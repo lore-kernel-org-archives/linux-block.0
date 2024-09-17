@@ -1,37 +1,70 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E225D8F0;
-	Tue, 17 Sep 2024 06:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9493B1A2;
+	Tue, 17 Sep 2024 06:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726554014; cv=none; b=g6m2AXPyuskgyBO0tzQi+ABt/mDG8m04IeKKipgXujERGjUVOonL9x70Wu+nqstOxFVesp51nxqT3B48Z/Kp2utz58XUhCnKWFqGBvBdumneNPwgFSidzu+i4BHe68INFtl5PAF9JbDLPtPWYmLEpr3F060TfR4OqUKy+ZlnkIg=
+	t=1726555139; cv=none; b=citjyUXYpWLO4JCCgzxJxwK2pdKxz2rIlsBzyOnhgUQCuzFHA6WfBS1YCWsgTbpY74/eI+eQTQ1N2fvYaXHnCD0jDftpZMmQJUdjTEXdGcZUtXJdub30eX+MkIQOML3ZN1jvjoXRmZYbdgnnF2e2ny4LG8e3E+tCJm1X9+Vz4Xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726554014; c=relaxed/simple;
-	bh=pFzT2ZqtUjl23iIZuzObb5iVFXkufhUazQnZ99FVJjU=;
+	s=arc-20240116; t=1726555139; c=relaxed/simple;
+	bh=XnDdcAYgUkXwdHYhr7LavMOrnmdRQitkG7WdHLSiYP4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R2yXDxU0UhCo5c+q0MCA8lZ+uw2XQwn4Gw1wvfYG7ISLMUrzA+/VyleIVJQak1Ojzg6exyrl4naEOGOuo+LlNYdEXivjhvwgaGcStjsTiEEIZE3x0pygsNJZuVUJvYvidnHigtS/TyMgqC7b+SyZQ8e294bwnWF1GN8Pq9tkLss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id C391B227ACB; Tue, 17 Sep 2024 08:20:07 +0200 (CEST)
-Date: Tue, 17 Sep 2024 08:20:07 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
-	sagi@grimberg.me, martin.petersen@oracle.com,
-	James.Bottomley@HansenPartnership.com, brauner@kernel.org,
-	viro@zeniv.linux.org.uk, jack@suse.cz, jaegeuk@kernel.org,
-	jlayton@kernel.org, chuck.lever@oracle.com, bvanassche@acm.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, gost.dev@samsung.com,
-	vishak.g@samsung.com, javier.gonz@samsung.com,
-	Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH v5 4/5] sd: limit to use write life hints
-Message-ID: <20240917062007.GA4170@lst.de>
-References: <20240910150200.6589-1-joshi.k@samsung.com> <CGME20240910151057epcas5p3369c6257a6f169b4caa6dd59548b538c@epcas5p3.samsung.com> <20240910150200.6589-5-joshi.k@samsung.com> <20240912130235.GB28535@lst.de> <e6ae5391-ae84-bae4-78ea-4983d04af69f@samsung.com> <20240913080659.GA30525@lst.de> <4a39215a-1b0e-3832-93bd-61e422705f8b@samsung.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pAYVNW4W+dLAsNT67agIDRPbngfowLQqHwSz6J6+rN72yf0CA/710EEmpFXFWNpCE63rxP8G3tWk/oPdSpO9KFjkxw0Se2MGcF9NagCHXagUDLJOq4NATvmo4oVxSWERscCYHiXfQRQ2z61OCQWGhm3nW/sf5ucnajrG2LYDgEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cueBtm+8; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cueBtm+8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726555136; x=1758091136;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XnDdcAYgUkXwdHYhr7LavMOrnmdRQitkG7WdHLSiYP4=;
+  b=cueBtm+8w5NSb6SKrpSH+ml+w8XmGq1tGP2K9ZDYK5cpIim8dcsBxo0C
+   grCqAh32HAqkZS6IA3uTJj4vc+3kJJmIldWM6v64xLij+cbt149ZjtgJh
+   VwCIAm3zh9tIloixffe6nGQPRduqK3kl7ctFXHWisCxwsgwYC0Txziymo
+   YJsM3QiNG2/ujoeiZ7n5VVcVYqHFsLBBYcwB31geKS1n+lkSynpo1B17v
+   d0R+yXH6ba9FTzybyu0BHsBxQRf+7Pv5toeu74XZ66wKYPi/p3/DmHFVm
+   To59bjvvX2fP4CeFPRlaeWaRMJU54VU0WRWMLFZH1D55DKUUaHgGfX78U
+   g==;
+X-CSE-ConnectionGUID: 0gK2a0a7Q4KbY5AMWt370A==
+X-CSE-MsgGUID: S6lqnWikR9qJQkuZuaUdRg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11197"; a="25555130"
+X-IronPort-AV: E=Sophos;i="6.10,234,1719903600"; 
+   d="scan'208";a="25555130"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 23:38:55 -0700
+X-CSE-ConnectionGUID: BfL39eQ1SDKBh37aW8qZcw==
+X-CSE-MsgGUID: cKKZaTReQmm5HK/CUj8/Rg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,234,1719903600"; 
+   d="scan'208";a="69321099"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 16 Sep 2024 23:38:50 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sqRrM-000ArC-0l;
+	Tue, 17 Sep 2024 06:38:48 +0000
+Date: Tue, 17 Sep 2024 14:38:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: Md Sadre Alam <quic_mdalam@quicinc.com>, axboe@kernel.dk,
+	song@kernel.org, yukuai3@huawei.com, agk@redhat.com,
+	snitzer@kernel.org, mpatocka@redhat.com, adrian.hunter@intel.com,
+	quic_asutoshd@quicinc.com, ritesh.list@gmail.com,
+	ulf.hansson@linaro.org, andersson@kernel.org,
+	konradybcio@kernel.org, kees@kernel.org, gustavoars@kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-raid@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-mmc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	quic_srichara@quicinc.com, quic_varada@quicinc.com,
+	quic_mdalam@quicinc.com
+Subject: Re: [PATCH v2 1/3] dm-inlinecrypt: Add inline encryption support
+Message-ID: <202409171440.qx2iOkY3-lkp@intel.com>
+References: <20240916085741.1636554-2-quic_mdalam@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,46 +73,156 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4a39215a-1b0e-3832-93bd-61e422705f8b@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20240916085741.1636554-2-quic_mdalam@quicinc.com>
 
-On Mon, Sep 16, 2024 at 07:19:21PM +0530, Kanchan Joshi wrote:
-> > Maybe part of the problem is that the API is very confusing.  A smal
-> > part of that is of course that the existing temperature hints already
-> > have some issues, but this seems to be taking them make it significantly
-> > worse.
-> 
-> Can you explain what part is confusing. This is a simple API that takes 
-> type/value pair. Two types (and respective values) are clearly defined 
-> currently, and more can be added in future.
+Hi Md,
 
-I though I outlined that below.
+kernel test robot noticed the following build warnings:
 
-> > But if we increase this to a variable number of hints that don't have
-> > any meaning (and even if that is just the rough order of the temperature
-> > hints assigned to them), that doesn't really work.  We'll need an API
-> > to check if these stream hints are supported and how many of them,
-> > otherwise the applications can't make any sensible use of them.
-> 
-> - Since writes are backward compatible, nothing bad happens if the 
-> passed placement-hint value is not supported. Maybe desired outcome (in 
-> terms of WAF reduction) may not come but that's not a kernel problem 
-> anyway. It's rather about how well application is segregating and how 
-> well device is doing its job.
+[auto build test WARNING on device-mapper-dm/for-next]
+[also build test WARNING on axboe-block/for-next linus/master song-md/md-next v6.11 next-20240916]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-What do you mean with "writes are backward compatible" ?
+url:    https://github.com/intel-lab-lkp/linux/commits/Md-Sadre-Alam/dm-inlinecrypt-Add-inline-encryption-support/20240916-170452
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git for-next
+patch link:    https://lore.kernel.org/r/20240916085741.1636554-2-quic_mdalam%40quicinc.com
+patch subject: [PATCH v2 1/3] dm-inlinecrypt: Add inline encryption support
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20240917/202409171440.qx2iOkY3-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240917/202409171440.qx2iOkY3-lkp@intel.com/reproduce)
 
-> - Device is perfectly happy to work with numbers (0 to 256 in current 
-> spec) to produce some value (i.e., WAF reduction). Any extra 
-> semantics/abstraction on these numbers only adds to the work without 
-> increasing that value. If any application needs that, it's free to 
-> attach any meaning/semantics to these numbers.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202409171440.qx2iOkY3-lkp@intel.com/
 
-If the device (or file system, which really needs to be in control
-for actual files vs just block devices) does not support all 256
-we need to reduce them to less than that.  The kernel can help with
-that a bit if the streams have meanings (collapsing temperature levels
-that are close), but not at all if they don't have meanings.  The
-application can and thus needs to know the number of separate
-streams available.
+All warnings (new ones prefixed by >>):
 
+>> drivers/md/dm-inline-crypt.c:198:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+     198 |         if ((sscanf(argv[2], "%llu%c", &tmpll, &dummy) != 1) ||
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     199 |             (tmpll & ((cc->sector_size >> SECTOR_SHIFT) - 1))) {
+         |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/md/dm-inline-crypt.c:250:9: note: uninitialized use occurs here
+     250 |         return ret;
+         |                ^~~
+   drivers/md/dm-inline-crypt.c:198:2: note: remove the 'if' if its condition is always false
+     198 |         if ((sscanf(argv[2], "%llu%c", &tmpll, &dummy) != 1) ||
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     199 |             (tmpll & ((cc->sector_size >> SECTOR_SHIFT) - 1))) {
+         |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     200 |                 ti->error = "Invalid iv_offset sector";
+         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     201 |                 goto bad;
+         |                 ~~~~~~~~~
+     202 |         }
+         |         ~
+>> drivers/md/dm-inline-crypt.c:198:6: warning: variable 'ret' is used uninitialized whenever '||' condition is true [-Wsometimes-uninitialized]
+     198 |         if ((sscanf(argv[2], "%llu%c", &tmpll, &dummy) != 1) ||
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/md/dm-inline-crypt.c:250:9: note: uninitialized use occurs here
+     250 |         return ret;
+         |                ^~~
+   drivers/md/dm-inline-crypt.c:198:6: note: remove the '||' if its condition is always false
+     198 |         if ((sscanf(argv[2], "%llu%c", &tmpll, &dummy) != 1) ||
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/md/dm-inline-crypt.c:178:9: note: initialize the variable 'ret' to silence this warning
+     178 |         int ret;
+         |                ^
+         |                 = 0
+   2 warnings generated.
+
+
+vim +198 drivers/md/dm-inline-crypt.c
+
+   168	
+   169	static int inlinecrypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+   170	{
+   171		struct inlinecrypt_config *cc;
+   172		char *cipher_api = NULL;
+   173		char *cipher, *chainmode;
+   174		unsigned long long tmpll;
+   175		char *ivmode;
+   176		int key_size;
+   177		char dummy;
+   178		int ret;
+   179	
+   180		if (argc < 5) {
+   181			ti->error = "Not enough arguments";
+   182			return -EINVAL;
+   183		}
+   184	
+   185		key_size = strlen(argv[1]) >> 1;
+   186	
+   187		cc = kzalloc(struct_size(cc, key, key_size), GFP_KERNEL);
+   188		if (!cc) {
+   189			ti->error = "Cannot allocate encryption context";
+   190			return -ENOMEM;
+   191		}
+   192		cc->key_size = key_size;
+   193		cc->sector_size = (1 << SECTOR_SHIFT);
+   194		cc->sector_shift = 0;
+   195	
+   196		ti->private = cc;
+   197	
+ > 198		if ((sscanf(argv[2], "%llu%c", &tmpll, &dummy) != 1) ||
+   199		    (tmpll & ((cc->sector_size >> SECTOR_SHIFT) - 1))) {
+   200			ti->error = "Invalid iv_offset sector";
+   201			goto bad;
+   202		}
+   203		cc->iv_offset = tmpll;
+   204	
+   205		ret = dm_get_device(ti, argv[3], dm_table_get_mode(ti->table),
+   206				    &cc->dev);
+   207		if (ret) {
+   208			ti->error = "Device lookup failed";
+   209			goto bad;
+   210		}
+   211	
+   212		ret = -EINVAL;
+   213		if (sscanf(argv[4], "%llu%c", &tmpll, &dummy) != 1 ||
+   214		    tmpll != (sector_t)tmpll) {
+   215			ti->error = "Invalid device sector";
+   216			goto bad;
+   217		}
+   218	
+   219		cc->start = tmpll;
+   220	
+   221		cipher = strsep(&argv[0], "-");
+   222		chainmode = strsep(&argv[0], "-");
+   223		ivmode = strsep(&argv[0], "-");
+   224	
+   225		cipher_api = kmalloc(CRYPTO_MAX_ALG_NAME, GFP_KERNEL);
+   226		if (!cipher_api)
+   227			goto bad;
+   228	
+   229		ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
+   230			       "%s(%s)", chainmode, cipher);
+   231		if (ret < 0 || ret >= CRYPTO_MAX_ALG_NAME) {
+   232			kfree(cipher_api);
+   233			ret = -ENOMEM;
+   234			goto bad;
+   235		}
+   236	
+   237		ret = crypt_select_inline_crypt_mode(ti, cipher_api, ivmode);
+   238	
+   239		/* Initialize and set key */
+   240		ret = inlinecrypt_set_key(cc, argv[1]);
+   241		if (ret < 0) {
+   242			ti->error = "Error decoding and setting key";
+   243			return ret;
+   244		}
+   245	
+   246		return 0;
+   247	bad:
+   248		ti->error = "Error in inlinecrypt mapping";
+   249		inlinecrypt_dtr(ti);
+   250		return ret;
+   251	}
+   252	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
