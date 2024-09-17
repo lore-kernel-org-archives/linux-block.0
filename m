@@ -1,103 +1,94 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295CB27442
-	for <linux-block@vger.kernel.org>; Tue, 17 Sep 2024 13:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7479E2905
+	for <linux-block@vger.kernel.org>; Tue, 17 Sep 2024 13:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726579164; cv=none; b=tVJdCWJ0ueS5RusCCq9qQfJDJkLYZZJTp34wLUYlW/Lso9OBWvn3bu5AjbpOnA2RuqGErwS0bXpdphfmT09sm29XUWiMGUweGmXbD2kbxnK0uXL4HQRExLglUzbe51kuijS78nZZ2bes3/1yLeeBlxul7x28QI1RRZRgpGzuaIo=
+	t=1726579954; cv=none; b=LUP7ztBIXdIJprnf7zA3GtCZslZ6/+3w0K9JfYQetlC5U+6UYYA8+q28OC1Ge8mCCVbo+qmDtwWqZvU1siQtEZAfAXmDn1UmibusDZecYwhbge/fZ1AgAlr5Y1VQ/rEzBP+FFdvEOMOjiAFq4MW8QhQtcEx2eZPHLQIYHH6ensw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726579164; c=relaxed/simple;
-	bh=xvzyl5Tii0TZ5qMfgT80igmAtogEy2vZ/X10F8N5HDY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jHq0TCEkOpstSSTnkgrdPW3J/RkIivOJ639N8GfFQypPD/5Ylez143RhLbaq/QniaV4CBbO/951zX7ycn3j5FnmMqGjJOeOV9JkGyDHA1KTXWVwzSwazHTLLUtOf5S22P/Adjrpk6FnMRp2ml4D9MdZXihOeMKldWn+izBMMlII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KrbY+wjD; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1726579954; c=relaxed/simple;
+	bh=W/priA7qZ9nOepOzunD2BNrBgpdAEFGb5SMud76cA8Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JMfnZgkFxOqtjeqL737HaGWoc3AEJiPs8GlsRpHYmSCERFTN+Yo+bNOiXoveuXTCaPpi8j+07Nm9sHfxEu81JGqrGmkytfZZg8RHC3vcqnb4W3vyI1hyXUsFJ37ijtvcjqeOae4NeOzaaHHUKwRyfAFV0DIx3sSxhC3kUOA0I5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uMJ8luWb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KrbY+wjD"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-374c180d123so2646235f8f.3
-        for <linux-block@vger.kernel.org>; Tue, 17 Sep 2024 06:19:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1726579160; x=1727183960; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=27jNzME+/7fttCtxjTnp0jfof/BjROPqxd8CF4lpuO8=;
-        b=KrbY+wjD94HI++WG7/D08IK8QyImiFQeO64ngARpGuIYJNNJwC5DO3sLCXgwyvHo+j
-         hjfMHrybIYoLPMHK0S9FrytoTBAWaUGejlayjqDTVcieaWGwSIk8YLy+NTSLYp7mh4UN
-         nNAq7e/7utYALxhxTGWVwBEjeeVv+fRcqVFY01N6EIvQ56oQ8VzdRvn/lgQKIsBVhPFl
-         lYrjOht8qC//PK8V+UE++hyd+p/folLvPmfXeQU/yKZoGUmKwPLGaauqKWMV3q1AkitL
-         1NKdQ3kYvE6P7q/Sw679hWYq3x2Cp47UpI207CYN3avRULHwBxW2FCA3ezGQwi49JqoY
-         1avg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726579160; x=1727183960;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=27jNzME+/7fttCtxjTnp0jfof/BjROPqxd8CF4lpuO8=;
-        b=dKLOMYTaCiiMJHQXxW+Z2K5xpmjOHhGtncsj5Cjwwi5Z33o7W6wVjPK+WWhnkwypAe
-         OO0OfOu0JDr0tlmjNe4cQ362pGJCnMtRyideYgTNNHq2ykPrDuDKcQBRYnwgvf29feKT
-         tLSGSFER9traR/tRxmjRqAGSBTC80npHkSoSYaD5eVcl0jKKPo0OBX6PVFYDUhCGyBxH
-         M/JE17PD9LD9x2MBfoOiLe7LkmoAPQCFRS36j4jtTL8ZOHI1a9HrfKBO+s/JzGm9GyS2
-         RflBhzYwvKh4TkoY3sEDkaxkTHdZ82PVGWfzw+24dyBYDXBPtRPL3s2F2rTQxROTuhzf
-         SITw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJaWMm1nuWFRrOapUOHY5MkI+8CSjJHjXG1H9pWUSOx/B1mmrfkvaGrs9sXiILiWmtXzjyA39qLE9Iag==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwK+UWs6HwgnOkSWfYzKKQP6LyXJ31UGaD2Wv+bq0Cxq/eKVfOt
-	YvmgzTPeyOcN1rxrvHBpmxABgTuso3T3jjkJOAOpSsuk0qVrjpcIUCeRcPRKvQE=
-X-Google-Smtp-Source: AGHT+IHu8f313IeBe0UZ5MIETHyTb4+67djwyZqabX9mkC2ANBI4B+suCOw/2HAhCZHM7utf7BPwCg==
-X-Received: by 2002:a5d:5f56:0:b0:374:ca16:e09b with SMTP id ffacd0b85a97d-378d61d5073mr10101968f8f.9.1726579160382;
-        Tue, 17 Sep 2024 06:19:20 -0700 (PDT)
-Received: from [10.130.5.220] ([83.68.141.146])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e7809e0fsm9535998f8f.110.2024.09.17.06.19.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2024 06:19:19 -0700 (PDT)
-Message-ID: <d22d787a-6810-4e2e-8807-4144efc220a7@kernel.dk>
-Date: Tue, 17 Sep 2024 07:19:18 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uMJ8luWb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89499C4CEC5;
+	Tue, 17 Sep 2024 13:32:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726579954;
+	bh=W/priA7qZ9nOepOzunD2BNrBgpdAEFGb5SMud76cA8Q=;
+	h=From:To:Cc:Subject:Date:From;
+	b=uMJ8luWb0FadBhEBBOLQCy7LotyBn+EPZF0JGGYgbB02laeANIUzibPYBB4cbLidY
+	 7N87l6NuqHv69OUV9pwYTQvDNUAljjiSHY6/v51/qeDqCnBF5P+mrKm46ZaoZiUjfI
+	 qiBw8R7HD756EilPSVvpvG1q2SFKwk7K5/DC3kIYL1L22MsBCVQmbIpSYlga0SYtga
+	 RwiGALx+vy/chP2pcsqlf5BmfaRkZA/2MDzHena8uic+VZEawnxUb64koyoAnV5FhZ
+	 jf2uG/+bCC+aR3vmJDSeBRq7iQ5i8q1Sw1hsGCz0J8VCP0ru0EfsZ8iUP97TDMpXN1
+	 YpxsqrvL7pJlg==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: "Richard W . M . Jones" <rjones@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jeff Moyer <jmoyer@redhat.com>,
+	Jiri Jaburek <jjaburek@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH v2] block: Fix elv_iosched_local_module handling of "none" scheduler
+Date: Tue, 17 Sep 2024 22:32:31 +0900
+Message-ID: <20240917133231.134806-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: Fix elv_iosched_local_module handling of "none"
- scheduler
-To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
- "Richard W . M . Jones" <rjones@redhat.com>, Jeff Moyer <jmoyer@redhat.com>,
- Jiri Jaburek <jjaburek@redhat.com>, Bart Van Assche <bvanassche@acm.org>,
- Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <20240917053258.128827-1-dlemoal@kernel.org>
- <20240917055331.GA2432@lst.de>
- <CAFj5m9JZe5g07YNVh6BL8ZixabRTrhx-AELxTxFNm9STM7gNzA@mail.gmail.com>
- <5ff26f49-dea6-4667-ae90-7b61908f67cf@kernel.org> <Zul97FvBsVuC1_h3@fedora>
- <20240917130518.GA32184@lst.de>
- <274ec9f3-b8b2-4a0a-bb13-f3705ddc349f@kernel.dk>
- <20240917131450.GA367@lst.de>
- <3a93a3ac-18d3-4031-ba16-ce172d10e7f4@kernel.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <3a93a3ac-18d3-4031-ba16-ce172d10e7f4@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 9/17/24 7:18 AM, Damien Le Moal wrote:
-> On 2024/09/17 15:14, Christoph Hellwig wrote:
->> On Tue, Sep 17, 2024 at 07:11:22AM -0600, Jens Axboe wrote:
->>> Whatever reshuffling people have in mind, that needs to happen AFTER
->>> this bug is sorted out.
->>
->> Yes.  The fix from Damien will work, but reverting to the old behavior
->> of ignoring the request_module return value feel much better.  I can
->> prepare a patch, but I didn't want to steal the credits from Damien.
->>
-> 
-> OK. I can send a v2 ignoring the request_module() result, as it was before.
+Commit 734e1a860312 ("block: Prevent deadlocks when switching
+elevators") introduced the function elv_iosched_load_module() to allow
+loading an elevator module outside of elv_iosched_store() with the
+target device queue not frozen, to avoid deadlocks. However, the "none"
+scheduler does not have a module and as a result,
+elv_iosched_load_module() always returns an error when trying to switch
+to this valid scheduler.
 
-Sounds good, let's do that.
+Fix this by ignoring the return value of the request_module() call
+done by elv_iosched_load_module(). This restores the behavior before
+commit 734e1a860312, which was to ignore the request_module() result and
+instead rely on elevator_change() to handle the "none" scheduler case.
 
+Reported-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Fixes: 734e1a860312 ("block: Prevent deadlocks when switching elevators")
+Cc: stable@vger.kernel.org
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+---
+Changes from v1:
+ - Switch to ignoring the return value of request_module() instead of
+   doing nothing if the scheduler name is "none".
+
+ block/elevator.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/block/elevator.c b/block/elevator.c
+index c355b55d0107..4122026b11f1 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -715,7 +715,9 @@ int elv_iosched_load_module(struct gendisk *disk, const char *buf,
+ 
+ 	strscpy(elevator_name, buf, sizeof(elevator_name));
+ 
+-	return request_module("%s-iosched", strstrip(elevator_name));
++	request_module("%s-iosched", strstrip(elevator_name));
++
++	return 0;
+ }
+ 
+ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
 -- 
-Jens Axboe
+2.46.0
 
