@@ -1,72 +1,72 @@
-Received: from mail-lf1-f100.google.com (mail-lf1-f100.google.com [209.85.167.100])
+Received: from mail-wr1-f98.google.com (mail-wr1-f98.google.com [209.85.221.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D094C7C
-	for <linux-block@vger.kernel.org>; Tue, 17 Sep 2024 00:26:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C800D2FA
+	for <linux-block@vger.kernel.org>; Tue, 17 Sep 2024 00:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726532771; cv=none; b=ofEOqTkYj7lDMUWuHcEN0f2KaoGmFVD6/jplcPtaBxKdCFHIKMrK2YZcJlsYa8tDjDZ5ZAau0TpTacgSz4Sej0x3NhqgPLa53sGU0RgQmcKpwxGA8flV6UB/+H4l/ZRkpyZmCuCMi63E7xIcHfExLAEREGijTTmgtWU3ShlROGc=
+	t=1726532974; cv=none; b=FJyrK/YnZDiQ13Xl3QbNBluuM/c7ctjWeq1Qw5OTdslilp6PoJ56+6pi8CKBHFr1nmRNfnzvBtkxVkn7z5iI04T79lND6UMnPj3gRj6B7rF8gBv3E6cSjJcuFWxE02Z5uaFyGSD2XXPDVQdRDUZlEWsz69pDg/2lH0ZJVAy8XAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726532771; c=relaxed/simple;
-	bh=psoVpQzJrBPVY0fYQAyJ99TpO5Nskyt6xZz6CZaMDgI=;
+	s=arc-20240116; t=1726532974; c=relaxed/simple;
+	bh=rZIUKdtXXUM4RQe9UE2317DuHDXoWVgSJvrTbGs76Ek=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ryOCYcdKTbZC4sHAnhSdcGVdJCeMXWxHAWdzroVoEpcBcREfHPoeNiwPX5mtl8GSYRPvIumVCQUKVuzeL7zFxXFbYI+s3F40vs6HhbYS8tTZ/AcKt3cQ6svKVYro4GLqXT3QCKzO9RphnLUIQzBs9udbIklHI06k+yZ46iZPbJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=JsN0Q0Wl; arc=none smtp.client-ip=209.85.167.100
+	 Content-Type:Content-Disposition:In-Reply-To; b=dIm1W0Dgm7BSg3ULDphtjh2zuOrUKrfaDIVdUA6zD+sV90CMxuSsgtv8lKQgPRBbcjTL4DgJOCxxFXMoZ6QTBTbaySwidNPSmWAJMpzYb07ujU+V3preTQGqPdqBIyKtE9q30BfFEb9H52+moB4FXBa2pw7rKW9UhRAYQFva6Nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=fQqgbBhW; arc=none smtp.client-ip=209.85.221.98
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="JsN0Q0Wl"
-Received: by mail-lf1-f100.google.com with SMTP id 2adb3069b0e04-5365d3f9d34so4146986e87.3
-        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2024 17:26:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="fQqgbBhW"
+Received: by mail-wr1-f98.google.com with SMTP id ffacd0b85a97d-374ca65cafdso2571874f8f.2
+        for <linux-block@vger.kernel.org>; Mon, 16 Sep 2024 17:29:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1726532766; x=1727137566; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1726532969; x=1727137769; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sJkeqOmLIp2YwPfiW45sQOEAdHiKn0a7hMa2yMqu3lo=;
-        b=JsN0Q0Wl+QHjAMT6e1KvPejMDD1SaHzx0q5jigiZflajkSWjqCzN98ZGpBztWrEHRj
-         XFfKDIWDcNIwGBCz/2w8Q9L5Q8PR4xuzs0ky30lsgdEJimv8yurvzmeubEdyJs9W9Us2
-         Y3eST3xKNPkg5dbIjfbrO9YrUOBTa4Wk6xd+Ro1/28bF6rhQ+Ln4sPZmUiLi9WfgThXs
-         GqHqbZYRVaMFSGKvabkXVNULbW3gpzhlHUj8tBC/yxiDe+nhC/zleeb/tzr1Dn8XXbVy
-         ak46eVqecRxIOxxU+Mm1tLLNY1TMhfyRvNk+rGQK4KL/hvzNlbHCmanxYSVEf8S981Wf
-         csIQ==
+        bh=UBk1QL4XfAb1rDUpGsJYWltghMq0wmKGOdrJxnMzsVs=;
+        b=fQqgbBhWnxcG9dTT+T79oj4nin20DOIXpN9Z2DBfC8u0L4NjkKUCTl5pQOvu0e9rJK
+         phb9ilLnFeymc5E5zGtcM7O2acp9eRKE7I1k5GXz/v6zjmR/wlncarCpVSf8kTLqjV1M
+         GWTp38RlbufUBodL7Li4/4yo2YqsnhPb1xI031qI56XPQ2JMsG/gbNjDEL5E3QsbxUPl
+         O8nOCZqllEMyM4uzWK+dZnxTVLZ0dDHuZg91qaDi1NFwb7RswH0kJl+Vn2TzqG8ieiul
+         V7HBNg+aW/25GH0esHWHaU51wDvIrDusdGhyi1Ot7LaelfjFukTFn16fpuKXnM9Fl5fL
+         Oc/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726532766; x=1727137566;
+        d=1e100.net; s=20230601; t=1726532969; x=1727137769;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sJkeqOmLIp2YwPfiW45sQOEAdHiKn0a7hMa2yMqu3lo=;
-        b=QZW7RF85Kn1ZPryYuJ6Vt9D8tn0QKOlY+l8ddGKb0iVfKvdl48k6PJx3Q9IDy5p39w
-         xS754JWbIclmkjfPYnLVfiWu6q/6gwAaZ7S6ekLK/O9weDk1j++sAHEXZKXZ+NXog02r
-         H5+xLPqDerEiNN9fJBVAVhaBlM3U9X/6ViMvJYDjjdtyzerS2aMNpL8qXvruhjA4hJ/S
-         lhZomwOslpKgKC224SI4c9zzrx8WLnOxcG+MZgQk9gbsI1/TU08UzArjHSP17i6MSL2a
-         VT+aLrrpKUh9349fnE8APiJsCLjaHnq5ro4D3aNTWfSbKID6zE2spTjpHtcaOqjfNzIp
-         GjHw==
-X-Forwarded-Encrypted: i=1; AJvYcCW1yr+lGu7jOtbCJyVyUipDuuW/jhNgOx5HNb5nUQqMxx7vLwmSsZR9lypDLfgJ//Wlrk04tkqqy2qi+A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5KV41BUIUXLIFR5SN5nRHWEp/DWk0LMHgMdRzoxevDIDuDL0q
-	hVAQ39e/uXoKfoCL+Ma2ra+VEBnqOxjJ14IuuzIgu89Rn8w74X6pAY0hu6bCXvt7ak44y/gyLmC
-	MiGJT3m/e+YRO1gquTPwrPv38a+t7cgkTCut4zliPAMy+su/N
-X-Google-Smtp-Source: AGHT+IEtmGTWHzIPRpxTZlEB76CHGzg9/6jk++SzbRLNHFu46m/c80qjy7UkT8k28+sEMShRN5smc/bz4Xdh
-X-Received: by 2002:a05:6512:114c:b0:533:4191:fa47 with SMTP id 2adb3069b0e04-5367ff24b46mr4929339e87.47.1726532765318;
-        Mon, 16 Sep 2024 17:26:05 -0700 (PDT)
+        bh=UBk1QL4XfAb1rDUpGsJYWltghMq0wmKGOdrJxnMzsVs=;
+        b=O3MLcF8+T8pdINrBYWRm8UgeuLipr9D8hldraow43xckO0w4J0bhSTdGoxBWpmd3Gz
+         r1puB0J9uhuNQVe7RziHM6oW/67ev/1OUKHQZm441oZ0+o0U28aA4s2dP0NbDVC0V7zh
+         0N4AWbzWjG03K4InjJJ62BH7NcZDtDVB6ZcLpxcMSsy3FCVEVsWR39lZr7LbKNyOjVYe
+         8Ux7pdwaRIlOGVnMNAIrg4H/g5kBpFLVk7mQOBSdkJTCgCOQWuHRztzCPCtwt3EAZ+3o
+         2Zv963qKpvB+aKVt8Vq3xwgNYtplHJanZFVK//3sOjQdhihiBu0DKuA+PKHGAdwBz6TE
+         PNng==
+X-Forwarded-Encrypted: i=1; AJvYcCXTkSgc5zhfrq3JvaHrpFDRXbToc1tTX5qQRnQN5aFMl9A8I18rZ5QxQy3tiLukIKLVzGPUijbSGJrKww==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyxl4DxE+KPwipUeoUYkJWSburEO8N9dqjwu/yhFjFX5Gfw6Vql
+	7R0NlTP/cJig33kpgp8YZO0NXKo/DjPahNl3POWUlIAD7RrJFZ5/uOZpWCv2LpcSrSqXRR98wEY
+	1Pi8ucVQby5c0dkihn04Sj+W+1iOfUq0Jy9IIuturp3CIuHp0
+X-Google-Smtp-Source: AGHT+IGCHp7sPpA2rRLpq2htJDHQMIzbQ5S0/AN0RDtBfo+EK/iBFDJEC3SRdA/EJn7BIyC8h9M9vA8mlI+Y
+X-Received: by 2002:adf:e3ca:0:b0:374:c847:859 with SMTP id ffacd0b85a97d-378d6253a74mr6261244f8f.54.1726532969085;
+        Mon, 16 Sep 2024 17:29:29 -0700 (PDT)
 Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 2adb3069b0e04-5368704bf9esm83720e87.53.2024.09.16.17.26.04
+        by smtp-relay.gmail.com with ESMTPS id ffacd0b85a97d-378e75f1d06sm271416f8f.53.2024.09.16.17.29.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Sep 2024 17:26:05 -0700 (PDT)
+        Mon, 16 Sep 2024 17:29:29 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 7872834028F;
-	Mon, 16 Sep 2024 18:26:03 -0600 (MDT)
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id DA44734028F;
+	Mon, 16 Sep 2024 18:29:27 -0600 (MDT)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 68727E40E56; Mon, 16 Sep 2024 18:26:03 -0600 (MDT)
-Date: Mon, 16 Sep 2024 18:26:03 -0600
+	id C8F6DE40E56; Mon, 16 Sep 2024 18:29:27 -0600 (MDT)
+Date: Mon, 16 Sep 2024 18:29:27 -0600
 From: Uday Shankar <ushankar@purestorage.com>
 To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/4] ublk: refactor recovery configuration flag helpers
-Message-ID: <ZujMm9RkQyNmqkwD@dev-ushankar.dev.purestorage.com>
+Subject: Re: [PATCH 4/4] ublk: support device recovery without I/O queueing
+Message-ID: <ZujNZ8FxtK2hqKQx@dev-ushankar.dev.purestorage.com>
 References: <20240617194451.435445-1-ushankar@purestorage.com>
- <20240617194451.435445-3-ushankar@purestorage.com>
- <ZoPf5L4oihlZJ1rW@fedora>
+ <20240617194451.435445-5-ushankar@purestorage.com>
+ <ZoQEmCuPIq0thaON@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,26 +75,57 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZoPf5L4oihlZJ1rW@fedora>
+In-Reply-To: <ZoQEmCuPIq0thaON@fedora>
 
-On Tue, Jul 02, 2024 at 07:09:24PM +0800, Ming Lei wrote:
-> I feel the name of ublk_nosrv_should_queue_io() is a bit misleading.
+On Tue, Jul 02, 2024 at 09:46:00PM +0800, Ming Lei wrote:
+> I'd suggest to add one per-ublk-queue flag for this purpose instead of
+> device state, then fetching device can be avoided in fast io path, please see
+> similar example of `->force_abort`.
+
+Done in v2.
+
+> >  	/* fill iod to slot in io cmd buffer */
+> >  	res = ublk_setup_iod(ubq, rq);
+> >  	if (unlikely(res != BLK_STS_OK))
+> > @@ -1602,7 +1616,15 @@ static void ublk_nosrv_work(struct work_struct *work)
+> >  	mutex_lock(&ub->mutex);
+> >  	if (ub->dev_info.state != UBLK_S_DEV_LIVE)
+> >  		goto unlock;
+> > -	__ublk_quiesce_dev(ub);
+> > +
+> > +	if (ublk_nosrv_should_queue_io(ub)) {
 > 
-> The difference between ublk_queue_can_use_recovery() and
-> ublk_queue_can_use_recovery_reissue() is clear, and
-> both two need to queue ios actually in case of nosrv most times
-> except for this one.
+> Here ublk_nosrv_should_queue_io() doesn't cover UBLK_F_USER_RECOVERY_REISSUE.
 
-Well yeah, this refactoring is all to set up for the final patch in this
-series. Taken in isolation, it might appear pointless.
+Not sure what you mean here. I don't see an issue, can you explain?
 
-I'm open to suggestions for better names if you have them.
+> 
+> > +		__ublk_quiesce_dev(ub);
+> > +	} else {
+> > +		blk_mq_quiesce_queue(ub->ub_disk->queue);
+> > +		ub->dev_info.state = UBLK_S_DEV_FAIL_IO;
+> > +		blk_mq_unquiesce_queue(ub->ub_disk->queue);
+> > +	}
+> 
+> If the above extra device state is saved, the whole change can be simplified,
+> and __ublk_quiesce_dev() still can be called for
+> UBLK_F_USER_RECOVERY_NOQUEUE, and UBLK_S_DEV_QUIESCED can cover this new flag,
+> meantime setting one per-ublk-queue flag, such as, ->fail_io_in_recovery.
 
-> I'd rather to not fetch ublk_device in fast io path since ublk is MQ
-> device, and only the queue structure should be touched in fast io path,
-> but it is fine to check device in any slow path.
+I don't think it's a good idea to have the state UBLK_S_DEV_QUIESCED
+cover the new flag. Then we will have a case where the state is
+UBLK_S_DEV_QUIESCED but the queue is not actually quiesced... that just
+seems confusing. I added a per-queue flag and used it in the fast path,
+but kept the new state as well.
 
-Added a helper which checks the queue-local copy of the device flags,
-and used it in ublk_queue_rq in v2. Sorry for the delay; please take a
-look.
+> > +/*
+> > + * - Block devices are recoverable if ublk server exits and restarts
+> > + * - Outstanding I/O when ublk server exits is met with errors
+> > + * - I/O issued while there is no ublk server is met with errors
+> > + */
+> > +#define UBLK_F_USER_RECOVERY_NOQUEUE (1ULL << 9)
+> 
+> Maybe UBLK_F_USER_RECOVERY_FAIL_IO is more readable?
+
+Sure, changed the name.
 
