@@ -1,228 +1,106 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9493B1A2;
-	Tue, 17 Sep 2024 06:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C610818C22;
+	Tue, 17 Sep 2024 07:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726555139; cv=none; b=citjyUXYpWLO4JCCgzxJxwK2pdKxz2rIlsBzyOnhgUQCuzFHA6WfBS1YCWsgTbpY74/eI+eQTQ1N2fvYaXHnCD0jDftpZMmQJUdjTEXdGcZUtXJdub30eX+MkIQOML3ZN1jvjoXRmZYbdgnnF2e2ny4LG8e3E+tCJm1X9+Vz4Xo=
+	t=1726556995; cv=none; b=Wd9H5Z5CuGd+/eomZG9HJustRxI5n4p9c+/Td+6Xigab+aJWVDOOwYkulZpexvLe0KwkH3jXQi4CIUR+ssL/3pcw7fPUQYP8YAyryzqSfACo2gqnNbBHkpT0k+YexbzItAl/e4jbBvMf/8E5vLh2WV+VJLT+8P6OryiILxN0EvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726555139; c=relaxed/simple;
-	bh=XnDdcAYgUkXwdHYhr7LavMOrnmdRQitkG7WdHLSiYP4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pAYVNW4W+dLAsNT67agIDRPbngfowLQqHwSz6J6+rN72yf0CA/710EEmpFXFWNpCE63rxP8G3tWk/oPdSpO9KFjkxw0Se2MGcF9NagCHXagUDLJOq4NATvmo4oVxSWERscCYHiXfQRQ2z61OCQWGhm3nW/sf5ucnajrG2LYDgEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cueBtm+8; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1726556995; c=relaxed/simple;
+	bh=QP5z3YpQ64vercqehKu18xDUR8Ghf0PcF4X/8nrkZms=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UW3Kfm+nw+3S12LzsGg1h+4k3yg0nW93M4WrlqQ6USJJOS7GNUix4aGywP6AMCjM0hpmvHu1kChKPa9D7ZU2WD3q2O349fxBp5BW6p9PQ2dvsmV8inxcLDX0UlfFIb59HwymC+FpNbOKO4w/Gm8TB2m9hAITpXsT4rST8/aIF20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=W1NLbyAo; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cueBtm+8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726555136; x=1758091136;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XnDdcAYgUkXwdHYhr7LavMOrnmdRQitkG7WdHLSiYP4=;
-  b=cueBtm+8w5NSb6SKrpSH+ml+w8XmGq1tGP2K9ZDYK5cpIim8dcsBxo0C
-   grCqAh32HAqkZS6IA3uTJj4vc+3kJJmIldWM6v64xLij+cbt149ZjtgJh
-   VwCIAm3zh9tIloixffe6nGQPRduqK3kl7ctFXHWisCxwsgwYC0Txziymo
-   YJsM3QiNG2/ujoeiZ7n5VVcVYqHFsLBBYcwB31geKS1n+lkSynpo1B17v
-   d0R+yXH6ba9FTzybyu0BHsBxQRf+7Pv5toeu74XZ66wKYPi/p3/DmHFVm
-   To59bjvvX2fP4CeFPRlaeWaRMJU54VU0WRWMLFZH1D55DKUUaHgGfX78U
-   g==;
-X-CSE-ConnectionGUID: 0gK2a0a7Q4KbY5AMWt370A==
-X-CSE-MsgGUID: S6lqnWikR9qJQkuZuaUdRg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11197"; a="25555130"
-X-IronPort-AV: E=Sophos;i="6.10,234,1719903600"; 
-   d="scan'208";a="25555130"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 23:38:55 -0700
-X-CSE-ConnectionGUID: BfL39eQ1SDKBh37aW8qZcw==
-X-CSE-MsgGUID: cKKZaTReQmm5HK/CUj8/Rg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,234,1719903600"; 
-   d="scan'208";a="69321099"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 16 Sep 2024 23:38:50 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sqRrM-000ArC-0l;
-	Tue, 17 Sep 2024 06:38:48 +0000
-Date: Tue, 17 Sep 2024 14:38:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Md Sadre Alam <quic_mdalam@quicinc.com>, axboe@kernel.dk,
-	song@kernel.org, yukuai3@huawei.com, agk@redhat.com,
-	snitzer@kernel.org, mpatocka@redhat.com, adrian.hunter@intel.com,
-	quic_asutoshd@quicinc.com, ritesh.list@gmail.com,
-	ulf.hansson@linaro.org, andersson@kernel.org,
-	konradybcio@kernel.org, kees@kernel.org, gustavoars@kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-mmc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	quic_srichara@quicinc.com, quic_varada@quicinc.com,
-	quic_mdalam@quicinc.com
-Subject: Re: [PATCH v2 1/3] dm-inlinecrypt: Add inline encryption support
-Message-ID: <202409171440.qx2iOkY3-lkp@intel.com>
-References: <20240916085741.1636554-2-quic_mdalam@quicinc.com>
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="W1NLbyAo"
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id 3D5B8100002;
+	Tue, 17 Sep 2024 10:09:32 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1726556972; bh=2uWqrevBYsQgvajuGiIozG7sst/1v+BZ6EvKtuKwz+8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=W1NLbyAoBZNeoTILFieA4L059ydXzmCxaSYzoFXiH0QVaQNe9o/n4jEi81nvvUb4o
+	 H707PmqEFlJseXu8KsSnnEBvSIfXLnJhCcAJ4LsfYVch75TYSi9eb5k1oJUwQTunbG
+	 pSVM3jTeY0hJr+UXYsaBvoMrOhfJXN5sqcWuqjI5cG32yIlAe909a3sKwsyCR+VQz+
+	 rdz/XhB405NGhV6rtI276RPGeTXyPec0qKjSFq80yEe1WZk7SDPyvexGHxfbe/JUC8
+	 qdmOjns+fmbOgkeQpb+hpQ8Roa4Nfbf5pG5IRvs4EhQMtZKJgYQ+9EMTC4h2t9n4ML
+	 7bV77vJ0bZHEw==
+Received: from mx1.t-argos.ru.ru (mail.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Tue, 17 Sep 2024 10:08:09 +0300 (MSK)
+Received: from Comp.ta.t-argos.ru (172.17.44.124) by ta-mail-02
+ (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 17 Sep
+ 2024 10:07:48 +0300
+From: Aleksandr Mishin <amishin@t-argos.ru>
+To: Shaohua Li <shli@fb.com>
+CC: Aleksandr Mishin <amishin@t-argos.ru>, Jens Axboe <axboe@kernel.dk>,
+	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>, Johannes
+ Thumshirn <johannes.thumshirn@wdc.com>, Chaitanya Kulkarni <kch@nvidia.com>,
+	Zhu Yanjun <yanjun.zhu@linux.dev>, Chengming Zhou
+	<zhouchengming@bytedance.com>, John Garry <john.g.garry@oracle.com>, Yu Kuai
+	<yukuai3@huawei.com>, Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH] nullb: Adjust device size calculation in null_alloc_dev()
+Date: Tue, 17 Sep 2024 10:07:29 +0300
+Message-ID: <20240917070729.15752-1-amishin@t-argos.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240916085741.1636554-2-quic_mdalam@quicinc.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 187786 [Sep 17 2024]
+X-KSMG-AntiSpam-Version: 6.1.1.5
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 34 0.3.34 8a1fac695d5606478feba790382a59668a4f0039, {Tracking_from_domain_doesnt_match_to}, t-argos.ru:7.1.1;mx1.t-argos.ru.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/09/17 06:34:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/09/17 06:27:00 #26601446
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Hi Md,
+In null_alloc_dev() device size is a subject to overflow because 'g_gb'
+(which is module parameter, may have any value and is not validated
+anywhere) is not cast to a larger data type before performing arithmetic.
 
-kernel test robot noticed the following build warnings:
+Cast 'g_gb' to unsigned long to prevent overflow.
 
-[auto build test WARNING on device-mapper-dm/for-next]
-[also build test WARNING on axboe-block/for-next linus/master song-md/md-next v6.11 next-20240916]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Md-Sadre-Alam/dm-inlinecrypt-Add-inline-encryption-support/20240916-170452
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git for-next
-patch link:    https://lore.kernel.org/r/20240916085741.1636554-2-quic_mdalam%40quicinc.com
-patch subject: [PATCH v2 1/3] dm-inlinecrypt: Add inline encryption support
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20240917/202409171440.qx2iOkY3-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240917/202409171440.qx2iOkY3-lkp@intel.com/reproduce)
+Fixes: 2984c8684f96 ("nullb: factor disk parameters")
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+---
+ drivers/block/null_blk/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409171440.qx2iOkY3-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/md/dm-inline-crypt.c:198:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-     198 |         if ((sscanf(argv[2], "%llu%c", &tmpll, &dummy) != 1) ||
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     199 |             (tmpll & ((cc->sector_size >> SECTOR_SHIFT) - 1))) {
-         |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/md/dm-inline-crypt.c:250:9: note: uninitialized use occurs here
-     250 |         return ret;
-         |                ^~~
-   drivers/md/dm-inline-crypt.c:198:2: note: remove the 'if' if its condition is always false
-     198 |         if ((sscanf(argv[2], "%llu%c", &tmpll, &dummy) != 1) ||
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     199 |             (tmpll & ((cc->sector_size >> SECTOR_SHIFT) - 1))) {
-         |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     200 |                 ti->error = "Invalid iv_offset sector";
-         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     201 |                 goto bad;
-         |                 ~~~~~~~~~
-     202 |         }
-         |         ~
->> drivers/md/dm-inline-crypt.c:198:6: warning: variable 'ret' is used uninitialized whenever '||' condition is true [-Wsometimes-uninitialized]
-     198 |         if ((sscanf(argv[2], "%llu%c", &tmpll, &dummy) != 1) ||
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/md/dm-inline-crypt.c:250:9: note: uninitialized use occurs here
-     250 |         return ret;
-         |                ^~~
-   drivers/md/dm-inline-crypt.c:198:6: note: remove the '||' if its condition is always false
-     198 |         if ((sscanf(argv[2], "%llu%c", &tmpll, &dummy) != 1) ||
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/md/dm-inline-crypt.c:178:9: note: initialize the variable 'ret' to silence this warning
-     178 |         int ret;
-         |                ^
-         |                 = 0
-   2 warnings generated.
-
-
-vim +198 drivers/md/dm-inline-crypt.c
-
-   168	
-   169	static int inlinecrypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
-   170	{
-   171		struct inlinecrypt_config *cc;
-   172		char *cipher_api = NULL;
-   173		char *cipher, *chainmode;
-   174		unsigned long long tmpll;
-   175		char *ivmode;
-   176		int key_size;
-   177		char dummy;
-   178		int ret;
-   179	
-   180		if (argc < 5) {
-   181			ti->error = "Not enough arguments";
-   182			return -EINVAL;
-   183		}
-   184	
-   185		key_size = strlen(argv[1]) >> 1;
-   186	
-   187		cc = kzalloc(struct_size(cc, key, key_size), GFP_KERNEL);
-   188		if (!cc) {
-   189			ti->error = "Cannot allocate encryption context";
-   190			return -ENOMEM;
-   191		}
-   192		cc->key_size = key_size;
-   193		cc->sector_size = (1 << SECTOR_SHIFT);
-   194		cc->sector_shift = 0;
-   195	
-   196		ti->private = cc;
-   197	
- > 198		if ((sscanf(argv[2], "%llu%c", &tmpll, &dummy) != 1) ||
-   199		    (tmpll & ((cc->sector_size >> SECTOR_SHIFT) - 1))) {
-   200			ti->error = "Invalid iv_offset sector";
-   201			goto bad;
-   202		}
-   203		cc->iv_offset = tmpll;
-   204	
-   205		ret = dm_get_device(ti, argv[3], dm_table_get_mode(ti->table),
-   206				    &cc->dev);
-   207		if (ret) {
-   208			ti->error = "Device lookup failed";
-   209			goto bad;
-   210		}
-   211	
-   212		ret = -EINVAL;
-   213		if (sscanf(argv[4], "%llu%c", &tmpll, &dummy) != 1 ||
-   214		    tmpll != (sector_t)tmpll) {
-   215			ti->error = "Invalid device sector";
-   216			goto bad;
-   217		}
-   218	
-   219		cc->start = tmpll;
-   220	
-   221		cipher = strsep(&argv[0], "-");
-   222		chainmode = strsep(&argv[0], "-");
-   223		ivmode = strsep(&argv[0], "-");
-   224	
-   225		cipher_api = kmalloc(CRYPTO_MAX_ALG_NAME, GFP_KERNEL);
-   226		if (!cipher_api)
-   227			goto bad;
-   228	
-   229		ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
-   230			       "%s(%s)", chainmode, cipher);
-   231		if (ret < 0 || ret >= CRYPTO_MAX_ALG_NAME) {
-   232			kfree(cipher_api);
-   233			ret = -ENOMEM;
-   234			goto bad;
-   235		}
-   236	
-   237		ret = crypt_select_inline_crypt_mode(ti, cipher_api, ivmode);
-   238	
-   239		/* Initialize and set key */
-   240		ret = inlinecrypt_set_key(cc, argv[1]);
-   241		if (ret < 0) {
-   242			ti->error = "Error decoding and setting key";
-   243			return ret;
-   244		}
-   245	
-   246		return 0;
-   247	bad:
-   248		ti->error = "Error in inlinecrypt mapping";
-   249		inlinecrypt_dtr(ti);
-   250		return ret;
-   251	}
-   252	
-
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 2f0431e42c49..5edbf9c0aceb 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -762,7 +762,7 @@ static struct nullb_device *null_alloc_dev(void)
+ 		return NULL;
+ 	}
+ 
+-	dev->size = g_gb * 1024;
++	dev->size = (unsigned long)g_gb * 1024;
+ 	dev->completion_nsec = g_completion_nsec;
+ 	dev->submit_queues = g_submit_queues;
+ 	dev->prev_submit_queues = g_submit_queues;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.30.2
+
