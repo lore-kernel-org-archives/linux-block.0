@@ -1,83 +1,80 @@
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8BF17920E
-	for <linux-block@vger.kernel.org>; Wed, 18 Sep 2024 09:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D35179654
+	for <linux-block@vger.kernel.org>; Wed, 18 Sep 2024 10:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726653438; cv=none; b=Bui+9/2o0mW1v7st/mocLnlVH9eE2I5f+Pr2250N5DJ7Z6jndOj56vG8LdnYoJO84m+kGU6GA9fVIBOezDwvdy5F4c4onq3h//BGhIp7jdTkHGCvqNrPjKraX8Iw77FL4zIRd49pmWsjO1TCgM0GcYkWUtX0KI+rQCqfLtq0Ndw=
+	t=1726654632; cv=none; b=fIoh03ztPod7uQSL6Wbr2ob769EiVyZYjPBrbJuX/HfAtieFW/Cv3/z21Dj+uTs3/MxfeUYBVIq9TLLntwo7Cy8nYZwFnQ9EuI4IvGASlQqXFh8V679WvFTVX9Hn5fy4AMCSHmune0PDmSlqpwGAzLVqhvofH5+csygis8KXPaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726653438; c=relaxed/simple;
-	bh=aEqJqQ0vfTH55PbtK6DICNgoEj/MVMbz7QyQlBQBPKg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uQ4xfuNsF6GFbDNTdiUIL6agY4SxbH7APyOYxFoKNe9q69gdHo0cOXAKKAJHTv6WAY2aQ9hIgpW0Uk57olO0BpDB7SKKFu9rxLPS/2LeeapnevRC/iGDlR5JxY0fQCdUecUzFcJbCCH/UxtpPQ9d4WChy4BlMGepsSrkI03h2ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=pWjsrlsV; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	s=arc-20240116; t=1726654632; c=relaxed/simple;
+	bh=+tpJnY909VM1M+m1CMhX0xl6c3hIZ9gIwNHSsoAD8J4=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=n+WxgAsHFwQuf8xgUEYbY8YZ5Yo4TbW1uf874EE0KXRKS229AyRRhztMaopcxUWTJbc+AoUqaU+A5cvAeWUsMoskkhL6Tpwd0PZPL9jDagG46JP51sDZjP1rRzl7L8VXBpZjPZ+4V089kHMNtwaq+VaWS1XS4ExVu9Crob+L2to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=g/0RNlEh; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="pWjsrlsV"
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e1ce8a675f7so5698111276.3
-        for <linux-block@vger.kernel.org>; Wed, 18 Sep 2024 02:57:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="g/0RNlEh"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-374c6187b6eso4833190f8f.0
+        for <linux-block@vger.kernel.org>; Wed, 18 Sep 2024 03:17:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1726653434; x=1727258234; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1726654628; x=1727259428; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KIx4pdRT/KSGss++ze3hxTvzw9zHVXZXZfsOwRj2D3Y=;
-        b=pWjsrlsVcXWVVoMWDu4OlsK82ij14Xjz6KR6kLzYE6CLGE480rv+DvQd6Iqf7L29KC
-         28gjeaPgHSSXn6WPpuH7ZDuYCZkbK1dUkTe6e8CgR3OmrtwBILqRPdfHOnckchevvyOc
-         p+s/3nx5B2QTIowzNX4OuUX0S/D4KVt3jU/3LFJ8wJs0BeANr65l8EsmqKHRgf4xWSw7
-         WbnoYQZoDcVlcsaWl9tkyBcoZUFcI8O2l434GqknSfKHUg2Cj8MFjiTALahIQt4VMAJO
-         3/bigMpUNakJVJFU2arqJ28ZHCb8oy68gPcBlF/uvzFGenAoeQJtJtXKGVaORVQ95fqH
-         57cA==
+        bh=9xmRlfgY58bu3lgrbHWfq1PnhjWfcGquoMknYxltLHw=;
+        b=g/0RNlEhZ8yqQd2ys9yx4Rbl/rjCpXGI0ubNLOYG6dPrAmwB34cNeVodCV2XkAvBhj
+         2b6D3UZVaihlE6VmUQsDWPPKQklE/zTCdJuZZEUkz756pmoxio3ugq8AsZL4BCR2jyxI
+         2mNAzCJo2Qa+kiIFIqNBpk4fN1YV33iumDo8jVe3Kwb6kH6ctvGn0w6QZv4Qzh5CfCgf
+         AdHCXa9zEs3/3iZ3TEPsN8NH/bzgd/0gamP8W7xlbeSzvdf1D+CiJFS8MeV591McvmVi
+         sc6WCOvaQ4Fr6M6xO0Kbp4ovTzlIc7N/0NbFWycbqTl5ea7E1epqYzpOhHbiLieuP0CW
+         +vyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726653434; x=1727258234;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1726654628; x=1727259428;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KIx4pdRT/KSGss++ze3hxTvzw9zHVXZXZfsOwRj2D3Y=;
-        b=fa8we1IAfeQn3rIZeTGz6gY4eGrE24Mdp3YdQL+gMpMGTSvVgarUbCjr4Uzbgrc7qP
-         bfyV5cK702eXmWl5PJyJYmLkFGfIh7MysnbBawA0BbuNa5ngr19QJNeTN2pZ3rmMDoBK
-         cO+6J4yNbi4i8dXYLA+PMk8+jQ4lf3zllM7XqTOohYj8eEXkFcbkAIXAam3NwhTS8p5w
-         /frQQD6ymJ4DruwYvx5yAL/DDi+gKZjYBVdPRv3VaQrYFwRxTIGnjRA8xog/7ax+kE/Z
-         a0LvzMeVlrjHSV66zv426dA1Wh0OoneKpMl8FywZd0Jzom8Xeva6MyjDtW7GISn82Afn
-         JoDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWQkQbLhDzyYwm+lrXaZ8bGSGtXGu126fRuHEVji/0V9Rdl1AqErx1cvxv/arq11+S7n5ukWtGHbGixOw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7RI3KQU9HeFDYO0In6nGPVDhE+Fkb4UfDm4KNTSdSfDsS5qNV
-	wKNuaHirGZAmH1gtUIypkkc/2yv2R8p7AF+Fdd4AzZbF4/8lhYYENK38VZFc4gCO9gU14VMnHmb
-	ZT0l/Qr586FiWB0aOU92fltycES8Gh7SMn/UttA==
-X-Google-Smtp-Source: AGHT+IHKpu7IV4bd4CPt8Iw9ri5vOZYDoXO50FkG8TLq2+PTVeUoLayDJEH63zGUtyeaY5AvRD4j8/cMEDxNpzcidho=
-X-Received: by 2002:a05:6902:200c:b0:e0e:cd17:610a with SMTP id
- 3f1490d57ef6-e1d9db98c4fmr19075343276.6.1726653434435; Wed, 18 Sep 2024
- 02:57:14 -0700 (PDT)
+        bh=9xmRlfgY58bu3lgrbHWfq1PnhjWfcGquoMknYxltLHw=;
+        b=X21BqNNVxfLIyufaRl3Ln5Gx7roJymTjkbuQiCDeD2wk4wC33DTHIWDTaEJZxmWoRc
+         f25Ylw0iQnxol6GTBX7QPssWPpiUNfV/dy1IfIElYHrbm+ZhdNg7rhAEaGYOwq1doJoi
+         a8U237chXbenR4dd+BI/DZlpQkRjcmgKSAYMCGPfOeaIDzkJO/ESkzV0riF4CbhYO1C9
+         +Hx0JfNR8Na7i9TKCBrswKqNV6tjM/Jo8KAd56oKgfPcWIQGNvVAbFF6ZwlbDGNxosAU
+         IVZvaPhvi5/co+nLozSjZ6OEhEp8qs85TzLxviBjdmbf3keBalQZoAvP0I4pt3+TR8CS
+         c9jA==
+X-Forwarded-Encrypted: i=1; AJvYcCW4o0EYK0wsbtvmWKWklP03HBHsjxt4EFD4tD5aCRNLfddIBZTIM0dfBKH8dL63tFkcreyqThlD0cQpWw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywn9utNOOhac4dyFVL2XsN9pNMQE4ArDW5riGpabbWNd7q7iSr+
+	El2YRt4GNoRzrRTMzukrgIe9ZmKW/8lyL9JK3koO4jXrjN4EgBJp+U6PkW8ut0I=
+X-Google-Smtp-Source: AGHT+IEt+88MOqjxAvT4BA2X407wtBcTy4RsMgu6zlhxdOqsfDfTg/sRarmUG6UIBwTVkHUeUeJlPg==
+X-Received: by 2002:a05:6000:128c:b0:374:cd3e:7d98 with SMTP id ffacd0b85a97d-378c2d062fcmr12084591f8f.19.1726654627726;
+        Wed, 18 Sep 2024 03:17:07 -0700 (PDT)
+Received: from [127.0.0.1] ([185.44.53.103])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e73e7feesm11837758f8f.29.2024.09.18.03.17.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Sep 2024 03:17:07 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: philipp.reisner@linbit.com, lars.ellenberg@linbit.com, 
+ christoph.boehmwalder@linbit.com, Qiu-ji Chen <chenqiuji666@gmail.com>
+Cc: drbd-dev@lists.linbit.com, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, baijiaju1990@gmail.com, 
+ stable@vger.kernel.org
+In-Reply-To: <20240913083504.10549-1-chenqiuji666@gmail.com>
+References: <20240913083504.10549-1-chenqiuji666@gmail.com>
+Subject: Re: [PATCH] drbd: Fix atomicity violation in drbd_uuid_set_bm()
+Message-Id: <172665462666.8208.13856585668352326031.b4-ty@kernel.dk>
+Date: Wed, 18 Sep 2024 04:17:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240913083504.10549-1-chenqiuji666@gmail.com>
-In-Reply-To: <20240913083504.10549-1-chenqiuji666@gmail.com>
-From: Philipp Reisner <philipp.reisner@linbit.com>
-Date: Wed, 18 Sep 2024 11:57:03 +0200
-Message-ID: <CADGDV=Vhx79JmTSzSJ+KN_236vKD0mZD6u3_23WRmte2wXW3fg@mail.gmail.com>
-Subject: Re: [PATCH] drbd: Fix atomicity violation in drbd_uuid_set_bm()
-To: Qiu-ji Chen <chenqiuji666@gmail.com>
-Cc: lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com, 
-	axboe@kernel.dk, drbd-dev@lists.linbit.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, baijiaju1990@gmail.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2-dev-648c7
 
-Hello Qiu-ji Chen,
 
-The code change looks okay to me.
-
-Reviewed-by: Philipp Reisner <philipp.reisner@linbit.com>
-
-On Fri, Sep 13, 2024 at 10:35=E2=80=AFAM Qiu-ji Chen <chenqiuji666@gmail.co=
-m> wrote:
->
+On Fri, 13 Sep 2024 16:35:04 +0800, Qiu-ji Chen wrote:
 > The violation of atomicity occurs when the drbd_uuid_set_bm function is
 > executed simultaneously with modifying the value of
 > device->ldev->md.uuid[UI_BITMAP]. Consider a scenario where, while
@@ -86,52 +83,17 @@ m> wrote:
 > zero. In this case, the check in drbd_uuid_set_bm might refer to the old
 > value of device->ldev->md.uuid[UI_BITMAP] (before locking), which allows
 > an invalid value to pass the validity check, resulting in inconsistency.
->
-> To address this issue, it is recommended to include the data validity che=
-ck
-> within the locked section of the function. This modification ensures that
-> the value of device->ldev->md.uuid[UI_BITMAP] does not change during the
-> validation process, thereby maintaining its integrity.
->
-> This possible bug is found by an experimental static analysis tool
-> developed by our team. This tool analyzes the locking APIs to extract
-> function pairs that can be concurrently executed, and then analyzes the
-> instructions in the paired functions to identify possible concurrency bug=
-s
-> including data races and atomicity violations.
->
-> Fixes: 9f2247bb9b75 ("drbd: Protect accesses to the uuid set with a spinl=
-ock")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Qiu-ji Chen <chenqiuji666@gmail.com>
-> ---
->  drivers/block/drbd/drbd_main.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_mai=
-n.c
-> index a9e49b212341..abafc4edf9ed 100644
-> --- a/drivers/block/drbd/drbd_main.c
-> +++ b/drivers/block/drbd/drbd_main.c
-> @@ -3399,10 +3399,12 @@ void drbd_uuid_new_current(struct drbd_device *de=
-vice) __must_hold(local)
->  void drbd_uuid_set_bm(struct drbd_device *device, u64 val) __must_hold(l=
-ocal)
->  {
->         unsigned long flags;
-> -       if (device->ldev->md.uuid[UI_BITMAP] =3D=3D 0 && val =3D=3D 0)
-> +       spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
-> +       if (device->ldev->md.uuid[UI_BITMAP] =3D=3D 0 && val =3D=3D 0) {
-> +               spin_unlock_irqrestore(&device->ldev->md.uuid_lock, flags=
-);
->                 return;
-> +       }
->
-> -       spin_lock_irqsave(&device->ldev->md.uuid_lock, flags);
->         if (val =3D=3D 0) {
->                 drbd_uuid_move_history(device);
->                 device->ldev->md.uuid[UI_HISTORY_START] =3D device->ldev-=
->md.uuid[UI_BITMAP];
-> --
-> 2.34.1
->
+> 
+> [...]
+
+Applied, thanks!
+
+[1/1] drbd: Fix atomicity violation in drbd_uuid_set_bm()
+      commit: 2f02b5af3a4482b216e6a466edecf6ba8450fa45
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
