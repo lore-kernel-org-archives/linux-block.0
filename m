@@ -1,131 +1,93 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E020847C;
-	Fri, 20 Sep 2024 00:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A523E79C2
+	for <linux-block@vger.kernel.org>; Fri, 20 Sep 2024 06:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726793307; cv=none; b=NMpJVgXSEs9hLtuCFyggslLbNwDnwpu7H77Ati0TUOjFqqglRhZUEnUZuY7hqN2m7atWcNDpBIL7MvuL8IhkVvqIfXumfEKtzktdhHdFob1Ea6DGbBpgZpnImrhhciaMe8hwL/A6rWUpvRPuYML4rI80p2zomlZsZCy1a06qIPI=
+	t=1726813278; cv=none; b=ICco0PgGfzzeBqToyFapSlpHwZz5oahktzHwCsmtnvComvzSZvc9UKGRUAzkYM7E0RorXcXVHnEbQlPKr897Rjki6NrE/lS0XMnfzTurXcHtAlAaXerLTHCXoDtf5a52prM8De4CB+LFvq0Ti2h2mRdUWKEaXM5SDBjw6wzxfeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726793307; c=relaxed/simple;
-	bh=1125Bsn3gcNwrrK/s5iBw/szpxMx/ayHRV9SLDByiss=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eKFDYWIMY2/9R6BU69znJqDI8hLZOUSZri4QxwXXtsz5PcsEO0QzUW69Bed7pye1m24DN0L3Y114RqltlSxsH4njQaGGBGFJKQDxyDSmtDmM2d1O5PYZVz03UGEnD7a/gdTCpS+bHICU0ryxN+ybX4QB9CjSgAyYD1/3DchRTSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=B05KZrDn; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1726813278; c=relaxed/simple;
+	bh=x/8tp2rG2IGjz3caKUOsHBf1tU+8jqDcVYS/WbSU3e0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=j+YbDnfvsqP2xanCIePJe4l3+npH6tpvWdhso8UQCNO2gjC3e5hTmYf8Kg1N2KQeK+kP7Z0QRrJlBRzNGnd1RtpIISparUGS2xWy4yQWzKyxYL6FmyqqhijmmoPCj6OlOd+173wOCl3JzU34GPyiSILmZQZZlvI79tzP0/Cjk9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=LTh7HeZW; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="B05KZrDn"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=wPfdNjbocK7zlRp7BCVRqJV1USyrv++jXmHPMXQ+sAQ=; b=B05KZrDnZm9U2lPj
-	mLxF/81X4ckU0MHIPtQv0/6oss4EOO3Ze5zE4iTin9pTaVr/QetiT5I8wz0OdGNaxrH5VHxaqSFYm
-	zAX42YczA4lHpVCTT8erKDJb0NFlj2B59bDwy6M1ZnvwBvIJdUwYHdHaDrcnVjhHmXY78ch6iK7rj
-	PyFd1NOqWsRC91gEVj3/f9rlmwFKMVAItW0HxkNrNuDhSkfYw1mWSnxxtFozfTk+lFRE5xL4eMXOI
-	XYOPmtShHl0sjTGmucNCkptp26z4H+GlUGsjSWysMugQY9zEB2WmeO9nMEAMk/3x+NJzC7Zl82C0E
-	TRNeQ66rZ1YEde2fmw==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1srRoo-006UPh-2n;
-	Fri, 20 Sep 2024 00:48:18 +0000
-From: linux@treblig.org
-To: axboe@kernel.dk,
-	hch@lst.de
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] block: Remove unused blk_limits_io_{min,opt}
-Date: Fri, 20 Sep 2024 01:48:17 +0100
-Message-ID: <20240920004817.676216-1-linux@treblig.org>
-X-Mailer: git-send-email 2.46.1
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="LTh7HeZW"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-42e7b7bef42so4234075e9.3
+        for <linux-block@vger.kernel.org>; Thu, 19 Sep 2024 23:21:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1726813275; x=1727418075; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FxTie3o+2ZAtDp1PjLR/OoHHfq8L/seIGfduFy59TX0=;
+        b=LTh7HeZWtIGXVPt0Mrt7EWelvIshHb7hBcYxtTAUhn4Sj7UmbIZRR0+VpT5vyuhSFp
+         wk/ek9hrcI+uLCRI0E6uaghUwmQlWIUytkyKWWU/2Kt1ezc0TOuMYuMjVTd9GSW245qI
+         ho6r/tYolGjcyWfNCFeo5JDLBGBTMXx1Mi0SLT2xKWUU26hqw9I/iXwlC6ksRGWhi7yF
+         JP5GD5a1uA7Sx7C4ygBxEyK/RLPYeR7l12ZJ15yzcH4MR4tijiiEnRM18WrnssYXWial
+         /vhpHWKOdMivuTUuZ7UMIe/fXDMsBBNxjeW55QSUMvGTwBNb6Jl60IireAG7/wZC2/mR
+         9Yqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726813275; x=1727418075;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FxTie3o+2ZAtDp1PjLR/OoHHfq8L/seIGfduFy59TX0=;
+        b=K9nx0i8c+PS4KfScp9DaliHiGtoOHcBArTrxxwPxG3xaJ4vD1WsH8oHhxbAwP+arZ6
+         aFKyqrqNhU/L3NOoxWTZTvoKC1jDSjxwgxALRhDJtsY5ff73vs8v3vThymjXpv9IbAgT
+         /ubooHrljI5QY/RE5i5myVipoExNf8k+LTeovAEm9WQdLjx8s5kTsv0NDTZur/bj1VwD
+         xT7PYwQLQRfRLCWUCOUT9cucbKPYLagX+PKXKSceTerNj/8o+LmCdnWbDR7telhwwl2y
+         IPQoAmn0TxQo8MLozauVDUqueR0bhKuLOBsIFEv65MYJ/myd3QIQrcL12Nv4UiKBwNwY
+         3pbA==
+X-Gm-Message-State: AOJu0YyMmvN38RyQxokakohS06NbfMoQKYujVA1CFuiuTZDi7NqW1/sH
+	T62QQpC6Hccs+ssjOyvndEajEUxVcb8PMr/s6a+W2iyxxF0h2BqTtfDlPc71m+g=
+X-Google-Smtp-Source: AGHT+IFDk27Z4fay6biiUFNe4AdHuKGgvRLIgi2So8WsIf4hjeHOC33tIt9lsKDztH0eS5Ca8llS8Q==
+X-Received: by 2002:a05:600c:511e:b0:429:dc88:7e65 with SMTP id 5b1f17b1804b1-42e7c1669f1mr5983665e9.12.1726813274678;
+        Thu, 19 Sep 2024 23:21:14 -0700 (PDT)
+Received: from [127.0.0.1] ([185.44.53.103])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e75450ec6sm39780565e9.21.2024.09.19.23.21.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Sep 2024 23:21:13 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: hch@lst.de, linux@treblig.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20240920004817.676216-1-linux@treblig.org>
+References: <20240920004817.676216-1-linux@treblig.org>
+Subject: Re: [PATCH] block: Remove unused blk_limits_io_{min,opt}
+Message-Id: <172681327241.42824.15179757360545790108.b4-ty@kernel.dk>
+Date: Fri, 20 Sep 2024 00:21:12 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2-dev-648c7
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-blk_limits_io_min and blk_limits_io_opt are unused since the
-recent commit
-  0a94a469a4f0 ("dm: stop using blk_limits_io_{min,opt}")
+On Fri, 20 Sep 2024 01:48:17 +0100, linux@treblig.org wrote:
+> blk_limits_io_min and blk_limits_io_opt are unused since the
+> recent commit
+>   0a94a469a4f0 ("dm: stop using blk_limits_io_{min,opt}")
+> 
+> Remove them.
+> 
+> 
+> [...]
 
-Remove them.
+Applied, thanks!
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- block/blk-settings.c   | 42 ------------------------------------------
- include/linux/blkdev.h |  2 --
- 2 files changed, 44 deletions(-)
+[1/1] block: Remove unused blk_limits_io_{min,opt}
+      commit: 9ba5dcc722de4390a1d3211b2ee3c864f84f5461
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index cd8a8eabc9a5..a446654ddee5 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -437,48 +437,6 @@ int queue_limits_set(struct request_queue *q, struct queue_limits *lim)
- }
- EXPORT_SYMBOL_GPL(queue_limits_set);
- 
--/**
-- * blk_limits_io_min - set minimum request size for a device
-- * @limits: the queue limits
-- * @min:  smallest I/O size in bytes
-- *
-- * Description:
-- *   Some devices have an internal block size bigger than the reported
-- *   hardware sector size.  This function can be used to signal the
-- *   smallest I/O the device can perform without incurring a performance
-- *   penalty.
-- */
--void blk_limits_io_min(struct queue_limits *limits, unsigned int min)
--{
--	limits->io_min = min;
--
--	if (limits->io_min < limits->logical_block_size)
--		limits->io_min = limits->logical_block_size;
--
--	if (limits->io_min < limits->physical_block_size)
--		limits->io_min = limits->physical_block_size;
--}
--EXPORT_SYMBOL(blk_limits_io_min);
--
--/**
-- * blk_limits_io_opt - set optimal request size for a device
-- * @limits: the queue limits
-- * @opt:  smallest I/O size in bytes
-- *
-- * Description:
-- *   Storage devices may report an optimal I/O size, which is the
-- *   device's preferred unit for sustained I/O.  This is rarely reported
-- *   for disk drives.  For RAID arrays it is usually the stripe width or
-- *   the internal track size.  A properly aligned multiple of
-- *   optimal_io_size is the preferred request size for workloads where
-- *   sustained throughput is desired.
-- */
--void blk_limits_io_opt(struct queue_limits *limits, unsigned int opt)
--{
--	limits->io_opt = opt;
--}
--EXPORT_SYMBOL(blk_limits_io_opt);
--
- static int queue_limit_alignment_offset(const struct queue_limits *lim,
- 		sector_t sector)
- {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 643c9020a35a..50c3b959da28 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -968,8 +968,6 @@ static inline void blk_queue_disable_write_zeroes(struct request_queue *q)
- /*
-  * Access functions for manipulating queue properties
-  */
--extern void blk_limits_io_min(struct queue_limits *limits, unsigned int min);
--extern void blk_limits_io_opt(struct queue_limits *limits, unsigned int opt);
- extern void blk_set_queue_depth(struct request_queue *q, unsigned int depth);
- extern void blk_set_stacking_limits(struct queue_limits *lim);
- extern int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+Best regards,
 -- 
-2.46.1
+Jens Axboe
+
+
 
