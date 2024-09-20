@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA38142E76;
-	Fri, 20 Sep 2024 11:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFAC1145B00;
+	Fri, 20 Sep 2024 11:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726830248; cv=none; b=mUAF5hL8QQCZTDRnq5Mdl1aZF0wcHNLYmdtrcvDaQFwFIu1wtY2I1scO6PPpJRCHPL62mwADwHQuPm4QXFuxl6LACRgWK8sX7qIbR5Z2YkD4ibxmaAIlUJ6xEXI/7kXN26l/Pvl8utg6e9fwGW2ZP5N09w2nom9FzgZvD2G9/z4=
+	t=1726830249; cv=none; b=Uukekm7BteFsxZjM1KJIR9FLs9028J4lCTmSltBHMOPr7A/CdIZJdX4Vl/4W2vaYc4fy51v4b3Ec4TI6V50hNy/GrmZa+4cU15hGpSEVjuC7SJQ6ts69FKzWi7HBkcHeCcF7BxzY9MMleCfTuStMCDC696mRqC4XLQkJpdvYDjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726830248; c=relaxed/simple;
-	bh=k9ndXh/Z2Lyi5mD7CmboUdiTNcsMfHAILqtOJ7bUFqg=;
+	s=arc-20240116; t=1726830249; c=relaxed/simple;
+	bh=/NmMJLxTvWxuIn0cbaOvs14svwWZw49nE2EhDGPDvZg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NpeMcagPy9T6AmIaezsQz5+FRfVd+QeGnxOOMAvShQS4FKM5bzKslebxI2tx855zqstz6HNDz6n9ZZ0+W2NuGw0XnZpvH0e7+iNl6L69kIn7n0VuTEUpKaOQgCVOjZYd1WpMwfYLGQLUavE87hLPQ0+SH8i1yk72viYhWr7ca14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=BWOEimD0; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=bhjdV8E08CKMD6D+oQ7qMC1d5LMrDG/ZX/Iadj8uW3klV2Ld1Sxwg3ABbNhhbr7ZyHeZ6cDq9FxdQSN0X/da5DeF5GJ6FN78O1+0OYAe3zkyP/ZO+YLuKwuX2fq+l2IzknvUKoN+UO/8yP413CSfJICJEdDw/XRQdDJyRwBgSqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=WfPtNv7T; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="BWOEimD0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4320DC4CEC3;
-	Fri, 20 Sep 2024 11:04:05 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="WfPtNv7T"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A49EC4CECD;
+	Fri, 20 Sep 2024 11:04:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1726830247;
-	bh=k9ndXh/Z2Lyi5mD7CmboUdiTNcsMfHAILqtOJ7bUFqg=;
+	s=korg; t=1726830249;
+	bh=/NmMJLxTvWxuIn0cbaOvs14svwWZw49nE2EhDGPDvZg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=BWOEimD0k41i6spYVEccLuUPnaEIm9zoJRbTyyi/Aj6jZreN/e6XNXvhwLuYMHB/g
-	 JPqkmmyho3hnPqCjpkeCacGU3rj7pzunF+4G7rSXrtdVZeKds+ljHu5K3Ij8tKUOqQ
-	 k23GFi9J4QArZYzIor9yPC2OP8SDZ3bGA7FJkbxY=
+	b=WfPtNv7TDfx+0kosdXY8p14ik7o8x+kwrM3OOSDUP/EljL0ChuzYTGDlfZcM+z4Mt
+	 5FG1MArxoku2OxMvyaMdkCcq9iSNEUwrInDy/LvYsiwYW8WE3/s3DPxM0FVUTuatMg
+	 Sg5Ao5BnAU0ku6s7DhrJoTEVrHF2FC3SG/wkbQ/M=
 From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-Date: Fri, 20 Sep 2024 07:03:26 -0400
-Subject: [PATCH 1/2] MAINTAINERS: fix PKTCDVD DRIVER to use L: for the list
- address
+Date: Fri, 20 Sep 2024 07:03:27 -0400
+Subject: [PATCH 2/2] MAINTAINERS: use the canonical soc mailing list
+ address and mark it as L:
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,46 +35,56 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240920-maintainers-m-to-l-tweak-v1-1-ea80b5cd3420@linuxfoundation.org>
+Message-Id: <20240920-maintainers-m-to-l-tweak-v1-2-ea80b5cd3420@linuxfoundation.org>
 References: <20240920-maintainers-m-to-l-tweak-v1-0-ea80b5cd3420@linuxfoundation.org>
 In-Reply-To: <20240920-maintainers-m-to-l-tweak-v1-0-ea80b5cd3420@linuxfoundation.org>
 To: torvalds@linux-foundation.org
 Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
  soc@lists.linux.dev, Konstantin Ryabitsev <konstantin@linuxfoundation.org>
 X-Mailer: b4 0.15-dev-dedf8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=899;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1303;
  i=konstantin@linuxfoundation.org; h=from:subject:message-id;
- bh=k9ndXh/Z2Lyi5mD7CmboUdiTNcsMfHAILqtOJ7bUFqg=;
- b=owGbwMvMwCW27YjM47CUmTmMp9WSGNLehi3yXTh166Eq4+YS97c6ix9Ki847dVB56cQbEz5Ju
- q2bFlCypaOUhUGMi0FWTJGlbF/spqDChx5y6T2mMHNYmUCGMHBxCsBEVG4xMrwx5NE+fmxpMse0
- R4IrXzp4acw3Ekzcd3jKfFNDGf3T4jWMDFP27vzBf07b3mCP0ZZv75I2rp7eV3r+y6OQBpevf94
- pXOcCAA==
+ bh=/NmMJLxTvWxuIn0cbaOvs14svwWZw49nE2EhDGPDvZg=;
+ b=owGbwMvMwCW27YjM47CUmTmMp9WSGNLehi125v/QvP6Jm9Ymw4v5q489LD35d7tfe8ey+ynqL
+ 7VaWR4rdZSyMIhxMciKKbKU7YvdFFT40EMuvccUZg4rE8gQBi5OAZjIsS6G//6fZ4pNVLyXn8Wv
+ 45iWMX+6WmJNI0Ojl/vFspWsoYLzvzIy9BmybvQ/ZtPXbr2xqyK2dfHj0pSIyQqqbIkGcgL+2kq
+ cAA==
 X-Developer-Key: i=konstantin@linuxfoundation.org; a=openpgp;
  fpr=DE0E66E32F1FDD0902666B96E63EDCA9329DD07E
 
-The PKTCDVD DRIVER subsystem has an M: entry that points at the
-linux-block mailing list. It is perfectly valid to have no M: entry for
-an orphaned subsystem, so change M: to L: so it properly indicates that
-the address is a mailing list, not a person.
+The soc@kernel.org address started out as a mail alias, but at some
+point became a mailing list. Use the canonical name of the list and
+properly mark it as L: instead of M:.
 
 Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
 ---
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ MAINTAINERS | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index f5526da33d4cc67eca7dc0c36410e570ba492486..60f07c11353412891707311d6d21fed94156ea8c 100644
+index 60f07c11353412891707311d6d21fed94156ea8c..5f9a0e2ca5c7470a89a20517087213e916ec9e09 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -18263,7 +18263,7 @@ F:	Documentation/devicetree/bindings/input/pine64,pinephone-keyboard.yaml
- F:	drivers/input/keyboard/pinephone-keyboard.c
- 
- PKTCDVD DRIVER
--M:	linux-block@vger.kernel.org
-+L:	linux-block@vger.kernel.org
- S:	Orphan
- F:	drivers/block/pktcdvd.c
- F:	include/linux/pktcdvd.h
+@@ -1717,8 +1717,8 @@ F:	include/uapi/linux/if_arcnet.h
+ ARM AND ARM64 SoC SUB-ARCHITECTURES (COMMON PARTS)
+ M:	Arnd Bergmann <arnd@arndb.de>
+ M:	Olof Johansson <olof@lixom.net>
+-M:	soc@kernel.org
+ L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
++L:	soc@lists.linux.dev
+ S:	Maintained
+ P:	Documentation/process/maintainer-soc.rst
+ C:	irc://irc.libera.chat/armlinux
+@@ -21650,8 +21650,8 @@ F:	drivers/accessibility/speakup/
+ SPEAR PLATFORM/CLOCK/PINCTRL SUPPORT
+ M:	Viresh Kumar <vireshk@kernel.org>
+ M:	Shiraz Hashim <shiraz.linux.kernel@gmail.com>
+-M:	soc@kernel.org
+ L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
++L:	soc@lists.linux.dev
+ S:	Maintained
+ W:	http://www.st.com/spear
+ F:	arch/arm/boot/dts/st/spear*
 
 -- 
 2.46.1
