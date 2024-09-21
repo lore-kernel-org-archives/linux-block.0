@@ -1,163 +1,111 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE35317838C
-	for <linux-block@vger.kernel.org>; Fri, 20 Sep 2024 14:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3724A29
+	for <linux-block@vger.kernel.org>; Sat, 21 Sep 2024 00:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726842030; cv=none; b=ty7KI06kl4d3F1Rv0Ru62wg92BrI7YslXRELZh5oCyu+htOYluyZ9ka7FB1ZTqEd2akDtQvrDOGocW8p8pMO4RJPQVB9QNGnOW0X1q7oV3cgVoq3fx2TtNzh9+yVJYybo8sZlyhjj+E0FcG5uMU7K5VJ9Og3OgYknAhe3QOJlR0=
+	t=1726877104; cv=none; b=rE7PCEC+MDFst1OP6BvGLCc6/Yh0bKS7ySMgBCpzURH16tXgu1c9FGXmqjUDMdwA9uToipOR46hHFi4Tg05OktbbCWAwcPiUMRwWMswWYhYfTj3PH5If8wmtqmYJnMIClyX+0kJkmSoWAWZwt7fOCrlSUQXB2xJIOl1/HJutmPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726842030; c=relaxed/simple;
-	bh=VuAAW+C9+09hTVErW/kMvUUITjpu2YXDEAAT/D/9+80=;
+	s=arc-20240116; t=1726877104; c=relaxed/simple;
+	bh=INlKS5tNGyAIUwftuVV4YHTl+jDewLLG5i9G1VOSdhM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g9ZNbp61kZ5UA7lyGeqFcgzGTb8OX8NVhHAB6e6+lSLohmJbJvR+cqGedd3vr57kjpCO0hlYAZggX6X9rq9JxrAlg36kZPrIFbx0Ojxg/wG6axMM3Bs3ehL39dy7m68pmr9NS+QkEm5JQWKRYLZpOvGYcz0Mxo55sDaYRq8oM70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g2IfqjQ5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=bGjb1Cil851aZ9M9rqYaCY8VZwX4uWTY2uqC3GhukEteYx53hOg4HDn/MLc16bX+XA52BRfunKPHImKQcHc9EPm0QJuMYH17p2mpK4gZaKTub7xO5j0geLjVOB2KTuUE7Rc2ligHSTI/OR024pITSJ9LnYxqA1UHQHc6NSv/87I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e64ROaQJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g2IfqjQ5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726842027;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fCalEBABFVFsMMhs8TPEqo8Ap8uiBjRPjKqEGdMLqnE=;
-	b=g2IfqjQ5Gj+tc8RgRqVVvFiSYqTcdW8Utbz7u7OXiU4ah6LJoZ6A+38jMu92nusZLG36Lk
-	chLoT97pkYhYYNByX704S1a76loAVte+/sDTxUPP9FCFM4FVkPd6BTG6upETZ1x9GwtMQw
-	Td/xZt0ifw0RIR0+Nke/t2WOYbgdiQE=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-93-wxKwX2dSMjaUM_AqgQXZxA-1; Fri, 20 Sep 2024 10:20:26 -0400
-X-MC-Unique: wxKwX2dSMjaUM_AqgQXZxA-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2d8b3af9e61so2245985a91.2
-        for <linux-block@vger.kernel.org>; Fri, 20 Sep 2024 07:20:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726842024; x=1727446824;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fCalEBABFVFsMMhs8TPEqo8Ap8uiBjRPjKqEGdMLqnE=;
-        b=mXoNw6Qq6SElo111IyqmUthZAQROfm9LsZt2KeBECKPHPu+6LZIoh9JncJ4ARQCNUK
-         lV6mKDOwTB3pqnUoSw7uQFYUpW0k1f+IJbnTSm+iNpqPYyrZt4lXuI7tmFR6R9JdJIu8
-         SgGBFx9j6Ok+BLyzYWkYJm+AxxCfumgEWUa6rwZejY1mrefj5B1InoEolcRmI+MxoRCV
-         UntEWawMUQgwc0DdzNEwm0PwK05DxyHjWqmo53SUULKONRJ3p4sxwbWJJ59alfkPLg7w
-         Hro/7M7DX3GDtgt+Ufl/bUNwJT2RfpijP9Pa5UmM4eUDfhvqG4nnUnu1ympKTcq5ACtm
-         nkzw==
-X-Gm-Message-State: AOJu0YyqNHVuolELurwAtlzU3Q7OuATaKnq/xESIeWSEu/S6yv0HLV8B
-	3yTPfhMpGXrrBpgR/Da969UCwNJ3JuVYNG+karuiflayuFHLRB2P+ty56/MIaW+t9RKskZD+bgR
-	3ov4ocg0UBEQOvCmfdjnFfCfP5i8/tHqGcMhjJPuVJcDcyRe1zG4uMEyqeCLaYOelkNDDw1GYlA
-	bpSU3VAdQV9JM7FB+jqNumhRezIa0Hhwg5Hrqwj7Trkm7xpg==
-X-Received: by 2002:a17:90a:62c7:b0:2da:9490:900c with SMTP id 98e67ed59e1d1-2dd80c7ecbcmr3202657a91.21.1726842024033;
-        Fri, 20 Sep 2024 07:20:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHyCh2QJpZ4RfCR4/0c8rkzSouxSf5uv4vyNtzdlJMeQxeDouDT2kEKJZpDylsJEwPmGG+nC5N7oytgOPvdg2Q=
-X-Received: by 2002:a17:90a:62c7:b0:2da:9490:900c with SMTP id
- 98e67ed59e1d1-2dd80c7ecbcmr3202632a91.21.1726842023707; Fri, 20 Sep 2024
- 07:20:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e64ROaQJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C75CC4CED1
+	for <linux-block@vger.kernel.org>; Sat, 21 Sep 2024 00:05:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726877103;
+	bh=INlKS5tNGyAIUwftuVV4YHTl+jDewLLG5i9G1VOSdhM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=e64ROaQJhUMqElYUQvXISerGDpIgaACDwT1Pmtd/JcGFjg7r6G4Wcol9dW/Ct5Yh8
+	 TEfFcHACIhE5bljDlNWosYLpPaibQbHrXBbIjuTmyIYJibl+e4+Zcyuf8t08CUdNKk
+	 rci2pYV75wXebjmxuOXOGCHDp5+jebj9tZtIcqFg4o0Qpsu7JhTyZWtXFhHjOi6bmr
+	 7e4XdUqRzIm6u2bizoq96GkLNRuFTIj0C3bHZQO4CnLE8HF+luv1sWPFzRSNJB9nqP
+	 qY9vo7jEunq2b3e08He+0raaz+TwkV9/adhZDMS39wOg0bnGqTURW8tMAnGmD+X9br
+	 y0Q769Iw6u3pA==
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e1a80979028so2651662276.1
+        for <linux-block@vger.kernel.org>; Fri, 20 Sep 2024 17:05:03 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUSpfNvqR66BnlA4lnITC3zmfGMM4vQXkSzCUzzkyK7EaldTgsNaEUpCtXbIwEE+9bliDGwsWmXYXCYbQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNpSdoySLumBq8wVJDCPD5SPI6tn/XXXAV/Loi7wUGO+NhmJAO
+	k88xR26WMNHLCIl0MYCaSK5XAS+MLxhKRH2tbrOZsKF3ht5UNAlfpz5D2YQ0ZAHD+Lh/i33qhV2
+	VyXJvugSQhnkOghq+yCYresJTOi0TMK1LbCSzSw==
+X-Google-Smtp-Source: AGHT+IFTgD18lT/k5y3/uFsZmumRkstI4L4Woj+Ow1MTZJ00Q7iFIujz/YsqJe0xXL7E4JJ1Hut1lEDJr9Sp5F5cVxQ=
+X-Received: by 2002:a05:690c:6506:b0:6dd:bc2b:2aa4 with SMTP id
+ 00721157ae682-6dfeeff826dmr53781547b3.39.1726877101859; Fri, 20 Sep 2024
+ 17:05:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHj4cs90xV1t2NbV6P3_z1oYwD0BcvMhC5V2mGgekRq8iae=NA@mail.gmail.com>
-In-Reply-To: <CAHj4cs90xV1t2NbV6P3_z1oYwD0BcvMhC5V2mGgekRq8iae=NA@mail.gmail.com>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Fri, 20 Sep 2024 22:20:11 +0800
-Message-ID: <CAHj4cs8YGgmemMZDXmt7yHa+Xq3EiEvRWOJGEQTDjqGB2rAogw@mail.gmail.com>
-Subject: Re: [bug report][regression][bisected] most of blktests nvme/tcp
- failed with the last linux code
-To: linux-block <linux-block@vger.kernel.org>, 
-	"open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>, Hannes Reinecke <hare@suse.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <20240919112952.981-1-qun-wei.lin@mediatek.com> <ZuwM-aEEo7DE-qXw@infradead.org>
+In-Reply-To: <ZuwM-aEEo7DE-qXw@infradead.org>
+From: Chris Li <chrisl@kernel.org>
+Date: Fri, 20 Sep 2024 17:04:51 -0700
+X-Gmail-Original-Message-ID: <CACePvbUCNxy3sf6+7hk9HPGTNtTMbA2=Entu0xbV7TbwX4M2WQ@mail.gmail.com>
+Message-ID: <CACePvbUCNxy3sf6+7hk9HPGTNtTMbA2=Entu0xbV7TbwX4M2WQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Add BLK_FEAT_READ_SYNCHRONOUS and SWP_READ_SYNCHRONOUS_IO
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Qun-Wei Lin <qun-wei.lin@mediatek.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, "Huang, Ying" <ying.huang@intel.com>, 
+	David Hildenbrand <david@redhat.com>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Al Viro <viro@zeniv.linux.org.uk>, Dan Schatzberg <schatzberg.dan@gmail.com>, 
+	Kairui Song <kasong@tencent.com>, Barry Song <baohua@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	linux-block@vger.kernel.org, Casper Li <casper.li@mediatek.com>, 
+	Chinwen Chang <chinwen.chang@mediatek.com>, Andrew Yang <andrew.yang@mediatek.com>, 
+	John Hsu <john.hsu@mediatek.com>, wsd_upstream@mediatek.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-+ Hannes
-I did bisect and it seems was introduced with the below commit:
+Hi Qun-Wei,
 
-commit 1e48b34c9bc79aa36700fccbfdf87e61e4431d2b
-Author: Hannes Reinecke <hare@suse.de>
-Date:   Mon Jul 22 14:02:22 2024 +0200
+Agree with Christoph that BLK_FEAT_READ_SYNCHRONOUS is not set
+anywhere. That needs to be fixed.
 
-    nvme: split off TLS sysfs attributes into a separate group
+Having a flag for BLK_FEAT_READ_SYNCHRONOUS and another flag for
+BLK_FEAT_SYNCHRONOUS is just confusing.
+for example, read path need to test two bits: "sis->flags &
+(SWP_SYNCHRONOUS_IO | SWP_READ_SYNCHRONOUS_IO)"
+
+There is only one caller of the bdev_synchronous(), which is in swapfile.c.
+
+I suggest if you have  BLK_FEAT_READ_SYNCHRONOUS, you should have a
+BLK_FEAT_WRITE_SYNCHRONOUS for writing.
+The previous path that test the SWP_SYNCHRONOUS_IO should convert into
+one of tests of SWP_READ_SYNCHRONOUS_IO or  SWP_WRITE_SYNCHRONOUS_IO
+depend on the read or write path (never both).
+
+"sis->flags & (SWP_SYNCHRONOUS_IO | SWP_READ_SYNCHRONOUS_IO)" will
+change into "sis->flags & SWP_READ_SYNCHRONOUS_IO"
+
+Then you can have  bdev_synchronous() just return the
+SWP_READ_SYNCHRONOUS_IO | SWP_WRITE_SYNCHRONOUS_IO if both are set.
+You don't need to have just bdev_synchronous() and
+bdev_read_synchronous(). That is more boilerplate code which is
+unnecessary.
+
+I also suggest you squish your two patches into one because there is
+no user of bdev_read_synchronous() in the first patch.
+You should introduce the function with the code that uses it. Yes,
+yes, I know you want to have a seperate patch for define vs another
+patch for using it. In this case there is no good reason for that.
+
+Best regards,
+
+Chris
 
 
-On Thu, Sep 19, 2024 at 12:09=E2=80=AFAM Yi Zhang <yi.zhang@redhat.com> wro=
-te:
+On Thu, Sep 19, 2024 at 4:37=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
+g> wrote:
 >
-> Hello
+> Well, you're not actually setting your new flags anywhere, which -
+> as you might know - is an reson for an insta-NAK.
 >
-> CKI reported most of the blktests nvme/tcp tests failed on the linux
-> tree[1], here is the reproducer and dmesg log, the issue cannot be
-> reproduced with 6.11.0, seems
-> it was introduced with the latest block code merge, please help check
-> it and let me know if you need any info/testing about it, thanks.
->
->
-> [1]
-> https://datawarehouse.cki-project.org/kcidb/tests/14394423
->
-> [2]
-> # nvme_trtype=3Dtcp ./check nvme/003
-> nvme/003 (tr=3Dtcp) (test if we're sending keep-alives to a discovery
-> controller) [failed]
->     runtime  11.280s  ...  11.188s
->     --- tests/nvme/003.out 2024-09-18 11:30:11.243366401 -0400
->     +++ /root/blktests/results/nodev_tr_tcp/nvme/003.out.bad
-> 2024-09-18 11:52:32.977112834 -0400
->     @@ -1,3 +1,3 @@
->      Running nvme/003
->     -disconnected 1 controller(s)
->     +disconnected 0 controller(s)
->      Test complete
-> # dmesg
-> [  447.213539] run blktests nvme/003 at 2024-09-18 11:52:21
-> [  447.229285] loop0: detected capacity change from 0 to 2097152
-> [  447.233104] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-> [  447.242398] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
-> [  447.251089] sysfs: cannot create duplicate filename
-> '/devices/virtual/nvme-fabrics/ctl/nvme0/reset_controller'
-> [  447.251810] CPU: 2 UID: 0 PID: 5241 Comm: nvme Kdump: loaded Not
-> tainted 6.12.0-0.rc0.adfc3ded5c33.2.test.el10.aarch64 #1
-> [  447.252540] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/=
-2015
-> [  447.253006] Call trace:
-> [  447.253171]  dump_backtrace+0xd8/0x130
-> [  447.253432]  show_stack+0x20/0x38
-> [  447.253657]  dump_stack_lvl+0x80/0xa8
-> [  447.253925]  dump_stack+0x18/0x30
-> [  447.254152]  sysfs_warn_dup+0x6c/0x90
-> [  447.254406]  sysfs_add_file_mode_ns+0x12c/0x138
-> [  447.254713]  create_files+0xa8/0x1f8
-> [  447.254973]  internal_create_group+0x18c/0x358
-> [  447.255274]  internal_create_groups+0x58/0xe0
-> [  447.255558]  sysfs_create_groups+0x20/0x40
-> [  447.255826]  device_add_attrs+0x19c/0x218
-> [  447.256093]  device_add+0x310/0x6d0
-> [  447.256327]  cdev_device_add+0x58/0xc0
-> [  447.256579]  nvme_add_ctrl+0x78/0xd0 [nvme_core]
-> [  447.256895]  nvme_tcp_create_ctrl+0x3c/0x178 [nvme_tcp]
-> [  447.257248]  nvmf_create_ctrl+0x150/0x288 [nvme_fabrics]
-> [  447.257614]  nvmf_dev_write+0x98/0xf8 [nvme_fabrics]
-> [  447.257948]  vfs_write+0xdc/0x380
-> [  447.258174]  ksys_write+0x7c/0x120
-> [  447.258408]  __arm64_sys_write+0x24/0x40
-> [  447.258673]  invoke_syscall.constprop.0+0x74/0xd0
-> [  447.258994]  do_el0_svc+0xb0/0xe8
-> [  447.259225]  el0_svc+0x44/0x1a0
-> [  447.259449]  el0t_64_sync_handler+0x120/0x130
-> [  447.259745]  el0t_64_sync+0x1a4/0x1a8
->
-> --
-> Best Regards,
->   Yi Zhang
-
-
-
---=20
-Best Regards,
-  Yi Zhang
-
