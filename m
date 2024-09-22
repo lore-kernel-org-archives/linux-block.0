@@ -1,138 +1,90 @@
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67368179BC
-	for <linux-block@vger.kernel.org>; Sun, 22 Sep 2024 09:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30E429A2
+	for <linux-block@vger.kernel.org>; Sun, 22 Sep 2024 14:18:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726995640; cv=none; b=QeeARjbyxRJV8/p68vdsBEime51daG7DScIUO5EZ8DZ1fujGv4msx4njSUcMUx0SETU0JCZGM2oH1B/1syhPP7fV/Dzrei3Vr5a4IOC2FwsOoBCZJZp89ypxsHhbfZq0PqWfTx8nW/7wnAq68g/M4Bw0Lz/dHgO8HjzVFyPXMI0=
+	t=1727014697; cv=none; b=SL4sYx+7IgWbeRborTSLwPT0wnBZdFJk75byH2tUfwWTHbKayJ98XUNSCTHSbwmbtKy9CAnhZo44mhp+ZoZ6FD9k40YFKPFEl7n/UVtGn56dr9KlJO9sHnKcmmw976KY4wWqS/MC7QPF0CtvW5EYSXpxHTHFqvvepZGt5lSY5+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726995640; c=relaxed/simple;
-	bh=KNPmiznq+7w2Dg6/JP5bey9XpXtrSbPCKL8PPRERt0Q=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YW6T++BkztW/ZA2ApqUnTXRWIw3llwYNX2X6cvahv29RB7H61I1/uA0PoDalCCpYNkBETZHEo158Xxkl6tcW7RjE4pdF8BJdpkE3huKvGz7G2ErfprT7WrXIV/Gch144tvS4QlL/r+Yt4velVGZxLlATfZ2bC2MkW5Hmg4D4bBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BXgcE5bU; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1727014697; c=relaxed/simple;
+	bh=1v3gI3D/nkcZrYshnVeYkBvWgias4MIf5icZKNFzlzg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mIy0+KmOGrkvJev9ASzKpc13++NjBlbQFQEQ/CLJdl3ev+alCskIGmlbiJOqBnLpCOSJPM2lIDz6tJ4whLuT4Sq/gUXHau8Xn+gqfsebJmzV6waQGjjDk7XdQqCDu9+BoRepZ+xfLkN9lLBbhUOD6pXFzYjw1iVAzVBRPtUGiqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Bj5pT+h8; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BXgcE5bU"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1726995635;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RyOlo8+d4ThXfS7chbqCLxoj/FQGSwMj0LsMOJLjRBQ=;
-	b=BXgcE5bUl/1JnJ0MA1n7IY7H5QSr4U+TsrkUN+q9pWek+2HkmpTkDsTuwkZ+ka31vMdbjP
-	KI+WXFRo+1O0y1GBii77PmOhDkgyctVhs949h/DABusidtiUO5fFYCJVMf4RFhGPtliPRl
-	xEYzMQPNClP6hm3WFCbEWmOiVjEtmlw=
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-To: yanjun.zhu@linux.dev,
-	yukuai1@huaweicloud.com,
-	dlemoal@kernel.org,
-	amishin@t-argos.ru,
-	shli@fb.com,
-	axboe@kernel.dk,
-	hare@suse.de,
-	linux-block@vger.kernel.org
-Subject: [PATCH 1/1] null_blk: Use u64 to avoid overflow in null_alloc_dev()
-Date: Sun, 22 Sep 2024 16:59:41 +0800
-Message-ID: <20240922085941.14832-1-yanjun.zhu@linux.dev>
-In-Reply-To: <e5807f3c-3173-44e6-b222-fc4679be4680@linux.dev>
-References: <e5807f3c-3173-44e6-b222-fc4679be4680@linux.dev>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Bj5pT+h8"
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48MCrgQu032383
+	for <linux-block@vger.kernel.org>; Sun, 22 Sep 2024 07:18:15 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=s2048-2021-q4; bh=8O6
+	k4c2jaJB7vRLGt5+zzaNNp5aDlFWuaR7DkhyaT2c=; b=Bj5pT+h8o71PlVmo5CR
+	A5F12Znmhr0vZaT4TP09yZAyFNTN6Iw9qDkIsfLOGZGOuRQwqnD9Fk3PB80QVZfZ
+	73KYtN8rFiOu6RsyfvUYWlF3uGJxJrIfeSUH1Lk32TU/yWdb+yvt8Gj5zMoS+WLX
+	WXHZZ/8+bf/ICuijhn3kRw7vmD8bH18hCR8/UHXHISBLeJ/jaL0aTw2vHFSVaLQ2
+	tYzfgVhzuY5+WpYrW2cwrRFcUCe/BFfQZ79tZDH7LRGrINt6ORZ++/SuN3p1S7yl
+	Uw7jqbaYMqaAzOXQJdxbpVJKf2iAuUj+aG1nrJOpsgNUecUFq5EhyDYpMoW0Gzik
+	mEw==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41ssfeehm9-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Sun, 22 Sep 2024 07:18:14 -0700 (PDT)
+Received: from twshared18321.17.frc2.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.11; Sun, 22 Sep 2024 14:18:13 +0000
+Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
+	id 82DC81352B87D; Sun, 22 Sep 2024 07:18:00 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC: Keith Busch <kbusch@kernel.org>
+Subject: [PATCH] block: fix blk_rq_map_integrity_sg kernel-doc
+Date: Sun, 22 Sep 2024 07:18:00 -0700
+Message-ID: <20240922141800.3622319-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: uvpkmQHf-PCNdiDwrKXr7Bhhco8ke6pl
+X-Proofpoint-GUID: uvpkmQHf-PCNdiDwrKXr7Bhhco8ke6pl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-22_13,2024-09-19_01,2024-09-02_01
 
-The member variable size in struct nullb_device is the type
-unsigned long, and the module parameter g_gb is the type int.
-In 32 bit architecture, unsigned long has 32 bit. This
-introduces overflow risks.
+From: Keith Busch <kbusch@kernel.org>
 
-Use the type u64 in struct nullb_device and configfs. This
-can avoid overflow risks.
+Fix the documentation to match the new function signature.
 
-Fixes: 2984c8684f96 ("nullb: factor disk parameters")
-Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+Fixes: 76c313f658d2752 ("blk-integrity: improved sg segment mapping")
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/block/null_blk/main.c     | 23 +++++++++++++++++++++--
- drivers/block/null_blk/null_blk.h |  2 +-
- 2 files changed, 22 insertions(+), 3 deletions(-)
+ block/blk-integrity.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 2f0431e42c49..88c6d6277d09 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -289,6 +289,11 @@ static inline ssize_t nullb_device_ulong_attr_show(unsigned long val,
- 	return snprintf(page, PAGE_SIZE, "%lu\n", val);
- }
- 
-+static inline ssize_t nullb_device_u64_attr_show(u64 val, char *page)
-+{
-+	return snprintf(page, PAGE_SIZE, "%llu\n", val);
-+}
-+
- static inline ssize_t nullb_device_bool_attr_show(bool val, char *page)
- {
- 	return snprintf(page, PAGE_SIZE, "%u\n", val);
-@@ -322,6 +327,20 @@ static ssize_t nullb_device_ulong_attr_store(unsigned long *val,
- 	return count;
- }
- 
-+static ssize_t nullb_device_u64_attr_store(u64 *val, const char *page,
-+	size_t count)
-+{
-+	int result;
-+	u64 tmp;
-+
-+	result = kstrtou64(page, 0, &tmp);
-+	if (result < 0)
-+		return result;
-+
-+	*val = tmp;
-+	return count;
-+}
-+
- static ssize_t nullb_device_bool_attr_store(bool *val, const char *page,
- 	size_t count)
- {
-@@ -438,7 +457,7 @@ static int nullb_apply_poll_queues(struct nullb_device *dev,
- 	return ret;
- }
- 
--NULLB_DEVICE_ATTR(size, ulong, NULL);
-+NULLB_DEVICE_ATTR(size, u64, NULL);
- NULLB_DEVICE_ATTR(completion_nsec, ulong, NULL);
- NULLB_DEVICE_ATTR(submit_queues, uint, nullb_apply_submit_queues);
- NULLB_DEVICE_ATTR(poll_queues, uint, nullb_apply_poll_queues);
-@@ -762,7 +781,7 @@ static struct nullb_device *null_alloc_dev(void)
- 		return NULL;
- 	}
- 
--	dev->size = g_gb * 1024;
-+	dev->size = (u64)g_gb * 1024;
- 	dev->completion_nsec = g_completion_nsec;
- 	dev->submit_queues = g_submit_queues;
- 	dev->prev_submit_queues = g_submit_queues;
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index a7bb32f73ec3..e30c011909ad 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -74,7 +74,7 @@ struct nullb_device {
- 	bool need_zone_res_mgmt;
- 	spinlock_t zone_res_lock;
- 
--	unsigned long size; /* device size in MB */
-+	u64 size; /* device size in MB */
- 	unsigned long completion_nsec; /* time in ns to complete a request */
- 	unsigned long cache_size; /* disk cache size in MB */
- 	unsigned long zone_size; /* zone size in MB if device is zoned */
--- 
-2.39.2
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index 0a2b1c5d0ebf1..83b696ba0cac3 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -56,8 +56,7 @@ int blk_rq_count_integrity_sg(struct request_queue *q, =
+struct bio *bio)
+=20
+ /**
+  * blk_rq_map_integrity_sg - Map integrity metadata into a scatterlist
+- * @q:		request queue
+- * @bio:	bio with integrity metadata attached
++ * @rq:		request to map
+  * @sglist:	target scatterlist
+  *
+  * Description: Map the integrity vectors in request into a
+--=20
+2.43.5
 
