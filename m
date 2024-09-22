@@ -1,202 +1,138 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08E3152196
-	for <linux-block@vger.kernel.org>; Sat, 21 Sep 2024 22:33:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67368179BC
+	for <linux-block@vger.kernel.org>; Sun, 22 Sep 2024 09:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726958031; cv=none; b=nNfCa9z3KykVFmDLl5Kun9UnxSSwQmt6hcm+3SeZH//3NLJRjrVc3Xgqrk2DlC3k4STDJ7On7K3krGDTy1aynZwiK9OiNQj5c3FLv8ilZF7otdSE4V6SjS4wQyrfU6Tz9tOC1+Xt2mv20T7HrLMuGou4BlQyM2cQH0NJonS/jbo=
+	t=1726995640; cv=none; b=QeeARjbyxRJV8/p68vdsBEime51daG7DScIUO5EZ8DZ1fujGv4msx4njSUcMUx0SETU0JCZGM2oH1B/1syhPP7fV/Dzrei3Vr5a4IOC2FwsOoBCZJZp89ypxsHhbfZq0PqWfTx8nW/7wnAq68g/M4Bw0Lz/dHgO8HjzVFyPXMI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726958031; c=relaxed/simple;
-	bh=Tp0FNXrk2yEfqUnoYGkY4MsSg6rdyB04bZgqohgoAbs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kld2Y5pbtumibJCwG6aia/bJbBJQoNAuGXsezLv5q5KXwhd3Nsr1sWDrqz1e3fv1OUlqCV83r+fykhBuO87kWfGSCruBEHXnnsi3I1VeRkYrd4m4c6B1Cos+w5YOuJ7x2yxFinPo36SXAzJRYU4E7Hucz7oa24LOlRSz5sYPxwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=u0yo62WZ; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1726995640; c=relaxed/simple;
+	bh=KNPmiznq+7w2Dg6/JP5bey9XpXtrSbPCKL8PPRERt0Q=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YW6T++BkztW/ZA2ApqUnTXRWIw3llwYNX2X6cvahv29RB7H61I1/uA0PoDalCCpYNkBETZHEo158Xxkl6tcW7RjE4pdF8BJdpkE3huKvGz7G2ErfprT7WrXIV/Gch144tvS4QlL/r+Yt4velVGZxLlATfZ2bC2MkW5Hmg4D4bBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BXgcE5bU; arc=none smtp.client-ip=95.215.58.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u0yo62WZ"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5365cf5de24so3977469e87.1
-        for <linux-block@vger.kernel.org>; Sat, 21 Sep 2024 15:33:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726958028; x=1727562828; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gX86j39e02j/mMJI41SFOhgjLK0jANOAafMy+BuLlM8=;
-        b=u0yo62WZeZbfVJe0NakLs6fPSii9QhbqrN/LKg3sgscDwhDI/Dn2hzicmKFIn1Zsc5
-         QL14mRlXSZ1yNWSNyDOA9+He07jIhuhxPm3U6XE8blBFoD9+qzq5rS7PcKRmF/s/O5Ho
-         rG7paYgsWfRx+GQ7VHlhk3lSZ877+JUnSz6R20iBjnulFkXW/TAVWj1TPg3ftQT79dkl
-         sf74VWHhHtFsJYh4bdguRnSscoIn6M6KsHwvCxwLdoXtwVEP6knHK33KPvG0w2nPHJ/X
-         Pm+Pqd+HMl1Tu2GpBy668pvxDOIx7vVSP8a+3SGB7Mns4awQ2FbHTVvHIrxsGTZBXLcD
-         76Cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726958028; x=1727562828;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gX86j39e02j/mMJI41SFOhgjLK0jANOAafMy+BuLlM8=;
-        b=JSydh8z0PC/WC+j7R8r0XPVSaIdQ8xuzyXe3YdVyh/dBDHFm43AFLYlDh3zzODGrWV
-         NMYMMka9aJORSiMYeH7Bmhz9f4xG93C6PVKuHA36Pr4/em7SLOPzBOEkt8GJhsG4tT5K
-         9sQNaWXx4OblcRVp+wVodnxCagR4AHrNr3SKg62uIMRYz+yZIZeSoYNpryhJtGf9UnA/
-         Vp401EJ6kKIg5QixIShaVkc8XSNXRKO6uL8Z/31IWfyA0S4ZxdilIWcpeJasLpC25vzK
-         8vZU+uxt5Ruu1jrqMSCnt3VKUngjD6qGOvN49L4kM3mGWhSWiyhaIHHgIl/QRSaxRTMF
-         YMDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUIhTuKtmOt25IT8uPsoUHjUC8Dnkv8312iYAZ0W8OR8arHxU5DyFJFtouqSRNPUyyG1JiQvazTNK1bAw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQf84Gx2QDpi9uNleg3g6T5NsBrAo6kGOPn6Bw36rgX6gj9xIg
-	VFUNHNxcTsqG8RExaBJgKyOkIQQOU6b53s+MP03rK8KeNcsPVsNVtEVGFJ3pdrQ=
-X-Google-Smtp-Source: AGHT+IEQg2tUTFCeWCDOw+B1mlFRNoo51OtcNliubEi2LO0DCWuhnyqKCtGXKESfuGiyNwvVThuwYg==
-X-Received: by 2002:a05:6512:ba4:b0:530:ba4b:f65d with SMTP id 2adb3069b0e04-536ad180176mr3632234e87.28.1726958027223;
-        Sat, 21 Sep 2024 15:33:47 -0700 (PDT)
-Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--7a1.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::7a1])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-536870ad17dsm2741416e87.241.2024.09.21.15.33.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Sep 2024 15:33:46 -0700 (PDT)
-Date: Sun, 22 Sep 2024 01:33:44 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>, 
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
-	Mikulas Patocka <mpatocka@redhat.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Asutosh Das <quic_asutoshd@quicinc.com>, Ritesh Harjani <ritesh.list@gmail.com>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Alim Akhtar <alim.akhtar@samsung.com>, 
-	Avri Altman <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	"manivannan.sadhasivam@linaro.org" <manivannan.sadhasivam@linaro.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>, "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, 
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>, 
-	"bartosz.golaszewski" <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v6 09/17] soc: qcom: ice: add HWKM support to the ICE
- driver
-Message-ID: <sgq72p6hkebkv6r5vsyvxsasojkhzlmwqravynpnwjkozwb7g7@6ml3vlkigxoh>
-References: <66953e65-2468-43b8-9ccf-54671613c4ab@linaro.org>
- <ivibs6qqxhbikaevys3iga7s73xq6dzq3u43gwjri3lozkrblx@jxlmwe5wiq7e>
- <98cc8d71d5d9476297a54774c382030d@quicinc.com>
- <CAA8EJpp_HY+YmMCRwdteeAHnSHtjuHb=nFar60O_PwLwjk0mNA@mail.gmail.com>
- <9bd0c9356e2b471385bcb2780ff2425b@quicinc.com>
- <20240912231735.GA2211970@google.com>
- <CAA8EJpq3sjfB0BsJTs3_r_ZFzhrrpy-A=9Dx9ks2KrDNYCntdg@mail.gmail.com>
- <20240913045716.GA2292625@google.com>
- <egtwyk2rp3mtnw2ry6npq5xjfhjvtnymbxy66zevtdi7yvaav4@gcnmrmtqro4b>
- <20240921194939.GB2187@quark.localdomain>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BXgcE5bU"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726995635;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RyOlo8+d4ThXfS7chbqCLxoj/FQGSwMj0LsMOJLjRBQ=;
+	b=BXgcE5bUl/1JnJ0MA1n7IY7H5QSr4U+TsrkUN+q9pWek+2HkmpTkDsTuwkZ+ka31vMdbjP
+	KI+WXFRo+1O0y1GBii77PmOhDkgyctVhs949h/DABusidtiUO5fFYCJVMf4RFhGPtliPRl
+	xEYzMQPNClP6hm3WFCbEWmOiVjEtmlw=
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+To: yanjun.zhu@linux.dev,
+	yukuai1@huaweicloud.com,
+	dlemoal@kernel.org,
+	amishin@t-argos.ru,
+	shli@fb.com,
+	axboe@kernel.dk,
+	hare@suse.de,
+	linux-block@vger.kernel.org
+Subject: [PATCH 1/1] null_blk: Use u64 to avoid overflow in null_alloc_dev()
+Date: Sun, 22 Sep 2024 16:59:41 +0800
+Message-ID: <20240922085941.14832-1-yanjun.zhu@linux.dev>
+In-Reply-To: <e5807f3c-3173-44e6-b222-fc4679be4680@linux.dev>
+References: <e5807f3c-3173-44e6-b222-fc4679be4680@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240921194939.GB2187@quark.localdomain>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, Sep 21, 2024 at 12:49:39PM GMT, Eric Biggers wrote:
-> Hi Dmitry,
-> 
-> On Fri, Sep 13, 2024 at 03:21:07PM +0300, Dmitry Baryshkov wrote:
-> > > > > > > > Once ICE has moved to a HWKM mode, the firmware key programming
-> > > > > > > currently does not support raw keys.
-> > > > > > > > This support is being added for the next Qualcomm chipset in Trustzone to
-> > > > > > > support both at he same time, but that will take another year or two to hit
-> > > > > > > the market.
-> > > > > > > > Until that time, due to TZ (firmware) limitations , the driver can only
-> > > > > > > support one or the other.
-> > > > > > > >
-> > > > > > > > We also cannot keep moving ICE modes, due to the HWKM enablement
-> > > > > > > being a one-time configurable value at boot.
-> > > > > > >
-> > > > > > > So the init of HWKM should be delayed until the point where the user tells if
-> > > > > > > HWKM or raw keys should be used.
-> > > > > >
-> > > > > > Ack.
-> > > > > > I'll work with Bartosz to look into moving to HWKM mode only during the first key program request
-> > > > > >
-> > > > >
-> > > > > That would mean the driver would have to initially advertise support for both
-> > > > > HW-wrapped keys and raw keys, and then it would revoke the support for one of
-> > > > > them later (due to the other one being used).  However, runtime revocation of
-> > > > > crypto capabilities is not supported by the blk-crypto framework
-> > > > > (Documentation/block/inline-encryption.rst), and there is no clear path to
-> > > > > adding such support.  Upper layers may have already checked the crypto
-> > > > > capabilities and decided to use them.  It's too late to find out that the
-> > > > > support was revoked in the middle of an I/O request.  Upper layer code
-> > > > > (blk-crypto, fscrypt, etc.) is not prepared for this.  And even if it was, the
-> > > > > best it could do is cleanly fail the I/O, which is too late as e.g. it may
-> > > > > happen during background writeback and cause user data to be thrown away.
-> > > > 
-> > > > Can we check crypto capabilities when the user sets the key?
-> > > 
-> > > I think you mean when a key is programmed into a keyslot?  That happens during
-> > > I/O, which is too late as I've explained above.
-> > > 
-> > > > Compare this to the actual HSM used to secure communication or
-> > > > storage. It has certain capabilities, which can be enumerated, etc.
-> > > > But then at the time the user sets the key it is perfectly normal to
-> > > > return an error because HSM is out of resources. It might even have
-> > > > spare key slots, but it might be not enough to be able to program the
-> > > > required key (as a really crazy example, consider the HSM having at
-> > > > this time a single spare DES key slot, while the user wants to program
-> > > > 3DES key).
-> > > 
-> > > That isn't how the kernel handles inline encryption keyslots.  They are only
-> > > programmed as needed for I/O.  If they are all in-use by pending I/O requests,
-> > > then the kernel waits for an I/O request to finish and reprograms the keyslot it
-> > > was using.  There is never an error reported due to lack of keyslots.
-> > 
-> > Does that mean that the I/O can be outstanding for the very long period
-> > of time? Or that if the ICE hardware has just a single keyslot, but
-> > there are two concurrent I/O processes using two different keys, the
-> > framework will be constantly swapping the keys programmed to the HW?
-> 
-> Yes for both.  Of course, system designers are supposed to put in enough
-> keyslots for this to not be much of a problem.
-> 
-> So, the "wait for a keyslot" logic in the block layer is necessary in general so
-> that applications don't unnecessarily get I/O errors.  But in a properly tuned
-> system this logic should be rarely executed.
-> 
-> And in cases where the keyslots really are a bottleneck, users can of course
-> just use software encryption instead.
-> 
-> Note that the number of keyslots is reported in sysfs.
-> 
-> > I think it might be prefereable for the drivers and the framework to
-> > support "preprogramming" of the keys, when the key is programmed to the
-> > hardware when it is set by the user.
-> 
-> This doesn't sound particularly useful.  If there are always enough keyslots,
-> then keyslots never get evicted and there is no advantage to this.  If there are
-> *not* always enough keyslots, then it's sometimes necessary to evict keyslots,
-> so it would not be desirable to have them permanently reserved.
+The member variable size in struct nullb_device is the type
+unsigned long, and the module parameter g_gb is the type int.
+In 32 bit architecture, unsigned long has 32 bit. This
+introduces overflow risks.
 
-I'm still trying to propose solutions for the hwkm-or-raw keys problem,
-trying to find a way to return an error early enough. So it's not about
-the hints for frequently-used keys, but for returning an error if the
-user tries to program key type which became unusupported after a
-previous call.
+Use the type u64 in struct nullb_device and configfs. This
+can avoid overflow risks.
 
-> It could make sense to have some sort of hints mechanism, where frequently-used
-> keys can be marked as high-priority to keep programmed in a keyslot.  I don't
-> see much of a need for this though, given that the eviction policy is already
-> LRU, so it already prefers to keep frequently-used keys in a keyslot.
-> 
-> > Another option might be to let the drivers validate the keys being set
-> > by userspace. This way in our case the driver might report that it
-> > supports both raw and wrapped keys, but start rejecting the keys once
-> > it gets notified that the user has programmed other kind of keys. This
-> > way key setup can fail, but the actual I/O can not. WDYT?
-> 
-> Well, that has the same effect as the crypto capabilities check which is already
-> done.  The problem is that your proposal effectively revokes a capability, and
-> that is racy.
-> 
-> - Eric
+Fixes: 2984c8684f96 ("nullb: factor disk parameters")
+Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+---
+ drivers/block/null_blk/main.c     | 23 +++++++++++++++++++++--
+ drivers/block/null_blk/null_blk.h |  2 +-
+ 2 files changed, 22 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 2f0431e42c49..88c6d6277d09 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -289,6 +289,11 @@ static inline ssize_t nullb_device_ulong_attr_show(unsigned long val,
+ 	return snprintf(page, PAGE_SIZE, "%lu\n", val);
+ }
+ 
++static inline ssize_t nullb_device_u64_attr_show(u64 val, char *page)
++{
++	return snprintf(page, PAGE_SIZE, "%llu\n", val);
++}
++
+ static inline ssize_t nullb_device_bool_attr_show(bool val, char *page)
+ {
+ 	return snprintf(page, PAGE_SIZE, "%u\n", val);
+@@ -322,6 +327,20 @@ static ssize_t nullb_device_ulong_attr_store(unsigned long *val,
+ 	return count;
+ }
+ 
++static ssize_t nullb_device_u64_attr_store(u64 *val, const char *page,
++	size_t count)
++{
++	int result;
++	u64 tmp;
++
++	result = kstrtou64(page, 0, &tmp);
++	if (result < 0)
++		return result;
++
++	*val = tmp;
++	return count;
++}
++
+ static ssize_t nullb_device_bool_attr_store(bool *val, const char *page,
+ 	size_t count)
+ {
+@@ -438,7 +457,7 @@ static int nullb_apply_poll_queues(struct nullb_device *dev,
+ 	return ret;
+ }
+ 
+-NULLB_DEVICE_ATTR(size, ulong, NULL);
++NULLB_DEVICE_ATTR(size, u64, NULL);
+ NULLB_DEVICE_ATTR(completion_nsec, ulong, NULL);
+ NULLB_DEVICE_ATTR(submit_queues, uint, nullb_apply_submit_queues);
+ NULLB_DEVICE_ATTR(poll_queues, uint, nullb_apply_poll_queues);
+@@ -762,7 +781,7 @@ static struct nullb_device *null_alloc_dev(void)
+ 		return NULL;
+ 	}
+ 
+-	dev->size = g_gb * 1024;
++	dev->size = (u64)g_gb * 1024;
+ 	dev->completion_nsec = g_completion_nsec;
+ 	dev->submit_queues = g_submit_queues;
+ 	dev->prev_submit_queues = g_submit_queues;
+diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
+index a7bb32f73ec3..e30c011909ad 100644
+--- a/drivers/block/null_blk/null_blk.h
++++ b/drivers/block/null_blk/null_blk.h
+@@ -74,7 +74,7 @@ struct nullb_device {
+ 	bool need_zone_res_mgmt;
+ 	spinlock_t zone_res_lock;
+ 
+-	unsigned long size; /* device size in MB */
++	u64 size; /* device size in MB */
+ 	unsigned long completion_nsec; /* time in ns to complete a request */
+ 	unsigned long cache_size; /* disk cache size in MB */
+ 	unsigned long zone_size; /* zone size in MB if device is zoned */
 -- 
-With best wishes
-Dmitry
+2.39.2
+
