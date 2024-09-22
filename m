@@ -1,90 +1,53 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30E429A2
-	for <linux-block@vger.kernel.org>; Sun, 22 Sep 2024 14:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE1A29A2
+	for <linux-block@vger.kernel.org>; Sun, 22 Sep 2024 14:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727014697; cv=none; b=SL4sYx+7IgWbeRborTSLwPT0wnBZdFJk75byH2tUfwWTHbKayJ98XUNSCTHSbwmbtKy9CAnhZo44mhp+ZoZ6FD9k40YFKPFEl7n/UVtGn56dr9KlJO9sHnKcmmw976KY4wWqS/MC7QPF0CtvW5EYSXpxHTHFqvvepZGt5lSY5+0=
+	t=1727015573; cv=none; b=gOUZg7ckojM3XpNkqJzysnm04goaZY+bW0Ulml/2jaBEWpOVl9f1Sw5YcufRpOuQp/asQ3DSMUSSE9EJNPsw+oZ64u4Kaye2tVW++gCFX1F1/ZyeMWxunjRa2UHhpVK8Fg9MFFJinLceZlfThfIPzqlwsWU4YJZ2YnlaOhZyZhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727014697; c=relaxed/simple;
-	bh=1v3gI3D/nkcZrYshnVeYkBvWgias4MIf5icZKNFzlzg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mIy0+KmOGrkvJev9ASzKpc13++NjBlbQFQEQ/CLJdl3ev+alCskIGmlbiJOqBnLpCOSJPM2lIDz6tJ4whLuT4Sq/gUXHau8Xn+gqfsebJmzV6waQGjjDk7XdQqCDu9+BoRepZ+xfLkN9lLBbhUOD6pXFzYjw1iVAzVBRPtUGiqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Bj5pT+h8; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1727015573; c=relaxed/simple;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CmbvOC3wwrNb1DTM8yYFGNGipsPCIRPZOtWTpt4C3feHOFX52G6gKOCxPlttDqgb0FKRcxNa1ZM+lh7HA5PtuZcmh6MFt/d9rWfYO5vzjkW+vNam+Z6vbvT9T/n6ipmweq8LUmiXOqYIrLwBPcLwR0Lv7YVWOFR9Fqlvkc6jLLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=4nuSC99z; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Bj5pT+h8"
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48MCrgQu032383
-	for <linux-block@vger.kernel.org>; Sun, 22 Sep 2024 07:18:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=s2048-2021-q4; bh=8O6
-	k4c2jaJB7vRLGt5+zzaNNp5aDlFWuaR7DkhyaT2c=; b=Bj5pT+h8o71PlVmo5CR
-	A5F12Znmhr0vZaT4TP09yZAyFNTN6Iw9qDkIsfLOGZGOuRQwqnD9Fk3PB80QVZfZ
-	73KYtN8rFiOu6RsyfvUYWlF3uGJxJrIfeSUH1Lk32TU/yWdb+yvt8Gj5zMoS+WLX
-	WXHZZ/8+bf/ICuijhn3kRw7vmD8bH18hCR8/UHXHISBLeJ/jaL0aTw2vHFSVaLQ2
-	tYzfgVhzuY5+WpYrW2cwrRFcUCe/BFfQZ79tZDH7LRGrINt6ORZ++/SuN3p1S7yl
-	Uw7jqbaYMqaAzOXQJdxbpVJKf2iAuUj+aG1nrJOpsgNUecUFq5EhyDYpMoW0Gzik
-	mEw==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41ssfeehm9-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Sun, 22 Sep 2024 07:18:14 -0700 (PDT)
-Received: from twshared18321.17.frc2.facebook.com (2620:10d:c085:108::150d) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Sun, 22 Sep 2024 14:18:13 +0000
-Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 82DC81352B87D; Sun, 22 Sep 2024 07:18:00 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] block: fix blk_rq_map_integrity_sg kernel-doc
-Date: Sun, 22 Sep 2024 07:18:00 -0700
-Message-ID: <20240922141800.3622319-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.43.5
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="4nuSC99z"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=4nuSC99zmjcr9owSUurHo8xLMz
+	txjfy938ZPW5Hmq1K7G/2WZujsAUSwdNlTg99m4Lua6eaqNWuo7YXO51kY+53KhZS63yf33Nb4RIp
+	nt6uYFScJdo0t0gSXLHpLJhONucmmWoj9RYTH56d0rK2xw58qy5PEApUfAg7Q3XRHaQ8GvgiGDfL6
+	FKCnaFQ7RpnACBUQGuixCJOLVGSr2Y6mFDGTS/AKz7Lf7ov2V1VB+svWHov2EFrvxdYb9DqxY65t3
+	6ZFRAJPOP7zZPGF6BKQ8rkUnZhSs/Dgjg3sFiB/bRpOczy4CMihrFLPNeJybrrLx/Qx+T5fJ9/9H1
+	NGV+e06Q==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1ssNdr-0000000FGfT-25Sv;
+	Sun, 22 Sep 2024 14:32:51 +0000
+Date: Sun, 22 Sep 2024 07:32:51 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Keith Busch <kbusch@meta.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH] block: fix blk_rq_map_integrity_sg kernel-doc
+Message-ID: <ZvAqk3Kpoo2ufwiF@infradead.org>
+References: <20240922141800.3622319-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: uvpkmQHf-PCNdiDwrKXr7Bhhco8ke6pl
-X-Proofpoint-GUID: uvpkmQHf-PCNdiDwrKXr7Bhhco8ke6pl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-22_13,2024-09-19_01,2024-09-02_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240922141800.3622319-1-kbusch@meta.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: Keith Busch <kbusch@kernel.org>
+Looks good:
 
-Fix the documentation to match the new function signature.
-
-Fixes: 76c313f658d2752 ("blk-integrity: improved sg segment mapping")
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/blk-integrity.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/block/blk-integrity.c b/block/blk-integrity.c
-index 0a2b1c5d0ebf1..83b696ba0cac3 100644
---- a/block/blk-integrity.c
-+++ b/block/blk-integrity.c
-@@ -56,8 +56,7 @@ int blk_rq_count_integrity_sg(struct request_queue *q, =
-struct bio *bio)
-=20
- /**
-  * blk_rq_map_integrity_sg - Map integrity metadata into a scatterlist
-- * @q:		request queue
-- * @bio:	bio with integrity metadata attached
-+ * @rq:		request to map
-  * @sglist:	target scatterlist
-  *
-  * Description: Map the integrity vectors in request into a
---=20
-2.43.5
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
