@@ -1,232 +1,250 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6451712E5D
-	for <linux-block@vger.kernel.org>; Mon, 23 Sep 2024 06:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727073084; cv=none; b=oFxONmf1ztIuPhq9xlIR8+mfGrRExEpDq4gJN4SpdaLKe6H2Yva1HmjblUmPOdxqs6aW38Cqb3gz5IGd1HzI/keRUoE3xLbxt/pjPdUNmYvdNXvVrV1K0gIi1I2Fbd86ed2+Rw87SvbFNHUqTirAIrTCuJNKdQkhaAuVoeceXOM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727073084; c=relaxed/simple;
-	bh=OcCJeJobHZzrowTHzZsblmR57klSEu9XCB+udNj/aEQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Er4mznpguw1wmFm7GT7C4JqrSLsMgRkQuRQEUEwmjqn7c9qbqXtFgEcp1rny1TPEo2UW27UwCxz/ZsX7MhLkDW9g2k3mYKGRSNtn4h43NfGHNHagnvsnzZFbUeshCOFIv/NIeIyBivf5L4zt4uNtmNJwsa40FO9FreUZ8k8n+RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0rzrLt75; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jgLB6hTt; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QN0BAD33; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mv4qvUXl; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5B6D529;
+	Mon, 23 Sep 2024 07:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727076008; cv=fail; b=SXLH7/0ouFZi8ar8JJTHzFs1BhkViXxP/BfNMslbbyVpgHVUsL6N5eh3LMlKDX5LdiBloEdA17RtL6R7/KN+Rw/JnVltGg5Wpz+FeOSrWN/zneFsUc59vPbMap08fl1Iecik+RDmjMAhnt4Fhkn5C1ppiYrOYEc3a543WOyqxA8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727076008; c=relaxed/simple;
+	bh=K6Mm7xhFfArcC4KuvAONKzsHehpkP6Y3hyqPn0qk3c0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=afTNEHo3dypAU5xDZ8NSnXtYnnB7zgYStgH7hOus5vTfWfMCPAUYayEH7/D8KMy+Q6Y6nPfRdlhwwfdBtoecOojNNidxrWVhmdLIuUTUK2TfrnEa43euzrXBP3xdcbpJ//ihmXIBKTHFh62mt9lNypqIifn59bXzQTce1hgszT4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=oL4ftEcF; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=hQC/aB8h; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0rzrLt75";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jgLB6hTt";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QN0BAD33";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="mv4qvUXl"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id DC02C1FB50;
-	Mon, 23 Sep 2024 06:31:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1727073080; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BTyjzRLqT6ZbaWunnClfylzQNdAVF2Mg5wFTiBIIHrs=;
-	b=0rzrLt75LcQYr/WzoBQ0Bev39qRtqePH7yQK5lcT4//KcUyXshkIuJQbsyxicQgw3t+mJp
-	mhxsORUKNK0haGPSprJ3XlP2NXapzW+Vm2E+/wbAVldx2HAVTU+73HoulqL0C4HzNx3exx
-	m+SXfnk2ARmS8F1srnQleaiSGejRzoM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1727073080;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BTyjzRLqT6ZbaWunnClfylzQNdAVF2Mg5wFTiBIIHrs=;
-	b=jgLB6hTtgkem/NUPRpOp3lV69DN4gq4WXbBvU9X+ZXsOu5ifDuSyGGpHsm2hvcDDEj+T3k
-	0w/CdmrN3VmYLTDA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=QN0BAD33;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=mv4qvUXl
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1727073079; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BTyjzRLqT6ZbaWunnClfylzQNdAVF2Mg5wFTiBIIHrs=;
-	b=QN0BAD33Iyg/bOxzkoNWDV4I3Ft2bL3grKX0msKHDNUlLEXnhnOIvTu244cD22vh4wd5uj
-	MP0+wgnC8MJaIFAyN6F2dBvmTAkRe3EupnbRnNoF4DdVMQNRD0rGQi1s+cAe9czEJQ0/Po
-	n+79qR+EBQL3AmXrRyVuX0D3n8ftvcw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1727073079;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BTyjzRLqT6ZbaWunnClfylzQNdAVF2Mg5wFTiBIIHrs=;
-	b=mv4qvUXlnym0h+B3P1DuvZmBKnGXsAKnoT0TRm6uVEZPqP+laQW10x0EzO14qQIitrgvb7
-	aCUHTPs5wNHJktBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9A45513A64;
-	Mon, 23 Sep 2024 06:31:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id zvU9IzcL8WZCTgAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 23 Sep 2024 06:31:19 +0000
-Message-ID: <5ce3b803-275d-4be3-a9bc-87d06a8f5033@suse.de>
-Date: Mon, 23 Sep 2024 08:31:19 +0200
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oL4ftEcF";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="hQC/aB8h"
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48MNaZG2024446;
+	Mon, 23 Sep 2024 07:19:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
+	message-id:date:subject:to:cc:references:from:in-reply-to
+	:content-type:content-transfer-encoding:mime-version; s=
+	corp-2023-11-20; bh=YmuD9cTb4luFpscZhvq57fgdj6756KTwjX7BB3btou0=; b=
+	oL4ftEcFpfiLuAgu6yhRvVn9C/+Y9k0xsAbpj66EHHPpsDFL7nyG3Z5GuezpLic6
+	Jf6NdMq1hlU+f+L6+rCPl8foQDHb9z1Tdw2XmO1UVAfhTPq03cs1esyjZI/KpJIf
+	yyXkyFVKTrrHvJPHBw2N4LB2V/pH483hAnBCMmqlL/6sN+iTZSW7bB91L7oegt4p
+	gEQdFVYVirYkquUC0uRa+N2WaAgHnWEgtzLKJ2UUxCgT0JxUfw+EwYMxaOeFpJm0
+	1hT27gdSluHJnNyfJ4/MRa+pmSH9GwoihQ8pqz6LwE3gK0a7AZUxyaxpamwk1Vbg
+	n6Czx7eZlS74QHH5KCVApw==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 41sp1abvnx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 23 Sep 2024 07:19:57 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 48N6W3Dx004787;
+	Mon, 23 Sep 2024 07:19:55 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2177.outbound.protection.outlook.com [104.47.58.177])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 41smk7e3hp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 23 Sep 2024 07:19:55 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=J21TnO7iisI4eEgjSpi8gRkZ3jsOpL9kJPPKcwz9AwySGlMpinEyXxRaouuktuGYSwy8yicfvaEOcfWSqkZHj9fyxGNy8U0LXw4TiHotRfn2cWdhCu8EA1mj9HAuxltyGzJrfp9Y8UaJBq2DuQE0bRNBYH9xwFy3Y8BzA1S1GFFAYwLIVVuFIHc3RevWj2rXcFomOtf7G3mlF9Tnb/Gz9FaXrD74DWv9MWo9gUW1jsea8VJX1No/hpV0Gl/IUj8kVcPdQKbPtEZ1DVYredC+FL0dqFEpz5mDr5CBEzSI8jegU5WNT9ugp0T636TfC+1ER2lKUvgmaP9f1TiD8hEfBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YmuD9cTb4luFpscZhvq57fgdj6756KTwjX7BB3btou0=;
+ b=mYlGPL0xuW6moLN18OCcYHqGoEDHFCfMmERw06gNGuXAW2DUemNQ0Ow0DldHRwaMN65p/v+9cmACTy+NcEWVvRfyfCG2IeO9I2pIK4AJopunZnvObIdD8GLEmJTynDoLSNXeiMRbuDWGt9PVwVWSLnh+2ktc6F0X+qdmSNX/5Q8J1y3sEqeWQE+SMG4ZvfQ0601OxOT2kRNT/zygsxkEl9QAnOgno0dpqij81bUm6dCWunbJA/QEk/ufcRvGiipz7/U64E/pIR6Tq1tfBsbk9ZUYeiCxs2cKChb2zbCjOzwqhO37JLwCmbkVHWDpRXvo4a0frvaaK3oQDcU/9l5IcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YmuD9cTb4luFpscZhvq57fgdj6756KTwjX7BB3btou0=;
+ b=hQC/aB8h5cnQI1E4FpEZUHuFDZIezo48H0vGpI6hTWi90kgJlgeq9G+a2p+mk+TdY1wlJiCk2seFGgf1cDf1Nzz6n6MXqDDJJYW7NvFOwW//RY3Q6nOZIqFpjiKZtc2VJD59jUuUuU9oeKyUcFhuJj3SGLSZ5xODpPrD95m/4Ds=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by SJ0PR10MB4653.namprd10.prod.outlook.com (2603:10b6:a03:2d7::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.13; Mon, 23 Sep
+ 2024 07:19:53 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088%3]) with mapi id 15.20.8005.010; Mon, 23 Sep 2024
+ 07:19:53 +0000
+Message-ID: <86f3586d-5b0a-483e-b94b-d4515d5c5244@oracle.com>
+Date: Mon, 23 Sep 2024 08:19:50 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 0/6] bio_split() error handling rework
+To: Hannes Reinecke <hare@suse.de>, axboe@kernel.dk, hch@lst.de
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org, martin.petersen@oracle.com
+References: <20240919092302.3094725-1-john.g.garry@oracle.com>
+ <bbe71976-c16c-4e3c-b110-6bf8eb709d54@suse.de>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <bbe71976-c16c-4e3c-b110-6bf8eb709d54@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO4P123CA0566.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:33b::16) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report][regression][bisected] most of blktests nvme/tcp
- failed with the last linux code
-To: Yi Zhang <yi.zhang@redhat.com>, linux-block
- <linux-block@vger.kernel.org>,
- "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <CAHj4cs90xV1t2NbV6P3_z1oYwD0BcvMhC5V2mGgekRq8iae=NA@mail.gmail.com>
- <CAHj4cs8YGgmemMZDXmt7yHa+Xq3EiEvRWOJGEQTDjqGB2rAogw@mail.gmail.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <CAHj4cs8YGgmemMZDXmt7yHa+Xq3EiEvRWOJGEQTDjqGB2rAogw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: DC02C1FB50
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	TO_DN_ALL(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
-X-Spam-Flag: NO
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|SJ0PR10MB4653:EE_
+X-MS-Office365-Filtering-Correlation-Id: 72f5db78-f693-4045-8e7c-08dcdba01e87
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?N1U3bVJla29vczZtMnVkRnBvL05TVitKNG1kVXVCeDFIQ1ZTZ0pBL01ycitl?=
+ =?utf-8?B?M3pGNUFpU2E4U1Q1U0x6RVhENGEreGI3bDQ2QmFtZ3RoL3M5Zm5vQzdwRWNH?=
+ =?utf-8?B?RWlpKy95NG5uRStoSGcyaUNLZ0s0NXB6dUxLa0tCdHhJM3FMc3hlcHB5QUF0?=
+ =?utf-8?B?Y0pwWHJPOVhLTzlWRzNsMG03dWFiVWtJK1prVmZzWXZtQ3JnOG50ZTVwU0Nu?=
+ =?utf-8?B?REtyQ2JaWUxybGduOHlHQjdQQUFYK3BMY0ZDZ2xIZVBwaTVSdlNYYS9xM29m?=
+ =?utf-8?B?RFhvWGg0WlNFa0tpVG0zK0hlOUNjQmxjeGlGUWFEY0d3L0FxMjVZajQvV0I4?=
+ =?utf-8?B?U1BPWDVGLzJNY2lvbFJnVnUwSTc0K01DNW13TjBwWmRHUjZUUEpsWk4vNjdN?=
+ =?utf-8?B?K2R3VEF4YXdCa2FJcFpjWjN6WkhmczRzblhLdXBURDdpQmtWOWlNcHFqQVow?=
+ =?utf-8?B?R09YSm1jQTBlVHFNazVhMUVRYXltb2hlTU1lejI1MlFuK01rSENub3dMWDNj?=
+ =?utf-8?B?MXl0TnRPUlhlSzhIQWx5Q051YTZMQzRSYklvRnU1bDAyd0s2NGMvc0ZIc3dV?=
+ =?utf-8?B?QkwyZlZ2VlNjY2JPby9RWVNSaEhIcGkvRGxiWEUycUhGOENOSnhIU0tJaEJP?=
+ =?utf-8?B?dzMzUkQ4UnQ1S09LTEsvTVJjVjEzbEE4MnpPRGRwdlEyUUtpZndIYzlFeEwr?=
+ =?utf-8?B?L25JM3lSOEZqRU5uVDFGUmkzc1p1aGgzMjFyRTRIeTljeG5OOFBMdkxQcDEw?=
+ =?utf-8?B?cUtOVWVFL3N5TUpkdDNqWnlNNnM0VHlnSTVXS3d5c3prUkUrY0hPNSsvNGVl?=
+ =?utf-8?B?Z1NiblhZczNtZDBwMEtRZStRdXU4L3A4TURkTnlyLy9kQkZzM2Q2ZXVyNUow?=
+ =?utf-8?B?aFFZbVFxZEorUDNacWlOM3gwQ0tFRmUvejVUSnV2RDhteEdEdGhSVjhXKzc1?=
+ =?utf-8?B?Y21vTDllSlhRN2hKQkR6ZGlYYnMyc1JzUVJodDd1cEl4c3FzN1BsUVVsRXZ4?=
+ =?utf-8?B?RWNGdnVuWXJ1dGdaOGlOUjN0N1J5K0NjSXFWM0RHdGEvVFU0cTNtUEg5WmJm?=
+ =?utf-8?B?V3QzNm9jM1QybHVSdFUrVzhKYkdaVUY4RldEOTJCTzVnYnVWT2hHYUFBRTBG?=
+ =?utf-8?B?TzFsbWdiMkxzVG41cG02UzZXUFZEbzRtQlRoZ1hSWE85bmpPZHovUmlHK2U0?=
+ =?utf-8?B?cWRmNXZNZ3g4OTZBN1pHVzZyVE1pZEJXYlltVUs5S0c0Wk1ZWldtUHZwWFAv?=
+ =?utf-8?B?alc0VUFnbFJLczhqSkdITnFQQjNyNk4vRVR1bVhkM0R3LzhrMjdnSGd6UHpa?=
+ =?utf-8?B?RjZTZWl5Szh0ZzlvK2YzZHkzWXFmN1RuUlNJSnB6UU1wTkxhOXp3cEwrMHdS?=
+ =?utf-8?B?dGMzeWNHRTQ2SXl1UlV0YWlRN0YyMkM4SlBWb3VRZHR2QUNQWWppMWtsTk5m?=
+ =?utf-8?B?QkJwVFJLekplRllobVdhVFZHUGZqVjJqQy94SmE0YzdmTlFybXlUV25tWjBj?=
+ =?utf-8?B?Zyt1TEpRWDJXS1ZrS0dFWWNGdmRPQzJ0QTdxdVpSYmRtQ040YVM3Nk9CMXhG?=
+ =?utf-8?B?RGNCZ0ZMUG9iVTYwRnJUWXhQdVVQd1dMeFY3WlpHcnB0VGhSc0xETkpERjQ3?=
+ =?utf-8?B?eXpkbDlSTUxVLzFnaUlqUnYzUDVxV01iUUdaWkFKQmYvWHExZm9HL2tCM2Vy?=
+ =?utf-8?B?SW1URThVbDl2bkxCcFBFY0F2dzdNdWkwWUxwaW91K2dOL3ZIZWNNVlF3PT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MExIUUhabDR4M3NKaDNuWFhpVm1iSnVxeW1uMk1BSHM0a1F3cllNazFkV1JR?=
+ =?utf-8?B?NlFYUkIwTkx0c3N6VGJoMW9jSjlJZllHVW1wbjZYK1hoUnRZc3FUQlE2M3Ba?=
+ =?utf-8?B?KzVja21TTUczTmlmUFd5bytzbkowSHFYSjRqNkp5bDdIV1FnMXRMSkF3NHh5?=
+ =?utf-8?B?YkZWbVVnOFg0aW5DV201UE91dnMzT1IxV3ZpSkVJSFgyT2MwTjU2aU1vRm1F?=
+ =?utf-8?B?S3ZsQjI5YXlSS2Y3NWhERmcrVjJCbUQzT2E3ejNYZzVsYm1pMk1DNGxPT09N?=
+ =?utf-8?B?YWFhakR3bm9yRktXcVl3OWVoZXo3dFR5UUtoMVZHbDJ4U3dsVTBzcW9sNjZY?=
+ =?utf-8?B?Z0JoYXZQM2hhZjg3MEFzMmdLeDl6aTdZbGpic3RUaXlKNVNnS3BlVTJpdFd6?=
+ =?utf-8?B?clBvOVcxRUxDWXJnb2JFSUtMSjdxZ3hyWHhTU2I5MEN1QVZCc0xWbFE1NFpY?=
+ =?utf-8?B?Q05tdUlyblFxRGd0YjNlYW9xQU9YVHF2TnZOKythbzdhU1NWTjU0bjIwSG9v?=
+ =?utf-8?B?TG04ZUtvaXpRUEZSUUxiQW40K2JxNEs0RCsyc0N2bS9WY0lCdXd1SXZFQUFz?=
+ =?utf-8?B?eGNBeWNmbHNHY3B2clZQeVRNVzVoWWdQcUw2VnRwcFJTWU5SbWVuWmlCQXRC?=
+ =?utf-8?B?bjdyZmtPNGY0Q0xvdzd1MDJ3OEF2YzlWMVRxN2dWTTVPeEJVRnhCWHFnOFZx?=
+ =?utf-8?B?MUZrcXdYeTU0T1dBVnl4ZEIxelM3bEU3Z3JEY05JYnovWGV6TnhCdUExSCto?=
+ =?utf-8?B?RCtoZDlvSTdHU3hwRDdYWk9obFM1Y3ZxYXgxQ2I2VHRQbjN6Y0hOeWlCZUQ0?=
+ =?utf-8?B?WnAvNFRxdFFvSjd0eDZGZ0xqckZsMzFOTkFGc1h1Ry9yRndSZ09McWx4NThl?=
+ =?utf-8?B?b2dXUWprcFVQL3c5V2ErNGljOE5iVW8wQ3hOb25ON2lBcmR1SUtoZVVCdG5Z?=
+ =?utf-8?B?azlCb1RSdFFicjZSeHJmYW1nbUI2N0NYQXA4bzlWWkppeFdrMjg3b2NUSWwx?=
+ =?utf-8?B?Nlk2Q1VGazV3SnBSM2I1V2FsWTBFOUI0MEhSQ1lxbjEwdlZzTUhlcWxVWmVD?=
+ =?utf-8?B?bXdSUEdrRnpGNHFVZzBRRXUrVEZ5cks4RUtNVWdsV3VTYmNTbHpnWEhFQVVM?=
+ =?utf-8?B?V0pKZVo3ZmtxTHJPa08rOS94VEpyT0t6V2cvZHZudEF2bjl1MkFBYloxNkxG?=
+ =?utf-8?B?MGJFYWlIUktnN0R4cWVsL2FQNlFMTHpYVmJ5L0xMbG1LNVRObVRwakNnZmxz?=
+ =?utf-8?B?RlVhN3ZnNXh6MWU0NGoyZFg1bVY1QkJmU0dMRGFjMVdSZkV3QndmY1Izdnl1?=
+ =?utf-8?B?Qi9tMjA0ODVOL3dBOGkyWUw5alZOajFHUkNKSjJGQXlxQzhRZ1BEU3ZvdVdM?=
+ =?utf-8?B?RzducDR6R2NJUkRhWkQrYmlmRDdDNGF6aFRJMGJnTlp6Q3kxR0pWNEszVTE3?=
+ =?utf-8?B?SlFvRjdNMWJDYlcxa2ZGZFhtczdqa2RtaCttNTZBRGNibEh6WVQ5ZDdsWUxH?=
+ =?utf-8?B?dFJPSnJrZ0ZHSkxiMDMyWmpBcHkwVEs5a1Foak1Ma1VMc3hXMTZ0SDFENU9Y?=
+ =?utf-8?B?VUpsMjNpaG5mVWg0dnVtOWc2MnMzMWNYak5NVE1VdEJIRTNZVUIybUVZeXNU?=
+ =?utf-8?B?a2RuOXMwd29pRytPM2VBbHFzRklKdmpnYk5CUE44Y1ZIaVFNa0tDZ1NGQ3Iy?=
+ =?utf-8?B?VWxyMnBISnNXeUI1WTd2RHA2dHdKYjFPdnlQbEp6RnFPZituQ3BMby9DcHJV?=
+ =?utf-8?B?OWdySEdJWjIzM2EwcE9YNmhWejhHR3NBUXQ4bTdmYXpldGJmV1kwREYrNzBM?=
+ =?utf-8?B?SmVlRE9LSDFsNnY4R0dlNU1lREE5Q09VQTlJTWYxVlAwSkZPOUEvU2VVVkNv?=
+ =?utf-8?B?dkUxVExHandtaTFWc0pNZzlMWTZhaWtsSUduTzMvdW0rc1VUYTduSmYvMjl2?=
+ =?utf-8?B?ZGtPQnQ1Ykl0VVpsK28rOGV4UUdYZ1B4RkEvS3EyS2M3ZDVmYXFtUWYvdXlI?=
+ =?utf-8?B?cXBjTlBXb1J3M0E1eDFGNXJ2ekxXdkEzQUlCU09Tam43b3RqejRHZ2FYenQv?=
+ =?utf-8?B?eGsvbXlwTXhQOC94Zlk5NVcyRU9pbXhidVo4VW1sQlNwZTh3aklpQU1wa21l?=
+ =?utf-8?Q?zvx1nYK2gvbpU33ym2/KqFwz/?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	RBgKDKO2+Hfc0aCB0XY/bRC7Ky+bNFSJX+Auip8l2mZizHsJY9aCoSRnsAARBBKTbFibpOMMy6qVYFSdgY0gtJbkU1P9pg1hmcIDFy9gbKoyXkP7PSgbf2HW/3UoLQSdUf9sJ2wfM+a905WKmMWjEI8AU9jMM+rdhJWmlcNcHexFSX/tuOm/XtG6AHFzF+0c2yFEQWb0hljbJf08jwqGpWOqiHE7YCwgF4naw7kf8o8NhLBwlqAtBJyKu7CGvOAwianztYs+SrpH5v8WGLL8/5VGNg/0CpIFwSkVRYnuax+Md98RRYMXbSiDHoZbIfuDGja5JaojdQnk9g/1XscITOHfNOYCiI/TRPDAm5/v/CA0/yH9tIW8UOgBX5hh44Y2Lvk8xCI8I40n+rSM+rd1akL5xfG1schloM4J1VNhbcVl6/ZUYwl1a3c928mHZSLthJ+zeFbW4WRBzGVtOaaK9FZfO1xcWU/JPAnho8zprQNt+HdbQCN2oUeE17q/CMtsZk+PNIHhafFXrybv9NGVULmiKXyXXFqpaFdh1jxm5nTN8JgF6CUcp/YBT9LrqbC0xjTPXQ7hMKyLO67opThyyowN+Off2CG3cOV8bR+83FE=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 72f5db78-f693-4045-8e7c-08dcdba01e87
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2024 07:19:53.6208
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: G1DhxxUl9+FUzEL+tj/E0ugCJiIbc/LlK57HfrFtmKrNNChXR9vcnkU6Gc5Rd+qo9NHGdu1c2AcRgv93nRyWtA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4653
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-23_04,2024-09-19_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 spamscore=0
+ bulkscore=0 suspectscore=0 malwarescore=0 mlxscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2408220000
+ definitions=main-2409230052
+X-Proofpoint-ORIG-GUID: DAEHZqYeIAt2_zGqF7otUGPwTH43uJH3
+X-Proofpoint-GUID: DAEHZqYeIAt2_zGqF7otUGPwTH43uJH3
 
-On 9/20/24 16:20, Yi Zhang wrote:
-> + Hannes
-> I did bisect and it seems was introduced with the below commit:
-> 
-> commit 1e48b34c9bc79aa36700fccbfdf87e61e4431d2b
-> Author: Hannes Reinecke <hare@suse.de>
-> Date:   Mon Jul 22 14:02:22 2024 +0200
-> 
->      nvme: split off TLS sysfs attributes into a separate group
-> 
-> 
-> On Thu, Sep 19, 2024 at 12:09 AM Yi Zhang <yi.zhang@redhat.com> wrote:
+On 23/09/2024 06:53, Hannes Reinecke wrote:
+> On 9/19/24 11:22, John Garry wrote:
+>> bio_split() error handling could be improved as follows:
+>> - Instead of returning NULL for an error - which is vague - return a
+>>    PTR_ERR, which may hint what went wrong.
+>> - Remove BUG_ON() calls - which are generally not preferred - and instead
+>>    WARN and pass an error code back to the caller. Many callers of
+>>    bio_split() don't check the return code. As such, for an error we 
+>> would
+>>    be getting a crash still from an invalid pointer dereference.
 >>
->> Hello
+>> Most bio_split() callers don't check the return value. However, it could
+>> be argued the bio_split() calls should not fail. So far I have just
+>> fixed up the md RAID code to handle these errors, as that is my interest
+>> now.
 >>
->> CKI reported most of the blktests nvme/tcp tests failed on the linux
->> tree[1], here is the reproducer and dmesg log, the issue cannot be
->> reproduced with 6.11.0, seems
->> it was introduced with the latest block code merge, please help check
->> it and let me know if you need any info/testing about it, thanks.
+>> Sending as an RFC as unsure if this is the right direction.
 >>
+>> The motivator for this series was initial md RAID atomic write support in
+>> https://lore.kernel.org/linux-block/21f19b4b-4b83-4ca2- 
+>> a93b-0a433741fd26@oracle.com/
 >>
->> [1]
->> https://datawarehouse.cki-project.org/kcidb/tests/14394423
+>> There I wanted to ensure that we don't split an atomic write bio, and it
+>> made more sense to handle this in bio_split() (instead of the bio_split()
+>> caller).
 >>
->> [2]
->> # nvme_trtype=tcp ./check nvme/003
->> nvme/003 (tr=tcp) (test if we're sending keep-alives to a discovery
->> controller) [failed]
->>      runtime  11.280s  ...  11.188s
->>      --- tests/nvme/003.out 2024-09-18 11:30:11.243366401 -0400
->>      +++ /root/blktests/results/nodev_tr_tcp/nvme/003.out.bad
->> 2024-09-18 11:52:32.977112834 -0400
->>      @@ -1,3 +1,3 @@
->>       Running nvme/003
->>      -disconnected 1 controller(s)
->>      +disconnected 0 controller(s)
->>       Test complete
->> # dmesg
->> [  447.213539] run blktests nvme/003 at 2024-09-18 11:52:21
->> [  447.229285] loop0: detected capacity change from 0 to 2097152
->> [  447.233104] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
->> [  447.242398] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
->> [  447.251089] sysfs: cannot create duplicate filename
->> '/devices/virtual/nvme-fabrics/ctl/nvme0/reset_controller'
->> [  447.251810] CPU: 2 UID: 0 PID: 5241 Comm: nvme Kdump: loaded Not
->> tainted 6.12.0-0.rc0.adfc3ded5c33.2.test.el10.aarch64 #1
->> [  447.252540] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
->> [  447.253006] Call trace:
->> [  447.253171]  dump_backtrace+0xd8/0x130
->> [  447.253432]  show_stack+0x20/0x38
->> [  447.253657]  dump_stack_lvl+0x80/0xa8
->> [  447.253925]  dump_stack+0x18/0x30
->> [  447.254152]  sysfs_warn_dup+0x6c/0x90
->> [  447.254406]  sysfs_add_file_mode_ns+0x12c/0x138
->> [  447.254713]  create_files+0xa8/0x1f8
->> [  447.254973]  internal_create_group+0x18c/0x358
->> [  447.255274]  internal_create_groups+0x58/0xe0
->> [  447.255558]  sysfs_create_groups+0x20/0x40
->> [  447.255826]  device_add_attrs+0x19c/0x218
->> [  447.256093]  device_add+0x310/0x6d0
->> [  447.256327]  cdev_device_add+0x58/0xc0
->> [  447.256579]  nvme_add_ctrl+0x78/0xd0 [nvme_core]
->> [  447.256895]  nvme_tcp_create_ctrl+0x3c/0x178 [nvme_tcp]
->> [  447.257248]  nvmf_create_ctrl+0x150/0x288 [nvme_fabrics]
->> [  447.257614]  nvmf_dev_write+0x98/0xf8 [nvme_fabrics]
->> [  447.257948]  vfs_write+0xdc/0x380
->> [  447.258174]  ksys_write+0x7c/0x120
->> [  447.258408]  __arm64_sys_write+0x24/0x40
->> [  447.258673]  invoke_syscall.constprop.0+0x74/0xd0
->> [  447.258994]  do_el0_svc+0xb0/0xe8
->> [  447.259225]  el0_svc+0x44/0x1a0
->> [  447.259449]  el0t_64_sync_handler+0x120/0x130
->> [  447.259745]  el0t_64_sync+0x1a4/0x1a8
+>> John Garry (6):
+>>    block: Rework bio_split() return value
+>>    block: Error an attempt to split an atomic write in bio_split()
+>>    block: Handle bio_split() errors in bio_submit_split()
+>>    md/raid0: Handle bio_split() errors
+>>    md/raid1: Handle bio_split() errors
+>>    md/raid10: Handle bio_split() errors
 >>
->> --
->> Best Regards,
->>    Yi Zhang
+>>   block/bio.c                 | 14 ++++++++++----
+>>   block/blk-crypto-fallback.c |  2 +-
+>>   block/blk-merge.c           |  5 +++++
+>>   drivers/md/raid0.c          | 10 ++++++++++
+>>   drivers/md/raid1.c          |  8 ++++++++
+>>   drivers/md/raid10.c         | 18 ++++++++++++++++++
+>>   6 files changed, 52 insertions(+), 5 deletions(-)
+>>
+> You are missing '__bio_split_to_limits()' which looks as it would need 
+> to be modified, too.
 > 
-> 
-> 
-How utterly curious.
-This mentioned patch moves some sysfs attributes to a different location 
-in the code. The stacktrace you've posted indicates that we're creating 
-a controller while the previous one is still present in sysfs, ie that 
-the lifetime of the controller has changed.
-I find it difficult to understand how the cited path could have changed
-the lifetime of the controller object, but will continue to check.
 
-Does the error disappear if you just revert the cited patch?
+In __bio_split_to_limits(), for REQ_OP_DISCARD, REQ_OP_SECURE_ERASE, and 
+REQ_OP_WRITE_ZEROES, we indirectly call bio_split(). And bio_split() 
+might error. But functions like bio_split_discard() can return NULL for 
+cases where a split is not required. So I suppose we need to check 
+IS_ERR(split) for those request types mentioned. For NULL being 
+returned, we would still have the __bio_split_to_limits() is "if 
+(split)" check.
 
-Cheers,
+Thanks,
+John
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+
 
