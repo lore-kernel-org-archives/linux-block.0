@@ -1,209 +1,168 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9A7199234;
-	Mon, 23 Sep 2024 11:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D511E495
+	for <linux-block@vger.kernel.org>; Mon, 23 Sep 2024 15:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727089216; cv=none; b=ETeyr9C6saBd7E92zFMkSBR23ngfwz6tXSv0SbsFVoNQJ+xui6Y27ISQ9GFJRgyxGjgOhmC8DQR3bRhx/R5vx7ZKjyS9Y7rfm+kaw2M8FnLWsW+4QIYfqVotUjdROZ0ZVgUqIcxqSbisMdJFMWLNuH/63/FucGfjpyyKD3Rs2DY=
+	t=1727105696; cv=none; b=Rw+cNTuL9bWR5MfvQwTWxhPn+dTLodN+Y3FebtPxQbK8W42W7SbkrwZyfEwf7G5QyVSrUdJhh9d13h5c5vqTeA6TEQ6EwYroHrhIPFZ9GqU2wFozpEj5nS3ays4aLt7TUIsoTr1doMSYKO3pImCEQ9Ivs8Ngqnl+v0YhXDvzw9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727089216; c=relaxed/simple;
-	bh=WK2gxePyJ3COI9wVgLo2wfO2u0lNfIo8LDzjMGUNyDE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r9gS81rcQQDVDmhQciaOgY5AGxiRaa46c86PE/DTFt7DOFfTvLDdCbIQEUNTY+vQASNZqL8P5w10agKiatOtEvcu/RKXL+4VGBnvLFibvNRBq7+ZzGfuxWt+Yg0wh7qcMW4PmH+NLDcn9e7tu2OG+E/FKglZuxJlgli0pNPQ7JM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1b8jcNU; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1727105696; c=relaxed/simple;
+	bh=HUTUtAJwOnQMmP4ReaCRv34dR7cQveXCjOS0OPc85O4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I6fegwUx5E9ilUUrmZb0qTqj/lraZTu4KSglbKpWLTyAKe4JOHcHnfx17HsKt8fZy5a77/0vcPAc1CvPgeRKUseLGwsl/IRxXhcNloUgOZS/vC7KsrlemjOrwdQiP4rIYTg2Svcf4VhlX7e78tDOlPZItlq1utKafprPvwlkzpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=J50WwPI7; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V1b8jcNU"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42cae6bb895so41854175e9.1;
-        Mon, 23 Sep 2024 04:00:14 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="J50WwPI7"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7d50e865b7aso3672527a12.0
+        for <linux-block@vger.kernel.org>; Mon, 23 Sep 2024 08:34:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727089213; x=1727694013; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nUqmFP2QzVpf7LDbD5h6EoX7C93mpfwdZpjgGxZ7JB0=;
-        b=V1b8jcNUQbo/A/dyYzcKtqpdxKRsyu6STfSSZpxNJliqLWtOsgYwEQ0B+UA3X+bS53
-         CjGm1pbpeh9gjIP2GoJjL9r5bBVRd3ShyCgSiOs0MHZvn8iZJJCMED/WqgpQOXaRsdz2
-         EizsfT1qX+qITec/r1HssVVqTqHgjTQ/0WOdvtVrfir0RcO3rI/rIUi/lb809gyduVv6
-         +w3ho7ijLoHNlCHMuQKqZhlMF/jZCLodzlTCJJcW+efZXf9Epof0DEW+5Oi/CVFRf/r8
-         dhB9Eb6g8pB1zRYK4WVBCqIMNqP3iqB22B2gp6NhP3D0IOPHyGyh88u8foUfl/U8TWwf
-         8lTg==
+        d=chromium.org; s=google; t=1727105694; x=1727710494; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=htTo4bA6hokXxaD54zIm5oQaYvd0c7+2dVU7JGOsPAg=;
+        b=J50WwPI7dLLVNT82rD/g0CuuOnpT2eXDfqqtol1FU/h+cHp7WwfgotmIdVCThEOQLt
+         V/1bS2f0wxf8RdpHyyCjY67EtfdPUlc4kwyCqbUnDp9w2Ir+HK4WbMfukDr1FqzShuCz
+         NpIWXAPVt1FjeLeinjVy3tvsqcBqHyezO3xm4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727089213; x=1727694013;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nUqmFP2QzVpf7LDbD5h6EoX7C93mpfwdZpjgGxZ7JB0=;
-        b=ALbf9DugoGxInT2SfKE1akw9UrQhWtLkLuk+iOdqYFSuIFBJh8lHzZiqjvz33fwr58
-         J21iBtdDorxtUDsKMgwyIQoZ0KjMwYZCV4vliVl3VCU2vp6N6u6OKtICQYmSWW8ywF+4
-         kIGxnFgSWWXNPklL7O74oin/Ljb0QsgvgaIY7I95YLFardmYuoAWiF2/owBCl2zw8Xpm
-         G3bZXULGjxQkWUqWRwIpTGiDa5Uuy5OZfciMrg1KB6uMYtcFW3CyNd/RDKfCSH5isE4j
-         TbM7+ECLVjVIrN6/O/nsoLOvuwk+IRQ5rF/sHaQf83MgVkfSWYoNNLMIVY1RTt2yphIk
-         JFIw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNl0PG1An1JJIW4UskACyWWo12Kou9dvkkqemkyCQH79oine6vBEwRKWIVyuKcZtQlBncrBTktJBKpgaKA@vger.kernel.org, AJvYcCVbCcXVNdzqBe3fVNrU8gS7bAwJXT/yeQqkXJIuEE9E6kXdZRFyzwSdhzf2OfHRD68Koo6DUAP/AsrC@vger.kernel.org, AJvYcCVqDcctbDN1tVNI/kMxeTh+vGHEPsYy0BVBwH7KHrCX/N+UbVp8V3o6FX0qSVOWX5fDF+dIDHy0XSGHkU8=@vger.kernel.org, AJvYcCW+UCyU0D43Wdj0CnOL3zo4PfQAGyLEwb2moNVoUo5BxiXi/SnNGEJt+QSY/qAOI5lL+lSCs4nssVLi@vger.kernel.org, AJvYcCXhZ8Ij6+qLX966RDNVVjBdwszgxvuPwYPpNrrGlMbvz376qxWEV/B3fsbgW/tMP7RsDoUgwgfSofMG@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcaJEOMlJQn/0Kh9SEx3rtEN7QEvCkuULj6BieICzSaWgs7YfN
-	lAI3PylF4mZJslIoj4adC9pD4q6j4uLGi43t7r7vnS2UQ2gU3C0K
-X-Google-Smtp-Source: AGHT+IHCSD/ALgIwBZ5s3Hy9r99p7T8tE7frQFItu74MHzu4oqQCqGEDZBKVq8n6KYGDunFNzIIAfw==
-X-Received: by 2002:a7b:cb8f:0:b0:42c:c003:edd1 with SMTP id 5b1f17b1804b1-42e7fa8229dmr57296115e9.10.1727089213273;
-        Mon, 23 Sep 2024 04:00:13 -0700 (PDT)
-Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42e7afd7490sm97856615e9.28.2024.09.23.04.00.11
+        d=1e100.net; s=20230601; t=1727105694; x=1727710494;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=htTo4bA6hokXxaD54zIm5oQaYvd0c7+2dVU7JGOsPAg=;
+        b=R8uR6+8k3YNvWHB7//IezUy7/jFTOJ9bTSs9XasMr4utdxPs0lW6ZgVZwaKAPWdx4j
+         FnIiqE+VnJaNwR/jTfb6Q8ZGcJLfd1Jr92Fyfu6X/ug8V8NZg4QZBPnViX+EewM++WGK
+         YrW5H1MuIDMP7UgWv29KWnGlgv4fhVM2grzhAzXinvjtZCjcEHbSQt9eRmxc7n3g1MOE
+         YD10CGh+/lV86WuWTeeUxQO/UyULWLK6cOJBwfPyYIpjTUtqgzhbr2HOedZteN3vc5PK
+         anParkmB0f81999lhfcj3pz+JrGgPjUeEwgOIvUpIyOmtwIbP0gPy+fayBjl1AzZ94MJ
+         yDgA==
+X-Forwarded-Encrypted: i=1; AJvYcCXoaKL2NPPk9LA47vUcCGLJHatEr6AWKeVCtAsvG69D82zRMF/5uEd91CDNSHsBwAPOMENTf1Tea/Vl7Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0BM80TseBec+gpvQyt0xF9kDqEpWYM8zVvR5kc+muByOIVnw2
+	aiHxACykf3gHf/jGHgeJcOuXOlzZHXijmwq0b8ugL00SP2CpztG9eldag6dEyw==
+X-Google-Smtp-Source: AGHT+IFMxCxBJJJxHj41XbzXl9Q6OwJp+/r0/ziCqyj2dh0P3QlbMT2L4a82gbq0YFQeekc/ifKulg==
+X-Received: by 2002:a17:90b:5344:b0:2da:61e1:1597 with SMTP id 98e67ed59e1d1-2dd80cd73b4mr15760979a91.36.1727105693975;
+        Mon, 23 Sep 2024 08:34:53 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:fd63:e1cf:ea96:b4b0])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dd6ef3c643sm9583520a91.37.2024.09.23.08.34.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2024 04:00:12 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	INAGAKI Hiroshi <musashino.open@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Ming Lei <ming.lei@redhat.com>,
-	Li Lingfeng <lilingfeng3@huawei.com>,
-	Christian Heusel <christian@heusel.eu>,
-	linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mmc@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: [RFC PATCH 4/4] dt-bindings: mmc: Document support for partition table in mmc-card
-Date: Mon, 23 Sep 2024 12:59:33 +0200
-Message-ID: <20240923105937.4374-5-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240923105937.4374-1-ansuelsmth@gmail.com>
-References: <20240923105937.4374-1-ansuelsmth@gmail.com>
+        Mon, 23 Sep 2024 08:34:53 -0700 (PDT)
+Date: Tue, 24 Sep 2024 00:34:49 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrey Skvortsov <andrej.skvortzov@gmail.com>
+Cc: Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] zram: don't free statically defined names
+Message-ID: <20240923153449.GC38742@google.com>
+References: <20240923080211.820185-1-andrej.skvortzov@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240923080211.820185-1-andrej.skvortzov@gmail.com>
 
-Document support for defining a partition table in the mmc-card node.
+On (24/09/23 11:02), Andrey Skvortsov wrote:
+> The change is similar to that is used in comp_algorithm_set.
+> This is detected by KASAN.
+> 
+> ==================================================================
 
-This is needed if the eMMC doesn't have a partition table written and
-the bootloader of the device load data by using absolute offset of the
-block device. This is common on embedded device that have eMMC installed
-to save space and have non removable block devices.
+---8<---
 
-eMMC provide a generic disk for user data and if supported also provide
-one or two additional disk (boot0 and boot1) for special usage of boot
-operation where normally is stored the bootloader or boot info.
+>  Unable to handle kernel paging request at virtual address ffffffffc1edc3c8
+>  KASAN: maybe wild-memory-access in range
+>  [0x0003fffe0f6e1e40-0x0003fffe0f6e1e47]
+>  Mem abort info:
+>    ESR = 0x0000000096000006
+>    EC = 0x25: DABT (current EL), IL = 32 bits
+>    SET = 0, FnV = 0
+>    EA = 0, S1PTW = 0
+>    FSC = 0x06: level 2 translation fault
+>  Data abort info:
+>    ISV = 0, ISS = 0x00000006, ISS2 = 0x00000000
+>    CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+>    GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+>  swapper pgtable: 4k pages, 48-bit VAs, pgdp=00000000427dc000
+>  [ffffffffc1edc3c8] pgd=00000000430e7003, p4d=00000000430e7003,
+>  pud=00000000430e8003, pmd=0000000000000000
+>  Internal error: Oops: 0000000096000006 [#1] SMP
+> 
+>  Tainted: [W]=WARN, [C]=CRAP, [N]=TEST
+>  Hardware name: Pine64 PinePhone (1.2) (DT)
+>  pstate: a0000005 (NzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+>  pc : kfree+0x60/0x3a0
+>  lr : zram_destroy_comps+0x98/0x198 [zram]
+>  sp : ffff800089b57450
+>  x29: ffff800089b57460 x28: 0000000000000004 x27: ffff800082833010
+>  x26: 1fffe00000c8039c x25: 1fffe00000ba5004 x24: ffff000005d28000
+>  x23: ffff800082533178 x22: ffff80007b71eaa8 x21: ffff000006401ce8
+>  x20: ffff80007b70f7a0 x19: ffffffffc1edc3c0 x18: 1ffff00010506d6b
+>  x17: 0000000000000000 x16: 0000000000000000 x15: ffff8000808e85e4
+>  x14: ffff8000808e8478 x13: ffff80008003fa50 x12: ffff80008003f87c
+>  x11: ffff800080011550 x10: ffff800081ee63f0 x9 : ffff80007b71eaa8
+>  x8 : ffff80008003fa50 x7 : ffff80008003f87c x6 : 00000018a10e2f30
+>  x5 : 00ffffffffffffff x4 : ffff00000ec93200 x3 : ffff00000bbee6e0
+>  x2 : 0000000000000000 x1 : 0000000000000000 x0 : fffffdffc0000000
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- .../devicetree/bindings/mmc/mmc-card.yaml     | 75 +++++++++++++++++++
- 1 file changed, 75 insertions(+)
+---8<---
 
-diff --git a/Documentation/devicetree/bindings/mmc/mmc-card.yaml b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-index fd347126449a..fab9fa5c170a 100644
---- a/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-+++ b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
-@@ -13,6 +13,10 @@ description: |
-   This documents describes the devicetree bindings for a mmc-host controller
-   child node describing a mmc-card / an eMMC.
- 
-+  It's possible to define a fixed partition table for an eMMC for the user
-+  partition and one of the 2 boot partition (boot0/boot1) if supported by the
-+  eMMC.
-+
- properties:
-   compatible:
-     const: mmc-card
-@@ -26,6 +30,48 @@ properties:
-       Use this to indicate that the mmc-card has a broken hpi
-       implementation, and that hpi should not be used.
- 
-+  "#address-cells": true
-+
-+  "#size-cells": true
-+
-+patternProperties:
-+  "^partitions(-boot[01])?$":
-+    type: object
-+
-+    properties:
-+      "#address-cells": true
-+
-+      "#size-cells": true
-+
-+    patternProperties:
-+      "@[0-9a-f]+$":
-+        type: object
-+
-+        properties:
-+          reg:
-+            description: partition's offset and size within the flash (in sector
-+              block, 512byte)
-+            maxItems: 1
-+
-+
-+          label:
-+            description: The label / name for this partition.
-+
-+          read-only:
-+            description: This parameter, if present, is a hint that this partition
-+              should only be mounted read-only. This is usually used for flash
-+              partitions containing early-boot firmware images or data which should
-+              not be clobbered.
-+            type: boolean
-+
-+        required:
-+          - reg
-+          - label
-+
-+        additionalProperties: false
-+
-+    additionalProperties: false
-+
- required:
-   - compatible
-   - reg
-@@ -42,6 +88,35 @@ examples:
-             compatible = "mmc-card";
-             reg = <0>;
-             broken-hpi;
-+
-+            #address-cells = <0>;
-+            #size-cells = <0>;
-+
-+            partitions {
-+                #address-cells = <1>;
-+                #size-cells = <1>;
-+
-+                partition@0 {
-+                    label = "kernel"; /* Kernel */
-+                    reg = <0x0 0x10000>; /* 32 MB */
-+                };
-+
-+                partition@3400 {
-+                    label = "rootfs";
-+                    reg = <0x3400 0x200000>; /* 1GB */
-+                };
-+            };
-+
-+            partitions-boot0 {
-+                #address-cells = <1>;
-+                #size-cells = <1>;
-+
-+                partition@0 {
-+                    label = "bl";
-+                    reg = <0x0 0x10000>; /* 32MB */
-+                    read-only;
-+                };
-+            };
-         };
-     };
- 
--- 
-2.45.2
+The above is not needed in the commit message (not even sure if the
+backtrace below is relevant).
 
+>  Call trace:
+>   kfree+0x60/0x3a0
+>   zram_destroy_comps+0x98/0x198 [zram]
+>   zram_reset_device+0x22c/0x4a8 [zram]
+>   reset_store+0x1bc/0x2d8 [zram]
+>   dev_attr_store+0x44/0x80
+>   sysfs_kf_write+0xfc/0x188
+>   kernfs_fop_write_iter+0x28c/0x428
+>   vfs_write+0x4dc/0x9b8
+>   ksys_write+0x100/0x1f8
+>   __arm64_sys_write+0x74/0xb8
+>   invoke_syscall+0xd8/0x260
+>   el0_svc_common.constprop.0+0xb4/0x240
+>   do_el0_svc+0x48/0x68
+>   el0_svc+0x40/0xc8
+>   el0t_64_sync_handler+0x120/0x130
+>   el0t_64_sync+0x190/0x198
+
+[..]
+
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index c3d245617083d..d9d2c36658f59 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -2116,7 +2116,9 @@ static void zram_destroy_comps(struct zram *zram)
+>  	}
+>  
+>  	for (prio = ZRAM_SECONDARY_COMP; prio < ZRAM_MAX_COMPS; prio++) {
+> -		kfree(zram->comp_algs[prio]);
+> +		/* Do not free statically defined compression algorithms */
+
+We probably don't really need this comment.
+
+> +		if (zram->comp_algs[prio] != default_compressor)
+> +			kfree(zram->comp_algs[prio]);
+>  		zram->comp_algs[prio] = NULL;
+>  	}
+
+OK, so... I wonder how do you get a `default_compressor` on a
+non-ZRAM_PRIMARY_COMP prio.  May I ask what's your reproducer?
+
+I didn't expect `default_compressor` on ZRAM_SECONDARY_COMP
+and below.  As far as I can tell, we only do this:
+
+	comp_algorithm_set(zram, ZRAM_PRIMARY_COMP, default_compressor);
+
+in zram_reset_device() and zram_add().  So, how does it end up in
+ZRAM_SECONDARY_COMP...
