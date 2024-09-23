@@ -1,233 +1,156 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961EE26AC3;
-	Mon, 23 Sep 2024 10:41:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727088073; cv=fail; b=slugQdmzQVjMl0fifuA+Q2ycM3WKqz95rgEyeQwbH9ym2BgHnwTmpx2ky53s1Y0qfwYEDDTO/QWmlRpwNkUmww6khgrMyIJx5+78MsXf2wRIHRbAVNGjD5b1IJvBqEXtuzu4W1SMu/jNVPW3ArHl6DMgbNMXxBrziA9CD0ypdu8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727088073; c=relaxed/simple;
-	bh=vgx9PYuhtd75DDdIcY++AzzEnMJdokbes03awWCOtVw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=SY/F+noCA29o4gsB/XpihQHTMATX2yEKNO8DI/9ySiLAHS1DaU8VGaYz6LlDlMX7ebjXHbHn2BU38o1qjtkSKK9paFwGdva7kUQLmdPfoqYcEwpc1Z630UN0yYos1vPTbS9v/uIF5OyfqbsO17uUEcGgFyB/PtkF0fzgG6f7SmM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=RL9a5oM2; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=FntJl2Ii; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E95B197A88;
+	Mon, 23 Sep 2024 11:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727089212; cv=none; b=cPfBOBNYQr5v+YbAE35EpemGk8u1YKRZnLmrW6KKjn7p1moaZSQML7YRwZ0liehQYS0Of0lCsgi+/P+Xb9WAaBYOPiorWh1f0ofsZc4k6Vc3XFUKlgpbYtKVnXYm6bASzHiDsPsK2wCh85Qbsdkb/ayuluJSSFdmI+qYMzvYo3s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727089212; c=relaxed/simple;
+	bh=rEJOd8Ag634czjmTBSKTu+5heBAHV6i2Bwts/0hgliw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=mSEux2RjopV/kOucIJiHrq3IgPi+MJHoZBKmA5j+Lw0qWLdNYH5/VXceGxfNWryRGDMvvwM6AW9xQiHaL43C740iVxAnqjGwMWUxG7eX+iqZPl7gg6OCagJ8GPA/oIIqtz1SDO6tXSwE0Z4ZwjNmqGdSAmkMAYMt2w4qYbSM/tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L+JwolTB; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RL9a5oM2";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="FntJl2Ii"
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48NABkxC010226;
-	Mon, 23 Sep 2024 10:40:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=
-	corp-2023-11-20; bh=sXntBT5Ei+RnDQfty6TCbCsKdT5s3rGvClNBF5ZHchc=; b=
-	RL9a5oM22q/k3iFgp4lxz9U4z+pY1cx7XBh8GbG7QRIAXSaKlSD4KIwvJT0EpY4L
-	UGorK2BknD+I1KuYQoaDyR57xptbmaYbzlnCLYLHYl7tz2d+AjYZ1PkAiCUTbEnd
-	tyNlQABQSUvTeV/s82W2Vu9jOIOoXhJkjU6WmKKkbFucbugJGtnPjbr5UqQXoDHE
-	g1TpsNN7IVWMQPnNXgcl5rbRBxBGOecWBMHowYQ7crrax+OhkRMuAokQVPHBy4wj
-	LzOgIsGw4vEvBDemR5gbZpGTJuDeKq8l1kZ5x9X5aCuHme6QHVlbYUB61yllfeqn
-	K2G/LRiOEjh99dJ1p/dkjw==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 41smjd1vqd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Sep 2024 10:40:56 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 48N9uAp7024940;
-	Mon, 23 Sep 2024 10:40:55 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2042.outbound.protection.outlook.com [104.47.55.42])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 41smk7m1e5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Sep 2024 10:40:55 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rMLv048tCYTJ8q6YyVyzWeR5uTirefWartZ0DiPjMEw3GMQ5XRmyQhT+cNQJP+3awA/XhUvhdOcr4xFKcB5T/8bX5bicVodZBVyilZvf9jYQlpoy0ALNtRdrZCb9nUQ01UdsjKipf1pfIHhjCrUrH5Dzttme2WYlXUUBvT4XZjNs50UiG2qtYgOhdeD4ph4aiamE6qe6t3EEL/aCeg1/3S+lNg/W1kEyLVXxs1a828FIA4wt3RHEcE0WIZGAG390waeSoOdb2s1w32YfhfmCUBTmMSlMeiU4HAdqT6UxA/tMTeusTSAJAdJfSDVHioMWL5qQjb8o3H/VdB86gcHceA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sXntBT5Ei+RnDQfty6TCbCsKdT5s3rGvClNBF5ZHchc=;
- b=nztpO/wbUTIKxQ7ls4oJF5HYRiv9XCoBkXeV56XCiC+VR+SGpO2b9KI6QHtk7hGCV2GyAzVDtzQEdH5DxRQcn96yNomHLiGKNlgg7T1PT3Dc2V3LfWd/lKVKaBLjw41xKflC/OUi6JL5Qs2jPOaFCZQAHCQMJCZZnMUkiw/2ErdgsqOouIA3yVJOOUVCUffIMuPVNIKdtOaXq0DFOYJ1a8zKF9qbbaI46g6z3Pq8vdboPWJydM4MckhPVhGHhquRQLxnNZoY2auAMJUprw+TZXzmZaqGDDQx4OVyIrUXsSWeitjHlradsCEwMw7qcVHyVSacD8rO5qR1iGlBRjxkSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L+JwolTB"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-42cde6b5094so37867095e9.3;
+        Mon, 23 Sep 2024 04:00:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sXntBT5Ei+RnDQfty6TCbCsKdT5s3rGvClNBF5ZHchc=;
- b=FntJl2IikbI0vZQs5KGzSCjQHxNTFED4BUa4Bq33UkoIp8eUsOf2MhfHDHnfnhRFe16fyY/Ex+IjUjbLEaXhwSjeBMmnFsofNhiqnUJtoFhchoGAO+z/AOQ/gcfkHzeNuvt6PWuXHLe+CudaveZ76jWFCuwT8wFCDH1bz0oc27w=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by SN7PR10MB6497.namprd10.prod.outlook.com (2603:10b6:806:2a4::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.12; Mon, 23 Sep
- 2024 10:40:52 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088%3]) with mapi id 15.20.8005.010; Mon, 23 Sep 2024
- 10:40:52 +0000
-Message-ID: <e14a87cb-6f83-4725-a556-0819bcff8a98@oracle.com>
-Date: Mon, 23 Sep 2024 11:40:48 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 5/6] md/raid1: Handle bio_split() errors
-To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, hch@lst.de
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-raid@vger.kernel.org, martin.petersen@oracle.com,
-        "yangerkun@huawei.com" <yangerkun@huawei.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20240919092302.3094725-1-john.g.garry@oracle.com>
- <20240919092302.3094725-6-john.g.garry@oracle.com>
- <bc4c414c-a7aa-358b-71c1-598af05f005f@huaweicloud.com>
- <0161641d-daef-4804-b4d2-4a83f625bc77@oracle.com>
- <c03de5c7-20b8-3973-a843-fc010f121631@huaweicloud.com>
- <44806c6f-d96a-498c-83e1-e3853ee79d5a@oracle.com>
- <59a46919-6c6d-46cb-1fe4-5ded849617e1@huaweicloud.com>
- <6148a744-e62c-45f6-b273-772aaf51a2df@oracle.com>
- <be465913-80c7-762a-51f1-56021aa323dd@huaweicloud.com>
-Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <be465913-80c7-762a-51f1-56021aa323dd@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P265CA0201.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:9e::21) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+        d=gmail.com; s=20230601; t=1727089208; x=1727694008; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OxRWLiboh7HytSmhqGBPtDBEZbsko5+ohtUjH0Pgnac=;
+        b=L+JwolTBeMW4IwVuDAEb5gVBoCK7PbeHPo78AAh19ln3fXZZBbWxVJ4U3l0gnyKxmH
+         Md5HqDkpAMd5eHv+1btFs8HZ7bzLcGrf+7ptp3p0YXKJnOgwMvCsqJBK0trCqvPe27Bt
+         3SY7JmVT07H+1+1xOfP0mqq1kuMip5cpLce4XKl+Qju3jOT4zzRdYy67UkKIYSCuZX7a
+         4+BAFWi/RPnGa3sJo4j92eoAA8iRRGUHY9v2bIrArNIrVnFHkhHs4UJKTiXg3pbe37vA
+         6lX6O/hsreav+loFl2NjQRL2LJ6KMhFZN3I0L6lval7uTrRUPmbMPK+WwVctBmzO1CsK
+         R8/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727089208; x=1727694008;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OxRWLiboh7HytSmhqGBPtDBEZbsko5+ohtUjH0Pgnac=;
+        b=B1AyDdL+0PCUiOWu7PPODvATwA6tm7imPnxOp4nJ1o/TPwgurHpu3P1Z/inC8CoIXb
+         LHe7qiaKGzKdfr8+C/VoaVf0O2qlLNSEnTeLfB1ADFhn8edDpHs0VWaCKY94RIGAXBJ7
+         gWortHlbpAm/1FBObPzFRPIKyVPiMY4s33X8R4J6Rjm6AugxYAu0atIQvcskSHgxWE8p
+         WTwGRb3rq1/bE+W1D+8ERsh1ED3vdGddKo0rwbhhyNxtz7hLfuo52gQ6ZXyEw/bJnP0O
+         D5nzrryHQwKulxKJtR6aRp9151a1r5KxyPRoOW+26lshoLRwaMwC6cn7YXt3RRIznPSE
+         VuBw==
+X-Forwarded-Encrypted: i=1; AJvYcCVAWsfmFOTgozPBNkHVF1qCA9DPHF5CvBp706GNfvx5TfTR+v9iLqbibA+GAoiszRuPP3x2kf8IeKy/r8Kl@vger.kernel.org, AJvYcCVBJAHyK4/OxC1XY6Fdogdj+HTB3Kf7mSq0T54faXErmfP42LdUoZWCJJ11DT8pT7N52INVCoW/NECc@vger.kernel.org, AJvYcCWUXztGl6j5Pk8v9SzEUifDNRjdT/xH1fRccJ9tQ/RuS0F8PZCf5Si9HPdc7X2nUBDgE5bVaqG9gzWR@vger.kernel.org, AJvYcCX/TOzVb50OZliNSkHRbxF0wkSoK+oEN5NhVSDw7j44SUkvVujAQMGLiehVZFQ682GSED/ZD/uQlNyq@vger.kernel.org, AJvYcCXZ4UVSK9+huxnJhz5YAu1ClzUmVhClJzVsFFf892cKsbMiQByGlFGArpgE0kim4Cnte/GHzwYsPnnQDnI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRri9sX0VLzdNzK/6fSm6g7O7IoPy7Q8QEvxBuoJKZG1h8rDrA
+	gbY+au8nAFFNaLOTeCukVjBkr3+4O2M+CY99WJrzPa6AERa8qatW
+X-Google-Smtp-Source: AGHT+IErWvFQEf2jiK9SRXlOED5yG6nPGlIzASYigX17RzzHW049azXXIEUSdWnJ+MCGtT3N32fXmA==
+X-Received: by 2002:a05:600c:4ecb:b0:42c:ae76:6cea with SMTP id 5b1f17b1804b1-42e7abe8455mr72712825e9.9.1727089207462;
+        Mon, 23 Sep 2024 04:00:07 -0700 (PDT)
+Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42e7afd7490sm97856615e9.28.2024.09.23.04.00.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2024 04:00:06 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	INAGAKI Hiroshi <musashino.open@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Ming Lei <ming.lei@redhat.com>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Christian Heusel <christian@heusel.eu>,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [RFC PATCH 0/4] block: partition table OF support
+Date: Mon, 23 Sep 2024 12:59:29 +0200
+Message-ID: <20240923105937.4374-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|SN7PR10MB6497:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3a3895a6-f61a-4d6a-657b-08dcdbbc325b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SWR4K1l1WTZ3RU1ETDQ2d2RQRkRFMW9BbXFYRyt2SUUzVTNHb1NGQTFMQXZI?=
- =?utf-8?B?VFNQY042bmU2SUh1QUNWL25NR001eFZqRHMvdTRyV1k5eFVFR01tRkxKV2g2?=
- =?utf-8?B?ZFZ1WnFUTGROS2tSTHJPMFl4Mm5tZHVGQnQyc3dpYTROQkE5c3dpNDNrT2Ix?=
- =?utf-8?B?Mk1zeFhRRG9JcEF4cGphb3BFK3lZL2dBOUlkSWlDeTNkTzRtSk9iaUliT0xC?=
- =?utf-8?B?c2hib0pOQ0pIVHJQdjJ1cG8xTkJZRDcwbWNBTDgxSVJodnYwcTNLYVoxREY4?=
- =?utf-8?B?d3p5WXhOVmlHcFQ0UmZtS085cVVxdWxBUUhLWjI1Vkxic2FjN3ZWWDZhU09E?=
- =?utf-8?B?Y1lSMFlKVEg2djJxZHpvR3UxYnVLTklDbENuazExaFpjeXdSQ00rcUtYQmhH?=
- =?utf-8?B?SkVRb0NiYUJqT2diejlmWmFIZU8razNYRm5lR2lWQ1VvbklYL0VuMXVwSWpV?=
- =?utf-8?B?Z3A2M1czTEV5TEp3ckVZay9PaE51OW1IZ0pvT0hHMnU4WmV6R1ZQcnd5ZmY3?=
- =?utf-8?B?WXB3Nis0S1ZmWDU3T2ZjMWpKTDREdFoxSVpkRFJaV1p5VFJ6S3Y4S0REcndo?=
- =?utf-8?B?R2MwZjdkKzhiVnlLYm9Yb0paMVYzbi9jR0dBOTJrSGgydmtlZnplYm16dkUx?=
- =?utf-8?B?VXlVSVM1c1hDNUdFU1RFcHFtS25EN1EvV1VtSHBsM05Rdk04alNDSHpFYk01?=
- =?utf-8?B?bU5IajNmRDF6V1RJNjdZQ3N0NjBkVFBwQTZGS3FaNzJzSmVKZXBmYXpHQmpp?=
- =?utf-8?B?cVoxRjJ1WG1tU0xWNER3N1BnUHFPcXlMcFpaTkpaRzAyRy9SdXdiUTBqMkxU?=
- =?utf-8?B?R0pSZ1dFZUxZb0FZSHhJOS9pb2wweG1HckxPUDZwY2YvZGloTFBWYWxjektN?=
- =?utf-8?B?bDNocnZXTjU1N2M4N251Nm15SUl6UUFXSFJGTUszSFl5UzNBakR3TnBDQzBt?=
- =?utf-8?B?NWQ3SDIrdS9MUDRYcURNR2pPWGZORFFDVHRtem5SL21nd0RZK3ZaM2hiSmJl?=
- =?utf-8?B?TjRGQjE4a01STWNQdDF2SjBqaElJb3VnUkx4eEpFWHVnUTRkM21ydnkxeXhu?=
- =?utf-8?B?QjlkMmFNSDNEWFlMREViUUZsbWdhRW92TUM2VWdiYXYvRlh4WnJvSC8xSmpH?=
- =?utf-8?B?aGkwQ0pPTTdxNE94bmNtZ1R5MmY3MlY4WG43KzE4L1liaUI0dXVaN2RxWUUw?=
- =?utf-8?B?K2l1aEgvSVd2YVBQcUk4YnlzYXcxTndNcEFJbU5uR3NJMWl5SHZIZmJSWllD?=
- =?utf-8?B?allPQnFVc2lWQ0U0VVl2NFdQcWF3dDZtU3JuZnRVczVQUlF3V09NbDJDdHV6?=
- =?utf-8?B?MzNIWmN0UDdvckM2cUhpVlhGSDZqdXo4TDlDSENRRGJRYStXVlAvRnZyLzlH?=
- =?utf-8?B?alJtS2lNcC8wNXNyY2Q3Z3hJL2M5dmYrTEF2ODA3NlQ4dHp5UFhrSUhvN0Zj?=
- =?utf-8?B?Z0Y3K0ZYZUNIK0hRUWYxcml2N1ZsY1l4Y3B3bUdEUVZNNnV5Qm11TjFsSWht?=
- =?utf-8?B?ZUgzNDVsbVg3UCtLWWZySHVlSFdoa0JnOFNHR3ArbzhnUDIvWTk1b1dtZ2hi?=
- =?utf-8?B?enl6RW9zdlhuVHJGQk55Z0JEc3pRK2xOb2dnNk03R3d0dEdKRWZ2bFBSMEgx?=
- =?utf-8?B?anIrT2FJWnVnR1dmM1NURC8veDVYVzQ2Y2JVY2FWUEtXUEFXc3Q3ZlVxSDEv?=
- =?utf-8?B?ekJ0WUd5bnA0bkYyb0Z3clFTa0d3bU54OXdDZ2RKY0tBTXZtMXRUczlaSklv?=
- =?utf-8?B?cWZyNGVXVTc0WGc4cU5sQXV3R1pEYUVBaUM2MHhuSlRxQnRhYkxHUVdaRDRO?=
- =?utf-8?B?SlliamJ1V2tSaHJHK2JDQT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TWphdzg4REROa3crekZvT3Z2OWF3RDRjcWlaVnl1eDNKOHR4a1ZncFBHdEhF?=
- =?utf-8?B?N0MwZStsbmtXck4va3JyVHk3WUxEdkJtdFNSekhtRFpNQzFTa1hvalBRNTVl?=
- =?utf-8?B?VS8zZ1lIVisrOXgvaVZNYUYrOTYvQmszdEZyWWoxaXhiSWYwV0dvMlFCVnpm?=
- =?utf-8?B?bENZZmpEV1BoSzhna0g4dTB1MzBVL2JoN2hDNzdjYmhEN3Q5ekphZTRwQmZC?=
- =?utf-8?B?bXFPVE9JV2RBLzEvRFM4WDlNazFURGxSRjIrSmJwVFpzZmpiais3YjVNZFN0?=
- =?utf-8?B?aEg4ZDVTRWkwS1EzUkx5a3lzU2NWa3duN2RVUmZURUZVZVVYeFE0L1JGVEpx?=
- =?utf-8?B?dU9DaGM3VWZZb0Rvd2tPUS9abklmbnVzcEY0WWYrWkZuRVVITjR2Nkw1MWRN?=
- =?utf-8?B?Tlc3NVBVNUlLL1REY0FzRnRoNkhGUkQyMkdJb1JpV1FWYmU3VWxYS2xuelp2?=
- =?utf-8?B?UjZBNHljOHdVYkdIK3dxOHJUaHo1dWVKOTlrR2hpYzZDWlVKZXRjZ08xc3By?=
- =?utf-8?B?YjJLMm9ZR3B1RDEvcW1YZHZjTUFZOEwwcHRpVkRhNkltSHd0L1FnaW8vYSt3?=
- =?utf-8?B?R29jZWhWY0FBQU1OWUwrK29ja2h0VW8rdVdFNDE4cFFvYW9HdFR2Nm9TeENz?=
- =?utf-8?B?MkJTbStOSGduWUV3VkVyNXcwM2ZFMDJabERlMXM1ckVvREtlUHc4RWxNQm15?=
- =?utf-8?B?amFnVmlzNGora2R4S3U3VytJSytuUFU4dWY3aEFZTnAzYk5GN09DUFdKV0I2?=
- =?utf-8?B?RDZ5MCtpUGV3czdTV1hQdC9GcE5idEJlU1hhNDNpak1GZm5MK2VGTUN4S0xo?=
- =?utf-8?B?NjQvN0t2OUZmdG0wczRaYTd2NlJrQmdZd2lxUDhXTEptU2JLRFNyY3BPbFVX?=
- =?utf-8?B?UUVrS1BpNFU5RFA1bUIvVHhaZDhnOHZCamJGMVlpTDRoOU9wL3hIRDNsV1hI?=
- =?utf-8?B?MU1sbXpJV1VUZ3U3aWlaV1ZXUGdrNXIvaW9MNXZpWjBzMnlvSEllYmRvRDFa?=
- =?utf-8?B?bGx2b045bkc0eUFYenNSeExnUC8rNUcyN0Z0NlYzbWMxS0ptOTgvZ01kN2gx?=
- =?utf-8?B?MW1zeTBudDNza0pXa1Q1WUVZK3piMUdCOURHVmEyR2pXdzJxYWRvV0U3QVov?=
- =?utf-8?B?TjRoRlFGUVBhNXp6WjR4L2dpS2piYzNRdXFZdW93bXNrcWVZSU9oR0RXNUdB?=
- =?utf-8?B?MmUrSzQ0UUI5NnRkYlV3RkN4OW5kZEhmL3pNcDkxV25MRGJHak1icEZ5M2VG?=
- =?utf-8?B?eit3S2luNEd3ZDZxV2NsOUhOU1VadjVabUpORjRZcXB2eHg3c3NVVVFqUzg1?=
- =?utf-8?B?cm44cWxJTHBma2pWL2h6dXBucXdFK0pQblQ5VlRqNXgwa0pVcGMrM0huRStK?=
- =?utf-8?B?b1NWNDZaSGdsL1lzK1MwVnoyQ0tCWis4cUp6TUFVL0xoaVM0S1dHZUIrV3hn?=
- =?utf-8?B?d08yWUNMcldtRkFJdDdsckVmR05aWlp5VnBjVTVsQW5Fc0VodllBTHlLcjhv?=
- =?utf-8?B?Yi9MN1F5bHUzdWx6VjhUQTRsQ29scVp4NUhzdEplS1FXM2gzWkgrQThWaXE4?=
- =?utf-8?B?TW5mMXBYbzVvS3gzeTlZRysySk95aS9hVVA4ekkyUkJaQjEzZXdoYVRMVjRE?=
- =?utf-8?B?UWtVdXNiVmF1MmFKSXFMQS9PZUxzRVhLTzFiOUR6NmtqYVM2NEh6aWkvSUV5?=
- =?utf-8?B?eWJXeDNPcWZyQTdJN0hGTGtaWmpoMUNpeE9zSUtCQytEa2pnOGp2Q0c5djhJ?=
- =?utf-8?B?SXo4UmxVMzFZVmh3emlWNGtualBGSjRUd2hjemtLdkZBWjVhSGtWUDNrSno3?=
- =?utf-8?B?Z2Z1MFpnMHhpc0hydjVZWmZWOFQ5UzdxYm1Zdk51THh3d1ovMnJDRjlFcTd6?=
- =?utf-8?B?eS92MjVxZVk0SHNlak8yVjlvK3Z1dWZQWElTeklUalFBUXk5dkduKytXdjlF?=
- =?utf-8?B?cUQvVStFdEUvNFczZVFsamo4cnJPYlVENk9CNE1YaHM3WkxnWkZhSGRpTE0x?=
- =?utf-8?B?WWRhRThrUVgzdVlvRURCTjJUTHdEK0o4WHV3S3RrS1MwckFldXlOejdBR3VE?=
- =?utf-8?B?Yk94SFVvOUNvZG4vaWZBT1ZRZzZwSnBQdGFTcElMbEpSOTZSQk1GNVNQWmFk?=
- =?utf-8?Q?l0z6SheIAOw0qVKyw/01SWC8a?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	0sfg8bKsvMMYQqyy0btLNxK1dhAEP+CyyhQPtQxDEiDW3VIeWUwGh06iQtjGiKHH7SvO9sYDBBvo6at88ktN8VphGVgwEXJsdDv4HxH5HYDOtkwhAovZYRBtxLdVmdmtTXbmvZe/r1wbecDJaGhvuceRu+LvPZr53UJ1aQDtzwq8wE5EqpAe7BdBJVTULeaxrY8zwCXlGnBN6FOChii1C8yw/M9EqE2k6VlfyWrprcis7NIqN6hXQreMUpQagH/iBVqJsncEzq7BvZDQdYlrZ793WWirqyzrKRPJzosGW1aTpAaYBMDud5U/4UC7+plvTzrBNuJKOObnFVwJjG5UEAXidZveESiF8E8k4TztUhqSvTY6vLF3D1SceesaHHGeBx7EUM6V/l59lktcjIekxXyfdmBfH0DPlB2E6773C3t8u4b+lrDTRwCvW9QnpRZgn2Is1+SgXuDEGyn4I7r6cyhDrlqPMKstjXiGBCeS1B6r6HfLOz8ui2306q0LD/SkkzYxSIf/W+lXjEJJBkPW1yNExwpIEBGN9FuZQSg44Kcrefum9z/qo2guo0PvGHbH2iHYOAptMFsjWeyTatjHWxeRa6A99DhoQk4182qVYtU=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3a3895a6-f61a-4d6a-657b-08dcdbbc325b
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2024 10:40:52.6814
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: U4WY4sES7JSSCxW0kNc3W+Ybu+Kf9szKGE6nxjjcJZX3eSVnIjsyhTXIVO369q4wZIWBv3HhZ3F3Fu1Hj3TdrA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR10MB6497
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-23_05,2024-09-19_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
- mlxlogscore=997 adultscore=0 mlxscore=0 bulkscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2408220000 definitions=main-2409230079
-X-Proofpoint-ORIG-GUID: xHWcrRT4VTM47bCkbArHdE0hGYFue0km
-X-Proofpoint-GUID: xHWcrRT4VTM47bCkbArHdE0hGYFue0km
+Content-Transfer-Encoding: 8bit
 
-On 23/09/2024 10:38, Yu Kuai wrote:
->>
->> Are you saying that some improvement needs to be made to the current 
->> code for badblocks handling, like initially try to skip bio_split()?
->>
->> Apart from that, what about the change in raid10_write_request(), 
->> w.r.t error handling?
->>
->> There, for an error in bio_split(), I think that we need to do some 
->> tidy-up if bio_split() fails, i.e. undo increase in rdev->nr_pending 
->> when looping conf->copies
->>
->> BTW, feel free to comment in patch 6/6 for that.
-> 
-> Yes, raid1/raid10 write are the same. If you want to enable atomic write
-> for raid1/raid10, you must add a new branch to handle badblocks now,
-> otherwise, as long as one copy contain any badblocks, atomic write will
-> fail while theoretically I think it can work.
+Hi,
+this is an initial proposal to complete support for manually defining
+partition table.
 
-ok, I'll check the badblocks code further to understand this.
+Some background on this. Many OEM on embedded device (modem, router...)
+are starting to migrate from NOR/NAND flash to eMMC. The reason for this
+is that OEM are starting to require more and more space for the firmware
+and price difference is becoming so little that using eMMC is only benefits
+and no cons.
 
-The point really for atomic writes support is that we should just not be 
-attempting to split a bio, and handle an attempt to split an atomic 
-write bio like any other bio split failure, e.g. if it does happen we 
-either have a software bug or out-of-resources (-ENOMEM). Properly 
-stacked atomic write queue limits should ensure that we are not in the 
-situation where we do need to split, and the new checking in bio_split() 
-is just an insurance policy.
+Given these reason, OEM are also using very custom way to provide a
+partition table and doesn't relay on common method like writing a table
+on the eMMC.
 
-Thanks,
-John
+One way that is commonly used is to hardcode the partition table and
+pass it to the system via various way (cmdline, special glue driver,
+block2mtd...)
+This way is also used on Android where the partition table
+is passed from the bootloader via cmdline.
+
+One reason to use this method is to save space on the device and to
+permit more flexibility on partition handling.
+
+What this series does is complete support for this feature.
+It's possible to use the cmdline to define a partition table similar
+to how it's done for MTD but this is problematic for a number of device
+where tweaking the cmdline is not possible. This series adds OF support
+to make it possible to define a partition table in the Device Tree.
+
+We implement a similar schema to the MTD fixed-partition, where we define
+a "label" and a "reg" with "offset" and "size".
+
+A new block partition parser is introduced that check if the block device
+have an OF node attached and check if a fixed-partition table is defined.
+
+If a correct node is found, then partition table is filled. cmdline will
+still have priority to this new parser.
+
+Some block device also implement boot1 and boot2 additional disk. Similar
+to the cmdline parser, these disk can have OF support using the
+"partitions-boot0" and "partitions-boot1" additional node.
+
+It's also completed support for declaring partition as read-only as this
+feature was introduced but never finished in the cmdline parser.
+
+Posting as RFC for any comments or additional checks on OF parser code.
+
+I hope this solution is better accepted as downstream this is becoming
+a real problem with a growing number of strange solution for the simple
+task of providing a fixed partition table.
+
+Christian Marangi (4):
+  block: add support for defining read-only partitions
+  docs: block: Document support for read-only partition in cmdline part
+  block: add support for partition table defined in OF
+  dt-bindings: mmc: Document support for partition table in mmc-card
+
+ Documentation/block/cmdline-partition.rst     |  5 +-
+ .../devicetree/bindings/mmc/mmc-card.yaml     | 75 ++++++++++++++++
+ block/blk.h                                   |  1 +
+ block/partitions/Kconfig                      |  8 ++
+ block/partitions/Makefile                     |  1 +
+ block/partitions/cmdline.c                    |  3 +
+ block/partitions/core.c                       |  3 +
+ block/partitions/of.c                         | 85 +++++++++++++++++++
+ 8 files changed, 180 insertions(+), 1 deletion(-)
+ create mode 100644 block/partitions/of.c
+
+-- 
+2.45.2
+
