@@ -1,121 +1,232 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296C02F26;
-	Mon, 23 Sep 2024 06:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6451712E5D
+	for <linux-block@vger.kernel.org>; Mon, 23 Sep 2024 06:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727072147; cv=none; b=f4Bu0cRfjAp3vEen+ez1aXdrBfUsoIhcH1NDveGvbksw0kR1xPz/jC252lY54recTaNFN5G/H760qKCtc7SauhmXVs14FEwkbj/iyHFhUMqE0WWJ3buyBhBmjoTgDQY+oDBgd1GgUGwofg+hl3Po9j8OnMmln9vbNHcnoXDCMoU=
+	t=1727073084; cv=none; b=oFxONmf1ztIuPhq9xlIR8+mfGrRExEpDq4gJN4SpdaLKe6H2Yva1HmjblUmPOdxqs6aW38Cqb3gz5IGd1HzI/keRUoE3xLbxt/pjPdUNmYvdNXvVrV1K0gIi1I2Fbd86ed2+Rw87SvbFNHUqTirAIrTCuJNKdQkhaAuVoeceXOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727072147; c=relaxed/simple;
-	bh=SDK5WAPvFQbd6TXK5jrk7iXs9dzKjQKBFUw2MueBtgE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=XV4gfp39HBoVNTVsD+HMt6DFh/FwCiNY/D/QAwn5+3DQZ+dLhm7voa+XrNuMIIqWJzC3fGPHBtERU0oIAP3bhf8ILO8cC19m2g2fvMOIz2pj/62oFgAWLKUCmfNg0vBDZDCdOz8chQF6x/rHANqtNQz7ObC9ITfN7A2n62/rGWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XBt5L1w04z4f3kvm;
-	Mon, 23 Sep 2024 14:15:18 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 177B51A0C3F;
-	Mon, 23 Sep 2024 14:15:35 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgCXysaFB_Fmq7NsCA--.30384S3;
-	Mon, 23 Sep 2024 14:15:34 +0800 (CST)
-Subject: Re: [PATCH RFC 5/6] md/raid1: Handle bio_split() errors
-To: John Garry <john.g.garry@oracle.com>, Yu Kuai <yukuai1@huaweicloud.com>,
- axboe@kernel.dk, hch@lst.de
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-raid@vger.kernel.org, martin.petersen@oracle.com,
- "yangerkun@huawei.com" <yangerkun@huawei.com>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20240919092302.3094725-1-john.g.garry@oracle.com>
- <20240919092302.3094725-6-john.g.garry@oracle.com>
- <bc4c414c-a7aa-358b-71c1-598af05f005f@huaweicloud.com>
- <0161641d-daef-4804-b4d2-4a83f625bc77@oracle.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <c03de5c7-20b8-3973-a843-fc010f121631@huaweicloud.com>
-Date: Mon, 23 Sep 2024 14:15:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1727073084; c=relaxed/simple;
+	bh=OcCJeJobHZzrowTHzZsblmR57klSEu9XCB+udNj/aEQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Er4mznpguw1wmFm7GT7C4JqrSLsMgRkQuRQEUEwmjqn7c9qbqXtFgEcp1rny1TPEo2UW27UwCxz/ZsX7MhLkDW9g2k3mYKGRSNtn4h43NfGHNHagnvsnzZFbUeshCOFIv/NIeIyBivf5L4zt4uNtmNJwsa40FO9FreUZ8k8n+RU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0rzrLt75; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jgLB6hTt; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QN0BAD33; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mv4qvUXl; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0rzrLt75";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jgLB6hTt";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QN0BAD33";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="mv4qvUXl"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id DC02C1FB50;
+	Mon, 23 Sep 2024 06:31:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727073080; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BTyjzRLqT6ZbaWunnClfylzQNdAVF2Mg5wFTiBIIHrs=;
+	b=0rzrLt75LcQYr/WzoBQ0Bev39qRtqePH7yQK5lcT4//KcUyXshkIuJQbsyxicQgw3t+mJp
+	mhxsORUKNK0haGPSprJ3XlP2NXapzW+Vm2E+/wbAVldx2HAVTU+73HoulqL0C4HzNx3exx
+	m+SXfnk2ARmS8F1srnQleaiSGejRzoM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727073080;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BTyjzRLqT6ZbaWunnClfylzQNdAVF2Mg5wFTiBIIHrs=;
+	b=jgLB6hTtgkem/NUPRpOp3lV69DN4gq4WXbBvU9X+ZXsOu5ifDuSyGGpHsm2hvcDDEj+T3k
+	0w/CdmrN3VmYLTDA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=QN0BAD33;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=mv4qvUXl
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727073079; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BTyjzRLqT6ZbaWunnClfylzQNdAVF2Mg5wFTiBIIHrs=;
+	b=QN0BAD33Iyg/bOxzkoNWDV4I3Ft2bL3grKX0msKHDNUlLEXnhnOIvTu244cD22vh4wd5uj
+	MP0+wgnC8MJaIFAyN6F2dBvmTAkRe3EupnbRnNoF4DdVMQNRD0rGQi1s+cAe9czEJQ0/Po
+	n+79qR+EBQL3AmXrRyVuX0D3n8ftvcw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727073079;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BTyjzRLqT6ZbaWunnClfylzQNdAVF2Mg5wFTiBIIHrs=;
+	b=mv4qvUXlnym0h+B3P1DuvZmBKnGXsAKnoT0TRm6uVEZPqP+laQW10x0EzO14qQIitrgvb7
+	aCUHTPs5wNHJktBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9A45513A64;
+	Mon, 23 Sep 2024 06:31:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id zvU9IzcL8WZCTgAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 23 Sep 2024 06:31:19 +0000
+Message-ID: <5ce3b803-275d-4be3-a9bc-87d06a8f5033@suse.de>
+Date: Mon, 23 Sep 2024 08:31:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <0161641d-daef-4804-b4d2-4a83f625bc77@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bug report][regression][bisected] most of blktests nvme/tcp
+ failed with the last linux code
+To: Yi Zhang <yi.zhang@redhat.com>, linux-block
+ <linux-block@vger.kernel.org>,
+ "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <CAHj4cs90xV1t2NbV6P3_z1oYwD0BcvMhC5V2mGgekRq8iae=NA@mail.gmail.com>
+ <CAHj4cs8YGgmemMZDXmt7yHa+Xq3EiEvRWOJGEQTDjqGB2rAogw@mail.gmail.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <CAHj4cs8YGgmemMZDXmt7yHa+Xq3EiEvRWOJGEQTDjqGB2rAogw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCXysaFB_Fmq7NsCA--.30384S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cr4UXF4rurWkCFW3AFyUtrb_yoW8Ary8pr
-	1ktFy5CrWUGrW8Cw17Xw4jya4Fyr1UJ3W5Ary0qa18ArnrJF9FqrWUXr1qgF1Y9r4xGF1j
-	qr18WFsxuFy7JFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-Rspamd-Queue-Id: DC02C1FB50
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_ALL(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	TO_DN_ALL(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.51
+X-Spam-Flag: NO
 
-
-
-在 2024/09/20 18:04, John Garry 写道:
-> On 20/09/2024 07:58, Yu Kuai wrote:
->> Hi,
+On 9/20/24 16:20, Yi Zhang wrote:
+> + Hannes
+> I did bisect and it seems was introduced with the below commit:
+> 
+> commit 1e48b34c9bc79aa36700fccbfdf87e61e4431d2b
+> Author: Hannes Reinecke <hare@suse.de>
+> Date:   Mon Jul 22 14:02:22 2024 +0200
+> 
+>      nvme: split off TLS sysfs attributes into a separate group
+> 
+> 
+> On Thu, Sep 19, 2024 at 12:09 AM Yi Zhang <yi.zhang@redhat.com> wrote:
 >>
->> 在 2024/09/19 17:23, John Garry 写道:
->>> Add proper bio_split() error handling. For any error, call
->>> raid_end_bio_io() and return;
->>>
->>> Signed-off-by: John Garry <john.g.garry@oracle.com>
->>> ---
->>>   drivers/md/raid1.c | 8 ++++++++
->>>   1 file changed, 8 insertions(+)
->>>
->>> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
->>> index 6c9d24203f39..c561e2d185e2 100644
->>> --- a/drivers/md/raid1.c
->>> +++ b/drivers/md/raid1.c
->>> @@ -1383,6 +1383,10 @@ static void raid1_read_request(struct mddev 
->>> *mddev, struct bio *bio,
->>>       if (max_sectors < bio_sectors(bio)) {
->>>           struct bio *split = bio_split(bio, max_sectors,
->>>                             gfp, &conf->bio_split);
->>> +        if (IS_ERR(split)) {
->>> +            raid_end_bio_io(r1_bio);
->>> +            return;
->>> +        }
+>> Hello
 >>
->> This way, BLK_STS_IOERR will always be returned, perhaps what you want
->> is to return the error code from bio_split()?
+>> CKI reported most of the blktests nvme/tcp tests failed on the linux
+>> tree[1], here is the reproducer and dmesg log, the issue cannot be
+>> reproduced with 6.11.0, seems
+>> it was introduced with the latest block code merge, please help check
+>> it and let me know if you need any info/testing about it, thanks.
+>>
+>>
+>> [1]
+>> https://datawarehouse.cki-project.org/kcidb/tests/14394423
+>>
+>> [2]
+>> # nvme_trtype=tcp ./check nvme/003
+>> nvme/003 (tr=tcp) (test if we're sending keep-alives to a discovery
+>> controller) [failed]
+>>      runtime  11.280s  ...  11.188s
+>>      --- tests/nvme/003.out 2024-09-18 11:30:11.243366401 -0400
+>>      +++ /root/blktests/results/nodev_tr_tcp/nvme/003.out.bad
+>> 2024-09-18 11:52:32.977112834 -0400
+>>      @@ -1,3 +1,3 @@
+>>       Running nvme/003
+>>      -disconnected 1 controller(s)
+>>      +disconnected 0 controller(s)
+>>       Test complete
+>> # dmesg
+>> [  447.213539] run blktests nvme/003 at 2024-09-18 11:52:21
+>> [  447.229285] loop0: detected capacity change from 0 to 2097152
+>> [  447.233104] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+>> [  447.242398] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
+>> [  447.251089] sysfs: cannot create duplicate filename
+>> '/devices/virtual/nvme-fabrics/ctl/nvme0/reset_controller'
+>> [  447.251810] CPU: 2 UID: 0 PID: 5241 Comm: nvme Kdump: loaded Not
+>> tainted 6.12.0-0.rc0.adfc3ded5c33.2.test.el10.aarch64 #1
+>> [  447.252540] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
+>> [  447.253006] Call trace:
+>> [  447.253171]  dump_backtrace+0xd8/0x130
+>> [  447.253432]  show_stack+0x20/0x38
+>> [  447.253657]  dump_stack_lvl+0x80/0xa8
+>> [  447.253925]  dump_stack+0x18/0x30
+>> [  447.254152]  sysfs_warn_dup+0x6c/0x90
+>> [  447.254406]  sysfs_add_file_mode_ns+0x12c/0x138
+>> [  447.254713]  create_files+0xa8/0x1f8
+>> [  447.254973]  internal_create_group+0x18c/0x358
+>> [  447.255274]  internal_create_groups+0x58/0xe0
+>> [  447.255558]  sysfs_create_groups+0x20/0x40
+>> [  447.255826]  device_add_attrs+0x19c/0x218
+>> [  447.256093]  device_add+0x310/0x6d0
+>> [  447.256327]  cdev_device_add+0x58/0xc0
+>> [  447.256579]  nvme_add_ctrl+0x78/0xd0 [nvme_core]
+>> [  447.256895]  nvme_tcp_create_ctrl+0x3c/0x178 [nvme_tcp]
+>> [  447.257248]  nvmf_create_ctrl+0x150/0x288 [nvme_fabrics]
+>> [  447.257614]  nvmf_dev_write+0x98/0xf8 [nvme_fabrics]
+>> [  447.257948]  vfs_write+0xdc/0x380
+>> [  447.258174]  ksys_write+0x7c/0x120
+>> [  447.258408]  __arm64_sys_write+0x24/0x40
+>> [  447.258673]  invoke_syscall.constprop.0+0x74/0xd0
+>> [  447.258994]  do_el0_svc+0xb0/0xe8
+>> [  447.259225]  el0_svc+0x44/0x1a0
+>> [  447.259449]  el0t_64_sync_handler+0x120/0x130
+>> [  447.259745]  el0t_64_sync+0x1a4/0x1a8
+>>
+>> --
+>> Best Regards,
+>>    Yi Zhang
 > 
-> Yeah, I would like to return that error code, so maybe I can encode it 
-> in the master_bio directly or pass as an arg to raid_end_bio_io().
-
-That's fine, however, I think the change can introduce problems in some
-corner cases, for example there is a rdev with badblocks and a slow rdev
-with full copy. Currently raid1_read_request() will split this bio to
-read some from fast rdev, and read the badblocks region from slow rdev.
-
-We need a new branch in read_balance() to choose a rdev with full copy.
-
-Thanks,
-Kuai
-
 > 
-> Thanks,
-> John
 > 
-> .
-> 
+How utterly curious.
+This mentioned patch moves some sysfs attributes to a different location 
+in the code. The stacktrace you've posted indicates that we're creating 
+a controller while the previous one is still present in sysfs, ie that 
+the lifetime of the controller has changed.
+I find it difficult to understand how the cited path could have changed
+the lifetime of the controller object, but will continue to check.
+
+Does the error disappear if you just revert the cited patch?
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
