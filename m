@@ -1,116 +1,220 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4464218C325;
-	Tue, 24 Sep 2024 10:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AF3154C0E
+	for <linux-block@vger.kernel.org>; Tue, 24 Sep 2024 10:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727173064; cv=none; b=ku3MAo/HSPeG69CMJlcnJOtLzKOXrr8FXMYICAFIfRpWrtTwiqvEbWRlfvmnsKs/QPkD8IMgHv+2KVn65sZ6+di7LBVN1Fb3NnaBCB6KkukH4GSXTQKc1CnTFIRhjO25tlfGKxz3xIIprfi2Y+mjsHK7Tk7ms1nJAmQysf2X6iE=
+	t=1727173571; cv=none; b=dVocehaTxMVjkT8vYmtshSzCfngKxOryQ8GjSpKQ0hqbzVuE0SnJViStz3A1NATxo4xNx3YQvybrtUGMJEnGz5anJFux+B72v3QYelK4Af6RqGj1VsEztA8+DDObnce5uJ/6w7TMLvfoOfWE2tj8GzzdW92NcHL/O1WbfG4+DgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727173064; c=relaxed/simple;
-	bh=MOrv/PO4+p/q2gx2H/jXlnLEDH+f3OEGh0lgTFRI7QQ=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VCmewtgXF0Sfi9Dz194/EUoMXXDnPF4/MWnhMWGd5ILy++e3UqwdrmeqDlRhcsdDmw0cNEXq8qkbvH7WfuzQRhPvKpO8xt1PM61wJEm2OTP58Lm0CdeS1Y4fcU8bb/eK2HJF28Ab+LcX0pYXoxAeGD6uLmaPJVlTMwvt24uC/jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z38oR2E1; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1727173571; c=relaxed/simple;
+	bh=aIxlxp4j/hmsNTU0P/dn29uqfvibH2qk9+A9qAsJNEI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=KPJJyI1se/qaG29tiLs25TTzLNhksPGg5grFlxfRGjxEuL8Zj8Gt7soLeBcrOrR2dmQMnZwmBdQTHTsYt9Lic3874oKqqRHZS/Bw6WddfH90xwkF3ZJSKKX3c+iatrI3ji2Lsi6mqN1kn5s4qtpDTiE0w0on+x83kcmRGr9TPKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=DfZWIDio; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z38oR2E1"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42e5e1e6d37so53307635e9.3;
-        Tue, 24 Sep 2024 03:17:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727173061; x=1727777861; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y6yq/DwFQfx4tBwrb6K58nwBTecQ5jjhs54hsQLsb9E=;
-        b=Z38oR2E1dsCG6CNYo51evLlunqZ20cOYS4Ppt1yoZVdkMgZrKv9J02i7f5MIJIy3pz
-         lkMSfpTAA+vi4j8rfgTcRDMV+pyNivEHEFEYEqdquoD3s8nsx/y5A+aAAjWzaMBHac4t
-         E/5hCXTtnNjJzomGLqD4TxFpbifNJn8rSyb7+K38wTOIEW46cHHxZZ2NKG06dh0f8Em5
-         8Rd9iAdTJTUz8BeDl7k/zz2K8LNPkScGNJOCVnr9Q8TmsEIp/pOqTVg+6f7NKQXGNcbq
-         uJHAtmOB1kddFNtYL3xiRil60W2owfkiSgiuo0LSZquyrcget57b+cYAhhaDz41yfVKH
-         aoYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727173061; x=1727777861;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y6yq/DwFQfx4tBwrb6K58nwBTecQ5jjhs54hsQLsb9E=;
-        b=p0e9xjdoPsHRZPsvLGPtoL7c+9HW0mIRFQ0DfQp7DsGV2QHIwIC+OfWqKlCj09uFCq
-         S53SaAHP/GA40dSSx09SjuQ9ewmcpSwQcvDnfTWKl6i+d/J85kUIUKuo0x/L3LVarJk1
-         T79DBzMRdfLfP4Gvc/RNJF6Tl3cVHuPIkBEii7MWqTDQRsUTR99MpBcbvzUgdeYIqUT2
-         INwiq1IvSasrxkREH/v2cExy393TRXrVL42VvotAhKPzbLLuNHBa3nupUzmVD/ZI7xOz
-         ko5VhnIwLADCBbfpNcXV1v0tQyX5EoUWnH+6vXXpzDpKxr/Ee+g7G6RM3mgSvNH+wso8
-         F92A==
-X-Forwarded-Encrypted: i=1; AJvYcCUa5DXOhQ05b3n85NeKxyw8XLhlYJxl1eC3Wxft4BM8JzWajpiS4jB3BJTZ1IcBgzoFguOgkATuuOOp@vger.kernel.org, AJvYcCUqk/Ob0M8x0mpUd7P/rRkUcpbceFVHAvz0O9e8Fgvptzhn0T2QSGO14lw8W69JnOhx91cvlvWIFXcMrbg=@vger.kernel.org, AJvYcCXLURe4W8R/yDkprd9Riobm0dbO62aJaGr5xjDChiLLOcCiPc/r+5iEmV2kGdUUE39xiPfBOveSxXnddbRT@vger.kernel.org, AJvYcCXNIb06qukqmiqIWrPdgxOXYO3sivBKaTUPf4WnTfPODG6d4f00N3CmMMsLvu8BmdIPcrmy3yEmkV5X@vger.kernel.org, AJvYcCXq5PWCz4UTjuTyBHUUT6/nR76i3EONd3Tm6KQeMODH9JRzt7i0FeRon9nb4ryv7wBmYUYNkbSJ6ra+@vger.kernel.org
-X-Gm-Message-State: AOJu0YyS0dClzAe7bRGqyUWI6NAWJjOaBxkHuYJq+jW0fXInORs1tMP1
-	18a0C0YVGdkDuzSs1e8OlPytss/7XUNjUuCoib/1/8Ugb9jwNyy+
-X-Google-Smtp-Source: AGHT+IE83mnLUuf+4WZRfrPw50LD+lxqX8rWtjINgvgK2vW5eLA5p3k20e4sMLnXxjQweQjgZ91oYA==
-X-Received: by 2002:a5d:4488:0:b0:377:9867:9028 with SMTP id ffacd0b85a97d-37a431ad4dbmr7918215f8f.44.1727173061365;
-        Tue, 24 Sep 2024 03:17:41 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc2c1ef1sm1188238f8f.35.2024.09.24.03.17.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Sep 2024 03:17:41 -0700 (PDT)
-Message-ID: <66f291c5.5d0a0220.328e5a.2c9e@mx.google.com>
-X-Google-Original-Message-ID: <ZvKRwI3zrXURbYKS@Ansuel-XPS.>
-Date: Tue, 24 Sep 2024 12:17:36 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-	Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	INAGAKI Hiroshi <musashino.open@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Al Viro <viro@zeniv.linux.org.uk>, Ming Lei <ming.lei@redhat.com>,
-	Li Lingfeng <lilingfeng3@huawei.com>,
-	Christian Heusel <christian@heusel.eu>, linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: Re: [RFC PATCH 3/4] block: add support for partition table defined
- in OF
-References: <20240923105937.4374-1-ansuelsmth@gmail.com>
- <20240923105937.4374-4-ansuelsmth@gmail.com>
- <ZvJdjRpFaPUuFhIO@infradead.org>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="DfZWIDio"
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240924102607euoutp029585059339af2640db258713059ceb10~4JzVn14hu0814908149euoutp02H
+	for <linux-block@vger.kernel.org>; Tue, 24 Sep 2024 10:26:07 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240924102607euoutp029585059339af2640db258713059ceb10~4JzVn14hu0814908149euoutp02H
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1727173567;
+	bh=xoXtx/PB5evdtfJqWlO5XQNvkO4mAhERHUcWqq0DHp8=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=DfZWIDioT0rJbnXI2bV2NZeqqJ88NelrnvMdco9fWTUVOTFswuwRt5DD5QnlrYdrD
+	 XSNupqIrlOThIMJRBn9nd5rdVN8KaTj3+OyBufl+YDQpSM1zrfi1GKqXqKK+o+REFU
+	 onfbT9pQpD0XF7SPTEWjOkETWnNaFYaD0nJTEHDQ=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20240924102607eucas1p140096a46f3f02e8306d0be04780e2444~4JzVYBi6u2327723277eucas1p1Q;
+	Tue, 24 Sep 2024 10:26:07 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges2new.samsung.com (EUCPMTA) with SMTP id FA.B0.09875.FB392F66; Tue, 24
+	Sep 2024 11:26:07 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240924102606eucas1p235b4127bc630978853fb1fd89ab32d74~4JzU88nmg0663606636eucas1p2K;
+	Tue, 24 Sep 2024 10:26:06 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240924102606eusmtrp24bf6a761fe20603202506111a94148fa~4JzU8QdjR0677806778eusmtrp2a;
+	Tue, 24 Sep 2024 10:26:06 +0000 (GMT)
+X-AuditID: cbfec7f4-131ff70000002693-40-66f293bfb144
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id F8.B9.14621.EB392F66; Tue, 24
+	Sep 2024 11:26:06 +0100 (BST)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20240924102605eusmtip2d0496f3fb2055bafe35b76e027366737~4JzUKpMZL0231402314eusmtip2r;
+	Tue, 24 Sep 2024 10:26:05 +0000 (GMT)
+Message-ID: <47f4de34-e83b-47a2-a260-c924d552ad67@samsung.com>
+Date: Tue, 24 Sep 2024 12:26:04 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZvJdjRpFaPUuFhIO@infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] virtio_blk: implement init_hctx MQ operation
+To: Max Gurtovoy <mgurtovoy@nvidia.com>, stefanha@redhat.com,
+	virtualization@lists.linux.dev, mst@redhat.com, axboe@kernel.dk
+Cc: kvm@vger.kernel.org, linux-block@vger.kernel.org, oren@nvidia.com
+Content-Language: en-US
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <17b866cb-c892-4ebd-bfb9-c97b3b95d67f@nvidia.com>
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDKsWRmVeSWpSXmKPExsWy7djPc7r7J39KM/h/jdVi9d1+Nos5Uwst
+	9t7Sttg6/zOTxf9fr1gtHlyaxG7xetJ/Vouj21eyOnB4XD5b6vFi80xGj97md2we7/ddZfP4
+	vEkugDWKyyYlNSezLLVI3y6BK+PC6wXMBf8kKvqmJDcwzhXpYuTkkBAwkdix5yFTFyMXh5DA
+	CkaJU3+msIMkhAS+MEq8O6gGkfjMKHHy5iNGmI41H6ZDdSxnlOhYsosZwvnIKDH/0Asgh4OD
+	V8BOYuNDYRCTRUBV4vzcWJBeXgFBiZMzn7CA2KIC8hL3b80AWyYs4CIxZX0TWFxEoF6ie+8R
+	MJtZwFXiQ28nG4QtLnHryXwmEJtNwFCi620XG8h4TqBNn3eJQJTISzRvnQ12jYTAHQ6JtU0L
+	2SFudpE4crCZGcIWlnh1fAtUXEbi/875TBAN7YwSC37fh3ImMEo0PL8F9bG1xJ1zv8C2MQto
+	SqzfpQ8RdpRoaVnADhKWEOCTuPFWEOIIPolJ26YzQ4R5JTrahCCq1SRmHV8Ht/bghUvMExiV
+	ZiGFyiwkX85C8s4shL0LGFlWMYqnlhbnpqcWG+WllusVJ+YWl+al6yXn525iBCag0/+Of9nB
+	uPzVR71DjEwcjIcYJTiYlUR4J938mCbEm5JYWZValB9fVJqTWnyIUZqDRUmcVzVFPlVIID2x
+	JDU7NbUgtQgmy8TBKdXAtKwz4uvL+ZfYf0r9/7b+ZkTsj4gmgRqt3EUr3D0Otv7UzjUWNr91
+	/EHOu8TuiabSBw+enKTcbNX/qfbwtlnngsKlL0vn7tb45Wdgqx6x7aETj9GDf29ZmtOYw+Uu
+	XXN1klU++nRvsG1tiHTdt9Ijm764PF/DPfXWPyFLfinrH9qTn2U9Sbtn0GcuGaQqZi+U4Lao
+	djNL0p85RrZaolcscnY7u1m7r5zLryrbsGz3jC3LPYOPnGXiOMulFyH9OqmILV9m3aqDyr/S
+	Fd56Pjw+v8HZ5d8HQZlNHAnms2592Bd2z0k41q/z4ru3R6dYfd3w9WHa5PDWq4/cmp99en4s
+	5IFPh/us6Rx31DV+r9jUrcRSnJFoqMVcVJwIAHZ0l0mvAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrPIsWRmVeSWpSXmKPExsVy+t/xe7r7Jn9KM3jQoGax+m4/m8WcqYUW
+	e29pW2yd/5nJ4v+vV6wWDy5NYrd4Pek/q8XR7StZHTg8Lp8t9XixeSajR2/zOzaP9/uusnl8
+	3iQXwBqlZ1OUX1qSqpCRX1xiqxRtaGGkZ2hpoWdkYqlnaGwea2VkqqRvZ5OSmpNZllqkb5eg
+	l3Hh9QLmgn8SFX1TkhsY54p0MXJySAiYSKz5MJ2pi5GLQ0hgKaPEt0cHmCASMhInpzWwQtjC
+	En+udbFBFL1nlFh1dyVQgoODV8BOYuNDYRCTRUBV4vzcWJByXgFBiZMzn7CA2KIC8hL3b81g
+	B7GFBVwkpqxvAouLCNRLNO/oAIszC7hKfOjthBp/n0niws5eNoiEuMStJ/PB7mETMJToegty
+	AwcHJ9Daz7tEIErMJLq2djFC2PISzVtnM09gFJqF5IxZSCbNQtIyC0nLAkaWVYwiqaXFuem5
+	xYZ6xYm5xaV56XrJ+bmbGIExt+3Yz807GOe9+qh3iJGJg/EQowQHs5II76SbH9OEeFMSK6tS
+	i/Lji0pzUosPMZoCg2Iis5Rocj4w6vNK4g3NDEwNTcwsDUwtzYyVxHndLp9PExJITyxJzU5N
+	LUgtgulj4uCUamCakOh4UX3bxBtBN+LyBacl8YpsznPMPrCiMDNmAcedsNLiy7tfNXt4r18g
+	9Egq+0Dh7qx5cy+2R0Xd7N3/9VhD0aMj4nMVJWdxsr6zXF44+bHs8QjGu88sTxf8PrU6jOlj
+	5JzY4xsmTNhawvatcmZv5+l3+j+lP4m+yc5bsXFV+gGRaNUbD+dHTN76/1D/wdV3lOw/ZXb+
+	LTCXWr/i/ERbm6srUsXTKjj3Zj81YdxSf1F4x/6Niy9FnKro0GJjVTY6qpJ6Uvlhsvs3m/SV
+	twKfX5z+NGVXffpO4ynVmfF9VxbdCi1hlSj48/dfx3z70nmft93wlur+Ycv+csdcluMy/OEL
+	2O0OXZ/yJ1Q2oCpOTImlOCPRUIu5qDgRAFdE+95CAwAA
+X-CMS-MailID: 20240924102606eucas1p235b4127bc630978853fb1fd89ab32d74
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20240912064617eucas1p1c3191629f76e04111d4b39b15fea350a
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20240912064617eucas1p1c3191629f76e04111d4b39b15fea350a
+References: <20240807224129.34237-1-mgurtovoy@nvidia.com>
+	<CGME20240912064617eucas1p1c3191629f76e04111d4b39b15fea350a@eucas1p1.samsung.com>
+	<fb28ea61-4e94-498e-9caa-c8b7786d437a@samsung.com>
+	<b2408b1b-67e7-4935-83b4-1a2850e07374@nvidia.com>
+	<5e051c18-bd96-4543-abeb-4ed245f16f9e@samsung.com>
+	<17b866cb-c892-4ebd-bfb9-c97b3b95d67f@nvidia.com>
 
-On Mon, Sep 23, 2024 at 11:34:53PM -0700, Christoph Hellwig wrote:
-> On Mon, Sep 23, 2024 at 12:59:32PM +0200, Christian Marangi wrote:
-> > +#define BOOT0_STR	"boot0"
-> > +#define BOOT1_STR	"boot1"
-> > +
-> 
-> This boot0/1 stuff looks like black magic, so it should probably be
-> documented at very least.
+Hi Max,
+
+On 23.09.2024 00:47, Max Gurtovoy wrote:
 >
+> On 17/09/2024 17:09, Marek Szyprowski wrote:
+>> On 17.09.2024 00:06, Max Gurtovoy wrote:
+>>> On 12/09/2024 9:46, Marek Szyprowski wrote:
+>>>> Dear All,
+>>>>
+>>>> On 08.08.2024 00:41, Max Gurtovoy wrote:
+>>>>> Set the driver data of the hardware context (hctx) to point 
+>>>>> directly to
+>>>>> the virtio block queue. This cleanup improves code readability and
+>>>>> reduces the number of dereferences in the fast path.
+>>>>>
+>>>>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>>>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>>>>> ---
+>>>>>     drivers/block/virtio_blk.c | 42
+>>>>> ++++++++++++++++++++------------------
+>>>>>     1 file changed, 22 insertions(+), 20 deletions(-)
+>>>> This patch landed in recent linux-next as commit 8d04556131c1
+>>>> ("virtio_blk: implement init_hctx MQ operation"). In my tests I found
+>>>> that it introduces a regression in system suspend/resume operation. 
+>>>> From
+>>>> time to time system crashes during suspend/resume cycle. Reverting 
+>>>> this
+>>>> patch on top of next-20240911 fixes this problem.
+>>> Could you please provide a detailed explanation of the system
+>>> suspend/resume operation and the specific testing methodology employed?
+>> In my tests I just call the 'rtcwake -s10 -mmem' command many times in a
+>> loop. I use standard Debian image under QEMU/ARM64. Nothing really 
+>> special.
+>
+> I run this test on my bare metal x86 server in a loop with fio in the 
+> background.
+>
+> The test passed.
 
-It is but from what I have read in the spec for flash in general (this
-is not limited to eMMC but also apply to UFS) these are hardware
-partition. If the version is high enough these are always present and
-have boot0 and boot1 name hardcoded by the driver.
 
-> > +	partitions_np = get_partitions_node(disk_np,
-> > +					    state->disk->disk_name);
-> 
-> disk->disk_name is not a stable identifier and can change from boot to
-> boot due to async probing.  You'll need to check a uuid or label instead.
+Maybe QEMU is a bit slower and exposes some kind of race caused by this 
+change.
 
-This is really for the 2 special partition up to check the suffix, we
-don't really care about the name. I guess it's acceptable to use
-unstable identifier?
 
-Thanks a lot for the review!
+>
+> Can you please re-test with the linux/master branch with applying this 
+> patch on top ?
 
+
+This issue is fully reproducible with vanilla v6.11 and v6.10 from Linus 
+and $subject patch applied on top of it.
+
+
+I've even checked it with x86_64 QEMU and first random Debian 
+preinstalled image I've found.
+
+
+Here is a detailed setup if You like to check it by yourself (tested on 
+Ubuntu 22.04 LTS x86_64 host):
+
+
+1. download x86_64 preinstalled Debian image:
+
+# wget 
+https://dietpi.com/downloads/images/DietPi_NativePC-BIOS-x86_64-Bookworm.img.xz
+# xz -d DietPi_NativePC-BIOS-x86_64-Bookworm.img.xz
+
+
+2. build kernel:
+
+# make x86_64_defconfig
+# make -j12
+
+
+3. run QEMU:
+
+# sudo qemu-system-x86_64 -enable-kvm     \
+     -kernel PATH_TO_YOUR_KERNEL_DIR/arch/x86/boot/bzImage \
+     -append "console=ttyS0 root=/dev/vda1 rootwait noapic tsc=unstable 
+init=/bin/sh" \
+     -smp 2 -m 2048     \
+     -drive 
+file=DietPi_NativePC-BIOS-x86_64-Bookworm.img,format=raw,if=virtio  \
+     -netdev user,id=net0 -device virtio-net,netdev=net0        \
+     -serial mon:stdio -nographic
+
+
+4. let it boot, then type (copy&paste line by line) in the init shell:
+
+# mount proc /proc -t proc
+# mount sys /sys -t sysfs
+# n=10; for i in `seq 1 $n`; do echo Test $i of $n; rtcwake -s10 -mmem; 
+date; echo Test $i done; done
+
+
+5. Use 'Ctrl-a' then 'x' to exit QEMU console.
+
+
+ > ...
+
+
+Best regards
 -- 
-	Ansuel
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
+
