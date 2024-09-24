@@ -1,144 +1,159 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485A150276;
-	Tue, 24 Sep 2024 08:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF881714CD
+	for <linux-block@vger.kernel.org>; Tue, 24 Sep 2024 09:25:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727165748; cv=none; b=fxx/OOiATxnbp0LT0x7PylAcTUYveKotf3C9sLqQbM24Vc3LaWBCZAt7kPFvAaHkBhmbYx7rfPxRIQdyFMtZqJsCFh62CjbAx4jtlBpC6608a8ufpO5zyVjgyMhR+lOGxc3c5SRq4FFd/NREzfgUd4u0e015N++lOMDK+gIlQV0=
+	t=1727169912; cv=none; b=sjEHQMUTOQwjte98n529o/Os/eR2oIkKsbs1UndluX+4ikYy3FwbfJqrR2ve5jzBdVJU2z6qp0wMebYo4oFDxmNu54ZgV5UHQVosjCedvTvlEyMct/WQjEkrVBJCOzyXGtmvRoV7a6wBTPUKxh4u7sPBw1vjD4sJ79UqTfIXGNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727165748; c=relaxed/simple;
-	bh=vSGXyxX6oOxCSJBz4sD8kNpYaTs7kKqybk7DzfvvCt4=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=GAGuuh1aMEGaxEwiy8zZJjIJteq8hCm7kNOaY81vjMSkzxwimBHdFf1/NzCLeX2c5rKO/vI+tbpJVK5Lw2qay81FFLKRDdylAWiJECLt2j4nskuQcUg8X5g5RUKkBMpNWZkfJiIjW3MBiLgsFe8wK5jbMXr4RjJJZWyAHesdo+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FukPoBfK; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+	s=arc-20240116; t=1727169912; c=relaxed/simple;
+	bh=dNHi3O2X2k099XP44w2M/mi53+tBlMIsNqguMCPtdWw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=F3qzg2aFOQQFO4eL5Cj0IeV9f6Kr4amF2IkOAbOQjhTSRNolY9eL38h25swno91jWFWGRMSRAO/KL53N87DhnEXcfyAmMxqBT5tomUUbtYECz/e4YINQ20HysiCra5d9MWjmdvF3GL9o4UrC6yLVLO5W5ihv//cDPy+jx9feAJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=BwzRx14T; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FukPoBfK"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48O2RpDt023576;
-	Tue, 24 Sep 2024 08:15:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	en0OrIo1jP7PuqBMsu1Ct7FHd5WhkM4OW0+JX6esDAU=; b=FukPoBfKG2i48q1X
-	1wDfbMjHbEBozSGIzYDCdNmtv4riZyyEV+sV5Uvql7nBNejj9rPhi824MZ+qVoS4
-	4u6dcFIreFDSMOol1h8PkBoN8jeEATkXinaw7+u3ETkkZ9GaPcA8SCGPvl+Gb7aB
-	0m293IQslKDWGbO5EfX8dCWb/6sLXcLgQcj9ZYyHaZCyaldp6l+dJbrd4LcFGyYT
-	e9/1Y2cxgvWxw/R8ut56wn2wKdec50qkoTQ7sZ8I4aizsxqy2nB/NlYpojQkFsOc
-	Bf9h350K9ECqorkVPhLjK5Za7YwTClxQ6k+IEcyoa0K855NdE0IAI1eNRgchHUqV
-	RrromQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41skjrgp6s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Sep 2024 08:15:40 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48O8Fdeb006749;
-	Tue, 24 Sep 2024 08:15:40 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41skjrgp6p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Sep 2024 08:15:39 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48O7o9dZ013933;
-	Tue, 24 Sep 2024 08:15:39 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41t9ymtq3y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Sep 2024 08:15:39 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48O8FcVT27198042
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 24 Sep 2024 08:15:38 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8CE7A5805D;
-	Tue, 24 Sep 2024 08:15:38 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DA6ED58059;
-	Tue, 24 Sep 2024 08:15:35 +0000 (GMT)
-Received: from [9.204.204.92] (unknown [9.204.204.92])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 24 Sep 2024 08:15:35 +0000 (GMT)
-Message-ID: <d22cff1a-701d-4078-867d-d82caa943bab@linux.vnet.ibm.com>
-Date: Tue, 24 Sep 2024 13:45:34 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] zram: don't free statically defined names
-Content-Language: en-GB
-To: Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andrey Skvortsov <andrej.skvortzov@gmail.com>
-Cc: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        stable@vger.kernel.org, Sachin Sant <sachinp@linux.ibm.com>
-References: <20240923164843.1117010-1-andrej.skvortzov@gmail.com>
- <20240924014241.GH38742@google.com>
-From: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
-In-Reply-To: <20240924014241.GH38742@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LILgiBblAokMJKO6uowWvrf4iMi37SFI
-X-Proofpoint-ORIG-GUID: bC6rzon100RjJ8KmFnzah6Sezjtt_6rD
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="BwzRx14T"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240924092502epoutp04622dab74e6d37cfb0a5e09cb0534bdcd~4I_Aw87Zy1569415694epoutp04f
+	for <linux-block@vger.kernel.org>; Tue, 24 Sep 2024 09:25:02 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240924092502epoutp04622dab74e6d37cfb0a5e09cb0534bdcd~4I_Aw87Zy1569415694epoutp04f
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1727169902;
+	bh=ujjozdZ0S6smtIOf2Eo64izQZAki0Dpgi2fL4KYD0eo=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=BwzRx14TxKNqqWxCV80gLdhvlfdc3ZqAyqcv+xSN/70v+VU1BDgpX7Yuq6dY1gHVy
+	 ey8Olc4DD3l7lFYt/DEiUZBlmTiFuxpTH6/QCV6O5fmYcYU6ci4DhvRoK/tjGUdkZJ
+	 EUzrxFfdKRAF4qrCCMeIX6oz91FYWhRs96A4HH3E=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20240924092501epcas5p3f637377fab6c1cc78535ad611ec3c268~4I9-tP-SU2625526255epcas5p3P;
+	Tue, 24 Sep 2024 09:25:01 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.180]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4XCZFm1yQRz4x9Q8; Tue, 24 Sep
+	2024 09:25:00 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	AE.0F.08855.C6582F66; Tue, 24 Sep 2024 18:25:00 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240924092459epcas5p23e41d7dfa92acf415d9dab1d0e433842~4I9918t0b2825728257epcas5p2N;
+	Tue, 24 Sep 2024 09:24:59 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20240924092459epsmtrp2deb043bef0671cc130aa36af932e5811~4I991DpJu0725707257epsmtrp2I;
+	Tue, 24 Sep 2024 09:24:59 +0000 (GMT)
+X-AuditID: b6c32a44-15fb870000002297-2f-66f2856cb18c
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	AF.28.19367.B6582F66; Tue, 24 Sep 2024 18:24:59 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240924092456epsmtip18d685cf23e102be2cbcceaf47e18117b~4I960RNvX2191221912epsmtip1D;
+	Tue, 24 Sep 2024 09:24:56 +0000 (GMT)
+Message-ID: <edcbf69e-9ae9-06df-60c0-47393371fcd8@samsung.com>
+Date: Tue, 24 Sep 2024 14:54:51 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-24_02,2024-09-23_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- spamscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0 phishscore=0
- clxscore=1011 malwarescore=0 mlxlogscore=701 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
- definitions=main-2409240053
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+	Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCH v5 4/5] sd: limit to use write life hints
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me,
+	martin.petersen@oracle.com, James.Bottomley@HansenPartnership.com,
+	brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+	jaegeuk@kernel.org, jlayton@kernel.org, chuck.lever@oracle.com,
+	bvanassche@acm.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com, Nitesh
+	Shetty <nj.shetty@samsung.com>
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20240918120159.GA20658@lst.de>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xbdRTH/d17e1saO69ljB9FgTVqNgasVcAfDIZmZLtuU0gWQ+LcaqUX
+	SugrfTCdJMLIUNfBBs2YVATmkM4iMhhBXiXIRthEHg6UR4UAlm2ullcTsw1FW8om/33OOd/z
+	O6/8ODj/E7aAk6XSM1qVVCEkuUTL9Z3hkYrTKxmiEQsb1U2dI5Hz+gpAZUsPcfTv1F0MTXS3
+	Yeibul4MfXGxAEOOBjOOGs9x0O+/udnoYa2VjUp7fgXINrkL3f7qAOq03SJQVe08GxnHWklk
+	6VvDUMtqFY6+cy4SaOifPhYaMlewX9tGj4weooemGwm6rPRHkh4ZMNBN1s9I+lrNx3RHtRuj
+	OybySHp5fpKgi5utgP6p+gabdjeF0E0OF5bKeyc7Qc5IZYw2jFGlq2VZqsxE4aEjkn2SmFiR
+	OFIch14VhqmkSiZRmHw4NXJ/lsIzszAsR6oweFypUp1OuHtvglZt0DNhcrVOnyhkNDKFJloT
+	pZMqdQZVZpSK0ceLRaKXYzzC97LlQ6MuUjPI/WB+roudB7o4Z4AfB1LRsPxKOTgDuBw+1QHg
+	iDOP8BkrAA7XL4InRvFAG+txyoVTi5gv0Aagq2WV9Ab4lAvA/AcyL/OovdDoGsa9TFAvwlO2
+	i6TP/yy8Ve4gvBxAvQ8f/VIBvOxPJUJj0di6H6cC4aSjCvPyVkoI5+8PrHeBU7UE/Hp5yPMQ
+	h0NSO+GwyeDV+FER8I+1ReDLDYXfuypwrx5SFj9ou9C60XUytDknNtgf3u9rZvtYAN0LNtLH
+	2XBmbobwcS5svVa8oU+CeX+Ps7x1cU/dhvbdvlpbYNGqA/O6IcWDnxbyfertcLp0fiMzEM5+
+	XsPySWjYmx/kW1shAecmb2DnQZh501bMm6Y3b5rG/H/hakBYQRCj0SkzmfQYjVjFnHhy73S1
+	sgms/4jw5FYwXrUW1QMwDugBkIMLt/JKJ5Yz+DyZ9MOTjFYt0RoUjK4HxHjOU4ILAtLVni+l
+	0kvE0XGi6NjY2Oi4V2LFwkCe8/SXMj6VKdUz2QyjYbSP8zCOnyAPu6t/w3RTYqvr739hPN60
+	ULS9Pi05KoNu2HOwpb7/0dlBZ1JpGstwnpVfWddqMpUcGSvY8lffYpkycs+9whS3wGI/2t0u
+	LzwccbnT/hJ3ind89s6DHzJudqgGk+yX3vyoqzFn2BTvnzIYvFTC4L1zTWOSSt2BJSLtyvPJ
+	RdxdRMIzIfaoqw72ytsdx6dn7sVlPXXMOPFtMGkNKrB0GizD7bWjEe6COvaCQL6tDTydItDu
+	mJ2qoHszjLhAeSnnas3+fQG5K7f77gDn2csDq9VH/1zrzrX/XBJUFiIKbh4PPtHy+sBYEbeT
+	KGXsb6W8W2yrPBaaayzpPHlwh7UsIC30uXohoZNLxeG4Vif9D9ch+QCaBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrIIsWRmVeSWpSXmKPExsWy7bCSnG5266c0gxeflC1W3+1ns3h9+BOj
+	xbQPP5kt/t99zmRx88BOJouVq48yWcye3sxk8WT9LGaLjf0cFo/vfGa3+LlsFbvFpEPXGC32
+	3tK2uLTI3WLP3pMsFvOXPWW36L6+g81i+fF/TBbbfs9ntlj3+j2Lxfm/x1ktzs+aw+4g5nH5
+	irfH+XsbWTymTTrF5nH5bKnHplWdbB6bl9R77F7wmclj980GNo+PT2+xePRtWcXocWbBEXaP
+	z5vkPDY9ecsUwBvFZZOSmpNZllqkb5fAlXH+ylu2gnNcFU8f7WNvYNzH0cXIySEhYCIxtek9
+	UxcjF4eQwHZGiUlTGtghEuISzdd+QNnCEiv/PWeHKHrNKLH/wkqwBK+AnUT32wvMIDaLgKpE
+	097pbBBxQYmTM5+wgNiiAkkSe+43MoHYwgK2Et2918HizEALbj2ZDxYXEVCSePrqLCPIAmaB
+	ZSwSB6e8hTqpjUXi/bKjQA4HB5uApsSFyaUgDZwCOhIv/71nhBhkJtG1tQvKlpfY/nYO8wRG
+	oVlI7piFZN8sJC2zkLQsYGRZxSiaWlCcm56bXGCoV5yYW1yal66XnJ+7iRGcCrSCdjAuW/9X
+	7xAjEwfjIUYJDmYlEd5JNz+mCfGmJFZWpRblxxeV5qQWH2KU5mBREudVzulMERJITyxJzU5N
+	LUgtgskycXBKNTAxZTk/npb9vf5JxJxFZb9sdj2UtDTnCmw+l8dk8PN8MC+T9RfWPctrZj9S
+	PX7t0yQ1jUUFqyMD9z5PDMopqF18XUXtz88XHkqdcqLX5XY/eOIh21hXIX36RapCxrUlBx12
+	MvA+qUg40M7/dIqBwcGpefNPVjzysw+7Y375/MlQhsXC1jv41+3i/HvW7W1SOvfJpwxdZzr9
+	95642n47dO0pn8n6f176ZOY2tFSHhOi8Dexm7V5YyXpQ6dHEbfl35D6dneP0b7uBi6Qov5tM
+	xJS3vfHv+G05uzawr63p3fv/2DbLYJ0Fi2/yN9rmbjtamu4e9ObqQ7uj8q5Lfp37G+FuW/D1
+	9Lu9U19esHq+otJFiaU4I9FQi7moOBEAityLA3QDAAA=
+X-CMS-MailID: 20240924092459epcas5p23e41d7dfa92acf415d9dab1d0e433842
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20240910151057epcas5p3369c6257a6f169b4caa6dd59548b538c
+References: <CGME20240910151057epcas5p3369c6257a6f169b4caa6dd59548b538c@epcas5p3.samsung.com>
+	<20240910150200.6589-5-joshi.k@samsung.com> <20240912130235.GB28535@lst.de>
+	<e6ae5391-ae84-bae4-78ea-4983d04af69f@samsung.com>
+	<20240913080659.GA30525@lst.de>
+	<4a39215a-1b0e-3832-93bd-61e422705f8b@samsung.com>
+	<20240917062007.GA4170@lst.de>
+	<b438dddd-f940-dd2b-2a6c-a2dbbc4ee67f@samsung.com>
+	<20240918064258.GA32627@lst.de>
+	<197b2c1a-66d2-5f5a-c258-7e2f35eff8e4@samsung.com>
+	<20240918120159.GA20658@lst.de>
 
-Please add below tages to the patch.
+On 9/18/2024 5:31 PM, Christoph Hellwig wrote:
+> On Wed, Sep 18, 2024 at 01:42:51PM +0530, Kanchan Joshi wrote:
+>> Would you prefer a new queue attribute (say nr_streams) that tells that?
+> 
+> No.  For one because using the same file descriptors as the one used
+> to set the hind actually makes it usable - finding the block device
+> does not.  And second as told about half a dozend time for this scheme
+> to actually work on a regular file the file system actually needs the
+> arbiter, as it can work on top of multiple block devices, consumes
+> streams, might export streams even if the underlying devices don't and
+> so on.
+> 
 
-Reported-by: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
+FS managed/created hints is a different topic altogether, and honestly 
+that is not the scope of this series. That needs to be thought at per-FS 
+level due to different data/meta layouts.
+This scope of this series is to enable application-managed hints passing 
+through the file system. FS only needs to pass what it receives. No 
+active decision making (since application is doing that). Whether it 
+works fine or not - is application's problem. But due to the simplicity 
+it scales across filesystems. This is for the class of applications that 
+know about their data and have decided to be in control.
 
-Tested-by: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
-
-Refer: 
-https://lore.kernel.org/lkml/57130e48-dbb6-4047-a8c7-ebf5aaea93f4@linux.vnet.ibm.com/
-
-Regards,
-
-Venkat.
-
-On 24/09/24 7:12 am, Sergey Senozhatsky wrote:
-> On (24/09/23 19:48), Andrey Skvortsov wrote:
->> When CONFIG_ZRAM_MULTI_COMP isn't set ZRAM_SECONDARY_COMP can hold
->> default_compressor, because it's the same offset as ZRAM_PRIMARY_COMP,
->> so we need to make sure that we don't attempt to kfree() the
->> statically defined compressor name.
->>
->> This is detected by KASAN.
->>
->> ==================================================================
->>    Call trace:
->>     kfree+0x60/0x3a0
->>     zram_destroy_comps+0x98/0x198 [zram]
->>     zram_reset_device+0x22c/0x4a8 [zram]
->>     reset_store+0x1bc/0x2d8 [zram]
->>     dev_attr_store+0x44/0x80
->>     sysfs_kf_write+0xfc/0x188
->>     kernfs_fop_write_iter+0x28c/0x428
->>     vfs_write+0x4dc/0x9b8
->>     ksys_write+0x100/0x1f8
->>     __arm64_sys_write+0x74/0xb8
->>     invoke_syscall+0xd8/0x260
->>     el0_svc_common.constprop.0+0xb4/0x240
->>     do_el0_svc+0x48/0x68
->>     el0_svc+0x40/0xc8
->>     el0t_64_sync_handler+0x120/0x130
->>     el0t_64_sync+0x190/0x198
->> ==================================================================
->>
->> Signed-off-by: Andrey Skvortsov <andrej.skvortzov@gmail.com>
->> Fixes: 684826f8271a ("zram: free secondary algorithms names")
->> Cc: <stable@vger.kernel.org>
-> Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Regardless, since placement-hints are not getting the reception I 
+imagined, I will backtrack.
