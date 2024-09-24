@@ -1,35 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB8B80025;
-	Tue, 24 Sep 2024 06:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDF317BA5;
+	Tue, 24 Sep 2024 06:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727159543; cv=none; b=ISgOL7pysbq2V6dAj87jSGjmdCtFUGtnm5eb+/7WBjwxaeohgR616ncWS2DgET+2sw1a1hWJjqLLO4vuwIofeMUUzNYkbZEArpLKQZW8N0/lE0fKE6mkTlXV2zv9JnIdiMLK8fMNuwiB5AbZcu7NUVxCzZSlnF7TuxcA+2UqGlY=
+	t=1727159698; cv=none; b=SxECvoP6JeQqQmkUDu2GOzGi8tZL/Ruyy8JZGNjIvEAeE5N4cjCWTvOPwN0es3aID8PPvuyP9+/73BDlywVyYQRHNrb97ASLbWV0J2ZI2C8hPqGJuqHpaTUXa9QSTQRch4qd+r7o+czudp4s/1LcSyqDvi+K/YstNGeYSGo4E2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727159543; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1727159698; c=relaxed/simple;
+	bh=QOvSlOdCncMCq+hOBcqWjYcq11XmuqUYP7cVzCFbvqY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GP+zG6dkETdMKPLHa1CZTcci/WwAg70+oze6aHYZHA6R6phXjfqgaHx+T9SoIEdhawZkPJhmJzgur+SxGyoabEzB9a1hht2kkaFbJ6kktmWh8yIPV94M+Yaog/GJEj7wYDcqmeIZx9p1E1dtuidDGH+60Q7fLE2Bqjo3xKG1seA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QEEFkCq0; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=p8v2mP0LG0nxAcO7edVveYYsD7BTpCKHlrW33lmhlwfs90UkH6WFJTXdxYMcb59yxaWRCuTVWk6gIt7s1ggrA1p4GzQqPW8/ANdDQKJ/e3dIWGKhcE8rOcu2zqwrfVdNQ6mOE15VCDWdSozk/8ItblMgY17W/Il13zjXuRJicoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BUQHy/bC; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QEEFkCq0"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BUQHy/bC"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=QEEFkCq0rEYWQiFcHA26MvQwjJ
-	zcnnGDMZM1tmC7MBf+vEs7cjMzfCeLKeS+qlus0adkBh+RCJyiekngrqnecRtp/sDgUnfRO86FdPh
-	zqSK8QCQKRfeKsRL/MyMd/wanN9qvWRs34w4nugLuv+KQUxvnPFKFdD+EInN/94tnzjOeMnQdF0J+
-	CyH9i84TSO4UuLU1ibPjaPoJb7ODH7RtwvUxc921EIh51DXfAOp3//COfgCl5/kjXa8nMQNyRK7oN
-	3DRBr4c1fi7WC6lP7jCoRhDWANUFEJBM2ze+KXRBuY+DzHplSlSSKUtjNk2g21tPdC+s7Sg7HLoOk
-	6Ik9WDNg==;
+	bh=Z10AX5pmivHLvyFDh9AxOjuKLhBjfi9gRjwNCchoGfk=; b=BUQHy/bC0q6M3+20hgp9JjpCkK
+	EaHw20cr944PM22BIpd4SUVux3pYJJzrYN0NRlpAK1nTPEncZpylwD4uVRu2hkdb5EaMrXschkM+J
+	LaCmEpdgcn+ru8vE2DMUw6Pll6UnPVcUeqgfFpjisW7USVZRtE5Zd2ImBERJISIS4EizP1vBm1tI0
+	plYcVfOFyJe9Vkx8nt4v++ZSq+8Ajq1TCi2uxQNrxQ6qZ76RFHd29tuiLuFZFEyx3CAiUxgdnCA3X
+	NG5H43kvjCWY65V2uym2ALRy4nwLIcZKQYifXoHseZGM5HSl5XnfQrhudXpsaS4wYkogJtXpLfF8k
+	8EaYdNkA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1ssz5r-00000001GSA-1kxV;
-	Tue, 24 Sep 2024 06:32:15 +0000
-Date: Mon, 23 Sep 2024 23:32:15 -0700
+	id 1ssz8P-00000001GoR-18Dy;
+	Tue, 24 Sep 2024 06:34:53 +0000
+Date: Mon, 23 Sep 2024 23:34:53 -0700
 From: Christoph Hellwig <hch@infradead.org>
 To: Christian Marangi <ansuelsmth@gmail.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
@@ -46,11 +46,11 @@ Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
 	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
 	Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: Re: [RFC PATCH 1/4] block: add support for defining read-only
- partitions
-Message-ID: <ZvJc7yVP_2UEn8MU@infradead.org>
+Subject: Re: [RFC PATCH 3/4] block: add support for partition table defined
+ in OF
+Message-ID: <ZvJdjRpFaPUuFhIO@infradead.org>
 References: <20240923105937.4374-1-ansuelsmth@gmail.com>
- <20240923105937.4374-2-ansuelsmth@gmail.com>
+ <20240923105937.4374-4-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,10 +59,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240923105937.4374-2-ansuelsmth@gmail.com>
+In-Reply-To: <20240923105937.4374-4-ansuelsmth@gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Looks good:
+On Mon, Sep 23, 2024 at 12:59:32PM +0200, Christian Marangi wrote:
+> +#define BOOT0_STR	"boot0"
+> +#define BOOT1_STR	"boot1"
+> +
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+This boot0/1 stuff looks like black magic, so it should probably be
+documented at very least.
 
+> +	partitions_np = get_partitions_node(disk_np,
+> +					    state->disk->disk_name);
+
+disk->disk_name is not a stable identifier and can change from boot to
+boot due to async probing.  You'll need to check a uuid or label instead.
