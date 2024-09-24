@@ -1,175 +1,116 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97CF15B56E
-	for <linux-block@vger.kernel.org>; Tue, 24 Sep 2024 10:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4464218C325;
+	Tue, 24 Sep 2024 10:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727172029; cv=none; b=X3nt8M1/QpF/93zg6W562y3IhoHJ2oMvVeODOmnpYcn/jJF4OgGQA63rAXHbB5QBq/6kXXOv2eKP6I5dT+87dIqnlVDEL9lpb+NJuO6T8eRU4RorQUOPn7XiaUNqNx8vRUKyRL9toMsdJRZqY8ifCeaaVUozevKM75kouQjJyFU=
+	t=1727173064; cv=none; b=ku3MAo/HSPeG69CMJlcnJOtLzKOXrr8FXMYICAFIfRpWrtTwiqvEbWRlfvmnsKs/QPkD8IMgHv+2KVn65sZ6+di7LBVN1Fb3NnaBCB6KkukH4GSXTQKc1CnTFIRhjO25tlfGKxz3xIIprfi2Y+mjsHK7Tk7ms1nJAmQysf2X6iE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727172029; c=relaxed/simple;
-	bh=MW7uAMBxOxYvLczeiayMBeBe4tJ6ZSEA1YN1+9gK99E=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=s0jwRdqSZcD7nAhuHmiKz1OnFUUsD1svQn54B/nwNVkZN8qb0SPax4JXxGG1SrQcmIbAsy4ydlXvxbyEvrO3QTxsejmvWSSHUB7pBja+gTBWRaAoX+p543ZyI9vHA0ehZb3nmomYeyzcI3Aha6dLNQsEO6bohodNiqeobLjfqXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a1957c7cf3so28627845ab.2
-        for <linux-block@vger.kernel.org>; Tue, 24 Sep 2024 03:00:27 -0700 (PDT)
+	s=arc-20240116; t=1727173064; c=relaxed/simple;
+	bh=MOrv/PO4+p/q2gx2H/jXlnLEDH+f3OEGh0lgTFRI7QQ=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VCmewtgXF0Sfi9Dz194/EUoMXXDnPF4/MWnhMWGd5ILy++e3UqwdrmeqDlRhcsdDmw0cNEXq8qkbvH7WfuzQRhPvKpO8xt1PM61wJEm2OTP58Lm0CdeS1Y4fcU8bb/eK2HJF28Ab+LcX0pYXoxAeGD6uLmaPJVlTMwvt24uC/jU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z38oR2E1; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z38oR2E1"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42e5e1e6d37so53307635e9.3;
+        Tue, 24 Sep 2024 03:17:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727173061; x=1727777861; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y6yq/DwFQfx4tBwrb6K58nwBTecQ5jjhs54hsQLsb9E=;
+        b=Z38oR2E1dsCG6CNYo51evLlunqZ20cOYS4Ppt1yoZVdkMgZrKv9J02i7f5MIJIy3pz
+         lkMSfpTAA+vi4j8rfgTcRDMV+pyNivEHEFEYEqdquoD3s8nsx/y5A+aAAjWzaMBHac4t
+         E/5hCXTtnNjJzomGLqD4TxFpbifNJn8rSyb7+K38wTOIEW46cHHxZZ2NKG06dh0f8Em5
+         8Rd9iAdTJTUz8BeDl7k/zz2K8LNPkScGNJOCVnr9Q8TmsEIp/pOqTVg+6f7NKQXGNcbq
+         uJHAtmOB1kddFNtYL3xiRil60W2owfkiSgiuo0LSZquyrcget57b+cYAhhaDz41yfVKH
+         aoYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727172027; x=1727776827;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a01in42YpZacjQNq2gwoU1Xzi0dMyhrMcy5fwZ6YU+0=;
-        b=gwBs76o0IT3r24QSaR9p5OoSZR/ZHy1udAVsJ29tJK7Af4eVlpeZ9XQnjMT0NpN/RT
-         9KDRx6Vw3WXmcUdSAYP0iZsbtOo+CENVs1MyH5ffPri4duQIdrICEGMZ7qglMrfJGj+J
-         u1ZJe9AQ0yNy4uuWLlTaSgFiZjLFlEkBoz/MU5O+fTQgosW/Ax489oI7I2xDMDeFehyL
-         FNicAjhZYe7iuLNl/sfmfrY+Diaov0C9pjRvMa3iteWGQ5ouprHtFII8rcKUCcApoUO5
-         jYKwj2DA1oEvm8UBeR/vP18MITtkmNJqda+luP5u0kxeebCN++C1dyKDQ4EWEylF7gb0
-         Os0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX7bjyqXCBAOQmWs1wnKufLbCAxfutckZGrNe4QQvrACO7zUUsCPDXahb0jVcL2WgX4yhuKxTpZNvs3ng==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxUsTUxI2/6AjEXg9x6/ys4F9AjpGVkn3s5gE0BXNzgq5Wt0TV
-	af3yeXYGKk1zNVlb7t8A217bU3XYIeAC8HWRy4lhJNciwu3hyZYf/FYhY1S1Bja+gxhDOt1b+wQ
-	2vKvsWRK+7COLzgKJsfoMUFS5BXydNfdB917K+vdggWVRfhfrHNELYks=
-X-Google-Smtp-Source: AGHT+IFEyPIqDOU0BgXapvNJ0AprH4g0Xhtxo+g/M18pZBOlY2RfqAs7/63imA7TvnWzXPr2FXqpLW98eVcT5vclBsQfy1g3Zgnj
+        d=1e100.net; s=20230601; t=1727173061; x=1727777861;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y6yq/DwFQfx4tBwrb6K58nwBTecQ5jjhs54hsQLsb9E=;
+        b=p0e9xjdoPsHRZPsvLGPtoL7c+9HW0mIRFQ0DfQp7DsGV2QHIwIC+OfWqKlCj09uFCq
+         S53SaAHP/GA40dSSx09SjuQ9ewmcpSwQcvDnfTWKl6i+d/J85kUIUKuo0x/L3LVarJk1
+         T79DBzMRdfLfP4Gvc/RNJF6Tl3cVHuPIkBEii7MWqTDQRsUTR99MpBcbvzUgdeYIqUT2
+         INwiq1IvSasrxkREH/v2cExy393TRXrVL42VvotAhKPzbLLuNHBa3nupUzmVD/ZI7xOz
+         ko5VhnIwLADCBbfpNcXV1v0tQyX5EoUWnH+6vXXpzDpKxr/Ee+g7G6RM3mgSvNH+wso8
+         F92A==
+X-Forwarded-Encrypted: i=1; AJvYcCUa5DXOhQ05b3n85NeKxyw8XLhlYJxl1eC3Wxft4BM8JzWajpiS4jB3BJTZ1IcBgzoFguOgkATuuOOp@vger.kernel.org, AJvYcCUqk/Ob0M8x0mpUd7P/rRkUcpbceFVHAvz0O9e8Fgvptzhn0T2QSGO14lw8W69JnOhx91cvlvWIFXcMrbg=@vger.kernel.org, AJvYcCXLURe4W8R/yDkprd9Riobm0dbO62aJaGr5xjDChiLLOcCiPc/r+5iEmV2kGdUUE39xiPfBOveSxXnddbRT@vger.kernel.org, AJvYcCXNIb06qukqmiqIWrPdgxOXYO3sivBKaTUPf4WnTfPODG6d4f00N3CmMMsLvu8BmdIPcrmy3yEmkV5X@vger.kernel.org, AJvYcCXq5PWCz4UTjuTyBHUUT6/nR76i3EONd3Tm6KQeMODH9JRzt7i0FeRon9nb4ryv7wBmYUYNkbSJ6ra+@vger.kernel.org
+X-Gm-Message-State: AOJu0YyS0dClzAe7bRGqyUWI6NAWJjOaBxkHuYJq+jW0fXInORs1tMP1
+	18a0C0YVGdkDuzSs1e8OlPytss/7XUNjUuCoib/1/8Ugb9jwNyy+
+X-Google-Smtp-Source: AGHT+IE83mnLUuf+4WZRfrPw50LD+lxqX8rWtjINgvgK2vW5eLA5p3k20e4sMLnXxjQweQjgZ91oYA==
+X-Received: by 2002:a5d:4488:0:b0:377:9867:9028 with SMTP id ffacd0b85a97d-37a431ad4dbmr7918215f8f.44.1727173061365;
+        Tue, 24 Sep 2024 03:17:41 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc2c1ef1sm1188238f8f.35.2024.09.24.03.17.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Sep 2024 03:17:41 -0700 (PDT)
+Message-ID: <66f291c5.5d0a0220.328e5a.2c9e@mx.google.com>
+X-Google-Original-Message-ID: <ZvKRwI3zrXURbYKS@Ansuel-XPS.>
+Date: Tue, 24 Sep 2024 12:17:36 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	INAGAKI Hiroshi <musashino.open@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>, Ming Lei <ming.lei@redhat.com>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Christian Heusel <christian@heusel.eu>, linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: Re: [RFC PATCH 3/4] block: add support for partition table defined
+ in OF
+References: <20240923105937.4374-1-ansuelsmth@gmail.com>
+ <20240923105937.4374-4-ansuelsmth@gmail.com>
+ <ZvJdjRpFaPUuFhIO@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1789:b0:3a0:bc39:2d8c with SMTP id
- e9e14a558f8ab-3a0c8d2e653mr99327325ab.25.1727172027017; Tue, 24 Sep 2024
- 03:00:27 -0700 (PDT)
-Date: Tue, 24 Sep 2024 03:00:26 -0700
-In-Reply-To: <0000000000005b6b0e0622220846@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66f28dba.050a0220.3eed3.0028.GAE@google.com>
-Subject: Re: [syzbot] [ntfs3?] kernel panic: corrupted stack end in
- kernel_init (2)
-From: syzbot <syzbot+ec17b78de14721dd3bdc@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, almaz.alexandrovich@paragon-software.com, 
-	ardb@kernel.org, linux-block@vger.kernel.org, linux-efi@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, ntfs3@lists.linux.dev, 
-	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZvJdjRpFaPUuFhIO@infradead.org>
 
-syzbot has found a reproducer for the following issue on:
+On Mon, Sep 23, 2024 at 11:34:53PM -0700, Christoph Hellwig wrote:
+> On Mon, Sep 23, 2024 at 12:59:32PM +0200, Christian Marangi wrote:
+> > +#define BOOT0_STR	"boot0"
+> > +#define BOOT1_STR	"boot1"
+> > +
+> 
+> This boot0/1 stuff looks like black magic, so it should probably be
+> documented at very least.
+>
 
-HEAD commit:    5f5673607153 Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=1298499f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=dedbcb1ff4387972
-dashboard link: https://syzkaller.appspot.com/bug?extid=ec17b78de14721dd3bdc
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11323107980000
+It is but from what I have read in the spec for flash in general (this
+is not limited to eMMC but also apply to UFS) these are hardware
+partition. If the version is high enough these are always present and
+have boot0 and boot1 name hardcoded by the driver.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/40172aed5414/disk-5f567360.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/58372f305e9d/vmlinux-5f567360.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d2aae6fa798f/Image-5f567360.gz.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/33ba6e22aaa5/mount_0.gz
+> > +	partitions_np = get_partitions_node(disk_np,
+> > +					    state->disk->disk_name);
+> 
+> disk->disk_name is not a stable identifier and can change from boot to
+> boot due to async probing.  You'll need to check a uuid or label instead.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ec17b78de14721dd3bdc@syzkaller.appspotmail.com
+This is really for the 2 special partition up to check the suffix, we
+don't really care about the name. I guess it's acceptable to use
+unstable identifier?
 
-x8 : 8f1719b15e27f800 x7 : 0000000000000000 x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000008 x3 : 0000000000000000
-x2 : ffff0000d7975ac0 x1 : 0000000000000000 x0 : ffff800080872848
-Kernel panic - not syncing: kernel stack overflow
-CPU: 1 UID: 0 PID: 16523 Comm: syz.3.4916 Not tainted 6.11.0-rc7-syzkaller-g5f5673607153 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:319
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:326
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:119
- dump_stack+0x1c/0x28 lib/dump_stack.c:128
- panic+0x300/0x884 kernel/panic.c:354
- nmi_panic+0x11c/0x23c kernel/panic.c:205
- panic_bad_stack+0x200/0x28c arch/arm64/kernel/traps.c:917
- enter_from_kernel_mode+0x0/0x74 arch/arm64/kernel/entry-common.c:928
- __bad_stack+0x78/0x7c arch/arm64/kernel/entry.S:566
- el1h_64_sync+0x0/0x68 arch/arm64/kernel/entry.S:591
-SMP: stopping secondary CPUs
-Kernel Offset: disabled
-CPU features: 0x10,00000207,00200128,42017203
-Memory Limit: none
+Thanks a lot for the review!
 
-================================
-WARNING: inconsistent lock state
-6.11.0-rc7-syzkaller-g5f5673607153 #0 Not tainted
---------------------------------
-inconsistent {INITIAL USE} -> {IN-NMI} usage.
-syz.3.4916/16523 [HC1[1]:SC0[0]:HE0:SE1] takes:
-ffff800091c892b8 ((efivars_lock).lock){....}-{2:2}, at: down_trylock+0x28/0xd8 kernel/locking/semaphore.c:139
-{INITIAL USE} state was registered at:
-  lock_acquire+0x240/0x728 kernel/locking/lockdep.c:5759
-  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-  _raw_spin_lock_irqsave+0x5c/0x7c kernel/locking/spinlock.c:162
-  down_interruptible+0x3c/0xfc kernel/locking/semaphore.c:83
-  efivars_register+0x2c/0x10c drivers/firmware/efi/vars.c:68
-  generic_ops_register drivers/firmware/efi/efi.c:229 [inline]
-  efisubsys_init+0x414/0x5f8 drivers/firmware/efi/efi.c:433
-  do_one_initcall+0x24c/0x9c0 init/main.c:1267
-  do_initcall_level+0x154/0x214 init/main.c:1329
-  do_initcalls+0x58/0xac init/main.c:1345
-  do_basic_setup+0x8c/0xa0 init/main.c:1364
-  kernel_init_freeable+0x324/0x478 init/main.c:1578
-  kernel_init+0x24/0x2a0 init/main.c:1467
-  ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-irq event stamp: 10106
-hardirqs last  enabled at (10105): [<ffff80008b3388f8>] __exit_to_kernel_mode arch/arm64/kernel/entry-common.c:85 [inline]
-hardirqs last  enabled at (10105): [<ffff80008b3388f8>] exit_to_kernel_mode+0xdc/0x10c arch/arm64/kernel/entry-common.c:95
-hardirqs last disabled at (10106): [<ffff80008b42e1b4>] __raw_spin_lock_irq include/linux/spinlock_api_smp.h:117 [inline]
-hardirqs last disabled at (10106): [<ffff80008b42e1b4>] _raw_spin_lock_irq+0x28/0x70 kernel/locking/spinlock.c:170
-softirqs last  enabled at (8930): [<ffff8000800307f8>] local_bh_enable+0x10/0x34 include/linux/bottom_half.h:32
-softirqs last disabled at (8928): [<ffff8000800307c4>] local_bh_disable+0x10/0x34 include/linux/bottom_half.h:19
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock((efivars_lock).lock);
-  <Interrupt>
-    lock((efivars_lock).lock);
-
- *** DEADLOCK ***
-
-1 lock held by syz.3.4916/16523:
- #0: ffff0000ef1b60e0 (&type->s_umount_key#52/1){+.+.}-{3:3}, at: alloc_super+0x1b0/0x83c fs/super.c:344
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 16523 Comm: syz.3.4916 Not tainted 6.11.0-rc7-syzkaller-g5f5673607153 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:319
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:326
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:119
- dump_stack+0x1c/0x28 lib/dump_stack.c:128
- print_usage_bug+0x698/0x9ac kernel/locking/lockdep.c:4000
- verify_lock_unused+0xc0/0x114 kernel/locking/lockdep.c:5691
- lock_acquire+0x3b0/0x728 kernel/locking/lockdep.c:5750
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0x5c/0x7c kernel/locking/spinlock.c:162
- down_trylock+0x28/0xd8 kernel/locking/semaphore.c:139
- efivar_trylock+0x20/0xa0 drivers/firmware/efi/vars.c:160
- efi_pstore_write+0x21c/0x63c drivers/firmware/efi/efi-pstore.c:223
- pstore_dump+0x764/0xad0 fs/pstore/platform.c:354
- kmsg_dump+0x17c/0x274 kernel/printk/printk.c:4214
- panic+0x34c/0x884 kernel/panic.c:385
- nmi_panic+0x11c/0x23c kernel/panic.c:205
- panic_bad_stack+0x200/0x28c arch/arm64/kernel/traps.c:917
- enter_from_kernel_mode+0x0/0x74 arch/arm64/kernel/entry-common.c:928
- __bad_stack+0x78/0x7c arch/arm64/kernel/entry.S:566
- el1h_64_sync+0x0/0x68 arch/arm64/kernel/entry.S:591
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+-- 
+	Ansuel
