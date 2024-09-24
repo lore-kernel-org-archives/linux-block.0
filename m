@@ -1,177 +1,96 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0676A5A79B
-	for <linux-block@vger.kernel.org>; Tue, 24 Sep 2024 06:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D794F8BF0
+	for <linux-block@vger.kernel.org>; Tue, 24 Sep 2024 06:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727160568; cv=none; b=sSoVGmIzcYvqWiwv0IqYNpKLZXdh12n57JfUT5QfNfp7VxK2mb1xNS1p3UeB4U2TYinzd1h/49UMX71EAXGwAXhOayITgeIDD4pRannoPRzffFrcSXGx9MeBnzLy23BjyuKYe1/vt9qN2dFCpEg6Sti2iw/n93u8fG73gK3f1+0=
+	t=1727160663; cv=none; b=rgGQGhBoGY/syucJUhiBOb5RqoSTX0yhJ89qaMelra2cG0JAn8UFUOgx+r68wyRgY4V5QyQklMOprzyMX0O/9A0TRPpA12EJtIEf/bJUCX9HnXKepPq9/sb7R8ebwcoS9cm23BjcASLaqozuYOJ/yp3wo+3aG+KeJhccR6GHJ18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727160568; c=relaxed/simple;
-	bh=bWxwDga/3/ZPpSwVkbi9CRNIEgUdfLBW6bSk/2l9/4I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SktC+KwsY7UoTPa4R/HpsXc/2M5V8ArKgfs2KeHnSQ1ev4uKDKTd/0ozLZxaw95MP69z0FWZrOmS0iBfXMmiPitU8NxbTufr+e4YA366TaFYYDhjVZ1BrJyGIIUAz1KjDXH3jEuJmDMHfLdT6QCoLRAKepphSvIbm4KVGLbzlHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=URaDdTjv; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=L7LnQn4g; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=URaDdTjv; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=L7LnQn4g; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1727160663; c=relaxed/simple;
+	bh=LpsqiJvMgPeFGUk+BZZEvqNyd7oNQvz6Lh1UHfN/Jdg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cMFaX6XqwDZrrg3FQCxYsCt4QXgFQZp1THEZNXdEtn8Dn/QTf/rHQi3DG8mG1brDg7j+t1eaLw0iol53ZdSZGKy4kQgL/BAMPd8i1BHdaEcgnengH0cJ5bpV8u5GZ7j/uIWCtukZDTgqEl21dM9LuNk4wrqZJkqTZiZXF566RvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=UdrwcHEb; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="URaDdTjv";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="L7LnQn4g";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="URaDdTjv";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="L7LnQn4g"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1342421B1B;
-	Tue, 24 Sep 2024 06:49:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1727160565; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7+HTSuGE6TRWU07fT3tUoleSR00bIryOgymqfCqcAFE=;
-	b=URaDdTjvIe2hQ+QGU9Czziopqoq/lKiYzfRKXSwHnu+/eGiqd/mB0uLhgrx3ASYF7RWRn0
-	VrC98icBcOdbhxzrIYPajCE8X/Zkg8imdjh5U+rbgZ6TgyG+XdqTJV33Dm7j5codJ+SmFr
-	K0l0zIj9iKJc+v06OiKT3yq+FvPt5Mg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1727160565;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7+HTSuGE6TRWU07fT3tUoleSR00bIryOgymqfCqcAFE=;
-	b=L7LnQn4g7zqWcz1IPT7XDwwKchrqdC5Hzd9ekzsuMd9YXo0qZs7r3/qszF/nmMfm5t0GK7
-	1mV8tpH3eKGl+pBQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=URaDdTjv;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=L7LnQn4g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1727160565; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7+HTSuGE6TRWU07fT3tUoleSR00bIryOgymqfCqcAFE=;
-	b=URaDdTjvIe2hQ+QGU9Czziopqoq/lKiYzfRKXSwHnu+/eGiqd/mB0uLhgrx3ASYF7RWRn0
-	VrC98icBcOdbhxzrIYPajCE8X/Zkg8imdjh5U+rbgZ6TgyG+XdqTJV33Dm7j5codJ+SmFr
-	K0l0zIj9iKJc+v06OiKT3yq+FvPt5Mg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1727160565;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7+HTSuGE6TRWU07fT3tUoleSR00bIryOgymqfCqcAFE=;
-	b=L7LnQn4g7zqWcz1IPT7XDwwKchrqdC5Hzd9ekzsuMd9YXo0qZs7r3/qszF/nmMfm5t0GK7
-	1mV8tpH3eKGl+pBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2F9F01386E;
-	Tue, 24 Sep 2024 06:49:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id q6jgBPRg8mYBWQAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 24 Sep 2024 06:49:24 +0000
-Message-ID: <7d355b78-fe13-4cb2-82f0-95795f61db36@suse.de>
-Date: Tue, 24 Sep 2024 08:49:17 +0200
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UdrwcHEb"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2054e22ce3fso51160765ad.2
+        for <linux-block@vger.kernel.org>; Mon, 23 Sep 2024 23:51:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1727160661; x=1727765461; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E/4TVrZGAPYYZ9jgK0SoUaboMFGCpBKiH3t0JiBxkdE=;
+        b=UdrwcHEbdf618KJiMNMrIGqYphlbDhR9+dV3iUpzKuq+OdtdTXARO577wptxGjIXEa
+         2PgX30ITBo6mU52q0nKCYEO7FjXCurWnadY0QoRN69jMhBblbilGLk0ebz23qXwjkU5R
+         d4pxHnwcfptku4iRn2bbaQ0a5ylT/1yhGwp6Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727160661; x=1727765461;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E/4TVrZGAPYYZ9jgK0SoUaboMFGCpBKiH3t0JiBxkdE=;
+        b=DpfzIfNfrMPqj0owfkrfGwAXVl0W60uJkZVW4dQ0VIztB4rOgEmDt457Pr/1owDmtB
+         TuFFanXaAi/pRFvMK6IB89OoYN6exJ+3N8QqErdSaGXwwyL3Frj+DyG/KoJMOgM4+4SK
+         9wp0xlrIPhtqchSUhR1a+TiJVEkXDngqvoceh845ETcQ/JjrOuzSDk0v9k736fkTYIkP
+         1YoWPfsu8UxBMjLSehyMISbtwhlR0ozUwjltKnPtWQ2cdYaHbSw8mIfWqCASTdUzx16i
+         FydvYioXmDeGqF8tcq+FOKjulosLOc+oQNYdGscaCsaxXfn/bY2ChhiAQ8bzaTMZP4VC
+         K6UA==
+X-Forwarded-Encrypted: i=1; AJvYcCVwiqLkzr5t5Ltz9qM21pdoPYbN3zjk496mq3LngpHBexqkgusafCwNfkJFFGGkUt5M4rQlY6DqqNt3Ig==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf5UHBelWpoNA/3/9KQsl1QfPQq3/1UOCrq36ykDDDTWEtRmpv
+	BDdRckSZwklqjcdUHczb+nZ8F0s/DZn1guLVK1wM471hO26tPtprS6acvxcAug==
+X-Google-Smtp-Source: AGHT+IHL8eRo0RSvvbNDTCkEkAe7y/UEEpovG0ZqtEloktAHurr+zf+J8pOugx0pBfpmpOm/9jfvfA==
+X-Received: by 2002:a17:903:41c9:b0:201:f1eb:bf98 with SMTP id d9443c01a7336-208d840ace4mr182071705ad.54.1727160661152;
+        Mon, 23 Sep 2024 23:51:01 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:93d1:1107:fd24:adf0])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20af1818a88sm4874115ad.210.2024.09.23.23.50.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2024 23:51:00 -0700 (PDT)
+Date: Tue, 24 Sep 2024 15:50:56 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Andrey Skvortsov <andrej.skvortzov@gmail.com>,
+	Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>,
+	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	stable@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCH v3] zram: don't free statically defined names
+Message-ID: <20240924065056.GP38742@google.com>
+References: <20240923164843.1117010-1-andrej.skvortzov@gmail.com>
+ <c8a4e62e-6c24-4b06-ac86-64cc4697bc2f@wanadoo.fr>
+ <ZvHurCYlCoi1ZTCX@skv.local>
+ <8294e492-5811-44de-8ee2-5f460a065f54@wanadoo.fr>
+ <20240924054951.GM38742@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report][regression][bisected] most of blktests nvme/tcp
- failed with the last linux code
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: Yi Zhang <yi.zhang@redhat.com>, linux-block
- <linux-block@vger.kernel.org>,
- "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
- Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>
-References: <CAHj4cs90xV1t2NbV6P3_z1oYwD0BcvMhC5V2mGgekRq8iae=NA@mail.gmail.com>
- <CAHj4cs8YGgmemMZDXmt7yHa+Xq3EiEvRWOJGEQTDjqGB2rAogw@mail.gmail.com>
- <5ce3b803-275d-4be3-a9bc-87d06a8f5033@suse.de>
- <jhllwfxcedrcxcnbajwl4x2l2ujcqowqcd4ps574zrafrqhjna@f4icvecutekm>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <jhllwfxcedrcxcnbajwl4x2l2ujcqowqcd4ps574zrafrqhjna@f4icvecutekm>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1342421B1B
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	TO_DN_ALL(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_TRACE(0.00)[suse.de:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240924054951.GM38742@google.com>
 
-On 9/24/24 08:38, Shinichiro Kawasaki wrote:
-> On Sep 23, 2024 / 08:31, Hannes Reinecke wrote:
-> [...]
->> How utterly curious.
->> This mentioned patch moves some sysfs attributes to a different location in
->> the code. The stacktrace you've posted indicates that we're creating a
->> controller while the previous one is still present in sysfs, ie that the
->> lifetime of the controller has changed.
->> I find it difficult to understand how the cited path could have changed
->> the lifetime of the controller object, but will continue to check.
-> 
-> I tried to recreate the failure, and observed a very similar but different
-> symptom. Kernel reported the KASAN BUG global-out-of-bounds, in
-> create_files() [3]. I confirmed that this symptom is triggered with the commit
-> 1e48b34c9bc7.
-> 
-[ .. ]
-> diff --git a/drivers/nvme/host/sysfs.c b/drivers/nvme/host/sysfs.c
-> index eb345551d6fe..b68a9e5f1ea3 100644
-> --- a/drivers/nvme/host/sysfs.c
-> +++ b/drivers/nvme/host/sysfs.c
-> @@ -767,6 +767,7 @@ static struct attribute *nvme_tls_attrs[] = {
->   	&dev_attr_tls_key.attr,
->   	&dev_attr_tls_configured_key.attr,
->   	&dev_attr_tls_keyring.attr,
-> +	NULL,
->   };
->   
->   static umode_t nvme_tls_attrs_are_visible(struct kobject *kobj,
+On (24/09/24 14:49), Sergey Senozhatsky wrote:
+> On (24/09/24 07:21), Christophe JAILLET wrote:
+> [..]
+> > > kfree_const() will not work if zram is built as a module. It works
+> > > only for .rodata for kernel image. [1]
+> > > 
+> > > 1. https://elixir.bootlin.com/linux/v6.11/source/include/asm-generic/sections.h#L177
+> > > 
+> > 
+> > If so, then it is likely that it is not correctly used elsewhere.
+> > 
+> > https://elixir.bootlin.com/linux/v6.11/source/drivers/dax/kmem.c#L289
+> > https://elixir.bootlin.com/linux/v6.11/source/drivers/firmware/arm_scmi/bus.c#L341
+> > https://elixir.bootlin.com/linux/v6.11/source/drivers/input/touchscreen/chipone_icn8505.c#L379
 
-Oh, indeed. That'll be the correct fix.
-
-Care to send an official patch?
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
-
+OK there are too many users of kfree_const() in drivers/ so
+un-exporting it is not an option, that was a silly idea.  We
+probably need to walk through them and make sure that they
+don't kfree_const() modules' .rodata
