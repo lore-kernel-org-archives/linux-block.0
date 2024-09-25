@@ -1,154 +1,130 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8069C17BB17
-	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 13:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD0B18B48D
+	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 14:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727270492; cv=none; b=USiyDlGTi+6V/pyAp33At90tAvDHtzOAJzEda2xBZ52hlx8GDtwYSpcRPt5n6hDaI1oHfV6e7NfYIXGEEKxdorFAkXHz/ZrLRJ9M/FxwtAH2d1okr+8+Dy2Iwy5ECCcHPM5b+MW/S2wObtWUpvhbWhNwYF3llWsSMAbn8EGg4FU=
+	t=1727274016; cv=none; b=bgxd7UWUHeKHCJ3gCeR8blrQjptqRWDSRRvVBSp5ER2rWbUhEma27VGmLlwmhcJ4bv+UWA/AuQVl1XyLqeypXqqmoDley1BJCkiHTu+4DBdtxMhfUmEfWkxmj2//xIkdbrGMxiFH8q10A6zFhKYO6t7LQYkxStJn6jmvmjn/YgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727270492; c=relaxed/simple;
-	bh=mnoe8Xd1F7ztDH7Q61E4LvL1QadZ2xUAO++ntgsh7/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=Vz/nqrOaqJI5LcIvLFqFOya63IKC4PJIbmWmvXvga/DP2N3Ev4bOOH0ZCs1OyFPFR0YPbKCUsR3DvhuD+mTTTtWH4Xjyx7brkHO1LXaTVc0Wy/aw6L1l0C5wp5m4xF7NataVChcIMixmEy0MGgAxlME8bbG2UwDA0IE7F0rQMZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Lc2HD6bl; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1727274016; c=relaxed/simple;
+	bh=l1sCpvtLYuSbeNJh5PG8L/QtftmDXwF2OMl87pBSvko=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Ka04QlZT49JqQYZNQPZPo3cp+WuQ8xTwi3i80MMcMI8D8Ekh7oPeN4t4M2dvgXVcG5E0vdiYbRaQZT52sU69kftm+tYnE6Owc97nj0RgKoggtPLoAsqnSsiMMud0ABnKGAToU/JPfMbwoE3uS0bXnV9EMjT7B9fBrs/IeKUOSDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PtQvL6fK; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Lc2HD6bl"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20240925132127epoutp02f5ec7a33a43b4344c2444238ad91ec4b~4f1tVzrGd2421424214epoutp02g
-	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 13:21:27 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20240925132127epoutp02f5ec7a33a43b4344c2444238ad91ec4b~4f1tVzrGd2421424214epoutp02g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1727270487;
-	bh=+1Yc1j/F9EUOGjp4C92RegYtPjoX8rRZqa0vTdTHK48=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=Lc2HD6blpJLV/4WfxwsAMpBsi8DR/GOPrjWsVCPHq5pNPwKz1Gs5TMn5c8GQkysLI
-	 5omKhiT71xcyqH1j/ZPBXqq2N/H1VD5qhpZb2PAV0d9v+dXE9fnnWpCb7McLLolakE
-	 0WNG7VZu3dH6EYYYyk1EtjeTpayhfHnFRxa3wYyM=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20240925132126epcas5p2b8370189c618a80127d8cb97c040f7a7~4f1somcHI0162601626epcas5p2T;
-	Wed, 25 Sep 2024 13:21:26 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.175]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4XDHS52bxdz4x9Ps; Wed, 25 Sep
-	2024 13:21:25 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	80.A5.08855.55E04F66; Wed, 25 Sep 2024 22:21:25 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240925132124epcas5p1cc362b7e5fec64e41bde11aec1ab9ea5~4f1qS-viC2284122841epcas5p1t;
-	Wed, 25 Sep 2024 13:21:24 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240925132124epsmtrp1de7dc004f5a08b5d887f6fa16623a015~4f1qSD7971595215952epsmtrp1w;
-	Wed, 25 Sep 2024 13:21:24 +0000 (GMT)
-X-AuditID: b6c32a44-15fb870000002297-b7-66f40e5581c4
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	9B.C3.19367.35E04F66; Wed, 25 Sep 2024 22:21:23 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240925132120epsmtip1fc0524d7ed2f4e6e95512f107b748adb~4f1nR6kh43096430964epsmtip1w;
-	Wed, 25 Sep 2024 13:21:20 +0000 (GMT)
-Message-ID: <8665404f-604e-ef64-e8d7-2a2e9de60ba7@samsung.com>
-Date: Wed, 25 Sep 2024 18:51:20 +0530
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PtQvL6fK"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48PD1XiS022617;
+	Wed, 25 Sep 2024 14:19:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:subject:from:reply-to:to:cc:date:in-reply-to
+	:references:content-type:content-transfer-encoding:mime-version;
+	 s=pp1; bh=JsL3gpgpujkygvgicHTmEKBG0+fOt0ySRyoy5v2B4e4=; b=PtQvL
+	6fKyysq8kQ/8M6rgabwLHrd7sfaV3MvP3nC0D2RQ2ENtfgWlO6m6+J8LDCCSMlU3
+	xhVH5swPsxPbUeMq4XKTEFE8jkgetvrxqtpT57ZJysDMjzPlo4Z3FZ/SJZTweKtN
+	uM2XYSKymWbPlnFeObZua4u6E7zh4W9mc7YrZU+21cA7UdeDdIP3/Z8gjT69gb5D
+	ih8k0kAVxm1/oVUPieUBexyjM9XPBwfNJ6OjlahoQnOM5nwZPNUM2PjZ/+Ejv8qz
+	y0Kj+A00VKCOBiLOE7uHyCSd02JV4vLwnIe8NrTU3r/0/Qg9B/yJn2tCk/vjcdBc
+	bwqo8/RO/EhxSJg9w==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41snvb8m2q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Sep 2024 14:19:56 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48PBqFKB000682;
+	Wed, 25 Sep 2024 14:19:55 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 41t8fut813-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Sep 2024 14:19:55 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48PEJt6736307246
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 25 Sep 2024 14:19:55 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EDA1758050;
+	Wed, 25 Sep 2024 14:19:54 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A634158045;
+	Wed, 25 Sep 2024 14:19:54 +0000 (GMT)
+Received: from rhel-laptop.ibm.com (unknown [9.61.147.165])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 25 Sep 2024 14:19:54 +0000 (GMT)
+Message-ID: <58a898bda1d1b2c1240ca329204070e8755e196a.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 0/1] add ioctl IOC_OPAL_SET_SID_PW
+From: Greg Joyce <gjoyce@linux.ibm.com>
+Reply-To: gjoyce@linux.ibm.com
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, msuchanek@suse.de, jonathan.derrick@linux.dev,
+        dwagner@suse.de
+Date: Wed, 25 Sep 2024 09:19:54 -0500
+In-Reply-To: <20240829175639.6478-1-gjoyce@linux.ibm.com>
+References: <20240829175639.6478-1-gjoyce@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.52.3 (3.52.3-1.fc40app2) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: mDnNj7EfHbijBU1QoEn9VBWZyLeXwg9y
+X-Proofpoint-GUID: mDnNj7EfHbijBU1QoEn9VBWZyLeXwg9y
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: [PATCH v6 3/3] io_uring: enable per-io hinting capability
-Content-Language: en-US
-To: Pavel Begunkov <asml.silence@gmail.com>, Hannes Reinecke <hare@suse.de>,
-	axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-	martin.petersen@oracle.com, brauner@kernel.org, viro@zeniv.linux.org.uk,
-	jack@suse.cz, jaegeuk@kernel.org, bcrl@kvack.org, dhowells@redhat.com,
-	bvanassche@acm.org
-Cc: linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-block@vger.kernel.org, linux-aio@kvack.org,
-	gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com, Nitesh
-	Shetty <nj.shetty@samsung.com>
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <cb3302c0-56dd-4173-9866-c8e40659becb@gmail.com>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Tf1DTZRzH7/nuyzYo3NcJ8UCezVXegYFbwXzwQEyJ+wqeoV53FiEt9uXH
-	bWxrP0Cgu8gOyl0OGYY0EEwpYXJ4DAQGA71JN1H5kQQBDV0xSuCGAXYlBLQxIv97PZ/P+33v
-	5/N57mHS2GWMIGamVEUppEIJl+6Dt9wKDgl9Z9OTNN5tPQtVGloAujpeTEealWYczdyaB6js
-	j6c0NHtqCUejN00YMl/SYaju6vcYmi3sw1HF+c8w5Limp6EJ2wID6SzDAJ0rOwVQ59hOZO7s
-	wVH1d5MMdMW6gqGWpWoaaph5jKP+ZasX6tdXMvYFkIM/JpAm/TiD7H/QiJODvWrSaDhNJ43z
-	OgbZVPMJ2TFaQCfnJsdw8nHXEJ3UNhsAee9it6t5N59cMG4jjQ4nlsh6TxyVQQlFlIJDSVNl
-	okxpejQ34VjKgZQIAY8fyo9Eu7kcqTCLiubGHkoMjcuUuHbA5WQLJWpXKVGoVHJ37Y1SyNQq
-	ipMhU6qiuZRcJJGHy8OUwiylWpoeJqVUe/g83usRLuEH4ozZykeYvIR50jltoheARroGeDMh
-	EQ6nJ0cYbmYTHQA2n35FA3xcPA9gZ3UTtnFwtmoYG47yy7inYQKwR9u3bncCWDGb7GZfYi+c
-	LDhHczNOvAqHp/6me+qbYc/XDtzN/sSHcHGoErh5CxEHmyr6vdxMIwLgmKN6LdmPMGHw9+WH
-	dPeBRqwC+FWdwaViMulEMBwoVbvRm4iGc/YTHu9LsNVZSXPLIXHDGzospZjn1rHQbm/GPbwF
-	Tlub16cJglPFResshvZf7euaj2Fbk9bLwzGw4J+RtViaK/Za+y5P1iZ4ZsmBucuQ8IVfFLE9
-	6u3wgW5y3RkAfymv8fJISKhZPuxZ230M6qYasbOAo39mK/pnptc/M43+/+CLADeAQEquzEqn
-	UiPkfCmVs/HcqbIsI1j7ICGxbWCkeiXMAjAmsADIpHH9fHWjc2lsX5EwN49SyFIUagmltIAI
-	1/OU0IL8U2WuHyZVpfDDI3nhAoEgPPINAZ8b4DtTeEHEJtKFKkpMUXJK8Z8PY3oHFWDPr34e
-	efd624HzXBtrtWX5uslywvnbRM3TrbJs0p6fPWC9uZg0ZDOHmi0Nmi8f2pNfCNhzKHfHQved
-	Ny//FdpRP/Hn23NHqnKOaI/Xq80/JwR+GtX1TVVR1ftgoEXbvhI3ulj6shcLTxhOHjLyrqjr
-	XsyLqt3fwW+focyHbfPlTxrz7MYLtuAYa28WK95vlX20py3wUq6O+e3x2nf9WfcT2IzsnO3i
-	sJKF27263UofwbYbkj4+ETNm08RSE0kN8Zoigah1q+FMzXh+ak7XkvZk0sGDZfU7jg7WxFGF
-	jyLFzxXv3CwpP1b5U0h3oJVzJ62PN3LvtfiPbEv794W8VWsK+yGQiyszhPwQmkIp/Bd5Uipy
-	qQQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrIIsWRmVeSWpSXmKPExsWy7bCSnG4w35c0gxc3rCzmrNrGaLH6bj+b
-	Rde/LSwWrw9/YrSY9uEns8W7pt8sFjcP7GSy2LNoEpPFytVHmSzetZ5jsZg9vZnJ4sn6WcwW
-	j+98ZreYdOgao8WUaU2MFntvaVvs2XuSxWL+sqfsFsuP/2Oy2PZ7PrPFutfvWSzO/z3OanF+
-	1hx2B3GPy1e8PXbOusvucf7eRhaPy2dLPTat6mTz2PRpErvH5iX1HrtvNrB5fHx6i8Xj/b6r
-	bB59W1YxepxZcAQoebra4/MmOY9NT94yBfBHcdmkpOZklqUW6dslcGW8m/OCqWAiR8XbVzvZ
-	Ghg3snUxcnJICJhIvJqxmKWLkYtDSGA7o8SfXXNZIRLiEs3XfrBD2MISK/89Z4coes0o0XRq
-	Mlg3r4CdxNOGKcwgNouAqsS1lz+g4oISJ2c+YQGxRQWSJPbcb2QCsYUF3CQ2zz4PtoAZaMGt
-	J/OZQIaKCOxkkvi48T8biMMs8J9RouPYMiaIdZeYJHa93QCU4eBgE9CUuDC5FMTkFLCV+Pgg
-	DmKQmUTX1i5GCFteYvvbOcwTGIVmIbljFpJ9s5C0zELSsoCRZRWjaGpBcW56bnKBoV5xYm5x
-	aV66XnJ+7iZGcKrQCtrBuGz9X71DjEwcjIcYJTiYlUR4J938mCbEm5JYWZValB9fVJqTWnyI
-	UZqDRUmcVzmnM0VIID2xJDU7NbUgtQgmy8TBKdXAtGty91rZVe5KTw30j9rtT5U90HPz0buu
-	I1u55tobHwuyyKmdd4VhWvP1rz9+WLO73TH4v/O5cvSMKWtkub1UZTae4+jWOr4gyY35iekh
-	YQ2lrUFL5zL9zNryWrdU1KWIffO67WoMpQtEP3JPaWx8YzTDsKnJ8olqVtgcnbBvwVYL20zO
-	r/nXsD5c535PaaF0dxun9QuR2Y9vVzWeePDfj8v1BXMiT73B5e8v9r/UuN75fpJoq/bCIl2e
-	617qXBm/PPndHsw8+TV86uppvWuqFba+2b/yNkOE8oHrwU6Psz7naGQFp/9b/e349F6u3ILV
-	7zYvVuP89zp7sWVYhcn14wxBqXILZeI7bh345/34sBJLcUaioRZzUXEiAE9puQyEAwAA
-X-CMS-MailID: 20240925132124epcas5p1cc362b7e5fec64e41bde11aec1ab9ea5
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240924093257epcas5p174955ae79ae2d08a886eeb45a6976d53
-References: <20240924092457.7846-1-joshi.k@samsung.com>
-	<CGME20240924093257epcas5p174955ae79ae2d08a886eeb45a6976d53@epcas5p1.samsung.com>
-	<20240924092457.7846-4-joshi.k@samsung.com>
-	<28419703-681c-4d8c-9450-bdc2aff19d56@suse.de>
-	<678921a8-584c-f95e-49c8-4d9ce9db94ab@samsung.com>
-	<cb3302c0-56dd-4173-9866-c8e40659becb@gmail.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-25_04,2024-09-25_02,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 clxscore=1011 spamscore=0 mlxscore=0
+ adultscore=0 impostorscore=0 bulkscore=0 malwarescore=0 suspectscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409250098
 
-On 9/25/2024 5:53 PM, Pavel Begunkov wrote:
-> On 9/25/24 12:09, Kanchan Joshi wrote:
->> On 9/25/2024 11:27 AM, Hannes Reinecke wrote:
-> ...
->> As it stands the new struct will introduce
->>> a hole of 24 bytes after 'hint_type'.
->>
->> This gets implicitly padded at this point [1][2], and overall size is
->> still capped by largest struct (which is of 16 bytes, placed just above
->> this).
-> 
-> For me it's about having hardly usable in the future by anyone else
-> 7 bytes of space or how much that will be. Try to add another field
-> using those bytes and endianess will start messing with you. And 7
-> bytes is not that convenient.
-> 
-> I have same problem with how commands were merged while I was not
-> looking. There was no explicit padding, and it split u64 into u32
-> and implicit padding, so no apps can use the space to put a pointer
-> anymore while there was a much better option of using one of existing
-> 4B fields.
+It's been about a month with no comments. Does anyone have any feedback
+on this patchset?
 
-How would you prefer it. Explicit padding (7 bytes), hint_type as u16 or 
-anything else?
+Thanks,
+Greg
+
+On Thu, 2024-08-29 at 12:56 -0500, gjoyce@linux.ibm.com wrote:
+> From: Greg Joyce <gjoyce@linux.ibm.com>
+>=20
+> This version does not reflect any code changes since there have
+> been no comments on the patchset since the original submission
+> on 13 Aug 2024.
+>=20
+> As requersted, it does contain an expanded description of the
+> patchset and a pointer to the CLI change. Thanks
+> to Daniel Wagner and Michal Such=C3=A1nek for the feedback.
+>=20
+> SED Opal allows a password for the SID user as well as the Admin1
+> user. If a CLI wishes to change the password of both users there
+> is currently no way to accomplish that using the SED Opal block
+> driver ioctls. The Admin1 password can be changes using the=20
+> IOC_OPAL_SET_PW ioctl but the SID password remains the password
+> that was set when the SED drive was provisioned (ownership).
+>=20
+> To allow a CLI to change the SID password, a new ioctl
+> IOC_OPAL_SET_SID_PW has been created. The valid current password is
+> required to change the SID password.
+>=20
+> The nvme-cli has been changed to use this ioctl such that the
+> "sed password" can change both the Admin1 and SID passwords.
+> The pull request can be found here:
+> 	https://github.com/linux-nvme/nvme-cli/pull/2467
+>=20
+> Greg Joyce (1):
+> =C2=A0 block: sed-opal: add ioctl IOC_OPAL_SET_SID_PW
+>=20
+> =C2=A0block/sed-opal.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 26 ++++++++++++++++++++++++++
+> =C2=A0include/linux/sed-opal.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
+> =C2=A0include/uapi/linux/sed-opal.h |=C2=A0 1 +
+> =C2=A03 files changed, 28 insertions(+)
+>=20
+
