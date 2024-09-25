@@ -1,57 +1,57 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9093C158866;
-	Wed, 25 Sep 2024 21:46:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D77E183CCB;
+	Wed, 25 Sep 2024 21:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727300812; cv=none; b=gKK6SkVre2b0JKRrqdLIuKDtMSH+oDZmBE4CXl0VodZ5lHJW3bZMXDTxDAWSciKa4LwdAA5nxXm7ngsxRNgkjD1A+9olKNxscmTNYxDz3lEI3Xu6lt1li5i9GjgGFGR7/WwNr++ytgvB4eGRLT8gfJpBgH+FpFmIbLDalT7hffE=
+	t=1727300816; cv=none; b=lxwz2Clo4F1FoaT9dASy7oci63beLFRr3Mevl47tIS9st5RR/+QlupsU08SkHBnsqbsnJabHQwMV84noQIikAnCeo70iSMxr0nrnTFPwb0l6yxomCN3ONisJ3Jd6Xe9liGFASOVjeBmN0SUWLnmwDTghm9eo9BOuiDv4WJLmQtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727300812; c=relaxed/simple;
-	bh=JRS8ctlAm3qYU/7UxMl0igxy25UFiLYuqzTjAkmm7t4=;
+	s=arc-20240116; t=1727300816; c=relaxed/simple;
+	bh=FeHxkCsjuNWL4fLxU+cdqB1g5g+6e0/6atm4D7lPtT8=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tto4mCGxR0TuSjwIOf3mVnxm/bfXUjHczt58k68v7/zqGC58NrMn0u3kKHbfKtx338yB0hEXddsUhgCHuJq4zhak+RxbfW3cDw9lX9XHvkskFbU2lMbCJqtcxyldzZxL3LQPLAW645sB18YVqQOcQk5iKGvwNq3fK48Gp1cJjt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JTW7cVBm; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version; b=FYAf2aqsfZRVli9Hqyavr9T4ci6dy/ZrMUJKavFIYHeB3nKAcJJHAYBpMS7UXAv0OZnJMLNUvhKpQ6t0ygEQ5mwJO60rN+9+XLPInSvPfUXJK81wSajLlSMjbb1TR5mzFWq0wmfgKxZQPAglIhuKY5Gr2tTN0yOXQPk2kg/BynI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cKrrdVbw; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTW7cVBm"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42cd46f3a26so2340905e9.2;
-        Wed, 25 Sep 2024 14:46:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cKrrdVbw"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-37cc5fb1e45so163542f8f.2;
+        Wed, 25 Sep 2024 14:46:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727300809; x=1727905609; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727300813; x=1727905613; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mPfCoOMxsJjIr/wXEPPqXPDSbCfoVOLl/AUDyDHyFMM=;
-        b=JTW7cVBmt6wPnj4wTGt7cCGaAffTOsekWNhufpwECg7i1l0fnnEsZlWxlzv0DPv5ts
-         OaWsJt1Y7lnl5k1cbvfAEOU6mty9Zo8ci7HTOHpLFGyh3itagTUtIRbJSVBwDAR6Nnhv
-         JUtXc5CVERzEDI2ViUwhFMp4VCSUVmB2YmAwuGqioysGB/Mu9JSJvfGs796FTZf7L5xo
-         CW8YSI11gvnyDd7i2+2w+qtEWTcLGNG48gG9oEr4v2Wo/5fv+r+YoPlzf8TpxnzM4Djt
-         eLCylenht1TcOTxtijpFB+1xZ/SnBUaRREa9WaFAypAr4BBoFPjIVBkqT37Jse1LQNIt
-         Goug==
+        bh=d9nJBatBeRhZqG9r4m0SatNAaTtD+mKgW27WzTrnpaU=;
+        b=cKrrdVbw8WMQaaHu5TuAQWGFVeNSWAfDH69/W0MdnZCjwPc/5H2FRQvwIZXQ+otbwf
+         OpE3M/jo2YVIfGir0gLBPoKgjT1L+P1rYDhwPM8qtIn/naE5E4awGaNwhpva10mxO6B6
+         VszGXjFX8u0BGiN6eQL8pPABk6qocpyoWCf3WGR2bslpx++JCCQO9q/HfVMluu1vD5zN
+         nBIIKHv8i1PBIpXrd1et+21HEk1uf9xYH2r66tkl21KHsP21zf0nAbJzDhDndRg0wAwd
+         5Uart59LAg87iNnfRNznreRgHUAwpm9yyq/8/ikwzZ/PvmUG5PIdbyzx9RhAxNx5FXh6
+         aaLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727300809; x=1727905609;
+        d=1e100.net; s=20230601; t=1727300813; x=1727905613;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mPfCoOMxsJjIr/wXEPPqXPDSbCfoVOLl/AUDyDHyFMM=;
-        b=jFm7sDCFk8lYOpvXvfSBbWL8W66FCcYAFg6jPGf22CrrCz3vmI0lOKbW3mF11stqOy
-         FW30uEORQOaupSt5OWc0jIBMmYJG0KXvl+4zCbIJ7BmMTmFAwV84lxfyC/MyunDksXj1
-         jf5dAh8nISLlq057pmLXH0DE5/hNykW9X72RzQQ93qaae5BPSC4hz266h35R3QK3XXwO
-         JyJJMdtNcYnrD45/wonyuzJ4+lPN8ArQm0tgP6YL5/ZL/n/nilw649b0u4j/Kw3fUUkd
-         grdtAnRRRBl0URq9S1NI/50uABPj+oLwTnzipLPNe3+L9aWKdDOwQtZGhi3MmmfCzLRI
-         FxrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU4cJD78LAZtGx+xdDQ9R/r5w9W+DyKZpbB42u730tGqn8FfTHA0JoQVG7qQMCIpWHaKsffOOx6eq5KT+Ue@vger.kernel.org, AJvYcCV1PwPGDI2NpwvVFfTaw7EudkpI3WjbXf/WGML98TOXpw1LkmWqFYvHfYyb7uUfzFpGgWsToqnRqeBd5FU=@vger.kernel.org, AJvYcCW767O3EbOeyRz1FznHLPEnPBUgMn5CC0ix581DXkuDV39f9XNqJ3ym/RH0L00HD2SQtPeimmNxDW93@vger.kernel.org, AJvYcCXKT4D+DlfBEbUx1e3E4I1636ugA6uKJGw9+uZbjwx2FFnNmBtES26Z4gA0NgnuQlAIZ0WAdQy8/yac@vger.kernel.org, AJvYcCXNZVqDvquh7JUi+1ZX/hhryGgFyp4XZVxcETtnFmNzrBWk8QV6C4U0q+iZs8Zwh+IGD473+XeWXffZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzX7SlKfuh0GuIH1Aj5/z98qwQaetDA6UXw7SBrVFRwQC/IVJEH
-	Bnrfx1iEbogy4mxKq3IRGfJNzAi7/g/RLKOKvXjrcVkZHuLnyTHK
-X-Google-Smtp-Source: AGHT+IGTce5mi+zGP1nqXGGDPQZkUaai36raLWa1UNPSL60TCBSVV7e7UIdYpJYbrhcAnUbxRz9g7A==
-X-Received: by 2002:a05:600c:1910:b0:42c:b9b1:8342 with SMTP id 5b1f17b1804b1-42e96119514mr26588975e9.19.1727300808654;
-        Wed, 25 Sep 2024 14:46:48 -0700 (PDT)
+        bh=d9nJBatBeRhZqG9r4m0SatNAaTtD+mKgW27WzTrnpaU=;
+        b=kW8q3YB6ztiN6RCJQtR+SFi0EDfyoKhAaIBs/l+/cbbKD8xkgTP14ptzpQ4TrUwZEb
+         F4txmQce4N0Ce8QTkk4ADcAy2CxJA9E2rwNzZbWigDgdNpIsEgQjufSXnE2kL9a05O4A
+         iCGWn9awbGXWqb6RdYa9ndHyWGpXRZ+r7mhKNXVb6Jr1nkKAQ9Mact8/izEyVDl2ZBNN
+         BIYbdgQnY9NtsW01LqRXVjXWEhoU+4ohfABs6ytj6h8fpVGN6nu521SR/lwKuDgbuych
+         PD73d7WWRZ/MRJjQNxKu2IM4qOOxr1y18g6hHydF1eZdj8oNAko1UvtRO2mMoA8MmHvP
+         DJGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUWv4SrX+szq8G/DOWDcAFHE6V1y2rKx5fUmmrsSw3q+qiWYu6sloVoD5CO4ui/TKDxSK/3IsKaiuNz@vger.kernel.org, AJvYcCVOdI/ylun78/0K9vHqZRgGao3IeRF7smzKcv+/pses5K3VDuRQDVy8Q0oIi8iBNMCXk7hH+x7GQfikAGg=@vger.kernel.org, AJvYcCVVd9xyvGK3bhRkPKlA3iuthA72IbnBKttTg6kz/cFwnJp2dV1ZRtNFifldGa8X13DVgj0tWxqjo5H6@vger.kernel.org, AJvYcCX1Kui7lfHYNPp+cHZzt1Ilz8E3FsditsHudWRupz7eVrtq9M7nDt/L+Janu47II/EGaox0b027HTzM@vger.kernel.org, AJvYcCXcUQinFyXN41+YWNjDNGg++0z2Fo3Js78DHqC1oUACXutl2cD43TJOv/OxaHgii5p7mkzTLr36rscKyCau@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxp9xAk6yNHfBD04EiEP1/+9V/phrL8Y7rH3JVlEodJCuT5/3QB
+	7GCOYNDBf7VsH4jMPqhEQBtHpbvoaHhQPPykyzf+CadftYXBP7EP
+X-Google-Smtp-Source: AGHT+IGZAeyKrzKHwOIGMyU2gN/Hnw0mA0ZY+Q9ejwmwD5hxO/FVKoUk2mqdLL+JRkRUMynqLB4o7Q==
+X-Received: by 2002:a05:6000:120a:b0:374:c847:852 with SMTP id ffacd0b85a97d-37cc247944dmr2442137f8f.29.1727300810823;
+        Wed, 25 Sep 2024 14:46:50 -0700 (PDT)
 Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42e96a1f2aasm28802565e9.45.2024.09.25.14.46.45
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42e96a1f2aasm28802565e9.45.2024.09.25.14.46.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2024 14:46:47 -0700 (PDT)
+        Wed, 25 Sep 2024 14:46:50 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jonathan Corbet <corbet@lwn.net>,
@@ -78,9 +78,9 @@ To: Jens Axboe <axboe@kernel.dk>,
 	linux-mmc@vger.kernel.org,
 	linux-mtd@lists.infradead.org,
 	Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: [RFC PATCH v2 4/5] dt-bindings: block: Generalize and introduce property for partitions
-Date: Wed, 25 Sep 2024 23:45:24 +0200
-Message-ID: <20240925214544.6114-5-ansuelsmth@gmail.com>
+Subject: [RFC PATCH v2 5/5] dt-bindings: mmc: Document support for partition table in mmc-card
+Date: Wed, 25 Sep 2024 23:45:25 +0200
+Message-ID: <20240925214544.6114-6-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240925214544.6114-1-ansuelsmth@gmail.com>
 References: <20240925214544.6114-1-ansuelsmth@gmail.com>
@@ -92,126 +92,107 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Generalize property from MTD partitions schema and introduce property for
-block partitions defined in OF.
+Document support for defining a partition table in the mmc-card node.
 
-Partition schema for block devices is a reduced schema of the MTD as
-only a few property are supported for it. (reg, label and read-only)
+This is needed if the eMMC doesn't have a partition table written and
+the bootloader of the device load data by using absolute offset of the
+block device. This is common on embedded device that have eMMC installed
+to save space and have non removable block devices.
+
+If an OF partition table is detected, any partition table written in the
+eMMC will be ignored and won't be parsed.
+
+eMMC provide a generic disk for user data and if supported (JEDEC 4.4+)
+also provide two additional disk ("boot0" and "boot1") for special usage
+of boot operation where normally is stored the bootloader or boot info.
 
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- .../bindings/block/partitions/partition.yaml  | 33 +++++++++++++++++++
- .../bindings/block/partitions/partitions.yaml | 27 +++++++++++++++
- .../bindings/mtd/partitions/partition.yaml    | 10 ++----
- 3 files changed, 62 insertions(+), 8 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/block/partitions/partition.yaml
- create mode 100644 Documentation/devicetree/bindings/block/partitions/partitions.yaml
+ .../devicetree/bindings/mmc/mmc-card.yaml     | 57 +++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/block/partitions/partition.yaml b/Documentation/devicetree/bindings/block/partitions/partition.yaml
-new file mode 100644
-index 000000000000..b9b1d8139e56
---- /dev/null
-+++ b/Documentation/devicetree/bindings/block/partitions/partition.yaml
-@@ -0,0 +1,33 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/block/partitions/partition.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/Documentation/devicetree/bindings/mmc/mmc-card.yaml b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
+index fd347126449a..58b6593a0f60 100644
+--- a/Documentation/devicetree/bindings/mmc/mmc-card.yaml
++++ b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
+@@ -13,6 +13,10 @@ description: |
+   This documents describes the devicetree bindings for a mmc-host controller
+   child node describing a mmc-card / an eMMC.
+ 
++  It's possible to define a fixed partition table for an eMMC for the user
++  partition and one of the 2 boot partition (boot0/boot1) if supported by the
++  eMMC.
 +
-+title: Partition
+ properties:
+   compatible:
+     const: mmc-card
+@@ -26,6 +30,30 @@ properties:
+       Use this to indicate that the mmc-card has a broken hpi
+       implementation, and that hpi should not be used.
+ 
++  "#address-cells":
++    const: 0
 +
-+description: |
-+  This binding describes a single flash partition. Each partition must have its
-+  relative offset and size specified. Depending on partition function extra
-+  properties can be used.
-+
-+maintainers:
-+  - Christian Marangi <ansuelsmth@gmail.com>
-+
-+properties:
-+  reg:
-+    description: partition's offset and size within the flash (in sector
-+      block, 512byte)
-+    maxItems: 1
-+
-+  label:
-+    description: The label / name for this partition.
-+
-+  read-only:
-+    description: This parameter, if present, is a hint that this partition
-+      should only be mounted read-only. This is usually used for flash
-+      partitions containing early-boot firmware images or data which should
-+      not be clobbered.
-+    type: boolean
-+
-+additionalProperties: true
-diff --git a/Documentation/devicetree/bindings/block/partitions/partitions.yaml b/Documentation/devicetree/bindings/block/partitions/partitions.yaml
-new file mode 100644
-index 000000000000..9c161aac364d
---- /dev/null
-+++ b/Documentation/devicetree/bindings/block/partitions/partitions.yaml
-@@ -0,0 +1,27 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/block/partitions/partitions.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Partitions
-+
-+description: |
-+  This binding is generic and describes the content of the partitions container
-+  node.
-+
-+maintainers:
-+  - Christian Marangi <ansuelsmth@gmail.com>
-+
-+properties:
-+  '#address-cells':
-+    enum: [1, 2]
-+
-+  '#size-cells':
-+    enum: [1, 2]
++  "#size-cells":
++    const: 0
 +
 +patternProperties:
-+  "^partition@[0-9a-f]+$":
-+    $ref: partition.yaml
++  "^partitions(-boot[01])?$":
++    $ref: /schemas/block/partitions/partitions.yaml
 +
-+unevaluatedProperties: false
-diff --git a/Documentation/devicetree/bindings/mtd/partitions/partition.yaml b/Documentation/devicetree/bindings/mtd/partitions/partition.yaml
-index 80d0452a2a33..e822d3219b68 100644
---- a/Documentation/devicetree/bindings/mtd/partitions/partition.yaml
-+++ b/Documentation/devicetree/bindings/mtd/partitions/partition.yaml
-@@ -6,6 +6,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
- 
- title: Partition
- 
-+$ref: /schemas/block/partitions/partition.yaml
++    patternProperties:
++      "^partition@[0-9a-f]+$":
++        $ref: /schemas/block/partitions/partition.yaml
 +
- description: |
-   This binding describes a single flash partition. Each partition must have its
-   relative offset and size specified. Depending on partition function extra
-@@ -28,19 +30,11 @@ maintainers:
- properties:
-   reg:
-     description: partition's offset and size within the flash
--    maxItems: 1
++        properties:
++          reg:
++            multipleOf: 512
++
++        required:
++          - reg
++          - label
++
++        unevaluatedProperties: false
++
+ required:
+   - compatible
+   - reg
+@@ -42,6 +70,35 @@ examples:
+             compatible = "mmc-card";
+             reg = <0>;
+             broken-hpi;
++
++            #address-cells = <0>;
++            #size-cells = <0>;
++
++            partitions {
++                #address-cells = <1>;
++                #size-cells = <1>;
++
++                partition@0 {
++                    label = "kernel"; /* Kernel */
++                    reg = <0x0 0x2000000>; /* 32 MB */
++                };
++
++                partition@2000000 {
++                    label = "rootfs";
++                    reg = <0x2000000 0x40000000>; /* 1GB */
++                };
++            };
++
++            partitions-boot0 {
++                #address-cells = <1>;
++                #size-cells = <1>;
++
++                partition@0 {
++                    label = "bl";
++                    reg = <0x0 0x2000000>; /* 32MB */
++                    read-only;
++                };
++            };
+         };
+     };
  
-   label:
-     description: The label / name for this partition. If omitted, the label
-       is taken from the node name (excluding the unit address).
- 
--  read-only:
--    description: This parameter, if present, is a hint that this partition
--      should only be mounted read-only. This is usually used for flash
--      partitions containing early-boot firmware images or data which should
--      not be clobbered.
--    type: boolean
--
-   lock:
-     description: Do not unlock the partition at initialization time (not
-       supported on all devices)
 -- 
 2.45.2
 
