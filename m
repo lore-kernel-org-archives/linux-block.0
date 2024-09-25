@@ -1,121 +1,303 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4739112D20D
-	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 09:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CED14B94C
+	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 10:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727256222; cv=none; b=l1haRu1fdFg6mT+X5y5QdKORGsSYgSE0FXrPp1Z1T1x5yUQ3GvKBMtZr0w8C8EpHdli+QD8sX2apiq5XIrYYaLth2SVHeP2cg/R31q6sIpE132SQ/wxSbYriVNsATg+5ywXZvHpAw5vwwQLLqIqL4M1SP4iTCyocMoyKB5Zl72A=
+	t=1727261924; cv=none; b=kauFJwHAWeInBq2Lcp/fstVfZLdJhTbWufnzVOEv/ijSzSXIj+bWAc4L4yse//OBtzgyfOSSWRhxsRahxJ254OnVhFOuCp0hM5GuvyIqSUe9scy6Jblk8FJmSbF3tQxPCrpztmQF7L7mno6EA0dy6HO6gNAPqlh/RamsbhjTK3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727256222; c=relaxed/simple;
-	bh=CsHNgHDX5NSd5k6WebfGUFU35z5a3oFsvU7LyCdz15k=;
+	s=arc-20240116; t=1727261924; c=relaxed/simple;
+	bh=AD8qQ8oIFpYMx0NSvqjkJPaO8l5/qZ+Mi6h9FVizZTA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YbpIYYymSafqk08Ppo094O2FKlTPpj2CecpMooiEDzr5+RBckKLqFADgiDdiiwPI4U5pFvAxqlvcz1YfokFbwys+LZjmIzN3NV+tbQk8I53R/sWAaTjWZN3qvF+fyzxD5f5lK7Ks+/7nX84uSD3CfEOeQnq9fzQs+dWHc3XE7qU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EY4Tcl0E; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=W6Ll2lxe+SluVKO4fnqyhb2TWp7aeRkXVkAjBU6g5BqPMtQ+dLF7T5LMl4GsRYTDQkv3Vzuc/earOmUYqD3YNb2oDqSUO6N1bxw2d6RhxkEuEVsRePh6RGogqkD83R99ka8eh1ipV9DVFYG5OGJij6uAu4SbWyOUN/hYBqaEHbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iIPKbqeA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EY4Tcl0E"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42cb1758e41so53135205e9.1
-        for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 02:23:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1727256218; x=1727861018; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Erl2ISmU+k1lGSmb71kUBr7EKO9urA/bALpyymmkCKY=;
-        b=EY4Tcl0E4q9fYrFUiO0XrAgtXK8dNs3SVxIz4qz8lgSGa2+NVp7Q09YWZqojK7ZVHy
-         1tZ9J3xJrC6GDOQqQ48Y5TkZZuDsAjrQML3j7NYnekDmG/Wq8ykgxmy8KFaLWLDBqjng
-         nd8kn1kOLmK8BHCTuc0gzviAj8poCmUJm3m96IfpZFmry1Lny81c0cuTCtR+0uxf9Cg0
-         ANBsy3842Qq8hTaRZpNV0fpwUi2Opd0KrxcOXI+LRu+hl7maz084EMPBcH3Ao5bYSHtO
-         7o7Insqkwynv+n+6p/uWIUcHd4md5M7ZrsEQkGCzA/iU8BQi5+TBWISkEe+13Ii5UJEc
-         Gk4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727256218; x=1727861018;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Erl2ISmU+k1lGSmb71kUBr7EKO9urA/bALpyymmkCKY=;
-        b=cnOrJpZB6i9mfM1TcS2Y/rtDJJdOeYu9kgNdcNaPcTM0KpMDNA6CBJ2Km6UZPdzvkq
-         jZ0wvgVrdCs1nS3wgwNIHzZQ8aZoGj8VCNUMt22sCxRPyVsRwPtrJyVJr0Wwe9jZkd4i
-         CX34vJJEv6KAS2Sn25gJXP1cISC5SVbmROOwtrSJxNY0IAO6dN3JVhIwHsQsRagoKDG2
-         /ylwFCm9oGTIiwDsu8zytsXWNEBO0AXx+cD2Q7tdBdhjVFlIwfrr5clkBYaqRC3hyQxD
-         xKVzZY/UK0Key1rwmmO/NxkWShB/m285MUhD+BZ9QQ+VM5/W6+jA9deB663vMMr5z6AV
-         R+zQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3rnazMuKBvSw61qOiKftk4uGlrDgc8n2LzQ45171tZhT7Xj3r11nSdA5d2BmKEQ36Wj+Jw4upZTi72A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7MQIBONVui0Wyjxq1653kvD62Us9Bu4Iplx02ITiNC3jm9od6
-	5a8bSPWCE4ab97QMGQH/F54y1OryAYe7lOA1EaMo3zyihmPxiRvu7sCy3wEJVA==
-X-Google-Smtp-Source: AGHT+IHRfauL5Udmy6C13QIxy5atPl9zt31xORaSC3ESwbQ7cvwTL7aLRZCIbVJrka2xQA7ywfRrPQ==
-X-Received: by 2002:a05:600c:4755:b0:428:10ec:e5ca with SMTP id 5b1f17b1804b1-42e9610ac97mr13190325e9.14.1727256218476;
-        Wed, 25 Sep 2024 02:23:38 -0700 (PDT)
-Received: from thinkpad ([80.66.138.17])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e96a168bdsm12264245e9.37.2024.09.25.02.23.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2024 02:23:37 -0700 (PDT)
-Date: Wed, 25 Sep 2024 11:23:36 +0200
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-To: Wadim Mueller <wafgo01@gmail.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>, Jonathan Corbet <corbet@lwn.net>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>, Shunsuke Mie <mie@igel.co.jp>,
-	linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/3] Add support for Block Passthrough Endpoint function
- driver
-Message-ID: <20240925092336.mf6plixpqe7fcsoa@thinkpad>
-References: <20240224210409.112333-1-wafgo01@gmail.com>
- <20240225160926.GA58532@thinkpad>
- <20240225203917.GA4678@bhlegrsu.conti.de>
- <20240226094530.GA2778@thinkpad>
- <rq85odwmqryrr4.fsf@gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iIPKbqeA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727261921;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tjvsI20CEZyn0oB2O4z5PLB1LKRwGi7K5BsBMFdQkNM=;
+	b=iIPKbqeAHjhO69aqNe3QjZ446x9H5owxato73D1ogHuCSgunQyMZlWjMwXIlzmNO9BovCL
+	0HCckYdT+kbIm4t1Z97dGtxnnonSggy7oKk2TmrUfSnWDF36yRjAsCyEBxKEh8oxi3ejn3
+	f2+A3N5rc2C57BqUZMPSjytiKHM/iUo=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-482-C2G0NCrYP56UyVLrHWQJ_w-1; Wed,
+ 25 Sep 2024 06:58:39 -0400
+X-MC-Unique: C2G0NCrYP56UyVLrHWQJ_w-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EBE1719367BE;
+	Wed, 25 Sep 2024 10:58:38 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.14])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DB12A1956054;
+	Wed, 25 Sep 2024 10:58:35 +0000 (UTC)
+Date: Wed, 25 Sep 2024 18:58:30 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] ublk: support device recovery without I/O queueing
+Message-ID: <ZvPs1h1byAkpYMGC@fedora>
+References: <20240917002155.2044225-1-ushankar@purestorage.com>
+ <20240917002155.2044225-5-ushankar@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <rq85odwmqryrr4.fsf@gmail.com>
+In-Reply-To: <20240917002155.2044225-5-ushankar@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Mon, Feb 26, 2024 at 07:47:30PM +0100, Wadim Mueller wrote:
-
-[...]
-
-> Okay, I understand this. The hypervisor was more of an example. I will
-> try to explain.
+On Mon, Sep 16, 2024 at 06:21:55PM -0600, Uday Shankar wrote:
+> ublk currently supports the following behaviors on ublk server exit:
 > 
-> I am currently reading through the virtio spec [1].
-> In chapter 4.1.4.5.1 there is the following statement:
+> A: outstanding I/Os get errors, subsequently issued I/Os get errors
+> B: outstanding I/Os get errors, subsequently issued I/Os queue
+> C: outstanding I/Os get reissued, subsequently issued I/Os queue
 > 
-> "The device MUST reset ISR status to 0 on driver read."
+> and the following behaviors for recovery of preexisting block devices by
+> a future incarnation of the ublk server:
 > 
-> So I was wondering, how we, as an PCI EP Device, supposed to clear a
-> register when the driver reads the same register? I mean how do we detect a
-> register read?
-> If you are a hypervisor its easy to do so, because you can intercept
-> every memory access made my the guest (the same applies if you build
-> custom HW for this purpose). But for us as an EP device its
-> difficult to detect this, even with MSIs and Doorbell Registers in
-> place.
+> 1: ublk devices stopped on ublk server exit (no recovery possible)
+> 2: ublk devices are recoverable using start/end_recovery commands
 > 
+> The userspace interface allows selection of combinations of these
+> behaviors using flags specified at device creation time, namely:
+> 
+> default behavior: A + 1
+> UBLK_F_USER_RECOVERY: B + 2
+> UBLK_F_USER_RECOVERY|UBLK_F_USER_RECOVERY_REISSUE: C + 2
+> 
+> The behavior A + 2 is currently unsupported. Add support for this
+> behavior under the new flag combination
+> UBLK_F_USER_RECOVERY|UBLK_F_USER_RECOVERY_FAIL_IO.
+> 
+> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+> ---
+> Changes since v1 (https://lore.kernel.org/linux-block/20240617194451.435445-5-ushankar@purestorage.com/):
+> - Change flag name from UBLK_F_USER_RECOVERY_NOQUEUE to
+>   UBLK_F_USER_RECOVERY_FAIL_IO
+> - Require UBLK_F_USER_RECOVERY to be set along with the new flag for it
+>   to be effective. This makes more sense, as UBLK_F_USER_RECOVERY
+>   essentially selects behavior 2 above (and not setting
+>   UBLK_F_USER_RECOVERY selects behavior 1).
+> - Add per-ublk-queue flag which is true iff device state is
+>   UBLK_S_DEV_FAIL_IO. This lets us avoid fetching the device in the fast
+>   path.
+> 
+>  drivers/block/ublk_drv.c      | 75 ++++++++++++++++++++++++++++-------
+>  include/uapi/linux/ublk_cmd.h | 18 +++++++++
+>  2 files changed, 79 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index c7a0493b3545..548043eeefb9 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -60,10 +60,12 @@
+>  		| UBLK_F_UNPRIVILEGED_DEV \
+>  		| UBLK_F_CMD_IOCTL_ENCODE \
+>  		| UBLK_F_USER_COPY \
+> -		| UBLK_F_ZONED)
+> +		| UBLK_F_ZONED \
+> +		| UBLK_F_USER_RECOVERY_FAIL_IO)
+>  
+>  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+> -		| UBLK_F_USER_RECOVERY_REISSUE)
+> +		| UBLK_F_USER_RECOVERY_REISSUE \
+> +		| UBLK_F_USER_RECOVERY_FAIL_IO)
+>  
+>  /* All UBLK_PARAM_TYPE_* should be included here */
+>  #define UBLK_PARAM_TYPE_ALL                                \
+> @@ -146,6 +148,7 @@ struct ublk_queue {
+>  	bool force_abort;
+>  	bool timeout;
+>  	bool canceling;
+> +	bool fail_io; /* copy of dev->state == UBLK_S_DEV_FAIL_IO */
+>  	unsigned short nr_io_ready;	/* how many ios setup */
+>  	spinlock_t		cancel_lock;
+>  	struct ublk_device *dev;
+> @@ -690,7 +693,8 @@ static inline bool ublk_nosrv_should_reissue_outstanding(struct ublk_device *ub)
+>   */
+>  static inline bool ublk_nosrv_dev_should_queue_io(struct ublk_device *ub)
+>  {
+> -	return ub->dev_info.flags & UBLK_F_USER_RECOVERY;
+> +	return (ub->dev_info.flags & UBLK_F_USER_RECOVERY) &&
+> +	       !(ub->dev_info.flags & UBLK_F_USER_RECOVERY_FAIL_IO);
+>  }
+>  
+>  /*
+> @@ -700,7 +704,8 @@ static inline bool ublk_nosrv_dev_should_queue_io(struct ublk_device *ub)
+>   */
+>  static inline bool ublk_nosrv_should_queue_io(struct ublk_queue *ubq)
+>  {
+> -	return ubq->flags & UBLK_F_USER_RECOVERY;
+> +	return (ubq->flags & UBLK_F_USER_RECOVERY) &&
+> +	       !(ubq->flags & UBLK_F_USER_RECOVERY_FAIL_IO);
+>  }
+>  
+>  /*
+> @@ -712,7 +717,14 @@ static inline bool ublk_nosrv_should_queue_io(struct ublk_queue *ubq)
+>  static inline bool ublk_nosrv_should_stop_dev(struct ublk_device *ub)
+>  {
+>  	return (!(ub->dev_info.flags & UBLK_F_USER_RECOVERY)) &&
+> -	       (!(ub->dev_info.flags & UBLK_F_USER_RECOVERY_REISSUE));
+> +	       (!(ub->dev_info.flags & UBLK_F_USER_RECOVERY_REISSUE)) &&
+> +	       (!(ub->dev_info.flags & UBLK_F_USER_RECOVERY_FAIL_IO));
+> +}
+> +
+> +static inline bool ublk_dev_in_recoverable_state(struct ublk_device *ub)
+> +{
+> +	return ub->dev_info.state == UBLK_S_DEV_QUIESCED ||
+> +	       ub->dev_info.state == UBLK_S_DEV_FAIL_IO;
+>  }
+>  
+>  static void ublk_free_disk(struct gendisk *disk)
+> @@ -1276,6 +1288,10 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  	struct request *rq = bd->rq;
+>  	blk_status_t res;
+>  
+> +	if (unlikely(ubq->fail_io)) {
+> +		return BLK_STS_TARGET;
+> +	}
+> +
+>  	/* fill iod to slot in io cmd buffer */
+>  	res = ublk_setup_iod(ubq, rq);
+>  	if (unlikely(res != BLK_STS_OK))
+> @@ -1626,6 +1642,7 @@ static void ublk_nosrv_work(struct work_struct *work)
+>  {
+>  	struct ublk_device *ub =
+>  		container_of(work, struct ublk_device, nosrv_work);
+> +	int i;
+>  
+>  	if (ublk_nosrv_should_stop_dev(ub)) {
+>  		ublk_stop_dev(ub);
+> @@ -1635,7 +1652,18 @@ static void ublk_nosrv_work(struct work_struct *work)
+>  	mutex_lock(&ub->mutex);
+>  	if (ub->dev_info.state != UBLK_S_DEV_LIVE)
+>  		goto unlock;
+> -	__ublk_quiesce_dev(ub);
+> +
+> +	if (ublk_nosrv_dev_should_queue_io(ub)) {
+> +		__ublk_quiesce_dev(ub);
+> +	} else {
+> +		blk_mq_quiesce_queue(ub->ub_disk->queue);
+> +		for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> +			ublk_get_queue(ub, i)->fail_io = true;
+> +		}
+> +		blk_mq_unquiesce_queue(ub->ub_disk->queue);
+> +		ub->dev_info.state = UBLK_S_DEV_FAIL_IO;
+> +	}
+> +
+>   unlock:
+>  	mutex_unlock(&ub->mutex);
+>  	ublk_cancel_dev(ub);
+> @@ -2389,8 +2417,13 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
+>  		return -EPERM;
+>  
+>  	/* forbid nonsense combinations of recovery flags */
+> -	if ((info.flags & UBLK_F_USER_RECOVERY_REISSUE) &&
+> -	    !(info.flags & UBLK_F_USER_RECOVERY)) {
+> +	switch (info.flags & UBLK_F_ALL_RECOVERY_FLAGS) {
+> +	case 0:
+> +	case UBLK_F_USER_RECOVERY:
+> +	case (UBLK_F_USER_RECOVERY | UBLK_F_USER_RECOVERY_REISSUE):
+> +	case (UBLK_F_USER_RECOVERY | UBLK_F_USER_RECOVERY_FAIL_IO):
+> +		break;
+> +	default:
+>  		pr_warn("%s: invalid recovery flags %llx\n", __func__,
+>  			info.flags & UBLK_F_ALL_RECOVERY_FLAGS);
+>  		return -EINVAL;
+> @@ -2722,14 +2755,18 @@ static int ublk_ctrl_start_recovery(struct ublk_device *ub,
+>  	 *     and related io_uring ctx is freed so file struct of /dev/ublkcX is
+>  	 *     released.
+>  	 *
+> +	 * and one of the following holds
+> +	 *
+>  	 * (2) UBLK_S_DEV_QUIESCED is set, which means the quiesce_work:
+>  	 *     (a)has quiesced request queue
+>  	 *     (b)has requeued every inflight rqs whose io_flags is ACTIVE
+>  	 *     (c)has requeued/aborted every inflight rqs whose io_flags is NOT ACTIVE
+>  	 *     (d)has completed/camceled all ioucmds owned by ther dying process
+> +	 *
+> +	 * (3) UBLK_S_DEV_FAIL_IO is set, which means the queue is not
+> +	 *     quiesced, but all I/O is being immediately errored
+>  	 */
+> -	if (test_bit(UB_STATE_OPEN, &ub->state) ||
+> -			ub->dev_info.state != UBLK_S_DEV_QUIESCED) {
+> +	if (test_bit(UB_STATE_OPEN, &ub->state) || !ublk_dev_in_recoverable_state(ub)) {
+>  		ret = -EBUSY;
+>  		goto out_unlock;
+>  	}
+> @@ -2753,6 +2790,7 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
+>  	const struct ublksrv_ctrl_cmd *header = io_uring_sqe_cmd(cmd->sqe);
+>  	int ublksrv_pid = (int)header->data[0];
+>  	int ret = -EINVAL;
+> +	int i;
+>  
+>  	pr_devel("%s: Waiting for new ubq_daemons(nr: %d) are ready, dev id %d...\n",
+>  			__func__, ub->dev_info.nr_hw_queues, header->dev_id);
+> @@ -2767,18 +2805,27 @@ static int ublk_ctrl_end_recovery(struct ublk_device *ub,
+>  	if (ublk_nosrv_should_stop_dev(ub))
+>  		goto out_unlock;
+>  
+> -	if (ub->dev_info.state != UBLK_S_DEV_QUIESCED) {
+> +	if (!ublk_dev_in_recoverable_state(ub)) {
+>  		ret = -EBUSY;
+>  		goto out_unlock;
+>  	}
+>  	ub->dev_info.ublksrv_pid = ublksrv_pid;
+>  	pr_devel("%s: new ublksrv_pid %d, dev id %d\n",
+>  			__func__, ublksrv_pid, header->dev_id);
+> +
+> +	blk_mq_quiesce_queue(ub->ub_disk->queue);
+> +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> +		ublk_get_queue(ub, i)->fail_io = false;
+> +	}
+>  	blk_mq_unquiesce_queue(ub->ub_disk->queue);
+> -	pr_devel("%s: queue unquiesced, dev id %d.\n",
+> -			__func__, header->dev_id);
+> -	blk_mq_kick_requeue_list(ub->ub_disk->queue);
+>  	ub->dev_info.state = UBLK_S_DEV_LIVE;
+> +	if (ublk_nosrv_dev_should_queue_io(ub)) {
+> +		blk_mq_unquiesce_queue(ub->ub_disk->queue);
+> +		pr_devel("%s: queue unquiesced, dev id %d.\n",
+> +				__func__, header->dev_id);
+> +		blk_mq_kick_requeue_list(ub->ub_disk->queue);
+> +	}
 
-Sorry for not responding earlier. Conversation got lost.
+I'd suggest to change the above into the following:
 
-Yes, I do agree that some of the expecatations of the current Virtio spec cannot
-be satisfied by the physical endpoint device. So I presented some of these
-problems at this year plumbers and the Virtio maintainer in the room agreed to
-have changes in the spec to fix these issues.
+	if (ublk_nosrv_dev_should_queue_io(ub)) {
+	  	ub->dev_info.state = UBLK_S_DEV_LIVE;
+		blk_mq_unquiesce_queue(ub->ub_disk->queue);
+		pr_devel("%s: queue unquiesced, dev id %d.\n",
+				__func__, header->dev_id);
+		blk_mq_kick_requeue_list(ub->ub_disk->queue);
+	} else {
+		blk_mq_quiesce_queue(ub->ub_disk->queue);
+	  	ub->dev_info.state = UBLK_S_DEV_LIVE;
+		for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
+			ublk_get_queue(ub, i)->fail_io = false;
+		blk_mq_unquiesce_queue(ub->ub_disk->queue);
+	}
 
-But it is not clear atm on whether we should introduce the changes in the
-virtio-pci transport or introduce a new transport altogether. I can include you
-in the discussions if you are still interested.
+- one more quiesce is avoided
+- ub->dev_info.state is only updated if request queue is quiesced.
 
-- Mani
+Otherwise, this patch looks fine.
 
--- 
-மணிவண்ணன் சதாசிவம்
+
+Thanks, 
+Ming
+
