@@ -1,93 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E79139E
-	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 04:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3014B41C94;
+	Wed, 25 Sep 2024 05:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727237063; cv=none; b=Iw/rn+8zn9XSOCVWQTGZb/hIAl6baOnKnyQRJNZqL7BC+5FQOcsWw1eAWAh+bZUXUalaO9qtDKYkA/kCZtN+LS0gxFd3nKMqFCIZeUxljU1m56J0kla87fLFiO8vDutOEQZK9oPRGyl1T6jBfWeQgOiRweUzegK93eGkCStAWiQ=
+	t=1727243318; cv=none; b=nPoZj4jBFk3fz/jxYPHHvuWo1vwdz8hsVNWRk2pLgc8QgqLzvakf73h/zhRjgQBmqv/BnW1NvqNL4RPk305WUyBlVbRlnXCogiEChlEKLt4Zs34LkfHG+F1cvPDdm0TS0Da4se3M1XZ2aGo6zfkLBtPghIAlBsH98HPriUlu6+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727237063; c=relaxed/simple;
-	bh=p6aXdQCsCQDb+qv4Oe0hGSlkljpbIyMoGX6UwtO7y4I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PGQYv1X05FcbF1n1Zku3qoG2TL4rOSLbRMNpVbgSq4t1dwilkFidy9/715/pQuHp+JZ0n26jD9cOXJU3KbDC37gC/f5/52H2H10ldNkJKHCNnqSHDPuH/w141F1er0m5T4rjUoAEwxo6ZS6KYuU1C3dQ718wODK5GI9SbiDlQVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nA88GzKs; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727243318; c=relaxed/simple;
+	bh=j9bql+QiM+ZHKuGQMvLh3g76Dofspwr0/9wgSEqiaKo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C4vGDGCRaKyb2CaLi5XzPCRZBALMtQGh677dAMfS61msbYfEsr6XLR6pZY6GgEzIO0D8tM0tBaj/9HY9arhTrQpy9Y4BrLw2yiPRZ0Acc0Z+BWL2olOQQ3FInwmChTcWmF4g4qR1s2WXF0fqq6dfC667MfZGEghBE5SsR1HW4DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=atHRudHw; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=F4UfQTWz; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=atHRudHw; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=F4UfQTWz; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nA88GzKs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0838FC4CEC3
-	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 04:04:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727237063;
-	bh=p6aXdQCsCQDb+qv4Oe0hGSlkljpbIyMoGX6UwtO7y4I=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=nA88GzKs5XmLWrndPrDBLIlm2YKSyzxjfTMeUcwyCTPPvNIylFyR9KPMoFnsRigln
-	 N5p5eiokmbwRNFB8e1m7FQtXltuKRfr6os8y9ARhe/aWfV6h/haikvrl4Vnew+Ouoa
-	 LYkNp9zgCqUA1VhD86WOVRzQRxKTrhSFhCkV6HIezFfP8yxytc51u8eyJWw4/FVgOQ
-	 FAcE5YV6H8NBTr+d4cd7x4TMq1Ptr874yhL8hO36EixErjyAzRw+6C+IlpFukgHbx5
-	 t1fHJ134zbPhaxJNFyuegXX2IdAnkA0bWqp+3dBgXajEbIxKGZEb4XX+N2N9pDrXJ1
-	 juJlN63g8Fiqg==
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3a0cb892c6aso188095ab.0
-        for <linux-block@vger.kernel.org>; Tue, 24 Sep 2024 21:04:22 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVgtjVYXNo6DfPTuMl9rsRwz7TTM4QoUsTdTcgIOsJyHlmeAD7WSpSX6yIGcu3fMFkS3CDTQkjtmGnElA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY90QwuHQBjP8TPSWVYdwbP3lVdJhgZp/AOXSEJmG/drEMkmfL
-	WMrLNQ4BlGp+LXIpEyVYGGCeZM8GB92g6X1O8iV0+Hev3fFCbbUE5amlTLnX8fak/+VRqvnLV8t
-	jcFFzx8DAY12CtH3AgsSba1knrgtnjBYF+0AB
-X-Google-Smtp-Source: AGHT+IELrtiyu4mKIo4xDH5TOC5IAATMzMKE7/IoB9tmPJ03N/88XGcxL4jb93lXI1QLJzXHw4dM7zmW4R0m7d9um7c=
-X-Received: by 2002:a05:6e02:1fec:b0:376:3026:9dfc with SMTP id
- e9e14a558f8ab-3a2703e74f4mr1275375ab.24.1727237062258; Tue, 24 Sep 2024
- 21:04:22 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="atHRudHw";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="F4UfQTWz";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="atHRudHw";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="F4UfQTWz"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 3B33D211E5;
+	Wed, 25 Sep 2024 05:48:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727243315; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WC5lMWPOQJyCMDITxuBay9ED03WWOnQxMVAZM6detzs=;
+	b=atHRudHw4gBD0qUXsdWoWwdoyXfPXvIBS2A+KbXSHk0CrsNiA3a6OGFUWRhIc6mk3ysasV
+	3HdjxlflV638ltA9o2Ktg5WNy7Qeh4tLixH+xX+4gzdSIGUF/bljn3N8bm3IN6lBiI3lYh
+	iYdqnQISjqEK75rTtpMPrRxWJB6LlKk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727243315;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WC5lMWPOQJyCMDITxuBay9ED03WWOnQxMVAZM6detzs=;
+	b=F4UfQTWzbznrvneSEC8Lv/HkKkdGj9H5jaap5pNTs6fMQhal/zdNlNranqs4t29fM8m756
+	rTNQDg/00eX0LsBQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727243315; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WC5lMWPOQJyCMDITxuBay9ED03WWOnQxMVAZM6detzs=;
+	b=atHRudHw4gBD0qUXsdWoWwdoyXfPXvIBS2A+KbXSHk0CrsNiA3a6OGFUWRhIc6mk3ysasV
+	3HdjxlflV638ltA9o2Ktg5WNy7Qeh4tLixH+xX+4gzdSIGUF/bljn3N8bm3IN6lBiI3lYh
+	iYdqnQISjqEK75rTtpMPrRxWJB6LlKk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727243315;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WC5lMWPOQJyCMDITxuBay9ED03WWOnQxMVAZM6detzs=;
+	b=F4UfQTWzbznrvneSEC8Lv/HkKkdGj9H5jaap5pNTs6fMQhal/zdNlNranqs4t29fM8m756
+	rTNQDg/00eX0LsBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 604D913A66;
+	Wed, 25 Sep 2024 05:48:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id LABIDTCk82azVAAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 25 Sep 2024 05:48:32 +0000
+Message-ID: <da049cc8-8f36-460e-b7fa-efcde5b19dbb@suse.de>
+Date: Wed, 25 Sep 2024 07:48:31 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240923164843.1117010-1-andrej.skvortzov@gmail.com>
- <20240924014241.GH38742@google.com> <d22cff1a-701d-4078-867d-d82caa943bab@linux.vnet.ibm.com>
- <CAF8kJuPEg1yKNmVvPbEYGME8HRoTXdHTANm+OKOZwX9B6uEtmw@mail.gmail.com>
- <CAF8kJuOs-3WZPQo0Ktyp=7DytWrL9+UrTNUGz+9n9s6urR-rtA@mail.gmail.com> <20240925003718.GA11458@google.com>
-In-Reply-To: <20240925003718.GA11458@google.com>
-From: Chris Li <chrisl@kernel.org>
-Date: Tue, 24 Sep 2024 21:04:10 -0700
-X-Gmail-Original-Message-ID: <CAF8kJuNDzk21jZR1+TkGdMOrXdQcfa+=bxLF6FhyuXzRwT4Y9Q@mail.gmail.com>
-Message-ID: <CAF8kJuNDzk21jZR1+TkGdMOrXdQcfa+=bxLF6FhyuXzRwT4Y9Q@mail.gmail.com>
-Subject: Re: [PATCH v3] zram: don't free statically defined names
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Andrey Skvortsov <andrej.skvortzov@gmail.com>, Minchan Kim <minchan@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	stable@vger.kernel.org, Sachin Sant <sachinp@linux.ibm.com>, 
-	linux-mm <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/3] nvme: enable FDP support
+To: Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, kbusch@kernel.org,
+ hch@lst.de, sagi@grimberg.me, martin.petersen@oracle.com,
+ brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+ jaegeuk@kernel.org, bcrl@kvack.org, dhowells@redhat.com, bvanassche@acm.org,
+ asml.silence@gmail.com
+Cc: linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, linux-block@vger.kernel.org, linux-aio@kvack.org,
+ gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com,
+ Hui Qi <hui81.qi@samsung.com>, Nitesh Shetty <nj.shetty@samsung.com>
+References: <20240924092457.7846-1-joshi.k@samsung.com>
+ <CGME20240924093250epcas5p39259624b9ebabdef15081ea9bd663d41@epcas5p3.samsung.com>
+ <20240924092457.7846-2-joshi.k@samsung.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240924092457.7846-2-joshi.k@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FREEMAIL_TO(0.00)[samsung.com,kernel.dk,kernel.org,lst.de,grimberg.me,oracle.com,zeniv.linux.org.uk,suse.cz,kvack.org,redhat.com,acm.org,gmail.com];
+	TAGGED_RCPT(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
-On Tue, Sep 24, 2024 at 5:37=E2=80=AFPM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> On (24/09/24 11:29), Chris Li wrote:
-> > On Tue, Sep 24, 2024 at 8:56=E2=80=AFAM Chris Li <chrisl@kernel.org> wr=
-ote:
-> [..]
-> > Given the merge window is closing. I suggest just reverting this
-> > change. As it is the fix also causing regression in the swap stress
-> > test for me. It is possible that is my test setup issue, but reverting
-> > sounds the safe bet.
->
-> The patch in question is just a kfree() call that is only executed
-> during zram reset and that fixes tiny memory leaks when zram is
-> configured with alternative (re-compression) streams.  I cannot
-> imagine how that can have any impact on runtime, that makes no
-> sense to me, I'm not sure that revert is justified here.
->
-After some discussion with Sergey, we have more progress on
-understanding the swap stress test regression.
-One of the triggering conditions is I don't have zram lz4 config
-enabled, (the config option name has changed) and the test script
-tries to set lz4 on zram and fails. It will fall back to the lzo.
-Anyway, if I have zram lz4 configured, my stress test can pass with
-the fix. Still I don't understand why disabling lz4 config can trigger
-it. Need to dig more.
+On 9/24/24 11:24, Kanchan Joshi wrote:
+> Flexible Data Placement (FDP), as ratified in TP 4146a, allows the host
+> to control the placement of logical blocks so as to reduce the SSD WAF.
+> 
+> Userspace can send the data lifetime information using the write hints.
+> The SCSI driver (sd) can already pass this information to the SCSI
+> devices. This patch does the same for NVMe.
+> 
+> Fetch the placement-identifiers if the device supports FDP.
+> The incoming write-hint is mapped to a placement-identifier, which in
+> turn is set in the DSPEC field of the write command.
+> 
+> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> Signed-off-by: Hui Qi <hui81.qi@samsung.com>
+> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+> ---
+>   drivers/nvme/host/core.c | 70 ++++++++++++++++++++++++++++++++++++++++
+>   drivers/nvme/host/nvme.h |  4 +++
+>   include/linux/nvme.h     | 19 +++++++++++
+>   3 files changed, 93 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Agree that we don't need to revert this.
+Cheers,
 
-Chris
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+
