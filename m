@@ -1,325 +1,277 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C412C647
-	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 05:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADD5647;
+	Wed, 25 Sep 2024 05:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727243758; cv=none; b=ILGsM20i8KbJzFg0EggNSpg208auI2IMKyW2/0YgwqXfVhF9IM6JAGmeBMOVY26bRkCGPYw7mdSLZxaMuBmlPK027AxC3P3kmEDUsFngPHtmidj6+bGEY1mTwn5IzJdqiyRIR00mMK5jubY9qkhIo+DoUQbo0igpdLhgzdg6DOY=
+	t=1727243858; cv=none; b=IDkljU5H7OvorDbGRHMInz9Q+SlYJcugyyo+TFuTXId/ndtbRcVBo+DoYpSoQDkcseZtpBELq6pLkrtPgPgoo+7PQNlXsXMlRHVIW0AX9L5WaL0Qbli+4+8mIeHlRTBehGNmpvdJ8N8ZJlsJqeEqvV/wGaE/wdRTPnYrfy/aYe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727243758; c=relaxed/simple;
-	bh=JoJJwPHkE+bIpBySPJv+PZsBOronzrH/gQIoCy7RmRM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iozXagbnruyi4AJhQApM729gm9hO+w2m7twwOOxJq628Wj4URwnVGox7Ig2OHbMiAI78+w7iK3dbLwRMhNgi9dNjI59aJfN1HrhGTP9IM9rex0OOJZJojEMEszItaQEsi2Wni6bXBq4SWBykCDMfeqx8EHMSzQGER2cZAxHcSWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=TvFVOS7N; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1727243858; c=relaxed/simple;
+	bh=QMnvkHrnX6DpOPIUvO7BNl1mwT3AgkjCUdRtDwNRGws=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aaLVLXNWeI9u/6OHQmIHyjleRJUFqN5Jd6/neliR5Tu8+ajbbQlAAoMB+yrjwW9vIeRclNX91eEjWGolUwh321yHh8OWwMfqu+zdtVADD57EBvvWEVxk5mpOJBBUT2obZNZ+NJUx3KPCFVe0PxAKpq8wuNuXen4ZcAFk1rZ1iWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ciPMTx17; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=yaVQlpLx; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uG6VMXJG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vKfFh61h; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TvFVOS7N"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48P1WhM3012527;
-	Wed, 25 Sep 2024 05:55:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	/P5pkH6V988JX/j1+ZFo6wtf3JvXWpptjE1sbPcullA=; b=TvFVOS7NY4r079Dq
-	s+0RNkeomSvwlTktAqQ0yymszb3NbZWjQkH0EZw8Y1/NPBGsxWYQrZwyVA50Xd0c
-	fTC5JdtbYQeCt4zxUTNih9rJqZ61zo+WUxaa6bRtJSX6uWexIIsoyYDny6Z6HtM1
-	r56FPMwMn2BLHcgzvTR/wfmmd0HUfbOdNh9X5jphPUmW/w+pGg89VwE7Y3R2KfIt
-	0kD0dhacuFw6jvVyrx2FHiy9IP4V501xO8uubU2RBswaLsn9XoY58kimWrI4Ug+J
-	6wY9RLNh8fEB7BBU8xNn56TzmrM6jnBIllXdcOAIqCX4wK2ok0IqwfhtS7Xi1QZt
-	zclWnw==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41smjjwx1k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Sep 2024 05:55:51 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48P5O7Vj008707;
-	Wed, 25 Sep 2024 05:55:51 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41t8v17w7f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Sep 2024 05:55:51 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48P5toQR2884174
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 25 Sep 2024 05:55:50 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BA18E5805C;
-	Wed, 25 Sep 2024 05:55:50 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CB96758062;
-	Wed, 25 Sep 2024 05:55:48 +0000 (GMT)
-Received: from [9.179.23.77] (unknown [9.179.23.77])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 25 Sep 2024 05:55:48 +0000 (GMT)
-Message-ID: <0289eaa5-4d6a-4302-96b0-9fc225da05b7@linux.ibm.com>
-Date: Wed, 25 Sep 2024 11:25:47 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests] nvme/{033-037}: timeout while waiting for nvme
- passthru namespace device
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "martin.wilck@suse.com" <martin.wilck@suse.com>,
-        "gjoyce@linux.ibm.com" <gjoyce@linux.ibm.com>
-References: <20240924084907.143999-1-nilay@linux.ibm.com>
- <e4xvyahvmmwcv7uenm4mptqp452kl2qq6ve57j7y7z4ylqli36@26ceqvdvry4k>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <e4xvyahvmmwcv7uenm4mptqp452kl2qq6ve57j7y7z4ylqli36@26ceqvdvry4k>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: oLTpPkDvn6QJCpB1qXlYECx-LJCaqxms
-X-Proofpoint-GUID: oLTpPkDvn6QJCpB1qXlYECx-LJCaqxms
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ciPMTx17";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="yaVQlpLx";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="uG6VMXJG";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vKfFh61h"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 718C11F7F9;
+	Wed, 25 Sep 2024 05:57:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727243854; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B+OcrvMk2e5Vhorb1JynJI09OAStj38QG4ipQBl6gow=;
+	b=ciPMTx172C9peh0vYN2hMc57lcq5V4u3kcCrS2+26HDvcZpfj6riY29AHezOvtIvIzpZ90
+	m3eFr70JerEItyewKxevGeyLYUF1fhqKBlPft+bqpec8GstQcSYgQerUGGjrRB9gs4hGpw
+	VkygvxjKttWUKcObwZI9haGMD1c8NAk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727243854;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B+OcrvMk2e5Vhorb1JynJI09OAStj38QG4ipQBl6gow=;
+	b=yaVQlpLxIpJG2brkAZLxlk/r3EaGCQDvk18lvMOp8ZsH15hGSX8vabbOnM9gZX+jQWTKI7
+	K4F/HKuXBmLNkjDA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=uG6VMXJG;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=vKfFh61h
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727243853; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B+OcrvMk2e5Vhorb1JynJI09OAStj38QG4ipQBl6gow=;
+	b=uG6VMXJGhMTjaEFTDmq/JjqCTRNhtZIMBBrDc0S7EB1p28CN0jrt7MAZ24FhKeNHtGNGWa
+	FFNWqAuF375eH1cWJ9iaTFYerihUbcHTWzf+Skhd7OiiS7z363U+B0KWze0rDR1SKyZRIE
+	lgqkS4iWiGSxQ5keyR1gsfodCQfGIOQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727243853;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B+OcrvMk2e5Vhorb1JynJI09OAStj38QG4ipQBl6gow=;
+	b=vKfFh61hx0+kGpTjpgTuXLR5MM46JZxoVUTf2GTIcO0YpI6rLDe7ezOa25xWSwo0pLFPbK
+	kJCKEDgMb1zvuiCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0DF3213A6A;
+	Wed, 25 Sep 2024 05:57:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id sHrsOEqm82YBVwAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 25 Sep 2024 05:57:30 +0000
+Message-ID: <28419703-681c-4d8c-9450-bdc2aff19d56@suse.de>
+Date: Wed, 25 Sep 2024 07:57:31 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-24_02,2024-09-24_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 adultscore=0 malwarescore=0 suspectscore=0 bulkscore=0
- spamscore=0 mlxscore=0 lowpriorityscore=0 phishscore=0 clxscore=1015
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409250037
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 3/3] io_uring: enable per-io hinting capability
+To: Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, kbusch@kernel.org,
+ hch@lst.de, sagi@grimberg.me, martin.petersen@oracle.com,
+ brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+ jaegeuk@kernel.org, bcrl@kvack.org, dhowells@redhat.com, bvanassche@acm.org,
+ asml.silence@gmail.com
+Cc: linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ io-uring@vger.kernel.org, linux-block@vger.kernel.org, linux-aio@kvack.org,
+ gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com,
+ Nitesh Shetty <nj.shetty@samsung.com>
+References: <20240924092457.7846-1-joshi.k@samsung.com>
+ <CGME20240924093257epcas5p174955ae79ae2d08a886eeb45a6976d53@epcas5p1.samsung.com>
+ <20240924092457.7846-4-joshi.k@samsung.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240924092457.7846-4-joshi.k@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 718C11F7F9
+X-Spam-Score: -3.01
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_TO(0.00)[samsung.com,kernel.dk,kernel.org,lst.de,grimberg.me,oracle.com,zeniv.linux.org.uk,suse.cz,kvack.org,redhat.com,acm.org,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[samsung.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
+On 9/24/24 11:24, Kanchan Joshi wrote:
+> With F_SET_RW_HINT fcntl, user can set a hint on the file inode, and
+> all the subsequent writes on the file pass that hint value down.
+> This can be limiting for large files (and for block device) as all the
+> writes can be tagged with only one lifetime hint value.
+> Concurrent writes (with different hint values) are hard to manage.
+> Per-IO hinting solves that problem.
+> 
+> Allow userspace to pass the write hint type and its value in the SQE.
+> Two new fields are carved in the leftover space of SQE:
+> 	__u8 hint_type;
+> 	__u64 hint_val;
+> 
+> Adding the hint_type helps in keeping the interface extensible for future
+> use.
+> At this point only one type TYPE_WRITE_LIFETIME_HINT is supported. With
+> this type, user can pass the lifetime hint values that are currently
+> supported by F_SET_RW_HINT fcntl.
+> 
+> The write handlers (io_prep_rw, io_write) process the hint type/value
+> and hint value is passed to lower-layer using kiocb. This is good for
+> supporting direct IO, but not when kiocb is not available (e.g.,
+> buffered IO).
+> 
+> In general, per-io hints take the precedence on per-inode hints.
+> Three cases to consider:
+> 
+> Case 1: When hint_type is 0 (explicitly, or implicitly as SQE fields are
+> initialized to 0), this means user did not send any hint. The per-inode
+> hint values are set in the kiocb (as before).
+> 
+> Case 2: When hint_type is TYPE_WRITE_LIFETIME_HINT, the hint_value is
+> set into the kiocb after sanity checking.
+> 
+> Case 3: When hint_type is anything else, this is flagged as an error
+> and write is failed.
+> 
+> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+> ---
+>   fs/fcntl.c                    | 22 ----------------------
+>   include/linux/rw_hint.h       | 24 ++++++++++++++++++++++++
+>   include/uapi/linux/io_uring.h | 10 ++++++++++
+>   io_uring/rw.c                 | 21 ++++++++++++++++++++-
+>   4 files changed, 54 insertions(+), 23 deletions(-)
+> 
+> diff --git a/fs/fcntl.c b/fs/fcntl.c
+> index 081e5e3d89ea..2eb78035a350 100644
+> --- a/fs/fcntl.c
+> +++ b/fs/fcntl.c
+> @@ -334,28 +334,6 @@ static int f_getowner_uids(struct file *filp, unsigned long arg)
+>   }
+>   #endif
+>   
+> -static bool rw_hint_valid(u64 hint)
+> -{
+> -	BUILD_BUG_ON(WRITE_LIFE_NOT_SET != RWH_WRITE_LIFE_NOT_SET);
+> -	BUILD_BUG_ON(WRITE_LIFE_NONE != RWH_WRITE_LIFE_NONE);
+> -	BUILD_BUG_ON(WRITE_LIFE_SHORT != RWH_WRITE_LIFE_SHORT);
+> -	BUILD_BUG_ON(WRITE_LIFE_MEDIUM != RWH_WRITE_LIFE_MEDIUM);
+> -	BUILD_BUG_ON(WRITE_LIFE_LONG != RWH_WRITE_LIFE_LONG);
+> -	BUILD_BUG_ON(WRITE_LIFE_EXTREME != RWH_WRITE_LIFE_EXTREME);
+> -
+> -	switch (hint) {
+> -	case RWH_WRITE_LIFE_NOT_SET:
+> -	case RWH_WRITE_LIFE_NONE:
+> -	case RWH_WRITE_LIFE_SHORT:
+> -	case RWH_WRITE_LIFE_MEDIUM:
+> -	case RWH_WRITE_LIFE_LONG:
+> -	case RWH_WRITE_LIFE_EXTREME:
+> -		return true;
+> -	default:
+> -		return false;
+> -	}
+> -}
+> -
+>   static long fcntl_get_rw_hint(struct file *file, unsigned int cmd,
+>   			      unsigned long arg)
+>   {
+> diff --git a/include/linux/rw_hint.h b/include/linux/rw_hint.h
+> index 309ca72f2dfb..f4373a71ffed 100644
+> --- a/include/linux/rw_hint.h
+> +++ b/include/linux/rw_hint.h
+> @@ -21,4 +21,28 @@ enum rw_hint {
+>   static_assert(sizeof(enum rw_hint) == 1);
+>   #endif
+>   
+> +#define	WRITE_LIFE_INVALID	(RWH_WRITE_LIFE_EXTREME + 1)
+> +
+> +static inline bool rw_hint_valid(u64 hint)
+> +{
+> +	BUILD_BUG_ON(WRITE_LIFE_NOT_SET != RWH_WRITE_LIFE_NOT_SET);
+> +	BUILD_BUG_ON(WRITE_LIFE_NONE != RWH_WRITE_LIFE_NONE);
+> +	BUILD_BUG_ON(WRITE_LIFE_SHORT != RWH_WRITE_LIFE_SHORT);
+> +	BUILD_BUG_ON(WRITE_LIFE_MEDIUM != RWH_WRITE_LIFE_MEDIUM);
+> +	BUILD_BUG_ON(WRITE_LIFE_LONG != RWH_WRITE_LIFE_LONG);
+> +	BUILD_BUG_ON(WRITE_LIFE_EXTREME != RWH_WRITE_LIFE_EXTREME);
+> +
+> +	switch (hint) {
+> +	case RWH_WRITE_LIFE_NOT_SET:
+> +	case RWH_WRITE_LIFE_NONE:
+> +	case RWH_WRITE_LIFE_SHORT:
+> +	case RWH_WRITE_LIFE_MEDIUM:
+> +	case RWH_WRITE_LIFE_LONG:
+> +	case RWH_WRITE_LIFE_EXTREME:
+> +		return true;
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+>   #endif /* _LINUX_RW_HINT_H */
+> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+> index 1fe79e750470..e21a74dd0c49 100644
+> --- a/include/uapi/linux/io_uring.h
+> +++ b/include/uapi/linux/io_uring.h
+> @@ -98,6 +98,11 @@ struct io_uring_sqe {
+>   			__u64	addr3;
+>   			__u64	__pad2[1];
+>   		};
+> +		struct {
+> +			/* To send per-io hint type/value with write command */
+> +			__u64	hint_val;
+> +			__u8	hint_type;
+> +		};
+Why is 'hint_val' 64 bits? Everything else is 8 bytes, so wouldn't it
+be better to shorten that? As it stands the new struct will introduce
+a hole of 24 bytes after 'hint_type'.
 
+Cheers,
 
-On 9/24/24 17:44, Shinichiro Kawasaki wrote:
-> On Sep 24, 2024 / 14:18, Nilay Shroff wrote:
->> Avoid waiting indefinitely for nvme passthru namespace block device
->> to appear. Wait for up to 5 seconds and during this time if namespace
->> block device doesn't appear then bail out and FAIL the test.
->>
->> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
->> ---
->> Hi,
->>
->> You may find more details about this issue here[1]. 
->>
->> I found that blktest nvme/033-037 hangs indefinitely when 
->> kernel rejects the passthru target namespace due to the 
->> duplicate IDs. This patch helps address this issue by  
->> ensuring that we bail out and fail the test if for any 
->> reason passthru target namspace is not created on the 
->> host. The relevant kernel patchv2 to fix the issue with 
->> duplicate IDs while using passthru loop target can be
->> found here[2].
->>
->> [1]: https://lore.kernel.org/all/8b17203f-ea4b-403b-a204-4fbc00c261ca@linux.ibm.com/
->> [2]: https://lore.kernel.org/all/20240921070547.531991-1-nilay@linux.ibm.com/
->>
->> Thanks!
-> 
-> Thanks for the patch :) It's bad that you stumbled into the infinite while loop
-> in _nvmet_passthru_target_connect(). I agree that it should be fixed.
-> 
-> Please find my comments in line.
-> 
-Thank you for your review comments!!
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
->> ---
->>  tests/nvme/033 |  7 +++++--
->>  tests/nvme/034 |  7 +++++--
->>  tests/nvme/035 |  6 +++---
->>  tests/nvme/036 | 14 ++++++++------
->>  tests/nvme/037 |  6 +++++-
->>  tests/nvme/rc  | 12 +++++++++++-
->>  6 files changed, 37 insertions(+), 15 deletions(-)
->>
->> diff --git a/tests/nvme/033 b/tests/nvme/033
->> index 5e05175..171974e 100755
->> --- a/tests/nvme/033
->> +++ b/tests/nvme/033
->> @@ -62,8 +62,11 @@ test_device() {
->>  	_nvmet_passthru_target_setup
->>  
->>  	nsdev=$(_nvmet_passthru_target_connect)
->> -
->> -	compare_dev_info "${nsdev}"
->> +	if [[ -z "$nsdev" ]]; then
->> +		echo "FAIL"
-> 
-> I think some more specific failure message will be useful. How about
-> "Failed to connect" or so? Same comment for the other test cases 034-037.
-Agreed, I will add a meaningful error message in next patch.
-> 
->> +	else
->> +		compare_dev_info "${nsdev}"
->> +	fi
->>  
->>  	_nvme_disconnect_subsys
->>  	_nvmet_passthru_target_cleanup
->> diff --git a/tests/nvme/034 b/tests/nvme/034
->> index 154fc91..7625204 100755
->> --- a/tests/nvme/034
->> +++ b/tests/nvme/034
->> @@ -32,8 +32,11 @@ test_device() {
->>  
->>  	_nvmet_passthru_target_setup
->>  	nsdev=$(_nvmet_passthru_target_connect)
->> -
->> -	_run_fio_verify_io --size="${NVME_IMG_SIZE}" --filename="${nsdev}"
->> +	if [[ -z "$nsdev" ]]; then
->> +		echo "FAIL"
->> +	else
->> +		_run_fio_verify_io --size="${NVME_IMG_SIZE}" --filename="${nsdev}"
->> +	fi
->>  
->>  	_nvme_disconnect_subsys
->>  	_nvmet_passthru_target_cleanup
->> diff --git a/tests/nvme/035 b/tests/nvme/035
->> index ff217d6..6ad9c56 100755
->> --- a/tests/nvme/035
->> +++ b/tests/nvme/035
->> @@ -30,13 +30,13 @@ test_device() {
->>  
->>  	_setup_nvmet
->>  
->> -	local ctrldev
-> 
-> Good catch :)
-> 
->>  	local nsdev
->>  
->>  	_nvmet_passthru_target_setup
->>  	nsdev=$(_nvmet_passthru_target_connect)
->> -
->> -	if ! _xfs_run_fio_verify_io "${nsdev}" "${NVME_IMG_SIZE}"; then
->> +	if [[ -z "$nsdev" ]]; then
->> +		echo "FAIL"
->> +	elif ! _xfs_run_fio_verify_io "${nsdev}" "${NVME_IMG_SIZE}"; then
->>  		echo "FAIL: fio verify failed"
->>  	fi
->>  
->> diff --git a/tests/nvme/036 b/tests/nvme/036
->> index 442ffe7..a67ca12 100755
->> --- a/tests/nvme/036
->> +++ b/tests/nvme/036
->> @@ -30,13 +30,15 @@ test_device() {
-> 
-> This could be a good chance to add "local nsdev".
-Yeah will do.
-> 
->>  
->>  	_nvmet_passthru_target_setup
->>  	nsdev=$(_nvmet_passthru_target_connect)
->> -
->> -	ctrldev=$(_find_nvme_dev "${def_subsysnqn}")
->> -
->> -	if ! nvme reset "/dev/${ctrldev}" >> "$FULL" 2>&1; then
->> -		echo "ERROR: reset failed"
->> +	if [[ -z "$nsdev" ]]; then
->> +		echo "FAIL"
->> +	else
->> +		ctrldev=$(_find_nvme_dev "${def_subsysnqn}")
->> +
->> +		if ! nvme reset "/dev/${ctrldev}" >> "$FULL" 2>&1; then
->> +			echo "ERROR: reset failed"
->> +		fi
->>  	fi
->> -
-> 
-> Nit: unnecessary change here.
-Okay, will remove this.
-> 
->>  	_nvme_disconnect_subsys
->>  	_nvmet_passthru_target_cleanup
->>  
->> diff --git a/tests/nvme/037 b/tests/nvme/037
->> index f7ddc2d..f0c8a77 100755
->> --- a/tests/nvme/037
->> +++ b/tests/nvme/037
->> @@ -27,7 +27,6 @@ test_device() {
->>  
->>  	local subsys="blktests-subsystem-"
->>  	local iterations=10
->> -	local ctrldev
-> 
-> Good catch. And we can add "local nsdev" here.
-yes will do.
-> 
->>  
->>  	for ((i = 0; i < iterations; i++)); do
->>  		_nvmet_passthru_target_setup --subsysnqn "${subsys}${i}"
->> @@ -37,6 +36,11 @@ test_device() {
->>  		_nvme_disconnect_subsys \
->>  			--subsysnqn "${subsys}${i}" >>"${FULL}" 2>&1
->>  		_nvmet_passthru_target_cleanup --subsysnqn "${subsys}${i}"
->> +
->> +		if [[ -z "$nsdev" ]]; then
->> +			echo "FAIL"
->> +			break
->> +		fi
->>  	done
->>  
->>  	echo "Test complete"
->> diff --git a/tests/nvme/rc b/tests/nvme/rc
->> index a877de3..3def0d0 100644
->> --- a/tests/nvme/rc
->> +++ b/tests/nvme/rc
->> @@ -394,6 +394,7 @@ _nvmet_passthru_target_setup() {
->>  
->>  _nvmet_passthru_target_connect() {
->>  	local subsysnqn="$def_subsysnqn"
->> +	local timeout="5"
->>  
->>  	while [[ $# -gt 0 ]]; do
->>  		case $1 in
->> @@ -414,9 +415,18 @@ _nvmet_passthru_target_connect() {
->>  	# The following tests can race with the creation
->>  	# of the device so ensure the block device exists
->>  	# before continuing
->> -	while [ ! -b "${nsdev}" ]; do sleep 1; done
->> +	start_time=$(date +%s)
->> +	while [ ! -b "${nsdev}" ]; do
->> +		sleep .1
-> 
-> Is there any reason to have 0.1 second wait duration? When I changed this to
-> "sleep 1", runtime of the test cases did not change on my test system.
-> 
-yes you're right there won't be any noticeable change in the runtime of 
-the test unless we run this test in a loop for multiple number of times.
-I would say that the gain would be only a fraction of a second in this case.
-So I will use sleep 1 instead of .1 as you suggested.
-
->> +		end_time=$(date +%s)
->> +		if ((end_time - start_time > timeout)); then
->> +			echo ""
-> 
-> This echo doesn't look required.
-> 
->> +			return 1
->> +		fi
-> 
-> If 1 second wait is okay instead of 0.1 second wait, the if block above can be
-> a bit simpler, like,
-> 
->               if ((++count >= timeout)); then
->                       return 1
->               fi
-> 
-> where, "local count=0" should be declared before.
-> 
-yeah with sleep 1 we can make it simple. I will update this in next patch.
-
->> +	done
->>  
->>  	echo "${nsdev}"
->> +	return 0
-> 
-> This "return 0" looks redundant. The previous echo succeeds always, then 0 is
-> returned anyway. Also, all of the callers check the failure of this function by
-> referring to the nsdev string echoed. They do not refer to the return code. So,
-> it is not so useful to explicitly show that 0 is returned on success.
-> 
-yes I will incorporate it in the next patch.
-
-Thanks,
---Nilay
