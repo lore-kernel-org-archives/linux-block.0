@@ -1,93 +1,158 @@
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FF44C91
-	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 00:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059B3148310
+	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 01:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727224646; cv=none; b=rJgWRarZwb8SsAgvuKkTHErWC04CQccO8166A3dGDVGttopRVeABLfQO94u6mgED58+IpnqDLmm7+ILjJ7AfD1aKwfnMbM0OZd7mTiofvM1yXWbEDX/Aycn+xIiAhzZk7brinvjUWVTX8Pn2zizMqzwuYCVBrG5G4lvAJxMZFCk=
+	t=1727228942; cv=none; b=bzcA9mCf6FH39FWaVIc1B3D0R8F1brhFqAlJ3ICILELVCTcWta4CCrBH++KQlhD2hctjMnLLNMTrDPQsdKIHMPcmcMG/iVLvRSUuehK+KzZwxvrivJ8FxPO7vWedgXNWWqlKrRQTAxTKCB5+gXVUOYlo5iz0A9jl4zd3l+Fxjn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727224646; c=relaxed/simple;
-	bh=Ne4vSr3cvYtPVxEhHNFux7VOXieBzrt1kuOruhtxSL0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UmFtf/B9PVPVw2x5P9L31wDCRzmE8sQ9j4fy2m+2ng1Pz5jz/0xDKy6qg7NCszfB/c8w+ihvF5XgXcE7cy2KCg5dgPgIXX+uRagCOCt7uFW/+SDq2g7prrvc+QjV1nBq5Ndg1WOlot/uZe1fTNuU4nrveHkE5susHvmrqlKYgXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=b9dI6Exf; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1727228942; c=relaxed/simple;
+	bh=g3Up5ycJcBXiri8FE+jRpYgWBq7NRqptB30sSCdkX0E=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Z7l1BYuToG9i0MVw/h31c9Hf8bC13XqOnYT2Vebn9bYpWDRB1aSGPqoUBx/7wZlXqBBqylr0DJ6acTQaerKUSVPXO6IfNgbfps2J/5ruVinpbladQCdcqRdmk0vP0WsnSvRCNvJ053TnFkePPp7iheAgJoew4oe2vasrfSyFqno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Vy/YLieu; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="b9dI6Exf"
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-7db637d1e4eso4481358a12.2
-        for <linux-block@vger.kernel.org>; Tue, 24 Sep 2024 17:37:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1727224644; x=1727829444; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qi+Ew/rpwQdNekWtvCMQfio8DRksEPNbxq/gVYTc9Bc=;
-        b=b9dI6ExfYHghZcb+6aNMSYMdVeecGzHlQ7pF5VDSD4FfPpELvS2C/+XGVYPQbGijtM
-         tORy73aiMoCF4X66byl96MkEzenZg/Pu3YCNZm6CgXFkjXzPL4ors4dXgQxC7gqkYY12
-         SahDw2Gwx2h07VUSn3plqGYpJwTRw2mhTxDTc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727224644; x=1727829444;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qi+Ew/rpwQdNekWtvCMQfio8DRksEPNbxq/gVYTc9Bc=;
-        b=rjNUcwmRX5k4XihxqdmgfiiHLYtOMBrRj4cYn6n1ybd03frw9GqRwdNT5hR+/bRlfQ
-         SCJvaNY2kZ/sfTp2WeiZ/DXyw0ngsLrxJDLPQzoyKdybI1OsAb4bOgNoSQJ/t9YC2whx
-         /IaQK+Hy3nxXvKf8coWV4CyoEl1X46HTM+a6pjQkAIivPDJWXygAVsVGi5flhaBP4rrE
-         0WsWwbA+wZMdjbVCJrAa7gJS/tFAuT/quvg52lPbKkZDu1bGocpEJ82gxDyDqEnoMMW8
-         CkjmbsQbqje/5kimAvCkBuKMxlyUi8SjHQMrfz1qXXLtnUmDY3voSlUjr+db/PtnFL3G
-         5c1A==
-X-Forwarded-Encrypted: i=1; AJvYcCXSEpLUqnkpId9ozRKnbTMp+FZ52hiC4sLJsWZrKVYND8x3EiweRrs2mr0z/ocf1X582lyFf+BMQ7crbw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLuuHrK1Z8NgdR4MhS9W+naBQMfxO1gd6lzXe/rqllA9eJIUcm
-	ook+sbsj64n97M9/3l6sbANmMa1AZ2rnCMDjyAZSsVJKk6hkvrmiTseUaOdxGA==
-X-Google-Smtp-Source: AGHT+IGHpbtyH6wG5q8wpr8glm0LmNDVojnlHAVCXzzabVBkw4UaRXRI6IpMn0gx/0I09JmQAN/eSw==
-X-Received: by 2002:a17:90a:cb97:b0:2d3:d398:3c1e with SMTP id 98e67ed59e1d1-2e06afd7775mr1014848a91.36.1727224644075;
-        Tue, 24 Sep 2024 17:37:24 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:234f:c061:7929:9747])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e058a0899fsm1409293a91.0.2024.09.24.17.37.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Sep 2024 17:37:23 -0700 (PDT)
-Date: Wed, 25 Sep 2024 09:37:18 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Chris Li <chrisl@kernel.org>
-Cc: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Andrey Skvortsov <andrej.skvortzov@gmail.com>,
-	Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	stable@vger.kernel.org, Sachin Sant <sachinp@linux.ibm.com>,
-	linux-mm <linux-mm@kvack.org>
-Subject: Re: [PATCH v3] zram: don't free statically defined names
-Message-ID: <20240925003718.GA11458@google.com>
-References: <20240923164843.1117010-1-andrej.skvortzov@gmail.com>
- <20240924014241.GH38742@google.com>
- <d22cff1a-701d-4078-867d-d82caa943bab@linux.vnet.ibm.com>
- <CAF8kJuPEg1yKNmVvPbEYGME8HRoTXdHTANm+OKOZwX9B6uEtmw@mail.gmail.com>
- <CAF8kJuOs-3WZPQo0Ktyp=7DytWrL9+UrTNUGz+9n9s6urR-rtA@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Vy/YLieu"
+Subject: Re: [PATCH v2 8/8] block: Init for CBD(CXL Block Device) module
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727228937;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R9a1mjfhW8sOmneVxsGeTyR7GmOE/nZ4p8AXfssa9uk=;
+	b=Vy/YLieu6gh5aOX72A74Pk3t4c4bhJmwEWsFPmat6BuU729HhBsAsOC1N+HgHj+Ng5YBEB
+	dd342ermEnCZTaS0Ylgukj21IwpejePVqd4Bzer7l6pcAvh+3A+4mrpEzYb/SwdmCL5rK8
+	QtESlk4hsMZFZpE34jA27wYliDqO49Q=
+To: Randy Dunlap <rdunlap@infradead.org>, axboe@kernel.dk,
+ dan.j.williams@intel.com, gregory.price@memverge.com, John@groves.net,
+ Jonathan.Cameron@Huawei.com, bbhushan2@marvell.com, chaitanyak@nvidia.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-cxl@vger.kernel.org, linux-bcache@vger.kernel.org
+References: <20240918101821.681118-1-dongsheng.yang@linux.dev>
+ <20240918101821.681118-9-dongsheng.yang@linux.dev>
+ <27bf8cff-83b6-4a41-923a-7713a847f979@infradead.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Dongsheng Yang <dongsheng.yang@linux.dev>
+Message-ID: <c8a09654-f27e-766a-58f2-d36dffe34322@linux.dev>
+Date: Wed, 25 Sep 2024 09:48:30 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <27bf8cff-83b6-4a41-923a-7713a847f979@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAF8kJuOs-3WZPQo0Ktyp=7DytWrL9+UrTNUGz+9n9s6urR-rtA@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On (24/09/24 11:29), Chris Li wrote:
-> On Tue, Sep 24, 2024 at 8:56 AM Chris Li <chrisl@kernel.org> wrote:
-[..]
-> Given the merge window is closing. I suggest just reverting this
-> change. As it is the fix also causing regression in the swap stress
-> test for me. It is possible that is my test setup issue, but reverting
-> sounds the safe bet.
+Hi Randy,
 
-The patch in question is just a kfree() call that is only executed
-during zram reset and that fixes tiny memory leaks when zram is
-configured with alternative (re-compression) streams.  I cannot
-imagine how that can have any impact on runtime, that makes no
-sense to me, I'm not sure that revert is justified here.
+在 2024/9/25 星期三 上午 12:35, Randy Dunlap 写道:
+> Hi.
+> 
+> On 9/18/24 3:18 AM, Dongsheng Yang wrote:
+>> diff --git a/drivers/block/cbd/Kconfig b/drivers/block/cbd/Kconfig
+>> new file mode 100644
+>> index 000000000000..16ffcca058c5
+>> --- /dev/null
+>> +++ b/drivers/block/cbd/Kconfig
+>> @@ -0,0 +1,45 @@
+>> +config BLK_DEV_CBD
+>> +	tristate "CXL Block Device (Experimental)"
+>> +	depends on DEV_DAX && FS_DAX
+>> +	help
+>> +	  CBD allows you to register a persistent memory device as a CBD transport.
+>> +	  You can use this persistent memory as a data cache to improve your block
+>> +	  device performance. Additionally, if you enable CBD_MULTIHOST, cbd allows
+> 
+> s/cbd/CBD/ for consistency. Or does 'cbd' here explicitly refer to the loadable module
+> name?
+
+I will use uppercase "CBD" in the next version for consistency.
+> 
+>> +	  you to access block devices on a remote host as if they were local disks.
+>> +
+>> +	  Select 'y' to build this module directly into the kernel.
+>> +	  Select 'm' to build this module as a loadable kernel module.
+>    +	  The module will be called cbd.
+> 
+>> +
+>> +	  If unsure say 'N'.
+>> +
+>> +config CBD_CRC
+>> +	bool "Enable CBD checksum"
+>> +	default N
+> 
+> We usually omit 'default N' since that is the default default.
+
+I explicitly added "default" here to make it clearer. In fact, I did a 
+search:
+
+find . -name 'Kconfig' -exec grep 'default n' {} + | wc -l
+
+There are over 400+ of "default n" in the Kconfig files. （I will use 
+'default n' in next version）
+> 
+>> +	depends on BLK_DEV_CBD
+>> +	help
+>> +	  When CBD_CRC is enabled, all data sent by CBD will include
+>> +	  a checksum. This includes a data checksum, a submit entry checksum,
+>> +	  and a completion entry checksum. This ensures the integrity of the
+>> +	  data transmitted through the CXL memory device.
+>> +
+>> +config CBD_DEBUG
+>> +	bool "Enable CBD debug"
+>> +	default N
+> 
+> Ditto.
+> 
+>> +	depends on BLK_DEV_CBD
+>> +	help
+>> +	  When CBD_DEBUG is enabled, cbd module will print more messages
+>> +	  for debugging. But that will affact performance, so do not use it
+> 
+> 	                               affect
+> 
+>> +	  in production case.
+>> +
+>> +config CBD_MULTIHOST
+>> +	bool "multi-hosts CXL Dlock Device"
+> 
+> 	                      Block
+> 
+>> +	default N
+> 
+> drop default line.
+> 
+>> +	depends on BLK_DEV_CBD
+>> +	help
+>> +	  When CBD_MULTIHOST is enabled, cbd allows the use of a shared memory device
+> 
+> cbd or CBD?
+> 
+>> +	  as a cbd transport. In this mode, the blkdev and backends on different
+> 
+> ditto.
+> 
+>> +	  hosts can be connected through the shared memory device, enabling cross-node
+>> +	  disk access.
+>> +
+>> +	  IMPORTANT: This Require your shared memory device support Hardware-consistency
+> 
+> 	                  requires                          supports
+> 
+>> +	  as CXL 3.0 described.
+> 
+> 	  as described in CXL 3.0.
+
+agreed.
+
+Thank you for your review.
+
+Dongsheng
+> 
