@@ -1,194 +1,131 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C974962B
-	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 11:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D141B18EFE0;
+	Wed, 25 Sep 2024 11:37:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727262593; cv=none; b=K7Oqx8djgk0GpSLl5QNBe8fm5w5lds7YNHmDQKDMNT/nflmHPd5jecpRIpxTkKsCKAieDwwLFe7+JWQgMHzYmXT947H0QjRWWlmKzlt+yoYEicFoTt4s5DFDogHmCinch5J4MouvIoOm6N3R5yIqmBGz12ujd74EskdfmWaOkwo=
+	t=1727264267; cv=none; b=mJDgrm7sQME+qXX66cEw5mDJQGsAeSmga57hPzdzYgSoofXzslDuNLCYukH5wkQPzGd/RwVwjL+D2cjzxkOfonoC+4GQ+XYj3ttRxFtTPb7zSL7bSPGZIJP5jwCzU/SBVk02sFvAuwntgEVlZZuLAx0d5VIF9PeKgX4zTbjXVxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727262593; c=relaxed/simple;
-	bh=LQEzXPAIIICkhmqoZQCr+ZgX6AtcOa0R/eWt6GYdcmY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=fIHqQjLu4hcxxe0e21k3Y07emQ1C3Wvt5yR9+engwS6dWh+EOD+c79M93nr4RnoQrgb+qxB8Ym52sctBj49E5NWqzdjVoJjKiJY+Mk2JVS/0K6y46pwpCmFqI1Tgwnrlm+NxF84KIw2MhsPqfVz4OKl4m9dqDO6D8vZXLrae/aU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=O6k+H8mm; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1727264267; c=relaxed/simple;
+	bh=7u+2A3YZEtGiBP27HjS6d6XYN9k0QAaxK0YBbUrwuYk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ebgsNAXzR7Fmwll9K9LSWxardvDmV6R/oHamMDxWLoCpiF4CiKUSuzMNLREl+rePtnSo8QmtUC32PBLkCt9NoLYSOOTs6pRByhCZbjXEN0Xj+8YDxfLZP+WRKsbQiWn7zqfg++nmaySJspRYjyvp6tRJVX2m6JOJZ6q18gB2sqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o4MazaC/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="O6k+H8mm"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240925110947epoutp04209287169f01b396efd7bbbef0a8208e~4eCv9Rl320752107521epoutp04-
-	for <linux-block@vger.kernel.org>; Wed, 25 Sep 2024 11:09:47 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240925110947epoutp04209287169f01b396efd7bbbef0a8208e~4eCv9Rl320752107521epoutp04-
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1727262587;
-	bh=N+h3PsTPTQHDyIY9DQ7puLUE1ePpWavL+lGTJUupizU=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=O6k+H8mm6iKRX5Zc+FhV3dBREcuw/+zRNC7A/CY2jdg9EZVZo7REij+jWss6liQ4V
-	 6ktt0okuWPFEHJR7LX6s70bek43R1tcphY0z5RHIOZyvbUD1AL05SxR90rbaDvknge
-	 vwRSoXxbyIZrhrmpDv3cQeQxnnLDbIok4cGkJKcE=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20240925110946epcas5p2d3caa556f7252ff32ef4283ce4becb0f~4eCvTn7cf1791117911epcas5p2F;
-	Wed, 25 Sep 2024 11:09:46 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.181]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4XDDX94bcYz4x9Pw; Wed, 25 Sep
-	2024 11:09:45 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	BE.48.08855.97FE3F66; Wed, 25 Sep 2024 20:09:45 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20240925110945epcas5p33419ecc893436e250dc77fe629d86c4d~4eCtxtCtn2184821848epcas5p3u;
-	Wed, 25 Sep 2024 11:09:45 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240925110945epsmtrp26fd009b541f5c043f80be1ddfacbbe1a~4eCtwuvnp0643906439epsmtrp2L;
-	Wed, 25 Sep 2024 11:09:45 +0000 (GMT)
-X-AuditID: b6c32a44-107ff70000002297-b2-66f3ef7983c6
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	7C.57.07567.87FE3F66; Wed, 25 Sep 2024 20:09:44 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240925110941epsmtip2688610a145f992978c8e49e754c94e0b~4eCqpQ_lf2519425194epsmtip2f;
-	Wed, 25 Sep 2024 11:09:41 +0000 (GMT)
-Message-ID: <678921a8-584c-f95e-49c8-4d9ce9db94ab@samsung.com>
-Date: Wed, 25 Sep 2024 16:39:40 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o4MazaC/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BC57C4CEC7;
+	Wed, 25 Sep 2024 11:37:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727264267;
+	bh=7u+2A3YZEtGiBP27HjS6d6XYN9k0QAaxK0YBbUrwuYk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=o4MazaC/8zVYXUHCb7eCYGVn7iUyAQ50jwlWdmtcN+a9rxQl0KfLeweO34xHVvaRN
+	 VczeOeZiK3GQfYLy4exJ2e3kRaMQD+JOwbC0Oz1Sz2qifrPG0DKrxkgC3X0bpND0o9
+	 rAVRWCaU1HQJSfQep/0SYpCiP0M4igkBgVds9GvGAKQlNn5tTS52BkZ4CuM29ClOKH
+	 oDaso1r72+4To4WL91F0J0de2SRWSzgFVXlhJLq4EFXxTiTmMgTyhYt4+YI7Hm7L8C
+	 zqb+UzVEdrVaVYf7i0TL35xh+kO5h78P9UFVRAcvVeo4H55iRw419YFzFGst6V+jeY
+	 EDdz0qkJjPp9g==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Konstantin Ovsepian <ovs@ovs.to>,
+	Breno Leitao <leitao@debian.org>,
+	Tejun Heo <tj@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	josef@toxicpanda.com,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.11 030/244] blk_iocost: fix more out of bound shifts
+Date: Wed, 25 Sep 2024 07:24:11 -0400
+Message-ID: <20240925113641.1297102-30-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240925113641.1297102-1-sashal@kernel.org>
+References: <20240925113641.1297102-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-	Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: [PATCH v6 3/3] io_uring: enable per-io hinting capability
-Content-Language: en-US
-To: Hannes Reinecke <hare@suse.de>, axboe@kernel.dk, kbusch@kernel.org,
-	hch@lst.de, sagi@grimberg.me, martin.petersen@oracle.com,
-	brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
-	jaegeuk@kernel.org, bcrl@kvack.org, dhowells@redhat.com, bvanassche@acm.org,
-	asml.silence@gmail.com
-Cc: linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-block@vger.kernel.org, linux-aio@kvack.org,
-	gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com, Nitesh
-	Shetty <nj.shetty@samsung.com>
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <28419703-681c-4d8c-9450-bdc2aff19d56@suse.de>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.11
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01TaVBTVxid+/KygEVfo5RLRjFNx6GoQFKWXqyo0yK+Dm0Hl4FuSiN5EAok
-	mSyltowyWECRTbCAYQlVKhBblLUghNKgoEGlI6BCK6IEtVD2wrQi2CQPW/6d891z7rnf983l
-	MLj5bB4nSqamlDJxjIBlj9e3ubm6H5qYiRCm1PBRob4eoPP3MlkodbEWR6Nt0wDlTv7DQOOJ
-	8zjqa23EUPOZbAxVnL+CofGkmzgqyDuKIfMFLQMN/T7DRtnG2wCdyk0EyNC/CTUbruFId26Y
-	jco6FjFUP69joMrRCRx1LXQwUZe2kL3DiezuCSIbtffYZNdAFU5239CQ1frjLLJ6OptN1pQe
-	IZv6Eljk1HA/Tk609LLIjFo9IK+XXLYcdn5NzlS7kNXmMSx41cfRW6WUWEIp+ZQsXC6JkkX6
-	C4L2hr0T5uMrFLmL/NCbAr5MHEv5CwLeC3YPjIqxzEDA/0Ico7GUgsUqlcBz21alXKOm+FK5
-	Su0voBSSGIW3wkMljlVpZJEeMkq9RSQUvuFjEX4WLU278R2m+NvpywJTGzsBjLyUCuw4kPCG
-	beVVjFRgz+ESTQDO9uQDmkwD2JVWitNkDsAT9WfBC8vtq7+wrJhLGACsShTRojEAy4f+sokc
-	iG1wOPGBTYQTG6DpuhGn6y/Da6fNNuxIHIRPewtt+tVEIKwp6GJaMYNwgv1mHWa9dA1RjsFH
-	zbNMK2EQzwH8tkJvIRwOi3CDv+ZorAY74i34R0oRmzavh0frCmwNQcJkB/uTF5j0swNg162U
-	pRZWw5GOWjaNeXBm3MCicTQcfDiI0zgeNtRkLHm3w4Rnd225DEvuhUuedNZKmD5vxqxlSDjA
-	Y8lcWv0qHMgeXnI6wQf5pUxaQsLUhQ/oWY0AWNf+EGQBvnbZWLTL2tcu60b7f3AJwPXAmVKo
-	YiOpcB+FSEbF/bfwcHlsNbB9kY0BDeCubtHDCDAOMALIYQjWOGT3TUVwHSTiQ19RSnmYUhND
-	qYzAx7KfkwyeY7jc8sdk6jCRt5/Q29fX19vPy1ckcHIYTSqScIlIsZqKpigFpXzhwzh2vAQs
-	S+Q8znQUxg+nZ9bl2BXvd9sUFKR8LI3LOxx+80xTbtmU+U+X9AMJOc8M9iF3sjs/fT/g0mLl
-	47W60/MRJcbDXgMtO19fV5HWYrpStW/z8xCxsfXILDd4Vl6+R9ga9Vvefg31g/zgWEXN58mj
-	g7vb2s0b3D9al+syN9fiq3McYP+4O8vZJNnV3hh63416+0Rb0/acfT3MnzrRWtYofyHjwCrD
-	+tDu+1uewJRJ5x3x0j2zr0TpL37z2rHvjwdndjisCBxy9QyNLcrYbLy8q9L+5+LJEMmHT++s
-	VKhdHlG8uOKTYhPvVO+qi2d3NvQoxgy39vLfrRovk5cVftKfdM7L9eoK45NpTwGukopFGxlK
-	lfhfs/a3TKsEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrGIsWRmVeSWpSXmKPExsWy7bCSvG7F+89pBpe+m1vMWbWN0WL13X42
-	i65/W1gsXh/+xGgx7cNPZot3Tb9ZLG4e2MlksWfRJCaLlauPMlm8az3HYjF7ejOTxZP1s5gt
-	Ht/5zG4x6dA1Rosp05oYLfbe0rbYs/cki8X8ZU/ZLZYf/8dkse33fGaLda/fs1ic/3uc1eL8
-	rDnsDuIel694e+ycdZfd4/y9jSwel8+Wemxa1cnmsenTJHaPzUvqPXbfbGDz+Pj0FovH+31X
-	2Tz6tqxi9Diz4AhQ8nS1x+dNch6bnrxlCuCP4rJJSc3JLEst0rdL4MroObuQqeCHeMXsU4fZ
-	Gxhf8XQxcnJICJhIXDtxkK2LkYtDSGA3o8TXq/vZIBLiEs3XfrBD2MISK/89Z4coes0oMbN/
-	JjNIglfATuJp00OwBhYBVYlTZw6xQMQFJU7OfAJmiwokSey538gEYgsLuElsnn2eFcRmBlpw
-	68l8JpChIgIrmCQu/ZkH5jAL/GeU6Di2jAli3StGiR0XJgCN4uBgE9CUuDC5FKSbU8Ba4mX7
-	XHaISWYSXVu7GCFseYnmrbOZJzAKzUJyyCwkC2chaZmFpGUBI8sqRsnUguLc9NxkwwLDvNRy
-	veLE3OLSvHS95PzcTYzgpKGlsYPx3vx/eocYmTgYDzFKcDArifBOuvkxTYg3JbGyKrUoP76o
-	NCe1+BCjNAeLkjiv4YzZKUIC6YklqdmpqQWpRTBZJg5OqQam7U9unX674FfNqRuL2M5d3PrW
-	Q35DVbfaIWV7NaW1KyXLQycb6fLL7GXc72Bruna73+8nZof/T/BReiv1doqdbOPFw7vCkqYI
-	XJX7pv/8lgjTm2mRs3y+CNgHFK39+4TpqEi9y8trcZu6YngZfvycMm9pzFPbJ/q7LwTnTtue
-	8Wy5Yb4Ne73HwWrNrb4L2JtL0ksmMEw4vW1LzJrO7bv7Xdf1RS0rV/XLS/JweXtyUfSDG179
-	i/eU747Y/dIhqas5I8ScI4Tp7Z3Ji2d2XreZsjH0jnaI193gMw6OEXGXzT5fmeY8da/gKv/y
-	UO0bnn+OOl1MEe29zucV48nEc+FODceuiZIJ7oXtr1Y0rDTUUWIpzkg01GIuKk4EACcrUB6J
-	AwAA
-X-CMS-MailID: 20240925110945epcas5p33419ecc893436e250dc77fe629d86c4d
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240924093257epcas5p174955ae79ae2d08a886eeb45a6976d53
-References: <20240924092457.7846-1-joshi.k@samsung.com>
-	<CGME20240924093257epcas5p174955ae79ae2d08a886eeb45a6976d53@epcas5p1.samsung.com>
-	<20240924092457.7846-4-joshi.k@samsung.com>
-	<28419703-681c-4d8c-9450-bdc2aff19d56@suse.de>
 
-On 9/25/2024 11:27 AM, Hannes Reinecke wrote:
->> @@ -98,6 +98,11 @@ struct io_uring_sqe {
->>               __u64    addr3;
->>               __u64    __pad2[1];
->>           };
->> +        struct {
->> +            /* To send per-io hint type/value with write command */
->> +            __u64    hint_val;
->> +            __u8    hint_type;
->> +        };
-> Why is 'hint_val' 64 bits? Everything else is 8 bytes, so wouldn't it
-> be better to shorten that? 
+From: Konstantin Ovsepian <ovs@ovs.to>
 
-Right, within kernel hint is stored as 8bits value.
-But I chose not because how kernel stores hint internally (which may 
-change at any time) but how the existing F_SET_RW_HINT interface exposed 
-this to user space. It expects u64.
+[ Upstream commit 9bce8005ec0dcb23a58300e8522fe4a31da606fa ]
 
-If we do 8bits interface here, application needs to learn that for the 
-same lifetime hint it needs u64 for fcntl interface, but u8 for io_uring 
-interface. That seems a bit confusing.
+Recently running UBSAN caught few out of bound shifts in the
+ioc_forgive_debts() function:
 
-Also, in future if we do support another hint type, we may be able to 
-pass hint_val beyond what can be supported by u8.
+UBSAN: shift-out-of-bounds in block/blk-iocost.c:2142:38
+shift exponent 80 is too large for 64-bit type 'u64' (aka 'unsigned long
+long')
+...
+UBSAN: shift-out-of-bounds in block/blk-iocost.c:2144:30
+shift exponent 80 is too large for 64-bit type 'u64' (aka 'unsigned long
+long')
+...
+Call Trace:
+<IRQ>
+dump_stack_lvl+0xca/0x130
+__ubsan_handle_shift_out_of_bounds+0x22c/0x280
+? __lock_acquire+0x6441/0x7c10
+ioc_timer_fn+0x6cec/0x7750
+? blk_iocost_init+0x720/0x720
+? call_timer_fn+0x5d/0x470
+call_timer_fn+0xfa/0x470
+? blk_iocost_init+0x720/0x720
+__run_timer_base+0x519/0x700
+...
 
-As it stands the new struct will introduce
-> a hole of 24 bytes after 'hint_type'.
+Actual impact of this issue was not identified but I propose to fix the
+undefined behaviour.
+The proposed fix to prevent those out of bound shifts consist of
+precalculating exponent before using it the shift operations by taking
+min value from the actual exponent and maximum possible number of bits.
 
-This gets implicitly padded at this point [1][2], and overall size is 
-still capped by largest struct (which is of 16 bytes, placed just above 
-this).
+Reported-by: Breno Leitao <leitao@debian.org>
+Signed-off-by: Konstantin Ovsepian <ovs@ovs.to>
+Acked-by: Tejun Heo <tj@kernel.org>
+Link: https://lore.kernel.org/r/20240822154137.2627818-1-ovs@ovs.to
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-iocost.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-[1] On 64bit
-»       union {
-»       »       struct {
-»       »       »       __u64      addr3;                /*    48     8 */
-»       »       »       __u64      __pad2[1];            /*    56     8 */
-»       »       };                                       /*    48    16 */
-»       »       struct {
-»       »       »       __u64      hint_val;             /*    48     8 */
-»       »       »       __u8       hint_type;            /*    56     1 */
-»       »       };                                       /*    48    16 */
-»       »       __u64              optval;               /*    48     8 */
-»       »       __u8               cmd[0];               /*    48     0 */
-»       };                                               /*    48    16 */
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 690ca99dfaca6..5a6098a3db57e 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2076,7 +2076,7 @@ static void ioc_forgive_debts(struct ioc *ioc, u64 usage_us_sum, int nr_debtors,
+ 			      struct ioc_now *now)
+ {
+ 	struct ioc_gq *iocg;
+-	u64 dur, usage_pct, nr_cycles;
++	u64 dur, usage_pct, nr_cycles, nr_cycles_shift;
+ 
+ 	/* if no debtor, reset the cycle */
+ 	if (!nr_debtors) {
+@@ -2138,10 +2138,12 @@ static void ioc_forgive_debts(struct ioc *ioc, u64 usage_us_sum, int nr_debtors,
+ 		old_debt = iocg->abs_vdebt;
+ 		old_delay = iocg->delay;
+ 
++		nr_cycles_shift = min_t(u64, nr_cycles, BITS_PER_LONG - 1);
+ 		if (iocg->abs_vdebt)
+-			iocg->abs_vdebt = iocg->abs_vdebt >> nr_cycles ?: 1;
++			iocg->abs_vdebt = iocg->abs_vdebt >> nr_cycles_shift ?: 1;
++
+ 		if (iocg->delay)
+-			iocg->delay = iocg->delay >> nr_cycles ?: 1;
++			iocg->delay = iocg->delay >> nr_cycles_shift ?: 1;
+ 
+ 		iocg_kick_waitq(iocg, true, now);
+ 
+-- 
+2.43.0
 
-»       /* size: 64, cachelines: 1, members: 13 */
-
-[2] On 32bit
-
-»       union {
-»       »       struct {
-»       »       »       __u64      addr3;                /*    48     8 */
-»       »       »       __u64      __pad2[1];            /*    56     8 */
-»       »       };                                       /*    48    16 */
-»       »       struct {
-»       »       »       __u64      hint_val;             /*    48     8 */
-»       »       »       __u8       hint_type;            /*    56     1 */
-»       »       };                                       /*    48    12 */
-»       »       __u64              optval;               /*    48     8 */
-»       »       __u8               cmd[0];               /*    48     0 */
-»       };                                               /*    48    16 */
-
-»       /* size: 64, cachelines: 1, members: 13 */
-};
