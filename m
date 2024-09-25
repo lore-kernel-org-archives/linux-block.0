@@ -1,54 +1,57 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0C81534FB;
-	Wed, 25 Sep 2024 21:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA62155733;
+	Wed, 25 Sep 2024 21:46:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727300803; cv=none; b=aKkP9gUnF3uFaspMRK+FetUmj68rofdt5s1yMd1gxvw0TFUPlGCrbSNm33ou2DG6SesFXFdGc+NYwKhtMlWP8GjPS6WJLFcXBTngns+n2xjyqotf/N5RjTeUcFSt9alC7/MdVk4qNMLsyniQRd5iyclIfJeJcPBB8QSilTMlSdQ=
+	t=1727300804; cv=none; b=JopIF5jdQ2CGrCQR17O3706Yz26fuSfe3tS00qfljSrRQoJAK8JL9LZKeO9n3jaQgFvJYg77uANw+TxS5NJw8AyeVVsd/71dqTX3Uf3tZ1ltI8JJ15tqEqGdxID1/8hmCX2YSdA55F7kY+u8liEiE3HXWUtfxNrodu+ZuR9XIKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727300803; c=relaxed/simple;
-	bh=hKPqj54rfSZOJYhQlr4OrA/L/22OYdi+JxkaqQ4JVug=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=FI/haenZMUE84LnXBrD4j9FbGZ9+h8iDMD3d2FhBQ25WFAgI82d14t7pWmf4Y2F44S+U2KannmPkrcucgm4V2EfWE0E18rGVAaYcDuNqCzuML9yFkTMmNa41vOQAKPAj+kdZwseGIcYYNgZBQPiF7GTQkOAUcPeLmYw1tAneGUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dii5f39l; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1727300804; c=relaxed/simple;
+	bh=vIZUmOhkctrpxNjE/bq31Se+xRGgI8VKyz9uNEv0GsQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FeJITD+oFK/npaSCwqtudPtO+OeaCGPWdBIH3mAWH+mZsIELftO5N5LHPF6liD3ZL3MOtQRa9WPfMoh4bdXCWi11dEMSFgzh946hlS6PIHXUL5QIg5Y0MhZRgmSjJDJS9bHZVsqnVecGvO306PqF3tLiK2jNATHW/UCgrRrbUOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jen2M9UI; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dii5f39l"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42cc8782869so2334405e9.2;
-        Wed, 25 Sep 2024 14:46:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jen2M9UI"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42cba6cdf32so2336675e9.1;
+        Wed, 25 Sep 2024 14:46:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727300800; x=1727905600; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GVmVgaclLf08yTC2h5OjCOTI7DSU5jBV3Cn+WzQVxUs=;
-        b=Dii5f39lmEUHDJoMMFW7d2zFhiH4bEGYeUw0AQ03txVdJgV/wZHsw8Eb1zdDZ671jK
-         eEbYk3dvpgwfDsKPYNUgM4jMcsHvHqWFHYeH7bMaowIEWDXhAjlOxCjvCxNZ5ix3iT6u
-         Xj9SG/rPpjIOGRFgzhO9wxkJMpDp7wmxHXL37FPVmjaQlkO0+D/6zEBSA/kU3nstbpjh
-         jMsI07Dzcgee7ZLZXxSPev7okgUmvFU1j9JZUh4wvqeN7VFOZA+B5uy4/Bf5xqzM2Ucs
-         xFkFh6Jxhx5OH6wK0MLnFroyEB8mbTrqIkTJbTzSCYCcVvPoZexjDgvXS5jS1VVmtLyS
-         Yabw==
+        d=gmail.com; s=20230601; t=1727300801; x=1727905601; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4T9c6jNuxQUPP/Rbzo55YkzEPcrdsPIICvkg9bn4/tM=;
+        b=jen2M9UIvNnpuNnpADilgCuXxN91dsPXb0y1OBOAXBcdXNrbOEaNoxH9dHZTPqnW2P
+         /UcBhRYSVD2W8CrrTOyoEy7Hu42y/Y2aJ3kdsWt9jy9quMU+4PzPLl7i/h1M7MweznAm
+         7rOmpMFpgF22QStPELnXxE9jm7l892MzswpgvEgLULE57TM8h9YRsNO8bpPZ8XxsxGkQ
+         mOtYKjNDQJMjg1qG4FZqJj0FE16pz08ct082r0tx2vTUs+FE+6ojGNAmKpUryWj798u5
+         B2+8rcK6eq71FvqaRp26KRFJspPNAW/1ncsK+b9EFDPK3RHzQYRnglMOotNlsrc/fSK8
+         TwcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727300800; x=1727905600;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GVmVgaclLf08yTC2h5OjCOTI7DSU5jBV3Cn+WzQVxUs=;
-        b=WZlRRHvdm9JSsqQ3PeIggFHmiwlZrUs2m8MuVkKFz9DSP6M3db5WDy9gloEQeysz4q
-         7ilNvLRHJ5QZXytyMxKq+19QXkMl2wa3DdGl5xRJPNj8gdpcI3hA6NeXTp04tLAJYQUY
-         pXH5TcIFo/UpNkexRzApz4CA9prgNAPU2D7ZWLzXXz+mmBEF7oNl/WEGkO79DGKiYLg1
-         LNV/zE64NbF16uoIU3Uk3p54a1lMcIbpTePoMdSxQQenWAVx9c7NR6FfIU1L1xZSR5z4
-         lKr7RdvTNPxxrpkZfWK/YSYAGJ4TxdLpqFE6aVQXho7O+jQ/08hHfOR6kftjP/dC69c4
-         NYSg==
-X-Forwarded-Encrypted: i=1; AJvYcCUOupihU0UFPV36FS1lQbmY0azguJTkCSnHjWbekPaykEyZgWkoE0b7E5Q6DKVOKk05IzikxLd4oY++LLLY@vger.kernel.org, AJvYcCVeJecL9SS7e0WLUg/cemVAoUVQeOpEZ8r/qbXluA7Mw/PhFZub08b6jw1msoQ+S67nAT4zOdv1az3H@vger.kernel.org, AJvYcCW1dyNr0xH/p3/s3XhwmTyn170B/S0DV2AjaZHs7hilBFa3zqyLZZRQSKz5ds1bfEGH8oyZjZNm9+7p@vger.kernel.org, AJvYcCWhw7QnnJ+IeM0pzLN+abVSphra+5zMs3Xgk7Wc5qLfC53kJq0pvTlND2Bht7ZJe1cIXHHIFMN+eMelC3s=@vger.kernel.org, AJvYcCXjGleRSv/Ud9PiFJLWJOKh24VtPBCvzZN4/nqYuqD6MFRvlCn+gXFWQaW79e8agi6R0oCzy3kwg0VH@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywe60CHDYPBRUsvGMEn90r4HMsRngnC4hqOxsVFmGt/SO+Ogb8c
-	JnfsOxH8OXbQCPfiT2XRi0jOmbnWLLa5KxlWjt9D2J9NCT58Jic9
-X-Google-Smtp-Source: AGHT+IFLnDQbe1OOtOZOCODKOAoHYW+yOXDMI3pVNSMriwEKjgwO+0xQ1+cxh4UpT8hlWIhtMosbxQ==
-X-Received: by 2002:a05:600c:3107:b0:42c:b995:20d9 with SMTP id 5b1f17b1804b1-42e9613634fmr31493025e9.28.1727300799582;
-        Wed, 25 Sep 2024 14:46:39 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727300801; x=1727905601;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4T9c6jNuxQUPP/Rbzo55YkzEPcrdsPIICvkg9bn4/tM=;
+        b=Whf8o5bATHnzWh+jYkYjOTrs90Guj3AKJZnByJMbU1Zu7QNWWg9DJ4k889UR8TE99g
+         qsAdqtfCuQtzLRbeiqfCHIBAE8ZylnqiE2j4FA/xqEs3S2WQzwnefBQvKlmsv1mCJnvn
+         kkBiH+3j9KHoNfTRv/rAntGxg+BX7UFGIQKGIh1EVBSYo50RlIJV7bztkRrIgfSgcQip
+         Ihh5WbX97DhFeQeUzX6eCdHFoeYZiQKRUzvFuXPHXJb4rUCY6eB3sHIamc06lOC6NDJw
+         kkvRD1ZLzRpgqT107pwEts0is6EKR9eSgAFjSiWhxiike3ArOA5cOQFBlVROxUDempJt
+         IDhg==
+X-Forwarded-Encrypted: i=1; AJvYcCUFq+kxRifTaihgr/LCEcWFO4+7FWnvw1pAGLqzk5q9uJJpbZtRJPsIfPlJ4uzIpMr6P1YqTv2HrvA1@vger.kernel.org, AJvYcCUrHEhUPNseaq9pEtUAG/4fNaEbTtE2oBc+ByqH8S0NIGF1EDOw8LlIs+VWB7DQL7wXJYbjQymyN/jf@vger.kernel.org, AJvYcCVKjlsLvuJQ1NwDa6tDE/NN6l4fLytxZzf4xadN02e5hOm65lpMcDuGNNRYeIdH6BDoo0nESRCIlPF8Wtv9@vger.kernel.org, AJvYcCVnxj/WuMWZq1Mfoi2QuPK+koww0YiUPipVdC228wbP3+zlqlK4sAy0mvRaXjP9YueRtfBlOWW31S+FXpo=@vger.kernel.org, AJvYcCXUaar8G2rfDg5itex5JYZFbr5XHoUL9tU3T+DDBNz/oR5sWlBb9XVyt/wsB1uaQulDfklH6YuVwkfE@vger.kernel.org
+X-Gm-Message-State: AOJu0YyC4+SLnsL8JKYWTvSSezp5tr1/RAKXRSuAsB9EM96ekyDLdbHT
+	LQzhDZ48QJuT7H61d6fJAeK93cGnmvvDuWQkmwayWxpCCOYDKVcN
+X-Google-Smtp-Source: AGHT+IFoBL1R6dV7SQmlZLkBLTdCPdCS80FZbnIfOFtYbfTr6iXHb66aYiNtJGIPYb/itJ2vx6/jEQ==
+X-Received: by 2002:a05:600c:8a7:b0:42c:c003:edd8 with SMTP id 5b1f17b1804b1-42e96953e43mr23751955e9.6.1727300801042;
+        Wed, 25 Sep 2024 14:46:41 -0700 (PDT)
 Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42e96a1f2aasm28802565e9.45.2024.09.25.14.46.38
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42e96a1f2aasm28802565e9.45.2024.09.25.14.46.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2024 14:46:39 -0700 (PDT)
+        Wed, 25 Sep 2024 14:46:40 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jonathan Corbet <corbet@lwn.net>,
@@ -75,10 +78,13 @@ To: Jens Axboe <axboe@kernel.dk>,
 	linux-mmc@vger.kernel.org,
 	linux-mtd@lists.infradead.org,
 	Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: [RFC PATCH v2 0/5] block: partition table OF support
-Date: Wed, 25 Sep 2024 23:45:20 +0200
-Message-ID: <20240925214544.6114-1-ansuelsmth@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Subject: [RFC PATCH v2 1/5] block: add support for defining read-only partitions
+Date: Wed, 25 Sep 2024 23:45:21 +0200
+Message-ID: <20240925214544.6114-2-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240925214544.6114-1-ansuelsmth@gmail.com>
+References: <20240925214544.6114-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -87,89 +93,58 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
-this is an initial proposal to complete support for manually defining
-partition table.
+Add support for defining read-only partitions and complete support for
+it in the cmdline partition parser as the additional "ro" after a
+partition is scanned but never actually applied.
 
-Some background on this. Many OEM on embedded device (modem, router...)
-are starting to migrate from NOR/NAND flash to eMMC. The reason for this
-is that OEM are starting to require more and more space for the firmware
-and price difference is becoming so little that using eMMC is only benefits
-and no cons.
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk.h                | 1 +
+ block/partitions/cmdline.c | 3 +++
+ block/partitions/core.c    | 3 +++
+ 3 files changed, 7 insertions(+)
 
-Given these reason, OEM are also using very custom way to provide a
-partition table and doesn't relay on common method like writing a table
-on the eMMC.
-
-One way that is commonly used is to hardcode the partition table and
-pass it to the system via various way (cmdline, special glue driver,
-block2mtd...)
-This way is also used on Android where the partition table
-is passed from the bootloader via cmdline.
-
-One reason to use this method is to save space on the device and to
-permit more flexibility on partition handling.
-
-What this series does is complete support for this feature.
-It's possible to use the cmdline to define a partition table similar
-to how it's done for MTD but this is problematic for a number of device
-where tweaking the cmdline is not possible. This series adds OF support
-to make it possible to define a partition table in the Device Tree.
-
-We implement a similar schema to the MTD fixed-partition, where we define
-a "label" and a "reg" with "offset" and "size".
-
-A new block partition parser is introduced that check if the block device
-have an OF node attached and check if a fixed-partition table is defined.
-
-If a correct node is found, then partition table is filled. cmdline will
-still have priority to this new parser.
-
-Some block device also implement boot1 and boot2 additional disk. Similar
-to the cmdline parser, these disk can have OF support using the
-"partitions-boot0" and "partitions-boot1" additional node.
-
-It's also completed support for declaring partition as read-only as this
-feature was introduced but never finished in the cmdline parser.
-
-Posting as RFC for any comments or additional checks on OF parser code.
-
-I hope this solution is better accepted as downstream this is becoming
-a real problem with a growing number of strange solution for the simple
-task of providing a fixed partition table.
-
-Changes v2:
-- Reference bytes in DT instead of Sector Size
-- Validate offset and size after Sector Size conversion
-- Limit boot0 and boot1 to eMMC and add comments about JEDEC spec
-- Generalize MTD partition schema and introduce block partitions schema
-- Add missing code to actually attach the OF parser to block partition core
-- Add reviewed by tag for read-only patch
-
-Christian Marangi (5):
-  block: add support for defining read-only partitions
-  docs: block: Document support for read-only partition in cmdline part
-  block: add support for partition table defined in OF
-  dt-bindings: block: Generalize and introduce property for partitions
-  dt-bindings: mmc: Document support for partition table in mmc-card
-
- Documentation/block/cmdline-partition.rst     |   5 +-
- .../bindings/block/partitions/partition.yaml  |  33 ++++
- .../bindings/block/partitions/partitions.yaml |  27 ++++
- .../devicetree/bindings/mmc/mmc-card.yaml     |  57 +++++++
- .../bindings/mtd/partitions/partition.yaml    |  10 +-
- block/blk.h                                   |   1 +
- block/partitions/Kconfig                      |   8 +
- block/partitions/Makefile                     |   1 +
- block/partitions/check.h                      |   1 +
- block/partitions/cmdline.c                    |   3 +
- block/partitions/core.c                       |   6 +
- block/partitions/of.c                         | 144 ++++++++++++++++++
- 12 files changed, 287 insertions(+), 9 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/block/partitions/partition.yaml
- create mode 100644 Documentation/devicetree/bindings/block/partitions/partitions.yaml
- create mode 100644 block/partitions/of.c
-
+diff --git a/block/blk.h b/block/blk.h
+index c718e4291db0..f300212d3e98 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -558,6 +558,7 @@ void blk_free_ext_minor(unsigned int minor);
+ #define ADDPART_FLAG_NONE	0
+ #define ADDPART_FLAG_RAID	1
+ #define ADDPART_FLAG_WHOLEDISK	2
++#define ADDPART_FLAG_READONLY	4
+ int bdev_add_partition(struct gendisk *disk, int partno, sector_t start,
+ 		sector_t length);
+ int bdev_del_partition(struct gendisk *disk, int partno);
+diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
+index 152c85df92b2..da3e719d8e51 100644
+--- a/block/partitions/cmdline.c
++++ b/block/partitions/cmdline.c
+@@ -237,6 +237,9 @@ static int add_part(int slot, struct cmdline_subpart *subpart,
+ 	put_partition(state, slot, subpart->from >> 9,
+ 		      subpart->size >> 9);
+ 
++	if (subpart->flags & PF_RDONLY)
++		state->parts[slot].flags |= ADDPART_FLAG_READONLY;
++
+ 	info = &state->parts[slot].info;
+ 
+ 	strscpy(info->volname, subpart->name, sizeof(info->volname));
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index ab76e64f0f6c..abad6c83db8f 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -373,6 +373,9 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
+ 			goto out_del;
+ 	}
+ 
++	if (flags & ADDPART_FLAG_READONLY)
++		bdev_set_flag(bdev, BD_READ_ONLY);
++
+ 	/* everything is up and running, commence */
+ 	err = xa_insert(&disk->part_tbl, partno, bdev, GFP_KERNEL);
+ 	if (err)
 -- 
 2.45.2
 
