@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 999EF54F95;
-	Thu, 26 Sep 2024 14:03:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966E69474;
+	Thu, 26 Sep 2024 14:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727359432; cv=none; b=NuJjR0tzDkOIJXikqO7x9NasusYhnqUYm9Bfrfq7wXijKLQb7rjUNpGsO7HlrN/FNKhYy8NRGpm7/H8Nh9w4Ro5PDrpiAk/kxcwj7dHJ98opNtKwwNVp6INN7tWBt87bQLMCtD+O478iarePJLQmDUngHKLrRAvnyyUbLPT30ak=
+	t=1727360142; cv=none; b=r/0oeG0UQ0C+OpFDkDn4iL+y49jlK3mws52567W9+Ode5wh8+enben3ijCCky37YZvfFnxzm73HMU+BWEUZ3A+yH1c6sLBZDLc4bVrNb5uQLx1ce6zhepmgQNWfU7s5ZsBF7FQm4zG/gy0apzLbosjHqzS+ZL5cuLjpgSpUuBSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727359432; c=relaxed/simple;
-	bh=jtCshB+kbsn9FzIzIwY86oEMwzDjCbBE1nTqG/gsx9Q=;
+	s=arc-20240116; t=1727360142; c=relaxed/simple;
+	bh=Kv1Cdy6l+gouokDZ3e4xVwNd6beXKTj/+T6t59ybc2A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jp99mhI83Xtr/b20oCMSyOIRIb3nxftZKmDLA7TxXpt4RMjonKRuG6evv0xPiJ42cxt4VetRPqeQZPW5qWAFmfqMEG8XhWPLHokzf56ga/kW2rMAAf3tHHffH7YvO41y9vQYmZ1dsUb/dtMMt+nGgAkCCJLJ7CQdTeXjDvzEvcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ue6+eDGl; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=LBjac+CexHR0HAFZlQ30Vng14sRpVgZnAUrVs0haY7+xDLTIEauLdA+0EEIxgzUxrL1gKJHyP2QoaqVyeTaG+W+zbXgg5W57VisUMryU3WzLF9pFBn9O8hoPFDbzPOR9o8CgzuegFbNiYnmqvC/Kpnm0Frq5kvTwNJm0UnEsTI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j7B2f0rc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ue6+eDGl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 085A0C4CEC5;
-	Thu, 26 Sep 2024 14:03:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j7B2f0rc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DECBCC4CEC5;
+	Thu, 26 Sep 2024 14:15:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727359432;
-	bh=jtCshB+kbsn9FzIzIwY86oEMwzDjCbBE1nTqG/gsx9Q=;
+	s=k20201202; t=1727360142;
+	bh=Kv1Cdy6l+gouokDZ3e4xVwNd6beXKTj/+T6t59ybc2A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ue6+eDGlWGKfphSJdEdkbSB0MTnPYtfZ6oX/1NUUtZTB3BncchmRwnjY/aSG9Xqgu
-	 vJh7HohBkSAlYbMWvh7cngB2t1BpoMg6fZuNz6zJyeIKHZo6cmQvx67b5SY0+9+Zct
-	 2KMSEM0mPDm4K2G27car0LT3NUfn5eXeUEVFzNmF4uKv5o4Pw7H0+bXI2/5q2Gdybp
-	 LIv6yuWL2nKqUQyIeAVm0Tc/lMyPpi3RrODjUEA+5AwK/we7lrOZoYy8SM5eDALJJv
-	 0vh6dNdKCbD4rjzo6WwTCu4hS6IvmJ9U2UHoyoyISHi6V0n0OZjH8CojCmP/wFW2EO
-	 D5Cnl6bdEuVng==
-Date: Thu, 26 Sep 2024 09:03:51 -0500
+	b=j7B2f0rcTDtiVBhyi6eeIT3fTA82VCjbUR0AY1bfVe8pnmhl8uVy+JDFnVDxuikdY
+	 blzfgrjf+udZhHHqnk5feo9ATaHui45Hp3V9VvMylh8yxWbARg/0VreYeJ4uOnDX+/
+	 BErfw9UvWnepSpuMxj5lmJ5due2iWYH5iUNrBwU5+iEpru8pYYGem9HZjr1/CM4jQ0
+	 n2/r+GERvb58j5IGvJq4I1gWuUDOiWT8f3oi8L2xhQU+InsAO2GWA1zXZdwkWtAtyA
+	 UfKZd0SNxWLg46UCZ1vKg8jlsxeaOHjSVuE9qNgD2HA2OKj2MVQDBd5KIMTIeowgmD
+	 fCg9LNU/RxXKQ==
+Date: Thu, 26 Sep 2024 09:15:41 -0500
 From: Rob Herring <robh@kernel.org>
 To: Christian Marangi <ansuelsmth@gmail.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
@@ -48,11 +48,11 @@ Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
 	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
 	Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: Re: [RFC PATCH v2 4/5] dt-bindings: block: Generalize and introduce
- property for partitions
-Message-ID: <20240926140351.GA2596132-robh@kernel.org>
+Subject: Re: [RFC PATCH v2 5/5] dt-bindings: mmc: Document support for
+ partition table in mmc-card
+Message-ID: <20240926141541.GA2625953-robh@kernel.org>
 References: <20240925214544.6114-1-ansuelsmth@gmail.com>
- <20240925214544.6114-5-ansuelsmth@gmail.com>
+ <20240925214544.6114-6-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,106 +61,69 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240925214544.6114-5-ansuelsmth@gmail.com>
+In-Reply-To: <20240925214544.6114-6-ansuelsmth@gmail.com>
 
-On Wed, Sep 25, 2024 at 11:45:24PM +0200, Christian Marangi wrote:
-> Generalize property from MTD partitions schema and introduce property for
-> block partitions defined in OF.
+On Wed, Sep 25, 2024 at 11:45:25PM +0200, Christian Marangi wrote:
+> Document support for defining a partition table in the mmc-card node.
 > 
-> Partition schema for block devices is a reduced schema of the MTD as
-> only a few property are supported for it. (reg, label and read-only)
+> This is needed if the eMMC doesn't have a partition table written and
+> the bootloader of the device load data by using absolute offset of the
+> block device. This is common on embedded device that have eMMC installed
+> to save space and have non removable block devices.
+> 
+> If an OF partition table is detected, any partition table written in the
+> eMMC will be ignored and won't be parsed.
+> 
+> eMMC provide a generic disk for user data and if supported (JEDEC 4.4+)
+> also provide two additional disk ("boot0" and "boot1") for special usage
+> of boot operation where normally is stored the bootloader or boot info.
 > 
 > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 > ---
->  .../bindings/block/partitions/partition.yaml  | 33 +++++++++++++++++++
->  .../bindings/block/partitions/partitions.yaml | 27 +++++++++++++++
->  .../bindings/mtd/partitions/partition.yaml    | 10 ++----
->  3 files changed, 62 insertions(+), 8 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/block/partitions/partition.yaml
->  create mode 100644 Documentation/devicetree/bindings/block/partitions/partitions.yaml
-
-Partitions are partitions. We don't need them defined in both mtd and 
-block. Could perhaps move them to bindings/partitions/, but that's not 
-really worth it in my opinion. Just use and add to what's in mtd.
-
+>  .../devicetree/bindings/mmc/mmc-card.yaml     | 57 +++++++++++++++++++
+>  1 file changed, 57 insertions(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/block/partitions/partition.yaml b/Documentation/devicetree/bindings/block/partitions/partition.yaml
-> new file mode 100644
-> index 000000000000..b9b1d8139e56
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/block/partitions/partition.yaml
-> @@ -0,0 +1,33 @@
-> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/block/partitions/partition.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> diff --git a/Documentation/devicetree/bindings/mmc/mmc-card.yaml b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
+> index fd347126449a..58b6593a0f60 100644
+> --- a/Documentation/devicetree/bindings/mmc/mmc-card.yaml
+> +++ b/Documentation/devicetree/bindings/mmc/mmc-card.yaml
+> @@ -13,6 +13,10 @@ description: |
+>    This documents describes the devicetree bindings for a mmc-host controller
+>    child node describing a mmc-card / an eMMC.
+>  
+> +  It's possible to define a fixed partition table for an eMMC for the user
+> +  partition and one of the 2 boot partition (boot0/boot1) if supported by the
+> +  eMMC.
 > +
-> +title: Partition
+>  properties:
+>    compatible:
+>      const: mmc-card
+> @@ -26,6 +30,30 @@ properties:
+>        Use this to indicate that the mmc-card has a broken hpi
+>        implementation, and that hpi should not be used.
+>  
+> +  "#address-cells":
+> +    const: 0
 > +
-> +description: |
+> +  "#size-cells":
+> +    const: 0
 
-Don't need '|' if no formatting.
+Don't need these properties.
 
-> +  This binding describes a single flash partition. Each partition must have its
-> +  relative offset and size specified. Depending on partition function extra
-> +  properties can be used.
 > +
-> +maintainers:
-> +  - Christian Marangi <ansuelsmth@gmail.com>
+> +patternProperties:
+> +  "^partitions(-boot[01])?$":
+> +    $ref: /schemas/block/partitions/partitions.yaml
 > +
-> +properties:
-> +  reg:
-> +    description: partition's offset and size within the flash (in sector
-> +      block, 512byte)
-> +    maxItems: 1
+> +    patternProperties:
+> +      "^partition@[0-9a-f]+$":
+> +        $ref: /schemas/block/partitions/partition.yaml
 > +
-> +  label:
-> +    description: The label / name for this partition.
-> +
-> +  read-only:
-> +    description: This parameter, if present, is a hint that this partition
-> +      should only be mounted read-only. This is usually used for flash
-> +      partitions containing early-boot firmware images or data which should
-> +      not be clobbered.
-> +    type: boolean
-> +
-> +additionalProperties: true
-> diff --git a/Documentation/devicetree/bindings/block/partitions/partitions.yaml b/Documentation/devicetree/bindings/block/partitions/partitions.yaml
-> new file mode 100644
-> index 000000000000..9c161aac364d
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/block/partitions/partitions.yaml
-> @@ -0,0 +1,27 @@
-> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/block/partitions/partitions.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Partitions
-> +
-> +description: |
-> +  This binding is generic and describes the content of the partitions container
-> +  node.
-> +
-> +maintainers:
-> +  - Christian Marangi <ansuelsmth@gmail.com>
-> +
-> +properties:
-> +  '#address-cells':
-> +    enum: [1, 2]
-> +
-> +  '#size-cells':
-> +    enum: [1, 2]
+> +        properties:
+> +          reg:
+> +            multipleOf: 512
 
-
-Like *all* other 'partitions' nodes, you need a compatible to say what 
-kind of partitions you have. It's conceivable that some vendor invented 
-their own scheme just like MTD devices.
-
-As I said before, this is just 'fixed-partitions'. If some properties 
-aren't supported, that's fine. All the 'align' properties are for 
-flashing tools and aren't supported in Linux. 
+I was going to suggest this, but I think it won't actually work because 
+it could be 2 cells for address and/or size.
 
 Rob
