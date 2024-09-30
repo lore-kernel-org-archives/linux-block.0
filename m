@@ -1,38 +1,38 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06F218DF76;
-	Mon, 30 Sep 2024 12:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF5D41A84;
+	Mon, 30 Sep 2024 12:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727700563; cv=none; b=Gz+xUnvAWtHKLDQfeLVh7SBHjIdZmzCk9wEGvNeZanDD1hfsKRJrfAKox6XCEHnOkjvOJBuKl6LWIUKsJGnUtSFQJFcC1ozeQ5ESXHjNy3TakY28kx/GYv9thIjlwJcqWO6LiYmiPFrhw600ClE/Gkw+qCkjvAGZuo2ZDkREWEc=
+	t=1727700855; cv=none; b=soh33BE2WzbbvxLVajoKHs9WyS0F8dqlKyNP1hWohzEDIH8RSmQTpWHUSY6H6Zvwffjg8/1a9eiSWoLkBp8R8uOIDGHOwH7BTnYXD9unEPhcUf2ZYUJPVzIzXwqZVVLjXHl5Oheq1mDB1Rln9Tmq85nLI7UjDQ80t1d7n9ylJBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727700563; c=relaxed/simple;
-	bh=F/U0sRoJdr4E2hz881oUVHvIf/z2huLNVCZMePykZz4=;
+	s=arc-20240116; t=1727700855; c=relaxed/simple;
+	bh=JbymPE1wAX7oLNeBnVW/EsUQEOcGrDy36SdgxsVK40U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gArUFO0QSRqxkg0HN4+VEAzkkx1Q5UlZI48YvMchghsFQMVMuY7ROmllp7cvMOzk13mRnSE1e2DEkCpea34YvgeegfqardH3KgidAW876qobzkctvemCCPoh5DqhAoE8+6Ck3lNbkBbmpw/kiP3bqE8IOpR3HlpztWJwHUhRuuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=198.175.65.13
+	 Content-Type:Content-Disposition:In-Reply-To; b=FJg0RCzLbt8ejyp2Isv2EILjX1upHDM6rQy2X930aRjzIQfuW4rHwOp83dP/hpUC/HUB+9Oe+0cQty5ibd7EeHybM4mohUhcxJCxHKw8RfYliWFIQkXmlOcExwPQaCWhwwY/xzmbMTwpstxCbkwlF/RZnvBB8kMGRn56z2nJw6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
-X-CSE-ConnectionGUID: X8ogNJCaSBmrAMSRJn/oCQ==
-X-CSE-MsgGUID: YxEr24y/Qmya4EIelEMJyw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11210"; a="37927560"
+X-CSE-ConnectionGUID: 4Cl5IOWHSYOx9akl6V4CHA==
+X-CSE-MsgGUID: hwDgEIaLTJqGqWNTZ8J5EA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11210"; a="26946175"
 X-IronPort-AV: E=Sophos;i="6.11,165,1725346800"; 
-   d="scan'208";a="37927560"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 05:49:22 -0700
-X-CSE-ConnectionGUID: I3zFfxIOTm28Yq4645XqPw==
-X-CSE-MsgGUID: ALUzUGNKTcm94Z5KTfvQmg==
+   d="scan'208";a="26946175"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 05:54:13 -0700
+X-CSE-ConnectionGUID: UFrOowHtT9C1RadabsDP0w==
+X-CSE-MsgGUID: YC01WcDRQtugj8jMJbQ4xg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,165,1725346800"; 
-   d="scan'208";a="73601077"
+   d="scan'208";a="72963878"
 Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 05:49:16 -0700
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 05:54:08 -0700
 Received: from andy by smile.fi.intel.com with local (Exim 4.98)
 	(envelope-from <andy@kernel.org>)
-	id 1svFpw-0000000Ef7L-3G1q;
-	Mon, 30 Sep 2024 15:49:12 +0300
-Date: Mon, 30 Sep 2024 15:49:12 +0300
+	id 1svFue-0000000EfCj-3mlL;
+	Mon, 30 Sep 2024 15:54:04 +0300
+Date: Mon, 30 Sep 2024 15:54:04 +0300
 From: Andy Shevchenko <andy@kernel.org>
 To: Christian Marangi <ansuelsmth@gmail.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
@@ -51,11 +51,9 @@ Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
 	linux-hardening@vger.kernel.org,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
 	Lorenzo Bianconi <lorenzo@kernel.org>, upstream@airoha.com
-Subject: Re: [PATCH v4 4/5] block: add support for partition table defined in
- OF
-Message-ID: <ZvqeSC3ZsRU0uEaB@smile.fi.intel.com>
+Subject: Re: [PATCH v4 0/5] block: partition table OF support
+Message-ID: <ZvqfbNDfI2QWZEBg@smile.fi.intel.com>
 References: <20240930113045.28616-1-ansuelsmth@gmail.com>
- <20240930113045.28616-5-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -64,85 +62,60 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240930113045.28616-5-ansuelsmth@gmail.com>
+In-Reply-To: <20240930113045.28616-1-ansuelsmth@gmail.com>
 Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Mon, Sep 30, 2024 at 01:30:11PM +0200, Christian Marangi wrote:
-> Add support for partition table defined in Device Tree. Similar to how
-> it's done with MTD, add support for defining a fixed partition table in
-> device tree.
+On Mon, Sep 30, 2024 at 01:30:07PM +0200, Christian Marangi wrote:
+> Hi,
+> this is an initial proposal to complete support for manually defining
+> partition table.
 > 
-> A common scenario for this is fixed block (eMMC) embedded devices that
-> have no MBR or GPT partition table to save storage space. Bootloader
-> access the block device with absolute address of data.
+> Some background on this. Many OEM on embedded device (modem, router...)
+> are starting to migrate from NOR/NAND flash to eMMC. The reason for this
+> is that OEM are starting to require more and more space for the firmware
+> and price difference is becoming so little that using eMMC is only benefits
+> and no cons.
 > 
-> This is to complete the functionality with an equivalent implementation
-> with providing partition table with bootargs, for case where the booargs
-> can't be modified and tweaking the Device Tree is the only solution to
-> have an usabe partition table.
+> Given these reason, OEM are also using very custom way to provide a
+> partition table and doesn't relay on common method like writing a table
+> on the eMMC.
 > 
-> The implementation follow the fixed-partitions parser used on MTD
-> devices where a "partitions" node is expected to be declared with
-> "fixed-partitions" compatible in the OF node of the disk device
-> (mmc-card for eMMC for example) and each child node declare a label
-> and a reg with offset and size. If label is not declared, the node name
-> is used as fallback. Eventually is also possible to declare the read-only
-> property to flag the partition as read-only.
+> One way that is commonly used is to hardcode the partition table and
+> pass it to the system via various way (cmdline, special glue driver,
+> block2mtd...)
+> This way is also used on Android where the partition table
+> is passed from the bootloader via cmdline.
 > 
-> For eMMC block, driver scan the disk name and check if it's suffixed with
-> "boot0" or "boot1".
-> This is to handle the additional disk provided by eMMC as supported in
-> JEDEC 4.4+. If this suffix is detected, "partitions-boot0" or
-> "partitions-boot1" are used instead of the generic "partitions" for the
-> relevant disk.
+> One reason to use this method is to save space on the device and to
+> permit more flexibility on partition handling.
+> 
+> What this series does is complete support for this feature.
+> It's possible to use the cmdline to define a partition table similar
+> to how it's done for MTD but this is problematic for a number of device
+> where tweaking the cmdline is not possible. This series adds OF support
+> to make it possible to define a partition table in the Device Tree.
+> 
+> We implement a similar schema to the MTD fixed-partition, where we define
+> a "label" and a "reg" with "offset" and "size".
+> 
+> A new block partition parser is introduced that check if the block device
+> have an OF node attached and check if a fixed-partition table is defined.
+> 
+> If a correct node is found, then partition table is filled. cmdline will
+> still have priority to this new parser.
+> 
+> Some block device also implement boot1 and boot2 additional disk. Similar
+> to the cmdline parser, these disk can have OF support using the
+> "partitions-boot0" and "partitions-boot1" additional node.
+> 
+> It's also completed support for declaring partition as read-only as this
+> feature was introduced but never finished in the cmdline parser.
 
-...
 
-> +	strscpy(info->volname, partname, sizeof(info->volname));
-
-We have 2-arguments strscpy(), please use that.
-
-> +	strlcat(state->pp_buf, tmp, PAGE_SIZE);
-
-In new code we should not use strl*(). They are subject to remove.
-And actually why? You have used strscpy() a few lines above...
-
-...
-
-> +	for_each_child_of_node(partitions_np, np) {
-
-Use _scoped() variant.
-
-> +		if (validate_of_partition(np, slot)) {
-> +			of_node_put(np);
-> +			ret = -1;
-> +			goto exit;
-> +		}
-> +
-> +		slot++;
-> +	}
-
-...
-
-> +	for_each_child_of_node(partitions_np, np) {
-
-Ditto.
-
-> +		if (slot >= state->limit) {
-> +			of_node_put(np);
-> +			break;
-> +		}
-> +
-> +		add_of_partition(state, slot, np);
-> +
-> +		slot++;
-> +	}
-
-...
-
-> +	strlcat(state->pp_buf, "\n", PAGE_SIZE);
-
-Why strl*()?
+I'm not sure I fully understood the problem you are trying to solve.
+I have a device at hand that uses eMMC (and was produced almost ten years ago).
+This device has a regular GPT on eMMC and no kernel needs to be patched for that.
+So, why is it a problem for the mentioned OEMs to use standard GPT approach?
 
 -- 
 With Best Regards,
