@@ -1,114 +1,144 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E85F17E918;
-	Mon, 30 Sep 2024 08:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3D318801E
+	for <linux-block@vger.kernel.org>; Mon, 30 Sep 2024 09:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727686576; cv=none; b=QMuqiwYS0yAn/M+zZNY1hF4W/2CEGSEaFHayk4raJyBmLxayZLwTWmDWavQK3/PnJ2j0uQMl5EeeL6joLGZsU7PJhN4BgkHZu/Ej7fv34FAwZhVcNAA4pK098bkeIucacJKlS7rwwX2DaS3OBDVXurHnzG7H93pGrUU7T3A4+OE=
+	t=1727688115; cv=none; b=PU4Ds1XDSER7hbMDmMIIoNMoDp4E93BXY8MN5cpIHHv+9ugCVCSojSSWnNG5qupkBptv+jzu4BGoBdN7naqryD3CkfFbEQOdCrhtePZAfBz7QYWHWKAIuQIDJ7ciVZpnRn/BB+mUx8a0aO5Ws4op2ZeB58Te6hC2SmSqzHpW9ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727686576; c=relaxed/simple;
-	bh=Cv5Fqr5fUDP+WM4qhGcV6/fa5KcFQBnq86VjMWn/mtI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=StiAFTxNd9s0QdNJ8vDT/WvPNnJeUiklovfMOnLVfo3L/uoYmyYK8A0UuIEyrr60Co4PvM0M+iUlc9Ixu9AQziQwVBVPfD/HJ8xhHcv1BMBR3NFP6s4SZ7ry3VGRvKMp0QRrvQ/9pofk1AyMv7eRGNzjTFtLeSGJ+CmS8z/ZVUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XHFKV2kGhz4f3kkd;
-	Mon, 30 Sep 2024 16:55:58 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id C43991A058E;
-	Mon, 30 Sep 2024 16:56:09 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgCn28emZ_pmgEUMCw--.63034S7;
-	Mon, 30 Sep 2024 16:56:09 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: axboe@kernel.dk,
-	tj@kernel.org,
-	josef@toxicpanda.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	cgroups@vger.kernel.org,
-	yukuai3@huawei.com,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH 3/5] blk-throttle: use new helper blkg_print_dev_name()
-Date: Mon, 30 Sep 2024 16:53:00 +0800
-Message-Id: <20240930085302.1558217-4-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240930085302.1558217-1-yukuai1@huaweicloud.com>
-References: <20240930085302.1558217-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1727688115; c=relaxed/simple;
+	bh=ihqC0moMa0gkpZDgI3toCyjoo7KCGvJzUF/2ZGkTW2U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=TlH0JL5Asr3pX4xNV2oMke6rOJ7hv9J0RvbAqw8PJFN2pq1BEn9b9XMRLxiL3LuoIEXal44VQsOzMxFxMhkrpnHgyaOEg7ipQTPsbzwnF4LbL/DrSUqnjhIEkkYdVjHhyc7oecWpA9REXgfSRDVw6CDIhlNJak3/fIqd89r5bnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rasmusvillemoes.dk; spf=pass smtp.mailfrom=rasmusvillemoes.dk; dkim=pass (1024-bit key) header.d=rasmusvillemoes.dk header.i=@rasmusvillemoes.dk header.b=Hh+UI6Hb; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rasmusvillemoes.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rasmusvillemoes.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=rasmusvillemoes.dk header.i=@rasmusvillemoes.dk header.b="Hh+UI6Hb"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2fabb837ddbso32502091fa.1
+        for <linux-block@vger.kernel.org>; Mon, 30 Sep 2024 02:21:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rasmusvillemoes.dk; s=google; t=1727688111; x=1728292911; darn=vger.kernel.org;
+        h=mime-version:user-agent:message-id:date:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wOxBnbL6b/6p40BCLZnOmRygJyLDz0xvKxJvU54ZAcY=;
+        b=Hh+UI6HbZcPGxjieEM4TxX9epsDZL+qMmDuJ3zyGj9tt418SFzVPGRcZhiOyCP4pEB
+         UR2+4leTrlu8SqUM+nRxznVArjAjWKESk15d7PnU8qxL0M0Say2CsznYeIzGx+5Gg/A0
+         HG4hkthepBPj4si4t/c6pJaoXTRbGfmsTYQ7w=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727688111; x=1728292911;
+        h=mime-version:user-agent:message-id:date:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wOxBnbL6b/6p40BCLZnOmRygJyLDz0xvKxJvU54ZAcY=;
+        b=LrL/eDkRpmuGat/SVFHmScKdOw8+v/fD3NaYZltSDr7l1cf5YB9I26YiGcn2oRU55r
+         TZeUSW38zai1dtX3zNpc7ATTmfBqRyi4XdxucymDHDaL4fQZacMc83kYG3KDipCS/a/b
+         Vp++AxeMVI/1CWkRVaeAD5JwlGA2Zh5r5THY7iU5gKx+5qJEgbF89Z6VsUU7YpGlfvdS
+         uQVx2gl48hAorlZd4eE+D0gSz9fESP5sL0ha3xgtISyhWlhc2w939/25ItM7lErXdotW
+         4cJHh4o1fcUPx9WWPYjPBlvgoqu6U6bVVsOJ3IZLzwR1X1oGCn1CDuhhU4ruLUeY+9er
+         SzWg==
+X-Forwarded-Encrypted: i=1; AJvYcCWBJi64ujbS6RA63Dlhfz5+ocwd95U+pmd9Kn4yBhnJ4ouX1nIYyrKn9JQqxMVyhqyQ0+O+g9hl6musWQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVsvxlYYX4MZTt86evxaORnPQQ47SeIA9DqGAHxEChwPRh3VfN
+	P79pN6SarV/gf38wRRnpP+TcU1d807EQ4eqwjAhPrc6+oNTY9BwFzpdDGOtGV6M=
+X-Google-Smtp-Source: AGHT+IHL3VXY5tvf4j7T6OaXxNRI231E0ILvU2TYhIVSEH7SSrJfMFW2DpRSkuCTashwRBUmWDv3uw==
+X-Received: by 2002:a2e:be1c:0:b0:2fa:cd3d:4a76 with SMTP id 38308e7fff4ca-2facd3d4c8fmr18895301fa.43.1727688111067;
+        Mon, 30 Sep 2024 02:21:51 -0700 (PDT)
+Received: from localhost ([81.216.59.226])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f9d4618eecsm12885541fa.118.2024.09.30.02.21.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 02:21:50 -0700 (PDT)
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>,  Jonathan Corbet <corbet@lwn.net>,  Ulf
+ Hansson <ulf.hansson@linaro.org>,  Rob Herring <robh@kernel.org>,
+  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor Dooley
+ <conor+dt@kernel.org>,  INAGAKI Hiroshi <musashino.open@gmail.com>,
+  Daniel Golle <daniel@makrotopia.org>,  Christian Brauner
+ <brauner@kernel.org>,  Al Viro <viro@zeniv.linux.org.uk>,  Jan Kara
+ <jack@suse.cz>,  Li Lingfeng <lilingfeng3@huawei.com>,  Christian Heusel
+ <christian@heusel.eu>,  linux-block@vger.kernel.org,
+  linux-doc@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-mmc@vger.kernel.org,  devicetree@vger.kernel.org,  Miquel Raynal
+ <miquel.raynal@bootlin.com>,  Lorenzo Bianconi <lorenzo@kernel.org>,
+  upstream@airoha.com
+Subject: Re: [PATCH v3 3/4] block: add support for partition table defined
+ in OF
+In-Reply-To: <20240929140713.6883-4-ansuelsmth@gmail.com> (Christian Marangi's
+	message of "Sun, 29 Sep 2024 16:06:19 +0200")
+References: <20240929140713.6883-1-ansuelsmth@gmail.com>
+	<20240929140713.6883-4-ansuelsmth@gmail.com>
+Date: Mon, 30 Sep 2024 11:21:53 +0200
+Message-ID: <877catlcni.fsf@prevas.dk>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCn28emZ_pmgEUMCw--.63034S7
-X-Coremail-Antispam: 1UD129KBjvdXoWrZF1rCw48AF15Kr43WFWfZrb_yoWkAFg_uF
-	ykCr18XFn3Ja4kArWDAr95ZFW2g3Zaqr10ga48Ja4xZr1aqan5Jay7XrsrKrWxZFWSk3sx
-	J3Z8XrW8AF1FqjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbkxFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWwA2048vs2IY02
-	0Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-	wVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
-	8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
-	xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
-	vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
-	r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04
-	v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7
-	AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE
-	2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcV
-	C2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kfnx
-	nUUI43ZEXa7VUbpwZ7UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain
 
-From: Yu Kuai <yukuai3@huawei.com>
+Christian Marangi <ansuelsmth@gmail.com> writes:
 
-To avoid abuse of bdi_dev_name().
+> diff --git a/block/partitions/of.c b/block/partitions/of.c
+> new file mode 100644
+> index 000000000000..bc6200eb86b3
+> --- /dev/null
+> +++ b/block/partitions/of.c
+> @@ -0,0 +1,151 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#include <linux/blkdev.h>
+> +#include <linux/major.h>
+> +#include <linux/of.h>
+> +#include "check.h"
+> +
+> +#define BOOT0_STR	"boot0"
+> +#define BOOT1_STR	"boot1"
+> +
+> +static struct device_node *get_partitions_node(struct device_node *disk_np,
+> +					       struct gendisk *disk)
+> +{
+> +	const char *node_name = "partitions";
+> +
+> +	/*
+> +	 * JEDEC specification 4.4 for eMMC introduced 3 additional partition
+> +	 * present on every eMMC. These additional partition are always hardcoded
+> +	 * from the eMMC driver as boot0, boot1 and rpmb. While rpmb is used to
+> +	 * store keys and exposed as a char device, the other 2 are exposed as
+> +	 * real separate disk with the boot0/1 appended to the disk name.
+> +	 *
+> +	 * Here we parse the disk_name in search for such suffix and select
+> +	 * the correct partition node.
+> +	 */
+> +	if (disk->major == MMC_BLOCK_MAJOR) {
+> +		const char *disk_name = disk->disk_name;
+> +
+> +		if (!memcmp(disk_name + strlen(disk_name) - strlen(BOOT0_STR),
+> +			    BOOT0_STR, sizeof(BOOT0_STR)))
+> +			node_name = "partitions-boot0";
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
+If strlen(disk_name) is less than 5 (and I don't know if that's actually
+possible), this well end up doing out-of-bounds access.
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 6943ec720f39..35d86d7570c5 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1381,15 +1381,8 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
- 			 int off)
- {
- 	struct throtl_grp *tg = pd_to_tg(pd);
--	const char *dname = blkg_dev_name(pd->blkg);
--	u64 bps_dft;
--	unsigned int iops_dft;
--
--	if (!dname)
--		return 0;
--
--	bps_dft = U64_MAX;
--	iops_dft = UINT_MAX;
-+	u64 bps_dft = U64_MAX;
-+	unsigned int iops_dft = UINT_MAX;
- 
- 	if (tg->bps[READ] == bps_dft &&
- 	    tg->bps[WRITE] == bps_dft &&
-@@ -1397,7 +1390,9 @@ static u64 tg_prfill_limit(struct seq_file *sf, struct blkg_policy_data *pd,
- 	    tg->iops[WRITE] == iops_dft)
- 		return 0;
- 
--	seq_printf(sf, "%s", dname);
-+	if (!blkg_print_dev_name(sf, pd->blkg))
-+		return 0;
-+
- 	if (tg->bps[READ] == U64_MAX)
- 		seq_printf(sf, " rbps=max");
- 	else
--- 
-2.39.2
+We have a strstarts() helper, could you also add a strends() helper that
+handles this correctly? Something like
 
+/**
+ * strends - does @str end with @suffix?
+ * @str: string to examine
+ * @suffix: suffix to look for.
+ */
+static inline bool strends(const char *str, const char *suffix)
+{
+	size_t n = strlen(str);
+        size_t m = strlen(suffix);
+        return n >= m && !memcmp(str + n - m, suffix, m);
+}
+
+[or name it str_has_suffix() or str_ends_with(), "strends" is not
+particularly readable, it's unfortunate that the existing strstarts is
+spelled like that].
+
+Rasmus
