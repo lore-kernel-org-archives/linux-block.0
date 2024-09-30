@@ -1,146 +1,208 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C631CFA9;
-	Mon, 30 Sep 2024 15:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A071919047D;
+	Mon, 30 Sep 2024 15:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727708775; cv=none; b=hkbSrfGM4ERETF6ipFxqiPfKA9SR7q0GH148P8owfwV3TrfJ1TyhvIv1wAZFTdBvy6ZNQfZ7iKaEcT5oA5S8NnvvOgPWEqOzhj/DBcd6s6x+y4VA5Ke+/xm/fPkud2eEeHHGK3iZ3DoPQD1R47xPPR7Hb2C/GIRB1Kxg7/u9aAE=
+	t=1727711721; cv=none; b=Miy/ksDTnr65zTUkh0ARmYa+fEIS451Dl8Bt8gpq8NWpu5F8nDJymXwjXBAOs7Ajn8IyymrzS0MyMTbjrmsGFF22pbOmeqY1AhpalIbeq6kb3iTYhxtLBa8u+hZExDfdfE67KsYSOcVFveO3LqqM38FstxanHvlMiPOfbwcbG6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727708775; c=relaxed/simple;
-	bh=ngCu/hMHjH84wDb0iV2Bzjsfq89LHQRH4viM11PNXYo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YD+cmAJlUynjpnNl1uSONRbiKrhdKqwvB4lxQM8MhirdKioAVrCbCGQjByNHuaUPnIpHdaTfbUgsrZgVi/F62UkZwAqPO1aWayaVJXvPFywvhiKluokOb5NerTYlXNPfh1Vnl2R73Oa8eSbQADjB6zvQR7mqgbtHBLQFrFc56KU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BPnuoTkA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727711721; c=relaxed/simple;
+	bh=mGAviq9lJYc+MOYHPo9IYVaqS8V8iDe5erw2ZUSak64=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xtq47mFUJZMQbPAoa6zu0IqfK79wwqOlQVGdUjVzjfb6NwXkrJO8vggLqepx+GZft4AGFgUSdbENp3JHpgrYEAMLrup/b1NiuVRIDCPl6gNNJDDeEDeXEnE4eT2edsFZVtBVuGi9VthLNK59suad5ufjK8Kx0mnaM+omciQ8/So=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bjU1I9+i; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BPnuoTkA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 271CCC4AF09;
-	Mon, 30 Sep 2024 15:06:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bjU1I9+i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 193D2C4CECF;
+	Mon, 30 Sep 2024 15:55:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727708775;
-	bh=ngCu/hMHjH84wDb0iV2Bzjsfq89LHQRH4viM11PNXYo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=BPnuoTkAce+HKTSoE8Qp66fgPmktDejNE4T3tbLfm7TfARmdTwqETAJusVUY84CRl
-	 AgpYBe2bWwq6xxOfyrarjllBWu9xrjK3B8vWhdvB8Gs+9xkpckQTZIhNQbyJvbclwu
-	 yDwK/jMFl5tvNSwRpwZEqbo12IgmYIFhAQqGiafyvb4jFQ262K2Mjqnk+bEA/qSiKf
-	 bC6lvFBj5fbirWrZAq5lBMTUnaVhilwvEO76YtRLGS8aB9DT8jVjkzFWf2oLTDfE5o
-	 pqOBYgMufHFLI67iRLMvFxcpC4qAUtP62n/EjPPmJ8aHPgIzMu9Bzdr1BmAbjJYDU5
-	 Gs69Q6O4lf4bQ==
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3e03c736466so2857419b6e.1;
-        Mon, 30 Sep 2024 08:06:15 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU8CGaicK8vdI0s0c4xABVTqGIGqNGrkWu1h4DgFO7mF6nUP1sFafKG+pl8oh3+HK016O7IFqsbpA==@vger.kernel.org, AJvYcCVAuf9uk15VrANfxzzaztSWutluOih75962c9STEzU9MqAlKOjx0gKPdeLk4X1ISncpYPT0gkWL2YcQLMho@vger.kernel.org, AJvYcCXifemE0chBDjVLecReFcHl8Y3i7RnQa6wRgV+hi9OSNrOSN1BYebLaCGRFHZapUSSoTyV+I48ONwz1o/I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYwOroSoJtVupTojvwqsuWyY1+Wu+LLIxg+PSlHuAnj0GxEK2G
-	T/Cz+Mx/sLkSzwlPmTnheVlq71k4poN6T1GWt2E1pYuexUoPifmJD6GlhT87ufdzMHEtkylz3/O
-	V5ezYwx8ukiWeTMd68AZNdYKA18w=
-X-Google-Smtp-Source: AGHT+IHN/VxcDlbpcWnreYOVCjZ9Xx5U1zGFEV2WvRfWn65plcCQgbQL8OEGiHdwBwPyv3sdav6QuUSzbbrUsT/gLLQ=
-X-Received: by 2002:a05:6871:e491:b0:277:e6f6:b383 with SMTP id
- 586e51a60fabf-28710aad143mr7769921fac.24.1727708774441; Mon, 30 Sep 2024
- 08:06:14 -0700 (PDT)
+	s=k20201202; t=1727711721;
+	bh=mGAviq9lJYc+MOYHPo9IYVaqS8V8iDe5erw2ZUSak64=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bjU1I9+imGGtceFBhpenmYqvQS2L/9hPWauneuIJgQfsnjOjtkwUVyTFZKXfG+4iU
+	 RioNMEoAhqTahTr0r+L6IvxycMaMdOcCitg+luYAlB6KHd76i4UWKCyTy/AhxSW7xk
+	 PX2oFrNmRDfr43HjN+4UpNQmqWeTlzGiH+N9zDuitT55fEWIIcvATPwISM1hk6MOKk
+	 rbFnf1g9fbY8njk18tvGTmGdSOm8dwdq4DRpnU784KOftV5LJVvogXe5qDkXvQNGHF
+	 3KxVKlddILW5JQwPiVIGdsVOdwmBh1C5RVsOWUKu94+0pOjEYvG13wxqxDh21Lil2m
+	 my2ISbfCA80nQ==
+Date: Mon, 30 Sep 2024 08:55:20 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: axboe@kernel.dk, brauner@kernel.org, viro@zeniv.linux.org.uk,
+	jack@suse.cz, dchinner@redhat.com, hch@lst.de, cem@kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	hare@suse.de, martin.petersen@oracle.com,
+	catherine.hoang@oracle.com, mcgrof@kernel.org,
+	ritesh.list@gmail.com, ojaswin@linux.ibm.com
+Subject: Re: [PATCH v6 3/7] fs: iomap: Atomic write support
+Message-ID: <20240930155520.GM21853@frogsfrogsfrogs>
+References: <20240930125438.2501050-1-john.g.garry@oracle.com>
+ <20240930125438.2501050-4-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240905092645.2885200-1-christian.loehle@arm.com> <20240905092645.2885200-3-christian.loehle@arm.com>
-In-Reply-To: <20240905092645.2885200-3-christian.loehle@arm.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Mon, 30 Sep 2024 17:06:03 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0gKeHsvB_Jfja=yYLijhe9_dWSjCaMDtE2isOuJa6dy8w@mail.gmail.com>
-Message-ID: <CAJZ5v0gKeHsvB_Jfja=yYLijhe9_dWSjCaMDtE2isOuJa6dy8w@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/8] cpuidle: Prefer teo over menu governor
-To: Christian Loehle <christian.loehle@arm.com>
-Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, rafael@kernel.org, 
-	peterz@infradead.org, juri.lelli@redhat.com, mingo@redhat.com, 
-	dietmar.eggemann@arm.com, vschneid@redhat.com, vincent.guittot@linaro.org, 
-	Johannes.Thumshirn@wdc.com, adrian.hunter@intel.com, ulf.hansson@linaro.org, 
-	bvanassche@acm.org, andres@anarazel.de, asml.silence@gmail.com, 
-	linux-block@vger.kernel.org, io-uring@vger.kernel.org, qyousef@layalina.io, 
-	dsmythies@telus.net, axboe@kernel.dk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240930125438.2501050-4-john.g.garry@oracle.com>
 
-On Thu, Sep 5, 2024 at 11:27=E2=80=AFAM Christian Loehle
-<christian.loehle@arm.com> wrote:
->
-> Since menu no longer has the interactivity boost teo works better
-> overall, so make it the default.
->
-> Signed-off-by: Christian Loehle <christian.loehle@arm.com>
-
-I know that this isn't strictly related to the use of iowait in menu,
-but I'd rather wait with this one until the previous change in menu
-settles down.
-
-Also it would be good to provide some numbers to support the "teo
-works better overall" claim above.
-
+On Mon, Sep 30, 2024 at 12:54:34PM +0000, John Garry wrote:
+> Support direct I/O atomic writes by producing a single bio with REQ_ATOMIC
+> flag set.
+> 
+> Initially FSes (XFS) should only support writing a single FS block
+> atomically.
+> 
+> As with any atomic write, we should produce a single bio which covers the
+> complete write length.
+> 
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
 > ---
->  drivers/cpuidle/Kconfig          | 5 +----
->  drivers/cpuidle/governors/menu.c | 2 +-
->  drivers/cpuidle/governors/teo.c  | 2 +-
->  3 files changed, 3 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/cpuidle/Kconfig b/drivers/cpuidle/Kconfig
-> index cac5997dca50..ae67a464025a 100644
-> --- a/drivers/cpuidle/Kconfig
-> +++ b/drivers/cpuidle/Kconfig
-> @@ -5,7 +5,7 @@ config CPU_IDLE
->         bool "CPU idle PM support"
->         default y if ACPI || PPC_PSERIES
->         select CPU_IDLE_GOV_LADDER if (!NO_HZ && !NO_HZ_IDLE)
-> -       select CPU_IDLE_GOV_MENU if (NO_HZ || NO_HZ_IDLE) && !CPU_IDLE_GO=
-V_TEO
-> +       select CPU_IDLE_GOV_TEO if (NO_HZ || NO_HZ_IDLE) && !CPU_IDLE_GOV=
-_MENU
->         help
->           CPU idle is a generic framework for supporting software-control=
-led
->           idle processor power management.  It includes modular cross-pla=
-tform
-> @@ -30,9 +30,6 @@ config CPU_IDLE_GOV_TEO
->           This governor implements a simplified idle state selection meth=
-od
->           focused on timer events and does not do any interactivity boost=
-ing.
->
-> -         Some workloads benefit from using it and it generally should be=
- safe
-> -         to use.  Say Y here if you are not happy with the alternatives.
-> -
->  config CPU_IDLE_GOV_HALTPOLL
->         bool "Haltpoll governor (for virtualized systems)"
->         depends on KVM_GUEST
-> diff --git a/drivers/cpuidle/governors/menu.c b/drivers/cpuidle/governors=
-/menu.c
-> index 28363bfa3e4c..c0ae5e98d6f1 100644
-> --- a/drivers/cpuidle/governors/menu.c
-> +++ b/drivers/cpuidle/governors/menu.c
-> @@ -508,7 +508,7 @@ static int menu_enable_device(struct cpuidle_driver *=
-drv,
->
->  static struct cpuidle_governor menu_governor =3D {
->         .name =3D         "menu",
-> -       .rating =3D       20,
-> +       .rating =3D       19,
->         .enable =3D       menu_enable_device,
->         .select =3D       menu_select,
->         .reflect =3D      menu_reflect,
-> diff --git a/drivers/cpuidle/governors/teo.c b/drivers/cpuidle/governors/=
-teo.c
-> index f2992f92d8db..6c3cc39f285d 100644
-> --- a/drivers/cpuidle/governors/teo.c
-> +++ b/drivers/cpuidle/governors/teo.c
-> @@ -537,7 +537,7 @@ static int teo_enable_device(struct cpuidle_driver *d=
-rv,
->
->  static struct cpuidle_governor teo_governor =3D {
->         .name =3D         "teo",
-> -       .rating =3D       19,
-> +       .rating =3D       20,
->         .enable =3D       teo_enable_device,
->         .select =3D       teo_select,
->         .reflect =3D      teo_reflect,
-> --
-> 2.34.1
->
+> Maybe we should also enforce that a mapping is in written state, as it
+> avoids issues later with forcealign and writing mappings which cover
+> multiple extents in different written/unwritten state.
+> 
+>  fs/iomap/direct-io.c  | 26 +++++++++++++++++++++++---
+>  fs/iomap/trace.h      |  3 ++-
+>  include/linux/iomap.h |  1 +
+>  3 files changed, 26 insertions(+), 4 deletions(-)
+> 
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index f637aa0706a3..9401c05cd2c0 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -271,7 +271,7 @@ static int iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
+>   * clearing the WRITE_THROUGH flag in the dio request.
+>   */
+>  static inline blk_opf_t iomap_dio_bio_opflags(struct iomap_dio *dio,
+> -		const struct iomap *iomap, bool use_fua)
+> +		const struct iomap *iomap, bool use_fua, bool atomic)
+>  {
+>  	blk_opf_t opflags = REQ_SYNC | REQ_IDLE;
+>  
+> @@ -283,6 +283,8 @@ static inline blk_opf_t iomap_dio_bio_opflags(struct iomap_dio *dio,
+>  		opflags |= REQ_FUA;
+>  	else
+>  		dio->flags &= ~IOMAP_DIO_WRITE_THROUGH;
+> +	if (atomic)
+> +		opflags |= REQ_ATOMIC;
+>  
+>  	return opflags;
+>  }
+> @@ -293,7 +295,8 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
+>  	const struct iomap *iomap = &iter->iomap;
+>  	struct inode *inode = iter->inode;
+>  	unsigned int fs_block_size = i_blocksize(inode), pad;
+> -	loff_t length = iomap_length(iter);
+> +	const loff_t length = iomap_length(iter);
+> +	bool atomic = iter->flags & IOMAP_ATOMIC;
+>  	loff_t pos = iter->pos;
+>  	blk_opf_t bio_opf;
+>  	struct bio *bio;
+> @@ -303,6 +306,9 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
+>  	size_t copied = 0;
+>  	size_t orig_count;
+>  
+> +	if (atomic && (length != fs_block_size))
+> +		return -EINVAL;
+> +
+>  	if ((pos | length) & (bdev_logical_block_size(iomap->bdev) - 1) ||
+>  	    !bdev_iter_is_aligned(iomap->bdev, dio->submit.iter))
+>  		return -EINVAL;
+> @@ -382,7 +388,7 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
+>  	 * can set up the page vector appropriately for a ZONE_APPEND
+>  	 * operation.
+>  	 */
+> -	bio_opf = iomap_dio_bio_opflags(dio, iomap, use_fua);
+> +	bio_opf = iomap_dio_bio_opflags(dio, iomap, use_fua, atomic);
+>  
+>  	nr_pages = bio_iov_vecs_to_alloc(dio->submit.iter, BIO_MAX_VECS);
+>  	do {
+> @@ -415,6 +421,17 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
+>  		}
+>  
+>  		n = bio->bi_iter.bi_size;
+> +		if (atomic && n != length) {
+> +			/*
+> +			 * This bio should have covered the complete length,
+> +			 * which it doesn't, so error. We may need to zero out
+> +			 * the tail (complete FS block), similar to when
+> +			 * bio_iov_iter_get_pages() returns an error, above.
+> +			 */
+> +			ret = -EINVAL;
+> +			bio_put(bio);
+> +			goto zero_tail;
+> +		}
+>  		if (dio->flags & IOMAP_DIO_WRITE) {
+>  			task_io_account_write(n);
+>  		} else {
+> @@ -598,6 +615,9 @@ __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+>  	if (iocb->ki_flags & IOCB_NOWAIT)
+>  		iomi.flags |= IOMAP_NOWAIT;
+>  
+> +	if (iocb->ki_flags & IOCB_ATOMIC)
+> +		iomi.flags |= IOMAP_ATOMIC;
+> +
+>  	if (iov_iter_rw(iter) == READ) {
+>  		/* reads can always complete inline */
+>  		dio->flags |= IOMAP_DIO_INLINE_COMP;
+> diff --git a/fs/iomap/trace.h b/fs/iomap/trace.h
+> index 0a991c4ce87d..4118a42cdab0 100644
+> --- a/fs/iomap/trace.h
+> +++ b/fs/iomap/trace.h
+> @@ -98,7 +98,8 @@ DEFINE_RANGE_EVENT(iomap_dio_rw_queued);
+>  	{ IOMAP_REPORT,		"REPORT" }, \
+>  	{ IOMAP_FAULT,		"FAULT" }, \
+>  	{ IOMAP_DIRECT,		"DIRECT" }, \
+> -	{ IOMAP_NOWAIT,		"NOWAIT" }
+> +	{ IOMAP_NOWAIT,		"NOWAIT" }, \
+> +	{ IOMAP_ATOMIC,		"ATOMIC" }
+>  
+>  #define IOMAP_F_FLAGS_STRINGS \
+>  	{ IOMAP_F_NEW,		"NEW" }, \
+> diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+> index 4ad12a3c8bae..c7644bdcfca3 100644
+> --- a/include/linux/iomap.h
+> +++ b/include/linux/iomap.h
+> @@ -178,6 +178,7 @@ struct iomap_folio_ops {
+>  #else
+>  #define IOMAP_DAX		0
+>  #endif /* CONFIG_FS_DAX */
+> +#define IOMAP_ATOMIC		(1 << 9)
+
+This new flag needs a documentation update.  What do you think of this?
+
+diff --git a/Documentation/filesystems/iomap/operations.rst b/Documentation/filesystems/iomap/operations.rst
+index 8e6c721d23301..279db993be7fa 100644
+--- a/Documentation/filesystems/iomap/operations.rst
++++ b/Documentation/filesystems/iomap/operations.rst
+@@ -513,6 +513,16 @@ IOMAP_WRITE`` with any combination of the following enhancements:
+    if the mapping is unwritten and the filesystem cannot handle zeroing
+    the unaligned regions without exposing stale contents.
+ 
++ * ``IOMAP_ATOMIC``: This write must be persisted in its entirety or
++   not at all.
++   The write must not be split into multiple I/O requests.
++   The file range to write must be aligned to satisfy the requirements
++   of both the filesystem and the underlying block device's atomic
++   commit capabilities.
++   If filesystem metadata updates are required (e.g. unwritten extent
++   conversion or copy on write), all updates for the entire file range
++   must be committed atomically as well.
++
+ Callers commonly hold ``i_rwsem`` in shared or exclusive mode before
+ calling this function.
+ 
+--D
+
+>  
+>  struct iomap_ops {
+>  	/*
+> -- 
+> 2.31.1
+> 
+> 
