@@ -1,61 +1,61 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E6121105;
-	Mon, 30 Sep 2024 10:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A7518BB8E;
+	Mon, 30 Sep 2024 10:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727691707; cv=none; b=Ym6GUHJSFkQ5OEQyiB03ojPvPWDfZ/QTpynfs2R45Poz3oW/+wbypyEbqa8PHq+1SSfP8hGUcyqIdo3vWQAZpTKTTEghw8qan5IHxM+0ZsxOM//nRB9GIlyJhPwLlJdNMfIhHKaISZjtg3emiXmnxXlae481lxT4MIi3LXVkrnc=
+	t=1727693303; cv=none; b=W2QjFvK6X6vzGeZeRh5MlAc+Craih5CkoRHM0lYYPus4QZ+DyvR3V4z04admQniaZ//lipv80YlwBS507NXtm7WKYy+Szkw81bEYdZ4KGR9mE8Gu8chlqpZrRgN9C5KdAR5mjov/mdy42Z5dCe/ZN+DTSUVhWv5Syonz6l9/aQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727691707; c=relaxed/simple;
-	bh=s1nABlC6VoIzuxImvl5KvjJPRPxfq/8aAumnJsCyWx4=;
+	s=arc-20240116; t=1727693303; c=relaxed/simple;
+	bh=A1QdosurTp0ef+7RMeZEr38JQEYF3lsGB4Pabjonqys=;
 	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jxX0xcXv1GIy23hsw59kmR0Qgb0xeVF9fPUBKyq2j4whiKGq2JKF/Cq8GSCpRbQZM2Kel779f24YK8WIdOFYRngbjvxbjMssbtA5kkbQWdRpn4SqWVmN1Wc6qar6bakoIsDP6ELdaUEzphlO/StyttxWACBS43hJhfpetaLrVM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OsGq1bFY; arc=none smtp.client-ip=209.85.128.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=S/jiPelI4Hhf7EqM20y/ppVjG1XRgd1D3tTd5EFtnf8VvqsQrB3RQZYT8IMK8Kg87ugDOf7GXv2B2Mc+43aZLqjLYCf3HMTkkv6WKrD6jtVdptMb6VuIKCb7bfNFLqv/xSmHT00k7EO5h1c3nScJdqXQvTvVMXxKXIVze+MUrNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bnlzcv0C; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OsGq1bFY"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-42cafda818aso40143895e9.2;
-        Mon, 30 Sep 2024 03:21:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bnlzcv0C"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2faccccbca7so7512001fa.2;
+        Mon, 30 Sep 2024 03:48:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727691703; x=1728296503; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727693299; x=1728298099; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:subject:cc
          :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=e1ty5pIk+oIg+yfM6En9ullK2BdDadhpV6rFAeaR270=;
-        b=OsGq1bFYgqmTUOjb/C8fsNzvCqpOMCURbLZ8ffZMW9XDQbRLc5vkN18mtiiBfE5o4L
-         qEmCecgyMMvs/nFgj/poV4oBhOGVsy7xXkSK6DXST7ji6pz94C3BMDPvDjXLH6MbwE69
-         HwmlHb5sQzgN3aAfk3pVNDe4YnEhVKNa/6j8vlnC8BRu1/FailNwS0toa6VLRhEVj2HH
-         dj1ifOv3eAct6JgcNKevtdjwGWI2a29v9aVsd66GnvVKEqv85Peiy7AAUlRomSzkHTIK
-         dlRbQFeLioxFL6pFI1BnCORaP3ik5iSA9n4Ca7lsM3Esf4wMDBEbkyYHS+soT9eakwj0
-         xNLA==
+        bh=wFh8kU+qt/WiTGXVF0NW8orHkyxzKHI7cefqhBGwbUI=;
+        b=Bnlzcv0CwP9He0lberQaVJ17xFrhq6tG/a7NODHXKyejXiW1RvV1aR1XDiSHWSmGWZ
+         03la4hHB3rZMBpIYHTgKarGZETBmBcX8U+rsO035cOrHeklmPUIluZ8/yE+zVcgDbKjS
+         pVckf1pCM6QURrxw2xvmRvMEO58+skozq5cz/c5liHP+QhRb8rp2mBHkPxBxQD6+wo3n
+         +5Mx95EMhzr0j1XRt32ouuO6BJSUwDveCdf+4vevusa3SPRD3+ubW7cCAh51kcuP0d5U
+         6kEvQ2Z9gTFjXLZyqPsT5aifaCogFe/X0MZ5e4im0xQEt1A24oKNR/nDkN4CgxAkpeJ4
+         /4jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727691703; x=1728296503;
+        d=1e100.net; s=20230601; t=1727693299; x=1728298099;
         h=in-reply-to:content-disposition:mime-version:references:subject:cc
          :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e1ty5pIk+oIg+yfM6En9ullK2BdDadhpV6rFAeaR270=;
-        b=r6XvnY49J53VKjlAX2fekiHaJtbvrBAYg/Wbo/qAxm1/6yg0ORJIWBnb9V38x5WKmU
-         zXeg5tH9Gg0YDtM7ncYk2YIbn1sEJnmDDa6oR0iyFP7hvJfJFDfltK2TvjWnAIQ97Uzb
-         mSrU69Asi2HY80SCnBTMu0eALNtQklaF0EfvhuyCKB1UynytWkMkFjE/eCBp5ncTjeJ5
-         z8OW1o3eFTs9Z2F84lmJ/YmAaZD50MyRFcYlLOz6NjLTLShPotp+1ObAMzHr2nBQl+5V
-         1xOOa8Y4LPABYmDLm50/ZpJZNz3ZllkNlkvbRx7gM3pQjG570/kLnA0umDYIX/mHcGed
-         Fgbw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+ye4K/4DpIWC+0RvFqQrAE9agUygxBQMNyxiCMxhzBZcDlMXyfjojRsXo+49TlJIAVqQZyHrIVhmJ@vger.kernel.org, AJvYcCU5gEGpjDSGeMs90YFOmEC+1Q8D4M2V3DjpwGV7hsAKqvYw0lTx6YffivPFmOSVkc2wOpFeaDENMcXE@vger.kernel.org, AJvYcCUh6esPCU6/yX0Kcd7t68GtPBIhoRtOcSqhaEN2TCBl6o9Xr6twpbgHePKS/bx4Zj8fW+auxhJ589WHQgXN@vger.kernel.org, AJvYcCUsb9G0M28GKrjLuEe9MmHl12IrzrDT9MaGEwgD6UQwocYE6YYvrJx++1iJdMcBdxxAZv0xsir38EM1@vger.kernel.org, AJvYcCWO2684CqQHvtXiZhI9fGxXPnxH6W6PdtAy7A01ge6YIspDI+XQH+qpEXqoKeDgJdeucxfVLH61d7a4/Zk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTSfDHSUxYQm65pHBt8SPXxkJy6bZndCrdQbAz/fmXLIB1pXtr
-	8RdqNfzp7DtcicGFoQJUsBKpokbQM9hb3iQstJG8m4bBHXZMiQ7J
-X-Google-Smtp-Source: AGHT+IFcMNiBxoJLFefp3RHNAM+ysXKbWQ8pSr0I++Vxp8TOI03DlajGb6rdIvwmvCY7iesDvMNFZw==
-X-Received: by 2002:a05:6000:10cd:b0:37c:cec2:23c6 with SMTP id ffacd0b85a97d-37cd5b2d54fmr5115987f8f.57.1727691703301;
-        Mon, 30 Sep 2024 03:21:43 -0700 (PDT)
+        bh=wFh8kU+qt/WiTGXVF0NW8orHkyxzKHI7cefqhBGwbUI=;
+        b=L9TfrZy+B3FVC3iT8zBz//I0378VtVJdOiH5CBlHolInpiQas/Fhog3MlqbaNUMAu8
+         fHfHG9dmPOcOq8NDj/5NUdmit9Exnh7FgT1zGppiuiWgG3MpNSpQibaPinIsjZNBh4Dn
+         BavaCiDWJOLmxofjkdCeQ1Ry86mkJe7DCEQ6S0Ii1ChRnNm8qGrpulde7F4EqFNDgTpY
+         5k6KIZojT7MXvA27du1haDOAR8+6XxNforyeN+vNw/w1A9P4EiWcIA/dFieOmXhE2E4r
+         q5GXLicg6wwf1FIOr6i0eygjwSb0iNBOyfAPql2vUcSDwe7E5q5QbPN/MYrAvoBv265b
+         SKUA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+GUERI8DlelDInDim9Ww/rOgMU9v8dpgL7MayWPu4Vuldpq2+l9L2kt6Y+1s2cj5pappxWEHLhWjRkn4=@vger.kernel.org, AJvYcCUHL77SFvxjOlw5n/yOQrj7DjfEBj/stP3QZoJp9GgkBNGdCYlPPuv3BzNEjQQwwL4XuysTKrfRZsvA@vger.kernel.org, AJvYcCUdvlXtwWHY++MQTGi4ewDIkvAeD6yrYKLvhe59BmPQ8j65sY2C1Q2aShqFE/YrwyhuXoRGEqMZOXCh@vger.kernel.org, AJvYcCVjyfraQFHw3p98u63zmbjQbSygyzQ5MgyHZPjuvsRSiee/Mo0WWKxGn9SOxj84rj/T+5CV0vTCWUk+@vger.kernel.org, AJvYcCXtzEyfPA+9YFFkWlTYnVM6ofmfECMpjmcfB56N9W4k8AxQtKWRJ4G+jJ99bf6+bUMEBbRwbJ8DApfhqKQr@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGXCbaIpvTYNk1vVXlA6xqVOVH9s6UcL+YEoJjGqOZMgbNVBW+
+	IxR0Imwmgtc4BFJzbIjMIY+R8rR/sTTrsa1NP/Dy5+iMsPDVrisU
+X-Google-Smtp-Source: AGHT+IH/V+rGK2bCvCQYKk/IC08xHxURSfbBgJZqxqlIHy8pllnZiZI+dX79uI70VLH/nEeAnsEWuw==
+X-Received: by 2002:a05:651c:19aa:b0:2fa:c46a:eb4c with SMTP id 38308e7fff4ca-2fac46aecb9mr31133321fa.3.1727693299138;
+        Mon, 30 Sep 2024 03:48:19 -0700 (PDT)
 Received: from Ansuel-XPS. (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cd565e21dsm8684448f8f.33.2024.09.30.03.21.42
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f57e1392fsm100666965e9.31.2024.09.30.03.48.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 03:21:42 -0700 (PDT)
-Message-ID: <66fa7bb6.5d0a0220.2dcbde.bf69@mx.google.com>
-X-Google-Original-Message-ID: <Zvp7r_Mml0zcmkcH@Ansuel-XPS.>
-Date: Mon, 30 Sep 2024 12:21:35 +0200
+        Mon, 30 Sep 2024 03:48:18 -0700 (PDT)
+Message-ID: <66fa81f2.050a0220.3358eb.f750@mx.google.com>
+X-Google-Original-Message-ID: <ZvqB64jZL8xhSZzO@Ansuel-XPS.>
+Date: Mon, 30 Sep 2024 12:48:11 +0200
 From: Christian Marangi <ansuelsmth@gmail.com>
-To: Sascha Hauer <s.hauer@pengutronix.de>
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
 Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
 	Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
@@ -74,7 +74,7 @@ Subject: Re: [PATCH v3 3/4] block: add support for partition table defined in
  OF
 References: <20240929140713.6883-1-ansuelsmth@gmail.com>
  <20240929140713.6883-4-ansuelsmth@gmail.com>
- <Zvpd48oOYletv7Ko@pengutronix.de>
+ <877catlcni.fsf@prevas.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,75 +83,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zvpd48oOYletv7Ko@pengutronix.de>
+In-Reply-To: <877catlcni.fsf@prevas.dk>
 
-On Mon, Sep 30, 2024 at 10:14:27AM +0200, Sascha Hauer wrote:
-> Hi Christian,
-> 
-> Thanks for working on this, it will be useful for me as well.
-> Some comments inside.
-> 
-> On Sun, Sep 29, 2024 at 04:06:19PM +0200, Christian Marangi wrote:
-> > Add support for partition table defined in Device Tree. Similar to how
-> > it's done with MTD, add support for defining a fixed partition table in
-> > device tree.
-> > 
-> > A common scenario for this is fixed block (eMMC) embedded devices that
-> > have no MBR or GPT partition table to save storage space. Bootloader
-> > access the block device with absolute address of data.
-> > 
-> > This is to complete the functionality with an equivalent implementation
-> > with providing partition table with bootargs, for case where the booargs
-> > can't be modified and tweaking the Device Tree is the only solution to
-> > have an usabe partition table.
-> > 
-> > The implementation follow the fixed-partitions parser used on MTD
-> > devices where a "partitions" node is expected to be declared with
-> > "fixed-partitions" compatible in the OF node of the disk device
-> > (mmc-card for eMMC for example) and each child node declare a label
-> > and a reg with offset and size. If label is not declared, the node name
-> > is used as fallback. Eventually is also possible to declare the read-only
-> > property to flag the partition as read-only.
-> > 
-> > For eMMC block, driver scan the disk name and check if it's suffixed with
-> > "boot0" or "boot1".
-> > This is to handle the additional disk provided by eMMC as supported in
-> > JEDEC 4.4+. If this suffix is detected, "partitions-boot0" or
-> > "partitions-boot1" are used instead of the generic "partitions" for the
-> > relevant disk.
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> >  block/partitions/Kconfig  |   8 ++
-> >  block/partitions/Makefile |   1 +
-> >  block/partitions/check.h  |   1 +
-> >  block/partitions/core.c   |   3 +
-> >  block/partitions/of.c     | 151 ++++++++++++++++++++++++++++++++++++++
-> >  5 files changed, 164 insertions(+)
-> >  create mode 100644 block/partitions/of.c
-> > 
-> > diff --git a/block/partitions/Kconfig b/block/partitions/Kconfig
-> > index 7aff4eb81c60..8534f7544f26 100644
-> > --- a/block/partitions/Kconfig
-> > +++ b/block/partitions/Kconfig
-> > @@ -270,4 +270,12 @@ config CMDLINE_PARTITION
-> >  	  Say Y here if you want to read the partition table from bootargs.
-> >  	  The format for the command line is just like mtdparts.
-> >  
-> > +config OF_PARTITION
-> > +	bool "Command line partition support" if PARTITION_ADVANCED
-> 
-> Should be "device tree partition support".
-> 
-> > +	depends on OF
-> > +	help
-> > +	  Say Y here if you want to enable support for partition table
-> > +	  defined in Device Tree. (mainly for eMMC)
-> > +	  The format for the command line is just like MTD fixed-partition schema.
-> > +
-> >  endmenu
-> 
-> [...]
+On Mon, Sep 30, 2024 at 11:21:53AM +0200, Rasmus Villemoes wrote:
+> Christian Marangi <ansuelsmth@gmail.com> writes:
 > 
 > > diff --git a/block/partitions/of.c b/block/partitions/of.c
 > > new file mode 100644
@@ -190,175 +125,43 @@ On Mon, Sep 30, 2024 at 10:14:27AM +0200, Sascha Hauer wrote:
 > > +		if (!memcmp(disk_name + strlen(disk_name) - strlen(BOOT0_STR),
 > > +			    BOOT0_STR, sizeof(BOOT0_STR)))
 > > +			node_name = "partitions-boot0";
-> > +		if (!memcmp(disk_name + strlen(disk_name) - strlen(BOOT1_STR),
-> > +			    BOOT1_STR, sizeof(BOOT1_STR)))
-> > +			node_name = "partitions-boot1";
-> > +	}
-> > +
-> > +	return of_get_child_by_name(disk_np, node_name);
-> > +}
-> > +
-> > +static int validate_of_partition(struct device_node *np, int slot)
-> > +{
-> > +	int a_cells, s_cells;
-> > +	const __be32 *reg;
-> > +	u64 offset, size;
-> > +	int len;
-> > +
-> > +	reg = of_get_property(np, "reg", &len);
-> > +
-> > +	a_cells = of_n_addr_cells(np);
-> > +	s_cells = of_n_size_cells(np);
-> > +
 > 
-> The corresponding mtd ofpart parser validates a_cells + s_cells against
-> len, like this:
+> If strlen(disk_name) is less than 5 (and I don't know if that's actually
+> possible), this well end up doing out-of-bounds access.
 > 
-> 	if (len / 4 != a_cells + s_cells) {
-> 		pr_debug("%s: ofpart partition %pOF (%pOF) error parsing reg property.\n",
-> 			 master->name, pp,
-> 			 mtd_node);
-> 		goto ofpart_fail;
-> 	}
+> We have a strstarts() helper, could you also add a strends() helper that
+> handles this correctly? Something like
 > 
-> I think you should do it here as well.
+> /**
+>  * strends - does @str end with @suffix?
+>  * @str: string to examine
+>  * @suffix: suffix to look for.
+>  */
+> static inline bool strends(const char *str, const char *suffix)
+> {
+> 	size_t n = strlen(str);
+>         size_t m = strlen(suffix);
+>         return n >= m && !memcmp(str + n - m, suffix, m);
+> }
 > 
-> > +	/*
-> > +	 * Validate offset conversion from bytes to sectors.
-> > +	 * Only the first partition is allowed to have offset 0.
-> > +	 */
-> 
-> Where is this constraint coming from? I would put the partitions in
-> order into the device tree as well, but the binding doesn't enforce it
-> and I see no reason to do so.
+> [or name it str_has_suffix() or str_ends_with(), "strends" is not
+> particularly readable, it's unfortunate that the existing strstarts is
+> spelled like that].
 >
 
-It's to handle case where offset is 0. But I think I can just check the
-value on validation.
+Nice idea and thanks for checking the problem with the out-of-bounds
+read.
 
-> > +	offset = of_read_number(reg, a_cells);
-> > +	if (do_div(offset, SECTOR_SIZE) ||
-> 
-> How about (offset % SECTOR_SIZE) or (offset & (SECTOR_SIZE - 1))? Might
-> be a bit more intuitive to read.
-> 
+Out of consistency with the unreadable strstarts I'm tempted to use
+strends.
 
-do_div was useful to check the result of the division at the same time
-but now that I think about it, it's not really needed. Checking the % of
-the devision is enough to validate the value are alligned to 512bytes.
+Since checking suffix of a string can't be something that unreal I
+searched for the 3 function name and to my surprise all 3 suggested name
+have a variant of the function statically defined hahaha.
 
-> > +	    (slot > 1 && !offset))
-> > +		return -EINVAL;
-> > +
-> > +	/* Validate size conversion from bytes to sectors */
-> > +	size = of_read_number(reg + a_cells, s_cells);
-> > +	if (do_div(size, SECTOR_SIZE) || !size)
-> > +		return -EINVAL;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static void add_of_partition(struct parsed_partitions *state, int slot,
-> > +			     struct device_node *np)
-> > +{
-> > +	struct partition_meta_info *info;
-> > +	char tmp[sizeof(info->volname) + 4];
-> > +	int a_cells, s_cells;
-> > +	const char *partname;
-> > +	const __be32 *reg;
-> > +	u64 offset, size;
-> > +	int len;
-> > +
-> > +	reg = of_get_property(np, "reg", &len);
-> > +
-> > +	a_cells = of_n_addr_cells(np);
-> > +	s_cells = of_n_size_cells(np);
-> > +
-> > +	/* Convert bytes to sector size */
-> > +	offset = of_read_number(reg, a_cells) / SECTOR_SIZE;
-> > +	size = of_read_number(reg + a_cells, s_cells) / SECTOR_SIZE;
-> > +
-> > +	put_partition(state, slot, offset, size);
-> > +
-> > +	if (of_property_read_bool(np, "read-only"))
-> > +		state->parts[slot].flags |= ADDPART_FLAG_READONLY;
-> > +
-> > +	/*
-> > +	 * Follow MTD label logic, search for label property,
-> > +	 * fallback to node name if not found.
-> > +	 */
-> > +	info = &state->parts[slot].info;
-> > +	partname = of_get_property(np, "label", &len);
-> > +	if (!partname)
-> > +		partname = of_get_property(np, "name", &len);
-> > +	strscpy(info->volname, partname, sizeof(info->volname));
-> > +
-> > +	snprintf(tmp, sizeof(tmp), "(%s)", info->volname);
-> > +	strlcat(state->pp_buf, tmp, PAGE_SIZE);
-> > +}
-> > +
-> > +int of_partition(struct parsed_partitions *state)
-> > +{
-> > +	struct device_node *disk_np, *partitions_np, *np;
-> > +	struct device *ddev = disk_to_dev(state->disk);
-> > +	int slot;
-> > +
-> > +	disk_np = of_node_get(ddev->parent->of_node);
-> > +	if (!disk_np)
-> > +		return 0;
-> > +
-> > +	partitions_np = get_partitions_node(disk_np, state->disk);
-> > +	if (!partitions_np ||
-> > +	    !of_device_is_compatible(partitions_np, "fixed-partitions"))
-> > +		return 0;
-> 
-> of_node_put(disk_np) missing here before return.
-> 
-
-Thjanks forgot about it when I added the compatible check.
-
-> > +
-> > +	/* Check if child are over the limit */
-> > +	slot = of_get_child_count(partitions_np);
-> > +	if (slot >= state->limit)
-> > +		goto err;
-> 
-> Other partition parsers just silently ignore the partitions
-> exceeding state->limit instead of throwing an error. Maybe do the same
-> here?
-> 
-
-Ehhh I didn't understand if this is correct or not. Ok I will follow how
-it's done by the other.
-
-> > +
-> > +	slot = 1;
-> > +	/* Validate parition offset and size */
-> > +	for_each_child_of_node(partitions_np, np) {
-> > +		if (validate_of_partition(np, slot))
-> > +			goto err;
-> > +
-> > +		slot++;
-> > +	}
-> > +
-> > +	slot = 1;
-> > +	for_each_child_of_node(partitions_np, np) {
-> > +		add_of_partition(state, slot, np);
-> > +
-> > +		slot++;
-> > +	}
-> > +
-> > +	strlcat(state->pp_buf, "\n", PAGE_SIZE);
-> > +
-> > +	return 1;
-> > +err:
-> > +	of_node_put(partitions_np);
-> > +	of_node_put(disk_np);
-> 
-> You should put the nodes for the non error case as well.
-> 
-
-ack.
+To not pollute this series I will just introduce the helper but I will
+add on my TODO list to convert the other function to make use of this
+helper instead.
 
 -- 
 	Ansuel
