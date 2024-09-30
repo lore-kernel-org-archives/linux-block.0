@@ -1,57 +1,57 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DFC18E75F;
-	Mon, 30 Sep 2024 11:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4D818E77D;
+	Mon, 30 Sep 2024 11:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727695891; cv=none; b=P9v+zcubvCk4kvhLq2ZiGPhZ+pu7Eg7n+6hueetMP6iDe/7n2dI8Vn94SKYIoAbVRQ/6rspKgtRU8UAUGlr9zsqY0Glw4U9eUY8eUJNy5bd8Wtd6gyOde3x5leBeO3PxlWt43RpltEfSXU1Cf4BqRT0/RU5Yvdrai4ZXYFy47MM=
+	t=1727695892; cv=none; b=LT/P1iwcxEmZ6DVod1iuld+1ni1rQUY+epJws4r4TIHlME6GhWdxQIujMaIKSdelo4nJdWDrst7Xe01y+DhhnJRIQRAYw9/mOt0DBA0HceJPJYdGHbidcb0pabbzF7mffxEl+lVdBjY+xSowiRwVXc2QkACHITBxDlX9lBteFBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727695891; c=relaxed/simple;
-	bh=vIZUmOhkctrpxNjE/bq31Se+xRGgI8VKyz9uNEv0GsQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ibgvoj8/E5Od4nNaSvj94T/SDh854Awhg6ZZZv6uvEzgeLpdkJrj5avK8weLVhZsDjXu0NqwrpjmQSwSJ8YkAZc5vIEXWUezKBoO+fEO7SoYz6uOTYgfJAfKbS9HiRXQ2mSrwREq96eZv2C9FU1nNpSukuMYuMiMj6MWplgnysA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kMFhT0Dj; arc=none smtp.client-ip=209.85.221.52
+	s=arc-20240116; t=1727695892; c=relaxed/simple;
+	bh=AvSpeRPjeVRXz5j8dQKUo3Zt1JFIF3gH9S62HhEmPeo=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=beRXDE1Ymxf7diyDC6ff7lOWw4JzU1v8pCnN1EX+aO8BFjVxvx7iCtqUya/cnVHKjGzQobZfkL9C12KGFRSUNiNvwb+YB3Ooo6UCx9uaHZLhEPd7OA8OXQvadoTDV9eQ52wRmsJCawaqLYeYppEfv7Rsn63/tD/tvPkLAws1lMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/a0EnKb; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kMFhT0Dj"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-37ccfada422so2182403f8f.2;
-        Mon, 30 Sep 2024 04:31:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/a0EnKb"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-42cbbb1727eso37399445e9.2;
+        Mon, 30 Sep 2024 04:31:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727695888; x=1728300688; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727695889; x=1728300689; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4T9c6jNuxQUPP/Rbzo55YkzEPcrdsPIICvkg9bn4/tM=;
-        b=kMFhT0DjXKwlwSbR/Azjgv4oU26ytUskdfREhpyzdOLM8HzGCk123Ztqm1wgZYzjft
-         /ndOYUPBJj8sDxDct2qiUkiAbK4yVqBbPpx6yyyoIVNpqw7SX+AuPL4Eax7gC1NRdHDt
-         FMq0QlZTFiycnTTW6jdRb0blOO58SqZeVBTdgyg4GmRHqn4zieUGABR9ZGg2N8UUJDGq
-         KKfb+CJT84CwM+b+b2LfXvK5AxBrawDhSeUEExC7dEJwRxg6XQGjt8n1ghNFt1tu/9Ny
-         TXlaU0LmMUXbZo29bozLftiL1rFEFK3oB1zMRMhkMX4zN7SDp76uY0EpYNx1qALb84Gg
-         krtg==
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=36HmyHvoEEpKMI8/Stc+TIqGBije17bfud9rEk2jFTM=;
+        b=c/a0EnKbZdvxSjmrJRA/ls80fCwWXFnKgCIRLYUGrCI7Y48B58wn5s+fqFDEbTpy1+
+         4r9bn5RLkf0vVntfGvW1fIVDwvTLFG0G5F0DtSLSy+EsvP0tYq6MB016hSKYSYyxV6PG
+         /0XHkhUvhLha9AU9Jrc7CYvKEGxYjQ2FQ8oQGgxSfZr7JRbOXlur3YenTpA6GIFbF0bz
+         AUpJltRDLiIWHPEj/D8oYkm4GsRlzfztaCIXRi9FXeOi73yFkWLskwNnbRvMMj20wQT2
+         FQ2mbB45FKzByG7aA0Jvjy0mgPz7ERw5PgkgBdIUHSvgIw1+oFCIYrc5xEdmYn/lcMpW
+         IkxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727695888; x=1728300688;
+        d=1e100.net; s=20230601; t=1727695889; x=1728300689;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4T9c6jNuxQUPP/Rbzo55YkzEPcrdsPIICvkg9bn4/tM=;
-        b=r8dbXECdZoHgWaSpQ6mvue3FZdTH+m9F2PT8LMQORO2j38yjCqImKPgFlipn2REHs2
-         Az/NHd4qUCamvD3uHmBEs5jCPw/CXaC+g89/dUA81uIGAAjiqFxhsUut/765Mq7BCAhw
-         idE9xaR+j1ZZy3nS6vkAL5mkxHYME3BiQB5bpQyuagIJ7Hv+YHJ6hK74H6O43JOazhAG
-         eVTgNxWtQlV1Brw5uJAr4jtVwtsJfZFCxpXVvghpD+7YXIa0MNLn3AR+7TjpfW+B+PUo
-         BVY5UrQ9XZMYNVAj4DfbGMX160VCuXwy7bKUdnBJsbbyF7DCbUSesrcP1QmDM/RGN6w5
-         ZVkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUOQ/YOqAXbrzAlCvFpsmDMSvUNoyJX3XkMjO4apWwZXv6QGHDUoZYfa4OXNnOS14pv+h4ORKqTMzQG@vger.kernel.org, AJvYcCUUG4ifDISd+83ZXodkabcfY8/R7srSw9zlT2aYTGMjWJLBP7a474hnTieaYKtTsf3YxAPFpyN1VEt3@vger.kernel.org, AJvYcCUXRE4jM7moSQ30gOwsPFFxkLm766EwjaSLf0p2DYXmZ+Vk8BtqxPKkIfkyi+wPFdEa8y8OA4PLBh29@vger.kernel.org, AJvYcCWuGiOwP3cHg0vxA0LTHs4wv1oc6zvc4tzUgW9LFMa19kl1adCQC32jCvJI54MVVXBwS/SFBQqwZe5lOng=@vger.kernel.org, AJvYcCXO7RUY04RdHBUaL4XDo4K8Vz+NWAQZxrZc/cJmFTXjn9ObFHHmwvx45Y5RhTRtdBSVpSY5iuup88Z/eqXQ@vger.kernel.org, AJvYcCXWdYJaMrFBEtfSnz3PBYeq0QAB+KnZkpr4a3V1/F9ltOUdMde8HnFWdY9gB7cHeqgmmRMcCpZmTXJvTyCQIaB5@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqV5UeuESpw4Llh/wNYpiDy9Uzh36XPJUx8PDpyIBp6icJVEqu
-	VwoVsisT1aTsIM8vvJjO/toZZyCgikHLIvuuTGs0ESNZQ7JpeDn5
-X-Google-Smtp-Source: AGHT+IF9WsH8NhMVUflWW6Q3l/hIjgZVoJvdNgq/QcLbG4GjJGrw9atHk9fPnPJRYuLBLHD7vOmpNg==
-X-Received: by 2002:a5d:5052:0:b0:37c:d537:9dc0 with SMTP id ffacd0b85a97d-37cd5a6bf42mr7699742f8f.12.1727695887712;
-        Mon, 30 Sep 2024 04:31:27 -0700 (PDT)
+        bh=36HmyHvoEEpKMI8/Stc+TIqGBije17bfud9rEk2jFTM=;
+        b=v9fTOmMUeqyX2d2fwVZbvC26cxCnHlf/3q/wrLsx5dYmzAFPA0x9Q9dBr0scwgs275
+         EarGWtvSQodJ9MYMpEk3xrPg4SHxS7qfnXHl56z4WglCFVDXiITi9sUiaGpCb5BXoEnb
+         X5l7ygqART7dw5pPHdpo9COdQi4QsYGxgoULQKMaa7+5Nrwm4VZsAEJOuX+1bWPmxo9V
+         kLmIINf6RCjH5MTE/nIjiOmSiLI+D7NPxCug6f4B7GkNpqQACC8N67ZrJ8tis/SLNi7j
+         z2Pxk+OxDSi+76Rz6LQb/A4TcL4+Wb52xz8nXPV6MOG78H8DSi8Ji+U3sNFNKrfhQChC
+         7Lzw==
+X-Forwarded-Encrypted: i=1; AJvYcCV9ZUnQ00YdUaPN5Nhak7/UVMULlt8CVzjOf2RQspugN0iPNQ+lvDoxNwAFnAK69D31UVLqa9AABLppL1LtJvug@vger.kernel.org, AJvYcCW3BZXp3DQO6fmJj76D/vCeZErAP5hZH/k9GrQfpnk3SDGyxRsXfeMDRzClNQlP4dlXCWga3wCJHPbz@vger.kernel.org, AJvYcCWALLQV7E0p81aSIEtyTowknou/oeCsEOvJbzkQmh3jdQpcpqWXyI9ez5PWN+miR9cLJCoetUo8wvccx7ZR@vger.kernel.org, AJvYcCWmPWEI44w+5qFIShqyqML1X7zv9F4a+1D4qo9+5x8ptUt/JokbuHLRu3QNUDHvNDrPNskAhEBpMdpW@vger.kernel.org, AJvYcCXKU4rTog3pLqoy8nPj0bZSXSjdGy1zAkS5iFAKTo64LLv75vpczJXZUxpWif34Wksvs/YaDirIPSqI0AA=@vger.kernel.org, AJvYcCXm7dOBAfOQYSDqxIJVwTB7Z0WRaGuUVWbhej19UaBQe9mXxst124x4K8As8Jayxz9vL6u5rxrrAqN7@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUnZf2A4fuNn9aC6u+BP6h4mf+Nj0NWTYaOkgZGxHhQEaxn5NX
+	9hx/ExWTmxxYOz7Xglp/0n2AxkiXYwdlkgn/7zkqMUeYC9d8pJLV
+X-Google-Smtp-Source: AGHT+IFdddYiC+jr5F0voSOw4j5kJnXv13mz7EIb2rZwLR4PRKIEIhzvRYwcw5tQ+Q66sYaMUFoqCQ==
+X-Received: by 2002:a05:600c:1f91:b0:42c:bc04:58a5 with SMTP id 5b1f17b1804b1-42f58491434mr93746695e9.33.1727695889210;
+        Mon, 30 Sep 2024 04:31:29 -0700 (PDT)
 Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37cd57427c6sm8889363f8f.96.2024.09.30.04.31.25
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37cd57427c6sm8889363f8f.96.2024.09.30.04.31.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 04:31:26 -0700 (PDT)
+        Mon, 30 Sep 2024 04:31:28 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jonathan Corbet <corbet@lwn.net>,
@@ -78,10 +78,9 @@ To: Jens Axboe <axboe@kernel.dk>,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
 	Lorenzo Bianconi <lorenzo@kernel.org>,
 	upstream@airoha.com
-Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v4 1/5] block: add support for defining read-only partitions
-Date: Mon, 30 Sep 2024 13:30:08 +0200
-Message-ID: <20240930113045.28616-2-ansuelsmth@gmail.com>
+Subject: [PATCH v4 2/5] docs: block: Document support for read-only partition in cmdline part
+Date: Mon, 30 Sep 2024 13:30:09 +0200
+Message-ID: <20240930113045.28616-3-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240930113045.28616-1-ansuelsmth@gmail.com>
 References: <20240930113045.28616-1-ansuelsmth@gmail.com>
@@ -93,58 +92,36 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for defining read-only partitions and complete support for
-it in the cmdline partition parser as the additional "ro" after a
-partition is scanned but never actually applied.
+Document support for read-only partition in cmdline partition for block
+devices by appending "ro" after the (partition name).
 
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk.h                | 1 +
- block/partitions/cmdline.c | 3 +++
- block/partitions/core.c    | 3 +++
- 3 files changed, 7 insertions(+)
+ Documentation/block/cmdline-partition.rst | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk.h b/block/blk.h
-index c718e4291db0..f300212d3e98 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -558,6 +558,7 @@ void blk_free_ext_minor(unsigned int minor);
- #define ADDPART_FLAG_NONE	0
- #define ADDPART_FLAG_RAID	1
- #define ADDPART_FLAG_WHOLEDISK	2
-+#define ADDPART_FLAG_READONLY	4
- int bdev_add_partition(struct gendisk *disk, int partno, sector_t start,
- 		sector_t length);
- int bdev_del_partition(struct gendisk *disk, int partno);
-diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
-index 152c85df92b2..da3e719d8e51 100644
---- a/block/partitions/cmdline.c
-+++ b/block/partitions/cmdline.c
-@@ -237,6 +237,9 @@ static int add_part(int slot, struct cmdline_subpart *subpart,
- 	put_partition(state, slot, subpart->from >> 9,
- 		      subpart->size >> 9);
+diff --git a/Documentation/block/cmdline-partition.rst b/Documentation/block/cmdline-partition.rst
+index 530bedff548a..526ba201dddc 100644
+--- a/Documentation/block/cmdline-partition.rst
++++ b/Documentation/block/cmdline-partition.rst
+@@ -39,13 +39,16 @@ blkdevparts=<blkdev-def>[;<blkdev-def>]
+     create a link to block device partition with the name "PARTNAME".
+     User space application can access partition by partition name.
  
-+	if (subpart->flags & PF_RDONLY)
-+		state->parts[slot].flags |= ADDPART_FLAG_READONLY;
++ro
++    read-only. Flag the partition as read-only.
 +
- 	info = &state->parts[slot].info;
+ Example:
  
- 	strscpy(info->volname, subpart->name, sizeof(info->volname));
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index ab76e64f0f6c..abad6c83db8f 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -373,6 +373,9 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
- 			goto out_del;
- 	}
+     eMMC disk names are "mmcblk0" and "mmcblk0boot0".
  
-+	if (flags & ADDPART_FLAG_READONLY)
-+		bdev_set_flag(bdev, BD_READ_ONLY);
-+
- 	/* everything is up and running, commence */
- 	err = xa_insert(&disk->part_tbl, partno, bdev, GFP_KERNEL);
- 	if (err)
+   bootargs::
+ 
+-    'blkdevparts=mmcblk0:1G(data0),1G(data1),-;mmcblk0boot0:1m(boot),-(kernel)'
++    'blkdevparts=mmcblk0:1G(data0),1G(data1),-;mmcblk0boot0:1m(boot)ro,-(kernel)'
+ 
+   dmesg::
+ 
 -- 
 2.45.2
 
