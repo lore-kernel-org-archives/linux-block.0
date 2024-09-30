@@ -1,314 +1,201 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667EA199E93
-	for <linux-block@vger.kernel.org>; Mon, 30 Sep 2024 18:21:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F033D17BEB7;
+	Mon, 30 Sep 2024 20:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727720470; cv=none; b=Fjde2TRLhoWHVagVvy1eayzWLU5g5uNoQ6huKlKONQG2y51EgWwE6KvppJmYUVEPcpb8ph05DmrSl3qUGpq2qXApwff4+JROZDGuGxVCsLiyUzCMciil1sDrY3xbDYMNUdwXlrlAVe4XBlysiDaT0AAl6EbLeAZU8433ojFTDh0=
+	t=1727728554; cv=none; b=HcfWWlXUzB0DFwoIgunRX+hIMw+ulox3757AFh5QgUwe2I437I1vWASvZV2xbKS277mOGBfaOS4VASZDWurTr1NAtO8YbAt/ZGm//s3uHswtEz4dWvY45dobbs4jXGODw2Q9234I2K5DPhRbkb4XkQqjnEnWP/OG+0jMxrGDoos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727720470; c=relaxed/simple;
-	bh=WMXM6grgrfQu3eqcKrunC0fA5XqYfx91KUbAlUnvoPo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=uYYP5JVrFtx6uwgE913+NVaE7t0LeAk/0U3hJXylDzeY8J9g9paB/XcIJRbLGtF3j4xi0MCpvXc43xzPhG4vMrNnayqSxyXy02AdLffW2YD97VOKKH6WAS2n9/P88MmNWwlM+KgnaN0uPrpYKLG+bh948tGJpsObnk/Cfx797us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=QsHPA+I/; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1727728554; c=relaxed/simple;
+	bh=ZhM5xPUfYNbchBISZZvzM6P6dwshGNX0e5Ob6ktp4L8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ooeNqsLVQ92mXxNSRy5418+rCQAaQf+MRff5SiW95sVHLfBPS4yP45HZh7ySSegMW6hawRu3Y/oI8UNU+K1eIjOqGM9J8/UOFYLPPnm/Of8qkJeS3RhEO3JnX3QsdzBfS+MWDr2xkLSo85Kndhw1tELC6qLaVYz43cEOH0xhhM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gts4qvFq; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="QsHPA+I/"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20240930182106epoutp03938cdc1ced7960dc3c49dfe1875659d4~6GJw9ZQYv1782417824epoutp03G
-	for <linux-block@vger.kernel.org>; Mon, 30 Sep 2024 18:21:06 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20240930182106epoutp03938cdc1ced7960dc3c49dfe1875659d4~6GJw9ZQYv1782417824epoutp03G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1727720466;
-	bh=i2W31PSDLoXfDAIGVqVKpmMhkKotr8fjX0j5n03WZq8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QsHPA+I/QTBw7l8n7nxWCl2wIhOubxu9YLtUz9UhKWuRiF9vhY2n5mZlXz4zXXnSx
-	 XXqCt6hLjX6mmjoEJ9MvdNZp60FNPVJ6/fnkHxixASo4rQO2RIADuexzqVJu7feC7W
-	 x58eX3Vftk7OorkD2vBE0GaVD4dLG2+dH9YF5Kmo=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20240930182105epcas5p1fb18814d8840786678374931f0f92e5d~6GJwXLI273030330303epcas5p1P;
-	Mon, 30 Sep 2024 18:21:05 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.175]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4XHTsX0Pwjz4x9Pp; Mon, 30 Sep
-	2024 18:21:04 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	81.F6.18935.F0CEAF66; Tue,  1 Oct 2024 03:21:03 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20240930182103epcas5p4c9e91ca3cdf20e900b1425ae45fef81d~6GJuPNzpG2069720697epcas5p4T;
-	Mon, 30 Sep 2024 18:21:03 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240930182103epsmtrp225c56587c62c66cc2420497c3a7c41b0~6GJuNAoh_2734327343epsmtrp2p;
-	Mon, 30 Sep 2024 18:21:03 +0000 (GMT)
-X-AuditID: b6c32a50-a99ff700000049f7-74-66faec0f0586
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	B4.29.07371.F0CEAF66; Tue,  1 Oct 2024 03:21:03 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240930182100epsmtip2e761add8ecf8f9113294676db34a2524~6GJrCcr9X2505325053epsmtip2N;
-	Mon, 30 Sep 2024 18:20:59 +0000 (GMT)
-From: Kanchan Joshi <joshi.k@samsung.com>
-To: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, hare@suse.de,
-	sagi@grimberg.me, martin.petersen@oracle.com, brauner@kernel.org,
-	viro@zeniv.linux.org.uk, jack@suse.cz, jaegeuk@kernel.org, bcrl@kvack.org,
-	dhowells@redhat.com, bvanassche@acm.org, asml.silence@gmail.com
-Cc: linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-block@vger.kernel.org, linux-aio@kvack.org,
-	gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com, Kanchan
-	Joshi <joshi.k@samsung.com>, Nitesh Shetty <nj.shetty@samsung.com>
-Subject: [PATCH v7 3/3] io_uring: enable per-io hinting capability
-Date: Mon, 30 Sep 2024 23:43:05 +0530
-Message-Id: <20240930181305.17286-4-joshi.k@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240930181305.17286-1-joshi.k@samsung.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gts4qvFq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727728553; x=1759264553;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=ZhM5xPUfYNbchBISZZvzM6P6dwshGNX0e5Ob6ktp4L8=;
+  b=Gts4qvFqzzf+nCGf8iqRY//9l0pYVkQiJ1FDRcIoYUtuL9gbAplygRNB
+   od995AIqYug3bZ7Gp2YA38mnnvELDtoxceITHKxrP0LXl4tNCZwTZFA8V
+   ltXtyUzHmLrzZnfC7Rux8POmmKJlZ8U0TTudTFA/p9xgknDWeffWRXLNp
+   Gh7/D6gfsUFv6xRvmnwB559u/iTWNKFpHhHgzBR1/Vl7lvmsFq8dy4+wc
+   d7XbPBnzPGwZHNeF4Q4JSRa53DF5y+qmDl8B2Qm0395SuAF+enPlL4iVA
+   GskSHU/+sXJrt7TA4JYWPFBgvG+mTLyEp7k139RtD1/tgYI7nFqomnbB5
+   g==;
+X-CSE-ConnectionGUID: k4hU7PHPQKOtoDGyKGLJ0Q==
+X-CSE-MsgGUID: cdNQutrWSFu4Zy3vEKNSxw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11211"; a="27015650"
+X-IronPort-AV: E=Sophos;i="6.11,166,1725346800"; 
+   d="scan'208";a="27015650"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 13:35:26 -0700
+X-CSE-ConnectionGUID: mCndPb4cSxe1tsWd0dSacg==
+X-CSE-MsgGUID: k+nXGbSLQ7m1pH92QfsDxw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,166,1725346800"; 
+   d="scan'208";a="78392383"
+Received: from spandruv-desk1.amr.corp.intel.com ([10.125.108.137])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 13:35:26 -0700
+Message-ID: <0a0186cad5a9254027d0ac6a7f39e39f5473665c.camel@linux.intel.com>
+Subject: Re: [RFC PATCH 6/8] cpufreq: intel_pstate: Remove iowait boost
+From: srinivas pandruvada <srinivas.pandruvada@linux.intel.com>
+To: "Rafael J. Wysocki" <rafael@kernel.org>, Christian Loehle
+	 <christian.loehle@arm.com>
+Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ peterz@infradead.org, juri.lelli@redhat.com, mingo@redhat.com, 
+ dietmar.eggemann@arm.com, vschneid@redhat.com, vincent.guittot@linaro.org, 
+ Johannes.Thumshirn@wdc.com, adrian.hunter@intel.com,
+ ulf.hansson@linaro.org,  bvanassche@acm.org, andres@anarazel.de,
+ asml.silence@gmail.com,  linux-block@vger.kernel.org,
+ io-uring@vger.kernel.org, qyousef@layalina.io,  dsmythies@telus.net,
+ axboe@kernel.dk
+Date: Mon, 30 Sep 2024 13:35:25 -0700
+In-Reply-To: <CAJZ5v0i3ULQ-Mzu=6yzo4whnWne0g1sxcgPL_u828Jyy1Qu1Zg@mail.gmail.com>
+References: <20240905092645.2885200-1-christian.loehle@arm.com>
+	 <20240905092645.2885200-7-christian.loehle@arm.com>
+	 <CAJZ5v0i3ULQ-Mzu=6yzo4whnWne0g1sxcgPL_u828Jyy1Qu1Zg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Te1BUVRzm3Hv3AblyW1BOS7HbCjbALOwm4FkHspCBO0oT5tSM1Qzt7F4e
-	7bK77SOpDAiElEnkFcpi4QPbhDHkIaKyZkvE4Gs1sFgIXF4zJgIKiCFC7bJY/vf9fuf7zne+
-	35kfG+fms3jsdLWB1qllKiHTi2hpDw4Red97nCLuL9iEDte2AFQ3cICJCpeaCTTePg1Qxf15
-	HE3mLhDIfukchtqOlWLoZF0HhibzrxOo6mAehkbrTTga+XOGhTr+mWCiUuvvAJVX5AJk6QtF
-	bZYuAlV/P8ZC5s4lDLUsVOPox/EpAtkWOxnIZjrMeh1S3T3bqHOmARZlG2wgqO5rRqqxdh+T
-	apwuZVFNNdnUBXsOk3ow1kdQUxdvMami5lpAXT3yi/PwyufUTGMA1Tg6gSV5v6eMTqNlClon
-	oNVyjSJdnRoj3LYjeUtyZJRYIpJI0UahQC3LoGOEcYlJovh0lXMQQsEnMpXR2UqS6fXC8Nei
-	dRqjgRakafSGGCGtVai0EdowvSxDb1SnhqlpwyaJWPxqpJP4oTLtyb2PtafDM090LTJzwOX1
-	hcCTDckIOPuggVkIvNhcsg3A8f2dwF1MA3jcVMxysbjkHIC3H+9+qrDkDeJukgXAG5X3CXcx
-	A6C97LZTwWYzyWB4o8zo6vuS5Ri019USLjVO1mDwD4e3C/uQsbDjqg1zYYIMgnWnFpbdOCSC
-	JUfrcbcbH1b+9mi570lKYVn3XtzNeR52VY6u3MmHeWeqll8ESbMn7DebMbc4Dn5Tf5Dlxj7w
-	bmfzCubBmUkL042V0DHsINx4N2xtKmK48WaY86SX4QqDO8PUnw93e62G+xdGMVcbkhy4t4Dr
-	Zr8MB0vHVpR+cOhQzQqmYPGsY2W8XwM4VPEloxjwTc9EMD0TwfS/2xGA1wIerdVnpNLySK1E
-	pKZ3/fexck1GI1jeh5CkVlB3ejHMCjA2sALIxoW+nEHrfAqXo5B9+hmt0yTrjCpabwWRziGX
-	4Lw1co1zodSGZEmEVBwRFRUVId0QJRH6ccbzv1VwyVSZgVbStJbWPdVhbE9eDqbXHg/c0OYf
-	vNYn9Modxg+/iqKD3j/z8GgBaX83uTvkQiv5zslrWbuyY9uLGE3PLUkT9+30LBMFQo/hljSP
-	7zpVsylMzNwuyZWNTeVSZoHQfvdhDF9e8ub1vlibI6B/8+SMb9XPQLn4182sj7ZkBr0gGMZ6
-	eAGJnKGeNfRX8VsvqQIj/7af2GjWM1+ZPJuN+z/if8DNVu7U+f20NvqlbK+BhNyzIsdND48S
-	fP35LOUXccSLq7ZXFc3P3dlzaGuvsvoANhITcGpCujohNFwzGhK9Q/52r8+If5JPucUahvdl
-	im+Velz0uyxoS1i3PZReN9eulxwrfit+1RuKYL6tpSEsf4+Q0KfJJCG4Ti/7FxVwYteYBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJIsWRmVeSWpSXmKPExsWy7bCSvC7/m19pBucf8VvMWbWN0WL13X42
-	i65/W1gsXh/+xGgx7cNPZot3Tb9ZLG4e2MlksWfRJCaLlauPMlm8az3HYjF7ejOTxZP1s5gt
-	Ht/5zG5x9P9bNotJh64xWkyZ1sRosfeWtsWevSdZLOYve8pusfz4PyaLbb/nM1use/2exeL8
-	3+OsFudnzWF3kPC4fMXbY+esu+we5+9tZPG4fLbUY9OqTjaPTZ8msXtsXlLvsftmA5vHx6e3
-	WDze77vK5tG3ZRWjx5kFR4CSp6s9Pm+S89j05C1TAH8Ul01Kak5mWWqRvl0CV8afN4UFG/Qr
-	lp78y9bAeEqti5GTQ0LARGJv8z3mLkYuDiGB3YwSD+/3sUMkxCWar/2AsoUlVv57zg5R9JFR
-	ovntK7YuRg4ONgFNiQuTS0HiIgIrmCS2PfnLAuIwC2xgkmhZsgesW1jASeLomfNMIDaLgKrE
-	6rW/weK8AhYSExeuZ4bYIC8x89J3sDingKXE5MsdYHEhoJo7P9qZIeoFJU7OfMICYjMD1Tdv
-	nc08gVFgFpLULCSpBYxMqxglUwuKc9Nzkw0LDPNSy/WKE3OLS/PS9ZLzczcxgmNbS2MH4735
-	//QOMTJxMB5ilOBgVhLhvXfoZ5oQb0piZVVqUX58UWlOavEhRmkOFiVxXsMZs1OEBNITS1Kz
-	U1MLUotgskwcnFINTAnPbkYUf3l+5euLU7GPDSI5wqM5mYsV3xnUvui4HJ0SPG/SG7vlXeUu
-	wYuuX33zbvPi+uo306bZ6EgtSRSrrvdkUXBQvTyb33uPoXLyhN3drfK93I8FT6RFsaXN/PN0
-	/YI0mZZAVyGra38PyL/tm1zsre1QcXe30Y7X7cG80wMPvcuMFvYU2Bt5Z1ukt4+JZUrIppUb
-	l1ryCnc73DNw9ysrElgwt5zJ9/KeixaPZ35jjF2Z8KV1YZD5zSu/n+89qa0xxS/5mmyAS/wt
-	pUfHjtSoztBJOnIwwlbHuUxSPj2BJTPPxjWU4fmT9tWJpRfK+3QqH50psEwuWdMmaB4xqyj/
-	yYtMpioO/wgup2IlluKMREMt5qLiRAALEIshXAMAAA==
-X-CMS-MailID: 20240930182103epcas5p4c9e91ca3cdf20e900b1425ae45fef81d
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20240930182103epcas5p4c9e91ca3cdf20e900b1425ae45fef81d
-References: <20240930181305.17286-1-joshi.k@samsung.com>
-	<CGME20240930182103epcas5p4c9e91ca3cdf20e900b1425ae45fef81d@epcas5p4.samsung.com>
 
-With F_SET_RW_HINT fcntl, user can set a hint on the file inode, and
-all the subsequent writes on the file pass that hint value down.
-This can be limiting for large files (and for block device) as all the
-writes can be tagged with only one lifetime hint value.
-Concurrent writes (with different hint values) are hard to manage.
-Per-IO hinting solves that problem.
-
-Allow userspace to pass additional metadata in the SQE.
-The type of passed metadata is expressed by a new field
-
-	__u16 meta_type;
-
-At this point one type META_TYPE_LIFETIME_HINT is supported.
-With this type, user can pass lifetime hint values in the new field
-
-	__u64 lifetime_val;
-
-This accepts all lifetime hint values that are possible with
-F_SET_RW_HINT fcntl.
-
-The write handlers (io_prep_rw, io_write) send the hint value to
-lower-layer using kiocb. This is good for upporting direct IO,
-but not when kiocb is not available (e.g., buffered IO).
-
-When per-io hints are not passed, the per-inode hint values are set in
-the kiocb (as before). Otherwise, these take the precedence on per-inode
-hints.
-
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
----
- fs/fcntl.c                    | 22 ----------------------
- include/linux/rw_hint.h       | 24 ++++++++++++++++++++++++
- include/uapi/linux/io_uring.h | 19 +++++++++++++++++++
- io_uring/rw.c                 | 25 ++++++++++++++++++++++++-
- 4 files changed, 67 insertions(+), 23 deletions(-)
-
-diff --git a/fs/fcntl.c b/fs/fcntl.c
-index 22dd9dcce7ec..a390a05f4ef8 100644
---- a/fs/fcntl.c
-+++ b/fs/fcntl.c
-@@ -334,28 +334,6 @@ static int f_getowner_uids(struct file *filp, unsigned long arg)
- }
- #endif
- 
--static bool rw_hint_valid(u64 hint)
--{
--	BUILD_BUG_ON(WRITE_LIFE_NOT_SET != RWH_WRITE_LIFE_NOT_SET);
--	BUILD_BUG_ON(WRITE_LIFE_NONE != RWH_WRITE_LIFE_NONE);
--	BUILD_BUG_ON(WRITE_LIFE_SHORT != RWH_WRITE_LIFE_SHORT);
--	BUILD_BUG_ON(WRITE_LIFE_MEDIUM != RWH_WRITE_LIFE_MEDIUM);
--	BUILD_BUG_ON(WRITE_LIFE_LONG != RWH_WRITE_LIFE_LONG);
--	BUILD_BUG_ON(WRITE_LIFE_EXTREME != RWH_WRITE_LIFE_EXTREME);
--
--	switch (hint) {
--	case RWH_WRITE_LIFE_NOT_SET:
--	case RWH_WRITE_LIFE_NONE:
--	case RWH_WRITE_LIFE_SHORT:
--	case RWH_WRITE_LIFE_MEDIUM:
--	case RWH_WRITE_LIFE_LONG:
--	case RWH_WRITE_LIFE_EXTREME:
--		return true;
--	default:
--		return false;
--	}
--}
--
- static long fcntl_get_rw_hint(struct file *file, unsigned int cmd,
- 			      unsigned long arg)
- {
-diff --git a/include/linux/rw_hint.h b/include/linux/rw_hint.h
-index 309ca72f2dfb..f4373a71ffed 100644
---- a/include/linux/rw_hint.h
-+++ b/include/linux/rw_hint.h
-@@ -21,4 +21,28 @@ enum rw_hint {
- static_assert(sizeof(enum rw_hint) == 1);
- #endif
- 
-+#define	WRITE_LIFE_INVALID	(RWH_WRITE_LIFE_EXTREME + 1)
-+
-+static inline bool rw_hint_valid(u64 hint)
-+{
-+	BUILD_BUG_ON(WRITE_LIFE_NOT_SET != RWH_WRITE_LIFE_NOT_SET);
-+	BUILD_BUG_ON(WRITE_LIFE_NONE != RWH_WRITE_LIFE_NONE);
-+	BUILD_BUG_ON(WRITE_LIFE_SHORT != RWH_WRITE_LIFE_SHORT);
-+	BUILD_BUG_ON(WRITE_LIFE_MEDIUM != RWH_WRITE_LIFE_MEDIUM);
-+	BUILD_BUG_ON(WRITE_LIFE_LONG != RWH_WRITE_LIFE_LONG);
-+	BUILD_BUG_ON(WRITE_LIFE_EXTREME != RWH_WRITE_LIFE_EXTREME);
-+
-+	switch (hint) {
-+	case RWH_WRITE_LIFE_NOT_SET:
-+	case RWH_WRITE_LIFE_NONE:
-+	case RWH_WRITE_LIFE_SHORT:
-+	case RWH_WRITE_LIFE_MEDIUM:
-+	case RWH_WRITE_LIFE_LONG:
-+	case RWH_WRITE_LIFE_EXTREME:
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
- #endif /* _LINUX_RW_HINT_H */
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 86cb385fe0b5..951e35226229 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -92,12 +92,23 @@ struct io_uring_sqe {
- 			__u16	addr_len;
- 			__u16	__pad3[1];
- 		};
-+		struct {
-+			/* Bit field to express 16 meta types */
-+			__u16	meta_type;
-+			__u16	__pad4[1];
-+		};
- 	};
- 	union {
- 		struct {
- 			__u64	addr3;
- 			__u64	__pad2[1];
- 		};
-+		struct {
-+			/* First meta type specific fields */
-+			__u64	lifetime_val;
-+			/* For future use */
-+			__u64	__pad5[1];
-+		};
- 		__u64	optval;
- 		/*
- 		 * If the ring is initialized with IORING_SETUP_SQE128, then
-@@ -107,6 +118,14 @@ struct io_uring_sqe {
- 	};
- };
- 
-+enum io_uring_sqe_meta_type_bits {
-+	META_TYPE_LIFETIME_HINT_BIT
-+};
-+
-+/* this meta type covers write hint values supported by F_SET_RW_HINT fcntl */
-+#define META_TYPE_LIFETIME_HINT	(1U << META_TYPE_LIFETIME_HINT_BIT)
-+
-+
- /*
-  * If sqe->file_index is set to this for opcodes that instantiate a new
-  * direct descriptor (like openat/openat2/accept), then io_uring will allocate
-diff --git a/io_uring/rw.c b/io_uring/rw.c
-index 510123d3d837..bf45ee8904a4 100644
---- a/io_uring/rw.c
-+++ b/io_uring/rw.c
-@@ -269,6 +269,24 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 		rw->kiocb.ki_ioprio = get_current_ioprio();
- 	}
- 	rw->kiocb.dio_complete = NULL;
-+	if (ddir == ITER_SOURCE) {
-+		u16 mtype = READ_ONCE(sqe->meta_type);
-+
-+		rw->kiocb.ki_write_hint = WRITE_LIFE_INVALID;
-+		if (mtype) {
-+			u64 lhint = READ_ONCE(sqe->lifetime_val);
-+
-+			if (READ_ONCE(sqe->__pad4[0]) ||
-+			    READ_ONCE(sqe->__pad5[0]))
-+				return -EINVAL;
-+
-+			if (mtype != META_TYPE_LIFETIME_HINT ||
-+			    !rw_hint_valid(lhint))
-+				return -EINVAL;
-+
-+			rw->kiocb.ki_write_hint = lhint;
-+		}
-+	}
- 
- 	rw->addr = READ_ONCE(sqe->addr);
- 	rw->len = READ_ONCE(sqe->len);
-@@ -1023,7 +1041,12 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
- 	if (unlikely(ret))
- 		return ret;
- 	req->cqe.res = iov_iter_count(&io->iter);
--	rw->kiocb.ki_write_hint = file_write_hint(rw->kiocb.ki_filp);
-+	/*
-+	 * Use per-file hint only if per-io hint is not set.
-+	 * We need per-io hint to get precedence.
-+	 */
-+	if (rw->kiocb.ki_write_hint == WRITE_LIFE_INVALID)
-+		rw->kiocb.ki_write_hint = file_write_hint(rw->kiocb.ki_filp);
- 
- 	if (force_nonblock) {
- 		/* If the file doesn't support async, just async punt */
--- 
-2.25.1
+T24gTW9uLCAyMDI0LTA5LTMwIGF0IDIwOjAzICswMjAwLCBSYWZhZWwgSi4gV3lzb2NraSB3cm90
+ZToKPiArU3Jpbml2YXMgd2hvIGNhbiBzYXkgbW9yZSBhYm91dCB0aGUgcmVhc29ucyB3aHkgaW93
+YWl0IGJvb3N0aW5nCj4gbWFrZXMKPiBhIGRpZmZlcmVuY2UgZm9yIGludGVsX3BzdGF0ZSB0aGFu
+IEkgZG8uCj4gCkl0IG1ha2VzIGRpZmZlcmVuY2Ugb24gWGVvbnMgYW5kIGFsc28gR0ZYIHBlcmZv
+cm1hbmNlLgpUaGUgYWN0dWFsIGdhaW5zIHdpbGwgYmUgbW9kZWwgc3BlY2lmaWMgYXMgaXQgd2ls
+bCBiZSBkZXBlbmRlbnQgb24KaGFyZHdhcmUgYWxnb3JpdGhtcyBhbmQgRVBQLgoKSXQgd2FzIGlu
+dHJvZHVjZWQgdG8gc29sdmUgcmVncmVzc2lvbiBpbiBTa3lsYWtlIHhlb25zLiBCdXQgZXZlbiBp
+biB0aGUKcmVjZW50IHNlcnZlcnMgdGhlcmUgYXJlIGdhaW5zLgpSZWZlciB0bwpodHRwczovL2xr
+bWwuaXUuZWR1L2h5cGVybWFpbC9saW51eC9rZXJuZWwvMTgwNi4wLzAzNTc0Lmh0bWwKClRoYW5r
+cywKU3Jpbml2YXMKCgo+IE9uIFRodSwgU2VwIDUsIDIwMjQgYXQgMTE6MjfigK9BTSBDaHJpc3Rp
+YW4gTG9laGxlCj4gPGNocmlzdGlhbi5sb2VobGVAYXJtLmNvbT4gd3JvdGU6Cj4gPiAKPiA+IEFu
+YWxvZ291cyB0byBzY2hlZHV0aWwsIHJlbW92ZSBpb3dhaXQgYm9vc3QgZm9yIHRoZSBzYW1lIHJl
+YXNvbnMuCj4gCj4gV2VsbCwgZmlyc3Qgb2YgYWxsLCBpb3dhaXQgYm9vc3Rpbmcgd2FzIGFkZGVk
+IHRvIGludGVsX3BzdGF0ZSB0byBoZWxwCj4gc29tZSB3b3JrbG9hZHMgdGhhdCBvdGhlcndpc2Ug
+d2VyZSB1bmRlcnBlcmZvcm1pbmcuwqAgSSdtIG5vdCBzdXJlIGlmCj4geW91IGNhbiBzaW1wbHkg
+cmVtb3ZlIGl0IHdpdGhvdXQgaW50cm9kdWNpbmcgcGVyZm9ybWFuY2UgcmVncmVzc2lvbnMKPiBp
+biB0aG9zZSB3b3JrbG9hZHMuCj4gCj4gV2hpbGUgeW91IGNhbiBhcmd1ZSB0aGF0IGl0IGlzIG5v
+dCB1c2VmdWwgaW4gc2NoZWR1dGlsIGFueSBtb3JlIGR1ZQo+IHRvCj4gdGhlIGltcHJvdmVkIHNj
+aGVkdWxlciBpbnB1dCBmb3IgaXQsIHlvdSBjYW4gaGFyZGx5IGV4dGVuZCB0aGF0Cj4gYXJndW1l
+bnQgdG8gaW50ZWxfcHN0YXRlIGJlY2F1c2UgaXQgZG9lc24ndCB1c2UgYWxsIG9mIHRoZSBzY2hl
+ZHVsZXIKPiBpbnB1dCB1c2VkIGJ5IHNjaGVkdXRpbC4KPiAKPiBBbHNvLCB0aGUgRUFTIGFuZCBV
+Q0xBTVBfTUFYIGFyZ3VtZW50cyBhcmUgbm90IGFwcGxpY2FibGUgdG8KPiBpbnRlbF9wc3RhdGUg
+YmVjYXVzZSBpdCBkb2Vzbid0IHN1cHBvcnQgYW55IG9mIHRoZW0uCj4gCj4gVGhpcyBhcHBsaWVz
+IHRvIHRoZSBvbmRlbWFuZCBjcHVmcmVxIGdvdmVybm9yIGVpdGhlci4KPiAKPiAKPiA+IFNpZ25l
+ZC1vZmYtYnk6IENocmlzdGlhbiBMb2VobGUgPGNocmlzdGlhbi5sb2VobGVAYXJtLmNvbT4KPiA+
+IC0tLQo+ID4gwqBkcml2ZXJzL2NwdWZyZXEvaW50ZWxfcHN0YXRlLmMgfCA1MCArKy0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0KPiA+IC0tLS0KPiA+IMKgMSBmaWxlIGNoYW5nZWQsIDMgaW5z
+ZXJ0aW9ucygrKSwgNDcgZGVsZXRpb25zKC0pCj4gPiAKPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJz
+L2NwdWZyZXEvaW50ZWxfcHN0YXRlLmMKPiA+IGIvZHJpdmVycy9jcHVmcmVxL2ludGVsX3BzdGF0
+ZS5jCj4gPiBpbmRleCBjMDI3OGQwMjNjZmMuLjdmMzBiMjU2OWJiMyAxMDA2NDQKPiA+IC0tLSBh
+L2RyaXZlcnMvY3B1ZnJlcS9pbnRlbF9wc3RhdGUuYwo+ID4gKysrIGIvZHJpdmVycy9jcHVmcmVx
+L2ludGVsX3BzdGF0ZS5jCj4gPiBAQCAtMTkxLDcgKzE5MSw2IEBAIHN0cnVjdCBnbG9iYWxfcGFy
+YW1zIHsKPiA+IMKgICogQHBvbGljeTrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIENQVUZyZXEgcG9s
+aWN5IHZhbHVlCj4gPiDCoCAqIEB1cGRhdGVfdXRpbDrCoMKgwqDCoMKgwqAgQ1BVRnJlcSB1dGls
+aXR5IGNhbGxiYWNrIGluZm9ybWF0aW9uCj4gPiDCoCAqIEB1cGRhdGVfdXRpbF9zZXQ6wqDCoCBD
+UFVGcmVxIHV0aWxpdHkgY2FsbGJhY2sgaXMgc2V0Cj4gPiAtICogQGlvd2FpdF9ib29zdDrCoMKg
+wqDCoMKgIGlvd2FpdC1yZWxhdGVkIGJvb3N0IGZyYWN0aW9uCj4gPiDCoCAqIEBsYXN0X3VwZGF0
+ZTrCoMKgwqDCoMKgwqAgVGltZSBvZiB0aGUgbGFzdCB1cGRhdGUuCj4gPiDCoCAqIEBwc3RhdGU6
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBTdG9yZXMgUCBzdGF0ZSBsaW1pdHMgZm9yIHRoaXMgQ1BV
+Cj4gPiDCoCAqIEB2aWQ6wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBTdG9yZXMgVklEIGxp
+bWl0cyBmb3IgdGhpcyBDUFUKPiA+IEBAIC0yNDUsNyArMjQ0LDYgQEAgc3RydWN0IGNwdWRhdGEg
+ewo+ID4gwqDCoMKgwqDCoMKgwqAgc3RydWN0IGFjcGlfcHJvY2Vzc29yX3BlcmZvcm1hbmNlIGFj
+cGlfcGVyZl9kYXRhOwo+ID4gwqDCoMKgwqDCoMKgwqAgYm9vbCB2YWxpZF9wc3NfdGFibGU7Cj4g
+PiDCoCNlbmRpZgo+ID4gLcKgwqDCoMKgwqDCoCB1bnNpZ25lZCBpbnQgaW93YWl0X2Jvb3N0Owo+
+ID4gwqDCoMKgwqDCoMKgwqAgczE2IGVwcF9wb3dlcnNhdmU7Cj4gPiDCoMKgwqDCoMKgwqDCoCBz
+MTYgZXBwX3BvbGljeTsKPiA+IMKgwqDCoMKgwqDCoMKgIHMxNiBlcHBfZGVmYXVsdDsKPiA+IEBA
+IC0yMTM2LDI4ICsyMTM0LDcgQEAgc3RhdGljIGlubGluZSB2b2lkCj4gPiBpbnRlbF9wc3RhdGVf
+dXBkYXRlX3V0aWxfaHdwX2xvY2FsKHN0cnVjdCBjcHVkYXRhICpjcHUsCj4gPiDCoHsKPiA+IMKg
+wqDCoMKgwqDCoMKgIGNwdS0+c2FtcGxlLnRpbWUgPSB0aW1lOwo+ID4gCj4gPiAtwqDCoMKgwqDC
+oMKgIGlmIChjcHUtPnNjaGVkX2ZsYWdzICYgU0NIRURfQ1BVRlJFUV9JT1dBSVQpIHsKPiA+IC3C
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJvb2wgZG9faW8gPSBmYWxzZTsKPiA+IC0KPiA+
+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNwdS0+c2NoZWRfZmxhZ3MgPSAwOwo+ID4g
+LcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLyoKPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgKiBTZXQgaW93YWl0X2Jvb3N0IGZsYWcgYW5kIHVwZGF0ZSB0aW1lLiBTaW5j
+ZSBJTwo+ID4gV0FJVCBmbGFnCj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICog
+aXMgc2V0IGFsbCB0aGUgdGltZSwgd2UgY2FuJ3QganVzdCBjb25jbHVkZSB0aGF0Cj4gPiB0aGVy
+ZSBpcwo+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIHNvbWUgSU8gYm91bmQg
+YWN0aXZpdHkgaXMgc2NoZWR1bGVkIG9uIHRoaXMgQ1BVCj4gPiB3aXRoIGp1c3QKPiA+IC3CoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiBvbmUgb2NjdXJyZW5jZS4gSWYgd2UgcmVjZWl2
+ZSBhdCBsZWFzdCB0d28gaW4KPiA+IHR3bwo+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCAqIGNvbnNlY3V0aXZlIHRpY2tzLCB0aGVuIHdlIHRyZWF0IGFzIGJvb3N0Cj4gPiBjYW5k
+aWRhdGUuCj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICovCj4gPiAtwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAodGltZV9iZWZvcmU2NCh0aW1lLCBjcHUtPmxhc3Rf
+aW9fdXBkYXRlICsgMiAqCj4gPiBUSUNLX05TRUMpKQo+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGRvX2lvID0gdHJ1ZTsKPiA+IC0KPiA+IC3CoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNwdS0+bGFzdF9pb191cGRhdGUgPSB0aW1lOwo+ID4gLQo+
+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKGRvX2lvKQo+ID4gLcKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGludGVsX3BzdGF0ZV9od3BfYm9v
+c3RfdXAoY3B1KTsKPiA+IC0KPiA+IC3CoMKgwqDCoMKgwqAgfSBlbHNlIHsKPiA+IC3CoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIGludGVsX3BzdGF0ZV9od3BfYm9vc3RfZG93bihjcHUpOwo+
+ID4gLcKgwqDCoMKgwqDCoCB9Cj4gPiArwqDCoMKgwqDCoMKgIGludGVsX3BzdGF0ZV9od3BfYm9v
+c3RfZG93bihjcHUpOwo+ID4gwqB9Cj4gPiAKPiA+IMKgc3RhdGljIGlubGluZSB2b2lkIGludGVs
+X3BzdGF0ZV91cGRhdGVfdXRpbF9od3Aoc3RydWN0Cj4gPiB1cGRhdGVfdXRpbF9kYXRhICpkYXRh
+LAo+ID4gQEAgLTIyNDAsOSArMjIxNyw2IEBAIHN0YXRpYyBpbmxpbmUgaW50MzJfdAo+ID4gZ2V0
+X3RhcmdldF9wc3RhdGUoc3RydWN0IGNwdWRhdGEgKmNwdSkKPiA+IMKgwqDCoMKgwqDCoMKgIGJ1
+c3lfZnJhYyA9IGRpdl9mcChzYW1wbGUtPm1wZXJmIDw8IGNwdS0+YXBlcmZfbXBlcmZfc2hpZnQs
+Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IHNhbXBsZS0+dHNjKTsKPiA+IAo+ID4gLcKgwqDCoMKgwqDCoCBpZiAoYnVzeV9mcmFjIDwgY3B1
+LT5pb3dhaXRfYm9vc3QpCj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBidXN5X2Zy
+YWMgPSBjcHUtPmlvd2FpdF9ib29zdDsKPiA+IC0KPiA+IMKgwqDCoMKgwqDCoMKgIHNhbXBsZS0+
+YnVzeV9zY2FsZWQgPSBidXN5X2ZyYWMgKiAxMDA7Cj4gPiAKPiA+IMKgwqDCoMKgwqDCoMKgIHRh
+cmdldCA9IFJFQURfT05DRShnbG9iYWwubm9fdHVyYm8pID8KPiA+IEBAIC0yMzAzLDcgKzIyNzcs
+NyBAQCBzdGF0aWMgdm9pZCBpbnRlbF9wc3RhdGVfYWRqdXN0X3BzdGF0ZShzdHJ1Y3QKPiA+IGNw
+dWRhdGEgKmNwdSkKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzYW1wbGUtPmFw
+ZXJmLAo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNhbXBsZS0+dHNjLAo+ID4g
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdldF9hdmdfZnJlcXVlbmN5KGNwdSksCj4g
+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBmcF90b2ludChjcHUtPmlvd2FpdF9ib29z
+dCAqIDEwMCkpOwo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgMCk7Cj4gPiDCoH0K
+PiA+IAo+ID4gwqBzdGF0aWMgdm9pZCBpbnRlbF9wc3RhdGVfdXBkYXRlX3V0aWwoc3RydWN0IHVw
+ZGF0ZV91dGlsX2RhdGEKPiA+ICpkYXRhLCB1NjQgdGltZSwKPiA+IEBAIC0yMzE3LDI0ICsyMjkx
+LDYgQEAgc3RhdGljIHZvaWQgaW50ZWxfcHN0YXRlX3VwZGF0ZV91dGlsKHN0cnVjdAo+ID4gdXBk
+YXRlX3V0aWxfZGF0YSAqZGF0YSwgdTY0IHRpbWUsCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgcmV0dXJuOwo+ID4gCj4gPiDCoMKgwqDCoMKgwqDCoCBkZWx0YV9ucyA9IHRpbWUg
+LSBjcHUtPmxhc3RfdXBkYXRlOwo+ID4gLcKgwqDCoMKgwqDCoCBpZiAoZmxhZ3MgJiBTQ0hFRF9D
+UFVGUkVRX0lPV0FJVCkgewo+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgLyogU3Rh
+cnQgb3ZlciBpZiB0aGUgQ1BVIG1heSBoYXZlIGJlZW4gaWRsZS4gKi8KPiA+IC3CoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIGlmIChkZWx0YV9ucyA+IFRJQ0tfTlNFQykgewo+ID4gLcKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNwdS0+aW93YWl0X2Jvb3N0
+ID0gT05FX0VJR0hUSF9GUDsKPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIH0gZWxz
+ZSBpZiAoY3B1LT5pb3dhaXRfYm9vc3QgPj0gT05FX0VJR0hUSF9GUCkgewo+ID4gLcKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNwdS0+aW93YWl0X2Jvb3N0IDw8
+PSAxOwo+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlm
+IChjcHUtPmlvd2FpdF9ib29zdCA+IGludF90b2ZwKDEpKQo+ID4gLcKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjcHUtPmlvd2FpdF9i
+b29zdCA9IGludF90b2ZwKDEpOwo+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfSBl
+bHNlIHsKPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBj
+cHUtPmlvd2FpdF9ib29zdCA9IE9ORV9FSUdIVEhfRlA7Cj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCB9Cj4gPiAtwqDCoMKgwqDCoMKgIH0gZWxzZSBpZiAoY3B1LT5pb3dhaXRfYm9v
+c3QpIHsKPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8qIENsZWFyIGlvd2FpdF9i
+b29zdCBpZiB0aGUgQ1BVIG1heSBoYXZlIGJlZW4KPiA+IGlkbGUuICovCj4gPiAtwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAoZGVsdGFfbnMgPiBUSUNLX05TRUMpCj4gPiAtwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY3B1LT5pb3dhaXRfYm9vc3Qg
+PSAwOwo+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZWxzZQo+ID4gLcKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNwdS0+aW93YWl0X2Jvb3N0ID4+
+PSAxOwo+ID4gLcKgwqDCoMKgwqDCoCB9Cj4gPiDCoMKgwqDCoMKgwqDCoCBjcHUtPmxhc3RfdXBk
+YXRlID0gdGltZTsKPiA+IMKgwqDCoMKgwqDCoMKgIGRlbHRhX25zID0gdGltZSAtIGNwdS0+c2Ft
+cGxlLnRpbWU7Cj4gPiDCoMKgwqDCoMKgwqDCoCBpZiAoKHM2NClkZWx0YV9ucyA8IElOVEVMX1BT
+VEFURV9TQU1QTElOR19JTlRFUlZBTCkKPiA+IEBAIC0yODMyLDcgKzI3ODgsNyBAQCBzdGF0aWMg
+dm9pZCBpbnRlbF9jcHVmcmVxX3RyYWNlKHN0cnVjdAo+ID4gY3B1ZGF0YSAqY3B1LCB1bnNpZ25l
+ZCBpbnQgdHJhY2VfdHlwZSwgaW4KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBz
+YW1wbGUtPmFwZXJmLAo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNhbXBsZS0+
+dHNjLAo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdldF9hdmdfZnJlcXVlbmN5
+KGNwdSksCj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBmcF90b2ludChjcHUtPmlv
+d2FpdF9ib29zdCAqIDEwMCkpOwo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgMCk7
+Cj4gPiDCoH0KPiA+IAo+ID4gwqBzdGF0aWMgdm9pZCBpbnRlbF9jcHVmcmVxX2h3cF91cGRhdGUo
+c3RydWN0IGNwdWRhdGEgKmNwdSwgdTMyIG1pbiwKPiA+IHUzMiBtYXgsCj4gPiAtLQo+ID4gMi4z
+NC4xCj4gPiAKCg==
 
