@@ -1,100 +1,236 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787A41C6889
-	for <linux-block@vger.kernel.org>; Tue,  1 Oct 2024 15:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00B51C6F51
+	for <linux-block@vger.kernel.org>; Tue,  1 Oct 2024 15:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727797050; cv=none; b=nBNHE5DJD8DBF17CSmhTbKcRWDi41DuEJSHyR3CMokfBXlow8CPD4X3ulFX1gEqPaiMc8OmXUATxeNJh/pYUAGO5fJdrZdbY7jIfi5P7DFkGgzIQOs8zd26oe7V2Qfm4tjOoDzN+VxNJM5OcdSmLVza7mPWKXd9BEWNlylK5pnA=
+	t=1727797157; cv=none; b=k4+454hvMyqSQZ14Zv+FfOVuUhIsS8DW6hop9Q/jozj72H6HHjfnhlbuvDZqocFHfVrEy0X0bm8pA9d7MvbJXMPOrcw65ClwQHgXi8PvQpY5J6YH99m6+fKIbMjQkDaiIP9iuvk+rTgJa3Co9Wkt55vryvYRyzMg0Vgpi/J5ZR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727797050; c=relaxed/simple;
-	bh=XBFt+lN55keQTEfhyTVFuCqjDhRK8NSUj6BMZjb+tK0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lcyV4wXThoLLCMMxQ5HIAhmwP4AyteE0ylU09yTSUfDtqnCPLG8jJJ2hniegAB0Y8Ezg8lLnSWRD0prCUYpu0+x+x63KjXSrvNeybixRXzcCjQ2EWxD23PuQALgSEv8ligWIik5dgjP8sbvvFFFSufcoWHDKUhs6vJAAgUCmSYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UK/fIkxo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727797157; c=relaxed/simple;
+	bh=BDi9O3VjavgtxDgqiy2HfoTxzwGVnpiWKCQwgk4ilwI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UNhSFzD62s+I9Ts7rfPOFBoCnc1FtXSK5rm5KYi+CKaCL13QPVPFy5VxE0EZgJ3hgd6DPK3hpHNi5efF7E6lANg6tHurtZacD+u5RNpdGTj0KPS0ihZQNL1+FTAEBLLjVGhB31egB/1Vzs9ZUNGfKcCy4V5e4yKUKqIfgkE+jCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=gAd/3ADv; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=NCmKmEVA; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=gAd/3ADv; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=NCmKmEVA; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UK/fIkxo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82091C4CEC6;
-	Tue,  1 Oct 2024 15:37:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727797050;
-	bh=XBFt+lN55keQTEfhyTVFuCqjDhRK8NSUj6BMZjb+tK0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UK/fIkxoSH6VW5Ach0U0AessLuQMkVM+e4T0r06/srnyrFf18bGE/J462pJGtZ1oI
-	 zxVR3bGCh0ni06pQJGGd6hX3QFXC78YNLlEWnxvVm9soyrVJKToLrbKEb7uZbUAHDh
-	 scSrTd72Nr3z/FuQIwG1AoHOomzqyrUN9krPGnVUq6j0LLaB8ZQo5NCxAQQPaqotx3
-	 2Sx9fo3meBhyKj6PkYBfZcjF2vESQS3+i339YNhUtJBMTZw8fNJ3cZUgvoMfHUaeqG
-	 hN34RQeJpQ4SKurejJL/zhcToGJswA4YP8eBfPUI9/YzXPgmykpOFC2d4zEl4R5zjG
-	 3QAzf1SrSwOew==
-Date: Tue, 1 Oct 2024 09:37:27 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-	Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, hch@lst.de,
-	sagi@grimberg.me, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com,
-	Chinmay Gameti <c.gameti@samsung.com>
-Subject: Re: [PATCH v2 2/3] block: support PI at non-zero offset within
- metadata
-Message-ID: <ZvwXN5n1XyqRoH9H@kbusch-mbp.mynextlight.net>
-References: <20240201130126.211402-1-joshi.k@samsung.com>
- <CGME20240201130843epcas5p1b1840bd14ced64a1effb6fd8c93c926d@epcas5p1.samsung.com>
- <20240201130126.211402-3-joshi.k@samsung.com>
- <ZvV4uCUXp9_4x5ct@kbusch-mbp>
- <8ed2637b-559e-3f27-3d1f-84a4718475fb@samsung.com>
- <ZvWSFvI-OJ2NP_m0@kbusch-mbp>
- <165deefb-a8b3-594e-9bfb-b3bcd588d23f@samsung.com>
- <yq1ttdx81ub.fsf@ca-mkp.ca.oracle.com>
- <20241001072708.tgdmbi56vofjkluc@ArmHalley.local>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="gAd/3ADv";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="NCmKmEVA";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="gAd/3ADv";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="NCmKmEVA"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 091601F8AE;
+	Tue,  1 Oct 2024 15:39:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1727797154; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=DYorea/Ue9I9ArbGtAeA+bBGvYAspGm+ycgJ2laBY4A=;
+	b=gAd/3ADvHebiwYnD4thDC/Z8hCNcDN32vpd2xbUZRw845b0rN6ALFz247wgwDH3QGZqffJ
+	5RqM9aN5uXuWZqtXbyXyhYd6tc2TdF7vcwCdYICXi0+i7A96H1zGaB28Mg2XYfwpi1AYUZ
+	C/ElfaQmecVbwLlCYnCgrJY2JOK3EIc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1727797154;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=DYorea/Ue9I9ArbGtAeA+bBGvYAspGm+ycgJ2laBY4A=;
+	b=NCmKmEVAgHJXyJTLe2nwp9YU8fl8ObZIsWku9MwjR4I9TpbHRxracnDWFC53S+FRfvdgQz
+	x/vrjn0y7Y6x7RBg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1727797154; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=DYorea/Ue9I9ArbGtAeA+bBGvYAspGm+ycgJ2laBY4A=;
+	b=gAd/3ADvHebiwYnD4thDC/Z8hCNcDN32vpd2xbUZRw845b0rN6ALFz247wgwDH3QGZqffJ
+	5RqM9aN5uXuWZqtXbyXyhYd6tc2TdF7vcwCdYICXi0+i7A96H1zGaB28Mg2XYfwpi1AYUZ
+	C/ElfaQmecVbwLlCYnCgrJY2JOK3EIc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1727797154;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=DYorea/Ue9I9ArbGtAeA+bBGvYAspGm+ycgJ2laBY4A=;
+	b=NCmKmEVAgHJXyJTLe2nwp9YU8fl8ObZIsWku9MwjR4I9TpbHRxracnDWFC53S+FRfvdgQz
+	x/vrjn0y7Y6x7RBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DD55313A73;
+	Tue,  1 Oct 2024 15:39:13 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id u66vNaEX/GYiOAAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Tue, 01 Oct 2024 15:39:13 +0000
+Message-ID: <73e499a7-6237-4f67-84c1-d6434b89df26@suse.cz>
+Date: Tue, 1 Oct 2024 17:39:13 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] mm, slab: fix use of SLAB_SUPPORTS_SYSFS in
+ kmem_cache_release()
+To: Hyeonggon Yoo <42.hyeyoo@gmail.com>, Nilay Shroff <nilay@linux.ibm.com>
+Cc: linux-mm@kvack.org, linux-block@vger.kernel.org,
+ akpm@linux-foundation.org, cl@linux.com, penberg@kernel.org,
+ rientjes@google.com, iamjoonsoo.kim@lge.com, roman.gushchin@linux.dev,
+ yi.zhang@redhat.com, shinichiro.kawasaki@wdc.com, axboe@kernel.dk,
+ gjoyce@linux.ibm.com
+References: <20241001140245.306087-1-nilay@linux.ibm.com>
+ <CAB=+i9QEQJ-LVZsDSLG8xf2g5eLP0vi0HUNnCwLqWSpx0St2bw@mail.gmail.com>
+Content-Language: en-US
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <CAB=+i9QEQJ-LVZsDSLG8xf2g5eLP0vi0HUNnCwLqWSpx0St2bw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241001072708.tgdmbi56vofjkluc@ArmHalley.local>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	MIME_GOOD(-0.10)[text/plain];
+	FREEMAIL_TO(0.00)[gmail.com,linux.ibm.com];
+	TAGGED_RCPT(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:mid]
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
-On Tue, Oct 01, 2024 at 09:27:08AM +0200, Javier González wrote:
-> On 30.09.2024 13:57, Martin K. Petersen wrote:
-> > 
-> > Kanchan,
-> > 
-> > > I spent a good deal of time on this today. I was thinking to connect
-> > > block read_verify/write_generate knobs to influence things at nvme level
-> > > (those PRCHK flags). But that will not be enough. Because with those
-> > > knobs block-layer will not attach meta-buffer, which is still needed.
-> > > 
-> > > The data was written under the condition when nvme driver set the
-> > > pi_type to 0 (even though at device level it was non-zero) during
-> > > integrity registration.
-> > > 
-> > > Thinking whether it will make sense to have a knob at the block-layer
-> > > level to do something like that i.e., override the set
-> > > integrity-profile with nop.
-> > 
-> > SCSI went to great lengths to ensure that invalid protection information
-> > would never be written during normal operation, regardless of whether
-> > the host sent PI or not. And thus the only time one would anticipate a
-> > PI error was if the data had actually been corrupted.
-> > 
+On 10/1/24 16:50, Hyeonggon Yoo wrote:
+> On Tue, Oct 1, 2024 at 11:02â€¯PM Nilay Shroff <nilay@linux.ibm.com> wrote:
+>>
+>> The fix implemented in commit 4ec10268ed98 ("mm, slab: unlink slabinfo,
+>> sysfs and debugfs immediately") caused a subtle side effect due to which
+>> while destroying the kmem cache, the code path would never get into
+>> sysfs_slab_release() function even though SLAB_SUPPORTS_SYSFS is defined
+>> and slab state is FULL. Due to this side effect, we would never release
+>> kobject defined for kmem cache and leak the associated memory.
+>>
+>> The issue here's with the use of __is_defined() macro in kmem_cache_
+>> release(). The __is_defined() macro expands to __take_second_arg(
+>> arg1_or_junk 1, 0). If "arg1_or_junk" is defined to 1 then it expands to
+>> __take_second_arg(0, 1, 0) and returns 1. If "arg1_or_junk" is NOT defined
+>> to any value then it expands to __take_second_arg(... 1, 0) and returns 0.
+>>
+>> In this particular issue, SLAB_SUPPORTS_SYSFS is defined without any
+>> associated value and that causes __is_defined(SLAB_SUPPORTS_SYSFS) to
+>> always evaluate to 0 and hence it would never invoke sysfs_slab_release().
+>>
+>> This patch helps fix this issue by defining SLAB_SUPPORTS_SYSFS to 1.
+
+Oops, thanks a lot for debugging and fixing this!
+
 > 
-> Is this something we should work on bringin to the NVMe TWG?
+> Hi Nilay,
+> 
+> Thanks for your effort in investigating the issue and fixing it!
+> This makes sense to me, but is there any reason the code avoids using
+> IS_ENABLED()?
+> 
+> I think technically either IS_ENABLED() or __is_defined() (with your
+> fix) would work
+> in this case, but it made me think "What is the difference between
+> IS_ENABLED() and __is_defined()?"
+> 
+> IS_ENABLED() is already frequently used in mm and only few code snippets use
+> __is_defined() directly.
 
-Maybe. It looks like they did the spec this way one purpose with the
-ability to toggle guard tags per IO.
+I was wary of using IS_ENABLED() because that's intended for CONFIG_ macros
+and SLAB_SUPPORTS_SYSFS isn't one, so even if it worked now, it wouldn't be
+guaranteed to stay working.
 
-Just some more background on this because it may sound odd to use a data
-protection namespace format that the kernel didn't support:
+> Best,
+> Hyeonggon
+> 
+>> Fixes: 4ec10268ed98 ("mm, slab: unlink slabinfo, sysfs and debugfs immediately")
+>> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+>> Closes: https://lore.kernel.org/all/CAHj4cs9YCCcfmdxN43-9H3HnTYQsRtTYw1Kzq-L468GfLKAENA@mail.gmail.com/
+>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+>> ---
+>>  mm/slab.h | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/mm/slab.h b/mm/slab.h
+>> index f22fb760b286..3e0a08ea4c42 100644
+>> --- a/mm/slab.h
+>> +++ b/mm/slab.h
+>> @@ -310,7 +310,7 @@ struct kmem_cache {
+>>  };
+>>
+>>  #if defined(CONFIG_SYSFS) && !defined(CONFIG_SLUB_TINY)
+>> -#define SLAB_SUPPORTS_SYSFS
+>> +#define SLAB_SUPPORTS_SYSFS 1
+>>  void sysfs_slab_unlink(struct kmem_cache *s);
+>>  void sysfs_slab_release(struct kmem_cache *s);
+>>  #else
+>> --
+>> 2.45.2
+>>
 
-In this use case, writes to the device primarily come from the
-passthrough interface, which could always use the guard tags for
-end-to-end protection. The kernel block IO was the only path that had
-the limitation.
-
-Besides the passthrough interface, though, the setup uses kernel block
-layer to write the partition tables. Upgrading from 6.8 -> 6.9 won't be
-able to read the partition table on these devices. I'm still not sure
-the best way to handle this, though.
