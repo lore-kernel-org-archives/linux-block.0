@@ -1,142 +1,100 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D23101BF7F8
-	for <linux-block@vger.kernel.org>; Tue,  1 Oct 2024 14:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787A41C6889
+	for <linux-block@vger.kernel.org>; Tue,  1 Oct 2024 15:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727794226; cv=none; b=oz+lltn6Qj9HNVtMauc6tmSCD0DGTXz2vYHPb0vI+hBWvFPbs0Mrk2RHE7X8obAcgYVme3X9zyh8shWr1JkWtPYLTO1H2y/xJiLcbfTagiwL5lFP1BJjik+zAJqNaXMEaV3Ie9evgxCYnii6nSgmUDL302tMDI2vif94atS8jw8=
+	t=1727797050; cv=none; b=nBNHE5DJD8DBF17CSmhTbKcRWDi41DuEJSHyR3CMokfBXlow8CPD4X3ulFX1gEqPaiMc8OmXUATxeNJh/pYUAGO5fJdrZdbY7jIfi5P7DFkGgzIQOs8zd26oe7V2Qfm4tjOoDzN+VxNJM5OcdSmLVza7mPWKXd9BEWNlylK5pnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727794226; c=relaxed/simple;
-	bh=P7Mh/0k5f06GwxeCsSl9O3t7BO8WWiTvcbVK1mF2FSE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TwXUV7UX9AdHPLb/xRdO/jK4wt3B2VSZhyaDuQLln5Nt8hhLT/8AC66H4QxbhRCHdA/QVmdC08U0z88RDXcYojSsC9Vj16HV0iiIpC8NeBMlUzsJmhVFD9PSngVh+lWNJeEbV3AmnIlKAgxadx2E+Xlx0FWXF/n9KS+EZU7jHTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N+UIJbbP; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1727797050; c=relaxed/simple;
+	bh=XBFt+lN55keQTEfhyTVFuCqjDhRK8NSUj6BMZjb+tK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lcyV4wXThoLLCMMxQ5HIAhmwP4AyteE0ylU09yTSUfDtqnCPLG8jJJ2hniegAB0Y8Ezg8lLnSWRD0prCUYpu0+x+x63KjXSrvNeybixRXzcCjQ2EWxD23PuQALgSEv8ligWIik5dgjP8sbvvFFFSufcoWHDKUhs6vJAAgUCmSYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UK/fIkxo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N+UIJbbP"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5398e4ae9efso3389504e87.1
-        for <linux-block@vger.kernel.org>; Tue, 01 Oct 2024 07:50:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727794223; x=1728399023; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3cSyeR9abJDVNh3IbE3iMwWTMv0KT43vGwZgDBM7Wbg=;
-        b=N+UIJbbPM8ojhHjLwBAleqLLYdj+9Jj76G3dztwDf04tWAX7d7HReGwNcKw9RfhLow
-         mHWXW6W3TloVYavgiD83EI/6kCpPbIUxmtpwPA3+HUApz5X1sRfrFGdoHRr7WirekNYL
-         SnnfdYvCxtGWD+78i9eUnl6ADm2ZG/sGvv1vI1Ql8MTukUo40JTfkOnELGTfnLBscMKZ
-         eIn7OBcXYclbz018xTxDxQFyMqrb+v3m0fOfgjJe0zFw/zffXZ1yRrEcRfu5ToC+ETMq
-         cziwOaQE9/G3neosrBg2MQ3cWKi7QNlIZQ1W5jBV+soL/BotTi5KJFg6s+uNmBRoBUUi
-         1Z/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727794223; x=1728399023;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3cSyeR9abJDVNh3IbE3iMwWTMv0KT43vGwZgDBM7Wbg=;
-        b=Ag0hEl5rFDwraWycxAyCF7es3cvsmExLSZzNJrbOLdFpQdS/x80aKKAZELt4nsWhzK
-         Zf8vYKmKPNAYc0u6RypNOMF5FBKB8FnOowomvvgwusNXzAAFxjQq8uE/WjXE+aJJd7Lk
-         7q4847KcZQATWZZUEeSKdagaq5Akj9OoOCfmdIJX+2qou2CJ4mVbC8Oc1y3zzSQ8hOXN
-         ROlHZNka5UblORJV5x04R93upCaszNjXz7HCQrwK4f7tnp55O5Y7lb++4CpZKjC6PSwX
-         lElqu3aMaIdQdJtWJECTGapLDbMXXRp5VPs2j14o0ArAsf1tT5+FD9wOSmjNcl3L5gQY
-         u8Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCVM+Shgiz4+NzPa0KBnMSJ8gaXUoFcBpimcoPTXMa7XWQIJqhWBZ53ymmaP7cc65ian6i2FlhB9faaidw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4kUKIrhfm6LnbuPedwYbKr7p3Z2mhpBjFdNxbL9e2J6FJ7uhq
-	dAID62DFaTjJ6jsShx2V5Ac2Ggk26XhYRv7jOFoTb3tLx9v02WmGqbDgSgPiy0YZ1WHwm0f+CE9
-	4Q4s5lnzy+B3mveHg7Ld3WIBFz1Q=
-X-Google-Smtp-Source: AGHT+IHjd7sSKcg/ku9VJaZ3qqa0ntw0KjgjijNTNSnxnRp33GMi/Fp+m2pyySF0Hqc8zWcZ4+YnGRENriOE71Izr24=
-X-Received: by 2002:a05:6512:3089:b0:52e:7542:f469 with SMTP id
- 2adb3069b0e04-5389fbc6f0amr7029314e87.0.1727794222640; Tue, 01 Oct 2024
- 07:50:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UK/fIkxo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82091C4CEC6;
+	Tue,  1 Oct 2024 15:37:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727797050;
+	bh=XBFt+lN55keQTEfhyTVFuCqjDhRK8NSUj6BMZjb+tK0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UK/fIkxoSH6VW5Ach0U0AessLuQMkVM+e4T0r06/srnyrFf18bGE/J462pJGtZ1oI
+	 zxVR3bGCh0ni06pQJGGd6hX3QFXC78YNLlEWnxvVm9soyrVJKToLrbKEb7uZbUAHDh
+	 scSrTd72Nr3z/FuQIwG1AoHOomzqyrUN9krPGnVUq6j0LLaB8ZQo5NCxAQQPaqotx3
+	 2Sx9fo3meBhyKj6PkYBfZcjF2vESQS3+i339YNhUtJBMTZw8fNJ3cZUgvoMfHUaeqG
+	 hN34RQeJpQ4SKurejJL/zhcToGJswA4YP8eBfPUI9/YzXPgmykpOFC2d4zEl4R5zjG
+	 3QAzf1SrSwOew==
+Date: Tue, 1 Oct 2024 09:37:27 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, hch@lst.de,
+	sagi@grimberg.me, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	Chinmay Gameti <c.gameti@samsung.com>
+Subject: Re: [PATCH v2 2/3] block: support PI at non-zero offset within
+ metadata
+Message-ID: <ZvwXN5n1XyqRoH9H@kbusch-mbp.mynextlight.net>
+References: <20240201130126.211402-1-joshi.k@samsung.com>
+ <CGME20240201130843epcas5p1b1840bd14ced64a1effb6fd8c93c926d@epcas5p1.samsung.com>
+ <20240201130126.211402-3-joshi.k@samsung.com>
+ <ZvV4uCUXp9_4x5ct@kbusch-mbp>
+ <8ed2637b-559e-3f27-3d1f-84a4718475fb@samsung.com>
+ <ZvWSFvI-OJ2NP_m0@kbusch-mbp>
+ <165deefb-a8b3-594e-9bfb-b3bcd588d23f@samsung.com>
+ <yq1ttdx81ub.fsf@ca-mkp.ca.oracle.com>
+ <20241001072708.tgdmbi56vofjkluc@ArmHalley.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241001140245.306087-1-nilay@linux.ibm.com>
-In-Reply-To: <20241001140245.306087-1-nilay@linux.ibm.com>
-From: Hyeonggon Yoo <42.hyeyoo@gmail.com>
-Date: Tue, 1 Oct 2024 23:50:10 +0900
-Message-ID: <CAB=+i9QEQJ-LVZsDSLG8xf2g5eLP0vi0HUNnCwLqWSpx0St2bw@mail.gmail.com>
-Subject: Re: [PATCH] mm, slab: fix use of SLAB_SUPPORTS_SYSFS in kmem_cache_release()
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-mm@kvack.org, linux-block@vger.kernel.org, vbabka@suse.cz, 
-	akpm@linux-foundation.org, cl@linux.com, penberg@kernel.org, 
-	rientjes@google.com, iamjoonsoo.kim@lge.com, roman.gushchin@linux.dev, 
-	yi.zhang@redhat.com, shinichiro.kawasaki@wdc.com, axboe@kernel.dk, 
-	gjoyce@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241001072708.tgdmbi56vofjkluc@ArmHalley.local>
 
-On Tue, Oct 1, 2024 at 11:02=E2=80=AFPM Nilay Shroff <nilay@linux.ibm.com> =
-wrote:
->
-> The fix implemented in commit 4ec10268ed98 ("mm, slab: unlink slabinfo,
-> sysfs and debugfs immediately") caused a subtle side effect due to which
-> while destroying the kmem cache, the code path would never get into
-> sysfs_slab_release() function even though SLAB_SUPPORTS_SYSFS is defined
-> and slab state is FULL. Due to this side effect, we would never release
-> kobject defined for kmem cache and leak the associated memory.
->
-> The issue here's with the use of __is_defined() macro in kmem_cache_
-> release(). The __is_defined() macro expands to __take_second_arg(
-> arg1_or_junk 1, 0). If "arg1_or_junk" is defined to 1 then it expands to
-> __take_second_arg(0, 1, 0) and returns 1. If "arg1_or_junk" is NOT define=
-d
-> to any value then it expands to __take_second_arg(... 1, 0) and returns 0=
-.
->
-> In this particular issue, SLAB_SUPPORTS_SYSFS is defined without any
-> associated value and that causes __is_defined(SLAB_SUPPORTS_SYSFS) to
-> always evaluate to 0 and hence it would never invoke sysfs_slab_release()=
-.
->
-> This patch helps fix this issue by defining SLAB_SUPPORTS_SYSFS to 1.
+On Tue, Oct 01, 2024 at 09:27:08AM +0200, Javier González wrote:
+> On 30.09.2024 13:57, Martin K. Petersen wrote:
+> > 
+> > Kanchan,
+> > 
+> > > I spent a good deal of time on this today. I was thinking to connect
+> > > block read_verify/write_generate knobs to influence things at nvme level
+> > > (those PRCHK flags). But that will not be enough. Because with those
+> > > knobs block-layer will not attach meta-buffer, which is still needed.
+> > > 
+> > > The data was written under the condition when nvme driver set the
+> > > pi_type to 0 (even though at device level it was non-zero) during
+> > > integrity registration.
+> > > 
+> > > Thinking whether it will make sense to have a knob at the block-layer
+> > > level to do something like that i.e., override the set
+> > > integrity-profile with nop.
+> > 
+> > SCSI went to great lengths to ensure that invalid protection information
+> > would never be written during normal operation, regardless of whether
+> > the host sent PI or not. And thus the only time one would anticipate a
+> > PI error was if the data had actually been corrupted.
+> > 
+> 
+> Is this something we should work on bringin to the NVMe TWG?
 
-Hi Nilay,
+Maybe. It looks like they did the spec this way one purpose with the
+ability to toggle guard tags per IO.
 
-Thanks for your effort in investigating the issue and fixing it!
-This makes sense to me, but is there any reason the code avoids using
-IS_ENABLED()?
+Just some more background on this because it may sound odd to use a data
+protection namespace format that the kernel didn't support:
 
-I think technically either IS_ENABLED() or __is_defined() (with your
-fix) would work
-in this case, but it made me think "What is the difference between
-IS_ENABLED() and __is_defined()?"
+In this use case, writes to the device primarily come from the
+passthrough interface, which could always use the guard tags for
+end-to-end protection. The kernel block IO was the only path that had
+the limitation.
 
-IS_ENABLED() is already frequently used in mm and only few code snippets us=
-e
-__is_defined() directly.
-
-Best,
-Hyeonggon
-
-> Fixes: 4ec10268ed98 ("mm, slab: unlink slabinfo, sysfs and debugfs immedi=
-ately")
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Closes: https://lore.kernel.org/all/CAHj4cs9YCCcfmdxN43-9H3HnTYQsRtTYw1Kz=
-q-L468GfLKAENA@mail.gmail.com/
-> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
-> ---
->  mm/slab.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/mm/slab.h b/mm/slab.h
-> index f22fb760b286..3e0a08ea4c42 100644
-> --- a/mm/slab.h
-> +++ b/mm/slab.h
-> @@ -310,7 +310,7 @@ struct kmem_cache {
->  };
->
->  #if defined(CONFIG_SYSFS) && !defined(CONFIG_SLUB_TINY)
-> -#define SLAB_SUPPORTS_SYSFS
-> +#define SLAB_SUPPORTS_SYSFS 1
->  void sysfs_slab_unlink(struct kmem_cache *s);
->  void sysfs_slab_release(struct kmem_cache *s);
->  #else
-> --
-> 2.45.2
->
+Besides the passthrough interface, though, the setup uses kernel block
+layer to write the partition tables. Upgrading from 6.8 -> 6.9 won't be
+able to read the partition table on these devices. I'm still not sure
+the best way to handle this, though.
