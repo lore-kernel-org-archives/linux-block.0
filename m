@@ -1,57 +1,57 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419991CF2AF;
-	Tue,  1 Oct 2024 22:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21C51CF5DD;
+	Tue,  1 Oct 2024 22:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727821242; cv=none; b=r+2BMxOCOTQTNhsg+0cYTbwh3ltzheMGgUCsSRnC+sgzDxWDUm5Qr7LL8+1xtbQDHNyEcXlAcGsP7ODRdSimG5OTPrmQ00UiKIjEUDTT/fblMyDkM8BCI24NiwMbIefOddwxUseHsHyHVaW+xuSnVOFtR4SBoIR98MNANrrECLo=
+	t=1727821245; cv=none; b=OutVdappPiFsAXVo7iKmk6+6lmsOfzAgQWBZtGWh0AehNenF7EbLz5sb6j+9jlvxCMNQKcahi8oKYxeUxNh+riHBMNuepYHFTVuZv95ZpidhyJVgW4YzGfNATdDmUpqvo7FI3tHG6VFfidO+i5hAwtL8xjTwnzeIlNe5BkThopk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727821242; c=relaxed/simple;
-	bh=AvSpeRPjeVRXz5j8dQKUo3Zt1JFIF3gH9S62HhEmPeo=;
+	s=arc-20240116; t=1727821245; c=relaxed/simple;
+	bh=uFj2dvFYNBFuFJirSb+yihT/EV1akv6TTLSHucJpP6E=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tmQub9VXZGNGy24ofd9b/fJtaldfYtzpmvo145MizEtH3shaYY9OY93S98Erbj3rCGKDNYC1EnPbx/LYyyss/oR3LbDKFQ5voQLfApT8B5sCirjs6IGFhAKLLTxh8HfBEC4dMUDSiWC2YZWMOWoRGxfo2PD2mmDYIAaKVoWkQgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bYWc+uzB; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version; b=gg1FnhugrBfr0LGgVw9qvxYmr+cVJNR4GJq/BPjH04/7qbJf4vM1nLUlVEPfWpCJx4C5ee+62bzwn8R1/1g0Y37UcVEJBljrIz0Mqt9OV7HK6P5A47ldE0v/zFZi1OEUQuoTCXpxssI0e93s7Tv7Wr4YqmH63d2pUBmNyMp9RDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nm1WOQ9S; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bYWc+uzB"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-42cafda818aso57939885e9.2;
-        Tue, 01 Oct 2024 15:20:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nm1WOQ9S"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-37cc810ce73so3503705f8f.1;
+        Tue, 01 Oct 2024 15:20:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727821239; x=1728426039; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727821242; x=1728426042; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=36HmyHvoEEpKMI8/Stc+TIqGBije17bfud9rEk2jFTM=;
-        b=bYWc+uzBWvH5QL9CXyyZvxSKrB3M+1gJn7bhGvOJlrCmXSw+JxBGagel+poM1IWgX4
-         ODnZmrUGEn52TK2gVWgOge/wG9ZabvKFckD0Mk4gl2hr/qWbaV/4f8wX7KcD4GxRxQJy
-         tC9JqBuqJBZzybdzptz3+bpSfCvKGAv+i7sONr74OeT+EZj7F26zRKhMvgQ7gi3NVRNY
-         T6DsjQJsOYpSQpVduN+4CWTAsbZ7Y+tZD4iki1Doh+pzBiZzub8lkZk8Jsyc8w/DxPI9
-         LmmLEgBwbZHEohhDI5gWUdTUXkPbn4i8JihBduWpRhb7JbbD3Oa68+Z0JqcFLDLW76sX
-         jJOQ==
+        bh=UvkeCfAFF2+TrOZNYfnjZ9TAqZKaKEt38PpwPlqvY1M=;
+        b=Nm1WOQ9SgslqM8QNzwdi1DjVJkoHlE0e9LmeKdRHfjts3+fs1Z8I5eeUQkdHdDzaXy
+         6VRUqzMUsORpb9BMyk2+TZRdmry+EA26oakcK64t0CsLq+85Kjj1NpgS192PbhMrclXH
+         rqd443zFwG8SJI2iCP0LZRK0/+r9z2vFdWXeAQWd0+SvNXjfM3tvUq8tNELMVL4IPt7X
+         ZKTXqx3rGhEmb9PdExJCeuKE12KvQRubKtPWReRTQJnwtq8SmLAl/MBTa+5wLWgtOT/z
+         tuRk2FfRHFsDx8dv4ZTUDDskIkIkfFD9pI8ImN9RPVNNXQZBXBPwg06uI8M2tEulIYXV
+         DgAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727821239; x=1728426039;
+        d=1e100.net; s=20230601; t=1727821242; x=1728426042;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=36HmyHvoEEpKMI8/Stc+TIqGBije17bfud9rEk2jFTM=;
-        b=itKD4wr9IqwkBxFTjz1fS2Oqrf78FEELl2j0jsXWCJhhFSMc7wlS8b+wlp/bdKsZpG
-         0J4rYoPDh/fYO64EY0DHN2mozQxsofLIkgK4RnbOky5bbEwpS/AKXTfVEa8gGMWYCgDY
-         gZpHEdG+NQ54n8rBkWAPGEnquxLJrWIvZZBIAH2CuYOhILo0TjktIpgYJHJrtvZlqVjO
-         /i+IxBC6RPMhBfzPqOkkWkVzgt2ZtIYWISLtLpUdTSNF8dT+telIPEpZcBXc8/Mu14jz
-         PQoVrAMbeLAaCIMsobeJazUPeAsZoTDpe1z/JOfJHyn7HLsPrJ2JMAVzhR4GfKyLjmYv
-         tPqw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/8gr6urstTjs1WnTX97K/di4Oc2/ALccRcsnCJek6jmC3W5MOjXkQaH6TS+sPqjZsFg3n9R2wyn1j@vger.kernel.org, AJvYcCUGNLtSm9tORSFxdy2/m8IozP1hbCGus7nj4bhdGqPt9+4fdeV9zMVxmJfojk2kgORhO2XiURIpWiiE@vger.kernel.org, AJvYcCUfDwxeirsw5t1T3yoe13Szr8RIix0mht+LNWGjw+7WvOcxSLXctbz+aQwwF2W1Ntnk5BYuIQcR3BFMxrE=@vger.kernel.org, AJvYcCUzI12b3kmkB3a0ElQnJHcxkuA8w7Bri3qRpv5ttopTo4zNvDF5ESt0HH/7IyaZc2d6xW4VwQ8SoQmH22RC@vger.kernel.org, AJvYcCWhDXoIjQNDAFzBzPpYx+/BWbR1d9/XdflAKwQTyubPpEnR3Icqv2htwPp0Vf3456474+MobZ4AgyN9@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1nEv+Q9nUvuGXib64Ar+QRfE8TyDeUhcc2YabYXr0kEoMmBzO
-	qpJqwtQipIG0QywcKvbNu2WyEU/vCu5wUtV6DxCTuSM0GEUySNeO
-X-Google-Smtp-Source: AGHT+IGIDPxjQ+V4nk5hK7ebrKIAFPgPpB4BaP2+JauvZQ+jCU4eMkLt/5R1XilbQgftoTFXdvGVxQ==
-X-Received: by 2002:a5d:5043:0:b0:374:c16d:6282 with SMTP id ffacd0b85a97d-37cfba12323mr683317f8f.55.1727821239214;
-        Tue, 01 Oct 2024 15:20:39 -0700 (PDT)
+        bh=UvkeCfAFF2+TrOZNYfnjZ9TAqZKaKEt38PpwPlqvY1M=;
+        b=ulIxoi4rfTiLK/l0DQO7f0UGLVqmS/AmxD/UQj1Ao2tBisWfr5iZJxog2xfUrbZaSv
+         GjNhcCaouym+qkQsli7/tesc4HrYL7MLMtQQ3lTnjyBE3Z7n1fmiAOF2OYTBO4cYd1vE
+         fronrp2yF4H+IYT1OOFsBdRSF4DhhnzKx/3TUVSPY2MmfEiMAvcF/mmVKCaLsiV5Rtu9
+         tB13yX+ux8X2EisyPRTjZUimnyYYqbsWRtNXe5wssJWyS3JxG6lXIi38M5VXADvf654S
+         b9ykxC8My5JGsrctQu+aUHSFfBuyjf8ybtAvkFj33GGoWlXG4L9m0klitPbgyGzKZoZ9
+         nHGg==
+X-Forwarded-Encrypted: i=1; AJvYcCV9UvND8BtfQJnbkChv9Xfk1cVzwBscRHHhO23ku08oXgGHI0tLQnE5AW9bydwPwh/pBYBt1a6YhQiH@vger.kernel.org, AJvYcCVsZmUnT3nwNpfyFGwW7gva99UzaRDln35rtLuW0PnUJb2CiSQvj5Cua43d1z4xLzgs/8dTynr58OY+@vger.kernel.org, AJvYcCWhODZzERSnSQxjL3BG4fKzLpm8UhrOu+IvOe166WWwQHGp3OMPGQeavMQ7Odu6IedjfM7wtlPhuBiAGz0=@vger.kernel.org, AJvYcCX+LDbE2D0esO68aKNlSLo2P6+iYb/3N67RpzURIPRCs0qULxFZ90V1+tS9Fh06qox/+XWrs5Q6P1s+QLWW@vger.kernel.org, AJvYcCXeaXKvz+edRlz0/EUAFh0y4+6LKSTSQuKTGaVd6F8/3DDyTbIxnLKBxSyc6JdUOjbYU5AKUU2UJviT@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPV/9+RM3bZ9OL6saLMXFSqbpU0NbJPz1D80bXU5+Xfx6qyOlu
+	F/IKOhFsdd5n71e/GEJAyPelOCs74Amh/NiJ5hDI2osa0YuyD16S
+X-Google-Smtp-Source: AGHT+IGdzj7eGjtzUH2e4oHAiqm3ikbyp7r4ZRQP5cTIPq03W/eHfzzj9TqfTqlU00uAZm44bq5y4A==
+X-Received: by 2002:adf:f98f:0:b0:371:8688:1660 with SMTP id ffacd0b85a97d-37cfba08fd6mr566868f8f.51.1727821241723;
+        Tue, 01 Oct 2024 15:20:41 -0700 (PDT)
 Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37cd57427fbsm12677089f8f.100.2024.10.01.15.20.36
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37cd57427fbsm12677089f8f.100.2024.10.01.15.20.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 15:20:38 -0700 (PDT)
+        Tue, 01 Oct 2024 15:20:41 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jonathan Corbet <corbet@lwn.net>,
@@ -86,9 +86,9 @@ To: Jens Axboe <axboe@kernel.dk>,
 	Lorenzo Bianconi <lorenzo@kernel.org>,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
 	upstream@airoha.com
-Subject: [PATCH v5 2/6] docs: block: Document support for read-only partition in cmdline part
-Date: Wed,  2 Oct 2024 00:18:54 +0200
-Message-ID: <20241001221931.9309-3-ansuelsmth@gmail.com>
+Subject: [PATCH v5 3/6] block: introduce device_add_of_disk()
+Date: Wed,  2 Oct 2024 00:18:55 +0200
+Message-ID: <20241001221931.9309-4-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20241001221931.9309-1-ansuelsmth@gmail.com>
 References: <20241001221931.9309-1-ansuelsmth@gmail.com>
@@ -100,36 +100,82 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Document support for read-only partition in cmdline partition for block
-devices by appending "ro" after the (partition name).
+Introduce device_add_of_disk() as a variant of device_add_disk() that
+permits to pass and attach a fwnode to disk dev.
+
+This variant can be useful for eMMC that might have the partition table
+for the disk defined in DT. A parser can later make use of the attached
+fwnode to parse the related table and init the hardcoded partition for
+the disk.
 
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- Documentation/block/cmdline-partition.rst | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ block/genhd.c          | 21 +++++++++++++++++++--
+ include/linux/blkdev.h |  3 +++
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/block/cmdline-partition.rst b/Documentation/block/cmdline-partition.rst
-index 530bedff548a..526ba201dddc 100644
---- a/Documentation/block/cmdline-partition.rst
-+++ b/Documentation/block/cmdline-partition.rst
-@@ -39,13 +39,16 @@ blkdevparts=<blkdev-def>[;<blkdev-def>]
-     create a link to block device partition with the name "PARTNAME".
-     User space application can access partition by partition name.
+diff --git a/block/genhd.c b/block/genhd.c
+index 1c05dd4c6980..0fc595895f1d 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -391,8 +391,9 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
+  * This function registers the partitioning information in @disk
+  * with the kernel.
+  */
+-int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+-				 const struct attribute_group **groups)
++static int __device_add_disk(struct device *parent, struct gendisk *disk,
++			     const struct attribute_group **groups,
++			     struct fwnode_handle *fwnode)
  
-+ro
-+    read-only. Flag the partition as read-only.
+ {
+ 	struct device *ddev = disk_to_dev(disk);
+@@ -452,6 +453,8 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 	ddev->parent = parent;
+ 	ddev->groups = groups;
+ 	dev_set_name(ddev, "%s", disk->disk_name);
++	if (fwnode)
++		device_set_node(ddev, fwnode);
+ 	if (!(disk->flags & GENHD_FL_HIDDEN))
+ 		ddev->devt = MKDEV(disk->major, disk->first_minor);
+ 	ret = device_add(ddev);
+@@ -553,8 +556,22 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 		elevator_exit(disk->queue);
+ 	return ret;
+ }
 +
- Example:
++int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
++				 const struct attribute_group **groups)
++{
++	return __device_add_disk(parent, disk, groups, NULL);
++}
+ EXPORT_SYMBOL(device_add_disk);
  
-     eMMC disk names are "mmcblk0" and "mmcblk0boot0".
++int __must_check device_add_of_disk(struct device *parent, struct gendisk *disk,
++				    const struct attribute_group **groups,
++				    struct fwnode_handle *fwnode)
++{
++	return __device_add_disk(parent, disk, groups, fwnode);
++}
++EXPORT_SYMBOL(device_add_of_disk);
++
+ static void blk_report_disk_dead(struct gendisk *disk, bool surprise)
+ {
+ 	struct block_device *bdev;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bf1aa951fda2..7d41f35f1065 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -725,6 +725,9 @@ static inline unsigned int blk_queue_depth(struct request_queue *q)
+ #define for_each_bio(_bio)		\
+ 	for (; _bio; _bio = _bio->bi_next)
  
-   bootargs::
- 
--    'blkdevparts=mmcblk0:1G(data0),1G(data1),-;mmcblk0boot0:1m(boot),-(kernel)'
-+    'blkdevparts=mmcblk0:1G(data0),1G(data1),-;mmcblk0boot0:1m(boot)ro,-(kernel)'
- 
-   dmesg::
- 
++int __must_check device_add_of_disk(struct device *parent, struct gendisk *disk,
++				    const struct attribute_group **groups,
++				    struct fwnode_handle *fwnode);
+ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 				 const struct attribute_group **groups);
+ static inline int __must_check add_disk(struct gendisk *disk)
 -- 
 2.45.2
 
