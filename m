@@ -1,35 +1,35 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C64419DF9A;
-	Tue,  1 Oct 2024 08:48:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEE115B54C;
+	Tue,  1 Oct 2024 09:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727772509; cv=none; b=EdmoAtcyvZS9Jxkh3sC5lxiO68gqrvjjxvbru9NwY+uL4DzmxwxZnFwy/TN1jM0sHt124PqU4J/ufpt5UX3nLxGoBBasFO7yuyRs3fGarWAdVn9+bnIPisbvV74Ue4trh6qi5CIOWrq+Z0Nc/9L5CBudWOnjXo9tJHQpmQX5/7U=
+	t=1727774456; cv=none; b=rfSMvUmI0nfZiYxM1aOBVFAg3EiQnEfIuud+wt3PEQL2Y8AiPI83zPVTPrmW8Cnwa8EGgebiqfi7Ij0mkhyxrUmfGJDYwWqh56lkbqzyqDqEWZjwrRkrJ2Uoh1GPrr93vsViJ5KtiQBn1LQkSRy+MauwHCPCA9yICfoTHrziCAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727772509; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1727774456; c=relaxed/simple;
+	bh=9BM+uzAwiW8lwTOB+YBTzCF3B3mbYwaS7AeG9dF4LA0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=csilEM9JUcGhRWJ/43elaWD7AaATYPhqrhFQv1ssWcvE3gtrgS0L4ozHRl/brEBiPQO+qzgquaN+kh17eRY0YNLUD6olDG7h78cGwqtic3pcUU8nZ6TafRbvq99/U71y99O4PqyVZU/Ct+hx6/i1Fz44lxZ1fc9nlbAkCLEq8Xk=
+	 Content-Type:Content-Disposition:In-Reply-To; b=S1YWpAi6W06zi4FfzLI4SCk2k2lBV2aCxnImTJ5f8Ur0w0bAtPgpw3cjyPQhz/NcLI5QFVgWK3giWrXpGpd5YzZ/nH+wMYprqzasGw7QTmXY5QtsV0emCcNJDMd+wP0e0sft26oGiYLru+RQWxAtK0vzvYPUAA7mWpH71+TSnRc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 10C4C227A87; Tue,  1 Oct 2024 10:39:12 +0200 (CEST)
-Date: Tue, 1 Oct 2024 10:39:11 +0200
+	id 59398227A87; Tue,  1 Oct 2024 11:20:48 +0200 (CEST)
+Date: Tue, 1 Oct 2024 11:20:48 +0200
 From: Christoph Hellwig <hch@lst.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, brauner@kernel.org, djwong@kernel.org,
-	viro@zeniv.linux.org.uk, jack@suse.cz, dchinner@redhat.com,
-	hch@lst.de, cem@kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, hare@suse.de,
-	martin.petersen@oracle.com, catherine.hoang@oracle.com,
-	mcgrof@kernel.org, ritesh.list@gmail.com, ojaswin@linux.ibm.com
-Subject: Re: [PATCH v6 1/7] block/fs: Pass an iocb to
- generic_atomic_write_valid()
-Message-ID: <20241001083911.GA20648@lst.de>
-References: <20240930125438.2501050-1-john.g.garry@oracle.com> <20240930125438.2501050-2-john.g.garry@oracle.com>
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, hare@suse.de,
+	sagi@grimberg.me, martin.petersen@oracle.com, brauner@kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, jaegeuk@kernel.org,
+	bcrl@kvack.org, dhowells@redhat.com, bvanassche@acm.org,
+	asml.silence@gmail.com, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-aio@kvack.org,
+	gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com
+Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+Message-ID: <20241001092047.GA23730@lst.de>
+References: <CGME20240930182052epcas5p37edefa7556b87c3fbb543275756ac736@epcas5p3.samsung.com> <20240930181305.17286-1-joshi.k@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,10 +38,11 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240930125438.2501050-2-john.g.garry@oracle.com>
+In-Reply-To: <20240930181305.17286-1-joshi.k@samsung.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Looks good:
+Any reason you completely ignored my feedback on the last version
+and did not even answer?
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+That's not a very productive way to work.
 
