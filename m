@@ -1,139 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout.perfora.net (mout.perfora.net [74.208.4.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178E51CB319
-	for <linux-block@vger.kernel.org>; Tue,  1 Oct 2024 15:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FF11CB524;
+	Tue,  1 Oct 2024 16:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.208.4.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727798391; cv=none; b=pVOAtNiB7j7zqS6GAXhu3k/bm6knObWbzebW6GgqnCHwFJkMZ6F2dnV7ZQfnjvr5kiYl6D5naJI++3Lj4KTG6s4NIR1Ms+9aZoV1fAG2NjDPzgW/LS5CXHaXcEOxKznSmwCfDhkndpQUDu7otjro6HxEmFRXF/+ILz27re6SCco=
+	t=1727799202; cv=none; b=crhs//DQSlviweQakpgXY+JeW9Wj8Gg7JXvgs0b+xGgpIcmsriALbpx8/ufUecYETRs+YaOPv7cnqAq+AcrCYIp4kZoNLpKfMnpB3SCBuQ+hZNRGaGVA/GBWT8+B+2eZti2U9hnmfqijCB5OblSwGrBboqplWTwC8oz6OCeVrYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727798391; c=relaxed/simple;
-	bh=11PpSItmRGySzj00xJglCXM6oonw2tTyyfHs+bvH3b4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DabzDxpLal3JLbz/3adFkzfmT3RB5YvRjmGHb8WYbeRmWymRxlkom6TFwnJW9PJvXdljDIZowBvuiTYtPo92fwIqSWb/vH0bCGsCqQWElEZsUOhduqjZkivVRFqoSjfegEMo43EY5Cd/Skt8p/8lr8UwyxJy2AEdVnvdtX41Osk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZFRB5O2w; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZFRB5O2w"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727798388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Pt9oSZjvdyhRuHwvrHhqU4iZrMh4nx/ABAlEg/T7YoM=;
-	b=ZFRB5O2wMUYwJJcSlT+WvwvbLdCPoJgjyby2x+7X65B0qnVNH8jQ3jRlkU5o1ebonoh1cc
-	XRbLBzF3KlwRkNfhzY8tjJsW7QJLeA7BQn9r1Y/bo9cArc1W1e8e2AktdFUc9EYqk5Y7mW
-	dJZjdoG2lbimBJRa32oCxGRIT3QBllk=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-QeydaRDiPny48c0ZzMZawA-1; Tue, 01 Oct 2024 11:59:48 -0400
-X-MC-Unique: QeydaRDiPny48c0ZzMZawA-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82aa8af04feso582599839f.1
-        for <linux-block@vger.kernel.org>; Tue, 01 Oct 2024 08:59:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727798387; x=1728403187;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Pt9oSZjvdyhRuHwvrHhqU4iZrMh4nx/ABAlEg/T7YoM=;
-        b=SMjCc+PbDwKPbYltyO1jAp12N1Z9ij+ZJ+dua4a/1IavkGxJezemyHIYkhmBh50mRb
-         xLb9EncEhfswEqgnKWHdmNsc2khR2GEHgHX8xd6vnsFrsjjlAA5+DMdQxAuAbn1H5sTQ
-         kUVcBdUOh4eJ2akycJxYIUQAJ8cBkwNh/AsMCKAJMpJcrbnUUghJX7FAaf8U2o7SGylg
-         qlB5bu7nBfGFTIA8SmnVBYPFGG6kwNaotXkkGHI5mqUdlsuQX7Pey+oBmx8Re64oegCX
-         VBb26pZW8HjjQfyNC2mc50kGHWM79YoufU59j/soRL5IHc+4Su9ECN/ksvwI9e7bCZf2
-         ZPTA==
-X-Forwarded-Encrypted: i=1; AJvYcCWaFxwDxJRORvwDt/mjkB5rZe83bCOueiGoAsxz8cOVAkfceFIDRR2yXNRE4Ab51rTox4zf742zlwqPbg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWgCE+ovpJb2UgzyiK8pDRUUPgPpz/WPD06eXAvL8IsniqSjcm
-	HvdoUityEIERjChvkFSobG+vvhOdtf7jEFKXoc4q0xUdkRzi9EZ6lTaaSBeNurziNBBxrKF6eSJ
-	E5thZ8goEYdCK25A91zrSmKexAafdS/xFkkPui3rU+TdpViYyJ50YewP5eLwtqZ7F5wY4Wm7GQ5
-	uOzQYmXSINkePeU9NYHDFtqtMSiCne0WJ0Jn0=
-X-Received: by 2002:a05:6e02:152a:b0:3a0:8c68:7705 with SMTP id e9e14a558f8ab-3a3451bc28cmr149151795ab.21.1727798386987;
-        Tue, 01 Oct 2024 08:59:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF6zi7QQok5nJey8sLlkc3K21xS/RR0PDZXUOpDiWCzSuNPV1QxvuJCOwNSARtr7Nq0bHmyFNzQFCLV5U6pIt0=
-X-Received: by 2002:a05:6e02:152a:b0:3a0:8c68:7705 with SMTP id
- e9e14a558f8ab-3a3451bc28cmr149151565ab.21.1727798386637; Tue, 01 Oct 2024
- 08:59:46 -0700 (PDT)
+	s=arc-20240116; t=1727799202; c=relaxed/simple;
+	bh=WArsn0K56fFi+9xbf+w+UqcpmiTu4Zl6xOHkdw1M67o=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ld7o1Sjl7knS5A0g5lX3ROS2FJ38noSM+1De/I3WlcY4e9t3sl58LyDRkLcW1Agnpv+ylxVnwKLzNNitudt3Slam3bs0bXTDUrJaTQqAWNkOJxcweEvpmZ1Qxm8EIQE1Zk6KD9HQN3nBE5QrC0KWNcsJ0repbzb3d7CDkJYrMdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=thebergstens.com; spf=pass smtp.mailfrom=thebergstens.com; arc=none smtp.client-ip=74.208.4.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=thebergstens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thebergstens.com
+Received: from jimw8 ([98.97.139.223]) by mrelay.perfora.net (mreueus002
+ [74.208.5.2]) with ESMTPSA (Nemesis) id 0Lbtbu-1sCjf30cXE-00evug; Tue, 01 Oct
+ 2024 17:58:25 +0200
+From: "James R. Bergsten" <jim@thebergstens.com>
+To: "'Christoph Hellwig'" <hch@lst.de>,
+	"'Kanchan Joshi'" <joshi.k@samsung.com>
+Cc: <axboe@kernel.dk>,
+	<kbusch@kernel.org>,
+	<hare@suse.de>,
+	<sagi@grimberg.me>,
+	<martin.petersen@oracle.com>,
+	<brauner@kernel.org>,
+	<viro@zeniv.linux.org.uk>,
+	<jack@suse.cz>,
+	<jaegeuk@kernel.org>,
+	<bcrl@kvack.org>,
+	<dhowells@redhat.com>,
+	<bvanassche@acm.org>,
+	<asml.silence@gmail.com>,
+	<linux-nvme@lists.infradead.org>,
+	<linux-fsdevel@vger.kernel.org>,
+	<io-uring@vger.kernel.org>,
+	<linux-block@vger.kernel.org>,
+	<linux-aio@kvack.org>,
+	<gost.dev@samsung.com>,
+	<vishak.g@samsung.com>,
+	<javier.gonz@samsung.com>
+References: <CGME20240930182052epcas5p37edefa7556b87c3fbb543275756ac736@epcas5p3.samsung.com> <20240930181305.17286-1-joshi.k@samsung.com> <20241001092047.GA23730@lst.de>
+In-Reply-To: <20241001092047.GA23730@lst.de>
+Subject: RE: [PATCH v7 0/3] FDP and per-io hints
+Date: Tue, 1 Oct 2024 08:58:17 -0700
+Message-ID: <006901db141a$bf9aa590$3ecff0b0$@thebergstens.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241001140245.306087-1-nilay@linux.ibm.com>
-In-Reply-To: <20241001140245.306087-1-nilay@linux.ibm.com>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Tue, 1 Oct 2024 23:59:34 +0800
-Message-ID: <CAHj4cs9Avm=CGfnJrwB5LJvXiW9-soozMhjYhWFAmdUPe_OyKQ@mail.gmail.com>
-Subject: Re: [PATCH] mm, slab: fix use of SLAB_SUPPORTS_SYSFS in kmem_cache_release()
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-mm@kvack.org, linux-block@vger.kernel.org, vbabka@suse.cz, 
-	akpm@linux-foundation.org, cl@linux.com, penberg@kernel.org, 
-	rientjes@google.com, iamjoonsoo.kim@lge.com, roman.gushchin@linux.dev, 
-	42.hyeyoo@gmail.com, shinichiro.kawasaki@wdc.com, axboe@kernel.dk, 
-	gjoyce@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+	charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQEtLMzQU9Mj3GK9LglaQbGW3QSfFAJ3IhvwAcJpBdOzrA9SwA==
+Content-Language: en-us
+X-Provags-ID: V03:K1:lv/Ipl00MnBrV8wUg8fbNZhL45WxX047MlZz8sQSg7lOnpxDafj
+ sctE9uJCJBO181V3JR/KCGtQEG8rMmYDC0NJNzoVB9jQz7Pdno0U7uAK3m6Z9vsAs9GYJSf
+ lyWMXG6tQg/J7lLe6hTY+ToIsKv+7SKuWoeo8WwyRTZ6fewLcGBa3tg8+tzdHOx2mqRYey9
+ WRH9M3x+SzUUDzPMPNgcA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:bQEm0Aqwc7E=;Ngp++CpEr0ANOEF+JEqnq6St0VH
+ XBDgQ0ALFIrFs+SbZtoljDmOZ5zLnlVoGx2+F4dYzhFR5ACzYTWonUrgq7f5AhZREz6jAIZqW
+ qeGrvj/HLq57PiV82HBvnIowVhM4l8sTSWbHCJBcpieej+N6tPLorEzj6NfMUBqoHNovg87QU
+ KidukiwF/W2Fe6DgW4RleSZSphq5N4yC26h4WdzRH0fjPUci4X4CbwWj7yzjzMxMHjeoskFZv
+ 2e/gv4iUCwnzPPWG2JSpXm6hJqA6PtD+P2JWPiYSJhyksSPTVRUal5hLMv6Jy1dx1JVczenBF
+ dWK7vslMfXvmBjrX/my1Y/MFEHC77u0lmwhlACN8zGcCiB8668dtXhMpwB+pAGZz7OTYZ4nEo
+ miQajcXB6wmlSmfg3NKDOmd31Nt1kyC11I4TTFQ0w2SwLLyfshWE3ZrOStzFE3PMCzadn0fUY
+ OatIKesgMnLKY/nAbyjdaZqB1QEB2WS67DVA2NCpH8AzIT/TVYeAW+Ln+1Er/rdDhFQzDWroM
+ n07siZpzAos07RGSp7YVcaoi2vtmMmEJ+GzdA5qfUR3hENqes/8/raHNt8kK8XrJvkIh+qLAl
+ Rac9V9iFXyIvMJ2avOqv+OmRkuudTJGyNVBHVZmjk7YVR7tItfb1VzDRnyvlIux63RxOrVMiT
+ 6MduGSPIFnFW/tVpRf6IUGoNa+SRMOmLMX9GE4hWLcmShx81Jdmxq1mRGjxtHWnMy0IwPXkcP
+ osEDB0LDYYggbNoaoqW6XLyvBT8jpaZGQ==
 
-On Tue, Oct 1, 2024 at 10:03=E2=80=AFPM Nilay Shroff <nilay@linux.ibm.com> =
-wrote:
->
-> The fix implemented in commit 4ec10268ed98 ("mm, slab: unlink slabinfo,
-> sysfs and debugfs immediately") caused a subtle side effect due to which
-> while destroying the kmem cache, the code path would never get into
-> sysfs_slab_release() function even though SLAB_SUPPORTS_SYSFS is defined
-> and slab state is FULL. Due to this side effect, we would never release
-> kobject defined for kmem cache and leak the associated memory.
->
-> The issue here's with the use of __is_defined() macro in kmem_cache_
-> release(). The __is_defined() macro expands to __take_second_arg(
-> arg1_or_junk 1, 0). If "arg1_or_junk" is defined to 1 then it expands to
-> __take_second_arg(0, 1, 0) and returns 1. If "arg1_or_junk" is NOT define=
-d
-> to any value then it expands to __take_second_arg(... 1, 0) and returns 0=
-.
->
-> In this particular issue, SLAB_SUPPORTS_SYSFS is defined without any
-> associated value and that causes __is_defined(SLAB_SUPPORTS_SYSFS) to
-> always evaluate to 0 and hence it would never invoke sysfs_slab_release()=
-.
->
-> This patch helps fix this issue by defining SLAB_SUPPORTS_SYSFS to 1.
->
-> Fixes: 4ec10268ed98 ("mm, slab: unlink slabinfo, sysfs and debugfs immedi=
-ately")
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Closes: https://lore.kernel.org/all/CAHj4cs9YCCcfmdxN43-9H3HnTYQsRtTYw1Kz=
-q-L468GfLKAENA@mail.gmail.com/
-> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+Now THIS Is the NVMe I came to know and love.  =F0=9F=98=8A
 
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
+-----Original Message-----
+From: Linux-nvme <linux-nvme-bounces@lists.infradead.org> On Behalf Of =
+Christoph Hellwig
+Sent: Tuesday, October 1, 2024 2:21 AM
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: axboe@kernel.dk; kbusch@kernel.org; hch@lst.de; hare@suse.de; =
+sagi@grimberg.me; martin.petersen@oracle.com; brauner@kernel.org; =
+viro@zeniv.linux.org.uk; jack@suse.cz; jaegeuk@kernel.org; =
+bcrl@kvack.org; dhowells@redhat.com; bvanassche@acm.org; =
+asml.silence@gmail.com; linux-nvme@lists.infradead.org; =
+linux-fsdevel@vger.kernel.org; io-uring@vger.kernel.org; =
+linux-block@vger.kernel.org; linux-aio@kvack.org; gost.dev@samsung.com; =
+vishak.g@samsung.com; javier.gonz@samsung.com
+Subject: Re: [PATCH v7 0/3] FDP and per-io hints
 
-> ---
->  mm/slab.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/mm/slab.h b/mm/slab.h
-> index f22fb760b286..3e0a08ea4c42 100644
-> --- a/mm/slab.h
-> +++ b/mm/slab.h
-> @@ -310,7 +310,7 @@ struct kmem_cache {
->  };
->
->  #if defined(CONFIG_SYSFS) && !defined(CONFIG_SLUB_TINY)
-> -#define SLAB_SUPPORTS_SYSFS
-> +#define SLAB_SUPPORTS_SYSFS 1
->  void sysfs_slab_unlink(struct kmem_cache *s);
->  void sysfs_slab_release(struct kmem_cache *s);
->  #else
-> --
-> 2.45.2
->
+Any reason you completely ignored my feedback on the last version and =
+did not even answer?
+
+That's not a very productive way to work.
 
 
---=20
-Best Regards,
-  Yi Zhang
 
