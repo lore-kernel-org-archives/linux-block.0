@@ -1,48 +1,59 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47EBC212F13;
-	Wed,  2 Oct 2024 18:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716B81D1F44
+	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 18:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727894242; cv=none; b=UsBTNVrRCqbfPoKQxZKENtpZITu9GBjNLjMAqrmvTR+G4dMGiJJqIqiw0M4xkoInNMb4oEGYKU02sUsRjZigaeDzZ+IoBsGZ3k+2Ulw9AVaXM8HhVnVC2Qsx3H9VslR9mUvHTN0iVslgaTaR17PvvlcXYlnxT7kknsvL2RMpF+U=
+	t=1727894315; cv=none; b=g9ccUTWVDm061I8TIo6k4kXJzypYSxwt5NSFe514RWI7VvMfwRdZBPrhgA50bx0GTkpOhqfHUVOdQTgFARWSIxeDkI0/2LpAwWd67f4NYApPFQ8SNEgc7Zk8H4l5Q7Bp7TzhOD8y1+79rclA3vYJ8DT0lgaHk8qaa1CBqg2n/8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727894242; c=relaxed/simple;
-	bh=msKaBRcTblAvNH8BTmUzvz0ZQ/WRHuI4LW0WaZWGq5s=;
+	s=arc-20240116; t=1727894315; c=relaxed/simple;
+	bh=xtCqdu3o/WVR5bOanAxpuwKmndQfilnxrYpVpFPeD8s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nhK0D1+ypYPKTtQ/UjOeCHy8EfppAEK2xB5rW597TdaQwFGxy/2yO+bewhz1kZCy0blkOSlXq9oidfVOdpqYvTgR7/9XQoc91n8Czyt3B5VzwcocyKCK23xwxPDlsbIzn+Vd8g8o4nFq9r+fODD8GeRevY+WKNlZXKYX8UUMeS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=QVx1wWKl; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=KrgCb78hmTMPHkvYmDtECmNXy2B01J9o8eOFlP3ihnt9LyytQjdHKFK6n2E9M4wjwiingqe22lnxSc57LVR3CB3BTyJbGDGBoFJKyZ/J9y4J3u1bg65tlm83PMbnq9fwhJBtKr0s8/xkjO/X/6ymcWOmHSJKKF9wSQJD27p36dY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=OHZwnTqi; arc=none smtp.client-ip=209.85.166.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="QVx1wWKl"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4XJk7N5N35zlgMWC;
-	Wed,  2 Oct 2024 18:37:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1727894234; x=1730486235; bh=gslW6VDOBWjnvqvcaaFUhPE4
-	6K/gPY6VZ++uzHysEOA=; b=QVx1wWKlxWBzqLs+71Yxrsn7vyqP4TVpyyjoh4o2
-	62HhZ9fJrKxzYpACINtvKg1BPuy36JCEx6L2R3GgrUAQx4XxWKYqNg0RsUMSC6u6
-	Aiv/Wrtszkqi7GgdDWtE2cEVHSd8kOc0eNspvNP4435z4urSy/DT3l8U7Afatp4E
-	m6rfDf24S/Nn+qdGk10CG2CQefu9V1C9BnvpwIoryOwRTdwarIgnbGqnx7uSSOf+
-	3pRFx59bZ+poAt9n+LpCqnn5BZntK47T33xonOKSr5r48mOBmojUu8q3f6us64Kj
-	4v1sVhZdMROcTC+UHMX15vGvroOFWLclvDkfowLn9WOudg==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id W4xEJA9JNW7E; Wed,  2 Oct 2024 18:37:14 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4XJk7C5sgTzlgMW9;
-	Wed,  2 Oct 2024 18:37:11 +0000 (UTC)
-Message-ID: <38daf18f-7637-4c27-9a43-67ad39dc15c0@acm.org>
-Date: Wed, 2 Oct 2024 11:37:11 -0700
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="OHZwnTqi"
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-82cd869453eso7155439f.0
+        for <linux-block@vger.kernel.org>; Wed, 02 Oct 2024 11:38:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1727894312; x=1728499112; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FJp0SLz4zhMPpN/9QdLXIlEOw6z2zlthBMJ+dYX71ZA=;
+        b=OHZwnTqiOZX2pCYvohsJfzZbj+miMj8lxDg/jGGTDvONYw/rAq5rL5TFJ/WfQhHz1P
+         SLbTRJgQuWMMEdvqexMNetzjeyGLQlg8U4IGgfeeovqHX5Z/cJ+pO1dbQoUuOs6lO1rO
+         N3SEC5ECzdfBOg4m4ZUW5oLNPI39+GbYUVU1AIMqRJEQ/Wo3/hhhGYEEufSzgCUhiRi+
+         5lBr8prbgDR9B4cbzPHyBOWETG4dUjgRnrsdk3fmhIeXt71vS22cVZ1Cedjg+213lMzm
+         HFvJ2VadKLu0elO1csmGY8MSzAqKbcVocrcMZ3plV07vgHkjUedQ/3EqGZ2+upM3UM8O
+         dmmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727894312; x=1728499112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FJp0SLz4zhMPpN/9QdLXIlEOw6z2zlthBMJ+dYX71ZA=;
+        b=tMvWM4DnWIDZyqDixWQxgnHNzzePphdAMyEOJbGmltwOWSAJZs2PWHKlijRxBc4UqR
+         kJJJr5zPJ+XN6zRXP9SXRk0G2Hoq5ElWcCtw1qo88VWMFHuOodH4iixBa/Ss7D3g8KXU
+         0UmoLyVG0lIWPIRV0AxxrFOEYcwEQUaiZq3KG+RLgc6RuQmQeM0vrPgCUgbpniVn8m4s
+         8kk1QdDxyOS2hzf9ReK1O8xY6lZKZgYTaUYkmzogrjQRfU6R5ae5fOm0oj6Dny0izTJa
+         kV+Qt8YLJKIfnt1bHSLFrfCVLkNXsCXV+4b1P9527x/ErEnEB/ycOnzslx/AtrPjBEPT
+         sr6g==
+X-Forwarded-Encrypted: i=1; AJvYcCVkyqhfiukfSwlZZciXUVt9RcLLGG7Hu/ccwmZawLhiiLozNzdLVCenrUEoyFI6JY/3mVZ6kvFchdgXxQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6FrxUK7c0U/6QKBpqwkzJ9GzX+BdtFcd61OKgWUR3AMAOlq7R
+	L2kDyMJuvVaSz0pUj/tPGUBNg4HmS7AZfbuc/dShZXhMjqfq8HaXLQ+D3tnLiNA=
+X-Google-Smtp-Source: AGHT+IG/gozMX83QOgvNxZbi7a72D75ruQINKEcBndSq/tSeqLeSd64OqvSHja3mYl25NQFARSWvzQ==
+X-Received: by 2002:a05:6602:2dc7:b0:82a:221d:51e8 with SMTP id ca18e2360f4ac-834d84f830dmr410358139f.13.1727894312385;
+        Wed, 02 Oct 2024 11:38:32 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4d8888497a6sm3232924173.37.2024.10.02.11.38.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Oct 2024 11:38:31 -0700 (PDT)
+Message-ID: <e20707d4-53bc-400c-bb66-f1bd63e063e9@kernel.dk>
+Date: Wed, 2 Oct 2024 12:38:30 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,41 +61,30 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 1/3] nvme: enable FDP support
-To: Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, kbusch@kernel.org,
- hch@lst.de, hare@suse.de, sagi@grimberg.me, martin.petersen@oracle.com,
- brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
- jaegeuk@kernel.org, bcrl@kvack.org, dhowells@redhat.com,
- asml.silence@gmail.com
-Cc: linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, linux-block@vger.kernel.org, linux-aio@kvack.org,
- gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com,
- Hui Qi <hui81.qi@samsung.com>, Nitesh Shetty <nj.shetty@samsung.com>
-References: <20240930181305.17286-1-joshi.k@samsung.com>
- <CGME20240930182056epcas5p33f823c00caadf9388b509bafcad86f3d@epcas5p3.samsung.com>
- <20240930181305.17286-2-joshi.k@samsung.com>
+Subject: Re: [RFC PATCH 1/2] aoe: add reference count in aoeif for tracking
+ the using of net_device
+To: Chun-Yi Lee <joeyli.kernel@gmail.com>, Justin Sanders <justin@coraid.com>
+Cc: Pavel Emelianov <xemul@openvz.org>, Kirill Korotaev <dev@openvz.org>,
+ "David S . Miller" <davem@davemloft.net>, Nicolai Stange <nstange@suse.com>,
+ Greg KH <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Chun-Yi Lee <jlee@suse.com>
+References: <20241002040616.25193-1-jlee@suse.com>
+ <20241002040616.25193-2-jlee@suse.com>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20240930181305.17286-2-joshi.k@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241002040616.25193-2-jlee@suse.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 9/30/24 11:13 AM, Kanchan Joshi wrote:
-> Flexible Data Placement (FDP), as ratified in TP 4146a, allows the host
-> to control the placement of logical blocks so as to reduce the SSD WAF.
-> 
-> Userspace can send the data lifetime information using the write hints.
-> The SCSI driver (sd) can already pass this information to the SCSI
-> devices. This patch does the same for NVMe.
-> 
-> Fetch the placement-identifiers if the device supports FDP.
-> The incoming write-hint is mapped to a placement-identifier, which in
-> turn is set in the DSPEC field of the write command.
+On 10/1/24 10:06 PM, Chun-Yi Lee wrote:
+> This is a patch for debugging. For tracking the reference count of using
+> net_device in aoeif, this patch adds a nd_pcpu_refcnt field in aoeif
+> structure. Two wrappers, nd_dev_hold() and nd_dev_put() are used to
+> call dev_hold(nd)/dev_put(nd) and maintain ifp->nd_pcpu_refcnt at the
+> same time.
 
-Is the description of this patch correct? The above description suggests
-that FDP information is similar in nature to SCSI data lifetime
-information. I don't think that's correct.
+There's no parallel universe in which using a percpu reference over just
+a refcount_t for something like aoe is warranted.
 
-Thanks,
-
-Bart.
+-- 
+Jens Axboe
