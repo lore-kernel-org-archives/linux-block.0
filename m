@@ -1,125 +1,172 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA8E197552
-	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 09:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C342564
+	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 10:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727860838; cv=none; b=iGSJyLWazRjfOdtzCqVeOg5RkrhsKM/IzVfMuHnTSNYW87lDijz8aBChh6VgtF4IEgEn47WDoNNSAJ5LvYgkylLrCTX3GJ2BCOtIBFNSVStnf2H6cliQvrPsJcV/xJAYn2O368BcYxng82Ky9nDHg8rXR3Fnp9OnDEx28jYJiyM=
+	t=1727864996; cv=none; b=ZIgotraJoxm8nIWBAcHLwUDiecRnzaHlOWBJc3zAY7x3Yp0dUTkGkueKuZ0KCDZnMYtMX+VZQqRp3cf+sWjv6d/0PJILK1n3FuHQf+pp814B0rONXLhP66uecVVv7q/qYGOR6XlPj13vP7lnGg3D6N+/4FN927d0MrRHszL0xQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727860838; c=relaxed/simple;
-	bh=mzDHbmnmSbZgPh/ZeldgAOMha3PtMlQ6ANgxAOBY+Lo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=JHosBGi0OFmdCWMLNzuAautr4EtLFcR63LnB/ncB68vTzaOx7Ukx8XCX0CTt4OSScqSw+Ov7rkR8ktn6UoPyqqaRfoLplx10gWdA/p1dL7uVkNLEn04RmYr/TWgmS33mrpj24HbZNKDSCLVFGXKRsT+hF7Hl45cWY4MMYi678Hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rasmusvillemoes.dk; spf=pass smtp.mailfrom=rasmusvillemoes.dk; dkim=pass (1024-bit key) header.d=rasmusvillemoes.dk header.i=@rasmusvillemoes.dk header.b=QogGA6z5; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rasmusvillemoes.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rasmusvillemoes.dk
+	s=arc-20240116; t=1727864996; c=relaxed/simple;
+	bh=NuNGaQe1XYDBG/UKLly1YHcwXhE3cmJIYgOSQXOKipM=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:References; b=gUCCkE728p1nMlIeDOdTqn3O72LWqsYfm4MTHIwcw6//Aksd18LIzpGvMwxkki0Dkir1PmQqj7L9okQC6GuOSXIO4xnUNWSMH8WhYWEXhjpXVjkRMdvX16CGNa3RVm48K3mp8WfJ+4cBBP0IaVOMpCTx4AHl2kovvKUQTTILpr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=FdKqEZeV; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rasmusvillemoes.dk header.i=@rasmusvillemoes.dk header.b="QogGA6z5"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5398e58ceebso599961e87.0
-        for <linux-block@vger.kernel.org>; Wed, 02 Oct 2024 02:20:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rasmusvillemoes.dk; s=google; t=1727860835; x=1728465635; darn=vger.kernel.org;
-        h=mime-version:user-agent:message-id:date:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ZO0Y8/ubh1XnuZPCq0ksaN5wnj9mPknfJDM/0u+lyg=;
-        b=QogGA6z5eZVmTANsamaQycj17E5dDAmzrgR5aS6Kh4VQ5qH5zJu85Gb1n+oG1R9AdY
-         gUiF9TQ0oudqONW3Wsz3a5wzIuekzBQ1FFmLB+IIbB2Gy75b/0PlVcnOsKgzAB4uIACp
-         /8t61Cbl4CgKgBh9+Y9IX45DcjEJRlDc+Ksik=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727860835; x=1728465635;
-        h=mime-version:user-agent:message-id:date:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3ZO0Y8/ubh1XnuZPCq0ksaN5wnj9mPknfJDM/0u+lyg=;
-        b=p1K7TY7vuWsjBu435uSl0gw1bMkImd+fs5ke2Wa+dCnIEV5ujmica8sMlPAhRNrgam
-         HSacIh+w5tEy5lv/+ZyARbKd2bdlUl4lRMNwCoy/wdHO4k+rBkjc9cNJNxm/rKn3VA42
-         +R65vUwSg0BA8i2eOmQd3RvDh/sNmAGc/pMmh1d1KwcA/8AttVRS6tAde1z0GeE/bNsd
-         DV4Oa0/hJ1OXU55zapbyaO7PVjUWm8ye8GK1rejBUUSGKGEBCCvbZBtbFAHi8hiQgnJ2
-         sMHH9RFyN4eO03TXvZEgu42HFIYTLF1dIIM5ccrdfaQ3tcqmZHSCVTF7vgoW9qbOlGNt
-         r1Fg==
-X-Forwarded-Encrypted: i=1; AJvYcCUxmfK0Jw65cnWF8p0cxMilxJ2ubrn+yLlr9PjEGJIpdxEr6XOsX3GOMssp5bP6PeeEiwVjdTUs03vP0g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxssqQLtXReSP1P1Dmk+9mTG6NskiXzUuG2yLwWog2DdWpFEux4
-	e926YA9s+dTtIE1LCNkoLUZsuYYQYfI75lshIIdYy6Fnr8ffim/Ad+mdygOAizY=
-X-Google-Smtp-Source: AGHT+IGtXJvrufAFjd2v/2BhFG3gRzFXYZPIU0TWOYK8Da9d0sVChTE0gL9gdkfIYnsbyV2u2l+F+A==
-X-Received: by 2002:a05:6512:12ca:b0:539:950b:139c with SMTP id 2adb3069b0e04-5399a24664bmr2042373e87.12.1727860835200;
-        Wed, 02 Oct 2024 02:20:35 -0700 (PDT)
-Received: from localhost ([81.216.59.226])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-538a043220csm1817735e87.156.2024.10.02.02.20.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2024 02:20:34 -0700 (PDT)
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-To: Andy Shevchenko <andy@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,  Jens Axboe <axboe@kernel.dk>,
-  Jonathan Corbet <corbet@lwn.net>,  Ulf Hansson <ulf.hansson@linaro.org>,
-  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,
-  Conor Dooley <conor+dt@kernel.org>,  Kees Cook <kees@kernel.org>,  Daniel
- Golle <daniel@makrotopia.org>,  INAGAKI Hiroshi
- <musashino.open@gmail.com>,  Christian Brauner <brauner@kernel.org>,  Al
- Viro <viro@zeniv.linux.org.uk>,  Li Lingfeng <lilingfeng3@huawei.com>,
-  Ming Lei <ming.lei@redhat.com>,  Christian Heusel <christian@heusel.eu>,
-  linux-block@vger.kernel.org,  linux-doc@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  linux-mmc@vger.kernel.org,
-  devicetree@vger.kernel.org,  linux-hardening@vger.kernel.org,  Miquel
- Raynal <miquel.raynal@bootlin.com>,  Lorenzo Bianconi
- <lorenzo@kernel.org>,  upstream@airoha.com
-Subject: Re: [PATCH v4 0/5] block: partition table OF support
-In-Reply-To: <ZvqfbNDfI2QWZEBg@smile.fi.intel.com> (Andy Shevchenko's message
-	of "Mon, 30 Sep 2024 15:54:04 +0300")
-References: <20240930113045.28616-1-ansuelsmth@gmail.com>
-	<ZvqfbNDfI2QWZEBg@smile.fi.intel.com>
-Date: Wed, 02 Oct 2024 11:20:37 +0200
-Message-ID: <87setej1y2.fsf@prevas.dk>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="FdKqEZeV"
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20241002102952euoutp02cec4c6e73c7539602965932c84d1aaf8~6nA5MUbtY2046920469euoutp02l
+	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 10:29:52 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20241002102952euoutp02cec4c6e73c7539602965932c84d1aaf8~6nA5MUbtY2046920469euoutp02l
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1727864992;
+	bh=B7pqOXXsM4Y87OzYSQIv8cWnQpJASDOO+OelvX9tBTs=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=FdKqEZeVcduiCxjNyO1FjwA10duqW1kr9fANYEePAhoaRCV92/CdtIUsQbXnPWFKc
+	 hMU5xNf+eHv3g7iG9R3k237Vf75iNyodR+DFeA+/4C7SY0scRZnTT74k1tCReduF1e
+	 C1zaDTYOLw1B9+x+HqeHhEnqJAWSVoBivv2KWn0c=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+	20241002102951eucas1p2a0fdbebc26c60c32df61e59d65b2613b~6nA46Rvm20706107061eucas1p2f;
+	Wed,  2 Oct 2024 10:29:51 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges3new.samsung.com (EUCPMTA) with SMTP id 2D.0A.09620.F902DF66; Wed,  2
+	Oct 2024 11:29:51 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20241002102951eucas1p2d81570a43d6e75c85f443a333a0e8b6a~6nA4hpTY32003520035eucas1p2l;
+	Wed,  2 Oct 2024 10:29:51 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241002102951eusmtrp2972f2b67761158907056603808cd1d63~6nA4hF7G70948109481eusmtrp2S;
+	Wed,  2 Oct 2024 10:29:51 +0000 (GMT)
+X-AuditID: cbfec7f5-d1bff70000002594-f5-66fd209f8b8c
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms2.samsung.com (EUCPMTA) with SMTP id 32.23.19096.F902DF66; Wed,  2
+	Oct 2024 11:29:51 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20241002102951eusmtip11d992995ccbcdf598a4a3c6705fa05aa~6nA4X1WuW1301313013eusmtip1g;
+	Wed,  2 Oct 2024 10:29:51 +0000 (GMT)
+Received: from localhost (106.110.32.122) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Wed, 2 Oct 2024 11:29:50 +0100
+Date: Wed, 2 Oct 2024 12:29:50 +0200
+From: Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
+To: Keith Busch <kbusch@kernel.org>
+CC: "Martin K. Petersen" <martin.petersen@oracle.com>, Kanchan Joshi
+	<joshi.k@samsung.com>, <axboe@kernel.dk>, <hch@lst.de>, <sagi@grimberg.me>,
+	<linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+	<gost.dev@samsung.com>, Chinmay Gameti <c.gameti@samsung.com>
+Subject: Re: [PATCH v2 2/3] block: support PI at non-zero offset within
+ metadata
+Message-ID: <20241002102950.g4dure7kobtaixgf@ArmHalley.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZvwXN5n1XyqRoH9H@kbusch-mbp.mynextlight.net>
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrKKsWRmVeSWpSXmKPExsWy7djPc7rzFf6mGdw6bG6x+m4/m8XK1UeZ
+	LCYdusZosfeWtsX8ZU/ZLZYf/8dkse71exYHdo/z9zayeFw+W+qxaVUnm8fmJfUeu282sHl8
+	fHqLxePzJrkA9igum5TUnMyy1CJ9uwSujGs7epkKXgtU3HnwjrWBcQ1vFyMnh4SAicSFRQdZ
+	uhi5OIQEVjBKLDzTzQbhfGGUOHrsJCOE85lR4smLGUAZDrCW+Y+sIeLLGSV6Go8xwxVdvXQT
+	ytnMKLHrxCtGkCUsAioSXUfOsIDYbAL2EpeW3WIGsUUElCXuzp/JCtLALDCVSeLes3tgDcIC
+	QRJbHvcwgdi8ArYSDd+2sELYghInZz4BG8QsYCXR+aGJFeQkZgFpieX/OCDC8hLNW2eDzecE
+	KlnWeZ0R4lEliccv3kLZtRKnttxiAtkrIdDOKXFr22F2iISLxIvVC5khbGGJV8e3QMVlJP7v
+	nM8EYVdLNJw8AdXcwijR2rGVFRIu1hJ9Z3IgahwlZvdtYoQI80nceCsIcRufxKRt05khwrwS
+	HW1CExhVZiF5bBaSx2YhPDYLyWMLGFlWMYqnlhbnpqcWG+ellusVJ+YWl+al6yXn525iBKak
+	0/+Of93BuOLVR71DjEwcjIcYJTiYlUR47x36mSbEm5JYWZValB9fVJqTWnyIUZqDRUmcVzVF
+	PlVIID2xJDU7NbUgtQgmy8TBKdXANN98Z+8r5vmce3LjHK40h/sv6HP48y6ySoaL8WnjktbF
+	eUbRz52efPUTrEiTrMz5yikoqzel6de5R1+in/DKhWo2Mdz40TK/6Wdy6dMrn1em/Pw651ha
+	0tL3fQelpepkmGSthWY0Tp31jEPZ8bWws4V/1qT132/rNyfb+eq8XTT3gaH/7uamLeweBvFr
+	rukmLuadrfzRWtBxdsS7VX8bst/m6kevm84g+bvw1huRaS8uNRU1nHEu7RHaWLd8ksZthpA2
+	wa40rbNnX4WlBjydnXKEi3OayUWpmTeuRlrvm1H8taJzRgi/6Z6LUtFb31u6nBHZ27tpq6TO
+	DZsPd44usuc+L7G8fV5KBn/bkdOtSizFGYmGWsxFxYkA7JuxE7gDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrPIsWRmVeSWpSXmKPExsVy+t/xu7rzFf6mGRzcLWex+m4/m8XK1UeZ
+	LCYdusZosfeWtsX8ZU/ZLZYf/8dkse71exYHdo/z9zayeFw+W+qxaVUnm8fmJfUeu282sHl8
+	fHqLxePzJrkA9ig9m6L80pJUhYz84hJbpWhDCyM9Q0sLPSMTSz1DY/NYKyNTJX07m5TUnMyy
+	1CJ9uwS9jGs7epkKXgtU3HnwjrWBcQ1vFyMHh4SAicT8R9ZdjFwcQgJLGSVmtt9j6WLkBIrL
+	SGz8cpUVwhaW+HOtiw2i6COjxPtvFxkhnM2MEje3fQXrYBFQkeg6cgbMZhOwl7i07BYziC0i
+	oCxxd/5MVpAGZoGpTBL3nt1jBEkICwRJbHncwwRi8wrYSjR828IKMfULs8Tka/uZIRKCEidn
+	PgGbyixgITFz/nlGkLuZBaQllv/jgAjLSzRvnQ1WzilgJbGs8zojxNlKEo9fvIWyayU+/33G
+	OIFRZBaSqbOQTJ2FMHUWkqkLGFlWMYqklhbnpucWG+kVJ+YWl+al6yXn525iBMbstmM/t+xg
+	XPnqo94hRiYOxkOMEhzMSiK89w79TBPiTUmsrEotyo8vKs1JLT7EaAoMo4nMUqLJ+cCkkVcS
+	b2hmYGpoYmZpYGppZqwkzst25XyakEB6YklqdmpqQWoRTB8TB6dUA1OPxpkZU8M/zK0wk5n3
+	zOx5B4ez7YGNp9POvzQIUOlPOue9dIPpYcu0X4J3czlf50x8tz3vzrvgwJdal7tm9k5s+e6V
+	81pp5ZeTJS1S2n83cJtt3Bzv289238v7q/q//ubu0K9zZthmfFHk/vqOOTnt/r0d8/naquq/
+	fDr8J4V1BeefBtmGVVdCZKZoNk3bWSXcVKR8KeZ4v/CD+TtKF4l9S1upn5b9QcMuYOLxb3kb
+	+UzTX1xJVAxauGzPX5GSHM8j0+o/cW6tVAtk+39xjfPNKze1r5u7LX8zN/qxdt9WY4XM5c3F
+	hz9f+5R1bp3jabb3U078PcduWcr54d8Uk4XNvzY1LN+V8rjzB8Oeqk4/JZbijERDLeai4kQA
+	X14TTmIDAAA=
+X-CMS-MailID: 20241002102951eucas1p2d81570a43d6e75c85f443a333a0e8b6a
+X-Msg-Generator: CA
+X-RootMTR: 20240201130843epcas5p1b1840bd14ced64a1effb6fd8c93c926d
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20240201130843epcas5p1b1840bd14ced64a1effb6fd8c93c926d
+References: <20240201130126.211402-1-joshi.k@samsung.com>
+	<CGME20240201130843epcas5p1b1840bd14ced64a1effb6fd8c93c926d@epcas5p1.samsung.com>
+	<20240201130126.211402-3-joshi.k@samsung.com> <ZvV4uCUXp9_4x5ct@kbusch-mbp>
+	<8ed2637b-559e-3f27-3d1f-84a4718475fb@samsung.com>
+	<ZvWSFvI-OJ2NP_m0@kbusch-mbp>
+	<165deefb-a8b3-594e-9bfb-b3bcd588d23f@samsung.com>
+	<yq1ttdx81ub.fsf@ca-mkp.ca.oracle.com>
+	<20241001072708.tgdmbi56vofjkluc@ArmHalley.local>
+	<ZvwXN5n1XyqRoH9H@kbusch-mbp.mynextlight.net>
 
-Andy Shevchenko <andy@kernel.org> writes:
-
-> On Mon, Sep 30, 2024 at 01:30:07PM +0200, Christian Marangi wrote:
->> Hi,
->> this is an initial proposal to complete support for manually defining
->> partition table.
->> 
->> 
->> Some block device also implement boot1 and boot2 additional disk. Similar
->> to the cmdline parser, these disk can have OF support using the
->> "partitions-boot0" and "partitions-boot1" additional node.
->> 
->> It's also completed support for declaring partition as read-only as this
->> feature was introduced but never finished in the cmdline parser.
+On 01.10.2024 09:37, Keith Busch wrote:
+>On Tue, Oct 01, 2024 at 09:27:08AM +0200, Javier González wrote:
+>> On 30.09.2024 13:57, Martin K. Petersen wrote:
+>> >
+>> > Kanchan,
+>> >
+>> > > I spent a good deal of time on this today. I was thinking to connect
+>> > > block read_verify/write_generate knobs to influence things at nvme level
+>> > > (those PRCHK flags). But that will not be enough. Because with those
+>> > > knobs block-layer will not attach meta-buffer, which is still needed.
+>> > >
+>> > > The data was written under the condition when nvme driver set the
+>> > > pi_type to 0 (even though at device level it was non-zero) during
+>> > > integrity registration.
+>> > >
+>> > > Thinking whether it will make sense to have a knob at the block-layer
+>> > > level to do something like that i.e., override the set
+>> > > integrity-profile with nop.
+>> >
+>> > SCSI went to great lengths to ensure that invalid protection information
+>> > would never be written during normal operation, regardless of whether
+>> > the host sent PI or not. And thus the only time one would anticipate a
+>> > PI error was if the data had actually been corrupted.
+>> >
+>>
+>> Is this something we should work on bringin to the NVMe TWG?
 >
+>Maybe. It looks like they did the spec this way one purpose with the
+>ability to toggle guard tags per IO.
 >
-> I'm not sure I fully understood the problem you are trying to solve.
-> I have a device at hand that uses eMMC (and was produced almost ten years ago).
-> This device has a regular GPT on eMMC and no kernel needs to be patched for that.
-> So, why is it a problem for the mentioned OEMs to use standard GPT approach?
+>Just some more background on this because it may sound odd to use a data
+>protection namespace format that the kernel didn't support:
+>
+>In this use case, writes to the device primarily come from the
+>passthrough interface, which could always use the guard tags for
+>end-to-end protection. The kernel block IO was the only path that had
+>the limitation.
+>
+>Besides the passthrough interface, though, the setup uses kernel block
+>layer to write the partition tables. Upgrading from 6.8 -> 6.9 won't be
+>able to read the partition table on these devices. I'm still not sure
+>the best way to handle this, though.
 
-For the user area (main block device), yes, a GPT can often be used, but
-not always. For the boot partitions, the particular SOC/cpu/bootrom may
-make it impossible to use a standard partition table, because the
-bootrom expects to find a bootloader at offset 0 on the active boot
-partition. In such a case, there's no way you can write a regular MBR or
-GPT, but it is nevertheless nice to have a machine-readable definition
-of which data goes where in the boot partitions. With these patches, one
-can do
+Mmmm. Need to think more about this.
 
-  partitions-boot0 {
-    partition@0 {
-      label = "bootloader";
-      reg = <0 0x...>; // 2 MB
-    }
-    partition@... {
-      label = "device-data";
-      reg = <...> // 4 MB
-    }
-  }
-
-and describe that layout.
-
-Rasmus
+Seems this is by design in NVMe.  Will try to come back to Mike and Judy
+to understand the background for this at the time...
