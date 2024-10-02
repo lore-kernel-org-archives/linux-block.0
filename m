@@ -1,70 +1,71 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC1E1CFEC7
-	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 13:17:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E993A1CFEDA
+	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 13:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727875052; cv=none; b=Mq5L/Gmrphix/ZWtJQMNYovo6a0/ylcIqGDf2B4+v59EFXffYHZAXMXl9J9wCV+rcja+EJ7WbzTjhS5IkrIoKtLbBLQY3jQ8+KGGm5TN3mP3tEJhyKo0GgP6OTUvFqdApg0lVOu+a2JRhS9rYiuPOBeH4A9v2Qk9Y9apEZzylic=
+	t=1727875052; cv=none; b=Kb7UQRMruxG9ucD0ZhM+4qj+h6IskyBI2EeWYIT6E4SucoedoMk2MffPZ0FkTgI/GzV5vz0hk1OI1yVSWbSaJVb2dYd8+tQoPSRJ8ilyRfBWqlR+mzpDrFkUpPU7eVMCOKLlJR/FPPGBe7TbWJ75YGs3mFwkZ/0UsLUwOcrm6lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1727875052; c=relaxed/simple;
-	bh=36nWme8y4GZ94wWNug6vyCXS0wdvEP/HfW+1E7YCpRk=;
+	bh=2A+8b1pr0Z3hF2MWtBAakd+me1LkLLnlQ/jk00xjDvc=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=EJLzWeY0S2tOA11jzisYezJAXK9QfiMV+isbiV5goaCXShMVn966TGQlhh1/xqR7JbMia0cJH2h90jzWx3R3F/x0QRJvk2d7maHM+C6A499xSRTKITkY9WuTCip1q0xrtYM7BVZ5XYZ4FJioUZh4ZJ9Tpvuwxb7NdHP1YIoKy3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=taTGbIF7; arc=none smtp.client-ip=209.85.166.182
+	 MIME-Version:Content-Type; b=N2Bg0K++Z2guy0D5nSR+k/SD1xp+BG0piyXfmdlPMeq3skMOfJFVrnGNDHfsx57WHfe6fijTjP3Qtg/8lnCkx0+vcRQB1HWbyMw2plD6Ksq9xazT3WBEq06XHVi6r5bcneDJOFX1oNUpLat9gfNvnKHpYKNiULMc7Usr4JElWPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=QXSMoyuY; arc=none smtp.client-ip=209.85.166.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="taTGbIF7"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3a2759a1b71so33621405ab.0
-        for <linux-block@vger.kernel.org>; Wed, 02 Oct 2024 06:17:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="QXSMoyuY"
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3a34ccc6a9aso14682535ab.1
+        for <linux-block@vger.kernel.org>; Wed, 02 Oct 2024 06:17:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1727875048; x=1728479848; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1727875050; x=1728479850; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fRW4Cz/ZHbTxTOnb6ZoyufUiDwCoy63jco0zbwWoTDE=;
-        b=taTGbIF7EiUE3jZ3URAk+jvyHeVim7xQQaRKn/zR65NBAQWKIUMYdfxiZy0KTvwJtt
-         SnCYzkb3g1dGoOK57Ub5atfiySbTLC6hqNl3+3WaGhcUst0iuMfo+AAr1gWV1owl5Z3T
-         qCEObT9Ic+lU441t+f0eFlwZB6XCX3j5KmeSYrk31kO8JfRhljVuMRuBnE2lCdbav7sZ
-         VgX0eoxh4T471MFLMQR5I67Ji7OsRef5o6FKMMFucWBLzyd9zrVYPz8nl5VeWiO6DdFn
-         ytkMHqPkmDfkAhGdFW4af1m+sL9FsjehaQD+A5dunq+3NC3ZCrUn1a9/nZ4UYmzoIxY1
-         QoMw==
+        bh=dLHqmD5F960+PFVlj2adteaxIzC89WdoauZaGlnWSKU=;
+        b=QXSMoyuYwAeuYYZBA9EBmq71R4S+zZDF7iYYcMv5Fq2CQymDbMsHvqmX+4bSPqFdeP
+         hmwLUrJXDs2laxClA6lJ++TEmKITEXYAF3T5F7DvsYO2nz+YK63fN+fL6wsjhgLRYnDp
+         RzZT3Ch/IjxEzPoz0BmTcOsaMOk2AWVrsqhS6Fv7jUNKHn8f9/S/if2QOUZpOzaH+qQW
+         QZPzj6aw7RbNUJ/WkKVX008yVx0Yjmh9Z+RAhYWaJoA/9BsCoW8nCZ5Cg+gue2iMZjjj
+         JbUy5uAuZw6uddAiVcY+Xc8jVlNbjiTunTONzh6UxdD2s8MxWI8Nwh2l6tD6GvOetF0S
+         EBag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727875048; x=1728479848;
+        d=1e100.net; s=20230601; t=1727875050; x=1728479850;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fRW4Cz/ZHbTxTOnb6ZoyufUiDwCoy63jco0zbwWoTDE=;
-        b=lRCLObP0prlcfVoa2e0xzocDbHhyLlOnfTSZ8YZehu0+uAjWlRNIgeUt/m6Wyb4Zid
-         VxAk/9VoNvAym8+HGBeKa4JYwx7ETORkUtjp1KZibaCe12ni24rjFNvA23v52Y+/EhrH
-         rhtGkIv+e/PXnFtM61tCdbw7GxFVh2oP+4XsvxCg1KkbMFNNEcBWLobMzG3k6YJSYC/J
-         MGkeaa7jv98t7mFt9Q6J9cFZ2Z7wdnLcGr28ovdeZB5jX6m1/8ZdOcuxAXcZNvsJTGQ/
-         XTJAJqFpDQVnXHohVnoGe2lbOQSTIv58XjmkqSEe/Wf2Fwn/ADdVsHczrla6yypZJaVi
-         NEwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVrJ8s4eLfLcey4dJYu74pck/AyeLyCLoPVtsiqA4cbt9feBScUK9SmVPYw8JNPxZ1TtWIF93nRe6A9KA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YznKcs2wEW3MSPqEavxj0RwhferzVNWiAGR8HVs1mgjTMgD1wEC
-	Rmblt/bCZ/kbJGXxWZvesZAJGVqUNMGTKBrmzqjU4jGHqZn/XVBOJ/9RIbH+fkFtwDaPF5YcDhG
-	AEkE=
-X-Google-Smtp-Source: AGHT+IHuxaPoCYtm3L1Gav3Ro6gdyVRIy6bPAZVe7gjGl0fcZClv9KzDyZ1fxfNnKo1x1TzHZQxr+Q==
-X-Received: by 2002:a05:6e02:1a8f:b0:3a3:6045:f8bd with SMTP id e9e14a558f8ab-3a3659156b1mr26379705ab.5.1727875048142;
-        Wed, 02 Oct 2024 06:17:28 -0700 (PDT)
+        bh=dLHqmD5F960+PFVlj2adteaxIzC89WdoauZaGlnWSKU=;
+        b=HJRC8JwCltzqeDETz8G/dSHCSgoTuj2yVtQXhfBRvgPU9FFCsqMq/v6aJbJWxk/hN5
+         CmVKZwvQWCaZUxDYrDu1D2c/RVfGF1eGcSMA3XX46KgMO7acqzx55nLjMt8BChs7ZeVc
+         4qru+zw0MtDQVMuaHiqnuMyUpbLJhYYjO0HHXVpHv3gKcucPayu6kdrqQ3hsdjAIS8ou
+         4dYvA7lkaSrgNl4Frs1cVjUwllTNTNOE3rDj9Qxxe5oYtd7yPblyx+/sNzoxMUoUWMmG
+         KjlLRPJbBxQk9drkD5Bl27gEHGxCT1e3k9d/V0urM8cznLlSOe5bmG4WToYgj8HsdhJC
+         DUxw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTXRPWHU2SolVLLh6ABTd13rz25qcVQwwtBp3eb6jOnB02IADxv02SwoMPThh3f/n0JNj/J2ks0AS83A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4Hw7R65Xaw8SGqxdn+/42+7k3lxoWoMO89yKVLxGMU+sC4vN9
+	3wgE2yEcL2NP6/kwORTsyGp35O7WyUDd9NF9WITlV/cT300DLW9JWyPDecsrSI/V6cCRU4ufpZW
+	goAg=
+X-Google-Smtp-Source: AGHT+IHIht0I/8GJalCXOyPKOfttdnOyJtYt5xKO9zFwIYtuSDHUVoTtPl7Mvzx/BNOqNOKHveJAuw==
+X-Received: by 2002:a05:6e02:1a89:b0:3a0:4c4e:2e53 with SMTP id e9e14a558f8ab-3a365915437mr25754565ab.5.1727875050072;
+        Wed, 02 Oct 2024 06:17:30 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a3678e3ea3sm3490625ab.87.2024.10.02.06.17.27
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a3678e3ea3sm3490625ab.87.2024.10.02.06.17.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2024 06:17:27 -0700 (PDT)
+        Wed, 02 Oct 2024 06:17:28 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Yu Kuai <yukuai3@huawei.com>, Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
- cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, 
- Christoph Hellwig <hch@lst.de>
-In-Reply-To: <Zv0kudA9xyGdaA4g@stanley.mountain>
-References: <Zv0kudA9xyGdaA4g@stanley.mountain>
-Subject: Re: [PATCH v2] blk_iocost: remove some duplicate irq
- disable/enables
-Message-Id: <172787504695.64996.11187205888353360431.b4-ty@kernel.dk>
-Date: Wed, 02 Oct 2024 07:17:26 -0600
+To: Justin Sanders <justin@coraid.com>, 
+ Chun-Yi Lee <joeyli.kernel@gmail.com>
+Cc: Pavel Emelianov <xemul@openvz.org>, Kirill Korotaev <dev@openvz.org>, 
+ "David S . Miller" <davem@davemloft.net>, Nicolai Stange <nstange@suse.com>, 
+ Greg KH <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Chun-Yi Lee <jlee@suse.com>
+In-Reply-To: <20241002035458.24401-1-jlee@suse.com>
+References: <20241002035458.24401-1-jlee@suse.com>
+Subject: Re: [PATCH v3] aoe: fix the potential use-after-free problem in
+ more places
+Message-Id: <172787504822.64996.12000204584360248821.b4-ty@kernel.dk>
+Date: Wed, 02 Oct 2024 07:17:28 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,17 +77,24 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.2-dev-648c7
 
 
-On Wed, 02 Oct 2024 13:47:21 +0300, Dan Carpenter wrote:
-> These are called from blkcg_print_blkgs() which already disables IRQs so
-> disabling it again is wrong.  It means that IRQs will be enabled slightly
-> earlier than intended, however, so far as I can see, this bug is harmless.
+On Wed, 02 Oct 2024 11:54:58 +0800, Chun-Yi Lee wrote:
+> For fixing CVE-2023-6270, f98364e92662 ("aoe: fix the potential
+> use-after-free problem in aoecmd_cfg_pkts") makes tx() calling dev_put()
+> instead of doing in aoecmd_cfg_pkts(). It avoids that the tx() runs
+> into use-after-free.
 > 
+> Then Nicolai Stange found more places in aoe have potential use-after-free
+> problem with tx(). e.g. revalidate(), aoecmd_ata_rw(), resend(), probe()
+> and aoecmd_cfg_rsp(). Those functions also use aoenet_xmit() to push
+> packet to tx queue. So they should also use dev_hold() to increase the
+> refcnt of skb->dev.
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] blk_iocost: remove some duplicate irq disable/enables
-      commit: 14d57ec3b86369d0037567f12caae0c9e9eaad9e
+[1/1] aoe: fix the potential use-after-free problem in more places
+      commit: 6d6e54fc71ad1ab0a87047fd9c211e75d86084a3
 
 Best regards,
 -- 
