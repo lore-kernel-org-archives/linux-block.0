@@ -1,73 +1,42 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC7911187
-	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 05:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56FD1FDA;
+	Wed,  2 Oct 2024 06:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727848427; cv=none; b=rtWnC2U2RsoXV/uP1zXxtSNnBOWe5LyVVyQygoeHNODxKRINFEr9hvP5T4N9XwqgGi8yVdy2jrVyfY89dAAy7318hjpb418Q48rrmtvruLNMndx15pnP3TvEu/RTMhjO/96Uelw3ntWdi7fEUvqfNlbKEck7BrrJ5wbzE9/hQII=
+	t=1727850652; cv=none; b=k8/ux0cnTywe1no7vfYtXWJtpe41CBrClxspVEAgR3xnMdzh4YVCPosqfQhMBIfEmfJZ6PjRijit16cxFqp/JV2ySfgr6N6DCVuufCMJvuLHIL3BwF0wqK8J9d/HPLLgCYy5hMgQOvDxGgxCZMQuMhnuYzEiAkT3mNlylRpRzYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727848427; c=relaxed/simple;
-	bh=SIgX91uTHifWEtgReNCzhIe7IG2O8Z1SQtz8/H0apK8=;
+	s=arc-20240116; t=1727850652; c=relaxed/simple;
+	bh=gP0sKfhvuSzg57TNF4iZB6rcl55U6xG8gnT83uX1NM4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OJPw/V9GB4JWLCKZEM9+H/spf+IuYmynIHiuvCpzL6oDCjIijcVxVfGrPBY/uOtu1yec9Ad7Mmwr2s5rSkXOYfGlmvWQDv/oGxuxtH42us4aL50RzH1qLxFc3QGF3V3nUPSf62DRpTVFEmGK3QRIgilCTVTkscBHoXqq7n/8yyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=O5XcbVAw; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=GciiG+cYqjFT59oU7PUaLYuDtOrhaOYAWINDg7cbPXM9E1KYNs9eFjKG9TOvPKhKSt9bAEC56P2+AOeQjXp7eFci6YPniX/CrIXKQwqP6AGHd53XWnctal7zuX4k1gzZKahI2MCvAKbY1RUciYyTIENAf3NL4Gs0Awdt1jb8QLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=SVt5Wfe+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="O5XcbVAw"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-37cd831ab06so2537897f8f.0
-        for <linux-block@vger.kernel.org>; Tue, 01 Oct 2024 22:53:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1727848423; x=1728453223; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Z3bBDoAXmx+gs8b1KuDNQSPhrXil7aJHswuVh/xJcY=;
-        b=O5XcbVAwb59+wKirArFvJcotvGIpkAhCWVYyhrDF+yCq43Zl2p7edf4Xyzghy6P26d
-         0Ci/c1Z4nPPpSxYMKDvKQBGC7FLwzr+715Zagy6SW0tbGGgUF8tpQRpJGkdxnwZvXrMQ
-         aFBCsJFxv1Hl8gp904oMbOmMFfARy04pVdvE9fb6C5MjD5QeqyxBCnBWrUFARoPcEplX
-         mvndmweDv5bDU50PvW2zl9a8H4ozZXk2faSwUiR6/vFC2o/6Ay5p9Ih1h/Q0xH7fsZAW
-         tbPPkW+yqjZP3eXS7Q3rtxFzMXNkQ/meFSPivHRAFuBllwHimDekINUtcgVS9IBMXi0D
-         CAXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727848423; x=1728453223;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0Z3bBDoAXmx+gs8b1KuDNQSPhrXil7aJHswuVh/xJcY=;
-        b=U8tHOJ/UHgo3tCbR32Lkq5tt1tG8Yls6nLjtF3QzkEWHToW1h1SdiVYJYvD4JSdGdz
-         /o1pPK2iDgbHypyaGX/6DOcGc/xuEMQz13hC4nEd3c8hBBU/LcIwBy6dHjn1C5LKFRKi
-         cT1AjywOKC2B2dqn04Nkj9a1SStp3JSVxDr3GbOGT1aFZdFynXQ28ScpzrNNgI9tCQvW
-         enjXN6o/9dyn7H6IQ9ePDFqjT8syT/epchkD6xfDjmVLpMmoboSQtUJ4RlL+YwKTm/Tr
-         SNbNmF51HMtaOGqCS5CbgAUkxGb4Tuovo0M0GF5cFusLJOTzC3Vgny42e8ccBcWY740C
-         qHzg==
-X-Forwarded-Encrypted: i=1; AJvYcCVvUTABmdwgbIFl84L3gxb3qD3ryGisuuMdzZ6WjlmyHEk5ysCoTZmYDmkLWYEui4yvH2hu8Fub/6Q2SA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yydbxnym+Xf+9NMhHL6S/88p9axzd/wLo2Kqd+MGIGKgp42HfwM
-	riCV0UaUsW4pSS3yO3RbbI2DlxmmggrebGvvAQ4h83kYMoOx+3B0Iy7Q7o1g2/E=
-X-Google-Smtp-Source: AGHT+IEYmAs+Nb8DOVp6b/C54wZi0j4LpH8rZzXj+DcrAl6qDLY7Tfv4lzNuqeMfdg2bjma+P+w37w==
-X-Received: by 2002:a5d:694a:0:b0:374:bde6:bff5 with SMTP id ffacd0b85a97d-37cfb9fb82bmr892437f8f.46.1727848423184;
-        Tue, 01 Oct 2024 22:53:43 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e4e24fsm78588645ad.244.2024.10.01.22.53.40
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 01 Oct 2024 22:53:42 -0700 (PDT)
-Date: Wed, 2 Oct 2024 13:53:38 +0800
-From: joeyli <jlee@suse.com>
-To: Valentin Kleibel <valentin@vrvis.at>
-Cc: Chun-Yi Lee <joeyli.kernel@gmail.com>,
-	Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="SVt5Wfe+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2439C4CEC5;
+	Wed,  2 Oct 2024 06:30:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1727850652;
+	bh=gP0sKfhvuSzg57TNF4iZB6rcl55U6xG8gnT83uX1NM4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SVt5Wfe+ixxQYeEvzIHoQluwKBk7pJq4X/hDB34WhI9RH1E+aTExMoNWIG17fiqXn
+	 lfhAkLnG2N7ZsrYNcXgMlCPfMWEP0h9IDhNZ5GyV1mJc0BEyUkSeI+vC0dXh6fX7vw
+	 axrFXlnZ8brcTN+SXS+8BBsQRzzOdYD7IGRl9Khs=
+Date: Wed, 2 Oct 2024 08:30:49 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Chun-Yi Lee <joeyli.kernel@gmail.com>
+Cc: Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
 	Pavel Emelianov <xemul@openvz.org>,
 	Kirill Korotaev <dev@openvz.org>,
 	"David S . Miller" <davem@davemloft.net>,
-	Nicolai Stange <nstange@suse.com>,
-	Greg KH <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] aoe: fix the potential use-after-free problem in more
- places
-Message-ID: <20241002055338.GI3296@linux-l9pv.suse>
-References: <20240912102935.31442-1-jlee@suse.com>
- <9371a3ab-3637-4106-bee5-9280abb5f5ae@vrvis.at>
+	Nicolai Stange <nstange@suse.com>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Chun-Yi Lee <jlee@suse.com>
+Subject: Re: [RFC PATCH 2/2] aoe: using wrappers instead of dev_hold/dev_put
+ for tracking the references of net_device in aoeif
+Message-ID: <2024100223-selection-thirsty-99b9@gregkh>
+References: <20241002040616.25193-1-jlee@suse.com>
+ <20241002040616.25193-3-jlee@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,43 +45,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9371a3ab-3637-4106-bee5-9280abb5f5ae@vrvis.at>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20241002040616.25193-3-jlee@suse.com>
 
-Hi Valentin,
+On Wed, Oct 02, 2024 at 12:06:16PM +0800, Chun-Yi Lee wrote:
+> Signed-off-by: Chun-Yi Lee <jlee@suse.com>
 
-On Thu, Sep 12, 2024 at 12:58:46PM +0200, Valentin Kleibel wrote:
-> > Then Nicolai Stange found more places in aoe have potential use-after-free
-> > problem with tx(). e.g. revalidate(), aoecmd_ata_rw(), resend(), probe()
-> > and aoecmd_cfg_rsp(). Those functions also use aoenet_xmit() to push
-> > packet to tx queue. So they should also use dev_hold() to increase the
-> > refcnt of skb->dev.
-> 
-> We've tested your patch on our servers and ran into an issue.
-> With heavy I/O load the aoe device had stale I/Os (e.g. rsync waiting
-> indefinetly on one core) that can be "fixed" by running aoe-revalidate on
-> that device.
-> 
-> Additionally when trying to shut down the system we see the message:
-> unregister_netdevice: waiting for XXX to become free. Usage Count = XXXXX
-> on aoe devices with a usage count somewhere in the millions.
-> This has been the same as without the patch, i assume the fix is still
-> incomplete.
->
+For obvious reasons, we can't take patches without any changelog
+comments, nor really review them either :(
 
-For the reference count debugging, I have sent a patch series here:
+thanks,
 
-[RFC PATCH 0/2] tracking the references of net_device in aoe
-https://lore.kernel.org/lkml/20241002040616.25193-1-jlee@suse.com/T/#t
-
-Base on my testing, the number of dev_hold(nd) and dev_put(nd) are balance
-in aoe after the this 'aoe: fix the potential use-after-free problem in more places'
-patch be applied on v6.11 kernel. I have tested add/modify/delete files in remote
-target by aoe. My testing is not a heavy I/O testing. But the result is
-balance.
-
-Could you please help to try the above debug patch series for looking at the
-refcnt value in aoe in your side?
-
-Thanks a lot!
-Joey Lee
+greg k-h
