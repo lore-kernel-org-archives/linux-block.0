@@ -1,41 +1,61 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC526433A9;
-	Wed,  2 Oct 2024 06:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9031FA4;
+	Wed,  2 Oct 2024 07:45:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727851847; cv=none; b=OTjjhP5XINmkpNmoEgF1CIsL1xHSXFA1CUopNl2lKmRIMkn/zEu37nCgp5/qXdP3XF2DtPcA8eJ7VGF0RoX2WV6TVvxVvabI5+ohLE1beEynNT0CbvXVJOjn4tD0ltSPM5ZWGfPTxp/rp2yKu0fSk+vIXykE6CPI4qIexAJIV44=
+	t=1727855145; cv=none; b=PKNV717jn7lk2nw2YIsYsEAyNW1VG6x6/xy7w4x3SNenajVRlVh3vqz94oqImmcyrfIAxEY0du3fpYyOdyWv9zQ8h9FpLe5dD7PdeXStSTnR2Qu8hX9VLcrzuYEfkeBNVkjAg39nwbhSAWhkxUpJP5u8tWoA42kRfR5v86QAMuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727851847; c=relaxed/simple;
-	bh=pe9TIUfOBz09aCk+wGE1jr2d3K4acd8qNm27bzgQx0o=;
+	s=arc-20240116; t=1727855145; c=relaxed/simple;
+	bh=kMJLqEV9tqhVK4MaaTaIf2NqFonku/YMWeCm0UPMw+g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ALDZAsqLvk8eBf4hncv71vHWl//Y5xlb5ZXkBHh/iQaRXwC3uPrBLNTPbU026gJoCJZPesfhevYgztLKXmcBWXlQnSl3k+MR4h5f8bUTTZRZv/WlKLDDRd1y6+kF5bURf174dglagRw16tvPHUGepkcaZPdA/48GlkQJeBftDB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Le/brAcA; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=EcDOaNUJSgPqOpvVF2thnQyVdGxBct+Ec7f5SUSXFT9qOxd2b1LgwlUvBCCihWV9oVniqoR1E9UhzDV0ML/L4dUtS1P0rnd8EKlk1gKvmQ6Ra5rQonu4ZV2ngX/Jn3rWeaAnPfHR7n4mSbu/zRSRlcSrENzuTxqfcUR6Iuy6ImI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=jWhW7GU0; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Le/brAcA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9370C4CEC5;
-	Wed,  2 Oct 2024 06:50:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1727851846;
-	bh=pe9TIUfOBz09aCk+wGE1jr2d3K4acd8qNm27bzgQx0o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Le/brAcAIxeEmd/Y+RH6JCKDZjhjBruMl6kap/QHPEVRETlwFAJ67d0kwyAjo+6hY
-	 JQPmSV58D3P0YZeRosE86Ae9ljwvzPZORHpqZBxSiareSQgBwT8tdgwV13dCmAdzZv
-	 Xfn+MqY0A7ZC6IMv+gfNwFob60MUaALpkCLrBBFM=
-Date: Wed, 2 Oct 2024 08:50:43 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Chun-Yi Lee <joeyli.kernel@gmail.com>
-Cc: Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
-	Pavel Emelianov <xemul@openvz.org>,
-	Kirill Korotaev <dev@openvz.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Nicolai Stange <nstange@suse.com>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Chun-Yi Lee <jlee@suse.com>
-Subject: Re: [PATCH v3] aoe: fix the potential use-after-free problem in more
- places
-Message-ID: <2024100233-email-regalia-8b66@gregkh>
-References: <20241002035458.24401-1-jlee@suse.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jWhW7GU0"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=+DhPlvZlgWyskAxxSMsqdkfwqzEhNZOw6Hp35GCELxs=; b=jWhW7GU067oIFkt/MVbbr+n18I
+	wGHnBAxyd6w8KVrImRRpeg0e8F9y2jHDIEVqUQPj0tMABOnVUHDgg3vzJV/cL7mqxIFVyGQW0k04R
+	mG1/tE0hfZiTGC2OcXUAiomagy9LPxMJewGF+HXgqsdPBLHd1iZ3LNImSJDZCB+5/Y+Aiq2mg3ULJ
+	ucLYzc7Zh6MzKOqZ4cIHtwFaZrcLqFDHtQE/pR16gQuQoANDxGhaHkj9iY48UC32IXqQR8lkRb5Ub
+	+8b/Seys7fulUj0BxasEhk18bXdnehu6debe2cwDX2SIt8Rh6EVGlOAoPCbxiJ5/xZuncm8hB+cxE
+	bYVueTUw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1svu3F-000000053lB-1BAr;
+	Wed, 02 Oct 2024 07:45:37 +0000
+Date: Wed, 2 Oct 2024 00:45:37 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	INAGAKI Hiroshi <musashino.open@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>, Ming Lei <ming.lei@redhat.com>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Christian Heusel <christian@heusel.eu>, linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: Re: [RFC PATCH 3/4] block: add support for partition table defined
+ in OF
+Message-ID: <Zvz6ITaMKmo0U3c3@infradead.org>
+References: <20240923105937.4374-1-ansuelsmth@gmail.com>
+ <20240923105937.4374-4-ansuelsmth@gmail.com>
+ <ZvJdjRpFaPUuFhIO@infradead.org>
+ <66f291c5.5d0a0220.328e5a.2c9e@mx.google.com>
+ <Zvu0sRreId59-lpH@infradead.org>
+ <66fbc042.050a0220.3523ed.a6f9@mx.google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,58 +64,18 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241002035458.24401-1-jlee@suse.com>
+In-Reply-To: <66fbc042.050a0220.3523ed.a6f9@mx.google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Oct 02, 2024 at 11:54:58AM +0800, Chun-Yi Lee wrote:
-> For fixing CVE-2023-6270, f98364e92662 ("aoe: fix the potential
-> use-after-free problem in aoecmd_cfg_pkts") makes tx() calling dev_put()
-> instead of doing in aoecmd_cfg_pkts(). It avoids that the tx() runs
-> into use-after-free.
+On Tue, Oct 01, 2024 at 11:26:22AM +0200, Christian Marangi wrote:
+> > No.  ->disk_name is in no way reliable, we can't hardcode that into
+> > a partition parser.
+> > 
 > 
-> Then Nicolai Stange found more places in aoe have potential use-after-free
-> problem with tx(). e.g. revalidate(), aoecmd_ata_rw(), resend(), probe()
-> and aoecmd_cfg_rsp(). Those functions also use aoenet_xmit() to push
-> packet to tx queue. So they should also use dev_hold() to increase the
-> refcnt of skb->dev.
-> 
-> On the other hand, moving dev_put() to tx() causes that the refcnt of
-> skb->dev be reduced to a negative value, because corresponding
-> dev_hold() are not called in revalidate(), aoecmd_ata_rw(), resend(),
-> probe(), and aoecmd_cfg_rsp(). This patch fixed this issue.
-> 
-> Link: https://nvd.nist.gov/vuln/detail/CVE-2023-6270
-> Fixes: f98364e92662 ("aoe: fix the potential use-after-free problem in aoecmd_cfg_pkts")
-> Reported-by: Nicolai Stange <nstange@suse.com>
-> Signed-off-by: Chun-Yi Lee <jlee@suse.com>
-> ---
-> 
+> Then any hint on this or alternative way?
 
-Hi,
+The normal way would be to use eui/ngui/uuid provided by the storage
+device.  We have a interface for that in the block layer support by
+scsi and nvme, but I don't know how to wire that up for eMMC which
+I suspect is what you care about.
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
-
-You are receiving this message because of the following common error(s)
-as indicated below:
-
-- You have marked a patch with a "Fixes:" tag for a commit that is in an
-  older released kernel, yet you do not have a cc: stable line in the
-  signed-off-by area at all, which means that the patch will not be
-  applied to any older kernel releases.  To properly fix this, please
-  follow the documented rules in the
-  Documentation/process/stable-kernel-rules.rst file for how to resolve
-  this.
-
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
-
-thanks,
-
-greg k-h's patch email bot
