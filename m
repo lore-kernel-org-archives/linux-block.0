@@ -1,57 +1,57 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D7119E7F3;
-	Wed,  2 Oct 2024 22:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7D619E98C;
+	Wed,  2 Oct 2024 22:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727907232; cv=none; b=nq3YEWBhjz0qlIp1NZ2Dod5ZDrqdKdB5g2kHj/v90O8viXPW7RJMiyatjOdLXy9T7n8HJw69r+p98j5P9K26xXCZbeI3HEG2nfgVeiOg5vAjJntyqV0/kkEr6xlURXz2wjFf2YdXpFvypUjGCoKC9UGCGpXVkslJAGjCFyb3v8M=
+	t=1727907235; cv=none; b=W3X88Z+jyJ6KVLPaUckQclT0k90aMTJrJ2h/35RF7rWUagkVYTRJ1E3L9bGh3prANougdk7tlhr2V4/E3sOV9xQgXg3AGRg0XT28/5GhaSW7au0fZ60zLKm7VNrl6qZ1iuzzuHApR5f1wslk1oP266tewlfM8bsyY/uJ9Ws7iXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727907232; c=relaxed/simple;
-	bh=R6u21lJQXFNnRlPRZqRDOeZ1baSlH/7f2ouLC6yhy+s=;
+	s=arc-20240116; t=1727907235; c=relaxed/simple;
+	bh=qBrpQ0OapihIETdTqtZmWQZZ6yy1lqfSHQgAjBqAJ8w=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OAmwyUuV7X6LcK1eTPOVqU8PZfEBbPZb9IizLgV8/swdQ+5NuOMOSxWvs9aHSf/1fmwMEfFZXnMdfsUpRabi5sYxmJDRIVdfPHCMMOxwn+HfUp0JLir+7U1ouSE0ssyAyTq3CFQCny/YXHevx9bttSbdKBlGy5ldc6kjVLxgorw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YqVw/CPG; arc=none smtp.client-ip=209.85.128.47
+	 MIME-Version; b=r6fuSqW3P9N97osr+WyJ0B62icVCbJNPFQsgDu+odujBuwhIy24U8xoNc4rIZ5snymrBj5YivI27RfJ1Wm7KzA+3XFzHtq6Y17p5zJDFgzZ9EUiqRYmFZsoJNSxtPXpqbz8vC0KWG1gS1BfwqY9xQZK9/Kor1sXI7/Uc3I5GVUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lxm8O27n; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YqVw/CPG"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42cb5b3c57eso1995135e9.2;
-        Wed, 02 Oct 2024 15:13:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lxm8O27n"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42cafda818aso1928935e9.2;
+        Wed, 02 Oct 2024 15:13:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727907229; x=1728512029; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727907232; x=1728512032; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bCCt52yzo7zLbL4p9hv8SgURf+U+fcbnakLfmIN0V0o=;
-        b=YqVw/CPGnoMfQouLXiqelVg4lmh4kMwym9QSDfr1k5itzEN6IOjnVhJhMa+6wOpHOy
-         oBHJpR90UV87QqrVPIWePwrd0uZxW4d/p51R98WMxvSOtV1uyhI6in7CgxsDm5qkZX/w
-         2JKYpV9/B0U7oa/1GABgCxdJpXiVIuB/NeQPtFHOI3MasTZ1omHiS/S7cy1BNfaeeO9s
-         MsrpaHscRCAa6n5CBuqdxM0hxvBq98bTHxs8Sa2w4kvI/vnbU75VPuolmDNXdqJ32AIc
-         GHb4ldy2hjHjGO3tiBbaw2tmQfelXOpO8+jubynqposfqZtyo9b4iwboUVjNhzGMha16
-         GT0Q==
+        bh=Oc8lpQtVqxlF5EBGWgyVqr5bkZcHuTE/5Ln0cX5+BQ8=;
+        b=lxm8O27ndD1IovRPmEHIyBt4dfqminLY6UmhRfL7quK31n3BbKZqN8GdxBRyCFWB42
+         W81y5qhVDty4pppgD0PgfHjeWjtB2X20jckpQ/GqnVmMnxqtLM3R8MHjtrqUEsf+v0oi
+         woq+xNJFx3W40ECzPUJqyPEKae/4qPZIvcOwBheAZxokqcPO4/rzCshronGjtjAKuCgL
+         6w/U/53MHkJ54ziZdKVAhNOcqzoc1Wy+x2y/Wizw2qcQS3YJuaCSxL94jG0JY9FQZGjJ
+         34WbO4pCgXaIXrBMP0Mcz0F3y4RWQceyaMSiHajo1jSjvzN0E8TumAF5zopv11pWSgqS
+         7acw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727907229; x=1728512029;
+        d=1e100.net; s=20230601; t=1727907232; x=1728512032;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bCCt52yzo7zLbL4p9hv8SgURf+U+fcbnakLfmIN0V0o=;
-        b=mmjhwBeKBrlZ5OdDu9dRHUX31xsC7BWA6RC+Ft8s6zsd9SpGB8nQHyLa17Ytfj7y+q
-         JatcIAlqhFVkxmFnP1gJJeOhIBhT1tG2JZgIBVxCtv8vVt92CUUvImmqwhRyPgYgP0AA
-         j44StvAa1METDfNoRI0JpksQ83nrS0oyHA1ehj9Tm8ugR+x6zcs+KGVsvMfddGOzbuSV
-         7w8i6JVHa2fBnOtgz/fplYs0rxPRCl+JIbQp7YgHG88z2SbvyynzcTHCAKcj8G7LZOIr
-         tAyCHl/gQimIlgx/jDLBH2zHmYoK1mMknfBY10tpzjRmcBTFmS+RjHfl9k99ph6d9g4v
-         YOtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUbBNjT2qwNnFVZWnpmuXdSMtjmdYkD6xz6z7v285kBpRnnH15QzP6FWLMUICFZc803+WXRph+mh7L1@vger.kernel.org, AJvYcCVMeHZdkOQfpR61NxEBEP5hdhmPTqaiX70lFzJR9ETvRSk/TGZEYjCOZ7xm7LzsQ00ut2lV8wT5zRR2@vger.kernel.org, AJvYcCVOmwsbbdz7Waq8F6vzbjLIiikKsicR6hQUca5dFO/o6OlGMpikysznS2P1LPErsStTTf5Q2aekdW6/223z@vger.kernel.org, AJvYcCVPDJwO0t8xHnBgTNoPMOH/A1lFl3b9S9x+Tm7p63vgl/o4VXDy7vq+BjAxVtDDEYkaHgfQOgtVtx2baUw=@vger.kernel.org, AJvYcCWTF70gHdyupaKCGW96EBAmP6VtcARJizkDwVHfr+7mdvcY3VnPQHsJGT2OL08JaKvEzSo7SfS4sjxu@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7guvnPpiVoDSDLax5jP6ZBwmD2HYspPS6Nm54ocWdKzeonBri
-	G4HJSNahkqoBa32TuxmiFHdYaUsdynvf2q36JNGC0neL2OWJcbCs
-X-Google-Smtp-Source: AGHT+IHbJ2VGvDWq9QrfhQabMZJM8rJ89EGNrryJEQbKFGMgmxsiqQCKWjbdtW00ydatiZXlORy+OA==
-X-Received: by 2002:a05:600c:4fc8:b0:428:18d9:9963 with SMTP id 5b1f17b1804b1-42f778f3821mr39279815e9.22.1727907229071;
-        Wed, 02 Oct 2024 15:13:49 -0700 (PDT)
+        bh=Oc8lpQtVqxlF5EBGWgyVqr5bkZcHuTE/5Ln0cX5+BQ8=;
+        b=lnNmgS+mIU7WCAryE5wzUqkwUDQDm3K2J3WCD+NVNk6rGdyePWAkdamYFdVeFNFGCX
+         Mnwo3EiMZjI9J4U7akig+uO2emomfiy4IkYwcD1PU5+7tHhbQHIqSGy7y+fH3A3/pRyU
+         ct9TYK8GBXLcFoSv9XfZFFaeZwH4V/l/4JDgTwfOSIXXfecI3TG3PfcxnUHlxoZLuXD/
+         ThrbZtFCetJ4updBEuV/ETD+mVyqXeC60hw/+eKh7U/ws1sxv3UJLcjTVzZQ0nZqVKBn
+         fl1AzSV23oFLhcfYa8vdRSSxSmj/mGn2fKZjc35wNlH3uy8HEvNJ07WGITZDYrRfo1Sq
+         BaGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2o0k/neOQ7FAUzZz7IOvIGIt00zGxtnIx5u61lECmz2HGrhZzuA9Xc8XKxlkaCDmMcaDiZivAxxXS@vger.kernel.org, AJvYcCUgoCHLSCWcXeVWg0N1We5pxgVQw31j5GP/w7b9yJTfM5V9Th5d43Qtm+l22e0H05vxhbBr/mJ00PAS@vger.kernel.org, AJvYcCWP0v8Tb0+GUZWUUAF0Z5CLJB4vvN+YC/UkkPJVIYS/uPzXx18BmzL0Ab6SjYKYhL6hhc6PMDJlS0rNTuM=@vger.kernel.org, AJvYcCXSiplaGOtrYufMBz9c0cF8QXu7kkY9zmcJzyoBsFy2mIkkGTa9JXN+2yp6GNuFis68VewzNshwXO1J@vger.kernel.org, AJvYcCXW4JlmXsEDHQHpWQ4Bx4QZV+0Q0cboHaX5FjlllgM6qVyYOh6htZQrACf3fkK1M/xeUrAp5CO4YhMVRy23@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOFsR3kV6ZfLFjZCNbbI3eZTfGbEqC+czqATMmrwwQz3klAhrD
+	iu0eqZkI25CNEKDd61c1AMZZG7YdLT7jfFHuEjYYm8Zmc14O6ZnZ
+X-Google-Smtp-Source: AGHT+IHrLc+U7lAjjtGt7GZ1uGyyMTu09XhAfXdEeCsNqOHh9RGHrZ02SW/Rm37DHFy3T1Yd4xOG8g==
+X-Received: by 2002:a05:600c:3b05:b0:42c:acb0:ddb6 with SMTP id 5b1f17b1804b1-42f777b7325mr34382125e9.9.1727907231663;
+        Wed, 02 Oct 2024 15:13:51 -0700 (PDT)
 Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42f79ead1absm29218245e9.17.2024.10.02.15.13.46
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42f79ead1absm29218245e9.17.2024.10.02.15.13.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2024 15:13:48 -0700 (PDT)
+        Wed, 02 Oct 2024 15:13:50 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jonathan Corbet <corbet@lwn.net>,
@@ -86,9 +86,9 @@ To: Jens Axboe <axboe@kernel.dk>,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
 	upstream@airoha.com,
 	Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH v6 3/6] block: introduce add_disk_fwnode()
-Date: Thu,  3 Oct 2024 00:11:43 +0200
-Message-ID: <20241002221306.4403-4-ansuelsmth@gmail.com>
+Subject: [PATCH v6 4/6] mmc: block: attach partitions fwnode if found in mmc-card
+Date: Thu,  3 Oct 2024 00:11:44 +0200
+Message-ID: <20241002221306.4403-5-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20241002221306.4403-1-ansuelsmth@gmail.com>
 References: <20241002221306.4403-1-ansuelsmth@gmail.com>
@@ -100,96 +100,105 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce add_disk_fwnode() as a replacement of device_add_disk() that
-permits to pass and attach a fwnode to disk dev.
+Attach partitions fwnode if found in mmc-card and register disk with it.
 
-This variant can be useful for eMMC that might have the partition table
-for the disk defined in DT. A parser can later make use of the attached
-fwnode to parse the related table and init the hardcoded partition for
-the disk.
+This permits block partition to reference the node and register a
+partition table defined in DT for the special case for embedded device
+that doesn't have a partition table flashed but have an hardcoded
+partition table passed from the system.
 
-device_add_disk() is converted to a simple wrapper of add_disk_fwnode()
-with the fwnode entry set as NULL.
+JEDEC BOOT partition boot0/boot1 are supported but in DT we refer with
+the JEDEC name of boot1 and boot2 to better adhere to documentation.
+
+Also JEDEC GP partition gp0/1/2/3 are supported but in DT we refer with
+the JEDEC name of gp1/2/3/4 to better adhere to documentration.
 
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- block/genhd.c          | 28 ++++++++++++++++++++++++----
- include/linux/blkdev.h |  3 +++
- 2 files changed, 27 insertions(+), 4 deletions(-)
+ drivers/mmc/core/block.c | 55 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 54 insertions(+), 1 deletion(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 1c05dd4c6980..bc30eee7ab16 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -383,16 +383,18 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index f58bea534004..d7eadf2b407f 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -2501,6 +2501,56 @@ static inline int mmc_blk_readonly(struct mmc_card *card)
+ 	       !(card->csd.cmdclass & CCC_BLOCK_WRITE);
  }
  
- /**
-- * device_add_disk - add disk information to kernel list
-+ * add_disk_fwnode - add disk information to kernel list with fwnode
-  * @parent: parent device for the disk
-  * @disk: per-device partitioning information
-  * @groups: Additional per-device sysfs groups
-+ * @fwnode: attached disk fwnode
-  *
-  * This function registers the partitioning information in @disk
-- * with the kernel.
-+ * with the kernel. Also attach a fwnode to the disk device.
-  */
--int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
--				 const struct attribute_group **groups)
-+int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
-+				 const struct attribute_group **groups,
-+				 struct fwnode_handle *fwnode)
- 
- {
- 	struct device *ddev = disk_to_dev(disk);
-@@ -452,6 +454,8 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 	ddev->parent = parent;
- 	ddev->groups = groups;
- 	dev_set_name(ddev, "%s", disk->disk_name);
-+	if (fwnode)
-+		device_set_node(ddev, fwnode);
- 	if (!(disk->flags & GENHD_FL_HIDDEN))
- 		ddev->devt = MKDEV(disk->major, disk->first_minor);
- 	ret = device_add(ddev);
-@@ -553,6 +557,22 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 		elevator_exit(disk->queue);
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(add_disk_fwnode);
-+
-+/**
-+ * device_add_disk - add disk information to kernel list
-+ * @parent: parent device for the disk
-+ * @disk: per-device partitioning information
-+ * @groups: Additional per-device sysfs groups
++/*
++ * Search for a declared partitions node for the disk in mmc-card related node.
 + *
-+ * This function registers the partitioning information in @disk
-+ * with the kernel.
++ * This is to permit support for partition table defined in DT in special case
++ * where a partition table is not written in the disk and is expected to be
++ * passed from the running system.
++ *
++ * For the user disk, "partitions" node is searched.
++ * For the special HW disk, "partitions-" node with the appended name is used
++ * following this conversion table (to adhere to JEDEC naming)
++ * - boot0 -> partitions-boot1
++ * - boot1 -> partitions-boot2
++ * - gp0 -> partitions-gp1
++ * - gp1 -> partitions-gp2
++ * - gp2 -> partitions-gp3
++ * - gp3 -> partitions-gp4
 + */
-+int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
-+				 const struct attribute_group **groups)
++static struct fwnode_handle *mmc_blk_get_partitions_node(struct device *mmc_dev,
++							 const char *subname)
 +{
-+	return add_disk_fwnode(parent, disk, groups, NULL);
++	const char *node_name = "partitions";
++
++	if (subname) {
++		mmc_dev = mmc_dev->parent;
++
++		/*
++		 * Check if we are allocating a BOOT disk boot0/1 disk.
++		 * In DT we use the JEDEC naming boot1/2.
++		 */
++		if (!strcmp(subname, "boot0"))
++			node_name = "partitions-boot1";
++		if (!strcmp(subname, "boot1"))
++			node_name = "partitions-boot2";
++		/*
++		 * Check if we are allocating a GP disk gp0/1/2/3 disk.
++		 * In DT we use the JEDEC naming gp1/2/3/4.
++		 */
++		if (!strcmp(subname, "gp0"))
++			node_name = "partitions-gp1";
++		if (!strcmp(subname, "gp1"))
++			node_name = "partitions-gp2";
++		if (!strcmp(subname, "gp2"))
++			node_name = "partitions-gp3";
++		if (!strcmp(subname, "gp3"))
++			node_name = "partitions-gp4";
++	}
++
++	return device_get_named_child_node(mmc_dev, node_name);
 +}
- EXPORT_SYMBOL(device_add_disk);
- 
- static void blk_report_disk_dead(struct gendisk *disk, bool surprise)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index bf1aa951fda2..c0f50f977f5e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -725,6 +725,9 @@ static inline unsigned int blk_queue_depth(struct request_queue *q)
- #define for_each_bio(_bio)		\
- 	for (; _bio; _bio = _bio->bi_next)
- 
-+int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
-+				 const struct attribute_group **groups,
-+				 struct fwnode_handle *fwnode);
- int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 				 const struct attribute_group **groups);
- static inline int __must_check add_disk(struct gendisk *disk)
++
+ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+ 					      struct device *parent,
+ 					      sector_t size,
+@@ -2509,6 +2559,7 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+ 					      int area_type,
+ 					      unsigned int part_type)
+ {
++	struct fwnode_handle *disk_fwnode;
+ 	struct mmc_blk_data *md;
+ 	int devidx, ret;
+ 	char cap_str[10];
+@@ -2610,7 +2661,9 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+ 	/* used in ->open, must be set before add_disk: */
+ 	if (area_type == MMC_BLK_DATA_AREA_MAIN)
+ 		dev_set_drvdata(&card->dev, md);
+-	ret = device_add_disk(md->parent, md->disk, mmc_disk_attr_groups);
++	disk_fwnode = mmc_blk_get_partitions_node(parent, subname);
++	ret = add_disk_fwnode(md->parent, md->disk, mmc_disk_attr_groups,
++			      disk_fwnode);
+ 	if (ret)
+ 		goto err_put_disk;
+ 	return md;
 -- 
 2.45.2
 
