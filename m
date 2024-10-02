@@ -1,37 +1,61 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE44B1940BC;
-	Wed,  2 Oct 2024 08:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB51145A1B;
+	Wed,  2 Oct 2024 08:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727858601; cv=none; b=G1OXp73F5CcKSNHoeoaTreVizVUeQ++wDejGH3mkLLaQ0eIyRyKtOE5gp5kplopmVHrzpMmZeWcvpEeIUragCLj/2kt5POVnj7H6FJDvyNxZCwLIs8HVHAxeRZL7VISFBs8xudjBz/g7yfPcQzeR2C/rQtcAPlFzp2CTqqMuwXU=
+	t=1727858816; cv=none; b=jaJ/6Lu9RKkB/ogT2Jspq1b1JeGxNe5va3gbbCh8OAkvmul5PSbMfVGSCQqkTI9AF2o9KGW+oWugOjtHb2uKTNXtgd4D1Zhbcpwz5BMxBPgOTastu4WHSjckYrNNHOdbFXq3zczsWPVDDn+XZMH4exs+3rk09kzIoUVJO5BE1WY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727858601; c=relaxed/simple;
-	bh=oR7poKQkS4ps7da71/gORSXX0ZMu3sXqJaASnGOW8u4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QO20EZuMF+xB4Id3OqBuXLJS6ruAiLO8QiR3npR6e0Sziv6xj8RdStcRIxfEHgX8kxoC7laVzgwWMJO3wWeqxxHo8sTutIcLVqIPV7TPrdAtXFwlSDH+nhv7+Gksw30dMEwsEl4tUmnbpFCFJBzPv7FjYmgRte/vIRN4fWLtzos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=evp+CPym; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1727858816; c=relaxed/simple;
+	bh=iy/BIYyK40dg9ebV9WMEldlWCF4rO/8jVQpEtKDVYPU=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ndt8gcT1jAg0gr0xNpjmZKJv1PT7GeaclcI1S6Kjd7WbPBO/n3aPV/k3TS3/lAVUchB7qfHBv4T0K45Y3VYGtGVR2aECpoAOIiLigotWbQHOGw0o8brgIK+FpJuRuPKpkAQwTmYU8nBvlHJPTAQj26nCQ1SS3OEUB5pDtnwcuvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BJXKfF/c; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="evp+CPym"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=zqTgHmGeTQIj5rCUjw3eJsZGjfP9Kf4g2n+yKtbQSII=; b=evp+CPymp4rfeaohFlPL3jsjkX
-	lSDSdOW2fVKMjJ0btWQWUs27jPbzBmSpu5LItDShUlLn6wllFLRHTj4Qh7/YLPr+kYI6BpJmARZLy
-	rGMeeQNupLBaOOTRNkKTzG8yGLLdK2HFuL9OxV6Sy5picrYh1PU1kNsyWF+QfU6xdBdFy2bpn9pQo
-	FfY24hLadtrsvn70Pf9gOP+diollduXZVAVZTZ0zwq/Jox5ocbl5ww3ixm5REEtIkZTmwHnCB9PY5
-	fUsxeYI3B48TO0L4/l/qwhj39YbsK5uPUhhCbC7M7vLLKwCKU7/SIgnpiy0Mb90qtHcKcOelBP6XR
-	9wsBAKgg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1svux0-00000005CKu-0nQM;
-	Wed, 02 Oct 2024 08:43:14 +0000
-Date: Wed, 2 Oct 2024 01:43:14 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BJXKfF/c"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42e82f7f36aso52090695e9.0;
+        Wed, 02 Oct 2024 01:46:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727858813; x=1728463613; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GhBvyE8q6EBFVXj/rB9bzTm3iod+t/31icDfvrestuM=;
+        b=BJXKfF/cfYW4024HIvky/sGVrRO1Q6jKyO/GsKyT5k/76GxngPMOkDC9dD24BWjG1t
+         uv+2+fQVdLYxpbHVRk4GwS5Z1TCoz1JsFxIA2eIW/elUdoGD7Ok9Y5PnxCRl7NRIsOiL
+         aD6KqW1AacXuJWHfF8z1HBH4IsgSLYekVYSSoBIeTK7PSdOVVFGgvDAGJMaXGixRDjGQ
+         ilTk8DPeWs5Z3RgqK4EckQtPoUHuG7MOuVYZpwG9Y3Y4irVsz0+r1GaLipaXtCGSy62X
+         RKnujQku1tzXe/blGR2TiHSnbFnTPtDv99mJuJBxENrVAEU6oPfwnMW6+xORl4NsdO9Y
+         UBMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727858813; x=1728463613;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GhBvyE8q6EBFVXj/rB9bzTm3iod+t/31icDfvrestuM=;
+        b=fzSYZdGDqPvHtXBLHaqShPfvpLGjdnuUHwLqutB859O8cCth+2bi6Pg1Ln6c5OsqGB
+         6hUGQ/cXWtfqXi0MR2ZN3CG8B/Cm764GGDQvlKmU9uG8HupiN0ic5bxFESK5772WwIui
+         2vZaxebdZGty/xuJ350fQJBWu2HBa9vz2wBkF2jb/lXOqB+1g0Pi4ArmZe3IQTge2ij4
+         vp8cslGTmM3yu5z+g989mpynaYUlgZAOR+ueIvQsG6sBd9KDGnSM6Kr01e3ddvFiVn6J
+         ik+v4pcTOUfUGNPnHPWQl9TQU2ZHhvpUaNl7b5MIdSo4X/ugiqTXyJ3+FpVyF5bV3YkU
+         rcEg==
+X-Forwarded-Encrypted: i=1; AJvYcCUJEquh7liWEY/eWl5dRCQsC3BwaFAX0e1qK/+45BNJ+a4sifZpKIDc94gLSbW+1qRJc8bJtp4xOo1Y@vger.kernel.org, AJvYcCUVXgig7aHSj7KB7RfMpQ9gquCQmBv/CplvdhG+THzMD1TFQbYgRDV+dhj4BRB/q155GpFQX2WWRI4NQoSA@vger.kernel.org, AJvYcCVKa4lDPvDgHpHd8YVgPoTtk4OWDAecgkK+DeYEOrhaZ6QWJcD6P6N+zGxyOXO7QEjFIERGiVcsovokgT4=@vger.kernel.org, AJvYcCVOF2qSC9bPpEI9oGJNV+cN23FJEQHLZBbGXVU2KqbosHeUvtlst5q3b6Yk3ysJjOzj37kCiallt5h6@vger.kernel.org, AJvYcCVWXy0xIrIJdewHAFZkRsV9a3t7FAP1C/NLWGNJfD/RpP01jlKfDoP8M++wbQj3pd3n8bXDpKeRwSw/@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCTUZ84Va+OY4aN9I9xGYkXxhOId5ax7cUz3iWMB14cgB07j/N
+	WEWCGXbwRRfxeyUVzJ0re0uU6IDz6+ap5PGma0oK96Dljr4oKun1
+X-Google-Smtp-Source: AGHT+IHKwnQNXxJiHx0BQX5FTBdr/zPkLpqkMi6DWboxhbduPp1AM0cC9yPMwcN92vQUajlnTWArOg==
+X-Received: by 2002:a05:600c:5494:b0:42c:baf9:beed with SMTP id 5b1f17b1804b1-42f778ef558mr14465905e9.27.1727858812582;
+        Wed, 02 Oct 2024 01:46:52 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f7a01f694sm12389635e9.35.2024.10.02.01.46.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Oct 2024 01:46:52 -0700 (PDT)
+Message-ID: <66fd087c.050a0220.3b87ae.3666@mx.google.com>
+X-Google-Original-Message-ID: <Zv0IdjQemuWZfZf5@Ansuel-XPS.>
+Date: Wed, 2 Oct 2024 10:46:46 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Christoph Hellwig <hch@infradead.org>
 Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
 	Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
@@ -56,11 +80,10 @@ Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
 	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
 	Lorenzo Bianconi <lorenzo@kernel.org>,
 	Miquel Raynal <miquel.raynal@bootlin.com>, upstream@airoha.com
-Subject: Re: [PATCH v5 5/6] block: add support for partition table defined in
- OF
-Message-ID: <Zv0HotHuCGDpmFp7@infradead.org>
+Subject: Re: [PATCH v5 3/6] block: introduce device_add_of_disk()
 References: <20241001221931.9309-1-ansuelsmth@gmail.com>
- <20241001221931.9309-6-ansuelsmth@gmail.com>
+ <20241001221931.9309-4-ansuelsmth@gmail.com>
+ <Zv0HGh0IjPCt3pYt@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,31 +92,54 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241001221931.9309-6-ansuelsmth@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <Zv0HGh0IjPCt3pYt@infradead.org>
 
-On Wed, Oct 02, 2024 at 12:18:57AM +0200, Christian Marangi wrote:
-> +static int validate_of_partition(struct device_node *np, int slot)
-> +{
-> +	int a_cells, s_cells;
-> +	const __be32 *reg;
-> +	u64 offset, size;
-> +	int len;
-> +
-> +	reg = of_get_property(np, "reg", &len);
-> +
-> +	a_cells = of_n_addr_cells(np);
-> +	s_cells = of_n_size_cells(np);
+On Wed, Oct 02, 2024 at 01:40:58AM -0700, Christoph Hellwig wrote:
+> Thanks,
+> 
+> this looks much better.  A few minor nitpicks, though:
+>
 
-Just personal preference, but I find code easier to read if variables
-are initialized at declaration time whenever possible:
+Very happy you like it, yes I wasn't sure what was the correct way to
+introduce the helper. If you notice in the blkdev.h we have also add_disk()
+that is a static inline wrapper for device_add_disk().
 
-	const __be32 *reg = of_get_property(np, "reg", &len);
-	int a_cells = of_n_addr_cells(np);
-	int s_cells = of_n_size_cells(np);
+Wonder if device_add_disk() should have the same treatement? No idea if
+it would cause problem with symbol with external modules, that is why I
+used the wrapper.
 
-(same for a few other functions below)
+> > -int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+> > -				 const struct attribute_group **groups)
+> > +static int __device_add_disk(struct device *parent, struct gendisk *disk,
+> > +			     const struct attribute_group **groups,
+> > +			     struct fwnode_handle *fwnode)
+> 
+> I don't think we need a separate helper if device_add_disk simply
+> wraps the OF version by passing a NULL fwnode.
+> 
+> > +int __must_check device_add_of_disk(struct device *parent, struct gendisk *disk,
+> > +				    const struct attribute_group **groups,
+> > +				    struct fwnode_handle *fwnode)
+> > +{
+> > +	return __device_add_disk(parent, disk, groups, fwnode);
+> > +}
+> 
+> I'd name this as add_disk_fwnode as the of in device_add_of_disk
+> reads as in add the device of the disk, and the fwnode is what gets
+> passed.  The device_ is a bit redundant and just there for historic
+> reasons as the original add_disk predates the device model.
+> 
+> Can you also add a kerneldoc comment for the new helper?
+> 
 
-Otherwise looks good:
+sure! I will wait the usual 24h to respin this.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > +EXPORT_SYMBOL(device_add_of_disk);
+> 
+> EXPORT_SYMBO_GPL, please.
+> 
+
+ack.
+
+-- 
+	Ansuel
