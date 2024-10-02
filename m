@@ -1,98 +1,54 @@
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C541D0E28
-	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 20:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396712141BA
+	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 20:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727899873; cv=none; b=dN9rTFhjKZj/MXnOlD56KqXnuD+OPlZBxnS5X1tG1yVsR3JowkVcSGZUuJbsqcxV5RxsmgfX1MTI/1EIkqDWYU2x3NpOWMO3FyksKfXskQlOoCJ4/FLU+sFRn/8jA2l+gnErf/CvcFi4s6IHUHBw7S37y4DXtTPok9P1vyzuVOY=
+	t=1727900053; cv=none; b=XWqM7RKPrsPA1KK2RCib5OJtaEMJgqKb/cNkgCMJPknJozdNHdyc3EDJT1vqyN4msU/Y8iqqWJPXmgydkypNfRpJfPALthzDWYtawna75ExH5vQNfO5awj4627q7+7oJy5tj85YB3+Z949Ew3MyD6DUaKY51H98xPcdnCc3ao54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727899873; c=relaxed/simple;
-	bh=TFJv8JZCdQm1fiPRzSCL3h+KmfUKwUIT8a5Q1mnYDIM=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=d1VU9oygNvJE6V9J0I1+33SjfMK8lS6V+I/Z50O/i2HxMvtbnoFN1pGPmX1TxHqhGBEZEDBbaf6SlO55BeOLHg/GDYR4tY1IsmboQxnigWr9G29YzwOs9R5SkcrbTFnCSwnKxTUPhrfX2N7xYRYopePa+4vbl56ow3rAzuawnXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=eehe88Zh; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1727900053; c=relaxed/simple;
+	bh=nVUSjpMmJw3twag4PvHHz+ORoKqB82N+aRoF2mFN1Jo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ffeNgdELROMz6ZUm4ZXW2BpNZKh1Qk96xAPWkmyM1ZXaYJtvsGi4reVQ+7Wns7xAcWxE1kjZN9x07+N+eOoSM0yzq6BTPmMPdzmA8xMKGL+i8ycTW28/lad1cXhvKhmlEIdKTa4W8lodbkQX3LnE8wABvtCC/AujX+Sq3LNyWBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y0uuiR3F; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="eehe88Zh"
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-82aa7c3b498so8414839f.1
-        for <linux-block@vger.kernel.org>; Wed, 02 Oct 2024 13:11:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1727899869; x=1728504669; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eIUl5ay0+q5O7PeesFzMGR4SFE6vIEzXh6Yv76TgMls=;
-        b=eehe88ZhudTOD2BReg9+00Jgt59sFiqXN7f0vSwxT7DMGi2TgC8yIbKkGA0Pn7Cadz
-         UH9iYSUABc4hHs7mt3xInjJ3ZLV4sNrvn/Uo27PSuLr7yrxM+N7rQ/FZWYme8XnMX5Ml
-         1+ylomRVcuWNWDY40nAsHOcsZ+6ssccDcnEH4JmfQTcXXvbSsRBjez6+YI+Q21Spl5+0
-         QrxU7Tc5AxUEvgUpvYSNGQh2Sop114XYPN0eKC4C0gRalvairlrRwQ5xbWw73nrsmgN9
-         S09NL2GSr1oCklOZH5b+3o3z2i3YIRbfJtSYvcfLDjr/6GOS9kLmEXlfM1tpxfVOchhY
-         zmeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727899869; x=1728504669;
-        h=content-transfer-encoding:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=eIUl5ay0+q5O7PeesFzMGR4SFE6vIEzXh6Yv76TgMls=;
-        b=nRYVedXjmQuW9w9821NC/I4ctlA/zC280nRZk1gchmgre/TE858psdOSY7G1QvFEUH
-         w7T9NR0e3FbEBACC+AlAue/AJEQQXkBDOE3RVdRVNzM+CjmyWzvuV9xSK7UwN5TRT9pE
-         9tZI5QNAeORXTGq1Ye4WhG8vWY3GFhjS9EAsiarwpqu/PRY2Iz2FroyL1uATpCB3DeSN
-         RsIWpWuXoD2tt6icepAvXsWueKSoqpwCut/W4QmWzuZMiJ421Fy+Y9M7kU6WUwXmsMuK
-         yWC6vplIliTxAjsZbEcdLaAvtemgOSyW3CSZ4yYaYxSlBuExP06OXYAuZi9ry+DNi8nK
-         Bvlw==
-X-Gm-Message-State: AOJu0YyMljS0RNchMh1zjyLl/qZqiA5svxhDrJUJjBV7IpZwe2l1CnYZ
-	3r6u3ksGAlyVGx+wrMiD5t4VwvBHpl/+7qvmOvuBiBAcN4YZsY6hymZaZfM4dbe+eb4/e9xeYAk
-	v+wDsvQ==
-X-Google-Smtp-Source: AGHT+IENfyrbRSIGzjvHCbpSVx1rr83P5D6wtq3ds/7pNNWF+ETCIEzGqziZdoqI/RBpOV70Xe0w3A==
-X-Received: by 2002:a05:6602:6d0e:b0:7f3:d85e:476f with SMTP id ca18e2360f4ac-834e76ad437mr53651239f.6.1727899869072;
-        Wed, 02 Oct 2024 13:11:09 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-834937194f7sm349504339f.39.2024.10.02.13.11.08
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Oct 2024 13:11:08 -0700 (PDT)
-Message-ID: <2aae722e-e815-4fe9-8321-86b062f517b3@kernel.dk>
-Date: Wed, 2 Oct 2024 14:11:07 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y0uuiR3F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8677CC4CEC2;
+	Wed,  2 Oct 2024 20:14:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727900052;
+	bh=nVUSjpMmJw3twag4PvHHz+ORoKqB82N+aRoF2mFN1Jo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Y0uuiR3F+dTRr/CgWA7Rx/gl06To7tC++qDOpw1FyozVFNNpcT0HL7iPuEvYWAvrU
+	 TfQsuMfU1IJS9gzBXoRZQRVa/gcPtEMLcJ7YIC0Pfgw2dShdRkaSYrNMRiD0vUseV1
+	 ANYaw0EvL7bxcADyeQ2okL/yDAYvDFlgFzfpA9qgjgTc06AKE9NN66HriuOQ+15z12
+	 vT4YKO7Hgh2vdga4fm9iHeDBBdJ3obwNTOOGAbFgXQw8sdf5Rs0FWTRzNuHNG0F35P
+	 oM98XRVXHZWdGkhpOh/WCnnovyGi4x0TmikGDv7rtoI+rUlrJGBBYUpdHP6pCGUsU0
+	 tuSQGgiMhzshw==
+Date: Wed, 2 Oct 2024 14:14:10 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: remove redundant passthrough check in
+ blk_mq_need_time_stamp()
+Message-ID: <Zv2pkuK-AWKP75GD@kbusch-mbp.dhcp.thefacebook.com>
+References: <2aae722e-e815-4fe9-8321-86b062f517b3@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: remove redundant passthrough check in
- blk_mq_need_time_stamp()
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2aae722e-e815-4fe9-8321-86b062f517b3@kernel.dk>
 
-Simply checking the rq_flags is enough to determine if accounting is
-being done for this request.
+On Wed, Oct 02, 2024 at 02:11:07PM -0600, Jens Axboe wrote:
+> Simply checking the rq_flags is enough to determine if accounting is
+> being done for this request.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Yep, rq_flags do not get set if request is a passthrough, so checking
+both is redundant.
 
----
-
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 4fecf46ef681..59e9adf815a4 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -857,12 +857,6 @@ void blk_mq_end_request_batch(struct io_comp_batch *ib);
-  */
- static inline bool blk_mq_need_time_stamp(struct request *rq)
- {
--	/*
--	 * passthrough io doesn't use iostat accounting, cgroup stats
--	 * and io scheduler functionalities.
--	 */
--	if (blk_rq_is_passthrough(rq))
--		return false;
- 	return (rq->rq_flags & (RQF_IO_STAT | RQF_STATS | RQF_USE_SCHED));
- }
- 
--- 
-Jens Axboe
-
+Reviewed-by: Keith Busch <kbusch@kernel.org>
