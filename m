@@ -1,62 +1,53 @@
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF601BFDFE
-	for <linux-block@vger.kernel.org>; Tue,  1 Oct 2024 23:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB525366
+	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 00:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727827044; cv=none; b=fAdPWnjw1KC9p0EK2VMwnnCXB9FErItl7lqxp7Pa78X1XUeUc5DySHh+jspgA1kaZIWqoMbuzGMv7+DQcbE5XtfWezOL/7W95eF1Z7kA4Rlo/4Ajx8BAk5X7jhQo6l6tHCak7vESQucE7OdRQxFgK7LmptF1jLJ0I0o5IurcBfk=
+	t=1727827521; cv=none; b=nIpkV4eqdD2rAThMxdgBDf10nlUmQGE/1SOwxtWv71Ili5KTiXBcvva4hKOTN/b1vHn8QSR8LiWRNX7N0e4aXoRVO5rmWVil5G7ra+w1IdqQemKjaFFYiyWMkmRzcoSSRtQxcTc/BaO7n1URogHIfeG7ne3DpV2FQ5+6qrncE4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727827044; c=relaxed/simple;
-	bh=bIkL3j1SUti+mxRknWXsGzjEHfZ++LfAOrCAj6OvBfk=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=VWYwIkX59BfCIMcz101DgRTG8BMJ8f0pdLqdCBX9YAlN1F9RWgKu3vh0P1JzYcZAi7YlKNcnGM0MxeQBvT33LbnG9gYb9+DbGyTi27bO+DEAFD9EVURA0rlGVpJxQu4m736OOdmNdiL2RIV9r1e2wrop7wAHnaKf+wFY5oWbxQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JHNcnhrt; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1727827521; c=relaxed/simple;
+	bh=/CV2L9JfJQt5E5RYpodw26MfQrUX+cJ+0L4O1Nm1koo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ErWA8vXQ9dPCfukCuN2tnuPWXeOzOs5XlqC5G9rs1+mj3OH6JtSq+cp7ERc5OpPxYxkALvMvE3NWRY2MJuNuaVFWhyrcqjLn17TGHDg0mdE3OvDoaS0pD0cDTOdLOeBlx+2U99vseKQZbvT0vSHJ6auAq4YdqyYbXsBspdNh2tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MxHsvEjX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JHNcnhrt"
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6db4b602e38so49559117b3.1
-        for <linux-block@vger.kernel.org>; Tue, 01 Oct 2024 16:57:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727827042; x=1728431842; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bIkL3j1SUti+mxRknWXsGzjEHfZ++LfAOrCAj6OvBfk=;
-        b=JHNcnhrtZliw4kbWb0DX9i0Gw3wtKiwktCDAlyuQPlq6o94UOMGurfB8iHI6ZIeXhp
-         qswo2+g2eNBLKUNAyaye3ImcDpVNZHafEbsD3XnnTElLexc6krqVPkgBy9brGTM+MYBv
-         WWznqMC89AIZdONKTGKs73dL5s3oitTYJ7moIHDBEARPaGqtyHVAm7HDPvaJFWswkxmA
-         AHI2C34XUE82zl29YppQ/bb+pAS5i+QYmY7updiP0H0nYm8edUrEOiVpLqfp9iUXydQs
-         ujcnCpbQXiXhtLD2JVlTP/8rQg/F+uQllVypxrz5wFO9sibBo1+CzWI/Tx45lCtzAbFW
-         MFug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727827042; x=1728431842;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bIkL3j1SUti+mxRknWXsGzjEHfZ++LfAOrCAj6OvBfk=;
-        b=Vt/GwiFWQhoRbMhS54rpdXt9Vs+CXpPc4qGoTwT5dKl9SeOKYqL76qXEUekGrs1PTP
-         YBqh5ZnGglyyZ48AITvwDBjAEAUmTcifwryQMtdChHJUeM3w4ccFbS7znRyjJg54DJs6
-         WlbdahqY6Ixqjo7BGdsK3Ium6BcW0qwkkvzZLY7XzMphjobO2F6+G3guFA+qOY9BFrlG
-         DAa7RofCm1wy4Qh+N6sx0DbNocZyW5wAlb9Cy8WDLoiU/YOwkz/P+GhRK5CVOSobP/DD
-         GrnBMtiCvhdlXe7Obt1dRt26jL15kTUJsp7Src35wnwAoCsCwZQCvvyhQt9dTAkCpOG9
-         Echw==
-X-Gm-Message-State: AOJu0Yzaym1Ds/PIqhCPZrOX5m6skPREKsE7UOcT2NLaiPGGRSz/7IJQ
-	m9Rx7fm+4kAJYmRD7ZA6R8G0A4DIITkMZNEM31fX8Tk8t7oyZro+LnVfbfw7c8JyQMLmq3/uLVD
-	Ci+51f+kiCyX6xnikvWjk6fto5GKnIg==
-X-Google-Smtp-Source: AGHT+IEMsTls5UCJifqYOtiWBMmWqGr2QjmhJoNaqBiJVXdA7meH2kvVJ4Z4lMKb1eB34QswbZW9DZnuPs+5bilBNRY=
-X-Received: by 2002:a05:690c:f92:b0:6e2:bcc:bccc with SMTP id
- 00721157ae682-6e2a2b728e5mr16740907b3.4.1727827041864; Tue, 01 Oct 2024
- 16:57:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MxHsvEjX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3202FC4CEC6;
+	Wed,  2 Oct 2024 00:05:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727827521;
+	bh=/CV2L9JfJQt5E5RYpodw26MfQrUX+cJ+0L4O1Nm1koo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MxHsvEjX0UHwGRleWVXUGviwZRHhEFRmXUGiuX/6840Q/f7aMXAMFRlRp062vG06S
+	 hYbQ8hbtIuBI4zcgKUCl+4ihyOAwcdVvjEzqFJfIstgMhZuhA+xLYNf7hy1AbOmRLG
+	 6KLqARKjERPqpkWEYng+1IxC9kvdS1PDSMEcWAxo/fY2IpiwMWESiNGA8Lied2juYk
+	 ulso43FO8Y3tcTk9LbJWiG6wRXLTrbGJedRPdYvUUaI6hG5zqYIVF72Lnww9FfM47c
+	 PMPHh2VsoJcwmaG5m3UZhe3M8fR2dq/XrilhyM/k0rZUWbkvhs1Sq1hoskezvALyjT
+	 DRygDiHxuOXBg==
+Date: Tue, 1 Oct 2024 18:05:19 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Leah Rumancik <leah.rumancik@gmail.com>
+Cc: linux-block@vger.kernel.org
+Subject: Re: subscribe
+Message-ID: <ZvyOP-3v8gjMlcU2@kbusch-mbp.dhcp.thefacebook.com>
+References: <CACzhbgRk9rzm0b6QdVdMZY-yk13nz+J9Uppt2pktQ3Hj4VBG1g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Leah Rumancik <leah.rumancik@gmail.com>
-Date: Tue, 1 Oct 2024 16:57:11 -0700
-Message-ID: <CACzhbgRk9rzm0b6QdVdMZY-yk13nz+J9Uppt2pktQ3Hj4VBG1g@mail.gmail.com>
-Subject: subscribe
-To: linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACzhbgRk9rzm0b6QdVdMZY-yk13nz+J9Uppt2pktQ3Hj4VBG1g@mail.gmail.com>
 
-subscribe
+On Tue, Oct 01, 2024 at 04:57:11PM -0700, Leah Rumancik wrote:
+> subscribe
+
+Thank you for your interest, but I think you meant to send:
+
+  subscribe linux-block
+
+To majordomo@vger.kernel.org instead.
