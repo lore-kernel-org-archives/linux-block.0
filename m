@@ -1,199 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D0F2C6A3;
-	Wed,  2 Oct 2024 05:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC7911187
+	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 05:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727847435; cv=none; b=U72B41bYVChFc3DFut3EVUyNKWqgSlpyWZxnzHb/BVAMm5hnlMt7gqnmnucq8T0oc3aA24e5alTTm0GLWRTgCf7T5pFgslD7NwBkSmLNSN4xqkCkA0/6CrhPUF5NuRwkSMhV+wMZ2G6E+4XQbafwekgq8Wx1kgDUlhhC/NSjd7I=
+	t=1727848427; cv=none; b=rtWnC2U2RsoXV/uP1zXxtSNnBOWe5LyVVyQygoeHNODxKRINFEr9hvP5T4N9XwqgGi8yVdy2jrVyfY89dAAy7318hjpb418Q48rrmtvruLNMndx15pnP3TvEu/RTMhjO/96Uelw3ntWdi7fEUvqfNlbKEck7BrrJ5wbzE9/hQII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727847435; c=relaxed/simple;
-	bh=mkpPzh6F0UskRDMs7KY5bB2zQ2NUZ7fT5xaqtGryN4k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Jx7La7pO/B03PLBMYWZCPD0VRBOpSl57S9D8YhKWo0KJGgnkHK1J79/zu51+mI/4z55QAAg9J1YX8G6pNMeVRyfEqP25jJf1cJjZUYe2RkRsQgfYBi4YjyBuYn0gLpAryUZxuvBydSAWdjAF+G/Rkp1ppfNwP7AugpRFMoCPkPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ongfvmnB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727848427; c=relaxed/simple;
+	bh=SIgX91uTHifWEtgReNCzhIe7IG2O8Z1SQtz8/H0apK8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OJPw/V9GB4JWLCKZEM9+H/spf+IuYmynIHiuvCpzL6oDCjIijcVxVfGrPBY/uOtu1yec9Ad7Mmwr2s5rSkXOYfGlmvWQDv/oGxuxtH42us4aL50RzH1qLxFc3QGF3V3nUPSf62DRpTVFEmGK3QRIgilCTVTkscBHoXqq7n/8yyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=O5XcbVAw; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ongfvmnB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D28E2C4CEC5;
-	Wed,  2 Oct 2024 05:37:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727847435;
-	bh=mkpPzh6F0UskRDMs7KY5bB2zQ2NUZ7fT5xaqtGryN4k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ongfvmnBAE4A77tC4y9gamiVSRVW0gEcVohuWKBRnuwlmvHo/tDXltdru0UcjEBLZ
-	 L8rnmvTSz25N6MprWbJx08aiuOK01sCqmGYb028UL3XitLRLA8vkz4mlXmA4RTzBmh
-	 OIUi07kM+b2oYmeepVDyfkI+gI66R9epP84ldS2GCuY3tbWx6NXQ9y9EYJ1OiBOSET
-	 6leCMjsZL8GzWfKD3B+dAvunRyovHI/P/CSoceFUCSls1CfqzhSRJywJVy51pnvWxx
-	 FyEVURdMbWZwyiCbaRilebBEz7TShT0Qm+aUDeeRkgXbg+YROwWUdb+07OwtVCSvw7
-	 XkRbrC8aW2QvQ==
-Message-ID: <bee9261e-1d8d-41d3-a600-da962aa4cf0f@kernel.org>
-Date: Wed, 2 Oct 2024 14:37:12 +0900
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="O5XcbVAw"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-37cd831ab06so2537897f8f.0
+        for <linux-block@vger.kernel.org>; Tue, 01 Oct 2024 22:53:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1727848423; x=1728453223; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0Z3bBDoAXmx+gs8b1KuDNQSPhrXil7aJHswuVh/xJcY=;
+        b=O5XcbVAwb59+wKirArFvJcotvGIpkAhCWVYyhrDF+yCq43Zl2p7edf4Xyzghy6P26d
+         0Ci/c1Z4nPPpSxYMKDvKQBGC7FLwzr+715Zagy6SW0tbGGgUF8tpQRpJGkdxnwZvXrMQ
+         aFBCsJFxv1Hl8gp904oMbOmMFfARy04pVdvE9fb6C5MjD5QeqyxBCnBWrUFARoPcEplX
+         mvndmweDv5bDU50PvW2zl9a8H4ozZXk2faSwUiR6/vFC2o/6Ay5p9Ih1h/Q0xH7fsZAW
+         tbPPkW+yqjZP3eXS7Q3rtxFzMXNkQ/meFSPivHRAFuBllwHimDekINUtcgVS9IBMXi0D
+         CAXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727848423; x=1728453223;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0Z3bBDoAXmx+gs8b1KuDNQSPhrXil7aJHswuVh/xJcY=;
+        b=U8tHOJ/UHgo3tCbR32Lkq5tt1tG8Yls6nLjtF3QzkEWHToW1h1SdiVYJYvD4JSdGdz
+         /o1pPK2iDgbHypyaGX/6DOcGc/xuEMQz13hC4nEd3c8hBBU/LcIwBy6dHjn1C5LKFRKi
+         cT1AjywOKC2B2dqn04Nkj9a1SStp3JSVxDr3GbOGT1aFZdFynXQ28ScpzrNNgI9tCQvW
+         enjXN6o/9dyn7H6IQ9ePDFqjT8syT/epchkD6xfDjmVLpMmoboSQtUJ4RlL+YwKTm/Tr
+         SNbNmF51HMtaOGqCS5CbgAUkxGb4Tuovo0M0GF5cFusLJOTzC3Vgny42e8ccBcWY740C
+         qHzg==
+X-Forwarded-Encrypted: i=1; AJvYcCVvUTABmdwgbIFl84L3gxb3qD3ryGisuuMdzZ6WjlmyHEk5ysCoTZmYDmkLWYEui4yvH2hu8Fub/6Q2SA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yydbxnym+Xf+9NMhHL6S/88p9axzd/wLo2Kqd+MGIGKgp42HfwM
+	riCV0UaUsW4pSS3yO3RbbI2DlxmmggrebGvvAQ4h83kYMoOx+3B0Iy7Q7o1g2/E=
+X-Google-Smtp-Source: AGHT+IEYmAs+Nb8DOVp6b/C54wZi0j4LpH8rZzXj+DcrAl6qDLY7Tfv4lzNuqeMfdg2bjma+P+w37w==
+X-Received: by 2002:a5d:694a:0:b0:374:bde6:bff5 with SMTP id ffacd0b85a97d-37cfb9fb82bmr892437f8f.46.1727848423184;
+        Tue, 01 Oct 2024 22:53:43 -0700 (PDT)
+Received: from linux-l9pv.suse ([124.11.22.254])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e4e24fsm78588645ad.244.2024.10.01.22.53.40
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 01 Oct 2024 22:53:42 -0700 (PDT)
+Date: Wed, 2 Oct 2024 13:53:38 +0800
+From: joeyli <jlee@suse.com>
+To: Valentin Kleibel <valentin@vrvis.at>
+Cc: Chun-Yi Lee <joeyli.kernel@gmail.com>,
+	Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
+	Pavel Emelianov <xemul@openvz.org>,
+	Kirill Korotaev <dev@openvz.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Nicolai Stange <nstange@suse.com>,
+	Greg KH <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] aoe: fix the potential use-after-free problem in more
+ places
+Message-ID: <20241002055338.GI3296@linux-l9pv.suse>
+References: <20240912102935.31442-1-jlee@suse.com>
+ <9371a3ab-3637-4106-bee5-9280abb5f5ae@vrvis.at>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 2/2] aoe: using wrappers instead of dev_hold/dev_put
- for tracking the references of net_device in aoeif
-To: Chun-Yi Lee <joeyli.kernel@gmail.com>, Justin Sanders <justin@coraid.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Pavel Emelianov <xemul@openvz.org>,
- Kirill Korotaev <dev@openvz.org>, "David S . Miller" <davem@davemloft.net>,
- Nicolai Stange <nstange@suse.com>, Greg KH <gregkh@linuxfoundation.org>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- Chun-Yi Lee <jlee@suse.com>
-References: <20241002040616.25193-1-jlee@suse.com>
- <20241002040616.25193-3-jlee@suse.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20241002040616.25193-3-jlee@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9371a3ab-3637-4106-bee5-9280abb5f5ae@vrvis.at>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 
-On 10/2/24 1:06 PM, Chun-Yi Lee wrote:
-> Signed-off-by: Chun-Yi Lee <jlee@suse.com>
+Hi Valentin,
 
-The wrappers where introduced in patch 1 without any user. So it seems that
-this patch should be squashed together with patch 1.
-
-> ---
->  drivers/block/aoe/aoecmd.c | 24 ++++++++++++------------
->  drivers/block/aoe/aoedev.c |  3 ++-
->  drivers/block/aoe/aoenet.c |  2 +-
->  3 files changed, 15 insertions(+), 14 deletions(-)
+On Thu, Sep 12, 2024 at 12:58:46PM +0200, Valentin Kleibel wrote:
+> > Then Nicolai Stange found more places in aoe have potential use-after-free
+> > problem with tx(). e.g. revalidate(), aoecmd_ata_rw(), resend(), probe()
+> > and aoecmd_cfg_rsp(). Those functions also use aoenet_xmit() to push
+> > packet to tx queue. So they should also use dev_hold() to increase the
+> > refcnt of skb->dev.
 > 
-> diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
-> index d1f4ddc57645..2bae364fc5ef 100644
-> --- a/drivers/block/aoe/aoecmd.c
-> +++ b/drivers/block/aoe/aoecmd.c
-> @@ -361,7 +361,7 @@ ata_rw_frameinit(struct frame *f)
->  	}
->  
->  	ah->cmdstat = ATA_CMD_PIO_READ | writebit | extbit;
-> -	dev_hold(t->ifp->nd);
-> +	nd_dev_hold(t->ifp->nd, t->ifp);
->  	skb->dev = t->ifp->nd;
->  }
->  
-> @@ -403,7 +403,7 @@ aoecmd_ata_rw(struct aoedev *d)
->  		__skb_queue_tail(&queue, skb);
->  		aoenet_xmit(&queue);
->  	} else {
-> -		dev_put(f->t->ifp->nd);
-> +		nd_dev_put(f->t->ifp->nd, f->t->ifp);
->  	}
->  	return 1;
->  }
-> @@ -421,16 +421,16 @@ aoecmd_cfg_pkts(ushort aoemajor, unsigned char aoeminor, struct sk_buff_head *qu
->  
->  	rcu_read_lock();
->  	for_each_netdev_rcu(&init_net, ifp) {
-> -		dev_hold(ifp);
-> +		nd_dev_hold(ifp, NULL);
->  		if (!is_aoe_netif(ifp)) {
-> -			dev_put(ifp);
-> +			nd_dev_put(ifp, NULL);
->  			continue;
->  		}
->  
->  		skb = new_skb(sizeof *h + sizeof *ch);
->  		if (skb == NULL) {
->  			printk(KERN_INFO "aoe: skb alloc failure\n");
-> -			dev_put(ifp);
-> +			nd_dev_put(ifp, NULL);
->  			continue;
->  		}
->  		skb_put(skb, sizeof *h + sizeof *ch);
-> @@ -486,11 +486,11 @@ resend(struct aoedev *d, struct frame *f)
->  	memcpy(h->dst, t->addr, sizeof h->dst);
->  	memcpy(h->src, t->ifp->nd->dev_addr, sizeof h->src);
->  
-> -	dev_hold(t->ifp->nd);
-> +	nd_dev_hold(t->ifp->nd, t->ifp);
->  	skb->dev = t->ifp->nd;
->  	skb = skb_clone(skb, GFP_ATOMIC);
->  	if (skb == NULL) {
-> -		dev_put(t->ifp->nd);
-> +		nd_dev_put(t->ifp->nd, t->ifp);
->  		return;
->  	}
->  	f->sent = ktime_get();
-> @@ -552,7 +552,7 @@ ejectif(struct aoetgt *t, struct aoeif *ifp)
->  	n = (e - ifp) * sizeof *ifp;
->  	memmove(ifp, ifp+1, n);
->  	e->nd = NULL;
-> -	dev_put(nd);
-> +	nd_dev_put(nd, NULL);
->  }
->  
->  static struct frame *
-> @@ -624,7 +624,7 @@ probe(struct aoetgt *t)
->  		__skb_queue_tail(&queue, skb);
->  		aoenet_xmit(&queue);
->  	} else {
-> -		dev_put(f->t->ifp->nd);
-> +		nd_dev_put(f->t->ifp->nd, f->t->ifp);
->  	}
->  }
->  
-> @@ -1403,7 +1403,7 @@ aoecmd_ata_id(struct aoedev *d)
->  	ah->cmdstat = ATA_CMD_ID_ATA;
->  	ah->lba3 = 0xa0;
->  
-> -	dev_hold(t->ifp->nd);
-> +	nd_dev_hold(t->ifp->nd, t->ifp);
->  	skb->dev = t->ifp->nd;
->  
->  	d->rttavg = RTTAVG_INIT;
-> @@ -1414,7 +1414,7 @@ aoecmd_ata_id(struct aoedev *d)
->  	if (skb)
->  		f->sent = ktime_get();
->  	else
-> -		dev_put(t->ifp->nd);
-> +		nd_dev_put(t->ifp->nd, t->ifp);
->  
->  	return skb;
->  }
-> @@ -1514,7 +1514,7 @@ setifbcnt(struct aoetgt *t, struct net_device *nd, int bcnt)
->  			pr_err("aoe: device setifbcnt failure; too many interfaces.\n");
->  			return;
->  		}
-> -		dev_hold(nd);
-> +		nd_dev_hold(nd, p);
->  		p->nd = nd;
->  		p->bcnt = bcnt;
->  	}
-> diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
-> index 9781488b286b..48c936dbb9e5 100644
-> --- a/drivers/block/aoe/aoedev.c
-> +++ b/drivers/block/aoe/aoedev.c
-> @@ -504,7 +504,8 @@ freetgt(struct aoedev *d, struct aoetgt *t)
->  	for (ifp = t->ifs; ifp < &t->ifs[NAOEIFS]; ++ifp) {
->  		if (!ifp->nd)
->  			break;
-> -		dev_put(ifp->nd);
-> +		nd_dev_put(ifp->nd, ifp);
-> +		aoeif_nd_refcnt_free(ifp);
->  	}
->  
->  	head = &t->ffree;
-> diff --git a/drivers/block/aoe/aoenet.c b/drivers/block/aoe/aoenet.c
-> index 923a134fd766..3565042b567f 100644
-> --- a/drivers/block/aoe/aoenet.c
-> +++ b/drivers/block/aoe/aoenet.c
-> @@ -63,7 +63,7 @@ tx(int id) __must_hold(&txlock)
->  			pr_warn("aoe: packet could not be sent on %s.  %s\n",
->  				ifp ? ifp->name : "netif",
->  				"consider increasing tx_queue_len");
-> -		dev_put(ifp);
-> +		nd_dev_put(ifp, NULL);
->  		spin_lock_irq(&txlock);
->  	}
->  	return 0;
+> We've tested your patch on our servers and ran into an issue.
+> With heavy I/O load the aoe device had stale I/Os (e.g. rsync waiting
+> indefinetly on one core) that can be "fixed" by running aoe-revalidate on
+> that device.
+> 
+> Additionally when trying to shut down the system we see the message:
+> unregister_netdevice: waiting for XXX to become free. Usage Count = XXXXX
+> on aoe devices with a usage count somewhere in the millions.
+> This has been the same as without the patch, i assume the fix is still
+> incomplete.
+>
 
+For the reference count debugging, I have sent a patch series here:
 
--- 
-Damien Le Moal
-Western Digital Research
+[RFC PATCH 0/2] tracking the references of net_device in aoe
+https://lore.kernel.org/lkml/20241002040616.25193-1-jlee@suse.com/T/#t
+
+Base on my testing, the number of dev_hold(nd) and dev_put(nd) are balance
+in aoe after the this 'aoe: fix the potential use-after-free problem in more places'
+patch be applied on v6.11 kernel. I have tested add/modify/delete files in remote
+target by aoe. My testing is not a heavy I/O testing. But the result is
+balance.
+
+Could you please help to try the above debug patch series for looking at the
+refcnt value in aoe in your side?
+
+Thanks a lot!
+Joey Lee
