@@ -1,59 +1,59 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FCA41974F4;
-	Wed,  2 Oct 2024 14:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EA61E892
+	for <linux-block@vger.kernel.org>; Wed,  2 Oct 2024 14:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727879137; cv=none; b=lCAGxpIL+DW2/G7BSI08h/M3kqQxEcDTQ5vVKfa5ofqj5mPEY7YWHe1ccpXflu5yojo6CNPfI7qB10/FhABTvEky/kKA3bvRZdUp2B3r1hU2AgNKxyBPfNG3209fwq+J3swPyB4gR9+PLwFY6thaU3FZWK7zrsCwZ2l86Nc9NU0=
+	t=1727880756; cv=none; b=CEuKOTNtoT5+Uy2RZ6ia0rgaOOLkv8IHidRW6scemANkJ8Y07MTpwB9Qc4ovHushCDvtFV74p14BLboWZ35CV95MX/VVxF/EexLA7P3z3EgdM0nsRWNkYIVKDjpw74EvHfAVuMxZWUDvCf8ckl4K2d0CC9+5/WjnIGQJZcIM1H0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727879137; c=relaxed/simple;
-	bh=Mi6Y8fYW1SdsKPutfBdt+bZEFZSkGWP+Kc/xk5qu5hM=;
+	s=arc-20240116; t=1727880756; c=relaxed/simple;
+	bh=7Eecab9W9O8J2c0mz3Jjl0PiWNnIAHMdaQcGLACoUWo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C/L54d/NZ+gjoqi86Sb7y1EVLRmn1nFGyQWr3bzsPP9FmGEyrgnxzHqOUpo8yLbNAZ7Qy2u32EzICN2acPbvAFBT2xvxTsH56PScYXg+Czss9NWMNg25NbQXzQv0l+iQHm2nPhryQYbZy0zW2zG3YbDhjW2CEW7TI9G75ZlvVJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gq2HwgYe; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=Req77VD6IJUWofXC8LHIpsdb1WKEscelPLgsi0YGdW7y/rTtR0hbWc9paXYyScdEL5M6omIeE8WOmPKBM7xdUzLgO0ZxcRKdwo+c6FOOb10MtLJpNURMgd+vxc8YGkNYNAxRS4OTC2ZysTdZXK6nSUDlrAE7ehyLQJqen1xfiX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=muXarhqC; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gq2HwgYe"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a7aa086b077so962235366b.0;
-        Wed, 02 Oct 2024 07:25:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="muXarhqC"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-82aa6be8457so33693739f.0
+        for <linux-block@vger.kernel.org>; Wed, 02 Oct 2024 07:52:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727879134; x=1728483934; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1727880752; x=1728485552; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=3Ffvu2nWYd/TtMPhyD4YwqAbLAjDY47YPXg3w4lrVDA=;
-        b=gq2HwgYedW6djkB/8T4K7Van8xcM752Bh+7nZDcQ5R7Lgc4OuoBDrVFq/1BHKkJOuQ
-         YbsnQRQjYGNRHYNNH/kekgvNkfr4lXYYk5LjpNZB2pgufKXXSmS7pFyQab/Jmam2luAp
-         btcdW+43iTFnlSaObk5926Z1+8RPAuo3p0nqhwovkGMjUYx+ihPQRK/264GF9tJ4SXNq
-         Tes5xm3U3UHV4bmIXiF8HoX5N5NOhZbZMqPNDmNdWcXcSEO4QB5liTMYt7+wo0BL8fWz
-         Pzw0UVkLkbro+ATHYtvkjtNhcsVhaDfNbYrPtXQE4qSJnHbthbLKYc8dGqI7+3TnObCw
-         0Gzw==
+        bh=RE3jwLRIcca02DnRrcz1K5ebgHznFKMdpmHOaNwDBuQ=;
+        b=muXarhqCavX7PZEbmBI3vs+V5X/AVVG7JxqG02h2HslyhOUIfRtjdPMzJb7WKpoaBI
+         cAU0E5FDdTooPJL9DSVwyzZg5jd7MyJPyJ1Q17aw/GcQoyoP3VRdb0a0vISWy9UTVG7V
+         /RobB4y9HihRm1gwhu0JYl+d3FW+QIlFdofZ3SQPcTawFjLu9+pQWp5LR18qOSluTQyP
+         dBkSgjoMxgjGv8Ceb3+aiPsVEcW16y8Qoud63xWwnoslcrRIFoOk3iZbCU6BuO8rdr/w
+         PNY59Tspd63+gqIoRU2KFtQ/5C1d8hDruIHTPT6heyiZNjhhcvzfzzk9gkbkN8x1hL3k
+         BFRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727879134; x=1728483934;
+        d=1e100.net; s=20230601; t=1727880752; x=1728485552;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Ffvu2nWYd/TtMPhyD4YwqAbLAjDY47YPXg3w4lrVDA=;
-        b=VfhSyUThZaoYSbfHR2MqZPnkCUt49CTVU5qzLznOrpNiKWmXEOpkTwLla8mP+kNXBE
-         Hbwb1yZMZOlfFOqYP5lm0lWrb7ELh5VV9lVaO0Y6Xw7f28FRNfBDz4ChJBmrZhVmE5YL
-         RMhIQ5vsEUxuBj3943K/SIi9p/A9ha54WYoWr7tZp8l9y7mQ9ikp6fkDtYHW3OV/0lna
-         D4sWKJ+y6AlnHUsA9i+t4aaYyuZD0h9yHRdAu8hRA5tSljMRQ5t0yVPR/ylPm9Jr+UTi
-         EFx9R7Nf//doq15Zq9AVuls2RLcrCGL4xyPllKUDv16WfBFYW211DV4cX92fNxMElDp1
-         vhGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUorVsY8MNmOlI1W2mn/jLxo3Qvlykw+wURp0x81TAMHHSgEtjU3hcuGsgydOfteTbZ8d/D1yT9cH/EGB0=@vger.kernel.org, AJvYcCVyrSnLo529TNcZutc21n1qEyGDX6ElgQ7b0VpZyzOSFKmJ820HtVVIgpIb4a5/ijdUwDSDWlrKfA==@vger.kernel.org, AJvYcCWp8UlRlq8wenLvomsqsgoicDBAnZVObFPmL03NVsPt6TzI1ya/B2Id99GrgOk6HXOa4V4ifEuivONxLY55Ng==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzL4FA78X/mFj+rZgBrjB0Bmg2K5RbngQeYNp0IX/U8Q64A7gm5
-	CNMDr3QCOyquwzv5R0oGzk7LUhQQumOOR4Nu8rCVi8m8q3bHHu3J
-X-Google-Smtp-Source: AGHT+IFvPj+ATYZr1BExZ+QKBSVAPTglcZEJzhHNqX4Kf54MmKEy7qHf5bA10I/1t1JMjnnnPOz7jw==
-X-Received: by 2002:a17:907:7ba8:b0:a8a:6c5d:63b2 with SMTP id a640c23a62f3a-a98f8245134mr302970566b.18.1727879133514;
-        Wed, 02 Oct 2024 07:25:33 -0700 (PDT)
-Received: from [192.168.42.109] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93c27c5b15sm870870366b.59.2024.10.02.07.25.32
+        bh=RE3jwLRIcca02DnRrcz1K5ebgHznFKMdpmHOaNwDBuQ=;
+        b=gzujgL9j6/0bQt/AQOeCN0fZjsxXUrHyyLooh9OcfFpNipCGbPcrVfCSFrE66NPfmP
+         X03UYQFRUkWoHNA05ofcwgxenRdl2MIjlLDBfeT2YCl5qii6CYLXFcdcaNgKZ/GR9cPZ
+         RGt5Bl78h1KWN9VuhRU3B83eRtcJ8DtWEFTtgibk5bDcrq1+YmrC+T0eyqsh42pbBPUT
+         BJHivMTdTYMPk6daWOnopa5+dcfj3yvHVdAO62+DtPQowtF+MG12xYtsio5k/pbFCF6k
+         1Peas6pw5bM0SozuP/L3yL2KjwAtxArqlIqvpQuhy0yd3h8uBoQii6awWGxba0chhxYO
+         Sw2w==
+X-Gm-Message-State: AOJu0YwHcH2gco7O/+LxlDJK2rDmvcsUcYfnzQIX5ATng9SGFXLuhKeW
+	RRtLtjQi5U8gURi9NKl+4EpC4mnt/bkVslcDBCPCQ0JHUBiDT+YnxZsE09xM5LSAK3gIKq5UUus
+	HZaY=
+X-Google-Smtp-Source: AGHT+IFxDrN1Jh9fL8m84ZZezCHROf22HJJ0i4yAlQJwKsDHcgLHrPVrxXpUs+W4KsPCS/Gzvt++tA==
+X-Received: by 2002:a5e:d709:0:b0:82c:da1e:4ae7 with SMTP id ca18e2360f4ac-834c839aa54mr506574639f.2.1727880751887;
+        Wed, 02 Oct 2024 07:52:31 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-834936cd3c6sm332234039f.13.2024.10.02.07.52.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Oct 2024 07:25:33 -0700 (PDT)
-Message-ID: <48c70b95-f0c9-44bc-8a3b-3010e8d682be@gmail.com>
-Date: Wed, 2 Oct 2024 15:26:02 +0100
+        Wed, 02 Oct 2024 07:52:30 -0700 (PDT)
+Message-ID: <b8fc402d-11d3-400f-ac35-f2b4f8538abf@kernel.dk>
+Date: Wed, 2 Oct 2024 08:52:30 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,76 +61,47 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 3/3] io_uring: enable per-io hinting capability
-To: Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, kbusch@kernel.org,
- hch@lst.de, hare@suse.de, sagi@grimberg.me, martin.petersen@oracle.com,
- brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
- jaegeuk@kernel.org, bcrl@kvack.org, dhowells@redhat.com, bvanassche@acm.org
-Cc: linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, linux-block@vger.kernel.org, linux-aio@kvack.org,
- gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com,
- Nitesh Shetty <nj.shetty@samsung.com>
-References: <20240930181305.17286-1-joshi.k@samsung.com>
- <CGME20240930182103epcas5p4c9e91ca3cdf20e900b1425ae45fef81d@epcas5p4.samsung.com>
- <20240930181305.17286-4-joshi.k@samsung.com>
+Subject: Re: Applying "none" for io-scheduler causes coredump
+To: Fred Richards <fredr@geexology.org>
+Cc: linux-block@vger.kernel.org
+References: <CANPzkX=nUnDGZjVrJmmJZgeeqAdDacbZgvUxptLuKTpVJ53oHg@mail.gmail.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20240930181305.17286-4-joshi.k@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CANPzkX=nUnDGZjVrJmmJZgeeqAdDacbZgvUxptLuKTpVJ53oHg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 9/30/24 19:13, Kanchan Joshi wrote:
-> With F_SET_RW_HINT fcntl, user can set a hint on the file inode, and
-> all the subsequent writes on the file pass that hint value down.
-> This can be limiting for large files (and for block device) as all the
-> writes can be tagged with only one lifetime hint value.
-> Concurrent writes (with different hint values) are hard to manage.
-> Per-IO hinting solves that problem.
+On 10/2/24 8:45 AM, Fred Richards wrote:
+> Hello,
+>  Mainline kernel 6.11.1 on my archlinux machine with several disks, if I apply "none" as the io-scheduler, it core dumps.
 > 
-> Allow userspace to pass additional metadata in the SQE.
-> The type of passed metadata is expressed by a new field
+> Startup script rc.local has:
 > 
-> 	__u16 meta_type;
-
-The new layout looks nicer, but let me elaborate on the previous
-comment. I don't believe we should be restricting to only one
-attribute per IO. What if someone wants to pass a lifetime hint
-together with integrity information?
-
-Instead, we might need something more extensible like an ability
-to pass a list / array of typed attributes / meta information / hints
-etc. An example from networking I gave last time was control messages,
-i.e. cmsg. In a basic oversimplified form the API from the user
-perspective could look like:
-
-struct meta_attr {
-	u16 type;
-	u64 data;
-};
-
-struct meta_attr attr[] = {{HINT, hint_value}, {INTEGRITY, ptr}};
-sqe->meta_attrs = attr;
-sqe->meta_nr = 2;
-
-I'm pretty sure there will be a bunch of considerations people
-will name the API should account for, like sizing the struct
-so it can fit integrity bits or even making it variable sized.
-
-
-> At this point one type META_TYPE_LIFETIME_HINT is supported.
-> With this type, user can pass lifetime hint values in the new field
+> echo none  | sudo tee /sys/block/nvme{0n1,1n1}/queue/scheduler
 > 
-> 	__u64 lifetime_val;
+> Causes this in the journal log -
 > 
-> This accepts all lifetime hint values that are possible with
-> F_SET_RW_HINT fcntl.
-> 
-> The write handlers (io_prep_rw, io_write) send the hint value to
-> lower-layer using kiocb. This is good for upporting direct IO,
-> but not when kiocb is not available (e.g., buffered IO).
-> 
-> When per-io hints are not passed, the per-inode hint values are set in
-> the kiocb (as before). Otherwise, these take the precedence on per-inode
-> hints.
+> Oct 01 14:39:06 tor systemd-coredump[987]: [🡕] Process 980 (tee) of user 0 dumped core.
+>                                            
+>                                            Stack trace of thread 980:
+>                                            #0  0x000079b6a0ca43f4 n/a (libc.so.6 + 0x963f4)
+>                                            #1  0x000079b6a0c4b120 raise (libc.so.6 + 0x3d120)
+>                                            #2  0x000079b6a0c324c3 abort (libc.so.6 + 0x244c3)
+>                                            #3  0x000079b6a0c323df n/a (libc.so.6 + 0x243df)
+>                                            #4  0x000079b6a0c43177 __assert_fail (libc.so.6 + 0x35177)
+>                                            #5  0x0000617a0fb4e3ec n/a (tee + 0x63ec)
+>                                            #6  0x0000617a0fb4a34f n/a (tee + 0x234f)
+>                                            #7  0x000079b6a0c33e08 n/a (libc.so.6 + 0x25e08)
+>                                            #8  0x000079b6a0c33ecc __libc_start_main (libc.so.6 + 0x25ecc)
+>                                            #9  0x0000617a0fb4a665 n/a (tee + 0x2665)
+>                                            ELF object binary architecture: AMD x86-64
+
+Should be fixed by:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/block?id=e3accac1a976e65491a9b9fba82ce8ddbd3d2389
+
+which is heading to 6.11-stable.
+
 -- 
-Pavel Begunkov
+Jens Axboe
+
