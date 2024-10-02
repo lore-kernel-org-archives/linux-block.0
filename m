@@ -1,57 +1,57 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CFA519885B;
-	Wed,  2 Oct 2024 22:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3F219CC26;
+	Wed,  2 Oct 2024 22:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727907226; cv=none; b=DVa0wwuBeoWDGEP8gZvTY6Jr5P902fUPSPk87ThuRNVILrht/XhDKc1VXdR8fXA4XSPEVZqt0Pd6JJQxW4mWeledG+jVlK9H3loqts6/zgiVvyYChPvMrhGxHoe/gqMzuSyIP0cmeVF2WHHHlDH4sDzHdxxvqbSkD0EOAxA40xA=
+	t=1727907229; cv=none; b=FvGW5fNUdyvoSdNpG2GBCopkHyG2zRvlgL+TCDqDPQZYQ2H31i8Ex7SACSsIkmP7UsAqSSTwBkgEpGg752bP4rJDvHpHm22JPaSc5hvmaIRukILuoYYx3U+8K+DmXazarvQTgA/kpgZN5404Ej/NT27gqiHE+5UkakbozvN0Q28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727907226; c=relaxed/simple;
-	bh=vIZUmOhkctrpxNjE/bq31Se+xRGgI8VKyz9uNEv0GsQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D4Qldwg1fG6DLgZbU30UGAtnhMoBDwa1aMWGNW0+v+2YQuGI/wmo5PBWeV2jTPjVmOKx0yfaWLRG1aEnh9SzRp2ifCitmpU1aGZ0iCOq82LTDKBwhMWTWN1RIHCVW8H2h+FZcqTJE7PnmWUAfFNve4goPlhzfpd4UQlEqGnNp8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hJdHh1pD; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1727907229; c=relaxed/simple;
+	bh=AvSpeRPjeVRXz5j8dQKUo3Zt1JFIF3gH9S62HhEmPeo=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=J/cfp6m37aDfqZC9FBRYsAAzAioYV8iElHvzT7qqdUiOmqy6L4wAz8zi2adwZKZRKYrWQgClC3U5xoTOA4RE9nClhF4+pUw5a5tlMe/AeFJazxFsR3pwaOt78n93qEkdBHr55Z0fY5TiZIcd1iZwqeQiyPVZVFaQaQLWsePDhPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MvmCBBDe; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hJdHh1pD"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42cbb08a1a5so2074785e9.3;
-        Wed, 02 Oct 2024 15:13:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MvmCBBDe"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42cb5b3c57eso1994875e9.2;
+        Wed, 02 Oct 2024 15:13:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727907223; x=1728512023; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727907226; x=1728512026; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4T9c6jNuxQUPP/Rbzo55YkzEPcrdsPIICvkg9bn4/tM=;
-        b=hJdHh1pDDc/wwQTw1aH+f3MPnAAzQk3DMfCYsLppvZPPYaGo78s+XDY2QXpl3ivF4r
-         Eyz/AUgGwiC8x8WZRCy/FpG2MCcERU+gdpV7RG1U6rpDXr096E3wwTFr3hQ7LfqvTnPP
-         36qyfooIgE6X3oSHR0sge39+pEkwBfo6D3MTj1AhEBbsLJLu5lWkbrvnTaZ8LXvtoYJ9
-         M/wuQmundepYbRPFahGic1sD7nFKeeIo5z9YqJq1eFJP29TZRWmHTigs5j4J2bPT7rQJ
-         f7080xDkLKLc7rm0wJthIK5p2UwIn/il7pZ5ylhwDJOewxDkvzjp71O54Jb/8PFV34Dx
-         52fg==
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=36HmyHvoEEpKMI8/Stc+TIqGBije17bfud9rEk2jFTM=;
+        b=MvmCBBDeKJ2xGkG8i/VHa4nCuDG/ZaxWYhCzNjlMgoRH0CgWx20lBPj8ocJ60ml+JV
+         RfEOikBFYf6rl7dSOs9PSDjXw7EIq4wQLWIV1T/82kDcChphJ1kmSza4sHvMDPfpfW++
+         NMo130zJRD5L2jpyxzHj7fV6fvSxszjIjrO3POV8eCLK3Yn3tZNrj5Q0IDRGdx4XrqeU
+         k8tw8bfXgHhLhFg4XxxpiDQcGlqMmJ7nZ+KohtzbtM47wC0n3CBueiZz5FOw8OsFr4QQ
+         d4JT9aa+hE4wy2r25ttmpWvqo+OKMGdLsGE9h9dhOu4edy297FVf9Kv398mC74at0vwk
+         ky4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727907223; x=1728512023;
+        d=1e100.net; s=20230601; t=1727907226; x=1728512026;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4T9c6jNuxQUPP/Rbzo55YkzEPcrdsPIICvkg9bn4/tM=;
-        b=MVscUUG2gEGv9d6tUtSnasGfj9rBzAloA870R6IwFR1D9dy43OgL4+SjCiNZmDARTV
-         NuoST+LQmcXqUd5KBNBqa3udHPnLSgITFcfaAUlPv2eYRkLw8OPsLRDtx8MrnkWn/EX9
-         8MzwzGGSeBJ9/t8d/x95CTcOMvCLpvsm4BRbFR80k5rUyjnoOsY8nxwQoT54aCb1b4Rs
-         ukXJYJh/HIEXLkLzu3R8wzm3YX4ZeSmQ5DLc3Tb2vQ/PzrQZ09QxcKcpCXslh9EMPXd1
-         L/zHIH9Qc4C8s4tmE8/tRBvdXw1Zd8NOe3E6PTuLTUIUOu6nqnMIfz36i5cWIB+kRg8G
-         oAXw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+2Dzzyz9xOSLWhnz9phH2zF2pQ36xtob8mKqTRRF/+kwM4/Yzu7inF+NwumN71iB1WKXYvR9B4mpl8FDp@vger.kernel.org, AJvYcCUpC9Kyml93hrrTza8hKvcNrGkTiAlyqZZCQG9wlEZh7fBlgIzifXckEtF3LuwqnkjLgLVku/4TZenw@vger.kernel.org, AJvYcCUzPqRGZNUYuXLjCt5TxUWIM/6DBBsb4/J/4T+b/cTtWxMrpmLW6B10ITJzgedDP1HYNw7myZIpkbyP8PU=@vger.kernel.org, AJvYcCWOTmP0JSUVj+R8PkkRCqi+mBH7iKJodNG8lnSipQ9SirY0h/QgEKhIaZPiDRJeKyddA1OJqA5ILi7X@vger.kernel.org, AJvYcCXANXhrP0uWNe+jQ+I5X22zZcFzAZGv0Zik9Sfw9hw0umMh0HdigEINv90M7oftYE5GSCG2CBl+bwCr@vger.kernel.org
-X-Gm-Message-State: AOJu0YycjLqnYW3QWTPIecME6w3GIduK6RhOuN2kCK20XlxZaMauahmd
-	vmSz0cyDS05IfD62P6QMonl2KmAtMbWdtZp4jDc/w83GPlnQXRqR
-X-Google-Smtp-Source: AGHT+IHVMWSt0Q6Br7yza0Y32FBkOq5Dsl21VP0EwCtbgpPqez3dioXXC+VpAgoAGlxYRcWXNuPDcA==
-X-Received: by 2002:a05:600c:500d:b0:426:5416:67e0 with SMTP id 5b1f17b1804b1-42f778f435fmr36503995e9.31.1727907223052;
-        Wed, 02 Oct 2024 15:13:43 -0700 (PDT)
+        bh=36HmyHvoEEpKMI8/Stc+TIqGBije17bfud9rEk2jFTM=;
+        b=iEdcbVk+EuVLvwH67vRN6Qbc8QmlYsudZNQs4v9M5aveSUoo5Gbs2om15WsaLdEdjK
+         hmezPvb48VuA6cz8AEM4xX0/N4PfYwp8U7melk28HnXDHckq6unPGn0eDardy0e85QHX
+         AtEK5dJdjud3R3o7FdDj1YDhUEtcxT7IYI76rYY0AYxv2MeUzbh5JtjzTrN5ictk6VOv
+         iH3HidhxPLf0epU4BJ1jEi9gR1LDg7jlfAxIfrWNAsj7PSrzBtpgOuibGW6AcVb7Xszn
+         V+F05eg+jQKEOrTtJqBvatNl1NxypgefGTFX3TMKUbigM18egkFWywh/t2HPN9wG0rpd
+         iw+w==
+X-Forwarded-Encrypted: i=1; AJvYcCUCKuuputubzpxPX/s76FhyvJYt/qG38y1XN998Q1mEEkFgqcmOzlbvaGqaWGA8rWGWaI4oeSozSUqy@vger.kernel.org, AJvYcCVCZ0Nkg6hzYTLc3ZcBM/YXPAJt44IN9U7hbpYUXVMXYwApMyCci0XdncfzBIAevZjHO5aUE4DkhWNkYk8=@vger.kernel.org, AJvYcCX9WwuxRN+qswI6tcrt9gaPVZ48bM1Eig63ZrpyXMjHNUFv9R3uKPy9XmoZjn7DjwIVQdauqoFX5r+Q@vger.kernel.org, AJvYcCXkZNdf25CsypyFl+YNlR13wSEEu4r+vq0LKiSSbC5PGUJYgXERm0EJB0VOijLmM1Lt964IdXreTxIc@vger.kernel.org, AJvYcCXlgSWaiogFtjXdnPaLIkQyMsRWjZnAswLD4TJCzTZoIS2HdqGNsxgUj9YFAhJ2Mj4P8z1OLIr5vBcuHugU@vger.kernel.org
+X-Gm-Message-State: AOJu0YxffibpOYusnmnUFE7OJNDSyAM/wKqdIe9npy+Yv1xP9s1gCCqb
+	Hb7Xjc2QvyQFEsgCufmBDvZYmY6a4rbdebj3ZAsltj8Hfm+GqmYe
+X-Google-Smtp-Source: AGHT+IH8zG6IQs/9tpO/SHQNvoOax51SUD4BoKGMr+glZVZqZQshRljrFpilX+Z23SlVh4aYkxEc8w==
+X-Received: by 2002:a05:600c:6dd9:b0:42e:93af:61c5 with SMTP id 5b1f17b1804b1-42f77948002mr35767695e9.14.1727907226194;
+        Wed, 02 Oct 2024 15:13:46 -0700 (PDT)
 Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42f79ead1absm29218245e9.17.2024.10.02.15.13.41
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42f79ead1absm29218245e9.17.2024.10.02.15.13.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2024 15:13:42 -0700 (PDT)
+        Wed, 02 Oct 2024 15:13:44 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jonathan Corbet <corbet@lwn.net>,
@@ -86,10 +86,9 @@ To: Jens Axboe <axboe@kernel.dk>,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
 	upstream@airoha.com,
 	Christoph Hellwig <hch@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v6 1/6] block: add support for defining read-only partitions
-Date: Thu,  3 Oct 2024 00:11:41 +0200
-Message-ID: <20241002221306.4403-2-ansuelsmth@gmail.com>
+Subject: [PATCH v6 2/6] docs: block: Document support for read-only partition in cmdline part
+Date: Thu,  3 Oct 2024 00:11:42 +0200
+Message-ID: <20241002221306.4403-3-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20241002221306.4403-1-ansuelsmth@gmail.com>
 References: <20241002221306.4403-1-ansuelsmth@gmail.com>
@@ -101,58 +100,36 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for defining read-only partitions and complete support for
-it in the cmdline partition parser as the additional "ro" after a
-partition is scanned but never actually applied.
+Document support for read-only partition in cmdline partition for block
+devices by appending "ro" after the (partition name).
 
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk.h                | 1 +
- block/partitions/cmdline.c | 3 +++
- block/partitions/core.c    | 3 +++
- 3 files changed, 7 insertions(+)
+ Documentation/block/cmdline-partition.rst | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk.h b/block/blk.h
-index c718e4291db0..f300212d3e98 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -558,6 +558,7 @@ void blk_free_ext_minor(unsigned int minor);
- #define ADDPART_FLAG_NONE	0
- #define ADDPART_FLAG_RAID	1
- #define ADDPART_FLAG_WHOLEDISK	2
-+#define ADDPART_FLAG_READONLY	4
- int bdev_add_partition(struct gendisk *disk, int partno, sector_t start,
- 		sector_t length);
- int bdev_del_partition(struct gendisk *disk, int partno);
-diff --git a/block/partitions/cmdline.c b/block/partitions/cmdline.c
-index 152c85df92b2..da3e719d8e51 100644
---- a/block/partitions/cmdline.c
-+++ b/block/partitions/cmdline.c
-@@ -237,6 +237,9 @@ static int add_part(int slot, struct cmdline_subpart *subpart,
- 	put_partition(state, slot, subpart->from >> 9,
- 		      subpart->size >> 9);
+diff --git a/Documentation/block/cmdline-partition.rst b/Documentation/block/cmdline-partition.rst
+index 530bedff548a..526ba201dddc 100644
+--- a/Documentation/block/cmdline-partition.rst
++++ b/Documentation/block/cmdline-partition.rst
+@@ -39,13 +39,16 @@ blkdevparts=<blkdev-def>[;<blkdev-def>]
+     create a link to block device partition with the name "PARTNAME".
+     User space application can access partition by partition name.
  
-+	if (subpart->flags & PF_RDONLY)
-+		state->parts[slot].flags |= ADDPART_FLAG_READONLY;
++ro
++    read-only. Flag the partition as read-only.
 +
- 	info = &state->parts[slot].info;
+ Example:
  
- 	strscpy(info->volname, subpart->name, sizeof(info->volname));
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index ab76e64f0f6c..abad6c83db8f 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -373,6 +373,9 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
- 			goto out_del;
- 	}
+     eMMC disk names are "mmcblk0" and "mmcblk0boot0".
  
-+	if (flags & ADDPART_FLAG_READONLY)
-+		bdev_set_flag(bdev, BD_READ_ONLY);
-+
- 	/* everything is up and running, commence */
- 	err = xa_insert(&disk->part_tbl, partno, bdev, GFP_KERNEL);
- 	if (err)
+   bootargs::
+ 
+-    'blkdevparts=mmcblk0:1G(data0),1G(data1),-;mmcblk0boot0:1m(boot),-(kernel)'
++    'blkdevparts=mmcblk0:1G(data0),1G(data1),-;mmcblk0boot0:1m(boot)ro,-(kernel)'
+ 
+   dmesg::
+ 
 -- 
 2.45.2
 
