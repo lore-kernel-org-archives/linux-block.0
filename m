@@ -1,192 +1,193 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FE8A1B969;
-	Thu,  3 Oct 2024 10:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D5D154458
+	for <linux-block@vger.kernel.org>; Thu,  3 Oct 2024 12:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727951461; cv=none; b=mSgnwQ5NRF6J1i736XLJ6UJ0BFE06qSKs6BaY3gaIaS7mAA2VclD0+4QiV+aOES1DlPLnSnYIJMcYbQmVA2VN4RW09dywldyTZuIeif/j0ZMNF6YS2XI+Cm3o8AlvSwg7VWIul56XpHkmAtx+Fe3QWELicQYDO20ilh6fKAH9oA=
+	t=1727956996; cv=none; b=the/qGJEbBrgJLOs6VFNoZONMdiVG1Y+kgbDkZeEUlu4wWVcV/VPfjqVlrWwxUCRu9Klfw/UwEKAL5Pv9Q12fWpPKYf30DfugSf05cWEgafcULDQp4PO0/BDbhPp5x5OjrYHezKdMPqqPSuDZZC1MMlSLWeptXDyhC/MkzRq+gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727951461; c=relaxed/simple;
-	bh=28Rp7iMfYu9uJMVMaa86uq9UWaNfDuDfeBBD55rbIZA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HG6OPjK98BUhUL4sT8YccemaR+IJbAQxYv6REiHbiRQTDKjbAPebzdrjb/whI9Hw+eNiBexk4vhaXQtyMH50p7cnAufoSUlUw764Dt6uMwMrmenn3LTM7R2ZSHtxOG0cv54b/gx1ZyRW+h5pTMJEPKKVb2F2J+GodrYqpDFjglU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C2422339;
-	Thu,  3 Oct 2024 03:31:27 -0700 (PDT)
-Received: from [10.1.38.55] (e127648.arm.com [10.1.38.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1EB173F64C;
-	Thu,  3 Oct 2024 03:30:53 -0700 (PDT)
-Message-ID: <6e21e8f1-e3b4-4915-87cc-6ce77f54cc8a@arm.com>
-Date: Thu, 3 Oct 2024 11:30:52 +0100
+	s=arc-20240116; t=1727956996; c=relaxed/simple;
+	bh=S9nYYA+ft7bnmvLPV9Xq5fVP9Vx11DcFu5nTQcirfjs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XelHdio8XDFNjZvIMw+2myDPtsJrgu4Jaf4eoBBlYVezmEGb60wAaYONiis9ghNvXL57aRDrR+TwFBgML4aKwTwUoP2BIWr0yEoJBngkvRJH0RZ6Fc+g5o67khayAxyaO0VD7rXxLsvflIvXIIm/DdxzG7A5DTlCH0qndCytnks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RK1ltBCO; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RK1ltBCO"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-37ce14ab7eeso782595f8f.2
+        for <linux-block@vger.kernel.org>; Thu, 03 Oct 2024 05:03:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1727956993; x=1728561793; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=h0v3FxexH6o+k9zGs10MnvBoywhJ9dhmJJLFKjWBKLg=;
+        b=RK1ltBCOKpMasL75F9bp60IhGt1HlAKoGHIWabpeiJBbvBAcg7lmIl6llxCWao9+qi
+         kBBmAGqWd4qwbZiQAw6Ez4UkqYZaN0vL4jDTr/gHx8SVzyVIzW6Eja2icEkrXko1szz7
+         XAKaWjrZzd6WwuJu79bjrkLGquBmaFK1Qf6Z7rTSRUb0D0e4vlNwWITrQCofPwx4TY1j
+         0yrpH8m+BNkm0UsL5X3+gHJu0xsHZb7AQtFomLgk5bp1GCofFoGGZI9p875zlBqf5tF+
+         UHS+GFJVoTK1LIZ4WmowAyEG1G5ZJ5AmEUbQCxaon5cwGKLKYDDj/kVBMicjNCyJFye4
+         VcCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727956993; x=1728561793;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h0v3FxexH6o+k9zGs10MnvBoywhJ9dhmJJLFKjWBKLg=;
+        b=MrK5rJMPek0ecN/T9fG6+on6AoUdrRLO7Q+x0uZeWzeOqhtiZLzicmsIZeLp2uM2BZ
+         J2BcCxidYowGkN3Yiy4bCPP5Q5jFqgzYHrTS0kpDUGFb1kp+jpe2KCSdUp732oiVRoi7
+         0k379KtKCRCOrr/w947ANCWRf+hchWGzCcFHICi2+0pva2AfIm9hpAxGtz7NsiCjuA29
+         EoubVWPo90MJZBmVYXsJxGciRcUiuAaBiQuXqX1SKK1hvjDaC777GbsMPuC3zNLHwxVz
+         Ia3FVoaynxbgjicbQDRuAMz+ibVHK/PF9DDDompYnW4HFJTVGTIdyP6WTK3Y3s8BlmXl
+         w4Hw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8+tt7xtrcStbPbEhW19kkMaZOL5GiTkOOsq9WMGicFGAwKaGMtmc2mLoL5IYTpP2JFykg9lbm/IYVLQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiNbHP/VocHLqL5873YWkF/DvRciUe7XxQ/X/BTlFRw6XFbCN7
+	NJJLJ7E4VQGF1sXp+0w5ZSHD3H922IlLklBYF3se/gNp34Zvyjq40i5Ipd6nF+w=
+X-Google-Smtp-Source: AGHT+IFdfQ8pVihlgtJc1iFCJTfVxzLCRaEka3dk4gA6mpMaHt4xXmFAwc1bV33dk9fxjbTpGaNSTw==
+X-Received: by 2002:a5d:47c4:0:b0:374:c6af:1658 with SMTP id ffacd0b85a97d-37cfb8b5503mr6603502f8f.1.1727956992907;
+        Thu, 03 Oct 2024 05:03:12 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f7727f72fsm50006655e9.1.2024.10.03.05.03.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2024 05:03:12 -0700 (PDT)
+Date: Thu, 3 Oct 2024 15:03:08 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Waiman Long <longman@redhat.com>
+Cc: Yu Kuai <yukuai3@huawei.com>, Tejun Heo <tj@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2] blk_iocost: remove some duplicate irq disable/enables
+Message-ID: <3083c357-9684-45d3-a9c7-2cd2912275a1@stanley.mountain>
+References: <Zv0kudA9xyGdaA4g@stanley.mountain>
+ <0a8fe25b-9b72-496d-b1fc-e8f773151e0a@redhat.com>
+ <925f3337-cf9b-4dc1-87ea-f1e63168fbc4@stanley.mountain>
+ <df1cc7cb-bac6-4ec2-b148-0260654cc59a@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 5/8] cpufreq/schedutil: Remove iowait boost
-To: Quentin Perret <qperret@google.com>, "Rafael J. Wysocki"
- <rafael@kernel.org>
-Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
- peterz@infradead.org, juri.lelli@redhat.com, mingo@redhat.com,
- dietmar.eggemann@arm.com, vschneid@redhat.com, vincent.guittot@linaro.org,
- Johannes.Thumshirn@wdc.com, adrian.hunter@intel.com, ulf.hansson@linaro.org,
- bvanassche@acm.org, andres@anarazel.de, asml.silence@gmail.com,
- linux-block@vger.kernel.org, io-uring@vger.kernel.org, qyousef@layalina.io,
- dsmythies@telus.net, axboe@kernel.dk
-References: <20240905092645.2885200-1-christian.loehle@arm.com>
- <20240905092645.2885200-6-christian.loehle@arm.com>
- <CAJZ5v0hJWwsErT193i394bHOczvCQwU_5AVVTJ1oKDe7kTW82g@mail.gmail.com>
- <Zv5oTvxPsiTWCJIo@google.com>
-Content-Language: en-US
-From: Christian Loehle <christian.loehle@arm.com>
-In-Reply-To: <Zv5oTvxPsiTWCJIo@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df1cc7cb-bac6-4ec2-b148-0260654cc59a@redhat.com>
 
-On 10/3/24 10:47, Quentin Perret wrote:
-> On Monday 30 Sep 2024 at 18:34:24 (+0200), Rafael J. Wysocki wrote:
->> On Thu, Sep 5, 2024 at 11:27 AM Christian Loehle
->> <christian.loehle@arm.com> wrote:
->>>
->>> iowait boost in schedutil was introduced by
->>> commit ("21ca6d2c52f8 cpufreq: schedutil: Add iowait boosting").
->>> with it more or less following intel_pstate's approach to increase
->>> frequency after an iowait wakeup.
->>> Behaviour that is piggy-backed onto iowait boost is problematic
->>> due to a lot of reasons, so remove it.
->>>
->>> For schedutil specifically these are some of the reasons:
->>> 1. Boosting is applied even in scenarios where it doesn't improve
->>> throughput.
->>
->> Well, I wouldn't argue this way because it is kind of like saying that
->> air conditioning is used even when it doesn't really help.  It is
->> sometimes hard to know in advance whether or not it will help though.
->>
->>> 2. The boost is not accounted for in EAS: a) feec() will only consider
->>>  the actual task utilization for task placement, but another CPU might
->>>  be more energy-efficient at that capacity than the boosted one.)
->>>  b) When placing a non-IO task while a CPU is boosted compute_energy()
->>>  assumes a lower OPP than what is actually applied. This leads to
->>>  wrong EAS decisions.
->>
->> That's a very good point IMV and so is the one regarding UCLAMP_MAX (8
->> in your list).
+On Wed, Oct 02, 2024 at 02:40:52PM -0400, Waiman Long wrote:
 > 
-> I would actually argue that this is also an implementation problem
-> rather than something fundamental about boosting. EAS could be taught
-> about iowait boosting and factor that into the decisions.
+> On 10/2/24 14:10, Dan Carpenter wrote:
+> > On Wed, Oct 02, 2024 at 01:49:48PM -0400, Waiman Long wrote:
+> > > > -	spin_unlock_irq(&ioc->lock);
+> > > > +	spin_unlock(&ioc->lock);
+> > > >    	return 0;
+> > > >    }
+> > > I would suggest adding a "lockdep_assert_irqs_disabled()" call before
+> > > spin_lock() to confirm that irq is indeed disabled just in case the callers
+> > > are changed in the future.
+> > It's really hard to predict future bugs.  I doubt we'll add new callers.
+> > Outputting this information to a struct seq_file *sf is pretty specific.
+> > 
+> > If there were a bug related to this, then wouldn't it be caught by lockdep?
+> > 
+> > The other idea is that we could catch bugs like this using static analysis.
+> > Like every time we take the &ioc->lock, either IRQs should already be disabled
+> > or we disable it ourselves.  I could write a Smatch check like this.
+> > 
+> > KTODO: add Smatch check to ensure IRQs are disabled for &ioc->lock
+> 
+> This is just a suggestion and it is fine if you don't think it is necessary.
+> The call can also serve as a comment that irq should have been disabled at
+> this point.
 
-Definitely, and I did do exactly that.
+I mean it's good to think about preventing future bugs.  I just feel like when
+it comes to adding asserts probably that's more useful when there are a lot of
+call paths.  Meanwhile if we add a static checker rule then we're probably going
+to find bugs.  Boom, maybe I've found one already?:
 
-> 
->> If the goal is to set the adequate performance for a given utilization
->> level (either actual or prescribed), boosting doesn't really play well
->> with this and it shouldn't be used at least in these cases.
-> 
-> There's plenty of cases where EAS will correctly understand that
-> migrating a task away will not reduce the OPP (e.g. another task on the
-> rq has a uclamp_min request, or another CPU in the perf domain has a
-> higher request), so iowait boosting could probably be added.
-> 
-> In fact if the iowait boost was made a task property, EAS could easily
-> understand the effect of migrating that boost with the task (it's not
-> fundamentally different from migrating a task with a high uclamp_min
-> from the energy model perspective).
+block/blk-iocost.c:3144 ioc_weight_write() warn: expected irq_disable for '&iocg->ioc->lock'
 
-True.
-> 
->>> 3. Actual IO heavy workloads are hardly distinguished from infrequent
->>> in_iowait wakeups.
->>
->> Do infrequent in_iowait wakeups really cause the boosting to be
->> applied at full swing?
->>
->>> 4. The boost isn't accounted for in task placement.
->>
->> I'm not sure what exactly this means.  "Big" vs "little" or something else?
->>
->>> 5. The boost isn't associated with a task, it therefore lingers on the
->>> rq even after the responsible task has migrated / stopped.
->>
->> Fair enough, but this is rather a problem with the implementation of
->> boosting and not with the basic idea of it.
-> 
-> +1
-> 
->>> 6. The boost isn't associated with a task, it therefore needs to ramp
->>> up again when migrated.
->>
->> Well, that again is somewhat implementation-related IMV, and it need
->> not be problematic in principle.  Namely, if a task migrates and it is
->> not the only one in the "new" CPUs runqueue, and the other tasks in
->> there don't use in_iowait, maybe it's better to not boost it?
->>
->> It also means that boosting is not very consistent, though, which is a
->> valid point.
->>
->>> 7. Since schedutil doesn't know which task is getting woken up,
->>> multiple unrelated in_iowait tasks lead to boosting.
->>
->> Well, that's by design: it boosts, when "there is enough IO pressure
->> in the runqueue", so to speak.
->>
->> Basically, it is a departure from the "make performance follow
->> utilization" general idea and it is based on the observation that in
->> some cases performance can be improved by taking additional
->> information into account.
->>
->> It is also about pure performance, not about energy efficiency.
->>
->>> 8. Boosting is hard to control with UCLAMP_MAX (which is only active
->>> when the task is on the rq, which for boosted tasks is usually not
->>> the case for most of the time).
-> 
-> Sounds like another reason to make iowait boosting per-task to me :-)
-> 
-> I've always thought that turning iowait boosting into some sort of
-> in-kernel uclamp_min request would be a good approach for most of the
-> issues mentioned above. Note that I'm not necessarily saying to use the
-> actual uclamp infrastructure (though it's valid option), I'm really just
-> talking about the concept. Is that something you've considered?
-> 
-> I presume we could even factor out the 'logic' part of the code that
-> decides out to request the boost into its own thing, and possibly have
-> different policies for different use-cases, but that might be overkill.
+block/blk-iocost.c
+  3090  static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
+  3091                                  size_t nbytes, loff_t off)
+  3092  {
+  3093          struct blkcg *blkcg = css_to_blkcg(of_css(of));
+  3094          struct ioc_cgrp *iocc = blkcg_to_iocc(blkcg);
+  3095          struct blkg_conf_ctx ctx;
+  3096          struct ioc_now now;
+  3097          struct ioc_gq *iocg;
+  3098          u32 v;
+  3099          int ret;
+  3100  
+  3101          if (!strchr(buf, ':')) {
+  3102                  struct blkcg_gq *blkg;
+  3103  
+  3104                  if (!sscanf(buf, "default %u", &v) && !sscanf(buf, "%u", &v))
+  3105                          return -EINVAL;
+  3106  
+  3107                  if (v < CGROUP_WEIGHT_MIN || v > CGROUP_WEIGHT_MAX)
+  3108                          return -EINVAL;
+  3109  
+  3110                  spin_lock_irq(&blkcg->lock);
 
-See the cover-letter part on per-task iowait boosting, specifically:
-[1]
-v1 per-task io boost
-https://lore.kernel.org/lkml/20240304201625.100619-1-christian.loehle@arm.com/
-v2 per-task io boost
-https://lore.kernel.org/lkml/20240518113947.2127802-2-christian.loehle@arm.com/
-[2]
-OSPM24 discussion iowait boosting
-https://www.youtube.com/watch?v=MSQGEsSziZ4
+Here we disable IRQs.
 
-These are the main issues with transforming the existing mechanism into
-a per-task attribute.
-Almost unsolvable is: Does reducing "iowait pressure" (be it per-task or per-rq)
-actually improve throughput even (assuming for now that this throughput is
-something we care about, I'm sure you know that isn't always the case, e.g.
-background tasks). With MCQ devices and some reasonable IO workload that is
-IO-bound our iowait boosting is often just boosting CPU frequency (which uses
-power obviously) to queue in yet another request for a device which has essentially
-endless pending requests. If pending request N+1 arrives x usecs earlier or
-later at the device then makes no difference in IO throughput.
-If boosting would improve e.g. IOPS (of that device) is something the block layer
-(with a lot of added infrastructure, but at least in theory it would know what
-device we're iowaiting on, unlike the scheduler) could tell us about. If that is
-actually useful for user experience (i.e. worth the power) only userspace can decide
-(and then we're back at uclamp_min anyway).
-(The above all assumes that iowait even means "is waiting for block IO and
-about to send another block IO" which is far from reality.)
+  3111                  iocc->dfl_weight = v * WEIGHT_ONE;
+  3112                  hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
+  3113                          struct ioc_gq *iocg = blkg_to_iocg(blkg);
+  3114  
+  3115                          if (iocg) {
+  3116                                  spin_lock(&iocg->ioc->lock);
 
-Thanks Quentin for getting involved, your input is very much appreciated!
+So this is fine.
 
-Regards,
-Christian
+  3117                                  ioc_now(iocg->ioc, &now);
+  3118                                  weight_updated(iocg, &now);
+  3119                                  spin_unlock(&iocg->ioc->lock);
+  3120                          }
+  3121                  }
+  3122                  spin_unlock_irq(&blkcg->lock);
+  3123  
+  3124                  return nbytes;
+  3125          }
+  3126  
+  3127          blkg_conf_init(&ctx, buf);
+  3128  
+  3129          ret = blkg_conf_prep(blkcg, &blkcg_policy_iocost, &ctx);
+  3130          if (ret)
+  3131                  goto err;
+  3132  
+  3133          iocg = blkg_to_iocg(ctx.blkg);
+  3134  
+  3135          if (!strncmp(ctx.body, "default", 7)) {
+  3136                  v = 0;
+  3137          } else {
+  3138                  if (!sscanf(ctx.body, "%u", &v))
+  3139                          goto einval;
+  3140                  if (v < CGROUP_WEIGHT_MIN || v > CGROUP_WEIGHT_MAX)
+  3141                          goto einval;
+  3142          }
+  3143  
+  3144          spin_lock(&iocg->ioc->lock);
+
+But why is this not spin_lock_irq()?  I haven't analyzed this so maybe it's
+fine.
+
+  3145          iocg->cfg_weight = v * WEIGHT_ONE;
+  3146          ioc_now(iocg->ioc, &now);
+  3147          weight_updated(iocg, &now);
+  3148          spin_unlock(&iocg->ioc->lock);
+  3149  
+  3150          blkg_conf_exit(&ctx);
+  3151          return nbytes;
+  3152  
+  3153  einval:
+  3154          ret = -EINVAL;
+  3155  err:
+  3156          blkg_conf_exit(&ctx);
+  3157          return ret;
+  3158  }
+
+regards,
+dan carpenter
