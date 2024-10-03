@@ -1,64 +1,72 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A253B12D1FA
-	for <linux-block@vger.kernel.org>; Thu,  3 Oct 2024 14:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4301547DA
+	for <linux-block@vger.kernel.org>; Thu,  3 Oct 2024 14:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727965036; cv=none; b=Z0k/lriWsezO004iAK8hV7Gp0hqOXDr2Q9I4/sZKG6lHKnEDCcrfEM47gIMCdaJ1b7ZBovIRrAFKjXVxDqwUyjCbMoT47MxeAD4VSLwjRgacC8DF3b04PBuWaR2y+7pnLgeLw4q/0APc+DsxwCh9lXNyhjecAwNzIurlTnDEyGc=
+	t=1727965924; cv=none; b=ds6HCIe2uosboxdpGvSFPLb9fFdzzVwgtw3aAu3Gz8s9L3XWDkXdbYdhN8CW2aOBAlvDDVV0WWgce7l1HNzDY92qXu0MH/rkBnkPfPeMyXF2BLl2jMFGDVQZRRg7YeaiTphIsXBUSJvn6wKeuTthU1EnMcWLEm9alMqNc9tOxmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727965036; c=relaxed/simple;
-	bh=gHAjhIpIOeUJHbAOojfrAXvUJGqyxiOvfwqFvRRxfgk=;
+	s=arc-20240116; t=1727965924; c=relaxed/simple;
+	bh=KT4wxf5eAijH7GEBqTLb1dsKcH58j0cYtgWI80Hfo98=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MTyE/iG/+XPaCQDUNvh4g67qfpGNHQhAcUm1OmICjnmkEMpSG/uEOgAbMFxFuozeUtN5knH+WABI6aADBfsW2kdrvExFY3R1K1Ef6JxouGMHOpKg63B2exFpulgmWJ7GzF7W+zRxRRGqgRS1yCbJa8iPMMVMKxXr77ehnJksQeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Z4lI+v5s; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ynz3gDSMZxqhKgnoGB88HO7fvK5WS28vRWacIAcSmIXhfgjYWIFRFV5kbQi9/6BzwyAjiLjy4fi2JOK5jFKETTsXAptiXoBCVtjqXJbFKLnoDnlvwAGHSuJ5CXiUrSDvcAdvpiBsiF4qLMNvhuCq//9jV0UoXW88Ek6U1Jj96JA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bjHBq23T; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Z4lI+v5s"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7db238d07b3so776484a12.2
-        for <linux-block@vger.kernel.org>; Thu, 03 Oct 2024 07:17:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bjHBq23T"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42cb806623eso8535935e9.2
+        for <linux-block@vger.kernel.org>; Thu, 03 Oct 2024 07:32:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1727965034; x=1728569834; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1727965921; x=1728570721; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nY8DUOxEIQESRM3K9M7xvE11dh819ZwIcVhYwQUWZKQ=;
-        b=Z4lI+v5s9v/mBsMlL4RGa8BVsJdsxHb8Qf4m9m38LCriyn+imczyE2oGd7yH2Ctkez
-         bSPqR7gyq+pXmpcFb73Cxl1ZKgzjq9jP+9ntxyskmwA0PtCEKLL3cmu5i1e8NMfFD12Q
-         /C5C60ea47cdOhHyAoUoVgPkklACgKDbjL4ds=
+        bh=5RVajOVWsOfO8XEUrv4orE56kvY5Og/6yTj5Q+VfXTA=;
+        b=bjHBq23T/Eo5B4IAFAZ1B8sgVoBfT8ov8WAe1ImKSMTpcryoIfPC0Pb+jVqkul9xvv
+         4ONw8PzNTz7vGA6nz3mRowSE/FZdP+pM/p0dVy91p2Ienvs8u26s01cbPd7ZjYXYWzdA
+         s0dY/Wjt1Kkl+C7+uSlbgNMdznLqP8s/67vvi5YPZT0Ce4SogCR8r5ca8JPkbxrbBzAe
+         wfns1EpWfI/M1eHFH1GgpxMM5cSjM1yIPsvmoWzwuu6qsst30qXi7EBEVnsHK3Abp/CV
+         h2W6ctgAVl+UWndHZmedfJZ/bp5B6AR/4MLVK4ybWaSbBL1XuAZiayoJ0CDbSfbppspl
+         Yo7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727965034; x=1728569834;
+        d=1e100.net; s=20230601; t=1727965921; x=1728570721;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nY8DUOxEIQESRM3K9M7xvE11dh819ZwIcVhYwQUWZKQ=;
-        b=fIODypkaP0wvcH0uhGiVInl7yUZPicR20WIwWvQ0O8xMsk8SAmPJVX4KjHhSllXNgD
-         59Yk8hcYgTrK9qIdubqx3GfKplIBTJeUTSTiMeQxp/bFlu9nXhuzrj7aJb54nLm2fOUa
-         t3SVUhcM4SbZrezGPsenxVv4wvLN6aOos7lCgoues3OYUdnbj0qJuVyub488r4QYztro
-         V4kzOJfx5rpled4u3COAbEl6y5Xao63JLDIPOZY5RWFEBkkjN7vl1T4FeZ1/YBNq/hn7
-         YFT8Gt7535FDqpp0YWH7qJfVwzQDsl65HxaZYqo1tU4lwWAIt87/2XcBGGYHkKisDxuP
-         UosQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0Ev+iXL0On13uRIegruVRwc1E3g+8tv39Vlh/pyYHZb9TnN/j7uCnCTJerAgykGNrnsZKe6V3QUGl0g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOnwWbJChvZ/ilSVOWTrxzryohrWLIHhjfWJv5eyP+lQ/Dq0HF
-	MbIH58tk9TFV17l9CzcQos8gn3/4y7gDiM59ivTOF/ALaB5CQwrQLMvNN2uNTw==
-X-Google-Smtp-Source: AGHT+IGUvOuLEO1DV/utG0RYTgEKqGUHXLTOcm7HmbY12ea9hGJydKB3qBvvZJ68s9VjAuZ4nZKjRA==
-X-Received: by 2002:a05:6a21:e8a:b0:1cf:6ef0:c6b9 with SMTP id adf61e73a8af0-1d5e2d7c128mr10364205637.32.1727965033720;
-        Thu, 03 Oct 2024 07:17:13 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:6c:4e9b:4272:1036])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71dd9d8c1c7sm1363003b3a.53.2024.10.03.07.17.11
+        bh=5RVajOVWsOfO8XEUrv4orE56kvY5Og/6yTj5Q+VfXTA=;
+        b=AK0aAO6pcXKPgVGRIjBbJUtEsJqzwMNuRAAGojZvno0LMMl1C4UCI88oMCjIoIlx05
+         GSHdXu1UqKZxqnIKU3793uXlxwvRI9xz6LrPIjQBWUla/U3kN0FP9X5sy6+JAyLytKh9
+         Xqo6ROzczSIFVWIfKFOv9BY71YD3Eos3Zf2sW4C7MetYykO7TQ7uU95vao7zUPp3U01Q
+         vnUEylSWkFxjiIDGTyiLVy7D1X0PsxCDMLyxwe0Jy3rtCvFPz9lAnzJk/VOORuyLHCx3
+         vafw/PqMQRD6EMu6bs34CGI8If6F3HyU6NhCrDWOT8C208YN3Kwk/+UEqf9ms7HCpciI
+         cczQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWFZgN77nsmfXM/mKZygM/s4K8SOZ9STdgBnbanoHTQ96SqTcY9piLvtg5pAB3Ubijqfyhb/O/sbSi5OA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9FumNy6xAG6gEGrKWeta4lT6+J0GAaI6VCMO1Roayf+FDRI8H
+	Veb2LT7f4t6SwFgsWlL7fLNUBReQTvgF1gFj5Uf2vr42j2bTnWIPbo8nlz2rodQ=
+X-Google-Smtp-Source: AGHT+IH13q3IC/QY1YZWkQjnVz9kQdjJo+gYRjabyv/Axphxp5+OqFLv6g4amWkLK2R4efSCLdMcbQ==
+X-Received: by 2002:a05:600c:350b:b0:42c:bcc8:5877 with SMTP id 5b1f17b1804b1-42f777b8a2bmr47756745e9.13.1727965921068;
+        Thu, 03 Oct 2024 07:32:01 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f79eadd04sm46070935e9.20.2024.10.03.07.32.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 07:17:12 -0700 (PDT)
-Date: Thu, 3 Oct 2024 23:17:09 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: Re: block: del_gendisk() vs blk_queue_enter() race condition
-Message-ID: <20241003141709.GN11458@google.com>
-References: <20241003085610.GK11458@google.com>
- <Zv6d1Iy18wKvliLm@infradead.org>
- <Zv6fbloZRg2xQ1Jf@infradead.org>
- <20241003140051.GM11458@google.com>
+        Thu, 03 Oct 2024 07:32:00 -0700 (PDT)
+Date: Thu, 3 Oct 2024 17:31:53 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Waiman Long <longman@redhat.com>, Yu Kuai <yukuai3@huawei.com>,
+	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2] blk_iocost: remove some duplicate irq disable/enables
+Message-ID: <68f3e5f8-895e-416b-88cf-284a263bd954@stanley.mountain>
+References: <Zv0kudA9xyGdaA4g@stanley.mountain>
+ <0a8fe25b-9b72-496d-b1fc-e8f773151e0a@redhat.com>
+ <925f3337-cf9b-4dc1-87ea-f1e63168fbc4@stanley.mountain>
+ <df1cc7cb-bac6-4ec2-b148-0260654cc59a@redhat.com>
+ <3083c357-9684-45d3-a9c7-2cd2912275a1@stanley.mountain>
+ <fe7ce685-f7e3-4963-a0d3-b992354ea1d8@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,92 +75,50 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241003140051.GM11458@google.com>
+In-Reply-To: <fe7ce685-f7e3-4963-a0d3-b992354ea1d8@kernel.dk>
 
-On (24/10/03 23:00), Sergey Senozhatsky wrote:
-> On (24/10/03 06:43), Christoph Hellwig wrote:
-[..]
-> So that mutex_lock(&disk->open_mutex) right before it potentially can
-> deadlock (I think it will).
+On Thu, Oct 03, 2024 at 07:21:25AM -0600, Jens Axboe wrote:
+> On 10/3/24 6:03 AM, Dan Carpenter wrote:
+> >   3117                                  ioc_now(iocg->ioc, &now);
+> >   3118                                  weight_updated(iocg, &now);
+> >   3119                                  spin_unlock(&iocg->ioc->lock);
+> >   3120                          }
+> >   3121                  }
+> >   3122                  spin_unlock_irq(&blkcg->lock);
+> >   3123  
+> >   3124                  return nbytes;
+> >   3125          }
+> >   3126  
+> >   3127          blkg_conf_init(&ctx, buf);
+> >   3128  
+> >   3129          ret = blkg_conf_prep(blkcg, &blkcg_policy_iocost, &ctx);
+> >   3130          if (ret)
+> >   3131                  goto err;
+> >   3132  
+> >   3133          iocg = blkg_to_iocg(ctx.blkg);
+> >   3134  
+> >   3135          if (!strncmp(ctx.body, "default", 7)) {
+> >   3136                  v = 0;
+> >   3137          } else {
+> >   3138                  if (!sscanf(ctx.body, "%u", &v))
+> >   3139                          goto einval;
+> >   3140                  if (v < CGROUP_WEIGHT_MIN || v > CGROUP_WEIGHT_MAX)
+> >   3141                          goto einval;
+> >   3142          }
+> >   3143  
+> >   3144          spin_lock(&iocg->ioc->lock);
+> > 
+> > But why is this not spin_lock_irq()?  I haven't analyzed this so maybe it's
+> > fine.
 > 
-> My idea, thus far, was to
+> That's a bug.
 > 
-> 	if (test_bit(GD_OWNS_QUEUE, &disk->state)) }
-> 		blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue);
-> 		blk_kick_queue_enter(disk->queue);  // this one simply wake_up_all(&q->mq_freeze_wq);
-> 											// if the queue has QUEUE_FLAG_DYING
-> 	}
-> 
-> in del_gendisk() before the very first time del_gendisk() attempts to
-> mutex_lock(&disk->open_mutex), because that mutex is already locked
-> forever.
 
-Well, just in case, the diff that I have (against 6.6)
+I could obviously write this patch but I feel stupid writing the commit message.
+My level of understanding is Monkey See Monkey do.  Could you take care of this?
 
----
+So somewhere we're taking a lock in the IRQ handler and this can lead to a
+deadlock? I thought this would have been caught by lockdep?
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 4f25d2c..470c910 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -304,6 +304,13 @@
- 	wake_up_all(&q->mq_freeze_wq);
- }
- 
-+void blk_kick_queue_enter(struct request_queue *q)
-+{
-+	if (WARN_ON_ONCE(!blk_queue_dying(q)))
-+		return;
-+	wake_up_all(&q->mq_freeze_wq);
-+}
-+
- /**
-  * blk_queue_enter() - try to increase q->q_usage_counter
-  * @q: request queue pointer
-diff --git a/block/genhd.c b/block/genhd.c
-index 203c880..3ccc593 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -581,9 +581,6 @@
- 	if (test_and_set_bit(GD_DEAD, &disk->state))
- 		return;
- 
--	if (test_bit(GD_OWNS_QUEUE, &disk->state))
--		blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue);
--
- 	/*
- 	 * Stop buffered writers from dirtying pages that can't be written out.
- 	 */
-@@ -641,6 +638,20 @@
- 
- 	disk_del_events(disk);
- 
-+	if (test_bit(GD_OWNS_QUEUE, &disk->state)) {
-+		/*
-+		 * Set QUEUE_FLAG_DYING before we grab ->open_mutex so that
-+		 * blkdev_put() -> release -> blk_queue_enter() can detect
-+		 * dead device
-+		 */
-+		blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue);
-+		/*
-+		 * Make sure that ->mq_freeze_wq see QUEUE_FLAG_DYING and
-+		 * bail out, unlocking ->open_mutex
-+		 */
-+		blk_kick_queue_enter(disk->queue);
-+	}
-+
- 	/*
- 	 * Prevent new openers by unlinked the bdev inode.
- 	 */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 6f67dbe..a49afe9 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -854,6 +854,7 @@
- extern int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags);
- extern void blk_queue_exit(struct request_queue *q);
- extern void blk_sync_queue(struct request_queue *q);
-+void blk_kick_queue_enter(struct request_queue *q);
- 
- /* Helper to convert REQ_OP_XXX to its string format XXX */
- extern const char *blk_op_str(enum req_op op);
+regards,
+dan carpenter
