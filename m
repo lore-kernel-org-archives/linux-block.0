@@ -1,48 +1,59 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09070224D1;
-	Thu,  3 Oct 2024 22:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90811C6892
+	for <linux-block@vger.kernel.org>; Thu,  3 Oct 2024 22:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727992834; cv=none; b=t7dI7ltpnhtrCSAGXnoHW5+2Vi/j0lK6a4CG1o/lHDFwCgkEhbF6akC7QHa6BRxyE+sqQ17z8/IBUPydVjhXI03/3VuUtHr/s0iWDHRQhlluRKMyMAKhooX4aFIrikq64VrJsFH2RdKH9yiJx3oIOn2FbB4KwAsfmIW/M8VGnMM=
+	t=1727993193; cv=none; b=V8zO68msIauC8gmKBGboIeudM79JA1NVIlFVj9uPx8y1zeVn1D9xYJPbK40na5ZlIC+4E7UXI4xFzIl8ZBQMe4nREJbY2shfpo3Z1NkZ6/RD0DGaFoeNq+lEe8d/BFyCNVp3jacMROeAb3H+sBxaDyeV9tNPplJ5GF2yW5vQ3sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727992834; c=relaxed/simple;
-	bh=IVj+wSsh4cf2uBOXlAJ67cfhtx5pQhOFpZ/jN++jz9o=;
+	s=arc-20240116; t=1727993193; c=relaxed/simple;
+	bh=Pt1ZUSvFX87DVRXIwapbBHcWsvds+a/vkDyvcPIZRsE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nJVcVaLtf4tvkKwfQl01weDs/eCXw5mzQf9LIAYPxHMi0Mtiu+SZn58vsFP3gp+yvkDGKn8TbT0NEFZQgDsGig2wiUlnywCRdP8qVy51mqKqUHEk4jCIU6FiUV30O81+nIesbeFVIKDxymS9TIHxO/Ru9ejBmjh4r5ccdmtQucA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ZJIG9etA; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=SlXke6gjLR1rKxmMqdeRd4MxlUXNIT/gPeXXjyDsHFElWeppGrrS7RA55TCz8nyhJh/t2EJHc9QlFvKAJaRepGqY3S2SFyraNrpimFrIxeZFKoJ+A4LOiORHfdKkpwVsqy1yZeAN5Jjk59D9KbIvQZpA0G0bweGjFNQNAY/bXow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Q+daZcbs; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ZJIG9etA"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4XKQbN2JFNz6ClY9l;
-	Thu,  3 Oct 2024 22:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1727992824; x=1730584825; bh=IVj+wSsh4cf2uBOXlAJ67cfh
-	tx5pQhOFpZ/jN++jz9o=; b=ZJIG9etAuWeFo63DpU/5WwAcTYG/bRzhE3wzJYpQ
-	oBlGAqnYxaBh+QVigZvS9kx6RYYOZkfl6xWqBUAt5BVnOJSoB3q4q6cz80o8aYvJ
-	K2Shx0X1Rp/EttqJZWDy1nQ6nicWBMBk+7kCwtNmFw+8iVQtNCfTlmrvnNek6vK3
-	GkKMMCgkVLY6o5Oh/Z4Iv/qfKoyZ6UHjK1sTb06NdoazfzcJ6+H21i5awSnrXFG7
-	OxNoUffo9CbUWoWkio1vBZYQ5+rzzbgzGlhV/SS55svleC/L/5mWsp8qzDkBhGd4
-	45/JSp1kRUppFi4ixDePMIhrbbHgu2ZYiwFaYBROcz6N7g==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id TAmCIb-0ZlQg; Thu,  3 Oct 2024 22:00:24 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4XKQbB4FqSz6ClY9k;
-	Thu,  3 Oct 2024 22:00:22 +0000 (UTC)
-Message-ID: <abd54d3a-3a5e-4ddc-9716-f6899512a3a4@acm.org>
-Date: Thu, 3 Oct 2024 15:00:21 -0700
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q+daZcbs"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-20b7463dd89so16382955ad.2
+        for <linux-block@vger.kernel.org>; Thu, 03 Oct 2024 15:06:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1727993191; x=1728597991; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/n+Bm+NK1yV3ykOPuXSmp/mRwlagEN1LGfqlR+znwqI=;
+        b=Q+daZcbsvqsmbadFRLjG6dF6/7BzcWDMhyc6RnMUaHPCpAHcHQGgRhc9T6r2rMWLSx
+         LSNGnYG1NrqN3AF0dAliwj0inSSv5yKaQRNDGKDj2vi992rHyxwYNFQ1lj8USvUOjdvt
+         SiuvSeLwZhzX2DmypLgunZM1R9Pt/YmL8nat1LDLlqLpSqeFsOHHV1ZhZWyg7oQqIq5o
+         56DQxD1daUlwTxnvWhuM9sSo8wRp85Nh5CneOgJ5pDa97xhR2y1xganV+DdpjNUNDX97
+         oLmFDb2duAqtkB5fJ/9h7H/SIx5t88rViVTpmdt8YKYzwk5ZgTIG4gYxk6IfTeqXsYaf
+         2wsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727993191; x=1728597991;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/n+Bm+NK1yV3ykOPuXSmp/mRwlagEN1LGfqlR+znwqI=;
+        b=dPpddEPopR2Gd5b1EvmhDR4jPlJ/PeWfDQr5yHLxqdi4nptxaIV2vzQi7dXTEIz2Tf
+         CkutgCuKizsf6bu0FQm9ASmdSxlHRY7MKVVUfx+cyc6ccIrHcewj38lity2buqnJfoa6
+         yN6tS90M85s91j8ZEwEt48uia6SkdMlSET9rWwVYAcjy7meXw4wzO64w6KIi4RbWRmu3
+         xvNwRhsW4yMfHgahxU0gRZpmHHFF8bzaEOLutZWkU9fSZt3S5IUuZpFTFHifec+TZvhb
+         oLB3CvgHqcpbeDdoNQFB2mttIECJxLNNnV3Cwpnu3b94EhzHyiDOgtxIuQw2q55bPDiz
+         1UUg==
+X-Forwarded-Encrypted: i=1; AJvYcCWAr+6FI7fc9G6FgTIY5VAMDXnrhuuqM8SPaR234zFujOjvANLrCwNb5a+hmJ2/RMzJXJEaOVFzAxzkUA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9BGda2iYoTNh2L99mCVxcAhxkj07EtaceaQ+Jt2vuLm++lv4s
+	CmO3fEF5I2iWLo70wVSgJTQrf9RpZ1Cv+UuFRZlDf+7beX+Hbc6vdRwOoDb/r7s=
+X-Google-Smtp-Source: AGHT+IG3Z3RoW+4gVwOQPtL97jDrvwXJXpPy+ySiF1kDHRm4DfIx6MZYfO3x19vUvzG8fbDYEx7ERQ==
+X-Received: by 2002:a17:902:f64c:b0:20b:982e:73f5 with SMTP id d9443c01a7336-20bfdf6b4d7mr8219805ad.3.1727993190942;
+        Thu, 03 Oct 2024 15:06:30 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beeca2235sm13554225ad.105.2024.10.03.15.06.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Oct 2024 15:06:30 -0700 (PDT)
+Message-ID: <d5b34514-aa3a-47dc-9521-d2774c1785a2@kernel.dk>
+Date: Thu, 3 Oct 2024 16:06:28 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,56 +61,41 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 0/3] FDP and per-io hints
-To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
- Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>,
- hare@suse.de, sagi@grimberg.me, brauner@kernel.org, viro@zeniv.linux.org.uk,
- jack@suse.cz, jaegeuk@kernel.org, bcrl@kvack.org, dhowells@redhat.com,
- asml.silence@gmail.com, linux-nvme@lists.infradead.org,
- linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org, linux-aio@kvack.org, gost.dev@samsung.com,
- vishak.g@samsung.com, javier.gonz@samsung.com
-References: <20241001092047.GA23730@lst.de>
- <99c95f26-d6fb-4354-822d-eac94fdba765@kernel.dk>
- <20241002075140.GB20819@lst.de>
- <f14a246b-10bf-40c1-bf8f-19101194a6dc@kernel.dk>
- <20241002151344.GA20364@lst.de>
- <Zv1kD8iLeu0xd7eP@kbusch-mbp.dhcp.thefacebook.com>
- <20241002151949.GA20877@lst.de> <yq17caq5xvg.fsf@ca-mkp.ca.oracle.com>
- <a8b6c57f-88fa-4af0-8a1a-d6a2f2ca8493@acm.org>
- <20241003125516.GC17031@lst.de> <Zv8RQLES1LJtDsKC@kbusch-mbp>
+Subject: Re: [PATCH v2] blk_iocost: remove some duplicate irq disable/enables
+To: Tejun Heo <tj@kernel.org>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, Waiman Long
+ <longman@redhat.com>, Yu Kuai <yukuai3@huawei.com>,
+ Josef Bacik <josef@toxicpanda.com>, cgroups@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <Zv0kudA9xyGdaA4g@stanley.mountain>
+ <0a8fe25b-9b72-496d-b1fc-e8f773151e0a@redhat.com>
+ <925f3337-cf9b-4dc1-87ea-f1e63168fbc4@stanley.mountain>
+ <df1cc7cb-bac6-4ec2-b148-0260654cc59a@redhat.com>
+ <3083c357-9684-45d3-a9c7-2cd2912275a1@stanley.mountain>
+ <fe7ce685-f7e3-4963-a0d3-b992354ea1d8@kernel.dk>
+ <68f3e5f8-895e-416b-88cf-284a263bd954@stanley.mountain>
+ <c26e5b36-d369-4353-a5a8-9c9b381ce239@kernel.dk>
+ <Zv8LAaeuJQkvscWF@slm.duckdns.org> <Zv8NBM4mOVoMoBQS@slm.duckdns.org>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <Zv8RQLES1LJtDsKC@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Zv8NBM4mOVoMoBQS@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/3/24 2:48 PM, Keith Busch wrote:
-> The only "bonus" I have is not repeatedly explaining why people can't
-> use h/w features the way they want.
+On 10/3/24 3:30 PM, Tejun Heo wrote:
+> On Thu, Oct 03, 2024 at 11:22:09AM -1000, Tejun Heo wrote:
+>> Yeah, that should be spin_lock_irq() for consistency but at the same time it
+>> doesn't look like anything is actually grabbing that lock (or blkcg->lock
+>> nesting outside of it) from an IRQ context, so no actual deadlock scenario
+>> exists and lockdep doesn't trigger.
+> 
+> Oh, wait, it's not that. blkg_conf_prep() implies queue_lock, so the IRQ is
+> disabled around it and adding _irq will trigger lockdep.
 
-Hi Keith,
+Ah makes sense, didn't realize it was nested under the queue lock. Then it
+does look like it's just that one spot.
 
-Although that's a fair argument, what are the use cases for this patch
-series? Filesystems in the kernel? Filesystems implemented in user
-space? Perhaps something else?
-
-This patch series adds new a new user space interface for passing hints
-to storage devices (in io_uring). As we all know such interfaces are
-hard to remove once these have been added.
-
-We don't need new user space interfaces to support FDP for filesystems
-in the kernel.
-
-For filesystems implemented in user space, would using NVMe pass-through
-be a viable approach? With this approach, no new user space interfaces
-have to be added.
-
-I'm wondering how to unblock FDP users without adding a new
-controversial mechanism in the kernel.
-
-Thanks,
-
-Bart.
+-- 
+Jens Axboe
 
