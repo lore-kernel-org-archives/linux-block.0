@@ -1,252 +1,91 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008B91A0BF6
-	for <linux-block@vger.kernel.org>; Thu,  3 Oct 2024 15:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC0A19B59F
+	for <linux-block@vger.kernel.org>; Thu,  3 Oct 2024 15:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727969446; cv=none; b=kQAuvEV547rhk8Jx85JCtpYoOEQTj+w/gc5m1K7H9EWLU0SmgO37K5txAu0OfphBKMowShQNCMn6/NXOSPLR6gRlyzBebADjCT/jfBbAqPrFWBVOAOw6dvXsHN5AKkB3oqbD9b3Z5xZ+NH6229H1HYaoOHY4gQR9VWWSxmklZEE=
+	t=1727970047; cv=none; b=O+VMTDFHZKsp246JUIc0BNkQ21kbwRhixgvdbMam13nx8Bx+vP4jM5HvK8tygCQMHg4Bnu5aWMPia3iblJVXaqXKdgpjDmzD8OPgyMWE+Aoz1bs02jkWhR8upqWkTrmmUHtIe0CYS8gsf/OtX7gBn+hFfj0gsYp/le1p3BTqGXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727969446; c=relaxed/simple;
-	bh=ihyEuhf8RXDlWjMsvFJcHceP0BxEx8jEfPSnllxRU0U=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uqyb0nW0+2BfnZhe6EPUkl2q95REI7V8oKSz89maUvFh+oJoEcax/qsMZTbD5unUgeWVNGhz9vKUvMQJemJie1frar2qMFA0RUpUIsijL5ilLz4sb7SnfHE8Mv/5Ip4faZnk+gCzSbwBbQrZRWYOYS2IHivd7YKkwz3Xc0E6HpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=CNcL7ho5; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1727970047; c=relaxed/simple;
+	bh=Xv+2+m+4+JYvcQpIPGbXQxe/SOmY4LHXHGq7DU2cTwo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K99iRiXT1jNdzZ1Vetxvn6LwtrUbDAbps/UU8XZ7VbXm5ObYo3sIFmZ8gDMUKzb3/R6OhvqAsFHeFnICYZPbQdA0fDf7hNEaX7M9lskEqtWKhCsSTWnuphRmZUPIEii9oJVKp2Z8hxoaIDkKPnURgCZHusicEdvXClnOM8QdfrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=RIxDhf1N; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="CNcL7ho5"
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4935dIJB001652
-	for <linux-block@vger.kernel.org>; Thu, 3 Oct 2024 08:30:44 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=s2048-2021-q4; bh=lip
-	KphSs6a9/GiT5Ho0ZLiFrRuNksaBKG9hDUS6DKVs=; b=CNcL7ho52H5RF3g1Q+E
-	BxnS+GapWGTWNYEmZQyUTEGNMZmhbGyZb59itHC+Ce87gjF6uPSajNDb/u5CfF8e
-	lhPsFKh+11Ek7LJLMAXdNU7sJCgaTTicvaXnwQJI59wn2bUZPKeRWIzFHCbYbhkG
-	SVguSJx5wxYuKpzZYLU0dI5yWyPay6Ck8KSepd6tXJaxsSRnhWgChPWjhQlEQKVi
-	P8ZlomG0G0DpDLEw2z24A/5rpdOFPJQQsbDB+fptIixLhF229eZbtk+KlC1tc6Oo
-	glN5H7/vvI5cEIgAFbCiWmkW0cHmCPPFvHsDzwTe+rO2RqmXzNQueYBd9C/XiEW+
-	7Dw==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 421cet5c3s-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Thu, 03 Oct 2024 08:30:43 -0700 (PDT)
-Received: from twshared17102.15.frc2.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Thu, 3 Oct 2024 15:30:41 +0000
-Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 556EE13C09D63; Thu,  3 Oct 2024 08:30:37 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <axboe@kernel.dk>
-CC: <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv2] block: enable passthrough command statistics
-Date: Thu, 3 Oct 2024 08:30:36 -0700
-Message-ID: <20241003153036.411721-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.43.5
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="RIxDhf1N"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-82aab679b7bso48211839f.0
+        for <linux-block@vger.kernel.org>; Thu, 03 Oct 2024 08:40:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1727970044; x=1728574844; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3F6p04osyI0jBGzF1g/V+1s/zjy9v4C68ZQz9+vQuaM=;
+        b=RIxDhf1NLvcGzQJ5n9h9e4yE8wPg6JhgrE1VmXmwUxZekR2xY2400Coaot7NVf9J59
+         22nie7OB7BQHXFy5JhYFhHriw1tThaLz8uoKbYv0D+0Xzim+L7Rx3Kxo1GKqiQQe7e3P
+         3laI6DaueM5zzzCUAC+oNcIUjacWNZ2vF6IXHfcXxC8AeXVPwcG4HRhP22GKi+VWdIKi
+         i073l/GIzii7b8hMe4mywXk0N/xSUSEa1NHAAfBXadmkorNZSWtvP21SfOkgWPxiR/F2
+         sOY8WHUGzy5o+RawssRYYh5G8GKeSKFOW/0gc/aKOy0tw1IWc/JYMT6e80rC5w6sXD8c
+         7nCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727970044; x=1728574844;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3F6p04osyI0jBGzF1g/V+1s/zjy9v4C68ZQz9+vQuaM=;
+        b=Y6kvd6mPn9xMjEHklXqxWaQUgOF+xyTRrGSnRv+O61flGTZCE6BlFNHDyfcrZY93T+
+         BUkSNfaga9RhBT6pjJEQMqel+H8eIshLUvtrx2I5A7QHHGKCLYt2nSlwQrkg7t8N8nGM
+         Pbw7DcXmfYrattyVPnAW5fZzX2O+Ko6xvcCOfgwo0D4UCTi3yYMsy00JpV6iOlDA2ZUM
+         22JQZETHgId3j5SWB3r0Lx2aMk+YoG4Hoi1NxbCawaKqBbhnxn6A12+LAE0W41Tg82GD
+         0CqUuSoMlMX6E94DQvVJjHF/LW+aPZJzCm6GJ8G9kVqRD2kp7nyHX99UM8YZe5WxbamO
+         WeSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWc2/CzuhDk+C1JrGnXr7EmT+K8fbYi8uBAZjKns9FArT6JMI3geCOcUbve7OwDlnrFf8xwm+pnWFZcSQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhXK5HOMSX+3AAdDS5pQNf3AG+C0AvKYvazDY3Tk87v06JesMD
+	NxIwA0u4uuel+Ar3GnnRfwgHnHyk2M/2IJbKDVqQSFErQZ/nlgc+/40HPDf7mGs=
+X-Google-Smtp-Source: AGHT+IGVeksN9lMqLrH0bdyiZE6lj04kAENcVkW1NzWCeTQqeC5TiiITBRhfRVIInJjo07jM+atEmA==
+X-Received: by 2002:a05:6602:1553:b0:82d:129f:acb6 with SMTP id ca18e2360f4ac-834d84d4e60mr669700239f.14.1727970044432;
+        Thu, 03 Oct 2024 08:40:44 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4db55acf198sm320040173.165.2024.10.03.08.40.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Oct 2024 08:40:43 -0700 (PDT)
+Message-ID: <d1738d8c-023d-4a37-9b49-f9b42290ccd2@kernel.dk>
+Date: Thu, 3 Oct 2024 09:40:42 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: nD78Y9k2eefqolwWsoN-5sASjzVUhy-a
-X-Proofpoint-GUID: nD78Y9k2eefqolwWsoN-5sASjzVUhy-a
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-03_15,2024-10-03_01,2024-09-30_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2] block: enable passthrough command statistics
+To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org
+Cc: hch@lst.de, Keith Busch <kbusch@kernel.org>
+References: <20241003153036.411721-1-kbusch@meta.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241003153036.411721-1-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Keith Busch <kbusch@kernel.org>
+On 10/3/24 9:30 AM, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Applications using the passthrough interfaces for IO want to continue
+> seeing the disk stats. These requests had been fenced off from this
+> block layer feature. While the block layer doesn't necessarily know what
+> a passthrough command does, we do know the data size and direction,
+> which is enough to account for the command's stats.
+> 
+> Since tracking these has the potential to produce unexpected results,
+> the passthrough stats are locked behind a new queue flag that needs to
+> be enabled with the /sys/block/<dev>/queue/iostats_passthrough
+> attribute.
 
-Applications using the passthrough interfaces for IO want to continue
-seeing the disk stats. These requests had been fenced off from this
-block layer feature. While the block layer doesn't necessarily know what
-a passthrough command does, we do know the data size and direction,
-which is enough to account for the command's stats.
+Looks good to me.
 
-Since tracking these has the potential to produce unexpected results,
-the passthrough stats are locked behind a new queue flag that needs to
-be enabled with the /sys/block/<dev>/queue/iostats_passthrough
-attribute.
-
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
-v1->v2:
-
-  Moved the passthrough stats enabling to its own attribute instead of
-  overloading the existing iostats
-
-  Added comments to the criteria for allowing passthrough stats
-
-Based on block for-6.13/block tree:
-
-  https://git.kernel.dk/cgit/linux-block/log/?h=3Dfor-6.13/block
-
- Documentation/ABI/stable/sysfs-block |  7 +++++++
- block/blk-mq-debugfs.c               |  1 +
- block/blk-mq.c                       | 27 ++++++++++++++++++++++++++-
- block/blk-sysfs.c                    | 26 ++++++++++++++++++++++++++
- include/linux/blkdev.h               |  3 +++
- 5 files changed, 63 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/sta=
-ble/sysfs-block
-index cea8856f798dd..8353611107154 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -424,6 +424,13 @@ Description:
- 		[RW] This file is used to control (on/off) the iostats
- 		accounting of the disk.
-=20
-+What:		/sys/block/<disk>/queue/iostats_passthrough
-+Date:		October 2024
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		[RW] This file is used to control (on/off) the iostats
-+		accounting of the disk for passthrough commands.
-+
-=20
- What:		/sys/block/<disk>/queue/logical_block_size
- Date:		May 2009
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 5463697a84428..d9d7fd441297e 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -93,6 +93,7 @@ static const char *const blk_queue_flag_name[] =3D {
- 	QUEUE_FLAG_NAME(RQ_ALLOC_TIME),
- 	QUEUE_FLAG_NAME(HCTX_ACTIVE),
- 	QUEUE_FLAG_NAME(SQ_SCHED),
-+	QUEUE_FLAG_NAME(IOSTATS_PASSTHROUGH),
- };
- #undef QUEUE_FLAG_NAME
-=20
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8e75e3471ea58..cf309b39bac04 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -993,13 +993,38 @@ static inline void blk_account_io_done(struct reque=
-st *req, u64 now)
- 	}
- }
-=20
-+static inline bool blk_rq_passthrough_stats(struct request *req)
-+{
-+	struct bio *bio =3D req->bio;
-+
-+	if (!blk_queue_passthrough_stat(req->q))
-+		return false;
-+
-+	/*
-+	 * Stats are accumulated in the bdev part, so must have one attached to
-+	 * a bio to do this
-+	 */
-+	if (!bio)
-+		return false;
-+	if (!bio->bi_bdev)
-+		return false;
-+
-+	/*
-+	 * Ensuring the size is aligned to the block size prevents observing an
-+	 * invalid sectors stat.
-+	 */
-+	if (blk_rq_bytes(req) & (bdev_logical_block_size(bio->bi_bdev) - 1))
-+		return false;
-+	return true;
-+}
-+
- static inline void blk_account_io_start(struct request *req)
- {
- 	trace_block_io_start(req);
-=20
- 	if (!blk_queue_io_stat(req->q))
- 		return;
--	if (blk_rq_is_passthrough(req))
-+	if (blk_rq_is_passthrough(req) && !blk_rq_passthrough_stats(req))
- 		return;
-=20
- 	req->rq_flags |=3D RQF_IO_STAT;
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index e85941bec857b..a4b32047ff680 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -272,6 +272,30 @@ static ssize_t queue_nr_zones_show(struct gendisk *d=
-isk, char *page)
- 	return queue_var_show(disk_nr_zones(disk), page);
- }
-=20
-+static ssize_t queue_iostats_passthrough_show(struct gendisk *disk, char=
- *page)
-+{
-+	return queue_var_show(blk_queue_passthrough_stat(disk->queue), page);
-+}
-+
-+static ssize_t queue_iostats_passthrough_store(struct gendisk *disk,
-+					       const char *page, size_t count)
-+{
-+	unsigned long ios;
-+	ssize_t ret;
-+
-+	ret =3D queue_var_store(&ios, page, count);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (ios)
-+		blk_queue_flag_set(QUEUE_FLAG_IOSTATS_PASSTHROUGH,
-+				   disk->queue);
-+	else
-+		blk_queue_flag_clear(QUEUE_FLAG_IOSTATS_PASSTHROUGH,
-+				     disk->queue);
-+
-+	return count;
-+}
- static ssize_t queue_nomerges_show(struct gendisk *disk, char *page)
- {
- 	return queue_var_show((blk_queue_nomerges(disk->queue) << 1) |
-@@ -460,6 +484,7 @@ QUEUE_RO_ENTRY(queue_max_open_zones, "max_open_zones"=
-);
- QUEUE_RO_ENTRY(queue_max_active_zones, "max_active_zones");
-=20
- QUEUE_RW_ENTRY(queue_nomerges, "nomerges");
-+QUEUE_RW_ENTRY(queue_iostats_passthrough, "iostats_passthrough");
- QUEUE_RW_ENTRY(queue_rq_affinity, "rq_affinity");
- QUEUE_RW_ENTRY(queue_poll, "io_poll");
- QUEUE_RW_ENTRY(queue_poll_delay, "io_poll_delay");
-@@ -586,6 +611,7 @@ static struct attribute *queue_attrs[] =3D {
- 	&queue_max_open_zones_entry.attr,
- 	&queue_max_active_zones_entry.attr,
- 	&queue_nomerges_entry.attr,
-+	&queue_iostats_passthrough_entry.attr,
- 	&queue_iostats_entry.attr,
- 	&queue_stable_writes_entry.attr,
- 	&queue_add_random_entry.attr,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 50c3b959da281..734a32efa77d7 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -602,6 +602,7 @@ enum {
- 	QUEUE_FLAG_RQ_ALLOC_TIME,	/* record rq->alloc_time_ns */
- 	QUEUE_FLAG_HCTX_ACTIVE,		/* at least one blk-mq hctx is active */
- 	QUEUE_FLAG_SQ_SCHED,		/* single queue style io dispatch */
-+	QUEUE_FLAG_IOSTATS_PASSTHROUGH,	/* passthrough command IO accounting */
- 	QUEUE_FLAG_MAX
- };
-=20
-@@ -617,6 +618,8 @@ void blk_queue_flag_clear(unsigned int flag, struct r=
-equest_queue *q);
- 	test_bit(QUEUE_FLAG_NOXMERGES, &(q)->queue_flags)
- #define blk_queue_nonrot(q)	(!((q)->limits.features & BLK_FEAT_ROTATIONA=
-L))
- #define blk_queue_io_stat(q)	((q)->limits.features & BLK_FEAT_IO_STAT)
-+#define blk_queue_passthrough_stat(q)	\
-+	test_bit(QUEUE_FLAG_IOSTATS_PASSTHROUGH, &(q)->queue_flags)
- #define blk_queue_dax(q)	((q)->limits.features & BLK_FEAT_DAX)
- #define blk_queue_pci_p2pdma(q)	((q)->limits.features & BLK_FEAT_PCI_P2P=
-DMA)
- #ifdef CONFIG_BLK_RQ_ALLOC_TIME
---=20
-2.43.5
-
+-- 
+Jens Axboe
