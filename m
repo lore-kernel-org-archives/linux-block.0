@@ -1,98 +1,102 @@
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC2F1A7AF6;
-	Thu,  3 Oct 2024 21:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B048748D;
+	Thu,  3 Oct 2024 21:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727990046; cv=none; b=a1O+25POw5WY57np7G24liLvkdQAIxjv1qNN+dj65EV7ItQdVGghVhuoiRrxGLtx9hZ7Wwi2CCr9leeNhSdmgYo2qMliNI8OW9WzIFdvSG4QYJ8XbL4O9NSqy9t+wvNSweERdkENM89RfSIkjLcKoWZH4udwcsgAqpJDabfLkZM=
+	t=1727990531; cv=none; b=FO+Vz8Khi0D+XhBE60jZXFqbIiL3XqZOfgNUk3Jk8jbqt5+wORjXRSVWxR7THbXbSlOvCtixvW69phmYjypkQKBmnWztw2Nuukc+KZW4mS4uDKJIQNNEJG7yMw2WFl+HZoNKyQVEYwjqN1nAebF7aG+shm13lBYoGBjdNxVEpu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727990046; c=relaxed/simple;
-	bh=azsOB2pmahUnI+fEcqJQeBQfkC+qKR86a6BpgWEGw7o=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=aY+yzze73qSEQEvOqfk7Jbr4KWgTzcRfOSad03iT8UWSE3ZFTtf7kubQpxGg05puML2exCASKWCY6Tqe0yIi32S+PMDqi6usHEHColhqz+w56RBhySlzTDyc99BH1uVn45i5jGLmNKNioCBtA+G95+61ZBjviovO9ANDTFrICf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=koHtHqal; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1727990531; c=relaxed/simple;
+	bh=myhzGuyZHVPOOzMuS6ujT2baNB9f6+kd036ZBWUO22w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gTX+R8tFm4Iwppk+SyphxuOSzpNO0wpAJR4bgmdHr83l1KIx1EGZhCe1pk9J+WcZTfvRQLlf5AYO6tz+38/y8iS7Yox6SIyQ9sDCIG1ASLVa5MbuPTz29GYhgm/Zj4kAj2fGZsSUqbCaLJMd3etWlCL3mkGnTpwpfBy6avuVUOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I0I1mRUr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="koHtHqal"
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6dbb24ee34dso12679027b3.2;
-        Thu, 03 Oct 2024 14:14:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727990043; x=1728594843; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=azsOB2pmahUnI+fEcqJQeBQfkC+qKR86a6BpgWEGw7o=;
-        b=koHtHqaltKH4VzryaD62Qwq/cYfGToSvnceYQeEF72Tgelqd6nJLdHNaXrlx+x03F8
-         9uBuMpj0dn6hzc/vXglWP8YhdWrErq9EhZyZ3chf5UCgG1LBZoO8oVcC6R1nETwWQiGd
-         cDskTbynfsGaqeyNk1ZSzbafq4gjG7W3uXXY9eo8XsPhN1DRdHlhQtZMmdZEw5rpSMjC
-         w1/U6lciswPFRw2ZudsbqkiEQaKXj5wHx4vQFH0OYBA1QGgzJ8dpL9NbFay4AZXuwJjw
-         qFTqxwSwL87YImTS+YXlA30sE6AUe+okuLd5AHEsLrc9VFrfTUl0OqRz3wLX14ne+Q4C
-         f7Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727990043; x=1728594843;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=azsOB2pmahUnI+fEcqJQeBQfkC+qKR86a6BpgWEGw7o=;
-        b=FvMVlgdGu1jZRvq3agbq6A0EQ9EE0Dp3UTvE97p5QPv4xrxBi+oiJhCq3TIP9pZX+w
-         GWQh0RGx9Z7oCiLicRQPHDKg4LSx5w+XLviyoL5fUr/+h3gjKFF2DMVKdUejFQGuAinX
-         NqobwfUreM6IbGujvsNLg8J1dkO4IaGo06ooNUIMdPLOoai7YGPnejwEMLZImKHk06r9
-         mI3wzfTLijRoS4e8pVZZWtOhr2demPlH0u8fl+19RCuSIsdA6dCsCq8Mami4LY28aHaK
-         aAwXDIUpiyNPZHnjmPWJQpMai31cK2bnuhKczFo2Qqf/Orpghem6YvT4sPJfkGTrEUa+
-         P0ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWX7x5Afibk0n00gd9lAnnHgCYdhWRB0zQSa8VeLILc2VvGv7BwdKwhybt+m8LEpMyUEa0P/ugRIfEt6g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPQragI+/5cUGXr7LeDAcjkn326AhIwpmvhhIpDpLX1DCNnZ22
-	jKpHXUcBtMrmLBYSi9/SbKBjb3VTHm4J1sly3TgC7htQam7fwMd9zDyBEL98360/X3kYvmQwimP
-	3Ub3cim0bzIQ7CsfPYhB91mWeX0EcOeLXeLk=
-X-Google-Smtp-Source: AGHT+IGcneqJ9ltwhLiMpfZVG0K6YZJ9KUKekp5V92hfQXzHDQTQO5L0v78OARWV5WBQI88UHTe6w66PodJyncuncj4=
-X-Received: by 2002:a05:690c:6610:b0:64a:f237:e0b0 with SMTP id
- 00721157ae682-6e2c6fc38dcmr6435097b3.5.1727990043470; Thu, 03 Oct 2024
- 14:14:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I0I1mRUr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A20A5C4CEC5;
+	Thu,  3 Oct 2024 21:22:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727990530;
+	bh=myhzGuyZHVPOOzMuS6ujT2baNB9f6+kd036ZBWUO22w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I0I1mRUrF5WQkvwsAwVjK9ucFIwj5abD5OgkBMlmN2ZR9Bh/8XJmH57i8lhGObRmZ
+	 8jpYcPk9QY9ueQxrG91roKLdbr4KmbuVUKqGFa7m+qxwCS7Bhq6X4S/ZtvUQ4VN+aE
+	 4nLTSPEfDBL6c39CxmVNRLEZNauzDtpI1EQQw7Fy5HLJNs3Y25EqgWYK4bT1nGTtWN
+	 JdOd4u/351RIawkJii/27WI91Hr1O73Tg53NJQn8qacOwyGHahaGErmgMuP7UeDch4
+	 ZTTHr3WMx69jM6xzIKRAxHzvGvJ5VB+ZGjNwxZKGDQL9jspF9IuC/BI8IEbjWEFp0+
+	 HiFVa10GeHE1g==
+Date: Thu, 3 Oct 2024 11:22:09 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	Waiman Long <longman@redhat.com>, Yu Kuai <yukuai3@huawei.com>,
+	Josef Bacik <josef@toxicpanda.com>, cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2] blk_iocost: remove some duplicate irq disable/enables
+Message-ID: <Zv8LAaeuJQkvscWF@slm.duckdns.org>
+References: <Zv0kudA9xyGdaA4g@stanley.mountain>
+ <0a8fe25b-9b72-496d-b1fc-e8f773151e0a@redhat.com>
+ <925f3337-cf9b-4dc1-87ea-f1e63168fbc4@stanley.mountain>
+ <df1cc7cb-bac6-4ec2-b148-0260654cc59a@redhat.com>
+ <3083c357-9684-45d3-a9c7-2cd2912275a1@stanley.mountain>
+ <fe7ce685-f7e3-4963-a0d3-b992354ea1d8@kernel.dk>
+ <68f3e5f8-895e-416b-88cf-284a263bd954@stanley.mountain>
+ <c26e5b36-d369-4353-a5a8-9c9b381ce239@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Leah Rumancik <leah.rumancik@gmail.com>
-Date: Thu, 3 Oct 2024 14:13:52 -0700
-Message-ID: <CACzhbgTFesCa-tpyCqunUoTw-1P2EJ83zDzrcB4fbMi6nNNwng@mail.gmail.com>
-Subject: read regression for dm-snapshot with loopback
-To: stable@vger.kernel.org
-Cc: axboe@kernel.dk, Christoph Hellwig <hch@lst.de>, bvanassche@acm.org, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c26e5b36-d369-4353-a5a8-9c9b381ce239@kernel.dk>
 
 Hello,
 
-I have been investigating a read performance regression of dm-snapshot
-on top of loopback in which the read time for a dd command increased
-from 2min to 40min. I bisected the issue to dc5fc361d89 ("block:
-attempt direct issue of plug list"). I blktraced before and after this
-commit and the main difference I saw was that before this commit, when
-the performance was good, there were a lot of IO unplugs on the loop
-dev. After this commit, I saw 0 IO unplugs.
+On Thu, Oct 03, 2024 at 08:38:48AM -0600, Jens Axboe wrote:
+...
+> >>>   3144          spin_lock(&iocg->ioc->lock);
+> >>>
+> >>> But why is this not spin_lock_irq()?  I haven't analyzed this so maybe it's
+> >>> fine.
+> >>
+> >> That's a bug.
+> >>
+> > 
+> > I could obviously write this patch but I feel stupid writing the
+> > commit message. My level of understanding is Monkey See Monkey do.
+> > Could you take care of this?
+> 
+> Sure - or let's add Tejun who knows this code better. Ah he's already
+> added. Tejun?
 
-On the mainline, I was also able to bisect to a commit which fixed
-this issue: 667ea36378cf ("loop: don't set QUEUE_FLAG_NOMERGES"). I
-also blktraced before and after this commit, and unsurprisingly, the
-main difference was that commit resulted in IO merges whereas
-previously there were none being.
+Yeah, that should be spin_lock_irq() for consistency but at the same time it
+doesn't look like anything is actually grabbing that lock (or blkcg->lock
+nesting outside of it) from an IRQ context, so no actual deadlock scenario
+exists and lockdep doesn't trigger.
 
-I don't totally understand what is going on with the first commit
-which introduced the issue but I'd guess some modifying of the plug
-list behavior resulted in IO not getting merged/grouped but when we
-enabled QUEUE_FLAG_NOMERGES, we were then able to optimize through
-this mechanism. Buuuut 2min->40min seems like a huge performance drop
-just from merged vs non-merged IO, no? So perhaps it's more
-complicated than that...
+> > So somewhere we're taking a lock in the IRQ handler and this can lead
+> > to a deadlock? I thought this would have been caught by lockdep?
+> 
+> It's nested inside blkcg->lock which is IRQ safe, that is enough. But
+> doing a quick scan of the file, the usage is definitely (widly)
+> inconsistent. Most times ioc->lock is grabbed disabling interrupts, but
 
-dc5fc361d89 -> 5.16
-667ea36378c -> 6.11
+Hmm... the only place I see is the one Dan pointed out.
 
-6.6.y and 6.1.y and were both experiencing the performance issue. I
-tried porting 667ea36378 to these branches; it applied cleanly and
-resolved the issue for both. So perhaps we should consider it for the
-stable trees, but it'd be great if someone from the block layer could
-chime in with a better idea of what's going on here.
+> there are also uses that doesn't disable interrupts, coming from things
+> like seq_file show paths which certainly look like they need it. lockdep
+> should certainly warn about this, only explanation I have is that nobody
+> bothered to do that :-)
 
-- leah
+The locks are intended to be IRQ-safe but it looks like they don't need to
+be at least for now. I'll send a patch to update the ioc_weight_write()
+pair.
+
+Thanks.
+
+-- 
+tejun
