@@ -1,50 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E13B6A33F;
-	Thu,  3 Oct 2024 21:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1DE31AAE11;
+	Thu,  3 Oct 2024 21:48:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727991047; cv=none; b=Bm5cRSTm7o2QtxmkYJ3yqYY96bzIrUmj61RhDwZKV9eC9EbfB9eCnPhFQ/gP4M5YcQKb6jatHQz0iUlCYDoCUAXcmaTb0gjSfJDx2cJMlKXN3nYwrQIvsnk/0zRU+fKvVc4CIJK8lrGvLn1ORJx80YC6fpi2Uh/hUr085oGUL2E=
+	t=1727992132; cv=none; b=qQblZPgfhDh10yxa1dGdDdslQgzmsa579/hyGwrfQNtkes/StOHVKtD8nwcAuc/1nHR3PfgFZsk+POnZ06xykTWxxNwGyus8kwjmgzIj5leWVzRIc/3AeLkan2MZTdc5yoz4f8hbheu1NcbY4ziTqBP3Zt5F26TI19po/umArAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727991047; c=relaxed/simple;
-	bh=kakrEADgGfwb+crJK1f9BO1JQPIodE1JT+klBW1nQDQ=;
+	s=arc-20240116; t=1727992132; c=relaxed/simple;
+	bh=4AzBG75BomVJ/TJ9cdnRW/C1hFEjYKKZnSLWMe4SVh4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c1/y69359IAP2xquJj8jCJnWbGlOEtWHDwobUMD6boCQwxThU+uida0d0I0OZz2aJvWIFh8YQWhG7Zq6Zh0w56kwjOwzaCL02bMgeiSlSSScZJgV55vJM6pZya7uFbuAqZ6JprI1Zx4ir+qAX4GdaM6ivwibksk3wqm+77W6Ufg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=syMmYGBc; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=WYmjuHBuxztvHyONuxygT3hQJlsO1nuFX9JSrGj2PEAlmUOrGPtbXwfAKBqjXtaLMCurs8ta7ViqATNKQuNHUWnzTVhdpZMpPilwjQfDRgmAiz7vVvbskY01knvjaEDz/48vo+Ul/cL3T47qIflPQJ1xDGNSRnRvvlLJ07m8ir0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uMjPkqbM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="syMmYGBc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 860DAC4CEC5;
-	Thu,  3 Oct 2024 21:30:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uMjPkqbM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE120C4CEC5;
+	Thu,  3 Oct 2024 21:48:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727991045;
-	bh=kakrEADgGfwb+crJK1f9BO1JQPIodE1JT+klBW1nQDQ=;
+	s=k20201202; t=1727992132;
+	bh=4AzBG75BomVJ/TJ9cdnRW/C1hFEjYKKZnSLWMe4SVh4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=syMmYGBc8278Fi5fZMuGoSb0+QSDyVF5vklFfXHH0+RwIEfjyK5N9uCe9AtXAL+kJ
-	 JdQiRl+BNbjALIP3HDXbMyVcsesYxyD3CFJo9OTEVLQJsOLCACI8Ji9ichvhcosv9W
-	 emH/RNR/I0G2xm3K40KT0QgNb6YsmQvnO2/kn+D3nwgKWTDy6owiCqtivQPavIDbar
-	 my9qLJAIUyoG4f/oSBajUE8ZA3ZPnXaAaVz9PO7T1eVjFKB3FmtGfPh08YRkJE4LEs
-	 iGZN2vRi41/YWiVUaXmCDkDyEnfchATmgOaxftzM7Byt/KXCn5a/DL5iWG+XBNrfKV
-	 VAhpdfF9k29AQ==
-Date: Thu, 3 Oct 2024 11:30:44 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Waiman Long <longman@redhat.com>, Yu Kuai <yukuai3@huawei.com>,
-	Josef Bacik <josef@toxicpanda.com>, cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2] blk_iocost: remove some duplicate irq disable/enables
-Message-ID: <Zv8NBM4mOVoMoBQS@slm.duckdns.org>
-References: <Zv0kudA9xyGdaA4g@stanley.mountain>
- <0a8fe25b-9b72-496d-b1fc-e8f773151e0a@redhat.com>
- <925f3337-cf9b-4dc1-87ea-f1e63168fbc4@stanley.mountain>
- <df1cc7cb-bac6-4ec2-b148-0260654cc59a@redhat.com>
- <3083c357-9684-45d3-a9c7-2cd2912275a1@stanley.mountain>
- <fe7ce685-f7e3-4963-a0d3-b992354ea1d8@kernel.dk>
- <68f3e5f8-895e-416b-88cf-284a263bd954@stanley.mountain>
- <c26e5b36-d369-4353-a5a8-9c9b381ce239@kernel.dk>
- <Zv8LAaeuJQkvscWF@slm.duckdns.org>
+	b=uMjPkqbMwo6KWPI/vjV7wXJVcjwZU9LhSDuHlFJrl85NLpOnFN+mcoCL/a5A3Divj
+	 z5qDWLrJ6MU/QyLV0Fuz2n1HOo03ima2F4T83y0nI6Fh5zPIyhsNCWSmFhB30vtOe4
+	 3YPqLCzzxVHxYqHpqPa0hpTwTUzTJ9PM1AzSfnUMNATDYf3c2ZC6wsfyWZinLRZGe+
+	 yQKSCwPkVxyhdwmkwz0NEQRcP0D4kibaGXmB7FbKPIF9yaCBxy9sDH6KEcMNvNMKAQ
+	 /VdwNv6PEykXhqeNS5TogetQApSvcMFGBGRtQL7rDPNdm8sXMYnqH8nq0H7Aw4nqVq
+	 DFXq83HxwBV1g==
+Date: Thu, 3 Oct 2024 15:48:48 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bvanassche@acm.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>,
+	hare@suse.de, sagi@grimberg.me, brauner@kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, jaegeuk@kernel.org,
+	bcrl@kvack.org, dhowells@redhat.com, asml.silence@gmail.com,
+	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-aio@kvack.org, gost.dev@samsung.com, vishak.g@samsung.com,
+	javier.gonz@samsung.com
+Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+Message-ID: <Zv8RQLES1LJtDsKC@kbusch-mbp>
+References: <20241001092047.GA23730@lst.de>
+ <99c95f26-d6fb-4354-822d-eac94fdba765@kernel.dk>
+ <20241002075140.GB20819@lst.de>
+ <f14a246b-10bf-40c1-bf8f-19101194a6dc@kernel.dk>
+ <20241002151344.GA20364@lst.de>
+ <Zv1kD8iLeu0xd7eP@kbusch-mbp.dhcp.thefacebook.com>
+ <20241002151949.GA20877@lst.de>
+ <yq17caq5xvg.fsf@ca-mkp.ca.oracle.com>
+ <a8b6c57f-88fa-4af0-8a1a-d6a2f2ca8493@acm.org>
+ <20241003125516.GC17031@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,18 +59,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zv8LAaeuJQkvscWF@slm.duckdns.org>
+In-Reply-To: <20241003125516.GC17031@lst.de>
 
-On Thu, Oct 03, 2024 at 11:22:09AM -1000, Tejun Heo wrote:
-> Yeah, that should be spin_lock_irq() for consistency but at the same time it
-> doesn't look like anything is actually grabbing that lock (or blkcg->lock
-> nesting outside of it) from an IRQ context, so no actual deadlock scenario
-> exists and lockdep doesn't trigger.
+On Thu, Oct 03, 2024 at 02:55:16PM +0200, Christoph Hellwig wrote:
+> On Wed, Oct 02, 2024 at 11:34:47AM -0700, Bart Van Assche wrote:
+> > Isn't FDP about communicating much more than only this information to
+> > the block device, e.g. information about reclaim units? Although I'm
+> > personally not interested in FDP, my colleagues were involved in the
+> > standardization of FDP.
+> 
+> Yes, it is.  And when I explained how to properly export this kind of
+> information can be implemented on top of the version Kanchan sent everyone
+> suddenly stopped diskussion technical points and went either silent or
+> all political.
 
-Oh, wait, it's not that. blkg_conf_prep() implies queue_lock, so the IRQ is
-disabled around it and adding _irq will trigger lockdep.
+The nominals can mean whatever you want. If you want it to mean
+"temperature", then that's what it means. If you want it to mean
+something else, then don't use this.
 
-Thanks.
+These are hints at the end of the day. Nothing locks the kernel into
+this if a better solution develops. As you know, it was ripped out
+before.
 
--- 
-tejun
+> So I think some peoples bonuses depend on not understanding the problem
+> I fear :(
+
+The only "bonus" I have is not repeatedly explaining why people can't
+use h/w features the way they want.
