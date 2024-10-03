@@ -1,189 +1,121 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7F213B58A
-	for <linux-block@vger.kernel.org>; Thu,  3 Oct 2024 09:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9373028370;
+	Thu,  3 Oct 2024 09:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727948885; cv=none; b=uFFnLcQU0ZR2MHVzRaofOHW9Do3Os8Voe0WmPuTyzPg24oV3GFTQDGBQqG59U5C9aMGXevv4WL5DE8Ac85dOKAa0jsHdOweCXRzWSQW17ZQGZb1hBt2Jk98ltc7f1u7zU3VCPOioYDJBoU8PMGqq2JDwLU1WS/gU2Md1PlC7I2w=
+	t=1727949570; cv=none; b=p54EO0vxA5S8eX/VRzydiiZ5iVUEQefs973PZFlKPap27WLk6QdS4HMXt7WmjhsHSSfBhnijukV1L/vaXkE+USZOTWjQ4QzL3Qe587D/VYbRtv5zt4W0SGFtYnDwAO4zNLEFq+o70CLKB4RrEDVnvtXv7t5WjX8HSkTkdDc8YQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727948885; c=relaxed/simple;
-	bh=SIeEpVSBefV9U+2eDCv2V0waDUEws1Q//fEl0frYGgo=;
+	s=arc-20240116; t=1727949570; c=relaxed/simple;
+	bh=GAvgnDYbIpJ8EztU1XXyYsFYyamS+ZKbGL4mJyafhNw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IAjcfqHoT+0cjUfgUuCAfh4aCop3VZl1gdaPv8VUfXv1SaJ9CewjEZW6ONHFi3QQtPcisA3Ptr1MYEnxbjQIXlbA6A2SRBd5HJhODhkunLGwNNddYyGPvzPusPcAfxnvxT0jPXCXgcPCyTpAbDxElBBhwX9wsMZFCQoUCWgvg44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V18XLltV; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V18XLltV"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a8a6d1766a7so112988566b.3
-        for <linux-block@vger.kernel.org>; Thu, 03 Oct 2024 02:48:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727948882; x=1728553682; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5CFsPHtLrJf+vHnalSd1JxuKBY+VdQMavFuJV9UtbEc=;
-        b=V18XLltVVcZTpS0/zlsmeQlTdud3qlvP/8sd2VN/849N8VUboChQlyd8RUMBXLTKkO
-         J9Rpr8RtOiRvvtjGXflvIF1fLv/GZSnuNyhHBM06SALMETqtQ8ThfYx7sJ5zGOGslqvE
-         nhLIcRSktPXcoUACj0KKKgau6Xz4CEo7w79rFsAmQpma/JLc3oLMYEG99rdpdU1yhM+v
-         wPVN1OqsKrmsN766rjL1jLOb0ZLwL4bBepcmkxrWwt1Io2kStMYtdSEuGtBIPC/FZIMj
-         LnapvTVhHriIgXxAIL0lGQCPyZZ6pYFrwVOgUxrrysU/xvuD80f7MvnuO2G4fE74fmf2
-         Y2eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727948882; x=1728553682;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5CFsPHtLrJf+vHnalSd1JxuKBY+VdQMavFuJV9UtbEc=;
-        b=GG4kpJ3rdBynY1WYAC7vmsXBEGN7zObSI2V2xu2wiQWdGT2rlU2orLZwTy2BZQmu92
-         TEFoM17+cS0BOjwBk5n5wJbA4PSe/tWFsoJ/0FN44snWme5DOnqMm9DclrBvV2Y7wbEz
-         wgvb//ZEmsPJRoEoBycH3Jtgd5a7OCtYcRtMZEmsVgTozEAu+58BMuwUBklpt8717Vug
-         yKzHSf6+o6xFgQbK916Jeqf/7aYLuaRVv7yTfrDMmob2JpdQ0iC43OYyjT6S02VJlTqG
-         vqV3JneN9Ku0c/eqaShw4NXwX/3iOa38dQuPgljITg+OyRN7XY9NgxBrHH+ev8pWdeD8
-         ylPw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGwM7tTVa4++5ZKwBSAoests5ID+4ECxMsAg5jaeJ45ZN3nQFC1iHHIHn++3XxQRRU2GygEq7SeJKd/w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YypMu3W57Pr0iwmb3ho8fLst2CptcwaR5tRM2YnYlRjCMVZFQ1T
-	kPNwfV2CPMx11/v+IdCBur6FQYyT14AXkZBzud4GI/JbLeuWLtrVACArWWpjtQ==
-X-Google-Smtp-Source: AGHT+IEltl18S2VzGqkQFdD4PfVtJi8u0kItMR+1qOuHbZiGw6nKi84syWPZmXhoI99aIB//u6x36g==
-X-Received: by 2002:a17:907:8015:b0:a99:9e9:a3dc with SMTP id a640c23a62f3a-a9909e9a5cfmr137474466b.2.1727948881784;
-        Thu, 03 Oct 2024 02:48:01 -0700 (PDT)
-Received: from google.com (40.162.204.35.bc.googleusercontent.com. [35.204.162.40])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99102a57a1sm61062466b.67.2024.10.03.02.48.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 02:48:01 -0700 (PDT)
-Date: Thu, 3 Oct 2024 09:47:58 +0000
-From: Quentin Perret <qperret@google.com>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Christian Loehle <christian.loehle@arm.com>, linux-pm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, peterz@infradead.org,
-	juri.lelli@redhat.com, mingo@redhat.com, dietmar.eggemann@arm.com,
-	vschneid@redhat.com, vincent.guittot@linaro.org,
-	Johannes.Thumshirn@wdc.com, adrian.hunter@intel.com,
-	ulf.hansson@linaro.org, bvanassche@acm.org, andres@anarazel.de,
-	asml.silence@gmail.com, linux-block@vger.kernel.org,
-	io-uring@vger.kernel.org, qyousef@layalina.io, dsmythies@telus.net,
-	axboe@kernel.dk
-Subject: Re: [RFC PATCH 5/8] cpufreq/schedutil: Remove iowait boost
-Message-ID: <Zv5oTvxPsiTWCJIo@google.com>
-References: <20240905092645.2885200-1-christian.loehle@arm.com>
- <20240905092645.2885200-6-christian.loehle@arm.com>
- <CAJZ5v0hJWwsErT193i394bHOczvCQwU_5AVVTJ1oKDe7kTW82g@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iJDYcOZ5EjZbcUEe0sA92Isitsa9llCIrISLVGDO77gJOjgKUV46ZLD5cvdFGnLatbNBphWkONR4AVKnGaQtmBLXUy+GSoH0BOgzu9snRzJJUPhCtCwMFManvAYo9P0fGAIlmSHl7StSZIC7S5gD8aJo4U+6bvBpXpKBM8ejqVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+X-CSE-ConnectionGUID: JSxS/CNDQjaeoEm8LJ3OHQ==
+X-CSE-MsgGUID: RCGoF4pKTaSIuJvgiL+dqA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11213"; a="44604905"
+X-IronPort-AV: E=Sophos;i="6.11,174,1725346800"; 
+   d="scan'208";a="44604905"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 02:59:28 -0700
+X-CSE-ConnectionGUID: sAT+PtLZQ5icH7Km736sXg==
+X-CSE-MsgGUID: 2r+uLvUiSDOn+6O7WPYLxw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,174,1725346800"; 
+   d="scan'208";a="74155166"
+Received: from unknown (HELO smile.fi.intel.com) ([10.237.72.154])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 02:59:23 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andy@kernel.org>)
+	id 1swIcB-0000000G4lR-3KKf;
+	Thu, 03 Oct 2024 12:59:19 +0300
+Date: Thu, 3 Oct 2024 12:59:19 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: Christian Marangi <ansuelsmth@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Kees Cook <kees@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	INAGAKI Hiroshi <musashino.open@gmail.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Christian Heusel <christian@heusel.eu>, linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, upstream@airoha.com
+Subject: Re: [PATCH v4 0/5] block: partition table OF support
+Message-ID: <Zv5q90Dc_VzA4xs3@smile.fi.intel.com>
+References: <20240930113045.28616-1-ansuelsmth@gmail.com>
+ <ZvqfbNDfI2QWZEBg@smile.fi.intel.com>
+ <87setej1y2.fsf@prevas.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJZ5v0hJWwsErT193i394bHOczvCQwU_5AVVTJ1oKDe7kTW82g@mail.gmail.com>
+In-Reply-To: <87setej1y2.fsf@prevas.dk>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Monday 30 Sep 2024 at 18:34:24 (+0200), Rafael J. Wysocki wrote:
-> On Thu, Sep 5, 2024 at 11:27 AM Christian Loehle
-> <christian.loehle@arm.com> wrote:
+On Wed, Oct 02, 2024 at 11:20:37AM +0200, Rasmus Villemoes wrote:
+> Andy Shevchenko <andy@kernel.org> writes:
+> > On Mon, Sep 30, 2024 at 01:30:07PM +0200, Christian Marangi wrote:
+
+...
+
+> >> this is an initial proposal to complete support for manually defining
+> >> partition table.
+> >> 
+> >> Some block device also implement boot1 and boot2 additional disk. Similar
+> >> to the cmdline parser, these disk can have OF support using the
+> >> "partitions-boot0" and "partitions-boot1" additional node.
+> >> 
+> >> It's also completed support for declaring partition as read-only as this
+> >> feature was introduced but never finished in the cmdline parser.
 > >
-> > iowait boost in schedutil was introduced by
-> > commit ("21ca6d2c52f8 cpufreq: schedutil: Add iowait boosting").
-> > with it more or less following intel_pstate's approach to increase
-> > frequency after an iowait wakeup.
-> > Behaviour that is piggy-backed onto iowait boost is problematic
-> > due to a lot of reasons, so remove it.
-> >
-> > For schedutil specifically these are some of the reasons:
-> > 1. Boosting is applied even in scenarios where it doesn't improve
-> > throughput.
+> > I'm not sure I fully understood the problem you are trying to solve.
+> > I have a device at hand that uses eMMC (and was produced almost ten years ago).
+> > This device has a regular GPT on eMMC and no kernel needs to be patched for that.
+> > So, why is it a problem for the mentioned OEMs to use standard GPT approach?
 > 
-> Well, I wouldn't argue this way because it is kind of like saying that
-> air conditioning is used even when it doesn't really help.  It is
-> sometimes hard to know in advance whether or not it will help though.
+> For the user area (main block device), yes, a GPT can often be used, but
+> not always. For the boot partitions, the particular SOC/cpu/bootrom may
+> make it impossible to use a standard partition table, because the
+> bootrom expects to find a bootloader at offset 0 on the active boot
+> partition. In such a case, there's no way you can write a regular MBR or
+> GPT, but it is nevertheless nice to have a machine-readable definition
+> of which data goes where in the boot partitions. With these patches, one
+> can do
 > 
-> > 2. The boost is not accounted for in EAS: a) feec() will only consider
-> >  the actual task utilization for task placement, but another CPU might
-> >  be more energy-efficient at that capacity than the boosted one.)
-> >  b) When placing a non-IO task while a CPU is boosted compute_energy()
-> >  assumes a lower OPP than what is actually applied. This leads to
-> >  wrong EAS decisions.
+>   partitions-boot0 {
+>     partition@0 {
+>       label = "bootloader";
+>       reg = <0 0x...>; // 2 MB
+>     }
+>     partition@... {
+>       label = "device-data";
+>       reg = <...> // 4 MB
+>     }
+>   }
 > 
-> That's a very good point IMV and so is the one regarding UCLAMP_MAX (8
-> in your list).
+> and describe that layout.
 
-I would actually argue that this is also an implementation problem
-rather than something fundamental about boosting. EAS could be taught
-about iowait boosting and factor that into the decisions.
+I see now, on the device I mentioned the firmware is located on a boot
+partition, so the user ones are being used for bootloader and the OS.
 
-> If the goal is to set the adequate performance for a given utilization
-> level (either actual or prescribed), boosting doesn't really play well
-> with this and it shouldn't be used at least in these cases.
+-- 
+With Best Regards,
+Andy Shevchenko
 
-There's plenty of cases where EAS will correctly understand that
-migrating a task away will not reduce the OPP (e.g. another task on the
-rq has a uclamp_min request, or another CPU in the perf domain has a
-higher request), so iowait boosting could probably be added.
 
-In fact if the iowait boost was made a task property, EAS could easily
-understand the effect of migrating that boost with the task (it's not
-fundamentally different from migrating a task with a high uclamp_min
-from the energy model perspective).
-
-> > 3. Actual IO heavy workloads are hardly distinguished from infrequent
-> > in_iowait wakeups.
-> 
-> Do infrequent in_iowait wakeups really cause the boosting to be
-> applied at full swing?
-> 
-> > 4. The boost isn't accounted for in task placement.
-> 
-> I'm not sure what exactly this means.  "Big" vs "little" or something else?
-> 
-> > 5. The boost isn't associated with a task, it therefore lingers on the
-> > rq even after the responsible task has migrated / stopped.
-> 
-> Fair enough, but this is rather a problem with the implementation of
-> boosting and not with the basic idea of it.
-
-+1
-
-> > 6. The boost isn't associated with a task, it therefore needs to ramp
-> > up again when migrated.
-> 
-> Well, that again is somewhat implementation-related IMV, and it need
-> not be problematic in principle.  Namely, if a task migrates and it is
-> not the only one in the "new" CPUs runqueue, and the other tasks in
-> there don't use in_iowait, maybe it's better to not boost it?
-> 
-> It also means that boosting is not very consistent, though, which is a
-> valid point.
-> 
-> > 7. Since schedutil doesn't know which task is getting woken up,
-> > multiple unrelated in_iowait tasks lead to boosting.
-> 
-> Well, that's by design: it boosts, when "there is enough IO pressure
-> in the runqueue", so to speak.
-> 
-> Basically, it is a departure from the "make performance follow
-> utilization" general idea and it is based on the observation that in
-> some cases performance can be improved by taking additional
-> information into account.
-> 
-> It is also about pure performance, not about energy efficiency.
-> 
-> > 8. Boosting is hard to control with UCLAMP_MAX (which is only active
-> > when the task is on the rq, which for boosted tasks is usually not
-> > the case for most of the time).
-
-Sounds like another reason to make iowait boosting per-task to me :-)
-
-I've always thought that turning iowait boosting into some sort of
-in-kernel uclamp_min request would be a good approach for most of the
-issues mentioned above. Note that I'm not necessarily saying to use the
-actual uclamp infrastructure (though it's valid option), I'm really just
-talking about the concept. Is that something you've considered?
-
-I presume we could even factor out the 'logic' part of the code that
-decides out to request the boost into its own thing, and possibly have
-different policies for different use-cases, but that might be overkill.
-
-Thanks,
-Quentin
