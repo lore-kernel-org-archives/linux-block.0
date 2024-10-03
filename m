@@ -1,59 +1,48 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC0A19B59F
-	for <linux-block@vger.kernel.org>; Thu,  3 Oct 2024 15:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4621A2556
+	for <linux-block@vger.kernel.org>; Thu,  3 Oct 2024 15:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727970047; cv=none; b=O+VMTDFHZKsp246JUIc0BNkQ21kbwRhixgvdbMam13nx8Bx+vP4jM5HvK8tygCQMHg4Bnu5aWMPia3iblJVXaqXKdgpjDmzD8OPgyMWE+Aoz1bs02jkWhR8upqWkTrmmUHtIe0CYS8gsf/OtX7gBn+hFfj0gsYp/le1p3BTqGXI=
+	t=1727970594; cv=none; b=GMDnpN3URQneSnG/Qw+jzdJ212UoP5jX4JmhnZTOxNeXhPQ0v7cxQPXU0tCgyakgPMKfF7GKv+qfiYVqjNDxpKpTwhU+bOxRchiwPnUeJDQJH9urP8k7C4h5uo4VZK0IrbWT7Xd8nCnJWUmZsuk5xVPzFnT6qc7nh1ynxT1CwKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727970047; c=relaxed/simple;
-	bh=Xv+2+m+4+JYvcQpIPGbXQxe/SOmY4LHXHGq7DU2cTwo=;
+	s=arc-20240116; t=1727970594; c=relaxed/simple;
+	bh=HBoZKzlCgXMLWnSt5LsdPtOaqSCa/zCq3mpaSqju2i0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K99iRiXT1jNdzZ1Vetxvn6LwtrUbDAbps/UU8XZ7VbXm5ObYo3sIFmZ8gDMUKzb3/R6OhvqAsFHeFnICYZPbQdA0fDf7hNEaX7M9lskEqtWKhCsSTWnuphRmZUPIEii9oJVKp2Z8hxoaIDkKPnURgCZHusicEdvXClnOM8QdfrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=RIxDhf1N; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=qRze7glTKWGzKKXA6T9BMhpV9/IlcA1OqiiE6+3XRXQ2/qCTqkXygmaNAkJerPn3OPkbaN5W8PgpBcO9a/J4r5rnXKr58z9h2Cqnmg3p0+XTR5bg5UnRqKmu1j3KiY/3NxNEXnUOPX/fyql80OB0MyIdBX2saEnnP/7C3yuNcbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OWt9wwHC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="RIxDhf1N"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-82aab679b7bso48211839f.0
-        for <linux-block@vger.kernel.org>; Thu, 03 Oct 2024 08:40:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1727970044; x=1728574844; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3F6p04osyI0jBGzF1g/V+1s/zjy9v4C68ZQz9+vQuaM=;
-        b=RIxDhf1NLvcGzQJ5n9h9e4yE8wPg6JhgrE1VmXmwUxZekR2xY2400Coaot7NVf9J59
-         22nie7OB7BQHXFy5JhYFhHriw1tThaLz8uoKbYv0D+0Xzim+L7Rx3Kxo1GKqiQQe7e3P
-         3laI6DaueM5zzzCUAC+oNcIUjacWNZ2vF6IXHfcXxC8AeXVPwcG4HRhP22GKi+VWdIKi
-         i073l/GIzii7b8hMe4mywXk0N/xSUSEa1NHAAfBXadmkorNZSWtvP21SfOkgWPxiR/F2
-         sOY8WHUGzy5o+RawssRYYh5G8GKeSKFOW/0gc/aKOy0tw1IWc/JYMT6e80rC5w6sXD8c
-         7nCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727970044; x=1728574844;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3F6p04osyI0jBGzF1g/V+1s/zjy9v4C68ZQz9+vQuaM=;
-        b=Y6kvd6mPn9xMjEHklXqxWaQUgOF+xyTRrGSnRv+O61flGTZCE6BlFNHDyfcrZY93T+
-         BUkSNfaga9RhBT6pjJEQMqel+H8eIshLUvtrx2I5A7QHHGKCLYt2nSlwQrkg7t8N8nGM
-         Pbw7DcXmfYrattyVPnAW5fZzX2O+Ko6xvcCOfgwo0D4UCTi3yYMsy00JpV6iOlDA2ZUM
-         22JQZETHgId3j5SWB3r0Lx2aMk+YoG4Hoi1NxbCawaKqBbhnxn6A12+LAE0W41Tg82GD
-         0CqUuSoMlMX6E94DQvVJjHF/LW+aPZJzCm6GJ8G9kVqRD2kp7nyHX99UM8YZe5WxbamO
-         WeSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWc2/CzuhDk+C1JrGnXr7EmT+K8fbYi8uBAZjKns9FArT6JMI3geCOcUbve7OwDlnrFf8xwm+pnWFZcSQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhXK5HOMSX+3AAdDS5pQNf3AG+C0AvKYvazDY3Tk87v06JesMD
-	NxIwA0u4uuel+Ar3GnnRfwgHnHyk2M/2IJbKDVqQSFErQZ/nlgc+/40HPDf7mGs=
-X-Google-Smtp-Source: AGHT+IGVeksN9lMqLrH0bdyiZE6lj04kAENcVkW1NzWCeTQqeC5TiiITBRhfRVIInJjo07jM+atEmA==
-X-Received: by 2002:a05:6602:1553:b0:82d:129f:acb6 with SMTP id ca18e2360f4ac-834d84d4e60mr669700239f.14.1727970044432;
-        Thu, 03 Oct 2024 08:40:44 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4db55acf198sm320040173.165.2024.10.03.08.40.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Oct 2024 08:40:43 -0700 (PDT)
-Message-ID: <d1738d8c-023d-4a37-9b49-f9b42290ccd2@kernel.dk>
-Date: Thu, 3 Oct 2024 09:40:42 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OWt9wwHC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727970591;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T/+JJP6IwNI/OgGJi3ENm7HucRM3TLm/O3z7U+CaXoE=;
+	b=OWt9wwHCTln2cuSIq26ykpaoUc9ox3Hqnq3JWUbib0dzwWg12leRNu0GEqq8h7AIevzpin
+	mynsjn+RTIqJiM0tc1c9g5r3HxHKSqoMu8mKhfMphlIJjBS/nmxlpzLXXt8eW4kOHcILFW
+	y6E04f9o2HVYkGHwYX4I3Cug5yvssTo=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-159-bp-PBI54OdSnzP37k9LIsg-1; Thu,
+ 03 Oct 2024 11:49:45 -0400
+X-MC-Unique: bp-PBI54OdSnzP37k9LIsg-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 81DA41955F42;
+	Thu,  3 Oct 2024 15:49:43 +0000 (UTC)
+Received: from [10.2.16.72] (unknown [10.2.16.72])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 567801955E8C;
+	Thu,  3 Oct 2024 15:49:40 +0000 (UTC)
+Message-ID: <18f3929d-9a29-4734-8466-17fa9e528c8f@redhat.com>
+Date: Thu, 3 Oct 2024 11:49:40 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,31 +50,84 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2] block: enable passthrough command statistics
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org
-Cc: hch@lst.de, Keith Busch <kbusch@kernel.org>
-References: <20241003153036.411721-1-kbusch@meta.com>
+Subject: Re: [PATCH v2] blk_iocost: remove some duplicate irq disable/enables
+To: Jens Axboe <axboe@kernel.dk>, Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Yu Kuai <yukuai3@huawei.com>, Tejun Heo <tj@kernel.org>,
+ Josef Bacik <josef@toxicpanda.com>, cgroups@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <Zv0kudA9xyGdaA4g@stanley.mountain>
+ <0a8fe25b-9b72-496d-b1fc-e8f773151e0a@redhat.com>
+ <925f3337-cf9b-4dc1-87ea-f1e63168fbc4@stanley.mountain>
+ <df1cc7cb-bac6-4ec2-b148-0260654cc59a@redhat.com>
+ <3083c357-9684-45d3-a9c7-2cd2912275a1@stanley.mountain>
+ <fe7ce685-f7e3-4963-a0d3-b992354ea1d8@kernel.dk>
+ <68f3e5f8-895e-416b-88cf-284a263bd954@stanley.mountain>
+ <c26e5b36-d369-4353-a5a8-9c9b381ce239@kernel.dk>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241003153036.411721-1-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8
+From: Waiman Long <longman@redhat.com>
+In-Reply-To: <c26e5b36-d369-4353-a5a8-9c9b381ce239@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 10/3/24 9:30 AM, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Applications using the passthrough interfaces for IO want to continue
-> seeing the disk stats. These requests had been fenced off from this
-> block layer feature. While the block layer doesn't necessarily know what
-> a passthrough command does, we do know the data size and direction,
-> which is enough to account for the command's stats.
-> 
-> Since tracking these has the potential to produce unexpected results,
-> the passthrough stats are locked behind a new queue flag that needs to
-> be enabled with the /sys/block/<dev>/queue/iostats_passthrough
-> attribute.
+On 10/3/24 10:38, Jens Axboe wrote:
+> On 10/3/24 8:31 AM, Dan Carpenter wrote:
+>> On Thu, Oct 03, 2024 at 07:21:25AM -0600, Jens Axboe wrote:
+>>> On 10/3/24 6:03 AM, Dan Carpenter wrote:
+>>>>    3117                                  ioc_now(iocg->ioc, &now);
+>>>>    3118                                  weight_updated(iocg, &now);
+>>>>    3119                                  spin_unlock(&iocg->ioc->lock);
+>>>>    3120                          }
+>>>>    3121                  }
+>>>>    3122                  spin_unlock_irq(&blkcg->lock);
+>>>>    3123
+>>>>    3124                  return nbytes;
+>>>>    3125          }
+>>>>    3126
+>>>>    3127          blkg_conf_init(&ctx, buf);
+>>>>    3128
+>>>>    3129          ret = blkg_conf_prep(blkcg, &blkcg_policy_iocost, &ctx);
+>>>>    3130          if (ret)
+>>>>    3131                  goto err;
+>>>>    3132
+>>>>    3133          iocg = blkg_to_iocg(ctx.blkg);
+>>>>    3134
+>>>>    3135          if (!strncmp(ctx.body, "default", 7)) {
+>>>>    3136                  v = 0;
+>>>>    3137          } else {
+>>>>    3138                  if (!sscanf(ctx.body, "%u", &v))
+>>>>    3139                          goto einval;
+>>>>    3140                  if (v < CGROUP_WEIGHT_MIN || v > CGROUP_WEIGHT_MAX)
+>>>>    3141                          goto einval;
+>>>>    3142          }
+>>>>    3143
+>>>>    3144          spin_lock(&iocg->ioc->lock);
+>>>>
+>>>> But why is this not spin_lock_irq()?  I haven't analyzed this so maybe it's
+>>>> fine.
+>>> That's a bug.
+>>>
+>> I could obviously write this patch but I feel stupid writing the
+>> commit message. My level of understanding is Monkey See Monkey do.
+>> Could you take care of this?
+> Sure - or let's add Tejun who knows this code better. Ah he's already
+> added. Tejun?
+>
+>> So somewhere we're taking a lock in the IRQ handler and this can lead
+>> to a deadlock? I thought this would have been caught by lockdep?
+> It's nested inside blkcg->lock which is IRQ safe, that is enough. But
+> doing a quick scan of the file, the usage is definitely (widly)
+> inconsistent. Most times ioc->lock is grabbed disabling interrupts, but
+> there are also uses that doesn't disable interrupts, coming from things
+> like seq_file show paths which certainly look like they need it. lockdep
+> should certainly warn about this, only explanation I have is that nobody
+> bothered to do that :-)
 
-Looks good to me.
+The lockdep validator will only warn about this if a debug kernel with 
+lockdep enabled has run a workload that exercises all the relevant 
+locking sequences that can implicate a potential for deadlock.
 
--- 
-Jens Axboe
+Cheers,
+Longman
+
