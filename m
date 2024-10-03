@@ -1,40 +1,60 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A828E19C57F
-	for <linux-block@vger.kernel.org>; Thu,  3 Oct 2024 13:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D5519CC2F
+	for <linux-block@vger.kernel.org>; Thu,  3 Oct 2024 13:55:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727962992; cv=none; b=BU+seR1QYUydRhVsAKh5CpzMIZ5+/Skl9+L0fotRK4jJNMlMAim5qabQH8CMh0rIC3hpiRw+9u6lZn6NuV8xZwAQntlRxgd1cDQd4NwZrc3G9RZNHLJ8EtIG8zmCPFNCfjGpyrH1Jv8UNpTcwXJ17VaIit/zEPUmglf+9A1t1gE=
+	t=1727963713; cv=none; b=j61vMJnOr68T6s6xk3zGUsiJfABDOJPsNKyEu4reicftIq1dLpBjmy+ddG4hbqwpYQS/hZW6p4gx5oK9ArV0nvE+gvIU5oGpIe0kytbha/gQFQNBkvDUXt/33RzFz+joSD6Ly84p7PjKRptcrfUAsDHTmpenJZxtStD3COyd3dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727962992; c=relaxed/simple;
-	bh=kYffSCMAA9WnqhpffigpImNRCmiFPClqVwPzGkPtD1U=;
+	s=arc-20240116; t=1727963713; c=relaxed/simple;
+	bh=bOmE3YcpZK/3CXAhmu0t3twv25X7t3k2uHa2c2EcvVM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lKza2T6uWrJFvvBkYS9gB6nxPBAR5KxFwHbTJpU5CxaqSAZrZ+EvgsdhUjPXidFdn5oXE2L+8BL89LQdVc71u0+jGi7VkPen4JL+5pqL2eCr2Sptgv2jH4ERru00rcVqs7nipwdU1Q0T2Ry4s9xfJBsD26TbjWSqYHl6b0uqjMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FQT6oJ2f; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=s3xjPz2Gg8cBtn1uXbhinpdL9H7cPyleTGI2+t0JybZwovEOYnE6xIbqtPoqRvNOWmlATBz2p/gHdpP55XEOB6nrXYWhzGEw/POBmCp3Ujs2FGFq0ahl8CNQTh6DKRYqLxhh7nfmhaDuFJfGrQ2U1h62Wj7hp1xBhMHASwISAl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=EtJGQF6S; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FQT6oJ2f"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=1KrY8UKqcVoR9megoowx8n9KYVTSnuQpRQYktfEuiUI=; b=FQT6oJ2f0HSPbqfE28OcJDCIF7
-	7niKnFxWqYnOVAhtjLAZ7tbk8JDtvkYmP+MhDjBBN/okcHE9dAs7FanPLxNvARySnku5CZvsBL4/i
-	rS/1PKmWQ1aBE9pEuJvCG0qThSXfXnCPBZp/4YaKUg+9bC89+J+ZIMeqQ0HiE6T1ww8y9+cJL9Nsj
-	JMlk1p1w1BQtgaMtaUemhiRdZ0zXUUajuHk387KDx797jxgtgRKu5fUbkhpi7IPCgT7yX6A/AGzfD
-	ZhxSRqBBCA+eSG08IkK7KULNGqQP2nH4xYTnvoN1zQJxCAamiqh2hweD9AJYYBgc+XJKXweP3k1+K
-	P3/I5dCQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1swM6o-00000009FRE-0NLv;
-	Thu, 03 Oct 2024 13:43:10 +0000
-Date: Thu, 3 Oct 2024 06:43:10 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EtJGQF6S"
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3e3bfa1f25fso82932b6e.0
+        for <linux-block@vger.kernel.org>; Thu, 03 Oct 2024 06:55:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1727963708; x=1728568508; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bOmE3YcpZK/3CXAhmu0t3twv25X7t3k2uHa2c2EcvVM=;
+        b=EtJGQF6Sa8p2xmhGkv908Q3JnRNtIheWO0cb7plaZMlGSjJKBqScOTDe31L01073f1
+         /1jDR0wHV6bJigRO1C8eweIGHkuvBzhdO8BlpR0US292+dLizkLooj9+5KP7/+ieRIG2
+         wmFCOkm0TDfPoU9qwOx1wa35LwL5E3a7BeDcU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727963708; x=1728568508;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bOmE3YcpZK/3CXAhmu0t3twv25X7t3k2uHa2c2EcvVM=;
+        b=lyDrzTPuu9/7iOu4pIHnNLKSm+XMlj7SOy0tWLaMD7h13T8TEV6BjQ+MKtEVFRF1hm
+         Zn+VZj5co0u5JuWQK69bTdpScNbm2c0hGQg5fIYGbVKzinGbF3vnXX9ZJ/+93Dhmxv0v
+         FpfrkG8AQeKExRs9ChMZD6RahNpTwWHmFv72Eiy9/8a4+xadKHItPKNF8eIYMajfBNPf
+         dDgQ9KfGgd5n3Lc86C46yfACVQwgo7izW4qVeZlnM6FuxaT3NX9qoRtXrD19wv1gi9uM
+         iCZ6Du41Jmm1vzQMOTA1SWqgtgKl7dkslbRC8pyvLaYRNOgkJ2MH2At17NHTpF7S9Fi2
+         H0tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUN1k5j5YBI2iJHvAorrYNcq5zFNQaepcmFdv4GiZ4+B3nxveY2tHOhvzO3EZ39mdqsAxrpqCgA0WJOw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyadejo2QeqfgL1Xm0+u93YuOMznGKFHmQnCvKlJQjuHtlHMnxV
+	H8vk7XYgN+FCEXaudRlMxHqZu00D80GE8V2DfHJR93WDYAf0mlMNV3B53c9+oA==
+X-Google-Smtp-Source: AGHT+IF1DAiVNaSsERkm9AvX26sdN3J2w5PQD88DZTRv7R0i1VKCdY1954ULkFYZrMw2Gm+661PEyQ==
+X-Received: by 2002:a54:4d04:0:b0:3e2:967b:ea8f with SMTP id 5614622812f47-3e3b41071acmr3991469b6e.21.1727963708369;
+        Thu, 03 Oct 2024 06:55:08 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:6c:4e9b:4272:1036])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e9dcb4d31bsm750099a12.57.2024.10.03.06.55.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2024 06:55:08 -0700 (PDT)
+Date: Thu, 3 Oct 2024 22:55:04 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
 Subject: Re: block: del_gendisk() vs blk_queue_enter() race condition
-Message-ID: <Zv6fbloZRg2xQ1Jf@infradead.org>
+Message-ID: <20241003135504.GL11458@google.com>
 References: <20241003085610.GK11458@google.com>
  <Zv6d1Iy18wKvliLm@infradead.org>
 Precedence: bulk
@@ -46,56 +66,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <Zv6d1Iy18wKvliLm@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Oct 03, 2024 at 06:36:20AM -0700, Christoph Hellwig wrote:
-> On Thu, Oct 03, 2024 at 05:56:10PM +0900, Sergey Senozhatsky wrote:
-> > blk_queue_enter() sleeps forever, under ->open_mutex, there is no
-> > way for it to be woken up and to detect blk_queue_dying().  del_gendisk()
-> > sleeps forever because it attempts to grab ->open_mutex before it calls
-> > __blk_mark_disk_dead(), which would mark the queue QUEUE_FLAG_DYING and
-> > wake up ->mq_freeze_wq (which is blk_queue_enter() in this case).
-> > 
-> > I wonder how to fix it.  My current "patch" is to set QUEUE_FLAG_DYING
-> > and "kick" ->mq_freeze_wq early on in del_gendisk(), before it attempts
-> > to grab ->open_mutex for the first time.
-> 
-> We split blk_queue_enter further to distinguish between file system
-> requests and passthrough ones.
-> 
-> The file system request should be using bio_queue_enter, which only
-> checks GD_DEAD, instead of QUEUE_FLAG_DYING.  Passthrough requests like
-> the cdrom door lock are using blk_queue_enter that checks QUEUE_FLAG_DYING
-> which only gets set in blk_mq_destroy_queue.
-> 
-> So AFAICS your trace should not happen with the current kernel, but
-> probably could happen with older stable version unless I'm missing
-> something.  What kernel version did you see this on?
+On (24/10/03 06:36), Christoph Hellwig wrote:
+> What kernel version did you see this on?
 
-.. actually, we still clear QUEUE_FLAG_DYING early.  Something like
-the pathc below (plus proper comments) should sort it out:
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 1c05dd4c6980b5..9a1e18fbb136cf 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -589,9 +589,6 @@ static void __blk_mark_disk_dead(struct gendisk *disk)
- 	if (test_and_set_bit(GD_DEAD, &disk->state))
- 		return;
- 
--	if (test_bit(GD_OWNS_QUEUE, &disk->state))
--		blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue);
--
- 	/*
- 	 * Stop buffered writers from dirtying pages that can't be written out.
- 	 */
-@@ -673,6 +670,9 @@ void del_gendisk(struct gendisk *disk)
- 		drop_partition(part);
- 	mutex_unlock(&disk->open_mutex);
- 
-+	if (test_bit(GD_OWNS_QUEUE, &disk->state))
-+		blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue);
-+
- 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
- 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
- 
+6.6
