@@ -1,125 +1,98 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAFE224D1;
-	Thu,  3 Oct 2024 20:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC2F1A7AF6;
+	Thu,  3 Oct 2024 21:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727989005; cv=none; b=D2ypLaBG6rQplNvgvs3g2rvzsdNwlmNhVkOPdkyWuAyrWrhAv6pOMajyAz28kD7LIEg/lO2cupQAcUyoPbnUySmx9uTvVdFzDP5gEWU04EKJtfayZl7Qkre8w4rN3RziFvIMn3BaC/vxSPI8boCE72ySKh+5ABSLxoe++vat65Y=
+	t=1727990046; cv=none; b=a1O+25POw5WY57np7G24liLvkdQAIxjv1qNN+dj65EV7ItQdVGghVhuoiRrxGLtx9hZ7Wwi2CCr9leeNhSdmgYo2qMliNI8OW9WzIFdvSG4QYJ8XbL4O9NSqy9t+wvNSweERdkENM89RfSIkjLcKoWZH4udwcsgAqpJDabfLkZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727989005; c=relaxed/simple;
-	bh=8cFxwG+dqzF652zgqIDsS6aXOxw1y9pY53x2OgkRKsc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=f+ZJQ72qzG7C9keq89Q4OhMFKs6zsgYLVrDSh6sIQ0twMYgW4lTczrFzjBVm61JX/7haLU6UGCWqDiEoWP41Rvi70S/jBVz9kcBQuIyPgP/jeOZ+6tp0tyR0PvNuZ7Fom8oen3SsAVQ8kpo9ACoBq4jZmKWgPqOjHi/zXS28uxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=xk/+/6N6; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1727990046; c=relaxed/simple;
+	bh=azsOB2pmahUnI+fEcqJQeBQfkC+qKR86a6BpgWEGw7o=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=aY+yzze73qSEQEvOqfk7Jbr4KWgTzcRfOSad03iT8UWSE3ZFTtf7kubQpxGg05puML2exCASKWCY6Tqe0yIi32S+PMDqi6usHEHColhqz+w56RBhySlzTDyc99BH1uVn45i5jGLmNKNioCBtA+G95+61ZBjviovO9ANDTFrICf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=koHtHqal; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="xk/+/6N6"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4XKP9d3r9lzlgVnY;
-	Thu,  3 Oct 2024 20:56:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1727988995; x=1730580996; bh=FTm9+Fd9U/H4haC16sHTR1bT
-	ESO2Tnj8MtorXX9dHs8=; b=xk/+/6N6QppPaTwrc2/ZXsj7P0XkCx6/abEpvUij
-	7rnzdtFkmXCvnGQ4WT4/ROVVqQIWjE1GhpClMCwptIEXn9w3ODdu2lepfN1d555H
-	yXw15gb0ui1kT/tG1PKxhSX09JjcUVSPhdD0JVgteokPrfxlxKnJtAxSdnjVWXP2
-	xJNDOpzJOoxivlrpxMLynthyTW/4UykYwKxUyTxnvelDN2Oqtwh/cFGCGxGEi1GG
-	VLg50OPsv6B1vbWzD0Sdz6VDL1iTfbimrklp8ua2U2UDeIKdhXGUGHBmPgudS9Dk
-	3sQevp889vWwxaYwUCvuG+kD/tb5ChPjxaP81gsLcc2foQ==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id xiJGC-xD0fY5; Thu,  3 Oct 2024 20:56:35 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4XKP9Y5388zlgVnN;
-	Thu,  3 Oct 2024 20:56:33 +0000 (UTC)
-Message-ID: <e6e6f77b-f5c6-4b1e-8ab2-b492755857f0@acm.org>
-Date: Thu, 3 Oct 2024 13:56:31 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="koHtHqal"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6dbb24ee34dso12679027b3.2;
+        Thu, 03 Oct 2024 14:14:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727990043; x=1728594843; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=azsOB2pmahUnI+fEcqJQeBQfkC+qKR86a6BpgWEGw7o=;
+        b=koHtHqaltKH4VzryaD62Qwq/cYfGToSvnceYQeEF72Tgelqd6nJLdHNaXrlx+x03F8
+         9uBuMpj0dn6hzc/vXglWP8YhdWrErq9EhZyZ3chf5UCgG1LBZoO8oVcC6R1nETwWQiGd
+         cDskTbynfsGaqeyNk1ZSzbafq4gjG7W3uXXY9eo8XsPhN1DRdHlhQtZMmdZEw5rpSMjC
+         w1/U6lciswPFRw2ZudsbqkiEQaKXj5wHx4vQFH0OYBA1QGgzJ8dpL9NbFay4AZXuwJjw
+         qFTqxwSwL87YImTS+YXlA30sE6AUe+okuLd5AHEsLrc9VFrfTUl0OqRz3wLX14ne+Q4C
+         f7Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727990043; x=1728594843;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=azsOB2pmahUnI+fEcqJQeBQfkC+qKR86a6BpgWEGw7o=;
+        b=FvMVlgdGu1jZRvq3agbq6A0EQ9EE0Dp3UTvE97p5QPv4xrxBi+oiJhCq3TIP9pZX+w
+         GWQh0RGx9Z7oCiLicRQPHDKg4LSx5w+XLviyoL5fUr/+h3gjKFF2DMVKdUejFQGuAinX
+         NqobwfUreM6IbGujvsNLg8J1dkO4IaGo06ooNUIMdPLOoai7YGPnejwEMLZImKHk06r9
+         mI3wzfTLijRoS4e8pVZZWtOhr2demPlH0u8fl+19RCuSIsdA6dCsCq8Mami4LY28aHaK
+         aAwXDIUpiyNPZHnjmPWJQpMai31cK2bnuhKczFo2Qqf/Orpghem6YvT4sPJfkGTrEUa+
+         P0ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCWX7x5Afibk0n00gd9lAnnHgCYdhWRB0zQSa8VeLILc2VvGv7BwdKwhybt+m8LEpMyUEa0P/ugRIfEt6g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPQragI+/5cUGXr7LeDAcjkn326AhIwpmvhhIpDpLX1DCNnZ22
+	jKpHXUcBtMrmLBYSi9/SbKBjb3VTHm4J1sly3TgC7htQam7fwMd9zDyBEL98360/X3kYvmQwimP
+	3Ub3cim0bzIQ7CsfPYhB91mWeX0EcOeLXeLk=
+X-Google-Smtp-Source: AGHT+IGcneqJ9ltwhLiMpfZVG0K6YZJ9KUKekp5V92hfQXzHDQTQO5L0v78OARWV5WBQI88UHTe6w66PodJyncuncj4=
+X-Received: by 2002:a05:690c:6610:b0:64a:f237:e0b0 with SMTP id
+ 00721157ae682-6e2c6fc38dcmr6435097b3.5.1727990043470; Thu, 03 Oct 2024
+ 14:14:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: blktests failures with v6.12-rc1 kernel
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "nbd@other.debian.org" <nbd@other.debian.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-References: <xpe6bea7rakpyoyfvspvin2dsozjmjtjktpph7rep3h25tv7fb@ooz4cu5z6bq6>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <xpe6bea7rakpyoyfvspvin2dsozjmjtjktpph7rep3h25tv7fb@ooz4cu5z6bq6>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Leah Rumancik <leah.rumancik@gmail.com>
+Date: Thu, 3 Oct 2024 14:13:52 -0700
+Message-ID: <CACzhbgTFesCa-tpyCqunUoTw-1P2EJ83zDzrcB4fbMi6nNNwng@mail.gmail.com>
+Subject: read regression for dm-snapshot with loopback
+To: stable@vger.kernel.org
+Cc: axboe@kernel.dk, Christoph Hellwig <hch@lst.de>, bvanassche@acm.org, 
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 10/3/24 1:02 AM, Shinichiro Kawasaki wrote:
-> #3: srp/001,002,011,012,013,014,016
-> 
->     The seven test cases in srp test group failed due to the WARN
->     "kmem_cache of name 'srpt-rsp-buf' already exists" [4]. The failures are
->     recreated in stable manner. They need further debug effort.
+Hello,
 
-Does the patch below help?
+I have been investigating a read performance regression of dm-snapshot
+on top of loopback in which the read time for a dd command increased
+from 2min to 40min. I bisected the issue to dc5fc361d89 ("block:
+attempt direct issue of plug list"). I blktraced before and after this
+commit and the main difference I saw was that before this commit, when
+the performance was good, there were a lot of IO unplugs on the loop
+dev. After this commit, I saw 0 IO unplugs.
 
-Thanks,
+On the mainline, I was also able to bisect to a commit which fixed
+this issue: 667ea36378cf ("loop: don't set QUEUE_FLAG_NOMERGES"). I
+also blktraced before and after this commit, and unsurprisingly, the
+main difference was that commit resulted in IO merges whereas
+previously there were none being.
 
-Bart.
+I don't totally understand what is going on with the first commit
+which introduced the issue but I'd guess some modifying of the plug
+list behavior resulted in IO not getting merged/grouped but when we
+enabled QUEUE_FLAG_NOMERGES, we were then able to optimize through
+this mechanism. Buuuut 2min->40min seems like a huge performance drop
+just from merged vs non-merged IO, no? So perhaps it's more
+complicated than that...
 
+dc5fc361d89 -> 5.16
+667ea36378c -> 6.11
 
-Subject: [PATCH] RDMA/srpt: Make kmem cache names unique
+6.6.y and 6.1.y and were both experiencing the performance issue. I
+tried porting 667ea36378 to these branches; it applied cleanly and
+resolved the issue for both. So perhaps we should consider it for the
+stable trees, but it'd be great if someone from the block layer could
+chime in with a better idea of what's going on here.
 
-Make sure that the "srpt-rsp-buf" cache names are unique. An example of
-a unique name generated by this patch:
-
-srpt-rsp-buf-fe80:0000:0000:0000:5054:00ff:fe5e:4708-enp1s0_siw-1
-
-Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Fixes: 5dabcd0456d7 ("RDMA/srpt: Add support for immediate data")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
-  drivers/infiniband/ulp/srpt/ib_srpt.c | 8 +++++++-
-  1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/infiniband/ulp/srpt/ib_srpt.c 
-b/drivers/infiniband/ulp/srpt/ib_srpt.c
-index 9632afbd727b..c4feb39b3106 100644
---- a/drivers/infiniband/ulp/srpt/ib_srpt.c
-+++ b/drivers/infiniband/ulp/srpt/ib_srpt.c
-@@ -2164,6 +2164,7 @@ static int srpt_cm_req_recv(struct srpt_device 
-*const sdev,
-  	u32 it_iu_len;
-  	int i, tag_num, tag_size, ret;
-  	struct srpt_tpg *stpg;
-+	char *cache_name;
-
-  	WARN_ON_ONCE(irqs_disabled());
-
-@@ -2245,8 +2246,13 @@ static int srpt_cm_req_recv(struct srpt_device 
-*const sdev,
-  	INIT_LIST_HEAD(&ch->cmd_wait_list);
-  	ch->max_rsp_size = ch->sport->port_attrib.srp_max_rsp_size;
-
--	ch->rsp_buf_cache = kmem_cache_create("srpt-rsp-buf", ch->max_rsp_size,
-+	cache_name = kasprintf(GFP_KERNEL, "srpt-rsp-buf-%s-%s-%d", src_addr,
-+			       dev_name(&sport->sdev->device->dev), port_num);
-+	if (!cache_name)
-+		goto free_ch;
-+	ch->rsp_buf_cache = kmem_cache_create(cache_name, ch->max_rsp_size,
-  					      512, 0, NULL);
-+	kfree(cache_name);
-  	if (!ch->rsp_buf_cache)
-  		goto free_ch;
-
-
+- leah
