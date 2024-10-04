@@ -1,69 +1,75 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF4B77107
-	for <linux-block@vger.kernel.org>; Fri,  4 Oct 2024 07:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21F613BAC6
+	for <linux-block@vger.kernel.org>; Fri,  4 Oct 2024 07:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728028170; cv=none; b=u9uN4/G1EkazWkAIdbgeAoGpWiF2wBbakJ8xyjy3WdvKR6en1MHPW0a4BJIw6yCxIk/Xvk4iv324TYi9dBfZSBeLDO72lXN5qY2jstlz0QUV4CyYFMBLT7Tdn8veTgdm/gp01F4x+XXMyCacBnRwFAObjRbBIRm6vWOt6YV7xLA=
+	t=1728028368; cv=none; b=E60qSAdJJGqxH2JfcNprQl/84iM4vVu5NBUzfDmyTjXTG5ducK2ZD2ypy5nrpxG/8V2alt4V0k+Mx7C8HNgnckQuMiBaebRDKhqsX1sSAna8UP8QpajQb9/wz5sbxAxuX2genXG8+85eMD8D7JNj3uFkEjtsye9fhesQ4wefaQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728028170; c=relaxed/simple;
-	bh=uWI9Y3wGxaOZ50c2KrZuMaQwdcT4vDrnO2S9iWoXzUM=;
+	s=arc-20240116; t=1728028368; c=relaxed/simple;
+	bh=CgrY0CfBLm/Lv7oKpW3zMYd1YEIHB0kEzF3/d0trJHY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iauZG8pzzqUsppJn4wMZD7Nh9L07a7wvaLvRyFOoxXburQLMEj1s4c3dhq7WXXZN1B2+eu1sNgTWpc1Y+HiFg+R4FOD0SBhAbVGvBbBxxTTUeGvjub502+xZ5twPx2dWUi7xYSYjP1S2l1rQ5yLX/F1gVodbWTBxD+3g0BAxgMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=GqT0Nwqq; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=hSXisHEmfTS8EgjW581j+XCME+nLfralFg+0NrAiV2U4sPY9HCBJuCvvMO8K8yfhrQ1HFZQuSReRzzohT+IIyyw2AZ9AyHB3z/P6ZHeKAGuTof4tBAZZcwz8nYJhlGvAf+UgWfiTSbQNYBfJfTBHFBaGzq7PxkeHQB7JBnxNCD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=SqaiBavG; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GqT0Nwqq"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20b0b2528d8so20731185ad.2
-        for <linux-block@vger.kernel.org>; Fri, 04 Oct 2024 00:49:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="SqaiBavG"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2fad784e304so23358081fa.2
+        for <linux-block@vger.kernel.org>; Fri, 04 Oct 2024 00:52:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1728028168; x=1728632968; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=atMHzrqYvsCgaEtQ7AVl+03E5wPm74inyiybNu8yKaI=;
-        b=GqT0NwqqMaz0qItq0/RzeREo5UQ7LI5QzeR+0q0ChiDXwL/xYlX6ikdBKCpSiJC3oF
-         nhaljHYqPpKplhWuVHot16GIXq5Rekhrp3gB2dE0qd0K0JQQHMUrZIkvIopzflrWaeJR
-         lwR/k4k+GPQFn/V6YTdDGSmxU5GUHqwXfcS4c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728028168; x=1728632968;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=suse.com; s=google; t=1728028364; x=1728633164; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=atMHzrqYvsCgaEtQ7AVl+03E5wPm74inyiybNu8yKaI=;
-        b=R3rjXE4/qSR/LdpSWd4Ngx6Wpw15Pk0ffha8W5KhXKqwe0XJrb3vDwSRAL05xZQB5h
-         s27yUstJYZtPhWgbL7Yv1lslcfsl41Yyn+09YdGf/GPm43aju9ZppaPzzn93zy2za8uf
-         zgcamePFyiuGkneSsjFvElFuN5B8jN96H1nGgLLounZHk8aihNgDdp1xrzQf8uEjdgKQ
-         EoZ/5ImLSOSPl5O+Pegrg5P3tJVWGB7V0WT8P4aaoZ1aRVA7vOhmWou52jk4Xm7wFfQp
-         ena0QxO1BkEFuLgFw57MPSySTDRJQw7b52b3ZP+K6/2xqbmXscVtwCTJhA163DGOLdWw
-         pHsA==
-X-Forwarded-Encrypted: i=1; AJvYcCXeJ5/WDaUD2EPe3EImNcuRg2byG2J5L9to/oxP6HDg540lUMiov3zxcxTL2hbe4lAA2OHjjIHAQO61Nw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCvRbngATTi05ew3YzyKOSo6HDrm2K9cjmeiDOPNO3Wh0V8rnj
-	mrScXmGHqAT7pUxHhvaHm0ezRq5NpyJJuz8BaPIfAochqcPd4dTrwMWTO276Q+FckiFSbAki+tE
-	2Xg==
-X-Google-Smtp-Source: AGHT+IFItqP6jLrD+gLp58Gl8QcN2yrFc4pGs4XpppXaKepcyhSGPWzl9QuhHTb7rXWq39jr+N72tg==
-X-Received: by 2002:a17:902:f552:b0:20b:85da:a6e5 with SMTP id d9443c01a7336-20bfdf64f63mr26121905ad.8.1728028168070;
-        Fri, 04 Oct 2024 00:49:28 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:17b3:dfd3:7130:df15])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beefafbfesm19122245ad.216.2024.10.04.00.49.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 00:49:27 -0700 (PDT)
-Date: Fri, 4 Oct 2024 16:49:24 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Yang Yang <yang.yang@vivo.com>
-Subject: Re: block: del_gendisk() vs blk_queue_enter() race condition
-Message-ID: <20241004074924.GQ11458@google.com>
-References: <20241003085610.GK11458@google.com>
- <Zv6d1Iy18wKvliLm@infradead.org>
- <Zv6fbloZRg2xQ1Jf@infradead.org>
- <20241003140051.GM11458@google.com>
- <20241003141709.GN11458@google.com>
- <20241004042127.GO11458@google.com>
- <Zv-O9tldIzPfD8ju@infradead.org>
- <20241004074818.GP11458@google.com>
+        bh=nCmr2NzFsgxtVcm+KzzvEFNxYTpPvNbNNxLvpB5hrI8=;
+        b=SqaiBavGPkKEQUTMyvd+aClushIV9GGRU28ITkgBr6ymQLbOmNPUpm5EbVHh69Eo4t
+         9XN/gEn/97Q3IrOuFEiaDw9nN4tFFQIgbmMuGXYXp9zPqMmjK8GO/ONXoWVJKdbiEd81
+         7Zh7ioqQk1hp58Byfbsp0LPniP6jJngwHbIi3I5Mi4wkIix8Hrrqmx0Eq4BenFdPqqZG
+         WRZiDiUF75tWMqvgrahZUEmyymE4Yf7QZfp38pLFPbYEbJgoaAQX5bCy45Gp5a7vOwZs
+         BReu68jbCLrAiLPKanG9rEnjpsp1QII/qs2CBrIvBi0ZQP+GCPcTCPLs4m+XK0TX3mQg
+         MGqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728028364; x=1728633164;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nCmr2NzFsgxtVcm+KzzvEFNxYTpPvNbNNxLvpB5hrI8=;
+        b=hNuK8ehg09mJRYHy+zExKebw7R59UmIO5dICN1yc4af37ZG8knD95JbgtyWrQBpA3u
+         HTJz/rm/vkjJGRw8c6hXfiQJmVjFRyzdtKS85sjBWrxTH0EiQf5NqHMWlhDPwAEW15fh
+         FPVL7jnJ5shGJ5Fooph6IymUI3Kh2HTUeULzBkS6KVtFfwU9SAJVTkXtKDfXxuGw/Tyx
+         p5h0krwi53+O98Lk2yZMWUiiXG4iIL4Ioz0GXNPPkcAxE6fzERYehHKFTXRr3U095TAM
+         1hilNGb0MoAVbp4CInoUWxHPT7wNyLglhDwX5lMvYELSoGXBf/fEaP/dnl3/igHSuwCu
+         NCfw==
+X-Forwarded-Encrypted: i=1; AJvYcCVPnCNMSLBfXOFhGhhtVFMHmOcYw4AbBmQxuWdC1dqYPwwD1QoSYVe6v+FHEQvNEUjWFaNkipbCi2Q4lw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOQax3SIMqKZG0biEZeLZ9rSwW/9Fae8j4pdluX1v3kmG1sg3f
+	WMogl7c/lzE0QAl6700X3nmdGYMT55U+gnRf3NtIWttJFnPshRj2WSZHGEXhW5XxSdZfiabr0ZS
+	a
+X-Google-Smtp-Source: AGHT+IE76QOCeJJ5ofZlvzBk7neiRJtspXeFIE3aYgejhCS89B2VGNTiw1f3BSY3t9L6R7QL9AYttQ==
+X-Received: by 2002:a2e:f1a:0:b0:2fa:d84a:bda1 with SMTP id 38308e7fff4ca-2faf3c1439dmr7645161fa.10.1728028363509;
+        Fri, 04 Oct 2024 00:52:43 -0700 (PDT)
+Received: from linux-l9pv.suse ([124.11.22.254])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e9dbc441b5sm2035252a12.0.2024.10.04.00.52.41
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 04 Oct 2024 00:52:43 -0700 (PDT)
+Date: Fri, 4 Oct 2024 15:52:39 +0800
+From: joeyli <jlee@suse.com>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Chun-Yi Lee <joeyli.kernel@gmail.com>,
+	Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
+	Pavel Emelianov <xemul@openvz.org>,
+	Kirill Korotaev <dev@openvz.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Nicolai Stange <nstange@suse.com>,
+	Greg KH <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] aoe: using wrappers instead of dev_hold/dev_put
+ for tracking the references of net_device in aoeif
+Message-ID: <20241004075239.GL3296@linux-l9pv.suse>
+References: <20241002040616.25193-1-jlee@suse.com>
+ <20241002040616.25193-3-jlee@suse.com>
+ <bee9261e-1d8d-41d3-a600-da962aa4cf0f@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,16 +78,27 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241004074818.GP11458@google.com>
+In-Reply-To: <bee9261e-1d8d-41d3-a600-da962aa4cf0f@kernel.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 
-On (24/10/04 16:48), Sergey Senozhatsky wrote:
-[..]
-> +	/*
-> +	 * Fail any new I/O.
-> +	 */
-> +	test_bit(GD_DEAD, &disk->state);
+Hi Damien,
 
-	 ^^^ set bit, of course.
+On Wed, Oct 02, 2024 at 02:37:12PM +0900, Damien Le Moal wrote:
+> On 10/2/24 1:06 PM, Chun-Yi Lee wrote:
+> > Signed-off-by: Chun-Yi Lee <jlee@suse.com>
+> 
+> The wrappers where introduced in patch 1 without any user. So it seems that
+> this patch should be squashed together with patch 1.
+>
 
-> +	blk_queue_disk_dead(disk->queue);
-> +
+I separated this two patches because the second one is base on another patch
+'[PATCH v3] aoe: fix the potential use-after-free problem in more places'. 
+
+Now that patch be accepted by Jens:
+https://www.spinics.net/lists/kernel/msg5384787.html
+
+According this, I will merge this patch with the 'PATCH 1' in next version.
+
+Thanks for your review and suggestion!
+
+Joey Lee
