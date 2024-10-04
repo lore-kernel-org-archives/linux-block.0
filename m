@@ -1,197 +1,157 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97281AA7B5
-	for <linux-block@vger.kernel.org>; Fri,  4 Oct 2024 15:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2275F1E32A5;
+	Fri,  4 Oct 2024 15:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728056105; cv=none; b=kyHGUP+rjxr6tEl6HLqHbuf+O4gRs/wUR0eVf65ts+VPRZooihnTEiJrbplQXjKvs99AbQJfqi53CH8H4lMoEihSyPs0Oa34WmrTlodRsukDKAOQ9ZQRYhdXCIY5oX3sXqTY+9exdcjlLAdVwzZtNtoaVQMlAVrOICwF6Ig3QiU=
+	t=1728056667; cv=none; b=UTBzrlax8Ol3fuiUIwzpyAowBQEIrWNgURkVrEQpU8TiLFqElBOTRBBZCyB7tFDfB5xhInwbm93bwldgl/Du8xZlfdD2uQYsuLWRQezaMrnA9tt5csneA9+B9G2nJV9+PkJwXN0JYAY8ixPU3AVT/lPsYSoOAbKOiw+nZsCzHuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728056105; c=relaxed/simple;
-	bh=4R+bjkkANUZFElUR3AnO4g7qOY03zDWdvgsvEAgGO8A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=juJO5sk9x+MqaVB7czsREClH1kYzN7C4zV9S7Dz3IgNKXq2IH6N6KJa55naspNSuytLoVuQxITMCTqzslsQO5UF9lVg+RS7QiTB4q/tJ+xWQ3TOYt99JGi1as95kzXJ2xPbGwkpiDxMIBVpTiSnFCj2Tw4rPYmcy/JPshud+KOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KxMxkNej; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1728056667; c=relaxed/simple;
+	bh=NCRbFchR/UiCwGDYeUZ5WgHfLqVnuUJ38glSDQuvl1w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QhuoIpXszYPOrNG7PmIBbTo43gPDshtdJn+IU5+kuC/UOL+cNsBh0wyAKNkqp7W4knPPrOpEg8gj1bBP1nU79TFwK1k02/zNY5M633HFh+kAqIatDkIo0jYDAn+YmVVzprZViCvr6oMcanm+dNijzeGMy8VrRnBSQUYaUJKR6i4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F9n2s60d; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KxMxkNej"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728056102;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tr59JQ1sfNf3b9KrmfGkricjfTXwGWXI04nwRJyi3R8=;
-	b=KxMxkNejy2EGfYGVA+XjKmGorme8fNgNrZ3FK3Vzw6Dn+QD/Q3+R+CJw0A85+msO3Zo/wp
-	HNRlgzQaqUvDRTSoq39MuodqGHi6VFLtgFfFyznuksWcn2EHBungF4vKVliJbSQMl4orou
-	z5vE9Z8epz+B3pYl9Gd8Jfhh2Suvs28=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-284-ciDQ5J12PYKA4ho9q_L3_A-1; Fri,
- 04 Oct 2024 11:34:58 -0400
-X-MC-Unique: ciDQ5J12PYKA4ho9q_L3_A-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3E8F519560BF;
-	Fri,  4 Oct 2024 15:34:57 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.24])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3141A19560A3;
-	Fri,  4 Oct 2024 15:34:52 +0000 (UTC)
-Date: Fri, 4 Oct 2024 23:34:47 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 4/5] ublk: support device recovery without I/O queueing
-Message-ID: <ZwALFzPLAW1AbW-J@fedora>
-References: <20241002220949.3087902-1-ushankar@purestorage.com>
- <20241002220949.3087902-5-ushankar@purestorage.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F9n2s60d"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a93b2070e0cso255415966b.3;
+        Fri, 04 Oct 2024 08:44:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728056664; x=1728661464; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dgROqxm/GM2bX7Pu2CBdkr0+nh2zIk2x+3LQPxQ2G+c=;
+        b=F9n2s60dFAeIEnhdl/XXA1UlYJAF4v/kwNJX3m9H7z4IQiAy4wKo9Evzt9ObRdEO/a
+         WeCtPqvCN2p6p9NW+MUTKyI4QlzCL0DKDw/vZR3aS9R/l1yQOHcSJsgEggc6lS7ADYEY
+         omqNfEXjl9WHSRTJhkzf32QLw/UIntyCwy7rN/8uUvI6AIsSCVShQbs8+q6sQ11rAF2M
+         7QynYKZRMnTDFl7lv8qIcKecjn4G51hy/jkb1WZ3pgq5d2s+HdA05fWu/zPKJrhhYQi2
+         0KPi8LaJDP2NB7sE+vasywBBJPeaEiATCHxldDUkCLx8ue4oF6bMa814Bk+YXhnqr0of
+         ysyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728056664; x=1728661464;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dgROqxm/GM2bX7Pu2CBdkr0+nh2zIk2x+3LQPxQ2G+c=;
+        b=qQp2t5pOcDXXmOGfD9sIaHEQs/nop4Ng7SRFRzQnibJJd8htZTa3+14l56hzQyylpF
+         FnH4PXHU3sTnRo/HQ0D5Z5cfT5Ne6FvDHNWwFZ7HI2QoEdSc5xRv/4o8gMGkm26+Tllh
+         Y5g7HU4M8VNeYQBwQlfDuNXLe2c8aUVWnuifNzUTzBjT7nv2FpB1ETE4F47aAkciS0GB
+         OAL409xgzHMIrSD/eCPfDOx2EDro/b56VdA28a2MvzBnI6qgK72t/yfrjUCYVUUOmYYk
+         4rht2fSmhXN/jar4SXLsa+1dV+ay/Dm8EUxhUSXiM6XoV/NFkHCxXaXH8ZV5BpSW6YLR
+         giAg==
+X-Forwarded-Encrypted: i=1; AJvYcCXodYiMY5vcL72kB8VKOd3RIJ07xtprMHE4Zd7kVmekaZjhdxIUWlgOTO0jTGKgZzAnyoEdGy5kVA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhqZjXHcJNMAzMoWrqqSpMEnjZB8UVoKdJZHJen9iBgXhMXuKW
+	WIKmT/V5wiUZi8wvnWYh68Bw2/QCzQmqtgiKySogK2wemuAv9Qi7
+X-Google-Smtp-Source: AGHT+IGu9zzz95tzmTvytgqZ6lk5aOX5Jip1eg/14hVAScy2A6Y/ctuNc0UfANbgtyVNgJUIGI+Zcg==
+X-Received: by 2002:a17:907:3e21:b0:a8a:18f9:269f with SMTP id a640c23a62f3a-a991c077e3dmr325612766b.60.1728056664043;
+        Fri, 04 Oct 2024 08:44:24 -0700 (PDT)
+Received: from [192.168.42.59] (82-132-213-31.dab.02.net. [82.132.213.31])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a992e7c46e3sm6350466b.180.2024.10.04.08.44.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Oct 2024 08:44:23 -0700 (PDT)
+Message-ID: <b232fa58-1255-44b2-92c9-f8eb4f70e2c9@gmail.com>
+Date: Fri, 4 Oct 2024 16:44:54 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241002220949.3087902-5-ushankar@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V6 7/8] io_uring/uring_cmd: support provide group kernel
+ buffer
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ io-uring@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+References: <20240912104933.1875409-1-ming.lei@redhat.com>
+ <20240912104933.1875409-8-ming.lei@redhat.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20240912104933.1875409-8-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 02, 2024 at 04:09:48PM -0600, Uday Shankar wrote:
-> ublk currently supports the following behaviors on ublk server exit:
+On 9/12/24 11:49, Ming Lei wrote:
+> Allow uring command to be group leader for providing kernel buffer,
+> and this way can support generic device zero copy over device buffer.
 > 
-> A: outstanding I/Os get errors, subsequently issued I/Os get errors
-> B: outstanding I/Os get errors, subsequently issued I/Os queue
-> C: outstanding I/Os get reissued, subsequently issued I/Os queue
+> The following patch will use the way to support zero copy for ublk.
 > 
-> and the following behaviors for recovery of preexisting block devices by
-> a future incarnation of the ublk server:
-> 
-> 1: ublk devices stopped on ublk server exit (no recovery possible)
-> 2: ublk devices are recoverable using start/end_recovery commands
-> 
-> The userspace interface allows selection of combinations of these
-> behaviors using flags specified at device creation time, namely:
-> 
-> default behavior: A + 1
-> UBLK_F_USER_RECOVERY: B + 2
-> UBLK_F_USER_RECOVERY|UBLK_F_USER_RECOVERY_REISSUE: C + 2
-> 
-> The behavior A + 2 is currently unsupported. Add support for this
-> behavior under the new flag combination
-> UBLK_F_USER_RECOVERY|UBLK_F_USER_RECOVERY_FAIL_IO.
-> 
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
-> Changes since v2 (https://lore.kernel.org/linux-block/20240917002155.2044225-5-ushankar@purestorage.com/):
-> - Clean up logic in ublk_ctrl_end_recovery
+>   include/linux/io_uring/cmd.h  |  7 +++++++
+>   include/uapi/linux/io_uring.h |  7 ++++++-
+>   io_uring/uring_cmd.c          | 28 ++++++++++++++++++++++++++++
+>   3 files changed, 41 insertions(+), 1 deletion(-)
 > 
->  drivers/block/ublk_drv.c      | 78 ++++++++++++++++++++++++++++-------
->  include/uapi/linux/ublk_cmd.h | 18 ++++++++
->  2 files changed, 81 insertions(+), 15 deletions(-)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index d5edef7bde43..f2a05dcbc58b 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -60,10 +60,12 @@
->  		| UBLK_F_UNPRIVILEGED_DEV \
->  		| UBLK_F_CMD_IOCTL_ENCODE \
->  		| UBLK_F_USER_COPY \
-> -		| UBLK_F_ZONED)
-> +		| UBLK_F_ZONED \
-> +		| UBLK_F_USER_RECOVERY_FAIL_IO)
->  
->  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
-> -		| UBLK_F_USER_RECOVERY_REISSUE)
-> +		| UBLK_F_USER_RECOVERY_REISSUE \
-> +		| UBLK_F_USER_RECOVERY_FAIL_IO)
->  
->  /* All UBLK_PARAM_TYPE_* should be included here */
->  #define UBLK_PARAM_TYPE_ALL                                \
-> @@ -146,6 +148,7 @@ struct ublk_queue {
->  	bool force_abort;
->  	bool timeout;
->  	bool canceling;
-> +	bool fail_io; /* copy of dev->state == UBLK_S_DEV_FAIL_IO */
->  	unsigned short nr_io_ready;	/* how many ios setup */
->  	spinlock_t		cancel_lock;
->  	struct ublk_device *dev;
-> @@ -690,7 +693,8 @@ static inline bool ublk_nosrv_should_reissue_outstanding(struct ublk_device *ub)
->   */
->  static inline bool ublk_nosrv_dev_should_queue_io(struct ublk_device *ub)
->  {
-> -	return ub->dev_info.flags & UBLK_F_USER_RECOVERY;
-> +	return (ub->dev_info.flags & UBLK_F_USER_RECOVERY) &&
-> +	       !(ub->dev_info.flags & UBLK_F_USER_RECOVERY_FAIL_IO);
->  }
->  
->  /*
-> @@ -700,7 +704,8 @@ static inline bool ublk_nosrv_dev_should_queue_io(struct ublk_device *ub)
->   */
->  static inline bool ublk_nosrv_should_queue_io(struct ublk_queue *ubq)
->  {
-> -	return ubq->flags & UBLK_F_USER_RECOVERY;
-> +	return (ubq->flags & UBLK_F_USER_RECOVERY) &&
-> +	       !(ubq->flags & UBLK_F_USER_RECOVERY_FAIL_IO);
->  }
->  
->  /*
-> @@ -714,6 +719,12 @@ static inline bool ublk_nosrv_should_stop_dev(struct ublk_device *ub)
->  	return !(ub->dev_info.flags & UBLK_F_USER_RECOVERY);
->  }
->  
-> +static inline bool ublk_dev_in_recoverable_state(struct ublk_device *ub)
+> diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
+> index 447fbfd32215..fde3a2ec7d9a 100644
+> --- a/include/linux/io_uring/cmd.h
+> +++ b/include/linux/io_uring/cmd.h
+> @@ -48,6 +48,8 @@ void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+>   void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+>   		unsigned int issue_flags);
+>   
+> +int io_uring_cmd_provide_kbuf(struct io_uring_cmd *ioucmd,
+> +		const struct io_uring_kernel_buf *grp_kbuf);
+>   #else
+>   static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+>   			      struct iov_iter *iter, void *ioucmd)
+> @@ -67,6 +69,11 @@ static inline void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+>   		unsigned int issue_flags)
+>   {
+>   }
+> +static inline int io_uring_cmd_provide_kbuf(struct io_uring_cmd *ioucmd,
+> +		const struct io_uring_kernel_buf *grp_kbuf)
 > +{
-> +	return ub->dev_info.state == UBLK_S_DEV_QUIESCED ||
-> +	       ub->dev_info.state == UBLK_S_DEV_FAIL_IO;
+> +	return -EOPNOTSUPP;
 > +}
-> +
->  static void ublk_free_disk(struct gendisk *disk)
->  {
->  	struct ublk_device *ub = disk->private_data;
-> @@ -1275,6 +1286,10 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
->  	struct request *rq = bd->rq;
->  	blk_status_t res;
->  
-> +	if (unlikely(ubq->fail_io)) {
-> +		return BLK_STS_TARGET;
-> +	}
-> +
->  	/* fill iod to slot in io cmd buffer */
->  	res = ublk_setup_iod(ubq, rq);
->  	if (unlikely(res != BLK_STS_OK))
-> @@ -1625,6 +1640,7 @@ static void ublk_nosrv_work(struct work_struct *work)
->  {
->  	struct ublk_device *ub =
->  		container_of(work, struct ublk_device, nosrv_work);
-> +	int i;
->  
->  	if (ublk_nosrv_should_stop_dev(ub)) {
->  		ublk_stop_dev(ub);
-> @@ -1634,7 +1650,18 @@ static void ublk_nosrv_work(struct work_struct *work)
->  	mutex_lock(&ub->mutex);
->  	if (ub->dev_info.state != UBLK_S_DEV_LIVE)
->  		goto unlock;
-> -	__ublk_quiesce_dev(ub);
-> +
-> +	if (ublk_nosrv_dev_should_queue_io(ub)) {
-> +		__ublk_quiesce_dev(ub);
-> +	} else {
-> +		blk_mq_quiesce_queue(ub->ub_disk->queue);
-> +		for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
-> +			ublk_get_queue(ub, i)->fail_io = true;
-> +		}
-> +		blk_mq_unquiesce_queue(ub->ub_disk->queue);
-> +		ub->dev_info.state = UBLK_S_DEV_FAIL_IO;
+>   #endif
+>   
+>   /*
+> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+> index 2af32745ebd3..11985eeac10e 100644
+> --- a/include/uapi/linux/io_uring.h
+> +++ b/include/uapi/linux/io_uring.h
+> @@ -271,9 +271,14 @@ enum io_uring_op {
+>    * sqe->uring_cmd_flags		top 8bits aren't available for userspace
+>    * IORING_URING_CMD_FIXED	use registered buffer; pass this flag
+>    *				along with setting sqe->buf_index.
+> + * IORING_PROVIDE_GROUP_KBUF	this command provides group kernel buffer
+> + *				for member requests which can retrieve
+> + *				any sub-buffer with offset(sqe->addr) and
+> + *				len(sqe->len)
 
-The above state update should be moved before blk_mq_unquiesce_queue().
+Is there a good reason it needs to be a cmd generic flag instead of
+ublk specific?
 
-Otherwise, this patch is fine.
+1. Extra overhead for files / cmds that don't even care about the
+feature.
 
-Thanks, 
-Ming
+2. As it stands with this patch, the flag is ignored by all other
+cmd implementations, which might be quite confusing as an api,
+especially so since if we don't set that REQ_F_GROUP_KBUF memeber
+requests will silently try to import a buffer the "normal way",
+i.e. interpret sqe->addr or such as the target buffer.
 
+3. We can't even put some nice semantics on top since it's
+still cmd specific and not generic to all other io_uring
+requests.
+
+I'd even think that it'd make sense to implement it as a
+new cmd opcode, but that's the business of the file implementing
+it, i.e. ublk.
+
+>    */
+>   #define IORING_URING_CMD_FIXED	(1U << 0)
+> -#define IORING_URING_CMD_MASK	IORING_URING_CMD_FIXED
+> +#define IORING_PROVIDE_GROUP_KBUF	(1U << 1)
+> +#define IORING_URING_CMD_MASK	(IORING_URING_CMD_FIXED | IORING_PROVIDE_GROUP_KBUF)
+>   
+>   
+>   /*
+-- 
+Pavel Begunkov
