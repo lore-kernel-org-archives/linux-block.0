@@ -1,99 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBCE1D9A47
-	for <linux-block@vger.kernel.org>; Fri,  4 Oct 2024 15:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB1F14A4F0
+	for <linux-block@vger.kernel.org>; Fri,  4 Oct 2024 15:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728054256; cv=none; b=JrBrxP9YA4uZw0ER8crgNmDkcpVxreI6mDN4l5+Mv6K4Fls7vier9/78DbLkVfGPyYZBCpNBdzChJlO/10e6iAi93khFt40+tR3OCt9nUqWGO9hGVua74IzzA93kotR4oRM99rpwrMZWJ7ztShtMHGUZMspztIv8g0D3/R9rhI8=
+	t=1728054665; cv=none; b=RHhiri2BWM0V7FJDl/T74uDlwk6uPXY09lwMDU19cKAOrAVq/yIin3AsLYrfINOrEAPPUoo3Ov1WmITOlfyAhQFrpXeqUcs4K4gxeXAwqI+2xs73bNY728A0CK3bw7P2/57z94+gHA+644kZYeMhMopQxnrsm6dnCp0MaZbQ3LY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728054256; c=relaxed/simple;
-	bh=0Mvf8g0y/IetiNf9TuF7nLsheo7/DratM5IF+Ugx0M8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ETvT3jT0pbj/lOk6Bj1NKFyyyiAxf7kq81hKOZw5vu6JQ6jjQkFFuWDmIv3ilZQdAHo8mHzi4QusAqDyOZU+zqyPSWKGMgVeIE9lwR/c+VvM0KIwbkkyTkpifGwIe6T8+1re2sc/QC6FcA8mNLPLWevfBW3c+3ybaxmbSTw4GMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lg3RCbtL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728054665; c=relaxed/simple;
+	bh=jnFHM6r84Lfl4o6JLyFBiFlq646o9aL1iijbE9lg7Qo=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=ADN5MLZdrZIvvV4hwf+06KnISJOfTU2uvQmBwUjCkZ5RGWZxHu40vP/92492glpc42rULjYzuhHAS6DcY5i3k9qkz/HqcsOVBn+gbD4X6gkAJdy2KFqtICvZmJn6doeWfwXaD97NvVOGqejwvimIhm0c3itMm6vSp1Jb2Zsyzm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=hpFzPiza; arc=none smtp.client-ip=209.85.166.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lg3RCbtL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D9EBC4CEC6;
-	Fri,  4 Oct 2024 15:04:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728054255;
-	bh=0Mvf8g0y/IetiNf9TuF7nLsheo7/DratM5IF+Ugx0M8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Lg3RCbtLVm+YVVxm5s0AfTybLJu01G/6mZpS9n7hqn/zSd0ZZLLC491mDoB+pLT8H
-	 JVWfnHIuD5eGv/U4kRn4UUNmBo/Zt0zp4M+DnEDerpGq3D0lkGIHMPfGZfuPW+YZBW
-	 XIdecAdBeaCURpJ0vv3xke4zUnxtVhk30as6zXB9wBNAcDqsCT68hnRPeAyJ/crUkx
-	 Cwa38U8mTN2nGhrE/9PX212/WMwXPz7ALmUueRCiMpB/kXJ7xoBKkg5Dmy1A6gbdZr
-	 TtJPhqZ/Cm8jTZR4Deul75mVKMimnvep5Vnr0GQwKKiMuWl1OiX+PVzjfhnQKq6G1/
-	 T3hr0oiq6X5ug==
-Date: Fri, 4 Oct 2024 09:04:13 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	axboe@kernel.dk
-Subject: Re: [PATCHv2] block: enable passthrough command statistics
-Message-ID: <ZwAD7RZjqpzQl43s@kbusch-mbp>
-References: <20241003153036.411721-1-kbusch@meta.com>
- <20241004053828.GA14377@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="hpFzPiza"
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-82aa8c36eefso123136039f.3
+        for <linux-block@vger.kernel.org>; Fri, 04 Oct 2024 08:11:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728054662; x=1728659462; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0tYC/ZBKecAVxkW5RVRCH9rQaXnyU8yQuRYba++SXmc=;
+        b=hpFzPizaNffTp3sUlRoVXClUAbLW4Fni8DcYP10lGROv1uXuesQXkwqqivBDKnnjvb
+         l6LdeWhVfwJfUXTFlO2L1ZL6LUjp0nyVUdkg7gH2jvpQIpm2V04bN0c7Wp6pu2orCjuS
+         2fz0Z93xVd5Z+ZzKF1bfaI+7TdL9+4wgyCI90Iy5e6ZdryKaFL0C+1het6NbzIFqaiFk
+         6D8v1fMHVAgsPR+IFJbcW360ra9oiBZCba7GAwWgDVjXhlnH6Epp+sW+z+fmRGEtnFV9
+         c+nkkFUj5cyORTQTJHmi0Wk1XDoaY9PRR3q6s2ZvKbpzjonFoBbm3r2+r9w48G76fNCV
+         fEEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728054662; x=1728659462;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0tYC/ZBKecAVxkW5RVRCH9rQaXnyU8yQuRYba++SXmc=;
+        b=f8iS17wNgCqUM3x7X5RsfHEn85xnF2IICQf5N3G5Ffq2mJ20d6NrEj7DvstJ377gco
+         xMawvxhFf8xG/kfGNPdVBC+aH6qdFz5CsHuNcoeBeh2bSeU/5z5AJHpULj9/SZQioVPF
+         t0KC4ZTcPeg0uXxuB3t29mlKt/Mjks0IL25JMA3fAKPYL4e6XxMfggbW8h/F9VkwwYqQ
+         ZKjWb7hVRvCUgHBkS2bTpfzvN8AHv0j9slLq138LgPKFGfw1VZcSw1jjWxZveFrIKApT
+         R/XhEaI1aZVzovTFH9+I/RPQvL4qqzIwpg7wgvAuzxasmnw8xf5njtf03sSOvuRWE31U
+         jaxw==
+X-Gm-Message-State: AOJu0YwChQnN2ynH4jS8YuEbfoQr6N8SjJyBH0lHE1cR4RZ9URFMtDVw
+	nVp98q9kjytxA2/ErZ8z2ZNtiYxFjAG+Zp0rgPSZBs+GWJdEHzu846WpfMhXs8ybmHkP1OWMVFg
+	z59k=
+X-Google-Smtp-Source: AGHT+IGl120Gyp+DnSn31/PKOF3vxTsl2vgUqZ6j5Q2Yi2Pv6dskZPIR0J2AogO0QDLtgrTa4aAoog==
+X-Received: by 2002:a05:6602:6c09:b0:82d:13ce:2956 with SMTP id ca18e2360f4ac-834f7d620e9mr339160539f.10.1728054662233;
+        Fri, 04 Oct 2024 08:11:02 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4db6ebf0adbsm8922173.115.2024.10.04.08.11.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Oct 2024 08:11:01 -0700 (PDT)
+Message-ID: <bc04d464-e0bd-457f-83d1-95f12b95f54e@kernel.dk>
+Date: Fri, 4 Oct 2024 09:11:01 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241004053828.GA14377@lst.de>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.12-rc2
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 04, 2024 at 07:38:28AM +0200, Christoph Hellwig wrote: > 
-> Missing. At the end of the sentence.  But even then this doesn't
-> explain why not accouting these requests is fine.
-> 
->  - requests without a bio are all those that don't transfer data
->  - requests with a bio but not bdev are almost all passthrough requests
->    as far as I can tell, with the only exception of nvme I/O command
->    passthrough.
-> 
-> I.e. what we have here is a special casing for nvme I/O commands.  Maybe
-> that's fine, but the comments and commit log should leave a clearly
-> visible trace of that and not confuse the hell out of people trying to
-> understand the logic later.
+Hi Linus,
 
-Even Jens was a little surprised to find nvme passthrough sets the bio
-bi_bdev. I didn't think it was unusual, but sounds like we are doing
-something special here.
- 
-> > +	/*
-> > +	 * Ensuring the size is aligned to the block size prevents observing an
-> > +	 * invalid sectors stat.
-> > +	 */
-> > +	if (blk_rq_bytes(req) & (bdev_logical_block_size(bio->bi_bdev) - 1))
-> > +		return false;
-> 
-> Now this probably won't trigger anyway for the usual workload (although
-> it might for odd NVMe command sets like KV and the SLM), but I'd expect the
-> size to be rounded (probably up?) and not entirely dropped.
+A few fixes for the block stack that should go into 6.12-rc2:
 
-This prevents commands with payload sizes that are not representative of
-sector access. Examples from NVMe include Copy, Dataset Management, and
-all the Reservation commands. The transfer size of those commands are
-unlikely to be a block aligned, so it's a simple way to filter them out.
-Rounding the payload size up will produce misleading stats, so I think
-it's better if they don't get to use the feature.
+- Fix another use-after-free in aoe
 
-> > +	ret = queue_var_store(&ios, page, count);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	if (ios)
-> > +		blk_queue_flag_set(QUEUE_FLAG_IOSTATS_PASSTHROUGH,
-> > +				   disk->queue);
-> > +	else
-> > +		blk_queue_flag_clear(QUEUE_FLAG_IOSTATS_PASSTHROUGH,
-> > +				     disk->queue);
-> 
-> Why is this using queue flags now?  This isn't really blk-mq internal,
-> so it should be using queue_limits->flag as pointed out last round.
+- Fixup wrong nested non-saving irq disable/restore in blk-iocost.
 
-So many flags... The atomic limit update seemed overkill for just this
-flag, but okay.
+- Fixup a kerneldoc complaint introduced by a merge window patch.
+
+Please pull!
+
+
+The following changes since commit 9852d85ec9d492ebef56dc5f229416c925758edc:
+
+  Linux 6.12-rc1 (2024-09-29 15:06:19 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.12-20241004
+
+for you to fetch changes up to 6d6e54fc71ad1ab0a87047fd9c211e75d86084a3:
+
+  aoe: fix the potential use-after-free problem in more places (2024-10-02 07:16:44 -0600)
+
+----------------------------------------------------------------
+block-6.12-20241004
+
+----------------------------------------------------------------
+Chun-Yi Lee (1):
+      aoe: fix the potential use-after-free problem in more places
+
+Dan Carpenter (1):
+      blk_iocost: remove some duplicate irq disable/enables
+
+Keith Busch (1):
+      block: fix blk_rq_map_integrity_sg kernel-doc
+
+ block/blk-integrity.c      |  3 +--
+ block/blk-iocost.c         |  8 ++++----
+ drivers/block/aoe/aoecmd.c | 13 ++++++++++++-
+ 3 files changed, 17 insertions(+), 7 deletions(-)
+
+-- 
+Jens Axboe
+
