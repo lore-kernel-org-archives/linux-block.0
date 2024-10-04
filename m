@@ -1,84 +1,148 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52122139C9;
-	Fri,  4 Oct 2024 14:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256E7156F53;
+	Fri,  4 Oct 2024 14:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728051048; cv=none; b=t/p+TAvAVJ+05kphIH2qiBv4TyitVs6KV+fN67A6InKuthsPW+vpeu52/n8bjAscALURcGP36jHL6CCxX/uQpOlWXUJI5sK4TaRHBqBhbljl0dH1tP7Qc1LLXQFKQd/0plbl8BinzWqOPIBNxLH7EjFm3nECRFle4/XR+I6ovfs=
+	t=1728051329; cv=none; b=jhcH0d5BJHGCUPnTuFPTfBWQY4pAlBMivkHxMf6jwUs/j+KkAcmhlc54msgYVtvvLFVZw5oRjwbO0PR+yx7FvZyDQU1oDbijospSSzNFY4YpE79Hr0k3ITAUgs2grTbYBPUc1LrWnETyifD3sr/Yd7+U5LQyZANUaO7eMEcN5os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728051048; c=relaxed/simple;
-	bh=JcoAozjGe6KJwo8JlLKfy7dzBgqW2BEBvSTA/VAxTfw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m/nAilbIGqjDRneNtlu+EGZ+cG21ZlG+6t8NJE6LGLVYVImt2BqmjOt9VIjSrQUEmjWzHhceHeR6j0OFvErmEqZH9P6JrOL/1iO6JG06G9b6Mr4UFu5fKzs4OAZqTsSSVNIOa5MoU/AF2a+zss+roqeAH8Qrl+snj1hUczEUcsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FRQhRwdB; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728051329; c=relaxed/simple;
+	bh=f0CIDOic0aOSPv4Rhb8ws9vKJ2LlNOZ8BXzrfe1DNiU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fz2uE4tUAPxJAkiYjR4GBXAYZlb/T/o9A2BYio96glEFTVUiCEXiPidYfnB8aTtAuPbzUEeq/oJ28DUIYb6yUdUaqTOKzHxsb0Bb9WNYCSL9jdWTd91IhCuMjHh6KA3eA0h+CRzEknUuL52lY2PbX8YwFdCzXIMYBWsc231NllE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=SEKJF3tF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0KdTuOfy; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=SEKJF3tF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0KdTuOfy; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FRQhRwdB"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20aff65aa37so18681845ad.1;
-        Fri, 04 Oct 2024 07:10:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728051044; x=1728655844; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Sfd0dihu7gfegBqVS9/NP6tMEUAcyFXZ5iJaoj+m2kw=;
-        b=FRQhRwdBAPr+1DR6VheuSOxfMQmi0PDbg4/odiyghl+4k/BxmEL0i+U0qd8Z1wCx6Y
-         8sUxN8VZef8yaWMW/clve1/6budN7YnCUHl8WR/KFsWzVucogxXKJw57psTpdFmXMjdW
-         8LMfdXClFwevZjjkF3hics5swOYZ0LAZt5YMBWwyWWlL3lLS29Sk/mbWcRUuNlQPiHaM
-         pCFWMEi1BvMRcflqwP5SeXGVXi15dZ8Sgb/hHUWBOw6mOYWzZxAeRDTqLubsgmMWawTx
-         GGp8oS3nXfX49rn+PEPIpNcO7tjf0fPjX83dD/SPyDJzfec8iVgQXX9Zjo06kA9qkRKp
-         IGHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728051044; x=1728655844;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Sfd0dihu7gfegBqVS9/NP6tMEUAcyFXZ5iJaoj+m2kw=;
-        b=c0sJnvKJV5osiHFZcwktyJk2SetLAz1cwatIW6G+tEOi3I1MyqtPk3ZBY96xXhkisT
-         Bu+DtpRbwZtR+JDGUaMm0xCzk2UJ1t16U/COHBW5dBGcl6V6FTWNs5b+wndlIK6lYSlC
-         UKLnhWmVDZWS2rBQKY4BVA6RoxKtJS2FohzGj9/tKsgRPkewLFhrnVgZA80dv8j+ZBjj
-         qoWnZc9obsbQ8F0sWXb0qqzLoDPcivGxGWgo4uAAK25VFkznKBGHo4lTeQBUux/GO7Lw
-         VfT/T2JGtQHCzuB/eakjSq1eh8sQCvDu7adlWo3wezeB9ethBSSs+U/cmxl5yPQnrfZJ
-         4o9w==
-X-Forwarded-Encrypted: i=1; AJvYcCW5XWFDDisJ8PBrFL2wBQCROhfB0a53hTlyZYIdbgKljDilyzar/Xjuy7vddFgAzE51pVhGWDLQx9E8BQ==@vger.kernel.org, AJvYcCXciPvyKfe7vCbIsb0ChaHcR2QouPwBDqNP6uWkSrBVn3BElgWfv0cqpqSbWe3IqAL2iIS+wwI3zq57Vdtk@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDMhdqBQoyCE31K0pU03eZHFCk0fWyQSv3nXw0K1dR92bIX10m
-	m7Qz+1iXpEOsD+qLXNcW2GyKoVo6LcD3dGg7c0A5e6V+Vpe+yXBP
-X-Google-Smtp-Source: AGHT+IEC6qnaS9VbQbPqrtFDm5c4hbnrAi1LBKJRSfHwE5682SXEXs7jSskoTR2Yjzx112qTn+aKyg==
-X-Received: by 2002:a17:902:db0d:b0:20b:8642:9863 with SMTP id d9443c01a7336-20bfdfc268dmr44096215ad.18.1728051043743;
-        Fri, 04 Oct 2024 07:10:43 -0700 (PDT)
-Received: from purva-IdeaPad-Gaming-3-15IHU6.. ([2405:204:20:6275:2654:2317:92c7:7b80])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beeca00a5sm24580825ad.113.2024.10.04.07.10.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 07:10:43 -0700 (PDT)
-From: SurajSonawane2415 <surajsonawane0215@gmail.com>
-To: hch@infradead.org
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	surajsonawane0215@gmail.com
-Subject: Explanation on Uninitialized Variable bio in blk_rq_prep_clone
-Date: Fri,  4 Oct 2024 19:40:37 +0530
-Message-Id: <20241004141037.43277-1-surajsonawane0215@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <Zv_eFIjstVns-ebG@infradead.org>
-References: <Zv_eFIjstVns-ebG@infradead.org>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="SEKJF3tF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0KdTuOfy";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="SEKJF3tF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0KdTuOfy"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 3C70C21D5F;
+	Fri,  4 Oct 2024 14:15:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1728051326; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jubd/UlB1yY1O3O6FyQ5eLpMul/tBHAq/yP21hqjlBU=;
+	b=SEKJF3tFNxke/7bupTLBkLU5JAsQOKwwrM3oPbBN7/V8FyG7JsAajI9yRXIMA73BZYMX0v
+	ov4ePImL8iGFj7RvumbInI06UeDnme8zsgzgSmTKG1a10N9MuChjZojFKqF/+M6zovPh/p
+	ecFheyRO7S8MaiIho3n1+9mBWChfRIY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1728051326;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jubd/UlB1yY1O3O6FyQ5eLpMul/tBHAq/yP21hqjlBU=;
+	b=0KdTuOfyQSfG6WbIudxiNmtswXW9OTHKyJjZz2J396CZ4490KH9tMObltqYcXKGdOnKemE
+	1U/6tg6TVjZFkdBw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=SEKJF3tF;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=0KdTuOfy
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1728051326; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jubd/UlB1yY1O3O6FyQ5eLpMul/tBHAq/yP21hqjlBU=;
+	b=SEKJF3tFNxke/7bupTLBkLU5JAsQOKwwrM3oPbBN7/V8FyG7JsAajI9yRXIMA73BZYMX0v
+	ov4ePImL8iGFj7RvumbInI06UeDnme8zsgzgSmTKG1a10N9MuChjZojFKqF/+M6zovPh/p
+	ecFheyRO7S8MaiIho3n1+9mBWChfRIY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1728051326;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jubd/UlB1yY1O3O6FyQ5eLpMul/tBHAq/yP21hqjlBU=;
+	b=0KdTuOfyQSfG6WbIudxiNmtswXW9OTHKyJjZz2J396CZ4490KH9tMObltqYcXKGdOnKemE
+	1U/6tg6TVjZFkdBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1AEF513A6E;
+	Fri,  4 Oct 2024 14:15:26 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 7ZZjA374/2Z6ZAAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 04 Oct 2024 14:15:26 +0000
+Message-ID: <99ab354d-b6b4-40e0-9f7a-d83b195e5719@suse.de>
+Date: Fri, 4 Oct 2024 16:15:25 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Explanation on Uninitialized Variable bio in blk_rq_prep_clone
+To: SurajSonawane2415 <surajsonawane0215@gmail.com>, hch@infradead.org
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <Zv_eFIjstVns-ebG@infradead.org>
+ <20241004141037.43277-1-surajsonawane0215@gmail.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20241004141037.43277-1-surajsonawane0215@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 3C70C21D5F
+X-Spam-Score: -4.50
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.50 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.19)[-0.971];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,infradead.org];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-Explaination of how bio could be used uninitialized in this function:
+On 10/4/24 16:10, SurajSonawane2415 wrote:
+> Explaination of how bio could be used uninitialized in this function:
+> 
+> In the function blk_rq_prep_clone, the variable bio is declared but can remain uninitialized
+> if the allocation with bio_alloc_clone fails. This can lead to undefined behavior when the
+> function attempts to free bio in the error handling section using bio_put(bio).
+> By initializing bio to NULL at declaration, we ensure that the cleanup code will only
+> interact with bio if it has been successfully allocated.
+> 
+Hate to say it, but it looks you are correct.
+Care to send a patch?
 
-In the function blk_rq_prep_clone, the variable bio is declared but can remain uninitialized 
-if the allocation with bio_alloc_clone fails. This can lead to undefined behavior when the 
-function attempts to free bio in the error handling section using bio_put(bio). 
-By initializing bio to NULL at declaration, we ensure that the cleanup code will only 
-interact with bio if it has been successfully allocated.
+Cheers,
 
-Best regards,
-Suraj Sonawane
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
