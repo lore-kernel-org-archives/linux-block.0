@@ -1,238 +1,286 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B2B210180;
-	Fri,  4 Oct 2024 13:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728047262; cv=fail; b=AdmgytuR2CtCrODwgItAzEqQ5bmwbVqQeadtYuGucMVenxXQvM1ICNVaHxIDLwGCeXHktPFkC7Ck0QSh2a2dFob4iJRlza41PjwtsqTpnjCkTruYU8+4kjVKvPzm2TGi4fQ/NTsPGu+UestELB3Dd3DT85bCV9tHLv5hSFw8dkc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728047262; c=relaxed/simple;
-	bh=se+KO1+WnkDpDCJuuH2D/mgk3gd5JyySFoh7120GktU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=vFCmhtVJmhv3w5Rf7qXEjcblM+VUWVfW5gRHzbdkNYVWkyy4ho/ZWot6SHXVy5nDl6NoydNsPX+rIOfA59eJyy3k0bwzlR95Dn17ubxlT75oFAt5umwQpPVeSj6y7g/X5Crs4PpO1XlSGk/HnfDWrDJ7qixiMEsdmffmxgJ9a6w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=jbsfMxPm; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=HzF7gD0+; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448C279F3;
+	Fri,  4 Oct 2024 13:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728047522; cv=none; b=SjVdfMtJojfS4+dnnmktEvfThIFGSl8gFxRIoaE9ukVrSZWnPV+fgyWmVJ3ATkSY5U8a+vAkEwd4i8KGLQwQixqi5wYgiztRvcDmlTQbf/ZqUeGoeg2zS/DacDHRdnyBtJaLRFRywHqwVBpr6Yrn8W+PnVlGFIaKzs5jsqWTRiU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728047522; c=relaxed/simple;
+	bh=N9PKPLTeWGSfz8qm954M/TcgcWGDBef//4vO4vU1/S4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c4I2M9Kp5u4KESWYUk2tECaEdlmmaMEzd7A27e+L0Xau4n50N4Yn4uOHiC2nXgKqKxA1fwlaM8lKtgfh6PyhOhNptMu2iN3cpbTZJ+vEjTlpP3+hiLt3yh5J1x9/GRDLKvQjiHrRc35TuM9x7cID2zgsV59Vx/lx3F8d+yS5tcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mh5o1uET; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jbsfMxPm";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="HzF7gD0+"
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 494CMXQG005633;
-	Fri, 4 Oct 2024 13:07:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=
-	corp-2023-11-20; bh=4+MUecNKIC28dP78VgEX4gOlD3WWQ9xvsh/4HgXLst0=; b=
-	jbsfMxPmHRxREUK25lv4m35mWfLrEGFenWsEzFu0Qq8DNw/X1faqFl/ksmpbAIcW
-	fV934CZj2VI3/ikQZRrIpWVf3f/CedPNubTDZ/LFYYf4sOHsTJm+RCqKS1R4V+Z8
-	1jGiQaVbI5F/pMXuHqXaaX5Hz1nU95DbMCCpft/pp3cpu7G/5rcW6+D4Lw2c2c+N
-	cMChUnE1gt+foQ2nEzclGPQk8gClAvIR0Dkz3JHwvrHdM2F+OeLG+f72WThp1Bpv
-	L0mqXtEmnxXZYjvENzKiDVJR5yhwGe4RVo+0S2mrrNfk1QVoLV9cX3V9LNXbFVwl
-	ctvCHTmnjPq86awfHzHq0Q==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 42206m1hba-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 04 Oct 2024 13:07:13 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 494BbHoc038180;
-	Fri, 4 Oct 2024 13:07:12 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2101.outbound.protection.outlook.com [104.47.58.101])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4220578ard-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 04 Oct 2024 13:07:12 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AABohpYnUhWfgDKywGRi6dP+WUioNXCbnHmwNXisiY/IBlAbZFlVCpmUUFsmTPHUVd6T/P/3olfMb/tfQnzNmBtHofisS48+1Ne0KWRwfrx30jGgbcdX9IYnOlMDGs7dwkvpOd+KaFuNRsOa3w+d2M1UcQVEbBwizUYro7oABpBLAiwplodLeFC7Kkb8i05JM3fWR1fPoIQtWiCNB8m2m1eQuRg2oFQq0IgNZSpAOiYkr1n/zQYCeXZ/Q3aV5oWTrxzQKpNQxeCL1CVwPj7S81y6em4b7EowG+whSsNXuVn7R8Qba7u/MN02GBCCs97iiuCnssOerfGusqhzifNpCg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4+MUecNKIC28dP78VgEX4gOlD3WWQ9xvsh/4HgXLst0=;
- b=cQEUpZoKU+WRbaUiE4LEA/8v06TPAufJ1XHZ6YQ88gO15gyjcxA5YiL87yQ/DIGnK0O/bc4pxmSfatA4BJwuf4RpDQoDB1OErQ9bFtjqldfbQ6Qv6lK2m35U5A2UhDdTcBOCFfQ4uvNWnwbAcp5eSDzCBL9w68KVbIeNhc0az9tJ/7dm8A3i2Rsea0Dhxp54WLJASD5PFCmf/q05E9/YG5+V7qjMCJh+DDRdWCRakyonCUIZur4fVKtVS8yQWadCfUYAqEeD/USnnjVbldDhlhj+QLQsqLA4ES9WoEErIHAIa7UrblCse25RLohsTB8U8A7Q/Xh5cYaynJNEwJj6gg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mh5o1uET"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a8d2b24b7a8so601110866b.1;
+        Fri, 04 Oct 2024 06:11:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4+MUecNKIC28dP78VgEX4gOlD3WWQ9xvsh/4HgXLst0=;
- b=HzF7gD0+LrCZCJ1jv531EjyHnNlrbC8LQMjlmwwROhCxtVKsTmT1c71UsbfjlvoNABELE1th0Ha9TTzrpRqymwT/yQp1icAtLaZjjlTyGzi2ZRkHY5jWgWpoq1iKPnfiMLAXvpUnXJqfCEi6buI42P5Rcv7H/Eu+AvkrVEubOkA=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by DM4PR10MB6885.namprd10.prod.outlook.com (2603:10b6:8:103::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.19; Fri, 4 Oct
- 2024 13:07:09 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088%3]) with mapi id 15.20.8026.016; Fri, 4 Oct 2024
- 13:07:09 +0000
-Message-ID: <f4d2180a-8baa-4636-a0a1-36e474fcd157@oracle.com>
-Date: Fri, 4 Oct 2024 14:07:05 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 5/8] xfs: Support FS_XFLAG_ATOMICWRITES
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, brauner@kernel.org, djwong@kernel.org,
-        viro@zeniv.linux.org.uk, jack@suse.cz, dchinner@redhat.com,
-        cem@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, hare@suse.de,
-        martin.petersen@oracle.com, catherine.hoang@oracle.com,
-        mcgrof@kernel.org, ritesh.list@gmail.com, ojaswin@linux.ibm.com
-References: <20241004092254.3759210-1-john.g.garry@oracle.com>
- <20241004092254.3759210-6-john.g.garry@oracle.com>
- <20241004123520.GB19295@lst.de>
-Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20241004123520.GB19295@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0201.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:1a5::8) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+        d=gmail.com; s=20230601; t=1728047518; x=1728652318; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Fc3X3qwck4YQiopkseGpBQwiV8nDGDLgCkjbw2S25IY=;
+        b=mh5o1uETzN4m7RMNNc1BXGBAlpAS8LhgFb8aOLTFN0vT+tYTaeQTeGPlyvpDIUj7fL
+         91GFmZagbg2V/w+Gf3PckkApp0uOA9Sr/5T+me/v0nLWZOPlo0cLnTPlFJeNP3IRcAwG
+         SszrWLw/FryGCcdCAwvVY9ylC1b3FmcWQLy8K/o0ZFag3hauzX2J3jAtfmWzHuAxwrgw
+         zx8XVgaXLMXM3MOjhSmqut4gEvQ+RqDGGJAebWSypjA6VIVQigC2t7oKTpIE0Pl0KewD
+         zbnv6VG9EZSeWSThJqMn4GR668bjDVLVdZpV7HATOWY/h/yBhjdtRS0o83Hs4Gj2s3mB
+         gnfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728047518; x=1728652318;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fc3X3qwck4YQiopkseGpBQwiV8nDGDLgCkjbw2S25IY=;
+        b=bFqDMK51ZwgqpV9/mrQQPlkl1wy+rI8y0lJDstOC2u8zn0PJmxRksrrdsBSu62rZq6
+         UYA4ay8YplCXvuV0CB6ndYRnOxyOE2sne2O6QHgdvXBKWFTy1CSoyQQlK4AkLY/kcqd/
+         9NkI9pFm2j/KutY85u7vISjUlq94VJlCofxWhUFKIJVijZ1SW5VlWPy6Pjqpyi7BZmbm
+         JHf2VXTp/K+MVnFw0u9C291NDtULY3IMaJV6TsDicxmZjh9ng8K7TvKaC+72mPEQrGNg
+         ynagQk/V93dqaOm8NgfHVU2/ynr38WhWOWPyv9ub/nDfUoz3eSiXJVtKEBeGwuqsNUhc
+         DKdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXsnp7EpsGS/s3vBQSeEBysCH8Vxyb3tJErESFEbaOg1tue8o80ckti5APrOe9D0h4xUTPaD0aNAw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIDNWVB+QNBxeSePYLVjY6/5fvIfldY3ShbD8MN4956ihrXegM
+	68FuUz8NZ8OYuot2Rj4jLiV0CYpsanxW/J1CEbYVRGW6Hm+LCdPadLI8cA==
+X-Google-Smtp-Source: AGHT+IEiyogmvyYzZYkVZL/D50xLIS2TaokESQ7K4HcMvvKbc7AU+u4A1Tj3SXd8nDU0EYNZ2ThOgg==
+X-Received: by 2002:a17:907:6e8f:b0:a80:c0ed:2145 with SMTP id a640c23a62f3a-a991cede485mr289531566b.2.1728047518058;
+        Fri, 04 Oct 2024 06:11:58 -0700 (PDT)
+Received: from [192.168.42.11] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9910285a17sm225112866b.36.2024.10.04.06.11.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Oct 2024 06:11:57 -0700 (PDT)
+Message-ID: <239e42d2-791e-4ef5-a312-8b5959af7841@gmail.com>
+Date: Fri, 4 Oct 2024 14:12:28 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|DM4PR10MB6885:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7adf0de5-a28c-4ae3-0169-08dce4757473
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?OXZqeVN2TzRML1REU2JpeUh4blJlQklLeHowaWhTWmhnejBvTDZONVFQcFUy?=
- =?utf-8?B?eVhIVFlUckhic1E5V2FCdG1NUi9VRFRUc0R4MHlDZW5ya00zMk4wc1lZMWtO?=
- =?utf-8?B?MnJaa2JOVSttVDVHd09sUndpREp6MjNROTRmTWx0aHdoNVRValcwMm1HSE9U?=
- =?utf-8?B?MDZPVVhsVWlmeGw1OFBQdEo3ZTd0eUpxQWtudEt3WWF1QlRLWWxNbXUvUGhT?=
- =?utf-8?B?YWUwZjdiazNTV0NQVkVMa3RmVEh2STRPOUM2bFBqRUJKelRhSG1pWkx1Sjdw?=
- =?utf-8?B?emlQVXNFeU9WeSs2SlR0SVZ0TzRieWdITEN4cXdiRG5BK01wWnp0R2FQbTlS?=
- =?utf-8?B?RndzR2kvZUowcGdtNzB1MXlOcENxc0FWSG54TGRLMnFFMFc2aW9FWDQ2TU5q?=
- =?utf-8?B?UHV4dE9wTnBka0tCVGg0bWI0MEQyYlJIaVRJMm1ka3NMNWRWTTZPN2c3UTdl?=
- =?utf-8?B?ZnZQZGhMYzk1cUsvUGJJdmtvd3pxUWtueTJyN2NDZWI3c3N3a3FUcTJYQ2Yx?=
- =?utf-8?B?eVVlb2lHcGQrbTVWVm8xTWlCUy9NdUlxSlJucy9PWEVZQ3A1QWEyRDI5Sm9m?=
- =?utf-8?B?OWFzYkZYNkdWSDVxMFhPckRvOU1OaWE1Q1Eyd0t3R04yby9pNTJWTmtSMDRY?=
- =?utf-8?B?aHJXVC9PTG1FSVRFNlEzZ0hZNk53cDR0Vk1rNGxJdGM4N1g4UmFidi9zS3JP?=
- =?utf-8?B?RnA0RFlrbk5VdFRLbCtxTUN2dmd2UUJtYUhzTXZmZzhlRlI4OUwvUUtCUTNN?=
- =?utf-8?B?aUQwK1dVTnVNRmtSZjBiS1VDSGR6blEyM1VyRm1nM1VNNWduZkE5UloxaE9h?=
- =?utf-8?B?eWwyZno1RjNpdUh1Um5reVJvYVY0S2JDbDRONEU5TTErOU9MZnZjdlppOGpF?=
- =?utf-8?B?N09LOTQ2c09JcXdicjY0c1NYMFArYVlCdE1MeW5tdTRkNGxFTitoT3Nka1Bu?=
- =?utf-8?B?K09rVi92OEw4SzFMSGo0NHpZYk9wNmlBMXFLTVNFRW9vQit0THphZ1EreHRU?=
- =?utf-8?B?UGNycmtOVzhBb09QNEdhbjE4QVdzQmVjZnJnN3hoV0l5YVhqQVdKNDZPNmRW?=
- =?utf-8?B?MHhGL2dIcExRa0FFWkMwbkM2d3pIcTFqN0hkT3NrU3p6eDFLWi9OVytqMjY3?=
- =?utf-8?B?UDZ5SXF6djlLVnU0S3V6RytHRGgyNGhEeVNpdU8yd2pkN1JmTmtuMHFZMC9D?=
- =?utf-8?B?UXk2MVFPYzc2NE5ER1NMOThlUzcyRGRYWHZ2USs5NWhpTFRIM0NRcksvQ0F0?=
- =?utf-8?B?Z2JJVVlLMGhJM3pOdXZCTHladStxT3hrYnFVd0htcjdWOXNqeDJsZWFEQlVu?=
- =?utf-8?B?ZkkzSHg2QTg4cXJjdVNheTE1TzFhKzR4WU9jNkFES0lnRUxKNk5QTCtxRGhG?=
- =?utf-8?B?UndpZXFoTzdwVno5ZlBaM2FkK1hZUCtnbGFXU1lZcU5uRUU4b1pFelZKcXhu?=
- =?utf-8?B?bkJLam5iQjBVTFNjV3NrU0dYeUZKMGV2UkQ2TzdsajRwa29sOGpMTDJxN2Fu?=
- =?utf-8?B?ZGpVZWVvSkJkb09rMmJIUFBsWG1mQkE5aUJ5ZHFTNEpFOUNpSS9teTRhYWkr?=
- =?utf-8?B?eVE0bmFvN2pNMCs4K0svaENTYXk0VWNvbDFnQUdGUlJxa0xhem5JamR1eFJj?=
- =?utf-8?B?a01BTUxsbjNVM3ZDK21mUzNVTVZVbnF4Wkt6ZGZrYU1GeVFUY21pckFpQlVB?=
- =?utf-8?B?Qk1GMUE3bXNQSjcwSDlQNll5QzFPTlFmVzgrOXNmSFZzMUtTa3ZGa2lBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VjBCSWdpTnR4QVdscy83Tno0MThoS0h0THVSY3FnTlVuUGo1amxpcTF1dFFh?=
- =?utf-8?B?WjRFa3JTaW5zd0dIL1pDc1B3UDlCN05UWm0vOUVzZm5LbVlYOVdWUDNvZmNW?=
- =?utf-8?B?d05BeUsrSVUvbGZrenBRSXJiK0pFUnhLci9jZEdRN2gyVzQvQStVSTFCcnRj?=
- =?utf-8?B?VFFocFlwazhLNlhtNGp6TmRiajVXcnNqTkVKWWtnUFFOVXcrdVdZa0FtL0VG?=
- =?utf-8?B?YTlWSWVtVTMrbk5DUndHMndKZThpNGdrWXFUaTNxbEhiVUxPTXBqU2owTGk1?=
- =?utf-8?B?NFhSNFdiR3pCdHpwTkhkbFhaMFQ2dVJYdkx5UGlLRm44Q2JBQUI2UWJCSmp4?=
- =?utf-8?B?ZERCOHpraU00YTZnRklQSFI4UktDalRhaFhWdXJjUTZvTUtRek01MXFFMTd1?=
- =?utf-8?B?UU9CNnFJdjYxcDNVWkF2NkNzUS84TXVEUDJZaE9RcjllazhwbEpCL1lzVmh5?=
- =?utf-8?B?THg3dzM5RC9WTnNEK3dFV1d4SEpIK1A1aDJpa0NOc0I2Zlk0aWtMYXprOTVR?=
- =?utf-8?B?cVFiOGZhVWhTNElEMVR2cTVLeEpOMFVLOUZPMWpjaGRTZm1HblE3aUtFWkJW?=
- =?utf-8?B?V2lRVXAwalhHS012VHVaQTNBdnkxcDZrTSs0cnl1SEw4ODBQdVRMb2ZZeW9S?=
- =?utf-8?B?R3Nrejc0NmZ4SGN4bTUrbjVnNFpwNXFxZjVNRVRiWkc2WnlIR0hJbXNSUUgx?=
- =?utf-8?B?SmNRUkd2Q2NIMXIwQjdMRXprS0hMQi8zY3d5R3l0K0t5cGlsZ0oyNlRQNW8y?=
- =?utf-8?B?WjJncHlFVGluZ0dPeFVRWk1ia1BUMDhqRzFBSUNiZkp2MlI3NlJ2RW5ybXBq?=
- =?utf-8?B?NG0waE5OQTdPZ3FLZHZDRUdjRnFPWXc3SEtSUzBnTTVjQUIrQ3BCa21iOUZs?=
- =?utf-8?B?cU9RUGcrTm5JVXZBN0ZxQklYUXRRT1NvNVpnNVJBMzVEQStEaDc2RWxndjNl?=
- =?utf-8?B?dmxJUjErbm42b3V0Z0NjNFRqTEVCMDlYWEtnZFNjb3dzY2xlQm8zZXNzN24z?=
- =?utf-8?B?OU94QUdoQ3JhUVZPSkg1WUlZY3E3TCtZUk0zNFI3OUFsVjNiVzhtTUpmcUdQ?=
- =?utf-8?B?NW1Semg1VU1KUCtCNVFPWmxYQWFpaGJPNjNPMEZvajcxYm5oUG9ZbHV3dmJu?=
- =?utf-8?B?N3NoQlZQMmdZaUc2a1BlN2tJTkE2VkMwVUdhcTJxWVVSd3VwaEN3OUMvd1dG?=
- =?utf-8?B?azZNMklxWERVSmhwWkM2LzdtTlpLdHBBclJKZXpqdG1valRSb01PZXh5cU5T?=
- =?utf-8?B?YjQ4TXB0R0V5MUVxSVprMlZ3YklEZUUxS0FROEo2NURtVk95a1liSnpSQmNv?=
- =?utf-8?B?MHJrbFN1UkgwN09SdzRvWS9qOTdqZnBjTVZhdzNIdkhlMXFDeThZalNZdk1K?=
- =?utf-8?B?L0hMRW14YzlCaVpBOVZFc3pMU3JNNkt1dEZick1wK0QxczU0L001c1JNeGJ4?=
- =?utf-8?B?a0VkRHJITHVTMTBTWkFZbXo4Vk5VeUh3czM5V1p4QzlGemtQSjlLOWFaVGdU?=
- =?utf-8?B?anVQVE9vL0d6dkE4bGdMYWZNWHYwSWJISkZOMTFtRXNBM2RuVXFySTR2cGpk?=
- =?utf-8?B?WHFJNS8rdXZBanU4VVFPekFtakNSS3c0RVZzclRzeHl3cm81YjlGV2R2aDJ4?=
- =?utf-8?B?VnRsMGNSZ1gzZmI2M1VnSWZWOVN6bGN5WlZzUmQrb2FBN3A4emhrZGNmTmM0?=
- =?utf-8?B?T1AxU28wUzFaQzNqc3lJTDlyVUJhajNGeXRlbGpWWExPZFZsNDduQ1A1OTRr?=
- =?utf-8?B?NkIzclNyejkwUW9MR1J4R3hFK3U2dHBJcDJiZzhlZGtmRUhhaXlxd0pva2lB?=
- =?utf-8?B?SkhuNm1LV2wwNGh6WFpqek51Uk5xYjJ2clN1SU9sUTZUeG1UMDcwdGZsQ0hL?=
- =?utf-8?B?bXo0R0hnR3RiNVduVGxodzBqc3ZrZ3VRbkZQRGFMR21mWXl3UXkrZlBSdnlQ?=
- =?utf-8?B?ZE9WTW15cWpaUXVQb0w3cEs5U2JVNEhNZmg4UmRkOERURjB5K1dPNWx3Tkxj?=
- =?utf-8?B?dkZuOWJnTkpwYi9Qc3FzRlZjSXkzV20vV3Vqb0duK1R0YUFVTmJzdDZPZmVm?=
- =?utf-8?B?em41RWhBbmV5R0JwcTJEOHRCdWtSQng1UmxsNGgzOTFrNDFlcGNHaXV6bTIr?=
- =?utf-8?B?cUx2SVlzaThEY3E3K1Z5WjY1TUFZM2F6Tml1cVlMN0FhdXBSWnBvdGNybVNZ?=
- =?utf-8?B?akE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	7B6kM2Md06JRoll9PsugayAegF2a9LgZFRo1IU+owQJ32fM0yPQnhf/DLxPQ4p3DkdhEgzc1QgIQsdMJGSq6S3IU8KfGvIcdL8sMhPIFdBh3iDqj+0tl7XbpYSM6y+ylAlAl8xJjx9ejT+ho+d0H1zjvK4WHXuv8A8CtdBqNQ/Pp1I5alQC1rIiedyvHcsiq7GSe/+MpnWda9O8pfeJIWn9y7AhGLgfZwuAK56Aut+Q4fO4E+PQppzuxU2vqY0LPa55fwgWhIfYpI4fLEQUVdSo7ozKp01kvckPNF4FcaRrtbY3G5dJ+69gOTe3LokscZoHTKAWZUxXJStonN8ZTkZTpHLvB48Dtz1ADHud9HWVBqlyCvY2FyO7KJqeK1Zxrc5RnCXYLjeWCBMVvFKEYGumI1J1pPPSC3krfe4pm3DVYiqfCNPtrkDVkdubB1EViJu/Av7i/TCB4Zp42Zj3Viv0eOJ5qQkocyAHm5rtRzV7Di2yRvXjpwC0aNtuvLOFUtOOaJTxt0vSG291qHSUrXDk62TbNKtLG4RZHV0KknTMGm5z9Krwz3mcCxZhHPiGB+9VQY6Stw3Py2OIW9MKmlGTze+69IYayerK/cVU0Yug=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7adf0de5-a28c-4ae3-0169-08dce4757473
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Oct 2024 13:07:09.7878
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4y2j/WkcQnQ6BT88g8E99n66faKKOwe+OGczjpE5/n/Hsei0y6p5lKqy7xhrHnZyYH1bDRbypkaUKwAmxdF19Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR10MB6885
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-04_10,2024-10-03_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
- adultscore=0 suspectscore=0 mlxscore=0 malwarescore=0 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2409260000 definitions=main-2410040094
-X-Proofpoint-GUID: otMuD0fI3vR90p9O3aw5yAdyiqlhVzSn
-X-Proofpoint-ORIG-GUID: otMuD0fI3vR90p9O3aw5yAdyiqlhVzSn
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V6 4/8] io_uring: support SQE group
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ io-uring@vger.kernel.org
+Cc: linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
+References: <20240912104933.1875409-1-ming.lei@redhat.com>
+ <20240912104933.1875409-5-ming.lei@redhat.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20240912104933.1875409-5-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 04/10/2024 13:35, Christoph Hellwig wrote:
-> On Fri, Oct 04, 2024 at 09:22:51AM +0000, John Garry wrote:
->> Add initial support for new flag FS_XFLAG_ATOMICWRITES.
->>
->> This flag is a file attribute that mirrors an ondisk inode flag.  Actual
->> support for untorn file writes (for now) depends on both the iflag and the
->> underlying storage devices, which we can only really check at statx and
->> pwritev2() time.  This is the same story as FS_XFLAG_DAX, which signals to
->> the fs that we should try to enable the fsdax IO path on the file (instead
->> of the regular page cache), but applications have to query STAT_ATTR_DAX to
->> find out if they really got that IO path.
->>
->> Current kernel support for atomic writes is based on HW support (for atomic
->> writes). Since for regular files XFS has no way to specify extent alignment
->> or granularity, atomic write size is limited to the FS block size.
-> 
-> I'm still confused why this flag is needed for the current version
-> of this patch set. 
+On 9/12/24 11:49, Ming Lei wrote:
+...
+> --- a/io_uring/io_uring.c
+> +++ b/io_uring/io_uring.c
+> @@ -111,13 +111,15 @@
+...
+> +static void io_complete_group_member(struct io_kiocb *req)
+> +{
+> +	struct io_kiocb *lead = get_group_leader(req);
+> +
+> +	if (WARN_ON_ONCE(!(req->flags & REQ_F_SQE_GROUP) ||
+> +			 lead->grp_refs <= 0))
+> +		return;
+> +
+> +	/* member CQE needs to be posted first */
+> +	if (!(req->flags & REQ_F_CQE_SKIP))
+> +		io_req_commit_cqe(req->ctx, req);
+> +
+> +	req->flags &= ~REQ_F_SQE_GROUP;
+
+I can't say I like this implicit state machine too much,
+but let's add a comment why we need to clear it. i.e.
+it seems it wouldn't be needed if not for the
+mark_last_group_member() below that puts it back to tunnel
+the leader to io_free_batch_list().
+
+> +
+> +	/* Set leader as failed in case of any member failed */
+> +	if (unlikely((req->flags & REQ_F_FAIL)))
+> +		req_set_fail(lead);
+> +
+> +	if (!--lead->grp_refs) {
+> +		mark_last_group_member(req);
+> +		if (!(lead->flags & REQ_F_CQE_SKIP))
+> +			io_req_commit_cqe(lead->ctx, lead);
+> +	} else if (lead->grp_refs == 1 && (lead->flags & REQ_F_SQE_GROUP)) {
+> +		/*
+> +		 * The single uncompleted leader will degenerate to plain
+> +		 * request, so group leader can be always freed via the
+> +		 * last completed member.
+> +		 */
+> +		lead->flags &= ~REQ_F_SQE_GROUP_LEADER;
+
+What does this try to handle? A group with a leader but no
+members? If that's the case, io_group_sqe() and io_submit_state_end()
+just need to fail such groups (and clear REQ_F_SQE_GROUP before
+that).
+
+> +	}
+> +}
+> +
+> +static void io_complete_group_leader(struct io_kiocb *req)
+> +{
+> +	WARN_ON_ONCE(req->grp_refs <= 1);
+> +	req->flags &= ~REQ_F_SQE_GROUP;
+> +	req->grp_refs -= 1;
+> +}
+> +
+> +static void io_complete_group_req(struct io_kiocb *req)
+> +{
+> +	if (req_is_group_leader(req))
+> +		io_complete_group_leader(req);
+> +	else
+> +		io_complete_group_member(req);
+> +}
+> +
+>   static void io_req_complete_post(struct io_kiocb *req, unsigned issue_flags)
+>   {
+>   	struct io_ring_ctx *ctx = req->ctx;
+> @@ -890,7 +1005,8 @@ static void io_req_complete_post(struct io_kiocb *req, unsigned issue_flags)
+>   	 * Handle special CQ sync cases via task_work. DEFER_TASKRUN requires
+>   	 * the submitter task context, IOPOLL protects with uring_lock.
+>   	 */
+> -	if (ctx->task_complete || (ctx->flags & IORING_SETUP_IOPOLL)) {
+> +	if (ctx->task_complete || (ctx->flags & IORING_SETUP_IOPOLL) ||
+> +	    req_is_group_leader(req)) {
+
+We're better to push all group requests to io_req_task_complete(),
+not just a group leader. While seems to be correct, that just
+overcomplicates the request's flow, it can post a CQE here, but then
+still expect to do group stuff in the CQE posting loop
+(flush_completions -> io_complete_group_req), which might post another
+cqe for the leader, and then do yet another post processing loop in
+io_free_batch_list().
 
 
-> We should always be able to support atomic writes
-> <= block size if support by the block device.
-> 
+>   		req->io_task_work.func = io_req_task_complete;
+>   		io_req_task_work_add(req);
+>   		return;
+> @@ -1388,11 +1504,43 @@ static void io_free_batch_list(struct io_ring_ctx *ctx,
+>   						    comp_list);
+>   
+>   		if (unlikely(req->flags & IO_REQ_CLEAN_SLOW_FLAGS)) {
+> +			if (req_is_last_group_member(req) ||
+> +					req_is_group_leader(req)) {
+> +				struct io_kiocb *leader;
+> +
+> +				/* Leader is freed via the last member */
+> +				if (req_is_group_leader(req)) {
+> +					if (req->grp_link)
+> +						io_queue_group_members(req);
+> +					node = req->comp_list.next;
+> +					continue;
+> +				}
+> +
+> +				/*
+> +				 * Prepare for freeing leader since we are the
+> +				 * last group member
+> +				 */
+> +				leader = get_group_leader(req);
+> +				leader->flags &= ~REQ_F_SQE_GROUP_LEADER;
+> +				req->flags &= ~REQ_F_SQE_GROUP;
+> +				/*
+> +				 * Link leader to current request's next,
+> +				 * this way works because the iterator
+> +				 * always check the next node only.
+> +				 *
+> +				 * Be careful when you change the iterator
+> +				 * in future
+> +				 */
+> +				wq_stack_add_head(&leader->comp_list,
+> +						  &req->comp_list);
+> +			}
+> +
+>   			if (req->flags & REQ_F_REFCOUNT) {
+>   				node = req->comp_list.next;
+>   				if (!req_ref_put_and_test(req))
+>   					continue;
+>   			}
+> +
+>   			if ((req->flags & REQ_F_POLLED) && req->apoll) {
+>   				struct async_poll *apoll = req->apoll;
+>   
+> @@ -1427,8 +1575,16 @@ void __io_submit_flush_completions(struct io_ring_ctx *ctx)
+>   		struct io_kiocb *req = container_of(node, struct io_kiocb,
+>   					    comp_list);
+>   
+> -		if (!(req->flags & REQ_F_CQE_SKIP))
+> -			io_req_commit_cqe(ctx, req);
+> +		if (unlikely(req->flags & (REQ_F_CQE_SKIP | REQ_F_SQE_GROUP))) {
+> +			if (req->flags & REQ_F_SQE_GROUP) {
+> +				io_complete_group_req(req);
+> +				continue;
+> +			}
+> +
+> +			if (req->flags & REQ_F_CQE_SKIP)
+> +				continue;
+> +		}
+> +		io_req_commit_cqe(ctx, req);
+>   	}
+>   	__io_cq_unlock_post(ctx);
+>   
+> @@ -1638,8 +1794,12 @@ static u32 io_get_sequence(struct io_kiocb *req)
+>   	struct io_kiocb *cur;
+>   
+>   	/* need original cached_sq_head, but it was increased for each req */
+> -	io_for_each_link(cur, req)
+> -		seq--;
+> +	io_for_each_link(cur, req) {
+> +		if (req_is_group_leader(cur))
+> +			seq -= cur->grp_refs;
+> +		else
+> +			seq--;
+> +	}
+>   	return seq;
+>   }
+...
+> @@ -2217,8 +2470,22 @@ static void io_submit_state_end(struct io_ring_ctx *ctx)
+>   {
+>   	struct io_submit_state *state = &ctx->submit_state;
+>   
+> -	if (unlikely(state->link.head))
+> -		io_queue_sqe_fallback(state->link.head);
+> +	if (unlikely(state->group.head || state->link.head)) {
+> +		/* the last member must set REQ_F_SQE_GROUP */
+> +		if (state->group.head) {
+> +			struct io_kiocb *lead = state->group.head;
+> +
+> +			state->group.last->grp_link = NULL;
+> +			if (lead->flags & IO_REQ_LINK_FLAGS)
+> +				io_link_sqe(&state->link, lead);
+> +			else
+> +				io_queue_sqe_fallback(lead);
 
-Sure, that is true (about being able to atomically write 1x FS block if 
-the bdev support it).
+req1(F_LINK), req2(F_GROUP), req3
 
-But if we are going to add forcealign or similar later, then it would 
-make sense (to me) to have FS_XFLAG_ATOMICWRITES (and its other flags) 
-from the beginning. I mean, for example, if FS_XFLAG_FORCEALIGN were 
-enabled and we want atomic writes, setting FS_XFLAG_ATOMICWRITES would 
-be rejected if AG count is not aligned with extsize, or extsize is not a 
-power-of-2, or extsize exceeds bdev limits. So FS_XFLAG_ATOMICWRITES 
-could have some value there.
+is supposed to be turned into
 
-As such, it makes sense to have a consistent user experience and require 
-FS_XFLAG_ATOMICWRITES from the beginning.
+req1 -> {group: req2 (lead), req3 }
 
-Cheers,
-John
+but note that req2 here doesn't have F_LINK set.
+I think it should be like this instead:
+
+if (state->link.head)
+	io_link_sqe();
+else
+	io_queue_sqe_fallback(lead);
+
+> +		}
+> +
+> +		if (unlikely(state->link.head))
+> +			io_queue_sqe_fallback(state->link.head);
+> +	}
+> +
+>   	/* flush only after queuing links as they can generate completions */
+>   	io_submit_flush_completions(ctx);
+>   	if (state->plug_started)
+
+
+-- 
+Pavel Begunkov
