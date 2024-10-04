@@ -1,217 +1,121 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8818F1AA794
-	for <linux-block@vger.kernel.org>; Fri,  4 Oct 2024 16:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8827F1E3795;
+	Fri,  4 Oct 2024 16:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728059744; cv=none; b=oLZe25sfEk6C4QLhSKgPWMDyE+kUP3wnN4JO8QDDKFo2IQohol0cDCadyzvv5PmVC/+lKbFCw8DaYREVgl0K/UAMsTahxkhC8IhrGnG19EHvSd9V0fMBdSLfzjCo4i9Qk4uliBfU21FaC6omel5DYFCC07mzVx1Xoz4EcVy/yV4=
+	t=1728060242; cv=none; b=rDAcHxonLahTrFHTIXDrpIa5N9nYLE79+RuqZxT9CiSFDqJBj7MAqhS7G94gbKJt5AhIGzfnxAkFi/sC1bn8oAEV5OWf5L8oxMKZDIiNNsfezTFYZU5CehDSs7bQwQtWJGVacUH51MugK53yhJ9Cgp9LKxrwmvrnERJLaRQ/D0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728059744; c=relaxed/simple;
-	bh=Rht8DS0KyZW4WkLs7S4Ooh3jDq7YzZ8jwWDHpGUOmJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=NnxuvBXsmd25kYBnMcK3QmtZMrI9YVPcRXn88HkCxDAAKxYV7FtJlvpcdA0QfVVCZfg2WXg1TzA+angeBfdzk7MuEnb3k6UqcJf9zrsr0BNOEPcGdtiTEbPeB5Q6vVVjFDtzwX6XeORREn5bpUe6kA/23W5FKPdGBg4SRgc8uZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Zp6oolf/; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1728060242; c=relaxed/simple;
+	bh=UNor5Daq1Hj/rkiA5hUcVkwjjCXkYG9ZGXwb/O6wnEw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hYOcemnbAYhhMPqMj+g391tcJ+fLBFASyC6ggTS6b9adoGTtsdTlvkgY++HLZNKsIljpnplKkGDfpMG4kg3/xyvXqsrjthk3ykYkOn0fMgKpXLYgcaHcgeZmBjHZlDHZJhQyMrQ3FACQcHXAWtOwDFUiYDRaeFSMqtKxAA0M9ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kE+xNx9X; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zp6oolf/"
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-37ccf0c0376so1517886f8f.3
-        for <linux-block@vger.kernel.org>; Fri, 04 Oct 2024 09:35:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kE+xNx9X"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c88c9e45c2so6014672a12.0;
+        Fri, 04 Oct 2024 09:44:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1728059741; x=1728664541; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=gmail.com; s=20230601; t=1728060239; x=1728665039; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=IKELkdxiqxEeNokUkCM6G/0RoFcGikRuDSNexYJ+bZE=;
-        b=Zp6oolf/erfZDUa+tT/HPWzz81pbEqFyd9/DxwFwCTNX3iyxvOi4a3unhb3HJsBobd
-         aK8qS3RIgxXa2PSFCX2ofznJB/cj7CIVkZQt0XMLtcnmbHVGW2kiwOi7A06hfTsj8kj4
-         H3ZFvrUkI9l9tsCrWJ3ln/EwI8qmCFjYyicKk9g6sHQjMc4AAdfhDh4FOrJEa5NXlRBf
-         YUGkrRYtzGAlom6BMF5Ce6PuU6fJUAxFolN51CeScev/4TjOWUYec3/uOc1YpVEFETWd
-         wxb+Fa4acbwWxEiznhkMmxOYGxUBrWcNmmH/DaytPg43fx9QVGBO8ZVjnO68rfrM43QC
-         en4Q==
+        bh=rtkEcDZJ4/Fz+x3oDOe63uDhs03xabv3JKtyFnIwGmQ=;
+        b=kE+xNx9XGuXRj7jFZ4QNKwIaydI4+1Kjeid5+K5V8CUDdyfY3uc586pIlXYrUAgcIl
+         i6/vM7/Pl15F/rnvyfJEnfNBTVWSavWJuzRg7vRNBBbkHmKMFvSIZO0b7OviZrUpQh0Q
+         LWYtzvUB0PDkoeE/W/DBBOltg2RKN/mbv9PUp7M+PLejQFutfz2XHF+OcCzNMGv6MFLs
+         TrFT/DSnpwsWApKlJQosUdrRuyY9GsrPLAs4ANQyNB+BLNP51A1WwqB+6o6+ziMXIFXZ
+         i/8Qr7l4Strzl7bfX1U6uK1FvKYuRzvK6jlRaAXDexqbyXW3wHbf2rxnmRtBDaRGgTVG
+         vIxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728059741; x=1728664541;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1728060239; x=1728665039;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IKELkdxiqxEeNokUkCM6G/0RoFcGikRuDSNexYJ+bZE=;
-        b=DLsbraB2WKCpYrjPhFZcovplOgAZZRtJ8DkDDfOMVQ/nygagjTn/NqV/tZCQ7ejDKm
-         khybHCnq6rlnOxM4p9iKx20oThgdrxJSrl0vjQjK6ralvcHSEHVvpQv2Eo/CTIzfq63O
-         YiZEC3eI2s+VjDLbGG3YtrKYAK0j8xe4mDk0/Sv3/5slApRRWEX/wyN+SfE8WV/0IJD4
-         vVmQlj4vZtAvI38BM0mEYCGzNFtO06JYcC3HHHROITxS43v+wkRnL1pg0mkmVDrJ1qfY
-         uVCi7U7+5MSw3dpKitWL85DUOCk2zFYrgoJP7YLdFrTloK4FHGWABQjnEGifCVtp64fM
-         koJg==
-X-Gm-Message-State: AOJu0Yy9qfZm6UX4Vf9QORJ37OfLLuhxkq9pfKtax4G6DQ9naHuosSxX
-	5rrQd40AjZtxMil+xFx0iBm/A/lXN1gmoO0oknHV9ixXbBVp9BrDaJbl20N0S1A=
-X-Google-Smtp-Source: AGHT+IEEY3IQ6Vkgb5y0joo/8LRBEVQYumMIaqnCSTLDtG7bZzgRKWblFPLn9vPTYW8JxaIm/W79Wg==
-X-Received: by 2002:a5d:6e91:0:b0:37c:d344:8b42 with SMTP id ffacd0b85a97d-37d0e6f0dfemr2192183f8f.15.1728059740605;
-        Fri, 04 Oct 2024 09:35:40 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d16972dfcsm24815f8f.102.2024.10.04.09.35.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 09:35:39 -0700 (PDT)
-Date: Fri, 4 Oct 2024 19:35:35 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Guoqing Jiang <guoqing.jiang@linux.dev>
-Cc: linux-block@vger.kernel.org
-Subject: [bug report] rnbd-clt: open code send_msg_open in rnbd_clt_map_device
-Message-ID: <bf9bc0a2-93e3-4def-b3ad-7a9d4c3f8c27@stanley.mountain>
+        bh=rtkEcDZJ4/Fz+x3oDOe63uDhs03xabv3JKtyFnIwGmQ=;
+        b=q+xbh73H1/n7a4z5G1wPDfw2F+hm09ZJEQJJEpSbS1i634bli3S1y/JynCpTZjLPyB
+         azaTY1FBBRngryJFQW8Eypp7JvWBoe7JsKQiGoiIETUDC32kw3LiYRZSy0sub0CWw5JO
+         JEOrl4gcOkpqj2ly/4Teh84MARQCGqHSQRtmv9HkyueM9wG2tKF4TedTryAQZPHLJDAH
+         7toTN4FlTLR1DSMoW2bVPMPnmLqRlsKxtrSkbtWfOGcK9fKzNSLQOLUT9CKEj3jSNC90
+         rOt8Z5ps/RZ2/rxP9rdtHTkJxx2AttV97r5ZIvQOJGHDB3U+BSPnv0TQUHoOa1xHHhoL
+         9IDA==
+X-Forwarded-Encrypted: i=1; AJvYcCWCCOuMl+mUGEr9cgeEEpvwyo0YGQkvPVS/I7Dwu+PcPCEA/alPw8sW7cGUyF/UwHN3iXN3lpNFiNgF/gNn@vger.kernel.org, AJvYcCWpx6Uawv4/mtjH7nKHegdEgfwBLx2V5ezX0wRJWo5xh4bNXkPCNsGp1fEAiaCQIFwGToHHE3TobjFXwT4p5jk=@vger.kernel.org, AJvYcCWvqvskbSbTODaevg0U9lV3QOwjPUHskw6aBu/Vubdb3FSgiYBnbqa7rNJg0ckZ1chlahc1OvC8+ubOvg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxqz7L++/5sFTIB1Q/Xeo9INstaVDfepwE9AnV+YdbkRV5W+Axv
+	B6y6AhfKv6anbh5Ui9mHcA1JUR1q4Hn05g7u1Rxcu6GAr4+/T220
+X-Google-Smtp-Source: AGHT+IEc5rpr7NxwjdqznlXv24+kd6fq1wnlYKs/nn4dcU0eENpde0atM6OdSgWyadBJgkBAbdDd+Q==
+X-Received: by 2002:a05:6402:280f:b0:5c8:a2b8:cab3 with SMTP id 4fb4d7f45d1cf-5c8d2f1e03amr3728528a12.4.1728060238589;
+        Fri, 04 Oct 2024 09:43:58 -0700 (PDT)
+Received: from ?IPV6:2003:df:bf2f:2200:c8eb:5450:fddc:5d96? (p200300dfbf2f2200c8eb5450fddc5d96.dip0.t-ipconnect.de. [2003:df:bf2f:2200:c8eb:5450:fddc:5d96])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c8e05f450csm48681a12.97.2024.10.04.09.43.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Oct 2024 09:43:58 -0700 (PDT)
+Message-ID: <9629a9d2-7e79-41ae-96c9-5fb26493c37a@gmail.com>
+Date: Fri, 4 Oct 2024 18:43:57 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] rust: block: convert `block::mq` to use `Refcount`
+To: Gary Guo <gary@garyguo.net>, Andreas Hindborg <a.hindborg@kernel.org>,
+ Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
+ Alex Gaynor <alex.gaynor@gmail.com>,
+ =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>, Jens Axboe <axboe@kernel.dk>
+Cc: Will Deacon <will@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Mark Rutland <mark.rutland@arm.com>, linux-block@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241004155247.2210469-1-gary@garyguo.net>
+ <20241004155247.2210469-4-gary@garyguo.net>
+Content-Language: de-AT-frami
+From: Dirk Behme <dirk.behme@gmail.com>
+In-Reply-To: <20241004155247.2210469-4-gary@garyguo.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello Guoqing Jiang,
+Am 04.10.24 um 17:52 schrieb Gary Guo:
+> Currently there's a custom reference counting in `block::mq`, which uses
+> `AtomicU64` Rust atomics, and this type doesn't exist on some 32-bit
+> architectures. We cannot just change it to use 32-bit atomics, because
+> doing so will make it vulnerable to refcount overflow. So switch it to
+> use the kernel refcount `kernel::sync::Refcount` instead.
+> 
+> There is an operation needed by `block::mq`, atomically decreasing
+> refcount from 2 to 0, which is not available through refcount.h, so
+> I exposed `Refcount::as_atomic` which allows accessing the refcount
+> directly.
+> 
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Boqun Feng <boqun.feng@gmail.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Signed-off-by: Gary Guo <gary@garyguo.net>
+> ---
+...
+> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+> index a0e22827f3f4..7b63c02bdce7 100644
+> --- a/rust/kernel/block/mq/request.rs
+> +++ b/rust/kernel/block/mq/request.rs
+....
+> @@ -37,6 +38,9 @@
+>   /// We need to track C and D to ensure that it is safe to end the request and hand
+>   /// back ownership to the block layer.
+>   ///
+> +/// Note that driver can still obtain new `ARef` even there is no `ARef`s in existence by using
 
-Commit 9ddae3bab6d7 ("rnbd-clt: open code send_msg_open in
-rnbd_clt_map_device") from Jul 6, 2022 (linux-next), leads to the
-following Smatch static checker warning:
+Do you like to check this sentence? Maybe:
 
-	drivers/block/rnbd/rnbd-clt.c:1641 rnbd_clt_map_device()
-	warn: double destroy '&dev->lock' (orig line 1589)
+Note that "a" driver can still obtain "a" new `ARef` even "if" there 
+"are" no `ARef`s in existence by using ....
 
-drivers/block/rnbd/rnbd-clt.c
-    1527 struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
-    1528                                            struct rtrs_addr *paths,
-    1529                                            size_t path_cnt, u16 port_nr,
-    1530                                            const char *pathname,
-    1531                                            enum rnbd_access_mode access_mode,
-    1532                                            u32 nr_poll_queues)
-    1533 {
-    1534         struct rnbd_clt_session *sess;
-    1535         struct rnbd_clt_dev *dev;
-    1536         int ret, errno;
-    1537         struct rnbd_msg_open_rsp *rsp;
-    1538         struct rnbd_msg_open msg;
-    1539         struct rnbd_iu *iu;
-    1540         struct kvec vec = {
-    1541                 .iov_base = &msg,
-    1542                 .iov_len  = sizeof(msg)
-    1543         };
-    1544 
-    1545         if (exists_devpath(pathname, sessname))
-    1546                 return ERR_PTR(-EEXIST);
-    1547 
-    1548         sess = find_and_get_or_create_sess(sessname, paths, path_cnt, port_nr, nr_poll_queues);
-    1549         if (IS_ERR(sess))
-    1550                 return ERR_CAST(sess);
-    1551 
-    1552         dev = init_dev(sess, access_mode, pathname, nr_poll_queues);
-    1553         if (IS_ERR(dev)) {
-    1554                 pr_err("map_device: failed to map device '%s' from session %s, can't initialize device, err: %pe\n",
-    1555                        pathname, sess->sessname, dev);
-    1556                 ret = PTR_ERR(dev);
-    1557                 goto put_sess;
-    1558         }
-    1559         if (insert_dev_if_not_exists_devpath(dev)) {
-    1560                 ret = -EEXIST;
-    1561                 goto put_dev;
+?
 
-Should these error paths really call rnbd_clt_put_dev()?
+Best regards
 
-    1562         }
-    1563 
-    1564         rsp = kzalloc(sizeof(*rsp), GFP_KERNEL);
-    1565         if (!rsp) {
-    1566                 ret = -ENOMEM;
-    1567                 goto del_dev;
-    1568         }
-    1569 
-    1570         iu = rnbd_get_iu(sess, RTRS_ADMIN_CON, RTRS_PERMIT_WAIT);
-    1571         if (!iu) {
-    1572                 ret = -ENOMEM;
-    1573                 kfree(rsp);
-    1574                 goto del_dev;
-    1575         }
-    1576         iu->buf = rsp;
-    1577         iu->dev = dev;
-    1578         sg_init_one(iu->sgt.sgl, rsp, sizeof(*rsp));
-    1579 
-    1580         msg.hdr.type    = cpu_to_le16(RNBD_MSG_OPEN);
-    1581         msg.access_mode = dev->access_mode;
-    1582         strscpy(msg.dev_name, dev->pathname, sizeof(msg.dev_name));
-    1583 
-    1584         WARN_ON(!rnbd_clt_get_dev(dev));
-
-The patch copied the rnbd_clt_get_dev() send_msg_open() to here.  Why do we
-need to take a second reference?  The gotos above imply that we are already
-holding a reference.
-
-    1585         ret = send_usr_msg(sess->rtrs, READ, iu,
-    1586                            &vec, sizeof(*rsp), iu->sgt.sgl, 1,
-    1587                            msg_open_conf, &errno, RTRS_PERMIT_WAIT);
-    1588         if (ret) {
-    1589                 rnbd_clt_put_dev(dev);
-    1590                 rnbd_put_iu(sess, iu);
-
-And these two puts.  Originally this failure path used to do a goto del_dev but
-commit commit 52334f4a573d ("rnbd-clt: don't free rsp in msg_open_conf for map
-scenario") changed it to goto put_iu so rnbd_put_iu() is called twice.
-
-    1591         } else {
-    1592                 ret = errno;
-    1593         }
-    1594         if (ret) {
-    1595                 rnbd_clt_err(dev,
-    1596                               "map_device: failed, can't open remote device, err: %d\n",
-    1597                               ret);
-    1598                 goto put_iu;
-                         ^^^^^^^^^^^^
-This goto here.
-
-    1599         }
-    1600         mutex_lock(&dev->lock);
-    1601         pr_debug("Opened remote device: session=%s, path='%s'\n",
-    1602                  sess->sessname, pathname);
-    1603         ret = rnbd_client_setup_device(dev, rsp);
-    1604         if (ret) {
-    1605                 rnbd_clt_err(dev,
-    1606                               "map_device: Failed to configure device, err: %d\n",
-    1607                               ret);
-    1608                 mutex_unlock(&dev->lock);
-    1609                 goto send_close;
-    1610         }
-    1611 
-    1612         rnbd_clt_info(dev,
-    1613                        "map_device: Device mapped as %s (nsectors: %llu, logical_block_size: %d, physical_block_size: %d, max_write_zeroes_sectors: %d, max_discard_sectors: %d, discard_granularity: %d, discard_alignment: %d, secure_discard: %d, max_segments: %d, max_hw_sectors: %d, wc: %d, fua: %d)\n",
-    1614                        dev->gd->disk_name, le64_to_cpu(rsp->nsectors),
-    1615                        le16_to_cpu(rsp->logical_block_size),
-    1616                        le16_to_cpu(rsp->physical_block_size),
-    1617                        le32_to_cpu(rsp->max_write_zeroes_sectors),
-    1618                        le32_to_cpu(rsp->max_discard_sectors),
-    1619                        le32_to_cpu(rsp->discard_granularity),
-    1620                        le32_to_cpu(rsp->discard_alignment),
-    1621                        le16_to_cpu(rsp->secure_discard),
-    1622                        sess->max_segments, sess->max_io_size / SECTOR_SIZE,
-    1623                        !!(rsp->cache_policy & RNBD_WRITEBACK),
-    1624                        !!(rsp->cache_policy & RNBD_FUA));
-    1625 
-    1626         mutex_unlock(&dev->lock);
-    1627         kfree(rsp);
-    1628         rnbd_put_iu(sess, iu);
-    1629         rnbd_clt_put_sess(sess);
-    1630 
-    1631         return dev;
-    1632 
-    1633 send_close:
-    1634         send_msg_close(dev, dev->device_id, RTRS_PERMIT_WAIT);
-    1635 put_iu:
-    1636         kfree(rsp);
-    1637         rnbd_put_iu(sess, iu);
-                 ^^^^^^^^^^^^^^^^^^^^^
-    1638 del_dev:
-    1639         delete_dev(dev);
-    1640 put_dev:
---> 1641         rnbd_clt_put_dev(dev);
-                 ^^^^^^^^^^^^^^^^^^^^^
-    1642 put_sess:
-    1643         rnbd_clt_put_sess(sess);
-    1644 
-    1645         return ERR_PTR(ret);
-    1646 }
-
-regards,
-dan carpenter
+Dirk
