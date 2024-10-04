@@ -1,68 +1,76 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A2739FEB;
-	Fri,  4 Oct 2024 06:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E231B4D8C6
+	for <linux-block@vger.kernel.org>; Fri,  4 Oct 2024 06:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728023262; cv=none; b=nmqETn10xyruo1MJRJ0SBTCJkuDI1D+zJ3qPFkW5vl9TiuRL6Sx3uuhfiENJ4Dk0gjrndDv0qbG9IFuL88FjuhhKrxalRw2DbzUjOs5YarIhpnawPLjyw3gVkK6q2vnO1vpGXcdYNhqkzglNf6cgwDr9YpvIjqzyssd0D4DMFP4=
+	t=1728024313; cv=none; b=qvWSeZIgrWx0JIdrXaXuo0m08zXSaqmKBXNp4xBInzETJqq0hhj1TK4LlzfmY6YeKdhBD5nQNDqWC6HKIMw7miATHz0E2k/NUT1tmGrNNv/pa8GwutHUhCDuce3o1b/u0VbzW3Whz1Kp4MYzepJ2qN/muywONil17mykF4+tT60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728023262; c=relaxed/simple;
-	bh=rqozs4HW6OYSXLAUVOBTDFuUNhs8rZVJzE5B+05LPGc=;
+	s=arc-20240116; t=1728024313; c=relaxed/simple;
+	bh=7L0cCai+hv1kyvo6agqACPpUErw1LhTrp8ceTVeZtvw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S72/k8qcFhguYVbM4KfKnHDJBK+uRaxAegXK4Z/okiKmHAAenNlCQoog7tD+m2e8EEk52lp6fRClVZGDHe099OZhl3EiEt6sRdK9l/IRf+ER0ntppT2OfMdJJn2YjTZuZie6UYd5pPe0nRHCutIBAa1/uGuVNihEv3Aq883A0gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id F1B57227A87; Fri,  4 Oct 2024 08:27:33 +0200 (CEST)
-Date: Fri, 4 Oct 2024 08:27:33 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Kanchan Joshi <joshi.k@samsung.com>, hare@suse.de, sagi@grimberg.me,
-	brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
-	jaegeuk@kernel.org, bcrl@kvack.org, dhowells@redhat.com,
-	bvanassche@acm.org, asml.silence@gmail.com,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-aio@kvack.org, gost.dev@samsung.com, vishak.g@samsung.com
-Subject: Re: [PATCH v7 0/3] FDP and per-io hints
-Message-ID: <20241004062733.GB14876@lst.de>
-References: <f14a246b-10bf-40c1-bf8f-19101194a6dc@kernel.dk> <20241002151344.GA20364@lst.de> <Zv1kD8iLeu0xd7eP@kbusch-mbp.dhcp.thefacebook.com> <20241002151949.GA20877@lst.de> <yq17caq5xvg.fsf@ca-mkp.ca.oracle.com> <20241003125400.GB17031@lst.de> <c68fef87-288a-42c7-9185-8ac173962838@kernel.dk> <CGME20241004053129eucas1p2aa4888a11a20a1a6287e7a32bbf3316b@eucas1p2.samsung.com> <20241004053121.GB14265@lst.de> <20241004061811.hxhzj4n2juqaws7d@ArmHalley.local>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kgMkXmWzUlH/gsv7JgQVS3HSufuraiVaB+KAX6xg0D8Ag7oKc+pul8Wzu1YXW5GF13URLgq6U9uDXa3BofOk3Nus7xLEsVGPz4VxtgSx2MsYRcU0V/NsRTYhGGL8NdnfyAzDDWosEKdz0a5Sq0WK/X8skp2QbuD5cgV/XaUNKJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=494DybeQ; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="494DybeQ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=sBDcvM4H5vQGBFRyqF2CSKmgC4ot6V+X0gZBu1hycKE=; b=494DybeQwGQSfgXMf+BzLG1S7/
+	745pnwkZQ+0t0w7/EDFw5x+W45fqITdp66kTYJiGTXqWN6iKGr+CfBJWpt+qTAg/pJlcM6GWYf+51
+	GHWBIxywSAeLgwLdF9Oy0n30VcxZReC7jEEBCZwecjeG6Z2CX7EOuPqsz2Ef00yb3EmF8sQ7YIWy/
+	FkH4Tt6C2uveawbv1laoDsfgIlCz5hq8V9Z0Ct04pk5dW42/U+/sJS4ng3G/V0jbVf2WgpzBKnH8R
+	g6upeRr/YgkbFGcL8qLV/A4N22Hp64md550S95K75VE6FfHtPGcot2V6blxcLNMWUKgKhfc3TcSh3
+	6m8Z6oVQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1swc3q-0000000B9tU-0FAz;
+	Fri, 04 Oct 2024 06:45:10 +0000
+Date: Thu, 3 Oct 2024 23:45:10 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Yang Yang <yang.yang@vivo.com>
+Subject: Re: block: del_gendisk() vs blk_queue_enter() race condition
+Message-ID: <Zv-O9tldIzPfD8ju@infradead.org>
+References: <20241003085610.GK11458@google.com>
+ <Zv6d1Iy18wKvliLm@infradead.org>
+ <Zv6fbloZRg2xQ1Jf@infradead.org>
+ <20241003140051.GM11458@google.com>
+ <20241003141709.GN11458@google.com>
+ <20241004042127.GO11458@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241004061811.hxhzj4n2juqaws7d@ArmHalley.local>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20241004042127.GO11458@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Oct 04, 2024 at 08:18:11AM +0200, Javier González wrote:
->> And for anyone who followed the previous discussions of the patches
->> none of this should been new, each point has been made at least three
->> times before.
->
-> Looking at the work you and Hans have been doing on XFS, it seems you
-> have been successful at mapping the semantics of the temperature to
-> zones (which has no semantics, just as FDP).
->
->    What is the difference between the mapping in zones and for FDP?
+On Fri, Oct 04, 2024 at 01:21:27PM +0900, Sergey Senozhatsky wrote:
+> Dunno. Is something like this completely silly?
 
-Probably not much, except for all the pitfalls in the FDP not quite hint
-not madatory design.
+__blk_mark_disk_dead got moved into the lock by: 7e04da2dc701 
+("block: fix deadlock between sd_remove & sd_release"), which has a trace
+that looks very similar to the one your reported.
 
-> The whole point is using an existing interface to cover the use-case of
-> people wanting hints in block.
+And that commit also points out something I missed - we do not set
+QUEUE_FLAG_DYING here because the gendisk does not own the queue for
+SCSI.  Because of that allocating the request in sd/sr will not fail, and
+it will deadlock.
 
-And that's fine.  And that point all the way back for month is that
-doing a complete dumb mapping in the driver for that is fundamentally
-wrong.  Kanchan's previous series did about 50% of the work to get
-it rid, but then everyone dropped dead and played politics.
+So I think the short term fix is to also fail passthrough request here -
+either by clearing and resurrecting QUEUE_FLAG_DYING or by also checking
+q->disk for GD_DEAD if it exists.  Both of these are a bit ugly because
+they will fail passthrough through /dev/sg during the removal which is
+unexpected (although probably not happening for usual workloads).
+
+The proper fix would be to split the freezing mechanism for file system
+vs passthrough I/O, but that's going to be a huge change.
 
