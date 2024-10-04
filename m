@@ -1,29 +1,45 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE66171739
-	for <linux-block@vger.kernel.org>; Fri,  4 Oct 2024 05:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A6252F76;
+	Fri,  4 Oct 2024 05:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728020315; cv=none; b=fYR21XFIs5ZTBUFL9ZDDuTEq0FLsIaGUn3teHeUHjDhbgVlTVuHluaqghfdilVI64ufAISoZzW5wqUWmBZvBpiyytMO0kFQVNHQWzEbLPVxNW0W6STR2vFXhrzGTSc/i2xLeOWS+3Vgc+QfJpNUgKTG9JyeUorm2MoTm0ah+IjI=
+	t=1728020652; cv=none; b=KxhGT6Nn4h7kAhFT/Dy7VikgOZb18vubRsk68JtYJ9VdP5FSDVR3HhXxdqjmwvzEy4Vj55Jnma4DHRbvfxfpuTysiDy2MF1lHwRPyM/4f6U2h44Rz1lzFMinwqXOwLsMPCwNe0nsyb/CDPgppzCe/FIBtGhcZ1gW1v3n61M5XXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728020315; c=relaxed/simple;
-	bh=YA01kvzOPgprLZABAlrdwx1ZNwemAB3HCjaW6Xy+STo=;
+	s=arc-20240116; t=1728020652; c=relaxed/simple;
+	bh=oC5K0/ShitYL7GsFKHIJR4DTrOAXzRqRN4nxDpVmbjc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jNmeWNBBjupjRU6TeovtntJtmiWjxAaGdzVQgB1beD1xMzaNIsxlsjgwfMo4OSpsgtIdNJSwkP/KoKv9xT3ogLJtDliItd1mov0FP7OGcRDTLGsgHyb8Z3LJocJg42bk8C5yC0WvEe7gsWSxpG3YPb4T1qZAv3fyB/9tLrSLGJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id A578F227A87; Fri,  4 Oct 2024 07:38:29 +0200 (CEST)
-Date: Fri, 4 Oct 2024 07:38:28 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv2] block: enable passthrough command statistics
-Message-ID: <20241004053828.GA14377@lst.de>
-References: <20241003153036.411721-1-kbusch@meta.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ScLgFe8F+yuuK+K1dMmSDOBcpf9t8Y1EqFNVp7M2ptzEQgCOsNdSTqSEcPatfc7O0EKmvebDWJ/jrQCdJBVVfC8xsxrByPvZ7zR1bC2eM34eL9IBfL0ff05w+G9m+U2EJDt9TaPZiY0+BjzuYqVgfub7jgTK1iyK7lvefnQwkYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YgnuRnLW; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YgnuRnLW"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=i66gyaXy5MtT8DBNJKCiC/vQxjyIN5X0O8CftA6PRzY=; b=YgnuRnLW8omOzvzmlPNlQw3Pov
+	Qw00vim6Gq9m+up48Dtft3BLd33hiKI0EMTLJF9T54pClM3ANxD1sf7Ao/cNJxCNyDUjrlDxC+fM8
+	iPfajZJcNrOEFae+kJfkpzNZ1A0kXhHEKpmjV4LEDzyMlcYXabuw3cs2PxSBj1nqc5MID1un9n1LM
+	Bed90RaqVQhYRuYp0oRvIbOq/HX222k1LGWrf9JDMgHFzAFRPj0r/m0Zj4AVWpLib/ZCt7q99NIFr
+	MTzxSHpQI+zPlwkKweY4j5x5cKhEZyIj9VhtYrRQCHq+rS/ZnD1a3Juj3So8pK5mMPtYfSTsHBm0+
+	G5H4MjSA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1swb6l-0000000B5OE-2uOp;
+	Fri, 04 Oct 2024 05:44:07 +0000
+Date: Thu, 3 Oct 2024 22:44:07 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Md Sadre Alam <quic_mdalam@quicinc.com>,
+	Israel Rukshin <israelr@nvidia.com>
+Subject: Re: [RFC PATCH] dm-inlinecrypt: add target for inline block device
+ encryption
+Message-ID: <Zv-Ap9E2r1bRT2Wm@infradead.org>
+References: <20241004004152.8845-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,91 +48,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241003153036.411721-1-kbusch@meta.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20241004004152.8845-1-ebiggers@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Oct 03, 2024 at 08:30:36AM -0700, Keith Busch wrote:
-> +What:		/sys/block/<disk>/queue/iostats_passthrough
-> +Date:		October 2024
-> +Contact:	linux-block@vger.kernel.org
-> +Description:
-> +		[RW] This file is used to control (on/off) the iostats
-> +		accounting of the disk for passthrough commands.
-> +
->  
->  What:		/sys/block/<disk>/queue/logical_block_size
->  Date:		May 2009
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index 5463697a84428..d9d7fd441297e 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -93,6 +93,7 @@ static const char *const blk_queue_flag_name[] = {
->  	QUEUE_FLAG_NAME(RQ_ALLOC_TIME),
->  	QUEUE_FLAG_NAME(HCTX_ACTIVE),
->  	QUEUE_FLAG_NAME(SQ_SCHED),
-> +	QUEUE_FLAG_NAME(IOSTATS_PASSTHROUGH),
->  };
->  #undef QUEUE_FLAG_NAME
->  
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 8e75e3471ea58..cf309b39bac04 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -993,13 +993,38 @@ static inline void blk_account_io_done(struct request *req, u64 now)
->  	}
->  }
->  
-> +static inline bool blk_rq_passthrough_stats(struct request *req)
-> +{
-> +	struct bio *bio = req->bio;
-> +
-> +	if (!blk_queue_passthrough_stat(req->q))
-> +		return false;
-> +
-> +	/*
-> +	 * Stats are accumulated in the bdev part, so must have one attached to
-> +	 * a bio to do this
-> +	 */
-> +	if (!bio)
-> +		return false;
-> +	if (!bio->bi_bdev)
-> +		return false;
+On Thu, Oct 03, 2024 at 05:41:52PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Add a new device-mapper target "dm-inlinecrypt" that is similar to
+> dm-crypt but uses the blk-crypto API instead of the regular crypto API.
+> This allows it to take advantage of inline encryption hardware such as
+> that commonly built into UFS host controllers.
+> 
+> The table syntax matches dm-crypt's, but for now only a stripped-down
+> set of parameters is supported.  For example, for now AES-256-XTS is the
+> only supported cipher.
 
-Missing. At the end of the sentence.  But even then this doesn't
-explain why not accouting these requests is fine.
+Maybe I'm stepping into a mine-field here, but if this simply uses
+blk-crypto to accellerate a subset of dm-crypt, why isn't dm-crypt
+simply enhanced to use blk-crypto when available?
+compatible,
 
- - requests without a bio are all those that don't transfer data
- - requests with a bio but not bdev are almost all passthrough requests
-   as far as I can tell, with the only exception of nvme I/O command
-   passthrough.
+> +EXPORT_SYMBOL_GPL(bio_crypt_set_ctx);
 
-I.e. what we have here is a special casing for nvme I/O commands.  Maybe
-that's fine, but the comments and commit log should leave a clearly
-visible trace of that and not confuse the hell out of people trying to
-understand the logic later.
-
-> +	/*
-> +	 * Ensuring the size is aligned to the block size prevents observing an
-> +	 * invalid sectors stat.
-> +	 */
-> +	if (blk_rq_bytes(req) & (bdev_logical_block_size(bio->bi_bdev) - 1))
-> +		return false;
-
-Now this probably won't trigger anyway for the usual workload (although
-it might for odd NVMe command sets like KV and the SLM), but I'd expect the
-size to be rounded (probably up?) and not entirely dropped.
-
-> +	ret = queue_var_store(&ios, page, count);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	if (ios)
-> +		blk_queue_flag_set(QUEUE_FLAG_IOSTATS_PASSTHROUGH,
-> +				   disk->queue);
-> +	else
-> +		blk_queue_flag_clear(QUEUE_FLAG_IOSTATS_PASSTHROUGH,
-> +				     disk->queue);
-
-Why is this using queue flags now?  This isn't really blk-mq internal,
-so it should be using queue_limits->flag as pointed out last round.
+Please split the exports in a separate subsystem into a separate prep
+patch, documenting why it makes sense to have these as exported APIs.
 
