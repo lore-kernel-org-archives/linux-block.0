@@ -1,121 +1,80 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8827F1E3795;
-	Fri,  4 Oct 2024 16:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A6A1CACE1
+	for <linux-block@vger.kernel.org>; Fri,  4 Oct 2024 16:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728060242; cv=none; b=rDAcHxonLahTrFHTIXDrpIa5N9nYLE79+RuqZxT9CiSFDqJBj7MAqhS7G94gbKJt5AhIGzfnxAkFi/sC1bn8oAEV5OWf5L8oxMKZDIiNNsfezTFYZU5CehDSs7bQwQtWJGVacUH51MugK53yhJ9Cgp9LKxrwmvrnERJLaRQ/D0M=
+	t=1728061023; cv=none; b=KU2XFMPVbF3uXHPU2JDXvHmPtUvZ7AiP2uly7ITJaPmrS9udlAzD5xpKhkiojeulJtOW2h9GGUbNTr7r6LBWfdLlBCR/zGImKU6AnWX/Hco+C9VST3X0Vzqi8b+JQBS3sJqQB1bx3wXP+bOY/P6oNFiShFUTgiPEAjRtyM3vOfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728060242; c=relaxed/simple;
-	bh=UNor5Daq1Hj/rkiA5hUcVkwjjCXkYG9ZGXwb/O6wnEw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hYOcemnbAYhhMPqMj+g391tcJ+fLBFASyC6ggTS6b9adoGTtsdTlvkgY++HLZNKsIljpnplKkGDfpMG4kg3/xyvXqsrjthk3ykYkOn0fMgKpXLYgcaHcgeZmBjHZlDHZJhQyMrQ3FACQcHXAWtOwDFUiYDRaeFSMqtKxAA0M9ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kE+xNx9X; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728061023; c=relaxed/simple;
+	bh=LC5opBzsfMWT+Woxf6ql+szBwJm4lOK2uFmK2/got7M=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=gs+23ipueNX5dwHQhES/HhK9QStJjWXYaZ8zQegmMPpUQ+OwXVUNKkITgbE5VzJn7TKUhx+xLT1LFQf3SFi3fOvtVQ4RvsQWhCkDxaQ/eKJf6rlEkI8iut92vb6JVk3mZvZoHvhj2UX/0+0xhltlukwtEdX5c8ctv9b401HiUW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OUi85u3A; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kE+xNx9X"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c88c9e45c2so6014672a12.0;
-        Fri, 04 Oct 2024 09:44:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728060239; x=1728665039; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rtkEcDZJ4/Fz+x3oDOe63uDhs03xabv3JKtyFnIwGmQ=;
-        b=kE+xNx9XGuXRj7jFZ4QNKwIaydI4+1Kjeid5+K5V8CUDdyfY3uc586pIlXYrUAgcIl
-         i6/vM7/Pl15F/rnvyfJEnfNBTVWSavWJuzRg7vRNBBbkHmKMFvSIZO0b7OviZrUpQh0Q
-         LWYtzvUB0PDkoeE/W/DBBOltg2RKN/mbv9PUp7M+PLejQFutfz2XHF+OcCzNMGv6MFLs
-         TrFT/DSnpwsWApKlJQosUdrRuyY9GsrPLAs4ANQyNB+BLNP51A1WwqB+6o6+ziMXIFXZ
-         i/8Qr7l4Strzl7bfX1U6uK1FvKYuRzvK6jlRaAXDexqbyXW3wHbf2rxnmRtBDaRGgTVG
-         vIxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728060239; x=1728665039;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rtkEcDZJ4/Fz+x3oDOe63uDhs03xabv3JKtyFnIwGmQ=;
-        b=q+xbh73H1/n7a4z5G1wPDfw2F+hm09ZJEQJJEpSbS1i634bli3S1y/JynCpTZjLPyB
-         azaTY1FBBRngryJFQW8Eypp7JvWBoe7JsKQiGoiIETUDC32kw3LiYRZSy0sub0CWw5JO
-         JEOrl4gcOkpqj2ly/4Teh84MARQCGqHSQRtmv9HkyueM9wG2tKF4TedTryAQZPHLJDAH
-         7toTN4FlTLR1DSMoW2bVPMPnmLqRlsKxtrSkbtWfOGcK9fKzNSLQOLUT9CKEj3jSNC90
-         rOt8Z5ps/RZ2/rxP9rdtHTkJxx2AttV97r5ZIvQOJGHDB3U+BSPnv0TQUHoOa1xHHhoL
-         9IDA==
-X-Forwarded-Encrypted: i=1; AJvYcCWCCOuMl+mUGEr9cgeEEpvwyo0YGQkvPVS/I7Dwu+PcPCEA/alPw8sW7cGUyF/UwHN3iXN3lpNFiNgF/gNn@vger.kernel.org, AJvYcCWpx6Uawv4/mtjH7nKHegdEgfwBLx2V5ezX0wRJWo5xh4bNXkPCNsGp1fEAiaCQIFwGToHHE3TobjFXwT4p5jk=@vger.kernel.org, AJvYcCWvqvskbSbTODaevg0U9lV3QOwjPUHskw6aBu/Vubdb3FSgiYBnbqa7rNJg0ckZ1chlahc1OvC8+ubOvg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxqz7L++/5sFTIB1Q/Xeo9INstaVDfepwE9AnV+YdbkRV5W+Axv
-	B6y6AhfKv6anbh5Ui9mHcA1JUR1q4Hn05g7u1Rxcu6GAr4+/T220
-X-Google-Smtp-Source: AGHT+IEc5rpr7NxwjdqznlXv24+kd6fq1wnlYKs/nn4dcU0eENpde0atM6OdSgWyadBJgkBAbdDd+Q==
-X-Received: by 2002:a05:6402:280f:b0:5c8:a2b8:cab3 with SMTP id 4fb4d7f45d1cf-5c8d2f1e03amr3728528a12.4.1728060238589;
-        Fri, 04 Oct 2024 09:43:58 -0700 (PDT)
-Received: from ?IPV6:2003:df:bf2f:2200:c8eb:5450:fddc:5d96? (p200300dfbf2f2200c8eb5450fddc5d96.dip0.t-ipconnect.de. [2003:df:bf2f:2200:c8eb:5450:fddc:5d96])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c8e05f450csm48681a12.97.2024.10.04.09.43.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Oct 2024 09:43:58 -0700 (PDT)
-Message-ID: <9629a9d2-7e79-41ae-96c9-5fb26493c37a@gmail.com>
-Date: Fri, 4 Oct 2024 18:43:57 +0200
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OUi85u3A"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728061021;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EpJ30SXry5ywItaI0zm3pCFPe4HCY3tu4N9t4xI5rt8=;
+	b=OUi85u3AOibRI+zLvCspJAyfae3KhXEGUtXs//2+E/68OMwhpqpZoeTzKpQA8FTzkZZ9oq
+	ZfmZsIP8Fd7S1soAmSs6vecCEgvXL4LD64T1gyFzVklVCc8jyd8KDQIbk8z4LC3KFEJGjs
+	/S/CRTaO5Vwrr/tTRCDi51s9x6xrHCY=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-472-QZcaDm-GPOmeyaH_zzULWg-1; Fri,
+ 04 Oct 2024 12:56:58 -0400
+X-MC-Unique: QZcaDm-GPOmeyaH_zzULWg-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 62DC019560BF;
+	Fri,  4 Oct 2024 16:56:56 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4435B19560AE;
+	Fri,  4 Oct 2024 16:56:53 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20241004153025.1867858-1-ming.lei@redhat.com>
+References: <20241004153025.1867858-1-ming.lei@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+    Alexander Viro <viro@zeniv.linux.org.uk>,
+    linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] lib/iov_iter.c: extract virt-contiguous pages in iov_iter_extract_bvec_pages
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] rust: block: convert `block::mq` to use `Refcount`
-To: Gary Guo <gary@garyguo.net>, Andreas Hindborg <a.hindborg@kernel.org>,
- Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
- Alex Gaynor <alex.gaynor@gmail.com>,
- =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>, Jens Axboe <axboe@kernel.dk>
-Cc: Will Deacon <will@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Mark Rutland <mark.rutland@arm.com>, linux-block@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241004155247.2210469-1-gary@garyguo.net>
- <20241004155247.2210469-4-gary@garyguo.net>
-Content-Language: de-AT-frami
-From: Dirk Behme <dirk.behme@gmail.com>
-In-Reply-To: <20241004155247.2210469-4-gary@garyguo.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3855841.1728061012.1@warthog.procyon.org.uk>
+Date: Fri, 04 Oct 2024 17:56:52 +0100
+Message-ID: <3855842.1728061012@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Am 04.10.24 um 17:52 schrieb Gary Guo:
-> Currently there's a custom reference counting in `block::mq`, which uses
-> `AtomicU64` Rust atomics, and this type doesn't exist on some 32-bit
-> architectures. We cannot just change it to use 32-bit atomics, because
-> doing so will make it vulnerable to refcount overflow. So switch it to
-> use the kernel refcount `kernel::sync::Refcount` instead.
-> 
-> There is an operation needed by `block::mq`, atomically decreasing
-> refcount from 2 to 0, which is not available through refcount.h, so
-> I exposed `Refcount::as_atomic` which allows accessing the refcount
-> directly.
-> 
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Boqun Feng <boqun.feng@gmail.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Signed-off-by: Gary Guo <gary@garyguo.net>
-> ---
-...
-> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-> index a0e22827f3f4..7b63c02bdce7 100644
-> --- a/rust/kernel/block/mq/request.rs
-> +++ b/rust/kernel/block/mq/request.rs
-....
-> @@ -37,6 +38,9 @@
->   /// We need to track C and D to ensure that it is safe to end the request and hand
->   /// back ownership to the block layer.
->   ///
-> +/// Note that driver can still obtain new `ARef` even there is no `ARef`s in existence by using
+Ming Lei <ming.lei@redhat.com> wrote:
 
-Do you like to check this sentence? Maybe:
+> All iov_iter_bvec() users only want to extract virt-contiguous pages from
+> iov_iter_extract_pages() instead physical-contiguous pages.
 
-Note that "a" driver can still obtain "a" new `ARef` even "if" there 
-"are" no `ARef`s in existence by using ....
+What do you mean by "virt-contiguous"?  Virtual according to what mapping?
 
-?
+The reason for physical contiguity is that you can pass a set of physical
+contiguous pages as a single DMA descriptor.  Therefore, at some point, you
+might end up screwing up skb_splice_from_iter().  Currently, that's limited to
+a PAGE_SIZE per fragment, but hopefully that will be fixed at some point.
 
-Best regards
+David
 
-Dirk
