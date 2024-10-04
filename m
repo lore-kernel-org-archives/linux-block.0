@@ -1,125 +1,84 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACEA156872;
-	Fri,  4 Oct 2024 13:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52122139C9;
+	Fri,  4 Oct 2024 14:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728047866; cv=none; b=mI0VvBN1GpRBUjFQb+0hzD3fsRTpC7++wxe7XmGfqIP3m7itJ3u4SKRSzvUCtI6cVvRUGj/Ur2AuC/uTvNVublIQdXt9+cNj8PzUAARHopBRyBDeIfTX84sPzhx6T26dDjDu1+t0iXBwleKP5syuWTozdmQbEoT3dWncWhpBYLQ=
+	t=1728051048; cv=none; b=t/p+TAvAVJ+05kphIH2qiBv4TyitVs6KV+fN67A6InKuthsPW+vpeu52/n8bjAscALURcGP36jHL6CCxX/uQpOlWXUJI5sK4TaRHBqBhbljl0dH1tP7Qc1LLXQFKQd/0plbl8BinzWqOPIBNxLH7EjFm3nECRFle4/XR+I6ovfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728047866; c=relaxed/simple;
-	bh=WHKnN32Pe2DhvGdAFMSHxyfMwJ8co7XmMknpVTg1sHs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cnlcG7oAMhc814NI/7XQQY05bqUIRgToRFelGqv6JY+4sLDb/FU0UQvi4xO5mecpwp9/8AWqTgVU09WQY5emv3GieutFMT44dl/jSVgFDJ0mJSgmILuBpQhBf8NUpsQaIY7ErCUachsslaFJDKU0Jh47eHyiFUtJQ2CskBcme3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LbIukUkH; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1728051048; c=relaxed/simple;
+	bh=JcoAozjGe6KJwo8JlLKfy7dzBgqW2BEBvSTA/VAxTfw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=m/nAilbIGqjDRneNtlu+EGZ+cG21ZlG+6t8NJE6LGLVYVImt2BqmjOt9VIjSrQUEmjWzHhceHeR6j0OFvErmEqZH9P6JrOL/1iO6JG06G9b6Mr4UFu5fKzs4OAZqTsSSVNIOa5MoU/AF2a+zss+roqeAH8Qrl+snj1hUczEUcsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FRQhRwdB; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LbIukUkH"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-42cbbb1727eso21475945e9.2;
-        Fri, 04 Oct 2024 06:17:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FRQhRwdB"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20aff65aa37so18681845ad.1;
+        Fri, 04 Oct 2024 07:10:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728047863; x=1728652663; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EP7ewQG/vBLMLg2WRG9XuTdzd48wbPPN6UpOMrmi6UY=;
-        b=LbIukUkHhmWZApevyxUSsS/jIzlvl2lP11QyomIXP/M2NpI9ftZM6/lwEP5iSHwhgd
-         bSYPoULCuo12Iad+/JQDZUCVB6rCCOPsLyEmZQkZSwxUobmUf7dYGnfBo/f+qabBiF6F
-         1tOmK0qWgXYvf2kneC2f8wugTlEP30CEt4AbPRGg6FdQxs84B85tClIODPMYxJ/MVNt7
-         60SresroerpvD9kLb0djEbZYu9EzC7aygld/ZHwl0UfJOsWvrq8gd4SQ7EYhhn58y+by
-         BmINYeUtimGHUS+454iypRzJ1FXa6HfJzpKJbj3miUK5eQbjkCejWDtYca1w8aQMXMkw
-         KFeg==
+        d=gmail.com; s=20230601; t=1728051044; x=1728655844; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Sfd0dihu7gfegBqVS9/NP6tMEUAcyFXZ5iJaoj+m2kw=;
+        b=FRQhRwdBAPr+1DR6VheuSOxfMQmi0PDbg4/odiyghl+4k/BxmEL0i+U0qd8Z1wCx6Y
+         8sUxN8VZef8yaWMW/clve1/6budN7YnCUHl8WR/KFsWzVucogxXKJw57psTpdFmXMjdW
+         8LMfdXClFwevZjjkF3hics5swOYZ0LAZt5YMBWwyWWlL3lLS29Sk/mbWcRUuNlQPiHaM
+         pCFWMEi1BvMRcflqwP5SeXGVXi15dZ8Sgb/hHUWBOw6mOYWzZxAeRDTqLubsgmMWawTx
+         GGp8oS3nXfX49rn+PEPIpNcO7tjf0fPjX83dD/SPyDJzfec8iVgQXX9Zjo06kA9qkRKp
+         IGHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728047863; x=1728652663;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EP7ewQG/vBLMLg2WRG9XuTdzd48wbPPN6UpOMrmi6UY=;
-        b=TqKe/wzfYzIobWasUzAuzs4BZeUrHRzakSYFAPU2AARKluoWZRQUSyaiRaqfAb0s5R
-         NInVFZY9SaMRNCfAwIzFKtJLIajR3puksSo7BlaJDWVvX190RsmV7dj6zgo2dnUQV9th
-         A7a51beJVhvHBDFiQ4xG6vPG6popHUmH0Gdm7iwI6lWj3NYgAe7T3qnAWf+PFE1V3O+K
-         sGtpd8V99LmhuTFABv6D9ynginU+UoL7JeLsjl973gGPdl8+8FhiBv7UJbUMY5L5SAG9
-         YEQLfDvuzhYAShZYJrtkufrQNSLcxaiOckYgb65ixalOzEUeEARpa6S8BATmHLgZwyUw
-         /S+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWZq8TgEaUQrxSBvCOvllzuiVVlluKHv6ajs0uCMV6Xu+iIsl2PD1pmMeio974j0+hnUjW06u0Bnw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCJiINUsRz1Ku2JGuREk6Lhus4/yTp9qSFkKCCVnqvhn68l3wP
-	yH8KTq+Ah9XPeFiEGCUXRLxIPWvk10BX4+67cD0T43goVza+O3mn
-X-Google-Smtp-Source: AGHT+IHLdjD1chhBEqT7Z6CJzV8NqCWrmBn1AalwxRxhrAQlFVuQUNB2Gs1NBQgdj9XlTBqrOaE/oQ==
-X-Received: by 2002:a05:600c:198c:b0:42c:bdb0:c61e with SMTP id 5b1f17b1804b1-42f85aae2damr21212005e9.13.1728047862855;
-        Fri, 04 Oct 2024 06:17:42 -0700 (PDT)
-Received: from [192.168.42.155] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f86b1d826sm15474155e9.26.2024.10.04.06.17.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Oct 2024 06:17:42 -0700 (PDT)
-Message-ID: <36b88a5a-1209-4db3-8514-0f1e1828f7e1@gmail.com>
-Date: Fri, 4 Oct 2024 14:18:13 +0100
+        d=1e100.net; s=20230601; t=1728051044; x=1728655844;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Sfd0dihu7gfegBqVS9/NP6tMEUAcyFXZ5iJaoj+m2kw=;
+        b=c0sJnvKJV5osiHFZcwktyJk2SetLAz1cwatIW6G+tEOi3I1MyqtPk3ZBY96xXhkisT
+         Bu+DtpRbwZtR+JDGUaMm0xCzk2UJ1t16U/COHBW5dBGcl6V6FTWNs5b+wndlIK6lYSlC
+         UKLnhWmVDZWS2rBQKY4BVA6RoxKtJS2FohzGj9/tKsgRPkewLFhrnVgZA80dv8j+ZBjj
+         qoWnZc9obsbQ8F0sWXb0qqzLoDPcivGxGWgo4uAAK25VFkznKBGHo4lTeQBUux/GO7Lw
+         VfT/T2JGtQHCzuB/eakjSq1eh8sQCvDu7adlWo3wezeB9ethBSSs+U/cmxl5yPQnrfZJ
+         4o9w==
+X-Forwarded-Encrypted: i=1; AJvYcCW5XWFDDisJ8PBrFL2wBQCROhfB0a53hTlyZYIdbgKljDilyzar/Xjuy7vddFgAzE51pVhGWDLQx9E8BQ==@vger.kernel.org, AJvYcCXciPvyKfe7vCbIsb0ChaHcR2QouPwBDqNP6uWkSrBVn3BElgWfv0cqpqSbWe3IqAL2iIS+wwI3zq57Vdtk@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDMhdqBQoyCE31K0pU03eZHFCk0fWyQSv3nXw0K1dR92bIX10m
+	m7Qz+1iXpEOsD+qLXNcW2GyKoVo6LcD3dGg7c0A5e6V+Vpe+yXBP
+X-Google-Smtp-Source: AGHT+IEC6qnaS9VbQbPqrtFDm5c4hbnrAi1LBKJRSfHwE5682SXEXs7jSskoTR2Yjzx112qTn+aKyg==
+X-Received: by 2002:a17:902:db0d:b0:20b:8642:9863 with SMTP id d9443c01a7336-20bfdfc268dmr44096215ad.18.1728051043743;
+        Fri, 04 Oct 2024 07:10:43 -0700 (PDT)
+Received: from purva-IdeaPad-Gaming-3-15IHU6.. ([2405:204:20:6275:2654:2317:92c7:7b80])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beeca00a5sm24580825ad.113.2024.10.04.07.10.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 07:10:43 -0700 (PDT)
+From: SurajSonawane2415 <surajsonawane0215@gmail.com>
+To: hch@infradead.org
+Cc: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	surajsonawane0215@gmail.com
+Subject: Explanation on Uninitialized Variable bio in blk_rq_prep_clone
+Date: Fri,  4 Oct 2024 19:40:37 +0530
+Message-Id: <20241004141037.43277-1-surajsonawane0215@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <Zv_eFIjstVns-ebG@infradead.org>
+References: <Zv_eFIjstVns-ebG@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V6 5/8] io_uring: support sqe group with members depending
- on leader
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- io-uring@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-References: <20240912104933.1875409-1-ming.lei@redhat.com>
- <20240912104933.1875409-6-ming.lei@redhat.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20240912104933.1875409-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 9/12/24 11:49, Ming Lei wrote:
-> IOSQE_SQE_GROUP just starts to queue members after the leader is completed,
-> which way is just for simplifying implementation, and this behavior is never
-> part of UAPI, and it may be relaxed and members can be queued concurrently
-> with leader in future.
-> 
-> However, some resource can't cross OPs, such as kernel buffer, otherwise
-> the buffer may be leaked easily in case that any OP failure or application
-> panic.
-> 
-> Add flag REQ_F_SQE_GROUP_DEP for allowing members to depend on group leader
-> explicitly, so that group members won't be queued until the leader request is
-> completed, the kernel resource lifetime can be aligned with group leader
+Explaination of how bio could be used uninitialized in this function:
 
-That's the current and only behaviour, we don't need an extra flag
-for that. We can add it back later when anything changes.
+In the function blk_rq_prep_clone, the variable bio is declared but can remain uninitialized 
+if the allocation with bio_alloc_clone fails. This can lead to undefined behavior when the 
+function attempts to free bio in the error handling section using bio_put(bio). 
+By initializing bio to NULL at declaration, we ensure that the cleanup code will only 
+interact with bio if it has been successfully allocated.
 
-> or group, one typical use case is to support zero copy for device internal
-> buffer.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->   include/linux/io_uring_types.h | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
-> index 11c6726abbb9..793d5a26d9b8 100644
-> --- a/include/linux/io_uring_types.h
-> +++ b/include/linux/io_uring_types.h
-> @@ -472,6 +472,7 @@ enum {
->   	REQ_F_BL_NO_RECYCLE_BIT,
->   	REQ_F_BUFFERS_COMMIT_BIT,
->   	REQ_F_SQE_GROUP_LEADER_BIT,
-> +	REQ_F_SQE_GROUP_DEP_BIT,
->   
->   	/* not a real bit, just to check we're not overflowing the space */
->   	__REQ_F_LAST_BIT,
-> @@ -554,6 +555,8 @@ enum {
->   	REQ_F_BUFFERS_COMMIT	= IO_REQ_FLAG(REQ_F_BUFFERS_COMMIT_BIT),
->   	/* sqe group lead */
->   	REQ_F_SQE_GROUP_LEADER	= IO_REQ_FLAG(REQ_F_SQE_GROUP_LEADER_BIT),
-> +	/* sqe group with members depending on leader */
-> +	REQ_F_SQE_GROUP_DEP	= IO_REQ_FLAG(REQ_F_SQE_GROUP_DEP_BIT),
->   };
->   
->   typedef void (*io_req_tw_func_t)(struct io_kiocb *req, struct io_tw_state *ts);
-
--- 
-Pavel Begunkov
+Best regards,
+Suraj Sonawane
