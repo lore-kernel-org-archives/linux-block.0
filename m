@@ -1,54 +1,54 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8CF1E3DE0
-	for <linux-block@vger.kernel.org>; Fri,  4 Oct 2024 15:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97281AA7B5
+	for <linux-block@vger.kernel.org>; Fri,  4 Oct 2024 15:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728055959; cv=none; b=NJOvHRyjMs1v00IOGdOH/KRjP3xhxc6gK/3u8JDu0n8RJcEj82HgFOOECOdxN3XTo+3PkVoGb4SbKbbg7qWLi14zZVLWusByFQfJCSMKRDDhuUj4TEUmFxsN3vERd+VfjuWEBjeZSPDl4ZSg0PgleXGFwZPOsUhPYL4c65ya6x0=
+	t=1728056105; cv=none; b=kyHGUP+rjxr6tEl6HLqHbuf+O4gRs/wUR0eVf65ts+VPRZooihnTEiJrbplQXjKvs99AbQJfqi53CH8H4lMoEihSyPs0Oa34WmrTlodRsukDKAOQ9ZQRYhdXCIY5oX3sXqTY+9exdcjlLAdVwzZtNtoaVQMlAVrOICwF6Ig3QiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728055959; c=relaxed/simple;
-	bh=5yTL8XGh2t9xK5VWWbyOX4lCsqycK775iZuobIRGfb8=;
+	s=arc-20240116; t=1728056105; c=relaxed/simple;
+	bh=4R+bjkkANUZFElUR3AnO4g7qOY03zDWdvgsvEAgGO8A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ekAd8+Yiam5W2P8BEb5Nhi1gyJgDt+6RU7jTZILQ1yB/CXzakIb0CzD8UD5vrshFIMaK3jLoIMWNTJivv06TWDytLdut7n2jwXClKK9wfwb9uHCYYAudKuUQGYuMq4YSpcZDuLHn+JWpfaVkNib3sCEoNbsYM8Rul0BnRho2wpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LbXWsncX; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=juJO5sk9x+MqaVB7czsREClH1kYzN7C4zV9S7Dz3IgNKXq2IH6N6KJa55naspNSuytLoVuQxITMCTqzslsQO5UF9lVg+RS7QiTB4q/tJ+xWQ3TOYt99JGi1as95kzXJ2xPbGwkpiDxMIBVpTiSnFCj2Tw4rPYmcy/JPshud+KOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KxMxkNej; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LbXWsncX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KxMxkNej"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728055956;
+	s=mimecast20190719; t=1728056102;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BsvYJhdgN7y4uvFjsLjEprL3BcHtuRcmRyB8X0RUZKI=;
-	b=LbXWsncXt2anQkzDsZG/VVSN02Fwp42c1Eu1puLlCKkGx8rNYiA0IBQbfupIvDwDBftm/M
-	jV35k6g4wbN34/IgpsZN7uEWiQq8sQYq2MGM30uEOTSpKlc6XCZOResuIBzF0omGfAXgbj
-	0+LyC4UVlfNCQ3/eCqZPPzliUIZqAF0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=Tr59JQ1sfNf3b9KrmfGkricjfTXwGWXI04nwRJyi3R8=;
+	b=KxMxkNejy2EGfYGVA+XjKmGorme8fNgNrZ3FK3Vzw6Dn+QD/Q3+R+CJw0A85+msO3Zo/wp
+	HNRlgzQaqUvDRTSoq39MuodqGHi6VFLtgFfFyznuksWcn2EHBungF4vKVliJbSQMl4orou
+	z5vE9Z8epz+B3pYl9Gd8Jfhh2Suvs28=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-302-aP2CdMNJOZqswZv2kB1EOQ-1; Fri,
- 04 Oct 2024 11:32:33 -0400
-X-MC-Unique: aP2CdMNJOZqswZv2kB1EOQ-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-284-ciDQ5J12PYKA4ho9q_L3_A-1; Fri,
+ 04 Oct 2024 11:34:58 -0400
+X-MC-Unique: ciDQ5J12PYKA4ho9q_L3_A-1
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A946F1955BD2;
-	Fri,  4 Oct 2024 15:32:31 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3E8F519560BF;
+	Fri,  4 Oct 2024 15:34:57 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.24])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A216419560A3;
-	Fri,  4 Oct 2024 15:32:25 +0000 (UTC)
-Date: Fri, 4 Oct 2024 23:32:18 +0800
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3141A19560A3;
+	Fri,  4 Oct 2024 15:34:52 +0000 (UTC)
+Date: Fri, 4 Oct 2024 23:34:47 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Uday Shankar <ushankar@purestorage.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
 	linux-block@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 2/5] ublk: refactor recovery configuration flag helpers
-Message-ID: <ZwAKgnJmJ6yZ-c50@fedora>
+Subject: Re: [PATCH v3 4/5] ublk: support device recovery without I/O queueing
+Message-ID: <ZwALFzPLAW1AbW-J@fedora>
 References: <20241002220949.3087902-1-ushankar@purestorage.com>
- <20241002220949.3087902-3-ushankar@purestorage.com>
+ <20241002220949.3087902-5-ushankar@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,10 +57,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241002220949.3087902-3-ushankar@purestorage.com>
+In-Reply-To: <20241002220949.3087902-5-ushankar@purestorage.com>
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Oct 02, 2024 at 04:09:46PM -0600, Uday Shankar wrote:
+On Wed, Oct 02, 2024 at 04:09:48PM -0600, Uday Shankar wrote:
 > ublk currently supports the following behaviors on ublk server exit:
 > 
 > A: outstanding I/Os get errors, subsequently issued I/Os get errors
@@ -80,20 +80,118 @@ On Wed, Oct 02, 2024 at 04:09:46PM -0600, Uday Shankar wrote:
 > UBLK_F_USER_RECOVERY: B + 2
 > UBLK_F_USER_RECOVERY|UBLK_F_USER_RECOVERY_REISSUE: C + 2
 > 
-> We can't easily change the userspace interface to allow independent
-> selection of one of {A, B, C} and one of {1, 2}, but we can refactor the
-> internal helpers which test for the flags. Replace the existing helpers
-> with the following set:
-> 
-> ublk_nosrv_should_reissue_outstanding: tests for behavior C
-> ublk_nosrv_[dev_]should_queue_io: tests for behavior B
-> ublk_nosrv_should_stop_dev: tests for behavior 1
+> The behavior A + 2 is currently unsupported. Add support for this
+> behavior under the new flag combination
+> UBLK_F_USER_RECOVERY|UBLK_F_USER_RECOVERY_FAIL_IO.
 > 
 > Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+> ---
+> Changes since v2 (https://lore.kernel.org/linux-block/20240917002155.2044225-5-ushankar@purestorage.com/):
+> - Clean up logic in ublk_ctrl_end_recovery
+> 
+>  drivers/block/ublk_drv.c      | 78 ++++++++++++++++++++++++++++-------
+>  include/uapi/linux/ublk_cmd.h | 18 ++++++++
+>  2 files changed, 81 insertions(+), 15 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index d5edef7bde43..f2a05dcbc58b 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -60,10 +60,12 @@
+>  		| UBLK_F_UNPRIVILEGED_DEV \
+>  		| UBLK_F_CMD_IOCTL_ENCODE \
+>  		| UBLK_F_USER_COPY \
+> -		| UBLK_F_ZONED)
+> +		| UBLK_F_ZONED \
+> +		| UBLK_F_USER_RECOVERY_FAIL_IO)
+>  
+>  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+> -		| UBLK_F_USER_RECOVERY_REISSUE)
+> +		| UBLK_F_USER_RECOVERY_REISSUE \
+> +		| UBLK_F_USER_RECOVERY_FAIL_IO)
+>  
+>  /* All UBLK_PARAM_TYPE_* should be included here */
+>  #define UBLK_PARAM_TYPE_ALL                                \
+> @@ -146,6 +148,7 @@ struct ublk_queue {
+>  	bool force_abort;
+>  	bool timeout;
+>  	bool canceling;
+> +	bool fail_io; /* copy of dev->state == UBLK_S_DEV_FAIL_IO */
+>  	unsigned short nr_io_ready;	/* how many ios setup */
+>  	spinlock_t		cancel_lock;
+>  	struct ublk_device *dev;
+> @@ -690,7 +693,8 @@ static inline bool ublk_nosrv_should_reissue_outstanding(struct ublk_device *ub)
+>   */
+>  static inline bool ublk_nosrv_dev_should_queue_io(struct ublk_device *ub)
+>  {
+> -	return ub->dev_info.flags & UBLK_F_USER_RECOVERY;
+> +	return (ub->dev_info.flags & UBLK_F_USER_RECOVERY) &&
+> +	       !(ub->dev_info.flags & UBLK_F_USER_RECOVERY_FAIL_IO);
+>  }
+>  
+>  /*
+> @@ -700,7 +704,8 @@ static inline bool ublk_nosrv_dev_should_queue_io(struct ublk_device *ub)
+>   */
+>  static inline bool ublk_nosrv_should_queue_io(struct ublk_queue *ubq)
+>  {
+> -	return ubq->flags & UBLK_F_USER_RECOVERY;
+> +	return (ubq->flags & UBLK_F_USER_RECOVERY) &&
+> +	       !(ubq->flags & UBLK_F_USER_RECOVERY_FAIL_IO);
+>  }
+>  
+>  /*
+> @@ -714,6 +719,12 @@ static inline bool ublk_nosrv_should_stop_dev(struct ublk_device *ub)
+>  	return !(ub->dev_info.flags & UBLK_F_USER_RECOVERY);
+>  }
+>  
+> +static inline bool ublk_dev_in_recoverable_state(struct ublk_device *ub)
+> +{
+> +	return ub->dev_info.state == UBLK_S_DEV_QUIESCED ||
+> +	       ub->dev_info.state == UBLK_S_DEV_FAIL_IO;
+> +}
+> +
+>  static void ublk_free_disk(struct gendisk *disk)
+>  {
+>  	struct ublk_device *ub = disk->private_data;
+> @@ -1275,6 +1286,10 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  	struct request *rq = bd->rq;
+>  	blk_status_t res;
+>  
+> +	if (unlikely(ubq->fail_io)) {
+> +		return BLK_STS_TARGET;
+> +	}
+> +
+>  	/* fill iod to slot in io cmd buffer */
+>  	res = ublk_setup_iod(ubq, rq);
+>  	if (unlikely(res != BLK_STS_OK))
+> @@ -1625,6 +1640,7 @@ static void ublk_nosrv_work(struct work_struct *work)
+>  {
+>  	struct ublk_device *ub =
+>  		container_of(work, struct ublk_device, nosrv_work);
+> +	int i;
+>  
+>  	if (ublk_nosrv_should_stop_dev(ub)) {
+>  		ublk_stop_dev(ub);
+> @@ -1634,7 +1650,18 @@ static void ublk_nosrv_work(struct work_struct *work)
+>  	mutex_lock(&ub->mutex);
+>  	if (ub->dev_info.state != UBLK_S_DEV_LIVE)
+>  		goto unlock;
+> -	__ublk_quiesce_dev(ub);
+> +
+> +	if (ublk_nosrv_dev_should_queue_io(ub)) {
+> +		__ublk_quiesce_dev(ub);
+> +	} else {
+> +		blk_mq_quiesce_queue(ub->ub_disk->queue);
+> +		for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> +			ublk_get_queue(ub, i)->fail_io = true;
+> +		}
+> +		blk_mq_unquiesce_queue(ub->ub_disk->queue);
+> +		ub->dev_info.state = UBLK_S_DEV_FAIL_IO;
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+The above state update should be moved before blk_mq_unquiesce_queue().
 
+Otherwise, this patch is fine.
 
-Thanks,
+Thanks, 
 Ming
 
