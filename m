@@ -1,121 +1,86 @@
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B16D182;
-	Sat,  5 Oct 2024 00:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A472AD23
+	for <linux-block@vger.kernel.org>; Sat,  5 Oct 2024 01:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728088883; cv=none; b=Rxie88dpbXgl7GZzWSs8VpTL9+QDgTwSd+2zRKNGnV5/LO7IQ5Jypi56tytlFAtEmiWQgt0zTBXA2AEEEi25pVc9KicHs1KQ1wiRoFRtyxP/wfKBbBOcBb04X2q+CIPUES407V6rvtgGtMfdXrw1/XUgKyjE8DgVfWprgy1aM/w=
+	t=1728091349; cv=none; b=Je/ct6urqkRPp0G/P2o0aNUq162B+MmMVKTIWK8YtHiDK1/U6yF9uSFr8Ez5RBUOMi9vUld+mUyIYyQ7DkpXFLLPhwtM08354F8JP3HgAAl+X+UdrimQdsREPMoZRSNE0b4zQfGdgzbDBdzmk75dmL4TwSjPgjmc1Pf8ODdcW+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728088883; c=relaxed/simple;
-	bh=LaR4kGrs9T92YX+VSRnrcfr1FVYBTPYB+H5z66zupfo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kP0z4qgiakLa5e0abZLTPOAdkqmwihhfs5fhd272xpZEUC/cW5AFCyWhbL0qr6SX0MyGceHGYhIvp0a76KKeskHkFBAX4tDPeayKxTQBh5tMnsFe/2YtNGnVN23fNAWkih4L89wsmpCiUo1pQjpr57AqXXT22Zi45L2pjjik0ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kG8inolI; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728091349; c=relaxed/simple;
+	bh=7HWjQznNYb08ZHhERH0pXjoZ10eAQNT8u4oZKb/GxHA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sBfKAJFt7aRSSyG1N9e2Eo8YpayZVg5s4lwudcEwc7xAkKRE85CUIBAqeO3rxyAVP4aKDt1qs331k2xMcM/UOdiI1ja5LuPu0I0tRRwX9aiKZPv3AeVGwujGmcFTYj0f5IpdvxWp42+wKfF2rQUPLSJ/4Modiv/7q4Mltj5qQ7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=g/VGASgz; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kG8inolI"
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6dbb24ee2ebso28742487b3.1;
-        Fri, 04 Oct 2024 17:41:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="g/VGASgz"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20b6c311f62so24300565ad.0
+        for <linux-block@vger.kernel.org>; Fri, 04 Oct 2024 18:22:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728088880; x=1728693680; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=owdQnnmJ0k9GqszQbsfRKFo2HloTe8ebu6VWxh7lnBE=;
-        b=kG8inolIiy3EXdGrsRyhBhpeP0um7hXGz/C4oQ5LwnER00av2iDDS1t+894HDucbrP
-         bVDIDVasPizH8RXncMB6CZDKooBSg9vPD/8Aa+VdjUQF3/XbycP/Xptk64v3rYKm/4aN
-         jXDJlogQGl5cp+taaSR3sqtbPF8q8mhQ+7yyVC/CzKSkkX6ezU/e87zp7Yu27jIbsDxS
-         dRybwFTMipLuSYuHGESgnbyP/AiDOZyB6w3BxvCFQ2RImR+2LwOknpFK+B3VpT33X2dh
-         PvQ1EDFrAtjYhDnaTEb/Yfo+d0A0DGCvXvyKcye2jir0u/9/ol08By/inGyPU3wWsQOF
-         T8ag==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728091346; x=1728696146; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mwUOdcuwOOimjt9LDoWFqhrfU+jsI9408hnb1NpCV18=;
+        b=g/VGASgztpVWh/Q34nB21H4XTjutCak8T2NPMILUOQNJJHuQ6POnyFzLWjwtMrbUOI
+         auVn6dSXGuDKoCx+ox9eKIlnVQzbDKrMu4ymmPXS03LY94AGo3ni/DhEmu1IenLFvz3q
+         QhLy/ek5baRgZjuwoojfsc7sLZKsEVTmQl/TxfGsGmkj+O6MoBLEcKmOopOLGICMwm5g
+         BJxzTxrGW3t7MqCiEXMAop5UpPgaMTuZiTjruo1ij7+onIaYd73qXqxrwqud/seADRxX
+         F/cGxPVpveWLriTiPpia5FtROIxUp0wLf0z+Aq8ZgRlTNzM7vVV9Uu6qb97p+9r0WkZI
+         c7Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728088880; x=1728693680;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=owdQnnmJ0k9GqszQbsfRKFo2HloTe8ebu6VWxh7lnBE=;
-        b=dT5xyRpo7rZOjjZR/2/FlJggtKVoJwIAdTONaEKEdcBA0jAo8/eMKsdFlPPjMmd6Ov
-         rW9zDpf0Iuvk0xr8qLxaFwq+GlH4qjXzPsOd0GxIzS7HXha/afszej+jXYku3kEHOTZ3
-         Xn/2qBSQET79g4qb/XrW1C5kgwUnqgAEZjLYp5k6/Iabe7x0ljpOW+LIU8xi+RZmco5l
-         2eRws5tQzuwuHZc1wGeOMbYpoygK6HRzOnhKHU6UN2Nc94PIcUnGvK/UOyBcfV6aCWcu
-         XrklhWbvMND/UQ7rxkWDaB1jel5jKIbNta6uG1+aVabUlhoxh+gcPCmdhMNd6UfBpPve
-         I8Hg==
-X-Forwarded-Encrypted: i=1; AJvYcCU5w/jSdpVczZbnV0eZGw3SwbjUfdPFhg/mdqFHh7BD5Sr652dguhWlPTprHvStpauY45K04PM4BV2Inw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnBKn8HCrFSBQjKX2AUSPAYmva9BNlGatt8NBg3LkHGMNXuIDZ
-	qsrLnHiFuwr4hT82oBLv94ydgTmJulF/1pQnxT8RrgKla5XxiKRwdYkhtOKFPj2wwWqR4MijPUC
-	MAsbnfBB439aoiKUDElgJZk+zx/k=
-X-Google-Smtp-Source: AGHT+IEc4JsbDjOUOZUAYvNP80Xbb7FLwNWnw3A9w7KC2tYpBb8LjgwpuWtLeg559en8y1jJ5C3WUwbpFG3x3PmhmGU=
-X-Received: by 2002:a05:690c:3088:b0:6e2:e3d:4dda with SMTP id
- 00721157ae682-6e2c702506emr33846777b3.17.1728088880398; Fri, 04 Oct 2024
- 17:41:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728091346; x=1728696146;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mwUOdcuwOOimjt9LDoWFqhrfU+jsI9408hnb1NpCV18=;
+        b=mewGTryqsa3NXG1o6netpvCGIFFSc5i57xWxmlHNH5Z+Ljb/+6f24Tj1dPaw9nakPa
+         lEfGdnw78CbGlFiPDcOZjQuaOKh/e4alrULqJphLe/FJLJHdjQjtI7MwvypmmZQITNe2
+         WuZ9dW332ZjwCen+bbJ2UXYVubH+s+BrV681fZhb1PZELDUI9vBUZFTJvvsNYqS2Kj3Q
+         W8+IU4/qT5imeOaj6PetoRegdYV4mA1cIaYDqMCUD4U3HxBdyIOM8sK0y3wivKorWReH
+         iqu8I9yMVmkpjeBE6RDYOVl5k+dfsBvA1BvNMiW5GwH0UmSiiUCCSR5R7ENvHdm6V3GM
+         rdwg==
+X-Forwarded-Encrypted: i=1; AJvYcCUUq6M/jay4mhZYhc6zKc7U1X3kw3zo/wBrFO575dVlGOS5dWyTqqaAT9hmJlTkuBeaZ1Z9s7wZ4E8JRg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGeTEQQpOOz9sGQqqxRG1tB1HE091my35g+s9KXtArV15bIH/c
+	VxXPyZj4dSWoO5c7WRKStoO8blzoh20H5d5ozjhES9OKMeqZTKfegPQL10CZi+U=
+X-Google-Smtp-Source: AGHT+IGoA2zRhIDde1IwSrkk3aqJJokT9h8Mgql1pe2fjGK6eSANH0L734iLI27o7bzT3eXlzqcZ3A==
+X-Received: by 2002:a17:902:e851:b0:207:1708:734c with SMTP id d9443c01a7336-20bfe022d08mr57774625ad.11.1728091346106;
+        Fri, 04 Oct 2024 18:22:26 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c13930715sm4447135ad.145.2024.10.04.18.22.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Oct 2024 18:22:25 -0700 (PDT)
+Message-ID: <65e41cfb-ad68-440f-9e2b-8b3341ed3005@kernel.dk>
+Date: Fri, 4 Oct 2024 19:22:24 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Stable backport request (was Re: read regression for dm-snapshot with
+ loopback)
+To: Leah Rumancik <leah.rumancik@gmail.com>, Christoph Hellwig <hch@lst.de>
+Cc: stable@vger.kernel.org, bvanassche@acm.org, linux-block@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 References: <CACzhbgTFesCa-tpyCqunUoTw-1P2EJ83zDzrcB4fbMi6nNNwng@mail.gmail.com>
  <20241004055854.GA14489@lst.de>
-In-Reply-To: <20241004055854.GA14489@lst.de>
-From: Leah Rumancik <leah.rumancik@gmail.com>
-Date: Fri, 4 Oct 2024 17:41:08 -0700
-Message-ID: <CACzhbgT_o0B7x9=c10QpRVEm1FuNaAU3Lh0cUGQ3B_+4s21cLw@mail.gmail.com>
-Subject: Re: read regression for dm-snapshot with loopback
-To: Christoph Hellwig <hch@lst.de>
-Cc: stable@vger.kernel.org, axboe@kernel.dk, bvanassche@acm.org, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ <CACzhbgT_o0B7x9=c10QpRVEm1FuNaAU3Lh0cUGQ3B_+4s21cLw@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CACzhbgT_o0B7x9=c10QpRVEm1FuNaAU3Lh0cUGQ3B_+4s21cLw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Cool, thanks. I'll poke around some more next week, but sounds good,
-let's go ahead with 667ea36378 for 6.6 and 6.1 then.
+On 10/4/24 6:41 PM, Leah Rumancik wrote:
+> Cool, thanks. I'll poke around some more next week, but sounds good,
+> let's go ahead with 667ea36378 for 6.6 and 6.1 then.
 
-- leah
+Greg, can you pickup 667ea36378cf for 6.1-stable and 6.6-stable?
 
-On Thu, Oct 3, 2024 at 10:58=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrot=
-e:
->
-> Hi Leah,
->
-> On Thu, Oct 03, 2024 at 02:13:52PM -0700, Leah Rumancik wrote:
-> > Hello,
-> >
-> > I have been investigating a read performance regression of dm-snapshot
-> > on top of loopback in which the read time for a dd command increased
-> > from 2min to 40min. I bisected the issue to dc5fc361d89 ("block:
-> > attempt direct issue of plug list"). I blktraced before and after this
-> > commit and the main difference I saw was that before this commit, when
-> > the performance was good, there were a lot of IO unplugs on the loop
-> > dev. After this commit, I saw 0 IO unplugs.
->
-> /me makes a not that it might make sense to enhance the tracing to show
-> which of the trace_block_unplug call sites did a particular unplug becaus=
-e
-> that might be helpful here, but I suspect the ones you saw the ones
-> from blk_mq_dispatch_plug_list, which now gets bypassed.
->
-> I'm not really sure how that changed things, except that I know in
-> old kernels we had issues with reordering I/O in this path, and
-> maybe your workload hit that?  Did the issue order change in the
-> blktrace?
->
-> > On the mainline, I was also able to bisect to a commit which fixed
-> > this issue: 667ea36378cf ("loop: don't set QUEUE_FLAG_NOMERGES"). I
-> > also blktraced before and after this commit, and unsurprisingly, the
-> > main difference was that commit resulted in IO merges whereas
-> > previously there were none being.
->
-> With QUEUE_FLAG_NOMERGES even very basic merging is enabled, so that
-> would fix any smaller amount of reordering.  It is in fact a bit
-> stupid that this ever got set by default on the loop driver.
->
-> > 6.6.y and 6.1.y and were both experiencing the performance issue. I
-> > tried porting 667ea36378 to these branches; it applied cleanly and
-> > resolved the issue for both. So perhaps we should consider it for the
-> > stable trees, but it'd be great if someone from the block layer could
-> > chime in with a better idea of what's going on here.
->
-> I'm totally fine with backporting the patch.
->
+-- 
+Jens Axboe
+
