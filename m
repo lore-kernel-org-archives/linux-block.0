@@ -1,138 +1,134 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E95146A93;
-	Fri,  4 Oct 2024 22:02:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BE8AD4B
+	for <linux-block@vger.kernel.org>; Sat,  5 Oct 2024 00:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728079320; cv=none; b=bb15wYpCWw2o0gzLb2QD4S3Ib79PuYKf4wJ/mp7X8U0j4IK6zqDMHdOh0q4+Yasnzo4ou0thQSPHviu7EO6Hf8JewvAqqNUd/gSDfmshQsUDzkezKDfxpfkGiTWBCFZWXON8nS6GISKuV3QxwQGoqVIT6kWbyBx+2M6ZbMS9ud4=
+	t=1728087251; cv=none; b=owiDR4X9XUv9q/eK8htYbYHEpeJWy1p1sL6SKMiUNpbPpLkG2TkcFbXmPtfsKVhPOwY4M9KbSV0o93i3NxG1/5XYyzapirE5niuw8PFo+CpCFPD6IbP5+u4kBlj4axhW/Xke/bphkOWxYVGpJVcUQBjpMGUtIW0e8sNEojrMUrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728079320; c=relaxed/simple;
-	bh=iPLMZgolL2OjvuOB8W1t69ecArE1UplQady/bEDmFSI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XZBjuOP/Y3GNPrxb3rrwc/7MEfjmgmqVAVfXyppshGoxY76uX7RZVAUxS8QEhGYVt/O8F39aOtMUF0KZaVl/A8oLKLcXLwo+/xfdGR+mjfIaPIpzuXxtdi9639u4/xIjjWAk9Dh9HxRnf1fUwEedBATnf5BomJ1jB8C0lh87Z6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WfgtGdHK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728087251; c=relaxed/simple;
+	bh=T0W0KBZI5DkiCjtxQ7TpePJYH2d/3/oGKPm/Q6dRQDk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RnTAJdb2Inx+cTP+xv/uR4tWXFfGFfVpxtnAY11oq79i3R/g7W+0GZzYJ8rMiACzRPy2sVCVQHMe7nQ4rhtSEkNp2d/8q00DJOSG9a9m43khw2Kdyyr3BRD9xBgnXD3pbYXsvlniwESxlzw5FXllljRL07Uf8AinpliA21fxRRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=jqgsak8Q; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WfgtGdHK"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 477ABC4CECD;
-	Fri,  4 Oct 2024 22:02:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728079320;
-	bh=iPLMZgolL2OjvuOB8W1t69ecArE1UplQady/bEDmFSI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=WfgtGdHKZu3QJZakEqIkOEurfeFBj3A5ggDvHDB02bUtxNONskfbEy/7ws0x71iw0
-	 9gLULbWDHHKWSF6iMaIQ3kR/SLmY/ePhKY6+yvTxzAAtjW0RLZm/QGTbrR/ECx11LU
-	 7C0ard6w15iKVOoFnAoaIK4U2HCNq3c9ovduDlx4Wu/Pq73WhiVJki8aOLPwvKpAPs
-	 6fvCOpUiYjXL7SQPTL9IxtIwLxk/iwbNLs+nYCIEgmFdxkV8WZKV3ariQAjI93oiAX
-	 VPtSO3VEQOVZXz7PO2402y1dzDOAjQPh00sk/v4J9cUmG7f/4gt9WVbGScJLDX50BA
-	 xfgiQXYP6yeCA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A9BCF8860;
-	Fri,  4 Oct 2024 22:02:00 +0000 (UTC)
-From: Mitchell Levy via B4 Relay <devnull+levymitchell0.gmail.com@kernel.org>
-Date: Fri, 04 Oct 2024 15:01:37 -0700
-Subject: [PATCH 1/2] rust: lockdep: Remove support for dynamically
- allocated LockClassKeys
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jqgsak8Q"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20b6c311f62so24128075ad.0
+        for <linux-block@vger.kernel.org>; Fri, 04 Oct 2024 17:14:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1728087249; x=1728692049; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sdvgpKhmD14lH5DEz2GjjZadZ28c69PHIkDv34BVtjY=;
+        b=jqgsak8QsIQ0alVyGBI3WHFcIA11Y0wF8K1uNNlhSzk9Ab3pinrLVBqoaNx8Xac70V
+         f8WQeLptSwLq7RsNFBgNffUXXrHepegJVD0vGcGgLTgV2HjBfU1S003tw/fA8bK7PNxc
+         CCg/bAVp4NhVDhrCI7vE4VU4KFUF2iVtH5d18=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728087249; x=1728692049;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sdvgpKhmD14lH5DEz2GjjZadZ28c69PHIkDv34BVtjY=;
+        b=fwjnUW4bWrYAX6NuUFcUXnSkcDnMKya3TUp9bLeJ2h9QnFeYXhXinawq61mx7BEIsH
+         2AFmXFRmDVesJp0lMZl8L9pN8ADX78DlmJSxu02SO9+GYglW/X08gp0OQiCo2qwiZ3Rr
+         jSMRIEZwdzsOjckCHvgLr0nutRts9WeHWM074+3Nwgg5sq5RS6mKQ+MqczHjhiwfVhIT
+         uWmU0OvWn3TahrxICVdF7SarlpIfq2nClZ/8IoWznfnK9zRw06xqMwr65xbNanyRG32p
+         BSw3drzBdTJxq0EHiTUhJLCY0uQ7lccG+P93gdbSP5Ni1GROJ7UxjztkDatFI71TFQEN
+         oq3A==
+X-Forwarded-Encrypted: i=1; AJvYcCWbUXVR9Q2JRA9WJkxf8FXWmOoNUjaoQIiKpoKGhixiNiAbdT2HdpKKpCrop5p86XJ1y2MC1tuRuZ8WBw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoKraqlyTKzR1q7Rugy36PaulY/rgzq/VuuJT7BbEMMXXmTyXh
+	vbmCBc1m/nzUrSJ5lHnQ86+j8cVyRt77RjLKTBvlZ3R+3P0LMuLp90juepBWug==
+X-Google-Smtp-Source: AGHT+IHv9C2jX/9/LO7J+EAweNR0wJaRJh/hpB23twcLNfojV9w8IEn9Gf8JDOL0bDIVCXkQV6JdPQ==
+X-Received: by 2002:a17:902:d485:b0:20b:b238:9d15 with SMTP id d9443c01a7336-20bff1a8709mr49363695ad.41.1728087249288;
+        Fri, 04 Oct 2024 17:14:09 -0700 (PDT)
+Received: from dianders.sjc.corp.google.com ([2620:15c:9d:2:8252:ce4b:5690:56b3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c13939c30sm3950575ad.142.2024.10.04.17.14.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 17:14:08 -0700 (PDT)
+From: Douglas Anderson <dianders@chromium.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Al Viro <viro@zeniv.linux.org.uk>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
+	Kyle Fortin <kyle.fortin@oracle.com>,
+	Douglas Anderson <dianders@google.com>,
+	Douglas Anderson <dianders@chromium.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Christian Heusel <christian@heusel.eu>,
+	Jan Kara <jack@suse.cz>,
+	Li Lingfeng <lilingfeng3@huawei.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Riyan Dhiman <riyandhiman14@gmail.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] block: add partition uuid into uevent as "PARTUUID"
+Date: Fri,  4 Oct 2024 17:13:43 -0700
+Message-ID: <20241004171340.v2.1.I938c91d10e454e841fdf5d64499a8ae8514dc004@changeid>
+X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241004-rust-lockdep-v1-1-e9a5c45721fc@gmail.com>
-References: <20241004-rust-lockdep-v1-0-e9a5c45721fc@gmail.com>
-In-Reply-To: <20241004-rust-lockdep-v1-0-e9a5c45721fc@gmail.com>
-To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
- Alex Gaynor <alex.gaynor@gmail.com>, 
- Wedson Almeida Filho <wedsonaf@gmail.com>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Andreas Hindborg <a.hindborg@kernel.org>, 
- Andreas Hindborg <a.hindborg@kernel.org>
-Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
- Mitchell Levy <levymitchell0@gmail.com>
-X-Mailer: b4 0.14.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1728079319; l=1817;
- i=levymitchell0@gmail.com; s=20240719; h=from:subject:message-id;
- bh=sPd80p5ID1e1fg5bg8nSOM9q7MeynA1KNnT/FYVqLZ0=;
- b=+P16WMaS1TptJcNjuLo6USG7helplG+QSPK9e9AOKqDmUSTTXHLfIItjWKVGXWBqjWeXUpkTl
- I/CNBV2TN7GC6h3bsOa85emNKu/4Fj9zFkR7uoxnP92z2fa+aWkvwhA
-X-Developer-Key: i=levymitchell0@gmail.com; a=ed25519;
- pk=n6kBmUnb+UNmjVkTnDwrLwTJAEKUfs2e8E+MFPZI93E=
-X-Endpoint-Received: by B4 Relay for levymitchell0@gmail.com/20240719 with
- auth_id=188
-X-Original-From: Mitchell Levy <levymitchell0@gmail.com>
-Reply-To: levymitchell0@gmail.com
+Content-Transfer-Encoding: 8bit
 
-From: Mitchell Levy <levymitchell0@gmail.com>
+From: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
 
-Currently, dynamically allocated LockCLassKeys can be used from the Rust
-side without having them registered. This is a soundness issue, so
-remove them.
+Both most common formats have uuid in addition to partition name:
+GPT: standard uuid xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+DOS: 4 byte disk signature and 1 byte partition xxxxxxxx-xx
 
-Suggested-by: Alice Ryhl <aliceryhl@google.com>
-Link: https://lore.kernel.org/rust-for-linux/20240815074519.2684107-3-nmi@metaspace.dk/
-Cc: stable@vger.kernel.org
-Signed-off-by: Mitchell Levy <levymitchell0@gmail.com>
+Tools from util-linux use the same notation for them.
+
+Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Reviewed-by: Kyle Fortin <kyle.fortin@oracle.com>
+[dianders: rebased to modern kernels]
+Signed-off-by: Douglas Anderson <dianders@google.com>
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
 ---
- rust/kernel/lib.rs  |  2 +-
- rust/kernel/sync.rs | 14 ++------------
- 2 files changed, 3 insertions(+), 13 deletions(-)
+I found myself needing the PARTUUID from userspace recently and it
+seems like pretty much all of the solutions involve a lot of code or
+including some userspace libraries to solve this for you. This is less
+than ideal when you're running from an initrd and want to keep things
+simple.
 
-diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-index 22a3bfa5a9e9..b5f4b3ce6b48 100644
---- a/rust/kernel/lib.rs
-+++ b/rust/kernel/lib.rs
-@@ -44,8 +44,8 @@
- pub mod page;
- pub mod prelude;
- pub mod print;
--pub mod sizes;
- pub mod rbtree;
-+pub mod sizes;
- mod static_assert;
- #[doc(hidden)]
- pub mod std_vendor;
-diff --git a/rust/kernel/sync.rs b/rust/kernel/sync.rs
-index 0ab20975a3b5..d270db9b9894 100644
---- a/rust/kernel/sync.rs
-+++ b/rust/kernel/sync.rs
-@@ -27,28 +27,18 @@
- unsafe impl Sync for LockClassKey {}
- 
- impl LockClassKey {
--    /// Creates a new lock class key.
--    pub const fn new() -> Self {
--        Self(Opaque::uninit())
--    }
--
-     pub(crate) fn as_ptr(&self) -> *mut bindings::lock_class_key {
-         self.0.get()
-     }
+Given that the kernel has PARTUUID handling already and needs to keep
+track of it for using it in "root=" matching, it seems silly not to
+expose it, so I wrote a patch for it.
+
+After I wrote the 2 line patch to expose the UUID, I thought to search
+the internet and found an old patch where someone had written what
+amounts to the same two lines [1], so I'm grabbing the old patch and
+resending as a v2. I'm keeping the Reviewed-by even though I rebased
+the patch (adjusted for file moves / name changes) since it's a tiny
+patch and the concept is identical to the old patch.
+
+Crossing my fingers that this looks OK to land.
+
+[1] https://lore.kernel.org/r/150729013610.744480.1644359289262914898.stgit@buzz
+
+Changes in v2:
+- Rebased
+
+ block/partitions/core.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 5bd7a603092e..aa54c1f4eaa5 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -253,6 +253,8 @@ static int part_uevent(const struct device *dev, struct kobj_uevent_env *env)
+ 	add_uevent_var(env, "PARTN=%u", bdev_partno(part));
+ 	if (part->bd_meta_info && part->bd_meta_info->volname[0])
+ 		add_uevent_var(env, "PARTNAME=%s", part->bd_meta_info->volname);
++	if (part->bd_meta_info && part->bd_meta_info->uuid[0])
++		add_uevent_var(env, "PARTUUID=%s", part->bd_meta_info->uuid);
+ 	return 0;
  }
  
--impl Default for LockClassKey {
--    fn default() -> Self {
--        Self::new()
--    }
--}
--
- /// Defines a new static lock class and returns a pointer to it.
- #[doc(hidden)]
- #[macro_export]
- macro_rules! static_lock_class {
-     () => {{
--        static CLASS: $crate::sync::LockClassKey = $crate::sync::LockClassKey::new();
-+        static CLASS: $crate::sync::LockClassKey =
-+            unsafe { ::core::mem::MaybeUninit::uninit().assume_init() };
-         &CLASS
-     }};
- }
-
 -- 
-2.34.1
-
+2.47.0.rc0.187.ge670bccf7e-goog
 
