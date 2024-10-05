@@ -1,91 +1,113 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05CC1386DA
-	for <linux-block@vger.kernel.org>; Sat,  5 Oct 2024 08:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E33D231C85;
+	Sat,  5 Oct 2024 09:49:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728116322; cv=none; b=Sp8gpUkDtw9SXMPWrCcsuvJMzNrtqSRfNV24EiVzfub2WJRYFJ7ki1ZZhlWorlW+R5wPEDN4a/171EKJY2wVueT/5A+T/QwGSL+QLPhXuqcxMs7559B0voyJN0LrK9bQgM3Gttq1+i5zDXUAJ3Vtd8ro0xwwOvCV97ATRK9+5eM=
+	t=1728121748; cv=none; b=Hfav/ZauMH+Ewg5ODj4QYvnbNyoqHGdrye5+As7QaBxqclgEQzFeorwRu37ql0qLRiSXqudLMB+JHTgVYmdRc8dC7JGWDesmA1pg3ulb4Vu9zFc54S6xFl9AS954p4AoVK1eEmxxkKYs9AyzMqUCcIZH2IngF5o9eaIO7LCp6GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728116322; c=relaxed/simple;
-	bh=ERneIrgLPRtWwRr7jfiUOeI59b33GahU8R7kfdUHHaU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AiUnp3LeG5nt/J4iVcoaL4t9KF+mHHJylre3LezezMW/cCngEvxJs24kkjgsBNenL2kKAU2eSdmqhw+9l7KeV1D3qQ1gllJjbjdXtUeoiFRIUTSsmUO96Brj8P73PXcVMabqoNK2Kcrw8Gu10gtNSahBZzoQOzP7WYdouWGkzbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZUetfGHl; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1728121748; c=relaxed/simple;
+	bh=Uw4lYBg8nf69CBDka22a/vAHDjtylMXhtmTDsQyIUzY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pE0oqNMOzerKtTfptCqrMQ+MPEmnFvpOPD9Kq02T2ZTGnycueGixXZjU8zJ6Vmw4W1W/6WL4GZB60Gle2UXQJid9C9j0OOhOyY/W+19zjndajgA1aqUJulpxpSmubMK6YZGMcjrkdcRWoeTUC3Q/i7KKzMkw0vWjIdjN/+UvcNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wf5rx/zC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZUetfGHl"
-Message-ID: <21e1b842-7662-46cb-9da7-fe37a3b3119b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728116318;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NMmkCzSXIAM+PLZxbf+a1AidtWBAPGqD1VWOkXNMcPo=;
-	b=ZUetfGHlSxiTqLvxg1v3AM+K64bVN20czslKjjbF5TywuBJdYVWyEu54jBenAtlpBhHE+F
-	AKa18sJR8W0TwofNKhn89ulvAHbmynuArQ+cJgPHcLIlug7bjNHXXq5xQWfGNqYWCa7fxq
-	zonkQB3gbpcaKde/TTazAA8GwkMpP3Y=
-Date: Sat, 5 Oct 2024 16:18:06 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wf5rx/zC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3238FC4CEC2;
+	Sat,  5 Oct 2024 09:49:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728121747;
+	bh=Uw4lYBg8nf69CBDka22a/vAHDjtylMXhtmTDsQyIUzY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=Wf5rx/zCSbqR81gZC5oqEvpyK4nb8wijEjWO3ntJxFbVmKzV0ibOehnsKBAemeztb
+	 4FWnxogzOPMC47l3bUKxoqimi51r61NKJr3XO5mpmGkyLK+AIeXUp0Mtc/xReNcuUj
+	 MATV0ILxBVE81axLxci3QNLXIFdD2QoXd1QrPpqYzqYzZbcvhS7HPMWADlAyxOCumu
+	 d4r000O3N/00lbYNW+Q6FUm4iTB9YNvtz6nRe6qTBYzxu60sElNGMUl4wr0vZHl/7Y
+	 6pHMG3rvNnCLNmtP7RhYA/go/1RzpCc1eJ5BIjha+3V55MJoSbD5Eprni+yD1SFdI9
+	 gA9og30k2qeDw==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: "Greg KH" <gregkh@linuxfoundation.org>
+Cc: "Gary Guo" <gary@garyguo.net>,  "Boqun Feng" <boqun.feng@gmail.com>,
+  "Miguel Ojeda" <ojeda@kernel.org>,  "Alex Gaynor"
+ <alex.gaynor@gmail.com>,  =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>,
+  "Benno Lossin" <benno.lossin@proton.me>,  "Alice Ryhl"
+ <aliceryhl@google.com>,  "Trevor Gross" <tmgross@umich.edu>,  "Jens Axboe"
+ <axboe@kernel.dk>,  "Will Deacon" <will@kernel.org>,  "Peter Zijlstra"
+ <peterz@infradead.org>,  "Mark Rutland" <mark.rutland@arm.com>,
+  <linux-block@vger.kernel.org>,  <rust-for-linux@vger.kernel.org>,
+  <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 3/3] rust: block: convert `block::mq` to use `Refcount`
+In-Reply-To: <2024100507-percolate-kinship-fc9a@gregkh> (Greg KH's message of
+	"Sat, 05 Oct 2024 09:47:25 +0200")
+References: <20241004155247.2210469-1-gary@garyguo.net>
+	<20241004155247.2210469-4-gary@garyguo.net>
+	<OKHi9uP1uJD59N2oYRk1OfsxsrGlqiupMsgcvrva9_IPnEI9wpoxmabHQo1EYen96ClDBRQyrJWxb7WJxiMiAA==@protonmail.internalid>
+	<2024100507-percolate-kinship-fc9a@gregkh>
+Date: Sat, 05 Oct 2024 11:48:53 +0200
+Message-ID: <87zfniop6i.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: blktests failures with v6.12-rc1 kernel
-To: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "nbd@other.debian.org" <nbd@other.debian.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-References: <xpe6bea7rakpyoyfvspvin2dsozjmjtjktpph7rep3h25tv7fb@ooz4cu5z6bq6>
- <e6e6f77b-f5c6-4b1e-8ab2-b492755857f0@acm.org>
- <dvpmtffxeydtpid3gigfmmc2jtp2dws6tx4bc27hqo4dp2adhv@x4oqoa2qzl2l>
- <5cff6598-21f3-4e85-9a06-f3a28380585b@linux.dev>
- <9fe72efb-46b8-4a72-b29c-c60a8c64f88c@acm.org>
- <b60fa0ab-591b-41e8-9fca-399b6a25b6d9@linux.dev>
- <c5c3c7d7-2db9-44fe-a316-b0b5bab30f1e@kernel.dk>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <c5c3c7d7-2db9-44fe-a316-b0b5bab30f1e@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+
+Hi Greg,
+
+"Greg KH" <gregkh@linuxfoundation.org> writes:
+
+> On Fri, Oct 04, 2024 at 04:52:24PM +0100, Gary Guo wrote:
+>> There is an operation needed by `block::mq`, atomically decreasing
+>> refcount from 2 to 0, which is not available through refcount.h, so
+>> I exposed `Refcount::as_atomic` which allows accessing the refcount
+>> directly.
+>
+> That's scary, and of course feels wrong on many levels, but:
+>
+>
+>> @@ -91,13 +95,17 @@ pub(crate) unsafe fn start_unchecked(this: &ARef<Self>) {
+>>      /// C `struct request`. If the operation fails, `this` is returned in the
+>>      /// `Err` variant.
+>>      fn try_set_end(this: ARef<Self>) -> Result<*mut bindings::request, ARef<Self>> {
+>> -        // We can race with `TagSet::tag_to_rq`
+>> -        if let Err(_old) = this.wrapper_ref().refcount().compare_exchange(
+>> -            2,
+>> -            0,
+>> -            Ordering::Relaxed,
+>> -            Ordering::Relaxed,
+>> -        ) {
+>> +        // To hand back the ownership, we need the current refcount to be 2.
+>> +        // Since we can race with `TagSet::tag_to_rq`, this needs to atomically reduce
+>> +        // refcount to 0. `Refcount` does not provide a way to do this, so use the underlying
+>> +        // atomics directly.
+>> +        if this
+>> +            .wrapper_ref()
+>> +            .refcount()
+>> +            .as_atomic()
+>> +            .compare_exchange(2, 0, Ordering::Relaxed, Ordering::Relaxed)
+>> +            .is_err()
+>
+> Why not just call rust_helper_refcount_set()?  Or is the issue that you
+> think you might not be 2 here?  And if you HAVE to be 2, why that magic
+> value (i.e. why not just always be 1 and rely on normal
+> increment/decrement?)
+>
+> I know some refcounts are odd in the kernel, but I don't see where the
+> block layer is caring about 2 as a refcount anywhere, what am I missing?
+
+It is in the documentation, rendered version available here [1]. Let me
+know if it is still unclear, then I guess we need to update the docs.
+
+Also, my session from Recipes has a little bit of discussion regarding
+this refcount and it's use [2].
+
+Best regards,
+Andreas
 
 
-在 2024/10/5 9:41, Jens Axboe 写道:
-> On 10/4/24 7:26 PM, Zhu Yanjun wrote:
->> ? 2024/10/5 0:31, Bart Van Assche ??:
->>> On 10/4/24 5:40 AM, Zhu Yanjun wrote:
->>>> So I add a jiffies (u64) value into the name.
->>> I don't think that embedding the value of the jiffies counter in the kmem cache names is sufficient to make cache names unique. That sounds like a fragile approach to me.
->> Sorry. I can not get you. Why jiffies counter is not sufficient to
->> make cache names unique? And why is it a fragile approach?
-> 1 jiffy is an eternity, what happens if someone calls
-> kmem_cache_create() twice in that window?
-
-Got it. Thanks a lot.
-
-Zhu Yanjun
-
->
->> I read your latest commit. In your commit, the ida is used to make
->> cache names unique. It is a good approach if it can fix this problem.
-> That seems over-engineered. Seems to me that either these things should
-> share a slab cache (why do they need one each, if they are the same
-> sized object?!). And if they really do need one, surely something ala:
->
-> static atomic_long_t slab_index;
->
-> sprintf(slab_name, "foo-%ld", atomic_inc_return(&slab_index));
->
-> would be all you need.
->
--- 
-Best Regards,
-Yanjun.Zhu
+[1] https://rust.docs.kernel.org/kernel/block/mq/struct.Request.html#implementation-details
+[2] https://youtu.be/1LEvgkhU-t4?si=B1XnJhzCCNnUtRsI&t=1685
 
