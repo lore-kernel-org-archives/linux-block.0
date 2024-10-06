@@ -1,109 +1,64 @@
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EB1749A
-	for <linux-block@vger.kernel.org>; Sat,  5 Oct 2024 21:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7853C3C;
+	Sun,  6 Oct 2024 00:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728164751; cv=none; b=Xsp+ssvMOaT298SAMnEyj231gDk52tvdZKJILdlstPxwX9dRycZZKxL3IQT1tLqtFt+1+tolmkOfYkje9acnrV8nNsmKNO0Sm8ky+ji3GN5aHkZsh+yH3+YXqJZXinijz6ae8KdRxR7dOEAJKHQqZfub+ahNtn12S0RpueXLylQ=
+	t=1728174152; cv=none; b=POCEKr6WkWPztwPl7Zc0rh0l+8MjwuOZMgPRLW16ukKUxYmzB0agd7jld1M4cZlUzj8gspufOeJ+Dm+5Dy8SU6VpWlk0VquU99RFLfGldZNkgbmP/VrjB5lJ+0Kv0K93DbxAEEwxvPFb7rzbwTC1RNvTq4DAHp5GUQgG1PebnAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728164751; c=relaxed/simple;
-	bh=o1c3cH7WiFg32NGuM/T7GjljhaJCu7xpquK2HQfv9JQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OE0236ydelZH73xbtpA0scJ+dSed/Yn50lg+4MtvS28YXIS/dYZavhyLh9Kj4muvSHhz7tV0jJ7VgAg2BzY8fe1UavIcbp08ZMEXEGanw0GISRhVI6OfvahoEDusf9tdhOEgE1vHy4Gj+WwpQ/xw3MbglODenieHM55m0JNdE+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HLKY5YtP; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1728174152; c=relaxed/simple;
+	bh=o0ez3cEN8lo6BNqb/QRS8T3RA9GefH1zDvKe1gnASr0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C3Fy3SfksjrJjvxMcCbbkZR1wU+WtfvaOmGv940dyan+qSe7yhgq/b7NI04BTeeKZvscMnBdny2jOS9/spQyFy72o7VXb7mnEFOhjGO/iHAcyEORoAcrXvAVN1xsrmD6J+0ZC6zlYx+ymFjKkVtqZ9LX/DioWM0JG+9pNQV77kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YhjPqz6O; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HLKY5YtP"
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7db1f13b14aso2610802a12.1
-        for <linux-block@vger.kernel.org>; Sat, 05 Oct 2024 14:45:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728164748; x=1728769548; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UmK9Xs58S08yxjMtYHm+HrNkToU7fdzXxnd+5Lv0Xns=;
-        b=HLKY5YtPjtUKo7jhhqV9yBzei1nMDYPYei3hU4YT2IWqHgQqRCs55cEBhKE90rBUBh
-         tcJQcmRby6hxqA9zEFDoldHKyTU6VVYmb3UzW0dN8iWJpy3V7FjAgBjZz+oKUe18n3nN
-         8axpnJBlk3smY//dqMQwcy4GoXrlAXeB1FtSjP623H4FRUTYVaRWqtskTP4zlPSQS5Dv
-         q/jOgfw4zqm8WOeLxKkHuHp3BhZnmaic28B+K9v84B5i/gMjSqxygO0uuEcLqUSEwJwB
-         kCqAVRWVw57fuB4nFH7OtAijyXR0hHcrluzPwPKfNt0hUdcOjwt/vmXp0bSTm9BGZlyT
-         FiAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728164748; x=1728769548;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UmK9Xs58S08yxjMtYHm+HrNkToU7fdzXxnd+5Lv0Xns=;
-        b=QYr8k1QHCFp7hyGEOQv9sSKd77M6IYxvKdgKCQ0spPfI9rbFOaXxI1Op5NLjJ4JyvT
-         xenUJXZ5d/+eXypHTqxTf0UjY6iJoLKvhpTi8X7+W7qDg6u1Qga9OHsmccWBx14eDWFL
-         JDydsAK01rguVlvYnBCQkosgTMCaN9Wtx0A8otU4wCwBu1wHr+wd6QKPvSkC15BGZMpz
-         pP5/c0H4jRknNvEy8yVurMpa6p9q2mfjRzsrSxNoQzy20zDJG/73q+nvfqbbW/RPgJDY
-         rdtoVmZlCIHI3VDvMYf1bLYoSE/pMIrg46JZWYV1quWrLAaeOOCLA1EUaxEpW3Ahtkvg
-         VZYg==
-X-Gm-Message-State: AOJu0YynVOZ0NMiVaegFzXQykyGHvpWV8WvoN6MIYLZJ1BGb93U0HLHZ
-	VfC+XMCGUBEfErmmo0zVrhOHmNkcAfx8JQQHTwa8nsvLAjR9+t7uT3y5jX6abDY=
-X-Google-Smtp-Source: AGHT+IF2CIeoWIaR7M9L7MG4cg5BH98dJB3GOpxAS+7PQNC9MiHoMI9+gMzk9ipUOljcrFRhvDz1NQ==
-X-Received: by 2002:a05:6a20:2d22:b0:1d2:e504:52ba with SMTP id adf61e73a8af0-1d6dfabb7ebmr11814308637.38.1728164748471;
-        Sat, 05 Oct 2024 14:45:48 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0d69246sm1882056b3a.182.2024.10.05.14.45.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 05 Oct 2024 14:45:47 -0700 (PDT)
-Message-ID: <dd003ffd-c63a-496a-8585-52fbb08c2189@kernel.dk>
-Date: Sat, 5 Oct 2024 15:45:46 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YhjPqz6O"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C0EC4CEC2;
+	Sun,  6 Oct 2024 00:22:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728174152;
+	bh=o0ez3cEN8lo6BNqb/QRS8T3RA9GefH1zDvKe1gnASr0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YhjPqz6O3kPZvQ5ohWx0v4V5gFe1jrD08I/5mw4r08GpMNEDHsJ8vCwE+57rHWgAA
+	 iATIn7z0R3ZcFCEvNz79PGb9kKoa5ZU6tdYEGRBO3ND+LoYt+4A1bn+be+fxU3u1zG
+	 txrFI3sk6yXVYQ3sbjg856iBTO0MDLnuGPhhyQZJqQeIYSFA0Vj5sL4PjCtZVk5oWM
+	 4uO+R6O4hUEfiDb+rq7MUMuCxhvbxOPCpqWxeOTloqAC18533CZHloSjFzyaykZUej
+	 GeRSbCvhmoVx2KeKYsXzHaAotJ+LGu6pU7DO0JnQubMCBouPNRnk7z1pjYXDnkggxj
+	 BVNRoCgl4loxg==
+Date: Sat, 5 Oct 2024 20:22:30 -0400
+From: Sasha Levin <sashal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Leah Rumancik <leah.rumancik@gmail.com>, Christoph Hellwig <hch@lst.de>,
+	stable@vger.kernel.org, bvanassche@acm.org,
+	linux-block@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: Stable backport request (was Re: read regression for dm-snapshot
+ with loopback)
+Message-ID: <ZwHYRg1rBi_nYNGb@sashalap>
+References: <CACzhbgTFesCa-tpyCqunUoTw-1P2EJ83zDzrcB4fbMi6nNNwng@mail.gmail.com>
+ <20241004055854.GA14489@lst.de>
+ <CACzhbgT_o0B7x9=c10QpRVEm1FuNaAU3Lh0cUGQ3B_+4s21cLw@mail.gmail.com>
+ <65e41cfb-ad68-440f-9e2b-8b3341ed3005@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: blktests failures with v6.12-rc1 kernel
-To: Bart Van Assche <bvanassche@acm.org>, Zhu Yanjun <yanjun.zhu@linux.dev>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "nbd@other.debian.org" <nbd@other.debian.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-References: <xpe6bea7rakpyoyfvspvin2dsozjmjtjktpph7rep3h25tv7fb@ooz4cu5z6bq6>
- <e6e6f77b-f5c6-4b1e-8ab2-b492755857f0@acm.org>
- <dvpmtffxeydtpid3gigfmmc2jtp2dws6tx4bc27hqo4dp2adhv@x4oqoa2qzl2l>
- <5cff6598-21f3-4e85-9a06-f3a28380585b@linux.dev>
- <9fe72efb-46b8-4a72-b29c-c60a8c64f88c@acm.org>
- <b60fa0ab-591b-41e8-9fca-399b6a25b6d9@linux.dev>
- <c5c3c7d7-2db9-44fe-a316-b0b5bab30f1e@kernel.dk>
- <d5fe08b6-68df-4d67-8870-dd7ae391973e@acm.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <d5fe08b6-68df-4d67-8870-dd7ae391973e@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <65e41cfb-ad68-440f-9e2b-8b3341ed3005@kernel.dk>
 
-On 10/5/24 3:36 PM, Bart Van Assche wrote:
-> On 10/4/24 6:41 PM, Jens Axboe wrote:
->> That seems over-engineered. Seems to me that either these things should
->> share a slab cache (why do they need one each, if they are the same
->> sized object?!).
-> 
-> The size of two of the three slab caches is variable.
-> 
->> And if they really do need one, surely something ala:
->>
->> static atomic_long_t slab_index;
->>
->> sprintf(slab_name, "foo-%ld", atomic_inc_return(&slab_index));
->>
->> would be all you need.
-> 
-> A 32-bit counter wraps around after about 4 billion iterations, isn't
-> it?
+On Fri, Oct 04, 2024 at 07:22:24PM -0600, Jens Axboe wrote:
+>On 10/4/24 6:41 PM, Leah Rumancik wrote:
+>> Cool, thanks. I'll poke around some more next week, but sounds good,
+>> let's go ahead with 667ea36378 for 6.6 and 6.1 then.
+>
+>Greg, can you pickup 667ea36378cf for 6.1-stable and 6.6-stable?
 
-I did use an atomic_long_t, just forgot to use that for the pseudo
-code inc and return. Though I highly doubt it matters in practice...
+Queued up, thanks!
 
 -- 
-Jens Axboe
-
+Thanks,
+Sasha
