@@ -1,94 +1,103 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F38119A
-	for <linux-block@vger.kernel.org>; Sun,  6 Oct 2024 00:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693C618E2A
+	for <linux-block@vger.kernel.org>; Sun,  6 Oct 2024 02:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728174988; cv=none; b=ow+nnWK81yi2BMreXDJael3MQsw/gaHPSlxieh0n2odVyVYQiN23N/27NUMYMRwKqDFvxwXCjAXEI2eDCY8LS61oH1iL4siZ4PrCji3Uazmhs99r6dU83tIjFHt8UIjgw4jT8px5udvETSFRhQVAR+GDZ8BMjY1TLKGvSjl25XU=
+	t=1728183331; cv=none; b=koA5mQXNiw83HVZpLtTByNj9tWTysIj/fpWguRQyil+CPGg4WItGNEyFxrWwGBpuweZ+5mDyhwhgPV565jIKJcFerDZsSmmL3OCf5Ub3Ip4699H49gWpDcWTFkfsiyXQ38FCio3H2fg7B2yrIERKXgpQYD6n+E3SyDfxtC7Zcp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728174988; c=relaxed/simple;
-	bh=3YsAgxjaNnAfxCx6k7+Qrasfd1NiWse39qG242ZIikQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NQvDCtmscU8cabd5wuXYCZOonckF25eSwH/gaJyRuUSczcs6Opsm4P6mandXlAG9M5VpKNig1x5f7KiatiCKJ5kBKJbJ0LKlVx71RFSQS5aDXA2euG0nmzm3x48k4TU6SihWV8vOYJLGH2qhQw8IaTfCsbkxHGi2iRYOjhwAPuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2PbNC2ZV; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1728183331; c=relaxed/simple;
+	bh=XoqFHZoD8LRyFFEFoy2YX3wiPCjH12B5geCY53ZUBwM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nKSgMybHzDM9VHWhvo90Czobmtb3vMr1YCD8aVrbwDy90eWv33GzMsVwCcmYG/6pgwrP04q9lanrWoY0H6oeA2B97k47ZeNAHNpf7v4h7ai8LZJrMd4iyn/moND6V380zHHYpXH/UZehXPIkxZOKJ6s2425ZGQneWXVY2N0M5iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TtYvgcHd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2PbNC2ZV"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7d4f85766f0so2709918a12.2
-        for <linux-block@vger.kernel.org>; Sat, 05 Oct 2024 17:36:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728174982; x=1728779782; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RrQlj2YvojzM59I8X95OkVlUrsJhhMGAu/0Q3InO4TY=;
-        b=2PbNC2ZVhJes18F+lOb6XyrRDmlbTQwXuMC/MFU6smfDV0RF+Aj6hQJMsPVtBLy8p2
-         cciywnVNdzN8kg4GS/yvDkU9TqcQXg+mqT5tXoGcGfoFByAHRZfUqAcPQ9Wg+1h5qEAE
-         45OmMPWVLiVlT2puWz6M4EJ8GI3m1ehYkSXyoB22VAQfiThj2dhQw2zwBNiP+BZE2sCC
-         y1aOQOfigIGts5hf4s9xD2cZABMDa+t4k/1pXINoS/O/nlCA8Z98dqGnXS86mPJ57evl
-         mBYOl/A5F1PH09LgIEAWiAET1RkhU7Z/1Wfkzo5v97jfdbWHyNbDVYY0ml2fAg1kizsu
-         uRTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728174982; x=1728779782;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RrQlj2YvojzM59I8X95OkVlUrsJhhMGAu/0Q3InO4TY=;
-        b=Vsf/N7LAZWyrxlpIXD7KzkYFjtZ4n5gF/b/G+4ME/3Iu//ItwAmwLP6VjUaXpNra/J
-         BIX7aDMWFf3KVw9eEo0TpJtnimUYVNfyZzXR6SIY4ZrByptHrTK8ic7SOeNlMupoMyO0
-         beSvx9KbYTaSx9UwhEpL3ldS5BJmZLUXPH0JApTwdT4lKS5UiprR8SWgob7x3N1T5QA5
-         9NcsvASAIh8j7ARB3LEh7RGO9r3kDdQvuhiiz7XwurGMi2JlYvfIoEbcUbUICyGrPhGx
-         EMn/7aBtfzNvGezlEqf1YgvAujjyFe9GbLbMoer8efeo6BrE4yp6k7F8uW0N/f5cyi1B
-         d4fw==
-X-Forwarded-Encrypted: i=1; AJvYcCXPCTuPCg3vHSB6t1KU+7iDnaKHvace64a0azfycmL+TncNgBegcQURwhsEAizx/ekFRegg9roYBDIeUg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDqgBy7XwymV/T7itGNtu7YexeTOv5T2UUaV6EhtNw0W1YXVhl
-	EMlVZ1F5p7FmdXHnNWbaNMOc7BwrKNpoOiRnp8oS4oMk+T3DmSkd2mWVwAd5gQ8=
-X-Google-Smtp-Source: AGHT+IFgsyI1HW/VvMNJ57lGMOCOdsh02gySVKetjct1KsIL2siQLk/lQbjYjV3W7fPLnj0qxChvLQ==
-X-Received: by 2002:a17:90b:4c04:b0:2e0:7d60:759 with SMTP id 98e67ed59e1d1-2e1e620e9efmr9416886a91.3.1728174981711;
-        Sat, 05 Oct 2024 17:36:21 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e1e85c91easm4188459a91.21.2024.10.05.17.36.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 05 Oct 2024 17:36:20 -0700 (PDT)
-Message-ID: <ed87fb71-cbfb-4c0a-a01c-f6cc83753432@kernel.dk>
-Date: Sat, 5 Oct 2024 18:36:19 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TtYvgcHd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728183327;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G6iRkIjBzgaoc8hnTNYoN69g64sbyelNUkm4jm5FOYc=;
+	b=TtYvgcHdPT2ws9jd1fhL+dCUH98LLnNccu8IhukHufHaq8TgwUAn0gX+EJlS0VJzsHTmcI
+	DwbmQzNjTZH38oN8dRMQbHFFJ1j/0hbAkS14lF0sAxlT0T/Db7/YqotU0xfl4kgYp5Gp2F
+	/TX7cxPdJeCaZiFclPZYrWb6hhFxnQc=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-37-CJH37iC7M3igG37hagfVkw-1; Sat,
+ 05 Oct 2024 22:55:24 -0400
+X-MC-Unique: CJH37iC7M3igG37hagfVkw-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00DF51956096;
+	Sun,  6 Oct 2024 02:55:22 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.21])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0546519560A2;
+	Sun,  6 Oct 2024 02:55:16 +0000 (UTC)
+Date: Sun, 6 Oct 2024 10:55:11 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: David Howells <dhowells@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ming.lei@redhat.com
+Subject: Re: [PATCH] lib/iov_iter.c: extract virt-contiguous pages in
+ iov_iter_extract_bvec_pages
+Message-ID: <ZwH8D-Hx4G7XvOUC@fedora>
+References: <20241004153025.1867858-1-ming.lei@redhat.com>
+ <3855842.1728061012@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Stable backport request (was Re: read regression for dm-snapshot
- with loopback)
-To: Sasha Levin <sashal@kernel.org>
-Cc: Leah Rumancik <leah.rumancik@gmail.com>, Christoph Hellwig <hch@lst.de>,
- stable@vger.kernel.org, bvanassche@acm.org, linux-block@vger.kernel.org,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <CACzhbgTFesCa-tpyCqunUoTw-1P2EJ83zDzrcB4fbMi6nNNwng@mail.gmail.com>
- <20241004055854.GA14489@lst.de>
- <CACzhbgT_o0B7x9=c10QpRVEm1FuNaAU3Lh0cUGQ3B_+4s21cLw@mail.gmail.com>
- <65e41cfb-ad68-440f-9e2b-8b3341ed3005@kernel.dk> <ZwHYRg1rBi_nYNGb@sashalap>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZwHYRg1rBi_nYNGb@sashalap>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3855842.1728061012@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 10/5/24 6:22 PM, Sasha Levin wrote:
-> On Fri, Oct 04, 2024 at 07:22:24PM -0600, Jens Axboe wrote:
->> On 10/4/24 6:41 PM, Leah Rumancik wrote:
->>> Cool, thanks. I'll poke around some more next week, but sounds good,
->>> let's go ahead with 667ea36378 for 6.6 and 6.1 then.
->>
->> Greg, can you pickup 667ea36378cf for 6.1-stable and 6.6-stable?
+On Fri, Oct 04, 2024 at 05:56:52PM +0100, David Howells wrote:
+> Ming Lei <ming.lei@redhat.com> wrote:
 > 
-> Queued up, thanks!
+> > All iov_iter_bvec() users only want to extract virt-contiguous pages from
+> > iov_iter_extract_pages() instead physical-contiguous pages.
+> 
+> What do you mean by "virt-contiguous"?  Virtual according to what mapping?
 
-Thanks Sasha!
+The term is from comment iov_iter_extract_kvec_pages(), seems it is
+invented by you, :-)
 
--- 
-Jens Axboe
+Actually iov_iter_extract_pages() requires that there isn't gap in the
+extracted pages, so 'offset' only exists in the 1st page, then these
+pages can be mapped to one virtual(contiguous) address.
+
+> 
+> The reason for physical contiguity is that you can pass a set of physical
+> contiguous pages as a single DMA descriptor.  Therefore, at some point, you
+> might end up screwing up skb_splice_from_iter().  Currently, that's limited to
+> a PAGE_SIZE per fragment, but hopefully that will be fixed at some point.
+
+If any user wants to extract physical pages, new interface can be added for
+returning single page instead of page array, cause it is physically contiguous.
+
+Other kind of iterators(UBUF, KVEC, ...) do return non physically-contiguous
+pages.
+
+The point is that one bvec often point to one page except for huge page
+case, so iov_iter_extract_pages() just returns single page each time
+no matter how big maxpages & maxsize is passed in.
+
+It is actually one regression:
+
+Fixes: a7e689dd1c06 ("block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages")
+
+
+Thanks,
+Ming
 
