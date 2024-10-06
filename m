@@ -1,56 +1,53 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C432216130C
-	for <linux-block@vger.kernel.org>; Sun,  6 Oct 2024 08:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD30AD55
+	for <linux-block@vger.kernel.org>; Sun,  6 Oct 2024 09:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728204414; cv=none; b=kcT3SDTqDvBNftsbO1Xc2UQ3TyBU2Y0YAgx+8+OZt7ozwTcUM84EaMWb7+DVBQssnbMQdbdNLUsCGXtRA5IyEpHsfXFRLUVawSvh6oTLn3Dby5cb5vQem6ffYIW9miHdmr6ZIwB419kFdanJcr5e2UzNjOg3vHfM6ZtWlh+sUAE=
+	t=1728206423; cv=none; b=JSLvk+0G70/vAc/KEigFNkFC1Z61GvX342w3zJVegR8z+nGeUt/Sxc/hSkHrBKs6aoALqbg3UB8RFf6MKNB/fhb5lU8MrcipaRgPiAvWWf8a3OcYu4V2fZaNaB8kA/03qqeTjlmY+eu5TXvtyIkpaPsQm+2xLSpXoW5UIeZYR1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728204414; c=relaxed/simple;
-	bh=uqfW9rXM7GrTBsQ3Q0S4AcJ1WSBxMnqaCCf0GV9ftO0=;
+	s=arc-20240116; t=1728206423; c=relaxed/simple;
+	bh=Y3c0u/i3lr4uuuTlQB559jEQPsXE4LfQN7zr7ELsmuU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a1aOPTrveljhOzpaOt0bayFP9p8YkTcSMX8GujzWcx5weUTUaXXuhu7VdUkENvBxuquXaXydgoKIDorCKeyBVcWLGHK+9Nx8lIF9VdW8frRaFogH0eYXDfXvSSky3U2dsVnvC1/hTmNm4sLtAhtjFMqCuGNOru+2dDi7Er6qaJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rfs/xqW3; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=g3qY0vFcjUlonbKlHAFnWFP59qhM3RC4jZ/iEvKklvKn0BTjUns5rvalLZxpnVYc3ehG2hSJOikq4K8vHFXgFYo0EgEoyUK5/GZOOcJCz/uTWpk2iY69NJeltT0XnhYqF82WPpulCweM+VRnu50StLJKq5yHPJVBVWoCfNI7HVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GdhIIdQ6; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rfs/xqW3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GdhIIdQ6"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728204410;
+	s=mimecast20190719; t=1728206419;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hPZEDzzPn8i4/QTMQcUT212dbnR5LHqzOBSy1TzKWOY=;
-	b=Rfs/xqW3nzuV4U/2t4VoAONeXHOHb4z1BjWtdIjMgrfZwf89PQJgP6Wp/2MLW6Hwl2FP7H
-	CfOOzvR/esflldq9P3UIaYQSMQa5WobaqIQ1gr6coOq9FPZUWCly4ZD9ijOKl9QD1tgTOA
-	dnB20fbhmtmnnf6BNPDH3mSMXkZWtCs=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=ZuyYwPp3wvMN5nhY7zUJBn2onf2TTorcSDP1HlwOoM8=;
+	b=GdhIIdQ6to5vcMN0yGCDoa/QyiocjnlRUlslRCYY+IAHUm1t9irlgcSyOtP+DNgBcT5mbD
+	34aITouBnDztxpNQQMyFfhumLRIAn+tAJWJonPeMO4AZb5nJjNOXOxOPhyEZ2ClWk5XvA4
+	snKcvpEgZUWgawe1m30ur7wNeUMlF+g=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-680-zGLFebcFPmm6-XbHhO86Xg-1; Sun,
- 06 Oct 2024 04:46:47 -0400
-X-MC-Unique: zGLFebcFPmm6-XbHhO86Xg-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-116-RuUSzXAFNGu0g-pGa2_87w-1; Sun,
+ 06 Oct 2024 05:20:17 -0400
+X-MC-Unique: RuUSzXAFNGu0g-pGa2_87w-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 73C5E19772C6;
-	Sun,  6 Oct 2024 08:46:46 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E475F195FE07;
+	Sun,  6 Oct 2024 09:20:15 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.29])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 223EE3000198;
-	Sun,  6 Oct 2024 08:46:41 +0000 (UTC)
-Date: Sun, 6 Oct 2024 16:46:36 +0800
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 36BB919560A2;
+	Sun,  6 Oct 2024 09:20:11 +0000 (UTC)
+Date: Sun, 6 Oct 2024 17:20:05 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: [PATCH V6 7/8] io_uring/uring_cmd: support provide group kernel
- buffer
-Message-ID: <ZwJObC6mzetw4goe@fedora>
-References: <20240912104933.1875409-1-ming.lei@redhat.com>
- <20240912104933.1875409-8-ming.lei@redhat.com>
- <b232fa58-1255-44b2-92c9-f8eb4f70e2c9@gmail.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	ming.lei@redhat.com
+Subject: Re: [PATCH] ublk: decouple hctx and ublk server threads
+Message-ID: <ZwJWRSBnH7Cm3djA@fedora>
+References: <20241002224437.3088981-1-ushankar@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,113 +56,249 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b232fa58-1255-44b2-92c9-f8eb4f70e2c9@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <20241002224437.3088981-1-ushankar@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, Oct 04, 2024 at 04:44:54PM +0100, Pavel Begunkov wrote:
-> On 9/12/24 11:49, Ming Lei wrote:
-> > Allow uring command to be group leader for providing kernel buffer,
-> > and this way can support generic device zero copy over device buffer.
-> > 
-> > The following patch will use the way to support zero copy for ublk.
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >   include/linux/io_uring/cmd.h  |  7 +++++++
-> >   include/uapi/linux/io_uring.h |  7 ++++++-
-> >   io_uring/uring_cmd.c          | 28 ++++++++++++++++++++++++++++
-> >   3 files changed, 41 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
-> > index 447fbfd32215..fde3a2ec7d9a 100644
-> > --- a/include/linux/io_uring/cmd.h
-> > +++ b/include/linux/io_uring/cmd.h
-> > @@ -48,6 +48,8 @@ void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
-> >   void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
-> >   		unsigned int issue_flags);
-> > +int io_uring_cmd_provide_kbuf(struct io_uring_cmd *ioucmd,
-> > +		const struct io_uring_kernel_buf *grp_kbuf);
-> >   #else
-> >   static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
-> >   			      struct iov_iter *iter, void *ioucmd)
-> > @@ -67,6 +69,11 @@ static inline void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
-> >   		unsigned int issue_flags)
-> >   {
-> >   }
-> > +static inline int io_uring_cmd_provide_kbuf(struct io_uring_cmd *ioucmd,
-> > +		const struct io_uring_kernel_buf *grp_kbuf)
-> > +{
-> > +	return -EOPNOTSUPP;
-> > +}
-> >   #endif
-> >   /*
-> > diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-> > index 2af32745ebd3..11985eeac10e 100644
-> > --- a/include/uapi/linux/io_uring.h
-> > +++ b/include/uapi/linux/io_uring.h
-> > @@ -271,9 +271,14 @@ enum io_uring_op {
-> >    * sqe->uring_cmd_flags		top 8bits aren't available for userspace
-> >    * IORING_URING_CMD_FIXED	use registered buffer; pass this flag
-> >    *				along with setting sqe->buf_index.
-> > + * IORING_PROVIDE_GROUP_KBUF	this command provides group kernel buffer
-> > + *				for member requests which can retrieve
-> > + *				any sub-buffer with offset(sqe->addr) and
-> > + *				len(sqe->len)
-> 
-> Is there a good reason it needs to be a cmd generic flag instead of
-> ublk specific?
+On Wed, Oct 02, 2024 at 04:44:37PM -0600, Uday Shankar wrote:
+> Currently, ublk_drv associates to each hardware queue (hctx) a unique
+> task (called the queue's ubq_daemon) which is allowed to issue
+> COMMIT_AND_FETCH commands against the hctx. If any other task attempts
+> to do so, the command fails immediately with EINVAL. When considered
+> together with the block layer architecture, the result is that for each
+> CPU C on the system, there is a unique ublk server thread which is
+> allowed to handle I/O submitted on CPU C. This can lead to suboptimal
+> performance under imbalanced load generation. For an extreme example,
+> suppose all the load is generated on CPUs mapping to a single ublk
+> server thread. Then that thread may be fully utilized and become the
+> bottleneck in the system, while other ublk server threads are totally
+> idle.
 
-io_uring request isn't visible for drivers, so driver can't know if the
-uring command is one group leader.
-
-Another way is to add new API of io_uring_cmd_may_provide_buffer(ioucmd)
-so driver can check if device buffer can be provided with this uring_cmd,
-but I prefer to the new uring_cmd flag:
-
-- IORING_PROVIDE_GROUP_KBUF can provide device buffer in generic way.
-- ->prep() can fail fast in case that it isn't one group request
+I am wondering why the problem can't be avoided by setting ublk server's
+thread affinity manually.
 
 > 
-> 1. Extra overhead for files / cmds that don't even care about the
-> feature.
+> This issue can also be addressed directly in the ublk server without
+> kernel support by having threads dequeue I/Os and pass them around to
+> ensure even load. But this solution involves moving I/Os between threads
+> several times. This is a bad pattern for performance, and we observed a
+> significant regression in peak bandwidth with this solution.
+> 
+> Therefore, address this issue by removing the association of a unique
+> ubq_daemon to each hctx. This association is fairly artificial anyways,
+> and removing it results in simpler driver code. Imbalanced load can then
 
-It is just checking ioucmd->flags in ->prep(), and basically zero cost.
+I did consider to remove the association from simplifying design &
+implementation viewpoint, but there are some problems which are hard to solve.
+
+> be balanced across all ublk server threads by having the threads fetch
+> I/Os for the same QID in a round robin manner. For example, in a system
+> with 4 ublk server threads, 2 hctxs, and a queue depth of 4, the threads
+> could issue fetch requests as follows (where each entry is of the form
+> qid, tag):
+> 
+> poller thread:	T0	T1	T2	T3
+> 		0,0	0,1	0,2	0,3
+> 		1,3	1,0	1,1	1,2
+
+How many ublk devices there are? If it is 1, just wondering why you use
+4 threads? Usually one thread is enough to drive one queue, and the
+actually io command handling can be moved to new work thread if the queue
+thread is saturated.
 
 > 
-> 2. As it stands with this patch, the flag is ignored by all other
-> cmd implementations, which might be quite confusing as an api,
-> especially so since if we don't set that REQ_F_GROUP_KBUF memeber
-> requests will silently try to import a buffer the "normal way",
-
-The usage is same with buffer select or fixed buffer, and consumer
-has to check the flag.
-
-And same with IORING_URING_CMD_FIXED which is ignored by other
-implementations except for nvme, :-)
-
-I can understand the concern, but it exits since uring cmd is born.
-
-> i.e. interpret sqe->addr or such as the target buffer.
-
-> 3. We can't even put some nice semantics on top since it's
-> still cmd specific and not generic to all other io_uring
-> requests.
+> Since tags appear to be allocated in sequential chunks, this provides a
+> rough approximation to distributing I/Os round-robin across all ublk
+> server threads, while letting I/Os stay fully thread-local.
 > 
-> I'd even think that it'd make sense to implement it as a
-> new cmd opcode, but that's the business of the file implementing
-> it, i.e. ublk.
+> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+> ---
+>  drivers/block/ublk_drv.c | 105 ++++++++++++---------------------------
+>  1 file changed, 33 insertions(+), 72 deletions(-)
 > 
-> >    */
-> >   #define IORING_URING_CMD_FIXED	(1U << 0)
-> > -#define IORING_URING_CMD_MASK	IORING_URING_CMD_FIXED
-> > +#define IORING_PROVIDE_GROUP_KBUF	(1U << 1)
-> > +#define IORING_URING_CMD_MASK	(IORING_URING_CMD_FIXED | IORING_PROVIDE_GROUP_KBUF)
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index a6c8e5cc6051..7e0ce35dbc6f 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -68,12 +68,12 @@
+>  	 UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED)
+>  
+>  struct ublk_rq_data {
+> -	struct llist_node node;
+> -
+> +	struct task_struct *task;
+>  	struct kref ref;
+>  };
+>  
+>  struct ublk_uring_cmd_pdu {
+> +	struct request *req;
+>  	struct ublk_queue *ubq;
+>  	u16 tag;
+>  };
+> @@ -133,15 +133,11 @@ struct ublk_queue {
+>  	int q_depth;
+>  
+>  	unsigned long flags;
+> -	struct task_struct	*ubq_daemon;
+>  	char *io_cmd_buf;
+>  
+> -	struct llist_head	io_cmds;
+> -
+>  	unsigned long io_addr;	/* mapped vm address */
+>  	unsigned int max_io_sz;
+>  	bool force_abort;
+> -	bool timeout;
+>  	bool canceling;
+>  	unsigned short nr_io_ready;	/* how many ios setup */
+>  	spinlock_t		cancel_lock;
+> @@ -982,16 +978,12 @@ static inline struct ublk_uring_cmd_pdu *ublk_get_uring_cmd_pdu(
+>  	return (struct ublk_uring_cmd_pdu *)&ioucmd->pdu;
+>  }
+>  
+> -static inline bool ubq_daemon_is_dying(struct ublk_queue *ubq)
+> -{
+> -	return ubq->ubq_daemon->flags & PF_EXITING;
+> -}
+> -
+>  /* todo: handle partial completion */
+>  static inline void __ublk_complete_rq(struct request *req)
+>  {
+>  	struct ublk_queue *ubq = req->mq_hctx->driver_data;
+>  	struct ublk_io *io = &ubq->ios[req->tag];
+> +	struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
+>  	unsigned int unmapped_bytes;
+>  	blk_status_t res = BLK_STS_OK;
+>  
+> @@ -1036,9 +1028,13 @@ static inline void __ublk_complete_rq(struct request *req)
+>  	else
+>  		__blk_mq_end_request(req, BLK_STS_OK);
+>  
+> -	return;
+> +	goto put_task;
+>  exit:
+>  	blk_mq_end_request(req, res);
+> +put_task:
+> +	WARN_ON_ONCE(!data->task);
+> +	put_task_struct(data->task);
+> +	data->task = NULL;
+>  }
+>  
+>  static void ublk_complete_rq(struct kref *ref)
+> @@ -1097,13 +1093,16 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
+>  		blk_mq_end_request(rq, BLK_STS_IOERR);
+>  }
+>  
+> -static inline void __ublk_rq_task_work(struct request *req,
+> +static inline void __ublk_rq_task_work(struct io_uring_cmd *cmd,
+>  				       unsigned issue_flags)
+>  {
+> +	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
+> +	struct request *req = pdu->req;
+>  	struct ublk_queue *ubq = req->mq_hctx->driver_data;
+>  	int tag = req->tag;
+>  	struct ublk_io *io = &ubq->ios[tag];
+>  	unsigned int mapped_bytes;
+> +	struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
+>  
+>  	pr_devel("%s: complete: op %d, qid %d tag %d io_flags %x addr %llx\n",
+>  			__func__, io->cmd->cmd_op, ubq->q_id, req->tag, io->flags,
+> @@ -1112,13 +1111,14 @@ static inline void __ublk_rq_task_work(struct request *req,
+>  	/*
+>  	 * Task is exiting if either:
+>  	 *
+> -	 * (1) current != ubq_daemon.
+> +	 * (1) current != io_uring_get_cmd_task(io->cmd).
+>  	 * io_uring_cmd_complete_in_task() tries to run task_work
+> -	 * in a workqueue if ubq_daemon(cmd's task) is PF_EXITING.
+> +	 * in a workqueue if cmd's task is PF_EXITING.
+>  	 *
+>  	 * (2) current->flags & PF_EXITING.
+>  	 */
+> -	if (unlikely(current != ubq->ubq_daemon || current->flags & PF_EXITING)) {
+> +	if (unlikely(current != io_uring_cmd_get_task(io->cmd) ||
+> +		     current->flags & PF_EXITING)) {
+>  		__ublk_abort_rq(ubq, req);
+>  		return;
+>  	}
+> @@ -1173,55 +1173,32 @@ static inline void __ublk_rq_task_work(struct request *req,
+>  	}
+>  
+>  	ublk_init_req_ref(ubq, req);
+> +	WARN_ON_ONCE(data->task);
+> +	data->task = get_task_struct(current);
 
-It needs one new file operation, and we shouldn't work toward
-this way.
+If queue/task association is killed, it doesn't make sense to record the
+->task any more, cause this io command can be handled by another thread
+in userspace, then UBLK_IO_COMMIT_AND_FETCH_REQ for this io request may
+be issued from task which isn't same with data->task.
+
+The main trouble is that error handling can't be done easily.
+
+>  	ubq_complete_io_cmd(io, UBLK_IO_RES_OK, issue_flags);
+>  }
+>  
+> -static inline void ublk_forward_io_cmds(struct ublk_queue *ubq,
+> -					unsigned issue_flags)
+> -{
+> -	struct llist_node *io_cmds = llist_del_all(&ubq->io_cmds);
+> -	struct ublk_rq_data *data, *tmp;
+> -
+> -	io_cmds = llist_reverse_order(io_cmds);
+> -	llist_for_each_entry_safe(data, tmp, io_cmds, node)
+> -		__ublk_rq_task_work(blk_mq_rq_from_pdu(data), issue_flags);
+> -}
+> -
+> -static void ublk_rq_task_work_cb(struct io_uring_cmd *cmd, unsigned issue_flags)
+> -{
+> -	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
+> -	struct ublk_queue *ubq = pdu->ubq;
+> -
+> -	ublk_forward_io_cmds(ubq, issue_flags);
+> -}
+> -
+>  static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
+>  {
+> -	struct ublk_rq_data *data = blk_mq_rq_to_pdu(rq);
+> -
+> -	if (llist_add(&data->node, &ubq->io_cmds)) {
+> -		struct ublk_io *io = &ubq->ios[rq->tag];
+> -
+> -		io_uring_cmd_complete_in_task(io->cmd, ublk_rq_task_work_cb);
+> -	}
+> +	struct ublk_io *io = &ubq->ios[rq->tag];
+> +	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(io->cmd);
+> +	pdu->req = rq;
+> +	io_uring_cmd_complete_in_task(io->cmd, __ublk_rq_task_work);
+>  }
+
+It should be fine to convert to io_uring_cmd_complete_in_task() since
+the callback list is re-ordered in io_uring.
+
+>  
+>  static enum blk_eh_timer_return ublk_timeout(struct request *rq)
+>  {
+>  	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
+> +	struct ublk_rq_data *data = blk_mq_rq_to_pdu(rq);
+>  	unsigned int nr_inflight = 0;
+>  	int i;
+>  
+>  	if (ubq->flags & UBLK_F_UNPRIVILEGED_DEV) {
+> -		if (!ubq->timeout) {
+> -			send_sig(SIGKILL, ubq->ubq_daemon, 0);
+> -			ubq->timeout = true;
+> -		}
+> -
+> +		send_sig(SIGKILL, data->task, 0);
+>  		return BLK_EH_DONE;
+>  	}
+>  
+> -	if (!ubq_daemon_is_dying(ubq))
+> +	if (!(data->task->flags & PF_EXITING))
+>  		return BLK_EH_RESET_TIMER;
+
+->task is only for error handling, but it may not work any more since
+who knows which task is for handling the io command actually.
 
 
-
-Thanks,
+Thanks, 
 Ming
 
