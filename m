@@ -1,56 +1,56 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693C618E2A
-	for <linux-block@vger.kernel.org>; Sun,  6 Oct 2024 02:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450875FEED
+	for <linux-block@vger.kernel.org>; Sun,  6 Oct 2024 03:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728183331; cv=none; b=koA5mQXNiw83HVZpLtTByNj9tWTysIj/fpWguRQyil+CPGg4WItGNEyFxrWwGBpuweZ+5mDyhwhgPV565jIKJcFerDZsSmmL3OCf5Ub3Ip4699H49gWpDcWTFkfsiyXQ38FCio3H2fg7B2yrIERKXgpQYD6n+E3SyDfxtC7Zcp8=
+	t=1728186869; cv=none; b=LnnU+MKeDQkJ0a7k/HDWL/508luqWBMBQCwMa2o529v6rNTMTE18VYpqDwBg8NuHTlbodQqQeux2EDbbUxSMKr5B0HAnYoNH7SmcdcAIphISC36IWckswabwpe6RTcv5Z44L1KjhnJDlOApO6OSle9UGms1yxMunZN0VkK3/8uU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728183331; c=relaxed/simple;
-	bh=XoqFHZoD8LRyFFEFoy2YX3wiPCjH12B5geCY53ZUBwM=;
+	s=arc-20240116; t=1728186869; c=relaxed/simple;
+	bh=cIKr7O4yQzF4ar3MExX335MGYdIri/si1RGn4cMWjA8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nKSgMybHzDM9VHWhvo90Czobmtb3vMr1YCD8aVrbwDy90eWv33GzMsVwCcmYG/6pgwrP04q9lanrWoY0H6oeA2B97k47ZeNAHNpf7v4h7ai8LZJrMd4iyn/moND6V380zHHYpXH/UZehXPIkxZOKJ6s2425ZGQneWXVY2N0M5iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TtYvgcHd; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nue0Dw4JcXhK70z7xHlU0F1ejUMTLdd8FJTKsDi+LVBjqHL8cdxNxywtHDXaP6zP0GwlCW31oH938hBujK1xDh2sLZlPBsSkR+uwS2xgOhI1w6F7WgkGruqucDqdihN3/TM+VnHNdOHnBc0Dy691SlV+j4VsILaF+APow+1JVJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AmUVceAA; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TtYvgcHd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AmUVceAA"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728183327;
+	s=mimecast20190719; t=1728186866;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=G6iRkIjBzgaoc8hnTNYoN69g64sbyelNUkm4jm5FOYc=;
-	b=TtYvgcHdPT2ws9jd1fhL+dCUH98LLnNccu8IhukHufHaq8TgwUAn0gX+EJlS0VJzsHTmcI
-	DwbmQzNjTZH38oN8dRMQbHFFJ1j/0hbAkS14lF0sAxlT0T/Db7/YqotU0xfl4kgYp5Gp2F
-	/TX7cxPdJeCaZiFclPZYrWb6hhFxnQc=
+	bh=pSq3nTl6jIdbog6zkho/feio3dOuT9WYpCQ8vRqv8ZA=;
+	b=AmUVceAAEaRYgkdzTmLeHg+x85GYn6IowdvUSyzanXni2b+K479vcABMs5Qr2Qjmj2KEjV
+	DQ1qaddAJkQk9QuW6SsDB//k6xdx4j4f9ZXOqyfb3TL/42XahI/aB2p76GVZOgXWahEIW9
+	1C+p1pkBniWiEFTk4upQM43iIhUTUGY=
 Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-37-CJH37iC7M3igG37hagfVkw-1; Sat,
- 05 Oct 2024 22:55:24 -0400
-X-MC-Unique: CJH37iC7M3igG37hagfVkw-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-630-a_Uht70wOMGLnUazx95dcQ-1; Sat,
+ 05 Oct 2024 23:54:22 -0400
+X-MC-Unique: a_Uht70wOMGLnUazx95dcQ-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00DF51956096;
-	Sun,  6 Oct 2024 02:55:22 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6413B195608A;
+	Sun,  6 Oct 2024 03:54:21 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.21])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0546519560A2;
-	Sun,  6 Oct 2024 02:55:16 +0000 (UTC)
-Date: Sun, 6 Oct 2024 10:55:11 +0800
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A572B3000198;
+	Sun,  6 Oct 2024 03:54:14 +0000 (UTC)
+Date: Sun, 6 Oct 2024 11:54:08 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: David Howells <dhowells@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>,
 	ming.lei@redhat.com
-Subject: Re: [PATCH] lib/iov_iter.c: extract virt-contiguous pages in
- iov_iter_extract_bvec_pages
-Message-ID: <ZwH8D-Hx4G7XvOUC@fedora>
-References: <20241004153025.1867858-1-ming.lei@redhat.com>
- <3855842.1728061012@warthog.procyon.org.uk>
+Subject: Re: [PATCH V6 4/8] io_uring: support SQE group
+Message-ID: <ZwIJ4Hn52-tm22Z8@fedora>
+References: <20240912104933.1875409-1-ming.lei@redhat.com>
+ <20240912104933.1875409-5-ming.lei@redhat.com>
+ <239e42d2-791e-4ef5-a312-8b5959af7841@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,43 +59,215 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3855842.1728061012@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <239e42d2-791e-4ef5-a312-8b5959af7841@gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Oct 04, 2024 at 05:56:52PM +0100, David Howells wrote:
-> Ming Lei <ming.lei@redhat.com> wrote:
+On Fri, Oct 04, 2024 at 02:12:28PM +0100, Pavel Begunkov wrote:
+> On 9/12/24 11:49, Ming Lei wrote:
+> ...
+> > --- a/io_uring/io_uring.c
+> > +++ b/io_uring/io_uring.c
+> > @@ -111,13 +111,15 @@
+> ...
+> > +static void io_complete_group_member(struct io_kiocb *req)
+> > +{
+> > +	struct io_kiocb *lead = get_group_leader(req);
+> > +
+> > +	if (WARN_ON_ONCE(!(req->flags & REQ_F_SQE_GROUP) ||
+> > +			 lead->grp_refs <= 0))
+> > +		return;
+> > +
+> > +	/* member CQE needs to be posted first */
+> > +	if (!(req->flags & REQ_F_CQE_SKIP))
+> > +		io_req_commit_cqe(req->ctx, req);
+> > +
+> > +	req->flags &= ~REQ_F_SQE_GROUP;
 > 
-> > All iov_iter_bvec() users only want to extract virt-contiguous pages from
-> > iov_iter_extract_pages() instead physical-contiguous pages.
-> 
-> What do you mean by "virt-contiguous"?  Virtual according to what mapping?
+> I can't say I like this implicit state machine too much,
+> but let's add a comment why we need to clear it. i.e.
+> it seems it wouldn't be needed if not for the
+> mark_last_group_member() below that puts it back to tunnel
+> the leader to io_free_batch_list().
 
-The term is from comment iov_iter_extract_kvec_pages(), seems it is
-invented by you, :-)
-
-Actually iov_iter_extract_pages() requires that there isn't gap in the
-extracted pages, so 'offset' only exists in the 1st page, then these
-pages can be mapped to one virtual(contiguous) address.
+Yeah, the main purpose is for reusing the flag for marking last
+member, will add comment for this usage.
 
 > 
-> The reason for physical contiguity is that you can pass a set of physical
-> contiguous pages as a single DMA descriptor.  Therefore, at some point, you
-> might end up screwing up skb_splice_from_iter().  Currently, that's limited to
-> a PAGE_SIZE per fragment, but hopefully that will be fixed at some point.
+> > +
+> > +	/* Set leader as failed in case of any member failed */
+> > +	if (unlikely((req->flags & REQ_F_FAIL)))
+> > +		req_set_fail(lead);
+> > +
+> > +	if (!--lead->grp_refs) {
+> > +		mark_last_group_member(req);
+> > +		if (!(lead->flags & REQ_F_CQE_SKIP))
+> > +			io_req_commit_cqe(lead->ctx, lead);
+> > +	} else if (lead->grp_refs == 1 && (lead->flags & REQ_F_SQE_GROUP)) {
+> > +		/*
+> > +		 * The single uncompleted leader will degenerate to plain
+> > +		 * request, so group leader can be always freed via the
+> > +		 * last completed member.
+> > +		 */
+> > +		lead->flags &= ~REQ_F_SQE_GROUP_LEADER;
+> 
+> What does this try to handle? A group with a leader but no
+> members? If that's the case, io_group_sqe() and io_submit_state_end()
+> just need to fail such groups (and clear REQ_F_SQE_GROUP before
+> that).
 
-If any user wants to extract physical pages, new interface can be added for
-returning single page instead of page array, cause it is physically contiguous.
+The code block allows to issue leader and members concurrently, but
+we have changed to always issue members after leader is completed, so
+the above code can be removed now.
 
-Other kind of iterators(UBUF, KVEC, ...) do return non physically-contiguous
-pages.
+> 
+> > +	}
+> > +}
+> > +
+> > +static void io_complete_group_leader(struct io_kiocb *req)
+> > +{
+> > +	WARN_ON_ONCE(req->grp_refs <= 1);
+> > +	req->flags &= ~REQ_F_SQE_GROUP;
+> > +	req->grp_refs -= 1;
+> > +}
+> > +
+> > +static void io_complete_group_req(struct io_kiocb *req)
+> > +{
+> > +	if (req_is_group_leader(req))
+> > +		io_complete_group_leader(req);
+> > +	else
+> > +		io_complete_group_member(req);
+> > +}
+> > +
+> >   static void io_req_complete_post(struct io_kiocb *req, unsigned issue_flags)
+> >   {
+> >   	struct io_ring_ctx *ctx = req->ctx;
+> > @@ -890,7 +1005,8 @@ static void io_req_complete_post(struct io_kiocb *req, unsigned issue_flags)
+> >   	 * Handle special CQ sync cases via task_work. DEFER_TASKRUN requires
+> >   	 * the submitter task context, IOPOLL protects with uring_lock.
+> >   	 */
+> > -	if (ctx->task_complete || (ctx->flags & IORING_SETUP_IOPOLL)) {
+> > +	if (ctx->task_complete || (ctx->flags & IORING_SETUP_IOPOLL) ||
+> > +	    req_is_group_leader(req)) {
+> 
+> We're better to push all group requests to io_req_task_complete(),
+> not just a group leader. While seems to be correct, that just
+> overcomplicates the request's flow, it can post a CQE here, but then
+> still expect to do group stuff in the CQE posting loop
+> (flush_completions -> io_complete_group_req), which might post another
+> cqe for the leader, and then do yet another post processing loop in
+> io_free_batch_list().
 
-The point is that one bvec often point to one page except for huge page
-case, so iov_iter_extract_pages() just returns single page each time
-no matter how big maxpages & maxsize is passed in.
+OK, it is simpler to complete all group reqs via tw.
 
-It is actually one regression:
+> 
+> 
+> >   		req->io_task_work.func = io_req_task_complete;
+> >   		io_req_task_work_add(req);
+> >   		return;
+> > @@ -1388,11 +1504,43 @@ static void io_free_batch_list(struct io_ring_ctx *ctx,
+> >   						    comp_list);
+> >   		if (unlikely(req->flags & IO_REQ_CLEAN_SLOW_FLAGS)) {
+> > +			if (req_is_last_group_member(req) ||
+> > +					req_is_group_leader(req)) {
+> > +				struct io_kiocb *leader;
+> > +
+> > +				/* Leader is freed via the last member */
+> > +				if (req_is_group_leader(req)) {
+> > +					if (req->grp_link)
+> > +						io_queue_group_members(req);
+> > +					node = req->comp_list.next;
+> > +					continue;
+> > +				}
+> > +
+> > +				/*
+> > +				 * Prepare for freeing leader since we are the
+> > +				 * last group member
+> > +				 */
+> > +				leader = get_group_leader(req);
+> > +				leader->flags &= ~REQ_F_SQE_GROUP_LEADER;
+> > +				req->flags &= ~REQ_F_SQE_GROUP;
+> > +				/*
+> > +				 * Link leader to current request's next,
+> > +				 * this way works because the iterator
+> > +				 * always check the next node only.
+> > +				 *
+> > +				 * Be careful when you change the iterator
+> > +				 * in future
+> > +				 */
+> > +				wq_stack_add_head(&leader->comp_list,
+> > +						  &req->comp_list);
+> > +			}
+> > +
+> >   			if (req->flags & REQ_F_REFCOUNT) {
+> >   				node = req->comp_list.next;
+> >   				if (!req_ref_put_and_test(req))
+> >   					continue;
+> >   			}
+> > +
+> >   			if ((req->flags & REQ_F_POLLED) && req->apoll) {
+> >   				struct async_poll *apoll = req->apoll;
+> > @@ -1427,8 +1575,16 @@ void __io_submit_flush_completions(struct io_ring_ctx *ctx)
+> >   		struct io_kiocb *req = container_of(node, struct io_kiocb,
+> >   					    comp_list);
+> > -		if (!(req->flags & REQ_F_CQE_SKIP))
+> > -			io_req_commit_cqe(ctx, req);
+> > +		if (unlikely(req->flags & (REQ_F_CQE_SKIP | REQ_F_SQE_GROUP))) {
+> > +			if (req->flags & REQ_F_SQE_GROUP) {
+> > +				io_complete_group_req(req);
+> > +				continue;
+> > +			}
+> > +
+> > +			if (req->flags & REQ_F_CQE_SKIP)
+> > +				continue;
+> > +		}
+> > +		io_req_commit_cqe(ctx, req);
+> >   	}
+> >   	__io_cq_unlock_post(ctx);
+> > @@ -1638,8 +1794,12 @@ static u32 io_get_sequence(struct io_kiocb *req)
+> >   	struct io_kiocb *cur;
+> >   	/* need original cached_sq_head, but it was increased for each req */
+> > -	io_for_each_link(cur, req)
+> > -		seq--;
+> > +	io_for_each_link(cur, req) {
+> > +		if (req_is_group_leader(cur))
+> > +			seq -= cur->grp_refs;
+> > +		else
+> > +			seq--;
+> > +	}
+> >   	return seq;
+> >   }
+> ...
+> > @@ -2217,8 +2470,22 @@ static void io_submit_state_end(struct io_ring_ctx *ctx)
+> >   {
+> >   	struct io_submit_state *state = &ctx->submit_state;
+> > -	if (unlikely(state->link.head))
+> > -		io_queue_sqe_fallback(state->link.head);
+> > +	if (unlikely(state->group.head || state->link.head)) {
+> > +		/* the last member must set REQ_F_SQE_GROUP */
+> > +		if (state->group.head) {
+> > +			struct io_kiocb *lead = state->group.head;
+> > +
+> > +			state->group.last->grp_link = NULL;
+> > +			if (lead->flags & IO_REQ_LINK_FLAGS)
+> > +				io_link_sqe(&state->link, lead);
+> > +			else
+> > +				io_queue_sqe_fallback(lead);
+> 
+> req1(F_LINK), req2(F_GROUP), req3
+> 
+> is supposed to be turned into
+> 
+> req1 -> {group: req2 (lead), req3 }
+> 
+> but note that req2 here doesn't have F_LINK set.
+> I think it should be like this instead:
+> 
+> if (state->link.head)
+> 	io_link_sqe();
+> else
+> 	io_queue_sqe_fallback(lead);
 
-Fixes: a7e689dd1c06 ("block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages")
+Indeed, the above change is correct.
 
 
 Thanks,
