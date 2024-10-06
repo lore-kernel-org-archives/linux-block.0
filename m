@@ -1,87 +1,112 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48F7EAC6
-	for <linux-block@vger.kernel.org>; Sun,  6 Oct 2024 03:55:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC88216D4E8;
+	Sun,  6 Oct 2024 06:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728186920; cv=none; b=F8acIf0EsuSrxfdAIGh8Uc5WZmeFPrsD2mb6OLZ++uncOEzDd8OZLWcOZVIDs9zurj92bcfF9d0E6L/Jy4moyT1aW3hw1AXSDIWWyz6WUW03BrLvlAMfjfo3tcOoDahu9g0oJSAq2+eFlxQi6EenHa5ZcVyoMPY7UK86u/sy/LQ=
+	t=1728197944; cv=none; b=m7E5VeFOhOcoAOsbIYiVLiHounRxaO2Yw4fd8YJkNqPfrp5XIuHK48E2ZrsD5bdQJNw5oCunaYGUOuc1BQP6xGPiVXAu8X5sWhISUBEBgQnwnoEhomZSrYHCqUhfMoyLsmk5C8/WxcGCD4s1NbLDrB8zCFG4IKJ6qqjF/sybueM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728186920; c=relaxed/simple;
-	bh=cHzYy/peCHbekEClQEQlfrfvaaKGeLEEElmDPiw1bC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xn0YOlgPDHuBwDYUN6FdaWY7Vz038AKgsqDVn8tm1EX7rnBaZw9u8+OPF5hx/WJ0jtfhwUJDgckh+ENvKYj+HI3cuKHyWx27EOoMAQ29yfiG2QiwGTFeoxvhglDniXAn/6f+OcAuPM0vCKWT/uYb7MbGX6Yc0VzRkbyZIYPooD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b1zysEHp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1728197944; c=relaxed/simple;
+	bh=/ZJ7KmFOl0EpI21Y0KEtqt/Oqi3/GZoai/I0cVMf/YE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bLDEXV1Ufb9+9nCvz7rPBGIj1EmgKJ1Si8DRRdK6fY8QII4qCSSHkFpI+MKy0kHS04h/xpMyuTKRxbPtF+5MovioASHJcHEPgwckeWtleakcBkRcF37LE6VUYw8LdrAtwSg+/rUTkiZUcw4d97jOpfWbHOvvClrs11Msa8XCraw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PipkX5Ft; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b1zysEHp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728186917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7kLinepcpe1b0ntnO9Z6uP9P9sY4ikJtKhQzk/NG7UM=;
-	b=b1zysEHp2yBvaV11QCLSlQCtFq92ntH/ACKJteKRPJOA4wnPaltOyu/zNAI/vAIlAlJNHb
-	TqHpYFkVnh5hZfRtR/EoDLhwl2zSFfAjZikI0ddjQi3p138NFnRznh/WYPCZSyEtMdCOom
-	vLRO5lxnQvXMTpuB/zLdmxP4BYMEmQ0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-466-dAdgM1NMOdWw0pPn8FsyEw-1; Sat,
- 05 Oct 2024 23:55:15 -0400
-X-MC-Unique: dAdgM1NMOdWw0pPn8FsyEw-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 46E17195422B;
-	Sun,  6 Oct 2024 03:55:14 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.21])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DEB0E3000198;
-	Sun,  6 Oct 2024 03:55:08 +0000 (UTC)
-Date: Sun, 6 Oct 2024 11:54:57 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH V6 5/8] io_uring: support sqe group with members
- depending on leader
-Message-ID: <ZwIKEdkQ4f5ueX31@fedora>
-References: <20240912104933.1875409-1-ming.lei@redhat.com>
- <20240912104933.1875409-6-ming.lei@redhat.com>
- <36b88a5a-1209-4db3-8514-0f1e1828f7e1@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PipkX5Ft"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-71b00a97734so3183553b3a.1;
+        Sat, 05 Oct 2024 23:59:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728197942; x=1728802742; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6i+cth8VkyIuhVRMhBqiNkopkDZ/SGnIu+dJ7Vv/9ds=;
+        b=PipkX5FtxhgMs8ue/n96FPR5CZAJz77gOrAt5VJblPd8gGTVFcR7XL+0JjIAMnlfpS
+         pbKeLgsl/PDNIa/iaglODn/vHCSJCGBIUgPlTtpNNzv7Kg1D9Ldw9QkxSlv63sfLS1PN
+         vKRYI75VmTdhjiunoi+NZEHIr8fULPENCVc4N+/b5YxVnUe3i9y1MTTFSDXb2Fc3sSCD
+         e04l4ae9LwrMAm6zFdOGaru3MwWMpqrUvVnRpU4gAlg9hEEeTmPrRtoSbfkWENxj1eW1
+         ha5CsE8X7wMa6mbZw7/goFJuFRFvfaQ1xXppIH91fee8djvFbgwVq4XXHPYF6OMGXmTT
+         xf+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728197942; x=1728802742;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6i+cth8VkyIuhVRMhBqiNkopkDZ/SGnIu+dJ7Vv/9ds=;
+        b=IY6Utg2aCwnSGlFYHSUiJw1jjzdXytQH4H86THh6A9EMuJ7wk172wbz649k9+HLjMX
+         jXskcEXZdOHbEQeNL+ULZZix1BxWI3yUlD7XMctYNO8nniV/e0S0edeVn2Cen4QAvhJL
+         63OhAOXWxQ34w2RfhJJzDGGh/K5WkcEvjPyaNxcva8qAYZXKptIxzDh7/bFsAE35BfG0
+         JNv4gVVdJd/iXTA0MO1QtGB7WurBFk+GajiTE3Je6UlBUO13D+wgH0/PWQ7kzXdHbrqd
+         QnbScE/Oh3GPwrMsgBOvVYHvHHN6eUeRnILTr10VLXDycX0PsZIZnRB1/X+jc4gvG1M0
+         14ow==
+X-Forwarded-Encrypted: i=1; AJvYcCVn89FB4+c3efqIFPpEyCD1PEYyAGN4kIygLSFhMPmrBb532ZijY+RsO7V9y1OwfMIb2VYuk2k57vtb3BRX@vger.kernel.org, AJvYcCWqu3aniGYztJT5h4W+JEA4NzperWMmxUC0H16Ql9fK5ZD1/e0z1FmYxUyOlVrfwaTdoWGrsS0jePIA5Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8k3Ebw6r6joyvXZ28Oz/Ym3FFJxnR73vNCtSJwhwjXkVevDZk
+	UEeq8J0oQp0ytK1MmVkNy+nGW7HfdFpeFTWDT6b4HTnWu9DlgK+6Fw1FYw==
+X-Google-Smtp-Source: AGHT+IG9vz8p5FUmnO6dAYjAuUD+uETY9KO4Rrxcroy4S/nYfi9f0mZ4v5TkdZzJoYa6FVs+Y961ZA==
+X-Received: by 2002:aa7:88c2:0:b0:718:d7de:3be2 with SMTP id d2e1a72fcca58-71de23df1c8mr11603943b3a.14.1728197942007;
+        Sat, 05 Oct 2024 23:59:02 -0700 (PDT)
+Received: from ?IPV6:2409:40c0:230:2966:8a2:4c2e:bb52:a9af? ([2409:40c0:230:2966:8a2:4c2e:bb52:a9af])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0d4a278sm2438134b3a.140.2024.10.05.23.58.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 05 Oct 2024 23:59:01 -0700 (PDT)
+Message-ID: <b22f1750-c53d-481f-8233-12adac30a807@gmail.com>
+Date: Sun, 6 Oct 2024 12:28:56 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <36b88a5a-1209-4db3-8514-0f1e1828f7e1@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: Explanation on Uninitialized Variable bio in blk_rq_prep_clone
+To: John Garry <john.g.garry@oracle.com>, hch@infradead.org
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <Zv_eFIjstVns-ebG@infradead.org>
+ <20241004141037.43277-1-surajsonawane0215@gmail.com>
+ <6a0ec577-fba1-44b3-87d8-3a202df19d8c@oracle.com>
+Content-Language: en-US
+From: Suraj Sonawane <surajsonawane0215@gmail.com>
+In-Reply-To: <6a0ec577-fba1-44b3-87d8-3a202df19d8c@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 04, 2024 at 02:18:13PM +0100, Pavel Begunkov wrote:
-> On 9/12/24 11:49, Ming Lei wrote:
-> > IOSQE_SQE_GROUP just starts to queue members after the leader is completed,
-> > which way is just for simplifying implementation, and this behavior is never
-> > part of UAPI, and it may be relaxed and members can be queued concurrently
-> > with leader in future.
-> > 
-> > However, some resource can't cross OPs, such as kernel buffer, otherwise
-> > the buffer may be leaked easily in case that any OP failure or application
-> > panic.
-> > 
-> > Add flag REQ_F_SQE_GROUP_DEP for allowing members to depend on group leader
-> > explicitly, so that group members won't be queued until the leader request is
-> > completed, the kernel resource lifetime can be aligned with group leader
+On 04/10/24 20:03, John Garry wrote:
+> On 04/10/2024 15:10, SurajSonawane2415 wrote:
+>> Explaination of how bio could be used uninitialized in this function:
+>>
+>> In the function blk_rq_prep_clone, the variable bio is declared but 
+>> can remain uninitialized
+>> if the allocation with bio_alloc_clone fails. This can lead to 
+>> undefined behavior when the
+>> function attempts to free bio in the error handling section using 
+>> bio_put(bio).
+>> By initializing bio to NULL at declaration, we ensure that the cleanup 
+>> code will only
+>> interact with bio if it has been successfully allocated.
+>>
+>>
 > 
-> That's the current and only behaviour, we don't need an extra flag
-> for that. We can add it back later when anything changes.
+> What about if rq_src->bio is NULL for blk_rq_prep_clone() -> 
+> __rq_for_each_bio(,rq_src):
+> 
+> #define __rq_for_each_bio(_bio, rq)    \
+>      if ((rq->bio))            \
+>          for (_bio = (rq)->bio; _bio; _bio = _bio->bi_next)
+> 
+> Then I don't think bio it get init'ed. Whether this is possible 
+> (rq_src->bio is NULL) is another question.
 
-OK.
+Hi Keith,
 
-Thanks, 
-Ming
+You're right to bring this up. If rq_src->bio is NULL, the 
+__rq_for_each_bio macro will skip the loop, meaning the bio variable 
+won't be used at all. So, even if bio isn’t initialized, it won't cause 
+any issues in that case.
 
+Thanks for pointing that out.
+
+Best regards,
+Suraj
