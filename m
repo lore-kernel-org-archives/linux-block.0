@@ -1,157 +1,258 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C9717F4F7
-	for <linux-block@vger.kernel.org>; Mon,  7 Oct 2024 09:45:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125C01DD870
+	for <linux-block@vger.kernel.org>; Mon,  7 Oct 2024 09:51:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728294318; cv=none; b=lPb93JbvjSWmaHj82whI19X/WU1Hlun103kZnXzV/JF9ly4gOaLK1YPjDvRqNtFEMqOYo936T/SeEr6aMMmp76CH3llEFqPITTkGbhZ68KL7ErvsOm7h8JT5Oyz+OJeZ6X2luKeao3irx3HavV7gt10fd2q+uS8BuYjrwWpnv1U=
+	t=1728294721; cv=none; b=k78ll+SZfXt2aF2VJjnwjMNQJSWXOKb2RArR+spgU1F8txn0y+UzT91Xo5RLQrF+IsY2b/Zgn9ar/CimCjctSiTTuAMnvdMvauYBeIp8a7+j7ijaCPl214j63lbGWVnEzGqZklwojLGQIKV00QVfY7k3J0tj0C74zpa8F6vfcOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728294318; c=relaxed/simple;
-	bh=Hx1F0tikbNColnhleodGdUAOmDHsZ0l3SwGG52L6zwE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N+i6fS8cTwyDGmPfo6sdwvxXTPJaYG8WI9auSDDpB0RIgkofFc6l7Fx/aAz3ydWOLYkzBIurEGvPQWsELbGKxjkLeWvlZdwqM3tkO0EalHpjQ0atL5Tqafh6zpkGsyuFrNvRbXV1p6RzgZ+i9S4Gg+vkkGtlXTf+H8PT5q23DhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=XhlDi3ct; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1728294721; c=relaxed/simple;
+	bh=28fEFY/hXxLCXhmVadIh9LyjLJaQY6Kwc8LMdw3jzXc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W3GdQvu9yLM2qT72xfRhbh85ps118GHsrXrhoBg3GxmRR/61lctzhe3qlKsLCChxgOEbnJHEAXqSaXHNDqg7nvbAZs0iKIUHIgtWmhFysjVtr7tyJeQH/IPSpNV7TWsF0goYIpUn3/ZxrQV3CSsyMxmrgCcCrNbyLzsJsiJCPGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PVO1xA7v; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XhlDi3ct"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-71def715ebdso1584141b3a.2
-        for <linux-block@vger.kernel.org>; Mon, 07 Oct 2024 02:45:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1728294316; x=1728899116; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ibq+LEAfPemunpVqR7LHp3t7YmtoUUQ7QEqbyhSu2tw=;
-        b=XhlDi3ctvRbbuzPvBt/CagIfRHvpEH8KrLgOfNW5yfJJweEExUWHoG0StFOYWFWasO
-         O1ovFtO+afjHK61iIG4zPnh+CClv1Gm0Z7DiNawHjLQmD3rVbfZFM8MuOsarR9AQswxE
-         hveByBNUAK0QrjnpB+JPSWtjWufEM1CHYk5Ao=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728294316; x=1728899116;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ibq+LEAfPemunpVqR7LHp3t7YmtoUUQ7QEqbyhSu2tw=;
-        b=k/XMUDkAdzCpBS45OShexvV2l875MQNMbkJwMBpt3Pme4OwA4yNDrQorNeeTrZJllS
-         cHzlie6fSZKdle8aGVr/IGlVAmaeU2CQpXUiTdA6oDq87U/0buZ00G+cNJXMna8XaJb4
-         IUqaFyC0IPrkSXWbhNSbdO1Iz09QRopvyxO4bVb3vOZWYvGutZkno31Ukmb8uyxLrHDD
-         Uz+hJBpslWhKKM4bXFVyisr4sHS2Tw9a0pR8SPQyp+pvxbq4IfDQDDEUQgBEyM1Yv9fz
-         VMIWkc+vFgOpBbL3XRdsDDuBifoC35nGEau9MdEVhp7T94J/UevH8xQEEzcnFa7Lcfqv
-         uL5g==
-X-Forwarded-Encrypted: i=1; AJvYcCVqTLuu5TGJAr0wuc37IRkuxaUO3ZNg8q+gNp1ezBM00Lk39vtcgCsmqasvDviBVJbW9V7BYbQuDL3XKw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YybuEBtoVoGYgwaFtszlXJxwPCsUzNtZqvamaLCyD/iw1ZeUL4l
-	ch25qGLinZyKhw4hw4KzYRn+jF4XdrXLRAh+VPYzfdnd99320hz6/oOFdHOivg==
-X-Google-Smtp-Source: AGHT+IGlphmJFtEqg+/TLxxWa6abQtsAjeVhInDIuEplGxIH3E9TBeO2FzZ86m1IGlDp/7Bqkgi/MA==
-X-Received: by 2002:a05:6a21:6f83:b0:1d2:e81c:ac76 with SMTP id adf61e73a8af0-1d6dfababffmr18648559637.32.1728294315839;
-        Mon, 07 Oct 2024 02:45:15 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:e05b:ffee:c9cf:bdec])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0d45323sm3993759b3a.122.2024.10.07.02.45.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2024 02:45:15 -0700 (PDT)
-Date: Mon, 7 Oct 2024 18:45:11 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Yang Yang <yang.yang@vivo.com>
-Subject: Re: block: del_gendisk() vs blk_queue_enter() race condition
-Message-ID: <20241007094511.GA10794@google.com>
-References: <Zv6d1Iy18wKvliLm@infradead.org>
- <Zv6fbloZRg2xQ1Jf@infradead.org>
- <20241003140051.GM11458@google.com>
- <20241003141709.GN11458@google.com>
- <20241004042127.GO11458@google.com>
- <Zv-O9tldIzPfD8ju@infradead.org>
- <20241004074818.GP11458@google.com>
- <Zv_ddkAZhjC9OQyo@infradead.org>
- <20241004143234.GR11458@google.com>
- <ZwN7OTXW3uDBbo--@infradead.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PVO1xA7v"
+Message-ID: <3108a1da-3eb3-4b9d-8063-eab25c7c2f29@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728294716;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gcSzrW1BnujUdglpblDDDF1lftH52B5+5zWrzMqP+B0=;
+	b=PVO1xA7vijKPtuXOjS6KwYYbkZFK/RqX3iR8e8Mokkan4S6LepxdfwkaWNdPTUR6J9FVol
+	JcW4a+4ydTim55sCtFQgZloAPOR+o3sZDQ027mufpCcgjOQEw+l4Q/du2JW/LIsQZB34Xa
+	3LcuEwKp/2utzRN+a+8/md1eBovEBwk=
+Date: Mon, 7 Oct 2024 17:51:45 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZwN7OTXW3uDBbo--@infradead.org>
+Subject: Re: [PATCH] RDMA/srpt: Make slab cache names unique
+To: Bart Van Assche <bvanassche@acm.org>, Jason Gunthorpe <jgg@nvidia.com>,
+ Leon Romanovsky <leonro@nvidia.com>
+Cc: linux-rdma@vger.kernel.org,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20241004173730.1932859-1-bvanassche@acm.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20241004173730.1932859-1-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On (24/10/06 23:10), Christoph Hellwig wrote:
-> On Fri, Oct 04, 2024 at 11:32:34PM +0900, Sergey Senozhatsky wrote:
-> > Hmm, setting QUEUE_FLAG_DYING unconditionally in __blk_mark_disk_dead()
-> > implies moving it up, to the very top of del_gendisk(), before the first
-> > time we grab ->open_mutex, because that's the issue that we are having.
-> > Does this sound like re-introducing the previous deadlock scenario (the
-> > one you pointed at previously) because of that "don't acquire ->open_mutex
-> > after freezing the queue" thing?
+在 2024/10/5 1:37, Bart Van Assche 写道:
+> Since commit 4c39529663b9 ("slab: Warn on duplicate cache names when
+> DEBUG_VM=y"), slab complains about duplicate cache names. Hence this
+> patch that makes cache names unique.
 > 
-> So the trace of that one is literally the same as the one you reported,
-> and I'm still wondering how they are related (I hope Yang Yang can
-> chime in)
->
-> I suspect that if we mark both the disk and queue dead
-> early that will error out everything and should fix it.
+> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Closes: https://lore.kernel.org/linux-block/xpe6bea7rakpyoyfvspvin2dsozjmjtjktpph7rep3h25tv7fb@ooz4cu5z6bq6/
+> Fixes: 5dabcd0456d7 ("RDMA/srpt: Add support for immediate data")
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>   drivers/infiniband/ulp/srpt/ib_srpt.c | 32 ++++++++++++++++++++++-----
+>   drivers/infiniband/ulp/srpt/ib_srpt.h |  6 +++++
+>   2 files changed, 32 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/infiniband/ulp/srpt/ib_srpt.c b/drivers/infiniband/ulp/srpt/ib_srpt.c
+> index 9632afbd727b..4cb462074f00 100644
+> --- a/drivers/infiniband/ulp/srpt/ib_srpt.c
+> +++ b/drivers/infiniband/ulp/srpt/ib_srpt.c
+> @@ -41,6 +41,7 @@
+>   #include <linux/string.h>
+>   #include <linux/delay.h>
+>   #include <linux/atomic.h>
+> +#include <linux/idr.h>
+>   #include <linux/inet.h>
+>   #include <rdma/ib_cache.h>
+>   #include <scsi/scsi_proto.h>
+> @@ -68,6 +69,7 @@ MODULE_LICENSE("Dual BSD/GPL");
+>   static u64 srpt_service_guid;
+>   static DEFINE_SPINLOCK(srpt_dev_lock);	/* Protects srpt_dev_list. */
+>   static LIST_HEAD(srpt_dev_list);	/* List of srpt_device structures. */
+> +static DEFINE_IDA(cache_ida);
+>   
+>   static unsigned srp_max_req_size = DEFAULT_MAX_REQ_SIZE;
+>   module_param(srp_max_req_size, int, 0444);
+> @@ -2120,12 +2122,14 @@ static void srpt_release_channel_work(struct work_struct *w)
+>   			     ch->rsp_buf_cache, DMA_TO_DEVICE);
+>   
+>   	kmem_cache_destroy(ch->rsp_buf_cache);
+> +	ida_free(&cache_ida, ch->rsp_buf_cache_idx);
+>   
+>   	srpt_free_ioctx_ring((struct srpt_ioctx **)ch->ioctx_recv_ring,
+>   			     sdev, ch->rq_size,
+>   			     ch->req_buf_cache, DMA_FROM_DEVICE);
+>   
+>   	kmem_cache_destroy(ch->req_buf_cache);
+> +	ida_free(&cache_ida, ch->req_buf_cache_idx);
+>   
+>   	kref_put(&ch->kref, srpt_free_ch);
+>   }
+> @@ -2164,6 +2168,7 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
+>   	u32 it_iu_len;
+>   	int i, tag_num, tag_size, ret;
+>   	struct srpt_tpg *stpg;
+> +	char cache_name[32];
 
-Does the diff below look like something that you are thinking about?
+The local variable cache_name is not zeroed.
 
-__blk_mark_disk_dead() cannot be moved alone, we need
-blk_report_disk_dead() before it.  And all of these should be
-done before the first time we take ->open_mutex.
+>   
+>   	WARN_ON_ONCE(irqs_disabled());
+>   
+> @@ -2245,8 +2250,11 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
+>   	INIT_LIST_HEAD(&ch->cmd_wait_list);
+>   	ch->max_rsp_size = ch->sport->port_attrib.srp_max_rsp_size;
+>   
+> -	ch->rsp_buf_cache = kmem_cache_create("srpt-rsp-buf", ch->max_rsp_size,
+> -					      512, 0, NULL);
+> +	ch->rsp_buf_cache_idx = ida_alloc(&cache_ida, GFP_KERNEL);
+> +	snprintf(cache_name, sizeof(cache_name), "srpt-rsp-buf-%u",
+> +		 ch->rsp_buf_cache_idx);
 
-I keep __blk_mark_disk_dead() the way it is and just forcibly
-set QUEUE_FLAG_DYING right before __blk_mark_disk_dead(), so
-that hopefully bio_queue_enter() can detect DYING.
+IIRC, snprintf will append a '\0' to the string "cache_name". So this 
+string "cache_name" will be used correctly even though this string 
+"cache_name" is not zeroed before it is used.
 
----
+> +	ch->rsp_buf_cache =
+> +		kmem_cache_create(cache_name, ch->max_rsp_size, 512, 0, NULL);
+>   	if (!ch->rsp_buf_cache)
+>   		goto free_ch;
+>   
+> @@ -2280,8 +2288,11 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
+>   		alignment_offset = round_up(imm_data_offset, 512) -
+>   			imm_data_offset;
+>   		req_sz = alignment_offset + imm_data_offset + srp_max_req_size;
+> -		ch->req_buf_cache = kmem_cache_create("srpt-req-buf", req_sz,
+> -						      512, 0, NULL);
+> +		ch->req_buf_cache_idx = ida_alloc(&cache_ida, GFP_KERNEL);
+> +		snprintf(cache_name, sizeof(cache_name), "srpt-req-buf-%u",
+> +			 ch->req_buf_cache_idx);
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 1c05dd4c6980..3b2a7e0f2176 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -649,6 +649,16 @@ void del_gendisk(struct gendisk *disk)
- 
- 	disk_del_events(disk);
- 
-+	/*
-+	 * Tell the file system to write back all dirty data and shut down if
-+	 * it hasn't been notified earlier.
-+	 */
-+	if (!test_bit(GD_DEAD, &disk->state))
-+		blk_report_disk_dead(disk, false);
-+	/* TODO: big fat comment */
-+	blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue);
-+	__blk_mark_disk_dead(disk);
-+
- 	/*
- 	 * Prevent new openers by unlinked the bdev inode.
- 	 */
-@@ -657,18 +667,10 @@ void del_gendisk(struct gendisk *disk)
- 		bdev_unhash(part);
- 	mutex_unlock(&disk->open_mutex);
- 
--	/*
--	 * Tell the file system to write back all dirty data and shut down if
--	 * it hasn't been notified earlier.
--	 */
--	if (!test_bit(GD_DEAD, &disk->state))
--		blk_report_disk_dead(disk, false);
--
- 	/*
- 	 * Drop all partitions now that the disk is marked dead.
- 	 */
- 	mutex_lock(&disk->open_mutex);
--	__blk_mark_disk_dead(disk);
- 	xa_for_each_start(&disk->part_tbl, idx, part, 1)
- 		drop_partition(part);
- 	mutex_unlock(&disk->open_mutex);
-@@ -714,6 +716,10 @@ void del_gendisk(struct gendisk *disk)
- 	rq_qos_exit(q);
- 	blk_mq_unquiesce_queue(q);
- 
-+	/* TODO: big fat comment */
-+	if (test_bit(GD_OWNS_QUEUE, &disk->state))
-+		blk_queue_flag_clear(QUEUE_FLAG_DYING, disk->queue);
-+
- 	/*
- 	 * If the disk does not own the queue, allow using passthrough requests
- 	 * again.  Else leave the queue frozen to fail all I/O.
+Ditto
+
+> +		ch->req_buf_cache =
+> +			kmem_cache_create(cache_name, req_sz, 512, 0, NULL);
+>   		if (!ch->req_buf_cache)
+>   			goto free_rsp_ring;
+>   
+> @@ -2479,6 +2490,7 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
+>   
+>   free_recv_cache:
+>   	kmem_cache_destroy(ch->req_buf_cache);
+> +	ida_free(&cache_ida, ch->req_buf_cache_idx);
+>   
+>   free_rsp_ring:
+>   	srpt_free_ioctx_ring((struct srpt_ioctx **)ch->ioctx_ring,
+> @@ -2487,6 +2499,7 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
+>   
+>   free_rsp_cache:
+>   	kmem_cache_destroy(ch->rsp_buf_cache);
+> +	ida_free(&cache_ida, ch->rsp_buf_cache_idx);
+>   
+>   free_ch:
+>   	if (rdma_cm_id)
+> @@ -3056,6 +3069,7 @@ static void srpt_free_srq(struct srpt_device *sdev)
+>   			     sdev->srq_size, sdev->req_buf_cache,
+>   			     DMA_FROM_DEVICE);
+>   	kmem_cache_destroy(sdev->req_buf_cache);
+> +	ida_free(&cache_ida, sdev->req_buf_cache_idx);
+>   	sdev->srq = NULL;
+>   }
+>   
+> @@ -3070,6 +3084,7 @@ static int srpt_alloc_srq(struct srpt_device *sdev)
+>   	};
+>   	struct ib_device *device = sdev->device;
+>   	struct ib_srq *srq;
+> +	char cache_name[32];
+
+Ditto
+
+>   	int i;
+>   
+>   	WARN_ON_ONCE(sdev->srq);
+> @@ -3082,8 +3097,11 @@ static int srpt_alloc_srq(struct srpt_device *sdev)
+>   	pr_debug("create SRQ #wr= %d max_allow=%d dev= %s\n", sdev->srq_size,
+>   		 sdev->device->attrs.max_srq_wr, dev_name(&device->dev));
+>   
+> -	sdev->req_buf_cache = kmem_cache_create("srpt-srq-req-buf",
+> -						srp_max_req_size, 0, 0, NULL);
+> +	sdev->req_buf_cache_idx = ida_alloc(&cache_ida, GFP_KERNEL);
+> +	snprintf(cache_name, sizeof(cache_name), "srpt-srq-req-buf-%u",
+> +		 sdev->req_buf_cache_idx);
+
+Ditto
+
+> +	sdev->req_buf_cache =
+> +		kmem_cache_create(cache_name, srp_max_req_size, 0, 0, NULL);
+>   	if (!sdev->req_buf_cache)
+>   		goto free_srq;
+>   
+> @@ -3106,6 +3124,7 @@ static int srpt_alloc_srq(struct srpt_device *sdev)
+>   
+>   free_cache:
+>   	kmem_cache_destroy(sdev->req_buf_cache);
+> +	ida_free(&cache_ida, sdev->req_buf_cache_idx);
+>   
+>   free_srq:
+>   	ib_destroy_srq(srq);
+> @@ -3926,6 +3945,7 @@ static void __exit srpt_cleanup_module(void)
+>   		rdma_destroy_id(rdma_cm_id);
+>   	ib_unregister_client(&srpt_client);
+>   	target_unregister_template(&srpt_template);
+> +	ida_destroy(&cache_ida);
+>   }
+>   
+>   module_init(srpt_init_module);
+> diff --git a/drivers/infiniband/ulp/srpt/ib_srpt.h b/drivers/infiniband/ulp/srpt/ib_srpt.h
+> index 4c46b301eea1..6d10cd7c9f21 100644
+> --- a/drivers/infiniband/ulp/srpt/ib_srpt.h
+> +++ b/drivers/infiniband/ulp/srpt/ib_srpt.h
+> @@ -276,6 +276,8 @@ enum rdma_ch_state {
+>    * @state:         channel state. See also enum rdma_ch_state.
+>    * @using_rdma_cm: Whether the RDMA/CM or IB/CM is used for this channel.
+>    * @processing_wait_list: Whether or not cmd_wait_list is being processed.
+> + * @rsp_buf_cache_idx: @rsp_buf_cache index for slab.
+> + * @req_buf_cache_idx: @req_buf_cache index for slab.
+>    * @rsp_buf_cache: kmem_cache for @ioctx_ring.
+>    * @ioctx_ring:    Send ring.
+>    * @req_buf_cache: kmem_cache for @ioctx_recv_ring.
+> @@ -316,6 +318,8 @@ struct srpt_rdma_ch {
+>   	u16			imm_data_offset;
+>   	spinlock_t		spinlock;
+>   	enum rdma_ch_state	state;
+> +	int			rsp_buf_cache_idx;
+> +	int			req_buf_cache_idx;
+
+Thanks.
+Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+
+Zhu Yanjun
+>   	struct kmem_cache	*rsp_buf_cache;
+>   	struct srpt_send_ioctx	**ioctx_ring;
+>   	struct kmem_cache	*req_buf_cache;
+> @@ -443,6 +447,7 @@ struct srpt_port {
+>    * @srq_size:      SRQ size.
+>    * @sdev_mutex:	   Serializes use_srq changes.
+>    * @use_srq:       Whether or not to use SRQ.
+> + * @req_buf_cache_idx: @req_buf_cache index for slab.
+>    * @req_buf_cache: kmem_cache for @ioctx_ring buffers.
+>    * @ioctx_ring:    Per-HCA SRQ.
+>    * @event_handler: Per-HCA asynchronous IB event handler.
+> @@ -459,6 +464,7 @@ struct srpt_device {
+>   	int			srq_size;
+>   	struct mutex		sdev_mutex;
+>   	bool			use_srq;
+> +	int			req_buf_cache_idx;
+>   	struct kmem_cache	*req_buf_cache;
+>   	struct srpt_recv_ioctx	**ioctx_ring;
+>   	struct ib_event_handler	event_handler;
+
