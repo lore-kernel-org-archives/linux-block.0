@@ -1,112 +1,60 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA7218133C
-	for <linux-block@vger.kernel.org>; Sun,  6 Oct 2024 21:11:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F295D13635E;
+	Mon,  7 Oct 2024 05:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728249069; cv=none; b=YLJdf5ILLPEUqTGuILJCTAdgFReFMrVUWhvkNHPffOtGXZVkAtYZvmpUb2DcFGNMCAqUdu8S99UaSx9LiEBeOvPj6UtDPsXw5UABU+WQgFT0ejhMGHnXjtdHjCPIFvXeuBNcHCYB8CgJA/P4BSyzv8dT7eS5hpqJsULSqS289XY=
+	t=1728279756; cv=none; b=hYwGLEQKk8NPFYkfjpaLL1rZMvax++TA03/maBlp6/Vylftk+vETvI6G4HrugO1gg1uhkiSkvtwMGqfnSTHIQn7zwPm7mFokJaC7yrXsH/6mWxViglXo8E9xy8MRfIuYWdJnrIQZUkt8fE9+06OqRSqcE2rF1PycAuetPv+4uRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728249069; c=relaxed/simple;
-	bh=+eFNjWgForNGlvpFra2igXT/QVdi0Sq1+iPGE7JoouQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xonwvj2wdxjBT0ITz42kz0k9zrvGxY0LMScdGEd/xhtOcm7mcHBM5exQegA6WZm1BV44Czs1TRMJUgOcuaHgTlMU6AUpilK200wufHKzyRblhsJLGpDfyeS/hJnUxeLblcNKHjoipdYjnFn1bV/lLeRuQWrpHHi5tFvAcIAz0oQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HyH0gkK6; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HyH0gkK6"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20b7259be6fso40961425ad.0
-        for <linux-block@vger.kernel.org>; Sun, 06 Oct 2024 14:11:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728249063; x=1728853863; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dloADBbuZWGn70AvE4DrbcMS4omNC91HnOyXDRn/hGE=;
-        b=HyH0gkK6NvUTRUDvfutCXgvc+Pu+in1kbRa3cKA8f2Fr+ppvNnCjmmh/qxoz+XFhy/
-         XuBDPUu+zngTSKPF/S8cdA6Of7RRqTEm3kyxQTz0Ic9uHo1sA9vlCMVzvlGpL9QewSxL
-         r5PQ13gUUxUoy+aIawLXjChgdUcUe6k9UwzTt/QLsjrEzBPe71iwOkJLFRMzfijOYozV
-         W10aZOgKiknqANRW3ksspHqSvOYbX8gBAr3rmodSkwSSYVgCP3Vjog6QGR+k+vhhmmWV
-         6tfbwyLJZWCep2y6xEStzuqaASUqzXHq1ADYtyfMBF3iWr017+04fgfStqGfJx54d3pA
-         T2NA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728249063; x=1728853863;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dloADBbuZWGn70AvE4DrbcMS4omNC91HnOyXDRn/hGE=;
-        b=vY9OGZ0yxZuug+wYdEoOEu4N1xX6oqzfn2wmMyr6BLjS3invZqIPx4aIX4qMeoco2x
-         w+K08WLpKRQwDrMsmVaF8Lf0dxrAXAlM+GMcWjDY8FNZkO9wUIeb8azt5fZfj86t0vyh
-         upd9hN2HZg9erLjjxAtNXJxxCtGxIyFtoBADym4EL+SBrNFQJfGMqiwYs3J3yxdw1V0r
-         HzBnhoNMhAUBn2YvvixZ+W3nBvHVlsY0s3sz+8cpA7F40TbcsUMy11T7TtCPE6jrtOCV
-         DqFYHgUSb+TKHTK0645RF5JiAtoUkCJ1CdFN7phuZoj4zwB200kL72KbXmFbJ4Mnolj3
-         zeuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfxDPeH7MvFAPKfJZFNZlzMRqdN8Qt97h4IYjVwECzReZbm/34Oo65IKLa3qrRjywnyGx+5cMWpQADMQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD5MrS6y+IzjzDUIXXUPLcmRHD2mljh4CyZf5Een8ofEH+ANp8
-	G9MGxn7GjbvrV90jAaGInGcw9Ak0zFSKyqCRlC76+VV50vIh7pTfEtVBK33+2s2h2JyOt0b9HXc
-	HHP8=
-X-Google-Smtp-Source: AGHT+IH5NNQf1Ie+vUj3S5amCK5fUOP7CYBZC8wQD1o0NC1Am1NwNpRLmuyhZ7iS6+THJDSgH8BYHg==
-X-Received: by 2002:a17:902:cec7:b0:20b:b238:9d25 with SMTP id d9443c01a7336-20bfe2a4109mr165129215ad.38.1728249063495;
-        Sun, 06 Oct 2024 14:11:03 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c13969477sm28488985ad.194.2024.10.06.14.11.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 06 Oct 2024 14:11:02 -0700 (PDT)
-Message-ID: <d2f5b906-d721-426f-a469-891eb2220eff@kernel.dk>
-Date: Sun, 6 Oct 2024 15:11:01 -0600
+	s=arc-20240116; t=1728279756; c=relaxed/simple;
+	bh=jNFJbeaBC/ddBNQtHsaqiEZYQpM+ep++AQHObx5w6UI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OeE4si6CambJ6bsx4+xVcxQuz+24W39Ec648FzG5tKo9Ovs0aH961Q6Q4RCYoOWjFZOJfaDJWSxEaMQCnHwMSZ7cGIXUee6gDFGPQKJY+DKUDQAZvcBze48NlV7WX1DBaxSPEJbv8msMb5ICfzJ1dm4sVpM9f6bkpSTq+XdwSeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 85BB1227A8E; Mon,  7 Oct 2024 07:42:29 +0200 (CEST)
+Date: Mon, 7 Oct 2024 07:42:29 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, brauner@kernel.org,
+	djwong@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+	dchinner@redhat.com, cem@kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, hare@suse.de,
+	martin.petersen@oracle.com, catherine.hoang@oracle.com,
+	mcgrof@kernel.org, ritesh.list@gmail.com, ojaswin@linux.ibm.com
+Subject: Re: [PATCH v7 5/8] xfs: Support FS_XFLAG_ATOMICWRITES
+Message-ID: <20241007054229.GA307@lst.de>
+References: <20241004092254.3759210-1-john.g.garry@oracle.com> <20241004092254.3759210-6-john.g.garry@oracle.com> <20241004123520.GB19295@lst.de> <f4d2180a-8baa-4636-a0a1-36e474fcd157@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: move iostat check into blk_acount_io_start()
-To: kernel test robot <oliver.sang@intel.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com, linux-block@vger.kernel.org
-References: <202410062110.512391df-oliver.sang@intel.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <202410062110.512391df-oliver.sang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f4d2180a-8baa-4636-a0a1-36e474fcd157@oracle.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 10/6/24 8:07 AM, kernel test robot wrote:
-> 
-> 
-> Hello,
-> 
-> kernel test robot noticed "blktests.block/024.fail" on:
-> 
-> commit: 5b0b8be85f1ca1c11566890f5d4564ee97cf2d41 ("[PATCH] block: move iostat check into blk_acount_io_start()")
-> url: https://github.com/intel-lab-lkp/linux/commits/Jens-Axboe/block-move-iostat-check-into-blk_acount_io_start/20241003-032648
-> base: https://git.kernel.org/cgit/linux/kernel/git/axboe/linux-block.git for-next
-> patch link: https://lore.kernel.org/all/550fc8a0-3461-49ac-879e-32908870f007@kernel.dk/
-> patch subject: [PATCH] block: move iostat check into blk_acount_io_start()
-> 
-> in testcase: blktests
-> version: blktests-x86_64-80430af-1_20240910
-> with following parameters:
-> 
-> 	disk: 1HDD
-> 	test: block-024
+On Fri, Oct 04, 2024 at 02:07:05PM +0100, John Garry wrote:
+> Sure, that is true (about being able to atomically write 1x FS block if the 
+> bdev support it).
+>
+> But if we are going to add forcealign or similar later, then it would make 
+> sense (to me) to have FS_XFLAG_ATOMICWRITES (and its other flags) from the 
+> beginning. I mean, for example, if FS_XFLAG_FORCEALIGN were enabled and we 
+> want atomic writes, setting FS_XFLAG_ATOMICWRITES would be rejected if AG 
+> count is not aligned with extsize, or extsize is not a power-of-2, or 
+> extsize exceeds bdev limits. So FS_XFLAG_ATOMICWRITES could have some value 
+> there.
+>
+> As such, it makes sense to have a consistent user experience and require 
+> FS_XFLAG_ATOMICWRITES from the beginning.
 
-This should fix it:
+Well, even with forcealign we're not going to lose support for atomic
+writes <= block size, are we?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8e75e3471ea5..9cbc0262ad19 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -331,7 +331,7 @@ EXPORT_SYMBOL(blk_rq_init);
- /* Set start and alloc time when the allocated request is actually used */
- static inline void blk_mq_rq_time_init(struct request *rq, u64 alloc_time_ns)
- {
--	if (blk_mq_need_time_stamp(rq))
-+	if (blk_queue_io_stat(rq->q))
- 		rq->start_time_ns = blk_time_get_ns();
- 	else
- 		rq->start_time_ns = 0;
-
--- 
-Jens Axboe
