@@ -1,51 +1,29 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B143A8F0;
-	Mon,  7 Oct 2024 05:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE113A8F0
+	for <linux-block@vger.kernel.org>; Mon,  7 Oct 2024 05:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728280490; cv=none; b=lvh2/Xp73SIVbun2p66kpA1fS396aXm6cICuivBmma2Mm9/tJsE52NN3mu9bHkT4Ssqw7jPaA8u2FQfmtQUhNjnJlmCLnRZ8asDPi5Ju5NGs1Y/IhbFZNOucyIBoryiCYDaLxwLA8muFKyrG1UQwccargmelBPgF662fqCBKzM0=
+	t=1728280621; cv=none; b=AHwCvrji179QKb+sO4NdKPf6c+8zzz+4c60p1mTx+4SEedKXsJy6JlVunPpO0x7vXVRO8wp8Sm9Qe/UYzs+1dTG81sZiYW5pBuwzQoxucRsxfDqVxvkGvJPind0lXeYLUEbGBo5f7ubCWKR2bMrOPA5HgBvnafe8pKrsTJ9X1zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728280490; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1728280621; c=relaxed/simple;
+	bh=WbBTY3zd9Yx8q1ZqTqR/LS3Q6vJ2tE+bh/lMSwfADMM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KzAetRxNzHjudBT9vGBFlNxAK3Ooo4ptkMajr4jRvv4yYaqfyiEG7ywXd3rmkikMwJJJdEmghJiFYf/qRNb15q2EQUp0pPz1lwbfqVfU/LB/KVUnqkYeNi1XP5TQ9ueafhdGUxJjxMPgxv80Hug5OjSugYQb8b9uIZGY9POsme4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=02Gr/1/q; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="02Gr/1/q"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=02Gr/1/qwpl5xb9yDRo4hRb1cC
-	LL1VLo3R/tp/phbLIUfxmMfP1c4gyCDBnB6WK8lnht8XKa4P00GpBQ7SccstTr4rpOHdia53zCKhz
-	/9/IBvbwTTvL2MJBcKGxkETwLsdQ5QoDlwKXLmeBsPsMxWdSJcFgbycyGuXV2nn1QF8e5dczGse2S
-	ADeyVzi1owIBd3rmUHOuMdr+hlbguOi/BL30Lh7HyZHJwvyfT82aIjXk8eDAC0R3jds3kLsMJdXAX
-	JckGoxbkOQV6lcOati3R2B39FN2WkRM56GtgBhCnbOIRJDUP93ElG9AX185hHHaF4JRWfZOnBOD9U
-	lny6NQ9A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1sxghe-00000001LZ9-1vhE;
-	Mon, 07 Oct 2024 05:54:42 +0000
-Date: Sun, 6 Oct 2024 22:54:42 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Douglas Anderson <dianders@chromium.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
-	Kyle Fortin <kyle.fortin@oracle.com>,
-	Douglas Anderson <dianders@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Christian Heusel <christian@heusel.eu>, Jan Kara <jack@suse.cz>,
-	Li Lingfeng <lilingfeng3@huawei.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	Riyan Dhiman <riyandhiman14@gmail.com>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] block: add partition uuid into uevent as "PARTUUID"
-Message-ID: <ZwN3ooAd6vUd7Fu5@infradead.org>
-References: <20241004171340.v2.1.I938c91d10e454e841fdf5d64499a8ae8514dc004@changeid>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XBdbK/fSf721wtatzJDjqpXXafxf4nuizpbVblkb1qAXz/UU6/c4hjTfzw1dgAOtvnyoI16IYx0t7q7uv6h8ZHfopvNgg3YqPCQhxi9CZzZEX7lyB6dI7LltpAXRH9w5lN42t1GaLIs6nLEHeAW6XSmm2u0GJubtwBx+kegZ0V4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 42335227A8E; Mon,  7 Oct 2024 07:56:56 +0200 (CEST)
+Date: Mon, 7 Oct 2024 07:56:56 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
+	linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCHv2] block: enable passthrough command statistics
+Message-ID: <20241007055656.GA510@lst.de>
+References: <20241003153036.411721-1-kbusch@meta.com> <20241004053828.GA14377@lst.de> <ZwAD7RZjqpzQl43s@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,10 +32,55 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241004171340.v2.1.I938c91d10e454e841fdf5d64499a8ae8514dc004@changeid>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <ZwAD7RZjqpzQl43s@kbusch-mbp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Looks good:
+On Fri, Oct 04, 2024 at 09:04:13AM -0600, Keith Busch wrote:
+> Even Jens was a little surprised to find nvme passthrough sets the bio
+> bi_bdev. I didn't think it was unusual, but sounds like we are doing
+> something special here.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+IIRC it was added to support metadata passthrough, but I'd have to do
+a little research to find the details.
 
+> > > +	/*
+> > > +	 * Ensuring the size is aligned to the block size prevents observing an
+> > > +	 * invalid sectors stat.
+> > > +	 */
+> > > +	if (blk_rq_bytes(req) & (bdev_logical_block_size(bio->bi_bdev) - 1))
+> > > +		return false;
+> > 
+> > Now this probably won't trigger anyway for the usual workload (although
+> > it might for odd NVMe command sets like KV and the SLM), but I'd expect the
+> > size to be rounded (probably up?) and not entirely dropped.
+> 
+> This prevents commands with payload sizes that are not representative of
+> sector access. Examples from NVMe include Copy, Dataset Management, and
+> all the Reservation commands. The transfer size of those commands are
+> unlikely to be a block aligned, so it's a simple way to filter them out.
+> Rounding the payload size up will produce misleading stats, so I think
+> it's better if they don't get to use the feature.
+
+True.  Please put this into the comments!
+
+> 
+> > > +	ret = queue_var_store(&ios, page, count);
+> > > +	if (ret < 0)
+> > > +		return ret;
+> > > +
+> > > +	if (ios)
+> > > +		blk_queue_flag_set(QUEUE_FLAG_IOSTATS_PASSTHROUGH,
+> > > +				   disk->queue);
+> > > +	else
+> > > +		blk_queue_flag_clear(QUEUE_FLAG_IOSTATS_PASSTHROUGH,
+> > > +				     disk->queue);
+> > 
+> > Why is this using queue flags now?  This isn't really blk-mq internal,
+> > so it should be using queue_limits->flag as pointed out last round.
+> 
+> So many flags... The atomic limit update seemed overkill for just this
+> flag, but okay.
+
+I've been slowly working on making q->flags entirely limited to
+blk-mq internal state.  We're not quite there yet, but I'd like to
+keep up the direction rather than having to fix it up later.
