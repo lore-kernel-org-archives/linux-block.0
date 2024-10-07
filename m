@@ -1,29 +1,51 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE113A8F0
-	for <linux-block@vger.kernel.org>; Mon,  7 Oct 2024 05:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6091442F3
+	for <linux-block@vger.kernel.org>; Mon,  7 Oct 2024 06:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728280621; cv=none; b=AHwCvrji179QKb+sO4NdKPf6c+8zzz+4c60p1mTx+4SEedKXsJy6JlVunPpO0x7vXVRO8wp8Sm9Qe/UYzs+1dTG81sZiYW5pBuwzQoxucRsxfDqVxvkGvJPind0lXeYLUEbGBo5f7ubCWKR2bMrOPA5HgBvnafe8pKrsTJ9X1zc=
+	t=1728281404; cv=none; b=FtPG+I/PDshJvYvvDa/UA7xlrf/3mKD57aGpMBCHPuaUyzXuRaABNw34l4pN6e3LPZws3T1Sjaia9PCoqPABa0553o6YI35tMI0qIj86okcHWYFIZP4EQY4zZ/WXl0gwaTZVkrK39Sf26OwhKn2pRot1AVT2VBINYULH/VlqjgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728280621; c=relaxed/simple;
-	bh=WbBTY3zd9Yx8q1ZqTqR/LS3Q6vJ2tE+bh/lMSwfADMM=;
+	s=arc-20240116; t=1728281404; c=relaxed/simple;
+	bh=3asrwxWL5qgkCGSWb4Nb+OCAcLe4Eb2okS4KiFHFclY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XBdbK/fSf721wtatzJDjqpXXafxf4nuizpbVblkb1qAXz/UU6/c4hjTfzw1dgAOtvnyoI16IYx0t7q7uv6h8ZHfopvNgg3YqPCQhxi9CZzZEX7lyB6dI7LltpAXRH9w5lN42t1GaLIs6nLEHeAW6XSmm2u0GJubtwBx+kegZ0V4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 42335227A8E; Mon,  7 Oct 2024 07:56:56 +0200 (CEST)
-Date: Mon, 7 Oct 2024 07:56:56 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, axboe@kernel.dk
-Subject: Re: [PATCHv2] block: enable passthrough command statistics
-Message-ID: <20241007055656.GA510@lst.de>
-References: <20241003153036.411721-1-kbusch@meta.com> <20241004053828.GA14377@lst.de> <ZwAD7RZjqpzQl43s@kbusch-mbp>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rkHUWIYHnvbRU7buySBap3Kndc+bbKXNurnS9Thlb9H87DMPbPjTJkwDipV6n/mktpWV20e/iVRnuyrnR/pe/RbuDUT8AVAKrhv7fU9eGkd21eWKB+AZOVhLz+TxqHk9q5kcFoR+8XL6tnPFgkyScwBOJXGgAscv1bHXV9ALuwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QATf1f43; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QATf1f43"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=OE2e/koAiN70ZSr/qpRMrFplUoQJfOoAGeA5DyeJzYc=; b=QATf1f438e7TYCSumpA7jJaz/w
+	4L3B1R5fpLXZ7uPgXoFVmbw+j1LDCln1rk+gVIC/xWfpjh5rHSW/zadNSnv+8N0wSRGZCp1O51+h/
+	518T9NvNVNXDBfoFE6M6UCFw42sQp5reXfm3HaSHfttBbzlWI8Snt49FpmEehlbhOqbBnpwcskNLF
+	oCIvLtL9N5jhxwQAciaaREXzI1jfwRXufvoNNjfGKUiJmd4NPV29W3fdyHCeuUc4bep05Ill+ZAy8
+	hiai/+eAVbdBRXWN73+xuXeez6qlIDWOYPL9oml1ryRzcBWXDrJeHR2ZSLDtHCggVOYwTGT/nhvao
+	lxNNJ0mg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1sxgwT-00000001NUp-17qd;
+	Mon, 07 Oct 2024 06:10:01 +0000
+Date: Sun, 6 Oct 2024 23:10:01 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Yang Yang <yang.yang@vivo.com>
+Subject: Re: block: del_gendisk() vs blk_queue_enter() race condition
+Message-ID: <ZwN7OTXW3uDBbo--@infradead.org>
+References: <20241003085610.GK11458@google.com>
+ <Zv6d1Iy18wKvliLm@infradead.org>
+ <Zv6fbloZRg2xQ1Jf@infradead.org>
+ <20241003140051.GM11458@google.com>
+ <20241003141709.GN11458@google.com>
+ <20241004042127.GO11458@google.com>
+ <Zv-O9tldIzPfD8ju@infradead.org>
+ <20241004074818.GP11458@google.com>
+ <Zv_ddkAZhjC9OQyo@infradead.org>
+ <20241004143234.GR11458@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,55 +54,25 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZwAD7RZjqpzQl43s@kbusch-mbp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20241004143234.GR11458@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Oct 04, 2024 at 09:04:13AM -0600, Keith Busch wrote:
-> Even Jens was a little surprised to find nvme passthrough sets the bio
-> bi_bdev. I didn't think it was unusual, but sounds like we are doing
-> something special here.
+On Fri, Oct 04, 2024 at 11:32:34PM +0900, Sergey Senozhatsky wrote:
+> Hmm, setting QUEUE_FLAG_DYING unconditionally in __blk_mark_disk_dead()
+> implies moving it up, to the very top of del_gendisk(), before the first
+> time we grab ->open_mutex, because that's the issue that we are having.
+> Does this sound like re-introducing the previous deadlock scenario (the
+> one you pointed at previously) because of that "don't acquire ->open_mutex
+> after freezing the queue" thing?
 
-IIRC it was added to support metadata passthrough, but I'd have to do
-a little research to find the details.
+So the trace of that one is literally the same as the one you reported,
+and I'm still wondering how they are related (I hope Yang Yang can
+chime in).  I suspect that if we mark both the disk and queue dead
+early that will error out everything and should fix it.
 
-> > > +	/*
-> > > +	 * Ensuring the size is aligned to the block size prevents observing an
-> > > +	 * invalid sectors stat.
-> > > +	 */
-> > > +	if (blk_rq_bytes(req) & (bdev_logical_block_size(bio->bi_bdev) - 1))
-> > > +		return false;
-> > 
-> > Now this probably won't trigger anyway for the usual workload (although
-> > it might for odd NVMe command sets like KV and the SLM), but I'd expect the
-> > size to be rounded (probably up?) and not entirely dropped.
-> 
-> This prevents commands with payload sizes that are not representative of
-> sector access. Examples from NVMe include Copy, Dataset Management, and
-> all the Reservation commands. The transfer size of those commands are
-> unlikely to be a block aligned, so it's a simple way to filter them out.
-> Rounding the payload size up will produce misleading stats, so I think
-> it's better if they don't get to use the feature.
+That would also avoid the issue with your patch in the next reply that
+would skip marking the disk dead when calling blk_mark_disk_dead.
 
-True.  Please put this into the comments!
-
-> 
-> > > +	ret = queue_var_store(&ios, page, count);
-> > > +	if (ret < 0)
-> > > +		return ret;
-> > > +
-> > > +	if (ios)
-> > > +		blk_queue_flag_set(QUEUE_FLAG_IOSTATS_PASSTHROUGH,
-> > > +				   disk->queue);
-> > > +	else
-> > > +		blk_queue_flag_clear(QUEUE_FLAG_IOSTATS_PASSTHROUGH,
-> > > +				     disk->queue);
-> > 
-> > Why is this using queue flags now?  This isn't really blk-mq internal,
-> > so it should be using queue_limits->flag as pointed out last round.
-> 
-> So many flags... The atomic limit update seemed overkill for just this
-> flag, but okay.
-
-I've been slowly working on making q->flags entirely limited to
-blk-mq internal state.  We're not quite there yet, but I'd like to
-keep up the direction rather than having to fix it up later.
+(BTW, we really need to write a big fat comment explaining how we ended
+up with whatever is the final fix here for the next person touching the
+code)
