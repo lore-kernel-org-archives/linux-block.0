@@ -1,115 +1,126 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E931DE3C9;
-	Mon,  7 Oct 2024 19:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 999351DE4E4
+	for <linux-block@vger.kernel.org>; Mon,  7 Oct 2024 20:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728331147; cv=none; b=VJHHSVEjKTTHQZHS10y11KCCwAwLW5bWZ+0In+b+VoGfTjLjFJWqx/Wt+gJ01bPKgETeDWMFOZLH9nvdxcxICvfuCx73EPNq3TrfodgvbtsURhbl/DnWKhPCtmkTQz6vIDQnOPwgapcAfqYKQJLVjuOGirje6K5XDznxEwL0Ae0=
+	t=1728332557; cv=none; b=fIA+booiVKJAk7yOm7qvH2PtrpjyMPkBOM6ZlxDbyCEaHlnchghEchoWr5BOIFCaQMJ0x5zmNzhdK58rCXRJDGoTZYj9NulQET3UswssYAdL4OdhA7WOZwNHUM8iM+FxoNrom9tLlC8qLaYTmZxjj+uX8Wk5tJpJRRzIlhd8Bvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728331147; c=relaxed/simple;
-	bh=thj4QNuBVdpzhcgmQvEaHsmcDvDMvw/85JwoSS2cLeA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=B2dBCxoCeNFR3zIb0WjviSKj5eXgmHFCbqsK4RS6k+RVJCcriJcgIHtu9UlHO4DYceNp3NunCdm0qvtIMdc5p4WYHBdUbAiM9594OOIWdmT8BwxjcSjRukNBR744Hv0GgBwybwANaeul97Ai6MiVPQ8odCa+RbL73gFtv/xaGzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JdnXBnEk; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728332557; c=relaxed/simple;
+	bh=+JurRkojZY4EtF+xRmXEH88+oNqlfaBMDd8Nb4X/7hQ=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=c3oej/vBneuY3KsVdzjHcmEJTvUhofu0Yvl9RmbEes4jXCkgtBb70Od/YBtXS4hyJULaXaDCk8HUXmESzi261CGmIjXOl7Z8DQj+RORw6+tPVWRsmJEyub2SiBBOLN78dPR6hyimj972WAOzQsoyYINBxkv5pHRFofeZ5GaQeJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=L6KryEch; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JdnXBnEk"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20ba8d92af9so36427695ad.3;
-        Mon, 07 Oct 2024 12:59:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="L6KryEch"
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-834d3363a10so185915439f.1
+        for <linux-block@vger.kernel.org>; Mon, 07 Oct 2024 13:22:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728331146; x=1728935946; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7Q+dBcOyu8eZIP4YqzCU9UrEsVgvXEVVe2L1QiBfl0g=;
-        b=JdnXBnEkXZ+aTPeYgZ5pqri23lxuoBHx8kAI/GHGSkGl8E7GSyh7AEWjcww1Gbpxp0
-         +T4vTP+G2x30pQ46nIFH42yu0XuueZMgJYiCOmt28/uvgTF9SBbJ7nO0ausQonSD+Gsy
-         +Y1+VjaH+fApsPIF0Nuf5i2StgDiHTzV907E1sg1dEsHcdMK7IL1GNbYxtoPQFyW8XeI
-         cNvinIymWzjJx4PWZSPZYmfiivfJQRPxkXCFA2XtjUX/whNAgTuUUDaZfp7LuFjd9Kx2
-         8+4uWJtQH0b9oE2vXMV8ua90/4c7L/4zCkLPF3HUJ+1r5D7TTMfWzrrG3d/kozWnEt6Y
-         Y+DA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728332554; x=1728937354; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QefVMDm8hBjPT+1JwbSaVFa7IKUqqLaGgXLC/P+/zW0=;
+        b=L6KryEchvj6hS292mMNLvBuKS6scDoEQpsWzujALkWKGRh4Qnqj2JKhFbvAQWWl/mw
+         VCmsc1KUaHgn/gZq3oLsq348QdMAfMB969zABGRZqI+ZBIJZkdVXCLY3yfLmghf+FTdq
+         YWgjgikwcXddrprcM/P3vvQzaMqwENYgCJvtmz2Um48+TrrPurslUjW3ldWrOp/LFt9W
+         nrhYzaTMQIl9Ft5LZykTnZjJ2FLLY82v/Q4b1r4PIL0TXsr0IYvvw2Zjej8i1TUUyXC2
+         DtZsiZqAaiLEYgj/DvMDrhaTxjfteH9XHRZS1X1KFTFQrg9/aRHVqMxRJ129IadhXVyt
+         bBZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728331146; x=1728935946;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1728332554; x=1728937354;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7Q+dBcOyu8eZIP4YqzCU9UrEsVgvXEVVe2L1QiBfl0g=;
-        b=QD/i6ODom0djXgrDbF3jw0L7DLV41dsiVz6lrneBsQftQnzOlpZHcx7T//aBPXciqw
-         t/1pqhd/xVJ0sMQt1gjpyzmzLl2SMwMwINbgy+YM5M3lfiOt2y47Fax4lJty1sJ9EUR0
-         X6OeTV2jizMHt5Khdsirs3ADiVpU7cKViWtwvxXOcyGM9WNreJRieRicUr8qjfXwFkiX
-         6Am9zLuGj0YTr1zBzlVEUCRrQt7Zvt6Q1AL9z0NgaQZ4gSHFAUgmPJJPFi8WnRegOhIO
-         PrtDXX7rXOfxSCB5HXYjUUSRxAr3ayAQ3KmJrMotCLCBBu0OufWxek4blRZho4I3tWQr
-         3J8A==
-X-Forwarded-Encrypted: i=1; AJvYcCXFmNAXltuetedpahjfKkdCxB3pYT9juYr4xvqCDj14KlOblHbYqh+N2AzeOJuq+rviX6jQIAqOmE3zgw==@vger.kernel.org, AJvYcCXztsmEvnt7k/8WZPOc418DVfVQqXzGZscBTQN41VwmFhUr0WHwLeJHaa0NnenXy4yCTCxp8kLXS2dbzQb3@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0mdROMhXQYjC2rEWAn/htYJVyJB/gLb3p9kYrXdGkov8p70cO
-	cozPpfCvmzSNyKSSWbWkxCJOxvx4DYKLNekZuDRFhFpwzaYeLmvZUOjo1g==
-X-Google-Smtp-Source: AGHT+IGX/F+DnO0tHOPQwUZwPxvu+rEaI9Z+wzByionsw3dV+SsslOPnYa3tHfoUeylaQpkVJIIMDQ==
-X-Received: by 2002:a17:902:c946:b0:20b:a9cd:3be5 with SMTP id d9443c01a7336-20bfdf7989emr202703185ad.15.1728331145708;
-        Mon, 07 Oct 2024 12:59:05 -0700 (PDT)
-Received: from purva-IdeaPad-Gaming-3-15IHU6.lan ([2409:40c0:11a4:8d8a:5733:98e8:c62d:29e6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c138cecf2sm43304685ad.104.2024.10.07.12.59.02
+        bh=QefVMDm8hBjPT+1JwbSaVFa7IKUqqLaGgXLC/P+/zW0=;
+        b=OptuifqMJQ0HAuUDdXO2qBFdx+bSZmxwEoiBVQNvympl4TwD6A/QE6itneOQlECUZ+
+         5AhueT16XlWN2HQE1kcbviegtTZJEpy+H01JyF3p4bZbVPNBpN6Moed3AyO2kWSAr4kj
+         4GUDCDNzqR+UKQSObRYVpUUrdy3irPH36blsFiu/FCHYEXS8hBiYY2nxpMN5mQEtuVJ1
+         NhJgfn68opwu4r+E6Hp6ZDLMCGyWsD2i10LhRsKhMmTdbIF9o/VLoHyWYGySzzuAKxNx
+         pvqKcfen5uhFP04MbQ5lvrrrGexkOEKrwG4ZygCuTuyHne1JlEUo5OspA6EtsihMMhdQ
+         14Dg==
+X-Forwarded-Encrypted: i=1; AJvYcCWD2avA1x6o55hXalFBYhBfdxH8gbIhZRYcCmck3YdrjsPxqchBKx15M/1mUywwf1C/+kHTlILcGoI5jA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWlKHBVkUIE5r3Y7hvqkalhDcPBcdBauCDnKRSMLDduITmy6EF
+	IzyE1cFeQfFL3TOD8op9T0aCsuswPbeCPCLfRyyaPg1s4JSkj4Ys3POfbBYnoqw=
+X-Google-Smtp-Source: AGHT+IF2W3KnYL3GA1TILGogvaha8pYup4+NHEwZvTPOaV7yC6EWbx9hu3M/fgNeyIQEycR1C6cK/Q==
+X-Received: by 2002:a05:6e02:1fc8:b0:3a3:44b2:acb2 with SMTP id e9e14a558f8ab-3a375be2a9dmr113900705ab.25.1728332554520;
+        Mon, 07 Oct 2024 13:22:34 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4db86e86898sm605463173.61.2024.10.07.13.22.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2024 12:59:05 -0700 (PDT)
-From: SurajSonawane2415 <surajsonawane0215@gmail.com>
-To: surajsonawane0215@gmail.com
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	hch@infradead.org
-Subject: [PATCH v2] block: Fix uninitialized symbol 'bio' in blk_rq_prep_clone
-Date: Tue,  8 Oct 2024 01:28:36 +0530
-Message-Id: <20241007195836.52576-1-surajsonawane0215@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241004100842.9052-1-surajsonawane0215@gmail.com>
-References: <20241004100842.9052-1-surajsonawane0215@gmail.com>
+        Mon, 07 Oct 2024 13:22:33 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Jonathan Corbet <corbet@lwn.net>, Ulf Hansson <ulf.hansson@linaro.org>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Daniel Golle <daniel@makrotopia.org>, 
+ INAGAKI Hiroshi <musashino.open@gmail.com>, 
+ Christian Brauner <brauner@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, 
+ Ming Lei <ming.lei@redhat.com>, Li Lingfeng <lilingfeng3@huawei.com>, 
+ Christian Heusel <christian@heusel.eu>, Avri Altman <avri.altman@wdc.com>, 
+ Linus Walleij <linus.walleij@linaro.org>, 
+ Adrian Hunter <adrian.hunter@intel.com>, 
+ Riyan Dhiman <riyandhiman14@gmail.com>, 
+ Mikko Rapeli <mikko.rapeli@linaro.org>, 
+ Jorge Ramirez-Ortiz <jorge@foundries.io>, 
+ Li Zhijian <lizhijian@fujitsu.com>, 
+ Dominique Martinet <dominique.martinet@atmark-techno.com>, 
+ Jens Wiklander <jens.wiklander@linaro.org>, 
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+ linux-block@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, 
+ devicetree@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>, 
+ Miquel Raynal <miquel.raynal@bootlin.com>, upstream@airoha.com, 
+ Christoph Hellwig <hch@infradead.org>, 
+ Christian Marangi <ansuelsmth@gmail.com>
+In-Reply-To: <20241002221306.4403-1-ansuelsmth@gmail.com>
+References: <20241002221306.4403-1-ansuelsmth@gmail.com>
+Subject: Re: [PATCH v6 0/6] block: partition table OF support
+Message-Id: <172833255295.162249.16483920948700467749.b4-ty@kernel.dk>
+Date: Mon, 07 Oct 2024 14:22:32 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-Fix the uninitialized symbol 'bio' in the function blk_rq_prep_clone
-to resolve the following error:
-block/blk-mq.c:3199 blk_rq_prep_clone() error: uninitialized symbol 'bio'.
 
-Signed-off-by: SurajSonawane2415 <surajsonawane0215@gmail.com>
----
-V1 - https://lore.kernel.org/lkml/20241004100842.9052-1-surajsonawane0215@gmail.com/
-V2 - Move bio_put(bio) into the bio_ctr error handling block, 
-ensuring memory cleanup occurs only when the bio_ctr fail.
+On Thu, 03 Oct 2024 00:11:40 +0200, Christian Marangi wrote:
+> this is an initial proposal to complete support for manually defining
+> partition table.
+> 
+> Some background on this. Many OEM on embedded device (modem, router...)
+> are starting to migrate from NOR/NAND flash to eMMC. The reason for this
+> is that OEM are starting to require more and more space for the firmware
+> and price difference is becoming so little that using eMMC is only benefits
+> and no cons.
+> 
+> [...]
 
- block/blk-mq.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Applied, thanks!
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4b2c8e940..32f99116c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3167,8 +3167,10 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
- 		if (!bio)
- 			goto free_and_out;
- 
--		if (bio_ctr && bio_ctr(bio, bio_src, data))
-+		if (bio_ctr && bio_ctr(bio, bio_src, data)) {
-+			bio_put(bio);
- 			goto free_and_out;
-+		}
- 
- 		if (rq->bio) {
- 			rq->biotail->bi_next = bio;
-@@ -3196,8 +3198,6 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
- 	return 0;
- 
- free_and_out:
--	if (bio)
--		bio_put(bio);
- 	blk_rq_unprep_clone(rq);
- 
- 	return -ENOMEM;
+[1/6] block: add support for defining read-only partitions
+      commit: 03cb793b26834ddca170ba87057c8f883772dd45
+[2/6] docs: block: Document support for read-only partition in cmdline part
+      commit: 62adb971e515d1bb0e9e555f3dd1d5dc948cf6a1
+[3/6] block: introduce add_disk_fwnode()
+      commit: e5f587242b6072ffab4f4a084a459a59f3035873
+[4/6] mmc: block: attach partitions fwnode if found in mmc-card
+      commit: 45ff6c340ddfc2dade74d5b7a8962c778ab7042c
+[5/6] block: add support for partition table defined in OF
+      commit: 884555b557e5e6d41c866e2cd8d7b32f50ec974b
+[6/6] dt-bindings: mmc: Document support for partition table in mmc-card
+      commit: 06f39701d0666d89dd3c86ff0b163c7139b7ba2d
+
+Best regards,
 -- 
-2.34.1
+Jens Axboe
+
+
 
