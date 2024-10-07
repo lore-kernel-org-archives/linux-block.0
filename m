@@ -1,258 +1,199 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125C01DD870
-	for <linux-block@vger.kernel.org>; Mon,  7 Oct 2024 09:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751951AB504
+	for <linux-block@vger.kernel.org>; Mon,  7 Oct 2024 10:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728294721; cv=none; b=k78ll+SZfXt2aF2VJjnwjMNQJSWXOKb2RArR+spgU1F8txn0y+UzT91Xo5RLQrF+IsY2b/Zgn9ar/CimCjctSiTTuAMnvdMvauYBeIp8a7+j7ijaCPl214j63lbGWVnEzGqZklwojLGQIKV00QVfY7k3J0tj0C74zpa8F6vfcOo=
+	t=1728295823; cv=none; b=p+ONyGmUFyfg1zfdKxnub3RbRx0DUuQxwcHw1o+ejevypj6+S9AxZTZJPLDUd0r/cFDmpPM1FQdHhpicJ44fXnHmVUFKIVVIpqu2BJYDbdT5Y1aWj/AkFLKNRgrOdE8BiFG3C9zEm1Zq7i6FJR2TfsraLCHx3VxbuBBotlbxcdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728294721; c=relaxed/simple;
-	bh=28fEFY/hXxLCXhmVadIh9LyjLJaQY6Kwc8LMdw3jzXc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W3GdQvu9yLM2qT72xfRhbh85ps118GHsrXrhoBg3GxmRR/61lctzhe3qlKsLCChxgOEbnJHEAXqSaXHNDqg7nvbAZs0iKIUHIgtWmhFysjVtr7tyJeQH/IPSpNV7TWsF0goYIpUn3/ZxrQV3CSsyMxmrgCcCrNbyLzsJsiJCPGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PVO1xA7v; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1728295823; c=relaxed/simple;
+	bh=/qon21ZaisnOlLkY7R2OhoF5IXf7cHCKcZo4Pa5BJ2M=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:References; b=JnWxNRLTVr08XxwBQFHKs3C9jAwXVDOkxJ6crPaiianZw1tgu6oKPUtMg2fxprkw3JS0qKuf2bkJa/l9QviFJHCjIIl5FoEynpFjQaDctV5tnNj/UWR6hzqnsav6EQ0eXMNtHUcb1/PThwfu+rpeB5m9qjvNfiqM+XBKYleI674=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=fttvgpkt; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PVO1xA7v"
-Message-ID: <3108a1da-3eb3-4b9d-8063-eab25c7c2f29@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728294716;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gcSzrW1BnujUdglpblDDDF1lftH52B5+5zWrzMqP+B0=;
-	b=PVO1xA7vijKPtuXOjS6KwYYbkZFK/RqX3iR8e8Mokkan4S6LepxdfwkaWNdPTUR6J9FVol
-	JcW4a+4ydTim55sCtFQgZloAPOR+o3sZDQ027mufpCcgjOQEw+l4Q/du2JW/LIsQZB34Xa
-	3LcuEwKp/2utzRN+a+8/md1eBovEBwk=
-Date: Mon, 7 Oct 2024 17:51:45 +0800
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="fttvgpkt"
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20241007101014euoutp0276b3733cf093973fc7db726e3145b63b~8I_LfWhaN2409224092euoutp029
+	for <linux-block@vger.kernel.org>; Mon,  7 Oct 2024 10:10:14 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20241007101014euoutp0276b3733cf093973fc7db726e3145b63b~8I_LfWhaN2409224092euoutp029
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1728295814;
+	bh=Wrs5njHyhQsaY2qMFeXLDtqldIUMw8Cs3rLGXTGdDr0=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=fttvgpktprywwOA+/0HlQCx5zxyylOxEABRZ9YUD3IhWKXU5yYU2eDkKER0RJM7pT
+	 ey1PLMpk4QblRV/fzbUw4hTEBVVwayKRXKnbtN3Ez80dg7Fbyo1QBm0rnBdv+FbiFs
+	 sJ7yDiDDDjYHQQotBbNXyjNfYX5/fqj9EhRtyKFw=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20241007101013eucas1p111022db7dfe721a110142c87b67de368~8I_LHGbUa1203412034eucas1p17;
+	Mon,  7 Oct 2024 10:10:13 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges2new.samsung.com (EUCPMTA) with SMTP id 07.B8.09875.583B3076; Mon,  7
+	Oct 2024 11:10:13 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20241007101013eucas1p13db5988cea66fb961cbb06a99d2878c8~8I_Krfv4c1224012240eucas1p1R;
+	Mon,  7 Oct 2024 10:10:13 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241007101013eusmtrp2e4e3882eb2a6277ce376cd99feffb5fa~8I_Kq0ipg2830128301eusmtrp2N;
+	Mon,  7 Oct 2024 10:10:13 +0000 (GMT)
+X-AuditID: cbfec7f4-11bff70000002693-cd-6703b385af9f
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id 9B.A1.14621.583B3076; Mon,  7
+	Oct 2024 11:10:13 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20241007101013eusmtip1593046fbf475df26d943c475dd73c5ad~8I_KYi01k0296502965eusmtip1Y;
+	Mon,  7 Oct 2024 10:10:13 +0000 (GMT)
+Received: from localhost (106.110.32.122) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Mon, 7 Oct 2024 11:10:12 +0100
+Date: Mon, 7 Oct 2024 12:10:11 +0200
+From: Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+CC: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen"
+	<martin.petersen@oracle.com>, Keith Busch <kbusch@kernel.org>, Kanchan Joshi
+	<joshi.k@samsung.com>, <hare@suse.de>, <sagi@grimberg.me>,
+	<brauner@kernel.org>, <viro@zeniv.linux.org.uk>, <jack@suse.cz>,
+	<jaegeuk@kernel.org>, <bcrl@kvack.org>, <dhowells@redhat.com>,
+	<bvanassche@acm.org>, <asml.silence@gmail.com>,
+	<linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
+	<io-uring@vger.kernel.org>, <linux-block@vger.kernel.org>,
+	<linux-aio@kvack.org>, <gost.dev@samsung.com>, <vishak.g@samsung.com>
+Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+Message-ID: <20241007101011.boufh3tipewgvuao@ArmHalley.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] RDMA/srpt: Make slab cache names unique
-To: Bart Van Assche <bvanassche@acm.org>, Jason Gunthorpe <jgg@nvidia.com>,
- Leon Romanovsky <leonro@nvidia.com>
-Cc: linux-rdma@vger.kernel.org,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20241004173730.1932859-1-bvanassche@acm.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20241004173730.1932859-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20241004123027.GA19168@lst.de>
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrPKsWRmVeSWpSXmKPExsWy7djPc7qtm5nTDV68NbKYs2obo8Xqu/1s
+	Fl3/trBYvD78idFi2oefzBbvmn6zWOxZNInJYuXqo0wW71rPsVjMnt7MZPFk/Sxmi0mHrjFa
+	TJnWxGix95a2xZ69J1ks5i97ym6x/Pg/Jot1r9+zWJz/e5zVQdjj8hVvj52z7rJ7nL+3kcXj
+	8tlSj02rOtk8Nn2axO6xeUm9x+6bDWweH5/eYvF4v+8qm8eZBUeA4qerPT5vkvPY9OQtUwBf
+	FJdNSmpOZllqkb5dAlfGs6s7mQrOSFe83ZbTwPhXtIuRk0NCwERi+9sPLF2MXBxCAisYJZru
+	NrJDOF8YJZ4/3cIK4XxmlOg58gUowwHWsuqsDER8OaNE45kVbCCjwIq+HxKDSGxmlDg65zM7
+	SIJFQEXi58IPYEVsAvYSl5bdYgaxRQSUJJ6+OssI0sAscIhF4suB+WANwgIGEu+/97KBbOMV
+	sJX4ddobJMwrIChxcuYTFhCbWcBKovNDEytICbOAtMTyfxwQYXmJ5q2zwcZzCuhIbL5zhhHi
+	TSWJxy/eQtm1Eqe23GICWSsh0Mcl0ThxCztEwkWi91s/VJGwxKvjMHEZif875zNB2NUSDSdP
+	QDW3MEq0dmxlhYSKtUTfmRyIGkeJV9N/QgOLT+LGW0GI2/gkJm2bzgwR5pXoaBOawKgyC8lj
+	s5A8NgvhsVlIHlvAyLKKUTy1tDg3PbXYKC+1XK84Mbe4NC9dLzk/dxMjMI2e/nf8yw7G5a8+
+	6h1iZOJgPMQowcGsJMIbsYYxXYg3JbGyKrUoP76oNCe1+BCjNAeLkjivaop8qpBAemJJanZq
+	akFqEUyWiYNTqoHJw2pe+rcv03fFVURIC0/OnKQyT2v/EZv6ugff26RW/FSPSqvz1vc+V+Xn
+	yr8h8Yvn9X8Xj7TkJSmahgX6TxWs9e1mVfm5+K3ljLu1lRdVcmR3K8kudxA8kqywf87M430i
+	57RV9qSsV4/QnjDRSj5Vot8s9R9H2vXCu2nB3XOits+qdXD23BVRvTi3vOLKBU6vZeza/UJz
+	fk/tkjDWsk3iKDaucVlfpl39aottwRb+8jjtei8r0+Jjid8WfjCRLXgkPH3Xpi13vNwk2ZQv
+	zMrK9jxjf6Xop4P6yvO3rQV/aKvOTTbud2pgt7hjtb9f6MHPRROd3Wqntty/E33yh+/u5N/T
+	HhXc+Zq+yu7fSSWW4oxEQy3mouJEAMwS+yASBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrJKsWRmVeSWpSXmKPExsVy+t/xu7qtm5nTDX5/FLGYs2obo8Xqu/1s
+	Fl3/trBYvD78idFi2oefzBbvmn6zWOxZNInJYuXqo0wW71rPsVjMnt7MZPFk/Sxmi0mHrjFa
+	TJnWxGix95a2xZ69J1ks5i97ym6x/Pg/Jot1r9+zWJz/e5zVQdjj8hVvj52z7rJ7nL+3kcXj
+	8tlSj02rOtk8Nn2axO6xeUm9x+6bDWweH5/eYvF4v+8qm8eZBUeA4qerPT5vkvPY9OQtUwBf
+	lJ5NUX5pSapCRn5xia1StKGFkZ6hpYWekYmlnqGxeayVkamSvp1NSmpOZllqkb5dgl7Gs6s7
+	mQrOSFe83ZbTwPhXtIuRg0NCwERi1VmZLkYuDiGBpYwSz/9eYuxi5ASKy0hs/HKVFcIWlvhz
+	rYsNougjo8SM9feZIJzNjBLH151iBqliEVCR+LnwAxuIzSZgL3Fp2S2wuIiAksTTV2cZQRqY
+	BQ6xSHw5MJ8dJCEsYCDx/nsvG8gZvAK2Er9Oe4OEhQROM0v8+S8MYvMKCEqcnPmEBcRmFrCQ
+	mDn/PCNIObOAtMTyfxwQYXmJ5q2zwVZxCuhIbL5zBuoBJYnHL95C2bUSn/8+Y5zAKDILydRZ
+	SKbOQpg6C8nUBYwsqxhFUkuLc9Nziw31ihNzi0vz0vWS83M3MQLTzLZjPzfvYJz36qPeIUYm
+	DsZDjBIczEoivBFrGNOFeFMSK6tSi/Lji0pzUosPMZoCQ2gis5Rocj4w0eWVxBuaGZgamphZ
+	GphamhkrifO6XT6fJiSQnliSmp2aWpBaBNPHxMEp1cC0gTPWO75AXqPGeadQe+v3U+a3m1ie
+	lnMvPZDbkHx/2c6grGZXv825hlsjN/1+ntEjXnF618PUIpklfGedPM8+bMvfMPvJ3DVmJ0+c
+	PqNqI//6utWT/yt7tz5XFGhav/XElHlVHoWq36sF5xjvPCsv8ezsq5z3MwLX/9q04cb+My/1
+	ZU3OdG7wOyIf5X/MOPvWrfyVBfpMr+vvtz5sFG76GrMqMOLf7KREX0F/+7nFcRd3CFnIzp1f
+	YDDLcJX/ou/rzRuPaIrcSuDbuHCi95zTkSJSeQusdD+Z8pz2TD7x4UVF7zrRHzwWtYWh3T5X
+	2ha2cXusEH6x1XjWqyPn7nvN/mAvfOLBn5a2f9I7Lv0UU2Ipzkg01GIuKk4EAHcvjMe8AwAA
+X-CMS-MailID: 20241007101013eucas1p13db5988cea66fb961cbb06a99d2878c8
+X-Msg-Generator: CA
+X-RootMTR: 20241004053129eucas1p2aa4888a11a20a1a6287e7a32bbf3316b
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20241004053129eucas1p2aa4888a11a20a1a6287e7a32bbf3316b
+References: <20241002151949.GA20877@lst.de>
+	<yq17caq5xvg.fsf@ca-mkp.ca.oracle.com> <20241003125400.GB17031@lst.de>
+	<c68fef87-288a-42c7-9185-8ac173962838@kernel.dk>
+	<CGME20241004053129eucas1p2aa4888a11a20a1a6287e7a32bbf3316b@eucas1p2.samsung.com>
+	<20241004053121.GB14265@lst.de>
+	<20241004061811.hxhzj4n2juqaws7d@ArmHalley.local>
+	<20241004062733.GB14876@lst.de>
+	<20241004065233.oc5gqcq3lyaxzjhz@ArmHalley.local>
+	<20241004123027.GA19168@lst.de>
 
-在 2024/10/5 1:37, Bart Van Assche 写道:
-> Since commit 4c39529663b9 ("slab: Warn on duplicate cache names when
-> DEBUG_VM=y"), slab complains about duplicate cache names. Hence this
-> patch that makes cache names unique.
-> 
-> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Closes: https://lore.kernel.org/linux-block/xpe6bea7rakpyoyfvspvin2dsozjmjtjktpph7rep3h25tv7fb@ooz4cu5z6bq6/
-> Fixes: 5dabcd0456d7 ("RDMA/srpt: Add support for immediate data")
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->   drivers/infiniband/ulp/srpt/ib_srpt.c | 32 ++++++++++++++++++++++-----
->   drivers/infiniband/ulp/srpt/ib_srpt.h |  6 +++++
->   2 files changed, 32 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/infiniband/ulp/srpt/ib_srpt.c b/drivers/infiniband/ulp/srpt/ib_srpt.c
-> index 9632afbd727b..4cb462074f00 100644
-> --- a/drivers/infiniband/ulp/srpt/ib_srpt.c
-> +++ b/drivers/infiniband/ulp/srpt/ib_srpt.c
-> @@ -41,6 +41,7 @@
->   #include <linux/string.h>
->   #include <linux/delay.h>
->   #include <linux/atomic.h>
-> +#include <linux/idr.h>
->   #include <linux/inet.h>
->   #include <rdma/ib_cache.h>
->   #include <scsi/scsi_proto.h>
-> @@ -68,6 +69,7 @@ MODULE_LICENSE("Dual BSD/GPL");
->   static u64 srpt_service_guid;
->   static DEFINE_SPINLOCK(srpt_dev_lock);	/* Protects srpt_dev_list. */
->   static LIST_HEAD(srpt_dev_list);	/* List of srpt_device structures. */
-> +static DEFINE_IDA(cache_ida);
->   
->   static unsigned srp_max_req_size = DEFAULT_MAX_REQ_SIZE;
->   module_param(srp_max_req_size, int, 0444);
-> @@ -2120,12 +2122,14 @@ static void srpt_release_channel_work(struct work_struct *w)
->   			     ch->rsp_buf_cache, DMA_TO_DEVICE);
->   
->   	kmem_cache_destroy(ch->rsp_buf_cache);
-> +	ida_free(&cache_ida, ch->rsp_buf_cache_idx);
->   
->   	srpt_free_ioctx_ring((struct srpt_ioctx **)ch->ioctx_recv_ring,
->   			     sdev, ch->rq_size,
->   			     ch->req_buf_cache, DMA_FROM_DEVICE);
->   
->   	kmem_cache_destroy(ch->req_buf_cache);
-> +	ida_free(&cache_ida, ch->req_buf_cache_idx);
->   
->   	kref_put(&ch->kref, srpt_free_ch);
->   }
-> @@ -2164,6 +2168,7 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
->   	u32 it_iu_len;
->   	int i, tag_num, tag_size, ret;
->   	struct srpt_tpg *stpg;
-> +	char cache_name[32];
+On 04.10.2024 14:30, Christoph Hellwig wrote:
+>On Fri, Oct 04, 2024 at 08:52:33AM +0200, Javier González wrote:
+>> So, considerign that file system _are_ able to use temperature hints and
+>> actually make them work, why don't we support FDP the same way we are
+>> supporting zones so that people can use it in production?
+>
+>Because apparently no one has tried it.  It should be possible in theory,
+>but for example unless you have power of 2 reclaim unit size size it
+>won't work very well with XFS where the AGs/RTGs must be power of two
+>aligned in the LBA space, except by overprovisioning the LBA space vs
+>the capacity actually used.
 
-The local variable cache_name is not zeroed.
+This is good. I think we should have at least a FS POC with data
+placement support to be able to drive conclusions on how the interface
+and requirements should be. Until we have that, we can support the
+use-cases that we know customers are asking for, i.e., block-level hints
+through the existing temperature API.
 
->   
->   	WARN_ON_ONCE(irqs_disabled());
->   
-> @@ -2245,8 +2250,11 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
->   	INIT_LIST_HEAD(&ch->cmd_wait_list);
->   	ch->max_rsp_size = ch->sport->port_attrib.srp_max_rsp_size;
->   
-> -	ch->rsp_buf_cache = kmem_cache_create("srpt-rsp-buf", ch->max_rsp_size,
-> -					      512, 0, NULL);
-> +	ch->rsp_buf_cache_idx = ida_alloc(&cache_ida, GFP_KERNEL);
-> +	snprintf(cache_name, sizeof(cache_name), "srpt-rsp-buf-%u",
-> +		 ch->rsp_buf_cache_idx);
+>
+>> I agree that down the road, an interface that allows hints (many more
+>> than 5!) is needed. And in my opinion, this interface should not have
+>> semintics attached to it, just a hint ID, #hints, and enough space to
+>> put 100s of them to support storage node deployments. But this needs to
+>> come from the users of the hints / zones / streams / etc,  not from
+>> us vendors. We do not have neither details on how they deploy these
+>> features at scale, nor the workloads to validate the results. Anything
+>> else will probably just continue polluting the storage stack with more
+>> interfaces that are not used and add to the problem of data placement
+>> fragmentation.
+>
+>Please always mentioned what layer you are talking about.  At the syscall
+>level the temperatur hints are doing quite ok.  A full stream separation
+>would obviously be a lot better, as would be communicating the zone /
+>reclaim unit / etc size.
 
-IIRC, snprintf will append a '\0' to the string "cache_name". So this 
-string "cache_name" will be used correctly even though this string 
-"cache_name" is not zeroed before it is used.
+I mean at the syscall level. But as mentioned above, we need to be very
+sure that we have a clear use-case for that. If we continue seeing hints
+being use in NVMe or other protocols, and the number increase
+significantly, we can deal with it later on.
 
-> +	ch->rsp_buf_cache =
-> +		kmem_cache_create(cache_name, ch->max_rsp_size, 512, 0, NULL);
->   	if (!ch->rsp_buf_cache)
->   		goto free_ch;
->   
-> @@ -2280,8 +2288,11 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
->   		alignment_offset = round_up(imm_data_offset, 512) -
->   			imm_data_offset;
->   		req_sz = alignment_offset + imm_data_offset + srp_max_req_size;
-> -		ch->req_buf_cache = kmem_cache_create("srpt-req-buf", req_sz,
-> -						      512, 0, NULL);
-> +		ch->req_buf_cache_idx = ida_alloc(&cache_ida, GFP_KERNEL);
-> +		snprintf(cache_name, sizeof(cache_name), "srpt-req-buf-%u",
-> +			 ch->req_buf_cache_idx);
+>
+>As an interface to a driver that doesn't natively speak temperature
+>hint on the other hand it doesn't work at all.
+>
+>> The issue is that the first series of this patch, which is as simple as
+>> it gets, hit the list in May. Since then we are down paths that lead
+>> nowhere. So the line between real technical feedback that leads to
+>> a feature being merged, and technical misleading to make people be a
+>> busy bee becomes very thin. In the whole data placement effort, we have
+>> been down this path many times, unfortunately...
+>
+>Well, the previous round was the first one actually trying to address the
+>fundamental issue after 4 month.  And then after a first round of feedback
+>it gets shutdown somehow out of nowhere.  As a maintainer and review that
+>is the kinda of contributors I have a hard time taking serious.
 
-Ditto
+I am not sure I understand what you mean in the last sentece, so I will
+not respond filling blanks with a bad interpretation.
 
-> +		ch->req_buf_cache =
-> +			kmem_cache_create(cache_name, req_sz, 512, 0, NULL);
->   		if (!ch->req_buf_cache)
->   			goto free_rsp_ring;
->   
-> @@ -2479,6 +2490,7 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
->   
->   free_recv_cache:
->   	kmem_cache_destroy(ch->req_buf_cache);
-> +	ida_free(&cache_ida, ch->req_buf_cache_idx);
->   
->   free_rsp_ring:
->   	srpt_free_ioctx_ring((struct srpt_ioctx **)ch->ioctx_ring,
-> @@ -2487,6 +2499,7 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
->   
->   free_rsp_cache:
->   	kmem_cache_destroy(ch->rsp_buf_cache);
-> +	ida_free(&cache_ida, ch->rsp_buf_cache_idx);
->   
->   free_ch:
->   	if (rdma_cm_id)
-> @@ -3056,6 +3069,7 @@ static void srpt_free_srq(struct srpt_device *sdev)
->   			     sdev->srq_size, sdev->req_buf_cache,
->   			     DMA_FROM_DEVICE);
->   	kmem_cache_destroy(sdev->req_buf_cache);
-> +	ida_free(&cache_ida, sdev->req_buf_cache_idx);
->   	sdev->srq = NULL;
->   }
->   
-> @@ -3070,6 +3084,7 @@ static int srpt_alloc_srq(struct srpt_device *sdev)
->   	};
->   	struct ib_device *device = sdev->device;
->   	struct ib_srq *srq;
-> +	char cache_name[32];
+In summary, what we are asking for is to take the patches that cover the
+current use-case, and work together on what might be needed for better
+FS support. For this, it seems you and Hans have a good idea of what you
+want to have based on XFS. We can help review or do part of the work,
+but trying to guess our way will only delay existing customers using
+existing HW.
 
-Ditto
-
->   	int i;
->   
->   	WARN_ON_ONCE(sdev->srq);
-> @@ -3082,8 +3097,11 @@ static int srpt_alloc_srq(struct srpt_device *sdev)
->   	pr_debug("create SRQ #wr= %d max_allow=%d dev= %s\n", sdev->srq_size,
->   		 sdev->device->attrs.max_srq_wr, dev_name(&device->dev));
->   
-> -	sdev->req_buf_cache = kmem_cache_create("srpt-srq-req-buf",
-> -						srp_max_req_size, 0, 0, NULL);
-> +	sdev->req_buf_cache_idx = ida_alloc(&cache_ida, GFP_KERNEL);
-> +	snprintf(cache_name, sizeof(cache_name), "srpt-srq-req-buf-%u",
-> +		 sdev->req_buf_cache_idx);
-
-Ditto
-
-> +	sdev->req_buf_cache =
-> +		kmem_cache_create(cache_name, srp_max_req_size, 0, 0, NULL);
->   	if (!sdev->req_buf_cache)
->   		goto free_srq;
->   
-> @@ -3106,6 +3124,7 @@ static int srpt_alloc_srq(struct srpt_device *sdev)
->   
->   free_cache:
->   	kmem_cache_destroy(sdev->req_buf_cache);
-> +	ida_free(&cache_ida, sdev->req_buf_cache_idx);
->   
->   free_srq:
->   	ib_destroy_srq(srq);
-> @@ -3926,6 +3945,7 @@ static void __exit srpt_cleanup_module(void)
->   		rdma_destroy_id(rdma_cm_id);
->   	ib_unregister_client(&srpt_client);
->   	target_unregister_template(&srpt_template);
-> +	ida_destroy(&cache_ida);
->   }
->   
->   module_init(srpt_init_module);
-> diff --git a/drivers/infiniband/ulp/srpt/ib_srpt.h b/drivers/infiniband/ulp/srpt/ib_srpt.h
-> index 4c46b301eea1..6d10cd7c9f21 100644
-> --- a/drivers/infiniband/ulp/srpt/ib_srpt.h
-> +++ b/drivers/infiniband/ulp/srpt/ib_srpt.h
-> @@ -276,6 +276,8 @@ enum rdma_ch_state {
->    * @state:         channel state. See also enum rdma_ch_state.
->    * @using_rdma_cm: Whether the RDMA/CM or IB/CM is used for this channel.
->    * @processing_wait_list: Whether or not cmd_wait_list is being processed.
-> + * @rsp_buf_cache_idx: @rsp_buf_cache index for slab.
-> + * @req_buf_cache_idx: @req_buf_cache index for slab.
->    * @rsp_buf_cache: kmem_cache for @ioctx_ring.
->    * @ioctx_ring:    Send ring.
->    * @req_buf_cache: kmem_cache for @ioctx_recv_ring.
-> @@ -316,6 +318,8 @@ struct srpt_rdma_ch {
->   	u16			imm_data_offset;
->   	spinlock_t		spinlock;
->   	enum rdma_ch_state	state;
-> +	int			rsp_buf_cache_idx;
-> +	int			req_buf_cache_idx;
-
-Thanks.
-Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
-
-Zhu Yanjun
->   	struct kmem_cache	*rsp_buf_cache;
->   	struct srpt_send_ioctx	**ioctx_ring;
->   	struct kmem_cache	*req_buf_cache;
-> @@ -443,6 +447,7 @@ struct srpt_port {
->    * @srq_size:      SRQ size.
->    * @sdev_mutex:	   Serializes use_srq changes.
->    * @use_srq:       Whether or not to use SRQ.
-> + * @req_buf_cache_idx: @req_buf_cache index for slab.
->    * @req_buf_cache: kmem_cache for @ioctx_ring buffers.
->    * @ioctx_ring:    Per-HCA SRQ.
->    * @event_handler: Per-HCA asynchronous IB event handler.
-> @@ -459,6 +464,7 @@ struct srpt_device {
->   	int			srq_size;
->   	struct mutex		sdev_mutex;
->   	bool			use_srq;
-> +	int			req_buf_cache_idx;
->   	struct kmem_cache	*req_buf_cache;
->   	struct srpt_recv_ioctx	**ioctx_ring;
->   	struct ib_event_handler	event_handler;
 
