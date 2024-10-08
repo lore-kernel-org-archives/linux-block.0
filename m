@@ -1,140 +1,113 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA7120CCE2;
-	Tue,  8 Oct 2024 17:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F64238DD6;
+	Tue,  8 Oct 2024 20:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728410213; cv=none; b=skptBxl2r9XXaTysfrc8WUanWq6wfw1zPevcouphP0JbWD9MepzrS5JxnBhfGeMxX6dtIqkaxWcrrjb2UvxdqdndhLn0wg84UP87s8mT14WfESbUtK9lV+RI7E/GZKe3YLyb66vPdqy2b1+AI12+TgJiyqXc75ibHldzIgV8Sew=
+	t=1728417746; cv=none; b=XnZ8GUmHQfB9wZhIN03KB7n7quy50H1Zd6twTmkUVMEu0ZT61Si5ZosCKqSW6//FJaU0brsRGvp+Ie1eG3XTHvftGI8WmiQGjwcQ6qS089FeSzIs9LT9Z0vz+FtPgsnOmlbnEW1yaKICXBJ64i8+J3oGcHtK9LAHaiOr7rYHwBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728410213; c=relaxed/simple;
-	bh=U7qfuMadL1/bOrsH6gnS6J46RyeQ1JjT5yevQB56uZA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bmgMyP+h+ESnAlSJhhdj+91YQRp/g0+Cm8HmT2Kg8mGofqL2pYRIhYyXv497YNsVdlRMg94++qNiC72eGO7ZDR5Wp0L4Jy9bxzD+mT6dD0t9dtP9yj9d+LqzBqd50IJucrFvz4PKwqdmGqCb/T0LQ6wbcO5lLoCLAUdUdq4FxmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b7HkOQwT; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728417746; c=relaxed/simple;
+	bh=mwnu9JDu0/QJ39vaeqgzPRoqn/uQOdBvX8cshH9rI2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q1cIcYBCVNp+r5958RzSWAtJhnMaiL5euuPCKQL5pMVioAfzAKJmSrJQfUO+/nVOgA0zSrCyJn09aeVYiT0aPRQcVCNb+KSJhjVGS4i/ECavHN/HZ+tMCE8xMs/wjbKDP0+2kwoHE0THApl+GH01VNEjRNUD+yG2eIQHyk3R5hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rN+E6v8u; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b7HkOQwT"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20c58e5e800so420905ad.1;
-        Tue, 08 Oct 2024 10:56:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728410211; x=1729015011; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O8a4Q5G12BXAMQ3G6wl/bOgUHbWzrhRiGaPzx6IjtXg=;
-        b=b7HkOQwTRKoFtbxP2bC/4g+NM6qv1In/HQCEo64yzYUdDuR1DCCh8gHHzWk56581Ef
-         AULwRdrg6wfWk5i70q0XSkvNSIp7p33KduFVBZgeNrMN9WaeM2i8Tsc/9hRtqs+vFVck
-         4KLbma0Ebn55USq9GQ9W/4IJ1ayfBw6JxnrpCqpimfgP313QkriOdxXzCqTtMGHqyHcs
-         xBl4AmcqKvjNnx+UsLFbDYtZbilyeLXmSlHdu+qWEvlEFDrSITcojx0zRtKIxPx4ujmW
-         R67mDJlWPgb3M9bPnzaprO4QdqIoce3PtMV1fqi65it5HQC8wIk6zGOK671/Fd/XkemQ
-         ykyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728410211; x=1729015011;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O8a4Q5G12BXAMQ3G6wl/bOgUHbWzrhRiGaPzx6IjtXg=;
-        b=hjv+5RpfZ4fjKRUBNK7GSxBlT+FF22y+nlttod6i2ID7Fo7CRgQOV9UGogJaeFMEFR
-         mOF+Fq+qonO9aKuuo8bUnjQV8N+/byjV4tQi7v0Hs+n2zH8NkZi9rJCXfL/EugK9Sml2
-         6VSlJbT3JRX7q69Bo80ImP5d44Bu/GP/Uiao5m1OxOYOfRMmpKDjw3Yi4MJxXeeqw3xU
-         FUzVXhVxvgC1FTDl/Lb36gWDiJvonivWYh1Cf3SmKHGQJsRxXTGa7nCC+41iaILLDC+M
-         P2hgSS3PfNCUHXw0JZ72v/QqTtSKNdK0wA5uNnzKGhKRCu1clvCKu+gDAclXgxC+oijS
-         nGWw==
-X-Forwarded-Encrypted: i=1; AJvYcCX/AJdaB+vtGXTQlCUDXjDIKsE2BxtDvNvKRw8kr2zaUEo09WbfZeo+Z25uHjI/BqK72ggK0QhVp4ktCRM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzs8CkYCXBhlura+wrNhcraA+/+X7kCjSwwRDVP3QdXfJ5gqBzb
-	lkuFKnHk7FWi2vBNQhHpZucLqBxMf6qN2hArXVIDFjdzbraVP2fn
-X-Google-Smtp-Source: AGHT+IGjaaQ3CqEaZx2NKh8Lx4iKNsOeY12LCVD2v1TscKrjsSIIjH41qU3QE5go7mdXLEB4lNQApQ==
-X-Received: by 2002:a17:902:d48f:b0:20c:5ffe:3ef1 with SMTP id d9443c01a7336-20c5ffe3f21mr9568255ad.17.1728410211353;
-        Tue, 08 Oct 2024 10:56:51 -0700 (PDT)
-Received: from purva-IdeaPad-Gaming-3-15IHU6.lan ([2409:40c0:11a4:8d8a:4707:c409:b6dc:a15d])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c138af9f7sm58401785ad.13.2024.10.08.10.56.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 10:56:51 -0700 (PDT)
-From: SurajSonawane2415 <surajsonawane0215@gmail.com>
-To: surajsonawane0215@gmail.com,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	hch@infradead.org
-Subject: [PATCH v4] block: Fix uninitialized symbol 'bio' in blk_rq_prep_clone
-Date: Tue,  8 Oct 2024 23:22:15 +0530
-Message-Id: <20241008175215.23975-1-surajsonawane0215@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241004100842.9052-1-surajsonawane0215@gmail.com>
-References: <20241004100842.9052-1-surajsonawane0215@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rN+E6v8u"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAF43C4CEC7;
+	Tue,  8 Oct 2024 20:02:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728417745;
+	bh=mwnu9JDu0/QJ39vaeqgzPRoqn/uQOdBvX8cshH9rI2M=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=rN+E6v8uF4ioUNKLIm91KJY7WajT816xax0xLKmMg82r/VdNKxRi2SuPyaYp5mvMp
+	 3iEUmIoUxBqAzw3S+3xHFwxDjNUXJ1ms4vvTgy40qSQdbS1e5YsXgihqx/FlfH41CR
+	 B5yXHM1xV2RQDH8pdQ+oYSffGAkWue72wxmp8FzHSdYe8F0+gQDgEtxtt3iMaFayap
+	 QQgLNNDuCW4krxkjKxBJa5Jy1wKnBCXJ8lwHOvYQ4u/HYgc6yow8XGPEF6rU7+hsiS
+	 Kkfhf7h/1UX7Uoiu1m8M2TLxAcmXcKHBMcjwCNjgHqioPraMS1As8rwzYnC/B4K15R
+	 l1T7CHnBap8VA==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 56F9BCE0DD1; Tue,  8 Oct 2024 13:02:25 -0700 (PDT)
+Date: Tue, 8 Oct 2024 13:02:25 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	kasan-dev <kasan-dev@googlegroups.com>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <acf7a96b-facb-469b-8079-edbec7770780@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
+ <ZnFT1Czb8oRb0SE7@pc636>
+ <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
+ <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
+ <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
+ <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz>
+ <ZnVInAV8BXhgAjP_@pc636>
+ <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
+ <b3d9710a-805e-4e37-8295-b5ec1133d15c@paulmck-laptop>
+ <37807ec7-d521-4f01-bcfc-a32650d5de25@suse.cz>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <37807ec7-d521-4f01-bcfc-a32650d5de25@suse.cz>
 
-Fix the uninitialized symbol 'bio' in the function blk_rq_prep_clone
-to resolve the following error:
-block/blk-mq.c:3199 blk_rq_prep_clone() error: uninitialized symbol 'bio'.
+On Tue, Oct 08, 2024 at 06:41:12PM +0200, Vlastimil Babka wrote:
+> On 7/24/24 15:53, Paul E. McKenney wrote:
+> > On Mon, Jul 15, 2024 at 10:39:38PM +0200, Vlastimil Babka wrote:
+> >> On 6/21/24 11:32 AM, Uladzislau Rezki wrote:
+> >> > On Wed, Jun 19, 2024 at 11:28:13AM +0200, Vlastimil Babka wrote:
+> >> > One question. Maybe it is already late but it is better to ask rather than not.
+> >> > 
+> >> > What do you think if we have a small discussion about it on the LPC 2024 as a
+> >> > topic? It might be it is already late or a schedule is set by now. Or we fix
+> >> > it by a conference time.
+> >> > 
+> >> > Just a thought.
+> >> 
+> >> Sorry for the late reply. The MM MC turned out to be so packed I didn't even
+> >> propose a slab topic. We could discuss in hallway track or a BOF, but
+> >> hopefully if the current direction taken by my RFC brings no unexpected
+> >> surprise, and the necessary RCU barrier side is also feasible, this will be
+> >> settled by time of plumbers.
+> > 
+> > That would be even better!
+> > 
+> > 							Thanx, Paul
+> 
+> Hah, so it was close but my hope was fulfilled in the end!
 
-Signed-off-by: SurajSonawane2415 <surajsonawane0215@gmail.com>
----
-V1 - Initialize 'bio' to NULL.
-V2 - Move bio_put(bio) into the bio_ctr error handling block,
-ensuring memory cleanup occurs only when the bio_ctr fail.
-V3 - Moved the bio declaration into the loop scope, eliminating
-the need to set it to NULL at the end of the loop.
-V4 - Adjusted position of arguments of bio_alloc_clone.
+Nice, and thank you!!!
 
- block/blk-mq.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+							Thanx, Paul
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4b2c8e940..89c9a6c4d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3156,19 +3156,21 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
- 		      int (*bio_ctr)(struct bio *, struct bio *, void *),
- 		      void *data)
- {
--	struct bio *bio, *bio_src;
-+	struct bio *bio_src;
- 
- 	if (!bs)
- 		bs = &fs_bio_set;
- 
- 	__rq_for_each_bio(bio_src, rq_src) {
--		bio = bio_alloc_clone(rq->q->disk->part0, bio_src, gfp_mask,
--				      bs);
-+		struct bio *bio = bio_alloc_clone(rq->q->disk->part0, bio_src,
-+					gfp_mask, bs);
- 		if (!bio)
- 			goto free_and_out;
- 
--		if (bio_ctr && bio_ctr(bio, bio_src, data))
-+		if (bio_ctr && bio_ctr(bio, bio_src, data)) {
-+			bio_put(bio);
- 			goto free_and_out;
-+		}
- 
- 		if (rq->bio) {
- 			rq->biotail->bi_next = bio;
-@@ -3176,7 +3178,6 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
- 		} else {
- 			rq->bio = rq->biotail = bio;
- 		}
--		bio = NULL;
- 	}
- 
- 	/* Copy attributes of the original request to the clone request. */
-@@ -3196,8 +3197,6 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
- 	return 0;
- 
- free_and_out:
--	if (bio)
--		bio_put(bio);
- 	blk_rq_unprep_clone(rq);
- 
- 	return -ENOMEM;
--- 
-2.34.1
-
+> commit bdf56c7580d267a123cc71ca0f2459c797b76fde
+> Merge: efdfcd40ad5e ecc4d6af979b
+> Author: Linus Torvalds <torvalds@linux-foundation.org>
+> Date:   Wed Sep 18 08:53:53 2024 +0200
+> 
+>     Merge tag 'slab-for-6.12' of
+> git://git.kernel.org/pub/scm/linux/kernel/git/vbabka/slab
+> 
+> So that was at 8:53 Vienna time, and Plumbers started at 10:00...
