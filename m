@@ -1,41 +1,84 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378243C0C
-	for <linux-block@vger.kernel.org>; Tue,  8 Oct 2024 04:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDE723A6;
+	Tue,  8 Oct 2024 05:01:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728361572; cv=none; b=oBThDTM2jBa6XvYH6ZRqiw42YZoqaeWRDDrRGTeDBp6xRzhzSBeJ1W06vlbAM6i7jAQnbW3quyYOzBnKtQdqJ2pyHUEsrSWLlulsvjO8TYFRLjwq4s6ZXlZjh+ZdPjJnIDqJd6hlt+PqIKXlDBb5owIqMpKg2Eg8GtfxmQwbyMw=
+	t=1728363679; cv=none; b=UMlepk1hspyOqPlSsXb/zGN/BnTiihBI/ReltdhCf9nDjIM1zkQci3sFMK1pXy4vZhaSOZRJ3L0MjywAa/bcaeAaf54KOEiFx4t4/mIN4qVSAyGBv6j0ytq+aVxQhQMHuXHoxecqytuSH4GjY933xZIV3KnrVlI8c21qD8XMW80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728361572; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1728363679; c=relaxed/simple;
+	bh=vUjlbtPij7dfv7xT5Zi5eQxxfKt1edeUy93PlruaS/g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f0y2xzw+WrrOPEeCaKu3PNBVmvugaPfiXg2NyC6Gi2b6tA52WlXaN5vLi8J1rbRW00Qsnc+xtiw1c5HMj9xHdrhLA4OuN7Cm454W8DLMUqWCEWE20Q/r73OdLwh3BUyOSknBvJhh0CRUtebJe7phbUSv4inBkHpkFmvR86Qmn3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 25C1B227A88; Tue,  8 Oct 2024 06:26:07 +0200 (CEST)
-Date: Tue, 8 Oct 2024 06:26:06 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@meta.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, hch@lst.de,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv3] block: enable passthrough command statistics
-Message-ID: <20241008042606.GA21010@lst.de>
-References: <20241007153236.2818562-1-kbusch@meta.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RHfx+tRJPLeGSWwpSpFoOGhCHdRDelj9FmLE9CCxE+NDg05BbTTRFvm3oDA05azzOpogMMpNBjfRN1Jqm2gK2PRurNiR6DK570yiRfGsaG7IO9X65oDkzlnfHlr7GVHEac+8uclX4uTW0x1mYVlWcxLom4Fvu1yzGAIdWcalKoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Mo2R9E0a; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Mo2R9E0a"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=EuATOjvebLdwzG9b6bXcZ4P8D8T60CsTrjqntsqyX44=; b=Mo2R9E0awieg8tJQtgVjxPtwtZ
+	qC8FSZiOrEu/dLRTjuIah5jjt/74vhpTFr2N2gAi0XB8CXQGbBlYbLGu1mW4ltEuRooE/C6uDzzq1
+	fBcxO1BSzpB5umAF9A7/CWGzHJhPuFXYVjyJHZYrbugCnNP4cDyjR796a9h88tH3uCqBLiEyI+gy1
+	lR/b41GsCcgJDJoDNyxDbmUQXJqsroiynIhqB7sp4XYvYQB3GGJolldmxDFUOnVuFtyYjWjytgEm/
+	gwfjnU9W/kRgekHXoGgahBQykK+2TwOO7d9tBkaHisNFEZhu+pFrKDJ8KklpVU1OyhN0HGvmB0wsc
+	OT3yTq5w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1sy2LP-00000004WGl-1M3J;
+	Tue, 08 Oct 2024 05:01:11 +0000
+Date: Mon, 7 Oct 2024 22:01:11 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Tejun Heo <tj@kernel.org>, axboe@kernel.dk, josef@toxicpanda.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+	"yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH v2 1/5] blk-cgroup: add a new helper blkg_print_dev_name()
+Message-ID: <ZwS8lwQ_fN2HY93p@infradead.org>
+References: <20240930085302.1558217-1-yukuai1@huaweicloud.com>
+ <20240930085302.1558217-2-yukuai1@huaweicloud.com>
+ <Zvrb0DXhtVHT2lfa@slm.duckdns.org>
+ <ce2b9ed1-cf74-1d50-a72a-23733c0d1db0@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241007153236.2818562-1-kbusch@meta.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ce2b9ed1-cf74-1d50-a72a-23733c0d1db0@huaweicloud.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Looks good:
+On Tue, Oct 08, 2024 at 09:39:05AM +0800, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2024/10/01 1:11, Tejun Heo 写道:
+> > Hello,
+> > 
+> > On Mon, Sep 30, 2024 at 04:52:58PM +0800, Yu Kuai wrote:
+> > > +static inline bool blkg_print_dev_name(struct seq_file *sf,
+> > > +				       struct blkcg_gq *blkg)
+> > > +{
+> > > +	struct gendisk *disk = blkg->q->disk;
+> > > +
+> > > +	if (!disk)
+> > > +		return false;
+> > > +
+> > > +	seq_printf(sf, "%u:%u", disk->major, disk->first_minor);
+> > > +	return true;
+> > > +}
+> > > +
+> > 
+> > I wonder whether we just should add a name field to disk.
+> > 
+> 
+> Of course we can, however, I'm not sure if this is better, because
+> this field is not used in the fast path.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Struct gendisk does have a (disk_)name field aleady.
 
