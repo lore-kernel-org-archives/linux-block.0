@@ -1,120 +1,110 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D6A13D24C
-	for <linux-block@vger.kernel.org>; Tue,  8 Oct 2024 06:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A769513B2B8;
+	Tue,  8 Oct 2024 06:24:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728367859; cv=none; b=Ocs/QzwOEQpKciRYwFjXF4cEf56AW5hwheljOf0nwItH6UgWRvjZJRrF460cuxf5n1A2251xGl7aK/zgLj3CZdsKCEF23Xu1VNhMX91zrQGjn2uCmac5/E3w6/cUSSR2rxzKYBN2bRHgubIzAOgvH/Q2a/Nnn5bphBGu0Sc7WvE=
+	t=1728368695; cv=none; b=KXC3PtcStWOvGrn7ldJDIkkwyHYp3HF3qGLO7LxqOvCcZ8GRi6GDQktmLWC8x7+raRoOS9Y+9E5WmPI/jnyQD6UnBy9R/QEbgGHwPNR3TSm0k/Fd+JRQrWu+Z3g9JX8SSP9p4bXQAO2ZKyfAZcN1Zn5fkakGpyl7cBSu88cNTg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728367859; c=relaxed/simple;
-	bh=J7k72rcreHpum8zzs4boKxlDlCONkpsnQW+XKPZjbk0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OyLijc0jhJOyRFl/Ae7bGTZrNw26ZJXb40MAWjWVuNpi/d3t34vjrxrc3520PT3txC4H8DrdI50N/Y7fpEz/E1JmJEpdf2+v/4QNLC4Z7IL74GRGH7fokGdPgCVmqK/IoYRWUzDZzrV3QI/6TN2Ew5ZiJdWZW3kbUf7Id5VTbz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=I/ouzm6a; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="I/ouzm6a"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-71e0cd1f3b6so970780b3a.0
-        for <linux-block@vger.kernel.org>; Mon, 07 Oct 2024 23:10:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1728367858; x=1728972658; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cDNysr7O1Ymf6qPXep3lZ58zMq8Zcc6aOQaV6CRgfYI=;
-        b=I/ouzm6abQovnL8uSnjoWsOCMI2GDdnIduNyu9oRNEPxDZPtLrbpnCRDrg3UckMdaF
-         yWcyxcGc/MQqY8uKwPML8iH8y6oAPT4ZmLn+9W7RhKs80f1EnI397UV8WfiECkkvfmV2
-         dWkmM/4zChx2xMSY2ME/hV3eBGER/EPF02b8M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728367858; x=1728972658;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cDNysr7O1Ymf6qPXep3lZ58zMq8Zcc6aOQaV6CRgfYI=;
-        b=Vpzzgwi9/CV5XOa99SnQq84NBrUXfizyzUdN/w1tneVX0HEEcE8OAe6PQoTVixe5uN
-         Ned2xIPH3vc1xyC9UGvJWAOTehGIcznV3OJUTSYDyY/uztvjipFjm9icVcGYo6QyQWEI
-         I42uqy5CSREvTML3a11iADIaZflLuvP3mwXHTE8G3bIMutPd+nIJ43MM+Xv2YOJwPDXm
-         tavAsYLJnb0o+2DnGR6eXZqYKf2FUtJNLaPcrrkEhRRc/MZScm+A8ekylVOzssy8bao7
-         cplAmSUg2pKNhKUAfOQayiGoAuh0gscFi+N2HdKfuxmg3EffF1IdIJ9PRLXe94Flsmz7
-         Sezg==
-X-Forwarded-Encrypted: i=1; AJvYcCWUHzlrJ7Xu/c/a3kWDRHo8ksQ7bqrJSV+Sd2aWyFGaW/qnJ+E2Y0P/3GLDyOBaSTOGi08MrDeXrOp4cA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxbs35F8fxQfEmna3kG8e9hqFXTOCBSNBoOVg33JpVPtssRyxg1
-	1Zr0dl/Hj3a5c+fAcshei64mue2uSIB5/XfeYaFhMVzXaWscZCCY2e9As9zppw==
-X-Google-Smtp-Source: AGHT+IFXeO5gCh1mEyxAzDIIq9T2hwj+EsCVIVEaE4VHD3TeULUF8DkyTujq9w8jixAkmmZ6ZILpCQ==
-X-Received: by 2002:a05:6a00:884:b0:71d:fd28:709a with SMTP id d2e1a72fcca58-71dfd28739fmr12501550b3a.23.1728367857670;
-        Mon, 07 Oct 2024 23:10:57 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:e05b:ffee:c9cf:bdec])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e9f682fe56sm5991010a12.51.2024.10.07.23.10.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2024 23:10:57 -0700 (PDT)
-Date: Tue, 8 Oct 2024 15:10:53 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	YangYang <yang.yang@vivo.com>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: block: del_gendisk() vs blk_queue_enter() race condition
-Message-ID: <20241008061053.GE10794@google.com>
-References: <20241003085610.GK11458@google.com>
- <b3690d1b-3c4f-4ec0-9d74-e09addc322ff@vivo.com>
- <20241008051948.GB10794@google.com>
- <20241008052617.GC10794@google.com>
- <ZwTJj5__g-4K8Hjz@infradead.org>
+	s=arc-20240116; t=1728368695; c=relaxed/simple;
+	bh=NSZQYul1LgLAy0nrr/tXr6PsqZqpJG1Ku86c4I4Wr28=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=X9k94gT2/8Ctupa0sElH9XbQIEFMcDc8IAV7FxryQzGxK3ucnFcarAQgtVOdzGRCppOQaXDSMlIkIxSm3R0upSF+tkgHr/Pxuif2T8DihkPZefrYiEG746JSp81AqWd4lckFcuCJ/N6vVVo984VvF6orjtlbljlBiUVxwxn0FFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XN5b14N5hz4f3kvm;
+	Tue,  8 Oct 2024 14:24:29 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 22FFB1A06D7;
+	Tue,  8 Oct 2024 14:24:47 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP4 (Coremail) with SMTP id gCh0CgDHR8Qt0ARnxzL9DQ--.55295S3;
+	Tue, 08 Oct 2024 14:24:46 +0800 (CST)
+Subject: Re: [PATCH v2 1/5] blk-cgroup: add a new helper blkg_print_dev_name()
+To: Christoph Hellwig <hch@infradead.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Tejun Heo <tj@kernel.org>, axboe@kernel.dk, josef@toxicpanda.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cgroups@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240930085302.1558217-1-yukuai1@huaweicloud.com>
+ <20240930085302.1558217-2-yukuai1@huaweicloud.com>
+ <Zvrb0DXhtVHT2lfa@slm.duckdns.org>
+ <ce2b9ed1-cf74-1d50-a72a-23733c0d1db0@huaweicloud.com>
+ <ZwS8lwQ_fN2HY93p@infradead.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <8aab9d5d-ed45-dc38-085b-e6ed67d0b3c6@huaweicloud.com>
+Date: Tue, 8 Oct 2024 14:24:45 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZwTJj5__g-4K8Hjz@infradead.org>
+In-Reply-To: <ZwS8lwQ_fN2HY93p@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDHR8Qt0ARnxzL9DQ--.55295S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jr1UCFyUWrW8Jw1UZryfXrb_yoWfurc_ua
+	43Cr4UC3W3G3WkJrs8Kr13GayDJF1DGFW5Z3WxJFsxZas8ZasxJFWUJas3Jws7AF40q3Zx
+	C3Z8Za40gFW2qjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbfkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY
+	04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64
+	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On (24/10/07 22:56), Christoph Hellwig wrote:
-> On Tue, Oct 08, 2024 at 02:26:17PM +0900, Sergey Senozhatsky wrote:
-> > Didn't copy one more backtrace here, there are two mutexes involved.
-> > 
-> >   schedule+0x554/0x1218
-> >   schedule_preempt_disabled+0x30/0x50
-> >   mutex_lock+0x3c/0x70
-> >   sr_block_release+0x2c/0x60 [sr_mod (HASH:d5f2 4)]
-> >   blkdev_put+0x184/0x290
-> >   blkdev_release+0x34/0x50
-> >   __fput_sync+0xa8/0x2d8
-> >   __arm64_sys_close+0x6c/0xd8
-> >   invoke_syscall+0x78/0xf0
-> > 
-> > So process A holds cd->lock and sleeps in blk_queue_enter()
-> >    process B holds ->open_mutex and sleeps on cd->lock, which is owned by A
-> >    process C sleeps on ->open_mutex, which is owned by B.
+Hi,
+
+在 2024/10/08 13:01, Christoph Hellwig 写道:
+> On Tue, Oct 08, 2024 at 09:39:05AM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2024/10/01 1:11, Tejun Heo 写道:
+>>> Hello,
+>>>
+>>> On Mon, Sep 30, 2024 at 04:52:58PM +0800, Yu Kuai wrote:
+>>>> +static inline bool blkg_print_dev_name(struct seq_file *sf,
+>>>> +				       struct blkcg_gq *blkg)
+>>>> +{
+>>>> +	struct gendisk *disk = blkg->q->disk;
+>>>> +
+>>>> +	if (!disk)
+>>>> +		return false;
+>>>> +
+>>>> +	seq_printf(sf, "%u:%u", disk->major, disk->first_minor);
+>>>> +	return true;
+>>>> +}
+>>>> +
+>>>
+>>> I wonder whether we just should add a name field to disk.
+>>>
+>>
+>> Of course we can, however, I'm not sure if this is better, because
+>> this field is not used in the fast path.
 > 
-> Oh, cd->mutex is a bit of a problem.  And looking into the generic
-> CD layer code this can be relatively easily avoided while cleaning
-> a lot of the code up.  Give me a little time to cook something up.
+> Struct gendisk does have a (disk_)name field aleady.
 
-Sure, thanks.  I can't test the patch, tho.  At least not yet.
+Yes, but this name is not major and minor(for example, sda instead of
+8:0), Tejun was probably talking about major and minor name field.
 
-CD layer is in several reports, I also have reports with SD, and
-a bunch of reports that I still have to look at. E.g.
+Thanks,
+Kuai
 
-		schedule
-		blk_queue_enter
-		blk_mq_alloc_request
-		scsi_execute_cmd
-		ioctl_internal_command
-		scsi_set_medium_removal
-		sd_release
-		blkdev_put
+> 
+> .
+> 
 
-cd->lock still falls a victim of
-"blk_queue_enter() and blk_queue_start_drain() are both called under ->open_mutex"
-thingy, which seems like a primary problem here.  No matter why
-blk_queue_enter() sleeps, draining under ->open_mutex, given that what we
-want to drain can hold ->open_mutex, sometimes isn't going to drain.
-
-> I also wonder if simulating a cdrom removal might be possible using
-> qemu to help reproducing some of this.
-
-Hmm, that's an interesting idea.  I've only tried to "unsafely"
-remove a USB stick out of my laptop so far, with no success.
