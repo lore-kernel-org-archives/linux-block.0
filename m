@@ -1,94 +1,59 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551221DE89D
-	for <linux-block@vger.kernel.org>; Tue,  8 Oct 2024 08:20:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C782A42077
+	for <linux-block@vger.kernel.org>; Tue,  8 Oct 2024 08:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728375658; cv=none; b=jdqjSL0dqjf1TKs4U8zIgRByATHhH8whLBnj193LhrM74lhE3+9vRjJon5ZTQCDa8waeALqfCSdpHtPPybpcI+9fEYxkyUmwlHRc9BL4shXxyjawPa4rPyyABnXTHeik3MhmUQOcLq9JMaPx+G92HPzc5LBOJSbB5EnJmdsIYCs=
+	t=1728376588; cv=none; b=YWXL0kG9/Id3OHf08hSq+zwyVBiw3jATnGP1JXIRS41Kq+ZL7mbpA5PNLFCQ8Txw3m5Z4LyaBmyfDH9hV2WYR2d9F3otbqanyYVu25kT2KLLzF0+OoX6mkS6meapGW+PNX2US5uX00osPOvmX4AGT2KORBvkVXCsh5II6WpUHm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728375658; c=relaxed/simple;
-	bh=ljQrM7B4sfJpM4WrK19gDwfNYUxlHnr8Ji4wA2/L0Mw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DU96T+SL6j38MM1Gi9XpTT9cVr1eysGuFzTEXsQPdlZAa7k/6T8m5CYZK6aWVogZQDenoRuoSUjmsdcs20wSZbasilY+kX3LHQpi5LyePKwJhqcR2wAjhm8r2L4lT1TwKZAz5JE1hVTfZz5VZK2QfNSdD0twvB6FijoNrA/+OLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Y24507tO; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1728376588; c=relaxed/simple;
+	bh=NyBnLFHYHS6RaxwqjX8S7uBPv4kboNDbOTataqJfYvo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=cR8cYgueWgsnLk9kg6/d5TcHBWkJGGv3MfRz6rmUIxAi/AvOSIUbEpCgCqWPZfMxBCgEdHuzU8c4uwvEgHsCvPf/nlB7+PCt0/wi33GGGFxYfowi1shrouoEjJ8VTEaFWlgFH3rJA8eRKstCIQ/ALk+AIlKWAAi+fmWJI6+zADU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bJxnRW3b; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Y24507tO"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2e09ff2d890so4502968a91.0
-        for <linux-block@vger.kernel.org>; Tue, 08 Oct 2024 01:20:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1728375657; x=1728980457; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+oXLtGSHe5om8v6PBFoBrZroby7ALXloXdoI+49xFMs=;
-        b=Y24507tOINdzkt2LGTy9+jQk0ZfYGDR6cqVtE82BNUMaJ2FjBncoDCeNH8hv1d86xW
-         WP9QZtpazg1rQPhJ2eGbM63URRDmN5xoh9dTYGvAAUZrB+8CCcC0M8IONIuWrGmASQWF
-         0Ctu6FaHI2zSMqynsn2zA1Bq2MncBnhfU2o9E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728375657; x=1728980457;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+oXLtGSHe5om8v6PBFoBrZroby7ALXloXdoI+49xFMs=;
-        b=Q09k7lPVrxwxRpERjPwaBcGEoUkc5mzp24cue/CpIfpwYwGEVGyGqUA/V74jguiNyv
-         ZHpFQicFz5nNJ+SyZgsfrHkIkJ75mLPl5/2Evx7L94ryxXFtqm5EFn7gGmAhgiBnZzfS
-         FjpkLmjQD9mW49aQZQSldvIUBj51zA0yuA7Ej8ZTQiRB9+Z3zYNvFFkORYoGWOHl5k1Q
-         CrzOxsutQ7h5el0XWL+iOn59X48g/kQhe+9aZMnBIHPSgpVbR48WM04DovFIYBeKgKk1
-         COjBjvCEgenWkIwDqCZ7ie7qED/dtQMNXzSLYOJfMgW6kLDARmoPoyCZl77Sz0pm2CZg
-         pWXA==
-X-Forwarded-Encrypted: i=1; AJvYcCUoVmuXB9h56aKALd0tB6lBLhE4TV+xKKpLoLvJPlcFrf1kK6rlUVGoWLwoA8SCCzgtm8TCRM8JK7WEtQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY/+GHRRV2LTnaBTgJ/rfxYnXbZFid8I5BuguCvI2uE8PNuHQ6
-	bnylS/6mJFsKz3ZJwUEJzegm+8/VFFrC1nKBn7ZlLQ7hwjTgv68H7tFNN/mJSA==
-X-Google-Smtp-Source: AGHT+IGt4zjrCp4TSKLjR4i6ftAHPqgAifUbRtQSDpQBw50EEVcO6VyrqxgHlu/OqtQu8crW1sV4Ig==
-X-Received: by 2002:a17:90b:3891:b0:2d8:9506:5dfd with SMTP id 98e67ed59e1d1-2e1e636770fmr17522849a91.35.1728375656724;
-        Tue, 08 Oct 2024 01:20:56 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:7cab:8c3d:935:cbd2])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e28b773a77sm737439a91.11.2024.10.08.01.20.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 01:20:56 -0700 (PDT)
-Date: Tue, 8 Oct 2024 17:20:52 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	YangYang <yang.yang@vivo.com>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: block: del_gendisk() vs blk_queue_enter() race condition
-Message-ID: <20241008082052.GF10794@google.com>
-References: <20241003085610.GK11458@google.com>
- <b3690d1b-3c4f-4ec0-9d74-e09addc322ff@vivo.com>
- <20241008051948.GB10794@google.com>
- <20241008052617.GC10794@google.com>
- <ZwTJj5__g-4K8Hjz@infradead.org>
- <20241008061053.GE10794@google.com>
- <ZwTprM-QVvMQX3Eo@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bJxnRW3b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4DD4C4CEC7;
+	Tue,  8 Oct 2024 08:36:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728376586;
+	bh=NyBnLFHYHS6RaxwqjX8S7uBPv4kboNDbOTataqJfYvo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=bJxnRW3bU3XRX11GifQMCVAidOaawm/iQmgjwpj7ezQ6bpjDbSS5C3/x4IPEC+ho9
+	 r9nqutWOz2qfLTIggoBkTJ0wev7dAEFFqlRef3muY55Q7Emqb6eNyHZCVoysgR5u3Y
+	 fV8YIWgLAQ/Fjr3lQXTYjnmrZC3WEoVp/op/DhDW4OekXirkYGQ1UYTNfsI2iFpgAe
+	 zOtWpUXIxFuQDyvW63v8Pqm9O9Y7SWBFcysCyzLHANuYJSM2xW4XPzy5BMOUj0aqb8
+	 zcbNfft4KDSEaOGX2OMM3edIbtXmKPtV5Lcc4GCbTL9PDYaa61q/oodC7msi9NCYvl
+	 IMCbIfMbalgnQ==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk,  linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: return void from the queue_sysfs_entry
+ load_module method
+In-Reply-To: <20241008050841.104602-1-hch@lst.de> (Christoph Hellwig's message
+	of "Tue, 8 Oct 2024 07:08:41 +0200")
+References: <20241008050841.104602-1-hch@lst.de>
+Date: Tue, 08 Oct 2024 10:36:08 +0200
+Message-ID: <87a5ffng93.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZwTprM-QVvMQX3Eo@infradead.org>
+Content-Type: text/plain
 
-On (24/10/08 01:13), Christoph Hellwig wrote:
-> On Tue, Oct 08, 2024 at 03:10:53PM +0900, Sergey Senozhatsky wrote:
-> > cd->lock still falls a victim of
-> > "blk_queue_enter() and blk_queue_start_drain() are both called under ->open_mutex"
-> > thingy, which seems like a primary problem here.  No matter why
-> > blk_queue_enter() sleeps, draining under ->open_mutex, given that what we
-> > want to drain can hold ->open_mutex, sometimes isn't going to drain.
-> 
-> Yes. So I think we'll need to move __blk_mark_disk_dead out
-> of ->open_mutex again
+Christoph Hellwig <hch@lst.de> writes:
 
-Right, we also need to make sure that we drain before we try to
-lock ->open_mutex in gel_dendisk() for the first time.
+> Requesting a module either succeeds or does nothing, return an error from
+> this method does not make sense.
+>
+> Also move the load_module after the store method in the struct
+> declaration to keep the important show and store methods together.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
 
-> it also isn't protected when calling blk_mark_disk_dead, but we'll
-> also need to stop the SCSI LLDs from submitting new commands from
-> their ->relase routines.   Let me cook up a little series..
+Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
 
-Thank you!
