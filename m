@@ -1,195 +1,144 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBB91D3653
-	for <linux-block@vger.kernel.org>; Tue,  8 Oct 2024 13:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407121DFE16
+	for <linux-block@vger.kernel.org>; Tue,  8 Oct 2024 13:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728393419; cv=none; b=Ycy8/p8Yrww1jOZcNUaDODIYh/HzRCHV+8rni5y7eKRs/bmSYnkWghpQ4aQPwFci7hTqXvXAtbQDZoGA3qlw0cn5vHHfsUCW44w9Ame4UZogn64eRwbBb2+Ksq30XoozgHvvfR41Eaa4HZVfxddmQqWhB/yoJKoHRgEfYF5TjnI=
+	t=1728393887; cv=none; b=OlHwBmHDMBuD01wm0ZYATeU83QIP7OJ+re9I5+mWs3puEeA5DDafjUbrtY2fAzLNfZJrtP/9ExOXnWawl+EueueyGlFnOsnZaQTDXjMMvKFqs9oIHA26UQiCWPHIU3y821Fge6RujER4Zf86ZHuCaIGZLKt17PC1XMsmGHpM/pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728393419; c=relaxed/simple;
-	bh=4qzCr/863Vf+2oDWeHcab0ZGKqVZCNqD9ak/lC92cUE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=boMkqeuu+YhVMWIjCY0EHulS1S5qXUCuI2vO6Bnsoix2txRHrqjCs8YWp5r/7TBplDUFsCwzTN/n6zcaqkcgfK1fMblbJ0sC5DvVRgo+Fiju9HWSh5uFktaxLqNGdJOMPD+jjsEDnmZ566L3Ai5tNfYVC3u77ZzxnSV4LeEdb5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TBFwvvvf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1728393887; c=relaxed/simple;
+	bh=1JLses5T18eVEvY7yJFIthwSZIRfibQxel3VlN8/p1Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DQ8hrzCLy0Z9XP96hu7EHIdC09agen1xLPErXxBkm4SQJVVf7pUvpSpmYVUH8EhF4p24NVzTZz/quQEZPTYjyEe3TlAVzvJXtaKja3SAhjwWvigSp/j3uqHEkWJ6HnKu1IpUX4RmmzhUtd4QPIOq+x3164tjybWMTFeDDheSbEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FR/gX1cE; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TBFwvvvf"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728393417;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4qzCr/863Vf+2oDWeHcab0ZGKqVZCNqD9ak/lC92cUE=;
-	b=TBFwvvvfiEKSd/wLzyHYxjIyBfyPSmI0bgfa0TkLC+o9UVLJJ2J50IjOE28+JwFYQ1RmmQ
-	a3yXaFvpq/iYtYS3vAqZqnTpW6kuqaIc0js3E0Vzt0S5jeenDoaK5c5EJV9OHnjTE3++Kc
-	kosdJbIdM8Ffp3Vp+dsE8bEk0gyyiGc=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-643-RDHmFeywNIChoEe83iauZw-1; Tue, 08 Oct 2024 09:16:56 -0400
-X-MC-Unique: RDHmFeywNIChoEe83iauZw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a994dfbb8b9so209508766b.3
-        for <linux-block@vger.kernel.org>; Tue, 08 Oct 2024 06:16:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728393415; x=1728998215;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FR/gX1cE"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-82ce603d8daso206438039f.0
+        for <linux-block@vger.kernel.org>; Tue, 08 Oct 2024 06:24:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728393884; x=1728998684; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=4qzCr/863Vf+2oDWeHcab0ZGKqVZCNqD9ak/lC92cUE=;
-        b=a6l7uq8KgISZbCU/4ciEFK0Xlsykw9DlaiCufwPranCQp43qhM+epc4q9uEdC+9FA4
-         /w2C/GuBeQ3yUJq/wJDCLjUx1hAptcZ4PZvEL1/vlTC9otzR83lPmN6tH1rWYymNUfoG
-         P1awsrc0auaZl5M+1QK4r9iv9HArTnV7PM7HF1s2z8Dv37+XJdWotSeV9kFzg9lDv5GY
-         VUzO7xXLWfMaEaPYIOafXsvKsmLBzwYthej9Q1hTPK298jaTQCN+N24JSGy0QrpqqBd2
-         gvH5Tkg3L9OFhpr75GpM4efYxEsG1vST8k9B7hJhj+vPYmxI5lFNHC8P2ZA5vWaEgmDC
-         W6jA==
-X-Gm-Message-State: AOJu0Yzgvq5XiNNNfIkf1WRL4kxl2LmJH9Ztev58bbqn6m/GmsqkUEyf
-	v91NQYYCn0rbW/WgVrHYPnDH9Ot4IUVRouZF7VJRoor6ACmG3AEsuX4lNE/Lz0bGVXb63w2sN2J
-	SLS0p2z/NbCqmPN3P86v10++nSoBTuIbTarsTLWkPDPhlHO2pvKZpWkijmcVq
-X-Received: by 2002:a17:907:3e05:b0:a93:d5d3:be4 with SMTP id a640c23a62f3a-a991bd16c3fmr1579990966b.13.1728393414775;
-        Tue, 08 Oct 2024 06:16:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHEFEZcrmlRMftqLlmOZSsoDK/ZCIPnc3OiarQfc2zlGz6X81vFDMyJSw+zoGP5nEXTggdgtw==
-X-Received: by 2002:a17:907:3e05:b0:a93:d5d3:be4 with SMTP id a640c23a62f3a-a991bd16c3fmr1579987666b.13.1728393414320;
-        Tue, 08 Oct 2024 06:16:54 -0700 (PDT)
-Received: from eisenberg.fritz.box (200116b82d43760013399881f4bcf5cb.dip.versatel-1u1.de. [2001:16b8:2d43:7600:1339:9881:f4bc:f5cb])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a993ed35544sm441427066b.73.2024.10.08.06.16.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 06:16:53 -0700 (PDT)
-Message-ID: <dfe23f1344f0a74d05d5a605aa78c5989be22619.camel@redhat.com>
-Subject: Re: [PATCH v6 0/5] PCI: Remove most pcim_iounmap_regions() users
-From: Philipp Stanner <pstanner@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, Tom Rix
- <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
- <yilun.xu@intel.com>,  Andy Shevchenko <andy@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Richard Cochran <richardcochran@gmail.com>, Damien
- Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>, John Garry
- <john.g.garry@oracle.com>, Chaitanya Kulkarni <kch@nvidia.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org,  linux-pci@vger.kernel.org
-Date: Tue, 08 Oct 2024 15:16:52 +0200
-In-Reply-To: <20240902062342.10446-2-pstanner@redhat.com>
-References: <20240902062342.10446-2-pstanner@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+        bh=28072l0Erbe4n22Upxqml8PWOL8yMC/7DRp754ESGqE=;
+        b=FR/gX1cE+Ua4vk1IVYUdrjsVnIp5UNRU7l67u1mcqoJ+oSNhFlsSwHFHnCfYDFZcLX
+         +9CLd3aLqq1o7wrQX3CJcdFv4AEWawoLsiv4R3hJa8z+ULU2PUv/ZWcPhrsZjVw8pCzW
+         8hZjoQNJM+AFCzoNAqxWNKgjb3gmArLRvMe4Z2sTD7raLHSKjFVT1fVf1PZ1gHM5/OI0
+         oMeuZQ662oBWCQWhlrZ4VUn6Sl8y7/YffDfPlK9Zd+Hj3k2QGCfI0/SiE46sxF4dbNle
+         hAqBlSXTbHR/gBndJ4YEsSuVbxUpAaoGHXJFRcQhVSFShiy0faYRRwYEzj6jTO+aPENp
+         M+kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728393884; x=1728998684;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=28072l0Erbe4n22Upxqml8PWOL8yMC/7DRp754ESGqE=;
+        b=Z6a5M6da9IgJHRt3bhQ7lb1qfg6t64CpTgk7afO7xlbHDV4vaGIPO1I23QSAJavF6R
+         yowxtg8xcJkvJfsx7/a0IKcUqXSX8jvqcwZKOdUHq2C7agOMfd8XCe7a163l9d1MCncW
+         ROSyJaXHLbYtR98k4VBs9YCMjBd8/FTiUzCfHN5DiJLvi36par8kjgeJkdWJ9+7/zOcd
+         zbwzl/HLU3dCIHNsvHKL5giLSx5TYwtHjfZmcb3HIaJS8hUZTAU4GFUC0SG9HDT/tsbL
+         XVvBBkVl7OZPvJbu9J+sW6foQjQqYuVggF59Ne2hfGMpW5MqmEUaeNMEBR4/OTWwm9hg
+         6ymw==
+X-Forwarded-Encrypted: i=1; AJvYcCWju5pXTkZfu/zfObAiZ2L8PNPNKmYFrOqpqpdY/6FxmVOTqhJ+rjtCHq01F4umcW1l0rBnku3IR87Yjw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUam0h4fAqR3EsbNV7+quI7QE49M+oTs83GkNvodi8Lnwyiirl
+	EwQUn6zZaaqIbiEyyZtasmOGOJPoRf40VVnqxFmGWK+4OsQTPOBAk/n5UxQ6KKU=
+X-Google-Smtp-Source: AGHT+IGfOZKIuFNdtMdRAw3DEguCQsc9zo5vlP2DhGPcapergjoIAvlXruUxK0+QvW4hpGWp34IswQ==
+X-Received: by 2002:a05:6e02:1e0d:b0:3a1:a57a:40a1 with SMTP id e9e14a558f8ab-3a375976f0bmr148548075ab.5.1728393883943;
+        Tue, 08 Oct 2024 06:24:43 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4db6ec2a7c8sm1649767173.128.2024.10.08.06.24.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Oct 2024 06:24:43 -0700 (PDT)
+Message-ID: <fe10ee8f-1220-4a1d-a25b-efaaa314699a@kernel.dk>
+Date: Tue, 8 Oct 2024 07:24:41 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 0/6] block: partition table OF support
+To: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
+ INAGAKI Hiroshi <musashino.open@gmail.com>,
+ Christian Brauner <brauner@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
+ Ming Lei <ming.lei@redhat.com>, Li Lingfeng <lilingfeng3@huawei.com>,
+ Christian Heusel <christian@heusel.eu>, Avri Altman <avri.altman@wdc.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ Riyan Dhiman <riyandhiman14@gmail.com>,
+ Mikko Rapeli <mikko.rapeli@linaro.org>,
+ Jorge Ramirez-Ortiz <jorge@foundries.io>, Li Zhijian
+ <lizhijian@fujitsu.com>,
+ Dominique Martinet <dominique.martinet@atmark-techno.com>,
+ Jens Wiklander <jens.wiklander@linaro.org>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
+ devicetree@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Miquel Raynal <miquel.raynal@bootlin.com>, upstream@airoha.com,
+ Christoph Hellwig <hch@infradead.org>,
+ Christian Marangi <ansuelsmth@gmail.com>
+References: <20241002221306.4403-1-ansuelsmth@gmail.com>
+ <172833255295.162249.16483920948700467749.b4-ty@kernel.dk>
+ <CAPDyKFoueMwVfN+P+tG7zT+-iUs=hghsRu+i9mNiHGw_9tcwBw@mail.gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAPDyKFoueMwVfN+P+tG7zT+-iUs=hghsRu+i9mNiHGw_9tcwBw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-@Bjorn:
+On 10/8/24 3:10 AM, Ulf Hansson wrote:
+> On Mon, 7 Oct 2024 at 22:22, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>>
+>> On Thu, 03 Oct 2024 00:11:40 +0200, Christian Marangi wrote:
+>>> this is an initial proposal to complete support for manually defining
+>>> partition table.
+>>>
+>>> Some background on this. Many OEM on embedded device (modem, router...)
+>>> are starting to migrate from NOR/NAND flash to eMMC. The reason for this
+>>> is that OEM are starting to require more and more space for the firmware
+>>> and price difference is becoming so little that using eMMC is only benefits
+>>> and no cons.
+>>>
+>>> [...]
+>>
+>> Applied, thanks!
+>>
+>> [1/6] block: add support for defining read-only partitions
+>>       commit: 03cb793b26834ddca170ba87057c8f883772dd45
+>> [2/6] docs: block: Document support for read-only partition in cmdline part
+>>       commit: 62adb971e515d1bb0e9e555f3dd1d5dc948cf6a1
+>> [3/6] block: introduce add_disk_fwnode()
+>>       commit: e5f587242b6072ffab4f4a084a459a59f3035873
+>> [4/6] mmc: block: attach partitions fwnode if found in mmc-card
+>>       commit: 45ff6c340ddfc2dade74d5b7a8962c778ab7042c
+>> [5/6] block: add support for partition table defined in OF
+>>       commit: 884555b557e5e6d41c866e2cd8d7b32f50ec974b
+>> [6/6] dt-bindings: mmc: Document support for partition table in mmc-card
+>>       commit: 06f39701d0666d89dd3c86ff0b163c7139b7ba2d
+>>
+> 
+> I think we may need another merging strategy for this as I quite big
+> changes in the pipe for the mmc block device this cycle.
+> 
+> Would it be possible for you to drop the mmc patches and instead share
+> an immutable branch with the block changes that I can pull in, so I
+> can take the mmc changes?
 
-How do you feel about this for v6.13? :)
+I mean we can, but the mmc changes in here are pretty self contained.
+I'd rather avoid rebasing the block tree for that, given how small the
+changes are. If it conflicts, should be easy enough to resolve.
 
-All Reviews / Acks are in place.
+You an also just pull in the block tree now and resolve the conflict.
+There's not a whole lot in there yet outside of this series.
 
-P.
-
-On Mon, 2024-09-02 at 08:23 +0200, Philipp Stanner wrote:
-> Changes in v6:
-> =C2=A0 - Remove the patches for "vdpa: solidrun" since the maintainer
-> seems
-> =C2=A0=C2=A0=C2=A0 unwilling to review and discuss, not to mention approv=
-e, anything
-> =C2=A0=C2=A0=C2=A0 that is part of a wider patch series across other subs=
-ystems.
-> =C2=A0 - Change series's name to highlight that not all callers are
-> removed
-> =C2=A0=C2=A0=C2=A0 by it.
->=20
-> Changes in v5:
-> =C2=A0 - Patch "ethernet: cavium": Re-add accidentally removed
-> =C2=A0=C2=A0=C2=A0 pcim_iounmap_region(). (Me)
-> =C2=A0 - Add Jens's Reviewed-by to patch "block: mtip32xx". (Jens)
->=20
-> Changes in v4:
-> =C2=A0 - Drop the "ethernet: stmicro: [...] patch since it doesn't apply
-> to
-> =C2=A0=C2=A0=C2=A0 net-next, and making it apply to that prevents it from=
- being
-> =C2=A0=C2=A0=C2=A0 applyable to PCI ._. (Serge, me)
-> =C2=A0 - Instead, deprecate pcim_iounmap_regions() and keep "ethernet:
-> =C2=A0=C2=A0=C2=A0 stimicro" as the last user for now.
-> =C2=A0 - ethernet: cavium: Use PTR_ERR_OR_ZERO(). (Andy)
-> =C2=A0 - vdpa: solidrun (Bugfix) Correct wrong printf string (was "psnet"
-> instead of
-> =C2=A0=C2=A0=C2=A0 "snet"). (Christophe)
-> =C2=A0 - vdpa: solidrun (Bugfix): Add missing blank line. (Andy)
-> =C2=A0 - vdpa: solidrun (Portation): Use PTR_ERR_OR_ZERO(). (Andy)
-> =C2=A0 - Apply Reviewed-by's from Andy and Xu Yilun.
->=20
-> Changes in v3:
-> =C2=A0 - fpga/dfl-pci.c: remove now surplus wrapper around
-> =C2=A0=C2=A0=C2=A0 pcim_iomap_region(). (Andy)
-> =C2=A0 - block: mtip32xx: remove now surplus label. (Andy)
-> =C2=A0 - vdpa: solidrun: Bugfix: Include forgotten place where stack UB
-> =C2=A0=C2=A0=C2=A0 occurs. (Andy, Christophe)
-> =C2=A0 - Some minor wording improvements in commit messages. (Me)
->=20
-> Changes in v2:
-> =C2=A0 - Add a fix for the UB stack usage bug in vdap/solidrun. Separate
-> =C2=A0=C2=A0=C2=A0 patch, put stable kernel on CC. (Christophe, Andy).
-> =C2=A0 - Drop unnecessary pcim_release_region() in mtip32xx (Andy)
-> =C2=A0 - Consequently, drop patch "PCI: Make pcim_release_region() a
-> public
-> =C2=A0=C2=A0=C2=A0 function", since there's no user anymore. (obsoletes t=
-he squash
-> =C2=A0=C2=A0=C2=A0 requested by Damien).
-> =C2=A0 - vdap/solidrun:
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 make 'i' an 'unsigned short' (Andy, me)
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 Use 'continue' to simplify loop (Andy)
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 Remove leftover blank line
-> =C2=A0 - Apply given Reviewed- / acked-bys (Andy, Damien, Bartosz)
->=20
->=20
-> Important things first:
-> This series is based on [1] and [2] which Bjorn Helgaas has currently
-> queued for v6.12 in the PCI tree.
->=20
-> This series shall remove pcim_iounmap_regions() in order to make way
-> to
-> remove its brother, pcim_iomap_regions().
->=20
-> Regards,
-> P.
->=20
-> [1]
-> https://lore.kernel.org/all/20240729093625.17561-4-pstanner@redhat.com/
-> [2]
-> https://lore.kernel.org/all/20240807083018.8734-2-pstanner@redhat.com/
->=20
-> Philipp Stanner (5):
-> =C2=A0 PCI: Deprecate pcim_iounmap_regions()
-> =C2=A0 fpga/dfl-pci.c: Replace deprecated PCI functions
-> =C2=A0 block: mtip32xx: Replace deprecated PCI functions
-> =C2=A0 gpio: Replace deprecated PCI functions
-> =C2=A0 ethernet: cavium: Replace deprecated PCI functions
->=20
-> =C2=A0drivers/block/mtip32xx/mtip32xx.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 18 ++++++++--------
-> --
-> =C2=A0drivers/fpga/dfl-pci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 | 16 ++++------------
-> =C2=A0drivers/gpio/gpio-merrifield.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 14 +++++++--=
------
-> =C2=A0.../net/ethernet/cavium/common/cavium_ptp.c=C2=A0=C2=A0=C2=A0 |=C2=
-=A0 7 +++----
-> =C2=A0drivers/pci/devres.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 8 ++++++--
-> =C2=A0include/linux/pci.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
-> =C2=A06 files changed, 29 insertions(+), 35 deletions(-)
->=20
-
+-- 
+Jens Axboe
