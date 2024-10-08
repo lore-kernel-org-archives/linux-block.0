@@ -1,157 +1,89 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A85B1DFD93
-	for <linux-block@vger.kernel.org>; Tue,  8 Oct 2024 14:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA7221D8DFB;
+	Tue,  8 Oct 2024 14:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728398543; cv=none; b=MvU42Y1ElCnmh1uR9oWmxOK6Ahj+XseDdE6rTTtmAdJt7kOK1scXGyy8IZLhtERrwirVb1u0/KSsLgjy6gubfDGP4ZBQqhpTngEXgHOvTPv//pc/SkdvncnWUa9mJMj2kTBlH+0BI6ua1i792bfuRW7NORbSnZwpvlT338sL9NM=
+	t=1728398673; cv=none; b=Vj2t3/XD2eM2PmI7onPxMPLj5wGJ7UNfKsu9xCWfSPf8uhLq/oEUvAJuVCewZRUbkOmQIwIGb3nRL9bwvS/+BeJa49++wit+94IHf6wwLjb8R/bccB5bT65YHYj2ATBZsk0zFfSaB2HfexplG5htQP89SJqSi8crWXeWv+QmB0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728398543; c=relaxed/simple;
-	bh=o6Cs+S4dLY3RcsYbinbcTb4X8WwMR++yo1PVH4PRV1Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WT7eEWIxh66HMihLQkwZonNYAAHwsapAzSWXWy1kwsEAj1QWhfW2N1bYiUqLMv5SKyncyn7jvIbW/1S9/ZM2Byi99ma9cSQ/BuIsCrawik0UDWtyYmUWKH1eIDlPePSuZS/Ax1Ye4XePx0CCK65bYP7BHSi/eeCQGRvwof7MatQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Nxqbp2r6; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1728398673; c=relaxed/simple;
+	bh=2r9KIBLL1cXgHzsof+Mzxlou0eXLychanxOKsDI3Vd0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=suJJrF2d/SVktFujCdqDVzHoP4wvf46ofO/ei0T/kCWBfhjZryNOXfw0ajquu7TGqZLw56YmU/Dw1aCdFWjbFav+niiVtmiOHjrtsCxAusb8Gsi6in+DDCHEsG4fvi/s1Kdk15Xrugfqtx8mcoYU57JlJMRB53RdjOdYXXmJsIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T7lrx/3E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Nxqbp2r6"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-835393376e1so2159239f.1
-        for <linux-block@vger.kernel.org>; Tue, 08 Oct 2024 07:42:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728398540; x=1729003340; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XfJXcyDI9iqVW74ae5e7Sy3x2feF3IZz7Y0c+ABg/kk=;
-        b=Nxqbp2r64WucbxqfuamiLO+vyvajb3GqzEn9AaIr70E1uKeZDbsshqF9Z9SIwsckAx
-         BeyvoNP9Q4TL22SjpTvRiE6M7yNAMloDBYteolLJd20fwhETzR4tRWQwqtrJiRby57P/
-         1m95RTrYI2mcl+9/8BVEUns8qNZqbxxiRqwUFkYRz5mXe/9faPNIZtZyv9haaKoJ2zWG
-         +YxoiZ5W0wmT9V+F4VRH7JsLm4hpx8mbiSY8+bp7PRFWKx/k0izGvD0tDq51BV5hWqft
-         oVyHSoLDQ56CiBaEhljPuVRta1dPzBc9Na4xtNP1f1afhw+8fk0DBo6ORDtC/US1ERKM
-         UjdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728398540; x=1729003340;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XfJXcyDI9iqVW74ae5e7Sy3x2feF3IZz7Y0c+ABg/kk=;
-        b=hNcRmwvBTZET2V3ueSvO8htGAyUMyitfT51f5oU3jtHYmPiU4FE6Wvq7UWDmhKq585
-         cVvm23LLVDMiOj8JpcZ+sCh+VkU5Ni2Q7SLSAmFs3ejKooT8A96SaZuNJJzkA2ZwszBV
-         3sUZAndU7VGnRRmO/g8MG8gkYBlTE7H+uVgvrZkvr/lWwHnSFcEG8N1qeCmy13n5JPjf
-         sfMNyD3DcqgmQcLrlix4yoxMBuD9Sf3kWz6VLvFIDGWIT4/DgyWkmeLO6d4oNDtdHuCe
-         EESx88Sm+hsfVIW1ZttPRj0s+BXAWiwZ4zSalx6mETrcqxM/TZ4qQRM/nYVow/Rhusxw
-         fUug==
-X-Forwarded-Encrypted: i=1; AJvYcCULn+YS64SfYWKLNMeS7DMMGMl3EDb33ZE8H/2Ga84QgSV8cL+zY+QogI/z3jEYeHtMn3zH7xAJvz9uqg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuiS/9GByHw2kk71rDrAyNATuJuICyf6R0TXe6iamHaVdGNRMa
-	imjCvJP4l4Ky32xAmp/PFkUuS8pdGThM7KJBqffrbq3DhiuucmmV0dQ6WqIPM0I=
-X-Google-Smtp-Source: AGHT+IETAiC1jlX8BMFN+l2CkCK2B5e9aBFzl2skka3yQGKdlkuUC0WqcWQi62+N2pbEqUuG2/CaYw==
-X-Received: by 2002:a05:6602:6c09:b0:82d:13ce:2956 with SMTP id ca18e2360f4ac-834f7d620e9mr1534160839f.10.1728398540377;
-        Tue, 08 Oct 2024 07:42:20 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-83503b308b6sm179730639f.50.2024.10.08.07.42.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Oct 2024 07:42:19 -0700 (PDT)
-Message-ID: <fe18edf0-dea7-49fa-a646-e06afddc84ee@kernel.dk>
-Date: Tue, 8 Oct 2024 08:42:18 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T7lrx/3E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CBBDC4CEC7;
+	Tue,  8 Oct 2024 14:44:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728398672;
+	bh=2r9KIBLL1cXgHzsof+Mzxlou0eXLychanxOKsDI3Vd0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=T7lrx/3EXHxD5qGecNBPZyiltAIxvOthAw23EzR8+WCK20equjsTRP01hX6d0yJZe
+	 +lCbO3N2b6N2rPy4uApYGLvbc0a7dSj5P+HKyEpluOg5RbeRjra1pvCwLgLSsJTOkf
+	 QUkrjTnusD3AtnS6p542x05JmpzFHhGyftkzX1SovS+Ooqd9rDya9WVOw5ktixC+7W
+	 OeDKwd/ZPmfdo82F/3RhCzgITXnXT2iXFPw644evbv1soENfOTupnQxenfAbStRf6O
+	 XhApI494qeYFBOcGv5BTfgr7wZq9X4IjgXisT7w9xlfiQSKtyRXRmrKMDSWjNeSQiA
+	 6eLnoFAguPyWA==
+Date: Tue, 8 Oct 2024 08:44:28 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Kanchan Joshi <joshi.k@samsung.com>, hare@suse.de, sagi@grimberg.me,
+	brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+	jaegeuk@kernel.org, bcrl@kvack.org, dhowells@redhat.com,
+	bvanassche@acm.org, asml.silence@gmail.com,
+	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-aio@kvack.org, gost.dev@samsung.com, vishak.g@samsung.com
+Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+Message-ID: <ZwVFTHMjrI4MaPtj@kbusch-mbp>
+References: <20241003125400.GB17031@lst.de>
+ <c68fef87-288a-42c7-9185-8ac173962838@kernel.dk>
+ <CGME20241004053129eucas1p2aa4888a11a20a1a6287e7a32bbf3316b@eucas1p2.samsung.com>
+ <20241004053121.GB14265@lst.de>
+ <20241004061811.hxhzj4n2juqaws7d@ArmHalley.local>
+ <20241004062733.GB14876@lst.de>
+ <20241004065233.oc5gqcq3lyaxzjhz@ArmHalley.local>
+ <20241004123027.GA19168@lst.de>
+ <20241007101011.boufh3tipewgvuao@ArmHalley.local>
+ <20241008122535.GA29639@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 0/6] block: partition table OF support
-To: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
- INAGAKI Hiroshi <musashino.open@gmail.com>,
- Christian Brauner <brauner@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
- Ming Lei <ming.lei@redhat.com>, Li Lingfeng <lilingfeng3@huawei.com>,
- Christian Heusel <christian@heusel.eu>, Avri Altman <avri.altman@wdc.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- Adrian Hunter <adrian.hunter@intel.com>,
- Riyan Dhiman <riyandhiman14@gmail.com>,
- Mikko Rapeli <mikko.rapeli@linaro.org>,
- Jorge Ramirez-Ortiz <jorge@foundries.io>, Li Zhijian
- <lizhijian@fujitsu.com>,
- Dominique Martinet <dominique.martinet@atmark-techno.com>,
- Jens Wiklander <jens.wiklander@linaro.org>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
- devicetree@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
- Miquel Raynal <miquel.raynal@bootlin.com>, upstream@airoha.com,
- Christoph Hellwig <hch@infradead.org>,
- Christian Marangi <ansuelsmth@gmail.com>
-References: <20241002221306.4403-1-ansuelsmth@gmail.com>
- <172833255295.162249.16483920948700467749.b4-ty@kernel.dk>
- <CAPDyKFoueMwVfN+P+tG7zT+-iUs=hghsRu+i9mNiHGw_9tcwBw@mail.gmail.com>
- <fe10ee8f-1220-4a1d-a25b-efaaa314699a@kernel.dk>
- <CAPDyKFpoFP3v8XneMoY5_DEVssYkDyK03QpikBdsZseO4_MLPw@mail.gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAPDyKFpoFP3v8XneMoY5_DEVssYkDyK03QpikBdsZseO4_MLPw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241008122535.GA29639@lst.de>
 
-On 10/8/24 8:33 AM, Ulf Hansson wrote:
-> On Tue, 8 Oct 2024 at 15:24, Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 10/8/24 3:10 AM, Ulf Hansson wrote:
->>> On Mon, 7 Oct 2024 at 22:22, Jens Axboe <axboe@kernel.dk> wrote:
->>>>
->>>>
->>>> On Thu, 03 Oct 2024 00:11:40 +0200, Christian Marangi wrote:
->>>>> this is an initial proposal to complete support for manually defining
->>>>> partition table.
->>>>>
->>>>> Some background on this. Many OEM on embedded device (modem, router...)
->>>>> are starting to migrate from NOR/NAND flash to eMMC. The reason for this
->>>>> is that OEM are starting to require more and more space for the firmware
->>>>> and price difference is becoming so little that using eMMC is only benefits
->>>>> and no cons.
->>>>>
->>>>> [...]
->>>>
->>>> Applied, thanks!
->>>>
->>>> [1/6] block: add support for defining read-only partitions
->>>>       commit: 03cb793b26834ddca170ba87057c8f883772dd45
->>>> [2/6] docs: block: Document support for read-only partition in cmdline part
->>>>       commit: 62adb971e515d1bb0e9e555f3dd1d5dc948cf6a1
->>>> [3/6] block: introduce add_disk_fwnode()
->>>>       commit: e5f587242b6072ffab4f4a084a459a59f3035873
->>>> [4/6] mmc: block: attach partitions fwnode if found in mmc-card
->>>>       commit: 45ff6c340ddfc2dade74d5b7a8962c778ab7042c
->>>> [5/6] block: add support for partition table defined in OF
->>>>       commit: 884555b557e5e6d41c866e2cd8d7b32f50ec974b
->>>> [6/6] dt-bindings: mmc: Document support for partition table in mmc-card
->>>>       commit: 06f39701d0666d89dd3c86ff0b163c7139b7ba2d
->>>>
->>>
->>> I think we may need another merging strategy for this as I quite big
->>> changes in the pipe for the mmc block device this cycle.
->>>
->>> Would it be possible for you to drop the mmc patches and instead share
->>> an immutable branch with the block changes that I can pull in, so I
->>> can take the mmc changes?
->>
->> I mean we can, but the mmc changes in here are pretty self contained.
->> I'd rather avoid rebasing the block tree for that, given how small the
->> changes are. If it conflicts, should be easy enough to resolve.
+On Tue, Oct 08, 2024 at 02:25:35PM +0200, Christoph Hellwig wrote:
+> On Mon, Oct 07, 2024 at 12:10:11PM +0200, Javier González wrote:
+> > In summary, what we are asking for is to take the patches that cover the
+> > current use-case, and work together on what might be needed for better
+> > FS support.
 > 
-> Okay, let's give it a try and see how it goes.
-> 
->>
->> You an also just pull in the block tree now and resolve the conflict.
->> There's not a whole lot in there yet outside of this series.
-> 
-> Let's wait and see. If we get some conflicts, you can always set a tag
-> to the latest of the mmc commits in your tree that I can pull instead.
+> And I really do not think it is a good idea.  For one it actually
+> works against the stated intent of the FDP spec.  Second extending
+> the hints to per per-I/O in the io_uring patch is actively breaking
+> the nice per-file I/O hint abstraction we have right now, and is
+> really unsuitable when actually used on a file and not just a block
+> device.  And if you are only on a block device I think passthrough
+> of some form is still the far better option, despite the problems
+> with it mentioned by Keith.
 
-Yep, sounds like plan!
+Then let's just continue with patches 1 and 2. They introduce no new
+user or kernel APIs, and people have already reported improvements using
+it. Further, it is just a hint, it doesn't lock the kernel into anything
+that may hinder future inovations and enhancements. So let's unblock
+users and refocus *our* time to something more productive, please?
 
--- 
-Jens Axboe
+And to be honest, the per-io hints for generic read/write use is only
+valuable for my users if metadata is also exposed to userspace. I know
+Javier's team is working on that in parallel, so per-io hints are a
+lower priority for me until that part settles.
