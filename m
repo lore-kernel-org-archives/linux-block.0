@@ -1,66 +1,65 @@
 Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D971DFE34
-	for <linux-block@vger.kernel.org>; Tue,  8 Oct 2024 13:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6A31E0497
+	for <linux-block@vger.kernel.org>; Tue,  8 Oct 2024 13:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728394124; cv=none; b=ZaT5eRx0FxDVPdGShC2k+Ha1uvgz+IzxyrAs5vwWiQGCfsOmpg7Bi900Cn70jS4dBAm55I01+lukkcrxLNFGFPxn4zxiaXmwsgluEm0+zA0CkpvhRHAbpc4BTQuZ313XfSYunD+28JQgGJ8hRsCJaPJTQV9cMA/CCs/v1vTR8To=
+	t=1728394125; cv=none; b=eRa8Ffi/DsR3vBW6v4bLRyZ0rRS1yc/xMRSFbt4g9XNfo4WV5/u0QZAdHYuhWJ0mt0CJCiF3ICWJ1Kb6uQIoH0/JhebijiPhlZrDaomTproW770xHdVTeczw8hAo93C7SxRkpRZHhu2Pn7De3PMsBGM+Q6TiBqZQMzbzeVszmEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728394124; c=relaxed/simple;
-	bh=sXRgsqscMJfrNdBHQXKCj7kVH0hkiBpVEZlWsfzAKWI=;
+	s=arc-20240116; t=1728394125; c=relaxed/simple;
+	bh=Fk2xWdQ7oFJIptimzfQx4nG9gJAcjP31UB3hTYdUsPI=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=FgaN1Fj5SPNLAqo0HASt5rOvNnRWvcCb0Kq1+BSS8hGzmUa2TgAwbX6saoxYQInGLxB5JqgFQI7h01Jtxp2RfnPMmys1WbTKdWaHfXbNN9vv372mXShdiLRWK6J0t1c6sauqKbCYKAc0sp+1Q5rIFIBO0fWA/0TSHEQbVGy48Hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=g0bI8018; arc=none smtp.client-ip=209.85.166.171
+	 MIME-Version:Content-Type; b=pFvT17LBR/E3oEGg09z3f8eGD9rLAxNjJzgHol050VGyiTEn4J/9X7VvJwkVT8Dy+XBAPOmJ7v9ZVD6TbHB0LpS3I1YRz3CdgSqfhW1xBowDGLmkJIKFE0zt0TurUxpjSNndWTUmu1tOdcoM+2dOodzzVCn76xrVAYFJ7K5k4so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YbVZgUwt; arc=none smtp.client-ip=209.85.166.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="g0bI8018"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a344f92143so29632995ab.2
-        for <linux-block@vger.kernel.org>; Tue, 08 Oct 2024 06:28:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YbVZgUwt"
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a3636ddad6so19833255ab.2
+        for <linux-block@vger.kernel.org>; Tue, 08 Oct 2024 06:28:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728394122; x=1728998922; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728394123; x=1728998923; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gzR0xmpXK4sc+02GZuYOyWk1D+MeANshvVkuAjLRRQE=;
-        b=g0bI8018Pj8GBSyyFWVv0Klypygo9QEE0urCstYWT2BIpdN4IyXLVTiN/3FEy/LjeU
-         KHcm7lKoyx0F4wURa5xc5sYUHzWI+srV/eBzoXWTsGj2AS4BkXA7+IJb2QN7I4zNDMxj
-         AEpU8jNxJTBK8QeiUa5Rwo38qT8BG9PzQJ0iA2/q1cEVR0MS8vfEj8/mwQD9O/MmEkuh
-         BlcP39+1+HYbjCkT3/T3I61D163VRt2rZgoHrfOI2C4QBJdgXPubZOLKfXyz864JtNRz
-         CP2+mMEZrslNdje023w2/OdtyaxzIr0DOgP+o/CiqlT8Fe9W8tLAeEwwcp655FlKIjvy
-         YbBw==
+        bh=/gtLinp5gQmHZWPk0gJtgI6MvF+HIdy6GkOJ1R/ji5U=;
+        b=YbVZgUwthV8LN1FjKh+SyKhDx+Tb8yV3mXFyhwQMKeoot6bGfPTq/SQkl7/6k+ZIaP
+         QthMetKVA0ESEOKRjIbYV585jooB4+049R5bRHenQCide5yTivk33pN5MTLwW2SpulSi
+         D/sGkKJQw5I9CvKdzyA44l22Rp02vYc38wssqDxDbqif3IDDRE3msSLRXmcftosljn9n
+         3K0ogruTtE8nDSXRyuwQsRK6MxJahM1zw6yhX4hV5goWfsza8bmnlqCllHdzm76LwoFH
+         ryECmLeeuEfEkfvEOlRyn6+hQTGYIN5qpO0LsfOwP+9rDuot62pYDyhtQHeHMdg5tp5l
+         zKLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728394122; x=1728998922;
+        d=1e100.net; s=20230601; t=1728394123; x=1728998923;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gzR0xmpXK4sc+02GZuYOyWk1D+MeANshvVkuAjLRRQE=;
-        b=sQzvMA9DfY3LVJpJ1ZX2OLAH+DQj1WGMH4H2+b/2ZtF5EMnFj8sAqvSt8nqXp8iDoi
-         tfcJdL5GWJbzpIsuww0abHXmRaWX83O3BSHqaMlzEnjFmeoaksIHK6lnXpfESGlS9bZr
-         FNSHgWS2wqxvPJq4y3qeHrJOFYUsmzOww55WD5BYmj5jeyaAxlfJhqZ/cq5BSUZh6WC3
-         eHZANYs+3N+h0jJEr7JfTQwxic5NB14aZDgADGb0iIwfQgM3In6gZo0olbUflNOt9ylb
-         bA6Axy3Ap9p1YXlPgMzLB9ywkyQzkFcTwtM47KOE1eYUatjNsXOnbPvsxZRd7P8lqJgV
-         1gPA==
-X-Gm-Message-State: AOJu0YxVZAXljN9ydcyosU6e09MC6q+UgFoRaj/8DoY3okiBCIYxo84M
-	uDt7pXLkps0TWJ5x+OX9lA5YEhRD9SL248OpslVWYFha4mNW/QyKYir/Xx7+KBDPXbwQ4Prligb
-	Npgo=
-X-Google-Smtp-Source: AGHT+IG4d99X/ULTUiQtZzdG6GX3bZ6nDeNUAwg9pbTaxl4nCm2PVmPJBbIXLnOW7Zr2Ok4X46GQDA==
-X-Received: by 2002:a05:6e02:13ae:b0:3a1:a57a:40a4 with SMTP id e9e14a558f8ab-3a375b9cdb6mr148432075ab.14.1728394121981;
-        Tue, 08 Oct 2024 06:28:41 -0700 (PDT)
+        bh=/gtLinp5gQmHZWPk0gJtgI6MvF+HIdy6GkOJ1R/ji5U=;
+        b=wluooBqPKBFbK/gTqAJ8kzYVy3KNoUkNAYRczt5wPV22abQq0WbUysEvpShkbPp8t3
+         uR70gi935NMj28W+L3SkgIx1HXku7/J5ucXtM4hA2IRj7/69Nh9x7ol8mlVka2eH8z0E
+         GhkODLEE9/jgjeuRS8oPq18KE57vNGOnf94qWCZXUTKyYBXIGI/rtcBvB4HdVMjyjD7P
+         AT+0hQIb6DeuStPhXTu+e0/Wb4/I9Qwv/YVBy58Hb3yeFDCWfaf9JS1/niuHbwPwcs7c
+         LWaYi98dHXEfK5SFZLU/sbtH6LGhP/DnctysWncNbrY8et4vOPp5h8HmVLRNdJLcALiA
+         Y3KA==
+X-Gm-Message-State: AOJu0YwMxdg59op7MrPaCpKRg4UG8BWBqji30ZAQh+x4Au5T9O+Cun3S
+	zflwtRjy8j18Jumy3kyqhD7WZsSw2oSRBbBtt05k7o9kWK2LH/9kmomzqwlodNAWMzozAYFgylC
+	lAK0=
+X-Google-Smtp-Source: AGHT+IFLuYWnVkBg6vVNiVVRkSBT/9RVastxB3Uz4/Mjy2kpIrp4snraADHXveLniIEybfFGJMYl6w==
+X-Received: by 2002:a92:b752:0:b0:3a3:778e:45cd with SMTP id e9e14a558f8ab-3a3778e472bmr103519665ab.21.1728394123317;
+        Tue, 08 Oct 2024 06:28:43 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a37a7e7cb2sm18287785ab.6.2024.10.08.06.28.41
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a37a7e7cb2sm18287785ab.6.2024.10.08.06.28.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 06:28:41 -0700 (PDT)
+        Tue, 08 Oct 2024 06:28:42 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20241008050841.104602-1-hch@lst.de>
-References: <20241008050841.104602-1-hch@lst.de>
-Subject: Re: [PATCH] block: return void from the queue_sysfs_entry
- load_module method
-Message-Id: <172839412106.7534.13389872662371366979.b4-ty@kernel.dk>
-Date: Tue, 08 Oct 2024 07:28:41 -0600
+To: linux-block@vger.kernel.org, Keith Busch <kbusch@meta.com>
+Cc: hch@lst.de, Keith Busch <kbusch@kernel.org>
+In-Reply-To: <20241007153236.2818562-1-kbusch@meta.com>
+References: <20241007153236.2818562-1-kbusch@meta.com>
+Subject: Re: [PATCHv3] block: enable passthrough command statistics
+Message-Id: <172839412207.7534.15256939193261032051.b4-ty@kernel.dk>
+Date: Tue, 08 Oct 2024 07:28:42 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,20 +71,24 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.2
 
 
-On Tue, 08 Oct 2024 07:08:41 +0200, Christoph Hellwig wrote:
-> Requesting a module either succeeds or does nothing, return an error from
-> this method does not make sense.
+On Mon, 07 Oct 2024 08:32:35 -0700, Keith Busch wrote:
+> Applications using the passthrough interfaces for IO want to continue
+> seeing the disk stats. These requests had been fenced off from this
+> block layer feature. While the block layer doesn't necessarily know what
+> a passthrough command does, we do know the data size and direction,
+> which is enough to account for the command's stats.
 > 
-> Also move the load_module after the store method in the struct
-> declaration to keep the important show and store methods together.
-> 
+> Since tracking these has the potential to produce unexpected results,
+> the passthrough stats are locked behind a new queue flag that needs to
+> be enabled with the /sys/block/<dev>/queue/iostats_passthrough
+> attribute.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: return void from the queue_sysfs_entry load_module method
-      commit: a2c17a5ea44f603eb4fbbdc13bdbcec587060635
+[1/1] block: enable passthrough command statistics
+      commit: 5dfb485db7d998b3eeb16bb95188c1e56195e047
 
 Best regards,
 -- 
