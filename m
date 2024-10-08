@@ -1,71 +1,61 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B3E1DE88F;
-	Tue,  8 Oct 2024 11:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55397603F
+	for <linux-block@vger.kernel.org>; Tue,  8 Oct 2024 11:58:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728387209; cv=none; b=MFmxSyxG4bDX6llir7EGGEdDeHfm29k1LdjUu5AAYv7VGWgzLs+wgzS6aKE2HY0ZWuG83XldYRBabIRTe7ONqHCEWD7CA7G+lJtY+Hks0Xn7Lij6LmJfUUWVbXND2A4mlb/Sd58K9m668zJzrPudWpm6xgzxjgh/7kG86qjOkXw=
+	t=1728388683; cv=none; b=qZDHtAd6Far341oKwUbJ1U5a+jj45JXfFhmnkc12oZVinqFcjCsPg2x+NeCb+zLIPFj4TMjELZPIYCXwZ3zns1w9vDAdaX25KzwLGiNaje5psxdVB9qxoLUoU7zXsMJXUl5LusEuIbiyEkvhoB8GvUplWcuu6Vx1kO7FAm26hnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728387209; c=relaxed/simple;
-	bh=umiJnaSgx5KeYV/NYoPOtX3HZdZvYwsTzuFtuBsn6Tk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JyF26t7Mh2+gpqlf+lwnjm8ZTLaEgCoo7wtMviBv60benqzMpJwQWsPRsePnxIbJaIVR+/+Zrb7tcjQzG2BzSICeongQdJtS5u7+0KJkK0WbjIdsUFQcJ0q28dU7OtJeuFivu83wi4ise2AWyiD546p83868wSQqLUxRXXDYqhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aaxLXWkz; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	s=arc-20240116; t=1728388683; c=relaxed/simple;
+	bh=J5B71StSY8EAuxc+N+jOSoLMA8E1Gsx/nTDfJMU1+hc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pLnobCnV0x3ylaWZ0zlpXMHdVyaPsoMhSfdLIyn3WxbnDmRdMyIfud7MqaDoFtUxOKhEyg7VuS6Zar1cTktj2IDXOaYda8TSByyAzgQbo72uv/PbduZnHhWp/xioc+cb9gugwT3mR+VVmXWWH8allxQXgquk9B3dJS6ZnsuRtCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=s+4IWaZY; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aaxLXWkz"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="s+4IWaZY"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=OdwlxzeGhkCEHL52PNGpSB9t0Q+ESkxcv7YoMNWWIhk=; b=aaxLXWkzgvLW1U+zejH2Ilo4tT
-	fl9W+BpYq0KXe2nc6sOih7YrDMz+2++T4X4Xy3plp2lzctiwVWpKj4Sr3svTgcSiDEyhHmRPno0rH
-	QjVXyjXu5XectNZ4BQZbdSn+ZBUFLHaSjpEKyOWVmVp0OwSB+2qP4A+smdASH876GZY98tt+tDv+F
-	VBABE72PRfZ7eUVhgRrAOOH2fBa02nTpsU3MJjih3YvWjxGg2rG3mcZa79zATQwmI78Fut9gDUdbK
-	3DYzVTYw4nK0qhlR2yCfM6gCmKw3kqCTpvC8KrsMtS8H661norBq+3z3tOI9Ml5C1qzjnTwkwiQ1A
-	nl9rvt4g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1sy8T1-00000005djB-1kIp;
-	Tue, 08 Oct 2024 11:33:27 +0000
-Date: Tue, 8 Oct 2024 04:33:27 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Ming Lei <ming.lei@redhat.com>,
-	linux-block@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-nvme@lists.infradead.org
-Subject: Re: [Report] requests are submitted to hardware in reverse order
- from nvme/virtio-blk queue_rqs()
-Message-ID: <ZwUYh9uJgETHAXl2@infradead.org>
-References: <ZbD7ups50ryrlJ/G@fedora>
- <ZbO9T_R4lN_7WkwQ@infradead.org>
- <1e0ad5fd-2d90-4a0a-bb5c-0b270dd8ddd8@acm.org>
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=bwPOU94ezTjZB+dYoExaZviNQILmlCv3Q6Fx386GZ74=; b=s+4IWaZYYOpVZqFEOUdXTWW/7j
+	1/EkSJFMjjcF/5RSXzN69UFWQAD7CMz3dHJWL6vf3+xiHhV7w5kFULd441jiyMDhud7tOLLRFfy5q
+	HN9vEi4eo8g7ESdZi81gFqUPbfJymsmLmJebrSZxn1IaTcJUhGF9XIFxUXP661YRY44xgKb5hSj+S
+	nqAexs0Bq6bXlLE9Q/ZKJBRtSxdzJM6hmhUpGWDrHeDzF2dq7Pr35CQHoNpQqIFrB/Um/K7LffjQC
+	5G/0xswOc+fnHSODbnAnbRq3FQvFMFrGf5RmZ0qN4yAsPrZrtMJ//gOiJ3PRC1+Q6FILSllzhhkwP
+	kf2tPwHA==;
+Received: from 2a02-8389-2341-5b80-a172-fba5-598b-c40c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:a172:fba5:598b:c40c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1sy8qm-00000005imr-3Hxf;
+	Tue, 08 Oct 2024 11:58:01 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	YangYang <yang.yang@vivo.com>,
+	linux-block@vger.kernel.org
+Subject: RFC: try to avoid del_gendisk vs passthrough from ->release deadlocks
+Date: Tue,  8 Oct 2024 13:57:49 +0200
+Message-ID: <20241008115756.355936-1-hch@lst.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1e0ad5fd-2d90-4a0a-bb5c-0b270dd8ddd8@acm.org>
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Oct 07, 2024 at 03:39:42PM -0700, Bart Van Assche wrote:
-> For my patch series that supports pipelining for zoned writes, I need
-> the submission order to be preserved. Jens mentioned two possible
-> solutions:
-> - Either keep the approach that requests on plug->mq_list are in reverse
->   order and reverse the request order just before submitting requests.
-> - Or change plug->mq_list into a doubly linked list.
-> 
-> The second approach seems the most interesting to me. I'm concerned that
-> with the first approach it will be difficult to preserve the request
-> order if a subset of the requests on plug->mq_list are submitted, e.g.
-> because a queue full condition is encountered by
-> blk_mq_dispatch_plug_list().
+Hi all,
 
-Note that you don't really need a full doubly linked, you just need a
-tail pointer in the plug, i.g. the same scheme as struct bio_list.
+this is my attempted fix for the problem reported by Sergey in the
+"block: del_gendisk() vs blk_queue_enter() race condition" thread.  As
+I don't have a reproducer this is all just best guest so far, so handle
+it with care!
 
+
+Diffstat
+ block/genhd.c          |   40 ++++++++++++++++++++++++++--------------
+ include/linux/blkdev.h |    1 +
+ 2 files changed, 27 insertions(+), 14 deletions(-)
