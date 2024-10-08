@@ -1,101 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC861DFD1;
-	Tue,  8 Oct 2024 14:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B32DDDC;
+	Tue,  8 Oct 2024 14:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728399130; cv=none; b=r8r/g3a9+AV4gxjAmnnq5xBQU0/7R2n4KUOrjgjdI9DuFsSxyh/BJkaPv7g4Nx0HlZVGr+YFLnxXyuNuBk6UJJa8Q09DmBRaWFkaaQ9rbez8fiop67zWU3TE6Iln2JnbCcK7T27koqa1kU2YdpratBRsS7yl/mBXw1yR1EddKM8=
+	t=1728399326; cv=none; b=QdNuoTXS3yYsFeNeYh+Mb7DTWGyfRkHXiVGWG4m0VKO+MVkIHw4C0MVELIIMpbSxeoCfiClAtLXWqnDjRBa/Gnuv+hzUR2YcaILgSqTnvbbjdAdJEHdh13n7rhLFG5S5jvY03gyx9Pw7tvPCFHxzzvFa20OvW2CVttq7IzxBKFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728399130; c=relaxed/simple;
-	bh=dqrkp2/3a4RSErawaG5/0PMhkPOSRe1WtaBNNRHUviQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RTVcdvnQyUtB8kTjKgenSuDZKMma80HW/CP4eB8nNRsceCM7sh78YL9gPA/QpKK/+QwLWFTD7Ac7fcTOpHZSem9Q49F8Du9g31He7bjwJnf+mZ7gWCdOaALKVB3aMz5AVN+3s8iRyK3/td9MR+OSlGoiB3o+rmJTJTeLinXFdaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diUoWpQz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728399326; c=relaxed/simple;
+	bh=W8eQq9YG4NkByNJtvfoEFHbRrapq4cTYFRvOGYOeNeU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CaIcFxYeAMW7tIzMXga1wc1ON8rpydlwVDXLWBjUmbCxhmPvI+Upd0dnzQ+8PTXulCK+uHXefkxLotc/GBCl/mjQ/zDYL2u4fatdDhOYIg6cNRValhxfakxFgJJK9D55i86+WiiOYE7kk5zTa8+qOoma5IGNdIov5FBLt+Hluvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bjorling.me; spf=pass smtp.mailfrom=bjorling.me; dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b=JVU5R0lk; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mKRnuW+u; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bjorling.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bjorling.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diUoWpQz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E7CAC4CEC7;
-	Tue,  8 Oct 2024 14:52:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728399129;
-	bh=dqrkp2/3a4RSErawaG5/0PMhkPOSRe1WtaBNNRHUviQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=diUoWpQzUfkVS2zYhn8+sLGYPQCmBhTaEjiOKYuZOaBuRT1fk8egb++918ito7jSK
-	 hv2yvl4zXHeGFtaGNt7vsOI4ut8NrClLjB7mxLD36G9BVJOwsoZm9HwYRl8rNWtw9t
-	 eT3hi8TsWXM9bSPzqGj0yaxNmgRKk+xTEduhA8hIKe32KIEUZZD1KY/3f/D+TIWoQ7
-	 CRGPcbyWHxYzyzegiMPx07Ijfr7zPvDwRbgyfeI0hUCifouSLq/UfDxb9YQflBLnLe
-	 1cuReQilV0qtnXjoNZiiMMeMAOTi9UtLRuw+ZKvreZOB+HWCE7PvcmIGA3cJTfsJcp
-	 iY6erFbJhmCTQ==
-Date: Tue, 8 Oct 2024 08:52:07 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: SurajSonawane2415 <surajsonawane0215@gmail.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, hch@infradead.org
-Subject: Re: [PATCH v3] block: Fix uninitialized symbol 'bio' in
- blk_rq_prep_clone
-Message-ID: <ZwVHF_0Z0dNnYW58@kbusch-mbp>
-References: <20241004100842.9052-1-surajsonawane0215@gmail.com>
- <20241008120413.16402-1-surajsonawane0215@gmail.com>
+	dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b="JVU5R0lk";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mKRnuW+u"
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 02024138039A;
+	Tue,  8 Oct 2024 10:55:22 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Tue, 08 Oct 2024 10:55:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bjorling.me; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm2; t=1728399321; x=1728485721; bh=s/
+	lymXYoCV742fut5rNz1QdRGMwe+LLRB8FhDplNi34=; b=JVU5R0lkKv4f13g/Sz
+	RGl3h9EkgbQk1nfZ155I1Sgv1x5HpD9msMhkOjubfYf0/gZG/tW40L7Dzl8oVUQH
+	/SnzhZbvE9PAoVRWyI0Q7dryZsNLzKSBKPbdx8ek0fWI75DwcDAEH2YbmOiqHQRb
+	Euq1evAttlT/2Bo6ZIbLVbkGgvT4ct5IhktsP5t0xPKkoNLliLh1elUFE2OBtCiT
+	6E/qW/fHeIhbMny2OVXiU6LotTACtnQ5R2I6gCyjgDl69Nmsu8AF1Pv4qjTP3LHT
+	N7C2R+kZ/ZjJl06yl4l8EzchvPkhhgyAk4zv2qWM86mcfqnTa+uVxWGH1eO5Tqn9
+	SblQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1728399321; x=1728485721; bh=s/lymXYoCV742
+	fut5rNz1QdRGMwe+LLRB8FhDplNi34=; b=mKRnuW+uEpbNkYDIK23CLu9PItby3
+	1vWzvpIBtygGsZSOTReMScbdI8hZCtGVKfa11QndljNUqxRThUg+TQDpNdmz+85S
+	mC3LDpP24dahey9N3pGNForHobzK+BP0zD3xDDapTNSW1rnCx/e/8yc50dOhzpkB
+	xgOqqWQiNRKBdCuUglLt2JsSITF+lxAYxXDB+ePGziWx66UKjeOrYRo0/pXPqOHC
+	9TsT0jg6NuCpHhfAmLCp4UQGfMbwbGciMjV6oVZatckfjFPBigOhhW877duQWlrv
+	yyodiaHvRFJUpnQRIFLdfwCk57CbsFvkWaZuVCT2ji8ydh7nB+qLH1s1g==
+X-ME-Sender: <xms:2UcFZzQo14R-qk98LZwhAe_IC_XEYSDmAcZ11LyY9UDZr_EN4_CoQQ>
+    <xme:2UcFZ0zyoE3cyaxwVKcnib_HuAFsf5naV_RjH9yXmr12HPPDo4fUWR03CNytKFeC3
+    kGKO7zk1DdtSVz0D_s>
+X-ME-Received: <xmr:2UcFZ43Kp-Q3TXNSZFmqp71nz-F0arODMYbjS5vpprBEfxVVzphwlLafgv78X9g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdefuddgkeefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpefhvfevuf
+    ffkffogggtgfesthekredtredtjeenucfhrhhomhepofgrthhirghsuceujhpprhhlihhn
+    ghcuoehmsegsjhhorhhlihhnghdrmhgvqeenucggtffrrghtthgvrhhnpedugeffkeehge
+    ehvdfgfeelvddugeffgeeuudelfeekvedtfeejgfduhfdtveefudenucevlhhushhtvghr
+    ufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmsegsjhhorhhlihhnghdrmh
+    gvpdhnsggprhgtphhtthhopeekpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehk
+    sghushgthheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhgthheslhhsthdruggvpd
+    hrtghpthhtohepughlvghmohgrlheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheptggr
+    shhsvghlsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhnvhhmvgeslh
+    hishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehlihhnuhigqdgslhho
+    tghksehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrh
+    hnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrthhirghsrdgs
+    jhhorhhlihhnghesfigutgdrtghomh
+X-ME-Proxy: <xmx:2UcFZzBYS2DP7xV_zRjZ9-Q1XvdbCb6jBRorYfVE1H_l7FlYvx0ftA>
+    <xmx:2UcFZ8hw09kA2A4Aua9-mwgSFD55KD1mdNQ0vEahy4N7IoTL1JT0uw>
+    <xmx:2UcFZ3pRoZ-mHlX8K6Xbp_2IApF_Kf1ixjLlYb9UX6UGzv0Dn79Okw>
+    <xmx:2UcFZ3je-EGBIFCB6804HHLQjJGrMLxf4lNEey0rTsbOypzj7rAGNA>
+    <xmx:2UcFZ1Vwwj086ME2qaOkAcynZJ_7gCpDd8ZGPgO6TKdHPu21TqLXDd2x>
+Feedback-ID: if4314918:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 8 Oct 2024 10:55:20 -0400 (EDT)
+From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
+To: kbusch@kernel.org,
+	hch@lst.de,
+	dlemoal@kernel.org,
+	cassel@kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias.bjorling@wdc.com>
+Subject: [PATCH 0/2] nvme: add rotational support
+Date: Tue,  8 Oct 2024 16:55:01 +0200
+Message-ID: <20241008145503.987195-1-m@bjorling.me>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241008120413.16402-1-surajsonawane0215@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 08, 2024 at 05:34:13PM +0530, SurajSonawane2415 wrote:
-> Fix the uninitialized symbol 'bio' in the function blk_rq_prep_clone
-> to resolve the following error:
-> block/blk-mq.c:3199 blk_rq_prep_clone() error: uninitialized symbol 'bio'.
+From: Matias Bjørling <matias.bjorling@wdc.com>
 
-...
+Enable support for NVMe devices that identifies as rotational.
 
-> @@ -3156,19 +3156,21 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
->  		      int (*bio_ctr)(struct bio *, struct bio *, void *),
->  		      void *data)
->  {
-> -	struct bio *bio, *bio_src;
-> +	struct bio *bio_src;
->  
->  	if (!bs)
->  		bs = &fs_bio_set;
->  
->  	__rq_for_each_bio(bio_src, rq_src) {
-> -		bio = bio_alloc_clone(rq->q->disk->part0, bio_src, gfp_mask,
-> +		struct bio *bio = bio_alloc_clone(rq->q->disk->part0, bio_src, gfp_mask,
->  				      bs);
->  		if (!bio)
->  			goto free_and_out;
->  
-> -		if (bio_ctr && bio_ctr(bio, bio_src, data))
-> +		if (bio_ctr && bio_ctr(bio, bio_src, data)) {
-> +			bio_put(bio);
->  			goto free_and_out;
-> +		}
->  
->  		if (rq->bio) {
->  			rq->biotail->bi_next = bio;
-> @@ -3176,7 +3178,6 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
->  		} else {
->  			rq->bio = rq->biotail = bio;
->  		}
-> -		bio = NULL;
->  	}
->  
->  	/* Copy attributes of the original request to the clone request. */
-> @@ -3196,8 +3197,6 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
->  	return 0;
->  
->  free_and_out:
-> -	if (bio)
-> -		bio_put(bio);
->  	blk_rq_unprep_clone(rq);
+Thanks to Keith, Damien, and Niklas for their feedback on the patchset.
 
-I think your commit message is missing the real "fix" here. The other
-place that goto's this label is if blk_crypto_rq_bio_prep() fails. At
-this point, the cloned 'rq' has all the bio's that get cleaned up in
-blk_rq_unprep_clone(), so that failure scenario is double put'ing the
-last bio.
+Matias Bjørling (2):
+  nvme: make independent ns identify default
+  nvme: add rotational support
+
+ drivers/nvme/host/core.c | 12 ++++++++----
+ include/linux/nvme.h     |  1 +
+ 2 files changed, 9 insertions(+), 4 deletions(-)
+
+-- 
+2.46.0
+
