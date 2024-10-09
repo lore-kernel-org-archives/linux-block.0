@@ -1,66 +1,168 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D934D1DF96B;
-	Wed,  9 Oct 2024 15:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56EE1836D9
+	for <linux-block@vger.kernel.org>; Wed,  9 Oct 2024 16:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728488397; cv=none; b=TJEy+xH0K8++fz2FeCYNF5X9CddwmrLXQ+wzLeOCW54H9ACwcbWqvcYCfu1uQXOHWqalRA8g0FJiKarDqcgWMU8ItwFXuTZ99NQbqJvnFKmfUq1dVRnWpxdedLo9OrJ3vxAjqvja/kN5Tabjs9aZtoiK1zdaDspIQMVmD8vBR8Q=
+	t=1728491858; cv=none; b=RjVGXBNES1nQiVyGGtvgkwz/zeHbH9xOWLzJFcBtkY53tof/Nf3EH0k3hx8sSFVrjN1I2Mays2WGS5mnntwfwAIUg4Oco2cygSEoIS5nGSfXQOfsGqdU8/aQOD6MUKjfl7t9M3ES+noXrAWTv9QewduWdJfrOQ3c8HVVfh1qWkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728488397; c=relaxed/simple;
-	bh=wU/oslILGgn2F02+9wwryHYoFa/vr8Fs/rJ85NNedk4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gy7Ab7sFxVzsa6T54KC34mP0D25EUjAJufNFQnUEajD8FRDOZOtyWzcLAw7//Qwe6Gg8j7Rc3CnY/0lVmAWhHYk/jrzYxGKKYcUMvOcTY3ZXTOecPBnSJBHcMeXjmJnH0HOCrXisQCC7Tl4h4YFDNLlkuAIR9uJTEgmXv7u99NU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9V768yk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728491858; c=relaxed/simple;
+	bh=FkPNiKrDC3+QHRxxD/nfxPn7Phy0LWVCU+eN7x54MFo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=HA9cUTYRZtxVf+IGnMYlg7XtB6g5QTdL+tedjiwfLY8PUORe5j1SMXbuy6geZ/esqRwrShttQE95vyG5UrDQC9oB49ar171A49vJzFjxTGCA89idbtQuhAMnvjUASE0G4FiHho/qY/cBERtlBxCwLx5yDiCakyEn6sPX7FHLX7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Q+9teczi; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9V768yk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB765C4CEC3;
-	Wed,  9 Oct 2024 15:39:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728488397;
-	bh=wU/oslILGgn2F02+9wwryHYoFa/vr8Fs/rJ85NNedk4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q9V768ykh3aN7rPScVW+4Bs8j6jHHeBrn6xA4l+k6uQPIpyQ2iA550JFNvRzG5YvL
-	 L/HXrfJsoZqfAYBzxtrnLm9r0f3nqmjlTy6J0yCU4O0McvZbfe3lnxpS+stNUzArXH
-	 hvkkeycnx5TOAqOm0lRTN/JaLNj5AouPWYx+qYGkfzBJOK7u6iPkyX3EwapqgRXn2x
-	 pvTTK3DFRHSTx8fjne9RL2cSyUjtQniny+1kj2/3N5nM8kPPJT3nIxRP4PsO1pxbqL
-	 UhIkskcnZxWlwPAd8FXHMPajsocgQ7j2NAKrwON0fxevk0ztvTmhiQkZvri5JwqY7Z
-	 4v2g/lF81nF4Q==
-Date: Wed, 9 Oct 2024 09:39:54 -0600
-From: Keith Busch <kbusch@kernel.org>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Q+9teczi"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20241009163734epoutp04ef4cc9e1543d8a6179e8239d8ec68671~81i8aSpIK0756607566epoutp04_
+	for <linux-block@vger.kernel.org>; Wed,  9 Oct 2024 16:37:34 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20241009163734epoutp04ef4cc9e1543d8a6179e8239d8ec68671~81i8aSpIK0756607566epoutp04_
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1728491854;
+	bh=aY3smltzT2+QB6bAt4NW22thzRqxBpoUiECX+vCKxPI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Q+9tecziQwol1Q1/+E8psFWsXKWKMAgDy1UGHyhSFxN57i47bTbYjOBU7wqLIgnYu
+	 +u5HCDGNPToNB6ZtqyYF3Bj8YyI/wtwk29qt6TKpRQni6X8oAhA0hyNSmFv8eennL0
+	 dEZesUjDLMqysOkik7kXzrnfD84vMhJY3DCBHczc=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20241009163733epcas5p429d02e668ad0fa36e526a89694424be8~81i7AjyU21769017690epcas5p4o;
+	Wed,  9 Oct 2024 16:37:33 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.183]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4XNz7v4P6Yz4x9Pq; Wed,  9 Oct
+	2024 16:37:31 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	40.68.09800.B41B6076; Thu, 10 Oct 2024 01:37:31 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20241009163633epcas5p1720534b46ce90de022aec84f7ae70099~81iDtR_6y2300123001epcas5p1Z;
+	Wed,  9 Oct 2024 16:36:33 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241009163633epsmtrp25ef6fd35eb6e0f7d15aa1687c124f70f~81iDsS4Sw0223302233epsmtrp2Z;
+	Wed,  9 Oct 2024 16:36:33 +0000 (GMT)
+X-AuditID: b6c32a4b-4a7fa70000002648-5f-6706b14bac92
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	2E.D0.08227.111B6076; Thu, 10 Oct 2024 01:36:33 +0900 (KST)
+Received: from ubuntu (unknown [107.99.41.245]) by epsmtip2.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20241009163630epsmtip2264d042ea2487ea6d5d95add84beb231~81iAjSaev1667016670epsmtip2y;
+	Wed,  9 Oct 2024 16:36:30 +0000 (GMT)
+Date: Wed, 9 Oct 2024 21:58:50 +0530
+From: Nitesh Shetty <nj.shetty@samsung.com>
 To: Christoph Hellwig <hch@lst.de>
-Cc: Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>, dlemoal@kernel.org,
-	cassel@kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Matias =?iso-8859-1?Q?Bj=F8rling?= <matias.bjorling@wdc.com>,
-	Wang Yugui <wangyugui@e16-tech.com>
-Subject: Re: [PATCH 0/2] nvme: add rotational support
-Message-ID: <ZwajykF81QLOkObY@kbusch-mbp>
-References: <20241008145503.987195-1-m@bjorling.me>
- <20241009074355.GA16181@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, Javier =?utf-8?B?R29uesOhbGV6?=
+	<javier.gonz@samsung.com>, Jens Axboe <axboe@kernel.dk>, "Martin K.
+	Petersen" <martin.petersen@oracle.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ hare@suse.de, sagi@grimberg.me, brauner@kernel.org, viro@zeniv.linux.org.uk,
+ jack@suse.cz, jaegeuk@kernel.org, bcrl@kvack.org, dhowells@redhat.com,
+ bvanassche@acm.org, asml.silence@gmail.com, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-aio@kvack.org, gost.dev@samsung.com,
+ vishak.g@samsung.com
+Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+Message-ID: <20241009162826.cpmb56rj4groafaq@ubuntu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20241009092828.GA18118@lst.de>
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Te0xTVxjP6b29vZV03BWmhzKRFLYpCLRYyoGBMxkhN4NlZPyxxAxZAzfl
+	Wbq2jKHZZMw67WA4Aigd46HLkMIkPGSI1ADCiAoSlVERMAxKhjwKwpQxHKzllsX/ft/vke98
+	35dDYsICnohMVekYjUqRISZ24W03D+wPiGkilJKxUS9UYWoDqH6iiECGzVYczd9cAahseR1D
+	tvwNHI12XeOgzovFHFRX38dBNv1dHP1w/msOsjYaMTQ9vspDfVuLBCruGQGopCwfIPMjf9Rp
+	voWjqp9neKi2f5ODrswv4Wjo334uGjJW8I7soR8Mx9DXjBM8euhxE04/GMymm01nCbp5pZhH
+	t/x0kr4+mkfQT2ce4fTSjd8J+rtWE6AHqnvt4p0T9GqzF91sXeTEuR5Nj0hhFMmMxptRJWUl
+	p6qUkeKY+MR3E0PkEmmANAyFir1VikwmUhwVGxcQnZph34HY+zNFRradilNoteKgwxGarGwd
+	452SpdVFihl1coZapg7UKjK12SploIrRhUslkuAQu/GT9JRywxxXfcrl816TNg9U8w2AT0JK
+	Bpcsa5gB7CKF1HUAa7cauGyxAuD5yicctngO4GD7CrYTMcxW8ljBDODDvDOALawAlv/zt91F
+	kjjlCycv7XZAgvKHd7ZIR9adEsOZucFtO0aN4XBkcAA4BDdKApfWCgmHX2Bv0H41zkELqFfh
+	rXIr7sB86iDsu2QmHFlI1fOhzTrCYx8UBetvXCZY7Abn+ludvAiu2sxOPgfWlVx2hk8BaLQY
+	ASu8A/W3i7Ynw6gUOFVXjLP8Xlh6+wqH5V+BhRtWDssLYHvlDvaBDY3VzgYecGTtKyem4dB4
+	mXN13Ri0tOiJc8DL+NJExpf6sTgcnl3O5xrtC8AoT1i7SbLwAGzsCKoGXBPwYNTaTCWjDVEf
+	UjE5/x85KSuzGWx/C7+YdjA1uRzYAzgk6AGQxMTugoAarlIoSFbkHmc0WYma7AxG2wNC7Pf5
+	HhO9lpRl/1cqXaJUFiaRyeVyWdghuVS8RzCv/zFZSCkVOiadYdSMZifHIfmiPM63Itd94O3X
+	Ozxyf4vy6U2Y8SoqsB27+MuU9a9NzzTcx2Tp2C30E/mkpl2dj20nLXeVvrqPultkCS79ZSgz
+	bXHiTOQfFSVPCJlVPzpc+sWJ92yzVYlHsO5vZvvdUORjvQpY5ldSImDyvWHZwcXCXp3XdNf4
+	r+sD5vfTT9csyITkB/y3gnQz9UNHuB013V2Sc4HrBe74/cPBb65PhCty9754w+3FqCu5v8ql
+	IJraeDijuzB29Jn/6aep0S7Hn3u69oN78fuOyT9ekPqHFFF/mjXBOaYL90+WfprfRDbaPgyd
+	i51sC6i1JIT6TjcsjD3zjy8ngXdwp9WwWhXBfCnKg2ViXJuikPphGq3iP82l/9qfBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrDIsWRmVeSWpSXmKPExsWy7bCSvK7gRrZ0gy97dSzmrNrGaLH6bj+b
+	Rde/LSwWrw9/YrSY9uEns8W7pt8sFjcP7GSy2LNoEpPFytVHmSzetZ5jsZg9vZnJ4sn6WcwW
+	j+98Zrc4+v8tm8WkQ9cYLaZMa2K02HtL22LP3pMsFvOXPWW3WH78H5PFutfvWSzO/z3OanF+
+	1hx2B3GPy1e8PXbOusvucf7eRhaPy2dLPTat6mTz2PRpErvH5iX1HrtvNrB5fHx6i8Xj/b6r
+	bB59W1YxepxZcAQoebra4/MmOY9NT94yBfBHcdmkpOZklqUW6dslcGX8b5nMXLCNo+LMo3a2
+	BsY3bF2MnBwSAiYSXS/msXcxcnEICexmlPi7/zJUQlJi2d8jzBC2sMTKf8/ZQWwhgUeMEv1t
+	OV2MHBwsAioSDxaLgZhsAtoSp/9zgFSICChJPH11lhFkJLPAfRaJt83TwcYICxhIvP/eywZS
+	zwu0d8fWAIi1h5klPs6dATaeV0BQ4uTMJywgNrOAmcS8zQ+ZQeqZBaQllv8Dm88poCNxdPFe
+	tgmMArOQdMxC0jELoWMBI/MqRsnUguLc9NxiwwKjvNRyveLE3OLSvHS95PzcTYzgCNfS2sG4
+	Z9UHvUOMTByMhxglOJiVRHh1F7KmC/GmJFZWpRblxxeV5qQWH2KU5mBREuf99ro3RUggPbEk
+	NTs1tSC1CCbLxMEp1cAk9qlPMYg1+7xQj/Uk70MvrW14WxsF5scXcig4bj1zcY2nR53fo01M
+	jL1px5hszbRXl68Jn+/AmO4XefbvuVjT5RNq1FnMPgkbnJhvdL75+LxPJwtydB8fM94mV9XP
+	UsZ17nzg4na1wuDZXL27In7si9o+P3jyNEaTXuaz2b0rZ93cvMloQujW++J/c8/0PCy0Kmhe
+	9MSpo33ZgTUuezrdDp+Ye+qd8g2xaBOXE6br0pVP3Pt6wEpU5oPr80ch5/P8+RT8nEPkPTSV
+	3AX+/ZPYbPHJavrFsyzdPm03Bfa+67mRtjZgs+vX4H253FOMFI7POeNpsPTZuT339gs4OXGe
+	LF+4s+ln74kbUvfz1R8rsRRnJBpqMRcVJwIABjvMN18DAAA=
+X-CMS-MailID: 20241009163633epcas5p1720534b46ce90de022aec84f7ae70099
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_2bc10_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20241004053129eucas1p2aa4888a11a20a1a6287e7a32bbf3316b
+References: <CGME20241004053129eucas1p2aa4888a11a20a1a6287e7a32bbf3316b@eucas1p2.samsung.com>
+	<20241004053121.GB14265@lst.de>
+	<20241004061811.hxhzj4n2juqaws7d@ArmHalley.local>
+	<20241004062733.GB14876@lst.de>
+	<20241004065233.oc5gqcq3lyaxzjhz@ArmHalley.local>
+	<20241004123027.GA19168@lst.de>
+	<20241007101011.boufh3tipewgvuao@ArmHalley.local>
+	<20241008122535.GA29639@lst.de> <ZwVFTHMjrI4MaPtj@kbusch-mbp>
+	<20241009092828.GA18118@lst.de>
+
+------w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_2bc10_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241009074355.GA16181@lst.de>
 
-On Wed, Oct 09, 2024 at 09:43:55AM +0200, Christoph Hellwig wrote:
-> On Tue, Oct 08, 2024 at 04:55:01PM +0200, Matias Bjørling wrote:
-> > From: Matias Bjørling <matias.bjorling@wdc.com>
-> > 
-> > Enable support for NVMe devices that identifies as rotational.
-> > 
-> > Thanks to Keith, Damien, and Niklas for their feedback on the patchset.
-> 
-> Hmm, the only previous version I've seen was the the RFCs from
-> Wang Yugui, last seen in August.
+On 09/10/24 11:28AM, Christoph Hellwig wrote:
+>On Tue, Oct 08, 2024 at 08:44:28AM -0600, Keith Busch wrote:
+>> Then let's just continue with patches 1 and 2. They introduce no new
+>> user or kernel APIs, and people have already reported improvements using
+>> it.
+>
+>They are still not any way actually exposing the FDP functionality
+>in the standard though.  How is your application going to align
+>anything to the reclaim unit?  Or is this another of the cases where
+>as a hyperscaler you just "know" from the data sheet?
 
-Oops, that slipped by me as well. I think the right thing to do is bring
-that one forward and retain the original credit. I agree with Matias
-that we ought to be able to query the independent identification without
-relying on CRWMS, though.
+I think Keith already[1] mentioned a couple of times in previous replies,
+this is an optional feature, if experiments doesn't give better
+results, FDP hints can be disabled.
+
+>
+>But also given that the submitter completely disappeared and refuses
+>to even discuss his patches I thing they are simply abandonware at
+>this point anyway.
+
+Kanchan is away due to personal reasons, he is expected to be back in a
+week or so.
+
+Regards,
+Nitesh Shetty
+
+[1] https://lore.kernel.org/all/ZmjSwfD1IqX-ADtL@kbusch-mbp.dhcp.thefacebook.com/
+
+------w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_2bc10_
+Content-Type: text/plain; charset="utf-8"
+
+
+------w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_2bc10_--
