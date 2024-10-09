@@ -1,81 +1,60 @@
-Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2ADD1917E7;
-	Wed,  9 Oct 2024 13:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69829126C0F
+	for <linux-block@vger.kernel.org>; Wed,  9 Oct 2024 13:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728480509; cv=none; b=KU7BUgO+c058lSxSaXBn43ImaPOltwAtQu0XtKts2l3RFLiOvbrIsX+8BTefbnJZmynyNgXlFw+pJCtjZ3asFvbFEq7AMPAxJ0PUe8HFvp/9XXDJp3QaS1dagIvuv871ojrQAdqZjLFH+nl2CutSlPmU1fKEMTP30+V9m82TIPc=
+	t=1728481795; cv=none; b=megmOfxZfFBpfZ8FEAoKGtA5BC5tmSI1pWaypZrL4NJJ67rxqfA1ih7TDgxqR35TeMltC3+CdAaxt7xZfuk9Dfsj/yr7T+o8qCWdP4A6uSD3KYHODy5FNDBj/9DsN1IKDsqk+nOBeAuJlAdwfiCNqFeBB5IhUP61f1Dczv3RYs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728480509; c=relaxed/simple;
-	bh=6J+dwhRH4H4+hyB8vozo7d8DXwiis+PBfA8eN9YRoaE=;
+	s=arc-20240116; t=1728481795; c=relaxed/simple;
+	bh=VE6E3ethquF8BF3+N8dwUzTWcMadHAiIMpcmWbTroCM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NxpFBD6q77ENCTOpyuhRHK21/DdRUdOJHBnmSsQ+vPj2x62YzkvGq+LaP1Oz3uaI6goU8cc2vBlye/NA/vX0wHZztcXnUnTBDfH0yjVAK7Fghe8vHsHSLMQhC3oZL++toWae1yIVD0RkNZ9wMT5nWbFrdizItEt/7bfcpZOZ/Ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bjorling.me; spf=pass smtp.mailfrom=bjorling.me; dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b=wsPmPxs0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=olThgFVl; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bjorling.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bjorling.me
+	 In-Reply-To:Content-Type; b=Vf6vOzzrGkZHPZKJUlALgx099Upa5xvBXynUdzYv4PTGeUuslynAJ6+yrmG7YT6AwzwazLCneFR5m6X2T7fvRIUQ16FUwb4qxU3fQ3KuImy2oFPKSVEOaW4FxcGYY+B1XnY6rEkDN34aeccxCGF4jrLmkRLitNErRHC9NEzSvuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=wfKO14Vc; arc=none smtp.client-ip=209.85.166.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b="wsPmPxs0";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="olThgFVl"
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id CD74E114019F;
-	Wed,  9 Oct 2024 09:28:25 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Wed, 09 Oct 2024 09:28:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bjorling.me; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1728480505;
-	 x=1728566905; bh=DEfoN8Vn3gmKHWlf0jh4UtY6eytWKRkiu28dZUV0LI0=; b=
-	wsPmPxs0s6gTPHrlXfQc1eQeI4BrR/8uGFItw4DIw3VqnIkjr9XIYQbO1Hks6dMh
-	wItValAlhayMnjPT/FNsP0KCSaxugGmgIoSpNyZUxNHAtbAClR/b3jb2KZQFNuev
-	0yg4rZCBSLXPoKpRahnewIBk7oxZhW+qbg7L6855Jbdii04jsdsZeylFuMODUeNW
-	wSU43qWIQ2uN5jhKxHAXnozWyKfhvH39uZiz5H/OTnYJqNTn7iQxoqzdKEDQbyG7
-	e+WkoAWk3xUxIH157xzM3RiL64tmKiF/ccpetIxmA6HlRpV6XAnxjJUT8pwNkC+o
-	PfBJUUSS2KizFfwMs2cS/w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1728480505; x=
-	1728566905; bh=DEfoN8Vn3gmKHWlf0jh4UtY6eytWKRkiu28dZUV0LI0=; b=o
-	lThgFVld3jvKdHZY9P9MoSIC1ygT2EEaczAeT1MMOHuK7LZsq2bk8IG4i87dSScE
-	rr3tJQQX9rnmAR79uKQ9SaETE5Mhe/k1qAmV1ItmAwdTrH8a+emZtaZuUkPM+2hC
-	5pFT5KaxpjvTqNvh6cXsJ+9iVIRlnsErLVppU23kLScqWMt5w7du3dJGw7jY6KqW
-	8jyxV+qvnW0zay4b8uIFGgq7AucWJmY8GbX0GMgnLRDIec8d7qJxE/ooO/Rx7sJ0
-	xeq5XzLTu4fKwXBo60Q+mP/ntJEHOOAnRbkUcMP0WnOO4hWF4gRH5BV3L8tdMB1O
-	9Jj/idStEyb1Kn0MzPwZA==
-X-ME-Sender: <xms:-YQGZ3ITmXcXRdtzzB5I4VKvV4etPw-7_r2glJogLHg6J5VmOTtaQA>
-    <xme:-YQGZ7LPs4TFIphLqyAry5QLrkZ7Q8e4iYjPIbpcsFv2-orm6BRtl143ZdZQyQZ-8
-    K4yJa7b-Rsv10GDTzs>
-X-ME-Received: <xmr:-YQGZ_uyodg_3YvfXy2hD-j9Poq2voqTps1deTywDMADxUIeLfP7RiB3OtcPGNaNAt8757yb-UayGTBJ64Ph-3nZC23mug>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeffedgieejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgsehtkeertddtvdej
-    necuhfhrohhmpeforghtihgrshcuuehjpphrlhhinhhguceomhessghjohhrlhhinhhgrd
-    hmvgeqnecuggftrfgrthhtvghrnhepkeefieeutddvteeguedthedvudfggfevgeevkeeg
-    geefkeeufffffeelleevgefgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomhepmhessghjohhrlhhinhhgrdhmvgdpnhgspghrtghpthhtohepledp
-    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtohephhgthheslhhsthdruggvpdhrtghpth
-    htohepkhgsuhhstghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegulhgvmhhorghl
-    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtrghsshgvlheskhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtoheplhhinhhugidqnhhvmhgvsehlihhsthhsrdhinhhfrhgruggvrggu
-    rdhorhhgpdhrtghpthhtoheplhhinhhugidqsghlohgtkhesvhhgvghrrdhkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgv
-    lhdrohhrghdprhgtphhtthhopehmrghtihgrshdrsghjohhrlhhinhhgseifuggtrdgtoh
-    hmpdhrtghpthhtohepfigrnhhghihughhuihesvgduiedqthgvtghhrdgtohhm
-X-ME-Proxy: <xmx:-YQGZwYj7nGupr9G0G8JVWdMfl07SzgAtu2vbv6r9Lxs5W8GbPMSYg>
-    <xmx:-YQGZ-YRqC92MmW1vo5ZQ196lZCaPgcXYToO3VqRZkiCiK0x--r_Ug>
-    <xmx:-YQGZ0Dfkr85R9YTygdWV6j7RNU7u2HSUo52zqewQngr0Ub-6tUecw>
-    <xmx:-YQGZ8Yfukd98v_cdpN8KphHB4oHKvVLB6yMoBOGS7S6yMKy50XAhg>
-    <xmx:-YQGZ0kRigUFIhSJAyohh2qeNwYINoIdsGWCxX6oftCxUf-IVBrZL-cH>
-Feedback-ID: if4314918:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 9 Oct 2024 09:28:04 -0400 (EDT)
-Message-ID: <c6e03246-57aa-41c5-90b9-261c6d6a14d1@bjorling.me>
-Date: Wed, 9 Oct 2024 15:27:57 +0200
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wfKO14Vc"
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-8323b555ae2so292702639f.2
+        for <linux-block@vger.kernel.org>; Wed, 09 Oct 2024 06:49:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728481791; x=1729086591; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fyf+TeeqENaLGjushgj4CkyUJ1Og8eh7H+0klpu40hI=;
+        b=wfKO14VcH9WTylapdvhexXtATRib9X+zL4iRcV6OqQ0s+eQcJpN0ODPKsos1CYNrMf
+         yALJptEqp34loZvbruF3Dn60mvJ/oz/yu2K+ol4SgOJDMZ3f3XcCm5d50CGHr+lQK8P2
+         +aVDqBkhLIWg9cq0LaDvmH1IQmPW+8CCxVWLpDf8j1+5GXSOscV7xhY18bnDXpnF3v7M
+         hcy1XCcIjMAS+nDogf9dq9CQ+VYgC1yqelPJ74iAlQ6Q0cFBz2sCnrDH8i4/ImjmTPQ7
+         uQvpcc/ZI6rRiOJpDxKs97ykEFxsaSyX+EbLa0m2RaIsgCqJjQ3DIGLNjkAtQ/VlEWJy
+         tIDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728481791; x=1729086591;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fyf+TeeqENaLGjushgj4CkyUJ1Og8eh7H+0klpu40hI=;
+        b=fMcCuG/5KWcrW4RKFdA5bGSWT2sFnxxaMNG756Z2IWnLicQzkI5qMC1djBvR1RjJCs
+         l/PxBcU+ZsD5rQNS9CqnC7njq4kyvXa31zdPvVrXhn7w1rBoqRaeNgz1OcdwDnZPNuem
+         m7LZrJMhf7cblmagGpj5Y5z+fi0b4rfWvK2Ym8aaNbV883/YLFaNgRhuJ3D+7ZqXA/7+
+         zOp8UO2v22EphVt10Xe8IsqFmvyteYJLcY2UoCf7WUWESBgC49H+WS83R6A3W6H3reFD
+         oXX2Z34yyDqjpnYUnWzPgYtAT1FmxtGXRvjYN8MmgNe4GowKLY+Sbmq46rOdUG8oq2PE
+         rdig==
+X-Forwarded-Encrypted: i=1; AJvYcCX84zeVTNc5yX6Bw2HDxwPfWfPdHfKCPpAOHQpcxTm9N6W6uvQob3y3Ob8U1XZasDvnuF6H+EGWV42fqg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUdVl+Z2Bk8GYvAaY0niX4fLkFFJLgkcEy4Xi6oIUbq6f4OXUc
+	3dulJqGpWmxXa7ujZ4lbWk2fCm7dWHek9tgAw5ihols18ZKC8SQHgg6RT3CjKincfPcB/0ZkhyC
+	DLHQ=
+X-Google-Smtp-Source: AGHT+IFR8YX7tjuzxJabSAFvoaA40ci5R7c3N3UaaVo2uS3lIw6hBhtyshxvIgp/4QS44IRnrym9eg==
+X-Received: by 2002:a05:6602:3426:b0:82a:a998:ebab with SMTP id ca18e2360f4ac-8353d4fe3c9mr231092239f.11.1728481791466;
+        Wed, 09 Oct 2024 06:49:51 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dba90f4166sm43695173.159.2024.10.09.06.49.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Oct 2024 06:49:50 -0700 (PDT)
+Message-ID: <07e306a9-db8b-40c7-834a-ec9831940b78@kernel.dk>
+Date: Wed, 9 Oct 2024 07:49:49 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,35 +62,34 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] nvme: add rotational support
-To: Christoph Hellwig <hch@lst.de>
-Cc: kbusch@kernel.org, dlemoal@kernel.org, cassel@kernel.org,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, =?UTF-8?Q?Matias_Bj=C3=B8rling?=
- <matias.bjorling@wdc.com>, Wang Yugui <wangyugui@e16-tech.com>
-References: <20241008145503.987195-1-m@bjorling.me>
- <20241009074355.GA16181@lst.de>
+Subject: Re: [PATCH 1/2] block: also mark disk-owned queues as dying in
+ __blk_mark_disk_dead
+To: Christoph Hellwig <hch@lst.de>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: YangYang <yang.yang@vivo.com>, linux-block@vger.kernel.org
+References: <20241009113831.557606-1-hch@lst.de>
+ <20241009113831.557606-2-hch@lst.de> <20241009123123.GD565009@google.com>
+ <20241009124137.GA21408@lst.de>
 Content-Language: en-US
-From: =?UTF-8?Q?Matias_Bj=C3=B8rling?= <m@bjorling.me>
-In-Reply-To: <20241009074355.GA16181@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241009124137.GA21408@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 09-10-2024 09:43, Christoph Hellwig wrote:
-> On Tue, Oct 08, 2024 at 04:55:01PM +0200, Matias Bjørling wrote:
->> From: Matias Bjørling <matias.bjorling@wdc.com>
->>
->> Enable support for NVMe devices that identifies as rotational.
->>
->> Thanks to Keith, Damien, and Niklas for their feedback on the patchset.
+On 10/9/24 6:41 AM, Christoph Hellwig wrote:
+>> // A silly nit: it seems the code uses blk_queue_flag_set() and
+>> // blk_queue_flag_clear() helpers, but there is no queue_flag_test(),
+>> // I don't know what if the preference here - stick to queue_flag
+>> // helpers, or is it ok to mix them.
 > 
-> Hmm, the only previous version I've seen was the the RFCs from
-> Wang Yugui, last seen in August.
-> 
-> What the improvement over that version?  Note that it also came
-> with basic nvmet support which is kinda nice.
+> Yeah.  I looked into a test_and_set wrapper, but then saw how pointless
+> the existing wrappers are.  So for now this just open codes it, and
+> once we're done with the fixes I plan to just send a patch to remove
+> the wrappers entirely.
 
-Ah, I made the patches without awareness of the earlier efforts.
+Agree, but that's because you didn't do it back when you changed them to
+be just set/clear bit operations ;-). They should definitely just go
+away now.
 
-This version, together with Keith's nvmet patch, does not rely on 
-setting/checking the CRIMS flag.
+-- 
+Jens Axboe
