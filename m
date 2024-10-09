@@ -1,59 +1,59 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDEA18FDAF;
-	Wed,  9 Oct 2024 11:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7031A18E343;
+	Wed,  9 Oct 2024 11:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728474038; cv=none; b=HXmOdQnljqY4E5R6ECUKPs9IV9dtxShfxLgwBEWEenBmGglPTO8S33nWqbOnkBB3Ll1Bl2agohRJT7iWbyC/g8xsiocEgorh7oxYN9PIexs+WsDXoEsgoyXp4KFf1baxFR7PRp+cMNZYGydJpFZqcpNihofmhNk9I/LtGq9vefo=
+	t=1728474782; cv=none; b=NVeA4bL98KwUmIh2Di7iM8bGVo8oBuMjcUobo6qDReUJtCgR6XDKN1heZcPCbkMyqkrR4pW/IjvUtb8ZUq2hlK3oOAThApzYtZOWXj5YGwPYNSIeCx4TSOgsji2jJQPp8Iwl9/f8WaX5WdMqU8ABt6KUByiS5w5gg7/iQrMZkO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728474038; c=relaxed/simple;
-	bh=a+57C84rClzBS7ubk6LgHlFunx8dFXsKxDKBsYdCEV8=;
+	s=arc-20240116; t=1728474782; c=relaxed/simple;
+	bh=XplJHMsY/rZE5Wb3LR3oWscFaiUId+MmQeZs4dRGmAw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sapXcYMpZuh440ZZnTWYy0zFvsZUahF5K9TtZKV/cNdVF5GBB8ZK21Ff/I9ezQSOP40Fthj3VQ6kZdbO0qgWa7U6GWE/CUbMUocA8g2Uw42dFhXe62oyBTASAxN9ms/PjTVcR13aJlSkmbQbhVuYYZee9IqNlKZUzynWLkme16s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cIFwWgck; arc=none smtp.client-ip=209.85.215.169
+	 In-Reply-To:Content-Type; b=MxG8ZwmIvJl+CIZy7AsztoI8JaTpYGRIcH5T4fQWNQJ/DVHJD8VLatmk7FgPgfDT/NSHmiOuzEhCzdKaOL8m3y+SW+Yk0QZkCgruPDuBfAJrsIdU5/yOvtXav9B1hYnLLDGre7AaTfOiwqgGYvWoZLpAn1GdpETOnDjROkkeCu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SIzgBMn/; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cIFwWgck"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7db54269325so5531210a12.2;
-        Wed, 09 Oct 2024 04:40:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SIzgBMn/"
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-37d3ae4a048so397762f8f.3;
+        Wed, 09 Oct 2024 04:53:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728474037; x=1729078837; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728474779; x=1729079579; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0U8brGX+QXwXhzrsq4Sm++YDJFuC1KzTkr7MoDharJQ=;
-        b=cIFwWgckwTFKzd7D1YgAX31UmOhr9OvdQHJ21STAjHacvGXXTrQEJQt/ccG2iPH9bx
-         hDdCcLFoY40P6jv9B7N6jbcX8zs3+PsCRd74VSfoeuMa/JQzVIa0U05RmRYR+Z8IPj3n
-         nE68B5OKB6FcfhdGt3PH5e6GzZ0+rp6SlR8a4SCZs/Ty0nz4Jn5mb2Xk8nVIsWM23Duq
-         gFrUUNzU02u8ATkE691LwSy25QllZ32mqcHkzbRmBtJDcZD0L9Ne2ANdprCbwni6ZXz7
-         8uEIaume1Q3qSRBJMNiZ5/+kooHVEhJcDNiWuE8rW2WWWgQM/m4bHR/iSR+5uFvNDCQP
-         caHw==
+        bh=khhqIPlwJBadfdybhRWW7Y5gqxa03C7W5xOqWI4I2uU=;
+        b=SIzgBMn/uCCqajDh7A6KgC1OrYZuOevjzaKO0+GOPBE2tg5pR1iWol/xuhtJe9eQcO
+         l0fEOIT5UD4oA4W0ZTGM3rUdyDUrk7T6HwAlWzTvYey+PEr98FaUl4qpBFZZ2bctfAcm
+         Zum/nJolxDYhnxEJZgeB4L2dVm5ykDJSuBTCiEvC9JMBP+o/nrxdY/JEnIRJIqufaxWE
+         6tXmJ/eaxzIwukQQyqiKZcc34oktI3fPAJCyYZxIiG9W9uSbI5NDzKPwjGT+9y8NElPe
+         EbK8aXUqjYEMM1dvrU75hfPj1IrpW3QNkqFMSKi5aZ6I/lJ2AMeYoAYpSj3GN1fbZeUV
+         5S0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728474037; x=1729078837;
+        d=1e100.net; s=20230601; t=1728474779; x=1729079579;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0U8brGX+QXwXhzrsq4Sm++YDJFuC1KzTkr7MoDharJQ=;
-        b=BGfUr2wbZVPgIHkB5zspEGvzjWiZzRKJ1xtdD3EStwKZg2Lb6Kx+RrABlJgwtQeh2R
-         T8O6prdzL+B67x6HukKH07ImAIfxW8mbVSnKFOGFlWJNH8JefI/EKNX9awTAQ11bqvHr
-         JWd//ANvI8RgGZpFDwyxuyAYwMVQXtTAJ1Bf22yLmJuIgLfms2ir3zMazSXT7KmhPus8
-         qQhkWNZGAz5sqbVUK9Dl78hV2Xjq0UAtUig0s+Dkzx9Kb/2+u/zCKcLJTNug7zMalmda
-         S4g3zR459wuADL8tpXc3qexETb8hfKbd3j0hkdRlrUrTMi30Up/DwiMI+xQ5/Tuy0IWd
-         klHg==
-X-Forwarded-Encrypted: i=1; AJvYcCW/i1HXSR6udqtiyr/hJ0JCvVMl/YjXrCVWxohFaFlktMnTO2g5sVmaPxRYSLiNJqCUpT3p7MMO1XgCfVRt@vger.kernel.org, AJvYcCXlym+zxjGm+EX/itcrJfC5q1AwoYAXdLZDzp9WZGVQ9dds1Uu4oc+dh5xSCIuME5IjXu0j9oKKicd66g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YynNnwAmDuO23GDC/QGwMmxsXDA2j3uFXSJ3htpNo/iubu1NRvd
-	MLvSzIY4QqHPzY6D61vAuJMHoIbIYyEjORgsjFl2ULBR7R51YMpf
-X-Google-Smtp-Source: AGHT+IHNCrNFUCi+dkI/CAAMqHJEaK/iEAEaXD0WwXQ2PiC0daDYO65uRP2ztK1slhpuqp5ZHtqYeQ==
-X-Received: by 2002:a05:6a21:31c7:b0:1cf:21c7:2aff with SMTP id adf61e73a8af0-1d8a3c30b74mr2933538637.23.1728474036778;
-        Wed, 09 Oct 2024 04:40:36 -0700 (PDT)
-Received: from ?IPV6:2409:40c0:1048:4b3c:cd38:b59:a263:1c9a? ([2409:40c0:1048:4b3c:cd38:b59:a263:1c9a])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e9f681f0cfsm8324278a12.27.2024.10.09.04.40.33
+        bh=khhqIPlwJBadfdybhRWW7Y5gqxa03C7W5xOqWI4I2uU=;
+        b=rxT7A6tKARuyiIrpMHr/NFLSGW1IhcTdSB2xRGsrFYpbrMpgrwDGg8kHR3OXI2IvBp
+         6+2edyNynRHm5T3fsGaFXCoH72+wXPvZLq2fLXbEIoH2mxyCH1gDidMjlQ8/dta7FcFa
+         LDhNNwmgGsX0gjZGxkQF6NW1MHZwjTgYFi6rwBiduQz6wG2JNnCoVtwGpD3yLl8CfCrz
+         eFObEJARECW4XRlHOQ3kiLJ5TXdC/eOm15C/EJS4h4bkaeM+LfXO92A8Jh3iL7kz9jWj
+         WSR7+Thgf3t8ju3albyjRCzDcFNdGZL8T/yjLWiCIK9vSLdjgoVQk8q70Fk+lCm/5QVk
+         FQaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/ZxPnHlXRMxEdSRi5W2mfzcw551YavT33/B7sGau7Eilw4V7MYmJU2SZIs9sSF+Z8biRKdrw/33kfPFM=@vger.kernel.org, AJvYcCWunWhEypfJj4FHiKKszwn1/jq4mVOEdVXgdmcwE0N7mNz94msyMiDfNeJHY5qxz4KZ5EugE3erLw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrFmx7iKi+meDFJUvzOzArx7vL9aq7om0lZ8nzoV5gRIgmq243
+	o02n0Wz18FMBDK+mC4bYW4B1X8+A+2Aw29dBjC5X6F06IAqLhOAH
+X-Google-Smtp-Source: AGHT+IHI0zRDtnW95czknI0HrDmMEsIz4FPF1Ek731FBw+bMwW9CNNDjY3boYvw6SwgYrCf7FfMXGg==
+X-Received: by 2002:adf:9b96:0:b0:37c:cf73:4bf7 with SMTP id ffacd0b85a97d-37d3aa2e27dmr1383856f8f.34.1728474778395;
+        Wed, 09 Oct 2024 04:52:58 -0700 (PDT)
+Received: from [192.168.42.45] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1690f66csm10218746f8f.13.2024.10.09.04.52.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2024 04:40:36 -0700 (PDT)
-Message-ID: <47216282-a3b4-4b85-a5d1-dadbf6814d76@gmail.com>
-Date: Wed, 9 Oct 2024 17:10:30 +0530
+        Wed, 09 Oct 2024 04:52:58 -0700 (PDT)
+Message-ID: <f6d34a4d-bf46-4120-8e2d-9585912a8867@gmail.com>
+Date: Wed, 9 Oct 2024 12:53:34 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,31 +61,87 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] block: Fix uninitialized symbol 'bio' in
- blk_rq_prep_clone
-To: Christoph Hellwig <hch@infradead.org>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241004100842.9052-1-surajsonawane0215@gmail.com>
- <20241008175215.23975-1-surajsonawane0215@gmail.com>
- <ZwYxA1sfQdaj0Hy3@infradead.org>
- <6e290cc3-0be1-4ee9-8e13-351f8cd9f658@gmail.com>
- <ZwZq5hIJSmQW1Sxa@infradead.org>
+Subject: Re: [PATCH V6 4/8] io_uring: support SQE group
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+ linux-block@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
+References: <20240912104933.1875409-1-ming.lei@redhat.com>
+ <20240912104933.1875409-5-ming.lei@redhat.com>
+ <239e42d2-791e-4ef5-a312-8b5959af7841@gmail.com> <ZwIJ4Hn52-tm22Z8@fedora>
 Content-Language: en-US
-From: Suraj Sonawane <surajsonawane0215@gmail.com>
-In-Reply-To: <ZwZq5hIJSmQW1Sxa@infradead.org>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ZwIJ4Hn52-tm22Z8@fedora>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 09/10/24 17:07, Christoph Hellwig wrote:
-> On Wed, Oct 09, 2024 at 04:30:56PM +0530, Suraj Sonawane wrote:
->> Should I submit a new version with the added empty line and explanation
->> about the tool and function issues?
+On 10/6/24 04:54, Ming Lei wrote:
+> On Fri, Oct 04, 2024 at 02:12:28PM +0100, Pavel Begunkov wrote:
+>> On 9/12/24 11:49, Ming Lei wrote:
+>> ...
+>>> --- a/io_uring/io_uring.c
+>>> +++ b/io_uring/io_uring.c
+>>> @@ -111,13 +111,15 @@
+>> ...
+>>> +static void io_complete_group_member(struct io_kiocb *req)
+>>> +{
+>>> +	struct io_kiocb *lead = get_group_leader(req);
+>>> +
+>>> +	if (WARN_ON_ONCE(!(req->flags & REQ_F_SQE_GROUP) ||
+>>> +			 lead->grp_refs <= 0))
+>>> +		return;
+>>> +
+>>> +	/* member CQE needs to be posted first */
+>>> +	if (!(req->flags & REQ_F_CQE_SKIP))
+>>> +		io_req_commit_cqe(req->ctx, req);
+>>> +
+>>> +	req->flags &= ~REQ_F_SQE_GROUP;
+>>
+>> I can't say I like this implicit state machine too much,
+>> but let's add a comment why we need to clear it. i.e.
+>> it seems it wouldn't be needed if not for the
+>> mark_last_group_member() below that puts it back to tunnel
+>> the leader to io_free_batch_list().
 > 
-> Let's wait for Jens if he wants a resend or not.  In the meantime
-> just tell us what tool you are using.
+> Yeah, the main purpose is for reusing the flag for marking last
+> member, will add comment for this usage.
 > 
-Okay sure!
-I found this error using the Smatch tool.
+>>
+>>> +
+>>> +	/* Set leader as failed in case of any member failed */
+>>> +	if (unlikely((req->flags & REQ_F_FAIL)))
+>>> +		req_set_fail(lead);
+>>> +
+>>> +	if (!--lead->grp_refs) {
+>>> +		mark_last_group_member(req);
+>>> +		if (!(lead->flags & REQ_F_CQE_SKIP))
+>>> +			io_req_commit_cqe(lead->ctx, lead);
+>>> +	} else if (lead->grp_refs == 1 && (lead->flags & REQ_F_SQE_GROUP)) {
+>>> +		/*
+>>> +		 * The single uncompleted leader will degenerate to plain
+>>> +		 * request, so group leader can be always freed via the
+>>> +		 * last completed member.
+>>> +		 */
+>>> +		lead->flags &= ~REQ_F_SQE_GROUP_LEADER;
+>>
+>> What does this try to handle? A group with a leader but no
+>> members? If that's the case, io_group_sqe() and io_submit_state_end()
+>> just need to fail such groups (and clear REQ_F_SQE_GROUP before
+>> that).
+> 
+> The code block allows to issue leader and members concurrently, but
+> we have changed to always issue members after leader is completed, so
+> the above code can be removed now.
 
-Best,
-Suraj Sonawane
+One case to check, what if the user submits just a single request marked
+as a group? The concern is that we create a group with a leader but
+without members otherwise, and when the leader goes through
+io_submit_flush_completions for the first time it drops it refs and
+starts waiting for members that don't exist to "wake" it. I mentioned
+above we should probably just fail it, but would be nice to have a
+test for it if not already.
+
+Forgot to mention, with the mentioned changes I believe the patch
+should be good enough.
+
+-- 
+Pavel Begunkov
