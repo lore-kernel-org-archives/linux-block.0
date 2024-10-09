@@ -1,25 +1,59 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC6D18FC93;
-	Wed,  9 Oct 2024 09:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF1241C6A;
+	Wed,  9 Oct 2024 11:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728467668; cv=none; b=MozJbKU3/Wa+mFOZfFfUPvCRtBcaWhY6Hp+51BHqcpWU9g+DSwxDlRxv/clqk/jUnIONiQanQKPVDrIt+AsCJjDL/YpwrPokzvPURedFVQhF0aQCU9VmPnLkfdPpZBgQwPpokVaqWdSeTUFEwLfb9YsL71ReDA3Yfm29ip/qxm0=
+	t=1728471664; cv=none; b=BxVN84V4co5RdapAL12sYwe21KrfxrD93V7ZWlmiF73abrRtFd2TNJZmoXSEc6YqQjbt9c/VuHTiySJCgKzDtB5sqcdXa3OcL2i7gnsyKomaWmuzMrkU1Sp18Bjt0OMPka7Ul+qQYk21xCjyq9w2qW0oXNoOTWryWYPMIdbKHVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728467668; c=relaxed/simple;
-	bh=VBotJtPDGGEmR2CyFHFYZxMHWD41xoURujuuBIez2GI=;
+	s=arc-20240116; t=1728471664; c=relaxed/simple;
+	bh=JKxhyQ9BOgWSYDC5gllA6FYyekxp6zW4aJDHnbf0qRw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oz0VsCvRq71W5DCEr98oF6wnjeNl84a2ng9XN5YonnIlRfwfDC9KKVFAsdkwlHwh3FTnrLGapQHUaP8Ji7gDe2Gab5LwFBJSFfd6IaAwSi68JpWseJh78FKXQ+zu+nSYaAkxxiblpNEQd6ox7tt4sPVmcnZNJ7ArH5hnbSzusxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 83E14FEC;
-	Wed,  9 Oct 2024 02:54:55 -0700 (PDT)
-Received: from [10.1.30.40] (e127648.arm.com [10.1.30.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3A79E3F64C;
-	Wed,  9 Oct 2024 02:54:21 -0700 (PDT)
-Message-ID: <c53236ad-b94e-4508-8f3a-7229e32f62bc@arm.com>
-Date: Wed, 9 Oct 2024 10:54:18 +0100
+	 In-Reply-To:Content-Type; b=e4f50UhgRMb0bZyRQ8/HeeKpo2lPKNMiPJlpF4X4EcDDP3RvOdSzBSKLNNIcgnGusOTa+r44+uL9m/xftKqnx7UT7pCEE+e8qqFvmLnC9Q8SvGM5ow70Z68OnF88MX+1zRpyJqD5zUP9elsFXZ2gjStei+E4GQkHaVlN8NtqrEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j9aCpzmZ; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j9aCpzmZ"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20bb610be6aso73182735ad.1;
+        Wed, 09 Oct 2024 04:01:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728471662; x=1729076462; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8OiY6CpBEzHsjraTshq69qQz+AGO9HWUOSPdHLM5wrI=;
+        b=j9aCpzmZyoyq7YC9qp8z6eQ+PhsImBLFO0raAzP6eYIHhCZ4cY+HOQIDW3xgXaH2O4
+         +aa9nNC6Z5O0o1vkkeWl6IslfJ5QLUSUgew/p887siFdsPCsNHnKIxV241wlwsJCtpeq
+         +dSaVmWj15Qo/UxPTkAvzxlM9EwRTe4kCOtfHrjAwsPGRx8Y+STX0OQ/qrtqEPAxWyiW
+         XGzIwsEej7TEbGq159K4yxUCcNiecAEYw2te1spVFzeuTuONGzqV1UHkUa8GIXB5I6v8
+         DxCpTU3L12FrLnJiIMPqmCGLjUSbonMiMSn/mbezKmFVW5qkEJzTSMQTagb7yRJs6Hmd
+         8FGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728471662; x=1729076462;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8OiY6CpBEzHsjraTshq69qQz+AGO9HWUOSPdHLM5wrI=;
+        b=inMunfkVIPFbeVrRnzWnwuw8e2pJ/M+pt8gm1+2V8XeNbXi/cOHBqcWrWX7aG6POGh
+         pspNUjlXPr9qjtc2YK38zGterNZLSX8PqQg2OggJsapmQm9e9bxjbQykXCx6xh/ofPwG
+         5igZ5FbBonQaoN01F3ywfX7WdCIa5wNbDYRBNqbGPCs67XwkhvPAzWUlBqQq+RI3BuV1
+         tEmNLLMCopOxQL+VuJkIp0Elb7EBUs+JBC8aJNLRfAK9XDH9wrUun46CNd5fvzhoWijI
+         9p2fAVTSBXKIBkR+7YNLlTS9texgXoqzpVpVqCfnistbe4Rc8hPEai0bQ19y5pVn1s5X
+         Us5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUlVY+gMQ23URgv/0ZuMQGzlTZ/WaZTlL16TQlaE9xkoZubYP7cLwgmyz9Kk/VZi42m3SKbRoKMd3ePzpor@vger.kernel.org, AJvYcCXlQ+1pG4C/64zCHtZol/+UB4px3nmI/1YKC/8351s9pobKS4ZKUr0bECwONCA2j1YPIjiFcw/DZpnA2g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxB4Zz8mYtmWN9S8Gm+N3fl8JGvST7esIQmCOS/3p0DN4Z12HGL
+	AaszXsjHSuLdKHYwCNpWrGsB7+PpEhD51degQj8EECdFuUO8fw8DvxF8hA==
+X-Google-Smtp-Source: AGHT+IF07LOXv7qo1PT0ouEnajyTQ5JOdx3xpv5X/Ep9k2ZNrxULBFiCmymWI7fNe5z6CLixrrnzSQ==
+X-Received: by 2002:a17:903:2302:b0:20c:6098:473d with SMTP id d9443c01a7336-20c637a4411mr24401435ad.60.1728471662264;
+        Wed, 09 Oct 2024 04:01:02 -0700 (PDT)
+Received: from ?IPV6:2409:40c0:1048:4b3c:cd38:b59:a263:1c9a? ([2409:40c0:1048:4b3c:cd38:b59:a263:1c9a])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c138cff51sm69020185ad.87.2024.10.09.04.00.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Oct 2024 04:01:01 -0700 (PDT)
+Message-ID: <6e290cc3-0be1-4ee9-8e13-351f8cd9f658@gmail.com>
+Date: Wed, 9 Oct 2024 16:30:56 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -27,126 +61,39 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 5/8] cpufreq/schedutil: Remove iowait boost
-To: Andres Freund <andres@anarazel.de>
-Cc: Quentin Perret <qperret@google.com>, "Rafael J. Wysocki"
- <rafael@kernel.org>, linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
- peterz@infradead.org, juri.lelli@redhat.com, mingo@redhat.com,
- dietmar.eggemann@arm.com, vschneid@redhat.com, vincent.guittot@linaro.org,
- Johannes.Thumshirn@wdc.com, adrian.hunter@intel.com, ulf.hansson@linaro.org,
- bvanassche@acm.org, asml.silence@gmail.com, linux-block@vger.kernel.org,
- io-uring@vger.kernel.org, qyousef@layalina.io, dsmythies@telus.net,
- axboe@kernel.dk
-References: <20240905092645.2885200-1-christian.loehle@arm.com>
- <20240905092645.2885200-6-christian.loehle@arm.com>
- <CAJZ5v0hJWwsErT193i394bHOczvCQwU_5AVVTJ1oKDe7kTW82g@mail.gmail.com>
- <Zv5oTvxPsiTWCJIo@google.com> <6e21e8f1-e3b4-4915-87cc-6ce77f54cc8a@arm.com>
- <io3xcj5vpqbkojoktbp3fuuj77gqqkf2v3gg62i4aep4ps36dc@we2zwwp5hsyt>
+Subject: Re: [PATCH v4] block: Fix uninitialized symbol 'bio' in
+ blk_rq_prep_clone
+To: Christoph Hellwig <hch@infradead.org>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241004100842.9052-1-surajsonawane0215@gmail.com>
+ <20241008175215.23975-1-surajsonawane0215@gmail.com>
+ <ZwYxA1sfQdaj0Hy3@infradead.org>
 Content-Language: en-US
-From: Christian Loehle <christian.loehle@arm.com>
-In-Reply-To: <io3xcj5vpqbkojoktbp3fuuj77gqqkf2v3gg62i4aep4ps36dc@we2zwwp5hsyt>
-Content-Type: text/plain; charset=UTF-8
+From: Suraj Sonawane <surajsonawane0215@gmail.com>
+In-Reply-To: <ZwYxA1sfQdaj0Hy3@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/5/24 01:39, Andres Freund wrote:
-> Hi,
+On 09/10/24 13:00, Christoph Hellwig wrote:
+> The patch itself looks good:
 > 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 > 
-> A caveat: I'm a userspace developer that occasionally strays into kernel land
-> (see e.g. the io_uring iowait thing). So I'm likely to get some kernel side
-> things wrong.
-
-Thank you for your input!
-
+> On Tue, Oct 08, 2024 at 11:22:15PM +0530, SurajSonawane2415 wrote:
+>> Fix the uninitialized symbol 'bio' in the function blk_rq_prep_clone
+>> to resolve the following error:
+>> block/blk-mq.c:3199 blk_rq_prep_clone() error: uninitialized symbol 'bio'.
 > 
-> On 2024-10-03 11:30:52 +0100, Christian Loehle wrote:
->> These are the main issues with transforming the existing mechanism into
->> a per-task attribute.
->> Almost unsolvable is: Does reducing "iowait pressure" (be it per-task or per-rq)
->> actually improve throughput even (assuming for now that this throughput is
->> something we care about, I'm sure you know that isn't always the case, e.g.
->> background tasks). With MCQ devices and some reasonable IO workload that is
->> IO-bound our iowait boosting is often just boosting CPU frequency (which uses
->> power obviously) to queue in yet another request for a device which has essentially
->> endless pending requests. If pending request N+1 arrives x usecs earlier or
->> later at the device then makes no difference in IO throughput.
+> To make this more readable I'd usually keep and empty line before
+> the actual error message.  But more importantly it would be useful
+> to explain what tool generated said error message, and maybe also add
+> a summary of the discussion why this function was in many ways
+> pretty horrible code.
 > 
-> That's sometimes true, but definitely not all the time? There are plenty
-> workloads with low-queue-depth style IO. Which often are also rather latency
-> sensitive.
-> 
-> E.g. the device a database journal resides on will typically have a low queue
-> depth. It's extremely common in OLTPish workloads to be bound by the latency
-> of journal flushes. If, after the journal flush completes, the CPU is clocked
-> low and takes a while to wake up, you'll see substantially worse performance.
+Thank you for the review and suggestions.
 
-Yeah absolutely and if we knew what a latency-sensitive journal flush is tuning
-cpuidle and cpufreq to it would probably be reasonable.
-I did test mmtests filebench-oltp that looked fine, do you have any other
-benchmarks you would like to see?
+Should I submit a new version with the added empty line and explanation 
+about the tool and function issues?
 
->> If boosting would improve e.g. IOPS (of that device) is something the block layer
->> (with a lot of added infrastructure, but at least in theory it would know what
->> device we're iowaiting on, unlike the scheduler) could tell us about. If that is
->> actually useful for user experience (i.e. worth the power) only userspace can decide
->> (and then we're back at uclamp_min anyway).
-> 
-> I think there are many cases where userspace won't realistically be able to do
-> anything about that.
-> 
-> For one, just because, for some workload, a too deep idle state is bad during
-> IO, doesn't mean userspace won't ever want to clock down. And it's probably
-> going to be too expensive to change any attributes around idle states for
-> individual IOs.
-
-So the kernel currently applies these to all of them essentially.
-
-> 
-> Are there actually any non-privileged APIs around this that userspace *could*
-> even change? I'd not consider moving to busy-polling based APIs a realistic
-> alternative.
-
-No and I'm not sure an actual non-privileged API would be a good idea, would
-it? It is essentially changing hardware behavior.
-So does busy-polling of course, but the kernel can at least curb that and
-maintain fairness and so forth.
-
-> 
-> For many workloads cpuidle is way too aggressive dropping into lower states
-> *despite* iowait. But just disabling all lower idle states obviously has
-> undesirable energy usage implications. It surely is the answer for some
-> workloads, but I don't think it'd be good to promote it as the sole solution.
-
-Right, but we (cpuidle) don't know how to distinguish the two, we just do it
-for all of them. Whether kernel or userspace applies the same (awful) heuristic
-doesn't make that much of a difference in practice.
-
-> 
-> It's easy to under-estimate the real-world impact of a change like this. When
-> benchmarking we tend to see what kind of throughput we can get, by having N
-> clients hammering the server as fast as they can. But in the real world that's
-> pretty rare for anything latency sensitive to go full blast - rather there's a
-> rate of requests incoming and that the clients are sensitive to requests being
-> processed more slowly.
-
-Agreed, this series is posted as RFT and I'm happy to take a look at any
-regressions for both the cpufreq and cpuidle parts of it.
-
-> 
-> 
-> That's not to say that the current situation can't be improved - I've seen way
-> too many workloads where the only ways to get decent performance were one of:
-> 
-> - disable most idle states (via sysfs or /dev/cpu_dma_latency)
-> - just have busy loops when idling - doesn't work when doing synchronous
->   syscalls that block though
-> - have some lower priority tasks scheduled that just burns CPU
-> 
-> I'm just worried that removing iowait will make this worse.
-
-I just need to mention again that almost all of what you replied does refer to
-cpuidle, not cpufreq (which this particular patch was about), not to create more
-confusion.
-
-Regards,
-Christian
+Best regards,
+Suraj Sonawane
