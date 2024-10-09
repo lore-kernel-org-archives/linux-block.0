@@ -1,104 +1,163 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B9D1A255C
-	for <linux-block@vger.kernel.org>; Wed,  9 Oct 2024 12:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07288198A19;
+	Wed,  9 Oct 2024 12:56:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728477815; cv=none; b=gjfENaKFnFnUBB19+7y9nd+66ZNbzXtll/ZCtugcdNrBkB1LjcOe1phm3mTqTfnR5wUCxfUdiWqAhriJw3+mS9cR3lfd4BxFZaCPHDacWQnLcQJSoIUu1clRzh+26/Ventl7GO8zn8p3HOq83fLmv5QoHrHz45VGGlpdPJp9Nog=
+	t=1728478595; cv=none; b=cpj7A4iYhLHTS+cry4WDbbRs25YI5KqIOYID+LCexvkMMU6CILKYk+oSnU9FUzsqnpOPJK2H8LqnQAIVpGdZ8FdJwzs0iB8b2eKSpyu1JoGlAK2Nyb31FZe3gY2nyhi5Q95ZXgbEm354dT0nmRWGFCCq3IJCYB+JOjH0oX5ldqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728477815; c=relaxed/simple;
-	bh=EJ0mjZpiTvo7aaYFVM9sQ4nYMP1oKk2RR4Iz/0DbNWA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TWJ83UrT+9R6s/3URgyDwYV9Ch897OhxjgXfov507fzW3C6wKfNsJOcaWtS7JBPqk9cl4/ZbQq4dVkrmlzHRBgnk7TrUoahV10ztO1AfjXrSIw+YBFgxaZhoA3mc3VQsjk36d94KIXFpDt2C8/dW+f9+w0NQ/o40Z4eKO+iUxMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=LPc5Nr19; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1728478595; c=relaxed/simple;
+	bh=9oPri9qqasBMmB9DQz59K5YGMiMULcNaNeBLDi08+8k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=asCCZiuesvHlOCEvv31z+7QnzUr1iYUIJrhAdElaDaJ7Zw2YiWWlpNVf/gxUg71WfvObjrHLrt3rcXPWgYnI0M0Lwc45qh/7Yk7RxDPWrURkpcjhTOmQASJqwmIZP2G91R8DCr4O4HFx6gzQJ/KzFnrRH/u2WTBDOdwLoqTRp78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bjorling.me; spf=pass smtp.mailfrom=bjorling.me; dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b=lULr2O2i; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RjjuVzkA; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bjorling.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bjorling.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="LPc5Nr19"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20b58f2e1f4so46013235ad.2
-        for <linux-block@vger.kernel.org>; Wed, 09 Oct 2024 05:43:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1728477813; x=1729082613; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uyzyg4yHFKtiomrdvdh9IAhRc4x4c/V6Ile49WRVMr0=;
-        b=LPc5Nr19otrPbFFuz7gP3iLu/m2IjOHcnct2S/oBrd/C3avd4S0H1FizKJeNUawogp
-         FftFji44j6bw3msDRSxjHQGZlg9cgCJvEyg1hINZ1stqqBd9E4/oHx8juWGM8yrEmigr
-         1UPlubbs4In9rlA9m6mYoF0eUh3NLwGsAGMV0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728477813; x=1729082613;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uyzyg4yHFKtiomrdvdh9IAhRc4x4c/V6Ile49WRVMr0=;
-        b=VUegOhmmWvBBGWSx/21IHYAucS6rM13AGG1h2SnDceGy2R5nda875hKc7Bykw173af
-         8DXnhvU/c0gRAa2WU8FzP22iiS6k9zOvm/Uic+Rt8IhZIUvL3iUgTW9KNuRfL9cfo3cS
-         /4cu1i/hKxB2FNC2i7EwF+qWJYwWD5I9yZJhG+3mha4hO1/J8MkmpKaJh5GM3lXsUxw2
-         11Mwr89VN9BfzfHGNblJf6r5e7w+1jxFk4S3VAWSyxT5XmUGEbh11Ey3RKELmPLeQmsE
-         LkN1hbQqLgE7rGrIgcoTnY43Z6iZufeWCz/QfGlh48GNClCKFMt55tfO0tWrZO2VjK4n
-         m6DA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHTOU/YTPgylMsMpRJBjCCzezh0fxcKJj8DRejBN4063lQRJy3Lgx2LJaIR5rV6wcqsLopO2OhI6d5OA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuDR5P1CbBh9sy6nNxTQV2448aV2dM1xwewXrwwTCvbzQUnj4h
-	8Zrhz2GDHOZBxdskEKs2+VPpKaeerB52IjsqTgcHTCKl6aRLpvGTrmoro1CNNA==
-X-Google-Smtp-Source: AGHT+IEUwPHJySPKzKJx8pK5OxTSSSycTnDz6yH48hb4lxKvVkk1+Q32y5eALYRDe4nnUCx2/v9nvQ==
-X-Received: by 2002:a17:903:2307:b0:20c:6bff:fcae with SMTP id d9443c01a7336-20c6c00012cmr25875285ad.5.1728477813685;
-        Wed, 09 Oct 2024 05:43:33 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:52d9:628d:d815:8496])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c13930b92sm69721945ad.128.2024.10.09.05.43.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2024 05:43:33 -0700 (PDT)
-Date: Wed, 9 Oct 2024 21:43:30 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>, YangYang <yang.yang@vivo.com>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: also mark disk-owned queues as dying in
- __blk_mark_disk_dead
-Message-ID: <20241009124330.GE565009@google.com>
-References: <20241009113831.557606-1-hch@lst.de>
- <20241009113831.557606-2-hch@lst.de>
- <20241009123123.GD565009@google.com>
- <20241009124137.GA21408@lst.de>
+	dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b="lULr2O2i";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RjjuVzkA"
+Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
+	by mailfout.phl.internal (Postfix) with ESMTP id C13DE13802E0;
+	Wed,  9 Oct 2024 08:56:29 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-12.internal (MEProxy); Wed, 09 Oct 2024 08:56:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bjorling.me; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1728478589;
+	 x=1728564989; bh=/AzJW0N5KlzFwGk56ZS/QWVVUxZznWUyJSgRHfPVWIs=; b=
+	lULr2O2iRO1OFbj6r6ObkI0ABNLJjclHuTgiYorMmC9yXQsEe8LQeAeMDiUcOQsb
+	r31e5qauOKL8zrg7qs5D4Xk4KmH3UQSeTtXaJ/sUEHAeZg9DFDuNnyzCKN7TYrVV
+	PQnj8B5ksdzZUJtvHbGpvVx0h7TrOFYAr/uPTGCffC8mc7KpWf027cGgYFAnPG47
+	cO4M5sewayP1WLHtfh9YnuHMt+B4v4dl3M8q4J2ahcNiHWUeVRgjZKXTRTVXZioa
+	Jv4ZN6cfTbudRH1VaTQkEZgWjchT9UMQ9fMaM7r+1L05I+cHM1Cq7IBpRPqgDvke
+	27AhnctxkEpRwW7pN0CQ4w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1728478589; x=
+	1728564989; bh=/AzJW0N5KlzFwGk56ZS/QWVVUxZznWUyJSgRHfPVWIs=; b=R
+	jjuVzkAacpX+gyzYy057yWObbkKF7JTsN8fr4sstvMXl5cJtyMcn5kK74M/3Qre3
+	a3hZtul0rdZM04Cjf5ZX/5Do42MQYGzTOhS3aaQVz83bCuL8bXSYdjaQtS5jzhf5
+	IfUQ/ARdADkZyzMZs4Ec3tBKsh8HxT6px2a4JR1d1d23All/xp4nNuPudsnzZqSf
+	gTq8xq9fD8gXXYgG80QWmQ903Pov46Xsm9JtEYZ5P7dwppUPz0dxcnL6A2uySKDm
+	skfZ7DWHB6LiEDjOwWJ2otnb2FMMa7sc19S6IBn1W4pQKyNXZvHzbfA+wDKTHDG8
+	BmzioGSWxbXsjHUzOA0+w==
+X-ME-Sender: <xms:fX0GZ1llMCZbH9_N2veLB2gplhiLomVR4rtoG1e0jMLZElTbBh8CXw>
+    <xme:fX0GZw05q6GyQ2C4mukE0zCXM55Da1mbKve8ielUym5L0dfpTv61OSd-Wqoe8U_XF
+    9h5iuWmT8DjXagwpQI>
+X-ME-Received: <xmr:fX0GZ7pQhYC9dx2FFvPGUy7xO3dpYehkZDK-lxdSxNjD5quHB4RoflxRFQYxdhY15ZX6py2yGXN7ccYb5xXwkTrM5Kr9Aw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeffedgiedtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtvdej
+    necuhfhrohhmpeforghtihgrshcuuehjpphrlhhinhhguceomhessghjohhrlhhinhhgrd
+    hmvgeqnecuggftrfgrthhtvghrnhepleehjefftdeijedvveeigffhgfdugeduieevudeh
+    jeefueffkeegjeffiefgheefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepmhessghjohhrlhhinhhgrdhmvgdpnhgspghrtghpthhtohepkedp
+    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepkhgsuhhstghhsehkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopehhtghhsehlshhtrdguvgdprhgtphhtthhopegulhgvmhhorghl
+    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtrghsshgvlheskhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtoheplhhinhhugidqnhhvmhgvsehlihhsthhsrdhinhhfrhgruggvrggu
+    rdhorhhgpdhrtghpthhtoheplhhinhhugidqsghlohgtkhesvhhgvghrrdhkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehmrghtihgrshdrsghjohhrlhhinhhgseifuggtrdgtoh
+    hm
+X-ME-Proxy: <xmx:fX0GZ1nnpXu1rct-gfyhbSgHB7IZA7ONhaJPKP60XIzMaS7ocQrSjg>
+    <xmx:fX0GZz07zWNh69s0gFFlE0a4_s3PYQM-YOevdx_ksqrjzfMkb-edfg>
+    <xmx:fX0GZ0ujveQY0oaLlJO5t01xYP4ZQpFmVs43y3gKx6n0nEQ1vVXKFQ>
+    <xmx:fX0GZ3V6NcvneDu72cF5w0lTuYN2bIuiRAzr6OQbHmdRGKoAmhzfGw>
+    <xmx:fX0GZ8LbcTilPp9YiRHz1t4rN8-BenERTb0jg7wtxVYhgjtEolQvKdMN>
+Feedback-ID: if4314918:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 9 Oct 2024 08:56:28 -0400 (EDT)
+Message-ID: <45a1326c-8a36-4f23-b5e6-c89bbefc5005@bjorling.me>
+Date: Wed, 9 Oct 2024 14:56:26 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009124137.GA21408@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] nvme: add rotational support
+To: Keith Busch <kbusch@kernel.org>
+Cc: hch@lst.de, dlemoal@kernel.org, cassel@kernel.org,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, =?UTF-8?Q?Matias_Bj=C3=B8rling?=
+ <matias.bjorling@wdc.com>
+References: <20241008145503.987195-1-m@bjorling.me>
+ <ZwVMLIt4iFX9MUjV@kbusch-mbp> <ZwWsZvOrQGQ2UR2P@kbusch-mbp>
+Content-Language: en-US
+From: =?UTF-8?Q?Matias_Bj=C3=B8rling?= <m@bjorling.me>
+In-Reply-To: <ZwWsZvOrQGQ2UR2P@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On (24/10/09 14:41), Christoph Hellwig wrote:
-> On Wed, Oct 09, 2024 at 09:31:23PM +0900, Sergey Senozhatsky wrote:
-> > >  	if (!test_bit(GD_OWNS_QUEUE, &disk->state)) {
-> > > +		if (test_bit(QUEUE_FLAG_RESURRECT, &q->queue_flags)) {
-> > > +			clear_bit(QUEUE_FLAG_DYING, &q->queue_flags);
-> > > +			clear_bit(QUEUE_FLAG_RESURRECT, &q->queue_flags);
-> > > +		}
-> > 
-> > Christoph, shouldn't QUEUE_FLAG_RESURRECT handling be outside of
-> > GD_OWNS_QUEUE if-block? Because __blk_mark_disk_dead() sets
-> > QUEUE_FLAG_DYING/QUEUE_FLAG_RESURRECT regardless of GD_OWNS_QUEUE.
+On 09-10-2024 00:04, Keith Busch wrote:
+> On Tue, Oct 08, 2024 at 09:13:48AM -0600, Keith Busch wrote:
+>> I still hope to see nvmet report this. It would be great to test this
+>> with HDD backed nvme-loop target.
 > 
-> For !GD_OWNS_QUEUE the queue is freed right below, so there isn't much
-> of a point.
-
-Oh, right.
-
-> > // A silly nit: it seems the code uses blk_queue_flag_set() and
-> > // blk_queue_flag_clear() helpers, but there is no queue_flag_test(),
-> > // I don't know what if the preference here - stick to queue_flag
-> > // helpers, or is it ok to mix them.
+> I took the liberty to write one up. Looks like everything is reporting
+> as expected.
 > 
-> Yeah.  I looked into a test_and_set wrapper, but then saw how pointless
-> the existing wrappers are.
+> ---
+> diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
+> index 954d4c0747704..e167c9a2ff995 100644
+> --- a/drivers/nvme/target/admin-cmd.c
+> +++ b/drivers/nvme/target/admin-cmd.c
+> @@ -685,6 +685,35 @@ static void nvmet_execute_identify_ctrl_nvm(struct nvmet_req *req)
+>   		   nvmet_zero_sgl(req, 0, sizeof(struct nvme_id_ctrl_nvm)));
+>   }
+>   
+> +static void nvmet_execute_id_cs_indep(struct nvmet_req *req)
+> +{
+> +	struct nvme_id_ns_cs_indep *id;
+> +	u16 status;
+> +
+> +	status = nvmet_req_find_ns(req);
+> +	if (status)
+> +		goto out;
+> +
+> +	id = kzalloc(sizeof(*id), GFP_KERNEL);
+> +	if (!id) {
+> +		status = NVME_SC_INTERNAL;
+> +		goto out;
+> +	}
+> +
+> +	id->nstat = NVME_NSTAT_NRDY;
+> +	id->anagrpid = req->ns->anagrpid;
+> +	id->nmic = NVME_NS_NMIC_SHARED;
+> +	if (req->ns->readonly)
+> +		id->nsattr |= NVME_NS_ATTR_RO;
+> +	if (req->ns->bdev && !bdev_nonrot(req->ns->bdev))
+> +		id->nsfeat |= NVME_NS_ROTATIONAL;
+> +
+> +	status = nvmet_copy_to_sgl(req, 0, id, sizeof(*id));
+> +	kfree(id);
+> +out:
+> +	nvmet_req_complete(req, status);
+> +}
+> +
+>   static void nvmet_execute_identify(struct nvmet_req *req)
+>   {
+>   	if (!nvmet_check_transfer_len(req, NVME_IDENTIFY_DATA_SIZE))
+> @@ -729,6 +758,9 @@ static void nvmet_execute_identify(struct nvmet_req *req)
+>   			break;
+>   		}
+>   		break;
+> +	case NVME_ID_CNS_NS_CS_INDEP:
+> +		nvmet_execute_id_cs_indep(req);
+> +		return;
+>   	}
+>   
+>   	pr_debug("unhandled identify cns %d on qid %d\n",
+> --
 
-Likewise.
+That was quick! Nice. Would you like me to pack it up in the serie and 
+resend?
 
-> So for now this just open codes it, and once we're done with the fixes
-> I plan to just send a patch to remove the wrappers entirely.
-
-Ack.
