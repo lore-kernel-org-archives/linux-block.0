@@ -1,99 +1,61 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF1241C6A;
-	Wed,  9 Oct 2024 11:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2987191F89;
+	Wed,  9 Oct 2024 11:37:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728471664; cv=none; b=BxVN84V4co5RdapAL12sYwe21KrfxrD93V7ZWlmiF73abrRtFd2TNJZmoXSEc6YqQjbt9c/VuHTiySJCgKzDtB5sqcdXa3OcL2i7gnsyKomaWmuzMrkU1Sp18Bjt0OMPka7Ul+qQYk21xCjyq9w2qW0oXNoOTWryWYPMIdbKHVw=
+	t=1728473832; cv=none; b=EL5I0UHZTGjB2Cx8DM8glgQaxQ7BZD0Jl/5zUCnTFLjuU5CSUQhzgqfAUlI1X2U4nwdbn0smnhIL3vN4aGixYa+b3Uk+VpQH18GCpW5/32KY5E7iSUjneuUoTBFq6qMV4+78DJks4X5w2rqxOzulge5IjWtLoe6VoFlT2YbjJN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728471664; c=relaxed/simple;
-	bh=JKxhyQ9BOgWSYDC5gllA6FYyekxp6zW4aJDHnbf0qRw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e4f50UhgRMb0bZyRQ8/HeeKpo2lPKNMiPJlpF4X4EcDDP3RvOdSzBSKLNNIcgnGusOTa+r44+uL9m/xftKqnx7UT7pCEE+e8qqFvmLnC9Q8SvGM5ow70Z68OnF88MX+1zRpyJqD5zUP9elsFXZ2gjStei+E4GQkHaVlN8NtqrEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j9aCpzmZ; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728473832; c=relaxed/simple;
+	bh=Rho3rFXpbK+cEsaIjikHsw+oQVoZZV8d6YiDgDH7Rsk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ITQHMSWKCvvz7sv25wJJpAVBY4HWxCf+dMyvaGRbTZ8lQ8EJbbIZfqvk0yds/s5ZA/U/cxyeeuBFaDpTO6OoYGNZwzG/5LgLt3QzvEMwYtaW8r0UlkPLrQkc00CvZ0FnRKvhiE+pHDdNDGUVxyTAyHXkGjUNXSiEtumyD6Ewo6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pZnZkX/z; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j9aCpzmZ"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20bb610be6aso73182735ad.1;
-        Wed, 09 Oct 2024 04:01:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728471662; x=1729076462; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8OiY6CpBEzHsjraTshq69qQz+AGO9HWUOSPdHLM5wrI=;
-        b=j9aCpzmZyoyq7YC9qp8z6eQ+PhsImBLFO0raAzP6eYIHhCZ4cY+HOQIDW3xgXaH2O4
-         +aa9nNC6Z5O0o1vkkeWl6IslfJ5QLUSUgew/p887siFdsPCsNHnKIxV241wlwsJCtpeq
-         +dSaVmWj15Qo/UxPTkAvzxlM9EwRTe4kCOtfHrjAwsPGRx8Y+STX0OQ/qrtqEPAxWyiW
-         XGzIwsEej7TEbGq159K4yxUCcNiecAEYw2te1spVFzeuTuONGzqV1UHkUa8GIXB5I6v8
-         DxCpTU3L12FrLnJiIMPqmCGLjUSbonMiMSn/mbezKmFVW5qkEJzTSMQTagb7yRJs6Hmd
-         8FGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728471662; x=1729076462;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8OiY6CpBEzHsjraTshq69qQz+AGO9HWUOSPdHLM5wrI=;
-        b=inMunfkVIPFbeVrRnzWnwuw8e2pJ/M+pt8gm1+2V8XeNbXi/cOHBqcWrWX7aG6POGh
-         pspNUjlXPr9qjtc2YK38zGterNZLSX8PqQg2OggJsapmQm9e9bxjbQykXCx6xh/ofPwG
-         5igZ5FbBonQaoN01F3ywfX7WdCIa5wNbDYRBNqbGPCs67XwkhvPAzWUlBqQq+RI3BuV1
-         tEmNLLMCopOxQL+VuJkIp0Elb7EBUs+JBC8aJNLRfAK9XDH9wrUun46CNd5fvzhoWijI
-         9p2fAVTSBXKIBkR+7YNLlTS9texgXoqzpVpVqCfnistbe4Rc8hPEai0bQ19y5pVn1s5X
-         Us5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUlVY+gMQ23URgv/0ZuMQGzlTZ/WaZTlL16TQlaE9xkoZubYP7cLwgmyz9Kk/VZi42m3SKbRoKMd3ePzpor@vger.kernel.org, AJvYcCXlQ+1pG4C/64zCHtZol/+UB4px3nmI/1YKC/8351s9pobKS4ZKUr0bECwONCA2j1YPIjiFcw/DZpnA2g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxB4Zz8mYtmWN9S8Gm+N3fl8JGvST7esIQmCOS/3p0DN4Z12HGL
-	AaszXsjHSuLdKHYwCNpWrGsB7+PpEhD51degQj8EECdFuUO8fw8DvxF8hA==
-X-Google-Smtp-Source: AGHT+IF07LOXv7qo1PT0ouEnajyTQ5JOdx3xpv5X/Ep9k2ZNrxULBFiCmymWI7fNe5z6CLixrrnzSQ==
-X-Received: by 2002:a17:903:2302:b0:20c:6098:473d with SMTP id d9443c01a7336-20c637a4411mr24401435ad.60.1728471662264;
-        Wed, 09 Oct 2024 04:01:02 -0700 (PDT)
-Received: from ?IPV6:2409:40c0:1048:4b3c:cd38:b59:a263:1c9a? ([2409:40c0:1048:4b3c:cd38:b59:a263:1c9a])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c138cff51sm69020185ad.87.2024.10.09.04.00.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2024 04:01:01 -0700 (PDT)
-Message-ID: <6e290cc3-0be1-4ee9-8e13-351f8cd9f658@gmail.com>
-Date: Wed, 9 Oct 2024 16:30:56 +0530
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pZnZkX/z"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=1EiTVLSlj4Cq86TlBOOJj7bBQhU7XUCwisc8VqcnPiI=; b=pZnZkX/zpoWSx0mfIMnL+oFtIm
+	uUBqkO81MXcUZUAF6+R4jW/910wfSgF42qxzNc8raqeyYnhZvZVeo+2/XJwlTrwXVjdLiIZzVQyf6
+	2TJNL1YHLyQmEL8WNHOWfkadCS8u096fJnNeNf6v2htTOltA2Pwh94uDVcUwFtXNu3OqChTS0uvlf
+	9boc/HmtXuSy/MVawyqRRCihKBCi9sWUbmQCzgZxxzsXC2P5TG86DFl2QPfrW+3yH4LSuJsUr/0yx
+	WdYz3RRYBWIa2qUqvtLgzxjSenk338EuIBpUROAdzfZaFvZ6K3zv84LrxrJrE/OBUVPEp+P1EY+2z
+	kDfenvWA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1syV0A-0000000959i-23EO;
+	Wed, 09 Oct 2024 11:37:10 +0000
+Date: Wed, 9 Oct 2024 04:37:10 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Suraj Sonawane <surajsonawane0215@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4] block: Fix uninitialized symbol 'bio' in
+ blk_rq_prep_clone
+Message-ID: <ZwZq5hIJSmQW1Sxa@infradead.org>
+References: <20241004100842.9052-1-surajsonawane0215@gmail.com>
+ <20241008175215.23975-1-surajsonawane0215@gmail.com>
+ <ZwYxA1sfQdaj0Hy3@infradead.org>
+ <6e290cc3-0be1-4ee9-8e13-351f8cd9f658@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] block: Fix uninitialized symbol 'bio' in
- blk_rq_prep_clone
-To: Christoph Hellwig <hch@infradead.org>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241004100842.9052-1-surajsonawane0215@gmail.com>
- <20241008175215.23975-1-surajsonawane0215@gmail.com>
- <ZwYxA1sfQdaj0Hy3@infradead.org>
-Content-Language: en-US
-From: Suraj Sonawane <surajsonawane0215@gmail.com>
-In-Reply-To: <ZwYxA1sfQdaj0Hy3@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6e290cc3-0be1-4ee9-8e13-351f8cd9f658@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 09/10/24 13:00, Christoph Hellwig wrote:
-> The patch itself looks good:
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> 
-> On Tue, Oct 08, 2024 at 11:22:15PM +0530, SurajSonawane2415 wrote:
->> Fix the uninitialized symbol 'bio' in the function blk_rq_prep_clone
->> to resolve the following error:
->> block/blk-mq.c:3199 blk_rq_prep_clone() error: uninitialized symbol 'bio'.
-> 
-> To make this more readable I'd usually keep and empty line before
-> the actual error message.  But more importantly it would be useful
-> to explain what tool generated said error message, and maybe also add
-> a summary of the discussion why this function was in many ways
-> pretty horrible code.
-> 
-Thank you for the review and suggestions.
+On Wed, Oct 09, 2024 at 04:30:56PM +0530, Suraj Sonawane wrote:
+> Should I submit a new version with the added empty line and explanation
+> about the tool and function issues?
 
-Should I submit a new version with the added empty line and explanation 
-about the tool and function issues?
+Let's wait for Jens if he wants a resend or not.  In the meantime
+just tell us what tool you are using.
 
-Best regards,
-Suraj Sonawane
