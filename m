@@ -1,94 +1,77 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600821BDA91;
-	Thu, 10 Oct 2024 09:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752BCBE6F;
+	Thu, 10 Oct 2024 09:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728552019; cv=none; b=SURgbf9NzgiF8ebRdsW5FTeqU4cdH76l3JOYsqVBjAyTwbc4asEegBqswP/3UFdy8vYsDKzsn/XLf9P3MPmoJq8G4Dbmhf3Cb7641rRX6kIYGAaK/xiAkqffM8W6/D1a5zBi8Qj3py2Y+qoflEFcAEi/Vf2LcUeuVIjKj29Y+Qs=
+	t=1728552563; cv=none; b=F0D9nBFUjQJ9MqusSoCrZBUWnEv2Q86u5km1M+XO+yDGTW0LMBOJ/XeBw9InB4sNVHq1pGv+d0ScKxy+6bHQdaaVQYqQwtgaUE2WtQ7B80Fu3DdYaaLTXu2ZkxBYc7yczad4W9WlW+V2SIAUJjIzDSTs/xLsJNC9xe/+ZdE7maw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728552019; c=relaxed/simple;
-	bh=bTnovMZgsgVOSlQlxmcq3a9nkqLgejdN9piq3zqLQ9Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jqYcREFbu+eaUVlCguQ/FWNN1MAa3Lx8jrecIVZoQ8yj05z/oDYIvwhkMdx5f0Cip+ipgHYeTn+VJvL9/F7l71PxP/PGh/cMaLUJZNfvOqwTrL9TZFPXfEJRDfC+oJNRgJQ73vlAqFRke7E8fM0m+xdIYm7DGHE26auZIa1s468=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 14AAD227A8E; Thu, 10 Oct 2024 11:20:11 +0200 (CEST)
-Date: Thu, 10 Oct 2024 11:20:10 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Javier Gonzalez <javier.gonz@samsung.com>
-Cc: Hans Holmberg <hans@owltronix.com>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Kanchan Joshi <joshi.k@samsung.com>, "hare@suse.de" <hare@suse.de>,
-	"sagi@grimberg.me" <sagi@grimberg.me>,
-	"brauner@kernel.org" <brauner@kernel.org>,
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"jack@suse.cz" <jack@suse.cz>,
-	"jaegeuk@kernel.org" <jaegeuk@kernel.org>,
-	"bcrl@kvack.org" <bcrl@kvack.org>,
-	"dhowells@redhat.com" <dhowells@redhat.com>,
-	"bvanassche@acm.org" <bvanassche@acm.org>,
-	"asml.silence@gmail.com" <asml.silence@gmail.com>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-aio@kvack.org" <linux-aio@kvack.org>,
-	"gost.dev@samsung.com" <gost.dev@samsung.com>,
-	"vishak.g@samsung.com" <vishak.g@samsung.com>
-Subject: Re: [PATCH v7 0/3] FDP and per-io hints
-Message-ID: <20241010092010.GC9287@lst.de>
-References: <20241004053121.GB14265@lst.de> <20241004061811.hxhzj4n2juqaws7d@ArmHalley.local> <20241004062733.GB14876@lst.de> <20241004065233.oc5gqcq3lyaxzjhz@ArmHalley.local> <20241004123027.GA19168@lst.de> <20241007101011.boufh3tipewgvuao@ArmHalley.local> <CANr-nt3TA75MSvTNWP3SwBh60dBwJYztHJL5LZvROa-j9Lov7g@mail.gmail.com> <97bd78a896b748b18e21e14511e8e0f4@CAMSVWEXC02.scsc.local> <CANr-nt11OJfLRFr=rzH0LyRUzVD9ZFLKsgree=Xqv__nWerVkg@mail.gmail.com> <20241010071327.rnh2wsuqdvcu2tx4@ArmHalley.local>
+	s=arc-20240116; t=1728552563; c=relaxed/simple;
+	bh=uHHQuCd+hBIGNhvjjP6qSw0Lol5SDSfCg5OF8r0zrs4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=MkvoX5oY839nrhvCkxisGouGnkJQuLWtwNN9oAU0zcsxVj/uLUoGt0eUcm2J6/UG/XHKdiT2/mPkq2XblZBWpJq+Z3CwO1kVbM96xDTNE9gwBliBIDDuVt6kdaXwKXCXamMBRaHAOnSxDGc93HSjaWsRSmJuDVAVXOD5o52oceg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YDdaetEy; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YDdaetEy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AE4BC4CEC5;
+	Thu, 10 Oct 2024 09:29:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728552563;
+	bh=uHHQuCd+hBIGNhvjjP6qSw0Lol5SDSfCg5OF8r0zrs4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=YDdaetEynXX+YuTMPWiX5TdxwuOt3klN+L+GbJU1NwyXKePOjL/KJhTXe9xLacNyl
+	 yAX0jq5e2KpK4n7CFfIEUnRY0H4V+QEN1l5ymfLBgmClvjSJZXGCzyoNGA/fBU+vri
+	 EgLDjyfQgHSDJNSMNDrgKaj4ht1dQP4KZn8FvpfdkohIYKWggsSgRNlZpMsCAyVKSf
+	 tmpDpO+J+2c2l3TXZw/hZ8vJikkKhWVc30SFRBooXsDMy2jNp3eIscKyWw6cf3JUd/
+	 vtG5Fq9UssLS0Ym4NzGlwECqrlLq4i7Lp9t0tQQiWl9qij2Jx1Xe9bcLDvaZY6FVNP
+	 mXulk9raq4eAg==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Francesco Zardi <frazar00@gmail.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>,  Alex Gaynor <alex.gaynor@gmail.com>,
+  Wedson Almeida Filho <wedsonaf@gmail.com>,  Boqun Feng
+ <boqun.feng@gmail.com>,  Gary Guo <gary@garyguo.net>,  =?utf-8?Q?Bj=C3=B6?=
+ =?utf-8?Q?rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>,  Benno Lossin <benno.lossin@proton.me>,
+  Andreas Hindborg <a.hindborg@samsung.com>,  Alice Ryhl
+ <aliceryhl@google.com>,  Jens Axboe <axboe@kernel.dk>,
+  rust-for-linux@vger.kernel.org,  linux-block@vger.kernel.org,
+  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] docs: rust: fix formatting for
+ kernel::block::mq::Request
+In-Reply-To: <20240903173027.16732-3-frazar00@gmail.com> (Francesco Zardi's
+	message of "Tue, 3 Sep 2024 19:30:29 +0200")
+References: <20240903173027.16732-3-frazar00@gmail.com>
+Date: Thu, 10 Oct 2024 11:29:05 +0200
+Message-ID: <87cyk8mhlq.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241010071327.rnh2wsuqdvcu2tx4@ArmHalley.local>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain
 
-On Thu, Oct 10, 2024 at 09:13:27AM +0200, Javier Gonzalez wrote:
-> Is this because RocksDB already does seggregation per file itself? Are
-> you doing something specific on XFS or using your knoledge on RocksDB to
-> map files with an "unwritten" protocol in the midde?
+Francesco Zardi <frazar00@gmail.com> writes:
 
-XFS doesn't really do anything smart at all except for grouping files
-with similar temperatures, but Hans can probably explain it in more
-detail.  So yes, this relies on the application doing the data separation
-and using the most logical vehicle for it: files.
-
+> Fix several issues with rustdoc formatting for the
+> `kernel::block::mq::Request` module, in particular:
 >
->    In this context, we have collected data both using FDP natively in
->    RocksDB and using the temperatures. Both look very good, because both
->    are initiated by RocksDB, and the FS just passes the hints directly
->    to the driver.
+> - An ordered list not rendering correctly, fixed by using numbers prefixes
+>   instead of letters
 >
-> I ask this to understand if this is the FS responsibility or the
-> application's one. Our work points more to letting applications use the
-> hints (as the use-cases are power users, like RocksDB). I agree with you
-> that a FS could potentially make an improvement for legacy applications
-> - we have not focused much on these though, so I trust you insights on
-> it.
+> - Code snippets formatted as regular text, fixed by wrapping the code with
+>   `back-ticks`
+>
+> - References to types missing intra-doc links, fixed by wrapping the
+>   types with [square brackets]
+>
+> Reported-by: Miguel Ojeda <ojeda@kernel.org>
+> Closes: https://github.com/Rust-for-Linux/linux/issues/1108
+> Signed-off-by: Francesco Zardi <frazar00@gmail.com>
 
-As mentioned multiple times before in this thread this absolutely
-depends on the abstraction level of the application.  If the application
-works on a raw device without a file system it obviously needs very
-low-level control.  And in my opinion passthrough is by far the best
-interface for that level of control.  If the application is using a
-file system there is no better basic level abstraction than a file,
-which can then be enhanced with relatively small amount of additional
-information going both ways: the file system telling the application
-what good file sizes and write patterns are, and the application telling
-the file system what files are good candidates to merge into the same
-write stream if the file system has to merge multiple actively written
-to files into a write stream.  Trying to do low-level per I/O hints
-on top of a file system is a recipe for trouble because you now have
-to entities fighting over placement control.
+Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
+
+Thanks for the patch!
+
 
