@@ -1,253 +1,176 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4BFC20DD2
-	for <linux-block@vger.kernel.org>; Thu, 10 Oct 2024 15:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C614A7DA62;
+	Thu, 10 Oct 2024 15:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728574226; cv=none; b=YrNj4fzuQ5Mu2VGPU/AxA3fxl50YzgmdzoKVZcVkucU2KWrlLndLj+o6nBjY6zHeQ6VfXmuBqWcwmLU5VOT5vQkvMazvMaDUuMhouXgJ+eoEzB3yQvGFge74MBM8IYZcRP6H/PNoK+EXHxBpQ9cEyS+Rdo2MKNRXC09tht7KlLM=
+	t=1728575262; cv=none; b=fptV2baK02QU+BIact81vrc5gI6JHsa5LdTX/GJ8s8TFKbtl8pSf/FU6oGVI9P5TvmVy1WSecA7W3v1xV2Zs1xpAvsRDYkJrYGkHeSELS0cu/taMw9oYBe5blCe61TkhAq7E11LrdzHsHKZBoz03C+tr/9XD+lByD/Yc53wwVPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728574226; c=relaxed/simple;
-	bh=VUDWEFrc5drSt8vR2KliRaRHQH61de7guLqBvu/K+IU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=P7VCwTw3ly6zJ7KYc6ZA2mCmTjeZjPsJIYL/8lni+TB/9yM5h+Hqt5Y0wCuPk4G/ZCNH9KELVoHDIjaZPc7rlp8xRJVVzZkS+NINfVohD43nvYGRvCiDzAtZNstUNocmcYzXUt/ro15Cm3c9APdBM48VwL8QaezApy2v9RlXaPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a34988d6b4so16666095ab.2
-        for <linux-block@vger.kernel.org>; Thu, 10 Oct 2024 08:30:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728574224; x=1729179024;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1728575262; c=relaxed/simple;
+	bh=m1n2YWFVEdaH5nVH4itHpiSzRpBwnNSQcR46978WYs4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QvwGnoGynYTh0X0s98/+lEuTHBbZnu4h95VrTS9tNYFaCR8on3M3XBNtY9/33//EZyF6QbOAxpByuyp/6Mm8RsqvSoaVCkyza5MGNAHKKLWhbhP1Sg8FafV6r8dpt0+6PWRsCHSDMeXrFW0hhFAZmvBSoZd4sXCr20iLUn6WHvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HjpATXrT; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HjpATXrT"
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c9388a00cfso912606a12.3;
+        Thu, 10 Oct 2024 08:47:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728575259; x=1729180059; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=lOrtMOEl2/v4ljPvD1T5zRUPqcdaOPtsScL3OxMIEpE=;
-        b=pe2sFGOsRiV2pI2d6usc6MtRZ1//DobUubyiQTCh3y9QDg5vbEqgZckzyT77R9TYto
-         iJ5vY7959w5s++0bCezQilC/mhKoTGpUZ6Xoa6JBKLRBpk9uRbeWLXTVKWE0OMXz5V8u
-         LSuidJobDgsrxpXSzR2lwFyg/977RugckfrgS93KjQG4qgsk4hEJFyyYyfv94rR9cr34
-         EhLihcQzfU7CMzWmiAQKAKYF7sth/2IRAtU5YlDwJfEgWSyHePbEaLN1tPYKOjkSbMu2
-         hgz/kN4v2n40DX4hw9dFQ6CRpH0l1AVOl3NQTWyvQ9QOBIwQJML7NQawjxOuCOGNfIms
-         zwpg==
-X-Forwarded-Encrypted: i=1; AJvYcCU9EWcA+Ui2S0v12uHdObbgxHcf5L11ewgTBilVNp1lhAUS6d77IOj4PkNFW4dPEEENLLVwTYhjFXGk/w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXQPd+bDgbYj8gYrfi85nTESqaumkM0s2MWAfZAbyP6m2uIK0w
-	eV8AOHI4hnY/yf2FzOArO6f+wJlINuYV2C21QlpLsbbfDfhs9dpJO4bz2R4TxLOjql/1JMd3J1z
-	qzj9zZpvsiFTG4N2fq2IYUz1d1e1uxFI8d7tBpi6WFX4g9VjMvtSRLJ8=
-X-Google-Smtp-Source: AGHT+IE33Ptol93r2SXPC7HWoQpirh/0/J8ZyCt+2ni/kZTzF7ZvtN2D7IGcGgtbHIcA01GQObkQB4i0xkdPH9hDUr6WEyOhCdGA
+        bh=XJOdKSCyRxWoJZsXqjQ2pGVqLKgYzGVaLiitUDbtxIM=;
+        b=HjpATXrTsJ1dsvyKAaL7MnlsedT0sqAzKe1Qgl69gRjPlVuI34kJaYARPiTKLhcp6j
+         ktjFUdA2Px1+E9V1Z8N828vCwpX5qtfGvUyZ7BCpfT0HoCiGDHXNiLWVsp/cT80mwD57
+         1zisZYpYWQCRp2bWnBQ++Ludncx087acmMgCzDnJjQRSgt7DsS+CcIBrbYfGrWlLNPvU
+         LhrPu6kiNRHF0zTPGZHStBdKM+/Bwx/Z4U9hljInHqsi4ii0SfrtkWaZAO83nLxm1HjZ
+         76ocryEQWiv848l29G9LfLfOioW7Co7/T7cvigbAJ/blWz8JKpaJIG4Rh10As8hrWE6J
+         mrQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728575259; x=1729180059;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XJOdKSCyRxWoJZsXqjQ2pGVqLKgYzGVaLiitUDbtxIM=;
+        b=n+ZlV8qV49qOobEoKcXO6/mWNLWE8xAClXetdpczkibJux+WlFXxZBBaitEKGLuQsH
+         TpcgsFBJ3pq7Xs7U00OlKvuCh1VlD0i/32k2wvHHpCzZYFmppjw675yrHTbaedmt19ls
+         BBJlJVwsQ6Jy+UR0amfYg2YkXItWHMPgLA9jUkCPGJP7JouPiTPAmIbvf2MqfbCSBBgk
+         xox6mILZjxu7dcMdzdjzqbCFqP+Fg+cYmXQuH6NrF+xESXCOWldcLdf8BmswpsoxPcvM
+         xwO/vvBLluuhqgAEQoJhyBLEySUHTWgVRAusPFNOVdgPDCHd/9cq+4DLsWkBbwYxBJNj
+         pXQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVrz9GE1/xL7jys70V1Xdr8hdoJRUlpyxIfJ4x/gyd+amdsPnNoJSVTreDvm3qwkpsi66qSZDo1NLejbVU=@vger.kernel.org, AJvYcCXE1cvLExrFWUcF6pPeTmyqy0y9pupN4k2fFp0l5KsJ8T4kGAqXY2+gKc5aRKWn4+8d7sBEI5KjkA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwC5IZuDQxvtBdPw4gr1tAHzroJ8q08yuKVKLUSZRtOvhMnRTkz
+	EX92Jk/FXpn0Xlui9RiaKk72/WmNqV5ya8Va0ILfzfqnbokubblf
+X-Google-Smtp-Source: AGHT+IEmtBgLQok+KmjxmSzpC3Ma+9HgYtARqPFruWkhsp331a529yBtG+P+AeYz/vjVJttl6CIMag==
+X-Received: by 2002:a17:907:e648:b0:a99:5985:bf39 with SMTP id a640c23a62f3a-a998d117e0amr591415466b.13.1728575258849;
+        Thu, 10 Oct 2024 08:47:38 -0700 (PDT)
+Received: from [192.168.42.29] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99a7f25406sm105668466b.69.2024.10.10.08.47.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Oct 2024 08:47:38 -0700 (PDT)
+Message-ID: <4b40eff1-a848-4742-9cb3-541bf8ed606e@gmail.com>
+Date: Thu, 10 Oct 2024 16:48:14 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fce:b0:3a3:3e17:994e with SMTP id
- e9e14a558f8ab-3a397cfc554mr72027075ab.9.1728574223820; Thu, 10 Oct 2024
- 08:30:23 -0700 (PDT)
-Date: Thu, 10 Oct 2024 08:30:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6707f30f.050a0220.64b99.001d.GAE@google.com>
-Subject: [syzbot] [block?] [bcachefs?] KASAN: slab-use-after-free Read in
- percpu_ref_put (2)
-From: syzbot <syzbot+905d719acdbd213bf67e@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, kent.overstreet@linux.dev, linux-bcachefs@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V6 7/8] io_uring/uring_cmd: support provide group kernel
+ buffer
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20240912104933.1875409-1-ming.lei@redhat.com>
+ <20240912104933.1875409-8-ming.lei@redhat.com>
+ <b232fa58-1255-44b2-92c9-f8eb4f70e2c9@gmail.com> <ZwJObC6mzetw4goe@fedora>
+ <38ad4c05-6ee3-4839-8d61-f8e1b5219556@gmail.com> <ZwdJ7sDuHhWT61FR@fedora>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ZwdJ7sDuHhWT61FR@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 10/10/24 04:28, Ming Lei wrote:
+> On Wed, Oct 09, 2024 at 04:14:33PM +0100, Pavel Begunkov wrote:
+>> On 10/6/24 09:46, Ming Lei wrote:
+>>> On Fri, Oct 04, 2024 at 04:44:54PM +0100, Pavel Begunkov wrote:
+>>>> On 9/12/24 11:49, Ming Lei wrote:
+...
+>>> so driver can check if device buffer can be provided with this uring_cmd,
+>>> but I prefer to the new uring_cmd flag:
+>>>
+>>> - IORING_PROVIDE_GROUP_KBUF can provide device buffer in generic way.
+>>
+>> Ok, could be.
+>>
+>>> - ->prep() can fail fast in case that it isn't one group request
+>>
+>> I don't believe that matters, a behaving user should never
+>> see that kind of failure.
+>>
+>>
+>>>> 1. Extra overhead for files / cmds that don't even care about the
+>>>> feature.
+>>>
+>>> It is just checking ioucmd->flags in ->prep(), and basically zero cost.
+>>
+>> It's not if we add extra code for each every feature, at
+>> which point it becomes a maze of such "ifs".
+> 
+> Yeah, I guess it can't be avoided in current uring_cmd design, which
 
-syzbot found the following issue on:
+If can't only if we keep putting all custom / some specific
+command features into the common path. And, for example, I
+just named how this one could be avoided.
 
-HEAD commit:    8f602276d390 Merge tag 'bcachefs-2024-10-05' of git://evil..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1033c7d0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ba92623fdea824c9
-dashboard link: https://syzkaller.appspot.com/bug?extid=905d719acdbd213bf67e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1131f307980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15148327980000
+The real question is whether we deem that buffer providing
+feature applicable widely enough so that it could be useful
+to many potential command implementations and therefore is
+worth of partially handling it generically in the common path.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-8f602276.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d7abbd2b0653/vmlinux-8f602276.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6a9f3d168828/bzImage-8f602276.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/184260729fa9/mount_8.gz
+> serves for different subsystems now, and more in future.
+> 
+> And the situation is similar with ioctl.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+905d719acdbd213bf67e@syzkaller.appspotmail.com
+Well, commands look too much as ioctl for my taste, but even
+then I naively hope it can avoid regressing to it.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in __ref_is_percpu include/linux/percpu-refcount.h:174 [inline]
-BUG: KASAN: slab-use-after-free in percpu_ref_put_many include/linux/percpu-refcount.h:332 [inline]
-BUG: KASAN: slab-use-after-free in percpu_ref_put+0xda/0x250 include/linux/percpu-refcount.h:351
-Read of size 8 at addr ffff8880364920b0 by task kworker/u4:8/1067
+>>>> 2. As it stands with this patch, the flag is ignored by all other
+>>>> cmd implementations, which might be quite confusing as an api,
+>>>> especially so since if we don't set that REQ_F_GROUP_KBUF memeber
+>>>> requests will silently try to import a buffer the "normal way",
+>>>
+>>> The usage is same with buffer select or fixed buffer, and consumer
+>>> has to check the flag.
+>>
+>> We fails requests when it's asked to use the feature but
+>> those are not supported, at least non-cmd requests.
+>>
+>>> And same with IORING_URING_CMD_FIXED which is ignored by other
+>>> implementations except for nvme, :-)
+>>
+>> Oh, that's bad. If you'd try to implement the flag in the
+>> future it might break the uapi. It might be worth to patch it
+>> up on the ublk side, i.e. reject the flag, + backport, and hope
+>> nobody tried to use them together, hmm?
+>>
+>>> I can understand the concern, but it exits since uring cmd is born.
+>>>
+>>>> i.e. interpret sqe->addr or such as the target buffer.
+>>>
+>>>> 3. We can't even put some nice semantics on top since it's
+>>>> still cmd specific and not generic to all other io_uring
+>>>> requests.
+>>>>
+>>>> I'd even think that it'd make sense to implement it as a
+>>>> new cmd opcode, but that's the business of the file implementing
+>>>> it, i.e. ublk.
+>>>>
+>>>>>      */
+>>>>>     #define IORING_URING_CMD_FIXED	(1U << 0)
+>>>>> -#define IORING_URING_CMD_MASK	IORING_URING_CMD_FIXED
+>>>>> +#define IORING_PROVIDE_GROUP_KBUF	(1U << 1)
+>>>>> +#define IORING_URING_CMD_MASK	(IORING_URING_CMD_FIXED | IORING_PROVIDE_GROUP_KBUF)
+>>>
+>>> It needs one new file operation, and we shouldn't work toward
+>>> this way.
+>>
+>> Not a new io_uring request, I rather meant sqe->cmd_op,
+>> like UBLK_U_IO_FETCH_REQ_PROVIDER_BUFFER.
+> 
+> `cmd_op` is supposed to be defined by subsystems, but maybe we can
+> reserve some for generic uring_cmd. Anyway this shouldn't be one big
+> deal, we can do that in future if there are more such uses.
 
-CPU: 0 UID: 0 PID: 1067 Comm: kworker/u4:8 Not tainted 6.12.0-rc1-syzkaller-00349-g8f602276d390 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: loop0 loop_rootcg_workfn
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:488
- kasan_report+0x143/0x180 mm/kasan/report.c:601
- __ref_is_percpu include/linux/percpu-refcount.h:174 [inline]
- percpu_ref_put_many include/linux/percpu-refcount.h:332 [inline]
- percpu_ref_put+0xda/0x250 include/linux/percpu-refcount.h:351
- blk_update_request+0x5e5/0x1160 block/blk-mq.c:923
- blk_mq_end_request+0x3e/0x70 block/blk-mq.c:1051
- loop_handle_cmd drivers/block/loop.c:1927 [inline]
- loop_process_work+0x1c10/0x2170 drivers/block/loop.c:1945
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+That's if the generic handling is desired, which isn't much
+different from a flag, otherwise it can be just a new random
+file specific cmd opcode as any other.
 
-Allocated by task 5114:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:257 [inline]
- __kmalloc_cache_noprof+0x19c/0x2c0 mm/slub.c:4295
- kmalloc_noprof include/linux/slab.h:878 [inline]
- kzalloc_noprof include/linux/slab.h:1014 [inline]
- __bch2_dev_alloc+0x57/0xa60 fs/bcachefs/super.c:1289
- bch2_dev_alloc+0xd4/0x170 fs/bcachefs/super.c:1359
- bch2_fs_alloc fs/bcachefs/super.c:939 [inline]
- bch2_fs_open+0x2e3f/0x2f80 fs/bcachefs/super.c:2050
- bch2_fs_get_tree+0x738/0x1710 fs/bcachefs/fs.c:2067
- vfs_get_tree+0x90/0x2b0 fs/super.c:1800
- do_new_mount+0x2be/0xb40 fs/namespace.c:3507
- do_mount fs/namespace.c:3847 [inline]
- __do_sys_mount fs/namespace.c:4055 [inline]
- __se_sys_mount+0x2d6/0x3c0 fs/namespace.c:4032
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 5114:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:230 [inline]
- slab_free_hook mm/slub.c:2342 [inline]
- slab_free mm/slub.c:4579 [inline]
- kfree+0x1a0/0x440 mm/slub.c:4727
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x22f/0x480 lib/kobject.c:737
- bch2_fs_free+0x27b/0x3c0 fs/bcachefs/super.c:667
- bch2_fs_get_tree+0xd9f/0x1710 fs/bcachefs/fs.c:2175
- vfs_get_tree+0x90/0x2b0 fs/super.c:1800
- do_new_mount+0x2be/0xb40 fs/namespace.c:3507
- do_mount fs/namespace.c:3847 [inline]
- __do_sys_mount fs/namespace.c:4055 [inline]
- __se_sys_mount+0x2d6/0x3c0 fs/namespace.c:4032
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff888036492000
- which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 176 bytes inside of
- freed 4096-byte region [ffff888036492000, ffff888036493000)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x36490
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0x4fff00000000040(head|node=1|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 04fff00000000040 ffff88801ac42140 dead000000000122 0000000000000000
-raw: 0000000000000000 0000000000040004 00000001f5000000 0000000000000000
-head: 04fff00000000040 ffff88801ac42140 dead000000000122 0000000000000000
-head: 0000000000000000 0000000000040004 00000001f5000000 0000000000000000
-head: 04fff00000000003 ffffea0000d92401 ffffffffffffffff 0000000000000000
-head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5114, tgid 5114 (syz-executor374), ts 95819092336, free_ts 95351745772
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1537
- prep_new_page mm/page_alloc.c:1545 [inline]
- get_page_from_freelist+0x3045/0x3190 mm/page_alloc.c:3457
- __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4733
- alloc_pages_mpol_noprof+0x3e8/0x680 mm/mempolicy.c:2265
- alloc_slab_page+0x6a/0x120 mm/slub.c:2412
- allocate_slab+0x5a/0x2f0 mm/slub.c:2578
- new_slab mm/slub.c:2631 [inline]
- ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3818
- __slab_alloc+0x58/0xa0 mm/slub.c:3908
- __slab_alloc_node mm/slub.c:3961 [inline]
- slab_alloc_node mm/slub.c:4122 [inline]
- __do_kmalloc_node mm/slub.c:4263 [inline]
- __kmalloc_noprof+0x25a/0x400 mm/slub.c:4276
- mempool_init_node+0x1ee/0x4e0 mm/mempool.c:217
- mempool_init_noprof+0x3a/0x50 mm/mempool.c:246
- bch2_fs_btree_interior_update_init+0xca/0x100 fs/bcachefs/btree_update_interior.c:2706
- bch2_fs_alloc fs/bcachefs/super.c:919 [inline]
- bch2_fs_open+0x2af9/0x2f80 fs/bcachefs/super.c:2050
- bch2_fs_get_tree+0x738/0x1710 fs/bcachefs/fs.c:2067
- vfs_get_tree+0x90/0x2b0 fs/super.c:1800
- do_new_mount+0x2be/0xb40 fs/namespace.c:3507
-page last free pid 5104 tgid 5104 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1108 [inline]
- free_unref_page+0xcfb/0xf20 mm/page_alloc.c:2638
- mempool_exit+0xc7/0x1a0 mm/mempool.c:170
- bch2_fs_io_write_exit+0x19/0x40 fs/bcachefs/io_write.c:1673
- __bch2_fs_free fs/bcachefs/super.c:550 [inline]
- bch2_fs_release+0x1e1/0x7d0 fs/bcachefs/super.c:609
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x22f/0x480 lib/kobject.c:737
- bch2_fs_get_tree+0xd9f/0x1710 fs/bcachefs/fs.c:2175
- vfs_get_tree+0x90/0x2b0 fs/super.c:1800
- do_new_mount+0x2be/0xb40 fs/namespace.c:3507
- do_mount fs/namespace.c:3847 [inline]
- __do_sys_mount fs/namespace.c:4055 [inline]
- __se_sys_mount+0x2d6/0x3c0 fs/namespace.c:4032
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff888036491f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff888036492000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff888036492080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                     ^
- ffff888036492100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888036492180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+Pavel Begunkov
