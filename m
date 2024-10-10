@@ -1,187 +1,369 @@
-Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6108F1A08BC
-	for <linux-block@vger.kernel.org>; Thu, 10 Oct 2024 09:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C30A47A60
+	for <linux-block@vger.kernel.org>; Thu, 10 Oct 2024 10:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728553721; cv=none; b=AE9bXzxL5WfFsImtOE8+J2dm6itSrc6s4/SEewXO2hjHvn3S6TmP53HtGhT4t+vfjZQ9GYTUzyP7F//zA/KvtWNXo6/EKpz5xRxrGTgbPYJ/vCLOyfNKiD8XQVoXJaAQvsOIc4tjX54JqYzdYsGNCMAsJDHGAcLEBtQqW2ViTH0=
+	t=1728557228; cv=none; b=spU7rlWWnajZXrI+IFT3VSnJOW8pkL0vgIS30v4495kLSZmITnMfjK9Fa7izu75sKzFPVsKM408jRZl7gg6+JyvWL38I3yUNFqTeajjHAfeE5xvJbluB6AWLakr2SDMFIjyKUlBWfzwqaMZwQCYofl3+gdlckJPmTpYSKfHoQm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728553721; c=relaxed/simple;
-	bh=Hmt3jEs6UFtCZSwVksLED/7D3NvxMMvWC6XgppiqDdk=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iVSj8cXNoAof4uK+5HifLSfP7EXBJLETq3b9Oy6A1ZpUViRCJt4RO9h4rnMwX1KI+SdZ269dTrw1bpzcsXuz0kFaxhQkoM1a0r8MHsUqemcWm7xZOdrboNLGwXZbfFaoLsXakBYbrrcT6YiDXsC9TQ6YRXg73ZDR0LeHsWcpC/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=kA0ia7XW; arc=none smtp.client-ip=185.70.40.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1728557228; c=relaxed/simple;
+	bh=l+lekDrxv+NN4sSwcg1Fa4FG2PAJyu0785nQwmZYuwU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KxcSPqrxmAgjvjw2Zxo/UzKYFwLr3k+5QfO4mIO7+DaPU1PSk8zvaTFgAdioY8A71BWfNH99WzThSU0YvIwNfeTQSnxtiwNvckDhGtcVyj5NAyv3H6UpouYj2BI52FOQboVcyeJZNRa9gd6mdXvBpBdqKb7P0npeVVh0RHOCXVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com; spf=none smtp.mailfrom=owltronix.com; dkim=pass (2048-bit key) header.d=owltronix-com.20230601.gappssmtp.com header.i=@owltronix-com.20230601.gappssmtp.com header.b=b6tBTZuY; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=owltronix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="kA0ia7XW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1728553716; x=1728812916;
-	bh=zjjrWauUtafR1DGK8lQ4A/Pbp3ms1S1NTtMuRVcyuIQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=kA0ia7XWxjYQ7IHaBlnJMZyUHgv6uMNRaP5fL2Bbv6Pvm4ioSI/5/pSAvZocNlK+N
-	 ciO4wv6VTht6djm++Bcq8Zgt3YSVp4efKCJLtqo42QwmdCQt5AHFrYlALVKCSp5/fB
-	 HjQ59bjThiJ3uNihNqJvTxmjBlVfc5HNfZnSfKPz9TowPmvXIjCRbcSI4MOwfFjCp7
-	 PgBkeGIUKwxCEoDo6+fm4JB0c8mQLCrWF7VoJlbk4Zy2iBgTDro5qnC94nhcYaz7Ov
-	 ckIjR5t7GxEFmoaxi8oMbxSN1hRcpn8yAR2fwhJhlJ2H3hckG6Bz0dmWfvsvVnUjhK
-	 Q306B2yKxJNCA==
-Date: Thu, 10 Oct 2024 09:48:31 +0000
-To: Andreas Hindborg <a.hindborg@kernel.org>, Gary Guo <gary@garyguo.net>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Alice Ryhl <aliceryhl@google.com>, Greg KH <gregkh@linuxfoundation.org>, Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Trevor Gross <tmgross@umich.edu>, Jens Axboe <axboe@kernel.dk>, Will Deacon <will@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Mark Rutland <mark.rutland@arm.com>, linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] rust: block: convert `block::mq` to use `Refcount`
-Message-ID: <19808a54-cb7e-4818-98e9-5de32bfede2c@proton.me>
-In-Reply-To: <87set4min7.fsf@kernel.org>
-References: <20241004155247.2210469-1-gary@garyguo.net> <2024100507-percolate-kinship-fc9a@gregkh> <87zfniop6i.fsf@kernel.org> <CAH5fLghK1dtkF5bRpcRcu2SXZ6vgPoHGLRqW2=r0J3-2T3ALwQ@mail.gmail.com> <fz1Ji-tl63pAnAOL2TkFwggNx45TTBONKOUcKAKq7e6ZOCX2KsklDS6Zbc_xqnMef1eevpM-a64Bui_nEg49mA==@protonmail.internalid> <20241005142332.78b8b5d0.gary@garyguo.net> <87msjioax2.fsf@kernel.org> <871q0onyhf.fsf@kernel.org> <87set4min7.fsf@kernel.org>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: 39b58565af7c7faa869c9594e80aa2a7225e8963
+	dkim=pass (2048-bit key) header.d=owltronix-com.20230601.gappssmtp.com header.i=@owltronix-com.20230601.gappssmtp.com header.b="b6tBTZuY"
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a9953bdc341so12459666b.2
+        for <linux-block@vger.kernel.org>; Thu, 10 Oct 2024 03:47:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20230601.gappssmtp.com; s=20230601; t=1728557225; x=1729162025; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G4qXWkDsZyoJRaoY97fcsqUYiGuQpt1fh3a0qCsfxsA=;
+        b=b6tBTZuY0FgwTdHBgj0iwra4Nev+srhPuxWaTSdd8gJSMDzaVXqzt2LFhPd8qab55u
+         GLY6gmDws1F3QTDGkx1sRd9Rx4jiuBTXKhfpzUXWTCFuk9arl1GW2ySzRbYjViacfyuy
+         qnv4h7870q+LtBbzCAzY9DqsP5xehHUSTeUHKo2CuPH2pcWtOebAamFAb9RlIr1EnYt0
+         kHVwGA9PnuwmsYA46llA745luhjdX0jKwTJ3pu1Hlsa2xzO/fILg6PD+Cp741zLGu/g4
+         Q/yJuZyCClgS2LQcvsqwlgbyk5ZnW+L4ZrgBOGoRe7olsc/uQF5IzP0MeSPv8GVCFo90
+         dHmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728557225; x=1729162025;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G4qXWkDsZyoJRaoY97fcsqUYiGuQpt1fh3a0qCsfxsA=;
+        b=J+XORvMwLiCTsTFM8i2+ikXqcgHbRGTlxY/yj7SF6W05Ly1y7w3ps8+TvkuuEDBVDg
+         7QLnP3W1EM3q5kax7r94X8y2dxLY9znVgKvT9fvBX4fW8BUCb+OSSMM7mKRNN+pYZ/+l
+         Z15glNvo+u05Y+ldH7EdrjEItoHvRRPTZmXGMJaN++S/lPYhp4PSu/6Skz7SoQF70ZwQ
+         oODVKqzZDMIArFnPEVSjKJxCRXr/o2d+6c1aSSk/FMz463iwnZuUgDrd6F1VuFBnIdJ3
+         NyHA0vF3GGMHlz+mq43RkNvvtoP0IH6HrqkPBqeJZ89MOf2QUxspv2a5Tr50jrJEsISt
+         akEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpJfBOyKCmDq0+ICSM8ePK3cQ0MJVQ/YEYPhbA7AmITeU6mz7tyHwdy0hynXhONW50ufvnzuopTfU0QQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2hhZkfNk7moNrhdOOflf3gp0k2JmAlwTIoJM09FMyRJyzdEQl
+	gOZPF444ZZsosixJuS/k0m9pA7sgaX4PEI1/iVn7hVBerfctE/5MEw71bZdXnIM7+ie490I42z3
+	zMQjY1oXc/120CERTQj01kPKnv5+0A0ogO+GiFg==
+X-Google-Smtp-Source: AGHT+IEI4Ku1pnkQvzw6BWVoEuWOMiAJsD24gneKHuvxfF17lxen+n5Q5JR6BhI9gX4nvsGLmKedVn4u5BlAe9fJmwo=
+X-Received: by 2002:a17:907:9801:b0:a99:3546:b50e with SMTP id
+ a640c23a62f3a-a998d3477cbmr510267966b.53.1728557224743; Thu, 10 Oct 2024
+ 03:47:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <CGME20241004053129eucas1p2aa4888a11a20a1a6287e7a32bbf3316b@eucas1p2.samsung.com>
+ <20241004053121.GB14265@lst.de> <20241004061811.hxhzj4n2juqaws7d@ArmHalley.local>
+ <20241004062733.GB14876@lst.de> <20241004065233.oc5gqcq3lyaxzjhz@ArmHalley.local>
+ <20241004123027.GA19168@lst.de> <20241007101011.boufh3tipewgvuao@ArmHalley.local>
+ <CANr-nt3TA75MSvTNWP3SwBh60dBwJYztHJL5LZvROa-j9Lov7g@mail.gmail.com>
+ <97bd78a896b748b18e21e14511e8e0f4@CAMSVWEXC02.scsc.local> <CANr-nt11OJfLRFr=rzH0LyRUzVD9ZFLKsgree=Xqv__nWerVkg@mail.gmail.com>
+ <20241010071327.rnh2wsuqdvcu2tx4@ArmHalley.local>
+In-Reply-To: <20241010071327.rnh2wsuqdvcu2tx4@ArmHalley.local>
+From: Hans Holmberg <hans@owltronix.com>
+Date: Thu, 10 Oct 2024 12:46:53 +0200
+Message-ID: <CANr-nt2=Lee8B94DMPY6yDaGaBD=Lt9qdG2TzGhAwU=ddZxckg@mail.gmail.com>
+Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+To: Javier Gonzalez <javier.gonz@samsung.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Keith Busch <kbusch@kernel.org>, 
+	Kanchan Joshi <joshi.k@samsung.com>, "hare@suse.de" <hare@suse.de>, 
+	"sagi@grimberg.me" <sagi@grimberg.me>, "brauner@kernel.org" <brauner@kernel.org>, 
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "jack@suse.cz" <jack@suse.cz>, 
+	"jaegeuk@kernel.org" <jaegeuk@kernel.org>, "bcrl@kvack.org" <bcrl@kvack.org>, 
+	"dhowells@redhat.com" <dhowells@redhat.com>, "bvanassche@acm.org" <bvanassche@acm.org>, 
+	"asml.silence@gmail.com" <asml.silence@gmail.com>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"io-uring@vger.kernel.org" <io-uring@vger.kernel.org>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>, 
+	"gost.dev@samsung.com" <gost.dev@samsung.com>, "vishak.g@samsung.com" <vishak.g@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 10.10.24 11:06, Andreas Hindborg wrote:
-> Andreas Hindborg <a.hindborg@kernel.org> writes:
->=20
->> Andreas Hindborg <a.hindborg@kernel.org> writes:
->>
->>> "Gary Guo" <gary@garyguo.net> writes:
->>>
->>>> On Sat, 5 Oct 2024 13:59:44 +0200
->>>> Alice Ryhl <aliceryhl@google.com> wrote:
->>>>
->>>>> On Sat, Oct 5, 2024 at 11:49=E2=80=AFAM Andreas Hindborg <a.hindborg@=
-kernel.org> wrote:
->>>>>>
->>>>>> Hi Greg,
->>>>>>
->>>>>> "Greg KH" <gregkh@linuxfoundation.org> writes:
->>>>>>
->>>>>>> On Fri, Oct 04, 2024 at 04:52:24PM +0100, Gary Guo wrote:
->>>>>>>> There is an operation needed by `block::mq`, atomically decreasing
->>>>>>>> refcount from 2 to 0, which is not available through refcount.h, s=
-o
->>>>>>>> I exposed `Refcount::as_atomic` which allows accessing the refcoun=
-t
->>>>>>>> directly.
->>>>>>>
->>>>>>> That's scary, and of course feels wrong on many levels, but:
->>>>>>>
->>>>>>>
->>>>>>>> @@ -91,13 +95,17 @@ pub(crate) unsafe fn start_unchecked(this: &AR=
-ef<Self>) {
->>>>>>>>      /// C `struct request`. If the operation fails, `this` is ret=
-urned in the
->>>>>>>>      /// `Err` variant.
->>>>>>>>      fn try_set_end(this: ARef<Self>) -> Result<*mut bindings::req=
-uest, ARef<Self>> {
->>>>>>>> -        // We can race with `TagSet::tag_to_rq`
->>>>>>>> -        if let Err(_old) =3D this.wrapper_ref().refcount().compar=
-e_exchange(
->>>>>>>> -            2,
->>>>>>>> -            0,
->>>>>>>> -            Ordering::Relaxed,
->>>>>>>> -            Ordering::Relaxed,
->>>>>>>> -        ) {
->>>>>>>> +        // To hand back the ownership, we need the current refcou=
-nt to be 2.
->>>>>>>> +        // Since we can race with `TagSet::tag_to_rq`, this needs=
- to atomically reduce
->>>>>>>> +        // refcount to 0. `Refcount` does not provide a way to do=
- this, so use the underlying
->>>>>>>> +        // atomics directly.
->>>>>>>> +        if this
->>>>>>>> +            .wrapper_ref()
->>>>>>>> +            .refcount()
->>>>>>>> +            .as_atomic()
->>>>>>>> +            .compare_exchange(2, 0, Ordering::Relaxed, Ordering::=
-Relaxed)
->>>>>>>> +            .is_err()
->>>>>>>
->>>>>>> Why not just call rust_helper_refcount_set()?  Or is the issue that=
- you
->>>>>>> think you might not be 2 here?  And if you HAVE to be 2, why that m=
-agic
->>>>>>> value (i.e. why not just always be 1 and rely on normal
->>>>>>> increment/decrement?)
->>>>>>>
->>>>>>> I know some refcounts are odd in the kernel, but I don't see where =
-the
->>>>>>> block layer is caring about 2 as a refcount anywhere, what am I mis=
-sing?
->>>>>>
->>>>>> It is in the documentation, rendered version available here [1]. Let=
- me
->>>>>> know if it is still unclear, then I guess we need to update the docs=
-.
->>>>>>
->>>>>> Also, my session from Recipes has a little bit of discussion regardi=
+On Thu, Oct 10, 2024 at 9:13=E2=80=AFAM Javier Gonzalez <javier.gonz@samsun=
+g.com> wrote:
+>
+> On 10.10.2024 08:40, Hans Holmberg wrote:
+> >On Wed, Oct 9, 2024 at 4:36=E2=80=AFPM Javier Gonzalez <javier.gonz@sams=
+ung.com> wrote:
+> >>
+> >>
+> >>
+> >> > -----Original Message-----
+> >> > From: Hans Holmberg <hans@owltronix.com>
+> >> > Sent: Tuesday, October 8, 2024 12:07 PM
+> >> > To: Javier Gonzalez <javier.gonz@samsung.com>
+> >> > Cc: Christoph Hellwig <hch@lst.de>; Jens Axboe <axboe@kernel.dk>; Ma=
+rtin K.
+> >> > Petersen <martin.petersen@oracle.com>; Keith Busch <kbusch@kernel.or=
+g>;
+> >> > Kanchan Joshi <joshi.k@samsung.com>; hare@suse.de; sagi@grimberg.me;
+> >> > brauner@kernel.org; viro@zeniv.linux.org.uk; jack@suse.cz; jaegeuk@k=
+ernel.org;
+> >> > bcrl@kvack.org; dhowells@redhat.com; bvanassche@acm.org;
+> >> > asml.silence@gmail.com; linux-nvme@lists.infradead.org; linux-
+> >> > fsdevel@vger.kernel.org; io-uring@vger.kernel.org; linux-block@vger.=
+kernel.org;
+> >> > linux-aio@kvack.org; gost.dev@samsung.com; vishak.g@samsung.com
+> >> > Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+> >> >
+> >> > On Mon, Oct 7, 2024 at 12:10=E2=80=AFPM Javier Gonz=C3=A1lez <javier=
+.gonz@samsung.com>
+> >> > wrote:
+> >> > >
+> >> > > On 04.10.2024 14:30, Christoph Hellwig wrote:
+> >> > > >On Fri, Oct 04, 2024 at 08:52:33AM +0200, Javier Gonz=C3=A1lez wr=
+ote:
+> >> > > >> So, considerign that file system _are_ able to use temperature =
+hints and
+> >> > > >> actually make them work, why don't we support FDP the same way =
+we are
+> >> > > >> supporting zones so that people can use it in production?
+> >> > > >
+> >> > > >Because apparently no one has tried it.  It should be possible in=
+ theory,
+> >> > > >but for example unless you have power of 2 reclaim unit size size=
+ it
+> >> > > >won't work very well with XFS where the AGs/RTGs must be power of=
+ two
+> >> > > >aligned in the LBA space, except by overprovisioning the LBA spac=
+e vs
+> >> > > >the capacity actually used.
+> >> > >
+> >> > > This is good. I think we should have at least a FS POC with data
+> >> > > placement support to be able to drive conclusions on how the inter=
+face
+> >> > > and requirements should be. Until we have that, we can support the
+> >> > > use-cases that we know customers are asking for, i.e., block-level=
+ hints
+> >> > > through the existing temperature API.
+> >> > >
+> >> > > >
+> >> > > >> I agree that down the road, an interface that allows hints (man=
+y more
+> >> > > >> than 5!) is needed. And in my opinion, this interface should no=
+t have
+> >> > > >> semintics attached to it, just a hint ID, #hints, and enough sp=
+ace to
+> >> > > >> put 100s of them to support storage node deployments. But this =
+needs to
+> >> > > >> come from the users of the hints / zones / streams / etc,  not =
+from
+> >> > > >> us vendors. We do not have neither details on how they deploy t=
+hese
+> >> > > >> features at scale, nor the workloads to validate the results. A=
+nything
+> >> > > >> else will probably just continue polluting the storage stack wi=
+th more
+> >> > > >> interfaces that are not used and add to the problem of data pla=
+cement
+> >> > > >> fragmentation.
+> >> > > >
+> >> > > >Please always mentioned what layer you are talking about.  At the=
+ syscall
+> >> > > >level the temperatur hints are doing quite ok.  A full stream sep=
+aration
+> >> > > >would obviously be a lot better, as would be communicating the zo=
+ne /
+> >> > > >reclaim unit / etc size.
+> >> > >
+> >> > > I mean at the syscall level. But as mentioned above, we need to be=
+ very
+> >> > > sure that we have a clear use-case for that. If we continue seeing=
+ hints
+> >> > > being use in NVMe or other protocols, and the number increase
+> >> > > significantly, we can deal with it later on.
+> >> > >
+> >> > > >
+> >> > > >As an interface to a driver that doesn't natively speak temperatu=
+re
+> >> > > >hint on the other hand it doesn't work at all.
+> >> > > >
+> >> > > >> The issue is that the first series of this patch, which is as s=
+imple as
+> >> > > >> it gets, hit the list in May. Since then we are down paths that=
+ lead
+> >> > > >> nowhere. So the line between real technical feedback that leads=
+ to
+> >> > > >> a feature being merged, and technical misleading to make people=
+ be a
+> >> > > >> busy bee becomes very thin. In the whole data placement effort,=
+ we have
+> >> > > >> been down this path many times, unfortunately...
+> >> > > >
+> >> > > >Well, the previous round was the first one actually trying to add=
+ress the
+> >> > > >fundamental issue after 4 month.  And then after a first round of=
+ feedback
+> >> > > >it gets shutdown somehow out of nowhere.  As a maintainer and rev=
+iew that
+> >> > > >is the kinda of contributors I have a hard time taking serious.
+> >> > >
+> >> > > I am not sure I understand what you mean in the last sentece, so I=
+ will
+> >> > > not respond filling blanks with a bad interpretation.
+> >> > >
+> >> > > In summary, what we are asking for is to take the patches that cov=
+er the
+> >> > > current use-case, and work together on what might be needed for be=
+tter
+> >> > > FS support. For this, it seems you and Hans have a good idea of wh=
+at you
+> >> > > want to have based on XFS. We can help review or do part of the wo=
+rk,
+> >> > > but trying to guess our way will only delay existing customers usi=
 ng
->>>>>> this refcount and it's use [2].
->>>>>>
->>>>>> Best regards,
->>>>>> Andreas
->>>>>>
->>>>>>
->>>>>> [1] https://rust.docs.kernel.org/kernel/block/mq/struct.Request.html=
-#implementation-details
->>>>>> [2] https://youtu.be/1LEvgkhU-t4?si=3DB1XnJhzCCNnUtRsI&t=3D1685
->>>>>
->>>>> So it sounds like there is one refcount from the C side, and some
->>>>> number of references from the Rust side. The function checks whether
->>>>> there's only one Rust reference left, and if so, takes ownership of
->>>>> the value, correct?
->>>>>
->>>>> In that case, the CAS should have an acquire ordering to synchronize
->>>>> with dropping the refcount 3->2 on another thread. Otherwise, you
->>>>> might have a data race with the operations that happened just before
->>>>> the 3->2 refcount drop.
->>>>>
->>>>> Alice
->>>>
->>>> The code as is is fine since there's no data protected in
->>>> `RequestDataWrapper` yet (in fact it's not even generic yet). I know
->>>> Andreas does want to introduce driver-specific data into that, so in
->>>> the long term the acquire would be necessary.
->>>>
->>>> Andreas, please let me know if you want me to make the change now, or
->>>> you'd rather change the ordering when you introduce data to
->>>> `RequestDataWrapper`.
->>>
->>> I guess we will have said data dependencies when we are going to run
->>> drop for fields in the private data area. Thanks for pointing that out.
->>> I will update the ordering when I submit that patch.
->>>
->>> As I mentioned before, I would rather we do not apply this patch before
->>> we get a way to inline helpers.
->>
->> As discussed offline, the code that suffers the performance regression
->> is downstream, and since this change seems to be important, I can apply
->> the helper LTO patch downstream as well.
->>
->> Since the plan for the downstream code _is_ to move upstream, I really
->> hope to see the helper LTO patch upstream, so we don't get a performance
->> regression because of these refcounts.
->>
->> If we cannot figure out a way to get the LTO patches (or an alternative
->> solution) upstream, we can always revert back to a more performant
->> solution in block.
->=20
-> I forgot to report the result of the benchmarks. Over the usual
-> benchmark workload that I run for `rnull` I see an average 0.8 percent
-> performance penalty with this patch. For some configurations
-> I see 95% CI N=3D40 [-18%;-5%]. So it is not insignificant.
+> >> > > existing HW.
+> >> >
+> >> > After reading the whole thread, I end up wondering why we need to ru=
+sh the
+> >> > support for a single use case through instead of putting the archite=
+cture
+> >> > in place for properly supporting this new type of hardware from the =
+start
+> >> > throughout the stack.
+> >>
+> >> This is not a rush. We have been supporting this use case through pass=
+thru for
+> >> over 1/2 year with code already upstream in Cachelib. This is mature e=
+nough as
+> >> to move into the block layer, which is what the end user wants to do e=
+ither way.
+> >>
+> >> This is though a very good point. This is why we upstreamed passthru a=
+t the
+> >> time; so people can experiment, validate, and upstream only when there=
+ is a
+> >> clear path.
+> >>
+> >> >
+> >> > Even for user space consumers of raw block devices, is the last vers=
+ion
+> >> > of the patch set good enough?
+> >> >
+> >> > * It severely cripples the data separation capabilities as only a ha=
+ndful of
+> >> >   data placement buckets are supported
+> >>
+> >> I could understand from your presentation at LPC, and late looking at =
+the code that
+> >> is available that you have been successful at getting good results wit=
+h the existing
+> >> interface in XFS. The mapping form the temperature semantics to zones =
+(no semantics)
+> >> is the exact same as we are doing with FDP. Not having to change neith=
+er in-kernel  nor user-space
+> >> structures is great.
+> >
+> >No, we don't map data directly to zones using lifetime hints. In fact,
+> >lifetime hints contribute only a
+> >relatively small part  (~10% extra write amp reduction, see the
+> >rocksdb benchmark results).
+> >Segregating data by file is the most important part of the data
+> >placement heuristic, at least
+> >for this type of workload.
+>
+> Is this because RocksDB already does seggregation per file itself? Are
+> you doing something specific on XFS or using your knoledge on RocksDB to
+> map files with an "unwritten" protocol in the midde?
 
-Was the benchmark run together with the LTO helper patches?
+Data placement by-file is based on that the lifetime of a file's data
+blocks are strongly correlated. When a file is deleted, all its blocks
+will be reclaimable at that point. This requires knowledge about the
+data placement buckets and works really well without any hints
+provided.
+The life-time hint heuristic I added on top is based on rocksdb
+statistics, but designed to be generic enough to work for a wider
+range of workloads (still need to validate this though - more work to
+be done).
 
----
-Cheers,
-Benno
+>
+>     In this context, we have collected data both using FDP natively in
+>     RocksDB and using the temperatures. Both look very good, because both
+>     are initiated by RocksDB, and the FS just passes the hints directly
+>     to the driver.
+>
+> I ask this to understand if this is the FS responsibility or the
+> application's one. Our work points more to letting applications use the
+> hints (as the use-cases are power users, like RocksDB). I agree with you
+> that a FS could potentially make an improvement for legacy applications
+> - we have not focused much on these though, so I trust you insights on
+> it.
 
+The big problem as I see it is that if applications are going to work
+well together on the same media we need a common placement
+implementation somewhere, and it seems pretty natural to make it part
+of filesystems to me.
+
+
+>
+> >>
+> >> >
+> >> > * It just won't work if there is more than one user application per =
+storage
+> >> >   device as different applications data streams will be mixed at the=
+ nvme
+> >> >   driver level..
+> >>
+> >> For now this use-case is not clear. Folks working on it are using pass=
+thru. When we
+> >> have a more clear understanding of what is needed, we might need chang=
+es in the kernel.
+> >>
+> >> If you see a need for this on the work that you are doing, by all mean=
+s, please send patches.
+> >> As I said at LPC, we can work together on this.
+> >>
+> >> >
+> >> > While Christoph has already outlined what would be desirable from a
+> >> > file system point of view, I don't have the answer to what would be =
+the overall
+> >> > best design for FDP. I would like to say that it looks to me like we=
+ need to
+> >> > consider more than more than the early adoption use cases and make s=
+ure we
+> >> > make the most of the hardware capabilities via logical abstractions =
+that
+> >> > would be compatible with a wider range of storage devices.
+> >> >
+> >> > Figuring the right way forward is tricky, but why not just let it ta=
+ke the time
+> >> > that is needed to sort this out while early users explore how to use=
+ FDP
+> >> > drives and share the results?
+> >>
+> >> I agree that we might need a new interface to support more hints, beyo=
+nd the temperatures.
+> >> Or maybe not. We would not know until someone comes with a use case. W=
+e have made the
+> >> mistake in the past of treating internal research as upstreamable work=
+. I know can see that
+> >> this simply complicates the in-kernel and user-space APIs.
+> >>
+> >> The existing API is usable and requires no changes. There is hardware.=
+ There are customers.
+> >> There are applications with upstream support which have been tested wi=
+th passthru (the
+> >> early results you mention). And the wiring to NVMe is _very_ simple. T=
+here is no reason
+> >> not to take this in, and then we will see what new interfaces we might=
+ need in the future.
+> >>
+> >> I would much rather spend time in discussing ideas with you and others=
+ on a potential
+> >> future API than arguing about the validity of an _existing_ one.
+> >>
+> >
+> >Yes, but while FDP support could be improved later on(happy to help if
+> >that'll be the case),
+> >I'm just afraid that less work now defining the way data placement is
+> >exposed is going to
+> >result in a bigger mess later when more use cases will be considered.
+>
+> Please, see the message I responded on the other thread. I hope it is a
+> way to move forward and actually work together on this.
