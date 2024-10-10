@@ -1,176 +1,97 @@
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C614A7DA62;
-	Thu, 10 Oct 2024 15:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6161991B8
+	for <linux-block@vger.kernel.org>; Thu, 10 Oct 2024 16:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728575262; cv=none; b=fptV2baK02QU+BIact81vrc5gI6JHsa5LdTX/GJ8s8TFKbtl8pSf/FU6oGVI9P5TvmVy1WSecA7W3v1xV2Zs1xpAvsRDYkJrYGkHeSELS0cu/taMw9oYBe5blCe61TkhAq7E11LrdzHsHKZBoz03C+tr/9XD+lByD/Yc53wwVPQ=
+	t=1728578440; cv=none; b=J+vF3a7cmK4hOtPSOjHZ3WH+9cyOXOKJ5MtmB5SphZwfHfrtZGVVmw7RudaMSzX+ZUGliNE0GUJr3FZH9aWBOThj8bq9i9A4lmeXfUI564iepEGF6zg41kCCwhpYyLTj+B4hEEuSwDJVoYhicBAxe/BrSwThEv9tuAkLLXfsNq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728575262; c=relaxed/simple;
-	bh=m1n2YWFVEdaH5nVH4itHpiSzRpBwnNSQcR46978WYs4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QvwGnoGynYTh0X0s98/+lEuTHBbZnu4h95VrTS9tNYFaCR8on3M3XBNtY9/33//EZyF6QbOAxpByuyp/6Mm8RsqvSoaVCkyza5MGNAHKKLWhbhP1Sg8FafV6r8dpt0+6PWRsCHSDMeXrFW0hhFAZmvBSoZd4sXCr20iLUn6WHvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HjpATXrT; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728578440; c=relaxed/simple;
+	bh=emRD/yhiwJNd5I3pgU02YmFVVUfHmQHkMVwo0yCFw0I=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=tTfWXNeNxI5VdkdOTHHLyI4IjEdmRpmbUCPsez5F961cJUb6F0UeEtlkRJcTA7CKJdjftDyjEkZ6naLWJy6moTC4Oy5MsQvoh/Ekp0JBwA/iMEs313qVuz1BXTovBR4H4zvACfN473GhPJOlKVUgHT4ztjqIvEpMUpVDu0/qUMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qPsGo8OS; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HjpATXrT"
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c9388a00cfso912606a12.3;
-        Thu, 10 Oct 2024 08:47:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qPsGo8OS"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-8354cecdfd3so35322339f.2
+        for <linux-block@vger.kernel.org>; Thu, 10 Oct 2024 09:40:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728575259; x=1729180059; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XJOdKSCyRxWoJZsXqjQ2pGVqLKgYzGVaLiitUDbtxIM=;
-        b=HjpATXrTsJ1dsvyKAaL7MnlsedT0sqAzKe1Qgl69gRjPlVuI34kJaYARPiTKLhcp6j
-         ktjFUdA2Px1+E9V1Z8N828vCwpX5qtfGvUyZ7BCpfT0HoCiGDHXNiLWVsp/cT80mwD57
-         1zisZYpYWQCRp2bWnBQ++Ludncx087acmMgCzDnJjQRSgt7DsS+CcIBrbYfGrWlLNPvU
-         LhrPu6kiNRHF0zTPGZHStBdKM+/Bwx/Z4U9hljInHqsi4ii0SfrtkWaZAO83nLxm1HjZ
-         76ocryEQWiv848l29G9LfLfOioW7Co7/T7cvigbAJ/blWz8JKpaJIG4Rh10As8hrWE6J
-         mrQw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728578436; x=1729183236; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xyEsB+OCzLx40GaxNsnDi2QdTHIQWPihWeYETwMhlxk=;
+        b=qPsGo8OS6Sl9xhrIuNpN0TgusVnXqpRlx8G6KM4xOP3rmGq6KNhd2dLTBc8bTLvCON
+         ZcGF4eEDaqB+HnXpj4WOzJdaYRGVv5nVUpS2ZOc3WbYUggza6ON0JLTMYDwGCOcPJOqh
+         OcO0IUsHzf1w5nm4eEh+JxKcmU9vvHHPFAvILGRN0HOioG+vfe5FJxUiOXI+9hFcz8Xk
+         9PveRexzB3hlgV40sasC/nDXvLD7B9rzKq6qqEjLlgOd5eVEb0Q5qZ2EnpbH/2jqQh9N
+         e8vsozbuh2Odep9EnabCUvksxlNiRLC1Mr7rl5ZjMHv5+Rt7ZjBXUr5d4Gh76aKklmZE
+         h1mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728575259; x=1729180059;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XJOdKSCyRxWoJZsXqjQ2pGVqLKgYzGVaLiitUDbtxIM=;
-        b=n+ZlV8qV49qOobEoKcXO6/mWNLWE8xAClXetdpczkibJux+WlFXxZBBaitEKGLuQsH
-         TpcgsFBJ3pq7Xs7U00OlKvuCh1VlD0i/32k2wvHHpCzZYFmppjw675yrHTbaedmt19ls
-         BBJlJVwsQ6Jy+UR0amfYg2YkXItWHMPgLA9jUkCPGJP7JouPiTPAmIbvf2MqfbCSBBgk
-         xox6mILZjxu7dcMdzdjzqbCFqP+Fg+cYmXQuH6NrF+xESXCOWldcLdf8BmswpsoxPcvM
-         xwO/vvBLluuhqgAEQoJhyBLEySUHTWgVRAusPFNOVdgPDCHd/9cq+4DLsWkBbwYxBJNj
-         pXQw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrz9GE1/xL7jys70V1Xdr8hdoJRUlpyxIfJ4x/gyd+amdsPnNoJSVTreDvm3qwkpsi66qSZDo1NLejbVU=@vger.kernel.org, AJvYcCXE1cvLExrFWUcF6pPeTmyqy0y9pupN4k2fFp0l5KsJ8T4kGAqXY2+gKc5aRKWn4+8d7sBEI5KjkA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwC5IZuDQxvtBdPw4gr1tAHzroJ8q08yuKVKLUSZRtOvhMnRTkz
-	EX92Jk/FXpn0Xlui9RiaKk72/WmNqV5ya8Va0ILfzfqnbokubblf
-X-Google-Smtp-Source: AGHT+IEmtBgLQok+KmjxmSzpC3Ma+9HgYtARqPFruWkhsp331a529yBtG+P+AeYz/vjVJttl6CIMag==
-X-Received: by 2002:a17:907:e648:b0:a99:5985:bf39 with SMTP id a640c23a62f3a-a998d117e0amr591415466b.13.1728575258849;
-        Thu, 10 Oct 2024 08:47:38 -0700 (PDT)
-Received: from [192.168.42.29] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99a7f25406sm105668466b.69.2024.10.10.08.47.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2024 08:47:38 -0700 (PDT)
-Message-ID: <4b40eff1-a848-4742-9cb3-541bf8ed606e@gmail.com>
-Date: Thu, 10 Oct 2024 16:48:14 +0100
+        d=1e100.net; s=20230601; t=1728578436; x=1729183236;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xyEsB+OCzLx40GaxNsnDi2QdTHIQWPihWeYETwMhlxk=;
+        b=LZWKXkNiCRM9+9wry6rK4Cel6GxrOx1rdUo5TDuw8sA8q96K6Oskp64vkn7tIKl8tt
+         Jg2DvY6+AWt3XF9q3xU1Zy9C44v+n6gj91dbu2hY26YRKmOuH7OCckdRSCAJ/bJ1W5qW
+         u/Q0V2vCJBp3O4rE2SfTEFlu9gsieisbKgfh7fZu9dZUqaIqEeir6tLnFkZdyfaBNB7Z
+         jSgKlnppK8f7TQCRMhd5S/f2XwFCtRSZyM4xZO+ESHL6P6tAf9800p4R9Id+yQLRvsYc
+         vlCNJxlftNOBDLOqr7LGTfaapZ9c9taUk+/eRl7QOg3jKiRCrd3E3jy6cEVvv01YNHFm
+         2asg==
+X-Forwarded-Encrypted: i=1; AJvYcCUbPcmAXnAsTn80dZJi9Xe2FsPuuN05Y5C/4bCL3q4xa1uxPCiWCDJjOYYNRfCadRKHUDKq8fqU+gYGVQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGpLOnFMeB1FX/TA7dt8jMdY7CMZlfFGCbeumJLjdUVHjY28hF
+	JKBn7Ve+Ve3zDTMxvZNq+cL3gKxMeCwVpWP/oSAakMKvMnNT1X7nMgJZ6RWsHI0=
+X-Google-Smtp-Source: AGHT+IFEmCZPBVhf98FTxzWL+eR06aMmyiWwZQg2crpBWOEdUtRFqg0o1IYByJp66uZ0W79z+8AwVA==
+X-Received: by 2002:a05:6602:1555:b0:82d:129f:acb6 with SMTP id ca18e2360f4ac-8353d5125a7mr656986839f.14.1728578436301;
+        Thu, 10 Oct 2024 09:40:36 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbad9d51afsm308876173.44.2024.10.10.09.40.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Oct 2024 09:40:35 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: Breno Leitao <leitao@debian.org>
+Cc: kernel-team@meta.com, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20241010141509.4028059-1-leitao@debian.org>
+References: <20241010141509.4028059-1-leitao@debian.org>
+Subject: Re: [PATCH] elevator: do not request_module if elevator exists
+Message-Id: <172857843553.77782.4750472326626678741.b4-ty@kernel.dk>
+Date: Thu, 10 Oct 2024 10:40:35 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V6 7/8] io_uring/uring_cmd: support provide group kernel
- buffer
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org
-References: <20240912104933.1875409-1-ming.lei@redhat.com>
- <20240912104933.1875409-8-ming.lei@redhat.com>
- <b232fa58-1255-44b2-92c9-f8eb4f70e2c9@gmail.com> <ZwJObC6mzetw4goe@fedora>
- <38ad4c05-6ee3-4839-8d61-f8e1b5219556@gmail.com> <ZwdJ7sDuHhWT61FR@fedora>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZwdJ7sDuHhWT61FR@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-On 10/10/24 04:28, Ming Lei wrote:
-> On Wed, Oct 09, 2024 at 04:14:33PM +0100, Pavel Begunkov wrote:
->> On 10/6/24 09:46, Ming Lei wrote:
->>> On Fri, Oct 04, 2024 at 04:44:54PM +0100, Pavel Begunkov wrote:
->>>> On 9/12/24 11:49, Ming Lei wrote:
-...
->>> so driver can check if device buffer can be provided with this uring_cmd,
->>> but I prefer to the new uring_cmd flag:
->>>
->>> - IORING_PROVIDE_GROUP_KBUF can provide device buffer in generic way.
->>
->> Ok, could be.
->>
->>> - ->prep() can fail fast in case that it isn't one group request
->>
->> I don't believe that matters, a behaving user should never
->> see that kind of failure.
->>
->>
->>>> 1. Extra overhead for files / cmds that don't even care about the
->>>> feature.
->>>
->>> It is just checking ioucmd->flags in ->prep(), and basically zero cost.
->>
->> It's not if we add extra code for each every feature, at
->> which point it becomes a maze of such "ifs".
+
+On Thu, 10 Oct 2024 07:15:08 -0700, Breno Leitao wrote:
+> Whenever an I/O elevator is changed, the system attempts to load a
+> module for the new elevator. This occurs regardless of whether the
+> elevator is already loaded or built directly into the kernel. This
+> behavior introduces unnecessary overhead and potential issues.
 > 
-> Yeah, I guess it can't be avoided in current uring_cmd design, which
-
-If can't only if we keep putting all custom / some specific
-command features into the common path. And, for example, I
-just named how this one could be avoided.
-
-The real question is whether we deem that buffer providing
-feature applicable widely enough so that it could be useful
-to many potential command implementations and therefore is
-worth of partially handling it generically in the common path.
-
-> serves for different subsystems now, and more in future.
+> This makes the operation slower, and more error-prone. For instance,
+> making the problem fixed by [1] visible for users that doesn't even rely
+> on modules being available through modules.
 > 
-> And the situation is similar with ioctl.
+> [...]
 
-Well, commands look too much as ioctl for my taste, but even
-then I naively hope it can avoid regressing to it.
+Applied, thanks!
 
->>>> 2. As it stands with this patch, the flag is ignored by all other
->>>> cmd implementations, which might be quite confusing as an api,
->>>> especially so since if we don't set that REQ_F_GROUP_KBUF memeber
->>>> requests will silently try to import a buffer the "normal way",
->>>
->>> The usage is same with buffer select or fixed buffer, and consumer
->>> has to check the flag.
->>
->> We fails requests when it's asked to use the feature but
->> those are not supported, at least non-cmd requests.
->>
->>> And same with IORING_URING_CMD_FIXED which is ignored by other
->>> implementations except for nvme, :-)
->>
->> Oh, that's bad. If you'd try to implement the flag in the
->> future it might break the uapi. It might be worth to patch it
->> up on the ublk side, i.e. reject the flag, + backport, and hope
->> nobody tried to use them together, hmm?
->>
->>> I can understand the concern, but it exits since uring cmd is born.
->>>
->>>> i.e. interpret sqe->addr or such as the target buffer.
->>>
->>>> 3. We can't even put some nice semantics on top since it's
->>>> still cmd specific and not generic to all other io_uring
->>>> requests.
->>>>
->>>> I'd even think that it'd make sense to implement it as a
->>>> new cmd opcode, but that's the business of the file implementing
->>>> it, i.e. ublk.
->>>>
->>>>>      */
->>>>>     #define IORING_URING_CMD_FIXED	(1U << 0)
->>>>> -#define IORING_URING_CMD_MASK	IORING_URING_CMD_FIXED
->>>>> +#define IORING_PROVIDE_GROUP_KBUF	(1U << 1)
->>>>> +#define IORING_URING_CMD_MASK	(IORING_URING_CMD_FIXED | IORING_PROVIDE_GROUP_KBUF)
->>>
->>> It needs one new file operation, and we shouldn't work toward
->>> this way.
->>
->> Not a new io_uring request, I rather meant sqe->cmd_op,
->> like UBLK_U_IO_FETCH_REQ_PROVIDER_BUFFER.
-> 
-> `cmd_op` is supposed to be defined by subsystems, but maybe we can
-> reserve some for generic uring_cmd. Anyway this shouldn't be one big
-> deal, we can do that in future if there are more such uses.
+[1/1] elevator: do not request_module if elevator exists
+      commit: 822138bfd69ba93e240dc3663ad719cd8c25d1fa
 
-That's if the generic handling is desired, which isn't much
-different from a flag, otherwise it can be just a new random
-file specific cmd opcode as any other.
-
+Best regards,
 -- 
-Pavel Begunkov
+Jens Axboe
+
+
+
