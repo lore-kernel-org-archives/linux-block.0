@@ -1,55 +1,55 @@
-Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDAD81C57AD;
-	Thu, 10 Oct 2024 12:40:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E701C68B2;
+	Thu, 10 Oct 2024 12:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728564013; cv=none; b=hbxUZMW2Tg84UOqtRLQzItqUnyM/sbNKLE67D/d8A4Olpqc1w5SzWvQydHgv1WqY5/aRiHfod6W1uFZYTq1Ys72F9b2YLo2X5E7f6qU2b/9EFVhX6Y2N7WqkVWstQToZMavzasr9I2jtB12qbpm5uR+ohcXVFB/BtG4mpKKOMss=
+	t=1728564014; cv=none; b=D9Pr+f/80eonxYd9tdtPy3nuOBybSmV5j/GC8Xl1cenCgg3OmoVp3by3X6+pUTnHC+aN5PJIp3R2tkg9itQrL+GknGOmtB0tnm9q7btr0myibhzsCO4sNI3XmMwY6MV8QV1DKq7jucr4bBNrDHwRF36h0+U25fvBlf6UNGbKDII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728564013; c=relaxed/simple;
-	bh=UPKd6cKu4G1mhtABi+QKRwnDX6seEVlORwH8zuLbdcw=;
+	s=arc-20240116; t=1728564014; c=relaxed/simple;
+	bh=68I1lwYU/+wJ4dnGG2TL+FT7xhZy5zqqb4ROoSUvlIQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MLrEOEoQf9mtzMF0Nc+J2P+qRO9W5SUgBFmW/l8TYyLOBCkUCa0av2F+jcHZvzisOzBDZAIZb3tdJ6hw4LEW4OJhF6p0sqoEoHeajL2XSxTUDJMOYdJ2OSqunYIfEtT3K/3MlB0eOSIfW9wMBLl/sk3Y9zWWMLVc5T9tREFXdGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bjorling.me; spf=pass smtp.mailfrom=bjorling.me; dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b=bHzeC+7M; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LLAxc+om; arc=none smtp.client-ip=103.168.172.151
+	 MIME-Version:Content-Type; b=S+3+N+ItQRObQ2GelwcouS7NgzARKWmH5pUSnL8igT8zF4UTkJM4A8JQ/F8jc4Hh/imTcT6dqlzgdIvoyFMfHt0b+htP37hnYzD0FUtQNI39bEKc7151pBuswlW1/iXW/4RNYGruHF860YT1NJRNmRmVGG/zbWiqVYbkdZRUsH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bjorling.me; spf=pass smtp.mailfrom=bjorling.me; dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b=E3MkTl43; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=B4dHZQCE; arc=none smtp.client-ip=103.168.172.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bjorling.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bjorling.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b="bHzeC+7M";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LLAxc+om"
+	dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b="E3MkTl43";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="B4dHZQCE"
 Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id DA27113805AF;
-	Thu, 10 Oct 2024 08:40:09 -0400 (EDT)
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 95F36114026F;
+	Thu, 10 Oct 2024 08:40:11 -0400 (EDT)
 Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Thu, 10 Oct 2024 08:40:09 -0400
+  by phl-compute-03.internal (MEProxy); Thu, 10 Oct 2024 08:40:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bjorling.me; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1728564009;
-	 x=1728650409; bh=wcmf7w+OiwLmdPkHU7Tj6zR6S+No4edofLVh/f0x3GA=; b=
-	bHzeC+7M0VPl9BzJsxdbjiI8R2st+LE38rIRyWUZaVMWTG3rA5JPQCj725gb9c5P
-	YjkRTnzFXwRV1a37AYcVeX+u47WgE7rhVKVO8UM8EVuS3wYDIbM8RnsLlHvx+ABY
-	nTFJlauK9CzsH3xPq48oKWNSJ1mIcE2G6Oby9ud6chi6SgSPMxAs/cNwwX8nonPQ
-	G1KKNFvRtiNdH+Ha0VvQWe3+f2qH2osOemXcuLR2v4Meji9LOFxziATL8n1Wu2RK
-	xAh5Xe177XF+Ii6efpYut0MQ6JVYp6seE77kj4jxVY5+4bX76VkI0e/47SfNwCNM
-	v4DFWFiMfehkxaPE4ieNsA==
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1728564011;
+	 x=1728650411; bh=Y4deuAV5jZ+rAUYMVlMbFoNe/5E0fsyGDwmlrSxU7dA=; b=
+	E3MkTl43mlmTpBpIYZpMWXm9GFW5kdDPRrUHzjH3IyDbk/XzJ5aCGXRe3cQHAeRn
+	sWXwgfFG6e1p/wew3IXozNZlZaOp0rY3VW8ql+exd0FnDmy0CvkVWMhUyg+R0PLj
+	LWmpQ2AAD8Z1WiJLm5jlXK66S6Yr4f3LAMVsZWPK5Mi2njKPxoSnmh0t6F+bvpIY
+	u+hnZ9aWoygbFOQhc6owsKWkw5hVPxneFqijvgK1gu+6rrqQGgW9BSEeXoDfqR2z
+	MJESWkGAagMs5thcX2Ib4cdoQd92raUnOPlg2o1OKHQs+0Jr9WKhm9/zma3NkPiB
+	iuzISBaOzPChq1jyFEcMYg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1728564009; x=
-	1728650409; bh=wcmf7w+OiwLmdPkHU7Tj6zR6S+No4edofLVh/f0x3GA=; b=L
-	LAxc+ommX//Ps7YDuDIu4MvziG6IKkpGhm+EDZ6TGHBOkfGf86mThYcgDaYctaK0
-	KehTSe6YyzvcsC2U+okreQO8VzPBTWGRgK3fbZ9GV3FY815vSVUY60fAu4ZFJIMz
-	QqDhi2868PItn7WWnlz56WOZ7wRkPBWxZowrypVCj/7Gn60WKCz4G1IPtXPvS7kj
-	eXzRig0OAaxEMvo12qkdL4KOkdIXaQyKLX6kvHGJ2gf+Yc9kzvgi/hXh51EzWexl
-	/ma+KzeGNJpx0sEC0aRWMqVRrqmyEZpXAPzLXCv7Zswz8ejXrE/SGWRiySc8FRsk
-	lKslYgQDjqL58t7JuptBA==
-X-ME-Sender: <xms:KcsHZ7Qi_0oVYie0HPRdXWr5Nnb1svYgG2-2jRQ9QVvErygU9o5U7w>
-    <xme:KcsHZ8yatYU9rPjBNFWnrd7pZwMwb66akCUueUTb01feZPbc_Awm5NNDcYTfCx7W9
-    JbguGSrmzldkuBXAlg>
-X-ME-Received: <xmr:KcsHZw2J1qrOzF_XjOwsBEA8cwhJt5psxygtpxaNzNDNM4ON9WY5pJO3FSk8THY>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1728564011; x=
+	1728650411; bh=Y4deuAV5jZ+rAUYMVlMbFoNe/5E0fsyGDwmlrSxU7dA=; b=B
+	4dHZQCEzcipYAHYFqDbWsXVuj8udK6MdvvKNfPzJ//dWgwyOg47kB1Wv1AtsHC2e
+	5GmlWZtAQsT0ag0L15PgVZt5gplB2HVPsPNqydWwko5gyOMji2EGQf6btTgX1ap9
+	Tl/iR2oN9XAKZELMpCdSFf4qK+veVbm4S6tJdRd3v3OWCfKbq5KFTM+9xb+fYa6l
+	UpE2cT70NbOqdf6ofkXRFUlPR0zLlUsixYvWeK7iVPem+ckSPTfXmg7t7T3b6BWH
+	v9B0XTlo5kCxcJq2b22s1odNVBbEZyq/9TAEGWIYzDsNu9iApYTanrpHNd5MCfZg
+	Zlxg25KwAkFzp/WyilFvQ==
+X-ME-Sender: <xms:K8sHZ19pUw9Zg_a1LJrZj2bU0MDq7txKeoqjM7lF4YeRZm_tCLiE6Q>
+    <xme:K8sHZ5tTuURjVYusuKJvxH-MhttnVpXiMhlkNpsMnZPVKQY3ChA6rytt0EooWlTjk
+    fO4zvBlcpSw3QxifTo>
+X-ME-Received: <xmr:K8sHZzAzSjiNouVrRpy4PDsFur2ScH-5Af4xrZxO6O0cNTYyVciSfNnf4hJcg9E>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdefhedgheeiucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
     rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpefhvfevuf
@@ -66,14 +66,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdefhedgheeiucetufdoteggod
     hkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopeifrghnghih
     uhhguhhisegvudeiqdhtvggthhdrtghomhdprhgtphhtthhopehmrghrthhinhdrphgvth
     gvrhhsvghnsehorhgrtghlvgdrtghomh
-X-ME-Proxy: <xmx:KcsHZ7B0WV9Hp48ghkmVtCxnyRmNA2x6fOP-9TlmJ0v1LI9YStfvVg>
-    <xmx:KcsHZ0iTcGYwEuZaYBs5eo7oZ_97cPTm3O9YpG-or3RZ54X95m9jcA>
-    <xmx:KcsHZ_oBiHk5pHnZ-Dt0c1EOsjtI4IP4vddBgVqWHDDlQ_PIAVTBBw>
-    <xmx:KcsHZ_gExQHojmDv5fWjRhFy_Np1TwveEPsWXa5U0Mkb3RKcZiKEmQ>
-    <xmx:KcsHZzqHas9WJaJMOEW1ha2J25bz48Al_MPRt0tlsBA_jMANvEap8DvW>
+X-ME-Proxy: <xmx:K8sHZ5dXuLbeWFCWC9FMMfga3Hn8PiAXwZcppClF8Ue6UlMXYJPMCA>
+    <xmx:K8sHZ6O5plh9MtqX3urKr-IFGpH6-P3OtmXkXTuG4xhoS_5nQsR1gQ>
+    <xmx:K8sHZ7kY8IZYFfCzYmUwxi4dMMFntMnblDA52e8p0KoFBS4wjd0hcg>
+    <xmx:K8sHZ0tOmtUEqGgfrVNWiA-o_nW2ZBU2C7ir0m8P5kQX6g0MdM2NWg>
+    <xmx:K8sHZ7nLkfXXZU-00hoTb6fK5h_w58FZmPd2gaqb2FVtt-sBxa0C37PA>
 Feedback-ID: if4314918:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 10 Oct 2024 08:40:07 -0400 (EDT)
+ 10 Oct 2024 08:40:10 -0400 (EDT)
 From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <m@bjorling.me>
 To: kbusch@kernel.org,
 	hch@lst.de,
@@ -86,9 +86,9 @@ To: kbusch@kernel.org,
 	martin.petersen@oracle.com,
 	hare@suse.de
 Cc: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias.bjorling@wdc.com>
-Subject: [PATCH 1/3 v2] nvme: make independent ns identify default
-Date: Thu, 10 Oct 2024 14:39:49 +0200
-Message-ID: <20241010123951.1226105-2-m@bjorling.me>
+Subject: [PATCH 2/3 v2] nvme: add rotational support
+Date: Thu, 10 Oct 2024 14:39:50 +0200
+Message-ID: <20241010123951.1226105-3-m@bjorling.me>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20241010123951.1226105-1-m@bjorling.me>
 References: <20241010123951.1226105-1-m@bjorling.me>
@@ -101,54 +101,88 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Matias Bjørling <matias.bjorling@wdc.com>
+From: Wang Yugui <wangyugui@e16-tech.com>
 
-The NVMe 2.0 specification adds an independent identify namespace
-data structure that contains generic attributes that apply to all
-namespace types. Some attributes carry over from the NVM command set
-identify namespace data structure, and others are new.
+Rotational devices, such as hard-drives, can be detected using
+the rotational bit in the namespace independent identify namespace
+data structure. Make the bit visible to the block layer through the
+rotational queue setting.
 
-Currently, the data structure only considered when CRIMS is enabled or
-when the namespace type is key-value.
-
-However, the independent namespace data structure
-is mandatory for devices that implement features from the 2.0+
-specification. Therefore, we can check this data structure first. If
-unavailable, retrieve the generic attributes from the NVM command set
-identify namespace data structure.
-
-Signed-off-by: Matias Bjørling <matias.bjorling@wdc.com>
+Signed-off-by: Wang Yugui <wangyugui@e16-tech.com>
+Reviewed-by: Matias Bjørling <matias.bjorling@wdc.com>
 Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+
+larlar
 ---
- drivers/nvme/host/core.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ drivers/nvme/host/core.c | 6 ++++++
+ drivers/nvme/host/nvme.h | 1 +
+ include/linux/nvme.h     | 1 +
+ 3 files changed, 8 insertions(+)
 
 diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 0dc8bcc664f2..9cbef6342c39 100644
+index 9cbef6342c39..a83cf54c5861 100644
 --- a/drivers/nvme/host/core.c
 +++ b/drivers/nvme/host/core.c
-@@ -3999,7 +3999,7 @@ static void nvme_scan_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- {
- 	struct nvme_ns_info info = { .nsid = nsid };
- 	struct nvme_ns *ns;
--	int ret;
-+	int ret = 1;
+@@ -41,6 +41,7 @@ struct nvme_ns_info {
+ 	bool is_readonly;
+ 	bool is_ready;
+ 	bool is_removed;
++	bool is_rotational;
+ };
  
- 	if (nvme_identify_ns_descs(ctrl, &info))
- 		return;
-@@ -4015,10 +4015,9 @@ static void nvme_scan_ns(struct nvme_ctrl *ctrl, unsigned nsid)
- 	 * data structure to find all the generic information that is needed to
- 	 * set up a namespace.  If not fall back to the legacy version.
- 	 */
--	if ((ctrl->cap & NVME_CAP_CRMS_CRIMS) ||
--	    (info.ids.csi != NVME_CSI_NVM && info.ids.csi != NVME_CSI_ZNS))
-+	if (!nvme_ctrl_limited_cns(ctrl))
- 		ret = nvme_ns_info_from_id_cs_indep(ctrl, &info);
--	else
-+	if (ret > 0)
- 		ret = nvme_ns_info_from_identify(ctrl, &info);
+ unsigned int admin_timeout = 60;
+@@ -1623,6 +1624,7 @@ static int nvme_ns_info_from_id_cs_indep(struct nvme_ctrl *ctrl,
+ 		info->is_shared = id->nmic & NVME_NS_NMIC_SHARED;
+ 		info->is_readonly = id->nsattr & NVME_NS_ATTR_RO;
+ 		info->is_ready = id->nstat & NVME_NSTAT_NRDY;
++		info->is_rotational = id->nsfeat & NVME_NS_ROTATIONAL;
+ 	}
+ 	kfree(id);
+ 	return ret;
+@@ -2170,6 +2172,9 @@ static int nvme_update_ns_info_block(struct nvme_ns *ns,
+ 	else
+ 		lim.features &= ~(BLK_FEAT_WRITE_CACHE | BLK_FEAT_FUA);
  
- 	if (info.is_removed)
++	if (info->is_rotational)
++		lim.features |= BLK_FEAT_ROTATIONAL;
++
+ 	/*
+ 	 * Register a metadata profile for PI, or the plain non-integrity NVMe
+ 	 * metadata masquerading as Type 0 if supported, otherwise reject block
+@@ -3619,6 +3624,7 @@ static struct nvme_ns_head *nvme_alloc_ns_head(struct nvme_ctrl *ctrl,
+ 	head->ns_id = info->nsid;
+ 	head->ids = info->ids;
+ 	head->shared = info->is_shared;
++	head->rotational = info->is_rotational;
+ 	ratelimit_state_init(&head->rs_nuse, 5 * HZ, 1);
+ 	ratelimit_set_flags(&head->rs_nuse, RATELIMIT_MSG_ON_RELEASE);
+ 	kref_init(&head->ref);
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index da57947130cc..3a36548d5c05 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -469,6 +469,7 @@ struct nvme_ns_head {
+ 	struct list_head	entry;
+ 	struct kref		ref;
+ 	bool			shared;
++	bool			rotational;
+ 	bool			passthru_err_log_enabled;
+ 	struct nvme_effects_log *effects;
+ 	u64			nuse;
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index 7b2ae2e43544..6d0eebb57544 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -560,6 +560,7 @@ enum {
+ 	NVME_NS_FLBAS_LBA_SHIFT	= 1,
+ 	NVME_NS_FLBAS_META_EXT	= 0x10,
+ 	NVME_NS_NMIC_SHARED	= 1 << 0,
++	NVME_NS_ROTATIONAL	= 1 << 4,
+ 	NVME_LBAF_RP_BEST	= 0,
+ 	NVME_LBAF_RP_BETTER	= 1,
+ 	NVME_LBAF_RP_GOOD	= 2,
 -- 
 2.46.0
 
