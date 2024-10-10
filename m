@@ -1,59 +1,60 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E7391CEAA6;
-	Thu, 10 Oct 2024 18:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E418A3D6B
+	for <linux-block@vger.kernel.org>; Thu, 10 Oct 2024 19:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728586248; cv=none; b=H38CPAK5WmbOKGzTrC6WIXiWofHDR3Bpo0rYsOkMlovSTBPxt4/XDcahhcbKZ1/8koIh/yfCLWuo/71ziC+6gdx5lDtlpcXMcclvfsBANmZtGmBgG4yIuAyYSbER7NzHvqCzRl3C5/fghQKp1t0TcSAvSFZZp5mRwTDcyCoRhxY=
+	t=1728588689; cv=none; b=UwYOBTalyyG3mqPylDqArHosz9k6t0Fqo/CBD0r+tPGJ0h3S9QWoOBgAXcaNApAlY/u4eAPRd91skY0C9Q7xEucKxzxDijW50zGmTof4I+QYeJpToxnv7znWDAMeJVbZWtJXMQYEIZltY4q672ZrjmCnrL7+qsNYPx1BmVQH/aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728586248; c=relaxed/simple;
-	bh=VvALfe1tjjjMdKtNZuRURZtOV2wf+a2gYaPw1L+uu3I=;
+	s=arc-20240116; t=1728588689; c=relaxed/simple;
+	bh=12QdTrNcCiAoL6tcG+CpDGmDROSVd3cKGB/868m13Eg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XkHjnc7RL1WXm8YKrhO3FiU+qCrzv6kH7+JRdmagLE37ExBI94vuHvlKiHYcheGadTuy1BPdSYcZfoBexQt6lwTD6Q7HL61lmouvf9tabdcsvCB5Fza6oZPvNQnVC1MoSCBf2LPOtGGv0K4Hp3qn3tWOUJ03ld9CQeAjUT+QHZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=csO8O0L7; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=A+hPgj6pucRmlCj/lnsmfhNNc9OczLTPtnyXywGYq9G2gAeN1EO4xz3qqOxLBkYS+PBXY5wSESnPiP+h/WSDBIeUxtF/FNl4OGq00t7ZMvtsMAviOeSY3wrq/1FPmScKkbnyC56V7V09khup/J6KJVj7Z8n69LjmCVoLWLdy0XA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KDbVKdW8; arc=none smtp.client-ip=209.85.166.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="csO8O0L7"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43117917eb9so8964735e9.0;
-        Thu, 10 Oct 2024 11:50:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KDbVKdW8"
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-8377fd760b0so14714939f.2
+        for <linux-block@vger.kernel.org>; Thu, 10 Oct 2024 12:31:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728586245; x=1729191045; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728588684; x=1729193484; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=rfaProorKPtZlGUv+B092FuMSIfSwLzcCZ2qy4P0GCQ=;
-        b=csO8O0L7f7w8/eCYOzGyTavFuXgH5cUxcFNmYd9MRNHj4G/ydzVwUQPPfHf/4OMiNj
-         ZKLPCJUC1WW1UqAcLAymQa5G8OucygJRoFwlO4KMaFstOju2WhE+fiwkmISxQvEkL1/j
-         +YE1fAAR3xYJmIwT9yzsQzQQ5a/JsHrN5Eu6pf+O3hmjJM0XcZH+r8LJQtMSFPIGND0D
-         rv8u7emP9f9AL7642AWwZDx69Dye261IoBRpPvrp1dl5cevGKLPH6Non15dCssTb24I1
-         x2SXzLQWF3pSRSxdKUWG/1qQJC/zoziD0cYZQ0uZVvbaGTX+IaG3tS4YvVgKDJx/WZHj
-         Nz8g==
+        bh=spnUaRSzdRBnptMZqzssihls7EmfH7EgrK6Ami2ZaaU=;
+        b=KDbVKdW8ceIcXCjmr0icp6OFrGy5US8zXGxt9+LBrwKWrw2Kjn+iKbIWVSvC8vWMRS
+         y0A5gOFxlbHN+ZnsIQ+VIKWseeAqOzlWY8V4cNNWNZK46hfRc/neXwR9DieFgoH8SlPW
+         FJ+9Ho5IhOgtSRHoOphe1+XAL+WuQgNSEkroyQn1MKpgHcrmbgwnzHvhqgqZ702zbYj5
+         Gic9sTIKIs6iBIXm4vu3D6PC3RsOM0PNLMExM48oNY5Fxe8YRb6kND2EIj0F9akC9nov
+         MKtpmQGHEagM44R1nEkYUy1t9zeY+7wMUM1cGGrHHG9kf9+NpPJY2hxfw3StK0v5XffT
+         wDag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728586245; x=1729191045;
+        d=1e100.net; s=20230601; t=1728588684; x=1729193484;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rfaProorKPtZlGUv+B092FuMSIfSwLzcCZ2qy4P0GCQ=;
-        b=pbkWYMW5r/L+1eNN64ooO4pOmMQCDfE2XFqMOLFl9P6zYydq0qlpT2AWypnCRDW8lj
-         RfEa+XCbejxkJ5tgJHz+9Zx4j4r0zF+PUxwRbAcrJNVspEYNLPIS/KqDITveFkTar4kc
-         LUno5xauPS6km3K90uSbXIJwJJuFSDm3RaB+aXgE/4ELwXolDRfwoADxlKpaodurjlCq
-         CncuCbfn/9h0iFoySBDUAXqDGlhlpOjBj+Le3YklzbH2x2OMX8suTCEbFaQH80P+KJX8
-         Ar3zuiUsULghLXtI8NG724S9jx0nD7fMhtgUlXFpjroo9yl1mKb8P9CH2jBpAA46qTnW
-         /L0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXqLA3ruir8wyswy+SykFYbwNPO7DU8mMCxwNgiOL/QoLmpo0LYU1VXlSmzYHN1Aa4DeyfQ2NCTXrZbiKY=@vger.kernel.org, AJvYcCXyvWLUByEdZ5PxX5Tq8mr/U22aVxHwoi0BijezmAQqE78egfLbY73Ty8hFT9lAzklSWB/eCMlfsg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKAQuEoQe3FYzQqqWHUkYlcBy90blmGFOaioDq2qi9DqWm/ejy
-	yRArmOV5dUq6gwcds5dD1s9vaXND1pA9szxN4wB9sRq40Tutd1tx
-X-Google-Smtp-Source: AGHT+IFpeSn9AXDIe0Rw6ZOwzFbea27/6FPpaJem64uoLtM6XhfRp3ozjDTlAtOD/aXqu5qAYySRRg==
-X-Received: by 2002:a05:600c:1c23:b0:430:57f2:baf2 with SMTP id 5b1f17b1804b1-430d59b7873mr62927435e9.22.1728586244334;
-        Thu, 10 Oct 2024 11:50:44 -0700 (PDT)
-Received: from [192.168.42.219] ([148.252.140.94])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4311835c3acsm23052745e9.41.2024.10.10.11.50.43
+        bh=spnUaRSzdRBnptMZqzssihls7EmfH7EgrK6Ami2ZaaU=;
+        b=Ppa9JQcJ75tB8tWvi/wLM1+7O9MAvFgJdymTEHBaPf9DC1M1n8oKDFAvLbX0ptjyqi
+         69GnwWnuKKchfESYLuMBZ3qD8HvAaROaFfxAXFjqCZdoOyggi6jhkbB/kVP/nvLgQ+Du
+         vgBVx6HhTf7PlIXXvIYiHLARvUwgncSEojT/Q55J+EG2F/e5jNvNuSSC93y4Hg2TOiVD
+         mZ8IcQS9FpgKYObzB8r0YE9nyhyCQ+TPpC7fuckj02u1+LsaIhzS35LG/ADYGaTKofY2
+         xAOun8S/qVPob3WZJCh05AtPvjP0M0oUdQg88aV42DdTOYRcLM9OQeuJRPvzmjbTsd/k
+         J5bA==
+X-Forwarded-Encrypted: i=1; AJvYcCXNifJLIvAif+O9RVJZUjo5qnHZfhEnGGN7JStNQ2bouTud6npF3aOLcaKRXJTYFDVD3VuZAIerfV7DHA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1QTOfr9PNR5bhB4OXAEIRcHD1hKndCUTKAVIt9giCSskA5N3r
+	hCE7tR55qB6yQ6Nh+YkNxSDrJRs29St/PUguUOFxmwTSyjPB2eueZq/dwKHckA3BYjNDOAHwHwn
+	sGd4=
+X-Google-Smtp-Source: AGHT+IG7QjsSxwt8l2+Tvy2EYNGV2L0M/5m6cRB5kDmTmxXmoUGWLaS4uG+b8eG6jt4jFBZeDCxBDw==
+X-Received: by 2002:a05:6602:4886:b0:82d:835:e66d with SMTP id ca18e2360f4ac-837932dc7cemr5370039f.9.1728588683752;
+        Thu, 10 Oct 2024 12:31:23 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbada84b54sm353318173.110.2024.10.10.12.31.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2024 11:50:43 -0700 (PDT)
-Message-ID: <b41dfbe1-2dee-47fc-a2f4-38bef49f60ab@gmail.com>
-Date: Thu, 10 Oct 2024 19:51:19 +0100
+        Thu, 10 Oct 2024 12:31:22 -0700 (PDT)
+Message-ID: <655b3348-27a1-4bc7-ade7-4d958a692d0b@kernel.dk>
+Date: Thu, 10 Oct 2024 13:31:21 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,249 +62,147 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V6 6/8] io_uring: support providing sqe group buffer
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org
+Subject: Re: [PATCH V6 7/8] io_uring/uring_cmd: support provide group kernel
+ buffer
+To: Pavel Begunkov <asml.silence@gmail.com>, Ming Lei <ming.lei@redhat.com>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org
 References: <20240912104933.1875409-1-ming.lei@redhat.com>
- <20240912104933.1875409-7-ming.lei@redhat.com>
- <51c10faa-ac28-4c40-82c4-373dbcad6e79@gmail.com> <ZwJIWqPT_Ae9K2bp@fedora>
- <8d93e1ba-0fdf-44d4-9189-199df57d0676@gmail.com> <ZwdDU1-lfywyb4jO@fedora>
+ <20240912104933.1875409-8-ming.lei@redhat.com>
+ <b232fa58-1255-44b2-92c9-f8eb4f70e2c9@gmail.com> <ZwJObC6mzetw4goe@fedora>
+ <38ad4c05-6ee3-4839-8d61-f8e1b5219556@gmail.com> <ZwdJ7sDuHhWT61FR@fedora>
+ <4b40eff1-a848-4742-9cb3-541bf8ed606e@gmail.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZwdDU1-lfywyb4jO@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <4b40eff1-a848-4742-9cb3-541bf8ed606e@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/10/24 04:00, Ming Lei wrote:
-> On Wed, Oct 09, 2024 at 03:25:25PM +0100, Pavel Begunkov wrote:
->> On 10/6/24 09:20, Ming Lei wrote:
->>> On Fri, Oct 04, 2024 at 04:32:04PM +0100, Pavel Begunkov wrote:
->>>> On 9/12/24 11:49, Ming Lei wrote:
->>>> ...
->>>>> It can help to implement generic zero copy between device and related
->>>>> operations, such as ublk, fuse, vdpa,
->>>>> even network receive or whatever.
->>>>
->>>> That's exactly the thing it can't sanely work with because
->>>> of this design.
->>>
->>> The provide buffer design is absolutely generic, and basically
->>>
->>> - group leader provides buffer for member OPs, and member OPs can borrow
->>> the buffer if leader allows by calling io_provide_group_kbuf()
->>>
->>> - after member OPs consumes the buffer, the buffer is returned back by
->>> the callback implemented in group leader subsystem, so group leader can
->>> release related sources;
->>>
->>> - and it is guaranteed that the buffer can be released always
->>>
->>> The ublk implementation is pretty simple, it can be reused in device driver
->>> to share buffer with other kernel subsystems.
->>>
->>> I don't see anything insane with the design.
->>
->> There is nothing insane with the design, but the problem is cross
->> request error handling, same thing that makes links a pain to use.
-> 
-> Wrt. link, the whole group is linked in the chain, and it respects
-> all existed link rule, care to share the trouble in link use case?
+Hi,
 
-Error handling is a pain, it has been, even for pure link without
-any groups. Even with a simple req1 -> req2, you need to track if
-the first request fails you need to expect another failed CQE for
-the second request, probably refcount (let's say non-atomically)
-some structure and clean it up when you get both CQEs. It's not
-prettier when the 2nd fails, especially if you consider short IO
-and that you can't fully retry that partial IO, e.g. you consumed
-data from the socket. And so on.
+Discussed this with Pavel, and on his suggestion, I tried prototyping a
+"buffer update" opcode. Basically it works like
+IORING_REGISTER_BUFFERS_UPDATE in that it can update an existing buffer
+registration. But it works as an sqe rather than being a sync opcode.
 
-> The only thing I thought of is that group internal link isn't supported
-> yet, but it may be added in future if use case is coming.
-> 
->> It's good that with storage reads are reasonably idempotent and you
->> can be retried if needed. With sockets and streams, however, you
->> can't sanely borrow a buffer without consuming it, so if a member
->> request processing the buffer fails for any reason, the user data
->> will be dropped on the floor. I mentioned quite a while before,
->> if for example you stash the buffer somewhere you can access
->> across syscalls like the io_uring's registered buffer table, the
->> user at least would be able to find an error and then memcpy the
->> unprocessed data as a fallback.
-> 
-> I guess it is net rx case, which requires buffer to cross syscalls,
-> then the buffer has to be owned by userspace, otherwise the buffer
-> can be leaked easily.
-> 
-> That may not match with sqe group which is supposed to borrow kernel
-> buffer consumed by users.
+The idea here is that you could do that upfront, or as part of a chain,
+and have it be generically available, just like any other buffer that
+was registered upfront. You do need an empty table registered first,
+which can just be sparse. And since you can pick the slot it goes into,
+you can rely on that slot afterwards (either as a link, or just the
+following sqe).
 
-It doesn't necessarily require to keep buffers across syscalls
-per se, it just can't drop the data it got on the floor. It's
-just storage can read data again.
+Quick'n dirty obviously, but I did write a quick test case too to verify
+that:
 
-...
->>>>> diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
->>>>> index 793d5a26d9b8..445e5507565a 100644
->>>>> --- a/include/linux/io_uring_types.h
->>>>> +++ b/include/linux/io_uring_types.h
-...
->>>> FWIW, would be nice if during init figure we can verify that the leader
->>>> provides a buffer IFF there is someone consuming it, but I don't think
->>>
->>> It isn't doable, same reason with IORING_OP_PROVIDE_BUFFERS, since buffer can
->>> only be provided in ->issue().
->>
->> In theory we could, in practise it'd be too much of a pain, I agree.
->>
->> IORING_OP_PROVIDE_BUFFERS is different as you just stash the buffer
->> in the io_uring instance, and it's used at an unspecified time later
->> by some request. In this sense the API is explicit, requests that don't
->> support it but marked with IOSQE_BUFFER_SELECT will be failed by the
->> kernel.
-> 
-> That is also one reason why I add ->accept_group_kbuf.
+1) It actually works (it seems to)
+2) It's not too slow (it seems not to be, I can get ~2.5M updates per
+   second in a vm on my laptop, which isn't too bad).
 
-I probably missed that, but I haven't seen that
+Not saying this is perfect, but perhaps it's worth entertaining an idea
+like that? It has the added benefit of being persistent across system
+calls as well, unless you do another IORING_OP_BUF_UPDATE at the end of
+your chain to re-set it.
 
->>>> the semantics is flexible enough to do it sanely. i.e. there are many
->>>> members in a group, some might want to use the buffer and some might not.
->>>>
-...
->>>>> +	if (!kbuf->bvec)
->>>>> +		return -EINVAL;
->>>>
->>>> How can this happen?
->>>
->>> OK, we can run the check in uring_cmd API.
->>
->> Not sure I follow, if a request providing a buffer can't set
->> a bvec it should just fail, without exposing half made
->> io_uring_kernel_buf to other requests.
->>
->> Is it rather a WARN_ON_ONCE check?
-> 
-> I meant we can check it in API of io_provide_group_kbuf() since the group
-> buffer is filled by driver, since then the buffer is immutable, and we
-> needn't any other check.
+Comments? Could it be useful for this?
 
-That's be a buggy provider, so sounds like WARN_ON_ONCE
-
-...
->>>>>     		if (unlikely(ret < 0))
->>>>> @@ -593,6 +600,15 @@ int io_send(struct io_kiocb *req, unsigned int issue_flags)
->>>>>     	if (issue_flags & IO_URING_F_NONBLOCK)
->>>>>     		flags |= MSG_DONTWAIT;
->>>>> +	if (req->flags & REQ_F_GROUP_KBUF) {
->>>>
->>>> Does anything prevent the request to be marked by both
->>>> GROUP_KBUF and BUFFER_SELECT? In which case we'd set up
->>>> a group kbuf and then go to the io_do_buffer_select()
->>>> overriding all of that
->>>
->>> It could be used in this way, and we can fail the member in
->>> io_queue_group_members().
->>
->> That's where the opdef flag could actually be useful,
->>
->> if (opdef[member]->accept_group_kbuf &&
->>      member->flags & SELECT_BUF)
->> 	fail;
->>
->>
->>>>> +		ret = io_import_group_kbuf(req,
->>>>> +					user_ptr_to_u64(sr->buf),
->>>>> +					sr->len, ITER_SOURCE,
->>>>> +					&kmsg->msg.msg_iter);
->>>>> +		if (unlikely(ret))
->>>>> +			return ret;
->>>>> +	}
->>>>> +
->>>>>     retry_bundle:
->>>>>     	if (io_do_buffer_select(req)) {
->>>>>     		struct buf_sel_arg arg = {
->>>>> @@ -1154,6 +1170,11 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
->>>>>     			goto out_free;
->>>>>     		}
->>>>>     		sr->buf = NULL;
->>>>> +	} else if (req->flags & REQ_F_GROUP_KBUF) {
->>>>
->>>> What happens if we get a short read/recv?
->>>
->>> For short read/recv, any progress is stored in iterator, nothing to do
->>> with the provide buffer, which is immutable.
->>>
->>> One problem for read is reissue, but it can be handled by saving iter
->>> state after the group buffer is imported, I will fix it in next version.
->>> For net recv, offset/len of buffer is updated in case of short recv, so
->>> it works as expected.
->>
->> That was one of my worries.
->>
->>> Or any other issue with short read/recv? Can you explain in detail?
->>
->> To sum up design wise, when members that are using the buffer as a
->> source, e.g. write/send, fail, the user is expected to usually reissue
->> both the write and the ublk cmd.
->>
->> Let's say you have a ublk leader command providing a 4K buffer, and
->> you group it with a 4K send using the buffer. Let's assume the send
->> is short and does't only 2K of data. Then the user would normally
->> reissue:
->>
->> ublk(4K, GROUP), send(off=2K)
->>
->> That's fine assuming short IO is rare.
->>
->> I worry more about the backward flow, ublk provides an "empty" buffer
->> to receive/read into. ublk wants to do something with the buffer in
->> the callback. What happens when read/recv is short (and cannot be
->> retried by io_uring)?
->>
->> 1. ublk(provide empty 4K buffer)
->> 2. recv, ret=2K
->> 3. ->grp_kbuf_ack: ublk should commit back only 2K
->>     of data and not assume it's 4K
-> 
-> ->grp_kbuf_ack is supposed to only return back the buffer to the
-> owner, and it doesn't care result of buffer consumption.
-> 
-> When ->grp_kbuf_ack() is done, it means this time buffer borrow is
-> over.
-> 
-> When userspace figures out it is one short read, it will send one
-> ublk uring_cmd to notify that this io command is completed with
-> result(2k). ublk driver may decide to requeue this io command for
-> retrying the remained bytes, when only remained part of the buffer
-> is allowed to borrow in following provide uring command originated
-> from userspace.
-
-My apologies, I failed to notice that moment, even though should've
-given it some thinking at the very beginning. I think that part would
-be a terrible interface. Might be good enough for ublk, but we can't
-be creating a ublk specific features that change the entire io_uring.
-Without knowing how much data it actually got, in generic case you
-1) need to require the buffer to be fully initialised / zeroed
-before handing it. 2) Can't ever commit the data from the callback,
-but it would need to wait until the userspace reacts. Yes, it
-works in the specific context of ublk, but I don't think it works
-as a generic interface.
-
-We need to fall back again and think if we can reuse the registered
-buffer table or something else, and make it much cleaner and more
-accommodating to other users. Jens, can you give a quick thought
-about the API? You've done a lot of interfaces before and hopefully
-have some ideas here.
-
-
-> For ublk use case, so far so good.
-> 
->>
->> Another option is to fail ->grp_kbuf_ack if any member fails, but
->> the API might be a bit too awkward and inconvenient .
-> 
-> We needn't ->grp_kbuf_ack() to cover buffer consumption.
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 86cb385fe0b5..02d4b66267ef 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -259,6 +259,7 @@ enum io_uring_op {
+ 	IORING_OP_FTRUNCATE,
+ 	IORING_OP_BIND,
+ 	IORING_OP_LISTEN,
++	IORING_OP_BUF_UPDATE,
+ 
+ 	/* this goes last, obviously */
+ 	IORING_OP_LAST,
+diff --git a/io_uring/opdef.c b/io_uring/opdef.c
+index a2be3bbca5ff..cda35d22397d 100644
+--- a/io_uring/opdef.c
++++ b/io_uring/opdef.c
+@@ -515,6 +515,10 @@ const struct io_issue_def io_issue_defs[] = {
+ 		.prep			= io_eopnotsupp_prep,
+ #endif
+ 	},
++	[IORING_OP_BUF_UPDATE] = {
++		.prep			= io_buf_update_prep,
++		.issue			= io_buf_update,
++	},
+ };
+ 
+ const struct io_cold_def io_cold_defs[] = {
+@@ -742,6 +746,9 @@ const struct io_cold_def io_cold_defs[] = {
+ 	[IORING_OP_LISTEN] = {
+ 		.name			= "LISTEN",
+ 	},
++	[IORING_OP_BUF_UPDATE] = {
++		.name			= "BUF_UPDATE",
++	},
+ };
+ 
+ const char *io_uring_get_opcode(u8 opcode)
+diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+index 33a3d156a85b..6f0071733018 100644
+--- a/io_uring/rsrc.c
++++ b/io_uring/rsrc.c
+@@ -1236,3 +1236,44 @@ int io_register_clone_buffers(struct io_ring_ctx *ctx, void __user *arg)
+ 		fput(file);
+ 	return ret;
+ }
++
++struct io_buf_update {
++	struct file *file;
++	struct io_uring_rsrc_update2 up;
++};
++
++int io_buf_update_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
++{
++	struct io_buf_update *ibu = io_kiocb_to_cmd(req, struct io_buf_update);
++	struct io_uring_rsrc_update2 __user *uaddr;
++
++	if (!req->ctx->buf_data)
++		return -ENXIO;
++	if (sqe->ioprio || sqe->fd || sqe->addr2 || sqe->rw_flags ||
++	    sqe->splice_fd_in)
++		return -EINVAL;
++	if (sqe->len != 1)
++		return -EINVAL;
++
++	uaddr = u64_to_user_ptr(READ_ONCE(sqe->addr));
++	if (copy_from_user(&ibu->up, uaddr, sizeof(*uaddr)))
++		return -EFAULT;
++
++	return 0;
++}
++
++int io_buf_update(struct io_kiocb *req, unsigned int issue_flags)
++{
++	struct io_buf_update *ibu = io_kiocb_to_cmd(req, struct io_buf_update);
++	struct io_ring_ctx *ctx = req->ctx;
++	int ret;
++
++	io_ring_submit_lock(ctx, issue_flags);
++	ret = __io_register_rsrc_update(ctx, IORING_RSRC_BUFFER, &ibu->up, ibu->up.nr);
++	io_ring_submit_unlock(ctx, issue_flags);
++
++	if (ret < 0)
++		req_set_fail(req);
++	io_req_set_res(req, ret, 0);
++	return 0;
++}
+diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
+index 8ed588036210..d41e75c956ef 100644
+--- a/io_uring/rsrc.h
++++ b/io_uring/rsrc.h
+@@ -142,4 +142,7 @@ static inline void __io_unaccount_mem(struct user_struct *user,
+ 	atomic_long_sub(nr_pages, &user->locked_vm);
+ }
+ 
++int io_buf_update_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
++int io_buf_update(struct io_kiocb *req, unsigned int issue_flags);
++
+ #endif
 
 -- 
-Pavel Begunkov
+Jens Axboe
