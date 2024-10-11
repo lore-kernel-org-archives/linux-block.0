@@ -1,156 +1,183 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0470C1F131C
-	for <linux-block@vger.kernel.org>; Fri, 11 Oct 2024 03:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86EF51C9B87
+	for <linux-block@vger.kernel.org>; Fri, 11 Oct 2024 03:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728616067; cv=none; b=Uaq7QRghMHeBI97LcOOBCSvtcNDdjaLKcGkZzIahoxhbTLh3S2AOxygcF/0u5zgy0kAU8xVCb245jg+cfQjU3xicC+k3agFuklT2GqnSc7yfoQNiXic36WDV9Sk6pvaQ0fHbPIh7YrIFLeheqzqHkEDmjikdCB/BeeXssrY07ik=
+	t=1728618781; cv=none; b=OZZKtsKEH4Zcs+bsiA92NkySEnldRg3S8fPW2P5RtchZeAGODz6HS0AkroyU2V5c5sbsWYI3TKUBuj0MlwGD6SeL7t07CxYvH/dKn9Kjg4weNvx0+Q4nCiAdP4xDKIJYtaaRIVjRcUrIo5LzXdTqdatH34KiYs1u2kXkoPX+T38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728616067; c=relaxed/simple;
-	bh=s+GtP91lhzA7g8WlS9x2LscjG5YUrgKiKGvt2sRK/jI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aR/RszPD0kQ9NRJvcifpgDPS4xlR0IXfuzyKRqhofgvfY1+TbcS9cBUvzk2ibBFc38Xublak2MvgEDy6f9n8S8VIaJZndM2nC1s8PjksOLocK/tW6Ty2GvZgRcH0DWG8H8Mu8vBZFCKQx76FqioT+NKDK9SkQgFMlZvIeCxgGxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GwTJZNOu; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1728618781; c=relaxed/simple;
+	bh=mKxYBI2DV9EIC92aYnw83/LgOe6UfT/sb+9xhOKx2Kk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r6XAGGIfQfJtAF0UlJjY1nWtgfDFAvIHBkNdWSl1xJRek9L3ttcD5/R5PeveedaZa5Ea22O30gLp1FpeN+FskYGK1hSJwpDXV2ynIXetZzKl6NgUzx482y2RikJwNATts2MgC1WYOMnYaFsUY5QrDDmsuXlykrBhRPr1Z1Y+bwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EwJ0/ayh; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GwTJZNOu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EwJ0/ayh"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728616064;
+	s=mimecast20190719; t=1728618778;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dKlEsBgYydTnFBw7QLKS2Ck92rhIyjf/5Nd0VrU+MdU=;
-	b=GwTJZNOue0tiZsgybz4uPWPomE0vpl9aty7BYOEZ+NMJUj0jKDjXHc01pC6SS6U6mIJ2i3
-	/iOEa4Vw6rJnwo/+wyL93o9kdMj77P6ETxZIdHlark7M9GhBzm4C5rYEHJQcm7mHr7yPNe
-	6YmC6xSjyJPyDGsrHquCJ8j/SP0yBe0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EhiV5ueL51Y0qrR+FVXMkHrU2UISlA3wemp2cv+GyUg=;
+	b=EwJ0/ayhoHFmXMuiFEUDNYwjLvg+sKdeJQYFf8zda/TdtTzPGSUig8ZxKclQcGF8ZeC/zg
+	F/PP2IvEKbazePv9TZTg19zqltERqtah8bNd4oT8YmZYUClZyaZwUZAsmfPJp12vkiXPO3
+	p62CEoQZYaMt4t/0JQIKO7+/ntQ4q7M=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-321-zKqueMzgNPmzOBH1Adcb9Q-1; Thu,
- 10 Oct 2024 23:07:43 -0400
-X-MC-Unique: zKqueMzgNPmzOBH1Adcb9Q-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-67-2hx9zfY4M6SZxeiREgM_-Q-1; Thu,
+ 10 Oct 2024 23:52:57 -0400
+X-MC-Unique: 2hx9zfY4M6SZxeiREgM_-Q-1
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 91E2419560B2;
-	Fri, 11 Oct 2024 03:07:42 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.103])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 926F41956089;
-	Fri, 11 Oct 2024 03:07:38 +0000 (UTC)
-Date: Fri, 11 Oct 2024 11:07:32 +0800
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A86451956095;
+	Fri, 11 Oct 2024 03:52:55 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.103])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E76271955F1D;
+	Fri, 11 Oct 2024 03:52:52 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: [PATCH V6 7/8] io_uring/uring_cmd: support provide group kernel
- buffer
-Message-ID: <ZwiWdO6SS_jlkYrM@fedora>
-References: <20240912104933.1875409-1-ming.lei@redhat.com>
- <20240912104933.1875409-8-ming.lei@redhat.com>
- <b232fa58-1255-44b2-92c9-f8eb4f70e2c9@gmail.com>
- <ZwJObC6mzetw4goe@fedora>
- <38ad4c05-6ee3-4839-8d61-f8e1b5219556@gmail.com>
- <ZwdJ7sDuHhWT61FR@fedora>
- <4b40eff1-a848-4742-9cb3-541bf8ed606e@gmail.com>
- <655b3348-27a1-4bc7-ade7-4d958a692d0b@kernel.dk>
- <ZwiN0Ioy2Y7cfnTI@fedora>
- <44028492-3681-4cd4-8ae2-ef7139ad50ad@kernel.dk>
+To: Jens Axboe <axboe@kernel.dk>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	David Howells <dhowells@redhat.com>
+Subject: [PATCH V2] lib/iov_iter.c: extract virt-contiguous pages in iov_iter_extract_bvec_pages
+Date: Fri, 11 Oct 2024 11:52:47 +0800
+Message-ID: <20241011035247.2444033-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <44028492-3681-4cd4-8ae2-ef7139ad50ad@kernel.dk>
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Thu, Oct 10, 2024 at 08:39:12PM -0600, Jens Axboe wrote:
-> On 10/10/24 8:30 PM, Ming Lei wrote:
-> > Hi Jens,
-> > 
-> > On Thu, Oct 10, 2024 at 01:31:21PM -0600, Jens Axboe wrote:
-> >> Hi,
-> >>
-> >> Discussed this with Pavel, and on his suggestion, I tried prototyping a
-> >> "buffer update" opcode. Basically it works like
-> >> IORING_REGISTER_BUFFERS_UPDATE in that it can update an existing buffer
-> >> registration. But it works as an sqe rather than being a sync opcode.
-> >>
-> >> The idea here is that you could do that upfront, or as part of a chain,
-> >> and have it be generically available, just like any other buffer that
-> >> was registered upfront. You do need an empty table registered first,
-> >> which can just be sparse. And since you can pick the slot it goes into,
-> >> you can rely on that slot afterwards (either as a link, or just the
-> >> following sqe).
-> >>
-> >> Quick'n dirty obviously, but I did write a quick test case too to verify
-> >> that:
-> >>
-> >> 1) It actually works (it seems to)
-> > 
-> > It doesn't work for ublk zc since ublk needs to provide one kernel buffer
-> > for fs rw & net send/recv to consume, and the kernel buffer is invisible
-> > to userspace. But  __io_register_rsrc_update() only can register userspace
-> > buffer.
-> 
-> I'd be surprised if this simple one was enough! In terms of user vs
-> kernel buffer, you could certainly use the same mechanism, and just
-> ensure that buffers are tagged appropriately. I need to think about that
-> a little bit.
+Actually iov_iter_extract_pages() requires that there isn't gap in the
+extracted pages, so 'offset' only exists in the 1st page, then these
+pages can be mapped to one virtual(contiguous) address.
 
-It is actually same with IORING_OP_PROVIDE_BUFFERS, so the following
-consumer OPs have to wait until this OP_BUF_UPDATE is completed.
+All iov_iter_bvec() users only want to extract virt-contiguous pages from
+iov_iter_extract_pages() instead physical-contiguous pages.
 
-Suppose we have N consumers OPs which depends on OP_BUF_UPDATE.
+Change iov_iter_extract_bvec_pages() to extract virt-contiguous pages via
+bvec helper.
 
-1) all N OPs are linked with OP_BUF_UPDATE
+This way can fill much more pages one time, instead of (often)one page from
+iov_iter_extract_pages() each time.
 
-Or
+The change is reasonable & safe since oher kind of iterators(UBUF, KVEC, ...)
+do return non physically-contiguous pages.
 
-2) submit OP_BUF_UPDATE first, and wait its completion, then submit N
-OPs concurrently.
+Fixes: a7e689dd1c06 ("block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages")
+Cc: David Howells <dhowells@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V2:
+	- add fixes
+	- improve commit log
 
-But 1) and 2) may slow the IO handing.  In 1) all N OPs are serialized,
-and 1 extra syscall is introduced in 2).
+ include/linux/bvec.h |  6 ++++++
+ lib/iov_iter.c       | 47 +++++++++++++++++++++++---------------------
+ 2 files changed, 31 insertions(+), 22 deletions(-)
 
-The same thing exists in the next OP_BUF_UPDATE which has to wait until
-all the previous buffer consumers are done. So the same slow thing are
-doubled. Not mention the application will become more complicated.
-
-Here the provided buffer is only visible among the N OPs wide, and making
-it global isn't necessary, and slow things down. And has kbuf lifetime
-issue.
-
-Also it makes error handling more complicated, io_uring has to remove
-the kernel buffer when the current task is exit, dependency or order with
-buffer provider is introduced.
-
-There could be more problems, will try to remember all related stuff
-thought before.
-
-> 
-> There are certainly many different ways that can get propagated which
-> would not entail a complicated mechanism. I really like the aspect of
-> having the identifier being the same thing that we already use, and
-> hence not needing to be something new on the side.
-> 
-> > Also multiple OPs may consume the buffer concurrently, which can't be
-> > supported by buffer select.
-> 
-> Why not? You can certainly have multiple ops using the same registered
-> buffer concurrently right now.
-
-Please see the above problem.
-
-Also I remember that the selected buffer is removed from buffer list,
-see io_provided_buffer_select(), but maybe I am wrong.
-
-
-Thanks,
-Ming
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index f41c7f0ef91e..98e1a4ad09e0 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -184,6 +184,12 @@ static inline void bvec_iter_advance_single(const struct bio_vec *bv,
+ 		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
+ 	     bvec_iter_advance_single((bio_vec), &(iter), (bvl).bv_len))
+ 
++#define for_each_bvec_max(bvl, bio_vec, iter, start, nr_bvecs)		\
++	for (iter = (start);						\
++	     (iter).bi_size && iter.bi_idx < nr_bvecs &&		\
++		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
++	     bvec_iter_advance_single((bio_vec), &(iter), (bvl).bv_len))
++
+ /* for iterating one bio from start to end */
+ #define BVEC_ITER_ALL_INIT (struct bvec_iter)				\
+ {									\
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 97003155bfac..6e00f6da5259 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1677,8 +1677,8 @@ static ssize_t iov_iter_extract_xarray_pages(struct iov_iter *i,
+ }
+ 
+ /*
+- * Extract a list of contiguous pages from an ITER_BVEC iterator.  This does
+- * not get references on the pages, nor does it get a pin on them.
++ * Extract a list of virtually contiguous pages from an ITER_BVEC iterator.
++ * This does not get references on the pages, nor does it get a pin on them.
+  */
+ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
+ 					   struct page ***pages, size_t maxsize,
+@@ -1686,35 +1686,38 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
+ 					   iov_iter_extraction_t extraction_flags,
+ 					   size_t *offset0)
+ {
+-	struct page **p, *page;
+-	size_t skip = i->iov_offset, offset, size;
+-	int k;
++	size_t skip = i->iov_offset, size = 0;
++	struct bvec_iter bi;
++	struct bio_vec bv;
++	int k = 0;
+ 
+-	for (;;) {
+-		if (i->nr_segs == 0)
+-			return 0;
+-		size = min(maxsize, i->bvec->bv_len - skip);
+-		if (size)
+-			break;
++	if (i->nr_segs == 0)
++		return 0;
++
++	if (i->iov_offset == i->bvec->bv_len) {
+ 		i->iov_offset = 0;
+ 		i->nr_segs--;
+ 		i->bvec++;
+ 		skip = 0;
+ 	}
++	bi.bi_size = maxsize + skip;
++	bi.bi_bvec_done = skip;
+ 
+-	skip += i->bvec->bv_offset;
+-	page = i->bvec->bv_page + skip / PAGE_SIZE;
+-	offset = skip % PAGE_SIZE;
+-	*offset0 = offset;
++	maxpages = want_pages_array(pages, maxsize, skip, maxpages);
+ 
+-	maxpages = want_pages_array(pages, size, offset, maxpages);
+-	if (!maxpages)
+-		return -ENOMEM;
+-	p = *pages;
+-	for (k = 0; k < maxpages; k++)
+-		p[k] = page + k;
++	for_each_bvec_max(bv, i->bvec, bi, bi, i->nr_segs) {
++		if (k >= maxpages)
++			break;
++		if (!k)
++			*offset0 = bv.bv_offset;
++		else if (bv.bv_offset)
++			break;
++		(*pages)[k++] = bv.bv_page;
++		size += bv.bv_len;
++		if (bv.bv_offset + bv.bv_len != PAGE_SIZE)
++			break;
++	}
+ 
+-	size = min_t(size_t, size, maxpages * PAGE_SIZE - offset);
+ 	iov_iter_advance(i, size);
+ 	return size;
+ }
+-- 
+2.46.0
 
