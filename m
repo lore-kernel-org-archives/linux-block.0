@@ -1,109 +1,107 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B289197A9F;
-	Fri, 11 Oct 2024 15:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69BD8002A;
+	Fri, 11 Oct 2024 16:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728662209; cv=none; b=cla4YJQytNaOc2XPnJuih5oSitcP+uuKACNJ116fR+MoVidb3bWlyZemQCzRDVRQ1/Hp/wS6WCJ1FR9aViXnxrkhNvOC1++ReyvbmELbhJtFOziqK2reLsLStJVZOt1FXEEvw0ZNPldPFyVtMkpgyL37esqW3RNQU4nni/th8tA=
+	t=1728662420; cv=none; b=TRKR8yUcjhyrAfKisC0Kj7Vxk4ktOjvgvYoF3QyUjVZf1FAje0g7NLlNHLIDwVPMn7oRXWR5l8J595ToRoUE12AMcoSCTeJk5jwLGzf65JUwVbZ2DuwmfIbvXu9OHcDScuzHpO+JD4LI1UqStrSpA0VGTEcSPqRmuPFq+kd4QAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728662209; c=relaxed/simple;
-	bh=oL0B8WhvV9HlIWbRkHl3q/AFYqOubI9dz+gH0QUroXs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kG08px6maVPQwgjL37/fla78kDiLXpWCSH11d+lppA2ePA1TQjoc4TmALzhcAfz3klM8MLndbzaaRyhmuR/9PiKryPfypi9ODmEmd9Bo/RZIGyWJ1deirOXrPFyKYgnDlxquW2qIPh0ilQuZk5DFD8ItIb1Y8teD75vkBwX1/QY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-430ee5c9570so23635065e9.3;
-        Fri, 11 Oct 2024 08:56:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728662205; x=1729267005;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Qk9tn5ydhdwoKVQDhImzSPs8EtpceWdxm3uEUMtcxn8=;
-        b=vovqVfngu0IbYtT+bveYfqNRl0PM7tAmW2eOkDF308L1QH/Y3Ik6pkbkIpAj1NY15I
-         RXCQGR+gdxdpPR8iyxOsql8REbsfDAI+w5jEArDtPs4Rnpc3+h3Q982UU2CO1XvgzcRR
-         iwF1+pF0Hb9EcnxCz7/Fp6ZaNZsDMHWf43dWa2KFf6FH4eMexO6wOn3hBxywCPN/vxd1
-         x1Ejt2kbMrCMoqnQU3MipqoxNIN2/7JQ5d1ZtLVFmfL7OP1zE4RvDRkIGoQRN629kS8h
-         NgBiQHEFVaLFJdo3nJbvDnYw7KEmBaD8NrafmkvATDS9RcCeSawQWfFHwhpDGvEdilZS
-         K6OA==
-X-Forwarded-Encrypted: i=1; AJvYcCVDotOn8zU7w/yMUbmN/D54b52VaTiobsoWL3XeOEAdxuhlSgtB28g4GOdEbURfK1GJH4FB2MMdUbzFTQ==@vger.kernel.org, AJvYcCWCLcNusJkal6Na+ZbNvnNQa+Lsc9a4mpHTdwdUPzuT/yRcXbiOYw7cf7QNHwXbuEc9KcRFEji3vLFH6T8S@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJnEGRS5igYWYm/WHF42Duh9T4zKl96jhCqzSAwqgemqU8pFC4
-	dlfMiZO/5a3qCXbehrb3nx6w7G0N3oCDXLFfMJYkJeftVYdwnNm2
-X-Google-Smtp-Source: AGHT+IE+rjEpG5QFGOkm0LC8xG9DFvh3m1qd9YXpUSFdwwXU+z9ltw2I6ZTmxURY24S4A6cB45BUfw==
-X-Received: by 2002:a05:600c:4f07:b0:42f:75e0:780e with SMTP id 5b1f17b1804b1-4311dec95demr31975695e9.10.1728662205289;
-        Fri, 11 Oct 2024 08:56:45 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b6d0217sm4229868f8f.60.2024.10.11.08.56.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 08:56:44 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: hch@infradead.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Bart Van Assche <bvanassche@acm.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Hannes Reinecke <hare@suse.de>
-Cc: kernel-team@meta.com,
-	linux-block@vger.kernel.org (open list:BLOCK LAYER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] elevator: Remove argument from elevator_find_get
-Date: Fri, 11 Oct 2024 08:56:15 -0700
-Message-ID: <20241011155615.3361143-1-leitao@debian.org>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1728662420; c=relaxed/simple;
+	bh=+Z0USPv7t42JmSxqVwA+aZ0L2/6J/9w7Iymbl0jaVtc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kFdAVd6N2E6hoNsKe5UkZzmV11t38B7OCWRYiXGeWVxHWK9GvhAT80FlVaJk+y+Iks6QqcoXKf0Wd/RboL32hyx6010C6HCxNVOoPB0JDfsrHA0F6Wr/QkD6Oms9IQSoBQM/M9EeFsaXlyeBVIzlKwN0yMJeaA9u/y9dE3LWRVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE51FC4CEC3;
+	Fri, 11 Oct 2024 16:00:18 +0000 (UTC)
+Date: Fri, 11 Oct 2024 12:00:28 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: syzbot <syzbot+list3bf21e6ac0139f8d008d@syzkaller.appspotmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ mhiramat@kernel.org, syzkaller-bugs@googlegroups.com, Jens Axboe
+ <axboe@kernel.dk>, linux-block@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [syzbot] Monthly trace report (Oct 2024)
+Message-ID: <20241011120028.1e4ed71c@gandalf.local.home>
+In-Reply-To: <67094369.050a0220.4cbc0.000d.GAE@google.com>
+References: <67094369.050a0220.4cbc0.000d.GAE@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Commit e4eb37cc0f3ed ("block: Remove elevator required features")
-removed the usage of `struct request_queue` from elevator_find_get(),
-but didn't removed the argument.
+On Fri, 11 Oct 2024 08:25:29 -0700
+syzbot <syzbot+list3bf21e6ac0139f8d008d@syzkaller.appspotmail.com> wrote:
 
-Remove the "struct request_queue *q" argument from elevator_find_get()
-given it is useless.
+> Hello trace maintainers/developers,
+> 
+> This is a 31-day syzbot report for the trace subsystem.
+> All related reports/information can be found at:
+> https://syzkaller.appspot.com/upstream/s/trace
+> 
+> During the period, 1 new issues were detected and 0 were fixed.
+> In total, 10 issues are still open and 38 have been fixed so far.
+> 
+> Some of the still happening issues:
+> 
+> Ref Crashes Repro Title
+> <1> 34      Yes   INFO: task hung in blk_trace_ioctl (4)
+>                   https://syzkaller.appspot.com/bug?extid=ed812ed461471ab17a0c
 
-Fixes: e4eb37cc0f3e ("block: Remove elevator required features")
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- block/elevator.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+If you check the maintainers file, blktrace.c has:
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 4122026b11f1..565807f0b1c7 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -106,8 +106,7 @@ static struct elevator_type *__elevator_find(const char *name)
- 	return NULL;
- }
- 
--static struct elevator_type *elevator_find_get(struct request_queue *q,
--		const char *name)
-+static struct elevator_type *elevator_find_get(const char *name)
- {
- 	struct elevator_type *e;
- 
-@@ -569,7 +568,7 @@ static struct elevator_type *elevator_get_default(struct request_queue *q)
- 	    !blk_mq_is_shared_tags(q->tag_set->flags))
- 		return NULL;
- 
--	return elevator_find_get(q, "mq-deadline");
-+	return elevator_find_get("mq-deadline");
- }
- 
- /*
-@@ -697,7 +696,7 @@ static int elevator_change(struct request_queue *q, const char *elevator_name)
- 	if (q->elevator && elevator_match(q->elevator->type, elevator_name))
- 		return 0;
- 
--	e = elevator_find_get(q, elevator_name);
-+	e = elevator_find_get(elevator_name);
- 	if (!e)
- 		return -EINVAL;
- 	ret = elevator_switch(q, e);
--- 
-2.43.5
+BLOCK LAYER
+M:      Jens Axboe <axboe@kernel.dk>
+L:      linux-block@vger.kernel.org
+
+
+
+> <2> 32      Yes   WARNING in bpf_get_stack_raw_tp
+>                   https://syzkaller.appspot.com/bug?extid=ce35de20ed6652f60652
+
+bpf_trace.c has:
+
+M:      Alexei Starovoitov <ast@kernel.org>
+M:      Daniel Borkmann <daniel@iogearbox.net>
+M:      Andrii Nakryiko <andrii@kernel.org>
+R:      Martin KaFai Lau <martin.lau@linux.dev>
+R:      Eduard Zingerman <eddyz87@gmail.com>
+R:      Song Liu <song@kernel.org>
+R:      Yonghong Song <yonghong.song@linux.dev>
+R:      John Fastabend <john.fastabend@gmail.com>
+R:      KP Singh <kpsingh@kernel.org>
+R:      Stanislav Fomichev <sdf@fomichev.me>
+R:      Hao Luo <haoluo@google.com>
+R:      Jiri Olsa <jolsa@kernel.org>
+L:      bpf@vger.kernel.org
+
+> <3> 13      Yes   WARNING in get_probe_ref
+>                   https://syzkaller.appspot.com/bug?extid=8672dcb9d10011c0a160
+> <4> 6       Yes   INFO: task hung in blk_trace_remove (2)
+>                   https://syzkaller.appspot.com/bug?extid=2373f6be3e6de4f92562
+> <5> 4       Yes   possible deadlock in __mod_timer (4)
+>                   https://syzkaller.appspot.com/bug?extid=83a876aef81c9a485ae8
+
+None of these look like they are tracing infrastructure related.
+
+-- Steve
+
+
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> To disable reminders for individual bugs, reply with the following command:
+> #syz set <Ref> no-reminders
+> 
+> To change bug's subsystems, reply with:
+> #syz set <Ref> subsystems: new-subsystem
+> 
+> You may send multiple commands in a single email message.
 
