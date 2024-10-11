@@ -1,45 +1,48 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE18E20ADE7;
-	Fri, 11 Oct 2024 08:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935FB20A5E2;
+	Fri, 11 Oct 2024 08:56:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728636257; cv=none; b=feQzTqUAGNiOrbI3G0YprQybRp7n8jjBw/I2QsLTMqFTItyhfvfXgcqClD0v9QGga7LolzX5oQIQOiagNI0qc9IYn1PBWzFuF7IuGvf4gmOmUzvLtqstIsBfb08Sxdqkzlig7ykH+P87SHF7NZ3u8WSpKKZgaQT0x09Q5VyZ6fk=
+	t=1728636999; cv=none; b=q6r6AARwAuHdg8pWhkf+3G1uJO/5VT8HAhJt11FpP5nroY+qzXwDZJyjzv1C0ysbSRyze1g/95egvi9jQkTUe+WS4p4NdNPHcIXc4oWLBt+JcMfYhsWXFv3sGzcIBE9MR1gRStB/7ZF/V970gmlY1yxgxc6srT28imNN4nl9hJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728636257; c=relaxed/simple;
-	bh=ZI9clCjJjhVmMmhpzQMGAsPFn6KxMsb2kzwjyz1MSKw=;
+	s=arc-20240116; t=1728636999; c=relaxed/simple;
+	bh=3aK2GFXaB51o5dyRuGxLEUmOb2CRwQ0mXANQpLb2hNI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lqnl6kH0IbldnL1RxNX4yQsClnOY0ZKFagjd/p2K0ym3iDFyKxpGPX6wQ/BoNXSb1xl6SxdoBGWo/bZsAMRdwQEtA+i188TKn1m9PgBGJKPY78Vp5VHU5DnlY10k6vN6sJv49bniFRTPpf8pJToHNGEwGftY8PP7pvRoqQlj7t4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sD8kqpP4; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sD8kqpP4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ufjU2q/C1FQdH4rkSPCHarm6ljmOSPBULCiUiT9EckE=; b=sD8kqpP4VzsRLqmeP0OxD40fLl
-	wrMM1jlHeRCdLcJsflW1Fjw66CYruIUBInI6EV+umzMLGnYqdIfoEd6GnzssQW5DCycAMt+hkymiz
-	0+t49eOlXG30bGb4CiYdQGF7jd+uMCbKx+8gjoXRwMgDyOpONA3iFrfazepyTmCy8/eU3LWbci+nt
-	4j02X12XIS8r2vTp+y+msbsUlx5iUOjxxvxZk4UCmuG4HRPHd8/HxnhtZpawhHJCCloUgh568GobO
-	5EIb6hXYPcw0RJla6huBxzgVN5gpDHtubsvyX7U1/MPR/2kKmNrsxBXKys+Vhin1h+9mFPektmGso
-	20TrEpqw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1szBFu-0000000FiVI-1u6R;
-	Fri, 11 Oct 2024 08:44:14 +0000
-Date: Fri, 11 Oct 2024 01:44:14 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH V2] lib/iov_iter.c: extract virt-contiguous pages in
- iov_iter_extract_bvec_pages
-Message-ID: <ZwjlXoSu6zA5Xcy7@infradead.org>
-References: <20241011035247.2444033-1-ming.lei@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=M/UEBIg7KepTQrm17lWOuwsa4ZFtmS/yWHXpyRJYbSxlV60PaZ0PhZ71nLFBgQ87IDNr4wx+haMXYrneexvPBUxHtgjgyM0KgTjMvQbf5f2BMkeviyKnwvvWyiKeII53pIvv8E+Tp+rQRs9Ln8U4p/UNjoItiR9Nlc5dMcwjO3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id A1AE1227AB3; Fri, 11 Oct 2024 10:56:31 +0200 (CEST)
+Date: Fri, 11 Oct 2024 10:56:31 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Javier Gonzalez <javier.gonz@samsung.com>
+Cc: Christoph Hellwig <hch@lst.de>, Hans Holmberg <hans@owltronix.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Kanchan Joshi <joshi.k@samsung.com>, "hare@suse.de" <hare@suse.de>,
+	"sagi@grimberg.me" <sagi@grimberg.me>,
+	"brauner@kernel.org" <brauner@kernel.org>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"jack@suse.cz" <jack@suse.cz>,
+	"jaegeuk@kernel.org" <jaegeuk@kernel.org>,
+	"bcrl@kvack.org" <bcrl@kvack.org>,
+	"dhowells@redhat.com" <dhowells@redhat.com>,
+	"bvanassche@acm.org" <bvanassche@acm.org>,
+	"asml.silence@gmail.com" <asml.silence@gmail.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-aio@kvack.org" <linux-aio@kvack.org>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>,
+	"vishak.g@samsung.com" <vishak.g@samsung.com>
+Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+Message-ID: <20241011085631.GA4039@lst.de>
+References: <20241004065233.oc5gqcq3lyaxzjhz@ArmHalley.local> <20241004123027.GA19168@lst.de> <20241007101011.boufh3tipewgvuao@ArmHalley.local> <CANr-nt3TA75MSvTNWP3SwBh60dBwJYztHJL5LZvROa-j9Lov7g@mail.gmail.com> <97bd78a896b748b18e21e14511e8e0f4@CAMSVWEXC02.scsc.local> <CANr-nt11OJfLRFr=rzH0LyRUzVD9ZFLKsgree=Xqv__nWerVkg@mail.gmail.com> <20241010071327.rnh2wsuqdvcu2tx4@ArmHalley.local> <CGME20241010092019eucas1p157b87b63e91cd2294df4a8f8e2de4cdf@eucas1p1.samsung.com> <20241010092010.GC9287@lst.de> <20241010122232.r2omntepzkmtmx7p@ArmHalley.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,142 +51,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241011035247.2444033-1-ming.lei@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20241010122232.r2omntepzkmtmx7p@ArmHalley.local>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, Oct 11, 2024 at 11:52:47AM +0800, Ming Lei wrote:
-> Actually iov_iter_extract_pages() requires that there isn't gap in the
-> extracted pages, so 'offset' only exists in the 1st page, then these
-> pages can be mapped to one virtual(contiguous) address.
-> 
-> All iov_iter_bvec() users only want to extract virt-contiguous pages from
-> iov_iter_extract_pages() instead physical-contiguous pages.
-> 
-> Change iov_iter_extract_bvec_pages() to extract virt-contiguous pages via
-> bvec helper.
-> 
-> This way can fill much more pages one time, instead of (often)one page from
-> iov_iter_extract_pages() each time.
-> 
-> The change is reasonable & safe since oher kind of iterators(UBUF, KVEC, ...)
-> do return non physically-contiguous pages.
+On Thu, Oct 10, 2024 at 02:22:32PM +0200, Javier Gonzalez wrote:
+> Passthru is great for prototyping and getting insights on end-to-end
+> applicability. We see though that it is difficult to get a full solution
+> based on it, unless people implement a use-space layer tailored to their
+> use-case (e.g., a version SPDK's bdev). After the POC phase, most folks
+> that can use passthru prefer to move to block - with a validated
+> use-case it should be easier to get things upstream.
+>
+> This is exactly where we are now.
 
-I had to read through the code to understand what this means.  Here is
-what I have written based on my understanding:
+That's a lot of marketing babble :)    What exact thing is missing
+from the passthrough interface when using say spdx over io_uring?
 
-The iov_iter_extract_pages interface allows to return physically
-discontiguous pages, as long as all but the first and last page
-in the array are page aligned and page size.  Rewrite
-iov_iter_extract_bvec_pages to take advantage of that instead of only
-returning ranges of physically contiguous pages.
+> If you saw the comments from Christian on the inode space, there are a
+> few plumbing challenges. Do you have any patches we could look at?
 
-> Fixes: a7e689dd1c06 ("block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages")
+I'm not sure what you refer to here.
 
-As far as I can tell the current behavior is highly suboptimal, but not
-actually buggy, does this really warrant a fixes tag?
-
-> +#define for_each_bvec_max(bvl, bio_vec, iter, start, nr_bvecs)		\
-> +	for (iter = (start);						\
-> +	     (iter).bi_size && iter.bi_idx < nr_bvecs &&		\
-> +		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
-> +	     bvec_iter_advance_single((bio_vec), &(iter), (bvl).bv_len))
-> +
-
-And this helper just makes the code harder to read, and makes people
-wonder what this undocumented _max interface does.  What about the
-below variant of your patch that open codes it, and throws in a few
-comments to explain the logic?
-
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 1abb32c0da50bc..7768f1b2006d81 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1677,8 +1677,8 @@ static ssize_t iov_iter_extract_xarray_pages(struct iov_iter *i,
- }
- 
- /*
-- * Extract a list of contiguous pages from an ITER_BVEC iterator.  This does
-- * not get references on the pages, nor does it get a pin on them.
-+ * Extract a list of virtually contiguous pages from an ITER_BVEC iterator.
-+ * This does not get references on the pages, nor does it get a pin on them.
-  */
- static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
- 					   struct page ***pages, size_t maxsize,
-@@ -1686,35 +1686,57 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
- 					   iov_iter_extraction_t extraction_flags,
- 					   size_t *offset0)
- {
--	struct page **p, *page;
--	size_t skip = i->iov_offset, offset, size;
--	int k;
-+	size_t skip = i->iov_offset, size = 0;
-+	struct bvec_iter bi;
-+	int k = 0;
- 
--	for (;;) {
--		if (i->nr_segs == 0)
--			return 0;
--		size = min(maxsize, i->bvec->bv_len - skip);
--		if (size)
--			break;
-+	if (i->nr_segs == 0)
-+		return 0;
-+
-+	if (i->iov_offset == i->bvec->bv_len) {
- 		i->iov_offset = 0;
- 		i->nr_segs--;
- 		i->bvec++;
- 		skip = 0;
- 	}
-+	bi.bi_size = maxsize + skip;
-+	bi.bi_bvec_done = skip;
-+
-+	maxpages = want_pages_array(pages, maxsize, skip, maxpages);
-+
-+	while (bi.bi_size && bi.bi_idx < i->nr_segs) {
-+		struct bio_vec bv = bvec_iter_bvec(i->bvec, bi);
-+
-+		/*
-+		 * The iov_iter_extract_pages interface only allows an offset
-+		 * into the first page.  Break out of the loop if we see an
-+		 * offset into subsequent pages, the caller will have to call
-+		 * iov_iter_extract_pages again for the reminder.
-+		 */
-+		if (k) {
-+			if (bv.bv_offset)
-+				break;
-+		} else {
-+			*offset0 = bv.bv_offset;
-+		}
- 
--	skip += i->bvec->bv_offset;
--	page = i->bvec->bv_page + skip / PAGE_SIZE;
--	offset = skip % PAGE_SIZE;
--	*offset0 = offset;
-+		(*pages)[k++] = bv.bv_page;
-+		size += bv.bv_len;
- 
--	maxpages = want_pages_array(pages, size, offset, maxpages);
--	if (!maxpages)
--		return -ENOMEM;
--	p = *pages;
--	for (k = 0; k < maxpages; k++)
--		p[k] = page + k;
-+		if (k >= maxpages)
-+			break;
-+
-+		/*
-+		 * Similarly, we are done when the end of the bvec doesn't align
-+		 * to a page boundary as that would create a hole in the
-+		 * returned space.  The caller will handle this with another call
-+		 * to iov_iter_extract_pages.
-+		 */
-+		if (bv.bv_offset + bv.bv_len != PAGE_SIZE)
-+			break;
-+	     	bvec_iter_advance_single(i->bvec, &bi, bv.bv_len);
-+	}
- 
--	size = min_t(size_t, size, maxpages * PAGE_SIZE - offset);
- 	iov_iter_advance(i, size);
- 	return size;
- }
