@@ -1,229 +1,323 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D9520B1F4;
-	Fri, 11 Oct 2024 09:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=210.61.82.184
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728637703; cv=fail; b=DEHSFx5am2nJfkkjfkeiaJnDefPe0h791HS9OLV4SqW6EoyG/y0YMpGXh3fNJo+kw5arfnPkNc/gQ+e0lNuC0L8J77xKnYlaWwips3Ipfik4ListM0ovP2V+MhB+WHriHSXfvWBJt6nlKydb91SqbxllId+LXDBRlTVjNNTw3mU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728637703; c=relaxed/simple;
-	bh=uN0nnRPsFIM2pf6E9qzHUmqmU1K8A2WFcD2jRXl3Q30=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=X2ILlNpWHSMS0zhFJDL/WGdSqynH7kywpLE5wXASUhlfcYeihx+OLXAAXCNQq4mWzCmSukDmK/NSIz2Pd2rCIEfeEuifZqIaZV1qeVtITkaJh3bN2xsSaAL0V6lKQHKNJuJ77LV+hWQkPLBH5G3gWZhGb8JoJULBbtiis1shGos=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=NTHWpHkh; dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b=iAYeMBQQ; arc=fail smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D8420C471;
+	Fri, 11 Oct 2024 09:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728637912; cv=none; b=OvXHtLVHlr0ICoZTmMLjfvvwcuLlLRoePhwIkRXVy2FWT5nJ00W88Wr8107x3EKHTExW7sW71NXj5mVbDoz+s6ZJEI4TzMcl8MeDr+K+PzOY0yCHzoIoh+CM9pnQN4qrgdKRv5e11MRXHgcMr6uerMXyvB8jG4hCRXtdjYYTCRg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728637912; c=relaxed/simple;
+	bh=ORHk/MtWm+5n2GP1vxz61zHs/LHbHCwCLpPCJRrIoq4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G/0MrKG4HmWZ5Jgl5KGNnvaQxjVPgGp1EfpgqP5b9JN/nlNK2MmlLsiDbeSRrz3kp2yf0eMA4YsYWI6nzruNtteuszvhdx7dc1OT5S3Z9AZ13mfEkzibh0jlGtAuFf9rgWlF39PhG/+lQIkIWBYDxGBVkBvTY9Jh22th/N2Mpws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=hgnAzCIl; arc=none smtp.client-ip=60.244.123.138
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="NTHWpHkh";
-	dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b="iAYeMBQQ"
-X-UUID: 5931aac487b011ef8b96093e013ec31c-20241011
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="hgnAzCIl"
+X-UUID: d6affe2e87b011ef88ecadb115cee93b-20241011
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=MIME-Version:Content-Transfer-Encoding:Content-ID:Content-Type:In-Reply-To:References:Message-ID:Date:Subject:CC:To:From; bh=uN0nnRPsFIM2pf6E9qzHUmqmU1K8A2WFcD2jRXl3Q30=;
-	b=NTHWpHkhrimCHSg6qGN9i7ekxlDSjlNJjeK+RZ8b9Ch5EWOyi9xk/CQfACXaoP9VLhSQb5AIb4PL6iC3iJKMvLEoWYjp1iEdBLINcFUZT3u73Z4rGUph4YLO3qNpsxYQkTGUDxgJn/K6AAOj29G1ez9vBqyyk3Qoio7nyh9YIqs=;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=XLdY4eVKFUF5U3hhdsNnHSjGU57ONtroIJeWyFkOtok=;
+	b=hgnAzCIlxX+GU8+6USzVgGjjno3NuQQjO2Nd/3hPsemm0LTQJ6hV7IqcadTx7FXH1OQoJAqcg4NW8JtsoUbfBe8kMHDTQkbmOEJ+khb01daetiAi4S/oCwxQ1YZJbiyhCG1J32SyJayGHCjbCKJUzJEO/1uTCimijlTyedlql6w=;
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.41,REQID:4b1a939e-15f4-46f2-b77a-5012c22c4a39,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:6dc6a47,CLOUDID:fd83a226-5902-4533-af4f-d0904aa89b3c,B
+X-CID-O-INFO: VERSION:1.1.41,REQID:aa41cf0c-3fcc-4de7-b8e4-e1ebb76c3160,IP:0,U
+	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-25
+X-CID-META: VersionHash:6dc6a47,CLOUDID:e33e1765-444a-4b47-a99a-591ade3b04b2,B
 	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
 	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
 	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
 X-CID-BVR: 0
 X-CID-BAS: 0,_,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 5931aac487b011ef8b96093e013ec31c-20241011
-Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw02.mediatek.com
+X-UUID: d6affe2e87b011ef88ecadb115cee93b-20241011
+Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw01.mediatek.com
 	(envelope-from <qun-wei.lin@mediatek.com>)
 	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 2021172029; Fri, 11 Oct 2024 17:08:15 +0800
-Received: from mtkmbs10n2.mediatek.inc (172.21.101.183) by
- MTKMBS09N1.mediatek.inc (172.21.101.35) with Microsoft SMTP Server
+	with ESMTP id 949481295; Fri, 11 Oct 2024 17:11:45 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 11 Oct 2024 17:08:13 +0800
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (172.21.101.237)
- by mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Fri, 11 Oct 2024 17:08:13 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MEXsEZEuMFjyNOFZ2c1LcEk/6SwC1n39vi3Yl1kzpkm1qwXYuPoW3eBBTd/SCown7RbrhB3vrOQWLGyEDFTYxUddtfwFus2/09lCRUm3kdh9Fgnrw1XPQne2PAc6abZnHq/b6upWOFkkZHrqSjgNK7r20xOMvrhpktlknRhbCPuU3Edbj7JsNbXnazM+IZ2d15my5uH1Ag2UtogZDMbcEKFtbaXZLMMISOUTLMihmMj5bvE4NrnapTmonVFFDDi23HJ6yonltKksG+oEBPNHpnYpI1FovS5bqUHy6/rSNobW1VPBWZdVFcVYmTnEJ30xOFUy2qS9ksbG28LDXDiJqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uN0nnRPsFIM2pf6E9qzHUmqmU1K8A2WFcD2jRXl3Q30=;
- b=uwOiUw4pC14MDfZFc38/2tkp3yXE0bxsOogkMhq7C82bfr5h1Z37KfEiDbkd/MuFOsK7wSgQsa5tfLEp7Wg2DLXt4b8Z6gRl8cuA7RN/d9jGxs64F5HtIf8S9R3ICgQ0JV30FyLEQeWOt0TeNpHAQ7MfnCSMnXK6PHboBfQnd6RLfyhTw/+rM1JuqzKJm5PcHNML+4/IW+d5G0EKgx8olvRCtXrUBtCcUNig1B/BrXZak+XLcm7A75BheYI1iNRl5JUbODYt0cLUbBfkuLyAPFajf5ia85NJDOFUgN4LnbAb7xm9Jw3GsMAKW8MYeXVBLAVUr2zm+Ta7rkN3dTzDPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mediatek.com; dmarc=pass action=none header.from=mediatek.com;
- dkim=pass header.d=mediatek.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mediateko365.onmicrosoft.com; s=selector2-mediateko365-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uN0nnRPsFIM2pf6E9qzHUmqmU1K8A2WFcD2jRXl3Q30=;
- b=iAYeMBQQbfBqACBfa17sFYmx4OGebhcdEvURI4RZKRMhD0SewViFGQTYy4w8dAmDuKbT+I1EW53jVn+bxpCmbZXpqa0AcxR+BXWM5Dvn//UgncDxbNruQfUzsPhVYoL3mANVlH/2uvPl+p9hJIQr56zgVKQ7jfJ1YqH+ROabjIM=
-Received: from PSAPR03MB5542.apcprd03.prod.outlook.com (2603:1096:301:4e::12)
- by SEZPR03MB7298.apcprd03.prod.outlook.com (2603:1096:101:124::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.16; Fri, 11 Oct
- 2024 09:08:10 +0000
-Received: from PSAPR03MB5542.apcprd03.prod.outlook.com
- ([fe80::a323:3128:209c:f02]) by PSAPR03MB5542.apcprd03.prod.outlook.com
- ([fe80::a323:3128:209c:f02%4]) with mapi id 15.20.8026.020; Fri, 11 Oct 2024
- 09:08:10 +0000
-From: =?utf-8?B?UXVuLXdlaSBMaW4gKOael+e+pOW0tCk=?= <Qun-wei.Lin@mediatek.com>
-To: "ying.huang@intel.com" <ying.huang@intel.com>
-CC: =?utf-8?B?QW5kcmV3IFlhbmcgKOaliuaZuuW8tyk=?= <Andrew.Yang@mediatek.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"baohua@kernel.org" <baohua@kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-mediatek@lists.infradead.org"
-	<linux-mediatek@lists.infradead.org>, "willy@infradead.org"
-	<willy@infradead.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	wsd_upstream <wsd_upstream@mediatek.com>, "david@redhat.com"
-	<david@redhat.com>, "schatzberg.dan@gmail.com" <schatzberg.dan@gmail.com>,
-	=?utf-8?B?Q2hpbndlbiBDaGFuZyAo5by16Yym5paHKQ==?=
-	<chinwen.chang@mediatek.com>, =?utf-8?B?Sm9obiBIc3UgKOioseawuOe/sCk=?=
-	<John.Hsu@mediatek.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "kasong@tencent.com" <kasong@tencent.com>,
-	=?utf-8?B?Q2FzcGVyIExpICjmnY7kuK3mpq4p?= <casper.li@mediatek.com>,
-	"chrisl@kernel.org" <chrisl@kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "matthias.bgg@gmail.com"
-	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
-	<angelogioacchino.delregno@collabora.com>, "ryan.roberts@arm.com"
-	<ryan.roberts@arm.com>
-Subject: Re: [PATCH 0/2] Add BLK_FEAT_READ_SYNCHRONOUS and
- SWP_READ_SYNCHRONOUS_IO
-Thread-Topic: [PATCH 0/2] Add BLK_FEAT_READ_SYNCHRONOUS and
- SWP_READ_SYNCHRONOUS_IO
-Thread-Index: AQHbCod08FuriN+lckm7AKNlb4+2T7JoJsoogBk+VYA=
-Date: Fri, 11 Oct 2024 09:08:10 +0000
-Message-ID: <17b30f253172cce94d1e2ec86d00e82eea077bde.camel@mediatek.com>
-References: <20240919112952.981-1-qun-wei.lin@mediatek.com>
-	 <87frporxtt.fsf@yhuang6-desk2.ccr.corp.intel.com>
-In-Reply-To: <87frporxtt.fsf@yhuang6-desk2.ccr.corp.intel.com>
-Accept-Language: zh-TW, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=mediatek.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PSAPR03MB5542:EE_|SEZPR03MB7298:EE_
-x-ms-office365-filtering-correlation-id: 84e20d17-5968-42f3-ee8c-08dce9d43aac
-x-ld-processed: a7687ede-7a6b-4ef6-bace-642f677fbe31,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?aWlBZWFVMzlGZkFpeWkzbzFLVXVyeC95aSszc3JZZXBkSGFGNXhPQkJHMVNt?=
- =?utf-8?B?TVFWa3JvQ29PcEVTTXJuM0VOYUxPeVRac3l2cXROckd3NU5yZHcyVWZoWE1s?=
- =?utf-8?B?UFNEUEZMYThBdDdtUWFybUMybGdxRWYvWmJDTy8rS3pNUW9TQlgvMzFGL0o2?=
- =?utf-8?B?M1FsVTlxTUtRQWlRMFpPeEllZ1NRSGo5TVlkOENyelR4Rlc5b0dBQkFHQVRt?=
- =?utf-8?B?Y1ZSaVgzN3Y1UjJmdWM0RXhsL01CU1ZYMFpjKzl6dkdQbFpHUjRZeHZYUy9l?=
- =?utf-8?B?a3E1QkVIUlZ2KzZRdE5xbG51V1Fob2REUnU4NjFETzVUK1pnOG9tQmNYTUxE?=
- =?utf-8?B?VzhzZ1pLMUYrZ0FHT1hzZ1hRMms0OHREQ1NxRUJoR0NjSS9jdWEzekcvdXY5?=
- =?utf-8?B?djhzLzhPUEw4eithYnlyekJ5QnpqbG45WlRyaHlnVlJ4RWl0NUdlNXlOdE5X?=
- =?utf-8?B?TENib2dFMEVtNkhSK0E4Y1hOWnQ1elBZdmJJWVJjUVhLUG10QmtUeXc0bHdE?=
- =?utf-8?B?VVRMRnNOUmh0VGJXUzFWVWNjUUEvRytsL1BzTUtJdWZiVFdXR2RqTFRtQ25O?=
- =?utf-8?B?SVJ0eFlPUWk2Tk83UFowU3YxNDBhMFdqREFnUzZxR2ZYK3JxNWw2SUp1Z1J5?=
- =?utf-8?B?akp1OE0zc1lkMXRkZTZwNzUrWEg4K0RkdnlkMCt2UWRWNlRaakVuME9Fd3ZR?=
- =?utf-8?B?dVJYdTVmeWRLOGtDRXAvWjFCMnNGeEZBb0tXQmc1MjJ3VUVQM1FISzhXaDBo?=
- =?utf-8?B?bXI0SFlQc3liR2h5T0RncVdONWJPdTlQV2h0aDlwQXRGSUs5L2xIZG8rME41?=
- =?utf-8?B?d2I3dS9hUFh6RnJZcmpoa0N3endTUHNoaURDWGdDZWZrcjF0Y0NoTGNDM3h1?=
- =?utf-8?B?KzZ0TU9KaVJ2cnJBZHczNUdqYUdXMnhKSEQ4TGwvVFg5cUQ4NzRYaXRhWmRO?=
- =?utf-8?B?K1A1OVk4Q1lTejJwQjUreHBhbzBQQXVBTEFoTFV2WG9pZEZVSU5ES3lVejR2?=
- =?utf-8?B?a2MyV0tGempab0ZVMU52T0xzbkd2bU9qSTVlMmxBVjZJclBXeEhRUmJqVTEr?=
- =?utf-8?B?MERHL0l2RmphT1RGNUJPbUNHNUlWekx5R0orWHEyRnZWcXFzWnBjNU5FeW5P?=
- =?utf-8?B?aENUeW9HQU1LVEhuVENBRkFSSEYrZWQxakVwTng4TWFQV1QveWYrVUpCNzg3?=
- =?utf-8?B?UFd6SEFiTDNJUmFzMlcySStTRk1tTXRoYlBGRit6akM3MjkzU3pYclM3Mlhy?=
- =?utf-8?B?UUNNNzdVWWdEZ0RhVFJ5WjdaR3phRnFFcmJoaFgxYTBoQVNLcHlqMlI5TFE3?=
- =?utf-8?B?QlpmRGJOM3ZXZ0JiVzZoWkVQR2c3ZFpoSWtVTVFMWFlLclJucFVrMkdERm1n?=
- =?utf-8?B?SkNSTC8ydTM5dlVVYjU5MEQ0WEJvaEpQYW5IV2tXWlh5V3Uxc1phcGRxN3FT?=
- =?utf-8?B?UW1oNEtYTUcwcWN6YjVvaGx4SU5EUTc0Vy9sSjhLdDJHRFdJT2tEZCtiRW00?=
- =?utf-8?B?UnhSMVpYYXNuOTBBTEIvV3NkQXp3ekVTZlNhdXN4SFdyZnZMVk5mc2UzbDZx?=
- =?utf-8?B?REg1UXEyTGR2WTRJM0FuRVVsRHBraU5nL2hhcnlwd0IrQjAvdm9nNXNsc0RT?=
- =?utf-8?B?TkY1SDdkdkRZaWdkNnVmL0pIQXFzUXVsSjhnQXowVEtVclBOZmxWc3ZaOFZC?=
- =?utf-8?B?VlJWbmpxbENWWTVGOUpEdEdKSURiT3B1akRJWUduUjI4dmtLeXZPWlRXR2c3?=
- =?utf-8?B?bWs5c0EzbHJMMlh0TDhvZStuQVlqM094NFpjUktLTXFCWUVRa0Fjd0RrdW00?=
- =?utf-8?B?L3daVFgxSTJwRnpITGMzdz09?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PSAPR03MB5542.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VHNtampsSDJZWFBvSHlrNFRuV0NrbGRVdUU3Q0lFcU1rY3FkQytqOE5RK3g3?=
- =?utf-8?B?eFNVNGluMVNndEM3dU5GcEc0ckhUa1N4TmpjaXp1bjFxOXhiaElSZ3ZTdmVk?=
- =?utf-8?B?K2lHMGlhS28wYktrQ3dHNG5ibjltVFlaTXF1Q3Q0WFlDSEw1NEd4SmkraHUz?=
- =?utf-8?B?V2tsQjVGS0xxRnlTeGY3SjUvQjF1M3k4MllpSVg1TFpPUXRVUzFOLzc4V2F3?=
- =?utf-8?B?L2dKeHRPTXRHa2J1ajlpM05rREpKdWhVU1JkUng4UW9zZ1RxbWRLSXlVSkZh?=
- =?utf-8?B?MlJ6ZE5yOGg0YUxxMmdGMTNnYjUySnRpallzbU9MQjhNSmh3UzJkUjRkZDY4?=
- =?utf-8?B?RHdFMTR4MDY1a2VtR1BHb1lsRzgzVWlzRFk3UFJWYVowV3lSUU5FTjJVd1M3?=
- =?utf-8?B?Uys0Z09ScGVKQTdpaTJrTndDNWVOYVpsS3MwTmQ5MFk0VUxiZnFSOFQ4RDhr?=
- =?utf-8?B?WU5RcUMxbXQ5SVByUUxGeEtUTDh4ZVliOUcwbFQxaWhCVS9aTnVqd2VSQ1pQ?=
- =?utf-8?B?cks0Q2pBZlZGbVB3MDVnQnFPZllYaUpUVlRWR0tYcnR1TWthUVFWVVA3cjY4?=
- =?utf-8?B?ejdjek9tVldJRk5XOWxxNXpqemRzZEptWUxFZDZzdDZYVWxrWXZuVmhtQ3M4?=
- =?utf-8?B?ak55ZzFhUEQ4QXlqYTZLR3cyMTZCK3pYK3BLYVM3dkFObmxJN0hDcGlRdU93?=
- =?utf-8?B?L1VYYXA0NGxrWHRSZnp2VFJuazN2ZzdHVUJwWE9BYXVTWXVWb25pbXg5WHVM?=
- =?utf-8?B?SGlRUXp5Sld5WmVYU29YWHlOaDRUVnRQdHl4WmpvQ0o5QSs4cWhVK29maStM?=
- =?utf-8?B?NWczQUxPT3NwWFpsTmVvR2tmYzZKWmxMUE5Lamo5N2FvYlNuTGt6UndERUVR?=
- =?utf-8?B?RkRmTlZGU25XQkNUblFOM2g1RStTak4yZ2lyODdUVnZqdWJSVkdrOHFCMStz?=
- =?utf-8?B?ZGpsd0N5cmwyMGcxZHN0WCt5UDNwdUU2VTlrUUxMQUlrQ2N3RDRicnFPVTB0?=
- =?utf-8?B?VmtZUC91K2xPdE9ycmxvcVFSSDhsQzM1cTFYUkdINjFxeVhVMXZ1am81dTRz?=
- =?utf-8?B?Q0hmc2VPM3ZlOHc2R3Z4bDN5dHY5TWtDR05CKys5SXN5OTR0bE5hK3JaNjU1?=
- =?utf-8?B?dzc5THJyK1ROZEEyeEtoV0tkT2NJMWkwSTlYaEhhVzVLcWZ6c2E0dDlBZnZF?=
- =?utf-8?B?elhQN2ZEUW9vYTZpM0xlbnhsQXFPYmxMdWsxaVp0Yklra2FrYlQyZmx5Tkps?=
- =?utf-8?B?UlNUV1huQmRtcG9VcEpzRVRHNEtJL3FTaENibDcxZnJldVBwS3NWWkVzQUNr?=
- =?utf-8?B?YWFCSWowMWh0bWEraXA4Ky8yQlFFVkhJNEVtNFpVeW9yU00wbFRCRG1aSysw?=
- =?utf-8?B?dkRwKy9COEFiUjc1WjREZFN6aWN6bm5FZGNtOXY4c3pZUTNpQ1FUMFhOUDU0?=
- =?utf-8?B?ZG5jemVRbnYyc3F6cXRkODNjRmRpanpkZGV0bGcrRWVseUYzb0MyZ3NuT2s1?=
- =?utf-8?B?enkrYm01ZDg2T2R3cld5c2Vqc1YwYTZIV0UxUjBTOUU4NGV4blVvaEJXQ0t6?=
- =?utf-8?B?cE1FZkthSVdldUZMaFBDbVFPSTBEeVV6TUdqc252UHhVZnlYVFFtTnl0b1RN?=
- =?utf-8?B?SFRrYy9zaUs1Q0tDRGE3NHlwNEVjTGowdkc2d3VzUmI1SElLNVQvQkVXem5z?=
- =?utf-8?B?V3crY01KZnZyV1kwd1F1WnNiT2FVUXVOMGpMZTZSSVFpUFI0MHF2b3plZTlq?=
- =?utf-8?B?ZWovZW8xYUhHeFM1NnM2V3lmQ2hrNjNJMmFhNzN5YS9FRHVMZHlnZG9QV0c5?=
- =?utf-8?B?TG9DWHBFWXBWVHcwRS8rcFVsVit1NUx1d0hIYW1uQ3V2OFhpT2NyckxuRFpU?=
- =?utf-8?B?SGhWN3pxY041MGpTOFZIRWFybXZGNXljWTkzaDU5ZFQ0Si9qUGVHK1dWOUMx?=
- =?utf-8?B?TVl3ZUIzNEd0TlNFNDZpMjgySXFNQ1RDQ1FKSkx2d3IzZmFaTnFVZVRLbUtQ?=
- =?utf-8?B?UkJxZnhvY3BENkVxY0R5Q0cra3dRZjhwMkhjZnZUbkhwNVpMVDlDNjVMdzZ3?=
- =?utf-8?B?M1hPU3VwWkNMb2FwRGZYWlR2LzZJZGJBSUIvNjVBNTAramVyeXdnMjUycWxn?=
- =?utf-8?B?cGtsTG9jTnlqcnRpajAySktaenR3Y08weWF4S0QrdkdMb2VMU1gxY0RMVVp3?=
- =?utf-8?B?a3c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D302519F7774FA4FB927294B1FA071E2@apcprd03.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ 15.2.1118.26; Fri, 11 Oct 2024 02:11:44 -0700
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 11 Oct 2024 17:11:44 +0800
+From: Qun-Wei Lin <qun-wei.lin@mediatek.com>
+To: Jens Axboe <axboe@kernel.dk>, Minchan Kim <minchan@kernel.org>, Sergey
+ Senozhatsky <senozhatsky@chromium.org>, Vishal Verma
+	<vishal.l.verma@intel.com>, Dan Williams <dan.j.williams@intel.com>, Dave
+ Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "Huang,
+ Ying" <ying.huang@intel.com>, Chris Li <chrisl@kernel.org>, Ryan Roberts
+	<ryan.roberts@arm.com>, David Hildenbrand <david@redhat.com>, Kairui Song
+	<kasong@tencent.com>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, Dan
+ Schatzberg <schatzberg.dan@gmail.com>, Barry Song <baohua@kernel.org>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<nvdimm@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	Casper Li <casper.li@mediatek.com>, Chinwen Chang
+	<chinwen.chang@mediatek.com>, Andrew Yang <andrew.yang@mediatek.com>, John
+ Hsu <john.hsu@mediatek.com>, <wsd_upstream@mediatek.com>, Qun-Wei Lin
+	<qun-wei.lin@mediatek.com>
+Subject: [PATCH] mm: Split BLK_FEAT_SYNCHRONOUS and SWP_SYNCHRONOUS_IO into separate read and write flags
+Date: Fri, 11 Oct 2024 17:11:33 +0800
+Message-ID: <20241011091133.28173-1-qun-wei.lin@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PSAPR03MB5542.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 84e20d17-5968-42f3-ee8c-08dce9d43aac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Oct 2024 09:08:10.6403
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a7687ede-7a6b-4ef6-bace-642f677fbe31
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KspmU+fhO9lU3qQrx/vs3EGhB7L0DBtE0f8DleGkedB9ybXooK6so0qzsBd98lsEgsbWrt9GVPZPn6Umd68jnUnWKCiVN+tS1ArvEefTJZ4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR03MB7298
+Content-Type: text/plain
+X-MTK: N
 
-SGkgWWluZywNCg0KVGhhbmsgeW91IGZvciB5b3VyIHF1ZXN0aW9uLg0KDQpUaGUgcHJpbWFyeSBt
-b3RpdmF0aW9uIGZvciB0aGVzZSBuZXcgZmVhdHVyZSBmbGFncyBpcyB0byBoYW5kbGUNCnNjZW5h
-cmlvcyB3aGVyZSB3ZSB3YW50IHJlYWQgb3BlcmF0aW9ucyB0byBiZSBjb21wbGV0ZWQgd2l0aGlu
-IHRoZQ0Kc3VibWl0IGNvbnRleHQsIHdoaWxlIHdyaXRlIG9wZXJhdGlvbnMgYXJlIGhhbmRsZWQg
-aW4gYSBkaWZmZXJlbnQNCmNvbnRleHQuDQoNClRoaXMgZG9lcyBub3QgbmVjZXNzYXJpbHkgaW1w
-bHkgdGhhdCB0aGUgd3JpdGUgb3BlcmF0aW9ucyBhcmUgc2xvdzsNCnJhdGhlciwgaXQgaXMgYWJv
-dXQgb3B0aW1pemluZyB0aGUgaGFuZGxpbmcgb2YgcmVhZCBhbmQgd3JpdGUNCm9wZXJhdGlvbnMg
-YmFzZWQgb24gdGhlaXIgc3BlY2lmaWMgY2hhcmFjdGVyaXN0aWNzIGFuZCByZXF1aXJlbWVudHMu
-DQoNCkJlc3QgUmVnYXJkcywNClF1bi1XZWkNCg0KT24gV2VkLCAyMDI0LTA5LTI1IGF0IDE1OjM0
-ICswODAwLCBIdWFuZywgWWluZyB3cm90ZToNCj4gIAkgDQo+IEV4dGVybmFsIGVtYWlsIDogUGxl
-YXNlIGRvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVudGlsDQo+IHlvdSBo
-YXZlIHZlcmlmaWVkIHRoZSBzZW5kZXIgb3IgdGhlIGNvbnRlbnQuDQo+ICBRdW4tV2VpIExpbiA8
-cXVuLXdlaS5saW5AbWVkaWF0ZWsuY29tPiB3cml0ZXM6DQo+IA0KPiA+IFRoaXMgcGF0Y2hzZXQg
-aW50cm9kdWNlcyAyIG5ldyBmZWF0dXJlIGZsYWdzLA0KPiBCTEtfRkVBVF9SRUFEX1NZTkNIUk9O
-T1VTIGFuZA0KPiA+IFNXUF9SRUFEX1NZTkNIUk9OT1VTX0lPLg0KPiA+DQo+ID4gVGhlc2UgY2hh
-bmdlcyBhcmUgbW90aXZhdGVkIGJ5IHRoZSBuZWVkIHRvIGJldHRlciBhY2NvbW1vZGF0ZQ0KPiBj
-ZXJ0YWluIHN3YXANCj4gPiBkZXZpY2VzIHRoYXQgc3VwcG9ydCBzeW5jaHJvbm91cyByZWFkIG9w
-ZXJhdGlvbnMgYnV0IGFzeW5jaHJvbm91cw0KPiB3cml0ZQ0KPiA+IG9wZXJhdGlvbnMuDQo+ID4N
-Cj4gPiBUaGUgZXhpc3RpbmcgQkxLX0ZFQVRfU1lOQ0hST05PVVMgYW5kIFNXUF9TWU5DSFJPTk9V
-U19JTyBmbGFncyBhcmUNCj4gbm90DQo+ID4gc3VmZmljaWVudCBmb3IgdGhlc2UgZGV2aWNlcywg
-YXMgdGhleSBlbmZvcmNlIHN5bmNocm9ub3VzIGJlaGF2aW9yDQo+IGZvciBib3RoDQo+ID4gcmVh
-ZCBhbmQgd3JpdGUgb3BlcmF0aW9ucy4NCj4gDQo+IFdoaWNoIGtpbmQgb2YgZGV2aWNlIG5lZWRz
-IHRoaXM/ICBSZWFkIGZhc3QsIGJ1dCB3cml0ZSBzbG93Pw0KPiANCj4gLS0NCj4gQmVzdCBSZWdh
-cmRzLA0KPiBIdWFuZywgWWluZw0K
+This patch splits the BLK_FEAT_SYNCHRONOUS feature flag into two
+separate flags: BLK_FEAT_READ_SYNCHRONOUS and
+BLK_FEAT_WRITE_SYNCHRONOUS. Similarly, the SWP_SYNCHRONOUS_IO flag is
+split into SWP_READ_SYNCHRONOUS_IO and SWP_WRITE_SYNCHRONOUS_IO.
+
+These changes are motivated by the need to better accommodate certain
+swap devices that support synchronous read operations but asynchronous write
+operations.
+
+The existing BLK_FEAT_SYNCHRONOUS and SWP_SYNCHRONOUS_IO flags are not
+sufficient for these devices, as they enforce synchronous behavior for
+both read and write operations.
+
+Signed-off-by: Qun-Wei Lin <qun-wei.lin@mediatek.com>
+---
+ drivers/block/brd.c           |  3 ++-
+ drivers/block/zram/zram_drv.c |  5 +++--
+ drivers/nvdimm/btt.c          |  3 ++-
+ drivers/nvdimm/pmem.c         |  5 +++--
+ include/linux/blkdev.h        | 24 ++++++++++++++++--------
+ include/linux/swap.h          | 31 ++++++++++++++++---------------
+ mm/memory.c                   |  4 ++--
+ mm/page_io.c                  |  6 +++---
+ mm/swapfile.c                 |  7 +++++--
+ 9 files changed, 52 insertions(+), 36 deletions(-)
+
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 2fd1ed101748..619a56bf747e 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -336,7 +336,8 @@ static int brd_alloc(int i)
+ 		.max_hw_discard_sectors	= UINT_MAX,
+ 		.max_discard_segments	= 1,
+ 		.discard_granularity	= PAGE_SIZE,
+-		.features		= BLK_FEAT_SYNCHRONOUS |
++		.features		= BLK_FEAT_READ_SYNCHRONOUS	|
++					  BLK_FEAT_WRITE_SYNCHRONOUS	|
+ 					  BLK_FEAT_NOWAIT,
+ 	};
+ 
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index ad9c9bc3ccfc..d2927ea76488 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -2345,8 +2345,9 @@ static int zram_add(void)
+ #if ZRAM_LOGICAL_BLOCK_SIZE == PAGE_SIZE
+ 		.max_write_zeroes_sectors	= UINT_MAX,
+ #endif
+-		.features			= BLK_FEAT_STABLE_WRITES |
+-						  BLK_FEAT_SYNCHRONOUS,
++		.features			= BLK_FEAT_STABLE_WRITES	|
++						  BLK_FEAT_READ_SYNCHRONOUS	|
++						  BLK_FEAT_WRITE_SYNCHRONOUS,
+ 	};
+ 	struct zram *zram;
+ 	int ret, device_id;
+diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
+index 423dcd190906..1665d98f51af 100644
+--- a/drivers/nvdimm/btt.c
++++ b/drivers/nvdimm/btt.c
+@@ -1501,7 +1501,8 @@ static int btt_blk_init(struct btt *btt)
+ 		.logical_block_size	= btt->sector_size,
+ 		.max_hw_sectors		= UINT_MAX,
+ 		.max_integrity_segments	= 1,
+-		.features		= BLK_FEAT_SYNCHRONOUS,
++		.features		= BLK_FEAT_READ_SYNCHRONOUS |
++					  BLK_FEAT_WRITE_SYNCHRONOUS,
+ 	};
+ 	int rc;
+ 
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index 210fb77f51ba..c22a6ee13769 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -455,8 +455,9 @@ static int pmem_attach_disk(struct device *dev,
+ 		.logical_block_size	= pmem_sector_size(ndns),
+ 		.physical_block_size	= PAGE_SIZE,
+ 		.max_hw_sectors		= UINT_MAX,
+-		.features		= BLK_FEAT_WRITE_CACHE |
+-					  BLK_FEAT_SYNCHRONOUS,
++		.features		= BLK_FEAT_WRITE_CACHE		|
++					  BLK_FEAT_READ_SYNCHRONOUS	|
++					  BLK_FEAT_WRITE_SYNCHRONOUS,
+ 	};
+ 	int nid = dev_to_node(dev), fua;
+ 	struct resource *res = &nsio->res;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 50c3b959da28..88e96d6cead2 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -304,20 +304,23 @@ typedef unsigned int __bitwise blk_features_t;
+ /* don't modify data until writeback is done */
+ #define BLK_FEAT_STABLE_WRITES		((__force blk_features_t)(1u << 5))
+ 
+-/* always completes in submit context */
+-#define BLK_FEAT_SYNCHRONOUS		((__force blk_features_t)(1u << 6))
++/* read operations always completes in submit context */
++#define BLK_FEAT_READ_SYNCHRONOUS	((__force blk_features_t)(1u << 6))
++
++/* write operations always completes in submit context */
++#define BLK_FEAT_WRITE_SYNCHRONOUS	((__force blk_features_t)(1u << 7))
+ 
+ /* supports REQ_NOWAIT */
+-#define BLK_FEAT_NOWAIT			((__force blk_features_t)(1u << 7))
++#define BLK_FEAT_NOWAIT			((__force blk_features_t)(1u << 8))
+ 
+ /* supports DAX */
+-#define BLK_FEAT_DAX			((__force blk_features_t)(1u << 8))
++#define BLK_FEAT_DAX			((__force blk_features_t)(1u << 9))
+ 
+ /* supports I/O polling */
+-#define BLK_FEAT_POLL			((__force blk_features_t)(1u << 9))
++#define BLK_FEAT_POLL			((__force blk_features_t)(1u << 10))
+ 
+ /* is a zoned device */
+-#define BLK_FEAT_ZONED			((__force blk_features_t)(1u << 10))
++#define BLK_FEAT_ZONED			((__force blk_features_t)(1u << 11))
+ 
+ /* supports PCI(e) p2p requests */
+ #define BLK_FEAT_PCI_P2PDMA		((__force blk_features_t)(1u << 12))
+@@ -1303,9 +1306,14 @@ static inline bool bdev_nonrot(struct block_device *bdev)
+ 	return blk_queue_nonrot(bdev_get_queue(bdev));
+ }
+ 
+-static inline bool bdev_synchronous(struct block_device *bdev)
++static inline bool bdev_read_synchronous(struct block_device *bdev)
++{
++	return bdev->bd_disk->queue->limits.features & BLK_FEAT_READ_SYNCHRONOUS;
++}
++
++static inline bool bdev_write_synchronous(struct block_device *bdev)
+ {
+-	return bdev->bd_disk->queue->limits.features & BLK_FEAT_SYNCHRONOUS;
++	return bdev->bd_disk->queue->limits.features & BLK_FEAT_WRITE_SYNCHRONOUS;
+ }
+ 
+ static inline bool bdev_stable_writes(struct block_device *bdev)
+diff --git a/include/linux/swap.h b/include/linux/swap.h
+index ca533b478c21..6719c6006894 100644
+--- a/include/linux/swap.h
++++ b/include/linux/swap.h
+@@ -205,21 +205,22 @@ struct swap_extent {
+ 	  offsetof(union swap_header, info.badpages)) / sizeof(int))
+ 
+ enum {
+-	SWP_USED	= (1 << 0),	/* is slot in swap_info[] used? */
+-	SWP_WRITEOK	= (1 << 1),	/* ok to write to this swap?	*/
+-	SWP_DISCARDABLE = (1 << 2),	/* blkdev support discard */
+-	SWP_DISCARDING	= (1 << 3),	/* now discarding a free cluster */
+-	SWP_SOLIDSTATE	= (1 << 4),	/* blkdev seeks are cheap */
+-	SWP_CONTINUED	= (1 << 5),	/* swap_map has count continuation */
+-	SWP_BLKDEV	= (1 << 6),	/* its a block device */
+-	SWP_ACTIVATED	= (1 << 7),	/* set after swap_activate success */
+-	SWP_FS_OPS	= (1 << 8),	/* swapfile operations go through fs */
+-	SWP_AREA_DISCARD = (1 << 9),	/* single-time swap area discards */
+-	SWP_PAGE_DISCARD = (1 << 10),	/* freed swap page-cluster discards */
+-	SWP_STABLE_WRITES = (1 << 11),	/* no overwrite PG_writeback pages */
+-	SWP_SYNCHRONOUS_IO = (1 << 12),	/* synchronous IO is efficient */
+-					/* add others here before... */
+-	SWP_SCANNING	= (1 << 14),	/* refcount in scan_swap_map */
++	SWP_USED	= (1 << 0),		/* is slot in swap_info[] used? */
++	SWP_WRITEOK	= (1 << 1),		/* ok to write to this swap?	*/
++	SWP_DISCARDABLE = (1 << 2),		/* blkdev support discard */
++	SWP_DISCARDING	= (1 << 3),		/* now discarding a free cluster */
++	SWP_SOLIDSTATE	= (1 << 4),		/* blkdev seeks are cheap */
++	SWP_CONTINUED	= (1 << 5),		/* swap_map has count continuation */
++	SWP_BLKDEV	= (1 << 6),		/* its a block device */
++	SWP_ACTIVATED	= (1 << 7),		/* set after swap_activate success */
++	SWP_FS_OPS	= (1 << 8),		/* swapfile operations go through fs */
++	SWP_AREA_DISCARD = (1 << 9),		/* single-time swap area discards */
++	SWP_PAGE_DISCARD = (1 << 10),		/* freed swap page-cluster discards */
++	SWP_STABLE_WRITES = (1 << 11),		/* no overwrite PG_writeback pages */
++	SWP_READ_SYNCHRONOUS_IO = (1 << 12),	/* synchronous read IO is efficient */
++	SWP_WRITE_SYNCHRONOUS_IO = (1 << 13),	/* synchronous write IO is efficient */
++						/* add others here before... */
++	SWP_SCANNING	= (1 << 14),		/* refcount in scan_swap_map */
+ };
+ 
+ #define SWAP_CLUSTER_MAX 32UL
+diff --git a/mm/memory.c b/mm/memory.c
+index 2366578015ad..93eb6c29e52c 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -4278,7 +4278,7 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
+ 	swapcache = folio;
+ 
+ 	if (!folio) {
+-		if (data_race(si->flags & SWP_SYNCHRONOUS_IO) &&
++		if (data_race(si->flags & SWP_READ_SYNCHRONOUS_IO) &&
+ 		    __swap_count(entry) == 1) {
+ 			/* skip swapcache */
+ 			folio = alloc_swap_folio(vmf);
+@@ -4413,7 +4413,7 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
+ 		goto out_nomap;
+ 	}
+ 
+-	/* allocated large folios for SWP_SYNCHRONOUS_IO */
++	/* allocated large folios for SWP_READ_SYNCHRONOUS_IO */
+ 	if (folio_test_large(folio) && !folio_test_swapcache(folio)) {
+ 		unsigned long nr = folio_nr_pages(folio);
+ 		unsigned long folio_start = ALIGN_DOWN(vmf->address, nr * PAGE_SIZE);
+diff --git a/mm/page_io.c b/mm/page_io.c
+index 78bc88acee79..ffcc9dbbe61e 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -455,10 +455,10 @@ void __swap_writepage(struct folio *folio, struct writeback_control *wbc)
+ 		swap_writepage_fs(folio, wbc);
+ 	/*
+ 	 * ->flags can be updated non-atomicially (scan_swap_map_slots),
+-	 * but that will never affect SWP_SYNCHRONOUS_IO, so the data_race
++	 * but that will never affect SWP_WRITE_SYNCHRONOUS_IO, so the data_race
+ 	 * is safe.
+ 	 */
+-	else if (data_race(sis->flags & SWP_SYNCHRONOUS_IO))
++	else if (data_race(sis->flags & SWP_WRITE_SYNCHRONOUS_IO))
+ 		swap_writepage_bdev_sync(folio, wbc, sis);
+ 	else
+ 		swap_writepage_bdev_async(folio, wbc, sis);
+@@ -592,7 +592,7 @@ static void swap_read_folio_bdev_async(struct folio *folio,
+ void swap_read_folio(struct folio *folio, struct swap_iocb **plug)
+ {
+ 	struct swap_info_struct *sis = swp_swap_info(folio->swap);
+-	bool synchronous = sis->flags & SWP_SYNCHRONOUS_IO;
++	bool synchronous = sis->flags & SWP_READ_SYNCHRONOUS_IO;
+ 	bool workingset = folio_test_workingset(folio);
+ 	unsigned long pflags;
+ 	bool in_thrashing;
+diff --git a/mm/swapfile.c b/mm/swapfile.c
+index 0cded32414a1..84f6fc86be2b 100644
+--- a/mm/swapfile.c
++++ b/mm/swapfile.c
+@@ -3460,8 +3460,11 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
+ 	if (si->bdev && bdev_stable_writes(si->bdev))
+ 		si->flags |= SWP_STABLE_WRITES;
+ 
+-	if (si->bdev && bdev_synchronous(si->bdev))
+-		si->flags |= SWP_SYNCHRONOUS_IO;
++	if (si->bdev && bdev_read_synchronous(si->bdev))
++		si->flags |= SWP_READ_SYNCHRONOUS_IO;
++
++	if (si->bdev && bdev_write_synchronous(si->bdev))
++		si->flags |= SWP_WRITE_SYNCHRONOUS_IO;
+ 
+ 	if (si->bdev && bdev_nonrot(si->bdev)) {
+ 		si->flags |= SWP_SOLIDSTATE;
+-- 
+2.45.2
+
