@@ -1,46 +1,37 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36DA18C03D;
-	Thu, 10 Oct 2024 20:44:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3009715E97
+	for <linux-block@vger.kernel.org>; Fri, 11 Oct 2024 01:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=222.66.158.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728593074; cv=none; b=lFxJZlf3avyenJc/CBM99pRHnOiYwp/0cVDItbz5Krkvzn/g17/nhJaFPl8LKLHjdpEPR2A4HI97a3hpiog0PVvYzeoHY6sMMyhbLxDab0r7FAL9YffGF9BWjZG29xe7Vlix6c1eASM8DMSOdO5V8nq8vMHWYSUoTvZzjUwaifw=
+	t=1728611278; cv=none; b=XpkgG5KZfGl/QR1RsRFjAH9aookjg6Ggr8+d8Tl7JdGU8k+71hjJpt/o0WCQzx3ERBBm25sUwybLeIv2w6ufbw13aZvNCmkdWFVXg3G3EroDkaPSdMKzd3crwq7MV6pNOKvL/hDB16vbHNPhCpXmlECx9eSxXs9CNx7ziIp4Ujs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728593074; c=relaxed/simple;
-	bh=ECBin4k6fw2OruJMi64LWYj7wG/maXr/6kyXQve3tKw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i1M8A61VfekeFdID0Xw575V1s4pz2oYKkpCzguJdjcxO+r0+wWqIMYjQ47JP2BB7EMT/sLZ3TcMeu9NBidd+CY/wHa0UCu1eF8gUKNoMVaWDSIHJD30uaa2V5CmQmc1HjaNdaZLrEWFDoloddC0HsaqMfy/awsTutblmpnjZ2Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=aT9yBInu; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="aT9yBInu"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=2yWyCpZ53gIzx3cAD/L1bBLUXyJxFe90aJntlIsY7DE=; b=aT9yBInumEWU60gV
-	hmoBzenr8/UVDbVxS8RVtQaRYD3ZDaRMzGPplltSjtBmfnjdaepkTRKdfeBQmxrLN7ntezYZhM1CW
-	Eig8HEueTHvc55w1U6RbNIb8ghmifhl/g8I1ZQpsb+5DPQyAWbavmL+Rouq2RlmvtEfzepN7u1acm
-	ynVYnUttaLcBFQsCvAxrWp8YZIHRDQnQG6cxC/G6/yfMOcdSfMmKzYroLjTlEbV6j7/DdQYKpzMEx
-	Eyplvi5UsEJjSNT5h/tI9667UVOS/zbDaZZAKYiQ4oCRw5GrcdhVkSq5FNj64Ea47tb9nCXb97ML+
-	L4USjEM5i16eVH46NQ==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1sz01M-00AMjK-0t;
-	Thu, 10 Oct 2024 20:44:28 +0000
-From: linux@treblig.org
-To: philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com,
-	christoph.boehmwalder@linbit.com,
-	axboe@kernel.dk
-Cc: drbd-dev@lists.linbit.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] drbd: Remove unused conn_lowest_minor
-Date: Thu, 10 Oct 2024 21:44:26 +0100
-Message-ID: <20241010204426.277535-1-linux@treblig.org>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1728611278; c=relaxed/simple;
+	bh=VzU/r74608DW8rwP3q/dNanxvdMrpgci97YcayLvb2k=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aAwBVYFUugzQEP1h5VDOidk+IddxJR8uCHFpKnFbzgeKPc8DMZ8Kx1T/51O15OTrYEu1hkDSC3+GUStD3lFj+ts7AD6hI5/ayce1T2fMg1ig+dONhm6rOEum9zAM7LMvfOnZzk0h4sLWrZgoq28V7jS0arI4ox+9l7JMXCP3pjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com; spf=pass smtp.mailfrom=unisoc.com; arc=none smtp.client-ip=222.66.158.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unisoc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unisoc.com
+Received: from dlp.unisoc.com ([10.29.3.86])
+	by SHSQR01.spreadtrum.com with ESMTP id 49B1lclI040915;
+	Fri, 11 Oct 2024 09:47:38 +0800 (+08)
+	(envelope-from Xiuhong.Wang@unisoc.com)
+Received: from SHDLP.spreadtrum.com (bjmbx02.spreadtrum.com [10.0.64.8])
+	by dlp.unisoc.com (SkyGuard) with ESMTPS id 4XPq6d43yJz2RY1yf;
+	Fri, 11 Oct 2024 09:39:21 +0800 (CST)
+Received: from tj10379pcu.spreadtrum.com (10.5.32.15) by
+ BJMBX02.spreadtrum.com (10.0.64.8) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.23; Fri, 11 Oct 2024 09:47:34 +0800
+From: Xiuhong Wang <xiuhong.wang@unisoc.com>
+To: <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <niuzhiguo84@gmail.com>, <ke.wang@unisoc.com>, <xiuhong.wang.cn@gmail.com>
+Subject: [PATCH] Revert "blk-throttle: Fix IO hang for a corner case"
+Date: Fri, 11 Oct 2024 09:47:24 +0800
+Message-ID: <20241011014724.2199182-1-xiuhong.wang@unisoc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,57 +39,49 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
+ BJMBX02.spreadtrum.com (10.0.64.8)
+X-MAIL:SHSQR01.spreadtrum.com 49B1lclI040915
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+This reverts commit 5b7048b89745c3c5fb4b3080fb7bced61dba2a2b.
 
-conn_lowest_minor() last use was removed by 2011 commit
-69a227731a37 ("drbd: Pass a peer device to a number of fuctions")
+The throtl_adjusted_limit function was removed after
+commit bf20ab538c81 ("blk-throttle: remove
+CONFIG_BLK_DEV_THROTTLING_LOW"), so the problem of not being
+able to scale after setting bps or iops to 1 will not occur.
+So revert this commit that bps/iops can be set to 1.
 
-Remove it.
-
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Cc: Baolin Wang <baolin.wang@linux.alibaba.com>
+Cc: Yu Kuai <yukuai3@huawei.com>
+Signed-off-by: Xiuhong Wang <xiuhong.wang@unisoc.com>
+Signed-off-by: Zhiguo Niu <zhiguo.niu@unisoc.com>
 ---
- drivers/block/drbd/drbd_int.h  |  1 -
- drivers/block/drbd/drbd_main.c | 14 --------------
- 2 files changed, 15 deletions(-)
+ block/blk-throttle.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index 2a05d955e30b..e21492981f7d 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -1364,7 +1364,6 @@ extern struct bio_set drbd_io_bio_set;
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 2c4192e12efa..443d1f47c2ce 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1485,13 +1485,13 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 			goto out_finish;
  
- extern struct mutex resources_mutex;
- 
--extern int conn_lowest_minor(struct drbd_connection *connection);
- extern enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsigned int minor);
- extern void drbd_destroy_device(struct kref *kref);
- extern void drbd_delete_device(struct drbd_device *device);
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index 0d74d75260ef..5bbd312c3e14 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -471,20 +471,6 @@ void _drbd_thread_stop(struct drbd_thread *thi, int restart, int wait)
- 		wait_for_completion(&thi->stop);
- }
- 
--int conn_lowest_minor(struct drbd_connection *connection)
--{
--	struct drbd_peer_device *peer_device;
--	int vnr = 0, minor = -1;
--
--	rcu_read_lock();
--	peer_device = idr_get_next(&connection->peer_devices, &vnr);
--	if (peer_device)
--		minor = device_to_minor(peer_device->device);
--	rcu_read_unlock();
--
--	return minor;
--}
--
- #ifdef CONFIG_SMP
- /*
-  * drbd_calc_cpu_mask() - Generate CPU masks, spread over all CPUs
+ 		ret = -EINVAL;
+-		if (!strcmp(tok, "rbps") && val > 1)
++		if (!strcmp(tok, "rbps"))
+ 			v[0] = val;
+-		else if (!strcmp(tok, "wbps") && val > 1)
++		else if (!strcmp(tok, "wbps"))
+ 			v[1] = val;
+-		else if (!strcmp(tok, "riops") && val > 1)
++		else if (!strcmp(tok, "riops"))
+ 			v[2] = min_t(u64, val, UINT_MAX);
+-		else if (!strcmp(tok, "wiops") && val > 1)
++		else if (!strcmp(tok, "wiops"))
+ 			v[3] = min_t(u64, val, UINT_MAX);
+ 		else
+ 			goto out_finish;
 -- 
-2.47.0
+2.25.1
 
