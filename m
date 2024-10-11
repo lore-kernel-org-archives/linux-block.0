@@ -1,109 +1,101 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B60C1E529;
-	Fri, 11 Oct 2024 12:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4DA218D68
+	for <linux-block@vger.kernel.org>; Fri, 11 Oct 2024 13:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728650283; cv=none; b=K1iXlZp/BFZELNlXvyVVUjm1vXeY5X0P35wC5pUPPXwuasSGz7WafPAhqImTykmry1cKEWnBK/73tdF5vIfXmg9jqk0KH3xPk6mqiHzFcAP3ftBAQnToZGg7oY5NZTqqYENoMc0qpuJynVjfeweFouJ8Twl1Pr+9318ertfUaXg=
+	t=1728652370; cv=none; b=eKDAKTkBP9iLBeU+6M3n3rC9CvnjPx1KTcqzSQOdtL15NuRwRUcSFR6C7Z8PutqG3siLneR0i+UqwcZ1HZDLo28bcYKsx4Q3d9fCs7JXMPy8Z1W5hptefNz/M7QXYKZpVjrQGAsrqhpMZnIyRtEm7mmTnB8mRsRQAccVxQD1ik0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728650283; c=relaxed/simple;
-	bh=NPzh69hoN8vFI9CF1VPACZHxMWIc4wZatQ/5mYKrXDA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=excdHNfcrMon/8olnmHwtrvll7U4tCn0A98XRXOpwT4njfkBg9Eqc8yOFb0OgxxsBzD37JO3CSQXY8otiCToFUSUeJSTyiClBdsRMSjUh1tRHjb7gSLZzn6TGVzHVYW5rmVm/JiESt9KjRGCcjSGRLOGdGcp7DKftqDq/j+Lb/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4311420b675so17255165e9.2;
-        Fri, 11 Oct 2024 05:38:01 -0700 (PDT)
+	s=arc-20240116; t=1728652370; c=relaxed/simple;
+	bh=my2VxRQrXUGJdn6lj6aDPWYkyYR/YcYNoSYt8mDZti8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rys61Di6DlQONm+xLFHx7Wk5Gbo8+lYhWXJCsDI7kUCh/++ZgPdIdMzYcuDJRPmHm4oRnGEUosYlGrER8j67mB7b0AyK4fmSSUN+arjM+R1KS7p1nxBqk7Z35IDWdzA7J3UqULfDTLgAM19xTfEio0LhWNn1DDma4+8LBqPoc/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qa1B0Q94; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qa1B0Q94"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-835464abfa7so66965539f.0
+        for <linux-block@vger.kernel.org>; Fri, 11 Oct 2024 06:12:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728652366; x=1729257166; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CjBvdCrJy9AjzpnGvNRYO/januDKQlvw/jXh8GXjiJ8=;
+        b=qa1B0Q94tEZmPXciEeIRUzIKUDEUfbdJyESpg0jA6inM+mEY6PLdN+8Za19dpaBbds
+         pl9Pvakch/lQFyycOeepF3RKQ/6q+eGAWrOoRN1MQWEU4ZHVM7dR3nRKZCYxbHKSUH47
+         H331aph3ryzG1dQZX13uhypzul2Vv8XuB6d2RfVLCKzfNl/CHnxCI29UvJ9Da0WPWQPE
+         lWjhkIFd6UkERtmwC7RgBqtJhK7GOxpZwjYpfO4Vtdk0zym1VXyR8bfWVXgCbR3LTOA/
+         LoBTLQ/KaTpO3KJKvZdNhd8XawF6xySLlkZQ3vfjOKxOAyR5j6rVXw1RVUpPGruB/Nf4
+         zYRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728650280; x=1729255080;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eBVz48o1g1I9UbDwyYUHJZKRlpZFQBxOo57xFoBIM5Y=;
-        b=GrZJRu/R4UAMyurPUzakYHfIfPkOGkSPcdsd6b487C3nXdpjhs9y8xdseK+T3ORHx8
-         NmxUlK+z5cmoyIRkh4Uo8E/41QRPwoPHrSsUkvecOHLeSccRDLQ41uGETaupLzCstkDI
-         aP9VyluKDIvZETHealzxTlcj+8uRRGa/NvU4amu4rr5oJE1OP+il3Uu3wPqys6BnNPJx
-         WU7+NYcA8NaWRL+ZEAe67iP903KOVxXCUXL9xZCZNyWslgh563pF/fT/Ny260hi/H9z9
-         5q1KGwYnieMOvXmQNi6lPCf/XHsJjDGTbeCzlwokSl8f84OLKp7OwUs/xZ/DK68bSagX
-         eZLg==
-X-Forwarded-Encrypted: i=1; AJvYcCXAtLcv87gKckM9psHs1k274sPanRtbEd/0d0XMwtrXNerG1SruYUoWKdJ6sgphnXulitNtF88rGLJne8P9@vger.kernel.org, AJvYcCXt6Fkz5jGS3IwANu1HLe/8awHNF9GDA6hJJJMM69UWfzT+6FZGRgiu59CHeo8iCAChObI9arig8xeceA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvmbRVbQ/N+ZsTTeF6ciCBTfxoII5LA95HRd25k0NT3vwyuI8V
-	7jaX206GhBri/7UtCSZQUjKdBMkUwALlMVprT+9vM5xNzMIQ6qnJ
-X-Google-Smtp-Source: AGHT+IF5hkoRf5hvMwE7/tXuKWAa/AOI0qaH49G5wqKQcdVxB+jGdrNe3l78p49k7EDh0XwDTCVT3w==
-X-Received: by 2002:a05:600c:1c06:b0:42c:a8d5:2df5 with SMTP id 5b1f17b1804b1-4311df1e6b0mr22330915e9.24.1728650279553;
-        Fri, 11 Oct 2024 05:37:59 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430ccf1f797sm74072725e9.4.2024.10.11.05.37.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 05:37:58 -0700 (PDT)
-Date: Fri, 11 Oct 2024 05:37:47 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, kernel-team@meta.com,
-	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] elevator: do not request_module if elevator exists
-Message-ID: <20241011-spotted-cormorant-of-research-0d8184@leitao>
-References: <20241010141509.4028059-1-leitao@debian.org>
- <ZwjgrwSw2vUVP2cp@infradead.org>
+        d=1e100.net; s=20230601; t=1728652366; x=1729257166;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CjBvdCrJy9AjzpnGvNRYO/januDKQlvw/jXh8GXjiJ8=;
+        b=n4vnt8iNB+W3KPLcBlrF1rSuzNcNv4+gOag6/BCjJtBS9ZXR4foNPHvZU5VYAwynWr
+         HABhOITRLV3cbXXqoeIWI8JAX+Z9/jlrwUDk5WpfK1MqWel21MQmMtHaYodVsglBpdqP
+         7B/s1v7aFNGcg60l4mR1LuWvgnPKbGCyW+/KUHfbpqP9sBTOrn3tf3EGYrkndyBD0fDa
+         cMPaby0BKjsBzGLRXRjh8C0kYyWgcMcy88OjoseUAJEfaqLLKlCMOOTVQRBSJDSjqDds
+         KEX32/eEHk5PNBjS3JXakXAtnIRNWtT70KPc7oxY6jRSX+ngGr9dOZcq6rQCtKXzVxXR
+         BuVA==
+X-Forwarded-Encrypted: i=1; AJvYcCVhQBs9H9k2Fb/nJ+at2gTgXABX4Hj5/BnUMOWddmSqKyt+UFICbbWunDyQ1nZRT7tksXm22AbVeU4KZQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUPOd6uRcdDWcAUS/7xCAkJtNR/OdXr5Ws4q1MBmKWLEevgdgI
+	sjfZG5Ge42dbnmKN3xCh1tu1JGqbxxkmOfgYZN6dQ6KATOLtr0JiDdlsmG1vn6c=
+X-Google-Smtp-Source: AGHT+IEtFfHEv9wmZhEEa3otACwtmvnXlmBWNr+mm/Vzer9DqTyJNJvCgM0xkf3v0OQ9WdwaWhkU+w==
+X-Received: by 2002:a05:6e02:160e:b0:3a0:4db0:ddbf with SMTP id e9e14a558f8ab-3a3b5f5cd14mr15928995ab.8.1728652366239;
+        Fri, 11 Oct 2024 06:12:46 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbad9b11c3sm634588173.10.2024.10.11.06.12.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Oct 2024 06:12:44 -0700 (PDT)
+Message-ID: <1b4889f3-3140-4855-8c74-f0c9df7318ca@kernel.dk>
+Date: Fri, 11 Oct 2024 07:12:43 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] elevator: do not request_module if elevator exists
+To: Christoph Hellwig <hch@infradead.org>, Breno Leitao <leitao@debian.org>
+Cc: kernel-team@meta.com, "open list:BLOCK LAYER"
+ <linux-block@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+References: <20241010141509.4028059-1-leitao@debian.org>
+ <ZwjgrwSw2vUVP2cp@infradead.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
 In-Reply-To: <ZwjgrwSw2vUVP2cp@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello Christoph,
-
-On Fri, Oct 11, 2024 at 01:24:15AM -0700, Christoph Hellwig wrote:
-> On Thu, Oct 10, 2024 at 07:15:08AM -0700, Breno Leitao wrote:
-> > Whenever an I/O elevator is changed, the system attempts to load a
-> > module for the new elevator. This occurs regardless of whether the
-> > elevator is already loaded or built directly into the kernel. This
-> > behavior introduces unnecessary overhead and potential issues.
-> > 
-> > This makes the operation slower, and more error-prone. For instance,
-> > making the problem fixed by [1] visible for users that doesn't even rely
-> > on modules being available through modules.
-> > 
-> > Do not try to load the ioscheduler if it is already visible.
-> > 
-> > This change brings two main benefits: it improves the performance of
-> > elevator changes, and it reduces the likelihood of errors occurring
-> > during this process.
-> > 
-> > [1] Commit e3accac1a976 ("block: Fix elv_iosched_local_module handling of "none" scheduler")
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  block/elevator.c | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/block/elevator.c b/block/elevator.c
-> > index 4122026b11f1..1904e217505a 100644
-> > --- a/block/elevator.c
-> > +++ b/block/elevator.c
-> > @@ -709,13 +709,16 @@ int elv_iosched_load_module(struct gendisk *disk, const char *buf,
-> >  			    size_t count)
-> >  {
-> >  	char elevator_name[ELV_NAME_MAX];
-> > +	const char *name;
-> >  
-> >  	if (!elv_support_iosched(disk->queue))
-> >  		return -EOPNOTSUPP;
-> >  
-> >  	strscpy(elevator_name, buf, sizeof(elevator_name));
-> > +	name = strstrip(elevator_name);
-> >  
-> > -	request_module("%s-iosched", strstrip(elevator_name));
-> > +	if (!__elevator_find(name))
+On 10/11/24 2:24 AM, Christoph Hellwig wrote:
+>> diff --git a/block/elevator.c b/block/elevator.c
+>> index 4122026b11f1..1904e217505a 100644
+>> --- a/block/elevator.c
+>> +++ b/block/elevator.c
+>> @@ -709,13 +709,16 @@ int elv_iosched_load_module(struct gendisk *disk, const char *buf,
+>>  			    size_t count)
+>>  {
+>>  	char elevator_name[ELV_NAME_MAX];
+>> +	const char *name;
+>>  
+>>  	if (!elv_support_iosched(disk->queue))
+>>  		return -EOPNOTSUPP;
+>>  
+>>  	strscpy(elevator_name, buf, sizeof(elevator_name));
+>> +	name = strstrip(elevator_name);
+>>  
+>> -	request_module("%s-iosched", strstrip(elevator_name));
+>> +	if (!__elevator_find(name))
 > 
 > __elevator_find needs to be called with elv_list_lock.
 
-That is right. Thanks for the heads-up.
+Doh yes. Breno, I just dropped it for now, just send a v2.
 
-I will send a fix soon.
+-- 
+Jens Axboe
