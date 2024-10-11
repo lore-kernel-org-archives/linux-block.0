@@ -1,89 +1,167 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495871E502;
-	Fri, 11 Oct 2024 13:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB5621A714;
+	Fri, 11 Oct 2024 13:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728652653; cv=none; b=AjznsDuP/Br1Nm4/pfqEvjViZexfdWwrfm50SNm/M8WOggK/Qh8+TidaYPXWFm4MwyFUbsHVhJ7BhwZzgOgLy/C7SxrI7kFtAujmTxq6KloiK7dVnRDQen2lStQO7SA7knau9pr7HXBGO6mDdabHDAMEAMsElH9HSF/A77he12U=
+	t=1728652857; cv=none; b=MCvEAPV/g+D7RGNgImmvI6i48S1lzqW/Dk2vGu1RCQ3kIDIoO9nB8p4HJPoDl+KffQ5aFHFXTE4655ZYFGMUZFZ1gAYwLJowWESgdSAojF9qTEJE6D8BfZB5E0TxeePEFn1OLyKvxbcYjSmOmV4i45Rb5Ggw1xauDD/J3f0iLFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728652653; c=relaxed/simple;
-	bh=Kq/IvEcbr0Ppgi+gMKR3bodZO8mVKo/H2Z3rATLOQtw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PbJGzZyQvBpGSoLHUNBB9kvEx5sHHKySbSs+h6+By7LKLngIU6dvk4NcOCFEA7pSsgzl0FhzTgSUrfsnx0fHFs758UU0dtCLpUaqyGWagSKsT5PfWiAIDd1tAN1x+ghJUasdRvfMQ0pckTaRojRhDGugQTGFv0F8MzokcPXQAK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5398cc2fcb7so2522922e87.1;
-        Fri, 11 Oct 2024 06:17:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728652649; x=1729257449;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lfW1cruP70qbfc8fGCdAsDZHmpmW3Yy+pxu/ro3VbRs=;
-        b=ZRJ/BLqYVA3FydSqbHM5OkIPkMptBha9I2VQqQzbVNvegpwg0zdDE1QhpjVS+cnv6k
-         CiBjPee56iblVftiJ+fCGkw7aA5ib1mTxfyLyC7ZyN90a5a0g257spbT0atevvPQ6XpU
-         Ztlao+BUuAfllmMXKcHhWx37fWjBAZLtTYEQHGazdUlFySx291juE7OoRlsoOA4YTtqr
-         pIopsWwvelIqUMWQTcQ3gLVjrKCBhRrhmS+uBUt3MV+USJm0/IRDt89V+ffog9oA56Gk
-         KkuYZJ8sfSj1pPgeMlO99dseAXSvhaeqlkYJ7Shggg0R1k1qMrAS7bHmO7ZF9ihB4ANk
-         UC4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXF282PAGDX1s3txWzJHWf1EcGAY9WXmnZTG4/fwc6kbosCQmbXaF3s6RBkr8b8GDPm3Xe/ndZS1wNPpwgw@vger.kernel.org, AJvYcCXl17hCYpffTlZ1nlN6LxyUmVKJPEm69CPyDkKv/wn+jIduND5QIj2YKpFuZEFTerzwFA+htoLR3gu9bg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4Jjewp+SVGpdgmfYSwFdsgUXOZTPSceUFEgKDnpr3ISXO0dlP
-	Uk+5RWG6VQh+ZOTgu97DfPKgdIMuPhG5UJFEV96AyPk2BWzBLvmh
-X-Google-Smtp-Source: AGHT+IGyMZLjHbKn+BkG0J5N13o/9elpv8TXs4WkQgXjz/AG3pNzSUo6/eCAy/izA//xOvyPkmqy6A==
-X-Received: by 2002:a05:6512:3e14:b0:52e:9dee:a6f5 with SMTP id 2adb3069b0e04-539da54809dmr1370319e87.46.1728652648897;
-        Fri, 11 Oct 2024 06:17:28 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431182d7929sm42256605e9.4.2024.10.11.06.17.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2024 06:17:28 -0700 (PDT)
-Date: Fri, 11 Oct 2024 06:17:26 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>, kernel-team@meta.com,
-	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] elevator: do not request_module if elevator exists
-Message-ID: <20241011-enigmatic-mustang-of-thunder-eae0d3@leitao>
-References: <20241010141509.4028059-1-leitao@debian.org>
- <ZwjgrwSw2vUVP2cp@infradead.org>
- <1b4889f3-3140-4855-8c74-f0c9df7318ca@kernel.dk>
+	s=arc-20240116; t=1728652857; c=relaxed/simple;
+	bh=e8FifqVONBIXYDPO3q4p/oVtmcyOoSKPN3d75PQqyyo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fXIF3jvBrE2MRP+GO3g8ATK1EtEmfZN4lO+kdsCbN9aZU3RFU1/u8m+zM2rvAbkDDYycKrkl5/ZZICr4Xfizv/Nc1qs773sAror3kdFsAv7yHbWHhFekIir4be/V0rqeU7z0oTgH2+/4vtS6PXOPImYLzbrWlBM4QrJ6lMljRuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FfiWsNK2; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FfiWsNK2"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=s5uwGYftDca6DbfMfT2/9OXcA7gA2HJJHNWbl7asyc4=; b=FfiWsNK26T7cDR9ImV0CPANc/+
+	Jc9UWigVdbq2gYCZKGrBjk9mSDEn/d1dPk1S7z3s8eKK2JbO4tAbsGNU25ZrhDjEuhhOUCTsah6IB
+	tolqnRp1VMaB8PBxPd4HPD+A2GKb18pF4LOqqS+5K0/8Bxe3XPDzhVvhCMIURaRBu9lFlio1J4eUw
+	3fI64Hl3xUgWmmjsf1LXslh+oZKCXjh3cMJZFdx9TKcUWd5orSIDnLGIVi9Ebm7aVYEC3b3hbPLpk
+	/sYYoIReu14K5tRtOyD9pbvMv2xYSY452ICbussHgJTPruNrPEW8XKHSXz4mPACuj2Ra8C148tgY2
+	30Yq5DgA==;
+Received: from 2a02-8389-2341-5b80-02eb-b750-687c-51db.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:2eb:b750:687c:51db] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1szFZb-0000000GQgt-0Dz6;
+	Fri, 11 Oct 2024 13:20:51 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	akpm@linux-foundation.org
+Cc: viro@zeniv.linux.org.uk,
+	dhowells@redhat.com,
+	ming.lei@redhat.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3] iov_iter: don't require contiguous pages in iov_iter_extract_bvec_pages
+Date: Fri, 11 Oct 2024 15:20:22 +0200
+Message-ID: <20241011132047.1153249-1-hch@lst.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1b4889f3-3140-4855-8c74-f0c9df7318ca@kernel.dk>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Hello Jens,
+The iov_iter_extract_pages interface allows to return physically
+discontiguous pages, as long as all but the first and last page
+in the array are page aligned and page size.  Rewrite
+iov_iter_extract_bvec_pages to take advantage of that instead of only
+returning ranges of physically contiguous pages.
 
-On Fri, Oct 11, 2024 at 07:12:43AM -0600, Jens Axboe wrote:
-> On 10/11/24 2:24 AM, Christoph Hellwig wrote:
-> >> diff --git a/block/elevator.c b/block/elevator.c
-> >> index 4122026b11f1..1904e217505a 100644
-> >> --- a/block/elevator.c
-> >> +++ b/block/elevator.c
-> >> @@ -709,13 +709,16 @@ int elv_iosched_load_module(struct gendisk *disk, const char *buf,
-> >>  			    size_t count)
-> >>  {
-> >>  	char elevator_name[ELV_NAME_MAX];
-> >> +	const char *name;
-> >>  
-> >>  	if (!elv_support_iosched(disk->queue))
-> >>  		return -EOPNOTSUPP;
-> >>  
-> >>  	strscpy(elevator_name, buf, sizeof(elevator_name));
-> >> +	name = strstrip(elevator_name);
-> >>  
-> >> -	request_module("%s-iosched", strstrip(elevator_name));
-> >> +	if (!__elevator_find(name))
-> > 
-> > __elevator_find needs to be called with elv_list_lock.
-> 
-> Doh yes. Breno, I just dropped it for now, just send a v2.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+[hch: minor cleanups, new commit log]
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
 
-Sure, I will be sending soon. Sorry for not finding it earlier.
+v3:
+ - open code the iterator
+ - improve commit log and comments
+
+ lib/iov_iter.c | 67 +++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 45 insertions(+), 22 deletions(-)
+
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 1abb32c0da50bc..9fc06f5fb7489f 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1677,8 +1677,8 @@ static ssize_t iov_iter_extract_xarray_pages(struct iov_iter *i,
+ }
+ 
+ /*
+- * Extract a list of contiguous pages from an ITER_BVEC iterator.  This does
+- * not get references on the pages, nor does it get a pin on them.
++ * Extract a list of virtually contiguous pages from an ITER_BVEC iterator.
++ * This does not get references on the pages, nor does it get a pin on them.
+  */
+ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
+ 					   struct page ***pages, size_t maxsize,
+@@ -1686,35 +1686,58 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
+ 					   iov_iter_extraction_t extraction_flags,
+ 					   size_t *offset0)
+ {
+-	struct page **p, *page;
+-	size_t skip = i->iov_offset, offset, size;
+-	int k;
++	size_t skip = i->iov_offset, size = 0;
++	struct bvec_iter bi;
++	int k = 0;
+ 
+-	for (;;) {
+-		if (i->nr_segs == 0)
+-			return 0;
+-		size = min(maxsize, i->bvec->bv_len - skip);
+-		if (size)
+-			break;
++	if (i->nr_segs == 0)
++		return 0;
++
++	if (i->iov_offset == i->bvec->bv_len) {
+ 		i->iov_offset = 0;
+ 		i->nr_segs--;
+ 		i->bvec++;
+ 		skip = 0;
+ 	}
++	bi.bi_size = maxsize + skip;
++	bi.bi_bvec_done = skip;
++
++	maxpages = want_pages_array(pages, maxsize, skip, maxpages);
++
++	while (bi.bi_size && bi.bi_idx < i->nr_segs) {
++		struct bio_vec bv = bvec_iter_bvec(i->bvec, bi);
++
++		/*
++		 * The iov_iter_extract_pages interface only allows an offset
++		 * into the first page.  Break out of the loop if we see an
++		 * offset into subsequent pages, the caller will have to call
++		 * iov_iter_extract_pages again for the reminder.
++		 */
++		if (k) {
++			if (bv.bv_offset)
++				break;
++		} else {
++			*offset0 = bv.bv_offset;
++		}
+ 
+-	skip += i->bvec->bv_offset;
+-	page = i->bvec->bv_page + skip / PAGE_SIZE;
+-	offset = skip % PAGE_SIZE;
+-	*offset0 = offset;
++		(*pages)[k++] = bv.bv_page;
++		size += bv.bv_len;
+ 
+-	maxpages = want_pages_array(pages, size, offset, maxpages);
+-	if (!maxpages)
+-		return -ENOMEM;
+-	p = *pages;
+-	for (k = 0; k < maxpages; k++)
+-		p[k] = page + k;
++		if (k >= maxpages)
++			break;
++
++		/*
++		 * We are done when the end of the bvec doesn't align to a page
++		 * boundary as that would create a hole in the returned space.
++		 * The caller will handle this with another call to
++		 * iov_iter_extract_pages.
++		 */
++		if (bv.bv_offset + bv.bv_len != PAGE_SIZE)
++			break;
++
++		bvec_iter_advance_single(i->bvec, &bi, bv.bv_len);
++	}
+ 
+-	size = min_t(size_t, size, maxpages * PAGE_SIZE - offset);
+ 	iov_iter_advance(i, size);
+ 	return size;
+ }
+-- 
+2.45.2
+
