@@ -1,166 +1,109 @@
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB0B802
-	for <linux-block@vger.kernel.org>; Fri, 11 Oct 2024 12:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B60C1E529;
+	Fri, 11 Oct 2024 12:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728649275; cv=none; b=RclzDQtraEg0AF0Xm9AD073sK6fEf/AZheytb9/dqsKxbGjQxR32x9744g4b0QleRkVnySYsYBg6xnc5YUPcAVos3q5q4rV/PiAnfYmkqQdhhJ7TYlUxh76yPkuXcRX9ZAY8yBwLpiQHlRKeHh3vAiQAi4qREZ3xYmCCDgIAdm4=
+	t=1728650283; cv=none; b=K1iXlZp/BFZELNlXvyVVUjm1vXeY5X0P35wC5pUPPXwuasSGz7WafPAhqImTykmry1cKEWnBK/73tdF5vIfXmg9jqk0KH3xPk6mqiHzFcAP3ftBAQnToZGg7oY5NZTqqYENoMc0qpuJynVjfeweFouJ8Twl1Pr+9318ertfUaXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728649275; c=relaxed/simple;
-	bh=UNYK9KIqo8UAE1kFipvlWrPRtyaFhx6K8hW4uJoytaw=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=I+yNeT8u6hD2pDYJ2vg99ZAjyXQkHiXoueGc62Nehwe4Q+0Rt/nVA9iw/c35vYPzt3P6JPE9vTLOa7cwzggNRKcpcJIx9vfrvjSLACjKN8MkI4KvJK3IQPsGpF/MM0d5ZeGVB4A7DISJHwXUlY9bRiLxOPtknZB1LVMPA9WkoyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=LS1hQtyf; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="LS1hQtyf"
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20241011122105euoutp01809378ebf1a7e93739ace9fe0bd05bf0~9ZVkhY2pJ2487924879euoutp01G
-	for <linux-block@vger.kernel.org>; Fri, 11 Oct 2024 12:21:05 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20241011122105euoutp01809378ebf1a7e93739ace9fe0bd05bf0~9ZVkhY2pJ2487924879euoutp01G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1728649265;
-	bh=FT7MJh5JI+H2sqgHyHILJBUQ7TL2PzQgzLPaiYaOkYk=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=LS1hQtyfOXfWlzkpxK39EzraCHNKXhnQi0O55u2Vfbtawv08T9W48xC/FxlBV5Jsf
-	 6Ol/jBLDLBTjzusIXJFt+INff76v7gdSCZFHJnfWggELkSID73OvZXIajvDVDGVdZE
-	 ug4i00RmElKU3nEXKvkaat5YzavhGoNJ/SMCbWb0=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20241011122104eucas1p2fd9851ae922e96d808441e75bfe5050c~9ZVkDZ1y32333823338eucas1p2o;
-	Fri, 11 Oct 2024 12:21:04 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges1new.samsung.com (EUCPMTA) with SMTP id E7.AE.09624.03819076; Fri, 11
-	Oct 2024 13:21:04 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20241011122104eucas1p2f5cdb80296ef765dd2e4fda6797017de~9ZVjbzcc12333823338eucas1p2n;
-	Fri, 11 Oct 2024 12:21:04 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20241011122104eusmtrp18312c6654091b567517730a0cc89784f~9ZVjahTqf2348623486eusmtrp1x;
-	Fri, 11 Oct 2024 12:21:04 +0000 (GMT)
-X-AuditID: cbfec7f2-c11ff70000002598-66-67091830b407
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id 3D.0E.19096.03819076; Fri, 11
-	Oct 2024 13:21:04 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20241011122104eusmtip269afd5e016719b370f634fa96a64864f~9ZVjOp9Zp1387013870eusmtip2x;
-	Fri, 11 Oct 2024 12:21:04 +0000 (GMT)
-Received: from localhost (106.110.32.122) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Fri, 11 Oct 2024 13:21:03 +0100
-Date: Fri, 11 Oct 2024 14:21:02 +0200
-From: Javier Gonzalez <javier.gonz@samsung.com>
-To: Christoph Hellwig <hch@lst.de>
-CC: Hans Holmberg <hans@owltronix.com>, Jens Axboe <axboe@kernel.dk>,
-	Christian Brauner <brauner@kernel.org>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, Keith Busch <kbusch@kernel.org>, Kanchan Joshi
-	<joshi.k@samsung.com>, "hare@suse.de" <hare@suse.de>, "sagi@grimberg.me"
-	<sagi@grimberg.me>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"jack@suse.cz" <jack@suse.cz>, "jaegeuk@kernel.org" <jaegeuk@kernel.org>,
-	"bcrl@kvack.org" <bcrl@kvack.org>, "dhowells@redhat.com"
-	<dhowells@redhat.com>, "bvanassche@acm.org" <bvanassche@acm.org>,
-	"asml.silence@gmail.com" <asml.silence@gmail.com>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-aio@kvack.org" <linux-aio@kvack.org>, "gost.dev@samsung.com"
-	<gost.dev@samsung.com>, "vishak.g@samsung.com" <vishak.g@samsung.com>
-Subject: Re: [PATCH v7 0/3] FDP and per-io hints
-Message-ID: <20241011122102.znguf6kpmbbsa42t@ArmHalley.local>
+	s=arc-20240116; t=1728650283; c=relaxed/simple;
+	bh=NPzh69hoN8vFI9CF1VPACZHxMWIc4wZatQ/5mYKrXDA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=excdHNfcrMon/8olnmHwtrvll7U4tCn0A98XRXOpwT4njfkBg9Eqc8yOFb0OgxxsBzD37JO3CSQXY8otiCToFUSUeJSTyiClBdsRMSjUh1tRHjb7gSLZzn6TGVzHVYW5rmVm/JiESt9KjRGCcjSGRLOGdGcp7DKftqDq/j+Lb/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4311420b675so17255165e9.2;
+        Fri, 11 Oct 2024 05:38:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728650280; x=1729255080;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eBVz48o1g1I9UbDwyYUHJZKRlpZFQBxOo57xFoBIM5Y=;
+        b=GrZJRu/R4UAMyurPUzakYHfIfPkOGkSPcdsd6b487C3nXdpjhs9y8xdseK+T3ORHx8
+         NmxUlK+z5cmoyIRkh4Uo8E/41QRPwoPHrSsUkvecOHLeSccRDLQ41uGETaupLzCstkDI
+         aP9VyluKDIvZETHealzxTlcj+8uRRGa/NvU4amu4rr5oJE1OP+il3Uu3wPqys6BnNPJx
+         WU7+NYcA8NaWRL+ZEAe67iP903KOVxXCUXL9xZCZNyWslgh563pF/fT/Ny260hi/H9z9
+         5q1KGwYnieMOvXmQNi6lPCf/XHsJjDGTbeCzlwokSl8f84OLKp7OwUs/xZ/DK68bSagX
+         eZLg==
+X-Forwarded-Encrypted: i=1; AJvYcCXAtLcv87gKckM9psHs1k274sPanRtbEd/0d0XMwtrXNerG1SruYUoWKdJ6sgphnXulitNtF88rGLJne8P9@vger.kernel.org, AJvYcCXt6Fkz5jGS3IwANu1HLe/8awHNF9GDA6hJJJMM69UWfzT+6FZGRgiu59CHeo8iCAChObI9arig8xeceA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvmbRVbQ/N+ZsTTeF6ciCBTfxoII5LA95HRd25k0NT3vwyuI8V
+	7jaX206GhBri/7UtCSZQUjKdBMkUwALlMVprT+9vM5xNzMIQ6qnJ
+X-Google-Smtp-Source: AGHT+IF5hkoRf5hvMwE7/tXuKWAa/AOI0qaH49G5wqKQcdVxB+jGdrNe3l78p49k7EDh0XwDTCVT3w==
+X-Received: by 2002:a05:600c:1c06:b0:42c:a8d5:2df5 with SMTP id 5b1f17b1804b1-4311df1e6b0mr22330915e9.24.1728650279553;
+        Fri, 11 Oct 2024 05:37:59 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430ccf1f797sm74072725e9.4.2024.10.11.05.37.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Oct 2024 05:37:58 -0700 (PDT)
+Date: Fri, 11 Oct 2024 05:37:47 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, kernel-team@meta.com,
+	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] elevator: do not request_module if elevator exists
+Message-ID: <20241011-spotted-cormorant-of-research-0d8184@leitao>
+References: <20241010141509.4028059-1-leitao@debian.org>
+ <ZwjgrwSw2vUVP2cp@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241011085631.GA4039@lst.de>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUxbZRTG9957e3vbpN2lQHhD51fJjBkDuujm6/dm1FzndHNZMCiJq3JX
-	lpWWtAOdlawWKqNO3AoOYW5jZLGsMAilgs6yjcJGO2gJFBAwJYS1qLCOrynOBZD2ou6/3znP
-	c3LO8+alcMkKL5E6qD7MatUKlYwUEi037vWmyKFAKTeObkPf2loAqgt8RSLzsoNA0x3zAJ2a
-	vYejO8b7BDrzdR0POWssGLpYdx1Dd0w+Ap2uKMRQsLEKRxbXEEDlp4wAtY0mI2ebh0Dnvgvx
-	kbVrGUMN0zME6l3q4m2PY/wDbzA/VgX4TO9YE8H4vXmM3VZCMvZ5C59pvnCU+WnEQDJzoVGC
-	6bDX8JiZK4Mk01PduSp265kF+8OMPRjG9qx/V/h8Fqs6mM9q017cL8wePLdC5o4LPr5i0BnA
-	DN8MBBSkn4LO+lbCDISUhK4F8JqtGeOKuwCuXL8LuGIBwDF3xaqNio7ccOZxfSuAxbNu/D9T
-	2FrK4woHgJaTRjyyhKA3wrbTfxMRJuk0aGu9CSIcR8tgaMobXYHTi3xYNuyOCrG0HM4sfklG
-	WES/ACsbagiOY6CnMhhlnH4WlswaeZGTcFoKrctUpC2gk2FgYmotnAze+i0MOC6ANx2j0WyQ
-	NgvhyIkBjBNegQvfzJEcx8KpLsfa8AbYXXac4FgPDR732nARgKZj3/O4t3gOlvaoOM8OeLy/
-	H3BtMRwOx3BniqGlpQLn2iJ47HMJ534c1o3dJk6ApKoHglU9EKzq/2DVALeBBDZPl6NkdVvU
-	7EepOkWOLk+tTP1Qk2MHq3+0e7lr/gdwZmou1QUwCrgApHBZnCjlPE8pEWUpjnzCajXva/NU
-	rM4FpBQhSxBtzHqEldBKxWH2EMvmstp/VYwSJBqwlIfGl1/ajJIU+fmH3I3C7Jb1fUuu2pH6
-	+J7ffZ9Ovm5vh5VDv2x4R9XgN43Vtb/9RUdwn9RTXL7Jf1/fmZGl3rlbf4E8MNSePp0RDoc1
-	617d1R7sCLvGPb8uvlXw2R/O6glN3zO+yc6rl+VNxeXUQO2lwKP5wmuZwlBqbFNCStPts0/o
-	JxP7rAm+0mGdeN/Mm5eIo2e3qj8oZL2x6UZ/Qn3By+/deu1q0YBc6ujfsa5M0ZyStL/IV7rL
-	PGE0l4Q8Jlmmx4al/ZU7eN57IP5ngbIwXex3WUYzTd6lnY+17g0ELz9ZfHFk959YTEYPLeUL
-	NcmCzSD+yB7nVvHT27ftbZQRumzFlk24Vqf4B86lIfESBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprNKsWRmVeSWpSXmKPExsVy+t/xe7oGEpzpBrNfcVvMWbWN0WL13X42
-	i65/W1gsXh/+xGgx7cNPZot3Tb9ZLOZOXc1qsWfRJCaLlauPMlm8az3HYjF7ejOTxZP1s5gt
-	Jh26xmgxZVoTo8XeW9oWe/aeZLGYv+wpu8Xy4/+YLNa9fs9icf7vcVYHEY/LV7w9ds66y+5x
-	/t5GFo/LZ0s9Nq3qZPPY9GkSu8fmJfUeu282sHl8fHqLxePwpkWsHu/3XWXzOLPgCFDydLXH
-	501yHpuevGUK4I/SsynKLy1JVcjILy6xVYo2tDDSM7S00DMysdQzNDaPtTIyVdK3s0lJzcks
-	Sy3St0vQy7g6/z9bwQPOin0NxQ2M79m7GDk4JARMJI7tKe1i5OIQEljKKDF7z1rGLkZOoLiM
-	xMYvV1khbGGJP9e62CCKPjJKfOrayASSEBLYwihx5a4XiM0ioCqxd/YvFhCbTUBfYtX2U2CD
-	RASUJJ6+OssI0sws8J1dYvKNE2AJYQEDifffe9lAbF4BW4mZ6xaxQAxdziLR2msEEReUODnz
-	CVicWcBCYub884wgVzMLSEss/8cBEuYU0Ja4++gVO8ShShKPX7yFeqBW4vPfZ4wTGIVnIZk0
-	C8mkWQiTFjAyr2IUSS0tzk3PLTbSK07MLS7NS9dLzs/dxAhMJduO/dyyg3Hlq496hxiZOBgP
-	MUpwMCuJ8OouZE0X4k1JrKxKLcqPLyrNSS0+xGgKDIqJzFKiyfnAZJZXEm9oZmBqaGJmaWBq
-	aWasJM7LduV8mpBAemJJanZqakFqEUwfEwenVANTWURI47xy3SfyZyU/JXxsrD4kc9h3l5DR
-	8wW17XNXXbc53LJzWcO03Dfv6vcIuH1ymxmzeMaKL23HfRgqpDUu9hw/f9aL+9m9LWsNvY0v
-	L43jWHR40kbB42wX6t+ce7BgUc68miveObM/BOzwOxfkOYmvU11acbora9id8OvRpkV7ev/t
-	uJ7vu1Gp97nC/t8cSWfmxfV6f3jy9p95fEzwlzt3Z7GVHO/ZE8I3e8fB/t/O8e7XLuzKbeSv
-	Fpvz6sfGy/5OpQ36c5Rl1u4yPLHvRtLDE39/tLy7+8d/n5Qf216bhYFtN0Jfiv2ptA2R4FD9
-	r7tTWW3u5iVz+KR5OlbfdZWbssfhE0N6KrfE5dWyHEosxRmJhlrMRcWJAGrl7aGuAwAA
-X-CMS-MailID: 20241011122104eucas1p2f5cdb80296ef765dd2e4fda6797017de
-X-Msg-Generator: CA
-X-RootMTR: 20241010092019eucas1p157b87b63e91cd2294df4a8f8e2de4cdf
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20241010092019eucas1p157b87b63e91cd2294df4a8f8e2de4cdf
-References: <20241004123027.GA19168@lst.de>
-	<20241007101011.boufh3tipewgvuao@ArmHalley.local>
-	<CANr-nt3TA75MSvTNWP3SwBh60dBwJYztHJL5LZvROa-j9Lov7g@mail.gmail.com>
-	<97bd78a896b748b18e21e14511e8e0f4@CAMSVWEXC02.scsc.local>
-	<CANr-nt11OJfLRFr=rzH0LyRUzVD9ZFLKsgree=Xqv__nWerVkg@mail.gmail.com>
-	<20241010071327.rnh2wsuqdvcu2tx4@ArmHalley.local>
-	<CGME20241010092019eucas1p157b87b63e91cd2294df4a8f8e2de4cdf@eucas1p1.samsung.com>
-	<20241010092010.GC9287@lst.de>
-	<20241010122232.r2omntepzkmtmx7p@ArmHalley.local>
-	<20241011085631.GA4039@lst.de>
+In-Reply-To: <ZwjgrwSw2vUVP2cp@infradead.org>
 
-On 11.10.2024 10:56, Christoph Hellwig wrote:
->On Thu, Oct 10, 2024 at 02:22:32PM +0200, Javier Gonzalez wrote:
->> Passthru is great for prototyping and getting insights on end-to-end
->> applicability. We see though that it is difficult to get a full solution
->> based on it, unless people implement a use-space layer tailored to their
->> use-case (e.g., a version SPDK's bdev). After the POC phase, most folks
->> that can use passthru prefer to move to block - with a validated
->> use-case it should be easier to get things upstream.
->>
->> This is exactly where we are now.
->
->That's a lot of marketing babble :)    What exact thing is missing
->from the passthrough interface when using say spdx over io_uring?
+Hello Christoph,
 
-The block layer provides a lot of functionality that passthru cannot
-provide. A simple example would be splits. You know this :)
+On Fri, Oct 11, 2024 at 01:24:15AM -0700, Christoph Hellwig wrote:
+> On Thu, Oct 10, 2024 at 07:15:08AM -0700, Breno Leitao wrote:
+> > Whenever an I/O elevator is changed, the system attempts to load a
+> > module for the new elevator. This occurs regardless of whether the
+> > elevator is already loaded or built directly into the kernel. This
+> > behavior introduces unnecessary overhead and potential issues.
+> > 
+> > This makes the operation slower, and more error-prone. For instance,
+> > making the problem fixed by [1] visible for users that doesn't even rely
+> > on modules being available through modules.
+> > 
+> > Do not try to load the ioscheduler if it is already visible.
+> > 
+> > This change brings two main benefits: it improves the performance of
+> > elevator changes, and it reduces the likelihood of errors occurring
+> > during this process.
+> > 
+> > [1] Commit e3accac1a976 ("block: Fix elv_iosched_local_module handling of "none" scheduler")
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >  block/elevator.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/block/elevator.c b/block/elevator.c
+> > index 4122026b11f1..1904e217505a 100644
+> > --- a/block/elevator.c
+> > +++ b/block/elevator.c
+> > @@ -709,13 +709,16 @@ int elv_iosched_load_module(struct gendisk *disk, const char *buf,
+> >  			    size_t count)
+> >  {
+> >  	char elevator_name[ELV_NAME_MAX];
+> > +	const char *name;
+> >  
+> >  	if (!elv_support_iosched(disk->queue))
+> >  		return -EOPNOTSUPP;
+> >  
+> >  	strscpy(elevator_name, buf, sizeof(elevator_name));
+> > +	name = strstrip(elevator_name);
+> >  
+> > -	request_module("%s-iosched", strstrip(elevator_name));
+> > +	if (!__elevator_find(name))
+> 
+> __elevator_find needs to be called with elv_list_lock.
 
-I am sure Jens and Keith can give you more specifics on their particular
-reasons.
+That is right. Thanks for the heads-up.
 
->
->> If you saw the comments from Christian on the inode space, there are a
->> few plumbing challenges. Do you have any patches we could look at?
->
->I'm not sure what you refer to here.
-
-This from Christian:
-   https://lore.kernel.org/all/20240903-erfassen-bandmitglieder-32dfaeee66b2@brauner/
+I will send a fix soon.
