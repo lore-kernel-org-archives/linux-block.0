@@ -1,167 +1,208 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB5621A714;
-	Fri, 11 Oct 2024 13:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4AE213EDE
+	for <linux-block@vger.kernel.org>; Fri, 11 Oct 2024 13:24:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728652857; cv=none; b=MCvEAPV/g+D7RGNgImmvI6i48S1lzqW/Dk2vGu1RCQ3kIDIoO9nB8p4HJPoDl+KffQ5aFHFXTE4655ZYFGMUZFZ1gAYwLJowWESgdSAojF9qTEJE6D8BfZB5E0TxeePEFn1OLyKvxbcYjSmOmV4i45Rb5Ggw1xauDD/J3f0iLFY=
+	t=1728653072; cv=none; b=Y0BpL7HD8LpZIF8tV2BfZkvygymUvABY4HdSQW3uwygaqdrKYW2yuyJNYOkjq0FoYF0Ma4oqoZzb4qTo4UDUS3A7DMAuoXuhm80Js6Y0u94A8yaxYMBwLn2vEq/dp3hvJw8HEl2cgVfLNFQulYaDFzXOMBi665B9OCJHVwEg8L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728652857; c=relaxed/simple;
-	bh=e8FifqVONBIXYDPO3q4p/oVtmcyOoSKPN3d75PQqyyo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fXIF3jvBrE2MRP+GO3g8ATK1EtEmfZN4lO+kdsCbN9aZU3RFU1/u8m+zM2rvAbkDDYycKrkl5/ZZICr4Xfizv/Nc1qs773sAror3kdFsAv7yHbWHhFekIir4be/V0rqeU7z0oTgH2+/4vtS6PXOPImYLzbrWlBM4QrJ6lMljRuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FfiWsNK2; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1728653072; c=relaxed/simple;
+	bh=BYttc2gCWtd8Qf7Biq7ewziJRDDPDD2lQmlIsPXM5Zg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lW+Pig1/fT0aGaHtqtcOZvd2Sq1d54XaW1knWQaSf6eTgU8hYt4djEvk3kpDCqkgZrOnEmy2E1It/h5/jpv5DASo/QCKNoex6fn5oyQH9ngux2L8oYpc70lw9LViwtuWhzIR8Opzn3AB3f4NTtMNSleJJH0mywLkOzzaG0qPUVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=EpKsoNPU; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FfiWsNK2"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=s5uwGYftDca6DbfMfT2/9OXcA7gA2HJJHNWbl7asyc4=; b=FfiWsNK26T7cDR9ImV0CPANc/+
-	Jc9UWigVdbq2gYCZKGrBjk9mSDEn/d1dPk1S7z3s8eKK2JbO4tAbsGNU25ZrhDjEuhhOUCTsah6IB
-	tolqnRp1VMaB8PBxPd4HPD+A2GKb18pF4LOqqS+5K0/8Bxe3XPDzhVvhCMIURaRBu9lFlio1J4eUw
-	3fI64Hl3xUgWmmjsf1LXslh+oZKCXjh3cMJZFdx9TKcUWd5orSIDnLGIVi9Ebm7aVYEC3b3hbPLpk
-	/sYYoIReu14K5tRtOyD9pbvMv2xYSY452ICbussHgJTPruNrPEW8XKHSXz4mPACuj2Ra8C148tgY2
-	30Yq5DgA==;
-Received: from 2a02-8389-2341-5b80-02eb-b750-687c-51db.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:2eb:b750:687c:51db] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1szFZb-0000000GQgt-0Dz6;
-	Fri, 11 Oct 2024 13:20:51 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	akpm@linux-foundation.org
-Cc: viro@zeniv.linux.org.uk,
-	dhowells@redhat.com,
-	ming.lei@redhat.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3] iov_iter: don't require contiguous pages in iov_iter_extract_bvec_pages
-Date: Fri, 11 Oct 2024 15:20:22 +0200
-Message-ID: <20241011132047.1153249-1-hch@lst.de>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="EpKsoNPU"
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-837ec133784so19452339f.3
+        for <linux-block@vger.kernel.org>; Fri, 11 Oct 2024 06:24:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728653069; x=1729257869; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8WBjL+tGnFDdmcuZ2Oif8Lreb74kWxL7K5w/Gs5miiU=;
+        b=EpKsoNPURQDuqj6QuBDhaJNxIvHo38yLFsVKtTJdw94UIheQnmgdwN3czMSHoM1C3x
+         r7Sw2tkkRP9oks//85pHTQm69Tuaz1GAZ9zbOD2d0c9UlRRMn2+7VVStouvdSHzIFZwC
+         4weOjsezR6Z/lsjQ8CQkRnaLW+z2dZ51vw9CF/KBEoxHoQFTbZ5eCweRxtPk1Pv5td9k
+         3yTN7VVNt4veW/KGCIUrMv44PigcyMGrWsblFTIOQrNmePxk+UpVdLN6pwFIG2jdOf1Z
+         4EeDefvRsDnBdF8Do5aqTYbXc8qHkBvJPjTVz+5BAA1g20316/qP5itWCVjcAR4oy6fz
+         ct/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728653069; x=1729257869;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8WBjL+tGnFDdmcuZ2Oif8Lreb74kWxL7K5w/Gs5miiU=;
+        b=PF4SYU6vGecQEzBF4FsQT0Js+J9yYc7wVhNpZZqBZUpNlt+v3UuAdSIJCkP0l4tzPr
+         X5MkgiHN1B3qbxeM39OVhIM4SRa56E3JKlHDWWBDyYsXa614kuWKfqmOdO0C7FOybGJf
+         /OHB5x6xa7PNA3YSA8TW1nn9sVMrZXwtt6uo/Q13cshyubZgY1jTkS/uUpuqwAeEDrKs
+         MGSsRS2bO0+TrryTjiVubGqyuMaZ+qfVSnE+o/L1WaorQ8cU0N71nbuunIFlW/g9UeE3
+         tggAjw1qWP9HYe1qy3DAIOg/J4MHjjEgn6azDmuusdB2QlX9k6hpdNVSqsyusDe2x4T1
+         qx2g==
+X-Forwarded-Encrypted: i=1; AJvYcCW3rrljbeqvdmlER2UU19a2LQb4dq8ZSg0PKrjXKsXUIi78N+VB5c2bnsSBzUk5G99Pqusx9AHH4H5PkQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywh+RvzJL33dTELjASNitPAqWSZz6CXzRqxK0/zcpsFzGVSapqk
+	2NeManMgvmkP1avHr95rvYolxdXYxdyTksyewOE1ZvYWqGKU748c5chIq0kV1U8=
+X-Google-Smtp-Source: AGHT+IHF19ikV7jmL12C340pK1iAO0S9tFu83pfPJMC8P921FfuQ5KnmILmxsomFZucElk94dIkOxg==
+X-Received: by 2002:a05:6602:26d2:b0:82a:4480:badc with SMTP id ca18e2360f4ac-8379477a6b5mr352210739f.10.1728653069486;
+        Fri, 11 Oct 2024 06:24:29 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbadaa8cb2sm636559173.123.2024.10.11.06.24.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Oct 2024 06:24:28 -0700 (PDT)
+Message-ID: <051e74c9-c5b4-40d7-9024-b4bd3f5d0a0f@kernel.dk>
+Date: Fri, 11 Oct 2024 07:24:27 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V6 7/8] io_uring/uring_cmd: support provide group kernel
+ buffer
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20240912104933.1875409-1-ming.lei@redhat.com>
+ <20240912104933.1875409-8-ming.lei@redhat.com>
+ <b232fa58-1255-44b2-92c9-f8eb4f70e2c9@gmail.com> <ZwJObC6mzetw4goe@fedora>
+ <38ad4c05-6ee3-4839-8d61-f8e1b5219556@gmail.com> <ZwdJ7sDuHhWT61FR@fedora>
+ <4b40eff1-a848-4742-9cb3-541bf8ed606e@gmail.com>
+ <655b3348-27a1-4bc7-ade7-4d958a692d0b@kernel.dk> <ZwiN0Ioy2Y7cfnTI@fedora>
+ <44028492-3681-4cd4-8ae2-ef7139ad50ad@kernel.dk> <ZwiWdO6SS_jlkYrM@fedora>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZwiWdO6SS_jlkYrM@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The iov_iter_extract_pages interface allows to return physically
-discontiguous pages, as long as all but the first and last page
-in the array are page aligned and page size.  Rewrite
-iov_iter_extract_bvec_pages to take advantage of that instead of only
-returning ranges of physically contiguous pages.
+On 10/10/24 9:07 PM, Ming Lei wrote:
+> On Thu, Oct 10, 2024 at 08:39:12PM -0600, Jens Axboe wrote:
+>> On 10/10/24 8:30 PM, Ming Lei wrote:
+>>> Hi Jens,
+>>>
+>>> On Thu, Oct 10, 2024 at 01:31:21PM -0600, Jens Axboe wrote:
+>>>> Hi,
+>>>>
+>>>> Discussed this with Pavel, and on his suggestion, I tried prototyping a
+>>>> "buffer update" opcode. Basically it works like
+>>>> IORING_REGISTER_BUFFERS_UPDATE in that it can update an existing buffer
+>>>> registration. But it works as an sqe rather than being a sync opcode.
+>>>>
+>>>> The idea here is that you could do that upfront, or as part of a chain,
+>>>> and have it be generically available, just like any other buffer that
+>>>> was registered upfront. You do need an empty table registered first,
+>>>> which can just be sparse. And since you can pick the slot it goes into,
+>>>> you can rely on that slot afterwards (either as a link, or just the
+>>>> following sqe).
+>>>>
+>>>> Quick'n dirty obviously, but I did write a quick test case too to verify
+>>>> that:
+>>>>
+>>>> 1) It actually works (it seems to)
+>>>
+>>> It doesn't work for ublk zc since ublk needs to provide one kernel buffer
+>>> for fs rw & net send/recv to consume, and the kernel buffer is invisible
+>>> to userspace. But  __io_register_rsrc_update() only can register userspace
+>>> buffer.
+>>
+>> I'd be surprised if this simple one was enough! In terms of user vs
+>> kernel buffer, you could certainly use the same mechanism, and just
+>> ensure that buffers are tagged appropriately. I need to think about that
+>> a little bit.
+> 
+> It is actually same with IORING_OP_PROVIDE_BUFFERS, so the following
+> consumer OPs have to wait until this OP_BUF_UPDATE is completed.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-[hch: minor cleanups, new commit log]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
+See below for the registered vs provided buffer confusion that seems to
+be a confusion issue here.
 
-v3:
- - open code the iterator
- - improve commit log and comments
+> Suppose we have N consumers OPs which depends on OP_BUF_UPDATE.
+> 
+> 1) all N OPs are linked with OP_BUF_UPDATE
+> 
+> Or
+> 
+> 2) submit OP_BUF_UPDATE first, and wait its completion, then submit N
+> OPs concurrently.
 
- lib/iov_iter.c | 67 +++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 45 insertions(+), 22 deletions(-)
+Correct
 
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 1abb32c0da50bc..9fc06f5fb7489f 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1677,8 +1677,8 @@ static ssize_t iov_iter_extract_xarray_pages(struct iov_iter *i,
- }
- 
- /*
-- * Extract a list of contiguous pages from an ITER_BVEC iterator.  This does
-- * not get references on the pages, nor does it get a pin on them.
-+ * Extract a list of virtually contiguous pages from an ITER_BVEC iterator.
-+ * This does not get references on the pages, nor does it get a pin on them.
-  */
- static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
- 					   struct page ***pages, size_t maxsize,
-@@ -1686,35 +1686,58 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
- 					   iov_iter_extraction_t extraction_flags,
- 					   size_t *offset0)
- {
--	struct page **p, *page;
--	size_t skip = i->iov_offset, offset, size;
--	int k;
-+	size_t skip = i->iov_offset, size = 0;
-+	struct bvec_iter bi;
-+	int k = 0;
- 
--	for (;;) {
--		if (i->nr_segs == 0)
--			return 0;
--		size = min(maxsize, i->bvec->bv_len - skip);
--		if (size)
--			break;
-+	if (i->nr_segs == 0)
-+		return 0;
-+
-+	if (i->iov_offset == i->bvec->bv_len) {
- 		i->iov_offset = 0;
- 		i->nr_segs--;
- 		i->bvec++;
- 		skip = 0;
- 	}
-+	bi.bi_size = maxsize + skip;
-+	bi.bi_bvec_done = skip;
-+
-+	maxpages = want_pages_array(pages, maxsize, skip, maxpages);
-+
-+	while (bi.bi_size && bi.bi_idx < i->nr_segs) {
-+		struct bio_vec bv = bvec_iter_bvec(i->bvec, bi);
-+
-+		/*
-+		 * The iov_iter_extract_pages interface only allows an offset
-+		 * into the first page.  Break out of the loop if we see an
-+		 * offset into subsequent pages, the caller will have to call
-+		 * iov_iter_extract_pages again for the reminder.
-+		 */
-+		if (k) {
-+			if (bv.bv_offset)
-+				break;
-+		} else {
-+			*offset0 = bv.bv_offset;
-+		}
- 
--	skip += i->bvec->bv_offset;
--	page = i->bvec->bv_page + skip / PAGE_SIZE;
--	offset = skip % PAGE_SIZE;
--	*offset0 = offset;
-+		(*pages)[k++] = bv.bv_page;
-+		size += bv.bv_len;
- 
--	maxpages = want_pages_array(pages, size, offset, maxpages);
--	if (!maxpages)
--		return -ENOMEM;
--	p = *pages;
--	for (k = 0; k < maxpages; k++)
--		p[k] = page + k;
-+		if (k >= maxpages)
-+			break;
-+
-+		/*
-+		 * We are done when the end of the bvec doesn't align to a page
-+		 * boundary as that would create a hole in the returned space.
-+		 * The caller will handle this with another call to
-+		 * iov_iter_extract_pages.
-+		 */
-+		if (bv.bv_offset + bv.bv_len != PAGE_SIZE)
-+			break;
-+
-+		bvec_iter_advance_single(i->bvec, &bi, bv.bv_len);
-+	}
- 
--	size = min_t(size_t, size, maxpages * PAGE_SIZE - offset);
- 	iov_iter_advance(i, size);
- 	return size;
- }
+> But 1) and 2) may slow the IO handing.  In 1) all N OPs are serialized,
+> and 1 extra syscall is introduced in 2).
+
+Yes you don't want do do #1. But the OP_BUF_UPDATE is cheap enough that
+you can just do it upfront. It's not ideal in terms of usage, and I get
+where the grouping comes from. But is it possible to do the grouping in
+a less intrusive fashion with OP_BUF_UPDATE? Because it won't change any
+of the other ops in terms of buffer consumption, they'd just need fixed
+buffer support and you'd flag the buffer index in sqe->buf_index. And
+the nice thing about that is that while fixed/registered buffers aren't
+really used on the networking side yet (as they don't bring any benefit
+yet), adding support for them could potentially be useful down the line
+anyway.
+
+> The same thing exists in the next OP_BUF_UPDATE which has to wait until
+> all the previous buffer consumers are done. So the same slow thing are
+> doubled. Not mention the application will become more complicated.
+
+It does not, you can do an update on a buffer that's already inflight.
+
+> Here the provided buffer is only visible among the N OPs wide, and making
+> it global isn't necessary, and slow things down. And has kbuf lifetime
+> issue.
+
+I was worried about it being too slow too, but the basic testing seems
+like it's fine. Yes with updates inflight it'll make it a tad bit
+slower, but really should not be a concern. I'd argue that even doing
+the very basic of things, which would be:
+
+1) Submit OP_BUF_UPDATE, get completion
+2) Do the rest of the ops
+
+would be totally fine in terms of performance. OP_BUF_UPDATE will
+_always_ completely immediately and inline, which means that it'll
+_always_ be immediately available post submission. The only think you'd
+ever have to worry about in terms of failure is a badly formed request,
+which is a programming issue, or running out of memory on the host.
+
+> Also it makes error handling more complicated, io_uring has to remove
+> the kernel buffer when the current task is exit, dependency or order with
+> buffer provider is introduced.
+
+Why would that be? They belong to the ring, so should be torn down as
+part of the ring anyway? Why would they be task-private, but not
+ring-private?
+
+>> There are certainly many different ways that can get propagated which
+>> would not entail a complicated mechanism. I really like the aspect of
+>> having the identifier being the same thing that we already use, and
+>> hence not needing to be something new on the side.
+>>
+>>> Also multiple OPs may consume the buffer concurrently, which can't be
+>>> supported by buffer select.
+>>
+>> Why not? You can certainly have multiple ops using the same registered
+>> buffer concurrently right now.
+> 
+> Please see the above problem.
+> 
+> Also I remember that the selected buffer is removed from buffer list,
+> see io_provided_buffer_select(), but maybe I am wrong.
+
+You're mixing up provided and registered buffers. Provided buffers are
+ones that the applications gives to the kernel, and the kernel grabs and
+consumes them. Then the application replenishes, repeat.
+
+Registered buffers are entirely different, those are registered with the
+kernel and we can do things like pre-gup the pages so we don't have to
+do them for every IO. They are entirely persistent, any multiple ops can
+keep using them, concurrently. They don't get consumed by an IO like
+provided buffers, they remain in place until they get unregistered (or
+updated, like my patch) at some point.
+
 -- 
-2.45.2
-
+Jens Axboe
