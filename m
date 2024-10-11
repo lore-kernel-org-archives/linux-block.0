@@ -1,134 +1,125 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901201C7B6F;
-	Fri, 11 Oct 2024 17:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE72199234;
+	Fri, 11 Oct 2024 17:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728666756; cv=none; b=bBgXCINiE/w0LwkPvThzzTdFCeoPTEX1E+fPQJephbAJ3x2M38YpaX92CzPB4wU/GDJXiDqmOom6DqDjRc8CL4XeP6snytWa9Do7ImLMnrDWVmiJ61ySBeTpwnux4mA2x2JRIxS6dzyGQyf58+gkKoyLa36F5QIGCXyI/hL51VA=
+	t=1728667969; cv=none; b=D76q1mvQFrjh7F2tSIph19fQZhksb0ewFICrvP+Jl/iLlH1qm/dNGQpY2U0Ax7l1BqGw6ykXEZas9NfVzs6eH1VZ9D8okfzUFnk84WGnN61YkXVtC2XQMlc3ROqubSYzQOV3jacsiZVXtl2h/JGkJTV1IfE5Wv11ACwTb8IRSak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728666756; c=relaxed/simple;
-	bh=bp3RXhYCSr41eXrHdNkF5Ty/7bBo7bu9rMhEzmkm/5A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D6HMdc4i/xtjQ7HCDpiYzIHiTBmTH7dg4wTS+LRWb61/4A1jhEtrYh7D6ImT/Jm75vZLjZ4rZlEF+ysvsmL6N3LFTk22xCalK8kOrwB7Dq9Je+icl1m7BwVM9XGCNBAgSzJr4exwp9RP987en8nGB5bswmsTjuUUr3Ddupkv6Sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JuOkg6Fp; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1728667969; c=relaxed/simple;
+	bh=9CkUuKL47esnuYB4rzdSD0YMfBXPI4yPI1K9UgwAZ30=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=IuJu5Xej1hVTzttV3YKpqXClzSE2dKIxxqnEh78J2g1PR+fIOGKZnBIi+tvNrpVR6kcus0hy+8EPujZbnWKuYJne2q0dMxe8qpujcA5nYMeZFU9Zzv+LPtIGZSfNecId0e2XD8XoPwNNeB6/tW4UKrPyWCay6GFf9TPhNWDO8q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bjorling.me; spf=pass smtp.mailfrom=bjorling.me; dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b=kZO5GIOs; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AtDMQtdo; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bjorling.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bjorling.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JuOkg6Fp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728666755; x=1760202755;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bp3RXhYCSr41eXrHdNkF5Ty/7bBo7bu9rMhEzmkm/5A=;
-  b=JuOkg6FpjN++bVpl3O2yAfKl2XoLeCRSDCL+5P029aPGfOAQDDI/C23E
-   uPIdN3e4wQsEsVkc661SzznPoSw1P/3rkOX+5LVs+I/TnNl/q1CQJGccz
-   JMazewSzcLVKXHvGA3Y6abzlt84S5PYL8w0eweLn6dw7BFLQ74EGen6yE
-   lmMlUzXC1g/LfHRLDuXqaafhHixPU/h0UiKEE2fC8ye7/Jsf1OnOJ+8+a
-   mSEH9serCfouxo2P99z0yCr+otYmyrx9hQIy5xVj+yvI5ITMcS0uaeORe
-   RMoKBYNZZZ7lecc61vPE1s+Egb7GY04W5vHQmFqSbG95nS6b07L6DGS4i
-   Q==;
-X-CSE-ConnectionGUID: 3zxrOv9HSYWmnhnH9jSnTw==
-X-CSE-MsgGUID: a/kVu/h8TFGpj5PrEhLN6g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="39199841"
-X-IronPort-AV: E=Sophos;i="6.11,196,1725346800"; 
-   d="scan'208";a="39199841"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 10:12:32 -0700
-X-CSE-ConnectionGUID: PTlI3y8yRcS0Sxbx54d+1Q==
-X-CSE-MsgGUID: HDc5vyy2Q/WeJAj6ESrd0Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,196,1725346800"; 
-   d="scan'208";a="114426529"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 11 Oct 2024 10:12:28 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1szJBi-000CXb-1G;
-	Fri, 11 Oct 2024 17:12:26 +0000
-Date: Sat, 12 Oct 2024 01:11:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>, kbusch@kernel.org,
-	hch@lst.de, dlemoal@kernel.org, cassel@kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, wangyugui@e16-tech.com,
-	martin.petersen@oracle.com, hare@suse.de
-Cc: oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH 3/3 v2] nvmet: add rotational support
-Message-ID: <202410120113.A3HaEkbg-lkp@intel.com>
-References: <20241010123951.1226105-4-m@bjorling.me>
+	dkim=pass (2048-bit key) header.d=bjorling.me header.i=@bjorling.me header.b="kZO5GIOs";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AtDMQtdo"
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfout.phl.internal (Postfix) with ESMTP id 0CCC913803B0;
+	Fri, 11 Oct 2024 13:32:46 -0400 (EDT)
+Received: from phl-imap-13 ([10.202.2.103])
+  by phl-compute-01.internal (MEProxy); Fri, 11 Oct 2024 13:32:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bjorling.me; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1728667966;
+	 x=1728754366; bh=9CkUuKL47esnuYB4rzdSD0YMfBXPI4yPI1K9UgwAZ30=; b=
+	kZO5GIOsjG1Uu6g8+Uq4Nu5sa7ZPNxCvkvjubYn5JWNwUFqAakgGuYdFCnMAxIbE
+	JqZLx2zdAF+IZf8vbjA6Rf6cUXgiOrauRtLhArMFqavd0oKa2UeU1gswjYh2LFs1
+	WyQAyjt5ZzljKUY/Bfam0EVHSj/dmMY0g19Zyga12/D4eoPE8vD6Uf9F3RVK9fxf
+	nEzt0b45GwyNgkAmMqm/5TYrpwXAiri4h7THc0/m8T/xgcbNafdXNow4z09nh+12
+	htPRq/JNvMmxF42hM+rq5GSaBJsCcwJ34i1/wbVyOowwIt7BiSOYkFGOsLVd6Okp
+	ZUie/Hoc2a8bw2QkYT3n7Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1728667966; x=
+	1728754366; bh=9CkUuKL47esnuYB4rzdSD0YMfBXPI4yPI1K9UgwAZ30=; b=A
+	tDMQtdog4MuyDXvTP1C6h7F9+FJbbTm9aGsabGM9HovXFhjKjOwOBYz4q2h7IZZF
+	KyJcwG5PW2qUi93W7hj0/lPgH5a088bj2eH3OeXw7Cvw8xmE9kwdf5Qc/G4vrP16
+	JQllC5kzPzloqVrvkKkniPCmTyJYkdcqbRMeN5hH6xbBjgnkXKCNyatPTT8p56ud
+	S/5GfH1THOy8oAjjibST2LO0RT7lFpuBVnxs1NCXUT7n/OWnsnAbeyeZl5TYZsJT
+	3sdbfgypJoz8azLtF8yAhqKZW6uxQHVBmfcL6qqwCrsIGZpQYGzBfCMMY0z463GY
+	teRsrK+nDyseoImg2nGRw==
+X-ME-Sender: <xms:PWEJZ3C1MGuOZgLU6Z-ANXLuCxiLC0J2ruSWE56pdJ6nFj4mHzCnvQ>
+    <xme:PWEJZ9j89RFnFQT5Qa1N9lmKIy0LIMCRJyOkDNK7QZdcHtrdO0bd6ldHDxIvP6riR
+    Dp1xIsWAhqFgLaUOHA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdefkedguddufecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthhqredtredt
+    jeenucfhrhhomhepofgrthhirghsuceujhpprhhlihhnghcuoehmsegsjhhorhhlihhngh
+    drmhgvqeenucggtffrrghtthgvrhhnpeekkeevfefggeduueejleelkeduveeigfeljeff
+    udejleduteelffeuffekhfetleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehmsegsjhhorhhlihhnghdrmhgvpdhnsggprhgtphhtthhopedu
+    uddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepfigrnhhghihughhuihesvgduie
+    dqthgvtghhrdgtohhmpdhrtghpthhtoheptggrshhsvghlsehkvghrnhgvlhdrohhrghdp
+    rhgtphhtthhopegulhgvmhhorghlsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehksg
+    hushgthheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqnhhvmhgvsehl
+    ihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtohephhgthheslhhsthdrug
+    gvpdhrtghpthhtohepmhgrrhhtihhnrdhpvghtvghrshgvnhesohhrrggtlhgvrdgtohhm
+    pdhrtghpthhtohephhgrrhgvsehsuhhsvgdruggvpdhrtghpthhtoheplhhinhhugidqsg
+    hlohgtkhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:PWEJZykQZwWMORQ63au5LvuRQ9ToY6Ybxq7SH0nfbjZu_XroPa1XoQ>
+    <xmx:PWEJZ5wjFp7n-e4NxlEIIHeFqrp2b4TguTDlEjWRHIvEo7BtAskwbg>
+    <xmx:PWEJZ8QVf4tfOnbjs3-yul9cfQoRfga3A2n0Or37ax0icBPyNs2RkA>
+    <xmx:PWEJZ8b4QBzHKx2eWirZ6EsQ4TrccIQnOe57zf4uUSM55wGv3B45mQ>
+    <xmx:PmEJZxKhplYi0vd_WYDCm5t7_dAGADrEKF-3ml9u_oIJ-HXsAIuZ4jgE>
+Feedback-ID: if4314918:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 23E6C1F00073; Fri, 11 Oct 2024 13:32:45 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241010123951.1226105-4-m@bjorling.me>
+Date: Fri, 11 Oct 2024 20:32:23 +0300
+From: =?UTF-8?Q?Matias_Bj=C3=B8rling?= <m@bjorling.me>
+To: "Christoph Hellwig" <hch@lst.de>
+Cc: kbusch@kernel.org, dlemoal@kernel.org, cassel@kernel.org,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, wangyugui@e16-tech.com,
+ martin.petersen@oracle.com, hare@suse.de,
+ =?UTF-8?Q?Matias_Bj=C3=B8rling?= <matias.bjorling@wdc.com>
+Message-Id: <455d17f6-ec55-4bce-b9d3-9f43eb4a056a@app.fastmail.com>
+In-Reply-To: <20241011081452.GA3337@lst.de>
+References: <20241010123951.1226105-1-m@bjorling.me>
+ <20241010123951.1226105-2-m@bjorling.me> <20241011081452.GA3337@lst.de>
+Subject: Re: [PATCH 1/3 v2] nvme: make independent ns identify default
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Matias,
+On Fri, Oct 11, 2024, at 11:14, Christoph Hellwig wrote:
+> On Thu, Oct 10, 2024 at 02:39:49PM +0200, Matias Bj=C3=B8rling wrote:
+>> From: Matias Bj=C3=B8rling <matias.bjorling@wdc.com>
+>>=20
+>> The NVMe 2.0 specification adds an independent identify namespace
+>> data structure that contains generic attributes that apply to all
+>> namespace types. Some attributes carry over from the NVM command set
+>> identify namespace data structure, and others are new.
+>>=20
+>> Currently, the data structure only considered when CRIMS is enabled or
+>> when the namespace type is key-value.
+>>=20
+>> However, the independent namespace data structure
+>> is mandatory for devices that implement features from the 2.0+
+>> specification. Therefore, we can check this data structure first. If
+>> unavailable, retrieve the generic attributes from the NVM command set
+>> identify namespace data structure.
+>
+> FYI, I still disagree with this for the same reason as before.
+> Assuming we're not really going to see hard drivers I'd be fine
+> with using it by default for 2.0 (or better even 2.1) by default.
 
-kernel test robot noticed the following build warnings:
+Sounds good. When I am back after next week, I'll update the patch set w=
+ith the version check and add the missing logic for hdd support.=20
 
-[auto build test WARNING on v6.12-rc2]
-[also build test WARNING on linus/master next-20241011]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Matias-Bj-rling/nvme-make-independent-ns-identify-default/20241010-204205
-base:   v6.12-rc2
-patch link:    https://lore.kernel.org/r/20241010123951.1226105-4-m%40bjorling.me
-patch subject: [PATCH 3/3 v2] nvmet: add rotational support
-config: i386-randconfig-062-20241011 (https://download.01.org/0day-ci/archive/20241012/202410120113.A3HaEkbg-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241012/202410120113.A3HaEkbg-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410120113.A3HaEkbg-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/nvme/target/admin-cmd.c:704:22: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le32 [usertype] anagrpid @@     got unsigned int [usertype] anagrpid @@
-   drivers/nvme/target/admin-cmd.c:704:22: sparse:     expected restricted __le32 [usertype] anagrpid
-   drivers/nvme/target/admin-cmd.c:704:22: sparse:     got unsigned int [usertype] anagrpid
-
-vim +704 drivers/nvme/target/admin-cmd.c
-
-   687	
-   688	static void nvmet_execute_id_cs_indep(struct nvmet_req *req)
-   689	{
-   690		struct nvme_id_ns_cs_indep *id;
-   691		u16 status;
-   692	
-   693		status = nvmet_req_find_ns(req);
-   694		if (status)
-   695			goto out;
-   696	
-   697		id = kzalloc(sizeof(*id), GFP_KERNEL);
-   698		if (!id) {
-   699			status = NVME_SC_INTERNAL;
-   700			goto out;
-   701		}
-   702	
-   703		id->nstat = NVME_NSTAT_NRDY;
- > 704		id->anagrpid = req->ns->anagrpid;
-   705		id->nmic = NVME_NS_NMIC_SHARED;
-   706		if (req->ns->readonly)
-   707			id->nsattr |= NVME_NS_ATTR_RO;
-   708		if (req->ns->bdev && !bdev_nonrot(req->ns->bdev))
-   709			id->nsfeat |= NVME_NS_ROTATIONAL;
-   710	
-   711		status = nvmet_copy_to_sgl(req, 0, id, sizeof(*id));
-   712		kfree(id);
-   713	out:
-   714		nvmet_req_complete(req, status);
-   715	}
-   716	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+(Apologies for double e-mail. My phone client formatted the mail in html=
+)
