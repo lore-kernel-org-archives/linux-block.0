@@ -1,85 +1,193 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98DC12CDA5;
-	Sat, 12 Oct 2024 07:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3F7130E57
+	for <linux-block@vger.kernel.org>; Sat, 12 Oct 2024 08:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728717321; cv=none; b=JB+jpjxq6nDRRQHHnHA93yjT3RZgfZAPVgnY66gadS+98FLHiMm+51XqCtKV4Ms211Fqx7JFLiXffcMRMc8dk9lt+nDgNpZ3u/geDiZcHPMMay+9i1MnT5phN4lHuMw3o98nj+9Qr5e0raGiKPwyallWFS9KraTR7Woqn5IjN7E=
+	t=1728723225; cv=none; b=fDjLTi/rMAqMjaaPGyBx8qdMrKgYAYbzTXjLmtcCJ6xli2Jerp915YidS2WL7E+2X3lEtTk7vF7bFtqsKr77wWtflMKg/1kx+y1AFakL4OuM86z30aJxYtxF93Zw5/4JvMOpVQ6Did5ZUIyDRm1iPFZYZIax3wiNEjKolnls2JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728717321; c=relaxed/simple;
-	bh=DlGndp0ryosAmmwi+KPu6DMY2uOf8LabQmxNj896WJo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q0NHF2b/0PMFJe6XhlcsYJW9zEaTsjFVc/q7++EbRlNXurC6mre8PzrKlIj4ZQ8z7MIMG1FbCPdccw9EhXzjrQ5GJMwTeMqwFn1Hf9a9QgrHqNsDIhowt7hB66hAXuB30gYJehMScAKpBte3oih/fO13LfF102rqtM1czacvQVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Fv5HbSLW; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1728723225; c=relaxed/simple;
+	bh=m0MoSSh0wgiqnwJBltdxVEJE1rD8anUzmaeGx0r0tS0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g1Ya84EoNgTb1JaeCpLX2pamo/yjgKNOcBfQeu+up1D31zO9vgTwHiBSDZpcrZlT252lY+bHAr8c0sTZKuWqg0rE7KPg0DEnZTymADuxHD9EvF5Mwa7YVEgOTTYdWTfL80c4t30wQmCu3DJqUwhGA+tuXl/eoJGdBv9YGc8EOV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eFaTAkJc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Fv5HbSLW"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=eKVPThxvf989v7DtzxaKQzLXa5qNtAiRX3s8s9yAlHA=; b=Fv5HbSLWfV5EjjJf5I4hXM/fl6
-	9NoEikqbc6ST/MAgVg9YhMH1t+OEcTUq9hUmoraPJ4VZJAfy39UPGDedI/NJDrkQEDxknP+z+Cfiz
-	Z9RZTgEma9+i4QWKjrqX/P9+m5nKTpRbLbQlQ6HvHKa4rdExB/jzzh2KQtDkpLcG8Ma0d4cOoWPIQ
-	L4GcKjVBnpUa7kSTeBE9m7F4jrTLplLK0D4QJzOIfKRBSFMSZ217DGQ162R0wjc5hV2bKqklBpxGt
-	B8ENowmQa/nf8VCmqY9bOnHOIfUmp292uBV88DDm6NVoyVHSQ74cXDT8LQwu/PEePmIC0XJnzTW+o
-	4ySAGaNw==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1szWL2-0000000Cxxw-1P51;
-	Sat, 12 Oct 2024 07:14:59 +0000
-Date: Sat, 12 Oct 2024 08:14:56 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Qun-wei Lin =?utf-8?B?KOael+e+pOW0tCk=?= <Qun-wei.Lin@mediatek.com>
-Cc: "ying.huang@intel.com" <ying.huang@intel.com>,
-	Andrew Yang =?utf-8?B?KOaliuaZuuW8tyk=?= <Andrew.Yang@mediatek.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"baohua@kernel.org" <baohua@kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	wsd_upstream <wsd_upstream@mediatek.com>,
-	"david@redhat.com" <david@redhat.com>,
-	"schatzberg.dan@gmail.com" <schatzberg.dan@gmail.com>,
-	Chinwen Chang =?utf-8?B?KOW8temMpuaWhyk=?= <chinwen.chang@mediatek.com>,
-	John Hsu =?utf-8?B?KOioseawuOe/sCk=?= <John.Hsu@mediatek.com>,
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"kasong@tencent.com" <kasong@tencent.com>,
-	Casper Li =?utf-8?B?KOadjuS4reamrik=?= <casper.li@mediatek.com>,
-	"chrisl@kernel.org" <chrisl@kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>
-Subject: Re: [PATCH 0/2] Add BLK_FEAT_READ_SYNCHRONOUS and
- SWP_READ_SYNCHRONOUS_IO
-Message-ID: <Zwoh8DrKgSD99xVQ@casper.infradead.org>
-References: <20240919112952.981-1-qun-wei.lin@mediatek.com>
- <87frporxtt.fsf@yhuang6-desk2.ccr.corp.intel.com>
- <17b30f253172cce94d1e2ec86d00e82eea077bde.camel@mediatek.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eFaTAkJc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728723223;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pmmPzgIs/vs2Xp/A8ftfT2TPwinHJ7c0cIDSFUJ4u8A=;
+	b=eFaTAkJcX1N+dq/hjekvpKaOCdXDJff1g9xxxfVYmF3DIXg1BOYx8dm6b+YGcqamqHzsu5
+	qyplDs55fG84r1g6uyVOsg3te6wGuGK3cYtmqWE6Uquh6RqRxb3kqlloPxgMOlBWhi6v5c
+	B6+tVSIP/gSrnxjo3sSi13F2mkF5X/0=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-235-IPvIziPbMOmeOJnAQi3d7Q-1; Sat,
+ 12 Oct 2024 04:53:39 -0400
+X-MC-Unique: IPvIziPbMOmeOJnAQi3d7Q-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 61B3619560AB;
+	Sat, 12 Oct 2024 08:53:38 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.121])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2E5481956089;
+	Sat, 12 Oct 2024 08:53:36 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	io-uring@vger.kernel.org,
+	Pavel Begunkov <asml.silence@gmail.com>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V7 0/8] io_uring: support sqe group and leased group kbuf
+Date: Sat, 12 Oct 2024 16:53:20 +0800
+Message-ID: <20241012085330.2540955-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <17b30f253172cce94d1e2ec86d00e82eea077bde.camel@mediatek.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Fri, Oct 11, 2024 at 09:08:10AM +0000, Qun-wei Lin (林群崴) wrote:
-> The primary motivation for these new feature flags is to handle
-> scenarios where we want read operations to be completed within the
-> submit context, while write operations are handled in a different
-> context.
-> 
-> This does not necessarily imply that the write operations are slow;
-> rather, it is about optimizing the handling of read and write
-> operations based on their specific characteristics and requirements.
+The 1st 3 patches are cleanup, and prepare for adding sqe group.
 
-So why wouldn't we always want to do that instead of making it a
-per-bdev flag?
+The 4th patch supports generic sqe group which is like link chain, but
+allows each sqe in group to be issued in parallel and the group shares
+same IO_LINK & IO_DRAIN boundary, so N:M dependency can be supported with
+sqe group & io link together.
+
+The 5th & 6th patches supports to lease other subsystem's kbuf to
+io_uring for use in sqe group wide.
+
+The 7th patch supports ublk zero copy based on io_uring sqe group &
+leased kbuf.
+
+Tests:
+
+1) pass liburing test
+- make runtests
+
+2) write/pass sqe group test case and sqe provide buffer case:
+
+https://github.com/ming1/liburing/tree/uring_group
+
+- covers related sqe flags combination and linking groups, both nop and
+one multi-destination file copy.
+
+- cover failure handling test: fail leader IO or member IO in both single
+  group and linked groups, which is done in each sqe flags combination
+  test
+
+- cover io_uring with leased group kbuf by adding ublk-loop-zc
+
+V7:
+	- remove dead code in sqe group support(Pavel)
+	- fail single group request(Pavel)
+	- remove IORING_PROVIDE_GROUP_KBUF(Pavel)
+	- remove REQ_F_SQE_GROUP_DEP(Pavel)
+	- rename as leasing buffer
+	- improve commit log
+	- map group member's IOSQE_IO_DRAIN to GROUP_KBUF, which
+	aligns with buffer select use, and it means that io_uring starts
+	to support leased kbuf from other subsystem for group member
+	requests only
+
+V6:
+	- follow Pavel's suggestion to disallow IOSQE_CQE_SKIP_SUCCESS &
+	  LINK_TIMEOUT
+	- kill __io_complete_group_member() (Pavel)
+	- simplify link failure handling (Pavel)
+	- move members' queuing out of completion lock (Pavel)
+	- cleanup group io complete handler
+	- add more comment
+	- add ublk zc into liburing test for covering
+	  IOSQE_SQE_GROUP & IORING_PROVIDE_GROUP_KBUF 
+
+V5:
+	- follow Pavel's suggestion to minimize change on io_uring fast code
+	  path: sqe group code is called in by single 'if (unlikely())' from
+	  both issue & completion code path
+
+	- simplify & re-write group request completion
+		avoid to touch io-wq code by completing group leader via tw
+		directly, just like ->task_complete
+
+		re-write group member & leader completion handling, one
+		simplification is always to free leader via the last member
+
+		simplify queueing group members, not support issuing leader
+		and members in parallel
+
+	- fail the whole group if IO_*LINK & IO_DRAIN is set on group
+	  members, and test code to cover this change
+
+	- misc cleanup
+
+V4:
+	- address most comments from Pavel
+	- fix request double free
+	- don't use io_req_commit_cqe() in io_req_complete_defer()
+	- make members' REQ_F_INFLIGHT discoverable
+	- use common assembling check in submission code path
+	- drop patch 3 and don't move REQ_F_CQE_SKIP out of io_free_req()
+	- don't set .accept_group_kbuf for net send zc, in which members
+	  need to be queued after buffer notification is got, and can be
+	  enabled in future
+	- add .grp_leader field via union, and share storage with .grp_link
+	- move .grp_refs into one hole of io_kiocb, so that one extra
+	cacheline isn't needed for io_kiocb
+	- cleanup & document improvement
+
+V3:
+	- add IORING_FEAT_SQE_GROUP
+	- simplify group completion, and minimize change on io_req_complete_defer()
+	- simplify & cleanup io_queue_group_members()
+	- fix many failure handling issues
+	- cover failure handling code in added liburing tests
+	- remove RFC
+
+V2:
+	- add generic sqe group, suggested by Kevin Wolf
+	- add REQ_F_SQE_GROUP_DEP which is based on IOSQE_SQE_GROUP, for sharing
+	  kernel resource in group wide, suggested by Kevin Wolf
+	- remove sqe ext flag, and use the last bit for IOSQE_SQE_GROUP(Pavel),
+	in future we still can extend sqe flags with one uring context flag
+	- initialize group requests via submit state pattern, suggested by Pavel
+	- all kinds of cleanup & bug fixes
+
+
+Ming Lei (7):
+  io_uring: add io_link_req() helper
+  io_uring: add io_submit_fail_link() helper
+  io_uring: add helper of io_req_commit_cqe()
+  io_uring: support SQE group
+  io_uring: support leased group buffer with REQ_F_GROUP_KBUF
+  io_uring/uring_cmd: support leasing device kernel buffer to io_uring
+  ublk: support lease io buffer to io_uring
+
+ drivers/block/ublk_drv.c       | 157 +++++++++++++-
+ include/linux/io_uring/cmd.h   |   7 +
+ include/linux/io_uring_types.h |  58 +++++
+ include/uapi/linux/io_uring.h  |   4 +
+ include/uapi/linux/ublk_cmd.h  |   7 +-
+ io_uring/io_uring.c            | 382 ++++++++++++++++++++++++++++++---
+ io_uring/io_uring.h            |  11 +
+ io_uring/kbuf.c                |  58 +++++
+ io_uring/kbuf.h                |  22 ++
+ io_uring/net.c                 |  23 +-
+ io_uring/rw.c                  |  21 +-
+ io_uring/timeout.c             |   6 +
+ io_uring/uring_cmd.c           |  13 ++
+ 13 files changed, 721 insertions(+), 48 deletions(-)
+
+-- 
+2.46.0
+
