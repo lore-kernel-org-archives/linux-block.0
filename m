@@ -1,72 +1,194 @@
-Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2806014B081
-	for <linux-block@vger.kernel.org>; Sat, 12 Oct 2024 21:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581047F48C;
+	Sun, 13 Oct 2024 20:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728770322; cv=none; b=R6Xiu4AqxqmMm8ZCpsxBpkAHFXQVdC9pZOdbeo5iVpBua4908Fvewauq3lIqUqVnGoZro22RxAEoBEa0Xbk0LEwRwy9D7oO4r0FAI7Hk0axR7RoeHIhCEwsbxlZeV6PaG9qBQBUySQvXyKHg7l/XGrxTFjzm+Hm5q3hKAcTqdPk=
+	t=1728850693; cv=none; b=HfBruTqb7LNmJUiO4htNyniHlxe8R8otcYTeado2p2kykbJRcUj6rTMiYNrMd1hmjmna15fcZ3COAuOgexZphAIM8j/a0dKz/0hh0ztfYuo9Q8hdOfVNNlxNoFok5gbsHP/G8dl4f308Vebp9JPjXfzxIXLeAH9a7/Dohv0Cp9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728770322; c=relaxed/simple;
-	bh=4p9zMCHyTvIHqWb+RiLLmYJIcUZSBcLyXxn110UCViQ=;
-	h=From:Message-ID:To:Subject:Date:MIME-Version:Content-Type; b=ZESa/xheKkze45a8nodOi9mi6jZAEudwOjxVmhwApQWXKnJZtnYt8nKgGKKeUz/E3UHYSQqLWEbjdq60YfcPK6ftASL7aMjf6i/mNciRTB0VD6C9b5ysLgV0p/lWEgRvn8NXClTtG9lMRkaOMAZqqDnBXyMNQVP4mrEqL7qr8yM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QnL96PbG; arc=none smtp.client-ip=209.85.210.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728850693; c=relaxed/simple;
+	bh=2uXmFeIEmUi172m67TxMp84JNKzsDgsI9o/AeKyM2yc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ResDTWNsgJvHCWHNpBfkWHFiYGyNcQzG3Tvro7hAjRNjYGfZ3YsuWd/s2/77VW3nPiYGPNL/Gkro6wAPWnNtwhxzVsylwhAy3XlRnCHOENMbDolvurAinI2hltmlTOCw/U06xSi5ebtpEy2+LLaXEf4B1ZA1e5qRK3MISLGnkKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=exIvs+i/; arc=none smtp.client-ip=192.134.164.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QnL96PbG"
-Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-71df4620966so2800417b3a.0
-        for <linux-block@vger.kernel.org>; Sat, 12 Oct 2024 14:58:40 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="exIvs+i/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728770319; x=1729375119; darn=vger.kernel.org;
-        h=mime-version:date:subject:to:reply-to:message-id:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4p9zMCHyTvIHqWb+RiLLmYJIcUZSBcLyXxn110UCViQ=;
-        b=QnL96PbG7eyACAoDyruqJf+xK4LX+tj9jm97LWRq+9B/Y+K1B5bwwxBvOzfZ4Tfdfb
-         Q5SoykWU420+jlZcl5NdiBFEuj7DrNhI/OwK2ThTvVKCG6NclFzRDGbJiK7IUNcl/gRP
-         hsDGHWkpqOqb46T+kToZNBDYAwfykntbSdHsxxNxFz0rLHamkVRfZP6pnRmHTMQosAA1
-         wJnyxKMkpipu7KSSoOQiEqL5pA+AStaBTWLSi7HtA72xXCZXW54hRN2MVcVddPIlEE29
-         PvP/dfppj3qfmkrnVMWnaiBidYs74KEMz+SHwqTj/IlFBFP0zlIbbZwucUBJ2064A3rv
-         +buw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728770319; x=1729375119;
-        h=mime-version:date:subject:to:reply-to:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4p9zMCHyTvIHqWb+RiLLmYJIcUZSBcLyXxn110UCViQ=;
-        b=E+xSneuguKGV6iP64T/aPolcPHRnV2sCqRe8Qb00UZ5zrt66CGHX2hLJtKSt028YoU
-         O+hpxsJ4IImgsnC9RzX9zB2bEGwq4rWwIT5WDeuJqKy0UhSA2d7xMZ0DBqTPK2+taDPN
-         mCaW8HQXLhlz5cYz7RBs+ijDQI5n5LKp6RtGREuAsSstTNkoWqrwAlDzM7w50g0FpFcz
-         Pu12nY3vm8xgtjA3k+v+cuME4FHB5AV4DKjFQj+arF/ZFGTj97ynVuO/hc7t+sAajMz7
-         4NVuBjlpWpGHjgTngV5TN4jQF8k/dvYn/t6XUP858eeKeDxLimZNV61Eh4SesWHtiMSl
-         G13Q==
-X-Gm-Message-State: AOJu0YxmY3vpLX9Nfhphm7oqpKZGFVjpasOAv9qfIz4WUA4nHvBcFcrr
-	DTo2tRbZWo/67rc7w2m9GFpLJsZJnl54oYMtnhx6zf3rUXuBNhJiVlHX2j0r
-X-Google-Smtp-Source: AGHT+IF7GAorPX0t7z98sppaQ8q2V4l4TNuPWYHZXRl45gjijkvaK3e/YThF3bCRC1WaUYBDbV/hBg==
-X-Received: by 2002:a05:6a20:cf8a:b0:1d7:5b6c:303c with SMTP id adf61e73a8af0-1d8bcf3beccmr11032592637.25.1728770319489;
-        Sat, 12 Oct 2024 14:58:39 -0700 (PDT)
-Received: from [103.67.163.162] ([103.67.163.162])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e5da00730sm67981b3a.15.2024.10.12.14.58.38
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 12 Oct 2024 14:58:38 -0700 (PDT)
-From: Josey Swihart <njomane286@gmail.com>
-X-Google-Original-From: Josey Swihart <joswihart@outlook.com>
-Message-ID: <d5d6de0cf4a29308349b434bb837687a4881b978cc86e633dbfd25f9ce8d0de1@mx.google.com>
-Reply-To: joswihart@outlook.com
-To: linux-block@vger.kernel.org
-Subject: Yamaha Piano 10/12
-Date: Sat, 12 Oct 2024 17:58:36 -0400
+  d=inria.fr; s=dc;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Sja7FWx2J2pFF7H03F4ldwixL8Qb/r4LwdjP0v1pkNc=;
+  b=exIvs+i/vmrrOC1BhG1dWTdYhowcV77JbThYwDdjK0/Wqiaqq9Fr0cce
+   rNzCFJlH0Zl3Gc94qiLI1s9PCSVuCYpsLvZjcvp+ULtzzTXbcfRvMqOYM
+   ncj7g6L1s1poZOa9BL666TBGtZjDcSWk9IcDnPVvWZAmigUTgCebAcAqC
+   Y=;
+Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.11,201,1725314400"; 
+   d="scan'208";a="98968275"
+Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2024 22:17:57 +0200
+From: Julia Lawall <Julia.Lawall@inria.fr>
+To: linux-nfs@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	vbabka@suse.cz,
+	paulmck@kernel.org,
+	Tom Talpey <tom@talpey.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Neil Brown <neilb@suse.de>,
+	linux-can@vger.kernel.org,
+	bridge@lists.linux.dev,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	linux-kernel@vger.kernel.org,
+	wireguard@lists.zx2c4.com,
+	netdev@vger.kernel.org,
+	ecryptfs@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: [PATCH 00/17] replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+Date: Sun, 13 Oct 2024 22:16:47 +0200
+Message-Id: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Since SLOB was removed and since
+commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
+it is not necessary to use call_rcu when the callback only performs
+kmem_cache_free. Use kfree_rcu() directly.
 
-I?m offering my late husband?s Yamaha piano to anyone who would truly appreciate it. If you or someone you know would be interested in receiving this instrument for free, please don?t hesitate to contact me.
+The changes were done using the following Coccinelle semantic patch.
+This semantic patch is designed to ignore cases where the callback
+function is used in another way.
 
-Warm regards,
-Josey
+// <smpl>
+#spatch --all-includes --include-headers
+
+@r@
+expression e;
+local idexpression e2;
+identifier cb,f,g;
+position p;
+@@
+
+(
+call_rcu(...,e2)
+|
+call_rcu(&e->f,cb@p)
+|
+call_rcu(&e->f.g,cb@p)
+)
+
+@r1@
+type T,T1;
+identifier x,r.cb;
+@@
+
+ cb(...) {
+(
+   kmem_cache_free(...);
+|
+   T x = ...;
+   kmem_cache_free(...,(T1)x);
+|
+   T x;
+   x = ...;
+   kmem_cache_free(...,(T1)x);
+)
+ }
+
+@s depends on r1@
+position p != r.p;
+identifier r.cb;
+@@
+
+ cb@p
+
+@script:ocaml@
+cb << r.cb;
+p << s.p;
+@@
+
+Printf.eprintf "Other use of %s at %s:%d\n" cb (List.hd p).file (List.hd p).line
+
+@depends on r1 && !s@
+expression e;
+identifier r.cb,f,g;
+position r.p;
+@@
+
+(
+- call_rcu(&e->f,cb@p)
++ kfree_rcu(e,f)
+|
+- call_rcu(&e->f.g,cb@p)
++ kfree_rcu(e,f.g)
+)
+
+@r1a depends on !s@
+type T,T1;
+identifier x,r.cb;
+@@
+
+- cb(...) {
+(
+-  kmem_cache_free(...);
+|
+-  T x = ...;
+-  kmem_cache_free(...,(T1)x);
+|
+-  T x;
+-  x = ...;
+-  kmem_cache_free(...,(T1)x);
+)
+- }
+
+@r2 depends on !r1@
+identifier r.cb;
+@@
+
+cb(...) {
+ ...
+}
+
+@script:ocaml depends on !r1 && !r2@
+cb << r.cb;
+@@
+
+Printf.eprintf "need definition for %s\n" cb
+// </smpl>
+
+---
+
+ arch/powerpc/kvm/book3s_mmu_hpte.c  |    8 ------
+ block/blk-ioc.c                     |    9 ------
+ drivers/net/wireguard/allowedips.c  |    9 +-----
+ fs/ecryptfs/dentry.c                |    8 ------
+ fs/nfsd/nfs4state.c                 |    9 ------
+ kernel/time/posix-timers.c          |    9 ------
+ net/batman-adv/translation-table.c  |   47 ++----------------------------------
+ net/bridge/br_fdb.c                 |    9 ------
+ net/can/gw.c                        |   13 ++-------
+ net/ipv4/fib_trie.c                 |    8 ------
+ net/ipv4/inetpeer.c                 |    9 +-----
+ net/ipv6/ip6_fib.c                  |    9 ------
+ net/ipv6/xfrm6_tunnel.c             |    8 ------
+ net/kcm/kcmsock.c                   |   10 -------
+ net/netfilter/nf_conncount.c        |   10 -------
+ net/netfilter/nf_conntrack_expect.c |   10 -------
+ net/netfilter/xt_hashlimit.c        |    9 ------
+ 17 files changed, 23 insertions(+), 171 deletions(-)
