@@ -1,165 +1,68 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6372C1A4F03;
-	Mon, 14 Oct 2024 11:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D0933C5;
+	Mon, 14 Oct 2024 11:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728903679; cv=none; b=FGpslM2M1DCe35IYaL0Vy7N6ickhpF+40JZrB1Ic+ZOP3uPsyL4+vHW1kqgpkoM+/BjB/dVZdKmO90Jim/ohDHLYQ0YnXZDFB809QYxtL3iAoNE+CswfxHZgb0ybsG6vVVZRhIEka5OZ6I1lnq3Th+p705XHw+K47uDA/rlj/TE=
+	t=1728905172; cv=none; b=UNZzV9+QRnyLNT02B5OdexqWAw3cOr9C7ufrbNQgM2ghiIO3acOaOg09F9aZ3CAPfQ2DNJze8QmJrmSKtGF3Eytpi38kUr8uivs5AmKXb2H2NhugVhYS812m74641GO9iWYdvwqydWXkhapYoYaFzhNMgdOT4UiFBP7/++QLwXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728903679; c=relaxed/simple;
-	bh=gGmDIIzyy9IHazPso2R/WKF0iZif8zx/sBJb7QmIGlg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b65UB5V6zugMtMjyBtJbIXB+gI/wILq6RORvfof+QD0zt1MTP2YwYGJEIeBp2mfkaJGoCJw3CRdq0v8xcYr8FKp1cw20S+u0W+GohYP3nJZbwsHwiIa56QyIZe/8J2euZ5tL0xKG5IK/3il1TR8Pm6Ie6iZY7lmfR79dzJC0/wE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 997AD16F8;
-	Mon, 14 Oct 2024 04:01:47 -0700 (PDT)
-Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 769A53F51B;
-	Mon, 14 Oct 2024 04:01:14 -0700 (PDT)
-From: Ryan Roberts <ryan.roberts@arm.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Greg Marsden <greg.marsden@oracle.com>,
-	Ivan Ivanov <ivan.ivanov@suse.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Kalesh Singh <kaleshsingh@google.com>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Matthias Brugger <mbrugger@suse.com>,
-	Miroslav Benes <mbenes@suse.cz>,
-	Will Deacon <will@kernel.org>
-Cc: Ryan Roberts <ryan.roberts@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	v9fs@lists.linux.dev,
-	virtualization@lists.linux.dev
-Subject: [RFC PATCH v1 35/57] virtio: Remove PAGE_SIZE compile-time constant assumption
-Date: Mon, 14 Oct 2024 11:58:42 +0100
-Message-ID: <20241014105912.3207374-35-ryan.roberts@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241014105912.3207374-1-ryan.roberts@arm.com>
-References: <20241014105514.3206191-1-ryan.roberts@arm.com>
- <20241014105912.3207374-1-ryan.roberts@arm.com>
+	s=arc-20240116; t=1728905172; c=relaxed/simple;
+	bh=KE+1RV7m2FOGPLNhNSEGqdDGgzbjlAE85XtRMREqhd4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jr2XLTVDRnI5X55ZesHN4QRXxZSnkwQTZViei0Mhne1FO+vDYheT99g6yPNWr5tOFVzwA+aaXviHQpMZ7bTPzL2DCeLmSSYxA9CtlID/ysDzP0M6gfpHwTSsvYB0oedW+Nap0OlYw9KXgKaAgoWvdHPSKusY5v3YEJCr/qhkVMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=43780 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1t0JD8-006HZk-B0; Mon, 14 Oct 2024 13:26:04 +0200
+Date: Mon, 14 Oct 2024 13:26:01 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Julia Lawall <Julia.Lawall@inria.fr>
+Cc: linux-nfs@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	vbabka@suse.cz, paulmck@kernel.org, Tom Talpey <tom@talpey.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Olga Kornievskaia <okorniev@redhat.com>, Neil Brown <neilb@suse.de>,
+	linux-can@vger.kernel.org, bridge@lists.linux.dev,
+	b.a.t.m.a.n@lists.open-mesh.org, linux-kernel@vger.kernel.org,
+	wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
+	ecryptfs@vger.kernel.org, linux-block@vger.kernel.org,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH 00/17] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <Zwz_yU8PnqU9Ngg5@calendula>
+References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+X-Spam-Score: -1.9 (-)
 
-To prepare for supporting boot-time page size selection, refactor code
-to remove assumptions about PAGE_SIZE being compile-time constant. Code
-intended to be equivalent when compile-time page size is active.
+On Sun, Oct 13, 2024 at 10:16:47PM +0200, Julia Lawall wrote:
+> Since SLOB was removed and since
+> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
+> it is not necessary to use call_rcu when the callback only performs
+> kmem_cache_free. Use kfree_rcu() directly.
 
-Updated multiple BUILD_BUG_ON() instances to test against page size
-limits.
+Applied and squashed into single patch for netfilter these patches:
 
-Wrap global variables that are initialized with PAGE_SIZE derived values
-using DEFINE_GLOBAL_PAGE_SIZE_VAR() so their initialization can be
-deferred for boot-time page size builds.
+[17/17] netfilter: xt_hashlimit: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+[16/17] netfilter: expect: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+[15/17] netfilter: nf_conncount: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
 
-Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
----
+this update is now flying to net-next.
 
-***NOTE***
-Any confused maintainers may want to read the cover note here for context:
-https://lore.kernel.org/all/20241014105514.3206191-1-ryan.roberts@arm.com/
-
- drivers/block/virtio_blk.c      |  2 +-
- drivers/virtio/virtio_balloon.c | 10 ++++++----
- net/9p/trans_virtio.c           |  4 ++--
- 3 files changed, 9 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 194417abc1053..8a8960b609bc9 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -899,7 +899,7 @@ static ssize_t serial_show(struct device *dev,
- 	int err;
- 
- 	/* sysfs gives us a PAGE_SIZE buffer */
--	BUILD_BUG_ON(PAGE_SIZE < VIRTIO_BLK_ID_BYTES);
-+	BUILD_BUG_ON(PAGE_SIZE_MIN < VIRTIO_BLK_ID_BYTES);
- 
- 	buf[VIRTIO_BLK_ID_BYTES] = '\0';
- 	err = virtblk_get_id(disk, buf);
-diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-index 54469277ca303..3818d894bd212 100644
---- a/drivers/virtio/virtio_balloon.c
-+++ b/drivers/virtio/virtio_balloon.c
-@@ -25,6 +25,7 @@
-  * page units.
-  */
- #define VIRTIO_BALLOON_PAGES_PER_PAGE (unsigned int)(PAGE_SIZE >> VIRTIO_BALLOON_PFN_SHIFT)
-+#define VIRTIO_BALLOON_PAGES_PER_PAGE_MAX (unsigned int)(PAGE_SIZE_MAX >> VIRTIO_BALLOON_PFN_SHIFT)
- #define VIRTIO_BALLOON_ARRAY_PFNS_MAX 256
- /* Maximum number of (4k) pages to deflate on OOM notifications. */
- #define VIRTIO_BALLOON_OOM_NR_PAGES 256
-@@ -138,7 +139,7 @@ static u32 page_to_balloon_pfn(struct page *page)
- {
- 	unsigned long pfn = page_to_pfn(page);
- 
--	BUILD_BUG_ON(PAGE_SHIFT < VIRTIO_BALLOON_PFN_SHIFT);
-+	BUILD_BUG_ON(PAGE_SHIFT_MIN < VIRTIO_BALLOON_PFN_SHIFT);
- 	/* Convert pfn from Linux page size to balloon page size. */
- 	return pfn * VIRTIO_BALLOON_PAGES_PER_PAGE;
- }
-@@ -228,7 +229,7 @@ static void set_page_pfns(struct virtio_balloon *vb,
- {
- 	unsigned int i;
- 
--	BUILD_BUG_ON(VIRTIO_BALLOON_PAGES_PER_PAGE > VIRTIO_BALLOON_ARRAY_PFNS_MAX);
-+	BUILD_BUG_ON(VIRTIO_BALLOON_PAGES_PER_PAGE_MAX > VIRTIO_BALLOON_ARRAY_PFNS_MAX);
- 
- 	/*
- 	 * Set balloon pfns pointing at this page.
-@@ -1042,8 +1043,9 @@ static int virtballoon_probe(struct virtio_device *vdev)
- 		 * host's base page size. However, it needs more work to report
- 		 * that value. The hard-coded order would be fine currently.
- 		 */
--#if defined(CONFIG_ARM64) && defined(CONFIG_ARM64_64K_PAGES)
--		vb->pr_dev_info.order = 5;
-+#if defined(CONFIG_ARM64)
-+		if (PAGE_SIZE == SZ_64K)
-+			vb->pr_dev_info.order = 5;
- #endif
- 
- 		err = page_reporting_register(&vb->pr_dev_info);
-diff --git a/net/9p/trans_virtio.c b/net/9p/trans_virtio.c
-index 0b8086f58ad55..25b8253011cec 100644
---- a/net/9p/trans_virtio.c
-+++ b/net/9p/trans_virtio.c
-@@ -786,7 +786,7 @@ static struct virtio_driver p9_virtio_drv = {
- 	.remove		= p9_virtio_remove,
- };
- 
--static struct p9_trans_module p9_virtio_trans = {
-+static DEFINE_GLOBAL_PAGE_SIZE_VAR(struct p9_trans_module, p9_virtio_trans, {
- 	.name = "virtio",
- 	.create = p9_virtio_create,
- 	.close = p9_virtio_close,
-@@ -804,7 +804,7 @@ static struct p9_trans_module p9_virtio_trans = {
- 	.pooled_rbuffers = false,
- 	.def = 1,
- 	.owner = THIS_MODULE,
--};
-+});
- 
- /* The standard init function */
- static int __init p9_virtio_init(void)
--- 
-2.43.0
-
+Thanks
