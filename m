@@ -1,146 +1,194 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB88C14F114
-	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 08:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4725F1487D6
+	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 08:34:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728894460; cv=none; b=lkoqXksn6RDz8A6jpNBb3a81kewxsloFX+dn3kn8wbfP5DM1VeVvgsvvdZTaCzQyD7j/KgEfnk6PqUMZlDmDl/y9LdERSqbvpjnTY8N3k1i/8EQ7DiuTfFAS3w/omAStc1AvCifk1w4U6SE7rvSVa05GXA2BTTMS63X3+lqi8KM=
+	t=1728894861; cv=none; b=Au4JbCoQkpJBhsT3jOl1mAb/HECr4jEsiXnWk6NFUWmeRqTJQi5i9Xd8TcpNYcvGmYvdKzXudidGlJX9sWs0ZhFIxEpHkrDJvx8cHxVSXAcv9HgQi4gEUnE9EoyV8dB38EXDZLp//Cxn7ljsyyT5eA7aCOV2m7/V0k5TZzkzqdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728894460; c=relaxed/simple;
-	bh=TJzj3Ji7bLkY42Y0Qiq/OYG4j5c51i9ljEt10a3JImU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HxKM5EKIv85b/trgSLDmiMjIcPZUrHRO/OQ+Bi+56xUevIeHffArBWKlCRToPxl/YJsHVm3xT9dNSU3KUG+nyLiD98LOs02TPIzAQGFcBGpLmKz3IwDXhHdMf42Zw/i8kqBFaxVVi+m4CvWkRx38iBMyPgqdGxGcZFTVlP3F9V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PbRNX1Zs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1728894861; c=relaxed/simple;
+	bh=sjwFt+D6aNELegNe3XomwGZpvF4BkxGE64lh855YL4I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kd3cDwd29K/W20WYOjewKgb7pQRPccpMYhvCfFKxWdvtEdu2Qk+QaXbCEizOn8krUkwnoeWBgQgx6e5kYZQfX2DAOnTladbFoV2pk3TieF4eJz8ZiUnZ8MbaSWAHWHDq6ovyjlnxd5zu0WedR2RZmqd+QgEnt8HSrqu5VfI/u+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=GGG6KeOF; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PbRNX1Zs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728894457;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TJzj3Ji7bLkY42Y0Qiq/OYG4j5c51i9ljEt10a3JImU=;
-	b=PbRNX1ZshN58cYiRytLHe2zuQ+/6rP//QQiSNZCDMlp8SYuS0/B91Aw2FtcjALj5zjxvak
-	jjAirUG570CEmOaIbvA0uByYjfY5PsD60vRsn7XnD3XWNOtGENlrhcygG9HffuR25Ac8MC
-	hMEFAstQLbijM1s+npqa6gdGUXP8AUI=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-CHuvSStlM2q62EcZ_sMRBA-1; Mon, 14 Oct 2024 04:27:36 -0400
-X-MC-Unique: CHuvSStlM2q62EcZ_sMRBA-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a7d2d414949so267810466b.0
-        for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 01:27:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728894455; x=1729499255;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TJzj3Ji7bLkY42Y0Qiq/OYG4j5c51i9ljEt10a3JImU=;
-        b=PwABHCyA045hN8TQHy8dWnUMqk0eBwQR6ugB7UYE5O3PDX/Rv3XFqAp6yA7iSW+Ain
-         mwb5xqWicr3/XCBVn9RR7HPynsFx95uvs4JsAd/cRIi9o0I543D+B4d7fppoGqkk+G+l
-         2QxqPedNnmAkNOaff48BlvKuAfJoZVtQtyKgMCkoKp8KrV5qvBoHPOx71hpax5acGnLX
-         ojvptxInhG7KOrl9mdvYJ/rw76mj9/tX3FZJtwEDu/y7XBKMiw3T6yyX+qJzcXusa83k
-         aH+4jINnlVlbputUIad00OdFu9U7py3EFk4uvEvDO7v8gqlTGLRcM1UwfQGXgqgVb0xp
-         wdDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVXNREXmyr4bZTwj4DAQLrpowOT1dX9AWOQ2YVZjoqzF8tHRZOkEIlth+GMlGHcu23fF8Kbk4XA9vtACw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YymZzSUMEdanh77+rPTdnq5CJqQknfgsMrB6jW8N7K4j0RG4/RY
-	uKAovtzzFDvjTK/DBCmgmhA/cf4Gy/Uqsx/O4apRExESKmC68Y6Rkk++UYsX/E/5nQgtDSkN8aq
-	hK5DIr19exHw6A+04u9sKFR7uqw26N2lxmktmnQlTUVBD0osXKZTzQKqLpg95
-X-Received: by 2002:a17:907:d03:b0:a8d:3d36:3169 with SMTP id a640c23a62f3a-a99b95e99afmr1010125866b.63.1728894454867;
-        Mon, 14 Oct 2024 01:27:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IET06hligI0OlzzqWIT8Zxv8HD0sGUV38UYd28vMXZeTZMRv5ATRNZ8cQQeTW6fnRICTxBimQ==
-X-Received: by 2002:a17:907:d03:b0:a8d:3d36:3169 with SMTP id a640c23a62f3a-a99b95e99afmr1010120866b.63.1728894454431;
-        Mon, 14 Oct 2024 01:27:34 -0700 (PDT)
-Received: from ?IPv6:2001:16b8:2d37:9800:1d57:78cf:c1ae:b0b3? (200116b82d3798001d5778cfc1aeb0b3.dip.versatel-1u1.de. [2001:16b8:2d37:9800:1d57:78cf:c1ae:b0b3])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a0edb1a00sm113812666b.128.2024.10.14.01.27.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 01:27:34 -0700 (PDT)
-Message-ID: <e612ef6af75929fa874817e6e8b4b69473af8051.camel@redhat.com>
-Subject: Re: [PATCH v7 4/5] gpio: Replace deprecated PCI functions
-From: Philipp Stanner <pstanner@redhat.com>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, Tom Rix
- <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
- <yilun.xu@intel.com>,  Andy Shevchenko <andy@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, Richard
- Cochran <richardcochran@gmail.com>, Damien Le Moal <dlemoal@kernel.org>,
- Hannes Reinecke <hare@suse.de>, Al Viro <viro@zeniv.linux.org.uk>,  Keith
- Busch <kbusch@kernel.org>, Li Zetao <lizetao1@huawei.com>,
- linux-block@vger.kernel.org,  linux-kernel@vger.kernel.org,
- linux-fpga@vger.kernel.org,  linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,  Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>
-Date: Mon, 14 Oct 2024 10:27:32 +0200
-In-Reply-To: <CAMRc=Me8U+7EwNDEh2RJJD8+FTPqO-CbwG_fiDmHLpjxh33o5w@mail.gmail.com>
-References: <20241014075329.10400-1-pstanner@redhat.com>
-	 <20241014075329.10400-5-pstanner@redhat.com>
-	 <CAMRc=McAfEPM0b0m6oYUO9_RC=qTd1vsg4wMn1Hb4jYQbx4irA@mail.gmail.com>
-	 <dc9d7bd817e5c8bc88b0b8dfffcf83b2676cc225.camel@redhat.com>
-	 <CAMRc=Me8U+7EwNDEh2RJJD8+FTPqO-CbwG_fiDmHLpjxh33o5w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="GGG6KeOF"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1728894850; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=nU/qU2kG8hi5utisxU99hecTxyvs2URAxnwqBBRt48M=;
+	b=GGG6KeOFyCyyk0zInUdYsjPkVrPMtawDUKptkHQNcgqDyqpGGm4dF+Soq0izk6V1vVGEv/oMSOukVNG6hqVYUZmn5DYLGYQhgEBV/UbEdlNT0YINVDKEua+k8KyL+RsCQtblJ8AnVuDpN4BFk4QzciJECoY6D5LiAetFKYSGMak=
+Received: from 30.178.81.252(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0WH3msgf_1728894848 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 14 Oct 2024 16:34:09 +0800
+Message-ID: <2091bf64-12d7-480f-acc7-55bca77fbf3e@linux.alibaba.com>
+Date: Mon, 14 Oct 2024 16:34:08 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: =?UTF-8?B?TW96aWxsYSBUaHVuZGVyYmlyZCDmtYvor5XniYg=?=
+Subject: Re: [PATCH blktests v3 2/2] nvme: test the nvme reservation feature
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
+ "dwagner@suse.de" <dwagner@suse.de>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <20241012111157.44368-1-kanie@linux.alibaba.com>
+ <20241012111157.44368-3-kanie@linux.alibaba.com>
+ <6e1e4df5-ccee-4a92-80ac-64976a526003@nvidia.com>
+From: Guixin Liu <kanie@linux.alibaba.com>
+In-Reply-To: <6e1e4df5-ccee-4a92-80ac-64976a526003@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, 2024-10-14 at 10:15 +0200, Bartosz Golaszewski wrote:
-> On Mon, Oct 14, 2024 at 10:08=E2=80=AFAM Philipp Stanner
-> <pstanner@redhat.com> wrote:
-> >=20
-> > On Mon, 2024-10-14 at 09:59 +0200, Bartosz Golaszewski wrote:
-> > > On Mon, Oct 14, 2024 at 9:53=E2=80=AFAM Philipp Stanner
-> > > <pstanner@redhat.com>
-> > > wrote:
-> > > >=20
-> > > > pcim_iomap_regions() and pcim_iomap_table() have been
-> > > > deprecated by
-> > > > the
-> > > > PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
-> > > > pcim_iomap_table(), pcim_iomap_regions_request_all()").
-> > > >=20
-> > > > Replace those functions with calls to pcim_iomap_region().
-> > > >=20
-> > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > > > Reviewed-by: Andy Shevchenko <andy@kernel.org>
-> > > > Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > > > ---
-> > >=20
-> > > This is part of a larger series so I acked it previously but at
-> > > second
-> > > glance it doesn't look like it depends on anything that comes
-> > > before?
-> > > Should it have been sent separately to the GPIO tree? Should I
-> > > pick
-> > > it
-> > > up independently?
-> >=20
-> > Thx for the offer, but it depends on pcim_iounmap_region(), which
-> > only
-> > becomes a public symbol through patch No.1 of this series :)
-> >=20
->=20
-> Then a hint: to make it more obvious to maintainers, I'd change the
-> commit title for patch 1 to say explicitly it makes this function
-> public. In fact: I'd split it and the deprecation into two separate
-> patches.
 
-Yeah, good idea. The maintainer could squash then if two atomic patches
-are deemed undesirable.
+在 2024/10/14 14:43, Chaitanya Kulkarni 写道:
+> On 10/12/24 04:11, Guixin Liu wrote:
+>> Test the NVMe reservation feature, including register, acquire,
+>> release and report.
+>>
+>> Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
+>> ---
+>>    tests/nvme/054     |  99 +++++++++++++++++++++++++++++++++++++++++
+>>    tests/nvme/054.out | 108 +++++++++++++++++++++++++++++++++++++++++++++
+>>    2 files changed, 207 insertions(+)
+>>    create mode 100644 tests/nvme/054
+>>    create mode 100644 tests/nvme/054.out
+>>
+>> diff --git a/tests/nvme/054 b/tests/nvme/054
+>> new file mode 100644
+>> index 0000000..f352c73
+>> --- /dev/null
+>> +++ b/tests/nvme/054
+>> @@ -0,0 +1,99 @@
+>> +#!/bin/bash
+>> +# SPDX-License-Identifier: GPL-3.0+
+>> +# Copyright (C) 2024 Guixin Liu
+>> +# Copyright (C) 2024 Alibaba Group.
+>> +#
+>> +# Test the NVMe reservation feature
+>> +#
+>> +. tests/nvme/rc
+>> +
+>> +DESCRIPTION="Test the NVMe reservation feature"
+>> +QUICK=1
+>> +nvme_trtype="loop"
+>> +
+>> +requires() {
+>> +	_nvme_requires
+>> +}
+>> +
+>> +resv_report() {
+>> +	local nvmedev=$1
+>> +	local report_arg=$2
+>> +
+>> +	nvme resv-report "/dev/${nvmedev}n1" "${report_arg}" | grep -v "hostid"
+>> +}
+>> +
+>> +test_resv() {
+>> +	local nvmedev=$1
+>> +	local report_arg="--cdw11=1"
+>> +
+>> +	if nvme resv-report --help 2>&1 | grep -- '--eds' > /dev/null; then
+>> +		report_arg="--eds"
+>> +	fi
+>> +
+>> +	echo "Register"
+>> +	resv_report "${nvmedev}" "${report_arg}"
+>> +	nvme resv-register "/dev/${nvmedev}n1" --nrkey=4 --rrega=0
+>> +	resv_report "${nvmedev}" "${report_arg}"
+>> +
+>> +	echo "Replace"
+>> +	nvme resv-register "/dev/${nvmedev}n1" --crkey=4 --nrkey=5 --rrega=2
+>> +	resv_report "${nvmedev}" "${report_arg}"
+>> +
+>> +	echo "Unregister"
+>> +	nvme resv-register "/dev/${nvmedev}n1" --crkey=5 --rrega=1
+>> +	resv_report "${nvmedev}" "${report_arg}"
+>> +
+>> +	echo "Acquire"
+>> +	nvme resv-register "/dev/${nvmedev}n1" --nrkey=4 --rrega=0
+>> +	nvme resv-acquire "/dev/${nvmedev}n1" --crkey=4 --rtype=1 --racqa=0
+>> +	resv_report "${nvmedev}" "${report_arg}"
+>> +
+>> +	echo "Preempt"
+>> +	nvme resv-acquire "/dev/${nvmedev}n1" --crkey=4 --rtype=2 --racqa=1
+>> +	resv_report "${nvmedev}" "${report_arg}"
+>> +
+>> +	echo "Release"
+>> +	nvme resv-release "/dev/${nvmedev}n1" --crkey=4 --rtype=2 --rrela=0
+>> +	resv_report "${nvmedev}" "${report_arg}"
+>> +
+>> +	echo "Clear"
+>> +	nvme resv-register "/dev/${nvmedev}n1" --nrkey=4 --rrega=0
+>> +	nvme resv-acquire "/dev/${nvmedev}n1" --crkey=4 --rtype=1 --racqa=0
+>> +	resv_report "${nvmedev}" "${report_arg}"
+>> +	nvme resv-release "/dev/${nvmedev}n1" --crkey=4 --rrela=1
+>> +}
+>> +
+>> +
+> make it easier to debug totally untested :-
+>
+> test_resv() {
+>           local nvmedev=$1
+>           local report_arg="--cdw11=1"
+>           test_dev="/dev/${nvmedev}n1"
+>
+>           if nvme resv-report --help 2>&1 | grep -- '--eds' > /dev/null; then
+>                   report_arg="--eds"
+>           fi
+>
+>           echo "Register"
+>           resv_report "${nvmedev}" "${report_arg}"
+>           nvme resv-register "${test_dev}" --nrkey=4 --rrega=0
+>           resv_report "${nvmedev}" "${report_arg}"
+>
+>           echo "Replace"
+>           nvme resv-register "${test_dev}" --crkey=4 --nrkey=5 --rrega=2
+>           resv_report "${nvmedev}" "${report_arg}"
+>
+>           echo "Unregister"
+>           nvme resv-register "${test_dev}" --crkey=5 --rrega=1
+>           resv_report "${nvmedev}" "${report_arg}"
+>
+>           echo "Acquire"
+>           nvme resv-register "${test_dev}" --nrkey=4 --rrega=0
+>           nvme resv-acquire "${test_dev}" --crkey=4 --rtype=1 --racqa=0
+>           resv_report "${nvmedev}" "${report_arg}"
+>
+>           echo "Preempt"
+>           nvme resv-acquire "${test_dev}" --crkey=4 --rtype=2 --racqa=1
+>           resv_report "${nvmedev}" "${report_arg}"
+>
+>           echo "Release"
+>           nvme resv-release "${test_dev}" --crkey=4 --rtype=2 --rrela=0
+>           resv_report "${nvmedev}" "${report_arg}"
+>
+>           echo "Clear"
+>           nvme resv-register "${test_dev}" --nrkey=4 --rrega=0
+>           nvme resv-acquire "${test_dev}" --crkey=4 --rtype=1 --racqa=0
+>           resv_report "${nvmedev}" "${report_arg}"
+>           nvme resv-release "${test_dev}" --crkey=4 --rrela=1
+> }
+>
+Thanks, changed in v4, and also change resv_report()'s firt param to
 
-Noted.
-Thank you!
-P.
+test_dev instead of nvmedev.
 
->=20
-> Bart
->=20
+Best Regards,
 
+Guixin Liu
+
+> irrespective of that looks good :-
+>
+> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+>
+> -ck
+>
+>
