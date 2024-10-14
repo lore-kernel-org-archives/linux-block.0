@@ -1,47 +1,55 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFBB1684B4;
-	Mon, 14 Oct 2024 11:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A456819D086;
+	Mon, 14 Oct 2024 12:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728906659; cv=none; b=is/mzPjRkqUCOazDsCPhYEjjbWnpF8hHcycYtd/VNQA+t2XBEhUgj9RhOmqtvZXabLGx96no0NB66vk1C9ZZons3GMi79OlOa1ZQBP9xRKNTUat7A/rLbcCSASOeOITSpFyuye5ujnOh9nTuVGtoqjOIK6W1ZrYfjSnsCZZBdvc=
+	t=1728908011; cv=none; b=FjwoB9cxCFFawPPuVjgIApGbqz6SQL2jPi76/Rj+XogqTsOZwGx2iCLPyR6U0lgGcwBOemYHep5garAKi4hHC13rft8DbiFtjvbrgSu4pu2/4B5RBbYP5RE2JrVtRxyTkyjgqyvKIDUXOupBpxvaWePSz4UcJI/Lq3B8NmCZhN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728906659; c=relaxed/simple;
-	bh=Q4e/kn/B4J8d1OxaWo7WyJ7HfcbNfBdR+3U59Cue+ts=;
+	s=arc-20240116; t=1728908011; c=relaxed/simple;
+	bh=Pqcl0dwf49EdBvTszQmFGHzrd66GK6QAO4IKAI4N30Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hN3VAwz0asBJm9uICwbkeX4sreJoLN6/jTgJ3nOBOcPM6f5VdentMhcLkNFnQeESjvDtxvDTSIOVmweYsWjmDo5k8Pn9g8chYCHzBIP/tZfXHpJJZis35Ac10a/tkHMgPaxB4ESN4/eBY6qiXgxwIQzJAZTjS60QfnTTwUQAhh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 885C6227AA8; Mon, 14 Oct 2024 13:50:52 +0200 (CEST)
-Date: Mon, 14 Oct 2024 13:50:52 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Javier Gonzalez <javier.gonz@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Kanchan Joshi <joshi.k@samsung.com>, "hare@suse.de" <hare@suse.de>,
-	"sagi@grimberg.me" <sagi@grimberg.me>,
-	"brauner@kernel.org" <brauner@kernel.org>,
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"jack@suse.cz" <jack@suse.cz>,
-	"jaegeuk@kernel.org" <jaegeuk@kernel.org>,
-	"bcrl@kvack.org" <bcrl@kvack.org>,
-	"dhowells@redhat.com" <dhowells@redhat.com>,
-	"bvanassche@acm.org" <bvanassche@acm.org>,
-	"asml.silence@gmail.com" <asml.silence@gmail.com>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-aio@kvack.org" <linux-aio@kvack.org>,
-	"gost.dev@samsung.com" <gost.dev@samsung.com>,
-	"vishak.g@samsung.com" <vishak.g@samsung.com>
-Subject: Re: [PATCH v7 0/3] FDP and per-io hints
-Message-ID: <20241014115052.GA32302@lst.de>
-References: <CGME20241010070738eucas1p2057209e5f669f37ca586ad4a619289ed@eucas1p2.samsung.com> <20241010070736.de32zgad4qmfohhe@ArmHalley.local> <20241010091333.GB9287@lst.de> <20241010115914.eokdnq2cmcvwoeis@ArmHalley.local> <20241011090224.GC4039@lst.de> <5e9f7f1c-48fd-477f-b4ba-c94e6b50b56f@kernel.dk> <20241014062125.GA21033@lst.de> <34d3ad68068f4f87bf0a61ea8fb8f217@CAMSVWEXC02.scsc.local> <20241014074708.GA22575@lst.de> <9e3792eebf7f427db7c466374972fb99@CAMSVWEXC02.scsc.local>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pedsqHzY8JAD8mFXONwTwN0PWScEFvZbe2ZNwm0ujPORKQqTWNkFtl2ISpQewtXyAFKbkGOgZFgDkq/qjs8pUIWoc2EfMN3jiwYAtVOIQ8nONfsNjNLySwLcFOyvtxS3XYxRUJ4cDhBstGtMeqH+uaB5CugQ4gheTWgShUm371E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TOjL8u/z; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TOjL8u/z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 596EFC4CEC3;
+	Mon, 14 Oct 2024 12:13:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728908011;
+	bh=Pqcl0dwf49EdBvTszQmFGHzrd66GK6QAO4IKAI4N30Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TOjL8u/z2Kga9VObd6TWtDpF8KY3MXxRzJWYOMnMOsIC6IsMZ2dNDiieIWJDGvCce
+	 nqRtUfMBZC537LmFYTarzmtsbh/LLF8IQuLoxO2JrckofKKwGvRnfeEnqDEXmxEwLl
+	 N55dohhrj51rGq6szyhCsKHt+oAkrJr0Pj7Cr1beHxF+T0ipqObt+SnssA28RecQsK
+	 mq2iaL81hT+C4tgZ+D6vAEZf/LhEu++7dYTcTFZdZAT3WRBf9/T71m82+h28+w84SS
+	 3yvfmBOw3WaRbrWGUm7duJpTcx1aton7uzy03IzG4WhB5nJHVkkkh5eOR9Dl+MtwRt
+	 wXV0BU6RxTLLA==
+Date: Mon, 14 Oct 2024 13:13:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>,
+	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+	Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
+	Al Viro <viro@zeniv.linux.org.uk>, Keith Busch <kbusch@kernel.org>,
+	Li Zetao <lizetao1@huawei.com>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v7 4/5] gpio: Replace deprecated PCI functions
+Message-ID: <20241014121324.GT77519@kernel.org>
+References: <20241014075329.10400-1-pstanner@redhat.com>
+ <20241014075329.10400-5-pstanner@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,48 +58,65 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9e3792eebf7f427db7c466374972fb99@CAMSVWEXC02.scsc.local>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20241014075329.10400-5-pstanner@redhat.com>
 
-On Mon, Oct 14, 2024 at 09:08:24AM +0000, Javier Gonzalez wrote:
-
-[can you fix your mailer please, no full quotes, and especially not
-quotes of the mail headers]
-
-> > What do you gain from that?  NVMe does not understand data temperatures,
-> > so why make up that claim?  
+On Mon, Oct 14, 2024 at 09:53:25AM +0200, Philipp Stanner wrote:
+> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by the
+> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> pcim_iomap_table(), pcim_iomap_regions_request_all()").
 > 
-> I expressed this a couple of times in this thread. It is no problem to
-> map temperatures to a protocol that does not understand the semantics.
-
-And I've agreed every time with you.  But the important point is that we
-must not do it in the driver where all context is lost.
-
-> > Especially as it directly undermindes any file system work to actually make use of it.
+> Replace those functions with calls to pcim_iomap_region().
 > 
-> I do not think it does. If a FS wants to use the temperatures, then they
-> would be able to leverage FDP besides SCSI.
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> Reviewed-by: Andy Shevchenko <andy@kernel.org>
+> Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  drivers/gpio/gpio-merrifield.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/gpio/gpio-merrifield.c b/drivers/gpio/gpio-merrifield.c
+> index 421d7e3a6c66..274afcba31e6 100644
+> --- a/drivers/gpio/gpio-merrifield.c
+> +++ b/drivers/gpio/gpio-merrifield.c
+> @@ -78,24 +78,24 @@ static int mrfld_gpio_probe(struct pci_dev *pdev, const struct pci_device_id *id
+>  	if (retval)
+>  		return retval;
+>  
+> -	retval = pcim_iomap_regions(pdev, BIT(1) | BIT(0), pci_name(pdev));
+> -	if (retval)
+> -		return dev_err_probe(dev, retval, "I/O memory mapping error\n");
+> -
+> -	base = pcim_iomap_table(pdev)[1];
+> +	base = pcim_iomap_region(pdev, 1, pci_name(pdev));
+> +	if (IS_ERR(base))
+> +		return dev_err_probe(dev, PTR_ERR(base), "I/O memory mapping error\n");
+>  
+>  	irq_base = readl(base + 0 * sizeof(u32));
+>  	gpio_base = readl(base + 1 * sizeof(u32));
+>  
+>  	/* Release the IO mapping, since we already get the info from BAR1 */
+> -	pcim_iounmap_regions(pdev, BIT(1));
+> +	pcim_iounmap_region(pdev, 1);
+>  
+>  	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+>  	if (!priv)
+>  		return -ENOMEM;
+>  
+>  	priv->dev = dev;
+> -	priv->reg_base = pcim_iomap_table(pdev)[0];
+> +	priv->reg_base = pcim_iomap_region(pdev, 0, pci_name(pdev));
+> +	if (IS_ERR(priv->reg_base))
+> +		return dev_err_probe(dev, PTR_ERR(base), "I/O memory mapping error\n");
 
-What do you mean with that?  This is a bit too much whitepaper vocabularly.
+Hi Philipp,
 
-We have code in XFS that can make use of the temperature hint.  But to
-make them work it actually needs to do real stream separation on the
-device.  I.e. the file system consumes the temperature hints.
+There seems to be a mismatch in the use of priv->reg_base and base above.
+Should the above use PTR_ERR(priv->reg_base) instead of PTR_ERR(base)?
 
-
-> And if we come up with a better interface later on, we can make the changes then.
-> I really do not see the issue. If we were adding a temperature abstraction now, I would agree with
-> You that we would need to cover the use-case you mention for FSs from the beginning, but this
-> Is already here. Seems like a fair compromise to support current users.
-
-Again, I think the temperature hints at the syscall level aren't all
-bad.  There's definitively a few things I'd like to do better in hindsight,
-but that's not the point.  The problem is trying to turn them into
-stream separation all the way down in the driver, which is fundamentally
-broken.
-
->   - How do we convince VFS folks to give us more space for hints at this point?
-
-What space from VFS folks do you need for hints?  And why does it
-matter?
-
+>  
+>  	priv->pin_info.pin_ranges = mrfld_gpio_ranges;
+>  	priv->pin_info.nranges = ARRAY_SIZE(mrfld_gpio_ranges);
+> -- 
+> 2.46.2
+> 
+> 
