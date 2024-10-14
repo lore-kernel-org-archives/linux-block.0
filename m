@@ -1,103 +1,94 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4063FD4
-	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 00:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCDCD15AF6
+	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 01:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728867091; cv=none; b=c6gTq/VLC7G+ABfk3jv828Tvl1Ue5vWrRaFk0EtivCCRi8mJ/b+hSN4UdGhFttYYzzz4SwKhr1dcLr6bp2uUH/DtI347F1HAPnFwr6gOF4aEElpeMVrghqMdZVctXMnAqWLGoio4IL/nkYuU8em+1FPGbfVEudjr/UvpVcmItcs=
+	t=1728869259; cv=none; b=N5xjRmeXPwQYtMay9owO37nXm8H5Xex6ZSwNknWndpUTNvgQpM2pJu0SVi+tTdcjIXDEiEd+fllaOREG+oiJRLPF+1KImh5EIKD/i04GDZEJXfxb19Pec/jQvaMkZWnx7N6WGX/UBnm3yPi4gNP5jr+ta+Up8MXUPIBhKXC56mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728867091; c=relaxed/simple;
-	bh=znTkRxnVJ87EJfVio0oOxdIwO8anRsmWpzsz5X1CfMM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B1L5ewUVRfXdTGdCVcWbrV015NFrkpFWTuYZ6E+Vid60T/ErrAww3vTR2VFAr+k6frr3pe474iyZgWkfTdP1g+87xh4vtT6QmpIehlLK+eYQ3zJfQQWZa48TgluIX84GDlKRwMd7N429ppJyUi44SSHF9CHP3UzwncSBpQE8+ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IGhxqCFB; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1728869259; c=relaxed/simple;
+	bh=4ZUXS+fpXMj0rqGVsOfAWazL9hWyK+uoeVHAyuMdy7c=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=tYg2BDRtthtOU1WZyqy7HryYpnckVzINZoJNG7ppFiy8U6zYq2E1X0JtVWeo+LzlwWVFg4Tflnp9VdmXQQkeQvka3SHDiDP3ntCTFlY8f7Ca3eFIfC3dE6xqqPJN8WR/YpIpYoNroW4YGVC+FuIVbpdNHstuEk0E2Tb070mtIk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c4lORWFQ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IGhxqCFB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c4lORWFQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728867088;
+	s=mimecast20190719; t=1728869256;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=mmuABJx7wIX9RlsNTIPRSsssFMiymfsh2OYsIQmAkx8=;
-	b=IGhxqCFB9sb1TaD5cLQlLseV8E61/LGUDfCjbEsBOglA99DmCYP+pL9bCqnf1WNCMoWuFX
-	51IJ7Qyt1QeBTeskG7GVDR43Pt8G5Djiuv5gqV1BdKN1HPEiz6tDJ0LigavfmVuYD2ISe0
-	2TQk5FH9x4bqqg46izyqOzExBpjjOzU=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=4ZUXS+fpXMj0rqGVsOfAWazL9hWyK+uoeVHAyuMdy7c=;
+	b=c4lORWFQ59uo07lNiK0FI5oMWxWXToaWhzrPL983WH8BDkCtFI6ncRZNAWPBSMrmaaHsiu
+	XJN2+NJGEQN4ZmIWMguMOAod1f60poRHGahU7Ea4wu4KllSJsJbiKCWUBGiblZq4fMVL5D
+	C8YiBCqIBC/hICnP7xmti4VmYCqEO5g=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-482-CYgOV6PZPDSN9dyczo0H8w-1; Sun,
- 13 Oct 2024 20:51:24 -0400
-X-MC-Unique: CYgOV6PZPDSN9dyczo0H8w-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-580-xMTe649hPVCV0sK32Rfkpw-1; Sun,
+ 13 Oct 2024 21:27:31 -0400
+X-MC-Unique: xMTe649hPVCV0sK32Rfkpw-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 71F9319560A2;
-	Mon, 14 Oct 2024 00:51:23 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.46])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 44BE73000198;
-	Mon, 14 Oct 2024 00:51:21 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1A80619560B1;
+	Mon, 14 Oct 2024 01:27:29 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.46])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3794819560AA;
+	Mon, 14 Oct 2024 01:27:22 +0000 (UTC)
+Date: Mon, 14 Oct 2024 09:27:17 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Rick Koch <mr.rickkoch@gmail.com>
-Subject: [PATCH] blk-mq: setup queue ->tag_set before initializing hctx
-Date: Mon, 14 Oct 2024 08:51:15 +0800
-Message-ID: <20241014005115.2699642-1-ming.lei@redhat.com>
+To: Hamza Mahfooz <someguy@effective-light.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Dan Williams <dan.j.williams@intel.com>
+Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-raid@vger.kernel.org,
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: [Report] annoyed dma debug warning "cacheline tracking EEXIST,
+ overlapping mappings aren't supported"
+Message-ID: <ZwxzdWmYcBK27mUs@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Commit 7b815817aa58 ("blk-mq: add helper for checking if one CPU is mapped to specified hctx")
-needs to check queue mapping via tag set in hctx's cpuhp handler.
+Hello Guys,
 
-However, q->tag_set may not be setup yet when the cpuhp handler is
-enabled, then kernel oops is triggered.
+I got more and more reports on DMA debug warning "cacheline tracking EEXIST,
+overlapping mappings aren't supported" in storage related tests:
 
-Fix the issue by setup queue tag_set before initializing hctx.
+1) liburing
+- test/iopoll-overflow.t
+- test/sq-poll-dup.t
 
-Reported-and-tested-by: Rick Koch <mr.rickkoch@gmail.com>
-Closes: https://lore.kernel.org/linux-block/CANa58eeNDozLaBHKPLxSAhEy__FPfJT_F71W=sEQw49UCrC9PQ@mail.gmail.com
-Fixes: 7b815817aa58 ("blk-mq: add helper for checking if one CPU is mapped to specified hctx")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Same buffer is used in more than 1 IO.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4b2c8e940f59..cf626e061dd7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4310,6 +4310,12 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	/* mark the queue as mq asap */
- 	q->mq_ops = set->ops;
- 
-+	/*
-+	 * ->tag_set has to be setup before initialize hctx, which cpuphp
-+	 * handler needs it for checking queue mapping
-+	 */
-+	q->tag_set = set;
-+
- 	if (blk_mq_alloc_ctxs(q))
- 		goto err_exit;
- 
-@@ -4328,8 +4334,6 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	INIT_WORK(&q->timeout_work, blk_mq_timeout_work);
- 	blk_queue_rq_timeout(q, set->timeout ? set->timeout : 30 * HZ);
- 
--	q->tag_set = set;
--
- 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
- 
- 	INIT_DELAYED_WORK(&q->requeue_work, blk_mq_requeue_work);
--- 
-2.46.0
+2) raid1 driver
+
+- same buffer is used in more than 1 bio
+
+3) some storage utilities
+- dm thin provisioning utility of thin_check
+- `dt`(https://github.com/RobinTMiller/dt)
+
+I looks like same user buffer is used in more than 1 dio.
+
+4) some self cooked test code which does same thing with 1)
+
+In storage stack, the buffer provider is far away from the actual DMA
+controller operating code, which doesn't have the knowledge if
+DMA_ATTR_SKIP_CPU_SYNC should be set.
+
+And suggestions for avoiding this noise?
+
+Thanks,
+Ming
 
