@@ -1,83 +1,47 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4F614A4DD
-	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 11:44:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFBB1684B4;
+	Mon, 14 Oct 2024 11:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728906266; cv=none; b=cwgFb0vlTLYFmr3gpSgmmKnM+JZ1dSA1xm7zxDEBnLHbObigvbE2zSrG2r44DS0TyofgfmWbMMEVcqKSVvyLjjwPZ8nj8WXNgmFemk35t/MturBquYL6pJXKhz+v7lN/Zkbc+vqgX7HAm6S51+4FdaBLSYKitzAMoHXyNXgCxWk=
+	t=1728906659; cv=none; b=is/mzPjRkqUCOazDsCPhYEjjbWnpF8hHcycYtd/VNQA+t2XBEhUgj9RhOmqtvZXabLGx96no0NB66vk1C9ZZons3GMi79OlOa1ZQBP9xRKNTUat7A/rLbcCSASOeOITSpFyuye5ujnOh9nTuVGtoqjOIK6W1ZrYfjSnsCZZBdvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728906266; c=relaxed/simple;
-	bh=VbSKfRKRq44ycDw07dlakxSkymhnx7/YT+1ucuN/GFM=;
+	s=arc-20240116; t=1728906659; c=relaxed/simple;
+	bh=Q4e/kn/B4J8d1OxaWo7WyJ7HfcbNfBdR+3U59Cue+ts=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XZzwkLyDYCK+BQe+Mdm81g3tuZrrxHsLywHHuciL5ZtzQonqGfhCyC0j/sp11UVvYQMyxw6nEe3LMS9EsiykL/X6CCxIvA5+PHJ6ooDGdGn1roQxOmGWglZP1VEvQvIDa4E2CYTVB7HOx4yVbUZRtEC1AxWmOYq5FAAjtHGL/aI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wugMEPB8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=g+zsyniK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wugMEPB8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=g+zsyniK; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wugMEPB8";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="g+zsyniK";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wugMEPB8";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="g+zsyniK"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 7D7631FB94;
-	Mon, 14 Oct 2024 11:44:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1728906262; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r4YD9TMRMEMXi3tkUSnaRNdtmPQ8SEI9Tx6/UEzhniw=;
-	b=wugMEPB8HIpKfT1fssD8RowZNVaW3JOoBMNgyD+JwyEAJQ6CuBtC2LqRR77aPfXhx3Cxyh
-	aouQo/oPhApdiAqpjR85uLi8sRZJ3hJVqnvN+uUeaG7pTSHCXIBmU4O8SfA9TU7FtKnLqA
-	xy0RXmnMFFyWp/LNgs7Cd4Psb2qbjr8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1728906262;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r4YD9TMRMEMXi3tkUSnaRNdtmPQ8SEI9Tx6/UEzhniw=;
-	b=g+zsyniKWEGyuW6KwqLMB4HqKXkMOip5Na2gJDqxnhDwFoIRCKcwv2saZEbNogu68YQCYo
-	ZhKJJbwJwsH0CsAg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1728906262; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r4YD9TMRMEMXi3tkUSnaRNdtmPQ8SEI9Tx6/UEzhniw=;
-	b=wugMEPB8HIpKfT1fssD8RowZNVaW3JOoBMNgyD+JwyEAJQ6CuBtC2LqRR77aPfXhx3Cxyh
-	aouQo/oPhApdiAqpjR85uLi8sRZJ3hJVqnvN+uUeaG7pTSHCXIBmU4O8SfA9TU7FtKnLqA
-	xy0RXmnMFFyWp/LNgs7Cd4Psb2qbjr8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1728906262;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r4YD9TMRMEMXi3tkUSnaRNdtmPQ8SEI9Tx6/UEzhniw=;
-	b=g+zsyniKWEGyuW6KwqLMB4HqKXkMOip5Na2gJDqxnhDwFoIRCKcwv2saZEbNogu68YQCYo
-	ZhKJJbwJwsH0CsAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6180513A51;
-	Mon, 14 Oct 2024 11:44:22 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 8dJhFRYEDWdnMwAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Mon, 14 Oct 2024 11:44:22 +0000
-Date: Mon, 14 Oct 2024 13:44:21 +0200
-From: Daniel Wagner <dwagner@suse.de>
-To: Guixin Liu <kanie@linux.alibaba.com>
-Cc: shinichiro.kawasaki@wdc.com, chaitanyak@nvidia.com, 
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH blktests v4 2/2] nvme: test the nvme reservation feature
-Message-ID: <a34131bd-3ff8-4531-9131-1dc35843fb36@flourine.local>
-References: <20241014090116.125500-1-kanie@linux.alibaba.com>
- <20241014090116.125500-3-kanie@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hN3VAwz0asBJm9uICwbkeX4sreJoLN6/jTgJ3nOBOcPM6f5VdentMhcLkNFnQeESjvDtxvDTSIOVmweYsWjmDo5k8Pn9g8chYCHzBIP/tZfXHpJJZis35Ac10a/tkHMgPaxB4ESN4/eBY6qiXgxwIQzJAZTjS60QfnTTwUQAhh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 885C6227AA8; Mon, 14 Oct 2024 13:50:52 +0200 (CEST)
+Date: Mon, 14 Oct 2024 13:50:52 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Javier Gonzalez <javier.gonz@samsung.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Kanchan Joshi <joshi.k@samsung.com>, "hare@suse.de" <hare@suse.de>,
+	"sagi@grimberg.me" <sagi@grimberg.me>,
+	"brauner@kernel.org" <brauner@kernel.org>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"jack@suse.cz" <jack@suse.cz>,
+	"jaegeuk@kernel.org" <jaegeuk@kernel.org>,
+	"bcrl@kvack.org" <bcrl@kvack.org>,
+	"dhowells@redhat.com" <dhowells@redhat.com>,
+	"bvanassche@acm.org" <bvanassche@acm.org>,
+	"asml.silence@gmail.com" <asml.silence@gmail.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-aio@kvack.org" <linux-aio@kvack.org>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>,
+	"vishak.g@samsung.com" <vishak.g@samsung.com>
+Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+Message-ID: <20241014115052.GA32302@lst.de>
+References: <CGME20241010070738eucas1p2057209e5f669f37ca586ad4a619289ed@eucas1p2.samsung.com> <20241010070736.de32zgad4qmfohhe@ArmHalley.local> <20241010091333.GB9287@lst.de> <20241010115914.eokdnq2cmcvwoeis@ArmHalley.local> <20241011090224.GC4039@lst.de> <5e9f7f1c-48fd-477f-b4ba-c94e6b50b56f@kernel.dk> <20241014062125.GA21033@lst.de> <34d3ad68068f4f87bf0a61ea8fb8f217@CAMSVWEXC02.scsc.local> <20241014074708.GA22575@lst.de> <9e3792eebf7f427db7c466374972fb99@CAMSVWEXC02.scsc.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -86,99 +50,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241014090116.125500-3-kanie@linux.alibaba.com>
-X-Spam-Score: -4.30
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_FIVE(0.00)[5]
-X-Spam-Flag: NO
-X-Spam-Level: 
+In-Reply-To: <9e3792eebf7f427db7c466374972fb99@CAMSVWEXC02.scsc.local>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Oct 14, 2024 at 05:01:16PM GMT, Guixin Liu wrote:
-> +resv_report() {
-> +	local test_dev=$1
-> +	local report_arg=$2
-> +
-> +	nvme resv-report "${test_dev}" "${report_arg}" | grep -v "hostid" | \
-> +		grep -E "gen|rtype|regctl|regctlext|cntlid|rcsts|rkey"
+On Mon, Oct 14, 2024 at 09:08:24AM +0000, Javier Gonzalez wrote:
 
-okay, let's see how this goes.
+[can you fix your mailer please, no full quotes, and especially not
+quotes of the mail headers]
 
-> +test_resv() {
-> +	local nvmedev=$1
-> +	local report_arg="--cdw11=1"
-> +	test_dev="/dev/${nvmedev}n1"
+> > What do you gain from that?  NVMe does not understand data temperatures,
+> > so why make up that claim?  
+> 
+> I expressed this a couple of times in this thread. It is no problem to
+> map temperatures to a protocol that does not understand the semantics.
 
-Please use the namespace lookup helper and don't hardcode the namespace
-id.
+And I've agreed every time with you.  But the important point is that we
+must not do it in the driver where all context is lost.
+
+> > Especially as it directly undermindes any file system work to actually make use of it.
+> 
+> I do not think it does. If a FS wants to use the temperatures, then they
+> would be able to leverage FDP besides SCSI.
+
+What do you mean with that?  This is a bit too much whitepaper vocabularly.
+
+We have code in XFS that can make use of the temperature hint.  But to
+make them work it actually needs to do real stream separation on the
+device.  I.e. the file system consumes the temperature hints.
 
 
-> +
-> +	if nvme resv-report --help 2>&1 | grep -- '--eds' > /dev/null; then
-> +		report_arg="--eds"
-> +	fi
-> +
-> +	echo "Register"
-> +	resv_report "${test_dev}" "${report_arg}"
-> +	nvme resv-register "${test_dev}" --nrkey=4 --rrega=0
-> +	resv_report "${test_dev}" "${report_arg}"
-> +
-> +	echo "Replace"
-> +	nvme resv-register "${test_dev}" --crkey=4 --nrkey=5 --rrega=2
-> +	resv_report "${test_dev}" "${report_arg}"
-> +
-> +	echo "Unregister"
-> +	nvme resv-register "${test_dev}" --crkey=5 --rrega=1
-> +	resv_report "${test_dev}" "${report_arg}"
-> +
-> +	echo "Acquire"
-> +	nvme resv-register "${test_dev}" --nrkey=4 --rrega=0
-> +	nvme resv-acquire "${test_dev}" --crkey=4 --rtype=1 --racqa=0
-> +	resv_report "${test_dev}" "${report_arg}"
-> +
-> +	echo "Preempt"
-> +	nvme resv-acquire "${test_dev}" --crkey=4 --rtype=2 --racqa=1
-> +	resv_report "${test_dev}" "${report_arg}"
-> +
-> +	echo "Release"
-> +	nvme resv-release "${test_dev}" --crkey=4 --rtype=2 --rrela=0
-> +	resv_report "${test_dev}" "${report_arg}"
-> +
-> +	echo "Clear"
-> +	nvme resv-register "${test_dev}" --nrkey=4 --rrega=0
-> +	nvme resv-acquire "${test_dev}" --crkey=4 --rtype=1 --racqa=0
-> +	resv_report "${test_dev}" "${report_arg}"
-> +	nvme resv-release "${test_dev}" --crkey=4 --rrela=1
-> +}
-> +
-> +test() {
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	_setup_nvmet
-> +
-> +	local nvmedev
-> +	local skipped=false
-> +	local subsys_path=""
-> +	local ns_path=""
-> +
-> +	_nvmet_target_setup --blkdev file --resv_enable
-> +	subsys_path="${NVMET_CFS}/subsystems/${def_subsysnqn}"
-> +	ns_path="${subsys_path}/namespaces/1"
+> And if we come up with a better interface later on, we can make the changes then.
+> I really do not see the issue. If we were adding a temperature abstraction now, I would agree with
+> You that we would need to cover the use-case you mention for FSs from the beginning, but this
+> Is already here. Seems like a fair compromise to support current users.
 
-Again here, it's better not to hardcode the nsid.
+Again, I think the temperature hints at the syscall level aren't all
+bad.  There's definitively a few things I'd like to do better in hindsight,
+but that's not the point.  The problem is trying to turn them into
+stream separation all the way down in the driver, which is fundamentally
+broken.
+
+>   - How do we convince VFS folks to give us more space for hints at this point?
+
+What space from VFS folks do you need for hints?  And why does it
+matter?
 
