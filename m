@@ -1,193 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0F82595;
-	Mon, 14 Oct 2024 00:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4063FD4
+	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 00:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728865891; cv=none; b=H17UGxqntZfMfCN1r+iBN8d17SkxMcQ2/GQObdppsiCKW5bXnE8Ho3ttxzg85UipCUdyJnCjr93Wai6+WUrjT7gwwm8vQnSpwjogLyX6fsnd+X5pnzysK5nMnoI9fHNY3R0EBt0goIHFG8KEcVokWcYO9Y8Bn+o0gZaNntsoxb0=
+	t=1728867091; cv=none; b=c6gTq/VLC7G+ABfk3jv828Tvl1Ue5vWrRaFk0EtivCCRi8mJ/b+hSN4UdGhFttYYzzz4SwKhr1dcLr6bp2uUH/DtI347F1HAPnFwr6gOF4aEElpeMVrghqMdZVctXMnAqWLGoio4IL/nkYuU8em+1FPGbfVEudjr/UvpVcmItcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728865891; c=relaxed/simple;
-	bh=XvIpO0hMtyh3Po24emY82DbVHrbP5ytugA80vx/L/C4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U7dM2Mcd2Qlwain2vHbjwieEd40N0TVRIyRb2gUvDRMsr2Y9H0lmvnzak5s6cIx2l7wbPnd++vqqU45+Aa9q9Cq+rMMrdcBCk3z5cVf9TZTL0lPbyNAyG2EEJVg/D/pKFTgrH0qkU3xKQIJDMK95QQq3XlW5PV6+W2HPJBKdsKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r9YqRKuw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728867091; c=relaxed/simple;
+	bh=znTkRxnVJ87EJfVio0oOxdIwO8anRsmWpzsz5X1CfMM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B1L5ewUVRfXdTGdCVcWbrV015NFrkpFWTuYZ6E+Vid60T/ErrAww3vTR2VFAr+k6frr3pe474iyZgWkfTdP1g+87xh4vtT6QmpIehlLK+eYQ3zJfQQWZa48TgluIX84GDlKRwMd7N429ppJyUi44SSHF9CHP3UzwncSBpQE8+ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IGhxqCFB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r9YqRKuw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E461C4CEC5;
-	Mon, 14 Oct 2024 00:31:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728865890;
-	bh=XvIpO0hMtyh3Po24emY82DbVHrbP5ytugA80vx/L/C4=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=r9YqRKuw96RsL0f2maCvk78OVekNkjc1FC0l5peRj1xFsFUp+Wk6XpDbm8K/I8Dat
-	 NtYj6Bt7tAjktwuIEYkK2pE6Nlz6suRz3IANFU3iMXWxI7B7SBdTbd2IFcE2RMqhNe
-	 Gzl7d51zCrp3PEv9lrIW1gc/wLVjkJdAhHf/b8suVLDK9/64J6axNZwU42guB6nhKd
-	 Bi+uaQAfSmkkbJhfVBfu3ahXZQy9cxY9cRnT2opvnrVBsZZFVpqu2kKlHbRWIQ75Yc
-	 VF5aZimutRyJow22wfPFMyDIphrxGhIuf1iV5oDIrKq8jmbchhfe2c3wMu4V4yxCL9
-	 zZuh3mAA+h63Q==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 043ABCE0D17; Sun, 13 Oct 2024 17:31:30 -0700 (PDT)
-Date: Sun, 13 Oct 2024 17:31:30 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Julia Lawall <Julia.Lawall@inria.fr>
-Cc: linux-nfs@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	vbabka@suse.cz, Tom Talpey <tom@talpey.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Olga Kornievskaia <okorniev@redhat.com>, Neil Brown <neilb@suse.de>,
-	linux-can@vger.kernel.org, bridge@lists.linux.dev,
-	b.a.t.m.a.n@lists.open-mesh.org, linux-kernel@vger.kernel.org,
-	wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
-	ecryptfs@vger.kernel.org, linux-block@vger.kernel.org,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/17] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <47a98e77-8bbf-48d7-bb52-50e85a5336a0@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IGhxqCFB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728867088;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mmuABJx7wIX9RlsNTIPRSsssFMiymfsh2OYsIQmAkx8=;
+	b=IGhxqCFB9sb1TaD5cLQlLseV8E61/LGUDfCjbEsBOglA99DmCYP+pL9bCqnf1WNCMoWuFX
+	51IJ7Qyt1QeBTeskG7GVDR43Pt8G5Djiuv5gqV1BdKN1HPEiz6tDJ0LigavfmVuYD2ISe0
+	2TQk5FH9x4bqqg46izyqOzExBpjjOzU=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-482-CYgOV6PZPDSN9dyczo0H8w-1; Sun,
+ 13 Oct 2024 20:51:24 -0400
+X-MC-Unique: CYgOV6PZPDSN9dyczo0H8w-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 71F9319560A2;
+	Mon, 14 Oct 2024 00:51:23 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.46])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 44BE73000198;
+	Mon, 14 Oct 2024 00:51:21 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Rick Koch <mr.rickkoch@gmail.com>
+Subject: [PATCH] blk-mq: setup queue ->tag_set before initializing hctx
+Date: Mon, 14 Oct 2024 08:51:15 +0800
+Message-ID: <20241014005115.2699642-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Sun, Oct 13, 2024 at 10:16:47PM +0200, Julia Lawall wrote:
-> Since SLOB was removed and since
-> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
-> it is not necessary to use call_rcu when the callback only performs
-> kmem_cache_free. Use kfree_rcu() directly.
-> 
-> The changes were done using the following Coccinelle semantic patch.
-> This semantic patch is designed to ignore cases where the callback
-> function is used in another way.
+Commit 7b815817aa58 ("blk-mq: add helper for checking if one CPU is mapped to specified hctx")
+needs to check queue mapping via tag set in hctx's cpuhp handler.
 
-For the series:
+However, q->tag_set may not be setup yet when the cpuhp handler is
+enabled, then kernel oops is triggered.
 
-Acked-by: Paul E. McKenney <paulmck@kernel.org>
+Fix the issue by setup queue tag_set before initializing hctx.
 
-> // <smpl>
-> #spatch --all-includes --include-headers
-> 
-> @r@
-> expression e;
-> local idexpression e2;
-> identifier cb,f,g;
-> position p;
-> @@
-> 
-> (
-> call_rcu(...,e2)
-> |
-> call_rcu(&e->f,cb@p)
-> |
-> call_rcu(&e->f.g,cb@p)
-> )
-> 
-> @r1@
-> type T,T1;
-> identifier x,r.cb;
-> @@
-> 
->  cb(...) {
-> (
->    kmem_cache_free(...);
-> |
->    T x = ...;
->    kmem_cache_free(...,(T1)x);
-> |
->    T x;
->    x = ...;
->    kmem_cache_free(...,(T1)x);
-> )
->  }
-> 
-> @s depends on r1@
-> position p != r.p;
-> identifier r.cb;
-> @@
-> 
->  cb@p
-> 
-> @script:ocaml@
-> cb << r.cb;
-> p << s.p;
-> @@
-> 
-> Printf.eprintf "Other use of %s at %s:%d\n" cb (List.hd p).file (List.hd p).line
-> 
-> @depends on r1 && !s@
-> expression e;
-> identifier r.cb,f,g;
-> position r.p;
-> @@
-> 
-> (
-> - call_rcu(&e->f,cb@p)
-> + kfree_rcu(e,f)
-> |
-> - call_rcu(&e->f.g,cb@p)
-> + kfree_rcu(e,f.g)
-> )
-> 
-> @r1a depends on !s@
-> type T,T1;
-> identifier x,r.cb;
-> @@
-> 
-> - cb(...) {
-> (
-> -  kmem_cache_free(...);
-> |
-> -  T x = ...;
-> -  kmem_cache_free(...,(T1)x);
-> |
-> -  T x;
-> -  x = ...;
-> -  kmem_cache_free(...,(T1)x);
-> )
-> - }
-> 
-> @r2 depends on !r1@
-> identifier r.cb;
-> @@
-> 
-> cb(...) {
->  ...
-> }
-> 
-> @script:ocaml depends on !r1 && !r2@
-> cb << r.cb;
-> @@
-> 
-> Printf.eprintf "need definition for %s\n" cb
-> // </smpl>
-> 
-> ---
-> 
->  arch/powerpc/kvm/book3s_mmu_hpte.c  |    8 ------
->  block/blk-ioc.c                     |    9 ------
->  drivers/net/wireguard/allowedips.c  |    9 +-----
->  fs/ecryptfs/dentry.c                |    8 ------
->  fs/nfsd/nfs4state.c                 |    9 ------
->  kernel/time/posix-timers.c          |    9 ------
->  net/batman-adv/translation-table.c  |   47 ++----------------------------------
->  net/bridge/br_fdb.c                 |    9 ------
->  net/can/gw.c                        |   13 ++-------
->  net/ipv4/fib_trie.c                 |    8 ------
->  net/ipv4/inetpeer.c                 |    9 +-----
->  net/ipv6/ip6_fib.c                  |    9 ------
->  net/ipv6/xfrm6_tunnel.c             |    8 ------
->  net/kcm/kcmsock.c                   |   10 -------
->  net/netfilter/nf_conncount.c        |   10 -------
->  net/netfilter/nf_conntrack_expect.c |   10 -------
->  net/netfilter/xt_hashlimit.c        |    9 ------
->  17 files changed, 23 insertions(+), 171 deletions(-)
+Reported-and-tested-by: Rick Koch <mr.rickkoch@gmail.com>
+Closes: https://lore.kernel.org/linux-block/CANa58eeNDozLaBHKPLxSAhEy__FPfJT_F71W=sEQw49UCrC9PQ@mail.gmail.com
+Fixes: 7b815817aa58 ("blk-mq: add helper for checking if one CPU is mapped to specified hctx")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4b2c8e940f59..cf626e061dd7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4310,6 +4310,12 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	/* mark the queue as mq asap */
+ 	q->mq_ops = set->ops;
+ 
++	/*
++	 * ->tag_set has to be setup before initialize hctx, which cpuphp
++	 * handler needs it for checking queue mapping
++	 */
++	q->tag_set = set;
++
+ 	if (blk_mq_alloc_ctxs(q))
+ 		goto err_exit;
+ 
+@@ -4328,8 +4334,6 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	INIT_WORK(&q->timeout_work, blk_mq_timeout_work);
+ 	blk_queue_rq_timeout(q, set->timeout ? set->timeout : 30 * HZ);
+ 
+-	q->tag_set = set;
+-
+ 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
+ 
+ 	INIT_DELAYED_WORK(&q->requeue_work, blk_mq_requeue_work);
+-- 
+2.46.0
+
