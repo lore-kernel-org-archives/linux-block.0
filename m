@@ -1,47 +1,42 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8EA313BC18;
-	Mon, 14 Oct 2024 05:56:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7772154670
+	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 05:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728885408; cv=none; b=VF7Wifp4gqa0nTWWJWYze4kNVcyNHhVo4njv80dkPavcRyOh1b6vBD+kAb75JB+jpg9BaIJVyDpE3oEuzkYJM59MwaeminlSy5GP2RSCWmOxGGQgSFxGWd4aTiIXI/UFiWUGmNvOwLzjqxUpAYpt6Wx+4jeo/gRCJ82dFPDYL3Q=
+	t=1728885460; cv=none; b=cg9uIsUktZqM2jad1hzBNWpoKpjsVRaX5Q6lVzlj309dp/F77fb0IA4mLsYSnL/joQT9dv/ZWGwxCCoAswxgxzmziu8IaKDuPy278y/I0SJ5lUQiWKge6kzb1JXv71kgeO8KDZmZJPK8QLZvRHVaPf3lfVQ/+CkuURyKlX59vwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728885408; c=relaxed/simple;
-	bh=yB1MZG1Qa1qE1idZEm0cZSis/LeY/QkS+vD8naHCaNE=;
+	s=arc-20240116; t=1728885460; c=relaxed/simple;
+	bh=Gd6Ev8peQ9QFugXWLwA7Y7+cMr+hJrQl9nkx4WlGxzU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XGLTogieLN+ERozdnLzKL0lH+lR3MISFW5frdiRj/Rg9qvxr9CZnynFJsK7GUS8x03MnDZ70XrpG8aEpW1qQvOfQhIZ5OILd7byiorVZ7kJbK6THBL6GBn861GbVqCvBE5OjxiUD123058nb4g6bgcb/5bzviRpLn/3ET1/h1LA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fegLa6jn; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=GCZsvZG3AsEGOt0YELGMt4n9a5OLW0pp57FF8ML4Bjak76aO73Ymt7b4FFmGxJKH46WbbYDGSu5EP0bFlYg5gpgKZ4RCUwjDrFRn+XIurJOmIRxzqfrAfuKzjX7YJNlvEMpdcbxcTLEOAUi0WMrLVDdcJ0B3JumEM/yaTlXcGso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=D/a1tJ/A; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fegLa6jn"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="D/a1tJ/A"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=aESkWpHra8Ha0Uwrq2Nm01+2Q6btlz5Wqf9DpnTb8+E=; b=fegLa6jnV44NsoSjvx5VMzMt43
-	N1njSqp3198V+wBiS5SlaeiKYaEd/+jkKzC3n3rYCkNKBhRw0z9+IoLdlx4fzZcUuMI8mrbX1/V3q
-	2pgZd/D7vSrgkcelIyjctDKLGStVqbTAWnfaxtb7JElIubIJhioL+fuoYiA1REmOeokicqu5/D1HE
-	QUiGs4uUYw/ZKudl8SjlarC4B1PIHFIMtL3M+TXGajS+X50ePVxrwiQweiKAE4MjhN/NpvpBfTKSq
-	3ovlA3vcJMY1M2tAOT2TIYdAGlJAUlWPA8Oi7r/lPF/Au3dITr+MbzR+H9LYkehSaKQfrcEqvsl1Z
-	ktcFhoKQ==;
+	bh=Gd6Ev8peQ9QFugXWLwA7Y7+cMr+hJrQl9nkx4WlGxzU=; b=D/a1tJ/A4WXDcaUmahVRo3Ybm3
+	UxZ5HJlWCk4bFZxTqOOgzrAu3CybnMdCwLGWD8+8ZCdhM5zngPtmK8VxNhgxYcngpuQLbb8Vls6of
+	3zLBvgfNlRqZjLXOG1xwB/qDgIbt6FNv+9tSM4pwguJdiEiHioaj+7RyVlo2IdTd/QTe2z9XiigRc
+	XM8gx/SffhN73Cynw+0OrCivimyRy2Ye1tG+DdD/wND6/7jQH++EMclCUOaf8zx7XKcQH9DTbDyoZ
+	wp+yFkFxhjPXbXOi0Fhcw8H7mNepUVS6ql69gjrHIhP5Tqjr2Lz1ojiBSXVp2xNlI0W9gLgVnLqpR
+	KYpiFH1A==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1t0E4R-00000003oPm-2ZKZ;
-	Mon, 14 Oct 2024 05:56:43 +0000
-Date: Sun, 13 Oct 2024 22:56:43 -0700
+	id 1t0E5L-00000003ocg-0ENv;
+	Mon, 14 Oct 2024 05:57:39 +0000
+Date: Sun, 13 Oct 2024 22:57:39 -0700
 From: Christoph Hellwig <hch@infradead.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: hch@infradead.org, Jens Axboe <axboe@kernel.dk>,
-	Bart Van Assche <bvanassche@acm.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
-	kernel-team@meta.com,
-	"open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] elevator: Remove argument from elevator_find_get
-Message-ID: <Zwyym8cvSYg2Qh-R@infradead.org>
-References: <20241011155615.3361143-1-leitao@debian.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Rick Koch <mr.rickkoch@gmail.com>
+Subject: Re: [PATCH] blk-mq: setup queue ->tag_set before initializing hctx
+Message-ID: <Zwyy05TbnmKWYclG@infradead.org>
+References: <20241014005115.2699642-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,21 +45,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241011155615.3361143-1-leitao@debian.org>
+In-Reply-To: <20241014005115.2699642-1-ming.lei@redhat.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Oct 11, 2024 at 08:56:15AM -0700, Breno Leitao wrote:
-> Commit e4eb37cc0f3ed ("block: Remove elevator required features")
-> removed the usage of `struct request_queue` from elevator_find_get(),
-> but didn't removed the argument.
-> 
-> Remove the "struct request_queue *q" argument from elevator_find_get()
-> given it is useless.
-> 
-> Fixes: e4eb37cc0f3e ("block: Remove elevator required features")
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+On Mon, Oct 14, 2024 at 08:51:15AM +0800, Ming Lei wrote:
+> Commit 7b815817aa58 ("blk-mq: add helper for checking if one CPU is mapped to specified hctx")
 
-Looks good:
+Overly long line.
+
+Otherwise looks good:
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-
