@@ -1,173 +1,152 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mailgate02.uberspace.is (mailgate02.uberspace.is [185.26.156.114])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C7E1A76C6
-	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 12:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840391AAE25
+	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 14:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.26.156.114
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728910766; cv=none; b=s82csdOGT649kbRuBt+euoV+8AyDzl+kISE/ZQj3Qk1ZTR0ChzCrbQW5yj7N51B37UV8S70E+/3Nq8khxG1o45aD8To7sT1aOfWXKf4SpW5jPnUWHodDpBEKsLv/I2xFPwinQQjy6sdLppAQHboxg2xM1QwrYBxL/GJlAbcX3ZU=
+	t=1728915311; cv=none; b=YErfpjouH1eGA3ocW61A2Xs7uXfNS8w/6JaLMmcor7cg3b5NIATKtYRqPzlABijtvKBoNqWChPecVdRbEraqMoJfY639IJ12hdNH6shH+GixIPX2S7j8Tt0DWiMVyHxUNDMxasBtlm7lJ5o9L1395/4vNLlkLcuUe5ehXh3OPXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728910766; c=relaxed/simple;
-	bh=Jg6pGOYiv5OzHtrcu0KE602yPfdGSrud2Mdl8UCB5Ug=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SxgUnuk2b3j8akCzVeaGJa9K/DhKm8ejsFnkO01htqqMxWjK7prwIHRjNzfmeAP5JKDwGvLIAKykPxNKHPyWUrXG+BMUgP23Z2iZKlzowxdtwAX2lOSR/o9vZEjZOMkRV61M4pKtY7SKayNhxO7jGWCCfgHkaSbhE6od7ed6qHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kz0VmlzO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1728915311; c=relaxed/simple;
+	bh=lo2UneFWwbc1KlyHxZ+Z2ZBmjJyjJuQVz8HtHHBF9C8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=H5arvtmr9eclSeYTFiPZ68+Bfl2fflgI/dARFwQLQMHxLcS3TDcKLgouDgc0IlZhAWtp+pNTjTeKSRo950t0n+0qVJ8bXMLAh2SPEQ0EmR5JgC3m+yG1wC9+hqa7dvM9WpZMHCNe6FolVX2se0CEGx9hGaxsiyIzn3pCiFwz98o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=is.currently.online; spf=pass smtp.mailfrom=is.currently.online; dkim=pass (4096-bit key) header.d=is.currently.online header.i=@is.currently.online header.b=hzZ5p9xr; arc=none smtp.client-ip=185.26.156.114
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=is.currently.online
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=is.currently.online
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kz0VmlzO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728910764;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kbvknu1cOjZZ0csG9pJAkO2ZJHMWQOgShZkt8KNqc3E=;
-	b=Kz0VmlzONiTjcrwWu6GlZfK/I587H2XSsq6yRHuHsuoFSGC1WfURtl9nQtVndgoztw0ItQ
-	3gnZkXZGAhpJ8RvYJHNgHP5YAjP79irjAxX2/rp2a9+xoyCEvoMRWW6/QyeC9E4Y2BlY1n
-	m8PTjBISXpIjsUPkFzaxCRZySVmztt4=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-650-3QeXpwoKM9KlIXtw72wV2A-1; Mon, 14 Oct 2024 08:59:23 -0400
-X-MC-Unique: 3QeXpwoKM9KlIXtw72wV2A-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5c936f71759so2746634a12.2
-        for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 05:59:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728910761; x=1729515561;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kbvknu1cOjZZ0csG9pJAkO2ZJHMWQOgShZkt8KNqc3E=;
-        b=vHy5DmLg8FZWj6b5iu3lBRoNxhUNzIEs0vwX/TVbJbqQK3V1vQbmBofQDqxWnr4Vll
-         bLqw9LDVtKzKZauJkCgLxbBNuf1dJFIhC9EoESt/eJD1SmwFZ7JAp3Co2evSz53nyL7k
-         S7yOKbDrYqQjt/dEVycA6QpqiDrNjQjaLw6u2bT/Hx6DocfS+iTGatoUZse/ww4RfRxn
-         OSnTcrgqXklqvbKKJV67fLP0ol59lf1xcy9rgCygjB0TXrLOK0LhI8HTqDM1qT9wMgpO
-         EPsh9Zl/5RmvlYmLAYjaZ8/MleTwigh1iABItfg65QMRcEIIzUXGTIKR+c/Eh6AKwvZE
-         V2zA==
-X-Forwarded-Encrypted: i=1; AJvYcCXK+/uTK8oVWlpieXVbrZqpEE905NO1hdtsLbeVZZ6dxWgppXR6lZNbjDONv/ELC3nO/A9nhm0EOVlI1w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4cNmERaKh6zE0J+I1kNxpRydOS7BCivB+uXDa7SynFJ5LE3xE
-	PaPCB/AjsX6O5S8gHqfxtz3nrKy96Pqfdgg50E3P5LqYcHq7YSQVa5+vCgdpgWx9SH7a3hsRyZC
-	1OqU4w5phKJDoMiCVmLcdiyrou5FMa/QcbuKftfEv30SE5UQch0oXGjPnTVx/
-X-Received: by 2002:a05:6402:2114:b0:5c9:6b7f:2f16 with SMTP id 4fb4d7f45d1cf-5c96b7f3145mr4416895a12.18.1728910761590;
-        Mon, 14 Oct 2024 05:59:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFFF+8Ta6ohQ9/nfR6Qe62tH/JkmiX/F4n9q/mR7oEx4wYYvRcjJ5zg08dI/qWotLZ1mqCX6w==
-X-Received: by 2002:a05:6402:2114:b0:5c9:6b7f:2f16 with SMTP id 4fb4d7f45d1cf-5c96b7f3145mr4416852a12.18.1728910761078;
-        Mon, 14 Oct 2024 05:59:21 -0700 (PDT)
-Received: from ?IPv6:2001:16b8:2d37:9800:1d57:78cf:c1ae:b0b3? (200116b82d3798001d5778cfc1aeb0b3.dip.versatel-1u1.de. [2001:16b8:2d37:9800:1d57:78cf:c1ae:b0b3])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c937267272sm4966512a12.75.2024.10.14.05.59.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 05:59:20 -0700 (PDT)
-Message-ID: <ae39d2783db4ecadd69a7e85d92ebe45c626bd62.camel@redhat.com>
-Subject: Re: [PATCH v7 4/5] gpio: Replace deprecated PCI functions
-From: Philipp Stanner <pstanner@redhat.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, Tom Rix
- <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
- <yilun.xu@intel.com>,  Andy Shevchenko <andy@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Richard Cochran <richardcochran@gmail.com>, Damien
- Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>, Al Viro
- <viro@zeniv.linux.org.uk>,  Keith Busch <kbusch@kernel.org>, Li Zetao
- <lizetao1@huawei.com>, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org, 
- linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org,  Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>
-Date: Mon, 14 Oct 2024 14:59:17 +0200
-In-Reply-To: <20241014121324.GT77519@kernel.org>
-References: <20241014075329.10400-1-pstanner@redhat.com>
-	 <20241014075329.10400-5-pstanner@redhat.com>
-	 <20241014121324.GT77519@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	dkim=pass (4096-bit key) header.d=is.currently.online header.i=@is.currently.online header.b="hzZ5p9xr"
+Received: from galatea.uberspace.de (galatea.uberspace.de [185.26.156.241])
+	by mailgate02.uberspace.is (Postfix) with ESMTPS id DA9E91813D6
+	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 16:07:31 +0200 (CEST)
+Received: (qmail 25999 invoked by uid 989); 14 Oct 2024 14:07:31 -0000
+Authentication-Results: galatea.uberspace.de;
+	auth=pass (plain)
+Received: from unknown (HELO unkown) (::1)
+	by galatea.uberspace.de (Haraka/3.0.1) with ESMTPSA; Mon, 14 Oct 2024 16:07:31 +0200
+From: Leon Schuermann <leon@is.currently.online>
+To: Bart Van Assche <bvanassche@acm.org>, Vincent Chen
+ <vincent.chen@sifive.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, Christoph
+ Hellwig <hch@lst.de>, Josef Bacik <josef@toxicpanda.com>
+Subject: Re: [bug report] block nbd0: Unexpected reply (15) 000000009c07859b
+In-Reply-To: <162da790-2824-4090-97a0-564c15ac793f@acm.org>
+References: <CABvJ_xhxR22i4_xfuFjf9PQxJHVUmW-Xr8dut_1F4Ys7gxW5pw@mail.gmail.com>
+ <2786c4cb-86ad-42bb-8998-4d8fe6a537a4@acm.org>
+ <CABvJ_xhqBRXPLvVDmKg9Jub7hc6vXE02S=iSR7RWW-a8UtU7WQ@mail.gmail.com>
+ <162da790-2824-4090-97a0-564c15ac793f@acm.org>
+Date: Mon, 14 Oct 2024 10:07:28 -0400
+Message-ID: <87jzea4w2n.fsf@silicon.host.schuermann.io>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-Rspamd-Bar: /
+X-Rspamd-Report: MIME_GOOD(-0.1)
+X-Rspamd-Score: -0.1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=is.currently.online; s=uberspace;
+	h=from:to:cc:subject:date;
+	bh=lo2UneFWwbc1KlyHxZ+Z2ZBmjJyjJuQVz8HtHHBF9C8=;
+	b=hzZ5p9xrAWA2bstnwzgWRwhTx8tyeWPYg1LhsxXi0GZTf68x9NyYvakE8z8k2QZewCOUdwqcrd
+	FmJ7mX1vkamCq5JHbhFRrLfBdvsuzY/6NzC9kOysmuXl9ClO+ln6z4tEgHZPmYBeSiMKcLtC66+X
+	9y+bezpFEPK2R8gqUV6rP0P54p73wrzCnYQSDFauRwQzKKBH6xtZ555S0DKsrNplVuh5Sz1al6vR
+	Tn/+GpP8H+VkNpVJWUOko5jwFw/pQH18Li9d0Ao+IJAD+AtIGHxLIzc2MrL7sjodjbJ5YHlJFCJk
+	ZWjxjTt1ER8aBDgu9n0hx54Ap7MI/7dcfsQRkkZBFy3BtoJfydf3NP6oBKMEFrCVjjljXSbdYgTu
+	EMr7X9GzcRGFUS2BQp7SQ2voDXFhAefn/ZEl87EsnCYUinCl4apzGhyfJ+xSeZTAWRyEGL70vGJ6
+	uUu4zjMlSmCrqvW4KwSmfZrsP/bF7vY56mpCOr3I8KLqYb8o6/vdXEutVbhJn7VbUSYpNhLWLLAY
+	fidsBvqdSYUZMIKvPGnKn+Y6ouyL+A1SnhpHR3jN48y4Fiqv7GdbFvke+Fakh1K4tQKn9xXQZh2a
+	rwxkw9gmch4rxdom5RUQvGIyhqM6mI66VMPAWMyXJ4wf8QMsXym33+ZjzCc/ibFRt6QBCSe8N/AO
+	8=
 
-On Mon, 2024-10-14 at 13:13 +0100, Simon Horman wrote:
-> On Mon, Oct 14, 2024 at 09:53:25AM +0200, Philipp Stanner wrote:
-> > pcim_iomap_regions() and pcim_iomap_table() have been deprecated by
-> > the
-> > PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
-> > pcim_iomap_table(), pcim_iomap_regions_request_all()").
-> >=20
-> > Replace those functions with calls to pcim_iomap_region().
-> >=20
-> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > Reviewed-by: Andy Shevchenko <andy@kernel.org>
-> > Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > ---
-> > =C2=A0drivers/gpio/gpio-merrifield.c | 14 +++++++-------
-> > =C2=A01 file changed, 7 insertions(+), 7 deletions(-)
-> >=20
-> > diff --git a/drivers/gpio/gpio-merrifield.c b/drivers/gpio/gpio-
-> > merrifield.c
-> > index 421d7e3a6c66..274afcba31e6 100644
-> > --- a/drivers/gpio/gpio-merrifield.c
-> > +++ b/drivers/gpio/gpio-merrifield.c
-> > @@ -78,24 +78,24 @@ static int mrfld_gpio_probe(struct pci_dev
-> > *pdev, const struct pci_device_id *id
-> > =C2=A0	if (retval)
-> > =C2=A0		return retval;
-> > =C2=A0
-> > -	retval =3D pcim_iomap_regions(pdev, BIT(1) | BIT(0),
-> > pci_name(pdev));
-> > -	if (retval)
-> > -		return dev_err_probe(dev, retval, "I/O memory
-> > mapping error\n");
-> > -
-> > -	base =3D pcim_iomap_table(pdev)[1];
-> > +	base =3D pcim_iomap_region(pdev, 1, pci_name(pdev));
-> > +	if (IS_ERR(base))
-> > +		return dev_err_probe(dev, PTR_ERR(base), "I/O
-> > memory mapping error\n");
-> > =C2=A0
-> > =C2=A0	irq_base =3D readl(base + 0 * sizeof(u32));
-> > =C2=A0	gpio_base =3D readl(base + 1 * sizeof(u32));
-> > =C2=A0
-> > =C2=A0	/* Release the IO mapping, since we already get the info
-> > from BAR1 */
-> > -	pcim_iounmap_regions(pdev, BIT(1));
-> > +	pcim_iounmap_region(pdev, 1);
-> > =C2=A0
-> > =C2=A0	priv =3D devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-> > =C2=A0	if (!priv)
-> > =C2=A0		return -ENOMEM;
-> > =C2=A0
-> > =C2=A0	priv->dev =3D dev;
-> > -	priv->reg_base =3D pcim_iomap_table(pdev)[0];
-> > +	priv->reg_base =3D pcim_iomap_region(pdev, 0,
-> > pci_name(pdev));
-> > +	if (IS_ERR(priv->reg_base))
-> > +		return dev_err_probe(dev, PTR_ERR(base), "I/O
-> > memory mapping error\n");
->=20
-> Hi Philipp,
->=20
-> There seems to be a mismatch in the use of priv->reg_base and base
-> above.
-> Should the above use PTR_ERR(priv->reg_base) instead of
-> PTR_ERR(base)?
+Vincent Chen <vincent.chen@sifive.com> writes:
+> I occasionally encountered this NBD error on the Linux 6.9.0-rc7
+> (commit hash: dd5a440a31fae) arm64 kernel when I executed the
+> stress-ng HDD test on NBD.
+>
+> [...]
+>
+> [  196.497492] block nbd0: Unexpected reply (15) 000000009c07859b
+> [  196.539765] block nbd0: Dead connection, failed to find a fallback
+> [  196.540442] block nbd0: shutting down sockets
 
-uff, yes, good catch!
-Will fix, thx
+Unfortunately, I can confirm this and the other "Double reply on req"
+bugs and pretty reliably reproduce them among a variety of different
+configurations and devices, such as
 
-P.
+- an AMD64 VM running a vanilla 6.12-rc3+1 6485cf5ea253 ("Merge tag
+  'hid-for-linus-2024101301'") with the Fedora 40 kernel config,
 
->=20
-> > =C2=A0
-> > =C2=A0	priv->pin_info.pin_ranges =3D mrfld_gpio_ranges;
-> > =C2=A0	priv->pin_info.nranges =3D ARRAY_SIZE(mrfld_gpio_ranges);
-> > --=20
-> > 2.46.2
-> >=20
-> >=20
->=20
+- and a Raspberry Pi running its vendor kernel (6.6.51+rpt-rpi-2712 #1
+  SMP PREEMPT Debian 1:6.6.51-1+rpt3 (2024-10-08) aarch64).
 
+I'm testing these NBD clients against both the nbd-server package
+(3.26.1) and QEMU's qemu-nbd (v8.2.2).
+
+Key to reproducing this issue seems to be high CPU load caused by the
+NBD / filesystem / networking stack (so, running on a high-bandwidth
+connection with a server that can keep up), as well as an SMP system (I
+am testing with 4 cores on both AMD64 and aarch64 platforms).
+
+To pinpoint the issue, I enabled the `nbd_send_request`,
+`nbd_header_sent` and `nbd_header_received` tracepoints while triggering
+the following bug:
+
+    [    0.000000] Linux version 6.12.0-rc3-nbddebug+ (root@treadmill-nbd-debug-4) (gcc (GCC) 14.2.1 20240912 (Red Hat 14.2.1-3), GNU ld version 2.41-37.fc40) #1 SMP PREEMPT_DYNAMIC Mon Oct 14 01:07:12 UTC 2024
+    [    0.000000] Command line: BOOT_IMAGE=(hd0,gpt1)/boot/vmlinuz-6.12.0-rc3-nbddebug+ root=UUID=944ab680-e1ab-49d7-a580-dfce30985180 ro consoleblank=0 systemd.show_status=true crashkernel=auto no_timer_check console=tty1 console=ttyS0,115200n8
+
+    [  +0.011557] EXT4-fs (nbd0): mounted filesystem 8998d2ee-2045-4708-bb3a-0fff335c437f r/w with ordered data mode. Quota mode: none.
+    [Oct14 02:36] block nbd0: Double reply on req 0000000015334b0a, cmd_cookie 193, handle cookie 187
+    [  +0.004639] block nbd0: Dead connection, failed to find a fallback
+
+Looking at the reversed trace file, we can see the offending header with
+cookie 187 == 0xbb:
+
+    kworker/u17:0-121     [000] .....   103.672786: nbd_header_received: nbd transport event: request 0000000015334b0a, handle 0x000000bb00000042
+
+However, some 11 events back, we can see that this request object was
+just sent with a different NBD handle/cookie:
+
+    stress-ng-hdd-1119    [000] .....   103.668096: nbd_header_sent: nbd transport event: request 0000000015334b0a, handle 0x000000c100000059
+    stress-ng-hdd-1119    [000] .....   103.668084: nbd_send_request: nbd0: request 0000000015334b0a
+
+This new NBD handle (0x000000c100000059) never appears in the trace
+file, perhaps because the socket was closed before it could be received.
+
+However, the exact handle of the offending NBD request was sent 49
+events before it was received again:
+
+    stress-ng-hdd-1120    [002] .....   103.647257: nbd_header_sent: nbd transport event: request 00000000ae03f314, handle 0x000000bb00000042
+    stress-ng-hdd-1120    [002] .....   103.647244: nbd_send_request: nbd0: request 00000000ae03f314
+
+In fact, all other requests in the trace have almost exactly 50 trace
+events between them being sent and received again. From this I conclude
+that it is mostly likely that the handle of the _received_ offending
+reply (103.672786) is indeed correct (0x000000bb00000042) and
+corresponds to the request 103.647244 (latency works out), but it is
+mapped onto an entirely wrong request object (0000000015334b0a), or onto
+a non-existent request object in the case of a "Unexpected request"
+error. Could it be that sometimes a request is prematurely marked as
+completed such that the queue tag gets reused?
+
+I tried a packet capture to confirm that the trace outputs do not
+diverge from what is sent on the wire, but my capture node could not
+keep up with the amount of traffic. Reducing bandwidth makes it harder
+to trigger a "Double reply" error in favor of "Unexpected reply" errors,
+which are more tricky to correlate with traffic. These missed packets
+cause Wireshark's protocol analyzer to choke on the pcap.
+
+All in all, this smells like a race condition around the NBD blk_mq
+management code / nbd_handle_reply function to me. I tried to trace
+through this code, but I am not familiar with the locking semantics and
+conventions of this subsystem. Unfortunately, KCSAN did not yield any
+promising findings (apart from a bunch of virtqueue and other
+filesystem-related races).
+
+I will try to investigate this further over the coming days. If anyone
+has advice on how to best debug these issues, that would be appreciated!
+
+-Leon
