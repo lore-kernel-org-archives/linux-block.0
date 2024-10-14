@@ -1,331 +1,258 @@
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDABC1BC58
-	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 09:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D16219D081
+	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 09:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728896497; cv=none; b=V0mXiLcKcTwY6Pk14f4FmuUFObl1OyZFbn4Xa9q9QwfLYQiNAwd+WqeXbIRmnNHDZ3NmoeCZUfM0UjMmWUDzwi/Mjhus8PlfVQIO8PmJkQUbeGk7vIBzJWO3yJoqfpmvZyfx6JBLks6aSiPK2L0FGPvwSZBFlK6VJRgBqeEkebs=
+	t=1728896912; cv=none; b=t+uYkr7fKAR3T/yLkB/H7rD/+44rKWIa+IWnAW+pvgtXrgVGN9VlrhePfRswcEx0+Sfb4TXpPYNFzharQHO94qAnWLPpMPlSoTguEBMDPltgqeyuO4pA5uLmPJXhq6dv4WzdrgLPiqQpvj0UdGmWLzU5KT5+YGpOfhYLuHRhYa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728896497; c=relaxed/simple;
-	bh=x9c6NlC7YTfuH6bqxUddC5RvTCVLKjWeg8XXLM9vV30=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bb/0wRt9Bhg1Ho73iob+NkDGPrFplKesxesTgunOvW8PVYLmYMwcJoDOWW7uPNFOzLWf9igJcWglMZWAJ9UNcbTpug0cetTaK8Ye4gEibq4OeqrXyMB8uQsR5DD/XPTK6ZNd4RC729ayp2HtM1TnkjNT2DdH8+KiEY+yunefxIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fBuGJXRl; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1728896912; c=relaxed/simple;
+	bh=I7k382vBQLqWgAZva9nJuw/OydYDSBL+SsP2DwlHAKM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:Content-Type:
+	 MIME-Version:References; b=fKcg9XJALZecEaMcxpsT1jetx0eEsiii8+MXRt85UwjqV+mLnQduBgqRgEF2CPXA/FHHJnZ2qqmxvTX3mwrznzVJ+nUS8A8g6UKcIYB/BlJ/RTOFmrJUyERIkTwbhSRWqhkD7oWNdE4wHXNzE4EwV8PFHTx9EvfXXEAE3Bc/PzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=qOdKVBJC; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fBuGJXRl"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1728896486; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=LuoGDYsPXj8p8f4XfuUqpXhQFNhBY0HBX7WSPxJ6GZA=;
-	b=fBuGJXRljJJYXH/m9BT1etXbbGYgZCSAabL7GNC0VEQaPEZZcxBK6hxvkXazLRIS8mRP7T1eKwhAJEKg95piy6LiwXS6bxOf54iov6gazyAl7ijg1T1O1RpuUZV1yx1bN7An+PRU0gvxtxcnQODDnfJxkRAuLIw6TRJj61YnnAM=
-Received: from localhost(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0WH3l89b_1728896481 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 14 Oct 2024 17:01:26 +0800
-From: Guixin Liu <kanie@linux.alibaba.com>
-To: shinichiro.kawasaki@wdc.com,
-	dwagner@suse.de,
-	chaitanyak@nvidia.com
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH blktests v4 1/2] nvme/{md/001,rc,002,016,017,030,052}: introduce --resv_enable argument
-Date: Mon, 14 Oct 2024 17:01:15 +0800
-Message-ID: <20241014090116.125500-2-kanie@linux.alibaba.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241014090116.125500-1-kanie@linux.alibaba.com>
-References: <20241014090116.125500-1-kanie@linux.alibaba.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="qOdKVBJC"
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20241014090827euoutp02918a2aa8cbcda5570ffa963f21edee09~_RpOwc8ze0621706217euoutp02W
+	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 09:08:27 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20241014090827euoutp02918a2aa8cbcda5570ffa963f21edee09~_RpOwc8ze0621706217euoutp02W
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1728896907;
+	bh=z3B/ennZQ25BkssBjHXIYaI5QeMwto4rU9yLnRu2n6E=;
+	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+	b=qOdKVBJCKFK4ROrAIb9NjIlAtiBWfL/MZNnLD1URm00M9GCbx97/qxcpBXhg3gt1q
+	 qfKVRjEuPAYb1wQdWEsWn6aMB2HsabfeULcYlHDVYdGTn/m1xt0Q2srA5lQOY4FVmt
+	 3fL0BzvFIg1mdB4AzHmD6fVJqsVVQbaYmTutiTBg=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20241014090826eucas1p1122e756848ed71ce9e01d7e4de9033a7~_RpOPwIyc0836108361eucas1p1m;
+	Mon, 14 Oct 2024 09:08:26 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+	eusmges3new.samsung.com (EUCPMTA) with SMTP id 70.B8.09620.A8FDC076; Mon, 14
+	Oct 2024 10:08:26 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20241014090826eucas1p20a1b983ba65066f2970d11ae6e5518c5~_RpNzgGIy1059610596eucas1p2Z;
+	Mon, 14 Oct 2024 09:08:26 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20241014090826eusmtrp1637a132b47c5a85d29f95a5a6d9140c0~_RpNyq1AR1839218392eusmtrp1J;
+	Mon, 14 Oct 2024 09:08:26 +0000 (GMT)
+X-AuditID: cbfec7f5-d1bff70000002594-8f-670cdf8a7777
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms2.samsung.com (EUCPMTA) with SMTP id 19.1D.19096.98FDC076; Mon, 14
+	Oct 2024 10:08:25 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20241014090825eusmtip1835d4a520fbab01b407256736ee0de53~_RpNm0_zd1645016450eusmtip1X;
+	Mon, 14 Oct 2024 09:08:25 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) by
+	CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) with Microsoft SMTP
+	Server (TLS) id 15.0.1497.2; Mon, 14 Oct 2024 10:08:25 +0100
+Received: from CAMSVWEXC02.scsc.local ([::1]) by CAMSVWEXC02.scsc.local
+	([fe80::3c08:6c51:fa0a:6384%13]) with mapi id 15.00.1497.012; Mon, 14 Oct
+	2024 10:08:24 +0100
+From: Javier Gonzalez <javier.gonz@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+CC: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, "Martin
+ K. Petersen" <martin.petersen@oracle.com>, Kanchan Joshi
+	<joshi.k@samsung.com>, "hare@suse.de" <hare@suse.de>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "brauner@kernel.org" <brauner@kernel.org>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "jack@suse.cz"
+	<jack@suse.cz>, "jaegeuk@kernel.org" <jaegeuk@kernel.org>, "bcrl@kvack.org"
+	<bcrl@kvack.org>, "dhowells@redhat.com" <dhowells@redhat.com>,
+	"bvanassche@acm.org" <bvanassche@acm.org>, "asml.silence@gmail.com"
+	<asml.silence@gmail.com>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "io-uring@vger.kernel.org"
+	<io-uring@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>, "vishak.g@samsung.com"
+	<vishak.g@samsung.com>
+Subject: RE: [PATCH v7 0/3] FDP and per-io hints
+Thread-Topic: [PATCH v7 0/3] FDP and per-io hints
+Thread-Index: AQHbG7xJFahlOOmkRUWBz3B/P2gFpLKBuCIAgAQCOYCAABtsUP///IcAgAAiAcA=
+Date: Mon, 14 Oct 2024 09:08:24 +0000
+Message-ID: <9e3792eebf7f427db7c466374972fb99@CAMSVWEXC02.scsc.local>
+In-Reply-To: <20241014074708.GA22575@lst.de>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupgk+LIzCtJLcpLzFFi42LZduzned2u+zzpBp++SFvMWbWN0WL13X42
+	i65/W1gsXh/+xGgx7cNPZot3Tb9ZLPYsmsRksXL1USaLd63nWCxmT29msniyfhazxaRD1xgt
+	pkxrYrTYe0vbYs/ekywW85c9ZbdYfvwfk8W61+9ZLM7/Pc7qIOxx+Yq3x85Zd9k9zt/byOJx
+	+Wypx6ZVnWwemz5NYvfYvKTeY/fNBjaPj09vsXi833eVzePMgiNA8dPVHp83yXlsevKWKYAv
+	issmJTUnsyy1SN8ugStj4dKPLAUPVCp2rPnG3sC4SLaLkZNDQsBE4sfDJcxdjFwcQgIrGCXe
+	TZnGBuF8YZSY/+YiVOYzo8S8NwtYYFqWnnnCCJFYDlR1ZwoLXNXiSb1QmTOMEgtWnYHqX8ko
+	8elrFxtIP5uAvsSq7acYQWwRASWJp6/OgnUwC1xjlzjYc4YJJCEsYCDRvGQfVJGhxLtlC6Fs
+	P4mf336BHcIioCrxZu4UdhCbV8BVouXMN7A4p4COxLIFJ8HmMArISjxa+QushllAXOLWk/lM
+	EE8ISiyavYcZwhaT+LfrIRuEbSCxdek+qEcVJfrmv2eB6NWRWLD7ExuErS2xbOFrZoi9ghIn
+	Zz4B+19C4CSXxJf5j9ghml0kZv67DmULS7w6vgXKlpE4PbkHakG1RMPJE0wTGLVmIblvFpJ9
+	s5Dsm4Vk3wJGllWM4qmlxbnpqcXGeanlesWJucWleel6yfm5mxiBifX0v+NfdzCuePVR7xAj
+	EwfjIUYJDmYlEd73UznThXhTEiurUovy44tKc1KLDzFKc7AoifOqpsinCgmkJ5akZqemFqQW
+	wWSZODilGphqQ1Q+LPbgq+m7KHbI4Vv3+YR17W6Mp6z3rhQJPP7Haf+kk5rHHsYtkQpdoJiQ
+	PlP48VbzqmX6666tbXpZ0P/kYfujDdE7Ugtmhv/co/KJudt3q/PZuhet5e9Zbe63vIzW1frM
+	fcbW23DNHolDe6ayMMpdFZTRnKvRxz8l80+597aecuVlUmXRB90V+RwOsx0/Lp57VqJedu9L
+	NrWr6fqbfTbN1+GXvCPJUXjZnvtrTw5vbmCX0M1tfSovNs1+xDj3s4bD1a7fafaHecrn77ao
+	kf92c1XVgyVLT6woe72hTonf6J5v0oXHifF8844lHVCsNRM8pcrW+3T6X4Ui9h6O1HCjnAL7
+	S3w3dl09kaXEUpyRaKjFXFScCACFqAVQGwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrOKsWRmVeSWpSXmKPExsVy+t/xu7qd93nSDR5Os7GYs2obo8Xqu/1s
+	Fl3/trBYvD78idFi2oefzBbvmn6zWOxZNInJYuXqo0wW71rPsVjMnt7MZPFk/Sxmi0mHrjFa
+	TJnWxGix95a2xZ69J1ks5i97ym6x/Pg/Jot1r9+zWJz/e5zVQdjj8hVvj52z7rJ7nL+3kcXj
+	8tlSj02rOtk8Nn2axO6xeUm9x+6bDWweH5/eYvF4v+8qm8eZBUeA4qerPT5vkvPY9OQtUwBf
+	lJ5NUX5pSapCRn5xia1StKGFkZ6hpYWekYmlnqGxeayVkamSvp1NSmpOZllqkb5dgl7GwqUf
+	WQoeqFTsWPONvYFxkWwXIyeHhICJxNIzTxi7GLk4hASWMkr8+drCBJGQkdj45SorhC0s8eda
+	FxtE0UdGidPHLzKCJIQEzjBKbL0TApFYySix+McDNpAEm4C+xKrtp8CKRASUJJ6+Ogu2glng
+	CrtE86LnYAlhAQOJ5iX7oIoMJd4tWwhl+0n8/PaLBcRmEVCVeDN3CjuIzSvgKtFy5hsLxLZf
+	zBIb1lwGa+AU0JFYtuAk2N2MArISj1b+AmtgFhCXuPVkPtQ/AhJL9pxnhrBFJV4+/gf1m4HE
+	1qX7WCBsRYm++e9ZIHp1JBbs/sQGYWtLLFv4mhniCEGJkzOfsExglJqFZMUsJC2zkLTMQtKy
+	gJFlFaNIamlxbnpusZFecWJucWleul5yfu4mRmAK3Hbs55YdjCtffdQ7xMjEwXiIUYKDWUmE
+	9/1UznQh3pTEyqrUovz4otKc1OJDjKbAgJnILCWanA9Mwnkl8YZmBqaGJmaWBqaWZsZK4rxs
+	V86nCQmkJ5akZqemFqQWwfQxcXBKNTD5HcjP5Z8t3Ten+GZ9vAWD98qcjtdRaYGJJttEDxx9
+	cvL0lfnMhe4Bv4JCG4sK46wOXuaaHtqisUp3w0vBKof5Ze28K9LmH2T70CbaN1PYq7tLvHZn
+	xtXsp1Fx1dv8ZcWdlV5eWtIo9ma9/aRPzhmtKuvDuJ9NOThb72J1x/a7Ow0D0v98X/0gxd2o
+	c/+PYtuHC1j3RRRMT96b/9rjyW7HHUKnlniGumuz3vp2PimpI3/25ORq6QfNB+SOLJvVt2qD
+	jmPJn8ZIP4PksnMcMdtvGjr8UfnPsrb5cLPUWTch7VZuNhlTf/WJ4fWs2foSYosu80pIztn+
+	RXLTrdmXchet7V7qo5LJ/kBp907d9UosxRmJhlrMRcWJAMKylzUKBAAA
+X-CMS-MailID: 20241014090826eucas1p20a1b983ba65066f2970d11ae6e5518c5
+X-Msg-Generator: CA
+X-RootMTR: 20241010070738eucas1p2057209e5f669f37ca586ad4a619289ed
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20241010070738eucas1p2057209e5f669f37ca586ad4a619289ed
+References: <20241009092828.GA18118@lst.de> <Zwab8WDgdqwhadlE@kbusch-mbp>
+	<CGME20241010070738eucas1p2057209e5f669f37ca586ad4a619289ed@eucas1p2.samsung.com>
+	<20241010070736.de32zgad4qmfohhe@ArmHalley.local>
+	<20241010091333.GB9287@lst.de>
+	<20241010115914.eokdnq2cmcvwoeis@ArmHalley.local>
+	<20241011090224.GC4039@lst.de>
+	<5e9f7f1c-48fd-477f-b4ba-c94e6b50b56f@kernel.dk>
+	<20241014062125.GA21033@lst.de>
+	<34d3ad68068f4f87bf0a61ea8fb8f217@CAMSVWEXC02.scsc.local>
+	<20241014074708.GA22575@lst.de>
 
-Add an optional argument --resv_enable to _nvmet_target_setup() and
-propagate it to _create_nvmet_subsystem() and _create_nvmet_ns().
+> -----Original Message-----
+> From: Christoph Hellwig <hch@lst.de>
+> Sent: Monday, October 14, 2024 9:47 AM
+> To: Javier Gonzalez <javier.gonz@samsung.com>
+> Cc: Christoph Hellwig <hch@lst.de>; Jens Axboe <axboe@kernel.dk>; Keith B=
+usch
+> <kbusch@kernel.org>; Martin K. Petersen <martin.petersen@oracle.com>; Kan=
+chan
+> Joshi <joshi.k@samsung.com>; hare@suse.de; sagi@grimberg.me;
+> brauner@kernel.org; viro@zeniv.linux.org.uk; jack@suse.cz; jaegeuk@kernel=
+.org;
+> bcrl@kvack.org; dhowells@redhat.com; bvanassche@acm.org;
+> asml.silence@gmail.com; linux-nvme@lists.infradead.org; linux-
+> fsdevel@vger.kernel.org; io-uring@vger.kernel.org; linux-block@vger.kerne=
+l.org;
+> linux-aio@kvack.org; gost.dev@samsung.com; vishak.g@samsung.com
+> Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+>=20
+> On Mon, Oct 14, 2024 at 07:02:11AM +0000, Javier Gonzalez wrote:
+> > > And exactly that is the problem.  For file systems we can't support
+> > > that sanely.  So IFF you absolutely want the per-I/O hints we need
+> > > an opt in by the file operations.  I've said that at least twice
+> > > in this discussion before, but as everyone likes to have political
+> > > discussions instead of technical ones no one replied to that.
+> >
+> > Is it a way forward to add this in a new spin of the series - keeping t=
+he
+> > temperature mapping on the NVMe side?
+>=20
+> What do you gain from that?  NVMe does not understand data temperatures,
+> so why make up that claim? =20
 
-One can call functions with --resv_enable to enable reservation
-feature on a specific namespace.
+I expressed this a couple of times in this thread. It is no problem to map =
+temperatures
+to a protocol that does not understand the semantics. It is not perfect, an=
+d in time
+I agree that we would benefit from exposing the raw hints without semantics=
+ from
+Block layer upwards.
 
-And also make _create_nvmet_ns and _create_nvmet_subsystem to parse
-for arguments, this makes these functions more flexible to use.
+But the temperatures are already there. We are not adding anything new. And=
+ thanks
+to this, we can enable existing users with _minimal_ changes to user-space.=
+ As pointed
+on the XFS zoned discussions, this is very similar to what you guys are doi=
+ng (exactly to
+re-use what it is already there), and it works. On top of this,  applicatio=
+ns that already
+understand temperatures (e.g., RocksDB) will be able to leverage FDP SSDs w=
+ithout changes.
 
-Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Daniel Wagner <dwagner@suse.de>
----
- common/nvme    | 89 ++++++++++++++++++++++++++++++++++++++++++--------
- tests/md/001   |  4 ++-
- tests/nvme/002 |  3 +-
- tests/nvme/016 |  7 ++--
- tests/nvme/017 | 10 +++---
- tests/nvme/030 |  6 ++--
- tests/nvme/052 |  5 ++-
- tests/nvme/rc  | 11 +++++--
- 8 files changed, 109 insertions(+), 26 deletions(-)
+> Especially as it directly undermindes any file system work to actually ma=
+ke use of it.
 
-diff --git a/common/nvme b/common/nvme
-index 9e78f3e..c1aa8d6 100644
---- a/common/nvme
-+++ b/common/nvme
-@@ -452,32 +452,95 @@ _remove_nvmet_port() {
- }
- 
- _create_nvmet_ns() {
--	local nvmet_subsystem="$1"
--	local nsid="$2"
--	local blkdev="$3"
-+	local nvmet_subsystem=""
-+	local nsid=""
-+	local blkdev=""
- 	local uuid="00000000-0000-0000-0000-000000000000"
--	local subsys_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
--	local ns_path="${subsys_path}/namespaces/${nsid}"
-+	local subsys_path=""
-+	local ns_path=""
-+	local resv_enable=false
- 
--	if [[ $# -eq 4 ]]; then
--		uuid="$4"
--	fi
-+	while [[ $# -gt 0 ]]; do
-+		case $1 in
-+			--subsysnqn)
-+				nvmet_subsystem="$2"
-+				shift 2
-+				;;
-+			--nsid)
-+				nsid="$2"
-+				shift 2
-+				;;
-+			--blkdev)
-+				blkdev="$2"
-+				shift 2
-+				;;
-+			--uuid)
-+				uuid="$2"
-+				shift 2
-+				;;
-+			--resv_enable)
-+				resv_enable=true
-+				shift 1
-+				;;
-+			*)
-+				echo "WARNING: unknown argument: $1"
-+				shift
-+				;;
-+		esac
-+	done
-+
-+	subsys_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
-+	ns_path="${subsys_path}/namespaces/${nsid}"
- 
- 	mkdir "${ns_path}"
- 	printf "%s" "${blkdev}" > "${ns_path}/device_path"
- 	printf "%s" "${uuid}" > "${ns_path}/device_uuid"
-+	if [[ -f "${ns_path}/resv_enable" && "${resv_enable}" = true ]] ; then
-+		printf 1 > "${ns_path}/resv_enable"
-+	fi
- 	printf 1 > "${ns_path}/enable"
- }
- 
- _create_nvmet_subsystem() {
--	local nvmet_subsystem="$1"
--	local blkdev="$2"
--	local uuid=$3
--	local cfs_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
-+	local nvmet_subsystem=""
-+	local blkdev=""
-+	local uuid="00000000-0000-0000-0000-000000000000"
-+	local resv_enable=""
-+	local cfs_path=""
-+
-+	while [[ $# -gt 0 ]]; do
-+		case $1 in
-+			--subsysnqn)
-+				nvmet_subsystem="$2"
-+				shift 2
-+				;;
-+			--blkdev)
-+				blkdev="$2"
-+				shift 2
-+				;;
-+			--uuid)
-+				uuid="$2"
-+				shift 2
-+				;;
-+			--resv_enable)
-+				resv_enable="--resv_enable";
-+				shift 1
-+				;;
-+			*)
-+				echo "WARNING: unknown argument: $1"
-+				shift
-+				;;
-+		esac
-+	done
- 
-+	cfs_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
- 	mkdir -p "${cfs_path}"
- 	echo 0 > "${cfs_path}/attr_allow_any_host"
--	_create_nvmet_ns "${nvmet_subsystem}" "1" "${blkdev}" "${uuid}"
-+	_create_nvmet_ns --subsysnqn "${nvmet_subsystem}" \
-+			 --nsid "1" \
-+			 --blkdev "${blkdev}" \
-+			 --uuid "${uuid}" \
-+			 ${resv_enable}
- }
- 
- _add_nvmet_allow_hosts() {
-diff --git a/tests/md/001 b/tests/md/001
-index 27df7b3..98da51d 100755
---- a/tests/md/001
-+++ b/tests/md/001
-@@ -52,7 +52,9 @@ setup_nvme_over_tcp() {
- 	local port
- 	port="$(_create_nvmet_port "${nvme_trtype}")"
- 
--	_create_nvmet_subsystem "${def_subsysnqn}" "/dev/mapper/ram0_big_optio" "${def_subsys_uuid}"
-+	_create_nvmet_subsystem --subsysnqn "${def_subsysnqn}" \
-+				--blkdev "/dev/mapper/ram0_big_optio" \
-+				--uuid "${def_subsys_uuid}"
- 	_add_nvmet_subsys_to_port "${port}" "${def_subsysnqn}"
- 
- 	_create_nvmet_host "${def_subsysnqn}" "${def_hostnqn}"
-diff --git a/tests/nvme/002 b/tests/nvme/002
-index f613c78..043ab1c 100755
---- a/tests/nvme/002
-+++ b/tests/nvme/002
-@@ -34,7 +34,8 @@ test() {
- 	local genctr=1
- 
- 	for ((i = 0; i < iterations; i++)); do
--		_create_nvmet_subsystem "blktests-subsystem-$i" "${loop_dev}"
-+		_create_nvmet_subsystem --subsysnqn "blktests-subsystem-$i" \
-+					--blkdev "${loop_dev}"
- 		_add_nvmet_subsys_to_port "${port}" "blktests-subsystem-$i"
- 	done
- 
-diff --git a/tests/nvme/016 b/tests/nvme/016
-index d1fdb35..1143cab 100755
---- a/tests/nvme/016
-+++ b/tests/nvme/016
-@@ -29,10 +29,13 @@ test() {
- 	loop_dev="$(losetup -f)"
- 	local genctr=1
- 
--	_create_nvmet_subsystem "${def_subsysnqn}" "${loop_dev}"
-+	_create_nvmet_subsystem --subsysnqn "${def_subsysnqn}" \
-+				--blkdev "${loop_dev}"
- 
- 	for ((i = 2; i <= iterations; i++)); do
--		_create_nvmet_ns "${def_subsysnqn}" "${i}" "${loop_dev}"
-+		_create_nvmet_ns --subsysnqn "${def_subsysnqn}" \
-+				 --nsid "${i}" \
-+				 --blkdev "${loop_dev}"
- 	done
- 
- 	port="$(_create_nvmet_port "${nvme_trtype}")"
-diff --git a/tests/nvme/017 b/tests/nvme/017
-index 114be60..5721000 100755
---- a/tests/nvme/017
-+++ b/tests/nvme/017
-@@ -29,12 +29,14 @@ test() {
- 
- 	local genctr=1
- 
--	_create_nvmet_subsystem "${def_subsysnqn}" "$(_nvme_def_file_path)" \
--		"${def_subsys_uuid}"
-+	_create_nvmet_subsystem --subsysnqn "${def_subsysnqn}" \
-+				--blkdev "$(_nvme_def_file_path)" \
-+				--uuid "${def_subsys_uuid}"
- 
- 	for ((i = 2; i <= iterations; i++)); do
--		_create_nvmet_ns "${def_subsysnqn}" "${i}" \
--				 "$(_nvme_def_file_path)"
-+		_create_nvmet_ns --subsysnqn "${def_subsysnqn}" \
-+				 --nsid "${i}" \
-+				 --blkdev "$(_nvme_def_file_path)"
- 	done
- 
- 	port="$(_create_nvmet_port "${nvme_trtype}")"
-diff --git a/tests/nvme/030 b/tests/nvme/030
-index b1ed8bc..5db20c0 100755
---- a/tests/nvme/030
-+++ b/tests/nvme/030
-@@ -30,13 +30,15 @@ test() {
- 
- 	port="$(_create_nvmet_port "${nvme_trtype}")"
- 
--	_create_nvmet_subsystem "${subsys}1" "$(losetup -f)"
-+	_create_nvmet_subsystem --subsysnqn "${subsys}1" \
-+				--blkdev "$(losetup -f)"
- 	_add_nvmet_subsys_to_port "${port}" "${subsys}1"
- 	_create_nvmet_host "${subsys}1" "${def_hostnqn}"
- 
- 	genctr=$(_discovery_genctr)
- 
--	_create_nvmet_subsystem "${subsys}2" "$(losetup -f)"
-+	_create_nvmet_subsystem --subsysnqn "${subsys}2" \
-+				--blkdev "$(losetup -f)"
- 	_add_nvmet_subsys_to_port "${port}" "${subsys}2"
- 
- 	genctr=$(_check_genctr "${genctr}" "adding a subsystem to a port")
-diff --git a/tests/nvme/052 b/tests/nvme/052
-index 401f043..1dcda23 100755
---- a/tests/nvme/052
-+++ b/tests/nvme/052
-@@ -64,7 +64,10 @@ test() {
- 		truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path).$i"
- 		uuid="$(uuidgen -r)"
- 
--		_create_nvmet_ns "${def_subsysnqn}" "${i}" "$(_nvme_def_file_path).$i" "${uuid}"
-+		_create_nvmet_ns --subsysnqn "${def_subsysnqn}" \
-+				--nsid "${i}" \
-+				--blkdev "$(_nvme_def_file_path).$i" \
-+				--uuid "${uuid}"
- 
- 		# wait until async request is processed and ns is created
- 		if ! nvmf_wait_for_ns "${uuid}" created; then
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 671012e..357cab9 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -324,6 +324,7 @@ _nvmet_target_setup() {
- 	local subsysnqn="${def_subsysnqn}"
- 	local subsys_uuid="${def_subsys_uuid}"
- 	local port
-+	local resv_enable=""
- 
- 	while [[ $# -gt 0 ]]; do
- 		case $1 in
-@@ -347,6 +348,10 @@ _nvmet_target_setup() {
- 				subsys_uuid="$2"
- 				shift 2
- 				;;
-+			--resv_enable)
-+				resv_enable="--resv_enable"
-+				shift 1
-+				;;
- 			*)
- 				echo "WARNING: unknown argument: $1"
- 				shift
-@@ -361,8 +366,10 @@ _nvmet_target_setup() {
- 		blkdev="$(_nvme_def_file_path)"
- 	fi
- 
--	_create_nvmet_subsystem "${subsysnqn}" "${blkdev}" \
--				"${subsys_uuid}"
-+	_create_nvmet_subsystem --subsysnqn "${subsysnqn}" \
-+				--blkdev "${blkdev}" \
-+				--uuid "${subsys_uuid}" \
-+				${resv_enable}
- 	port="$(_create_nvmet_port "${nvme_trtype}")"
- 	_add_nvmet_subsys_to_port "${port}" "${subsysnqn}"
- 	_create_nvmet_host "${subsysnqn}" "${def_hostnqn}" \
--- 
-2.43.0
+I do not think it does. If a FS wants to use the temperatures, then they wo=
+uld be able to leverage
+FDP besides SCSI. And if we come up with a better interface later on, we ca=
+n make the changes then.
+I really do not see the issue. If we were adding a temperature abstraction =
+now, I would agree with
+You that we would need to cover the use-case you mention for FSs from the b=
+eginning, but this
+Is already here. Seems like a fair compromise to support current users.
+
+
+>=20
+> > If not, what would be acceptable for a first version, before getting in=
+to adding
+> > a new interface to expose agnostic hints?
+>=20
+> Just iterate on Kanchan's series for a block layer (and possible user lev=
+el,
+> but that's less urgent) interface for stream separation?
+
+We can work on this later, but it is not that easy. Look at the mail I forw=
+arded=20
+Form Christian. We now can store hints in the same structure as the tempera=
+tures.=20
+I believe that we would be able to support 128 hints. If we are serious abo=
+ut supporting=20
+hints as a general interface, 128 hints is not nearly enough. Moreover:
+
+  - How do we convince VFS folks to give us more space for hints at this po=
+int?
+  - How do we make agnostic hints and temperature co-exist? Do we use a bit=
+ to select=20
+     and create a protocol? This seems over-complicated
+  - When we are exposing general hints to the block layer, how do we suppor=
+t N:N=20
+     FS:Block_Devices? and DMs? This is not obvious, and it goes well beyon=
+d what we
+     need today, but we probably need to think about it.
+=20
+And these are just questions that we know. You see that this is a big lift =
+(which we=20
+can work together on!), but will delay current users by months. And honestl=
+y, I do
+not feel comfortable doing this alone; we need application and  FS folks li=
+ke you to=20
+help guide this so that it is really usable.
+
+I say it again: Your idea about properly supporting hints in FS is good, an=
+d I think we should
+work on it. But I do not believe that the current patches (with added thing=
+s like opt in file ops)=20
+get in the way of this.  So if the disagreement is if these patches are har=
+mful, let's talk about=20
+this explicitly and try to agree; we do not need to go over the need for a =
+new hint interface.=20
+We already agree on this.
 
