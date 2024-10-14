@@ -1,109 +1,79 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8F329CA
-	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 16:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BECE1C7265;
+	Mon, 14 Oct 2024 18:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728924333; cv=none; b=A6ZavpnbLhnjR9o2ncysBNp63+xmebcGyc2MItizjsg8ynJm10ngy65A4/uGhUsCN31/DQbki6S6NlzMhGUaRdeQ3O9BC2GWKuDQKyCKeb4Mxei27sjqpSk8fk7KjtZ1lSAzoROiqMw5DCfFM4r2P+bbBI3/nXlaXnDEyTuxE3A=
+	t=1728929370; cv=none; b=CFZLqZhQzlg0VRkFu5Knn8Giedr8BsMeomNzeCOeaSiCvWzVXIZjxvtIpTnvqfcHHcShJBzarRRmu6IDmzV3sPp5/ZVa7/WIA7eFqgsAPUMt2M5+g6naiRipcjrrKAojvcUXNdJJdRpR7YqMUCEGei90CoTPr8bErj9dVG8W5S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728924333; c=relaxed/simple;
-	bh=grYIK9osXBs31UEgg648AG6dUiZ52FwAEW7cDwHQwzw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E7O80zagGqnMT3Yh+A4MaFsxaxcQntUc3WwjNWPJ/JEUMjlCm7QdFpeYtcytHVq3eyW5gWwR0hOlotzdPmym0R38FAD6MjafRFGzT8/xy5wqTEB+cADUQ8KnaGu9s97fBNAujz3Vbj+e9aty+BtAjJLI2Wiz1liPvPebMOQwudA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=RIiMmsoa; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="RIiMmsoa"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43120f65540so22253245e9.0
-        for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 09:45:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1728924330; x=1729529130; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=grYIK9osXBs31UEgg648AG6dUiZ52FwAEW7cDwHQwzw=;
-        b=RIiMmsoaGd4GeTwcwej3z4C8tfNkZ/xd9ywOTT0+xU6wyATZhB/ymXky30bnetAAXe
-         gEjW/wkZoRiCAGlGsSeRX3yLSc17tiF/Bg5M0WnRqZE1Oy4LA94iIYxFTCteESB+RHfN
-         kobQpdFg+vgCYLguTUXXjA2StRpMHhj/lSmcYRzggQm6E3dUc2h+kJr9e5gy05ohiISQ
-         io+P5eRkggtQWgp6A6Rd4fXt4wi3HHPk7+ieoyiAK9Pk48TbQc+7TCGjKoRctcln0NfS
-         vp1Q1uoMxy9dgvUBLTwTuO/iTvQuYlixsGRscPHnj3pLvdQh0GJjE+u+XYMornqnVoZT
-         V8uA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728924330; x=1729529130;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=grYIK9osXBs31UEgg648AG6dUiZ52FwAEW7cDwHQwzw=;
-        b=T8eDyKEP1vuPco+EX+6iE6W6Po3dcIZJNwUjAbIUS+JX9OKaEvKXq1QWu2vRK85auu
-         AZIu0Wt5qYS9ip2DztcvRQQ5fUOkXBjBkRUDz788QCwuDwCQf8PUPKlXF5BdMN6pfnsh
-         oLXvxVZcrffO5NBxE5AGd5NZ93mvN8IKjnHF+bXvT7NbkokYnBXxNlmFVr23RDwVUP8w
-         TSkhGgAywY+ew6ZJu2vcH/e2Tamcrn02ROBdb4NsNvYGUhYM8PVuIA9TTjM9poVKxQAH
-         DM5WA8+e0PCxBKc1Mfk5Byg7a9VeK65uAtKRRZtk7vJFUEsUHF5TPHRKrDxsSVGvpG5s
-         me/g==
-X-Forwarded-Encrypted: i=1; AJvYcCV6+kyDh/Y6IC0hAFZp84czxVhi31KrJ709k3LYFc86KixeQecKGfA5uyRN8yiNNjq+BMkOByDmjieRhg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmVezdEq1EyhubPz87UkLOJyYFXorfmQyA5tBFuj8GENqGLYo/
-	HTvTb5IpGIldqZ44HZ0PJlnu+kKEa0CTNGacW2avhYRfsBAp3StBTDceKGcwkNY=
-X-Google-Smtp-Source: AGHT+IEPD/piRW2UpqC6E11an6S8QYVfY/9TiIDZseUGBgsVRSIPbykwzHPL0EGPEZdRGbjvGwPi+Q==
-X-Received: by 2002:a05:600c:3543:b0:425:80d5:b8b2 with SMTP id 5b1f17b1804b1-431255e4113mr83913985e9.16.1728924329666;
-        Mon, 14 Oct 2024 09:45:29 -0700 (PDT)
-Received: from blackdock.suse.cz ([193.86.92.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430d70b444csm159006015e9.33.2024.10.14.09.45.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 09:45:29 -0700 (PDT)
-Date: Mon, 14 Oct 2024 18:45:27 +0200
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Xiuhong Wang <xiuhong.wang@unisoc.com>
-Cc: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk, 
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	niuzhiguo84@gmail.com, ke.wang@unisoc.com, xiuhong.wang.cn@gmail.com
-Subject: Re: [PATCH] Revert "blk-throttle: Fix IO hang for a corner case"
-Message-ID: <dgfa2ehxmdixfi2fu32b5kjoyfpbd3ew5e6rmzxpcy7crwctaf@st4s4df6nvuo>
-References: <20241011014724.2199182-1-xiuhong.wang@unisoc.com>
+	s=arc-20240116; t=1728929370; c=relaxed/simple;
+	bh=QWPFvEXhnNSElL02iFk/bzB2xt65kkr795ytO+XzExM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PPLkfo36G/K9/i4JLGxwINCnyvHPSPlUSUja/fB9IGLwmQ7py74OzJXkrCBYQY7QusDudC6WzYRU8XEJhaLfitFZBjJJFmADfUzrp2SrmZDto7vvTCoEz8pz2eWTpsV8jOhS+4EMMN8VxwD20NVHG2qy/teEz3BToyfYEOwNJoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1C93B1007;
+	Mon, 14 Oct 2024 11:09:55 -0700 (PDT)
+Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 513A73F71E;
+	Mon, 14 Oct 2024 11:09:24 -0700 (PDT)
+Message-ID: <7411ae1d-5e36-46da-99cf-c485ebdb31bc@arm.com>
+Date: Mon, 14 Oct 2024 19:09:08 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="uztwfvhsighpltti"
-Content-Disposition: inline
-In-Reply-To: <20241011014724.2199182-1-xiuhong.wang@unisoc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Report] annoyed dma debug warning "cacheline tracking EEXIST,
+ overlapping mappings aren't supported"
+To: Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc: Hannes Reinecke <hare@suse.de>,
+ Hamza Mahfooz <someguy@effective-light.com>,
+ Dan Williams <dan.j.williams@intel.com>, linux-block@vger.kernel.org,
+ io-uring@vger.kernel.org, linux-raid@vger.kernel.org, iommu@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <ZwxzdWmYcBK27mUs@fedora>
+ <426b5600-7489-43a7-8007-ac4d9dbc9aca@suse.de>
+ <20241014074151.GA22419@lst.de> <ZwzPDU5Lgt6MbpYt@fedora>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <ZwzPDU5Lgt6MbpYt@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 14/10/2024 8:58 am, Ming Lei wrote:
+> On Mon, Oct 14, 2024 at 09:41:51AM +0200, Christoph Hellwig wrote:
+>> On Mon, Oct 14, 2024 at 09:23:14AM +0200, Hannes Reinecke wrote:
+>>>> 3) some storage utilities
+>>>> - dm thin provisioning utility of thin_check
+>>>> - `dt`(https://github.com/RobinTMiller/dt)
+>>>>
+>>>> I looks like same user buffer is used in more than 1 dio.
+>>>>
+>>>> 4) some self cooked test code which does same thing with 1)
+>>>>
+>>>> In storage stack, the buffer provider is far away from the actual DMA
+>>>> controller operating code, which doesn't have the knowledge if
+>>>> DMA_ATTR_SKIP_CPU_SYNC should be set.
+>>>>
+>>>> And suggestions for avoiding this noise?
+>>>>
+>>> Can you check if this is the NULL page? Operations like 'discard' will
+>>> create bios with several bvecs all pointing to the same NULL page.
+>>> That would be the most obvious culprit.
+>>
+>> The only case I fully understand without looking into the details
+>> is raid1, and that will obviously map the same data multiple times
+> 
+> The other cases should be concurrent DIOs on same userspace buffer.
 
---uztwfvhsighpltti
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+active_cacheline_insert() does already bail out for DMA_TO_DEVICE, so it 
+returning -EEXIST to tickle the warning would seem to genuinely imply 
+these are DMA mappings requesting to *write* the same cacheline 
+concurrently, which is indeed broken in general.
 
-Hello.
-
-On Fri, Oct 11, 2024 at 09:47:24AM GMT, Xiuhong Wang <xiuhong.wang@unisoc.c=
-om> wrote:
-> This reverts commit 5b7048b89745c3c5fb4b3080fb7bced61dba2a2b.
->=20
-> The throtl_adjusted_limit function was removed after
-> commit bf20ab538c81 ("blk-throttle: remove
-> CONFIG_BLK_DEV_THROTTLING_LOW"), so the problem of not being
-> able to scale after setting bps or iops to 1 will not occur.
-> So revert this commit that bps/iops can be set to 1.
-
-What is the use case where the difference between 1 or 2 matters?
-(Unless this is meant as a cleanup, then it makes sense to me.)
-
-Thanks
-Michal
-
---uztwfvhsighpltti
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZw1KpQAKCRAt3Wney77B
-SXyMAQCuAyDBL/Tk0ei5q1tJj97Fl9PrFECqf4yehX8sZ8fJDgEA53yyuPX0IL9y
-WsU9rCvia5eXmIaIry0DtV9gUfy2twU=
-=JUxf
------END PGP SIGNATURE-----
-
---uztwfvhsighpltti--
+Thanks,
+Robin.
