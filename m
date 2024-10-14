@@ -1,97 +1,98 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08BC14AD2E
-	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 07:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1305155757
+	for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 07:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728892707; cv=none; b=B4wQ4WSVzJnodqhKz3fAUO3D6Q0sH2aJb8Dj/6zAvjf0dClvJTeLVbFOda1/jeWLZltXJodEAHM11eqNPSomgyhgYQ3qlWKZE48TTVwMtf1PnTTRdgijRJtQ24pR9/zEk75fCU8EwWdwgsXZV5IFJoT7wk4UIXjO2TOWIzLvcLI=
+	t=1728892762; cv=none; b=QiLUdooawFqibLTbxUjo/JZ7brW6cK52gViear1mDTYI4sktw9xmb+8DIdOnQqNqzPcjopSvQp+RRDG/EgPwlWxw9IRU9174jYpJjwMy4dQ69Ge161lrb1Jag65Qedg8PExqhpTqXL5uAo7tHu8X9pWGTRizgOB/bcGY+5W+mlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728892707; c=relaxed/simple;
-	bh=okUCVxZQmNBCZOnwLzSniC5oceCmOwUWK0e9RpAsbxI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hrSyyoQvTTlF2fQeDCh1Qen03mzvZIbuCcHakPs0eHxC+sdYeNeXsS0mH2omBYMH5oKHRdUtPvJN7w0DExtvntMy4pmVziG011146x3AEKgUcIXjLeRPIkvpj9oognkTamNCJbYqIwtaIxMA+Umo2QZID7HIUPrVH/KAdOmbxM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UozniotZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1728892762; c=relaxed/simple;
+	bh=6tVaK1PwUlL+I4aBVzPDvZNVDH6jBwylHdHPE0Qiet8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i3oTLrFNwCxIMgMZSk0IA3OOA21K9ZlebxWH6WlaUAPbxV0kxQ6I19iV1YiEfLBVsikunLgzy2dWSCRVk+6+1kE793vA3nrFXkmhwsPzG8Ml91bLIZ7XSROM+K6VaZL5FsJB7+T/7B6gtb1JTVpleUABlEduzgGxRo1TAxHFRCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=yW7oWpZA; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UozniotZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728892702;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wBWYGh1L8mzLbunG0zkaPybO/VfGp8yc/5u12WiFxg0=;
-	b=UozniotZZ6wX/WstfA/gflvGgKIXze91sDfrtWENdFwMNyKhHIkJoWMwAU0JfOXvVAhwhn
-	X453trEnC6CIKg77R3THgjMBTGD/Vw0T52ye77+CQ5k6i8z+h1c+7pJGqxPTbkgHSmn2PH
-	4exoLgn2Kc8laF7snALJiQgKKXEjt6s=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-45-gto0hQeUPoivTJQQlE95vQ-1; Mon,
- 14 Oct 2024 03:58:19 -0400
-X-MC-Unique: gto0hQeUPoivTJQQlE95vQ-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8893C1956080;
-	Mon, 14 Oct 2024 07:58:17 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.128])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 523B519560AA;
-	Mon, 14 Oct 2024 07:58:10 +0000 (UTC)
-Date: Mon, 14 Oct 2024 15:58:05 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Hannes Reinecke <hare@suse.de>,
-	Hamza Mahfooz <someguy@effective-light.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-	linux-raid@vger.kernel.org, iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [Report] annoyed dma debug warning "cacheline tracking EEXIST,
- overlapping mappings aren't supported"
-Message-ID: <ZwzPDU5Lgt6MbpYt@fedora>
-References: <ZwxzdWmYcBK27mUs@fedora>
- <426b5600-7489-43a7-8007-ac4d9dbc9aca@suse.de>
- <20241014074151.GA22419@lst.de>
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="yW7oWpZA"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-539e59dadebso2131537e87.0
+        for <linux-block@vger.kernel.org>; Mon, 14 Oct 2024 00:59:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1728892759; x=1729497559; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6tVaK1PwUlL+I4aBVzPDvZNVDH6jBwylHdHPE0Qiet8=;
+        b=yW7oWpZA3BTF2qLluR9yNKl8wmcaBX1Ca0r0VcsJjz8TMfs1Q9ltSdkFdoGa0n0gZg
+         9vz175ulwvN72ljFMjlXE8Bda7Aq4wDL9T7c5J6rwm35psM+brYjcdbDnERepfTa76V/
+         F8QGNrShmfHd4tak/31zRJl7xsCjwl4y3Zm4TS1tLYK5lyLqTAUNRDf29LzLQ/kP1lJv
+         D6n53Zv3bAKKSjwrY7AQoH1R6r7ofISZ17sdk8Gux7jvb+M57yd5zH/SeWjbaierGyFG
+         DHSpZWXtskUg2d9ZgVE2Atis6F/5bFru7s31ew8AijdX0+ATXXx2TaYS41AhF39aNNjE
+         sWXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728892759; x=1729497559;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6tVaK1PwUlL+I4aBVzPDvZNVDH6jBwylHdHPE0Qiet8=;
+        b=o8AxBaRiahonOm1P2CD8k0DhbhLfWpwBeMBeMSE58t4XQKwa2N6weCohtRPFdJ8Dyn
+         /SQyaKyS6zmA8Eirjz7QN3ILYz6oNZxuXWfKmDXNMYXa8h5wrmlCwUxW5Bk5yA2N5zfA
+         6keEsQOpM0UrvosDoUAsObpZ68LO/mBgqs9I4ZujGvS6n3I1QTaGQaszhOhgpfYk6cNY
+         p6mwaRKi1t1AIR43ynJaFnGDHp+ty5SU2OEYFNZLoB+SiPuQmW16xiS061agu//Lf33H
+         EvNzXe9fPkeXEmPTVTyteu+R5D3+ED4ghoK6lEBcUu/Tn7rQgYsmLbNE0P8kz6+BYo/O
+         vb1A==
+X-Forwarded-Encrypted: i=1; AJvYcCXEmRCEMqY105H5Ljy89pHOUtUEKjer9JTEIaVAVKUdAB85Qox9Iio6n38Ky1gA3FvdM/evX8s9i+IBxg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxqjf8ERIgbfQSQ6yvLWA7fSY3NcEUhweYhlaf7RjuaNGjstE7c
+	uK3MCaF8IROZIxHqZzzBS4YjfIsP1Ke/j17FsbpqiE/wZcEIgvsSyt/fT3R/U4zgKQUf646YkrV
+	uH4OUhPGnUIoqEEkDkSJuLJkteAkprXwkOAPG3A==
+X-Google-Smtp-Source: AGHT+IEpWHvzePip2AbpOZrDDoOTlWCLBCnZZjhQ7Blogjf+ZP6Ifrw41m8GkUv9NHZszflLIk7m6dG7ATFP47hYxNQ=
+X-Received: by 2002:a05:6512:3a8d:b0:52e:76d5:9504 with SMTP id
+ 2adb3069b0e04-539da3be550mr5304615e87.3.1728892759031; Mon, 14 Oct 2024
+ 00:59:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241014074151.GA22419@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+References: <20241014075329.10400-1-pstanner@redhat.com> <20241014075329.10400-5-pstanner@redhat.com>
+In-Reply-To: <20241014075329.10400-5-pstanner@redhat.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Mon, 14 Oct 2024 09:59:08 +0200
+Message-ID: <CAMRc=McAfEPM0b0m6oYUO9_RC=qTd1vsg4wMn1Hb4jYQbx4irA@mail.gmail.com>
+Subject: Re: [PATCH v7 4/5] gpio: Replace deprecated PCI functions
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, 
+	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>, Al Viro <viro@zeniv.linux.org.uk>, 
+	Keith Busch <kbusch@kernel.org>, Li Zetao <lizetao1@huawei.com>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 09:41:51AM +0200, Christoph Hellwig wrote:
-> On Mon, Oct 14, 2024 at 09:23:14AM +0200, Hannes Reinecke wrote:
-> >> 3) some storage utilities
-> >> - dm thin provisioning utility of thin_check
-> >> - `dt`(https://github.com/RobinTMiller/dt)
-> >>
-> >> I looks like same user buffer is used in more than 1 dio.
-> >>
-> >> 4) some self cooked test code which does same thing with 1)
-> >>
-> >> In storage stack, the buffer provider is far away from the actual DMA
-> >> controller operating code, which doesn't have the knowledge if
-> >> DMA_ATTR_SKIP_CPU_SYNC should be set.
-> >>
-> >> And suggestions for avoiding this noise?
-> >>
-> > Can you check if this is the NULL page? Operations like 'discard' will 
-> > create bios with several bvecs all pointing to the same NULL page.
-> > That would be the most obvious culprit.
-> 
-> The only case I fully understand without looking into the details
-> is raid1, and that will obviously map the same data multiple times
+On Mon, Oct 14, 2024 at 9:53=E2=80=AFAM Philipp Stanner <pstanner@redhat.co=
+m> wrote:
+>
+> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by the
+> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+>
+> Replace those functions with calls to pcim_iomap_region().
+>
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> Reviewed-by: Andy Shevchenko <andy@kernel.org>
+> Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
 
-The other cases should be concurrent DIOs on same userspace buffer.
+This is part of a larger series so I acked it previously but at second
+glance it doesn't look like it depends on anything that comes before?
+Should it have been sent separately to the GPIO tree? Should I pick it
+up independently?
 
-
-Thanks,
-Ming
-
+Bart
