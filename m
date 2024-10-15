@@ -1,242 +1,204 @@
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39E916C6B7
-	for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 02:44:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F390E158535
+	for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 03:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728960250; cv=none; b=StoGtSqL1yySB5Q0v+XDHBygA9NOBhxgPfUDHCWsg3e4vBKseNqG/9eBlN/1oXNN88eEdOcLC0WwQxjqfFsIn/uTwAv18tLE3e9UYCbKT8Hx2aULlFpsyPqvafkRyp/ed14Qii0XJQeGo/62NXEgzuZrnkIzVU4h+nEN/QAo9fw=
+	t=1728961686; cv=none; b=RydsaQ2gJbiaTMlfvjlNkDV+tRMWJApQfzMUO7N1wQlQFZQjjZ6tBoAhuBPKvJCcDfjBpiI2ADYumTRuMlCz8X0FQZmEbKNCutgouXDDcHVzj2wsQOgIAwVgT3Pr5qUSuteJOVKb46sj/59lTH1kgbiXrP2kBjWhuPqEvpwJnzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728960250; c=relaxed/simple;
-	bh=SSn1tBRHwwFejPRpCfvzyROatGLcICbkpdu6kfniqMQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DopWaVmY3yR+MCghNXEDfVp4apdPrcPOK74bFM4WaT1nyCGiMVmtxsFl0pQvBMcOp1LghXW9olC/Ta4HEy00Jg0roPh9LHAQjkPhECHacm0rnJNIv1Xm5Bb5VDaxoRNQjdDkf1CLGdybstd3Il2C9CKvZfqrj6mPyFxtQnMxwwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=XGVKSbES; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1728961686; c=relaxed/simple;
+	bh=Q/SW4RakySLAJ+vlnVIdkbXUQssSXnwfcIMI4oelo+M=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:Content-Type:
+	 MIME-Version:References; b=KBNeYrydnX4woBV0TIuIn9tcwGfGxYGAbpuKOJKafjfzeHWKAnxaOGaioCN1fhBX4ybugZOrrlDXRoHj38bIEmZSAW1EnPQWHBeh7eKmAOeqfNmsVJZJ6QiRHFCgeJkIneItKSysSLAKG0Sz2/5NUP41TVE1TSVzJK5zcVNu44k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=to4hCVDn; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="XGVKSbES"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1728960245; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=qGaT1MjLcicCCFcPYcIWXlJa7+2EDyqC35Au3H9lEV0=;
-	b=XGVKSbESPvKGR9osXs0u/SwMLJ3mzuPdQ14Afkfa2Sa3kX1yMZtYcksk0Gzrf/euuB/LhGggctn+1M397iYZzCe2wrLGbe4V9USOHQEeSm4s8kmbcuo2/rJz/XAy082rtHFxSBxnyttj7jw7naLWzeNGbQT12IATrDXgkiSAnp8=
-Received: from localhost(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0WHBdP3t_1728960240 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 15 Oct 2024 10:44:05 +0800
-From: Guixin Liu <kanie@linux.alibaba.com>
-To: shinichiro.kawasaki@wdc.com,
-	dwagner@suse.de,
-	chaitanyak@nvidia.com
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH blktests v5 2/2] nvme: test the nvme reservation feature
-Date: Tue, 15 Oct 2024 10:43:50 +0800
-Message-ID: <20241015024350.16271-3-kanie@linux.alibaba.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241015024350.16271-1-kanie@linux.alibaba.com>
-References: <20241015024350.16271-1-kanie@linux.alibaba.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="to4hCVDn"
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20241015030801euoutp0225d3da03fa1860b28998f953be4ca844~_gX1DGvd53183431834euoutp02m
+	for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 03:08:01 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20241015030801euoutp0225d3da03fa1860b28998f953be4ca844~_gX1DGvd53183431834euoutp02m
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1728961681;
+	bh=V6MxMARZ/fd8PmMdfu49JsoNqWc/GHuLb3BoVceTtYU=;
+	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+	b=to4hCVDnsyq8MM9lV5L4fZFP9lxtzcRin50XfZGnREdRShZbaGJMp9p7xN3jBk4C/
+	 59u5nCDiKRJv0UatL0XiJg1oX9YI8G88QsrnnQuOuDbQeYDOkUMMAGcRtb8tt9sEte
+	 nVcaYwHQ7mg7qJDY8dbnXticWuN9FUkxeAARXbzg=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+	20241015030801eucas1p27c948a33fa3c21d627da897266683415~_gX0dt1TQ2989529895eucas1p2d;
+	Tue, 15 Oct 2024 03:08:01 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges1new.samsung.com (EUCPMTA) with SMTP id 3C.3E.09624.19CDD076; Tue, 15
+	Oct 2024 04:08:01 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20241015030800eucas1p1e2584459613eaa885539d58f9c8ec4b8~_gXzXS0mL1042710427eucas1p1k;
+	Tue, 15 Oct 2024 03:08:00 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241015030800eusmtrp25976737c3a3da77806b8aaf3ab1decfb~_gXzWjKpz0951909519eusmtrp2t;
+	Tue, 15 Oct 2024 03:08:00 +0000 (GMT)
+X-AuditID: cbfec7f2-c11ff70000002598-95-670ddc91e98a
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id 24.6F.14621.F8CDD076; Tue, 15
+	Oct 2024 04:08:00 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20241015030759eusmtip2b042992190a2a3ca6745c77ee402d385~_gXzK2Mrz3239132391eusmtip2j;
+	Tue, 15 Oct 2024 03:07:59 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) by
+	CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) with Microsoft SMTP
+	Server (TLS) id 15.0.1497.2; Tue, 15 Oct 2024 04:07:59 +0100
+Received: from CAMSVWEXC02.scsc.local ([::1]) by CAMSVWEXC02.scsc.local
+	([fe80::3c08:6c51:fa0a:6384%13]) with mapi id 15.00.1497.012; Tue, 15 Oct
+	2024 04:07:58 +0100
+From: Javier Gonzalez <javier.gonz@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+CC: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, "Martin
+ K. Petersen" <martin.petersen@oracle.com>, Kanchan Joshi
+	<joshi.k@samsung.com>, "hare@suse.de" <hare@suse.de>, "sagi@grimberg.me"
+	<sagi@grimberg.me>, "brauner@kernel.org" <brauner@kernel.org>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "jack@suse.cz"
+	<jack@suse.cz>, "jaegeuk@kernel.org" <jaegeuk@kernel.org>, "bcrl@kvack.org"
+	<bcrl@kvack.org>, "dhowells@redhat.com" <dhowells@redhat.com>,
+	"bvanassche@acm.org" <bvanassche@acm.org>, "asml.silence@gmail.com"
+	<asml.silence@gmail.com>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "io-uring@vger.kernel.org"
+	<io-uring@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-aio@kvack.org" <linux-aio@kvack.org>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>, "vishak.g@samsung.com"
+	<vishak.g@samsung.com>
+Subject: RE: [PATCH v7 0/3] FDP and per-io hints
+Thread-Topic: [PATCH v7 0/3] FDP and per-io hints
+Thread-Index: AQHbG7xJFahlOOmkRUWBz3B/P2gFpLKBuCIAgAQCOYCAABtsUP///IcAgAAiAcCAACIYAIABC7FQ
+Date: Tue, 15 Oct 2024 03:07:57 +0000
+Message-ID: <c0675721048d4b0a9a654e2e1669ad60@CAMSVWEXC02.scsc.local>
+In-Reply-To: <20241014115052.GA32302@lst.de>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUxTVxjGOfdebi8dxUtReoLbiE3IEmEFDI7jImxZxN1FZSbbJCMqNnJT
+	iKWQFizzY3QwFAFlq4KzMKFOi4WArjL5xlCGDEUNqeKKVmSUyYqDQl0WLcIotyz893s/nvO8
+	75tD4cJjZAiVrshmlQqpXEzyies3X9599/vHAlnUObc/qqq7DlC9rYxExfNNBJrsmQWowvkS
+	R1P5bgJ1XNBiyFjfi6GpwrsEqjxbgCH7FR2OtOYhgM5U5APUORyOOjr7CVRtGOeh2r55DDVO
+	ThPo3us+3w+DGMv9bUyrzsZj7j35mWAsd3IYU90JkjHNannMtYt5TLtVQzIz48MEM931gGQG
+	an5dzN8+zLhMbzMm+9/YzoBk/uZUVp5+kFVGxu/jpw06Ps9yr8otbCnjaUC9fzHwoyAdA38f
+	7eUVAz4lpC8DmN/Z4MsFLwAsnzCRXOAC0Nr1kLcscdlmcK5QC+DVljnf/7smDBpvMACg02on
+	PBIhbQTw35lcD5N0JKxrvgU8vJoWw3HHHeAR4PQQD3aXDmCeQhAdBQsudnmbouGUQe/lZKgx
+	ji8xQYfBVlMp6WEBnQAbftLiHvajI+B5W+MSA/ot+Ifx1dLcOC2Cw/ZqjNshEF6o7MA5Dobz
+	baMkx1Hwl0tdBMfr4KnqaYLTRsCa9lmS43Bo0E/inG8g7D/nWZK/2N/Ph9dKGrxH2gLPzp33
+	PhoEHX1N3vybcKF1eYjDUNP/G/YdWK9bMZ9uhZ9uhZ9uhV8NIOqAiM1RZchYVbSCVUtU0gxV
+	jkIm2Z+ZYQKLX/X2fN9sC/jRMSMxA4wCZgApXLxaoC0WyISCVOlXh1hlZooyR86qzGAtRYhF
+	grDUUFZIy6TZ7AGWzWKVy1WM8gvRYDGDceWyFskRufrF14+cuZu/tMZuGwkP7zaQlrkbRT9Q
+	TEy3a7f7TPYjdV6Y4Z245nb8yPE/ZfGKocyC2FfPUxKjsQT/wWP6rZ9Onf4scDRhQ8le88ba
+	piLLITygNGRUXBl8ac1HVek7ch8bB65m/LXjRlJFXtLJHkf2lpDETfh97Z735SdHfAxtC5iP
+	69Q3jt6x7RL18zcCdn4c5/RTuj94DWxJESlrpcEHiaInX2Bbs8qePbPjw43J5SXv8dsSHnbG
+	X0kTHQ0NFVkcRxv5iTrdJy61uXmsZ2Pygl5/wmq82e6jaf628OnuDf+YV3XzMPtTZ1S1duT4
+	xGRV5K5NTbHsmJhQpUmj1+NKlfQ/z41RExkEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrOKsWRmVeSWpSXmKPExsVy+t/xe7oT7vCmGyzewGwxZ9U2RovVd/vZ
+	LLr+bWGxeH34E6PFtA8/mS3eNf1msdizaBKTxcrVR5ks3rWeY7GYPb2ZyeLJ+lnMFpMOXWO0
+	mDKtidFi7y1tiz17T7JYzF/2lN1i+fF/TBbrXr9nsTj/9zirg7DH5SveHjtn3WX3OH9vI4vH
+	5bOlHptWdbJ5bPo0id1j85J6j903G9g8Pj69xeLxft9VNo8zC44AxU9Xe3zeJOex6clbpgC+
+	KD2bovzSklSFjPziElulaEMLIz1DSws9IxNLPUNj81grI1MlfTublNSczLLUIn27BL2Mi69C
+	Cn7zV7Tu6GdvYFzN08XIySEhYCLx+e5H5i5GLg4hgaWMEse/XWaHSMhIbPxylRXCFpb4c62L
+	DaLoI6PExCl/WSCcM4wSbT/WMkE4Kxklfp2dxAzSwiagL7Fq+ylGEFtEQEni6auzjCBFzAJX
+	2CWaFz0HSwgLGEg0L9kHVWQo8W7ZQig7SqJh5VMwm0VAVWLnph42EJtXwFVi7eJJUMfOYJF4
+	sHAuWIJTQEdi3t11YJsZBWQlHq38BfYEs4C4xK0n85kgnhCQWLLnPDOELSrx8vE/qOcMJLYu
+	3ccCYStK9M1/zwLRqyOxYPcnNghbW2LZwtfMEEcISpyc+YRlAqPULCQrZiFpmYWkZRaSlgWM
+	LKsYRVJLi3PTc4sN9YoTc4tL89L1kvNzNzECU+C2Yz8372Cc9+qj3iFGJg7GQ4wSHMxKIryT
+	unjThXhTEiurUovy44tKc1KLDzGaAgNmIrOUaHI+MAnnlcQbmhmYGpqYWRqYWpoZK4nzul0+
+	nyYkkJ5YkpqdmlqQWgTTx8TBKdXAlJEa8n/TTDN3ztr3+n8Yb2+Y7r362rfklBuuHl/57TNv
+	Gh4yOvx9Rgnz0uKTtqLGC+rzcs+ezXm4XU6F78L0hklBxZOn35jVzGnzu7KCxXix2PX5ORsS
+	uHM7b2w69fywczqXiqr2Md7N9yWEKo6FPEpqVGrhYSrsjsi6q1TiG/DTO0dq/U3m+HcJp5Y5
+	7oy6GaPxzF9zdezHRbMvzn3Q2ct7VP0/X7TfQ6vqeXP2+/MkM12qqTj082HWBmOXuJNXnq3u
+	W3g47G9MqhK3+3oW8b9bm7zsTZYdWjLravfdp/Ylnrdz4nc9ujLX32QOn4iuneLKnVtP/fMv
+	2Xz34OVJqY/6mLtUa8QvLM780/rMS4mlOCPRUIu5qDgRABIoUg4KBAAA
+X-CMS-MailID: 20241015030800eucas1p1e2584459613eaa885539d58f9c8ec4b8
+X-Msg-Generator: CA
+X-RootMTR: 20241010070738eucas1p2057209e5f669f37ca586ad4a619289ed
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20241010070738eucas1p2057209e5f669f37ca586ad4a619289ed
+References: <CGME20241010070738eucas1p2057209e5f669f37ca586ad4a619289ed@eucas1p2.samsung.com>
+	<20241010070736.de32zgad4qmfohhe@ArmHalley.local>
+	<20241010091333.GB9287@lst.de>
+	<20241010115914.eokdnq2cmcvwoeis@ArmHalley.local>
+	<20241011090224.GC4039@lst.de>
+	<5e9f7f1c-48fd-477f-b4ba-c94e6b50b56f@kernel.dk>
+	<20241014062125.GA21033@lst.de>
+	<34d3ad68068f4f87bf0a61ea8fb8f217@CAMSVWEXC02.scsc.local>
+	<20241014074708.GA22575@lst.de>
+	<9e3792eebf7f427db7c466374972fb99@CAMSVWEXC02.scsc.local>
+	<20241014115052.GA32302@lst.de>
 
-Test the NVMe reservation feature, including register, acquire,
-release and report.
+> On Mon, Oct 14, 2024 at 09:08:24AM +0000, Javier Gonzalez wrote:
+> > > Especially as it directly undermindes any file system work to actuall=
+y make use
+> of it.
+> >
+> > I do not think it does. If a FS wants to use the temperatures, then the=
+y
+> > would be able to leverage FDP besides SCSI.
+>=20
+> What do you mean with that?  This is a bit too much whitepaper vocabularl=
+y.
+>=20
+> We have code in XFS that can make use of the temperature hint.  But to
+> make them work it actually needs to do real stream separation on the
+> device.  I.e. the file system consumes the temperature hints.
 
-Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- tests/nvme/054     | 101 +++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/054.out |  68 ++++++++++++++++++++++++++++++
- 2 files changed, 169 insertions(+)
- create mode 100644 tests/nvme/054
- create mode 100644 tests/nvme/054.out
+The device can guarantee the stream separation without knowing the temperat=
+ure.
 
-diff --git a/tests/nvme/054 b/tests/nvme/054
-new file mode 100644
-index 0000000..71c625c
---- /dev/null
-+++ b/tests/nvme/054
-@@ -0,0 +1,101 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2024 Guixin Liu
-+# Copyright (C) 2024 Alibaba Group.
-+#
-+# Test the NVMe reservation feature
-+#
-+. tests/nvme/rc
-+
-+DESCRIPTION="Test the NVMe reservation feature"
-+QUICK=1
-+nvme_trtype="loop"
-+
-+requires() {
-+	_nvme_requires
-+}
-+
-+resv_report() {
-+	local test_dev=$1
-+	local report_arg=$2
-+
-+	nvme resv-report "${test_dev}" "${report_arg}" | grep -v "hostid" | \
-+		grep -E "gen|rtype|regctl|regctlext|cntlid|rcsts|rkey"
-+}
-+
-+test_resv() {
-+	local ns=$1
-+	local report_arg="--cdw11=1"
-+	test_dev="/dev/${ns}"
-+
-+	if nvme resv-report --help 2>&1 | grep -- '--eds' > /dev/null; then
-+		report_arg="--eds"
-+	fi
-+
-+	echo "Register"
-+	resv_report "${test_dev}" "${report_arg}"
-+	nvme resv-register "${test_dev}" --nrkey=4 --rrega=0
-+	resv_report "${test_dev}" "${report_arg}"
-+
-+	echo "Replace"
-+	nvme resv-register "${test_dev}" --crkey=4 --nrkey=5 --rrega=2
-+	resv_report "${test_dev}" "${report_arg}"
-+
-+	echo "Unregister"
-+	nvme resv-register "${test_dev}" --crkey=5 --rrega=1
-+	resv_report "${test_dev}" "${report_arg}"
-+
-+	echo "Acquire"
-+	nvme resv-register "${test_dev}" --nrkey=4 --rrega=0
-+	nvme resv-acquire "${test_dev}" --crkey=4 --rtype=1 --racqa=0
-+	resv_report "${test_dev}" "${report_arg}"
-+
-+	echo "Preempt"
-+	nvme resv-acquire "${test_dev}" --crkey=4 --rtype=2 --racqa=1
-+	resv_report "${test_dev}" "${report_arg}"
-+
-+	echo "Release"
-+	nvme resv-release "${test_dev}" --crkey=4 --rtype=2 --rrela=0
-+	resv_report "${test_dev}" "${report_arg}"
-+
-+	echo "Clear"
-+	nvme resv-register "${test_dev}" --nrkey=4 --rrega=0
-+	nvme resv-acquire "${test_dev}" --crkey=4 --rtype=1 --racqa=0
-+	resv_report "${test_dev}" "${report_arg}"
-+	nvme resv-release "${test_dev}" --crkey=4 --rrela=1
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	_setup_nvmet
-+
-+	local ns
-+	local skipped=false
-+	local subsys_path=""
-+	local ns_path=""
-+
-+	_nvmet_target_setup --blkdev file --resv_enable
-+	subsys_path="${NVMET_CFS}/subsystems/${def_subsysnqn}"
-+	_nvme_connect_subsys
-+
-+	ns=$(_find_nvme_ns "${def_subsys_uuid}")
-+	ns_id=$(echo "${ns}" | grep -oE '[0-9]+' | sed -n '2p')
-+	ns_path="${subsys_path}/namespaces/${ns_id}"
-+
-+	if [[ -f "${ns_path}/resv_enable" ]] ; then
-+		test_resv "${ns}"
-+	else
-+		SKIP_REASONS+=("missing reservation feature")
-+		skipped=true
-+	fi
-+
-+	_nvme_disconnect_subsys
-+	_nvmet_target_cleanup
-+
-+	if [[ "${skipped}" = true ]] ; then
-+		return 1
-+	fi
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/054.out b/tests/nvme/054.out
-new file mode 100644
-index 0000000..5adb30d
---- /dev/null
-+++ b/tests/nvme/054.out
-@@ -0,0 +1,68 @@
-+Running nvme/054
-+Register
-+gen       : 0
-+rtype     : 0
-+regctl    : 0
-+NVME Reservation  success
-+gen       : 1
-+rtype     : 0
-+regctl    : 1
-+regctlext[0] :
-+  cntlid     : ffff
-+  rcsts      : 0
-+  rkey       : 4
-+Replace
-+NVME Reservation  success
-+gen       : 2
-+rtype     : 0
-+regctl    : 1
-+regctlext[0] :
-+  cntlid     : ffff
-+  rcsts      : 0
-+  rkey       : 5
-+Unregister
-+NVME Reservation  success
-+gen       : 3
-+rtype     : 0
-+regctl    : 0
-+Acquire
-+NVME Reservation  success
-+NVME Reservation Acquire success
-+gen       : 4
-+rtype     : 1
-+regctl    : 1
-+regctlext[0] :
-+  cntlid     : ffff
-+  rcsts      : 1
-+  rkey       : 4
-+Preempt
-+NVME Reservation Acquire success
-+gen       : 5
-+rtype     : 2
-+regctl    : 1
-+regctlext[0] :
-+  cntlid     : ffff
-+  rcsts      : 1
-+  rkey       : 4
-+Release
-+NVME Reservation Release success
-+gen       : 5
-+rtype     : 0
-+regctl    : 1
-+regctlext[0] :
-+  cntlid     : ffff
-+  rcsts      : 0
-+  rkey       : 4
-+Clear
-+NVME Reservation  success
-+NVME Reservation Acquire success
-+gen       : 6
-+rtype     : 1
-+regctl    : 1
-+regctlext[0] :
-+  cntlid     : ffff
-+  rcsts      : 1
-+  rkey       : 4
-+NVME Reservation Release success
-+disconnected 1 controller(s)
-+Test complete
--- 
-2.43.0
+> > And if we come up with a better interface later on, we can make the cha=
+nges
+> then.
+> > I really do not see the issue. If we were adding a temperature abstract=
+ion now, I
+> would agree with
+> > You that we would need to cover the use-case you mention for FSs from t=
+he
+> beginning, but this
+> > Is already here. Seems like a fair compromise to support current users.
+>=20
+> Again, I think the temperature hints at the syscall level aren't all
+> bad.  There's definitively a few things I'd like to do better in hindsigh=
+t,
+> but that's not the point.  The problem is trying to turn them into
+> stream separation all the way down in the driver, which is fundamentally
+> broken.
+>=20
+> >   - How do we convince VFS folks to give us more space for hints at thi=
+s point?
+>=20
+> What space from VFS folks do you need for hints?  And why does it
+> matter?
+
+We need space in the inode to store the hint ID.
+
+Look, this feels like going in circles. All this gaslighting is what makes =
+it difficult to=20
+push patches when you just do not like the feature. It is the 3rd time I pr=
+opose you=20
+a way forward and you simply cannot provide any specific technical feedback=
+ - in the=20
+past email I posted several questions about the interface you seem to be ta=
+lking=20
+about and you explicitly omit that.
+
 
