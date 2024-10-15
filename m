@@ -1,194 +1,123 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9664C9F
-	for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 10:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3401E1C33
+	for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 10:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728986745; cv=none; b=MHdqXUFdavHeoptlSY/DqZuJnfDPPw1z/mVqUlyc6Q4dpjioE6B3WLKkLjE6JUAWo1zpqIMdUYUqWkbFTeWxmL6nD1DYKJoOVsMqv5O7FADZ87vs7hTuy7kXz1GBSURybXJSPyT3RDBp0NMKZLl+JCdzHR1F1XF79sw3PZlpq0Q=
+	t=1728987712; cv=none; b=BtnOhui+wg04mjtdMdczr6h++nCYiaOnkKveFezzQcr1x6+720nIvrpunYApdpFEfDq+YOaAR1G7/QJS10bW4HLOWFHNhZw4hX7ZmTw+ft5pqjmnHm3Rlqqbt96RzICLWgUsPerJkDd6WxoHI8M7TOl7YNxSmkgJ2JEmszpbDJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728986745; c=relaxed/simple;
-	bh=BPsnlM4jiS7NsX7J2NdZKdPrFoWf/4f2HMA3nR+Yv3g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J+tjGN/lMyvZK95ai2KOuEOIjlXOqxeKpljF4qUpDyL43hFLgZ7+lAdFqJ4LsOF3l1CStmnio64C8GWs3jbV8v9oSjlaTDVI9AmVcG4K9LpvzcUROoPiU4hZZKv3gEBl+S+c8Qq7jCibwPbIOS4wKl3UDAVmrLeg0PDBVrO15o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V6lwJAi9; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1728987712; c=relaxed/simple;
+	bh=vipnB5wwhRrndBzLgvXpspVuZIUR/r6CALGw+eq6bqY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=VAblaid3c8Zxe1XgwaQC9Y66RvjT1DQWYe1NWTB1Jvbpyk81fAJI5y3QG8hAaHghpfA3pTbBoOqU2W2r5dMCvQEN7FhMjZFycxRbO5OpuONgm/KeIFnhvoLnG/fDgbWrcoFxc6BrXZYOSXeh0LyoL2IsRTb7EympjJAyTQ07x2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ToFeJ+sq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V6lwJAi9"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2e0d9b70455so4022444a91.3
-        for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 03:05:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728986743; x=1729591543; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5Qrkg/ZRV10IdU56/7mYKjiH6Upw8Qx1eT1zUM9r+QU=;
-        b=V6lwJAi9ATBprSXBlwBEAF/EGPX0fGKWZ5th8Gob+kRbtYG9mJs2uKI9PkK7Y0NN+H
-         mUhOao3UYL2oE5vUuQFyLVjiUeGDpPeeEKqiSioPCd8IqttXBZtZSjFlFvbO7wZ+Oati
-         NxNyw+6EhjvGJGDLKIN35YUJ6mQXyqkkmFlNAcszDk7mFsg3mLDB0ACbWEtav9EFsVik
-         XxN5Su2yG0Rvi//ID9/qiV+AAqgCl2H9BTAP7b5NXKALPLLJfjUmg4dHl9szGAJUl9pw
-         N/PcITj00ryexU6JjyWFleZzQYpxfQvcsx/9PlBcG1PgcB+LfV4ieboFg9rkyBAylrZV
-         VStA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728986743; x=1729591543;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5Qrkg/ZRV10IdU56/7mYKjiH6Upw8Qx1eT1zUM9r+QU=;
-        b=vxBvJuZLkdIv80TnR3vZN3kMxM27EG2RwdHE+4CFZHxfWEgpANXFELCkWFdErzyqnR
-         X8yK+oYJwfwuKam14iK+zzkiSYhDimAP1DCc5XuCarxffo5Ize4Ttm1RVxlWqiHpmzcq
-         CTP2SYVXGtF9qZXCSZk9/sW5b/2Ec6lKKyxSCw78tl6unGtdhOZmm2jsPY72nJnRyevt
-         42vMyQ/5ZG9c4Mpd26PxZ/YBw3C8o/uGJiHGLsPhCe1SzYIiWvc17hsYIXyniL+qZfTq
-         0j5/UD+PouAp+NlutVNIuzVV2+1PvliDPw2+Az2sOQTSt9t5/mvm5lD+wSwkpM5wFniA
-         mAcw==
-X-Forwarded-Encrypted: i=1; AJvYcCX7/5j8bIhG+HEZYNvvLHy78K/GxkPSo3gJmMgsmKrXx53lkGqDtbK7N7QQYwshH8YDxLed4oSKoXiUkw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/w7Uri0s5iNlwPMGvTvG5kRESHwJIjxo+mfhY8cHiPimvE7yc
-	TUm+6OJxYUBHuXaQJEdJ4tVpmDv5nZA2OZcV+OfMzERLtoAP38Qds3ieBZ/8pxyZ7rXfFp8XG24
-	lV3Dw9JopwD+PtX19nkrBiR6qgC9j5+JoSwqX
-X-Google-Smtp-Source: AGHT+IHbXOGzJCKOgpup02dkaO5xVaIhqtf9TGZtn/M5v/vKmEv8ALqVeLPqkRz25CJYOQrboeLU0AvZT7KH0o5zi68=
-X-Received: by 2002:a17:90a:ee85:b0:2e2:e8fc:e0dd with SMTP id
- 98e67ed59e1d1-2e2f0dc33f8mr15829263a91.35.1728986742588; Tue, 15 Oct 2024
- 03:05:42 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ToFeJ+sq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728987710;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=bh+Ir/j3gUT3OWFj/tNxfK3IIX6mfHtdP5FI1CZ59vE=;
+	b=ToFeJ+sqjm/EUkpsiGz7u+BcZcnS8HLrwk5T4i+SaS94F8o2V/FXLHX3cxAl05MqyDOioJ
+	MnklZWdCy9Cm2xSLyMdOSrBBTbiem3LEl8/FHbLylQZbViHNlcHVD4g72sHXdIkz4SGoyP
+	F5E2w2hjQVc5GzyToGfj+9/c3rfyf+Y=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-126-mAb97BP8MGuxHYZ7yVKARQ-1; Tue,
+ 15 Oct 2024 06:21:47 -0400
+X-MC-Unique: mAb97BP8MGuxHYZ7yVKARQ-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8FA1319560BE;
+	Tue, 15 Oct 2024 10:21:45 +0000 (UTC)
+Received: from redhat.com (unknown [10.39.194.132])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9800219560A2;
+	Tue, 15 Oct 2024 10:21:43 +0000 (UTC)
+Date: Tue, 15 Oct 2024 12:21:40 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: josef@toxicpanda.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, nbd@other.debian.org,
+	eblake@redhat.com
+Subject: Kernel NBD client waits on wrong cookie, aborts connection
+Message-ID: <Zw5CNDIde6xkq_Sf@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <67094369.050a0220.4cbc0.000d.GAE@google.com> <20241011120028.1e4ed71c@gandalf.local.home>
-In-Reply-To: <20241011120028.1e4ed71c@gandalf.local.home>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Tue, 15 Oct 2024 12:05:29 +0200
-Message-ID: <CANp29Y4KERQxwOwMCW5a4+YahhA8gWyJ=btE=OxnNgrF6puFgw@mail.gmail.com>
-Subject: Re: [syzbot] Monthly trace report (Oct 2024)
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: syzbot <syzbot+list3bf21e6ac0139f8d008d@syzkaller.appspotmail.com>, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	mhiramat@kernel.org, syzkaller-bugs@googlegroups.com, 
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Steven,
+Hi all,
 
-Thanks for the analysis!
+the other day I was running some benchmarks to compare different QEMU
+block exports, and one of the scenarios I was interested in was
+exporting NBD from qemu-storage-daemon over a unix socket and attaching
+it as a block device using the kernel NBD client. I would then run a VM
+on top of it and fio inside of it.
 
-On Fri, Oct 11, 2024 at 6:00=E2=80=AFPM Steven Rostedt <rostedt@goodmis.org=
-> wrote:
->
-> On Fri, 11 Oct 2024 08:25:29 -0700
-> syzbot <syzbot+list3bf21e6ac0139f8d008d@syzkaller.appspotmail.com> wrote:
->
-> > Hello trace maintainers/developers,
-> >
-> > This is a 31-day syzbot report for the trace subsystem.
-> > All related reports/information can be found at:
-> > https://syzkaller.appspot.com/upstream/s/trace
-> >
-> > During the period, 1 new issues were detected and 0 were fixed.
-> > In total, 10 issues are still open and 38 have been fixed so far.
-> >
-> > Some of the still happening issues:
-> >
-> > Ref Crashes Repro Title
-> > <1> 34      Yes   INFO: task hung in blk_trace_ioctl (4)
-> >                   https://syzkaller.appspot.com/bug?extid=3Ded812ed4614=
-71ab17a0c
->
-> If you check the maintainers file, blktrace.c has:
->
-> BLOCK LAYER
-> M:      Jens Axboe <axboe@kernel.dk>
-> L:      linux-block@vger.kernel.org
+Unfortunately, I couldn't get any numbers because the connection always
+aborted with messages like "Double reply on req ..." or "Unexpected
+reply ..." in the host kernel log.
 
-Judging by MAINTAINERS and ./scripts/get_maintainer.pl,
-kernel/trace/blktrace.c belongs to both "BLOCK LAYER" and "TRACING".
+Yesterday I found some time to have a closer look why this is happening,
+and I think I have a rough understanding of what's going on now. Look at
+these trace events:
 
-$ ./scripts/get_maintainer.pl kernel/trace/blktrace.c
-< ... >
-linux-block@vger.kernel.org (open list:BLOCK LAYER)
-linux-kernel@vger.kernel.org (open list:TRACING)
+        qemu-img-51025   [005] ..... 19503.285423: nbd_header_sent: nbd transport event: request 000000002df03708, handle 0x0000150c0000005a
+[...]
+        qemu-img-51025   [008] ..... 19503.285500: nbd_payload_sent: nbd transport event: request 000000002df03708, handle 0x0000150c0000005d
+[...]
+   kworker/u49:1-47350   [004] ..... 19503.285514: nbd_header_received: nbd transport event: request 00000000b79e7443, handle 0x0000150c0000005a
 
+This is the same request, but the handle has changed between
+nbd_header_sent and nbd_payload_sent! I think this means that we hit one
+of the cases where the request is requeued, and then the next time it
+is executed with a different blk-mq tag, which is something the nbd
+driver doesn't seem to expect.
 
->
->
->
-> > <2> 32      Yes   WARNING in bpf_get_stack_raw_tp
-> >                   https://syzkaller.appspot.com/bug?extid=3Dce35de20ed6=
-652f60652
->
-> bpf_trace.c has:
->
-> M:      Alexei Starovoitov <ast@kernel.org>
-> M:      Daniel Borkmann <daniel@iogearbox.net>
-> M:      Andrii Nakryiko <andrii@kernel.org>
-> R:      Martin KaFai Lau <martin.lau@linux.dev>
-> R:      Eduard Zingerman <eddyz87@gmail.com>
-> R:      Song Liu <song@kernel.org>
-> R:      Yonghong Song <yonghong.song@linux.dev>
-> R:      John Fastabend <john.fastabend@gmail.com>
-> R:      KP Singh <kpsingh@kernel.org>
-> R:      Stanislav Fomichev <sdf@fomichev.me>
-> R:      Hao Luo <haoluo@google.com>
-> R:      Jiri Olsa <jolsa@kernel.org>
-> L:      bpf@vger.kernel.org
+Of course, since the cookie is transmitted in the header, the server
+replies with the original handle that contains the tag from the first
+call, while the kernel is only waiting for a handle with the new tag and
+is confused by the server response.
 
-Same for kernel/trace/bpf_trace.c:
+I'm not sure yet which of the following options should be considered the
+real problem here, so I'm only describing the situation without trying
+to provide a patch:
 
-$ ./scripts/get_maintainer.pl kernel/trace/bpf_trace.c
-< ... >
-Matt Bobrowski <mattbobrowski@google.com> (maintainer:BPF [SECURITY &
-LSM] (Security Audit and Enforc...)
-Steven Rostedt <rostedt@goodmis.org> (maintainer:TRACING)
+1. Is it that blk-mq should always re-run the request with the same tag?
+   I don't expect so, though in practice I was surprised to see that it
+   happens quite often after nbd requeues a request that it actually
+   does end up with the same cookie again.
 
->
-> > <3> 13      Yes   WARNING in get_probe_ref
-> >                   https://syzkaller.appspot.com/bug?extid=3D8672dcb9d10=
-011c0a160
-> > <4> 6       Yes   INFO: task hung in blk_trace_remove (2)
-> >                   https://syzkaller.appspot.com/bug?extid=3D2373f6be3e6=
-de4f92562
-> > <5> 4       Yes   possible deadlock in __mod_timer (4)
-> >                   https://syzkaller.appspot.com/bug?extid=3D83a876aef81=
-c9a485ae8
->
-> None of these look like they are tracing infrastructure related.
+2. Is it that nbd should use cookies that don't depend on the tag?
+   Maybe, but then we lose an easy way to identify the request from the
+   server response.
 
-Like get_maintainer.pl, syzbot relies on the MAINTAINERS file to
-attribute bugs to the individual kernel subsystems. If several ones
-are suitable, the bug is assigned several labels at once. It's now
-actually the case for all open "trace" findings:
+3. Is it that it should never requeue requests after already starting to
+   send data for them? This sounds most likely to me, but also like the
+   biggest change to make in nbd.
 
-https://syzkaller.appspot.com/upstream/s/trace
+4. Or something else entirely?
 
-(FWIW it's also possible to manually overwrite these labels and remove
-specific bugs from the monthly reports).
+I tested this with the 6.10.12 kernel from Fedora 40, but a quick git
+diff on nbd.c doesn't suggest that anything related has changed since
+then. This is how I reproduced it for debugging (without a VM):
 
-I could make syzbot set "trace" only if there's no other good
-candidate, but I wonder if that could hide the findings in the trace
-infrastructure that manifested themselves in some specific traced
-subsystem.
+$ qemu-storage-daemon --blockdev null-co,size=$((16*(1024**3))),node-name=data --nbd-server addr.type=unix,addr.path=/tmp/nbd.sock --export nbd,id=exp0,node-name=data,writable=on
+# nbd-client -unix -N data /tmp/nbd.sock /dev/nbd0
+# qemu-img bench -f host_device -w -s 4k -c 1000000 -t none -i io_uring /dev/nbd0
 
---=20
-Aleksandr
+I couldn't trigger the problem with TCP or without the io_uring backend
+(i.e. using Linux AIO or the thread pool) for 'qemu-img bench'.
 
->
-> -- Steve
->
->
-> >
-> > ---
-> > This report is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> >
-> > To disable reminders for individual bugs, reply with the following comm=
-and:
-> > #syz set <Ref> no-reminders
-> >
-> > To change bug's subsystems, reply with:
-> > #syz set <Ref> subsystems: new-subsystem
-> >
-> > You may send multiple commands in a single email message.
->
+Kevin
+
