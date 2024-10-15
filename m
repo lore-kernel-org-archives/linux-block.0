@@ -1,109 +1,137 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684801D89F3;
-	Tue, 15 Oct 2024 11:12:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4955C1D1512
+	for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 12:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728990782; cv=none; b=bFPf8EPjeNOAgcNfgEN3AVGjlAgZNmN83rng3YVgzbtIl36ohx+3HFzj1tIPMOUSjBaz4Tl18NJQKRwICZm+sCV9NMH89KaKf5WS0l/BfFrtRkjNoYrvNpuKXFDWLuQYDQbl9BFgisr2+iXK38iwmi3mU9evUy8fdtpxoJWKWNA=
+	t=1728993719; cv=none; b=i4qMAFjsyIbk072pZdTa2UxZWVI9xcESu81scXcvNGn/P+RFDPNtvYWDy3vxCFD/J371TUROmnYVBmQ7gAxjtImA6GtUTevs7RMoMLdRo7sUSbX1clx91uXOyoXnjS5D4dCTXV3eSFd1EbHpIK+EwHKsLDPs7jRG9iSo3E2jPsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728990782; c=relaxed/simple;
-	bh=blOj5kaVfqgH/c/QOxdEfAHq0oDfRJ5JzIeLxGB40ak=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=HrDoep0dorw9B2ai1QJqW2lxXqnhHnrCTew0W7WaVaQh7VK9iDPwEZ5yEVNlmiEgt5P95NypYUp4ix05ABbkLmd/pt04u+/TlNdER+UT/vHLcx8yYsTFuENe2gJgTUo7H8ocr8j6Z8hF2MWi4SCCOwKjr5u4Y1rQZ/okLM7zqM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XSWfL6PC1z4f3kK5;
-	Tue, 15 Oct 2024 19:12:42 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id DEADF1A018D;
-	Tue, 15 Oct 2024 19:12:54 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgAXTMg1Tg5nUMijEA--.19818S3;
-	Tue, 15 Oct 2024 19:12:54 +0800 (CST)
-Subject: Re: [PATCH] Revert "blk-throttle: Fix IO hang for a corner case"
-To: Xiuhong Wang <xiuhong.wang@unisoc.com>, tj@kernel.org,
- josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: niuzhiguo84@gmail.com, ke.wang@unisoc.com, xiuhong.wang.cn@gmail.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20241011014724.2199182-1-xiuhong.wang@unisoc.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <6a7cb48f-e3a2-8583-151b-423f85aabd17@huaweicloud.com>
-Date: Tue, 15 Oct 2024 19:12:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1728993719; c=relaxed/simple;
+	bh=5STNNMU14LlGt3mb7eHEV1o3zKU6ofipwX6azD8RTmw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XT+aVDSHR+5LapipODN4U/Isrxx7BeBDomEnt3tmrTfPj/oCI5O9x9K/UbH7QTq/6/JwC6PjAlagloFv8uv3UyUvkeKPh7n0MdkKKDAdVEGIRM+ez8sNuBE9Ol1XGsqPWra5/8Rcl4S1DEyDFfwyvSDLeyXDnfu0/NQh/JQwBxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FiSRnmhv; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FiSRnmhv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728993717;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wU8cdLwyvTrF+rHqLCsTDBJ07XOTLiGXwc0WAS/2LmE=;
+	b=FiSRnmhvimm7PTVXjzvmBMc2aY2qh6mgBvNGEK5XcicPmjduH/7n3LiXVHiWs9fgFR13N6
+	M4uKF5fcywE9ZaGTlJXAI3wEjoIi9+kZute2zAh4V8uz1cjdQ3nZZ2neFRPVZLzGiTh2bU
+	G8rfRyO7jgpCqmvcCtwstBfhWhrtcPI=
+Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
+ [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-125-hTdZ9ZPxPnayyf_XuZuAcA-1; Tue, 15 Oct 2024 08:01:56 -0400
+X-MC-Unique: hTdZ9ZPxPnayyf_XuZuAcA-1
+Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-50d55977001so495060e0c.2
+        for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 05:01:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728993715; x=1729598515;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wU8cdLwyvTrF+rHqLCsTDBJ07XOTLiGXwc0WAS/2LmE=;
+        b=FfzmewHs21Yw3SE4qwScOgmsvAZK8U+VriAZBhCGJI518RAltZaCJhcUUNGl4f7wFg
+         YobQZW01hygM/VIuo5gu28x6e9RC3PrilPk1/0Wy7VS3JuPeOJAK3Cyyuzgv9Ij+JAeq
+         hm6/KqCDUPSLXt2J8RY7mmSpxqk0LZ3o/nJYrHv15eU809pjCP5xujHmu1SEV+jvFZdk
+         QlkR+cXkdYtYK7Id1Akyys4XI0YRr68g98lvy3eF5CQUlIxYqUqCU8wwocAKAz9YbcDX
+         JjlptOqEk77gYSjyCQ5N9qxfY5azRDoTQv+C/0VtGChGDwcu76PQ33Gcq51UYogO7ptS
+         6F6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUj/YiWIY/tA+3OcKO8ZwKkepXSe3apc9ENATqbaJo9GYTD0n/oswQ1Gp06yWKwF3LjqzEWRIRjaJD3JQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4AoXY5rjJd3EmzvmYHbvr5AGFnQ0MSWhR5HDdPhS/RCgaO6TL
+	jxgDVwUuNOeXotUMbRIDoIrRsryWlg2FrW6dqFg6lBsuJE9liOopSuUA4Bs21PjwCYMHRaJmV5y
+	+JSqJRAyHIG3lPT8G1AsuPzjh85TJQLDDqnPabP8QtXdlTjv6ARDDZ30vUe+J8dVilIJQEd4bdI
+	dkFuRr+RujJW2iD+TJrcmibcAh6Bkrt4Pcc/E=
+X-Received: by 2002:a05:6122:1806:b0:50d:66e1:826c with SMTP id 71dfb90a1353d-50d66e18bc3mr4635256e0c.11.1728993715044;
+        Tue, 15 Oct 2024 05:01:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEY9moZmYa4OxScIx+qlWeWary99ll+sUXMmuoKJvUOuDyTsB1cplqv8slY88hUZimrfDZiaEvs4AQrit04Tbw=
+X-Received: by 2002:a05:6122:1806:b0:50d:66e1:826c with SMTP id
+ 71dfb90a1353d-50d66e18bc3mr4635183e0c.11.1728993714514; Tue, 15 Oct 2024
+ 05:01:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241011014724.2199182-1-xiuhong.wang@unisoc.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAXTMg1Tg5nUMijEA--.19818S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1UtFWfury8uF1fZry5Arb_yoW8XrWUp3
-	4fGryj9r1Utwn0ka13ta43Was7Gws3KryxJF98Ar1Fqry3GryqgFsYkr1Y93WIvFZa9anF
-	gF1DZr1DAFnIvrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Ib4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
-	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
-	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
-	IYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <Zw5CNDIde6xkq_Sf@redhat.com>
+In-Reply-To: <Zw5CNDIde6xkq_Sf@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Tue, 15 Oct 2024 20:01:43 +0800
+Message-ID: <CAFj5m9LXwcH7vc2Fk_i+VhfUA+tevzhciJzKc1am49y_5jgC2Q@mail.gmail.com>
+Subject: Re: Kernel NBD client waits on wrong cookie, aborts connection
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org, 
+	nbd@other.debian.org, eblake@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-ÔÚ 2024/10/11 9:47, Xiuhong Wang Ð´µÀ:
-> This reverts commit 5b7048b89745c3c5fb4b3080fb7bced61dba2a2b.
-> 
-> The throtl_adjusted_limit function was removed after
-> commit bf20ab538c81 ("blk-throttle: remove
-> CONFIG_BLK_DEV_THROTTLING_LOW"), so the problem of not being
-> able to scale after setting bps or iops to 1 will not occur.
-> So revert this commit that bps/iops can be set to 1.
-> 
-> Cc: Baolin Wang <baolin.wang@linux.alibaba.com>
-> Cc: Yu Kuai <yukuai3@huawei.com>
-> Signed-off-by: Xiuhong Wang <xiuhong.wang@unisoc.com>
-> Signed-off-by: Zhiguo Niu <zhiguo.niu@unisoc.com>
-> ---
->   block/blk-throttle.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-LGRM
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+On Tue, Oct 15, 2024 at 6:22=E2=80=AFPM Kevin Wolf <kwolf@redhat.com> wrote=
+:
+>
+> Hi all,
+>
+> the other day I was running some benchmarks to compare different QEMU
+> block exports, and one of the scenarios I was interested in was
+> exporting NBD from qemu-storage-daemon over a unix socket and attaching
+> it as a block device using the kernel NBD client. I would then run a VM
+> on top of it and fio inside of it.
+>
+> Unfortunately, I couldn't get any numbers because the connection always
+> aborted with messages like "Double reply on req ..." or "Unexpected
+> reply ..." in the host kernel log.
+>
+> Yesterday I found some time to have a closer look why this is happening,
+> and I think I have a rough understanding of what's going on now. Look at
+> these trace events:
+>
+>         qemu-img-51025   [005] ..... 19503.285423: nbd_header_sent: nbd t=
+ransport event: request 000000002df03708, handle 0x0000150c0000005a
+> [...]
+>         qemu-img-51025   [008] ..... 19503.285500: nbd_payload_sent: nbd =
+transport event: request 000000002df03708, handle 0x0000150c0000005d
+> [...]
+>    kworker/u49:1-47350   [004] ..... 19503.285514: nbd_header_received: n=
+bd transport event: request 00000000b79e7443, handle 0x0000150c0000005a
+>
+> This is the same request, but the handle has changed between
+> nbd_header_sent and nbd_payload_sent! I think this means that we hit one
+> of the cases where the request is requeued, and then the next time it
+> is executed with a different blk-mq tag, which is something the nbd
+> driver doesn't seem to expect.
+>
+> Of course, since the cookie is transmitted in the header, the server
+> replies with the original handle that contains the tag from the first
+> call, while the kernel is only waiting for a handle with the new tag and
+> is confused by the server response.
+>
+> I'm not sure yet which of the following options should be considered the
+> real problem here, so I'm only describing the situation without trying
+> to provide a patch:
+>
+> 1. Is it that blk-mq should always re-run the request with the same tag?
+>    I don't expect so, though in practice I was surprised to see that it
+>    happens quite often after nbd requeues a request that it actually
+>    does end up with the same cookie again.
 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 2c4192e12efa..443d1f47c2ce 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -1485,13 +1485,13 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
->   			goto out_finish;
->   
->   		ret = -EINVAL;
-> -		if (!strcmp(tok, "rbps") && val > 1)
-> +		if (!strcmp(tok, "rbps"))
->   			v[0] = val;
-> -		else if (!strcmp(tok, "wbps") && val > 1)
-> +		else if (!strcmp(tok, "wbps"))
->   			v[1] = val;
-> -		else if (!strcmp(tok, "riops") && val > 1)
-> +		else if (!strcmp(tok, "riops"))
->   			v[2] = min_t(u64, val, UINT_MAX);
-> -		else if (!strcmp(tok, "wiops") && val > 1)
-> +		else if (!strcmp(tok, "wiops"))
->   			v[3] = min_t(u64, val, UINT_MAX);
->   		else
->   			goto out_finish;
-> 
+No.
+
+request->tag will change, but we may take ->internal_tag(sched) or
+->tag(none), which won't change.
+
+I guess was_interrupted() in nbd_send_cmd() is triggered, then the payload
+is sent with a different tag.
+
+I will try to cook one patch soon.
+
+Thanks,
+Ming
 
