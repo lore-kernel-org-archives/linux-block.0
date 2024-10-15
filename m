@@ -1,95 +1,110 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670C38468;
-	Tue, 15 Oct 2024 01:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE01C156C62
+	for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 01:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728956792; cv=none; b=C8uqSvWFFAKxfJflojjnoX92UsQP/WkFU2NGUuX7pMR8NTEdRYjKBrOkBKB5o0Dkuckgw46a2LYSboUP5MsQ2aT6d3ItADMz3j6Ev8xIrCrVsTQ5x6dD4WOiLJXLQTzIALaA69U4zqMZ8ksUkmkvM+Zqe4dbTwI6YvZ0KLAbbeg=
+	t=1728957563; cv=none; b=hDD5rawAIEQ1Jp+pQR8SULvajE6ZVgbcujdKEUyJuCsJnynTtCvmAk5p8VYJTrk+qBA3ZslYcgxQboJEDFx0Y+EPfee6Q3O7CDNeL7bnesKykhXXV5d2Is/2EhfBydHNUsoYALzMHAZIar/FevRc1viLMqHa3AhiXoDT0i6/orE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728956792; c=relaxed/simple;
-	bh=1LOSpeTDcBfNC7lfaD4GUxd3xiGukOwPWLHbATyJKHk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BqYsOB2v5cSI6J50L+Pn3ySERtp9kiKK+aIiE3N5iXjn41V1Od3lQuRwIURXD+/V1qgir/nSn0CnukZI0JxlGrxZywbzDyxe/pt7yrkzjJIA4VORF7rIkGjPXHmWsCA4KnOkXJeIv2Yekk9n+yBTJ5D/kW0JMyJsNTtQFFJE6q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=etfDcGeD; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728957563; c=relaxed/simple;
+	bh=/mpWQQUg4SLGbw0b6uVKlir/V5LQ1XvyAyhlgfEndo8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YKNNcfN9NtHIP5JA3HUMSuaDYxqqbqu2rqW6JQHadEQgmVbXYvzcXpn4I0BKtfLYrzshMJIlGPf9aGMA+x4fUvBhpf4Dc4XjQ9jUk2QKuUY15ckCv2/UApvEeEWH4l8VnTil03a42cBF0jDkB4u92OpPZk4eBcz+fVMD6Dmo8/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gtOkBtSO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="etfDcGeD"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2fb4fa17044so15047281fa.3;
-        Mon, 14 Oct 2024 18:46:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728956789; x=1729561589; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1LOSpeTDcBfNC7lfaD4GUxd3xiGukOwPWLHbATyJKHk=;
-        b=etfDcGeDrq/mqDltvH7+/mmGwoBpr+ANIsNE3nCGiT09NUtaFuIBvozmY25Iy+UobY
-         pHvJdfh++Yeej3hoIIq4r7wZzozwx1d0nc7reJ5naNEIveepITMwfavLM4zoM5rzdvJb
-         +1l1k6HPhIhxt//52ZfJ9vik8+rygEktuwvkL4nkeyc9JQDK9h09p5phTsgqssVXnWrV
-         P7nhLIfOYLhSwwvQmklwhBwb9ApLYsiyb91S2MQ5htArCkRYk/+l/9TkiTrBxtU5y/qg
-         LwyDx2irsG/NmbNNyeMEV0yeIpwfmBEgCZlsjZuMVeAagSHYBRHmCI/eLhE9irXfTb4z
-         29nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728956789; x=1729561589;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1LOSpeTDcBfNC7lfaD4GUxd3xiGukOwPWLHbATyJKHk=;
-        b=b+pKI9fO3/HuV1lGMW9ZTotryC0EnojxGKjyfsOFPbm2Q01Dy3V5s0IbgpQXVt6a6J
-         tdw00nj2E6+vRXypbaXbQyhY4ogoMY17ki4gX6vGbCYrRxVfTVu/R/7dKzGFLnUn6n/I
-         echPsj3247IrKXWFV/T8J7g/EaVT5iefZpNisbUdlRsj8PGFfJxIT8xkDPGTGoYvTZI0
-         sUdh35FEdu2ZNZIwQA/LxZTgPfQm+XIZt3rZGee5ZlEmPGwdF3FXcGcvpoPvjJRutZKK
-         NYQ2E9BHWSknXJb5M1MKMsn+La8FzJT65y6+RjIHiQggFRflsYrCwhdWWQx+g+/AKlKv
-         0vng==
-X-Forwarded-Encrypted: i=1; AJvYcCVqCX800naZv3Btl0V4DZMsjjJlSUP2TLZDWnumNZG1JPLxQGXJSASh2pFVpy0PqABi0OSwEjPXmVPx4Zn1@vger.kernel.org, AJvYcCWJwo7raCG5kykF8LOSWLuQ+w3whIh++6Pxytoo8d7JeAtXky7uaeUn6XaupAeb1pHFa/9l2Cs2@vger.kernel.org, AJvYcCXEuUkhgh7CLYULR2SRpbZDTyKr1cIAev/pvLZwj53Eneq5MSVcVga/DH5upoqmCWzNDt5LgF8FRT6XNx8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCCLt6Y5nOx+UUX9ULcVETssPinWrv2VtVZfIaPUfFpmxAbM3X
-	lXw6zWpHWRMrWNlGNtJOmzoA8lpaaDzJPjr8cmu3ZLFacjN7fDehugmEme3d3JvzaliJkBZYQKr
-	FpuoZg6p++z9Nobwzn4Esugy7D82o8AQcLOc=
-X-Google-Smtp-Source: AGHT+IG4go9cTfMsoy7KIZm+tBl9/AfmWuFk/WTV50i1VYxt9hID/QmhVd4Jm6Ik2WNcB3HM63fHGdfPFScPsXcwD8g=
-X-Received: by 2002:a05:651c:b13:b0:2fb:597e:28d9 with SMTP id
- 38308e7fff4ca-2fb597e2cebmr12254341fa.14.1728956788362; Mon, 14 Oct 2024
- 18:46:28 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gtOkBtSO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728957559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ml1ZBBcs96kgD+D7cgCrxHrlfi6RlfUgZkDg/aeocjg=;
+	b=gtOkBtSOsTYxj40ujpaW5nQ3R8xtu/lr5y0XsIiqA8bIo2z9Fnq1ld3jv1DPW6bDSToCJA
+	ZChyqFZJIZM9tYDqs+b94BGqKEqLmbVWaF5ZLtQ3gmg0J7toZ9o4Fuf99OOrQN/3mcKXM7
+	0hvm4dIV13b9JFLypvQP0+oB74SGjZA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-370-m3OzuSbkP1ilKYyrQmSsqg-1; Mon,
+ 14 Oct 2024 21:59:16 -0400
+X-MC-Unique: m3OzuSbkP1ilKYyrQmSsqg-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 74E88195608B;
+	Tue, 15 Oct 2024 01:59:14 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.119])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E666419560AA;
+	Tue, 15 Oct 2024 01:59:07 +0000 (UTC)
+Date: Tue, 15 Oct 2024 09:59:02 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+	Hamza Mahfooz <someguy@effective-light.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+	linux-raid@vger.kernel.org, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [Report] annoyed dma debug warning "cacheline tracking EEXIST,
+ overlapping mappings aren't supported"
+Message-ID: <Zw3MZrK_l7DuFfFd@fedora>
+References: <ZwxzdWmYcBK27mUs@fedora>
+ <426b5600-7489-43a7-8007-ac4d9dbc9aca@suse.de>
+ <20241014074151.GA22419@lst.de>
+ <ZwzPDU5Lgt6MbpYt@fedora>
+ <7411ae1d-5e36-46da-99cf-c485ebdb31bc@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241011014724.2199182-1-xiuhong.wang@unisoc.com> <dgfa2ehxmdixfi2fu32b5kjoyfpbd3ew5e6rmzxpcy7crwctaf@st4s4df6nvuo>
-In-Reply-To: <dgfa2ehxmdixfi2fu32b5kjoyfpbd3ew5e6rmzxpcy7crwctaf@st4s4df6nvuo>
-From: Xiuhong Wang <xiuhong.wang.cn@gmail.com>
-Date: Tue, 15 Oct 2024 09:46:17 +0800
-Message-ID: <CAOsHCa0wyTtA65mGBB_8YM7vmQyvkTDcwwvELEEMJ5WKu2QNhw@mail.gmail.com>
-Subject: Re: [PATCH] Revert "blk-throttle: Fix IO hang for a corner case"
-To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
-Cc: Xiuhong Wang <xiuhong.wang@unisoc.com>, tj@kernel.org, josef@toxicpanda.com, 
-	axboe@kernel.dk, cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, niuzhiguo84@gmail.com, ke.wang@unisoc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7411ae1d-5e36-46da-99cf-c485ebdb31bc@arm.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Hi Michal,
+On Mon, Oct 14, 2024 at 07:09:08PM +0100, Robin Murphy wrote:
+> On 14/10/2024 8:58 am, Ming Lei wrote:
+> > On Mon, Oct 14, 2024 at 09:41:51AM +0200, Christoph Hellwig wrote:
+> > > On Mon, Oct 14, 2024 at 09:23:14AM +0200, Hannes Reinecke wrote:
+> > > > > 3) some storage utilities
+> > > > > - dm thin provisioning utility of thin_check
+> > > > > - `dt`(https://github.com/RobinTMiller/dt)
+> > > > > 
+> > > > > I looks like same user buffer is used in more than 1 dio.
+> > > > > 
+> > > > > 4) some self cooked test code which does same thing with 1)
+> > > > > 
+> > > > > In storage stack, the buffer provider is far away from the actual DMA
+> > > > > controller operating code, which doesn't have the knowledge if
+> > > > > DMA_ATTR_SKIP_CPU_SYNC should be set.
+> > > > > 
+> > > > > And suggestions for avoiding this noise?
+> > > > > 
+> > > > Can you check if this is the NULL page? Operations like 'discard' will
+> > > > create bios with several bvecs all pointing to the same NULL page.
+> > > > That would be the most obvious culprit.
+> > > 
+> > > The only case I fully understand without looking into the details
+> > > is raid1, and that will obviously map the same data multiple times
+> > 
+> > The other cases should be concurrent DIOs on same userspace buffer.
+> 
+> active_cacheline_insert() does already bail out for DMA_TO_DEVICE, so it
+> returning -EEXIST to tickle the warning would seem to genuinely imply these
+> are DMA mappings requesting to *write* the same cacheline concurrently,
+> which is indeed broken in general.
 
-Remove this patch to make the code clearer and easier to understand.
+The two io_uring tests are READ, and the dm thin_check are READ too.
 
-Michal Koutn=C3=BD <mkoutny@suse.com> =E4=BA=8E2024=E5=B9=B410=E6=9C=8815=
-=E6=97=A5=E5=91=A8=E4=BA=8C 00:45=E5=86=99=E9=81=93=EF=BC=9A
->
-> Hello.
->
-> On Fri, Oct 11, 2024 at 09:47:24AM GMT, Xiuhong Wang <xiuhong.wang@unisoc=
-.com> wrote:
-> > This reverts commit 5b7048b89745c3c5fb4b3080fb7bced61dba2a2b.
-> >
-> > The throtl_adjusted_limit function was removed after
-> > commit bf20ab538c81 ("blk-throttle: remove
-> > CONFIG_BLK_DEV_THROTTLING_LOW"), so the problem of not being
-> > able to scale after setting bps or iops to 1 will not occur.
-> > So revert this commit that bps/iops can be set to 1.
->
-> What is the use case where the difference between 1 or 2 matters?
-> (Unless this is meant as a cleanup, then it makes sense to me.)
->
-> Thanks
-> Michal
+For the raid1 case, the warning is from raid1_sync_request() which may
+have both READ/WRITE IO.
+
+Thanks,
+Ming
+
