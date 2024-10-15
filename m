@@ -1,172 +1,137 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0AF1EBA10
-	for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 12:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35AEE1EF945;
+	Tue, 15 Oct 2024 12:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728994281; cv=none; b=rKdBbuHxe6OuBbiv5gwshWsRRiQh73YFyfz/OSNBxxDDHCEFi7DTmVVzB14h4I98NgL/MEW8etPwD6j3GGzjvrwgnYcM5hIpmPefFZrbZGoW9Mxt0WV/0FyfTVQdTPuWIEWLS3T0MXNqSvX0GyB5k1yyzYQDkRhLLPT5H4jUrLI=
+	t=1728994342; cv=none; b=pTNwAnmK4OHo5mcmwBk6S8XPZFUaOrje4KOH2LxZIm8X99DWHr19DZADfU1fFn4Lm7L7BHi6gTZ6VSMWvJRhM0A03GKaL0ei539sosST+XQMrtl4bvYnxU7gZdDzFdKWmSRrKs9FMzikWMXWkEeQQL274c6ZpolOAj1EoBBscC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728994281; c=relaxed/simple;
-	bh=V+4C3/dscvAkJcP+wPFslM1V6UlX9KAE3mMI9JhJ9IU=;
+	s=arc-20240116; t=1728994342; c=relaxed/simple;
+	bh=JVaN+276foz8D467uVisbk7ZPfas8KFjh0xX60dO7v0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=irQnwpwEh32QDyTk/3mUrVWcXxN5ojiMiJeCYi62BAIWEqn4S5vENNJkRpROhcAbjGCsmEXt2vrXjB5zfESqv7zrUFM62ErjvwLdDFbdb0YbKvTJAfSVZuapRzEfut8ddFjITYqExuOt1mi7rwLdJ/VaKyRiN9HLjPM7u5yj9zM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DqyiHuce; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DqyiHuce"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728994277;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G3Pcz/dEOnqKX/cFViUwxujJai8oBAzKnB5CGzzdEx0=;
-	b=DqyiHucewE8IJ9Swt67LtHlt8v7fZr2KzjVpF3XY8iUaG+Sw4kmRZFSauF8Pgq8QiAFz46
-	oHGXmi+b1XCWRcNVtjvz6oZytbGb+e+chha09sX7QDifgYHAgRXPJF8uQZ/blTYyJApB8M
-	TIpPwF4cv4kr4S2gdmZuDgOJ+F6tmxU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-205-hIfcxqtOOSO0A-W20qWf1g-1; Tue,
- 15 Oct 2024 08:11:14 -0400
-X-MC-Unique: hIfcxqtOOSO0A-W20qWf1g-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B8ED51956083;
-	Tue, 15 Oct 2024 12:11:13 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.121])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9A2EA1956056;
-	Tue, 15 Oct 2024 12:11:08 +0000 (UTC)
-Date: Tue, 15 Oct 2024 20:11:02 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org,
-	nbd@other.debian.org, eblake@redhat.com, ming.lei@redhat.com
-Subject: Re: Kernel NBD client waits on wrong cookie, aborts connection
-Message-ID: <Zw5b1mwk3aG01NTg@fedora>
-References: <Zw5CNDIde6xkq_Sf@redhat.com>
- <CAFj5m9LXwcH7vc2Fk_i+VhfUA+tevzhciJzKc1am49y_5jgC2Q@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nVdFpr2qXM1FPb7EKEL5FX9BpgRnta+nwpf756Ce2x/lQyEs8sIeTb8hxJHYXTRy0BShlh4P52ehWR/wg6aBoDGHGRUd2ywoPZQDO+KO5fOrwPYVxtH3BudCgNneBF+0Gy/LCEMBypqLr/5DtCYRnpVdb5+zAcVM2grhBfOpAHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 29EBB227AAC; Tue, 15 Oct 2024 14:12:13 +0200 (CEST)
+Date: Tue, 15 Oct 2024 14:12:12 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: axboe@kernel.dk, brauner@kernel.org, djwong@kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, dchinner@redhat.com,
+	hch@lst.de, cem@kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, hare@suse.de,
+	martin.petersen@oracle.com, catherine.hoang@oracle.com,
+	mcgrof@kernel.org, ritesh.list@gmail.com, ojaswin@linux.ibm.com
+Subject: Re: [PATCH v8 4/7] fs: iomap: Atomic write support
+Message-ID: <20241015121212.GA32583@lst.de>
+References: <20241015090142.3189518-1-john.g.garry@oracle.com> <20241015090142.3189518-5-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFj5m9LXwcH7vc2Fk_i+VhfUA+tevzhciJzKc1am49y_5jgC2Q@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <20241015090142.3189518-5-john.g.garry@oracle.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Oct 15, 2024 at 08:01:43PM +0800, Ming Lei wrote:
-> On Tue, Oct 15, 2024 at 6:22 PM Kevin Wolf <kwolf@redhat.com> wrote:
-> >
-> > Hi all,
-> >
-> > the other day I was running some benchmarks to compare different QEMU
-> > block exports, and one of the scenarios I was interested in was
-> > exporting NBD from qemu-storage-daemon over a unix socket and attaching
-> > it as a block device using the kernel NBD client. I would then run a VM
-> > on top of it and fio inside of it.
-> >
-> > Unfortunately, I couldn't get any numbers because the connection always
-> > aborted with messages like "Double reply on req ..." or "Unexpected
-> > reply ..." in the host kernel log.
-> >
-> > Yesterday I found some time to have a closer look why this is happening,
-> > and I think I have a rough understanding of what's going on now. Look at
-> > these trace events:
-> >
-> >         qemu-img-51025   [005] ..... 19503.285423: nbd_header_sent: nbd transport event: request 000000002df03708, handle 0x0000150c0000005a
-> > [...]
-> >         qemu-img-51025   [008] ..... 19503.285500: nbd_payload_sent: nbd transport event: request 000000002df03708, handle 0x0000150c0000005d
-> > [...]
-> >    kworker/u49:1-47350   [004] ..... 19503.285514: nbd_header_received: nbd transport event: request 00000000b79e7443, handle 0x0000150c0000005a
-> >
-> > This is the same request, but the handle has changed between
-> > nbd_header_sent and nbd_payload_sent! I think this means that we hit one
-> > of the cases where the request is requeued, and then the next time it
-> > is executed with a different blk-mq tag, which is something the nbd
-> > driver doesn't seem to expect.
-> >
-> > Of course, since the cookie is transmitted in the header, the server
-> > replies with the original handle that contains the tag from the first
-> > call, while the kernel is only waiting for a handle with the new tag and
-> > is confused by the server response.
-> >
-> > I'm not sure yet which of the following options should be considered the
-> > real problem here, so I'm only describing the situation without trying
-> > to provide a patch:
-> >
-> > 1. Is it that blk-mq should always re-run the request with the same tag?
-> >    I don't expect so, though in practice I was surprised to see that it
-> >    happens quite often after nbd requeues a request that it actually
-> >    does end up with the same cookie again.
+On Tue, Oct 15, 2024 at 09:01:39AM +0000, John Garry wrote:
+> Support direct I/O atomic writes by producing a single bio with REQ_ATOMIC
+> flag set.
 > 
-> No.
+> Initially FSes (XFS) should only support writing a single FS block
+> atomically.
 > 
-> request->tag will change, but we may take ->internal_tag(sched) or
-> ->tag(none), which won't change.
+> As with any atomic write, we should produce a single bio which covers the
+> complete write length.
 > 
-> I guess was_interrupted() in nbd_send_cmd() is triggered, then the payload
-> is sent with a different tag.
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
+> ---
+>  .../filesystems/iomap/operations.rst          | 11 ++++++
+>  fs/iomap/direct-io.c                          | 38 +++++++++++++++++--
+>  fs/iomap/trace.h                              |  3 +-
+>  include/linux/iomap.h                         |  1 +
+>  4 files changed, 48 insertions(+), 5 deletions(-)
 > 
-> I will try to cook one patch soon.
+> diff --git a/Documentation/filesystems/iomap/operations.rst b/Documentation/filesystems/iomap/operations.rst
+> index 8e6c721d2330..fb95e99ca1a0 100644
+> --- a/Documentation/filesystems/iomap/operations.rst
+> +++ b/Documentation/filesystems/iomap/operations.rst
+> @@ -513,6 +513,17 @@ IOMAP_WRITE`` with any combination of the following enhancements:
+>     if the mapping is unwritten and the filesystem cannot handle zeroing
+>     the unaligned regions without exposing stale contents.
+>  
+> + * ``IOMAP_ATOMIC``: This write is being issued with torn-write
+> +   protection. Only a single bio can be created for the write, and the
+> +   write must not be split into multiple I/O requests, i.e. flag
+> +   REQ_ATOMIC must be set.
+> +   The file range to write must be aligned to satisfy the requirements
+> +   of both the filesystem and the underlying block device's atomic
+> +   commit capabilities.
+> +   If filesystem metadata updates are required (e.g. unwritten extent
+> +   conversion or copy on write), all updates for the entire file range
+> +   must be committed atomically as well.
+> +
+>  Callers commonly hold ``i_rwsem`` in shared or exclusive mode before
+>  calling this function.
+>  
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index f637aa0706a3..c968a0e2a60b 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -271,7 +271,7 @@ static int iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
+>   * clearing the WRITE_THROUGH flag in the dio request.
+>   */
+>  static inline blk_opf_t iomap_dio_bio_opflags(struct iomap_dio *dio,
+> -		const struct iomap *iomap, bool use_fua)
+> +		const struct iomap *iomap, bool use_fua, bool atomic)
+>  {
+>  	blk_opf_t opflags = REQ_SYNC | REQ_IDLE;
+>  
+> @@ -283,6 +283,8 @@ static inline blk_opf_t iomap_dio_bio_opflags(struct iomap_dio *dio,
+>  		opflags |= REQ_FUA;
+>  	else
+>  		dio->flags &= ~IOMAP_DIO_WRITE_THROUGH;
+> +	if (atomic)
+> +		opflags |= REQ_ATOMIC;
+>  
+>  	return opflags;
+>  }
+> @@ -293,7 +295,8 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
+>  	const struct iomap *iomap = &iter->iomap;
+>  	struct inode *inode = iter->inode;
+>  	unsigned int fs_block_size = i_blocksize(inode), pad;
+> -	loff_t length = iomap_length(iter);
+> +	const loff_t length = iomap_length(iter);
+> +	bool atomic = iter->flags & IOMAP_ATOMIC;
+>  	loff_t pos = iter->pos;
+>  	blk_opf_t bio_opf;
+>  	struct bio *bio;
+> @@ -303,6 +306,9 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
+>  	size_t copied = 0;
+>  	size_t orig_count;
+>  
+> +	if (atomic && (length != fs_block_size))
 
-Please try the following patch:
+Nit: no need for the inner braces here.
 
+> +		if (atomic && n != length) {
+> +			/*
+> +			 * This bio should have covered the complete length,
+> +			 * which it doesn't, so error. We may need to zero out
+> +			 * the tail (complete FS block), similar to when
+> +			 * bio_iov_iter_get_pages() returns an error, above.
+> +			 */
+> +			ret = -EINVAL;
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 2cafcf11ee8b..e3eb31c3ee75 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -682,3 +682,16 @@ u32 blk_mq_unique_tag(struct request *rq)
- 		(rq->tag & BLK_MQ_UNIQUE_TAG_MASK);
- }
- EXPORT_SYMBOL(blk_mq_unique_tag);
-+
-+/*
-+ * Same with blk_mq_unique_tag, but one persistent tag is included in
-+ * the request lifetime.
-+ */
-+u32 blk_mq_unique_static_tag(struct request *rq)
-+{
-+	u32 tag = rq->q->elevator ? rq->internal_tag : rq->tag;
-+
-+	return (rq->mq_hctx->queue_num << BLK_MQ_UNIQUE_TAG_BITS) |
-+		(tag & BLK_MQ_UNIQUE_TAG_MASK);
-+}
-+EXPORT_SYMBOL(blk_mq_unique_static_tag);
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index b852050d8a96..cc522a2cb9fb 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -201,7 +201,7 @@ static void nbd_requeue_cmd(struct nbd_cmd *cmd)
- static u64 nbd_cmd_handle(struct nbd_cmd *cmd)
- {
- 	struct request *req = blk_mq_rq_from_pdu(cmd);
--	u32 tag = blk_mq_unique_tag(req);
-+	u32 tag = blk_mq_unique_static_tag(req);
- 	u64 cookie = cmd->cmd_cookie;
- 
- 	return (cookie << NBD_COOKIE_BITS) | tag;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 4fecf46ef681..d6266759d62d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -793,6 +793,7 @@ enum {
- };
- 
- u32 blk_mq_unique_tag(struct request *rq);
-+u32 blk_mq_unique_static_tag(struct request *rq);
- 
- static inline u16 blk_mq_unique_tag_to_hwq(u32 unique_tag)
- {
+Do we want a WARN_ON_ONCE here because this is a condition that should be
+impossible to hit?
 
--- 
-Ming
+Otherwise looks good:
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
