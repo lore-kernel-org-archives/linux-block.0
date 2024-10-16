@@ -1,93 +1,87 @@
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0E42071F8
-	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 14:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E981DAC9C
+	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 14:08:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729087719; cv=none; b=fi7hVQLrbUaIIuPGC5DzVgJHrkyxInherkqWhms6X/gBizlFDa0KyeLK/jTwg4fTJE6j2aCf4FKyq3Ls9RgX+ZN2b6q5dH8h8gJWm77/8Oh6gbiBkuWdpOXfxDXmc2heP5RYH4ZssMS7w11DMzHGtge94IV0WoZZhJ6R9NY84U8=
+	t=1729087733; cv=none; b=ryFUYiQeSHuvdepnp9on8muJPIengTQXPmcYS1aIfaBcTMH6+92IMM1sX7tj9HZ+2HR52dJWeFUSiL8TGP74Y56GMJBNoocz1swb11IDW0HzhXXCAddTDweMNYhQndJb0cmhH1+X0GYNh8QbzISfpdKrz6X+p1b1xAOfF7PNLfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729087719; c=relaxed/simple;
-	bh=PS1FdrTKbnIDdkOC+D3Nb5orQ02UkG2CduMcOr5bLzU=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=GnvalCych3fI4DH+5Z9sqGDLyGUgGJCuKw1Q9h5dblacBfW65YN+4iZ5Dlt9UsevWkgisjjTdCQkHVK/vgW0zAIG5DKHaVo1VDxZ7X0gxC0wI7bGsnRI3snFCenXujViWyp/hYFIm1chXuPrJfhwFijZH0S+XhFFOXFQEH7kXVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=voAxgxDu; arc=none smtp.client-ip=209.85.166.177
+	s=arc-20240116; t=1729087733; c=relaxed/simple;
+	bh=LJ6kyCAdTOGA8kL19ZQGbzu4tfizaDgX0Xs9pQozxls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=WL59srw0TE4UOsP9bHvF4KbNNqn8bUC7a4c6ZNXA/EPGoiUGr+XCocO7fjcRYg+GVrW/sJnkTxMRNkl4NP3nDWkGJCeIZcwDrjeC6faVEbfnJnl8qRsruwD/Kj7a+mLAxGrh/YJXsEDli0H7oGDBOEcd+Qqb2Jg9mMObfZTUzzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ULOSi4AX; arc=none smtp.client-ip=209.85.166.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="voAxgxDu"
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a3b0247d67so21704245ab.3
-        for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 07:08:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ULOSi4AX"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-83a98e107feso37941139f.3
+        for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 07:08:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729087716; x=1729692516; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZKcAJrsMT6v1EJVRGfh/ABrvXvKqs+PkK6NkGIgrV2k=;
-        b=voAxgxDuHbmwYC3huppaDu/KXWEJFLo6Re2QXGptppnwmYoNrc78tVDv98AqGjArjW
-         wY708e4OWj6z1i1SIYnm6ML4Lto9fg7KmS9sg+64KmPQdow6/eWEIf1LAHd/es6mpJmD
-         WiaTdiBWZ6A6S18OW8K2mXCWNDT6+Ski996/yrXm9IdRSRX9GHYPXDWn4plr6YmXaeyn
-         EzKXN9rer8drqAzULuePYk+51a9ElF3Ca9c4gasrW0/mK8kT/pfMb5ai+5P2S/j8DGBf
-         W5ZoIQNF2c1sN6FkvC1Wk80pechRnGjI+Wxov0fF8mvkh+HDcxZN+sD2/KlTQcg2c1UJ
-         5Eww==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729087730; x=1729692530; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3xgrle76UhYTPJ8zHhkNXFtNRb530+tWPePdj4IUhfk=;
+        b=ULOSi4AXLKIBhvOB1rNXovGYPFYcH6YICYVBitD0KvAACHANCvdIwowwWglLRRX3Ui
+         EVe8dpthokR1C8ePxJXZ9t/adxyiXBxF+pRyS+vCy/KtC1b51Ki90BIpR5sPnp1GrUGZ
+         lxU+OcgfMaeB8Nfkl82nPsoXVDIAJY1csNrXvB4g1ruXYIG9k1ZtjkECYrNr3FGs5aAD
+         HHYIYGlnVZTB0CKoS6DihGY5G9kGsN1Oz4CB+G/xJb6P9/yJnhNpbFzBSyoG5NgXsiO1
+         JF46d10ftu6lpjnLwiYiTSPkIbR95I6kyUSkuljetDVs63A+ezE9AM9VV0GMTX8X9z3P
+         NGhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729087716; x=1729692516;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZKcAJrsMT6v1EJVRGfh/ABrvXvKqs+PkK6NkGIgrV2k=;
-        b=ekRx4e4Mx4fDdE9ThWWMWAef08m8qzs1c1bGWGtFrLXYgEgjmYy9VM9udtARRUXolb
-         y+2U3J8H3u6OQtb8SESlAtdKjKnd549cqrh0mI6MaWbHi0ZsXNmMGp7xeW+L/rUyMOiO
-         4t86SZUTUxeRhEcpA/8JdkqMhs+DAyISF6NNAxET7xuM371s4o3BcLuuTh+GflF5ARsB
-         l8/8kqRUg+KvE2SJ8rRdmWzVccNdnwAzzpp8NJjIzLecniTJybRXmfufHZsXhKwujWmH
-         rFxrpuhEtSC6jj+BHwprNx67ALmxu47G81IVdbGpxqfd2ih68TE5o2Zc7VeE7CQpTfWX
-         58AA==
-X-Gm-Message-State: AOJu0Yy6Ye2XPu57kf/rURA7GwecwqNqMMia+vM6IkG9iuGWjlLYTSNa
-	kRtwJJ4M0IB6CPFrn1lNhxCOuqvYyc5rZxZuGEzBh8gw2y4x4NxAU6U8S7dqgU+7ucilEaAaV7c
-	5
-X-Google-Smtp-Source: AGHT+IGdDjZuMmb+MY28FT9rHcKllNprqDnweo3KftlNd0C2m7Hj+r7n3A4gyxBMkQbFHQich3bsbw==
-X-Received: by 2002:a05:6e02:1a4f:b0:3a3:b254:ca2c with SMTP id e9e14a558f8ab-3a3bce11c80mr144485285ab.25.1729087715535;
-        Wed, 16 Oct 2024 07:08:35 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a3d70cd606sm8284545ab.52.2024.10.16.07.08.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 07:08:34 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-In-Reply-To: <20241016134847.2911721-1-ming.lei@redhat.com>
-References: <20241016134847.2911721-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] ublk: don't allow user copy for unprivileged device
-Message-Id: <172908771463.7156.1054660987028664043.b4-ty@kernel.dk>
-Date: Wed, 16 Oct 2024 08:08:34 -0600
+        d=1e100.net; s=20230601; t=1729087730; x=1729692530;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3xgrle76UhYTPJ8zHhkNXFtNRb530+tWPePdj4IUhfk=;
+        b=cZ1fLXnDVPB23n93JrfhBb77fk1pA/8oZnBnVSxCJkVg1WQWYCfa+1FBxG5L5RNhI1
+         72eE3+1FrMOUBUTQ+5b50Jf28n3jYwGNXsm+SIhKzIDEq0fAv4MozWt9wzwRHoLnWxrF
+         gxmWxSspmkZUtLh3B8OyaMStOtE0/+gYC8Lvr+dlAenlRZS5rY7jHcitOiLlMWVpEIJ/
+         zO6Bga4KWdCwR8ozgiKeP9W5hx/PZM8vd3a80J/DcT1qJV+qRnjc9BvTqMod8I/3L4bL
+         lzhXaYLvQSvGJWcJPUOtf8CNPBCOuFbsSqDd1hnXaF8y4t76qDbidqRabk1vcjjCxnyZ
+         rPbA==
+X-Forwarded-Encrypted: i=1; AJvYcCWmC+LbHTOrYJUb+KARiMK9TOPhHZGs8Y+c3g1263v6E9WeL604feg2tUwdcxGxLRuTeJ+a1rfaDxD8VQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyf1ryzUS/VyGFb3bLhTiI+x4/x7Mssqf7Z6Z4Q+DksBk4zuJY9
+	7WTfepo81nTPu1U60UMMTXKGA7qahPS4QoywOPrtLd/bXjrHIO5Of2bmKuD55ISDphn3QpDfMuR
+	V
+X-Google-Smtp-Source: AGHT+IH0DlWCca0XU4Pz2vOuAY4KeSanD7TstsE1E9QSXBMm1pGxR7tPPtCNqwazfjy6IBt9VlSHZw==
+X-Received: by 2002:a05:6602:3fc1:b0:83a:a4ff:49d7 with SMTP id ca18e2360f4ac-83aa4ff4abemr162961239f.9.1729087729997;
+        Wed, 16 Oct 2024 07:08:49 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbec9b11a2sm793103173.39.2024.10.16.07.08.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Oct 2024 07:08:49 -0700 (PDT)
+Message-ID: <4cc684af-cf7a-46d6-8880-ad645862df16@kernel.dk>
+Date: Wed, 16 Oct 2024 08:08:49 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ublk: don't allow user copy for unprivileged device
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+References: <20241016134847.2911721-1-ming.lei@redhat.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241016134847.2911721-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
 
-
-On Wed, 16 Oct 2024 21:48:47 +0800, Ming Lei wrote:
+On 10/16/24 7:48 AM, Ming Lei wrote:
 > UBLK_F_USER_COPY requires userspace to call write() on ublk char
 > device for filling request buffer, and unprivileged device can't
 > be trusted.
 > 
 > So don't allow user copy for unprivileged device.
 > 
-> 
-> [...]
+> Fixes: 1172d5b8beca ("ublk: support user copy")
 
-Applied, thanks!
+I marked this one for stable as well.
 
-[1/1] ublk: don't allow user copy for unprivileged device
-      commit: 42aafd8b48adac1c3b20fe5892b1b91b80c1a1e6
-
-Best regards,
 -- 
 Jens Axboe
-
-
 
