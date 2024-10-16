@@ -1,87 +1,96 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E981DAC9C
-	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 14:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B1B2076B3
+	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 15:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729087733; cv=none; b=ryFUYiQeSHuvdepnp9on8muJPIengTQXPmcYS1aIfaBcTMH6+92IMM1sX7tj9HZ+2HR52dJWeFUSiL8TGP74Y56GMJBNoocz1swb11IDW0HzhXXCAddTDweMNYhQndJb0cmhH1+X0GYNh8QbzISfpdKrz6X+p1b1xAOfF7PNLfE=
+	t=1729092940; cv=none; b=FULBsKM0PAuqdJTr6X7rr6HDywhz3S91aWCSCP7T+LBIcOLEMYNqIBp8TrIXnUvowX5dTY7vJe9XXoDZ7ACfTV8Z6iO11IEU6/4LMGJ0ZqvPGlj8OZ9UqD22m2xpzY6ZsWqaM2hZBHmnf1smY/FZIw4GWGJNnXCYjG/msm/oDUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729087733; c=relaxed/simple;
-	bh=LJ6kyCAdTOGA8kL19ZQGbzu4tfizaDgX0Xs9pQozxls=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=WL59srw0TE4UOsP9bHvF4KbNNqn8bUC7a4c6ZNXA/EPGoiUGr+XCocO7fjcRYg+GVrW/sJnkTxMRNkl4NP3nDWkGJCeIZcwDrjeC6faVEbfnJnl8qRsruwD/Kj7a+mLAxGrh/YJXsEDli0H7oGDBOEcd+Qqb2Jg9mMObfZTUzzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ULOSi4AX; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ULOSi4AX"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-83a98e107feso37941139f.3
-        for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 07:08:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729087730; x=1729692530; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3xgrle76UhYTPJ8zHhkNXFtNRb530+tWPePdj4IUhfk=;
-        b=ULOSi4AXLKIBhvOB1rNXovGYPFYcH6YICYVBitD0KvAACHANCvdIwowwWglLRRX3Ui
-         EVe8dpthokR1C8ePxJXZ9t/adxyiXBxF+pRyS+vCy/KtC1b51Ki90BIpR5sPnp1GrUGZ
-         lxU+OcgfMaeB8Nfkl82nPsoXVDIAJY1csNrXvB4g1ruXYIG9k1ZtjkECYrNr3FGs5aAD
-         HHYIYGlnVZTB0CKoS6DihGY5G9kGsN1Oz4CB+G/xJb6P9/yJnhNpbFzBSyoG5NgXsiO1
-         JF46d10ftu6lpjnLwiYiTSPkIbR95I6kyUSkuljetDVs63A+ezE9AM9VV0GMTX8X9z3P
-         NGhA==
+	s=arc-20240116; t=1729092940; c=relaxed/simple;
+	bh=GHjwlwxveIPYDnG8AMYjvLxv+SlAx7mv+T7WRWCO6lc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QV23agKV/sKjsb468b2GvYrDoiP6HzEk5PfMx37oy028XgnBgXOrOgWewVA58M+1t6XIkJ3JpBrZFAdqA7yVzJsRy4tvnTYXJ37LM9V1eorpV90f7M5cOmUeb4uV/yAz4hpsexpCgAPDTheutOyajpAVSalpDdRBb4Abj1iQWa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a3c90919a2so188695ab.0
+        for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 08:35:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729087730; x=1729692530;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3xgrle76UhYTPJ8zHhkNXFtNRb530+tWPePdj4IUhfk=;
-        b=cZ1fLXnDVPB23n93JrfhBb77fk1pA/8oZnBnVSxCJkVg1WQWYCfa+1FBxG5L5RNhI1
-         72eE3+1FrMOUBUTQ+5b50Jf28n3jYwGNXsm+SIhKzIDEq0fAv4MozWt9wzwRHoLnWxrF
-         gxmWxSspmkZUtLh3B8OyaMStOtE0/+gYC8Lvr+dlAenlRZS5rY7jHcitOiLlMWVpEIJ/
-         zO6Bga4KWdCwR8ozgiKeP9W5hx/PZM8vd3a80J/DcT1qJV+qRnjc9BvTqMod8I/3L4bL
-         lzhXaYLvQSvGJWcJPUOtf8CNPBCOuFbsSqDd1hnXaF8y4t76qDbidqRabk1vcjjCxnyZ
-         rPbA==
-X-Forwarded-Encrypted: i=1; AJvYcCWmC+LbHTOrYJUb+KARiMK9TOPhHZGs8Y+c3g1263v6E9WeL604feg2tUwdcxGxLRuTeJ+a1rfaDxD8VQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf1ryzUS/VyGFb3bLhTiI+x4/x7Mssqf7Z6Z4Q+DksBk4zuJY9
-	7WTfepo81nTPu1U60UMMTXKGA7qahPS4QoywOPrtLd/bXjrHIO5Of2bmKuD55ISDphn3QpDfMuR
-	V
-X-Google-Smtp-Source: AGHT+IH0DlWCca0XU4Pz2vOuAY4KeSanD7TstsE1E9QSXBMm1pGxR7tPPtCNqwazfjy6IBt9VlSHZw==
-X-Received: by 2002:a05:6602:3fc1:b0:83a:a4ff:49d7 with SMTP id ca18e2360f4ac-83aa4ff4abemr162961239f.9.1729087729997;
-        Wed, 16 Oct 2024 07:08:49 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbec9b11a2sm793103173.39.2024.10.16.07.08.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Oct 2024 07:08:49 -0700 (PDT)
-Message-ID: <4cc684af-cf7a-46d6-8880-ad645862df16@kernel.dk>
-Date: Wed, 16 Oct 2024 08:08:49 -0600
+        d=1e100.net; s=20230601; t=1729092938; x=1729697738;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9JqhR4ZtEuyLzM/TTx/0hTwfmqZsDh9mfAHJ0ABaYb8=;
+        b=tK2Z8eoZWJezFMXkIiaTihqJdJUhcT7zVU81+aq+cmOsNgTvk3fQCzIrdQHgyWaoEl
+         wHeniZsfg1PHCLIk85J9Ajj+jp+IyE/8OJI6++Gj/gV5JUqP4prDWss26q05M7BWe+m+
+         mYrlFkFXGNw1FBH6zQKuvUq3X20zwlPTN799OiTd1you4C1SYhoLK+mqoISoy2chCpmU
+         /JDHgOl+7dJ2wKnmPRUwc0RQMAgnFkn5AN7Lzu/O8hb2Kg//NhOiRXKIo+BLDCi0Ybo6
+         dI0rPuG5aFqNF8TRf/k/nVA8oImOG9JUZnqD+AwAUZ1CHLVc9k7s37yTYId2a0VvMOS8
+         ldNg==
+X-Gm-Message-State: AOJu0YySAS/tYpHsLt795ahRtBb12gHmmPMHNFmxSsGax223THVIvVSt
+	EGMUDBhcRRJdrbeLvifI7QfRY7X/Qcge9220y0ipSxCFJuAwNKBkWXkMtbUBoe+JoVxhLMWtWX5
+	NWI4TD2+i09awv3wtCzllrAedTvDrAxi75KlElS9zreSOlZ+vpibuXz0=
+X-Google-Smtp-Source: AGHT+IFVURw2c73YcMmgIkcpLXz8fFY44ICkuTuu+hnvO4F0VDcH5uubNGoWH8SBWce8uUkxlD+AGWtvyTiTAg9b3tVI8Ev0MHuu
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ublk: don't allow user copy for unprivileged device
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-References: <20241016134847.2911721-1-ming.lei@redhat.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241016134847.2911721-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1d0c:b0:3a1:a26e:81a with SMTP id
+ e9e14a558f8ab-3a3dc4a7b7fmr44327775ab.7.1729092938153; Wed, 16 Oct 2024
+ 08:35:38 -0700 (PDT)
+Date: Wed, 16 Oct 2024 08:35:38 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <670fdd4a.050a0220.d9b66.016e.GAE@google.com>
+Subject: [syzbot] Monthly block report (Oct 2024)
+From: syzbot <syzbot+list57f9fb326ad19207a6f6@syzkaller.appspotmail.com>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 10/16/24 7:48 AM, Ming Lei wrote:
-> UBLK_F_USER_COPY requires userspace to call write() on ublk char
-> device for filling request buffer, and unprivileged device can't
-> be trusted.
-> 
-> So don't allow user copy for unprivileged device.
-> 
-> Fixes: 1172d5b8beca ("ublk: support user copy")
+Hello block maintainers/developers,
 
-I marked this one for stable as well.
+This is a 31-day syzbot report for the block subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/block
 
--- 
-Jens Axboe
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 23 issues are still open and 94 have been fixed so far.
 
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  4260    Yes   KMSAN: kernel-infoleak in filemap_read
+                   https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
+<2>  2332    Yes   INFO: task hung in bdev_release
+                   https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
+<3>  1566    Yes   INFO: task hung in blkdev_fallocate
+                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
+<4>  584     No    INFO: task hung in bdev_open
+                   https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
+<5>  89      No    INFO: task hung in read_part_sector (2)
+                   https://syzkaller.appspot.com/bug?extid=82de77d3f217960f087d
+<6>  44      Yes   INFO: rcu detected stall in schedule (7)
+                   https://syzkaller.appspot.com/bug?extid=005409b89b9a9675cb2a
+<7>  37      Yes   INFO: task hung in nbd_add_socket (2)
+                   https://syzkaller.appspot.com/bug?extid=cbb4b1ebc70d0c5a8c29
+<8>  30      No    KCSAN: data-race in block_uevent / inc_diskseq (2)
+                   https://syzkaller.appspot.com/bug?extid=c147f9175ec6cc7bd73b
+<9>  16      Yes   INFO: task hung in truncate_inode_pages
+                   https://syzkaller.appspot.com/bug?extid=bae3c73c7bf2fe3a740b
+<10> 11      Yes   KASAN: slab-use-after-free Read in percpu_ref_put (2)
+                   https://syzkaller.appspot.com/bug?extid=905d719acdbd213bf67e
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
