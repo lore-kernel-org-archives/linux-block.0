@@ -1,230 +1,308 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8ABA12E75;
-	Wed, 16 Oct 2024 20:03:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D68A1C1741
+	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 20:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729109028; cv=none; b=Q0xiCWC/dVIEBlZm8mlVp3TKhR6hLOEAm1YR2iueT+Jxmm5bgW5q2iDxzSGDRGNLoAiIN6eY+Os89v+6Yt8q1r8/QwN4tsYC6szXo8ntIDVfrM937uDlNzAkFWd9lc/47Sfro30QRh/6CsL153WnhaL/+gFjbWbMIbr66fU/ev0=
+	t=1729109609; cv=none; b=DQmpi6UNMTHXu6vEkekIsl+jvisIauBTO7TzUfXu/SS7U2+fEhL37337yTJ7Zl2QQUpgiuyjWUE0wiPf91BkZp5AKRz2W3R/75zBpk/e56wWZP6+uGY4xgrUghG+nXqnwxaXvt5bW3w1lOUtisZ25Jf52aKFZ3RRl6eDdDzPo50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729109028; c=relaxed/simple;
-	bh=siHADyCOksevsW3dlLz/5xynMSqTra9QywIhGTEVtDI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xd+ZmNHkhkx+Pa2RL9NviGqJoR2ibwlKajf+BYQA3cY7D7zRUKxmVtqhQQXtSCd3BNfgwz3VyS5tMZ705alUVJU0ZsyD7HcjZIL61bmrbFyvJOyx9k8msD0v7Symq91RvNKp1QVJny1UQyuZFzUHjN0HFkcAnV77YH6gu8jwVEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RgnBwV3n; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729109609; c=relaxed/simple;
+	bh=W6sG4XInhRzCu8cDMzCc51e1cYCKaqsFe9Eeb5BE+gw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gpLKRGYHl2CmQwRzAB+S0CyvJqE7uzG01nJrPvw9xZDtDBNL9JLaNR6abmhJT65Ct2O+f+2cAv/3W2JD0GYuu2tQCcjbAm7Cwco3oOtPxkqVOSL1Ecz3frDl5B3OursUWt6MEhteEBapYrbj+3VBHB6GoYJb3tcafUIw2fRCkkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=nWOSfs2l; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RgnBwV3n"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51C98C4CEC5;
-	Wed, 16 Oct 2024 20:03:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729109028;
-	bh=siHADyCOksevsW3dlLz/5xynMSqTra9QywIhGTEVtDI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RgnBwV3nddKeJBVuzwucRW+AxnjgT7yLROZjU1y17ugKQFPnjZI9rUaoUXfQLO16l
-	 5PlEgu03hW8CXpxwQs4rBq9WV6rEW6Q+2yQLtBWKQg/pFE7hiJxWrzRTmP7pSmpwLf
-	 TGjWp0MbnSN/AeWnvhC8b+vwP1lK+UKj5o6AqW4gY8JTLV13t3LpRi6iVGmwfGMAXQ
-	 haRbULk6fO81kh8KHqoEpw4ghQmVN88rcSDxy43pgGmgySAm1//ABVchULIUGKjvR4
-	 iMtXKttkLsGDGlMQpJ46BkwVMUqCicd9XnsdB2lZBVj/IYNKzrniZjtkz9teFxLMF4
-	 uxUbeqgRuAavg==
-Date: Wed, 16 Oct 2024 13:03:47 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, brauner@kernel.org, viro@zeniv.linux.org.uk,
-	jack@suse.cz, dchinner@redhat.com, hch@lst.de, cem@kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	hare@suse.de, martin.petersen@oracle.com,
-	catherine.hoang@oracle.com, mcgrof@kernel.org,
-	ritesh.list@gmail.com, ojaswin@linux.ibm.com
-Subject: Re: [PATCH v9 5/8] fs: iomap: Atomic write support
-Message-ID: <20241016200347.GP21853@frogsfrogsfrogs>
-References: <20241016100325.3534494-1-john.g.garry@oracle.com>
- <20241016100325.3534494-6-john.g.garry@oracle.com>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="nWOSfs2l"
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 49GJEwOQ001765
+	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 13:13:26 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2021-q4; bh=CoZ2NfTGVLahbkZYF3
+	aIpD95P8EHEfquqQlIum/cS/Y=; b=nWOSfs2lZmonST4quBXdvxt8iElPBjQwL4
+	Qdvv39YpsQWeOdUoBrwe3MYqabR7w9c6sJh7YLjRuTvKKSdENFGdlEdXvmmiTAPW
+	qACxoy2jbk51K4KNXkXEaXUqe3N/glvCzAu/qAtKi6r67OgmHdZk8+lPYmgA7Uqa
+	U+5MsenFIBlkE+BZyRR26GMBp0lbg2x5H74deyT81Qb0vqDsDxU84ua+lFfHDOgA
+	1i4jGqNeQdqfjCp32CeJSX2YXyafg902zSJLbGtPnb6d5p29R8nqSyZAE01D3Dp+
+	RDJXsjhdNf9NMrhzyborhm0YSmv318xdVTAxYGdh81PcpVh8Jaxg==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 42a8wm4mys-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 13:13:25 -0700 (PDT)
+Received: from twshared29849.08.ash9.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.11; Wed, 16 Oct 2024 20:13:23 +0000
+Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
+	id DD5C914344E5F; Wed, 16 Oct 2024 13:13:09 -0700 (PDT)
+From: Keith Busch <kbusch@meta.com>
+To: <hch@lst.de>, <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>
+CC: <anuj20.g@samsung.com>, <martin.petersen@oracle.com>,
+        Keith Busch
+	<kbusch@kernel.org>
+Subject: [PATCH] blk-integrity: remove seed for user mapped buffers
+Date: Wed, 16 Oct 2024 13:13:09 -0700
+Message-ID: <20241016201309.1090320-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241016100325.3534494-6-john.g.garry@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: itGscruqgwIAdox55m1JhFsEAiAH7V7z
+X-Proofpoint-ORIG-GUID: itGscruqgwIAdox55m1JhFsEAiAH7V7z
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
-On Wed, Oct 16, 2024 at 10:03:22AM +0000, John Garry wrote:
-> Support direct I/O atomic writes by producing a single bio with REQ_ATOMIC
-> flag set.
-> 
-> Initially FSes (XFS) should only support writing a single FS block
-> atomically.
-> 
-> As with any atomic write, we should produce a single bio which covers the
-> complete write length.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->  .../filesystems/iomap/operations.rst          | 11 ++++++
->  fs/iomap/direct-io.c                          | 38 +++++++++++++++++--
->  fs/iomap/trace.h                              |  3 +-
->  include/linux/iomap.h                         |  1 +
->  4 files changed, 48 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/filesystems/iomap/operations.rst b/Documentation/filesystems/iomap/operations.rst
-> index b93115ab8748..5f382076db67 100644
-> --- a/Documentation/filesystems/iomap/operations.rst
-> +++ b/Documentation/filesystems/iomap/operations.rst
-> @@ -513,6 +513,17 @@ IOMAP_WRITE`` with any combination of the following enhancements:
->     if the mapping is unwritten and the filesystem cannot handle zeroing
->     the unaligned regions without exposing stale contents.
->  
-> + * ``IOMAP_ATOMIC``: This write is being issued with torn-write
-> +   protection. Only a single bio can be created for the write, and the
+From: Keith Busch <kbusch@kernel.org>
 
-Dumb nit:        ^^ start new sentences on a new line like the rest of
-the file, please.
+The seed is only used for kernel generation and verification. That
+doesn't happen for user buffers, so passing the seed around doesn't
+accomplish anything.
 
-With that fixed,
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/bio-integrity.c         | 13 +++++--------
+ block/blk-integrity.c         |  4 ++--
+ drivers/nvme/host/ioctl.c     | 17 ++++++++---------
+ include/linux/bio-integrity.h |  4 ++--
+ include/linux/blk-integrity.h |  5 ++---
+ 5 files changed, 19 insertions(+), 24 deletions(-)
 
---D
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 88e3ad73c3854..2a4bd66116920 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -199,7 +199,7 @@ EXPORT_SYMBOL(bio_integrity_add_page);
+=20
+ static int bio_integrity_copy_user(struct bio *bio, struct bio_vec *bvec=
+,
+ 				   int nr_vecs, unsigned int len,
+-				   unsigned int direction, u32 seed)
++				   unsigned int direction)
+ {
+ 	bool write =3D direction =3D=3D ITER_SOURCE;
+ 	struct bio_integrity_payload *bip;
+@@ -247,7 +247,6 @@ static int bio_integrity_copy_user(struct bio *bio, s=
+truct bio_vec *bvec,
+ 	}
+=20
+ 	bip->bip_flags |=3D BIP_COPY_USER;
+-	bip->bip_iter.bi_sector =3D seed;
+ 	bip->bip_vcnt =3D nr_vecs;
+ 	return 0;
+ free_bip:
+@@ -258,7 +257,7 @@ static int bio_integrity_copy_user(struct bio *bio, s=
+truct bio_vec *bvec,
+ }
+=20
+ static int bio_integrity_init_user(struct bio *bio, struct bio_vec *bvec=
+,
+-				   int nr_vecs, unsigned int len, u32 seed)
++				   int nr_vecs, unsigned int len)
+ {
+ 	struct bio_integrity_payload *bip;
+=20
+@@ -267,7 +266,6 @@ static int bio_integrity_init_user(struct bio *bio, s=
+truct bio_vec *bvec,
+ 		return PTR_ERR(bip);
+=20
+ 	memcpy(bip->bip_vec, bvec, nr_vecs * sizeof(*bvec));
+-	bip->bip_iter.bi_sector =3D seed;
+ 	bip->bip_iter.bi_size =3D len;
+ 	bip->bip_vcnt =3D nr_vecs;
+ 	return 0;
+@@ -303,8 +301,7 @@ static unsigned int bvec_from_pages(struct bio_vec *b=
+vec, struct page **pages,
+ 	return nr_bvecs;
+ }
+=20
+-int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t b=
+ytes,
+-			   u32 seed)
++int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t b=
+ytes)
+ {
+ 	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
+ 	unsigned int align =3D blk_lim_dma_alignment_and_pad(&q->limits);
+@@ -350,9 +347,9 @@ int bio_integrity_map_user(struct bio *bio, void __us=
+er *ubuf, ssize_t bytes,
+=20
+ 	if (copy)
+ 		ret =3D bio_integrity_copy_user(bio, bvec, nr_bvecs, bytes,
+-					      direction, seed);
++					      direction);
+ 	else
+-		ret =3D bio_integrity_init_user(bio, bvec, nr_bvecs, bytes, seed);
++		ret =3D bio_integrity_init_user(bio, bvec, nr_bvecs, bytes);
+ 	if (ret)
+ 		goto release_pages;
+ 	if (bvec !=3D stack_vec)
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index 83b696ba0cac3..b180cac61a9dd 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -113,9 +113,9 @@ int blk_rq_map_integrity_sg(struct request *rq, struc=
+t scatterlist *sglist)
+ EXPORT_SYMBOL(blk_rq_map_integrity_sg);
+=20
+ int blk_rq_integrity_map_user(struct request *rq, void __user *ubuf,
+-			      ssize_t bytes, u32 seed)
++			      ssize_t bytes)
+ {
+-	int ret =3D bio_integrity_map_user(rq->bio, ubuf, bytes, seed);
++	int ret =3D bio_integrity_map_user(rq->bio, ubuf, bytes);
+=20
+ 	if (ret)
+ 		return ret;
+diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+index b9b79ccfabf8a..f697d2d1d7e42 100644
+--- a/drivers/nvme/host/ioctl.c
++++ b/drivers/nvme/host/ioctl.c
+@@ -114,7 +114,7 @@ static struct request *nvme_alloc_user_request(struct=
+ request_queue *q,
+=20
+ static int nvme_map_user_request(struct request *req, u64 ubuffer,
+ 		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
+-		u32 meta_seed, struct io_uring_cmd *ioucmd, unsigned int flags)
++		struct io_uring_cmd *ioucmd, unsigned int flags)
+ {
+ 	struct request_queue *q =3D req->q;
+ 	struct nvme_ns *ns =3D q->queuedata;
+@@ -152,8 +152,7 @@ static int nvme_map_user_request(struct request *req,=
+ u64 ubuffer,
+ 		bio_set_dev(bio, bdev);
+=20
+ 	if (has_metadata) {
+-		ret =3D blk_rq_integrity_map_user(req, meta_buffer, meta_len,
+-						meta_seed);
++		ret =3D blk_rq_integrity_map_user(req, meta_buffer, meta_len);
+ 		if (ret)
+ 			goto out_unmap;
+ 	}
+@@ -170,7 +169,7 @@ static int nvme_map_user_request(struct request *req,=
+ u64 ubuffer,
+=20
+ static int nvme_submit_user_cmd(struct request_queue *q,
+ 		struct nvme_command *cmd, u64 ubuffer, unsigned bufflen,
+-		void __user *meta_buffer, unsigned meta_len, u32 meta_seed,
++		void __user *meta_buffer, unsigned meta_len,
+ 		u64 *result, unsigned timeout, unsigned int flags)
+ {
+ 	struct nvme_ns *ns =3D q->queuedata;
+@@ -187,7 +186,7 @@ static int nvme_submit_user_cmd(struct request_queue =
+*q,
+ 	req->timeout =3D timeout;
+ 	if (ubuffer && bufflen) {
+ 		ret =3D nvme_map_user_request(req, ubuffer, bufflen, meta_buffer,
+-				meta_len, meta_seed, NULL, flags);
++				meta_len, NULL, flags);
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -268,7 +267,7 @@ static int nvme_submit_io(struct nvme_ns *ns, struct =
+nvme_user_io __user *uio)
+ 	c.rw.lbatm =3D cpu_to_le16(io.appmask);
+=20
+ 	return nvme_submit_user_cmd(ns->queue, &c, io.addr, length, metadata,
+-			meta_len, lower_32_bits(io.slba), NULL, 0, 0);
++			meta_len, NULL, 0, 0);
+ }
+=20
+ static bool nvme_validate_passthru_nsid(struct nvme_ctrl *ctrl,
+@@ -323,7 +322,7 @@ static int nvme_user_cmd(struct nvme_ctrl *ctrl, stru=
+ct nvme_ns *ns,
+=20
+ 	status =3D nvme_submit_user_cmd(ns ? ns->queue : ctrl->admin_q, &c,
+ 			cmd.addr, cmd.data_len, nvme_to_user_ptr(cmd.metadata),
+-			cmd.metadata_len, 0, &result, timeout, 0);
++			cmd.metadata_len, &result, timeout, 0);
+=20
+ 	if (status >=3D 0) {
+ 		if (put_user(result, &ucmd->result))
+@@ -370,7 +369,7 @@ static int nvme_user_cmd64(struct nvme_ctrl *ctrl, st=
+ruct nvme_ns *ns,
+=20
+ 	status =3D nvme_submit_user_cmd(ns ? ns->queue : ctrl->admin_q, &c,
+ 			cmd.addr, cmd.data_len, nvme_to_user_ptr(cmd.metadata),
+-			cmd.metadata_len, 0, &cmd.result, timeout, flags);
++			cmd.metadata_len, &cmd.result, timeout, flags);
+=20
+ 	if (status >=3D 0) {
+ 		if (put_user(cmd.result, &ucmd->result))
+@@ -504,7 +503,7 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, =
+struct nvme_ns *ns,
+ 	if (d.addr && d.data_len) {
+ 		ret =3D nvme_map_user_request(req, d.addr,
+ 			d.data_len, nvme_to_user_ptr(d.metadata),
+-			d.metadata_len, 0, ioucmd, vec);
++			d.metadata_len, ioucmd, vec);
+ 		if (ret)
+ 			return ret;
+ 	}
+diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.=
+h
+index dd831c269e994..dbf0f74c15291 100644
+--- a/include/linux/bio-integrity.h
++++ b/include/linux/bio-integrity.h
+@@ -72,7 +72,7 @@ struct bio_integrity_payload *bio_integrity_alloc(struc=
+t bio *bio, gfp_t gfp,
+ 		unsigned int nr);
+ int bio_integrity_add_page(struct bio *bio, struct page *page, unsigned =
+int len,
+ 		unsigned int offset);
+-int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t l=
+en, u32 seed);
++int bio_integrity_map_user(struct bio *bio, void __user *ubuf, ssize_t l=
+en);
+ void bio_integrity_unmap_user(struct bio *bio);
+ bool bio_integrity_prep(struct bio *bio);
+ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done);
+@@ -99,7 +99,7 @@ static inline void bioset_integrity_free(struct bio_set=
+ *bs)
+ }
+=20
+ static inline int bio_integrity_map_user(struct bio *bio, void __user *u=
+buf,
+-					 ssize_t len, u32 seed)
++					 ssize_t len)
+ {
+ 	return -EINVAL;
+ }
+diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.=
+h
+index 676f8f860c474..c7eae0bfb013f 100644
+--- a/include/linux/blk-integrity.h
++++ b/include/linux/blk-integrity.h
+@@ -28,7 +28,7 @@ static inline bool queue_limits_stack_integrity_bdev(st=
+ruct queue_limits *t,
+ int blk_rq_map_integrity_sg(struct request *, struct scatterlist *);
+ int blk_rq_count_integrity_sg(struct request_queue *, struct bio *);
+ int blk_rq_integrity_map_user(struct request *rq, void __user *ubuf,
+-			      ssize_t bytes, u32 seed);
++			      ssize_t bytes);
+=20
+ static inline bool
+ blk_integrity_queue_supports_integrity(struct request_queue *q)
+@@ -104,8 +104,7 @@ static inline int blk_rq_map_integrity_sg(struct requ=
+est *q,
+ }
+ static inline int blk_rq_integrity_map_user(struct request *rq,
+ 					    void __user *ubuf,
+-					    ssize_t bytes,
+-					    u32 seed)
++					    ssize_t bytes)
+ {
+ 	return -EINVAL;
+ }
+--=20
+2.43.5
 
-> +   write must not be split into multiple I/O requests, i.e. flag
-> +   REQ_ATOMIC must be set.
-> +   The file range to write must be aligned to satisfy the requirements
-> +   of both the filesystem and the underlying block device's atomic
-> +   commit capabilities.
-> +   If filesystem metadata updates are required (e.g. unwritten extent
-> +   conversion or copy on write), all updates for the entire file range
-> +   must be committed atomically as well.
-> +
->  Callers commonly hold ``i_rwsem`` in shared or exclusive mode before
->  calling this function.
->  
-> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-> index f637aa0706a3..ed4764e3b8f0 100644
-> --- a/fs/iomap/direct-io.c
-> +++ b/fs/iomap/direct-io.c
-> @@ -271,7 +271,7 @@ static int iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
->   * clearing the WRITE_THROUGH flag in the dio request.
->   */
->  static inline blk_opf_t iomap_dio_bio_opflags(struct iomap_dio *dio,
-> -		const struct iomap *iomap, bool use_fua)
-> +		const struct iomap *iomap, bool use_fua, bool atomic)
->  {
->  	blk_opf_t opflags = REQ_SYNC | REQ_IDLE;
->  
-> @@ -283,6 +283,8 @@ static inline blk_opf_t iomap_dio_bio_opflags(struct iomap_dio *dio,
->  		opflags |= REQ_FUA;
->  	else
->  		dio->flags &= ~IOMAP_DIO_WRITE_THROUGH;
-> +	if (atomic)
-> +		opflags |= REQ_ATOMIC;
->  
->  	return opflags;
->  }
-> @@ -293,7 +295,8 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
->  	const struct iomap *iomap = &iter->iomap;
->  	struct inode *inode = iter->inode;
->  	unsigned int fs_block_size = i_blocksize(inode), pad;
-> -	loff_t length = iomap_length(iter);
-> +	const loff_t length = iomap_length(iter);
-> +	bool atomic = iter->flags & IOMAP_ATOMIC;
->  	loff_t pos = iter->pos;
->  	blk_opf_t bio_opf;
->  	struct bio *bio;
-> @@ -303,6 +306,9 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
->  	size_t copied = 0;
->  	size_t orig_count;
->  
-> +	if (atomic && length != fs_block_size)
-> +		return -EINVAL;
-> +
->  	if ((pos | length) & (bdev_logical_block_size(iomap->bdev) - 1) ||
->  	    !bdev_iter_is_aligned(iomap->bdev, dio->submit.iter))
->  		return -EINVAL;
-> @@ -382,7 +388,7 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
->  	 * can set up the page vector appropriately for a ZONE_APPEND
->  	 * operation.
->  	 */
-> -	bio_opf = iomap_dio_bio_opflags(dio, iomap, use_fua);
-> +	bio_opf = iomap_dio_bio_opflags(dio, iomap, use_fua, atomic);
->  
->  	nr_pages = bio_iov_vecs_to_alloc(dio->submit.iter, BIO_MAX_VECS);
->  	do {
-> @@ -415,6 +421,17 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
->  		}
->  
->  		n = bio->bi_iter.bi_size;
-> +		if (WARN_ON_ONCE(atomic && n != length)) {
-> +			/*
-> +			 * This bio should have covered the complete length,
-> +			 * which it doesn't, so error. We may need to zero out
-> +			 * the tail (complete FS block), similar to when
-> +			 * bio_iov_iter_get_pages() returns an error, above.
-> +			 */
-> +			ret = -EINVAL;
-> +			bio_put(bio);
-> +			goto zero_tail;
-> +		}
->  		if (dio->flags & IOMAP_DIO_WRITE) {
->  			task_io_account_write(n);
->  		} else {
-> @@ -598,6 +615,9 @@ __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
->  	if (iocb->ki_flags & IOCB_NOWAIT)
->  		iomi.flags |= IOMAP_NOWAIT;
->  
-> +	if (iocb->ki_flags & IOCB_ATOMIC)
-> +		iomi.flags |= IOMAP_ATOMIC;
-> +
->  	if (iov_iter_rw(iter) == READ) {
->  		/* reads can always complete inline */
->  		dio->flags |= IOMAP_DIO_INLINE_COMP;
-> @@ -659,7 +679,17 @@ __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
->  			if (ret != -EAGAIN) {
->  				trace_iomap_dio_invalidate_fail(inode, iomi.pos,
->  								iomi.len);
-> -				ret = -ENOTBLK;
-> +				if (iocb->ki_flags & IOCB_ATOMIC) {
-> +					/*
-> +					 * folio invalidation failed, maybe
-> +					 * this is transient, unlock and see if
-> +					 * the caller tries again.
-> +					 */
-> +					ret = -EAGAIN;
-> +				} else {
-> +					/* fall back to buffered write */
-> +					ret = -ENOTBLK;
-> +				}
->  			}
->  			goto out_free_dio;
->  		}
-> diff --git a/fs/iomap/trace.h b/fs/iomap/trace.h
-> index 0a991c4ce87d..4118a42cdab0 100644
-> --- a/fs/iomap/trace.h
-> +++ b/fs/iomap/trace.h
-> @@ -98,7 +98,8 @@ DEFINE_RANGE_EVENT(iomap_dio_rw_queued);
->  	{ IOMAP_REPORT,		"REPORT" }, \
->  	{ IOMAP_FAULT,		"FAULT" }, \
->  	{ IOMAP_DIRECT,		"DIRECT" }, \
-> -	{ IOMAP_NOWAIT,		"NOWAIT" }
-> +	{ IOMAP_NOWAIT,		"NOWAIT" }, \
-> +	{ IOMAP_ATOMIC,		"ATOMIC" }
->  
->  #define IOMAP_F_FLAGS_STRINGS \
->  	{ IOMAP_F_NEW,		"NEW" }, \
-> diff --git a/include/linux/iomap.h b/include/linux/iomap.h
-> index d0420e962ffd..84282db3e4c1 100644
-> --- a/include/linux/iomap.h
-> +++ b/include/linux/iomap.h
-> @@ -178,6 +178,7 @@ struct iomap_folio_ops {
->  #else
->  #define IOMAP_DAX		0
->  #endif /* CONFIG_FS_DAX */
-> +#define IOMAP_ATOMIC		(1 << 9)
->  
->  struct iomap_ops {
->  	/*
-> -- 
-> 2.31.1
-> 
-> 
