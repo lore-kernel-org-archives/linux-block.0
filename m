@@ -1,84 +1,83 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AFAB2144C3;
-	Wed, 16 Oct 2024 20:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DE914EC47;
+	Wed, 16 Oct 2024 23:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729109634; cv=none; b=nNnpH8gHSXfxAeODilLcxXdb00iRmYAkLhJOWBK+w2A/vAMXeEFQWJGI/rCXovxdhMaQnKVJFRB0TmpYx3gGixUw5K09/Lfe+mr7h8c699fFohoC9ScBzbLmsFLGVva93sNVpQqJ//zYPtNt/MXWPYFNS6H5J7jf6MpcDGIZLdI=
+	t=1729121310; cv=none; b=H81N3HfIu8H5xnDZAfyypz2FRLeAwXqT6TcMU/cMXaKRJnb0pAVoDP88aUq4HGPq0dbi8cuAdGmLE7zqDLxTvh7QMwJqf3upJyaF/Bk672isW61J0RF6VI+jcvry0OIxzPOYBjQH/Pkfvbk34rxPXN6hTVY6JiZJFtdMQ1lytPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729109634; c=relaxed/simple;
-	bh=VgjQ478YncvsdTabXKQrMpIeuCGxwKtvvuK8UNlZgNc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oBd198g3pIMsaVSo0b4DWowSqpL3ydUsgdrpoEcJyR1LC10WgSuuEjX9qkZhed8MwYqT/zvmAS5vBKQBACIpXM06EOoOGcTj3UEbuCYWUhwkIJ4zt2MabeLN4tfVWAQRZS7KN79hAzat8Ag5EswZNyL85IRubjuJJzWKcJDDrvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D6vQ30zw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729121310; c=relaxed/simple;
+	bh=Cf2GH1PBloo5u/SL/FWRlv6cAAqFO5p0+n+kcE4KN6Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mtXnkex0x4mZs6RuejM9oN0MYrhyhoCF1noXf5G7ElUZOcwH07C7sUKyHnVKc7RvNLPJ19Z3QUhZmFi49JqCQIdrTzjDn/yYLgOdrN/XF2w62GscGFaErHp1ia9oT8tWmPv4t1L7e6zsn/aTVF+bk8a01yWP+5NjhPzDP7RiUpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=srDjm2OR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6vQ30zw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 283A3C4CEC5;
-	Wed, 16 Oct 2024 20:13:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="srDjm2OR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B1F6C4CEC5;
+	Wed, 16 Oct 2024 23:28:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729109634;
-	bh=VgjQ478YncvsdTabXKQrMpIeuCGxwKtvvuK8UNlZgNc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D6vQ30zwmphZ0bxRiDwuaOKD5DTXX4cVU0SH4moU5ODvqWcnRye1kpALnEwcuPTfZ
-	 JLRSXCQJRkkSR00UJkZwfTOH/B87uqcMeHNQdAmsgd6d5mqdyAHEWhXOZLM2M1pefk
-	 uy7js/8y/03I05tXr501BWqGoCA0k0ZBWwmEAMFNOcLIxeX40lIRbQTPGNm4x38VNE
-	 1yQ98DMX9l0RWIL0hU8HUQJ042zsp8i1PE05p9G82Sa41ChcSFPP8qd5BwTJEcFm1d
-	 9sXIO4ogjo1hhi6EekCszaPAPQP07wbaaT0KIVvNmYl0b/Sq6uQkZVlcovdyriyDyh
-	 N3LHWyB2iXg+Q==
-Date: Wed, 16 Oct 2024 13:13:53 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, brauner@kernel.org, viro@zeniv.linux.org.uk,
-	jack@suse.cz, dchinner@redhat.com, hch@lst.de, cem@kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	hare@suse.de, martin.petersen@oracle.com,
-	catherine.hoang@oracle.com, mcgrof@kernel.org,
-	ritesh.list@gmail.com, ojaswin@linux.ibm.com
-Subject: Re: [PATCH v9 8/8] xfs: Support setting FMODE_CAN_ATOMIC_WRITE
-Message-ID: <20241016201353.GR21853@frogsfrogsfrogs>
-References: <20241016100325.3534494-1-john.g.garry@oracle.com>
- <20241016100325.3534494-9-john.g.garry@oracle.com>
+	s=k20201202; t=1729121309;
+	bh=Cf2GH1PBloo5u/SL/FWRlv6cAAqFO5p0+n+kcE4KN6Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=srDjm2OR+icJr6InORy6hB9Et8mZt7YKSYCYKk8rd9PM8f15H6wXjPfsW5BWBcxtA
+	 rfzs9xlCI1KZ5e1+FWD7W69gMw7D1Of7Ezc816dZM7D8x2ulF9Urb4d8GJh6W2IeWt
+	 YECUnauGjoBOjPIbd0dayFBbR/YjoogtnWmN1iOuwAsDZVjTx1GvSgjumKnwVNq+N9
+	 G5/KlyH7nPYg2bGxbGbsPu71INdgmOtJ6GlTgPEjYOsa19V3oVopHoWzG0XO+p527o
+	 LMHGSeE4mPM6Y6hCT9rNSRaj8HkAT0RgCXBVTYNRU7p0mceDkOa32deaQA3ktNejKk
+	 n99Y5QGRhMXzQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: dm-devel@lists.linux.dev
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Md Sadre Alam <quic_mdalam@quicinc.com>,
+	Israel Rukshin <israelr@nvidia.com>,
+	Milan Broz <gmazyland@gmail.com>,
+	Mikulas Patocka <mpatocka@redhat.com>
+Subject: [RFC PATCH v2 0/2] dm-inlinecrypt: add target for inline block device encryption
+Date: Wed, 16 Oct 2024 16:27:46 -0700
+Message-ID: <20241016232748.134211-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241016100325.3534494-9-john.g.garry@oracle.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 16, 2024 at 10:03:25AM +0000, John Garry wrote:
-> Set FMODE_CAN_ATOMIC_WRITE flag if we can atomic write for that inode.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
+This is yet another proposal for dm-inlinecrypt, this one resulting from
+the conversation at
+https://lore.kernel.org/linux-block/20240916085741.1636554-2-quic_mdalam@quicinc.com/T/#u.
+This brings in the work that was already done in Android's
+dm-default-key but drops the passthrough support, as it doesn't seem
+like that will go anywhere upstream anytime soon.  This makes the
+proposal suitable as a replacement for dm-crypt only.
 
-Woot!
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+Compared to the other patch linked above, this patch addresses a large
+number of issues, the main ones being mentioned at
+https://lore.kernel.org/linux-block/20240921185519.GA2187@quark.localdomain/
 
---D
+Changed in v2:
+- Split block exports into a separate patch.
+- Return the key from STATUSTYPE_TABLE.  This is a misfeature, but it's
+  needed to comply with the device-mapper UAPI.
+- Don't pass uninitialized key to blk_crypto_evict_key().
+- Use {} instead of {0}.
+- Simplify inlinecrypt_prepare_ioctl().
 
-> ---
->  fs/xfs/xfs_file.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-> index 1ccbc1eb75c9..ca47cae5a40a 100644
-> --- a/fs/xfs/xfs_file.c
-> +++ b/fs/xfs/xfs_file.c
-> @@ -1253,6 +1253,8 @@ xfs_file_open(
->  	if (xfs_is_shutdown(XFS_M(inode->i_sb)))
->  		return -EIO;
->  	file->f_mode |= FMODE_NOWAIT | FMODE_CAN_ODIRECT;
-> +	if (xfs_inode_can_atomicwrite(XFS_I(inode)))
-> +		file->f_mode |= FMODE_CAN_ATOMIC_WRITE;
->  	return generic_file_open(inode, file);
->  }
->  
-> -- 
-> 2.31.1
-> 
-> 
+Eric Biggers (2):
+  block: export blk-crypto symbols required by dm-inlinecrypt
+  dm-inlinecrypt: add target for inline block device encryption
+
+ block/blk-crypto.c          |   3 +
+ drivers/md/Kconfig          |  10 +
+ drivers/md/Makefile         |   1 +
+ drivers/md/dm-inlinecrypt.c | 417 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 431 insertions(+)
+ create mode 100644 drivers/md/dm-inlinecrypt.c
+
+
+base-commit: c964ced7726294d40913f2127c3f185a92cb4a41
+-- 
+2.47.0
+
