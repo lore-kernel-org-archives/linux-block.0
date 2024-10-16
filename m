@@ -1,68 +1,56 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2EC2076A6;
-	Wed, 16 Oct 2024 11:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BA320694F
+	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 11:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729076934; cv=none; b=DEZZ9fxSr8+5Tzu/it3xoOoIOh2LkcQH2cLhZRjcZAnsC14GuicTkDiWD0iL7rdzz+IKNiIOvf8pTNH514pMYfJIybqDNUMLFHFow9P7BDbfNlwcb64Dc0/NUqjaDXhiSan5cGA0R3mA2C2ldHa9nm+PyOndVNkDSsMeutfrnmQ=
+	t=1729077005; cv=none; b=hD9s/a1EjyPOYelBXRqPvanSU4mIEHDVBAwxAAQ73WKz56m8lQCjSnO4C3SNAbZPUy/r37bvTBgyPkqkCiuK/RC5h1DB0AZMYNPuy/AuPVOsJw3M0YeRhOMawWzoiKCQMjGu3vVzeFrGmsjPiTQ36P4jHpENcofyNqEVjMD+RA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729076934; c=relaxed/simple;
-	bh=serKe8tHlOrXNXs54i3kenw7XTJg+lTNjLS5V05yv/s=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qMfQKPSNvQPiFai5ce/TYgLnhSgG4rtiwCW7i25H+KcT4V7qmWp9/P5gXS3sAMFdE98plN0IcdrxZHPyoLfm+e0gAyI7rtt+1OLjSlbWpUWltraYe/amTofFE2rgB932X3Hnk8Dpg4bqIppqoaE2beKQvFWPyIodWGpMcnRtd9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ST9F9vra; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729077005; c=relaxed/simple;
+	bh=JOvznjdwsLSo4/sL3eqKP6ezcffmjM+8OknSWm6ouUM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VPrdJDR/MtrIN6y7DGbIGWi7XI5P73krRW7zVfetJIgTew1zTsWyhZGKB79D/awmLZ4eyTpSd5NX0cpjHg1DAigRV+db6kqUWLTuuJdEdXhkOeoky6aQygpQZWu5ycvAnzH8avAWX/Lv/lMhoZFwZBYwlyK3enaCNz+V3gEM7Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SQ99fPX1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ST9F9vra"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fb561f273eso27936181fa.2;
-        Wed, 16 Oct 2024 04:08:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729076931; x=1729681731; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hgR2+WDRyuZp5/EA3TzWdSDdm1lah41Q0kcqmp7FNNY=;
-        b=ST9F9vraVIONjZ3PNKxa8T1vDyFU643f8LoW3rqjQblbFueJGiQYTUDUntERg0U5LS
-         H4cCUn/ja6SviIW0o+QCuJ+8c2p7ymm0CXYSuPmgPOM/76zp8RqlMpiWsi3PqE+XeKNf
-         b1cDa+sDMefDZ41soTz62THEQMIJPCHu3Nf5ogFDhnyWTBaBMs76PLCtymf4dr7apdPn
-         3dDOKfIIlBteadrWB5wTdIvf6lLcKbgDbz34AHd++Gernqmzud6mts7W+4Et+7YG7YNv
-         y2OzRgNywSBfPrkXOjF8y1JwGOk1NQe2nvdaFRZrMgyNOC4kMRAHJSmWbZuSZFOgDGJ+
-         Friw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729076931; x=1729681731;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hgR2+WDRyuZp5/EA3TzWdSDdm1lah41Q0kcqmp7FNNY=;
-        b=Cm9RaszUdJvajHOGgMnLNGkGfdFob2O4p6JYj3vAm/sFp+RpsQq8DKLwpAMbhrWXSb
-         xkSegD87WOi1YZ2gDtotRaExkgWc+5zFIByus9dSF/3jR7aZEZO1G6sg5UgFgOlE591i
-         n5OB6QC+Zzq7Sh6+ETByfQgzZ2brloAVX7lpMnQWUx4sXWzUvk7ZpQGCFKpJk6ANMMp2
-         kT2hcbRJdKHaxaQI+83LYxdlkMUFpdiNZY57zjdeUJ6KV9euKUHUwoFed0uxNkxmsFo0
-         7lwuQyTTPVj7Ng2QM4uxUjku8JKM9wQ209E/fFucaPC8Huv9JzCl7gbpbEF2drC+aqa0
-         WxXg==
-X-Forwarded-Encrypted: i=1; AJvYcCU5IAX4AlyCHG47dgESRGJlTIabAsKIizLCMAV9C1+lx4wOCpsDpdxSZ5Z2W1Eg2/GdAq6/UGfasHOr7roFfko=@vger.kernel.org, AJvYcCUxSjTc0rhSQ/tPwmF5JtBWDkkclJtc8OZwUGeAKQePLjVHh/Lii4VYZ/S9RZWL2rCmhEYjz8hhZx2amNmC@vger.kernel.org, AJvYcCXqB/dx1eh4MiLqrO80drd/cVFtfc0edjVQ9HstMulxogpffxsTNyq0cI+fqW453V7e4RKlxxUEiSNHaN4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnvKNQiG8S5L3rtH72/5BRjcJrZD5QhQJV0cFWLVpUq9snjE3O
-	Qs9La4XVui5hfTk0LSbAFobGCXooGTwp9a/cXTAQhdb78Zta8r9n
-X-Google-Smtp-Source: AGHT+IFjjfpeb7i91SIRpG3vpwFOV9VHQnoo1Etn6OxAQdEDHy7vguM7RDwkvRepnzmSP1K0JGJJEQ==
-X-Received: by 2002:a2e:4c09:0:b0:2fa:d978:a6a2 with SMTP id 38308e7fff4ca-2fb327813b8mr61302781fa.27.1729076930577;
-        Wed, 16 Oct 2024 04:08:50 -0700 (PDT)
-Received: from pc636 (host-95-203-1-67.mobileonline.telia.com. [95.203.1.67])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2fb5d122023sm4019741fa.29.2024.10.16.04.08.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 04:08:50 -0700 (PDT)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
-Date: Wed, 16 Oct 2024 13:08:47 +0200
-To: Julia Lawall <Julia.Lawall@inria.fr>, Jens Axboe <axboe@kernel.dk>
-Cc: Jens Axboe <axboe@kernel.dk>, kernel-janitors@vger.kernel.org,
-	vbabka@suse.cz, paulmck@kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 09/17] block: replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <Zw-ev-t7G6X4RX8Z@pc636>
-References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
- <20241013201704.49576-10-Julia.Lawall@inria.fr>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SQ99fPX1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729077003;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yY8czTw0atJ2kY+lxbeGshgj4CTRoWHqolYYWlHXoJU=;
+	b=SQ99fPX1lVugWCLdnJV2sOxYc+4lsC8TB9IgcYYdhafievkoYd2jZhRaXrUaQ3zuxoFVMy
+	KTfiEFlFNos8Kt3r1kK8CKaJTUuV9wOSl4ojuqyBkw1V2Ik0vBmTN5qyDVJ6D3qPdSxmIZ
+	ubO68ez4sD7VNQBB21XAYmXUQx/59lo=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-639-hSgBnnVmNJSOJtcZoopS8w-1; Wed,
+ 16 Oct 2024 07:10:00 -0400
+X-MC-Unique: hSgBnnVmNJSOJtcZoopS8w-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 806C919560BD;
+	Wed, 16 Oct 2024 11:09:58 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.48])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 70BED3000198;
+	Wed, 16 Oct 2024 11:09:53 +0000 (UTC)
+Date: Wed, 16 Oct 2024 19:09:48 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	YangYang <yang.yang@vivo.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: also mark disk-owned queues as dying in
+ __blk_mark_disk_dead
+Message-ID: <Zw-e_CtNKeLJ3q1a@fedora>
+References: <20241009113831.557606-1-hch@lst.de>
+ <20241009113831.557606-2-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,53 +59,58 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241013201704.49576-10-Julia.Lawall@inria.fr>
+In-Reply-To: <20241009113831.557606-2-hch@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Sun, Oct 13, 2024 at 10:16:56PM +0200, Julia Lawall wrote:
-> Since SLOB was removed and since
-> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
-> it is not necessary to use call_rcu when the callback only performs
-> kmem_cache_free. Use kfree_rcu() directly.
+On Wed, Oct 09, 2024 at 01:38:20PM +0200, Christoph Hellwig wrote:
+> When del_gendisk shuts down access to a gendisk, it could lead to a
+> deadlock with sd or, which try to submit passthrough SCSI commands from
+> their ->release method under open_mutex.  The submission can be blocked
+> in blk_enter_queue while del_gendisk can't get to actually telling them
+> top stop and wake them up.
 > 
-> The changes were made using Coccinelle.
+> As the disk is going away there is no real point in sending these
+> commands, but we have no really good way to distinguish between the
+> cases.  For now mark even standalone (aka SCSI queues) as dying in
+> del_gendisk to avoid this deadlock, but the real fix will be to split
+> freeing a disk from freezing a queue for not disk associated requests.
 > 
-> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
-> 
+> Reported-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 > ---
->  block/blk-ioc.c |    9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
+>  block/genhd.c          | 16 ++++++++++++++--
+>  include/linux/blkdev.h |  1 +
+>  2 files changed, 15 insertions(+), 2 deletions(-)
 > 
-> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-> index 25dd4db11121..ce82770c72ab 100644
-> --- a/block/blk-ioc.c
-> +++ b/block/blk-ioc.c
-> @@ -32,13 +32,6 @@ static void get_io_context(struct io_context *ioc)
->  	atomic_long_inc(&ioc->refcount);
->  }
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 1c05dd4c6980b5..7026569fa8a0be 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -589,8 +589,16 @@ static void __blk_mark_disk_dead(struct gendisk *disk)
+>  	if (test_and_set_bit(GD_DEAD, &disk->state))
+>  		return;
 >  
-> -static void icq_free_icq_rcu(struct rcu_head *head)
-> -{
-> -	struct io_cq *icq = container_of(head, struct io_cq, __rcu_head);
-> -
-> -	kmem_cache_free(icq->__rcu_icq_cache, icq);
-> -}
-> -
->  /*
->   * Exit an icq. Called with ioc locked for blk-mq, and with both ioc
->   * and queue locked for legacy.
-> @@ -102,7 +95,7 @@ static void ioc_destroy_icq(struct io_cq *icq)
->  	 */
->  	icq->__rcu_icq_cache = et->icq_cache;
->  	icq->flags |= ICQ_DESTROYED;
-> -	call_rcu(&icq->__rcu_head, icq_free_icq_rcu);
-> +	kfree_rcu(icq, __rcu_head);
->  }
->  
->  /*
-> 
-> 
-Reviewed-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
+> -	if (test_bit(GD_OWNS_QUEUE, &disk->state))
+> -		blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue);
+> +	/*
+> +	 * Also mark the disk dead if it is not owned by the gendisk.  This
+> +	 * means we can't allow /dev/sg passthrough or SCSI internal commands
+> +	 * while unbinding a ULP.  That is more than just a bit ugly, but until
+> +	 * we untangle q_usage_counter into one owned by the disk and one owned
+> +	 * by the queue this is as good as it gets.  The flag will be cleared
+> +	 * at the end of del_gendisk if it wasn't set before.
+> +	 */
+> +	if (!test_and_set_bit(QUEUE_FLAG_DYING, &disk->queue->queue_flags))
+> +		set_bit(QUEUE_FLAG_RESURRECT, &disk->queue->queue_flags);
 
---
-Uladzislau Rezki
+Setting QUEUE_FLAG_DYING may fail passthrough request for
+!GD_OWNS_QUEUE, I guess this may cause SCSI regression.
+
+blk_queue_enter() need to wait until RESURRECT & DYING are cleared
+instead of returning failure.
+
+
+Thanks, 
+Ming
 
