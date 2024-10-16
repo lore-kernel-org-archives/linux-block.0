@@ -1,49 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9AE3B1AF;
-	Wed, 16 Oct 2024 00:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27CF013B298
+	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 02:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729039922; cv=none; b=GEfMRKNh0jR91QnfdOP0wplTy8crCVLxdriRtdOicQRFMj3rt7qjV7FtYEOcNK4XjaVzkBUYTuvOfKKx6nGPaYMKxUxB7fRPqGGQpo3j+f25nQo6jVO2+QEVPvdXjTU/N0ZKKmo5xWZU8gbLSuWVQ0EHdlwqhCsVq5F7ocTV0kQ=
+	t=1729044583; cv=none; b=c9n7OajuMPJhEQigb28iWgCue0FmQB336EXzfuOusMXAQbXpublwY0nIeSYRRSKvljBsZf7aTosgGXj/aasVtDMhoIjs5OoEag0v8juqwpxT/F2iIKTzkxU8pScbBFmQdcRPh0IS2XkM7vpLcF7Jr71r/RPb/fpdzBXuRabGS/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729039922; c=relaxed/simple;
-	bh=Bx/dFlbKzH10Je0iK3Rb4Fy5a5F7DDy4gj4hZJOTdTE=;
+	s=arc-20240116; t=1729044583; c=relaxed/simple;
+	bh=eUolet1snSZHeCCL4llL4piALp5qR510l7HA0K4id2I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KxTkq9WRwxhxYjk4ImhGMQDlQJK6TBNCKltuJOyEjjeWjlvVK2q8Iia26+R8K44TTDfr7m4SDt+0XWI3SRhgsf5Gu8gTajdY7g4nXgFSiX+/ED7Bn/o+6IScmcMG2bqE2NgOLCUqWw6kHKwo/aUicNNpj0KPw8QB8T+W8poEeKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RaqrnVhn; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=pefL993MqOJGEhFBtOk2PnbFUPQZcOPuE77MElFOWmT+Si1LBMjthBjhe0J0Tq3Q1Z9hgIpEghjFmmtRnh4Lg9QgGROfALTxjjQmHfpIoSyF+rWxzzSPwtiJMLA7vKglvRQnCRzCJt3eO5VRiOwhbbCcxG+8DbOUJW1bVbfPJjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=bV8wSP8y; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RaqrnVhn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506CAC4CECD;
-	Wed, 16 Oct 2024 00:52:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729039922;
-	bh=Bx/dFlbKzH10Je0iK3Rb4Fy5a5F7DDy4gj4hZJOTdTE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RaqrnVhnhESaXVBIKzWMfLPyKquNczQJ7PzExRn42zw9+dgbiq8qx8uwILmNzk1UW
-	 8Bd0aW4NAPxaPaGTm623pMyCrxc3jseEv+YTfFldZa1qdBRZ5VDvarAlN8PUt0Yge2
-	 qMHW9JXDdTeSdeq0fwBo/R9rByna0/qfCBh7VLkyJ5W4PvtLhcox0bAfO6rOPBukHz
-	 LJF1QbuRRfMUAv71xqPmkdk8p1x803S2qm4FN2RwqZu8u1qAulkTCMrXa248hOy6JK
-	 DtP205u1obmFlmj9hVqGFNk0i13tKJ1LVkLp66zhK0dy69f1hRzVDTWR987Ca/KvxB
-	 F5NOgY4Bin5Lw==
-Date: Tue, 15 Oct 2024 17:52:01 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, brauner@kernel.org,
-	viro@zeniv.linux.org.uk, jack@suse.cz, dchinner@redhat.com,
-	cem@kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, hare@suse.de,
-	martin.petersen@oracle.com, catherine.hoang@oracle.com,
-	mcgrof@kernel.org, ritesh.list@gmail.com, ojaswin@linux.ibm.com
-Subject: Re: [PATCH v7 5/8] xfs: Support FS_XFLAG_ATOMICWRITES
-Message-ID: <20241016005201.GH21836@frogsfrogsfrogs>
-References: <20241004092254.3759210-1-john.g.garry@oracle.com>
- <20241004092254.3759210-6-john.g.garry@oracle.com>
- <20241004123520.GB19295@lst.de>
- <f4d2180a-8baa-4636-a0a1-36e474fcd157@oracle.com>
- <20241007054229.GA307@lst.de>
- <f0febabf-25ee-4fbe-9dfe-77a240cc29db@oracle.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bV8wSP8y"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2e2a999b287so4698378a91.0
+        for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 19:09:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1729044581; x=1729649381; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CD0AIDbbe2k/wft/JxhhhYWwZsuYMnFY5p6ITMALvnI=;
+        b=bV8wSP8yG2N8+DecBliUEa/39WfDPzmSaaD/BAMcmTSZ+QV6PjQIQrlR/msvZ9kfjq
+         OcAdayQLeiz1wGqBw8Te4erGDTCT8c/+F+lPy0tgwWoy7HSiuzPoEohWcay5XEkh4CxL
+         GoecTc9VYf7S6RfNNMRJ93+g1KNiNKSUQjCYk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729044581; x=1729649381;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CD0AIDbbe2k/wft/JxhhhYWwZsuYMnFY5p6ITMALvnI=;
+        b=K3HGM5P/aI4AFGDU57vkmBD+U1rCFPoALeFlE3crRz6rxHtv/0wExTaoS89S+oeLGf
+         PQ1erLjbg8QH2JhQnEiQk9rR+rfqnbthZF6ejdTLYz/8xewoh/dXoWRXFmrEUAEfgaAr
+         vS8bIVyK0IKBbVsdjkd4RcEF32ge5+ykq9Or/uNQBqT3973ioTfylGK9Ns0X06vx9IkR
+         IQtOKq+pEmHUvZg2nUb/XlDSkHrABq0Wz5Ke0ak+r2KNXEaOEcEnmS4mV3+U/UL1ZIlS
+         W2N4arMP8ttKxHQyj0WC5Wshv5Ed4v9g+MHowRkM67ySYEGKW+UoOv3ZhQVzsT4xBcwN
+         94Sg==
+X-Forwarded-Encrypted: i=1; AJvYcCWCP1XVeWbVq6SHCQ3m/NrXyGQI0iedSZTzjpa9wHHJf/vRkSFUo5E0LoTWUxIt3FG67BmcShcn7tEvGA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpqGVRu+EL+14IK3ROu5XZTRn65+14422ZgENE2ZcvELeFur7o
+	H+bDR0ogznaOyLoqH7e2WfaItqV3613i0wFhLRAwt2rfZz+KMxalGRreM111VA==
+X-Google-Smtp-Source: AGHT+IEtxmZJcYtemAf1UqN8wg5UwjQoXzLXDGnLmloGlbvWj5oEVFzdrSI+O6/hBezjjVoAwaVdYg==
+X-Received: by 2002:a17:90a:c7cf:b0:2e2:a661:596a with SMTP id 98e67ed59e1d1-2e2f0ad039fmr21115454a91.13.1729044581529;
+        Tue, 15 Oct 2024 19:09:41 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:2ce0:7364:7a47:e887])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e392e8ed7fsm2767682a91.12.2024.10.15.19.09.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2024 19:09:41 -0700 (PDT)
+Date: Wed, 16 Oct 2024 11:09:37 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: YangYang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: try to avoid del_gendisk vs passthrough from ->release deadlocks
+ v2
+Message-ID: <20241016020937.GC1279924@google.com>
+References: <20241009113831.557606-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,48 +65,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f0febabf-25ee-4fbe-9dfe-77a240cc29db@oracle.com>
+In-Reply-To: <20241009113831.557606-1-hch@lst.de>
 
-On Sun, Oct 13, 2024 at 10:06:04PM +0100, John Garry wrote:
-> On 07/10/2024 06:42, Christoph Hellwig wrote:
-> > On Fri, Oct 04, 2024 at 02:07:05PM +0100, John Garry wrote:
-> > > Sure, that is true (about being able to atomically write 1x FS block if the
-> > > bdev support it).
-> > > 
-> > > But if we are going to add forcealign or similar later, then it would make
-> > > sense (to me) to have FS_XFLAG_ATOMICWRITES (and its other flags) from the
-> > > beginning. I mean, for example, if FS_XFLAG_FORCEALIGN were enabled and we
-> > > want atomic writes, setting FS_XFLAG_ATOMICWRITES would be rejected if AG
-> > > count is not aligned with extsize, or extsize is not a power-of-2, or
-> > > extsize exceeds bdev limits. So FS_XFLAG_ATOMICWRITES could have some value
-> > > there.
-> > > 
-> > > As such, it makes sense to have a consistent user experience and require
-> > > FS_XFLAG_ATOMICWRITES from the beginning.
-> > 
-> > Well, even with forcealign we're not going to lose support for atomic
-> > writes <= block size, are we?
-> > 
+On (24/10/09 13:38), Christoph Hellwig wrote:
+> Hi all,
 > 
-> forcealign would not be required for atomic writes <= FS block size.
-> 
-> How about this modified approach:
-> 
-> a. Drop FS_XFLAG_ATOMICWRITES support from this series, and so we can always
-> atomic write 1x FS block (if the bdev supports it)
-> 
-> b. If we agree to support forcealign afterwards, then we can introduce 2x
-> new flags:
-> 	- FS_XFLAG_FORCEALIGN - as before
-> 	- FS_XFLAG_BIG_ATOMICWRITES - this depends on  FS_XFLAG_FORCEALIGN being
-> enabled per inode, and allows us to atomically write > 1 FS block
-> 
-> c. Later support writing < 1 FS block
-> 	- this would not depend on forcealign
-> 	- would require a real user, and I don't know one yet
-> 
-> better?
+> this is my attempted fix for the problem reported by Sergey in the
+> "block: del_gendisk() vs blk_queue_enter() race condition" thread.  As
+> I don't have a reproducer this is all just best guest so far, so handle
+> it with care!
 
-Sounds fine to /me/, but that's just my opinion. :)
+Hi YangYang, Jens,
 
---D
+Are you OK with the series?
