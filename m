@@ -1,45 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFCB2216A13;
-	Wed, 16 Oct 2024 19:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C87720605A;
+	Wed, 16 Oct 2024 19:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729107352; cv=none; b=fPgoYgeUTFd379ub0nove2X8trh85R1sHGVzt2E+2iCsbT7lzv0Cs5cAx7sDaqs4FQeWgohO7vr/jdIl8ijUTWLgvZTds9r9zpXD9QY21e++nCFR0zPGyn9Q2T7Uu8Ys+mvu+ZXJYxNDq2vVUi3ldniy8R0qWTtQ7XxWPAkmlUA=
+	t=1729108626; cv=none; b=dZu7C1UY85xLMJWAyOdWzAbpVHk7NhQiG3hg0NAlrmkfL15Zh8TZwseoPlrmuDRFjKgNHAWzGo2GoyZZZr0G9xNrOUkK/iPG/OVFC0Y2RIz/EqisSFOGXRh0fRoVyFZdJihR8utFTz7iUpT10X3zD1jyd4EFJ8jq/NnRdBik4Zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729107352; c=relaxed/simple;
-	bh=zQBkoRKgsffe6sm8fQRMZvpdlOGY9+zXwYUi6ybAbV8=;
+	s=arc-20240116; t=1729108626; c=relaxed/simple;
+	bh=XK0vsHUoYE5TeMTdnMkvGDa3GmUtnqn/BbD5ef1Q8W4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q8B6cH3M5nCp26NZ7TwmCkDsUHzXeMjsJ36ozZMe7OzE8y4HpInDCrAcKcVAiCpHE5uuQqXCKXET/yCZDHvUXx4YKImAPtN2ML1LZjJJt/WL/3J1bd3G8O4BYPrlvGHfd6xZmsXt33P422x0A7RWb4e+Ce9ang36fEaYUYS7vWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JHob37zr; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=nNcpYUtIQXrqmCgV3GhFZRxrDwh46NQVgc00u2roQYXfsHPRT22LHxZr9urSGRsFsB1wO++FvF5prPcpiNooseDzvX8TaBi1PP4Zf5c3kCsL3VSHcIAaAE3PQcz//VzulKRDMVCesoyq/nu2B5iPnv+1Obn9qdyRNwsXJnr2dFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gOAotM9k; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JHob37zr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51B8EC4CED1;
-	Wed, 16 Oct 2024 19:35:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gOAotM9k"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8EEBC4CEC5;
+	Wed, 16 Oct 2024 19:57:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729107352;
-	bh=zQBkoRKgsffe6sm8fQRMZvpdlOGY9+zXwYUi6ybAbV8=;
+	s=k20201202; t=1729108625;
+	bh=XK0vsHUoYE5TeMTdnMkvGDa3GmUtnqn/BbD5ef1Q8W4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JHob37zr2eyddutbScP40veOlgjdzzewqg0C3Kydv5hPYn+i+i7JgcqyJ3F2rEask
-	 xw2wJ46bITMY+zwuljeoC7DTqEj/8p0HmEdgc9uV5WfQw39S61S2RaW0vnkUxQxPXB
-	 IWVaKuHdnMW7XEkdLEpSHekVGCuGzYA3GL3YChGO/J4VW9ZSfXne3DqdeaTvA8zFYV
-	 KB7jW/vnTx4Z8NYGECMdHJ2tRGxLsfyr0fAOwEBBwyIVkgoLOjpatskNDtRNGcc4UO
-	 TK4eoQGss5ZUENN6R1GFcyLP8dsntpKJwf16zLHO9mOSiN0BR7pK9pERmQM5bFhIbn
-	 fRvow2mNKcnbA==
-Date: Wed, 16 Oct 2024 13:35:48 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Anuj Gupta <anuj20.g@samsung.com>
-Cc: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-	asml.silence@gmail.com, anuj1072538@gmail.com, krisman@suse.de,
-	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com,
-	linux-scsi@vger.kernel.org, vishak.g@samsung.com,
-	Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v4 04/11] block: define meta io descriptor
-Message-ID: <ZxAVlFfF-gjzFLwr@kbusch-mbp.dhcp.thefacebook.com>
-References: <20241016112912.63542-1-anuj20.g@samsung.com>
- <CGME20241016113741epcas5p3b90adb3b43b6b443ffd00df29d63d289@epcas5p3.samsung.com>
- <20241016112912.63542-5-anuj20.g@samsung.com>
+	b=gOAotM9kVMO0qxulzQX32MRw4u7Qkvyke2ydb3RqqR7793BGtG6Kqkk+iVbwdKhJz
+	 y37f3HZGuk2iFKjFePm5+cZkcvDAit0hTAfmObxjtxmnnDMp1AqAwCnt5lOxeeqwwD
+	 OP3QXqLSdDD/Fcb90re8jfm/9ZTMKZ8UxjnzahR90C+cCQOJ6FHbqIPjSwwxfAk6Kw
+	 aBlIC1kx8zmt4L7PXYUOb9mWRl4CLQxxpQXuJHSPYxWhHXKvY8jbacFxyNjjb2zvdj
+	 uWZUM4UWqxb8B12YsfXjsvdHuoZs8AGq4CNEK74lqhvL17RNEIqMbMksNkzNuxWAAF
+	 kBMyRbcHGFK1Q==
+Date: Wed, 16 Oct 2024 12:57:05 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: axboe@kernel.dk, brauner@kernel.org, viro@zeniv.linux.org.uk,
+	jack@suse.cz, dchinner@redhat.com, hch@lst.de, cem@kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	hare@suse.de, martin.petersen@oracle.com,
+	catherine.hoang@oracle.com, mcgrof@kernel.org,
+	ritesh.list@gmail.com, ojaswin@linux.ibm.com
+Subject: Re: [PATCH v9 2/8] fs/block: Check for IOCB_DIRECT in
+ generic_atomic_write_valid()
+Message-ID: <20241016195705.GN21853@frogsfrogsfrogs>
+References: <20241016100325.3534494-1-john.g.garry@oracle.com>
+ <20241016100325.3534494-3-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,20 +49,142 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241016112912.63542-5-anuj20.g@samsung.com>
+In-Reply-To: <20241016100325.3534494-3-john.g.garry@oracle.com>
 
-On Wed, Oct 16, 2024 at 04:59:05PM +0530, Anuj Gupta wrote:
-> +struct uio_meta {
-> +	meta_flags_t	flags;
-> +	u16		app_tag;
-> +	u32		seed;
-> +	struct iov_iter iter;
-> +};
+On Wed, Oct 16, 2024 at 10:03:19AM +0000, John Garry wrote:
+> Currently FMODE_CAN_ATOMIC_WRITE is set if the bdev can atomic write and
+> the file is open for direct IO. This does not work if the file is not
+> opened for direct IO, yet fcntl(O_DIRECT) is used on the fd later.
+> 
+> Change to check for direct IO on a per-IO basis in
+> generic_atomic_write_valid(). Since we want to report -EOPNOTSUPP for
+> non-direct IO for an atomic write, change to return an error code.
+> 
+> Relocate the block fops atomic write checks to the common write path, as to
+> catch non-direct IO.
+> 
+> Fixes: c34fc6f26ab8 ("fs: Initial atomic write support")
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
 
-Is the seed used for anything other than the kernel's t10 generation and
-verification? It looks like that's all it is for today, and that part is
-skipped for userspace metadata, so I'm not sure we need it.
+Looks good to me,
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
-I know it's been used for passthrough commands since nvme started
-supporitng it, but I don't see why the driver ever bothered. I think it
-wasn't necessary and we've been carrying it forward ever since.
+--D
+
+> ---
+>  block/fops.c       | 18 ++++++++++--------
+>  fs/read_write.c    | 13 ++++++++-----
+>  include/linux/fs.h |  2 +-
+>  3 files changed, 19 insertions(+), 14 deletions(-)
+> 
+> diff --git a/block/fops.c b/block/fops.c
+> index 968b47b615c4..2d01c9007681 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -36,11 +36,8 @@ static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
+>  }
+>  
+>  static bool blkdev_dio_invalid(struct block_device *bdev, struct kiocb *iocb,
+> -				struct iov_iter *iter, bool is_atomic)
+> +				struct iov_iter *iter)
+>  {
+> -	if (is_atomic && !generic_atomic_write_valid(iocb, iter))
+> -		return true;
+> -
+>  	return iocb->ki_pos & (bdev_logical_block_size(bdev) - 1) ||
+>  		!bdev_iter_is_aligned(bdev, iter);
+>  }
+> @@ -368,13 +365,12 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
+>  static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+>  {
+>  	struct block_device *bdev = I_BDEV(iocb->ki_filp->f_mapping->host);
+> -	bool is_atomic = iocb->ki_flags & IOCB_ATOMIC;
+>  	unsigned int nr_pages;
+>  
+>  	if (!iov_iter_count(iter))
+>  		return 0;
+>  
+> -	if (blkdev_dio_invalid(bdev, iocb, iter, is_atomic))
+> +	if (blkdev_dio_invalid(bdev, iocb, iter))
+>  		return -EINVAL;
+>  
+>  	nr_pages = bio_iov_vecs_to_alloc(iter, BIO_MAX_VECS + 1);
+> @@ -383,7 +379,7 @@ static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+>  			return __blkdev_direct_IO_simple(iocb, iter, bdev,
+>  							nr_pages);
+>  		return __blkdev_direct_IO_async(iocb, iter, bdev, nr_pages);
+> -	} else if (is_atomic) {
+> +	} else if (iocb->ki_flags & IOCB_ATOMIC) {
+>  		return -EINVAL;
+>  	}
+>  	return __blkdev_direct_IO(iocb, iter, bdev, bio_max_segs(nr_pages));
+> @@ -625,7 +621,7 @@ static int blkdev_open(struct inode *inode, struct file *filp)
+>  	if (!bdev)
+>  		return -ENXIO;
+>  
+> -	if (bdev_can_atomic_write(bdev) && filp->f_flags & O_DIRECT)
+> +	if (bdev_can_atomic_write(bdev))
+>  		filp->f_mode |= FMODE_CAN_ATOMIC_WRITE;
+>  
+>  	ret = bdev_open(bdev, mode, filp->private_data, NULL, filp);
+> @@ -700,6 +696,12 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+>  	if ((iocb->ki_flags & (IOCB_NOWAIT | IOCB_DIRECT)) == IOCB_NOWAIT)
+>  		return -EOPNOTSUPP;
+>  
+> +	if (iocb->ki_flags & IOCB_ATOMIC) {
+> +		ret = generic_atomic_write_valid(iocb, from);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	size -= iocb->ki_pos;
+>  	if (iov_iter_count(from) > size) {
+>  		shorted = iov_iter_count(from) - size;
+> diff --git a/fs/read_write.c b/fs/read_write.c
+> index 2c3263530828..befec0b5c537 100644
+> --- a/fs/read_write.c
+> +++ b/fs/read_write.c
+> @@ -1830,18 +1830,21 @@ int generic_file_rw_checks(struct file *file_in, struct file *file_out)
+>  	return 0;
+>  }
+>  
+> -bool generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter)
+> +int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter)
+>  {
+>  	size_t len = iov_iter_count(iter);
+>  
+>  	if (!iter_is_ubuf(iter))
+> -		return false;
+> +		return -EINVAL;
+>  
+>  	if (!is_power_of_2(len))
+> -		return false;
+> +		return -EINVAL;
+>  
+>  	if (!IS_ALIGNED(iocb->ki_pos, len))
+> -		return false;
+> +		return -EINVAL;
+>  
+> -	return true;
+> +	if (!(iocb->ki_flags & IOCB_DIRECT))
+> +		return -EOPNOTSUPP;
+> +
+> +	return 0;
+>  }
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index fbfa032d1d90..ba47fb283730 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -3721,6 +3721,6 @@ static inline bool vfs_empty_path(int dfd, const char __user *path)
+>  	return !c;
+>  }
+>  
+> -bool generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter);
+> +int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter);
+>  
+>  #endif /* _LINUX_FS_H */
+> -- 
+> 2.31.1
+> 
+> 
