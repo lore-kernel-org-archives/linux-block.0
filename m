@@ -1,109 +1,271 @@
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779DF1DA26
-	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 16:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE07127442
+	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 17:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729097995; cv=none; b=FeuqUlbEPTrzEjHKiTiKU92NXyYSF80kdj2JOnLfViXOckLpdhKIHMlH+L6+fSwQipXzkYUZk0g+8StWOe0JdXimqwhKf6XYhM2X7MN3h3dOs0MVbIoPvCaJ7dN0Ia3/v0M7CPjyNzifb8TWRZSBVkdJD7D9qopchUxmFycXnAE=
+	t=1729098033; cv=none; b=RcXDG3z8sWy3oNzfV3FU6LG1N05kGjIW7GjbjzZ29Zb25l6bsfKoMWXak9XSsXI0VYSJaCJ/znEip50BB8bqhZ8xbdYI6vCHrggIlzxgsa9n6ixbBIfyIqY9NVW72InGy+v/MxcLmNQvfYeCV2iO7WM41B5c8i6Fp8UhZAeSik8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729097995; c=relaxed/simple;
-	bh=xSIImeFEygj5y9E9o8GWTHfMUhwjbY68nmw1P3u05eU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=j06hMUbTCIoHLwcwx+20K5R8efP/ZX+0W0Sx8lWqa1UKWmANGnRBDWBrdhHjkDqMrxNhv0Aj9vqHWTY4YlVr8pGnAYSwo5MLmopw41AqFlGP8X1oHBNQ5QpsAjteM0DSwLTgox5u3Fk/ZV6bq2dnY2V74B4HEmektxIzpttxwPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=B9Z+ffod; arc=none smtp.client-ip=209.85.166.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1729098033; c=relaxed/simple;
+	bh=7TJF32rdwJMjhU/Z5acXr3OQQIR/fJtwi1Ox0KTLl9g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AJNEoDzlESpHwUSN3gGQtmYIe55SimB9wqMsqPmTn4bBi3BhWu34iYLCbCxdPSnDvg2I50aD+qQsPteF55CxdUwdzWP9En71fQR+3yPxY+cnkrqZbYNj9iRF2xwgGSlqXGCz9liildH+/nnqOZVE+ulfNTGOY8Pck4uoAAjpj5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BapW9fR/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="B9Z+ffod"
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-8354599fd8aso265589339f.1
-        for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 09:59:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729097993; x=1729702793; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2XTXN8MMXBXH+WCyjCMYr89UD/xwa7PuNDWgb/DeL7c=;
-        b=B9Z+ffodUFIpc3zQ/qes5JsU0lFNKiF9lzofCORi0ZhZDCk/nxplZMoyZNtak8+liI
-         +sOmrsK3xyxrTKf/qhjqgKbTjH93vykub90buPYO1wQ3RKLFcdXt9L/t1FKXE81X9Fdj
-         +BncwQ+9Of4rqAMB+cSsalVqU6m/AUcGgxSXJP/ctoQ/2gZZyIcC7MeLIZnoogoHvAKJ
-         +lgipjGcPhD9dRg9kKeOR+yGcy5T9d/fBnRYJCr7a+y4groTf3p1nZCxujjeXOVU8toE
-         LeAnQBuTA/o+62vUZtp6L1IbbcFUteCVawYPE98TEO84LDPOG0Yc4KJU+ye5OZjtJ7V8
-         PUvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729097993; x=1729702793;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2XTXN8MMXBXH+WCyjCMYr89UD/xwa7PuNDWgb/DeL7c=;
-        b=anPJu5i+5DBi0UqdyiMYWMwo3BOIo7LGs5711WrrSOeYos9vILcJAAr+CCADdFbxmg
-         zEZvHTZ6fWoczXm11fGaK6FxBjP8Kp2a0fMXwwS0dzHRNVTnjyl/gCDKSIYyYD92jcwu
-         NEsgtvnl/Ppprg6E1Fu2olfOzuGdCyr9WlmwGF8XNpD4wGb4sFL3UfIhKfgSDc8VvpeZ
-         Swy8rrHtzlq0GNREKBCJxEzz6Ouy89l9Ua+tSXu2gLP0TSMPOjt21BofHpy5j0MTmYuG
-         qTBa804oYcmB2xtAXbm01fMEtO9exJz6bHdjtPWYB6erdYxlKgQvVj7QFkH9uz9lTGPY
-         pdew==
-X-Gm-Message-State: AOJu0YwxHc1Cn0eUPFpsTaW6dRMgi2XxZRjynIoR1rUWcfNr/AZlzVRm
-	vVP4HeCFiukuHpo3GSdkzxFFkJDtcZX3LJAoYN13xsDXZ9q9DS5FDEijMy6gEoU=
-X-Google-Smtp-Source: AGHT+IHQU/ynDyUYszAyL0NN+5GAINKYxm3zsvKajiuil1Zt1kx193TwmJPWE+nlOlV49q1uIQ257Q==
-X-Received: by 2002:a05:6602:6d18:b0:835:40af:c45b with SMTP id ca18e2360f4ac-83a9447a320mr494479139f.7.1729097992679;
-        Wed, 16 Oct 2024 09:59:52 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-83a8b28c0cesm85576539f.3.2024.10.16.09.59.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 09:59:51 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: ming.lei@redhat.com, Muchun Song <muchun.song@linux.dev>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- muchun.song@linux.dev
-In-Reply-To: <20241014092934.53630-1-songmuchun@bytedance.com>
-References: <20241014092934.53630-1-songmuchun@bytedance.com>
-Subject: Re: [PATCH RESEND v3 0/3] Fix some starvation problems in block
- layer
-Message-Id: <172909799069.38573.9078542205672825920.b4-ty@kernel.dk>
-Date: Wed, 16 Oct 2024 10:59:50 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BapW9fR/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729098030;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mViKApRo6igGqVvtmAP7Iaps/dUXLYqDGQEydxLPacY=;
+	b=BapW9fR/hM6FiEjxGiP9jVF2Yb/38HzvnZFtZy5T5JzcOatrZnUUI+okABD1cktIibzGpm
+	Qqgz/ETbWAmgQZTgCMYxinS69RsoM4pCsmfPw5Lus/kioVxD9I5EhNWW99imqEtzwRzsAU
+	ivGl4UF9o6F0/TgYiwR23+8AVvLs+io=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-187-6dghzgIJPLOOdCpbZ4vlsw-1; Wed,
+ 16 Oct 2024 13:00:27 -0400
+X-MC-Unique: 6dghzgIJPLOOdCpbZ4vlsw-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1555219560AF;
+	Wed, 16 Oct 2024 17:00:26 +0000 (UTC)
+Received: from redhat.com (unknown [10.39.194.174])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DF8E919560AD;
+	Wed, 16 Oct 2024 17:00:23 +0000 (UTC)
+Date: Wed, 16 Oct 2024 19:00:15 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+	nbd@other.debian.org, eblake@redhat.com, leon@is.currently.online
+Subject: Re: Kernel NBD client waits on wrong cookie, aborts connection
+Message-ID: <Zw_xHyXkl9eUftst@redhat.com>
+References: <Zw5CNDIde6xkq_Sf@redhat.com>
+ <CAFj5m9LXwcH7vc2Fk_i+VhfUA+tevzhciJzKc1am49y_5jgC2Q@mail.gmail.com>
+ <Zw5b1mwk3aG01NTg@fedora>
+ <CAFj5m9+x+tiAAKj3dX_WcFczkdSNaR6nguDHm9FXuYjQHd8YcA@mail.gmail.com>
+ <Zw5nMQoPrSIq9axl@fedora>
+ <Zw6S6RoKWzUnNVpu@redhat.com>
+ <Zw8i6-DVDsLk3sq9@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zw8i6-DVDsLk3sq9@fedora>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-
-On Mon, 14 Oct 2024 17:29:31 +0800, Muchun Song wrote:
-> We encounter a problem on our servers where hundreds of UNINTERRUPTED
-> processes are all waiting in the WBT wait queue. And the IO hung detector
-> logged so many messages about "blocked for more than 122 seconds". The
-> call trace is as follows:
+Am 16.10.2024 um 04:20 hat Ming Lei geschrieben:
+> On Tue, Oct 15, 2024 at 06:06:01PM +0200, Kevin Wolf wrote:
+> > Am 15.10.2024 um 14:59 hat Ming Lei geschrieben:
+> > > On Tue, Oct 15, 2024 at 08:15:17PM +0800, Ming Lei wrote:
+> > > > On Tue, Oct 15, 2024 at 8:11 PM Ming Lei <ming.lei@redhat.com> wrote:
+> > > > >
+> > > > > On Tue, Oct 15, 2024 at 08:01:43PM +0800, Ming Lei wrote:
+> > > > > > On Tue, Oct 15, 2024 at 6:22 PM Kevin Wolf <kwolf@redhat.com> wrote:
+> > > > > > >
+> > > > > > > Hi all,
+> > > > > > >
+> > > > > > > the other day I was running some benchmarks to compare different QEMU
+> > > > > > > block exports, and one of the scenarios I was interested in was
+> > > > > > > exporting NBD from qemu-storage-daemon over a unix socket and attaching
+> > > > > > > it as a block device using the kernel NBD client. I would then run a VM
+> > > > > > > on top of it and fio inside of it.
+> > > > > > >
+> > > > > > > Unfortunately, I couldn't get any numbers because the connection always
+> > > > > > > aborted with messages like "Double reply on req ..." or "Unexpected
+> > > > > > > reply ..." in the host kernel log.
+> > > > > > >
+> > > > > > > Yesterday I found some time to have a closer look why this is happening,
+> > > > > > > and I think I have a rough understanding of what's going on now. Look at
+> > > > > > > these trace events:
+> > > > > > >
+> > > > > > >         qemu-img-51025   [005] ..... 19503.285423: nbd_header_sent: nbd transport event: request 000000002df03708, handle 0x0000150c0000005a
+> > > > > > > [...]
+> > > > > > >         qemu-img-51025   [008] ..... 19503.285500: nbd_payload_sent: nbd transport event: request 000000002df03708, handle 0x0000150c0000005d
+> > > > > > > [...]
+> > > > > > >    kworker/u49:1-47350   [004] ..... 19503.285514: nbd_header_received: nbd transport event: request 00000000b79e7443, handle 0x0000150c0000005a
+> > > > > > >
+> > > > > > > This is the same request, but the handle has changed between
+> > > > > > > nbd_header_sent and nbd_payload_sent! I think this means that we hit one
+> > > > > > > of the cases where the request is requeued, and then the next time it
+> > > > > > > is executed with a different blk-mq tag, which is something the nbd
+> > > > > > > driver doesn't seem to expect.
+> > > > > > >
+> > > > > > > Of course, since the cookie is transmitted in the header, the server
+> > > > > > > replies with the original handle that contains the tag from the first
+> > > > > > > call, while the kernel is only waiting for a handle with the new tag and
+> > > > > > > is confused by the server response.
+> > > > > > >
+> > > > > > > I'm not sure yet which of the following options should be considered the
+> > > > > > > real problem here, so I'm only describing the situation without trying
+> > > > > > > to provide a patch:
+> > > > > > >
+> > > > > > > 1. Is it that blk-mq should always re-run the request with the same tag?
+> > > > > > >    I don't expect so, though in practice I was surprised to see that it
+> > > > > > >    happens quite often after nbd requeues a request that it actually
+> > > > > > >    does end up with the same cookie again.
+> > > > > >
+> > > > > > No.
+> > > > > >
+> > > > > > request->tag will change, but we may take ->internal_tag(sched) or
+> > > > > > ->tag(none), which won't change.
+> > > > > >
+> > > > > > I guess was_interrupted() in nbd_send_cmd() is triggered, then the payload
+> > > > > > is sent with a different tag.
+> > > > > >
+> > > > > > I will try to cook one patch soon.
+> > > > >
+> > > > > Please try the following patch:
+> > > > 
+> > > > Oops, please ignore the patch, it can't work since
+> > > > nbd_handle_reply() doesn't know static tag.
+> > > 
+> > > Please try the v2:
+> > 
+> > It doesn't fully work, though it replaced the bug with a different one.
+> > Now I get "Unexpected request" for the final flush request.
 > 
->     Call Trace:
->         __schedule+0x959/0xee0
->         schedule+0x40/0xb0
->         io_schedule+0x12/0x40
->         rq_qos_wait+0xaf/0x140
->         wbt_wait+0x92/0xc0
->         __rq_qos_throttle+0x20/0x30
->         blk_mq_make_request+0x12a/0x5c0
->         generic_make_request_nocheck+0x172/0x3f0
->         submit_bio+0x42/0x1c0
->         ...
+> That just shows the approach is working.
 > 
-> [...]
+> Flush request doesn't have static tag, that is why it is failed.
+> It shouldn't be hard to cover it, please try the attached & revised
+> patch.
 
-Applied, thanks!
+Any other request types that are unusual, or is flush the only one?
 
-[1/3] block: fix missing dispatching request when queue is started or unquiesced
-      commit: 4bddfec1a0fb837f66b403a11ee1834769df2330
-[2/3] block: fix ordering between checking QUEUE_FLAG_QUIESCED and adding requests
-      commit: 542c1c1b4cca00051997f4e1ad330a518e727c79
-[3/3] block: fix ordering between checking BLK_MQ_S_STOPPED and adding requests
-      commit: 1936f2e6981297621deed9afcdc9063c1964fc5b
+> Another solution is to add per-nbd-device map for retrieving nbd_cmd
+> by the stored `index` in cookie, and the cost is one such array for
+> each device.
 
-Best regards,
--- 
-Jens Axboe
+Yes, just creating the cookie another way and having an explicit mapping
+back is the obvious naive solution (my option 2). It would be nice to
+avoid this.
 
+> > 
+> > Anyway, before talking about specific patches, would this even be the
+> > right solution or would it only paper over a bigger issue?
+> > 
+> > Is getting a different tag the only thing that can go wrong if you
+> > handle a request partially and then requeue it?
+> 
+> Strictly speaking it is BLK_STS_RESOURCE.
+> 
+> Not like userspace implementation, kernel nbd call one sock_sendmsg()
+> for sending either request header, or each single data bvec, so
+> partial xmit can't be avoided. This kind of handling is fine, given
+> TCP is just byte stream, nothing difference is observed from nbd
+> server side if data is correct.
 
+I wasn't questioning the partial submission, but only if it's a good
+idea to return the request to the queue in this case, or if the nbd
+driver should use another mechanism to keep working on the request
+without returning it. But if this is accepted and a common pattern in
+other drivers, too (is it?), I don't have a problem with it.
+
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 2cafcf11ee8b..3cc14fc76546 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -682,3 +682,51 @@ u32 blk_mq_unique_tag(struct request *rq)
+>  		(rq->tag & BLK_MQ_UNIQUE_TAG_MASK);
+>  }
+>  EXPORT_SYMBOL(blk_mq_unique_tag);
+> +
+> +/* Same with blk_mq_unique_tag, but one persistent tag is included */
+> +u32 blk_mq_unique_static_tag(struct request *rq)
+> +{
+> +	bool use_sched = rq->q->elevator;
+> +	u32 tag;
+> +
+> +	if (rq == rq->mq_hctx->fq->flush_rq) {
+> +		if (use_sched)
+> +			tag = rq->mq_hctx->sched_tags->nr_tags;
+> +		else
+> +			tag = rq->mq_hctx->tags->nr_tags;
+> +	} else {
+> +		tag = use_sched ? rq->internal_tag : rq->tag;
+> +	}
+> +
+> +	return (rq->mq_hctx->queue_num << BLK_MQ_UNIQUE_TAG_BITS) |
+> +		(tag & BLK_MQ_UNIQUE_TAG_MASK);
+> +}
+> +EXPORT_SYMBOL(blk_mq_unique_static_tag);
+> +
+> +static struct request *
+> +__blk_mq_static_tag_to_rq(const struct blk_mq_hw_ctx *hctx,
+> +		const struct blk_mq_tags *tags, u32 tag)
+> +{
+> +	if (tag < tags->nr_tags)
+> +		return tags->static_rqs[tag];
+> +	else if (tag == tags->nr_tags)
+> +		return hctx->fq->flush_rq;
+> +	else
+> +		return NULL;
+> +}
+
+There is probably little reason to have this as a separate function. It
+will be more readable if you inline it and make tags just a local
+variable in blk_mq_static_tag_to_req().
+
+> +struct request *blk_mq_static_tag_to_req(struct request_queue *q, u32 uniq_tag)
+> +{
+> +	unsigned long hwq = blk_mq_unique_tag_to_hwq(uniq_tag);
+> +	u32 tag = blk_mq_unique_tag_to_tag(uniq_tag);
+> +	const struct blk_mq_hw_ctx *hctx= xa_load(&q->hctx_table, hwq);
+> +
+> +	if (!hctx)
+> +		return NULL;
+> +
+> +	if (q->elevator)
+> +		return __blk_mq_static_tag_to_rq(hctx, hctx->sched_tags, tag);
+> +
+> +	return __blk_mq_static_tag_to_rq(hctx, hctx->tags, tag);
+> +}
+> +EXPORT_SYMBOL(blk_mq_static_tag_to_req);
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index b852050d8a96..5be324233c9f 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -201,7 +201,7 @@ static void nbd_requeue_cmd(struct nbd_cmd *cmd)
+>  static u64 nbd_cmd_handle(struct nbd_cmd *cmd)
+>  {
+>  	struct request *req = blk_mq_rq_from_pdu(cmd);
+> -	u32 tag = blk_mq_unique_tag(req);
+> +	u32 tag = blk_mq_unique_static_tag(req);
+>  	u64 cookie = cmd->cmd_cookie;
+>  
+>  	return (cookie << NBD_COOKIE_BITS) | tag;
+> @@ -818,10 +818,7 @@ static struct nbd_cmd *nbd_handle_reply(struct nbd_device *nbd, int index,
+>  
+>  	handle = be64_to_cpu(reply->cookie);
+>  	tag = nbd_handle_to_tag(handle);
+> -	hwq = blk_mq_unique_tag_to_hwq(tag);
+
+hwq is now unused and can be removed.
+
+> -	if (hwq < nbd->tag_set.nr_hw_queues)
+> -		req = blk_mq_tag_to_rq(nbd->tag_set.tags[hwq],
+> -				       blk_mq_unique_tag_to_tag(tag));
+> +	req = blk_mq_static_tag_to_req(nbd->disk->queue, tag);
+>  	if (!req || !blk_mq_request_started(req)) {
+>  		dev_err(disk_to_dev(nbd->disk), "Unexpected reply (%d) %p\n",
+>  			tag, req);
+
+This version of the patch survives the reproducer I used for debugging
+this. I'll try to give it some more testing later.
+
+Kevin
 
