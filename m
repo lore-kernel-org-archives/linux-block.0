@@ -1,117 +1,93 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2B7208D7D
-	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 13:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0E42071F8
+	for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 14:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729086545; cv=none; b=u9D1rFde+1nIwks4UJLHxhFzeDcEnBzk1FPD/yrSGWXzjOseXSGm8v/v/VvX627qEixeeyfCJDYZycO+zBL2LGkOsYi/ySm6clBlvV4J4zzLgCQqYG1Q681QEwBflztbzR9ldfyQpNPtOSQio5rIi98yd/MgBeR11f/8e4Pw0TU=
+	t=1729087719; cv=none; b=fi7hVQLrbUaIIuPGC5DzVgJHrkyxInherkqWhms6X/gBizlFDa0KyeLK/jTwg4fTJE6j2aCf4FKyq3Ls9RgX+ZN2b6q5dH8h8gJWm77/8Oh6gbiBkuWdpOXfxDXmc2heP5RYH4ZssMS7w11DMzHGtge94IV0WoZZhJ6R9NY84U8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729086545; c=relaxed/simple;
-	bh=oeDMAKC9K17Dkws8Wmds1B1c5PpAg/GWWVAtPWWiVLY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CT9icQc8GLkt1DxjBLfvXFHpLhemWHFLg2dMeRrs3vwgeg3w/kTTvgzWLzLnOfMUSlAaRaNGpFRelIPK5OaLT4j37S+ALGpt1qI4rAqjizaJZIYZHFk/2NhVTfCIsO8FNyf+yMj11N6HcBwZJ0x8wlOEft6Dlwbhe9bURHCE76s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ckAfSsDA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729087719; c=relaxed/simple;
+	bh=PS1FdrTKbnIDdkOC+D3Nb5orQ02UkG2CduMcOr5bLzU=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=GnvalCych3fI4DH+5Z9sqGDLyGUgGJCuKw1Q9h5dblacBfW65YN+4iZ5Dlt9UsevWkgisjjTdCQkHVK/vgW0zAIG5DKHaVo1VDxZ7X0gxC0wI7bGsnRI3snFCenXujViWyp/hYFIm1chXuPrJfhwFijZH0S+XhFFOXFQEH7kXVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=voAxgxDu; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ckAfSsDA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729086543;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=cN8i7MhL5vKtmx1nhy8lQZRTC/jV6NMqewcc5fjiG/4=;
-	b=ckAfSsDAWKbhDSsI0OZl/ZkQ0KeBar0nU3HC/Yi7hvzDt2hHWNd33ygMHPL8SYk4BcMoW2
-	FCEM2geyjju0Zw+MRRD3bPuHwflDoTljeeRplS0h7eD9I0sx7fV4YsP822a+6B6309Vu0R
-	tVZydIU7L/jrsQHB3QZwE5egwzdNV5w=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-614-RYGtCcWFMyiBFNnll1x2wA-1; Wed,
- 16 Oct 2024 09:49:00 -0400
-X-MC-Unique: RYGtCcWFMyiBFNnll1x2wA-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B2E87195608B;
-	Wed, 16 Oct 2024 13:48:58 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.48])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7D8101956086;
-	Wed, 16 Oct 2024 13:48:57 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] ublk: don't allow user copy for unprivileged device
-Date: Wed, 16 Oct 2024 21:48:47 +0800
-Message-ID: <20241016134847.2911721-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="voAxgxDu"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a3b0247d67so21704245ab.3
+        for <linux-block@vger.kernel.org>; Wed, 16 Oct 2024 07:08:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729087716; x=1729692516; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZKcAJrsMT6v1EJVRGfh/ABrvXvKqs+PkK6NkGIgrV2k=;
+        b=voAxgxDuHbmwYC3huppaDu/KXWEJFLo6Re2QXGptppnwmYoNrc78tVDv98AqGjArjW
+         wY708e4OWj6z1i1SIYnm6ML4Lto9fg7KmS9sg+64KmPQdow6/eWEIf1LAHd/es6mpJmD
+         WiaTdiBWZ6A6S18OW8K2mXCWNDT6+Ski996/yrXm9IdRSRX9GHYPXDWn4plr6YmXaeyn
+         EzKXN9rer8drqAzULuePYk+51a9ElF3Ca9c4gasrW0/mK8kT/pfMb5ai+5P2S/j8DGBf
+         W5ZoIQNF2c1sN6FkvC1Wk80pechRnGjI+Wxov0fF8mvkh+HDcxZN+sD2/KlTQcg2c1UJ
+         5Eww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729087716; x=1729692516;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZKcAJrsMT6v1EJVRGfh/ABrvXvKqs+PkK6NkGIgrV2k=;
+        b=ekRx4e4Mx4fDdE9ThWWMWAef08m8qzs1c1bGWGtFrLXYgEgjmYy9VM9udtARRUXolb
+         y+2U3J8H3u6OQtb8SESlAtdKjKnd549cqrh0mI6MaWbHi0ZsXNmMGp7xeW+L/rUyMOiO
+         4t86SZUTUxeRhEcpA/8JdkqMhs+DAyISF6NNAxET7xuM371s4o3BcLuuTh+GflF5ARsB
+         l8/8kqRUg+KvE2SJ8rRdmWzVccNdnwAzzpp8NJjIzLecniTJybRXmfufHZsXhKwujWmH
+         rFxrpuhEtSC6jj+BHwprNx67ALmxu47G81IVdbGpxqfd2ih68TE5o2Zc7VeE7CQpTfWX
+         58AA==
+X-Gm-Message-State: AOJu0Yy6Ye2XPu57kf/rURA7GwecwqNqMMia+vM6IkG9iuGWjlLYTSNa
+	kRtwJJ4M0IB6CPFrn1lNhxCOuqvYyc5rZxZuGEzBh8gw2y4x4NxAU6U8S7dqgU+7ucilEaAaV7c
+	5
+X-Google-Smtp-Source: AGHT+IGdDjZuMmb+MY28FT9rHcKllNprqDnweo3KftlNd0C2m7Hj+r7n3A4gyxBMkQbFHQich3bsbw==
+X-Received: by 2002:a05:6e02:1a4f:b0:3a3:b254:ca2c with SMTP id e9e14a558f8ab-3a3bce11c80mr144485285ab.25.1729087715535;
+        Wed, 16 Oct 2024 07:08:35 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a3d70cd606sm8284545ab.52.2024.10.16.07.08.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Oct 2024 07:08:34 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+In-Reply-To: <20241016134847.2911721-1-ming.lei@redhat.com>
+References: <20241016134847.2911721-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] ublk: don't allow user copy for unprivileged device
+Message-Id: <172908771463.7156.1054660987028664043.b4-ty@kernel.dk>
+Date: Wed, 16 Oct 2024 08:08:34 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-UBLK_F_USER_COPY requires userspace to call write() on ublk char
-device for filling request buffer, and unprivileged device can't
-be trusted.
 
-So don't allow user copy for unprivileged device.
+On Wed, 16 Oct 2024 21:48:47 +0800, Ming Lei wrote:
+> UBLK_F_USER_COPY requires userspace to call write() on ublk char
+> device for filling request buffer, and unprivileged device can't
+> be trusted.
+> 
+> So don't allow user copy for unprivileged device.
+> 
+> 
+> [...]
 
-Fixes: 1172d5b8beca ("ublk: support user copy")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c      | 11 ++++++++++-
- include/uapi/linux/ublk_cmd.h |  8 +++++++-
- 2 files changed, 17 insertions(+), 2 deletions(-)
+Applied, thanks!
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index cd509126e152..f812cd271573 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -2519,10 +2519,19 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 	 * TODO: provide forward progress for RECOVERY handler, so that
- 	 * unprivileged device can benefit from it
- 	 */
--	if (info.flags & UBLK_F_UNPRIVILEGED_DEV)
-+	if (info.flags & UBLK_F_UNPRIVILEGED_DEV) {
- 		info.flags &= ~(UBLK_F_USER_RECOVERY_REISSUE |
- 				UBLK_F_USER_RECOVERY);
- 
-+		/*
-+		 * For USER_COPY, we depends on userspace to fill request
-+		 * buffer by pwrite() to ublk char device, which can't be
-+		 * used for unprivileged device
-+		 */
-+		if (info.flags & UBLK_F_USER_COPY)
-+			return -EINVAL;
-+	}
-+
- 	/* the created device is always owned by current user */
- 	ublk_store_owner_uid_gid(&info.owner_uid, &info.owner_gid);
- 
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 897ace0794c2..cbe53c980cbc 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -174,7 +174,13 @@
- /* use ioctl encoding for uring command */
- #define UBLK_F_CMD_IOCTL_ENCODE	(1UL << 6)
- 
--/* Copy between request and user buffer by pread()/pwrite() */
-+/*
-+ *  Copy between request and user buffer by pread()/pwrite()
-+ *
-+ *  Not available for UBLK_F_UNPRIVILEGED_DEV, otherwise userspace may
-+ *  deceive us by not filling request buffer, then kernel uninitialized
-+ *  data may be leaked.
-+ */
- #define UBLK_F_USER_COPY	(1UL << 7)
- 
- /*
+[1/1] ublk: don't allow user copy for unprivileged device
+      commit: 42aafd8b48adac1c3b20fe5892b1b91b80c1a1e6
+
+Best regards,
 -- 
-2.46.0
+Jens Axboe
+
+
 
