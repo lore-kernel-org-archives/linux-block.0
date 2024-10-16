@@ -1,71 +1,49 @@
-Received: from mail-qt1-f227.google.com (mail-qt1-f227.google.com [209.85.160.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01721F80DD
-	for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 20:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9AE3B1AF;
+	Wed, 16 Oct 2024 00:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729025480; cv=none; b=txQVEAdb4TInxHwYcG6NCdsDRcBospSdzZPehoFNRqtrlnExtpN3EYEdrIs/emIOS4En2MEAEuY4Uok/5ECQoNAaAmvqWpiIPMNQVzud0W7EVsIPAfTE1jEqLrYTgw3lYkgBCXGoavMCF79zLgay2kaPdD4JOIY6e+UVd+sJLzk=
+	t=1729039922; cv=none; b=GEfMRKNh0jR91QnfdOP0wplTy8crCVLxdriRtdOicQRFMj3rt7qjV7FtYEOcNK4XjaVzkBUYTuvOfKKx6nGPaYMKxUxB7fRPqGGQpo3j+f25nQo6jVO2+QEVPvdXjTU/N0ZKKmo5xWZU8gbLSuWVQ0EHdlwqhCsVq5F7ocTV0kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729025480; c=relaxed/simple;
-	bh=bHG14hrGQSpai5KqJFMnfSP1YbhX56ortjMFznQtdvs=;
+	s=arc-20240116; t=1729039922; c=relaxed/simple;
+	bh=Bx/dFlbKzH10Je0iK3Rb4Fy5a5F7DDy4gj4hZJOTdTE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NT4yjHoDmNGxXCqWXHeK+IKLZcdP98Cwb/m1wcN5ZH2FgcIkr9up9U1uvXUEi54iJTeI9+T5Wa8il0RczJ465xEt7Kbw6iegBCju2OUAComGODxO1Wu8rpNsOSUwI8DhH7YElbnF/MmzW56+0hpiTq74oDWiO165Fiv63g/nLsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Phy1B6+l; arc=none smtp.client-ip=209.85.160.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=KxTkq9WRwxhxYjk4ImhGMQDlQJK6TBNCKltuJOyEjjeWjlvVK2q8Iia26+R8K44TTDfr7m4SDt+0XWI3SRhgsf5Gu8gTajdY7g4nXgFSiX+/ED7Bn/o+6IScmcMG2bqE2NgOLCUqWw6kHKwo/aUicNNpj0KPw8QB8T+W8poEeKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RaqrnVhn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Phy1B6+l"
-Received: by mail-qt1-f227.google.com with SMTP id d75a77b69052e-4603f64ef17so2318201cf.0
-        for <linux-block@vger.kernel.org>; Tue, 15 Oct 2024 13:51:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1729025476; x=1729630276; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DVNM786p1ZLPjq83UTTZ75/h5J/YAHeE+f5HGIGi4Z8=;
-        b=Phy1B6+lFwU6SKC6qQc2q2Hdtbi/093+VtfCBAoSXt/IvCUAj2gS97iRsIUiYG7OQ2
-         qM5bSAEo/rWsV+k7/on8vk0EY2c8RiU16lGMY2e3UBh18v/u5cT5OoXX+CIcZkDY+Tb9
-         4QZSAhP7ftLy7p5D/sfIAovoSClq1AKa2oEg0RnJYXHOdEnHh3dBAwYMLBYX9EVC6r2W
-         1Tvksi+sRsLDlfdAOo9b3lZ1vW4vScJM+P4yzrleWSzPgfWTf44Qy4+MNEjoicZP99LR
-         zCy7heJnFbXL+zQJ1EB4yRlztK/pGbGWKlU237jEkK18qFOyUcVGmYBN6HHX4MrjO+uW
-         q5Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729025476; x=1729630276;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DVNM786p1ZLPjq83UTTZ75/h5J/YAHeE+f5HGIGi4Z8=;
-        b=anQIu4cccMkZyYX3zyW/PzOqQ3fhAURpoesEbqs3MScSmkBP7EtTB1IfouyEdX/0zg
-         36M9rQ5tqs40VvYLWZ7D262E8XxIVH1KdRFVFmWHpPZJpSZiK5xaNwzMNgVtUqynOsCB
-         lGqkhsIHVXTGUweTLg/wfROZFKvbSuHcxREpSWp+/XBpLysAEWKFFDQurgbBMuEH0gtI
-         iXbbJV3WNrlOuNjYknjM0P1hPlY3saXuWvdVyXOnV+dPzBo5+8uNbhQr5drGO5cMe4fb
-         dP44Pdrx7J7VpQM7uDwy+CHXuZK7nEUTr+qtKd+W7WBMFfNbbn72TwryF/TFqO/KMMI9
-         WgvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU+6g84cqFZxemVA/YlJHYrWM16NhBzNfgWQtOpRccWh5GFLeYcOinQBs0TbJSwNZsZcOyB+ofbaucVoA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+L4HINW6SUYoOs818z3ZzmMGXA67pVNGXBggD0XDCdrBtMt24
-	daMgBPPpqngomRB4FxfVKI0/LYLgwwotje9cLTV+pQ8RjL2P0Xum7OgUir2SHQPjlzD7e54Ny6v
-	E6afM7VhGjdNTjEp+OWlV3YqG6QtOMm7s
-X-Google-Smtp-Source: AGHT+IF37guVaImyqyoBZvUR1Cd0UduUKmtTgG8eF3VDtCjKmJhYju1jaLvJacMsRIzA7rrjILVaEU4UvzfO
-X-Received: by 2002:ac8:5a84:0:b0:458:25ec:68cf with SMTP id d75a77b69052e-46089b2d12emr25632271cf.13.1729025476558;
-        Tue, 15 Oct 2024 13:51:16 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-6cc22971d2asm627616d6.51.2024.10.15.13.51.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 13:51:16 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id C4B8134047A;
-	Tue, 15 Oct 2024 14:51:14 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id AB68AE4055F; Tue, 15 Oct 2024 14:51:14 -0600 (MDT)
-Date: Tue, 15 Oct 2024 14:51:14 -0600
-From: Uday Shankar <ushankar@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] ublk: eliminate unnecessary io_cmds queue
-Message-ID: <Zw7Vwsh3G25bbl93@dev-ushankar.dev.purestorage.com>
-References: <20241009193700.3438201-1-ushankar@purestorage.com>
- <ZwdNvyXdXbsCf9MF@fedora>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RaqrnVhn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506CAC4CECD;
+	Wed, 16 Oct 2024 00:52:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729039922;
+	bh=Bx/dFlbKzH10Je0iK3Rb4Fy5a5F7DDy4gj4hZJOTdTE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RaqrnVhnhESaXVBIKzWMfLPyKquNczQJ7PzExRn42zw9+dgbiq8qx8uwILmNzk1UW
+	 8Bd0aW4NAPxaPaGTm623pMyCrxc3jseEv+YTfFldZa1qdBRZ5VDvarAlN8PUt0Yge2
+	 qMHW9JXDdTeSdeq0fwBo/R9rByna0/qfCBh7VLkyJ5W4PvtLhcox0bAfO6rOPBukHz
+	 LJF1QbuRRfMUAv71xqPmkdk8p1x803S2qm4FN2RwqZu8u1qAulkTCMrXa248hOy6JK
+	 DtP205u1obmFlmj9hVqGFNk0i13tKJ1LVkLp66zhK0dy69f1hRzVDTWR987Ca/KvxB
+	 F5NOgY4Bin5Lw==
+Date: Tue, 15 Oct 2024 17:52:01 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, brauner@kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, dchinner@redhat.com,
+	cem@kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, hare@suse.de,
+	martin.petersen@oracle.com, catherine.hoang@oracle.com,
+	mcgrof@kernel.org, ritesh.list@gmail.com, ojaswin@linux.ibm.com
+Subject: Re: [PATCH v7 5/8] xfs: Support FS_XFLAG_ATOMICWRITES
+Message-ID: <20241016005201.GH21836@frogsfrogsfrogs>
+References: <20241004092254.3759210-1-john.g.garry@oracle.com>
+ <20241004092254.3759210-6-john.g.garry@oracle.com>
+ <20241004123520.GB19295@lst.de>
+ <f4d2180a-8baa-4636-a0a1-36e474fcd157@oracle.com>
+ <20241007054229.GA307@lst.de>
+ <f0febabf-25ee-4fbe-9dfe-77a240cc29db@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,27 +52,48 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZwdNvyXdXbsCf9MF@fedora>
+In-Reply-To: <f0febabf-25ee-4fbe-9dfe-77a240cc29db@oracle.com>
 
-On Thu, Oct 10, 2024 at 11:45:03AM +0800, Ming Lei wrote:
-> >  static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
-> >  {
-> > -	struct ublk_rq_data *data = blk_mq_rq_to_pdu(rq);
-> > -
-> > -	if (llist_add(&data->node, &ubq->io_cmds)) {
-> > -		struct ublk_io *io = &ubq->ios[rq->tag];
-> > +	struct ublk_io *io = &ubq->ios[rq->tag];
-> >  
-> > -		io_uring_cmd_complete_in_task(io->cmd, ublk_rq_task_work_cb);
-> > -	}
-> > +	ublk_get_uring_cmd_pdu(io->cmd)->req = rq;
-> > +	io_uring_cmd_complete_in_task(io->cmd, __ublk_rq_task_work);
-> >  }
+On Sun, Oct 13, 2024 at 10:06:04PM +0100, John Garry wrote:
+> On 07/10/2024 06:42, Christoph Hellwig wrote:
+> > On Fri, Oct 04, 2024 at 02:07:05PM +0100, John Garry wrote:
+> > > Sure, that is true (about being able to atomically write 1x FS block if the
+> > > bdev support it).
+> > > 
+> > > But if we are going to add forcealign or similar later, then it would make
+> > > sense (to me) to have FS_XFLAG_ATOMICWRITES (and its other flags) from the
+> > > beginning. I mean, for example, if FS_XFLAG_FORCEALIGN were enabled and we
+> > > want atomic writes, setting FS_XFLAG_ATOMICWRITES would be rejected if AG
+> > > count is not aligned with extsize, or extsize is not a power-of-2, or
+> > > extsize exceeds bdev limits. So FS_XFLAG_ATOMICWRITES could have some value
+> > > there.
+> > > 
+> > > As such, it makes sense to have a consistent user experience and require
+> > > FS_XFLAG_ATOMICWRITES from the beginning.
+> > 
+> > Well, even with forcealign we're not going to lose support for atomic
+> > writes <= block size, are we?
+> > 
 > 
-> I'd suggest to comment that io_uring_cmd_complete_in_task() needs to
-> maintain io command order.
+> forcealign would not be required for atomic writes <= FS block size.
+> 
+> How about this modified approach:
+> 
+> a. Drop FS_XFLAG_ATOMICWRITES support from this series, and so we can always
+> atomic write 1x FS block (if the bdev supports it)
+> 
+> b. If we agree to support forcealign afterwards, then we can introduce 2x
+> new flags:
+> 	- FS_XFLAG_FORCEALIGN - as before
+> 	- FS_XFLAG_BIG_ATOMICWRITES - this depends on  FS_XFLAG_FORCEALIGN being
+> enabled per inode, and allows us to atomically write > 1 FS block
+> 
+> c. Later support writing < 1 FS block
+> 	- this would not depend on forcealign
+> 	- would require a real user, and I don't know one yet
+> 
+> better?
 
-Sorry, can you explain why this is important? Generally speaking
-out-of-order completion of I/Os is considered okay, so what's the issue
-if the dispatch to the ublk server here is not in order?
+Sounds fine to /me/, but that's just my opinion. :)
 
+--D
