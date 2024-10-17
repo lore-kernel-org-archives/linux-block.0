@@ -1,36 +1,57 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74EE3111AD;
-	Thu, 17 Oct 2024 15:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125FB111AD
+	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 15:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729178624; cv=none; b=lEuER1QIhLJUHZleTSggP+wSqnwbA3ViXSJClV8T5wKy7rpg7if8UPYNr5delfmMP/O2NMcOGcKbFB13thHfYTKNuts1EIW4DU62Hc6Ex93AcrzwM5ryMB3Z4ecHQ3EbsFFYXinFCGx9o1Ylh2cqjKbycL8WRhz7aBscTc2aCpw=
+	t=1729179787; cv=none; b=EYha6aoyRKKJw3uH9yBbEHz1BH1i5vADeJmgV7JtA8MfDdjcFkZvRFSOgk4io0a/PYEqtgjzkuYMsvT5UBCTgSp6j+1E3v3tJK2ANaPDmPYPkeO42pLRNnjXSFb4nnzaMMETyOrH3XcR/IYGGD4k+8So1h0GiWTsjKeU7VuSpEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729178624; c=relaxed/simple;
-	bh=le4VB4b0n93zSCV37N2PIWDQ3Rzmu0T7S4TGih9DMsQ=;
+	s=arc-20240116; t=1729179787; c=relaxed/simple;
+	bh=poYUPwywsKpOeIi53rfn8CRh/RiYY8sxvAT15x3saiA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TlY+whNkF3qnveXJIHADMJHjQyXKD31WsL67gw1VwQ0cfeXMsqmoqYaNaMPZmkw4Dd0EEdTkZb1cn+LWqd0XFhQGdkZDovV2VXHRQg/d0LbSfj7M0xczN5EZYXm5HlsXrlibIa/DgCWUGCc991S5w/qq+OsLMBUfoSXjzdtO4U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 32601227A8E; Thu, 17 Oct 2024 17:23:37 +0200 (CEST)
-Date: Thu, 17 Oct 2024 17:23:37 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
-	hare@suse.de, sagi@grimberg.me, martin.petersen@oracle.com,
-	brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
-	jaegeuk@kernel.org, bcrl@kvack.org, dhowells@redhat.com,
-	bvanassche@acm.org, asml.silence@gmail.com,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-aio@kvack.org, gost.dev@samsung.com, vishak.g@samsung.com,
-	javier.gonz@samsung.com
-Subject: Re: [PATCH v7 0/3] FDP and per-io hints
-Message-ID: <20241017152336.GA25327@lst.de>
-References: <CGME20240930182052epcas5p37edefa7556b87c3fbb543275756ac736@epcas5p3.samsung.com> <20240930181305.17286-1-joshi.k@samsung.com> <20241015055006.GA18759@lst.de> <8be869a7-c858-459a-a34b-063bc81ce358@samsung.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YN5AjDWavMal3//+kXUmwM+iX1AWOyM32hvUEj0jEYNSxIDKrQ7o6GwHgluE+87S3Ch1zEAAGb0AUIj6P5a9BfrslmFOOms8kT380sDXpRyCKLQvrX/YyuNhqo/OWUA4YyKEppgaRGfVtI2HXI5ppjDEYv6ENChixysMG3RojVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IkU+Fxen; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IkU+Fxen"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729179785;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lUy+NHCY90HFmiHuL5kBvzZvtUN1CcRm3oIFWnmLPRo=;
+	b=IkU+FxenORjn3xsWE+cOtfnI3NeS9VUcvxOi6z4PnPHHlPDXCQdXiNFp8kj0gaM9ZVM/bn
+	hAL844Rck9Yld6moh0xLOpxAUdArhdG0FqI2fX2oUjz6BFIq0rJUT3pJc7xcZlaTYvOyHp
+	CGBsV5ySYjmFnzlypPba9H3dfShddBA=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-260-K7FxqgiwN4SnUhSC_t5xfw-1; Thu,
+ 17 Oct 2024 11:43:03 -0400
+X-MC-Unique: K7FxqgiwN4SnUhSC_t5xfw-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1361B197703D;
+	Thu, 17 Oct 2024 15:43:02 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.14])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00C731956086;
+	Thu, 17 Oct 2024 15:42:55 +0000 (UTC)
+Date: Thu, 17 Oct 2024 23:42:50 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, nbd@other.debian.org, eblake@redhat.com,
+	vincent.chen@sifive.com, Leon Schuermann <leon@is.currently.online>,
+	Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH] nbd: fix partial sending
+Message-ID: <ZxEwelJ__pzSMDPo@fedora>
+References: <20241017113614.2964389-1-ming.lei@redhat.com>
+ <354b464e-4ae0-460b-b6d1-8ae208345bfa@acm.org>
+ <140c4437-fea2-482b-a43f-4ffe6c35e3d2@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,66 +60,47 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8be869a7-c858-459a-a34b-063bc81ce358@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <140c4437-fea2-482b-a43f-4ffe6c35e3d2@kernel.dk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Thu, Oct 17, 2024 at 08:05:38PM +0530, Kanchan Joshi wrote:
-> Seems per-I/O hints are not getting the love they deserve.
-> Apart from the block device, the usecase is when all I/Os of VM (or 
-> container) are to be grouped together or placed differently.
-
-But that assumes the file system could actually support it.  Which
-is hard when you don't assume the file system isn't simply a passthrough
-entity, which will not give you great results.
-
-> > 2) A per-I/O interface to set these temperature hint conflicts badly
-> > with how placement works in file systems.  If we have an urgent need
-> > for it on the block device it needs to be opt-in by the file operations
-> > so it can be enabled on block device, but not on file systems by
-> > default.  This way you can implement it for block device, but not
-> > provide it on file systems by default.  If a given file system finds
-> > a way to implement it it can still opt into implementing it of course.
+On Thu, Oct 17, 2024 at 09:22:22AM -0600, Jens Axboe wrote:
+> On 10/17/24 9:13 AM, Bart Van Assche wrote:
+> > On 10/17/24 4:36 AM, Ming Lei wrote:
+> >> +static blk_status_t nbd_send_pending_cmd(struct nbd_device *nbd,
+> >> +        struct nbd_cmd *cmd)
+> >> +{
+> >> +    struct request *req = blk_mq_rq_from_pdu(cmd);
+> >> +    unsigned long deadline = READ_ONCE(req->deadline);
+> >> +    unsigned int wait_ms = 2;
+> >> +    blk_status_t res;
+> >> +
+> >> +    WARN_ON_ONCE(test_bit(NBD_CMD_REQUEUED, &cmd->flags));
+> >> +
+> >> +    while (true) {
+> >> +        res = nbd_send_cmd(nbd, cmd, cmd->index);
+> >> +        if (res != BLK_STS_RESOURCE)
+> >> +            return res;
+> >> +        if (READ_ONCE(jiffies) + msecs_to_jiffies(wait_ms) >= deadline)
+> >> +            break;
+> >> +        msleep(wait_ms);
+> >> +        wait_ms *= 2;
+> >> +    }
+> > 
+> > I think that there are better solutions to wait until more data
+> > can be sent, e.g. by using the kernel equivalent of the C library
+> > function select().
 > 
-> Why do you see this as something that is so different across filesystems 
-> that they would need to "find a way to implement"?
+> It's vfs_poll() - but I don't think that'd be worth it here, the nbd
+> driver sets BLK_MQ_F_BLOCKING anyway. Using a poll trigger for this
+> would be a lot more complicated, and need quite a bit of support code.
 
-If you want to do useful stream separation you need to write data
-sequentially into the stream.  Now with streams or FDP that does not
-actually imply sequentially in LBA space, but if you want the file
-system to not actually deal with fragmentation from hell, and be
-easily track what is grouped together you really want it sequentially
-in the LBA space as well.  In other words, any kind of write placement
-needs to be intimately tied to the file system block allocator.
+Agree.
 
-> Both per-file and per-io hints are supplied by userspace. Inode and 
-> kiocb only happen to be the mean to receive the hint information.
-> FS is free to use this information (iff it wants) or simply forward this 
-> down.
+It is one unlikely event and not worth vfs_poll() here.
 
-As mentioned above just passing it down is not actually very useful.
-It might give you nice benchmark numbers when you basically reimplement
-space management in userspace on a fully preallocated file, but for that
-you're better of just using the block device.  If you actually want
-to treat the files as files you need full file system involvement.
+And the retry with exponential backoff wait should work just fine.
 
-> Per-file hint just gets stored (within inode) without individual FS 
-> involvement. Per-io hint follows the same model (i.e., it is set by 
-> upper layer like io_uring/aio) and uses kiocb to store the hint. It does 
-> not alter the stored inode hint value!
 
-Yes, and now you'll get complaints that the file system ignores it
-when it can't properly support it.  This is why we need a per-fop
-opt in.
-
-> The generic code (like fs/direct-io.c, fs/iomap/direct-io.c etc.,) 
-> already forwards the incoming hints, without any intelligence.
-
-Yes, and that is a problem.  We stopped doing that, but Samsung sneaked
-some of this back in recently as I noticed.
-
-> Overall, I do not see the conflict. It's all user-driven. No?
-
-I have the gut feeling that you've just run benchmarks on image files
-emulating block devices and not actually tried real file system workloads
-based on this unfortunately.
+Thanks,
+Ming
 
