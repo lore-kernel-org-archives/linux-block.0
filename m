@@ -1,57 +1,49 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125FB111AD
-	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 15:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1F51DED7D;
+	Thu, 17 Oct 2024 15:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729179787; cv=none; b=EYha6aoyRKKJw3uH9yBbEHz1BH1i5vADeJmgV7JtA8MfDdjcFkZvRFSOgk4io0a/PYEqtgjzkuYMsvT5UBCTgSp6j+1E3v3tJK2ANaPDmPYPkeO42pLRNnjXSFb4nnzaMMETyOrH3XcR/IYGGD4k+8So1h0GiWTsjKeU7VuSpEM=
+	t=1729179883; cv=none; b=bb+Lyj2Ii0dnRhQ8xx0AyH5g+Bc3YQcCsFwZfGAB1xX5JO2CIuTyfFbAyL0Abe7H6mxWjDnkSdK4Ns4HlloqkjAr+FSUiLavvJcj2cRH1uLfRd0EYEPMzYqGV8o1CI66VVtZBNlIvVlsfiGT8F+zXPddC7LSrkyuLXzJM6AWvgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729179787; c=relaxed/simple;
-	bh=poYUPwywsKpOeIi53rfn8CRh/RiYY8sxvAT15x3saiA=;
+	s=arc-20240116; t=1729179883; c=relaxed/simple;
+	bh=YyMF8CAbGHfi2Sw0wRiqwANy0JpymXK7ZZYD+DPBNbM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YN5AjDWavMal3//+kXUmwM+iX1AWOyM32hvUEj0jEYNSxIDKrQ7o6GwHgluE+87S3Ch1zEAAGb0AUIj6P5a9BfrslmFOOms8kT380sDXpRyCKLQvrX/YyuNhqo/OWUA4YyKEppgaRGfVtI2HXI5ppjDEYv6ENChixysMG3RojVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IkU+Fxen; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=DMF1upTt16MhP293thhuAL7suE7OWFMNmc84B+gtAnC1B6+C7Cxnpe0BodcMylwKg6D/3fR3mIyxluQ8KssBnL0Caw7tUt55MG3HScMIMnz1SSZhrbhcx1pTU1VkCTap5WzllpaF+ytT7Ek2w08ra6ocGoSkjWqIzzDnaarWzhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uGtOCC0K; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IkU+Fxen"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729179785;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lUy+NHCY90HFmiHuL5kBvzZvtUN1CcRm3oIFWnmLPRo=;
-	b=IkU+FxenORjn3xsWE+cOtfnI3NeS9VUcvxOi6z4PnPHHlPDXCQdXiNFp8kj0gaM9ZVM/bn
-	hAL844Rck9Yld6moh0xLOpxAUdArhdG0FqI2fX2oUjz6BFIq0rJUT3pJc7xcZlaTYvOyHp
-	CGBsV5ySYjmFnzlypPba9H3dfShddBA=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-260-K7FxqgiwN4SnUhSC_t5xfw-1; Thu,
- 17 Oct 2024 11:43:03 -0400
-X-MC-Unique: K7FxqgiwN4SnUhSC_t5xfw-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1361B197703D;
-	Thu, 17 Oct 2024 15:43:02 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.14])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00C731956086;
-	Thu, 17 Oct 2024 15:42:55 +0000 (UTC)
-Date: Thu, 17 Oct 2024 23:42:50 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
-	josef@toxicpanda.com, nbd@other.debian.org, eblake@redhat.com,
-	vincent.chen@sifive.com, Leon Schuermann <leon@is.currently.online>,
-	Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH] nbd: fix partial sending
-Message-ID: <ZxEwelJ__pzSMDPo@fedora>
-References: <20241017113614.2964389-1-ming.lei@redhat.com>
- <354b464e-4ae0-460b-b6d1-8ae208345bfa@acm.org>
- <140c4437-fea2-482b-a43f-4ffe6c35e3d2@kernel.dk>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uGtOCC0K"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEC1EC4CEC3;
+	Thu, 17 Oct 2024 15:44:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729179883;
+	bh=YyMF8CAbGHfi2Sw0wRiqwANy0JpymXK7ZZYD+DPBNbM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uGtOCC0KZ+nQG3KRlBLvL3qkiKVlc9OuxDmzeY/a0qZE1JclZl0IvwCA7qJx1bePC
+	 J+ICr6c0I5o4mWgMbRUDPMezx9EHk7I0I1VJIClLE1pySihpdyWuHoKH1rPGUIjEnJ
+	 rRNeb269IyZtZEvF1uaNvjtBRoEhjzXSs9Muo2HfP6swFWuzSOrAAkXIWgOz8lFlFm
+	 UxsKN2UtuWSUZUwbH6WREbBggDHkXWKHPmJ5GlQpc9ta5szoU88MMOwrCUxx1Td7CU
+	 UxsbMHQKBgsY3Gmf+Sw07HFzvaGBDMZOV8w8WX6yy6KiAE+uz60bnhgU8wKueSmQPy
+	 xEw2/sh6hsewA==
+Date: Thu, 17 Oct 2024 09:44:39 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, hare@suse.de,
+	sagi@grimberg.me, martin.petersen@oracle.com, brauner@kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, jaegeuk@kernel.org,
+	bcrl@kvack.org, dhowells@redhat.com, bvanassche@acm.org,
+	asml.silence@gmail.com, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-aio@kvack.org,
+	gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com
+Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+Message-ID: <ZxEw5-l6DtlXCQRO@kbusch-mbp.dhcp.thefacebook.com>
+References: <CGME20240930182052epcas5p37edefa7556b87c3fbb543275756ac736@epcas5p3.samsung.com>
+ <20240930181305.17286-1-joshi.k@samsung.com>
+ <20241015055006.GA18759@lst.de>
+ <8be869a7-c858-459a-a34b-063bc81ce358@samsung.com>
+ <20241017152336.GA25327@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,47 +52,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <140c4437-fea2-482b-a43f-4ffe6c35e3d2@kernel.dk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+In-Reply-To: <20241017152336.GA25327@lst.de>
 
-On Thu, Oct 17, 2024 at 09:22:22AM -0600, Jens Axboe wrote:
-> On 10/17/24 9:13 AM, Bart Van Assche wrote:
-> > On 10/17/24 4:36 AM, Ming Lei wrote:
-> >> +static blk_status_t nbd_send_pending_cmd(struct nbd_device *nbd,
-> >> +        struct nbd_cmd *cmd)
-> >> +{
-> >> +    struct request *req = blk_mq_rq_from_pdu(cmd);
-> >> +    unsigned long deadline = READ_ONCE(req->deadline);
-> >> +    unsigned int wait_ms = 2;
-> >> +    blk_status_t res;
-> >> +
-> >> +    WARN_ON_ONCE(test_bit(NBD_CMD_REQUEUED, &cmd->flags));
-> >> +
-> >> +    while (true) {
-> >> +        res = nbd_send_cmd(nbd, cmd, cmd->index);
-> >> +        if (res != BLK_STS_RESOURCE)
-> >> +            return res;
-> >> +        if (READ_ONCE(jiffies) + msecs_to_jiffies(wait_ms) >= deadline)
-> >> +            break;
-> >> +        msleep(wait_ms);
-> >> +        wait_ms *= 2;
-> >> +    }
-> > 
-> > I think that there are better solutions to wait until more data
-> > can be sent, e.g. by using the kernel equivalent of the C library
-> > function select().
-> 
-> It's vfs_poll() - but I don't think that'd be worth it here, the nbd
-> driver sets BLK_MQ_F_BLOCKING anyway. Using a poll trigger for this
-> would be a lot more complicated, and need quite a bit of support code.
+On Thu, Oct 17, 2024 at 05:23:37PM +0200, Christoph Hellwig wrote:
+> If you want to do useful stream separation you need to write data
+> sequentially into the stream.  Now with streams or FDP that does not
+> actually imply sequentially in LBA space, but if you want the file
+> system to not actually deal with fragmentation from hell, and be
+> easily track what is grouped together you really want it sequentially
+> in the LBA space as well.  In other words, any kind of write placement
+> needs to be intimately tied to the file system block allocator.
 
-Agree.
+I'm replying just to make sure I understand what you're saying:
 
-It is one unlikely event and not worth vfs_poll() here.
+If we send per IO hints on a file, we could have interleaved hot and
+cold pages at various offsets of that file, so the filesystem needs an
+efficient way to allocate extents and track these so that it doesn't
+interleave these in LBA space. I think that makes sense.
 
-And the retry with exponential backoff wait should work just fine.
-
-
-Thanks,
-Ming
-
+We can add a fop_flags and block/fops.c can be the first one to turn it
+on since that LBA access is entirely user driven.
