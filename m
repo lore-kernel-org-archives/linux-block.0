@@ -1,52 +1,54 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597181DF729
-	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 16:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4530D1DE8AC
+	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 16:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729181434; cv=none; b=DpSosSkLj8FMk/Rx4xPMGTlM19vH2+agX9bjJ4BSMOsG28Rx0BC1Lv4jh/gYffbyLcQcZtxocVQlb/IAu0klaluCH7JrD8R6tRS2ETv8KjNjTE0mWFv4CTxWyAomGmsKGZHLGzQzR99dIbci9C1LBuCLB7u+145xf32ZAdP8z/Y=
+	t=1729181590; cv=none; b=iyVipfrbzLqKSDBkNTVEm0LS5DTAoMA+pmVTRSgS65HeveANvf+bf1rPqZCtUpB5moQDmyO/gr+KsxP4KmoTae1dJjH92tXTH/Sfhp5Fh4dDabV0nBy3Fe96JfJLyNCQulo7QoLI1RQZaDLREUruBW8JO1jwNL94fI9fcFwgr7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729181434; c=relaxed/simple;
-	bh=p/pdlwEOz7x4atHfPH22yaUj+cFfP6Ldj5Fdo1PQsAg=;
+	s=arc-20240116; t=1729181590; c=relaxed/simple;
+	bh=RaJWIJh/DiVAdUI7KCm5HwoZmUdvvS0hR2E+rcnqMhg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VpzN3Nt3IaTxjEYWkXtmmNU4zUYS6HoA+AlUDKnWtx194g5/jVqXhDIDRlgvTkUdrYZNWmqwLmB3tlOqJz9O1oBpKu7sAOw2wV+QK++mgjJh+WcKqDmQ+OhVYycC0AhVwRPuV4JNSfdbXQ3djeBM7yzWzDpieh76vYd6jUwzOHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=IpsQFmON; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=WBmOsISnMqMJn8a8IBMAXDI5wayDHQz7f6rGkmLdZ74hr+ozLSonS9OqDGDk20Z8oNkaBkD++VBPQRYs8KWJRWbMF2sGjH1ZNV1lym5SkupAaOi8K3AIw2caihxK+e8YifqFPZIf3rQm+Q+yPtdGzJS4ZVcVhqEAxvPfsAkd6UE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=R3hoP7VR; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="IpsQFmON"
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49HCgsBK003824
-	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 09:10:32 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="R3hoP7VR"
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 49HChDXG024703
+	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 09:13:04 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=8XyX8u59mNjnQPnGrxzikA04q0KGVl3u3qy1AjZng4g=; b=IpsQFmON4IMW
-	CH/iLUNJvCbdArXLLYsgLxtHPtSmunWocZc6QSNJUgBUeoJdHYieF6TQTIksvdln
-	7Z9xPLofaq/X2vsdEDJpYSB3/+UjVzv4sj2ZUn0QEOT0uF2iekQaLEQyctRrWLdX
-	a3qhXO7MdefRTbpkdejv4s7txNh2yjT4sESFXtxiAYfC1fNGbxu4rGibsrBrfYLK
-	rKsphDuZCxF2Y1Eb+de/UdcJKLurqYJuescb0DpZ73MvSrYZ7iDi+4yWiH1US/Bu
-	t5V+xB0T7zDgkhiWoiEfIX1KDgR1Zazem27gFeqbeoJZhg3ePEH9TDn6qMKhn+SC
-	6TsjdCIi7g==
+	 bh=iWtes4q52ch0yD+cMaKAQwN0cKm8w/0t0MM6PKPQXDs=; b=R3hoP7VRBd3E
+	szLhqAtpjscsyJaGsll4Wyj6CbEk4HtJnWtZ1dUcp4TQ0wh12uL0xq7gO372ZOnk
+	P5QzD70MtVn7feHhSYVF3SzjB6ddQIyi/fT+y2VGhuAqHzZdi8BWFhOYMFFcn0nP
+	qYr48pzwYguZrTCabgV51PhnRxTBHjVSzkrwNG7MdxfIbd+q+jNNnkidyuErSXR5
+	zOxRqpMvwypR3VU2fSq4l0sPqww6+99rDPDAq00+SWYhCng1QLZGWe983sWXgIpW
+	RVo7kajYIOBwlxT5vEim3ZkMVHd6iZSQevoz3EfMazJZw2nADudlkenuDccN9Ulr
+	EiGsGGAqMg==
 Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 42a9tjkbjn-16
+	by m0001303.ppops.net (PPS) with ESMTPS id 42a8wmb2by-8
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 09:10:32 -0700 (PDT)
-Received: from twshared4085.05.ash9.facebook.com (2620:10d:c0a8:1b::30) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 09:13:03 -0700 (PDT)
+Received: from twshared4354.35.frc1.facebook.com (2620:10d:c0a8:1c::1b) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Thu, 17 Oct 2024 16:10:23 +0000
+ 15.2.1544.11; Thu, 17 Oct 2024 16:12:59 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 2C20E143A4AFC; Thu, 17 Oct 2024 09:10:14 -0700 (PDT)
+	id 16DCD143A4AA1; Thu, 17 Oct 2024 09:09:57 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
         <axboe@kernel.dk>, <hch@lst.de>, <io-uring@vger.kernel.org>
 CC: <linux-fsdevel@vger.kernel.org>, <joshi.k@samsung.com>,
-        <javier.gonz@samsung.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv8 4/6] fs: introduce per-io hint support flag
-Date: Thu, 17 Oct 2024 09:09:35 -0700
-Message-ID: <20241017160937.2283225-5-kbusch@meta.com>
+        <javier.gonz@samsung.com>, Nitesh Shetty <nj.shetty@samsung.com>,
+        Hannes
+ Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv8 1/6] block, fs: restore kiocb based write hint processing
+Date: Thu, 17 Oct 2024 09:09:32 -0700
+Message-ID: <20241017160937.2283225-2-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20241017160937.2283225-1-kbusch@meta.com>
 References: <20241017160937.2283225-1-kbusch@meta.com>
@@ -59,51 +61,182 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: y6vnruTOA1ibLpqMudlL4Zh590nmvtCA
-X-Proofpoint-GUID: y6vnruTOA1ibLpqMudlL4Zh590nmvtCA
+X-Proofpoint-GUID: -G6Z0j3CO62aIaBjQ35Ieyb75_WsWMeV
+X-Proofpoint-ORIG-GUID: -G6Z0j3CO62aIaBjQ35Ieyb75_WsWMeV
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-05_02,2024-10-04_01,2024-09-30_01
+ definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
-From: Keith Busch <kbusch@kernel.org>
+From: Kanchan Joshi <joshi.k@samsung.com>
 
-A block device may support write hints on a per-io basis. The raw block
-file operations can effectively use these, but real filesystems are not
-ready to make use of this. Provide a file_operations flag to indicate
-support, and set it for the block file operations.
+struct kiocb has a 2 bytes hole that developed post commit 41d36a9f3e53
+("fs: remove kiocb.ki_hint"). But write hint returned with commit
+449813515d3e ("block, fs: Restore the per-bio/request data lifetime
+fields").
 
+This patch uses the leftover space in kiocb to carve 2 byte field
+ki_write_hint. Restore the code that operates on kiocb to use
+ki_write_hint instead of inode hint value.
+
+This does not change any behavior, but needed to enable per-io hints.
+
+Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- block/fops.c       | 2 +-
- include/linux/fs.h | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ block/fops.c         | 6 +++---
+ fs/aio.c             | 1 +
+ fs/cachefiles/io.c   | 1 +
+ fs/direct-io.c       | 2 +-
+ fs/iomap/direct-io.c | 2 +-
+ include/linux/fs.h   | 8 ++++++++
+ io_uring/rw.c        | 1 +
+ 7 files changed, 16 insertions(+), 5 deletions(-)
 
 diff --git a/block/fops.c b/block/fops.c
-index d0b16d3975fd6..15a63e26161ea 100644
+index e696ae53bf1e0..85b9b97d372c8 100644
 --- a/block/fops.c
 +++ b/block/fops.c
-@@ -869,7 +869,7 @@ const struct file_operations def_blk_fops =3D {
- 	.splice_write	=3D iter_file_splice_write,
- 	.fallocate	=3D blkdev_fallocate,
- 	.uring_cmd	=3D blkdev_uring_cmd,
--	.fop_flags	=3D FOP_BUFFER_RASYNC,
-+	.fop_flags	=3D FOP_BUFFER_RASYNC | FOP_PER_IO_HINTS,
- };
+@@ -74,7 +74,7 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *=
+iocb,
+ 		bio_init(&bio, bdev, vecs, nr_pages, dio_bio_write_op(iocb));
+ 	}
+ 	bio.bi_iter.bi_sector =3D pos >> SECTOR_SHIFT;
+-	bio.bi_write_hint =3D file_inode(iocb->ki_filp)->i_write_hint;
++	bio.bi_write_hint =3D iocb->ki_write_hint;
+ 	bio.bi_ioprio =3D iocb->ki_ioprio;
+ 	if (iocb->ki_flags & IOCB_ATOMIC)
+ 		bio.bi_opf |=3D REQ_ATOMIC;
+@@ -203,7 +203,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb,=
+ struct iov_iter *iter,
 =20
- static __init int blkdev_init(void)
+ 	for (;;) {
+ 		bio->bi_iter.bi_sector =3D pos >> SECTOR_SHIFT;
+-		bio->bi_write_hint =3D file_inode(iocb->ki_filp)->i_write_hint;
++		bio->bi_write_hint =3D iocb->ki_write_hint;
+ 		bio->bi_private =3D dio;
+ 		bio->bi_end_io =3D blkdev_bio_end_io;
+ 		bio->bi_ioprio =3D iocb->ki_ioprio;
+@@ -319,7 +319,7 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb =
+*iocb,
+ 	dio->flags =3D 0;
+ 	dio->iocb =3D iocb;
+ 	bio->bi_iter.bi_sector =3D pos >> SECTOR_SHIFT;
+-	bio->bi_write_hint =3D file_inode(iocb->ki_filp)->i_write_hint;
++	bio->bi_write_hint =3D iocb->ki_write_hint;
+ 	bio->bi_end_io =3D blkdev_bio_end_io_async;
+ 	bio->bi_ioprio =3D iocb->ki_ioprio;
+=20
+diff --git a/fs/aio.c b/fs/aio.c
+index e8920178b50f7..db618817e670d 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -1517,6 +1517,7 @@ static int aio_prep_rw(struct kiocb *req, const str=
+uct iocb *iocb, int rw_type)
+ 	req->ki_flags =3D req->ki_filp->f_iocb_flags | IOCB_AIO_RW;
+ 	if (iocb->aio_flags & IOCB_FLAG_RESFD)
+ 		req->ki_flags |=3D IOCB_EVENTFD;
++	req->ki_write_hint =3D file_write_hint(req->ki_filp);
+ 	if (iocb->aio_flags & IOCB_FLAG_IOPRIO) {
+ 		/*
+ 		 * If the IOCB_FLAG_IOPRIO flag of aio_flags is set, then
+diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+index 6a821a959b59e..c3db102ae64e2 100644
+--- a/fs/cachefiles/io.c
++++ b/fs/cachefiles/io.c
+@@ -309,6 +309,7 @@ int __cachefiles_write(struct cachefiles_object *obje=
+ct,
+ 	ki->iocb.ki_pos		=3D start_pos;
+ 	ki->iocb.ki_flags	=3D IOCB_DIRECT | IOCB_WRITE;
+ 	ki->iocb.ki_ioprio	=3D get_current_ioprio();
++	ki->iocb.ki_write_hint  =3D file_write_hint(file);
+ 	ki->object		=3D object;
+ 	ki->start		=3D start_pos;
+ 	ki->len			=3D len;
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index bbd05f1a21453..73629e26becbe 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -409,7 +409,7 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdi=
+o,
+ 		bio->bi_end_io =3D dio_bio_end_io;
+ 	if (dio->is_pinned)
+ 		bio_set_flag(bio, BIO_PAGE_PINNED);
+-	bio->bi_write_hint =3D file_inode(dio->iocb->ki_filp)->i_write_hint;
++	bio->bi_write_hint =3D dio->iocb->ki_write_hint;
+=20
+ 	sdio->bio =3D bio;
+ 	sdio->logical_offset_in_bio =3D sdio->cur_page_fs_offset;
+diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+index f637aa0706a31..fff43f121ee65 100644
+--- a/fs/iomap/direct-io.c
++++ b/fs/iomap/direct-io.c
+@@ -397,7 +397,7 @@ static loff_t iomap_dio_bio_iter(const struct iomap_i=
+ter *iter,
+ 		fscrypt_set_bio_crypt_ctx(bio, inode, pos >> inode->i_blkbits,
+ 					  GFP_KERNEL);
+ 		bio->bi_iter.bi_sector =3D iomap_sector(iomap, pos);
+-		bio->bi_write_hint =3D inode->i_write_hint;
++		bio->bi_write_hint =3D dio->iocb->ki_write_hint;
+ 		bio->bi_ioprio =3D dio->iocb->ki_ioprio;
+ 		bio->bi_private =3D dio;
+ 		bio->bi_end_io =3D iomap_dio_bio_end_io;
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 04e875a37f604..026dc9801dc20 100644
+index 3559446279c15..04e875a37f604 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -2117,6 +2117,8 @@ struct file_operations {
- #define FOP_HUGE_PAGES		((__force fop_flags_t)(1 << 4))
- /* Treat loff_t as unsigned (e.g., /dev/mem) */
- #define FOP_UNSIGNED_OFFSET	((__force fop_flags_t)(1 << 5))
-+/* File system can handle per-io hints */
-+#define FOP_PER_IO_HINTS       ((__force fop_flags_t)(1 << 6))
+@@ -370,6 +370,7 @@ struct kiocb {
+ 	void			*private;
+ 	int			ki_flags;
+ 	u16			ki_ioprio; /* See linux/ioprio.h */
++	u16			ki_write_hint;
+ 	union {
+ 		/*
+ 		 * Only used for async buffered reads, where it denotes the
+@@ -2337,12 +2338,18 @@ static inline bool HAS_UNMAPPED_ID(struct mnt_idm=
+ap *idmap,
+ 	       !vfsgid_valid(i_gid_into_vfsgid(idmap, inode));
+ }
 =20
- /* Wrap a directory iterator that needs exclusive inode access */
- int wrap_directory_iterator(struct file *, struct dir_context *,
++static inline enum rw_hint file_write_hint(struct file *filp)
++{
++	return file_inode(filp)->i_write_hint;
++}
++
+ static inline void init_sync_kiocb(struct kiocb *kiocb, struct file *fil=
+p)
+ {
+ 	*kiocb =3D (struct kiocb) {
+ 		.ki_filp =3D filp,
+ 		.ki_flags =3D filp->f_iocb_flags,
+ 		.ki_ioprio =3D get_current_ioprio(),
++		.ki_write_hint =3D file_write_hint(filp),
+ 	};
+ }
+=20
+@@ -2353,6 +2360,7 @@ static inline void kiocb_clone(struct kiocb *kiocb,=
+ struct kiocb *kiocb_src,
+ 		.ki_filp =3D filp,
+ 		.ki_flags =3D kiocb_src->ki_flags,
+ 		.ki_ioprio =3D kiocb_src->ki_ioprio,
++		.ki_write_hint =3D kiocb_src->ki_write_hint,
+ 		.ki_pos =3D kiocb_src->ki_pos,
+ 	};
+ }
+diff --git a/io_uring/rw.c b/io_uring/rw.c
+index 80ae3c2ebb70c..ffd637ca0bd17 100644
+--- a/io_uring/rw.c
++++ b/io_uring/rw.c
+@@ -1027,6 +1027,7 @@ int io_write(struct io_kiocb *req, unsigned int iss=
+ue_flags)
+ 	if (unlikely(ret))
+ 		return ret;
+ 	req->cqe.res =3D iov_iter_count(&io->iter);
++	rw->kiocb.ki_write_hint =3D file_write_hint(rw->kiocb.ki_filp);
+=20
+ 	if (force_nonblock) {
+ 		/* If the file doesn't support async, just async punt */
 --=20
 2.43.5
 
