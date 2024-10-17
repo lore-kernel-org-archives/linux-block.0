@@ -1,545 +1,293 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7511D5164;
-	Wed, 16 Oct 2024 23:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067E2A2D
+	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 01:16:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729121310; cv=none; b=ZKGPLn8uebicxr4YnbfC12/4hpFmX+1Ulmr5SzC1zzZxEswvuqaLVVniErXyS3IdTqo2EGIVEJBVtK6+t0OrLTpISwbAxJm3PR57c0h9QmIBpzlsErjed2xg1IPCW2XyFe7VanGGY7SJyqBn28vEJ/zt6VM7mRGokIp7xIrT2nY=
+	t=1729127786; cv=none; b=DbLobi5CXrfHoXW/ScFreOQApNIoSKpLJ52zXGqjWp2mWGgntxCNXIiiCaA2cq6Pj0CSHZt4C5ZxMk1aJ7xYUo8dCZzvzhTgLcumlEk79YFJ+JjB4X44/3EAApkMmeA1GZx2H4TWleKWZ11r2IyZ4gQLD+PxP6k2f/SAMO1LfHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729121310; c=relaxed/simple;
-	bh=cOF4Fs1XsTHMvu6pL1SvvJiFeitKQbVtvbigWyYmDT0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z7RdRgQsYQT73d8np5G0w59fruR9gPaIbjOwpP8x2Sgs8b9V9ItqgB5KR1mkYSDIioOVU34/88agOsEwyEAbIvVI4+1jJwcIfi/NOF/eOd2EY7uc8E1EA0DNc+55nLdMjByygf8IKm9W+vImtplfd27QyOlNB2dF5zfxVOPzh0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ex5EmWlb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729127786; c=relaxed/simple;
+	bh=ZEBoGtesNYnAEoX9XWxR8j9uFns+YQYyMkECW9cuKE8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CIYIgWssraxdRf3VDIMpNDSZOznImzeqFpT+iKHbTqWd0d23nBS5uFvWyIR9bFhXHNAWBy1vzyJ68usYnhClbw/OPywaukxe+s+iMNmL6r+Q19vPyOzbhfweQeZNrYxBLmA3XNnt7SoBr9q7M/2dhZRXvdxm8wTN79MDCOhTSlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XhXUUJSo; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ex5EmWlb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BDD9C4CECF;
-	Wed, 16 Oct 2024 23:28:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729121310;
-	bh=cOF4Fs1XsTHMvu6pL1SvvJiFeitKQbVtvbigWyYmDT0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ex5EmWlbWK+l7CZ10+wL7BZHe39QF/lm9cGpLvyY4VluyPPF4gv22KnmjYDzTeUh5
-	 aWvqD8geXBfm4H+5P7WMmUjrnCkYVqHwmUecIND/qvmEuk2vF3h9+bYvYm4gDBS3Xe
-	 nruDYrw/aJL806CMH3HddThKrQb9Dx6mq4qBFD7gFzRI7Nuo7LipYQJv/uN1kvnc6u
-	 PLYmoO3qMoVvYksyi09jOWNtiDee4BwrvKRNERpGV97kd94q9wDlGbY+9w0M7L+nbK
-	 4iH+MNDll1dYc/VJXUDPMrv/UqRCgi5/j0ThSAmSpVC93xu6rOKC3EKBc6aXFeTewM
-	 4d87RKY5ejvzg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: dm-devel@lists.linux.dev
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Md Sadre Alam <quic_mdalam@quicinc.com>,
-	Israel Rukshin <israelr@nvidia.com>,
-	Milan Broz <gmazyland@gmail.com>,
-	Mikulas Patocka <mpatocka@redhat.com>
-Subject: [RFC PATCH v2 2/2] dm-inlinecrypt: add target for inline block device encryption
-Date: Wed, 16 Oct 2024 16:27:48 -0700
-Message-ID: <20241016232748.134211-3-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241016232748.134211-1-ebiggers@kernel.org>
-References: <20241016232748.134211-1-ebiggers@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XhXUUJSo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729127782;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=04/zFF68XVVU/AKo0obm1oju/P6UD8HalmEqeh3udI8=;
+	b=XhXUUJSoR/EyZTZRw2SN2T9kG8o1AkFD3PQl/qrZyp+fKyQFyOTCNYE5IguJc1GA1XvX1m
+	H8JotjpQKWAxzuziqQoN35jqTH/vtbssCoiOtYpf3/5Mi4GtIk8QmU3sNekF2tgqWIMQk9
+	cunJP+DhK2rNFyd4PPaWB0ZPVKCrpcU=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-350-VOBTIoXUO4CZAMjXnCTRvA-1; Wed,
+ 16 Oct 2024 21:16:19 -0400
+X-MC-Unique: VOBTIoXUO4CZAMjXnCTRvA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ED31C19560B8;
+	Thu, 17 Oct 2024 01:16:17 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.46])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CFAB019560A2;
+	Thu, 17 Oct 2024 01:16:12 +0000 (UTC)
+Date: Thu, 17 Oct 2024 09:16:07 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+	nbd@other.debian.org, eblake@redhat.com, leon@is.currently.online
+Subject: Re: Kernel NBD client waits on wrong cookie, aborts connection
+Message-ID: <ZxBlV_qZ54S3sFum@fedora>
+References: <Zw5CNDIde6xkq_Sf@redhat.com>
+ <CAFj5m9LXwcH7vc2Fk_i+VhfUA+tevzhciJzKc1am49y_5jgC2Q@mail.gmail.com>
+ <Zw5b1mwk3aG01NTg@fedora>
+ <CAFj5m9+x+tiAAKj3dX_WcFczkdSNaR6nguDHm9FXuYjQHd8YcA@mail.gmail.com>
+ <Zw5nMQoPrSIq9axl@fedora>
+ <Zw6S6RoKWzUnNVpu@redhat.com>
+ <Zw8i6-DVDsLk3sq9@fedora>
+ <Zw_xHyXkl9eUftst@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zw_xHyXkl9eUftst@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-From: Eric Biggers <ebiggers@google.com>
+On Wed, Oct 16, 2024 at 07:00:15PM +0200, Kevin Wolf wrote:
+> Am 16.10.2024 um 04:20 hat Ming Lei geschrieben:
+> > On Tue, Oct 15, 2024 at 06:06:01PM +0200, Kevin Wolf wrote:
+> > > Am 15.10.2024 um 14:59 hat Ming Lei geschrieben:
+> > > > On Tue, Oct 15, 2024 at 08:15:17PM +0800, Ming Lei wrote:
+> > > > > On Tue, Oct 15, 2024 at 8:11 PM Ming Lei <ming.lei@redhat.com> wrote:
+> > > > > >
+> > > > > > On Tue, Oct 15, 2024 at 08:01:43PM +0800, Ming Lei wrote:
+> > > > > > > On Tue, Oct 15, 2024 at 6:22 PM Kevin Wolf <kwolf@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > Hi all,
+> > > > > > > >
+> > > > > > > > the other day I was running some benchmarks to compare different QEMU
+> > > > > > > > block exports, and one of the scenarios I was interested in was
+> > > > > > > > exporting NBD from qemu-storage-daemon over a unix socket and attaching
+> > > > > > > > it as a block device using the kernel NBD client. I would then run a VM
+> > > > > > > > on top of it and fio inside of it.
+> > > > > > > >
+> > > > > > > > Unfortunately, I couldn't get any numbers because the connection always
+> > > > > > > > aborted with messages like "Double reply on req ..." or "Unexpected
+> > > > > > > > reply ..." in the host kernel log.
+> > > > > > > >
+> > > > > > > > Yesterday I found some time to have a closer look why this is happening,
+> > > > > > > > and I think I have a rough understanding of what's going on now. Look at
+> > > > > > > > these trace events:
+> > > > > > > >
+> > > > > > > >         qemu-img-51025   [005] ..... 19503.285423: nbd_header_sent: nbd transport event: request 000000002df03708, handle 0x0000150c0000005a
+> > > > > > > > [...]
+> > > > > > > >         qemu-img-51025   [008] ..... 19503.285500: nbd_payload_sent: nbd transport event: request 000000002df03708, handle 0x0000150c0000005d
+> > > > > > > > [...]
+> > > > > > > >    kworker/u49:1-47350   [004] ..... 19503.285514: nbd_header_received: nbd transport event: request 00000000b79e7443, handle 0x0000150c0000005a
+> > > > > > > >
+> > > > > > > > This is the same request, but the handle has changed between
+> > > > > > > > nbd_header_sent and nbd_payload_sent! I think this means that we hit one
+> > > > > > > > of the cases where the request is requeued, and then the next time it
+> > > > > > > > is executed with a different blk-mq tag, which is something the nbd
+> > > > > > > > driver doesn't seem to expect.
+> > > > > > > >
+> > > > > > > > Of course, since the cookie is transmitted in the header, the server
+> > > > > > > > replies with the original handle that contains the tag from the first
+> > > > > > > > call, while the kernel is only waiting for a handle with the new tag and
+> > > > > > > > is confused by the server response.
+> > > > > > > >
+> > > > > > > > I'm not sure yet which of the following options should be considered the
+> > > > > > > > real problem here, so I'm only describing the situation without trying
+> > > > > > > > to provide a patch:
+> > > > > > > >
+> > > > > > > > 1. Is it that blk-mq should always re-run the request with the same tag?
+> > > > > > > >    I don't expect so, though in practice I was surprised to see that it
+> > > > > > > >    happens quite often after nbd requeues a request that it actually
+> > > > > > > >    does end up with the same cookie again.
+> > > > > > >
+> > > > > > > No.
+> > > > > > >
+> > > > > > > request->tag will change, but we may take ->internal_tag(sched) or
+> > > > > > > ->tag(none), which won't change.
+> > > > > > >
+> > > > > > > I guess was_interrupted() in nbd_send_cmd() is triggered, then the payload
+> > > > > > > is sent with a different tag.
+> > > > > > >
+> > > > > > > I will try to cook one patch soon.
+> > > > > >
+> > > > > > Please try the following patch:
+> > > > > 
+> > > > > Oops, please ignore the patch, it can't work since
+> > > > > nbd_handle_reply() doesn't know static tag.
+> > > > 
+> > > > Please try the v2:
+> > > 
+> > > It doesn't fully work, though it replaced the bug with a different one.
+> > > Now I get "Unexpected request" for the final flush request.
+> > 
+> > That just shows the approach is working.
+> > 
+> > Flush request doesn't have static tag, that is why it is failed.
+> > It shouldn't be hard to cover it, please try the attached & revised
+> > patch.
+> 
+> Any other request types that are unusual, or is flush the only one?
 
-Add a new device-mapper target "dm-inlinecrypt" that is similar to
-dm-crypt but uses the blk-crypto API instead of the regular crypto API.
-This allows it to take advantage of inline encryption hardware such as
-that commonly built into UFS host controllers.
+Flush is the only one.
 
-The table syntax matches dm-crypt's, but for now only a stripped-down
-set of parameters is supported.  For example, for now AES-256-XTS is the
-only supported cipher.
+> 
+> > Another solution is to add per-nbd-device map for retrieving nbd_cmd
+> > by the stored `index` in cookie, and the cost is one such array for
+> > each device.
+> 
+> Yes, just creating the cookie another way and having an explicit mapping
+> back is the obvious naive solution (my option 2). It would be nice to
+> avoid this.
+> 
+> > > 
+> > > Anyway, before talking about specific patches, would this even be the
+> > > right solution or would it only paper over a bigger issue?
+> > > 
+> > > Is getting a different tag the only thing that can go wrong if you
+> > > handle a request partially and then requeue it?
+> > 
+> > Strictly speaking it is BLK_STS_RESOURCE.
+> > 
+> > Not like userspace implementation, kernel nbd call one sock_sendmsg()
+> > for sending either request header, or each single data bvec, so
+> > partial xmit can't be avoided. This kind of handling is fine, given
+> > TCP is just byte stream, nothing difference is observed from nbd
+> > server side if data is correct.
+> 
+> I wasn't questioning the partial submission, but only if it's a good
+> idea to return the request to the queue in this case, or if the nbd
+> driver should use another mechanism to keep working on the request
+> without returning it. But if this is accepted and a common pattern in
+> other drivers, too (is it?), I don't have a problem with it.
 
-dm-inlinecrypt is based on Android's dm-default-key with the
-controversial passthrough support removed.  Note that due to the removal
-of passthrough support, use of dm-inlinecrypt in combination with
-fscrypt causes double encryption of file contents (similar to dm-crypt +
-fscrypt), with the fscrypt layer not being able to use the inline
-encryption hardware.  This makes dm-inlinecrypt unusable on systems such
-as Android that use fscrypt and where a more optimized approach is
-needed.  It is however suitable as a replacement for dm-crypt.
+It is one common pattern to retrieve request with tag in many storage
+drivers(scsi, nvme, ...), also it should be the only way.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- drivers/md/Kconfig          |  10 +
- drivers/md/Makefile         |   1 +
- drivers/md/dm-inlinecrypt.c | 417 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 428 insertions(+)
- create mode 100644 drivers/md/dm-inlinecrypt.c
+But userspace implementation needn't it, with async/.await the io
+request or whatever can be defined as one local variable.
 
-diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-index 1e9db8e4acdf6..caed60097a216 100644
---- a/drivers/md/Kconfig
-+++ b/drivers/md/Kconfig
-@@ -268,10 +268,20 @@ config DM_CRYPT
- 	  To compile this code as a module, choose M here: the module will
- 	  be called dm-crypt.
- 
- 	  If unsure, say N.
- 
-+config DM_INLINECRYPT
-+	tristate "Inline encryption target support"
-+	depends on BLK_DEV_DM
-+	depends on BLK_INLINE_ENCRYPTION
-+	help
-+	  This device-mapper target is similar to dm-crypt, but it uses the
-+	  blk-crypto API instead of the regular crypto API. This allows it to
-+	  take advantage of inline encryption hardware such as that commonly
-+	  built into UFS host controllers.
-+
- config DM_SNAPSHOT
-        tristate "Snapshot target"
-        depends on BLK_DEV_DM
-        select DM_BUFIO
- 	help
-diff --git a/drivers/md/Makefile b/drivers/md/Makefile
-index 476a214e4bdc2..6e44ff32b8af8 100644
---- a/drivers/md/Makefile
-+++ b/drivers/md/Makefile
-@@ -49,10 +49,11 @@ obj-$(CONFIG_BLK_DEV_DM)	+= dm-mod.o
- obj-$(CONFIG_BLK_DEV_DM_BUILTIN) += dm-builtin.o
- obj-$(CONFIG_DM_UNSTRIPED)	+= dm-unstripe.o
- obj-$(CONFIG_DM_BUFIO)		+= dm-bufio.o
- obj-$(CONFIG_DM_BIO_PRISON)	+= dm-bio-prison.o
- obj-$(CONFIG_DM_CRYPT)		+= dm-crypt.o
-+obj-$(CONFIG_DM_INLINECRYPT)	+= dm-inlinecrypt.o
- obj-$(CONFIG_DM_DELAY)		+= dm-delay.o
- obj-$(CONFIG_DM_DUST)		+= dm-dust.o
- obj-$(CONFIG_DM_FLAKEY)		+= dm-flakey.o
- obj-$(CONFIG_DM_MULTIPATH)	+= dm-multipath.o dm-round-robin.o
- obj-$(CONFIG_DM_MULTIPATH_QL)	+= dm-queue-length.o
-diff --git a/drivers/md/dm-inlinecrypt.c b/drivers/md/dm-inlinecrypt.c
-new file mode 100644
-index 0000000000000..d6c2e6e1fdbbb
---- /dev/null
-+++ b/drivers/md/dm-inlinecrypt.c
-@@ -0,0 +1,417 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright 2024 Google LLC
-+ */
-+
-+#include <linux/blk-crypto.h>
-+#include <linux/device-mapper.h>
-+#include <linux/module.h>
-+
-+#define DM_MSG_PREFIX	"inlinecrypt"
-+
-+static const struct dm_inlinecrypt_cipher {
-+	const char *name;
-+	enum blk_crypto_mode_num mode_num;
-+	int key_size;
-+} dm_inlinecrypt_ciphers[] = {
-+	{
-+		.name = "aes-xts-plain64",
-+		.mode_num = BLK_ENCRYPTION_MODE_AES_256_XTS,
-+		.key_size = 64,
-+	},
-+};
-+
-+/**
-+ * struct inlinecrypt_ctx - private data of an inlinecrypt target
-+ * @dev: the underlying device
-+ * @start: starting sector of the range of @dev which this target actually maps.
-+ *	   For this purpose a "sector" is 512 bytes.
-+ * @cipher_string: the name of the encryption algorithm being used
-+ * @iv_offset: starting offset for IVs.  IVs are generated as if the target were
-+ *	       preceded by @iv_offset 512-byte sectors.
-+ * @sector_size: crypto sector size in bytes (usually 4096)
-+ * @sector_bits: log2(sector_size)
-+ * @key: the encryption key to use
-+ * @max_dun: the maximum DUN that may be used (computed from other params)
-+ */
-+struct inlinecrypt_ctx {
-+	struct dm_dev *dev;
-+	sector_t start;
-+	const char *cipher_string;
-+	u64 iv_offset;
-+	unsigned int sector_size;
-+	unsigned int sector_bits;
-+	struct blk_crypto_key key;
-+	u64 max_dun;
-+};
-+
-+static const struct dm_inlinecrypt_cipher *
-+lookup_cipher(const char *cipher_string)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(dm_inlinecrypt_ciphers); i++) {
-+		if (strcmp(cipher_string, dm_inlinecrypt_ciphers[i].name) == 0)
-+			return &dm_inlinecrypt_ciphers[i];
-+	}
-+	return NULL;
-+}
-+
-+static void inlinecrypt_dtr(struct dm_target *ti)
-+{
-+	struct inlinecrypt_ctx *ctx = ti->private;
-+
-+	if (ctx->dev) {
-+		if (ctx->key.size)
-+			blk_crypto_evict_key(ctx->dev->bdev, &ctx->key);
-+		dm_put_device(ti, ctx->dev);
-+	}
-+	kfree_sensitive(ctx->cipher_string);
-+	kfree_sensitive(ctx);
-+}
-+
-+static int inlinecrypt_ctr_optional(struct dm_target *ti,
-+				    unsigned int argc, char **argv)
-+{
-+	struct inlinecrypt_ctx *ctx = ti->private;
-+	struct dm_arg_set as;
-+	static const struct dm_arg _args[] = {
-+		{0, 3, "Invalid number of feature args"},
-+	};
-+	unsigned int opt_params;
-+	const char *opt_string;
-+	bool iv_large_sectors = false;
-+	char dummy;
-+	int err;
-+
-+	as.argc = argc;
-+	as.argv = argv;
-+
-+	err = dm_read_arg_group(_args, &as, &opt_params, &ti->error);
-+	if (err)
-+		return err;
-+
-+	while (opt_params--) {
-+		opt_string = dm_shift_arg(&as);
-+		if (!opt_string) {
-+			ti->error = "Not enough feature arguments";
-+			return -EINVAL;
-+		}
-+		if (!strcmp(opt_string, "allow_discards")) {
-+			ti->num_discard_bios = 1;
-+		} else if (sscanf(opt_string, "sector_size:%u%c",
-+				  &ctx->sector_size, &dummy) == 1) {
-+			if (ctx->sector_size < SECTOR_SIZE ||
-+			    ctx->sector_size > 4096 ||
-+			    !is_power_of_2(ctx->sector_size)) {
-+				ti->error = "Invalid sector_size";
-+				return -EINVAL;
-+			}
-+		} else if (!strcmp(opt_string, "iv_large_sectors")) {
-+			iv_large_sectors = true;
-+		} else {
-+			ti->error = "Invalid feature arguments";
-+			return -EINVAL;
-+		}
-+	}
-+
-+	/* dm-inlinecrypt doesn't implement iv_large_sectors=false. */
-+	if (ctx->sector_size != SECTOR_SIZE && !iv_large_sectors) {
-+		ti->error = "iv_large_sectors must be specified";
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Construct an inlinecrypt mapping:
-+ * <cipher> <key> <iv_offset> <dev_path> <start>
-+ *
-+ * This syntax matches dm-crypt's, but the set of supported functionality has
-+ * been stripped down.
-+ */
-+static int inlinecrypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
-+{
-+	struct inlinecrypt_ctx *ctx;
-+	const struct dm_inlinecrypt_cipher *cipher;
-+	u8 raw_key[BLK_CRYPTO_MAX_KEY_SIZE];
-+	unsigned int dun_bytes;
-+	unsigned long long tmpll;
-+	char dummy;
-+	int err;
-+
-+	if (argc < 5) {
-+		ti->error = "Not enough arguments";
-+		return -EINVAL;
-+	}
-+
-+	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx) {
-+		ti->error = "Out of memory";
-+		return -ENOMEM;
-+	}
-+	ti->private = ctx;
-+
-+	/* <cipher> */
-+	ctx->cipher_string = kstrdup(argv[0], GFP_KERNEL);
-+	if (!ctx->cipher_string) {
-+		ti->error = "Out of memory";
-+		err = -ENOMEM;
-+		goto bad;
-+	}
-+	cipher = lookup_cipher(ctx->cipher_string);
-+	if (!cipher) {
-+		ti->error = "Unsupported cipher";
-+		err = -EINVAL;
-+		goto bad;
-+	}
-+
-+	/* <key> */
-+	if (strlen(argv[1]) != 2 * cipher->key_size) {
-+		ti->error = "Incorrect key size for cipher";
-+		err = -EINVAL;
-+		goto bad;
-+	}
-+	if (hex2bin(raw_key, argv[1], cipher->key_size) != 0) {
-+		ti->error = "Malformed key string";
-+		err = -EINVAL;
-+		goto bad;
-+	}
-+
-+	/* <iv_offset> */
-+	if (sscanf(argv[2], "%llu%c", &ctx->iv_offset, &dummy) != 1) {
-+		ti->error = "Invalid iv_offset sector";
-+		err = -EINVAL;
-+		goto bad;
-+	}
-+
-+	/* <dev_path> */
-+	err = dm_get_device(ti, argv[3], dm_table_get_mode(ti->table),
-+			    &ctx->dev);
-+	if (err) {
-+		ti->error = "Device lookup failed";
-+		goto bad;
-+	}
-+
-+	/* <start> */
-+	if (sscanf(argv[4], "%llu%c", &tmpll, &dummy) != 1 ||
-+	    tmpll != (sector_t)tmpll) {
-+		ti->error = "Invalid start sector";
-+		err = -EINVAL;
-+		goto bad;
-+	}
-+	ctx->start = tmpll;
-+
-+	/* optional arguments */
-+	ctx->sector_size = SECTOR_SIZE;
-+	if (argc > 5) {
-+		err = inlinecrypt_ctr_optional(ti, argc - 5, &argv[5]);
-+		if (err)
-+			goto bad;
-+	}
-+	ctx->sector_bits = ilog2(ctx->sector_size);
-+	if (ti->len & ((ctx->sector_size >> SECTOR_SHIFT) - 1)) {
-+		ti->error = "Device size is not a multiple of sector_size";
-+		err = -EINVAL;
-+		goto bad;
-+	}
-+
-+	ctx->max_dun = (ctx->iv_offset + ti->len - 1) >>
-+		       (ctx->sector_bits - SECTOR_SHIFT);
-+	dun_bytes = DIV_ROUND_UP(fls64(ctx->max_dun), 8);
-+
-+	err = blk_crypto_init_key(&ctx->key, raw_key, cipher->mode_num,
-+				  dun_bytes, ctx->sector_size);
-+	if (err) {
-+		ti->error = "Error initializing blk-crypto key";
-+		goto bad;
-+	}
-+
-+	err = blk_crypto_start_using_key(ctx->dev->bdev, &ctx->key);
-+	if (err) {
-+		ti->error = "Error starting to use blk-crypto";
-+		goto bad;
-+	}
-+
-+	ti->num_flush_bios = 1;
-+
-+	err = 0;
-+	goto out;
-+
-+bad:
-+	inlinecrypt_dtr(ti);
-+out:
-+	memzero_explicit(raw_key, sizeof(raw_key));
-+	return err;
-+}
-+
-+static int inlinecrypt_map(struct dm_target *ti, struct bio *bio)
-+{
-+	const struct inlinecrypt_ctx *ctx = ti->private;
-+	sector_t sector_in_target;
-+	u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE] = {};
-+
-+	bio_set_dev(bio, ctx->dev->bdev);
-+
-+	/*
-+	 * If the bio is a device-level request which doesn't target a specific
-+	 * sector, there's nothing more to do.
-+	 */
-+	if (bio_sectors(bio) == 0)
-+		return DM_MAPIO_REMAPPED;
-+
-+	/*
-+	 * The bio should never have an encryption context already, since
-+	 * dm-inlinecrypt doesn't pass through any inline encryption
-+	 * capabilities to the layer above it.
-+	 */
-+	if (WARN_ON_ONCE(bio_has_crypt_ctx(bio)))
-+		return DM_MAPIO_KILL;
-+
-+	/* Map the bio's sector to the underlying device. (512-byte sectors) */
-+	sector_in_target = dm_target_offset(ti, bio->bi_iter.bi_sector);
-+	bio->bi_iter.bi_sector = ctx->start + sector_in_target;
-+
-+	/* Calculate the DUN and enforce data-unit (crypto sector) alignment. */
-+	dun[0] = ctx->iv_offset + sector_in_target; /* 512-byte sectors */
-+	if (dun[0] & ((ctx->sector_size >> SECTOR_SHIFT) - 1))
-+		return DM_MAPIO_KILL;
-+	dun[0] >>= ctx->sector_bits - SECTOR_SHIFT; /* crypto sectors */
-+
-+	/*
-+	 * This check isn't necessary as we should have calculated max_dun
-+	 * correctly, but be safe.
-+	 */
-+	if (WARN_ON_ONCE(dun[0] > ctx->max_dun))
-+		return DM_MAPIO_KILL;
-+
-+	bio_crypt_set_ctx(bio, &ctx->key, dun, GFP_NOIO);
-+
-+	return DM_MAPIO_REMAPPED;
-+}
-+
-+static void inlinecrypt_status(struct dm_target *ti, status_type_t type,
-+			       unsigned int status_flags, char *result,
-+			       unsigned int maxlen)
-+{
-+	const struct inlinecrypt_ctx *ctx = ti->private;
-+	unsigned int sz = 0;
-+	int num_feature_args = 0;
-+
-+	switch (type) {
-+	case STATUSTYPE_INFO:
-+	case STATUSTYPE_IMA:
-+		result[0] = '\0';
-+		break;
-+
-+	case STATUSTYPE_TABLE:
-+		/*
-+		 * Warning: like dm-crypt, dm-inlinecrypt includes the key in
-+		 * the returned table.  Userspace is responsible for redacting
-+		 * the key when needed.
-+		 */
-+		DMEMIT("%s %*phN %llu %s %llu", ctx->cipher_string,
-+		       ctx->key.size, ctx->key.raw, ctx->iv_offset,
-+		       ctx->dev->name, ctx->start);
-+		num_feature_args += !!ti->num_discard_bios;
-+		if (ctx->sector_size != SECTOR_SIZE)
-+			num_feature_args += 2;
-+		if (num_feature_args != 0) {
-+			DMEMIT(" %d", num_feature_args);
-+			if (ti->num_discard_bios)
-+				DMEMIT(" allow_discards");
-+			if (ctx->sector_size != SECTOR_SIZE) {
-+				DMEMIT(" sector_size:%u", ctx->sector_size);
-+				DMEMIT(" iv_large_sectors");
-+			}
-+		}
-+		break;
-+	}
-+}
-+
-+static int inlinecrypt_prepare_ioctl(struct dm_target *ti,
-+				     struct block_device **bdev)
-+{
-+	const struct inlinecrypt_ctx *ctx = ti->private;
-+	const struct dm_dev *dev = ctx->dev;
-+
-+	*bdev = dev->bdev;
-+
-+	/* Only pass ioctls through if the device sizes match exactly. */
-+	return ctx->start != 0 || ti->len != bdev_nr_sectors(dev->bdev);
-+}
-+
-+static int inlinecrypt_iterate_devices(struct dm_target *ti,
-+				       iterate_devices_callout_fn fn,
-+				       void *data)
-+{
-+	const struct inlinecrypt_ctx *ctx = ti->private;
-+
-+	return fn(ti, ctx->dev, ctx->start, ti->len, data);
-+}
-+
-+#ifdef CONFIG_BLK_DEV_ZONED
-+static int inlinecrypt_report_zones(struct dm_target *ti,
-+				    struct dm_report_zones_args *args,
-+				    unsigned int nr_zones)
-+{
-+	const struct inlinecrypt_ctx *ctx = ti->private;
-+
-+	return dm_report_zones(ctx->dev->bdev, ctx->start,
-+			ctx->start + dm_target_offset(ti, args->next_sector),
-+			args, nr_zones);
-+}
-+#else
-+#define inlinecrypt_report_zones NULL
-+#endif
-+
-+static void inlinecrypt_io_hints(struct dm_target *ti,
-+				 struct queue_limits *limits)
-+{
-+	const struct inlinecrypt_ctx *ctx = ti->private;
-+	const unsigned int sector_size = ctx->sector_size;
-+
-+	limits->logical_block_size =
-+		max_t(unsigned int, limits->logical_block_size, sector_size);
-+	limits->physical_block_size =
-+		max_t(unsigned int, limits->physical_block_size, sector_size);
-+	limits->io_min = max_t(unsigned int, limits->io_min, sector_size);
-+	limits->dma_alignment = limits->logical_block_size - 1;
-+}
-+
-+static struct target_type inlinecrypt_target = {
-+	.name			= "inlinecrypt",
-+	.version		= {1, 0, 0},
-+	/*
-+	 * Do not set DM_TARGET_PASSES_CRYPTO, since dm-inlinecrypt consumes the
-+	 * crypto capability itself.
-+	 */
-+	.features		= DM_TARGET_ZONED_HM,
-+	.module			= THIS_MODULE,
-+	.ctr			= inlinecrypt_ctr,
-+	.dtr			= inlinecrypt_dtr,
-+	.map			= inlinecrypt_map,
-+	.status			= inlinecrypt_status,
-+	.prepare_ioctl		= inlinecrypt_prepare_ioctl,
-+	.iterate_devices	= inlinecrypt_iterate_devices,
-+	.report_zones		= inlinecrypt_report_zones,
-+	.io_hints		= inlinecrypt_io_hints,
-+};
-+
-+static int __init dm_inlinecrypt_init(void)
-+{
-+	return dm_register_target(&inlinecrypt_target);
-+}
-+
-+static void __exit dm_inlinecrypt_exit(void)
-+{
-+	dm_unregister_target(&inlinecrypt_target);
-+}
-+
-+module_init(dm_inlinecrypt_init);
-+module_exit(dm_inlinecrypt_exit);
-+
-+MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
-+MODULE_DESCRIPTION(DM_NAME " target for inline encryption");
-+MODULE_LICENSE("GPL");
--- 
-2.47.0
+> 
+> > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> > index 2cafcf11ee8b..3cc14fc76546 100644
+> > --- a/block/blk-mq-tag.c
+> > +++ b/block/blk-mq-tag.c
+> > @@ -682,3 +682,51 @@ u32 blk_mq_unique_tag(struct request *rq)
+> >  		(rq->tag & BLK_MQ_UNIQUE_TAG_MASK);
+> >  }
+> >  EXPORT_SYMBOL(blk_mq_unique_tag);
+> > +
+> > +/* Same with blk_mq_unique_tag, but one persistent tag is included */
+> > +u32 blk_mq_unique_static_tag(struct request *rq)
+> > +{
+> > +	bool use_sched = rq->q->elevator;
+> > +	u32 tag;
+> > +
+> > +	if (rq == rq->mq_hctx->fq->flush_rq) {
+> > +		if (use_sched)
+> > +			tag = rq->mq_hctx->sched_tags->nr_tags;
+> > +		else
+> > +			tag = rq->mq_hctx->tags->nr_tags;
+> > +	} else {
+> > +		tag = use_sched ? rq->internal_tag : rq->tag;
+> > +	}
+> > +
+> > +	return (rq->mq_hctx->queue_num << BLK_MQ_UNIQUE_TAG_BITS) |
+> > +		(tag & BLK_MQ_UNIQUE_TAG_MASK);
+> > +}
+> > +EXPORT_SYMBOL(blk_mq_unique_static_tag);
+> > +
+> > +static struct request *
+> > +__blk_mq_static_tag_to_rq(const struct blk_mq_hw_ctx *hctx,
+> > +		const struct blk_mq_tags *tags, u32 tag)
+> > +{
+> > +	if (tag < tags->nr_tags)
+> > +		return tags->static_rqs[tag];
+> > +	else if (tag == tags->nr_tags)
+> > +		return hctx->fq->flush_rq;
+> > +	else
+> > +		return NULL;
+> > +}
+> 
+> There is probably little reason to have this as a separate function. It
+> will be more readable if you inline it and make tags just a local
+> variable in blk_mq_static_tag_to_req().
+
+Looks doable.
+
+> 
+> > +struct request *blk_mq_static_tag_to_req(struct request_queue *q, u32 uniq_tag)
+> > +{
+> > +	unsigned long hwq = blk_mq_unique_tag_to_hwq(uniq_tag);
+> > +	u32 tag = blk_mq_unique_tag_to_tag(uniq_tag);
+> > +	const struct blk_mq_hw_ctx *hctx= xa_load(&q->hctx_table, hwq);
+> > +
+> > +	if (!hctx)
+> > +		return NULL;
+> > +
+> > +	if (q->elevator)
+> > +		return __blk_mq_static_tag_to_rq(hctx, hctx->sched_tags, tag);
+> > +
+> > +	return __blk_mq_static_tag_to_rq(hctx, hctx->tags, tag);
+> > +}
+> > +EXPORT_SYMBOL(blk_mq_static_tag_to_req);
+> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > index b852050d8a96..5be324233c9f 100644
+> > --- a/drivers/block/nbd.c
+> > +++ b/drivers/block/nbd.c
+> > @@ -201,7 +201,7 @@ static void nbd_requeue_cmd(struct nbd_cmd *cmd)
+> >  static u64 nbd_cmd_handle(struct nbd_cmd *cmd)
+> >  {
+> >  	struct request *req = blk_mq_rq_from_pdu(cmd);
+> > -	u32 tag = blk_mq_unique_tag(req);
+> > +	u32 tag = blk_mq_unique_static_tag(req);
+> >  	u64 cookie = cmd->cmd_cookie;
+> >  
+> >  	return (cookie << NBD_COOKIE_BITS) | tag;
+> > @@ -818,10 +818,7 @@ static struct nbd_cmd *nbd_handle_reply(struct nbd_device *nbd, int index,
+> >  
+> >  	handle = be64_to_cpu(reply->cookie);
+> >  	tag = nbd_handle_to_tag(handle);
+> > -	hwq = blk_mq_unique_tag_to_hwq(tag);
+> 
+> hwq is now unused and can be removed.
+
+OK, will kill it.
+
+> 
+> > -	if (hwq < nbd->tag_set.nr_hw_queues)
+> > -		req = blk_mq_tag_to_rq(nbd->tag_set.tags[hwq],
+> > -				       blk_mq_unique_tag_to_tag(tag));
+> > +	req = blk_mq_static_tag_to_req(nbd->disk->queue, tag);
+> >  	if (!req || !blk_mq_request_started(req)) {
+> >  		dev_err(disk_to_dev(nbd->disk), "Unexpected reply (%d) %p\n",
+> >  			tag, req);
+> 
+> This version of the patch survives the reproducer I used for debugging
+> this. I'll try to give it some more testing later.
+
+Ok, thanks for the test.
+
+
+Thanks,
+Ming
 
