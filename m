@@ -1,55 +1,51 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3EBE1D47AC
-	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 15:48:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B74B13B797;
+	Thu, 17 Oct 2024 16:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729180090; cv=none; b=VRfh1Kr68FhXRmBbXFn+BMEhyvDhFERmDTZLoX8AU1P1p0JRy1SfAoEUq2rTT6sTwho+ninXePYoN/Prk8EbajYjjNFSMAKwbtzqdJ4nUB7ewfFPUbHgNbaUG9kAMV6VoGC8ZAgOWcrk26IFDRRGS2iRPKZlFEfTrdzQ+TPvdto=
+	t=1729181205; cv=none; b=q7h8xoo+8+7f/aBEoXEJvQCkC2pV287ZrvcK54AXKXqbUhSIYls5Q2XSY7BQZRHGXjs99EjVIMm+PlgnSnKHchnD9Z0C9b3pKfThvtSfXILgjXGTGkkEqpDPiZLeV25Rgi52Q58UG4r9Wz+SnO5jFvWjp/ychwc/vEn5Ppu0ZFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729180090; c=relaxed/simple;
-	bh=gnmyZZ49v9ju8GP0Lh8E7mHc2YtSuA0JGHxaFFzYXPw=;
+	s=arc-20240116; t=1729181205; c=relaxed/simple;
+	bh=sxLBVfVgG6T70/qpBvtsFGUgrJ9BQHiMs+QBb2kssdg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RMOV9fbwXtaYga6DnXs/YHJetc/u+Bb6ap7kbN7R7le0L0LJb+SdVObFHPPgnNDrHNTuzOPaLK0gEFWNbx6mfzt/MeepzMyWsMEy36Bqhm4TOeEOoqUFAybNut4Ii0I2TZzAaDvArMjXcCC8mql4cBydbYxRZAva1NyDwYeXOMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LCt4ddXU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=A4sUtipHXXdmePTX/6VRwrHhU9L4k4UTrQhu6YoZBvZ2Rnq9vJfF02OEr4vsB0DcnUffylkctZq8BSQTAiGGM8tV5eqjUvcda/8XH8WLFKN5lV16YqSyok2ZIUeKK/50Y4vP2FRbzA1B1hz2VOJYQPP66bGujbirdsbonAiffeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gffDCd6j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LCt4ddXU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729180084;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CkJIgd3MOKUyNmAOO8gKZqK4l1/szFdaieOcQRfp1Cg=;
-	b=LCt4ddXU1WDxKwaJFyL8ts8mcx/eSzS6SOAHkXM+GaVvCybhSAzEt5fTYoJ49S6mNAU7pq
-	I7MFqFZDRgjLsGvm24BZePnDQjqiz/DLVykAVHiNTrQqi6JGSpQJzaC9PESDIyQA4DqSkg
-	FJRpJmtI/ci7HfMk6G+X+0Wa4ByPaNs=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-82-bbeqPzlpPtO9aunp2Sqk7g-1; Thu,
- 17 Oct 2024 11:48:01 -0400
-X-MC-Unique: bbeqPzlpPtO9aunp2Sqk7g-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B4B38195608F;
-	Thu, 17 Oct 2024 15:47:59 +0000 (UTC)
-Received: from redhat.com (unknown [10.39.192.100])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 33AF3300018D;
-	Thu, 17 Oct 2024 15:47:55 +0000 (UTC)
-Date: Thu, 17 Oct 2024 17:47:53 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	josef@toxicpanda.com, nbd@other.debian.org, eblake@redhat.com,
-	vincent.chen@sifive.com, Leon Schuermann <leon@is.currently.online>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH] nbd: fix partial sending
-Message-ID: <ZxExqStWA5HmZMzy@redhat.com>
-References: <20241017113614.2964389-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gffDCd6j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 481DCC4CEC3;
+	Thu, 17 Oct 2024 16:06:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729181204;
+	bh=sxLBVfVgG6T70/qpBvtsFGUgrJ9BQHiMs+QBb2kssdg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gffDCd6jUTW1l1kOMeBrkIvTn0E+ToGcq/Xm+HdcLQ1Oza1utr/Oy1QbQxYgsjrWW
+	 Z7r4Uc3GEa75Q+ZWX5YvKzBQcAunJCXuuNFfw8pZYvYStMxzWjb0pen98HU1Qt8/xk
+	 kuhJg8Jf1aMhbmD1z03D7B2TVVa+YT5eNXGQMuPQXG6nuwimwzsPQuRa88P38+N5Ow
+	 odQsIJrRlEiimxp1+3f3+nYrosWSNuWt0bvGwiyJ+bdSWrYKrqSfK73R+7UmJXGdu8
+	 BXoN2+6XEeSWIUUo+d7LAiROz/12437PYHGbxV0iDZ4EliKp+XqaM/B2+R/nPJv9TO
+	 H1z6YF5t/E7Xw==
+Date: Thu, 17 Oct 2024 10:06:41 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, hare@suse.de,
+	sagi@grimberg.me, martin.petersen@oracle.com, brauner@kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, jaegeuk@kernel.org,
+	bcrl@kvack.org, dhowells@redhat.com, bvanassche@acm.org,
+	asml.silence@gmail.com, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-aio@kvack.org,
+	gost.dev@samsung.com, vishak.g@samsung.com, javier.gonz@samsung.com
+Subject: Re: [PATCH v7 0/3] FDP and per-io hints
+Message-ID: <ZxE2EeZYKN1ZiSuT@kbusch-mbp.dhcp.thefacebook.com>
+References: <CGME20240930182052epcas5p37edefa7556b87c3fbb543275756ac736@epcas5p3.samsung.com>
+ <20240930181305.17286-1-joshi.k@samsung.com>
+ <20241015055006.GA18759@lst.de>
+ <8be869a7-c858-459a-a34b-063bc81ce358@samsung.com>
+ <20241017152336.GA25327@lst.de>
+ <ZxEw5-l6DtlXCQRO@kbusch-mbp.dhcp.thefacebook.com>
+ <20241017154649.GA27203@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,115 +54,22 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241017113614.2964389-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <20241017154649.GA27203@lst.de>
 
-Am 17.10.2024 um 13:36 hat Ming Lei geschrieben:
-> nbd driver sends request header and payload with multiple call of
-> sock_sendmsg, and partial sending can't be avoided. However, nbd driver
-> returns BLK_STS_RESOURCE to block core in this situation. This way causes
-> one issue: request->tag may change in the next run of nbd_queue_rq(), but
-> the original old tag has been sent as part of header cookie, this way
-> confuses nbd driver reply handling, since the real request can't be
-> retrieved any more with the obsolete old tag.
+On Thu, Oct 17, 2024 at 05:46:49PM +0200, Christoph Hellwig wrote:
+> On Thu, Oct 17, 2024 at 09:44:39AM -0600, Keith Busch wrote:
 > 
-> Fix it by retrying sending directly, this way is reasonable & safe since
-> nothing can move on if the current hw queue(socket) has pending request,
-> and unnecessary requeue can be avoided in this way.
+> > We can add a fop_flags and block/fops.c can be the first one to turn it
+> > on since that LBA access is entirely user driven.
 > 
-> Cc: vincent.chen@sifive.com
-> Cc: Leon Schuermann <leon@is.currently.online>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> Kevin,
-> 	Please test this version, thanks!
-
-The NBD errors seem to go away with this.
-
-I'm not sure about side effects, though. Isn't the idea behind EINTR
-that you return to userspace to let it handle a signal? Looping in the
-kernel doesn't quite achieve this, so do we delay/prevent signal
-delivery with this? On the other hand, if it were completely prevented,
-then this should become an infinite loop, which it didn't in my test.
-
->  drivers/block/nbd.c | 35 +++++++++++++++++++++++++++++++++--
->  1 file changed, 33 insertions(+), 2 deletions(-)
+> Yes, that's my main request on the per-I/O hint interface.
 > 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index b852050d8a96..ef84071041e3 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -701,8 +701,9 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
->  			if (sent) {
->  				nsock->pending = req;
->  				nsock->sent = sent;
-> +			} else {
-> +				set_bit(NBD_CMD_REQUEUED, &cmd->flags);
->  			}
-> -			set_bit(NBD_CMD_REQUEUED, &cmd->flags);
->  			return BLK_STS_RESOURCE;
->  		}
->  		dev_err_ratelimited(disk_to_dev(nbd->disk),
-> @@ -743,7 +744,6 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
->  					 */
->  					nsock->pending = req;
->  					nsock->sent = sent;
-> -					set_bit(NBD_CMD_REQUEUED, &cmd->flags);
->  					return BLK_STS_RESOURCE;
->  				}
->  				dev_err(disk_to_dev(nbd->disk),
-> @@ -778,6 +778,35 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
->  	return BLK_STS_OK;
->  }
->  
-> +/*
-> + * Send pending nbd request and payload, part of them have been sent
-> + * already, so we have to send them all with current request, and can't
-> + * return BLK_STS_RESOURCE, otherwise request tag may be changed in next
-> + * retry
-> + */
-> +static blk_status_t nbd_send_pending_cmd(struct nbd_device *nbd,
-> +		struct nbd_cmd *cmd)
-> +{
-> +	struct request *req = blk_mq_rq_from_pdu(cmd);
-> +	unsigned long deadline = READ_ONCE(req->deadline);
-> +	unsigned int wait_ms = 2;
-> +	blk_status_t res;
-> +
-> +	WARN_ON_ONCE(test_bit(NBD_CMD_REQUEUED, &cmd->flags));
-> +
-> +	while (true) {
-> +		res = nbd_send_cmd(nbd, cmd, cmd->index);
-> +		if (res != BLK_STS_RESOURCE)
-> +			return res;
-> +		if (READ_ONCE(jiffies) + msecs_to_jiffies(wait_ms) >= deadline)
-> +			break;
-> +		msleep(wait_ms);
-> +		wait_ms *= 2;
-> +	}
-> +
-> +	return BLK_STS_IOERR;
-> +}
-> +
->  static int nbd_read_reply(struct nbd_device *nbd, struct socket *sock,
->  			  struct nbd_reply *reply)
->  {
-> @@ -1111,6 +1140,8 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *cmd, int index)
->  		goto out;
->  	}
->  	ret = nbd_send_cmd(nbd, cmd, index);
-> +	if (ret == BLK_STS_RESOURCE && nsock->pending == req)
-> +		ret = nbd_send_pending_cmd(nbd, cmd);
+> Now we just need to not dumb down the bio level interface to five
+> temeperature level and just expose the different write streams and we
+> can all have a happy Kumbaya.
 
-Is there a reason to call nbd_send_cmd() outside of the new loop first
-instead of going to the loop directly? It's always better to only have
-a single code path.
+I'm sending a revised version of this patch set that attempts to address
+these issues.
 
->  out:
->  	mutex_unlock(&nsock->tx_lock);
->  	nbd_config_put(nbd);
-
-Kevin
-
+The io_uring hint is weird to me, so that part is simplified just to get
+the point across.
