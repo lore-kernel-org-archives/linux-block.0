@@ -1,173 +1,118 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-oo1-f97.google.com (mail-oo1-f97.google.com [209.85.161.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B53227B8D;
-	Thu, 17 Oct 2024 21:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6CB36AF5
+	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 22:31:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729199006; cv=none; b=Enbf+ov8XyzRkSWU8Fjky5PHLBZARuh3XYJu6orCl9qWpWksoA7b5G6zQuY21nWHKDEAiUbiyZMTGhOMTTC+SLFDoWZMZPJ/wYPwf8pxWednqE8hfFcaV1Irt6kI1m+Cvzf4BqFsn4HPcLOh+WTUdUApBatTCKrx474sz0LxzK4=
+	t=1729204291; cv=none; b=OBd6PgQFU5ddWgICuP3H/mOfNhl62Bjpo3aCERprcLkKFnv6CnpAjGIf0MjbHbpGpydB3TYeM0xoJte2GG/hZj0vuYF9d+K3UL9pMfcj9m8Jm1B9mtPvn7Zqbgl2wDv63EGxBU9uJYlOWfGn/4vThuaLJLN0Xut4ZyZ/YCAXKBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729199006; c=relaxed/simple;
-	bh=5c0OzaK5IWI8SBVrSXjzsZwgOScIKtQWIl0UEi3SCkY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VY/rFmLFjZIUEkzJ469a5g5Qy6mjScyx1D+7Nq8GJ2NIBfQVCbeAM/Uq9OZ5ke9iY9vQDA6ibhwDA7B9QOO+vfL7dNHZAED1Gi+x4wom8UqMsIYgsyxsextZ77WO/OFEMX5gcy6c+50tgkyUUwyQzMM7LWnPEf5cOOKpDrK/BUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHYdLZTh; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729204291; c=relaxed/simple;
+	bh=wk78pm9A4wHGUJAGgC3pZI461YJyrUTx/sPnr9UF0G0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IT0UW7Naob9+Q2lnN1Q5i5mUmW98MTUHG9eVBdTew0QuEgXlPXPKk6GYwArYdDCAzIUZT5hWR2SGQxLqs5K8ZtrulGQD4J0hFZp3oEVNs/EV/UrLbF36E9fi8BWJKPoF2mQIBBJ7JTNVfACoKcZzXFxBlLrsf5z/FYDQvn+Ka6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=bul45V/m; arc=none smtp.client-ip=209.85.161.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHYdLZTh"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a9a4031f69fso191475566b.0;
-        Thu, 17 Oct 2024 14:03:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="bul45V/m"
+Received: by mail-oo1-f97.google.com with SMTP id 006d021491bc7-5e5a0519d00so655091eaf.3
+        for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 15:31:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729199003; x=1729803803; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xwi/jLdpwjlMfrJap3Pht6f++ggFG8vC8WGAVFQM4q8=;
-        b=HHYdLZTh8ueCttj7/ujrjfXwN8iLKIXhKAHLXIR0R25KBYsDVNNsTrqefZolx2t7Zb
-         apetRblrDI0UGRcAlkMvEdnBuSVHQisvGJQtzmef1LAaLAQSTizu/QQfLgxPNEXdPbnO
-         phZWZlgd5oBbLB7cZkjwbNPNPDnaqjhSezV0HKDCAPWabt5QKcjbyoxN+AhD4Xz/uu5h
-         UE8oNN3Ggwnd1197NInSlHjp2G9Kiy4DU53TCNwKCqa47sHgTT0PAs53nUrH2XK/SCcd
-         6asvNn8KwkoSCQeV2GmWhB8anWsOKeD4R/Vq+9JENJhnSCHTYDUUSUPBU6Ec4CinDHFH
-         R8hw==
+        d=purestorage.com; s=google2022; t=1729204289; x=1729809089; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=01Ao9hN/kTz0hVqpiuP+bXoNmbAQDLYKmsJTnEYA3R4=;
+        b=bul45V/magsAj6PbCCBG/ZBdrigA7WqE9SqUygwi2tK39SCQ7zr28RNml/EloFcBFB
+         Jm/exItr0zyy6mwbZvOI2mULO9OrtWySBEa2qX9pMFRMlkQFv19plz9Ni9dGaoMbxx+8
+         GXhDgtBKw22HfNx/O4wkQOwLePDsoYYdwuaQdAj8xqhCq88W+AxJIPG1bPwN9AWJdm8/
+         xxa5ZuePu18Z0Tb0knXlyhSo3Ap0yh9W5tm/GWfngtPXiaclMiJ8y8zE6zdGK+u2+JFh
+         byZC1lFJue4GLKtdLhmJILaDG5g9WUxhM9SUDZbl4Q0+cIyAPNWM65sQ4aL4rNo61r8F
+         Q/CQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729199003; x=1729803803;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1729204289; x=1729809089;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xwi/jLdpwjlMfrJap3Pht6f++ggFG8vC8WGAVFQM4q8=;
-        b=lvqJE1I074alX8QccNgBBAcSF9jGjJnFmxv2k1vKYHBzgHNeujz8ThkZguXikNCScR
-         RqC9NGTzwk3jTyXrMDv4l5hk6WQoVouHt5u5Kr1IgzNmMo8Fubw/o1hMuOR7+8ycTbUA
-         945nL9HShVd9k17nTkKtKBLQ5XlUlDIIkdlv50hm1A6rcvwyHvsyHTZWHoD5R9CjMCRr
-         3F7+na21c2BaKeoTznQJ3Ia29wqFTeBzVXe/hp1GaiwNr28m+j3a8hg6cRT2cH1R/yh1
-         ShQcko0bwix5fBgO0TQ48KnJBY/mO3YIlM32EYyzm/MT9FuaoaS3psfilxxq2kogIxAq
-         cRtw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNN4h8VtWwdtHnMAJYM8g6Vlxy6mBreD3MIqwmT4o+bnd4AaSSwmhGFv92DMVV5Cm8VFUy0A5fe74YrA==@vger.kernel.org, AJvYcCWq6K31bdUi9P7xEwM65wm4oVdC0vFvNHqkSokifcjxaYIUxDjThA565paYRtWthiAjwX9rFAdbFGqeVSNk@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxd+PCelxPhzKiqkpI8Dz1+72t5tJWSCl2pWRa1qrBWGqDhUJcE
-	9zCdLbJw3BHx4H8aiLe21WEy0GfXiIFqeF/seH2yrquRBfdcFsaW
-X-Google-Smtp-Source: AGHT+IEzlb6TE6aNf7mV+L4jKpcVBGJHExhpZbaDN5yuxFRd+LKyEMVSD+59YXqLRCLPt9ghRmRv3w==
-X-Received: by 2002:a17:907:7252:b0:a9a:134:9887 with SMTP id a640c23a62f3a-a9a69c9eb2dmr9383766b.41.1729199003273;
-        Thu, 17 Oct 2024 14:03:23 -0700 (PDT)
-Received: from [192.168.2.30] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a68ad4dd7sm13201666b.68.2024.10.17.14.03.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Oct 2024 14:03:22 -0700 (PDT)
-Message-ID: <ba4880b2-0569-4125-9670-0119d37d57b0@gmail.com>
-Date: Thu, 17 Oct 2024 23:03:21 +0200
+        bh=01Ao9hN/kTz0hVqpiuP+bXoNmbAQDLYKmsJTnEYA3R4=;
+        b=flv4Aq8R7//GfQn7E1xuVGtOkg8D4LcD9/3cNLe1dEZGyIfmrWxt1fmMLMO0goUEt1
+         QdiQI99Z7d+ooEKe0SJyj/8Wp8VvwCMt+0w/uTJHn0k8N938Um7E/6q02T3zRg7kuWjN
+         KtiJfTxih9l1Pnaf8he2Tl+DIGW7VLgxiEG81ivD7CbCEP0reZQkCfjwobZi7W2SSzXC
+         g1tEdDqbqG/K0qBvRCDbksKXiZrNVwAQ+Z9d8q8fbdER6LKNBftf6IE4TS1yZwUGntC5
+         oNmcVT3pvh5EqS+FGKTfw0eCwvBHFaW/X+D8AsqfBdDz7S1UaPc6GD4GQ03tml0/w00h
+         4cqg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIYwtYoPcyzIKFSoXoTlANsAweFKS2ijKkzkV5Ip/d/vWJRl2v4rPEKw36h3GqWXQbIOl4VX1f6yi9gQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJIG6+wBHMFMyav6ux7a09P/SY65sKm8MrRTUOp+kqM9v36b5l
+	TYt8G6xosA/N3vlyAmkYD0yOyfR2MY9MMojBEjDEU4difpEzopPI+wmyG9hdIRK6OBUfmEm/r2q
+	wqL/cIUDLGuhubFIgNFDvW6/b4k9+qL4R
+X-Google-Smtp-Source: AGHT+IHA3V3Z/+WLVZlhVvJt5Ls1583QiP3dkdawaIsOXLjr7NYnfApMcV+SfGMQYJRWOeHXsOyei/Au7lzN
+X-Received: by 2002:a05:6870:b628:b0:277:e1e8:a085 with SMTP id 586e51a60fabf-2892c330c99mr309696fac.23.1729204288839;
+        Thu, 17 Oct 2024 15:31:28 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-2892afdda33sm16477fac.39.2024.10.17.15.31.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Oct 2024 15:31:28 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 0320734029E;
+	Thu, 17 Oct 2024 16:31:27 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id E7821E413D0; Thu, 17 Oct 2024 16:31:26 -0600 (MDT)
+Date: Thu, 17 Oct 2024 16:31:26 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH V6 8/8] ublk: support provide io buffer
+Message-ID: <ZxGQPgvfquLw8AgP@dev-ushankar.dev.purestorage.com>
+References: <20240912104933.1875409-1-ming.lei@redhat.com>
+ <20240912104933.1875409-9-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [RFC PATCH v2 2/2] dm-inlinecrypt: add target for inline block
- device encryption
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, Md Sadre Alam <quic_mdalam@quicinc.com>,
- Israel Rukshin <israelr@nvidia.com>, Mikulas Patocka <mpatocka@redhat.com>
-References: <20241016232748.134211-1-ebiggers@kernel.org>
- <20241016232748.134211-3-ebiggers@kernel.org>
- <20241017194415.GA11717@sol.localdomain>
- <b8670e11-61d4-4831-8a21-2dda3c5db131@gmail.com>
- <20241017202852.GB11717@sol.localdomain>
-Content-Language: en-US
-From: Milan Broz <gmazyland@gmail.com>
-Autocrypt: addr=gmazyland@gmail.com; keydata=
- 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
-In-Reply-To: <20241017202852.GB11717@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240912104933.1875409-9-ming.lei@redhat.com>
 
-On 10/17/24 10:28 PM, Eric Biggers wrote:
-> On Thu, Oct 17, 2024 at 10:17:04PM +0200, Milan Broz wrote:
->> On 10/17/24 9:44 PM, Eric Biggers wrote:
->>> On Wed, Oct 16, 2024 at 04:27:48PM -0700, Eric Biggers wrote:
->>>> Add a new device-mapper target "dm-inlinecrypt" that is similar to
->>>> dm-crypt but uses the blk-crypto API instead of the regular crypto API.
->>>> This allows it to take advantage of inline encryption hardware such as
->>>> that commonly built into UFS host controllers.
->>>
->>> A slight difference in behavior vs. dm-crypt that I just became aware of:
->>> dm-crypt allows XTS keys whose first half equals the second half, i.e.
->>> cipher key == tweak key.  dm-inlinecrypt typically will not allow this.  Inline
->>> encryption hardware typically rejects such keys, and blk-crypto-fallback rejects
->>> them too because it uses CRYPTO_TFM_REQ_FORBID_WEAK_KEYS.
->>>
->>> IMO, rejecting these weak keys is desirable, and the fact that dm-inlinecrypt
->>> fixes this issue with dm-crypt will just need to be documented.
->>
->> Hm, I thought this is already rejected in crypto API (at least in FIPS mode)...
->>
->> It should be rejected exactly as you described even for dm-crypt,
->> just the check should be (IMO) part of crypto API (set keys), not dm-crypt itself.
->>
->> And here I think we should not be backward "compatible" as it is security issue,
->> both XTS keys just must not be the same.
->>
-> 
-> In "FIPS mode" such keys are always rejected, but otherwise it is opt-in via the
-> flag CRYPTO_TFM_REQ_FORBID_WEAK_KEYS.  dm-crypt doesn't use that flag.
-> 
-> We could certainly try to fix that in dm-crypt, though I expect that some
-> dm-crypt users have started relying on such keys.  It is a common misconception
-> that XTS is secure when the two halves of the key are the same.
+On Thu, Sep 12, 2024 at 06:49:28PM +0800, Ming Lei wrote:
+> +static int ublk_provide_io_buf(struct io_uring_cmd *cmd,
+> +		struct ublk_queue *ubq, int tag)
+> +{
+> +	struct ublk_device *ub = cmd->file->private_data;
+> +	struct ublk_rq_data *data;
+> +	struct request *req;
+> +
+> +	if (!ub)
+> +		return -EPERM;
+> +
+> +	req = __ublk_check_and_get_req(ub, ubq, tag, 0);
+> +	if (!req)
+> +		return -EINVAL;
+> +
+> +	pr_devel("%s: qid %d tag %u request bytes %u\n",
+> +			__func__, tag, ubq->q_id, blk_rq_bytes(req));
+> +
+> +	data = blk_mq_rq_to_pdu(req);
+> +
+> +	/*
+> +	 * io_uring guarantees that the callback will be called after
+> +	 * the provided buffer is consumed, and it is automatic removal
+> +	 * before this uring command is freed.
+> +	 *
+> +	 * This request won't be completed unless the callback is called,
+> +	 * so ublk module won't be unloaded too.
+> +	 */
+> +	return io_uring_cmd_provide_kbuf(cmd, data->buf);
+> +}
 
-Ah, ok, I missed that weak keys flag.
-
-We never did that in cryptsetup (including LUKS and plain with hashed passwords),
-with the exception for benchmark (where it it was not a real key, just all zeroes,
-and was fixed years ago as it did not work in FIPS) -- and obviously the case when
-user set the key explicitly.
-
-The same check is now in VeraCrypt (that uses dm-crypt on Linux).
-I know about several broken HW crypto, but actually no dm-crypt user.
-
-IMO we should set CRYPTO_TFM_REQ_FORBID_WEAK_KEYS by default. We can always introduce
-flag to disable it, but I would really like to know if there are any real users....
-
-Milan
+We did some testing with this patchset and saw some panics due to
+grp_kbuf_ack being a garbage value. Turns out that's because we forgot
+to set the UBLK_F_SUPPORT_ZERO_COPY flag on the device. But it looks
+like the UBLK_IO_PROVIDE_IO_BUF command is still allowed for such
+devices. Should this function test that the device has zero copy
+configured and fail if it doesn't?
 
