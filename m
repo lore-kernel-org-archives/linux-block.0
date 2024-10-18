@@ -1,56 +1,56 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DDB18CBEC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154E618CBEA;
 	Fri, 18 Oct 2024 07:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729238074; cv=none; b=WFdjAPObL+FndS7FmLmrcBNfuf31yK9w113yxyBdMT9XgK0vjRmKjUcLRGEi0/d34oFRsRfUVtQcHJV30MMtFQUBy+92gyzc3QEpl6SvJzNqy3c6sR8js/hLgs0i0u+ixibqICbau458zUSXaPK7gCXe/nFaThPTBFtBKNdyqdI=
+	t=1729238074; cv=none; b=FT17VNoi+G87fmOY3AgdXttz4Q2FVe30O1lENsVyfSCcE8bWHB+hzkos3cMyh17IrwO3pcL3bZmNUVDRzoUq24FskkxElc3AOZUe363yImttTQKfN1Lae6ICtkuNgVWYnPPditdD4gPpH6yTBst2vRpcY8OrY6q6NXI/gNb4hIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729238074; c=relaxed/simple;
-	bh=VYb4AXeRfDuSPexQUmqF2/JPGM2xgfoqbX7SzxfRB5g=;
+	bh=hFiA3yVMRXmu3FFPYS/22OGs0zS/sa/t+OHctXnHRxw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pqAFbJf9FeJty9iwG7lIdNIr4YMJOU4gxx5Bm65MJ1S4Bqx0BHakhYIjuTspIuqgr6um4rhRtFFQ2NA6973HZuTgQ2suWl4ByzfEug7tviVu0qJE2FhctarsNY0L46lZv3j7kqMnjJZkMKmiARfQjHABiEaQOIUZDpADpJO1V5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K+qzlvoN; arc=none smtp.client-ip=198.175.65.20
+	 MIME-Version; b=MFurnjQNcbIVrM9a0Kwy97gj8kh3mROyspsYoYb33K0o+eqBHOPEDZiVKpvYFsrf36J+QrchNwAyX9XesIjNVjicz6pqQDgk0kAvRIQlT/o7QDn1H2KQ34itX8bxKmvIDirUNhDPcSwRLdrXIPzwBSI5Ct7zBmb8IRILuUZMgow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nbz983L2; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K+qzlvoN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nbz983L2"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1729238073; x=1760774073;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=VYb4AXeRfDuSPexQUmqF2/JPGM2xgfoqbX7SzxfRB5g=;
-  b=K+qzlvoNWCRTFXp5eODqoCih4+AHIFc2LOeur3PVWAvFYuf1bAkgrSqW
-   ZrHOWhyDlu4uM2wg1F8fSEtrlJa2E8OHMEC3o13HrsmCh0Fr7JDrFVO8H
-   lZgombz3OV4rGBzbxkoYYhv9Lvc6DpP/WDCMdlF/Yh0uVGGqr5uH/NKau
-   YRytlhMyBC+hyTweHapXB8rX1YSuqqV4i9joaP4ESlTdATGAyu39J4sZW
-   U4hBw0o/iNZxiapLEAPM/ZrmmPszGbzPnJ94qrK9aP/m/3D41jhsJhPc/
-   1hO/pYz1MH+M6af+oO/XPE3bqtHQimU9HSE62zxef7f4Zb5uVX4CoFWaW
+  bh=hFiA3yVMRXmu3FFPYS/22OGs0zS/sa/t+OHctXnHRxw=;
+  b=Nbz983L2AGPkpFPZbPp9hF4U3ZGe2i/IcU3bk+tA7Dh/n2sT2n7k0985
+   WQl+eQj/WWrWK9kVA6Zo8B/KO3yyZXMr+Q2/Lc4OQxwDFFle1ddbB19DU
+   3OD15nbp/jk817fmuSx698jn3vIIezpod9v+aeQYzZiMJZg34wrhy1QdP
+   XimWEV1dp6QyyPM4j2dK94nbyK9MVomqC+YkleIdpnP3P6MfJMutNRY8t
+   IEF+5hjEErCt/yCOYPW9eH4/rx5TK+5maDTu3P8C02SMKMWjGyAWPLy5m
+   9TnXVkvUs70npPsizQ5uSxWQFpq3fPk2bu7eVj1oDZBrEvZ1E5W4v/2ZR
    Q==;
-X-CSE-ConnectionGUID: beZaYOjEQDW1uktY6jFqOg==
-X-CSE-MsgGUID: 3QgOGX5/RcOgwCZhz6HWew==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28549560"
+X-CSE-ConnectionGUID: dUPcKe/9QC2rdK007xLv7g==
+X-CSE-MsgGUID: z5cLq1ubTSC1XaeMtNUIug==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28549567"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="28549560"
+   d="scan'208";a="28549567"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
   by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 00:54:33 -0700
-X-CSE-ConnectionGUID: C6HyQPG8RaaWj0C89faR3g==
-X-CSE-MsgGUID: f1pdlETeRN6DD9MxxgeLWQ==
+X-CSE-ConnectionGUID: lmYFe0tdSnawla+UrnCTMg==
+X-CSE-MsgGUID: Q7JGkfbBQNCA8IW3wANpIQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
-   d="scan'208";a="79604071"
+   d="scan'208";a="79604068"
 Received: from klitkey1-mobl1.ger.corp.intel.com (HELO tkristo-desk.intel.com) ([10.245.246.169])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 00:54:27 -0700
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 00:54:25 -0700
 From: Tero Kristo <tero.kristo@linux.intel.com>
 To: axboe@kernel.dk
 Cc: hch@lst.de,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCHv2 2/2] blk-mq: add support for CPU latency limits
-Date: Fri, 18 Oct 2024 10:30:38 +0300
-Message-ID: <20241018075416.436916-3-tero.kristo@linux.intel.com>
+Subject: [PATCHv2 1/2] block/genhd: add sysfs knobs for the CPU latency PM QoS settings
+Date: Fri, 18 Oct 2024 10:30:37 +0300
+Message-ID: <20241018075416.436916-2-tero.kristo@linux.intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241018075416.436916-1-tero.kristo@linux.intel.com>
 References: <20241018075416.436916-1-tero.kristo@linux.intel.com>
@@ -62,128 +62,116 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for setting CPU latency limits when a request is dispatched
-to driver layer, and removing it once the device is idle. The latency
-limits use the dev PM QoS framework for setting per-cpu limits for
-active CPUs. The feature is user configurable via sysfs knobs under the
-block device.
+Add sysfs knobs for the following parameters:
+
+  cpu_lat_limit_us: for limiting the CPU latency to given value when block IO
+		    is running
+  cpu_lat_timeout_ms: for clearing up the CPU latency limit after block IO
+		      is complete
+
+This can be used to prevent the CPU from entering deep idle states when
+block IO is running and waiting for an interrupt, potentially causing
+large latencies to the operation.
 
 Signed-off-by: Tero Kristo <tero.kristo@linux.intel.com>
 ---
- block/blk-mq.c         | 54 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/blk-mq.h | 12 ++++++++++
- 2 files changed, 66 insertions(+)
+ block/genhd.c          | 47 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h |  3 +++
+ 2 files changed, 50 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4b2c8e940f59..f8906e2aff6d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -29,6 +29,7 @@
- #include <linux/blk-crypto.h>
- #include <linux/part_stat.h>
- #include <linux/sched/isolation.h>
-+#include <linux/pm_qos.h>
- 
- #include <trace/events/block.h>
- 
-@@ -2700,11 +2701,62 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug)
- static void __blk_mq_flush_plug_list(struct request_queue *q,
- 				     struct blk_plug *plug)
- {
-+	struct request *req, *next;
-+	struct blk_mq_hw_ctx *hctx;
-+	int cpu;
-+
- 	if (blk_queue_quiesced(q))
- 		return;
-+
-+	rq_list_for_each_safe(&plug->mq_list, req, next) {
-+		hctx = req->mq_hctx;
-+
-+		if (next && next->mq_hctx == hctx)
-+			continue;
-+
-+		if (q->disk->cpu_lat_limit < 0)
-+			continue;
-+
-+		hctx->last_active = jiffies + msecs_to_jiffies(q->disk->cpu_lat_timeout);
-+
-+		if (!hctx->cpu_lat_limit_active) {
-+			hctx->cpu_lat_limit_active = true;
-+			for_each_cpu(cpu, hctx->cpumask) {
-+				struct dev_pm_qos_request *qos;
-+
-+				qos = per_cpu_ptr(hctx->cpu_lat_qos, cpu);
-+				dev_pm_qos_add_request(get_cpu_device(cpu), qos,
-+						       DEV_PM_QOS_RESUME_LATENCY,
-+						       q->disk->cpu_lat_limit);
-+			}
-+			schedule_delayed_work(&hctx->cpu_latency_work,
-+					      msecs_to_jiffies(q->disk->cpu_lat_timeout));
-+		}
-+	}
-+
- 	q->mq_ops->queue_rqs(&plug->mq_list);
+diff --git a/block/genhd.c b/block/genhd.c
+index 1c05dd4c6980..e60af2639136 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1046,6 +1046,48 @@ static ssize_t partscan_show(struct device *dev,
+ 	return sprintf(buf, "%u\n", disk_has_partscan(dev_to_disk(dev)));
  }
  
-+static void blk_mq_cpu_latency_work(struct work_struct *work)
++static ssize_t cpu_lat_limit_us_show(struct device *dev,
++				     struct device_attribute *attr, char *buf)
 +{
-+	struct blk_mq_hw_ctx *hctx = container_of(work, struct blk_mq_hw_ctx,
-+						  cpu_latency_work.work);
-+	int cpu;
++	struct gendisk *disk = dev_to_disk(dev);
 +
-+	if (time_after(jiffies, hctx->last_active)) {
-+		for_each_cpu(cpu, hctx->cpumask) {
-+			struct dev_pm_qos_request *qos;
-+
-+			qos = per_cpu_ptr(hctx->cpu_lat_qos, cpu);
-+			dev_pm_qos_remove_request(qos);
-+		}
-+		hctx->cpu_lat_limit_active = false;
-+	} else {
-+		schedule_delayed_work(&hctx->cpu_latency_work,
-+				      msecs_to_jiffies(hctx->queue->disk->cpu_lat_timeout));
-+	}
++	return sprintf(buf, "%d\n", disk->cpu_lat_limit);
 +}
 +
- static void blk_mq_dispatch_plug_list(struct blk_plug *plug, bool from_sched)
- {
- 	struct blk_mq_hw_ctx *this_hctx = NULL;
-@@ -3729,6 +3778,11 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 	if (xa_insert(&q->hctx_table, hctx_idx, hctx, GFP_KERNEL))
- 		goto exit_flush_rq;
++static ssize_t cpu_lat_limit_us_store(struct device *dev,
++				      struct device_attribute *attr,
++				      const char *buf, size_t count)
++{
++	struct gendisk *disk = dev_to_disk(dev);
++	int i;
++
++	if (count > 0 && !kstrtoint(buf, 10, &i))
++		disk->cpu_lat_limit = i;
++
++	return count;
++}
++
++static ssize_t cpu_lat_timeout_ms_show(struct device *dev,
++				       struct device_attribute *attr, char *buf)
++{
++	struct gendisk *disk = dev_to_disk(dev);
++
++	return sprintf(buf, "%d\n", disk->cpu_lat_timeout);
++}
++
++static ssize_t cpu_lat_timeout_ms_store(struct device *dev,
++					struct device_attribute *attr,
++					const char *buf, size_t count)
++{
++	struct gendisk *disk = dev_to_disk(dev);
++	int i;
++
++	if (count > 0 && !kstrtoint(buf, 10, &i))
++		disk->cpu_lat_timeout = i;
++
++	return count;
++}
++
+ static DEVICE_ATTR(range, 0444, disk_range_show, NULL);
+ static DEVICE_ATTR(ext_range, 0444, disk_ext_range_show, NULL);
+ static DEVICE_ATTR(removable, 0444, disk_removable_show, NULL);
+@@ -1060,6 +1102,8 @@ static DEVICE_ATTR(inflight, 0444, part_inflight_show, NULL);
+ static DEVICE_ATTR(badblocks, 0644, disk_badblocks_show, disk_badblocks_store);
+ static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
+ static DEVICE_ATTR(partscan, 0444, partscan_show, NULL);
++static DEVICE_ATTR_RW(cpu_lat_limit_us);
++static DEVICE_ATTR_RW(cpu_lat_timeout_ms);
  
-+	hctx->cpu_lat_qos = alloc_percpu(struct dev_pm_qos_request);
-+	if (!hctx->cpu_lat_qos)
-+		goto exit_flush_rq;
-+	INIT_DELAYED_WORK(&hctx->cpu_latency_work, blk_mq_cpu_latency_work);
-+
- 	return 0;
+ #ifdef CONFIG_FAIL_MAKE_REQUEST
+ ssize_t part_fail_show(struct device *dev,
+@@ -1111,6 +1155,8 @@ static struct attribute *disk_attrs[] = {
+ 	&dev_attr_events_poll_msecs.attr,
+ 	&dev_attr_diskseq.attr,
+ 	&dev_attr_partscan.attr,
++	&dev_attr_cpu_lat_limit_us.attr,
++	&dev_attr_cpu_lat_timeout_ms.attr,
+ #ifdef CONFIG_FAIL_MAKE_REQUEST
+ 	&dev_attr_fail.attr,
+ #endif
+@@ -1377,6 +1423,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
+ #ifdef CONFIG_BLOCK_HOLDER_DEPRECATED
+ 	INIT_LIST_HEAD(&disk->slave_bdevs);
+ #endif
++	disk->cpu_lat_limit = -1;
+ 	return disk;
  
-  exit_flush_rq:
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index b751cc92209b..2b61942490d6 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -435,6 +435,18 @@ struct blk_mq_hw_ctx {
- 	/** @kobj: Kernel object for sysfs. */
- 	struct kobject		kobj;
+ out_erase_part0:
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 50c3b959da28..8bf76da2efac 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -213,6 +213,9 @@ struct gendisk {
+ 	u64 diskseq;
+ 	blk_mode_t open_mode;
  
-+	/** @cpu_latency_work: Work to handle CPU latency PM limits. */
-+	struct delayed_work	cpu_latency_work;
++	int cpu_lat_limit;
++	int cpu_lat_timeout;
 +
-+	/** @cpu_lat_limit_active: If CPU latency limits are active or not. */
-+	bool			cpu_lat_limit_active;
-+
-+	/** @last_active: Jiffies value when the queue was last active. */
-+	unsigned long		last_active;
-+
-+	/** @cpu_lat_qos: PM QoS latency limits for individual CPUs. */
-+	struct dev_pm_qos_request __percpu *cpu_lat_qos;
-+
- #ifdef CONFIG_BLK_DEBUG_FS
- 	/**
- 	 * @debugfs_dir: debugfs directory for this hardware queue. Named
+ 	/*
+ 	 * Independent sector access ranges. This is always NULL for
+ 	 * devices that do not have multiple independent access ranges.
 -- 
 2.43.1
 
