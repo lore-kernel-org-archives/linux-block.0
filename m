@@ -1,130 +1,63 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D1C1B6D10
-	for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 18:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA3F7485
+	for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 22:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729277161; cv=none; b=ffVHVCk668iadiNhz8HVPqeYXS9PdFT2Q2oGwvkfSz8DUTA+k2Afuk8HwZCvBzl3hinyGDM5dIh+l2gpk4PAMbnbVOt8f1dLitGIcGs864Ac7NJBuc3PMFuqeuks+4gUmoh0Ijeh5UDRfaKS33q3KcQN3BZpQTFjSy79pPV4rzo=
+	t=1729292223; cv=none; b=FlTVY1cNVgcpIjoUwEbS39NNyj5NERiQQfo6mEw516D11dQTW94UscpOSXWXQ/zwMo12xfrgGsz82DXo5HOYeWYkMxqUYRfVQOMDLN2A+4IcvMuFqC5VpVSbRtflOwTUSaOvTTLVn2dcedxk4g9BM8/FHJaxu1BHEwV0X4ZbY/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729277161; c=relaxed/simple;
-	bh=phEX9ymVimk2sUfotD4QxcaLIVr47XMFLKtpw5UFHlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mbgLl/0vnB6X7syyv+2rdFd4/eh/fJT1EMqM5zu2tkP45P4oLVFIdzZsKzlcX9uQHzUbosDTweAvo2DoQPdoRjGNu5BSlqfHZcjVx2+fU/gmk6/uc72sOeFOIH41qYjSB7RwXPCep4rsHrmqwOtY0luvuCjjN/37iChplTsc1dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W3yhixbK; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1729292223; c=relaxed/simple;
+	bh=SsSV0FI1JzuQPcBhHXS3u3kf+vgZger1NkujCylzPn8=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=YR0UhdM0PKICFdFF33+k25JWv+LiNwfmq8obQRnvJcwGIRseF1ZswXvOMKIYYfzAn8TZlEtWL0iL0yIWwoBIqWQq/zM66aZmxOVNfRe9ky5NFy1lAb124qWRHa150nLbZIq40qoxb1Cf3eQUheSJpQFj7eTvkVF/o+OUMR0awiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YMc3/E1/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W3yhixbK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729277160; x=1760813160;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=phEX9ymVimk2sUfotD4QxcaLIVr47XMFLKtpw5UFHlw=;
-  b=W3yhixbKkCiPnHCrW+PpeqCGOPKxKqRTYjb+5G4OyFi5D9TDJDa7aH7O
-   HOpyMwzgd6NHydzlnD02CiIfvgSmnfjZ9cmAFiacz1UKnctIAH2yIbfJE
-   XkvxrH5yKUtJSsPvFpXZ6ZQsdB5vVquA58eA5yy3TY1s8MlByOAf/y4ld
-   ImL/LR7sfLVIo27O81dvx18hnZ+0NVKrQM4YL559JbLyH+je8Ue3QatEb
-   F9D3+c3gwVMLgMznCfETbSrBtf06oIeXzx/tk0GllAaQdNGsQC8+8jRHZ
-   u+8h1emO3sUU+qXnr7ZwNS7HwhOJgOLP93In6zLod9gZxa7EKVkV79GJu
-   Q==;
-X-CSE-ConnectionGUID: wI8heA0uSUyTvOzSprEIag==
-X-CSE-MsgGUID: zQwbeqjpR52gbPBmCOG6QA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11229"; a="40182402"
-X-IronPort-AV: E=Sophos;i="6.11,214,1725346800"; 
-   d="scan'208";a="40182402"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 11:45:59 -0700
-X-CSE-ConnectionGUID: gfyqjxktSYqWipjgpQmU9g==
-X-CSE-MsgGUID: 8/lcsv35T3iOGWVLfp224w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,214,1725346800"; 
-   d="scan'208";a="83571247"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 18 Oct 2024 11:45:57 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t1rz1-000OBt-2L;
-	Fri, 18 Oct 2024 18:45:55 +0000
-Date: Sat, 19 Oct 2024 02:45:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] block: model freeze & enter queue as rwsem for
- supporting lockdep
-Message-ID: <202410190214.KgZovHXy-lkp@intel.com>
-References: <20241018013542.3013963-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YMc3/E1/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18EB2C4CEC3;
+	Fri, 18 Oct 2024 22:57:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729292223;
+	bh=SsSV0FI1JzuQPcBhHXS3u3kf+vgZger1NkujCylzPn8=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=YMc3/E1/mU0QQ0GlzXTLP5c1kfa4qw0PKdxFlR0UBiCGbJlGw3hGkivOoi3GCxty+
+	 z9FDXjWrXwhI1tEG8FSkwJDUnlfTZENylD4l21i16j5/mxkhRSEhDYpq0J3R1u8Als
+	 DFQ5XNu/wDtxjBrPIvH09DPwrFFXp9jPdx5ZIZcrAXCsPuXNuYFcdv7lGemlBw9KiA
+	 wkkPPyI1Lq/ZatHRVbHGvz2EKtkESfMyFOCgub6dQJ65fIkWNPS40Gx4ISQ/9VIcGw
+	 wkZ6VGTa/e2WdIoCmLZoQth6KHAy9S665oQ5UXs+yTNxgJ3Rh11VpZHaTzxmqNZ972
+	 b2uIOC3PDVf/g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF9E3805CC0;
+	Fri, 18 Oct 2024 22:57:09 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.12-rc4
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <72c65a83-f629-45ed-b9b9-bc3efd88e86b@kernel.dk>
+References: <72c65a83-f629-45ed-b9b9-bc3efd88e86b@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <72c65a83-f629-45ed-b9b9-bc3efd88e86b@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.12-20241018
+X-PR-Tracked-Commit-Id: b0bf1afde7c34698cf61422fa8ee60e690dc25c3
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: f8eacd8ad7a658b805c635f8ffad7913981f863c
+Message-Id: <172929222855.3285619.16132534262748967286.pr-tracker-bot@kernel.org>
+Date: Fri, 18 Oct 2024 22:57:08 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241018013542.3013963-1-ming.lei@redhat.com>
 
-Hi Ming,
+The pull request you sent on Fri, 18 Oct 2024 12:02:27 -0600:
 
-kernel test robot noticed the following build warnings:
+> git://git.kernel.dk/linux.git tags/block-6.12-20241018
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on linus/master v6.12-rc3 next-20241018]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/f8eacd8ad7a658b805c635f8ffad7913981f863c
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/block-model-freeze-enter-queue-as-rwsem-for-supporting-lockdep/20241018-093704
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20241018013542.3013963-1-ming.lei%40redhat.com
-patch subject: [PATCH] block: model freeze & enter queue as rwsem for supporting lockdep
-config: x86_64-allnoconfig (https://download.01.org/0day-ci/archive/20241019/202410190214.KgZovHXy-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241019/202410190214.KgZovHXy-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410190214.KgZovHXy-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> block/blk-mq.c:125:6: warning: variable 'sub_class' set but not used [-Wunused-but-set-variable]
-     125 |         int sub_class;
-         |             ^
-   1 warning generated.
-
-
-vim +/sub_class +125 block/blk-mq.c
-
-   122	
-   123	void blk_freeze_queue_start(struct request_queue *q)
-   124	{
- > 125		int sub_class;
-   126	
-   127		mutex_lock(&q->mq_freeze_lock);
-   128		sub_class = q->mq_freeze_depth;
-   129		if (++q->mq_freeze_depth == 1) {
-   130			percpu_ref_kill(&q->q_usage_counter);
-   131			mutex_unlock(&q->mq_freeze_lock);
-   132			if (queue_is_mq(q))
-   133				blk_mq_run_hw_queues(q, false);
-   134		} else {
-   135			mutex_unlock(&q->mq_freeze_lock);
-   136		}
-   137		/*
-   138		 * model as down_write_trylock() so that two concurrent freeze queue
-   139		 * can be allowed
-   140		 */
-   141		if (blk_queue_freeze_lockdep(q))
-   142			rwsem_acquire(&q->q_usage_counter_map, sub_class, 1, _RET_IP_);
-   143	}
-   144	EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
-   145	
+Thank you!
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
