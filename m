@@ -1,142 +1,348 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286C67BAEC;
-	Fri, 18 Oct 2024 15:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E03F165EFC;
+	Fri, 18 Oct 2024 15:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729263837; cv=none; b=mFjxJc/MjcBx1SCh09RJLACPmKoTZy+WBX8hbShK5VpME0yOTUYYtK6OEHUW9npMcTfFpMp+zONnWU49jkpTb0KD1DswXHmuWSurstPOsk3XCL+P3WSo9Xlo5SBwMEBHDf1SEWNr71e90uMRCV5swCdKdR9sebqfVOldAD5+I6Q=
+	t=1729266962; cv=none; b=eksz4SsER2hxhPZ1K2Ll/JZRwgyQXgTJ1yPUwR64NYMGBjrd4Zw/Sv2/NUjJvlsIQ20P1wrHNlfatGQAKwqlFTkafSDvlqJ0qA47LFmwtnTp5wwKPExBoxqd3D6hLzNGGVwdyLm3P7zxZ6jWnkhFiyIID7F3anlTIciFxKC8WSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729263837; c=relaxed/simple;
-	bh=2bfs2UEwo6ToOh8FqCQeqUWi9lfpjMNVBp5cRaIPVyM=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=qOHg6NFxP9+OqpHXFgoEyImxuhHbj5Ye81pQi3wk9wtzNpg/BWtL7XmsG7HA1Vcvp9xFzG2Y5HXRl34Hsjjbs0JWRfVgzlXlSKM8yBxk3CdkoBjDwek1MK7q/RT+nRV7xSPaJ5/RE0oc59iJUkxsCU4D5tdI/wHhphv8ZcTwgHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ez7yx+zR; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729266962; c=relaxed/simple;
+	bh=mzdF4Z+AYm4onIUjlaq/BOs4aeUbImE1nxsfhZ4LMF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=IvebDlt1FVtpy912VICP0PYqveA8qQYooPNbgoRfaBMEZR3X5XsorvxzCDp2tLOr4Za5F3Dtgio7xihy4/w+7j9T8MlUWGRU7Sk9lfIqewq1JOOqqVS18AHltW7xE74C/1il45cuS9oYlE3/PXtRL+B47vQjgj06ANeUHRxt4ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q/46ysZs; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=OfGQEtiG; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uv/AQojz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=F7q2W6Kl; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ez7yx+zR"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4603aced3a5so16855491cf.1;
-        Fri, 18 Oct 2024 08:03:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729263834; x=1729868634; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2bfs2UEwo6ToOh8FqCQeqUWi9lfpjMNVBp5cRaIPVyM=;
-        b=ez7yx+zR0cD5xTGSdsBViwj41n6ij5LFvlr809gs3Pqj5jiaQONjZ0TvKI14NOv2rD
-         fbtDc7PYJcNmtgIdFXl5MO8Xnj/mL++/TjLIolhw4e1/C2r+I5y7b3juoFrOVY+esD8U
-         L0/xTM76u8/BQxoHahMieWnTYcsh7gElxoDV9K1NnT/cmvXsIUeA4IRmN0/Gh++D6Nan
-         yqWaDwdAYDwv+2jPtFMKb6uJgFl+fw/9I5qYhlXoXJan20DZrE9HU51IRxbwPq/uT0aM
-         kGGG+MQzd3kpgomxbEUG0+HzyVf+h2+dCSks34G2k8/+4ajUM+BIeJd8xgcEy2NjMCS3
-         6Rgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729263834; x=1729868634;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2bfs2UEwo6ToOh8FqCQeqUWi9lfpjMNVBp5cRaIPVyM=;
-        b=DgztNlIFSGvleZu1xB7H3zbHm1rTfc/h0QfwPn1WZiF50qRUh+acI1T5k3hrdnE3lS
-         NBCrRIm1t4cKqkFHX9ZpjgrGqSZCJGY1w5Sz0zvMcfuXj2wcvSuqSEI3D/KPgxq/9sNF
-         ByIhKxvfl9khDm+ZWp1+ZOqvOlhDAMXWq1XFlgnUwPVXAhpR9rcAXIQeEsGQXQTU0Apv
-         Fcxp0QCwdrgG9JUZSTH3t23Hk8Bc/KZYAwdlWaGNA5LTds+i2UtOO178qUerDA/TR+jH
-         xxnx3qhBVLCJ2LRkUlIy0pFK71BktMdbqsRUccMTMGKp0HqMIjvzn9GyG0UmbtvDITaY
-         cZeg==
-X-Forwarded-Encrypted: i=1; AJvYcCVHKZgzzZ/bAvoZCa/nenuBBBR9x7xvs1llYlqiCv7jtFbKeprhkgjE1m8f4t+9opxJc+o8WeaFIcEBBOd33y4o@vger.kernel.org, AJvYcCVLvOfMK+8FhI2E4iQ17WaQQEKe9KgaoIOcPE9acHCkwlL2LcEiNdVooYXyGrxTb3DyIEprBJR0H6CEJ2iz@vger.kernel.org, AJvYcCVlZ7oRwOQgSFgZDM986eLXjBQPVvVAuWK15pnav+RQLKeAB4FxiX0jPn/bIoq2+abMft/MBoezeUnOAQ==@vger.kernel.org, AJvYcCWCLZJJ2L3WHhpAK9wKyn7d1LiZE6Yz/eA7XvWz0O/MSSmlsMaUIUeuTrrsGgEKpRalfNOaosxdU9KR@vger.kernel.org, AJvYcCXVFpBHAtHErX2nf5opVVo1T0Imku4li7Y1Ril94azImZeS7TO4C8V5KR8gQjsCLP6bhqepnHMmIxYx/qfR@vger.kernel.org, AJvYcCXa+yIxV6JqKMN9qXSvJmkhPC0Z7W/O5Xty+eTUUNlxlLl2hjKlXXzJGOuOOxz5mL5gOn9NpQyvAfPvRiE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzggh6hO9be8tUQP1pVY5lRQhOffZKIM8RbgOS1dU63A9t261Gq
-	UkWoQS/PsFT9ECs4AqKAF65OHQpghR/VYZDx/c5QZBG775CryzQ2
-X-Google-Smtp-Source: AGHT+IFtSxqYQ+Uh1KxSL4gmbFP2b5u4RAOEyxYYnsypWhrbsVj/jXKkNnFmi1COXRELCZUTv+Zc5A==
-X-Received: by 2002:a05:622a:2309:b0:460:8be6:9b00 with SMTP id d75a77b69052e-460aede585bmr37176911cf.50.1729263833772;
-        Fri, 18 Oct 2024 08:03:53 -0700 (PDT)
-Received: from [127.0.0.1] (syn-076-188-177-122.res.spectrum.com. [76.188.177.122])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-460b818e356sm2189391cf.69.2024.10.18.08.03.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Oct 2024 08:03:53 -0700 (PDT)
-Date: Fri, 18 Oct 2024 11:03:50 -0400
-From: Adrian Vovk <adrianvovk@gmail.com>
-To: Christoph Hellwig <hch@infradead.org>
-CC: Eric Biggers <ebiggers@kernel.org>, Md Sadre Alam <quic_mdalam@quicinc.com>,
- axboe@kernel.dk, song@kernel.org, yukuai3@huawei.com, agk@redhat.com,
- snitzer@kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
- adrian.hunter@intel.com, quic_asutoshd@quicinc.com, ritesh.list@gmail.com,
- ulf.hansson@linaro.org, andersson@kernel.org, konradybcio@kernel.org,
- kees@kernel.org, gustavoars@kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-mmc@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-hardening@vger.kernel.org,
- quic_srichara@quicinc.com, quic_varada@quicinc.com
-Subject: Re: [PATCH v2 1/3] dm-inlinecrypt: Add inline encryption support
-User-Agent: Thunderbird for Android
-In-Reply-To: <ZxH4lnkQNhTP5fe6@infradead.org>
-References: <20240916085741.1636554-1-quic_mdalam@quicinc.com> <20240916085741.1636554-2-quic_mdalam@quicinc.com> <20240921185519.GA2187@quark.localdomain> <ZvJt9ceeL18XKrTc@infradead.org> <ef3c9a17-79f3-4937-965e-52e2b9e66ac2@gmail.com> <ZxHwgsm2iP2Z_3at@infradead.org> <CAAdYy_mVy3uXPqWbjPzK_i8w7Okq73wKBQyc95TbnonE36rPgQ@mail.gmail.com> <ZxH4lnkQNhTP5fe6@infradead.org>
-Message-ID: <D96294E2-F17A-4E58-90FB-1D17747048E5@gmail.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q/46ysZs";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="OfGQEtiG";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="uv/AQojz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="F7q2W6Kl"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 6032721CC0;
+	Fri, 18 Oct 2024 15:55:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729266957; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=OCBmksGnjAHAm7dBBbultPZCd4jnr3Q8BRqGtT7HV9Y=;
+	b=Q/46ysZsSCuItvouRHtQT3Tkrjes9AC+RAcrBED/Mfp5sE7jTXxYhibY/J+6XPH9F9R8J9
+	W5mzeHAWI2wDJaS6T+x+6dwVi8N9uTPDluc7IVELMqDM+/4kK9lfRjkDFKw7ESVSlYivi0
+	6k555zYkyTztUhSjslJX8uZ/PVmzMRM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729266957;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=OCBmksGnjAHAm7dBBbultPZCd4jnr3Q8BRqGtT7HV9Y=;
+	b=OfGQEtiG/ycz0FGXECa0+mASyRCC1b10mbXrVKMRmOmLNOu18Anvb4rUj75padTHMOrfrs
+	nA6DoVsim3isRyCw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="uv/AQojz";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=F7q2W6Kl
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729266956; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=OCBmksGnjAHAm7dBBbultPZCd4jnr3Q8BRqGtT7HV9Y=;
+	b=uv/AQojzO+QXyfHq1hpKtHxwWQtiuBrZwA5M0NqD9drbtxDTbom2nuvdCFjiFdwNPPGYR9
+	bOUqBUsL9Y54n2bIAOi8aQdpgz4ulheBfQlesYSkMx4f5LGwV0nC4id5gDZdrxdxECkfTM
+	c1M4IuxtcWGUOpLjqR0/nA2GrKFDm2I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729266956;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=OCBmksGnjAHAm7dBBbultPZCd4jnr3Q8BRqGtT7HV9Y=;
+	b=F7q2W6KlpiRYkF4qjPtL35fEymdvya5MSaV54sHyLflqNl8XVabQBDRHVU83Fkeg6pQwQ9
+	nVoqxtXAXCgNocBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1ADC713680;
+	Fri, 18 Oct 2024 15:55:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 92/LAAyFEmdMUAAAD6G6ig
+	(envelope-from <rgoldwyn@suse.de>); Fri, 18 Oct 2024 15:55:56 +0000
+Date: Fri, 18 Oct 2024 11:55:50 -0400
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: linux-fsdevel@vger.kernel.org
+Cc: linux-xfs@vger.kernel.org, gfs2@lists.linux.dev, 
+	linux-block@vger.kernel.org
+Subject: [PATCH] iomap: writeback_control pointer part of iomap_writepage_ctx
+Message-ID: <326b2b66114c97b892dbcf83f3d41b86c64e93d6.1729266269.git.rgoldwyn@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Rspamd-Queue-Id: 6032721CC0
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_TLS_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TO_DN_NONE(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.51
+X-Spam-Flag: NO
+
+Reduces the number of arguments to functions iomap_writepages() and
+all functions in the writeback path which require both wpc and wbc.
+The filesystems need to initialize wpc with wbc before calling
+iomap_writepages().
+
+Signed-off-by: Goldwyn Rodrigues <rgoldwyn@suse.com>
+---
+ block/fops.c           |  6 ++++--
+ fs/gfs2/aops.c         |  6 ++++--
+ fs/iomap/buffered-io.c | 31 +++++++++++++++----------------
+ fs/xfs/xfs_aops.c      |  8 ++++++--
+ fs/zonefs/file.c       |  6 ++++--
+ include/linux/iomap.h  |  3 ++-
+ 6 files changed, 35 insertions(+), 25 deletions(-)
+
+diff --git a/block/fops.c b/block/fops.c
+index e696ae53bf1e..3425bb72e887 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -513,9 +513,11 @@ static const struct iomap_writeback_ops blkdev_writeback_ops = {
+ static int blkdev_writepages(struct address_space *mapping,
+ 		struct writeback_control *wbc)
+ {
+-	struct iomap_writepage_ctx wpc = { };
++	struct iomap_writepage_ctx wpc = {
++		.wbc	=	wbc,
++	};
+ 
+-	return iomap_writepages(mapping, wbc, &wpc, &blkdev_writeback_ops);
++	return iomap_writepages(mapping, &wpc, &blkdev_writeback_ops);
+ }
+ 
+ const struct address_space_operations def_blk_aops = {
+diff --git a/fs/gfs2/aops.c b/fs/gfs2/aops.c
+index 68fc8af14700..e741bd34453d 100644
+--- a/fs/gfs2/aops.c
++++ b/fs/gfs2/aops.c
+@@ -149,7 +149,9 @@ static int gfs2_writepages(struct address_space *mapping,
+ 			   struct writeback_control *wbc)
+ {
+ 	struct gfs2_sbd *sdp = gfs2_mapping2sbd(mapping);
+-	struct iomap_writepage_ctx wpc = { };
++	struct iomap_writepage_ctx wpc = {
++			.wbc	= wbc,
++	};
+ 	int ret;
+ 
+ 	/*
+@@ -158,7 +160,7 @@ static int gfs2_writepages(struct address_space *mapping,
+ 	 * want balance_dirty_pages() to loop indefinitely trying to write out
+ 	 * pages held in the ail that it can't find.
+ 	 */
+-	ret = iomap_writepages(mapping, wbc, &wpc, &gfs2_writeback_ops);
++	ret = iomap_writepages(mapping, &wpc, &gfs2_writeback_ops);
+ 	if (ret == 0 && wbc->nr_to_write > 0)
+ 		set_bit(SDF_FORCE_AIL_FLUSH, &sdp->sd_flags);
+ 	return ret;
+diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+index 78ebd265f425..9c199a34b017 100644
+--- a/fs/iomap/buffered-io.c
++++ b/fs/iomap/buffered-io.c
+@@ -1757,17 +1757,17 @@ static int iomap_submit_ioend(struct iomap_writepage_ctx *wpc, int error)
+ }
+ 
+ static struct iomap_ioend *iomap_alloc_ioend(struct iomap_writepage_ctx *wpc,
+-		struct writeback_control *wbc, struct inode *inode, loff_t pos)
++		struct inode *inode, loff_t pos)
+ {
+ 	struct iomap_ioend *ioend;
+ 	struct bio *bio;
+ 
+ 	bio = bio_alloc_bioset(wpc->iomap.bdev, BIO_MAX_VECS,
+-			       REQ_OP_WRITE | wbc_to_write_flags(wbc),
++			       REQ_OP_WRITE | wbc_to_write_flags(wpc->wbc),
+ 			       GFP_NOFS, &iomap_ioend_bioset);
+ 	bio->bi_iter.bi_sector = iomap_sector(&wpc->iomap, pos);
+ 	bio->bi_end_io = iomap_writepage_end_bio;
+-	wbc_init_bio(wbc, bio);
++	wbc_init_bio(wpc->wbc, bio);
+ 	bio->bi_write_hint = inode->i_write_hint;
+ 
+ 	ioend = iomap_ioend_from_bio(bio);
+@@ -1817,8 +1817,8 @@ static bool iomap_can_add_to_ioend(struct iomap_writepage_ctx *wpc, loff_t pos)
+  * writepage context that the caller will need to submit.
+  */
+ static int iomap_add_to_ioend(struct iomap_writepage_ctx *wpc,
+-		struct writeback_control *wbc, struct folio *folio,
+-		struct inode *inode, loff_t pos, unsigned len)
++		struct folio *folio, struct inode *inode,
++		loff_t pos, unsigned len)
+ {
+ 	struct iomap_folio_state *ifs = folio->private;
+ 	size_t poff = offset_in_folio(folio, pos);
+@@ -1829,7 +1829,7 @@ static int iomap_add_to_ioend(struct iomap_writepage_ctx *wpc,
+ 		error = iomap_submit_ioend(wpc, 0);
+ 		if (error)
+ 			return error;
+-		wpc->ioend = iomap_alloc_ioend(wpc, wbc, inode, pos);
++		wpc->ioend = iomap_alloc_ioend(wpc, inode, pos);
+ 	}
+ 
+ 	if (!bio_add_folio(&wpc->ioend->io_bio, folio, len, poff))
+@@ -1838,14 +1838,13 @@ static int iomap_add_to_ioend(struct iomap_writepage_ctx *wpc,
+ 	if (ifs)
+ 		atomic_add(len, &ifs->write_bytes_pending);
+ 	wpc->ioend->io_size += len;
+-	wbc_account_cgroup_owner(wbc, &folio->page, len);
++	wbc_account_cgroup_owner(wpc->wbc, &folio->page, len);
+ 	return 0;
+ }
+ 
+ static int iomap_writepage_map_blocks(struct iomap_writepage_ctx *wpc,
+-		struct writeback_control *wbc, struct folio *folio,
+-		struct inode *inode, u64 pos, unsigned dirty_len,
+-		unsigned *count)
++		struct folio *folio, struct inode *inode, u64 pos,
++		unsigned dirty_len, unsigned *count)
+ {
+ 	int error;
+ 
+@@ -1869,7 +1868,7 @@ static int iomap_writepage_map_blocks(struct iomap_writepage_ctx *wpc,
+ 		case IOMAP_HOLE:
+ 			break;
+ 		default:
+-			error = iomap_add_to_ioend(wpc, wbc, folio, inode, pos,
++			error = iomap_add_to_ioend(wpc, folio, inode, pos,
+ 					map_len);
+ 			if (!error)
+ 				(*count)++;
+@@ -1952,7 +1951,7 @@ static bool iomap_writepage_handle_eof(struct folio *folio, struct inode *inode,
+ }
+ 
+ static int iomap_writepage_map(struct iomap_writepage_ctx *wpc,
+-		struct writeback_control *wbc, struct folio *folio)
++		struct folio *folio)
+ {
+ 	struct iomap_folio_state *ifs = folio->private;
+ 	struct inode *inode = folio->mapping->host;
+@@ -2000,7 +1999,7 @@ static int iomap_writepage_map(struct iomap_writepage_ctx *wpc,
+ 	 * Walk through the folio to find dirty areas to write back.
+ 	 */
+ 	while ((rlen = iomap_find_dirty_range(folio, &pos, end_pos))) {
+-		error = iomap_writepage_map_blocks(wpc, wbc, folio, inode,
++		error = iomap_writepage_map_blocks(wpc, folio, inode,
+ 				pos, rlen, &count);
+ 		if (error)
+ 			break;
+@@ -2037,7 +2036,7 @@ static int iomap_writepage_map(struct iomap_writepage_ctx *wpc,
+ }
+ 
+ int
+-iomap_writepages(struct address_space *mapping, struct writeback_control *wbc,
++iomap_writepages(struct address_space *mapping,
+ 		struct iomap_writepage_ctx *wpc,
+ 		const struct iomap_writeback_ops *ops)
+ {
+@@ -2053,8 +2052,8 @@ iomap_writepages(struct address_space *mapping, struct writeback_control *wbc,
+ 		return -EIO;
+ 
+ 	wpc->ops = ops;
+-	while ((folio = writeback_iter(mapping, wbc, folio, &error)))
+-		error = iomap_writepage_map(wpc, wbc, folio);
++	while ((folio = writeback_iter(mapping, wpc->wbc, folio, &error)))
++		error = iomap_writepage_map(wpc, folio);
+ 	return iomap_submit_ioend(wpc, error);
+ }
+ EXPORT_SYMBOL_GPL(iomap_writepages);
+diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
+index 6dead20338e2..5d758910a843 100644
+--- a/fs/xfs/xfs_aops.c
++++ b/fs/xfs/xfs_aops.c
+@@ -471,10 +471,14 @@ xfs_vm_writepages(
+ 	struct address_space	*mapping,
+ 	struct writeback_control *wbc)
+ {
+-	struct xfs_writepage_ctx wpc = { };
++	struct xfs_writepage_ctx wpc = {
++		.ctx = {
++			.wbc	= wbc,
++		},
++	};
+ 
+ 	xfs_iflags_clear(XFS_I(mapping->host), XFS_ITRUNCATED);
+-	return iomap_writepages(mapping, wbc, &wpc.ctx, &xfs_writeback_ops);
++	return iomap_writepages(mapping, &wpc.ctx, &xfs_writeback_ops);
+ }
+ 
+ STATIC int
+diff --git a/fs/zonefs/file.c b/fs/zonefs/file.c
+index 35166c92420c..51b03689b976 100644
+--- a/fs/zonefs/file.c
++++ b/fs/zonefs/file.c
+@@ -152,9 +152,11 @@ static const struct iomap_writeback_ops zonefs_writeback_ops = {
+ static int zonefs_writepages(struct address_space *mapping,
+ 			     struct writeback_control *wbc)
+ {
+-	struct iomap_writepage_ctx wpc = { };
++	struct iomap_writepage_ctx wpc = {
++		.wbc	= wbc,
++	};
+ 
+-	return iomap_writepages(mapping, wbc, &wpc, &zonefs_writeback_ops);
++	return iomap_writepages(mapping, &wpc, &zonefs_writeback_ops);
+ }
+ 
+ static int zonefs_swap_activate(struct swap_info_struct *sis,
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index 4ad12a3c8bae..2435ad63d1ad 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -341,6 +341,7 @@ struct iomap_writeback_ops {
+ struct iomap_writepage_ctx {
+ 	struct iomap		iomap;
+ 	struct iomap_ioend	*ioend;
++	struct writeback_control *wbc;
+ 	const struct iomap_writeback_ops *ops;
+ 	u32			nr_folios;	/* folios added to the ioend */
+ };
+@@ -350,7 +351,7 @@ void iomap_ioend_try_merge(struct iomap_ioend *ioend,
+ 		struct list_head *more_ioends);
+ void iomap_sort_ioends(struct list_head *ioend_list);
+ int iomap_writepages(struct address_space *mapping,
+-		struct writeback_control *wbc, struct iomap_writepage_ctx *wpc,
++		struct iomap_writepage_ctx *wpc,
+ 		const struct iomap_writeback_ops *ops);
+ 
+ /*
+-- 
+2.47.0
 
 
-
-On October 18, 2024 1:56:38 AM EDT, Christoph Hellwig <hch@infradead=2Eorg=
-> wrote:
->On Fri, Oct 18, 2024 at 01:44:19AM -0400, Adrian Vovk wrote:
->> > So just run a target on each partition=2E
->>=20
->>=20
->> That has different semantics=2E If I encrypt each virtual partition the=
-re's
->> nothing encrypting the metadata around the virtual partitions=2E Of cou=
-rse,
->> this is a rather contrived example but point stands, the semantics are
->> different=2E
->
->Then you set up an dm-crype device mapper table for the partition table a=
-s
->well=2E
-
-Sure, but then this way you're encrypting each partition twice=2E Once by =
-the dm-crypt inside of the partition, and again by the dm-crypt that's unde=
-r the partition table=2E This double encryption is ruinous for performance,=
- so it's just not a feasible solution and thus people don't do this=2E Woul=
-d be nice if we had the flexibility though=2E
-
-Plus, I'm not sure that such a double encryption approach is even feasible=
- with blk-crypto=2E Is the blk-crypto engine capable of receiving two keys =
-and encrypting twice with them?
-
->
->> > This is the prime example of why allowing higher layers to skip
->> > encryption is a no-go=2E
->> >
->>=20
->> In what way does that break the file system's security model? Could you
->> elaborate on what's objectionable about the behavior here?
->
->Because you are now bypassing encryption for certainl LBA ranges in
->the file system based on hints/flags for something sitting way above
->in the stack=2E
->
-
-Well the data is still encrypted=2E It's just encrypted with a different k=
-ey=2E If the attacker has a FDE dump of the disk, the data is still just as=
- inaccessible to them=2E
-
-In fact, allowing for this will let us tighten up security instead of punc=
-hing holes=2E It would let us put encrypted home directories on top of full=
--disk encryption=2E So if an attacker has a disk image and the FDE key, the=
-y still wouldn't be able to decrypt the user's home directory because they'=
-d need more keys=2E We also want to put fscrypt on top of the encrypted hom=
-e directories to encrypt each app data directory, so if you have a banking =
-app the attacker wouldn't be able to get that app's data even if they manag=
-e to get your home directory key=2E Right now, doing something like this re=
-quires stacking encryption and is thus unfeasible and we can't do it, so we=
-'re stuck with one layer of full disk encryption and no isolation between u=
-sers and apps=2E
-
-Thanks,
-Adrian
+-- 
+Goldwyn
