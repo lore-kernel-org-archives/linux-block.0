@@ -1,177 +1,216 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154E618CBEA;
-	Fri, 18 Oct 2024 07:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E4917839C
+	for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 08:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729238074; cv=none; b=FT17VNoi+G87fmOY3AgdXttz4Q2FVe30O1lENsVyfSCcE8bWHB+hzkos3cMyh17IrwO3pcL3bZmNUVDRzoUq24FskkxElc3AOZUe363yImttTQKfN1Lae6ICtkuNgVWYnPPditdD4gPpH6yTBst2vRpcY8OrY6q6NXI/gNb4hIo=
+	t=1729241423; cv=none; b=krZvGmFhFcKojM67RQEjVJtIgsV4PSr95Xn0AcQf5SJOBH0bbopsnKe4nk/wJASim0rQ13IwOfIJEf17GbDLMJkYPaGGt/dRpkJ+pxgDmqpZ1aKWwVgjxsGTWrPl/GoH/fdE0bHZ+34HHbuP3j43sSvZZhc5195z00VYX99CJX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729238074; c=relaxed/simple;
-	bh=hFiA3yVMRXmu3FFPYS/22OGs0zS/sa/t+OHctXnHRxw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MFurnjQNcbIVrM9a0Kwy97gj8kh3mROyspsYoYb33K0o+eqBHOPEDZiVKpvYFsrf36J+QrchNwAyX9XesIjNVjicz6pqQDgk0kAvRIQlT/o7QDn1H2KQ34itX8bxKmvIDirUNhDPcSwRLdrXIPzwBSI5Ct7zBmb8IRILuUZMgow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nbz983L2; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1729241423; c=relaxed/simple;
+	bh=dXAGNRNvKCH5gnbwI7IXcGCoTQyL7L1FPojjzghzptw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=WcGM7W3SXytOMwZJaYWzRUotddpyLiJ4mTUwfnYtf9j5uHdIMsqpHpNUTBuE5nMkQ5ggjx/vOWvGZhFhdA7/3EjQc2kx04KEpPUZduSvTioH4KT6ocHIRiFAVxrPfVVsF5ioZnIDvV+6fA1mBMyMew2wmUxt0ZTFt9PRS0d7rMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=QiowE7/n; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nbz983L2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729238073; x=1760774073;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hFiA3yVMRXmu3FFPYS/22OGs0zS/sa/t+OHctXnHRxw=;
-  b=Nbz983L2AGPkpFPZbPp9hF4U3ZGe2i/IcU3bk+tA7Dh/n2sT2n7k0985
-   WQl+eQj/WWrWK9kVA6Zo8B/KO3yyZXMr+Q2/Lc4OQxwDFFle1ddbB19DU
-   3OD15nbp/jk817fmuSx698jn3vIIezpod9v+aeQYzZiMJZg34wrhy1QdP
-   XimWEV1dp6QyyPM4j2dK94nbyK9MVomqC+YkleIdpnP3P6MfJMutNRY8t
-   IEF+5hjEErCt/yCOYPW9eH4/rx5TK+5maDTu3P8C02SMKMWjGyAWPLy5m
-   9TnXVkvUs70npPsizQ5uSxWQFpq3fPk2bu7eVj1oDZBrEvZ1E5W4v/2ZR
-   Q==;
-X-CSE-ConnectionGUID: dUPcKe/9QC2rdK007xLv7g==
-X-CSE-MsgGUID: z5cLq1ubTSC1XaeMtNUIug==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28549567"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="28549567"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 00:54:33 -0700
-X-CSE-ConnectionGUID: lmYFe0tdSnawla+UrnCTMg==
-X-CSE-MsgGUID: Q7JGkfbBQNCA8IW3wANpIQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
-   d="scan'208";a="79604068"
-Received: from klitkey1-mobl1.ger.corp.intel.com (HELO tkristo-desk.intel.com) ([10.245.246.169])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 00:54:25 -0700
-From: Tero Kristo <tero.kristo@linux.intel.com>
-To: axboe@kernel.dk
-Cc: hch@lst.de,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCHv2 1/2] block/genhd: add sysfs knobs for the CPU latency PM QoS settings
-Date: Fri, 18 Oct 2024 10:30:37 +0300
-Message-ID: <20241018075416.436916-2-tero.kristo@linux.intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241018075416.436916-1-tero.kristo@linux.intel.com>
-References: <20241018075416.436916-1-tero.kristo@linux.intel.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="QiowE7/n"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20241018085013epoutp034ba99da5045caf968220a2e2741ba37f~-f_dJLfVJ0635206352epoutp03c
+	for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 08:50:13 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20241018085013epoutp034ba99da5045caf968220a2e2741ba37f~-f_dJLfVJ0635206352epoutp03c
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1729241413;
+	bh=ncVCmNC5q9sLwvQGITeEvX2kPlF4Nabnk4kf+n1iovs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QiowE7/ndjk/lmriSZhyzCKXAstwezuQZSUZsrse5RTEq5GhrJEiZxJ/AqPvjkInh
+	 QHFq38oQZ+Qw/IXwbSULv70OIGxvJLU1Bg+XB3nPmCWjybXOPCGXjmUmSgCL8Kso4/
+	 J9BpVi2sGvUAO91HvSOlhX2oAOg1OdIhcVgLqO2I=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20241018085012epcas5p2b93800cfdb671b6362bc3d6ab1791ab4~-f_cpBkVQ2265822658epcas5p2X;
+	Fri, 18 Oct 2024 08:50:12 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.178]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4XVJLV6lLwz4x9QG; Fri, 18 Oct
+	2024 08:50:10 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	A6.DA.08574.D3122176; Fri, 18 Oct 2024 17:50:05 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20241018083430epcas5p138473638c4aea07ac9320900406c8d52~-fwvEfi5F1491014910epcas5p1u;
+	Fri, 18 Oct 2024 08:34:30 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20241018083430epsmtrp12783beedb848e16be51a982002df02be~-fwvA2Blx2774327743epsmtrp1w;
+	Fri, 18 Oct 2024 08:34:30 +0000 (GMT)
+X-AuditID: b6c32a44-93ffa7000000217e-f2-6712213dd6a9
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	40.82.07371.69D12176; Fri, 18 Oct 2024 17:34:30 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20241018083428epsmtip20018145a4091d5b02fc61d03210c7b85~-fwtNvBXG0587105871epsmtip2k;
+	Fri, 18 Oct 2024 08:34:28 +0000 (GMT)
+Date: Fri, 18 Oct 2024 13:56:48 +0530
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, kbusch@kernel.org, martin.petersen@oracle.com,
+	asml.silence@gmail.com, anuj1072538@gmail.com, krisman@suse.de,
+	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	linux-scsi@vger.kernel.org, vishak.g@samsung.com
+Subject: Re: [PATCH v4 11/11] scsi: add support for user-meta interface
+Message-ID: <20241018082648.GA32006@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241017143918.GC21905@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xbdRTH87u39LFYvRQYZ11UvA7Yg1dZ6S6Mx+Zwq8ElRBMXMYZd6E2L
+	QFv78DGnK7pCHAyESeIqo0zZkC5jC1SkECgwEIbARghDGDBCAB3LnGB4yLDa9jKz/z7n/L7n
+	/M7j9+PjoptcMT9LbWB0ajqH5G7hNN7YFRqe8JJIGTU8H00tLj/mUBW2RkRdmSzhUmPtDoyq
+	vdKNUX+YBzlUWecdRP3UfwmnWsf3UNbLczyqcLSJS9X0uDDqlqWCd0Aod1gmefLhAaO83vYl
+	V95QfUreMmbiyhfnxjnyYrsNyRt++UT+V/0LqYK07HgVQysYXRCjztQostTKBDLlzfRD6TGy
+	KEm4JJbaRwap6VwmgUx+PTX8cFaOu2gy6AM6x+h2pdJ6PRmZGK/TGA1MkEqjNySQjFaRo5Vq
+	I/R0rt6oVkaoGUOcJCoqOsYtPJ6tspcVYdoV8UdDD8t5JmTdegYJ+EBIwXa6iOdhEdGCYOT7
+	4DNoi5uXEBR2tSLWWEHQ0VHmVvG9ETN1h1h/KwJH9xjOGvMIHi1MYJ5UHCIYfqhrRh7mEqHQ
+	9ZvZy/4ECXMLA96sOFGLQeuIBfcc+BFH4Ju2e16RkAgHh72Xw7Iv3Dw/62UBEQYdE/U+Hg4g
+	Xob2xh7MkwiIXj6ce9jGYRtKhrWpPxHLfrDQY+exLIb7JfmbrIS14TmMZS188XPbpj4JzH0l
+	3oJwQgXn+mY2Nc9DeV8dxvqfhbOPZzf9QmiqfMIkFNRWbDJA66AJY8clh/GRk+yE8jCY6xjk
+	foVetDzVm+Wp61gOg6qWJa7FHY4T26HGxWdxF1xrjqxCPja0jdHqc5VMZoxWomY+/H/hmZrc
+	euR907uTm9CvVldEJ8L4qBMBHyf9hRmnfJUioYL++ASj06TrjDmMvhPFuJdViosDMjXuT6E2
+	pEuksVFSmUwmjd0rk5CBwgfmCwoRoaQNTDbDaBndkziMLxCbMMtB53rpwLvk/pXi4SS/jaP8
+	R5ff8FUFmsz5sB596/M980UJKV1DLok00DJ0oHm25GSIoL+4JKM6YweZNnwhYnX1HnVwZrTM
+	Nap5zb8urtkKwcdqhkLT9ieVChLDbwhfOdvoHIyti8/rne32iSvsr7r+XEpzaPXVjel9y1//
+	Pr36/k7V2wVSY/fiM41c51rL5N6MxLTIqenK0VfPLxSETF7PbuH4VdF3Y5aPvzMufBBmzL/Y
+	cMmuwLXOHxeUpb1XJ6XffbvzX7j/t/liBnkt79jWbRvVlUenAj4tdxKHezT/TOTetq6HOe5y
+	rOj07HboYALbRbKl90JcXSea3lq/feczguToVbRkN67T0/8B6liBHlwEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupmkeLIzCtJLcpLzFFi42LZdlhJXnearFC6wdK9ghYfv/5msZizahuj
+	xeq7/WwWNw/sZLJYufook8W71nMsFpMOXWO02H5mKbPF3lvaFvOXPWW36L6+g81i+fF/TBbn
+	Z81hd+D12DnrLrvH5bOlHptWdbJ5bF5S77H7ZgObx8ent1g8+rasYvTYfLra4/MmuQDOKC6b
+	lNSczLLUIn27BK6M83M+MRZsk6hoW3CQsYHxh3AXIweHhICJxKN1zl2MnBxCArsZJXYcyQax
+	JQQkJE69XMYIYQtLrPz3nL2LkQuo5gmjxLU1p1lBEiwCqhIr1u0CK2ITUJc48rwVzBYRUJJ4
+	+uosI0gDs8BKJom9V2cxgySEBdwlZuy7D1bEK6ArsXPLCRaIqc1MEke+3IVKCEqcnPmEBcRm
+	FtCSuPHvJRPIpcwC0hLL/3GAhDkFdCQO3tkEdoSogLLEgW3HmSYwCs5C0j0LSfcshO4FjMyr
+	GCVTC4pz03OTDQsM81LL9YoTc4tL89L1kvNzNzGC40tLYwfjvfn/9A4xMnEwHmKU4GBWEuFN
+	qhdMF+JNSaysSi3Kjy8qzUktPsQozcGiJM5rOGN2ipBAemJJanZqakFqEUyWiYNTqoEp85zV
+	Ub4JR+/+/3hVPpr/sIJ57EPDP+XrP5lON45XMssRFxEKzzaVep/P/P2HvJF/N7Nb4NLHbvtF
+	Nq2QX5W1/KwMh86f70w8ekcrXwqud5VsFk1kFnl6835A/gbh5TcFdPqVnWN+6fbeYNL7+fCt
+	oubkprWTGdd3lxU+lytJ5BOZeyP/n7SUSTvbnSmf7Lt/TGb61KF/SeDeGYm35YXVXOwLVDT/
+	rmaQvf7ltfNzq1ju6dN/Tp43e7mDhXaHcfiRN7EBDKVzbr/xjDh/xLs+6Fy0xEobqRV3rvOv
+	fve/4a6zzwZNh9t+dbLL97C0GZ61Xp+ska+3Qvf+ma1rnl4S2GYX+Or58c/S+1fkTbFXYinO
+	SDTUYi4qTgQAECi23R4DAAA=
+X-CMS-MailID: 20241018083430epcas5p138473638c4aea07ac9320900406c8d52
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_54f87_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20241016113757epcas5p42b95123c857e5d92d9cdec55e190ce4e
+References: <20241016112912.63542-1-anuj20.g@samsung.com>
+	<CGME20241016113757epcas5p42b95123c857e5d92d9cdec55e190ce4e@epcas5p4.samsung.com>
+	<20241016112912.63542-12-anuj20.g@samsung.com>
+	<20241017113923.GC1885@green245> <20241017143918.GC21905@lst.de>
 
-Add sysfs knobs for the following parameters:
+------w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_54f87_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 
-  cpu_lat_limit_us: for limiting the CPU latency to given value when block IO
-		    is running
-  cpu_lat_timeout_ms: for clearing up the CPU latency limit after block IO
-		      is complete
+On Thu, Oct 17, 2024 at 04:39:18PM +0200, Christoph Hellwig wrote:
+> On Thu, Oct 17, 2024 at 05:09:23PM +0530, Anuj Gupta wrote:
+> > This snippet prevents a scenario where a apptag check is specified without
+> > a reftag check and vice-versa, which is not possible for scsi[1].
+> > But for
+> > block layer generated integrity apptag check (BIP_CHECK_APPTAG) is not
+> > specified. When scsi drive is formatted with type1/2 PI, block layer would
+> > specify refcheck but not appcheck. Hence, these I/O's would fail. Do you
+> > see how we can handle this?
+> 
+> Well, this is also related to difference in capability checking.
 
-This can be used to prevent the CPU from entering deep idle states when
-block IO is running and waiting for an interrupt, potentially causing
-large latencies to the operation.
+Right.
 
-Signed-off-by: Tero Kristo <tero.kristo@linux.intel.com>
----
- block/genhd.c          | 47 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/blkdev.h |  3 +++
- 2 files changed, 50 insertions(+)
+> Just curious, do you have any user of the more fine grained checking
+> in NVMe?  If not we could support the SCSI semantics only and emulate
+> them using the fine grained NVMe semantics and have no portability
+> problems.
+ 
+We can choose to support scsi semantics only and expose only the valid
+scsi combinations to userspace i.e.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 1c05dd4c6980..e60af2639136 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1046,6 +1046,48 @@ static ssize_t partscan_show(struct device *dev,
- 	return sprintf(buf, "%u\n", disk_has_partscan(dev_to_disk(dev)));
+1. no check
+2. guard check only
+3. ref + app check only
+4. guard + ref + app check
+
+Something like this [*] on top of this series, untested though. Does
+this align with what you have in mind?
+
+[*]
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 24fad9b6f3ec..2ca27910770b 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -308,12 +308,10 @@ static void bio_uio_meta_to_bip(struct bio *bio, struct uio_meta *meta)
+ {
+ 	struct bio_integrity_payload *bip = bio_integrity(bio);
+ 
+-	if (meta->flags & BLK_INTEGRITY_CHK_GUARD)
++	if (meta->flags & IO_INTEGRITY_CHK_GUARD)
+ 		bip->bip_flags |= BIP_CHECK_GUARD;
+-	if (meta->flags & BLK_INTEGRITY_CHK_APPTAG)
+-		bip->bip_flags |= BIP_CHECK_APPTAG;
+-	if (meta->flags & BLK_INTEGRITY_CHK_REFTAG)
+-		bip->bip_flags |= BIP_CHECK_REFTAG;
++	if (meta->flags & IO_INTEGRITY_CHK_REF_APP)
++		bip->bip_flags |= BIP_CHECK_REFTAG | BIP_CHECK_APPTAG;
+ 
+ 	bip->app_tag = meta->app_tag;
  }
+@@ -329,9 +327,9 @@ int bio_integrity_map_iter(struct bio *bio, struct uio_meta *meta)
+ 		return -EINVAL;
  
-+static ssize_t cpu_lat_limit_us_show(struct device *dev,
-+				     struct device_attribute *attr, char *buf)
-+{
-+	struct gendisk *disk = dev_to_disk(dev);
-+
-+	return sprintf(buf, "%d\n", disk->cpu_lat_limit);
-+}
-+
-+static ssize_t cpu_lat_limit_us_store(struct device *dev,
-+				      struct device_attribute *attr,
-+				      const char *buf, size_t count)
-+{
-+	struct gendisk *disk = dev_to_disk(dev);
-+	int i;
-+
-+	if (count > 0 && !kstrtoint(buf, 10, &i))
-+		disk->cpu_lat_limit = i;
-+
-+	return count;
-+}
-+
-+static ssize_t cpu_lat_timeout_ms_show(struct device *dev,
-+				       struct device_attribute *attr, char *buf)
-+{
-+	struct gendisk *disk = dev_to_disk(dev);
-+
-+	return sprintf(buf, "%d\n", disk->cpu_lat_timeout);
-+}
-+
-+static ssize_t cpu_lat_timeout_ms_store(struct device *dev,
-+					struct device_attribute *attr,
-+					const char *buf, size_t count)
-+{
-+	struct gendisk *disk = dev_to_disk(dev);
-+	int i;
-+
-+	if (count > 0 && !kstrtoint(buf, 10, &i))
-+		disk->cpu_lat_timeout = i;
-+
-+	return count;
-+}
-+
- static DEVICE_ATTR(range, 0444, disk_range_show, NULL);
- static DEVICE_ATTR(ext_range, 0444, disk_ext_range_show, NULL);
- static DEVICE_ATTR(removable, 0444, disk_removable_show, NULL);
-@@ -1060,6 +1102,8 @@ static DEVICE_ATTR(inflight, 0444, part_inflight_show, NULL);
- static DEVICE_ATTR(badblocks, 0644, disk_badblocks_show, disk_badblocks_store);
- static DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
- static DEVICE_ATTR(partscan, 0444, partscan_show, NULL);
-+static DEVICE_ATTR_RW(cpu_lat_limit_us);
-+static DEVICE_ATTR_RW(cpu_lat_timeout_ms);
+ 	/* should fit into two bytes */
+-	BUILD_BUG_ON(BLK_INTEGRITY_VALID_FLAGS >= (1 << 16));
++	BUILD_BUG_ON(IO_INTEGRITY_VALID_FLAGS >= (1 << 16));
  
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- ssize_t part_fail_show(struct device *dev,
-@@ -1111,6 +1155,8 @@ static struct attribute *disk_attrs[] = {
- 	&dev_attr_events_poll_msecs.attr,
- 	&dev_attr_diskseq.attr,
- 	&dev_attr_partscan.attr,
-+	&dev_attr_cpu_lat_limit_us.attr,
-+	&dev_attr_cpu_lat_timeout_ms.attr,
- #ifdef CONFIG_FAIL_MAKE_REQUEST
- 	&dev_attr_fail.attr,
- #endif
-@@ -1377,6 +1423,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
- #ifdef CONFIG_BLOCK_HOLDER_DEPRECATED
- 	INIT_LIST_HEAD(&disk->slave_bdevs);
- #endif
-+	disk->cpu_lat_limit = -1;
- 	return disk;
+-	if (meta->flags && (meta->flags & ~BLK_INTEGRITY_VALID_FLAGS))
++	if (meta->flags && (meta->flags & ~IO_INTEGRITY_VALID_FLAGS))
+ 		return -EINVAL;
  
- out_erase_part0:
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 50c3b959da28..8bf76da2efac 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -213,6 +213,9 @@ struct gendisk {
- 	u64 diskseq;
- 	blk_mode_t open_mode;
- 
-+	int cpu_lat_limit;
-+	int cpu_lat_timeout;
-+
  	/*
- 	 * Independent sector access ranges. This is always NULL for
- 	 * devices that do not have multiple independent access ranges.
--- 
-2.43.1
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index 753971770733..714700f9826e 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -40,6 +40,15 @@
+ #define BLOCK_SIZE_BITS 10
+ #define BLOCK_SIZE (1<<BLOCK_SIZE_BITS)
+ 
++/*
++ * flags for integrity meta
++ */
++#define IO_INTEGRITY_CHK_GUARD		(1U << 0) /* enforce guard check */
++#define IO_INTEGRITY_CHK_REF_APP	(1U << 1) /* enforce ref and app check */
++
++#define IO_INTEGRITY_VALID_FLAGS (IO_INTEGRITY_CHK_GUARD | \
++				  IO_INTEGRITY_CHK_REF_APP)
++
+ #define SEEK_SET	0	/* seek relative to beginning of file */
+ #define SEEK_CUR	1	/* seek relative to current file position */
+ #define SEEK_END	2	/* seek relative to end of file */
 
+
+------w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_54f87_
+Content-Type: text/plain; charset="utf-8"
+
+
+------w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_54f87_--
