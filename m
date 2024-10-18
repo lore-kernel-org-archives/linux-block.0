@@ -1,241 +1,127 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726213207
-	for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 14:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0471F1F428B
+	for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 14:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729260533; cv=none; b=KXQ1tn6TCoAmFdxZHijWw7IRNIkzrYzrijj/xUbxUL9rMKUOO2T5nH/JJCfJXVmI+qQXU1MduIciwidpH+XxDp56odhNaAii3q557gHM/U81a/JsG17uXnqAP6nWBT0LCyhf1KrMpNh7jjOUSKl34JQTsDqaEEjsMGqGNwuCIWM=
+	t=1729261282; cv=none; b=n6i4Zw+1ErbMUZCO+b03bmHSvbwhnxGXboYCpvwr1Gy1uByEQJwRT0yAn/egV2YBalzxrLRf/7Tjzu64m4rN/oBcLfO/Eo5iZTtnIYGooM9soxj0WUHgE8h+6u2bckkv/XNjO+yFKABZvm2UioZDt0zJj787cYK1NMfU3J3Drqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729260533; c=relaxed/simple;
-	bh=fSeg5Xp4DDTE8QjemzrLpZGEltGLWVl9ljjDI68WXaM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rZ2FPzOypMlrf85cg14xYIvJES/ofsOl+u1GZ/7pUACjalhwh72ISUluCMn66VATulEB6BZ6Z/Z2lb82S0zn/lwzAasgGiWz7w3epfK3knmE21iQQUrPlobE43aGU9uHksD/gC/0xyf4vdNi3SwxEHwqpDFVa42+60udZEzGtIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DJSBjJlX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729261282; c=relaxed/simple;
+	bh=xHybtiKyTxNA1jI8buXYvXG734IlXSdiFFZRHOOaxdM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ruooiSH9uhbDmS2/YY0vyuumnsizS7iiVCyxQapJKjXRNxUI/0NcuDBMJ/ZBkY1NrTNXsGswJFm+aSWQQw4BJrnD4kS1mT+tHyBE8IIYtlyoLX829fnIT7XN1kpPTaX2CQl3CJAWWhViUTk4UvGp28MCT0wJ3XDq0vfjoaalVQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gf+2gEda; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DJSBjJlX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729260530;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=pz7ZHQxjjchXDpKx/w9P5M+hghfxRJUm9JLpFUVefj0=;
-	b=DJSBjJlXOV/Hyi+nqu3Jl3ybvDiVb7zw/t05kwsoWFWt+gUWL+n7m7Xq1nLpukXwGv6w4C
-	i6FaxQtF6iYIJf2lvfTaibR0DBGf5pba7ZscuiJ+wDj9Ui0/Jm5agW70MjNWovsq0pmC++
-	m2vi7yDXUCSr0GZi9dij/puq+l3/Kas=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-593-aj6ZjEzaP5uaopjSCuVsKw-1; Fri,
- 18 Oct 2024 10:08:45 -0400
-X-MC-Unique: aj6ZjEzaP5uaopjSCuVsKw-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B12451933171;
-	Fri, 18 Oct 2024 14:08:40 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.23])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 58B0219560AD;
-	Fri, 18 Oct 2024 14:08:37 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: josef@toxicpanda.com,
-	nbd@other.debian.org,
-	eblake@redhat.com,
-	Ming Lei <ming.lei@redhat.com>,
-	vincent.chen@sifive.com,
-	Leon Schuermann <leon@is.currently.online>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Kevin Wolf <kwolf@redhat.com>
-Subject: [PATCH V2] nbd: fix partial sending
-Date: Fri, 18 Oct 2024 22:08:31 +0800
-Message-ID: <20241018140831.3064135-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gf+2gEda"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-208cf673b8dso22398355ad.3
+        for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 07:21:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729261279; x=1729866079; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yxkU0SurZ3ytvyybPNhQLE8bgWu3q/xADixl58fl7SE=;
+        b=gf+2gEdauu4iblVqH0Q8ixqqzmkR672MxZGaEGuTwcUofb3qD9OVe+U1LH3DZwNaO0
+         UWvOQy7hB5rFSqc0EPKKSN7pcjHfKFuZa8U/3W30/f5wXyagc335BEcfwFf/9erOTTch
+         iwX0sNKBTkKdc0I0GBvvZ5QSpKhZg1gGZlMth1KWytRbNeqWd/CiztxeORbF5ldViAWY
+         TNkzfpizE+5b1eDVHhpusX79DPKwugtZ3EUJGwOUjpCTxCcR6FADs6dNDZC//T8p3kxf
+         TawCxxvASl1gP/v9cBQJ32yNL0KuxNEcJ/IMPaNBLVVmETArdLZ5islYnuesfT85GO3v
+         +ytw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729261279; x=1729866079;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yxkU0SurZ3ytvyybPNhQLE8bgWu3q/xADixl58fl7SE=;
+        b=emABPPfzcmxUz6utnAttPds32K690gZjJb4iJAvJGnj5EWQb/loAECCnc3IovWaqmw
+         Izm1RH2nU3UiKehat/HjT2sz98q9i1FIp+5i/QI2Gv8xNta4zJfYonKAwOjeLiqJOTTf
+         raUXJbyKOyQgic9et41D6fbLgoxN+wuK8eG6dHGk03HfcuFbidHxAdb2ek3UV10AdW6Q
+         VBAT6lrLjvrCiIfNzBqTAsJ57MV5Befqyniz4XUTmReyIEaA+NPKMrSW4OxpnRLJnEpN
+         6dIJYCAK1tboVADQXyTHSb5a0WMpO+7FKG9Buy1J05ySnIjmrzSo3VqftaYkPd9E2xwq
+         NRZg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0XQNvOkT7alN+c6mhA6T/oRTM9RAM/TSEtwfb5HaylRan3YpZlD7yL5CJ1FZshoOik9y1NFqpUnp9fg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxixWACYfCjEL4Q4+yY8MC2t0RGklk7/WiN4sk21RmBjT3c4GAn
+	jD+xDQWMv1vtX5E8nyta4RAJD9HmCl6WTRRJgeV0lJjIZBFaZusphfKKUqTkD5vkx/xGMD8aZDm
+	S
+X-Google-Smtp-Source: AGHT+IGZk6UCrT0VIMAN6pIiPBhEinc4i35+NJcdRK7GjNJnOyc6aLd4dZkz49tcq67yLWma6DwkOw==
+X-Received: by 2002:a17:903:234b:b0:20c:fa0b:5297 with SMTP id d9443c01a7336-20e5a78e147mr33139555ad.26.1729261279129;
+        Fri, 18 Oct 2024 07:21:19 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20e5a8f9f34sm13138225ad.235.2024.10.18.07.21.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Oct 2024 07:21:18 -0700 (PDT)
+Message-ID: <cb9d65fe-47b9-4539-a8d0-9863e8ebf49f@kernel.dk>
+Date: Fri, 18 Oct 2024 08:21:17 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 2/2] blk-mq: add support for CPU latency limits
+To: Tero Kristo <tero.kristo@linux.intel.com>
+Cc: hch@lst.de, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241018075416.436916-1-tero.kristo@linux.intel.com>
+ <20241018075416.436916-3-tero.kristo@linux.intel.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241018075416.436916-3-tero.kristo@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-nbd driver sends request header and payload with multiple call of
-sock_sendmsg, and partial sending can't be avoided. However, nbd driver
-returns BLK_STS_RESOURCE to block core in this situation. This way causes
-one issue: request->tag may change in the next run of nbd_queue_rq(), but
-the original old tag has been sent as part of header cookie, this way
-confuses nbd driver reply handling, since the real request can't be
-retrieved any more with the obsolete old tag.
+On 10/18/24 1:30 AM, Tero Kristo wrote:
+> @@ -2700,11 +2701,62 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug)
+>  static void __blk_mq_flush_plug_list(struct request_queue *q,
+>  				     struct blk_plug *plug)
+>  {
+> +	struct request *req, *next;
+> +	struct blk_mq_hw_ctx *hctx;
+> +	int cpu;
+> +
+>  	if (blk_queue_quiesced(q))
+>  		return;
+> +
+> +	rq_list_for_each_safe(&plug->mq_list, req, next) {
+> +		hctx = req->mq_hctx;
+> +
+> +		if (next && next->mq_hctx == hctx)
+> +			continue;
+> +
+> +		if (q->disk->cpu_lat_limit < 0)
+> +			continue;
+> +
+> +		hctx->last_active = jiffies + msecs_to_jiffies(q->disk->cpu_lat_timeout);
+> +
+> +		if (!hctx->cpu_lat_limit_active) {
+> +			hctx->cpu_lat_limit_active = true;
+> +			for_each_cpu(cpu, hctx->cpumask) {
+> +				struct dev_pm_qos_request *qos;
+> +
+> +				qos = per_cpu_ptr(hctx->cpu_lat_qos, cpu);
+> +				dev_pm_qos_add_request(get_cpu_device(cpu), qos,
+> +						       DEV_PM_QOS_RESUME_LATENCY,
+> +						       q->disk->cpu_lat_limit);
+> +			}
+> +			schedule_delayed_work(&hctx->cpu_latency_work,
+> +					      msecs_to_jiffies(q->disk->cpu_lat_timeout));
+> +		}
+> +	}
+> +
 
-Fix it by retrying sending directly in per-socket work function,
-meantime return BLK_STS_OK to block layer core.
+This is, quite literally, and insane amount of cycles to add to the hot
+issue path. You're iterating each request in the list, and then each CPU
+in the mask of the hardware context for each request.
 
-Cc: vincent.chen@sifive.com
-Cc: Leon Schuermann <leon@is.currently.online>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- move pending retry to socket work function and return BLK_STS_OK, so that
-	userspace can get chance to handle the signal(Kevin)
+This just won't fly, not at all. Like the previous feedback, please
+figure out a way to make this cheaper. This means don't iterate a bunch
+of stuff.
 
- drivers/block/nbd.c | 89 +++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 77 insertions(+), 12 deletions(-)
+Outside of that, lots of styling issues here too, but none of that
+really matters until the base mechanism is at least half way sane.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index b852050d8a96..855f4a79e37c 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -62,6 +62,7 @@ struct nbd_sock {
- 	bool dead;
- 	int fallback_index;
- 	int cookie;
-+	struct work_struct work;
- };
- 
- struct recv_thread_args {
-@@ -141,6 +142,9 @@ struct nbd_device {
-  */
- #define NBD_CMD_INFLIGHT	2
- 
-+/* Just part of request header or data payload is sent successfully */
-+#define NBD_CMD_PARTIAL_SEND	3
-+
- struct nbd_cmd {
- 	struct nbd_device *nbd;
- 	struct mutex lock;
-@@ -466,6 +470,12 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req)
- 	if (!mutex_trylock(&cmd->lock))
- 		return BLK_EH_RESET_TIMER;
- 
-+	/* partial send is handled in nbd_sock's work function */
-+	if (test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags)) {
-+		mutex_unlock(&cmd->lock);
-+		return BLK_EH_RESET_TIMER;
-+	}
-+
- 	if (!test_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
- 		mutex_unlock(&cmd->lock);
- 		return BLK_EH_DONE;
-@@ -614,6 +624,27 @@ static inline int was_interrupted(int result)
- 	return result == -ERESTARTSYS || result == -EINTR;
- }
- 
-+/*
-+ * We've already sent header or part of data payload, have no choice but
-+ * to set pending and schedule it in work.
-+ *
-+ * And we have to return BLK_STS_OK to block core, otherwise this same
-+ * request may be re-dispatched with different tag, but our header has
-+ * been sent out with old tag, and this way does confuse reply handling.
-+ */
-+static void nbd_run_pending_work(struct nbd_device *nbd,
-+				 struct nbd_sock *nsock,
-+				 struct nbd_cmd *cmd, int sent)
-+{
-+	struct request *req = blk_mq_rq_from_pdu(cmd);
-+
-+	nsock->pending = req;
-+	nsock->sent = sent;
-+	set_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
-+	refcount_inc(&nbd->config_refs);
-+	schedule_work(&nsock->work);
-+}
-+
- /*
-  * Returns BLK_STS_RESOURCE if the caller should retry after a delay.
-  * Returns BLK_STS_IOERR if sending failed.
-@@ -699,11 +730,12 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
- 			 * completely done.
- 			 */
- 			if (sent) {
--				nsock->pending = req;
--				nsock->sent = sent;
-+				nbd_run_pending_work(nbd, nsock, cmd, sent);
-+				return BLK_STS_OK;
-+			} else {
-+				set_bit(NBD_CMD_REQUEUED, &cmd->flags);
-+				return BLK_STS_RESOURCE;
- 			}
--			set_bit(NBD_CMD_REQUEUED, &cmd->flags);
--			return BLK_STS_RESOURCE;
- 		}
- 		dev_err_ratelimited(disk_to_dev(nbd->disk),
- 			"Send control failed (result %d)\n", result);
-@@ -737,14 +769,8 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
- 			result = sock_xmit(nbd, index, 1, &from, flags, &sent);
- 			if (result < 0) {
- 				if (was_interrupted(result)) {
--					/* We've already sent the header, we
--					 * have no choice but to set pending and
--					 * return BUSY.
--					 */
--					nsock->pending = req;
--					nsock->sent = sent;
--					set_bit(NBD_CMD_REQUEUED, &cmd->flags);
--					return BLK_STS_RESOURCE;
-+					nbd_run_pending_work(nbd, nsock, cmd, sent);
-+					return BLK_STS_OK;
- 				}
- 				dev_err(disk_to_dev(nbd->disk),
- 					"Send data failed (result %d)\n",
-@@ -778,6 +804,44 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
- 	return BLK_STS_OK;
- }
- 
-+/* handle partial sending */
-+static void nbd_pending_cmd_work(struct work_struct *work)
-+{
-+	struct nbd_sock *nsock = container_of(work, struct nbd_sock, work);
-+	struct request *req = nsock->pending;
-+	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
-+	struct nbd_device *nbd = cmd->nbd;
-+	unsigned long deadline = READ_ONCE(req->deadline);
-+	unsigned int wait_ms = 2;
-+
-+	mutex_lock(&cmd->lock);
-+
-+	WARN_ON_ONCE(test_bit(NBD_CMD_REQUEUED, &cmd->flags));
-+	if (!test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags))
-+		goto out;
-+
-+	mutex_lock(&nsock->tx_lock);
-+	while (true) {
-+		nbd_send_cmd(nbd, cmd, cmd->index);
-+		if (!nsock->pending)
-+			break;
-+
-+		/* don't bother timeout handler for partial sending */
-+		if (READ_ONCE(jiffies) + msecs_to_jiffies(wait_ms) >= deadline) {
-+			cmd->status = BLK_STS_IOERR;
-+			blk_mq_complete_request(req);
-+			break;
-+		}
-+		msleep(wait_ms);
-+		wait_ms *= 2;
-+	}
-+	mutex_unlock(&nsock->tx_lock);
-+	clear_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
-+out:
-+	mutex_unlock(&cmd->lock);
-+	nbd_config_put(nbd);
-+}
-+
- static int nbd_read_reply(struct nbd_device *nbd, struct socket *sock,
- 			  struct nbd_reply *reply)
- {
-@@ -1224,6 +1288,7 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 	nsock->pending = NULL;
- 	nsock->sent = 0;
- 	nsock->cookie = 0;
-+	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
- 	socks[config->num_connections++] = nsock;
- 	atomic_inc(&config->live_connections);
- 	blk_mq_unfreeze_queue(nbd->disk->queue);
 -- 
-2.44.0
-
+Jens Axboe
