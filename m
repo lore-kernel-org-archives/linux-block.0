@@ -1,172 +1,108 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12B020E30C;
-	Fri, 18 Oct 2024 06:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A375218C031;
+	Fri, 18 Oct 2024 07:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729231427; cv=none; b=FkktCQdDqluAjovxEuSUR57SPKkuhPQEdIfLNt95yyfcBAZm64gFuqShPHly3vvQhQNETLjIERzK2uEDzr6PFoeasAlNxdiT0L5e276CIXogMuFX/pMnCtFFSHIcnXQ/vCDPwoBcRhC08TNtrzuMVUm54uAvwbYE6atI6wjzWcs=
+	t=1729238068; cv=none; b=DU/sLaKoLHmBT2QDBG/xxDiAP+H9luUR+t5D4KZ6Ryv5LPD1XC8pJs2MZLtWL664a9V8zOetjzGPir3qPKGmp7xPKwygvWb/kXGm+gWZsBkftZBOMqMdVXWMAsj95ImFl741cKdFck/dFaqNWtpff+rmKHdTQfn3W9WaaIF18o0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729231427; c=relaxed/simple;
-	bh=3Pc5B9k2Yu6Bz7cqzdyRm60n3qQYMjT6ZtRgRh5KS4Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Oe9V5DIlmI7z7zrHqRaZZUBl03FoZWWhKHSncG8PVmQi8sRVHCxvPwInFDp06TLIuMCIBCSbM4laDfLv6f0DfDDR7BOsDTuWgyR8SbuOfeeOIz8zb+1HbVFQSaLwvx1ISbTSsLExOB6T8abPzqbEy0LoBg+GcKVz/Djp3qLHpo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=WmG5hHju; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DZvkMGtL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=WmG5hHju; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=DZvkMGtL; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1729238068; c=relaxed/simple;
+	bh=C3amggeE6f0YWqgreyBQl44LY0xcRHzZJvlc3nAImog=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ivP698EOMTiKWE2uqNgsHFrpHNF8rAJ8ggR4zL6Go3Doelkc8CSiZQTLv0+llGmVf+qdQzLxQOrx+xrKgVo0p5CgBMmV6/2dXqroi2zb5jGYz3OCNpCNQ1fGyWxYdonwkowP2fZfYelTWQeZnWr2shtXoEacHPv0MnQyuJ/OEmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UUMpcNcF; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="WmG5hHju";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DZvkMGtL";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="WmG5hHju";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="DZvkMGtL"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 22F321FD95;
-	Fri, 18 Oct 2024 06:03:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1729231424; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qXzwlPFkcgwlpkHju4Sd2T8xIwl3ThYFl+oOkaTK9oA=;
-	b=WmG5hHju+D85BM0oQGeSxZsh/RrU4wW3evRG7YJNAhupjwDY0/3+dFkBAbS6a1Ws7hQeNb
-	mmG3Yy/iBU61bBDgnSUw+Hlpvo7MNUlObvfp6C295KuelPtU+mmGBZEaoqQJZQ7X6PO7Eq
-	1yJI+raN5ZhSyfbN7ICf/4gMbuml47c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1729231424;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qXzwlPFkcgwlpkHju4Sd2T8xIwl3ThYFl+oOkaTK9oA=;
-	b=DZvkMGtLGOWIhpFDZEUwf8Vv8GLPmIT3fZL3UnW+ZzOx+L9TCI/3IICOQbnCwK+emH8l9C
-	r5eZZWBz+FfU5VBw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=WmG5hHju;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=DZvkMGtL
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1729231424; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qXzwlPFkcgwlpkHju4Sd2T8xIwl3ThYFl+oOkaTK9oA=;
-	b=WmG5hHju+D85BM0oQGeSxZsh/RrU4wW3evRG7YJNAhupjwDY0/3+dFkBAbS6a1Ws7hQeNb
-	mmG3Yy/iBU61bBDgnSUw+Hlpvo7MNUlObvfp6C295KuelPtU+mmGBZEaoqQJZQ7X6PO7Eq
-	1yJI+raN5ZhSyfbN7ICf/4gMbuml47c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1729231424;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qXzwlPFkcgwlpkHju4Sd2T8xIwl3ThYFl+oOkaTK9oA=;
-	b=DZvkMGtLGOWIhpFDZEUwf8Vv8GLPmIT3fZL3UnW+ZzOx+L9TCI/3IICOQbnCwK+emH8l9C
-	r5eZZWBz+FfU5VBw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id ACD6413680;
-	Fri, 18 Oct 2024 06:03:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id o95aKD/6EWcIHQAAD6G6ig
-	(envelope-from <hare@suse.de>); Fri, 18 Oct 2024 06:03:43 +0000
-Message-ID: <3a4c8e27-9d45-4f73-9440-252547a3fadf@suse.de>
-Date: Fri, 18 Oct 2024 08:03:43 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UUMpcNcF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729238067; x=1760774067;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=C3amggeE6f0YWqgreyBQl44LY0xcRHzZJvlc3nAImog=;
+  b=UUMpcNcFaXxbDA2WAQsV0gaQ38+9zZVwPvO2wpwNqUYIJfAsMGi7sLcm
+   /kRmUwF+BzV7IZEwqLYN13q+68L4CaAKadgiKwcNPWpiXHP5v+h7iSWDw
+   4mLGfnJC/tyQaKh01KJteO8MDgfC3JLgLAVPKp37rB12eR8FeIZ4wxuLw
+   EMv4NxXI5WxLj4X4H6rAavA+htW0OsaIgV0nUX0F42elKYJA/dD2X2guO
+   J5UA2EhajbEglIXPUTH0eo+iCpQvqc0E4GUiZsBMyXiSL7XI7vfIJdy5m
+   Qm6vEzoEMgK1yTK/Qw0S5Cc6EFPg6Fd14Sje98hqqnuHAopPQ6AxUwfLa
+   g==;
+X-CSE-ConnectionGUID: etixMqv/RDacBSZuuzmDiQ==
+X-CSE-MsgGUID: YYKSmS+yS6qISsCZW4kyEA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28549554"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="28549554"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 00:54:26 -0700
+X-CSE-ConnectionGUID: XTQIMnySQc2MEHKg+RdnDg==
+X-CSE-MsgGUID: c5vVUu/2R6mZuBgdQ+o0cg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
+   d="scan'208";a="79604062"
+Received: from klitkey1-mobl1.ger.corp.intel.com (HELO tkristo-desk.intel.com) ([10.245.246.169])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 00:54:23 -0700
+From: Tero Kristo <tero.kristo@linux.intel.com>
+To: axboe@kernel.dk
+Cc: hch@lst.de,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCHv2 0/2] blk-mq: add CPU latency limit control
+Date: Fri, 18 Oct 2024 10:30:36 +0300
+Message-ID: <20241018075416.436916-1-tero.kristo@linux.intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv8 5/6] io_uring: enable per-io hinting capability
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, axboe@kernel.dk, hch@lst.de,
- io-uring@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, joshi.k@samsung.com,
- javier.gonz@samsung.com, Nitesh Shetty <nj.shetty@samsung.com>,
- Keith Busch <kbusch@kernel.org>
-References: <20241017160937.2283225-1-kbusch@meta.com>
- <20241017160937.2283225-6-kbusch@meta.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20241017160937.2283225-6-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 22F321FD95
-X-Spam-Score: -4.51
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,samsung.com:email,suse.de:dkim,suse.de:mid,suse.de:email];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
 
-On 10/17/24 18:09, Keith Busch wrote:
-> From: Kanchan Joshi <joshi.k@samsung.com>
-> 
-> With F_SET_RW_HINT fcntl, user can set a hint on the file inode, and
-> all the subsequent writes on the file pass that hint value down. This
-> can be limiting for block device as all the writes can be tagged with
-> only one lifetime hint value. Concurrent writes (with different hint
-> values) are hard to manage. Per-IO hinting solves that problem.
-> 
-> Allow userspace to pass additional metadata in the SQE.
-> 
-> 	__u16 write_hint;
-> 
-> This accepts all hint values that the file allows.
-> 
-> The write handlers (io_prep_rw, io_write) send the hint value to
-> lower-layer using kiocb. This is good for upporting direct IO, but not
-> when kiocb is not available (e.g., buffered IO).
-> 
-> When per-io hints are not passed, the per-inode hint values are set in
-> the kiocb (as before). Otherwise, per-io hints  take the precedence over
-> per-inode hints.
-> 
-> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->   include/uapi/linux/io_uring.h |  4 ++++
->   io_uring/rw.c                 | 11 +++++++++--
->   2 files changed, 13 insertions(+), 2 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hello,
 
-Cheers,
+Try #2 of the patches here. I sent earlier an RFC version against block/bio
+[1], and then an isolated patch for NVMe driver only [2].
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+After feedback from maintainers, I've reworked the patches again to block
+layer, this time to multiqueue support only. Once a blk-mq request is about
+to be dispatched to the driver layer, the PM QoS variables for active CPUs
+are tweaked based on configuration, and a timeout is launched as a delayed
+work that drops the PM QoS limits once the queue is idle. The mechanism is
+disabled by default, and only enabled once user activates it via the
+provided sysfs knobs.
+
+Some measurement data provided below as a reference for the
+results, measured with 'fio' on an Intel Icelake Xeon platform, with an
+extra NVMe card on the system. Both latency and bandwidth values are
+provided, to showcase that the latency is reduced and bandwidth is not
+impacted negatively due to overhead. C6 residency measurement is not
+very accurate in my test leading to somewhat glitchy result on its
+value (c6%).
+
+key:
+  slat: start latency max, in us
+  clat: completion latency max, in us
+  lat: overall latency max, in us
+  bw: min-avg-max bandwidth values
+  c6%: c6 (deep idle) residency for the active CPU during the test
+
+cpu_lat_limit_us=10 (enabled)
+  slat: 63, clat: 107, lat: 115, bw: 1177-1367-1397, c6%: 11.9
+  slat: 30, clat: 129, lat: 137, bw: 1196-1380-1409, c6%: 0.9
+  slat: 60, clat: 101, lat: 109, bw: 1193-1372-1407, c6%: 0.9
+  slat: 29, clat: 135, lat: 143, bw: 1184-1369-1398, c6%: 1.0
+  slat: 29, clat: 112, lat: 120, bw: 1188-1368-1397, c6%: 1.0
+cpu_lat_limit_us=-1 (disabled)
+  slat: 106, clat: 281, lat: 353, bw: 1183-1363-1403, c6%: 79.9
+  slat: 107, clat: 270, lat: 319, bw: 1192-1370-1406, c6%: 79.8
+  slat: 156, clat: 269, lat: 323, bw: 1187-1363-1398, c6%: 80.4
+  slat: 106, clat: 267, lat: 316, bw: 1183-1367-1402, c6%: 80.5
+  slat: 108, clat: 247, lat: 313, bw: 1186-1368-1404, c6%: 80.0
+  slat: 107, clat: 274, lat: 323, bw: 1188-1361-1399, c6%: 80.0
+
+-Tero
+
+[1] https://lore.kernel.org/lkml/ZtHWkn2FJhAa+Vvo@fedora/T/
+[2] https://lore.kernel.org/lkml/20241004101014.3716006-1-tero.kristo@linux.intel.com/
+
