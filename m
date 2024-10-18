@@ -1,199 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835FF205AA3;
-	Fri, 18 Oct 2024 18:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D1C1B6D10
+	for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 18:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729277106; cv=none; b=IhxKmKAgea+SJzh7rQ5iGFcBwPa6+W54uzZBimWL7VpAq5rJ1zP+qwmZ98Wo11Xm+MnRuO42jsAqC3E7lPbcEMRDvgZy6h41E52qXkERAmO7AJ/yT4Tag2WAMlt7tWbi1cZLJR/GkK7cj5N1OXMg+wUkDZ2IpQmbFke91sBWf6k=
+	t=1729277161; cv=none; b=ffVHVCk668iadiNhz8HVPqeYXS9PdFT2Q2oGwvkfSz8DUTA+k2Afuk8HwZCvBzl3hinyGDM5dIh+l2gpk4PAMbnbVOt8f1dLitGIcGs864Ac7NJBuc3PMFuqeuks+4gUmoh0Ijeh5UDRfaKS33q3KcQN3BZpQTFjSy79pPV4rzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729277106; c=relaxed/simple;
-	bh=CJqMmKGmlMC1ZgTSvCsZDhV/pMMcxUr0PbmDF9R/3J8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AtXgYBdH2gz0eSbBuS+FGeAvLWadoZ5k7cFdZiFFUge1YrCpAtgVsvjpxNWon0kkLUuPNxhJteqKWweg9asNLRRzUurw3gT2OeVsqNFvekS+OrzTEZQIcMpN6NoTSnTsrvJjKWvZf1D8/kAIIjqrRzqXi5SBJ8FCpaFJ9k3VGEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tb8QNDbB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729277161; c=relaxed/simple;
+	bh=phEX9ymVimk2sUfotD4QxcaLIVr47XMFLKtpw5UFHlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mbgLl/0vnB6X7syyv+2rdFd4/eh/fJT1EMqM5zu2tkP45P4oLVFIdzZsKzlcX9uQHzUbosDTweAvo2DoQPdoRjGNu5BSlqfHZcjVx2+fU/gmk6/uc72sOeFOIH41qYjSB7RwXPCep4rsHrmqwOtY0luvuCjjN/37iChplTsc1dU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W3yhixbK; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tb8QNDbB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0401DC4CED2;
-	Fri, 18 Oct 2024 18:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729277106;
-	bh=CJqMmKGmlMC1ZgTSvCsZDhV/pMMcxUr0PbmDF9R/3J8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Tb8QNDbBm1c5jVfWGHeTX79arz2h6WihIiGeGNIT1wKOvl2SnsoxQny2qbD9K1FS5
-	 97IPTYhanx0dVA/KlRGXyEAFlT3qZc5C3vmIG1rDfkSH2LyQaUiCnmtuIj6YD37F5h
-	 g4WCzHrK0wC5FDmW5iezMTH7eAeEg/CHLKAH4Qp9fiamrAYfzwxlebwnZvFSKbxHAk
-	 yiQDNBYnN+xJV0CVw+2R+YJrgal7feu2DQYXE0AETmCZ4+krXjiiwSrmpxVeK46w6g
-	 MrU3gjK5ZqSFodlQJ5Ej0BiLUESxaSHZ8BqiviYFBDcr65dFbbHe+Yxb9T66VX434g
-	 9ZMlF7J4BWWWg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: dm-devel@lists.linux.dev
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	Md Sadre Alam <quic_mdalam@quicinc.com>,
-	Israel Rukshin <israelr@nvidia.com>,
-	Milan Broz <gmazyland@gmail.com>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Adrian Vovk <adrianvovk@gmail.com>
-Subject: [RFC PATCH 4/4] ext4,f2fs: support metadata encryption via dm-default-key
-Date: Fri, 18 Oct 2024 11:43:39 -0700
-Message-ID: <20241018184339.66601-5-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241018184339.66601-1-ebiggers@kernel.org>
-References: <20241018184339.66601-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W3yhixbK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729277160; x=1760813160;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=phEX9ymVimk2sUfotD4QxcaLIVr47XMFLKtpw5UFHlw=;
+  b=W3yhixbKkCiPnHCrW+PpeqCGOPKxKqRTYjb+5G4OyFi5D9TDJDa7aH7O
+   HOpyMwzgd6NHydzlnD02CiIfvgSmnfjZ9cmAFiacz1UKnctIAH2yIbfJE
+   XkvxrH5yKUtJSsPvFpXZ6ZQsdB5vVquA58eA5yy3TY1s8MlByOAf/y4ld
+   ImL/LR7sfLVIo27O81dvx18hnZ+0NVKrQM4YL559JbLyH+je8Ue3QatEb
+   F9D3+c3gwVMLgMznCfETbSrBtf06oIeXzx/tk0GllAaQdNGsQC8+8jRHZ
+   u+8h1emO3sUU+qXnr7ZwNS7HwhOJgOLP93In6zLod9gZxa7EKVkV79GJu
+   Q==;
+X-CSE-ConnectionGUID: wI8heA0uSUyTvOzSprEIag==
+X-CSE-MsgGUID: zQwbeqjpR52gbPBmCOG6QA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11229"; a="40182402"
+X-IronPort-AV: E=Sophos;i="6.11,214,1725346800"; 
+   d="scan'208";a="40182402"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 11:45:59 -0700
+X-CSE-ConnectionGUID: gfyqjxktSYqWipjgpQmU9g==
+X-CSE-MsgGUID: 8/lcsv35T3iOGWVLfp224w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,214,1725346800"; 
+   d="scan'208";a="83571247"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 18 Oct 2024 11:45:57 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t1rz1-000OBt-2L;
+	Fri, 18 Oct 2024 18:45:55 +0000
+Date: Sat, 19 Oct 2024 02:45:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: model freeze & enter queue as rwsem for
+ supporting lockdep
+Message-ID: <202410190214.KgZovHXy-lkp@intel.com>
+References: <20241018013542.3013963-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241018013542.3013963-1-ming.lei@redhat.com>
 
-From: Eric Biggers <ebiggers@google.com>
+Hi Ming,
 
-Set the bi_skip_dm_default_key flag on bios that are targeting the
-contents of an encrypted file and therefore should not be en/decrypted
-by dm-default-key.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- fs/crypto/inline_crypt.c | 14 +++++++++++++-
- fs/f2fs/data.c           |  6 +++++-
- include/linux/fscrypt.h  | 14 ++++++++++++++
- 3 files changed, 32 insertions(+), 2 deletions(-)
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.12-rc3 next-20241018]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/fs/crypto/inline_crypt.c b/fs/crypto/inline_crypt.c
-index 40de69860dcf9..b75c69c09500b 100644
---- a/fs/crypto/inline_crypt.c
-+++ b/fs/crypto/inline_crypt.c
-@@ -261,17 +261,22 @@ static void fscrypt_generate_dun(const struct fscrypt_inode_info *ci,
-  *
-  * Normally the bio should be newly allocated (i.e. no pages added yet), as
-  * otherwise fscrypt_mergeable_bio() won't work as intended.
-  *
-  * The encryption context will be freed automatically when the bio is freed.
-+ *
-+ * This function also handles setting bi_skip_dm_default_key when needed.
-  */
- void fscrypt_set_bio_crypt_ctx(struct bio *bio, const struct inode *inode,
- 			       u64 first_lblk, gfp_t gfp_mask)
- {
- 	const struct fscrypt_inode_info *ci;
- 	u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE];
- 
-+	if (fscrypt_inode_should_skip_dm_default_key(inode))
-+		bio_set_skip_dm_default_key(bio);
-+
- 	if (!fscrypt_inode_uses_inline_crypto(inode))
- 		return;
- 	ci = inode->i_crypt_info;
- 
- 	fscrypt_generate_dun(ci, first_lblk, dun);
-@@ -342,20 +347,26 @@ EXPORT_SYMBOL_GPL(fscrypt_set_bio_crypt_ctx_bh);
-  *
-  * This function isn't required in cases where crypto-mergeability is ensured in
-  * another way, such as I/O targeting only a single file (and thus a single key)
-  * combined with fscrypt_limit_io_blocks() to ensure DUN contiguity.
-  *
-+ * This function also returns false if the next part of the I/O would need to
-+ * have a different value for the bi_skip_dm_default_key flag.
-+ *
-  * Return: true iff the I/O is mergeable
-  */
- bool fscrypt_mergeable_bio(struct bio *bio, const struct inode *inode,
- 			   u64 next_lblk)
- {
- 	const struct bio_crypt_ctx *bc = bio->bi_crypt_context;
- 	u64 next_dun[BLK_CRYPTO_DUN_ARRAY_SIZE];
- 
- 	if (!!bc != fscrypt_inode_uses_inline_crypto(inode))
- 		return false;
-+	if (bio_should_skip_dm_default_key(bio) !=
-+	    fscrypt_inode_should_skip_dm_default_key(inode))
-+		return false;
- 	if (!bc)
- 		return true;
- 
- 	/*
- 	 * Comparing the key pointers is good enough, as all I/O for each key
-@@ -385,11 +396,12 @@ bool fscrypt_mergeable_bio_bh(struct bio *bio,
- {
- 	const struct inode *inode;
- 	u64 next_lblk;
- 
- 	if (!bh_get_inode_and_lblk_num(next_bh, &inode, &next_lblk))
--		return !bio->bi_crypt_context;
-+		return !bio->bi_crypt_context &&
-+		       !bio_should_skip_dm_default_key(bio);
- 
- 	return fscrypt_mergeable_bio(bio, inode, next_lblk);
- }
- EXPORT_SYMBOL_GPL(fscrypt_mergeable_bio_bh);
- 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index 94f7b084f6016..a413508210994 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -484,10 +484,12 @@ static void f2fs_set_bio_crypt_ctx(struct bio *bio, const struct inode *inode,
- 	 * The f2fs garbage collector sets ->encrypted_page when it wants to
- 	 * read/write raw data without encryption.
- 	 */
- 	if (!fio || !fio->encrypted_page)
- 		fscrypt_set_bio_crypt_ctx(bio, inode, first_idx, gfp_mask);
-+	else if (fscrypt_inode_should_skip_dm_default_key(inode))
-+		bio_set_skip_dm_default_key(bio);
- }
- 
- static bool f2fs_crypt_mergeable_bio(struct bio *bio, const struct inode *inode,
- 				     pgoff_t next_idx,
- 				     const struct f2fs_io_info *fio)
-@@ -495,11 +497,13 @@ static bool f2fs_crypt_mergeable_bio(struct bio *bio, const struct inode *inode,
- 	/*
- 	 * The f2fs garbage collector sets ->encrypted_page when it wants to
- 	 * read/write raw data without encryption.
- 	 */
- 	if (fio && fio->encrypted_page)
--		return !bio_has_crypt_ctx(bio);
-+		return !bio_has_crypt_ctx(bio) &&
-+			(bio_should_skip_dm_default_key(bio) ==
-+			 fscrypt_inode_should_skip_dm_default_key(inode));
- 
- 	return fscrypt_mergeable_bio(bio, inode, next_idx);
- }
- 
- void f2fs_submit_read_bio(struct f2fs_sb_info *sbi, struct bio *bio,
-diff --git a/include/linux/fscrypt.h b/include/linux/fscrypt.h
-index 772f822dc6b82..eac1917db79a9 100644
---- a/include/linux/fscrypt.h
-+++ b/include/linux/fscrypt.h
-@@ -890,10 +890,24 @@ static inline u64 fscrypt_limit_io_blocks(const struct inode *inode, u64 lblk,
- {
- 	return nr_blocks;
- }
- #endif /* !CONFIG_FS_ENCRYPTION_INLINE_CRYPT */
- 
-+#if IS_ENABLED(CONFIG_FS_ENCRYPTION) && IS_ENABLED(CONFIG_DM_DEFAULT_KEY)
-+static inline bool
-+fscrypt_inode_should_skip_dm_default_key(const struct inode *inode)
-+{
-+	return IS_ENCRYPTED(inode) && S_ISREG(inode->i_mode);
-+}
-+#else
-+static inline bool
-+fscrypt_inode_should_skip_dm_default_key(const struct inode *inode)
-+{
-+	return false;
-+}
-+#endif
-+
- /**
-  * fscrypt_inode_uses_inline_crypto() - test whether an inode uses inline
-  *					encryption
-  * @inode: an inode. If encrypted, its key must be set up.
-  *
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/block-model-freeze-enter-queue-as-rwsem-for-supporting-lockdep/20241018-093704
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20241018013542.3013963-1-ming.lei%40redhat.com
+patch subject: [PATCH] block: model freeze & enter queue as rwsem for supporting lockdep
+config: x86_64-allnoconfig (https://download.01.org/0day-ci/archive/20241019/202410190214.KgZovHXy-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241019/202410190214.KgZovHXy-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410190214.KgZovHXy-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> block/blk-mq.c:125:6: warning: variable 'sub_class' set but not used [-Wunused-but-set-variable]
+     125 |         int sub_class;
+         |             ^
+   1 warning generated.
+
+
+vim +/sub_class +125 block/blk-mq.c
+
+   122	
+   123	void blk_freeze_queue_start(struct request_queue *q)
+   124	{
+ > 125		int sub_class;
+   126	
+   127		mutex_lock(&q->mq_freeze_lock);
+   128		sub_class = q->mq_freeze_depth;
+   129		if (++q->mq_freeze_depth == 1) {
+   130			percpu_ref_kill(&q->q_usage_counter);
+   131			mutex_unlock(&q->mq_freeze_lock);
+   132			if (queue_is_mq(q))
+   133				blk_mq_run_hw_queues(q, false);
+   134		} else {
+   135			mutex_unlock(&q->mq_freeze_lock);
+   136		}
+   137		/*
+   138		 * model as down_write_trylock() so that two concurrent freeze queue
+   139		 * can be allowed
+   140		 */
+   141		if (blk_queue_freeze_lockdep(q))
+   142			rwsem_acquire(&q->q_usage_counter_map, sub_class, 1, _RET_IP_);
+   143	}
+   144	EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
+   145	
+
 -- 
-2.47.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
