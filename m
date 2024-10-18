@@ -1,108 +1,96 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD9C3207;
-	Fri, 18 Oct 2024 12:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA10202649
+	for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 13:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729255006; cv=none; b=n+d3zUfsULLGiJFt0Jyr1FfEbbkpuU47CB5HeYVbVSp9kZiJKW5dB52izR1d2o3p/1OXZ3dFRmskk352Kev8/RpWWfJXRIwl33CmeIk+HW6onrxT+ZynEtFbfGr/REio3CXiOPcTwgeSY/31QDhpfIVtrnAU+SDm1QJW+nMMPmk=
+	t=1729258898; cv=none; b=vB03l5pZZRT4ZBrwJSi1/o1B2HH/7zXhLxRW7MSF0/2u1iKZb0wHCKt05d0LPVcfaMEdo0C6U4EaMT1rw5kMuuuOZwI6xH5dWsVwotjeWopfcirvxqHMpn6Vt/LbZ5SltmhyHkXSBtI1c505qBRw9TJizu5qTMhiaL4paAl1h4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729255006; c=relaxed/simple;
-	bh=tyMewtQqpHxg4qbfOy5HqA9327malShWrnPYHfuO2vg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K/jnKojaQEjhdZ/dbrb9d/GchnYJJJw6g0bQTaJq9dbjPoeDN1Q1T+tJrIu4n8xVUa3WhUJ/QEb2D/8rF1M/Cn3oIyg7wxjThN8X80+QMaGyxTT1ZiWlKbwq9443LC/rUnC91mKQTvGfmPKEI2k0ctFApUDN058gDswlTV7Wkho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
-X-CSE-ConnectionGUID: 0cXE/RMeS8il+576EWH2vg==
-X-CSE-MsgGUID: r0T/vuPmQYqRHeav2DZvew==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="39326594"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="39326594"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 05:36:45 -0700
-X-CSE-ConnectionGUID: m9kwGWSOS+q+2j/CwHgoLQ==
-X-CSE-MsgGUID: Ks+uPRRJR+C757twukfZZQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
-   d="scan'208";a="79663802"
-Received: from smile.fi.intel.com ([10.237.72.154])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 05:36:39 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andy@kernel.org>)
-	id 1t1mDa-00000004Sex-2cSq;
-	Fri, 18 Oct 2024 15:36:34 +0300
-Date: Fri, 18 Oct 2024 15:36:34 +0300
-From: Andy Shevchenko <andy@kernel.org>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>,
-	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, Li Zetao <lizetao1@huawei.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v8 2/6] PCI: Deprecate pcim_iounmap_regions()
-Message-ID: <ZxJWUoMg9vYyXwMW@smile.fi.intel.com>
-References: <20241016094911.24818-2-pstanner@redhat.com>
- <20241016094911.24818-4-pstanner@redhat.com>
- <Zw-XkFcaXjlF5az0@smile.fi.intel.com>
- <0cf0ffed63a8645c49f043877c526b2ab0abf96e.camel@redhat.com>
+	s=arc-20240116; t=1729258898; c=relaxed/simple;
+	bh=kh5oD6A/6KbJFilOKOiK9/PajEa/k9LBfHKTJY9YqPQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bSWQK0ygzxPA0z1kr3CK1Ku1YmNMY+Xz/nDH9/+bKJDSbhhfM0ZW/YKNpexhTCDv/xiRAZbUEC1GE77+UGhOPyRljt31TAd8Mk1l0dWMJJXH7q4AvOK6dVPXQ3gUVOx8RwiC86lwDaymoCknc4wTOP6oBiBMwj7Hl5MUU+HW49M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2AkFMk4m; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2AkFMk4m"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-71e983487a1so1223029b3a.2
+        for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 06:41:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729258896; x=1729863696; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=b1VnLrCVNMejlDWuQ0DoAd9DQoJYLg29l4ybJKv1YpA=;
+        b=2AkFMk4m5Ug+e2Ms8pjJir9IVANUVVyJLnI+ghfFL+hXBtnHRUFLuemfkclOjGLuqB
+         cUMMMp3vpKvpPSsgxZ89sVpWYcID3kgiZ5OYsyKMReeZgbvGu1tU7Ozwghbevu1Omavr
+         ibJxE5ikX+0J/5GOfWAEsaZVXcp1Xvv6BNufy7CKI/LpNgSvFrDIlM59zVgoZwJEp1Jy
+         J2O7B1jEvO4zUj5CR1ggpkovsjbW/NWpAnm8AKvp5xDj3+q5euZnbSRATuu+uCcRDA0k
+         jhTAKvq2izosVHso3xUJftPtFuc2fOHS7S9YHD80fIdheaaZBlJhcD3yIPFCPGOJ1ftm
+         cYPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729258896; x=1729863696;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b1VnLrCVNMejlDWuQ0DoAd9DQoJYLg29l4ybJKv1YpA=;
+        b=XdFUEteV78+yKUk6JPxklAYsw7yhrNFRQJ2U/Dr84Nc5kHaWDBmgn9JuZ1YXF2MK3g
+         PPfpxFYL4ngszhoISAWFFLC3B+jveASxquCxs8S3Q5xPfIVjz3Qe5y/To7vLHOvduVuv
+         O9Ie7mzzrbv5Hlbrzvr8YVnb2DDQ3LYxA6tRe9wTGYpp7CxX26fOyPq8xyPHJJJlDZoV
+         FN0u8uTQvia+Kuf/yiaFxUAcb8W6zM0ORNKeOH7DN3zBQ1mNA6VG/weX/96ThLmknmsr
+         mErKuywnK3B636aDFzJAnZ3abONM4sQNwKx7OcctkOSJChpQ+4xWlbiiHz/t4GiPtT2V
+         y/4w==
+X-Gm-Message-State: AOJu0YyzHk5Yz1HGmve1cysZvwSK7iBe26l3R2b3YjPwRvdvSMdi2Myp
+	E4cGDvshwJPLsdEPOHgBHw0xLDKDHG9SovxubHtnCsvzFB6er5hVLOoVk0ADp38=
+X-Google-Smtp-Source: AGHT+IG1/mO3+HiIvU3+IE0QD88Z1xxPcN2N+LR7fjbokMxSsXIpqBDobU3fEylpeyFNFDelrHqPNg==
+X-Received: by 2002:a05:6a00:2d8d:b0:71e:4cff:2654 with SMTP id d2e1a72fcca58-71ea31d289dmr3631082b3a.6.1729258896041;
+        Fri, 18 Oct 2024 06:41:36 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ea3409928sm1420212b3a.113.2024.10.18.06.41.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Oct 2024 06:41:35 -0700 (PDT)
+Message-ID: <9e42e6a2-f6ad-4fb5-af9b-72d0c7f6889b@kernel.dk>
+Date: Fri, 18 Oct 2024 07:41:33 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0cf0ffed63a8645c49f043877c526b2ab0abf96e.camel@redhat.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 0/8] block atomic writes for xfs
+To: John Garry <john.g.garry@oracle.com>, cem@kernel.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, hare@suse.de,
+ martin.petersen@oracle.com, catherine.hoang@oracle.com, mcgrof@kernel.org,
+ ritesh.list@gmail.com, ojaswin@linux.ibm.com, brauner@kernel.org,
+ djwong@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+ dchinner@redhat.com, hch@lst.de
+References: <20241016100325.3534494-1-john.g.garry@oracle.com>
+ <8107c05d-1222-4e47-bbcd-eba64e085669@oracle.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <8107c05d-1222-4e47-bbcd-eba64e085669@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 18, 2024 at 12:52:15PM +0200, Philipp Stanner wrote:
-> On Wed, 2024-10-16 at 13:38 +0300, Andy Shevchenko wrote:
-> > On Wed, Oct 16, 2024 at 11:49:05AM +0200, Philipp Stanner wrote:
-
-...
-
-> > > + * This function is DEPRECATED. Do not use it in new code.
-> > 
-> > Interestingly that the syntax of the DEPRECATED is not documented
-> > (yet?),
-> > however the sphinx parser hints us about **DEPRECATED** format — see
-> > Documentation/sphinx/parse-headers.pl:251. In any case the above
-> > seems
-> > like second used (in a form of the full sentence) and will be updated
-> > in accordance with the above mentioned script.
+On 10/18/24 3:29 AM, John Garry wrote:
+> On 16/10/2024 11:03, John Garry wrote:
 > 
-> Can't completely follow – so one should always write "**DEPRECATED**",
-> correct?
+> Hi Jens,
+> 
+> There are block changes in this series. I was going to ask Carlos to
+> queue this work via the XFS tree, so can you let me know whether you
+> have any issue with those (block) changes. There is a fix included,
+> which I can manually backport to stable (if not autoselected).
+> 
+> Note that I still plan on sending a v10 for this series, to fix a
+> small documentation issue which Darrick noticed.
 
-I can't answer to this, because there may be "rendered" form and in this case
-it should not be surrounded by double asterisks, otherwise it's better to have
-at the start.
-
-> Is that a blocker for you?
-
-Nope, I mentioned this in the last sentence in my previous reply.
-
-> All the docstrings in pci/pci.c and pci/devres.c so far just use
-> "DEPRECATED".
-
-Yeah, this, if ever needed, has to be changed at once.
+To avoid conflicts, let's do a separate branch that we can both pull in.
+I'll take a closer look and set that up once you post v10.
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
-
+Jens Axboe
