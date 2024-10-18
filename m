@@ -1,57 +1,31 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D1617279E;
-	Fri, 18 Oct 2024 05:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F9316A956;
+	Fri, 18 Oct 2024 05:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729228939; cv=none; b=knn+5YIozTmGxkbhqadgtJKiP5wdXdc8TvzYFNX//5H3TN+brmpIkRhR+H5J7+BnnvRVFtEwBXbmz1fw/FYZXDkXFK1hPxShRoKsVg4XH8+qQuUpSwojz0oDFVVJjI1IqdSmAr4P1R1uD7JO+uwO+ZLRUKT1F+bqY4Djq4+YQS4=
+	t=1729230410; cv=none; b=V2aIH2daMhnYWkWUwT84bsllw7d9gsYUWLqzGH3wM2w09mlfAKqn9kjG3NXJIc9cbfn3fW5+OGL4n3hcf0NXVSBrUsiPD5cp6gUCwYtlNAT4dwv+92jJf/SYCeq1MJ9VV4p2IX54SV7cqcdEu+nx/Aoj56+xnIG/8PuZMTDED0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729228939; c=relaxed/simple;
-	bh=SbU7YvsCLBo1fozw+FCn9FJ09fqD2MMNao4L3BGSKMY=;
+	s=arc-20240116; t=1729230410; c=relaxed/simple;
+	bh=VV3tg4VoXO9k9cXc+scsHom6zLncU1Z/kb5ocBjvncc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OEmrw7ORRvqLP+QI6nPzgidKofeWmTIHRPaY7+AcuWOgkrI1B8AEk6dQ6x7KPn8+Fs1CkjkeTFVu3bTB621EMrEMecpJIDkpIk1Djem4sfTpeDX6dfmI+UZaJsTg1vFWqKjxwbvxGOed2WE18om5O9m4RmvM9oeoUbVxKKutLI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pN1jvbXe; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pN1jvbXe"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=SbU7YvsCLBo1fozw+FCn9FJ09fqD2MMNao4L3BGSKMY=; b=pN1jvbXeIe6Ly1VsjgN9jHbM3X
-	grsroMmv6DWVBi/qgE6zMc7DQUd5KKDwUPQpSz6tMVyjkVsiUcxAa7I3U1FfLYR+e3WkJ25Y7EYLo
-	kkPCDoKb1H39X7AOfEhw9roZJP0bBvx+c60wsU85OyRTCi4DqUe4Dp7K0K7aayfRzdNoTCs8/5VLB
-	g7aUcZnJh8RxPoQKf+HZRewwL0NxIGD7TxhTxq80itaL4BJXfjw+89QQlaepUSlxtgHRoCzbXxaQO
-	7gPm52k8QXwHogv5Dn2Hu1iikUVePK1WbOXVT+EyngGke06K7pGO+HUxiTDW337Dof1/grzE8WeuH
-	KnaBqS0w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1t1fRC-0000000GxYM-2rYk;
-	Fri, 18 Oct 2024 05:22:10 +0000
-Date: Thu, 17 Oct 2024 22:22:10 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Adrian Vovk <adrianvovk@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Md Sadre Alam <quic_mdalam@quicinc.com>, axboe@kernel.dk,
-	song@kernel.org, yukuai3@huawei.com, agk@redhat.com,
-	snitzer@kernel.org, mpatocka@redhat.com, adrian.hunter@intel.com,
-	quic_asutoshd@quicinc.com, ritesh.list@gmail.com,
-	ulf.hansson@linaro.org, andersson@kernel.org,
-	konradybcio@kernel.org, kees@kernel.org, gustavoars@kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-mmc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-hardening@vger.kernel.org, quic_srichara@quicinc.com,
-	quic_varada@quicinc.com
-Subject: Re: [PATCH v2 1/3] dm-inlinecrypt: Add inline encryption support
-Message-ID: <ZxHwgsm2iP2Z_3at@infradead.org>
-References: <20240916085741.1636554-1-quic_mdalam@quicinc.com>
- <20240916085741.1636554-2-quic_mdalam@quicinc.com>
- <20240921185519.GA2187@quark.localdomain>
- <ZvJt9ceeL18XKrTc@infradead.org>
- <ef3c9a17-79f3-4937-965e-52e2b9e66ac2@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=W0iTTLHHf14fGAn1hWgvo7hqQl696Rc9wwDj4NvmqRsImFNQuN2fq6n6KIlM1kGFVu8hkcFYgGVcQh+3OI6VLnKVfptkSnSZGwpvc/bxGEP1rRKZZ1eizk74PRzsTP/NuCjnNi268rYOjB7Gr8T/oHjO95bg3Zsx84lbqZt5JXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 2D4E3227AAF; Fri, 18 Oct 2024 07:46:44 +0200 (CEST)
+Date: Fri, 18 Oct 2024 07:46:44 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@meta.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	axboe@kernel.dk, hch@lst.de, io-uring@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, joshi.k@samsung.com,
+	javier.gonz@samsung.com, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv8 2/6] block: use generic u16 for write hints
+Message-ID: <20241018054643.GA20262@lst.de>
+References: <20241017160937.2283225-1-kbusch@meta.com> <20241017160937.2283225-3-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,33 +34,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ef3c9a17-79f3-4937-965e-52e2b9e66ac2@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20241017160937.2283225-3-kbusch@meta.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Oct 17, 2024 at 11:26:49PM -0400, Adrian Vovk wrote:
-> Let's say I'm using LVM, so I've got a physical partition that stores a
-> couple different virtual partitions. I can use dm-default-key both
-> underneath the physical partition, and on top of some of the virtual
-> partitions. In such a configuration, the virtual partitions with their own
-> dm-default-key instance get encrypted with their own key and passed through
-> the lower dm-default-key instance onto the hardware. Virtual partitions that
-> lack their own dm-default-key are encrypted once by the lower dm-default-key
-> instance. There's no filesystem involved here, and yet to avoid the cost of
-> double-encryption we need the passthrough functionality of dm-default-key.
-> This scenario is constrained entirely to the block layer.
+On Thu, Oct 17, 2024 at 09:09:33AM -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> This is still backwards compatible with lifetime hints. It just doesn't
+> constrain the hints to that definition.
 
-So just run a target on each partition.
+So in the end we'll end up with two uses of it - the existing 5
+temperature hints and the new stream separation.  I think it
+would be cleaner to make it a union, but I don't care that
+strongly.
 
-> Other usecases involve loopback devices. This is a real scenario of
-> something we do in userspace. I have a loopback file, with a partition table
-> inside where some partitions are encrypted and others are not. I would like
-> to store this loopback file in a filesystem that sits on top of a dm-crypt
-> protected partition. With the current capabilities of the kernel, I'd have
-> to double-encrypt. But with dm-default-key, I could encrypt just once.
+But we probably want a way to distinguish which one is supported.
 
-Which would completely break the security model of the underlying
-file system, because it can't trust what you do in the loop device.
+E.g. for SCSI we set a net BLK_FEAT_WRITE_HINTS, for NVMe we'll set
+BLK_FEAT_STREAM_SEPARATION.
 
-This is the prime example of why allowing higher layers to skip
-encryption is a no-go.
-
+Either way this should probably be the first patch in the series.
