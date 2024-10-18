@@ -1,56 +1,59 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A375218C031;
-	Fri, 18 Oct 2024 07:54:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DDB18CBEC;
+	Fri, 18 Oct 2024 07:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729238068; cv=none; b=DU/sLaKoLHmBT2QDBG/xxDiAP+H9luUR+t5D4KZ6Ryv5LPD1XC8pJs2MZLtWL664a9V8zOetjzGPir3qPKGmp7xPKwygvWb/kXGm+gWZsBkftZBOMqMdVXWMAsj95ImFl741cKdFck/dFaqNWtpff+rmKHdTQfn3W9WaaIF18o0=
+	t=1729238074; cv=none; b=WFdjAPObL+FndS7FmLmrcBNfuf31yK9w113yxyBdMT9XgK0vjRmKjUcLRGEi0/d34oFRsRfUVtQcHJV30MMtFQUBy+92gyzc3QEpl6SvJzNqy3c6sR8js/hLgs0i0u+ixibqICbau458zUSXaPK7gCXe/nFaThPTBFtBKNdyqdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729238068; c=relaxed/simple;
-	bh=C3amggeE6f0YWqgreyBQl44LY0xcRHzZJvlc3nAImog=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ivP698EOMTiKWE2uqNgsHFrpHNF8rAJ8ggR4zL6Go3Doelkc8CSiZQTLv0+llGmVf+qdQzLxQOrx+xrKgVo0p5CgBMmV6/2dXqroi2zb5jGYz3OCNpCNQ1fGyWxYdonwkowP2fZfYelTWQeZnWr2shtXoEacHPv0MnQyuJ/OEmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UUMpcNcF; arc=none smtp.client-ip=198.175.65.20
+	s=arc-20240116; t=1729238074; c=relaxed/simple;
+	bh=VYb4AXeRfDuSPexQUmqF2/JPGM2xgfoqbX7SzxfRB5g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pqAFbJf9FeJty9iwG7lIdNIr4YMJOU4gxx5Bm65MJ1S4Bqx0BHakhYIjuTspIuqgr6um4rhRtFFQ2NA6973HZuTgQ2suWl4ByzfEug7tviVu0qJE2FhctarsNY0L46lZv3j7kqMnjJZkMKmiARfQjHABiEaQOIUZDpADpJO1V5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K+qzlvoN; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UUMpcNcF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K+qzlvoN"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729238067; x=1760774067;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=C3amggeE6f0YWqgreyBQl44LY0xcRHzZJvlc3nAImog=;
-  b=UUMpcNcFaXxbDA2WAQsV0gaQ38+9zZVwPvO2wpwNqUYIJfAsMGi7sLcm
-   /kRmUwF+BzV7IZEwqLYN13q+68L4CaAKadgiKwcNPWpiXHP5v+h7iSWDw
-   4mLGfnJC/tyQaKh01KJteO8MDgfC3JLgLAVPKp37rB12eR8FeIZ4wxuLw
-   EMv4NxXI5WxLj4X4H6rAavA+htW0OsaIgV0nUX0F42elKYJA/dD2X2guO
-   J5UA2EhajbEglIXPUTH0eo+iCpQvqc0E4GUiZsBMyXiSL7XI7vfIJdy5m
-   Qm6vEzoEMgK1yTK/Qw0S5Cc6EFPg6Fd14Sje98hqqnuHAopPQ6AxUwfLa
-   g==;
-X-CSE-ConnectionGUID: etixMqv/RDacBSZuuzmDiQ==
-X-CSE-MsgGUID: YYKSmS+yS6qISsCZW4kyEA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28549554"
+  t=1729238073; x=1760774073;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=VYb4AXeRfDuSPexQUmqF2/JPGM2xgfoqbX7SzxfRB5g=;
+  b=K+qzlvoNWCRTFXp5eODqoCih4+AHIFc2LOeur3PVWAvFYuf1bAkgrSqW
+   ZrHOWhyDlu4uM2wg1F8fSEtrlJa2E8OHMEC3o13HrsmCh0Fr7JDrFVO8H
+   lZgombz3OV4rGBzbxkoYYhv9Lvc6DpP/WDCMdlF/Yh0uVGGqr5uH/NKau
+   YRytlhMyBC+hyTweHapXB8rX1YSuqqV4i9joaP4ESlTdATGAyu39J4sZW
+   U4hBw0o/iNZxiapLEAPM/ZrmmPszGbzPnJ94qrK9aP/m/3D41jhsJhPc/
+   1hO/pYz1MH+M6af+oO/XPE3bqtHQimU9HSE62zxef7f4Zb5uVX4CoFWaW
+   Q==;
+X-CSE-ConnectionGUID: beZaYOjEQDW1uktY6jFqOg==
+X-CSE-MsgGUID: 3QgOGX5/RcOgwCZhz6HWew==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28549560"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="28549554"
+   d="scan'208";a="28549560"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 00:54:26 -0700
-X-CSE-ConnectionGUID: XTQIMnySQc2MEHKg+RdnDg==
-X-CSE-MsgGUID: c5vVUu/2R6mZuBgdQ+o0cg==
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 00:54:33 -0700
+X-CSE-ConnectionGUID: C6HyQPG8RaaWj0C89faR3g==
+X-CSE-MsgGUID: f1pdlETeRN6DD9MxxgeLWQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,213,1725346800"; 
-   d="scan'208";a="79604062"
+   d="scan'208";a="79604071"
 Received: from klitkey1-mobl1.ger.corp.intel.com (HELO tkristo-desk.intel.com) ([10.245.246.169])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 00:54:23 -0700
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2024 00:54:27 -0700
 From: Tero Kristo <tero.kristo@linux.intel.com>
 To: axboe@kernel.dk
 Cc: hch@lst.de,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCHv2 0/2] blk-mq: add CPU latency limit control
-Date: Fri, 18 Oct 2024 10:30:36 +0300
-Message-ID: <20241018075416.436916-1-tero.kristo@linux.intel.com>
+Subject: [PATCHv2 2/2] blk-mq: add support for CPU latency limits
+Date: Fri, 18 Oct 2024 10:30:38 +0300
+Message-ID: <20241018075416.436916-3-tero.kristo@linux.intel.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241018075416.436916-1-tero.kristo@linux.intel.com>
+References: <20241018075416.436916-1-tero.kristo@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,50 +62,128 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hello,
+Add support for setting CPU latency limits when a request is dispatched
+to driver layer, and removing it once the device is idle. The latency
+limits use the dev PM QoS framework for setting per-cpu limits for
+active CPUs. The feature is user configurable via sysfs knobs under the
+block device.
 
-Try #2 of the patches here. I sent earlier an RFC version against block/bio
-[1], and then an isolated patch for NVMe driver only [2].
+Signed-off-by: Tero Kristo <tero.kristo@linux.intel.com>
+---
+ block/blk-mq.c         | 54 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h | 12 ++++++++++
+ 2 files changed, 66 insertions(+)
 
-After feedback from maintainers, I've reworked the patches again to block
-layer, this time to multiqueue support only. Once a blk-mq request is about
-to be dispatched to the driver layer, the PM QoS variables for active CPUs
-are tweaked based on configuration, and a timeout is launched as a delayed
-work that drops the PM QoS limits once the queue is idle. The mechanism is
-disabled by default, and only enabled once user activates it via the
-provided sysfs knobs.
-
-Some measurement data provided below as a reference for the
-results, measured with 'fio' on an Intel Icelake Xeon platform, with an
-extra NVMe card on the system. Both latency and bandwidth values are
-provided, to showcase that the latency is reduced and bandwidth is not
-impacted negatively due to overhead. C6 residency measurement is not
-very accurate in my test leading to somewhat glitchy result on its
-value (c6%).
-
-key:
-  slat: start latency max, in us
-  clat: completion latency max, in us
-  lat: overall latency max, in us
-  bw: min-avg-max bandwidth values
-  c6%: c6 (deep idle) residency for the active CPU during the test
-
-cpu_lat_limit_us=10 (enabled)
-  slat: 63, clat: 107, lat: 115, bw: 1177-1367-1397, c6%: 11.9
-  slat: 30, clat: 129, lat: 137, bw: 1196-1380-1409, c6%: 0.9
-  slat: 60, clat: 101, lat: 109, bw: 1193-1372-1407, c6%: 0.9
-  slat: 29, clat: 135, lat: 143, bw: 1184-1369-1398, c6%: 1.0
-  slat: 29, clat: 112, lat: 120, bw: 1188-1368-1397, c6%: 1.0
-cpu_lat_limit_us=-1 (disabled)
-  slat: 106, clat: 281, lat: 353, bw: 1183-1363-1403, c6%: 79.9
-  slat: 107, clat: 270, lat: 319, bw: 1192-1370-1406, c6%: 79.8
-  slat: 156, clat: 269, lat: 323, bw: 1187-1363-1398, c6%: 80.4
-  slat: 106, clat: 267, lat: 316, bw: 1183-1367-1402, c6%: 80.5
-  slat: 108, clat: 247, lat: 313, bw: 1186-1368-1404, c6%: 80.0
-  slat: 107, clat: 274, lat: 323, bw: 1188-1361-1399, c6%: 80.0
-
--Tero
-
-[1] https://lore.kernel.org/lkml/ZtHWkn2FJhAa+Vvo@fedora/T/
-[2] https://lore.kernel.org/lkml/20241004101014.3716006-1-tero.kristo@linux.intel.com/
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4b2c8e940f59..f8906e2aff6d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -29,6 +29,7 @@
+ #include <linux/blk-crypto.h>
+ #include <linux/part_stat.h>
+ #include <linux/sched/isolation.h>
++#include <linux/pm_qos.h>
+ 
+ #include <trace/events/block.h>
+ 
+@@ -2700,11 +2701,62 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug)
+ static void __blk_mq_flush_plug_list(struct request_queue *q,
+ 				     struct blk_plug *plug)
+ {
++	struct request *req, *next;
++	struct blk_mq_hw_ctx *hctx;
++	int cpu;
++
+ 	if (blk_queue_quiesced(q))
+ 		return;
++
++	rq_list_for_each_safe(&plug->mq_list, req, next) {
++		hctx = req->mq_hctx;
++
++		if (next && next->mq_hctx == hctx)
++			continue;
++
++		if (q->disk->cpu_lat_limit < 0)
++			continue;
++
++		hctx->last_active = jiffies + msecs_to_jiffies(q->disk->cpu_lat_timeout);
++
++		if (!hctx->cpu_lat_limit_active) {
++			hctx->cpu_lat_limit_active = true;
++			for_each_cpu(cpu, hctx->cpumask) {
++				struct dev_pm_qos_request *qos;
++
++				qos = per_cpu_ptr(hctx->cpu_lat_qos, cpu);
++				dev_pm_qos_add_request(get_cpu_device(cpu), qos,
++						       DEV_PM_QOS_RESUME_LATENCY,
++						       q->disk->cpu_lat_limit);
++			}
++			schedule_delayed_work(&hctx->cpu_latency_work,
++					      msecs_to_jiffies(q->disk->cpu_lat_timeout));
++		}
++	}
++
+ 	q->mq_ops->queue_rqs(&plug->mq_list);
+ }
+ 
++static void blk_mq_cpu_latency_work(struct work_struct *work)
++{
++	struct blk_mq_hw_ctx *hctx = container_of(work, struct blk_mq_hw_ctx,
++						  cpu_latency_work.work);
++	int cpu;
++
++	if (time_after(jiffies, hctx->last_active)) {
++		for_each_cpu(cpu, hctx->cpumask) {
++			struct dev_pm_qos_request *qos;
++
++			qos = per_cpu_ptr(hctx->cpu_lat_qos, cpu);
++			dev_pm_qos_remove_request(qos);
++		}
++		hctx->cpu_lat_limit_active = false;
++	} else {
++		schedule_delayed_work(&hctx->cpu_latency_work,
++				      msecs_to_jiffies(hctx->queue->disk->cpu_lat_timeout));
++	}
++}
++
+ static void blk_mq_dispatch_plug_list(struct blk_plug *plug, bool from_sched)
+ {
+ 	struct blk_mq_hw_ctx *this_hctx = NULL;
+@@ -3729,6 +3778,11 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	if (xa_insert(&q->hctx_table, hctx_idx, hctx, GFP_KERNEL))
+ 		goto exit_flush_rq;
+ 
++	hctx->cpu_lat_qos = alloc_percpu(struct dev_pm_qos_request);
++	if (!hctx->cpu_lat_qos)
++		goto exit_flush_rq;
++	INIT_DELAYED_WORK(&hctx->cpu_latency_work, blk_mq_cpu_latency_work);
++
+ 	return 0;
+ 
+  exit_flush_rq:
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index b751cc92209b..2b61942490d6 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -435,6 +435,18 @@ struct blk_mq_hw_ctx {
+ 	/** @kobj: Kernel object for sysfs. */
+ 	struct kobject		kobj;
+ 
++	/** @cpu_latency_work: Work to handle CPU latency PM limits. */
++	struct delayed_work	cpu_latency_work;
++
++	/** @cpu_lat_limit_active: If CPU latency limits are active or not. */
++	bool			cpu_lat_limit_active;
++
++	/** @last_active: Jiffies value when the queue was last active. */
++	unsigned long		last_active;
++
++	/** @cpu_lat_qos: PM QoS latency limits for individual CPUs. */
++	struct dev_pm_qos_request __percpu *cpu_lat_qos;
++
+ #ifdef CONFIG_BLK_DEBUG_FS
+ 	/**
+ 	 * @debugfs_dir: debugfs directory for this hardware queue. Named
+-- 
+2.43.1
 
