@@ -1,93 +1,182 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470241D934D
-	for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 22:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C5F20E331
+	for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 00:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729205486; cv=none; b=oIayF0CcygC/AfzslSe/pNJhTrf4nNiDSaiLUrkiZ62T+XwMLMTPO8jIXK8PC5RSUGBp5SAKb9VTJqMnKE8SpqpdmHWt1wDMzNCzEeqY7PsQm38D7LDZrisiNMQQHaMtR9xRk2Ab2CGnK1bD8zq/jYqI5bPBreeGxGLJKLCQ6h8=
+	t=1729211628; cv=none; b=MZL2BnJUB5kBuJnDBUtctF2OLVYDI6nGUWaJmW9r6kuGDb20UOvmvujnwEhWMWcpJS6DJcqEB91kZYABl6yPz5bchaOZcIJ2sbszCUzmdjuiIUKtZCRmqOBWvu+rA7uXcJF4dlG9VbvwnVaZc+o5qkjvOFXkbUSNSWI3L9xZZnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729205486; c=relaxed/simple;
-	bh=F6+p/UVIJr1f2Whg0Y2sN0nuRYlxV0q1v5Rz+NEfs/k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=axEUHAn3DPT0j+IrPBRIPbrYFemAIlEZPyKWRfYIA1vnDSSn5AtMjzX7Z4hRuEeDK6/zJyFcM3VOX3nsh+31Eb/b6wFjl6ZVNQmfoSgcOIVuCW0vHoNyPdYUjCmHkKEU+xODwR+1azE/uhgnMhqsbNPOD687LFmCkhCe9yPsjmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0jhMNAoX; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1729211628; c=relaxed/simple;
+	bh=AhetLLZjZ7Zje0LnpL+3nSqKV1nxDX1QDoD8iNXRkLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uIDDGPiueGoAhF6x6ZQH7TZYlvNC+v8birXto2fPSjpt1aQnBXyhKncmltEQ9B2RjVFPuiZ8CaGrnB8krgJ6RFsfQypo5Z4DBCM9YtNY3UwrOJ9nYRq6b4pi79ZALncTW2MIPqNX0ZHUUF+2GpEWgjbFOexMFAfFLbndjZcBmeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EKpx0fLK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0jhMNAoX"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-71e57d89ffaso1156310b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 17 Oct 2024 15:51:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729205483; x=1729810283; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+mw4EAmgbxRff1MICbmhx606Y0hdnGoOtoskp9RHouA=;
-        b=0jhMNAoX2K8BlmnnQYbpF0nTmSEpMHhCsW0FIzrrrDRFDXhNF1SgQsYB+LJLeQg5iy
-         4nZl/9LtrkggHx6YMBPDy0Rz1qAULIPm5NajSfY9s5y1jh9VwtimUY52GBXmUygKabNs
-         LT9jtUOxx6PdE8v0Ee1X/4ge32hctElnKMFEN5k8LOnkEVN4smcwdqH9Oz2JvMkL3GnP
-         58LSSJdIm5bC1tG9l4TBDRyDJ78b1DfcFDxit1ESPDe+OyCV7VzBDpxiWXR6LDa1zhKf
-         81fByw0Y/VibHKYV7FMuyLTKPK4lPFs2M27nonx8ibHmLfI5XEtAgIqktIlaf7oSBhGP
-         TTsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729205483; x=1729810283;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+mw4EAmgbxRff1MICbmhx606Y0hdnGoOtoskp9RHouA=;
-        b=NUSPxMXot8mbCwoERpCwTk0yNZ+7+uhN2ZnCJ7wxwkdhZZt0A7kqWXcJSzoSW8zqR/
-         OPXayW7Z9wMnpGtN8/6YUfxyC1CLdIPGPE4CGHXav9cdcpSQyzobLWcPpkmk222huJO+
-         8BgM8p547+UymurTenxG3BqkD4qczS1xBa/N8esE6TCyYC5pfp/NWxd46mP3k6OPOEhi
-         9XMyTf7dcwA0qzGB9jJ9nrjQpWcN1CMoR2QaWfANESgPeTfJmrNuyrnnlZBchSDg6C6E
-         onYkEb9v3LWJ64zCWlwHJ2pl6Hu/MXuXZVbJL/MwlKJiBlfGpu1JftnpBE2FrdbKIObM
-         HOWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWi4Bg/uvvO1MYRIXZ4yvOs3z9h15TURij6YHVIzquYRHwNBJhjd2nd1jK7/1OEgnXaxvb5D5+aH2i6Pw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBJnL+Cet/Zudp2Ed0Ekud83/UKjdc+SWNXILDginkB5uvNn6d
-	2h8sr48EgD37vdub7JyMB9Sf6ze8LYdM59QrFSSXo4PuSiYL6Tafpf4zgfebiG0=
-X-Google-Smtp-Source: AGHT+IElS3afcGyUGmbCSqMvboNjMAF5io0kozg4OeEcMlWoHPb2GAlJ9GXegxQOyjitJa1uX8Kthw==
-X-Received: by 2002:a05:6a00:22c4:b0:71e:8046:2728 with SMTP id d2e1a72fcca58-71ea330863bmr671978b3a.17.1729205483507;
-        Thu, 17 Oct 2024 15:51:23 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ea333efcdsm183159b3a.76.2024.10.17.15.51.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Oct 2024 15:51:22 -0700 (PDT)
-Message-ID: <86072e08-bac5-4a4f-9c76-8b1eb53ea8a2@kernel.dk>
-Date: Thu, 17 Oct 2024 16:51:20 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EKpx0fLK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729211623;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VjYPRX8Iz5Iy3kIHsvr6PFbsOkBL0I/0YocXnDEJqJY=;
+	b=EKpx0fLKyPVZcBxFud+rv2yP+i4WmyqZDPIzFTbQSfZhuvSw14g0Scp1fY0l7Uqm5COpzk
+	jNl2KKczVCaoBCg004CfOhfIIR6nLsTqij3ajAFMEEbO0Rn5HNxX4n30peQEBLst/N0Vma
+	U1XgHcROPKC8DjIpTC/LDYaBYbU4zIc=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-121-HGioRHGlPian-Lj_AJK47Q-1; Thu,
+ 17 Oct 2024 20:33:40 -0400
+X-MC-Unique: HGioRHGlPian-Lj_AJK47Q-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4DE591955F45;
+	Fri, 18 Oct 2024 00:33:38 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.56])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9BE8F300018D;
+	Fri, 18 Oct 2024 00:33:31 +0000 (UTC)
+Date: Fri, 18 Oct 2024 08:33:26 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, nbd@other.debian.org, eblake@redhat.com,
+	vincent.chen@sifive.com, Leon Schuermann <leon@is.currently.online>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH] nbd: fix partial sending
+Message-ID: <ZxGs1sb3PlWs0knI@fedora>
+References: <20241017113614.2964389-1-ming.lei@redhat.com>
+ <ZxExqStWA5HmZMzy@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 07/11] io_uring/rw: add support to send meta along with
- read/write
-To: Christoph Hellwig <hch@lst.de>, Anuj Gupta <anuj20.g@samsung.com>
-Cc: kbusch@kernel.org, martin.petersen@oracle.com, asml.silence@gmail.com,
- anuj1072538@gmail.com, krisman@suse.de, io-uring@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
- gost.dev@samsung.com, linux-scsi@vger.kernel.org, vishak.g@samsung.com,
- Kanchan Joshi <joshi.k@samsung.com>
-References: <20241016112912.63542-1-anuj20.g@samsung.com>
- <CGME20241016113747epcas5p4e276eb0da2695ba032ce1d2a3b83fff4@epcas5p4.samsung.com>
- <20241016112912.63542-8-anuj20.g@samsung.com> <20241017081057.GA27241@lst.de>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241017081057.GA27241@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZxExqStWA5HmZMzy@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 10/17/24 2:10 AM, Christoph Hellwig wrote:
-> s/meta/metadata/ in the subject.
+On Thu, Oct 17, 2024 at 05:47:53PM +0200, Kevin Wolf wrote:
+> Am 17.10.2024 um 13:36 hat Ming Lei geschrieben:
+> > nbd driver sends request header and payload with multiple call of
+> > sock_sendmsg, and partial sending can't be avoided. However, nbd driver
+> > returns BLK_STS_RESOURCE to block core in this situation. This way causes
+> > one issue: request->tag may change in the next run of nbd_queue_rq(), but
+> > the original old tag has been sent as part of header cookie, this way
+> > confuses nbd driver reply handling, since the real request can't be
+> > retrieved any more with the obsolete old tag.
+> > 
+> > Fix it by retrying sending directly, this way is reasonable & safe since
+> > nothing can move on if the current hw queue(socket) has pending request,
+> > and unnecessary requeue can be avoided in this way.
+> > 
+> > Cc: vincent.chen@sifive.com
+> > Cc: Leon Schuermann <leon@is.currently.online>
+> > Cc: Bart Van Assche <bvanassche@acm.org>
+> > Reported-by: Kevin Wolf <kwolf@redhat.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> > Kevin,
+> > 	Please test this version, thanks!
 > 
->> +	const struct io_uring_meta *md = (struct io_uring_meta *)sqe->big_sqe_cmd;
+> The NBD errors seem to go away with this.
 > 
-> Overly long line.
+> I'm not sure about side effects, though. Isn't the idea behind EINTR
+> that you return to userspace to let it handle a signal? Looping in the
 
-That's fine in io_uring, I prefer slightly longer lines rather than needlessly
-breaking them up.
+Well, the retry can be done in one work function, then userspace can get
+chance to handle signal.
 
--- 
-Jens Axboe
+> kernel doesn't quite achieve this, so do we delay/prevent signal
+> delivery with this? On the other hand, if it were completely prevented,
+> then this should become an infinite loop, which it didn't in my test.
+
+If retry can't succeed in the request's deadline, it will fail.
+
+> 
+> >  drivers/block/nbd.c | 35 +++++++++++++++++++++++++++++++++--
+> >  1 file changed, 33 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > index b852050d8a96..ef84071041e3 100644
+> > --- a/drivers/block/nbd.c
+> > +++ b/drivers/block/nbd.c
+> > @@ -701,8 +701,9 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
+> >  			if (sent) {
+> >  				nsock->pending = req;
+> >  				nsock->sent = sent;
+> > +			} else {
+> > +				set_bit(NBD_CMD_REQUEUED, &cmd->flags);
+> >  			}
+> > -			set_bit(NBD_CMD_REQUEUED, &cmd->flags);
+> >  			return BLK_STS_RESOURCE;
+> >  		}
+> >  		dev_err_ratelimited(disk_to_dev(nbd->disk),
+> > @@ -743,7 +744,6 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
+> >  					 */
+> >  					nsock->pending = req;
+> >  					nsock->sent = sent;
+> > -					set_bit(NBD_CMD_REQUEUED, &cmd->flags);
+> >  					return BLK_STS_RESOURCE;
+> >  				}
+> >  				dev_err(disk_to_dev(nbd->disk),
+> > @@ -778,6 +778,35 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
+> >  	return BLK_STS_OK;
+> >  }
+> >  
+> > +/*
+> > + * Send pending nbd request and payload, part of them have been sent
+> > + * already, so we have to send them all with current request, and can't
+> > + * return BLK_STS_RESOURCE, otherwise request tag may be changed in next
+> > + * retry
+> > + */
+> > +static blk_status_t nbd_send_pending_cmd(struct nbd_device *nbd,
+> > +		struct nbd_cmd *cmd)
+> > +{
+> > +	struct request *req = blk_mq_rq_from_pdu(cmd);
+> > +	unsigned long deadline = READ_ONCE(req->deadline);
+> > +	unsigned int wait_ms = 2;
+> > +	blk_status_t res;
+> > +
+> > +	WARN_ON_ONCE(test_bit(NBD_CMD_REQUEUED, &cmd->flags));
+> > +
+> > +	while (true) {
+> > +		res = nbd_send_cmd(nbd, cmd, cmd->index);
+> > +		if (res != BLK_STS_RESOURCE)
+> > +			return res;
+> > +		if (READ_ONCE(jiffies) + msecs_to_jiffies(wait_ms) >= deadline)
+> > +			break;
+> > +		msleep(wait_ms);
+> > +		wait_ms *= 2;
+> > +	}
+> > +
+> > +	return BLK_STS_IOERR;
+> > +}
+> > +
+> >  static int nbd_read_reply(struct nbd_device *nbd, struct socket *sock,
+> >  			  struct nbd_reply *reply)
+> >  {
+> > @@ -1111,6 +1140,8 @@ static blk_status_t nbd_handle_cmd(struct nbd_cmd *cmd, int index)
+> >  		goto out;
+> >  	}
+> >  	ret = nbd_send_cmd(nbd, cmd, index);
+> > +	if (ret == BLK_STS_RESOURCE && nsock->pending == req)
+> > +		ret = nbd_send_pending_cmd(nbd, cmd);
+> 
+> Is there a reason to call nbd_send_cmd() outside of the new loop first
+> instead of going to the loop directly? It's always better to only have
+> a single code path.
+
+IMO, it is better to add new cold code path for handling the unusual
+pending request, and nbd_send_cmd() has been too complicated to maintain.
+
+
+Thanks,
+Ming
 
