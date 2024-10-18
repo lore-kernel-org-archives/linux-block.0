@@ -1,463 +1,616 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9AE42052
-	for <linux-block@vger.kernel.org>; Fri, 18 Oct 2024 01:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC481154C00;
+	Fri, 18 Oct 2024 02:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729215362; cv=none; b=DtL2L0LFeQLoqTudBgckbQaRuZaxs46NC6ft4/EIGoTmaTE481o4lcpnS94SbH75cmVxxI8O0UESNAzK9+P797zu3tyuKMUi3BHyO5s8s9nvMRq9NJecL55uofv5KfdGLfKpfV3aYeU5WlSVllQv6He3wSD6/nryB1uVpbOqSA8=
+	t=1729219967; cv=none; b=DEo5tSjohpuTk4lBv4Ur26dThkkki4tKvBhnXMDX/tYJ7C6AVFehZGTzOWx0i4I8FBIeT8O56Q0MKrj/CHfJQMH4c0QkQ50DJmUR2cvNQAuNbUK3rJqWiKfMncGn/vb3u0lSmhCjBYBzKucgSF6se6yJSlD6aFSnx4Jw5ZmfcdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729215362; c=relaxed/simple;
-	bh=uzbyww0fmKo7tgkQY91i+nj7NKUyowu0VlKA6sZxVNM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OvEA5379686NUKAmgA50YYSbBTLrdSMHro57EhWY/pB7R5SBCgyqUBLiTHsbmKcCMLOpTn0X6GPru11YYew+zy34QTjGJGQGMYWzIh2JQQwZJVj69AksMVo7yy21T00faUIauii6YWCjtZdjoTpAgyaBs3esS1RZ3qjugLKIFgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hAjMJUYT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729219967; c=relaxed/simple;
+	bh=pabfNCmlIPwYzm5IgdudAqy7XRVMiMocc5gWvyE8Pxw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sj9TuCvv2oRhZ023vTZl4BshSMZiRelB6mnbytdn/T0+yq9NMeS1GU0rpUnRSQX1GdxmNsguFPn/4A/m+nm7Ic7sA3Wln2bkbVyQNv9Qhx2FGEHahdX4afEmZRX7WdeEhfUEhWH0OuIyTIY+EVeAXtCzbqePYzJvH53N6LSLfTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SAMu9D6o; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hAjMJUYT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729215358;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=xGcMnSD84PeKJ+hpAg5pWB5Bi0hILYcn+WQq8wrM1As=;
-	b=hAjMJUYTCtPqdukGwGr5sGTCmTYHzo5BItJsXyZIYdCFOi+3cFAE1q0onpcKvHoRVJZzFM
-	7Wp+jE8uya6mg4hftKRIBts1QjDTke/iVSa0T5V+RuwRsD1unf/SIwXnQlq4cZADPk4Zk6
-	V4IchOIJepxwg9/X0MGPegiqTI3Qo0M=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-194-ZlorA9ASPNWdkgqV5I19kA-1; Thu,
- 17 Oct 2024 21:35:52 -0400
-X-MC-Unique: ZlorA9ASPNWdkgqV5I19kA-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 86DEC1956096;
-	Fri, 18 Oct 2024 01:35:51 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.56])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 168681956086;
-	Fri, 18 Oct 2024 01:35:49 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] block: model freeze & enter queue as rwsem for supporting lockdep
-Date: Fri, 18 Oct 2024 09:35:42 +0800
-Message-ID: <20241018013542.3013963-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SAMu9D6o"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6cc2ea27a50so21459626d6.0;
+        Thu, 17 Oct 2024 19:52:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729219964; x=1729824764; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=L46f3uUSqgRYVs6jmS0mM8WHRPMBaXlVySl7LjIwhEs=;
+        b=SAMu9D6oT4Fp+iKC8L5j6t4ovyquzCg1wdNt8R5MVMSOsna/HIaikMc1Vq8m5xoh0L
+         ASn0ey3jfqDjlPbvU3q5fdwrBC7CoHp1fniP2E3aw5GX5mSPhJXjq17v8XIL3DPz/WAH
+         wc+fIqBu50oqwzySU1n/Rkh1dESXD9w4qwrhAO8qSqNbFj+JyIOsNTEdUCRHLTxlD4Iy
+         gQ20lEorv3hrQV/AN2DovfRDSunhM38CA3JCbM14jt/3Hg1ehEzz4tnKP6pGSkp5+lKN
+         vomGOySIZkyxqFdhHTRRfHsKv/h7cOlwdxlzH3TKYJlibZHcyW64cYTLQ2qxoJldWMMe
+         C5DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729219964; x=1729824764;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L46f3uUSqgRYVs6jmS0mM8WHRPMBaXlVySl7LjIwhEs=;
+        b=iIVHKM5N9Uyf56zcXepFvfbh5QfNv4Mut7MwORg/nM0UW5pjcEwzidx+Yrr9ONxuP0
+         CNKizafL0DmKCqn/PyPN/gvA1XJ/smGWv/sxrx9wxdngMJm5K6L9oiuQa2Ou5VzXon4E
+         isce5QCU/u06RqF6t2CLFn+Z+wJ6mlD8JJc4duwM+lIIMJCG0IyJC2JqlRdfGWKtoo7s
+         Mf6Ci4wT2ooJ0ajncSgdhR4w1o48TcZqOtFe/4EPDvS6AFyAMkoPB42eOOp37YCFpIzP
+         3a0sRFKvWDSER55AA0lDKfuXzUk3yYQn3PvOtE6D6km/UtqI25gHlnHJ7W0OJGm8T6cr
+         wrFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUQgeNOgfDsc5Em4jBHISYw96TS8GDsg+baSaHlnnE65JPpOA72fxeMwXqMlL6sGbjV1SiTdXrIK3B+ugA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGS4++8XNiG+FofYnAmgww3uScHaK9AULrCBeDJHAibcKN+7cl
+	S4ENPS6KvNTTZQCzF8cTflCzNBVc/E9WP6QV789R725DM0swuBWj
+X-Google-Smtp-Source: AGHT+IGyw12kC3EtWeqkNzL6vOrVD7F7x084oiflFQVyi8H67D9oZ0Q04qk8nX/3+/Fvf4vne2xo6g==
+X-Received: by 2002:a05:6214:31a1:b0:6cb:e9da:bd4 with SMTP id 6a1803df08f44-6cde1879c6cmr16538756d6.5.1729219964399;
+        Thu, 17 Oct 2024 19:52:44 -0700 (PDT)
+Received: from [10.56.180.205] (syn-076-188-177-122.res.spectrum.com. [76.188.177.122])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cde117b295sm2750836d6.71.2024.10.17.19.52.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Oct 2024 19:52:43 -0700 (PDT)
+Message-ID: <681a6d2e-a80a-4e81-a049-841d7e8582ba@gmail.com>
+Date: Thu, 17 Oct 2024 22:52:42 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 2/2] dm-inlinecrypt: add target for inline block
+ device encryption
+To: Eric Biggers <ebiggers@kernel.org>, dm-devel@lists.linux.dev
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Md Sadre Alam <quic_mdalam@quicinc.com>, Israel Rukshin
+ <israelr@nvidia.com>, Milan Broz <gmazyland@gmail.com>,
+ Mikulas Patocka <mpatocka@redhat.com>
+References: <20241016232748.134211-1-ebiggers@kernel.org>
+ <20241016232748.134211-3-ebiggers@kernel.org>
+Content-Language: en-US
+From: Adrian Vovk <adrianvovk@gmail.com>
+In-Reply-To: <20241016232748.134211-3-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Recently we got several deadlock report[1][2][3] caused by blk_mq_freeze_queue
-and blk_enter_queue().
+Hello,
 
-Turns out the two are just like one rwsem, so model them as rwsem for
-supporting lockdep:
+On 10/16/24 19:27, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Add a new device-mapper target "dm-inlinecrypt" that is similar to
+> dm-crypt but uses the blk-crypto API instead of the regular crypto API.
+> This allows it to take advantage of inline encryption hardware such as
+> that commonly built into UFS host controllers.
 
-1) model blk_mq_freeze_queue() as down_write_trylock()
-- it is exclusive lock, so dependency with blk_enter_queue() is covered
-- it is trylock because blk_mq_freeze_queue() are allowed to run concurrently
+Wow! Thank you for this patch! This is something we really want in 
+systemd and in GNOME, and I came across this patchset on accident while 
+trying to find a way to get someone to work on it for us.
 
-2) model blk_enter_queue() as down_read()
-- it is shared lock, so concurrent blk_enter_queue() are allowed
-- it is read lock, so dependency with blk_mq_freeze_queue() is modeled
-- blk_queue_exit() is often called from other contexts(such as irq), and
-it can't be annotated as rwsem_release(), so simply do it in
-blk_enter_queue(), this way still covered cases as many as possible
+> The table syntax matches dm-crypt's, but for now only a stripped-down
+> set of parameters is supported.  For example, for now AES-256-XTS is the
+> only supported cipher.
+>
+> dm-inlinecrypt is based on Android's dm-default-key with the
+> controversial passthrough support removed.
 
-NVMe is the only subsystem which may call blk_mq_freeze_queue() and
-blk_mq_unfreeze_queue() from different context, so it is the only
-exception for the modeling. Add one tagset flag to exclude it from
-the lockdep support.
+That's quite unfortunate. I'd say this passthrough support is probably 
+the most powerful thing about dm-default-key.
 
-With lockdep support, such kind of reports may be reported asap and
-needn't wait until the real deadlock is triggered.
+Could you elaborate on why you removed it? I think it's a necessary 
+feature. Enabling multiple layers of encryption stacked on top of each 
+other, without paying the cost of double (or more...) encryption, is 
+something we really want over in userspace. It'll enable us to stack 
+full-disk encryption with encrypted /home directories for each user and 
+then stack encrypted per-app data dirs on top of that. I'd say that the 
+passthrough support is more important for us than the performance 
+benefit of using inline encryption hardware.
 
-For example, the following lockdep report can be triggered in the
-report[3].
+Without a solution to layer encryption we can't do a lot of good things 
+we want to do in userspace.
 
-[   45.701432] ======================================================
-[   45.702621] WARNING: possible circular locking dependency detected
-[   45.703829] 6.12.0-rc1_uring_dev+ #188 Not tainted
-[   45.704806] ------------------------------------------------------
-[   45.705903] bash/1323 is trying to acquire lock:
-[   45.706153] ffff88813e075870 (&q->limits_lock){+.+.}-{3:3}, at: queue_wc_store+0x11c/0x380
-[   45.706602]
-               but task is already holding lock:
-[   45.706927] ffff88813e075730 (&q->sysfs_lock){+.+.}-{3:3}, at: queue_attr_store+0xd9/0x170
-[   45.707391]
-               which lock already depends on the new lock.
+As far as I understand, the passthrough support was controversial only 
+because previous upstreaming attempts tried to punch holes into dm-crypt 
+to make this work. I don't know of an attempt to upstream dm-default-key 
+as-is, with passthrough support. As far as I can tell, people even 
+seemed open to that idea...
 
-[   45.707838]
-               the existing dependency chain (in reverse order) is:
-[   45.708238]
-               -> #2 (&q->sysfs_lock){+.+.}-{3:3}:
-[   45.708558]        __mutex_lock+0x177/0x10d0
-[   45.708797]        queue_attr_store+0xd9/0x170
-[   45.709039]        kernfs_fop_write_iter+0x39f/0x5a0
-[   45.709304]        vfs_write+0x5d3/0xe80
-[   45.709514]        ksys_write+0xfb/0x1d0
-[   45.709723]        do_syscall_64+0x95/0x180
-[   45.709946]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   45.710256]
-               -> #1 (q->q_usage_counter){++++}-{0:0}:
-[   45.710589]        blk_try_enter_queue+0x32/0x340
-[   45.710842]        blk_queue_enter+0x97/0x4c0
-[   45.711080]        blk_mq_alloc_request+0x347/0x900
-[   45.711340]        scsi_execute_cmd+0x183/0xc20
-[   45.711584]        read_capacity_16+0x1ce/0xbb0
-[   45.711823]        sd_revalidate_disk.isra.0+0xf78/0x8b40
-[   45.712119]        sd_probe+0x813/0xf40
-[   45.712320]        really_probe+0x1e0/0x8a0
-[   45.712542]        __driver_probe_device+0x18c/0x370
-[   45.712801]        driver_probe_device+0x4a/0x120
-[   45.713053]        __device_attach_driver+0x162/0x270
-[   45.713327]        bus_for_each_drv+0x115/0x1a0
-[   45.713572]        __device_attach_async_helper+0x1a0/0x240
-[   45.713872]        async_run_entry_fn+0x97/0x4f0
-[   45.714127]        process_one_work+0x85d/0x1430
-[   45.714377]        worker_thread+0x5be/0xff0
-[   45.714610]        kthread+0x293/0x350
-[   45.714811]        ret_from_fork+0x31/0x70
-[   45.715032]        ret_from_fork_asm+0x1a/0x30
-[   45.715667]
-               -> #0 (&q->limits_lock){+.+.}-{3:3}:
-[   45.716819]        __lock_acquire+0x310a/0x6060
-[   45.717476]        lock_acquire.part.0+0x122/0x360
-[   45.718133]        __mutex_lock+0x177/0x10d0
-[   45.718759]        queue_wc_store+0x11c/0x380
-[   45.719384]        queue_attr_store+0xff/0x170
-[   45.720007]        kernfs_fop_write_iter+0x39f/0x5a0
-[   45.720647]        vfs_write+0x5d3/0xe80
-[   45.721252]        ksys_write+0xfb/0x1d0
-[   45.721847]        do_syscall_64+0x95/0x180
-[   45.722433]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   45.723085]
-               other info that might help us debug this:
+Is there some context I'm missing? Information would be appreciated.
 
-[   45.724532] Chain exists of:
-                 &q->limits_lock --> q->q_usage_counter --> &q->sysfs_lock
+> Note that due to the removal
+> of passthrough support, use of dm-inlinecrypt in combination with
+> fscrypt causes double encryption of file contents (similar to dm-crypt +
+> fscrypt), with the fscrypt layer not being able to use the inline
+> encryption hardware.  This makes dm-inlinecrypt unusable on systems such
+> as Android that use fscrypt and where a more optimized approach is
+> needed.
 
-[   45.726122]  Possible unsafe locking scenario:
+Yeah, sadly you've removed the use-case we're very interested in. 
+Generic PC hardware doesn't have blk-crypto hardware as far as I can 
+tell, so we don't get the performance benefit of replacing dm-crypt with 
+dm-inlinecrypt. However, we do get the performance benefit of the 
+passthrough support (if we run this on top of the blk-crypto software 
+emulation mode, for instance)
 
-[   45.727114]        CPU0                    CPU1
-[   45.727687]        ----                    ----
-[   45.728270]   lock(&q->sysfs_lock);
-[   45.728792]                                lock(q->q_usage_counter);
-[   45.729466]                                lock(&q->sysfs_lock);
-[   45.730119]   lock(&q->limits_lock);
-[   45.730655]
-                *** DEADLOCK ***
 
-[   45.731983] 5 locks held by bash/1323:
-[   45.732524]  #0: ffff88811a4a0450 (sb_writers#4){.+.+}-{0:0}, at: ksys_write+0xfb/0x1d0
-[   45.733290]  #1: ffff88811fa35890 (&of->mutex#2){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x25d/0x5a0
-[   45.734113]  #2: ffff888118e9fc20 (kn->active#133){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x281/0x5a0
-[   45.734939]  #3: ffff88813e0751e0 (q->q_usage_counter){++++}-{0:0}, at: blk_mq_freeze_queue+0x12/0x20
-[   45.735797]  #4: ffff88813e075730 (&q->sysfs_lock){+.+.}-{3:3}, at: queue_attr_store+0xd9/0x170
-[   45.736626]
-               stack backtrace:
-[   45.737598] CPU: 9 UID: 0 PID: 1323 Comm: bash Not tainted 6.12.0-rc1_uring_dev+ #188
-[   45.738388] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-1.fc39 04/01/2014
-[   45.739222] Call Trace:
-[   45.739762]  <TASK>
-[   45.740309]  dump_stack_lvl+0x84/0xd0
-[   45.740962]  print_circular_bug.cold+0x1e4/0x278
-[   45.741628]  check_noncircular+0x331/0x410
-[   45.742289]  ? __pfx_check_noncircular+0x10/0x10
-[   45.742933]  ? lock_release+0x588/0xcc0
-[   45.743536]  ? lockdep_lock+0xbe/0x1c0
-[   45.744156]  ? __pfx_lockdep_lock+0x10/0x10
-[   45.744785]  ? is_bpf_text_address+0x21/0x100
-[   45.745442]  __lock_acquire+0x310a/0x6060
-[   45.746088]  ? __pfx___lock_acquire+0x10/0x10
-[   45.746735]  ? __pfx___bfs+0x10/0x10
-[   45.747325]  lock_acquire.part.0+0x122/0x360
-[   45.747947]  ? queue_wc_store+0x11c/0x380
-[   45.748564]  ? __pfx_lock_acquire.part.0+0x10/0x10
-[   45.749254]  ? trace_lock_acquire+0x12f/0x1a0
-[   45.749903]  ? queue_wc_store+0x11c/0x380
-[   45.750545]  ? lock_acquire+0x2f/0xb0
-[   45.751168]  ? queue_wc_store+0x11c/0x380
-[   45.751777]  __mutex_lock+0x177/0x10d0
-[   45.752379]  ? queue_wc_store+0x11c/0x380
-[   45.752988]  ? queue_wc_store+0x11c/0x380
-[   45.753586]  ? __pfx___mutex_lock+0x10/0x10
-[   45.754202]  ? __pfx___lock_acquire+0x10/0x10
-[   45.754823]  ? lock_acquire.part.0+0x122/0x360
-[   45.755456]  ? queue_wc_store+0x11c/0x380
-[   45.756063]  queue_wc_store+0x11c/0x380
-[   45.756653]  ? __pfx_lock_acquired+0x10/0x10
-[   45.757305]  ? lock_acquire+0x2f/0xb0
-[   45.757904]  ? trace_contention_end+0xd4/0x110
-[   45.758524]  ? __pfx_queue_wc_store+0x10/0x10
-[   45.759172]  ? queue_attr_store+0xd9/0x170
-[   45.759899]  ? __pfx_autoremove_wake_function+0x10/0x10
-[   45.760587]  queue_attr_store+0xff/0x170
-[   45.761213]  ? sysfs_kf_write+0x41/0x170
-[   45.761823]  ? __pfx_sysfs_kf_write+0x10/0x10
-[   45.762461]  kernfs_fop_write_iter+0x39f/0x5a0
-[   45.763109]  vfs_write+0x5d3/0xe80
-[   45.763690]  ? lockdep_hardirqs_on_prepare+0x274/0x3f0
-[   45.764368]  ? __pfx_vfs_write+0x10/0x10
-[   45.764964]  ksys_write+0xfb/0x1d0
-[   45.765544]  ? __pfx_ksys_write+0x10/0x10
-[   45.766160]  ? ksys_dup3+0xce/0x2b0
-[   45.766710]  do_syscall_64+0x95/0x180
-[   45.767267]  ? filp_close+0x1d/0x30
-[   45.767801]  ? do_dup2+0x27c/0x4f0
-[   45.768334]  ? syscall_exit_to_user_mode+0x97/0x290
-[   45.768930]  ? lockdep_hardirqs_on_prepare+0x274/0x3f0
-[   45.769538]  ? syscall_exit_to_user_mode+0x97/0x290
-[   45.770136]  ? do_syscall_64+0xa1/0x180
-[   45.770665]  ? clear_bhb_loop+0x25/0x80
-[   45.771206]  ? clear_bhb_loop+0x25/0x80
-[   45.771735]  ? clear_bhb_loop+0x25/0x80
-[   45.772261]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   45.772843] RIP: 0033:0x7f3b17be9984
-[   45.773363] Code: c7 00 16 00 00 00 b8 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 80 3d c5 06 0e 00 00 74 13 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 55 48 89 e5 48 83 ec 20 48 89
-[   45.775131] RSP: 002b:00007fffaa975ba8 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
-[   45.775909] RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007f3b17be9984
-[   45.776672] RDX: 0000000000000005 RSI: 0000556af3758790 RDI: 0000000000000001
-[   45.777454] RBP: 00007fffaa975bd0 R08: 0000000000000073 R09: 00000000ffffffff
-[   45.778251] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000005
-[   45.779039] R13: 0000556af3758790 R14: 00007f3b17cc35c0 R15: 00007f3b17cc0f00
-[   45.779822]  </TASK>
+Best,
 
-[1] occasional block layer hang when setting 'echo noop > /sys/block/sda/queue/scheduler'
-https://bugzilla.kernel.org/show_bug.cgi?id=219166
+Adrian Vovk
 
-[2] del_gendisk() vs blk_queue_enter() race condition
-https://lore.kernel.org/linux-block/20241003085610.GK11458@google.com/
-
-[3] queue_freeze & queue_enter deadlock in scsi
-https://lore.kernel.org/linux-block/ZxG38G9BuFdBpBHZ@fedora/T/#u
-
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c         |  3 +++
- block/blk-mq-debugfs.c   |  1 +
- block/blk-mq.c           | 15 +++++++++++++++
- block/blk.h              |  9 +++++++++
- block/genhd.c            |  3 +++
- drivers/nvme/host/core.c |  4 ++--
- include/linux/blk-mq.h   |  5 ++++-
- include/linux/blkdev.h   |  6 ++++++
- 8 files changed, 43 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index bc5e8c5eaac9..2c3ca6d405e2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -384,6 +384,7 @@ static void blk_timeout_work(struct work_struct *work)
- 
- struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id)
- {
-+	static struct lock_class_key __q_usage_counter_key;
- 	struct request_queue *q;
- 	int error;
- 
-@@ -441,6 +442,8 @@ struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id)
- 				PERCPU_REF_INIT_ATOMIC, GFP_KERNEL);
- 	if (error)
- 		goto fail_stats;
-+	lockdep_init_map(&q->q_usage_counter_map, "q->q_usage_counter",
-+			 &__q_usage_counter_key, 0);
- 
- 	q->nr_requests = BLKDEV_DEFAULT_RQ;
- 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 5463697a8442..d0edac3b8b08 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -188,6 +188,7 @@ static const char *const hctx_flag_name[] = {
- 	HCTX_FLAG_NAME(BLOCKING),
- 	HCTX_FLAG_NAME(NO_SCHED),
- 	HCTX_FLAG_NAME(NO_SCHED_BY_DEFAULT),
-+	HCTX_FLAG_NAME(SKIP_FREEZE_LOCKDEP),
- };
- #undef HCTX_FLAG_NAME
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4b2c8e940f59..b1b970650641 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -122,7 +122,10 @@ void blk_mq_in_flight_rw(struct request_queue *q, struct block_device *part,
- 
- void blk_freeze_queue_start(struct request_queue *q)
- {
-+	int sub_class;
-+
- 	mutex_lock(&q->mq_freeze_lock);
-+	sub_class = q->mq_freeze_depth;
- 	if (++q->mq_freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
- 		mutex_unlock(&q->mq_freeze_lock);
-@@ -131,6 +134,12 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	} else {
- 		mutex_unlock(&q->mq_freeze_lock);
- 	}
-+	/*
-+	 * model as down_write_trylock() so that two concurrent freeze queue
-+	 * can be allowed
-+	 */
-+	if (blk_queue_freeze_lockdep(q))
-+		rwsem_acquire(&q->q_usage_counter_map, sub_class, 1, _RET_IP_);
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
- 
-@@ -188,6 +197,9 @@ void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- 		wake_up_all(&q->mq_freeze_wq);
- 	}
- 	mutex_unlock(&q->mq_freeze_lock);
-+
-+	if (blk_queue_freeze_lockdep(q))
-+		rwsem_release(&q->q_usage_counter_map, _RET_IP_);
- }
- 
- void blk_mq_unfreeze_queue(struct request_queue *q)
-@@ -4185,6 +4197,9 @@ void blk_mq_destroy_queue(struct request_queue *q)
- 	blk_queue_start_drain(q);
- 	blk_mq_freeze_queue_wait(q);
- 
-+	/* counter pair of acquire in blk_queue_start_drain */
-+	if (blk_queue_freeze_lockdep(q))
-+		rwsem_release(&q->q_usage_counter_map, _RET_IP_);
- 	blk_sync_queue(q);
- 	blk_mq_cancel_work_sync(q);
- 	blk_mq_exit_queue(q);
-diff --git a/block/blk.h b/block/blk.h
-index c718e4291db0..d6274f3bece9 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/bio-integrity.h>
- #include <linux/blk-crypto.h>
-+#include <linux/lockdep.h>
- #include <linux/memblock.h>	/* for max_pfn/max_low_pfn */
- #include <linux/sched/sysctl.h>
- #include <linux/timekeeping.h>
-@@ -43,6 +44,8 @@ void bio_await_chain(struct bio *bio);
- 
- static inline bool blk_try_enter_queue(struct request_queue *q, bool pm)
- {
-+	/* model as down_read() for lockdep */
-+	rwsem_acquire_read(&q->q_usage_counter_map, 0, 0, _RET_IP_);
- 	rcu_read_lock();
- 	if (!percpu_ref_tryget_live_rcu(&q->q_usage_counter))
- 		goto fail;
-@@ -56,12 +59,18 @@ static inline bool blk_try_enter_queue(struct request_queue *q, bool pm)
- 		goto fail_put;
- 
- 	rcu_read_unlock();
-+	/*
-+	 * queue exit often happen in other context, so we simply annotate
-+	 * release here, still lots of cases can be covered
-+	 */
-+	rwsem_release(&q->q_usage_counter_map, _RET_IP_);
- 	return true;
- 
- fail_put:
- 	blk_queue_exit(q);
- fail:
- 	rcu_read_unlock();
-+	rwsem_release(&q->q_usage_counter_map, _RET_IP_);
- 	return false;
- }
- 
-diff --git a/block/genhd.c b/block/genhd.c
-index 1c05dd4c6980..4016a83a0d83 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -722,6 +722,9 @@ void del_gendisk(struct gendisk *disk)
- 		blk_queue_flag_clear(QUEUE_FLAG_INIT_DONE, q);
- 		__blk_mq_unfreeze_queue(q, true);
- 	} else {
-+		/* counter pair of acquire in blk_queue_start_drain */
-+		if (blk_queue_freeze_lockdep(q))
-+			rwsem_release(&q->q_usage_counter_map, _RET_IP_);
- 		if (queue_is_mq(q))
- 			blk_mq_exit_queue(q);
- 	}
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index ba6508455e18..6575f0f5a5fe 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -4528,7 +4528,7 @@ int nvme_alloc_admin_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
- 		/* Reserved for fabric connect and keep alive */
- 		set->reserved_tags = 2;
- 	set->numa_node = ctrl->numa_node;
--	set->flags = BLK_MQ_F_NO_SCHED;
-+	set->flags = BLK_MQ_F_NO_SCHED | BLK_MQ_F_SKIP_FREEZE_LOCKDEP;
- 	if (ctrl->ops->flags & NVME_F_BLOCKING)
- 		set->flags |= BLK_MQ_F_BLOCKING;
- 	set->cmd_size = cmd_size;
-@@ -4598,7 +4598,7 @@ int nvme_alloc_io_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
- 		/* Reserved for fabric connect */
- 		set->reserved_tags = 1;
- 	set->numa_node = ctrl->numa_node;
--	set->flags = BLK_MQ_F_SHOULD_MERGE;
-+	set->flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SKIP_FREEZE_LOCKDEP;
- 	if (ctrl->ops->flags & NVME_F_BLOCKING)
- 		set->flags |= BLK_MQ_F_BLOCKING;
- 	set->cmd_size = cmd_size;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 4fecf46ef681..9c5c9dc0e7e2 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -687,7 +687,10 @@ enum {
- 	 * or shared hwqs instead of 'mq-deadline'.
- 	 */
- 	BLK_MQ_F_NO_SCHED_BY_DEFAULT	= 1 << 6,
--	BLK_MQ_F_ALLOC_POLICY_START_BIT = 7,
-+
-+	BLK_MQ_F_SKIP_FREEZE_LOCKDEP	= 1 << 7,
-+
-+	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
- 	BLK_MQ_F_ALLOC_POLICY_BITS = 1,
- };
- #define BLK_MQ_FLAG_TO_ALLOC_POLICY(flags) \
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 50c3b959da28..5f25521bf2f6 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -25,6 +25,7 @@
- #include <linux/uuid.h>
- #include <linux/xarray.h>
- #include <linux/file.h>
-+#include <linux/lockdep.h>
- 
- struct module;
- struct request_queue;
-@@ -471,6 +472,9 @@ struct request_queue {
- 	struct xarray		hctx_table;
- 
- 	struct percpu_ref	q_usage_counter;
-+#ifdef CONFIG_DEBUG_LOCK_ALLOC
-+	struct lockdep_map	q_usage_counter_map;
-+#endif
- 
- 	struct request		*last_merge;
- 
-@@ -635,6 +639,8 @@ void blk_queue_flag_clear(unsigned int flag, struct request_queue *q);
- #define blk_queue_sq_sched(q)	test_bit(QUEUE_FLAG_SQ_SCHED, &(q)->queue_flags)
- #define blk_queue_skip_tagset_quiesce(q) \
- 	((q)->limits.features & BLK_FEAT_SKIP_TAGSET_QUIESCE)
-+#define blk_queue_freeze_lockdep(q) \
-+	!(q->tag_set->flags & BLK_MQ_F_SKIP_FREEZE_LOCKDEP)
- 
- extern void blk_set_pm_only(struct request_queue *q);
- extern void blk_clear_pm_only(struct request_queue *q);
--- 
-2.46.0
-
+> It is however suitable as a replacement for dm-crypt.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>   drivers/md/Kconfig          |  10 +
+>   drivers/md/Makefile         |   1 +
+>   drivers/md/dm-inlinecrypt.c | 417 ++++++++++++++++++++++++++++++++++++
+>   3 files changed, 428 insertions(+)
+>   create mode 100644 drivers/md/dm-inlinecrypt.c
+>
+> diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
+> index 1e9db8e4acdf6..caed60097a216 100644
+> --- a/drivers/md/Kconfig
+> +++ b/drivers/md/Kconfig
+> @@ -268,10 +268,20 @@ config DM_CRYPT
+>   	  To compile this code as a module, choose M here: the module will
+>   	  be called dm-crypt.
+>   
+>   	  If unsure, say N.
+>   
+> +config DM_INLINECRYPT
+> +	tristate "Inline encryption target support"
+> +	depends on BLK_DEV_DM
+> +	depends on BLK_INLINE_ENCRYPTION
+> +	help
+> +	  This device-mapper target is similar to dm-crypt, but it uses the
+> +	  blk-crypto API instead of the regular crypto API. This allows it to
+> +	  take advantage of inline encryption hardware such as that commonly
+> +	  built into UFS host controllers.
+> +
+>   config DM_SNAPSHOT
+>          tristate "Snapshot target"
+>          depends on BLK_DEV_DM
+>          select DM_BUFIO
+>   	help
+> diff --git a/drivers/md/Makefile b/drivers/md/Makefile
+> index 476a214e4bdc2..6e44ff32b8af8 100644
+> --- a/drivers/md/Makefile
+> +++ b/drivers/md/Makefile
+> @@ -49,10 +49,11 @@ obj-$(CONFIG_BLK_DEV_DM)	+= dm-mod.o
+>   obj-$(CONFIG_BLK_DEV_DM_BUILTIN) += dm-builtin.o
+>   obj-$(CONFIG_DM_UNSTRIPED)	+= dm-unstripe.o
+>   obj-$(CONFIG_DM_BUFIO)		+= dm-bufio.o
+>   obj-$(CONFIG_DM_BIO_PRISON)	+= dm-bio-prison.o
+>   obj-$(CONFIG_DM_CRYPT)		+= dm-crypt.o
+> +obj-$(CONFIG_DM_INLINECRYPT)	+= dm-inlinecrypt.o
+>   obj-$(CONFIG_DM_DELAY)		+= dm-delay.o
+>   obj-$(CONFIG_DM_DUST)		+= dm-dust.o
+>   obj-$(CONFIG_DM_FLAKEY)		+= dm-flakey.o
+>   obj-$(CONFIG_DM_MULTIPATH)	+= dm-multipath.o dm-round-robin.o
+>   obj-$(CONFIG_DM_MULTIPATH_QL)	+= dm-queue-length.o
+> diff --git a/drivers/md/dm-inlinecrypt.c b/drivers/md/dm-inlinecrypt.c
+> new file mode 100644
+> index 0000000000000..d6c2e6e1fdbbb
+> --- /dev/null
+> +++ b/drivers/md/dm-inlinecrypt.c
+> @@ -0,0 +1,417 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright 2024 Google LLC
+> + */
+> +
+> +#include <linux/blk-crypto.h>
+> +#include <linux/device-mapper.h>
+> +#include <linux/module.h>
+> +
+> +#define DM_MSG_PREFIX	"inlinecrypt"
+> +
+> +static const struct dm_inlinecrypt_cipher {
+> +	const char *name;
+> +	enum blk_crypto_mode_num mode_num;
+> +	int key_size;
+> +} dm_inlinecrypt_ciphers[] = {
+> +	{
+> +		.name = "aes-xts-plain64",
+> +		.mode_num = BLK_ENCRYPTION_MODE_AES_256_XTS,
+> +		.key_size = 64,
+> +	},
+> +};
+> +
+> +/**
+> + * struct inlinecrypt_ctx - private data of an inlinecrypt target
+> + * @dev: the underlying device
+> + * @start: starting sector of the range of @dev which this target actually maps.
+> + *	   For this purpose a "sector" is 512 bytes.
+> + * @cipher_string: the name of the encryption algorithm being used
+> + * @iv_offset: starting offset for IVs.  IVs are generated as if the target were
+> + *	       preceded by @iv_offset 512-byte sectors.
+> + * @sector_size: crypto sector size in bytes (usually 4096)
+> + * @sector_bits: log2(sector_size)
+> + * @key: the encryption key to use
+> + * @max_dun: the maximum DUN that may be used (computed from other params)
+> + */
+> +struct inlinecrypt_ctx {
+> +	struct dm_dev *dev;
+> +	sector_t start;
+> +	const char *cipher_string;
+> +	u64 iv_offset;
+> +	unsigned int sector_size;
+> +	unsigned int sector_bits;
+> +	struct blk_crypto_key key;
+> +	u64 max_dun;
+> +};
+> +
+> +static const struct dm_inlinecrypt_cipher *
+> +lookup_cipher(const char *cipher_string)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(dm_inlinecrypt_ciphers); i++) {
+> +		if (strcmp(cipher_string, dm_inlinecrypt_ciphers[i].name) == 0)
+> +			return &dm_inlinecrypt_ciphers[i];
+> +	}
+> +	return NULL;
+> +}
+> +
+> +static void inlinecrypt_dtr(struct dm_target *ti)
+> +{
+> +	struct inlinecrypt_ctx *ctx = ti->private;
+> +
+> +	if (ctx->dev) {
+> +		if (ctx->key.size)
+> +			blk_crypto_evict_key(ctx->dev->bdev, &ctx->key);
+> +		dm_put_device(ti, ctx->dev);
+> +	}
+> +	kfree_sensitive(ctx->cipher_string);
+> +	kfree_sensitive(ctx);
+> +}
+> +
+> +static int inlinecrypt_ctr_optional(struct dm_target *ti,
+> +				    unsigned int argc, char **argv)
+> +{
+> +	struct inlinecrypt_ctx *ctx = ti->private;
+> +	struct dm_arg_set as;
+> +	static const struct dm_arg _args[] = {
+> +		{0, 3, "Invalid number of feature args"},
+> +	};
+> +	unsigned int opt_params;
+> +	const char *opt_string;
+> +	bool iv_large_sectors = false;
+> +	char dummy;
+> +	int err;
+> +
+> +	as.argc = argc;
+> +	as.argv = argv;
+> +
+> +	err = dm_read_arg_group(_args, &as, &opt_params, &ti->error);
+> +	if (err)
+> +		return err;
+> +
+> +	while (opt_params--) {
+> +		opt_string = dm_shift_arg(&as);
+> +		if (!opt_string) {
+> +			ti->error = "Not enough feature arguments";
+> +			return -EINVAL;
+> +		}
+> +		if (!strcmp(opt_string, "allow_discards")) {
+> +			ti->num_discard_bios = 1;
+> +		} else if (sscanf(opt_string, "sector_size:%u%c",
+> +				  &ctx->sector_size, &dummy) == 1) {
+> +			if (ctx->sector_size < SECTOR_SIZE ||
+> +			    ctx->sector_size > 4096 ||
+> +			    !is_power_of_2(ctx->sector_size)) {
+> +				ti->error = "Invalid sector_size";
+> +				return -EINVAL;
+> +			}
+> +		} else if (!strcmp(opt_string, "iv_large_sectors")) {
+> +			iv_large_sectors = true;
+> +		} else {
+> +			ti->error = "Invalid feature arguments";
+> +			return -EINVAL;
+> +		}
+> +	}
+> +
+> +	/* dm-inlinecrypt doesn't implement iv_large_sectors=false. */
+> +	if (ctx->sector_size != SECTOR_SIZE && !iv_large_sectors) {
+> +		ti->error = "iv_large_sectors must be specified";
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Construct an inlinecrypt mapping:
+> + * <cipher> <key> <iv_offset> <dev_path> <start>
+> + *
+> + * This syntax matches dm-crypt's, but the set of supported functionality has
+> + * been stripped down.
+> + */
+> +static int inlinecrypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+> +{
+> +	struct inlinecrypt_ctx *ctx;
+> +	const struct dm_inlinecrypt_cipher *cipher;
+> +	u8 raw_key[BLK_CRYPTO_MAX_KEY_SIZE];
+> +	unsigned int dun_bytes;
+> +	unsigned long long tmpll;
+> +	char dummy;
+> +	int err;
+> +
+> +	if (argc < 5) {
+> +		ti->error = "Not enough arguments";
+> +		return -EINVAL;
+> +	}
+> +
+> +	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+> +	if (!ctx) {
+> +		ti->error = "Out of memory";
+> +		return -ENOMEM;
+> +	}
+> +	ti->private = ctx;
+> +
+> +	/* <cipher> */
+> +	ctx->cipher_string = kstrdup(argv[0], GFP_KERNEL);
+> +	if (!ctx->cipher_string) {
+> +		ti->error = "Out of memory";
+> +		err = -ENOMEM;
+> +		goto bad;
+> +	}
+> +	cipher = lookup_cipher(ctx->cipher_string);
+> +	if (!cipher) {
+> +		ti->error = "Unsupported cipher";
+> +		err = -EINVAL;
+> +		goto bad;
+> +	}
+> +
+> +	/* <key> */
+> +	if (strlen(argv[1]) != 2 * cipher->key_size) {
+> +		ti->error = "Incorrect key size for cipher";
+> +		err = -EINVAL;
+> +		goto bad;
+> +	}
+> +	if (hex2bin(raw_key, argv[1], cipher->key_size) != 0) {
+> +		ti->error = "Malformed key string";
+> +		err = -EINVAL;
+> +		goto bad;
+> +	}
+> +
+> +	/* <iv_offset> */
+> +	if (sscanf(argv[2], "%llu%c", &ctx->iv_offset, &dummy) != 1) {
+> +		ti->error = "Invalid iv_offset sector";
+> +		err = -EINVAL;
+> +		goto bad;
+> +	}
+> +
+> +	/* <dev_path> */
+> +	err = dm_get_device(ti, argv[3], dm_table_get_mode(ti->table),
+> +			    &ctx->dev);
+> +	if (err) {
+> +		ti->error = "Device lookup failed";
+> +		goto bad;
+> +	}
+> +
+> +	/* <start> */
+> +	if (sscanf(argv[4], "%llu%c", &tmpll, &dummy) != 1 ||
+> +	    tmpll != (sector_t)tmpll) {
+> +		ti->error = "Invalid start sector";
+> +		err = -EINVAL;
+> +		goto bad;
+> +	}
+> +	ctx->start = tmpll;
+> +
+> +	/* optional arguments */
+> +	ctx->sector_size = SECTOR_SIZE;
+> +	if (argc > 5) {
+> +		err = inlinecrypt_ctr_optional(ti, argc - 5, &argv[5]);
+> +		if (err)
+> +			goto bad;
+> +	}
+> +	ctx->sector_bits = ilog2(ctx->sector_size);
+> +	if (ti->len & ((ctx->sector_size >> SECTOR_SHIFT) - 1)) {
+> +		ti->error = "Device size is not a multiple of sector_size";
+> +		err = -EINVAL;
+> +		goto bad;
+> +	}
+> +
+> +	ctx->max_dun = (ctx->iv_offset + ti->len - 1) >>
+> +		       (ctx->sector_bits - SECTOR_SHIFT);
+> +	dun_bytes = DIV_ROUND_UP(fls64(ctx->max_dun), 8);
+> +
+> +	err = blk_crypto_init_key(&ctx->key, raw_key, cipher->mode_num,
+> +				  dun_bytes, ctx->sector_size);
+> +	if (err) {
+> +		ti->error = "Error initializing blk-crypto key";
+> +		goto bad;
+> +	}
+> +
+> +	err = blk_crypto_start_using_key(ctx->dev->bdev, &ctx->key);
+> +	if (err) {
+> +		ti->error = "Error starting to use blk-crypto";
+> +		goto bad;
+> +	}
+> +
+> +	ti->num_flush_bios = 1;
+> +
+> +	err = 0;
+> +	goto out;
+> +
+> +bad:
+> +	inlinecrypt_dtr(ti);
+> +out:
+> +	memzero_explicit(raw_key, sizeof(raw_key));
+> +	return err;
+> +}
+> +
+> +static int inlinecrypt_map(struct dm_target *ti, struct bio *bio)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +	sector_t sector_in_target;
+> +	u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE] = {};
+> +
+> +	bio_set_dev(bio, ctx->dev->bdev);
+> +
+> +	/*
+> +	 * If the bio is a device-level request which doesn't target a specific
+> +	 * sector, there's nothing more to do.
+> +	 */
+> +	if (bio_sectors(bio) == 0)
+> +		return DM_MAPIO_REMAPPED;
+> +
+> +	/*
+> +	 * The bio should never have an encryption context already, since
+> +	 * dm-inlinecrypt doesn't pass through any inline encryption
+> +	 * capabilities to the layer above it.
+> +	 */
+> +	if (WARN_ON_ONCE(bio_has_crypt_ctx(bio)))
+> +		return DM_MAPIO_KILL;
+> +
+> +	/* Map the bio's sector to the underlying device. (512-byte sectors) */
+> +	sector_in_target = dm_target_offset(ti, bio->bi_iter.bi_sector);
+> +	bio->bi_iter.bi_sector = ctx->start + sector_in_target;
+> +
+> +	/* Calculate the DUN and enforce data-unit (crypto sector) alignment. */
+> +	dun[0] = ctx->iv_offset + sector_in_target; /* 512-byte sectors */
+> +	if (dun[0] & ((ctx->sector_size >> SECTOR_SHIFT) - 1))
+> +		return DM_MAPIO_KILL;
+> +	dun[0] >>= ctx->sector_bits - SECTOR_SHIFT; /* crypto sectors */
+> +
+> +	/*
+> +	 * This check isn't necessary as we should have calculated max_dun
+> +	 * correctly, but be safe.
+> +	 */
+> +	if (WARN_ON_ONCE(dun[0] > ctx->max_dun))
+> +		return DM_MAPIO_KILL;
+> +
+> +	bio_crypt_set_ctx(bio, &ctx->key, dun, GFP_NOIO);
+> +
+> +	return DM_MAPIO_REMAPPED;
+> +}
+> +
+> +static void inlinecrypt_status(struct dm_target *ti, status_type_t type,
+> +			       unsigned int status_flags, char *result,
+> +			       unsigned int maxlen)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +	unsigned int sz = 0;
+> +	int num_feature_args = 0;
+> +
+> +	switch (type) {
+> +	case STATUSTYPE_INFO:
+> +	case STATUSTYPE_IMA:
+> +		result[0] = '\0';
+> +		break;
+> +
+> +	case STATUSTYPE_TABLE:
+> +		/*
+> +		 * Warning: like dm-crypt, dm-inlinecrypt includes the key in
+> +		 * the returned table.  Userspace is responsible for redacting
+> +		 * the key when needed.
+> +		 */
+> +		DMEMIT("%s %*phN %llu %s %llu", ctx->cipher_string,
+> +		       ctx->key.size, ctx->key.raw, ctx->iv_offset,
+> +		       ctx->dev->name, ctx->start);
+> +		num_feature_args += !!ti->num_discard_bios;
+> +		if (ctx->sector_size != SECTOR_SIZE)
+> +			num_feature_args += 2;
+> +		if (num_feature_args != 0) {
+> +			DMEMIT(" %d", num_feature_args);
+> +			if (ti->num_discard_bios)
+> +				DMEMIT(" allow_discards");
+> +			if (ctx->sector_size != SECTOR_SIZE) {
+> +				DMEMIT(" sector_size:%u", ctx->sector_size);
+> +				DMEMIT(" iv_large_sectors");
+> +			}
+> +		}
+> +		break;
+> +	}
+> +}
+> +
+> +static int inlinecrypt_prepare_ioctl(struct dm_target *ti,
+> +				     struct block_device **bdev)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +	const struct dm_dev *dev = ctx->dev;
+> +
+> +	*bdev = dev->bdev;
+> +
+> +	/* Only pass ioctls through if the device sizes match exactly. */
+> +	return ctx->start != 0 || ti->len != bdev_nr_sectors(dev->bdev);
+> +}
+> +
+> +static int inlinecrypt_iterate_devices(struct dm_target *ti,
+> +				       iterate_devices_callout_fn fn,
+> +				       void *data)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +
+> +	return fn(ti, ctx->dev, ctx->start, ti->len, data);
+> +}
+> +
+> +#ifdef CONFIG_BLK_DEV_ZONED
+> +static int inlinecrypt_report_zones(struct dm_target *ti,
+> +				    struct dm_report_zones_args *args,
+> +				    unsigned int nr_zones)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +
+> +	return dm_report_zones(ctx->dev->bdev, ctx->start,
+> +			ctx->start + dm_target_offset(ti, args->next_sector),
+> +			args, nr_zones);
+> +}
+> +#else
+> +#define inlinecrypt_report_zones NULL
+> +#endif
+> +
+> +static void inlinecrypt_io_hints(struct dm_target *ti,
+> +				 struct queue_limits *limits)
+> +{
+> +	const struct inlinecrypt_ctx *ctx = ti->private;
+> +	const unsigned int sector_size = ctx->sector_size;
+> +
+> +	limits->logical_block_size =
+> +		max_t(unsigned int, limits->logical_block_size, sector_size);
+> +	limits->physical_block_size =
+> +		max_t(unsigned int, limits->physical_block_size, sector_size);
+> +	limits->io_min = max_t(unsigned int, limits->io_min, sector_size);
+> +	limits->dma_alignment = limits->logical_block_size - 1;
+> +}
+> +
+> +static struct target_type inlinecrypt_target = {
+> +	.name			= "inlinecrypt",
+> +	.version		= {1, 0, 0},
+> +	/*
+> +	 * Do not set DM_TARGET_PASSES_CRYPTO, since dm-inlinecrypt consumes the
+> +	 * crypto capability itself.
+> +	 */
+> +	.features		= DM_TARGET_ZONED_HM,
+> +	.module			= THIS_MODULE,
+> +	.ctr			= inlinecrypt_ctr,
+> +	.dtr			= inlinecrypt_dtr,
+> +	.map			= inlinecrypt_map,
+> +	.status			= inlinecrypt_status,
+> +	.prepare_ioctl		= inlinecrypt_prepare_ioctl,
+> +	.iterate_devices	= inlinecrypt_iterate_devices,
+> +	.report_zones		= inlinecrypt_report_zones,
+> +	.io_hints		= inlinecrypt_io_hints,
+> +};
+> +
+> +static int __init dm_inlinecrypt_init(void)
+> +{
+> +	return dm_register_target(&inlinecrypt_target);
+> +}
+> +
+> +static void __exit dm_inlinecrypt_exit(void)
+> +{
+> +	dm_unregister_target(&inlinecrypt_target);
+> +}
+> +
+> +module_init(dm_inlinecrypt_init);
+> +module_exit(dm_inlinecrypt_exit);
+> +
+> +MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
+> +MODULE_DESCRIPTION(DM_NAME " target for inline encryption");
+> +MODULE_LICENSE("GPL");
