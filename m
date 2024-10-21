@@ -1,88 +1,113 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7877814263
-	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 02:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E0A19925B
+	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 04:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729477628; cv=none; b=nGzFTFcA8SzbY2DNIeWB42+czDDssG+DmNEyat9TkBmnlBT6SjjtSyEw+c05KLOMRkqlvWiPrGdJi9vIpjT9TygWK/HAFIXmJLASCJm2Q6HkyLkHO0nhw3HzTlDe4Yr8RMQh/BXwyCTZgdnP3zvJXe9ReL4cdtHH/U7gBcDd4zw=
+	t=1729483216; cv=none; b=GrvQlxSdjRd7ZubQeJeSPuHA6ZqM4yAV6CexRF4K/7aiId800K1paoevvLP/yoQ01BVvaPsj4BnNEMfn2usqJEv/ZCoO2VdQHzcgj24BVJ94s+M9BicXge3QBZGLjEWD71Lhh+ls+49YjbFElipv/Qgim/JdezDeSYEfoz1IooM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729477628; c=relaxed/simple;
-	bh=wChIIOljRZMbMsClGwWazXIABPZWJ1X/9rhsdtrKznQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W9pUZglKp3mYMxiUbowPl/6Sjcv1/PU0vgpZ3QWk4zLtRB5tNoW6VWj6hEVoK1wB+MVtKfOx1kJ3XeZZIoHbKdlCB35E8VLXnbEJqeBR/t0p1/Z9UjPfub2UxtIjSEsjWBWagSGKnV2v/IIcBVdrbHOscNaEpnkkGnzYlHIXEbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aHIuVJja; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729483216; c=relaxed/simple;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=aEGx0yirmzrPIos5yZ6E0ZZT35eNeIl40T1bQwSKQIfsozuWzKUOkCjB5UrNaL2G/rKSlNRpBCpSuGBXXsHqhKckzxN+52IBv/sJ/4aoQhWzl5C9wuCyByLwIBk6GMQ/N5sVVTQgptEusFhWPr65Kj1Ck4POzCckWL6OAxtIQIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=W2+IJxaw; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aHIuVJja"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729477625;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+sjMziFfxbGDr6d+iWUv4ZQCz7jkJM/gB/nV/7pRVlc=;
-	b=aHIuVJjaGYF7cslctJ5JSQ1c4ld4npByB6nN6fUCLcOxWAWIgQlUNQLvBGB++TKNyFtlfb
-	fOmyqEiNyEytF5p9oliy2J4sXQZv8IvR7ZNYtWJKzG5yeC8RgURfy45+YLbi7jXYb+crD3
-	DbnM1Q4J00zNJjTtH7LHIshdGpnC4bk=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-353-mJgu-wZ7M3C4MjtQVk-IAw-1; Sun,
- 20 Oct 2024 22:27:02 -0400
-X-MC-Unique: mJgu-wZ7M3C4MjtQVk-IAw-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EEDDE195609D;
-	Mon, 21 Oct 2024 02:26:59 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.25])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6F4C119560A3;
-	Mon, 21 Oct 2024 02:26:53 +0000 (UTC)
-Date: Mon, 21 Oct 2024 10:26:48 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, akpm@linux-foundation.org, viro@zeniv.linux.org.uk,
-	dhowells@redhat.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] iov_iter: don't require contiguous pages in
- iov_iter_extract_bvec_pages
-Message-ID: <ZxW76N4hU2_4Zs3E@fedora>
-References: <20241011132047.1153249-1-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="W2+IJxaw"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20241021035324epoutp03c31c9e68d44b787509a3675fe08d72e7~AW3Kd7o7d0199001990epoutp03u
+	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 03:53:24 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20241021035324epoutp03c31c9e68d44b787509a3675fe08d72e7~AW3Kd7o7d0199001990epoutp03u
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1729482804;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=W2+IJxawqzgcBChIlcNeNfk7coG8mvvD7lbnipymiNmSAScMciTYlAp3jDX8QTRE2
+	 eYd+OsvRbWviuIlnM2mVW0UEVWuIIzdDB5wpwPwL7o7pXKfPi1bL3CEmU+lj8uyybZ
+	 TPpJJTLNIKML89jrHHGzK3+HbWH29Xp/ByIbAXHI=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20241021035324epcas5p12ccdd5a52c15f6f360c65c17e64eb3be~AW3KSDTvY0089000890epcas5p1N;
+	Mon, 21 Oct 2024 03:53:24 +0000 (GMT)
+Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.177]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4XX1cg3HD7z4x9Pr; Mon, 21 Oct
+	2024 03:53:23 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	14.A2.18935.330D5176; Mon, 21 Oct 2024 12:53:23 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20241021035323epcas5p3b2390d405621dcf18735b547fee153b7~AW3JA_vPX0434004340epcas5p3M;
+	Mon, 21 Oct 2024 03:53:23 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20241021035323epsmtrp125ecbe8d902e2051cee4661eacde54bb~AW3JATGTO1039610396epsmtrp1k;
+	Mon, 21 Oct 2024 03:53:23 +0000 (GMT)
+X-AuditID: b6c32a50-a99ff700000049f7-f9-6715d033ad01
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	64.74.08227.330D5176; Mon, 21 Oct 2024 12:53:23 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20241021035322epsmtip2c9daad8aed9690ef0a8bec70c8665986~AW3ITdVlF1271312713epsmtip2r;
+	Mon, 21 Oct 2024 03:53:22 +0000 (GMT)
+Message-ID: <9870b4ad-d140-47a0-9fe6-787128971069@samsung.com>
+Date: Mon, 21 Oct 2024 09:23:21 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241011132047.1153249-1-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH for-next] nvme: use helpers to access io_uring cmd space
+To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <c274d35f441c649f0b725c70f681ec63774fce3b.1729265044.git.asml.silence@gmail.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNKsWRmVeSWpSXmKPExsWy7bCmuq7xBdF0g1frxC3mrNrGaLH6bj+b
+	xbvWcywWe29pO7B47Jx1l93j8tlSj8+b5AKYo7JtMlITU1KLFFLzkvNTMvPSbZW8g+Od403N
+	DAx1DS0tzJUU8hJzU22VXHwCdN0yc4B2KSmUJeaUAoUCEouLlfTtbIryS0tSFTLyi0tslVIL
+	UnIKTAr0ihNzi0vz0vXyUkusDA0MjEyBChOyM07tWMpUYFRxbW4fUwOjbhcjJ4eEgInEo89/
+	mUFsIYE9jBLnvrp3MXIB2Z8YJY6e3c0I4XxjlGg6fIMNpuPewmXMEIm9jBLtW+ayQThvGSVO
+	dbwAynBw8ArYSWx6rQnSwCKgKjHhyAwmEJtXQFDi5MwnLCC2qIC8xP1bM9hBbGEBH4kjz4+y
+	gbSKCLhKrPikAhJmFrCV+H3kKAuELS5x68l8JpASNgFNiQuTS0HCnAKxEu3z1jFBlMhLbH87
+	B+w0CYFH7BJv9y1hhLjZReLDhsNQtrDEq+Nb2CFsKYmX/W1QdrbEg0cPWCDsGokdm/tYIWx7
+	iYY/N1hB9jID7V2/Sx9iF59E7+8nYOdICPBKdLQJQVQrStyb9BSqU1zi4YwlULaHRMvKyYyQ
+	cN7AKDHxbdwERoVZSGEyC8mTs5B8Mwth8QJGllWMUqkFxbnpqcmmBYa6eanl8LhOzs/dxAhO
+	hVoBOxhXb/ird4iRiYPxEKMEB7OSCK9SiWi6EG9KYmVValF+fFFpTmrxIUZTYOxMZJYSTc4H
+	JuO8knhDE0sDEzMzMxNLYzNDJXHe161zU4QE0hNLUrNTUwtSi2D6mDg4pRqYRHd/X6/3/kOK
+	/oKIvWW195Onf3dlaExnnb4kQdXUh/Wg65k+ZW2hzNT0k1Km/7yVlqx5NXe/NfeTlQ0rP1cF
+	Xz5dYxfwc8nlZpUdybk9m3oF3v4w69+eLXJh79yWUm6f+u3V22ZN+BuX3RzoKbZ50VathZbd
+	v7Kf1ekr8gZPYp5TuWmJyvnyOHmNGfOWM5768vQ/rz5HhdifYzl+hk5FCc+e+nuebehZ8DXu
+	1E/X02sTp0xJdJ6ycbbztNbVe/MfaAtdXFSd15nfdiB085vjS+9ofNs4p/1rzaLTd/5cLVCd
+	rcSWFn/o9uezqnut1N566IpZfXHu2ZN7Kl5Lxvzuc9mjkWLBKfNMpizgMrlyR4mlOCPRUIu5
+	qDgRAFURnc4OBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrBLMWRmVeSWpSXmKPExsWy7bCSvK7xBdF0gw9H2S3mrNrGaLH6bj+b
+	xbvWcywWe29pO7B47Jx1l93j8tlSj8+b5AKYo7hsUlJzMstSi/TtErgyTu1YylRgVHFtbh9T
+	A6NuFyMnh4SAicS9hcuYuxi5OIQEdjNKLGg8zQyREJdovvaDHcIWllj57zk7RNFrRonHm4+y
+	djFycPAK2Elseq0JUsMioCox4cgMJhCbV0BQ4uTMJywgtqiAvMT9WzPA5ggL+EgceX6UDaRV
+	RMBVYsUnFZAws4CtxO8jR1kgxm9glHh96xojREJc4taT+Uwg9WwCmhIXJpeChDkFYiXa561j
+	gigxk+ja2gVVLi+x/e0c5gmMQrOQXDELyaRZSFpmIWlZwMiyilEytaA4Nz232LDAKC+1XK84
+	Mbe4NC9dLzk/dxMjOPC1tHYw7ln1Qe8QIxMH4yFGCQ5mJRFepRLRdCHelMTKqtSi/Pii0pzU
+	4kOM0hwsSuK83173pggJpCeWpGanphakFsFkmTg4pRqYZsqeNWb5LxgZK/dIoV9cJZ331Yoe
+	rY2Nmhwux+pjhZo5nnUm8Kh5VNf5HHeMC/jKt/TCZ9ni83NP2/Ze2Ore9uNb6cr3817ceMR2
+	YHpXqsKtnvwjPyfmv1CtUGaJ1nStmMnTZ3R8rvlFjV8d19QulKhviZgVOz1EWDJ/+umU8Mne
+	11gcQ0Klvh6SVl16Zkuq5QWN1pov/0uFW9kfL7KYWLjOy8hop9G5XwfiM0L/nvsbss3h2v5V
+	3E+Db+pOs4rZ/3eb6pIXJ/7yTWEouWwrrjVVonFNru2Kz8JRDdquq2NsON9Jz3mQ/phxDuNp
+	1n3V8j9mHmSqWjrDzsuj5rezcv+jY3mWp/fpvexnqT2qxFKckWioxVxUnAgAaDsCcusCAAA=
+X-CMS-MailID: 20241021035323epcas5p3b2390d405621dcf18735b547fee153b7
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20241018161636epcas5p43562d1c949f7e6ed0289a7ec213490ff
+References: <CGME20241018161636epcas5p43562d1c949f7e6ed0289a7ec213490ff@epcas5p4.samsung.com>
+	<c274d35f441c649f0b725c70f681ec63774fce3b.1729265044.git.asml.silence@gmail.com>
 
-On Fri, Oct 11, 2024 at 03:20:22PM +0200, Christoph Hellwig wrote:
-> The iov_iter_extract_pages interface allows to return physically
-> discontiguous pages, as long as all but the first and last page
-> in the array are page aligned and page size.  Rewrite
-> iov_iter_extract_bvec_pages to take advantage of that instead of only
-> returning ranges of physically contiguous pages.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> [hch: minor cleanups, new commit log]
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
-> 
-> v3:
->  - open code the iterator
->  - improve commit log and comments
-
-Hello Jens,
-
-Gentle ping...
-
-
-
-thanks,
-Ming
-
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
