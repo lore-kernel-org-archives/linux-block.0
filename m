@@ -1,110 +1,210 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160381E3DED
-	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 09:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5B21E4113
+	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 11:11:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729503344; cv=none; b=PYOQg01uIkeALZcwo1lU6KDgTay5nnPrn+Id9qC6Qc5q4mmOA2xpK5H0/ci1c0wg3MgC2qZCWztvp15T6Y9hDNdGgDLOuaEd4BybtR450IvNz4E0UZ04RcuTKDo5PyZ0o2ZY8dOo+jKK+O0+j9wbAc0LtgGKmAxRIU5KlrY5HJ0=
+	t=1729509113; cv=none; b=L81IfFglKj08Gj0oVIUhQQkiSXkWKz4DtX4Xt9eeAb10nJJ0SkVBRvLME8qlOVqpETBoK72nayLI9qYsAOrjQtDV+sQd7fWEnjcAoKG/0sLtwlylqAB3kglgAidEl0DGVr3C+R4DJqZvl5PHQtHiCSreRGPzU6fMQl8gC09CVzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729503344; c=relaxed/simple;
-	bh=/Aqo9WPzE2ID4oasxty3yzeeqaODshxgbd4TNFTtOyQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iJNDOxfNaKBLe50BVjX4470EQE3Qw4OjjUy/hf1QKdNSnLh17RvMSMEhdOS8qOgUn6Guoje5oAqCuBGTzLJWD/C6jSwu+6wp0h4rss8Bi2/mi5gLDXnrIDzLRqNmcLT/3ZdlFwNDAsYmXX8pHJ+cBQXqp9mW1g3zeZz7g3Zuy48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=OrF0ntAH; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+	s=arc-20240116; t=1729509113; c=relaxed/simple;
+	bh=Si9uBiI7VNrAZ4+UyHCR60bAs5nFBYKN4ZOHMdTtrEo=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=bAyd14+xwAnbgCbN7Ad6RxXla4M9YF2H4AlLzIMzEyrLobyc/Or+QmiNvRzaCuWPQlYzdDMLhdYOMxBH9iIOf4HusqsB++MwJu0clZPqElPTJnw0Xwgpcpt0rnGA1okcwfAcjhr5fXEiYIR635VfE38FARNPZ0Ha38OYku2H/PM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DL0CM4li; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="OrF0ntAH"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71e5a62031aso2907346b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 02:35:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1729503341; x=1730108141; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GsT+de8zLV+6IwIjpVLKGD78ddm4AlMrsbMhyzImO7o=;
-        b=OrF0ntAHXefTfKyPQFjNqZ7pW+zyRV8NQ0n5VtijAlCa7OpI6lTTw67EVjkbI7GiXO
-         45LbM66jWD/LnfhsWDJyPNYNOvrSUS9xk5oevHVgZGnD+nsbOoSeVFC4KATw7vnU50+p
-         oRQWpHRyJGOUGHDy0IKRK5RzyAmKfBcwoFCXzHvFcSdoM69FUSYikEtFcJYbQWKB0gcD
-         ii4vN9x5srn3KcUf6fgjV/GwyfHKI4PMcnB5TD3+U1IFeFoZl1bFxSjDsckmi1Ejuamu
-         /gWENIhTFxsRUkhjqnv/RGOrKHOT0BjTl5ePPUrHOBuvA/x+0kL1Qdc5SMz06pxvPiTG
-         0p8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729503341; x=1730108141;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GsT+de8zLV+6IwIjpVLKGD78ddm4AlMrsbMhyzImO7o=;
-        b=o+4O3BwpEf4M3O+0Pk/RwqTJCXCgrL92sA7O/dNesSj17KsTsqreOfLnlu44yTyX8L
-         +yFNb2g+XA3lwEUX/u6m9dT3UBm+f9SX8jg5szy5iuNOQmQG8dgsm4FPmdIle9duSkQ9
-         c/vcLiRGdc/q16Hz8JthLyW1c2T0vhxFC4gec6/Cyc7zi/UfCwhSPyENLFnF0ESus4Xt
-         /N+VOX5ZuUe960eSbgMRUIRB0+tfgfIzoz8Re0KJhpSttE2sHfwj8jY563TneprFIeRp
-         kFrir5B2BchtyOaUeXzEGAKTPjYRNn7WTXkHW1s0QKfoih2W+yW/mPw8Zz9feIdTW2OG
-         d1hw==
-X-Forwarded-Encrypted: i=1; AJvYcCXNpFaN8OSXnntjRe/QU0xbFDpc0mQjGaKJge4xy07FWNqc3aouDwhOneu5tfzp9bE9p+yUI8DPFX1vZA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLz2RfxTxfo2yQfzHTS/jvpgWrj4FB+gKRJP9Nahs6RAGUfPPH
-	2xFGA1J3B8n39gQY2gYfktgyd1K9Koi1ptZ+TcS0xiRljQESLVK0USNloTHJHIo=
-X-Google-Smtp-Source: AGHT+IFG92jte1IkPnhsjRpkj4LvK1CAKm+mAn9i576/YceM9UKswKVvkdfH3hCvGZ0NwGL/6YsT5Q==
-X-Received: by 2002:a05:6a21:2d88:b0:1d6:97f2:5f72 with SMTP id adf61e73a8af0-1d92c49fc1emr14116941637.3.1729503340762;
-        Mon, 21 Oct 2024 02:35:40 -0700 (PDT)
-Received: from PXLDJ45XCM.bytedance.net ([61.213.176.9])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec1408916sm2427653b3a.199.2024.10.21.02.35.37
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 21 Oct 2024 02:35:40 -0700 (PDT)
-From: Muchun Song <songmuchun@bytedance.com>
-To: axboe@kernel.dk
-Cc: josef@toxicpanda.com,
-	oleg@redhat.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	muchun.song@linux.dev,
-	Muchun Song <songmuchun@bytedance.com>
-Subject: [PATCH] block: remove redundant explicit memory barrier from rq_qos waiter and waker
-Date: Mon, 21 Oct 2024 16:52:51 +0800
-Message-Id: <20241021085251.73353-1-songmuchun@bytedance.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DL0CM4li"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729509109;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yVOOQRTDPP9EQyCM0BO2Vz41MIi/v/BOtRJeWq4CdzI=;
+	b=DL0CM4liGwNqHHFiiJx6GGQ6PVeHWGgGPh4lTn8V+d5bNeDYUHhCdDdFnvKKfq3Th4neuR
+	fMcJsn72LLNNbRJ/GqNgK8XNCaHQfMbeB+DyBkjTDuuAdzBPTKrZrq/J6Bv47SpNh4VfMF
+	O++ygtHnHWU4S3yCx49NcEmr/qjg+NE=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-121-0Db2WKbVPky42uFBgGVOxg-1; Mon,
+ 21 Oct 2024 07:11:46 -0400
+X-MC-Unique: 0Db2WKbVPky42uFBgGVOxg-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E90361955EA7;
+	Mon, 21 Oct 2024 11:11:43 +0000 (UTC)
+Received: from [10.45.226.64] (unknown [10.45.226.64])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B2A6019560AA;
+	Mon, 21 Oct 2024 11:11:40 +0000 (UTC)
+Date: Mon, 21 Oct 2024 13:11:36 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>
+cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
+    linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
+    Md Sadre Alam <quic_mdalam@quicinc.com>, 
+    Israel Rukshin <israelr@nvidia.com>, Milan Broz <gmazyland@gmail.com>, 
+    Adrian Vovk <adrianvovk@gmail.com>
+Subject: Re: [RFC PATCH 2/4] block: add the bi_skip_dm_default_key flag
+In-Reply-To: <20241018184339.66601-3-ebiggers@kernel.org>
+Message-ID: <2caf648d-73cf-9436-2af4-ad530a966592@redhat.com>
+References: <20241018184339.66601-1-ebiggers@kernel.org> <20241018184339.66601-3-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-The memory barriers in list_del_init_careful() and list_empty_careful()
-in pairs already handle the proper ordering between data.got_token
-and data.wq.entry. So remove the redundant explicit barriers. And also
-change a "break" statement to "return" to avoid redundant calling of
-finish_wait().
+Hi
 
-Signed-off-by: Muchun Song <songmuchun@bytedance.com>
----
- block/blk-rq-qos.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+What about using the REQ_META flag (it is set on metadata bios and cleared 
+on data bios), instead of adding a new flag with the same meaning?
 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index dc510f493ba57..9b0aa7dd6779f 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -218,7 +218,6 @@ static int rq_qos_wake_function(struct wait_queue_entry *curr,
- 		return -1;
- 
- 	data->got_token = true;
--	smp_wmb();
- 	wake_up_process(data->task);
- 	list_del_init_careful(&curr->entry);
- 	return 1;
-@@ -274,10 +273,9 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
- 			 * which means we now have two. Put our local token
- 			 * and wake anyone else potentially waiting for one.
- 			 */
--			smp_rmb();
- 			if (data.got_token)
- 				cleanup_cb(rqw, private_data);
--			break;
-+			return;
- 		}
- 		io_schedule();
- 		has_sleeper = true;
--- 
-2.20.1
+Mikulas
+
+
+On Fri, 18 Oct 2024, Eric Biggers wrote:
+
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Add a flag bi_skip_dm_default_key to struct bio.  This flag indicates
+> that dm-default-key should not en/decrypt the bio, due to it targeting
+> the contents of an encrypted file.
+> 
+> When a bio is cloned, copy the bi_skip_dm_default_key flag.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  block/bio.c                 |  3 +++
+>  block/blk-crypto-fallback.c |  2 ++
+>  include/linux/blk-crypto.h  | 36 ++++++++++++++++++++++++++++++++++++
+>  include/linux/blk_types.h   |  3 +++
+>  4 files changed, 44 insertions(+)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index ac4d77c889322..5ff0b66e47a42 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -267,10 +267,13 @@ void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
+>  	bio->bi_iocost_cost = 0;
+>  #endif
+>  #endif
+>  #ifdef CONFIG_BLK_INLINE_ENCRYPTION
+>  	bio->bi_crypt_context = NULL;
+> +#if IS_ENABLED(CONFIG_DM_DEFAULT_KEY)
+> +	bio->bi_skip_dm_default_key = false;
+> +#endif
+>  #endif
+>  #ifdef CONFIG_BLK_DEV_INTEGRITY
+>  	bio->bi_integrity = NULL;
+>  #endif
+>  	bio->bi_vcnt = 0;
+> diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+> index b1e7415f8439c..dd5f1edcc44b3 100644
+> --- a/block/blk-crypto-fallback.c
+> +++ b/block/blk-crypto-fallback.c
+> @@ -179,10 +179,12 @@ static struct bio *blk_crypto_fallback_clone_bio(struct bio *bio_src)
+>  	bio_for_each_segment(bv, bio_src, iter)
+>  		bio->bi_io_vec[bio->bi_vcnt++] = bv;
+>  
+>  	bio_clone_blkg_association(bio, bio_src);
+>  
+> +	bio_clone_skip_dm_default_key(bio, bio_src);
+> +
+>  	return bio;
+>  }
+>  
+>  static bool
+>  blk_crypto_fallback_alloc_cipher_req(struct blk_crypto_keyslot *slot,
+> diff --git a/include/linux/blk-crypto.h b/include/linux/blk-crypto.h
+> index 5e5822c18ee41..f1f3d546c53e5 100644
+> --- a/include/linux/blk-crypto.h
+> +++ b/include/linux/blk-crypto.h
+> @@ -110,10 +110,13 @@ static inline bool bio_has_crypt_ctx(struct bio *bio)
+>  	return false;
+>  }
+>  
+>  #endif /* CONFIG_BLK_INLINE_ENCRYPTION */
+>  
+> +static inline void bio_clone_skip_dm_default_key(struct bio *dst,
+> +						 const struct bio *src);
+> +
+>  int __bio_crypt_clone(struct bio *dst, struct bio *src, gfp_t gfp_mask);
+>  /**
+>   * bio_crypt_clone - clone bio encryption context
+>   * @dst: destination bio
+>   * @src: source bio
+> @@ -125,11 +128,44 @@ int __bio_crypt_clone(struct bio *dst, struct bio *src, gfp_t gfp_mask);
+>   *	   @gfp_mask doesn't include %__GFP_DIRECT_RECLAIM.
+>   */
+>  static inline int bio_crypt_clone(struct bio *dst, struct bio *src,
+>  				  gfp_t gfp_mask)
+>  {
+> +	bio_clone_skip_dm_default_key(dst, src);
+>  	if (bio_has_crypt_ctx(src))
+>  		return __bio_crypt_clone(dst, src, gfp_mask);
+>  	return 0;
+>  }
+>  
+> +#if IS_ENABLED(CONFIG_DM_DEFAULT_KEY)
+> +static inline void bio_set_skip_dm_default_key(struct bio *bio)
+> +{
+> +	bio->bi_skip_dm_default_key = true;
+> +}
+> +
+> +static inline bool bio_should_skip_dm_default_key(const struct bio *bio)
+> +{
+> +	return bio->bi_skip_dm_default_key;
+> +}
+> +
+> +static inline void bio_clone_skip_dm_default_key(struct bio *dst,
+> +						 const struct bio *src)
+> +{
+> +	dst->bi_skip_dm_default_key = src->bi_skip_dm_default_key;
+> +}
+> +#else /* CONFIG_DM_DEFAULT_KEY */
+> +static inline void bio_set_skip_dm_default_key(struct bio *bio)
+> +{
+> +}
+> +
+> +static inline bool bio_should_skip_dm_default_key(const struct bio *bio)
+> +{
+> +	return false;
+> +}
+> +
+> +static inline void bio_clone_skip_dm_default_key(struct bio *dst,
+> +						 const struct bio *src)
+> +{
+> +}
+> +#endif /* !CONFIG_DM_DEFAULT_KEY */
+> +
+>  #endif /* __LINUX_BLK_CRYPTO_H */
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index dce7615c35e7e..2ee6a7e570796 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -247,10 +247,13 @@ struct bio {
+>  #endif
+>  #endif
+>  
+>  #ifdef CONFIG_BLK_INLINE_ENCRYPTION
+>  	struct bio_crypt_ctx	*bi_crypt_context;
+> +#if IS_ENABLED(CONFIG_DM_DEFAULT_KEY)
+> +	bool			bi_skip_dm_default_key;
+> +#endif
+>  #endif
+>  
+>  #if defined(CONFIG_BLK_DEV_INTEGRITY)
+>  	struct bio_integrity_payload *bi_integrity; /* data integrity */
+>  #endif
+> -- 
+> 2.47.0
+> 
 
