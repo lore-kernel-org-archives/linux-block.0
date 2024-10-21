@@ -1,72 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C2B1C3F0B;
-	Mon, 21 Oct 2024 15:47:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68AE17C224;
+	Mon, 21 Oct 2024 16:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729525671; cv=none; b=cZupPjluSRBRm7JZhvqY9d68BwDdjDOe+++UXwgqp9vebuhO6O+NII8TZnd4i0K8h+BaF4xovv50H0UCgPhd/V37ZfE6Jkpteux8ufePbYHuurFyR/SpYrW++gnHdnO74lOKjVPNQhOEr1BvowNmvNUXPQ5coQYmIfAiccE+AIw=
+	t=1729526599; cv=none; b=hiMHDnic/P/0PDPZJt/11T7rx/fjvuCM0Cls49XqgMnoQOHXzcoYggYRIGy9KYAJaUeQpG1wfswvb78/wyUFvidCSGexheXtuk277vomY76qwQBgib/UeTDx62PzocJ106GDflSZnGgEs5F4i/XNHIAA1uAJ5pQCy0tThPkm3xA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729525671; c=relaxed/simple;
-	bh=eoIDTD70jGHK8rQg1tI8OpdE3wiIkzDwBZrBOvTpqTA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HpcJ9wc/F13Cd+anVu8nkbpTPrkgzkOkUTLtg3P8UKFJx6dEtwioZRoJ2U0aLjcfqIAbb8u3LOUaBSRmwaMuZy0voxxL3SIx3IdDMjLuaUSmb3sEwKUTAm61KAR3WDomTVmz+De3jLmSKwjEZoy6gWK4dLgiHhYm6qjyBVz/Gqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uJ6O3/Eg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729526599; c=relaxed/simple;
+	bh=FGr4Qsj06zUzUHVuKLNhO1H5bImxOCmYQAFVuLxT+2Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AYIbr0j+7PtyvwNa0qV6lA5eawV8iva6LIlPOWjlMgX3+9+EZAEhz9cXWescq73a6skR+AjUp/sWiMRyV3Fsv3d88N/I2Ehd8o+dOfScWKW26POejLgrZ5HCqd/LOHwp8DVSsllCtM3yG5XxYGkKVN/6AK/RZ+W5r0YikJ3UTAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L3X+JzZF; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uJ6O3/Eg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF50BC4CEC3;
-	Mon, 21 Oct 2024 15:47:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729525670;
-	bh=eoIDTD70jGHK8rQg1tI8OpdE3wiIkzDwBZrBOvTpqTA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uJ6O3/Eg6LuZBVbvEhmJGmq5UhlraJjHuFScrTmXpEbKNqxl3qPWCqW9og//FdOw7
-	 hfp0NqrPLYmgYPdeXpezpTfJ04KOnUCv9G2+czs7PPHV9dRShcsBk0Q0WxJs0GNuN8
-	 UkrpQv50sacx/D8D/8C+f0jcf6P3LDBdaNzUpIRwJSpQvs865Cy65GK9ctVP75vriQ
-	 pDZLbes5RePbk2QSNN9Iy3AUxFmd/e7JxGwLvMQkGwvigIA7axQxf1FoApGbxeavpO
-	 Sb9UIt0xyMQQgHX4r+mr52vXegSrJlMS1/CVz9gmB5OVwVuaP9K70NWGxZICWFwf+g
-	 7RwmJfZ2RfFfQ==
-Date: Mon, 21 Oct 2024 09:47:47 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, axboe@kernel.dk,
-	io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	joshi.k@samsung.com, javier.gonz@samsung.com,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCHv8 1/6] block, fs: restore kiocb based write hint
- processing
-Message-ID: <ZxZ3o_HzN8HN6QPK@kbusch-mbp>
-References: <20241017160937.2283225-1-kbusch@meta.com>
- <20241017160937.2283225-2-kbusch@meta.com>
- <20241018055032.GB20262@lst.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L3X+JzZF"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-539e8607c2aso4987724e87.3;
+        Mon, 21 Oct 2024 09:03:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729526596; x=1730131396; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z4G33DRMtPm23BbC189biiKlGJhxd9tSyy0FqMwL+Fc=;
+        b=L3X+JzZF9aXlhZRp6Nt//JaU384VFvfh0MtUiVFh1elQCXbvGJmIfcyiYp4e5QrkQ/
+         OmRlhlUlzuQgS0dCOEdAsSrWJSCYE+f0SXKACyp0vr9OwbnN4IIxupY974VnBTLrlOi/
+         yAaRv7n0/6leN5Hqs4Uj1vYxOT8GXKtUbUj4bRKDLo8+EUe2Qt+d1+ABnJjWs3hMQ2oa
+         aS8I0IckAGrjllNL0K9vwRZK92CAbNdgERd+ZWo6QEkpWAin/tPBls0dcMNpUAGj6jMw
+         BbvoA3geQ2yv0DvzNbodYJaF7I2KXsQJLbVKavIyDE1mPuYWJLiEU0bE7hYxoNU4Ryh8
+         J0Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729526596; x=1730131396;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z4G33DRMtPm23BbC189biiKlGJhxd9tSyy0FqMwL+Fc=;
+        b=TW32mGINohaQcBqpcQ0FiZCVb3YSrcebKTHioJ93Cq3wP5eIQ6Bv5Hfb7Evfu62RDC
+         BxK6TfhIAgBCI05sQEPgoKPPp4sZeLlOUTyy/uZYNfguLda819BaCEFFU/Nn/OUaw4qW
+         RdyKRsJApk7y8E1L2odvkkbD9+6epL16zCEKBOYJH2I5lRdTfaaMjjh6LQynTniPH0dM
+         Do4eQiSNXklQ2bswoNv/p/7Xgaqd+Xuy9ZTD/3N8ZpIvFFDvXlua19IrMrFBktu09le1
+         aWxUV2v1uwfcacgpkctYSzsWbTBJLu0vOXkGSSyp8GWPpaf+BiTe0pHYmqraJOs1IQOp
+         WKPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUBS/gDHhkxFl3hiTMZvUNUibbCS1qT/I3qnprKJ7n1U9ZfwWzvITjDBkI+5z1oly0/RKkngsA0lA==@vger.kernel.org, AJvYcCVgpyvIbCLus1kZUSN/msGxRJip/iy0m6BFEfmLMsEqU1k4LB7Fr+Cr2lCO76vbS08Io3OMXuMKMSzQ5Z8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0BTUOoCkFxKrWV1+jAgoIeix2+pS6NOHpj3iKFN7t6OowzefV
+	isAJfTmNMC5+sDth9aQuhXZCoPFbiPMcQwbGe7hiv7nc+99QLSkH
+X-Google-Smtp-Source: AGHT+IFoQoQoEaud+eLTStEY9OPyvLF0VdXmN7ecMR/CgXdkr/3qTpxTs+6uQ/4yCk25IMLxxyA4QA==
+X-Received: by 2002:a05:6512:2813:b0:533:44e7:1b2a with SMTP id 2adb3069b0e04-53a154b2d95mr5538344e87.40.1729526595551;
+        Mon, 21 Oct 2024 09:03:15 -0700 (PDT)
+Received: from [192.168.42.158] ([185.69.144.55])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4316f580069sm61177885e9.14.2024.10.21.09.03.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Oct 2024 09:03:14 -0700 (PDT)
+Message-ID: <106bc650-a79f-4408-b096-76d49a495195@gmail.com>
+Date: Mon, 21 Oct 2024 17:04:00 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241018055032.GB20262@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH for-next] nvme: use helpers to access io_uring cmd space
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <c274d35f441c649f0b725c70f681ec63774fce3b.1729265044.git.asml.silence@gmail.com>
+ <b82b36c3-5ab5-4e99-941b-b099020d1b36@nvidia.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <b82b36c3-5ab5-4e99-941b-b099020d1b36@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 18, 2024 at 07:50:32AM +0200, Christoph Hellwig wrote:
-> On Thu, Oct 17, 2024 at 09:09:32AM -0700, Keith Busch wrote:
-> >  {
-> >  	*kiocb = (struct kiocb) {
-> >  		.ki_filp = filp,
-> >  		.ki_flags = filp->f_iocb_flags,
-> >  		.ki_ioprio = get_current_ioprio(),
-> > +		.ki_write_hint = file_write_hint(filp),
-> 
-> And we'll need to distinguish between the per-inode and per file
-> hint.  I.e. don't blindly initialize ki_write_hint to the per-inode
-> one here, but make that conditional in the file operation.
+On 10/19/24 01:44, Chaitanya Kulkarni wrote:
+> + (linux-nvme)
 
-Maybe someone wants to do direct-io with partions where each partition
-has a different default "hint" when not provided a per-io hint? I don't
-know of such a case, but it doesn't sound terrible. In any case, I feel
-if you're directing writes through these interfaces, you get to keep all
-the pieces: user space controls policy, kernel just provides the
-mechanisms to do it.
+My bad, lost CC nvme. Thanks for review
+
+
+> On 10/18/24 09:16, Pavel Begunkov wrote:
+>> Command implementations shouldn't be directly looking into io_uring_cmd
+>> to carve free space. Use an io_uring helper, which will also do build
+>> time size sanitisation.
+>>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+
+-- 
+Pavel Begunkov
