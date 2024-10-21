@@ -1,180 +1,109 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E930B3398E
-	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 05:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDAB1CF5F6;
+	Mon, 21 Oct 2024 07:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729489579; cv=none; b=rX8gmDQWOKbdyHpM5Y3mhXynbc2N+jV4AcZbPRG8bkma/EMJ27UeDb4/J2DrRLh3I++yZoNQB77aHVKxcbE5+ydgYqlGAH6gh6oPZIk/cn/ulf5zx4pOP7eh++ybgoMVp1aqRZo/kbjmlJCCxDBg6kktYVFXksfONnkoRZejyTA=
+	t=1729494341; cv=none; b=a28SRGYp3C2Qikft3iinC08/+BEEQuQlMNV1BzOZcaI5jRr4tkM33D2v5bKsfus+8qPMbHcZB20xUe3/JXkhsLtXjjEGFMNrfIE1xHgHsGfAbfFm64wfcMsMtpDaumsapOObnAeawxWkgaE8oIIfoah46h2rAgvNI2xwT5zESf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729489579; c=relaxed/simple;
-	bh=WYR0bDNkGe9X68XYEReTJwExKJCaA46pObJ2KdmkveU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=j7PyE5IMF+9OmTbMG4abYRzrJRlwFcJKh2pbMEYduQQvf3/L1viCswjBPXlEHrNXiNARApVFkAd0bFpQv35lvT1GOxEtD9iBMyrGuBRn8hDdtdyE216C81ub6qxuzAW7rs6sZ5L33FYwQuzAny89pC9mGXtZhM9vEpkoNjYTUxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=YQp+am13; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="YQp+am13"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20241021054614epoutp02f51b8205542018543d9ce52b6b33faa5~AYZrjxjjl2799927999epoutp02g
-	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 05:46:14 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20241021054614epoutp02f51b8205542018543d9ce52b6b33faa5~AYZrjxjjl2799927999epoutp02g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1729489574;
-	bh=Ulf1ksMYUE48Lu6prNlTGdKuI66NQr+PY9q1T25et7A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YQp+am13l49BWM9zrOhUQjf4CeeUczK3XUhEluSRV8gbIbOeRqHa5Ap1SKKL9ITtG
-	 owkWmZ2KfG65fts3vCmpmF3SD8Zvru0uqEzExuZjNweVEoWpP/zoYfFYjMw5DwjAMQ
-	 TJ1bDutIEulUFoBPyNU3l/rvF1WzuDAlHs6tvolo=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20241021054614epcas5p49b1b700178b50cab66292a5f758b4a99~AYZrGrJFc1969619696epcas5p4s;
-	Mon, 21 Oct 2024 05:46:14 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.177]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4XX46q2lLmz4x9QB; Mon, 21 Oct
-	2024 05:46:11 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	31.3B.18935.3AAE5176; Mon, 21 Oct 2024 14:46:11 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20241021053853epcas5p28278ac9cd4f6791bca8d676cf06d99c5~AYTQNEp_O2430924309epcas5p20;
-	Mon, 21 Oct 2024 05:38:53 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20241021053853epsmtrp2824203125cc849df811967e71284722f~AYTQLzLCz2056520565epsmtrp2i;
-	Mon, 21 Oct 2024 05:38:53 +0000 (GMT)
-X-AuditID: b6c32a50-cb1f8700000049f7-14-6715eaa32d47
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	40.A0.08227.CE8E5176; Mon, 21 Oct 2024 14:38:52 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20241021053850epsmtip27568a368b48baf3fd3e276f32d38fe4a~AYTOKAtMD1344313443epsmtip2c;
-	Mon, 21 Oct 2024 05:38:50 +0000 (GMT)
-Date: Mon, 21 Oct 2024 11:01:10 +0530
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, kbusch@kernel.org, martin.petersen@oracle.com,
-	asml.silence@gmail.com, anuj1072538@gmail.com, krisman@suse.de,
-	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com,
-	linux-scsi@vger.kernel.org, vishak.g@samsung.com, Kanchan Joshi
-	<joshi.k@samsung.com>
-Subject: Re: [PATCH v4 07/11] io_uring/rw: add support to send meta along
- with read/write
-Message-ID: <20241021053110.GA2720@green245>
+	s=arc-20240116; t=1729494341; c=relaxed/simple;
+	bh=84wmG/QqjIrtQQLbrCFY1D3Z/opjPo88jrJz0k32RHE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sp7ILWUiYfrXOA7+qW2xMLF0kzXPWtwNicCdCOYsr6WQsaELELJDnT3uqXJMS1o/cnEVtLyOyHiTLQPDMiWZrDpnvivBOOT0qFNTTk2+JtyPm5GGTdeQvh2SKqbzJxaVqPLG/9Df5EF7koAUsBMjOV2ASfsPWATPbgHmNurZgNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4315e9e9642so32629175e9.0;
+        Mon, 21 Oct 2024 00:05:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729494337; x=1730099137;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UuyasMgkP9ACihQpzbrksqcPeP7uWQUhYgegjJyc8I8=;
+        b=oWAX9jY4mg6GduD2A37rkVYcnpRZkJkpKToXfWAa0eFD95AAyy919yzBt3S45d4ydJ
+         +PhCNMwCpq3DKiGpy+cSkllmB1ynCGB9G7IOphLbq4aYCkTatH91N1jariOiIcXO1Pw4
+         DgiD6RHSHBJ+YbGZEuc75VJNuz1M1UBfEsCU9oIqOlr86DQLcCdyT1k6ihGHi/7Q2Gej
+         joD9TkDeBaNMoXuLbuVGTL26h5AJCL05Gd3a+DIqsn65RmPiWeA9V3O/KKiVdY97E8Mb
+         7e5Zm0URQB8lNwyRy/08c3slxUN3Dr7QqwDYyFXTYg3/WJjpC65PQOU3nMhi9NUuOKjT
+         CKxA==
+X-Forwarded-Encrypted: i=1; AJvYcCVvafrsSCEJ8sh5xFX6uaknFZ6vn0H74LkREStDvTI47Iy6WfAiqjNCtzwzB7IWFaM8gqbqBLXasjzDdw==@vger.kernel.org, AJvYcCWMWC5Qo+/sN2yNHmX7aebm+GHepmnowq+lVWO08bJnXKWiV/Aa5QJeFu/ozwenPaqP60QamA6psUd9Txi/@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMzkETLrpEw32dSgOYmONvZmp/lJyCp/g3MrZYuv7fvmmPI93H
+	bAZ7ZAMUaRAYy4xX/21xtBEpj03v6Nf80FPh1hVgbYiucNTD94WO
+X-Google-Smtp-Source: AGHT+IG8O0M5kVa+Y0zMRDEF4giA3frmfFmV6DY0Rv6ItTOkBc3uE4a++W6C/asLcaygteal3Y9uQA==
+X-Received: by 2002:a05:600c:1d09:b0:430:57f2:bae5 with SMTP id 5b1f17b1804b1-4316169a968mr69435105e9.27.1729494337054;
+        Mon, 21 Oct 2024 00:05:37 -0700 (PDT)
+Received: from [10.50.4.202] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4316f570c79sm46756225e9.3.2024.10.21.00.05.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Oct 2024 00:05:36 -0700 (PDT)
+Message-ID: <064a6fb0-0cdb-4634-863d-a06574fcc0fa@grimberg.me>
+Date: Mon, 21 Oct 2024 10:05:34 +0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241017081057.GA27241@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrEJsWRmVeSWpSXmKPExsWy7bCmlu7iV6LpBjOv8Fl8/PqbxWLOqm2M
-	Fqvv9rNZ3Dywk8li5eqjTBbvWs+xWBz9/5bNYtKha4wW288sZbbYe0vbYv6yp+wW3dd3sFks
-	P/6PyeL8rDnsDnweO2fdZfe4fLbUY9OqTjaPzUvqPXbfbGDz+Pj0FotH35ZVjB6bT1d7fN4k
-	F8AZlW2TkZqYklqkkJqXnJ+SmZduq+QdHO8cb2pmYKhraGlhrqSQl5ibaqvk4hOg65aZA3S5
-	kkJZYk4pUCggsbhYSd/Opii/tCRVISO/uMRWKbUgJafApECvODG3uDQvXS8vtcTK0MDAyBSo
-	MCE74+GLf8wFX/kr7i6+x9jA+IWni5GTQ0LAROLdnU3sXYxcHEICexglDp1ZzAbhfGKU2Ppj
-	BlTmG6PEwaOX2WBa7p5oYoVI7GWUmLDyGSOE84xR4teU+ewgVSwCqhLP/j8Hs9kE1CWOPG9l
-	BLFFBJQknr46C9bALHCBSeLQ5b9gY4UFoiVmvv8BVsQroCPxfNlPKFtQ4uTMJywgNidQ/Oif
-	16wgtqiAssSBbceZQAZJCJzhkJh1egIzxH0uEu9nnmCFsIUlXh3fwg5hS0l8frcX6od0iR+X
-	nzJB2AUSzcf2MULY9hKtp/rB5jALZEgcPnUIqldWYuqpdUwQcT6J3t9PoHp5JXbMg7GVJNpX
-	zoGyJST2nmuAsj0kFn/dCw2v+4wSX/bNZJvAKD8LyXOzkOyDsHUkFuz+xDaLkQPIlpZY/o8D
-	wtSUWL9LfwEj6ypGqdSC4tz01GTTAkPdvNRyeKQn5+duYgQnbq2AHYyrN/zVO8TIxMF4iFGC
-	g1lJhFepRDRdiDclsbIqtSg/vqg0J7X4EKMpMLomMkuJJucDc0deSbyhiaWBiZmZmYmlsZmh
-	kjjv69a5KUIC6YklqdmpqQWpRTB9TBycUg1MuczGB0Ojty6PLb8hb7jDbcVH4QYHs5XhCkv3
-	T72o/3TRO4P6XSoJju/b+NtaTeR1X0zdFhTfZ3RccktmCP/n/5slP+yq4ppY7ZNZ22NVdfu9
-	6ZUrdbIMPinxdYq177+u23Ey7+ekO18e/JPcp3vso/hqvi8ic5mDbbZ/fpLvsIpderlMa522
-	zbZ5z9Z9Fpc9IByuUBYTvvbFy9baE2Y2J/2X7N9c6sWiOffWo6v5BzW/bIkWPvNkW4AWk+p0
-	n8ylBya0cl5548TUf0LpjfnXV2eTzVkjfRx4Nn/+ppo0Obv4w5pHLQbH6/J2N883euM4/cJV
-	40me5jyZcQusnin9PPPzkn2B36YuKd6rFi2LlViKMxINtZiLihMBZMA/GGUEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEIsWRmVeSWpSXmKPExsWy7bCSvO6bF6LpBs83mVt8/PqbxWLOqm2M
-	Fqvv9rNZ3Dywk8li5eqjTBbvWs+xWBz9/5bNYtKha4wW288sZbbYe0vbYv6yp+wW3dd3sFks
-	P/6PyeL8rDnsDnweO2fdZfe4fLbUY9OqTjaPzUvqPXbfbGDz+Pj0FotH35ZVjB6bT1d7fN4k
-	F8AZxWWTkpqTWZZapG+XwJXRvfQbS8FW3orP2xazNjCe5epi5OSQEDCRuHuiibWLkYtDSGA3
-	o8TxmV+ZIBISEqdeLmOEsIUlVv57zg5R9IRRov/qd7AiFgFViWf/QRKcHGwC6hJHnreCNYgI
-	KEk8fXWWEaSBWeACk8S2JW+YQRLCAtESM9//ACviFdCReL7sJyPE1PuMEqfPtDBDJAQlTs58
-	wgJiMwtoSdz49xJoGweQLS2x/B8HSJgTqPfon9esILaogLLEgW3HmSYwCs5C0j0LSfcshO4F
-	jMyrGCVTC4pz03OLDQuM8lLL9YoTc4tL89L1kvNzNzGCo01LawfjnlUf9A4xMnEwHmKU4GBW
-	EuFVKhFNF+JNSaysSi3Kjy8qzUktPsQozcGiJM777XVvipBAemJJanZqakFqEUyWiYNTqoFJ
-	sO3yqnksO3Zm9R3OaOfgWBI263OCYGjVsbkru33uy90NPNifJdS5nVm+ueHz05zDJ5/bf9W7
-	+XdyKL/WN+4VNglbeyY95zvEl/B69doq0aOF+94uyVY/r7vYMkM50sdW5c7kebJzIvsnVOhv
-	ZErhc3hw5KqwUBXvhN9PBXIOcvn9Pru4U3qJTH7ATK8Ug03vD5/K7pNpej33v/mrB2wnw/rt
-	HFsvGnfrnPrFNelKhXSCjcusnyde+tpIu+nmVK/MKFOTqv2zXCpZISxuQl3rj/21ix6fOW8c
-	Jcbm/idJymlxOJdNhtyDFQ8eLHX/vjb/pt5Cdu7rbx0zNrzfyv1A3c7lQZzmPdeMMr3/ty2U
-	WIozEg21mIuKEwEHf0/iJQMAAA==
-X-CMS-MailID: 20241021053853epcas5p28278ac9cd4f6791bca8d676cf06d99c5
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_5d1e1_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20241016113747epcas5p4e276eb0da2695ba032ce1d2a3b83fff4
-References: <20241016112912.63542-1-anuj20.g@samsung.com>
-	<CGME20241016113747epcas5p4e276eb0da2695ba032ce1d2a3b83fff4@epcas5p4.samsung.com>
-	<20241016112912.63542-8-anuj20.g@samsung.com>
-	<20241017081057.GA27241@lst.de>
-
-------Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_5d1e1_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-
-> What is the meta_type for?  To distintinguish PI from non-PI metadata?
-
-meta_type field is kept so that meta_types beyond integrity can also
-be supported in future. Pavel suggested this to Kanchan when this was
-discussed in LSF/MM.
-
-> Why doesn't this support non-PI metadata?
-
-It supports that. We have tested that (pi_type = 0 case).
-
-> Also PI or TO_PI might be
-> a better name than the rather generic integrity.  (but I'll defer to
-> Martin if he has any good arguments for naming here).
-
-Open to a different/better name.
-
-> 
-> >  static bool need_complete_io(struct io_kiocb *req)
-> >  {
-> > +	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
-> > +
-> > +	/* Exclude meta IO as we don't support partial completion for that */
-> >  	return req->flags & REQ_F_ISREG ||
-> > -		S_ISBLK(file_inode(req->file)->i_mode);
-> > +		S_ISBLK(file_inode(req->file)->i_mode) ||
-> > +		!(rw->kiocb.ki_flags & IOCB_HAS_METADATA);
-> >  }
-> 
-> What partial ocmpletions aren't supported?  Note that this would
-> trigger easily as right now metadata is only added for block devices
-> anyway.
-
-It seems that this scenario is less likely to happen. The plumbing
-seemed a bit non trivial. I have the plan to look at it, once the
-initial version of this series goes in.
-
-> 
-> > +	if (unlikely(kiocb->ki_flags & IOCB_HAS_METADATA)) {
-> 
-> For a workload using metadata this is everything but unlikely.  Is
-> there a specific reason you're trying to override the existing
-> branch predictor here (although on at least x86_64 gcc these kinds
-> of unlikely calls tend to be no-ops anyway).
-
-The branch predictions were added to make it a bit friendly for
-non-metadata read/write case. 
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] blk-mq: add one blk_mq_req_flags_t type to support mq
+ ctx fallback
+To: Ming Lei <ming.lei@redhat.com>, zhuxiaohui <zhuxiaohui400@gmail.com>
+Cc: axboe@kernel.dk, kbusch@kernel.org, hch@lst.de,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, Zhu Xiaohui <zhuxiaohui.400@bytedance.com>
+References: <20241020144041.15953-1-zhuxiaohui.400@bytedance.com>
+ <ZxWwvF0Er-Aj-rtX@fedora>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <ZxWwvF0Er-Aj-rtX@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-------Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_5d1e1_
-Content-Type: text/plain; charset="utf-8"
 
 
-------Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_5d1e1_--
+On 21/10/2024 4:39, Ming Lei wrote:
+> On Sun, Oct 20, 2024 at 10:40:41PM +0800, zhuxiaohui wrote:
+>> From: Zhu Xiaohui <zhuxiaohui.400@bytedance.com>
+>>
+>> It is observed that nvme connect to a nvme over fabric target will
+>> always fail when 'nohz_full' is set.
+>>
+>> In commit a46c27026da1 ("blk-mq: don't schedule block kworker on
+>> isolated CPUs"), it clears hctx->cpumask for all isolate CPUs,
+>> and when nvme connect to a remote target, it may fails on this stack:
+>>
+>>          blk_mq_alloc_request_hctx+1
+>>          __nvme_submit_sync_cmd+106
+>>          nvmf_connect_io_queue+181
+>>          nvme_tcp_start_queue+293
+>>          nvme_tcp_setup_ctrl+948
+>>          nvme_tcp_create_ctrl+735
+>>          nvmf_dev_write+532
+>>          vfs_write+237
+>>          ksys_write+107
+>>          do_syscall_64+128
+>>          entry_SYSCALL_64_after_hwframe+118
+>>
+>> due to that the given blk_mq_hw_ctx->cpumask is cleared with no available
+>> blk_mq_ctx on the hw queue.
+>>
+>> This patch introduce a new blk_mq_req_flags_t flag 'BLK_MQ_REQ_ARB_MQ'
+>> as well as a nvme_submit_flags_t 'NVME_SUBMIT_ARB_MQ' which are used to
+>> indicate that block layer can fallback to a  blk_mq_ctx whose cpu
+>> is not isolated.
+> blk_mq_alloc_request_hctx()
+> 	...
+> 	cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
+> 	...
+>
+> It can happen in case of non-cpu-isolation too, such as when this hctx hasn't
+> online CPUs, both are same actually from this viewpoint.
+>
+> It is one long-time problem for nvme fc.
+
+For what nvmf is using blk_mq_alloc_request_hctx() is not important. It 
+just needs a tag from that hctx. the request execution is running where 
+blk_mq_alloc_request_hctx() is running.
