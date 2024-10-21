@@ -1,46 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461F01FB3F6;
-	Mon, 21 Oct 2024 19:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F331991AE;
+	Mon, 21 Oct 2024 19:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729537811; cv=none; b=XCZxHvge8gzyGL74wUvodmHGQfhc2iMKRM07IuqJg4LKpZBRiRm+oT0RfDpFt2RjvPq/CgybFcU1Oblz8IRC2F403VOCjjGGnA/lYGXHT0+Te/dd7J6KiO/nN7PaT6u5b13FaAkgqFmf6rqQ69ZUlCnZ6upmWTiLDyY1U1ePjrM=
+	t=1729539320; cv=none; b=kiuVnFdOqApKWR2dyMFGClYMkSk3cNGSJQkJnA0+73whuXIcpP1edI4GT3CEAHC+5ZVxHaR5ZNH2tfil6AvLIZ0i4u9jxhaX2bbrYv0ge6zuQaLfQx7VwIJuZfi7Bw1gJIwXABCPn8yxhm3mGXtiA3++eoKsgURRPd0ipiFOJGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729537811; c=relaxed/simple;
-	bh=LYfZM6Q6uUneW9KRYJEfi2BKTV//PDb/wWBvvJxwfR8=;
+	s=arc-20240116; t=1729539320; c=relaxed/simple;
+	bh=S+eoZ9PsMFOj075TBAMfbklJrhMw50VOHQse4okNSPU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XalskxB4sUZR84qRhzQ9+EHfvIq3+uHP5jn2v0XoUV52GeLpCoDQi6uJEEAci64b8Rf0E+m6EB5/udhouqpmRzqMDGqMawcokaowwkZZp2eLu7qMIoZQLIcoR2rZOYsZ2CYgO6Jq0KfkBev0SGdrpQlDJdMvuH5Zp0/qYzjgEgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fhS8MIpP; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=q/QQyZ0bsS09JeQNNA1DScQXLc0QXaksXWbWqQL+kMpU1uiVjE2RHOThxhcZ+ob1mq1vaYDNolNXg3f5iP/Y55Yii6pOCh1Z3hhoQed/fl/cdD12FSxZ404H3K+05fluVPF523ftQWN6U2l0rhD7QVM5u7n1JOby3bcuO399Qr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i87kZedR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fhS8MIpP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F563C4CEE5;
-	Mon, 21 Oct 2024 19:10:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i87kZedR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91F80C4CEE9;
+	Mon, 21 Oct 2024 19:35:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729537810;
-	bh=LYfZM6Q6uUneW9KRYJEfi2BKTV//PDb/wWBvvJxwfR8=;
+	s=k20201202; t=1729539318;
+	bh=S+eoZ9PsMFOj075TBAMfbklJrhMw50VOHQse4okNSPU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fhS8MIpPoWxTg9VRlPO9/Q30BPSxXPRqalwXfqAi/ZezydoSfQSqJz9IdPNGv08sn
-	 BX2WZirNj0hQXfKA8AAb64kCR8J3dlJ3/VQN7x/KDyiF3vBRaHAitmtksGjTRx3Gmh
-	 HxwZnTmVBWmOP4JW4TYRMztJgo8rsRGWD4T4P2cUsb3VsB8pHWQ1loS3BNwaJvgnVn
-	 OwaXjtFFQjM6gT8tKQqbte4wxL1995C2rWoRXAjx4886cGz6IkulPql2Hz5cgcgD09
-	 4pAZDg+6PHfU+0VgddrHP5LEVQRt0fnzCrTwrz1DbsA+TzNBMRNb6NL2XSCuzbpxZD
-	 5CmcqjjNnusfA==
-Date: Mon, 21 Oct 2024 19:10:08 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	Md Sadre Alam <quic_mdalam@quicinc.com>,
-	Israel Rukshin <israelr@nvidia.com>,
-	Milan Broz <gmazyland@gmail.com>,
-	Adrian Vovk <adrianvovk@gmail.com>
-Subject: Re: [RFC PATCH 0/4] dm-default-key: target for filesystem metadata
- encryption
-Message-ID: <20241021191008.GB1395714@google.com>
-References: <20241018184339.66601-1-ebiggers@kernel.org>
- <b56689c6-c0cd-c44e-16fb-8a73c460aa87@redhat.com>
+	b=i87kZedRPyejz9h+qiOBKWrrI2Whc6Xb01cPDQ/kj7/qwvJaLkvkgxhv5GL+bJH1c
+	 xy1+Vo8vn2FdmizpfWFhUWLNOml0K/7bR57ZR/PlAp/M4AwQJ+kkbbBj1p2qNWk0GN
+	 Y36wzVsmOYlnJaseXmmzx9OgUrHmZ5gKo4W16l12ejzYbXou2W/lctU6x7DpQqK0QI
+	 o0JNDtEXYXDl9ZCl9hfjp6TnUZK+SPvNFltBBsA29zFE5aU7FcWj8bcefhntVRw6ni
+	 IQrRelotOl5lnpQMNxj7B1WOGQrNJqMXq6MvTg+Jr6a1PNgabD2CCIx1Vok/YpIwoo
+	 4X+JmF/7fYgug==
+Date: Mon, 21 Oct 2024 13:35:15 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	axboe@kernel.dk, io-uring@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, joshi.k@samsung.com,
+	javier.gonz@samsung.com, Nitesh Shetty <nj.shetty@samsung.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCHv8 1/6] block, fs: restore kiocb based write hint
+ processing
+Message-ID: <Zxas8xGoydNLGwsc@kbusch-mbp>
+References: <20241017160937.2283225-1-kbusch@meta.com>
+ <20241017160937.2283225-2-kbusch@meta.com>
+ <20241018055032.GB20262@lst.de>
+ <ZxZ3o_HzN8HN6QPK@kbusch-mbp>
+ <a87c67aa-b1fe-48dc-9b5a-bc6732931298@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,67 +51,31 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b56689c6-c0cd-c44e-16fb-8a73c460aa87@redhat.com>
+In-Reply-To: <a87c67aa-b1fe-48dc-9b5a-bc6732931298@acm.org>
 
-On Mon, Oct 21, 2024 at 01:52:58PM +0200, Mikulas Patocka wrote:
-> On Fri, 18 Oct 2024, Eric Biggers wrote:
-> 
-> > This series adds "metadata encryption" support to ext4 and f2fs via a
-> > new device-mapper target dm-default-key.  dm-default-key encrypts all
-> > data on a block device that isn't already encrypted by the filesystem.
+On Mon, Oct 21, 2024 at 10:09:57AM -0700, Bart Van Assche wrote:
+> On 10/21/24 8:47 AM, Keith Busch wrote:
+> > On Fri, Oct 18, 2024 at 07:50:32AM +0200, Christoph Hellwig wrote:
+> > > On Thu, Oct 17, 2024 at 09:09:32AM -0700, Keith Busch wrote:
+> > > >   {
+> > > >   	*kiocb = (struct kiocb) {
+> > > >   		.ki_filp = filp,
+> > > >   		.ki_flags = filp->f_iocb_flags,
+> > > >   		.ki_ioprio = get_current_ioprio(),
+> > > > +		.ki_write_hint = file_write_hint(filp),
+> > > 
+> > > And we'll need to distinguish between the per-inode and per file
+> > > hint.  I.e. don't blindly initialize ki_write_hint to the per-inode
+> > > one here, but make that conditional in the file operation.
 > > 
-> > Except for the passthrough support, dm-default-key is basically the same
-> > as the proposed dm-inlinecrypt which omits that feature
-> > (https://lore.kernel.org/dm-devel/20241016232748.134211-1-ebiggers@kernel.org/).
-> > 
-> > I am sending this out for reference, as dm-default-key (which Android
-> > has been using for a while) hasn't previously been sent to the lists in
-> > full, and there has been interest in it.  However, my current impression
-> > is that this feature will need to be redesigned as a filesystem native
-> > feature in order to make it upstream.  If that is indeed the case, then
-> > IMO it would make sense to merge dm-inlinecrypt in the mean time instead
-> > (or add its functionality to dm-crypt) so that anyone who just wants
-> > "dm-crypt + inline encryption hardware" gets a solution for that.
+> > Maybe someone wants to do direct-io with partions where each partition
+> > has a different default "hint" when not provided a per-io hint? I don't
+> > know of such a case, but it doesn't sound terrible. In any case, I feel
+> > if you're directing writes through these interfaces, you get to keep all
+> > the pieces: user space controls policy, kernel just provides the
+> > mechanisms to do it.
 > 
-> I we merge dm-inlinecrypt, we can't remove it later because users will 
-> depend on it. I think it is not sensible to have two targets 
-> (dm-inlinecrypt and dm-default-key) that do almost the same thing.
+> Is it important to support partitions on top of FDP namespaces? 
 
-The code would not need to be duplicated, though.  E.g. dm-default-key
-functionality could be added as an enable_passthrough option to dm-inlinecrypt.
-Or the same .c file could register both targets sharing most of the same code.
-
-> I've got another idea - what about a new target "dm-metadata-switch" that 
-> will take two block devices as arguments and it will pass metadata bios to 
-> the first device and data bios to the second device - so that the logic 
-> to decide where the bio will go would be decoupled from the encryption. 
-> Then, you can put dm-crypt or dm-inlinecrypt underneath 
-> "dm-metadata-switch".
-> 
-> ----------------------
-> |     filesystem     |
-> ----------------------
->           |
->           V
-> ----------------------
-> | dm-metadata-switch |
-> ----------------------
->       |           |
->       V           |
-> ------------      |
-> | dm-crypt |      |
-> ------------      |
->       |           |
->       V           V
-> -------------------------
-> | physical block device |
-> -------------------------
-
-Would this have any use case other than what dm-default-key does?
-
-Keep in mind that dm-metadata-switch would have to pass through all sector
-addresses unchanged.  So if you wanted to reuse this to actually put your
-filesystem metadata on one disk and data on another, this wouldn't be very
-effective at that, as both data and metadata would take up the full space.
-
-- Eric
+It's already used with partitions, so yes, it's important. Breaking that
+as a condition to make it work with the block stack is a non-starter.
