@@ -1,124 +1,110 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4A41DF99C
-	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 08:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160381E3DED
+	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 09:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729499504; cv=none; b=QB4fsSWWjqHZITWMwci0gReSx1ltPJ3xVFARyDqY0nLbeL4zr84IO3Necij4R6JpyofB0MjXXOvcHQ9YTelZwlLXE0+XNgYf6pqPxKQ0uTnR7IwTTS70yvBLcw19Qe10/UIGzhxxyAqW5NBXp3zUDQ1LX/PlGl7ptk8aeF9Zp1I=
+	t=1729503344; cv=none; b=PYOQg01uIkeALZcwo1lU6KDgTay5nnPrn+Id9qC6Qc5q4mmOA2xpK5H0/ci1c0wg3MgC2qZCWztvp15T6Y9hDNdGgDLOuaEd4BybtR450IvNz4E0UZ04RcuTKDo5PyZ0o2ZY8dOo+jKK+O0+j9wbAc0LtgGKmAxRIU5KlrY5HJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729499504; c=relaxed/simple;
-	bh=f21XiQvlg0ti+Xjzxa+Z7uE3FmNRpazGuntm6reHJi0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ieTJIJKQVyimanJXpbYW0aHtQXBdpPJNeChiAK/0K2ZR2tQQV3p0z3WhGNYiWDs/b8QSF0FjI44CiNzb2LSkInxNMK43SQv9GXsLOsRZ72U5sUEWlze+/3/rJftcefF0z2IgsXKFLENbdHhBvjNg9D5lpX+7tj4G4BgQOuXTaow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SnhrvIwN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729503344; c=relaxed/simple;
+	bh=/Aqo9WPzE2ID4oasxty3yzeeqaODshxgbd4TNFTtOyQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iJNDOxfNaKBLe50BVjX4470EQE3Qw4OjjUy/hf1QKdNSnLh17RvMSMEhdOS8qOgUn6Guoje5oAqCuBGTzLJWD/C6jSwu+6wp0h4rss8Bi2/mi5gLDXnrIDzLRqNmcLT/3ZdlFwNDAsYmXX8pHJ+cBQXqp9mW1g3zeZz7g3Zuy48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=OrF0ntAH; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SnhrvIwN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729499501;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZcSc+4L9y38uraoqMApZCtt9pe8JnUSoYfln1jlvOsY=;
-	b=SnhrvIwNunW2+V748Ys0lTipis0xI8pBKROcY7ssZzuHUv2SxRl/2e+aeigZxyD3rmASPs
-	nZwbejMZv64e8csRcgTstXhdZg5KZexbKqfVTgufk3CJ88GH4hm5TFS0FOhAZvwNl6Unbd
-	sRcVJQm1ZexKGfuLwbtuLK+y2RdnKAU=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-625-36Rx2BnCNDeuD8EftrT9VQ-1; Mon,
- 21 Oct 2024 04:31:40 -0400
-X-MC-Unique: 36Rx2BnCNDeuD8EftrT9VQ-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BEEAE1955D80;
-	Mon, 21 Oct 2024 08:31:37 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.104])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D147B1956056;
-	Mon, 21 Oct 2024 08:31:31 +0000 (UTC)
-Date: Mon, 21 Oct 2024 16:31:26 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Sagi Grimberg <sagi@grimberg.me>
-Cc: zhuxiaohui <zhuxiaohui400@gmail.com>, axboe@kernel.dk,
-	kbusch@kernel.org, hch@lst.de, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	Zhu Xiaohui <zhuxiaohui.400@bytedance.com>
-Subject: Re: [PATCH v1] blk-mq: add one blk_mq_req_flags_t type to support mq
- ctx fallback
-Message-ID: <ZxYRXvyxzlFP_NPl@fedora>
-References: <20241020144041.15953-1-zhuxiaohui.400@bytedance.com>
- <ZxWwvF0Er-Aj-rtX@fedora>
- <064a6fb0-0cdb-4634-863d-a06574fcc0fa@grimberg.me>
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="OrF0ntAH"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71e5a62031aso2907346b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 02:35:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1729503341; x=1730108141; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GsT+de8zLV+6IwIjpVLKGD78ddm4AlMrsbMhyzImO7o=;
+        b=OrF0ntAHXefTfKyPQFjNqZ7pW+zyRV8NQ0n5VtijAlCa7OpI6lTTw67EVjkbI7GiXO
+         45LbM66jWD/LnfhsWDJyPNYNOvrSUS9xk5oevHVgZGnD+nsbOoSeVFC4KATw7vnU50+p
+         oRQWpHRyJGOUGHDy0IKRK5RzyAmKfBcwoFCXzHvFcSdoM69FUSYikEtFcJYbQWKB0gcD
+         ii4vN9x5srn3KcUf6fgjV/GwyfHKI4PMcnB5TD3+U1IFeFoZl1bFxSjDsckmi1Ejuamu
+         /gWENIhTFxsRUkhjqnv/RGOrKHOT0BjTl5ePPUrHOBuvA/x+0kL1Qdc5SMz06pxvPiTG
+         0p8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729503341; x=1730108141;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GsT+de8zLV+6IwIjpVLKGD78ddm4AlMrsbMhyzImO7o=;
+        b=o+4O3BwpEf4M3O+0Pk/RwqTJCXCgrL92sA7O/dNesSj17KsTsqreOfLnlu44yTyX8L
+         +yFNb2g+XA3lwEUX/u6m9dT3UBm+f9SX8jg5szy5iuNOQmQG8dgsm4FPmdIle9duSkQ9
+         c/vcLiRGdc/q16Hz8JthLyW1c2T0vhxFC4gec6/Cyc7zi/UfCwhSPyENLFnF0ESus4Xt
+         /N+VOX5ZuUe960eSbgMRUIRB0+tfgfIzoz8Re0KJhpSttE2sHfwj8jY563TneprFIeRp
+         kFrir5B2BchtyOaUeXzEGAKTPjYRNn7WTXkHW1s0QKfoih2W+yW/mPw8Zz9feIdTW2OG
+         d1hw==
+X-Forwarded-Encrypted: i=1; AJvYcCXNpFaN8OSXnntjRe/QU0xbFDpc0mQjGaKJge4xy07FWNqc3aouDwhOneu5tfzp9bE9p+yUI8DPFX1vZA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLz2RfxTxfo2yQfzHTS/jvpgWrj4FB+gKRJP9Nahs6RAGUfPPH
+	2xFGA1J3B8n39gQY2gYfktgyd1K9Koi1ptZ+TcS0xiRljQESLVK0USNloTHJHIo=
+X-Google-Smtp-Source: AGHT+IFG92jte1IkPnhsjRpkj4LvK1CAKm+mAn9i576/YceM9UKswKVvkdfH3hCvGZ0NwGL/6YsT5Q==
+X-Received: by 2002:a05:6a21:2d88:b0:1d6:97f2:5f72 with SMTP id adf61e73a8af0-1d92c49fc1emr14116941637.3.1729503340762;
+        Mon, 21 Oct 2024 02:35:40 -0700 (PDT)
+Received: from PXLDJ45XCM.bytedance.net ([61.213.176.9])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec1408916sm2427653b3a.199.2024.10.21.02.35.37
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 21 Oct 2024 02:35:40 -0700 (PDT)
+From: Muchun Song <songmuchun@bytedance.com>
+To: axboe@kernel.dk
+Cc: josef@toxicpanda.com,
+	oleg@redhat.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	muchun.song@linux.dev,
+	Muchun Song <songmuchun@bytedance.com>
+Subject: [PATCH] block: remove redundant explicit memory barrier from rq_qos waiter and waker
+Date: Mon, 21 Oct 2024 16:52:51 +0800
+Message-Id: <20241021085251.73353-1-songmuchun@bytedance.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <064a6fb0-0cdb-4634-863d-a06574fcc0fa@grimberg.me>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 21, 2024 at 10:05:34AM +0300, Sagi Grimberg wrote:
-> 
-> 
-> 
-> On 21/10/2024 4:39, Ming Lei wrote:
-> > On Sun, Oct 20, 2024 at 10:40:41PM +0800, zhuxiaohui wrote:
-> > > From: Zhu Xiaohui <zhuxiaohui.400@bytedance.com>
-> > > 
-> > > It is observed that nvme connect to a nvme over fabric target will
-> > > always fail when 'nohz_full' is set.
-> > > 
-> > > In commit a46c27026da1 ("blk-mq: don't schedule block kworker on
-> > > isolated CPUs"), it clears hctx->cpumask for all isolate CPUs,
-> > > and when nvme connect to a remote target, it may fails on this stack:
-> > > 
-> > >          blk_mq_alloc_request_hctx+1
-> > >          __nvme_submit_sync_cmd+106
-> > >          nvmf_connect_io_queue+181
-> > >          nvme_tcp_start_queue+293
-> > >          nvme_tcp_setup_ctrl+948
-> > >          nvme_tcp_create_ctrl+735
-> > >          nvmf_dev_write+532
-> > >          vfs_write+237
-> > >          ksys_write+107
-> > >          do_syscall_64+128
-> > >          entry_SYSCALL_64_after_hwframe+118
-> > > 
-> > > due to that the given blk_mq_hw_ctx->cpumask is cleared with no available
-> > > blk_mq_ctx on the hw queue.
-> > > 
-> > > This patch introduce a new blk_mq_req_flags_t flag 'BLK_MQ_REQ_ARB_MQ'
-> > > as well as a nvme_submit_flags_t 'NVME_SUBMIT_ARB_MQ' which are used to
-> > > indicate that block layer can fallback to a  blk_mq_ctx whose cpu
-> > > is not isolated.
-> > blk_mq_alloc_request_hctx()
-> > 	...
-> > 	cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
-> > 	...
-> > 
-> > It can happen in case of non-cpu-isolation too, such as when this hctx hasn't
-> > online CPUs, both are same actually from this viewpoint.
-> > 
-> > It is one long-time problem for nvme fc.
-> 
-> For what nvmf is using blk_mq_alloc_request_hctx() is not important. It just
-> needs a tag from that hctx. the request execution is running where
-> blk_mq_alloc_request_hctx() is running.
+The memory barriers in list_del_init_careful() and list_empty_careful()
+in pairs already handle the proper ordering between data.got_token
+and data.wq.entry. So remove the redundant explicit barriers. And also
+change a "break" statement to "return" to avoid redundant calling of
+finish_wait().
 
-I am afraid that just one tag from the specified hw queue isn't enough.
+Signed-off-by: Muchun Song <songmuchun@bytedance.com>
+---
+ block/blk-rq-qos.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-The connection request needs to be issued to the hw queue & completed.
-Without any online CPU for this hw queue, the request can't be completed
-in case of managed-irq.
-
-
-thanks,
-Ming
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index dc510f493ba57..9b0aa7dd6779f 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -218,7 +218,6 @@ static int rq_qos_wake_function(struct wait_queue_entry *curr,
+ 		return -1;
+ 
+ 	data->got_token = true;
+-	smp_wmb();
+ 	wake_up_process(data->task);
+ 	list_del_init_careful(&curr->entry);
+ 	return 1;
+@@ -274,10 +273,9 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
+ 			 * which means we now have two. Put our local token
+ 			 * and wake anyone else potentially waiting for one.
+ 			 */
+-			smp_rmb();
+ 			if (data.got_token)
+ 				cleanup_cb(rqw, private_data);
+-			break;
++			return;
+ 		}
+ 		io_schedule();
+ 		has_sleeper = true;
+-- 
+2.20.1
 
