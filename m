@@ -1,113 +1,180 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E0A19925B
-	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 04:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E930B3398E
+	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 05:46:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729483216; cv=none; b=GrvQlxSdjRd7ZubQeJeSPuHA6ZqM4yAV6CexRF4K/7aiId800K1paoevvLP/yoQ01BVvaPsj4BnNEMfn2usqJEv/ZCoO2VdQHzcgj24BVJ94s+M9BicXge3QBZGLjEWD71Lhh+ls+49YjbFElipv/Qgim/JdezDeSYEfoz1IooM=
+	t=1729489579; cv=none; b=rX8gmDQWOKbdyHpM5Y3mhXynbc2N+jV4AcZbPRG8bkma/EMJ27UeDb4/J2DrRLh3I++yZoNQB77aHVKxcbE5+ydgYqlGAH6gh6oPZIk/cn/ulf5zx4pOP7eh++ybgoMVp1aqRZo/kbjmlJCCxDBg6kktYVFXksfONnkoRZejyTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729483216; c=relaxed/simple;
-	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=aEGx0yirmzrPIos5yZ6E0ZZT35eNeIl40T1bQwSKQIfsozuWzKUOkCjB5UrNaL2G/rKSlNRpBCpSuGBXXsHqhKckzxN+52IBv/sJ/4aoQhWzl5C9wuCyByLwIBk6GMQ/N5sVVTQgptEusFhWPr65Kj1Ck4POzCckWL6OAxtIQIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=W2+IJxaw; arc=none smtp.client-ip=203.254.224.33
+	s=arc-20240116; t=1729489579; c=relaxed/simple;
+	bh=WYR0bDNkGe9X68XYEReTJwExKJCaA46pObJ2KdmkveU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=j7PyE5IMF+9OmTbMG4abYRzrJRlwFcJKh2pbMEYduQQvf3/L1viCswjBPXlEHrNXiNARApVFkAd0bFpQv35lvT1GOxEtD9iBMyrGuBRn8hDdtdyE216C81ub6qxuzAW7rs6sZ5L33FYwQuzAny89pC9mGXtZhM9vEpkoNjYTUxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=YQp+am13; arc=none smtp.client-ip=203.254.224.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="W2+IJxaw"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20241021035324epoutp03c31c9e68d44b787509a3675fe08d72e7~AW3Kd7o7d0199001990epoutp03u
-	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 03:53:24 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20241021035324epoutp03c31c9e68d44b787509a3675fe08d72e7~AW3Kd7o7d0199001990epoutp03u
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="YQp+am13"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20241021054614epoutp02f51b8205542018543d9ce52b6b33faa5~AYZrjxjjl2799927999epoutp02g
+	for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 05:46:14 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20241021054614epoutp02f51b8205542018543d9ce52b6b33faa5~AYZrjxjjl2799927999epoutp02g
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1729482804;
-	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=W2+IJxawqzgcBChIlcNeNfk7coG8mvvD7lbnipymiNmSAScMciTYlAp3jDX8QTRE2
-	 eYd+OsvRbWviuIlnM2mVW0UEVWuIIzdDB5wpwPwL7o7pXKfPi1bL3CEmU+lj8uyybZ
-	 TPpJJTLNIKML89jrHHGzK3+HbWH29Xp/ByIbAXHI=
+	s=mail20170921; t=1729489574;
+	bh=Ulf1ksMYUE48Lu6prNlTGdKuI66NQr+PY9q1T25et7A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YQp+am13l49BWM9zrOhUQjf4CeeUczK3XUhEluSRV8gbIbOeRqHa5Ap1SKKL9ITtG
+	 owkWmZ2KfG65fts3vCmpmF3SD8Zvru0uqEzExuZjNweVEoWpP/zoYfFYjMw5DwjAMQ
+	 TJ1bDutIEulUFoBPyNU3l/rvF1WzuDAlHs6tvolo=
 Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20241021035324epcas5p12ccdd5a52c15f6f360c65c17e64eb3be~AW3KSDTvY0089000890epcas5p1N;
-	Mon, 21 Oct 2024 03:53:24 +0000 (GMT)
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20241021054614epcas5p49b1b700178b50cab66292a5f758b4a99~AYZrGrJFc1969619696epcas5p4s;
+	Mon, 21 Oct 2024 05:46:14 +0000 (GMT)
 Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.177]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4XX1cg3HD7z4x9Pr; Mon, 21 Oct
-	2024 03:53:23 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4XX46q2lLmz4x9QB; Mon, 21 Oct
+	2024 05:46:11 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
 	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	14.A2.18935.330D5176; Mon, 21 Oct 2024 12:53:23 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20241021035323epcas5p3b2390d405621dcf18735b547fee153b7~AW3JA_vPX0434004340epcas5p3M;
-	Mon, 21 Oct 2024 03:53:23 +0000 (GMT)
+	31.3B.18935.3AAE5176; Mon, 21 Oct 2024 14:46:11 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20241021053853epcas5p28278ac9cd4f6791bca8d676cf06d99c5~AYTQNEp_O2430924309epcas5p20;
+	Mon, 21 Oct 2024 05:38:53 +0000 (GMT)
 Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20241021035323epsmtrp125ecbe8d902e2051cee4661eacde54bb~AW3JATGTO1039610396epsmtrp1k;
-	Mon, 21 Oct 2024 03:53:23 +0000 (GMT)
-X-AuditID: b6c32a50-a99ff700000049f7-f9-6715d033ad01
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241021053853epsmtrp2824203125cc849df811967e71284722f~AYTQLzLCz2056520565epsmtrp2i;
+	Mon, 21 Oct 2024 05:38:53 +0000 (GMT)
+X-AuditID: b6c32a50-cb1f8700000049f7-14-6715eaa32d47
 Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
 	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	64.74.08227.330D5176; Mon, 21 Oct 2024 12:53:23 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20241021035322epsmtip2c9daad8aed9690ef0a8bec70c8665986~AW3ITdVlF1271312713epsmtip2r;
-	Mon, 21 Oct 2024 03:53:22 +0000 (GMT)
-Message-ID: <9870b4ad-d140-47a0-9fe6-787128971069@samsung.com>
-Date: Mon, 21 Oct 2024 09:23:21 +0530
+	40.A0.08227.CE8E5176; Mon, 21 Oct 2024 14:38:52 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20241021053850epsmtip27568a368b48baf3fd3e276f32d38fe4a~AYTOKAtMD1344313443epsmtip2c;
+	Mon, 21 Oct 2024 05:38:50 +0000 (GMT)
+Date: Mon, 21 Oct 2024 11:01:10 +0530
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, kbusch@kernel.org, martin.petersen@oracle.com,
+	asml.silence@gmail.com, anuj1072538@gmail.com, krisman@suse.de,
+	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	linux-scsi@vger.kernel.org, vishak.g@samsung.com, Kanchan Joshi
+	<joshi.k@samsung.com>
+Subject: Re: [PATCH v4 07/11] io_uring/rw: add support to send meta along
+ with read/write
+Message-ID: <20241021053110.GA2720@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH for-next] nvme: use helpers to access io_uring cmd space
-To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Language: en-US
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <c274d35f441c649f0b725c70f681ec63774fce3b.1729265044.git.asml.silence@gmail.com>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNKsWRmVeSWpSXmKPExsWy7bCmuq7xBdF0g1frxC3mrNrGaLH6bj+b
-	xbvWcywWe29pO7B47Jx1l93j8tlSj8+b5AKYo7JtMlITU1KLFFLzkvNTMvPSbZW8g+Od403N
-	DAx1DS0tzJUU8hJzU22VXHwCdN0yc4B2KSmUJeaUAoUCEouLlfTtbIryS0tSFTLyi0tslVIL
-	UnIKTAr0ihNzi0vz0vXyUkusDA0MjEyBChOyM07tWMpUYFRxbW4fUwOjbhcjJ4eEgInEo89/
-	mUFsIYE9jBLnvrp3MXIB2Z8YJY6e3c0I4XxjlGg6fIMNpuPewmXMEIm9jBLtW+ayQThvGSVO
-	dbwAynBw8ArYSWx6rQnSwCKgKjHhyAwmEJtXQFDi5MwnLCC2qIC8xP1bM9hBbGEBH4kjz4+y
-	gbSKCLhKrPikAhJmFrCV+H3kKAuELS5x68l8JpASNgFNiQuTS0HCnAKxEu3z1jFBlMhLbH87
-	B+w0CYFH7BJv9y1hhLjZReLDhsNQtrDEq+Nb2CFsKYmX/W1QdrbEg0cPWCDsGokdm/tYIWx7
-	iYY/N1hB9jID7V2/Sx9iF59E7+8nYOdICPBKdLQJQVQrStyb9BSqU1zi4YwlULaHRMvKyYyQ
-	cN7AKDHxbdwERoVZSGEyC8mTs5B8Mwth8QJGllWMUqkFxbnpqcmmBYa6eanl8LhOzs/dxAhO
-	hVoBOxhXb/ird4iRiYPxEKMEB7OSCK9SiWi6EG9KYmVValF+fFFpTmrxIUZTYOxMZJYSTc4H
-	JuO8knhDE0sDEzMzMxNLYzNDJXHe161zU4QE0hNLUrNTUwtSi2D6mDg4pRqYRHd/X6/3/kOK
-	/oKIvWW195Onf3dlaExnnb4kQdXUh/Wg65k+ZW2hzNT0k1Km/7yVlqx5NXe/NfeTlQ0rP1cF
-	Xz5dYxfwc8nlZpUdybk9m3oF3v4w69+eLXJh79yWUm6f+u3V22ZN+BuX3RzoKbZ50VathZbd
-	v7Kf1ekr8gZPYp5TuWmJyvnyOHmNGfOWM5768vQ/rz5HhdifYzl+hk5FCc+e+nuebehZ8DXu
-	1E/X02sTp0xJdJ6ycbbztNbVe/MfaAtdXFSd15nfdiB085vjS+9ofNs4p/1rzaLTd/5cLVCd
-	rcSWFn/o9uezqnut1N566IpZfXHu2ZN7Kl5Lxvzuc9mjkWLBKfNMpizgMrlyR4mlOCPRUIu5
-	qDgRAFURnc4OBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrBLMWRmVeSWpSXmKPExsWy7bCSvK7xBdF0gw9H2S3mrNrGaLH6bj+b
-	xbvWcywWe29pO7B47Jx1l93j8tlSj8+b5AKYo7hsUlJzMstSi/TtErgyTu1YylRgVHFtbh9T
-	A6NuFyMnh4SAicS9hcuYuxi5OIQEdjNKLGg8zQyREJdovvaDHcIWllj57zk7RNFrRonHm4+y
-	djFycPAK2Elseq0JUsMioCox4cgMJhCbV0BQ4uTMJywgtqiAvMT9WzPA5ggL+EgceX6UDaRV
-	RMBVYsUnFZAws4CtxO8jR1kgxm9glHh96xojREJc4taT+Uwg9WwCmhIXJpeChDkFYiXa561j
-	gigxk+ja2gVVLi+x/e0c5gmMQrOQXDELyaRZSFpmIWlZwMiyilEytaA4Nz232LDAKC+1XK84
-	Mbe4NC9dLzk/dxMjOPC1tHYw7ln1Qe8QIxMH4yFGCQ5mJRFepRLRdCHelMTKqtSi/Pii0pzU
-	4kOM0hwsSuK83173pggJpCeWpGanphakFsFkmTg4pRqYZsqeNWb5LxgZK/dIoV9cJZ331Yoe
-	rY2Nmhwux+pjhZo5nnUm8Kh5VNf5HHeMC/jKt/TCZ9ni83NP2/Ze2Ore9uNb6cr3817ceMR2
-	YHpXqsKtnvwjPyfmv1CtUGaJ1nStmMnTZ3R8rvlFjV8d19QulKhviZgVOz1EWDJ/+umU8Mne
-	11gcQ0Klvh6SVl16Zkuq5QWN1pov/0uFW9kfL7KYWLjOy8hop9G5XwfiM0L/nvsbss3h2v5V
-	3E+Db+pOs4rZ/3eb6pIXJ/7yTWEouWwrrjVVonFNru2Kz8JRDdquq2NsON9Jz3mQ/phxDuNp
-	1n3V8j9mHmSqWjrDzsuj5rezcv+jY3mWp/fpvexnqT2qxFKckWioxVxUnAgAaDsCcusCAAA=
-X-CMS-MailID: 20241021035323epcas5p3b2390d405621dcf18735b547fee153b7
+In-Reply-To: <20241017081057.GA27241@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrEJsWRmVeSWpSXmKPExsWy7bCmlu7iV6LpBjOv8Fl8/PqbxWLOqm2M
+	Fqvv9rNZ3Dywk8li5eqjTBbvWs+xWBz9/5bNYtKha4wW288sZbbYe0vbYv6yp+wW3dd3sFks
+	P/6PyeL8rDnsDnweO2fdZfe4fLbUY9OqTjaPzUvqPXbfbGDz+Pj0FotH35ZVjB6bT1d7fN4k
+	F8AZlW2TkZqYklqkkJqXnJ+SmZduq+QdHO8cb2pmYKhraGlhrqSQl5ibaqvk4hOg65aZA3S5
+	kkJZYk4pUCggsbhYSd/Opii/tCRVISO/uMRWKbUgJafApECvODG3uDQvXS8vtcTK0MDAyBSo
+	MCE74+GLf8wFX/kr7i6+x9jA+IWni5GTQ0LAROLdnU3sXYxcHEICexglDp1ZzAbhfGKU2Ppj
+	BlTmG6PEwaOX2WBa7p5oYoVI7GWUmLDyGSOE84xR4teU+ewgVSwCqhLP/j8Hs9kE1CWOPG9l
+	BLFFBJQknr46C9bALHCBSeLQ5b9gY4UFoiVmvv8BVsQroCPxfNlPKFtQ4uTMJywgNidQ/Oif
+	16wgtqiAssSBbceZQAZJCJzhkJh1egIzxH0uEu9nnmCFsIUlXh3fwg5hS0l8frcX6od0iR+X
+	nzJB2AUSzcf2MULY9hKtp/rB5jALZEgcPnUIqldWYuqpdUwQcT6J3t9PoHp5JXbMg7GVJNpX
+	zoGyJST2nmuAsj0kFn/dCw2v+4wSX/bNZJvAKD8LyXOzkOyDsHUkFuz+xDaLkQPIlpZY/o8D
+	wtSUWL9LfwEj6ypGqdSC4tz01GTTAkPdvNRyeKQn5+duYgQnbq2AHYyrN/zVO8TIxMF4iFGC
+	g1lJhFepRDRdiDclsbIqtSg/vqg0J7X4EKMpMLomMkuJJucDc0deSbyhiaWBiZmZmYmlsZmh
+	kjjv69a5KUIC6YklqdmpqQWpRTB9TBycUg1MuczGB0Ojty6PLb8hb7jDbcVH4QYHs5XhCkv3
+	T72o/3TRO4P6XSoJju/b+NtaTeR1X0zdFhTfZ3RccktmCP/n/5slP+yq4ppY7ZNZ22NVdfu9
+	6ZUrdbIMPinxdYq177+u23Ey7+ekO18e/JPcp3vso/hqvi8ic5mDbbZ/fpLvsIpderlMa522
+	zbZ5z9Z9Fpc9IByuUBYTvvbFy9baE2Y2J/2X7N9c6sWiOffWo6v5BzW/bIkWPvNkW4AWk+p0
+	n8ylBya0cl5548TUf0LpjfnXV2eTzVkjfRx4Nn/+ppo0Obv4w5pHLQbH6/J2N883euM4/cJV
+	40me5jyZcQusnin9PPPzkn2B36YuKd6rFi2LlViKMxINtZiLihMBZMA/GGUEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEIsWRmVeSWpSXmKPExsWy7bCSvO6bF6LpBs83mVt8/PqbxWLOqm2M
+	Fqvv9rNZ3Dywk8li5eqjTBbvWs+xWBz9/5bNYtKha4wW288sZbbYe0vbYv6yp+wW3dd3sFks
+	P/6PyeL8rDnsDnweO2fdZfe4fLbUY9OqTjaPzUvqPXbfbGDz+Pj0FotH35ZVjB6bT1d7fN4k
+	F8AZxWWTkpqTWZZapG+XwJXRvfQbS8FW3orP2xazNjCe5epi5OSQEDCRuHuiibWLkYtDSGA3
+	o8TxmV+ZIBISEqdeLmOEsIUlVv57zg5R9IRRov/qd7AiFgFViWf/QRKcHGwC6hJHnreCNYgI
+	KEk8fXWWEaSBWeACk8S2JW+YQRLCAtESM9//ACviFdCReL7sJyPE1PuMEqfPtDBDJAQlTs58
+	wgJiMwtoSdz49xJoGweQLS2x/B8HSJgTqPfon9esILaogLLEgW3HmSYwCs5C0j0LSfcshO4F
+	jMyrGCVTC4pz03OLDQuM8lLL9YoTc4tL89L1kvNzNzGCo01LawfjnlUf9A4xMnEwHmKU4GBW
+	EuFVKhFNF+JNSaysSi3Kjy8qzUktPsQozcGiJM777XVvipBAemJJanZqakFqEUyWiYNTqoFJ
+	sO3yqnksO3Zm9R3OaOfgWBI263OCYGjVsbkru33uy90NPNifJdS5nVm+ueHz05zDJ5/bf9W7
+	+XdyKL/WN+4VNglbeyY95zvEl/B69doq0aOF+94uyVY/r7vYMkM50sdW5c7kebJzIvsnVOhv
+	ZErhc3hw5KqwUBXvhN9PBXIOcvn9Pru4U3qJTH7ATK8Ug03vD5/K7pNpej33v/mrB2wnw/rt
+	HFsvGnfrnPrFNelKhXSCjcusnyde+tpIu+nmVK/MKFOTqv2zXCpZISxuQl3rj/21ix6fOW8c
+	Jcbm/idJymlxOJdNhtyDFQ8eLHX/vjb/pt5Cdu7rbx0zNrzfyv1A3c7lQZzmPdeMMr3/ty2U
+	WIozEg21mIuKEwEHf0/iJQMAAA==
+X-CMS-MailID: 20241021053853epcas5p28278ac9cd4f6791bca8d676cf06d99c5
 X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed;
+	boundary="----Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_5d1e1_"
+X-Sendblock-Type: REQ_APPROVE
 CMS-TYPE: 105P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20241018161636epcas5p43562d1c949f7e6ed0289a7ec213490ff
-References: <CGME20241018161636epcas5p43562d1c949f7e6ed0289a7ec213490ff@epcas5p4.samsung.com>
-	<c274d35f441c649f0b725c70f681ec63774fce3b.1729265044.git.asml.silence@gmail.com>
+X-CMS-RootMailID: 20241016113747epcas5p4e276eb0da2695ba032ce1d2a3b83fff4
+References: <20241016112912.63542-1-anuj20.g@samsung.com>
+	<CGME20241016113747epcas5p4e276eb0da2695ba032ce1d2a3b83fff4@epcas5p4.samsung.com>
+	<20241016112912.63542-8-anuj20.g@samsung.com>
+	<20241017081057.GA27241@lst.de>
 
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+------Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_5d1e1_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+
+> What is the meta_type for?  To distintinguish PI from non-PI metadata?
+
+meta_type field is kept so that meta_types beyond integrity can also
+be supported in future. Pavel suggested this to Kanchan when this was
+discussed in LSF/MM.
+
+> Why doesn't this support non-PI metadata?
+
+It supports that. We have tested that (pi_type = 0 case).
+
+> Also PI or TO_PI might be
+> a better name than the rather generic integrity.  (but I'll defer to
+> Martin if he has any good arguments for naming here).
+
+Open to a different/better name.
+
+> 
+> >  static bool need_complete_io(struct io_kiocb *req)
+> >  {
+> > +	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
+> > +
+> > +	/* Exclude meta IO as we don't support partial completion for that */
+> >  	return req->flags & REQ_F_ISREG ||
+> > -		S_ISBLK(file_inode(req->file)->i_mode);
+> > +		S_ISBLK(file_inode(req->file)->i_mode) ||
+> > +		!(rw->kiocb.ki_flags & IOCB_HAS_METADATA);
+> >  }
+> 
+> What partial ocmpletions aren't supported?  Note that this would
+> trigger easily as right now metadata is only added for block devices
+> anyway.
+
+It seems that this scenario is less likely to happen. The plumbing
+seemed a bit non trivial. I have the plan to look at it, once the
+initial version of this series goes in.
+
+> 
+> > +	if (unlikely(kiocb->ki_flags & IOCB_HAS_METADATA)) {
+> 
+> For a workload using metadata this is everything but unlikely.  Is
+> there a specific reason you're trying to override the existing
+> branch predictor here (although on at least x86_64 gcc these kinds
+> of unlikely calls tend to be no-ops anyway).
+
+The branch predictions were added to make it a bit friendly for
+non-metadata read/write case. 
+
+
+------Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_5d1e1_
+Content-Type: text/plain; charset="utf-8"
+
+
+------Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_5d1e1_--
