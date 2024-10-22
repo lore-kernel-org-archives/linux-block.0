@@ -1,68 +1,67 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8633E1BD4F9
-	for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 22:25:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35841CCEE7
+	for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 22:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729635909; cv=none; b=YR7zLA0wgPN6FUwyvHQUJ0LBtJ8HCBVBbKCG6Rq78MLaW+/+hPUFCKDLOKfLeVtzesBEFGmMXPX/Ii0y76paKNrRyxFAp3C86CvJHcN/ncW+b/OsNAWzkZr/9vjj50AsFdw6uZsZK+M3H6jPdfJehv36cUN8Nk8zeBddlfRXYyo=
+	t=1729635911; cv=none; b=CZHuNc0Vr6jUH5594ztMJlZR+P4I7OleritUwX0ps+pK11mOAf9HgtKr/mdBuU3kgXTO8J/pmH2wnBCon5ixi9aNqwU4UpIz091CWaOV0nyYd/MDu176RYN1T3I6XiQLKZCpksn1J7ddKBIOJEH6CT327Y8U4x42vsgWsGNRUwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729635909; c=relaxed/simple;
-	bh=iOiJ34DqRyuaW2f1KEzrFUgvNVZUdPnsNfSrAJPsx5Y=;
+	s=arc-20240116; t=1729635911; c=relaxed/simple;
+	bh=Z1cZjeKf/jozcwiyWOWX+ZIBI+FWOzyh7DvqYvmsWkY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Cj+qszDTNmeucPWxjXuujCxEYjBcPAxW4fsxXehY3uS/pMpD+Snlm0i8vfc0/Lf+PShacEPVtFZpY6/ehiorkWc9prUjd2az8q7GAfDxyDCafSqUrsVFxhxyYhkOfo0bzJgOgqSKUZEaSIFfW8C9aaXyT8gvuq1OWBN4dYrHLQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NtbcO6wz; arc=none smtp.client-ip=209.85.166.179
+	 MIME-Version:Content-Type; b=OxzlkL36ORjB3iYOz88mgwJj9C1kG2ETPj0sPWFkmPX3QwyeJhfCENaZhORUN1ntJPHV2esNAyUxJjHCmO+Y3LYbh2o/B6fNuI4vpnpD6ZsCh2yDKH7MmRMxfE3tFeXW4Y1Mr9BokdAol6w26XmimUIPquQ0pkIIjgckDzyzSqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DrudqmM1; arc=none smtp.client-ip=209.85.166.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NtbcO6wz"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3a3b463e9b0so22429195ab.3
-        for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 15:25:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DrudqmM1"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a3b7d95a11so21293235ab.2
+        for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 15:25:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729635907; x=1730240707; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729635909; x=1730240709; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OCS+af++TIhD/0ZORFL2loLAkC1Uw2+3hJp4y+XdylY=;
-        b=NtbcO6wzeSQG51gAWMNoakfIB70sm0ayvCTGkDToChZC6ocPDbxNF+ss8jnLHfUXpL
-         vOCpEbzuFfNbtg6kBWl5f3HmuDSCXMrydewQCD50/v/dFCf7k4g9iF4JXb0YVebhXCRV
-         5e4zT5DP/5D8hpZb3XhWwecFdEYB4JBCmsJxUcy7mI/fKAJl8Xt2e5MmCyJs4T5iHUpb
-         0FPNgkuDMJUbhn1zo/2P4Zm4TBPK0u6W4ICgjRPKMkCSQ8DRIG8mXMSZvyUoGEcHSJYD
-         Ijqs3DtNn18k6ayMPp31hawApr7Y3jt8JUbSTqKszCoDxruB+yGELZNbd8oJ0BM8dLAm
-         zreg==
+        bh=0Wdl0kwphF2c8vv3SMO2fVvGpDrIoce+OneiyQG9nXE=;
+        b=DrudqmM1sd5Mwww1nFxn8VCx7r6c+yPditOJ9DxYQP6N/f/4JTdymvUraWixrYwEDd
+         Ml2DqF/DFKwnFg2w5TZ1G0oeBWVxBKh2a1aBnubeAFI2gN75gMgpTW02XMcrVo7IOOr5
+         2DuADxGeaJJGq3G/nBq/EuKbkKZrtWT68ZMJKXyA6CWuHRaenBX51dhYXuvoECFFbzh0
+         TyK86fM7fBKhAXxbvTBu5XkeG3RCPLh83e59qXPVpcz5IE/YXYuWB3124R4K+bzqTtXI
+         pX7NP/DRl9S5zkbXrLVXya9ou2mLd3sn1TIYs/XdJ3T567z2Kl226EmEYfA+RMWvB3F7
+         SCTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729635907; x=1730240707;
+        d=1e100.net; s=20230601; t=1729635909; x=1730240709;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OCS+af++TIhD/0ZORFL2loLAkC1Uw2+3hJp4y+XdylY=;
-        b=kC01A5w4iEgm001KnLWfS6QlKKb/IAu8ynGIBXtN/eE5zI8uZ5N1jnvOiOICe2nIOB
-         JpvWFz3t0mhEGuv7/7/LJMDyD4M77P+0kXoh9VbdaBvsK7NINQtnYQpsUAElBd+MVuSU
-         QONz/Sm0Y8bJNjwawLtJSIkrcmv0bkllvzIfqyJ0wov+qKCD8efD6vVftiKzZUvSlN1/
-         v244uBoeHtTmifQangFIFeBAzFbnaaiZ1IFebjNOAl4zWUDb4gJNVfqDWAppv2VioTda
-         0UKUt0Aqw+2zKD3lpAP3bVgxursaBOwfFjW17xvV7N7Atsik05qgX3ebf87hPKNaIyPT
-         Akuw==
-X-Forwarded-Encrypted: i=1; AJvYcCXwl4wXf3HFtLcV+v/cfYD0DG7EXe1p9k+pf+gFqqP4T5yZ98E3CgGErR3xKLs6pLenB6ad6SGctPcUvw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRcjEjWwuKvULRoiFrL8tBaysmARFcWlv+NJuKFlArfjvhCMoJ
-	5Kkk0j0oVBenEGYOEpZ1z4wUi7Afat9OhETeuDJU2+5XjtkjdqYXV0Ze2dsNVEkHudIzlTrtmwS
-	q
-X-Google-Smtp-Source: AGHT+IECbvU9xyqGdGLSnp+emlrEw2DQYwrGr6DhTTYByG6dOze7v/lx58pfZoZ+MZmljeoaYjemDw==
-X-Received: by 2002:a05:6e02:1c0f:b0:3a3:b256:f325 with SMTP id e9e14a558f8ab-3a4d59e03c6mr7425865ab.20.1729635907638;
-        Tue, 22 Oct 2024 15:25:07 -0700 (PDT)
+        bh=0Wdl0kwphF2c8vv3SMO2fVvGpDrIoce+OneiyQG9nXE=;
+        b=o4lTq44fgC4B1Z1WMVsWU+UiNIsasgYoXU1zouMxD951oSIv0dtKVOg2SyXSEQS666
+         koFmimmZ13g7KbmJcZhMC7IBkrmmGRX3faVY/4CWepZGRvUcA99Duh1ZHEjDybnfyXEb
+         /VR5+vYqKrB3p1l9J9qA+4yEOB11Q/iOqgpGs9Copr5lxWTo6lRqyh3wKOn+K8QFmxAt
+         lBgoEqU4XzrVzj+NBZfPO3jWKoK8hBnP6yQvtUlixFp0eHnJzxm3mJ5JqcvDjre44Yc5
+         vCeEv4G/Z1mCIQAXcICH8rOJDIRFjB+pZ0BiB2gjz8ZUcTU1YX78Dh8uTQiT10N4mUmq
+         1/og==
+X-Gm-Message-State: AOJu0Yw1dFIyAiSLcdSThI1saCZAQJ8gMcptH9AdTIKiY4pcFobu5Rs0
+	OvLGqTUPT4DW6QmBcsScYqcHOOtgz1hfOQvalrXF6lKWCmeLhqV4xmCSvQpNEk8=
+X-Google-Smtp-Source: AGHT+IFCHP8jHtw9I0EW/rBRRR87HKzXzIXgYn6ehqFfzqLjMc7iRS7Pvz2diCbQT9CFggYFStQ+0Q==
+X-Received: by 2002:a05:6e02:13a6:b0:3a3:b1c4:8197 with SMTP id e9e14a558f8ab-3a4d5a00b6cmr7283545ab.23.1729635908957;
+        Tue, 22 Oct 2024 15:25:08 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc2a65f952sm1767297173.176.2024.10.22.15.25.06
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc2a65f952sm1767297173.176.2024.10.22.15.25.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 15:25:06 -0700 (PDT)
+        Tue, 22 Oct 2024 15:25:08 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Muchun Song <muchun.song@linux.dev>
-Cc: josef@toxicpanda.com, oleg@redhat.com, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, muchun.song@linux.dev
-In-Reply-To: <20241021085251.73353-1-songmuchun@bytedance.com>
-References: <20241021085251.73353-1-songmuchun@bytedance.com>
-Subject: Re: [PATCH] block: remove redundant explicit memory barrier from
- rq_qos waiter and waker
-Message-Id: <172963590674.1032314.6365851966628094463.b4-ty@kernel.dk>
-Date: Tue, 22 Oct 2024 16:25:06 -0600
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
+ Peter Wang <peter.wang@mediatek.com>, Chao Leng <lengchao@huawei.com>, 
+ Ming Lei <ming.lei@redhat.com>, stable@vger.kernel.org
+In-Reply-To: <20241022181617.2716173-1-bvanassche@acm.org>
+References: <20241022181617.2716173-1-bvanassche@acm.org>
+Subject: Re: [PATCH] blk-mq: Make blk_mq_quiesce_tagset() hold the tag list
+ mutex less long
+Message-Id: <172963590776.1032314.13124670972320527966.b4-ty@kernel.dk>
+Date: Tue, 22 Oct 2024 16:25:07 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,20 +73,18 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.2
 
 
-On Mon, 21 Oct 2024 16:52:51 +0800, Muchun Song wrote:
-> The memory barriers in list_del_init_careful() and list_empty_careful()
-> in pairs already handle the proper ordering between data.got_token
-> and data.wq.entry. So remove the redundant explicit barriers. And also
-> change a "break" statement to "return" to avoid redundant calling of
-> finish_wait().
+On Tue, 22 Oct 2024 11:16:17 -0700, Bart Van Assche wrote:
+> Make sure that the tag_list_lock mutex is no longer held than necessary.
+> This change reduces latency if e.g. blk_mq_quiesce_tagset() is called
+> concurrently from more than one thread. This function is used by the
+> NVMe core and also by the UFS driver.
 > 
 > 
-> [...]
 
 Applied, thanks!
 
-[1/1] block: remove redundant explicit memory barrier from rq_qos waiter and waker
-      commit: 904ebd2527c507752f5ddb358f887d2e0dab96a0
+[1/1] blk-mq: Make blk_mq_quiesce_tagset() hold the tag list mutex less long
+      commit: 6fbd7e0472b73bc21b19d56d3f95c2a1a5456607
 
 Best regards,
 -- 
