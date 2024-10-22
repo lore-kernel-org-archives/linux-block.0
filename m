@@ -1,78 +1,95 @@
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B4E7F460
-	for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 06:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C67C811EB
+	for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 06:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729578790; cv=none; b=DQZhQ7LEg6wasV9KehkZyzLXCnB/EA984SF6JAIsoIbLRhOSjZ7tfrhJanGLVnLD6rM2n4SnoSTkvhCjP1hlLlG8j7XANXS+QvepTlj5xJe75E66wnxC4FuiCvzCY2Y7tITe1giXPlz7PVjogrzzMhpznOAygWNeFt266Ho062U=
+	t=1729579285; cv=none; b=loOHJ0nYwUgl9AGhX2o4GtB8em9+2zY2HRxhE++sDlP0vNz17R96paoCV+wrcB9afdUlHpz5PHb1t+yN1cgIOqT+xrF3ok4r3eCGfAUaq+HFdl9ooS1eGSdK+D6m2r/mX4laA6I3kN+3UKItVGbgv8l1GidL3/bpcvchtW2LycQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729578790; c=relaxed/simple;
-	bh=AC9tJ2nFp4SGtHALUPMcfQs4hHc9AElyN2mcfup589s=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=eUUw/snJau2Que3hjuQBiL460Q2nzgf+3wOSnqomIMmplQqbrxU/rS8inUCFDqSNpmPHHkPODHKXuqSLY2JZiNScJHLbbPKbc3kXLD7K0xbR12QCX7o38/ot5mRuO+W8BuI8DyRwLJ3PS0JW8/HOlMxeTe+guZEEElnpXD9qhU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vCMj/rhr; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1729579285; c=relaxed/simple;
+	bh=8rWXsXQq6NdVS1F1zehZTK67NKYq+21PQOFC+qOjWPU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j1yFk9HeBC5W6LrO0KHJFnrP4Kcs5p21c9cEhvSaG1PXnAZo8mMUo7aDBRT6desU92jJWTLeKvTh/An0dB/m+e8IaShUj9ZwEKer2/5HiOaGKiNGbm91O64PniF8EnJEREhgudoectUtuHJltojrD4l4BSoLJ+rY5jqiGVY3jQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fx8g9crT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vCMj/rhr"
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1729578784;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fx8g9crT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729579282;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4qjMWGm/U9BUvuXs53nUhhk2P2eOgQ21koz66cHzG/s=;
-	b=vCMj/rhr23QaMD9ASuemrIZwhoCSmAQhISszho0zMtBFf4pfkF1XU0kUOAkiaPzhtwiy6B
-	HyK5uv2Q3pC1+jLqLAEkJSd3zuIBQCsd/rUz3/8UW7YWYHZWYiiS+LpDGHpocXx1mrKEki
-	bya4qu9ophNtY94WXF9c2Wee2E0mozQ=
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=IjW0hc48Gk3fKCcS4ufRCuOIE7OPIiyHBp7mhfF7o/s=;
+	b=Fx8g9crTucJvCt0p5s9FffBbXK1L1qNn2Y0uNcTJwIhlLvmiQ/VURLIwKvfgTR8Xq9ztOd
+	FJrqFAmd0OM1eY6z7hmABNcm4hVO7CXqHEu9doCcI7FClFge94iaDV7tJfeErZG7oxoTHD
+	nxb1ClSy7AJfHKiTPgdGQzRMvQzj3EY=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-228-_eTnGFqxOEOx_gWgft9ulg-1; Tue,
+ 22 Oct 2024 02:41:18 -0400
+X-MC-Unique: _eTnGFqxOEOx_gWgft9ulg-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 99647195608B;
+	Tue, 22 Oct 2024 06:41:17 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.175])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 460C919560A2;
+	Tue, 22 Oct 2024 06:41:15 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: linux-block@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] block/027: setup scsi_debug with MQ
+Date: Tue, 22 Oct 2024 14:41:09 +0800
+Message-ID: <20241022064109.3303704-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3818.100.11.1.3\))
-Subject: Re: [PATCH] block: remove redundant explicit memory barrier from
- rq_qos waiter and waker
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <ab3720ec-b12b-4c0a-8e56-930753c709fd@kernel.dk>
-Date: Tue, 22 Oct 2024 14:31:53 +0800
-Cc: Muchun Song <songmuchun@bytedance.com>,
- josef@toxicpanda.com,
- oleg@redhat.com,
- linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Omar Sandoval <osandov@osandov.com>
-Content-Transfer-Encoding: 7bit
-Message-Id: <7C429559-E91C-4732-901B-0D49C2D083F7@linux.dev>
-References: <20241021085251.73353-1-songmuchun@bytedance.com>
- <ab3720ec-b12b-4c0a-8e56-930753c709fd@kernel.dk>
-To: Jens Axboe <axboe@kernel.dk>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
+block/027 focuses on race condition between blkg association and
+request_queue shutdown. Unfortunately it is a bit easy to trigger
+lockup by setting scsi_debug in the following way:
 
+- single queue
+- 21 LUNs
+- small queue depth(110)
+- 10us completion delay
+- fio: 4 jobs, with iodepth 2048
 
-> On Oct 21, 2024, at 21:45, Jens Axboe <axboe@kernel.dk> wrote:
-> 
-> On 10/21/24 2:52 AM, Muchun Song wrote:
->> The memory barriers in list_del_init_careful() and list_empty_careful()
->> in pairs already handle the proper ordering between data.got_token
->> and data.wq.entry. So remove the redundant explicit barriers. And also
->> change a "break" statement to "return" to avoid redundant calling of
->> finish_wait().
-> 
-> Not sure why you didn't CC Omar on this one, as he literally just last
-> week fixed an issue related to this.
+The above setting creates big contention on tag allocation of blk-mq
+code path, especially scsi_debug takes memcpy to simulate IO, which
+doesn't match device in reality.
 
-Hi Jens,
+So setup scsi_debug with MQ and avoid to trigger lockup which doesn't
+exist in real storage device usually.
 
-Yes. I only CC the author of patch of adding the barriers, I thought
-they should be more confident about this. Thanks for your reminder.
-I saw Omar's great fix. And thanks for you help me CC Omar. I think
-he'll be also suitable for commenting on this patch.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ tests/block/027 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Muchun,
-Thanks.
+diff --git a/tests/block/027 b/tests/block/027
+index a79a115..cf4ff16 100755
+--- a/tests/block/027
++++ b/tests/block/027
+@@ -84,7 +84,7 @@ test() {
+ 	echo "Running ${TEST_NAME}"
+ 
+ 	scsi_debug_stress_remove virtual_gb=128 max_luns=21 ndelay=10000 \
+-		max_queue=110
++		max_queue=110 submit_queues=$(nproc)
+ 
+ 	echo "Test complete"
+ }
+-- 
+2.46.0
+
