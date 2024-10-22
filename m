@@ -1,74 +1,93 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993B31A0BD7
-	for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 15:05:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1AC07E0E4;
+	Tue, 22 Oct 2024 18:16:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729609541; cv=none; b=aSbDeeHetPJ1Bg4B0F70y/BJlz4MvpVocntbfjOQHVKbm7MW28UG/xdrR3TvACwyYf0K1BrionRcgFOQP3h8nUDo1XNGjI/l6gGGgjU0b0Ck6IenIRg0L53REWSfsP6+aw5Rfj5FIEOXxR/TvVxLv667sd50oPSItI/9Vs97Y5c=
+	t=1729621007; cv=none; b=kWew0skP+U9TYz3gUM7YP7EzZfpbHFxXYEi+vYAdZmvcliH6hJ5grlzXvuXkdaoQ6en9V87DtEi6nSDafFWeRhGpsPEA+G2FRRqYwwv9ZZNZRVPLY2ly2A0+o33DtUgbu1wUyI4Y2ZkuPxx1PN5URTWSgTUWlEkYtZpjw+bURkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729609541; c=relaxed/simple;
-	bh=VGPr6BW3vTEn7vab3wmqikb8wAlWu5eezgeYIMD9+KY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GrDybyqW3VmvQ3p34o2H6daYH8D8ALaOAFC8SRe+7TOT7Q+Gq/5rJEM/Ftz0YhvqPdMQrXuby7sAg4rZPFPPtJ5yEna+QI6OSWFBOVvaREhiDPQxAgiz21Ei9dta49d7PSvuO8SF/x8ukwHk0Pw44dAYVnvSKL2bLEMdsspvubc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=wYUlEGH2; arc=none smtp.client-ip=199.89.1.12
+	s=arc-20240116; t=1729621007; c=relaxed/simple;
+	bh=UZqgYCmGKMLoPX6x45jwleLfwKc2WBwRV6SssUQHBmI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r5GD1tNdUL6PMuIqT9zBrzz1LyxsK6upgS6aW0Eg5xJ5gfDJkD0XbH04OJPouaK5c1AHWyAkzK1PDyiHoHb/1q2+aptkWRhI/6A344JRN9YNsmShUaNJhcoPAqU0xCPcOWeQmjY0RL2HSUlKxleDzwi/iHv50lXxlpVtPuN/2LA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=GYmhqKWi; arc=none smtp.client-ip=199.89.1.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="wYUlEGH2"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="GYmhqKWi"
 Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4XXwTt5NPLzlgVnf;
-	Tue, 22 Oct 2024 15:05:38 +0000 (UTC)
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4XY0kH2RNKz6ClY9C;
+	Tue, 22 Oct 2024 18:16:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1729609537; x=1732201538; bh=H9H2CeGKHHtFgPf5NY60xx8J
-	rgkBxlNmQDcZYIMGhus=; b=wYUlEGH2EYibqn4xtjtbqqvUKzhaIHti6ZtF2wWc
-	rDOxmDcgkoOLYCrTwfoTzpt2HoPP7yElwHSZFB+M39CMYbSw7nEhpSyUZp+CIXjz
-	E7N20fYLemPaz0RKZ5z474lnrOkt/2O2lnVTzDSw5QKLL52ZloHH+WfZr3VyZ78S
-	4LEV8ReUHHQH7cUC6fbBU8sMGMaQaI6YN9wECAQe7pbQ49U7IaKsSCbJTxp3nES0
-	+bwVMJUroZSVOoU1PiOu43OeH46NJTc2cO5aW1a01FiJyyY5rIgsnEmNZuaW0Yop
-	p4NkMB/NBi0F7XgYsU7D+4aDNaKDMyTDPEbwspObOujltg==
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1729620996; x=1732212997; bh=lsF95ZAMKXS4nPzun/TBSeUR4KI4RRlcTUe
+	on854CPA=; b=GYmhqKWiPRNZ7boT3oKFHkSK24TQ3JGeHFMdq+hS2EzS99mejpg
+	uEu6ifotQaphZt5Zs50DEts1seDZJyNiDt2NzpVg7t+BgCMfMy07TzPhlTuet0pL
+	dnDtv3dLrP7mM/MsD5s4VSGq9obL3CaXo1iDquk9TnaW7WfCGJ988a36BpwUvT7M
+	kG6cfEPQo2EV4Qo+t0pB6qFjgkKW89tO0rIigwkaKIGnvlltVHvStZU/XdE1lXUf
+	w7fmGguOSN94qN6UiPCaNcLEAHoxEqMhEzUylhVoePl/pHelENgMTEl/ZBTJn0sa
+	GHz94o0VpMU0WWylTP201M7Lts8ujwsY6bA==
 X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id WX03nRb566X2; Tue, 22 Oct 2024 15:05:37 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id Z0rZcDsQIz26; Tue, 22 Oct 2024 18:16:36 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4XXwTr4L4RzlgTWR;
-	Tue, 22 Oct 2024 15:05:35 +0000 (UTC)
-Message-ID: <ed9a22b7-64b7-4b83-a6c9-1269129e89d1@acm.org>
-Date: Tue, 22 Oct 2024 08:05:32 -0700
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4XY0kC4YXMz6CmLxj;
+	Tue, 22 Oct 2024 18:16:35 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Peter Wang <peter.wang@mediatek.com>,
+	Chao Leng <lengchao@huawei.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] blk-mq: Make blk_mq_quiesce_tagset() hold the tag list mutex less long
+Date: Tue, 22 Oct 2024 11:16:17 -0700
+Message-ID: <20241022181617.2716173-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.47.0.105.g07ac214952-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: model freeze & enter queue as rwsem for supporting
- lockdep
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20241018013542.3013963-1-ming.lei@redhat.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20241018013542.3013963-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 10/17/24 6:35 PM, Ming Lei wrote:
->                 -> #1 (q->q_usage_counter){++++}-{0:0}:
+Make sure that the tag_list_lock mutex is no longer held than necessary.
+This change reduces latency if e.g. blk_mq_quiesce_tagset() is called
+concurrently from more than one thread. This function is used by the
+NVMe core and also by the UFS driver.
 
-What code in the upstream kernel associates lockdep information
-with a *counter*? I haven't found it. Did I perhaps overlook something?
+Reported-by: Peter Wang <peter.wang@mediatek.com>
+Cc: Chao Leng <lengchao@huawei.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: stable@vger.kernel.org
+Fixes: commit 414dd48e882c ("blk-mq: add tagset quiesce interface")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-mq.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Thanks,
-
-Bart.
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4b2c8e940f59..1ef227dfb9ba 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -283,8 +283,9 @@ void blk_mq_quiesce_tagset(struct blk_mq_tag_set *set=
+)
+ 		if (!blk_queue_skip_tagset_quiesce(q))
+ 			blk_mq_quiesce_queue_nowait(q);
+ 	}
+-	blk_mq_wait_quiesce_done(set);
+ 	mutex_unlock(&set->tag_list_lock);
++
++	blk_mq_wait_quiesce_done(set);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_quiesce_tagset);
+=20
