@@ -1,104 +1,61 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D7B322A;
-	Tue, 22 Oct 2024 03:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986D91E529;
+	Tue, 22 Oct 2024 05:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729568683; cv=none; b=Q7hFx/BkR/3ozDPwfd1u84vc0YitvyjIQIDLeTFhbNMEc8mgeozAzorbMDwwgYD7WXet9r+AlAYvWnj4/+qTFHbfBrgR/sZGo6n7djwBHeBmJvHOrnqqUPm6nPorIMz0eyNvnaK6ljtTLKQ1SZIC9hjEQlKpqVP7R7jlxaZdiuM=
+	t=1729576052; cv=none; b=uxNPQfcfw4OxK9+NWV8qbwGHcrL1ksiFVMRZ37HqeQ/I+wztwRts4f9EwoNjE5pjYLNPnuNC6861h7KNDSNNkOqxFEU3c8akSx7Srz20DjDOQ/0h+1ypbgCkkOjHq1uelOkNOBX7iNrS/FEh8ruehLf9rm7299PmZhECyHw4tQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729568683; c=relaxed/simple;
-	bh=YgbWt+luvyj6U/M/28j9MXXg8bQthV1WWq11E6tvA04=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=brUb+1A/aF25urW/Os/1ZjD/XJO1yIPgWV3IvCFtiwAiNyGBWyY4iGGtN3QomxDH6SILAoSaVmWYTFSNPj01k96FgiM/b9En4mwJDe0tWKaGM5dvJscP4+AuwoYZnMdCWYm0VGs8Yqszc/gm9nmGxVn17jdbEcHkIOImCOqomDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4XXdMl6f9Zz4f3jY4;
-	Tue, 22 Oct 2024 11:44:19 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 4BBB91A0194;
-	Tue, 22 Oct 2024 11:44:37 +0800 (CST)
-Received: from [10.174.179.155] (unknown [10.174.179.155])
-	by APP4 (Coremail) with SMTP id gCh0CgAnXMihHxdn2ikYEw--.26094S3;
-	Tue, 22 Oct 2024 11:44:35 +0800 (CST)
-Message-ID: <eedc01d5-42f9-39f0-25c4-340f35ee8eab@huaweicloud.com>
-Date: Tue, 22 Oct 2024 11:44:33 +0800
+	s=arc-20240116; t=1729576052; c=relaxed/simple;
+	bh=LPuixlA46B4UAAi2n/d5wOwtUkJPAHXBRr5naLlXK/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VlvbN7LBtpIyOfDSx1F0fC2jeYQ8RwEZ7YWk8bZq4fLuwUpMqOcBupdrTabt2tUY6zlNFhx2PvOGetYTAFtvrTjKKubRuX7BX+J99Jo1s383+l1cxjonXGIGl/JkmIvkk8+xB8BMe7pZeWQXenV41LY7q9RddI5Pu8OB3PE1kSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Q95/yiVp; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Q95/yiVp"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=GV0HOySxp39Kq8vKvXCDAfddUtjmlYH3wufNENw9DY4=; b=Q95/yiVpXZwfE8aKoOBD7q0GN5
+	XvWgKLST+1HBiNDrvOJ3Ma10nDNXEIzpA0zT0ehcpxqwC85n4UFfTnxkDiPbRc6uH1nZV1Ish3xtJ
+	QMPn3MvJwJ4thKRrzYYEkh1KIvoAiUcXLP6C4UMPb1/WrFKPsJ89VgvLKVQrepX9i66lkSDl5wh8V
+	Idj1spgmTZ/p2LbPdsow8WZje89sh+6LbNS9hndDnmYcDYHcZH4SJ95Vosw4A0/sFd0SlkSZvbO3d
+	fCsOhObX1D4H8/5AtDdaTNys8CFdTDm4g6pBY40/oRvSZH8bjnXuXTChQYXHKp6tJglsEZXnxMJuN
+	xkDCbGVA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1t37jn-00000009i5U-0Ell;
+	Tue, 22 Oct 2024 05:47:23 +0000
+Date: Mon, 21 Oct 2024 22:47:23 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Goldwyn Rodrigues <rgoldwyn@suse.de>
+Cc: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	gfs2@lists.linux.dev, linux-block@vger.kernel.org
+Subject: Re: [PATCH] iomap: writeback_control pointer part of
+ iomap_writepage_ctx
+Message-ID: <Zxc8awN_MHkuNhQZ@infradead.org>
+References: <326b2b66114c97b892dbcf83f3d41b86c64e93d6.1729266269.git.rgoldwyn@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101
- Thunderbird/104.0
-Subject: Re: [PATCH v2] blk-cgroup: don't clear stat in blkcg_reset_stats()
-To: =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
-Cc: tj@kernel.org, josef@toxicpanda.com, hch@lst.de, axboe@kernel.dk,
- longman@redhat.com, ming.lei@redhat.com, cgroups@vger.kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yukuai1@huaweicloud.com, houtao1@huawei.com, yi.zhang@huawei.com,
- yangerkun@huawei.com, yukuai3@huawei.com, lilingfeng3@huawei.com
-References: <20240821020756.786000-1-lilingfeng@huaweicloud.com>
- <migrlemuqjqff6y64o6ukfkuil6uwuarwvyg3xymfphnicznna@sy5dwhovytuz>
-From: Li Lingfeng <lilingfeng@huaweicloud.com>
-In-Reply-To: <migrlemuqjqff6y64o6ukfkuil6uwuarwvyg3xymfphnicznna@sy5dwhovytuz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAnXMihHxdn2ikYEw--.26094S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZFy8Xw17Zw4DuF43WF1kAFb_yoW8AFyUp3
-	4DAF90ka1kJr1kA3yxCw4fZr1Fgw4ft345GF98J34FkF1qqr92qr40yw45ZFyDGa4Ikw10
-	qr45Z34vk345ZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Ib4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
-	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-	WwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
-	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
-	IYCTnIWIevJa73UjIFyTuYvjxUFku4UUUUU
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <326b2b66114c97b892dbcf83f3d41b86c64e93d6.1729266269.git.rgoldwyn@suse.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
+On Fri, Oct 18, 2024 at 11:55:50AM -0400, Goldwyn Rodrigues wrote:
+> Reduces the number of arguments to functions iomap_writepages() and
+> all functions in the writeback path which require both wpc and wbc.
+> The filesystems need to initialize wpc with wbc before calling
+> iomap_writepages().
 
-在 2024/8/21 23:51, Michal Koutný 写道:
-> Hello.
->
-> On Wed, Aug 21, 2024 at 10:07:56AM GMT, Li Lingfeng <lilingfeng@huaweicloud.com> wrote:
->> The list of root cgroup can be used by both cgroup v1 and v2 while
->> non-root cgroup can't since it must be removed before switch between
->> cgroup v1 and v2.
->> So it may has effect if the list of root used by cgroup v2 was corrupted
->> after switching to cgroup v1, and switch back to cgroup v2 to use the
->> corrupted list again.
->> However, the root cgroup will not use the list any more after commit
->> ef45fe470e1e("blk-cgroup: show global disk stats in root cgroup io.stat").
-> How come? Before that patch the root file was excluded with
-> CFTYPE_NOT_ON_ROOT. IOW how has that patch an effect on llist traversal?
->
-> (It doesn't matter, your patch doesn't restore memset anyway.)
->
-> This is the reasoning how I understand it:
->
-> | The removed function clears blkg.iostat structures that is only used on
-> | v2 whereas the function can only be called with v1 hierarchy attached.
-> | Zeroing effect could potentially be visible root blkcg "shared" between
-> | v1 and v2 but v2 actually synthesizes stats differently for root.
-Yes, that's what I mean.
->> Although this has no negative effect, it is not necessary. Remove the
->> related code for cleanup. No function change.
-> I'm impressed by the amount of analysis you did to potentially remove
-> the unused function. If you feel like cleaning up more or sectioning,
-> see also [1] or [2] for inspiration.
-Thank you for your advice. I'll look at them later.
-> Thanks,
-> Michal
->
-> [1] https://lore.kernel.org/all/20240625005906.106920-14-roman.gushchin@linux.dev/
-> [2] https://lore.kernel.org/all/20240628210317.272856-1-roman.gushchin@linux.dev/
+While this looks obviously correct, I'm not sure what the point of
+it is as it adds slightly more lines of code.  Does it generate
+better binary code?  Do you have future changes that depend on it?
 
