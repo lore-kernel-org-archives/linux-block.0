@@ -1,114 +1,195 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE8D18037
-	for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 02:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B9912F5B3;
+	Tue, 22 Oct 2024 02:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729563349; cv=none; b=utzEhcBp3IC+LHkTDJwOszddlAMe3cjJ28gV3+O4L5smypH3PicpXaCw9ppwfx9jVNzcWnGyeVn6iT9t2U23S7qnXDEvIbspUPKJcn1MBF+5CU+tuJOb27hIUiWY8XZ60wXKUHyGjhJRPiHcteV+VylCMYvUIYOCkePyISnnbqI=
+	t=1729565017; cv=none; b=XPt5Hnk3hKtxbX51OPbmuvCe2Ol8y5XDFDFbvNslw9L0nrfplBySuLRdsh4svAexEce0lM68CLVS+atUAID+GqO56ffGHiOcM/yePV2rKiri+U6H9rN5SxTMpNj/71WUxgZjuMbVVrBYrxSZV6Bm37AivDqKwtq5FRVbcY9S884=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729563349; c=relaxed/simple;
-	bh=pbeqm/4lDticn44T/H1lEAozJ185Yn/JSE8ABYd2Pdo=;
+	s=arc-20240116; t=1729565017; c=relaxed/simple;
+	bh=Wggp83axKwYuG52/5IBox4xlMsX+yBkM3ohG7r4Va/k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YOND6tUgEYKwFIaVdWk9j83VpDSu0sY4v46nR+WWn8C9UMT8TygRU+hfZBJ530GQON4ZmhiAhxAb8meJvAijh4omTg46mpRo5DpH+cDeiH7oNY8f84Cj5x9lnwa8pJAotJ4eacONaw4/fCstVkVndablMiuseCJgKkqCj2vbQrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ARUH4Qhu; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ARUH4Qhu"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2e30116efc9so4180683a91.2
-        for <linux-block@vger.kernel.org>; Mon, 21 Oct 2024 19:15:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729563347; x=1730168147; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RNlJRbWNX8TeaxenMAs/1dyZVD2NFdZT3ufrI/c9QqU=;
-        b=ARUH4QhusZ6+rw3u1HMIcnhbCOSWKDPlwB7vVKX9vB+kJQike667NRVbZfTIep3KJO
-         5FJrHPrmp6Sae2eNlqLxCs3ndb7vKH38bVWg1hAM89arLurjTooH8QjCMo8OqtlrxT6r
-         ga46f5fMuN6jEw3meI3306ADww4wDQq7BC4uTQfF+qvEWaAXdqsYMdI+icelRtv1HZEs
-         lDtbJpY5QpmIiv12fX63rXBHimOtsyR8iM2vFzmTcSH4phUDWpU0wUP7fObbs0RRQ5zH
-         7XhCvD+6+VZrlif97Cca0qfFpW85nt2XmCxXXvkfQkDxGZdiaD28MB8WhSHcQoxVRhuI
-         2V3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729563347; x=1730168147;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RNlJRbWNX8TeaxenMAs/1dyZVD2NFdZT3ufrI/c9QqU=;
-        b=RcKwcat+5DfvJIQ8Jmo5OoLXMERTt0n9gN9ErVZiGFnFr/M2RV+0WaQQHwdA1xlbcK
-         K0dJnTbnYrTpbMfMdf6SUQxn6ZD2XmBNWwFeokFZ0BJy9om172iu2Ej/mc2ys+SeOGOk
-         Y6REIhgrmsat6F5pv8rqiCY7lnDCxtwnNJ5HYmz23EgvxUZxEfCuRTpBxhzk1ihFisAA
-         aRVBMmsrUhr1a3S5PyWwqNukiPKw9Qt1tyw+LZstQjh0STnG+5B/V+heQrdSt7ncQQHa
-         lFJRnD+uydWtiLFvTxe0KrFHtxPzD1TnirrkhowAZcfA9pz/kd9nH43GItOn1+DNPqW0
-         xKFw==
-X-Gm-Message-State: AOJu0YyB6oAZ92DvAvsx21bEGkLtsLkt7hhL7kNqBHv0uJgm+Y+QWFMt
-	FXEVp76kXAe8GYaSTV4WEbTkiDihjWQeyky5deqI9ZEjZjjJndqj89FjY64WjxQ=
-X-Google-Smtp-Source: AGHT+IEtMx3N774bFTm8H+5RinJQCu4GEmpvSWPjvaljYWd5L1x3yvpVMmhWgemDhGVamDKLS0tgqA==
-X-Received: by 2002:a17:90a:bb89:b0:2e2:e743:74f7 with SMTP id 98e67ed59e1d1-2e5616e20f5mr15954496a91.2.1729563346921;
-        Mon, 21 Oct 2024 19:15:46 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e5ad5106f8sm4658559a91.49.2024.10.21.19.15.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2024 19:15:46 -0700 (PDT)
-Message-ID: <45d605c0-848c-4253-8636-4d72d3fd3f6d@kernel.dk>
-Date: Mon, 21 Oct 2024 20:15:45 -0600
+	 In-Reply-To:Content-Type; b=L4gMJuhW9Rdk3Km6f1CpujnYihPt5tM9+L8PPNCoqRU+g7K4uK6dkO8hpKSIXUQSJYyj8Lxxv4zkrTl+OVU3kJ6uN4aDXSht2bXpJLpBUP6BRlDn1pi0vZuSKqgrwf2wKwjFV/ONYp6IFbRsjOozGiZkF9WcxNFeLEtqcNGygA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4XXc1809QNz4f3jLy;
+	Tue, 22 Oct 2024 10:43:08 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 61ABB1A018C;
+	Tue, 22 Oct 2024 10:43:25 +0800 (CST)
+Received: from [10.174.179.155] (unknown [10.174.179.155])
+	by APP4 (Coremail) with SMTP id gCh0CgDHR8RLERdnxkAUEw--.52830S3;
+	Tue, 22 Oct 2024 10:43:23 +0800 (CST)
+Message-ID: <b49ccd16-d31c-af03-7833-d8caaa71d7f6@huaweicloud.com>
+Date: Tue, 22 Oct 2024 10:43:23 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Regression] b1a000d3b8ec ("block: relax direct io memory
- alignment")
-To: Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>
-References: <Zw6a7SlNGMlsHJ19@fedora> <20241016080419.GA30713@lst.de>
- <Zw958YtMExrNhUxy@fedora>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Zw958YtMExrNhUxy@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101
+ Thunderbird/104.0
+Subject: Re: [PATCH v3] block: flush all throttled bios when deleting the
+ cgroup
+To: tj@kernel.org, josef@toxicpanda.com, hch@lst.de, mkoutny@suse.com,
+ axboe@kernel.dk
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com, houtao1@huawei.com,
+ yi.zhang@huawei.com, yangerkun@huawei.com, yukuai3@huawei.com,
+ lilingfeng3@huawei.com
+References: <20240817071108.1919729-1-lilingfeng@huaweicloud.com>
+From: Li Lingfeng <lilingfeng@huaweicloud.com>
+In-Reply-To: <20240817071108.1919729-1-lilingfeng@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDHR8RLERdnxkAUEw--.52830S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxWr4xZr4kWr1ruw45GF1Utrb_yoWrZr4DpF
+	WS93W5Cw1Utr9Ikr4agr15JFWS9ws5WrW3C3s7Ja4akrWxt3WDKFn5ZrWrXFWrJFn3Cr4S
+	vF1DtrW8uF1DG37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Ib4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
+	IYCTnIWIevJa73UjIFyTuYvjxUrsqXDUUUU
+X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
 
-On 10/16/24 2:31 AM, Ming Lei wrote:
-> On Wed, Oct 16, 2024 at 10:04:19AM +0200, Christoph Hellwig wrote:
->> On Wed, Oct 16, 2024 at 12:40:13AM +0800, Ming Lei wrote:
->>> Hello Guys,
->>>
->>> Turns out host controller's DMA alignment is often too relax, so two DMA
->>> buffers may cross same cache line easily, and trigger the warning of
->>> "cacheline tracking EEXIST, overlapping mappings aren't supported".
->>>
->>> The attached test code can trigger the warning immediately with CONFIG_DMA_API_DEBUG
->>> enabled when reading from one scsi disk which queue DMA alignment is 3.
->>>
->>
->> We should not allow smaller than cache line alignment on architectures
->> that are not cache coherent indeed.
-> 
-> Yes, something like the following change:
-> 
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index a446654ddee5..26bd0e72c68e 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -348,7 +348,9 @@ static int blk_validate_limits(struct queue_limits *lim)
->  	 */
->  	if (!lim->dma_alignment)
->  		lim->dma_alignment = SECTOR_SIZE - 1;
-> -	if (WARN_ON_ONCE(lim->dma_alignment > PAGE_SIZE))
-> +	else if (lim->dma_alignment < L1_CACHE_BYTES - 1)
-> +		lim->dma_alignment = L1_CACHE_BYTES - 1;
-> +	else if (WARN_ON_ONCE(lim->dma_alignment > PAGE_SIZE))
->  		return -EINVAL;
->  
->  	if (lim->alignment_offset) {
+Friendly ping ...
 
-This will break existing applications, running on an architecture
-that are cache coherent.
+Thanks
 
--- 
-Jens Axboe
+在 2024/8/17 15:11, Li Lingfeng 写道:
+> From: Li Lingfeng <lilingfeng3@huawei.com>
+>
+> When a process migrates to another cgroup and the original cgroup is deleted,
+> the restrictions of throttled bios cannot be removed. If the restrictions
+> are set too low, it will take a long time to complete these bios.
+>
+> Refer to the process of deleting a disk to remove the restrictions and
+> issue bios when deleting the cgroup.
+>
+> This makes difference on the behavior of throttled bios:
+> Before: the limit of the throttled bios can't be changed and the bios will
+> complete under this limit;
+> Now: the limit will be canceled and the throttled bios will be flushed
+> immediately.
+>
+> References:
+> [1] https://lore.kernel.org/r/20220318130144.1066064-4-ming.lei@redhat.com
+> [2] https://lore.kernel.org/all/da861d63-58c6-3ca0-2535-9089993e9e28@huaweicloud.com/
+>
+> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
+> ---
+>    v2->v3:
+>      Change "tg_cancel_bios" to "tg_flush_bios";
+>      Add reference of v2 to describe the background.
+>   block/blk-throttle.c | 68 ++++++++++++++++++++++++++++----------------
+>   1 file changed, 44 insertions(+), 24 deletions(-)
+>
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index 6943ec720f39..cf7f4912c57a 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -1526,6 +1526,42 @@ static void throtl_shutdown_wq(struct request_queue *q)
+>   	cancel_work_sync(&td->dispatch_work);
+>   }
+>   
+> +static void tg_flush_bios(struct throtl_grp *tg)
+> +{
+> +	struct throtl_service_queue *sq = &tg->service_queue;
+> +
+> +	if (tg->flags & THROTL_TG_CANCELING)
+> +		return;
+> +	/*
+> +	 * Set the flag to make sure throtl_pending_timer_fn() won't
+> +	 * stop until all throttled bios are dispatched.
+> +	 */
+> +	tg->flags |= THROTL_TG_CANCELING;
+> +
+> +	/*
+> +	 * Do not dispatch cgroup without THROTL_TG_PENDING or cgroup
+> +	 * will be inserted to service queue without THROTL_TG_PENDING
+> +	 * set in tg_update_disptime below. Then IO dispatched from
+> +	 * child in tg_dispatch_one_bio will trigger double insertion
+> +	 * and corrupt the tree.
+> +	 */
+> +	if (!(tg->flags & THROTL_TG_PENDING))
+> +		return;
+> +
+> +	/*
+> +	 * Update disptime after setting the above flag to make sure
+> +	 * throtl_select_dispatch() won't exit without dispatching.
+> +	 */
+> +	tg_update_disptime(tg);
+> +
+> +	throtl_schedule_pending_timer(sq, jiffies + 1);
+> +}
+> +
+> +static void throtl_pd_offline(struct blkg_policy_data *pd)
+> +{
+> +	tg_flush_bios(pd_to_tg(pd));
+> +}
+> +
+>   struct blkcg_policy blkcg_policy_throtl = {
+>   	.dfl_cftypes		= throtl_files,
+>   	.legacy_cftypes		= throtl_legacy_files,
+> @@ -1533,6 +1569,7 @@ struct blkcg_policy blkcg_policy_throtl = {
+>   	.pd_alloc_fn		= throtl_pd_alloc,
+>   	.pd_init_fn		= throtl_pd_init,
+>   	.pd_online_fn		= throtl_pd_online,
+> +	.pd_offline_fn		= throtl_pd_offline,
+>   	.pd_free_fn		= throtl_pd_free,
+>   };
+>   
+> @@ -1553,32 +1590,15 @@ void blk_throtl_cancel_bios(struct gendisk *disk)
+>   	 */
+>   	rcu_read_lock();
+>   	blkg_for_each_descendant_post(blkg, pos_css, q->root_blkg) {
+> -		struct throtl_grp *tg = blkg_to_tg(blkg);
+> -		struct throtl_service_queue *sq = &tg->service_queue;
+> -
+> -		/*
+> -		 * Set the flag to make sure throtl_pending_timer_fn() won't
+> -		 * stop until all throttled bios are dispatched.
+> -		 */
+> -		tg->flags |= THROTL_TG_CANCELING;
+> -
+>   		/*
+> -		 * Do not dispatch cgroup without THROTL_TG_PENDING or cgroup
+> -		 * will be inserted to service queue without THROTL_TG_PENDING
+> -		 * set in tg_update_disptime below. Then IO dispatched from
+> -		 * child in tg_dispatch_one_bio will trigger double insertion
+> -		 * and corrupt the tree.
+> +		 * disk_release will call pd_offline_fn to cancel bios.
+> +		 * However, disk_release can't be called if someone get
+> +		 * the refcount of device and issued bios which are
+> +		 * inflight after del_gendisk.
+> +		 * Cancel bios here to ensure no bios are inflight after
+> +		 * del_gendisk.
+>   		 */
+> -		if (!(tg->flags & THROTL_TG_PENDING))
+> -			continue;
+> -
+> -		/*
+> -		 * Update disptime after setting the above flag to make sure
+> -		 * throtl_select_dispatch() won't exit without dispatching.
+> -		 */
+> -		tg_update_disptime(tg);
+> -
+> -		throtl_schedule_pending_timer(sq, jiffies + 1);
+> +		tg_flush_bios(blkg_to_tg(blkg));
+>   	}
+>   	rcu_read_unlock();
+>   	spin_unlock_irq(&q->queue_lock);
 
