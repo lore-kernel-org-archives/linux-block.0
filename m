@@ -1,99 +1,74 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F9B1A255D
-	for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 14:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993B31A0BD7
+	for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 15:05:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729608468; cv=none; b=cy58jUm5FOGJFbk7RU05PscIYH35g8PsWrrsgqRxNQu8hGbpSQc0XbO0DSPm4zbQOCfWiHlSU71nLZya4eXMPtboyaChOhVd8L2M3VN2BfeJMm3pD2d3jAQFPnB/LIvEPgXYCEPUOqUs8wZUlXo+VF6J7ZZ7a5sVoUwLZ+BsvEA=
+	t=1729609541; cv=none; b=aSbDeeHetPJ1Bg4B0F70y/BJlz4MvpVocntbfjOQHVKbm7MW28UG/xdrR3TvACwyYf0K1BrionRcgFOQP3h8nUDo1XNGjI/l6gGGgjU0b0Ck6IenIRg0L53REWSfsP6+aw5Rfj5FIEOXxR/TvVxLv667sd50oPSItI/9Vs97Y5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729608468; c=relaxed/simple;
-	bh=AUnKd1M3xJOmg0hqJKHoR2GCQfujvFGd8uC2lbtp0O0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=feRWF9WuNR0Lilucy52Y/0yXQUTdL7iuiVCQMztehU0AcL+SK9Fzdqyy4Vjgp7hnIZ6/ebXuoSCibzidrvmYayNyY3wGDLtDdygqWXOnbmhdoz/FxWYob5x2ozK2kGxFSh2K+AZIDGz2XJaYzIiy1wj3/qm2jleSp2rLlMtL5MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=QceEMfXL; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1729609541; c=relaxed/simple;
+	bh=VGPr6BW3vTEn7vab3wmqikb8wAlWu5eezgeYIMD9+KY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GrDybyqW3VmvQ3p34o2H6daYH8D8ALaOAFC8SRe+7TOT7Q+Gq/5rJEM/Ftz0YhvqPdMQrXuby7sAg4rZPFPPtJ5yEna+QI6OSWFBOVvaREhiDPQxAgiz21Ei9dta49d7PSvuO8SF/x8ukwHk0Pw44dAYVnvSKL2bLEMdsspvubc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=wYUlEGH2; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="QceEMfXL"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-83a9cd37a11so243447039f.3
-        for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 07:47:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729608465; x=1730213265; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uvAvvPqD8Vbc7iZ14dJm8AwQMGagAK8236HrKhSHbpU=;
-        b=QceEMfXLOui1NwL++tUN6xwq+ct9k0FdaM8IuzcaYfbowKPSrrVV1J17rUoqQBrk58
-         EO7Umbe7SbrPnupj5acuyQIQp9+TOKoy+poSoKICwCzkdSs6YWxVWAPD1SUriIbb1+gV
-         MOeR4hWmXIDXMjLHla4kdb0LoU8If/7ddP9OrE2ZrlXLHL3DoKpg75JpPQePQ5Fs8fnK
-         AkOwGFdQj+SQNVCxWyOnfkaDtCBEnxH9L2D7LYEvmS7JygxTWR5q5F+jN/BnPrx1Qrs4
-         YZakC9j7khvV5RwWXwaN8zZ6W0wt8DitxEClrKmnKwcTKOABzez3+E3+Ndm7SOAMwk3Y
-         Pc6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729608465; x=1730213265;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uvAvvPqD8Vbc7iZ14dJm8AwQMGagAK8236HrKhSHbpU=;
-        b=OfJtEy4y3B45Mt8GxsmZ/2Sl8yv5fE92ze6sYOv0Qtw5/5tfbdPewADHyTkJmf7e2a
-         9YN2FmLklr+OoagOwJWgmT9+Q2hrpgTT9M7bxoraQ2pXxLgRZ5hQDujyYfcaMs2Yx0zT
-         KTX/Jctcj40UfoXpcd5w+Wf/L+E1iv0tcOZLoshv96p0p/2l3nygBXc+G8xdZF4vPOhx
-         9RsPJAEhH7tMp70x6hwTDpvKVDUTxLA9fowd8L0QRITGPJnrrSjztZ0mz77Xnbk0eEkz
-         5cZMCqC9eVmQA4Xpm/qiv45+wzSLKmhlJLn+9kRq0DMPS83u6ZiHVhiL07e+5WNoD1ZF
-         4JMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVw7nGsD13tKJ5CHtwDUIfmisi53lEGEhuUqQrFpIIsUloSZ9aXWPhnWoQZHWPvajx4ym0aBQum//+a5g==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxi+k10MsxoVXH9VhKwoazA/KAWfXp33zeYe9yZSTIShCDfQWT6
-	pIAZ0eGilo23jfzv4iWe0PqRsfUhSAt9pWzWTLt86R90fVAWjpqJ079olM40O6U=
-X-Google-Smtp-Source: AGHT+IFMA8/8XkeEa3fN1L/EdBNpDM5BgG5xlJL0Vg6Yh5CEnSh4WlfRGT4N951JDyO4WWAxrEdCjA==
-X-Received: by 2002:a05:6e02:1ca5:b0:3a3:b559:5b92 with SMTP id e9e14a558f8ab-3a3f4060be5mr155339825ab.14.1729608465688;
-        Tue, 22 Oct 2024 07:47:45 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc2a52fc4fsm1600289173.22.2024.10.22.07.47.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 07:47:45 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: tj@kernel.org, josef@toxicpanda.com, hch@lst.de, mkoutny@suse.com, 
- Li Lingfeng <lilingfeng@huaweicloud.com>
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com, houtao1@huawei.com, 
- yi.zhang@huawei.com, yangerkun@huawei.com, yukuai3@huawei.com, 
- lilingfeng3@huawei.com
-In-Reply-To: <20240817071108.1919729-1-lilingfeng@huaweicloud.com>
-References: <20240817071108.1919729-1-lilingfeng@huaweicloud.com>
-Subject: Re: [PATCH v3] block: flush all throttled bios when deleting the
- cgroup
-Message-Id: <172960846463.861462.5399495567961070618.b4-ty@kernel.dk>
-Date: Tue, 22 Oct 2024 08:47:44 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="wYUlEGH2"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4XXwTt5NPLzlgVnf;
+	Tue, 22 Oct 2024 15:05:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1729609537; x=1732201538; bh=H9H2CeGKHHtFgPf5NY60xx8J
+	rgkBxlNmQDcZYIMGhus=; b=wYUlEGH2EYibqn4xtjtbqqvUKzhaIHti6ZtF2wWc
+	rDOxmDcgkoOLYCrTwfoTzpt2HoPP7yElwHSZFB+M39CMYbSw7nEhpSyUZp+CIXjz
+	E7N20fYLemPaz0RKZ5z474lnrOkt/2O2lnVTzDSw5QKLL52ZloHH+WfZr3VyZ78S
+	4LEV8ReUHHQH7cUC6fbBU8sMGMaQaI6YN9wECAQe7pbQ49U7IaKsSCbJTxp3nES0
+	+bwVMJUroZSVOoU1PiOu43OeH46NJTc2cO5aW1a01FiJyyY5rIgsnEmNZuaW0Yop
+	p4NkMB/NBi0F7XgYsU7D+4aDNaKDMyTDPEbwspObOujltg==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id WX03nRb566X2; Tue, 22 Oct 2024 15:05:37 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4XXwTr4L4RzlgTWR;
+	Tue, 22 Oct 2024 15:05:35 +0000 (UTC)
+Message-ID: <ed9a22b7-64b7-4b83-a6c9-1269129e89d1@acm.org>
+Date: Tue, 22 Oct 2024 08:05:32 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: model freeze & enter queue as rwsem for supporting
+ lockdep
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20241018013542.3013963-1-ming.lei@redhat.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20241018013542.3013963-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
 
+On 10/17/24 6:35 PM, Ming Lei wrote:
+>                 -> #1 (q->q_usage_counter){++++}-{0:0}:
 
-On Sat, 17 Aug 2024 15:11:08 +0800, Li Lingfeng wrote:
-> When a process migrates to another cgroup and the original cgroup is deleted,
-> the restrictions of throttled bios cannot be removed. If the restrictions
-> are set too low, it will take a long time to complete these bios.
-> 
-> Refer to the process of deleting a disk to remove the restrictions and
-> issue bios when deleting the cgroup.
-> 
-> [...]
+What code in the upstream kernel associates lockdep information
+with a *counter*? I haven't found it. Did I perhaps overlook something?
 
-Applied, thanks!
+Thanks,
 
-[1/1] block: flush all throttled bios when deleting the cgroup
-      (no commit info)
-
-Best regards,
--- 
-Jens Axboe
-
-
+Bart.
 
