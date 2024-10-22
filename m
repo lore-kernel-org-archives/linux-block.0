@@ -1,103 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E4918BBA9
-	for <linux-block@vger.kernel.org>; Tue, 22 Oct 2024 10:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E7019ABD5;
+	Tue, 22 Oct 2024 13:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729592675; cv=none; b=RrBR5dDpdRpsvZtcgS4XQNgEdIexK5wf+Nbrm29/G/Wk5tW5YFZ8IqqviYEfX6qibSBOE/IBUfQkKKPqQhZ8wK3DxrFEfJ6Lyy9SJ+YTB90GJtnD62BgvuOgS7jNAPDoa6lU6E+LW9e8/OUI9MiCyNO4cLwmb4v+ZVWXzPc/h3c=
+	t=1729603415; cv=none; b=hNF/aR8dNsafh7JSzCCCUeWgIazXKZYEUz/BNMGlO6YsjoXo7dU4HbbO3XIbuEDABijfSme2deSm7lbdA1zmBcHfmiqdosQmgiSUH8yVFuWPHEWLCxup3aqT8nIrMjcHd/RnTBuHzZytuKw6zEme8hGbQfdAU2buo/Zj8dmHEws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729592675; c=relaxed/simple;
-	bh=TYUSi9Yplde1tXSVFfpDZFbguzd/gWK3YUSGfzajH0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gtzLuhZNUaRyiycnh4203zNBa0kXHHwqZJiQslEEnb+rc8qLZqlm+dTvXK/wmp/oLNeZBAFOIKV30vKv12K3JRqf9Tf10J+FXMUHXdmuPtr08v1FVwg+66Baie79kqjeuIeX2UcC3fbZSLxlAH7gkVqffzXy3TGEoCmrVa+R3+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80876C4CEC3;
-	Tue, 22 Oct 2024 10:24:33 +0000 (UTC)
-Date: Tue, 22 Oct 2024 11:24:31 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [Regression] b1a000d3b8ec ("block: relax direct io memory
- alignment")
-Message-ID: <Zxd9XyqqA604F1Rn@arm.com>
-References: <Zw6a7SlNGMlsHJ19@fedora>
- <20241016080419.GA30713@lst.de>
- <Zw958YtMExrNhUxy@fedora>
+	s=arc-20240116; t=1729603415; c=relaxed/simple;
+	bh=EBBcu3Jy1dsTafAyGkwzDqbaieu6rHDVpF1F9KQZ0+4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fhrGkBHVowEGbm5kgE0nnJrK+fOdYguwFZsGmFcQqvdo0xy0PPXdTtt1WoBYBKR/kkYM2LTLu3O2DKpQ53OUI7lZRE6OgAE8lcFeNYzmSL6Vi8tUQ025ZFEemze+LoVZpJ3jOXpXZKYuB+dX+F59QIWa1V6Yl3P6YLbitJ4cqtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4315eeb2601so66343955e9.2;
+        Tue, 22 Oct 2024 06:23:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729603411; x=1730208211;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=doI9dnYU9khV/lZLroP8Aji2iy4gTFD49z/1DNwsnjU=;
+        b=u+76FGoaVylwOfqe30IeHuAK+7jQew5TA4FnfiiGMhSpRgrcSsmqMDlQJODT9bY3L4
+         0MKETsI8Up2JpzuTNn5D6PkDOtMGxCXF4VWzVUp75Z18G5s6wblx3+SLP9oGtOoFudfI
+         pB8Mh4taVwvukI0g0gNARXvNcdJP4Djs60fAyY692UJjmc4kLrw9UMqBfjaCV+Ogkih0
+         J+ilvJ9jE/STEdEun2hrx/ekpRsAxReRCuqvGBbc7BiINaGSSzxDsazH/2yokKpxPiJ4
+         3wN1VyjRz9R7O7aBp7Hl5oLAKTvpAb6aCpes5+YXiGxSNliYsTAelam3ggEjOu4+z6v6
+         I3wg==
+X-Forwarded-Encrypted: i=1; AJvYcCWT1gWAPg9ZPVRcfyaOI7ZJhXUsyIlmlO1wvhzASZaVjom6ZlL2So82PG8yqn21Vu2gK1iL8kl1KHhLkw==@vger.kernel.org, AJvYcCXMba6UPVBLiYd/Ulvjtq+HZtAENjHiP4BQ3FaXaQpQmz9i6azZ/QCPIvhsmx9QvZU+0Y2eNwIEkJxzji/W@vger.kernel.org
+X-Gm-Message-State: AOJu0YxelOFNfhy8pIfx3qs+ekRbqoLkj/1JgdNr3DsUgEoT76+qoJVi
+	3gEokO2AQBlMuK4PotSc8UVl3h9pAGrwt4WccugfdnxB4Sm5Py6X
+X-Google-Smtp-Source: AGHT+IFtfcGtHriiS8qJidjpGvb1I0KhqA5oCBvkMBNtAdG2Qej7SWHcMOpQCTXGIcwwPTdSMBhvJQ==
+X-Received: by 2002:a05:600c:5118:b0:431:604d:b22 with SMTP id 5b1f17b1804b1-4316163bcbdmr184358845e9.16.1729603411208;
+        Tue, 22 Oct 2024 06:23:31 -0700 (PDT)
+Received: from [10.100.102.74] (89-138-78-158.bb.netvision.net.il. [89.138.78.158])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0a4856fsm6625100f8f.33.2024.10.22.06.23.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Oct 2024 06:23:30 -0700 (PDT)
+Message-ID: <fe49daac-5990-464a-aeeb-c7c5f9d4d156@grimberg.me>
+Date: Tue, 22 Oct 2024 16:23:29 +0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zw958YtMExrNhUxy@fedora>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] blk-mq: add one blk_mq_req_flags_t type to support mq
+ ctx fallback
+To: Ming Lei <ming.lei@redhat.com>
+Cc: zhuxiaohui <zhuxiaohui400@gmail.com>, axboe@kernel.dk, kbusch@kernel.org,
+ hch@lst.de, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, Zhu Xiaohui <zhuxiaohui.400@bytedance.com>
+References: <20241020144041.15953-1-zhuxiaohui.400@bytedance.com>
+ <ZxWwvF0Er-Aj-rtX@fedora> <064a6fb0-0cdb-4634-863d-a06574fcc0fa@grimberg.me>
+ <ZxYRXvyxzlFP_NPl@fedora> <ab2ed574-5fb8-49d9-b6f3-5030566fc64a@grimberg.me>
+ <ZxZm5HcsGCYoQ6Mv@fedora> <6edb988e-2ec0-49b4-b859-e8346137ba68@grimberg.me>
+ <Zxb8KaoUVstRCxiP@fedora>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <Zxb8KaoUVstRCxiP@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 16, 2024 at 04:31:45PM +0800, Ming Lei wrote:
-> On Wed, Oct 16, 2024 at 10:04:19AM +0200, Christoph Hellwig wrote:
-> > On Wed, Oct 16, 2024 at 12:40:13AM +0800, Ming Lei wrote:
-> > > Turns out host controller's DMA alignment is often too relax, so two DMA
-> > > buffers may cross same cache line easily, and trigger the warning of
-> > > "cacheline tracking EEXIST, overlapping mappings aren't supported".
-> > > 
-> > > The attached test code can trigger the warning immediately with CONFIG_DMA_API_DEBUG
-> > > enabled when reading from one scsi disk which queue DMA alignment is 3.
-> > 
-> > We should not allow smaller than cache line alignment on architectures
-> > that are not cache coherent indeed.
+>
+>>> It is just lucky for connection request because IO isn't started
+>>> yet at that time, and the allocation always succeeds in the 1st try of
+>>> __blk_mq_get_tag().
+>> It's not lucky, we reserve a per-queue tag for exactly this flow (connect)
+>> so we
+>> always have one available. And when the connect is running, the driver
+>> should
+>> guarantee nothing else is running.
+> What if there is multiple concurrent allocation(reserve) requests?
 
-Even on architectures that are not fully coherent, the coherency is a
-property of the device. You may need to somehow pass this information in
-struct queue_limits if you want it to be optimal.
+There can't be none.
 
-> Yes, something like the following change:
-> 
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index a446654ddee5..26bd0e72c68e 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -348,7 +348,9 @@ static int blk_validate_limits(struct queue_limits *lim)
->  	 */
->  	if (!lim->dma_alignment)
->  		lim->dma_alignment = SECTOR_SIZE - 1;
-> -	if (WARN_ON_ONCE(lim->dma_alignment > PAGE_SIZE))
-> +	else if (lim->dma_alignment < L1_CACHE_BYTES - 1)
-> +		lim->dma_alignment = L1_CACHE_BYTES - 1;
-> +	else if (WARN_ON_ONCE(lim->dma_alignment > PAGE_SIZE))
->  		return -EINVAL;
+>   You still
+> may run into allocation from other hw queue. In reality, nvme may don't
+> use in that way, but as one API, it is still not good, or at least the
+> behavior should be documented.
 
-L1_CACHE_BYTES is not the right check here since a level 2/3 cache may
-have a larger cache line than level 1 (and we have such configurations
-on arm64 where ARCH_DMA_MINALIGN is 128 and L1_CACHE_BYTES is 64). Use
-dma_get_cache_alignment() instead. On fully coherent architectures like
-x86 it should return 1.
+I agree. NVMe may have a unique need here, but it needs a tag from a
+specific hctx while the context requesting it does not map according to
+the hctx cpumap. It cannot use any other tag from any other hctx.
 
-That said, the DMA debug code also uses the static L1_CACHE_SHIFT and it
-will trigger the warning anyway. Some discussion around the DMA API
-debug came up during the small ARCH_KMALLOC_MINALIGN changes (don't
-remember it was in private with Robin or on the list). Now kmalloc() can
-return a small buffer (less than a cache line) that won't be bounced if
-the device is coherent (see dma_kmalloc_safe()) but the DMA API debug
-code only checks for direction == DMA_TO_DEVICE, not
-dev_is_dma_coherent(). For arm64 I did not want to disable small
-ARCH_KMALLOC_MINALIGN if CONFIG_DMA_API_DEBUG is enabled as this would
-skew the testing by forcing all allocations to be ARCH_DMA_MINALIGN
-aligned.
-
-Maybe I'm missing something in those checks but I'm surprised that the
-DMA API debug code doesn't complain about small kmalloc() buffers on x86
-(which never had any bouncing for this specific case since it's fully
-coherent). I suspect people just don't enable DMA debugging on x86 for
-such devices (typically USB drivers have this issue).
-
-So maybe the DMA API debug should have two modes: a generic one that
-catches alignments irrespective of the coherency of the device and
-another that's specific to the device/architecture coherency properties.
-The former, if enabled, should also force a higher minimum kmalloc()
-alignment and a dma_get_cache_alignment() > 1.
-
--- 
-Catalin
+The reason is that the connect for a queue must be done from a tag that
+belongs to the queue because nvme relies on it when it does resolution 
+back to
+the request to the completion.
