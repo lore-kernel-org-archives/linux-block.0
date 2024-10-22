@@ -1,92 +1,94 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E7019ABD5;
-	Tue, 22 Oct 2024 13:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFFC558A5;
+	Tue, 22 Oct 2024 14:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729603415; cv=none; b=hNF/aR8dNsafh7JSzCCCUeWgIazXKZYEUz/BNMGlO6YsjoXo7dU4HbbO3XIbuEDABijfSme2deSm7lbdA1zmBcHfmiqdosQmgiSUH8yVFuWPHEWLCxup3aqT8nIrMjcHd/RnTBuHzZytuKw6zEme8hGbQfdAU2buo/Zj8dmHEws=
+	t=1729607880; cv=none; b=czUoRNf2wNum33oGYLh5W8SwJWlk0jNvb3acFdJlyfuPH+M3Q3npj5Z8iKCw3tW3b3JP4V9M0yjZOri85/cI0gledPiSkH0LTavvdrBIvIYEMQLHu+VjC5MhsS/9qwvuPplMX8LUj9A0W8mg7dRL53eBmm25TH4lFaoLDnyLu/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729603415; c=relaxed/simple;
-	bh=EBBcu3Jy1dsTafAyGkwzDqbaieu6rHDVpF1F9KQZ0+4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fhrGkBHVowEGbm5kgE0nnJrK+fOdYguwFZsGmFcQqvdo0xy0PPXdTtt1WoBYBKR/kkYM2LTLu3O2DKpQ53OUI7lZRE6OgAE8lcFeNYzmSL6Vi8tUQ025ZFEemze+LoVZpJ3jOXpXZKYuB+dX+F59QIWa1V6Yl3P6YLbitJ4cqtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4315eeb2601so66343955e9.2;
-        Tue, 22 Oct 2024 06:23:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729603411; x=1730208211;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=doI9dnYU9khV/lZLroP8Aji2iy4gTFD49z/1DNwsnjU=;
-        b=u+76FGoaVylwOfqe30IeHuAK+7jQew5TA4FnfiiGMhSpRgrcSsmqMDlQJODT9bY3L4
-         0MKETsI8Up2JpzuTNn5D6PkDOtMGxCXF4VWzVUp75Z18G5s6wblx3+SLP9oGtOoFudfI
-         pB8Mh4taVwvukI0g0gNARXvNcdJP4Djs60fAyY692UJjmc4kLrw9UMqBfjaCV+Ogkih0
-         J+ilvJ9jE/STEdEun2hrx/ekpRsAxReRCuqvGBbc7BiINaGSSzxDsazH/2yokKpxPiJ4
-         3wN1VyjRz9R7O7aBp7Hl5oLAKTvpAb6aCpes5+YXiGxSNliYsTAelam3ggEjOu4+z6v6
-         I3wg==
-X-Forwarded-Encrypted: i=1; AJvYcCWT1gWAPg9ZPVRcfyaOI7ZJhXUsyIlmlO1wvhzASZaVjom6ZlL2So82PG8yqn21Vu2gK1iL8kl1KHhLkw==@vger.kernel.org, AJvYcCXMba6UPVBLiYd/Ulvjtq+HZtAENjHiP4BQ3FaXaQpQmz9i6azZ/QCPIvhsmx9QvZU+0Y2eNwIEkJxzji/W@vger.kernel.org
-X-Gm-Message-State: AOJu0YxelOFNfhy8pIfx3qs+ekRbqoLkj/1JgdNr3DsUgEoT76+qoJVi
-	3gEokO2AQBlMuK4PotSc8UVl3h9pAGrwt4WccugfdnxB4Sm5Py6X
-X-Google-Smtp-Source: AGHT+IFtfcGtHriiS8qJidjpGvb1I0KhqA5oCBvkMBNtAdG2Qej7SWHcMOpQCTXGIcwwPTdSMBhvJQ==
-X-Received: by 2002:a05:600c:5118:b0:431:604d:b22 with SMTP id 5b1f17b1804b1-4316163bcbdmr184358845e9.16.1729603411208;
-        Tue, 22 Oct 2024 06:23:31 -0700 (PDT)
-Received: from [10.100.102.74] (89-138-78-158.bb.netvision.net.il. [89.138.78.158])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ee0a4856fsm6625100f8f.33.2024.10.22.06.23.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2024 06:23:30 -0700 (PDT)
-Message-ID: <fe49daac-5990-464a-aeeb-c7c5f9d4d156@grimberg.me>
-Date: Tue, 22 Oct 2024 16:23:29 +0300
+	s=arc-20240116; t=1729607880; c=relaxed/simple;
+	bh=p8jy6tdnkz723LntVeZITPLHFVxOn5i0CPMPqySErvQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DqtnC7uQZ6sYoGFyx/t9r2rjtpwVFn2yh1E0EQPMKCaOQMbfyY/jkyr+DXnTEsZjlQagbC5W/8GkuusqBpYy+6mNo1DNpiK7Uss3w3kO9vo/Sko6iR2EtNbWVO1VJs7XH3wMFhOwmUL+CFceE3ulYxad/Q1MpA7oowAmnPshKZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ivL/y0fE; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ivL/y0fE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85C45C4CEC3;
+	Tue, 22 Oct 2024 14:37:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729607879;
+	bh=p8jy6tdnkz723LntVeZITPLHFVxOn5i0CPMPqySErvQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ivL/y0fEKyi7iD+u35NDeLqW0E6Lrz5NIplvCGuMqxND+xRNwNHrHvm6/y+WuMlkx
+	 VlG+GuWFHDiF2y72ckcH0ZXfDuNlDq6UMIJAd7MLrvAJ7sz1phEoDVb86lucGIIKDT
+	 GD9xXU1iY64Ii3YGGnjPVD0DPkCzB14WDYWiRk/Txoiue72azE001DVvlypP194JsV
+	 ljFpCcmD7FR8y9YS/tf8z4pafahLex+fwjf0ptffHUyDwmet/dxxYqxjQRMircXORN
+	 LTrYgh3r1ciNs7Nfu5iB8q3QTzyhvK0t4uePDYiL7ojlVgI2sn3XqZzvruY5B3GP4B
+	 sO58BjR2qPI7A==
+Date: Tue, 22 Oct 2024 08:37:56 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, axboe@kernel.dk,
+	io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	joshi.k@samsung.com, javier.gonz@samsung.com,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCHv8 1/6] block, fs: restore kiocb based write hint
+ processing
+Message-ID: <Zxe4xL-sM5yF2isM@kbusch-mbp>
+References: <20241017160937.2283225-1-kbusch@meta.com>
+ <20241017160937.2283225-2-kbusch@meta.com>
+ <20241018055032.GB20262@lst.de>
+ <ZxZ3o_HzN8HN6QPK@kbusch-mbp>
+ <20241022064309.GA11161@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] blk-mq: add one blk_mq_req_flags_t type to support mq
- ctx fallback
-To: Ming Lei <ming.lei@redhat.com>
-Cc: zhuxiaohui <zhuxiaohui400@gmail.com>, axboe@kernel.dk, kbusch@kernel.org,
- hch@lst.de, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, Zhu Xiaohui <zhuxiaohui.400@bytedance.com>
-References: <20241020144041.15953-1-zhuxiaohui.400@bytedance.com>
- <ZxWwvF0Er-Aj-rtX@fedora> <064a6fb0-0cdb-4634-863d-a06574fcc0fa@grimberg.me>
- <ZxYRXvyxzlFP_NPl@fedora> <ab2ed574-5fb8-49d9-b6f3-5030566fc64a@grimberg.me>
- <ZxZm5HcsGCYoQ6Mv@fedora> <6edb988e-2ec0-49b4-b859-e8346137ba68@grimberg.me>
- <Zxb8KaoUVstRCxiP@fedora>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <Zxb8KaoUVstRCxiP@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241022064309.GA11161@lst.de>
 
->
->>> It is just lucky for connection request because IO isn't started
->>> yet at that time, and the allocation always succeeds in the 1st try of
->>> __blk_mq_get_tag().
->> It's not lucky, we reserve a per-queue tag for exactly this flow (connect)
->> so we
->> always have one available. And when the connect is running, the driver
->> should
->> guarantee nothing else is running.
-> What if there is multiple concurrent allocation(reserve) requests?
+On Tue, Oct 22, 2024 at 08:43:09AM +0200, Christoph Hellwig wrote:
+> On Mon, Oct 21, 2024 at 09:47:47AM -0600, Keith Busch wrote:
+> > On Fri, Oct 18, 2024 at 07:50:32AM +0200, Christoph Hellwig wrote:
+> > > On Thu, Oct 17, 2024 at 09:09:32AM -0700, Keith Busch wrote:
+> > > >  {
+> > > >  	*kiocb = (struct kiocb) {
+> > > >  		.ki_filp = filp,
+> > > >  		.ki_flags = filp->f_iocb_flags,
+> > > >  		.ki_ioprio = get_current_ioprio(),
+> > > > +		.ki_write_hint = file_write_hint(filp),
+> > > 
+> > > And we'll need to distinguish between the per-inode and per file
+> > > hint.  I.e. don't blindly initialize ki_write_hint to the per-inode
+> > > one here, but make that conditional in the file operation.
+> > 
+> > Maybe someone wants to do direct-io with partions where each partition
+> > has a different default "hint" when not provided a per-io hint? I don't
+> > know of such a case, but it doesn't sound terrible. In any case, I feel
+> > if you're directing writes through these interfaces, you get to keep all
+> > the pieces: user space controls policy, kernel just provides the
+> > mechanisms to do it.
+> 
+> Eww.  You actually pointed out a real problem here: if a device
+> has multiple partitions the write streams as of this series are
+> shared by them, which breaks their use case as the applications or
+> file systems in different partitions will get other users of the
+> write stream randomly overlayed onto theirs.
+> 
+> So either the available streams need to be split into smaller pools
+> by partitions, or we just assigned them to the first partition to
+> make these scheme work for partitioned devices.
+> 
+> Either way mixing up the per-inode hint and the dynamic one remains
+> a bad idea.
 
-There can't be none.
-
->   You still
-> may run into allocation from other hw queue. In reality, nvme may don't
-> use in that way, but as one API, it is still not good, or at least the
-> behavior should be documented.
-
-I agree. NVMe may have a unique need here, but it needs a tag from a
-specific hctx while the context requesting it does not map according to
-the hctx cpumap. It cannot use any other tag from any other hctx.
-
-The reason is that the connect for a queue must be done from a tag that
-belongs to the queue because nvme relies on it when it does resolution 
-back to
-the request to the completion.
+No doubt it's almost certainly not a good idea to mix different stream
+usages, but that's not the kernels problem. It's user space policy. I
+don't think the kernel needs to perform any heroic efforts to split
+anything here. Just keep it simple.
