@@ -1,93 +1,90 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1AC07E0E4;
-	Tue, 22 Oct 2024 18:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861A31B654C;
+	Tue, 22 Oct 2024 18:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729621007; cv=none; b=kWew0skP+U9TYz3gUM7YP7EzZfpbHFxXYEi+vYAdZmvcliH6hJ5grlzXvuXkdaoQ6en9V87DtEi6nSDafFWeRhGpsPEA+G2FRRqYwwv9ZZNZRVPLY2ly2A0+o33DtUgbu1wUyI4Y2ZkuPxx1PN5URTWSgTUWlEkYtZpjw+bURkE=
+	t=1729621092; cv=none; b=Jc223zextcD0e3OMjza6tc7ebIB2CpNKVOBI40jsIPWf/dfQa+KKmbhe8EH3wxrltVFD7apJrf9sXdB1Y36CdMIOeljVk4y+E1U2u5PzghrZBlZeXBfUDcpWGl81yZaRYkINRCdK/ZGhAYS4brpu4FGYPHCV0pPS3vXEcxjBB2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729621007; c=relaxed/simple;
-	bh=UZqgYCmGKMLoPX6x45jwleLfwKc2WBwRV6SssUQHBmI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r5GD1tNdUL6PMuIqT9zBrzz1LyxsK6upgS6aW0Eg5xJ5gfDJkD0XbH04OJPouaK5c1AHWyAkzK1PDyiHoHb/1q2+aptkWRhI/6A344JRN9YNsmShUaNJhcoPAqU0xCPcOWeQmjY0RL2HSUlKxleDzwi/iHv50lXxlpVtPuN/2LA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=GYmhqKWi; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1729621092; c=relaxed/simple;
+	bh=I0ncawAsRIQf7yHcV9v6YkDdfdA0KSVBzsz9dvhzBRc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=grqiWYqEmYzAfWVNRx7Y3q7HxqKOCiMbGsGGO67uR2hPr74x/J6HyeaeDN7syWgL8BcRBcQfsQQoGiM1K5ctpt16EAd2KR9Ds7DN+VlaM8I9leEE2ONFVhizmJ9dVTZcK1AUuw/AUiQD0PdknQcXMCSgTYbRILvSlrqqrGvt36Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V/KSRryU; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="GYmhqKWi"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4XY0kH2RNKz6ClY9C;
-	Tue, 22 Oct 2024 18:16:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1729620996; x=1732212997; bh=lsF95ZAMKXS4nPzun/TBSeUR4KI4RRlcTUe
-	on854CPA=; b=GYmhqKWiPRNZ7boT3oKFHkSK24TQ3JGeHFMdq+hS2EzS99mejpg
-	uEu6ifotQaphZt5Zs50DEts1seDZJyNiDt2NzpVg7t+BgCMfMy07TzPhlTuet0pL
-	dnDtv3dLrP7mM/MsD5s4VSGq9obL3CaXo1iDquk9TnaW7WfCGJ988a36BpwUvT7M
-	kG6cfEPQo2EV4Qo+t0pB6qFjgkKW89tO0rIigwkaKIGnvlltVHvStZU/XdE1lXUf
-	w7fmGguOSN94qN6UiPCaNcLEAHoxEqMhEzUylhVoePl/pHelENgMTEl/ZBTJn0sa
-	GHz94o0VpMU0WWylTP201M7Lts8ujwsY6bA==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id Z0rZcDsQIz26; Tue, 22 Oct 2024 18:16:36 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4XY0kC4YXMz6CmLxj;
-	Tue, 22 Oct 2024 18:16:35 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Peter Wang <peter.wang@mediatek.com>,
-	Chao Leng <lengchao@huawei.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] blk-mq: Make blk_mq_quiesce_tagset() hold the tag list mutex less long
-Date: Tue, 22 Oct 2024 11:16:17 -0700
-Message-ID: <20241022181617.2716173-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.47.0.105.g07ac214952-goog
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V/KSRryU"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2e5b1aaad96so461731a91.0;
+        Tue, 22 Oct 2024 11:18:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729621091; x=1730225891; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I0ncawAsRIQf7yHcV9v6YkDdfdA0KSVBzsz9dvhzBRc=;
+        b=V/KSRryUz+QQ13y64UnMMKiXElMxDpVNBD8cwclaFdV2ltDF7y7t9kr6wXmvbskK8F
+         7NXpw9H43hcWyxXQfA2prt9RCBO7f8QnVOArmGebGQislwx79V6rm3PHwcqpNGSnLmW3
+         /dhtf1FLy3kyPa4wLbSdHHn8LwAisC7wYaL+AfwmrFZsCzJs+gbmB90FmodCAbWGF4fp
+         CSbMtupvgVyMOo5gjdxwdR3k+kP+aQuSPLIweV02k35wLwCIGJmu0+Dx6M24/sFt/6lI
+         0L89hTlVnzq6+BDfLbiJA0HiuIDnJoNFpkzgtjOHJD2RR///V9cPCERuLVQlFlys+IuF
+         kpBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729621091; x=1730225891;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I0ncawAsRIQf7yHcV9v6YkDdfdA0KSVBzsz9dvhzBRc=;
+        b=SjFqbrc/TfGFAYNE/EFgMl/7ceKny1hNhxzzGEARHBu8DM8Jst1hIORNSeL/kH5A1t
+         ZZ/GtsaCQ2s7mXbDWS3ZV9b/AmX5ZlkuQghMjpd6+I84+HVG0kSmcHpLKXo0b0I/Ehag
+         Wjw4SKJCP7t8OcaPicHm8zNeizHCX9WUKHAntaaSzfdBPVkcM0A6pidb8OeezFJ4AShk
+         r7F8e7+mMhdwqQWXPjMKyFSk2HBWojqyHK6r1TC/yydvcFlpjUkhbrBW5O5DI3DVicpN
+         xy16U+w2YprWmc+Q4m0PWcpN3cU1scHOL0ZSMqJDqCrFYd2+YY9wfAS2zcBUr9oZdPdv
+         eQvw==
+X-Forwarded-Encrypted: i=1; AJvYcCU0vv6nxWl9/7xqOO0CPOlo/96YVokLAVR/frYqI4CrNxW93x0Bieg/lFgCkK6X4mDdfpxn7UYCG6G7Ug==@vger.kernel.org, AJvYcCUH/xrbjgVOjgvL3nC024O8S6CmWG/8+yk6AvOYuOUtV7bBHs5HBJJYCLOH/3/hglbyOQGwN5adAAxpkbrF@vger.kernel.org, AJvYcCUPTEkcky2SgPZm98TGcC22LummB9Gdus35JtSIW+XjhSxvjfDaFiqpjxOrXCjwaFO9n18lUzItnD9vy0DfZJE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDOchta/qQeu1/SuwIR2rlTy2mC2oCszdtbsMeJYWVu6C756JL
+	7JCeclB6YCOZ2zQIzbQbctQeXaw8jm8OH6IiruyL+WXvSIyEyUEX86lNuzMFAVNyGcMBLIDieG6
+	gA6PaIdfMC9jZXxrE1wwJu+Vp+2w=
+X-Google-Smtp-Source: AGHT+IFWENN2kUGUgFc+5VTacL6qecqwBecLkdOpuyUli3hT8G3Ji+Ak3iOAwSoM5rIIKv/sUolih9Es/vjGtBlCg08=
+X-Received: by 2002:a17:90b:148f:b0:2e3:1af7:6ead with SMTP id
+ 98e67ed59e1d1-2e5616e9f15mr7829383a91.5.1729621090802; Tue, 22 Oct 2024
+ 11:18:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240903173027.16732-3-frazar00@gmail.com> <87cyk8mhlq.fsf@kernel.org>
+In-Reply-To: <87cyk8mhlq.fsf@kernel.org>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 22 Oct 2024 20:17:57 +0200
+Message-ID: <CANiq72nYKH+UCQQ8mHTc1Z7Spinp9v9hrjLzVyWHXaoeSShQTw@mail.gmail.com>
+Subject: Re: [PATCH v2] docs: rust: fix formatting for kernel::block::mq::Request
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Francesco Zardi <frazar00@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
+	Alice Ryhl <aliceryhl@google.com>, Jens Axboe <axboe@kernel.dk>, rust-for-linux@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Make sure that the tag_list_lock mutex is no longer held than necessary.
-This change reduces latency if e.g. blk_mq_quiesce_tagset() is called
-concurrently from more than one thread. This function is used by the
-NVMe core and also by the UFS driver.
+On Thu, Oct 10, 2024 at 11:29=E2=80=AFAM Andreas Hindborg <a.hindborg@kerne=
+l.org> wrote:
+>
+> Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
+>
+> Thanks for the patch!
 
-Reported-by: Peter Wang <peter.wang@mediatek.com>
-Cc: Chao Leng <lengchao@huawei.com>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: stable@vger.kernel.org
-Fixes: commit 414dd48e882c ("blk-mq: add tagset quiesce interface")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Andreas/Jens: do you want me to pick this through `rust-next`?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4b2c8e940f59..1ef227dfb9ba 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -283,8 +283,9 @@ void blk_mq_quiesce_tagset(struct blk_mq_tag_set *set=
-)
- 		if (!blk_queue_skip_tagset_quiesce(q))
- 			blk_mq_quiesce_queue_nowait(q);
- 	}
--	blk_mq_wait_quiesce_done(set);
- 	mutex_unlock(&set->tag_list_lock);
-+
-+	blk_mq_wait_quiesce_done(set);
- }
- EXPORT_SYMBOL_GPL(blk_mq_quiesce_tagset);
-=20
+Fixes: 3253aba3408a ("rust: block: introduce `kernel::block::mq` module")
+
+Thanks!
+
+Cheers,
+Miguel
