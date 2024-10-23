@@ -1,149 +1,199 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1E1DE56A
-	for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 13:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6DC1ADFF1;
+	Wed, 23 Oct 2024 14:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729691320; cv=none; b=B6+AkFnvW9lFKSD2X5pYj3yZ90eaw9K4Uls5GSjn0oTlx+VdDPl/pZIEjjuCI22Xeq25aV8VeCi6HFLRKWaLb5FWktvVWbeyFrWh0RcSKTemUPQU3YKI8dO2ilbU2aBXkTlUpSAD5z/pFHTWmInURATaRZhuxwKYe8IYv1PaVn0=
+	t=1729692476; cv=none; b=FSiK5+2VEepM2SgkDSYXHqwM+Ie+zC7wORYJSq3uyySjqfnHXeLh0UwtHC4Z/TsMysdmqmTbfdRSX1g858natdgi2d65FW1TtQS4MvgkXv3ay0cB5qkM50iOmsuS7dec+CfEhHR0A/FhPgWV9NKqYEOOQ6blte1qN87ZblKBv4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729691320; c=relaxed/simple;
-	bh=XIGajH1WfcU2vrjwHWK3Ps8Yjlrjs5GemtdLFAHQzlM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GmBtD4VQuJ3ciGypyEe5a+/FMbBH0D7C6FJACTSURU7rwvNBbej+yBWYmfEYQ/gczAuPzXZuSYQiUM1KFqxufnLFijITTbrxuhyMgudgFUMvz1Dl8f7G4GQVyd4H3v5b88r984KtS5uQOCMLfYE5qQaQJPpl3A0KGDrwLVUe7WY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=f1js9bWK; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1729692476; c=relaxed/simple;
+	bh=BGfya1zO/7KRe/QXpwkCe7fgxTJA3GU1aZOOwokCgRc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DG3+AfvH9lK0OG5a5fxR+L8XdjPVarZAdCfHmq2q1FKnuUPCbCZ4fHYqziTMeuW8SQLqwgGH1NbLX92lzo7xzD+qyXsN4Z3pfAe8OcVCsBFB+pNvJ7juvLQPWxp/HbNY+ibd9rtyT+jlz1Iqsarehz+aU2RLNlUWEgpRK4FlgQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cUUrsS76; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="f1js9bWK"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-8323b555a6aso399587139f.3
-        for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 06:48:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729691317; x=1730296117; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gEIqUzGMIrBpPH9lAOie9M7I6NLNlESkw5pvksDp/zQ=;
-        b=f1js9bWKIoStim4CfGFIp/8NuG704qhWEsFAA3GFSiVZjYGrIq0bZv1ATgF48qNWSr
-         UQAT2YxcxMvVDDx+WAUWaNRcgD0lmTXfFji88vICfrCWWWlVMH1Gd8ffZpn2A2KDPe9E
-         0yIebbYS+ZbDqwiYIC83fhwmwhdymlH7wZi0lUJwv0bK5nCghtj65oKvicQHB8mjzF8A
-         P27M0zrnc4DsJ4F+tAOs46Lyw0qWGX54UmCLVBXax0DqfXxwz2SfCSYr0ClTebYdxSEL
-         4CYuzEtMpD1LjJGR0bwFUkmaIX7AQnqjI+vKFZB7NY0r+K95BuFKeYfw06bIQyKpEI91
-         uL5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729691317; x=1730296117;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gEIqUzGMIrBpPH9lAOie9M7I6NLNlESkw5pvksDp/zQ=;
-        b=Ex46PrhBn6fnBD0yziVsavmjsAkXU+d0CPyAomF8PQxTH/zslah/LNNkrErwgK11O+
-         f8ZSpA1qlq0KMeQPNSZm8COrnPgpxd6+U+FQlwLIVK++t7u7jEDld6Yr+jh8ibaJOYym
-         PaUCB1edaGtsAnQK5jcHSfQxrwjf1+qCyCLWh5y2gj9qf/oV3vHs/sq0IH3dhI55U9Js
-         gmZVlvZMOzqOvKVVnq+eHkF+R64k4xcKW7YRstxmqn0XEf1U2Kyew0NWpjkRudxzBacY
-         YxMgbd9Rg4oz3W34ea90J9z3v5V3DOAcsVocBqopa2Gpvmt0OmanrLN66IrJ59h2DOck
-         p6ug==
-X-Forwarded-Encrypted: i=1; AJvYcCXcturPRa9GD/CISNre1OFFN48V+vLVWn3m6W/QwOQApf9zB4rWOzM6BLWmg6J/V5Sm/f1CVWULEFYKag==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxyw4csXqCAPdzzGsdnHyKOxAedbhsL6vbpr/8x5tas1qgfUi1A
-	y22WOoZMPK1FgbRb3aHjuAU5a1KdGuQIfeTCG9VMvV/2ebi46UYAN+Usk4vdHPhOyI8FvuqX4ie
-	n
-X-Google-Smtp-Source: AGHT+IHzPfoXN73PCw1LM7z9gdgS3t3XCwcu2wJWjvpKYFx7Doynd8Jdu5IggzzFdQsBoQxTRaKfqA==
-X-Received: by 2002:a05:6602:14c7:b0:83a:b881:7abe with SMTP id ca18e2360f4ac-83af63ebc86mr286739739f.14.1729691316627;
-        Wed, 23 Oct 2024 06:48:36 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc2a556f58sm2040691173.42.2024.10.23.06.48.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Oct 2024 06:48:36 -0700 (PDT)
-Message-ID: <f8ff8b69-f4d0-40d4-a2c5-b5bfeb973c71@kernel.dk>
-Date: Wed, 23 Oct 2024 07:48:35 -0600
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cUUrsS76"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729692474; x=1761228474;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=BGfya1zO/7KRe/QXpwkCe7fgxTJA3GU1aZOOwokCgRc=;
+  b=cUUrsS76qm36n65bfIxauV2RGsnyzNk+89wZckUICacEPjwoPlcB9RoJ
+   bHsovjdPraQfGHQzKTjT4A59+bw8DRHpieOEK3RAsMvTNn+Ev6K6T8Uit
+   SSaJSq4h7jsLkbXx6GpaFdcdODG/mO4TCCnGn7SU0BIn5Ul7dw7PdO0M9
+   Z+p9AlY3oYHiQiCqSoRjqDBA7OkGR/UFiJ3/V8j5PNBGjTYkerj2OVYXN
+   5Mn9dL2ZdrzWhO56Fmm06zcSEM59QnRQ/it3EApn6JHMKzTlG5hrS30e7
+   t0j8hOjgEiLFa/58zmoZnbZWyTcGQKNXGpxKwCH7NcSilPqzqfaacQf88
+   A==;
+X-CSE-ConnectionGUID: jbpmO3mKRAylId/Q7zLlyQ==
+X-CSE-MsgGUID: fDivbJInR3mn8MZ7gh6Hyw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11234"; a="16903297"
+X-IronPort-AV: E=Sophos;i="6.11,226,1725346800"; 
+   d="scan'208";a="16903297"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 07:06:07 -0700
+X-CSE-ConnectionGUID: G3DNUeWGRpmxsUBbkKyi8g==
+X-CSE-MsgGUID: ME0MdL5CQ5G8C9hoXxaMyQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,226,1725346800"; 
+   d="scan'208";a="117692788"
+Received: from lfiedoro-mobl.ger.corp.intel.com (HELO tkristo-desk.intel.com) ([10.245.246.76])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 07:06:04 -0700
+From: Tero Kristo <tero.kristo@linux.intel.com>
+To: axboe@kernel.dk
+Cc: hch@lst.de,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 2/2] blk-mq: add support for CPU latency limits
+Date: Wed, 23 Oct 2024 17:06:00 +0300
+Message-ID: <20241023140601.839546-1-tero.kristo@linux.intel.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241018075416.436916-1-tero.kristo@linux.intel.com>
+References: <20241018075416.436916-1-tero.kristo@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 2/2] blk-mq: add support for CPU latency limits
-To: Tero Kristo <tero.kristo@linux.intel.com>
-Cc: hch@lst.de, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241018075416.436916-1-tero.kristo@linux.intel.com>
- <20241018075416.436916-3-tero.kristo@linux.intel.com>
- <cb9d65fe-47b9-4539-a8d0-9863e8ebf49f@kernel.dk>
- <fa2bc7e5088fd309d846a57edf06520dc83632ba.camel@linux.intel.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <fa2bc7e5088fd309d846a57edf06520dc83632ba.camel@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/23/24 7:26 AM, Tero Kristo wrote:
-> On Fri, 2024-10-18 at 08:21 -0600, Jens Axboe wrote:
->> On 10/18/24 1:30 AM, Tero Kristo wrote:
->>> @@ -2700,11 +2701,62 @@ static void blk_mq_plug_issue_direct(struct
->>> blk_plug *plug)
->>>  static void __blk_mq_flush_plug_list(struct request_queue *q,
->>>  				     struct blk_plug *plug)
->>>  {
->>> +	struct request *req, *next;
->>> +	struct blk_mq_hw_ctx *hctx;
->>> +	int cpu;
->>> +
->>>  	if (blk_queue_quiesced(q))
->>>  		return;
->>> +
->>> +	rq_list_for_each_safe(&plug->mq_list, req, next) {
->>> +		hctx = req->mq_hctx;
->>> +
->>> +		if (next && next->mq_hctx == hctx)
->>> +			continue;
->>> +
->>> +		if (q->disk->cpu_lat_limit < 0)
->>> +			continue;
->>> +
->>> +		hctx->last_active = jiffies + msecs_to_jiffies(q-
->>>> disk->cpu_lat_timeout);
->>> +
->>> +		if (!hctx->cpu_lat_limit_active) {
->>> +			hctx->cpu_lat_limit_active = true;
->>> +			for_each_cpu(cpu, hctx->cpumask) {
->>> +				struct dev_pm_qos_request *qos;
->>> +
->>> +				qos = per_cpu_ptr(hctx-
->>>> cpu_lat_qos, cpu);
->>> +				dev_pm_qos_add_request(get_cpu_dev
->>> ice(cpu), qos,
->>> +						      
->>> DEV_PM_QOS_RESUME_LATENCY,
->>> +						       q->disk-
->>>> cpu_lat_limit);
->>> +			}
->>> +			schedule_delayed_work(&hctx-
->>>> cpu_latency_work,
->>> +					      msecs_to_jiffies(q-
->>>> disk->cpu_lat_timeout));
->>> +		}
->>> +	}
->>> +
->>
->> This is, quite literally, and insane amount of cycles to add to the
->> hot
->> issue path. You're iterating each request in the list, and then each
->> CPU
->> in the mask of the hardware context for each request.
-> 
-> Ok, I made some optimizations to the code, sending v3 shortly. In this,
-> all the PM QoS handling and iteration of lists is moved to the
-> workqueue, and happens in the background. The initial block requests
-> (until the workqueue fires) may run with higher latency, but that is
-> most likely an okay compromise.
-> 
-> PS: Please bear with me, my knowledge of the block layer and/or NVMe is
-> pretty limited. I am sorry if these patches make you frustrated, that
-> is not my intention.
+Add support for setting CPU latency limits when a request is dispatched
+to driver layer, and removing it once the device is idle. A delayed work
+is scheduled from the first block layer activity, and the workqueue ticks
+with the configurable timeout period, checking if there has been any
+activity. After the initial kick of the workqueue, only the last activity
+time is updated with the current jiffies value, minimizing overhead.
+The feature is user configurable via sysfs knobs under each individual
+block device.
 
-That's fine, but I'd much rather you ask for clarification if there's
-something that you don't understand, rather than keep adding really
-expensive code to the issue path. Pushing the iteration to the workqueue
-indeed sounds like the much better approach.
+Signed-off-by: Tero Kristo <tero.kristo@linux.intel.com>
+---
+v2:
+  * moved implementation back to block layer, to the request queue
+    dispatch section
 
+v3:
+  * further optimization; fast path now only updates the jiffies value,
+    and kicks off the workqueue for handling the PM QoS activities if
+    not already active
+  * moved the fast path handling under individual request handling, to
+    avoid iterating the whole request queue
+
+ block/blk-mq.c         | 51 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h | 12 ++++++++++
+ 2 files changed, 63 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4b2c8e940f59..e8d82601471d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -29,6 +29,7 @@
+ #include <linux/blk-crypto.h>
+ #include <linux/part_stat.h>
+ #include <linux/sched/isolation.h>
++#include <linux/pm_qos.h>
+ 
+ #include <trace/events/block.h>
+ 
+@@ -1303,6 +1304,12 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
+ 	rq->rq_next = NULL;
+ 	rq_list_add(&plug->mq_list, rq);
+ 	plug->rq_count++;
++
++	if (rq->q->disk->cpu_lat_limit >= 0) {
++		rq->mq_hctx->last_active = jiffies;
++		if (!delayed_work_pending(&rq->mq_hctx->cpu_latency_work))
++			schedule_delayed_work(&rq->mq_hctx->cpu_latency_work, 0);
++	}
+ }
+ 
+ /**
+@@ -2705,6 +2712,45 @@ static void __blk_mq_flush_plug_list(struct request_queue *q,
+ 	q->mq_ops->queue_rqs(&plug->mq_list);
+ }
+ 
++static void blk_mq_cpu_latency_work(struct work_struct *work)
++{
++	struct blk_mq_hw_ctx *hctx = container_of(work, struct blk_mq_hw_ctx,
++						  cpu_latency_work.work);
++	int cpu;
++	bool add_req = false;
++	bool remove_req = false;
++	unsigned long timeout;
++
++	timeout = msecs_to_jiffies(hctx->queue->disk->cpu_lat_timeout);
++
++	if (time_after(jiffies, hctx->last_active + timeout)) {
++		remove_req = true;
++		hctx->cpu_lat_limit_active = false;
++	} else {
++		if (!hctx->cpu_lat_limit_active) {
++			hctx->cpu_lat_limit_active = true;
++			add_req = true;
++		}
++		schedule_delayed_work(&hctx->cpu_latency_work,
++				      hctx->last_active + timeout - jiffies);
++	}
++
++	if (!add_req && !remove_req)
++		return;
++
++	for_each_cpu(cpu, hctx->cpumask) {
++		struct dev_pm_qos_request *qos;
++
++		qos = per_cpu_ptr(hctx->cpu_lat_qos, cpu);
++		if (add_req)
++			dev_pm_qos_add_request(get_cpu_device(cpu), qos,
++					       DEV_PM_QOS_RESUME_LATENCY,
++					       hctx->queue->disk->cpu_lat_limit);
++		else
++			dev_pm_qos_remove_request(qos);
++	}
++}
++
+ static void blk_mq_dispatch_plug_list(struct blk_plug *plug, bool from_sched)
+ {
+ 	struct blk_mq_hw_ctx *this_hctx = NULL;
+@@ -3729,6 +3775,11 @@ static int blk_mq_init_hctx(struct request_queue *q,
+ 	if (xa_insert(&q->hctx_table, hctx_idx, hctx, GFP_KERNEL))
+ 		goto exit_flush_rq;
+ 
++	hctx->cpu_lat_qos = alloc_percpu(struct dev_pm_qos_request);
++	if (!hctx->cpu_lat_qos)
++		goto exit_flush_rq;
++	INIT_DELAYED_WORK(&hctx->cpu_latency_work, blk_mq_cpu_latency_work);
++
+ 	return 0;
+ 
+  exit_flush_rq:
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 4fecf46ef681..4442c18bf3d9 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -435,6 +435,18 @@ struct blk_mq_hw_ctx {
+ 	/** @kobj: Kernel object for sysfs. */
+ 	struct kobject		kobj;
+ 
++	/** @cpu_latency_work: Work to handle CPU latency PM limits. */
++	struct delayed_work	cpu_latency_work;
++
++	/** @cpu_lat_limit_active: If CPU latency limits are active or not. */
++	bool			cpu_lat_limit_active;
++
++	/** @last_active: Jiffies value when the queue was last active. */
++	unsigned long		last_active;
++
++	/** @cpu_lat_qos: PM QoS latency limits for individual CPUs. */
++	struct dev_pm_qos_request __percpu *cpu_lat_qos;
++
+ #ifdef CONFIG_BLK_DEBUG_FS
+ 	/**
+ 	 * @debugfs_dir: debugfs directory for this hardware queue. Named
 -- 
-Jens Axboe
+2.43.1
+
