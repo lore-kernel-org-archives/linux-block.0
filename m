@@ -1,102 +1,133 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C703198E70;
-	Tue, 22 Oct 2024 22:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC656381B9;
+	Wed, 23 Oct 2024 00:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729636309; cv=none; b=Q6blpuOxr2iRUrgvRzA+grFR7cuyha5pqOdvc75pzMqwGfRbvjkPS8sS8FmX3VqsIIEVPvTtL2UOtLSTuLIiIpAALF6ZfSIy6ZQmDUpwlBUdQ6Phr/muWZJ0uZia7ccbObxcLXAgq4GODP2oibblXx55T/Dp9edgoU1UINBwoC4=
+	t=1729644594; cv=none; b=nZiI+EV8S+TBkkl7X0wJ/kzYUGHdvGdRuMkzIkUy04jbTigmI8uNJpGKyJts4fUJuFBlKLKIXhkpZckhFMlC2pMCmV1n7YkZUbexxwlMHN3sHER6SsJzYbBAL+tGOQveyBr1x+7S390O7xO3xEEvntHFV6ng4owwpp2m7OykkcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729636309; c=relaxed/simple;
-	bh=ocjuPZBQcm/gWoqJic+qab9ral+ThqVee195AQgsKkE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D0s9kgw4zIiFs/ieqIukrm3srVm3rWuO8PzkXfIJ5sHucYVx1WX8V6T5DGNM2RLnuI5rG4kBZZCBnCAXv2cgTGYnGX1y4dz7RtislWwk4Pw1Acp8fJ7uQvUV0Z09hiMYGQV3IMekFvZVZEHluiPQbUOpjNQPCrwQZNLI4VbSVUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R34GQA+3; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729644594; c=relaxed/simple;
+	bh=1H70krAFFQnKSMTdlulrx+xU/B8GJ1UDxaR4z5z72yU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cszTpsqlt9Z01hHCtduccmUkoUYrM1RGndh97zxHDOBHuKaO87PAOlLSdn75+6lM8hxQ2x9ObdK177jRQESWycdn8xHFNh1veYNQuMNyJOUAkMl8N6NITLCwq1ypn96gLkVCirF+5Myp9ZksPbFe1JOpDCA5/lJnNF202ExXJ1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lwoc7yo8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mJeezreo; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lwoc7yo8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mJeezreo; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R34GQA+3"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2e2b71fd16fso997596a91.3;
-        Tue, 22 Oct 2024 15:31:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729636307; x=1730241107; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PBpv4lygubL36e25IlDlHYVhQfEMD1LpJ9xSKfCH59o=;
-        b=R34GQA+3L3iLgJl+SPKzLE5nuB/g6u250oBm+Y33x7MyP4FAfoePGRfGnNkY8bnBx6
-         L0kEKBxYspnkWfQJcwMqDEYHDhNsncXhIHZCSTFj6TpbQLylsEgH41zb/WkfXgQydpGK
-         x42BzqrIdMv+cKSaIIVwYIilLiibtsq/yAeKbeP+IxkO3Lb98642be7MfVyKrAUxCYK/
-         8gNgoKHLhiCv1+oJbr6tIQODhDsDf3hKOJW6V+LpdgYARLAWeADQjpcsm4WxfBOmcc4b
-         GiwmJiZnbxrfTho9gWROnZ4Olu+14FlF6G9lGEVMOfhi4V+Ocr26lwISuyFDbxRpGY0u
-         8i4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729636307; x=1730241107;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PBpv4lygubL36e25IlDlHYVhQfEMD1LpJ9xSKfCH59o=;
-        b=Q6MtBAI6MjFCp/2N4mhyTyqJQsmaHXZ/b3t1gl9sHxohzhXg5mXCbnrmLD62qAiWDH
-         RBbpnfkMl25TBlIOAr/NfPZe2jmQO5Wuu1kXiRPGQh9Ds4d5RjMVMmfP+6pNyCog9f/8
-         Iw7meetMTPwe7tZtpdViKVxy0UFZzGzOIlozIGFO/qv/L/vyXjtnwlqKJ9QpqgfWWMpB
-         3nrLPvI5+wp6xFjEJH3za5oGphx0Z+p9/zIIxNe24rCjaOIBaIPw5Yq0f+6JqqWiwslF
-         Mmj9EYbI2VTKrxcfmSND6tcl5TONgOIolMRto3YfU+XQyegicessFSmzRCAIU/z85tzP
-         MS+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUwYwpjccLiva7PIWlllXTos5rzo/FnihpSiTbqqQcA1M7gTRJj6fSzoA99wmUCA1mLDWm2KwGwPDPXCz8Xvgk=@vger.kernel.org, AJvYcCWwhQqNf4eo9sn5vL8QOl842QrreBTspUjFc/218moK06Cfk2K2yxlKBpxmHc5IIwVWEHq7Qc9VtRbsRg==@vger.kernel.org, AJvYcCXgdueFVHZMWHvPMFUYmqJQN2v+BzCSvIH92/DJXqsWMGby+xUgpRX8kGWAHVLzGAd7ei2ZBIkPRWlBAkW8@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIojq4TRL//3yHpfv+SktWbsTbp34FL8eZbT++ioJyg5Z0U030
-	pU1jI1btzymfbsxHHFptS2b6DMPLjjY0HTFYknITQc6lkYbFQJ8MXSeUCwdYkaLwKUb9Cu+zr4q
-	fZVwMeRVBqMAAR1QiWf6mliUBQJc=
-X-Google-Smtp-Source: AGHT+IF0Wv7Vo0CTXqsPq9UXSA/5GUboFf7wua2ylNI/g94oPhAOc52VDUG52CbXVCp+BaDOVxFamTT3zwtxiXqa4No=
-X-Received: by 2002:a17:90a:d80d:b0:2e2:abab:c456 with SMTP id
- 98e67ed59e1d1-2e76b5b7e1emr221085a91.1.1729636306837; Tue, 22 Oct 2024
- 15:31:46 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lwoc7yo8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="mJeezreo";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lwoc7yo8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="mJeezreo"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 109CB21CA1;
+	Wed, 23 Oct 2024 00:49:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729644591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z9UnB97aT5chZUB6SsFs3xGInYZMzx2XkbtIvLb1OS0=;
+	b=lwoc7yo8Uyg/wB2NendbgT9LkyhLsE078bGJbW/CuVJzTfOsaJiERLS+i8TBmhCQynzLx6
+	tDO+LU0QM0fjn0gevQ9b3wIjUP6TNz+V/X6KsMLqfSeS/8t0bRjHjkgoKcgSjA0f5xC89Q
+	qpKNBFWyf2WRvPAZtMtzKOJHP4UxTTk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729644591;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z9UnB97aT5chZUB6SsFs3xGInYZMzx2XkbtIvLb1OS0=;
+	b=mJeezreopOgO4lktUXkh5CsZKpaUZ/His6+18Q67/ni13W26yVgnj9PNkhOIv2jdBo08Ek
+	9jExaY9ADA3QDRDw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729644591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z9UnB97aT5chZUB6SsFs3xGInYZMzx2XkbtIvLb1OS0=;
+	b=lwoc7yo8Uyg/wB2NendbgT9LkyhLsE078bGJbW/CuVJzTfOsaJiERLS+i8TBmhCQynzLx6
+	tDO+LU0QM0fjn0gevQ9b3wIjUP6TNz+V/X6KsMLqfSeS/8t0bRjHjkgoKcgSjA0f5xC89Q
+	qpKNBFWyf2WRvPAZtMtzKOJHP4UxTTk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729644591;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z9UnB97aT5chZUB6SsFs3xGInYZMzx2XkbtIvLb1OS0=;
+	b=mJeezreopOgO4lktUXkh5CsZKpaUZ/His6+18Q67/ni13W26yVgnj9PNkhOIv2jdBo08Ek
+	9jExaY9ADA3QDRDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9A37813A63;
+	Wed, 23 Oct 2024 00:49:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id TV/UGS5IGGc0HQAAD6G6ig
+	(envelope-from <rgoldwyn@suse.de>); Wed, 23 Oct 2024 00:49:50 +0000
+Date: Tue, 22 Oct 2024 20:49:40 -0400
+From: Goldwyn Rodrigues <rgoldwyn@suse.de>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	gfs2@lists.linux.dev, linux-block@vger.kernel.org
+Subject: Re: [PATCH] iomap: writeback_control pointer part of
+ iomap_writepage_ctx
+Message-ID: <4xccx2qgkqkncwtpgrfdfyzrwcv6xssgnaxsyvpasd43rcb33x@pxf33u4kryz6>
+References: <326b2b66114c97b892dbcf83f3d41b86c64e93d6.1729266269.git.rgoldwyn@suse.com>
+ <Zxc8awN_MHkuNhQZ@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240903173027.16732-3-frazar00@gmail.com>
-In-Reply-To: <20240903173027.16732-3-frazar00@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Wed, 23 Oct 2024 00:31:34 +0200
-Message-ID: <CANiq72mXuDbT4aSH6DTiAK0AWZjSg+qgHH+L0fP8sZaYYSvFHg@mail.gmail.com>
-Subject: Re: [PATCH v2] docs: rust: fix formatting for kernel::block::mq::Request
-To: Francesco Zardi <frazar00@gmail.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
-	Alice Ryhl <aliceryhl@google.com>, Jens Axboe <axboe@kernel.dk>, rust-for-linux@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zxc8awN_MHkuNhQZ@infradead.org>
+X-Spam-Score: -3.80
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.995];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_FIVE(0.00)[5]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On Tue, Sep 3, 2024 at 8:00=E2=80=AFPM Francesco Zardi <frazar00@gmail.com>=
- wrote:
->
-> Fix several issues with rustdoc formatting for the
-> `kernel::block::mq::Request` module, in particular:
->
-> - An ordered list not rendering correctly, fixed by using numbers prefixe=
-s
->   instead of letters
->
-> - Code snippets formatted as regular text, fixed by wrapping the code wit=
-h
->   `back-ticks`
->
-> - References to types missing intra-doc links, fixed by wrapping the
->   types with [square brackets]
->
-> Reported-by: Miguel Ojeda <ojeda@kernel.org>
-> Closes: https://github.com/Rust-for-Linux/linux/issues/1108
-> Signed-off-by: Francesco Zardi <frazar00@gmail.com>
+On 22:47 21/10, Christoph Hellwig wrote:
+> On Fri, Oct 18, 2024 at 11:55:50AM -0400, Goldwyn Rodrigues wrote:
+> > Reduces the number of arguments to functions iomap_writepages() and
+> > all functions in the writeback path which require both wpc and wbc.
+> > The filesystems need to initialize wpc with wbc before calling
+> > iomap_writepages().
+> 
+> While this looks obviously correct, I'm not sure what the point of
+> it is as it adds slightly more lines of code.  Does it generate
+> better binary code?  Do you have future changes that depend on it?
+> 
 
-Applied to `rust-next` -- thanks everyone!
+No future updates depending on it. It just makes the code
+more readable.
 
-    [ Added an extra intra-doc link. Took the chance to add some periods
-      for consistency. Reworded slightly. - Miguel ]
+No point bouncing two pointers to different functions in the write-
+back path, when one can be encompassed into another.
 
-Cheers,
-Miguel
+-- 
+Goldwyn
