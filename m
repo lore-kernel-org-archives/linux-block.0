@@ -1,540 +1,233 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F1C1A7271
-	for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 09:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729677316; cv=none; b=B5vO4mVYmhGm951MZPDeM4yGwRlUsFWG/RI6FzSyLSVQn/x2LwnNCQunne+mG++GGiuTCanQfBgwVGASqMyTtwTxPsHW4ImNrrSeOtUKStj1LMgtHkTfNWhqLa6Oe9q4ZTfGg82kR0EKwmx4AsACu2FJckluA3+7qY/nKQltV6Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729677316; c=relaxed/simple;
-	bh=+FVdnVre7ofwoYH68Sy4BzXcOlIiJ2nUaR3uwNdr1gw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t17snfj3fh92bA55n8VaYpNwmh6A0ij5Oa/45rvmo3DWXpxc0OtTKTWh2LA0e6034Pr3/5EEPZs5lL7KoFkEssBSqoO/U0LYg1RJ7HLKFHt5yIYyl+lKZZxTfemKRqwENsfhtYwGPSUWnxhuc+aWU7EFCfTo6JPUxIqqy8Tb3tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hqnjyEJ7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDFC1A2642;
+	Wed, 23 Oct 2024 11:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729682493; cv=fail; b=IWrbn+CrM2UFUawIdnONysDy9lkH7JcYpyFFQcIf0tsIlFe/aaE5Xl7UYvw/a1ucaN8zDJAmWOSx5+QdgPEZ+Ixvk/2S2A+P+iFPusOml80YNuaGSHV8TJxq0dxqpaN73+m5/4EWAbh4abPTfJRcSImW5wQ4iHVaFhIgYk5wBtA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729682493; c=relaxed/simple;
+	bh=kKfKoI7DUVOzShcdxBiuTm8RNqXb0ex/2JailTKvVYQ=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=repvIPFUAS0IpLFC/ZXV1A1hFGFOhzSV6FvnzkIA4viadccRWusGRd+iQKU7eCvbg4/Ax6AL15m3ebmzi1kUPqQE3Pz2SKHmuf3RG1AapygY/1RVsrjNk5aOS851ae8npjNic9LT6+ocH3kT1DZICt9+Ln2RHP4AgFqG2iT8S2o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=euz4fuJ3; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=iqXHet2y; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hqnjyEJ7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729677313;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6fChrjJ4PBXmjzA74oq7U7p9U5IYVMMbrVBQiegw/Jo=;
-	b=hqnjyEJ7Ncf+mC+m6K6VCj9eDQHlYWmzA96uI9dnA91mMMzX0+JSwyP2JvNgca+roQ9smM
-	cOeKfjxTXRjzgxft3IoINhl/G7RhpEf8AJygZ8oipICRr+rtSDr38Iyb13j0j2WVG/Kmao
-	Wg5PPoM2bYIDGiR8kl+LiTc74RqMueU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-JsdOgAHqOP2Uo6xuvAd7IA-1; Wed,
- 23 Oct 2024 05:55:10 -0400
-X-MC-Unique: JsdOgAHqOP2Uo6xuvAd7IA-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BA19E1956083;
-	Wed, 23 Oct 2024 09:55:08 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.171])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9D8D81956056;
-	Wed, 23 Oct 2024 09:55:07 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Waiman Long <longman@redhat.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 3/3] block: model freeze & enter queue as lock for supporting lockdep
-Date: Wed, 23 Oct 2024 17:54:35 +0800
-Message-ID: <20241023095438.3451156-4-ming.lei@redhat.com>
-In-Reply-To: <20241023095438.3451156-1-ming.lei@redhat.com>
-References: <20241023095438.3451156-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="euz4fuJ3";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="iqXHet2y"
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49N7tgHl018250;
+	Wed, 23 Oct 2024 11:21:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2023-11-20; bh=6F1y0PBEhjepcjZh9bRvPJ7kiQzx5Wo5HDhEWErNuvM=; b=
+	euz4fuJ36m1SXlxX+GFDyiduF/VUyXU+0I86GF4KuoXPgwxNfN41CDRQDeB5qwnW
+	UtSCC195PNfRuTCnQDxS3c/e9Rc+WIk9ppCgQLqZiH1byB9EG/jzEPKNvPkYEHVW
+	R/lMg5h/JxxvvhNefOvLCRSBzA2kZR9fgn+Vgj0lEQvs0Qgfulyg8emfnVYGg+mb
+	4CmpYkj3Yk6SugIMUkzpBE2kRVzabECAQgQdpKpZpvSEEDTcd4IFwgRxnaI9r3h3
+	KEnsWDNjZf3n4qP9kENwlGEN1zGm2ORp18soVlDy+gPJzSxGPX3sDWF6SltCPZQY
+	VDl2pjubMWWBKnY6wkg2oA==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 42c55uyubq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 23 Oct 2024 11:21:07 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 49NAB8vN036236;
+	Wed, 23 Oct 2024 11:21:07 GMT
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2046.outbound.protection.outlook.com [104.47.70.46])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 42emh2d162-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 23 Oct 2024 11:21:07 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZQBwDxKEF1QN1L66xOH0zMxQtxTkggkJsrusJH7sYhSxeza5Bpm6WEAwPLQ91shMLi/e22DHVH49JwOS2T6oSBIYkXxkQ+kL2yCGGixua8Yk8csUbD9msLy7B5bmd2ftv28Sg6ZY2zMygwhBqODf9xDexvWhNFgcv/b40cXssGJgTjyz2EqlDVwi33mv/oxuAhKZZ+ar8cV98G4FPhzCMU6ikXYVpBfoCuUJsTjaiRdWikOuB/9C/ZZKI82Ciuvk+Ko97ABPwQY3qO4jaBgBHk7MvnRCht2OTarcHeukrvzFfRjvoKb7IlifuUSM4Ch7IyqTEG1A/5zu3WRf1uz3tg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6F1y0PBEhjepcjZh9bRvPJ7kiQzx5Wo5HDhEWErNuvM=;
+ b=XDxniIDHMy3/h42r8FNJubQWD0zqpJ4T0XhQM5gAK30aM7C4Wg0uUJDqzHDUesMGo7qJXXeDSr8F2bbcewUb1Jrrv8LOLYkPG+zSW9G4fuC8W9+8cG6pLcJDGJZocd0K33xTSwBj5neRul3NbyE1PYKsOvJ/ach+61rWABtWpeqPX4CrcWUs0a8K5iKuDKzUThfuWKMdndleUGgisDbbWLok0STzr4CD2vt3IYKVGR7t36a/uaVrdNHlPjW4D4Wg4RnKNinT0VigH5b1fbftAWVQ8LvEPOKYGFMhwUAeJeYVX6PnF3mnj6EkJFKHU7p3/dHwuBNI7F9e0bKDNOF/Jg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6F1y0PBEhjepcjZh9bRvPJ7kiQzx5Wo5HDhEWErNuvM=;
+ b=iqXHet2ypxnEDTnQ6hNKk1lk1D9ZDmsb8Hf8tP7Y78S9PjSz7bKjyIc6tNQElYApeF85UrjO8JYTx6h9AeKMM0zx9PCoPMd9eB+v/LLpL7k/F7h0xFDDP0ZGWH282Lzyx2z5BDjlspjQSkM3fVprIkN+Iydl3sXkRvAMVTH9oQE=
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
+ by DS7PR10MB7132.namprd10.prod.outlook.com (2603:10b6:8:ef::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.28; Wed, 23 Oct
+ 2024 11:21:04 +0000
+Received: from DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
+ ([fe80::4f45:f4ab:121:e088%5]) with mapi id 15.20.8069.027; Wed, 23 Oct 2024
+ 11:21:04 +0000
+Message-ID: <68d10e83-b196-4935-a350-464b82c30e44@oracle.com>
+Date: Wed, 23 Oct 2024 12:21:00 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 5/6] md/raid1: Handle bio_split() errors
+To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, hch@lst.de
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org, martin.petersen@oracle.com,
+        "yangerkun@huawei.com" <yangerkun@huawei.com>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20240919092302.3094725-1-john.g.garry@oracle.com>
+ <20240919092302.3094725-6-john.g.garry@oracle.com>
+ <bc4c414c-a7aa-358b-71c1-598af05f005f@huaweicloud.com>
+ <0161641d-daef-4804-b4d2-4a83f625bc77@oracle.com>
+ <c03de5c7-20b8-3973-a843-fc010f121631@huaweicloud.com>
+Content-Language: en-US
+From: John Garry <john.g.garry@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <c03de5c7-20b8-3973-a843-fc010f121631@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO4P123CA0223.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a6::12) To DM6PR10MB4313.namprd10.prod.outlook.com
+ (2603:10b6:5:212::20)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|DS7PR10MB7132:EE_
+X-MS-Office365-Filtering-Correlation-Id: 05d4b4fb-46f1-4299-d213-08dcf354c7f1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?REZ1SGJIOWpVUUhudjB0dUMzek1XS2ppMlVUaTZqUDErRmxnTXowekxyUU5k?=
+ =?utf-8?B?S2xmTjA0a3lLckNEZTJXODlZdDQzVXBTdmRmdjNZMEFJU0xnSVNxZm91cHZR?=
+ =?utf-8?B?Y2FUS0QxS1lQL2Y5a2RYYmNGRG05THpobGNJNUdKNmdCTTdsODd4ZnU4ajZK?=
+ =?utf-8?B?eDVHRHdpOEgzZFdITkxKNzkvQjN2Ym4zajNTWFZKSkJ5NmtVU0VyR2RUR090?=
+ =?utf-8?B?L0FTcjNIc2RWYzJveTQ4Z1UvK0RZNWpvbXEvQWFSUEJIdU1EMjQwd0JxWk1M?=
+ =?utf-8?B?OHVZZTV3b25UbjVzMTVvWDZVeVJXUHRUTlJxNzlCMStYd1hqMWdrSHEvNEhk?=
+ =?utf-8?B?ZjJLMEt4RTNweU03RFJySmtZVHJYdm5VQy9pb0RzRjJxWDl5elU5eng3dGJx?=
+ =?utf-8?B?aG1wczZ3MkYvMTg2TStFa09FZlFTT2FjZEJrcTNsVUh5YlJoZTRtNlFBbWhX?=
+ =?utf-8?B?c0ZrSWxxUk50blh2V3FVZU43Q3h3d1RvSUY5N1BJVE5sNlBCOHVRd3U1WU1h?=
+ =?utf-8?B?aCtjcUU0bEx6VGc1YnQrVU1SSlhMRVl3R1c1cHF1bVdHSXk3MStod2Z0ZWJX?=
+ =?utf-8?B?S1RIZmhOUFJhWlkxV29zRWtxcWxBQ3VJOXZleVlEaElXRnpqZzFWNzZ0b2tS?=
+ =?utf-8?B?UXlSNFY2U2ZzcWkvZHEyR1pTVmhrSy9RZm94N1kvcVhwUFExNWt6Ny9ObmpT?=
+ =?utf-8?B?RUVsSG4zeGFQUFJCSGpZRGxQZXdnYmc0TjJhNGhoK3NQMFlsY0xiODF5bzVL?=
+ =?utf-8?B?TlJxWVk1d2FqenZSbkIxWjZuK0lLN2gycmRVcC82Y1pySG5nZXlZckQxRk9x?=
+ =?utf-8?B?UUxqaHI3WnVpQVI4TGFPZFd3TEhPN0FtQlVoZEUyRXZiMkZ3Qmp0WVIzQk5U?=
+ =?utf-8?B?eGkyL3VOTkhneU1OREYvMnIzYjdwL1d2c0RJeFlHUU5NM1FvbzBMWDh4aFdP?=
+ =?utf-8?B?cEpwSjRTN29QaHBDRlYwSUZIWHdmOUdCNDNKREZPOXlESDNHcUJ4OXVqUXda?=
+ =?utf-8?B?Nkt0VVl0cE10TEM3YktLS0VQclhrQWloTlAzUURGa3A0d3NUNjhqWFo4b1BH?=
+ =?utf-8?B?S0U0OFVpcEZuQis5czVEbmNObVdCUHJsOUwyZGFQK0VUVGcvbndmS2Ziek9C?=
+ =?utf-8?B?RHd1dmJaUC9PcjFFTnB3OEY5VU11ZlZnOXJrUnlCdXcrMG45d3hjT0NreXVt?=
+ =?utf-8?B?SDNXemdGbWRZM2VSU2hySWNNSFVhYkUrZmtIdG9WU2tUeDJZTWU4dElZOGVI?=
+ =?utf-8?B?UE9RSHhFcFBpNW1CTjh0TG9yR1RWTGFjSjhPSjlwVGVLVDhoMEs1eGp2dVJZ?=
+ =?utf-8?B?allsMkd0eWlQRGhzMDVFbWxnTkQ1bnRKNWZvelZBeEJBNmtEOHowT2lvNkVL?=
+ =?utf-8?B?OG1rN2hOYkNmcW5ZdGpSazhYbVNXeGVsUUthSEg5Mmh2S085TjVMdU1LWTEv?=
+ =?utf-8?B?dlR0bnlCQXhGMWlrYnBud1ZFUFdqQzlMeWNKdk51RVlkeFJvK0JQeGI5STRk?=
+ =?utf-8?B?OEVXTXROUmx4M3dUWC9CMXpQRERVNzNWejhDTHVHTSt6c0dkaklYc3hxOUNO?=
+ =?utf-8?B?NHZhYzBIZjdRclBXTlVjUi9mNGVodkIwUnB5cU5LZnVGRFpZamZ1ZFNlUWhN?=
+ =?utf-8?B?czVaVzQweWxmUHdPL1IzQzUxMVBpcGg2NFdGM3FPY3NMSXVjS3UwdXJrSHBG?=
+ =?utf-8?B?c1doN1A2RU5KLzlsM3FNTUVxRFFoQzlDeXRCdlRmV1BMa2hDS29aeUpFYmgr?=
+ =?utf-8?Q?aJW+ECQmZ7/w9/2rQo1fxJgTs1OFb/7iuXcqOZu?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VTA5aGFwVGNGNUd3VldDaHlyaytoMlhzc0hqUTU0WXZrUHdsMlBXMmhnV1NN?=
+ =?utf-8?B?dWh4TlVVbVRvZnRmbEdOYVcrZ29QWk5uT2FSeVE3ZmxXNXJadStjaVl0L2pw?=
+ =?utf-8?B?VGIvU2l3Y2JBYmVDZS8rajF5Wkd3bFROU01OVWVlQ3o5NTIzbnJ4U2FLOTBT?=
+ =?utf-8?B?a2E5enpveW1YclRGN0pHcjdSTjFabGdURmNnZ0t5ckluVy9MRGVEZGYwU0VU?=
+ =?utf-8?B?d1NTbmhpREt4WEs3ejhWNW5NUzlJQTQ3Y1ozRmY3b2RhK0xLbW0zN2Yvdkdy?=
+ =?utf-8?B?R1R2Wlo0d2doTGRkb3gyWnU5NUFPRW1vaUo2cjRuU2Zaai9iZDJLeVlneU9L?=
+ =?utf-8?B?NVhaQzJ0NSs1MUZidXNoQmZXdFl5YkE1N1Qrc3JVZjgxaFBXZ1JoUkJYaVkw?=
+ =?utf-8?B?eFlicUtEc2k3T0pZWEYrckFZbDFDaXhRUjBtNDltb0tDdzU5Z0FjOGRDQW1k?=
+ =?utf-8?B?c2FCUmR5eWw1N2VwcGtwaXhQcTBwbjFnY0xEL2ZsMVlOMWlTM0VEU3pabHR3?=
+ =?utf-8?B?aVY3dGhhVTRSVm5QM0hlOXFFSzZVNUxrQU4zUnpSOGNIY1BZTXIwaEtUamtp?=
+ =?utf-8?B?ZVEzZHVkUExPS3A4WHQxaEhVWm9NS0JTcWJHS3Nia0wzdUJuMmYvdWJ2TkRQ?=
+ =?utf-8?B?aU5MUHd5ejdHOHdkTEI5VUhrbHExMmNTTjlsZmNNVFFqaFNBUkV3bmFqbUk4?=
+ =?utf-8?B?ZkhtWVVRdDFyZGY5OVZIa0preU5zeE9TaGx2RE1LMHpYcGRySk1KNDZUVERY?=
+ =?utf-8?B?d1RCQ3lLNDlrb2FZRzNFZXZldnRxK0x3bVdvZWl1QVRJSTdmd2ZWOEZQMm5t?=
+ =?utf-8?B?VlhBKzVDZ3BESnhRMDBVdTkyMG11UjlzZGQzL2pOcjllSTBnMkwvemptQVZq?=
+ =?utf-8?B?akswRXJzQ1pQZWJjT2V4aGNMSlAvOFNrRzdVMkgyNEx3cTVrM1NLcEE3ZGxp?=
+ =?utf-8?B?djIzVmJka094V2RSYzcrRVgzUTMxSUVmQmZuenE5TXlnR0ZJeUlINXArdWV3?=
+ =?utf-8?B?MlVLSDlsRGVrV0xBRTNHMkdZZ09XS1UvWkI4L0RYaVJMYWJtVW1SbHpBSzlh?=
+ =?utf-8?B?bmE1L1A3WjJtYmxRSit4OWFJSFBIbUlLUnB3aHVZMHpqZ0pZVFoyMHJ4dytW?=
+ =?utf-8?B?cFFHdTVld0QrWEdZMk4yWEtqdk9UcE1jVm5yQ2pSZHpvK0NYNERtMmlGM21X?=
+ =?utf-8?B?eStULzh2SzdQQXd6ZmN2K2VjUkhGZkNiUHFOTW5QOFQ1UU1ISk5IWGFCcHZx?=
+ =?utf-8?B?aGRPaDJLL3RoMTZVRGRNRFNYTkE2VUlGNnRBbk85NEZRRUhSbXhVZXk2OFFw?=
+ =?utf-8?B?cUdmTFFETStUYjNoc3FsL1gwY0lQOE4xUFhSc0RRM0tNZEVHQXhjNUNKNW91?=
+ =?utf-8?B?UFhYWlM0OHdsdklJQkFad3lLVDlMTlFsbHk3NTRMbmdvdS8rRUwzY01kMTl6?=
+ =?utf-8?B?eHFKVUJIMWoxekZ4NlI1YmI0UXgxWTBwN2VkaGhKNmxKa2I2bmlpUUxaNVBQ?=
+ =?utf-8?B?TFVrRzlCOUpyL3htWXgwZGJXbG1yOEE4YldhVlVoYi9BVVFBQVFyL1NLcGov?=
+ =?utf-8?B?eTE0aFJIdTNEc0NoallUUnpqUkkvcGFpYU53VkR0MHh4b0o1U0Z2bG1ILzJR?=
+ =?utf-8?B?dlMwUUVVaHUwWGJlWXMyYXNGWTErRHR6RTNZeXZtZ2U0MGVSY3lZYkUwYXhx?=
+ =?utf-8?B?SHJCelZrSUZHTmZWQkdGZVNZVWNyY2k1Y0JoN1NweFI0UnN1WHBSZzd6YkYy?=
+ =?utf-8?B?VERNNldGdjdiaWV3cExZeDQxUkJVRWthUW1pbS91ODh0M0JKSzNsNm9CM2VH?=
+ =?utf-8?B?MjUrTFFIczBCN2xFcXkyNklwZmNQWU1mc0tXWE1ydDZnYk1ESXlGMUVYZnhq?=
+ =?utf-8?B?SlM5bUZoUmtGTUxOeVVQbVBVNXpXRnF1enpzL1VmSGs4aWZTNnJUbnFBOXZ4?=
+ =?utf-8?B?bW5xZUtJU3Q3ell5eS93bldSNDNFMXBBTUhtYUtiM0w5Sy9aZzVEM3pzeDI1?=
+ =?utf-8?B?SVlTQkdYMklyNGdQaDhqZHVPdlNRNW5rVjkwTytyc0RlVzM3aUFuWmtLMzcr?=
+ =?utf-8?B?dkRDYzlFMDVBaEdaMU5DRjM3c1lXcEZvaFQ0Rlp5akZEUGhkejU1T3J2MHBS?=
+ =?utf-8?B?K1pvR21ZV3phcTN4S2o0cjlFd1dkRjd3Z3NiQU9acUdpaDJCaW44RElSbmNo?=
+ =?utf-8?B?WVE9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	1Rd7VVlkdFmC1sJloNlbiDSwxnyOZrMhvVUUFMy0O+jiKnaiSlgfG/HjQEoy+Lt439pLRgjeZ2WSYw51haM7/qZPjIPGnZ8EVsfveFlNzcE1HTD400ndX+Uxi/5/YJojlCx394GcD065BHFDCz2Kgxe+nelGxmmZw0dYQ3ckKqCP+fHa90TPA+L37SjJ2zH15mJDXWFcW3CqNduicYeg9FPml+B2LPAU71eeQ1eAJIvxUuYX/zxAsrdvGBAkFqCIFd+l1D8nKdIJC4g4pA0jRt3usjYkAWgaJ4woiDaKK/iOBYIQhZbuOEaB03QFqf+yxSTP/lc8gAy0Fqxag3TTj5yg6/qLOSjsp93zgRvzJMdbKJh0sBPZl3isiTRtMA3I+X/PTFJWXScvR/fs9leZq/7TrPcjDSbI3uz6Ycb6Xe+u6+aI2xPoTAIW8iRUsl+LUPPRr+1Y8sE27fDayl/ZU5jJnFbPg2CWinhhk0/uJq91buxD8SGku6OuMQZpbNtEcgo97QeWxaXRhYDBkIrqzQB8i953UYLDZ8xl4fDwPii166FZnpFAD360j5A92HeP45kJZmJHjZXLYhcv7NxYiOgrUcNM6/PUw5qk2avoZQI=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 05d4b4fb-46f1-4299-d213-08dcf354c7f1
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2024 11:21:03.9808
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wuJdSwwVdKhVKKHdzMkrpE565iIb0yQcheDtTmurBsm4qSUnqvsgIWa9NdTdHR1C+4FubAOjgbecfZ6CNGKwWQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB7132
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-23_09,2024-10-23_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0
+ mlxlogscore=999 mlxscore=0 bulkscore=0 spamscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2409260000 definitions=main-2410230066
+X-Proofpoint-GUID: aJPklSuUSzFlMkubdmZfIvDIIyRaA6GT
+X-Proofpoint-ORIG-GUID: aJPklSuUSzFlMkubdmZfIvDIIyRaA6GT
 
-Recently we got several deadlock report[1][2][3] caused by blk_mq_freeze_queue
-and blk_enter_queue().
+On 23/09/2024 07:15, Yu Kuai wrote:
 
-Turns out the two are just like acquiring read/write lock, so model them as
-read/write lock for supporting lockdep:
+Hi Kuai,
 
-1) model q->q_usage_counter as two locks(io and queue lock)
-- queue lock covers sync with blk_enter_queue()
+>> iff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+>> index 6c9d24203f39..c561e2d185e2 100644
+>> --- a/drivers/md/raid1.c
+>> +++ b/drivers/md/raid1.c
+>> @@ -1383,6 +1383,10 @@ static void raid1_read_request(struct mddev 
+>> *mddev, struct bio *bio,
+>>       if (max_sectors < bio_sectors(bio)) {
+>>           struct bio *split = bio_split(bio, max_sectors,
+>>                             gfp, &conf->bio_split);
+>> +        if (IS_ERR(split)) {
+>> +            raid_end_bio_io(r1_bio);
+>> +            return;
+>> +        }
+> 
+> This way, BLK_STS_IOERR will always be returned, perhaps what you want
+> is to return the error code from bio_split()?
 
-- io lock covers sync with bio_enter_queue()
+I am not sure on the best way to pass the bio_split() error code to 
+bio->bi_status.
 
-2) make the lockdep class/key as per-queue:
+I could just have this pattern:
 
-- different subsystem has very different lock use pattern, shared lock class
-causes false positive easily
+bio->bi_status = errno_to_blk_status(err);
+set_bit(R1BIO_Uptodate, &r1_bio->state);
+raid_end_bio_io(r1_bio);
 
-- freeze_queue degrades to no lock in case that disk state becomes DEAD because
-  bio_enter_queue() won't be blocked any more
+Is there a neater way to do this?
 
-- freeze_queue degrades to no lock in case that request queue becomes dying
-  because blk_enter_queue() won't be blocked any more
-
-3) model blk_mq_freeze_queue() as acquire_exclusive & try_lock
-- it is exclusive lock, so dependency with blk_enter_queue() is covered
-
-- it is trylock because blk_mq_freeze_queue() are allowed to run concurrently
-
-4) model blk_enter_queue() & bio_enter_queue() as acquire_read()
-- nested blk_enter_queue() are allowed
-
-- dependency with blk_mq_freeze_queue() is covered
-
-- blk_queue_exit() is often called from other contexts(such as irq), and
-it can't be annotated as lock_release(), so simply do it in
-blk_enter_queue(), this way still covered cases as many as possible
-
-With lockdep support, such kind of reports may be reported asap and
-needn't wait until the real deadlock is triggered.
-
-For example, the following lockdep report can be triggered in the
-report[3].
-
-[   31.671822] ======================================================
-[   31.673169] WARNING: possible circular locking dependency detected
-[   31.674456] 6.11.0_nbd+ #411 Not tainted
-[   31.675220] ------------------------------------------------------
-[   31.676379] bash/1425 is trying to acquire lock:
-[   31.676861] ffff990b8ea27530 (&q->limits_lock){+.+.}-{3:3}, at: queue_wc_store+0x8e/0x180
-[   31.677268]
-               but task is already holding lock:
-[   31.677548] ffff990b8ea27410 (&q->sysfs_lock){+.+.}-{3:3}, at: queue_attr_store+0x75/0xc0
-[   31.677931]
-               which lock already depends on the new lock.
-
-[   31.678315]
-               the existing dependency chain (in reverse order) is:
-[   31.678664]
-               -> #2 (&q->sysfs_lock){+.+.}-{3:3}:
-[   31.678951]        __mutex_lock+0xad/0xb20
-[   31.679157]        queue_attr_store+0x75/0xc0
-[   31.679366]        kernfs_fop_write_iter+0x15c/0x210
-[   31.679608]        vfs_write+0x2a7/0x540
-[   31.679801]        ksys_write+0x75/0x100
-[   31.679999]        do_syscall_64+0x95/0x180
-[   31.680209]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   31.680488]
-               -> #1 (&q->q_usage_counter(queue)#2){++++}-{0:0}:
-[   31.680839]        blk_queue_enter+0x195/0x1d0
-[   31.681060]        blk_mq_alloc_request+0x136/0x2d0
-[   31.681301]        scsi_execute_cmd+0x9c/0x4c0
-[   31.681528]        read_capacity_16+0x116/0x410
-[   31.681765]        sd_revalidate_disk.isra.0+0x54d/0x2f00
-[   31.682044]        sd_probe+0x2ec/0x520
-[   31.682238]        really_probe+0xd3/0x390
-[   31.682445]        __driver_probe_device+0x78/0x150
-[   31.682682]        driver_probe_device+0x1f/0x90
-[   31.682908]        __device_attach_driver+0x89/0x110
-[   31.683161]        bus_for_each_drv+0x95/0xf0
-[   31.683377]        __device_attach_async_helper+0xa7/0xf0
-[   31.683639]        async_run_entry_fn+0x31/0x130
-[   31.683875]        process_one_work+0x212/0x700
-[   31.684100]        worker_thread+0x1ce/0x380
-[   31.684308]        kthread+0xd2/0x110
-[   31.684490]        ret_from_fork+0x31/0x50
-[   31.684700]        ret_from_fork_asm+0x1a/0x30
-[   31.684922]
-               -> #0 (&q->limits_lock){+.+.}-{3:3}:
-[   31.685499]        __lock_acquire+0x15c0/0x23e0
-[   31.685872]        lock_acquire+0xd8/0x300
-[   31.686207]        __mutex_lock+0xad/0xb20
-[   31.686535]        queue_wc_store+0x8e/0x180
-[   31.686877]        queue_attr_store+0x84/0xc0
-[   31.687231]        kernfs_fop_write_iter+0x15c/0x210
-[   31.687594]        vfs_write+0x2a7/0x540
-[   31.687907]        ksys_write+0x75/0x100
-[   31.688219]        do_syscall_64+0x95/0x180
-[   31.688534]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   31.688910]
-               other info that might help us debug this:
-
-[   31.689621] Chain exists of:
-                 &q->limits_lock --> &q->q_usage_counter(queue)#2 --> &q->sysfs_lock
-
-[   31.690549]  Possible unsafe locking scenario:
-
-[   31.691060]        CPU0                    CPU1
-[   31.691389]        ----                    ----
-[   31.691716]   lock(&q->sysfs_lock);
-[   31.691999]                                lock(&q->q_usage_counter(queue)#2);
-[   31.692460]                                lock(&q->sysfs_lock);
-[   31.692863]   lock(&q->limits_lock);
-[   31.693155]
-                *** DEADLOCK ***
-
-[   31.693746] 6 locks held by bash/1425:
-[   31.694043]  #0: ffff990b8007e420 (sb_writers#4){.+.+}-{0:0}, at: ksys_write+0x75/0x100
-[   31.694543]  #1: ffff990bcf1a3288 (&of->mutex#2){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x115/0x210
-[   31.695119]  #2: ffff990b91888378 (kn->active#166){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x11e/0x210
-[   31.695685]  #3: ffff990b8ea26ee8 (&q->q_usage_counter(io)#2){++++}-{0:0}, at: queue_attr_store+0x60/0xc0
-[   31.696269]  #4: ffff990b8ea26f20 (&q->q_usage_counter(queue)#2){++++}-{0:0}, at: queue_attr_store+0x60/0xc0
-[   31.696846]  #5: ffff990b8ea27410 (&q->sysfs_lock){+.+.}-{3:3}, at: queue_attr_store+0x75/0xc0
-[   31.697381]
-               stack backtrace:
-[   31.697826] CPU: 9 UID: 0 PID: 1425 Comm: bash Not tainted 6.11.0_nbd+ #411
-[   31.698285] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-1.fc39 04/01/2014
-[   31.698807] Call Trace:
-[   31.699058]  <TASK>
-[   31.699289]  dump_stack_lvl+0x93/0xf0
-[   31.699598]  print_circular_bug+0x26e/0x340
-[   31.699924]  check_noncircular+0x16c/0x190
-[   31.700251]  ? lock_acquire+0x2a1/0x300
-[   31.700561]  __lock_acquire+0x15c0/0x23e0
-[   31.700877]  lock_acquire+0xd8/0x300
-[   31.701181]  ? queue_wc_store+0x8e/0x180
-[   31.701502]  __mutex_lock+0xad/0xb20
-[   31.701806]  ? queue_wc_store+0x8e/0x180
-[   31.702128]  ? queue_wc_store+0x8e/0x180
-[   31.702446]  ? queue_wc_store+0x8e/0x180
-[   31.702761]  queue_wc_store+0x8e/0x180
-[   31.703084]  ? __mutex_lock+0xad/0xb20
-[   31.703385]  ? __mutex_lock+0x6e4/0xb20
-[   31.703691]  ? mark_held_locks+0x40/0x70
-[   31.704004]  ? queue_attr_store+0x75/0xc0
-[   31.704317]  queue_attr_store+0x84/0xc0
-[   31.704643]  kernfs_fop_write_iter+0x15c/0x210
-[   31.704987]  vfs_write+0x2a7/0x540
-[   31.705274]  ksys_write+0x75/0x100
-[   31.705559]  do_syscall_64+0x95/0x180
-[   31.705864]  ? do_user_addr_fault+0x361/0x790
-[   31.706239]  ? trace_hardirqs_off+0x4b/0xc0
-[   31.706564]  ? clear_bhb_loop+0x25/0x80
-[   31.706966]  ? clear_bhb_loop+0x25/0x80
-[   31.707272]  ? clear_bhb_loop+0x25/0x80
-[   31.707568]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[   31.707927] RIP: 0033:0x7fb69d85e174
-[   31.708227] Code: 89 02 48 c7 c0 ff ff ff ff eb bd 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 80 3d 6d b4 0d 00 00 74 13 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 55 48 89 e5 48 83 ec 20 48 89
-[   31.709343] RSP: 002b:00007ffed933fb48 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
-[   31.709834] RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007fb69d85e174
-[   31.710311] RDX: 0000000000000005 RSI: 000055713d6fb7d0 RDI: 0000000000000001
-[   31.710779] RBP: 00007ffed933fb70 R08: 0000000000000073 R09: 0000000000000001
-[   31.711263] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000005
-[   31.711755] R13: 000055713d6fb7d0 R14: 00007fb69d932780 R15: 0000000000000005
-[   31.712242]  </TASK>
-
-[1] occasional block layer hang when setting 'echo noop > /sys/block/sda/queue/scheduler'
-https://bugzilla.kernel.org/show_bug.cgi?id=219166
-
-[2] del_gendisk() vs blk_queue_enter() race condition
-https://lore.kernel.org/linux-block/20241003085610.GK11458@google.com/
-
-[3] queue_freeze & queue_enter deadlock in scsi
-https://lore.kernel.org/linux-block/ZxG38G9BuFdBpBHZ@fedora/T/#u
-
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c       | 18 ++++++++++++++++--
- block/blk-mq.c         | 26 ++++++++++++++++++++++----
- block/blk.h            | 29 ++++++++++++++++++++++++++---
- block/genhd.c          | 15 +++++++++++----
- include/linux/blkdev.h |  6 ++++++
- 5 files changed, 81 insertions(+), 13 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index bc5e8c5eaac9..09d10bb95fda 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -261,6 +261,8 @@ static void blk_free_queue(struct request_queue *q)
- 		blk_mq_release(q);
- 
- 	ida_free(&blk_queue_ida, q->id);
-+	lockdep_unregister_key(&q->io_lock_cls_key);
-+	lockdep_unregister_key(&q->q_lock_cls_key);
- 	call_rcu(&q->rcu_head, blk_free_queue_rcu);
- }
- 
-@@ -278,18 +280,20 @@ void blk_put_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL(blk_put_queue);
- 
--void blk_queue_start_drain(struct request_queue *q)
-+bool blk_queue_start_drain(struct request_queue *q)
- {
- 	/*
- 	 * When queue DYING flag is set, we need to block new req
- 	 * entering queue, so we call blk_freeze_queue_start() to
- 	 * prevent I/O from crossing blk_queue_enter().
- 	 */
--	blk_freeze_queue_start(q);
-+	bool freeze = __blk_freeze_queue_start(q);
- 	if (queue_is_mq(q))
- 		blk_mq_wake_waiters(q);
- 	/* Make blk_queue_enter() reexamine the DYING flag. */
- 	wake_up_all(&q->mq_freeze_wq);
-+
-+	return freeze;
- }
- 
- /**
-@@ -321,6 +325,8 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 			return -ENODEV;
- 	}
- 
-+	rwsem_acquire_read(&q->q_lockdep_map, 0, 0, _RET_IP_);
-+	rwsem_release(&q->q_lockdep_map, _RET_IP_);
- 	return 0;
- }
- 
-@@ -352,6 +358,8 @@ int __bio_queue_enter(struct request_queue *q, struct bio *bio)
- 			goto dead;
- 	}
- 
-+	rwsem_acquire_read(&q->io_lockdep_map, 0, 0, _RET_IP_);
-+	rwsem_release(&q->io_lockdep_map, _RET_IP_);
- 	return 0;
- dead:
- 	bio_io_error(bio);
-@@ -441,6 +449,12 @@ struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id)
- 				PERCPU_REF_INIT_ATOMIC, GFP_KERNEL);
- 	if (error)
- 		goto fail_stats;
-+	lockdep_register_key(&q->io_lock_cls_key);
-+	lockdep_register_key(&q->q_lock_cls_key);
-+	lockdep_init_map(&q->io_lockdep_map, "&q->q_usage_counter(io)",
-+			 &q->io_lock_cls_key, 0);
-+	lockdep_init_map(&q->q_lockdep_map, "&q->q_usage_counter(queue)",
-+			 &q->q_lock_cls_key, 0);
- 
- 	q->nr_requests = BLKDEV_DEFAULT_RQ;
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2c84c2d2510d..60c58142819e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -120,17 +120,29 @@ void blk_mq_in_flight_rw(struct request_queue *q, struct block_device *part,
- 	inflight[1] = mi.inflight[1];
- }
- 
--void blk_freeze_queue_start(struct request_queue *q)
-+bool __blk_freeze_queue_start(struct request_queue *q)
- {
-+	int freeze;
-+
- 	mutex_lock(&q->mq_freeze_lock);
- 	if (++q->mq_freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
- 		mutex_unlock(&q->mq_freeze_lock);
- 		if (queue_is_mq(q))
- 			blk_mq_run_hw_queues(q, false);
-+		freeze = true;
- 	} else {
- 		mutex_unlock(&q->mq_freeze_lock);
-+		freeze = false;
- 	}
-+
-+	return freeze;
-+}
-+
-+void blk_freeze_queue_start(struct request_queue *q)
-+{
-+	if (__blk_freeze_queue_start(q))
-+		blk_freeze_acquire_lock(q, false, false);
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
- 
-@@ -176,8 +188,10 @@ void blk_mq_freeze_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue);
- 
--void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
-+bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- {
-+	int unfreeze = false;
-+
- 	mutex_lock(&q->mq_freeze_lock);
- 	if (force_atomic)
- 		q->q_usage_counter.data->force_atomic = true;
-@@ -186,13 +200,17 @@ void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- 	if (!q->mq_freeze_depth) {
- 		percpu_ref_resurrect(&q->q_usage_counter);
- 		wake_up_all(&q->mq_freeze_wq);
-+		unfreeze = true;
- 	}
- 	mutex_unlock(&q->mq_freeze_lock);
-+
-+	return unfreeze;
- }
- 
- void blk_mq_unfreeze_queue(struct request_queue *q)
- {
--	__blk_mq_unfreeze_queue(q, false);
-+	if (__blk_mq_unfreeze_queue(q, false))
-+		blk_unfreeze_release_lock(q, false, false);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
- 
-@@ -204,7 +222,7 @@ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
-  */
- void blk_freeze_queue_start_non_owner(struct request_queue *q)
- {
--	blk_freeze_queue_start(q);
-+	__blk_freeze_queue_start(q);
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start_non_owner);
- 
-diff --git a/block/blk.h b/block/blk.h
-index c718e4291db0..832e54c5a271 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/bio-integrity.h>
- #include <linux/blk-crypto.h>
-+#include <linux/lockdep.h>
- #include <linux/memblock.h>	/* for max_pfn/max_low_pfn */
- #include <linux/sched/sysctl.h>
- #include <linux/timekeeping.h>
-@@ -35,8 +36,9 @@ struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
- void blk_free_flush_queue(struct blk_flush_queue *q);
- 
- void blk_freeze_queue(struct request_queue *q);
--void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
--void blk_queue_start_drain(struct request_queue *q);
-+bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
-+bool blk_queue_start_drain(struct request_queue *q);
-+bool __blk_freeze_queue_start(struct request_queue *q);
- int __bio_queue_enter(struct request_queue *q, struct bio *bio);
- void submit_bio_noacct_nocheck(struct bio *bio);
- void bio_await_chain(struct bio *bio);
-@@ -69,8 +71,11 @@ static inline int bio_queue_enter(struct bio *bio)
- {
- 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
- 
--	if (blk_try_enter_queue(q, false))
-+	if (blk_try_enter_queue(q, false)) {
-+		rwsem_acquire_read(&q->io_lockdep_map, 0, 0, _RET_IP_);
-+		rwsem_release(&q->io_lockdep_map, _RET_IP_);
- 		return 0;
-+	}
- 	return __bio_queue_enter(q, bio);
- }
- 
-@@ -734,4 +739,22 @@ void blk_integrity_verify(struct bio *bio);
- void blk_integrity_prepare(struct request *rq);
- void blk_integrity_complete(struct request *rq, unsigned int nr_bytes);
- 
-+static inline void blk_freeze_acquire_lock(struct request_queue *q, bool
-+		disk_dead, bool queue_dying)
-+{
-+	if (!disk_dead)
-+		rwsem_acquire(&q->io_lockdep_map, 0, 1, _RET_IP_);
-+	if (!queue_dying)
-+		rwsem_acquire(&q->q_lockdep_map, 0, 1, _RET_IP_);
-+}
-+
-+static inline void blk_unfreeze_release_lock(struct request_queue *q, bool
-+		disk_dead, bool queue_dying)
-+{
-+	if (!queue_dying)
-+		rwsem_release(&q->q_lockdep_map, _RET_IP_);
-+	if (!disk_dead)
-+		rwsem_release(&q->io_lockdep_map, _RET_IP_);
-+}
-+
- #endif /* BLK_INTERNAL_H */
-diff --git a/block/genhd.c b/block/genhd.c
-index 1c05dd4c6980..6ad3fcde0110 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -581,13 +581,13 @@ static void blk_report_disk_dead(struct gendisk *disk, bool surprise)
- 	rcu_read_unlock();
- }
- 
--static void __blk_mark_disk_dead(struct gendisk *disk)
-+static bool __blk_mark_disk_dead(struct gendisk *disk)
- {
- 	/*
- 	 * Fail any new I/O.
- 	 */
- 	if (test_and_set_bit(GD_DEAD, &disk->state))
--		return;
-+		return false;
- 
- 	if (test_bit(GD_OWNS_QUEUE, &disk->state))
- 		blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue);
-@@ -600,7 +600,7 @@ static void __blk_mark_disk_dead(struct gendisk *disk)
- 	/*
- 	 * Prevent new I/O from crossing bio_queue_enter().
- 	 */
--	blk_queue_start_drain(disk->queue);
-+	return blk_queue_start_drain(disk->queue);
- }
- 
- /**
-@@ -641,6 +641,7 @@ void del_gendisk(struct gendisk *disk)
- 	struct request_queue *q = disk->queue;
- 	struct block_device *part;
- 	unsigned long idx;
-+	bool start_drain, queue_dying;
- 
- 	might_sleep();
- 
-@@ -668,7 +669,10 @@ void del_gendisk(struct gendisk *disk)
- 	 * Drop all partitions now that the disk is marked dead.
- 	 */
- 	mutex_lock(&disk->open_mutex);
--	__blk_mark_disk_dead(disk);
-+	start_drain = __blk_mark_disk_dead(disk);
-+	queue_dying = blk_queue_dying(q);
-+	if (start_drain)
-+		blk_freeze_acquire_lock(q, true, queue_dying);
- 	xa_for_each_start(&disk->part_tbl, idx, part, 1)
- 		drop_partition(part);
- 	mutex_unlock(&disk->open_mutex);
-@@ -725,6 +729,9 @@ void del_gendisk(struct gendisk *disk)
- 		if (queue_is_mq(q))
- 			blk_mq_exit_queue(q);
- 	}
-+
-+	if (start_drain)
-+		blk_unfreeze_release_lock(q, true, queue_dying);
- }
- EXPORT_SYMBOL(del_gendisk);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 50c3b959da28..57f1ee386b57 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -25,6 +25,7 @@
- #include <linux/uuid.h>
- #include <linux/xarray.h>
- #include <linux/file.h>
-+#include <linux/lockdep.h>
- 
- struct module;
- struct request_queue;
-@@ -471,6 +472,11 @@ struct request_queue {
- 	struct xarray		hctx_table;
- 
- 	struct percpu_ref	q_usage_counter;
-+	struct lock_class_key	io_lock_cls_key;
-+	struct lockdep_map	io_lockdep_map;
-+
-+	struct lock_class_key	q_lock_cls_key;
-+	struct lockdep_map	q_lockdep_map;
- 
- 	struct request		*last_merge;
- 
--- 
-2.46.0
+Thanks,
+John
 
