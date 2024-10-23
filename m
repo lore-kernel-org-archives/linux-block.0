@@ -1,27 +1,27 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B15C139E;
-	Wed, 23 Oct 2024 03:42:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9144503C;
+	Wed, 23 Oct 2024 03:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729654958; cv=none; b=dwgRm/TDXKA05GTbXhwqehJ8Ey37sZHjCSX9wMaCXMI2pslKCgBNAksJhZ51xcimpIWjKHw6xX8MhGXj28JjqcqrvG01PF2S1tul59qo3JYYV4yWaw8U6QuBIinCKgapfDf3SzLVgTk2+3Dr2gXLnokfh+UTR19mOKLnkpW9GyY=
+	t=1729655112; cv=none; b=GA50O4utUbk2ke/hjuO9jLOelwnUZSLDCX13sLxWr4RVKY+a7ijlo5vM9VykDaf8yYUPnHeB6bfx6+rt42kSvl64G9TN4JKOLC4PChfQmldXGXVO3ldKh3THL1rv8euEQgbjm1cVb0PCD5Qql69pW/ZAbcL+IRBiC7ta+YTUNkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729654958; c=relaxed/simple;
-	bh=28Cy+6s/ss0dY2uMRJvrIed0vyGPiWbChvb7TVYNKYM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=G/TCODbZwVW2qT4BnZ0sKwY4p/Iu5oNSgv63VuikYqKxZPBwUkNpRJUep+wbPQKTjgu1mqf/Vt0VRxtliMtnEkzI6AzqUNJJOGQUoWpr+pftEb1v40LFLp7UObzrQiWJIVNmpw/sES9IpJ6Ns0VfdiwdLQvEIgZ2EbpuG5Wtpi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	s=arc-20240116; t=1729655112; c=relaxed/simple;
+	bh=q1Cgk3EdRlCGwIGlFpSmls1eqESzBShWIedpv5+4V00=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=O6C1luaIbFAdkzMxy+eJpw0WAcYlTcrFGOw3MYtQqs0ze142cD9LamugzGKgJBJuFmlUaDh7JaK5YMkoyZNpXUv9gJNd7zqXF+I63qSLEf9eokBX9BV1jpENpa3K7GipelawEWr9ZCH4p61Mq/u684rjUzZm/i4wA5zZksf51iI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4XYFGs032sz4f3jcs;
-	Wed, 23 Oct 2024 11:42:13 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XYFKq1WdVz4f3k6H;
+	Wed, 23 Oct 2024 11:44:47 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 6974D1A018C;
-	Wed, 23 Oct 2024 11:42:30 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 806D11A058E;
+	Wed, 23 Oct 2024 11:44:59 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgCHusaicBhnUCB2Ew--.20884S4;
-	Wed, 23 Oct 2024 11:42:28 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgD3LMk6cRhnKkt2Ew--.63539S4;
+	Wed, 23 Oct 2024 11:44:59 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: stable@vger.kernel.org,
 	gregkh@linuxfoundation.org,
@@ -32,9 +32,9 @@ Cc: linux-block@vger.kernel.org,
 	yukuai1@huaweicloud.com,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com
-Subject: [PATCH 6.1] block, bfq: fix procress reference leakage for bfqq in merge chain
-Date: Wed, 23 Oct 2024 11:39:50 +0800
-Message-Id: <20241023033950.3950039-1-yukuai1@huaweicloud.com>
+Subject: [PATCH 5.15] block, bfq: fix procress reference leakage for bfqq in merge chain
+Date: Wed, 23 Oct 2024 11:42:22 +0800
+Message-Id: <20241023034222.3997079-1-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -44,23 +44,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCHusaicBhnUCB2Ew--.20884S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxZw4xtr4UAw4rWF45ZFyrJFb_yoWruFWrpa
-	13ta13Ar1xXr45Wry7Jr4UZ3WFkr1fA39rtF9aq34kJr1DArnrtF1vvw18ZFyIqrZ5uwsx
+X-CM-TRANSID:gCh0CgD3LMk6cRhnKkt2Ew--.63539S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxZw4xtr4UAw4rWF4rJF17Awb_yoWruFWrpa
+	13ta1fAr1xXr45Wr17Jr4UZ3WFkr1fJ39rtF9aq34kJr1DArnrtF1qyw18ZF92qrZ5uw43
 	Xr10qr97Jr17JFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
-	tVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUU
-	UU=
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUFg4SDU
+	UUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
@@ -121,10 +121,10 @@ Signed-off-by: Jens Axboe <axboe@kernel.dk>
  1 file changed, 17 insertions(+), 20 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index bfce6343a577..8e797782cfe3 100644
+index b0bdb5197530..c985c944fa65 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -3117,10 +3117,12 @@ void bfq_release_process_ref(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+@@ -2981,10 +2981,12 @@ void bfq_release_process_ref(struct bfq_data *bfqd, struct bfq_queue *bfqq)
  	bfq_put_queue(bfqq);
  }
  
@@ -140,7 +140,7 @@ index bfce6343a577..8e797782cfe3 100644
  	bfq_log_bfqq(bfqd, bfqq, "merging with queue %lu",
  		(unsigned long)new_bfqq->pid);
  	/* Save weight raising and idle window of the merged queues */
-@@ -3214,6 +3216,8 @@ bfq_merge_bfqqs(struct bfq_data *bfqd, struct bfq_io_cq *bic,
+@@ -3078,6 +3080,8 @@ bfq_merge_bfqqs(struct bfq_data *bfqd, struct bfq_io_cq *bic,
  	bfq_reassign_last_bfqq(bfqq, new_bfqq);
  
  	bfq_release_process_ref(bfqd, bfqq);
@@ -149,7 +149,7 @@ index bfce6343a577..8e797782cfe3 100644
  }
  
  static bool bfq_allow_bio_merge(struct request_queue *q, struct request *rq,
-@@ -3249,14 +3253,8 @@ static bool bfq_allow_bio_merge(struct request_queue *q, struct request *rq,
+@@ -3113,14 +3117,8 @@ static bool bfq_allow_bio_merge(struct request_queue *q, struct request *rq,
  		 * fulfilled, i.e., bic can be redirected to new_bfqq
  		 * and bfqq can be put.
  		 */
@@ -166,7 +166,7 @@ index bfce6343a577..8e797782cfe3 100644
  
  		/*
  		 * Change also bqfd->bio_bfqq, as
-@@ -5616,9 +5614,7 @@ bfq_do_early_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+@@ -5482,9 +5480,7 @@ bfq_do_early_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
  	 * state before killing it.
  	 */
  	bfqq->bic = bic;
@@ -177,7 +177,7 @@ index bfce6343a577..8e797782cfe3 100644
  }
  
  /*
-@@ -6066,6 +6062,7 @@ static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
+@@ -5916,6 +5912,7 @@ static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
  	bool waiting, idle_timer_disabled = false;
  
  	if (new_bfqq) {
@@ -185,7 +185,7 @@ index bfce6343a577..8e797782cfe3 100644
  		/*
  		 * Release the request's reference to the old bfqq
  		 * and make sure one is taken to the shared queue.
-@@ -6081,18 +6078,18 @@ static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
+@@ -5931,18 +5928,18 @@ static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
  		 * then complete the merge and redirect it to
  		 * new_bfqq.
  		 */
