@@ -1,141 +1,149 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29BE1DFEF;
-	Wed, 23 Oct 2024 13:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1E1DE56A
+	for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 13:48:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729689989; cv=none; b=Wr2rlIfuEYqTpJLgqrqtuANG+fNFRykLwBzeklO1eUrIhoBoACIW0+zOizt+uGiuCCqc8Y9cYGHuziyiG+1L5bBZJSkjdlttTlA/G2Uy0JY4y38Mhq0yudAXUvM49EvbjlMl8BJhLpqVx+C0ZTWGjcxMhrdKfyH5XaLxyHQpgDo=
+	t=1729691320; cv=none; b=B6+AkFnvW9lFKSD2X5pYj3yZ90eaw9K4Uls5GSjn0oTlx+VdDPl/pZIEjjuCI22Xeq25aV8VeCi6HFLRKWaLb5FWktvVWbeyFrWh0RcSKTemUPQU3YKI8dO2ilbU2aBXkTlUpSAD5z/pFHTWmInURATaRZhuxwKYe8IYv1PaVn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729689989; c=relaxed/simple;
-	bh=C3erVz82tfNvDb362fEzo83f3STSjhuRqLUdPl8pVjA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eYSO7YOquVhE+5Rhr1aT33/y2bIsG80ty9AsWdZNnWjdzYd2B83YRT4aLgqzpSepRKcIFEDBulXMTiCESBf5qErwmKi57XW0GO4yO2sOQ8W66GYzezPKgpO2iVk9xmjeC7tnrOMlaAgC/SpqcXmL6JtTM/Rd2FmHlkqn6jabqIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MW5gKwLG; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1729691320; c=relaxed/simple;
+	bh=XIGajH1WfcU2vrjwHWK3Ps8Yjlrjs5GemtdLFAHQzlM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GmBtD4VQuJ3ciGypyEe5a+/FMbBH0D7C6FJACTSURU7rwvNBbej+yBWYmfEYQ/gczAuPzXZuSYQiUM1KFqxufnLFijITTbrxuhyMgudgFUMvz1Dl8f7G4GQVyd4H3v5b88r984KtS5uQOCMLfYE5qQaQJPpl3A0KGDrwLVUe7WY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=f1js9bWK; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MW5gKwLG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729689988; x=1761225988;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=C3erVz82tfNvDb362fEzo83f3STSjhuRqLUdPl8pVjA=;
-  b=MW5gKwLGd3/hVbHDgOr/naUuUIeZaxfuUIT3wBR7nPwP5FuI2XfKKTMW
-   HLwUYe5QtWPP+mdTZepL8b/TT6qwYYhFQiFmRlY4Hgd3IYhyUrXlMoo6o
-   +I+OgG3Ub1Awjhzm46PMzrrkL38zGvsdyqtNCwBThafqz2u2vhD8qxpgs
-   5jIg/dpg9MTtMI0RrYGeDM4DROl6+ZjwMArHfJnXS6P0hkNfHPMrT6Ajo
-   nXaoVI911m6nFlmQu3FZv0nxwSsI2LQ3kfEQk2KjQQz9l65XKc9SfGLBP
-   gdkP1hxmwSwH/E1wFNp1e141VQW9ECl3wSdKQQMfFAnkY0yLPM1vBnWmt
-   g==;
-X-CSE-ConnectionGUID: DYpVvpdGRDSqyHL3NSDNiw==
-X-CSE-MsgGUID: b5r5qST8QkGqLXQbJQPDSQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11234"; a="29379235"
-X-IronPort-AV: E=Sophos;i="6.11,226,1725346800"; 
-   d="scan'208";a="29379235"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 06:26:26 -0700
-X-CSE-ConnectionGUID: plTvsQr6RXaYNMZDiCfKTA==
-X-CSE-MsgGUID: GBzCtDPZRj6v+kkMbkUc5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,226,1725346800"; 
-   d="scan'208";a="110993727"
-Received: from lfiedoro-mobl.ger.corp.intel.com ([10.245.246.76])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2024 06:26:24 -0700
-Message-ID: <fa2bc7e5088fd309d846a57edf06520dc83632ba.camel@linux.intel.com>
-Subject: Re: [PATCHv2 2/2] blk-mq: add support for CPU latency limits
-From: Tero Kristo <tero.kristo@linux.intel.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: hch@lst.de, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Wed, 23 Oct 2024 16:26:21 +0300
-In-Reply-To: <cb9d65fe-47b9-4539-a8d0-9863e8ebf49f@kernel.dk>
-References: <20241018075416.436916-1-tero.kristo@linux.intel.com>
-	 <20241018075416.436916-3-tero.kristo@linux.intel.com>
-	 <cb9d65fe-47b9-4539-a8d0-9863e8ebf49f@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="f1js9bWK"
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-8323b555a6aso399587139f.3
+        for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 06:48:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729691317; x=1730296117; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gEIqUzGMIrBpPH9lAOie9M7I6NLNlESkw5pvksDp/zQ=;
+        b=f1js9bWKIoStim4CfGFIp/8NuG704qhWEsFAA3GFSiVZjYGrIq0bZv1ATgF48qNWSr
+         UQAT2YxcxMvVDDx+WAUWaNRcgD0lmTXfFji88vICfrCWWWlVMH1Gd8ffZpn2A2KDPe9E
+         0yIebbYS+ZbDqwiYIC83fhwmwhdymlH7wZi0lUJwv0bK5nCghtj65oKvicQHB8mjzF8A
+         P27M0zrnc4DsJ4F+tAOs46Lyw0qWGX54UmCLVBXax0DqfXxwz2SfCSYr0ClTebYdxSEL
+         4CYuzEtMpD1LjJGR0bwFUkmaIX7AQnqjI+vKFZB7NY0r+K95BuFKeYfw06bIQyKpEI91
+         uL5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729691317; x=1730296117;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gEIqUzGMIrBpPH9lAOie9M7I6NLNlESkw5pvksDp/zQ=;
+        b=Ex46PrhBn6fnBD0yziVsavmjsAkXU+d0CPyAomF8PQxTH/zslah/LNNkrErwgK11O+
+         f8ZSpA1qlq0KMeQPNSZm8COrnPgpxd6+U+FQlwLIVK++t7u7jEDld6Yr+jh8ibaJOYym
+         PaUCB1edaGtsAnQK5jcHSfQxrwjf1+qCyCLWh5y2gj9qf/oV3vHs/sq0IH3dhI55U9Js
+         gmZVlvZMOzqOvKVVnq+eHkF+R64k4xcKW7YRstxmqn0XEf1U2Kyew0NWpjkRudxzBacY
+         YxMgbd9Rg4oz3W34ea90J9z3v5V3DOAcsVocBqopa2Gpvmt0OmanrLN66IrJ59h2DOck
+         p6ug==
+X-Forwarded-Encrypted: i=1; AJvYcCXcturPRa9GD/CISNre1OFFN48V+vLVWn3m6W/QwOQApf9zB4rWOzM6BLWmg6J/V5Sm/f1CVWULEFYKag==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxyw4csXqCAPdzzGsdnHyKOxAedbhsL6vbpr/8x5tas1qgfUi1A
+	y22WOoZMPK1FgbRb3aHjuAU5a1KdGuQIfeTCG9VMvV/2ebi46UYAN+Usk4vdHPhOyI8FvuqX4ie
+	n
+X-Google-Smtp-Source: AGHT+IHzPfoXN73PCw1LM7z9gdgS3t3XCwcu2wJWjvpKYFx7Doynd8Jdu5IggzzFdQsBoQxTRaKfqA==
+X-Received: by 2002:a05:6602:14c7:b0:83a:b881:7abe with SMTP id ca18e2360f4ac-83af63ebc86mr286739739f.14.1729691316627;
+        Wed, 23 Oct 2024 06:48:36 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc2a556f58sm2040691173.42.2024.10.23.06.48.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Oct 2024 06:48:36 -0700 (PDT)
+Message-ID: <f8ff8b69-f4d0-40d4-a2c5-b5bfeb973c71@kernel.dk>
+Date: Wed, 23 Oct 2024 07:48:35 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 2/2] blk-mq: add support for CPU latency limits
+To: Tero Kristo <tero.kristo@linux.intel.com>
+Cc: hch@lst.de, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241018075416.436916-1-tero.kristo@linux.intel.com>
+ <20241018075416.436916-3-tero.kristo@linux.intel.com>
+ <cb9d65fe-47b9-4539-a8d0-9863e8ebf49f@kernel.dk>
+ <fa2bc7e5088fd309d846a57edf06520dc83632ba.camel@linux.intel.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <fa2bc7e5088fd309d846a57edf06520dc83632ba.camel@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, 2024-10-18 at 08:21 -0600, Jens Axboe wrote:
-> On 10/18/24 1:30 AM, Tero Kristo wrote:
-> > @@ -2700,11 +2701,62 @@ static void blk_mq_plug_issue_direct(struct
-> > blk_plug *plug)
-> > =C2=A0static void __blk_mq_flush_plug_list(struct request_queue *q,
-> > =C2=A0				=C2=A0=C2=A0=C2=A0=C2=A0 struct blk_plug *plug)
-> > =C2=A0{
-> > +	struct request *req, *next;
-> > +	struct blk_mq_hw_ctx *hctx;
-> > +	int cpu;
-> > +
-> > =C2=A0	if (blk_queue_quiesced(q))
-> > =C2=A0		return;
-> > +
-> > +	rq_list_for_each_safe(&plug->mq_list, req, next) {
-> > +		hctx =3D req->mq_hctx;
-> > +
-> > +		if (next && next->mq_hctx =3D=3D hctx)
-> > +			continue;
-> > +
-> > +		if (q->disk->cpu_lat_limit < 0)
-> > +			continue;
-> > +
-> > +		hctx->last_active =3D jiffies + msecs_to_jiffies(q-
-> > >disk->cpu_lat_timeout);
-> > +
-> > +		if (!hctx->cpu_lat_limit_active) {
-> > +			hctx->cpu_lat_limit_active =3D true;
-> > +			for_each_cpu(cpu, hctx->cpumask) {
-> > +				struct dev_pm_qos_request *qos;
-> > +
-> > +				qos =3D per_cpu_ptr(hctx-
-> > >cpu_lat_qos, cpu);
-> > +				dev_pm_qos_add_request(get_cpu_dev
-> > ice(cpu), qos,
-> > +						=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
-> > DEV_PM_QOS_RESUME_LATENCY,
-> > +						=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 q->disk-
-> > >cpu_lat_limit);
-> > +			}
-> > +			schedule_delayed_work(&hctx-
-> > >cpu_latency_work,
-> > +					=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 msecs_to_jiffies(q-
-> > >disk->cpu_lat_timeout));
-> > +		}
-> > +	}
-> > +
->=20
-> This is, quite literally, and insane amount of cycles to add to the
-> hot
-> issue path. You're iterating each request in the list, and then each
-> CPU
-> in the mask of the hardware context for each request.
+On 10/23/24 7:26 AM, Tero Kristo wrote:
+> On Fri, 2024-10-18 at 08:21 -0600, Jens Axboe wrote:
+>> On 10/18/24 1:30 AM, Tero Kristo wrote:
+>>> @@ -2700,11 +2701,62 @@ static void blk_mq_plug_issue_direct(struct
+>>> blk_plug *plug)
+>>>  static void __blk_mq_flush_plug_list(struct request_queue *q,
+>>>  				     struct blk_plug *plug)
+>>>  {
+>>> +	struct request *req, *next;
+>>> +	struct blk_mq_hw_ctx *hctx;
+>>> +	int cpu;
+>>> +
+>>>  	if (blk_queue_quiesced(q))
+>>>  		return;
+>>> +
+>>> +	rq_list_for_each_safe(&plug->mq_list, req, next) {
+>>> +		hctx = req->mq_hctx;
+>>> +
+>>> +		if (next && next->mq_hctx == hctx)
+>>> +			continue;
+>>> +
+>>> +		if (q->disk->cpu_lat_limit < 0)
+>>> +			continue;
+>>> +
+>>> +		hctx->last_active = jiffies + msecs_to_jiffies(q-
+>>>> disk->cpu_lat_timeout);
+>>> +
+>>> +		if (!hctx->cpu_lat_limit_active) {
+>>> +			hctx->cpu_lat_limit_active = true;
+>>> +			for_each_cpu(cpu, hctx->cpumask) {
+>>> +				struct dev_pm_qos_request *qos;
+>>> +
+>>> +				qos = per_cpu_ptr(hctx-
+>>>> cpu_lat_qos, cpu);
+>>> +				dev_pm_qos_add_request(get_cpu_dev
+>>> ice(cpu), qos,
+>>> +						      
+>>> DEV_PM_QOS_RESUME_LATENCY,
+>>> +						       q->disk-
+>>>> cpu_lat_limit);
+>>> +			}
+>>> +			schedule_delayed_work(&hctx-
+>>>> cpu_latency_work,
+>>> +					      msecs_to_jiffies(q-
+>>>> disk->cpu_lat_timeout));
+>>> +		}
+>>> +	}
+>>> +
+>>
+>> This is, quite literally, and insane amount of cycles to add to the
+>> hot
+>> issue path. You're iterating each request in the list, and then each
+>> CPU
+>> in the mask of the hardware context for each request.
+> 
+> Ok, I made some optimizations to the code, sending v3 shortly. In this,
+> all the PM QoS handling and iteration of lists is moved to the
+> workqueue, and happens in the background. The initial block requests
+> (until the workqueue fires) may run with higher latency, but that is
+> most likely an okay compromise.
+> 
+> PS: Please bear with me, my knowledge of the block layer and/or NVMe is
+> pretty limited. I am sorry if these patches make you frustrated, that
+> is not my intention.
 
-Ok, I made some optimizations to the code, sending v3 shortly. In this,
-all the PM QoS handling and iteration of lists is moved to the
-workqueue, and happens in the background. The initial block requests
-(until the workqueue fires) may run with higher latency, but that is
-most likely an okay compromise.
+That's fine, but I'd much rather you ask for clarification if there's
+something that you don't understand, rather than keep adding really
+expensive code to the issue path. Pushing the iteration to the workqueue
+indeed sounds like the much better approach.
 
-PS: Please bear with me, my knowledge of the block layer and/or NVMe is
-pretty limited. I am sorry if these patches make you frustrated, that
-is not my intention.
-
--Tero
-
->=20
-> This just won't fly, not at all. Like the previous feedback, please
-> figure out a way to make this cheaper. This means don't iterate a
-> bunch
-> of stuff.
->=20
-> Outside of that, lots of styling issues here too, but none of that
-> really matters until the base mechanism is at least half way sane.
->=20
-
+-- 
+Jens Axboe
