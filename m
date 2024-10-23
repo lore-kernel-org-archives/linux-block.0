@@ -1,88 +1,82 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0AEA1C6F6C
-	for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 18:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A46014EC62
+	for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 20:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729706750; cv=none; b=APdtw202S5jDiWg1kDHRFDvNQrDsPCCUGxnr9W2He4xIxMQv3LscfAupFUYa7R2x1ZjPvOv4ufc2tqvL2brGO3JEuQougaZVpnhDhr0Gr84H9kBL75PVk7egG7LoW37KIDf20XPOF2gPl/HmDqonqR3da3bioLo6xTgYH7rqvuw=
+	t=1729715338; cv=none; b=JMCc7lRCMzgqad+HVxXIrKYz0QTKdKepHZOtuks7LBW2slyFW/aie9IY++M07ls9d+1JlTRpcK58vRowDWvlTz5QL1OKpRIRZTEcI0zYxi567tWq1tXgVmeolobDKi8pgf0EIj4AaS6JQbzIrHkV/5hkMaPoiDtXTCgWxH1EtGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729706750; c=relaxed/simple;
-	bh=oEaDo2kybVFDzi/NhFITXzCPo8uFtJlRzA+ZM08Hg9M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wp277NcrOLPtV9cgDmhHAslMjTN6bfBbxIXmf7+5rtWco2X/VJ5cTglB6wO+UrefXy9BjgRwrHnIo46n2JDWoPmWxbCgyI5BUmt3c8SpDTLbL1jHfal39de1yI8AA7mJZmxOYL4R4p2HNaSCgU3qWIfvutEBI95x0sZtCFb9ZnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=XU0VKADX; arc=none smtp.client-ip=199.89.1.11
+	s=arc-20240116; t=1729715338; c=relaxed/simple;
+	bh=hNTcDabg0IyRDTQ72OSli/AH71ZJC7W1EeSe4SKGd64=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kMYp9CBj4HtWfq965/zfmAbTYbt/dspA/0Qb0mmYSDeJRsKrRFgo9wR/F/7gqA/EjV+3DlRjp0nFYUO7H96E+Wx9ZbUR2Tp2e5ArU3uFuY9y+phUEdy7fvFmNgEou6P2caUMZIG9QPKPWt0R+tD2jJq/otYi6sbXEkQyphQulAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=NjnUX7ki; arc=none smtp.client-ip=199.89.1.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="XU0VKADX"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="NjnUX7ki"
 Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4XYcRJ0G9dz6ClY9V;
-	Wed, 23 Oct 2024 18:05:48 +0000 (UTC)
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4XYgcS0F6FzlgMVX;
+	Wed, 23 Oct 2024 20:28:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1729706746; x=1732298747; bh=X1imJyw1koIR/tmRgV6cPQ5D
-	eMZfvhrj1ANBWcZYcMc=; b=XU0VKADXfJMCD9pO4sj3em4k5yoh0t0acTqppapn
-	bPGMPrP5g3jfSQ5W1z3DnfjTjBcCJkJln6W08hNgoY1Z58mUShFZfk0e17skiA4s
-	txIkahx5CN/m8igXoR/6Q/W+GdnlNym7FOj3bdsCFOsWs1tnEwlHPIFkYVahbCHQ
-	etcGyl2H6pAkup0depMEWmHBeilt3yjJoX5NlonxNsB6QHRK5S/zROZXng3pFaqJ
-	yqrwcHprsch4rN2fEoqSnv/qBP0E5m+hZMteL/t9uj6tIn4nNVZ2H88LYUMpN8NK
-	ug938pPQduT3kXXVLGofQ/9YixxNRV5qth5va79ggNlyoA==
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1729715334; x=1732307335; bh=rHr34/GqPQFevhREox8MksjSlRZ/juaa04V
+	Wer/6K7Y=; b=NjnUX7kirG/inSCWMxLO2BOP4/l5p1uoUkojk9nRqjMxR9puW1a
+	QfOD1KQODhnXaB7P7e2ybdq2E99l83aIRYlrlLMqGrQgbbhh+Gm5PIMD66lHTH8I
+	1EdezyMgRCBBAsduStvbCrUua8o5teiQBkKnBGFiXsqlRDO+QHFpWc8ysM4Ovy9+
+	O2hHMqJ+v367bvzS6+QogWMl9qkQIISQ2zoBUDrRRT+przkWC3QOO85wlM22m7ZW
+	3MwtuJhkofN46wMBegsjrpkhvXoazWq5MfnIWtusaxMWA++PvK8HHMST5+3rpUuT
+	0gbK1TTCboXSs72q0VPtwGSV23W9peJ0Ldg==
 X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id GE5pV_St0w6g; Wed, 23 Oct 2024 18:05:46 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id g_f5G4H2vERV; Wed, 23 Oct 2024 20:28:54 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4XYcRG07crz6ClY9S;
-	Wed, 23 Oct 2024 18:05:45 +0000 (UTC)
-Message-ID: <25c20682-9f37-411a-9a1d-a8009fc96909@acm.org>
-Date: Wed, 23 Oct 2024 11:05:45 -0700
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4XYgcQ0x56zlgT1K;
+	Wed, 23 Oct 2024 20:28:53 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH] blk-mq: Unexport blk_mq_flush_busy_ctxs()
+Date: Wed, 23 Oct 2024 13:28:50 -0700
+Message-ID: <20241023202850.3469279-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.47.0.105.g07ac214952-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: model freeze & enter queue as rwsem for supporting
- lockdep
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>
-References: <20241018013542.3013963-1-ming.lei@redhat.com>
- <ed9a22b7-64b7-4b83-a6c9-1269129e89d1@acm.org> <Zxis2vQgXENELBAr@fedora>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <Zxis2vQgXENELBAr@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 10/23/24 12:59 AM, Ming Lei wrote:
-> On Tue, Oct 22, 2024 at 08:05:32AM -0700, Bart Van Assche wrote:
->> On 10/17/24 6:35 PM, Ming Lei wrote:
->>>                  -> #1 (q->q_usage_counter){++++}-{0:0}:
->>
->> What code in the upstream kernel associates lockdep information
->> with a *counter*? I haven't found it. Did I perhaps overlook something?
-> 
-> Please look fs/kernfs/dir.c, and there should be more in linux kernel.
+Commit a6088845c2bf ("block: kyber: make kyber more friendly with merging=
+")
+removed the only blk_mq_flush_busy_ctxs() call from outside the block lay=
+er
+core. Hence unexport blk_mq_flush_busy_ctxs().
 
- From block/blk-core.c:
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-mq.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-	error = percpu_ref_init(&q->q_usage_counter,
-				blk_queue_usage_counter_release,
-				PERCPU_REF_INIT_ATOMIC, GFP_KERNEL);
-
-The per-cpu ref implementation occurs in the following source files: 
-include/linux/percpu-refcount.h and lib/percpu-refcount.c. It is not
-clear to me how fs/kernfs/dir.c is related to q->q_usage_counter?
-
-Thanks,
-
-Bart.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 7482e682deca..9abe6b9dd2ea 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1716,7 +1716,6 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *h=
+ctx, struct list_head *list)
+=20
+ 	sbitmap_for_each_set(&hctx->ctx_map, flush_busy_ctx, &data);
+ }
+-EXPORT_SYMBOL_GPL(blk_mq_flush_busy_ctxs);
+=20
+ struct dispatch_rq_data {
+ 	struct blk_mq_hw_ctx *hctx;
