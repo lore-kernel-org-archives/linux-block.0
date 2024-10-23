@@ -1,114 +1,95 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EAC015624D
-	for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 08:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED4D156F3F;
+	Wed, 23 Oct 2024 09:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729671293; cv=none; b=lKDSddircwoVaLnv9RjQaFBs7nL1Z4FBgyKPJhDZQTCUXc2AsLIqTpT1sE+H94nk5C+2A3wALYDWL+qaerhSXwpCCAn7URGShSc9xWRdG/CBngY6zTRrtC3O5DrKnxR7dA7vv3Gvr6vJAE5uSPaQ3ovtO1K7twwO7biJ6Ct3pK8=
+	t=1729676571; cv=none; b=fItZ6tFUGlqeBP52KllcDp7vHrQqG815g1y/02FMOH1MNPfMBHWeWTzfYGIfVEL36r9Bv38RuGdzi5/GHDHNNyWIj7gZTWb3mKe2l/rCPKcjoc2xGnjv3oAwYZQg6Vm6h1fK7IMQHxtruPFkKz9ppZq99CorfERb0bGLoZjUSyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729671293; c=relaxed/simple;
-	bh=ntLWO+iE+1gwrTbfuiL5/pgnoEjVIuVBISOtCd1ajMo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V9RivzBeCda9H8mDIuIZ1pT3yJSt9yMd3eh2x9khyo3GNv4xMw9jwb0KYUxPJo/dwitg53DpIlb1u2rGNmYvyxLEPVgh4Mf3LkYWyX+5euAU19FIX/eDqCIADD5nIOd5AYEMOujN65LymBXc6fkV5/S0nvacIusbrn5jhpyv6sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G3i5x3qm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G3i5x3qm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729671291;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B3GXfkHhVEGQSWTQWS/QZ/6RvPfNerfsebO3yq7ox3o=;
-	b=G3i5x3qmHGY8VhyATiW1XdJNmtA2icLJMu3L8dLk/2rDbxmydH96CQc/Xo43lGOgVCgu3+
-	ZZnFt/aAXCUhbreK2IC7Z9qBox5tvZvc94ZZYlIFRyZDC3CiIm2UHJKZdoe7isRBCezy8k
-	n8mn654RVoDafViyztWfhGFvNxDvfBI=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-252-N7DNoR73O8aoXheucPKUwQ-1; Wed,
- 23 Oct 2024 04:14:47 -0400
-X-MC-Unique: N7DNoR73O8aoXheucPKUwQ-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0417F1956058;
-	Wed, 23 Oct 2024 08:14:45 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.171])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7C0341956088;
-	Wed, 23 Oct 2024 08:14:39 +0000 (UTC)
-Date: Wed, 23 Oct 2024 16:14:34 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-block@vger.kernel.org,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [Regression] b1a000d3b8ec ("block: relax direct io memory
- alignment")
-Message-ID: <ZxiwaupwAkf1u8VE@fedora>
-References: <Zw6a7SlNGMlsHJ19@fedora>
- <20241016080419.GA30713@lst.de>
- <Zw958YtMExrNhUxy@fedora>
- <Zxd9XyqqA604F1Rn@arm.com>
- <20241023061233.GA2612@lst.de>
+	s=arc-20240116; t=1729676571; c=relaxed/simple;
+	bh=ZVO+m6dd2TbPk1D1NrHhok/pFrVC+SLZu4rcLUprNi0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NC2KS5Hpu6Y0JKyyB20HZl74VAAA3u0D4/ukYPSFR1Mtt2hBpaKsuPCYCfQhHkmmipaoEjaEEqN6VoSutKKEo9iuDnR/FsC+Psk+6QxpHTEIH55h2Aft/SPpuLd4VasVHuR2UcmHvODqdmT7qJlPBTAfeKIqJU1kUqINlzs6TT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5c40aea5c40so426683a12.0;
+        Wed, 23 Oct 2024 02:42:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729676568; x=1730281368;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BO4IKSBHt1Q1mT9S6U7vhhQdn4yhc4ey19Jpo4ZbbSM=;
+        b=C50gzFk+Hs1aOMxhehCOgQ+D6gSDCY9/d659E4K7fqZQ0DMoWP+CHss9tUMVaVv7tM
+         WEcFRQZFSpJ8yrLFN8aaM35wYcmeihV2vjXKkVJ+fTrTgqirKG0PDI2/pTu8Ux2c2og9
+         E9e+TJpH+6gqfKjLvnPHxsyDl7alZumRvtpW5eGwD2ZYvzBfXIIQ4d22yrLiQmmTlBMi
+         lZBpuYgmRuINn64TK3WvzLOesQd/Ia34yVy5DzffKu5pZ+9PVCFFoWdBLhUErt1WQ9GJ
+         WAgEqe/NZEW05HtTMxpewr1sWzoDezxDTvOpi6nEMBilx4zRN5A/sDYspmK/H8l5EAGe
+         qsQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXGyCArSvE6hUMkSDAw24qiBJKdXyv+QPH6qWKj7JgUuYLyMRL+0ZMMUBBwmSsudAbGx+J8+LyKZEGvgNCi@vger.kernel.org, AJvYcCXy/qbe3GAn6jHOKjUk7vWlivvTPyBF2ZK+dQGKBUUVDvuHQjQRJhA7TBAXOBaHReZ3Dsmpbsy3Cd9+wg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtBL3qNeR3LafJrnKehLH+Qr/77IaztQRy0kBb2IxfscUgvUai
+	jR7NRN3FHCSU3W9IEpF7MmC2P4xAs4rUFDLw2+5MYh4MtD1spvvcRoMwnA==
+X-Google-Smtp-Source: AGHT+IEY9r0hhRI68S05Re1NMWBeDSLewD/olC9sdYV9K4kcHMpuA1lxmq2LKhabH/W4oqe0Yo2YEw==
+X-Received: by 2002:a05:6402:1ec8:b0:5c8:a2b8:cab3 with SMTP id 4fb4d7f45d1cf-5cb8b4e5b8dmr2190463a12.4.1729676568263;
+        Wed, 23 Oct 2024 02:42:48 -0700 (PDT)
+Received: from [10.100.102.74] (89-138-78-158.bb.netvision.net.il. [89.138.78.158])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cb66c6b1d8sm4181729a12.72.2024.10.23.02.42.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Oct 2024 02:42:47 -0700 (PDT)
+Message-ID: <1a948684-aa1a-46cb-a51b-e16b1da1c358@grimberg.me>
+Date: Wed, 23 Oct 2024 12:42:46 +0300
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241023061233.GA2612@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] blk-mq: add one blk_mq_req_flags_t type to support mq
+ ctx fallback
+To: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>, zhuxiaohui <zhuxiaohui400@gmail.com>,
+ axboe@kernel.dk, kbusch@kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Zhu Xiaohui <zhuxiaohui.400@bytedance.com>
+References: <20241020144041.15953-1-zhuxiaohui.400@bytedance.com>
+ <ZxWwvF0Er-Aj-rtX@fedora> <064a6fb0-0cdb-4634-863d-a06574fcc0fa@grimberg.me>
+ <ZxYRXvyxzlFP_NPl@fedora> <ab2ed574-5fb8-49d9-b6f3-5030566fc64a@grimberg.me>
+ <ZxZm5HcsGCYoQ6Mv@fedora> <6edb988e-2ec0-49b4-b859-e8346137ba68@grimberg.me>
+ <Zxb8KaoUVstRCxiP@fedora> <fe49daac-5990-464a-aeeb-c7c5f9d4d156@grimberg.me>
+ <20241023051914.GA1341@lst.de>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20241023051914.GA1341@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 23, 2024 at 08:12:33AM +0200, Christoph Hellwig wrote:
-> On Tue, Oct 22, 2024 at 11:24:31AM +0100, Catalin Marinas wrote:
-> > > > We should not allow smaller than cache line alignment on architectures
-> > > > that are not cache coherent indeed.
-> > 
-> > Even on architectures that are not fully coherent, the coherency is a
-> > property of the device. You may need to somehow pass this information in
-> > struct queue_limits if you want it to be optimal.
-> 
-> Well, devices set the queue limits.  So this would be a fix in the
-> drivers that set the queue limits.  SCSI already does this in the
-> midlayer code,
 
-I guess it isn't true:
 
-[linux]# cat /sys/block/sda/queue/dma_alignment
-3
 
-> so the main places to fix are nvme und ublk.
-> 
-> I cant take care of nvme by copying the scsi pattern.
-> 
-> > That said, the DMA debug code also uses the static L1_CACHE_SHIFT and it
-> > will trigger the warning anyway. Some discussion around the DMA API
-> > debug came up during the small ARCH_KMALLOC_MINALIGN changes (don't
-> > remember it was in private with Robin or on the list). Now kmalloc() can
-> > return a small buffer (less than a cache line) that won't be bounced if
-> > the device is coherent (see dma_kmalloc_safe()) but the DMA API debug
-> > code only checks for direction == DMA_TO_DEVICE, not
-> > dev_is_dma_coherent(). For arm64 I did not want to disable small
-> > ARCH_KMALLOC_MINALIGN if CONFIG_DMA_API_DEBUG is enabled as this would
-> > skew the testing by forcing all allocations to be ARCH_DMA_MINALIGN
-> > aligned.
-> > 
-> > Maybe I'm missing something in those checks but I'm surprised that the
-> > DMA API debug code doesn't complain about small kmalloc() buffers on x86
-> > (which never had any bouncing for this specific case since it's fully
-> > coherent). I suspect people just don't enable DMA debugging on x86 for
-> > such devices (typically USB drivers have this issue).
-> 
-> I don't think there's too many of these indeed.
+On 23/10/2024 8:19, Christoph Hellwig wrote:
+> On Tue, Oct 22, 2024 at 04:23:29PM +0300, Sagi Grimberg wrote:
+>> I agree. NVMe may have a unique need here, but it needs a tag from a
+>> specific hctx while the context requesting it does not map according to
+>> the hctx cpumap. It cannot use any other tag from any other hctx.
+>>
+>> The reason is that the connect for a queue must be done from a tag that
+>> belongs to the queue because nvme relies on it when it does resolution back
+>> to
+>> the request to the completion.
+> I wonder if we should byte the bullet and not use a request for the
+> connect commands.  We've already special cased the AEN command because
+> it was causing too many problems, and given all the pain so far connect
+> might also have hit that treshold.
 
-Usually it is assumed that it is safe to DMA over kmalloc() buffer...
+That would be trading one set of problems for another. We had some hard
+times in the past to correctly fence AERs against controller states 
+because it
+is not a normal block request.
 
-thanks,
-Ming
+Plus, unlike AERs, connect has a timeout, which we'll need to take care 
+of...
 
+Not that it is not possible, I'd just like to avoid this option.
