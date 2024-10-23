@@ -1,82 +1,128 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f100.google.com (mail-oa1-f100.google.com [209.85.160.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A46014EC62
-	for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 20:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A23481B1
+	for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 21:15:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729715338; cv=none; b=JMCc7lRCMzgqad+HVxXIrKYz0QTKdKepHZOtuks7LBW2slyFW/aie9IY++M07ls9d+1JlTRpcK58vRowDWvlTz5QL1OKpRIRZTEcI0zYxi567tWq1tXgVmeolobDKi8pgf0EIj4AaS6JQbzIrHkV/5hkMaPoiDtXTCgWxH1EtGg=
+	t=1729718155; cv=none; b=dZirYLwd93hn6uMzj94qbUQLAFSXrkahvcNTxjhNzkUj64i3LqZD+efz4V0rA3bI7fe7BY7QgyoCbODUK5pXeYDbx8pjWUc0olRbRO9f/7CG28Bh2DOOK5LAyjBmKn5wPtxYFXCmAwIFIuQPogQmqmCHMkXiw2HsS2N1rI3qwqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729715338; c=relaxed/simple;
-	bh=hNTcDabg0IyRDTQ72OSli/AH71ZJC7W1EeSe4SKGd64=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kMYp9CBj4HtWfq965/zfmAbTYbt/dspA/0Qb0mmYSDeJRsKrRFgo9wR/F/7gqA/EjV+3DlRjp0nFYUO7H96E+Wx9ZbUR2Tp2e5ArU3uFuY9y+phUEdy7fvFmNgEou6P2caUMZIG9QPKPWt0R+tD2jJq/otYi6sbXEkQyphQulAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=NjnUX7ki; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1729718155; c=relaxed/simple;
+	bh=xkpH8lLTG9c3p1Ro1+SoWKPP5IKBS7+x5hs5r63cxJE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=H8A5KmbiftGeJ/FgQ0Vgi8FpacE1cKOAYBq7z+UXXdUa79Y0nufdvrKSGukogarrEUZ118vHX1QOS1Nh5092BxAt5+pL9pZaKzBz51zgKwS07u5lz6UwUdFq84xDFXIDN3nrqCuPoAmkIu+NT0TsO3ht4UhBaciH+wkJfhHy/H0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=M6ZvaRsA; arc=none smtp.client-ip=209.85.160.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="NjnUX7ki"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4XYgcS0F6FzlgMVX;
-	Wed, 23 Oct 2024 20:28:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1729715334; x=1732307335; bh=rHr34/GqPQFevhREox8MksjSlRZ/juaa04V
-	Wer/6K7Y=; b=NjnUX7kirG/inSCWMxLO2BOP4/l5p1uoUkojk9nRqjMxR9puW1a
-	QfOD1KQODhnXaB7P7e2ybdq2E99l83aIRYlrlLMqGrQgbbhh+Gm5PIMD66lHTH8I
-	1EdezyMgRCBBAsduStvbCrUua8o5teiQBkKnBGFiXsqlRDO+QHFpWc8ysM4Ovy9+
-	O2hHMqJ+v367bvzS6+QogWMl9qkQIISQ2zoBUDrRRT+przkWC3QOO85wlM22m7ZW
-	3MwtuJhkofN46wMBegsjrpkhvXoazWq5MfnIWtusaxMWA++PvK8HHMST5+3rpUuT
-	0gbK1TTCboXSs72q0VPtwGSV23W9peJ0Ldg==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id g_f5G4H2vERV; Wed, 23 Oct 2024 20:28:54 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4XYgcQ0x56zlgT1K;
-	Wed, 23 Oct 2024 20:28:53 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH] blk-mq: Unexport blk_mq_flush_busy_ctxs()
-Date: Wed, 23 Oct 2024 13:28:50 -0700
-Message-ID: <20241023202850.3469279-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.47.0.105.g07ac214952-goog
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="M6ZvaRsA"
+Received: by mail-oa1-f100.google.com with SMTP id 586e51a60fabf-2884e7fadb8so218099fac.2
+        for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 14:15:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1729718152; x=1730322952; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QWnXrhO7H2hLUx4TRf77CLBlysOiI1jydW7RM0rQhME=;
+        b=M6ZvaRsAhBs6poDCWVJyN3Y/o7sg2+UoGJugjLZWyS9DNnHsLpDEUySq+y5XmNLsNn
+         lbcFr1DmDlgR/mseDUKdtwRv+iE/uPzzdawIIeDLRPzWvAwWNwe7dPteyH5QNl7PwVNX
+         jt/km5Dkr8GWI1rxNyqWvM5RDTkIZHEt5NjoQBOkJ0GdoC9V6RwqzYiFtxBZx+Y8+O3y
+         MfEynE2yMQsPsLo6eP62sLt9AH8FBlDHkn4L2/4CzB1FqAa5kmZD4t7qN/nwHoLWkw6U
+         CXM6HffUilyjbWVtCLqSeovOlMvdQd27JsEYjkOkrt5mvCcrEIj3YuvbJqIW2fWa/yUh
+         9aNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729718152; x=1730322952;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QWnXrhO7H2hLUx4TRf77CLBlysOiI1jydW7RM0rQhME=;
+        b=ridzZciaoBD/uchz7E65+y0BOJ2tSVE03BrPmNLBfNB6o6m31+wb4FJELGD2vxNYsj
+         HdZWj5mE/aEg3urv14lkSLLHPQKAZXdxbrlG3GRPwWgOG9D00hoseCh8oAYGXxqbcpqu
+         6ak7q1I6XpDG/WNo2BUD+3saiRBMBU+UJSbGun0gmrsgo3UGs/s/TczHTHUvF3MYHAY4
+         lckmg3RPhfYMTuboo9CSGwYi648KVg/VyUq57E8r0iwmN2JIf9lL/jSdSpIZUa9+kOXV
+         QJ+Qd2LEfa4UAB1jPHIX2H9sUPwuO+KL37JJeB9cLo0rhaV6hhKDWAcBiFDRU+wOiaAo
+         J81A==
+X-Forwarded-Encrypted: i=1; AJvYcCWLKBUDCNuF2N8bEucU1KurCixszbgR3jZtsye3rWtOa2EwkA39/YskFYBJk5jjzKJuh2IeOsEDRWpf7A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwerVYmgUCwZKOqnmDA+E5UGc+TRj6JZP4MeX/TqN//DaFVZUUP
+	3h3qU7C6E/fhbgSdUkQ9ImQNoMq3HA8qCd+EadJp57VJ8STtNhSLEmr2+5LFWGmBNSlxNwWewe6
+	x7sw9AHXIcL4jNwTU/PMk5SOioEIqRw8p1LeLgNbvBw5VvAno
+X-Google-Smtp-Source: AGHT+IED6zp0Am/YixQ0vvtVvueXLlVmAkcXvq+lCwAkJwApc+22gSEPafj6KkGKD/+2e61wHQaGQBVbd6bL
+X-Received: by 2002:a05:6870:9626:b0:277:eac5:c344 with SMTP id 586e51a60fabf-28ccb816848mr4656976fac.19.1729718151930;
+        Wed, 23 Oct 2024 14:15:51 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-28c7941edf7sm331173fac.38.2024.10.23.14.15.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2024 14:15:51 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id E1BEB3400E6;
+	Wed, 23 Oct 2024 15:15:49 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id CD110E4134A; Wed, 23 Oct 2024 15:15:49 -0600 (MDT)
+From: Uday Shankar <ushankar@purestorage.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Christoph Hellwig <hch@lst.de>
+Cc: Uday Shankar <ushankar@purestorage.com>,
+	linux-block@vger.kernel.org,
+	Xinyu Zhang <xizhang@purestorage.com>
+Subject: [PATCH] block: fix sanity checks in blk_rq_map_user_bvec
+Date: Wed, 23 Oct 2024 15:15:19 -0600
+Message-Id: <20241023211519.4177873-1-ushankar@purestorage.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Commit a6088845c2bf ("block: kyber: make kyber more friendly with merging=
-")
-removed the only blk_mq_flush_busy_ctxs() call from outside the block lay=
-er
-core. Hence unexport blk_mq_flush_busy_ctxs().
+From: Xinyu Zhang <xizhang@purestorage.com>
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+blk_rq_map_user_bvec contains a check bytes + bv->bv_len > nr_iter which
+causes unnecessary failures in NVMe passthrough I/O, reproducible as
+follows:
+
+- register a 2 page, page-aligned buffer against a ring
+- use that buffer to do a 1 page io_uring NVMe passthrough read
+
+The second (i = 1) iteration of the loop in blk_rq_map_user_bvec will
+then have nr_iter == 1 page, bytes == 1 page, bv->bv_len == 1 page, so
+the check bytes + bv->bv_len > nr_iter will succeed, causing the I/O to
+fail. This failure is unnecessary, as when the check succeeds, it means
+we've checked the entire buffer that will be used by the request - i.e.
+blk_rq_map_user_bvec should complete successfully. Therefore, terminate
+the loop early and return successfully when the check bytes + bv->bv_len
+> nr_iter succeeds.
+
+While we're at it, also remove the check that all segments in the bvec
+are single-page. While this seems to be true for all users of the
+function, it doesn't appear to be required anywhere downstream.
+
+Signed-off-by: Xinyu Zhang <xizhang@purestorage.com>
+Co-developed-by: Uday Shankar <ushankar@purestorage.com>
+Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 ---
- block/blk-mq.c | 1 -
- 1 file changed, 1 deletion(-)
+ block/blk-map.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7482e682deca..9abe6b9dd2ea 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1716,7 +1716,6 @@ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *h=
-ctx, struct list_head *list)
-=20
- 	sbitmap_for_each_set(&hctx->ctx_map, flush_busy_ctx, &data);
- }
--EXPORT_SYMBOL_GPL(blk_mq_flush_busy_ctxs);
-=20
- struct dispatch_rq_data {
- 	struct blk_mq_hw_ctx *hctx;
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 0e1167b23934..6ef2ec1f7d78 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -600,9 +600,7 @@ static int blk_rq_map_user_bvec(struct request *rq, const struct iov_iter *iter)
+ 		if (nsegs >= nr_segs || bytes > UINT_MAX - bv->bv_len)
+ 			goto put_bio;
+ 		if (bytes + bv->bv_len > nr_iter)
+-			goto put_bio;
+-		if (bv->bv_offset + bv->bv_len > PAGE_SIZE)
+-			goto put_bio;
++			break;
+ 
+ 		nsegs++;
+ 		bytes += bv->bv_len;
+
+base-commit: d165768847839f8d1ae5f8081ecc018a190d50e8
+-- 
+2.34.1
+
