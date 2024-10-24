@@ -1,74 +1,62 @@
-Received: from mail-yw1-f227.google.com (mail-yw1-f227.google.com [209.85.128.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D893416F271
-	for <linux-block@vger.kernel.org>; Thu, 24 Oct 2024 06:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41717177998;
+	Thu, 24 Oct 2024 06:15:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729750430; cv=none; b=ZM4NynNVj08Sw0idq78+5smn9wxO4TSRL0DrBi16ctRkURtFjZjRAxbtoA9ALpV2oQ5/4aKXXFXEmFypauzIdw+VWpCod1yofpfFAKaMk5MwfEjUb8JoNtCPsslXrW4g4yPBF0gNlk9erclT8bVTduxuFx00LH6EI3OLvoDckmc=
+	t=1729750505; cv=none; b=By9/XeMo0yRvwTFuaYIGTbYvMB0525R1rY8Bz2Zw5mnGbJEFoB2E42FNngTEomOM/rxGjRZK4MFWkEfQiTIV64Bqd7NLTx3wqrRD9F4uT6TBChMSAxkEdvhT24aE+7Rmnzp9qOVNpsrc6zI35PCxSQBO+DFIYt4ruIlt3w6zB9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729750430; c=relaxed/simple;
-	bh=IgnmH2zlhXj7D09v/j5kD4MyGBPkUvzJ16VV1zTqzog=;
+	s=arc-20240116; t=1729750505; c=relaxed/simple;
+	bh=slboK5q8uJWK2Rq3IME2ccochvGNGQSVeogqk/vnDYw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=icAnuhh3TeyD+VEyNsAWyuflQUnsUKsA5BEasUvyFTGqWYOemtCJm2t2qyg8H0EUde3YyYeiTk/cQHrgFAkpH9MXSNxC4TEqTOwzpBG8iLsni9bDUv0FciXFBVA5sMKtAfWFU0LiuvjCfFKQHmDqhUhN4VA1Ho3GUNb3JqOE958=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=gaBKK8zF; arc=none smtp.client-ip=209.85.128.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=VoUtRJXNUfsQv7g9gkZJVcvLsZ9GHHI+1UiHqb3K8o+9Lx2qweubqPXuE6Cc6ZRmMLV7P+DMCuBfF46ogebVzbyCQZyF/yRpR7Ry4mMfbfuqnR0d1abMU+4BKZtBJkih6C1ohVSs6VbM0LOXbEEfzb6oIhxTb8xVTjkUdNVzdCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UepaPorx; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="gaBKK8zF"
-Received: by mail-yw1-f227.google.com with SMTP id 00721157ae682-6e35bf59cf6so16501017b3.0
-        for <linux-block@vger.kernel.org>; Wed, 23 Oct 2024 23:13:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1729750427; x=1730355227; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dm/MIEPBZZEOTofpGdxuDln2Sbwtj9Q1T0/qRWDHTc0=;
-        b=gaBKK8zFYRXDzScGu8qlyEb2q6qPicPUyzAmDe51xBuDbQ8enAl7/xeVo/P2VCqh4L
-         YjXBMvEzier6cND2M5RVzIBArxV65DPMgLUGIcWIweTNElwGrmV+cgWiPZ0Zx1StAmpf
-         x7uo6skYH6ffLib06bOVKnlr5LjLJeeG8TAMbk1JhFcIj5u/jD1cGE4pXqTnfiZhTHex
-         WO3GL01bSurFeA7OA/URXbP1/8wiQNaLHkRIlRihPjhcyfSLlZSsASV5bQk9ht71NZ6o
-         NROmO1iBVo2l2n9cTIsJbUczq6lUXNewv9t8BMC75fMhD7jgRnLNuSbR//+HE0fUuGOx
-         GAUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729750427; x=1730355227;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dm/MIEPBZZEOTofpGdxuDln2Sbwtj9Q1T0/qRWDHTc0=;
-        b=WXkDBkePRvZhZekB5/g/fCSnayc2hN4RflMFWpuj2X40unfA54Jx5U/asEkCLDrw47
-         43vhaqyudSxyP04Hwu0fEn9+Gqu7kSG1vKbx57q5cuKiAcpnZeY/1qTfYUKuBiUxNeY8
-         hXWd7+PBuX+JnvKx4JArSnL4CgPTbKh96Gbvz+GRNsOvnESkCP/AoeX75Wv5eZZjM/y7
-         4klRZHXmvAnpBAdKnRJeVueQz6jwM/jKLMDlsPH1cTyhv3PKAK3cPaddKKeWR/hItyJn
-         +4slw7m7FWregDEdqqom2P8Qn2GLmxiWyUFK7JN7pvkgD5p3Kc36ZE24r7V65Jgtn3dO
-         xtVA==
-X-Forwarded-Encrypted: i=1; AJvYcCWeB7ocVWH9kra9WkK3sFithHQR+kaB+H8ckuo5E8t6LTyzqJV8pkiLiH08ITTIg4NFdfEmFMd3LRQXHQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhqVJHNhJTFk9XZhgWwkGsFmh3ubsJdt55VYoSqVJ/huxXosxI
-	N+zeSTQ284sDdatHbEqTtVk2CTyASVthbewmkQiByHDB32a5v0qAAT2fXL4b8+o/XmuEVgickwn
-	brriOpqYv7tEleFh3OlqKxIHpJaHGZMol
-X-Google-Smtp-Source: AGHT+IEhyEKaFLcwxKzb9qz5fWduhegmFNqG9YQNEHkxE03Rz8LClOBW2B9+P/2B9IZUzvBsvOtnFWept6qx
-X-Received: by 2002:a05:690c:2c8c:b0:6e5:2adf:d584 with SMTP id 00721157ae682-6e84df79fc6mr5430387b3.14.1729750426835;
-        Wed, 23 Oct 2024 23:13:46 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-6e5f5a81ab3sm3805517b3.39.2024.10.23.23.13.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 23:13:46 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 069DE34040D;
-	Thu, 24 Oct 2024 00:13:45 -0600 (MDT)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id E3D57E40391; Thu, 24 Oct 2024 00:13:44 -0600 (MDT)
-Date: Thu, 24 Oct 2024 00:13:44 -0600
-From: Uday Shankar <ushankar@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH V7 5/7] io_uring: support leased group buffer with
- REQ_F_GROUP_KBUF
-Message-ID: <ZxnlmNGYWz+AikvV@dev-ushankar.dev.purestorage.com>
-References: <20241012085330.2540955-1-ming.lei@redhat.com>
- <20241012085330.2540955-6-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UepaPorx"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=GJu8E1kmcKaxN7Py5JO+aITM1D4B6y3Wcbyx8qaQDWQ=; b=UepaPorxu1MJbYkWEg5SHN+JOy
+	i/HhX7ZFzlnyzKIPg74YMkm22c0nW1SHL8iJLDwOEcGbD537u9Wy49ZOG0hWV35xbqHsrq9jj7x+a
+	HHiWJgl+KUmm3DYmuFyR4MJ54oHpRE2M1aIo7Bse+923LlNuC9EjnWTV+5OOl1qanoqHRjv4a9WH2
+	xo+C6IShEO9oiGds5oiUOz3aqdBiQWWtpEai3VAgxAESu3X28MJSRpavA6gLacOfNuWDYz9JN2h6N
+	lmzPn0uM1Mpeg+szxniBk5/30pInFfrNEPLxfgAMKej1085lTz5PsPE/m6lvlCaAtQXntQ1+d6IWD
+	1NDkVlXQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1t3r7Z-0000000GslD-1X4P;
+	Thu, 24 Oct 2024 06:14:57 +0000
+Date: Wed, 23 Oct 2024 23:14:57 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Adrian Vovk <adrianvovk@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Md Sadre Alam <quic_mdalam@quicinc.com>, axboe@kernel.dk,
+	song@kernel.org, yukuai3@huawei.com, agk@redhat.com,
+	snitzer@kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
+	adrian.hunter@intel.com, quic_asutoshd@quicinc.com,
+	ritesh.list@gmail.com, ulf.hansson@linaro.org, andersson@kernel.org,
+	konradybcio@kernel.org, kees@kernel.org, gustavoars@kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-raid@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-mmc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-hardening@vger.kernel.org, quic_srichara@quicinc.com,
+	quic_varada@quicinc.com
+Subject: Re: [PATCH v2 1/3] dm-inlinecrypt: Add inline encryption support
+Message-ID: <Zxnl4VnD6K6No4UQ@infradead.org>
+References: <20240916085741.1636554-2-quic_mdalam@quicinc.com>
+ <20240921185519.GA2187@quark.localdomain>
+ <ZvJt9ceeL18XKrTc@infradead.org>
+ <ef3c9a17-79f3-4937-965e-52e2b9e66ac2@gmail.com>
+ <ZxHwgsm2iP2Z_3at@infradead.org>
+ <CAAdYy_mVy3uXPqWbjPzK_i8w7Okq73wKBQyc95TbnonE36rPgQ@mail.gmail.com>
+ <ZxH4lnkQNhTP5fe6@infradead.org>
+ <D96294E2-F17A-4E58-90FB-1D17747048E5@gmail.com>
+ <ZxieZPlH-S9pakYW@infradead.org>
+ <CAAdYy_ms=VmvxZy9QiMkwcNk21a2kVy73c8-NxUh4dNJuLefCg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,14 +65,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241012085330.2540955-6-ming.lei@redhat.com>
+In-Reply-To: <CAAdYy_ms=VmvxZy9QiMkwcNk21a2kVy73c8-NxUh4dNJuLefCg@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Sat, Oct 12, 2024 at 04:53:25PM +0800, Ming Lei wrote:
-> +int io_import_group_kbuf(struct io_kiocb *req, unsigned long buf_off,
-> +		unsigned int len, int dir, struct iov_iter *iter)
-> +{
-> +	struct io_kiocb *lead = req->grp_link;
+On Wed, Oct 23, 2024 at 10:52:06PM -0400, Adrian Vovk wrote:
+> > Why do you assume the encryption would happen twice?
+> 
+> I'm not assuming. That's the behavior of dm-crypt without passthrough.
+> It just encrypts everything that moves through it. If I stack two
+> layers of dm-crypt on top of each other my data is encrypted twice.
 
-This works since grp_link and grp_leader are in a union together, but
-this should really be req->grp_leader, right?
+Sure.  But why would you do that?
+
+> > No one knows that it actually is encryped.  The lower layer just knows
+> > the skip encryption flag was set, but it has zero assurance data
+> > actually was encrypted.
+> 
+> I think it makes sense to require that the data is actually encrypted
+> whenever the flag is set. Of course there's no way to enforce that
+> programmatically, but code that sets the flag without making sure the
+> data gets encrypted some other way wouldn't pass review.
+
+You have a lot of trusted in reviers. But even that doesn't help as
+the kernel can load code that never passed review.
+
+> Alternatively, if I recall correctly it should be possible to just
+> check if the bio has an attached encryption context. If it has one,
+> then just pass-through. If it doesn't, then attach your own. No flag
+> required this way, and dm-default-key would only add encryption iff
+> the data isn't already encrypted.
+
+That at least sounds a little better.  But it still doesn't answer
+why we need this hack instead always encrypting at one layer instead
+of splitting it up.
 
