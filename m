@@ -1,140 +1,79 @@
-Received: from mail.stoffel.org (mail.stoffel.org [172.104.24.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E3F22B647;
-	Thu, 24 Oct 2024 19:21:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=172.104.24.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616D2169AE4;
+	Thu, 24 Oct 2024 19:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729797701; cv=none; b=sq2X+sywZA+qh347weAjZHc3WzY5V2GWR2jXTgLQgEo6dpXyCFswqoTMh4AIeX1zX8JpFcVZG49ngzdryiFXl86QtYow7l4mrrCnAa/66i4PDiOs6nBk4zk3qKXXIYLzcg8RDgLyMlW6WsGlzPa+3G+YS6CrSEA8Ua+JIX/6qto=
+	t=1729799105; cv=none; b=uVeun1f+lSNsMFQPVUp+UIXOVmYW2lCyfBPqB4noJiwg9MBnidbX3RhYC6bnq/a4S8TsTtq9/ptXztZ3ixEC/FyvXUPOspqUcxqYkOVXwkevgqtHuaFasznq8BXT7AqNWTOT+pJ7GEfCUrwum/lYtjXgkdJrGxkIf356yg7ocb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729797701; c=relaxed/simple;
-	bh=x5W7AHA7QoAl5BXhjCt2PyWAEngxusuwMWAjkEDBeo0=;
-	h=MIME-Version:Content-Type:Message-ID:Date:From:To:Cc:Subject:
-	 In-Reply-To:References; b=PxOhcxMBGdauYdzIRRSBXk/D49odILolP0HuBQyL988spgtEAOi9Gu2TSrQ0ohI9M4ekyjOiur8qq6eCr9qh7z/DOoGeQtpDQIwB+98KnNyBZMbv0ebiNH/UrAZxKv55qUKpyno9LzuWGK5Jc6Q4YXiw71mOr4A8Qi+L06zwhaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stoffel.org; spf=pass smtp.mailfrom=stoffel.org; arc=none smtp.client-ip=172.104.24.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stoffel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stoffel.org
-Received: from quad.stoffel.org (syn-097-095-183-072.res.spectrum.com [97.95.183.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.stoffel.org (Postfix) with ESMTPSA id B72191E468;
-	Thu, 24 Oct 2024 15:21:37 -0400 (EDT)
-Received: by quad.stoffel.org (Postfix, from userid 1000)
-	id 15731A0A8C; Thu, 24 Oct 2024 15:21:37 -0400 (EDT)
+	s=arc-20240116; t=1729799105; c=relaxed/simple;
+	bh=c3ndfUOsrrS7srSLbBC5XHM8epxlV6CY0XRm3bJUdrk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bO5uTov2WN9dx3yy/rgr4UC4TSRtTIdxR+fiNQhyQi30bg08EJ0+WgdD20jvobyjsmPdbcTkKlJLwgHfwX3N8ujwMnSg0b2CZJCGOFpZdedaxq4P+3S6Ga2xelMWReF39nSHf3olVBtboNIbOm08/CioFjD6A3eviVMbLQx9v9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iMm7iwRB; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iMm7iwRB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73751C4CEC7;
+	Thu, 24 Oct 2024 19:45:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729799105;
+	bh=c3ndfUOsrrS7srSLbBC5XHM8epxlV6CY0XRm3bJUdrk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iMm7iwRB0IZhUym/BkBFYexGqZs5nJlZjVp6oVWt2Y+QKne9rEfQ8OP5uGohgohK5
+	 OiLmtiC6Qcki98RPMySRRWlpwcdMEmFLZ+/OQp8MaYl4f3oON41x5L0VpNeY3PMrYg
+	 ANIwH36Hdj6UkfYudeAL5AwSm4C01OH3kIlZD7LXJHXDrRglTNUiU6c0MYQsvr8c5o
+	 W2CrIRTSUcfVjtU7jyIVcfJkDZ2qCYFfmze8hT/onGmRyUslacLh8u42UKGSt+E5bD
+	 0isyu0ZkRtRKyd+IBnN5hp7ulV05UaHP1cOFz4f9nlbiQDrqwRGML40hlhUkWhtRjG
+	 zNWDjrPygqmnw==
+Date: Thu, 24 Oct 2024 13:45:02 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, axboe@kernel.dk,
+	io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	joshi.k@samsung.com, javier.gonz@samsung.com
+Subject: Re: [PATCHv8 2/6] block: use generic u16 for write hints
+Message-ID: <Zxqjvu0w9OsJN2uB@kbusch-mbp.dhcp.thefacebook.com>
+References: <20241017160937.2283225-1-kbusch@meta.com>
+ <20241017160937.2283225-3-kbusch@meta.com>
+ <20241018054643.GA20262@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Message-ID: <26394.40513.57614.718772@quad.stoffel.home>
-Date: Thu, 24 Oct 2024 15:21:37 -0400
-From: "John Stoffel" <john@stoffel.org>
-To: Adrian Vovk <adrianvovk@gmail.com>
-Cc: Geoff Back <geoff@demonlair.co.uk>,
-    Christoph Hellwig <hch@infradead.org>,
-    Eric Biggers <ebiggers@kernel.org>,
-    Md Sadre Alam <quic_mdalam@quicinc.com>,
-    axboe@kernel.dk,
-    song@kernel.org,
-    yukuai3@huawei.com,
-    agk@redhat.com,
-    snitzer@kernel.org,
-    Mikulas Patocka <mpatocka@redhat.com>,
-    adrian.hunter@intel.com,
-    quic_asutoshd@quicinc.com,
-    ritesh.list@gmail.com,
-    ulf.hansson@linaro.org,
-    andersson@kernel.org,
-    konradybcio@kernel.org,
-    kees@kernel.org,
-    gustavoars@kernel.org,
-    linux-block@vger.kernel.org,
-    linux-kernel@vger.kernel.org,
-    linux-raid@vger.kernel.org,
-    dm-devel@lists.linux.dev,
-    linux-mmc@vger.kernel.org,
-    linux-arm-msm@vger.kernel.org,
-    linux-hardening@vger.kernel.org,
-    quic_srichara@quicinc.com,
-    quic_varada@quicinc.com
-X-Clacks-Overhead: GNU Terry Pratchett
-Subject: Re: [PATCH v2 1/3] dm-inlinecrypt: Add inline encryption support
-In-Reply-To: <CAAdYy_=n19fT2U1KUcF+etvbLGiOgdVZ7DceBQiHqEtXcOa-Ow@mail.gmail.com>
-References: <20240916085741.1636554-1-quic_mdalam@quicinc.com>
-	<20240916085741.1636554-2-quic_mdalam@quicinc.com>
-	<20240921185519.GA2187@quark.localdomain>
-	<ZvJt9ceeL18XKrTc@infradead.org>
-	<ef3c9a17-79f3-4937-965e-52e2b9e66ac2@gmail.com>
-	<ZxHwgsm2iP2Z_3at@infradead.org>
-	<CAAdYy_mVy3uXPqWbjPzK_i8w7Okq73wKBQyc95TbnonE36rPgQ@mail.gmail.com>
-	<ZxH4lnkQNhTP5fe6@infradead.org>
-	<D96294E2-F17A-4E58-90FB-1D17747048E5@gmail.com>
-	<ZxieZPlH-S9pakYW@infradead.org>
-	<CAAdYy_ms=VmvxZy9QiMkwcNk21a2kVy73c8-NxUh4dNJuLefCg@mail.gmail.com>
-	<dfe48df3-5527-4aed-889a-224221cbd190@demonlair.co.uk>
-	<CAAdYy_=n19fT2U1KUcF+etvbLGiOgdVZ7DceBQiHqEtXcOa-Ow@mail.gmail.com>
-X-Mailer: VM 8.3.x under 28.2 (x86_64-pc-linux-gnu)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241018054643.GA20262@lst.de>
 
->>>>> "Adrian" =3D=3D Adrian Vovk <adrianvovk@gmail.com> writes:
+On Fri, Oct 18, 2024 at 07:46:44AM +0200, Christoph Hellwig wrote:
+> On Thu, Oct 17, 2024 at 09:09:33AM -0700, Keith Busch wrote:
+> > From: Keith Busch <kbusch@kernel.org>
+> > 
+> > This is still backwards compatible with lifetime hints. It just doesn't
+> > constrain the hints to that definition.
+> 
+> So in the end we'll end up with two uses of it - the existing 5
+> temperature hints and the new stream separation.  I think it
+> would be cleaner to make it a union, but I don't care that
+> strongly.
+> 
+> But we probably want a way to distinguish which one is supported.
+> 
+> E.g. for SCSI we set a net BLK_FEAT_WRITE_HINTS, for NVMe we'll set
+> BLK_FEAT_STREAM_SEPARATION.
+> 
+> Either way this should probably be the first patch in the series.
 
-> On Thu, Oct 24, 2024 at 4:11=E2=80=AFAM Geoff Back <geoff@demonlair.c=
-o.uk> wrote:
->>=20
->>=20
->> On 24/10/2024 03:52, Adrian Vovk wrote:
->> > On Wed, Oct 23, 2024 at 2:57=E2=80=AFAM Christoph Hellwig <hch@inf=
-radead.org> wrote:
->> >> On Fri, Oct 18, 2024 at 11:03:50AM -0400, Adrian Vovk wrote:
->> >>> Sure, but then this way you're encrypting each partition twice. =
-Once by the dm-crypt inside of the partition, and again by the dm-crypt=
- that's under the partition table. This double encryption is ruinous fo=
-r performance, so it's just not a feasible solution and thus people don=
-'t do this. Would be nice if we had the flexibility though.
->>=20
->> As an encrypted-systems administrator, I would actively expect and
->> require that stacked encryption layers WOULD each encrypt.  If I hav=
-e
->> set up full disk encryption, then as an administrator I expect that =
-to
->> be obeyed without exception, regardless of whether some higher level=
+I'm not sure I follow this feedback. The SCSI feature is defined as a
+lifetime stream association in SBC-5. So it's still a stream for SCSI,
+but you want to call it "WRITE_HINT", which is not a term used in the
+SCSI spec for this feature. But, you want to call it STREAM_SEPARATION
+for NVMe only, even though the FDP spec doesn't use that term? What's
+wrong with just calling it a generic hint support feature?
 
->> file system has done encryption already.
->>=20
->> Anything that allows a higher level to bypass the full disk encrypti=
-on
->> layer is, in my opinion, a bug and a serious security hole.
-
-> Sure I'm sure there's usecases where passthrough doesn't make sense.
-> It should absolutely be an opt-in flag on the dm target, so you the
-> administrator at setup time can choose whether or not you perform
-> double-encryption (and it defaults to doing so). Because there are
-> usecases where it doesn't matter, and for those usecases we'd set
-> the flag and allow passthrough for performance reasons.
-
-If you're so concerend about security that you're double or triple
-encrypting data at various layers, then obviously skipping encryption
-at a lower layer just because an upper layer says "He, I already
-encrypted this!" just doesn't make any sense. =20
-
-So how does your scheme defend against bad actors?  I'm on a system
-with an encrypted disk.  I make a file and mount it with loop, and the
-encrypt it.  But it's slow!  So I turn off encryption.  Now I shutdown
-the loop device cleanly, unmount, and reboot the system.  So what
-should I be seing in those blocks if I examine the plain file that's
-now not mounted? =20
-
-Could this be a way to smuggle data out because now the data written
-to the low level disk is encypted with a much weaker algorithm?  So I
-can just take the system disk and read the raw data and find the data? =
-=20
-
-I'm not saying it's going to be easy or simple, but is it possible? =20=
-
-
-John
-
-
+I also don't see why SCSI couldn't use per-io hints just like this
+enables for NVMe. The spec doesn't limit SCSI to just 5 streams, so this
+provides a way to access them all through the raw block device.
