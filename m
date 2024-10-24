@@ -1,62 +1,57 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41717177998;
-	Thu, 24 Oct 2024 06:15:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F716175D50
+	for <linux-block@vger.kernel.org>; Thu, 24 Oct 2024 06:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729750505; cv=none; b=By9/XeMo0yRvwTFuaYIGTbYvMB0525R1rY8Bz2Zw5mnGbJEFoB2E42FNngTEomOM/rxGjRZK4MFWkEfQiTIV64Bqd7NLTx3wqrRD9F4uT6TBChMSAxkEdvhT24aE+7Rmnzp9qOVNpsrc6zI35PCxSQBO+DFIYt4ruIlt3w6zB9M=
+	t=1729751570; cv=none; b=PnLIBKW/xQ6ZmyWcCtydqzJt8vzK5+/AZSas0oRK5Ww5Wtpr8ngTTDB1b4njDLV+jJohGoeri0ZX7dnI0MWdCHWyG+jK8iOZx8zbZvQ6jGewTJK1dgcQFC7AnQhJodMTol0MB8dPChpnujFVp2zht6ZM+yG53VrF7C/Og+ZhErg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729750505; c=relaxed/simple;
-	bh=slboK5q8uJWK2Rq3IME2ccochvGNGQSVeogqk/vnDYw=;
+	s=arc-20240116; t=1729751570; c=relaxed/simple;
+	bh=+UPCXQBkWNTDiXfeMiQlhW8zB4gJG3TTUSrx8pIfxiY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VoUtRJXNUfsQv7g9gkZJVcvLsZ9GHHI+1UiHqb3K8o+9Lx2qweubqPXuE6Cc6ZRmMLV7P+DMCuBfF46ogebVzbyCQZyF/yRpR7Ry4mMfbfuqnR0d1abMU+4BKZtBJkih6C1ohVSs6VbM0LOXbEEfzb6oIhxTb8xVTjkUdNVzdCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UepaPorx; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=J2yZ78GzGvjHAKTb+s31E8ZW9NCSNrgzXmlBBAosSwj1rmBdYbpjjFdwvx/p4sViOQ3nEQ6hMxGRI0fkVZumJkSBKZdyvLLXVnLzPmjvE9Dx+AL6FUftUnJUi1PJYOohBK2Nu1QBM/ckPsuz+eEL32zwBkUBHDIGM6GdJY+eJW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MJEVfiBj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UepaPorx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=GJu8E1kmcKaxN7Py5JO+aITM1D4B6y3Wcbyx8qaQDWQ=; b=UepaPorxu1MJbYkWEg5SHN+JOy
-	i/HhX7ZFzlnyzKIPg74YMkm22c0nW1SHL8iJLDwOEcGbD537u9Wy49ZOG0hWV35xbqHsrq9jj7x+a
-	HHiWJgl+KUmm3DYmuFyR4MJ54oHpRE2M1aIo7Bse+923LlNuC9EjnWTV+5OOl1qanoqHRjv4a9WH2
-	xo+C6IShEO9oiGds5oiUOz3aqdBiQWWtpEai3VAgxAESu3X28MJSRpavA6gLacOfNuWDYz9JN2h6N
-	lmzPn0uM1Mpeg+szxniBk5/30pInFfrNEPLxfgAMKej1085lTz5PsPE/m6lvlCaAtQXntQ1+d6IWD
-	1NDkVlXQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1t3r7Z-0000000GslD-1X4P;
-	Thu, 24 Oct 2024 06:14:57 +0000
-Date: Wed, 23 Oct 2024 23:14:57 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Adrian Vovk <adrianvovk@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Md Sadre Alam <quic_mdalam@quicinc.com>, axboe@kernel.dk,
-	song@kernel.org, yukuai3@huawei.com, agk@redhat.com,
-	snitzer@kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
-	adrian.hunter@intel.com, quic_asutoshd@quicinc.com,
-	ritesh.list@gmail.com, ulf.hansson@linaro.org, andersson@kernel.org,
-	konradybcio@kernel.org, kees@kernel.org, gustavoars@kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-mmc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-hardening@vger.kernel.org, quic_srichara@quicinc.com,
-	quic_varada@quicinc.com
-Subject: Re: [PATCH v2 1/3] dm-inlinecrypt: Add inline encryption support
-Message-ID: <Zxnl4VnD6K6No4UQ@infradead.org>
-References: <20240916085741.1636554-2-quic_mdalam@quicinc.com>
- <20240921185519.GA2187@quark.localdomain>
- <ZvJt9ceeL18XKrTc@infradead.org>
- <ef3c9a17-79f3-4937-965e-52e2b9e66ac2@gmail.com>
- <ZxHwgsm2iP2Z_3at@infradead.org>
- <CAAdYy_mVy3uXPqWbjPzK_i8w7Okq73wKBQyc95TbnonE36rPgQ@mail.gmail.com>
- <ZxH4lnkQNhTP5fe6@infradead.org>
- <D96294E2-F17A-4E58-90FB-1D17747048E5@gmail.com>
- <ZxieZPlH-S9pakYW@infradead.org>
- <CAAdYy_ms=VmvxZy9QiMkwcNk21a2kVy73c8-NxUh4dNJuLefCg@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MJEVfiBj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729751567;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1YPOQaP9fLsohm+bZdFISaQhDYYb3guJlfd4tvlkGmE=;
+	b=MJEVfiBjlBix0hHYGbT6X0n1gEvlUfVLZqEoTf5ZKmQ2lWbhZZabqGw9TtUpFDNeGHxQcM
+	Yp5EQN92PjwW6CbULZOa9RM3AjAQBGKYyIs1i6sHi9LvPWG5s29QCGIDKaIOPD5ai/uN1n
+	7v9ICgoYaB3Rt3+n1i3BANuJLTwiUWw=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-407-Nb3Pj152Mk6E4qJjtxXwGw-1; Thu,
+ 24 Oct 2024 02:32:43 -0400
+X-MC-Unique: Nb3Pj152Mk6E4qJjtxXwGw-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5434B19560AF;
+	Thu, 24 Oct 2024 06:32:42 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.150])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00012300018D;
+	Thu, 24 Oct 2024 06:32:37 +0000 (UTC)
+Date: Thu, 24 Oct 2024 14:32:32 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH V7 5/7] io_uring: support leased group buffer with
+ REQ_F_GROUP_KBUF
+Message-ID: <ZxnqAMkrUowONyu7@fedora>
+References: <20241012085330.2540955-1-ming.lei@redhat.com>
+ <20241012085330.2540955-6-ming.lei@redhat.com>
+ <ZxnlmNGYWz+AikvV@dev-ushankar.dev.purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,37 +60,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAAdYy_ms=VmvxZy9QiMkwcNk21a2kVy73c8-NxUh4dNJuLefCg@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <ZxnlmNGYWz+AikvV@dev-ushankar.dev.purestorage.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Wed, Oct 23, 2024 at 10:52:06PM -0400, Adrian Vovk wrote:
-> > Why do you assume the encryption would happen twice?
+On Thu, Oct 24, 2024 at 12:13:44AM -0600, Uday Shankar wrote:
+> On Sat, Oct 12, 2024 at 04:53:25PM +0800, Ming Lei wrote:
+> > +int io_import_group_kbuf(struct io_kiocb *req, unsigned long buf_off,
+> > +		unsigned int len, int dir, struct iov_iter *iter)
+> > +{
+> > +	struct io_kiocb *lead = req->grp_link;
 > 
-> I'm not assuming. That's the behavior of dm-crypt without passthrough.
-> It just encrypts everything that moves through it. If I stack two
-> layers of dm-crypt on top of each other my data is encrypted twice.
+> This works since grp_link and grp_leader are in a union together, but
+> this should really be req->grp_leader, right?
 
-Sure.  But why would you do that?
+Yeah, will fix it in V8.
 
-> > No one knows that it actually is encryped.  The lower layer just knows
-> > the skip encryption flag was set, but it has zero assurance data
-> > actually was encrypted.
-> 
-> I think it makes sense to require that the data is actually encrypted
-> whenever the flag is set. Of course there's no way to enforce that
-> programmatically, but code that sets the flag without making sure the
-> data gets encrypted some other way wouldn't pass review.
-
-You have a lot of trusted in reviers. But even that doesn't help as
-the kernel can load code that never passed review.
-
-> Alternatively, if I recall correctly it should be possible to just
-> check if the bio has an attached encryption context. If it has one,
-> then just pass-through. If it doesn't, then attach your own. No flag
-> required this way, and dm-default-key would only add encryption iff
-> the data isn't already encrypted.
-
-That at least sounds a little better.  But it still doesn't answer
-why we need this hack instead always encrypting at one layer instead
-of splitting it up.
+Thanks, 
+Ming
 
