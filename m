@@ -1,101 +1,88 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DB2C8DF
-	for <linux-block@vger.kernel.org>; Fri, 25 Oct 2024 03:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C28F42A81
+	for <linux-block@vger.kernel.org>; Fri, 25 Oct 2024 03:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729825654; cv=none; b=qajwRY+UNGYcV4C4GQcfRdmiv150UD2G4elNrp8YBF8ByYWbaWRtuhnhS/PjC7kyo0d2oPQsQ06DGuJd4DCE553X19+EZEHJJyM3tclS3J7Aip9UmCmmeulgcENzBxIXhaCdjYQhECzB5j4QPV56l8/NCyGcx4913JewXYLrfmA=
+	t=1729826339; cv=none; b=nZwfUQWEZOt3H9t2o/inQF4YRB9/Lj5OFy93OUdcJWrMyyEeQ00waQ3k8HyUuM7q+VAatfQtbi6YWqJp+N+/IDgFuFOi3370WRRw9FI3pjOH6PbantsSjhiVW2W5N+TGeOXkg040nKHfIZQcMI2X/rOt5obP5nJv6yBhi1TEHDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729825654; c=relaxed/simple;
-	bh=4Up7llp93TzxHMadJkeLylkY36+RTr3wjXZAZ0Q6ynw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kFszR7lVK/1Nylej1gorxLlRIuqDiDVcTpYYm8Xbm/88/7vjhoYqlZLAujPrtmMqNJxPqPluUWa+a7Z9nQgRADM2icUnIzHDrR2kDesNp9SgRblfEOdZc/1ETkrHbj3hzg1pEOUztnS7VszThnVMU9RDpGI1s0CG0BHMO/vF9wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 410795b6927e11efa216b1d71e6e1362-20241025
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:7b600df3-4113-4a34-a380-f2f3c1e837cb,IP:0,U
-	RL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:25
-X-CID-META: VersionHash:82c5f88,CLOUDID:18cc2e093df12ef7caaa79bae9b09a59,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:5,IP:nil,URL:0,
-	File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:N
-	O,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 410795b6927e11efa216b1d71e6e1362-20241025
-Received: from node2.com.cn [(10.44.16.197)] by mailgw.kylinos.cn
-	(envelope-from <zenghongling@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1590586329; Fri, 25 Oct 2024 11:07:22 +0800
-Received: from node2.com.cn (localhost [127.0.0.1])
-	by node2.com.cn (NSMail) with SMTP id 73B17B804842;
-	Fri, 25 Oct 2024 11:07:22 +0800 (CST)
-X-ns-mid: postfix-671B0B61-322270602
-Received: from localhost.localdomain (unknown [172.25.120.36])
-	by node2.com.cn (NSMail) with ESMTPA id 91B45B804842;
-	Fri, 25 Oct 2024 03:07:12 +0000 (UTC)
-From: Hongling Zeng <zenghongling@kylinos.cn>
-To: inux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	zhongling0719@126.com,
-	Hongling Zeng <zenghongling@kylinos.cn>
-Subject: [PATCH] blk-core: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-Date: Fri, 25 Oct 2024 11:07:09 +0800
-Message-Id: <20241025030709.9520-1-zenghongling@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1729826339; c=relaxed/simple;
+	bh=tXQkeaeiyjrP8ovNzD7qPH0VZDqqmd80n8mUaW1CdTY=;
+	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
+	 Cc:In-Reply-To:To; b=bUvNEHhlgjjkZ97fuYPNgZtF4rPnTG1Ow8fkeRvuA/1lWM5DMvyKr8d5K0Z7BfWZCYdbKij+UKLv6FgHmBeaE1+2pq2YZB73xCdJ/lpwqKD+tEtZ+3zqCCBIwLJdrUNIOf94Uk2yTdvc7kenSJ1EoE/a0JPo5b1j0pHM4wHpYAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=crIVqVKU; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="crIVqVKU"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7203c74e696so1158728b3a.0
+        for <linux-block@vger.kernel.org>; Thu, 24 Oct 2024 20:18:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1729826334; x=1730431134; darn=vger.kernel.org;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tXQkeaeiyjrP8ovNzD7qPH0VZDqqmd80n8mUaW1CdTY=;
+        b=crIVqVKUWkbuJ8p4m4BSg47Y8e7SyXbJqjBzf/0riDVD7ZDDPjAw5IJBEAsGJq5C/K
+         NsdpxYP9M+jfpdODD898Zto63qX9DIuI2dAwO3+SA2WLJLKy36zlkc+8CXV1l0oP+iNq
+         JO+LymLuVpEby5En4/k6BshEKKNx+96gBVwDPVUENQ0Lz6G3+5mH+THYtW50jTFIkg/N
+         4OR80+ZQ/PSs1ZwqBENjM6cQcCbJYu7hRA/KexgaS/87UmlLs+i626TEmYqEKoa1wyrG
+         Cn2qiGd/q8Z3aaQRNii39dwjiVofxvGvq072RxnbgoZcwWMrHa0Ohq1f4perDXvA7zEi
+         CUIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729826334; x=1730431134;
+        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
+         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tXQkeaeiyjrP8ovNzD7qPH0VZDqqmd80n8mUaW1CdTY=;
+        b=JPkBtyOmEBZU1B8Y8RcEfrYnRsR6oiwnUu2mSAkSPOfwQZfmNKAVwACwNl9q755kLv
+         YP5NcPeJoZiGzNi/DX4CmJCt5hT/tgY0w5jdrnTsTozwcT0dgxoxH9lSh8y8aGIVhgxj
+         ruLSfsjCvoyQCCgC6WHxCYvN4L2oqzhF5MaxDXomEFDAWo2WSYyuQbhu2k3rGagGJ1Mc
+         QmDqk5D8BqQahKV7LbnSZT8bcojry9xEqOsIfLAOi/g8msh8otmdbNJtAMQ3glEP6U05
+         1sxLnrDBKSmiWk7VdOup9wTUyQW5Sp2y8VZZfZd07U2tYS0UvPvqe0iihXXCc+bTVmQ+
+         4/rA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2nuWPPNDm2jDsuAqQ5aVtaz/ImR/Pd1rfvbDzwyyCTvf5yTwMVxbXNwKvlih4bAX8DmtPuSeuXd4srw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2eeQKTg9R9FhbDIvNo/N5HNxNChYFE3GouKV5r1T/YS++HPCW
+	+5qxTq4Hf26q2fmc4C9vNjThaHDkMyYDUIR88iKxF7V3YfiRQTIWZMmu2MR4+Te8dxFu6r96aDl
+	V
+X-Google-Smtp-Source: AGHT+IGMOtUun+mqvBAqwf3N2awxftRn2vQwoWZVT/1fKy4JV+aPQ2RLWjvghe6xyUDIIdKrHEXEmg==
+X-Received: by 2002:a05:6a00:2d25:b0:71e:6a99:472f with SMTP id d2e1a72fcca58-72030b992eemr10198723b3a.24.1729826334455;
+        Thu, 24 Oct 2024 20:18:54 -0700 (PDT)
+Received: from smtpclient.apple ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7205794f996sm164136b3a.93.2024.10.24.20.18.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Oct 2024 20:18:53 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: Jens Axboe <axboe@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH] blk-core: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+Date: Thu, 24 Oct 2024 21:18:43 -0600
+Message-Id: <9324E4C6-5AA8-488F-A26F-8868A96747E7@kernel.dk>
+References: <20241025030709.9520-1-zenghongling@kylinos.cn>
+Cc: inux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ zhongling0719@126.com
+In-Reply-To: <20241025030709.9520-1-zenghongling@kylinos.cn>
+To: Hongling Zeng <zenghongling@kylinos.cn>
+X-Mailer: iPhone Mail (22A3370)
 
-Since SLOB was removed and since
-commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache=
-_destroy()"),
-it is not necessary to use call_rcu when the callback only performs
-kmem_cache_free. Use kfree_rcu() directly.
+On Oct 24, 2024, at 9:07=E2=80=AFPM, Hongling Zeng <zenghongling@kylinos.cn>=
+ wrote:
+>=20
+> =EF=BB=BFSince SLOB was removed and since
+> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_=
+destroy()"),
+> it is not necessary to use call_rcu when the callback only performs
+> kmem_cache_free. Use kfree_rcu() directly.
 
-The changes were made using Coccinelle.
+I=E2=80=99d take an extra look at that one if I were you.=20
 
-Signed-off-by: Hongling Zeng <zenghongling@kylinos.cn>
----
- block/blk-core.c | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index bc5e8c5..459eb7e 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -245,14 +245,6 @@ void blk_clear_pm_only(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_clear_pm_only);
-=20
--static void blk_free_queue_rcu(struct rcu_head *rcu_head)
--{
--	struct request_queue *q =3D container_of(rcu_head,
--			struct request_queue, rcu_head);
--
--	percpu_ref_exit(&q->q_usage_counter);
--	kmem_cache_free(blk_requestq_cachep, q);
--}
-=20
- static void blk_free_queue(struct request_queue *q)
- {
-@@ -261,7 +253,7 @@ static void blk_free_queue(struct request_queue *q)
- 		blk_mq_release(q);
-=20
- 	ida_free(&blk_queue_ida, q->id);
--	call_rcu(&q->rcu_head, blk_free_queue_rcu);
-+	kfree_rcu(q, rcu_head);
- }
-=20
- /**
---=20
-2.1.0
+=E2=80=94=20
+Jens Axboe
 
