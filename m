@@ -1,246 +1,248 @@
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751BE67A0D
-	for <linux-block@vger.kernel.org>; Fri, 25 Oct 2024 07:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B8718BC34;
+	Fri, 25 Oct 2024 07:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729840091; cv=none; b=jin0fdoWXg5xSv7+H3rTguoEVGsRhJx+VfMdC3mmMmWtDYYmPiYXKpyFVR5VwenXvPylGzNoZg0b+tWvvQzvZ2wKZLy9mCDaYeg4ZwXk0Ra5kurn1pabm0NhmbGhw4dld5HdJoQW1kU+ZgNQIZriqEUHrknSSJch7wrDVEUBDLI=
+	t=1729842634; cv=none; b=kPUfC+PzN+LFmm2+WhzzsoaPBB1uZtzIUVTMSn5e1RDJtXGTCNfecSN6evAQti8yArRzWHNIgEHOpRE6w0ZYoxX4YLlyznBOGQAyydCVFnVLIBejXLGcgFfyO2ThN0WpX7gDf7Vxg+c2fPJFhJYOqYZlOeLM+rEX8+eDkoG0/kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729840091; c=relaxed/simple;
-	bh=OCt2JXDwQcahD201JmN8JzcHxOMa0mpP4bfT4+/gq/0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WxMxPFeHCllhoMxZCDS13sIRlofINRmPagaudTw5PC/dnHUzpBpjSgk/Qgiqkz/wX8qpXWNDVcAEHatKZuvZqyNHXziO/SlXMO9q8aoK0DS3ji2qPRfVWaPKvF0SBS903f1NtPuIkFVVVfEl8xI2piKcARJEJtRqQAFZGfZfrLI=
+	s=arc-20240116; t=1729842634; c=relaxed/simple;
+	bh=uVyDIzrMhpMILz655M51Vt7BTLiBxwWcOnZzBwsXeH8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=u5H/QVFzfFjHjVKI7ee27YdXkbhAIWCOeU9p7B5oYIHaLQ911/yhmAPFePQvQn/XaywYnhsXCq0XI5AecFpDA0LAkAQlHFx/Z3Gm0xTPZJ7kTPi0Z4SeOECPQIL27CDSAN6g8B8r9vP8bqPvD8uwwX+qoYvXcc6wz80/ajqTkXc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4XZYl50m96z4f3jXg
-	for <linux-block@vger.kernel.org>; Fri, 25 Oct 2024 15:07:45 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4XZZgv6Pddz4f3jMW;
+	Fri, 25 Oct 2024 15:50:03 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 98B871A018D
-	for <linux-block@vger.kernel.org>; Fri, 25 Oct 2024 15:08:02 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgAnXMjLQxtniG9BFA--.60018S4;
-	Fri, 25 Oct 2024 15:08:02 +0800 (CST)
-From: Yang Erkun <yangerkun@huaweicloud.com>
-To: axboe@kernel.dk,
-	ulf.hansson@linaro.org,
-	hch@lst.de,
-	yukuai3@huawei.com,
-	houtao1@huawei.com,
-	penguin-kernel@i-love.sakura.ne.jp
-Cc: linux-block@vger.kernel.org,
-	yangerkun@huawei.com,
-	yangerkun@huaweicloud.com
-Subject: [PATCH] brd: fix null pointer when modprobe brd
-Date: Fri, 25 Oct 2024 15:05:11 +0800
-Message-Id: <20241025070511.932879-1-yangerkun@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	by mail.maildlp.com (Postfix) with ESMTP id 619E71A0196;
+	Fri, 25 Oct 2024 15:50:21 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP4 (Coremail) with SMTP id gCh0CgDH+8e7TRtnG0lEFA--.6716S3;
+	Fri, 25 Oct 2024 15:50:21 +0800 (CST)
+Subject: Re: [PATCH] block: refactor rq_qos_wait()
+To: Muchun Song <songmuchun@bytedance.com>, axboe@kernel.dk
+Cc: mingo@redhat.com, peterz@infradead.org, chengming.zhou@linux.dev,
+ muchun.song@linux.dev, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, tj@kernel.org, "yukuai (C)"
+ <yukuai3@huawei.com>
+References: <20241024043525.98663-1-songmuchun@bytedance.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <9c6099ba-8d95-f2f6-fe36-7333f706c0fc@huaweicloud.com>
+Date: Fri, 25 Oct 2024 15:50:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20241024043525.98663-1-songmuchun@bytedance.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAnXMjLQxtniG9BFA--.60018S4
-X-Coremail-Antispam: 1UD129KBjvJXoW3Jw1xWF13GryUCw47Ary8uFg_yoW7Xw13pa
-	13KrWxtrWrCrs3K3yUXw1UuF1rJa1v93yxZ3WxCr1S9r4rArySv3WFyFyjvryrGrWkAF15
-	ZFZ8tF18WF1rC3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
-	Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUU
-	UUU
-X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
+X-CM-TRANSID:gCh0CgDH+8e7TRtnG0lEFA--.6716S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3WF1DtFWDGry3tryUXr1rCrg_yoWxZr43pa
+	yrKF15tF48JrZrKw1xJw4fAa4a9w4rGa43GrWxKasrAr4j9r9YqF1kKF1kWa4Yyrs3XF48
+	Xw40qr9xCrs8A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU92b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+	07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
+	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
+	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
+	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
+	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+	BIdaVFxhVjvjDU0xZFpf9x07UAwIDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-From: Yang Erkun <yangerkun@huawei.com>
+Hi,
 
-My colleague Wupeng found the following problems during fault injection:
++CC Tejun
 
-BUG: unable to handle page fault for address: fffffbfff809d073
-PGD 6e648067 P4D 123ec8067 PUD 123ec4067 PMD 100e38067 PTE 0
-Oops: Oops: 0000 [#1] PREEMPT SMP KASAN NOPTI
-CPU: 5 UID: 0 PID: 755 Comm: modprobe Not tainted 6.12.0-rc3+ #17
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-1.16.1-2.fc37 04/01/2014
-RIP: 0010:__asan_load8+0x4c/0xa0
-...
-Call Trace:
- <TASK>
- blkdev_put_whole+0x41/0x70
- bdev_release+0x1a3/0x250
- blkdev_release+0x11/0x20
- __fput+0x1d7/0x4a0
- task_work_run+0xfc/0x180
- syscall_exit_to_user_mode+0x1de/0x1f0
- do_syscall_64+0x6b/0x170
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
+ÔÚ 2024/10/24 12:35, Muchun Song Ð´µÀ:
+> When rq_qos_wait() is first introduced, it is easy to understand. But
+> with some bug fixes applied, it is not easy for newcomers to understand
+> the whole logic under those fixes. In this patch, rq_qos_wait() is
+> refactored and more comments are added for better understanding. There
+> are 4 points for the improvement:
+> 
+>      1) Use waitqueue_active() instead of wq_has_sleeper() to eliminate
+>         unnecessary memory barrier in wq_has_sleeper() which is supposed
+>         to be used in waker side. In this case, we do need the barrier.
+>         So use the cheaper one to locklessly test for waiters on the queue.
+> 
+>      2) There is already a macro DEFINE_WAIT_FUNC() to declare a
+>         wait_queue_entry with a specified waking function. But there is not
+>         a counterpart for initializing one wait_queue_entry with a
+>         specified waking function. So introducing init_wait_func() for
+>         this, which also could be used elsewhere (like filemap.c). It can
+>         be used in rq_qos_wait() to use default_wake_function() to wake up
+>         waiters, which could remove ->task field from rq_qos_wait_data.
 
-The error path of modprobe will ignores the refcnt for the module, and
-directly releases everything about this all associated resources. For
-the brd module, it can be brd_fops. The brd_init function attempts to
-create 16 ramdisks; each time add_disk is called, a file for the block
-device is created to help do partition scanning and remains alive util
-we return to userspace(Also we can open it with another user thread).
-Let's say brd_init has successfully create the first ramdisk, but fail
-to create the second, the error handling path will release code segment.
-Consequently, bdev_release for file of first ramdisk will trigger null
-pointer since brd_fops has been removed.
+I think it's better to cook point 2 as a seperate patch.
 
-To resolve issue, implement a solution similar to loop_init, and
-reintroduce brd_devices_mutex to help serialize modifications to
-brd_list.
+Whether or not, this patch LGTM.
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
-Fixes: 7f9b348cb5e9 ("brd: convert to blk_alloc_disk/blk_cleanup_disk")
-Reported-by: Wupeng Ma <mawupeng1@huawei.com>
-Signed-off-by: Yang Erkun <yangerkun@huawei.com>
----
- drivers/block/brd.c | 70 ++++++++++++++++++++-------------------------
- 1 file changed, 31 insertions(+), 39 deletions(-)
-
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 2fd1ed101748..f86dd0795d3c 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -316,6 +316,7 @@ __setup("ramdisk_size=", ramdisk_size);
-  * (should share code eventually).
-  */
- static LIST_HEAD(brd_devices);
-+static DEFINE_MUTEX(brd_devices_mutex);
- static struct dentry *brd_debugfs_dir;
- 
- static int brd_alloc(int i)
-@@ -340,14 +341,21 @@ static int brd_alloc(int i)
- 					  BLK_FEAT_NOWAIT,
- 	};
- 
--	list_for_each_entry(brd, &brd_devices, brd_list)
--		if (brd->brd_number == i)
-+	mutex_lock(&brd_devices_mutex);
-+	list_for_each_entry(brd, &brd_devices, brd_list) {
-+		if (brd->brd_number == i) {
-+			mutex_unlock(&brd_devices_mutex);
- 			return -EEXIST;
-+		}
-+	}
- 	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
--	if (!brd)
-+	if (!brd) {
-+		mutex_unlock(&brd_devices_mutex);
- 		return -ENOMEM;
-+	}
- 	brd->brd_number		= i;
- 	list_add_tail(&brd->brd_list, &brd_devices);
-+	mutex_unlock(&brd_devices_mutex);
- 
- 	xa_init(&brd->brd_pages);
- 
-@@ -378,7 +386,9 @@ static int brd_alloc(int i)
- out_cleanup_disk:
- 	put_disk(disk);
- out_free_dev:
-+	mutex_lock(&brd_devices_mutex);
- 	list_del(&brd->brd_list);
-+	mutex_unlock(&brd_devices_mutex);
- 	kfree(brd);
- 	return err;
- }
-@@ -388,21 +398,6 @@ static void brd_probe(dev_t dev)
- 	brd_alloc(MINOR(dev) / max_part);
- }
- 
--static void brd_cleanup(void)
--{
--	struct brd_device *brd, *next;
--
--	debugfs_remove_recursive(brd_debugfs_dir);
--
--	list_for_each_entry_safe(brd, next, &brd_devices, brd_list) {
--		del_gendisk(brd->brd_disk);
--		put_disk(brd->brd_disk);
--		brd_free_pages(brd);
--		list_del(&brd->brd_list);
--		kfree(brd);
--	}
--}
--
- static inline void brd_check_and_reset_par(void)
- {
- 	if (unlikely(!max_part))
-@@ -424,17 +419,7 @@ static inline void brd_check_and_reset_par(void)
- 
- static int __init brd_init(void)
- {
--	int err, i;
--
--	brd_check_and_reset_par();
--
--	brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
--
--	for (i = 0; i < rd_nr; i++) {
--		err = brd_alloc(i);
--		if (err)
--			goto out_free;
--	}
-+	int i;
- 
- 	/*
- 	 * brd module now has a feature to instantiate underlying device
-@@ -450,28 +435,35 @@ static int __init brd_init(void)
- 	 *	If (X / max_part) was not already created it will be created
- 	 *	dynamically.
- 	 */
-+	brd_check_and_reset_par();
-+	brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
- 
- 	if (__register_blkdev(RAMDISK_MAJOR, "ramdisk", brd_probe)) {
--		err = -EIO;
--		goto out_free;
-+		pr_info("brd: module NOT loaded !!!\n");
-+		debugfs_remove_recursive(brd_debugfs_dir);
-+		return -EIO;
- 	}
- 
-+	for (i = 0; i < rd_nr; i++)
-+		brd_alloc(i);
-+
- 	pr_info("brd: module loaded\n");
- 	return 0;
--
--out_free:
--	brd_cleanup();
--
--	pr_info("brd: module NOT loaded !!!\n");
--	return err;
- }
- 
- static void __exit brd_exit(void)
- {
-+	struct brd_device *brd, *next;
- 
- 	unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
--	brd_cleanup();
--
-+	debugfs_remove_recursive(brd_debugfs_dir);
-+	list_for_each_entry_safe(brd, next, &brd_devices, brd_list) {
-+		del_gendisk(brd->brd_disk);
-+		put_disk(brd->brd_disk);
-+		brd_free_pages(brd);
-+		list_del(&brd->brd_list);
-+		kfree(brd);
-+	}
- 	pr_info("brd: module unloaded\n");
- }
- 
--- 
-2.39.2
+>
+>      3) Remove acquire_inflight_cb() logic for the first waiter out of the
+>         while loop to make the code clear.
+> 
+>      4) Add more comments to explain how to sync with different waiters and
+>         the waker.
+> 
+> Signed-off-by: Muchun Song <songmuchun@bytedance.com>
+> ---
+>   block/blk-rq-qos.c   | 82 +++++++++++++++++++++++++++++---------------
+>   include/linux/wait.h |  6 ++--
+>   2 files changed, 58 insertions(+), 30 deletions(-)
+> 
+> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+> index 9b0aa7dd6779f..5d995d389eaf5 100644
+> --- a/block/blk-rq-qos.c
+> +++ b/block/blk-rq-qos.c
+> @@ -196,7 +196,6 @@ bool rq_depth_scale_down(struct rq_depth *rqd, bool hard_throttle)
+>   
+>   struct rq_qos_wait_data {
+>   	struct wait_queue_entry wq;
+> -	struct task_struct *task;
+>   	struct rq_wait *rqw;
+>   	acquire_inflight_cb_t *cb;
+>   	void *private_data;
+> @@ -218,7 +217,20 @@ static int rq_qos_wake_function(struct wait_queue_entry *curr,
+>   		return -1;
+>   
+>   	data->got_token = true;
+> -	wake_up_process(data->task);
+> +	/*
+> +	 * autoremove_wake_function() removes the wait entry only when it
+> +	 * actually changed the task state. We want the wait always removed.
+> +	 * Remove explicitly and use default_wake_function().
+> +	 */
+> +	default_wake_function(curr, mode, wake_flags, key);
+> +	/*
+> +	 * Note that the order of operations is important as finish_wait()
+> +	 * tests whether @curr is removed without grabbing the lock. This
+> +	 * should be the last thing to do to make sure we will not have a
+> +	 * UAF access to @data. And the semantics of memory barrier in it
+> +	 * also make sure the waiter will see the latest @data->got_token
+> +	 * once list_empty_careful() in finish_wait() returns true.
+> +	 */
+>   	list_del_init_careful(&curr->entry);
+>   	return 1;
+>   }
+> @@ -244,41 +256,55 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
+>   		 cleanup_cb_t *cleanup_cb)
+>   {
+>   	struct rq_qos_wait_data data = {
+> -		.wq = {
+> -			.func	= rq_qos_wake_function,
+> -			.entry	= LIST_HEAD_INIT(data.wq.entry),
+> -		},
+> -		.task = current,
+> -		.rqw = rqw,
+> -		.cb = acquire_inflight_cb,
+> -		.private_data = private_data,
+> +		.rqw		= rqw,
+> +		.cb		= acquire_inflight_cb,
+> +		.private_data	= private_data,
+> +		.got_token	= false,
+>   	};
+> -	bool has_sleeper;
+> +	bool first_waiter;
+>   
+> -	has_sleeper = wq_has_sleeper(&rqw->wait);
+> -	if (!has_sleeper && acquire_inflight_cb(rqw, private_data))
+> +	/*
+> +	 * If there are no waiters in the waiting queue, try to increase the
+> +	 * inflight counter if we can. Otherwise, prepare for adding ourselves
+> +	 * to the waiting queue.
+> +	 */
+> +	if (!waitqueue_active(&rqw->wait) && acquire_inflight_cb(rqw, private_data))
+>   		return;
+>   
+> -	has_sleeper = !prepare_to_wait_exclusive(&rqw->wait, &data.wq,
+> +	init_wait_func(&data.wq, rq_qos_wake_function);
+> +	first_waiter = prepare_to_wait_exclusive(&rqw->wait, &data.wq,
+>   						 TASK_UNINTERRUPTIBLE);
+> +	/*
+> +	 * Make sure there is at least one inflight process; otherwise, waiters
+> +	 * will never be woken up. Since there may be no inflight process before
+> +	 * adding ourselves to the waiting queue above, we need to try to
+> +	 * increase the inflight counter for ourselves. And it is sufficient to
+> +	 * guarantee that at least the first waiter to enter the waiting queue
+> +	 * will re-check the waiting condition before going to sleep, thus
+> +	 * ensuring forward progress.
+> +	 */
+> +	if (!data.got_token && first_waiter && acquire_inflight_cb(rqw, private_data)) {
+> +		finish_wait(&rqw->wait, &data.wq);
+> +		/*
+> +		 * We raced with rq_qos_wake_function() getting a token,
+> +		 * which means we now have two. Put our local token
+> +		 * and wake anyone else potentially waiting for one.
+> +		 *
+> +		 * Enough memory barrier in list_empty_careful() in
+> +		 * finish_wait() is paired with list_del_init_careful()
+> +		 * in rq_qos_wake_function() to make sure we will see
+> +		 * the latest @data->got_token.
+> +		 */
+> +		if (data.got_token)
+> +			cleanup_cb(rqw, private_data);
+> +		return;
+> +	}
+> +
+> +	/* we are now relying on the waker to increase our inflight counter. */
+>   	do {
+> -		/* The memory barrier in set_task_state saves us here. */
+>   		if (data.got_token)
+>   			break;
+> -		if (!has_sleeper && acquire_inflight_cb(rqw, private_data)) {
+> -			finish_wait(&rqw->wait, &data.wq);
+> -
+> -			/*
+> -			 * We raced with rq_qos_wake_function() getting a token,
+> -			 * which means we now have two. Put our local token
+> -			 * and wake anyone else potentially waiting for one.
+> -			 */
+> -			if (data.got_token)
+> -				cleanup_cb(rqw, private_data);
+> -			return;
+> -		}
+>   		io_schedule();
+> -		has_sleeper = true;
+>   		set_current_state(TASK_UNINTERRUPTIBLE);
+>   	} while (1);
+>   	finish_wait(&rqw->wait, &data.wq);
+> diff --git a/include/linux/wait.h b/include/linux/wait.h
+> index 8aa3372f21a08..b008ca42b5903 100644
+> --- a/include/linux/wait.h
+> +++ b/include/linux/wait.h
+> @@ -1206,14 +1206,16 @@ int autoremove_wake_function(struct wait_queue_entry *wq_entry, unsigned mode, i
+>   
+>   #define DEFINE_WAIT(name) DEFINE_WAIT_FUNC(name, autoremove_wake_function)
+>   
+> -#define init_wait(wait)								\
+> +#define init_wait_func(wait, function)						\
+>   	do {									\
+>   		(wait)->private = current;					\
+> -		(wait)->func = autoremove_wake_function;			\
+> +		(wait)->func = function;					\
+>   		INIT_LIST_HEAD(&(wait)->entry);					\
+>   		(wait)->flags = 0;						\
+>   	} while (0)
+>   
+> +#define init_wait(wait)	init_wait_func(wait, autoremove_wake_function)
+> +
+>   typedef int (*task_call_f)(struct task_struct *p, void *arg);
+>   extern int task_call_func(struct task_struct *p, task_call_f func, void *arg);
+>   
+> 
 
