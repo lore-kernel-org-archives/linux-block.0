@@ -1,46 +1,46 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA57339FF2
-	for <linux-block@vger.kernel.org>; Fri, 25 Oct 2024 00:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B8E14277
+	for <linux-block@vger.kernel.org>; Fri, 25 Oct 2024 00:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729816679; cv=none; b=d6vuzcak922XKlmV3RBQ+av4D2/+VEejrRs4qEofL9iV/C30wKZ5KTV90tIGOGKKDY6XmA+qIoBQgXt3PPztv0MJmn5O0QnXtvngMEMdCrkFdrt7fMyKS/l4YR8bkUr+RZeuGBvKp1paiakK1FAoawMjwxgg5aH+Kf9AyF8AV38=
+	t=1729816682; cv=none; b=JQwTBsUZBjmnMgFkwuZZB2Mrf148loazP1B9PCHnd7R/xDcQlJP0xH5C+pnwB1OxxeeHu5EtFkk8hvUdFcfqU/G6b4iDjkWPcypUu1t5frS5zwPltT38G89XCrVGvzp5pg3KlApMsoYh33IOe+eTOlnwv819mhIq/XW6wmJL3r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729816679; c=relaxed/simple;
-	bh=sMgwvjUhq3tF+Lgl21ldlA1Yr4MwGWW6sshpk9Pt6j8=;
+	s=arc-20240116; t=1729816682; c=relaxed/simple;
+	bh=Olg2lpE8qFdYHK1854gCWeI/rvnaCSXJqNbsUpx8ubA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z/ieOZpwH6/8Tw1zFdrSyV2vCSlrHInskqk6fCZFBQqw3migEG6T+gQ6OgrcHBpgYjoizou1kYrgSjnflQbCvkDTGjEgYDfaVoKxlvF5cKVr+f6Z2tOS9J9tQlflec/z1LcyszitJQb4/ou3Tgfu3h/npoKQYknyH4rukPqXOR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TuFuRAwH; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=hUrTXyPy2B1fUTuCtENTWQozmYrFseLdHVHn7Lv12RroYDc+YmPZE+KYgvd7XruJNOZcWmv0/trNlXUcxTk08sR9qMs1j12cnDFjXU1Syi9Mei3+Eo0Q3V0PwuIS4wpH4iIjiUeTixMHRItAKAXU13CjLK5SpmmbPYmYgBQic/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SvxBpFiJ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TuFuRAwH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SvxBpFiJ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729816675;
+	s=mimecast20190719; t=1729816679;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Y6+zLF7qyVynVu0svG5QjzT7pX1JxbR+qHzl6WhHYkg=;
-	b=TuFuRAwH2MUBsNyZ/XPiA6FQmBcX+nv4jbLm+TVUp38XO1RjclUnJxTonbd/1USXK9I2QC
-	8ijjsN5R/d/CwjuG1eZgXMzorXWJKc9S2k06HCmjkkNtAeecSUEMQrrufTIrKXTD5FKZXD
-	3pSoqQNY8FGIU0xomUXv86Au7qHlp5Q=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=uE1fr5Ij3ZfzUwzW5aMbdzvUD+Foxf2eQ6lm2mTzYMU=;
+	b=SvxBpFiJccNsRGf9GrM7KVcfPs1PGh+Wt6gHddeHCiR9I8pgNorGaniAJIx4iJ3QzqpINZ
+	Khxa15seokvIrVePTPLpGZwBwg+j0qh686BfTKy+7Dwrs7nWwswl0h8Vp2no91S2bJ6yvP
+	UlDCSJ4uWFfg4z47Dhxq1APbC/Cq8ss=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-694-JiQOOPfnMTeq_LkXDEuFLw-1; Thu,
- 24 Oct 2024 20:37:50 -0400
-X-MC-Unique: JiQOOPfnMTeq_LkXDEuFLw-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-295-LJYOV8XoMXS9NDdZSkRLTQ-1; Thu,
+ 24 Oct 2024 20:37:45 -0400
+X-MC-Unique: LJYOV8XoMXS9NDdZSkRLTQ-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9901119560B4;
-	Fri, 25 Oct 2024 00:37:48 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E0F071956096;
+	Fri, 25 Oct 2024 00:37:43 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.27])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7BA341956088;
-	Fri, 25 Oct 2024 00:37:46 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7FF30196BB7D;
+	Fri, 25 Oct 2024 00:37:41 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -53,9 +53,9 @@ Cc: Christoph Hellwig <hch@lst.de>,
 	linux-kernel@vger.kernel.org,
 	Bart Van Assche <bvanassche@acm.org>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 3/3] block: model freeze & enter queue as lock for supporting lockdep
-Date: Fri, 25 Oct 2024 08:37:20 +0800
-Message-ID: <20241025003722.3630252-4-ming.lei@redhat.com>
+Subject: [PATCH V2 2/3] nvme: core: switch to non_owner variant of start_freeze/unfreeze queue
+Date: Fri, 25 Oct 2024 08:37:19 +0800
+Message-ID: <20241025003722.3630252-3-ming.lei@redhat.com>
 In-Reply-To: <20241025003722.3630252-1-ming.lei@redhat.com>
 References: <20241025003722.3630252-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -65,356 +65,44 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Recently we got several deadlock report[1][2][3] caused by
-blk_mq_freeze_queue and blk_enter_queue().
-
-Turns out the two are just like acquiring read/write lock, so model them
-as read/write lock for supporting lockdep:
-
-1) model q->q_usage_counter as two locks(io and queue lock)
-
-- queue lock covers sync with blk_enter_queue()
-
-- io lock covers sync with bio_enter_queue()
-
-2) make the lockdep class/key as per-queue:
-
-- different subsystem has very different lock use pattern, shared lock
- class causes false positive easily
-
-- freeze_queue degrades to no lock in case that disk state becomes DEAD
-  because bio_enter_queue() won't be blocked any more
-
-- freeze_queue degrades to no lock in case that request queue becomes dying
-  because blk_enter_queue() won't be blocked any more
-
-3) model blk_mq_freeze_queue() as acquire_exclusive & try_lock
-- it is exclusive lock, so dependency with blk_enter_queue() is covered
-
-- it is trylock because blk_mq_freeze_queue() are allowed to run
-  concurrently
-
-4) model blk_enter_queue() & bio_enter_queue() as acquire_read()
-- nested blk_enter_queue() are allowed
-
-- dependency with blk_mq_freeze_queue() is covered
-
-- blk_queue_exit() is often called from other contexts(such as irq), and
-it can't be annotated as lock_release(), so simply do it in
-blk_enter_queue(), this way still covered cases as many as possible
-
-With lockdep support, such kind of reports may be reported asap and
-needn't wait until the real deadlock is triggered.
-
-For example, lockdep report can be triggered in the report[3] with this
-patch applied.
-
-[1] occasional block layer hang when setting 'echo noop > /sys/block/sda/queue/scheduler'
-https://bugzilla.kernel.org/show_bug.cgi?id=219166
-
-[2] del_gendisk() vs blk_queue_enter() race condition
-https://lore.kernel.org/linux-block/20241003085610.GK11458@google.com/
-
-[3] queue_freeze & queue_enter deadlock in scsi
-https://lore.kernel.org/linux-block/ZxG38G9BuFdBpBHZ@fedora/T/#u
+nvme_start_freeze() and nvme_unfreeze() may be called from same context,
+so switch them to call non_owner variant of start_freeze/unfreeze queue.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c       | 18 ++++++++++++++++--
- block/blk-mq.c         | 26 ++++++++++++++++++++++----
- block/blk.h            | 29 ++++++++++++++++++++++++++---
- block/genhd.c          | 15 +++++++++++----
- include/linux/blkdev.h |  6 ++++++
- 5 files changed, 81 insertions(+), 13 deletions(-)
+ drivers/nvme/host/core.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index bc5e8c5eaac9..09d10bb95fda 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -261,6 +261,8 @@ static void blk_free_queue(struct request_queue *q)
- 		blk_mq_release(q);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index ba6508455e18..66d76a9296b1 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -4871,7 +4871,7 @@ void nvme_unfreeze(struct nvme_ctrl *ctrl)
  
- 	ida_free(&blk_queue_ida, q->id);
-+	lockdep_unregister_key(&q->io_lock_cls_key);
-+	lockdep_unregister_key(&q->q_lock_cls_key);
- 	call_rcu(&q->rcu_head, blk_free_queue_rcu);
+ 	srcu_idx = srcu_read_lock(&ctrl->srcu);
+ 	list_for_each_entry_rcu(ns, &ctrl->namespaces, list)
+-		blk_mq_unfreeze_queue(ns->queue);
++		blk_mq_unfreeze_queue_non_owner(ns->queue);
+ 	srcu_read_unlock(&ctrl->srcu, srcu_idx);
+ 	clear_bit(NVME_CTRL_FROZEN, &ctrl->flags);
  }
- 
-@@ -278,18 +280,20 @@ void blk_put_queue(struct request_queue *q)
+@@ -4913,7 +4913,12 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl)
+ 	set_bit(NVME_CTRL_FROZEN, &ctrl->flags);
+ 	srcu_idx = srcu_read_lock(&ctrl->srcu);
+ 	list_for_each_entry_rcu(ns, &ctrl->namespaces, list)
+-		blk_freeze_queue_start(ns->queue);
++		/*
++		 * Typical non_owner use case is from pci driver, in which
++		 * start_freeze is called from timeout work function, but
++		 * unfreeze is done in reset work context
++		 */
++		blk_freeze_queue_start_non_owner(ns->queue);
+ 	srcu_read_unlock(&ctrl->srcu, srcu_idx);
  }
- EXPORT_SYMBOL(blk_put_queue);
- 
--void blk_queue_start_drain(struct request_queue *q)
-+bool blk_queue_start_drain(struct request_queue *q)
- {
- 	/*
- 	 * When queue DYING flag is set, we need to block new req
- 	 * entering queue, so we call blk_freeze_queue_start() to
- 	 * prevent I/O from crossing blk_queue_enter().
- 	 */
--	blk_freeze_queue_start(q);
-+	bool freeze = __blk_freeze_queue_start(q);
- 	if (queue_is_mq(q))
- 		blk_mq_wake_waiters(q);
- 	/* Make blk_queue_enter() reexamine the DYING flag. */
- 	wake_up_all(&q->mq_freeze_wq);
-+
-+	return freeze;
- }
- 
- /**
-@@ -321,6 +325,8 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 			return -ENODEV;
- 	}
- 
-+	rwsem_acquire_read(&q->q_lockdep_map, 0, 0, _RET_IP_);
-+	rwsem_release(&q->q_lockdep_map, _RET_IP_);
- 	return 0;
- }
- 
-@@ -352,6 +358,8 @@ int __bio_queue_enter(struct request_queue *q, struct bio *bio)
- 			goto dead;
- 	}
- 
-+	rwsem_acquire_read(&q->io_lockdep_map, 0, 0, _RET_IP_);
-+	rwsem_release(&q->io_lockdep_map, _RET_IP_);
- 	return 0;
- dead:
- 	bio_io_error(bio);
-@@ -441,6 +449,12 @@ struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id)
- 				PERCPU_REF_INIT_ATOMIC, GFP_KERNEL);
- 	if (error)
- 		goto fail_stats;
-+	lockdep_register_key(&q->io_lock_cls_key);
-+	lockdep_register_key(&q->q_lock_cls_key);
-+	lockdep_init_map(&q->io_lockdep_map, "&q->q_usage_counter(io)",
-+			 &q->io_lock_cls_key, 0);
-+	lockdep_init_map(&q->q_lockdep_map, "&q->q_usage_counter(queue)",
-+			 &q->q_lock_cls_key, 0);
- 
- 	q->nr_requests = BLKDEV_DEFAULT_RQ;
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 96858fb3b9ff..76f277a30c11 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -120,17 +120,29 @@ void blk_mq_in_flight_rw(struct request_queue *q, struct block_device *part,
- 	inflight[1] = mi.inflight[1];
- }
- 
--void blk_freeze_queue_start(struct request_queue *q)
-+bool __blk_freeze_queue_start(struct request_queue *q)
- {
-+	int freeze;
-+
- 	mutex_lock(&q->mq_freeze_lock);
- 	if (++q->mq_freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
- 		mutex_unlock(&q->mq_freeze_lock);
- 		if (queue_is_mq(q))
- 			blk_mq_run_hw_queues(q, false);
-+		freeze = true;
- 	} else {
- 		mutex_unlock(&q->mq_freeze_lock);
-+		freeze = false;
- 	}
-+
-+	return freeze;
-+}
-+
-+void blk_freeze_queue_start(struct request_queue *q)
-+{
-+	if (__blk_freeze_queue_start(q))
-+		blk_freeze_acquire_lock(q, false, false);
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
- 
-@@ -176,8 +188,10 @@ void blk_mq_freeze_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue);
- 
--void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
-+bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- {
-+	int unfreeze = false;
-+
- 	mutex_lock(&q->mq_freeze_lock);
- 	if (force_atomic)
- 		q->q_usage_counter.data->force_atomic = true;
-@@ -186,13 +200,17 @@ void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic)
- 	if (!q->mq_freeze_depth) {
- 		percpu_ref_resurrect(&q->q_usage_counter);
- 		wake_up_all(&q->mq_freeze_wq);
-+		unfreeze = true;
- 	}
- 	mutex_unlock(&q->mq_freeze_lock);
-+
-+	return unfreeze;
- }
- 
- void blk_mq_unfreeze_queue(struct request_queue *q)
- {
--	__blk_mq_unfreeze_queue(q, false);
-+	if (__blk_mq_unfreeze_queue(q, false))
-+		blk_unfreeze_release_lock(q, false, false);
- }
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
- 
-@@ -205,7 +223,7 @@ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
-  */
- void blk_freeze_queue_start_non_owner(struct request_queue *q)
- {
--	blk_freeze_queue_start(q);
-+	__blk_freeze_queue_start(q);
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start_non_owner);
- 
-diff --git a/block/blk.h b/block/blk.h
-index c718e4291db0..832e54c5a271 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/bio-integrity.h>
- #include <linux/blk-crypto.h>
-+#include <linux/lockdep.h>
- #include <linux/memblock.h>	/* for max_pfn/max_low_pfn */
- #include <linux/sched/sysctl.h>
- #include <linux/timekeeping.h>
-@@ -35,8 +36,9 @@ struct blk_flush_queue *blk_alloc_flush_queue(int node, int cmd_size,
- void blk_free_flush_queue(struct blk_flush_queue *q);
- 
- void blk_freeze_queue(struct request_queue *q);
--void __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
--void blk_queue_start_drain(struct request_queue *q);
-+bool __blk_mq_unfreeze_queue(struct request_queue *q, bool force_atomic);
-+bool blk_queue_start_drain(struct request_queue *q);
-+bool __blk_freeze_queue_start(struct request_queue *q);
- int __bio_queue_enter(struct request_queue *q, struct bio *bio);
- void submit_bio_noacct_nocheck(struct bio *bio);
- void bio_await_chain(struct bio *bio);
-@@ -69,8 +71,11 @@ static inline int bio_queue_enter(struct bio *bio)
- {
- 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
- 
--	if (blk_try_enter_queue(q, false))
-+	if (blk_try_enter_queue(q, false)) {
-+		rwsem_acquire_read(&q->io_lockdep_map, 0, 0, _RET_IP_);
-+		rwsem_release(&q->io_lockdep_map, _RET_IP_);
- 		return 0;
-+	}
- 	return __bio_queue_enter(q, bio);
- }
- 
-@@ -734,4 +739,22 @@ void blk_integrity_verify(struct bio *bio);
- void blk_integrity_prepare(struct request *rq);
- void blk_integrity_complete(struct request *rq, unsigned int nr_bytes);
- 
-+static inline void blk_freeze_acquire_lock(struct request_queue *q, bool
-+		disk_dead, bool queue_dying)
-+{
-+	if (!disk_dead)
-+		rwsem_acquire(&q->io_lockdep_map, 0, 1, _RET_IP_);
-+	if (!queue_dying)
-+		rwsem_acquire(&q->q_lockdep_map, 0, 1, _RET_IP_);
-+}
-+
-+static inline void blk_unfreeze_release_lock(struct request_queue *q, bool
-+		disk_dead, bool queue_dying)
-+{
-+	if (!queue_dying)
-+		rwsem_release(&q->q_lockdep_map, _RET_IP_);
-+	if (!disk_dead)
-+		rwsem_release(&q->io_lockdep_map, _RET_IP_);
-+}
-+
- #endif /* BLK_INTERNAL_H */
-diff --git a/block/genhd.c b/block/genhd.c
-index 1c05dd4c6980..6ad3fcde0110 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -581,13 +581,13 @@ static void blk_report_disk_dead(struct gendisk *disk, bool surprise)
- 	rcu_read_unlock();
- }
- 
--static void __blk_mark_disk_dead(struct gendisk *disk)
-+static bool __blk_mark_disk_dead(struct gendisk *disk)
- {
- 	/*
- 	 * Fail any new I/O.
- 	 */
- 	if (test_and_set_bit(GD_DEAD, &disk->state))
--		return;
-+		return false;
- 
- 	if (test_bit(GD_OWNS_QUEUE, &disk->state))
- 		blk_queue_flag_set(QUEUE_FLAG_DYING, disk->queue);
-@@ -600,7 +600,7 @@ static void __blk_mark_disk_dead(struct gendisk *disk)
- 	/*
- 	 * Prevent new I/O from crossing bio_queue_enter().
- 	 */
--	blk_queue_start_drain(disk->queue);
-+	return blk_queue_start_drain(disk->queue);
- }
- 
- /**
-@@ -641,6 +641,7 @@ void del_gendisk(struct gendisk *disk)
- 	struct request_queue *q = disk->queue;
- 	struct block_device *part;
- 	unsigned long idx;
-+	bool start_drain, queue_dying;
- 
- 	might_sleep();
- 
-@@ -668,7 +669,10 @@ void del_gendisk(struct gendisk *disk)
- 	 * Drop all partitions now that the disk is marked dead.
- 	 */
- 	mutex_lock(&disk->open_mutex);
--	__blk_mark_disk_dead(disk);
-+	start_drain = __blk_mark_disk_dead(disk);
-+	queue_dying = blk_queue_dying(q);
-+	if (start_drain)
-+		blk_freeze_acquire_lock(q, true, queue_dying);
- 	xa_for_each_start(&disk->part_tbl, idx, part, 1)
- 		drop_partition(part);
- 	mutex_unlock(&disk->open_mutex);
-@@ -725,6 +729,9 @@ void del_gendisk(struct gendisk *disk)
- 		if (queue_is_mq(q))
- 			blk_mq_exit_queue(q);
- 	}
-+
-+	if (start_drain)
-+		blk_unfreeze_release_lock(q, true, queue_dying);
- }
- EXPORT_SYMBOL(del_gendisk);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 50c3b959da28..57f1ee386b57 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -25,6 +25,7 @@
- #include <linux/uuid.h>
- #include <linux/xarray.h>
- #include <linux/file.h>
-+#include <linux/lockdep.h>
- 
- struct module;
- struct request_queue;
-@@ -471,6 +472,11 @@ struct request_queue {
- 	struct xarray		hctx_table;
- 
- 	struct percpu_ref	q_usage_counter;
-+	struct lock_class_key	io_lock_cls_key;
-+	struct lockdep_map	io_lockdep_map;
-+
-+	struct lock_class_key	q_lock_cls_key;
-+	struct lockdep_map	q_lockdep_map;
- 
- 	struct request		*last_merge;
- 
+ EXPORT_SYMBOL_GPL(nvme_start_freeze);
 -- 
 2.46.0
 
