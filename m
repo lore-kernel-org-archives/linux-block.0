@@ -1,145 +1,98 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f98.google.com (mail-oa1-f98.google.com [209.85.160.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44468203706
-	for <linux-block@vger.kernel.org>; Fri, 25 Oct 2024 12:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894071DFD8
+	for <linux-block@vger.kernel.org>; Fri, 25 Oct 2024 18:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729859047; cv=none; b=FYvf/N3OIqh1DI+poYs+vwyLrZ/2V6cGXUCc9JqMIc1LeqNNw3LnmYwyCxJQIPN6eW6DVq/UIS+75pMvbsxtxS5yn98KAXwatC3xihUiMKvNNZiUwJOwiRmVdTCPGnAUzeiqQpOcRVscvyvsO4szL3HykQ02RGraK59EHnpBCcc=
+	t=1729881099; cv=none; b=nnYo4uj2aRl9nCdCldTNQE2jqBr3TVogj1AgbmYfnTzVtLhplkpZgD2FYEQ2uYTgeXhhuFmP99v3DJv+M1Gi0S/wBjZ6mYtrxLzwD0btJ9N+VoJsAQqSRYKew0h2MUtdOp8f21+ZpM7ZiCmbg/hxGmqMUVM8Wy9/1ePLsSvmvMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729859047; c=relaxed/simple;
-	bh=vABzLKNvlOxdyet/MKsBKs8rtzdGuPcPBOr6mAJI6sM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DJdjRlfWCdPuKxgKoNgJwhs0Yzw4g99aEOh/ccU/EQ/Znks/xRKTT/19MfHGBxO0IBcLvOVw+K9culWvQpy2vSDBnxlym8NFmuMySDpgUw40olFq7jHty0vNb08zuRdslTGmgTn5xRMgJoe2SCPnJktz4rnFWQ0ajYujHOxJ39g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bUARgdsU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729881099; c=relaxed/simple;
+	bh=1ofbrdaWLVdHUGxBkgA93LdIUCYbEShz/TryfOVyq6c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ofQmuxIjvYuQM2GU/VLEeagMJ/asUoHkq8KC+wgppubqX15qnu5cpVh4DLNz8vq3uRqQZ+xLKPeA0jx06DAY5KIlE5Vs72ccp0cnyh9pXi+AvEDL5/wyYFmhULjXg82Tq8ld2lljY4lHEbDDaQWSzbDje3+SED494NzfcVqR0uM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=LQ0fbwrM; arc=none smtp.client-ip=209.85.160.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bUARgdsU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729859044;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cywKv9TEoDTr7tj5I18bYRcgvSakRA47XCPWDnlogL0=;
-	b=bUARgdsUzLx0jXb2Yfz+sBI8K9d5t1VgWPOg3YueBeZuAxOA+99OD5wniOsEV9GV9/73v5
-	GFtGZ/tNm9ls0NoMguamCaSfLH0C03JFYivM82gH4xMMmrjWQqIBJGDF70ipcazdmFJVxP
-	i9QzZNcyIpraDBhNNQdRd/EeeNwJOKo=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-164-HydeUNApNS2RR6AwEGz7nw-1; Fri,
- 25 Oct 2024 08:23:57 -0400
-X-MC-Unique: HydeUNApNS2RR6AwEGz7nw-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 281A5191379F;
-	Fri, 25 Oct 2024 12:23:25 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.106])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 26A4E196BB7D;
-	Fri, 25 Oct 2024 12:23:23 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	io-uring@vger.kernel.org,
-	Pavel Begunkov <asml.silence@gmail.com>
-Cc: linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Akilesh Kailash <akailash@google.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V8 6/7] io_uring/uring_cmd: support leasing device kernel buffer to io_uring
-Date: Fri, 25 Oct 2024 20:22:43 +0800
-Message-ID: <20241025122247.3709133-7-ming.lei@redhat.com>
-In-Reply-To: <20241025122247.3709133-1-ming.lei@redhat.com>
-References: <20241025122247.3709133-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="LQ0fbwrM"
+Received: by mail-oa1-f98.google.com with SMTP id 586e51a60fabf-288a990b0abso1210103fac.2
+        for <linux-block@vger.kernel.org>; Fri, 25 Oct 2024 11:31:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1729881096; x=1730485896; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EIM5DGiJ6PGvlZJHET8vwbCjolmj9XxWNBNIURynsP0=;
+        b=LQ0fbwrM7lIxclygDmyrE7gOipfktsrgJ5XFXZI1LJb1d8KkdCVIiEXoy4/dag75Tp
+         Iq7VxpP1wssD4Gbvkz/vybMZ08kJAHXl88GpRLUyJwN0ZDHNyWSkBfTcqxAMDCPK30BD
+         GAilL0wl9nSrQ9YaQqQe1JoXSMvoZ9DNj9vbHFA7niF2W0Axakdwdc4F73fdRhJ2WCcH
+         AIom/2SX+Tx6M6W7DAeX3V4wmY0uZ63mQeBedbOaH9toDObfGF7jvyvz9f5ZHfuD5G71
+         rgG5Tm8ry/i75mwJG2xG4nNZsYHxmSOmpFG8PP/uZ5PFfE1Ib2TQvt7PTi0kEt5f0etD
+         l/BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729881096; x=1730485896;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EIM5DGiJ6PGvlZJHET8vwbCjolmj9XxWNBNIURynsP0=;
+        b=U4RhfHqLjuyL3LzqFtDuO0/0y+ztGU3IFFuuZb270QrbL/bHBtKCL7wmxI5PpGYrrP
+         VyUjaEWFWiBNMMNHJurNLeBxIjx2Bd7Wvm6RJDCp//lbJTn3Vrs7x8suiUuP1Uhb3ex2
+         pTvQ8W1Ye9sDLTjTYY0ys+MxpqpQMF+uMG4K7yeCO3T0lTpBSCJohjdhYdDYiZKM7kFY
+         8pYGFkFZJjzzJtXHYJu50ccex0Lsloa8k1HrtJ0b38K7veFrTIcj1liKCGp00cekjp7h
+         V5c5vRvOWNg/mMWrGsyzFlcnHg2Q9ixiSWGYl7rEdNifkLsaeJ+lDYEC1VAckD97kpFp
+         w/Cw==
+X-Forwarded-Encrypted: i=1; AJvYcCV2QJ0rLsVkNYk+eILWbBxTItQnwhu9DZBc5Sq3aaCrs61Es9Jt7us4XbhVrJAYsgXOD7MIlt/tE4y6Og==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnRNzgStuNgRo+G40w2XSrJAIDogjjjIoaI0PcqVnYpR2BeFR7
+	LuYpwukmldYqBZS/zlBHPOzBliCQN2G24lvZKoKb2THsUS80VtOLW04/0t/iRIAdkkuuTAmhCR/
+	U4cdr8IHYtTdYrEL53uxuXVORpyOzsgf0OQyBViM5e+KhAFCh
+X-Google-Smtp-Source: AGHT+IEr9jXs7b2AOWsWivDEC34tM6qcAevxNhAYRCEXmg0Jm92otJwx7oluktoSjg0Njxb5JAtK1LVjUCnS
+X-Received: by 2002:a05:6870:d207:b0:277:eb15:5c60 with SMTP id 586e51a60fabf-29051af7146mr430594fac.10.1729881096380;
+        Fri, 25 Oct 2024 11:31:36 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-29036eb60ddsm55354fac.28.2024.10.25.11.31.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2024 11:31:36 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 65AB9340325;
+	Fri, 25 Oct 2024 12:31:35 -0600 (MDT)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 5A05BE40EF3; Fri, 25 Oct 2024 12:31:35 -0600 (MDT)
+Date: Fri, 25 Oct 2024 12:31:35 -0600
+From: Uday Shankar <ushankar@purestorage.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, xizhang@purestorage.com, joshi.k@samsung.com,
+	anuj20.g@samsung.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: fix queue limits checks in blk_rq_map_user_bvec
+ for real
+Message-ID: <ZxvkB/6KBq7XwWAU@dev-ushankar.dev.purestorage.com>
+References: <20241025115818.54976-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241025115818.54976-1-hch@lst.de>
 
-Add API of io_uring_cmd_lease_kbuf() for driver to lease its kernel
-buffer to io_uring.
+On Fri, Oct 25, 2024 at 01:58:11PM +0200, Christoph Hellwig wrote:
+> blk_rq_map_user_bvec currently only has ad-hoc checks for queue limits,
+> and the last fix to it enabled valid NVMe I/O to pass, but also allowed
+> invalid one for drivers that set a max_segment_size or seg_boundary
+> limit.
+> 
+> Fix it once for all by using the bio_split_rw_at helper from the I/O
+> path that indicates if and where a bio would be have to be split to
+> adhere to the queue limits, and it it returns a positive value, turn
+> that into -EREMOTEIO to retry using the copy path.
+> 
+> Fixes: 2ff949441802 ("block: fix sanity checks in blk_rq_map_user_bvec")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-The leased buffer can only be consumed by io_uring OPs in group wide,
-and the uring_cmd has to be one group leader.
+This passes my test for NVMe passthrough I/O using a strict subset of a
+preregistered buffer (see 2ff949441802 for details).
 
-This way can support generic device zero copy over device buffer in
-userspace:
-
-- create one sqe group
-- lease one device buffer to io_uring by the group leader of uring_cmd
-- io_uring member OPs consume this kernel buffer by passing IOSQE_IO_DRAIN
-  which isn't used for group member, and mapped to GROUP_KBUF.
-- the kernel buffer is returned back after all member OPs are completed
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- include/linux/io_uring/cmd.h |  7 +++++++
- io_uring/uring_cmd.c         | 13 +++++++++++++
- 2 files changed, 20 insertions(+)
-
-diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
-index c189d36ad55e..bdf7abfa0d8a 100644
---- a/include/linux/io_uring/cmd.h
-+++ b/include/linux/io_uring/cmd.h
-@@ -60,6 +60,8 @@ void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
- /* Execute the request from a blocking context */
- void io_uring_cmd_issue_blocking(struct io_uring_cmd *ioucmd);
- 
-+int io_uring_cmd_lease_kbuf(struct io_uring_cmd *ioucmd,
-+		const struct io_uring_kernel_buf *grp_kbuf);
- #else
- static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
- 			      struct iov_iter *iter, void *ioucmd)
-@@ -82,6 +84,11 @@ static inline void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
- static inline void io_uring_cmd_issue_blocking(struct io_uring_cmd *ioucmd)
- {
- }
-+static inline int io_uring_cmd_lease_kbuf(struct io_uring_cmd *ioucmd,
-+		const struct io_uring_kernel_buf *grp_kbuf)
-+{
-+	return -EOPNOTSUPP;
-+}
- #endif
- 
- /*
-diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-index 6994f60d7ec7..2c9c2c60c6cd 100644
---- a/io_uring/uring_cmd.c
-+++ b/io_uring/uring_cmd.c
-@@ -15,6 +15,7 @@
- #include "alloc_cache.h"
- #include "rsrc.h"
- #include "uring_cmd.h"
-+#include "kbuf.h"
- 
- static struct uring_cache *io_uring_async_get(struct io_kiocb *req)
- {
-@@ -175,6 +176,18 @@ void io_uring_cmd_done(struct io_uring_cmd *ioucmd, ssize_t ret, ssize_t res2,
- }
- EXPORT_SYMBOL_GPL(io_uring_cmd_done);
- 
-+int io_uring_cmd_lease_kbuf(struct io_uring_cmd *ioucmd,
-+		const struct io_uring_kernel_buf *grp_kbuf)
-+{
-+	struct io_kiocb *req = cmd_to_io_kiocb(ioucmd);
-+
-+	if (unlikely(ioucmd->flags & IORING_URING_CMD_FIXED))
-+		return -EINVAL;
-+
-+	return io_lease_group_kbuf(req, grp_kbuf);
-+}
-+EXPORT_SYMBOL_GPL(io_uring_cmd_lease_kbuf);
-+
- static int io_uring_cmd_prep_setup(struct io_kiocb *req,
- 				   const struct io_uring_sqe *sqe)
- {
--- 
-2.46.0
+Tested-by: Uday Shankar <ushankar@purestorage.com>
 
