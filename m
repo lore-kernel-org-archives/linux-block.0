@@ -1,95 +1,49 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9FD1DE892;
-	Mon, 28 Oct 2024 16:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74681DF974
+	for <linux-block@vger.kernel.org>; Mon, 28 Oct 2024 16:13:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730132001; cv=none; b=sbHuNzk3ceBgxx9BTzU7ZqnOxDMSukHqrRD/1Q0/6kTOusAVyj7hxCZc/rGEpmjVsZr6Ypz1C9gsHxW4KQ9d6ntjTQ0OIx1uAEOoROLOhyg1lTxphYSehcTzwiN//9k3NT9wgEcfMZ0D9VeMNtQJRIVqaZCyxSw0u9SHPrpeEU8=
+	t=1730132031; cv=none; b=htACbbLQDsdg89qJqPyVjuOAjgvsK4v+s75J5j0tw8Y4IzExEqwRnGuMcid3V6hm5zCnmasJM5ee3MEe18Qr4N3eya71Oo79LFhZHs8uM2iEJjlMa2uv6UzwnGVlrgcJhgrozodGCk3vnW3/CIIsSUgDX8NhjDnexAPiKXMRIKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730132001; c=relaxed/simple;
-	bh=Rj7dAa97W4f4nsy3wpoOstotuVQdhoO58XJVBGQXGgA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F5aCJCK71sIpIC686awDWVUvTDomklHdkx1D2n4obbZ/49EqLJ0qXa+zdyynG3qOPPEYhsLyL6YAw/2m4HTH9kBMAVT19GXB7adUFbk47y6AviWwb1KuhHsk4l5qufB4BRNLGzvHk/YtwSpnQs+K2OaeOZsoPndbvEJCZ58W0dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=W0dqk1Ds; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="W0dqk1Ds"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Xcdj53kxVzlgVnY;
-	Mon, 28 Oct 2024 16:13:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1730131990; x=1732723991; bh=aVIfM6ADLRrW2ddhkhRN1Ajj
-	S03IN19K19H+CtsbWaU=; b=W0dqk1DsslaMtQqRUmYfCegGOqGHrqnDrBsmojNg
-	gIK38JxDgmg9hSczFGVpBQ+VMchq05YeATWBuU/ttAFAxocaqf0NvdPrfjsP+jvB
-	sNphj7PLtS9+uCjWq9gDoR6/HZ52a+D9FFe3Eerfk44lAlErzTVCIjRUrmK1bSih
-	Iy3M1dfEs4ejypA41t9GfZYJ3tE13m83o+JpgpPAiFl5PB9ZpmcwBzfBuWGqKIJp
-	SCnmsX/A3fuIqK+HW/thaWRFwjddUyjB+06oy94SByPou5AkmgfOOreyiyADV7tP
-	t9jRAePD4uGb1SHVlYx5E6tnUZYSAHi0/DirZru94rycow==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id EpRxxZ74yApD; Mon, 28 Oct 2024 16:13:10 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Xcdj06BCKzlgMVd;
-	Mon, 28 Oct 2024 16:13:08 +0000 (UTC)
-Message-ID: <e83cfc72-029f-4ab1-b8e4-56732585e9fd@acm.org>
-Date: Mon, 28 Oct 2024 09:13:08 -0700
+	s=arc-20240116; t=1730132031; c=relaxed/simple;
+	bh=6uGp1EeSwaOmY3vJJnh8frp66AqgxPjESm4eP8/8iF4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NE4JMVjFWpHVib03ubzL4rqpSVQQscCqqt8hoMaGIbNHFdLgfs/I3O/TrA65tlKr3rzATmOT3NZR3w4pcZrCoTAogpQf1i/arNNZb4VdFOwUsab/DcHp3pReI3tBrcYFU08cC6SykpWY3DWs9LWfwdH6OeIr+X27h/JF/ly3S6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id F088E68BEB; Mon, 28 Oct 2024 17:13:46 +0100 (CET)
+Date: Mon, 28 Oct 2024 17:13:46 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Christoph Hellwig <hch@lst.de>, Yang Erkun <yangerkun@huaweicloud.com>,
+	axboe@kernel.dk, ulf.hansson@linaro.org, houtao1@huawei.com,
+	penguin-kernel@i-love.sakura.ne.jp, linux-block@vger.kernel.org,
+	yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] brd: defer automatic disk creation until module
+ initialization succeeds
+Message-ID: <20241028161346.GA29122@lst.de>
+References: <20241028090726.2958921-1-yangerkun@huaweicloud.com> <20241028094409.GA31248@lst.de> <c2ec4267-6cd6-43ec-2857-287d4610441c@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv9 7/7] scsi: set permanent stream count in block limits
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- io-uring@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, hch@lst.de, joshi.k@samsung.com,
- javier.gonz@samsung.com, Keith Busch <kbusch@kernel.org>
-References: <20241025213645.3464331-1-kbusch@meta.com>
- <20241025213645.3464331-8-kbusch@meta.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20241025213645.3464331-8-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c2ec4267-6cd6-43ec-2857-287d4610441c@huaweicloud.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 10/25/24 2:36 PM, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> The block limits exports the number of write hints, so set this limit if
-> the device reports support for the lifetime hints. Not only does this
-> inform the user of which hints are possible, it also allows scsi devices
-> supporting the feature to utilize the full range through raw block
-> device direct-io.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->   drivers/scsi/sd.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-> index ca4bc0ac76adc..235dd6e5b6688 100644
-> --- a/drivers/scsi/sd.c
-> +++ b/drivers/scsi/sd.c
-> @@ -3768,6 +3768,8 @@ static int sd_revalidate_disk(struct gendisk *disk)
->   		sd_config_protection(sdkp, &lim);
->   	}
->   
-> +	lim.max_write_hints = sdkp->permanent_stream_count;
-> +
->   	/*
->   	 * We now have all cache related info, determine how we deal
->   	 * with flush requests.
+On Mon, Oct 28, 2024 at 07:29:54PM +0800, Yu Kuai wrote:
+> I don't quite understand this, if the gendisk already exists,
+> the probe callback won't be called from the open path, because
+> ilookup() from blkdev_get_no_open() will found the bdev inode.
+> Hence there will only be a small race windown for concurrent
+> create on open callers to return -EEXIST here.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+True.  I'd still avoid the noice printk for that corner case, though.
+
