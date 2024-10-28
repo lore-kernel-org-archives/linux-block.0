@@ -1,48 +1,38 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E200186616;
-	Mon, 28 Oct 2024 18:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF3F1DF266;
+	Mon, 28 Oct 2024 18:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=204.191.154.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730140059; cv=none; b=Nb8OYesr+K/bp3e0LGo3EGNswNJ4HuKKGTSrLYm40smPjcZDsV0N0W53XLOJpYfUdjL8Pbk3nYVLGAy95MmqjOMbuI7KFsw+WReH4veKvRbzyO6trxD6yB3ce00tkH1YRWlDYHBY3bvMoP5UFfSB2xanJmzGxSuD99b8TvP/IlM=
+	t=1730140092; cv=none; b=pW6dssa28rzocVKYJMtPEFLytAYmmchKPdzaDDcP1cOo+td2rvpY86CPmcCgf5Z5iyZdQK6JVuE/lPydKhgSlazu5iVoNJoJFvxB4SreznZcGJ6XILji2Ry8u7QhKtV2KPxfHWXbRTxp9qHTQ5uOBVvH6ms4POXVBY4E86/tNIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730140059; c=relaxed/simple;
-	bh=rhlpUCqerCgg89TeahubZhhVDdSg0WPb2EHjHy0q2Xw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KkJY6sKdSi2wwoC3FCStrYyJ/g9YsJvhFmL5XLnnamngNi22nSjUsnIYcw9VCCe/+aZhUhpmSJ5KRWyvB2bgA4K/z1oHX32QrQ0gH+Npj26sBiDJFr2by9ffDEoFAVnzY/GVFIB8wOD/iSvgovo+7Xd+X1pPQxeloYfvqtLSjHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=DhKPFJpw; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1730140092; c=relaxed/simple;
+	bh=jysc9seah1CkGTogQocmaGVdqs178PC3SgenoTMtVGU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Subject; b=YIZH5js2bZpjzPlV2WDCLlUBbZ54xciUVZXz7tbkF9DoWhuqu2uYf9kfrHOX4aLVLAT4bcMLIWEFMuDKxrZBM3e7/UBIQ6LxRNVFU95l0ZhMICiq4GZy083F0qSRl82+xOAe/sScdR68GOwW3DURXbtV8pBCpllYIZYIvNwDukY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com; spf=pass smtp.mailfrom=deltatee.com; dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b=WMjqOgKe; arc=none smtp.client-ip=204.191.154.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deltatee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deltatee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="DhKPFJpw"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Xchh93fq2zlgVnY;
-	Mon, 28 Oct 2024 18:27:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1730140054; x=1732732055; bh=rhlpUCqerCgg89TeahubZhhV
-	DdSg0WPb2EHjHy0q2Xw=; b=DhKPFJpwpvxhzpKYxUjS3ZL89K5UeOtkI/jcnaB6
-	cNh3v4ZfnI0ivSzxXOQKTXYMYhzusvFhy79ymlg+2ZDoMhzboqNNAGPDSHDTkDNJ
-	L5FWLiu7IuAieAeFA40n3agyo5Rymjr6y/bc96C5MCwsU6FiUUvGXsjfQ9LOCD7N
-	51FN8UKAgeq8VD3JFETDbgUyNZN6qo7kk51MRsFdngjRj+wAu6FtzN8trc5d+q7V
-	aVVDXTCsll4vYfbcUJaTxzUcyrIr7VgARFcNVQBQ53GveJMWdUBskwwSXAhE9Fj8
-	p3WQOPXTNDTnP3PzVtEppXyRAN0KPyczS4udNgXocq5bNQ==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id sMy7fRG_jkxB; Mon, 28 Oct 2024 18:27:34 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Xchh56TsqzlgTWR;
-	Mon, 28 Oct 2024 18:27:33 +0000 (UTC)
-Message-ID: <626bd35e-7216-4379-967d-5f6ebb4a5272@acm.org>
-Date: Mon, 28 Oct 2024 11:27:33 -0700
+	dkim=pass (2048-bit key) header.d=deltatee.com header.i=@deltatee.com header.b="WMjqOgKe"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+	MIME-Version:Date:Message-ID:content-disposition;
+	bh=xfwaAlX8xBNBzzQd8cWtPopo9omhZXUl1zo673gmZPU=; b=WMjqOgKeRu8KLmj0e+FfaKQ5nw
+	SgLTeMPtlxn7YvNSwEXm9WRVO6V3OfUYWzBkFxex8g5DhluJnjtGZAOP88y+oEYbhTswl001wqbjC
+	VAMp0KBM1cV3pxfWiT9t7GEpH6PP3iHvzxFOSltTDDGP1nFT4qfRwTkyuhh+Ij31rgOzU9qZSzueN
+	FXFsu3EvxwXrCsD6Ddkf3+5bHEPJculCmwf5FKruYO+4w5MEugAU88AXgFQlK1emwFsWfp6VAnMOR
+	XgGvOU7wsYcyzcO9LPQQNiLmuWtrD8A0tY2Ryo4R36g1lHw3F9kJrwi9exvBKqXcTantt6HmE9C2I
+	NC3mHOlg==;
+Received: from d104-157-31-28.abhsia.telus.net ([104.157.31.28] helo=[192.168.1.250])
+	by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <logang@deltatee.com>)
+	id 1t5UT4-002Zeg-0P;
+	Mon, 28 Oct 2024 12:27:54 -0600
+Message-ID: <9db04bd9-81e1-4e60-a590-0882cd86052f@deltatee.com>
+Date: Mon, 28 Oct 2024 12:27:51 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,33 +40,56 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv9 3/7] block: allow ability to limit partition write hints
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- io-uring@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, hch@lst.de, joshi.k@samsung.com,
- javier.gonz@samsung.com, Keith Busch <kbusch@kernel.org>
-References: <20241025213645.3464331-1-kbusch@meta.com>
- <20241025213645.3464331-4-kbusch@meta.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20241025213645.3464331-4-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
+Cc: Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Yishai Hadas <yishaih@nvidia.com>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+ iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+References: <cover.1730037261.git.leon@kernel.org>
+ <34d44537a65aba6ede215a8ad882aeee028b423a.1730037261.git.leon@kernel.org>
+Content-Language: en-CA
+From: Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <34d44537a65aba6ede215a8ad882aeee028b423a.1730037261.git.leon@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 104.157.31.28
+X-SA-Exim-Rcpt-To: leon@kernel.org, axboe@kernel.dk, jgg@ziepe.ca, robin.murphy@arm.com, joro@8bytes.org, will@kernel.org, hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, bhelgaas@google.com, yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com, alex.williamson@redhat.com, m.szyprowski@samsung.com, jglisse@redhat.com, akpm@linux-foundation.org, corbet@lwn.net, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-rdma@vger.kernel.org, iommu@lists.linux.dev, linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+X-Spam-Level: 
+Subject: Re: [RFC PATCH 2/7] block: don't merge different kinds of P2P
+ transfers in a single bio
+X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 
-On 10/25/24 2:36 PM, Keith Busch wrote:
-> When multiple partitions are used, you may want to enforce different
-> subsets of the available write hints for each partition. Provide a
-> bitmap attribute of the available write hints, and allow an admin to
-> write a different mask to set the partition's allowed write hints.
 
-After /proc/irq/*/smp_affinity was introduced (a bitmask),
-/proc/irq/*/smp_affinity_list (set of ranges) was introduced as a more
-user-friendly alternative. Is the same expected to happen with the
-write_hint_mask? If so, shouldn't we skip the bitmask user space
-interface and directly introduce the more user friendly interface (set
-of ranges)?
 
-Thanks,
+On 2024-10-27 08:21, Leon Romanovsky wrote:
+> From: Christoph Hellwig <hch@lst.de>
+> 
+> To get out of the dma mapping helpers having to check every segment for
+> it's P2P status, ensure that bios either contain P2P transfers or non-P2P
+> transfers, and that a P2P bio only contains ranges from a single device.
+> 
+> This means we do the page zone access in the bio add path where it should
+> be still page hot, and will only have do the fairly expensive P2P topology
+> lookup once per bio down in the dma mapping path, and only for already
+> marked bios.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 
-Bart.
+Looks good to me.
+
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+
