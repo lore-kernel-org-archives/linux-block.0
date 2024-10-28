@@ -1,30 +1,30 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107F41EA73
-	for <linux-block@vger.kernel.org>; Mon, 28 Oct 2024 02:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9542629D;
+	Mon, 28 Oct 2024 02:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730081451; cv=none; b=RkOzlVNRL/KBT5ZcnkoHJ8lFAuFyZvn5FsF8Z2MxVzUkjFTsVuWtHf4UVFDtKEQkFAT4noFPEHsb3aOepjmfLpCmmicVUPDhhcmEiO8DYhthbheYIFzV6QAFMT7813HmCSVKO0H41jJWd/r/Zbrr2HDbjYp1o5C74AKzyvMyX1c=
+	t=1730081723; cv=none; b=ucnpeGoWaj9hQKDRa3lpc7BmN67VnvwmtEK0yk45Xi/cWPCqKJXawUQVcPvQmEnLK7IUvMy9i+PJ6utCkERcedlLWDeaD+jN2sm/GUrfmzfqaaDw+mUlqyPT3agMrHO1u4QZnduUraRATqxnVUkTG8cmCUDHB5+WG6O9OhJF2JU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730081451; c=relaxed/simple;
-	bh=Rb2WaBHzRO/NZ+VyH6n+CwrdI0GOxX9ATA7169Z1LB4=;
+	s=arc-20240116; t=1730081723; c=relaxed/simple;
+	bh=fi4xyBrEXuaTg527LBr5rHF1RhqIopAP2QD9ydHZHBQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QIeStOEW7vs+ZDRuj0Da0TjPZBh+PcMsjsDPXo0wT3WIHIfLAwGfVBzCMnNWa91Pb6YanFbnVWYxgAyn95GxYE9HxgmYiKhA5BaphE/H4/LPsWglNoibhUKYY+e3fiwaZDDM9PaU4M4EB5qI1E8S/xBhE3FRsG5ihCV8CIj5buE=
+	 In-Reply-To:Content-Type; b=sH9kVfpny/o6f3DC63jL8xkQIBA4VdGeh4xzGiXRbeGJ0G1KWJrq4rjm5WjzO3DanUW6L9ofnVPLlSYrEJIGkP6be5sJIPSGvlzQ0COmku8aPmAYNOaonlW3g/UCNFCmWdVVeKAvYjXLkxQteUJarviLJ6U1VBySaxLn6npRV+w=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XcH0W2SHQz4f3lVg
-	for <linux-block@vger.kernel.org>; Mon, 28 Oct 2024 10:10:19 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XcH5r6pkBz4f3lW8;
+	Mon, 28 Oct 2024 10:14:56 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id BCF9C1A08FC
-	for <linux-block@vger.kernel.org>; Mon, 28 Oct 2024 10:10:37 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 607C11A0196;
+	Mon, 28 Oct 2024 10:15:15 +0800 (CST)
 Received: from [10.174.177.210] (unknown [10.174.177.210])
-	by APP4 (Coremail) with SMTP id gCh0CgCXc4eb8h5nvqeWAA--.172S3;
-	Mon, 28 Oct 2024 10:10:37 +0800 (CST)
-Message-ID: <717f69f3-fe7c-ced7-6947-5a974c663af1@huaweicloud.com>
-Date: Mon, 28 Oct 2024 10:10:35 +0800
+	by APP4 (Coremail) with SMTP id gCh0CgCHYoay8x5nxfOWAA--.65400S3;
+	Mon, 28 Oct 2024 10:15:15 +0800 (CST)
+Message-ID: <a3aefdff-fdbf-b4b8-ed2d-821b332b4664@huaweicloud.com>
+Date: Mon, 28 Oct 2024 10:15:14 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,244 +34,112 @@ MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.1
 Subject: Re: [PATCH] brd: fix null pointer when modprobe brd
-To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+ Yu Kuai <yukuai1@huaweicloud.com>, Luis Chamberlain <mcgrof@kernel.org>
+Cc: linux-block@vger.kernel.org, yangerkun@huawei.com, axboe@kernel.dk,
  ulf.hansson@linaro.org, hch@lst.de, houtao1@huawei.com,
- penguin-kernel@i-love.sakura.ne.jp
-Cc: linux-block@vger.kernel.org, yangerkun@huawei.com,
- "yukuai (C)" <yukuai3@huawei.com>
+ linux-modules@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
 References: <20241025070511.932879-1-yangerkun@huaweicloud.com>
- <a15f07a9-d95d-3282-659d-ccd32ac19311@huaweicloud.com>
+ <a55c8d7e-cfd7-4ab9-ab45-bd7fdecaaf3c@I-love.SAKURA.ne.jp>
+ <05915eac-e5c7-c293-d960-a781e91fd23d@huaweicloud.com>
+ <62e97223-a508-4174-9ba0-6f897149a825@I-love.SAKURA.ne.jp>
+ <a3e499ec-32a3-7e44-c8fd-3d01cdbee25a@huaweicloud.com>
+ <544c2ac3-33ff-46a2-b21d-60a53d64efe5@I-love.SAKURA.ne.jp>
 From: yangerkun <yangerkun@huaweicloud.com>
-In-Reply-To: <a15f07a9-d95d-3282-659d-ccd32ac19311@huaweicloud.com>
+In-Reply-To: <544c2ac3-33ff-46a2-b21d-60a53d64efe5@I-love.SAKURA.ne.jp>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCXc4eb8h5nvqeWAA--.172S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxuFWxurW5Kw48tr13Ww17ZFb_yoW3Ww1UpF
-	4kGrW8trW5Crn3Gr4UXr1UXFyrJr40qa1kXr18XF10yr47Ar1vqr1UXryjgr1UArW8JF18
-	Ar15Jrn7ZF1rJ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:gCh0CgCHYoay8x5nxfOWAA--.65400S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxCrW8Kw17GF1rtw45uFy7GFg_yoW5GFWxpr
+	WxGa13KF4UXr1qk3WDt3WUAr1rtrWIyr48XryrXrWIy3yq9rnava1fKw4Y9F98CF48CF47
+	Xrs5GayxAry8CaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-	IcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2Kf
-	nxnUUI43ZEXa7VUbGQ6JUUUUU==
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU13ku3UUUUU==
 X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
 
 
-在 2024/10/25 15:59, Yu Kuai 写道:
-> Hi,
-> 
-> 在 2024/10/25 15:05, Yang Erkun 写道:
->> From: Yang Erkun <yangerkun@huawei.com>
+在 2024/10/26 16:06, Tetsuo Handa 写道:
+> On 2024/10/26 15:28, Yu Kuai wrote:
+>> Hi,
 >>
->> My colleague Wupeng found the following problems during fault injection:
+>> 在 2024/10/26 13:55, Tetsuo Handa 写道:
+>>> On 2024/10/26 10:21, Yu Kuai wrote:
+>>>> Hi,
+>>>>
+>>>> 在 2024/10/25 18:40, Tetsuo Handa 写道:
+>>>>> On 2024/10/25 16:05, Yang Erkun wrote:
+>>>>>> From: Yang Erkun <yangerkun@huawei.com>
+>>>>>>
+>>>>>> My colleague Wupeng found the following problems during fault injection:
+>>>>>>
+>>>>>> BUG: unable to handle page fault for address: fffffbfff809d073
+>>>>>
+>>>>> Excuse me, but subject says "null pointer" whereas dmesg says
+>>>>> "not a null pointer dereference". Is this a use-after-free bug?
+>>>>> Also, what verb comes after "when modprobe brd" ?
+>>>>>
+>>>>> Is this problem happening with parallel execution? If yes, parallelly
+>>>>> running what and what?
+>>>>
+>>>> The problem is straightforward, to be short,
+>>>>
+>>>> T1: morprobe brd
+>>>> brd_init
+>>>>    brd_alloc
+>>>>     add_disk
+>>>>           T2: open brd
+>>>>           bdev_open
+>>>>            try_module_get
+>>>>     // err path
+>>>>     brd_cleanup
+>>>>             // dereference brd_fops() while module is freed.
+>>>
+>>> Then, fault injection is irrelevant, isn't it?
 >>
->> BUG: unable to handle page fault for address: fffffbfff809d073
->> PGD 6e648067 P4D 123ec8067 PUD 123ec4067 PMD 100e38067 PTE 0
->> Oops: Oops: 0000 [#1] PREEMPT SMP KASAN NOPTI
->> CPU: 5 UID: 0 PID: 755 Comm: modprobe Not tainted 6.12.0-rc3+ #17
->> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
->> 1.16.1-2.fc37 04/01/2014
->> RIP: 0010:__asan_load8+0x4c/0xa0
->> ...
->> Call Trace:
->>   <TASK>
->>   blkdev_put_whole+0x41/0x70
->>   bdev_release+0x1a3/0x250
->>   blkdev_release+0x11/0x20
->>   __fput+0x1d7/0x4a0
->>   task_work_run+0xfc/0x180
->>   syscall_exit_to_user_mode+0x1de/0x1f0
->>   do_syscall_64+0x6b/0x170
->>   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>> Fault injection must involved in the test, brd_init() is unlikely to
+>> fail.
+>>>
+>>> If bdev_open() can grab a reference before module's initialization phase
+>>> completes is a problem, I think that we can fix the problem with just
 >>
->> The error path of modprobe will ignores the refcnt for the module, and
->> directly releases everything about this all associated resources. For
->> the brd module, it can be brd_fops. The brd_init function attempts to
->> create 16 ramdisks; each time add_disk is called, a file for the block
->> device is created to help do partition scanning and remains alive util
->> we return to userspace(Also we can open it with another user thread).
->> Let's say brd_init has successfully create the first ramdisk, but fail
->> to create the second, the error handling path will release code segment.
->> Consequently, bdev_release for file of first ramdisk will trigger null
->> pointer since brd_fops has been removed.
->>
->> To resolve issue, implement a solution similar to loop_init, and
->> reintroduce brd_devices_mutex to help serialize modifications to
->> brd_list.
->>
+>> Yes, and root cause is that stuff inside module can be freed if module
+>> initialization failed, it's not safe to deference disk->fops in this
+>> case.
 > 
-> This patch looks good to me, just some nits below:
+> Too bad. Then, we have to defer disk_alloc() until module initialization phase
+> is guaranteed to return success like loop.c does. Please update patch title and
+> description to something like below.
 > 
->> Fixes: 7f9b348cb5e9 ("brd: convert to blk_alloc_disk/blk_cleanup_disk")
->> Reported-by: Wupeng Ma <mawupeng1@huawei.com>
->> Signed-off-by: Yang Erkun <yangerkun@huawei.com>
->> ---
->>   drivers/block/brd.c | 70 ++++++++++++++++++++-------------------------
->>   1 file changed, 31 insertions(+), 39 deletions(-)
->>
->> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
->> index 2fd1ed101748..f86dd0795d3c 100644
->> --- a/drivers/block/brd.c
->> +++ b/drivers/block/brd.c
->> @@ -316,6 +316,7 @@ __setup("ramdisk_size=", ramdisk_size);
->>    * (should share code eventually).
->>    */
->>   static LIST_HEAD(brd_devices);
->> +static DEFINE_MUTEX(brd_devices_mutex);
->>   static struct dentry *brd_debugfs_dir;
->>   static int brd_alloc(int i)
->> @@ -340,14 +341,21 @@ static int brd_alloc(int i)
->>                         BLK_FEAT_NOWAIT,
->>       };
->> -    list_for_each_entry(brd, &brd_devices, brd_list)
->> -        if (brd->brd_number == i)
->> +    mutex_lock(&brd_devices_mutex);
->> +    list_for_each_entry(brd, &brd_devices, brd_list) {
->> +        if (brd->brd_number == i) {
->> +            mutex_unlock(&brd_devices_mutex);
->>               return -EEXIST;
->> +        }
->> +    }
->>       brd = kzalloc(sizeof(*brd), GFP_KERNEL);
->> -    if (!brd)
->> +    if (!brd) {
->> +        mutex_unlock(&brd_devices_mutex);
->>           return -ENOMEM;
->> +    }
->>       brd->brd_number        = i;
->>       list_add_tail(&brd->brd_list, &brd_devices);
->> +    mutex_unlock(&brd_devices_mutex);
->>       xa_init(&brd->brd_pages);
+> Subject: brd: defer automatic disk creation until module initialization succeeds
 > 
-> The global mutex is used to protect brd_alloc() from module init and
-> brd_alloc() from creating on open? If so, I think just use the lock in
-> the caller is cleaner.
+> loop_init() is calling loop_add() after __register_blkdev() succeeds and is
+> ignoring disk_add() failure from loop_add(), for loop_add() failure is not
+> fatal and successfully created disks are already visible to bdev_open().
+> 
+> brd_init() is currently calling brd_alloc() before __register_blkdev()
+> succeeds and is releasing successfully created disks when brd_init()
+> returns an error. This can cause UAF when brd_init() failure raced with
+> bdev_open(), for successfully created disks are already visible to
+> bdev_open(). Fix this problem by following what loop_init() does.
 
-Yes, it appears cleaner. However, is it a little too long to hold the
-mutex lock, considering that brd_alloc in brd_init can occur
-concurrently with brd_prbe? See f7bf35862477 ("brd: reduce the
-brd_devices_mutex scope")
+Tetsuo and Kuai,
 
-> 
->> @@ -378,7 +386,9 @@ static int brd_alloc(int i)
->>   out_cleanup_disk:
->>       put_disk(disk);
->>   out_free_dev:
->> +    mutex_lock(&brd_devices_mutex);
->>       list_del(&brd->brd_list);
->> +    mutex_unlock(&brd_devices_mutex);
->>       kfree(brd);
->>       return err;
->>   }
->> @@ -388,21 +398,6 @@ static void brd_probe(dev_t dev)
->>       brd_alloc(MINOR(dev) / max_part);
->>   }
->> -static void brd_cleanup(void)
->> -{
->> -    struct brd_device *brd, *next;
->> -
->> -    debugfs_remove_recursive(brd_debugfs_dir);
->> -
->> -    list_for_each_entry_safe(brd, next, &brd_devices, brd_list) {
->> -        del_gendisk(brd->brd_disk);
->> -        put_disk(brd->brd_disk);
->> -        brd_free_pages(brd);
->> -        list_del(&brd->brd_list);
->> -        kfree(brd);
->> -    }
->> -}
->> -
->>   static inline void brd_check_and_reset_par(void)
->>   {
->>       if (unlikely(!max_part))
->> @@ -424,17 +419,7 @@ static inline void brd_check_and_reset_par(void)
->>   static int __init brd_init(void)
->>   {
->> -    int err, i;
->> -
->> -    brd_check_and_reset_par();
->> -
->> -    brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
->> -
->> -    for (i = 0; i < rd_nr; i++) {
->> -        err = brd_alloc(i);
->> -        if (err)
->> -            goto out_free;
->> -    }
->> +    int i;
->>       /*
->>        * brd module now has a feature to instantiate underlying device
->> @@ -450,28 +435,35 @@ static int __init brd_init(void)
->>        *    If (X / max_part) was not already created it will be created
->>        *    dynamically.
->>        */
->> +    brd_check_and_reset_par();
->> +    brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
->>       if (__register_blkdev(RAMDISK_MAJOR, "ramdisk", brd_probe)) {
->> -        err = -EIO;
->> -        goto out_free;
->> +        pr_info("brd: module NOT loaded !!!\n");
->> +        debugfs_remove_recursive(brd_debugfs_dir);
->> +        return -EIO;
->>       }
->> +    for (i = 0; i < rd_nr; i++)
->> +        brd_alloc(i);
-> 
-> Now that brd_alloc() can fail while loding the module will succed,
-> please also add err log if brd_alloc() failed.
+This commit msg looks good to me. I couldn't reply to some emails the
+other day. Thanks a lot for your discussion and review to make this
+problem clear!
 
-OK
-
->> +
->>       pr_info("brd: module loaded\n");
->>       return 0;
->> -
->> -out_free:
->> -    brd_cleanup();
->> -
->> -    pr_info("brd: module NOT loaded !!!\n");
->> -    return err;
->>   }
->>   static void __exit brd_exit(void)
->>   {
->> +    struct brd_device *brd, *next;
->>       unregister_blkdev(RAMDISK_MAJOR, "ramdisk");
->> -    brd_cleanup();
->> -
->> +    debugfs_remove_recursive(brd_debugfs_dir);
->> +    list_for_each_entry_safe(brd, next, &brd_devices, brd_list) {
->> +        del_gendisk(brd->brd_disk);
->> +        put_disk(brd->brd_disk);
->> +        brd_free_pages(brd);
->> +        list_del(&brd->brd_list);
->> +        kfree(brd);
->> +    }
-> 
-> Why the global mutex is not used here? It took a while for me to figure
-> out that this is safe, because unregister_blkdev() make sure no new
-> brd_alloc() can be called from open path, and in progress open will be
-> synchronized with del_gendisk().
-Yes
-
-> 
-> However, please add some comments or just hold the global mutex.
-
-OK
-
-> 
-> Thanks,
-> Kuai
-> 
->>       pr_info("brd: module unloaded\n");
->>   }
->>
+Thanks,
+Erkun.
 
