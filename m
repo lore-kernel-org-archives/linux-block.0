@@ -1,145 +1,143 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9542629D;
-	Mon, 28 Oct 2024 02:15:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81FE15C140
+	for <linux-block@vger.kernel.org>; Mon, 28 Oct 2024 03:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730081723; cv=none; b=ucnpeGoWaj9hQKDRa3lpc7BmN67VnvwmtEK0yk45Xi/cWPCqKJXawUQVcPvQmEnLK7IUvMy9i+PJ6utCkERcedlLWDeaD+jN2sm/GUrfmzfqaaDw+mUlqyPT3agMrHO1u4QZnduUraRATqxnVUkTG8cmCUDHB5+WG6O9OhJF2JU=
+	t=1730087722; cv=none; b=e3G+pHRfPoS+gy9nKM0kj2hARUJIQuXfWFTUKvVQ9jnEB6QP96ZcIsY9dvyLNMgA40XJQxcVfSFUdGNTdjLxZkmvdWnKHUAMkfhToDknOettHe/VwMeEgm3cFVJh5CigpXcleTTJnvGjmtSumI6cj/oOglqy9uLxxSUWA6NAshA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730081723; c=relaxed/simple;
-	bh=fi4xyBrEXuaTg527LBr5rHF1RhqIopAP2QD9ydHZHBQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sH9kVfpny/o6f3DC63jL8xkQIBA4VdGeh4xzGiXRbeGJ0G1KWJrq4rjm5WjzO3DanUW6L9ofnVPLlSYrEJIGkP6be5sJIPSGvlzQ0COmku8aPmAYNOaonlW3g/UCNFCmWdVVeKAvYjXLkxQteUJarviLJ6U1VBySaxLn6npRV+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XcH5r6pkBz4f3lW8;
-	Mon, 28 Oct 2024 10:14:56 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 607C11A0196;
-	Mon, 28 Oct 2024 10:15:15 +0800 (CST)
-Received: from [10.174.177.210] (unknown [10.174.177.210])
-	by APP4 (Coremail) with SMTP id gCh0CgCHYoay8x5nxfOWAA--.65400S3;
-	Mon, 28 Oct 2024 10:15:15 +0800 (CST)
-Message-ID: <a3aefdff-fdbf-b4b8-ed2d-821b332b4664@huaweicloud.com>
-Date: Mon, 28 Oct 2024 10:15:14 +0800
+	s=arc-20240116; t=1730087722; c=relaxed/simple;
+	bh=wKdq2ojcsvjFSKLtbJ43rf1uG8MA5N83T36nu1dsqMs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=T+ler2JFk8zCkAo7aWPzg/a/dLmXHykFwCWWZ/8qcs6cSp/am4bRJuehOUXCdM+rVBY2Wo114G2WfMefE+iYZQuaub1istbPlTZvBRR6Tzsw1R+zdcOn6M69zUZIMb5SPv1FFtGFFRyEb+EnwTHaku1H2ecuA4bKJJXbjV3wQFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=cuWgeGAA; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="cuWgeGAA"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20241028035511epoutp043a827a844ce1768dcea0aec5048589b9~CgZt35DvW2193921939epoutp04H
+	for <linux-block@vger.kernel.org>; Mon, 28 Oct 2024 03:55:11 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20241028035511epoutp043a827a844ce1768dcea0aec5048589b9~CgZt35DvW2193921939epoutp04H
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1730087711;
+	bh=bo6Ea5i0R6emGG7nj9+WppTEgZq02wQoJLP9S61V1so=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cuWgeGAAxiRPYto8Vna81W6OItruMIz3jjDQB6H+MCaRHXO6PkfHOQZNTCZRajkVb
+	 CGGuM6JRagmkzQTN5OT43pqHs67vE2iwQqT64BHiwsoZRz0zF+ba8qNulbJk4vyF/P
+	 LLa4m1HHm6PYkAetkSIuadaCKSpaF0x7/zmEIG6k=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20241028035510epcas5p2656031a5840a38aca3e05b9581123591~CgZtMYkcw2900229002epcas5p2k;
+	Mon, 28 Oct 2024 03:55:10 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.179]) by
+	epsnrtp1.localdomain (Postfix) with ESMTP id 4XcKKS43Vpz4x9Q5; Mon, 28 Oct
+	2024 03:55:08 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	F1.A6.09420.C1B0F176; Mon, 28 Oct 2024 12:55:08 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20241028035435epcas5p4dbd78e5f7bacde9fc302fcfde86453b9~CgZLzQgVv1472514725epcas5p4c;
+	Mon, 28 Oct 2024 03:54:35 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241028035434epsmtrp2eb03ec25eb9f71578219fd904e79a04d~CgZLyUu_81877218772epsmtrp2k;
+	Mon, 28 Oct 2024 03:54:34 +0000 (GMT)
+X-AuditID: b6c32a49-33dfa700000024cc-a9-671f0b1cde6c
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	02.26.08227.AFA0F176; Mon, 28 Oct 2024 12:54:34 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20241028035432epsmtip2358aad8e30b6e4241266bb0a578e7b49~CgZJ1ATw50427304273epsmtip2a;
+	Mon, 28 Oct 2024 03:54:32 +0000 (GMT)
+Date: Mon, 28 Oct 2024 09:16:48 +0530
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org, asml.silence@gmail.com,
+	anuj1072538@gmail.com, krisman@suse.de, io-uring@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, linux-scsi@vger.kernel.org, vishak.g@samsung.com,
+	Kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [PATCH v4 04/11] block: define meta io descriptor
+Message-ID: <20241028034648.GA18956@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH] brd: fix null pointer when modprobe brd
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
- Yu Kuai <yukuai1@huaweicloud.com>, Luis Chamberlain <mcgrof@kernel.org>
-Cc: linux-block@vger.kernel.org, yangerkun@huawei.com, axboe@kernel.dk,
- ulf.hansson@linaro.org, hch@lst.de, houtao1@huawei.com,
- linux-modules@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20241025070511.932879-1-yangerkun@huaweicloud.com>
- <a55c8d7e-cfd7-4ab9-ab45-bd7fdecaaf3c@I-love.SAKURA.ne.jp>
- <05915eac-e5c7-c293-d960-a781e91fd23d@huaweicloud.com>
- <62e97223-a508-4174-9ba0-6f897149a825@I-love.SAKURA.ne.jp>
- <a3e499ec-32a3-7e44-c8fd-3d01cdbee25a@huaweicloud.com>
- <544c2ac3-33ff-46a2-b21d-60a53d64efe5@I-love.SAKURA.ne.jp>
-From: yangerkun <yangerkun@huaweicloud.com>
-In-Reply-To: <544c2ac3-33ff-46a2-b21d-60a53d64efe5@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCHYoay8x5nxfOWAA--.65400S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxCrW8Kw17GF1rtw45uFy7GFg_yoW5GFWxpr
-	WxGa13KF4UXr1qk3WDt3WUAr1rtrWIyr48XryrXrWIy3yq9rnava1fKw4Y9F98CF48CF47
-	Xrs5GayxAry8CaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU13ku3UUUUU==
-X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
+In-Reply-To: <yq1h694lwnm.fsf@ca-mkp.ca.oracle.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrPJsWRmVeSWpSXmKPExsWy7bCmhq4Mt3y6wfVbUhYfv/5msZizahuj
+	xeq7/WwWNw/sZLJYufook8W71nMsFkf/v2WzmHToGqPF9jNLmS323tK2mL/sKbtF9/UdbBbL
+	j/9jsjg/aw67A5/Hzll32T0uny312LSqk81j85J6j903G9g8Pj69xeLRt2UVo8fm09UenzfJ
+	BXBGZdtkpCampBYppOYl56dk5qXbKnkHxzvHm5oZGOoaWlqYKynkJeam2iq5+AToumXmAF2u
+	pFCWmFMKFApILC5W0rezKcovLUlVyMgvLrFVSi1IySkwKdArTswtLs1L18tLLbEyNDAwMgUq
+	TMjOuP/as2ADW0XvuW+sDYwrWLsYOTkkBEwkrv3oYuxi5OIQEtjNKLHlcjuU84lRYsnaVijn
+	G6PE/Ddv2GBavq66yAKR2MsoMWvJRSYI5xmjxMnLp8GqWARUJQ5/uMMOYrMJqEsceQ4yipND
+	RMBUYvKnrWwgDcwC+5gkjl2awwySEBawk+g5sg+sgVdAV+L32otsELagxMmZT4DWcXBwChhL
+	LJ4rABIWFVCWOLDtONhiCYETHBLPbzRAfeQiceg5SD2ILSzx6vgWdghbSuLzu71QL6RL/Lj8
+	lAnCLpBoPraPEcK2l2g91Q92D7NAhsTa/Z+h5shKTD21jgkizifR+/sJVC+vxI55MLaSRPvK
+	OVC2hMTecw1QtodE04EWNngIdTxdwDyBUX4Wkt9mIdkHYetILNj9iW0W0M/MAtISy/9xQJia
+	Eut36S9gZF3FKJlaUJybnlpsWmCYl1oOj/Hk/NxNjOCUreW5g/Hugw96hxiZOBgPMUpwMCuJ
+	8K6OlU0X4k1JrKxKLcqPLyrNSS0+xGgKjKyJzFKiyfnArJFXEm9oYmlgYmZmZmJpbGaoJM77
+	unVuipBAemJJanZqakFqEUwfEwenVANTduR9QT9BM7/J6V6us3/2a3nWzpR8yf/1h7TZfXNN
+	T57NR3bc1o2yOKrLuDz97GVtqWWlml2JJk6c+9YH/jNRFS1Z+2aKwBqmJrOel499NoQs2hLo
+	uvBdxqtXod6yuiH1XW11qQmddoY+V07NzY7anx21pGHOycPBDP/q3/tNqam980Ba72iHn7mW
+	z2F36Xm3LdcLsq+OrNG9crNN8n/QfTsHwanLRQ34v9syXtilFb7i7/UZDd5BaZxlXRNnbbjO
+	lNx+9atRWSP3bNP64LVz3bS/L5uekNu2s3jK28rSjx9dHDUnbkr6ZWOeujiH343NaKV6+u/z
+	nVfP/X9gfb6Wca7bqTe2c+u31orM71ViKc5INNRiLipOBAB9ZzhnYgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprAIsWRmVeSWpSXmKPExsWy7bCSvO4vLvl0g039xhYfv/5msZizahuj
+	xeq7/WwWNw/sZLJYufook8W71nMsFkf/v2WzmHToGqPF9jNLmS323tK2mL/sKbtF9/UdbBbL
+	j/9jsjg/aw67A5/Hzll32T0uny312LSqk81j85J6j903G9g8Pj69xeLRt2UVo8fm09UenzfJ
+	BXBGcdmkpOZklqUW6dslcGVsPfaTveADc8WKpjbmBsZG5i5GTg4JAROJr6susoDYQgK7GSVu
+	fuSBiEtInHq5jBHCFpZY+e85excjF1DNE0aJk32z2UESLAKqEoc/3AGz2QTUJY48bwVrEBEw
+	lZj8aSsbSAOzwD4miRW9b8ESwgJ2Ej1H9oE18AroSvxee5ENYuozRolV7x+wQCQEJU7OfAJm
+	MwtoSdz495Kpi5EDyJaWWP6PA8TkFDCWWDxXAKRCVEBZ4sC240wTGAVnIWmehaR5FkLzAkbm
+	VYySqQXFuem5xYYFRnmp5XrFibnFpXnpesn5uZsYwZGmpbWDcc+qD3qHGJk4GA8xSnAwK4nw
+	ro6VTRfiTUmsrEotyo8vKs1JLT7EKM3BoiTO++11b4qQQHpiSWp2ampBahFMlomDU6qBKdRx
+	2YKrJ9ZGXFO98FgyYc+9b44aIpl2vvstei93an5MeixVZai7hENA1tO0eH/Bdj1/07tJx61P
+	RrG5LF/r5TJzw6kuJW7H3b8EXLguBF1/aJ29T8H7adrPN7bLdr1XEvAXjk86deoyZ87nR37n
+	ZvB25cpG1731ct9wQ/64bvzz1e2erXn8t2aXtm1mevhATCBjges7wx/5FWzuOhNPr/SfeaAm
+	7ajyRrV/Aq8FzExkcpdoTJyu1BYjrHZ20Y/HuiumXD7UoDRNv3xjzN5lfnUvk2bP5xB0XWT9
+	bf0nJ+nfHUz+mWEuNzjCWe+wfGgp7RM9fstiWVnnxZjTFc8NPl2JNZbIPxFyIqOxVLFUiaU4
+	I9FQi7moOBEAaLCvJyMDAAA=
+X-CMS-MailID: 20241028035435epcas5p4dbd78e5f7bacde9fc302fcfde86453b9
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_7d6d3_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20241016113741epcas5p3b90adb3b43b6b443ffd00df29d63d289
+References: <20241016112912.63542-1-anuj20.g@samsung.com>
+	<CGME20241016113741epcas5p3b90adb3b43b6b443ffd00df29d63d289@epcas5p3.samsung.com>
+	<20241016112912.63542-5-anuj20.g@samsung.com>
+	<yq1h694lwnm.fsf@ca-mkp.ca.oracle.com>
 
+------w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_7d6d3_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 
+> Not sure what to do about the storage tag. For Linux that would probably
+> be owned by the filesystem (as opposed to the application). But I guess
+> one could envision a userland application acting as a storage target and
+> in that case the tag would need to be passed to the kernel.
 
-在 2024/10/26 16:06, Tetsuo Handa 写道:
-> On 2024/10/26 15:28, Yu Kuai wrote:
->> Hi,
->>
->> 在 2024/10/26 13:55, Tetsuo Handa 写道:
->>> On 2024/10/26 10:21, Yu Kuai wrote:
->>>> Hi,
->>>>
->>>> 在 2024/10/25 18:40, Tetsuo Handa 写道:
->>>>> On 2024/10/25 16:05, Yang Erkun wrote:
->>>>>> From: Yang Erkun <yangerkun@huawei.com>
->>>>>>
->>>>>> My colleague Wupeng found the following problems during fault injection:
->>>>>>
->>>>>> BUG: unable to handle page fault for address: fffffbfff809d073
->>>>>
->>>>> Excuse me, but subject says "null pointer" whereas dmesg says
->>>>> "not a null pointer dereference". Is this a use-after-free bug?
->>>>> Also, what verb comes after "when modprobe brd" ?
->>>>>
->>>>> Is this problem happening with parallel execution? If yes, parallelly
->>>>> running what and what?
->>>>
->>>> The problem is straightforward, to be short,
->>>>
->>>> T1: morprobe brd
->>>> brd_init
->>>>    brd_alloc
->>>>     add_disk
->>>>           T2: open brd
->>>>           bdev_open
->>>>            try_module_get
->>>>     // err path
->>>>     brd_cleanup
->>>>             // dereference brd_fops() while module is freed.
->>>
->>> Then, fault injection is irrelevant, isn't it?
->>
->> Fault injection must involved in the test, brd_init() is unlikely to
->> fail.
->>>
->>> If bdev_open() can grab a reference before module's initialization phase
->>> completes is a problem, I think that we can fix the problem with just
->>
->> Yes, and root cause is that stuff inside module can be freed if module
->> initialization failed, it's not safe to deference disk->fops in this
->> case.
+I will reserve space for storage tag in the user interface for now.
+That way, we can introduce and use it later when it is actually used.
+
 > 
-> Too bad. Then, we have to defer disk_alloc() until module initialization phase
-> is guaranteed to return success like loop.c does. Please update patch title and
-> description to something like below.
+> -- 
+> Martin K. Petersen	Oracle Linux Engineering
 > 
-> Subject: brd: defer automatic disk creation until module initialization succeeds
-> 
-> loop_init() is calling loop_add() after __register_blkdev() succeeds and is
-> ignoring disk_add() failure from loop_add(), for loop_add() failure is not
-> fatal and successfully created disks are already visible to bdev_open().
-> 
-> brd_init() is currently calling brd_alloc() before __register_blkdev()
-> succeeds and is releasing successfully created disks when brd_init()
-> returns an error. This can cause UAF when brd_init() failure raced with
-> bdev_open(), for successfully created disks are already visible to
-> bdev_open(). Fix this problem by following what loop_init() does.
 
-Tetsuo and Kuai,
+------w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_7d6d3_
+Content-Type: text/plain; charset="utf-8"
 
-This commit msg looks good to me. I couldn't reply to some emails the
-other day. Thanks a lot for your discussion and review to make this
-problem clear!
 
-Thanks,
-Erkun.
-
+------w5-2f3KIOrSunQhSxAIo7Dy_B_SBAQB3Xz8aCSUoiMSFB8w5=_7d6d3_--
