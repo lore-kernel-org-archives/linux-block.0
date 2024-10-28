@@ -1,44 +1,95 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39931DED71;
-	Mon, 28 Oct 2024 16:12:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9FD1DE892;
+	Mon, 28 Oct 2024 16:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730131973; cv=none; b=O1auDamT4CSkPxhmFpcmqX7iqiQf68Awv8ysFPJ6I85ZXj76dsZff4AjDzKOd7QJAl8AAFP7FdV1xVShrlxPFpcbD9Uz4PGjRW6gfKo9rofsEiIyNUkLzSwOQuMvGNKMDxm5IQlXhIomewWr6doTB7IB7Cq4+cBDug4NLwoduMs=
+	t=1730132001; cv=none; b=sbHuNzk3ceBgxx9BTzU7ZqnOxDMSukHqrRD/1Q0/6kTOusAVyj7hxCZc/rGEpmjVsZr6Ypz1C9gsHxW4KQ9d6ntjTQ0OIx1uAEOoROLOhyg1lTxphYSehcTzwiN//9k3NT9wgEcfMZ0D9VeMNtQJRIVqaZCyxSw0u9SHPrpeEU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730131973; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TM1G/GaI/x8munPq75ZFkmCblJCWZm2Luq76Aay4phHeBqhbsKqeS4F9XyaFALgUPeaA495J8l4jbCt0RY1v0D9HZDc/cGG9M0ioBfgA7JFz193zoUFXWycHg11PWkmYGD01Co5e9sPPtoLv87zKbj5MMNppXAY3FFyAFQcJ5co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 0491668BEB; Mon, 28 Oct 2024 17:12:49 +0100 (CET)
-Date: Mon, 28 Oct 2024 17:12:48 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, song@kernel.org, yukuai3@huawei.com, hch@lst.de,
-	martin.petersen@oracle.com, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-	hare@suse.de, Johannes.Thumshirn@wdc.com
-Subject: Re: [PATCH v2 4/7] block: Handle bio_split() errors in
- bio_submit_split()
-Message-ID: <20241028161248.GD28829@lst.de>
-References: <20241028152730.3377030-1-john.g.garry@oracle.com> <20241028152730.3377030-5-john.g.garry@oracle.com>
+	s=arc-20240116; t=1730132001; c=relaxed/simple;
+	bh=Rj7dAa97W4f4nsy3wpoOstotuVQdhoO58XJVBGQXGgA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F5aCJCK71sIpIC686awDWVUvTDomklHdkx1D2n4obbZ/49EqLJ0qXa+zdyynG3qOPPEYhsLyL6YAw/2m4HTH9kBMAVT19GXB7adUFbk47y6AviWwb1KuhHsk4l5qufB4BRNLGzvHk/YtwSpnQs+K2OaeOZsoPndbvEJCZ58W0dQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=W0dqk1Ds; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="W0dqk1Ds"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Xcdj53kxVzlgVnY;
+	Mon, 28 Oct 2024 16:13:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1730131990; x=1732723991; bh=aVIfM6ADLRrW2ddhkhRN1Ajj
+	S03IN19K19H+CtsbWaU=; b=W0dqk1DsslaMtQqRUmYfCegGOqGHrqnDrBsmojNg
+	gIK38JxDgmg9hSczFGVpBQ+VMchq05YeATWBuU/ttAFAxocaqf0NvdPrfjsP+jvB
+	sNphj7PLtS9+uCjWq9gDoR6/HZ52a+D9FFe3Eerfk44lAlErzTVCIjRUrmK1bSih
+	Iy3M1dfEs4ejypA41t9GfZYJ3tE13m83o+JpgpPAiFl5PB9ZpmcwBzfBuWGqKIJp
+	SCnmsX/A3fuIqK+HW/thaWRFwjddUyjB+06oy94SByPou5AkmgfOOreyiyADV7tP
+	t9jRAePD4uGb1SHVlYx5E6tnUZYSAHi0/DirZru94rycow==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id EpRxxZ74yApD; Mon, 28 Oct 2024 16:13:10 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Xcdj06BCKzlgMVd;
+	Mon, 28 Oct 2024 16:13:08 +0000 (UTC)
+Message-ID: <e83cfc72-029f-4ab1-b8e4-56732585e9fd@acm.org>
+Date: Mon, 28 Oct 2024 09:13:08 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241028152730.3377030-5-john.g.garry@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv9 7/7] scsi: set permanent stream count in block limits
+To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+ io-uring@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org, hch@lst.de, joshi.k@samsung.com,
+ javier.gonz@samsung.com, Keith Busch <kbusch@kernel.org>
+References: <20241025213645.3464331-1-kbusch@meta.com>
+ <20241025213645.3464331-8-kbusch@meta.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20241025213645.3464331-8-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Looks good:
+On 10/25/24 2:36 PM, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> The block limits exports the number of write hints, so set this limit if
+> the device reports support for the lifetime hints. Not only does this
+> inform the user of which hints are possible, it also allows scsi devices
+> supporting the feature to utilize the full range through raw block
+> device direct-io.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>   drivers/scsi/sd.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+> index ca4bc0ac76adc..235dd6e5b6688 100644
+> --- a/drivers/scsi/sd.c
+> +++ b/drivers/scsi/sd.c
+> @@ -3768,6 +3768,8 @@ static int sd_revalidate_disk(struct gendisk *disk)
+>   		sd_config_protection(sdkp, &lim);
+>   	}
+>   
+> +	lim.max_write_hints = sdkp->permanent_stream_count;
+> +
+>   	/*
+>   	 * We now have all cache related info, determine how we deal
+>   	 * with flush requests.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
