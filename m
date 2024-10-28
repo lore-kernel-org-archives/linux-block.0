@@ -1,85 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AC118A924;
-	Mon, 28 Oct 2024 06:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D03617CA1B;
+	Mon, 28 Oct 2024 08:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730097998; cv=none; b=J3ZtHsAZyrH8qGEVw+MaJQv9SHD0kf5mw//1+ssxKo/DvDrFAiZMCX0Wxg88ujEV4HIcDwuoQNtwPi6Rj5yorl8526qHnrQJvlCfpxH2YBDcd/zAAd8dy+1xngecpo/G5lXlok0KIBbaYpOuRq/8pova5ks7UJNcK/rK/i7lppk=
+	t=1730104913; cv=none; b=VjToIdT5wkpJHVUNG9A75zKdXjyMEVXPt5e569+bpTMKpIQza/7HuyNRsNfNa6iO612ywNo25F9fEJIEERRIq2uSLJ4467pBEi037WN+rYMzMF8sofD9//YiQbJI/uaXykznXbM1vE72ILZkDfnIVhj7o3p20AgZtY4OpufgnGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730097998; c=relaxed/simple;
-	bh=JxpLCeEPUhJrMkdL0TYudbC/XbTxYSrHktHQOg5tBzY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pajR0/ucKNIQXo/E8COdMX0upwc/8LRvqEdlN1DPHe3PvwIBxvHrdcJgyZVhaAbyaEiRtpSxQuiGXN2OTXcnm8WUid/G/JObx3NVF3ToBjf6LZSiAF1IenFBisuWbL8HC9T3pElTmPKXM+2hP0ROzci1+tLjYsooP8wvZLS3KcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXfr6iuk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730104913; c=relaxed/simple;
+	bh=KTIfXUdYAvpwso49g1yYWYsZv6RvufQJe+aCEFcGvJ0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VnSLucdwAyS3PRlBF16+LTzRpI4DJkzBSWUdJNZjrdSHvB4mAZJGeWvjH1WyJlWbTK+APld7EWiYhcNSUUXbI5T7izHPbcNEOJdI+YcrjPsk8qFpoYTbf+oVzkYl+WicmYk+13Ml9uZ7bVptZesCRMwzV4sAo8QpuJ0deV6O2LA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=x3TXW5jz; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VQAr2k4I; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXfr6iuk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EA05C4CEC3;
-	Mon, 28 Oct 2024 06:46:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730097998;
-	bh=JxpLCeEPUhJrMkdL0TYudbC/XbTxYSrHktHQOg5tBzY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pXfr6iukpFNitgAKIIVSyCYtDDCh3B1GaWuseUbNm4XLfuvHiPNIEI1RqzgXGCn+r
-	 T8x3ffU9NvEGqhEZOlcisSCjWlq5PsrCdXVG8sEw7pR+jCveH56xttouEjDQJDV8WY
-	 bx5SFdkmU/eJH7Hrzmkv07xrrIzZ4Y8X8n46X7ryPLmoTBBwUTYHLhLxEw9x3XHUY1
-	 Sze57dE6qj3rdN/EwuSVQ8/g13tIxT1HqDmg5aZ6q77NA2Bid5WHDDtaexWJgT2Sgx
-	 tKYkFMMAg8RNVBv4t74ApVds33Nr2L4PoRFdOrDOZnsgk8sPPHU+TQP6pn8GBLAoZx
-	 12xZsB0TjAqdA==
-Date: Mon, 28 Oct 2024 08:46:34 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Srinivasulu Thanneeru <dev.srinivasulu@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 05/18] dma: Provide an interface to allow allocate IOVA
-Message-ID: <20241028064634.GE1615717@unreal>
-References: <cover.1730037276.git.leon@kernel.org>
- <844f3dcf9c341b8178bfbc90909ef13d11dd2193.1730037276.git.leon@kernel.org>
- <CAMtOeKJeVrELCp5JpYTC64KdfKpbnW9a8QrnL6ziCYL48nc=qQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="x3TXW5jz";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VQAr2k4I"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1730104909;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1H44vgesP1XQXrv9CcIfmLIuQ+1Lb7UWNVl5j+TBJ08=;
+	b=x3TXW5jzTZtadCH2BFHWSDUQsinXPlK0IrDDFRy/3tNQK0hzy3RehZqmDb5+LDPS5kOzQc
+	sjnMxY5k25sQYGXLGYjtF6Teg3B84jy/bMViihmY1+l351ebf71jlbT5IqfVe40dQneeB3
+	vKETQHeiYHoTnMEQ4/E9gkHBCmVSG0H21a4FRwH9RLTNgC4pNPkvjcWbza9iOzYXpTcOb6
+	NKB13JlaGMBXliD2Dq9Na5nEvaPDkQYWh7KYhQShbbhXtic1cULYTlUI4tJPwgU550RGvk
+	lUPOTglWIlyyGcXjEuR58wOsJ4hJd0Zpv72EbpMDTC6edTBiAM+tatV4FIUG1A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1730104910;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1H44vgesP1XQXrv9CcIfmLIuQ+1Lb7UWNVl5j+TBJ08=;
+	b=VQAr2k4I06KdONU7UIdNQErDeF0PPVIHebz4hNbPiOnA40OILCuO/XnqUe/puyjjeB+a6q
+	D8khm6vUYCuFTgCQ==
+To: Hugh Dickins <hughd@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Christian Brauner
+ <brauner@kernel.org>, Matthew Wilcox <willy@infradead.org>, Christoph
+ Hellwig <hch@lst.de>, Kent Overstreet <kent.overstreet@linux.dev>,
+ "Darrick J. Wong" <djwong@kernel.org>, Peter Zijlstra
+ <peterz@infradead.org>, linux-fsdevel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, Linus Torvalds <torvalds@linuxfoundation.org>
+Subject: Re: [PATCH] iov_iter: fix copy_page_from_iter_atomic() if
+ KMAP_LOCAL_FORCE_MAP
+In-Reply-To: <dd5f0c89-186e-18e1-4f43-19a60f5a9774@google.com>
+References: <dd5f0c89-186e-18e1-4f43-19a60f5a9774@google.com>
+Date: Mon, 28 Oct 2024 09:41:48 +0100
+Message-ID: <874j4w4o1f.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMtOeKJeVrELCp5JpYTC64KdfKpbnW9a8QrnL6ziCYL48nc=qQ@mail.gmail.com>
+Content-Type: text/plain
 
-On Mon, Oct 28, 2024 at 09:54:49AM +0530, Srinivasulu Thanneeru wrote:
-> On Sun, Oct 27, 2024 at 10:23 PM Leon Romanovsky <leon@kernel.org> wrote:
-> >
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> >
-> > The existing .map_page() callback provides both allocating of IOVA
-> > and linking DMA pages. That combination works great for most of the
-> > callers who use it in control paths, but is less effective in fast
-> > paths where there may be multiple calls to map_page().
-> 
-> Can you please share perf stats with this patch in fast path, if available?
+On Sun, Oct 27 2024 at 15:23, Hugh Dickins wrote:
+> generic/077 on x86_32 CONFIG_DEBUG_KMAP_LOCAL_FORCE_MAP=y with highmem,
+> on huge=always tmpfs, issues a warning and then hangs (interruptibly):
+>
+> WARNING: CPU: 5 PID: 3517 at mm/highmem.c:622 kunmap_local_indexed+0x62/0xc9
+> CPU: 5 UID: 0 PID: 3517 Comm: cp Not tainted 6.12.0-rc4 #2
+> ...
+> copy_page_from_iter_atomic+0xa6/0x5ec
+> generic_perform_write+0xf6/0x1b4
+> shmem_file_write_iter+0x54/0x67
+>
+> Fix copy_page_from_iter_atomic() by limiting it in that case
+> (include/linux/skbuff.h skb_frag_must_loop() does similar).
+>
+> But going forward, perhaps CONFIG_DEBUG_KMAP_LOCAL_FORCE_MAP is too
+> surprising, has outlived its usefulness, and should just be removed?
 
-I don't have this data for HMM and VFIO as they have other benefits from this
-series except performance. For NVMe, I don't have the data yet, but it will
-come https://lore.kernel.org/all/cover.1730037261.git.leon@kernel.org/,
-as it is the main performant user of this API.
+It has caught real problems and as long as we have highmem support, it
+should stay IMO to provide test coverage.
 
-This is the main reason why NVMe series is marked as RFC yet.
+Thanks,
 
-Thanks
+        tglx
+
+
