@@ -1,43 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B3F524C;
-	Mon, 28 Oct 2024 19:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE311DFE1C;
+	Mon, 28 Oct 2024 20:59:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730144800; cv=none; b=VCcPLHK3kWrAAuKiCW0tg5HT0b3/MgLQb6W6unK8EVgo+DqiwX0gVM9jOLd0WzXvGgluhDDD0Qu7l8K2Psa1RzbgagiXvJ3Suf6lfCYJYEbDD/FaOi6NTFIqWYZWuYtFBVM9xcLUcyIwvrw3nfO04C5V7bFvWcxrsZickbcD8ME=
+	t=1730149145; cv=none; b=IwWKSDkJkiHsCLPQpDeOGR5tFABIVQ2O7tZHohbWqIKczY8nI/uFVF7bryeYno2+Z9uGY+UwUPcA1Pf7Kz5icTs+Y/TrpmyTJxloHYiEO+cE0f1v7US7CiIHeXxo2wzh8gSrfGjwlCgRxtelk5y7BUbRrjg8oUr4wU/MZp5B8Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730144800; c=relaxed/simple;
-	bh=qZt8mJEDRl+Yth1e6zFjf+4BIU5q5r0ncS6SezGz7b8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=In/AA7WwQVKwBJ1zEXcPtPSIERw3ZU8s5sa7QTHSE+Rx+R+QFRLdMagGey4Oz/uM6P4f4XOBkffwYrk+5BOFdkTguCfj+1WPVrRCLplvCmb7DG4LT9ggHgrBZvUWY+3RB4utP7Yz/I3SwzwqU1ZNgXmrrtTgLU77wb89OPz/Ytg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bx5NAOQS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730149145; c=relaxed/simple;
+	bh=XDchRQtmy6pHQo4VldmyUQn5KpIMSBE9FuRx/IQ/fLc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=ba/i5GJSzfWbnG6cDm5hqDqK02WJ9aIR73MA4UJvgfoayCXD69BlugrdoOGNP71ujMbWyTRPGgFsT3/+TlQAjK9+7cwoQl8Dss5CEmS5T7fVf7F4vg9td8FxKUHSSqYzblQd/LHdaVFTOUCColqZ78UojIU0LzkvuaaByoNlj+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YHWCjZnS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bx5NAOQS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8F33C4CEC3;
-	Mon, 28 Oct 2024 19:46:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YHWCjZnS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8324C4CEC3;
+	Mon, 28 Oct 2024 20:59:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730144799;
-	bh=qZt8mJEDRl+Yth1e6zFjf+4BIU5q5r0ncS6SezGz7b8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bx5NAOQS/qZimCwhu4Tm3bsAGYBRGjZwoqtP1zKvpbF3pT9s4gfzbc2zgrfenOZxM
-	 zdZx6V1GKJeeI3+fls+Mx6UJfo4cVmLb0T/WZETo/fTXodQMVaxzL4KpJJbIT5dKVG
-	 3svJm0EpMXZmnG8eoR6/0xvc8BLpglaWX9OTudu69TonjzK73RHXZimXm/5AEVQsVD
-	 yLbjvDq27Hnr1p/9R5hfXS1hrxbPWwjmulI+itn7PHPZc/qB8v6lT54MVddl9Umfzu
-	 nTuuhsKPauBDPxabGkrHj1EVc35BnyDJthVXBlOVp4WTHiSQNw6coamAekfchPx/fS
-	 QksMEwbvoRQaw==
-Date: Mon, 28 Oct 2024 13:46:36 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org, hch@lst.de,
-	joshi.k@samsung.com, javier.gonz@samsung.com
-Subject: Re: [PATCHv9 3/7] block: allow ability to limit partition write hints
-Message-ID: <Zx_qHAqoFpl7Ivj7@kbusch-mbp>
-References: <20241025213645.3464331-1-kbusch@meta.com>
- <20241025213645.3464331-4-kbusch@meta.com>
- <626bd35e-7216-4379-967d-5f6ebb4a5272@acm.org>
+	s=k20201202; t=1730149144;
+	bh=XDchRQtmy6pHQo4VldmyUQn5KpIMSBE9FuRx/IQ/fLc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=YHWCjZnSvGD0FLXm38frIZRba2sQQ98rHEmaoqo7+IGWHJUxibwDnNsBZgESkMQf2
+	 TsIZgg66kDAZi3cQ/raC0xLCHxFt/n+Q+GfpSPikoPYWogMwVVkT2YGGo6r+mvlpQs
+	 LYcYZiWraEirilGEQRB7r1dSqxIlLl6PnIyzBEG69k5H5ZL/4V51yCX9ue/AQ9hoao
+	 YtQPx9n4wU6TLKUu3BMoGWW4nbSLG6WcdHPvYzg+727B9k+tQFNcmm7b2B+OIclaEr
+	 WoCdB/gjnaxlHYJSzABbNThj3fTHRWtRg5gmc802RNwzAtTGyuBAMLTzhdJzsWVOka
+	 YksEeTIOFMwbA==
+Date: Mon, 28 Oct 2024 15:59:02 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 01/18] PCI/P2PDMA: refactor the p2pdma mapping helpers
+Message-ID: <20241028205902.GA1114413@bhelgaas>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,23 +57,120 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <626bd35e-7216-4379-967d-5f6ebb4a5272@acm.org>
+In-Reply-To: <a4d93ca45f7ad09105a1cf347e6b6d6b6fb7e303.1730037276.git.leon@kernel.org>
 
-On Mon, Oct 28, 2024 at 11:27:33AM -0700, Bart Van Assche wrote:
-> On 10/25/24 2:36 PM, Keith Busch wrote:
-> > When multiple partitions are used, you may want to enforce different
-> > subsets of the available write hints for each partition. Provide a
-> > bitmap attribute of the available write hints, and allow an admin to
-> > write a different mask to set the partition's allowed write hints.
+Prefer subject capitalization in drivers/pci:
+
+  PCI/P2PDMA: Refactor ...
+
+On Sun, Oct 27, 2024 at 04:21:01PM +0200, Leon Romanovsky wrote:
+> From: Christoph Hellwig <hch@lst.de>
 > 
-> After /proc/irq/*/smp_affinity was introduced (a bitmask),
-> /proc/irq/*/smp_affinity_list (set of ranges) was introduced as a more
-> user-friendly alternative. Is the same expected to happen with the
-> write_hint_mask? If so, shouldn't we skip the bitmask user space
-> interface and directly introduce the more user friendly interface (set
-> of ranges)?
+> The current scheme with a single helper to determine the P2P status
+> and map a scatterlist segment force users to always use the map_sg
+> helper to DMA map, which we're trying to get away from because they
+> are very cache inefficient.
+> ...
 
-I don't much of have an opinion either way. One thing I like for the
-bitmask representation is you write 0 to turn it off vs. the list type
-writes a null string. Writing 0 to disable just feels more natural to
-me, but not a big deal.
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+
+A couple minor nits below.
+
+> @@ -1412,28 +1411,29 @@ int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
+>  		size_t s_length = s->length;
+>  		size_t pad_len = (mask - iova_len + 1) & mask;
+>  
+> -		if (is_pci_p2pdma_page(sg_page(s))) {
+> -			map = pci_p2pdma_map_segment(&p2pdma_state, dev, s);
+> -			switch (map) {
+> -			case PCI_P2PDMA_MAP_BUS_ADDR:
+> -				/*
+> -				 * iommu_map_sg() will skip this segment as
+> -				 * it is marked as a bus address,
+> -				 * __finalise_sg() will copy the dma address
+> -				 * into the output segment.
+> -				 */
+> -				continue;
+> -			case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+> -				/*
+> -				 * Mapping through host bridge should be
+> -				 * mapped with regular IOVAs, thus we
+> -				 * do nothing here and continue below.
+> -				 */
+> -				break;
+> -			default:
+> -				ret = -EREMOTEIO;
+> -				goto out_restore_sg;
+> -			}
+> +		switch (pci_p2pdma_state(&p2pdma_state, dev, sg_page(s))) {
+> +		case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+> +			/*
+> +			 * Mapping through host bridge should be mapped with
+> +			 * regular IOVAs, thus we do nothing here and continue
+> +			 * below.
+> +			 */
+
+I guess this is technically not a fall-through to the next case
+because there's no executable code here, but since the comment
+separates these two cases, I would find it easier to read if you
+included the break here explicitly.
+
+> +		case PCI_P2PDMA_MAP_NONE:
+> +			break;
+
+> +void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
+> +		struct device *dev, struct page *page);
+> +
+> +/**
+> + * pci_p2pdma_state - check the P2P transfer state of a page
+> + * @state: 	P2P state structure
+
+Checkpatch complains about space before tab here.
+
+> + * pci_p2pdma_bus_addr_map - map a PCI_P2PDMA_MAP_BUS_ADDR P2P transfer
+> + * @state: 	P2P state structure
+
+And here.
+
+> @@ -462,34 +462,32 @@ int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
+>  		enum dma_data_direction dir, unsigned long attrs)
+>  {
+>  	struct pci_p2pdma_map_state p2pdma_state = {};
+> -	enum pci_p2pdma_map_type map;
+>  	struct scatterlist *sg;
+>  	int i, ret;
+>  
+>  	for_each_sg(sgl, sg, nents, i) {
+> -		if (is_pci_p2pdma_page(sg_page(sg))) {
+> -			map = pci_p2pdma_map_segment(&p2pdma_state, dev, sg);
+> -			switch (map) {
+> -			case PCI_P2PDMA_MAP_BUS_ADDR:
+> -				continue;
+> -			case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+> -				/*
+> -				 * Any P2P mapping that traverses the PCI
+> -				 * host bridge must be mapped with CPU physical
+> -				 * address and not PCI bus addresses. This is
+> -				 * done with dma_direct_map_page() below.
+> -				 */
+> -				break;
+> -			default:
+> -				ret = -EREMOTEIO;
+> +		switch (pci_p2pdma_state(&p2pdma_state, dev, sg_page(sg))) {
+> +		case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+> +			/*
+> +			 * Any P2P mapping that traverses the PCI host bridge
+> +			 * must be mapped with CPU physical address and not PCI
+> +			 * bus addresses.
+> +			 */
+
+Same fall-through comment.
+
+> +		case PCI_P2PDMA_MAP_NONE:
+> +			sg->dma_address = dma_direct_map_page(dev, sg_page(sg),
+> +					sg->offset, sg->length, dir, attrs);
+> +			if (sg->dma_address == DMA_MAPPING_ERROR) {
+> +				ret = -EIO;
+>  				goto out_unmap;
+>  			}
+> -		}
