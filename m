@@ -1,115 +1,82 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245447DA81;
-	Tue, 29 Oct 2024 16:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B3F1D7989;
+	Tue, 29 Oct 2024 16:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730220464; cv=none; b=ipBQT5gVhI2x0/RMs/1urLaPR2fL8l25VleWz9bxo8daU4LxeDWoFrMtZ2qkScuRUwIaWUUOvH4LGCHwiw8KuWGurLqnC44cJCKNttKdRLnApczc7jrLHcA3JfYslrOdUyMIYNj0fEo0gmHdxWTjDCPWBMsAMTsozP3pZhoWdO8=
+	t=1730220528; cv=none; b=MHRqg2uEpqIbl4p2Wv6rZngMb/39o5fNLK5uBOlvFPvoe5GgOb6Lku17miW+JL1492Gu8MA3/ONZRh/CSnuPJubXvScOBKe6K9hYvmTXpAYU4bVAn5q+3xRFbBEdbC4OqBKhPoG2jmvTh5zV8CrmctqA/XWk/OP6JHFKpezvg9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730220464; c=relaxed/simple;
-	bh=avcy8Y5x6vA/ZlM46laLBaGxAC90NqrADTtALMmEr5s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eHzdpYDaiPUdtUfj6kXKKISuPAyAfRBSKfadSxtiOCr8iRZlTHc4cFi0vm3otkTZHuajAKaHESQ1rs3JIMvKCmtGoBL/Ym+brf/GQycqUPgNon/bgITiVWJYWb6W5Fu4Zu/LGppwngzmq7EOfmgaHbR8FpHAjkHDdPMmksfBheY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l2nsFDoK; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1730220528; c=relaxed/simple;
+	bh=UHUCi4vpc9NsIGRx2NWApkLxNhg8anztoSGFsyKXm3w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eGsDdLX4nLb/kOKikq2yJcuI2As+8u57c+YsrpN/FsVoDNvHJTmTiA3l/y84OMf9DhvRfrs5oS0EAid1NSQUPLnayDdbalOp7GfT2vqaDIu51hwbHNC5W2LjHgmCCzcWXyNY1C86wa182Xlt/m21v0wtQxsETNbWC7FkF5UAe8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OyHYnWW1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l2nsFDoK"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43163667f0eso53943295e9.0;
-        Tue, 29 Oct 2024 09:47:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730220460; x=1730825260; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rWA4KkCBSk1QKJcRvuDg5QtHyButhhkG/bhJ4kRAJsc=;
-        b=l2nsFDoKI192DObcBralaK0l/CKqaWxsHi3mjucwal5UQ7VC5W8WNs/CXeyCAJYSfu
-         8N63dv9splcYUvDVjToyLciCMSusXbJ2jYrfA8wDsVZjVDf4kj7mf0yrqAEMsvsc6wm8
-         TDvo/XVASqms5NBtcc1imvjjkiSsahi0/ekzVSbgoKMLp0SLwOiXnR+mARlUVv13tXlT
-         lXrgJj6FgLPnoIGYFdv0+jeCXTIdkN4QM/wFN+ZPVF4p7Xk/Dt+eqD5lJ/fTXO+a/uBk
-         6OBqKbuEFha9I0p7fbLyiJS1K8TWYaHKnnBnNhA2C/GW1X1p1eKUYqF7jAsAsNvNa40G
-         rMRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730220460; x=1730825260;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rWA4KkCBSk1QKJcRvuDg5QtHyButhhkG/bhJ4kRAJsc=;
-        b=qSWuIKoaXXmSBO11hco+LdP7HIHbE1yU437SUKxGVnur6gDVX6SGi6qLx5R2blMXjE
-         O/K9tO+JM9xi/s69ZnoxaKAEMMNUz6Z8uPKagrJCd1u+HqN5UBFUASEWeaDUoZ0Xqh3t
-         3I4a+BV9zDf4AR+eMjjS6G3oUqZcnz5ufCMy/0eMimCBqsjhuCew/ePucCw17orlMl3y
-         iDhJAz82xX4YbwFLAi0Ftbyw17C3TrcyFD15gGy0VHQwR7rozBUWX0ovCNA/A9D7aJv3
-         jr5bYcPPzOeovi+V9lMyT9YngnRTxTpVL5jZwzZWRLSHTVb/c8YsOu2GdCsjSGmQWQg9
-         mwUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU8y8bTHUkZCVwPy0X2VWxw1heoasBSiERTj0nCV+/uP6auDmZ2lAPzI2s/03GF7rAQ+6rF2xgMFQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxN4cykGUSyDQ+Dd7Qtsb2aZCe8VvqT6OXIIjZPZIkSfpZYZA7n
-	Y3jXBA1aLgmaxj+CR/NGK4LAYZzGuH5J61fMnczMbfc0KJuJQczYQ3s04w==
-X-Google-Smtp-Source: AGHT+IFD+FrvwNPWG4HQp9xxXxKz5wJI7IrnIOX6wMnvWX7HE2Jw6oIqAJ3GEGWXuliMMxZqNwWcIw==
-X-Received: by 2002:a05:600c:1546:b0:431:57e5:b245 with SMTP id 5b1f17b1804b1-4319ad14981mr87058525e9.23.1730220460184;
-        Tue, 29 Oct 2024 09:47:40 -0700 (PDT)
-Received: from [192.168.42.53] ([148.252.132.209])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b3bb62sm13081754f8f.29.2024.10.29.09.47.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Oct 2024 09:47:39 -0700 (PDT)
-Message-ID: <4576f723-5694-40b5-a656-abd1c8d05d62@gmail.com>
-Date: Tue, 29 Oct 2024 16:47:59 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OyHYnWW1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DB9EC4CEE7;
+	Tue, 29 Oct 2024 16:48:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730220528;
+	bh=UHUCi4vpc9NsIGRx2NWApkLxNhg8anztoSGFsyKXm3w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OyHYnWW1pjm6Aj8Kkcd/dadQl9cdDWv80O4cGEbK301k/HKDeMTCHwvXC+cwoVNue
+	 We6HnodpvPrTnrRZK2G3lOYDParD9rcxcFpCDPsScBhny2/aGDhYpHfyMfzYn2V5i2
+	 8vIqKiSqrbDs8K9LAxdas5kt/hXTScdnJlrcx6hI16sgOa8vSRzptDpr4ytKHcn6JC
+	 2K+J092fr8qm+NMl8fhV653EwxDOStqEih+f09slsAjOAG/FjJ16ZGRrUEa75cPx7F
+	 SRKR/Kt8/jRcBo0e6P4sI47wJZ5jEmWK0WEOf/k+ExW9WR6qRlyhSZXoppq6fNCTC3
+	 iAO+F3XpPWYrQ==
+Date: Tue, 29 Oct 2024 18:48:43 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 01/18] PCI/P2PDMA: refactor the p2pdma mapping helpers
+Message-ID: <20241029164843.GO1615717@unreal>
+References: <a4d93ca45f7ad09105a1cf347e6b6d6b6fb7e303.1730037276.git.leon@kernel.org>
+ <20241028205902.GA1114413@bhelgaas>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V8 5/7] io_uring: support leased group buffer with
- REQ_F_GROUP_KBUF
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- io-uring@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
- Akilesh Kailash <akailash@google.com>
-References: <20241025122247.3709133-1-ming.lei@redhat.com>
- <20241025122247.3709133-6-ming.lei@redhat.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20241025122247.3709133-6-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241028205902.GA1114413@bhelgaas>
 
-On 10/25/24 13:22, Ming Lei wrote:
-...
-> diff --git a/io_uring/rw.c b/io_uring/rw.c
-> index 4bc0d762627d..5a2025d48804 100644
-> --- a/io_uring/rw.c
-> +++ b/io_uring/rw.c
-> @@ -245,7 +245,8 @@ static int io_prep_rw_setup(struct io_kiocb *req, int ddir, bool do_import)
->   	if (io_rw_alloc_async(req))
->   		return -ENOMEM;
->   
-> -	if (!do_import || io_do_buffer_select(req))
-> +	if (!do_import || io_do_buffer_select(req) ||
-> +	    io_use_leased_grp_kbuf(req))
->   		return 0;
->   
->   	rw = req->async_data;
-> @@ -489,6 +490,11 @@ static bool __io_complete_rw_common(struct io_kiocb *req, long res)
->   		}
->   		req_set_fail(req);
->   		req->cqe.res = res;
-> +		if (io_use_leased_grp_kbuf(req)) {
+On Mon, Oct 28, 2024 at 03:59:02PM -0500, Bjorn Helgaas wrote:
+> Prefer subject capitalization in drivers/pci:
+> 
+>   PCI/P2PDMA: Refactor ...
+> 
+> On Sun, Oct 27, 2024 at 04:21:01PM +0200, Leon Romanovsky wrote:
+> > From: Christoph Hellwig <hch@lst.de>
+> > 
+> > The current scheme with a single helper to determine the P2P status
+> > and map a scatterlist segment force users to always use the map_sg
+> > helper to DMA map, which we're trying to get away from because they
+> > are very cache inefficient.
+> > ...
+> 
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> 
+> A couple minor nits below.
 
-That's what I'm talking about, we're pushing more and
-into the generic paths (or patching every single hot opcode
-there is). You said it's fine for ublk the way it was, i.e.
-without tracking, so let's then pretend it's a ublk specific
-feature, kill that addition and settle at that if that's the
-way to go.
-
-> +			struct io_async_rw *io = req->async_data;
-> +
-> +			io_req_zero_remained(req, &io->iter);
-> +		}
->   	}
->   	return false;
-
--- 
-Pavel Begunkov
+I'll fix, thanks
