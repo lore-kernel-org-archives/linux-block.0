@@ -1,53 +1,57 @@
 Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46538197A82
-	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 15:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F1318E028
+	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 15:22:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730215204; cv=none; b=N+f4xv3t5uGYnHKLMzieVN9cLT1n2+KYteFg4eTa5ra8TXYsWg1AXvu/llvURbrAlk3bApvj3y9yxqfQmO2gkk4QbFvD816dH2qbLcUYKxlyK7HWV5mY7zYwYmTdMVnVl/cYS3szRuiM1IvHztApVw3VtEnV+yAc1eDMJYZONi8=
+	t=1730215333; cv=none; b=VALEbd2HbFugLGQc/OuMEnHKeKpD5LqVMjWp5RrEmA7XMpT5ObmWwChFK/Zrl9Lwba2DA4W9ZcEItWLlXkBKN+vr+Uj1dTJ9oNv05yXU+GdqSvODRTP91OTt9QoDOXw98J+rUUCMcNyHO5WU3liG91ca45S3yevByp5Nz4IpPLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730215204; c=relaxed/simple;
-	bh=u5K3D5yLSkHuUgTsOePWDLML5bOnFkPsgBx7WMm9Kok=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AsdLsbFe81xP9uYFMMDqBeIXOv2NIEjrsVjIX+HqYeB5VE504m4lQkYmGYJHfLN/5wZ1gW3XI/4uNR5kmIxdDRwngqzBNmXfVy5YWryFMa56vU23EPad9Q4mK6IWmN5MW1b2zCaV1+yfGsloxOjRqVvrkjsZxp/iYz6CJPypyrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=EkBldLnO; arc=none smtp.client-ip=67.231.145.42
+	s=arc-20240116; t=1730215333; c=relaxed/simple;
+	bh=lTngeVgYMu8iRvvavbDcw/84hBpD6tPbdXy11QgC3/g=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GzzI5nAzslxfrOT3TgcKLpFIF26jAYWfMIRm6TuMpz6p/rO+ZgYLPKiV0/G2OjgnImLXKDfJNQZtpF3UO08Kfd51OWpU/0271ZlqX5Zi0KHF07DenVKyrLYRLcOAVeuRxXa/5+Do4jhXZAfMSdYtzAsnGUZfjfvzJ99bOvn9MSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=NI3Pdccr; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="EkBldLnO"
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49T72Trt012612
-	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 08:20:01 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="NI3Pdccr"
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49T72Lb3008408
+	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 08:22:11 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2021-q4; bh=XgvQBUxMc4oBRDRyps
-	Eh3gf2mVo+uaeROl5mqKEtNEM=; b=EkBldLnO1a5HwaERD48j8+tJYInobYCnto
-	+7gK6kCnzA59H/PerqdNJH6U57UXRpA4P265FoAfDfBvquW4SsqUAf5bwseHRogt
-	GNm2UQseW/y1/FI6TVRnHIlTrwl4QyDP028+Pa5WSrtYsoETwdCIbRKIYrG4jysk
-	1s5MTTyxmeHVTFXstQalE8mUKJSHB+9MhSBjgAWo2IYYcj0bGf6KaNfaML12mw/I
-	stlMrECM7iIqHeb2R8SbLqg4nf1qnIPeSVi8XfuEzan3LBxv3nMUs9sI+vALdfmK
-	QgBOe7Lu8P/1YchdWUt9SMoKE9RbPsQKcatwmHxw87SeazTjAThA==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 42jty7asby-17
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
+	 bh=lpkw70ScsQg5oJhrDT3X/i9ncqvY2EB0/2EmfsOYbl0=; b=NI3Pdccrpn9s
+	1KZ0FlPkPtyF6fvqqHi9EgyUKaFA/nqfW5x968ow82SiwbIF9969BnCCVrau2nK6
+	XZYtgqbOPrTN90pI9k75IN5Yei8alA2JoKnOAXpjKPQDU2xuuvg+iJ6jHdE9rvv8
+	e/PiHhXTtYFu1mamJfWKLQkWaaaDc4Trepge9GFgs8XlOzGGo+iPZLU1F5ujndHB
+	BAFKif/TIPJgI+HGekz0415+pDngH6ux9B/esMXWJxWNkKtuyRWK3lg0AmyF1cId
+	XYJ/M9LbFVRNUk7Q/MBPK9FmfSrUJXEDTrX7W0QYOAJT9wVdCtVFTD9nYpdhI3kO
+	bNve1sBzPw==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 42jty52ube-7
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 08:20:01 -0700 (PDT)
-Received: from twshared10900.35.frc1.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 08:22:11 -0700 (PDT)
+Received: from twshared12347.06.ash8.facebook.com (2620:10d:c0a8:1b::8e35) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Tue, 29 Oct 2024 15:19:58 +0000
+ 15.2.1544.11; Tue, 29 Oct 2024 15:22:07 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id D97AA14920E9A; Tue, 29 Oct 2024 08:19:43 -0700 (PDT)
+	id 4346D14920EAF; Tue, 29 Oct 2024 08:19:44 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
         <linux-scsi@vger.kernel.org>, <io-uring@vger.kernel.org>
 CC: <linux-fsdevel@vger.kernel.org>, <hch@lst.de>, <joshi.k@samsung.com>,
         <javier.gonz@samsung.com>, <bvanassche@acm.org>,
         Keith Busch
-	<kbusch@kernel.org>
-Subject: [PATCHv10 0/9] write hints with nvme fdp, scsi streams
-Date: Tue, 29 Oct 2024 08:19:13 -0700
-Message-ID: <20241029151922.459139-1-kbusch@meta.com>
+	<kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>
+Subject: [PATCHv10 9/9] scsi: set permanent stream count in block limits
+Date: Tue, 29 Oct 2024 08:19:22 -0700
+Message-ID: <20241029151922.459139-10-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20241029151922.459139-1-kbusch@meta.com>
+References: <20241029151922.459139-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,68 +61,40 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: -LEN1ALTGY8SwWBllUULf4ic8HaqOBIU
-X-Proofpoint-GUID: -LEN1ALTGY8SwWBllUULf4ic8HaqOBIU
+X-Proofpoint-ORIG-GUID: YLug9fG6c3OYIuPGWlOtSt9jYGDQUjDh
+X-Proofpoint-GUID: YLug9fG6c3OYIuPGWlOtSt9jYGDQUjDh
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-Changes from v9:
+The block limits exports the number of write hints, so set this limit if
+the device reports support for the lifetime hints. Not only does this
+inform the user of which hints are possible, it also allows scsi devices
+supporting the feature to utilize the full range through raw block
+device direct-io.
 
-  Document the partition hint mask
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ drivers/scsi/sd.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-  Use bitmap_alloc API
-
-  Fixup bitmap memory leak
-
-  Return invalid value if user requests an invalid write hint
-
-  Added and exported a block device feature flag for indicating generic
-  placement hint support
-
-  Added statx write hint max field
-
-  Added BUILD_BUG_ON check for new io_uring SQE fields.
-
-  Added reviews
-
-Kanchan Joshi (2):
-  io_uring: enable per-io hinting capability
-  nvme: enable FDP support
-
-Keith Busch (7):
-  block: use generic u16 for write hints
-  block: introduce max_write_hints queue limit
-  statx: add write hint information
-  block: allow ability to limit partition write hints
-  block, fs: add write hint to kiocb
-  block: export placement hint feature
-  scsi: set permanent stream count in block limits
-
- Documentation/ABI/stable/sysfs-block | 13 +++++
- block/bdev.c                         | 18 ++++++
- block/blk-settings.c                 |  5 ++
- block/blk-sysfs.c                    |  6 ++
- block/fops.c                         | 31 +++++++++-
- block/partitions/core.c              | 44 ++++++++++++++-
- drivers/nvme/host/core.c             | 84 ++++++++++++++++++++++++++++
- drivers/nvme/host/nvme.h             |  5 ++
- drivers/scsi/sd.c                    |  2 +
- fs/stat.c                            |  1 +
- include/linux/blk-mq.h               |  3 +-
- include/linux/blk_types.h            |  4 +-
- include/linux/blkdev.h               | 15 +++++
- include/linux/fs.h                   |  1 +
- include/linux/nvme.h                 | 19 +++++++
- include/linux/stat.h                 |  1 +
- include/uapi/linux/io_uring.h        |  4 ++
- include/uapi/linux/stat.h            |  3 +-
- io_uring/io_uring.c                  |  2 +
- io_uring/rw.c                        |  3 +-
- 20 files changed, 253 insertions(+), 11 deletions(-)
-
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index ca4bc0ac76adc..235dd6e5b6688 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -3768,6 +3768,8 @@ static int sd_revalidate_disk(struct gendisk *disk)
+ 		sd_config_protection(sdkp, &lim);
+ 	}
+=20
++	lim.max_write_hints =3D sdkp->permanent_stream_count;
++
+ 	/*
+ 	 * We now have all cache related info, determine how we deal
+ 	 * with flush requests.
 --=20
 2.43.5
 
