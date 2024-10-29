@@ -1,111 +1,147 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDC9198A35;
-	Tue, 29 Oct 2024 16:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230C01D9A51;
+	Tue, 29 Oct 2024 16:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730218980; cv=none; b=JmcLlhBK+EzI8gCsYxV/L+Uk5dZyvnWJssz7dmJdOxcbNPDKPaWPHqUxlUlZYw3gKHu/fYayk54Iow+sJu9C3IU3oHmssxp0Dz5T8NLcYmo6JUjn2OjQ4UxiDR9ZgjhGVsiEZNoI9643txveW3NvYXPeP8lz55FHeoX8hOxNSOc=
+	t=1730219920; cv=none; b=iT5m0USgcFV1buMTGp1Qxr9BiuHfGYbhAdJdVGHcwlVI0rm882ImvZTn4UMe4pkESFMRgHH0R/J+jtpTY6iD+KjiguxgDRWeeUMKjo+IhpeBnf8D4vSNrBj7UPPDF2nBIVR/Kx3hZm9FqE6CRR218l7Vu844C/2TC3r3dBB3LQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730218980; c=relaxed/simple;
-	bh=rnqDaUxeAcqkIk/Vh8WJ9TxoWp2/b9FHNdxNoOJlIGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZLf/06yalPaIlHnIKwIsW9RP7bXMfzuak5EuoUxtqNN0tfIdnWAV4pexnpEf0s2lbitlJN4/cwr8uwu4qreWF6/Reg4pwhnG4WZS1OIkQgkO0S1ZDVgof2UAMa9LpZnXTdPT8hbzhLA2Xcz1tYT49kYloUN67nE+73+AwmxBgwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmO/oYVP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730219920; c=relaxed/simple;
+	bh=dSQechY7kKZJkZNicyQbJ3cyE+OPqhZQ1obuU+tkcfU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j9I/8g+XZ2dOOZGBUfSgQ9laQPG5OYPHmVxqN7lfIYwVcuXswFuKc4MQecQ2U9d7+xTVBfuUnMcOUW50gTZsoo3JjJm4ZJ9R2QIhWll9s2dhnTG/b7BzlE6W4jGeY285h2gPAXUvo4ogSBBfkZCeZTlaDL7zjQXjzFtM+rk5/Cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AAtnnpTW; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmO/oYVP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 504EFC4CECD;
-	Tue, 29 Oct 2024 16:22:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730218980;
-	bh=rnqDaUxeAcqkIk/Vh8WJ9TxoWp2/b9FHNdxNoOJlIGE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tmO/oYVPLqeC34LQRu1PYdnSvZd4ijfcozDJ/SywAmS8CCeUdPO4Fei0e+9PG7HGl
-	 vDX2HjNZVgs0J/AzgItViMJdpiiaKg8CzAexngMVRoxuFOCVWnE7RWrU2kpRi0lnGZ
-	 A4LNtMgy/AaERrSI2RzlS22JN6iLwo/Be9JAw1deT9ivdMKL9drQfgjaaIhceCP600
-	 /pPjlAohYl149PBupNLsUs5Mb0RhmWrwAFePvBX4VbuZjcJfFHM3vNn+DrE8lnOvuz
-	 bTWTe4ltpcTa4zF94DrK960V4pDkPfbP2q+pxxNotVMGXyc292q+8mPV1BVYUA3e2s
-	 OMYC/pMJ5z6+w==
-Date: Tue, 29 Oct 2024 10:22:56 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	joshi.k@samsung.com, javier.gonz@samsung.com, bvanassche@acm.org,
-	Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCHv10 9/9] scsi: set permanent stream count in block limits
-Message-ID: <ZyEL4FOBMr4H8DGM@kbusch-mbp>
-References: <20241029151922.459139-1-kbusch@meta.com>
- <20241029151922.459139-10-kbusch@meta.com>
- <20241029152654.GC26431@lst.de>
- <ZyEAb-zgvBlzZiaQ@kbusch-mbp>
- <20241029153702.GA27545@lst.de>
- <ZyEBhOoDHKJs4EEY@kbusch-mbp>
- <20241029155330.GA27856@lst.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AAtnnpTW"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43155afca99so56595e9.1;
+        Tue, 29 Oct 2024 09:38:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730219916; x=1730824716; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cVGyxAIaxcFI0Z/SaAj/2sA3gCvkq4jv863YJyc1V9I=;
+        b=AAtnnpTWdHo8BzAvw0n+jIQ0RepEDSBvFrrsU8MyMKPfv3K1WP9A1tJDtpzitHueG5
+         6Uovf6DxB8KQw6k2KVYcu4l+acoJJrr4s1o98PKNkoEMHEWTNH+gPS7IKoTDmrVxMZCr
+         P8HZXLTZIYs5ZV9UaG7SOvy2BJ0H8CY4vuVLDxmIvRecZCkEFyVeDhx5dpDg/K7Jwles
+         A5cbWRcw0JF2b+tCg3ND5DmreH1PPhLf1tqrLoiwHeiOfxrzTmNGdDB54MBIguwS/qRz
+         FLsZfn622yRGje+/NwEkiRqYVtWUb+BMta56O0HBsfloL1L3/VIycsnkKAouv7mTsId7
+         ZT1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730219916; x=1730824716;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cVGyxAIaxcFI0Z/SaAj/2sA3gCvkq4jv863YJyc1V9I=;
+        b=E2T0Ey5zzxOgiwNhEwUWK6DmFiTXNhEqBPhPp/REbyds1LVYYjyOsJ2iE5iiTXNAuG
+         7zFcU6onsZSPDQx9BEUnms1SAxy4JpfNSsEsMI/rvb2e/VMcbUgc2QIWtapSZFkJcizF
+         iccdki0Vi+WCm7cqfdiPIBC5pwULOaWKPDz9HBGjR/Oweu8thyrIJLtn9lDb47fMbTzH
+         SgFnfi9AZIgLF0EfDKC80Up3+3MufPcYnpfmRKxFIaJbDPx6TaicN9mySvUbbLG/EUWz
+         My5pg7fizyZYnJkkhkGuOMlL6Xg0/8nG74ZrWXoGqyDMApzH8v7+pUWMg2a8mNKevle3
+         QbJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXxT3A0KB++fDh32SDxIcERviC8ydlSgKB/j9vV5JmAZS7o5fz2oO+8qy3oy8aEWiQpxaSqWP3ca5IkA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgHtXeiet2lBe3QjwXzqO8/LqD5yrkPm9IHXyPgkYbhbu48tNm
+	gWgNHWmYsVlsY6Z4873jKnmevyP86ZO4IsudHWg6+6EIoNiyBuG4
+X-Google-Smtp-Source: AGHT+IF447NseM2GzhbL85pACWbqOtidpVfM1Qg3JoFEFPvXZWdm+CnKoLkQwDVFvqanl3mXwRgUKw==
+X-Received: by 2002:a5d:5d85:0:b0:381:b20b:ff3e with SMTP id ffacd0b85a97d-381b20bffa5mr1781847f8f.26.1730219916265;
+        Tue, 29 Oct 2024 09:38:36 -0700 (PDT)
+Received: from [192.168.42.53] ([148.252.132.209])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b1c65dsm13110992f8f.8.2024.10.29.09.38.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Oct 2024 09:38:36 -0700 (PDT)
+Message-ID: <2bcce6c2-29c5-4b36-9840-7db516a40c41@gmail.com>
+Date: Tue, 29 Oct 2024 16:38:55 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241029155330.GA27856@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V8 4/7] io_uring: support SQE group
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+ Uday Shankar <ushankar@purestorage.com>,
+ Akilesh Kailash <akailash@google.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20241025122247.3709133-1-ming.lei@redhat.com>
+ <20241025122247.3709133-5-ming.lei@redhat.com>
+ <5417bcc5-e766-4044-905b-da5768d69f29@kernel.dk> <ZyA_dbiU0ho5IJYA@fedora>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ZyA_dbiU0ho5IJYA@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 29, 2024 at 04:53:30PM +0100, Christoph Hellwig wrote:
-> On Tue, Oct 29, 2024 at 09:38:44AM -0600, Keith Busch wrote:
-> > They're not exposed as write streams. Patch 7/9 sets the feature if it
-> > is a placement id or not, and only nvme sets it, so scsi's attributes
-> > are not claiming to be a write stream.
+On 10/29/24 01:50, Ming Lei wrote:
+> On Mon, Oct 28, 2024 at 06:12:34PM -0600, Jens Axboe wrote:
+>> On 10/25/24 6:22 AM, Ming Lei wrote:
+>>> SQE group is defined as one chain of SQEs starting with the first SQE that
+>>> has IOSQE_SQE_GROUP set, and ending with the first subsequent SQE that
+>>> doesn't have it set, and it is similar with chain of linked SQEs.
+>>>
+>>> Not like linked SQEs, each sqe is issued after the previous one is
+>>> completed. All SQEs in one group can be submitted in parallel. To simplify
+>>> the implementation from beginning, all members are queued after the leader
+>>> is completed, however, this way may be changed and leader and members may
+>>> be issued concurrently in future.
+>>>
+>>> The 1st SQE is group leader, and the other SQEs are group member. The whole
+>>> group share single IOSQE_IO_LINK and IOSQE_IO_DRAIN from group leader, and
+>>> the two flags can't be set for group members. For the sake of
+>>> simplicity, IORING_OP_LINK_TIMEOUT is disallowed for SQE group now.
+>>>
+>>> When the group is in one link chain, this group isn't submitted until the
+>>> previous SQE or group is completed. And the following SQE or group can't
+>>> be started if this group isn't completed. Failure from any group member will
+>>> fail the group leader, then the link chain can be terminated.
+>>>
+>>> When IOSQE_IO_DRAIN is set for group leader, all requests in this group and
+>>> previous requests submitted are drained. Given IOSQE_IO_DRAIN can be set for
+>>> group leader only, we respect IO_DRAIN by always completing group leader as
+>>> the last one in the group. Meantime it is natural to post leader's CQE
+>>> as the last one from application viewpoint.
+>>>
+>>> Working together with IOSQE_IO_LINK, SQE group provides flexible way to
+>>> support N:M dependency, such as:
+>>>
+>>> - group A is chained with group B together
+>>> - group A has N SQEs
+>>> - group B has M SQEs
+>>>
+>>> then M SQEs in group B depend on N SQEs in group A.
+>>>
+>>> N:M dependency can support some interesting use cases in efficient way:
+>>>
+>>> 1) read from multiple files, then write the read data into single file
+>>>
+>>> 2) read from single file, and write the read data into multiple files
+>>>
+>>> 3) write same data into multiple files, and read data from multiple files and
+>>> compare if correct data is written
+>>>
+>>> Also IOSQE_SQE_GROUP takes the last bit in sqe->flags, but we still can
+>>> extend sqe->flags with io_uring context flag, such as use __pad3 for
+>>> non-uring_cmd OPs and part of uring_cmd_flags for uring_cmd OP.
+>>
+>> Since it's taking the last flag, maybe a better idea to have the last
+>> flag mean "more flags in (for example) __pad3" and put the new flag
+>> there? Not sure you mean in terms of "io_uring context flag", would it
+>> be an enter flag? Ring required to be setup with a certain flag? Neither
+>> of those seem super encouraging, imho.
 > 
-> So it shows up in sysfs, but:
+> I meant:
 > 
->  - queue_max_write_hints (which really should be queue_max_write_streams)
->    still picks it up, and from there the statx interface
+> If "more flags in __pad3" is enabled in future we may claim it as one
+> feature to userspace, such as IORING_FEAT_EXT_FLAG.
 > 
->  - per-inode fcntl hint that encode a temperature still magically
->    get dumpted into the write streams if they are set.
-> 
-> In other words it's a really leaky half-backed abstraction.
+> Will improve the above commit log.
 
-Exactly why I asked last time: "who uses it and how do you want them to
-use it" :)
- 
-> Let's brainstorm how it could be done better:
-> 
->  - the max_write_streams values only set by block devices that actually
->    do support write streams, and not the fire and forget temperature
->    hints.  They way this is queried is by having a non-zero value
->    there, not need for an extra flag.
+And we can't take it in either case. The field is in a union, and
+other opcodes use that part of the SQE. Enabling a generic feature
+for a subset of requests only is not a good idea.
 
-So we need a completely different attribute for SCSI's permanent write
-streams? You'd mentioned earlier you were okay with having SCSI be able
-to utilized per-io raw block write hints. Having multiple things to
-check for what are all just write classifiers seems unnecessarily
-complicated.
-
->  - but the struct file (or maybe inode) gets a supported flag, as stream
->    separation needs to be supported by the file system 
->  - a separate fcntl is used to set per-inode streams (if you care about
->    that, seem like the bdev use case focusses on per-I/O).  In that case
->    we'd probably also need a separate inode field for them, or a somewhat
->    complicated scheme to decide what is stored in the inode field if there
->    is only one.
-
-No need to create a new fcntl. The people already testing this are
-successfully using FDP with the existing fcntl hints. Their applications
-leverage FDP as way to separate files based on expected lifetime. It is
-how they want to use it and it is working above expectations. 
-
->  - for block devices bdev/fops.c maps the temperature hints into write
->    streams if write streams are supported, any user that mixes and
->    matches write streams and temperature hints gets what they deserve
-
-That's fine. This patch series pretty much accomplishes that part.
-
->  - this could also be a helper for file systems that want to do the
->    same.
-> 
-> Just a quick writeup while I'm on the run, there's probably a hole or
-> two that could be poked into it.
+-- 
+Pavel Begunkov
