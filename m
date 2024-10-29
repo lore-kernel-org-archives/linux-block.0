@@ -1,330 +1,259 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE6623BB
-	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 00:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D6FD51C
+	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 01:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730160762; cv=none; b=TGugW9iePLAaxsXI3sshpNdnC8/Ba9EF9mKhlUWKxv3J7VRkKTxekJNygjX7FYczgCipLZKRp9DR6eBy28JFZZois5lACr+p8mcJCEboUGVJMbMjDTCcdtgUzdJsn0AP8CWAoqm4qHUIbSTFpZHe7Dc749ODHAqOCO95Xr0/gfk=
+	t=1730164798; cv=none; b=rU8MH+erQGZD06Ns+6OD/RuOxpmnSLG+oId27+xhN56xiMc/QDDyTpR4ZC6RapYJuIoI4b8mWymsdQVqRBGeKUlAjRzQ4X3dBqDhrRiOVsXn7YBZDMpU4QCwcOh3KRG2YMxiR3WJA0mHP6e8g016swKbHS/hQT+RsqGbiPFcwFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730160762; c=relaxed/simple;
-	bh=Dfh6059ILmBKUOqfqOEuNDgltskB/vAAqOXIljx7UQo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OiztdpI35jONq242Cdyf854mt+/06MEoMlH7TVzk6pJEZfEJO4IKYGN90HfFVToksI8Jq/yE1AUyhpnQRWUVjYw/VN6wzKXGJoG7GXSyyG/vn4dMyiOcrqUncTf/OgSQm+nIYQf6SPEupb6qIn6+wk6XHZJkQBKv+9R7LGpmmJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=PK1O+FoS; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1730164798; c=relaxed/simple;
+	bh=DrFZEom/tjC6u5UF/qKe9FYv7ahFDQxDW715s0oaNhI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SUig0zHGiwCaJFcpLZi2ULgHgetQEFRRUokO1zKsKIis2hwsYiytp7eNBgBMLB26i1zqAu1pUdzOnB3nBjaxBzMGgqfgudoftcAvwgydjmaAb9fliML6O35eb6Z8ZYhYVoF4ki9ELmDwC7hUHC8YQjd74Am+o9O8N56gnGtTt68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BJQhb8tD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="PK1O+FoS"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20c70abba48so38365675ad.0
-        for <linux-block@vger.kernel.org>; Mon, 28 Oct 2024 17:12:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730160757; x=1730765557; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s8qKWHlu9nuAcuqLVuzotLi/gmSD4/gHhTwEshGFxUM=;
-        b=PK1O+FoSq6q/t4AycpRG2qghNyn6ImHEzXlwOVhVyDAEsrf4yOYEe73D91CN7F5Coz
-         braXZG+OS/qMjynvUK/fngdMmOrMn7chN4SG27pBkdgLKhj9gizQSoygoIndjWWiAt3R
-         5lgQ9hIs/UZEWnb1+PggFw3oc24weC7/BO6gLNM17owJCbMThGFfMCVkcFEsiz0Zpwix
-         iHwJkZLeimIleFlnwH4dQUVTetsQiLj7DwGMG3YcAzkcGpeZlKrMTHgWJRMl3HwMi33w
-         Ss6tSFDzn40ZW81kQgl4x023T08KaX3ilaDzGwRsYnt+twDfixxfjYLLTHKn+iTUUf1A
-         teRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730160757; x=1730765557;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s8qKWHlu9nuAcuqLVuzotLi/gmSD4/gHhTwEshGFxUM=;
-        b=O5KcWQTrCkfNCLloRKMrSup5mS7fZNjGo3IwUf5PcjlZ23EkmUgDsJIaaZGqUZHyfo
-         uwHR88TLi8zFLv4anuk0JAry8lPTxAtPbCOsY3ge/3fnjWdvGSa8Yx8BNdLdJXCDKlPj
-         7VgzfMdVfYK/GY9Zn/UYnVtDZqYGA9SFPYgehY5uZzfBFvShUS7o466gVE7sV/4Zs56g
-         53JB22PyqV34j0GN/J4wZHErYT+gI6z+8VJ3bjdfiXg1GeLld0JWirG3qZ3Tyt7OawJo
-         nGXQLYphOUwBg0/G1iCUWPMpLDOFn54cuc1bSnUAjfAIH5bwZdb7s7/3k5ezWnQN94uy
-         JMoA==
-X-Gm-Message-State: AOJu0Yy7XSxcywPY5pUR1ubs9CWabwEZ+xcjdkExbVh+BIl8gsdKXib1
-	xFB71jyInLaPp2EnnsxvBQjMZm+kWRpJEfJFRrqQxwd6Gth1lcO/iLx+mDxNinw=
-X-Google-Smtp-Source: AGHT+IFztKnN/rPEGts6EWZftWX5Kd6cuEVK5UZoUQtqzO8B1Igsy6sILka6bWLdXowb61+wy1ucBA==
-X-Received: by 2002:a17:903:32c4:b0:20c:7796:5e76 with SMTP id d9443c01a7336-210c68d82f3mr151410745ad.18.1730160756590;
-        Mon, 28 Oct 2024 17:12:36 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bbf71d50sm55994615ad.72.2024.10.28.17.12.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Oct 2024 17:12:36 -0700 (PDT)
-Message-ID: <5417bcc5-e766-4044-905b-da5768d69f29@kernel.dk>
-Date: Mon, 28 Oct 2024 18:12:34 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJQhb8tD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730164794;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=WNMbK6tnCIQzJ9PMcLLLrD6cfAt4KQVqcwg0Zc03tMk=;
+	b=BJQhb8tDylBbc9QrBBCt4R4rIFBgcBztL4wuKD3YV6ZSJDFMe9cojqc1gJ3BHZqAkVH5wr
+	WJIzKsY3eMNlAFJAvH+7oNT1TwPTVA8GfI8lEUwseCMOVfMeASwsm/oKJ+e07mC3RKASFP
+	fBaJthz5HSEKFXlURMbxDRLAdqHU3Jc=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-681--DC9ZPsLOzCaDUVTnjUf_Q-1; Mon,
+ 28 Oct 2024 21:19:53 -0400
+X-MC-Unique: -DC9ZPsLOzCaDUVTnjUf_Q-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DB88919560AE;
+	Tue, 29 Oct 2024 01:19:50 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.82])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 05FDF19560A2;
+	Tue, 29 Oct 2024 01:19:48 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: josef@toxicpanda.com,
+	nbd@other.debian.org,
+	eblake@redhat.com,
+	Ming Lei <ming.lei@redhat.com>,
+	vincent.chen@sifive.com,
+	Leon Schuermann <leon@is.currently.online>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Kevin Wolf <kwolf@redhat.com>
+Subject: [PATCH V3] nbd: fix partial sending
+Date: Tue, 29 Oct 2024 09:19:41 +0800
+Message-ID: <20241029011941.153037-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V8 4/7] io_uring: support SQE group
-To: Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org,
- Pavel Begunkov <asml.silence@gmail.com>
-Cc: linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
- Akilesh Kailash <akailash@google.com>, Kevin Wolf <kwolf@redhat.com>
-References: <20241025122247.3709133-1-ming.lei@redhat.com>
- <20241025122247.3709133-5-ming.lei@redhat.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241025122247.3709133-5-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 10/25/24 6:22 AM, Ming Lei wrote:
-> SQE group is defined as one chain of SQEs starting with the first SQE that
-> has IOSQE_SQE_GROUP set, and ending with the first subsequent SQE that
-> doesn't have it set, and it is similar with chain of linked SQEs.
-> 
-> Not like linked SQEs, each sqe is issued after the previous one is
-> completed. All SQEs in one group can be submitted in parallel. To simplify
-> the implementation from beginning, all members are queued after the leader
-> is completed, however, this way may be changed and leader and members may
-> be issued concurrently in future.
-> 
-> The 1st SQE is group leader, and the other SQEs are group member. The whole
-> group share single IOSQE_IO_LINK and IOSQE_IO_DRAIN from group leader, and
-> the two flags can't be set for group members. For the sake of
-> simplicity, IORING_OP_LINK_TIMEOUT is disallowed for SQE group now.
-> 
-> When the group is in one link chain, this group isn't submitted until the
-> previous SQE or group is completed. And the following SQE or group can't
-> be started if this group isn't completed. Failure from any group member will
-> fail the group leader, then the link chain can be terminated.
-> 
-> When IOSQE_IO_DRAIN is set for group leader, all requests in this group and
-> previous requests submitted are drained. Given IOSQE_IO_DRAIN can be set for
-> group leader only, we respect IO_DRAIN by always completing group leader as
-> the last one in the group. Meantime it is natural to post leader's CQE
-> as the last one from application viewpoint.
-> 
-> Working together with IOSQE_IO_LINK, SQE group provides flexible way to
-> support N:M dependency, such as:
-> 
-> - group A is chained with group B together
-> - group A has N SQEs
-> - group B has M SQEs
-> 
-> then M SQEs in group B depend on N SQEs in group A.
-> 
-> N:M dependency can support some interesting use cases in efficient way:
-> 
-> 1) read from multiple files, then write the read data into single file
-> 
-> 2) read from single file, and write the read data into multiple files
-> 
-> 3) write same data into multiple files, and read data from multiple files and
-> compare if correct data is written
-> 
-> Also IOSQE_SQE_GROUP takes the last bit in sqe->flags, but we still can
-> extend sqe->flags with io_uring context flag, such as use __pad3 for
-> non-uring_cmd OPs and part of uring_cmd_flags for uring_cmd OP.
+nbd driver sends request header and payload with multiple call of
+sock_sendmsg, and partial sending can't be avoided. However, nbd driver
+returns BLK_STS_RESOURCE to block core in this situation. This way causes
+one issue: request->tag may change in the next run of nbd_queue_rq(), but
+the original old tag has been sent as part of header cookie, this way
+confuses nbd driver reply handling, since the real request can't be
+retrieved any more with the obsolete old tag.
 
-Since it's taking the last flag, maybe a better idea to have the last
-flag mean "more flags in (for example) __pad3" and put the new flag
-there? Not sure you mean in terms of "io_uring context flag", would it
-be an enter flag? Ring required to be setup with a certain flag? Neither
-of those seem super encouraging, imho.
+Fix it by retrying sending directly in per-socket work function,
+meantime return BLK_STS_OK to block layer core.
 
-Apart from that, just a few minor nits below.
+Cc: vincent.chen@sifive.com
+Cc: Leon Schuermann <leon@is.currently.online>
+Cc: Bart Van Assche <bvanassche@acm.org>
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V3:
+	- rename nbd_run_pending_work()(Kevin)
+	- warning on double schedule(Kevin)
+	- cover requeue in handling pending work function
 
-> +void io_fail_group_members(struct io_kiocb *req)
-> +{
-> +	struct io_kiocb *member = req->grp_link;
-> +
-> +	while (member) {
-> +		struct io_kiocb *next = member->grp_link;
-> +
-> +		if (!(member->flags & REQ_F_FAIL)) {
-> +			req_set_fail(member);
-> +			io_req_set_res(member, -ECANCELED, 0);
-> +		}
-> +		member = next;
-> +	}
-> +}
-> +
-> +static void io_queue_group_members(struct io_kiocb *req)
-> +{
-> +	struct io_kiocb *member = req->grp_link;
-> +
-> +	if (!member)
-> +		return;
-> +
-> +	req->grp_link = NULL;
-> +	while (member) {
-> +		struct io_kiocb *next = member->grp_link;
-> +
-> +		member->grp_leader = req;
-> +		if (unlikely(member->flags & REQ_F_FAIL)) {
-> +			io_req_task_queue_fail(member, member->cqe.res);
-> +		} else if (unlikely(req->flags & REQ_F_FAIL)) {
-> +			io_req_task_queue_fail(member, -ECANCELED);
-> +		} else {
-> +			io_req_task_queue(member);
-> +		}
-> +		member = next;
-> +	}
-> +}
+V2:
+	- move pending retry to socket work function and return BLK_STS_OK, so that
+	userspace can get chance to handle the signal(Kevin)
 
-Was going to say don't check for !member, you have the while loop. Which
-is what you do in the helper above. You can also drop the parens in this
-one.
 
-> +static enum group_mem io_prep_free_group_req(struct io_kiocb *req,
-> +					     struct io_kiocb **leader)
-> +{
-> +	/*
-> +	 * Group completion is done, so clear the flag for avoiding double
-> +	 * handling in case of io-wq
-> +	 */
-> +	req->flags &= ~REQ_F_SQE_GROUP;
-> +
-> +	if (req_is_group_leader(req)) {
-> +		/* Queue members now */
-> +		if (req->grp_link)
-> +			io_queue_group_members(req);
-> +		return GROUP_LEADER;
-> +	} else {
-> +		if (!req_is_last_group_member(req))
-> +			return GROUP_OTHER_MEMBER;
-> +
-> +		/*
-> +		 * Prepare for freeing leader which can only be found from
-> +		 * the last member
-> +		 */
-> +		*leader = req->grp_leader;
-> +		(*leader)->flags &= ~REQ_F_SQE_GROUP_LEADER;
-> +		req->grp_leader = NULL;
-> +		return GROUP_LAST_MEMBER;
-> +	}
-> +}
+ drivers/block/nbd.c | 95 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 85 insertions(+), 10 deletions(-)
 
-Just drop the second indentation here.
-
-> @@ -927,7 +1051,8 @@ static void io_req_complete_post(struct io_kiocb *req, unsigned issue_flags)
->  	 * Handle special CQ sync cases via task_work. DEFER_TASKRUN requires
->  	 * the submitter task context, IOPOLL protects with uring_lock.
->  	 */
-> -	if (ctx->task_complete || (ctx->flags & IORING_SETUP_IOPOLL)) {
-> +	if (ctx->task_complete || (ctx->flags & IORING_SETUP_IOPOLL) ||
-> +	    (req->flags & REQ_F_SQE_GROUP)) {
->  		req->io_task_work.func = io_req_task_complete;
->  		io_req_task_work_add(req);
->  		return;
-
-Minor detail, but might be nice with a REQ_F_* flag for this in the
-future.
-
-> @@ -1450,8 +1596,16 @@ void __io_submit_flush_completions(struct io_ring_ctx *ctx)
->  		struct io_kiocb *req = container_of(node, struct io_kiocb,
->  					    comp_list);
->  
-> -		if (!(req->flags & REQ_F_CQE_SKIP))
-> -			io_req_commit_cqe(ctx, req);
-> +		if (unlikely(req->flags & (REQ_F_CQE_SKIP | REQ_F_SQE_GROUP))) {
-> +			if (req->flags & REQ_F_SQE_GROUP) {
-> +				io_complete_group_req(req);
-> +				continue;
-> +			}
-> +
-> +			if (req->flags & REQ_F_CQE_SKIP)
-> +				continue;
-> +		}
-> +		io_req_commit_cqe(ctx, req);
->  	}
->  	__io_cq_unlock_post(ctx);
->  
-> @@ -1661,8 +1815,12 @@ static u32 io_get_sequence(struct io_kiocb *req)
->  	struct io_kiocb *cur;
->  
->  	/* need original cached_sq_head, but it was increased for each req */
-> -	io_for_each_link(cur, req)
-> -		seq--;
-> +	io_for_each_link(cur, req) {
-> +		if (req_is_group_leader(cur))
-> +			seq -= cur->grp_refs;
-> +		else
-> +			seq--;
-> +	}
->  	return seq;
->  }
->  
-> @@ -2124,6 +2282,67 @@ static int io_init_req(struct io_ring_ctx *ctx, struct io_kiocb *req,
->  	return def->prep(req, sqe);
->  }
->  
-> +static struct io_kiocb *io_group_sqe(struct io_submit_link *group,
-> +				     struct io_kiocb *req)
-> +{
-> +	/*
-> +	 * Group chain is similar with link chain: starts with 1st sqe with
-> +	 * REQ_F_SQE_GROUP, and ends with the 1st sqe without REQ_F_SQE_GROUP
-> +	 */
-> +	if (group->head) {
-> +		struct io_kiocb *lead = group->head;
-> +
-> +		/*
-> +		 * Members can't be in link chain, can't be drained, but
-> +		 * the whole group can be linked or drained by setting
-> +		 * flags on group leader.
-> +		 *
-> +		 * IOSQE_CQE_SKIP_SUCCESS can't be set for member
-> +		 * for the sake of simplicity
-> +		 */
-> +		if (req->flags & (IO_REQ_LINK_FLAGS | REQ_F_IO_DRAIN |
-> +				REQ_F_CQE_SKIP))
-> +			req_fail_link_node(lead, -EINVAL);
-> +
-> +		lead->grp_refs += 1;
-> +		group->last->grp_link = req;
-> +		group->last = req;
-> +
-> +		if (req->flags & REQ_F_SQE_GROUP)
-> +			return NULL;
-> +
-> +		req->grp_link = NULL;
-> +		req->flags |= REQ_F_SQE_GROUP;
-> +		group->head = NULL;
-> +
-> +		return lead;
-> +	} else {
-> +		if (WARN_ON_ONCE(!(req->flags & REQ_F_SQE_GROUP)))
-> +			return req;
-> +		group->head = req;
-> +		group->last = req;
-> +		req->grp_refs = 1;
-> +		req->flags |= REQ_F_SQE_GROUP_LEADER;
-> +		return NULL;
-> +	}
-> +}
-
-Same here, drop the 2nd indentation.
-
-> diff --git a/io_uring/timeout.c b/io_uring/timeout.c
-> index 9973876d91b0..ed6c74f1a475 100644
-> --- a/io_uring/timeout.c
-> +++ b/io_uring/timeout.c
-> @@ -149,6 +149,8 @@ static void io_req_tw_fail_links(struct io_kiocb *link, struct io_tw_state *ts)
->  			res = link->cqe.res;
->  		link->link = NULL;
->  		io_req_set_res(link, res, 0);
-> +		if (req_is_group_leader(link))
-> +			io_fail_group_members(link);
->  		io_req_task_complete(link, ts);
->  		link = nxt;
->  	}
-> @@ -543,6 +545,10 @@ static int __io_timeout_prep(struct io_kiocb *req,
->  	if (is_timeout_link) {
->  		struct io_submit_link *link = &req->ctx->submit_state.link;
->  
-> +		/* so far disallow IO group link timeout */
-> +		if (req->ctx->submit_state.group.head)
-> +			return -EINVAL;
-> +
-
-For now, disallow IO group linked timeout
-
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index b852050d8a96..a14a454ba0e8 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -62,6 +62,7 @@ struct nbd_sock {
+ 	bool dead;
+ 	int fallback_index;
+ 	int cookie;
++	struct work_struct work;
+ };
+ 
+ struct recv_thread_args {
+@@ -141,6 +142,9 @@ struct nbd_device {
+  */
+ #define NBD_CMD_INFLIGHT	2
+ 
++/* Just part of request header or data payload is sent successfully */
++#define NBD_CMD_PARTIAL_SEND	3
++
+ struct nbd_cmd {
+ 	struct nbd_device *nbd;
+ 	struct mutex lock;
+@@ -466,6 +470,12 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req)
+ 	if (!mutex_trylock(&cmd->lock))
+ 		return BLK_EH_RESET_TIMER;
+ 
++	/* partial send is handled in nbd_sock's work function */
++	if (test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags)) {
++		mutex_unlock(&cmd->lock);
++		return BLK_EH_RESET_TIMER;
++	}
++
+ 	if (!test_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
+ 		mutex_unlock(&cmd->lock);
+ 		return BLK_EH_DONE;
+@@ -614,6 +624,30 @@ static inline int was_interrupted(int result)
+ 	return result == -ERESTARTSYS || result == -EINTR;
+ }
+ 
++/*
++ * We've already sent header or part of data payload, have no choice but
++ * to set pending and schedule it in work.
++ *
++ * And we have to return BLK_STS_OK to block core, otherwise this same
++ * request may be re-dispatched with different tag, but our header has
++ * been sent out with old tag, and this way does confuse reply handling.
++ */
++static void nbd_sched_pending_work(struct nbd_device *nbd,
++				   struct nbd_sock *nsock,
++				   struct nbd_cmd *cmd, int sent)
++{
++	struct request *req = blk_mq_rq_from_pdu(cmd);
++
++	/* pending work should be scheduled only once */
++	WARN_ON_ONCE(test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags));
++
++	nsock->pending = req;
++	nsock->sent = sent;
++	set_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
++	refcount_inc(&nbd->config_refs);
++	schedule_work(&nsock->work);
++}
++
+ /*
+  * Returns BLK_STS_RESOURCE if the caller should retry after a delay.
+  * Returns BLK_STS_IOERR if sending failed.
+@@ -699,8 +733,8 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
+ 			 * completely done.
+ 			 */
+ 			if (sent) {
+-				nsock->pending = req;
+-				nsock->sent = sent;
++				nbd_sched_pending_work(nbd, nsock, cmd, sent);
++				return BLK_STS_OK;
+ 			}
+ 			set_bit(NBD_CMD_REQUEUED, &cmd->flags);
+ 			return BLK_STS_RESOURCE;
+@@ -737,14 +771,8 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
+ 			result = sock_xmit(nbd, index, 1, &from, flags, &sent);
+ 			if (result < 0) {
+ 				if (was_interrupted(result)) {
+-					/* We've already sent the header, we
+-					 * have no choice but to set pending and
+-					 * return BUSY.
+-					 */
+-					nsock->pending = req;
+-					nsock->sent = sent;
+-					set_bit(NBD_CMD_REQUEUED, &cmd->flags);
+-					return BLK_STS_RESOURCE;
++					nbd_sched_pending_work(nbd, nsock, cmd, sent);
++					return BLK_STS_OK;
+ 				}
+ 				dev_err(disk_to_dev(nbd->disk),
+ 					"Send data failed (result %d)\n",
+@@ -770,6 +798,14 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
+ 	return BLK_STS_OK;
+ 
+ requeue:
++	/*
++	 * Can't requeue in case we are dealing with partial send
++	 *
++	 * We must run from pending work function.
++	 * */
++	if (test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags))
++		return BLK_STS_OK;
++
+ 	/* retry on a different socket */
+ 	dev_err_ratelimited(disk_to_dev(nbd->disk),
+ 			    "Request send failed, requeueing\n");
+@@ -778,6 +814,44 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
+ 	return BLK_STS_OK;
+ }
+ 
++/* handle partial sending */
++static void nbd_pending_cmd_work(struct work_struct *work)
++{
++	struct nbd_sock *nsock = container_of(work, struct nbd_sock, work);
++	struct request *req = nsock->pending;
++	struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
++	struct nbd_device *nbd = cmd->nbd;
++	unsigned long deadline = READ_ONCE(req->deadline);
++	unsigned int wait_ms = 2;
++
++	mutex_lock(&cmd->lock);
++
++	WARN_ON_ONCE(test_bit(NBD_CMD_REQUEUED, &cmd->flags));
++	if (WARN_ON_ONCE(!test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags)))
++		goto out;
++
++	mutex_lock(&nsock->tx_lock);
++	while (true) {
++		nbd_send_cmd(nbd, cmd, cmd->index);
++		if (!nsock->pending)
++			break;
++
++		/* don't bother timeout handler for partial sending */
++		if (READ_ONCE(jiffies) + msecs_to_jiffies(wait_ms) >= deadline) {
++			cmd->status = BLK_STS_IOERR;
++			blk_mq_complete_request(req);
++			break;
++		}
++		msleep(wait_ms);
++		wait_ms *= 2;
++	}
++	mutex_unlock(&nsock->tx_lock);
++	clear_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags);
++out:
++	mutex_unlock(&cmd->lock);
++	nbd_config_put(nbd);
++}
++
+ static int nbd_read_reply(struct nbd_device *nbd, struct socket *sock,
+ 			  struct nbd_reply *reply)
+ {
+@@ -1224,6 +1298,7 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+ 	nsock->pending = NULL;
+ 	nsock->sent = 0;
+ 	nsock->cookie = 0;
++	INIT_WORK(&nsock->work, nbd_pending_cmd_work);
+ 	socks[config->num_connections++] = nsock;
+ 	atomic_inc(&config->live_connections);
+ 	blk_mq_unfreeze_queue(nbd->disk->queue);
 -- 
-Jens Axboe
+2.44.0
+
