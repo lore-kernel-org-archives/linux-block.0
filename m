@@ -1,176 +1,330 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE311DFE1C;
-	Mon, 28 Oct 2024 20:59:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE6623BB
+	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 00:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730149145; cv=none; b=IwWKSDkJkiHsCLPQpDeOGR5tFABIVQ2O7tZHohbWqIKczY8nI/uFVF7bryeYno2+Z9uGY+UwUPcA1Pf7Kz5icTs+Y/TrpmyTJxloHYiEO+cE0f1v7US7CiIHeXxo2wzh8gSrfGjwlCgRxtelk5y7BUbRrjg8oUr4wU/MZp5B8Dg=
+	t=1730160762; cv=none; b=TGugW9iePLAaxsXI3sshpNdnC8/Ba9EF9mKhlUWKxv3J7VRkKTxekJNygjX7FYczgCipLZKRp9DR6eBy28JFZZois5lACr+p8mcJCEboUGVJMbMjDTCcdtgUzdJsn0AP8CWAoqm4qHUIbSTFpZHe7Dc749ODHAqOCO95Xr0/gfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730149145; c=relaxed/simple;
-	bh=XDchRQtmy6pHQo4VldmyUQn5KpIMSBE9FuRx/IQ/fLc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=ba/i5GJSzfWbnG6cDm5hqDqK02WJ9aIR73MA4UJvgfoayCXD69BlugrdoOGNP71ujMbWyTRPGgFsT3/+TlQAjK9+7cwoQl8Dss5CEmS5T7fVf7F4vg9td8FxKUHSSqYzblQd/LHdaVFTOUCColqZ78UojIU0LzkvuaaByoNlj+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YHWCjZnS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730160762; c=relaxed/simple;
+	bh=Dfh6059ILmBKUOqfqOEuNDgltskB/vAAqOXIljx7UQo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OiztdpI35jONq242Cdyf854mt+/06MEoMlH7TVzk6pJEZfEJO4IKYGN90HfFVToksI8Jq/yE1AUyhpnQRWUVjYw/VN6wzKXGJoG7GXSyyG/vn4dMyiOcrqUncTf/OgSQm+nIYQf6SPEupb6qIn6+wk6XHZJkQBKv+9R7LGpmmJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=PK1O+FoS; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YHWCjZnS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8324C4CEC3;
-	Mon, 28 Oct 2024 20:59:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730149144;
-	bh=XDchRQtmy6pHQo4VldmyUQn5KpIMSBE9FuRx/IQ/fLc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=YHWCjZnSvGD0FLXm38frIZRba2sQQ98rHEmaoqo7+IGWHJUxibwDnNsBZgESkMQf2
-	 TsIZgg66kDAZi3cQ/raC0xLCHxFt/n+Q+GfpSPikoPYWogMwVVkT2YGGo6r+mvlpQs
-	 LYcYZiWraEirilGEQRB7r1dSqxIlLl6PnIyzBEG69k5H5ZL/4V51yCX9ue/AQ9hoao
-	 YtQPx9n4wU6TLKUu3BMoGWW4nbSLG6WcdHPvYzg+727B9k+tQFNcmm7b2B+OIclaEr
-	 WoCdB/gjnaxlHYJSzABbNThj3fTHRWtRg5gmc802RNwzAtTGyuBAMLTzhdJzsWVOka
-	 YksEeTIOFMwbA==
-Date: Mon, 28 Oct 2024 15:59:02 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 01/18] PCI/P2PDMA: refactor the p2pdma mapping helpers
-Message-ID: <20241028205902.GA1114413@bhelgaas>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="PK1O+FoS"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20c70abba48so38365675ad.0
+        for <linux-block@vger.kernel.org>; Mon, 28 Oct 2024 17:12:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730160757; x=1730765557; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=s8qKWHlu9nuAcuqLVuzotLi/gmSD4/gHhTwEshGFxUM=;
+        b=PK1O+FoSq6q/t4AycpRG2qghNyn6ImHEzXlwOVhVyDAEsrf4yOYEe73D91CN7F5Coz
+         braXZG+OS/qMjynvUK/fngdMmOrMn7chN4SG27pBkdgLKhj9gizQSoygoIndjWWiAt3R
+         5lgQ9hIs/UZEWnb1+PggFw3oc24weC7/BO6gLNM17owJCbMThGFfMCVkcFEsiz0Zpwix
+         iHwJkZLeimIleFlnwH4dQUVTetsQiLj7DwGMG3YcAzkcGpeZlKrMTHgWJRMl3HwMi33w
+         Ss6tSFDzn40ZW81kQgl4x023T08KaX3ilaDzGwRsYnt+twDfixxfjYLLTHKn+iTUUf1A
+         teRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730160757; x=1730765557;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s8qKWHlu9nuAcuqLVuzotLi/gmSD4/gHhTwEshGFxUM=;
+        b=O5KcWQTrCkfNCLloRKMrSup5mS7fZNjGo3IwUf5PcjlZ23EkmUgDsJIaaZGqUZHyfo
+         uwHR88TLi8zFLv4anuk0JAry8lPTxAtPbCOsY3ge/3fnjWdvGSa8Yx8BNdLdJXCDKlPj
+         7VgzfMdVfYK/GY9Zn/UYnVtDZqYGA9SFPYgehY5uZzfBFvShUS7o466gVE7sV/4Zs56g
+         53JB22PyqV34j0GN/J4wZHErYT+gI6z+8VJ3bjdfiXg1GeLld0JWirG3qZ3Tyt7OawJo
+         nGXQLYphOUwBg0/G1iCUWPMpLDOFn54cuc1bSnUAjfAIH5bwZdb7s7/3k5ezWnQN94uy
+         JMoA==
+X-Gm-Message-State: AOJu0Yy7XSxcywPY5pUR1ubs9CWabwEZ+xcjdkExbVh+BIl8gsdKXib1
+	xFB71jyInLaPp2EnnsxvBQjMZm+kWRpJEfJFRrqQxwd6Gth1lcO/iLx+mDxNinw=
+X-Google-Smtp-Source: AGHT+IFztKnN/rPEGts6EWZftWX5Kd6cuEVK5UZoUQtqzO8B1Igsy6sILka6bWLdXowb61+wy1ucBA==
+X-Received: by 2002:a17:903:32c4:b0:20c:7796:5e76 with SMTP id d9443c01a7336-210c68d82f3mr151410745ad.18.1730160756590;
+        Mon, 28 Oct 2024 17:12:36 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bbf71d50sm55994615ad.72.2024.10.28.17.12.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Oct 2024 17:12:36 -0700 (PDT)
+Message-ID: <5417bcc5-e766-4044-905b-da5768d69f29@kernel.dk>
+Date: Mon, 28 Oct 2024 18:12:34 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a4d93ca45f7ad09105a1cf347e6b6d6b6fb7e303.1730037276.git.leon@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V8 4/7] io_uring: support SQE group
+To: Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org,
+ Pavel Begunkov <asml.silence@gmail.com>
+Cc: linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
+ Akilesh Kailash <akailash@google.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20241025122247.3709133-1-ming.lei@redhat.com>
+ <20241025122247.3709133-5-ming.lei@redhat.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241025122247.3709133-5-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Prefer subject capitalization in drivers/pci:
-
-  PCI/P2PDMA: Refactor ...
-
-On Sun, Oct 27, 2024 at 04:21:01PM +0200, Leon Romanovsky wrote:
-> From: Christoph Hellwig <hch@lst.de>
+On 10/25/24 6:22 AM, Ming Lei wrote:
+> SQE group is defined as one chain of SQEs starting with the first SQE that
+> has IOSQE_SQE_GROUP set, and ending with the first subsequent SQE that
+> doesn't have it set, and it is similar with chain of linked SQEs.
 > 
-> The current scheme with a single helper to determine the P2P status
-> and map a scatterlist segment force users to always use the map_sg
-> helper to DMA map, which we're trying to get away from because they
-> are very cache inefficient.
-> ...
+> Not like linked SQEs, each sqe is issued after the previous one is
+> completed. All SQEs in one group can be submitted in parallel. To simplify
+> the implementation from beginning, all members are queued after the leader
+> is completed, however, this way may be changed and leader and members may
+> be issued concurrently in future.
+> 
+> The 1st SQE is group leader, and the other SQEs are group member. The whole
+> group share single IOSQE_IO_LINK and IOSQE_IO_DRAIN from group leader, and
+> the two flags can't be set for group members. For the sake of
+> simplicity, IORING_OP_LINK_TIMEOUT is disallowed for SQE group now.
+> 
+> When the group is in one link chain, this group isn't submitted until the
+> previous SQE or group is completed. And the following SQE or group can't
+> be started if this group isn't completed. Failure from any group member will
+> fail the group leader, then the link chain can be terminated.
+> 
+> When IOSQE_IO_DRAIN is set for group leader, all requests in this group and
+> previous requests submitted are drained. Given IOSQE_IO_DRAIN can be set for
+> group leader only, we respect IO_DRAIN by always completing group leader as
+> the last one in the group. Meantime it is natural to post leader's CQE
+> as the last one from application viewpoint.
+> 
+> Working together with IOSQE_IO_LINK, SQE group provides flexible way to
+> support N:M dependency, such as:
+> 
+> - group A is chained with group B together
+> - group A has N SQEs
+> - group B has M SQEs
+> 
+> then M SQEs in group B depend on N SQEs in group A.
+> 
+> N:M dependency can support some interesting use cases in efficient way:
+> 
+> 1) read from multiple files, then write the read data into single file
+> 
+> 2) read from single file, and write the read data into multiple files
+> 
+> 3) write same data into multiple files, and read data from multiple files and
+> compare if correct data is written
+> 
+> Also IOSQE_SQE_GROUP takes the last bit in sqe->flags, but we still can
+> extend sqe->flags with io_uring context flag, such as use __pad3 for
+> non-uring_cmd OPs and part of uring_cmd_flags for uring_cmd OP.
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+Since it's taking the last flag, maybe a better idea to have the last
+flag mean "more flags in (for example) __pad3" and put the new flag
+there? Not sure you mean in terms of "io_uring context flag", would it
+be an enter flag? Ring required to be setup with a certain flag? Neither
+of those seem super encouraging, imho.
 
-A couple minor nits below.
+Apart from that, just a few minor nits below.
 
-> @@ -1412,28 +1411,29 @@ int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg, int nents,
->  		size_t s_length = s->length;
->  		size_t pad_len = (mask - iova_len + 1) & mask;
->  
-> -		if (is_pci_p2pdma_page(sg_page(s))) {
-> -			map = pci_p2pdma_map_segment(&p2pdma_state, dev, s);
-> -			switch (map) {
-> -			case PCI_P2PDMA_MAP_BUS_ADDR:
-> -				/*
-> -				 * iommu_map_sg() will skip this segment as
-> -				 * it is marked as a bus address,
-> -				 * __finalise_sg() will copy the dma address
-> -				 * into the output segment.
-> -				 */
-> -				continue;
-> -			case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-> -				/*
-> -				 * Mapping through host bridge should be
-> -				 * mapped with regular IOVAs, thus we
-> -				 * do nothing here and continue below.
-> -				 */
-> -				break;
-> -			default:
-> -				ret = -EREMOTEIO;
-> -				goto out_restore_sg;
-> -			}
-> +		switch (pci_p2pdma_state(&p2pdma_state, dev, sg_page(s))) {
-> +		case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-> +			/*
-> +			 * Mapping through host bridge should be mapped with
-> +			 * regular IOVAs, thus we do nothing here and continue
-> +			 * below.
-> +			 */
-
-I guess this is technically not a fall-through to the next case
-because there's no executable code here, but since the comment
-separates these two cases, I would find it easier to read if you
-included the break here explicitly.
-
-> +		case PCI_P2PDMA_MAP_NONE:
-> +			break;
-
-> +void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
-> +		struct device *dev, struct page *page);
+> +void io_fail_group_members(struct io_kiocb *req)
+> +{
+> +	struct io_kiocb *member = req->grp_link;
 > +
-> +/**
-> + * pci_p2pdma_state - check the P2P transfer state of a page
-> + * @state: 	P2P state structure
+> +	while (member) {
+> +		struct io_kiocb *next = member->grp_link;
+> +
+> +		if (!(member->flags & REQ_F_FAIL)) {
+> +			req_set_fail(member);
+> +			io_req_set_res(member, -ECANCELED, 0);
+> +		}
+> +		member = next;
+> +	}
+> +}
+> +
+> +static void io_queue_group_members(struct io_kiocb *req)
+> +{
+> +	struct io_kiocb *member = req->grp_link;
+> +
+> +	if (!member)
+> +		return;
+> +
+> +	req->grp_link = NULL;
+> +	while (member) {
+> +		struct io_kiocb *next = member->grp_link;
+> +
+> +		member->grp_leader = req;
+> +		if (unlikely(member->flags & REQ_F_FAIL)) {
+> +			io_req_task_queue_fail(member, member->cqe.res);
+> +		} else if (unlikely(req->flags & REQ_F_FAIL)) {
+> +			io_req_task_queue_fail(member, -ECANCELED);
+> +		} else {
+> +			io_req_task_queue(member);
+> +		}
+> +		member = next;
+> +	}
+> +}
 
-Checkpatch complains about space before tab here.
+Was going to say don't check for !member, you have the while loop. Which
+is what you do in the helper above. You can also drop the parens in this
+one.
 
-> + * pci_p2pdma_bus_addr_map - map a PCI_P2PDMA_MAP_BUS_ADDR P2P transfer
-> + * @state: 	P2P state structure
+> +static enum group_mem io_prep_free_group_req(struct io_kiocb *req,
+> +					     struct io_kiocb **leader)
+> +{
+> +	/*
+> +	 * Group completion is done, so clear the flag for avoiding double
+> +	 * handling in case of io-wq
+> +	 */
+> +	req->flags &= ~REQ_F_SQE_GROUP;
+> +
+> +	if (req_is_group_leader(req)) {
+> +		/* Queue members now */
+> +		if (req->grp_link)
+> +			io_queue_group_members(req);
+> +		return GROUP_LEADER;
+> +	} else {
+> +		if (!req_is_last_group_member(req))
+> +			return GROUP_OTHER_MEMBER;
+> +
+> +		/*
+> +		 * Prepare for freeing leader which can only be found from
+> +		 * the last member
+> +		 */
+> +		*leader = req->grp_leader;
+> +		(*leader)->flags &= ~REQ_F_SQE_GROUP_LEADER;
+> +		req->grp_leader = NULL;
+> +		return GROUP_LAST_MEMBER;
+> +	}
+> +}
 
-And here.
+Just drop the second indentation here.
 
-> @@ -462,34 +462,32 @@ int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
->  		enum dma_data_direction dir, unsigned long attrs)
->  {
->  	struct pci_p2pdma_map_state p2pdma_state = {};
-> -	enum pci_p2pdma_map_type map;
->  	struct scatterlist *sg;
->  	int i, ret;
+> @@ -927,7 +1051,8 @@ static void io_req_complete_post(struct io_kiocb *req, unsigned issue_flags)
+>  	 * Handle special CQ sync cases via task_work. DEFER_TASKRUN requires
+>  	 * the submitter task context, IOPOLL protects with uring_lock.
+>  	 */
+> -	if (ctx->task_complete || (ctx->flags & IORING_SETUP_IOPOLL)) {
+> +	if (ctx->task_complete || (ctx->flags & IORING_SETUP_IOPOLL) ||
+> +	    (req->flags & REQ_F_SQE_GROUP)) {
+>  		req->io_task_work.func = io_req_task_complete;
+>  		io_req_task_work_add(req);
+>  		return;
+
+Minor detail, but might be nice with a REQ_F_* flag for this in the
+future.
+
+> @@ -1450,8 +1596,16 @@ void __io_submit_flush_completions(struct io_ring_ctx *ctx)
+>  		struct io_kiocb *req = container_of(node, struct io_kiocb,
+>  					    comp_list);
 >  
->  	for_each_sg(sgl, sg, nents, i) {
-> -		if (is_pci_p2pdma_page(sg_page(sg))) {
-> -			map = pci_p2pdma_map_segment(&p2pdma_state, dev, sg);
-> -			switch (map) {
-> -			case PCI_P2PDMA_MAP_BUS_ADDR:
-> -				continue;
-> -			case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-> -				/*
-> -				 * Any P2P mapping that traverses the PCI
-> -				 * host bridge must be mapped with CPU physical
-> -				 * address and not PCI bus addresses. This is
-> -				 * done with dma_direct_map_page() below.
-> -				 */
-> -				break;
-> -			default:
-> -				ret = -EREMOTEIO;
-> +		switch (pci_p2pdma_state(&p2pdma_state, dev, sg_page(sg))) {
-> +		case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-> +			/*
-> +			 * Any P2P mapping that traverses the PCI host bridge
-> +			 * must be mapped with CPU physical address and not PCI
-> +			 * bus addresses.
-> +			 */
+> -		if (!(req->flags & REQ_F_CQE_SKIP))
+> -			io_req_commit_cqe(ctx, req);
+> +		if (unlikely(req->flags & (REQ_F_CQE_SKIP | REQ_F_SQE_GROUP))) {
+> +			if (req->flags & REQ_F_SQE_GROUP) {
+> +				io_complete_group_req(req);
+> +				continue;
+> +			}
+> +
+> +			if (req->flags & REQ_F_CQE_SKIP)
+> +				continue;
+> +		}
+> +		io_req_commit_cqe(ctx, req);
+>  	}
+>  	__io_cq_unlock_post(ctx);
+>  
+> @@ -1661,8 +1815,12 @@ static u32 io_get_sequence(struct io_kiocb *req)
+>  	struct io_kiocb *cur;
+>  
+>  	/* need original cached_sq_head, but it was increased for each req */
+> -	io_for_each_link(cur, req)
+> -		seq--;
+> +	io_for_each_link(cur, req) {
+> +		if (req_is_group_leader(cur))
+> +			seq -= cur->grp_refs;
+> +		else
+> +			seq--;
+> +	}
+>  	return seq;
+>  }
+>  
+> @@ -2124,6 +2282,67 @@ static int io_init_req(struct io_ring_ctx *ctx, struct io_kiocb *req,
+>  	return def->prep(req, sqe);
+>  }
+>  
+> +static struct io_kiocb *io_group_sqe(struct io_submit_link *group,
+> +				     struct io_kiocb *req)
+> +{
+> +	/*
+> +	 * Group chain is similar with link chain: starts with 1st sqe with
+> +	 * REQ_F_SQE_GROUP, and ends with the 1st sqe without REQ_F_SQE_GROUP
+> +	 */
+> +	if (group->head) {
+> +		struct io_kiocb *lead = group->head;
+> +
+> +		/*
+> +		 * Members can't be in link chain, can't be drained, but
+> +		 * the whole group can be linked or drained by setting
+> +		 * flags on group leader.
+> +		 *
+> +		 * IOSQE_CQE_SKIP_SUCCESS can't be set for member
+> +		 * for the sake of simplicity
+> +		 */
+> +		if (req->flags & (IO_REQ_LINK_FLAGS | REQ_F_IO_DRAIN |
+> +				REQ_F_CQE_SKIP))
+> +			req_fail_link_node(lead, -EINVAL);
+> +
+> +		lead->grp_refs += 1;
+> +		group->last->grp_link = req;
+> +		group->last = req;
+> +
+> +		if (req->flags & REQ_F_SQE_GROUP)
+> +			return NULL;
+> +
+> +		req->grp_link = NULL;
+> +		req->flags |= REQ_F_SQE_GROUP;
+> +		group->head = NULL;
+> +
+> +		return lead;
+> +	} else {
+> +		if (WARN_ON_ONCE(!(req->flags & REQ_F_SQE_GROUP)))
+> +			return req;
+> +		group->head = req;
+> +		group->last = req;
+> +		req->grp_refs = 1;
+> +		req->flags |= REQ_F_SQE_GROUP_LEADER;
+> +		return NULL;
+> +	}
+> +}
 
-Same fall-through comment.
+Same here, drop the 2nd indentation.
 
-> +		case PCI_P2PDMA_MAP_NONE:
-> +			sg->dma_address = dma_direct_map_page(dev, sg_page(sg),
-> +					sg->offset, sg->length, dir, attrs);
-> +			if (sg->dma_address == DMA_MAPPING_ERROR) {
-> +				ret = -EIO;
->  				goto out_unmap;
->  			}
-> -		}
+> diff --git a/io_uring/timeout.c b/io_uring/timeout.c
+> index 9973876d91b0..ed6c74f1a475 100644
+> --- a/io_uring/timeout.c
+> +++ b/io_uring/timeout.c
+> @@ -149,6 +149,8 @@ static void io_req_tw_fail_links(struct io_kiocb *link, struct io_tw_state *ts)
+>  			res = link->cqe.res;
+>  		link->link = NULL;
+>  		io_req_set_res(link, res, 0);
+> +		if (req_is_group_leader(link))
+> +			io_fail_group_members(link);
+>  		io_req_task_complete(link, ts);
+>  		link = nxt;
+>  	}
+> @@ -543,6 +545,10 @@ static int __io_timeout_prep(struct io_kiocb *req,
+>  	if (is_timeout_link) {
+>  		struct io_submit_link *link = &req->ctx->submit_state.link;
+>  
+> +		/* so far disallow IO group link timeout */
+> +		if (req->ctx->submit_state.group.head)
+> +			return -EINVAL;
+> +
+
+For now, disallow IO group linked timeout
+
+-- 
+Jens Axboe
