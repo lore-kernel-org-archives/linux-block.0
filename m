@@ -1,58 +1,48 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD6B19DF95
-	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 17:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4062107;
+	Tue, 29 Oct 2024 17:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730221474; cv=none; b=pM1nXUDNL6Xu86Xn0h6+8pbjwxFPECxqkdKtUBK2oqBhf/o/pNHp+2n8eCi+yUgwWjtRrnv/gvnbewlxrwz8PizLt+zt1tQBRP161hFztNEpmXcUBdVuKjavCpZi+El6TB0LlEP0RIWwW2K23apsq4HWNfGN4zec8VaYRr/yQzA=
+	t=1730222323; cv=none; b=OkBvDcZf5YK178TJSWe3wKgT5y3epeiOjE++8zFHrCXaAblur7AGipKF0rK+kjEZmKTe7/F+7i6WykqJGQ88COEX1a2O7ZKhOLzVy63zLmnPU/xiOaSf1ET1HR6IHFEOQhLh98b7ugQfZs8wLBvE7NJwonjkEBcybCeNyZddrd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730221474; c=relaxed/simple;
-	bh=f33AX6vxDktnL1Q1WQZRpvc2rxalaMW8mJosg2XWBRY=;
+	s=arc-20240116; t=1730222323; c=relaxed/simple;
+	bh=2D/7DMDIkv5CaFUJ/6cNHz29ejsYbKwAcaknwspeL6U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GqVONqd6ljiKObnGT8ixjH6b3EOG/fvjnpmKBr48BCD18Pvqr+kuIURjpSt35GIK6f/Ak0R4x/gvb+x/lxYrx2+Nk4P8HPM2WNR+EyQRuFdTdTFy4zfI/Q1PX1OY3wgX4inJdVjhWqgQte6H/V5M+B+jhNFnlCZhi24rvo1eAd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2Edj1GAf; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=Lseb0ZoRfHyNR4sXJ4Ypgkhv3Lc6dU0NwrGrznf7NBKcEe80D3Mn0okeH+68REJEAUN+KhPpGcibM6L/rCGAaYKL8xuQYQtIwp0AeqOxGiYtVCns9Ti1b/3IEpnN5aIhagoFaE8kizHPONtzIsoKwKWWhp358dWEj/+wNrh+3lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Lxs/REA4; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2Edj1GAf"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3a5075ed279so6387915ab.0
-        for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 10:04:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730221470; x=1730826270; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FgtCGT/gnyeVQ7GMbFqDFyhmhGdCmgWHodfBuWQWmQM=;
-        b=2Edj1GAfhPB+7Ih2U/PSW7IhO7zrdLpzwAych/SmWrpx0ilwYJT80EbIJ3049GTaez
-         jLZHvenyqXq8m/o1Wq6mgZcScJJsZI2Pb6aWOhwRXccfA41g2JtCG57pnRLQSaTUW1cF
-         u2OVubipji+9V9I6dZNHsnJmspwSq5ENjntba0ADXOn16ZefOGaozS/x4LyjVLS3Pno/
-         tOt/raezI4nTBnyBqylQpD/HgVGQu55KaixEz6IeuvUrU3Js/9e29kpghm8npfyUCdAe
-         /tQHUb7AEA20uKYoXwpsPyoX+RWwutCZLYb3J9RayOVoezHupoMFiJqzUwantom5iRbg
-         X7Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730221470; x=1730826270;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FgtCGT/gnyeVQ7GMbFqDFyhmhGdCmgWHodfBuWQWmQM=;
-        b=aB5140kRj//a29MEkDXM0o2oNJ+3Anm8Fz7pEtk6tGVXHx7cOkQuaFBPt0hGGNMwf4
-         IYDVm/FhCAkhjjT5wVZix/mIDRDMJNW36sp+6G+TYgIJ9gmkK2Ynop6ErW0AHu095+xh
-         xBJ3sYtPFCMRcITzcVNiKwyyc3iU8zwkKxRhGN8nZA6wH5XyM4d9zbO8/W00/aYluYiS
-         66nrASvof8eIVCsQ6pN/42d880vu5bS+u35Rb+GccKc/9KF29Oc+3i+V177NTum2JEnK
-         Xi1SmDxBcQWBddKE1d0PzDE9usUJpaJ7O/77uArHZHzYrhf5IsZL10cTkCuL5D4IuJwH
-         fOQQ==
-X-Gm-Message-State: AOJu0YxZn7Jqto5XmcImcuApsZvKTLBjopJAOFizeR6ZoAsGriG7q/Nk
-	18pkYgSPz22Ncq5mz3bEBOlNjKbqrmJcX9JJbFUtB/9YFvoq1/W3hcou9IstNC8=
-X-Google-Smtp-Source: AGHT+IFRJ9SKURpxxdOfKf20+yezaTn+5AAlq9kf1IrEbHZgykDxjL1lAAu6f9r03kKlrdlvIubugQ==
-X-Received: by 2002:a92:cdac:0:b0:3a0:933a:2a0a with SMTP id e9e14a558f8ab-3a4ed29bf3bmr105804775ab.7.1730221470435;
-        Tue, 29 Oct 2024 10:04:30 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a4e6dcfff7sm24248595ab.14.2024.10.29.10.04.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Oct 2024 10:04:29 -0700 (PDT)
-Message-ID: <d859c85c-b7bf-4673-8c77-9d7113f19dbb@kernel.dk>
-Date: Tue, 29 Oct 2024 11:04:28 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Lxs/REA4"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4XdH682yjwzlgMVd;
+	Tue, 29 Oct 2024 17:18:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1730222315; x=1732814316; bh=Os+S4pHy7trxPWBaGt6FASH6
+	K1G9Xgdn5eNIwNX8SiE=; b=Lxs/REA4wylfESXkATPL24Gb7eQfk4klgZJ/W5Zu
+	g+KzwFz9gVBXOtBtfqFAiZ+hZUAcRkkKrssAcminMzwVZ61rhk8fpZEDtyf4IToe
+	Wj7Uh+Qua9StMJ+JUx7I/A7lwfpQ7NkhDKIOtB22OgNR15iavT4EcLifRvXtR6ZP
+	Z+W5dtY20asvPZMxFuDTcs5+8L5r6LptxN6IX08H4j2L5r08jI2WImkyV2garTV/
+	4m+oKY6OzZQFfMulGQfKErmZrMJ+MW/lu28Yr10FOi8l2jqoeyKBtz2cTuFdwRUk
+	xsdn+hWJbpaZ1FOKEru9zO9fSrbZaJ/hgskRh11QpEg9qQ==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id sPa9noDahnIv; Tue, 29 Oct 2024 17:18:35 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4XdH606Yv3zlgMVY;
+	Tue, 29 Oct 2024 17:18:32 +0000 (UTC)
+Message-ID: <343c29f2-59d6-48c5-937f-a02775b192ae@acm.org>
+Date: Tue, 29 Oct 2024 10:18:31 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,70 +50,98 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V8 0/8] io_uring: support sqe group and leased group kbuf
-To: Pavel Begunkov <asml.silence@gmail.com>, Ming Lei <ming.lei@redhat.com>,
- io-uring@vger.kernel.org
-Cc: linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
- Akilesh Kailash <akailash@google.com>
-References: <20241025122247.3709133-1-ming.lei@redhat.com>
- <15b9b1e0-d961-4174-96ed-5a6287e4b38b@gmail.com>
+Subject: Re: [PATCHv10 9/9] scsi: set permanent stream count in block limits
+To: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-scsi@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, joshi.k@samsung.com, javier.gonz@samsung.com,
+ Keith Busch <kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>
+References: <20241029151922.459139-1-kbusch@meta.com>
+ <20241029151922.459139-10-kbusch@meta.com> <20241029152654.GC26431@lst.de>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <15b9b1e0-d961-4174-96ed-5a6287e4b38b@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20241029152654.GC26431@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/29/24 11:01 AM, Pavel Begunkov wrote:
-> On 10/25/24 13:22, Ming Lei wrote:
->> The 1st 3 patches are cleanup, and prepare for adding sqe group.
->>
->> The 4th patch supports generic sqe group which is like link chain, but
->> allows each sqe in group to be issued in parallel and the group shares
->> same IO_LINK & IO_DRAIN boundary, so N:M dependency can be supported with
->> sqe group & io link together.
->>
->> The 5th & 6th patches supports to lease other subsystem's kbuf to
->> io_uring for use in sqe group wide.
->>
->> The 7th patch supports ublk zero copy based on io_uring sqe group &
->> leased kbuf.
->>
->> Tests:
->>
->> 1) pass liburing test
->> - make runtests
->>
->> 2) write/pass sqe group test case and sqe provide buffer case:
->>
->> https://github.com/ming1/liburing/tree/uring_group
->>
->> - covers related sqe flags combination and linking groups, both nop and
->> one multi-destination file copy.
->>
->> - cover failure handling test: fail leader IO or member IO in both single
->>    group and linked groups, which is done in each sqe flags combination
->>    test
->>
->> - cover io_uring with leased group kbuf by adding ublk-loop-zc
-> 
-> To make my position clear, I think the table approach will turn
-> much better API-wise if the performance suffices, and we can only know
-> that experimentally. I tried that idea with sockets back then, and it
-> was looking well. It'd be great if someone tries to implement and
-> compare it, though I don't believe I should be trying it, so maybe Ming
-> or Jens can, especially since Jens already posted a couple series for
-> problems standing in the way, i.e global rsrc nodes and late buffer
-> binding. In any case, I'm not opposing to the series if Jens decides to
-> merge it.
+On 10/29/24 8:26 AM, Christoph Hellwig wrote:
+> Bart, btw: I think the current sd implementation is buggy as well, as
+> it assumes the permanent streams are ordered by their data temperature
+> in the IO Advise hints mode page, but I can't find anything in the
+> spec that requires a particular ordering.
 
-With the rsrc node stuff sorted out, I was thinking last night that I
-should take another look at this. While that work was (mostly) done
-because of the lingering closes, it does nicely enable ephemeral buffers
-too.
+How about modifying sd_read_io_hints() such that permanent stream
+information is ignored if the order of the RELATIVE LIFETIME information
+reported by the GET STREAM STATUS command does not match the permanent
+stream order?
 
-I'll take a stab at it... While I would love to make progress on this
-feature proposed in this series, it's arguably more important to do it
-in such a way that we can live with it, long term.
+Thanks,
 
--- 
-Jens Axboe
+Bart.
+
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 41e2dfa2d67d..277035febd82 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -3192,7 +3192,12 @@ sd_read_cache_type(struct scsi_disk *sdkp, 
+unsigned char *buffer)
+  	sdkp->DPOFUA = 0;
+  }
+
+-static bool sd_is_perm_stream(struct scsi_disk *sdkp, unsigned int 
+stream_id)
++/*
++ * Returns the relative lifetime of a permanent stream. Returns -1 if the
++ * GET STREAM STATUS command fails or if the stream is not a permanent 
+stream.
++ */
++static int sd_perm_stream_rel_lifetime(struct scsi_disk *sdkp,
++				       unsigned int stream_id)
+  {
+  	u8 cdb[16] = { SERVICE_ACTION_IN_16, SAI_GET_STREAM_STATUS };
+  	struct {
+@@ -3212,14 +3217,16 @@ static bool sd_is_perm_stream(struct scsi_disk 
+*sdkp, unsigned int stream_id)
+  	res = scsi_execute_cmd(sdev, cdb, REQ_OP_DRV_IN, &buf, sizeof(buf),
+  			       SD_TIMEOUT, sdkp->max_retries, &exec_args);
+  	if (res < 0)
+-		return false;
++		return -1;
+  	if (scsi_status_is_check_condition(res) && scsi_sense_valid(&sshdr))
+  		sd_print_sense_hdr(sdkp, &sshdr);
+  	if (res)
+-		return false;
++		return -1;
+  	if (get_unaligned_be32(&buf.h.len) < sizeof(struct scsi_stream_status))
+-		return false;
+-	return buf.h.stream_status[0].perm;
++		return -1;
++	if (!buf.h.stream_status[0].perm)
++		return -1;
++	return buf.h.stream_status[0].rel_lifetime;
+  }
+
+  static void sd_read_io_hints(struct scsi_disk *sdkp, unsigned char 
+*buffer)
+@@ -3247,9 +3254,17 @@ static void sd_read_io_hints(struct scsi_disk 
+*sdkp, unsigned char *buffer)
+  	 * should assign the lowest numbered stream identifiers to permanent
+  	 * streams.
+  	 */
+-	for (desc = start; desc < end; desc++)
+-		if (!desc->st_enble || !sd_is_perm_stream(sdkp, desc - start))
++	int prev_rel_lifetime = -1;
++	for (desc = start; desc < end; desc++) {
++		int rel_lifetime;
++
++		if (!desc->st_enble)
+  			break;
++		rel_lifetime = sd_perm_stream_rel_lifetime(sdkp, desc - start);
++		if (rel_lifetime < 0 || rel_lifetime < prev_rel_lifetime)
++			break;
++		prev_rel_lifetime = rel_lifetime;
++	}
+  	permanent_stream_count_old = sdkp->permanent_stream_count;
+  	sdkp->permanent_stream_count = desc - start;
+  	if (sdkp->rscs && sdkp->permanent_stream_count < 2)
+
