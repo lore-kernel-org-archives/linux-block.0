@@ -1,221 +1,299 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E3F206045
-	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 14:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03183192D62;
+	Tue, 29 Oct 2024 15:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730211586; cv=none; b=q8RnlmKhM9Fmd6MLIgtfo+lCConV1ugdBQ+ijYVxT6ji/nW/qPwBP1QDBgrkqBVAoaeADFDQERFzqhtjUJQuZxzYkdVpPSKhbycRL8Vh7RbvGPoQ4R3+rrReSTjMs0fDAtQhU7QoZIaGJMBMEDHNJOJ9a4XgI0eg4+sVwE89oUA=
+	t=1730214666; cv=none; b=VYJ0+xyF70APgI4uQKuMpO/sj8bA4ADWpxSzc7fNTlgcapkFK8bmACitwzXWYg6FkCy5h2T3AWysr8AgdvRAh3JMa5I3+lSYeAfOtQFt7JgZnajLyomivgQLLTpZBbtkbiTDCGDnXCcyZq/OQCHpvBAthpT8JeglkuUh9wMlYrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730211586; c=relaxed/simple;
-	bh=unA474vqNLlHejUqhR6aj0g+xfwZ46KVg7yvTTABG5o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uarsxyw5J2k2yqhiiJwPoOlFWAM4p/95hvySSD7FwpfjJonmis5M8jHeYQCpszGrSF9iE2WIZzVvP0KII1QkoTmuDixGjqYKV5PSdWaOua9Rjk1eChGX12cPRicehWAiZYZdjyBr+oxxLq8XL6j0hPbNPdP7GigKzIqcTuaJrZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sSkgYki/; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1730214666; c=relaxed/simple;
+	bh=SQQchx1vtsZlKAa985I87v+ow+U4p33UlUeg+FERc0I=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=ukMNT9cv/evKIahb5k1kbBzkfygm7Bd0j6atcLFrQk5Rg6wEID3xkgeM8ac10Gdr8YAwZWee1aIrzEO3M2jqIEdPpFVM5hnlG0X87hAwFY7Po7QsG0LygVH4s+VnbtOquSfGiq5euGhMOBSWFVhe1FGN9MuuFEN6vugddxYdg20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LyBQOUO2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sSkgYki/"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=lpkwz/Hq5+900iE7JhgIR8AHZ/MI2DeNvttLnsF5Mxg=; b=sSkgYki/qCkeYqQN25+p4DQ6V4
-	NT84dJb2lPWomKx4JKcRyBX4irXhIVHxjt5fmB86T0r3eB8DMtP3mr2+D4TGcVZOFZh+NIxrlagMA
-	Z7GT2Xs+Uw9os+A9kF6Q3mnxF+4PvehZgiX3QJiYLdhdNCdGsneVcreMHscNRD+VHS4uKF/36M6Kl
-	x0Cx6ybG3UtognuIsEHFxbLJ2M5H2ux3YKQeTN0+PqxsEyEGyasxepigysIGKXV3ZKlNHn5Xz3Jps
-	IR1jVRNsc4Om2bPxqD4tY6lzKurxdr5kZiEa/7lg7toX/1FIT9NifEz5LUweOSsg7r9+tWe/GXHhP
-	Y5nhjPnQ==;
-Received: from 2a02-8389-2341-5b80-1009-120a-6297-8bca.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:1009:120a:6297:8bca] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1t5n4P-0000000EiH0-3lw4;
-	Tue, 29 Oct 2024 14:19:42 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH] block: add a bdev_limits helper
-Date: Tue, 29 Oct 2024 15:19:37 +0100
-Message-ID: <20241029141937.249920-1-hch@lst.de>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LyBQOUO2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 518F5C4CEE5;
+	Tue, 29 Oct 2024 15:11:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730214665;
+	bh=SQQchx1vtsZlKAa985I87v+ow+U4p33UlUeg+FERc0I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=LyBQOUO2cEsu+Tni0G/a2shPNK+3v0pcWANBtQ3I2TpwqpZtXMDurKkmJNCB2oohh
+	 FDq6iFWCCGs1KozCEG39c2+UBJ4oZAul+Fh/hrzx93pik7koNtaiystZtJXr9nHeci
+	 OVwi2t8duMu/ih5zjJmkGrY1Z7RUHbWslWh8nCjnILiVUmGdP96opvDh6vYyZzJkDL
+	 iqTq3OInuyi1xereyTOtUDDWIjp64Dk1bkhfTokQgnE7hOvGaX6nT86WvQCFXPs9aA
+	 8JqhSVbH+n/fg2UKLL9y5lDCFyFvtph8fNrcQaCSJLpiFtY+LSFpMwaLG+EvyuCA64
+	 9EBM45hwMqjQg==
+Date: Tue, 29 Oct 2024 10:11:04 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 02/18] dma-mapping: move the PCI P2PDMA mapping helpers
+ to pci-p2pdma.h
+Message-ID: <20241029151104.GA1156518@bhelgaas>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <27698e7cc55f6ca5371c3d86c50fd3afce9afddd.1730037276.git.leon@kernel.org>
 
-Add a helper to get the queue_limits from the bdev without having to
-poke into the request_queue.
+On Sun, Oct 27, 2024 at 04:21:02PM +0200, Leon Romanovsky wrote:
+> From: Christoph Hellwig <hch@lst.de>
+> 
+> To support the upcoming non-scatterlist mapping helpers, we need to go
+> back to have them called outside of the DMA API.  Thus move them out of
+> dma-map-ops.h, which is only for DMA API implementations to pci-p2pdma.h,
+> which is for driver use.
+> 
+> Note that the core helper is still not exported as the mapping is
+> expected to be done only by very highlevel subsystem code at least for
+> now.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-merge.c            |  3 +--
- block/blk-settings.c         |  2 +-
- drivers/md/dm-cache-target.c |  4 ++--
- drivers/md/dm-clone-target.c |  4 ++--
- drivers/md/dm-thin.c         |  2 +-
- fs/btrfs/zoned.c             |  7 ++-----
- include/linux/blkdev.h       | 15 ++++++++++-----
- 7 files changed, 19 insertions(+), 18 deletions(-)
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 8b9a9646aed8..d813d799cee7 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -411,10 +411,9 @@ struct bio *bio_split_zone_append(struct bio *bio,
-  */
- struct bio *bio_split_to_limits(struct bio *bio)
- {
--	const struct queue_limits *lim = &bdev_get_queue(bio->bi_bdev)->limits;
- 	unsigned int nr_segs;
- 
--	return __bio_split_to_limits(bio, lim, &nr_segs);
-+	return __bio_split_to_limits(bio, bdev_limits(bio->bi_bdev), &nr_segs);
- }
- EXPORT_SYMBOL(bio_split_to_limits);
- 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index a446654ddee5..95fc39d09872 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -661,7 +661,7 @@ EXPORT_SYMBOL(blk_stack_limits);
- void queue_limits_stack_bdev(struct queue_limits *t, struct block_device *bdev,
- 		sector_t offset, const char *pfx)
- {
--	if (blk_stack_limits(t, &bdev_get_queue(bdev)->limits,
-+	if (blk_stack_limits(t, bdev_limits(bdev),
- 			get_start_sect(bdev) + offset))
- 		pr_notice("%s: Warning: Device %pg is misaligned\n",
- 			pfx, bdev);
-diff --git a/drivers/md/dm-cache-target.c b/drivers/md/dm-cache-target.c
-index 40709310e327..bc18255380b0 100644
---- a/drivers/md/dm-cache-target.c
-+++ b/drivers/md/dm-cache-target.c
-@@ -3361,7 +3361,7 @@ static int cache_iterate_devices(struct dm_target *ti,
- static void disable_passdown_if_not_supported(struct cache *cache)
- {
- 	struct block_device *origin_bdev = cache->origin_dev->bdev;
--	struct queue_limits *origin_limits = &bdev_get_queue(origin_bdev)->limits;
-+	struct queue_limits *origin_limits = bdev_limits(origin_bdev);
- 	const char *reason = NULL;
- 
- 	if (!cache->features.discard_passdown)
-@@ -3383,7 +3383,7 @@ static void disable_passdown_if_not_supported(struct cache *cache)
- static void set_discard_limits(struct cache *cache, struct queue_limits *limits)
- {
- 	struct block_device *origin_bdev = cache->origin_dev->bdev;
--	struct queue_limits *origin_limits = &bdev_get_queue(origin_bdev)->limits;
-+	struct queue_limits *origin_limits = bdev_limits(origin_bdev);
- 
- 	if (!cache->features.discard_passdown) {
- 		/* No passdown is done so setting own virtual limits */
-diff --git a/drivers/md/dm-clone-target.c b/drivers/md/dm-clone-target.c
-index 12bbe487a4c8..e956d980672c 100644
---- a/drivers/md/dm-clone-target.c
-+++ b/drivers/md/dm-clone-target.c
-@@ -2020,7 +2020,7 @@ static void clone_resume(struct dm_target *ti)
- static void disable_passdown_if_not_supported(struct clone *clone)
- {
- 	struct block_device *dest_dev = clone->dest_dev->bdev;
--	struct queue_limits *dest_limits = &bdev_get_queue(dest_dev)->limits;
-+	struct queue_limits *dest_limits = bdev_limits(dest_dev);
- 	const char *reason = NULL;
- 
- 	if (!test_bit(DM_CLONE_DISCARD_PASSDOWN, &clone->flags))
-@@ -2041,7 +2041,7 @@ static void disable_passdown_if_not_supported(struct clone *clone)
- static void set_discard_limits(struct clone *clone, struct queue_limits *limits)
- {
- 	struct block_device *dest_bdev = clone->dest_dev->bdev;
--	struct queue_limits *dest_limits = &bdev_get_queue(dest_bdev)->limits;
-+	struct queue_limits *dest_limits = bdev_limits(dest_bdev);
- 
- 	if (!test_bit(DM_CLONE_DISCARD_PASSDOWN, &clone->flags)) {
- 		/* No passdown is done so we set our own virtual limits */
-diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-index 89632ce97760..9095f19a84f3 100644
---- a/drivers/md/dm-thin.c
-+++ b/drivers/md/dm-thin.c
-@@ -2842,7 +2842,7 @@ static void disable_discard_passdown_if_not_supported(struct pool_c *pt)
- {
- 	struct pool *pool = pt->pool;
- 	struct block_device *data_bdev = pt->data_dev->bdev;
--	struct queue_limits *data_limits = &bdev_get_queue(data_bdev)->limits;
-+	struct queue_limits *data_limits = bdev_limits(data_bdev);
- 	const char *reason = NULL;
- 
- 	if (!pt->adjusted_pf.discard_passdown)
-diff --git a/fs/btrfs/zoned.c b/fs/btrfs/zoned.c
-index 826b128a6df0..32ce2edf582b 100644
---- a/fs/btrfs/zoned.c
-+++ b/fs/btrfs/zoned.c
-@@ -707,11 +707,8 @@ int btrfs_check_zoned_mode(struct btrfs_fs_info *fs_info)
- 		 * zoned mode. In this case, we don't have a valid max zone
- 		 * append size.
- 		 */
--		if (bdev_is_zoned(device->bdev)) {
--			blk_stack_limits(lim,
--					 &bdev_get_queue(device->bdev)->limits,
--					 0);
--		}
-+		if (bdev_is_zoned(device->bdev))
-+			blk_stack_limits(lim, bdev_limits(device->bdev), 0);
- 	}
- 
- 	/*
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d0a52ed05e60..7bfc877e159e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1159,6 +1159,11 @@ enum blk_default_limits {
-  */
- #define BLK_DEF_MAX_SECTORS_CAP	2560u
- 
-+static inline struct queue_limits *bdev_limits(struct block_device *bdev)
-+{
-+	return &bdev_get_queue(bdev)->limits;
-+}
-+
- static inline unsigned long queue_segment_boundary(const struct request_queue *q)
- {
- 	return q->limits.seg_boundary_mask;
-@@ -1293,23 +1298,23 @@ unsigned int bdev_discard_alignment(struct block_device *bdev);
- 
- static inline unsigned int bdev_max_discard_sectors(struct block_device *bdev)
- {
--	return bdev_get_queue(bdev)->limits.max_discard_sectors;
-+	return bdev_limits(bdev)->max_discard_sectors;
- }
- 
- static inline unsigned int bdev_discard_granularity(struct block_device *bdev)
- {
--	return bdev_get_queue(bdev)->limits.discard_granularity;
-+	return bdev_limits(bdev)->discard_granularity;
- }
- 
- static inline unsigned int
- bdev_max_secure_erase_sectors(struct block_device *bdev)
- {
--	return bdev_get_queue(bdev)->limits.max_secure_erase_sectors;
-+	return bdev_limits(bdev)->max_secure_erase_sectors;
- }
- 
- static inline unsigned int bdev_write_zeroes_sectors(struct block_device *bdev)
- {
--	return bdev_get_queue(bdev)->limits.max_write_zeroes_sectors;
-+	return bdev_limits(bdev)->max_write_zeroes_sectors;
- }
- 
- static inline bool bdev_nonrot(struct block_device *bdev)
-@@ -1345,7 +1350,7 @@ static inline bool bdev_write_cache(struct block_device *bdev)
- 
- static inline bool bdev_fua(struct block_device *bdev)
- {
--	return bdev_get_queue(bdev)->limits.features & BLK_FEAT_FUA;
-+	return bdev_limits(bdev)->features & BLK_FEAT_FUA;
- }
- 
- static inline bool bdev_nowait(struct block_device *bdev)
--- 
-2.45.2
-
+> ---
+>  drivers/iommu/dma-iommu.c   |  1 +
+>  include/linux/dma-map-ops.h | 84 -------------------------------------
+>  include/linux/pci-p2pdma.h  | 84 +++++++++++++++++++++++++++++++++++++
+>  kernel/dma/direct.c         |  1 +
+>  4 files changed, 86 insertions(+), 84 deletions(-)
+> 
+> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+> index 6e50023c8112..c422e36c0d66 100644
+> --- a/drivers/iommu/dma-iommu.c
+> +++ b/drivers/iommu/dma-iommu.c
+> @@ -26,6 +26,7 @@
+>  #include <linux/mutex.h>
+>  #include <linux/of_iommu.h>
+>  #include <linux/pci.h>
+> +#include <linux/pci-p2pdma.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/spinlock.h>
+>  #include <linux/swiotlb.h>
+> diff --git a/include/linux/dma-map-ops.h b/include/linux/dma-map-ops.h
+> index 49edcbda19d1..6ee626e50708 100644
+> --- a/include/linux/dma-map-ops.h
+> +++ b/include/linux/dma-map-ops.h
+> @@ -435,88 +435,4 @@ static inline void debug_dma_dump_mappings(struct device *dev)
+>  
+>  extern const struct dma_map_ops dma_dummy_ops;
+>  
+> -enum pci_p2pdma_map_type {
+> -	/*
+> -	 * PCI_P2PDMA_MAP_UNKNOWN: Used internally for indicating the mapping
+> -	 * type hasn't been calculated yet. Functions that return this enum
+> -	 * never return this value.
+> -	 */
+> -	PCI_P2PDMA_MAP_UNKNOWN = 0,
+> -
+> -	/*
+> -	 * Not a PCI P2PDMA transfer.
+> -	 */
+> -	PCI_P2PDMA_MAP_NONE,
+> -
+> -	/*
+> -	 * PCI_P2PDMA_MAP_NOT_SUPPORTED: Indicates the transaction will
+> -	 * traverse the host bridge and the host bridge is not in the
+> -	 * allowlist. DMA Mapping routines should return an error when
+> -	 * this is returned.
+> -	 */
+> -	PCI_P2PDMA_MAP_NOT_SUPPORTED,
+> -
+> -	/*
+> -	 * PCI_P2PDMA_BUS_ADDR: Indicates that two devices can talk to
+> -	 * each other directly through a PCI switch and the transaction will
+> -	 * not traverse the host bridge. Such a mapping should program
+> -	 * the DMA engine with PCI bus addresses.
+> -	 */
+> -	PCI_P2PDMA_MAP_BUS_ADDR,
+> -
+> -	/*
+> -	 * PCI_P2PDMA_MAP_THRU_HOST_BRIDGE: Indicates two devices can talk
+> -	 * to each other, but the transaction traverses a host bridge on the
+> -	 * allowlist. In this case, a normal mapping either with CPU physical
+> -	 * addresses (in the case of dma-direct) or IOVA addresses (in the
+> -	 * case of IOMMUs) should be used to program the DMA engine.
+> -	 */
+> -	PCI_P2PDMA_MAP_THRU_HOST_BRIDGE,
+> -};
+> -
+> -struct pci_p2pdma_map_state {
+> -	struct dev_pagemap *pgmap;
+> -	enum pci_p2pdma_map_type map;
+> -	u64 bus_off;
+> -};
+> -
+> -/* helper for pci_p2pdma_state(), do not use directly */
+> -void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
+> -		struct device *dev, struct page *page);
+> -
+> -/**
+> - * pci_p2pdma_state - check the P2P transfer state of a page
+> - * @state: 	P2P state structure
+> - * @dev:	device to transfer to/from
+> - * @page:	page to map
+> - *
+> - * Check if @page is a PCI P2PDMA page, and if yes of what kind.  Returns the
+> - * map type, and updates @state with all information needed for a P2P transfer.
+> - */
+> -static inline enum pci_p2pdma_map_type
+> -pci_p2pdma_state(struct pci_p2pdma_map_state *state, struct device *dev,
+> -		struct page *page)
+> -{
+> -	if (IS_ENABLED(CONFIG_PCI_P2PDMA) && is_pci_p2pdma_page(page)) {
+> -		if (state->pgmap != page->pgmap)
+> -			__pci_p2pdma_update_state(state, dev, page);
+> -		return state->map;
+> -	}
+> -	return PCI_P2PDMA_MAP_NONE;
+> -}
+> -
+> -/**
+> - * pci_p2pdma_bus_addr_map - map a PCI_P2PDMA_MAP_BUS_ADDR P2P transfer
+> - * @state: 	P2P state structure
+> - * @paddr:	physical address to map
+> - *
+> - * Map a physically contigous PCI_P2PDMA_MAP_BUS_ADDR transfer.
+> - */
+> -static inline dma_addr_t
+> -pci_p2pdma_bus_addr_map(struct pci_p2pdma_map_state *state, phys_addr_t paddr)
+> -{
+> -	WARN_ON_ONCE(state->map != PCI_P2PDMA_MAP_BUS_ADDR);
+> -	return paddr + state->bus_off;
+> -}
+> -
+>  #endif /* _LINUX_DMA_MAP_OPS_H */
+> diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
+> index 2c07aa6b7665..66b71f60a811 100644
+> --- a/include/linux/pci-p2pdma.h
+> +++ b/include/linux/pci-p2pdma.h
+> @@ -104,4 +104,88 @@ static inline struct pci_dev *pci_p2pmem_find(struct device *client)
+>  	return pci_p2pmem_find_many(&client, 1);
+>  }
+>  
+> +enum pci_p2pdma_map_type {
+> +	/*
+> +	 * PCI_P2PDMA_MAP_UNKNOWN: Used internally for indicating the mapping
+> +	 * type hasn't been calculated yet. Functions that return this enum
+> +	 * never return this value.
+> +	 */
+> +	PCI_P2PDMA_MAP_UNKNOWN = 0,
+> +
+> +	/*
+> +	 * Not a PCI P2PDMA transfer.
+> +	 */
+> +	PCI_P2PDMA_MAP_NONE,
+> +
+> +	/*
+> +	 * PCI_P2PDMA_MAP_NOT_SUPPORTED: Indicates the transaction will
+> +	 * traverse the host bridge and the host bridge is not in the
+> +	 * allowlist. DMA Mapping routines should return an error when
+> +	 * this is returned.
+> +	 */
+> +	PCI_P2PDMA_MAP_NOT_SUPPORTED,
+> +
+> +	/*
+> +	 * PCI_P2PDMA_BUS_ADDR: Indicates that two devices can talk to
+> +	 * each other directly through a PCI switch and the transaction will
+> +	 * not traverse the host bridge. Such a mapping should program
+> +	 * the DMA engine with PCI bus addresses.
+> +	 */
+> +	PCI_P2PDMA_MAP_BUS_ADDR,
+> +
+> +	/*
+> +	 * PCI_P2PDMA_MAP_THRU_HOST_BRIDGE: Indicates two devices can talk
+> +	 * to each other, but the transaction traverses a host bridge on the
+> +	 * allowlist. In this case, a normal mapping either with CPU physical
+> +	 * addresses (in the case of dma-direct) or IOVA addresses (in the
+> +	 * case of IOMMUs) should be used to program the DMA engine.
+> +	 */
+> +	PCI_P2PDMA_MAP_THRU_HOST_BRIDGE,
+> +};
+> +
+> +struct pci_p2pdma_map_state {
+> +	struct dev_pagemap *pgmap;
+> +	enum pci_p2pdma_map_type map;
+> +	u64 bus_off;
+> +};
+> +
+> +/* helper for pci_p2pdma_state(), do not use directly */
+> +void __pci_p2pdma_update_state(struct pci_p2pdma_map_state *state,
+> +		struct device *dev, struct page *page);
+> +
+> +/**
+> + * pci_p2pdma_state - check the P2P transfer state of a page
+> + * @state: 	P2P state structure
+> + * @dev:	device to transfer to/from
+> + * @page:	page to map
+> + *
+> + * Check if @page is a PCI P2PDMA page, and if yes of what kind.  Returns the
+> + * map type, and updates @state with all information needed for a P2P transfer.
+> + */
+> +static inline enum pci_p2pdma_map_type
+> +pci_p2pdma_state(struct pci_p2pdma_map_state *state, struct device *dev,
+> +		struct page *page)
+> +{
+> +	if (IS_ENABLED(CONFIG_PCI_P2PDMA) && is_pci_p2pdma_page(page)) {
+> +		if (state->pgmap != page->pgmap)
+> +			__pci_p2pdma_update_state(state, dev, page);
+> +		return state->map;
+> +	}
+> +	return PCI_P2PDMA_MAP_NONE;
+> +}
+> +
+> +/**
+> + * pci_p2pdma_bus_addr_map - map a PCI_P2PDMA_MAP_BUS_ADDR P2P transfer
+> + * @state: 	P2P state structure
+> + * @paddr:	physical address to map
+> + *
+> + * Map a physically contigous PCI_P2PDMA_MAP_BUS_ADDR transfer.
+> + */
+> +static inline dma_addr_t
+> +pci_p2pdma_bus_addr_map(struct pci_p2pdma_map_state *state, phys_addr_t paddr)
+> +{
+> +	WARN_ON_ONCE(state->map != PCI_P2PDMA_MAP_BUS_ADDR);
+> +	return paddr + state->bus_off;
+> +}
+> +
+>  #endif /* _LINUX_PCI_P2P_H */
+> diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
+> index a793400161c2..47e124561fff 100644
+> --- a/kernel/dma/direct.c
+> +++ b/kernel/dma/direct.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/vmalloc.h>
+>  #include <linux/set_memory.h>
+>  #include <linux/slab.h>
+> +#include <linux/pci-p2pdma.h>
+>  #include "direct.h"
+>  
+>  /*
+> -- 
+> 2.46.2
+> 
