@@ -1,44 +1,44 @@
 Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3952B192D8C
-	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 15:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2A9194C83
+	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 15:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730215192; cv=none; b=b1YDoofk5fE6dIGfxE+FIKgR1H8KFhFm3EbGNIj8VIkb+27gXsqMwCFwKxVAqOKdqPJrERi+MVzfNQmzSYGSPJ+y0AeR+JAn/dxc5v9CcSdRv0DZ1Ph9tXtlngxfXEOlBD6KE4CMv8sTNuQl43zWqzRwfOEeGUx2G5Qd/JLq5TQ=
+	t=1730215197; cv=none; b=BsBI8bWz0rNGuf5oElxq6s/yUb+m3nuKXPQT6KeuhJnESJRTvBO8lj3k3AczTNpEpNqyQhCex2dM/ljb2JRQJ66k0m0wvl1lCJBhAJGvqhEBsHjr/ZXx+5SQEquQkoQ0D85iI74UCyFMQWJud7WLtEBOpMn8/Ffkov5meGDtQSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730215192; c=relaxed/simple;
-	bh=u823h6nUpL2mhd/bMO+hteVG/iDcIFJwd0H9jEPB4bs=;
+	s=arc-20240116; t=1730215197; c=relaxed/simple;
+	bh=GD7uThjhDzyP28oGcsmN6/eNWGUs4YiXhY9KVTQmUTE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mJB/bkinGaxdMFRz5Azj/5RindJLZQh8HoTCkKPW+Idc/u+oFwQv6mQ9yPR4X0CPcCEi+nDyhtI7aqX7bDfol0FBHQHNfE3CX1W3pbCOGTtOeBotcjGkt68l4HZBLt0wMBcgpz4D+zUI/8ewnYDde5DdviK8NhDony1Fz5kYdsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=hc2pQwqq; arc=none smtp.client-ip=67.231.153.30
+	 MIME-Version:Content-Type; b=WJYWaruLy49NguOdMBd/NYQXHDJ/7Z3vfwphbixTXbFBXjoiX4svVDRSAT5q9gGLD4/wYjKZcN5N5H3vc7j/xxIk00FQuYSqUBdjJdRjR5AbC1z0FjI6nvyMgqnuk5rNWQC+6zlvCcrilRw4rLmFkDwfeRD3skZwBLZb17y0rEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Ho3jedvR; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="hc2pQwqq"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Ho3jedvR"
 Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49TEaXlf009750
-	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 08:19:49 -0700
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49TEaXlp009750
+	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 08:19:54 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=YQ+ll8EUN2qkPqvUcVib+PjturAFUp8AJc6rGfz+mJI=; b=hc2pQwqqgkaQ
-	kJ8rI8tnoC80TP32qJjK4Gm9bvcOv/zJxfAbKVwVArxg8Rc4rlUQeUFoVntNai57
-	VDl7c6eiMPPZ6yn9TVSrKaGkX08v/8z5wqxYLf7mSCbGJZL6jgnZSlwkIxpJ65XQ
-	CKqKVVQU4QIokSPaJFKDsHL4KsT6UwT69ZC/db34NZnTaLp/+Wddw2lE/cjr2uS9
-	tE7udOCyfhb/7sUEdWedslIOaazN75oxTl/ZlyYZDVlM0+rMiWBfZzpzrrC+0/b0
-	147wP8zK5AsQ1zGkaghL+6SSh8LsCkMc+0nGzq9iK1vNwLP0KlY8AVtFYph3zwLJ
-	EmKBVHCP2Q==
+	 bh=7vuu9MU8HwzONpvRjqiHwphNE/Y6asPy43+abByRhi8=; b=Ho3jedvRtHL/
+	2BIwDRamOsQyk4bI0ern4VkA0Sgxm9CGZRA7LFeFM/8Sokt+oJIFrVBgg57/ro6e
+	4EH2C4uv9ohV4DiI0t2VJPll7Y/ADbUIFNUXC73O4eG+kCJ+k32fnuq7yEWH6mI1
+	6jgMa4/ZNWPvHbifiA3s/NzfL4/pyx1jrMQ8FzfnXY4Ua8PkGZ2NGye+XnKOnDoY
+	MunY6kSk8oQ6fE/krdLzs2hnL0SdZm26LjcVGXStmKbejOYv+Pv6jVtKQihIvBct
+	1JchLnv0UC4SysCD62DjH6oJuE8WGuLE79n5YhuhjiRqb2rAOado9J+P8rQCM8xY
+	e8v7XR8gNQ==
 Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 42k1m9rd37-4
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 42k1m9rd37-14
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 08:19:48 -0700 (PDT)
-Received: from twshared19620.08.ash8.facebook.com (2620:10d:c0a8:1c::1b) by
+	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 08:19:53 -0700 (PDT)
+Received: from twshared26373.08.ash9.facebook.com (2620:10d:c0a8:1c::1b) by
  mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.2.1544.11; Tue, 29 Oct 2024 15:19:47 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id F015C14920E9E; Tue, 29 Oct 2024 08:19:43 -0700 (PDT)
+	id 1676C14920EA5; Tue, 29 Oct 2024 08:19:44 -0700 (PDT)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
         <linux-scsi@vger.kernel.org>, <io-uring@vger.kernel.org>
@@ -46,9 +46,9 @@ CC: <linux-fsdevel@vger.kernel.org>, <hch@lst.de>, <joshi.k@samsung.com>,
         <javier.gonz@samsung.com>, <bvanassche@acm.org>,
         Keith Busch
 	<kbusch@kernel.org>
-Subject: [PATCHv10 2/9] block: introduce max_write_hints queue limit
-Date: Tue, 29 Oct 2024 08:19:15 -0700
-Message-ID: <20241029151922.459139-3-kbusch@meta.com>
+Subject: [PATCHv10 5/9] block, fs: add write hint to kiocb
+Date: Tue, 29 Oct 2024 08:19:18 -0700
+Message-ID: <20241029151922.459139-6-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20241029151922.459139-1-kbusch@meta.com>
 References: <20241029151922.459139-1-kbusch@meta.com>
@@ -61,138 +61,113 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: LOpSyhaWh6T94Q8SRDmVrB9CTec0qFmm
-X-Proofpoint-ORIG-GUID: LOpSyhaWh6T94Q8SRDmVrB9CTec0qFmm
+X-Proofpoint-GUID: ZYPJMIoiltZBC6LJ4J2inNWIKUawPTuV
+X-Proofpoint-ORIG-GUID: ZYPJMIoiltZBC6LJ4J2inNWIKUawPTuV
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-Drivers with hardware that support write streams need a way to export how
-many are available so applications can generically query this.
+This prepares for sources other than the inode to provide a write hint.
+The block layer will use it for direct IO if the requested hint is
+within the block device's allowed hints.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- Documentation/ABI/stable/sysfs-block |  7 +++++++
- block/blk-settings.c                 |  3 +++
- block/blk-sysfs.c                    |  3 +++
- include/linux/blkdev.h               | 12 ++++++++++++
- 4 files changed, 25 insertions(+)
+ block/fops.c       | 31 ++++++++++++++++++++++++++++---
+ include/linux/fs.h |  1 +
+ 2 files changed, 29 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/sta=
-ble/sysfs-block
-index 8353611107154..f2db2cabb8e75 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -506,6 +506,13 @@ Description:
- 		[RO] Maximum size in bytes of a single element in a DMA
- 		scatter/gather list.
+diff --git a/block/fops.c b/block/fops.c
+index 2d01c90076813..bb3855ee044f0 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -71,7 +71,7 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *=
+iocb,
+ 		bio_init(&bio, bdev, vecs, nr_pages, dio_bio_write_op(iocb));
+ 	}
+ 	bio.bi_iter.bi_sector =3D pos >> SECTOR_SHIFT;
+-	bio.bi_write_hint =3D file_inode(iocb->ki_filp)->i_write_hint;
++	bio.bi_write_hint =3D iocb->ki_write_hint;
+ 	bio.bi_ioprio =3D iocb->ki_ioprio;
+ 	if (iocb->ki_flags & IOCB_ATOMIC)
+ 		bio.bi_opf |=3D REQ_ATOMIC;
+@@ -200,7 +200,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb,=
+ struct iov_iter *iter,
 =20
-+What:		/sys/block/<disk>/queue/max_write_hints
-+Date:		October 2024
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		[RO] Maximum number of write hints supported, 0 if not
-+		supported. If supported, valid values are 1 through
-+		max_write_hints, inclusive.
+ 	for (;;) {
+ 		bio->bi_iter.bi_sector =3D pos >> SECTOR_SHIFT;
+-		bio->bi_write_hint =3D file_inode(iocb->ki_filp)->i_write_hint;
++		bio->bi_write_hint =3D iocb->ki_write_hint;
+ 		bio->bi_private =3D dio;
+ 		bio->bi_end_io =3D blkdev_bio_end_io;
+ 		bio->bi_ioprio =3D iocb->ki_ioprio;
+@@ -316,7 +316,7 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb =
+*iocb,
+ 	dio->flags =3D 0;
+ 	dio->iocb =3D iocb;
+ 	bio->bi_iter.bi_sector =3D pos >> SECTOR_SHIFT;
+-	bio->bi_write_hint =3D file_inode(iocb->ki_filp)->i_write_hint;
++	bio->bi_write_hint =3D iocb->ki_write_hint;
+ 	bio->bi_end_io =3D blkdev_bio_end_io_async;
+ 	bio->bi_ioprio =3D iocb->ki_ioprio;
 =20
- What:		/sys/block/<disk>/queue/max_segments
- Date:		March 2010
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index a446654ddee5e..921fb4d334fa4 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -43,6 +43,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
- 	lim->seg_boundary_mask =3D BLK_SEG_BOUNDARY_MASK;
-=20
- 	/* Inherit limits from component devices */
-+	lim->max_write_hints =3D USHRT_MAX;
- 	lim->max_segments =3D USHRT_MAX;
- 	lim->max_discard_segments =3D USHRT_MAX;
- 	lim->max_hw_sectors =3D UINT_MAX;
-@@ -544,6 +545,8 @@ int blk_stack_limits(struct queue_limits *t, struct q=
-ueue_limits *b,
- 	t->max_segment_size =3D min_not_zero(t->max_segment_size,
- 					   b->max_segment_size);
-=20
-+	t->max_write_hints =3D min(t->max_write_hints, b->max_write_hints);
-+
- 	alignment =3D queue_limit_alignment_offset(b, start);
-=20
- 	/* Bottom device has different alignment.  Check that it is
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 741b95dfdbf6f..85f48ca461049 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -104,6 +104,7 @@ QUEUE_SYSFS_LIMIT_SHOW(max_segments)
- QUEUE_SYSFS_LIMIT_SHOW(max_discard_segments)
- QUEUE_SYSFS_LIMIT_SHOW(max_integrity_segments)
- QUEUE_SYSFS_LIMIT_SHOW(max_segment_size)
-+QUEUE_SYSFS_LIMIT_SHOW(max_write_hints)
- QUEUE_SYSFS_LIMIT_SHOW(logical_block_size)
- QUEUE_SYSFS_LIMIT_SHOW(physical_block_size)
- QUEUE_SYSFS_LIMIT_SHOW(chunk_sectors)
-@@ -457,6 +458,7 @@ QUEUE_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_=
-kb");
- QUEUE_RO_ENTRY(queue_max_segments, "max_segments");
- QUEUE_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
- QUEUE_RO_ENTRY(queue_max_segment_size, "max_segment_size");
-+QUEUE_RO_ENTRY(queue_max_write_hints, "max_write_hints");
- QUEUE_RW_LOAD_MODULE_ENTRY(elv_iosched, "scheduler");
-=20
- QUEUE_RO_ENTRY(queue_logical_block_size, "logical_block_size");
-@@ -591,6 +593,7 @@ static struct attribute *queue_attrs[] =3D {
- 	&queue_max_discard_segments_entry.attr,
- 	&queue_max_integrity_segments_entry.attr,
- 	&queue_max_segment_size_entry.attr,
-+	&queue_max_write_hints_entry.attr,
- 	&queue_hw_sector_size_entry.attr,
- 	&queue_logical_block_size_entry.attr,
- 	&queue_physical_block_size_entry.attr,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d0a52ed05e60c..90a19ea889276 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -394,6 +394,8 @@ struct queue_limits {
- 	unsigned short		max_integrity_segments;
- 	unsigned short		max_discard_segments;
-=20
-+	unsigned short		max_write_hints;
-+
- 	unsigned int		max_open_zones;
- 	unsigned int		max_active_zones;
-=20
-@@ -1189,6 +1191,11 @@ static inline unsigned short queue_max_segments(co=
-nst struct request_queue *q)
- 	return q->limits.max_segments;
+@@ -362,6 +362,23 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb=
+ *iocb,
+ 	return -EIOCBQUEUED;
  }
 =20
-+static inline unsigned short queue_max_write_hints(struct request_queue =
-*q)
++static int blkdev_write_hint(struct kiocb *iocb, struct block_device *bd=
+ev)
 +{
-+	return q->limits.max_write_hints;
++	u16 hint =3D iocb->ki_write_hint;
++
++	if (!hint)
++		return file_inode(iocb->ki_filp)->i_write_hint;
++
++	if (hint > bdev_max_write_hints(bdev))
++		return -EINVAL;
++
++	if (bdev_is_partition(bdev) &&
++	    !test_bit(hint - 1, bdev->write_hint_mask))
++		return -EINVAL;
++
++	return hint;
 +}
 +
- static inline unsigned short queue_max_discard_segments(const struct req=
-uest_queue *q)
+ static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *ite=
+r)
  {
- 	return q->limits.max_discard_segments;
-@@ -1236,6 +1243,11 @@ static inline unsigned int bdev_max_segments(struc=
-t block_device *bdev)
- 	return queue_max_segments(bdev_get_queue(bdev));
- }
+ 	struct block_device *bdev =3D I_BDEV(iocb->ki_filp->f_mapping->host);
+@@ -373,6 +390,14 @@ static ssize_t blkdev_direct_IO(struct kiocb *iocb, =
+struct iov_iter *iter)
+ 	if (blkdev_dio_invalid(bdev, iocb, iter))
+ 		return -EINVAL;
 =20
-+static inline unsigned short bdev_max_write_hints(struct block_device *b=
-dev)
-+{
-+	return queue_max_write_hints(bdev_get_queue(bdev));
-+}
++	if (iov_iter_rw(iter) =3D=3D WRITE) {
++		int hint =3D blkdev_write_hint(iocb, bdev);
 +
- static inline unsigned queue_logical_block_size(const struct request_que=
-ue *q)
- {
- 	return q->limits.logical_block_size;
++		if (hint < 0)
++			return hint;
++		iocb->ki_write_hint =3D hint;
++	}
++
+ 	nr_pages =3D bio_iov_vecs_to_alloc(iter, BIO_MAX_VECS + 1);
+ 	if (likely(nr_pages <=3D BIO_MAX_VECS)) {
+ 		if (is_sync_kiocb(iocb))
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 4b5cad44a1268..1a00accf412e5 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -370,6 +370,7 @@ struct kiocb {
+ 	void			*private;
+ 	int			ki_flags;
+ 	u16			ki_ioprio; /* See linux/ioprio.h */
++	u16			ki_write_hint;
+ 	union {
+ 		/*
+ 		 * Only used for async buffered reads, where it denotes the
 --=20
 2.43.5
 
