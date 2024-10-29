@@ -1,73 +1,62 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C42204016
-	for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 08:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF17D200BBC;
+	Tue, 29 Oct 2024 09:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730192186; cv=none; b=GELyO8dSLdHd15PldbxPDbAsKKXoc8pGJ1XwakPyVFFTEZpzPdSulbtvqx3hgnWJWyZMVnBC7pfTyH+bGLv7K5SnYmq3zzpm7BLFhxL7K01bq8maBZp6TQrEifuw7/G8gMP3VG5IHP9rTo87O8LRyf9gU4Ae5DNn9YxTZIhWvXI=
+	t=1730193104; cv=none; b=Fv+EYXp48FBnnYdYetNl1ttpY+GhLfti6ygCdY3meeQ3TVrGyYNxD8fGu+sMELeeNIQUkPwrwSPxT5xL7lIV1+QBqMrMB8BCfpnjnjM82qSBdN227hs0aoA5F4rbp2WvojBJj1BvxAOwojI+QIu0u6b54JJ1XqE5MnjrugQ7Aek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730192186; c=relaxed/simple;
-	bh=AXIBIm6u6Qx7op8AsQATpLo/Zp3lmq8PTNJE67XTfpI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G9wXKGdaJ4qFEezzSurfb7udmVwPRNdDopmXVzsxjfStRLPq9Pk34Pt6G+dkBAZjJbK5TzovVwWq8na5/1J4kMaxUtaXQFvLsNp+tpKhwlvNclQP12XFS5ojkNRcuUNUeb8Kzeb5zDhn7g5JfuVhYDhX432aBWAQrJR3ainSvRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=PsV0AbyP; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="PsV0AbyP"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20ca1b6a80aso50739685ad.2
-        for <linux-block@vger.kernel.org>; Tue, 29 Oct 2024 01:56:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1730192184; x=1730796984; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FFSFeeDBOyZstKB4qR1rdcdR6LJarrbDAw3IQnrq+2o=;
-        b=PsV0AbyPRImWvDekcrMqlDLXKnJ3jmiOjLhD1PAil9ERY7unor8f3pMgASKq1lCVcV
-         k9A/SdCwkfo4MUGO9xk6H75oW44KKIKs0T2C/H8pVU9TwcW9QV8l1qedHCTa763o//Ga
-         jyDbcFpJu+/dcXh8Gablk0ZiyiJsSldnvvCZ1nZt/DHR14UvED7wDMSsRMTYd8FP3tTd
-         9hlo1caEvw1R218tCVC7XkVnBAoaduThWBA9UZDGnA4a+zceBglw7WyzoiDYv+B7j/e8
-         X/V9y4pm0MdEZvmmm5C6LGSsmQd6oxk1qmMuTXIchN1372lS19MtEXZj1VFrZXstxVMD
-         fI+Q==
+	s=arc-20240116; t=1730193104; c=relaxed/simple;
+	bh=SvUjc0ShhUJ8PhVnVn5bxNftQP0fRbqFlsWFRRWwIMc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rUrUvGPaCkAZSaq1y6IX7rgNeNf2JhtdaWUiNBt6We3DvDD0oPhYwqpRWWTkNLWFG7Oc37B1GXNQBsrdt/+mLNNsa24Ys7CPlAhLeWZMeDSY0oUT2kHilbQmeGp7vGW94JMFXr8QjYfVZ+Ch44STZKrt9GTk5RllvMBhOSzN3DI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-539eb97f26aso5319918e87.2;
+        Tue, 29 Oct 2024 02:11:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730192184; x=1730796984;
+        d=1e100.net; s=20230601; t=1730193101; x=1730797901;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FFSFeeDBOyZstKB4qR1rdcdR6LJarrbDAw3IQnrq+2o=;
-        b=swwxuUQ7AKEHi422eC5ARHLIflbVmywNKBjwBfO8eU84uGq5CKTF1bVE0/8N5EY0qF
-         zxLdC+VVvMcjMux5OC+GuDJa+32BGaushA9EYtXP4FUJXaDPIiy6347djYXRHu1YexAa
-         fy4v0O2+ObtW6BN7oVpgtv99YUnlTn8KPVYPpVEzciRNqP/p2SNzx3hqsz+2Y73jDe6B
-         FbD13TPgkKqH31hGt5wsQMltIl8MjTk5nmDrHCuY/rEz/TfXNJKVucjTLFJwWn67NdJI
-         Hc1iy3qAzd8JPZy4IXGlGNj8COGIh7QIaCvL3Ma8tYAmHHc2XG/JpPiy+AQ+HllzydjT
-         vulw==
-X-Forwarded-Encrypted: i=1; AJvYcCVHlQEpUXtMBw41I+X1C2WCMnfb213P4E+U/AkqV6Z1bK5oNcjdHJrZ/+/uPkgkh9YxGKButkqxxDAUQg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxmmf5HApQGO0GRZGcNrr5fMS5lObJwdYFrThXXeF+3q/uxCaL2
-	y27Zk7F5ZMoQR2QuAxOF7rk7iCTR8Nxy18xjg0kl3+aQq2dFiiMF7M+t5aNDdiA=
-X-Google-Smtp-Source: AGHT+IHUiKiL8NxbpHUidQXUZlRt/40IbI6UTNYVhRyPPrvl8eNbx53ouNpRbo+L6FHbv61oZFiB4g==
-X-Received: by 2002:a05:6a21:1798:b0:1d9:18b7:496 with SMTP id adf61e73a8af0-1d9a851e099mr15600766637.45.1730192183609;
-        Tue, 29 Oct 2024 01:56:23 -0700 (PDT)
-Received: from PXLDJ45XCM.bytedance.net ([61.213.176.9])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7edc8696a86sm7156832a12.47.2024.10.29.01.56.20
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 29 Oct 2024 01:56:23 -0700 (PDT)
-From: Muchun Song <songmuchun@bytedance.com>
-To: axboe@kernel.dk,
-	tj@kernel.org,
-	yukuai1@huaweicloud.com
-Cc: chengming.zhou@linux.dev,
-	muchun.song@linux.dev,
-	linux-block@vger.kernel.org,
+        bh=SHFBQa6cjEimlbCXbA9xxyetkthyL4ca8SFHWzeSkLA=;
+        b=P7T9iXh55ZBwpEyZeqwmPcIpj2xA5ABILTnrfWK+52AGWNPfIXiDByblLVsVhL1twX
+         G+1hv/EztDs7Pknnn3o2qmZeQj3Cch4c4Gnbni9L9eUf/YGIVScn3x4+dVrt0DGGOCrx
+         XjnAWQC05byhsM5g9crgK0BJGowNVfFEL94zVDpwUK0flf6TFhHnzUqPskBzOPpPWMDw
+         EElzV4VmDCv4WXuAuLGPqy1Xp+uo3lcjazJ37indzAXyygVdeXIYiKy4AKiIcJITyHaC
+         i8ITkX9uP2dnDRnzS3RqThS/i5Mn3HSONwD5sa+ucnmLATuPBrmA8NlXsAoU2mUnHVw5
+         7TYw==
+X-Forwarded-Encrypted: i=1; AJvYcCVCOqlFwvo+94cWiQr6pn3f6EHAzFhEWFn7wN+NlKqj4yuIHnn+mx/1EzX3qY7raWcTP14V2uVf2DIUtA==@vger.kernel.org, AJvYcCXTCMluGaBRvwnhscXxeYAQGmfQVOnFA4PJs/OGJGp+mmu67pragERiYeqSssq8jorsO6gkAiKrTd2TWg==@vger.kernel.org, AJvYcCXeRGvTK9dtNd7/WO2SZq9yLuNPK1MhVkF7zDquNtgP9cewXHlwcXjnVXtlwViH+bPG+lBKc0olt6Djw8RI@vger.kernel.org
+X-Gm-Message-State: AOJu0YxK0WdsmW83HaT0dP2W5EA0BgH0AtqvDiMCG9pZ6rqh5p0CYYph
+	hgs74ApkkOtO+K4MznQnMQ8TKEsk6a7eByRp1HaWwQGIOb+4rfwZ
+X-Google-Smtp-Source: AGHT+IFJTESo4oJeQB4cKVRo8UjWHZscVtmUPs2gtEXYHYwUup2fKpV699zrxFmWr9bDUda49tBLDQ==
+X-Received: by 2002:a05:6512:3404:b0:53b:27ba:2d11 with SMTP id 2adb3069b0e04-53b348cb2cbmr6032968e87.16.1730193100751;
+        Tue, 29 Oct 2024 02:11:40 -0700 (PDT)
+Received: from nuc.fritz.box (p200300f6f71fdb00fa633ffffe02074c.dip0.t-ipconnect.de. [2003:f6:f71f:db00:fa63:3fff:fe02:74c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b929a8sm12000095f8f.103.2024.10.29.02.11.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2024 02:11:40 -0700 (PDT)
+From: Johannes Thumshirn <jth@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Muchun Song <songmuchun@bytedance.com>,
-	Yu Kuai <yukuai3@huawei.com>
-Subject: [PATCH v2 2/2] block: refactor rq_qos_wait()
-Date: Tue, 29 Oct 2024 16:55:59 +0800
-Message-Id: <20241029085559.98390-2-songmuchun@bytedance.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241029085559.98390-1-songmuchun@bytedance.com>
-References: <20241029085559.98390-1-songmuchun@bytedance.com>
+	linux-raid@vger.kernel.org,
+	axboe@kernel.dk,
+	song@kernel.org,
+	yukuai3@huawei.com,
+	hch@lst.de,
+	martin.petersen@oracle.com,
+	hare@suse.de,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH] btrfs: handle bio_split() error
+Date: Tue, 29 Oct 2024 10:11:21 +0100
+Message-ID: <20241029091121.16281-1-jth@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241028152730.3377030-1-john.g.garry@oracle.com>
+References: <20241028152730.3377030-1-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,128 +65,45 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When rq_qos_wait() is first introduced, it is easy to understand. But
-with some bug fixes applied, it is not easy for newcomers to understand
-the whole logic under those fixes. In this patch, rq_qos_wait() is
-refactored and more comments are added for better understanding. There
-are 3 points for the improvement:
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-1) Use waitqueue_active() instead of wq_has_sleeper() to eliminate
-   unnecessary memory barrier in wq_has_sleeper() which is supposed
-   to be used in waker side. In this case, we do need the barrier.
-   So use the cheaper one to locklessly test for waiters on the queue.
+Now that bio_split() can return errors, add error handling for it in
+btrfs_split_bio() and ultimately btrfs_submit_chunk().
 
-2) Remove acquire_inflight_cb() logic for the first waiter out of the
-   while loop to make the code clear.
-
-3) Add more comments to explain how to sync with different waiters and
-   the waker.
-
-Signed-off-by: Muchun Song <songmuchun@bytedance.com>
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
-v2:
- - Introduce init_wait_func() in a seprate patch (Yu Kuai).
 
- block/blk-rq-qos.c | 68 ++++++++++++++++++++++++++++++++--------------
- 1 file changed, 47 insertions(+), 21 deletions(-)
+John,
+in case you have to send a v3, can you please include this one in your series?
 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 858ce69c04ece..5d995d389eaf5 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -223,6 +223,14 @@ static int rq_qos_wake_function(struct wait_queue_entry *curr,
- 	 * Remove explicitly and use default_wake_function().
- 	 */
- 	default_wake_function(curr, mode, wake_flags, key);
-+	/*
-+	 * Note that the order of operations is important as finish_wait()
-+	 * tests whether @curr is removed without grabbing the lock. This
-+	 * should be the last thing to do to make sure we will not have a
-+	 * UAF access to @data. And the semantics of memory barrier in it
-+	 * also make sure the waiter will see the latest @data->got_token
-+	 * once list_empty_careful() in finish_wait() returns true.
-+	 */
- 	list_del_init_careful(&curr->entry);
- 	return 1;
- }
-@@ -248,37 +256,55 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
- 		 cleanup_cb_t *cleanup_cb)
- {
- 	struct rq_qos_wait_data data = {
--		.rqw = rqw,
--		.cb = acquire_inflight_cb,
--		.private_data = private_data,
-+		.rqw		= rqw,
-+		.cb		= acquire_inflight_cb,
-+		.private_data	= private_data,
-+		.got_token	= false,
- 	};
--	bool has_sleeper;
-+	bool first_waiter;
+ fs/btrfs/bio.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/fs/btrfs/bio.c b/fs/btrfs/bio.c
+index 1f216d07eff6..96cacd5c03a5 100644
+--- a/fs/btrfs/bio.c
++++ b/fs/btrfs/bio.c
+@@ -81,6 +81,9 @@ static struct btrfs_bio *btrfs_split_bio(struct btrfs_fs_info *fs_info,
  
--	has_sleeper = wq_has_sleeper(&rqw->wait);
--	if (!has_sleeper && acquire_inflight_cb(rqw, private_data))
-+	/*
-+	 * If there are no waiters in the waiting queue, try to increase the
-+	 * inflight counter if we can. Otherwise, prepare for adding ourselves
-+	 * to the waiting queue.
-+	 */
-+	if (!waitqueue_active(&rqw->wait) && acquire_inflight_cb(rqw, private_data))
- 		return;
- 
- 	init_wait_func(&data.wq, rq_qos_wake_function);
--	has_sleeper = !prepare_to_wait_exclusive(&rqw->wait, &data.wq,
-+	first_waiter = prepare_to_wait_exclusive(&rqw->wait, &data.wq,
- 						 TASK_UNINTERRUPTIBLE);
-+	/*
-+	 * Make sure there is at least one inflight process; otherwise, waiters
-+	 * will never be woken up. Since there may be no inflight process before
-+	 * adding ourselves to the waiting queue above, we need to try to
-+	 * increase the inflight counter for ourselves. And it is sufficient to
-+	 * guarantee that at least the first waiter to enter the waiting queue
-+	 * will re-check the waiting condition before going to sleep, thus
-+	 * ensuring forward progress.
-+	 */
-+	if (!data.got_token && first_waiter && acquire_inflight_cb(rqw, private_data)) {
-+		finish_wait(&rqw->wait, &data.wq);
-+		/*
-+		 * We raced with rq_qos_wake_function() getting a token,
-+		 * which means we now have two. Put our local token
-+		 * and wake anyone else potentially waiting for one.
-+		 *
-+		 * Enough memory barrier in list_empty_careful() in
-+		 * finish_wait() is paired with list_del_init_careful()
-+		 * in rq_qos_wake_function() to make sure we will see
-+		 * the latest @data->got_token.
-+		 */
-+		if (data.got_token)
-+			cleanup_cb(rqw, private_data);
-+		return;
-+	}
+ 	bio = bio_split(&orig_bbio->bio, map_length >> SECTOR_SHIFT, GFP_NOFS,
+ 			&btrfs_clone_bioset);
++	if (IS_ERR(bio))
++		return ERR_CAST(bio);
 +
-+	/* we are now relying on the waker to increase our inflight counter. */
- 	do {
--		/* The memory barrier in set_task_state saves us here. */
- 		if (data.got_token)
- 			break;
--		if (!has_sleeper && acquire_inflight_cb(rqw, private_data)) {
--			finish_wait(&rqw->wait, &data.wq);
--
--			/*
--			 * We raced with rq_qos_wake_function() getting a token,
--			 * which means we now have two. Put our local token
--			 * and wake anyone else potentially waiting for one.
--			 */
--			if (data.got_token)
--				cleanup_cb(rqw, private_data);
--			return;
--		}
- 		io_schedule();
--		has_sleeper = true;
- 		set_current_state(TASK_UNINTERRUPTIBLE);
- 	} while (1);
- 	finish_wait(&rqw->wait, &data.wq);
+ 	bbio = btrfs_bio(bio);
+ 	btrfs_bio_init(bbio, fs_info, NULL, orig_bbio);
+ 	bbio->inode = orig_bbio->inode;
+@@ -687,6 +690,10 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
+ 
+ 	if (map_length < length) {
+ 		bbio = btrfs_split_bio(fs_info, bbio, map_length);
++		if (IS_ERR(bbio)) {
++			ret = PTR_ERR(bbio);
++			goto fail;
++		}
+ 		bio = &bbio->bio;
+ 	}
+ 
 -- 
-2.20.1
+2.43.0
 
