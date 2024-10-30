@@ -1,45 +1,28 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7E51E47BC
-	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 14:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81A01E8852
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 14:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730296890; cv=none; b=LxsdZ0v7YZP/QZAKMF4VIi0cUftQ0hIJ1z5e+wZMF9LdTXUXoP8hwjnHWGDiV0JjAWaaCRi6KAuKPLuY3NtuVMuhRCtelDVrunV2RdP1pCp5lLwa+ArfHdYwszX/ncrpuEDnDs3buZmWd/anBqgPpCWfeBkADlAWth2xMc5bL0Y=
+	t=1730297167; cv=none; b=gLQqQAUawavtOF80kWFSRSI58jHnnmGviA2Mka6ri8M7CTj0JNjHH2VKDNKckLZNTLZkW+pNBDZ+VwQgUFGkc3SouEBc7VqtJuiw56+nsHrLH+fd7Bxw1AcilF8zqDgkbFGc8nKfr2U4ZwFJOTOBJMrdYNthqXUyMLOrAlo0IVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730296890; c=relaxed/simple;
-	bh=6+7m6bYb0yRvXggvjkGS4Ftl7KoswgwqALAkltkMZJY=;
+	s=arc-20240116; t=1730297167; c=relaxed/simple;
+	bh=LayOEp7PIaxEFenKikZcJGmKC/G1LdQ9CnPPng8AOt8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XgWXDSb2ImZhBNHaKP7rwFaCmUZCqk72OJZBcSDwfVDNQDSNhvI3IrllChfdh8oV9ntuxypgvBS+cNybkiANQLkFYNyaQNr1yXYHJ0e9BlT2IgQKhA/5pfU7UKjNxFcDTyLURE/H7p0tqk63N/vbxPK/xPTXkXrkYdkclfQgtSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hl/5rLSk; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hl/5rLSk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC6BFC4CECE;
-	Wed, 30 Oct 2024 14:01:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730296890;
-	bh=6+7m6bYb0yRvXggvjkGS4Ftl7KoswgwqALAkltkMZJY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hl/5rLSk8xUWrwa5SZ9zEWoxtXYayiw4h5biVEPfkCNe1PLnhhaIxlW7qoL1s8OvN
-	 lD8SC4/7kV0u6BKKt+J0ggTHKjCaCm8kqrcnYoUE7uiI57FDwlBD9I9r+6tVFnJaHy
-	 accUAztW4Uo0lmN3+gxRYD8e3vOMBeicVCSYnBAoriaqNy875wtOvS1h+3eQihnzX9
-	 qntUNReqYZOF5Rgkm1bP4MmaSHEVtTgWRQDWG91zV6teHVvZrbgGBH0enCSv5vVvfg
-	 ZTQpRNSdgz/X4yuQh0+r8lHIyn3krgUmFK36eScMwEq8FmIUj9krmQ+FapM4B1AAoO
-	 mFvR+YY3QzoEQ==
-Date: Wed, 30 Oct 2024 08:01:27 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Kanchan Joshi <joshi.k@samsung.com>, Keith Busch <kbusch@meta.com>,
-	hch@lst.de, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, anuj20.g@samsung.com,
-	martin.petersen@oracle.com
-Subject: Re: [PATCH] blk-integrity: remove seed for user mapped buffers
-Message-ID: <ZyI8N3HpC_2ffxsS@kbusch-mbp.dhcp.thefacebook.com>
-References: <CGME20241016201337epcas5p33625af2c67f92092078b0b43874d67bd@epcas5p3.samsung.com>
- <20241016201309.1090320-1-kbusch@meta.com>
- <5220b70f-13e9-4f73-b611-97235db87ed5@samsung.com>
- <c156bc1f-da5c-4522-8e5d-b138a94cb7d2@kernel.dk>
- <75331d62-fb0b-41ef-9a47-2bbe78e09f9f@kernel.dk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YXvDdhoo01KnT1yIgZ1+8X2WKMHsE4f4hirUb1MYUIM6uFJmnlEJeJ13Z6R50PRLO1w3wN3DXu9B3Y1f4zDBapX4kivW+DiNJ+ZumlkRMrE00qI/mbm1ilnntExLMf+Gkl93rt92W0imIWPjcGFu++NLsvzw44gEPPBjyECgK8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id F3F13227AAE; Wed, 30 Oct 2024 15:06:01 +0100 (CET)
+Date: Wed, 30 Oct 2024 15:06:01 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org
+Subject: Re: [PATCH] loop: Use bdev limit helpers for configuring discard
+Message-ID: <20241030140601.GA29107@lst.de>
+References: <20241030111900.3981223-1-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,20 +31,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <75331d62-fb0b-41ef-9a47-2bbe78e09f9f@kernel.dk>
+In-Reply-To: <20241030111900.3981223-1-john.g.garry@oracle.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Oct 30, 2024 at 07:50:12AM -0600, Jens Axboe wrote:
-> On 10/30/24 7:47 AM, Jens Axboe wrote:
-> > On 10/30/24 7:38 AM, Kanchan Joshi wrote:
-> >> Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
-> >>
-> >> Jens,
-> >> Please see if this can be picked.
-> >> Helps to reduce a dependency for io_uring metadata series.
-> > 
-> > Keith, is this queued in the nvme tree?
-> 
-> Doesn't look like it is, picked it up.
+On Wed, Oct 30, 2024 at 11:19:00AM +0000, John Garry wrote:
+> +		granularity = bdev_discard_granularity(bdev) ?:
+> +			bdev_physical_block_size(bdev);
 
-Thanks. It has block api changes, so I usually don't presume to apply
-those patches through our nvme tree.
+The discard granularity is always set to at least the physical block
+size, so this can be simplified to:
+
+		granularity = bdev_discard_granularity(bdev);
+
