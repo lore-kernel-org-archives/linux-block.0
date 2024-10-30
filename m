@@ -1,30 +1,32 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B19F13FEE
-	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 14:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E3F1F4277
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 14:46:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730299581; cv=none; b=QDcgQQOCN9Jenm1ZCx8b11LSKM7zz4MKEGfTWfkxDoud9EBRCpe2uzzRUQvQB4Ur73/p/HApknehSEWbkjf54w0B+kFjGcJUF5s49QifMmHAZG1aMzOg4G9fJDSlRJFmjw+LsKpb3JKF19OD9KtMhEeZz9EEF6yZrKpB5SOMtfg=
+	t=1730299619; cv=none; b=JNzq/x7D1XJFYc3MyeFvQOFLTbyx8u4FBWvCEUvBWlX+jWLSkMBc9SCHaIcHIFXUz1GxFYwWpNpQ6sK+z3eJs/p7iRg3e9nzWXIx5HpiP5uTRePWFCaZNRhcL9b23dTE6nB34+xOfCcOYCAJv8gLwZdz8RnC5LwGSsZKL0P7Qbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730299581; c=relaxed/simple;
-	bh=MJP11/QvfhvD18yrQkw6920l9kku52DISNJt3+SrcTQ=;
+	s=arc-20240116; t=1730299619; c=relaxed/simple;
+	bh=6M0qlmEZ3yl4gXbTD1ep6BwaVr2X3YzV3YvrKIGdQkU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IEqBOsbp/FAfIl4nMT12iXcgVeAoKTQjTbEPkD57jIUdZzoERIYS2UdXgmmyA0UPSy7uw9UdkDLxv/RrBPCUmPHo93KYkF2ZvGldZwkM1F+ISi13ziUf4XJXTBv7LVb0UhZiJo/3F1+dR+YgUSg/omUZvZuHuH58BbnkcpcKcgE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=c5lDzA6dIcxO+OwJR+5V45cRRd/x2xUqM2pYN3wX0m1SQbxGPLE+gK7SIxsP9vgsXctsiBy/SotH7zytbKsTHtYN/vSRYVYks2yb3ge/IONsCReQKC1L5vHr8bSFi5jDUR+TyOWm3TlGiogkiXP7JGrTB73whWVt7CRa7+xqd/E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 83576227A8E; Wed, 30 Oct 2024 15:46:15 +0100 (CET)
-Date: Wed, 30 Oct 2024 15:46:14 +0100
+	id 50F02227A8E; Wed, 30 Oct 2024 15:46:53 +0100 (CET)
+Date: Wed, 30 Oct 2024 15:46:52 +0100
 From: Christoph Hellwig <hch@lst.de>
 To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 4/5] block: always verify unfreeze lock on the owner
- task
-Message-ID: <20241030144614.GC32043@lst.de>
-References: <20241030124240.230610-1-ming.lei@redhat.com> <20241030124240.230610-5-ming.lei@redhat.com>
+	Christoph Hellwig <hch@lst.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Lai Yi <yi1.lai@linux.intel.com>
+Subject: Re: [PATCH 5/5] block: don't verify IO lock for freeze/unfreeze in
+ elevator_init_mq()
+Message-ID: <20241030144652.GD32043@lst.de>
+References: <20241030124240.230610-1-ming.lei@redhat.com> <20241030124240.230610-6-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,24 +35,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241030124240.230610-5-ming.lei@redhat.com>
+In-Reply-To: <20241030124240.230610-6-ming.lei@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Oct 30, 2024 at 08:42:36PM +0800, Ming Lei wrote:
-> commit f1be1788a32e ("block: model freeze & enter queue as lock for
-> supporting lockdep") tries to apply lockdep for verifying freeze &
-> unfreeze. However, the verification is only done the outmost freeze and
-> unfreeze. This way is actually not correct because q->mq_freeze_depth
-> still may drop to zero on other task instead of the freeze owner task.
+On Wed, Oct 30, 2024 at 08:42:37PM +0800, Ming Lei wrote:
+> --- a/block/elevator.c
+> +++ b/block/elevator.c
+> @@ -598,13 +598,17 @@ void elevator_init_mq(struct request_queue *q)
+>  	 * drain any dispatch activities originated from passthrough
+>  	 * requests, then no need to quiesce queue which may add long boot
+>  	 * latency, especially when lots of disks are involved.
+> +	 *
+> +	 * Disk isn't added yet, so verifying queue lock only manually.
+>  	 */
+> -	blk_mq_freeze_queue(q);
+> +	blk_mq_freeze_queue_non_owner(q);
+> +	blk_freeze_acquire_lock(q, true, false);
+>  	blk_mq_cancel_work_sync(q);
+>  
+>  	err = blk_mq_init_sched(q, e);
+>  
+> -	blk_mq_unfreeze_queue(q);
+> +	blk_unfreeze_release_lock(q, true, false);
+> +	blk_mq_unfreeze_queue_non_owner(q);
 
-Well, that's how non-owner functions work in general.
-
-> Fix this issue by always verifying the last unfreeze lock on the owner
-> task context, and freeze lock is still verified on the outmost one.
-> 
-> Fixes: f1be1788a32e ("block: model freeze & enter queue as lock for supporting lockdep")
-
-What does this actually fix vs just improving coverage?  Because the
-hacks in here look pretty horrible and I'd be much happier if we didn't
-have them.
+Why do we need to free at all from the add_disk case?  The passthrough
+command should never hit the elevator, or am I missing something?
 
