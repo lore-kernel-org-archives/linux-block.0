@@ -1,114 +1,157 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718D01F4700;
-	Wed, 30 Oct 2024 21:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C588194C75;
+	Wed, 30 Oct 2024 21:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730322570; cv=none; b=q044QovSFzGS4i3QcUigopXhNUdJD8TWUtvM+DDGXxdZB3BAQSdYdjRZsEXp+OilqRhoFYWAxu+DxIsnX6lERQ9CFWkKtNh7co2+SmCgFXKWfts1g1of0WLuKhbXQoavK685tcQ9XgDCKGzlR0LTXWHrqUTSDn4/XeK5PS9Ll5s=
+	t=1730322932; cv=none; b=NHXChaR6TfwQAu9krlH2O6y3cJf03Odwwj24Wwr/Pu0csuQtws3MZ3N5LELj2N6R4V3SU0r/OExKwd4VLkocnJiTUtTBv7tH0F/JfKjuU0W2FDB3lvdtHQcWY3sTvM5K+Mf79CKQlahug8KeruJMO2HWxnqHJuuCcLQGzAqXKlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730322570; c=relaxed/simple;
-	bh=NBQ38qs+AbyE0Vr5iDj8caZDO5/MYkzq0hD2+YnFywI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sWnPPSFRoEsbWYyXlhdX04gCrjZx1YdsCuO+tXGcWSbpB8QTje1yYk/bEyC1uuN3q9twFG8TrRG77Az89WLkcOKIWch11E4tWYPdTDwI3p/aSfkY3P237Qe9/OVig+hJsLMfLc14+yFLlJiM6enHHXxUt+ix7ZNEj5neCqlcP9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DAKgH6Pm; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730322932; c=relaxed/simple;
+	bh=E/1gsPMYddyGtV5nOIdJOU+wxqCAx3Iy9SGPQsxfff0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=GHlJ7tS9ioshbAjm5xbU5l2N7e4nMLci33KkYe6mku49OgOaRW02PvZbYl2AHB6HQKO8phu2wLYT0t+FnoIwRDzCKabU2E1G0ud6jnQtyEHozeoHP6uBPLepW/9oq7J4Ok9Ze3wT0KnRXSpZ6i4WTDkkW3C+dANtQRDJOdK7QiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sn30FgKL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DAKgH6Pm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9A5AC4CECE;
-	Wed, 30 Oct 2024 21:09:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sn30FgKL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CAABC4CECE;
+	Wed, 30 Oct 2024 21:15:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730322569;
-	bh=NBQ38qs+AbyE0Vr5iDj8caZDO5/MYkzq0hD2+YnFywI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DAKgH6Pmk7D2XBp3rQzuXx0gmeaTve7/Q+dbQ3Anyg2ljqQvRnSqbacrTvbXsN5ou
-	 G8Fy8GdyHdrOacMUD2zMcHK37+gABPdJQGK2G/IWs5WhA4GRqbtM1Ns39tPviPAUCG
-	 UTsIBn5/d6xL267h9o1ECYi7+hqDK5lg0UVxm6czQgLXVjp9IhV3NNbPrErHeEYNsT
-	 hvxg4BlgiQ/CzplHAPDdiljSmVNrlRtXAZUimsNWCyZOl72QdmWE/5ETP0yc2xp3Ty
-	 MvW5EpmRDHStTsQrPev91kCO7hV9wdC4WP/F+aLzDNHfCuKb1kegKtFtE+T2b9PQ++
-	 BJArTVNMCczvQ==
-Date: Wed, 30 Oct 2024 15:09:26 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-	asml.silence@gmail.com, brauner@kernel.org, viro@zeniv.linux.org.uk,
-	jack@suse.cz, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-	gost.dev@samsung.com, vishak.g@samsung.com, anuj1072538@gmail.com,
-	Anuj Gupta <anuj20.g@samsung.com>
-Subject: Re: [PATCH v6 06/10] io_uring/rw: add support to send metadata along
- with read/write
-Message-ID: <ZyKghoCwbOjAxXMz@kbusch-mbp.dhcp.thefacebook.com>
-References: <20241030180112.4635-1-joshi.k@samsung.com>
- <CGME20241030181013epcas5p2762403c83e29c81ec34b2a7755154245@epcas5p2.samsung.com>
- <20241030180112.4635-7-joshi.k@samsung.com>
+	s=k20201202; t=1730322931;
+	bh=E/1gsPMYddyGtV5nOIdJOU+wxqCAx3Iy9SGPQsxfff0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=Sn30FgKLhEeH/3+fVxl55wltUvnTtRFcf2H+jqIFpQVQhKjYIW2MIjJ3539zvlwQ7
+	 aFHSPzV9u60J7nm2OKTcxsIKIW9B/h8TKgg0haIAl5XKebYk2eKrBFum7KN5okpfQS
+	 uXBnPEzxTp/daAJBIhPlkPxnSYbkxhb8pli6PVbydIBSkf9C72yj893KtGZjymrKGY
+	 eqOWMmvDOxE+IHj+DNztzEWjjZFOM90eLUjBc2Rh+jEkFeSyCIpdXlNy6jy9pBvepb
+	 xl7mygLzXHIoY0zrMbCWEXS8poSRxssdex4GamVBZABlQn1T2unvlWdGDlbUQUEoJS
+	 lFdm13L90KFiQ==
+Date: Wed, 30 Oct 2024 16:15:29 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>,
+	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+	Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Al Viro <viro@zeniv.linux.org.uk>, Li Zetao <lizetao1@huawei.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: [PATCH v8 0/6] PCI: Remove most pcim_iounmap_regions() users
+Message-ID: <20241030211529.GA1220902@bhelgaas>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241030180112.4635-7-joshi.k@samsung.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241016094911.24818-2-pstanner@redhat.com>
 
-On Wed, Oct 30, 2024 at 11:31:08PM +0530, Kanchan Joshi wrote:
-> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-> index 024745283783..48dcca125db3 100644
-> --- a/include/uapi/linux/io_uring.h
-> +++ b/include/uapi/linux/io_uring.h
-> @@ -105,6 +105,22 @@ struct io_uring_sqe {
->  		 */
->  		__u8	cmd[0];
->  	};
-> +	/*
-> +	 * If the ring is initialized with IORING_SETUP_SQE128, then
-> +	 * this field is starting offset for 64 bytes of data. For meta io
-> +	 * this contains 'struct io_uring_meta_pi'
-> +	 */
-> +	__u8	big_sqe[0];
-> +};
-> +
-> +/* this is placed in SQE128 */
-> +struct io_uring_meta_pi {
-> +	__u16		pi_flags;
-> +	__u16		app_tag;
-> +	__u32		len;
-> +	__u64		addr;
-> +	__u64		seed;
-> +	__u64		rsvd[2];
->  };
+On Wed, Oct 16, 2024 at 11:49:03AM +0200, Philipp Stanner wrote:
+> Merge plan for this is the PCI-Tree.
+> 
+> After this series, only two users (net/ethernet/stmicro and
+> vdpa/solidrun) will remain to be ported in the subsequent merge window.
+> Doing them right now proved very difficult because of various conflicts
+> as they are currently also being reworked.
+> 
+> Changes in v8:
+>   - Patch "gpio: ..": Fix a bug: don't print the wrong error code. (Simon)
+>   - Split patch 1 into two patches to make adding of the new public API
+>     obvious (Bartosz)
+>   - Patch "ethernet: cavium: ...": Remove outdated sentences from the
+>     commit message.
+> 
+> Changes in v7:
+>   - Add Paolo's Acked-by.
+>   - Rebase on current master; drop patch No.1 which made
+>     pcim_request_region() public.
+> 
+> Changes in v6:
+>   - Remove the patches for "vdpa: solidrun" since the maintainer seems
+>     unwilling to review and discuss, not to mention approve, anything
+>     that is part of a wider patch series across other subsystems.
+>   - Change series's name to highlight that not all callers are removed
+>     by it.
+> 
+> Changes in v5:
+>   - Patch "ethernet: cavium": Re-add accidentally removed
+>     pcim_iounmap_region(). (Me)
+>   - Add Jens's Reviewed-by to patch "block: mtip32xx". (Jens)
+> 
+> Changes in v4:
+>   - Drop the "ethernet: stmicro: [...] patch since it doesn't apply to
+>     net-next, and making it apply to that prevents it from being
+>     applyable to PCI ._. (Serge, me)
+>   - Instead, deprecate pcim_iounmap_regions() and keep "ethernet:
+>     stimicro" as the last user for now.
+>   - ethernet: cavium: Use PTR_ERR_OR_ZERO(). (Andy)
+>   - vdpa: solidrun (Bugfix) Correct wrong printf string (was "psnet" instead of
+>     "snet"). (Christophe)
+>   - vdpa: solidrun (Bugfix): Add missing blank line. (Andy)
+>   - vdpa: solidrun (Portation): Use PTR_ERR_OR_ZERO(). (Andy)
+>   - Apply Reviewed-by's from Andy and Xu Yilun.
+> 
+> Changes in v3:
+>   - fpga/dfl-pci.c: remove now surplus wrapper around
+>     pcim_iomap_region(). (Andy)
+>   - block: mtip32xx: remove now surplus label. (Andy)
+>   - vdpa: solidrun: Bugfix: Include forgotten place where stack UB
+>     occurs. (Andy, Christophe)
+>   - Some minor wording improvements in commit messages. (Me)
+> 
+> Changes in v2:
+>   - Add a fix for the UB stack usage bug in vdap/solidrun. Separate
+>     patch, put stable kernel on CC. (Christophe, Andy).
+>   - Drop unnecessary pcim_release_region() in mtip32xx (Andy)
+>   - Consequently, drop patch "PCI: Make pcim_release_region() a public
+>     function", since there's no user anymore. (obsoletes the squash
+>     requested by Damien).
+>   - vdap/solidrun:
+>     • make 'i' an 'unsigned short' (Andy, me)
+>     • Use 'continue' to simplify loop (Andy)
+>     • Remove leftover blank line
+>   - Apply given Reviewed- / acked-bys (Andy, Damien, Bartosz)
+> 
+> 
+> Important things first:
+> This series is based on [1] and [2] which Bjorn Helgaas has currently
+> queued for v6.12 in the PCI tree.
+> 
+> This series shall remove pcim_iounmap_regions() in order to make way to
+> remove its brother, pcim_iomap_regions().
+> 
+> Regards,
+> P.
+> 
+> [1] https://lore.kernel.org/all/20240729093625.17561-4-pstanner@redhat.com/
+> [2] https://lore.kernel.org/all/20240807083018.8734-2-pstanner@redhat.com/
+> 
+> Philipp Stanner (6):
+>   PCI: Make pcim_iounmap_region() a public function
+>   PCI: Deprecate pcim_iounmap_regions()
+>   fpga/dfl-pci.c: Replace deprecated PCI functions
+>   block: mtip32xx: Replace deprecated PCI functions
+>   gpio: Replace deprecated PCI functions
+>   ethernet: cavium: Replace deprecated PCI functions
+> 
+>  drivers/block/mtip32xx/mtip32xx.c              | 18 ++++++++----------
+>  drivers/fpga/dfl-pci.c                         | 16 ++++------------
+>  drivers/gpio/gpio-merrifield.c                 | 15 ++++++++-------
+>  .../net/ethernet/cavium/common/cavium_ptp.c    |  7 +++----
+>  drivers/pci/devres.c                           |  8 ++++++--
+>  include/linux/pci.h                            |  1 +
+>  6 files changed, 30 insertions(+), 35 deletions(-)
 
-On the previous version, I was more questioning if it aligns with what
-Pavel was trying to do here. I didn't quite get it, so I was more
-confused than saying it should be this way now.
-
-But I personally think this path makes sense. I would set it up just a
-little differently for extended sqe's so that the PI overlays a more
-generic struct that other opcodes might find a way to use later.
-Something like:
-
-struct io_uring_sqe_ext {
-	union {
-		__u32	rsvd0[8];
-		struct {
-			__u16		pi_flags;
-			__u16		app_tag;
-			__u32		len;
-			__u64		addr;
-			__u64		seed;
-		} rw_pi;
-	};
-	__u32	rsvd1[8];
-};
-  
-> @@ -3902,6 +3903,9 @@ static int __init io_uring_init(void)
->  	/* top 8bits are for internal use */
->  	BUILD_BUG_ON((IORING_URING_CMD_MASK & 0xff000000) != 0);
->  
-> +	BUILD_BUG_ON(sizeof(struct io_uring_meta_pi) >
-> +		     sizeof(struct io_uring_sqe));
-
-Then this check would become:
-
-	BUILD_BUG_ON(sizeof(struct io_uring_sqe_ext) != sizeof(struct io_uring_sqe));
+Applied to pci/devm for v6.13, thanks!
