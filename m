@@ -1,129 +1,90 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3033817579
-	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 13:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041DA61FFE
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 13:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730294454; cv=none; b=YI6lkND/cU3p6uW8S3vnJETLOk6B/SsKvPyXCt2OEjIHMBsBlzOSIbb9XJO81RvUteTDiMKxPc+cUZ87U+40DUBffM5ajKXjsWZViRvlQr9/2NgliG10U5Dc4SxPgr0i86dpTmpd0duRzd4LemuYLo++1bOJCv+AlJbkE4FUn4c=
+	t=1730294646; cv=none; b=FaG+yhoUwVBt6+u44EXqTedT+Hq8adcJeuSFi9lK5oWT5bSInrslSaEHl0MliAx9hY/cUzLe6F7Hrv8rQycXN1O1ohNDHH9tLf0EbkGIi9f/6jmasu3cXQ8kWfxllTm9CqN8miJARK5JDUpBwUVSNyUTRZVgKDePXAQMPan3yzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730294454; c=relaxed/simple;
-	bh=V2WPzvbbzQfgwMPqDzWNQTTXVsQclLVGxXXHSG2cCNs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bAslIWVz5/056jdEaBeHb49iWM2vesvc9Esu/fFIRatvs99XHpInaPdb9nAfp8IPS6Amxxb9Mh1sRL5BxclTSo6wtJ58SU7EOrlrVJUJWiMlxsjOXO9Ls1Y5J46lx716lXmHvQ3szP5mB4gcSLLw+ohFzvZNvXcWr+hEoLgqty4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nRhcURT1; arc=none smtp.client-ip=209.85.166.41
+	s=arc-20240116; t=1730294646; c=relaxed/simple;
+	bh=J4tNvFsAU0oyy9UJe1JV0ODTjjbe3y8f/cZKSxCiCQA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=kDrmQNQI3ajZdcgRliMRZi5u5cNicbj/Bpfj6L6hsGJSGyLQhV9HrnKMHVDmzsGfJnxh27at++T0yQD8GFqNbUrEdOEjy+glrddiSSh9GidnvaZeU8zyBx7DWhruEmfo4X9VqjjCrVd3lWx9+VKWui61pRv4INnbg2xJXoVhKKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=W23MSUd+; arc=none smtp.client-ip=209.85.166.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nRhcURT1"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-83abf71f244so218796439f.1
-        for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 06:20:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="W23MSUd+"
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3a4e30bffe3so19888155ab.3
+        for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 06:24:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730294451; x=1730899251; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=adEXhwMuT7QHQGAB5KoTePWRnBbGG1A5V3HCE+rDC+o=;
-        b=nRhcURT1AraPTZ0t2yvM6LqmMSOkCqYedi7vPWrPvC1LXynylZBn8gqQM6z1VySTzJ
-         EzzOtM41qobpejSVIUiNmhd8OCPCw4ZFIwPkouQxXf/kgGl+UsjygV3Au9o/6+Ffd/xz
-         vybWRP6QquJwqZ/qgQpSfgrrWv6QgnIsPMAHDQyEnVNYtpyoa8EYyYKV77WSSlYpY3Kf
-         Vhk9oqFNFaUTY/XXigSgjV+MQ91wNNsytA0ii0BIWZubUdHyLxsYQB4gW9YSoa6cMA/r
-         bMhSmhffGbbD4n8MTJHV1e2ZEEqLKGfsyfqYx4E41yWIIzsQE4cM5cnPu+oLEcpzSTW0
-         yrlQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730294643; x=1730899443; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WuLcwxvg4aKVVQpXc9RHyDJ1aHCs6rFcVSR3V26kh/Q=;
+        b=W23MSUd+DxIIZTU5mQ3ITNPmp1Y0AEPf52SXCt+tn0AsKGBFxZjiS1F4uDlFnDl/e1
+         NejQJ8esUxSCD9UnSQld7ypILQCLg62biNmK0FnAtkIOcoGgMIxD2SmHBnRTYYongZCC
+         IWAd9xttcDmSfK4odprRAmqogSBJx+qCWpSa+v0zpk5RlQlAgJ4+gV7veouuDbMfiZro
+         037J8X/3PtisMoBNP6iqDJvtak/gysRc/KCkHVjkAC0w4dZFkInYTe/NR8NGqYMaf2p7
+         WvVPlrZoq3jVLJfk2YPxvMwVFmv2LxTbHvicYe+wZhxo408CNUeJNIwGvl+RHOq3L1Pu
+         /YKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730294451; x=1730899251;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=adEXhwMuT7QHQGAB5KoTePWRnBbGG1A5V3HCE+rDC+o=;
-        b=abPo7yER4TBaNgmyMfUFNaKvyqVljKLAe+mwF4k7XX633MxrBm4SNEOIFZHgHwAhWL
-         m14xAxj1hxa3bV9mK5ttnaJR+Tpm+QHIE+usgGpiEULR+WUWrQUZsYTXSJJ8hnKdP2h0
-         35z4bHbXpk/P1A5NrWFsOYKjKk8ksQ3kKy2FW//sSK4Zc6mkTNq0C4fz4pN+dxDMuryl
-         j5wy339GPsUM3eSCQXSMn/k14v8XUuM6gpUCRy/APnkt5vWGJiUj5RlOt3kuAxch0cPH
-         /SsqnbKEe+r5X3+K4+lcc0Cw5EgkXlta/ayMWjlm+tdtYh50bt1lqgqwz4MTN8QwLE6L
-         8I3g==
-X-Forwarded-Encrypted: i=1; AJvYcCU9XOSRaiFX0CLTbaN75HI8NsAh7PPZFqq86zbpe1GeIlJtFJd1ayLntu10/OxHNvcDYhsCMhju/IpGhw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFOuEs7NNmvrzdYgLfKE1zRbLb1hJghr0TkKZcYKJXrzth9sxZ
-	7cVeXWsRivrAw+g5h1Dldh4xY0w6/Ir4Lq8SlawoeUEirkTqJGqBngLJmp7p6sI=
-X-Google-Smtp-Source: AGHT+IE1gya8DOKv02mrGw2idtxQZHTZ4tVr3O33fc42BDUiQhAjx67dZQQUsUaBW8z5Sau94zjOGA==
-X-Received: by 2002:a05:6602:6343:b0:83b:29a5:ff89 with SMTP id ca18e2360f4ac-83b29a602bamr1106197239f.15.1730294451146;
-        Wed, 30 Oct 2024 06:20:51 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc727ae9cdsm2840996173.158.2024.10.30.06.20.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Oct 2024 06:20:50 -0700 (PDT)
-Message-ID: <d986221d-7399-4487-9c28-5d6f953510cd@kernel.dk>
-Date: Wed, 30 Oct 2024 07:20:48 -0600
+        d=1e100.net; s=20230601; t=1730294643; x=1730899443;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WuLcwxvg4aKVVQpXc9RHyDJ1aHCs6rFcVSR3V26kh/Q=;
+        b=F50B6aKH76h3BTC0FUAu3PZZcVxlfMxI/4iYKNPiqUzybq6qOYqi1LRxSJ2mw9gTHE
+         oM3rfGUa76NsGxTAnc+nd8GUFZhwRL3uGJZ2DPQVE4KCbzuxZM2MUSiXj07Lq2tbGMyr
+         KSxNmhzdfQ17yuWpIBAH7ERnjJX9VLzeXEfWjlCY1Y6vz4TEIo/kfx0Wipl3r8tehyvf
+         Hixni0gtGmV0iAmPWxuOfFg6krBc6URGaa7+fqoY15NWBUo3PQRCGehd5IzeRi/9nw4u
+         IZmyLbUQsjzyiyrXascXq7eggZb+3Ee4dEaBur1geMhUX/QsbabLksCcaIb8DXpSEo0F
+         hhOw==
+X-Gm-Message-State: AOJu0Yyku3bWFMN2OYYIBjgdr1j6Rum3ZGi2UJ05QK4aveUCCp45vT59
+	Nz4ZRkznjEjm2bs/xMbaUH4pj355il8t2PZRO9jXMWsDllwgArG+d8l+6XdWuo/0zhwnTNU2Xm+
+	D
+X-Google-Smtp-Source: AGHT+IFR/MjiFjAkiXS3+6bu1Wp8NyiD8RP57EybP/Y0iKTte8U3yjnanm2Sh/eZ2zuLlWhRpLDuVQ==
+X-Received: by 2002:a05:6e02:1528:b0:3a3:b593:83a4 with SMTP id e9e14a558f8ab-3a4ed295bb6mr138461035ab.14.1730294643309;
+        Wed, 30 Oct 2024 06:24:03 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a5e7c159c5sm943025ab.74.2024.10.30.06.24.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2024 06:24:02 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: hch@lst.de, John Garry <john.g.garry@oracle.com>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20241030111900.3981223-1-john.g.garry@oracle.com>
+References: <20241030111900.3981223-1-john.g.garry@oracle.com>
+Subject: Re: [PATCH] loop: Use bdev limit helpers for configuring discard
+Message-Id: <173029464188.11526.7633767288761868544.b4-ty@kernel.dk>
+Date: Wed, 30 Oct 2024 07:24:01 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V8 0/8] io_uring: support sqe group and leased group kbuf
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
- Akilesh Kailash <akailash@google.com>
-References: <20241025122247.3709133-1-ming.lei@redhat.com>
- <15b9b1e0-d961-4174-96ed-5a6287e4b38b@gmail.com>
- <d859c85c-b7bf-4673-8c77-9d7113f19dbb@kernel.dk>
- <bc44d3c0-41e8-425c-957f-bad70aedcc50@kernel.dk>
- <e76d9742-5693-4057-b925-3917943c7441@kernel.dk>
- <f51e50c8-271e-49b6-b3e1-a63bf61d7451@kernel.dk> <ZyGT3h5jNsKB0mrZ@fedora>
- <674e8c3c-1f2c-464a-ad59-da3d00104383@kernel.dk> <ZyGjID-17REc9X3e@fedora>
- <ZyGx4JBPdU4VlxlZ@fedora>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZyGx4JBPdU4VlxlZ@fedora>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-On 10/29/24 10:11 PM, Ming Lei wrote:
-> On Wed, Oct 30, 2024 at 11:08:16AM +0800, Ming Lei wrote:
->> On Tue, Oct 29, 2024 at 08:43:39PM -0600, Jens Axboe wrote:
-> 
-> ...
-> 
->>> You could avoid the OP dependency with just a flag, if you really wanted
->>> to. But I'm not sure it makes a lot of sense. And it's a hell of a lot
->>
->> Yes, IO_LINK won't work for submitting multiple IOs concurrently, extra
->> syscall makes application too complicated, and IO latency is increased.
->>
->>> simpler than the sqe group scheme, which I'm a bit worried about as it's
->>> a bit complicated in how deep it needs to go in the code. This one
->>> stands alone, so I'd strongly encourage we pursue this a bit further and
->>> iron out the kinks. Maybe it won't work in the end, I don't know, but it
->>> seems pretty promising and it's soooo much simpler.
->>
->> If buffer register and lookup are always done in ->prep(), OP dependency
->> may be avoided.
-> 
-> Even all buffer register and lookup are done in ->prep(), OP dependency
-> still can't be avoided completely, such as:
-> 
-> 1) two local buffers for sending to two sockets
-> 
-> 2) group 1: IORING_OP_LOCAL_KBUF1 & [send(sock1), send(sock2)]  
-> 
-> 3) group 2: IORING_OP_LOCAL_KBUF2 & [send(sock1), send(sock2)]
-> 
-> group 1 and group 2 needs to be linked, but inside each group, the two
-> sends may be submitted in parallel.
 
-That is where groups of course work, in that you can submit 2 groups and
-have each member inside each group run independently. But I do think we
-need to decouple the local buffer and group concepts entirely. For the
-first step, getting local buffers working with zero copy would be ideal,
-and then just live with the fact that group 1 needs to be submitted
-first and group 2 once the first ones are done.
+On Wed, 30 Oct 2024 11:19:00 +0000, John Garry wrote:
+> Instead of directly looking at the request_queue limits, use the bdev
+> limits helpers, which is preferable.
+> 
+> 
 
-Once local buffers are done, we can look at doing the sqe grouping in a
-nice way. I do think it's a potentially powerful concept, but we're
-going to make a lot more progress on this issue if we carefully separate
-dependencies and get each of them done separately.
+Applied, thanks!
 
+[1/1] loop: Use bdev limit helpers for configuring discard
+      commit: 8d3fd059dd289e6c322e5741ad56794bcce699a2
+
+Best regards,
 -- 
 Jens Axboe
+
+
+
