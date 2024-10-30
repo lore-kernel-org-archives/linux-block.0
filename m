@@ -1,58 +1,58 @@
 Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518491CEAA9
-	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 18:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4631CF28C
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 18:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730311817; cv=none; b=GGtqGmNe9qkH8JLc2fSopojvj3w7pohi181YtdWkRmel2JVFXe1QV0Sh9bgSKMt69HCouVbOLGy4zVmqCjY6mxOjVRRsqPZeqvwowGTfPOf38ZP636gQZSb4F2VEU5KVoCjmx4N1FrttcHtOkQjPZPQPKtUlibD7csaQFXkpbBM=
+	t=1730311821; cv=none; b=nW+3AQQHl6LLisXzhUffnIDRrHGPZ3yWyY/oy6lwBdsnU5XkNZ29ZK7G1Sb20w+yVIQ8cEA4vs3B9nQIasKhNYPeaCvYxrt3dodXqQ7Il99aPDkg79o/QuKZ4e9qvzbf2ImApUBC8XznosMFKvGvMwD/RMGbsV9vJqkgxOYrq1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730311817; c=relaxed/simple;
-	bh=hG8FiFxjxXyHm56h0ScdIRfLd6/tK9OnEVj8jZ9gfhM=;
+	s=arc-20240116; t=1730311821; c=relaxed/simple;
+	bh=h61XHxtGBrHbySmSN02hKHgmG5g4G7WHzdsPAzbYfm8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=fU72vEyDwo9WRGbkjaz2xbMAJ/PSY3DtgM+ycdTiMNfSKBCbso2YKumLSDzFQtV5QY1MjV/qafK26ngU+bGzHH416XSjPe0dBJc5zRgaP+1sClGvilyEmh1TfL01vxwlU2eilIb1QQItDHrJfr5TZ03JQUV8MLa28oAlfTSRJ28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=c0a6J53k; arc=none smtp.client-ip=203.254.224.33
+	 Content-Type:References; b=r8gwRd67jMD8hI6c0hDOW1br0tQDoW8i+CfjjoVElGNjlvNAgkTwbqe4uaVdVLM1QWvGrrxmX2Sp+C5p/GWC1a1Qje4Nquxb43RmFVK7uI2LDT+Y53nJFWJepUCgK1u6pv1QYfmwLJJOlIHVVQZgd3Hh+C+GhSovMwvUI2MqsOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=D4Za6GJp; arc=none smtp.client-ip=203.254.224.33
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="c0a6J53k"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20241030181010epoutp03df57531cd0f9af3b6f48d7f967be999b~DTWysEAMt2983429834epoutp03B
-	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 18:10:10 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20241030181010epoutp03df57531cd0f9af3b6f48d7f967be999b~DTWysEAMt2983429834epoutp03B
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="D4Za6GJp"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20241030181016epoutp031c484c36e0b566b599e0be627d8e3478~DTW3Zr6-U2983429834epoutp03D
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 18:10:16 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20241030181016epoutp031c484c36e0b566b599e0be627d8e3478~DTW3Zr6-U2983429834epoutp03D
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1730311811;
-	bh=FoqnIJwb0Z3BnzujRfjpSNb42rOvps9u7WH0JkZKm6o=;
+	s=mail20170921; t=1730311816;
+	bh=5dd6k7v+UY0om6PeVSUR7s0B1t3uJAXmfinngCFpk1k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c0a6J53kQrvpkw4H3N36rP6hx2PHTDRbkQbDWb8ahLiNn6psOcWc1KKHK/HDzBgwg
-	 BlVlu/Mxx8Zf+52Kk40DP16UMI0u4yI6BHJM71Wc6w32mX2SLqikE7a2a07MyZwm6O
-	 kySpznkTwkvUj6TUNFxSkUAT3E8lSJ1hV6qTyG5A=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20241030181010epcas5p4abd6dbdfe08bded4bc46cd5a8c29a441~DTWx4z0jp0638906389epcas5p49;
-	Wed, 30 Oct 2024 18:10:10 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.176]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4XdwC46dSXz4x9Pq; Wed, 30 Oct
-	2024 18:10:08 +0000 (GMT)
+	b=D4Za6GJpWfyf4nCcwWCbr5+X9LhoM1ZMxeMRXxPlgxoDOHzSpIHkNzTQjj5EIiZqj
+	 iA6z+PhqzXdChhXnnWrns07OSoxqSwwSZ7462se6a7o+bDvzyETn7kZkZxPUcGUkLU
+	 UkKcN+kusNri58GnLZNpWU0jk1rYLusWqxwJN+4k=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20241030181015epcas5p2794e489d89aa91e8f2874c02a9fe9736~DTW2wncmu2064320643epcas5p2D;
+	Wed, 30 Oct 2024 18:10:15 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.178]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4XdwCB1Dn5z4x9Pt; Wed, 30 Oct
+	2024 18:10:14 +0000 (GMT)
 Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	07.ED.08574.08672276; Thu, 31 Oct 2024 03:10:08 +0900 (KST)
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	08.84.09800.68672276; Thu, 31 Oct 2024 03:10:14 +0900 (KST)
 Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20241030181008epcas5p333603fdbf3afb60947d3fc51138d11bf~DTWwVJnWa1475114751epcas5p3f;
-	Wed, 30 Oct 2024 18:10:08 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20241030181013epcas5p2762403c83e29c81ec34b2a7755154245~DTW1PNGss2977629776epcas5p2B;
+	Wed, 30 Oct 2024 18:10:13 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
 	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20241030181008epsmtrp2606d4ffa7080df4891ded85dec9cad92~DTWwP4H8P1079210792epsmtrp2G;
-	Wed, 30 Oct 2024 18:10:08 +0000 (GMT)
-X-AuditID: b6c32a44-93ffa7000000217e-e9-67227680801c
+	20241030181013epsmtrp214ca5e4a527ae130fe7e2b15a6fc637e~DTW1N4vn81079110791epsmtrp2K;
+	Wed, 30 Oct 2024 18:10:13 +0000 (GMT)
+X-AuditID: b6c32a4b-23fff70000002648-b8-67227686650c
 Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	AB.78.08229.08672276; Thu, 31 Oct 2024 03:10:08 +0900 (KST)
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	28.69.07371.58672276; Thu, 31 Oct 2024 03:10:13 +0900 (KST)
 Received: from localhost.localdomain (unknown [107.99.41.245]) by
 	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20241030181005epsmtip267b17ad271ee69c5084ac7f152967aaf~DTWt2IfN90238402384epsmtip2p;
-	Wed, 30 Oct 2024 18:10:05 +0000 (GMT)
+	20241030181011epsmtip223d455f1a907e45b745108614a8aeb73~DTWywP6is0686406864epsmtip2i;
+	Wed, 30 Oct 2024 18:10:10 +0000 (GMT)
 From: Kanchan Joshi <joshi.k@samsung.com>
 To: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
 	martin.petersen@oracle.com, asml.silence@gmail.com, brauner@kernel.org,
@@ -62,9 +62,10 @@ Cc: linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
 	linux-scsi@vger.kernel.org, gost.dev@samsung.com, vishak.g@samsung.com,
 	anuj1072538@gmail.com, Anuj Gupta <anuj20.g@samsung.com>, Kanchan Joshi
 	<joshi.k@samsung.com>
-Subject: [PATCH v6 04/10] fs, iov_iter: define meta io descriptor
-Date: Wed, 30 Oct 2024 23:31:06 +0530
-Message-Id: <20241030180112.4635-5-joshi.k@samsung.com>
+Subject: [PATCH v6 06/10] io_uring/rw: add support to send metadata along
+ with read/write
+Date: Wed, 30 Oct 2024 23:31:08 +0530
+Message-Id: <20241030180112.4635-7-joshi.k@samsung.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241030180112.4635-1-joshi.k@samsung.com>
 Precedence: bulk
@@ -74,104 +75,291 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrLJsWRmVeSWpSXmKPExsWy7bCmhm5DmVK6wbmF+hYfv/5msWia8JfZ
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrAJsWRmVeSWpSXmKPExsWy7bCmhm5bmVK6wZVlrBYfv/5msWia8JfZ
 	Ys6qbYwWq+/2s1m8PvyJ0eLmgZ1MFitXH2WyeNd6jsVi9vRmJouj/9+yWUw6dI3RYu8tbYs9
 	e0+yWMxf9pTdovv6DjaL5cf/MVmc/3uc1eL8rDnsDkIeO2fdZfe4fLbUY9OqTjaPzUvqPXbf
 	bGDz+Pj0FotH35ZVjB5nFhxh9/i8Sc5j05O3TAFcUdk2GamJKalFCql5yfkpmXnptkrewfHO
 	8aZmBoa6hpYW5koKeYm5qbZKLj4Bum6ZOUA/KSmUJeaUAoUCEouLlfTtbIryS0tSFTLyi0ts
-	lVILUnIKTAr0ihNzi0vz0vXyUkusDA0MjEyBChOyM3YeWMdacIm34tWa30wNjNO5uxg5OCQE
-	TCQeN5R1MXJyCAnsZpR4cs60i5ELyP7EKHF+yy9WCOcbo8T37/9YQapAGmZ8esAGkdjLKPH6
-	xwxmCOczo8TyVVvZQMayCWhKXJhcCtIgIrCUUWLl9WiQGmaB5UwS79ZPYQSpERZwlPh0Xh+k
-	hkVAVaLn32EWEJtXwFzi/sPZTBDL5CVmXvrODmJzClhIfNhxE6pGUOLkzCdgNjNQTfPW2WA3
-	SAg84JBYuvgfC0Szi0Tv1BmMELawxKvjW9ghbCmJz+/2skHY2RIPHj2Aqq+R2LG5D+pLe4mG
-	PzdYQe5kBvpl/S59iF18Er2/nzBBQo5XoqNNCKJaUeLepKdQneISD2csYYUo8ZCYu7kSEjrd
-	jBIfTi5nn8AoPwvJB7OQfDALYdkCRuZVjJKpBcW56anJpgWGeanl8FhNzs/dxAhO11ouOxhv
-	zP+nd4iRiYPxEKMEB7OSCK9lkGK6EG9KYmVValF+fFFpTmrxIUZTYBBPZJYSTc4HZoy8knhD
-	E0sDEzMzMxNLYzNDJXHe161zU4QE0hNLUrNTUwtSi2D6mDg4pRqY7nrN3LRfcdqU9K/rF2wW
-	KV59YkvJ9I8tDmySvJEzlWpYFhdzHz394tGfxboz1k2dbS1y9MdjB9svasWaTTdP9ntPlQuv
-	5FzVdNW33r5PbbfLv6COA57Su05tlr3iUxzL/vkO+91zDG/PL64XE1N8eufzAtX3EnzHviVb
-	VFzfPEnk9/878ZdvVtyu3JTT/r1mga21VcXVb3791w84Lwllq/lhenuXfs/yG1Pv3pn05rn9
-	vjmepR3+gS+c9fieGUVe0zi6ddmakpk3+BSqz+tXGs46dbXsvtJHPZnfyXdnuP02eLw0h7XI
-	KZVh2cvvL9W39W3U3LVLaGu//+7SV3svq2zb41Bu5vhbUmrSArtfiq5KLMUZiYZazEXFiQBf
-	/ecGYAQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprMIsWRmVeSWpSXmKPExsWy7bCSvG5DmVK6wfvtghYfv/5msWia8JfZ
+	lVILUnIKTAr0ihNzi0vz0vXyUkusDA0MjEyBChOyM/53nWUvaLWqmNj8ma2BsUu/i5GTQ0LA
+	RGJ63x32LkYuDiGB3YwSezbfYYNwPjFKrNozgRXC+cYocbb7BQtMy8yH0xghEnsZJY5+mgDV
+	/5lR4sXXJ0AtHBxsApoSFyaXgjSICCxllFh5PRqkhllgOZPEu/VTGEESwgLREj0LtoFNZRFQ
+	ldg3ewcziM0rYC6x5MxVRoht8hIzL31nB7E5BSwkPuy4yQJRIyhxcuYTMJsZqKZ562xmiPo7
+	HBKH9qVA2C4S6760Ql0tLPHq+BZ2CFtK4vO7vWwQdrbEg0cPoGpqJHZs7mOFsO0lGv7cAPuF
+	GeiX9bv0IVbxSfT+fsIEEpYQ4JXoaBOCqFaUuDfpKVSnuMTDGUugbA+JLW93QMOqGxg8G9pZ
+	JjDKz0LywSwkH8xC2LaAkXkVo2RqQXFuemqxaYFxXmo5PGKT83M3MYKTtpb3DsZHDz7oHWJk
+	4mA8xCjBwawkwmsZpJguxJuSWFmVWpQfX1Sak1p8iNEUGMQTmaVEk/OBeSOvJN7QxNLAxMzM
+	zMTS2MxQSZz3devcFCGB9MSS1OzU1ILUIpg+Jg5OqQamvOdNO5fo3d8ssXdG+43yReoqT3Wf
+	dpg/bMzyX/PTNCTz5oqdP5K3O3OE7ji+feHZXRM/J8z3+7FOW3oLx633Fz8vPRyn8du726FL
+	3mo17/7a+8VPf6Q9zxFSTU05d4a//W5zkdiuqowwtyjvViOeXefDJVTqb+78otQRrddix8yo
+	MaVtC0exRmCBxn/Nw29O5ZnPuru4MzzMTy2f/5t459fPF0JWxHrO3bHs77YZT5juTLJ5HWe/
+	yuQUw8vAXS1+1/IqQxqaGBX2ba5xqqq6Xzs1xTNGlbP3+fRlN1+tFc+aMnHHik7Fg4K7KxOV
+	kw+JHNw8l0vIeIaoa4z/S+eK0guWWQ+XGM29llHxr2i/EktxRqKhFnNRcSIALFfmX2MEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKIsWRmVeSWpSXmKPExsWy7bCSvG5rmVK6wekVKhYfv/5msWia8JfZ
 	Ys6qbYwWq+/2s1m8PvyJ0eLmgZ1MFitXH2WyeNd6jsVi9vRmJouj/9+yWUw6dI3RYu8tbYs9
 	e0+yWMxf9pTdovv6DjaL5cf/MVmc/3uc1eL8rDnsDkIeO2fdZfe4fLbUY9OqTjaPzUvqPXbf
-	bGDz+Pj0FotH35ZVjB5nFhxh9/i8Sc5j05O3TAFcUVw2Kak5mWWpRfp2CVwZOw+sYy24xFvx
-	as1vpgbG6dxdjJwcEgImEjM+PWDrYuTiEBLYzSix4MM7NoiEuETztR/sELawxMp/z8FsIYGP
-	jBIPPnl1MXJwsAloSlyYXArSKyKwnlHi7N4JLCAOs8BGJokpG88xghQJCzhKfDqvD9LLIqAq
-	0fPvMAuIzStgLnH/4WwmiPnyEjMvfQebzylgIfFhx00WiF3mEtcXnmGHqBeUODnzCVicGai+
-	eets5gmMArOQpGYhSS1gZFrFKJlaUJybnltsWGCYl1quV5yYW1yal66XnJ+7iREcb1qaOxi3
-	r/qgd4iRiYPxEKMEB7OSCK9lkGK6EG9KYmVValF+fFFpTmrxIUZpDhYlcV7xF70pQgLpiSWp
-	2ampBalFMFkmDk6pBqajO/kY6lWvq+zc2Vbtwsg8J9qxOKeCc/WbpGkPHPXvtPR/qr8UJm6b
-	ui/ZzmsrE8/HVaWS2xY8+y7SOr3orYpm6I7nrxd2P9C8yq5nsFtfciqnzanpjzbITWOq3Ldn
-	3uG8MvNpn6OPMlkzJBS9eS50ielPp5Sp39Sv9//NmRYVHZ+fLbrcdTH380y5aJMXZjv2Hlrt
-	spRBMW3upimc2gHcxf613YuFrv20Ppv0s+ysyZ42g01+d/ZfupXePbe/JGH9rn2v2WMN7MJ2
-	JU9aV+YqoitxxnPqeavLNX8lO48y/M1lW3VnTvNW5sz0+SIRz+1nrnL69PfHlb/bXi1UrH3/
-	ZJd/jPKhh9wbJa5du/NOiaU4I9FQi7moOBEAYQnKiyYDAAA=
-X-CMS-MailID: 20241030181008epcas5p333603fdbf3afb60947d3fc51138d11bf
+	bGDz+Pj0FotH35ZVjB5nFhxh9/i8Sc5j05O3TAFcUVw2Kak5mWWpRfp2CVwZ/7vOshe0WlVM
+	bP7M1sDYpd/FyMkhIWAiMfPhNMYuRi4OIYHdjBKrHnczQyTEJZqv/WCHsIUlVv57zg5R9JFR
+	4sGt00AOBwebgKbEhcmlIHERgfWMEmf3TmABcZgFNjJJTNl4jhGkW1ggUuLkhBOsIDaLgKrE
+	vtk7wDbwCphLLDlzlRFig7zEzEvfwbZxClhIfNhxkwXEFgKqub7wDDtEvaDEyZlPwOLMQPXN
+	W2czT2AUmIUkNQtJagEj0ypGydSC4tz03GTDAsO81HK94sTc4tK8dL3k/NxNjOCY09LYwXhv
+	/j+9Q4xMHIyHGCU4mJVEeC2DFNOFeFMSK6tSi/Lji0pzUosPMUpzsCiJ8xrOmJ0iJJCeWJKa
+	nZpakFoEk2Xi4JRqYEp4f3Plbunbpxs9mr0Pnu/z7uT607BkV4n3bjbZsnkN/hwX2+2aaqVy
+	003TtiQLh/NK886L+RO4PLo2sVNU2d3saYnOL2tn+YUpm0/FSZ389CTSgOVH7lHWdq4wc52z
+	c4+5ZFawO99c8mda3dXeL1lBDp0xui+OHXr6hvGZwqOC/jjBZuOemoprB/d9O1AkI/lc0U78
+	qOnxXwuXhQWsOvCzXYvZ7RlfzepJKdbSflazNWdmuvmUMYhxBN9x4hHZ/eTKXDvd3zMN3B+d
+	jLF2WHVnMU+91ul3yUUnvtftzFpy1+3+7+kPslOd+Zd/Ed3/85fIIvv2lTpnbXd9vXK59Lpt
+	n7zAt6DvQcU/vNa9VmIpzkg01GIuKk4EAFI9WC8oAwAA
+X-CMS-MailID: 20241030181013epcas5p2762403c83e29c81ec34b2a7755154245
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 CMS-TYPE: 105P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20241030181008epcas5p333603fdbf3afb60947d3fc51138d11bf
+X-CMS-RootMailID: 20241030181013epcas5p2762403c83e29c81ec34b2a7755154245
 References: <20241030180112.4635-1-joshi.k@samsung.com>
-	<CGME20241030181008epcas5p333603fdbf3afb60947d3fc51138d11bf@epcas5p3.samsung.com>
+	<CGME20241030181013epcas5p2762403c83e29c81ec34b2a7755154245@epcas5p2.samsung.com>
 
 From: Anuj Gupta <anuj20.g@samsung.com>
 
-Add flags to describe checks for integrity meta buffer. Also, introduce
-a  new 'uio_meta' structure that upper layer can use to pass the
-meta/integrity information.
+This patch adds the capability of passing integrity metadata along with
+read/write.
 
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+Introduce a new 'struct io_uring_meta_pi' that contains following:
+- pi_flags: integrity check flags namely
+IO_INTEGRITY_CHK_{GUARD/APPTAG/REFTAG}
+- len: length of the pi/metadata buffer
+- buf: address of the metadata buffer
+- seed: seed value for reftag remapping
+- app_tag: application defined 16b value
+
+Application sets up a SQE128 ring, prepares io_uring_meta_pi within
+the second SQE.
+The patch processes this information to prepare uio_meta descriptor
+and passes it down using kiocb->private.
+
+Meta exchange is supported only for direct IO.
+Also vectored read/write operations with meta are not supported
+currently.
+
 Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
 ---
- include/linux/uio.h     | 9 +++++++++
- include/uapi/linux/fs.h | 9 +++++++++
- 2 files changed, 18 insertions(+)
+ include/uapi/linux/io_uring.h | 16 ++++++++
+ io_uring/io_uring.c           |  4 ++
+ io_uring/rw.c                 | 71 ++++++++++++++++++++++++++++++++++-
+ io_uring/rw.h                 | 14 ++++++-
+ 4 files changed, 102 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 853f9de5aa05..8ada84e85447 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -82,6 +82,15 @@ struct iov_iter {
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 024745283783..48dcca125db3 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -105,6 +105,22 @@ struct io_uring_sqe {
+ 		 */
+ 		__u8	cmd[0];
  	};
- };
- 
-+typedef __u16 uio_meta_flags_t;
-+
-+struct uio_meta {
-+	uio_meta_flags_t	flags;
-+	u16			app_tag;
-+	u64			seed;
-+	struct iov_iter		iter;
++	/*
++	 * If the ring is initialized with IORING_SETUP_SQE128, then
++	 * this field is starting offset for 64 bytes of data. For meta io
++	 * this contains 'struct io_uring_meta_pi'
++	 */
++	__u8	big_sqe[0];
 +};
 +
- static inline const struct iovec *iter_iov(const struct iov_iter *iter)
- {
- 	if (iter->iter_type == ITER_UBUF)
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 753971770733..9070ef19f0a3 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -40,6 +40,15 @@
- #define BLOCK_SIZE_BITS 10
- #define BLOCK_SIZE (1<<BLOCK_SIZE_BITS)
++/* this is placed in SQE128 */
++struct io_uring_meta_pi {
++	__u16		pi_flags;
++	__u16		app_tag;
++	__u32		len;
++	__u64		addr;
++	__u64		seed;
++	__u64		rsvd[2];
+ };
  
-+/* flags for integrity meta */
-+#define IO_INTEGRITY_CHK_GUARD		(1U << 0) /* enforce guard check */
-+#define IO_INTEGRITY_CHK_REFTAG		(1U << 1) /* enforce ref check */
-+#define IO_INTEGRITY_CHK_APPTAG		(1U << 2) /* enforce app check */
+ /*
+diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+index 44a772013c09..c5fd74e42c04 100644
+--- a/io_uring/io_uring.c
++++ b/io_uring/io_uring.c
+@@ -3879,6 +3879,7 @@ static int __init io_uring_init(void)
+ 	BUILD_BUG_SQE_ELEM(48, __u64,  addr3);
+ 	BUILD_BUG_SQE_ELEM_SIZE(48, 0, cmd);
+ 	BUILD_BUG_SQE_ELEM(56, __u64,  __pad2);
++	BUILD_BUG_SQE_ELEM_SIZE(64, 0, big_sqe);
+ 
+ 	BUILD_BUG_ON(sizeof(struct io_uring_files_update) !=
+ 		     sizeof(struct io_uring_rsrc_update));
+@@ -3902,6 +3903,9 @@ static int __init io_uring_init(void)
+ 	/* top 8bits are for internal use */
+ 	BUILD_BUG_ON((IORING_URING_CMD_MASK & 0xff000000) != 0);
+ 
++	BUILD_BUG_ON(sizeof(struct io_uring_meta_pi) >
++		     sizeof(struct io_uring_sqe));
 +
-+#define IO_INTEGRITY_VALID_FLAGS (IO_INTEGRITY_CHK_GUARD | \
-+				  IO_INTEGRITY_CHK_REFTAG | \
-+				  IO_INTEGRITY_CHK_APPTAG)
+ 	io_uring_optable_init();
+ 
+ 	/*
+diff --git a/io_uring/rw.c b/io_uring/rw.c
+index 30448f343c7f..cbb74fcfd0d1 100644
+--- a/io_uring/rw.c
++++ b/io_uring/rw.c
+@@ -257,6 +257,46 @@ static int io_prep_rw_setup(struct io_kiocb *req, int ddir, bool do_import)
+ 	return 0;
+ }
+ 
++static inline void io_meta_save_state(struct io_async_rw *io)
++{
++	io->meta_state.seed = io->meta.seed;
++	iov_iter_save_state(&io->meta.iter, &io->meta_state.iter_meta);
++}
 +
- #define SEEK_SET	0	/* seek relative to beginning of file */
- #define SEEK_CUR	1	/* seek relative to current file position */
- #define SEEK_END	2	/* seek relative to end of file */
++static inline void io_meta_restore(struct io_async_rw *io)
++{
++	io->meta.seed = io->meta_state.seed;
++	iov_iter_restore(&io->meta.iter, &io->meta_state.iter_meta);
++}
++
++static int io_prep_rw_meta(struct io_kiocb *req, const struct io_uring_sqe *sqe,
++			   struct io_rw *rw, int ddir)
++{
++	const struct io_uring_meta_pi *md = (struct io_uring_meta_pi *)sqe->big_sqe;
++	const struct io_issue_def *def;
++	struct io_async_rw *io;
++	int ret;
++
++	if (READ_ONCE(md->rsvd[0]) || READ_ONCE(md->rsvd[1]))
++		return -EINVAL;
++
++	def = &io_issue_defs[req->opcode];
++	if (def->vectored)
++		return -EOPNOTSUPP;
++
++	io = req->async_data;
++	io->meta.flags = READ_ONCE(md->pi_flags);
++	io->meta.app_tag = READ_ONCE(md->app_tag);
++	io->meta.seed = READ_ONCE(md->seed);
++	ret = import_ubuf(ddir, u64_to_user_ptr(READ_ONCE(md->addr)),
++			  READ_ONCE(md->len), &io->meta.iter);
++	if (unlikely(ret < 0))
++		return ret;
++	rw->kiocb.ki_flags |= IOCB_HAS_METADATA;
++	io_meta_save_state(io);
++	return ret;
++}
++
+ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 		      int ddir, bool do_import)
+ {
+@@ -279,11 +319,19 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 		rw->kiocb.ki_ioprio = get_current_ioprio();
+ 	}
+ 	rw->kiocb.dio_complete = NULL;
++	rw->kiocb.ki_flags = 0;
+ 
+ 	rw->addr = READ_ONCE(sqe->addr);
+ 	rw->len = READ_ONCE(sqe->len);
+ 	rw->flags = READ_ONCE(sqe->rw_flags);
+-	return io_prep_rw_setup(req, ddir, do_import);
++	ret = io_prep_rw_setup(req, ddir, do_import);
++
++	if (unlikely(ret))
++		return ret;
++
++	if (req->ctx->flags & IORING_SETUP_SQE128)
++		ret = io_prep_rw_meta(req, sqe, rw, ddir);
++	return ret;
+ }
+ 
+ int io_prep_read(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+@@ -409,7 +457,10 @@ static inline loff_t *io_kiocb_update_pos(struct io_kiocb *req)
+ static void io_resubmit_prep(struct io_kiocb *req)
+ {
+ 	struct io_async_rw *io = req->async_data;
++	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
+ 
++	if (rw->kiocb.ki_flags & IOCB_HAS_METADATA)
++		io_meta_restore(io);
+ 	iov_iter_restore(&io->iter, &io->iter_state);
+ }
+ 
+@@ -794,7 +845,7 @@ static int io_rw_init_file(struct io_kiocb *req, fmode_t mode, int rw_type)
+ 	if (!(req->flags & REQ_F_FIXED_FILE))
+ 		req->flags |= io_file_get_flags(file);
+ 
+-	kiocb->ki_flags = file->f_iocb_flags;
++	kiocb->ki_flags |= file->f_iocb_flags;
+ 	ret = kiocb_set_rw_flags(kiocb, rw->flags, rw_type);
+ 	if (unlikely(ret))
+ 		return ret;
+@@ -823,6 +874,18 @@ static int io_rw_init_file(struct io_kiocb *req, fmode_t mode, int rw_type)
+ 		kiocb->ki_complete = io_complete_rw;
+ 	}
+ 
++	if (kiocb->ki_flags & IOCB_HAS_METADATA) {
++		struct io_async_rw *io = req->async_data;
++
++		/*
++		 * We have a union of meta fields with wpq used for buffered-io
++		 * in io_async_rw, so fail it here.
++		 */
++		if (!(req->file->f_flags & O_DIRECT))
++			return -EOPNOTSUPP;
++		kiocb->private = &io->meta;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -897,6 +960,8 @@ static int __io_read(struct io_kiocb *req, unsigned int issue_flags)
+ 	 * manually if we need to.
+ 	 */
+ 	iov_iter_restore(&io->iter, &io->iter_state);
++	if (kiocb->ki_flags & IOCB_HAS_METADATA)
++		io_meta_restore(io);
+ 
+ 	do {
+ 		/*
+@@ -1101,6 +1166,8 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
+ 	} else {
+ ret_eagain:
+ 		iov_iter_restore(&io->iter, &io->iter_state);
++		if (kiocb->ki_flags & IOCB_HAS_METADATA)
++			io_meta_restore(io);
+ 		if (kiocb->ki_flags & IOCB_WRITE)
+ 			io_req_end_write(req);
+ 		return -EAGAIN;
+diff --git a/io_uring/rw.h b/io_uring/rw.h
+index 3f432dc75441..2d7656bd268d 100644
+--- a/io_uring/rw.h
++++ b/io_uring/rw.h
+@@ -2,6 +2,11 @@
+ 
+ #include <linux/pagemap.h>
+ 
++struct io_meta_state {
++	u32			seed;
++	struct iov_iter_state	iter_meta;
++};
++
+ struct io_async_rw {
+ 	size_t				bytes_done;
+ 	struct iov_iter			iter;
+@@ -9,7 +14,14 @@ struct io_async_rw {
+ 	struct iovec			fast_iov;
+ 	struct iovec			*free_iovec;
+ 	int				free_iov_nr;
+-	struct wait_page_queue		wpq;
++	/* wpq is for buffered io, while meta fields are used with direct io */
++	union {
++		struct wait_page_queue		wpq;
++		struct {
++			struct uio_meta			meta;
++			struct io_meta_state		meta_state;
++		};
++	};
+ };
+ 
+ int io_prep_read_fixed(struct io_kiocb *req, const struct io_uring_sqe *sqe);
 -- 
 2.25.1
 
