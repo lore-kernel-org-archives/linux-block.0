@@ -1,54 +1,55 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6001E411D
-	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 12:43:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391F11E411D
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 12:43:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730292186; cv=none; b=sYLdGL9b+rD9haHkh1DAc6buMduSmba0KyEPTjTlglnKPtjHj6HTZZxuALS+Hzlv3u3V1rQqOinISlWr8TXvBqAwzLFdnKuJUY47yXy6wdacITZRRDUGR0YRTbmqZlI1UiMftEQKT92VOz0v8s417SE6KS4gsnHpGzgSUxyvIro=
+	t=1730292190; cv=none; b=HaEcLu+P47x82pzy+MAno68l4SRUUmau7rjkOiY+VpJE+GhtV7biQAPnHhc4TAAPHtSDClvfxVCbUcvAa8XL8nfEsUq3cLvcAoMUB1/+Yg3PcB7ZFwPxJ6gpzSRBpE+MgJ0icpkbwsE1u6zkHAhDQk5GmKkKw9VvePvMvZS8mRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730292186; c=relaxed/simple;
-	bh=cIpm7/Mv1/Dm5u3a5E2sIF9GhrybngbpYo4cGeWviDo=;
+	s=arc-20240116; t=1730292190; c=relaxed/simple;
+	bh=xIDDJ2iriMWUvhnOBPwvhMViDw2wqRXR4WaxMM2XkGg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NrMVqpWsBcwGTFQ+Qn1fa/i+RS9bdUzPaVe0Ro4LdNUGm3ByAH4XS1CCrKaWAfP6UZxlfsQRdvwUuFgkEsPt4vwoGlvCRpX4HsgUGsatqq3cgiiFHHhtCPzcfKTSrK37cEVx5bN4ltKOUsUqOltUFT/fZ4TV+uP6DkIv+khgXdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JoP+bus6; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=g1ErkIK/C3qef2luVdw/DNromJKQ3+UwHAIAEHw+lpTRfMxBymHKz64EiZw3bAHiDbjyPFDm/9REWNfLa26zJJGAbXfZq45eQhjVYzwh3O2UwQYwJ/63VRl4eqDLOkDL5fHeC1/vBvcNThumaKryJpoG2FXVAlvFfpb18hQpseA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TGqMTh2c; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JoP+bus6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TGqMTh2c"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730292183;
+	s=mimecast20190719; t=1730292186;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ApEMFDOrNDD/+MWPH551HnF0S8o5RB1vvdhPKMCWkUc=;
-	b=JoP+bus6JKtVwZ6s6Xy7fetJhqqvk0E1+xp4xCwfTLm9nuPyUDZZPRuF7QnXEk50BfZqpw
-	zug1iB8OW9pU2co+Ytc6T2LmzqK8/Wg5yyilrXw7peETny1obRgyOWyM/XDCVlhqHVB5kj
-	DkYPbbeuxRWY6u7Fnwr6HBlX733QLGI=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=EkQqbAAQxUN8KVTJJir8/kNitbMwZ9QU4FyTIn53bVw=;
+	b=TGqMTh2cl9zqevcFqI35YOEkz481cXdKV9RqLTRq/UCx5FMU09NUWfrZhi6mgREIdIYZYu
+	DgtccYFVDUkoTBykQvFeYS+0cMZrEK4hu6pjzNecBUzi7o592xuPJV7dK1z1Y9TLr93xGr
+	RQutmDtYhplzw5T0nHkcBn6Ik+DSrLw=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-158-MBdBJgmvN2iYW6NZ53nfyA-1; Wed,
- 30 Oct 2024 08:43:00 -0400
-X-MC-Unique: MBdBJgmvN2iYW6NZ53nfyA-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-543-TP-ektvbMBSzS6pFAFBjqA-1; Wed,
+ 30 Oct 2024 08:43:04 -0400
+X-MC-Unique: TP-ektvbMBSzS6pFAFBjqA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5628019560BF;
-	Wed, 30 Oct 2024 12:42:59 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8DD551955D5F;
+	Wed, 30 Oct 2024 12:43:03 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.140])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DDDFB19560AA;
-	Wed, 30 Oct 2024 12:42:57 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6F4DC19560A2;
+	Wed, 30 Oct 2024 12:43:01 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/5] blk-mq: add non_owner variant of blk_mq_freeze_queue API
-Date: Wed, 30 Oct 2024 20:42:34 +0800
-Message-ID: <20241030124240.230610-3-ming.lei@redhat.com>
+	Ming Lei <ming.lei@redhat.com>,
+	Ilya Dryomov <idryomov@gmail.com>
+Subject: [PATCH 3/5] rbd: convert to blk_mq_freeze_queue_non_owner
+Date: Wed, 30 Oct 2024 20:42:35 +0800
+Message-ID: <20241030124240.230610-4-ming.lei@redhat.com>
 In-Reply-To: <20241030124240.230610-1-ming.lei@redhat.com>
 References: <20241030124240.230610-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -58,55 +59,29 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Add non_owner variant of blk_mq_freeze_queue API for rbd.
+rbd just calls blk_mq_freeze_queue() only, and doesn't unfreeze queue in
+current context, so convert to blk_mq_freeze_queue_non_owner().
 
+Cc: Ilya Dryomov <idryomov@gmail.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c         | 14 +++++++++++---
- include/linux/blk-mq.h |  1 +
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ drivers/block/rbd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5f4496220432..8e18284ede8f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -195,12 +195,20 @@ void blk_mq_unfreeze_queue(struct request_queue *q)
- EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue);
- 
- /*
-- * non_owner variant of blk_freeze_queue_start
-+ * non_owner variant of blk_mq_freeze_queue
-  *
-- * Unlike blk_freeze_queue_start, the queue doesn't need to be unfrozen
-- * by the same task.  This is fragile and should not be used if at all
-+ * Unlike blk_mq_freeze_queue, the queue doesn't need to be unfrozen by
-+ * the same task. This is fragile and should not be used if at all
-  * possible.
-  */
-+void blk_mq_freeze_queue_non_owner(struct request_queue *q)
-+{
-+	__blk_freeze_queue_start(q);
-+	blk_mq_freeze_queue_wait(q);
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_non_owner);
-+
-+/* non_owner variant of blk_freeze_queue_start */
- void blk_freeze_queue_start_non_owner(struct request_queue *q)
- {
- 	__blk_freeze_queue_start(q);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 2035fad3131f..ed15dc2e7bd6 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -919,6 +919,7 @@ void blk_freeze_queue_start(struct request_queue *q);
- void blk_mq_freeze_queue_wait(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout);
-+void blk_mq_freeze_queue_non_owner(struct request_queue *q);
- void blk_mq_unfreeze_queue_non_owner(struct request_queue *q);
- void blk_freeze_queue_start_non_owner(struct request_queue *q);
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 9c8b19a22c2a..63c183ecdad9 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -7282,7 +7282,7 @@ static ssize_t do_rbd_remove(const char *buf, size_t count)
+ 		 * Prevent new IO from being queued and wait for existing
+ 		 * IO to complete/fail.
+ 		 */
+-		blk_mq_freeze_queue(rbd_dev->disk->queue);
++		blk_mq_freeze_queue_non_owner(rbd_dev->disk->queue);
+ 		blk_mark_disk_dead(rbd_dev->disk);
+ 	}
  
 -- 
 2.47.0
