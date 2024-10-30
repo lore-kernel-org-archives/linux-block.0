@@ -1,276 +1,265 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9464B4437
-	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 03:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA65228F7
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 03:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730257713; cv=none; b=VnLBTllHN6OZg6NkWWUf9sSJZ366OLDsqd3aS0wndurX9h4sRgLcrqkdewkrC9x50aBzfw1bDO3LZOwNW5W4zDZRY+ac4vFZqXMOZgqPpCwvO+qSj25hHTEdLKP0tn3ZfeGJ9zQ5E2g53ELFuiSJ3KELHJbmBurvpZ122IoXvhg=
+	t=1730260351; cv=none; b=Hspf9FAcLlJRkk3fnpKXzv8vlaFvJ7SKgToVC27tO2fl/HyErcWoVQD6OVBnuRQAu94VTQnyn+j25WFM5d/lYfFjcNXhr5MiUrz6ttHHpa4r5hGM0tMT0IL9ayVh91LQQaGTBRuPXjgTCn7BTU6YicO622l8Y9tOK5gmfAP9s8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730257713; c=relaxed/simple;
-	bh=UkycRODotxZEcNkAU8JknJDQPDP8o7pTJtvemAw36fE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KeGp4EATMK5XJ6DOP/m7MVDTFDsO1nJLTlzfYRwZDhL4YvLMUrqjkQtXZs1wGLdb8U/7NqpWdBWaQjVLU8wZ+5e8mSm/rsP1ToHYBM/fFRtEjDOqwhZ4Tof2UQt4RIuOFpxLC+uCQh1VukUuck8myof1/ZpJhbtkGNAA7oe57kE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yp8Sg/5b; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yp8Sg/5b"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730257709;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fbHuXlFlnl48M3O3jSnpkto2uwlwm2XUX+8EBx8eszo=;
-	b=Yp8Sg/5bz+AWVdH8U7zJTuVPBht8iZbL/olL+aCzQiXH+UK5VKLcjp+p1dt2/F42mV3PT0
-	ZCm2AJrwicNwgjL/Wbd/MF3H6I81FuYEpZ8BEtsDE5yooPBiJruB3BKBECUMTD+qrXtbAL
-	1V28S5mtyZzRkKyW3G+ZTTiLPtGrK9c=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-494-Kt-XLbwqPB2Z0xKMT4R5Qg-1; Tue,
- 29 Oct 2024 23:08:27 -0400
-X-MC-Unique: Kt-XLbwqPB2Z0xKMT4R5Qg-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7144B19560A3;
-	Wed, 30 Oct 2024 03:08:26 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.45])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1782A19560AA;
-	Wed, 30 Oct 2024 03:08:21 +0000 (UTC)
-Date: Wed, 30 Oct 2024 11:08:16 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Akilesh Kailash <akailash@google.com>
-Subject: Re: [PATCH V8 0/8] io_uring: support sqe group and leased group kbuf
-Message-ID: <ZyGjID-17REc9X3e@fedora>
-References: <20241025122247.3709133-1-ming.lei@redhat.com>
- <15b9b1e0-d961-4174-96ed-5a6287e4b38b@gmail.com>
- <d859c85c-b7bf-4673-8c77-9d7113f19dbb@kernel.dk>
- <bc44d3c0-41e8-425c-957f-bad70aedcc50@kernel.dk>
- <e76d9742-5693-4057-b925-3917943c7441@kernel.dk>
- <f51e50c8-271e-49b6-b3e1-a63bf61d7451@kernel.dk>
- <ZyGT3h5jNsKB0mrZ@fedora>
- <674e8c3c-1f2c-464a-ad59-da3d00104383@kernel.dk>
+	s=arc-20240116; t=1730260351; c=relaxed/simple;
+	bh=uT8oxjYgqQQLCOiXAOgePDDXIZJCEvwqmMML3TW4XhM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mMpAXaqTT4sgLhvMSMzq7zlejoXQoixhnDa9mW+uAR0hQQxMiQZF8JHMmhJQOFPjBE3peEtKKxRaftniVyUnUK46+wMXoxiDA+Z5EmL+ay2iXd/hWBnubv7vwZ1Pdq0pyN5JhCceMy8OR4dNG+79e6txdv+EnD3qoUh9+xGZGrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XdY8y1rnwz4f3lVp
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 11:52:02 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id BEED41A0196
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 11:52:20 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgCngYVurSFn5fNXAQ--.10778S4;
+	Wed, 30 Oct 2024 11:52:20 +0800 (CST)
+From: Yang Erkun <yangerkun@huaweicloud.com>
+To: axboe@kernel.dk,
+	ulf.hansson@linaro.org,
+	hch@lst.de,
+	yukuai3@huawei.com,
+	houtao1@huawei.com,
+	penguin-kernel@i-love.sakura.ne.jp
+Cc: linux-block@vger.kernel.org,
+	yangerkun@huawei.com,
+	yangerkun@huaweicloud.com
+Subject: [PATCH v2] brd: defer automatic disk creation until module initialization succeeds
+Date: Wed, 30 Oct 2024 11:49:14 +0800
+Message-Id: <20241030034914.907829-1-yangerkun@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <674e8c3c-1f2c-464a-ad59-da3d00104383@kernel.dk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCngYVurSFn5fNXAQ--.10778S4
+X-Coremail-Antispam: 1UD129KBjvJXoW3Jw1xWF47tr4DKry7Wry8Xwb_yoW7Xw43pF
+	W3KFW8trW5Gr1fGw4UX3W7uFyrGa109w4rXa4xuw1S9r45Ar9aqayIy34jqrZ5GrWkAF4U
+	ZrZ8KF48Wr4F93DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUU
+	UUU
+X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-On Tue, Oct 29, 2024 at 08:43:39PM -0600, Jens Axboe wrote:
-> On 10/29/24 8:03 PM, Ming Lei wrote:
-> > On Tue, Oct 29, 2024 at 03:26:37PM -0600, Jens Axboe wrote:
-> >> On 10/29/24 2:06 PM, Jens Axboe wrote:
-> >>> On 10/29/24 1:18 PM, Jens Axboe wrote:
-> >>>> Now, this implementation requires a user buffer, and as far as I'm told,
-> >>>> you currently have kernel buffers on the ublk side. There's absolutely
-> >>>> no reason why kernel buffers cannot work, we'd most likely just need to
-> >>>> add a IORING_RSRC_KBUFFER type to handle that. My question here is how
-> >>>> hard is this requirement? Reason I ask is that it's much simpler to work
-> >>>> with userspace buffers. Yes the current implementation maps them
-> >>>> everytime, we could certainly change that, however I don't see this
-> >>>> being an issue. It's really no different than O_DIRECT, and you only
-> >>>> need to map them once for a read + whatever number of writes you'd need
-> >>>> to do. If a 'tag' is provided for LOCAL_BUF, it'll post a CQE whenever
-> >>>> that buffer is unmapped. This is a notification for the application that
-> >>>> it's done using the buffer. For a pure kernel buffer, we'd either need
-> >>>> to be able to reference it (so that we KNOW it's not going away) and/or
-> >>>> have a callback associated with the buffer.
-> >>>
-> >>> Just to expand on this - if a kernel buffer is absolutely required, for
-> >>> example if you're inheriting pages from the page cache or other
-> >>> locations you cannot control, we would need to add something ala the
-> >>> below:
-> >>
-> >> Here's a more complete one, but utterly untested. But it does the same
-> >> thing, mapping a struct request, but it maps it to an io_rsrc_node which
-> >> in turn has an io_mapped_ubuf in it. Both BUFFER and KBUFFER use the
-> >> same type, only the destruction is different. Then the callback provided
-> >> needs to do something ala:
-> >>
-> >> struct io_mapped_ubuf *imu = node->buf;
-> >>
-> >> if (imu && refcount_dec_and_test(&imu->refs))
-> >> 	kvfree(imu);
-> >>
-> >> when it's done with the imu. Probably an rsrc helper should just be done
-> >> for that, but those are details.
-> >>
-> >> diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-> >> index 9621ba533b35..050868a4c9f1 100644
-> >> --- a/io_uring/rsrc.c
-> >> +++ b/io_uring/rsrc.c
-> >> @@ -8,6 +8,8 @@
-> >>  #include <linux/nospec.h>
-> >>  #include <linux/hugetlb.h>
-> >>  #include <linux/compat.h>
-> >> +#include <linux/bvec.h>
-> >> +#include <linux/blk-mq.h>
-> >>  #include <linux/io_uring.h>
-> >>  
-> >>  #include <uapi/linux/io_uring.h>
-> >> @@ -474,6 +476,9 @@ void io_free_rsrc_node(struct io_rsrc_node *node)
-> >>  		if (node->buf)
-> >>  			io_buffer_unmap(node->ctx, node);
-> >>  		break;
-> >> +	case IORING_RSRC_KBUFFER:
-> >> +		node->kbuf_fn(node);
-> >> +		break;
-> > 
-> > Here 'node' is freed later, and it may not work because ->imu is bound
-> > with node.
-> 
-> Not sure why this matters? imu can be bound to any node (and has a
-> separate ref), but the node will remain for as long as the submission
-> runs. It has to, because the last reference is put when submission of
-> all requests in that series ends.
+From: Yang Erkun <yangerkun@huawei.com>
 
-Fine, how is the imu found from OP? Not see related code to add the
-allocated node into submission_state or ctx->buf_table.
+My colleague Wupeng found the following problems during fault injection:
 
-io_rsrc_node_lookup() needs to find the buffer any way, right?
+BUG: unable to handle page fault for address: fffffbfff809d073
+PGD 6e648067 P4D 123ec8067 PUD 123ec4067 PMD 100e38067 PTE 0
+Oops: Oops: 0000 [#1] PREEMPT SMP KASAN NOPTI
+CPU: 5 UID: 0 PID: 755 Comm: modprobe Not tainted 6.12.0-rc3+ #17
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.16.1-2.fc37 04/01/2014
+RIP: 0010:__asan_load8+0x4c/0xa0
+...
+Call Trace:
+ <TASK>
+ blkdev_put_whole+0x41/0x70
+ bdev_release+0x1a3/0x250
+ blkdev_release+0x11/0x20
+ __fput+0x1d7/0x4a0
+ task_work_run+0xfc/0x180
+ syscall_exit_to_user_mode+0x1de/0x1f0
+ do_syscall_64+0x6b/0x170
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-> 
-> >> @@ -1070,6 +1075,65 @@ int io_register_clone_buffers(struct io_ring_ctx *ctx, void __user *arg)
-> >>  	return ret;
-> >>  }
-> >>  
-> >> +struct io_rsrc_node *io_rsrc_map_request(struct io_ring_ctx *ctx,
-> >> +					 struct request *req,
-> >> +					 void (*kbuf_fn)(struct io_rsrc_node *))
-> >> +{
-> >> +	struct io_mapped_ubuf *imu = NULL;
-> >> +	struct io_rsrc_node *node = NULL;
-> >> +	struct req_iterator rq_iter;
-> >> +	unsigned int offset;
-> >> +	struct bio_vec bv;
-> >> +	int nr_bvecs;
-> >> +
-> >> +	if (!bio_has_data(req->bio))
-> >> +		goto out;
-> >> +
-> >> +	nr_bvecs = 0;
-> >> +	rq_for_each_bvec(bv, req, rq_iter)
-> >> +		nr_bvecs++;
-> >> +	if (!nr_bvecs)
-> >> +		goto out;
-> >> +
-> >> +	node = io_rsrc_node_alloc(ctx, IORING_RSRC_KBUFFER);
-> >> +	if (!node)
-> >> +		goto out;
-> >> +	node->buf = NULL;
-> >> +
-> >> +	imu = kvmalloc(struct_size(imu, bvec, nr_bvecs), GFP_NOIO);
-> >> +	if (!imu)
-> >> +		goto out;
-> >> +
-> >> +	imu->ubuf = 0;
-> >> +	imu->len = 0;
-> >> +	if (req->bio != req->biotail) {
-> >> +		int idx = 0;
-> >> +
-> >> +		offset = 0;
-> >> +		rq_for_each_bvec(bv, req, rq_iter) {
-> >> +			imu->bvec[idx++] = bv;
-> >> +			imu->len += bv.bv_len;
-> >> +		}
-> >> +	} else {
-> >> +		struct bio *bio = req->bio;
-> >> +
-> >> +		offset = bio->bi_iter.bi_bvec_done;
-> >> +		imu->bvec[0] = *__bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
-> >> +		imu->len = imu->bvec[0].bv_len;
-> >> +	}
-> >> +	imu->nr_bvecs = nr_bvecs;
-> >> +	imu->folio_shift = PAGE_SHIFT;
-> >> +	refcount_set(&imu->refs, 1);
-> > 
-> > One big problem is how to initialize the reference count, because this
-> > buffer need to be used in the following more than one request. Without
-> > one perfect counter, the buffer won't be freed in the exact time without
-> > extra OP.
-> 
-> Each request that uses the node, will grab a reference to the node. The
-> node holds a reference to the buffer. So at least as the above works,
-> the buf will be put when submission ends, as that puts the node and
-> subsequently the one reference the imu has by default. It'll outlast any
-> of the requests that use it during submission, and there cannot be any
-> other users of it as it isn't discoverable outside of that.
+loop_init() is calling loop_add() after __register_blkdev() succeeds and
+is ignoring disk_add() failure from loop_add(), for loop_add() failure
+is not fatal and successfully created disks are already visible to
+bdev_open().
 
-OK, if the node/buffer is only looked up in ->prep(), this way works.
+brd_init() is currently calling brd_alloc() before __register_blkdev()
+succeeds and is releasing successfully created disks when brd_init()
+returns an error. This can cause UAF for the latter two case:
 
-> 
-> > I think the reference should be in `node` which need to be live if any
-> > consumer OP isn't completed.
-> 
-> That is how it works... io_req_assign_rsrc_node() will assign a node to
-> a request, which will be there until the request completes.
-> 
-> >> +	node->buf = imu;
-> >> +	node->kbuf_fn = kbuf_fn;
-> >> +	return node;
-> > 
-> > Also this function needs to register the buffer to table with one
-> > pre-defined buf index, then the following request can use it by
-> > the way of io_prep_rw_fixed().
-> 
-> It should not register it with the table, the whole point is to keep
-> this node only per-submission discoverable. If you're grabbing random
-> request pages, then it very much is a bit finicky and needs to be of
-> limited scope.
+case 1:
+    T1:
+modprobe brd
+  brd_init
+    brd_alloc(0) // success
+      add_disk
+        disk_scan_partitions
+          bdev_file_open_by_dev // alloc file
+          fput // won't free until back to userspace
+    brd_alloc(1) // failed since mem alloc error inject
+  // error path for modprobe will release code segment
+  // back to userspace
+  __fput
+    blkdev_release
+      bdev_release
+        blkdev_put_whole
+          bdev->bd_disk->fops->release // fops is freed now, UAF!
 
-There can be more than 1 buffer uses in single submission, can you share
-how OP finds the specific buffer with ->buf_index from submission state?
-This part is missed in your patch.
+case 2:
+    T1:                            T2:
+modprobe brd
+  brd_init
+    brd_alloc(0) // success
+                                   open(/dev/ram0)
+    brd_alloc(1) // fail
+  // error path for modprobe
 
-> 
-> Each request type would need to support it. For normal read/write, I'd
-> suggest just adding IORING_OP_READ_LOCAL and WRITE_LOCAL to do that.
-> 
-> > If OP dependency can be avoided, I think this approach is fine,
-> > otherwise I still suggest sqe group. Not only performance, but
-> > application becomes too complicated.
-> 
-> You could avoid the OP dependency with just a flag, if you really wanted
-> to. But I'm not sure it makes a lot of sense. And it's a hell of a lot
+                                   close(/dev/ram0)
+                                   ...
+                                   /* UAF! */
+                                   bdev->bd_disk->fops->release
 
-Yes, IO_LINK won't work for submitting multiple IOs concurrently, extra
-syscall makes application too complicated, and IO latency is increased.
+Fix this problem by following what loop_init() does. Besides,
+reintroduce brd_devices_mutex to help serialize modifications to
+brd_list.
 
-> simpler than the sqe group scheme, which I'm a bit worried about as it's
-> a bit complicated in how deep it needs to go in the code. This one
-> stands alone, so I'd strongly encourage we pursue this a bit further and
-> iron out the kinks. Maybe it won't work in the end, I don't know, but it
-> seems pretty promising and it's soooo much simpler.
+Fixes: 7f9b348cb5e9 ("brd: convert to blk_alloc_disk/blk_cleanup_disk")
+Reported-by: Wupeng Ma <mawupeng1@huawei.com>
+Signed-off-by: Yang Erkun <yangerkun@huawei.com>
+---
+ drivers/block/brd.c | 66 ++++++++++++++++++++++++++++++---------------
+ 1 file changed, 44 insertions(+), 22 deletions(-)
 
-If buffer register and lookup are always done in ->prep(), OP dependency
-may be avoided.
+v1->v2:
+1. add brd_find_or_alloc_device and brd_free_device
+2. remove pr_info in brd_alloc
 
-> 
-> > We also we need to provide ->prep() callback for uring_cmd driver, so
-> > that io_rsrc_map_request() can be called by driver in ->prep(),
-> > meantime `io_ring_ctx` and `io_rsrc_node` need to be visible for driver.
-> > What do you think of these kind of changes?
-> 
-> io_ring_ctx is already visible in the normal system headers,
-> io_rsrc_node we certainly could make visible. That's not a big deal. It
-> makes a lot more sense to export than some of the other stuff we have in
-> there! As long as it's all nicely handled by helpers, then we'd be fine.
-
-OK.
-
-
-thanks,
-Ming
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 2fd1ed101748..5a95671d8151 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -316,8 +316,40 @@ __setup("ramdisk_size=", ramdisk_size);
+  * (should share code eventually).
+  */
+ static LIST_HEAD(brd_devices);
++static DEFINE_MUTEX(brd_devices_mutex);
+ static struct dentry *brd_debugfs_dir;
+ 
++static struct brd_device *brd_find_or_alloc_device(int i)
++{
++	struct brd_device *brd;
++
++	mutex_lock(&brd_devices_mutex);
++	list_for_each_entry(brd, &brd_devices, brd_list) {
++		if (brd->brd_number == i) {
++			mutex_unlock(&brd_devices_mutex);
++			return ERR_PTR(-EEXIST);
++		}
++	}
++
++	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
++	if (!brd) {
++		mutex_unlock(&brd_devices_mutex);
++		return ERR_PTR(-ENOMEM);
++	}
++	brd->brd_number	= i;
++	list_add_tail(&brd->brd_list, &brd_devices);
++	mutex_unlock(&brd_devices_mutex);
++	return brd;
++}
++
++static void brd_free_device(struct brd_device *brd)
++{
++	mutex_lock(&brd_devices_mutex);
++	list_del(&brd->brd_list);
++	mutex_unlock(&brd_devices_mutex);
++	kfree(brd);
++}
++
+ static int brd_alloc(int i)
+ {
+ 	struct brd_device *brd;
+@@ -340,14 +372,9 @@ static int brd_alloc(int i)
+ 					  BLK_FEAT_NOWAIT,
+ 	};
+ 
+-	list_for_each_entry(brd, &brd_devices, brd_list)
+-		if (brd->brd_number == i)
+-			return -EEXIST;
+-	brd = kzalloc(sizeof(*brd), GFP_KERNEL);
+-	if (!brd)
+-		return -ENOMEM;
+-	brd->brd_number		= i;
+-	list_add_tail(&brd->brd_list, &brd_devices);
++	brd = brd_find_or_alloc_device(i);
++	if (IS_ERR(brd))
++		return PTR_ERR(brd);
+ 
+ 	xa_init(&brd->brd_pages);
+ 
+@@ -378,8 +405,7 @@ static int brd_alloc(int i)
+ out_cleanup_disk:
+ 	put_disk(disk);
+ out_free_dev:
+-	list_del(&brd->brd_list);
+-	kfree(brd);
++	brd_free_device(brd);
+ 	return err;
+ }
+ 
+@@ -398,8 +424,7 @@ static void brd_cleanup(void)
+ 		del_gendisk(brd->brd_disk);
+ 		put_disk(brd->brd_disk);
+ 		brd_free_pages(brd);
+-		list_del(&brd->brd_list);
+-		kfree(brd);
++		brd_free_device(brd);
+ 	}
+ }
+ 
+@@ -426,16 +451,6 @@ static int __init brd_init(void)
+ {
+ 	int err, i;
+ 
+-	brd_check_and_reset_par();
+-
+-	brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
+-
+-	for (i = 0; i < rd_nr; i++) {
+-		err = brd_alloc(i);
+-		if (err)
+-			goto out_free;
+-	}
+-
+ 	/*
+ 	 * brd module now has a feature to instantiate underlying device
+ 	 * structure on-demand, provided that there is an access dev node.
+@@ -451,11 +466,18 @@ static int __init brd_init(void)
+ 	 *	dynamically.
+ 	 */
+ 
++	brd_check_and_reset_par();
++
++	brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
++
+ 	if (__register_blkdev(RAMDISK_MAJOR, "ramdisk", brd_probe)) {
+ 		err = -EIO;
+ 		goto out_free;
+ 	}
+ 
++	for (i = 0; i < rd_nr; i++)
++		brd_alloc(i);
++
+ 	pr_info("brd: module loaded\n");
+ 	return 0;
+ 
+-- 
+2.39.2
 
