@@ -1,59 +1,59 @@
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B03E64962C
-	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 13:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3033817579
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 13:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730294316; cv=none; b=bKayLihCFIfhDgUwoGr+jpHbErWmKfHjdZnY39AWWbyQcbBKp9NELJJmJQ8TCi+Ta8vYODd0aOjW74+nPZPBRwWoMikXt4L3fpj8XgKUM1gfKAu+MUyot7YbOoFbzteZ9e66+KN3hEcbmqXBoAdfthvYWdl+u9LcoTTIj3KvWJo=
+	t=1730294454; cv=none; b=YI6lkND/cU3p6uW8S3vnJETLOk6B/SsKvPyXCt2OEjIHMBsBlzOSIbb9XJO81RvUteTDiMKxPc+cUZ87U+40DUBffM5ajKXjsWZViRvlQr9/2NgliG10U5Dc4SxPgr0i86dpTmpd0duRzd4LemuYLo++1bOJCv+AlJbkE4FUn4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730294316; c=relaxed/simple;
-	bh=LIfyOYBgyE8jPsonsO08s5c9H+51CaQ9ZQOxZcP2fng=;
+	s=arc-20240116; t=1730294454; c=relaxed/simple;
+	bh=V2WPzvbbzQfgwMPqDzWNQTTXVsQclLVGxXXHSG2cCNs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VlSb7hLm6+bHvrmz9K7R2Os2JnR57rMQ/nsvWitblNWk6uwLg90bLa8MFe2VcYiX4QAddwlGXXq560CLyIf7Hevjx06fSCMY5qIbmvIKlOBrQ8VyolhIxNH4lrptEuzPLYspJ/Kp1mimWg1NtsJN6YdBVUlpRBz808kEJq47HLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Jk4/z+/c; arc=none smtp.client-ip=209.85.166.50
+	 In-Reply-To:Content-Type; b=bAslIWVz5/056jdEaBeHb49iWM2vesvc9Esu/fFIRatvs99XHpInaPdb9nAfp8IPS6Amxxb9Mh1sRL5BxclTSo6wtJ58SU7EOrlrVJUJWiMlxsjOXO9Ls1Y5J46lx716lXmHvQ3szP5mB4gcSLLw+ohFzvZNvXcWr+hEoLgqty4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nRhcURT1; arc=none smtp.client-ip=209.85.166.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Jk4/z+/c"
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-83abe7fc77eso252044539f.0
-        for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 06:18:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nRhcURT1"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-83abf71f244so218796439f.1
+        for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 06:20:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730294313; x=1730899113; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730294451; x=1730899251; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=JbPVVJaMvOc+4INW8+OHxJGLahkSjh9QTxtTCPjpo+c=;
-        b=Jk4/z+/cRfqHc907PcOHn7u7TDRgFYIUiJ7fc+HXhMdU2fH/M96a9VkfwnE0JxwaTz
-         P0jVJXkY0B3pdrTruAwykyN07ZRHVSbYK9Xb46oMS6X/kJrq9mizzHWKNJrL3RjRNlxT
-         /bzC++3cfL+rh8EStahPrUQYGALeJQ6rPo5/nd2yAf3ZWXGouMImrQOvHsRLc78gnSGl
-         fqzZRD84DcXwNeiUWiy/ZEYpsaC3qIXtDVq7ZNs39lGoGysgKXdmQ0F+K2eDHGPW7j7R
-         a2WJ6rikBiTK4eoG3fn//6RWFBhxCfpE/A6G5ZeOpG6WmOt5bXgiAME4DBJ3c9ZEflMc
-         2HkA==
+        bh=adEXhwMuT7QHQGAB5KoTePWRnBbGG1A5V3HCE+rDC+o=;
+        b=nRhcURT1AraPTZ0t2yvM6LqmMSOkCqYedi7vPWrPvC1LXynylZBn8gqQM6z1VySTzJ
+         EzzOtM41qobpejSVIUiNmhd8OCPCw4ZFIwPkouQxXf/kgGl+UsjygV3Au9o/6+Ffd/xz
+         vybWRP6QquJwqZ/qgQpSfgrrWv6QgnIsPMAHDQyEnVNYtpyoa8EYyYKV77WSSlYpY3Kf
+         Vhk9oqFNFaUTY/XXigSgjV+MQ91wNNsytA0ii0BIWZubUdHyLxsYQB4gW9YSoa6cMA/r
+         bMhSmhffGbbD4n8MTJHV1e2ZEEqLKGfsyfqYx4E41yWIIzsQE4cM5cnPu+oLEcpzSTW0
+         yrlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730294313; x=1730899113;
+        d=1e100.net; s=20230601; t=1730294451; x=1730899251;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JbPVVJaMvOc+4INW8+OHxJGLahkSjh9QTxtTCPjpo+c=;
-        b=qQHa/vZx9mwEJDx+cC6HQlPBywjxqQCJN9SiCrmXxjP81LOVCn5J3KaNpZ4EF0psmI
-         xglKljIoNWep9mNiLxE3wMzexnqEEL6Pgj9vsZeqXDFf3sJoNzORSeVB2MnqlsNrvmEN
-         D6O2f1nLWBuy34HCQTszZHUvu9ZKzoH7XQM84X7B9gEnhv9+mN9zC2HysAUW0DihoAWx
-         RmFjLkKPSw1rbrnUmwyOfrFPQHaAvs51DQOCQtVtegpGWDspU1WMG3pBUldfLSwGpSOg
-         S4dJoucXKfwH+AzffeeAdoV07dJnKGibrSHTZ1JAK9joF1ViilkxKwiqiaCffOlJLU0s
-         XrAA==
-X-Forwarded-Encrypted: i=1; AJvYcCXOEH7IQ7daOb98g6JANxna+3lSiogkg8gJi5GeNKojwu7JWbMbdY086reMvy7MruBnTWgwk37PofHl1Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFHbqh/I7gceSs7Yuehvjo/FMbjXgcCgIaBHchjw/SCfpsOW5t
-	GFWfx7JHldDTbWfaMy2YBAdlldrZE5oGNf4ZxpphuoKVvEQV2Y0DySQdfvFoVIk=
-X-Google-Smtp-Source: AGHT+IFeYkMmJiLQVWGLDQxAreKEJFM0zq4rMPkoENhZDxKn0gaCn/p0Z8uQAJ7bKgC1KZgSvkrurA==
-X-Received: by 2002:a05:6602:2cd0:b0:83a:7a19:1de0 with SMTP id ca18e2360f4ac-83b1c5cd847mr1840162039f.14.1730294312634;
-        Wed, 30 Oct 2024 06:18:32 -0700 (PDT)
+        bh=adEXhwMuT7QHQGAB5KoTePWRnBbGG1A5V3HCE+rDC+o=;
+        b=abPo7yER4TBaNgmyMfUFNaKvyqVljKLAe+mwF4k7XX633MxrBm4SNEOIFZHgHwAhWL
+         m14xAxj1hxa3bV9mK5ttnaJR+Tpm+QHIE+usgGpiEULR+WUWrQUZsYTXSJJ8hnKdP2h0
+         35z4bHbXpk/P1A5NrWFsOYKjKk8ksQ3kKy2FW//sSK4Zc6mkTNq0C4fz4pN+dxDMuryl
+         j5wy339GPsUM3eSCQXSMn/k14v8XUuM6gpUCRy/APnkt5vWGJiUj5RlOt3kuAxch0cPH
+         /SsqnbKEe+r5X3+K4+lcc0Cw5EgkXlta/ayMWjlm+tdtYh50bt1lqgqwz4MTN8QwLE6L
+         8I3g==
+X-Forwarded-Encrypted: i=1; AJvYcCU9XOSRaiFX0CLTbaN75HI8NsAh7PPZFqq86zbpe1GeIlJtFJd1ayLntu10/OxHNvcDYhsCMhju/IpGhw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFOuEs7NNmvrzdYgLfKE1zRbLb1hJghr0TkKZcYKJXrzth9sxZ
+	7cVeXWsRivrAw+g5h1Dldh4xY0w6/Ir4Lq8SlawoeUEirkTqJGqBngLJmp7p6sI=
+X-Google-Smtp-Source: AGHT+IE1gya8DOKv02mrGw2idtxQZHTZ4tVr3O33fc42BDUiQhAjx67dZQQUsUaBW8z5Sau94zjOGA==
+X-Received: by 2002:a05:6602:6343:b0:83b:29a5:ff89 with SMTP id ca18e2360f4ac-83b29a602bamr1106197239f.15.1730294451146;
+        Wed, 30 Oct 2024 06:20:51 -0700 (PDT)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc725ea578sm2901604173.21.2024.10.30.06.18.31
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc727ae9cdsm2840996173.158.2024.10.30.06.20.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Oct 2024 06:18:32 -0700 (PDT)
-Message-ID: <ee56b950-55c2-47a0-97e0-b781ec804106@kernel.dk>
-Date: Wed, 30 Oct 2024 07:18:30 -0600
+        Wed, 30 Oct 2024 06:20:50 -0700 (PDT)
+Message-ID: <d986221d-7399-4487-9c28-5d6f953510cd@kernel.dk>
+Date: Wed, 30 Oct 2024 07:20:48 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -73,145 +73,57 @@ References: <20241025122247.3709133-1-ming.lei@redhat.com>
  <e76d9742-5693-4057-b925-3917943c7441@kernel.dk>
  <f51e50c8-271e-49b6-b3e1-a63bf61d7451@kernel.dk> <ZyGT3h5jNsKB0mrZ@fedora>
  <674e8c3c-1f2c-464a-ad59-da3d00104383@kernel.dk> <ZyGjID-17REc9X3e@fedora>
+ <ZyGx4JBPdU4VlxlZ@fedora>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZyGjID-17REc9X3e@fedora>
+In-Reply-To: <ZyGx4JBPdU4VlxlZ@fedora>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/29/24 9:08 PM, Ming Lei wrote:
-> On Tue, Oct 29, 2024 at 08:43:39PM -0600, Jens Axboe wrote:
->> On 10/29/24 8:03 PM, Ming Lei wrote:
->>> On Tue, Oct 29, 2024 at 03:26:37PM -0600, Jens Axboe wrote:
->>>> On 10/29/24 2:06 PM, Jens Axboe wrote:
->>>>> On 10/29/24 1:18 PM, Jens Axboe wrote:
->>>>>> Now, this implementation requires a user buffer, and as far as I'm told,
->>>>>> you currently have kernel buffers on the ublk side. There's absolutely
->>>>>> no reason why kernel buffers cannot work, we'd most likely just need to
->>>>>> add a IORING_RSRC_KBUFFER type to handle that. My question here is how
->>>>>> hard is this requirement? Reason I ask is that it's much simpler to work
->>>>>> with userspace buffers. Yes the current implementation maps them
->>>>>> everytime, we could certainly change that, however I don't see this
->>>>>> being an issue. It's really no different than O_DIRECT, and you only
->>>>>> need to map them once for a read + whatever number of writes you'd need
->>>>>> to do. If a 'tag' is provided for LOCAL_BUF, it'll post a CQE whenever
->>>>>> that buffer is unmapped. This is a notification for the application that
->>>>>> it's done using the buffer. For a pure kernel buffer, we'd either need
->>>>>> to be able to reference it (so that we KNOW it's not going away) and/or
->>>>>> have a callback associated with the buffer.
->>>>>
->>>>> Just to expand on this - if a kernel buffer is absolutely required, for
->>>>> example if you're inheriting pages from the page cache or other
->>>>> locations you cannot control, we would need to add something ala the
->>>>> below:
->>>>
->>>> Here's a more complete one, but utterly untested. But it does the same
->>>> thing, mapping a struct request, but it maps it to an io_rsrc_node which
->>>> in turn has an io_mapped_ubuf in it. Both BUFFER and KBUFFER use the
->>>> same type, only the destruction is different. Then the callback provided
->>>> needs to do something ala:
->>>>
->>>> struct io_mapped_ubuf *imu = node->buf;
->>>>
->>>> if (imu && refcount_dec_and_test(&imu->refs))
->>>> 	kvfree(imu);
->>>>
->>>> when it's done with the imu. Probably an rsrc helper should just be done
->>>> for that, but those are details.
->>>>
->>>> diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
->>>> index 9621ba533b35..050868a4c9f1 100644
->>>> --- a/io_uring/rsrc.c
->>>> +++ b/io_uring/rsrc.c
->>>> @@ -8,6 +8,8 @@
->>>>  #include <linux/nospec.h>
->>>>  #include <linux/hugetlb.h>
->>>>  #include <linux/compat.h>
->>>> +#include <linux/bvec.h>
->>>> +#include <linux/blk-mq.h>
->>>>  #include <linux/io_uring.h>
->>>>  
->>>>  #include <uapi/linux/io_uring.h>
->>>> @@ -474,6 +476,9 @@ void io_free_rsrc_node(struct io_rsrc_node *node)
->>>>  		if (node->buf)
->>>>  			io_buffer_unmap(node->ctx, node);
->>>>  		break;
->>>> +	case IORING_RSRC_KBUFFER:
->>>> +		node->kbuf_fn(node);
->>>> +		break;
->>>
->>> Here 'node' is freed later, and it may not work because ->imu is bound
->>> with node.
->>
->> Not sure why this matters? imu can be bound to any node (and has a
->> separate ref), but the node will remain for as long as the submission
->> runs. It has to, because the last reference is put when submission of
->> all requests in that series ends.
+On 10/29/24 10:11 PM, Ming Lei wrote:
+> On Wed, Oct 30, 2024 at 11:08:16AM +0800, Ming Lei wrote:
+>> On Tue, Oct 29, 2024 at 08:43:39PM -0600, Jens Axboe wrote:
 > 
-> Fine, how is the imu found from OP? Not see related code to add the
-> allocated node into submission_state or ctx->buf_table.
-
-Just didn't do that, see the POC test patch I did for rw for just
-grabbing the fixed one in io_submit_state. Really depends on how many
-we'd need - if it's just 1 per submit, then whatever I had would work
-and the OP just needs to know to look there.
-
-> io_rsrc_node_lookup() needs to find the buffer any way, right?
-
-That's for table lookup, for the POC there's just the one node hence
-nothing really to lookup. It's either rsrc_empty_node, or a valid node.
-
->>> I think the reference should be in `node` which need to be live if any
->>> consumer OP isn't completed.
->>
->> That is how it works... io_req_assign_rsrc_node() will assign a node to
->> a request, which will be there until the request completes.
->>
->>>> +	node->buf = imu;
->>>> +	node->kbuf_fn = kbuf_fn;
->>>> +	return node;
->>>
->>> Also this function needs to register the buffer to table with one
->>> pre-defined buf index, then the following request can use it by
->>> the way of io_prep_rw_fixed().
->>
->> It should not register it with the table, the whole point is to keep
->> this node only per-submission discoverable. If you're grabbing random
->> request pages, then it very much is a bit finicky and needs to be of
->> limited scope.
+> ...
 > 
-> There can be more than 1 buffer uses in single submission, can you share
-> how OP finds the specific buffer with ->buf_index from submission state?
-> This part is missed in your patch.
-
-If we need more than one, then yeah we'd need an index rather than just
-a single pointer. Doesn't really change the mechanics, you'd need to
-provide an index like with ->buf_index.
-
-It's not missed in the patch, it's really just a POC patch to show how
-it can be done, by no means a done solution! But we can certainly get it
-there.
-
->> Each request type would need to support it. For normal read/write, I'd
->> suggest just adding IORING_OP_READ_LOCAL and WRITE_LOCAL to do that.
+>>> You could avoid the OP dependency with just a flag, if you really wanted
+>>> to. But I'm not sure it makes a lot of sense. And it's a hell of a lot
 >>
->>> If OP dependency can be avoided, I think this approach is fine,
->>> otherwise I still suggest sqe group. Not only performance, but
->>> application becomes too complicated.
+>> Yes, IO_LINK won't work for submitting multiple IOs concurrently, extra
+>> syscall makes application too complicated, and IO latency is increased.
 >>
->> You could avoid the OP dependency with just a flag, if you really wanted
->> to. But I'm not sure it makes a lot of sense. And it's a hell of a lot
+>>> simpler than the sqe group scheme, which I'm a bit worried about as it's
+>>> a bit complicated in how deep it needs to go in the code. This one
+>>> stands alone, so I'd strongly encourage we pursue this a bit further and
+>>> iron out the kinks. Maybe it won't work in the end, I don't know, but it
+>>> seems pretty promising and it's soooo much simpler.
+>>
+>> If buffer register and lookup are always done in ->prep(), OP dependency
+>> may be avoided.
 > 
-> Yes, IO_LINK won't work for submitting multiple IOs concurrently, extra
-> syscall makes application too complicated, and IO latency is increased.
+> Even all buffer register and lookup are done in ->prep(), OP dependency
+> still can't be avoided completely, such as:
+> 
+> 1) two local buffers for sending to two sockets
+> 
+> 2) group 1: IORING_OP_LOCAL_KBUF1 & [send(sock1), send(sock2)]  
+> 
+> 3) group 2: IORING_OP_LOCAL_KBUF2 & [send(sock1), send(sock2)]
+> 
+> group 1 and group 2 needs to be linked, but inside each group, the two
+> sends may be submitted in parallel.
 
-It's really not a big deal to prepare-and-submit the dependencies
-separately, but at the same time, I don't think it'd be a bad idea to
-support eg 2 local buffers per submit. Or whatever we need there.
+That is where groups of course work, in that you can submit 2 groups and
+have each member inside each group run independently. But I do think we
+need to decouple the local buffer and group concepts entirely. For the
+first step, getting local buffers working with zero copy would be ideal,
+and then just live with the fact that group 1 needs to be submitted
+first and group 2 once the first ones are done.
 
-This is more from a usability point of view, because the rest of the
-machinery is so much more expensive than a single extra syscall that the
-latter is not goinbg to affect IO latencies at all.
+Once local buffers are done, we can look at doing the sqe grouping in a
+nice way. I do think it's a potentially powerful concept, but we're
+going to make a lot more progress on this issue if we carefully separate
+dependencies and get each of them done separately.
 
 -- 
 Jens Axboe
