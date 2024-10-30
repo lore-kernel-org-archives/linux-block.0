@@ -1,110 +1,120 @@
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A536ADDD2
-	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 13:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04FA1E570D
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 13:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730295098; cv=none; b=kAJqWtsihrzAF0Zem940QFdn2gJ85lTQhYr/LnAPDa8jZ5qmqfedHtA+RI57Xp+/q88TRlwyg0AMbsRL0BxyfbzfL4bif1s3n74fdJXkgCXbxsMLrPTuqRwv8qDQtRsq9xkAAeXr/kYmcFxPkNM+6Lxs3f0Up/IkF6pqwZUhiSY=
+	t=1730295521; cv=none; b=Kf9Uob/lgYKsedZ9AB6I7kX0hgGzX+XWIaNO6bueDb2a5z6r5yC+CVFck0jW1gQDtaostY1kcYhxYXFfXY8ASQa/MO6LcIujUxZMwiTHphJwUycsjqqdwE7GquZG2z9n01lfjV2+b/+lXFy7a2Acs3g60Eq6Q+1P3oKnYv7XY/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730295098; c=relaxed/simple;
-	bh=JfEjxbbjSy46q6R4UVWqsoa5drPceNueU1cJkIYvP4I=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=jneOEAhX25sDQV9P/Q3e6OWkjyLh73GKosEHM48DJbKUKltJiQsaiMosuXOwOxYbTWV5Z51pHYoiCDkNjq/m0SF9qj3vkoPsqKXNEZVaapldyV62CzIkNl7lrR8QsE9j7ydxfBwZ8vsMQ5HUqAdqARHgWU81Nj11u5lekDOkuYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=wBxmOjdB; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1730295521; c=relaxed/simple;
+	bh=zTgYIo/ph95KYaS4AGg/KCiidRJKZvPlzVLAWb6L+dA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=rnAKRHLNK9v1WbXy5cixm4ZZAYhcSCmddiOxMG4qXe1dCHUEXjVDudlhpLIdsyo9YeyEYLTwnH8GoyVLC7G6JcX32XweOG1kwvWb6tqKu/Uc9GaWyOi798payd2ziLoJYAiuQ00j4ZwDNItkOdkVrTRz/Cy9qKX0AxAIDlq+9YM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=dthvk/cY; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wBxmOjdB"
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a3c00f2c75so25281115ab.2
-        for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 06:31:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730295095; x=1730899895; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QG0bHo+3AaqkzRTJMo9uhs8IGAc5w0zj0KZJJ320Jpw=;
-        b=wBxmOjdBej6Fhb5rmhQBQq5PhI96RLWkT1K2PofEIP0ROELh5vP8rsoZUDxxIly+WG
-         e9sXfynIX3ccvbDVNncxmtKAesWnltN5bv54Per26s1LfBMPv1e+fLJjvQa0UTMI98X9
-         JIXQzzUYiSJe+zn70aStXTTTzFmUMKQJjG7Vrux6pH4suON4RkTaNJtc+mqoDa3mj6vV
-         V9Ay13iUZ/ulS6zpHDRjZRJBck7dDmvgTmkuFvAx4w9IZfTStXn0KeJVxRv1lz8NEMnu
-         hdRllp5Vs4ZYz+NpUmFzst5ClevYedCTFiArEXWdaBbRFJOcx/gCB6RD7uopoJXzgKn5
-         wjwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730295095; x=1730899895;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QG0bHo+3AaqkzRTJMo9uhs8IGAc5w0zj0KZJJ320Jpw=;
-        b=xPejg9yavxoBpFgDBxEQgEXJNaF1eCKViwR0SLEyEA0nNSr8yhkobje0RqoQqGDU5R
-         p75Bgcu7HtSMJWXwU73MOTfpUvrn+iRuW2EUK2czb/tEAu6s4GTrO7CKcrVV9jfp4LiG
-         /5R062EnxlNX0V4btrbBUKefB82WsByQX24XjgIluEieX9Ott+pAa8LQs76+LPwzhTv1
-         KfDzbAd+p/5JK2CkDnvH6fGmWJ6I0rQnIpq/AZUjo9ZppNrO2zHIUDBPbCP7zucS1Bc2
-         ePag5JIC/fSET2IWOAZD7nSKLqw4esRNw+ujOMXZa/zMgvURrnuSQwtgtBZv+YzE+Ep6
-         wJAA==
-X-Gm-Message-State: AOJu0YzchpUVAFu9o9cy/c8eRoURIPHtBk7lHw3dA404gM4tX2q0Dfwh
-	oN74VDoSr6rK0SN3GHwQoSdd0xvLXLL4NZSVjcsJ4GgmtkAznH7IaOxTuyIB40U=
-X-Google-Smtp-Source: AGHT+IHBDoYFIQE8HrLOQVHt8MGkWKETeOH93sSfgYs10/jYifF8nyLcHZjgCOVDnxwsCGZQzscoHA==
-X-Received: by 2002:a05:6e02:1546:b0:3a0:8f99:5e00 with SMTP id e9e14a558f8ab-3a4ed2799ddmr150334795ab.4.1730295095431;
-        Wed, 30 Oct 2024 06:31:35 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dc72784f07sm2829826173.153.2024.10.30.06.31.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 06:31:34 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: ulf.hansson@linaro.org, hch@lst.de, yukuai3@huawei.com, 
- houtao1@huawei.com, penguin-kernel@i-love.sakura.ne.jp, 
- Yang Erkun <yangerkun@huaweicloud.com>
-Cc: linux-block@vger.kernel.org, yangerkun@huawei.com
-In-Reply-To: <20241030034914.907829-1-yangerkun@huaweicloud.com>
-References: <20241030034914.907829-1-yangerkun@huaweicloud.com>
-Subject: Re: [PATCH v2] brd: defer automatic disk creation until module
- initialization succeeds
-Message-Id: <173029509229.12165.10740300177309636784.b4-ty@kernel.dk>
-Date: Wed, 30 Oct 2024 07:31:32 -0600
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="dthvk/cY"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20241030133830epoutp02705176ca9cc57a1de766dd1c15c42b09~DPpl8bM_E2531125311epoutp02J
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 13:38:30 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20241030133830epoutp02705176ca9cc57a1de766dd1c15c42b09~DPpl8bM_E2531125311epoutp02J
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1730295510;
+	bh=zTgYIo/ph95KYaS4AGg/KCiidRJKZvPlzVLAWb6L+dA=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=dthvk/cYTQEkCGTtbBRpJrwGzPQ4y6Aq0ZtxjO8+ROBPa6F78JPDImWv7vgew/YUM
+	 OoyO0iRBJKiYNUHhB3abGVYY+4u6O0Ghxmgp+Z+vwZNsBdeQG0xcNK0welgftggyEt
+	 6jpl2MsX+WrVAFKk6XT+j1pmd/6/qOPSoyypvEXA=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20241030133830epcas5p1ddf2e7a7914c516d8e089455798b2ffc~DPplhwsqx2484524845epcas5p1t;
+	Wed, 30 Oct 2024 13:38:30 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.183]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4Xdp9d176kz4x9Pp; Wed, 30 Oct
+	2024 13:38:29 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	C6.A1.09420.5D632276; Wed, 30 Oct 2024 22:38:29 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20241030133828epcas5p3309db76a679c8cdf5c9becf738d8132a~DPpj9I0GL1177411774epcas5p3F;
+	Wed, 30 Oct 2024 13:38:28 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241030133828epsmtrp273d2749e8a99a5360c463a3f6a3db2c0~DPpj8guYt1231612316epsmtrp2U;
+	Wed, 30 Oct 2024 13:38:28 +0000 (GMT)
+X-AuditID: b6c32a49-0d5ff700000024cc-c3-672236d5d5af
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	A5.00.07371.4D632276; Wed, 30 Oct 2024 22:38:28 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20241030133827epsmtip148f9748681ac0d4487214a277e6a9802~DPpiwgHTl1312513125epsmtip1D;
+	Wed, 30 Oct 2024 13:38:27 +0000 (GMT)
+Message-ID: <5220b70f-13e9-4f73-b611-97235db87ed5@samsung.com>
+Date: Wed, 30 Oct 2024 19:08:26 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] blk-integrity: remove seed for user mapped buffers
+To: Keith Busch <kbusch@meta.com>, hch@lst.de, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc: anuj20.g@samsung.com, martin.petersen@oracle.com, Keith Busch
+	<kbusch@kernel.org>
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20241016201309.1090320-1-kbusch@meta.com>
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrBJsWRmVeSWpSXmKPExsWy7bCmhu5VM6V0g+09LBZNE/4yW6y+289m
+	sXL1USaLSYeuMVqcubqQxWLvLW2L+cueslssP/6PyYHD4/LZUo9NqzrZPDYvqffYfbOBzePc
+	xQqPj09vsXj0bVnF6PF5k1wAR1S2TUZqYkpqkUJqXnJ+SmZeuq2Sd3C8c7ypmYGhrqGlhbmS
+	Ql5ibqqtkotPgK5bZg7QWUoKZYk5pUChgMTiYiV9O5ui/NKSVIWM/OISW6XUgpScApMCveLE
+	3OLSvHS9vNQSK0MDAyNToMKE7IxNCzcyFcxirFjZztnAWN/FyMkhIWAi8fLCB+YuRi4OIYHd
+	jBL/9n5lgXA+MUqc6ZjABuF8Y5To+XuaDabl6KRtUFV7GSX+X7zLDuG8ZZRYsLcFrIpXwE7i
+	ddMaMJtFQFXi2saXjBBxQYmTM5+wgNiiAvIS92/NYAexhQXcJZ6u7QCrFxGolfjb9IgJxGYW
+	CJc42LMNyhaXuPVkPpDNwcEmoClxYXIpSJhTwFxi/srd7BAl8hLb385hhjh0LodE/7ZECNtF
+	4t/3W1APCEu8Or6FHcKWkvj8bi9UPFviwaMHLBB2jcSOzX2sELa9RMOfG6wga5mB1q7fpQ+x
+	ik+i9/cTsGskBHglOtqEIKoVJe5NegrVKS7xcMYSKNtDouXhH2iwdTFKfJr/k30Co8IspECZ
+	heTJWUi+mYWweQEjyypGydSC4tz01GLTAsO81HJ4bCfn525iBCdZLc8djHcffNA7xMjEwXiI
+	UYKDWUmE1zJIMV2INyWxsiq1KD++qDQntfgQoykwdiYyS4km5wPTfF5JvKGJpYGJmZmZiaWx
+	maGSOO/r1rkpQgLpiSWp2ampBalFMH1MHJxSDUx80cdLt9Z/OxzaP8EjfZOcpKpLvtOBc5Os
+	9HMzdZ8FXzZv4dHJfH9JcOeqm+llc9dfNeJTW+p2WUpvo6ZD8bWoU3fMz+XcS1M7mG6nePb8
+	D/MnbTu3qbS9sRA2ePxh/zVX9lAOucmma861WZRcV1thonwg5q7ndYZpz+Z319jfXX9ZRU9q
+	SthPYYt7N38Z+NouyerX4DnJnPA/2OTbUwO+X9ytj86vVbvB80475OP6yEZP6+XvpURt8rYF
+	cx/f3bD9RrRe587rMw53SWaIBAht9z3j/8ZBL5TXjXvXrred/O/t5hxZnfGfTXe5ZfGv4i2K
+	q/uXWixefjDcbiWv4eusRx5z7k0J7dSxfZU+85ESS3FGoqEWc1FxIgDzo0YXOwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmphkeLIzCtJLcpLzFFi42LZdlhJTveKmVK6wbSdShZNE/4yW6y+289m
+	sXL1USaLSYeuMVqcubqQxWLvLW2L+cueslssP/6PyYHD4/LZUo9NqzrZPDYvqffYfbOBzePc
+	xQqPj09vsXj0bVnF6PF5k1wARxSXTUpqTmZZapG+XQJXxqaFG5kKZjFWrGznbGCs72Lk5JAQ
+	MJE4OmkbSxcjF4eQwG5GiTtH+9ggEuISzdd+sEPYwhIr/z1nhyh6zSix8nEfC0iCV8BO4nXT
+	GrAGFgFViWsbXzJCxAUlTs58AlYjKiAvcf/WDLBBwgLuEk/XdoDViwjUSkz5OocJxGYWCJf4
+	8LsFLC4k0MUocflqKURcXOLWk/lANRwcbAKaEhcmg4U5Bcwl5q/czQ5RYibRtbWLEcKWl9j+
+	dg7zBEahWUiumIVk0iwkLbOQtCxgZFnFKJlaUJybnptsWGCYl1quV5yYW1yal66XnJ+7iREc
+	UVoaOxjvzf+nd4iRiYPxEKMEB7OSCK9lkGK6EG9KYmVValF+fFFpTmrxIUZpDhYlcV7DGbNT
+	hATSE0tSs1NTC1KLYLJMHJxSDUwmJxe4Lj239PE35suJScEhe77EnsqU9NUSmdc8xUPwqpid
+	6He+mi0hk9eenpucVXX0UNIXsb3FUXsF7S8sWvvAuPwV99Ss5o19Xw4Xty980BRR8J0vMDvZ
+	kS/irEmJiMbsm9d3pzwVfmX9uX6lnJ6Sl/T0T7Nkv2ec+3qbZ92+AyXXIw7l1d06MbmdV7Lk
+	jMmJ84sTvFbq9R/d/XCK8AXNBSdebgqeuUH+z9ZV2zi43724v/vNqbDwl+FHesS0TzSmGTHs
+	bV1q/Z8z5dfJjzwzjn1O5JyUcWBz5PNfz2dn2+Zb90iJ/HVid/ETmRF98tX3VTo3H9qcunKA
+	ReVe6E7uhewxh93092f9r+nkCH27WomlOCPRUIu5qDgRAEW4CiwXAwAA
+X-CMS-MailID: 20241030133828epcas5p3309db76a679c8cdf5c9becf738d8132a
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20241016201337epcas5p33625af2c67f92092078b0b43874d67bd
+References: <CGME20241016201337epcas5p33625af2c67f92092078b0b43874d67bd@epcas5p3.samsung.com>
+	<20241016201309.1090320-1-kbusch@meta.com>
 
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
 
-On Wed, 30 Oct 2024 11:49:14 +0800, Yang Erkun wrote:
-> My colleague Wupeng found the following problems during fault injection:
-> 
-> BUG: unable to handle page fault for address: fffffbfff809d073
-> PGD 6e648067 P4D 123ec8067 PUD 123ec4067 PMD 100e38067 PTE 0
-> Oops: Oops: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> CPU: 5 UID: 0 PID: 755 Comm: modprobe Not tainted 6.12.0-rc3+ #17
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-> 1.16.1-2.fc37 04/01/2014
-> RIP: 0010:__asan_load8+0x4c/0xa0
-> ...
-> Call Trace:
->  <TASK>
->  blkdev_put_whole+0x41/0x70
->  bdev_release+0x1a3/0x250
->  blkdev_release+0x11/0x20
->  __fput+0x1d7/0x4a0
->  task_work_run+0xfc/0x180
->  syscall_exit_to_user_mode+0x1de/0x1f0
->  do_syscall_64+0x6b/0x170
->  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> [...]
-
-Applied, thanks!
-
-[1/1] brd: defer automatic disk creation until module initialization succeeds
-      commit: 826cc42adf44930a633d11a5993676d85ddb0842
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Jens,
+Please see if this can be picked.
+Helps to reduce a dependency for io_uring metadata series.
