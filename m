@@ -1,60 +1,60 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24659D531
-	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 02:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4916AD531
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 02:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730253810; cv=none; b=BbNCSFPwncf3B+uxtsJXf+WAjzqjs39zFK32oZHK5qwhPLAWDDid10srBYK8beVy/SFI1FTn9h5GZMybpYmHGK3retiwT3AAkgXmannImwAa7uZC3BygziGBl5SRP4/iKeW0CzUJecOJTppgrN97zXWlzFp1D3i6dxTi+nAgX4o=
+	t=1730253912; cv=none; b=f15wWHpS+O475s7y/AgKOJplwmxIxhxuOlIMPaTo+Hg1C99OygLkm7CKtF+pOJECyBWIg1m/BHio3wb5JZmPgR54ETDQaQNJF5oJHE5L5O3nDb3CeGYxPfAbdL1tsyifblrNa3C4ACnDUCvY/5+ZO9uF0aQZCEaU23nmTkMvklE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730253810; c=relaxed/simple;
-	bh=LU1WE0bQtdB1RPf/2yVDnHWzxB3haG8OLEiQV7bYcsk=;
+	s=arc-20240116; t=1730253912; c=relaxed/simple;
+	bh=qOxo1ealBUpnYDuccw5HopU/YEp0sygcp2s1+X4YXWo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PTu4bF5hMPI3NOXCr0zNnFZNEPtEsVLCAtLHVfvtyEqETPlEp/AO7NOpOb1kdMJc/rl+6SROtDR1xOG+3XgtMm25SJSOmIq8NB+MYoIeF5oSjGUjmnAf3mKn+3CeGC3HBglIgnZoSjWuEWsrxqSonPDL9rh763XqIozCp+g2I7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E578eA7/; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=l7eRjP1HcDiDSlYMOlP9Gfe805MdZ7M2hnnOat58VSzAAiG0VttV7eHlNTwbSsKYWXaG8HQV7etMkGV81IQaZ8dkMaXcjpmUCtK+NRaMhqAEIG4jQkblgqoCAHZYwRlFSZHxw0iyK6yZmhSEFhmVY/69OaG2/zPDlfX/oy7x50k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WWdXzkVi; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E578eA7/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WWdXzkVi"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730253805;
+	s=mimecast20190719; t=1730253909;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Sx7Y3kuzS6Yv4+4Wap4ntFPjaeMUnRc7s/tK0L5UIy0=;
-	b=E578eA7/EfuNToneTQPXc56FZ/frvluz+MkTb9ZzItcukG6H+FiV4CstwFegNzAnV0H8kG
-	a/hvu8iiqWKsOayFSJCLcLJlqhvDWNk5ws0RioYUxbq43//BCOvyUdeSXWvVvUsWBvFpp/
-	z5mYBobLH0PXyhLhL5mzh4RWIcpdYZs=
+	bh=csyr4yRJRh1sAsUoP3396gbOTM4+V/kYFOHfrz5IzyU=;
+	b=WWdXzkVixGwz7kVhn9SXB4/jnKEwXxSIWIC+ldnSymvynrLY5fK60ReuvIKjoVgxRcAMhd
+	1MYQZZ6BcY4eMKNA5DSm6saVlkQPSrheJRe6RTGaysywHA35z5tbOIpWGZCO5vU1Y8epJx
+	SDnxOOgj/zE/P5y0ZEOpf3j151a3RjQ=
 Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-612-XfoAEF_KOYyxmz6XJwo0IA-1; Tue,
- 29 Oct 2024 22:03:23 -0400
-X-MC-Unique: XfoAEF_KOYyxmz6XJwo0IA-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-578-Xq5Z3oleOT-kx4HghSsGyQ-1; Tue,
+ 29 Oct 2024 22:05:07 -0400
+X-MC-Unique: Xq5Z3oleOT-kx4HghSsGyQ-1
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3AD4B195608A;
-	Wed, 30 Oct 2024 02:03:22 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B01A91955EA5;
+	Wed, 30 Oct 2024 02:05:05 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.45])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5363019560A3;
-	Wed, 30 Oct 2024 02:03:16 +0000 (UTC)
-Date: Wed, 30 Oct 2024 10:03:10 +0800
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CA92919560A3;
+	Wed, 30 Oct 2024 02:05:00 +0000 (UTC)
+Date: Wed, 30 Oct 2024 10:04:53 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
 	linux-block@vger.kernel.org,
 	Uday Shankar <ushankar@purestorage.com>,
-	Akilesh Kailash <akailash@google.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V8 0/8] io_uring: support sqe group and leased group kbuf
-Message-ID: <ZyGT3h5jNsKB0mrZ@fedora>
+	Akilesh Kailash <akailash@google.com>
+Subject: Re: [PATCH V8 5/7] io_uring: support leased group buffer with
+ REQ_F_GROUP_KBUF
+Message-ID: <ZyGURQ-LgIY9DOmh@fedora>
 References: <20241025122247.3709133-1-ming.lei@redhat.com>
- <15b9b1e0-d961-4174-96ed-5a6287e4b38b@gmail.com>
- <d859c85c-b7bf-4673-8c77-9d7113f19dbb@kernel.dk>
- <bc44d3c0-41e8-425c-957f-bad70aedcc50@kernel.dk>
- <e76d9742-5693-4057-b925-3917943c7441@kernel.dk>
- <f51e50c8-271e-49b6-b3e1-a63bf61d7451@kernel.dk>
+ <20241025122247.3709133-6-ming.lei@redhat.com>
+ <4576f723-5694-40b5-a656-abd1c8d05d62@gmail.com>
+ <ZyGBlWUt02xJRQii@fedora>
+ <bbf2612e-e029-460f-91cf-e1b00de3e656@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,153 +63,57 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f51e50c8-271e-49b6-b3e1-a63bf61d7451@kernel.dk>
+In-Reply-To: <bbf2612e-e029-460f-91cf-e1b00de3e656@gmail.com>
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Tue, Oct 29, 2024 at 03:26:37PM -0600, Jens Axboe wrote:
-> On 10/29/24 2:06 PM, Jens Axboe wrote:
-> > On 10/29/24 1:18 PM, Jens Axboe wrote:
-> >> Now, this implementation requires a user buffer, and as far as I'm told,
-> >> you currently have kernel buffers on the ublk side. There's absolutely
-> >> no reason why kernel buffers cannot work, we'd most likely just need to
-> >> add a IORING_RSRC_KBUFFER type to handle that. My question here is how
-> >> hard is this requirement? Reason I ask is that it's much simpler to work
-> >> with userspace buffers. Yes the current implementation maps them
-> >> everytime, we could certainly change that, however I don't see this
-> >> being an issue. It's really no different than O_DIRECT, and you only
-> >> need to map them once for a read + whatever number of writes you'd need
-> >> to do. If a 'tag' is provided for LOCAL_BUF, it'll post a CQE whenever
-> >> that buffer is unmapped. This is a notification for the application that
-> >> it's done using the buffer. For a pure kernel buffer, we'd either need
-> >> to be able to reference it (so that we KNOW it's not going away) and/or
-> >> have a callback associated with the buffer.
+On Wed, Oct 30, 2024 at 01:25:33AM +0000, Pavel Begunkov wrote:
+> On 10/30/24 00:45, Ming Lei wrote:
+> > On Tue, Oct 29, 2024 at 04:47:59PM +0000, Pavel Begunkov wrote:
+> > > On 10/25/24 13:22, Ming Lei wrote:
+> > > ...
+> > > > diff --git a/io_uring/rw.c b/io_uring/rw.c
+> > > > index 4bc0d762627d..5a2025d48804 100644
+> > > > --- a/io_uring/rw.c
+> > > > +++ b/io_uring/rw.c
+> > > > @@ -245,7 +245,8 @@ static int io_prep_rw_setup(struct io_kiocb *req, int ddir, bool do_import)
+> > > >    	if (io_rw_alloc_async(req))
+> > > >    		return -ENOMEM;
+> > > > -	if (!do_import || io_do_buffer_select(req))
+> > > > +	if (!do_import || io_do_buffer_select(req) ||
+> > > > +	    io_use_leased_grp_kbuf(req))
+> > > >    		return 0;
+> > > >    	rw = req->async_data;
+> > > > @@ -489,6 +490,11 @@ static bool __io_complete_rw_common(struct io_kiocb *req, long res)
+> > > >    		}
+> > > >    		req_set_fail(req);
+> > > >    		req->cqe.res = res;
+> > > > +		if (io_use_leased_grp_kbuf(req)) {
+> > > 
+> > > That's what I'm talking about, we're pushing more and
+> > > into the generic paths (or patching every single hot opcode
+> > > there is). You said it's fine for ublk the way it was, i.e.
+> > > without tracking, so let's then pretend it's a ublk specific
+> > > feature, kill that addition and settle at that if that's the
+> > > way to go.
 > > 
-> > Just to expand on this - if a kernel buffer is absolutely required, for
-> > example if you're inheriting pages from the page cache or other
-> > locations you cannot control, we would need to add something ala the
-> > below:
+> > As I mentioned before, it isn't ublk specific, zeroing is required
+> > because the buffer is kernel buffer, that is all. Any other approach
+> > needs this kind of handling too. The coming fuse zc need it.
+> > 
+> > And it can't be done in driver side, because driver has no idea how
+> > to consume the kernel buffer.
+> > 
+> > Also it is only required in case of short read/recv, and it isn't
+> > hot path, not mention it is just one check on request flag.
 > 
-> Here's a more complete one, but utterly untested. But it does the same
-> thing, mapping a struct request, but it maps it to an io_rsrc_node which
-> in turn has an io_mapped_ubuf in it. Both BUFFER and KBUFFER use the
-> same type, only the destruction is different. Then the callback provided
-> needs to do something ala:
-> 
-> struct io_mapped_ubuf *imu = node->buf;
-> 
-> if (imu && refcount_dec_and_test(&imu->refs))
-> 	kvfree(imu);
-> 
-> when it's done with the imu. Probably an rsrc helper should just be done
-> for that, but those are details.
-> 
-> diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-> index 9621ba533b35..050868a4c9f1 100644
-> --- a/io_uring/rsrc.c
-> +++ b/io_uring/rsrc.c
-> @@ -8,6 +8,8 @@
->  #include <linux/nospec.h>
->  #include <linux/hugetlb.h>
->  #include <linux/compat.h>
-> +#include <linux/bvec.h>
-> +#include <linux/blk-mq.h>
->  #include <linux/io_uring.h>
->  
->  #include <uapi/linux/io_uring.h>
-> @@ -474,6 +476,9 @@ void io_free_rsrc_node(struct io_rsrc_node *node)
->  		if (node->buf)
->  			io_buffer_unmap(node->ctx, node);
->  		break;
-> +	case IORING_RSRC_KBUFFER:
-> +		node->kbuf_fn(node);
-> +		break;
-
-Here 'node' is freed later, and it may not work because ->imu is bound
-with node.
-
->  	default:
->  		WARN_ON_ONCE(1);
->  		break;
-> @@ -1070,6 +1075,65 @@ int io_register_clone_buffers(struct io_ring_ctx *ctx, void __user *arg)
->  	return ret;
->  }
->  
-> +struct io_rsrc_node *io_rsrc_map_request(struct io_ring_ctx *ctx,
-> +					 struct request *req,
-> +					 void (*kbuf_fn)(struct io_rsrc_node *))
-> +{
-> +	struct io_mapped_ubuf *imu = NULL;
-> +	struct io_rsrc_node *node = NULL;
-> +	struct req_iterator rq_iter;
-> +	unsigned int offset;
-> +	struct bio_vec bv;
-> +	int nr_bvecs;
-> +
-> +	if (!bio_has_data(req->bio))
-> +		goto out;
-> +
-> +	nr_bvecs = 0;
-> +	rq_for_each_bvec(bv, req, rq_iter)
-> +		nr_bvecs++;
-> +	if (!nr_bvecs)
-> +		goto out;
-> +
-> +	node = io_rsrc_node_alloc(ctx, IORING_RSRC_KBUFFER);
-> +	if (!node)
-> +		goto out;
-> +	node->buf = NULL;
-> +
-> +	imu = kvmalloc(struct_size(imu, bvec, nr_bvecs), GFP_NOIO);
-> +	if (!imu)
-> +		goto out;
-> +
-> +	imu->ubuf = 0;
-> +	imu->len = 0;
-> +	if (req->bio != req->biotail) {
-> +		int idx = 0;
-> +
-> +		offset = 0;
-> +		rq_for_each_bvec(bv, req, rq_iter) {
-> +			imu->bvec[idx++] = bv;
-> +			imu->len += bv.bv_len;
-> +		}
-> +	} else {
-> +		struct bio *bio = req->bio;
-> +
-> +		offset = bio->bi_iter.bi_bvec_done;
-> +		imu->bvec[0] = *__bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
-> +		imu->len = imu->bvec[0].bv_len;
-> +	}
-> +	imu->nr_bvecs = nr_bvecs;
-> +	imu->folio_shift = PAGE_SHIFT;
-> +	refcount_set(&imu->refs, 1);
-
-One big problem is how to initialize the reference count, because this
-buffer need to be used in the following more than one request. Without
-one perfect counter, the buffer won't be freed in the exact time without
-extra OP.
-
-I think the reference should be in `node` which need to be live if any
-consumer OP isn't completed.
-
-> +	node->buf = imu;
-> +	node->kbuf_fn = kbuf_fn;
-> +	return node;
-
-Also this function needs to register the buffer to table with one
-pre-defined buf index, then the following request can use it by
-the way of io_prep_rw_fixed().
-
-If OP dependency can be avoided, I think this approach is fine,
-otherwise I still suggest sqe group. Not only performance, but
-application becomes too complicated.
-
-We also we need to provide ->prep() callback for uring_cmd driver, so
-that io_rsrc_map_request() can be called by driver in ->prep(),
-meantime `io_ring_ctx` and `io_rsrc_node` need to be visible for driver.
-What do you think of these kind of changes?
+> I agree, it's not hot, it's a failure path, and the recv side
+> is of medium hotness, but the main concern is that the feature
+> is too actively leaking into other requests.
+ 
+The point is that if you'd like to support kernel buffer. If yes, this
+kind of change can't be avoided.
 
 
-thanks, 
+Thanks,
 Ming
 
