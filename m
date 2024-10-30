@@ -1,204 +1,224 @@
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986A71BD9D1
-	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 18:47:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730314057; cv=fail; b=OD2EnjztrTsacJ26Jo30AVP9S2qJlLZ1yqM0gU+GVkuafGrZ+EX5lsf7vIrxzoLy1gec5V8m1Nv5LnXJEXXcIbAQ9Py9lQ6+QGXRFMEmL4mrXb96+3RbXxHhMt5WcJAIq7i5JVeuZOWf6IMTy6Uypt79knfnbluTO0PBqJ1MElg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730314057; c=relaxed/simple;
-	bh=unAHLglHXgJ/Qe0/TWfPjlaHpVYXPfbef0dK3OymNEs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Vt7AX86noOoCQxS5/dF7+zr6jE2wQXhTnMkhe7d768q4fCIpYeHxS96RealuUERo7TMeXJcdxHxMez0gObALWxcdW3hVZ0paOenPR/Dxcp2i/o7jhqhNp3C8hHdxajnJcM7wVZVru6RFy0163Ya0G/apxy7iFkMDPRuCFiMRpRw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=ouT1os6R; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=SiMNzGdi; arc=fail smtp.client-ip=216.71.154.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE881D04B9
+	for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 20:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730318751; cv=none; b=cqFoaUGlNjhvDKqe9N/QZS+71D1URvFbA/571kIwCYfB6dXjM+urMKgOohceXC+K5BC3LT653uSIHUy93WxZCEI0tgjn2fCZGzv/VkaNVP1/OTJxidOj7a/etry+nHIzFv0L0YHI6pqbiGeCU6NAHLuCCMYdF8ChLnxP9+aJ/bo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730318751; c=relaxed/simple;
+	bh=lkwtoRA5tvMUiCpjLAGYONGPDcS+xn0HGuOJP0Bh3dc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=kA0xQviWo6Q2Fq8I+4xrZaacF4Qt0eHJIq62a/0z9d7RroctmUasmJUBOsXALzrL0+ZQrpKIW19yt9zrSTF4NgMLvOLDK0sla7XQlLuQ0i8xtT2fQiP8U5mt/mAGEI6zWxWbDe+YipsR1W8C5RM/LZgKs/OJ6cAeRrL0/yB2BKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CDbTh8xn; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ouT1os6R";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="SiMNzGdi"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1730314055; x=1761850055;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=unAHLglHXgJ/Qe0/TWfPjlaHpVYXPfbef0dK3OymNEs=;
-  b=ouT1os6Rx0X49nGjPEQyafM7Iq84uaKKa1aAtIFIXkddq3RgdkGeS6kw
-   3/5ywf3+UamnCaswX0DCZb/QTz6eZ/BOi2nOdEBwiYG5jKZTqX628kU2U
-   +HGPRkG0RMuz6VVuje4vXrxryOdwOJhwP+vbvaDelaQOuCLDN2ejyECXX
-   Y4OOMSz8v4NKKemsT/6pXX3wepx6SjwKaV2AGC1beib+OdGgB95ei3h/9
-   cInv3HC3Cm8ngqpFT8O1BnkC7oGUxWG7T+bbKlbH7Zchb0tn1SwwbB4Ig
-   n3HGalKnVIwox4jqm0pgxedRYeJ4Gzj8OqyCuf8BNbxaepbvQfXZDNZ44
-   g==;
-X-CSE-ConnectionGUID: ZZQKPe4rR3WyVvP3Ly7zCQ==
-X-CSE-MsgGUID: 8KdL8mWaRyu94ZHlS7ITiA==
-X-IronPort-AV: E=Sophos;i="6.11,245,1725292800"; 
-   d="scan'208";a="29658880"
-Received: from mail-westusazlp17013074.outbound.protection.outlook.com (HELO SJ2PR03CU002.outbound.protection.outlook.com) ([40.93.1.74])
-  by ob1.hgst.iphmx.com with ESMTP; 31 Oct 2024 02:47:29 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RgdQjpHUlimh+1y/MCx+FLE0GD9es5DGM2xlWTCXCRcOyLFqOyuE+amqI2dtGOpZp1b30WKj+p2er/9W9gIWOlCg8zSuN9DIQqtA0jz6ZIRbmspk72vfuy4X31ghIOt7UXlydxs/lzjvVPAzB7uTSKSFSjExiKkm1d/ORmPNxaRMziwfE4SNZM7LVqWOKPiV1LIYFf5nAc6EmqAKbrAb9kyGFrQlwODoyPfqUiOrXrnNxlOFA6ORH3rGpshG0vabdhptQvfbr0ksSYPw/VKX8yjIUi6Q7l+EB0HFmgIiHkYW+hSMEz1L9muOo/zqE+lGZSCKyZjQdYH7gsbA9kE9MA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=unAHLglHXgJ/Qe0/TWfPjlaHpVYXPfbef0dK3OymNEs=;
- b=RDUHrIi0yPxT8632ONRgAs87Y0dtp5H6xOd1tmrPP4Ldn14uwfzHIWlAdzCZN+dQQRb6YFgplJUOsfnprC4b67gzs6M0xqkkY9ouHkXzwZFzf4Mx+EQPJiS9JlRTCBYbcRr9bFisB87c4YEUHt8OqDEtRJ9mWxFKvlnCwkXuA+4OdXR6mAqB6+it76SHLS/+UmVpkZZD5WM2wOBbA+zl/g2K9bX5koaHHx5sCF43J4SmraGfoh1wW/4YqRcUuW12v/8IOy/CMJ4I3G4Lc+mHgrEV1ynHpSVh6DXszhdW1Qt85i7eoSp7DpN20SRAtD2E6ZPNRSe+n0MyWQd7XCndQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CDbTh8xn"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4316a44d1bbso1758445e9.3
+        for <linux-block@vger.kernel.org>; Wed, 30 Oct 2024 13:05:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=unAHLglHXgJ/Qe0/TWfPjlaHpVYXPfbef0dK3OymNEs=;
- b=SiMNzGdi9YplFT6goAZh4suZGlSZsdl0lGi92BA6Hhg3ZpHR+oZW9CI20MCXWTDUm9qe71MC6ykJWJgdT7wf/YdFjtfTm+5SgU6SFd1CIWKDpbhdsX9/jFJvEnC8V7ZYhvWixu7RQuPOG0r06XI/DppXs/O8pNxQc9gn/a5wYUU=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by BY5PR04MB6900.namprd04.prod.outlook.com (2603:10b6:a03:229::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.32; Wed, 30 Oct
- 2024 18:47:26 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969%4]) with mapi id 15.20.8093.027; Wed, 30 Oct 2024
- 18:47:26 +0000
-From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To: hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC: Chaitanya Kulkarni <kch@nvidia.com>, Kundan Kumar
-	<kundan.kumar@samsung.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>
-Subject: Re: drop some broken zone append support code
-Thread-Topic: drop some broken zone append support code
-Thread-Index: AQHbKotD7rvQuXXiMEG0URcxXJRLmbKfozyA
-Date: Wed, 30 Oct 2024 18:47:26 +0000
-Message-ID: <8b043769-d733-418b-a418-f558d0a21c2a@wdc.com>
-References: <20241030051859.280923-1-hch@lst.de>
-In-Reply-To: <20241030051859.280923-1-hch@lst.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|BY5PR04MB6900:EE_
-x-ms-office365-filtering-correlation-id: d8bbc504-1db6-4779-ee64-08dcf9134c9e
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?STF0Y3l1aWhvTEJVQjNuQkRvcHFJc2h3U2VzUXdCSG5kZlc2cTE3TC9qYjUy?=
- =?utf-8?B?VG5BS3FDZGRsbHNaUHl6TnlOMTl1elJBRXhsT0ZuTWF3WFE5aEhYYVJpQ3RB?=
- =?utf-8?B?dkpoWW9RTUVxNUxpNzNKU3V0TmJLZWQyQ2ZHbjhFNHV4T1RSUkNkTVJXemJI?=
- =?utf-8?B?ZWFHTFZ4WkoxNTJEQkY3QmZDc0lMbWhQakxPSzhvMWVvTlF1UE9oRkF6cUhH?=
- =?utf-8?B?WTd1YjU1MXlabTlBeHliVGZodEE0TFVXaEZpamhRRUxkRzRmWW5uaDB1WWtt?=
- =?utf-8?B?ZnRBSVFoUnREaEtvSGdUQTVCeU1qbjNNWUVzWUlRVElpVE9aM3BOOVpmV1g0?=
- =?utf-8?B?ZHZSalJ5dVI2ek1kYkVnemVRSUxHTDVJY0graFdMazBWZFgxTVVlaUVRRVVl?=
- =?utf-8?B?bHg3NXBaMzcvTksxaytYYkh1UjJMaWJQWkNFNW5rZkRKQmoxRzVwS1ZwVG0x?=
- =?utf-8?B?eFJNRisweTBCKytwZ2lQbDZKa1MvZ0wvM3R1Y0lNWU5vZ3pUb1VwSzd5bVlS?=
- =?utf-8?B?NGJ5SXFjYTkwaHVEV2tGVVhwRmhyVVArdU9EYy9pOHlBYU8xNDk0cHV3M1dl?=
- =?utf-8?B?V0E4N1pFNkJhaTIxMkNzYllPclBwTEFFMytBT0RpWEJHY1JzcVRFRnNxMTho?=
- =?utf-8?B?b0FueXJMeDY3QjBTL2l1UUgxTzk2TElYL1p3QXlUOXFZN01XTE10amJhR2JS?=
- =?utf-8?B?Nit4cjdpaTg5SW9wWUZraXZ0MXlDZHMveTF6WDUwLzNLaTl4VEtBZWh0NDRC?=
- =?utf-8?B?b244cGhrdnVUcGZCaDc4M3FMc3E1aFBndm45c0F0MElNdzZORkpnWVAvcWUr?=
- =?utf-8?B?cEk4T2pVWnpZSWZEVTBnRjIwYmlWeVpmb1Z5YUVLeVIvdnd3U0I5WFlFcHhs?=
- =?utf-8?B?M3JYTlYzdHJ5Y1lXb2xEVGxTNVBvYXpoYTZZckl4RUlaeXZ1M0tpbmd4bGdE?=
- =?utf-8?B?ZyswWE56S3FaZFJJbmx5Q1VzcjRYdlFwU0RmTWNLU3ZGK1VIMXJRSm9ORlJa?=
- =?utf-8?B?T0w3T2tZV0FMTVVmMEZzT1ZPYkJIakw3dWZEN0lCZmhKcXVjU0hrMlJwL3hD?=
- =?utf-8?B?b0FKSEJWeEpQajhCOTZ5MUQrWXpFeTVrVW43OSt2SnQ3VXV6RVIrUDlKcC9K?=
- =?utf-8?B?djNBM0RiWWFBdU5iY0hyS2lrSFJuUFpqbHhGR0hERU1EaStvWW1ZL3NGZ0R0?=
- =?utf-8?B?U1VNYTNHUThnL3ZXdjVGWk1JTU1pTkpCd2JtY1VYZFVsc3Q3MTcyYnZMcnVh?=
- =?utf-8?B?bVZ0emg1SVpoS3M1VFVsU3RIdHMvK0YzZHVubnFYVWdOZjlWeW1NekMyc01I?=
- =?utf-8?B?SmF4eVJRM0pwSWNzN0hkNXJYd1ZzTWl1anZoRmRHZFloUzlja1NPVGIyc2RB?=
- =?utf-8?B?akMreEhjeCtEbzM5ck8zRmRrTi9WTWtWMnFLK2hvTzUvZENoTlJUNk9jUU8v?=
- =?utf-8?B?NlZJcVpwdmR4RTNJMFhkZjNIV0FZN3NXdVl0ZlJPQlcvMU1QU3BLU1VzczRS?=
- =?utf-8?B?c3J0bWo4UG90SHllMjBzTWJ3c1c3RW1DeWVTc2gzeS9NK0Q5ajYra0FOdmti?=
- =?utf-8?B?eUlicFpLd0t5NXVCb3c1REtuYTRad0s4VEQzN1FyUjFwZEt4Ui8xclh4R0ty?=
- =?utf-8?B?cy9WalNCZUc4cXNkSzVvdTd4a2g2YlNTNXAwL2xLcThWY0lYQ3p0NTVINVVy?=
- =?utf-8?B?aldFYlpNVXlNdFJ1SnMwOWZITXFJUXFaYlFtZ0ppa1VUMWE4b3E1eE80UTQv?=
- =?utf-8?B?OWRsK0NBTUtzNzFRaitzdllFMGNCRnlyc2N0Q3p0Y1BSN0VtM2xkT1NDM1Nx?=
- =?utf-8?Q?AR5hBd50t37bJDLuXBpsqYqq2ZqgGQuh1snyU=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?cko3Y1VPVGFNcTkwUU5DeldmQTh6OVRKa0xMUlBySGszYjYxVHFHdnorSzJY?=
- =?utf-8?B?ZEQ4NWI2V1QwalRUd2xtQXgxZnlleVJGR2VVbVB6SU9reG9MbldlL2hUUUhF?=
- =?utf-8?B?QTR2dlNabk1WRnU1cjFTOVJiUldhUjlOK0hzV2Z1a0RMWWhSNS83VWNzMmJj?=
- =?utf-8?B?czYxNW4wd3lkZXFTeUM5VG15TUgwMzkwaThEbTNXby9XVjMza1lGRHZqaldz?=
- =?utf-8?B?OFVNcERRWmxndDVXS2FoSEROZE1mcmNJUFg2WFlvNENhTHFqUGNpSXZYOXNS?=
- =?utf-8?B?RGNOcWhCZ0d2Z0gyMld2RG4yWWhmelFCcmhBbEcraEdGUWFhZEZjNDd6N2Zr?=
- =?utf-8?B?aWtla1drcEVveEJ1KzdqWnlyWE84djRQRnN6MG9lUElQRnVPQ1RRL1ZGT3ox?=
- =?utf-8?B?NXBtRzB0eFpZa2ROOVA5WFE3ditPOFJrdkxiMDdIOXI5dSs3WkEzK0gxTU5J?=
- =?utf-8?B?R1M0U2pnNlJBRENTNTdsaEFyVkMxTVdNK0RYekNtUko3SHZMdXVpN1pPMVdF?=
- =?utf-8?B?S0NIT1BjRVpac0Zpck9FR2s4OTlxVkdTeWhMdys3Qk1nNUp1S0pVQkFpTHJE?=
- =?utf-8?B?ZUJCUHdiM25BdUlhdStTMktxYStPdEg4Zjd5cjlsK2pnekhFazFsNDhzdlhv?=
- =?utf-8?B?VVZIVWliVFpTdDFkU252ajNFM2ozVTAyeU5qTUkzYit0bFR6d3BoOGFKeS9F?=
- =?utf-8?B?YUtYUmEzSXB0WmFqSDZhNVIxOVFMZDk2eEFvRittcHE5Ty91QnBid3BKWFRy?=
- =?utf-8?B?N3VMU2oxSmVUa1FMUkpMT2lGZ1NmbXltY2EvaW9VNDFtSVY2MThYc21zZzVV?=
- =?utf-8?B?UnFwWHlIWG5xU0NPY3ltSDN0QjJSOVBxa3RTZHcxcFdveFVZU3cyeWRXQnE0?=
- =?utf-8?B?MDFZOWVuRWZPellzcVRwcXM0a0dRZENsV2ZuU2pHaGd4dXNIa284clVLOS9T?=
- =?utf-8?B?TXRFMFZ4cy9zN0o0bDA0L1JTak4yU0V2R2lGZXZCejdmRmZHaHE4YW1JZDZ3?=
- =?utf-8?B?R3FNUGdCemgvTnZ0TTFaVmJDeFBpOHZ5WTB1WjM5cUc2UW5ZWVZuaW83UTFx?=
- =?utf-8?B?YjVnbllPd1JsQTlWL211a3c1UzVDdjdCT0FtbkpGaTUxTEhtNEg0UHZITi8z?=
- =?utf-8?B?enZOV2ZMaXNPUUdqQU13d1J0eFhmYUhRbHdGOTNEeVpyOU16NFovY0RmcXJE?=
- =?utf-8?B?V0h1bUV3TDlFQThFdjVIVG5WTjA1Y0pLUEdoSXB5dE9VOUFFMG9XZU5xTHZa?=
- =?utf-8?B?Qk9SM2YzOUtqQW9mVFB4YURpTHNjOFhMVVJCUjVNS1gzcUtQMnozY1A0bzBy?=
- =?utf-8?B?YUNNTnpKMkxjWE5pR3NQcE9SUU9GazUxNW9POXlEaDU5dHZjWThyLzNNb0lB?=
- =?utf-8?B?c01GL1ZBd0J0WkdrNGNWV2R5L0kzWnNDeHhmQm9TWXVBNFZIQTdsc1BxVDVo?=
- =?utf-8?B?V2J3OFZlaVFsNDJMTWhhMGxhcklIcnhVTmhOZDBmZXdYNkY1QjJTNkQ1R25y?=
- =?utf-8?B?ZDNYdExrWDkrbnRjSk0rQnFVeEJSY3BUWStuSWV5NGtaRU54Rk1RNktYeGVS?=
- =?utf-8?B?WTlKNG53Y1hyR1RlMUtGRitpUVk1VldmdkU1blNvZ09jbWtaSi94VHVYd1lK?=
- =?utf-8?B?NkR0WTEwZ0kwc0VpYm5uNy9uWWN3YU1Ra3RFUWNsVitUV096SHNIQ2tia0la?=
- =?utf-8?B?RXkwVERlWkZjWDF3TzA5UEtZQnNnN1p1aktIcDN3b1c3TTB3VHcwY0s4QlZB?=
- =?utf-8?B?aUxrUzlHQTRtUURQUitrbzBBbEVsdnlCSXJzQm1hdDNyQm9CakdzQXM1elVo?=
- =?utf-8?B?TTMzdGFDK3lNMG5icC9ZaUZEYVEwZlBEbTc0dTRmL2wwWVZQYnZ6K0JSemlP?=
- =?utf-8?B?QmdwUnlyNGdFY013V2N2OE5YQWZRRzVnQVJQN3kwaFVOOFVvMG41SDdCNUdt?=
- =?utf-8?B?eER3dkN0Z1NFcUpVdXNrRlp6TG84S2dOb3V6M1Q3SkJCclNCZVhYcGUwRTla?=
- =?utf-8?B?LzFwOWRPTVBBVFY4VGwzYUVGNW52NmJoZmxKZEEyMm1uc0IvK3cyZTFiRThJ?=
- =?utf-8?B?OFRVM0JRYXZsSVVVbTJnRDdsODFYa3Bid3AwUkt2K2oxUHNYUmEvdk50dDJW?=
- =?utf-8?B?SW9sOUsrdS8xa3MwckZRYkNkS01OQzE4TTNJVHlaNStaSVAzSnN5QkNGUkVT?=
- =?utf-8?B?T3c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6B6490B90FA9C446932C8AD7E75DBAF3@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=linaro.org; s=google; t=1730318746; x=1730923546; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BMYzWn3a9BZHBJmSLCvIY/w+pubGzIYYisFrSZ78I48=;
+        b=CDbTh8xni7gt/fZC/QpUJta+7XxgsP6nM1iYI+yc36Uh5MZRuUVOudH4bKH3fj49sn
+         1M5InDtuCThD8wXNGDFAy2+78AL6N/MbHG8Woa7mjuBuIT+8mk5/+I5g60/KEH4CFxPM
+         rPVGsbn23SfMOFGa1YvGCfLgjOZSWgAKa8xh+KXNufUllaI6+1zGhj/dVLlIcqh6p0XH
+         59D20lzthze2a7oC1+NYhX5fePMpeBaQU/SmKVZ6AAlyZwkvAgpXlk1qh5xbBHdIcnan
+         hsDgS+VBMjf1Atzm6js6WIQipqyZpdoIp4UcdBT3+zpoo+aJ5lZ47xwI/Yt39SKOFGx0
+         zrVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730318746; x=1730923546;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BMYzWn3a9BZHBJmSLCvIY/w+pubGzIYYisFrSZ78I48=;
+        b=oh5iRvoUQYCJanwlLMYUGOslpoBtd7qytxCGr7EJe1lVVI6rBkzsVe/u8DxXtxnUuJ
+         19s0emq0GTGNY7vsSzgsFeUUqwTqe4iVxuwinaqXB4dlOJjDkZI917l9OIQ+KFGsbSWy
+         S4Ka8ePgkNSb3D3uhAaXsb6jyhZy+/dwZa93P0IadEHr+GHWONKQ34nYcrBXIDeG135b
+         iUMRwZIRWPkmVDYT5NsZGbZowFIl17DULjNIJ1Khbi3SskShT8aRqfT/agHFyPgjjCCH
+         Em5zHolWsU82ZdkXNk7SaTuxWuk6P9YxIijGCxVPRP/Y1HsxfTAeRH6iTMWG0lBVBt5Y
+         Ka6A==
+X-Forwarded-Encrypted: i=1; AJvYcCU7QMH/FXDhmoa6SwTP+SEb3YaRDawfLNfOKYvuB4cAvktrptEbZw8tr5RiBxId5Irl3LIfstoXwlFXUQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZBldkU+G4BKV1kbB6s4Fw1NvLvUV67jFEeZaKOa+pF2Ewx2ai
+	kEarjF3Fs9GKm+rGcNhhlZOJlE7RzWG3ME15J8YdSZ5aTUrVkNCaa41ckFhov3M=
+X-Google-Smtp-Source: AGHT+IEDH4m+a8rcy96TqWsPWN9s2UOIanCX22F1aRjED1fm8KzovyJb8Oo8tcsdMdF1fJbXALgUwQ==
+X-Received: by 2002:a05:600c:1d28:b0:431:6060:8b16 with SMTP id 5b1f17b1804b1-4327b80055dmr7553265e9.30.1730318746063;
+        Wed, 30 Oct 2024 13:05:46 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431bd9a9a53sm30796495e9.30.2024.10.30.13.05.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2024 13:05:45 -0700 (PDT)
+Date: Wed, 30 Oct 2024 23:05:41 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Johannes Thumshirn <jth@kernel.org>,
+	John Garry <john.g.garry@oracle.com>
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+	axboe@kernel.dk, song@kernel.org, yukuai3@huawei.com, hch@lst.de,
+	martin.petersen@oracle.com, hare@suse.de,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: Re: [PATCH] btrfs: handle bio_split() error
+Message-ID: <1cab6d9b-8493-4baf-8a44-602dc035ded6@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	8xi2sgzeBQPOxI4/qPxpBl4Dqmvp8FG3yXQrIZ/ZJ9gvXeFTZUjotiD1DjS/Is0SFE2d5CBPNf6syt4ZvrphDl8+8SruCGUKbLbJIBnDPdei3hQUGX4SNjHuecbxq9Ww1+RZH/5rcyHjB3XqX7QxTbukdJzFnuxsfjqkFaaGrtG2IZKOpViySN5tGuIUnMHzEFxqsDRwav3k1rBa+gBzt1JcyJLbApJmOd+w+Ms/wNmhAf2xrmOdOglM/b+CAnXvLVE644FyxgG1VJ2k1g7xWd7EaPYyqC/o+539x4APXFmVEmWPhmbwdfhJ3Ge3OEof3XUyRGXbxb2Ns7/9KqasMPDT7stmxcwLtN1K64BVk+1jvrInG7JPp/v6boTy+n1whqzLROpeaKTrRAFpMz6n1J5OxUtxC4p6cl1WJWXkqZJfZwZoXJReIyTNL+h8XEOtWanJX2JKWYLGEhMFOIZzW8ZRAK+Jlx6hM57jXqfqaN53g1L1Lk0cYZTmFaUJ9iL3qwY52Evd25AkdjUe9lvkkA5FELJY8iD9iKWvVRKzr7X3BcnUIgqKg164GeAKX8Sld3ukDMYWTdM00te3c9zhragWKf2GTYzUxZl7frEJxSDlDi3GBqxDg16IFL0biQ68
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d8bbc504-1db6-4779-ee64-08dcf9134c9e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Oct 2024 18:47:26.4793
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 7OP8sImsVhcb74qZLnMEV5kScqYuLsH7LOzACprGywXwn8XGeTNh7cHmSWPcCIE/h0IzgleefjF8uWeBZ7Z547nF4Nwh/nADFdbtb7X0Wyc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6900
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241029091121.16281-1-jth@kernel.org>
 
-T24gMzAuMTAuMjQgMDY6MTksIENocmlzdG9waCBIZWxsd2lnIHdyb3RlOg0KPiBIaSBKZW5zLA0K
-PiANCj4gd2hlbiBwb3J0aW5nIG15IHpvbmVkIFhGUyBjb2RlIEkgcmFuIGludG8gYSByZWdyZXNz
-aW9uIGluDQo+IF9fYmlvX2lvdl9pdGVyX2dldF9wYWdlcyA2LjEyLCB3aGljaCBpc24ndCBhbGwg
-dGhhdCBzdXJwcmlzaW5nIGdpdmVuIHRoYXQNCj4gdGhpcyBwYXRoIGlzbid0IHVzZWQgdXBzdHJl
-YW0uICBBZnRlciBzcGVuZGluZyBzb21lIHRpbWUgdHJ5aW5nIHRvIGZpeCBpdA0KPiBJIGdhdmUg
-dXAgYW5kIHBvcnRlZCBteSBjb2RlIHRvIHRoZSBzY2hlbWUgdXNlZCBpbiBidHJmcyB3aGVyZSB0
-aGUgZmlsZQ0KPiBzeXN0ZW0gc3BsaXRzIGJpb3MgdG8gdGhlIGhhcmR3YXJlIGJvdW5kYXJpZXMs
-IHdoaWNoIG1vcmUgY2xvc2VseSBtaXJyb3INCj4gd2hhdCB3ZSBkbyBmb3IgdGhlICJub3JtYWwi
-IGJpbyBwYXRoLg0KPiANCj4gRWl0aGVyIHdheSB3ZSBzaG91bGQgbm90IGNhcnJ5IGRlYWQgY29k
-ZSwgc28gcGF0Y2ggMSByZW1vdmVzIHRoYXQuDQo+IFBhdGNoIDIgYWxzbyByZW1vdmVzIG91ciBv
-dGhlciB6b25lIGFwcGVuZCBoZWxwZXIgYXMgZm9yIHRoZSBzYW1lIHJlYXNvbg0KPiBubyBvbmUg
-YnV0IHNlbWktcGFzc3Rocm91Z2ggaW50ZXJmYWNlcyBsaWtlIG52bWV0IHNob3VsZCB1c2UgaXQs
-IGFuZA0KPiB0aG9zZSBjYW4gc2ltcGx5IHVzZSBiaW9fYWRkX3BjX3BhZ2UuDQoNCklJUkMgdGhp
-cyBjb2RlIHdhcyBvbmNlIHVzZWQgYnkgdGhlIHpvbmUtYXBwZW5kIGNvZGUgd2Ugd2hlcmUgdXNp
-bmcgaW4gDQp6b25lZnMsIGJ1dCB0aGF0IGNvZGUgaGFzIGJlZW4gcmlwcGVkIG91dCwgc28uDQoN
-Ckxvb2tzIGdvb2QsDQpSZXZpZXdlZC1ieTogSm9oYW5uZXMgVGh1bXNoaXJuIDxqb2hhbm5lcy50
-aHVtc2hpcm5Ad2RjLmNvbT4NCg==
+Hi Johannes,
+
+kernel test robot noticed the following build warnings:
+
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Johannes-Thumshirn/btrfs-handle-bio_split-error/20241029-171227
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/kdave/linux.git for-next
+patch link:    https://lore.kernel.org/r/20241029091121.16281-1-jth%40kernel.org
+patch subject: [PATCH] btrfs: handle bio_split() error
+config: openrisc-randconfig-r072-20241030 (https://download.01.org/0day-ci/archive/20241031/202410310231.WMcRwBhG-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 14.1.0
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202410310231.WMcRwBhG-lkp@intel.com/
+
+smatch warnings:
+fs/btrfs/bio.c:763 btrfs_submit_chunk() error: 'bbio' dereferencing possible ERR_PTR()
+
+vim +/bbio +763 fs/btrfs/bio.c
+
+ae42a154ca8972 Christoph Hellwig  2023-03-07  660  static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
+103c19723c80bf Christoph Hellwig  2022-11-15  661  {
+d5e4377d505189 Christoph Hellwig  2023-01-21  662  	struct btrfs_inode *inode = bbio->inode;
+4317ff0056bedf Qu Wenruo          2023-03-23  663  	struct btrfs_fs_info *fs_info = bbio->fs_info;
+ae42a154ca8972 Christoph Hellwig  2023-03-07  664  	struct bio *bio = &bbio->bio;
+adbe7e388e4239 Anand Jain         2023-04-15  665  	u64 logical = bio->bi_iter.bi_sector << SECTOR_SHIFT;
+103c19723c80bf Christoph Hellwig  2022-11-15  666  	u64 length = bio->bi_iter.bi_size;
+103c19723c80bf Christoph Hellwig  2022-11-15  667  	u64 map_length = length;
+921603c76246a7 Christoph Hellwig  2022-12-12  668  	bool use_append = btrfs_use_zone_append(bbio);
+103c19723c80bf Christoph Hellwig  2022-11-15  669  	struct btrfs_io_context *bioc = NULL;
+103c19723c80bf Christoph Hellwig  2022-11-15  670  	struct btrfs_io_stripe smap;
+9ba0004bd95e05 Christoph Hellwig  2023-01-21  671  	blk_status_t ret;
+9ba0004bd95e05 Christoph Hellwig  2023-01-21  672  	int error;
+103c19723c80bf Christoph Hellwig  2022-11-15  673  
+f4d39cf1cebfb8 Johannes Thumshirn 2024-07-31  674  	if (!bbio->inode || btrfs_is_data_reloc_root(inode->root))
+f4d39cf1cebfb8 Johannes Thumshirn 2024-07-31  675  		smap.rst_search_commit_root = true;
+f4d39cf1cebfb8 Johannes Thumshirn 2024-07-31  676  	else
+f4d39cf1cebfb8 Johannes Thumshirn 2024-07-31  677  		smap.rst_search_commit_root = false;
+9acaa64187f9b4 Johannes Thumshirn 2023-09-14  678  
+103c19723c80bf Christoph Hellwig  2022-11-15  679  	btrfs_bio_counter_inc_blocked(fs_info);
+cd4efd210edfb3 Christoph Hellwig  2023-05-31  680  	error = btrfs_map_block(fs_info, btrfs_op(bio), logical, &map_length,
+9fb2acc2fe07f1 Qu Wenruo          2023-09-17  681  				&bioc, &smap, &mirror_num);
+9ba0004bd95e05 Christoph Hellwig  2023-01-21  682  	if (error) {
+9ba0004bd95e05 Christoph Hellwig  2023-01-21  683  		ret = errno_to_blk_status(error);
+9ba0004bd95e05 Christoph Hellwig  2023-01-21  684  		goto fail;
+103c19723c80bf Christoph Hellwig  2022-11-15  685  	}
+103c19723c80bf Christoph Hellwig  2022-11-15  686  
+852eee62d31abd Christoph Hellwig  2023-01-21  687  	map_length = min(map_length, length);
+d5e4377d505189 Christoph Hellwig  2023-01-21  688  	if (use_append)
+b35243a447b9fe Christoph Hellwig  2024-08-26  689  		map_length = btrfs_append_map_length(bbio, map_length);
+d5e4377d505189 Christoph Hellwig  2023-01-21  690  
+103c19723c80bf Christoph Hellwig  2022-11-15  691  	if (map_length < length) {
+b35243a447b9fe Christoph Hellwig  2024-08-26  692  		bbio = btrfs_split_bio(fs_info, bbio, map_length);
+28c02a018d50ae Johannes Thumshirn 2024-10-29  693  		if (IS_ERR(bbio)) {
+28c02a018d50ae Johannes Thumshirn 2024-10-29  694  			ret = PTR_ERR(bbio);
+28c02a018d50ae Johannes Thumshirn 2024-10-29  695  			goto fail;
+
+We hit this goto.  We know from the if statement that map_length < length.
+
+28c02a018d50ae Johannes Thumshirn 2024-10-29  696  		}
+2cef0c79bb81d8 Christoph Hellwig  2023-03-07  697  		bio = &bbio->bio;
+103c19723c80bf Christoph Hellwig  2022-11-15  698  	}
+103c19723c80bf Christoph Hellwig  2022-11-15  699  
+1c2b3ee3b0ec4b Christoph Hellwig  2023-01-21  700  	/*
+1c2b3ee3b0ec4b Christoph Hellwig  2023-01-21  701  	 * Save the iter for the end_io handler and preload the checksums for
+1c2b3ee3b0ec4b Christoph Hellwig  2023-01-21  702  	 * data reads.
+1c2b3ee3b0ec4b Christoph Hellwig  2023-01-21  703  	 */
+fbe960877b6f43 Christoph Hellwig  2023-05-31  704  	if (bio_op(bio) == REQ_OP_READ && is_data_bbio(bbio)) {
+0d3acb25e70d5f Christoph Hellwig  2023-01-21  705  		bbio->saved_iter = bio->bi_iter;
+1c2b3ee3b0ec4b Christoph Hellwig  2023-01-21  706  		ret = btrfs_lookup_bio_sums(bbio);
+1c2b3ee3b0ec4b Christoph Hellwig  2023-01-21  707  		if (ret)
+10d9d8c3512f16 Qu Wenruo          2024-08-17  708  			goto fail;
+1c2b3ee3b0ec4b Christoph Hellwig  2023-01-21  709  	}
+7276aa7d38255b Christoph Hellwig  2023-01-21  710  
+f8a53bb58ec7e2 Christoph Hellwig  2023-01-21  711  	if (btrfs_op(bio) == BTRFS_MAP_WRITE) {
+d5e4377d505189 Christoph Hellwig  2023-01-21  712  		if (use_append) {
+d5e4377d505189 Christoph Hellwig  2023-01-21  713  			bio->bi_opf &= ~REQ_OP_WRITE;
+d5e4377d505189 Christoph Hellwig  2023-01-21  714  			bio->bi_opf |= REQ_OP_ZONE_APPEND;
+69ccf3f4244abc Christoph Hellwig  2023-01-21  715  		}
+69ccf3f4244abc Christoph Hellwig  2023-01-21  716  
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  717  		if (is_data_bbio(bbio) && bioc &&
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  718  		    btrfs_need_stripe_tree_update(bioc->fs_info, bioc->map_type)) {
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  719  			/*
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  720  			 * No locking for the list update, as we only add to
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  721  			 * the list in the I/O submission path, and list
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  722  			 * iteration only happens in the completion path, which
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  723  			 * can't happen until after the last submission.
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  724  			 */
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  725  			btrfs_get_bioc(bioc);
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  726  			list_add_tail(&bioc->rst_ordered_entry, &bbio->ordered->bioc_list);
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  727  		}
+02c372e1f016e5 Johannes Thumshirn 2023-09-14  728  
+f8a53bb58ec7e2 Christoph Hellwig  2023-01-21  729  		/*
+f8a53bb58ec7e2 Christoph Hellwig  2023-01-21  730  		 * Csum items for reloc roots have already been cloned at this
+f8a53bb58ec7e2 Christoph Hellwig  2023-01-21  731  		 * point, so they are handled as part of the no-checksum case.
+f8a53bb58ec7e2 Christoph Hellwig  2023-01-21  732  		 */
+4317ff0056bedf Qu Wenruo          2023-03-23  733  		if (inode && !(inode->flags & BTRFS_INODE_NODATASUM) &&
+169aaaf2e0be61 Qu Wenruo          2024-06-14  734  		    !test_bit(BTRFS_FS_STATE_NO_DATA_CSUMS, &fs_info->fs_state) &&
+d5e4377d505189 Christoph Hellwig  2023-01-21  735  		    !btrfs_is_data_reloc_root(inode->root)) {
+f8a53bb58ec7e2 Christoph Hellwig  2023-01-21  736  			if (should_async_write(bbio) &&
+f8a53bb58ec7e2 Christoph Hellwig  2023-01-21  737  			    btrfs_wq_submit_bio(bbio, bioc, &smap, mirror_num))
+852eee62d31abd Christoph Hellwig  2023-01-21  738  				goto done;
+103c19723c80bf Christoph Hellwig  2022-11-15  739  
+f8a53bb58ec7e2 Christoph Hellwig  2023-01-21  740  			ret = btrfs_bio_csum(bbio);
+f8a53bb58ec7e2 Christoph Hellwig  2023-01-21  741  			if (ret)
+10d9d8c3512f16 Qu Wenruo          2024-08-17  742  				goto fail;
+cebae292e0c32a Johannes Thumshirn 2024-06-07  743  		} else if (use_append ||
+cebae292e0c32a Johannes Thumshirn 2024-06-07  744  			   (btrfs_is_zoned(fs_info) && inode &&
+cebae292e0c32a Johannes Thumshirn 2024-06-07  745  			    inode->flags & BTRFS_INODE_NODATASUM)) {
+cbfce4c7fbde23 Christoph Hellwig  2023-05-24  746  			ret = btrfs_alloc_dummy_sum(bbio);
+cbfce4c7fbde23 Christoph Hellwig  2023-05-24  747  			if (ret)
+10d9d8c3512f16 Qu Wenruo          2024-08-17  748  				goto fail;
+f8a53bb58ec7e2 Christoph Hellwig  2023-01-21  749  		}
+103c19723c80bf Christoph Hellwig  2022-11-15  750  	}
+f8a53bb58ec7e2 Christoph Hellwig  2023-01-21  751  
+22b4ef50dc1d11 David Sterba       2024-08-27  752  	btrfs_submit_bio(bio, bioc, &smap, mirror_num);
+852eee62d31abd Christoph Hellwig  2023-01-21  753  done:
+852eee62d31abd Christoph Hellwig  2023-01-21  754  	return map_length == length;
+9ba0004bd95e05 Christoph Hellwig  2023-01-21  755  
+9ba0004bd95e05 Christoph Hellwig  2023-01-21  756  fail:
+9ba0004bd95e05 Christoph Hellwig  2023-01-21  757  	btrfs_bio_counter_dec(fs_info);
+10d9d8c3512f16 Qu Wenruo          2024-08-17  758  	/*
+10d9d8c3512f16 Qu Wenruo          2024-08-17  759  	 * We have split the original bbio, now we have to end both the current
+10d9d8c3512f16 Qu Wenruo          2024-08-17  760  	 * @bbio and remaining one, as the remaining one will never be submitted.
+10d9d8c3512f16 Qu Wenruo          2024-08-17  761  	 */
+10d9d8c3512f16 Qu Wenruo          2024-08-17  762  	if (map_length < length) {
+10d9d8c3512f16 Qu Wenruo          2024-08-17 @763  		struct btrfs_bio *remaining = bbio->private;
+                                                                                              ^^^^^^^^^^^^^
+Error pointer dereference
+
+10d9d8c3512f16 Qu Wenruo          2024-08-17  764  
+10d9d8c3512f16 Qu Wenruo          2024-08-17  765  		ASSERT(bbio->bio.bi_pool == &btrfs_clone_bioset);
+10d9d8c3512f16 Qu Wenruo          2024-08-17  766  		ASSERT(remaining);
+10d9d8c3512f16 Qu Wenruo          2024-08-17  767  
+9ca0e58cb752b0 Qu Wenruo          2024-08-24  768  		btrfs_bio_end_io(remaining, ret);
+10d9d8c3512f16 Qu Wenruo          2024-08-17  769  	}
+9ca0e58cb752b0 Qu Wenruo          2024-08-24  770  	btrfs_bio_end_io(bbio, ret);
+852eee62d31abd Christoph Hellwig  2023-01-21  771  	/* Do not submit another chunk */
+852eee62d31abd Christoph Hellwig  2023-01-21  772  	return true;
+852eee62d31abd Christoph Hellwig  2023-01-21  773  }
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
