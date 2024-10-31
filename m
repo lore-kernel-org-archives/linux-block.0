@@ -1,30 +1,31 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8326719D08A
-	for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 12:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296791BD9E4
+	for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 12:59:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730379490; cv=none; b=I/SqlcTTbw2QZjRBDFzXmypjQg+KzYe50azMq8cUAaVDSRFavuiqy4XoQ/Tr4r9/RqrG4k/UFGXNBdDD8Q30UzJ2gEv8UAAlE7l9QhCuEj8sM79/vs0nGE9rjM3hcvmwvzd02UZruR93QuMJHfpthhiIfkGtX55PuRCj3Qp0h2E=
+	t=1730379544; cv=none; b=ZJ8OUSgatx69kp0SstWzt4nhNco/cT6ML8Xj1RAzNrFEdeuyfpYaLa3vKNNXU4hzE0vkYynKJzMYNBe5H1k4mNihplFSkYrdtDH2LXKdYTbfSPRAxVP7dge5j4rlgPirtxbkFh2eI5Lg/O1zJTFz0BWsg5/8d3f4Eh9o5xh1oaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730379490; c=relaxed/simple;
-	bh=4bxiv1HbKVMcRgx1PcZc+iP6mPjtzdt+ckVwauwZb3I=;
+	s=arc-20240116; t=1730379544; c=relaxed/simple;
+	bh=pMDnqOT9jURegdfJnhDfvqdjmMnKEHAuDqwQKKNF4jw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HTGr8cdWBKK2MFOIFnaW88ZHx6y0r1vNdpBeI9iC2YlNSuUfvEwKS4hThSJ0yMj8ubAVQVbXcxmhEvAjw6sq5f8s7VGtYSQNhMPZcoNtYw7/ilBurGACPgYLOTP9ukmtXjk0sf7u/t2w3WlMA6iMDymFFYKNr8DRpAZLnkZvqjo=
+	 Content-Type:Content-Disposition:In-Reply-To; b=nOKbnO+xDpdx6lDzOpJ2531Y3wVqG3kSM58QoNnz4m9X64BVDf9nYm2ueIIyqQ8vmew+3DtgKQ8iksxb1yyZqrBfJ4wb/yJdgBSRULnx8xUikMl219lQO9waFvXlXKw0pSrjAlOio4psrMI/L7UhjGFR/brrxkIoU+w3xI1WjOI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 02A0568BFE; Thu, 31 Oct 2024 13:58:01 +0100 (CET)
-Date: Thu, 31 Oct 2024 13:58:01 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Klara Modin <klarasmodin@gmail.com>
-Subject: Re: [PATCH] lib/iov_iter.c: initialize bi.bi_idx before iterating
- over bvec
-Message-ID: <20241031125801.GB17520@lst.de>
-References: <20241031110224.293343-1-ming.lei@redhat.com>
+	id 7A69668AA6; Thu, 31 Oct 2024 13:58:57 +0100 (CET)
+Date: Thu, 31 Oct 2024 13:58:57 +0100
+From: hch <hch@lst.de>
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc: hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Kundan Kumar <kundan.kumar@samsung.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: drop some broken zone append support code
+Message-ID: <20241031125857.GA17841@lst.de>
+References: <20241030051859.280923-1-hch@lst.de> <8b043769-d733-418b-a418-f558d0a21c2a@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,37 +34,13 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241031110224.293343-1-ming.lei@redhat.com>
+In-Reply-To: <8b043769-d733-418b-a418-f558d0a21c2a@wdc.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Oct 31, 2024 at 07:02:24PM +0800, Ming Lei wrote:
-> Initialize bi.bi_idx as 0 before iterating over bvec, otherwise
-> garbage data can be used as ->bi_idx.
-> 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Reported-and-tested-by: Klara Modin <klarasmodin@gmail.com>
-> Fixes: e4e535bff2bc ("iov_iter: don't require contiguous pages in iov_iter_extract_bvec_pages")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  lib/iov_iter.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-> index 9fc06f5fb748..c761f6db3cb4 100644
-> --- a/lib/iov_iter.c
-> +++ b/lib/iov_iter.c
-> @@ -1699,6 +1699,7 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
->  		i->bvec++;
->  		skip = 0;
->  	}
-> +	bi.bi_idx = 0;
+On Wed, Oct 30, 2024 at 06:47:26PM +0000, Johannes Thumshirn wrote:
+> IIRC this code was once used by the zone-append code we where using in 
+> zonefs, but that code has been ripped out, so.
 
-Looks good, but the more future proof variant would be to
-initialize bi to zero at declaration time:
-
-	struct bvec_iter bi = { };
-
-Either way:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Yes, I already had a chat with Damien how that can be done the same way
+as in btrfs and zoned xfs.
 
