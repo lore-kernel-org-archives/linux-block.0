@@ -1,151 +1,102 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869A51494AB;
-	Thu, 31 Oct 2024 14:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA9919E99C
+	for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 15:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730385914; cv=none; b=toF4KO6YInPI7PgocjliTnhFw8AdIP6Qf2KmMrm70QeNL1xTMe+gR9vewazX9fECYCrfVuufePvfSOshy6NztHW8cY5/WgyZ5SBDARVvBP7URuAUG1d3ylB0x/1AguA1RqqlOX0hS+hM72EGUhx+CDPt2Ugz19QTSFA7f1KpQ0E=
+	t=1730387244; cv=none; b=ZIMlfWXayN104JGfzlZR6rRFYRx0r0uUxjHJMrMmm8GjWXBUNjoCYS78UrHhy/FNfJwL+Z9caaK98PFwJKG89lIJTlGfWCTwbKRR24AIAMeOmbY5HZzE4nQmmnhakIheAU5cF+SKudGhXhxTdcgs6Tm6RseVBzfRIW5egoNWn5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730385914; c=relaxed/simple;
-	bh=8pMDvHQAob58llAamwS7N/iZRX9fW8xGRAqSaiYFYEk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pd5J3oZ+rbRA757pKKR/+WmMjiH0ibtneqhjF/MnfEDheuv+tPhodqc9FK6eyxwHGTC7wlIXfv/DqEU9fvmePttQpDUOkJKJO/tEucfaDF/6ORgUg1TIw2TJMXIb8fB2Nox8KqzeibmG+zNBTy+Id8SrQekHh0e6T7fimRVscO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2fb587d0436so11573851fa.2;
-        Thu, 31 Oct 2024 07:45:12 -0700 (PDT)
+	s=arc-20240116; t=1730387244; c=relaxed/simple;
+	bh=91tAvQ83xBc46G4koXmUCJaD5io6wSvNhoxK+WGNFZk=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=huvI9ZixUpEHIHobEwp9fJnde3DMuJpE/ZxRmJ7Q+ku7k8fka2ZHs97CaTeWBsHjLby9Hwhakeuwl4kPx5Sp9aFLp8kCfGNJS5Iourbai0pMUGDMQ2+SURAsP1YEdWv6yab1EQSPjE+/VZLDdhihCc6WeypJgOR24MSII6PV7UM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=tc7js3bR; arc=none smtp.client-ip=209.85.166.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="tc7js3bR"
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3a6ace3b6a5so1364845ab.1
+        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 08:07:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730387240; x=1730992040; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=NPL0PCNbmEqD8r8cbgZ9GH/XUgdz2tIwqRDBvk3oWCk=;
+        b=tc7js3bRYPUtO0hOqq/ehue592AYTahrGXQwhglgX69LhlutBzQrMa76xGzWLqQPOH
+         f2A+u5b5nm4WkjD3fuYd3hH+np7zMTRrxGXwscG3kBHRQvm/Py5atYsap95c7+0uEBLv
+         0gmNHaZl2fViDH3v2iseWyCjvlbc8H/iXW4Tm2f71Q47/w4FSb/yJBvSs6sEgWL51g+Q
+         xKb/L6UVUSTi8nrtKf1vpysfbMdL0AlAk0cudZkGN18lpR2wzn8dR2SvutaJA8IMwY77
+         2MflgsjFOwkkTublMjdndT7HHkI1JV2NAhYS40LGxSig5B+fRNCNQU56N84gCg187OaT
+         4WJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730385911; x=1730990711;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MrXWCVeDKqKbudttL82vkicTuerPbo3lkRQbqLFBsV8=;
-        b=RkK4NW1jPLEQ+/CH36VAn/WsqqdHQ4X0TsVZ3Uq0h6L1n7zcu8nh1LDVhcv2x1vaav
-         aAVesYqF2rXKmLENIvP79ZjhUhI4g//L78eS8miso/Y9jITTZQCGb2T5IgFV3rAWyEq+
-         utT7e8hzdfmvnwXMFM1Ah0UVHvQf3SSNybtT9JteaLcPjvYRB7i05E+c1ch5ahdXKFyH
-         bK/b4Okx1t+XFGwvLYQJz9T7/33gT07eCm3RUiYoIOLZ7mrld6tYza4IB9ClwQUYf1fL
-         MUsE7JlFkHpInR+zEptUcF41j52vGN1Fb0+uS+CX+CObKHJUhIFYAdI75vkfnriMQSkd
-         nzvg==
-X-Forwarded-Encrypted: i=1; AJvYcCW3GA0agC9Z/UvJ9m8KvjtT5ARzhLjgtY+ONeworQUfwSpj1zaN01PjCJ+G34PgldNsdiIDELj0PqnwpA==@vger.kernel.org, AJvYcCXezTJPiSGNlcorQxkDwUK3kWsPfHhoFuuVHdXflrJ4mKqArkCvql0JoX8ruJzQ+BIzJ+DHbUpA2rRt+lWt@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFVUkee4yxxaJyD73oNFaI3GSshyiIMedgxcF3HSqHmZ5szWLU
-	NjaXsaygk2tDc79m8J2BoVz/RLiVn7KsSpgfUgTMIhcl6GY92v2T
-X-Google-Smtp-Source: AGHT+IG+YC4v1kqIrDdLWucSevyPreQkgj+9r+AjqJsmVrOIOvdtK5TfywiFoVIydO6nuyMoGu6xiQ==
-X-Received: by 2002:a2e:a545:0:b0:2fb:8df3:2291 with SMTP id 38308e7fff4ca-2fedb7a2e8fmr612321fa.16.1730385910299;
-        Thu, 31 Oct 2024 07:45:10 -0700 (PDT)
-Received: from nuc.fritz.box (p200300f6f71fdb00fa633ffffe02074c.dip0.t-ipconnect.de. [2003:f6:f71f:db00:fa63:3fff:fe02:74c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ceaef1e71csm522293a12.38.2024.10.31.07.45.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Oct 2024 07:45:08 -0700 (PDT)
-From: Johannes Thumshirn <jth@kernel.org>
-To: Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	David Sterba <dsterba@suse.com>,
-	linux-btrfs@vger.kernel.org (open list:BTRFS FILE SYSTEM),
-	linux-kernel@vger.kernel.org (open list)
-Cc: linux-block@vger.kernel.org,
-	John Garry <john.g.garry@oracle.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH v2] btrfs: handle bio_split() error
-Date: Thu, 31 Oct 2024 15:44:57 +0100
-Message-ID: <20241031144458.11497-1-jth@kernel.org>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1730387240; x=1730992040;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NPL0PCNbmEqD8r8cbgZ9GH/XUgdz2tIwqRDBvk3oWCk=;
+        b=ZlRyl9SF6xxqKv527BORoLZ+ShSAGnroqZBfQZXVy4wLvjj5i0sR1Z8GtIZ+ih4+E9
+         9jBdkckAFG4xskK0MzzaJHF00CTRXtOjw4wfscMhAzw7SR7FFMc2byyWonoJTP6G6tCd
+         yEcTnF2URw+qDYqC0hLp/mok0RzeIjw/PJ/3HEqq/1Sz9CboioMTSWRT0z3M53vvnUTz
+         JCVI5j118Iz+NnRAQE0k4naqaKjWg+x4cuCEiZ+DJ/q8mEncEOpLu+aVrGdcVMbvJpg3
+         CgQWG/84hXn3dTQxNAVRsJMXz9eABipnR3oAQXaXLQMrhPVppn5D8DdeXMlAK6VmIBCo
+         QGMg==
+X-Forwarded-Encrypted: i=1; AJvYcCXIYTV3WlDjZds4Np9VUdy1cSP/9NKkC2yk9crU19wI+laUMV/qJ5G40hg3hBxQF5tWsbwPQlCjgviuFg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTRVqwpE+DT/3ewT8Q2MUhAbPJc99mrHDKC6Vn72TBNns27Bkn
+	xSGnTIZfQeMaqutrRY5w/GZpzPFVjIgaXHZZMBNwia4GrFtBRZgKbOg5RWYqb+k=
+X-Google-Smtp-Source: AGHT+IEbci1KaplCW/wzGBnx9hlaJx/LzhoEL83R0CzDGNDdGxwkz+Tuk3wYvzFMZg9zvkTBVrP80Q==
+X-Received: by 2002:a05:6e02:2188:b0:3a4:ea4f:ac9e with SMTP id e9e14a558f8ab-3a4ed30fef7mr194074745ab.26.1730387240031;
+        Thu, 31 Oct 2024 08:07:20 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a6a97b0038sm3725365ab.1.2024.10.31.08.07.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Oct 2024 08:07:19 -0700 (PDT)
+Message-ID: <d9069c8e-6a58-4574-b842-f1e1f20c55f3@kernel.dk>
+Date: Thu, 31 Oct 2024 09:07:18 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V8 0/8] io_uring: support sqe group and leased group kbuf
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+ linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
+ Akilesh Kailash <akailash@google.com>
+References: <15b9b1e0-d961-4174-96ed-5a6287e4b38b@gmail.com>
+ <d859c85c-b7bf-4673-8c77-9d7113f19dbb@kernel.dk>
+ <bc44d3c0-41e8-425c-957f-bad70aedcc50@kernel.dk>
+ <e76d9742-5693-4057-b925-3917943c7441@kernel.dk>
+ <f51e50c8-271e-49b6-b3e1-a63bf61d7451@kernel.dk> <ZyGT3h5jNsKB0mrZ@fedora>
+ <674e8c3c-1f2c-464a-ad59-da3d00104383@kernel.dk> <ZyGjID-17REc9X3e@fedora>
+ <ZyGx4JBPdU4VlxlZ@fedora> <d986221d-7399-4487-9c28-5d6f953510cd@kernel.dk>
+ <ZyLxJdn7bboZMAcs@fedora> <63e2091d-d000-4b42-818b-802341ac877f@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <63e2091d-d000-4b42-818b-802341ac877f@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Another option is that we fully stick with the per-group buffer concept,
+which could also work just fine with io_rsrc_node. If we stick with the
+OP_GROUP_START thing, then that op could setup group_buf thing that is
+local to that group. This is where an instantiated buffer would appear
+too, keeping it strictly local to that group. That avoids needing any
+kind of ring state for this, and the group_buf would be propagated from
+the group leader to the members. The group_buf lives until all members
+of the group are dead, at which point it's released. I forget if your
+grouping implementation mandated the same scheme I originally had, where
+the group leader completes last? If it does, then it's a natural thing
+to have the group_buf live for the duration of the group leader, and it
+can just be normal per-io_kiocb data at that point, nothing special
+needed there.
 
-Now that bio_split() can return errors, add error handling for it in
-btrfs_split_bio() and ultimately btrfs_submit_chunk().
+As with the previous scheme, each request using one of these
+IORING_RSRC_KBUFFER nodes just assigns it like it would any other fixed
+resource node, and the normal completion path puts it.
 
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
-
-This is based on top of John Garry's series "bio_split() error handling
-rework" explicitly on the patch titled "block: Rework bio_split() return
-value", which are as of now (Tue Oct 29 10:02:16 2024) not yet merged into
-any tree.
-
-Changes to v1:
-- convert ERR_PTR to blk_status_t
-- correctly fail already split bbios
----
- fs/btrfs/bio.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/fs/btrfs/bio.c b/fs/btrfs/bio.c
-index 1f216d07eff6..d2cfef5e4d4a 100644
---- a/fs/btrfs/bio.c
-+++ b/fs/btrfs/bio.c
-@@ -81,6 +81,9 @@ static struct btrfs_bio *btrfs_split_bio(struct btrfs_fs_info *fs_info,
- 
- 	bio = bio_split(&orig_bbio->bio, map_length >> SECTOR_SHIFT, GFP_NOFS,
- 			&btrfs_clone_bioset);
-+	if (IS_ERR(bio))
-+		return ERR_CAST(bio);
-+
- 	bbio = btrfs_bio(bio);
- 	btrfs_bio_init(bbio, fs_info, NULL, orig_bbio);
- 	bbio->inode = orig_bbio->inode;
-@@ -687,6 +690,10 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
- 
- 	if (map_length < length) {
- 		bbio = btrfs_split_bio(fs_info, bbio, map_length);
-+		if (IS_ERR(bbio)) {
-+			ret = errno_to_blk_status(PTR_ERR(bbio));
-+			goto fail;
-+		}
- 		bio = &bbio->bio;
- 	}
- 
-@@ -698,7 +705,7 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
- 		bbio->saved_iter = bio->bi_iter;
- 		ret = btrfs_lookup_bio_sums(bbio);
- 		if (ret)
--			goto fail;
-+			goto fail_split;
- 	}
- 
- 	if (btrfs_op(bio) == BTRFS_MAP_WRITE) {
-@@ -732,13 +739,13 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
- 
- 			ret = btrfs_bio_csum(bbio);
- 			if (ret)
--				goto fail;
-+				goto fail_split;
- 		} else if (use_append ||
- 			   (btrfs_is_zoned(fs_info) && inode &&
- 			    inode->flags & BTRFS_INODE_NODATASUM)) {
- 			ret = btrfs_alloc_dummy_sum(bbio);
- 			if (ret)
--				goto fail;
-+				goto fail_split;
- 		}
- 	}
- 
-@@ -746,7 +753,7 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
- done:
- 	return map_length == length;
- 
--fail:
-+fail_split:
- 	btrfs_bio_counter_dec(fs_info);
- 	/*
- 	 * We have split the original bbio, now we have to end both the current
-@@ -760,6 +767,7 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
- 
- 		btrfs_bio_end_io(remaining, ret);
- 	}
-+fail:
- 	btrfs_bio_end_io(bbio, ret);
- 	/* Do not submit another chunk */
- 	return true;
 -- 
-2.43.0
-
+Jens Axboe
