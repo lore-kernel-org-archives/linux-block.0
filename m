@@ -1,37 +1,39 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4005914F102
-	for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 08:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FC312CDB6;
+	Thu, 31 Oct 2024 08:04:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730361754; cv=none; b=hNwh8DDmvKYCNsFNOne8fnBfd1d8Dz1HdBCqXifJzClYLdaw05EWpS8z1RxJ98a8L9DxhoK+008INKUy+LO8tEAGotAdDYpuSGJRysRK6pzUKIi8FoLVY59S1wC3WgDaPUojXrm4MxtaERAkc+iGqrNuWNYC5NiI5DlUl7LthM8=
+	t=1730361850; cv=none; b=tKlfUvLP8jSLwYh7RMdlY/gWNnKfkCwCOLTJ3rxsBnx1uhzhfCMy6V+0Yx6Od/gPef/4k2Q0mtGjjcMw1dGYyvHhjcq7WSSYWpw5IudHooiKu+7Ie9W9jusmESzzB/RRmLuHfehvmaxY/M2wAKfgAdIuwsNTEBhurZ9RSfQ8A2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730361754; c=relaxed/simple;
-	bh=vG0P6R0UWjCaahI7aUT+t+QGnHLGXug0vHBEi7mI51E=;
+	s=arc-20240116; t=1730361850; c=relaxed/simple;
+	bh=M2HXVbpzDsTg+HwYe96n52wNzDV2Oii+fM5cd4T49Nk=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=IWiIbq8b1T6L0+/qbR9ASwVbDmsZsw8S7GkhoIBcBllSXG77UILfrYYk43y33PmPw5BDIoKKuVcudpX/VOACF398S+psWi6o4ureNsUPwyhVrPZfmUjhWbQWtFD7lk3bQ1PeV8hbuR6Fx6uH6v0gqqJ/ezv5448mFWky0O5Mbu8=
+	 In-Reply-To:Content-Type; b=S1gvo8SeCT/p0neCx8MSse6y6Z3a+Ue3PpJfNCz5RKIAGDyWfTWWDj2T71bQwq6MZkcPAv6tNhJOFdT/m5C8j1GZ0ei6rk+GCW8YpTXn83DDaoymZLMyralZ3VqlO3POVJM4qZW/f/u3BPBqf5B7evyKF2NL4c1nGa567m5PZ9k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XfGg36g2Yz4f3lVd
-	for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 16:02:07 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XfGht543zz4f3lfg;
+	Thu, 31 Oct 2024 16:03:42 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 80E831A0568
-	for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 16:02:26 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 4275D1A018C;
+	Thu, 31 Oct 2024 16:04:01 +0800 (CST)
 Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgB3U4eOOSNnAN3GAQ--.60536S3;
-	Thu, 31 Oct 2024 16:02:24 +0800 (CST)
-Subject: Re: [PATCH v3 blktests 0/5] add new tests for blk-throttle
-To: Yu Kuai <yukuai1@huaweicloud.com>, saranyamohan@google.com,
- tj@kernel.org, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, yangerkun@huawei.com,
- Ming Lei <ming.lei@redhat.com>, "yukuai (C)" <yukuai3@huawei.com>
-References: <20240420084505.3624763-1-yukuai1@huaweicloud.com>
+	by APP4 (Coremail) with SMTP id gCh0CgCHYobwOSNnHfjGAQ--.59788S3;
+	Thu, 31 Oct 2024 16:04:01 +0800 (CST)
+Subject: Re: [PATCH v2 1/5] blk-cgroup: add a new helper blkg_print_dev_name()
+To: Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20240930085302.1558217-1-yukuai1@huaweicloud.com>
+ <20240930085302.1558217-2-yukuai1@huaweicloud.com>
+ <Zvrb0DXhtVHT2lfa@slm.duckdns.org>
 From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <05380f47-13a0-cd25-8f34-003fc1a85729@huaweicloud.com>
-Date: Thu, 31 Oct 2024 16:02:22 +0800
+Message-ID: <33183043-335f-fd07-1068-c873656f51d6@huaweicloud.com>
+Date: Thu, 31 Oct 2024 16:04:00 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 Precedence: bulk
@@ -40,87 +42,55 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240420084505.3624763-1-yukuai1@huaweicloud.com>
+In-Reply-To: <Zvrb0DXhtVHT2lfa@slm.duckdns.org>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB3U4eOOSNnAN3GAQ--.60536S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF15Aw48AF15Kr4UtFWDurg_yoW8ur45p3
-	y5GF4rKa1xJFnrJ3W3GanrKrWrXw4rGr47Aw17Xr13ZF10v3y7Gry29w1ftFWSyF17WryU
-	Z3Wvqr4rG3WUZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-	IcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-	0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JUG0PhUUUUU=
+X-CM-TRANSID:gCh0CgCHYobwOSNnHfjGAQ--.59788S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYK7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72
+	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
+	rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
+	1l4c8EcI0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
+	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r
+	43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
+	7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
+	W8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU
+	F9a9DUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi, Tejun and Shinichiro
+Hi, Tejun!
 
-And +CC Ming
-
-在 2024/04/20 16:45, Yu Kuai 写道:
-> From: Yu Kuai <yukuai3@huawei.com>
+在 2024/10/01 1:11, Tejun Heo 写道:
+> Hello,
 > 
-> changes in v3:
->   - lots of style changes suggested by Shinichiro
+> On Mon, Sep 30, 2024 at 04:52:58PM +0800, Yu Kuai wrote:
+>> +static inline bool blkg_print_dev_name(struct seq_file *sf,
+>> +				       struct blkcg_gq *blkg)
+>> +{
+>> +	struct gendisk *disk = blkg->q->disk;
+>> +
+>> +	if (!disk)
+>> +		return false;
+>> +
+>> +	seq_printf(sf, "%u:%u", disk->major, disk->first_minor);
+>> +	return true;
+>> +}
+>> +
 > 
-> changes in v2:
->   - move lots of functions to rc
-> 
-> Yu Kuai (5):
->    tests/throtl: add first test for blk-throttle
->    tests/throtl: add a new test 002
->    tests/throtl: add a new test 003
->    tests/throtl: add a new test 004
->    tests/throtl: add a new test 005
+> I wonder whether we just should add a name field to disk.
 
-Do you guys have any suggestions on these tests? Our clients
-report a problem that iops limit will cause IO hang, root cause
-is the same as [1], and this behaviour is introduced by commit
-9f5ede3c01f9 ("block: throttle split bio in case of iops limit"),
-splited IO will be re throttled at the tail of bio list.
-
-And we're planing to fix this(Our clients don't accept this behaviour),
-by spliting bio-list into a bps throttled list and iops throttled list,
-so if iops is within limit, splited IO can be dispatched directly. And
-it'll be good to still have a place upstream for functional tests.
-
-[1] https://lore.kernel.org/all/20240812150049.8252-1-ioworker0@gmail.com/
+And suggestions on this set now? I guess add a name filed is not
+appropriate. :(
 
 Thanks,
 Kuai
 
 > 
->   tests/throtl/001     | 39 ++++++++++++++++++
->   tests/throtl/001.out |  6 +++
->   tests/throtl/002     | 30 ++++++++++++++
->   tests/throtl/002.out |  4 ++
->   tests/throtl/003     | 32 +++++++++++++++
->   tests/throtl/003.out |  4 ++
->   tests/throtl/004     | 37 +++++++++++++++++
->   tests/throtl/004.out |  4 ++
->   tests/throtl/005     | 37 +++++++++++++++++
->   tests/throtl/005.out |  3 ++
->   tests/throtl/rc      | 96 ++++++++++++++++++++++++++++++++++++++++++++
->   11 files changed, 292 insertions(+)
->   create mode 100755 tests/throtl/001
->   create mode 100644 tests/throtl/001.out
->   create mode 100755 tests/throtl/002
->   create mode 100644 tests/throtl/002.out
->   create mode 100755 tests/throtl/003
->   create mode 100644 tests/throtl/003.out
->   create mode 100755 tests/throtl/004
->   create mode 100644 tests/throtl/004.out
->   create mode 100755 tests/throtl/005
->   create mode 100644 tests/throtl/005.out
->   create mode 100644 tests/throtl/rc
+> Thanks.
 > 
 
