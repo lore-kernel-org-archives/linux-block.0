@@ -1,25 +1,58 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82221B95B;
-	Thu, 31 Oct 2024 21:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3856113C9C0
+	for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 21:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730409530; cv=none; b=CXH2mRRwXU4wNodljRDIX3MetPYWidbibuU4fLqKwLL4jfFsleNDJ2pcdn6CmJATNUIiZ0F57kYH3xBSKdaOF11QvfihoHBnP5tq7T1Q3talz9KyPor6I1nGPlAhmbYVCwJ9T+U1iTCAnPfQ0k+K5Rzr/8A5848T7u8BppVIj/M=
+	t=1730409859; cv=none; b=iNhcjoO/r5d36Xz6WE9QsrkjMI/agHlUi148mkt8yZmrJCHaRyvBiqtqcWKgWNciRF4Q5LOh8au0mH27tROqYRlCgNRQR1ReSbn4lj4GmOFcWOfa95JGGpeO7K7HTPCEzW23wN3zWf+Sx3hhEglCqSEIhZJ/nydZrr6/XNFdNA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730409530; c=relaxed/simple;
-	bh=cpF4AAIzOXZkhcxxrsLBIFg7A1MuiEGbI4VYVNmRk2I=;
+	s=arc-20240116; t=1730409859; c=relaxed/simple;
+	bh=MhymX7A3Uu+ithNvsEI/GOxTZ8CxLwV6KjVAApSjZNI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fXWydcTckPwAkrENjwo9kxOzW6qUXDA6oe73dDomPtcinqiaTcpbbconc0jeDRz/wewdwp0fneIXmrIlw+hPi2llObKDKN80ioNPt8PeZdq3aQOxXSSdjk7jJfQU05QxUe/Uktpo8UvWK1d3hA+q0/k1h1EGjLZB19CtjS5T3DY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C6EFD153B;
-	Thu, 31 Oct 2024 14:19:11 -0700 (PDT)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 334AF3F73B;
-	Thu, 31 Oct 2024 14:18:30 -0700 (PDT)
-Message-ID: <7e362d8b-c02a-4327-9c5d-af1c4725ddc7@arm.com>
-Date: Thu, 31 Oct 2024 21:18:11 +0000
+	 In-Reply-To:Content-Type; b=SF/cDT7UHECn8ZVvhsN2GKxnv2+QmnA6pDj5/QDqUMXnVDhccYhkF4pFYUVlN+9Ct33htBXpeqDL6/7UI7bAgcyoDsEfUCTMyDk5E4e1Zg7GAePANt8ZME4TaiQE1oqhxj2LP4eSdBXg7G2EGMCVJIyeuPmwg8zPM9x7jjk0v3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=TXSF1sx/; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="TXSF1sx/"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-720b2d8bcd3so1017535b3a.2
+        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 14:24:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730409852; x=1731014652; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=O7/HnUXDg/vXS33ST6qzChVVjLK4LIVcVbe/7leAtlw=;
+        b=TXSF1sx/1BpeUfqvmD7t00/inVT8As8xGu4GXUjJwH9ZTtfSWbsQqXQ5r+LwiRQBSM
+         WPRTJvnyP1YnZQo7xYUMM9wOOc9lz/I2WkLofifsyxADyNYwd25+Cuh6A9b+38jCs9PR
+         qH4Z41J/FQRiCon1hKYZ84N/V6fyNN5F+xbc3mC3eNWrz/ypzqOW3fg6NaJ9YzIj63f4
+         vNRSwDiVdLfORZTgbzwm94//1EIM9NQnK1RZO/OlFcKyLiWFQa0R412qy57Rx5+f+9QW
+         jAxK8PUgvJmueehoHekWC2CAXOhIGsnM2Hdd/PmxxkW6BkGqg7CsaGT4RcTJLuBi809l
+         rrkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730409852; x=1731014652;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O7/HnUXDg/vXS33ST6qzChVVjLK4LIVcVbe/7leAtlw=;
+        b=Ms/D30L1Kkk7f2FvUgrNqXr+sZoR8Nm8xXxGsep8o+x0yYP43PVyCWRMy6dui7b9zg
+         g3ysrMFt8nVOgN1sQtjfKI8obcVcO5n+z9g3o/ujgJc1fEWYeRZgQzeDdEqaU9p2xs+Q
+         EosD8L/Ick3eBCwOTHQlFZLwx9kuZw9yD57gz3RggEOOuPZ0AB46i4PDe9G/BUbPJ1ht
+         c1V8dqNAGqdwlFKaXgLPXZ5H7a/EmpupODbynglbkLV4nkdATaGplSbxuthh72ZyejPi
+         RWqQNPOdqsxzlKmr5GT+HX3m5VhCSpMw3p8vQ7vWW4BOHkDI7koC6EGYItErg37pG3Fq
+         Y3zw==
+X-Gm-Message-State: AOJu0YykN928lYVeCMWLYAbRbUnhC3LTiOLsMfJppdXgUYBOV7V5CYwg
+	2Gk98DvYRyVAvt+IC1DTo2IXIJdiyvbzos/csV6/5LnnfmHt/a2Cjf1mktJAGsc=
+X-Google-Smtp-Source: AGHT+IGHH/FzYsWgflbxII3YBb1w6beQMVxD7diTb0MInLD2F/tUVezebR7ZK6ylxwzrc8K+RMDbBg==
+X-Received: by 2002:a05:6a00:988:b0:71e:6ef2:6c11 with SMTP id d2e1a72fcca58-72062f874bemr29839614b3a.9.1730409852429;
+        Thu, 31 Oct 2024 14:24:12 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1b8d02sm1580960b3a.43.2024.10.31.14.24.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Oct 2024 14:24:11 -0700 (PDT)
+Message-ID: <5d99696d-bc46-421c-b8df-c64dda483215@kernel.dk>
+Date: Thu, 31 Oct 2024 15:24:10 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -27,106 +60,74 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 08/17] dma-mapping: add a dma_need_unmap helper
-To: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>
-Cc: Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
- Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
- iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-References: <cover.1730298502.git.leon@kernel.org>
- <00385b3557fa074865d37b0ac613d2cb28bcb741.1730298502.git.leon@kernel.org>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <00385b3557fa074865d37b0ac613d2cb28bcb741.1730298502.git.leon@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH V8 4/7] io_uring: support SQE group
+To: Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org,
+ Pavel Begunkov <asml.silence@gmail.com>
+Cc: linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
+ Akilesh Kailash <akailash@google.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20241025122247.3709133-1-ming.lei@redhat.com>
+ <20241025122247.3709133-5-ming.lei@redhat.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241025122247.3709133-5-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 30/10/2024 3:12 pm, Leon Romanovsky wrote:
-> From: Christoph Hellwig <hch@lst.de>
+On 10/25/24 6:22 AM, Ming Lei wrote:
+> SQE group is defined as one chain of SQEs starting with the first SQE that
+> has IOSQE_SQE_GROUP set, and ending with the first subsequent SQE that
+> doesn't have it set, and it is similar with chain of linked SQEs.
 > 
-> Add helper that allows a driver to skip calling dma_unmap_*
-> if the DMA layer can guarantee that they are no-nops.
+> Not like linked SQEs, each sqe is issued after the previous one is
+> completed. All SQEs in one group can be submitted in parallel. To simplify
+> the implementation from beginning, all members are queued after the leader
+> is completed, however, this way may be changed and leader and members may
+> be issued concurrently in future.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->   include/linux/dma-mapping.h |  5 +++++
->   kernel/dma/mapping.c        | 20 ++++++++++++++++++++
->   2 files changed, 25 insertions(+)
+> The 1st SQE is group leader, and the other SQEs are group member. The whole
+> group share single IOSQE_IO_LINK and IOSQE_IO_DRAIN from group leader, and
+> the two flags can't be set for group members. For the sake of
+> simplicity, IORING_OP_LINK_TIMEOUT is disallowed for SQE group now.
 > 
-> diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-> index 8074a3b5c807..6906edde505d 100644
-> --- a/include/linux/dma-mapping.h
-> +++ b/include/linux/dma-mapping.h
-> @@ -410,6 +410,7 @@ static inline bool dma_need_sync(struct device *dev, dma_addr_t dma_addr)
->   {
->   	return dma_dev_need_sync(dev) ? __dma_need_sync(dev, dma_addr) : false;
->   }
-> +bool dma_need_unmap(struct device *dev);
->   #else /* !CONFIG_HAS_DMA || !CONFIG_DMA_NEED_SYNC */
->   static inline bool dma_dev_need_sync(const struct device *dev)
->   {
-> @@ -435,6 +436,10 @@ static inline bool dma_need_sync(struct device *dev, dma_addr_t dma_addr)
->   {
->   	return false;
->   }
-> +static inline bool dma_need_unmap(struct device *dev)
-> +{
-> +	return false;
-> +}
->   #endif /* !CONFIG_HAS_DMA || !CONFIG_DMA_NEED_SYNC */
->   
->   struct page *dma_alloc_pages(struct device *dev, size_t size,
-> diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-> index 864a1121bf08..daa97a650778 100644
-> --- a/kernel/dma/mapping.c
-> +++ b/kernel/dma/mapping.c
-> @@ -442,6 +442,26 @@ bool __dma_need_sync(struct device *dev, dma_addr_t dma_addr)
->   }
->   EXPORT_SYMBOL_GPL(__dma_need_sync);
->   
-> +/**
-> + * dma_need_unmap - does this device need dma_unmap_* operations
-> + * @dev: device to check
-> + *
-> + * If this function returns %false, drivers can skip calling dma_unmap_* after
-> + * finishing an I/O.  This function must be called after all mappings that might
-> + * need to be unmapped have been performed.
+> When the group is in one link chain, this group isn't submitted until the
+> previous SQE or group is completed. And the following SQE or group can't
+> be started if this group isn't completed. Failure from any group member will
+> fail the group leader, then the link chain can be terminated.
+> 
+> When IOSQE_IO_DRAIN is set for group leader, all requests in this group and
+> previous requests submitted are drained. Given IOSQE_IO_DRAIN can be set for
+> group leader only, we respect IO_DRAIN by always completing group leader as
+> the last one in the group. Meantime it is natural to post leader's CQE
+> as the last one from application viewpoint.
+> 
+> Working together with IOSQE_IO_LINK, SQE group provides flexible way to
+> support N:M dependency, such as:
+> 
+> - group A is chained with group B together
+> - group A has N SQEs
+> - group B has M SQEs
+> 
+> then M SQEs in group B depend on N SQEs in group A.
+> 
+> N:M dependency can support some interesting use cases in efficient way:
+> 
+> 1) read from multiple files, then write the read data into single file
+> 
+> 2) read from single file, and write the read data into multiple files
+> 
+> 3) write same data into multiple files, and read data from multiple files and
+> compare if correct data is written
+> 
+> Also IOSQE_SQE_GROUP takes the last bit in sqe->flags, but we still can
+> extend sqe->flags with io_uring context flag, such as use __pad3 for
+> non-uring_cmd OPs and part of uring_cmd_flags for uring_cmd OP.
 
-In terms of the unmap call itself, why don't we just use dma_skip_sync 
-to short-cut dma_direct_unmap_*() and make sure it's as cheap as possible?
+Did you run the liburing tests with this? I rebased it on top of the
+flags2 patch I just sent out, and it fails defer-taskrun and crashes
+link_drain. Don't know if others fail too. I'll try the original one
+too, but nothing between those two should make a difference. It passes
+just fine with just the flags2 patch, so I'm a bit suspicious this patch
+is the issue.
 
-In terms of not having to unmap implying not having to store addresses 
-at all, it doesn't seem super-useful when you still have to store them 
-for long enough to find out that you don't :/
-
-Thanks,
-Robin.
-
-> + */
-> +bool dma_need_unmap(struct device *dev)
-> +{
-> +	if (!dma_map_direct(dev, get_dma_ops(dev)))
-> +		return true;
-> +#ifdef CONFIG_DMA_NEED_SYNC
-> +	if (!dev->dma_skip_sync)
-> +		return true;
-> +#endif
-> +	return IS_ENABLED(CONFIG_DMA_API_DEBUG);
-> +}
-> +EXPORT_SYMBOL_GPL(dma_need_unmap);
-> +
->   static void dma_setup_need_sync(struct device *dev)
->   {
->   	const struct dma_map_ops *ops = get_dma_ops(dev);
+-- 
+Jens Axboe
