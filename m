@@ -1,118 +1,188 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD6F288B5;
-	Thu, 31 Oct 2024 01:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC9728FD
+	for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 02:53:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730339866; cv=none; b=tEI4+tLO7kRZ46WiPBrZ9G1zWTNtmk9m76H+mb8AS6x1TnUCrgoQ2po1M+IHBM8cq59Gbe9h6vt9DdwkSldufxVDNUHs2IpGYHfanZU5fNT+wHdctEBrKBNVlq4yZ838e2HJ67KNuxbFSPvNptpVuC/avRIdBUV8KX9ni3AbORc=
+	t=1730343227; cv=none; b=H0AO5yZ736iej6Cwh7Vqof/qzYLzRC4Ah099R26wN/amv/ddTEJ2cPl/GuN0/jqF4dQJL1QrPXOhqHIUCM4gUct255BpEchCiZqn5uZ2Qi3XYwr31MAYnKMbB5LElu3tdYB4cK4sLRww1Aoy+BSvDNkn9eoDft1GL822LbaTRQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730339866; c=relaxed/simple;
-	bh=Nvk6gtzOUBBKduL7W20nZi58AzXjD2xlg9jDt0cmKuQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=MJWB6a681CwCFIMTo2meA2IVC9oxDNJs7BGAlc6xgfNN4Pj0N+lrf1QURv/070jnpXvlEB9PNVtcRue3J1WwxnRgX/RGuHfh0J+5FWv/qiiQC9ZMSv4dn6QUhfZi/HhVOeagZR651DLk6e0HUm35TjHIFIhBSyi3W/IwSvk7xp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Xf6ZG3rWJz4f3jkV;
-	Thu, 31 Oct 2024 09:57:26 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 28F101A058E;
-	Thu, 31 Oct 2024 09:57:39 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgCHYoYR5CJnOgSvAQ--.50242S3;
-	Thu, 31 Oct 2024 09:57:39 +0800 (CST)
-Subject: Re: [PATCH v2 4/5] md/raid1: Atomic write support
-To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk, song@kernel.org,
- hch@lst.de
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-raid@vger.kernel.org, martin.petersen@oracle.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20241030094912.3960234-1-john.g.garry@oracle.com>
- <20241030094912.3960234-5-john.g.garry@oracle.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <d4d9d0cf-08ff-6494-172a-44694b6d13f9@huaweicloud.com>
-Date: Thu, 31 Oct 2024 09:57:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1730343227; c=relaxed/simple;
+	bh=q6aokFqKjHcnhGpzeCRfMyuRqwZfJGaYimFpSbJrme0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f2rrCfxlhpR71A8kEuC+7THkZVOx0+qMDHwXCr39rPTtVkGXuQxDcxvHOWEHkEDj/U33maJJRZAd6uLcHS5dzlR6tp1394WqmEdWcBXci8qyOontxWIIy2e4pjwlI1fudegpkXpZk4V0M7zoKDoLo00RKhPUaQV+fq2geLjQjV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IkM5exRl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IkM5exRl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730343224;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MGu1lyhks3UKXm4waSwre3Yazxs4FzW3CseVQuT845M=;
+	b=IkM5exRlOvKH1fATSrubhrAHs56FG8Y6yX/HjLj3SQYuJKG0odIiMW9bMb94wb2c6Stg/O
+	s9CkNmD7EoS/vtTYJ1QrRWe4MX9reXynds65Ck7+qRqEa6VLX5TfK7dfwzwGlNFDlhe0BI
+	2gzD2WymNcodzjGZOaJMW4j/rRTcgRE=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-601-djwUy86YOAW9ncplZMPjrg-1; Wed,
+ 30 Oct 2024 22:53:38 -0400
+X-MC-Unique: djwUy86YOAW9ncplZMPjrg-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C11F419560A7;
+	Thu, 31 Oct 2024 02:53:36 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.34])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A553C19560A2;
+	Thu, 31 Oct 2024 02:53:30 +0000 (UTC)
+Date: Thu, 31 Oct 2024 10:53:25 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Akilesh Kailash <akailash@google.com>, ming.lei@redhat.com
+Subject: Re: [PATCH V8 0/8] io_uring: support sqe group and leased group kbuf
+Message-ID: <ZyLxJdn7bboZMAcs@fedora>
+References: <15b9b1e0-d961-4174-96ed-5a6287e4b38b@gmail.com>
+ <d859c85c-b7bf-4673-8c77-9d7113f19dbb@kernel.dk>
+ <bc44d3c0-41e8-425c-957f-bad70aedcc50@kernel.dk>
+ <e76d9742-5693-4057-b925-3917943c7441@kernel.dk>
+ <f51e50c8-271e-49b6-b3e1-a63bf61d7451@kernel.dk>
+ <ZyGT3h5jNsKB0mrZ@fedora>
+ <674e8c3c-1f2c-464a-ad59-da3d00104383@kernel.dk>
+ <ZyGjID-17REc9X3e@fedora>
+ <ZyGx4JBPdU4VlxlZ@fedora>
+ <d986221d-7399-4487-9c28-5d6f953510cd@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241030094912.3960234-5-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCHYoYR5CJnOgSvAQ--.50242S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww48GFy7tF1xAF18Cr45KFg_yoW8Wr1rp3
-	9Iga4Yyr4Ut3W2kasrAFWUCa1Fyw4kKFWIkF1fJ3yFvrnIgrWDKF4FqFWDWr1jvFyfX34U
-	tanYkrZrGF13JaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AF
-	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07UAwI
-	DUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d986221d-7399-4487-9c28-5d6f953510cd@kernel.dk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi,
-
-ÔÚ 2024/10/30 17:49, John Garry Ð´µÀ:
-> Set BLK_FEAT_ATOMIC_WRITES_STACKED to enable atomic writes.
+On Wed, Oct 30, 2024 at 07:20:48AM -0600, Jens Axboe wrote:
+> On 10/29/24 10:11 PM, Ming Lei wrote:
+> > On Wed, Oct 30, 2024 at 11:08:16AM +0800, Ming Lei wrote:
+> >> On Tue, Oct 29, 2024 at 08:43:39PM -0600, Jens Axboe wrote:
+> > 
+> > ...
+> > 
+> >>> You could avoid the OP dependency with just a flag, if you really wanted
+> >>> to. But I'm not sure it makes a lot of sense. And it's a hell of a lot
+> >>
+> >> Yes, IO_LINK won't work for submitting multiple IOs concurrently, extra
+> >> syscall makes application too complicated, and IO latency is increased.
+> >>
+> >>> simpler than the sqe group scheme, which I'm a bit worried about as it's
+> >>> a bit complicated in how deep it needs to go in the code. This one
+> >>> stands alone, so I'd strongly encourage we pursue this a bit further and
+> >>> iron out the kinks. Maybe it won't work in the end, I don't know, but it
+> >>> seems pretty promising and it's soooo much simpler.
+> >>
+> >> If buffer register and lookup are always done in ->prep(), OP dependency
+> >> may be avoided.
+> > 
+> > Even all buffer register and lookup are done in ->prep(), OP dependency
+> > still can't be avoided completely, such as:
+> > 
+> > 1) two local buffers for sending to two sockets
+> > 
+> > 2) group 1: IORING_OP_LOCAL_KBUF1 & [send(sock1), send(sock2)]  
+> > 
+> > 3) group 2: IORING_OP_LOCAL_KBUF2 & [send(sock1), send(sock2)]
+> > 
+> > group 1 and group 2 needs to be linked, but inside each group, the two
+> > sends may be submitted in parallel.
 > 
-> For an attempt to atomic write to a region which has bad blocks, error
-> the write as we just cannot do this. It is unlikely to find devices which
-> support atomic writes and bad blocks.
-> 
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->   drivers/md/raid1.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
-> 
-> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-> index a10018282629..b57f69e3e8a7 100644
-> --- a/drivers/md/raid1.c
-> +++ b/drivers/md/raid1.c
-> @@ -1524,6 +1524,13 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
->   				blocked_rdev = rdev;
->   				break;
->   			}
-> +
-> +			if (is_bad && bio->bi_opf & REQ_ATOMIC) {
-> +				/* We just cannot atomically write this ... */
-> +				error = -EFAULT;
-> +				goto err_handle;
-> +			}
+> That is where groups of course work, in that you can submit 2 groups and
+> have each member inside each group run independently. But I do think we
+> need to decouple the local buffer and group concepts entirely. For the
+> first step, getting local buffers working with zero copy would be ideal,
+> and then just live with the fact that group 1 needs to be submitted
+> first and group 2 once the first ones are done.
 
-One nit here. If the write range are all badblocks, then this rdev is
-skipped, and bio won't be splited, so I think atomic write is still fine
-in this case. Perhaps move this conditon below?
+IMHO, it is one _kernel_ zero copy(_performance_) feature, which often imply:
 
-Same for raid10.
+- better performance expectation
+- no big change on existed application for using this feature
+
+Application developer is less interested in sort of crippled or immature
+feature, especially need big change on existed code logic(then two code paths
+need to maintain), with potential performance regression.
+
+With sqe group and REQ_F_GROUP_KBUF, application just needs lines of
+code change for using the feature, and it is pretty easy to evaluate
+the feature since no any extra logic change & no extra syscall/wait
+introduced. The whole patchset has been mature enough, unfortunately
+blocked without obvious reasons.
+
+> 
+> Once local buffers are done, we can look at doing the sqe grouping in a
+> nice way. I do think it's a potentially powerful concept, but we're
+> going to make a lot more progress on this issue if we carefully separate
+> dependencies and get each of them done separately.
+
+One fundamental difference between local buffer and REQ_F_GROUP_KBUF is
+
+- local buffer has to be provided and used in ->prep()
+- REQ_F_GROUP_KBUF needs to be provided in ->issue() instead of ->prep()
+
+The only common code could be one buffer abstraction for OP to use, but
+still used differently, ->prep() vs. ->issue().
+
+So it is hard to call it decouple, especially REQ_F_GROUP_KBUF has been
+simple enough, and the main change is to import it in OP code.
+
+Local buffer is one smart idea, but I hope the following things may be
+settled first:
+
+1) is it generic enough to just allow to provide local buffer during
+->prep()?
+
+- this way actually becomes sync & nowait IO, instead AIO, and has been
+  one strong constraint from UAPI viewpoint.
+
+- Driver may need to wait until some data comes, then return & provide
+the buffer with data, and local buffer can't cover this case
+
+2) is it allowed to call ->uring_cmd() from io_uring_cmd_prep()? If not,
+any idea to call into driver for leasing the kernel buffer to io_uring?
+
+3) in OP code, how to differentiate normal userspace buffer select with
+local buffer? And how does OP know if normal buffer select or local
+kernel buffer should be used? Some OP may want to use normal buffer
+select instead of local buffer, others may want to use local buffer.
+
+4) arbitrary numbers of local buffer needs to be supported, since IO
+often comes at batch, it shouldn't be hard to support it by adding xarray
+to submission state, what do you think of this added complexity? Without
+supporting arbitrary number of local buffers, performance can be just
+bad, it doesn't make sense as zc viewpoint. Meantime as number of local
+buffer is increased, more rsrc_node & imu allocation is introduced, this
+still may degrade perf a bit.
+
+5) io_rsrc_node becomes part of interface between io_uring and driver
+for releasing the leased buffer, so extra data has to be
+added to `io_rsrc_node` for driver use.
+
+However, from above, the following can be concluded at least:
+
+- it isn't generic enough, #1, #3
+- it still need sqe group
+- it is much more complicated than REQ_F_GROUP_KBUF only
+- it can't be more efficient
+
 
 Thanks,
-Kuai
-
-> +
->   			if (is_bad && first_bad <= r1_bio->sector) {
->   				/* Cannot write here at all */
->   				bad_sectors -= (r1_bio->sector - first_bad);
-> @@ -3220,6 +3227,7 @@ static int raid1_set_limits(struct mddev *mddev)
->   
->   	md_init_stacking_limits(&lim);
->   	lim.max_write_zeroes_sectors = 0;
-> +	lim.features |= BLK_FEAT_ATOMIC_WRITES_STACKED;
->   	err = mddev_stack_rdev_limits(mddev, &lim, MDDEV_STACK_INTEGRITY);
->   	if (err) {
->   		queue_limits_cancel_update(mddev->gendisk->queue);
-> 
+Ming
 
