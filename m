@@ -1,59 +1,59 @@
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0451014901B;
-	Thu, 31 Oct 2024 15:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA0319EED7
+	for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 15:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730388344; cv=none; b=S5hW8dnqN5ZXrEP9hD3bfZOs0W7xDTBJQCcoc/Cv/eDqhS5qKp1X40PUCuxPV8mNSHNt9iqeT90ScpJ/wo099TrxOS4iZ7dxGRdqPRup8zDKxjYHZwFG1vSsHSYR7Vawrs0Qlgsd2qk4Yr1zA8e3sfGMmBsW6eDsWvLoVaCh08g=
+	t=1730389359; cv=none; b=lceZrWbDBBhA42cBRDzbGFdD9mAn85GZMKNoipmg5Ik4PHJ0HANOj2E7jdjjqCeUmqulxXHgX8VlG7v6rwdHz99m+moMTIsDTs3hWhmZpQS2kPhXq5FwKYxfvtyPcRsc31fhYklLGuJj0lJ/wP9HdEHCSFoX2xqGVQPjP3GLyYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730388344; c=relaxed/simple;
-	bh=Yxqn4MKUlmE5FvElEFTTG0aCAYi+S/ks5h/B1al1GbE=;
+	s=arc-20240116; t=1730389359; c=relaxed/simple;
+	bh=0NtkvTCi3ZOjvlTD7dhsImSkuX2SKlh1rwQxldb1VFs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k4parfoF+LE8EaWnRu4sF0sd/Cmbo4YoaYPgkhpberCJHedVICil1WnOMgzL5K2MW0DrjAC3prrotICnNXjgTZUMWoGEiuIkjx/CoFWh6atbF28MROKMPi8hLle20kUynRU5HTqhbaluCVXjhstWIfEFDgiInLRbYLU/iK/g6zM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TxlBwNhy; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=Ar+TmK9r/szIW0QMeAxgJfExhv5m9L5rZDVaaderCbKLSeXvmhM87Qe0zOzrMD34YGxL9FC13UtIJn2CyD0TnhLwTZlYB4R9DKWFMUPpU48li7wx7raGqEh23S2VpypCsTkhkRJAVsXq4caen5c1i0jdlcOlGeONxz8EEdgyXXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=kqmsYqTf; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxlBwNhy"
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a99f629a7aaso166869666b.1;
-        Thu, 31 Oct 2024 08:25:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="kqmsYqTf"
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-83aacecc8efso64555839f.0
+        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 08:42:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730388339; x=1730993139; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730389355; x=1730994155; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=mZJ38uUiV0IwfSglZx/QA5nl2rkQcw/rwuRnrc1ojIo=;
-        b=TxlBwNhyvlFdVn/3QnFEo0U99AV42N5Xovo0011pmb9N+poOUP/WXHET6vCJnPV84b
-         VAdZ3622rpCUjpBgv9Fh1AAIxPH2Vj2uZz0ctU7vrkEAsjbUGuq0pwbNIPBPgBnPGTuK
-         FOBLTEot2jP7BTfYKo6S1r52uUW8ko3rkROWWGgAR0lSymE3EmKpLjEVPYaEOO2XnAxV
-         1GUo0rPSwZ1QBUe5Z/5b7LVBE2nDW9n+whxxeC9ur4/PClU5sPbvoymCOttG42Tr+URY
-         tfT1U2w4gNMuFkNeep1Vz8UZE9sKZd/Wc/NS3wKUIA2O22QkEMMDrc9dHCaaTQXLut4o
-         TuQw==
+        bh=Zu4t7ikgDLPihQeRUe19wAEWK8bbjEbdWU4hqER7Wu4=;
+        b=kqmsYqTfZ/EMVU+mznZuygMkc4oKn65+EcqxgNds8bsLE12uMtqfA/DI5ISy2A7OEC
+         hEa1YkKVnctayPCnBqByZ9iMHKv1KHzYzWw20vsP9CQ2PztsNQow+3muSijpltMjc54A
+         Ra9JEgI5Nfk3cL+t3R9SwV2EIT4nrWDuxn7zFz+lhXO/q7J1JMFz0GvlZlaserTW/AWW
+         RxTGpT6g4RJEnBLEdZEQe4tccdsKZM9+sFJmwpD5cmT4F1dl/JtgDzvgJYjhH3HWnRps
+         dD8Bi/8YUvPVMAi2aserWlTrb6IhYF2fNdCLxvRbc7Wpvzi/ncQsnSm19iDH7y8WJanu
+         Oxhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730388339; x=1730993139;
+        d=1e100.net; s=20230601; t=1730389355; x=1730994155;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mZJ38uUiV0IwfSglZx/QA5nl2rkQcw/rwuRnrc1ojIo=;
-        b=JHtLxP//1r+OMz+s6H6SuG1Q4y8/DJAEmiU99BdXKpRTH021wwpyv8S10Lkg5/EQl7
-         dUuI3C9q5IlNsDuBtxQ0vZ/oqSdKuP6TW3BrE3WUfdmj1ck3zDmjW9W5/7sPmQqQLqFj
-         NkZPjEdSAuqGrd0Z/qo86eouvnwxF3HRjnXWAxZI8AEVK9rRys37qyXK4pZf0n1SFu3S
-         CsTmP1RbdES3Dr9P/vB3zQE9+V547tWNeMrKzZNtpf9SiTDMyckeW1JlbIUX/UaOoJR8
-         B+DnEUC0DLxVnsBsjS2ISc7MUgmJVfSymAFKvducTQcKLhAmUIWqoYYEWg2aRBi3+2WB
-         2E9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXbaxxx8HR+Rh5B65RWMnIIvshW2Kc2KasOSrcoKYwW70vhspx6B5PAAjcL4EXDHHas0m2rzkXbT8J/3A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGJ+faSmwbYz8wiH2D9uNYOD3d+HHgGEMiGyCI7Rzg/NwkDJ4L
-	DPhExt0rJciBz1xeFwPFvjMRzfYviH6gu7Ay+69hY5Xoi6y57gGf
-X-Google-Smtp-Source: AGHT+IHZCZKPvnqTOLw9+9qhMkvj4J5Nhm7BSMwiTaS2/AMHRv/aYnmaKwNnsoAhNH5WPQe3Dn6coA==
-X-Received: by 2002:a17:907:9446:b0:a99:f209:cea3 with SMTP id a640c23a62f3a-a9e55a4f2b9mr273180766b.11.1730388339050;
-        Thu, 31 Oct 2024 08:25:39 -0700 (PDT)
-Received: from [192.168.42.226] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9e566436basm79966466b.179.2024.10.31.08.25.38
+        bh=Zu4t7ikgDLPihQeRUe19wAEWK8bbjEbdWU4hqER7Wu4=;
+        b=JFnqYYMurlsotDc0k5On9bNR3SfNRuGJijLKAELX2rnxvuLvtoZhbMLOYvzfwsGREa
+         jykY/Frt2PJiYM5R1GLbJKGW9aXXI37bVCa5RQr+idU+TwBpg4y6gL6hZL0zH7IueuJW
+         U034Uqm113sVWYm8bvGXe4UjuAXoADFzJW0yyPNPwBKnGXbeYLil2Oet4bZeD7HAnAtr
+         kNJi32Cgu1WLbbPFsQ7wj2vuqlqFUcuQV65Mk8f4DKXJtfbaNAZKNb/uYjqrxZVJI8GQ
+         ZUATjwW0jphQkO/iULhows72y4Uq0ecLQFPkNkMLzXBhvZ3CoYzVkXhPjkTtO028CsR3
+         KISA==
+X-Forwarded-Encrypted: i=1; AJvYcCUzRgA3zq40Fj27itUuOiHf/OkYmkZMv2z5eWZHOT67vSdzo2dQ1NeES6eZesJspIWBw8LHjJrBihFUQQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4y901xhvQGSUtmyzBl3H8UwGCVPusMpIU+W4i1Bo7aHLiHMSx
+	OHTJSxBzEckGESugw9JDKHm+ipL4UjHUyC42+wgK4bsr7y8umqpbgYNhGyE6Qh4=
+X-Google-Smtp-Source: AGHT+IHa2dzQdMslHA1FvCu6c4JUdPTqwrA6RqZYR3mOyurWoXTJiivF7PieJ8badg2W5wGDUdk+hA==
+X-Received: by 2002:a05:6e02:111:b0:3a3:637f:1012 with SMTP id e9e14a558f8ab-3a6aff71b31mr2963635ab.12.1730389354967;
+        Thu, 31 Oct 2024 08:42:34 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4de049a4813sm334757173.149.2024.10.31.08.42.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 08:25:38 -0700 (PDT)
-Message-ID: <bc9c365a-16fc-46b2-bc92-4c6dfbc3ada6@gmail.com>
-Date: Thu, 31 Oct 2024 15:25:55 +0000
+        Thu, 31 Oct 2024 08:42:34 -0700 (PDT)
+Message-ID: <eb7f844c-9517-4ff9-979f-d78afd4673c4@kernel.dk>
+Date: Thu, 31 Oct 2024 09:42:33 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,7 +62,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH V8 0/8] io_uring: support sqe group and leased group kbuf
-To: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+To: Pavel Begunkov <asml.silence@gmail.com>, Ming Lei <ming.lei@redhat.com>
 Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
  Uday Shankar <ushankar@purestorage.com>,
  Akilesh Kailash <akailash@google.com>
@@ -75,103 +75,132 @@ References: <20241025122247.3709133-1-ming.lei@redhat.com>
  <674e8c3c-1f2c-464a-ad59-da3d00104383@kernel.dk>
  <1f40a907-9c53-408d-997e-da49e5751c66@gmail.com>
  <6e6893cd-890d-46b0-9164-01801a4145bc@kernel.dk>
+ <bc9c365a-16fc-46b2-bc92-4c6dfbc3ada6@gmail.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <6e6893cd-890d-46b0-9164-01801a4145bc@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <bc9c365a-16fc-46b2-bc92-4c6dfbc3ada6@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/31/24 14:29, Jens Axboe wrote:
-> On 10/31/24 7:25 AM, Pavel Begunkov wrote:
->> On 10/30/24 02:43, Jens Axboe wrote:
->>> On 10/29/24 8:03 PM, Ming Lei wrote:
->>>> On Tue, Oct 29, 2024 at 03:26:37PM -0600, Jens Axboe wrote:
->>>>> On 10/29/24 2:06 PM, Jens Axboe wrote:
->>>>>> On 10/29/24 1:18 PM, Jens Axboe wrote:
->> ...
->>>>> +    node->buf = imu;
->>>>> +    node->kbuf_fn = kbuf_fn;
->>>>> +    return node;
+On 10/31/24 9:25 AM, Pavel Begunkov wrote:
+> On 10/31/24 14:29, Jens Axboe wrote:
+>> On 10/31/24 7:25 AM, Pavel Begunkov wrote:
+>>> On 10/30/24 02:43, Jens Axboe wrote:
+>>>> On 10/29/24 8:03 PM, Ming Lei wrote:
+>>>>> On Tue, Oct 29, 2024 at 03:26:37PM -0600, Jens Axboe wrote:
+>>>>>> On 10/29/24 2:06 PM, Jens Axboe wrote:
+>>>>>>> On 10/29/24 1:18 PM, Jens Axboe wrote:
+>>> ...
+>>>>>> +    node->buf = imu;
+>>>>>> +    node->kbuf_fn = kbuf_fn;
+>>>>>> +    return node;
+>>>>>
+>>>>> Also this function needs to register the buffer to table with one
+>>>>> pre-defined buf index, then the following request can use it by
+>>>>> the way of io_prep_rw_fixed().
 >>>>
->>>> Also this function needs to register the buffer to table with one
->>>> pre-defined buf index, then the following request can use it by
->>>> the way of io_prep_rw_fixed().
+>>>> It should not register it with the table, the whole point is to keep
+>>>> this node only per-submission discoverable. If you're grabbing random
+>>>> request pages, then it very much is a bit finicky
 >>>
->>> It should not register it with the table, the whole point is to keep
->>> this node only per-submission discoverable. If you're grabbing random
->>> request pages, then it very much is a bit finicky
+>>> Registering it into the table has enough of design and flexibility
+>>> merits: error handling, allowing any type of dependencies of requests
+>>> by handling it in the user space, etc.
 >>
->> Registering it into the table has enough of design and flexibility
->> merits: error handling, allowing any type of dependencies of requests
->> by handling it in the user space, etc.
+>> Right, but it has to be a special table. See my lengthier reply to Ming.
 > 
-> Right, but it has to be a special table. See my lengthier reply to Ming.
+> Mind pointing the specific part? I read through the thread and didn't
+> see why it _has_ to be a special table.
+> And by "special" I assume you mean the property of it being cleaned up
+> / flushed by the end of submission / syscall, right?
 
-Mind pointing the specific part? I read through the thread and didn't
-see why it _has_ to be a special table.
-And by "special" I assume you mean the property of it being cleaned up
-/ flushed by the end of submission / syscall, right?
+Right, that's all I mean, special in the sense that it isn't persistent.
+Nothing special about it otherwise. Maybe "separate table from
+buf_table" is a more accurate way to describe it.
 
-> The initial POC did install it into a table, it's just a one-slot table,
-
-By "table" I actually mean anything that survives beyond the current
-syscall / submission and potentially can be used by requests submitted
-with another syscall.
-
-> io_submit_state. I think the right approach is to have an actual struct
-> io_rsrc_data local_table in the ctx, with refs put at the end of submit.
-> Same kind of concept, just allows for more entries (potentially), with
-> the same requirement that nodes get put when submit ends. IOW, requests
-> need to find it within the same submit.
+>> The initial POC did install it into a table, it's just a one-slot table,
 > 
-> Obviously you would not NEED to do that, but if the use case is grabbing
-> bvecs out of a request, then it very much should not be discoverable
-> past the initial assignments within that submit scope.
-> 
->>> and needs to be of
->>> limited scope.
+> By "table" I actually mean anything that survives beyond the current
+> syscall / submission and potentially can be used by requests submitted
+> with another syscall.
+
+Obviously there's nothing special about the above mentioned table in the
+sense that it's a normal table, it just doesn't survive beyond the
+current submission. The reason why I like that approach is that it
+doesn't leave potentially iffy data in a table beyond that submission.
+If we don't own this data, it's merely borrowed from someone else, then
+special case must be taken around it.
+
+>> io_submit_state. I think the right approach is to have an actual struct
+>> io_rsrc_data local_table in the ctx, with refs put at the end of submit.
+>> Same kind of concept, just allows for more entries (potentially), with
+>> the same requirement that nodes get put when submit ends. IOW, requests
+>> need to find it within the same submit.
 >>
->> And I don't think we can force it, neither with limiting exposure to
->> submission only nor with the Ming's group based approach. The user can
->> always queue a request that will never complete and/or by using
->> DEFER_TASKRUN and just not letting it run. In this sense it might be
->> dangerous to block requests of an average system shared block device,
->> but if it's fine with ublk it sounds like it should be fine for any of
->> the aforementioned approaches.
+>> Obviously you would not NEED to do that, but if the use case is grabbing
+>> bvecs out of a request, then it very much should not be discoverable
+>> past the initial assignments within that submit scope.
+>>
+>>>> and needs to be of
+>>>> limited scope.
+>>>
+>>> And I don't think we can force it, neither with limiting exposure to
+>>> submission only nor with the Ming's group based approach. The user can
+>>> always queue a request that will never complete and/or by using
+>>> DEFER_TASKRUN and just not letting it run. In this sense it might be
+>>> dangerous to block requests of an average system shared block device,
+>>> but if it's fine with ublk it sounds like it should be fine for any of
+>>> the aforementioned approaches.
+>>
+>> As long as the resource remains valid until the last put of the node,
+>> then it should be OK. Yes the application can mess things up in terms of
 > 
-> As long as the resource remains valid until the last put of the node,
-> then it should be OK. Yes the application can mess things up in terms of
+> It should be fine in terms of buffers staying alive. The "dangerous"
+> part I mentioned is about abuse of a shared resource, e.g. one
+> container locking up all requests of a bdev so that another container
+> can't do any IO, maybe even with an fs on top. Nevertheless, it's ublk,
+> I don't think we need to concern about that much since io_uring is
+> on the other side from normal user space.
 
-It should be fine in terms of buffers staying alive. The "dangerous"
-part I mentioned is about abuse of a shared resource, e.g. one
-container locking up all requests of a bdev so that another container
-can't do any IO, maybe even with an fs on top. Nevertheless, it's ublk,
-I don't think we need to concern about that much since io_uring is
-on the other side from normal user space.
+If you leave it in the table, then you can no longer rely on the final
+put being the callback driver. Maybe this is fine, but then it needs
+some other mechanism for this.
 
-> latency if it uses one of these bufs for eg a read on a pipe that never
-> gets any data, but the data will remain valid regardless. And that's
-> very much a "doctor it hurts when I..." case, it should not cause any
+>> latency if it uses one of these bufs for eg a read on a pipe that never
+>> gets any data, but the data will remain valid regardless. And that's
+>> very much a "doctor it hurts when I..." case, it should not cause any
+> 
+> Right, I care about malicious abuse when it can affect other users,
+> break isolation / fairness, etc., I'm saying that there is no
+> difference between all the approaches in this aspect, and if so
+> it should also be perfectly ok from the kernel's perspective to allow
+> to leave a buffer in the table long term. If the user wants to screw
+> itself and doesn't remove the buffer that's the user's choice to
+> shoot itself in the leg.
+> 
+> From this angle, that I look at the auto removal you add not as some
+> security / etc. concern, but just as a QoL / performance feature so
+> that the user doesn't need to remove the buffer by hand.
+> 
+> FWIW, instead of having another table, we can just mark a sub range
+> of the main buffer table to be cleared every time after submission,
+> just like we separate auto slot allocation with ranges.
 
-Right, I care about malicious abuse when it can affect other users,
-break isolation / fairness, etc., I'm saying that there is no
-difference between all the approaches in this aspect, and if so
-it should also be perfectly ok from the kernel's perspective to allow
-to leave a buffer in the table long term. If the user wants to screw
-itself and doesn't remove the buffer that's the user's choice to
-shoot itself in the leg.
+I did consider that idea too, mainly from the perspective of then not
+needing any kind of special OP or OP support to grab one of these
+buffers, it'd just use the normal table but in a separate range. Doesn't
+feel super clean, and does require some odd setup. Realistically,
+applications probabably use one or the other and not combined, so
+perhaps it's fine and the range is just the normal range. If they do mix
+the two, then yeah they would want to use separate ranges for them.
 
- From this angle, that I look at the auto removal you add not as some
-security / etc. concern, but just as a QoL / performance feature so
-that the user doesn't need to remove the buffer by hand.
-
-FWIW, instead of having another table, we can just mark a sub range
-of the main buffer table to be cleared every time after submission,
-just like we separate auto slot allocation with ranges.
-
-> safety issues. It'll just prevent progress for the other requests that
-> are using that buffer, if they need the final put to happen before
-> making progress.
+Honestly don't care too deeply about that implementation detail, I care
+more about having these buffers be io_rsrc_node and using the general
+infrastructure for them. If we have to add IORING_RSRC_KBUFFER for them
+and a callback + data field to io_rsrc_node, that still a much better
+approach than having some other intermediate type which basically does
+the same thing, except it needs new fields to store it and new helpers
+to alloc/put it.
 
 -- 
-Pavel Begunkov
+Jens Axboe
