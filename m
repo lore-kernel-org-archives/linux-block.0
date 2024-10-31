@@ -1,190 +1,94 @@
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266F814D6E1;
-	Thu, 31 Oct 2024 07:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8248314D2BD;
+	Thu, 31 Oct 2024 07:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730360794; cv=none; b=iBRo/Z5C4iWWx1wBsUObJHJj4A7OADRic2RI3JF55v8Vcnelo/fNn766jqADBYKcOESUL6DrBrAetRti416IXd5cozz4/bPRpUIvDCv8vGqzlubOG0yq6PAqs7Fa+WnfjHNWZDg1KT57D2ggMLeGkyQnmuYQrOmB8n0x7l/FJnY=
+	t=1730361574; cv=none; b=i7N6c3wlAu6Ko939RcrInEo/CXNNxvXvDyC/rrPZeZj2gQwJ0uJFagrSzR/YpozNJtd7tu76zZ3nERmRaBsazblCJbVJ4iyskMWj5myvbbcl1ItUkQ+F83wmj0icyfpc7dn9oo9rYr45eBtV1kX6iFEinnCyHGRATOTE3Eo8hDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730360794; c=relaxed/simple;
-	bh=33phXrmK8nmqMHKYFyD3A7lDPDZpmvZXuiUrbzomsjs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VYY62HABN7zDxMfKgvqrOVbAssxSsxChrux8PqPdZYJq2+4llW3JA0OTTv3X2jUshcJdP/skSSXEyQeGscd3MlGbKl97+gCKpcNdbCzpoK0gsa/ijDW1W9Aoi1Ue0BDfOy6fjGvygN7BKNjT3qUU1jIPIqTVuiHxyP2IxHl6hVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=p/9aLeKN; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1730361574; c=relaxed/simple;
+	bh=r4WvFfTJfMdRUmFzrlSoIGEf8BKQg/IhRD4qnokJQvg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EsnBx/V7/NQ5tIcul5WSbkatoRqNQMlug8lvecIHPIJ8ogC+GOg9YuGCC6JB0uzN1sdLUvN0Xk7YpsKIa9jeoOEBfhrOV6biQWi5vpQfR2S++TQcyQqlpsT5m1kf/fymy3cybNCLslirgt/Jptpa7Pm6wgWtp5Rae0L4hlL57GY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YSE0qfi9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="p/9aLeKN"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1730360783; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=Yi5S3FvCJe7m8m05OvpuB+dWdFv2eUKXm00/bjW1XKs=;
-	b=p/9aLeKNdV7LAhkpLU0Yi0xqx/6MIYfXioKHCjax2wPa3KwsB5tWyUcjtW9Xu7oHJtba19gKZmq4Fnhrrr2vsBWMbXK0Fc9sKt1PCvg/NWP+jgQYkrQb06dkPb/btpTeRmSt2OHeFVUv4c2Y84ZmSwlpVnLfXn5Fe0/S1+cw53Q=
-Received: from localhost(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0WIHewz0_1730360781 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 31 Oct 2024 15:46:22 +0800
-From: 'Guanjun' <guanjun@linux.alibaba.com>
-To: corbet@lwn.net,
-	axboe@kernel.dk,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	vgoyal@redhat.com,
-	stefanha@redhat.com,
-	miklos@szeredi.hu,
-	tglx@linutronix.de,
-	peterz@infradead.org,
-	akpm@linux-foundation.org,
-	paulmck@kernel.org,
-	thuth@redhat.com,
-	rostedt@goodmis.org,
-	bp@alien8.de,
-	xiongwei.song@windriver.com,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org
-Cc: guanjun@linux.alibaba.com
-Subject: [PATCH RFC v1 2/2] genirq/cpuhotplug: Handle managed IRQs when the last CPU hotplug out in the affinity
-Date: Thu, 31 Oct 2024 15:46:18 +0800
-Message-ID: <20241031074618.3585491-3-guanjun@linux.alibaba.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241031074618.3585491-1-guanjun@linux.alibaba.com>
-References: <20241031074618.3585491-1-guanjun@linux.alibaba.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YSE0qfi9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31A22C4CEC3;
+	Thu, 31 Oct 2024 07:59:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730361574;
+	bh=r4WvFfTJfMdRUmFzrlSoIGEf8BKQg/IhRD4qnokJQvg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YSE0qfi9lLOBn1EH9BGdBYxYLpBIBHIK0QaNCb5Z2f/3ZU0SiPGduT5S8BZpZzVhE
+	 QsE8znEvky7HGyINHWNHZtUimXc0OyWjetPBBGPw4IpeX6whHRZ0Squq75I9D2OXoh
+	 Dj4A2PcDjtD53WxZ8CfoENNGNXS3uZ1vTjYJ05qe8rdIM0RAaKg01VZUsT2btH90gN
+	 3IfJ20Y+iAFHW1y+lpY5HZMEPNs5tEjpoTUkB7qMwux7hxpqN1+o4tJ7RVpOBKxrIT
+	 w9KRIYFGI2KFLA4w2wF7IkinK0w9y+ewKYwfXPBFWw7JG53t4IL192NVOKYAlQAK8j
+	 0+j+mdz3I8PxQ==
+Date: Thu, 31 Oct 2024 09:59:28 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v1 09/17] docs: core-api: document the IOVA-based API
+Message-ID: <20241031075928.GA7473@unreal>
+References: <cover.1730298502.git.leon@kernel.org>
+ <881ef0bcf9aa971e995fbdd00776c5140a7b5b3d.1730298502.git.leon@kernel.org>
+ <19cf7d58-4a28-4ce8-9524-8c99fdc79062@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <19cf7d58-4a28-4ce8-9524-8c99fdc79062@infradead.org>
 
-From: Guanjun <guanjun@linux.alibaba.com>
+On Wed, Oct 30, 2024 at 06:41:21PM -0700, Randy Dunlap wrote:
+> (nits)
+> 
+> On 10/30/24 8:12 AM, Leon Romanovsky wrote:
+> > From: Christoph Hellwig <hch@lst.de>
+> > 
+> > Add an explanation of the newly added IOVA-based mapping API.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> >  Documentation/core-api/dma-api.rst | 70 ++++++++++++++++++++++++++++++
+> >  1 file changed, 70 insertions(+)
 
-Once we limit the number of managed interrupts, if the last online CPU in
-the affinity goes offline, it will result in the interrupt becoming unavailable
-util one of the assigned CPUs comes online again. So prevent the last online
-CPU in the affinity from going offline, and return -EBUSY in this situation.
+<...>
 
-Signed-off-by: Guanjun <guanjun@linux.alibaba.com>
----
- .../admin-guide/kernel-parameters.txt         |  3 ++
- include/linux/irq.h                           |  2 +
- kernel/cpu.c                                  |  2 +-
- kernel/irq/cpuhotplug.c                       | 51 +++++++++++++++++++
- 4 files changed, 57 insertions(+), 1 deletion(-)
+> > +These APIs allow a very efficient mapping when using an IOMMU.  They are an
+> > +optional path that requires extra code and are only recommended for drivers
+> > +where DMA mapping performance, or the space usage for storing the DMA addresses
+> > +matter.  All the consideration from the previous section apply here as well.
+> 
+>                     considerations
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index ac80f35d04c9..173598cbf4a6 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -3244,6 +3244,9 @@
- 			interrupts cannot be properly allocated where a large
- 			number of devices are present. The default number is 0,
- 			that means no limit to the number of managed irqs.
-+			Once we limit the number of managed interrupts, the last
-+			online CPU in the affinity goes offline will fail with
-+			the error code -EBUSY.
- 			Format: integer between 0 and num_possible_cpus() / num_possible_nodes()
- 			Default: 0
- 
-diff --git a/include/linux/irq.h b/include/linux/irq.h
-index fa711f80957b..68ce05a74079 100644
---- a/include/linux/irq.h
-+++ b/include/linux/irq.h
-@@ -615,8 +615,10 @@ extern int irq_set_vcpu_affinity(unsigned int irq, void *vcpu_info);
- #if defined(CONFIG_SMP) && defined(CONFIG_GENERIC_IRQ_MIGRATION)
- extern void irq_migrate_all_off_this_cpu(void);
- extern int irq_affinity_online_cpu(unsigned int cpu);
-+extern int irq_affinity_offline_cpu(unsigned int cpu);
- #else
- # define irq_affinity_online_cpu	NULL
-+# define irq_affinity_offline_cpu	NULL
- #endif
- 
- #if defined(CONFIG_SMP) && defined(CONFIG_GENERIC_PENDING_IRQ)
-diff --git a/kernel/cpu.c b/kernel/cpu.c
-index c4aaf73dec9e..672d920970b2 100644
---- a/kernel/cpu.c
-+++ b/kernel/cpu.c
-@@ -2219,7 +2219,7 @@ static struct cpuhp_step cpuhp_hp_states[] = {
- 	[CPUHP_AP_IRQ_AFFINITY_ONLINE] = {
- 		.name			= "irq/affinity:online",
- 		.startup.single		= irq_affinity_online_cpu,
--		.teardown.single	= NULL,
-+		.teardown.single	= irq_affinity_offline_cpu,
- 	},
- 	[CPUHP_AP_PERF_ONLINE] = {
- 		.name			= "perf:online",
-diff --git a/kernel/irq/cpuhotplug.c b/kernel/irq/cpuhotplug.c
-index 15a7654eff68..e6f068198e4a 100644
---- a/kernel/irq/cpuhotplug.c
-+++ b/kernel/irq/cpuhotplug.c
-@@ -232,6 +232,31 @@ static void irq_restore_affinity_of_irq(struct irq_desc *desc, unsigned int cpu)
- 		irq_set_affinity_locked(data, affinity, false);
- }
- 
-+static int irq_check_affinity_of_irq(struct irq_desc *desc, unsigned int cpu)
-+{
-+	struct irq_data *data = irq_desc_get_irq_data(desc);
-+	const struct cpumask *affinity = irq_data_get_affinity_mask(data);
-+	unsigned int cur;
-+
-+	if (!irqd_affinity_is_managed(data) || !desc->action ||
-+	    !irq_data_get_irq_chip(data) || !cpumask_test_cpu(cpu, affinity))
-+		return 0;
-+
-+	for_each_cpu(cur, affinity)
-+		if (cur != cpu && cpumask_test_cpu(cur, cpu_online_mask))
-+			return 0;
-+
-+	/*
-+	 * If the onging offline CPU is the last one in the affinity,
-+	 * the managed interrupts will be unavailable until one of
-+	 * the assigned CPUs comes online. To prevent this unavailability,
-+	 * return -EBUSY directly in this case.
-+	 */
-+	pr_warn("Affinity %*pbl of managed IRQ%u contains only one CPU%u that online\n",
-+		cpumask_pr_args(affinity), data->irq, cpu);
-+	return -EBUSY;
-+}
-+
- /**
-  * irq_affinity_online_cpu - Restore affinity for managed interrupts
-  * @cpu:	Upcoming CPU for which interrupts should be restored
-@@ -252,3 +277,29 @@ int irq_affinity_online_cpu(unsigned int cpu)
- 
- 	return 0;
- }
-+
-+/**
-+ * irq_affinity_offline_cpu - Check affinity for managed interrupts
-+ * to prevent the unavailability caused by taking the last CPU in the
-+ * affinity offline.
-+ * @cpu:	Upcoming CPU for which interrupts should be checked
-+ */
-+int irq_affinity_offline_cpu(unsigned int cpu)
-+{
-+	struct irq_desc *desc;
-+	unsigned int irq;
-+	int ret = 0;
-+
-+	irq_lock_sparse();
-+	for_each_active_irq(irq) {
-+		desc = irq_to_desc(irq);
-+		raw_spin_lock_irq(&desc->lock);
-+		ret = irq_check_affinity_of_irq(desc, cpu);
-+		raw_spin_unlock_irq(&desc->lock);
-+		if (ret < 0)
-+			break;
-+	}
-+	irq_unlock_sparse();
-+
-+	return ret;
-+}
--- 
-2.43.5
+<...>
 
+> > +is used to unmap a range previous mapped, and
+> 
+>                             previously
+
+Thanks
