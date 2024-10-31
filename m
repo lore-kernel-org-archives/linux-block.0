@@ -1,122 +1,109 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBE81BD515
-	for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 17:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4484149C55;
+	Thu, 31 Oct 2024 20:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730396635; cv=none; b=S3MLuoDQ4yEb3pxI4dqaJvUECid02n9KmBkQE8J45hBeiw7c4HaNPqNNQXrU57yh8UOnCv7toMof5L/MEKn1qoooqFErwYOc44iWEK/EWvaUg5MfTXjSKQtIusqS0xV6k/9aDSXU8LBIZLGblV0BLHAPdy9WIrAzcpEqNXHrqoE=
+	t=1730407391; cv=none; b=NKI2eZTcXD4gGnQ966LEFxyxOQQE1uOmDpmih0aXhFnqDXs0qXpT/tqnr1ja1sYM9NqKu6O64NDv4bjvrq8Y/VGpEjABgGODWS1RZZxideCeTM4372rZLGT22XLmIEMQQ3h7ssAThUqauzBbEO3+lbw1i/PKmLI5grqyAKF8K8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730396635; c=relaxed/simple;
-	bh=mhTsv1ygiWFnjDiVQe/E1G0vEfNsEKPKJTElZp6SXYc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o5drMGmat1IvtdmmbYJEJsLYns1OyoXbQk0RrPsNz/6OIO6LaNlZIabqJkwhkJS6CBT/YO741L29H5q6KfU6cvzUW0XfG+0rlq8TU72z/2kTt47wDfhE03fT/F9I1ScH/FUPmwscZ+9YX2CKPIyFE3+yh+rKELK+CAq7s183xMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dZqBiU8D; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1730407391; c=relaxed/simple;
+	bh=H9TYKTBvHoQ5rvWOlZrf5R8cp5gm744S0WtiOVj2YhM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dQ6vyye8Y2R4V3qRUCATesG+f7RmUzE2M+Is2l+G1NUeK/6fHM7Qd/ZKl2NlNiRAbO8XyZNvOTYFegqzhiXJPT8kXgN87d7JSrcOjY6tw7PvylqA2DSCMULKkfWZnjov8kxP7DF5OGoAadJoji7wnuGIXVUbKiC3I+Kh7wTH9sU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lr7kPUgI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dZqBiU8D"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-83a9ca86049so44376339f.0
-        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 10:43:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730396633; x=1731001433; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cJN1S3OA8zjlhqH9iA1Z8bsg9GoFf4IOEEdKUROgci0=;
-        b=dZqBiU8DXpQWfL+3eDl4LNW0W8j+Gz/J02RI+YIltmvo+mXJ8sK+GXmVmFZki7saWo
-         EiOfNKfrdJx3cH16jzNPC4J1UW6Znf3Fl/LOGauWgtG+nlV9MvRTmmWSW6AdlRhGm/jV
-         PruJ2QGCXMvZiFufP41oXDueGWmKZx5GRxOMoWb0ks7naLXT2NhNcFb42vJMO6j/oPYs
-         sF3gAAC6PSuY+vA3Fy9x0bAH+9iJjo/A832nbSe1ZHD2UM/UnGW26frMvAhMmeuGc11m
-         XpHb/8EJldScXIeKUKhsgBZlD+JolvOaJA8QEP8jb3Jlp4Rr0giiK4Jb9loOapjHOiFD
-         oB+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730396633; x=1731001433;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cJN1S3OA8zjlhqH9iA1Z8bsg9GoFf4IOEEdKUROgci0=;
-        b=DWoS6jeTBlmFFCvQIkwqMBT4Q9oioLbfj/4MIcf7f4DEMvflD12i53jx/SUGMjkeL0
-         tKsFt/dOuEum8UVOjXzOWT9u6wIM4uxL1V/pqUiOFAONH1fdzJPYVtHxNst7qVMYxDpf
-         1DZK5RzN3UnDzIkj4+/axUmxzRnuBJgzTG0FTsnU1LKRyYpfXtHC7UHLMZtCeydCpsV1
-         r59fK2PvM9oazB/Q9sgaMtjjjcFTHXj5f2RAf9hQcK7tyd1EWXwbgMYrgu/D6pRJqv1r
-         u1fnUbLm+ut0AZdxlDdPlMdW5cZOMBFnjYc3/rZXNXIIPPZYZYK26x2osWTrWiaG8LVY
-         bgYg==
-X-Forwarded-Encrypted: i=1; AJvYcCV2L5oxZHulVNWL+4rPss5shA9eMT8X7ToOI62FOL4uvbENhuRlp2VQXpqQQOXHvqAGEeYEfNxE0fHfFg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDpIWlaHtSuql8lpbbklPNBt9Y0IGY2WDdevISfGf2Nk+NYcXV
-	kXnGI+lYbKOnT7qdxXCvMPng1aL76BVAw53CchOqZ7qx5lQWHpNusGnmmPnAOCU=
-X-Google-Smtp-Source: AGHT+IGqvDPac4jMToI9PP3ppL4bi2ob+amIyOKddZ0fGQ56qF7607m8ktK4Ur1sfUjByGfZ1fMmYA==
-X-Received: by 2002:a05:6602:6d0b:b0:83a:a9e9:6dc9 with SMTP id ca18e2360f4ac-83b1c4c27eemr2156317139f.12.1730396633080;
-        Thu, 31 Oct 2024 10:43:53 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4de048e3736sm379375173.81.2024.10.31.10.43.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 10:43:52 -0700 (PDT)
-Message-ID: <8b4500da-4ed8-4cd2-ba3b-0c2d0b5b4551@kernel.dk>
-Date: Thu, 31 Oct 2024 11:43:50 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lr7kPUgI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7011FC4CEC3;
+	Thu, 31 Oct 2024 20:43:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730407391;
+	bh=H9TYKTBvHoQ5rvWOlZrf5R8cp5gm744S0WtiOVj2YhM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lr7kPUgI/7iVNgICJResGJ30FaV5ODcyHJ9WGRkVobW4I+2qmOuISPyR7TgVvtOL0
+	 SmzSJOoShZhbOMucGyUH2uuWA6uV+MEqkVpWqucL5pewOQIRjkLlpdRuvDl1QVDfWX
+	 j1897yIh4R6d4BkCIdg8zDSKqwvM5/ucAQVUt6ez1WZ9F859wkA3oJfZDIz3/BvZ9Q
+	 CFmDxviw5iM6FMEQKmQ/YcUbuNijZ7G5KlXaJgFBJfCLtyj90f3jtiAtedA93PWWwn
+	 Aojx0RCSHe5LU/8+xXjxLd+N9OOoZAjQdgre/g+5QavM+S81ng8FOAv7tC01+C4SFj
+	 e0eXzNVUyHdgQ==
+Date: Thu, 31 Oct 2024 22:43:06 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
+Message-ID: <20241031204306.GB88858@unreal>
+References: <cover.1730298502.git.leon@kernel.org>
+ <3144b6e7-5c80-46d2-8ddc-a71af3c23072@kernel.dk>
+ <20241031083450.GA30625@lst.de>
+ <20241031090530.GC7473@unreal>
+ <20241031092113.GA1791@lst.de>
+ <20241031093746.GA88858@unreal>
+ <8b4500da-4ed8-4cd2-ba3b-0c2d0b5b4551@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
-To: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>,
- Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
- iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-References: <cover.1730298502.git.leon@kernel.org>
- <3144b6e7-5c80-46d2-8ddc-a71af3c23072@kernel.dk>
- <20241031083450.GA30625@lst.de> <20241031090530.GC7473@unreal>
- <20241031092113.GA1791@lst.de> <20241031093746.GA88858@unreal>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241031093746.GA88858@unreal>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b4500da-4ed8-4cd2-ba3b-0c2d0b5b4551@kernel.dk>
 
-On 10/31/24 3:37 AM, Leon Romanovsky wrote:
-> On Thu, Oct 31, 2024 at 10:21:13AM +0100, Christoph Hellwig wrote:
->> On Thu, Oct 31, 2024 at 11:05:30AM +0200, Leon Romanovsky wrote:
->>> This series is a subset of the series you tested and doesn't include the
->>> block layer changes which most likely were the cause of the performance
->>> regression.
->>>
->>> This is why I separated the block layer changes from the rest of the series
->>> and marked them as RFC.
->>>
->>> The current patch set is viable for HMM and VFIO. Can you please retest
->>> only this series and leave the block layer changes for later till Christoph
->>> finds the answer for the performance regression?
->>
->> As the subset doesn't touch block code or code called by block I don't
->> think we need Jens to benchmark it, unless he really wants to.
+On Thu, Oct 31, 2024 at 11:43:50AM -0600, Jens Axboe wrote:
+> On 10/31/24 3:37 AM, Leon Romanovsky wrote:
+> > On Thu, Oct 31, 2024 at 10:21:13AM +0100, Christoph Hellwig wrote:
+> >> On Thu, Oct 31, 2024 at 11:05:30AM +0200, Leon Romanovsky wrote:
+> >>> This series is a subset of the series you tested and doesn't include the
+> >>> block layer changes which most likely were the cause of the performance
+> >>> regression.
+> >>>
+> >>> This is why I separated the block layer changes from the rest of the series
+> >>> and marked them as RFC.
+> >>>
+> >>> The current patch set is viable for HMM and VFIO. Can you please retest
+> >>> only this series and leave the block layer changes for later till Christoph
+> >>> finds the answer for the performance regression?
+> >>
+> >> As the subset doesn't touch block code or code called by block I don't
+> >> think we need Jens to benchmark it, unless he really wants to.
+> > 
+> > He wrote this sentence in his email, while responding on subset which
+> > doesn't change anything in block layer: "just want to make sure
+> > something like this doesn't get merged until that is both fully
+> > understood and sorted out."
+> > 
+> > This series works like a charm for RDMA (HMM) and VFIO.
 > 
-> He wrote this sentence in his email, while responding on subset which
-> doesn't change anything in block layer: "just want to make sure
-> something like this doesn't get merged until that is both fully
-> understood and sorted out."
+> I don't care about rdma/vfio, nor do I test it, so you guys can do
+> whatever you want there, as long as it doesn't regress the iommu side.
+> The block series is separate, so we'll deal with that when we get there.
 > 
-> This series works like a charm for RDMA (HMM) and VFIO.
+> I don't know why you CC'ed linux-block on the series.
 
-I don't care about rdma/vfio, nor do I test it, so you guys can do
-whatever you want there, as long as it doesn't regress the iommu side.
-The block series is separate, so we'll deal with that when we get there.
+Because of the second part, which is marked as RFC and based on this
+one. I think that it is better to present whole picture to everyone
+interested in the discussion.
 
-I don't know why you CC'ed linux-block on the series.
+Thanks
 
--- 
-Jens Axboe
+> 
+> -- 
+> Jens Axboe
+> 
