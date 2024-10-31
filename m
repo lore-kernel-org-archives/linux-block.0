@@ -1,91 +1,95 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59C4193417;
-	Thu, 31 Oct 2024 14:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D2C1993B2;
+	Thu, 31 Oct 2024 14:12:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730383588; cv=none; b=QFok1N9uEH63W8BOedWs48M0URNHZkg0g4XrCtulkFLBTUrbNiMMZVJ5AsIrFo3QJxIW7a/uYnMJMU0rOqJgdU5FHlM/X4RWV1Mcu7h2Lij1WrFrfsNTANUFH3jGupUsgcxKr1sqh3YdWargg93QmBOCx81zP75enYJF/E4q6L8=
+	t=1730383968; cv=none; b=F5Lld9QQBkYZ3icJMz+Dnuf0XFU6VyAhk+p/MbLmGWybw99B0yQZIZy2OiESTQDCqjj/XloZlXg/eXvGdM0oycEL9jmvY+bb86DgIx6O36v3Y050KIVeda+ASM1rGmIAM3nzdPeAsy+AvhKwfkhdoDe/XB3WY1l7b4EWrDp9vVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730383588; c=relaxed/simple;
-	bh=Muuu1WqyPpcP/xIjgoC6z8E8xeJtiugg598fNvNyN/E=;
+	s=arc-20240116; t=1730383968; c=relaxed/simple;
+	bh=ZBxXT6yqiTiK4rpdSgTpaZMBXpgDcFgXwOMVCui9Tes=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MV0JT534Z8tT/kKfSRwpll1urMPbU/GeWwjQ7sVtkB2kITQpEhqxOryUOVejsbDPpfJcdup5gjYxkaw5smn6xuxdcuF+vO4n+EM734wWyopJCQpDpUN3d8y1OeTG3CvClJDgIBMdzM3WlVJv7yDeWt16u4NFzRR9U4tWOrSAoFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yajt8S6A; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=YUV/NvMxw87QXAMtfnTjSrilfCcbEotQ+HFeKtjBD44flqwct8TPU4mX/kNo06KoDleitXPnPdfd0cp7M9NzRCWezGK0BNJwKxo0eYb+Cndv08JkCHjupZNY4vxsJKho62EQM5NZH5IIzD8FBYH0EMxmGIEWGjtWGwIong1IKQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jyiZT4Ya; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yajt8S6A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97E5CC4FF52;
-	Thu, 31 Oct 2024 14:06:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jyiZT4Ya"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE616C4CED6;
+	Thu, 31 Oct 2024 14:12:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730383587;
-	bh=Muuu1WqyPpcP/xIjgoC6z8E8xeJtiugg598fNvNyN/E=;
+	s=k20201202; t=1730383968;
+	bh=ZBxXT6yqiTiK4rpdSgTpaZMBXpgDcFgXwOMVCui9Tes=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Yajt8S6AC7lJXMJrgMLEU3WjiH6d4vU7KU0GM5nIxrxzkAw/O57yMJU7wWVVXTkNR
-	 rY7sX5J9AIFrLXPtjGtoazojQ9YMoRazK6YBgLm/ELf+L+vJloJIS1QHBNTvOQnyzK
-	 /l78HsUM4nNyzQrlqs8HL8HhaIy5TS1lfMc4hSDpq69PpZOzCBGlWoXYC+1wImnmbN
-	 1YmgKCBdtkdZ+PXXHKzy4NmGvZwLiLJ9w0WFhqCqoV1tjb6rO1Inv5xcZOPlxoYUIG
-	 SxWpP4CQAvW8UfWHyswYpaL0doLT2p3x8cHDslxjtZ6pL2ZtNVyfw6FDnII5RTIBDO
-	 OiNIopie+Riww==
-Date: Thu, 31 Oct 2024 08:06:24 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Hans Holmberg <hans@owltronix.com>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org, io-uring@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, joshi.k@samsung.com,
-	javier.gonz@samsung.com, bvanassche@acm.org,
-	Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCHv10 9/9] scsi: set permanent stream count in block limits
-Message-ID: <ZyOO4PojaVIdmlOA@kbusch-mbp.dhcp.thefacebook.com>
-References: <ZyEL4FOBMr4H8DGM@kbusch-mbp>
- <20241030045526.GA32385@lst.de>
- <ZyJTsyDjn6ABVbV0@kbusch-mbp.dhcp.thefacebook.com>
- <20241030154556.GA4449@lst.de>
- <ZyJVV6R5Ei0UEiVJ@kbusch-mbp.dhcp.thefacebook.com>
- <20241030155052.GA4984@lst.de>
- <ZyJiEwZwjevelmW2@kbusch-mbp.dhcp.thefacebook.com>
- <20241030165708.GA11009@lst.de>
- <ZyK0GS33Qhkx3AW-@kbusch-mbp.dhcp.thefacebook.com>
- <CANr-nt35zoSijRXYr+ommmWGfq0+Ye0tf3SfHfwi0cfpvwB0pg@mail.gmail.com>
+	b=jyiZT4Ya10y2A4ctvcIen2W3fK0LLMEUuTbrBiHkkOjXjukzGm/EBezbZENmE3vNv
+	 USSyTQrgjWsiuMJJGZoEAMGE3Trug3Lr2U4ZoV8Zx9t78F/RF5UwbaPZIMUAxUT5O3
+	 SZ4teg0Jqk1DcxldPj2RWneUcS2R3LW27kSZ3m1knM9m7fyG6jDd+ojpjNUD3RILtN
+	 rqeJySriFx/JbVxaHGAlnoBD5F5lFtoCBCmrZeRoeEgAVxMTus39BjH0IRwNQU/Y2C
+	 pxuofxo6lRQrGeSj1RDY00lAH4EdgII9Jj2lFOZZSqQ/0kC1HDtIDoiPZzt12mdLBb
+	 AaY3LoeEazIyw==
+Date: Thu, 31 Oct 2024 15:12:43 +0100
+From: Niklas Cassel <cassel@kernel.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, yangxingui <yangxingui@huawei.com>,
+	axboe@kernel.dk, John Garry <john.g.garry@oracle.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	James.Bottomley@hansenpartnership.com,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"yukuai (C)" <yukuai3@huawei.com>,
+	"yangerkun@huawei.com" <yangerkun@huawei.com>
+Subject: Re: [bug report] block: Non-NCQ commands will never be executed
+ while fio is continuously running
+Message-ID: <ZyOQWyyai2JkKyzy@ryzen>
+References: <eef1e927-c9b2-c61d-7f48-92e65d8b0418@huawei.com>
+ <922e3d52-9567-4371-9a43-6d51f716a370@kernel.org>
+ <129e1e4b-426f-3d5b-b95c-d386c90cfe06@huawei.com>
+ <5b4a15be-1cb2-4477-8f17-b808612d10d5@kernel.org>
+ <0e78cce0-3f4c-3ddf-4d5b-ee2b5c8d7e1a@huawei.com>
+ <ZuAtLK5jIPEjhXmU@ryzen.lan>
+ <7f179f49-a57b-45bf-92f0-f577aa0b8565@kernel.org>
+ <04cf3f31-4bd8-3ce9-867a-41628e56e861@huaweicloud.com>
+ <e1ff5ccc-8204-44d8-ba62-84c8bd204fa0@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANr-nt35zoSijRXYr+ommmWGfq0+Ye0tf3SfHfwi0cfpvwB0pg@mail.gmail.com>
+In-Reply-To: <e1ff5ccc-8204-44d8-ba62-84c8bd204fa0@kernel.org>
 
-On Thu, Oct 31, 2024 at 09:19:51AM +0100, Hans Holmberg wrote:
-> On Wed, Oct 30, 2024 at 11:33 PM Keith Busch <kbusch@kernel.org> wrote:
-> > That is very much apples-to-oranges. The B+ isn't on the same device
-> > being evaluated for WAF, where this has all that mixed in. I think the
-> > results are pretty good, all things considered.
+On Thu, Sep 19, 2024 at 04:14:15PM +0200, Damien Le Moal wrote:
+> On 2024/09/19 14:26, Yu Kuai wrote:
+> > 
+> > Does libata return a specific value in this case? If so, maybe we can
+> > stop other hctx untill this IO is handled.
+> > 
+> > For now, I think libata should use single hctx, it just doesn't support
+> > multiple hctx yet.
 > 
-> No. The meta data IO is just 0.1% of all writes, so that we use a
-> separate device for that in the benchmark really does not matter.
-
-It's very little spatially, but they overwrite differently than other
-data, creating many small holes in large erase blocks.
- 
-> Since we can achieve a WAF of ~1 for RocksDB on flash, why should we
-> be content with another 67% of unwanted device side writes on top of
-> that?
+> libata does not care/know about hctx. It only issues commands to ATA devices,
+> which always are single queue. And pure SATA adapters like AHCI are always
+> single queue.
 > 
-> It's of course impossible to compare your benchmark figures and mine
-> directly since we are using different devices, but hey, we definitely
-> have an opportunity here to make significant gains for FDP if we just
-> provide the right kernel interfaces.
+> The issue at hand can happen only for libsas based SAS HBAs that have multiple
+> command submission queues (with a shared tag set). Commands for the same device
+> may end up being submitted through different queues, and when the submitted
+> commands include a mix of NCQ and non-NCQ commands, the problem happens without
+> libata being able to easily do anything about it, and not possible control
+> possible at the scsi layer either since the commands submitted are SCSI (not yet
+> translated to ATA commands) which do not have any NCQ/non-NCQ exclusion
+> knowledge at all. NCQ is an ATA concept unknown to the scsi and block layer.
 > 
-> Why shouldn't we expose the hardware in a way that enables the users
-> to make the most out of it?
+> We (Niklas and I) are trying to find a solution, but that may not be within
+> libata itself. It may need changes to libsas as well. Not sure yet. Still exploring.
 
-Because the people using this want this interface. Stalling for the last
-6 months hasn't produced anything better, appealing to non-existent
-vaporware to block something ready-to-go that satisfies a need right
-now is just wasting everyone's time.
+Hello Xingui,
 
-Again, I absolutely disagree that this locks anyone in to anything.
-That's an overly dramatic excuse.
+I send a proposed solution to this problem here:
+https://lore.kernel.org/linux-ide/20241031140731.224589-4-cassel@kernel.org/
+
+Please test and see if it addresses your problem.
+
+
+Kind regards,
+Niklas
