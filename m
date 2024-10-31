@@ -1,35 +1,26 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3BE1BD9ED;
-	Thu, 31 Oct 2024 09:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF73188599;
+	Thu, 31 Oct 2024 09:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730365536; cv=none; b=jRLFUHaDhawOOosw6jwRBzwt5fS8zFezPukS0atGK0S42PyfSRRdJQh11Nfiy/YiLnpuZ+l2Ho3dy6KrwOfC8BwEiw2iYK1HEn9yPixKjAEWTrkCmnDTxWJ8j14+jbkH1kKDs9bW0G4KNkjvoLoCkFsGmKuFJiNfzc90Q6GS5M0=
+	t=1730366959; cv=none; b=q7ofCePxn49QDRdYuKH1QDHPIJ3N/p4atW6V+HmyY1FyThlt+xJ3X+lTkccs6AYPQaQjKR/OiZBDvUBsFKw3LwXAauomwk9yZm8bMQKAyd5z9DmC3td3CGyPqTh/dDsgkqGrGOnnCtKcj90cIDCtmVcVoOXkPOCHa/vvD56D1Uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730365536; c=relaxed/simple;
-	bh=GG1JVJs4dR1AOjE1AJ7ilFPgtAWW0eecmwqTp/vt+xo=;
+	s=arc-20240116; t=1730366959; c=relaxed/simple;
+	bh=dZHxgnrIkdMO2LldTpzDLOjBpT2bck5vMllRHMoj9aE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JL4tYAR5kRcDvdtnAsHyh0rE+tlwPiEGJmicXcf1WZbwYu19Wuo6qD54KAXfllD83qohOO84Y3TImntX5oYPtHLMqoCRyYw9Ghduf33ADU9ivkGJQ0JlE4J9BWHYTid3RblvUAGNLjMdQvMeNxVLEBjOA9nvesucvGgkw6/C5kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QmlWshUd; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QmlWshUd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E46ACC4CEC3;
-	Thu, 31 Oct 2024 09:05:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730365535;
-	bh=GG1JVJs4dR1AOjE1AJ7ilFPgtAWW0eecmwqTp/vt+xo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QmlWshUdBNcB1FWxXRPNndrpzxX3aAqhzeAeIGagnyn4fy5f45tGBkaDIMtVIOMSH
-	 f2449uvXl29R43CYnG1NWyJNJFs8AcYS+J3/4AoaP+t4DGqAhmFlaAi0DonSP1IJXs
-	 nqTFKGmBX62BU7Kq02whoNjJqhZNJXu4xTMAUf5TA9MsBWXeKgqU/7OfPHX4JQdM6Q
-	 cYeO/+jCF2CQ7VRPVWNfb4dd0leBLAU/Wm+kzEVcI2myW0Ik/rO07OwQb1Z9w7wpM9
-	 cbflE1vTPSMudvnmxNiKBwpQsf9zOOlAijHfeIWAa1xqN0InkTRlZPm0qFA7PRteHE
-	 VKaKdM1Y44eGA==
-Date: Thu, 31 Oct 2024 11:05:30 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=FGdN975s6lLsgRr5pj2lIBInFqIUPl+Sw1HYSnyOX0mGGJ/Eql8Ke/Y4qnY4BYAX0r8PSX98vmZqcXHBWbWxeSslzIybmpaf03ELJngZLWuDU6Xj/R4fV46MAgcU28uicyGKaMYWGHRNSp1ZcftJloPhJ1DHze1vjIoS6uQOWtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 0872F68B05; Thu, 31 Oct 2024 10:21:14 +0100 (CET)
+Date: Thu, 31 Oct 2024 10:21:13 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
 	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
 	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
 	Bjorn Helgaas <bhelgaas@google.com>,
@@ -47,10 +38,8 @@ Cc: Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
 	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
 	kvm@vger.kernel.org, linux-mm@kvack.org
 Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241031090530.GC7473@unreal>
-References: <cover.1730298502.git.leon@kernel.org>
- <3144b6e7-5c80-46d2-8ddc-a71af3c23072@kernel.dk>
- <20241031083450.GA30625@lst.de>
+Message-ID: <20241031092113.GA1791@lst.de>
+References: <cover.1730298502.git.leon@kernel.org> <3144b6e7-5c80-46d2-8ddc-a71af3c23072@kernel.dk> <20241031083450.GA30625@lst.de> <20241031090530.GC7473@unreal>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,33 +48,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241031083450.GA30625@lst.de>
+In-Reply-To: <20241031090530.GC7473@unreal>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Oct 31, 2024 at 09:34:50AM +0100, Christoph Hellwig wrote:
-> On Wed, Oct 30, 2024 at 07:44:13PM -0600, Jens Axboe wrote:
-> > On Christoph's request, I tested this series last week and saw some
-> > pretty significant performance regressions on my box. I don't know what
-> > the status is in terms of that, just want to make sure something like
-> > this doesn't get merged until that is both fully understood and sorted
-> > out.
-
-This series is a subset of the series you tested and doesn't include the
-block layer changes which most likely were the cause of the performance
-regression.
-
-This is why I separated the block layer changes from the rest of the series
-and marked them as RFC.
-
-The current patch set is viable for HMM and VFIO. Can you please retest
-only this series and leave the block layer changes for later till Christoph
-finds the answer for the performance regression?
-
-Thanks
-
+On Thu, Oct 31, 2024 at 11:05:30AM +0200, Leon Romanovsky wrote:
+> This series is a subset of the series you tested and doesn't include the
+> block layer changes which most likely were the cause of the performance
+> regression.
 > 
-> Working on it, but I have way too many things going on at once.  Note
-> that the weird thing about your setup was that we apparently dropped into
-> the slow path, which still puzzles me.  But I should probably also look
-> into making that path a little less slow.
+> This is why I separated the block layer changes from the rest of the series
+> and marked them as RFC.
 > 
-> 
+> The current patch set is viable for HMM and VFIO. Can you please retest
+> only this series and leave the block layer changes for later till Christoph
+> finds the answer for the performance regression?
+
+As the subset doesn't touch block code or code called by block I don't
+think we need Jens to benchmark it, unless he really wants to.
+
