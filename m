@@ -1,105 +1,139 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3E813A261
-	for <linux-block@vger.kernel.org>; Fri,  1 Nov 2024 02:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E50113CABC;
+	Fri,  1 Nov 2024 03:03:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730429850; cv=none; b=tIdS3pxcRSXhBNDHhBsPi0EkDl5o+/GiYUXv0doodckbetdGgMWzVKZixtKtZOvWvtxLyTafxAQ6hK4Vs4Dg6btQzWwKPdWI1osY6p+FwPhn7N4bzgbV7otnE9Y9/bU75/tdGkqmbB8pCp0hU3OJ5f9yskLRcXoeYlkSw+vLkxU=
+	t=1730430208; cv=none; b=VjI4CYzzuCDY3Eha3grPHEjSmoulR1xTRb5P8pkU7Sk5NBTgVFZPaY3zG7rZEMHr7Gm7pqxdFOE/p+N9ttGkQAPGDgVJQRvppX9KQkdmJoWDaYvWVeBDKOduxm6lamhOJgJXlqAxI0XnY5hn6dS0D+Lr29afGPy4LV8PKsQ4vsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730429850; c=relaxed/simple;
-	bh=/mdzDZR4+wo1myx0nPTYHZaXC5JbN5DcrsAG0GvRWTg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PWRvA/2zqxAvvt2xgJ4Eet2mKqcYI6fG68ZML8tKsdaiCwIGoiJS5U4UX/A4a/bO6/HsEO5FOh9lXNHbiVZYZ1W1GqiZ2pQuCO+8YFpBaTQc8+lxW0YJSJrqEIPy5VaFf6GBzTXyKJbHNbF15MVf0uHD2QhVQZV1I4wjRfMDbH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XKPAJO++; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1730430208; c=relaxed/simple;
+	bh=y8yW7zcDDjfMePg5zhO73d5G3dBGBJ+0ZlV2Vk5qn0o=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=VFQ0RTdc212GQKBEsNrvdqe4FwsZP317OZxSsbSQOWYieWJCCoHkU8slCfAxMgaFohsWoV6TJZq1V4XI5/YcDIglKofxh+JtdDj/sfzOUROjl1frNAP4vR8rlX5PhrGAFYFosOUBH0I9N7lHzRduRX1pgRFt8psNRfyzPg5LmZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cGhmaTsb; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XKPAJO++"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730429845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WrRR+jmjGYZ4o2y5dZd8Dy64s/J6JM0Bu0o0KaXdXFg=;
-	b=XKPAJO++8LbJ+m6bkiuwYtekvQ4MpBPD/vE39VQ6vr+JoCwokwQR4vMxkxn25iB32gaSIN
-	MQSto0sPsNUUqCxLyXFSR0+sLhR8lMogl5yWEKer2hk+tCFnMWIxVoLcJokQpVDjSxvOUu
-	50L0G5k5zCm1EV8vVqYV92kgzxsZfZg=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-423-0OFgqDoiPI6huLLcjHnjWA-1; Thu,
- 31 Oct 2024 22:57:23 -0400
-X-MC-Unique: 0OFgqDoiPI6huLLcjHnjWA-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BADFB1956088;
-	Fri,  1 Nov 2024 02:57:22 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.63])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 505AA30001A5;
-	Fri,  1 Nov 2024 02:57:17 +0000 (UTC)
-Date: Fri, 1 Nov 2024 10:57:12 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Akilesh Kailash <akailash@google.com>
-Subject: Re: [PATCH V8 0/8] io_uring: support sqe group and leased group kbuf
-Message-ID: <ZyRDiFM2ivDWC_rf@fedora>
-References: <e76d9742-5693-4057-b925-3917943c7441@kernel.dk>
- <f51e50c8-271e-49b6-b3e1-a63bf61d7451@kernel.dk>
- <ZyGT3h5jNsKB0mrZ@fedora>
- <674e8c3c-1f2c-464a-ad59-da3d00104383@kernel.dk>
- <ZyGjID-17REc9X3e@fedora>
- <ZyGx4JBPdU4VlxlZ@fedora>
- <d986221d-7399-4487-9c28-5d6f953510cd@kernel.dk>
- <ZyLxJdn7bboZMAcs@fedora>
- <63e2091d-d000-4b42-818b-802341ac877f@kernel.dk>
- <d9069c8e-6a58-4574-b842-f1e1f20c55f3@kernel.dk>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cGhmaTsb"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1730430201; h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To;
+	bh=lHTFluFn91Zgm50b/7m57y+ytTEX564G7atSqw12Uyc=;
+	b=cGhmaTsb8/XMusaCd7fl8mpaoKg3/Lh/ZeUojnSnkfvmilMgHf8/rV+IV0BDL4RCjphDNiLoE0ex7OtqQnnOtswIEmGmGCJiV9A0NP8aO2/XhQXhlzSUdJwjrzYxOvnVDOry3t6eSlbLSDtLLDAb44vyfUsgEe7bF89lP7bYis0=
+Received: from smtpclient.apple(mailfrom:guanjun@linux.alibaba.com fp:SMTPD_---0WIKwQpa_1730430199 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 01 Nov 2024 11:03:20 +0800
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d9069c8e-6a58-4574-b842-f1e1f20c55f3@kernel.dk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.300.61.1.2\))
+Subject: Re: [PATCH RFC v1 1/2] genirq/affinity: add support for limiting
+ managed interrupts
+From: mapicccy <guanjun@linux.alibaba.com>
+In-Reply-To: <87v7x8woeq.ffs@tglx>
+Date: Fri, 1 Nov 2024 11:03:08 +0800
+Cc: corbet@lwn.net,
+ axboe@kernel.dk,
+ mst@redhat.com,
+ jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com,
+ eperezma@redhat.com,
+ vgoyal@redhat.com,
+ stefanha@redhat.com,
+ miklos@szeredi.hu,
+ peterz@infradead.org,
+ akpm@linux-foundation.org,
+ paulmck@kernel.org,
+ thuth@redhat.com,
+ rostedt@goodmis.org,
+ bp@alien8.de,
+ xiongwei.song@windriver.com,
+ linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <9847EC49-8F55-486A-985D-C3EDD168762D@linux.alibaba.com>
+References: <20241031074618.3585491-1-guanjun@linux.alibaba.com>
+ <20241031074618.3585491-2-guanjun@linux.alibaba.com> <87v7x8woeq.ffs@tglx>
+To: Thomas Gleixner <tglx@linutronix.de>
+X-Mailer: Apple Mail (2.3774.300.61.1.2)
 
-On Thu, Oct 31, 2024 at 09:07:18AM -0600, Jens Axboe wrote:
-> Another option is that we fully stick with the per-group buffer concept,
-> which could also work just fine with io_rsrc_node. If we stick with the
-> OP_GROUP_START thing, then that op could setup group_buf thing that is
-> local to that group. This is where an instantiated buffer would appear
-> too, keeping it strictly local to that group. That avoids needing any
-> kind of ring state for this, and the group_buf would be propagated from
-> the group leader to the members. The group_buf lives until all members
-> of the group are dead, at which point it's released. I forget if your
-> grouping implementation mandated the same scheme I originally had, where
-> the group leader completes last? If it does, then it's a natural thing
 
-Yes, the group leader's CQE is posted after all members' CQE are posted,
-and the leader request is freed after all member request is freed.
 
-> to have the group_buf live for the duration of the group leader, and it
-> can just be normal per-io_kiocb data at that point, nothing special
-> needed there.
+> 2024=E5=B9=B410=E6=9C=8831=E6=97=A5 18:35=EF=BC=8CThomas Gleixner =
+<tglx@linutronix.de> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On Thu, Oct 31 2024 at 15:46, guanjun@linux.alibaba.com wrote:
+>> #ifdef CONFIG_SMP
+>>=20
+>> +static unsigned int __read_mostly managed_irqs_per_node;
+>> +static struct cpumask managed_irqs_cpumsk[MAX_NUMNODES] =
+__cacheline_aligned_in_smp =3D {
+>> +	[0 ... MAX_NUMNODES-1] =3D {CPU_BITS_ALL}
+>> +};
+>>=20
+>> +static void __group_prepare_affinity(struct cpumask *premask,
+>> +				     cpumask_var_t *node_to_cpumask)
+>> +{
+>> +	nodemask_t nodemsk =3D NODE_MASK_NONE;
+>> +	unsigned int ncpus, n;
+>> +
+>> +	get_nodes_in_cpumask(node_to_cpumask, premask, &nodemsk);
+>> +
+>> +	for_each_node_mask(n, nodemsk) {
+>> +		cpumask_and(&managed_irqs_cpumsk[n], =
+&managed_irqs_cpumsk[n], premask);
+>> +		cpumask_and(&managed_irqs_cpumsk[n], =
+&managed_irqs_cpumsk[n], node_to_cpumask[n]);
+>=20
+> How is this managed_irqs_cpumsk array protected against concurrency?
 
-That is basically what GROUP_KBUF is written, just not using io_rsrc_node.
+My intention was to allocate up to `managed_irq_per_node` cpu bits from =
+`managed_irqs_cpumask[n]`,
+even if another task modifies some of the bits in the =
+`managed_irqs_cpumask[n]` at the same time.
 
-> 
-> As with the previous scheme, each request using one of these
-> IORING_RSRC_KBUFFER nodes just assigns it like it would any other fixed
-> resource node, and the normal completion path puts it.
+>=20
+>> +		ncpus =3D cpumask_weight(&managed_irqs_cpumsk[n]);
+>> +		if (ncpus < managed_irqs_per_node) {
+>> +			/* Reset node n to current node cpumask */
+>> +			cpumask_copy(&managed_irqs_cpumsk[n], =
+node_to_cpumask[n]);
+>=20
+> This whole logic is incomprehensible and aside of the concurrency
+> problem it's broken when CPUs are made present at run-time because =
+these
+> cpu masks are static and represent the stale state of the last
+> invocation.
 
-Here the thing is simpler, all member can just use leader's io_rsrc_node,
-leader's rsrc_node reference is grabbed & leased to member when adding member
-to group, and released by the normal io_req_put_rsrc_nodes(). 
+Sorry, I realize there is indeed a logic issue here (caused by =
+developing on 5.10 LTS and rebase to the latest linux-next).
+
+>=20
+> Given the limitations of the x86 vector space, which is not going away
+> anytime soon, there are only two options IMO to handle such a =
+scenario.
+>=20
+>   1) Tell the nvme/block layer to disable queue affinity management
+>=20
+>   2) Restrict the devices and queues to the nodes they sit on
+
+I have tried fixing this issue through nvme driver, but later discovered =
+that the same issue exists with virtio net.
+Therefore, I want to address this with a more general solution.
 
 Thanks,
-Ming
+Guanjun
+
+>=20
+> Thanks,
+>=20
+>        tglx
 
