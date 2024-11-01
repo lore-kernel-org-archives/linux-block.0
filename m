@@ -1,79 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4AA1A2643;
-	Fri,  1 Nov 2024 22:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C75137745;
+	Fri,  1 Nov 2024 23:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730501121; cv=none; b=kEGYEEDNduyAXj16q/N7fE7P3Hb8K1QFCSQOZ41LJgU3i6gvFOiLVdET1AhLcwPtFsyWWCWx/9n6fTH9IqncWdZ6bZYYevL/hp692NSpjCStDmjrmoOZGvrScngCUEYinmHgai+uNuSVCZkjRvqeZ2xEbELZ9mHb19aTeDh1DDY=
+	t=1730504241; cv=none; b=ZDLqvOVBEEySuLrCP8D4PoqUwnBWViS/I9sq18VYewfjVan2cOAX/1e9tGHfbnRkd5q8Y16TB8SLeBjU9bNDOwOp/g1SkNLlOr0r6FjrW/HfxIPLpo4hUaO0P/KI3/Po+Tlej8LLKol5BDek3HB8gYfbPBVknfmeIL8hEAJi9Bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730501121; c=relaxed/simple;
-	bh=SkEop5/7smK/MSZYAFqBhRctwlHKaIbrZmOShSAg2a0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ECbfJ4rD9e01UDhh7f7k2P6okRLulYWs/77ZOX2FEPL6Kve+YSTS68WKMUuMSAhZY8TNq+6Kf8u5FqP6GxBLMcM1im9+m3iaDhvtfNap47qFk0tmEcCA75y7ArvdVhk/MJ4TNOlwL2LSBSyUH/Fj/DStAwvwiH9Yu92gWpSKJpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dV+DKEI5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730504241; c=relaxed/simple;
+	bh=3kj6OyEELQBFa/kDWXd9HVrlsW3N9aS0gU28/KPADWY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=FBEs2Wwqcz1EUvh6EVcKJoD2IfYHjsbUoH0K6sid+LCmW0l2Kg8GrgseqXXQcdXNYFilSq/1ofped9L6KdJLRHuQYUyR6WaU1BVyodjLA90cquw5oWK9Yp28k869PzSqjiBdWF6FMJP52wQ6YuE/3nyJ11FGcva0L5hOEhWBrns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=JWEj9QjS; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=a34UxBWJ; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dV+DKEI5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BF66C4CECD;
-	Fri,  1 Nov 2024 22:45:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730501120;
-	bh=SkEop5/7smK/MSZYAFqBhRctwlHKaIbrZmOShSAg2a0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dV+DKEI59gzZ7vZ7g6rBWuQ1pBC9BQ08cUWOFgV3rDETROWtZj37bpVQ+IrFlJQdn
-	 GS3Wv9smC4PbSHUvCy4oQiCvCiOBoIRoOlNDH7gSRHbDTKni9PPkfw2lBuLY6WOdqd
-	 mN2K0Vkf0OWXAdqG+vOscXlNzoPwGGzbqJ1nSWffsAwzA6BrlvrUz+ymq/k9salvOR
-	 waad78D/rW6fAjLj0KcvNxoDF4IWZJ6uJp31m3Qs4Bg1Rt22BggwfY7eeCCC5J3x7V
-	 lRCqfH8VBEqLXOHDdy7kJplF5eqkVn/bX/KZjYHwqiD8GSSi5axArTyj3Va7whKyG1
-	 ad1ZgyE9IsHhw==
-Date: Fri, 1 Nov 2024 16:45:17 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>, dlemoal@kernel.org,
-	cassel@kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	wangyugui@e16-tech.com, martin.petersen@oracle.com, hare@suse.de,
-	Matias =?iso-8859-1?Q?Bj=F8rling?= <matias.bjorling@wdc.com>
-Subject: Re: [PATCH 1/3 v2] nvme: make independent ns identify default
-Message-ID: <ZyVZ_T4HtnqSWTm0@kbusch-mbp.dhcp.thefacebook.com>
-References: <20241010123951.1226105-1-m@bjorling.me>
- <20241010123951.1226105-2-m@bjorling.me>
- <20241011081452.GA3337@lst.de>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JWEj9QjS";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="a34UxBWJ"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1730504237;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5hEbhXrDUtyuWKJd3ehaILokOGyu2h6Q6B5wfuMSyD0=;
+	b=JWEj9QjSBEyCLLc2sdGDVDHcdRYMuPETvwuhGBviRL/LQKvn0eWocb5w+DiZzTkMOC7uWr
+	fPD9AbGNop10pVIuH2G+X+xTlNcnjpn660Vh8xo343ffA86Q0uSwb/8dj3Ueq4kIt/ADcQ
+	010zK74KumgO4nFr89HL5E2dEoLNEy27jC4ROhnqzx+5Z9wDK0MKHKLCNIcMKqD/Zr99ne
+	JqEajIb88CUZjq/bfKi3QEFvH57wRgSxlAteKaAlmfFj67bIMdq4VY1zkcnab4V2ZKLHw7
+	ofr7M1f2WJ2XvhOmww5tSuy3ohxhYNOXMtOf25dGqdwuD0cYokRIE9DrQHL9Cg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1730504237;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5hEbhXrDUtyuWKJd3ehaILokOGyu2h6Q6B5wfuMSyD0=;
+	b=a34UxBWJt0wl4wyuMAv1RCtfRBgMJ6wl9RM2K6j1I9qDmQClIdys5MO7cAup4fpZLr9ZT6
+	aU3o2yNbv17xKKBg==
+To: mapicccy <guanjun@linux.alibaba.com>
+Cc: corbet@lwn.net, axboe@kernel.dk, mst@redhat.com, jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com, eperezma@redhat.com, vgoyal@redhat.com,
+ stefanha@redhat.com, miklos@szeredi.hu, peterz@infradead.org,
+ akpm@linux-foundation.org, paulmck@kernel.org, thuth@redhat.com,
+ rostedt@goodmis.org, bp@alien8.de, xiongwei.song@windriver.com,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH RFC v1 1/2] genirq/affinity: add support for limiting
+ managed interrupts
+In-Reply-To: <9847EC49-8F55-486A-985D-C3EDD168762D@linux.alibaba.com>
+References: <20241031074618.3585491-1-guanjun@linux.alibaba.com>
+ <20241031074618.3585491-2-guanjun@linux.alibaba.com> <87v7x8woeq.ffs@tglx>
+ <9847EC49-8F55-486A-985D-C3EDD168762D@linux.alibaba.com>
+Date: Sat, 02 Nov 2024 00:37:16 +0100
+Message-ID: <87h68qttjn.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241011081452.GA3337@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 11, 2024 at 10:14:52AM +0200, Christoph Hellwig wrote:
-> On Thu, Oct 10, 2024 at 02:39:49PM +0200, Matias Bjørling wrote:
-> > From: Matias Bjørling <matias.bjorling@wdc.com>
-> > 
-> > The NVMe 2.0 specification adds an independent identify namespace
-> > data structure that contains generic attributes that apply to all
-> > namespace types. Some attributes carry over from the NVM command set
-> > identify namespace data structure, and others are new.
-> > 
-> > Currently, the data structure only considered when CRIMS is enabled or
-> > when the namespace type is key-value.
-> > 
-> > However, the independent namespace data structure
-> > is mandatory for devices that implement features from the 2.0+
-> > specification. Therefore, we can check this data structure first. If
-> > unavailable, retrieve the generic attributes from the NVM command set
-> > identify namespace data structure.
-> 
-> FYI, I still disagree with this for the same reason as before.
-> Assuming we're not really going to see hard drivers I'd be fine
-> with using it by default for 2.0 (or better even 2.1) by default.
+On Fri, Nov 01 2024 at 11:03, mapicccy wrote:
+>> 2024=E5=B9=B410=E6=9C=8831=E6=97=A5 18:35=EF=BC=8CThomas Gleixner <tglx@=
+linutronix.de> =E5=86=99=E9=81=93=EF=BC=9A
+>>> +	get_nodes_in_cpumask(node_to_cpumask, premask, &nodemsk);
+>>> +
+>>> +	for_each_node_mask(n, nodemsk) {
+>>> +		cpumask_and(&managed_irqs_cpumsk[n], &managed_irqs_cpumsk[n], premas=
+k);
+>>> +		cpumask_and(&managed_irqs_cpumsk[n], &managed_irqs_cpumsk[n], node_t=
+o_cpumask[n]);
+>>=20
+>> How is this managed_irqs_cpumsk array protected against concurrency?
+>
+> My intention was to allocate up to `managed_irq_per_node` cpu bits from `=
+managed_irqs_cpumask[n]`,
+> even if another task modifies some of the bits in the `managed_irqs_cpuma=
+sk[n]` at the same time.
 
-I've got the rest of the required logs and identifications implemented
-in nvmet to support this. There's one more issue, though, if we do
-restrict the identify to >= 2.0 or 2.1. nvmet reports 1.3, and I suspect
-there's a bit more work than just changing the value of NVMET_DEFAULT_VS
-in order to comply with claiming that version.
+That may have been your intention, but how is this even remotely
+correct?
+
+Aside of that. If it's intentional and you think it's correct then you
+should have documented that in the code and also annotated it to not
+trigger santiziers.
+
+>> Given the limitations of the x86 vector space, which is not going away
+>> anytime soon, there are only two options IMO to handle such a scenario.
+>>=20
+>>   1) Tell the nvme/block layer to disable queue affinity management
+>>=20
+>>   2) Restrict the devices and queues to the nodes they sit on
+>
+> I have tried fixing this issue through nvme driver, but later
+> discovered that the same issue exists with virtio net.  Therefore, I
+> want to address this with a more general solution.
+
+I understand, but a general solution for this problem won't exist
+ever.
+
+It's very reasonable to restrict this for one particular device type or
+subsystem while maintaining the strict managed property for others, no?
+
+General solutions are definitely preferred, but not for the price that
+they break existing completely correct and working setups. Which is what
+your 2/2 patch does for sure.
+
+Thanks,
+
+        tglx
