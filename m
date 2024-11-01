@@ -1,151 +1,112 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C09D14B955
-	for <linux-block@vger.kernel.org>; Fri,  1 Nov 2024 00:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E51F12B73;
+	Fri,  1 Nov 2024 00:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730419237; cv=none; b=eJTEKz3WJ5jKgxqHV17BcvNQPrWH/U8mrs7tNwuRAfpkbsm6nvNTWCyrBXHfM3i9pJnJX82r+3jHvHq/MgLvnYRd1xmD2cF2V0zkx+XZ1a2WHGy6NVpQNzluMN3I2xUofJgaYmd+xylw5b1GLrEGfOjEJxKezoD1nU+VbV5IDdY=
+	t=1730421102; cv=none; b=WYFT3PVpOfD0TPbL4J6xBd8wsGHoRzq9OvVP7x53jlqaX7JMwTL3vIfFsbKYWxFZhjG5IBfHwTss82DbwtMadTzZo2pX6pAbCvoJKrP04P75mrgK/2PqC1FPV+d0ayZ4fdDDQmARXforChubEET+Q3WFjkaeqqDrC3Vuee64YGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730419237; c=relaxed/simple;
-	bh=kCbF1BGKFlr0TH22ZVN9QAMkiO+/ZsFquQTfEEVzmss=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Gt3gzSgoalk8NeRtv3BRQyw4RR+nZqJ0jdbtVvQZWVWz1a8DcxATorHqO5gyquYZvCxd6iS9FOEOKNxuZ/t6/llHN3cIxItNeC/y7htPbd6zDObvxeTafgsc41GqJzPTkzwG9p9UxKBpngKQutv0g9gVj/y4NIPRp9/3dkbcZXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3M2gN/Mm; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1730421102; c=relaxed/simple;
+	bh=ZYzfPKnXeqQKl2UoKwdex+ZdgecqpyO6d7Co5BOCub0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J/NGmWREwlHd899+1x4E4TqCYvR953vOSu7RmSUPyM3ULtSIJ/7p82G3/EYIiahSYFu/Dyd3Maaptxb3ZtttuFQvi9uN0OIHjgMirtbQ3Yhbglcipz9d5Ka1591w8t4O/Gg0ma+qhtMRn2K1X6mJkd4tAmJVJA7P+UhMq3saOaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5SZVedO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3M2gN/Mm"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20cf3e36a76so15825195ad.0
-        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 17:00:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730419230; x=1731024030; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dgz+wo5j9vmVU9qVXQho9fYZe5URfdso2CAlnF0E6eg=;
-        b=3M2gN/Mm9BB0WTuXJMiI3SaQp1zLxvH5joUPbiaessBStwl5m5VtbLWZVaX8VvbzaH
-         tzmUosSmflWyo9EvHRzTDjfa1uwOrLvypE4ThhMmcR1KQXghUV4frecfjvabzgnhCwLh
-         nNIe9I60lKD7+xCoz+f6ntsj4TCGC38VWjeVQR24p763OWEZIxWpGYXNmWKsvh33akQ0
-         s9Nuq1eN3cDG4I+nBpdbZMZKT0iCCfTrcwVI/mrHgOnjiNpmT3ma7RJ/xPyq4DtU1mu4
-         TvUDKu0DlCaSqcRvyzBJ38fhh80TrWdnYjwm4MP7CRKQ5CTP03CAHbE4Rd5+Auxq9ndy
-         P2Cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730419230; x=1731024030;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dgz+wo5j9vmVU9qVXQho9fYZe5URfdso2CAlnF0E6eg=;
-        b=Q773rvnAf79sXth1rFFvgDtN1WpBkKd/wv0llRBaFcef99dC4crgkmhmMDyQNfaVMI
-         RYnsauDNRq85bAsbNL5REc4Vw5Ui3bituaaOEoTuZRWE1ZZsp/VfSrcoGsysf9c/UGsm
-         WGrWKql4PJaRd6Q8ZDTtj+k4NIDKZ6/cwNt8IqYayr7c3umh3W2iJjzgWdbJMRXpHD2i
-         zmuQXFjPv/ypewCobAb02BVZnSyEZR+ommk1QB0oT2je7JPq99iPLEa5IojQngxFf8AE
-         XMWa9mBG+6xpnLGwJxD3VKyhBs15E2d4pyRS/WJOLUm2d2j4HixeXPFdwX+nuIpMw6Zr
-         rX4A==
-X-Gm-Message-State: AOJu0YwnYYK1bc0G1kP69HI3/AuN4tD8FXfL3Vo6tWlXNtAqm5/0aXjS
-	CpLzWl6q9PvUC2BYh8dvt/kpFfNtMiLIr3stuNZXOLxwGyhEy9UiK/VHd+jApTQ=
-X-Google-Smtp-Source: AGHT+IHMcPmiGV8WDWLcWhzZV96GKUO9WN1MIbAPV65R3VB7QoMAqyPlyadCJwvNaREewdaCWBACKA==
-X-Received: by 2002:a17:903:32c7:b0:20c:b274:34d0 with SMTP id d9443c01a7336-21103c77454mr54294315ad.46.1730419230073;
-        Thu, 31 Oct 2024 17:00:30 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057d3c3esm13691365ad.245.2024.10.31.17.00.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 17:00:29 -0700 (PDT)
-Message-ID: <7bcfad82-3b8d-4bc6-8c7f-f0fee37e77e7@kernel.dk>
-Date: Thu, 31 Oct 2024 18:00:28 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5SZVedO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C3AAC4CECF;
+	Fri,  1 Nov 2024 00:31:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730421101;
+	bh=ZYzfPKnXeqQKl2UoKwdex+ZdgecqpyO6d7Co5BOCub0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B5SZVedO7uxnkhggwZtwe8fM+j03A2+S7QsYGx+4b4jVPJlREuuFy+eQ0d4UHNBxx
+	 7Ok0EewzxVB7XDeeOQrhOem9pofzqgKwfiJugS8Qva2/1VwOHodbkhvnMXhyJSWld+
+	 BIfpxKyIxDC2BTDqoXOARZK6gEmerc32gN62ni9k9IZW+GD0PaL5MJ1J60dwoygkfY
+	 3gCvnArKZYsweL4e9eU8hfOBRN0l3u7uRfroGxtuOfTl85X7q+Qqq/MhPj+SzOLJqP
+	 MFlP4VyxHMN1gjemaJGEGBHYyIvduDuL7TeVoqovwvIygkBRTBtuMyirwxbnPveVrr
+	 4YLf6fqEDy72g==
+Date: Thu, 31 Oct 2024 17:31:40 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Sami Tolvanen <samitolvanen@google.com>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>,
+	Yang Erkun <yangerkun@huaweicloud.com>, linux-block@vger.kernel.org,
+	yangerkun@huawei.com, axboe@kernel.dk, ulf.hansson@linaro.org,
+	hch@lst.de, houtao1@huawei.com, "yukuai (C)" <yukuai3@huawei.com>,
+	linux-modules@vger.kernel.org
+Subject: Re: [PATCH] brd: fix null pointer when modprobe brd
+Message-ID: <ZyQhbHxDTRXTJgIx@bombadil.infradead.org>
+References: <20241025070511.932879-1-yangerkun@huaweicloud.com>
+ <a55c8d7e-cfd7-4ab9-ab45-bd7fdecaaf3c@I-love.SAKURA.ne.jp>
+ <05915eac-e5c7-c293-d960-a781e91fd23d@huaweicloud.com>
+ <62e97223-a508-4174-9ba0-6f897149a825@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V8 4/7] io_uring: support SQE group
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org,
- Pavel Begunkov <asml.silence@gmail.com>
-Cc: linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
- Akilesh Kailash <akailash@google.com>, Kevin Wolf <kwolf@redhat.com>
-References: <20241025122247.3709133-1-ming.lei@redhat.com>
- <20241025122247.3709133-5-ming.lei@redhat.com>
- <5d99696d-bc46-421c-b8df-c64dda483215@kernel.dk>
- <6a1978e5-50e4-4591-aecc-4e7191034a9e@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <6a1978e5-50e4-4591-aecc-4e7191034a9e@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <62e97223-a508-4174-9ba0-6f897149a825@I-love.SAKURA.ne.jp>
 
-On 10/31/24 3:39 PM, Jens Axboe wrote:
-> On 10/31/24 3:24 PM, Jens Axboe wrote:
->> On 10/25/24 6:22 AM, Ming Lei wrote:
->>> SQE group is defined as one chain of SQEs starting with the first SQE that
->>> has IOSQE_SQE_GROUP set, and ending with the first subsequent SQE that
->>> doesn't have it set, and it is similar with chain of linked SQEs.
->>>
->>> Not like linked SQEs, each sqe is issued after the previous one is
->>> completed. All SQEs in one group can be submitted in parallel. To simplify
->>> the implementation from beginning, all members are queued after the leader
->>> is completed, however, this way may be changed and leader and members may
->>> be issued concurrently in future.
->>>
->>> The 1st SQE is group leader, and the other SQEs are group member. The whole
->>> group share single IOSQE_IO_LINK and IOSQE_IO_DRAIN from group leader, and
->>> the two flags can't be set for group members. For the sake of
->>> simplicity, IORING_OP_LINK_TIMEOUT is disallowed for SQE group now.
->>>
->>> When the group is in one link chain, this group isn't submitted until the
->>> previous SQE or group is completed. And the following SQE or group can't
->>> be started if this group isn't completed. Failure from any group member will
->>> fail the group leader, then the link chain can be terminated.
->>>
->>> When IOSQE_IO_DRAIN is set for group leader, all requests in this group and
->>> previous requests submitted are drained. Given IOSQE_IO_DRAIN can be set for
->>> group leader only, we respect IO_DRAIN by always completing group leader as
->>> the last one in the group. Meantime it is natural to post leader's CQE
->>> as the last one from application viewpoint.
->>>
->>> Working together with IOSQE_IO_LINK, SQE group provides flexible way to
->>> support N:M dependency, such as:
->>>
->>> - group A is chained with group B together
->>> - group A has N SQEs
->>> - group B has M SQEs
->>>
->>> then M SQEs in group B depend on N SQEs in group A.
->>>
->>> N:M dependency can support some interesting use cases in efficient way:
->>>
->>> 1) read from multiple files, then write the read data into single file
->>>
->>> 2) read from single file, and write the read data into multiple files
->>>
->>> 3) write same data into multiple files, and read data from multiple files and
->>> compare if correct data is written
->>>
->>> Also IOSQE_SQE_GROUP takes the last bit in sqe->flags, but we still can
->>> extend sqe->flags with io_uring context flag, such as use __pad3 for
->>> non-uring_cmd OPs and part of uring_cmd_flags for uring_cmd OP.
->>
->> Did you run the liburing tests with this? I rebased it on top of the
->> flags2 patch I just sent out, and it fails defer-taskrun and crashes
->> link_drain. Don't know if others fail too. I'll try the original one
->> too, but nothing between those two should make a difference. It passes
->> just fine with just the flags2 patch, so I'm a bit suspicious this patch
->> is the issue.
+On Sat, Oct 26, 2024 at 02:55:59PM +0900, Tetsuo Handa wrote:
+> If bdev_open() can grab a reference before module's initialization phase
+> completes is a problem,
+
+Yes, that would indicate there's a bug and alas we have a regression.
+Commit d1909c0221739 ("module: Don't ignore errors from
+set_memory_XX()") merged on v6.9 introduced a regression, allowing
+module init to start and later us failing module initialization to
+complete. So to be clear, there's a possible transition from live to
+not live right away.
+
+This was discussed in this thread:
+
+https://lore.kernel.org/all/Zuv0nmFblHUwuT8v@bombadil.infradead.org/T/#u
+
+> I think that we can fix the problem with just
 > 
-> False alarm, it was my messup adding the group flag. Works just fine.
-> I'm attaching the version I tested, on top of that flags2 patch.
+>  int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
+>  	      const struct blk_holder_ops *hops, struct file *bdev_file)
+>  {
+>  (...snipped...)
+>  	ret = -ENXIO;
+>  	if (!disk_live(disk))
+>  		goto abort_claiming;
+> -	if (!try_module_get(disk->fops->owner))
+> +	if ((disk->fops->owner && module_is_coming(disk->fops->owner)) || !try_module_get(disk->fops->owner))
+>  		goto abort_claiming;
+>  	ret = -EBUSY;
+>  	if (!bdev_may_open(bdev, mode))
+>  (...snipped...)
+>  }
 > 
-> Since we're on the topic - my original bundle patch used a bundle OP to
-> define an sqe grouping, which didn't need to use an sqe flag. Any
-> particular reason why you went with a flag for this one?
+> change. It would be cleaner if we can do
 > 
-> I do think it comes out nicer with a flag for certain things, like being
-> able to link groups. Maybe that's the primary reason.
+>  bool try_module_get(struct module *module)
+>  {
+>  	bool ret = true;
+>  
+>  	if (module) {
+>  		/* Note: here, we can fail to get a reference */
+> -		if (likely(module_is_live(module) &&
+> +		if (likely(module_is_live(module) && !module_is_coming(module) &&
+>  			   atomic_inc_not_zero(&module->refcnt) != 0))
+>  			trace_module_get(module, _RET_IP_);
+>  		else
+>  			ret = false;
+>  	}
+>  	return ret;
+>  }
+> 
+> but I don't know if this change breaks something.
 
-Various hickups, please just see the patches here, works now:
+As I see it, if we fix the above regression I can't see how a module
+being live can transition into coming other than the regression above.
 
-https://git.kernel.dk/cgit/linux/log/?h=io_uring-group
-
--- 
-Jens Axboe
+  Luis
