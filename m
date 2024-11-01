@@ -1,102 +1,105 @@
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6884374D1;
-	Fri,  1 Nov 2024 02:17:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3E813A261
+	for <linux-block@vger.kernel.org>; Fri,  1 Nov 2024 02:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730427443; cv=none; b=AYTDgb1SSwCrnbr8gdP9w2jbCsq++ABHdOdxLiJTkLgQOpw69A+3OHbi1UdWHxTB6f7ftEatAGpE8k+H9534Ks/mnXg6QSXoMCLE58KEL+r3TKV5I2ne74jNse1ePjQxZxeXPT6s9/weGpazpshHhzTw/hcJ1z3K+4mnR3Zfcyg=
+	t=1730429850; cv=none; b=tIdS3pxcRSXhBNDHhBsPi0EkDl5o+/GiYUXv0doodckbetdGgMWzVKZixtKtZOvWvtxLyTafxAQ6hK4Vs4Dg6btQzWwKPdWI1osY6p+FwPhn7N4bzgbV7otnE9Y9/bU75/tdGkqmbB8pCp0hU3OJ5f9yskLRcXoeYlkSw+vLkxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730427443; c=relaxed/simple;
-	bh=3IJ5z7vPmpvE6o56uYCMiKRwaOdrOWry1RofWajHgCE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=K6oAtc0RdoXw5k4XgTuTcs4Ewc+omTTvkf01HfCEhmtih/2g/VgEy31Zrno/MEJtjcehMza1W/pbevQNYtJuQMKgAmyXJ6AH6vOYysGOmnlrUIpqhPERSV5/Ip5P9vVZPUU2yOUG6HUz21fnrDHy8VKvmsQoP9uGOiKHyxcvn4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Xfkym5yXZz1yp1C;
-	Fri,  1 Nov 2024 10:17:20 +0800 (CST)
-Received: from kwepemg100017.china.huawei.com (unknown [7.202.181.58])
-	by mail.maildlp.com (Postfix) with ESMTPS id C6FCE140136;
-	Fri,  1 Nov 2024 10:17:11 +0800 (CST)
-Received: from [10.67.120.108] (10.67.120.108) by
- kwepemg100017.china.huawei.com (7.202.181.58) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 1 Nov 2024 10:17:11 +0800
-Message-ID: <b1a9c348-d3c6-1786-9c51-763cec1f2384@huawei.com>
-Date: Fri, 1 Nov 2024 10:17:10 +0800
+	s=arc-20240116; t=1730429850; c=relaxed/simple;
+	bh=/mdzDZR4+wo1myx0nPTYHZaXC5JbN5DcrsAG0GvRWTg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PWRvA/2zqxAvvt2xgJ4Eet2mKqcYI6fG68ZML8tKsdaiCwIGoiJS5U4UX/A4a/bO6/HsEO5FOh9lXNHbiVZYZ1W1GqiZ2pQuCO+8YFpBaTQc8+lxW0YJSJrqEIPy5VaFf6GBzTXyKJbHNbF15MVf0uHD2QhVQZV1I4wjRfMDbH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XKPAJO++; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XKPAJO++"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730429845;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WrRR+jmjGYZ4o2y5dZd8Dy64s/J6JM0Bu0o0KaXdXFg=;
+	b=XKPAJO++8LbJ+m6bkiuwYtekvQ4MpBPD/vE39VQ6vr+JoCwokwQR4vMxkxn25iB32gaSIN
+	MQSto0sPsNUUqCxLyXFSR0+sLhR8lMogl5yWEKer2hk+tCFnMWIxVoLcJokQpVDjSxvOUu
+	50L0G5k5zCm1EV8vVqYV92kgzxsZfZg=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-423-0OFgqDoiPI6huLLcjHnjWA-1; Thu,
+ 31 Oct 2024 22:57:23 -0400
+X-MC-Unique: 0OFgqDoiPI6huLLcjHnjWA-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BADFB1956088;
+	Fri,  1 Nov 2024 02:57:22 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.63])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 505AA30001A5;
+	Fri,  1 Nov 2024 02:57:17 +0000 (UTC)
+Date: Fri, 1 Nov 2024 10:57:12 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Akilesh Kailash <akailash@google.com>
+Subject: Re: [PATCH V8 0/8] io_uring: support sqe group and leased group kbuf
+Message-ID: <ZyRDiFM2ivDWC_rf@fedora>
+References: <e76d9742-5693-4057-b925-3917943c7441@kernel.dk>
+ <f51e50c8-271e-49b6-b3e1-a63bf61d7451@kernel.dk>
+ <ZyGT3h5jNsKB0mrZ@fedora>
+ <674e8c3c-1f2c-464a-ad59-da3d00104383@kernel.dk>
+ <ZyGjID-17REc9X3e@fedora>
+ <ZyGx4JBPdU4VlxlZ@fedora>
+ <d986221d-7399-4487-9c28-5d6f953510cd@kernel.dk>
+ <ZyLxJdn7bboZMAcs@fedora>
+ <63e2091d-d000-4b42-818b-802341ac877f@kernel.dk>
+ <d9069c8e-6a58-4574-b842-f1e1f20c55f3@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.1
-Subject: Re: [bug report] block: Non-NCQ commands will never be executed while
- fio is continuously running
-Content-Language: en-CA
-To: Niklas Cassel <cassel@kernel.org>, Damien Le Moal <dlemoal@kernel.org>
-CC: Yu Kuai <yukuai1@huaweicloud.com>, <axboe@kernel.dk>, John Garry
-	<john.g.garry@oracle.com>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>, "yukuai (C)"
-	<yukuai3@huawei.com>, "yangerkun@huawei.com" <yangerkun@huawei.com>
-References: <eef1e927-c9b2-c61d-7f48-92e65d8b0418@huawei.com>
- <922e3d52-9567-4371-9a43-6d51f716a370@kernel.org>
- <129e1e4b-426f-3d5b-b95c-d386c90cfe06@huawei.com>
- <5b4a15be-1cb2-4477-8f17-b808612d10d5@kernel.org>
- <0e78cce0-3f4c-3ddf-4d5b-ee2b5c8d7e1a@huawei.com>
- <ZuAtLK5jIPEjhXmU@ryzen.lan>
- <7f179f49-a57b-45bf-92f0-f577aa0b8565@kernel.org>
- <04cf3f31-4bd8-3ce9-867a-41628e56e861@huaweicloud.com>
- <e1ff5ccc-8204-44d8-ba62-84c8bd204fa0@kernel.org> <ZyOQWyyai2JkKyzy@ryzen>
-From: yangxingui <yangxingui@huawei.com>
-In-Reply-To: <ZyOQWyyai2JkKyzy@ryzen>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepemh200015.china.huawei.com (7.202.181.124) To
- kwepemg100017.china.huawei.com (7.202.181.58)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d9069c8e-6a58-4574-b842-f1e1f20c55f3@kernel.dk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
+On Thu, Oct 31, 2024 at 09:07:18AM -0600, Jens Axboe wrote:
+> Another option is that we fully stick with the per-group buffer concept,
+> which could also work just fine with io_rsrc_node. If we stick with the
+> OP_GROUP_START thing, then that op could setup group_buf thing that is
+> local to that group. This is where an instantiated buffer would appear
+> too, keeping it strictly local to that group. That avoids needing any
+> kind of ring state for this, and the group_buf would be propagated from
+> the group leader to the members. The group_buf lives until all members
+> of the group are dead, at which point it's released. I forget if your
+> grouping implementation mandated the same scheme I originally had, where
+> the group leader completes last? If it does, then it's a natural thing
 
+Yes, the group leader's CQE is posted after all members' CQE are posted,
+and the leader request is freed after all member request is freed.
 
-On 2024/10/31 22:12, Niklas Cassel wrote:
-> On Thu, Sep 19, 2024 at 04:14:15PM +0200, Damien Le Moal wrote:
->> On 2024/09/19 14:26, Yu Kuai wrote:
->>>
->>> Does libata return a specific value in this case? If so, maybe we can
->>> stop other hctx untill this IO is handled.
->>>
->>> For now, I think libata should use single hctx, it just doesn't support
->>> multiple hctx yet.
->>
->> libata does not care/know about hctx. It only issues commands to ATA devices,
->> which always are single queue. And pure SATA adapters like AHCI are always
->> single queue.
->>
->> The issue at hand can happen only for libsas based SAS HBAs that have multiple
->> command submission queues (with a shared tag set). Commands for the same device
->> may end up being submitted through different queues, and when the submitted
->> commands include a mix of NCQ and non-NCQ commands, the problem happens without
->> libata being able to easily do anything about it, and not possible control
->> possible at the scsi layer either since the commands submitted are SCSI (not yet
->> translated to ATA commands) which do not have any NCQ/non-NCQ exclusion
->> knowledge at all. NCQ is an ATA concept unknown to the scsi and block layer.
->>
->> We (Niklas and I) are trying to find a solution, but that may not be within
->> libata itself. It may need changes to libsas as well. Not sure yet. Still exploring.
-> 
-> Hello Xingui,
-> 
-> I send a proposed solution to this problem here:
-> https://lore.kernel.org/linux-ide/20241031140731.224589-4-cassel@kernel.org/
-> 
-> Please test and see if it addresses your problem.
-> 
-OK, thanks for following this issue and fixing it, we will verify it as 
-soon as possible.
+> to have the group_buf live for the duration of the group leader, and it
+> can just be normal per-io_kiocb data at that point, nothing special
+> needed there.
 
-Thanks.
-Xingui
+That is basically what GROUP_KBUF is written, just not using io_rsrc_node.
+
+> 
+> As with the previous scheme, each request using one of these
+> IORING_RSRC_KBUFFER nodes just assigns it like it would any other fixed
+> resource node, and the normal completion path puts it.
+
+Here the thing is simpler, all member can just use leader's io_rsrc_node,
+leader's rsrc_node reference is grabbed & leased to member when adding member
+to group, and released by the normal io_req_put_rsrc_nodes(). 
+
+Thanks,
+Ming
 
