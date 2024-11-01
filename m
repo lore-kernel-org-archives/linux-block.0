@@ -1,32 +1,58 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C22142623;
-	Fri,  1 Nov 2024 05:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED17142623;
+	Fri,  1 Nov 2024 06:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730440133; cv=none; b=sylEdhKKALH+yTOuyVVMo6ya/1E4hGZu4Rs8/jhSYUrZ6y9Cgj6B47kDwUV32me5ay27x65HbEzMD8zcKngE4pmcabfkX3aOfs2ng2Fde0DIWGMYjTdDB4Z+DPSvbyAbr75VZex1XwsZQwvOZNTw/bzu95wAkmClhFMJ/c3rQAQ=
+	t=1730441482; cv=none; b=cbd4V0zc8L1fDA2CeWvlXPunbwN0yueQDoPhvcPjpeyoG4ZS2YyRsYBEgC1NaJQS1HPFnZrrFXymF68HGErdbNUv88cwpjVWXa480m1YE/lCG5ITwSzidJR/AuBmcWN/P9wswJ81R0f/7PngfeH268TPk/zNkqz8YYt8rA0XNxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730440133; c=relaxed/simple;
-	bh=Qhg1ePt6bI7vC06KC8D9a1xSNzp4aHzxpV/8S+8WCz0=;
+	s=arc-20240116; t=1730441482; c=relaxed/simple;
+	bh=xuvDhMPsSnRBldbb9zqlIWoH9RpyHnNr2U6kz9Sckdc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kgiyCkDrfO8biwUwaIsP5LBVBfqJzf0+eAEf967RCwijAlASyrZrXsLmPEAtoWdst+dthVFPgnurLsmvlXpjwBFqsSoi+68DdcTvD6QSjPPv/R1KHVPbOGgu8B3KCakrGjcY9C1cOmryRtbuTdrOD1cWjpqw7BlbAjkUc4jRY/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 0FE3368BFE; Fri,  1 Nov 2024 06:48:47 +0100 (CET)
-Date: Fri, 1 Nov 2024 06:48:46 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-	David Sterba <dsterba@suse.com>,
-	Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH 2/4] block: lift bio_is_zone_append to bio.h
-Message-ID: <20241101054846.GB13514@lst.de>
-References: <20241101052206.437530-1-hch@lst.de> <20241101052206.437530-3-hch@lst.de> <f376f179-0173-49b4-b4c6-0cabb8720dfd@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tHF/LwrVqE8V7BRl88UC8sZTPdWa+lVlIuo/pGI7Wjb9JoSyM0hlLydOwTPwqRST3m+AebfyQZWCsNA5U0rPGk7PFAuhxpuyH90SywNkqAvl3aMo52PjoF8hPJxrg7VvZk6PmvZYWpqbcFMTvYs+Z83NJqH0kpt2oOn0Ozlu7dE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GxotyBrg; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GxotyBrg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C71BBC4CECD;
+	Fri,  1 Nov 2024 06:11:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730441481;
+	bh=xuvDhMPsSnRBldbb9zqlIWoH9RpyHnNr2U6kz9Sckdc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GxotyBrgjRANc5p7HrsCLBXgaj4HLa5WC8j/hwfVk4KJAdkHmExC7kSQTYNp89ILA
+	 Yx2fbg2gbC1Wjyn01FDcCrk577MzfB5np9DJobJUCMYKqeBjjKbyJl4ye3AMAvF9/M
+	 eWLWv6oFnkXuCdVlONIFHy4LNALMfsWKyHZrQE/pe6g5rPZdzyyrOB4cB2hoNjYS79
+	 lqHPB1G+uBa5evs4A6a/506EDsJ0Nq/l3fddVEF8YAVmp1SK1vnA6Z0/l70YE3mAJc
+	 C3wKq7ppvuxcUZM3NDVqxKZW+swjVBkdxdhk2qeZWESspprkV0FeKW4hemHsE21yeg
+	 a8+9J8MNFi77A==
+Date: Fri, 1 Nov 2024 08:11:16 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH 2/7] block: don't merge different kinds of P2P
+ transfers in a single bio
+Message-ID: <20241101061116.GC88858@unreal>
+References: <cover.1730037261.git.leon@kernel.org>
+ <34d44537a65aba6ede215a8ad882aeee028b423a.1730037261.git.leon@kernel.org>
+ <d4378502-6bc2-4064-8c35-191738105406@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,20 +61,31 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f376f179-0173-49b4-b4c6-0cabb8720dfd@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <d4378502-6bc2-4064-8c35-191738105406@acm.org>
 
-On Fri, Nov 01, 2024 at 02:37:29PM +0900, Damien Le Moal wrote:
-> > +static inline bool bio_is_zone_append(struct bio *bio)
-> > +{
-> > +	if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED))
-> > +		return false;
+On Thu, Oct 31, 2024 at 01:58:37PM -0700, Bart Van Assche wrote:
+> On 10/27/24 7:21 AM, Leon Romanovsky wrote:
+> > +		/*
+> > +		 * When doing ZONE_DEVICE-based P2P transfers, all pages in a
+> > +		 * bio must be P2P pages from the same device.
+> > +		 */
+> > +		if ((bio->bi_opf & REQ_P2PDMA) &&
+> > +		    !zone_device_pages_have_same_pgmap(bv->bv_page, page))
+> > +			return 0;
 > 
-> Nit: this "if" is probably not needed. But it does not hurt either. Since we
-> should never be seeing this function being called for the
-> !IS_ENABLED(CONFIG_BLK_DEV_ZONED) case, should we add a WARN_ON_ONCE() ?
+> It's probably too late to change the "zone_device_" prefix into
+> something that cannot be confused with a reference to zoned block
+> devices?
 
-The point of the IS_ENALBED is to optimize away the code when it can't
-be used.  The WARN_ON_ONCE would generate worse code than just leaving
-the check in.
+It is never too late to send a patch which renames the names, but it needs
+to be worth it. However it is hard to see global benefit from zone_device_* rename.
+ZONE_DEVICE is a well known term in the kernel and it is used all other places
+in the kernel.
 
+Thanks
+
+> 
+> Thanks,
+> 
+> Bart.
+> 
