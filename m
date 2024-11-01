@@ -1,134 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D391CA8D
-	for <linux-block@vger.kernel.org>; Fri,  1 Nov 2024 02:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6884374D1;
+	Fri,  1 Nov 2024 02:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730427319; cv=none; b=N6BX9vrAJxS6PA9bvJkTp0sdPGD4i7MVyEX6JiOSC2kEWVbE1LCzEOMvvFBZ6knIIvshBdzLxbpDZQqsX8HT48QZa4d455O9LUDG9QneCb7gUuWe28A0Rgw9bBCrXEhxziOEydC3np2Lyli2dMOMK0uRl/7uHpeK/yZtrJBSIU4=
+	t=1730427443; cv=none; b=AYTDgb1SSwCrnbr8gdP9w2jbCsq++ABHdOdxLiJTkLgQOpw69A+3OHbi1UdWHxTB6f7ftEatAGpE8k+H9534Ks/mnXg6QSXoMCLE58KEL+r3TKV5I2ne74jNse1ePjQxZxeXPT6s9/weGpazpshHhzTw/hcJ1z3K+4mnR3Zfcyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730427319; c=relaxed/simple;
-	bh=yJdGIwUEYPOmEs8ij3kiy6zzV0QYlQFlQfm8YmlYIbg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O8FwaD8bYUkdF4tn1K7CRjAF027/2CNmGv4j9M5xc5chJtZTEqtJFle2ByFZy/f2nSVAObsTrkhL038MDdRB8jwWJXjyjad1W/NlpLGgk0NbrvTFt51SA85fPcuo0FY+j9Mojvj4jEmvUvaTHWUDA8fNrVJ9Gy2oNu+ViShkyH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KYDxDF4i; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KYDxDF4i"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730427312;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yJdGIwUEYPOmEs8ij3kiy6zzV0QYlQFlQfm8YmlYIbg=;
-	b=KYDxDF4i9Kc/wENqJEJaIOi+KtLmaAZev+0Bd7qTUyzDEycsyY2Czv3y7hoS6ceE3Hd6Sn
-	TpWCtBPq4zsO3PPwH6fLGfgyIWywLEx7JdrH+j8j0Cp+ecLZzCxUx666zHtK9Tukdjz4+q
-	AgmJFP+WhBj+ePeEFI2RIohB/x/QlK0=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-VkrWugeoM2GS3i_pfqpCSA-1; Thu, 31 Oct 2024 22:15:10 -0400
-X-MC-Unique: VkrWugeoM2GS3i_pfqpCSA-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2e2eb765285so1842041a91.1
-        for <linux-block@vger.kernel.org>; Thu, 31 Oct 2024 19:15:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730427310; x=1731032110;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yJdGIwUEYPOmEs8ij3kiy6zzV0QYlQFlQfm8YmlYIbg=;
-        b=TqdEzM7tW1qPwNLgOVJCdRyfad38oL9YepTiDfh5QyllrKc+UWrRe83xQCBcud9dGd
-         oT8h2Ycvz7BPWjsIEiYlFeGj7IdrTDXHOsfYvlcNLfuTtB6T8ZGKkPXk3Tlk1ha79cwZ
-         6FqRqIsqh5wNBP0rJ3KKtV+NyR+dnprLj+KXFRJyjzc0bac1pm3ix1oZhOQ6h+sSUgki
-         bnztRNzJs/ewPW02Rqn6U1KAOOuhH+aWBNGrbwDPAqjQ1TEmGbecV/TmI4z9epfCK2rw
-         gKxPCBNQBvlMW2No+krc7fSX38JQ6lt0S7d2xKL9QS39yDp6+YHzZca0Ikz7zisuhcLv
-         8r5g==
-X-Forwarded-Encrypted: i=1; AJvYcCW/WZhpPQ7xMFzBAJx1Q/kwa3wKB9Gsm0OZWio+e3uIvfz5OUa1IZ8SxKXWdQxJ4UUtqxqSG7x1EI2aEg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhJ1t4rp+k6jEdaCZSwxBLjD/0VjVwOifEKOKhoPBApGJ8Pf10
-	Gw++UPpZsLlDP6ayG5aF9aPO+dFPkvZiITCqnJBo+KxSCmPooj9DF6KdbSou3F8dY0lbyKew+rZ
-	fpBX74MolAfYy2UhlLE63W9yP+ynkgT/+V5FLFfRDtMmpTqq3hrdIL3UttE1kXjj8cCEnWcYIXO
-	Y7tAk07v95oOW6XxXnkcAP1parFwcL7K/zQKw=
-X-Received: by 2002:a17:90b:2d92:b0:2e2:e159:8f7b with SMTP id 98e67ed59e1d1-2e94c29f2cemr2655468a91.3.1730427309724;
-        Thu, 31 Oct 2024 19:15:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHy16t0It8M5wuxzMCN0u7b3KxhGxysg7D6J/QWKdLqLpcbAtWiRV69Dq4QwYxCS/HPdiOkYmqXnbjdd/QPCCE=
-X-Received: by 2002:a17:90b:2d92:b0:2e2:e159:8f7b with SMTP id
- 98e67ed59e1d1-2e94c29f2cemr2655410a91.3.1730427309206; Thu, 31 Oct 2024
- 19:15:09 -0700 (PDT)
+	s=arc-20240116; t=1730427443; c=relaxed/simple;
+	bh=3IJ5z7vPmpvE6o56uYCMiKRwaOdrOWry1RofWajHgCE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=K6oAtc0RdoXw5k4XgTuTcs4Ewc+omTTvkf01HfCEhmtih/2g/VgEy31Zrno/MEJtjcehMza1W/pbevQNYtJuQMKgAmyXJ6AH6vOYysGOmnlrUIpqhPERSV5/Ip5P9vVZPUU2yOUG6HUz21fnrDHy8VKvmsQoP9uGOiKHyxcvn4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Xfkym5yXZz1yp1C;
+	Fri,  1 Nov 2024 10:17:20 +0800 (CST)
+Received: from kwepemg100017.china.huawei.com (unknown [7.202.181.58])
+	by mail.maildlp.com (Postfix) with ESMTPS id C6FCE140136;
+	Fri,  1 Nov 2024 10:17:11 +0800 (CST)
+Received: from [10.67.120.108] (10.67.120.108) by
+ kwepemg100017.china.huawei.com (7.202.181.58) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 1 Nov 2024 10:17:11 +0800
+Message-ID: <b1a9c348-d3c6-1786-9c51-763cec1f2384@huawei.com>
+Date: Fri, 1 Nov 2024 10:17:10 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com> <20241101015101.98111-1-qiang4.zhang@linux.intel.com>
-In-Reply-To: <20241101015101.98111-1-qiang4.zhang@linux.intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 1 Nov 2024 10:11:11 +0800
-Message-ID: <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
-Subject: Re: [PATCH v2] virtio: only reset device and restore status if needed
- in device resume
-To: qiang4.zhang@linux.intel.com
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jens Axboe <axboe@kernel.dk>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
-	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	"Chen, Jian Jun" <jian.jun.chen@intel.com>, Andi Shyti <andi.shyti@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, David Hildenbrand <david@redhat.com>, 
-	Gerd Hoffmann <kraxel@redhat.com>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Qiang Zhang <qiang4.zhang@intel.com>, 
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-sound@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.1
+Subject: Re: [bug report] block: Non-NCQ commands will never be executed while
+ fio is continuously running
+Content-Language: en-CA
+To: Niklas Cassel <cassel@kernel.org>, Damien Le Moal <dlemoal@kernel.org>
+CC: Yu Kuai <yukuai1@huaweicloud.com>, <axboe@kernel.dk>, John Garry
+	<john.g.garry@oracle.com>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>, "yukuai (C)"
+	<yukuai3@huawei.com>, "yangerkun@huawei.com" <yangerkun@huawei.com>
+References: <eef1e927-c9b2-c61d-7f48-92e65d8b0418@huawei.com>
+ <922e3d52-9567-4371-9a43-6d51f716a370@kernel.org>
+ <129e1e4b-426f-3d5b-b95c-d386c90cfe06@huawei.com>
+ <5b4a15be-1cb2-4477-8f17-b808612d10d5@kernel.org>
+ <0e78cce0-3f4c-3ddf-4d5b-ee2b5c8d7e1a@huawei.com>
+ <ZuAtLK5jIPEjhXmU@ryzen.lan>
+ <7f179f49-a57b-45bf-92f0-f577aa0b8565@kernel.org>
+ <04cf3f31-4bd8-3ce9-867a-41628e56e861@huaweicloud.com>
+ <e1ff5ccc-8204-44d8-ba62-84c8bd204fa0@kernel.org> <ZyOQWyyai2JkKyzy@ryzen>
+From: yangxingui <yangxingui@huawei.com>
+In-Reply-To: <ZyOQWyyai2JkKyzy@ryzen>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepemh200015.china.huawei.com (7.202.181.124) To
+ kwepemg100017.china.huawei.com (7.202.181.58)
 
-On Fri, Nov 1, 2024 at 9:54=E2=80=AFAM <qiang4.zhang@linux.intel.com> wrote=
-:
->
-> From: Qiang Zhang <qiang4.zhang@intel.com>
->
-> Virtio core unconditionally reset and restore status for all virtio
-> devices before calling restore method. This breaks some virtio drivers
-> which don't need to do anything in suspend and resume because they
-> just want to keep device state retained.
 
-The challenge is how can driver know device doesn't need rest.
 
-For example, PCI has no_soft_reset which has been done in the commit
-"virtio: Add support for no-reset virtio PCI PM".
+On 2024/10/31 22:12, Niklas Cassel wrote:
+> On Thu, Sep 19, 2024 at 04:14:15PM +0200, Damien Le Moal wrote:
+>> On 2024/09/19 14:26, Yu Kuai wrote:
+>>>
+>>> Does libata return a specific value in this case? If so, maybe we can
+>>> stop other hctx untill this IO is handled.
+>>>
+>>> For now, I think libata should use single hctx, it just doesn't support
+>>> multiple hctx yet.
+>>
+>> libata does not care/know about hctx. It only issues commands to ATA devices,
+>> which always are single queue. And pure SATA adapters like AHCI are always
+>> single queue.
+>>
+>> The issue at hand can happen only for libsas based SAS HBAs that have multiple
+>> command submission queues (with a shared tag set). Commands for the same device
+>> may end up being submitted through different queues, and when the submitted
+>> commands include a mix of NCQ and non-NCQ commands, the problem happens without
+>> libata being able to easily do anything about it, and not possible control
+>> possible at the scsi layer either since the commands submitted are SCSI (not yet
+>> translated to ATA commands) which do not have any NCQ/non-NCQ exclusion
+>> knowledge at all. NCQ is an ATA concept unknown to the scsi and block layer.
+>>
+>> We (Niklas and I) are trying to find a solution, but that may not be within
+>> libata itself. It may need changes to libsas as well. Not sure yet. Still exploring.
+> 
+> Hello Xingui,
+> 
+> I send a proposed solution to this problem here:
+> https://lore.kernel.org/linux-ide/20241031140731.224589-4-cassel@kernel.org/
+> 
+> Please test and see if it addresses your problem.
+> 
+OK, thanks for following this issue and fixing it, we will verify it as 
+soon as possible.
 
-And there's a ongoing long discussion of adding suspend support in the
-virtio spec, then driver know it's safe to suspend/resume without
-reset.
-
->
-> Virtio GPIO is a typical example. GPIO states should be kept unchanged
-> after suspend and resume (e.g. output pins keep driving the output) and
-> Virtio GPIO driver does nothing in freeze and restore methods. But the
-> reset operation in virtio_device_restore breaks this.
-
-Is this mandated by GPIO or virtio spec? If yes, let's quote the revelant p=
-art.
-
->
-> Since some devices need reset in suspend and resume while some needn't,
-> create a new helper function for the original reset and status restore
-> logic so that virtio drivers can invoke it in their restore method
-> if necessary.
-
-How are those drivers classified?
-
->
-> Signed-off-by: Qiang Zhang <qiang4.zhang@intel.com>
-
-Thanks
+Thanks.
+Xingui
 
