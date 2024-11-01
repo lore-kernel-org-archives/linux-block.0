@@ -1,177 +1,89 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64074142624;
-	Fri,  1 Nov 2024 05:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE0414A4C6;
+	Fri,  1 Nov 2024 05:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730438576; cv=none; b=BjTU3MQOIv+ollAFSG/uvmLI0bYJG56QrJIIzkn3i5v1o/NLC7603GbRAjzuAesFki0MqNZ4g+N8N78enxFVLrqFArpc2SUC1lMA1PjvjHBeXHe/2DHito3q4B3QPdVQ+AsiCmofgANBVtrkwCuTYumv3zTlwQgRm9zVOItS9lo=
+	t=1730439273; cv=none; b=i/BtGiDd44zCVSdXg7gAIe/2jijJNTjD2/ZF0hN7JYPU+m8CnXceU4v46lkiAuIqDTZ7FhhwbcCRCy5MozjDnxJ95poFA6auBpmlPoV4ndRWg0CbyMNDQ93v3VqrJN3N2pRUIyGqpiwibeS96BtSfslx8V39XcNqgxg2kZefT+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730438576; c=relaxed/simple;
-	bh=pGNjlh/5TANRkDFAanOu/LKbRP8oaSiAvvCfhO4t6yI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H6Kcvv3qxJLw+YOwTM2OafQK8pwIiHp4QQvy9RW6fnDxoR5duxlf2jtPFP5kcaKMZSLR7lyuTUAk7QJALXGKKNLYTUbHRzoNRuDcet4nBbLk1aSGUaDpDjThdonkf26bLJQ8e0jYhkL9vf1mTEUB2ySNutK5m/BYuVti3Sp9TW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YYD9qxns; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1730439273; c=relaxed/simple;
+	bh=wgLvzcsYWd5pdxhNxs+0A/6mIrFsEw2ggcJ2Zd28IP4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=uLhNwZdl9bJHiCv/cgEqWCwow/ClJGNvoeIyoW6ZfJt8Zvf6NxK1u9THX/3eeA2wcbTHS5RxCvHlOxKHEiLU0c9CESp1sb3ni2issHFo8sOOvccJh2tkkwpTClHEdY/iD0WkYnll0Qgv6ZN9eh75eQmI5fq/P12Ch67fZLuSdog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l86vyP9g; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YYD9qxns"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730438574; x=1761974574;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=pGNjlh/5TANRkDFAanOu/LKbRP8oaSiAvvCfhO4t6yI=;
-  b=YYD9qxns7tfTKNWnEINwY5oeJvXljPRcGawyhfCWqzP3K7nexPS+Kdm2
-   U1wKHQXNqFeYLkksa+mzqGjct60JItoDsUcQTWH+QggQzUbUDHJtsCBap
-   trIDOL6eVYYIC2YufcRnYU5RT4A8uV4tH8NywAnZpQviOV7/QNbBbYVN/
-   Wf96U5njp8QgfXkEYfuJPQ8ItGlrpGs/xzDuCSgZ7W5S6u/sn8RCcT+Xw
-   9LFYYKltlTM0LHoY0BggSSFiM9/33emXHC/JvwAMbnevER1UI8tov4pcB
-   ACVCn918QNYGdEQVZMR1MZSPpVrrlg25JW7spIdn5HyBnnzfduiKlRTmu
-   Q==;
-X-CSE-ConnectionGUID: jA2xccugSsu1flMsUGDkeQ==
-X-CSE-MsgGUID: E8OGjcz2QgarRGZ/LjKR8A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="30314687"
-X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
-   d="scan'208";a="30314687"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 22:22:51 -0700
-X-CSE-ConnectionGUID: TVbU//UlQUCwNIzd8pgqTg==
-X-CSE-MsgGUID: R6mTecEmTzu92S+st927WA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
-   d="scan'208";a="83678534"
-Received: from qz-dev1.sh.intel.com (HELO localhost) ([10.239.147.28])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 22:22:44 -0700
-Date: Fri, 1 Nov 2024 13:20:11 +0800
-From: Qiang Zhang <qiang4.zhang@linux.intel.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jens Axboe <axboe@kernel.dk>, Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gonglei <arei.gonglei@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	"Chen, Jian Jun" <jian.jun.chen@intel.com>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	David Hildenbrand <david@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Qiang Zhang <qiang4.zhang@intel.com>,
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH v2] virtio: only reset device and restore status if
- needed in device resume
-Message-ID: <ZyRlC-5V_NTKgzXh@dev-qz>
-References: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com>
- <20241101015101.98111-1-qiang4.zhang@linux.intel.com>
- <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l86vyP9g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45B3CC4CECD;
+	Fri,  1 Nov 2024 05:34:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730439273;
+	bh=wgLvzcsYWd5pdxhNxs+0A/6mIrFsEw2ggcJ2Zd28IP4=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+	b=l86vyP9gTebKEP+awPKmAWW6TwIERtU8GTILBCWavHO0UtqsXAU9+FWIkzP2fFhE6
+	 6OFifmDnGDSGv3HR5aH18yb/NfJ3SGArvCJO/RehHaDWlt6b7X512/g7/glBGT9qQL
+	 xFRPCrPZ0GYGI2o3xWqPsn7E3fmUQZHd17jGP6dxey2i0b43cpiGXMLNIHILznGCsP
+	 HVsa5Pc7JRUUMZYr2VwXQsppsWUrPFdNqiWuVBQTT5yepPZCxN2fM4v1nGhWyC3pAP
+	 Xm84rrehBJNoUFaRUUF86BiNowmbCIKDyOPPYh1xwbjwWUHYL4ILLC3KJA4Dm5n+60
+	 6W6bCNWeXYBjw==
+Message-ID: <a7b87e01-045e-423e-854d-4707f9102c75@kernel.org>
+Date: Fri, 1 Nov 2024 14:34:31 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+From: Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [PATCH 1/4] block: fix bio_split_rw_at to take
+ zone_write_granularity into account
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+ David Sterba <dsterba@suse.com>, Damien Le Moal <damien.lemoal@wdc.com>
+Cc: linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
+References: <20241101052206.437530-1-hch@lst.de>
+ <20241101052206.437530-2-hch@lst.de>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20241101052206.437530-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 01, 2024 at 10:11:11AM +0800, Jason Wang wrote:
-> On Fri, Nov 1, 2024 at 9:54 AM <qiang4.zhang@linux.intel.com> wrote:
-> >
-> > From: Qiang Zhang <qiang4.zhang@intel.com>
-> >
-> > Virtio core unconditionally reset and restore status for all virtio
-> > devices before calling restore method. This breaks some virtio drivers
-> > which don't need to do anything in suspend and resume because they
-> > just want to keep device state retained.
+On 11/1/24 14:21, Christoph Hellwig wrote:
+> Otherwise it can create unaligned writes on zoned devices.
 > 
-> The challenge is how can driver know device doesn't need rest.
-
-Hi,
-
-Per my understanding to PM, in the suspend flow, device drivers need to
-1. First manage/stop accesses from upper level software and
-2. Store the volatile context into in-memory data structures.
-3. Put devices into some low power (suspended) state.
-The resume process does the reverse.
-If a device context won't loose after entering some low power state
-(optional), it's OK to skip step 2.
-
-For virtio devices, spec doesn't define whether their states will lost
-after platform entering suspended state. So to work with different
-hypervisors, virtio drivers typically trigger a reset in suspend/resume
-flow. This works fine for virtio devices if following conditions are met:
-- Device state can be totally recoverable.
-- There isn't any working behaviour expected in suspended state, i.e. the
-  suspended state should be sub-state of reset.
-However, the first point may be hard to implement from driver side for some
-devices. The second point may be unacceptable for some kind of devices.
-
-For your question, for devices whose suspended state is alike reset state,
-the hypervisor have the flexibility to retain its state or not, kernel
-driver can unconditionally reset it with proper re-initialization to
-accomplish better compatibility. For others, hypervisor *must* retain
-device state and driver just keeps using it.
-
+> Fixes: a805a4fa4fa3 ("block: introduce zone_write_granularity limit")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-merge.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> For example, PCI has no_soft_reset which has been done in the commit
-> "virtio: Add support for no-reset virtio PCI PM".
-> 
-> And there's a ongoing long discussion of adding suspend support in the
-> virtio spec, then driver know it's safe to suspend/resume without
-> reset.
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index d813d799cee7..d6895859a2fb 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -358,7 +358,8 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
+>  	 * split size so that each bio is properly block size aligned, even if
+>  	 * we do not use the full hardware limits.
+>  	 */
+> -	bytes = ALIGN_DOWN(bytes, lim->logical_block_size);
+> +	bytes = ALIGN_DOWN(bytes, lim->zone_write_granularity ?
+> +			lim->zone_write_granularity : lim->logical_block_size);
 
-That's great! Hopefully it can fill the gap.
-Currently, I think we can safely move the reset to drivers' freeze methods,
-virtio core has no reason to take it as a common action required by all
-devices. And the reset operation can be optional skipped if driver have
-hints from device that it can retain state.
+Nit: we could also do:
 
-> 
-> >
-> > Virtio GPIO is a typical example. GPIO states should be kept unchanged
-> > after suspend and resume (e.g. output pins keep driving the output) and
-> > Virtio GPIO driver does nothing in freeze and restore methods. But the
-> > reset operation in virtio_device_restore breaks this.
-> 
-> Is this mandated by GPIO or virtio spec? If yes, let's quote the revelant part.
+	bytes = ALIGN_DOWN(bytes,
+		max(lim->logical_block_size, lim->zone_write_granularity));
 
-No. But in actual hardware design (e.g. Intel PCH GPIO), or from the
-requirement perspective, GPIO pin state can be (should support) retained
-in suspended state.
-If Virtio GPIO is used to let VM operate such physical GPIO chip indirectly,
-it can't be reset in suspend and resume. Meanwhile the hypervisor will
-retain pin states after suspension.
+Also, I wonder if we should leave read split as is based on the logical block
+size only ? Probably does not matter much...
 
-> 
-> >
-> > Since some devices need reset in suspend and resume while some needn't,
-> > create a new helper function for the original reset and status restore
-> > logic so that virtio drivers can invoke it in their restore method
-> > if necessary.
-> 
-> How are those drivers classified?
-
-I think this depends whether hypervisor will keep devices state in platform
-suspend process. I think hypervisor should because suspend and reset are
-conceptually two different things.
+>  
+>  	/*
+>  	 * Bio splitting may cause subtle trouble such as hang when doing sync
 
 
-Thanks
-Qiang
+-- 
+Damien Le Moal
+Western Digital Research
