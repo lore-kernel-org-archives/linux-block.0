@@ -1,60 +1,59 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F42391C729E
-	for <linux-block@vger.kernel.org>; Fri,  1 Nov 2024 17:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C7B13B7A3
+	for <linux-block@vger.kernel.org>; Fri,  1 Nov 2024 18:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730483675; cv=none; b=Gm+tvkqqID1n+cg6nxvYDCk8eNGSdx9q4iVkyJqKIahg4H8BTa88mk2cgnSe1VkvODo4Q9hBwATT125byrIFiusfEVL2f862DwN/CFDpqVcaeY8GFB25pirBiu9XmDRDF2XSJtxocmtbQLtdQ+7TrfnBee7aoXPvxtdCGIoRPGE=
+	t=1730484062; cv=none; b=tCsmr0TMvkq8y7qyizmDpZQ3ycBsyL1CPQ7eqFjEqo/yNfWoEJzkeszMV/cbyn7Bc61YKpT4GiuRBC6bWLkXOGXu+oA3uXjWVDxWewhhBtLtjFXkUdRCDoPigl0zTSlqK72nxFxoBWjLv34pEkJKpXmUvUYuaIQEEEH7G+znfY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730483675; c=relaxed/simple;
-	bh=ACjPRHF4938imeJvdByUPKKOQmFwdW/Irc+W/vwpLlI=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:In-Reply-To:
-	 Content-Type:References; b=UsQVwpzj6K/jdCuVtIp/okN9NRORn+YnEVb/4j4ZFZKE4mxpQYLoyju98wvPYTlc54COoucd+ut+0PqD/V9EsAapo/Z38qc31VRTjSLdXzCUlY+CV+iCRiyMDHp784mSXz4OInIvnmQ7lttsa82f/6jkYyO7kn5R2Xa/a0rHwa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Nw2TZno7; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1730484062; c=relaxed/simple;
+	bh=lDxX97HRCwte7/+htCKALpm9+jdEA6tzt9fHi4sSekc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tjxAlBbu2DcZb+FAguJpaSqiNNpQ866yucxYycA+3+OqdvN9zqCGcGXGehb0CB1+IzccR6WhaZZk54AJKKe/nef/yGvOhcNGzOVs+V3zpzrE9cAaOHog6taK3ms56Xyry+GrbW3nDBAEGrcDiZ1e/d0ODnIXMrl+2FyAs7e/z0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DszDmIyQ; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Nw2TZno7"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20241101175429epoutp0246b05c0658ec5f83cfd01c89cee84672~D6bqsuo0U2333023330epoutp024
-	for <linux-block@vger.kernel.org>; Fri,  1 Nov 2024 17:54:29 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20241101175429epoutp0246b05c0658ec5f83cfd01c89cee84672~D6bqsuo0U2333023330epoutp024
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1730483669;
-	bh=c5jILukSrTG9L/qJp/8Gej0z2povjeMHGl5jO0D8TP0=;
-	h=Date:From:Subject:To:Cc:In-Reply-To:References:From;
-	b=Nw2TZno78l9tlvABsOX9z0rmkhpicF4+nb4/eSmRY1riinm0J/PYloaGtkyfdreAh
-	 CImq2P764BQwCkh0pPbkuPh0qhg8boXPe8AGX3ZJ19Jy+pAcT2Qrt4p1H2CZKuvn0h
-	 vWAhtaJl/eg1BOz6Kss6wLtyLEhmhudcd60PwNOc=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20241101175428epcas5p174f072c7185d446f8c447b919b273d26~D6bpfM0MU0354703547epcas5p10;
-	Fri,  1 Nov 2024 17:54:28 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.182]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4Xg7m321Bpz4x9Pp; Fri,  1 Nov
-	2024 17:54:27 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	03.3E.09800.3D515276; Sat,  2 Nov 2024 02:54:27 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20241101175426epcas5p28cd4ef5a2e01db38ff56c3aeaf0b2ca6~D6bnWj7ne1320513205epcas5p2p;
-	Fri,  1 Nov 2024 17:54:26 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20241101175426epsmtrp2ec9ba1f4ac89e4fb7213a1440da6d111~D6bnVy0jK0075700757epsmtrp2J;
-	Fri,  1 Nov 2024 17:54:26 +0000 (GMT)
-X-AuditID: b6c32a4b-4a7fa70000002648-d6-672515d3cd85
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	B3.5F.07371.2D515276; Sat,  2 Nov 2024 02:54:26 +0900 (KST)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20241101175423epsmtip15b00205ce519e8e19cacac9cec420314~D6bk6BkzR2648426484epsmtip1u;
-	Fri,  1 Nov 2024 17:54:23 +0000 (GMT)
-Message-ID: <ceb58d97-b2e3-4d36-898d-753ba69476be@samsung.com>
-Date: Fri, 1 Nov 2024 23:24:15 +0530
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DszDmIyQ"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20c77459558so20172275ad.0
+        for <linux-block@vger.kernel.org>; Fri, 01 Nov 2024 11:00:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730484059; x=1731088859; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZxQwy2JqTWj9mxjVfqetkAg0pKbHnFj/zTWURSyf02U=;
+        b=DszDmIyQVe2wigfIQbkl0Bg4gFieFC7pq+S78h2K8uSf6p7SW3bkvkCnNI4RXxZ5Nb
+         dV2/Lu7JYKPWbVgbFE5kq9FFFlmOuudCkp4U/1Ar7QgGEQ8ojFdrahEOCiGcmx37kD1d
+         nvAgNulv7kSV7GBhufqSmu3tlNEhjvnXvk1YvTiRliJJ5ckhtPtYWBPGrBKL2kmfWEvh
+         1oNcuxh1iSyWx6Yfrj5ewuzU1EsXZhUHg3t0s+TlOVOsynQ2/+6EU7gkPT4yc5yQLOYe
+         yHGnrviCiXZpBzgThL5aHZemh/ERDs4Y9aNlOaNN5N50Sjp/DcnRgQ3P0UFSUc+2XyEO
+         uAJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730484059; x=1731088859;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZxQwy2JqTWj9mxjVfqetkAg0pKbHnFj/zTWURSyf02U=;
+        b=NiCrBsFXjCC7a0ZSCzp4dqR6j5shtoLmXfpL+sIuNZokxiiKWM4Xeke4Fk3WaV2r3Q
+         Ou/pI/F9veBwMt/lWK0wNjS9GZwazMMXJ2//XSgDCH+JAvlKUuwRtRiG/x/pc2UggKti
+         d1tYMxKQ+aRq52XLR8kSbMWTZo/UzXEl+Le6DaUWbhdpzP5kX+wEFfhlzUaF5SFJ0Xo1
+         LJ7S5aqgdG9MJIwPZlnBSOYWDfTWaqC2xymo7e7bsHrsCY+du9AqY4d1Qa+nYOYapqyB
+         p2yHnJSroUootFp6yroUxxw2g1t22GT6NjO8q5ikNgvJKzEEr5D0ruZiwe1la5tszwNc
+         AuRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUGTqWpLlGl+cVcdMmCdDEbNHNL4OlFnCe8Y8FTfQPZuQWce18WyOd6VzofwSZZngtJR2eEPx6SKCxfaQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YywERKjFNaG2ztWX0vMDDbZfPGbU/Rs9I0+bRt4V4NfV9y3LpxH
+	Z6WzTEZ46XbxG/Pn3u0Ay+9aWQyh2jsEtu5IbCPlf3IbUPb/gLfpKPIOSKWXAmM=
+X-Google-Smtp-Source: AGHT+IHIuaWcf1xcN43PpKZ8niU1vNOkNBowKv0WWyf5GdmO0yEPPdOW4bYmWtdq3vSnbd4UKzDAZg==
+X-Received: by 2002:a17:902:ec8c:b0:20e:5777:1b83 with SMTP id d9443c01a7336-210f75339d6mr153711675ad.24.1730484059189;
+        Fri, 01 Nov 2024 11:00:59 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057a6815sm24201025ad.135.2024.11.01.11.00.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Nov 2024 11:00:58 -0700 (PDT)
+Message-ID: <a6ce38ba-a10d-4126-99c2-bf3d823227bd@kernel.dk>
+Date: Fri, 1 Nov 2024 12:00:57 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,180 +61,149 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v6 06/10] io_uring/rw: add support to send metadata
- along with read/write
-To: Pavel Begunkov <asml.silence@gmail.com>, Keith Busch <kbusch@kernel.org>
-Cc: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-	brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, gost.dev@samsung.com, vishak.g@samsung.com,
-	anuj1072538@gmail.com, Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH] iov_iter: don't require contiguous pages in
+ iov_iter_extract_bvec_pages
+To: Eric Dumazet <eric.dumazet@gmail.com>, Christoph Hellwig <hch@lst.de>
+Cc: akpm@linux-foundation.org, viro@zeniv.linux.org.uk, dhowells@redhat.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ming.lei@redhat.com
+References: <20241024050021.627350-1-hch@lst.de>
+ <fd0ec853-1f9c-4013-8b5d-89357594d02f@gmail.com>
 Content-Language: en-US
-In-Reply-To: <914cd186-8d15-4989-ad4e-f7e268cd3266@gmail.com>
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02TfUwTZxzH81yv1ytJx1EkPFSFes4gLGA723o4wTncdomSMZ2b7h+40Fth
-	lLb0WvaSuZU5mLgNQdyAwgYYNre6jFCoA4EMW3mTISw4hGa8iJAQEUEck00haz3c+O+T7+/3
-	fX4vz/PgAukkJsMzDBbWbGD0JBaAXvRERcUMhmzTKU4+ElH3lh6i1MdFKwKq0nERUBdGT2PU
-	rGcRUCPtzQj1w4UOhLqbdw2lKkpPINQZ9xCg2rzPUK1tPShV9d20iPrsRhNGne9aRaj+lS4h
-	1W+vFD0fRDfbR0X0YJ+VdjoKMLqh9iO6ZcSG0femvShd2OgA9K/VV0T0fWc47ZyaQ5ID3szc
-	k84yWtYsZw1pRm2GQRdPHjickpii1iiUMco4ahcpNzBZbDy5/2ByzEsZet84pDyH0Vt9UjLD
-	ceSOhD1mo9XCytONnCWeZE1avUlliuWYLM5q0MUaWMtupULxrNqXmJqZ/nnLAGYa3/buQt3P
-	mA2UhJ8CYhwSKuiq7MVOgQBcSrQA2PqJA/EHpMQigJ2zkA/8BaDXOYM9cfxd1Y7ygTYAXXdq
-	RLxjDsDz0wl+lhAJ0DU7IPQzSjwNz/UOIrweBHvKp1A/hxARcNxb5vPiOEZEwYESq18OJlLg
-	1TtLwM8biIOwpGpR5K8lIJYReL284HFAQIRC71TV4zPFRDycqC9FeT0CnnBVCPwGSCzj8Jdb
-	vQjf9X44OvZAwHMwvN3VKOJZBu/fbVubLBNOTE6gPH8AmxoKhTzvhbZHw0J/owJfo3WXdvC1
-	noJfPJxC/DIkJPBkvpTP3gLHzkyvOUPhzbLaNaZh41wT4PdWg8CvivNFRUBuX7cW+7rR7OvG
-	sf9fuRqgDhDGmrgsHcupTTsN7Dv/3XeaMcsJHj/26ANNYHJiIdYNEBy4AcQF5AbJgmmrTirR
-	Mu+9z5qNKWarnuXcQO27n2KBLCTN6PstBkuKUhWnUGk0GlXcTo2SDJXM5n2tlRI6xsJmsqyJ
-	NT/xIbhYZkNS/0Q36kvZgp5Isa16a+5zzaeTOvH+XM8/wm86NiXqjmscxzaryTde0I8N7br8
-	O1o/vxg8nbT7XLTy1vHIhrA+w/eu4fZDN/KOBWu/7V4twG3XtTWe4CJL4XA1Qbwy+CDD9ls5
-	JlNcpTPqX2+tFSd9KXv7SJhnPDGi/OjZzsTLpT/Od+sy33KMyfFydvtQdtTmVwODApH5vX8w
-	qyEd3uwZp/i1mfDUCi+5SubHX9livfbTy6IOZfZRrq9vpCOnmEDc28s8brN0n6qbIj22dlvj
-	EXb5xaWNDbn7As7eFipyDh/6dCUy0NOivhRoSa9blvRsioVJtpty1AXxooQPs0mUS2eU0QIz
-	x/wLle6hs3UEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrLIsWRmVeSWpSXmKPExsWy7bCSnO4lUdV0gx9X2Cw+fv3NYtE04S+z
-	xZxV2xgtVt/tZ7N4ffgTo8XNAzuZLFauPspk8a71HIvF7OnNTBaTDl1jtNh7S9tiz96TLBbz
-	lz1lt+i+voPNYvnxf0wW5/8eZ7U4P2sOu4Ogx85Zd9k9Lp8t9di0qpPNY/OSeo/dNxvYPD4+
-	vcXi0bdlFaPHmQVH2D0+b5Lz2PTkLVMAVxSXTUpqTmZZapG+XQJXRs/uC2wF91UrPqzfztbA
-	OFmui5GTQ0LAROLn/AMsXYxcHEICuxkl7m/rZoZIiEs0X/vBDmELS6z89xzMFhJ4zSgx9UIF
-	iM0rYCex9fUFVhCbRUBFYtHpy0wQcUGJkzOfsIDYogLyEvdvzQDq5eBgE9CUuDC5FMQUFoiX
-	2DdTB6RCRMBHYvL8T+wgJzAL/GCS2NZzDWrVQiaJrt+SIDYz0Dm3nswHG88pYCvxYON0Foi4
-	mUTX1i5GCFteonnrbOYJjEKzkFwxC0n7LCQts5C0LGBkWcUomVpQnJuem2xYYJiXWq5XnJhb
-	XJqXrpecn7uJERzDWho7GO/N/6d3iJGJg/EQowQHs5II74cC5XQh3pTEyqrUovz4otKc1OJD
-	jNIcLErivIYzZqcICaQnlqRmp6YWpBbBZJk4OKUamKJDv2i9+Pv5zCYXsXLGgz5JuYezp6+X
-	6lq2szDiqz93+EKtk//W83//Gtn26mBiAP+B7KfL/yWHvRB9cfIq02u2FSsK2Ta2h6b0XhFj
-	ifubK66woPPXnPZ5b79uyZ6aOTMvP/n37prDKuri1vcqOV3cr8T6NSYt2sFb73C7p3dlbMjT
-	VqOYI9Vrzu8OejzPIE1xjpL96Z7M0Hl1E7YuvBkfoT/9aPB9i5I1qfN2s/xP3Xs5dN0OJ+HN
-	H3P+yn/8+cz3qeupS48f80pHRn/jYqp7ldBY82LKSRmTR459n2dPPZEpyOvyK5rhppTf3NiM
-	qyxZiw08TX7/k9t5ynWOzOnzzM1TlINe/7BfJJzpv1GJpTgj0VCLuag4EQCSpVXGUAMAAA==
-X-CMS-MailID: 20241101175426epcas5p28cd4ef5a2e01db38ff56c3aeaf0b2ca6
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20241030181013epcas5p2762403c83e29c81ec34b2a7755154245
-References: <20241030180112.4635-1-joshi.k@samsung.com>
-	<CGME20241030181013epcas5p2762403c83e29c81ec34b2a7755154245@epcas5p2.samsung.com>
-	<20241030180112.4635-7-joshi.k@samsung.com>
-	<ZyKghoCwbOjAxXMz@kbusch-mbp.dhcp.thefacebook.com>
-	<914cd186-8d15-4989-ad4e-f7e268cd3266@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <fd0ec853-1f9c-4013-8b5d-89357594d02f@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 10/31/2024 8:09 PM, Pavel Begunkov wrote:
-> On 10/30/24 21:09, Keith Busch wrote:
->> On Wed, Oct 30, 2024 at 11:31:08PM +0530, Kanchan Joshi wrote:
->>> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/ 
->>> io_uring.h
->>> index 024745283783..48dcca125db3 100644
->>> --- a/include/uapi/linux/io_uring.h
->>> +++ b/include/uapi/linux/io_uring.h
->>> @@ -105,6 +105,22 @@ struct io_uring_sqe {
->>>            */
->>>           __u8    cmd[0];
->>>       };
->>> +    /*
->>> +     * If the ring is initialized with IORING_SETUP_SQE128, then
->>> +     * this field is starting offset for 64 bytes of data. For meta io
->>> +     * this contains 'struct io_uring_meta_pi'
->>> +     */
->>> +    __u8    big_sqe[0];
->>> +};
+On 11/1/24 11:05 AM, Eric Dumazet wrote:
 > 
-> I don't think zero sized arrays are good as a uapi regardless of
-> cmd[0] above, let's just do
-> 
-> sqe = get_sqe();
-> big_sqe = (void *)(sqe + 1)
-> 
-> with an appropriate helper.
-
-In one of the internal version I did just that (i.e., sqe + 1), and 
-that's fine for kernel.
-But afterwards added big_sqe so that userspace can directly access 
-access second-half of SQE_128. We have the similar big_cqe[] within 
-io_uring_cqe too.
-
-Is this still an eyesore?
-
->>> +
->>> +/* this is placed in SQE128 */
->>> +struct io_uring_meta_pi {
->>> +    __u16        pi_flags;
->>> +    __u16        app_tag;
->>> +    __u32        len;
->>> +    __u64        addr;
->>> +    __u64        seed;
->>> +    __u64        rsvd[2];
->>>   };
+> On 10/24/24 7:00 AM, Christoph Hellwig wrote:
+>> From: Ming Lei <ming.lei@redhat.com>
 >>
->> On the previous version, I was more questioning if it aligns with what
+>> The iov_iter_extract_pages interface allows to return physically
+>> discontiguous pages, as long as all but the first and last page
+>> in the array are page aligned and page size.  Rewrite
+>> iov_iter_extract_bvec_pages to take advantage of that instead of only
+>> returning ranges of physically contiguous pages.
+>>
+>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>> [hch: minor cleanups, new commit log]
+>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>> ---
+>>   lib/iov_iter.c | 67 +++++++++++++++++++++++++++++++++-----------------
+>>   1 file changed, 45 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+>> index 1abb32c0da50..9fc06f5fb748 100644
+>> --- a/lib/iov_iter.c
+>> +++ b/lib/iov_iter.c
+>> @@ -1677,8 +1677,8 @@ static ssize_t iov_iter_extract_xarray_pages(struct iov_iter *i,
+>>   }
+>>     /*
+>> - * Extract a list of contiguous pages from an ITER_BVEC iterator.  This does
+>> - * not get references on the pages, nor does it get a pin on them.
+>> + * Extract a list of virtually contiguous pages from an ITER_BVEC iterator.
+>> + * This does not get references on the pages, nor does it get a pin on them.
+>>    */
+>>   static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
+>>                          struct page ***pages, size_t maxsize,
+>> @@ -1686,35 +1686,58 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
+>>                          iov_iter_extraction_t extraction_flags,
+>>                          size_t *offset0)
+>>   {
+>> -    struct page **p, *page;
+>> -    size_t skip = i->iov_offset, offset, size;
+>> -    int k;
+>> +    size_t skip = i->iov_offset, size = 0;
+>> +    struct bvec_iter bi;
+>> +    int k = 0;
+>>   -    for (;;) {
+>> -        if (i->nr_segs == 0)
+>> -            return 0;
+>> -        size = min(maxsize, i->bvec->bv_len - skip);
+>> -        if (size)
+>> -            break;
+>> +    if (i->nr_segs == 0)
+>> +        return 0;
+>> +
+>> +    if (i->iov_offset == i->bvec->bv_len) {
+>>           i->iov_offset = 0;
+>>           i->nr_segs--;
+>>           i->bvec++;
+>>           skip = 0;
+>>       }
+>> +    bi.bi_size = maxsize + skip;
+>> +    bi.bi_bvec_done = skip;
+>> +
+>> +    maxpages = want_pages_array(pages, maxsize, skip, maxpages);
+>> +
+>> +    while (bi.bi_size && bi.bi_idx < i->nr_segs) {
+>> +        struct bio_vec bv = bvec_iter_bvec(i->bvec, bi);
+>> +
+>> +        /*
+>> +         * The iov_iter_extract_pages interface only allows an offset
+>> +         * into the first page.  Break out of the loop if we see an
+>> +         * offset into subsequent pages, the caller will have to call
+>> +         * iov_iter_extract_pages again for the reminder.
+>> +         */
+>> +        if (k) {
+>> +            if (bv.bv_offset)
+>> +                break;
+>> +        } else {
+>> +            *offset0 = bv.bv_offset;
+>> +        }
+>>   -    skip += i->bvec->bv_offset;
+>> -    page = i->bvec->bv_page + skip / PAGE_SIZE;
+>> -    offset = skip % PAGE_SIZE;
+>> -    *offset0 = offset;
+>> +        (*pages)[k++] = bv.bv_page;
+>> +        size += bv.bv_len;
+>>   -    maxpages = want_pages_array(pages, size, offset, maxpages);
+>> -    if (!maxpages)
+>> -        return -ENOMEM;
+>> -    p = *pages;
+>> -    for (k = 0; k < maxpages; k++)
+>> -        p[k] = page + k;
+>> +        if (k >= maxpages)
+>> +            break;
+>> +
+>> +        /*
+>> +         * We are done when the end of the bvec doesn't align to a page
+>> +         * boundary as that would create a hole in the returned space.
+>> +         * The caller will handle this with another call to
+>> +         * iov_iter_extract_pages.
+>> +         */
+>> +        if (bv.bv_offset + bv.bv_len != PAGE_SIZE)
+>> +            break;
+>> +
+>> +        bvec_iter_advance_single(i->bvec, &bi, bv.bv_len);
+>> +    }
+>>   -    size = min_t(size_t, size, maxpages * PAGE_SIZE - offset);
+>>       iov_iter_advance(i, size);
+>>       return size;
+>>   }
 > 
-> I missed that discussion, let me know if I need to look it up
-
-Yes, please take a look at previous iteration (v5):
-https://lore.kernel.org/io-uring/e7aae741-c139-48d1-bb22-dbcd69aa2f73@samsung.com/
-
-Also the corresponding code, since my other answers will use that.
-
->> Pavel was trying to do here. I didn't quite get it, so I was more
->> confused than saying it should be this way now.
 > 
-> The point is, SQEs don't have nearly enough space to accommodate all
-> such optional features, especially when it's taking so much space and
-> not applicable to all reads but rather some specific  use cases and
-> files. Consider that there might be more similar extensions and we might
-> even want to use them together.
+> This is causing major network regression in UDP sendfile, found by syzbot.
 > 
-> 1. SQE128 makes it big for all requests, intermixing with requests that
-> don't need additional space wastes space. SQE128 is fine to use but at
-> the same time we should be mindful about it and try to avoid enabling it
-> if feasible.
-
-Right. And initial versions of this series did not use SQE128. But as we 
-moved towards passing more comprehensive PI information, first SQE was 
-not enough. And we thought to make use of SQE128 rather than taking 
-copy_from_user cost.
-
- > 2. This API hard codes io_uring_meta_pi into the extended part of the
-> SQE. If we want to add another feature it'd need to go after the meta
-> struct. SQE256?
-
-Not necessarily. It depends on how much extra space it needs for another 
-feature. To keep free space in first SQE, I chose to place PI in the 
-second one. Anyone requiring 20b (in v6) or 18b (in v5) space, does not 
-even have to ask for SQE128.
-For more, they can use leftover space in second SQE (about half of 
-second sqe will still be free). In v5, they have entire second SQE if 
-they don't want to use PI.
-If contiguity is a concern, we can move all PI bytes (about 32b) to the 
-end of second SQE.
-
-
- > And what if the user doesn't need PI but only the second
-> feature?
-
-Not this version, but v5 exposed meta_type as bit flags.
-And with that, user will not pass the PI flag and that enables to use 
-all the PI bytes for something else. We will have union of PI with some 
-other info that is known not to co-exist.
-
-> In short, the uAPI need to have a clear vision of how it can be used
-> with / extended to multiple optional features and not just PI.
+> I will release the syzbot report and this fix :
 > 
-> One option I mentioned before is passing a user pointer to an array of
-> structures, each would will have the type specifying what kind of
-> feature / meta information it is, e.g. META_TYPE_PI. It's not a
-> complete solution but a base idea to extend upon. I separately
-> mentioned before, if copy_from_user is expensive we can optimise it
-> with pre-registering memory. I think Jens even tried something similar
-> with structures we pass as waiting parameters.
+> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+> index 65ec660c2960..e19aab1fccca 100644
+> --- a/lib/iov_iter.c
+> +++ b/lib/iov_iter.c
+> @@ -1728,6 +1728,10 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
+>                 (*pages)[k++] = bv.bv_page;
+>                 size += bv.bv_len;
 > 
-> I didn't read through all iterations of the series, so if there is
-> some other approach described that ticks the boxes and flexible
-> enough, I'd be absolutely fine with it.
+> +               if (size > maxsize) {
+> +                       size = maxsize;
+> +                       break;
+> +               }
+>                 if (k >= maxpages)
+>                         break;
 
-Please just read v5. I think it ticks as many boxes as possible without 
-having to resort to copy_from_user.
+Thanks Eric, I've applied your patch.
 
+-- 
+Jens Axboe
