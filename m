@@ -1,238 +1,98 @@
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1FE14B965;
-	Sat,  2 Nov 2024 07:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F9282890
+	for <linux-block@vger.kernel.org>; Sat,  2 Nov 2024 14:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730533186; cv=none; b=gJtxArTe4beEMX+/Q6HuEnFmadM5nHbXcegQ+pBuwkKg9ED5X32SyD+/7FQCPFxUfXJqdlOs0b4ZH7fFTzczfLyNf1X1d6tx2ataoTuXlbo2ctN0Lk4eTyudZGl3wodhKTnrnUgSc5PeyM6IOnkyQgVqxpQPqUn/lJvcMrt1QWM=
+	t=1730558724; cv=none; b=QFaQqlSZyBlBfYFRmccjsu4mWkRX29cZ2b3sPYjFlmXIlh+qWyHOQIXyw5PLcLfISXMotdmzx3dhGgan8noR8ll5uOl0M3EEYftsDL5m4JvAoSRuU37GOV41/RmdZm5r3TOf40lOPt13k38ZDXvhVk3Do85FNmshuti9TSubGJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730533186; c=relaxed/simple;
-	bh=PEb7dEPLpsiEUBwEV+omdt0TcIQ9CKXJLt8jWJGdcI8=;
+	s=arc-20240116; t=1730558724; c=relaxed/simple;
+	bh=NR4/lJyYcVmDmEfs1LZZtR3UCu292JMRe6HTYN9c2cA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b3IJgndS2Kga1Fkik6BJ6tfOkZ2fDKA96s6myoTn1Mm6gKWObpPPX8OmT9Hqq87PtB/qxa3SJ+B3+YvRuoyH0EzfCh8E0NEHM5zAAt4NucDup5ZXRDQ9LwSS/YA9PFYOQkkl993QabRTR9A/nGznqP8AKd719iIl2SUZtevn7Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Vo9PwtDe; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 In-Reply-To:Content-Type; b=gOB2sHjUST6OtUikB0wyOSN5emhl0MxuQjxzVoC4WhBVaE/m26L81vEnLkIvRk8a/+TqV918cP2+RehudpNOec87j0ws+4DkRCHrOYagoO96uSyLkNt39V/V9QxMkq8QXcInE/HYCO2H3YZ3Qo6ZzJ+1ysqx4w5WXGCQ2DLbmlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rkGXyjn0; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Vo9PwtDe"
-Message-ID: <f80e7b54-b897-4df2-a49d-bc6012640a8a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730533181;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zkq8x4dmz9yfUFHPf0EELUUQUn7E8nglf4dRQUS+EMY=;
-	b=Vo9PwtDerSGdplleUNX0Y/p+JDHIf70BdVvazCyN6y7vBeSmJN/2zQyKwdwVLMDJ75gcUi
-	p2dyDGNKJmn61rctVMXgRmkGSEuGDVdgsPLZmNxceQZmMQrgLWD8jMvyZRZxdxYdGOxMmE
-	AmgT0wss4pgZ2ZNAb8fYVAZQLqSC69g=
-Date: Sat, 2 Nov 2024 08:39:35 +0100
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rkGXyjn0"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-720be2b27acso2215967b3a.0
+        for <linux-block@vger.kernel.org>; Sat, 02 Nov 2024 07:45:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730558722; x=1731163522; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Lw5gpO69AvE6tiialPAqMUca5KLxdrCooMsgVemIQNY=;
+        b=rkGXyjn0ysINAjToN9f7aBpS8FsE0L+nNjxEgaltqJxCGMVY7qMMQgIRCR8HFcTrKX
+         K3476mBPSTKaEGlIbxTKie9a1p3gF71aeWfceE4WHmB7Woweu6Jtny+SRPju3fGUtP6q
+         rXVharK9/8tGhGr2SHN2AO215E80m+YW9ROUQ6kzPexX81f0BX4T71WBOQoK9xrXQjCk
+         GC0Ihs562n1J8pXGo5PZS8jIyarA4B6+mHYgf4tUoWh8XTrzY98T/AbRVOY0aoJlaO1U
+         uTem3+T1M48wUKm9ig/aIYAEVcNBqo7NVGS4VkO3KnFm+2439g33O0DorCa15Ac6vfbb
+         JYzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730558722; x=1731163522;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lw5gpO69AvE6tiialPAqMUca5KLxdrCooMsgVemIQNY=;
+        b=xR85QwfANQvpU9IOrnTwSNO2Z8ywvBedXF2v6FDmm/v729ClmfFZP5bY5NKDdIV7B2
+         3bKSjXj1jDxzTWhWKk5fEZrCoD7eH4toWAB+CiK5Xo7C6Nugor+PSDcbI3ecVaSP2swX
+         rzlRZ7mO4B0GLHFIFf822ZBDRvmX+9joPFolcE3o4uha9rsO5uQ5xDOcc86utM3IBCtJ
+         c5Rfj20XBfTVNTQ0u5caYFUZLBABABK2RsQt52G+nT4BxXKoYQh0Zlfick4LEqJtRKZm
+         K2NMFy2PcGvTmjf6sQK6SXCrVVxYwXPwum1WNU/pqak7/mfgx67F4bYLrjlLUdO8/YBM
+         E3hA==
+X-Forwarded-Encrypted: i=1; AJvYcCVa7b8ZWxgxX1c2Eicl96+gis8XAdkcM7sGsOK5jYDH8GPi3/gMJ9hJBDxByJFagWOjDWUWjk8zpK9GCw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWlyAr3vI7wa4uvppkAShRrBGG3YSneyDVGb9+p7GMhDyiez/X
+	RwUT5ww2BjcJTQNKeM6GLD6NcuYJb0bmhtZoxpasD0y7oUMXCMl6BYv6+dr4r80=
+X-Google-Smtp-Source: AGHT+IHNiDASTJSpVgC71p+4nUFyInfeTb1rctdvtTVempQa22fUIdNtOiI46RlOrj9alt2VHzotew==
+X-Received: by 2002:a05:6a00:9aa:b0:71e:5b0e:a5e4 with SMTP id d2e1a72fcca58-720b9ddc8f1mr14464634b3a.27.1730558722101;
+        Sat, 02 Nov 2024 07:45:22 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1b8d2fsm4227197b3a.9.2024.11.02.07.45.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 Nov 2024 07:45:21 -0700 (PDT)
+Message-ID: <801bf877-542e-46ed-a13c-bfc8bf133bd1@kernel.dk>
+Date: Sat, 2 Nov 2024 08:45:20 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH 2/7] block: don't merge different kinds of P2P
- transfers in a single bio
-To: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
-Cc: Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
- Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
- iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-References: <cover.1730037261.git.leon@kernel.org>
- <34d44537a65aba6ede215a8ad882aeee028b423a.1730037261.git.leon@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <34d44537a65aba6ede215a8ad882aeee028b423a.1730037261.git.leon@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] lib/iov_iter: fix bvec iterator setup
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>, Eric Dumazet <edumazet@google.com>,
+ syzbot+71abe7ab2b70bca770fd@syzkaller.appspotmail.com
+References: <20241102014211.348731-1-ming.lei@redhat.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241102014211.348731-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-在 2024/10/27 15:21, Leon Romanovsky 写道:
-> From: Christoph Hellwig <hch@lst.de>
+On 11/1/24 7:42 PM, Ming Lei wrote:
+> .bi_size of bvec iterator should be initialized as real max size for
+> walking, and .bi_bvec_done just counts how many bytes need to be
+> skipped in the 1st bvec, so .bi_size isn't related with .bi_bvec_done.
 > 
-> To get out of the dma mapping helpers having to check every segment for
-> it's P2P status, ensure that bios either contain P2P transfers or non-P2P
-> transfers, and that a P2P bio only contains ranges from a single device.
+> This patch fixes bvec iterator initialization, and the inner `size`
+> check isn't needed any more, so revert Eric Dumazet's commit
+> 7bc802acf193 ("iov-iter: do not return more bytes than requested in
+> iov_iter_extract_bvec_pages()").
 > 
-> This means we do the page zone access in the bio add path where it should
-> be still page hot, and will only have do the fairly expensive P2P topology
-> lookup once per bio down in the dma mapping path, and only for already
-> marked bios.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Fixes: e4e535bff2bc ("iov_iter: don't require contiguous pages in iov_iter_extract_bvec_pages")
+> Reported-by: syzbot+71abe7ab2b70bca770fd@syzkaller.appspotmail.com
+> Tested-by: syzbot+71abe7ab2b70bca770fd@syzkaller.appspotmail.com
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->   block/bio.c               | 36 +++++++++++++++++++++++++++++-------
->   block/blk-map.c           | 32 ++++++++++++++++++++++++--------
->   include/linux/blk_types.h |  2 ++
->   3 files changed, 55 insertions(+), 15 deletions(-)
+> Hi Jens,
 > 
-> diff --git a/block/bio.c b/block/bio.c
-> index 2d3bc8bfb071..943a6d78cb3e 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -928,8 +928,6 @@ static bool bvec_try_merge_page(struct bio_vec *bv, struct page *page,
->   		return false;
->   	if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
->   		return false;
-> -	if (!zone_device_pages_have_same_pgmap(bv->bv_page, page))
-> -		return false;
->   
->   	*same_page = ((vec_end_addr & PAGE_MASK) == ((page_addr + off) &
->   		     PAGE_MASK));
-> @@ -993,6 +991,14 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
->   	if (bio->bi_vcnt > 0) {
->   		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
->   
-> +		/*
-> +		 * When doing ZONE_DEVICE-based P2P transfers, all pages in a
-> +		 * bio must be P2P pages from the same device.
-> +		 */
-> +		if ((bio->bi_opf & REQ_P2PDMA) &&
-> +		    !zone_device_pages_have_same_pgmap(bv->bv_page, page))
-> +			return 0;
-> +
->   		if (bvec_try_merge_hw_page(q, bv, page, len, offset,
->   				same_page)) {
->   			bio->bi_iter.bi_size += len;
-> @@ -1009,6 +1015,9 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
->   		 */
->   		if (bvec_gap_to_prev(&q->limits, bv, offset))
->   			return 0;
-> +	} else {
-> +		if (is_pci_p2pdma_page(page))
-> +			bio->bi_opf |= REQ_P2PDMA | REQ_NOMERGE;
->   	}
->   
->   	bvec_set_page(&bio->bi_io_vec[bio->bi_vcnt], page, len, offset);
-> @@ -1133,11 +1142,24 @@ static int bio_add_page_int(struct bio *bio, struct page *page,
->   	if (bio->bi_iter.bi_size > UINT_MAX - len)
->   		return 0;
->   
-> -	if (bio->bi_vcnt > 0 &&
-> -	    bvec_try_merge_page(&bio->bi_io_vec[bio->bi_vcnt - 1],
-> -				page, len, offset, same_page)) {
-> -		bio->bi_iter.bi_size += len;
-> -		return len;
-> +	if (bio->bi_vcnt > 0) {
-> +		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
-> +
-> +		/*
-> +		 * When doing ZONE_DEVICE-based P2P transfers, all pages in a
-> +		 * bio must be P2P pages from the same device.
-> +		 */
-> +		if ((bio->bi_opf & REQ_P2PDMA) &&
-> +		    !zone_device_pages_have_same_pgmap(bv->bv_page, page))
-> +			return 0;
-> +
-> +		if (bvec_try_merge_page(bv, page, len, offset, same_page)) {
-> +			bio->bi_iter.bi_size += len;
-> +			return len;
-> +		}
-> +	} else {
-> +		if (is_pci_p2pdma_page(page))
-> +			bio->bi_opf |= REQ_P2PDMA | REQ_NOMERGE;
->   	}
->   
->   	if (bio->bi_vcnt >= bio->bi_max_vecs)
-> diff --git a/block/blk-map.c b/block/blk-map.c
-> index 0e1167b23934..03192b1ca6ea 100644
-> --- a/block/blk-map.c
-> +++ b/block/blk-map.c
-> @@ -568,6 +568,7 @@ static int blk_rq_map_user_bvec(struct request *rq, const struct iov_iter *iter)
->   	const struct queue_limits *lim = &q->limits;
->   	unsigned int nsegs = 0, bytes = 0;
->   	struct bio *bio;
-> +	int error;
->   	size_t i;
->   
->   	if (!nr_iter || (nr_iter >> SECTOR_SHIFT) > queue_max_hw_sectors(q))
-> @@ -588,15 +589,30 @@ static int blk_rq_map_user_bvec(struct request *rq, const struct iov_iter *iter)
->   	for (i = 0; i < nr_segs; i++) {
->   		struct bio_vec *bv = &bvecs[i];
->   
-> -		/*
-> -		 * If the queue doesn't support SG gaps and adding this
-> -		 * offset would create a gap, fallback to copy.
-> -		 */
-> -		if (bvprvp && bvec_gap_to_prev(lim, bvprvp, bv->bv_offset)) {
-> -			blk_mq_map_bio_put(bio);
-> -			return -EREMOTEIO;
-> +		error = -EREMOTEIO;
-> +		if (bvprvp) {
-> +			/*
-> +			 * If the queue doesn't support SG gaps and adding this
-> +			 * offset would create a gap, fallback to copy.
-> +			 */
-> +			if (bvec_gap_to_prev(lim, bvprvp, bv->bv_offset))
-> +				goto put_bio;
-> +
-> +			/*
-> +			 * When doing ZONE_DEVICE-based P2P transfers, all pages
-> +			 * in a bio must be P2P pages, and from the same device.
-> +			 */
-> +			if ((bio->bi_opf & REQ_P2PDMA) &&
-> +			    zone_device_pages_have_same_pgmap(bvprvp->bv_page,
-> +					bv->bv_page))
-> +				goto put_bio;
-> +		} else {
-> +			if (is_pci_p2pdma_page(bv->bv_page))
-> +				bio->bi_opf |= REQ_P2PDMA | REQ_NOMERGE;
->   		}
-> +
->   		/* check full condition */
-> +		error = -EINVAL;
->   		if (nsegs >= nr_segs || bytes > UINT_MAX - bv->bv_len)
->   			goto put_bio;
->   		if (bytes + bv->bv_len > nr_iter)
-> @@ -611,7 +627,7 @@ static int blk_rq_map_user_bvec(struct request *rq, const struct iov_iter *iter)
->   	return 0;
->   put_bio:
->   	blk_mq_map_bio_put(bio);
-> -	return -EINVAL;
-> +	return error;
->   }
->   
->   /**
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index dce7615c35e7..94cf146e8ce6 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -378,6 +378,7 @@ enum req_flag_bits {
->   	__REQ_DRV,		/* for driver use */
->   	__REQ_FS_PRIVATE,	/* for file system (submitter) use */
->   	__REQ_ATOMIC,		/* for atomic write operations */
-> +	__REQ_P2PDMA,		/* contains P2P DMA pages */
->   	/*
->   	 * Command specific flags, keep last:
->   	 */
-> @@ -410,6 +411,7 @@ enum req_flag_bits {
->   #define REQ_DRV		(__force blk_opf_t)(1ULL << __REQ_DRV)
->   #define REQ_FS_PRIVATE	(__force blk_opf_t)(1ULL << __REQ_FS_PRIVATE)
->   #define REQ_ATOMIC	(__force blk_opf_t)(1ULL << __REQ_ATOMIC)
-> +#define REQ_P2PDMA	(__force blk_opf_t)(1ULL << __REQ_P2PDMA)
+> If possible, please merge this one with Eric's commit.
 
-#define REQ_P2PDMA	(__force blk_opf_t)BIT_ULL(__REQ_P2PDMA)
+I can just swap them out.
 
-Use BIT_ULL instead of direct left shit.
-
-Zhu Yanjun
-
->   
->   #define REQ_NOUNMAP	(__force blk_opf_t)(1ULL << __REQ_NOUNMAP)
->   
-
+-- 
+Jens Axboe
