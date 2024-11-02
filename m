@@ -1,110 +1,63 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125604C66
-	for <linux-block@vger.kernel.org>; Sat,  2 Nov 2024 01:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BB71F61C
+	for <linux-block@vger.kernel.org>; Sat,  2 Nov 2024 01:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730511749; cv=none; b=uhqxrBFrz8IzFMVMg6bmL27ms1YYT541oM4CPLPbiOFAtNY8u6szKiAqvin6xg+RihQyxA9pJBVLdQkhWTLkptWl7o7L7lvMPy76IRd5bDVoOZ/+OhrGjoCIBQA4TA4KyapcflS/CUPQwO37cSUjTARJUYwcnIGtU4aBMDxgjXc=
+	t=1730512060; cv=none; b=CM9RpDbBYetF8rmiVDSuD95AyZkRMBZ2BSTk0mbo9AO4ksSL1W9AxQMqvFdSYW/6b1oU8MUAsL8iG5BIW1K33Ne8v290JczX52xHty07NGG+GxChVdrM3vYl7QkQIsy7p9mmxqoG6DcktuvLnkyUiT3B5gan6Cq2WGEIX8hUBEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730511749; c=relaxed/simple;
-	bh=H3cAD0Nq97TSeNvnDXCm1EZEjANrh6SrZz5rOUUVVW0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H1aUzTuSljaR6kn8VA3v1fAkJU4x3QP1bujTLaM+H79sXpQEI42PceDtK3JenZWpZSeA+SWWpKKTqb7o0LGB2ep8fpuvF91iSvt0CB9WjYWXjtjWnSsrx4eYQp05bQaI/4U1cA8KIkhrZ/SBUKR49ZYWz86KC0UGDdCErCi+cNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LUwRuB5k; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1730512060; c=relaxed/simple;
+	bh=XQ52TdvjhOE5Z16NVpv2GQDzhUrfftBb11+3DSZezWs=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=iru6zLcn8OTrEUsQVzZpk7wxqHLP2UdXlNBToA/lXE9u+nPJCJyWF/y/z3lulqbUrVHW4IftyQI9ZKsP/zUbqaKVEnWhgGyJefbF6VBJ5FhaKujvRDnOw0NqGM3KjVgRn6zpJqZaNvjGvb5uGoucWGJkwDo+9xviPZA5Nj6uVAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ugPkBjwc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LUwRuB5k"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730511745;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=xFNZY3dE2yh7jXFMNid4zOc75gX/aeO64Mu8f9zton4=;
-	b=LUwRuB5kcNxDAPSVD4ByJJOgB3+fxJ621RbvXcDDVSAtSdGvbmJFdIWE3e4GVULtEvx+iB
-	YOyxybxByoPaoJQ6vkYDofAyFcaY5kx7Ji4Kpsxt3lp8ATkkp/yz7YiiKcNWnEUwXjdu0/
-	nlcjcStmNiVIsb7JUGAtkQ6lv2pQ1SU=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-680-GWL25e0AMgKfYQF4bTLy3w-1; Fri,
- 01 Nov 2024 21:42:24 -0400
-X-MC-Unique: GWL25e0AMgKfYQF4bTLy3w-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 353D919560A5;
-	Sat,  2 Nov 2024 01:42:23 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.4])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B44E31956052;
-	Sat,  2 Nov 2024 01:42:21 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	syzbot+71abe7ab2b70bca770fd@syzkaller.appspotmail.com
-Subject: [PATCH] lib/iov_iter: fix bvec iterator setup
-Date: Sat,  2 Nov 2024 09:42:11 +0800
-Message-ID: <20241102014211.348731-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ugPkBjwc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17E08C4CECD;
+	Sat,  2 Nov 2024 01:47:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730512060;
+	bh=XQ52TdvjhOE5Z16NVpv2GQDzhUrfftBb11+3DSZezWs=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=ugPkBjwc0DNjFtkNyBWII4YQxyjXWGkqJBlH9e4XYI8cGfq3aAoRiuWmfRmLo0ZqM
+	 WvC0DyUm27FBU3oDziGuO35Quw+ERejgxcXR7F9RMv3IBj6QNTjY2UIxAawxw9xQvR
+	 ll6/GuNIJYnsOSov39ewRbD3zhlukmPkeu31fazHEcIBkigtH9jeoIkBlco/rlDtva
+	 FRrzruq7cO//zONJHehWrYOTv1ocvJmHWn1nfNn9ZS1HFgGJs0VCLvWMGQ6zM6DVF7
+	 fkVhRwTVb5qjpFJmb3kAE6Pkq07Mvnv0yQVAY+pL+wnN1A1OCaGk3W9BgYdGIWLjqE
+	 dEx5M1k6m7WLw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CE13AB8A90;
+	Sat,  2 Nov 2024 01:47:49 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.12-rc6
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <89bedd77-813e-4b5d-9ee6-87c97bd9b3ba@kernel.dk>
+References: <89bedd77-813e-4b5d-9ee6-87c97bd9b3ba@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <89bedd77-813e-4b5d-9ee6-87c97bd9b3ba@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.12-20241101
+X-PR-Tracked-Commit-Id: d0c6cc6c6a6164a853e86206309b5a5bc5e3e72b
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: f4a1e8e36973e2034c9eac2b3538470f8b2748a4
+Message-Id: <173051206817.2889628.8127622897465777102.pr-tracker-bot@kernel.org>
+Date: Sat, 02 Nov 2024 01:47:48 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-.bi_size of bvec iterator should be initialized as real max size for
-walking, and .bi_bvec_done just counts how many bytes need to be
-skipped in the 1st bvec, so .bi_size isn't related with .bi_bvec_done.
+The pull request you sent on Fri, 1 Nov 2024 12:12:08 -0600:
 
-This patch fixes bvec iterator initialization, and the inner `size`
-check isn't needed any more, so revert Eric Dumazet's commit
-7bc802acf193 ("iov-iter: do not return more bytes than requested in
-iov_iter_extract_bvec_pages()").
+> git://git.kernel.dk/linux.git tags/block-6.12-20241101
 
-Cc: Eric Dumazet <edumazet@google.com>
-Fixes: e4e535bff2bc ("iov_iter: don't require contiguous pages in iov_iter_extract_bvec_pages")
-Reported-by: syzbot+71abe7ab2b70bca770fd@syzkaller.appspotmail.com
-Tested-by: syzbot+71abe7ab2b70bca770fd@syzkaller.appspotmail.com
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-Hi Jens,
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/f4a1e8e36973e2034c9eac2b3538470f8b2748a4
 
-If possible, please merge this one with Eric's commit.
+Thank you!
 
-
- lib/iov_iter.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
-
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 3026bdcb4738..4a54c7af62c0 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1700,7 +1700,7 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
- 		skip = 0;
- 	}
- 	bi.bi_idx = 0;
--	bi.bi_size = maxsize + skip;
-+	bi.bi_size = maxsize;
- 	bi.bi_bvec_done = skip;
- 
- 	maxpages = want_pages_array(pages, maxsize, skip, maxpages);
-@@ -1724,10 +1724,6 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
- 		(*pages)[k++] = bv.bv_page;
- 		size += bv.bv_len;
- 
--		if (size >= maxsize) {
--			size = maxsize;
--			break;
--		}
- 		if (k >= maxpages)
- 			break;
- 
 -- 
-2.46.0
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
