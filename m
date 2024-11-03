@@ -1,261 +1,161 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5762F189BA0
-	for <linux-block@vger.kernel.org>; Sun,  3 Nov 2024 22:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE312154C08;
+	Sun,  3 Nov 2024 22:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730672371; cv=none; b=MbXq6zupQwe7JjlhAuvzkxK+BuVKDSLLldYMBMS3AChrT9UWlIkVjDXUHS/HL42dvz1JFxn20RkOcSy+hqFzd0afXfz4aLficiYEa5AEAr4rHuApPReL1dUjD541eCbF10vpcCdeQe3D8pPzz/RfG7ac8tfQLqnpmmwvcPmyd28=
+	t=1730673083; cv=none; b=FaTEUNfIkY29fK/ziI4reG7kZdmfyapZ97y4DWAMwY4S34/wOZT8CYsm3uSpNOnxcaJf74zfKwK3CGRdpqPfgFWSmHZtDb0ejC18DuwNjg45pU5GhXvhmOWIbn4zU/BXa0KVtxhA7uD3ifRc2DcO5sha0HgnpZpNL5mJQWaLQTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730672371; c=relaxed/simple;
-	bh=bO9OJotYEzM2+vVRB5il0EnhrqFe5lgqyaf6ZsQf/Q4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=VpMDOv/eoPowFxyXyb5rJPhcsDzMy6EeUE1Hwgn82lJRh4AZ+r6rvQKDMiyHJabo6HF+JWp9BZc1oV+BNu8W1JqSs3IR15vxZbC7vyrz+sR/amaXLIm9+G2MqqUG4XbogQ142l9ahauCxZ1s5znju/zxIM3rl7mZmi//qTKrqSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a3c90919a2so39657035ab.0
-        for <linux-block@vger.kernel.org>; Sun, 03 Nov 2024 14:19:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730672368; x=1731277168;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1730673083; c=relaxed/simple;
+	bh=hhtn9HCvafeK3eDppZtxCQW/RpzVXm7nW+bUvrH5ceI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TtezmtpBTZP+zn10414TNj9zLB8TqDD3m9BrWuPoSeQesVOI9oGQPEGP4h4ntEh8sGmT4IcitKeICNZr7Uz20SS66yU9xMNb2X6iamaHC1gWAkBjh9cu4SzUXQIIaf6MTR3URQEZxyvE+1QatA08i1EZznRZqZ1V1wvr1ZGFSu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TVdPtdAz; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TVdPtdAz"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43159c9f617so27808955e9.2;
+        Sun, 03 Nov 2024 14:31:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730673080; x=1731277880; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=NZIgSmxRYm8E+xa5d7Au2QP17BqgW2Q7/r/PyOGlTVo=;
-        b=Ncu15pcHIAvSJGOPBHhba5uynhnuzKUuHNhwhhCcOA6ZJtn/zvSL2v2+Ext+ZsiSgs
-         2iorw6UiQGgN41BjMm7OdL1XyXzI6C+XLNIuMdJYdM21TSsrkVwhHvwnSvkSv5HgWAI1
-         6tIHlOoNI4yq9CDOh9V5VqFUIKRN8BvkWp2k8CS5A24bs3l/eovDYyy+uZFdptYx858L
-         Kvxw+FVA6UO5uOQ3rFDy1fYP2NFrx5u2MLcutI1mMos87KsHHEfoYSa6+hIMThvTgsOr
-         CrpaqFRZGc6pvoTFSU2sPzbURX+nez9KtyO4ScuALdWAqlc7tvxAZ1jRyQuP1COZEW04
-         mGBw==
-X-Forwarded-Encrypted: i=1; AJvYcCXJEwYeJOpPr7pTdG+9lszMa+pur3IJZu5pPmrxJ5sXAwXulyVem8DczSZQYviRm/aq+c0lEPoE8v8KqA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3MtjsyXTHd4Wnu0AFRLEKll66CgNiqwzPepOSPMxO9q6YQpfh
-	Yv1ZP9862T5k0OheCrZfaL8fFsF90U66NezkG3IH70/Ys9Ubi+xivRCtiZmkzQvRdn08TX73SU3
-	tknPMXoY76pok3s6e6M0XmqtvCo3n3e4Qv/9odHJD8Vsbb3wi06ixCaA=
-X-Google-Smtp-Source: AGHT+IGEcWcWl7bGZfPIF94SJSQTObO7kdMGWvP5SyTeJURLHfWp1YQ01L634BbBAjTVcWBkYfIv5i0qVIi4aog4SyE3l7Su2C0t
+        bh=XGrK+KTHRBvs0q/y6HvC4FviTAm+itFMEXAEERpVRz0=;
+        b=TVdPtdAzPgL9R0FcnCDY+wXNLHTBi8G8eZlPKNHWUlnLTiembI8LqmKzieAJGsTCyh
+         NFUV4EYFNN+/QZwGg7LuBKDEo7w/xWdFnDWNQT0MhEzs+KZG/yrARtAUSHWTfPhKWCCu
+         LDJIXGQhk5lrPV74Tgn3l7DYjx0tdZTw95MCYGqsxpJPE/UN2BIsNtpjjmQW3WVBX1Pq
+         fkusutaxBAUsTipFZmmdA29fZYCSfSEKAo9lEKm4m3fOn8ZcBEV/I5dV0N6o0Yi3v2Y8
+         NQixhtdbEIcf4tcbJ/PCmcRozVXiqdSYncsyPOVh/GZFfMP2UZaaT5YEUDjt/u0v5s1i
+         KK4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730673080; x=1731277880;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XGrK+KTHRBvs0q/y6HvC4FviTAm+itFMEXAEERpVRz0=;
+        b=SiYmNzp4ImgZiPnExGOKdHrWCrBnSnYaCvEB8n0Uv1OqZ48G1PP09ig/1py9Pg550U
+         bVukZ2h14gaYe/BNwp08aotcx2EKdXH/grMH40NlGX+894SkAUtZCkBhb6dPA8c1n7k2
+         NP3ir3EpQqoCouBpOytmASh+YuAjiZITGBLz2R5N5tVuNYSHaEk35R2cUBigMgC9JhPo
+         WXss3sa2esbkFwqdYeiCR/cIrdYsK96o8TDOBdMoGfT0HDk5gaXCdH4Xsfb8gT+y7m72
+         HwSckTxR248sE6L8ZwDCpYlfGVRSFhtb68AwLPj6UVvw+AFZMKFpbAkM2FydDvYDoudW
+         q6tw==
+X-Forwarded-Encrypted: i=1; AJvYcCU3AyycmDxQOPELKcm7/yDCQxiLRbnvXeaK1ftY53ENHXETGM/s5vGgW7MuGIaFrlezmePiiX7q2b7lTQw=@vger.kernel.org, AJvYcCXFnHAYdmSbqbiXm1s9bulsqD+z1vbNO7DmwnLlEz1uZpsvWirPnAgdfq5G5aYbfIzdeMt7H2lV4w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5G1z7oUNlzgiRihU6fHtN0+7X7mHTK3fkA5tJG6vM2kHc/vgr
+	VuIc8LsGkQov+L8EULfsNhQQ8js2M+i94FpcyCVBcFBEWppwQ08B
+X-Google-Smtp-Source: AGHT+IFIovAu2JOjQRZyT1MDER7onmVD1Wyw++CyRxJTX4tEceAMw2uubDP/1GC4E5HJ/SWENQlxag==
+X-Received: by 2002:a05:600c:500a:b0:431:561b:b32a with SMTP id 5b1f17b1804b1-4319acb8ce7mr274677125e9.19.1730673080050;
+        Sun, 03 Nov 2024 14:31:20 -0800 (PST)
+Received: from [192.168.42.207] ([85.255.236.151])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7d20sm11661095f8f.7.2024.11.03.14.31.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 03 Nov 2024 14:31:19 -0800 (PST)
+Message-ID: <4802ef4c-84ca-4588-aa34-6f1ffa31ac49@gmail.com>
+Date: Sun, 3 Nov 2024 22:31:25 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:188d:b0:3a6:b360:c6e5 with SMTP id
- e9e14a558f8ab-3a6b360c89amr93253375ab.16.1730672368513; Sun, 03 Nov 2024
- 14:19:28 -0800 (PST)
-Date: Sun, 03 Nov 2024 14:19:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6727f6f0.050a0220.3c8d68.0aa9.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in __submit_bio
-From: syzbot <syzbot+949ae54e95a2fab4cbb4@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ming.lei@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V8 5/7] io_uring: support leased group buffer with
+ REQ_F_GROUP_KBUF
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+ linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
+ Akilesh Kailash <akailash@google.com>
+References: <20241025122247.3709133-1-ming.lei@redhat.com>
+ <20241025122247.3709133-6-ming.lei@redhat.com>
+ <4576f723-5694-40b5-a656-abd1c8d05d62@gmail.com> <ZyGBlWUt02xJRQii@fedora>
+ <bbf2612e-e029-460f-91cf-e1b00de3e656@gmail.com> <ZyGURQ-LgIY9DOmh@fedora>
+ <40107636-651f-47ea-8086-58953351c462@gmail.com> <ZyQpH8ttWAhS9C5G@fedora>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ZyQpH8ttWAhS9C5G@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 11/1/24 01:04, Ming Lei wrote:
+> On Thu, Oct 31, 2024 at 01:16:07PM +0000, Pavel Begunkov wrote:
+>> On 10/30/24 02:04, Ming Lei wrote:
+>>> On Wed, Oct 30, 2024 at 01:25:33AM +0000, Pavel Begunkov wrote:
+>>>> On 10/30/24 00:45, Ming Lei wrote:
+>>>>> On Tue, Oct 29, 2024 at 04:47:59PM +0000, Pavel Begunkov wrote:
+>>>>>> On 10/25/24 13:22, Ming Lei wrote:
+>>>>>> ...
+>>>>>>> diff --git a/io_uring/rw.c b/io_uring/rw.c
+>>>>>>> index 4bc0d762627d..5a2025d48804 100644
+>>>>>>> --- a/io_uring/rw.c
+>>>>>>> +++ b/io_uring/rw.c
+>>>>>>> @@ -245,7 +245,8 @@ static int io_prep_rw_setup(struct io_kiocb *req, int ddir, bool do_import)
+>>>>>>>      	if (io_rw_alloc_async(req))
+>>>>>>>      		return -ENOMEM;
+>>>>>>> -	if (!do_import || io_do_buffer_select(req))
+>>>>>>> +	if (!do_import || io_do_buffer_select(req) ||
+>>>>>>> +	    io_use_leased_grp_kbuf(req))
+>>>>>>>      		return 0;
+>>>>>>>      	rw = req->async_data;
+>>>>>>> @@ -489,6 +490,11 @@ static bool __io_complete_rw_common(struct io_kiocb *req, long res)
+>>>>>>>      		}
+>>>>>>>      		req_set_fail(req);
+>>>>>>>      		req->cqe.res = res;
+>>>>>>> +		if (io_use_leased_grp_kbuf(req)) {
+>>>>>>
+>>>>>> That's what I'm talking about, we're pushing more and
+>>>>>> into the generic paths (or patching every single hot opcode
+>>>>>> there is). You said it's fine for ublk the way it was, i.e.
+>>>>>> without tracking, so let's then pretend it's a ublk specific
+>>>>>> feature, kill that addition and settle at that if that's the
+>>>>>> way to go.
+>>>>>
+>>>>> As I mentioned before, it isn't ublk specific, zeroing is required
+>>>>> because the buffer is kernel buffer, that is all. Any other approach
+>>>>> needs this kind of handling too. The coming fuse zc need it.
+>>>>>
+>>>>> And it can't be done in driver side, because driver has no idea how
+>>>>> to consume the kernel buffer.
+>>>>>
+>>>>> Also it is only required in case of short read/recv, and it isn't
+>>>>> hot path, not mention it is just one check on request flag.
+>>>>
+>>>> I agree, it's not hot, it's a failure path, and the recv side
+>>>> is of medium hotness, but the main concern is that the feature
+>>>> is too actively leaking into other requests.
+>>> The point is that if you'd like to support kernel buffer. If yes, this
+>>> kind of change can't be avoided.
+>>
+>> There is no guarantee with the patchset that there will be any IO done
+>> with that buffer, e.g. place a nop into the group, and even then you
+> 
+> Yes, here it depends on user. In case of ublk, the application has to be
+> trusted, and the situation is same with other user-emulated storage, such
+> as qemu.
+> 
+>> have offsets and length, so it's not clear what the zeroying is supposed
+>> to achieve.
+> 
+> The buffer may bee one page cache page, if it isn't initialized
+> completely, kernel data may be leaked to userspace via mmap.
+> 
+>> Either the buffer comes fully "initialised", i.e. free of
+>> kernel private data, or we need to track what parts of the buffer were
+>> used.
+> 
+> That is why the only workable way is to zero the remainder in
+> consumer of OP, imo.
 
-syzbot found the following issue on:
+If it can leak kernel data in some way, I'm afraid zeroing of the
+remainder alone won't be enough to prevent it, e.g. the recv/read
+len doesn't have to match the buffer size.
 
-HEAD commit:    f9f24ca362a4 Add linux-next specific files for 20241031
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=17f26630580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=328572ed4d152be9
-dashboard link: https://syzkaller.appspot.com/bug?extid=949ae54e95a2fab4cbb4
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=102632a7980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16749340580000
+So likely leased buffers should come to io_uring already
+initialised, or more specifically it shouldn't contain any data
+that the user space (ublk user space) is not supposed to see.
+The other way is to track what parts of the buffer were actually
+filled.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/eb84549dd6b3/disk-f9f24ca3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/beb29bdfa297/vmlinux-f9f24ca3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8881fe3245ad/bzImage-f9f24ca3.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/61af3e8f2dbd/mount_0.gz
-
-The issue was bisected to:
-
-commit f1be1788a32e8fa63416ad4518bbd1a85a825c9d
-Author: Ming Lei <ming.lei@redhat.com>
-Date:   Fri Oct 25 00:37:20 2024 +0000
-
-    block: model freeze & enter queue as lock for supporting lockdep
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13eafaa7980000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=101afaa7980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17eafaa7980000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+949ae54e95a2fab4cbb4@syzkaller.appspotmail.com
-Fixes: f1be1788a32e ("block: model freeze & enter queue as lock for supporting lockdep")
-
-exFAT-fs (loop0): failed to load upcase table (idx : 0x00012153, chksum : 0x822ffc2e, utbl_chksum : 0xe619d30d)
-======================================================
-WARNING: possible circular locking dependency detected
-6.12.0-rc5-next-20241031-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor382/6007 is trying to acquire lock:
-ffff8881427474e8 (&q->q_usage_counter(io)#17){++++}-{0:0}, at: __submit_bio+0x2c2/0x560 block/blk-core.c:629
-
-but task is already holding lock:
-ffff888034dd00e8 (&sbi->s_lock){+.+.}-{4:4}, at: exfat_create+0x1a2/0x5a0 fs/exfat/namei.c:553
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&sbi->s_lock){+.+.}-{4:4}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
-       exfat_lookup+0x140/0x18f0 fs/exfat/namei.c:701
-       lookup_open fs/namei.c:3573 [inline]
-       open_last_lookups fs/namei.c:3694 [inline]
-       path_openat+0x11a7/0x3590 fs/namei.c:3930
-       do_filp_open+0x235/0x490 fs/namei.c:3960
-       do_sys_openat2+0x13e/0x1d0 fs/open.c:1419
-       do_sys_open fs/open.c:1434 [inline]
-       __do_sys_openat fs/open.c:1450 [inline]
-       __se_sys_openat fs/open.c:1445 [inline]
-       __x64_sys_openat+0x247/0x2a0 fs/open.c:1445
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (&sb->s_type->i_mutex_key#15){++++}-{4:4}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
-       down_write+0x99/0x220 kernel/locking/rwsem.c:1577
-       inode_lock include/linux/fs.h:817 [inline]
-       __generic_file_fsync+0x97/0x1a0 fs/libfs.c:1536
-       exfat_file_fsync+0xf9/0x1d0 fs/exfat/file.c:524
-       __loop_update_dio+0x1a4/0x500 drivers/block/loop.c:204
-       loop_set_status+0x62b/0x8f0 drivers/block/loop.c:1290
-       lo_ioctl+0xcbc/0x1f50
-       blkdev_ioctl+0x57d/0x6a0 block/ioctl.c:693
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:907 [inline]
-       __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&q->q_usage_counter(io)#17){++++}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3161 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3280 [inline]
-       validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
-       __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
-       bio_queue_enter block/blk.h:75 [inline]
-       blk_mq_submit_bio+0x1510/0x2490 block/blk-mq.c:3069
-       __submit_bio+0x2c2/0x560 block/blk-core.c:629
-       __submit_bio_noacct_mq block/blk-core.c:710 [inline]
-       submit_bio_noacct_nocheck+0x4d3/0xe30 block/blk-core.c:739
-       submit_bh fs/buffer.c:2819 [inline]
-       __sync_dirty_buffer+0x23d/0x390 fs/buffer.c:2857
-       exfat_set_volume_dirty+0x5d/0x80 fs/exfat/super.c:124
-       exfat_create+0x1aa/0x5a0 fs/exfat/namei.c:554
-       lookup_open fs/namei.c:3595 [inline]
-       open_last_lookups fs/namei.c:3694 [inline]
-       path_openat+0x1c03/0x3590 fs/namei.c:3930
-       do_filp_open+0x235/0x490 fs/namei.c:3960
-       do_sys_openat2+0x13e/0x1d0 fs/open.c:1419
-       do_sys_open fs/open.c:1434 [inline]
-       __do_sys_openat fs/open.c:1450 [inline]
-       __se_sys_openat fs/open.c:1445 [inline]
-       __x64_sys_openat+0x247/0x2a0 fs/open.c:1445
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &q->q_usage_counter(io)#17 --> &sb->s_type->i_mutex_key#15 --> &sbi->s_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&sbi->s_lock);
-                               lock(&sb->s_type->i_mutex_key#15);
-                               lock(&sbi->s_lock);
-  rlock(&q->q_usage_counter(io)#17);
-
- *** DEADLOCK ***
-
-3 locks held by syz-executor382/6007:
- #0: ffff888034b8a420 (sb_writers#9){.+.+}-{0:0}, at: mnt_want_write+0x3f/0x90 fs/namespace.c:515
- #1: ffff88807733e330 (&sb->s_type->i_mutex_key#15){++++}-{4:4}, at: inode_lock include/linux/fs.h:817 [inline]
- #1: ffff88807733e330 (&sb->s_type->i_mutex_key#15){++++}-{4:4}, at: open_last_lookups fs/namei.c:3691 [inline]
- #1: ffff88807733e330 (&sb->s_type->i_mutex_key#15){++++}-{4:4}, at: path_openat+0x89a/0x3590 fs/namei.c:3930
- #2: ffff888034dd00e8 (&sbi->s_lock){+.+.}-{4:4}, at: exfat_create+0x1a2/0x5a0 fs/exfat/namei.c:553
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 6007 Comm: syz-executor382 Not tainted 6.12.0-rc5-next-20241031-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2074
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2206
- check_prev_add kernel/locking/lockdep.c:3161 [inline]
- check_prevs_add kernel/locking/lockdep.c:3280 [inline]
- validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
- __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
- bio_queue_enter block/blk.h:75 [inline]
- blk_mq_submit_bio+0x1510/0x2490 block/blk-mq.c:3069
- __submit_bio+0x2c2/0x560 block/blk-core.c:629
- __submit_bio_noacct_mq block/blk-core.c:710 [inline]
- submit_bio_noacct_nocheck+0x4d3/0xe30 block/blk-core.c:739
- submit_bh fs/buffer.c:2819 [inline]
- __sync_dirty_buffer+0x23d/0x390 fs/buffer.c:2857
- exfat_set_volume_dirty+0x5d/0x80 fs/exfat/super.c:124
- exfat_create+0x1aa/0x5a0 fs/exfat/namei.c:554
- lookup_open fs/namei.c:3595 [inline]
- open_last_lookups fs/namei.c:3694 [inline]
- path_openat+0x1c03/0x3590 fs/namei.c:3930
- do_filp_open+0x235/0x490 fs/namei.c:3960
- do_sys_openat2+0x13e/0x1d0 fs/open.c:1419
- do_sys_open fs/open.c:1434 [inline]
- __do_sys_openat fs/open.c:1450 [inline]
- __se_sys_openat fs/open.c:1445 [inline]
- __x64_sys_openat+0x247/0x2a0 fs/open.c:1445
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd567e88559
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 21 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe5ed3b418 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 00007fd567ed10aa RCX: 00007fd567e88559
-RDX: 000000000000275a RSI: 0000000020000080 RDI: 00000000ffffff9c
-RBP: 0000000000000000 R08: 0023706f6f6c2f76 R09: 00007ffe5ed3b450
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffe5ed3b43c
-R13: 0000000000000028 R14: 431bde82d7b634db R15: 00007ffe5ed3b470
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+Pavel Begunkov
