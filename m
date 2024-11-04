@@ -1,192 +1,114 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A062161FD8;
-	Mon,  4 Nov 2024 01:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCA57E583;
+	Mon,  4 Nov 2024 01:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730682483; cv=none; b=Z4jha/YtKWQ6FU0Up2wDRUo5kO6uOJu9YCerhAaX6YDq313eiifblP4s6t+ltHGrebykC0QDFfrthGXZUCWQ2G7b2/SqjOG2iSzkg0cFjzbRjB2Yl3n+w1D+6dL16vytuhYaJBWeQpFwlI2olJEP1LMmuC+xS+92GlPD0EzmMmw=
+	t=1730682728; cv=none; b=ZOHSHYp7rEJH4uH0A5x+lRMXYjyDjNrVdSkmhf6TOnKNdkmKuff8se7iMEcNenyEDUq8400DiP702jBLniq4pg/uVSd9pW+R3mljgR9Ayi2VZyZ21f5+i0hUQl+4EHDOpHQ0rV3BlfZkXAVSq26eWtEJfwwN36rKFXkkT+qq8e8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730682483; c=relaxed/simple;
-	bh=s2yGMAkH/4YtbPPz4G6fiXcbcU0OquZs4d2LcQGE3k4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M9CUkVf2GeAFV4LKqqOCxXCGCHAdThuyI6T0thh34LMQNEA/mvs8ZapwumSXjz2lqNZ5wFEU6AqN00R3AJRxGl4qpwLZyBsm2B6mGFhMeQryX43JRi3X6TDIGvXzlOA2UKOTzH+2BMmI37EJyvNPcT+ParmBLB6AIX7oVbqfhXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LZ8moKd2; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1730682728; c=relaxed/simple;
+	bh=pBJCQW4Oet+UlOfycbMG2VqQdA0DEcW5Cw/2nr0Junc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bZoChny5pPdgDublGvYMSE7piH5FvwAZmM5hAYjoJX8URTqPzmqVvq3j13Oo0a6LLTR39CsCh7f0OlhKgD22aF5BDKqzMA5LmOLRhDzQQKXSxpJGtt8mzQZfGeK9UgeDWEqjn9IA3hoSHeAYNgmjy+CPHCEFowiQY+/qyZkYm4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bLSACuN3; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LZ8moKd2"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-431688d5127so28426975e9.0;
-        Sun, 03 Nov 2024 17:08:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730682480; x=1731287280; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=elUM2cPNXhblAteuQ5GGbCd8S7We8l81+E3gqzNbeUg=;
-        b=LZ8moKd2mSBABmnMxYVI/33MGU0bB8Qpj2pixTqN0ngEIZ5DTkxpa8nUx8h8eP1xdF
-         SQdLQHCKJz2FWuvNIBUmUnIKpLi7o1lsbfR0t10/QKwAzRO2g0Dzs2AKqhaUreGblElG
-         JN0EYOmbcr7iZ0JvZASgxI0k5qoMnc5ha/whu3cAJ3G5xrk/mk341AGbqgq5iY0UmeMV
-         0Sxut7DpjPkSWUiBhc4Gp0ZNQFfHI3D75marJNgYU4/tISVVnKh73Wu5Ijicv5UUqkxP
-         ry1Qs8UhlWh278AI+U8lHUtK04RJKAqrDPSwnydOISNDH5/Djw0UGWmVWikXA97YZYSb
-         NgOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730682480; x=1731287280;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=elUM2cPNXhblAteuQ5GGbCd8S7We8l81+E3gqzNbeUg=;
-        b=PgYtNmYYthbjCz0Rk6FIpJ8eLfUCfQaBkGOfRuw1gy5B86lQ/kp6Q2dBT4KLqGPDwc
-         XhMitME3soEnf+6OGQyi2uGlueyWVVJ+QRtIJF8MQndIbyI4uFmPOtPRaYn1t8HHSbLt
-         2Z66svPUhd51xGOCPWFxn2C5W37VndjHpYiljlduAsClAZ1KV1cVpvW81OcSaSYt9am/
-         ApbjR0tODHv3JACFK5a68liKUJ99q4LmkIEHjEpgw5SAy4+xd1jr4yAUXKg1qKez8vS8
-         83xCFNVoG22liC6EJEAPDknc4z8/FHZ1q/SmwJdDUwR7zjBJx39C0W27Gfqv9GjneHoS
-         9rAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWxWrlJCIlx6u66id9QjDZy8zTzz+4ok0xsWyT851Jwkvif8E6Lgy299g8G5RW3D7izhf61JUXC+g==@vger.kernel.org, AJvYcCX7Bjs2UW+8ae+jX0szHvZPfh3yxYaZ/yvQHMHqWuCW1y37vvq/CY75yyd8IMrMU+pPtyxWj4PIH0Gk7+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD5HknZS7SNLIyndZleqjV6hMPJsyU3SwmZmiMToA2fIL8N375
-	0iX1jlYLiqNZzOUKsA59q0PSxso75fjO8ObPX0H/3Y8GxZEaviHn
-X-Google-Smtp-Source: AGHT+IFvIGbOP+EgUOpXHoLu1xdOrJBoJMELWDng7t0hNOYGNK9YjtjRknrZEh3k66UfoSi/z7iw4g==
-X-Received: by 2002:a05:600c:1548:b0:42f:80f4:ab31 with SMTP id 5b1f17b1804b1-4319acadc1emr263253605e9.18.1730682479828;
-        Sun, 03 Nov 2024 17:07:59 -0800 (PST)
-Received: from [192.168.42.207] ([85.255.236.151])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d6848b5sm136711305e9.32.2024.11.03.17.07.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 03 Nov 2024 17:07:59 -0800 (PST)
-Message-ID: <0cd7e62b-3e5d-46f2-926b-5e3c3f65c7dd@gmail.com>
-Date: Mon, 4 Nov 2024 01:08:04 +0000
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bLSACuN3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730682727; x=1762218727;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pBJCQW4Oet+UlOfycbMG2VqQdA0DEcW5Cw/2nr0Junc=;
+  b=bLSACuN3wkfEcKBYOQiryNPLrFAdyeWOAcXAcOtj1fVRBkzaZPu/Disc
+   qtfl8wp+Cs02PZH4nKvJV1JuCqB+nr0eH0tOsqAYK8ZtKv6+iaJP+r9Xq
+   RHjh3WZ/AaV/MASC3Om6Hv7r8TVBZNXmLQPLLq6sV4aRGyC5/lbHl4Js0
+   nxp3B7wYXuwGwhxbJz851H8H9UeT5OnJ12Yw1eWU2GRSnk81qCzJ4THar
+   RhG8OHHW6CG2VgVhqiY7zy8sHnHOAcfykzebzBvH3o5z878XJZmc5tRJ1
+   Np2Elb9z0g1WkKxaGpWAGZ2n/eDKRgw7na3PZm3h339zYrft4j4aTrRV+
+   A==;
+X-CSE-ConnectionGUID: f8PHlujPT8+zOqHfNSUXSg==
+X-CSE-MsgGUID: lBWWkxGFSkOi8pRnslPgbA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30218267"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="30218267"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2024 17:12:06 -0800
+X-CSE-ConnectionGUID: rrNHJLK/Q66UPfjhyk36jQ==
+X-CSE-MsgGUID: i1joT7kgQDK4/iPzYVXWmQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
+   d="scan'208";a="114308874"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 03 Nov 2024 17:12:03 -0800
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t7ldR-000kL9-0x;
+	Mon, 04 Nov 2024 01:12:01 +0000
+Date: Mon, 4 Nov 2024 09:11:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk, song@kernel.org,
+	yukuai3@huawei.com, hch@lst.de
+Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+	martin.petersen@oracle.com, John Garry <john.g.garry@oracle.com>
+Subject: Re: [PATCH v3 4/5] md/raid1: Atomic write support
+Message-ID: <202411040805.745M3bMe-lkp@intel.com>
+References: <20241101144616.497602-5-john.g.garry@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V8 5/7] io_uring: support leased group buffer with
- REQ_F_GROUP_KBUF
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
- Akilesh Kailash <akailash@google.com>
-References: <20241025122247.3709133-1-ming.lei@redhat.com>
- <20241025122247.3709133-6-ming.lei@redhat.com>
- <4576f723-5694-40b5-a656-abd1c8d05d62@gmail.com> <ZyGBlWUt02xJRQii@fedora>
- <bbf2612e-e029-460f-91cf-e1b00de3e656@gmail.com> <ZyGURQ-LgIY9DOmh@fedora>
- <40107636-651f-47ea-8086-58953351c462@gmail.com> <ZyQpH8ttWAhS9C5G@fedora>
- <4802ef4c-84ca-4588-aa34-6f1ffa31ac49@gmail.com> <ZygSWB08t1PPyPyv@fedora>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZygSWB08t1PPyPyv@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241101144616.497602-5-john.g.garry@oracle.com>
 
-On 11/4/24 00:16, Ming Lei wrote:
-> On Sun, Nov 03, 2024 at 10:31:25PM +0000, Pavel Begunkov wrote:
->> On 11/1/24 01:04, Ming Lei wrote:
->>> On Thu, Oct 31, 2024 at 01:16:07PM +0000, Pavel Begunkov wrote:
->>>> On 10/30/24 02:04, Ming Lei wrote:
->>>>> On Wed, Oct 30, 2024 at 01:25:33AM +0000, Pavel Begunkov wrote:
->>>>>> On 10/30/24 00:45, Ming Lei wrote:
->>>>>>> On Tue, Oct 29, 2024 at 04:47:59PM +0000, Pavel Begunkov wrote:
->>>>>>>> On 10/25/24 13:22, Ming Lei wrote:
->>>>>>>> ...
->>>>>>>>> diff --git a/io_uring/rw.c b/io_uring/rw.c
->>>>>>>>> index 4bc0d762627d..5a2025d48804 100644
->>>>>>>>> --- a/io_uring/rw.c
->>>>>>>>> +++ b/io_uring/rw.c
->>>>>>>>> @@ -245,7 +245,8 @@ static int io_prep_rw_setup(struct io_kiocb *req, int ddir, bool do_import)
->>>>>>>>>       	if (io_rw_alloc_async(req))
->>>>>>>>>       		return -ENOMEM;
->>>>>>>>> -	if (!do_import || io_do_buffer_select(req))
->>>>>>>>> +	if (!do_import || io_do_buffer_select(req) ||
->>>>>>>>> +	    io_use_leased_grp_kbuf(req))
->>>>>>>>>       		return 0;
->>>>>>>>>       	rw = req->async_data;
->>>>>>>>> @@ -489,6 +490,11 @@ static bool __io_complete_rw_common(struct io_kiocb *req, long res)
->>>>>>>>>       		}
->>>>>>>>>       		req_set_fail(req);
->>>>>>>>>       		req->cqe.res = res;
->>>>>>>>> +		if (io_use_leased_grp_kbuf(req)) {
->>>>>>>>
->>>>>>>> That's what I'm talking about, we're pushing more and
->>>>>>>> into the generic paths (or patching every single hot opcode
->>>>>>>> there is). You said it's fine for ublk the way it was, i.e.
->>>>>>>> without tracking, so let's then pretend it's a ublk specific
->>>>>>>> feature, kill that addition and settle at that if that's the
->>>>>>>> way to go.
->>>>>>>
->>>>>>> As I mentioned before, it isn't ublk specific, zeroing is required
->>>>>>> because the buffer is kernel buffer, that is all. Any other approach
->>>>>>> needs this kind of handling too. The coming fuse zc need it.
->>>>>>>
->>>>>>> And it can't be done in driver side, because driver has no idea how
->>>>>>> to consume the kernel buffer.
->>>>>>>
->>>>>>> Also it is only required in case of short read/recv, and it isn't
->>>>>>> hot path, not mention it is just one check on request flag.
->>>>>>
->>>>>> I agree, it's not hot, it's a failure path, and the recv side
->>>>>> is of medium hotness, but the main concern is that the feature
->>>>>> is too actively leaking into other requests.
->>>>> The point is that if you'd like to support kernel buffer. If yes, this
->>>>> kind of change can't be avoided.
->>>>
->>>> There is no guarantee with the patchset that there will be any IO done
->>>> with that buffer, e.g. place a nop into the group, and even then you
->>>
->>> Yes, here it depends on user. In case of ublk, the application has to be
->>> trusted, and the situation is same with other user-emulated storage, such
->>> as qemu.
->>>
->>>> have offsets and length, so it's not clear what the zeroying is supposed
->>>> to achieve.
->>>
->>> The buffer may bee one page cache page, if it isn't initialized
->>> completely, kernel data may be leaked to userspace via mmap.
->>>
->>>> Either the buffer comes fully "initialised", i.e. free of
->>>> kernel private data, or we need to track what parts of the buffer were
->>>> used.
->>>
->>> That is why the only workable way is to zero the remainder in
->>> consumer of OP, imo.
->>
->> If it can leak kernel data in some way, I'm afraid zeroing of the
->> remainder alone won't be enough to prevent it, e.g. the recv/read
->> len doesn't have to match the buffer size.
-> 
-> The leased kernel buffer size is fixed, and the recv/read len is known
-> in case of short read/recv, the remainder part is known too, so can you
-> explain why zeroing remainder alone isn't enough?
+Hi John,
 
-"The buffer may bee one page cache page, if it isn't initialized
-completely, kernel data may be leaked to userspace via mmap."
+kernel test robot noticed the following build errors:
 
-I don't know the exact path you meant in this sentence, but let's
-take an example:
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master v6.12-rc5 next-20241101]
+[cannot apply to song-md/md-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-1. The leaser, e.g. ublk cmd, allocates an uninitialised page and
-leases it to io_uring.
+url:    https://github.com/intel-lab-lkp/linux/commits/John-Garry/block-Add-extra-checks-in-blk_validate_atomic_write_limits/20241101-225310
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20241101144616.497602-5-john.g.garry%40oracle.com
+patch subject: [PATCH v3 4/5] md/raid1: Atomic write support
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241104/202411040805.745M3bMe-lkp@intel.com/reproduce)
 
-2. User space (e.g. ublk user space impl) does some IO to fill
-the buffer, but it's buggy or malicious and fills only half of
-the buffer:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411040805.745M3bMe-lkp@intel.com/
 
-recv(leased_buffer, offset=0, len = 2K);
+All errors (new ones prefixed by >>):
 
-So, one half is filled with data, the other half is still not
-initialsed.
+   make[1]: Circular tools/testing/selftests/alsa/global-timer <- tools/testing/selftests/alsa/global-timer dependency dropped.
+   Makefile:60: warning: overriding recipe for target 'emit_tests'
+   ../lib.mk:182: warning: ignoring old recipe for target 'emit_tests'
+   make[1]: *** No targets.  Stop.
+>> Makefile:47: *** Cannot find a vmlinux for VMLINUX_BTF at any of "  ../../../../vmlinux /sys/kernel/btf/vmlinux /boot/vmlinux-5.9.0-2-amd64".  Stop.
+   make[1]: *** No targets.  Stop.
+   make[1]: *** No targets.  Stop.
 
-3. The lease ends, and we copy full 4K back to user space with the
-unitialised chunk.
 
-You can correct me on ublk specifics, I assume 3. is not a copy and
-the user in 3 is the one using a ublk block device, but the point I'm
-making is that if something similar is possible, then just zeroing is not
-enough, the user can skip the step filling the buffer. If it can't leak
-any private data, then the buffer should've already been initialised by
-the time it was lease. Initialised is in the sense that it contains no
-kernel private data and no data we shouldn't be able to see like
-private memory of an unrelated user process or such.
+vim +47 Makefile
+
+3812b8c5c5d527 Masahiro Yamada 2019-02-22  46  
+3812b8c5c5d527 Masahiro Yamada 2019-02-22 @47  # Do not use make's built-in rules and variables
+3812b8c5c5d527 Masahiro Yamada 2019-02-22  48  # (this increases performance and avoids hard-to-debug behaviour)
+3812b8c5c5d527 Masahiro Yamada 2019-02-22  49  MAKEFLAGS += -rR
+3812b8c5c5d527 Masahiro Yamada 2019-02-22  50  
 
 -- 
-Pavel Begunkov
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
