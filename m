@@ -1,134 +1,115 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48FC1BB6BA;
-	Mon,  4 Nov 2024 12:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E48C1B6CE2
+	for <linux-block@vger.kernel.org>; Mon,  4 Nov 2024 12:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730722448; cv=none; b=M2SIB57Ig39z4vi14ZOxY/vJBCGwb8+IKwWO+BYCr22by5CtzqXeLJSv/CrklubrvuK1zioKbltHvfbqvAS7n6FazXyBKCCKCR7LcPOfEEFKCaG+18WZna8Xf8+ptWbSfGASP1j7JPTdrfemzVrTyEdjubDSMhw+HMyBag7bLxM=
+	t=1730722770; cv=none; b=Ue+B8XSFuKrwQrb1tOlDxXx6Jsc1lms4Um5QYjSU6slz8UiUepT7oAQ6OcTV6v2qckYe79Vc2IKQt5i0vQW0GvuB6ZkJCQeUwu7uOF9mFaPe2SbfE9IFzXCbM/mEWwIprlTovhFrsZ3jAanykI8t/W8Zj7+Zoqu96+zAOUR/HSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730722448; c=relaxed/simple;
-	bh=LlJTpzPFOcXD6rJumc2gatXqNvI8NA9EdhmLf5bd0yg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bUgq1gj602hDPdL5184xDEhDHFMya901vTJI/WpSorJdJad/EpTj+XKHKNCYV3TYlX/Jeakkw6X7xNAJFlKJ4XxxJoDQvGtrDT+HyGP56vWo73AAml3J0XlrZK3z+ygkk9Q1H2ZuLz9P99oVlNTS6SjE89bdofKnaNJaeRSOi2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a9a850270e2so692809366b.0;
-        Mon, 04 Nov 2024 04:14:06 -0800 (PST)
+	s=arc-20240116; t=1730722770; c=relaxed/simple;
+	bh=WafvJUVr8z2C1zDRQCvtKO+6K1W+UrIoTEdLDQdvuUQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VCW6e9RoABZNNPoHoy0z4F9lN/TiOtQH54m8rOFxQfrEF4Z48gNghBo2jj9pLvEGKn1rV920w1EuE7SaBuH5rxgucvmx0a0d2D6lWtdQzsY+gdRlbAjKbpXXmJV4Vf1IOlSCPNl81dZTbFyltEb19XViv2wMYeML6uddFaQiONk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=bU/bwQTR; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="bU/bwQTR"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6cbe9e8bbb1so30847196d6.1
+        for <linux-block@vger.kernel.org>; Mon, 04 Nov 2024 04:19:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1730722767; x=1731327567; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tx1bOostXz+VH0GPtKgcyKswUQOWFhDDl/A9OfJb8HU=;
+        b=bU/bwQTRIAnSnu3ity+sjC0E2sq7Lx/G0WwuhQK1tFta0i+JHHb4ZgDaI+BwMp0GjP
+         mTuJkPdog3bS5cRlvNdXCOGo6r9C6lL8DpawfLdS9WQBuXkSkb3uRvVJ+3Jft2TU0l4z
+         Z7KQQ+bkelEINXuk6QjGwNJ1comMgCWJsIkvNFZ5eRsjDjojgELoEC7yc5lG8mAlNej8
+         74E5s7BmIpYr0/slUqyH43XmVbIAUeR4ArRinA/7yHVjpHr70CAydaCZc60vL5kQVRHN
+         60rPc+umLegF9M1e2Yl3TaNdXedLwfhi/5tJn9HzowNouiuDeuDVDwHWq3Uougepuohw
+         t3eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730722445; x=1731327245;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oLfhXe+DOk/Zvr718XsKSVZCtaQ0VoFVxnwJJzDWUIw=;
-        b=Xg6TiatSQOqTyxVXajrgVhXE5z0U+xtM8NJkwdjqJ2BJSWZTAkHn3Yxr9kVsTMZpuM
-         N57bBNIeQJ+qkw3if7tLag8cA8qf8UQ0mRYDt/5eh9vL1KibxOOzZMPKvemTJT7OjVxj
-         e4J1uhYOv7DFclbH0t703joD+1VK8YYJIoQ5oEOYpNqmyED9IZ70twyhwnlY2DlIppdF
-         rM5INUUclODH8TC7ORsh0t/zfhE0o7BFCCOSM8yVzRFnORXBF4JKGCDKf0TR29jklI2J
-         nSkTTTpKz8UzapbFGsyM2w2AHlRrajUWgc9VNrtVcmFmK1AsugJBR2MZKXXcu3c16EYt
-         5AEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVSkFmNyf+FoJ29VnPdvWIk51kphP8sC5FiB6mzwPQQBSMwCUKvjfDvydS7qVJVO4O8up2VDv2wa1BGmIKn@vger.kernel.org, AJvYcCW1OQ8/zobVBwYBca8uiy9LQfI5wsClNoK8ksr5CE1B0gQWdwpbfj/ujtThH4B0cCurpfIz3XVparEVfA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyotnqNlyq+OMIeuERH5S66kxPQTiJjTWjlSA/EV9R++t+ytFl
-	Vdd56YcJH++o9RVT1HH4JBDNxIkRYw0bbax36Zuaga//jY3zh7sm
-X-Google-Smtp-Source: AGHT+IEjEmNi1Mf4Lrwzo59HZaxOA4fUhH1eR1qk3q6/SqNWYRNG9+oN+bdCXPzY4FnI+PsKaQYCmg==
-X-Received: by 2002:a17:907:2dac:b0:a9a:82e2:e8ce with SMTP id a640c23a62f3a-a9e6587e288mr1356965066b.40.1730722444776;
-        Mon, 04 Nov 2024 04:14:04 -0800 (PST)
-Received: from nuc.fritz.box (p200300f6f71fdb00fa633ffffe02074c.dip0.t-ipconnect.de. [2003:f6:f71f:db00:fa63:3fff:fe02:74c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9e56494052sm543350466b.29.2024.11.04.04.14.03
+        d=1e100.net; s=20230601; t=1730722767; x=1731327567;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tx1bOostXz+VH0GPtKgcyKswUQOWFhDDl/A9OfJb8HU=;
+        b=Dsm60JnWbGBfNbCCBni5O/u4ZDLGKhVjb6/X9Fr/jJUlyjD/r3yt6pl5kW8kFJ5tgj
+         9Iz2Xf7X0cBl5J3iZlaFPXlRQU6fBeyHNqWOtjVMMy85M9PplUjWDlsCuTO7OoiPUGag
+         zVi+KuQsPoliYFPMYR9bf17hF3Evui/DcHd96WOu5UcpVpu9oEAoN5muSsaFCsN/LUis
+         iZ9+cDc+kTYLax4ZfqbOzPQoc6ZvcN7Rfslp+vL1qTMHc827JIUyr1AxHaO1L7d48yZ5
+         Rg9yHNYKdC96CWPSTCYRNWx8Mf4dOkXhKqptnWBT1qYgn+W1j8gXCM+YoYZZaJZksrC0
+         Q7uw==
+X-Forwarded-Encrypted: i=1; AJvYcCXKy+e1cR4L9Vx06AC6xo2YYKB5J7ozohXTgFBB+PaXxI8F1YoxeOXlgPmb4G5xllaOJeBOtrmlSf2NHw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9VeG184m1mcS6fDJuH8TMUTCmslKZGhgWAPwsr4p+3RpRGskD
+	VmMBmhPrW6OfYjhY6YVdeZ0m507nS4Okw3wSClTKOdlWtrk0K4VYJF2Zk0XJKp4=
+X-Google-Smtp-Source: AGHT+IGGw97HgDqXEc70DPdglFSAiLC2/hvL6iix2sWZheUlrSMhSyN4gGvDNAQMyTZfPVibvICZkw==
+X-Received: by 2002:a05:6214:3a8b:b0:6cb:c199:462a with SMTP id 6a1803df08f44-6d35c137657mr208089456d6.27.1730722766648;
+        Mon, 04 Nov 2024 04:19:26 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d353fc718csm47611946d6.38.2024.11.04.04.19.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 04:14:04 -0800 (PST)
-From: Johannes Thumshirn <jth@kernel.org>
-To: Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	David Sterba <dsterba@suse.com>,
-	linux-btrfs@vger.kernel.org (open list:BTRFS FILE SYSTEM),
-	linux-kernel@vger.kernel.org (open list)
-Cc: linux-block@vger.kernel.org,
-	John Garry <john.g.garry@oracle.com>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH v3] btrfs: handle bio_split() error
-Date: Mon,  4 Nov 2024 13:13:17 +0100
-Message-ID: <20241104121318.16784-1-jth@kernel.org>
-X-Mailer: git-send-email 2.43.0
+        Mon, 04 Nov 2024 04:19:25 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1t7w3I-00000000hJn-3gHO;
+	Mon, 04 Nov 2024 08:19:24 -0400
+Date: Mon, 4 Nov 2024 08:19:24 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Robin Murphy <robin.murphy@arm.com>, Leon Romanovsky <leon@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v1 07/17] dma-mapping: Implement link/unlink ranges API
+Message-ID: <20241104121924.GC35848@ziepe.ca>
+References: <cover.1730298502.git.leon@kernel.org>
+ <f8c7f160c9ae97fef4ccd355f9979727552c7374.1730298502.git.leon@kernel.org>
+ <51c5a5d5-6f90-4c42-b0ef-b87791e00f20@arm.com>
+ <20241104091048.GA25041@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241104091048.GA25041@lst.de>
 
-From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+On Mon, Nov 04, 2024 at 10:10:48AM +0100, Christoph Hellwig wrote:
+> >> +		arch_sync_dma_for_device(phys, size, dir);
+> >
+> > Plus if the aim is to pass P2P and whatever arbitrary physical addresses 
+> > through here as well, how can we be sure this isn't going to explode?
+> 
+> That's a good point.  Only mapped through host bridge P2P can even
+> end up here, so the address is a perfectly valid physical address
+> in the host.  But I'm not sure if all arch_sync_dma_for_device
+> implementations handle IOMMU memory fine.
 
-Now that bio_split() can return errors, add error handling for it in
-btrfs_split_bio() and ultimately btrfs_submit_chunk().
+I was told on x86 if you do a cache flush operation on MMIO there is a
+chance it will MCE. Recently had some similar discussions about ARM
+where it was asserted some platforms may have similar.
 
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
+It would be safest to only call arch flushing calls on memory that is
+mapped cachable. We can assume that a P2P target is never CPU
+mapped cachable, regardless of how the DMA is routed.
 
-This is based on top of John Garry's series "bio_split() error handling
-rework" explicitly on the patch titled "block: Rework bio_split() return
-value", which are as of now (Tue Oct 29 10:02:16 2024) not yet merged into
-any tree.
-
-Changes to v2:
-- assign the split bbio to a new variable, so we can keep the old error
-  paths and end the original bbio
-
-Changes to v1:
-- convert ERR_PTR to blk_status_t
-- correctly fail already split bbios
----
- fs/btrfs/bio.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/fs/btrfs/bio.c b/fs/btrfs/bio.c
-index 1f216d07eff6..7a0998d0abe3 100644
---- a/fs/btrfs/bio.c
-+++ b/fs/btrfs/bio.c
-@@ -81,6 +81,9 @@ static struct btrfs_bio *btrfs_split_bio(struct btrfs_fs_info *fs_info,
- 
- 	bio = bio_split(&orig_bbio->bio, map_length >> SECTOR_SHIFT, GFP_NOFS,
- 			&btrfs_clone_bioset);
-+	if (IS_ERR(bio))
-+		return ERR_CAST(bio);
-+
- 	bbio = btrfs_bio(bio);
- 	btrfs_bio_init(bbio, fs_info, NULL, orig_bbio);
- 	bbio->inode = orig_bbio->inode;
-@@ -678,7 +681,7 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
- 				&bioc, &smap, &mirror_num);
- 	if (error) {
- 		ret = errno_to_blk_status(error);
--		goto fail;
-+		goto end_bbio;
- 	}
- 
- 	map_length = min(map_length, length);
-@@ -686,7 +689,14 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
- 		map_length = btrfs_append_map_length(bbio, map_length);
- 
- 	if (map_length < length) {
--		bbio = btrfs_split_bio(fs_info, bbio, map_length);
-+		struct btrfs_bio *split;
-+
-+		split = btrfs_split_bio(fs_info, bbio, map_length);
-+		if (IS_ERR(split)) {
-+			ret = errno_to_blk_status(PTR_ERR(split));
-+			goto end_bbio;
-+		}
-+		bbio = split;
- 		bio = &bbio->bio;
- 	}
- 
-@@ -760,6 +770,7 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
- 
- 		btrfs_bio_end_io(remaining, ret);
- 	}
-+end_bbio:
- 	btrfs_bio_end_io(bbio, ret);
- 	/* Do not submit another chunk */
- 	return true;
--- 
-2.43.0
-
+Jason
