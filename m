@@ -1,194 +1,77 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0210C2EB10
-	for <linux-block@vger.kernel.org>; Mon,  4 Nov 2024 01:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE051779BD
+	for <linux-block@vger.kernel.org>; Mon,  4 Nov 2024 05:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730683312; cv=none; b=iJic8qH9609s3HHknAtxkoSC925JbtAB2Sfk+Y1Zl5AUu0SdQKjGGoa/TIstvAgV1aQBdHudYNELtSK6WWdNXiCqD7+JxK4dBR3+ZppI2YEstvTkNhnhGJWg6QwLsPFwVcefIL6vgfHXZwJ4Blwz8zeAX5BmO6mcwDNszd52qb8=
+	t=1730698945; cv=none; b=bQ2sw5gqjo7Ad5fWF8TSvnipHZzFMbaRVrZkwFEVFtg3Xkujzw80nxtqWjA48jYPk0w1s0dWZHfF6VMdPbYHES4IRFpxi4+O/6hbM5wZVK39WIymu4FgIG3zwQshF6cXk6TvJZp7NT8ey5dgXO0e4yondBRffZqdRUq5SQVmjDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730683312; c=relaxed/simple;
-	bh=Uy99q9eepkEl4NTSA53tC4l4a2Omao+FMYRINELvplE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YkF29w54eE0azFPCvjcK4VixC/WupEDaEsqAT9dl0Ta/Ix1wlvPh4wrGodQlf6QyDUrV2KaQFEi+On7T3mKYm7xyZ5weFklNwgYLGD2YM2BqXfqCdUlvVbTXmVSXaOOso8QCv0q69hdL6QzRCGHsdvM2A4NGTae24+6EbC364r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N3vpbZnm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1730698945; c=relaxed/simple;
+	bh=PBCP0b88xmLJjaCaqMQF1GYDxJycxuObNcyMLWGXUjQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uHRuI2Vh/0YUcqSn6xho/k2hlZPnR2nmr/lYrYTi1cwZvLBSjFdEDMx74t7SdXUmrCv0KY2Rrr442zuBc7zgRl+Nwn+3lfRMO0m3WeSiAvsqAEkrugfi+1n+EQ+ZnLGuGGrLulzYfHregQAYaf5qi9+ZWceSZQxBw0cCPle8PBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=GjeJRynt; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3vpbZnm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730683308;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dCTtV2ju/9XvHh9YhtOf3FTrchBZpHdTIhodln+S6Yw=;
-	b=N3vpbZnmycy+2vyvUIs943YuUKq+UY1LExSx/bou5Og0dZMb2MEuJjSLfGA0EvD4H/OzHy
-	o0wXusbz5ODncsZayLp1KmUFL6UVeuhTtvaSOorZTqNofnTBegUsHaXul/6MtAwO28e83v
-	fcBaKQ8IvBtHiqxBLw8eOORytJrhUWU=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-688-HLcllT7BNaOGLCbHqXG8lg-1; Sun,
- 03 Nov 2024 20:21:47 -0500
-X-MC-Unique: HLcllT7BNaOGLCbHqXG8lg-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5665319560B8;
-	Mon,  4 Nov 2024 01:21:46 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.38])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DBCC819560A2;
-	Mon,  4 Nov 2024 01:21:38 +0000 (UTC)
-Date: Mon, 4 Nov 2024 09:21:31 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Akilesh Kailash <akailash@google.com>
-Subject: Re: [PATCH V8 5/7] io_uring: support leased group buffer with
- REQ_F_GROUP_KBUF
-Message-ID: <ZyghmwcI1U4WizyX@fedora>
-References: <20241025122247.3709133-6-ming.lei@redhat.com>
- <4576f723-5694-40b5-a656-abd1c8d05d62@gmail.com>
- <ZyGBlWUt02xJRQii@fedora>
- <bbf2612e-e029-460f-91cf-e1b00de3e656@gmail.com>
- <ZyGURQ-LgIY9DOmh@fedora>
- <40107636-651f-47ea-8086-58953351c462@gmail.com>
- <ZyQpH8ttWAhS9C5G@fedora>
- <4802ef4c-84ca-4588-aa34-6f1ffa31ac49@gmail.com>
- <ZygSWB08t1PPyPyv@fedora>
- <0cd7e62b-3e5d-46f2-926b-5e3c3f65c7dd@gmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GjeJRynt"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=q5WxpSV0COpMUs5rb9YhxAje/mfiA+IQ6jsRXp40OfQ=; b=GjeJRynt7INRXOkDUqFg94fpA3
+	gDUHYc9fJ68/kw2bLDRq0a89xMVQPLcgIMPdf81Cq4EpzgwX8rbRL/A0d8lLBWQDIL8ScsXQP5b39
+	cGHcw1pcicQL4OwevhN/BvfG4nIKH9M9ENnVe5BRrZ0OdDXZ1zCiKE2iKo2llv5JHhzcp7DTcsXz+
+	bCfLdaYs+wRi9bj072FUZ7IrrAhBoehwm5cO4wQChulAUDWP4mOgZvjRT7DVC/PO6ygIBii00UvM9
+	HIPHAFV1AJMZMEGFVqZSqQYshmLGZzauY/4NPgueOP4z4Rl0BfBtq7LLJ3qKopQEwtjWIZ1DHUZXo
+	slViulyA==;
+Received: from 2a02-8389-2341-5b80-c843-e027-3367-36ce.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:c843:e027:3367:36ce] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1t7pr2-0000000ChO0-1cBo;
+	Mon, 04 Nov 2024 05:42:21 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH] block: update blk_stack_limits documentation
+Date: Mon,  4 Nov 2024 06:42:18 +0100
+Message-ID: <20241104054218.45596-1-hch@lst.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0cd7e62b-3e5d-46f2-926b-5e3c3f65c7dd@gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Nov 04, 2024 at 01:08:04AM +0000, Pavel Begunkov wrote:
-> On 11/4/24 00:16, Ming Lei wrote:
-> > On Sun, Nov 03, 2024 at 10:31:25PM +0000, Pavel Begunkov wrote:
-> > > On 11/1/24 01:04, Ming Lei wrote:
-> > > > On Thu, Oct 31, 2024 at 01:16:07PM +0000, Pavel Begunkov wrote:
-> > > > > On 10/30/24 02:04, Ming Lei wrote:
-> > > > > > On Wed, Oct 30, 2024 at 01:25:33AM +0000, Pavel Begunkov wrote:
-> > > > > > > On 10/30/24 00:45, Ming Lei wrote:
-> > > > > > > > On Tue, Oct 29, 2024 at 04:47:59PM +0000, Pavel Begunkov wrote:
-> > > > > > > > > On 10/25/24 13:22, Ming Lei wrote:
-> > > > > > > > > ...
-> > > > > > > > > > diff --git a/io_uring/rw.c b/io_uring/rw.c
-> > > > > > > > > > index 4bc0d762627d..5a2025d48804 100644
-> > > > > > > > > > --- a/io_uring/rw.c
-> > > > > > > > > > +++ b/io_uring/rw.c
-> > > > > > > > > > @@ -245,7 +245,8 @@ static int io_prep_rw_setup(struct io_kiocb *req, int ddir, bool do_import)
-> > > > > > > > > >       	if (io_rw_alloc_async(req))
-> > > > > > > > > >       		return -ENOMEM;
-> > > > > > > > > > -	if (!do_import || io_do_buffer_select(req))
-> > > > > > > > > > +	if (!do_import || io_do_buffer_select(req) ||
-> > > > > > > > > > +	    io_use_leased_grp_kbuf(req))
-> > > > > > > > > >       		return 0;
-> > > > > > > > > >       	rw = req->async_data;
-> > > > > > > > > > @@ -489,6 +490,11 @@ static bool __io_complete_rw_common(struct io_kiocb *req, long res)
-> > > > > > > > > >       		}
-> > > > > > > > > >       		req_set_fail(req);
-> > > > > > > > > >       		req->cqe.res = res;
-> > > > > > > > > > +		if (io_use_leased_grp_kbuf(req)) {
-> > > > > > > > > 
-> > > > > > > > > That's what I'm talking about, we're pushing more and
-> > > > > > > > > into the generic paths (or patching every single hot opcode
-> > > > > > > > > there is). You said it's fine for ublk the way it was, i.e.
-> > > > > > > > > without tracking, so let's then pretend it's a ublk specific
-> > > > > > > > > feature, kill that addition and settle at that if that's the
-> > > > > > > > > way to go.
-> > > > > > > > 
-> > > > > > > > As I mentioned before, it isn't ublk specific, zeroing is required
-> > > > > > > > because the buffer is kernel buffer, that is all. Any other approach
-> > > > > > > > needs this kind of handling too. The coming fuse zc need it.
-> > > > > > > > 
-> > > > > > > > And it can't be done in driver side, because driver has no idea how
-> > > > > > > > to consume the kernel buffer.
-> > > > > > > > 
-> > > > > > > > Also it is only required in case of short read/recv, and it isn't
-> > > > > > > > hot path, not mention it is just one check on request flag.
-> > > > > > > 
-> > > > > > > I agree, it's not hot, it's a failure path, and the recv side
-> > > > > > > is of medium hotness, but the main concern is that the feature
-> > > > > > > is too actively leaking into other requests.
-> > > > > > The point is that if you'd like to support kernel buffer. If yes, this
-> > > > > > kind of change can't be avoided.
-> > > > > 
-> > > > > There is no guarantee with the patchset that there will be any IO done
-> > > > > with that buffer, e.g. place a nop into the group, and even then you
-> > > > 
-> > > > Yes, here it depends on user. In case of ublk, the application has to be
-> > > > trusted, and the situation is same with other user-emulated storage, such
-> > > > as qemu.
-> > > > 
-> > > > > have offsets and length, so it's not clear what the zeroying is supposed
-> > > > > to achieve.
-> > > > 
-> > > > The buffer may bee one page cache page, if it isn't initialized
-> > > > completely, kernel data may be leaked to userspace via mmap.
-> > > > 
-> > > > > Either the buffer comes fully "initialised", i.e. free of
-> > > > > kernel private data, or we need to track what parts of the buffer were
-> > > > > used.
-> > > > 
-> > > > That is why the only workable way is to zero the remainder in
-> > > > consumer of OP, imo.
-> > > 
-> > > If it can leak kernel data in some way, I'm afraid zeroing of the
-> > > remainder alone won't be enough to prevent it, e.g. the recv/read
-> > > len doesn't have to match the buffer size.
-> > 
-> > The leased kernel buffer size is fixed, and the recv/read len is known
-> > in case of short read/recv, the remainder part is known too, so can you
-> > explain why zeroing remainder alone isn't enough?
-> 
-> "The buffer may bee one page cache page, if it isn't initialized
-> completely, kernel data may be leaked to userspace via mmap."
-> 
-> I don't know the exact path you meant in this sentence, but let's
-> take an example:
-> 
-> 1. The leaser, e.g. ublk cmd, allocates an uninitialised page and
-> leases it to io_uring.
-> 
-> 2. User space (e.g. ublk user space impl) does some IO to fill
-> the buffer, but it's buggy or malicious and fills only half of
-> the buffer:
-> 
-> recv(leased_buffer, offset=0, len = 2K);
-> 
-> So, one half is filled with data, the other half is still not
-> initialsed.
+Listing every single features that needs to be pre-set by stacking
+drivers does not scale.
 
-io_req_zero_remained() is added in this patch and called after the
-half is done for both io_read() and net recv().
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-settings.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-> 
-> 3. The lease ends, and we copy full 4K back to user space with the
-> unitialised chunk.
-> 
-> You can correct me on ublk specifics, I assume 3. is not a copy and
-> the user in 3 is the one using a ublk block device, but the point I'm
-> making is that if something similar is possible, then just zeroing is not
-> enough, the user can skip the step filling the buffer. If it can't leak
-
-Can you explain how user skips the step given read IO is member of one group?
-
-> any private data, then the buffer should've already been initialised by
-> the time it was lease. Initialised is in the sense that it contains no
-
-For block IO the practice is to zero the remainder after short read, please
-see example of loop, lo_complete_rq() & lo_read_simple().
-
-Thanks,
-Ming
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 95fc39d09872..5ee3d6d1448d 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -508,10 +508,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 	t->features |= (b->features & BLK_FEAT_INHERIT_MASK);
+ 
+ 	/*
+-	 * BLK_FEAT_NOWAIT and BLK_FEAT_POLL need to be supported both by the
+-	 * stacking driver and all underlying devices.  The stacking driver sets
+-	 * the flags before stacking the limits, and this will clear the flags
+-	 * if any of the underlying devices does not support it.
++	 * Some feaures need to be supported both by the stacking driver and all
++	 * underlying devices.  The stacking driver sets these flags before
++	 * stacking the limits, and this will clear the flags if any of the
++	 * underlying devices does not support it.
+ 	 */
+ 	if (!(b->features & BLK_FEAT_NOWAIT))
+ 		t->features &= ~BLK_FEAT_NOWAIT;
+-- 
+2.45.2
 
