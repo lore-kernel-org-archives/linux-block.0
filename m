@@ -1,193 +1,219 @@
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F251AF0B9;
-	Mon,  4 Nov 2024 10:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730717161; cv=fail; b=iZH/hGkicwCHbcNMoglZs7kTLsROh/eQyTrTXjuFzsz/f1CGSUmHP2+wcjzhp0KwHo398PRRVdGtEhZlwyfigpNp8D9eSbyniV3QyBz4V0aqpE5Cvkw9aInKMgBUXDmCeDWE2nBk9zN7GY20/Rpy8Cf3OduhyJRFUVw03RUabyI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730717161; c=relaxed/simple;
-	bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=JM2TdGxNFu5Mn4CDfg+l5G3DxzaR+T43MLg446BMmZHH2BZok5yC1NLFeA74zC8bxmQsnrrHqRSHHw5N1uV/39fwgQGCBqnn7yjT/P+krA/jV8pt7EqbmfyYWGM9wxIHCD449Hs8R1Vm9XzbrHdP1GoZqewMqe3I1wUkIu2/c7E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=DU/q7WJO; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=RvBCXE6+; arc=fail smtp.client-ip=68.232.143.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="DU/q7WJO";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="RvBCXE6+"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1730717159; x=1762253159;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
-  b=DU/q7WJOWCYshsOI8IARiHQbgYp5vQ9G4eJhGdN0t7IiPRK6niptgN9j
-   3Ipb/dW1wsT23+4fCwqRgDDLfEg4xQEUbgG2Wr0JS2yZ67Kb5SFJ2dwOU
-   NVRN8cLy6NSJhnEDT0wwHgMaXYVv1Q5JFpmLObwKg84QnyV3avNyNhGfI
-   7PNZ1Nq7mYL6sxqINcm14V09qKFkDKRj1QWx+0nC5lxmyT77vBiFpno1U
-   tTavdwfRV0pG25g0fYkxOX8ZrG7TDzSaEYiM0uqc5ath1PqYCSD/uqFJD
-   Dau6i36vgwAAqrdkkXJi19z4JL2bHbzxTBxIE06M6Koeryibx9mj7pyQp
-   Q==;
-X-CSE-ConnectionGUID: yZuYFUfURxSPxdc3MMPGpg==
-X-CSE-MsgGUID: nJVNbm0YTdaFBQDdyDZsEg==
-X-IronPort-AV: E=Sophos;i="6.11,256,1725292800"; 
-   d="scan'208";a="31081438"
-Received: from mail-northcentralusazlp17010006.outbound.protection.outlook.com (HELO CH1PR05CU001.outbound.protection.outlook.com) ([40.93.20.6])
-  by ob1.hgst.iphmx.com with ESMTP; 04 Nov 2024 18:45:56 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fWvrCG8emDopKLrHzqRvjRjM0S7xcmwKG4IShawpcehZ12FeWrAuIEpydHbeFdlTgTLSXwxJN89413Oc23+UFwspOAxq/alh0UwTGIqdAdIh38LyWE62btfZNmAevqFQHCQeDnqd/QABHFh2uuhHixirKMxkh8DhVZqSddND+G2MQfgQ4XH0sitPCg33+RL+mdMSuVbaN5/Gdu4PJbCmaRFBk7aVL7tLPBbv8PruHa7R0pIwutJUctS5bK9oOV+pi06k898AmWL/QI6xLEbUw+ReYgpHRXj8UPsncTDeepQdKc8jzyqncdO5esL5m4ApNpIgh8ENAId9aLS9lSqziQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=pmQ8OofQy5SIp+HYslAGtHTEiIPpCjqbq7TCKcLJp/y10CwOj8R61E07KWzi9IS9A/xSu0usJCHq6y96LLpjN8fCzyQdIegzPSEdZDbLycSF8nBw1t5sWTgb1bxfHaKyf6ekCZI/jpH59vQVZOtqXJExgP/7nfKMyNFHCyaINIQCkSVl7b5sPbTK2g/IcmdsZgchxka8qp/Jd+K/GsmtLQhbG6xbznmi4ghVNETm8anSO334Q85S3qESaEACUbTfyLgnnFrZKL7YxiFJykCwI/uBg4RMa6cf2qQhg1eSdS2V1Z31eLuGKQmRUyQ0QwA4kuJtaGLMec/z4ebs2mKXAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=RvBCXE6+KtbVptNLDu20HCWoO3qxFZ/0iWRiGNnk2TqW5jpW632AAJFpv083ymhKbuAX9+i1qR6k335D+bESMw7X1jChtXIgS04dv7dVt48hpYYVQJKbBk1avliJtF5w9HqcbI4kMVIS/1vCF13r+nxx8qlCKQlASfugwtkT/Nk=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by SA2PR04MB7690.namprd04.prod.outlook.com (2603:10b6:806:141::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Mon, 4 Nov
- 2024 10:45:55 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::ee22:5d81:bfcf:7969%4]) with mapi id 15.20.8114.028; Mon, 4 Nov 2024
- 10:45:54 +0000
-From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To: hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Damien
- Le Moal <Damien.LeMoal@wdc.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>
-Subject: Re: [PATCH 4/4] btrfs: split bios to the fs sector size boundary
-Thread-Topic: [PATCH 4/4] btrfs: split bios to the fs sector size boundary
-Thread-Index: AQHbLB4Y43NkqB4360KDKayC7WgWjbKm9TUA
-Date: Mon, 4 Nov 2024 10:45:54 +0000
-Message-ID: <835fe042-4770-480b-a3bf-5c6a9851ee70@wdc.com>
-References: <20241101052206.437530-1-hch@lst.de>
- <20241101052206.437530-5-hch@lst.de>
-In-Reply-To: <20241101052206.437530-5-hch@lst.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|SA2PR04MB7690:EE_
-x-ms-office365-filtering-correlation-id: 298f5a4d-6770-450c-d276-08dcfcbddbd9
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|1800799024|366016|10070799003|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?TXdOZmJXa3hTRlp3aUpycjE3WnZTdVJyOEs5bGRYclE1TExlRDk2TTBXb21l?=
- =?utf-8?B?WDVqMmxBamNRZUl1dXgvYTlaTGx6QmxSRUJEalhWUGU2dWRuLzhqOGVPVnBT?=
- =?utf-8?B?b3YrVDVmRjA3SGZ6ODIrQzMrb1NZbXlzMTZhZVJ4T2l3Z0hFaEFPNGRmSEdp?=
- =?utf-8?B?YVlzYVRVRkxWVjRBaEJEMzRSY2xibTE3T1R3UGZtUWJQU1EyUkptYWhJa3lL?=
- =?utf-8?B?NmhmTzBxS1V2NkFoVVhGQ056RnpEelRPcnFnZ2l4QVdiT0J2Y3hYSlk0RXkx?=
- =?utf-8?B?VzFsQlFldzRtS0VVcVFaWDdnV25MTjhlWXRtVXAzL29RWWRxTko5aTQ1dDlz?=
- =?utf-8?B?b002S1dOcEpqdS9UdXo5UnFzbXlzOG5Ib3h2d0ZySVdNcGpaZ3dJZ2V3RmtZ?=
- =?utf-8?B?YWZ5Z0JTNnk4QWFqTjR1a2pGTjVld3pPSWR2NXJ4L3IvYlFOalpqZEVNbWo0?=
- =?utf-8?B?NWE5eUNMZWRhUFdDQXNIZ0Fidlg5SU52QTV1bzJxVUFkdFEwR0EwZEVKNWJy?=
- =?utf-8?B?S1R4U0huWDU5cm1qQ20xak5kWkhybnFzNHpOcXFUZWd1cXdyM0NSVE01RlV5?=
- =?utf-8?B?cWc5QzRyOWlJSHkrdkpKdzArWTRuZkRxNjhhTUdOSEZYelZVdVV1N2NUemdQ?=
- =?utf-8?B?dk9HcEpJbUxPSEkxRnVHbWEzWW5xMm50WlQ3aDBIbEY0SGZHbzVrUUJ2MEZC?=
- =?utf-8?B?SGNtRVNaa1dFL0tGUVVIK2pIdGxySVdiVjZ3M21zWUFpVGVKRVB5emtDTlcx?=
- =?utf-8?B?d3Z2akJHaFhURWMyUXdkM0l0dVQvOXplUXoxRFg0RUY3OEluLzhvc1Vzeklk?=
- =?utf-8?B?b2tRZndvaFRYc2U3S3M5dEJUcVVNbXY3RFI4TDJiR1dONlg3em9xUGFsV3dk?=
- =?utf-8?B?WEwrWXBpcVd3RTFvRXB3ai9TZThzRFpoTEZpM0ZiYUxSQURveFJOdTdCUm9s?=
- =?utf-8?B?MnR5Ykt5K2MrQUFYMFpvWDJONklrSzNhbG9uWnVJTXkraHFnTlNPSkpLaGZG?=
- =?utf-8?B?bEVVOWFBRXAwczVkNnRNb3Nva1RBd1RMQjM4WnJQMUNaUXRDLzlQR3lEdE02?=
- =?utf-8?B?WHdDZi9BVE85eVZDdnY1eFl3SlNlekI4ZDhRb2wzYjRqWFFQb05qMThoSk1l?=
- =?utf-8?B?SnlGK1hTN2ZOWTNCQ1F1ZjNuOStpSzB2YTdtWTUvV1dTVFZDTklUWm1UOU1M?=
- =?utf-8?B?OUhYK256dUtCZk4xSURuVnp0Nm05UUdhK0srQysvcHZaVU5EQ2tCNjd2ZTNT?=
- =?utf-8?B?OUFPWExLc3Z5aDV4V2RDMVJLMjRhT2l1TE1USFNmckNVay9RaTlsRmhPNlFV?=
- =?utf-8?B?cFVyODhJMHpJdHU1aThYbHdyM3RnaEZuSDdGNWV1azFONG14anJDWFhzUmRM?=
- =?utf-8?B?Y0RPTHBEMU1lZ2UwNERMQ2Z3K1BOKzlRWVRycFMwL0pxQkxhL2d0Z052VVh5?=
- =?utf-8?B?R0hTQ0V4MUJiblNVV0VWdU1wRjJ1UHY5KzA1YkJJM1VXbEhHV2Z5OTN2MExQ?=
- =?utf-8?B?VDNTanZBaXRuWnJ3cjBtTnhFOVNLK0VBa0QvRlJjUHl3YzVncjBkRzduZC95?=
- =?utf-8?B?MVAxaHdJbUoxRmkyS0VoK1NmVkVKT0doUVl0dmc5dmhEdDlzb0o4RkVuQnRW?=
- =?utf-8?B?VnJCU3NTSXFTbkY3YjVZbVkzSXp4V0Q4OGIzSU9EemZrWGlhbHRyVzdNZWZG?=
- =?utf-8?B?aVhvR0czVDNBNGZXQ1pFS3Irc0dYTWhuR05nTHByZ1RuRjZKWHlhcWk2ZUxK?=
- =?utf-8?B?elNuVnVVR09QT2JvdU1tQ1J4Q09UdlU5OUVDMWZWSmtHM0RXZk5IdlpKdXha?=
- =?utf-8?Q?KV0omSs3gDQCvJ9JeUXnS2g6bF3UGqw+e3BmU=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(10070799003)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?aFM4WlR6dThkRkhnMU1QL3ZLTENOZFF4aUpXZFRvTlc4bnZSK0JzNVdYYmkv?=
- =?utf-8?B?bmtJbHJZQm9nQXk2ZDZpYi9lajY2bFJJUkxITUxLS1JDVVRtWmx5akdpRXF6?=
- =?utf-8?B?dW1SWk9TdlJZdmxLREtjWmdsMFRmYWtJTUNCY3RXUmlaMHFRWDNVeFFOVGRU?=
- =?utf-8?B?MGZqYmhCb3UxcU4wMGdiQ2p5enhnV1grT2x4MHNJb09rVWVGM2tHU1Zjay9v?=
- =?utf-8?B?VmErcU91dlUySHh5d2pzeUN3d0FaeGNrL1d3bmNNanIrc1dtMk9wajM4cDhI?=
- =?utf-8?B?c0RaekdLK1ZrRGh3RXZGR096empyZUlrdlFnbFJVTFUvKzFEUHNuZmFzVDN3?=
- =?utf-8?B?NnEzamkvbithaUk1R0xRZmhuL0hWRmRwU1llN04xZWZvQjJrNnhqRmFDeXRy?=
- =?utf-8?B?V0hTUElxMVI2eVUyYVRQSWUrSlQ4eFVOLzg3NGxhamdVV2d0RXBKNjUxdEdJ?=
- =?utf-8?B?UVM4Q0Ftall2ZEFXWHp1TWtMbWZ5Ujd3N21jNkNaN3o2RkpTTUhsc29rNEp4?=
- =?utf-8?B?cnUyelI3dm1WdUtTM0lRTHV2akFha2NVUjQ4TUZueVcwOE5HMWtVMUk0QVhp?=
- =?utf-8?B?TEgxRzNxVHg5SVFWYWdHQVZndnViWnFqaE8zc1Q1UDBGTVpwMnQxOXdjZVJs?=
- =?utf-8?B?Y2VONFhaMW5JS20vNW1RYzgwek1QNHBpQldtNk4zcDRaMFcwWnJTaTJFQmlJ?=
- =?utf-8?B?ZE02SnlqY2RlY3NxZzVBbFQwRGtxd0x1QitCeWdtVGdPaUN4RHRaSTlFN2Z6?=
- =?utf-8?B?QWhCdERCZDdFNUxwbGt1OUpGclFHQ1VaaCtyOUZTUFFXVUNZNFc2ekRpczFC?=
- =?utf-8?B?Zmt4MjNBdnJVd3RkWGZJMUhvSElOV0dIU3BMTEVXTHM0ZlpLTkxTRlhZNGoz?=
- =?utf-8?B?c1BkdUg1Y05na2xXWXlTMFpTRDdYSElkYXYza0ZHbmZqbVM1N294NGFWYndx?=
- =?utf-8?B?WE9wMnB1YituU2NWWGZVYXRaVGpLTk1hVS9nQ2RubkJBQkJ6TlRuQnNvM08y?=
- =?utf-8?B?VXB6S2FxTUdHY2tuSSt0RlFnVUZTVElwUGpUelVUZ2dyOGdaNm92ZDBlNGor?=
- =?utf-8?B?KzRZZVNIRG51d0JvYlprNjYxdEhsVDJObUprakM2Tm1tc1MzZ0I2ZFowWkFH?=
- =?utf-8?B?KzdaNEdiRHhSVXhTQ2UrcU1vblZ0VkY5dHJlNTFpT3dJMkNMak9IdnJQOW4w?=
- =?utf-8?B?TDNtaE0zMGVESW94UW9UTmtTb0oyWkc0S2xKK2pBUmlFcmduWnMwemFBam1T?=
- =?utf-8?B?bUtCREtlQyt1OHFPSjdwQldBd0k4WFlzTFEwbitWVFNXaFVlZkswUlp5dDBt?=
- =?utf-8?B?YlA4Zm9mSDBsQytXams0eFBCTTlXUU9uN3lPbHJQTzJSZ3pOMTcvaTBNNEdL?=
- =?utf-8?B?dTdnaUxLcitHRGU3SnlrMGxZRlVLZit3OGJqSnQyalRWajNlaDJRd0Y4S3da?=
- =?utf-8?B?S2FNZU1QQWYyWUc4c3pYRWtOTkR4cmprWnl4MU9INktMVW0rUnNsZ2ZFWnFW?=
- =?utf-8?B?alpiUllDYUFDbmtLUzRhbGROV1pJR082bGNDaEdReHBUT2dJSS82b0JjV29o?=
- =?utf-8?B?M3lLWWtUNnJlRGpvRUkvQ244bWRQZTNBVFJNTldMY1dVYkE0Z0Z1OTcyekl3?=
- =?utf-8?B?ai94OVM5RU9nb1pWYXhuRUxzOTE1bE1YRWJKbUdzMytQMUV1eUcvMmQvRTZY?=
- =?utf-8?B?VUduOS9EOFZHRUtzWXpGTHQxTVEvZ0xQZ00wRGtzRjd4K1dJYWN0cHl5K3lF?=
- =?utf-8?B?Szh5QStaVjBYalhBU01sNGJlYmcxM1hKWlpGNkY3SjNRMG16WXkzVzZpcUxU?=
- =?utf-8?B?bC9UMTVUWTVRTG5mZHNOeXdRRmQwcWJoSmFiZnVBUjQxNm05RnZPakkrTWRK?=
- =?utf-8?B?eFBiMkN5dnp2Y0dVK1djdXFiYlUyOVljQ1crdVlZaUVHZ0ljOFBRdTVPUFNy?=
- =?utf-8?B?Rm5xcHdoWWNjK2Q0aG5xOFNKdGYrbWUxekFuaGJLY0tSQWlCaDk1eTA2c2FI?=
- =?utf-8?B?MWk0LzZkTHdFLzF0ZlNVQTFHT01MZ0pmdVhWcWFqSEFHNkdFZWFvZ1F2emhw?=
- =?utf-8?B?NGZ3TEhuZXFMUld1SHA3dHNIVTNzN1RMaW9weVBNQldKSmhnN01yczZnZy9l?=
- =?utf-8?B?TWFYeUxPSStNcVdrLzF0L2FZenRUdVhSQWVKd05zdzNYOHMzMWppZnF4TmJP?=
- =?utf-8?B?T1p6ZEdMcEt6TGtCMG54OTlwRVFMdXAvK3MzdHlpbWFsckdpLy9naEpmYmpK?=
- =?utf-8?B?ZTVpclN1OTR0dkZCMTFFM1hmbE1RPT0=?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <375A9DDCF77ECE4385ECEAB011B4BE61@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0621BE86A;
+	Mon,  4 Nov 2024 11:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730718215; cv=none; b=mVfKzhvuWBhoZ1YN46nZwkpw5AFYACLqXd4ubJlQRbl0xKKwNPQ6VsSL50lkZGJ0DfxGpOmAjWWoSgxPzNmVHSWHBz1Vgxi9DVmyRy/oPtDn4wZJylghkb9VlxcPp3SSLuBp81yIm5X5zcYsUQXd8LwwVG2iCqyVWQRC0hy0spY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730718215; c=relaxed/simple;
+	bh=uKQ+9FJPyqAuZ9Q1CAPh0iDMBJJWvOUwK8au8disGTg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NVUsD5yQK2icwTluC0mwMhYsW/Pbx/cqjDCHfJGaMbmDaMyuMTbwrlobxjTPTivj7fX54JDXBQWSkmIWuievjsOUfd2dee4wYVtfGhRUMxcwdu4cMig+FoLDo3nXdoLxDVwmdwTAtyAHREFkmNbBVJN8jSFEz9pQA8KckMIiKQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XhpVB12t0z4f3m8w;
+	Mon,  4 Nov 2024 19:03:14 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id E7EE11A06D7;
+	Mon,  4 Nov 2024 19:03:26 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgCXc4f8qShng7pLAw--.24644S4;
+	Mon, 04 Nov 2024 19:03:26 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: axboe@kernel.dk,
+	ming.lei@redhat.com
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH -next] block: fix uaf for flush rq while iterating tags
+Date: Mon,  4 Nov 2024 19:00:05 +0800
+Message-Id: <20241104110005.1412161-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	MqqeHalNlztqCG+5gGVJ+pOWQXIKVGBhdaqy8kCpsHevrd65H8aOGZuMzka21eLKWDyToLj6XsMGMtz+KCMUQntIWV+b66v4sr3NDLBJWfehWYtfMSC7bfloloEcHh80ZPnja/SuZ098e0VJdSP+7WCah0ocyMb9n7XfXEAK2/nRfMoC2QzPbnrspAoLhEE0opl5swYOLyQKIw4zQ72KfcJzh1zn9ZSlh/HEUmoibQevM1XAVwi0eICATXynm9ktKXVC6V7fLESrJ/QqAQnW//nO/oxiWQkwxyLAP0CHc14sCE6b0ixsRSagkiBQtK1bnKIF1Yl+h+g8foUm5Hkcc/PYLX4pK7qrt4J4Bqzwx7ZVE08g8UFl9O82cIUTkt/eEcO4ZmDaf8x0iynqYZNMImyCTEXx0aNk2hVqb5zPjSUKOi9zU2vpyR8FV4f5Hv3GOzM10w5XL6Rjq9l+dgyduNj051N3JDbzjwxbBVq8Xev3rIVxV2HAS2BMhym/PP3rmQawN/rF0TLqs+AJkJWImyQT3ewBdodYgqEqmqtiZRN6/PdN4NKQwtOKjsU98+GYfaSRUiwE35xweOnJ/AuNnSRnBoTv/8Z6YmllYOZbLpAOrRXy13r+Kyl31ww6TU+4
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 298f5a4d-6770-450c-d276-08dcfcbddbd9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Nov 2024 10:45:54.6982
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pBo++MnkoAQmTOfPdn3PjGoWpjN89ppgBo9wa+DTzeK2nCO7g2SWZHcalGwlVysUqVEfmgLiFebPnHTDhRSiRGMaeqCrd3Ti5dF0zHrGFOI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR04MB7690
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCXc4f8qShng7pLAw--.24644S4
+X-Coremail-Antispam: 1UD129KBjvJXoW3XrW3Xw13KryxAF15trW3Awb_yoW3XrW5pr
+	Z8G3y7Ar40qryUWFZ2ya1fJFy8Zan8Gr1fGrs3Kr9xZFyj9ry7Xayv9FyaqFy0krZaya1U
+	ZF1ktrWrKr1UGw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
+	AVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
+	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbSfO7UUUU
+	U==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-TG9va3MgZ29vZCwNClJldmlld2VkLWJ5OiBKb2hhbm5lcyBUaHVtc2hpcm4gPGpvaGFubmVzLnRo
-dW1zaGlybkB3ZGMuY29tPg0K
+From: Yu Kuai <yukuai3@huawei.com>
+
+blk_mq_clear_flush_rq_mapping() is not called during scsi probe, by
+checking blk_queue_init_done(). However, QUEUE_FLAG_INIT_DONE is cleared
+in del_gendisk by commit aec89dc5d421 ("block: keep q_usage_counter in
+atomic mode after del_gendisk"), hence for disk like scsi, following
+blk_mq_destroy_queue() will not clear flush rq from tags->rqs[] as well,
+cause following uaf that is found by our syzkaller for v6.6:
+
+==================================================================
+BUG: KASAN: slab-use-after-free in blk_mq_find_and_get_req+0x16e/0x1a0 block/blk-mq-tag.c:261
+Read of size 4 at addr ffff88811c969c20 by task kworker/1:2H/224909
+
+CPU: 1 PID: 224909 Comm: kworker/1:2H Not tainted 6.6.0-ga836a5060850 #32
+Workqueue: kblockd blk_mq_timeout_work
+Call Trace:
+
+__dump_stack lib/dump_stack.c:88 [inline]
+dump_stack_lvl+0x91/0xf0 lib/dump_stack.c:106
+print_address_description.constprop.0+0x66/0x300 mm/kasan/report.c:364
+print_report+0x3e/0x70 mm/kasan/report.c:475
+kasan_report+0xb8/0xf0 mm/kasan/report.c:588
+blk_mq_find_and_get_req+0x16e/0x1a0 block/blk-mq-tag.c:261
+bt_iter block/blk-mq-tag.c:288 [inline]
+__sbitmap_for_each_set include/linux/sbitmap.h:295 [inline]
+sbitmap_for_each_set include/linux/sbitmap.h:316 [inline]
+bt_for_each+0x455/0x790 block/blk-mq-tag.c:325
+blk_mq_queue_tag_busy_iter+0x320/0x740 block/blk-mq-tag.c:534
+blk_mq_timeout_work+0x1a3/0x7b0 block/blk-mq.c:1673
+process_one_work+0x7c4/0x1450 kernel/workqueue.c:2631
+process_scheduled_works kernel/workqueue.c:2704 [inline]
+worker_thread+0x804/0xe40 kernel/workqueue.c:2785
+kthread+0x346/0x450 kernel/kthread.c:388
+ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:293
+
+Allocated by task 942:
+kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+____kasan_kmalloc mm/kasan/common.c:374 [inline]
+__kasan_kmalloc mm/kasan/common.c:383 [inline]
+__kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:380
+kasan_kmalloc include/linux/kasan.h:198 [inline]
+__do_kmalloc_node mm/slab_common.c:1007 [inline]
+__kmalloc_node+0x69/0x170 mm/slab_common.c:1014
+kmalloc_node include/linux/slab.h:620 [inline]
+kzalloc_node include/linux/slab.h:732 [inline]
+blk_alloc_flush_queue+0x144/0x2f0 block/blk-flush.c:499
+blk_mq_alloc_hctx+0x601/0x940 block/blk-mq.c:3788
+blk_mq_alloc_and_init_hctx+0x27f/0x330 block/blk-mq.c:4261
+blk_mq_realloc_hw_ctxs+0x488/0x5e0 block/blk-mq.c:4294
+blk_mq_init_allocated_queue+0x188/0x860 block/blk-mq.c:4350
+blk_mq_init_queue_data block/blk-mq.c:4166 [inline]
+blk_mq_init_queue+0x8d/0x100 block/blk-mq.c:4176
+scsi_alloc_sdev+0x843/0xd50 drivers/scsi/scsi_scan.c:335
+scsi_probe_and_add_lun+0x77c/0xde0 drivers/scsi/scsi_scan.c:1189
+__scsi_scan_target+0x1fc/0x5a0 drivers/scsi/scsi_scan.c:1727
+scsi_scan_channel drivers/scsi/scsi_scan.c:1815 [inline]
+scsi_scan_channel+0x14b/0x1e0 drivers/scsi/scsi_scan.c:1791
+scsi_scan_host_selected+0x2fe/0x400 drivers/scsi/scsi_scan.c:1844
+scsi_scan+0x3a0/0x3f0 drivers/scsi/scsi_sysfs.c:151
+store_scan+0x2a/0x60 drivers/scsi/scsi_sysfs.c:191
+dev_attr_store+0x5c/0x90 drivers/base/core.c:2388
+sysfs_kf_write+0x11c/0x170 fs/sysfs/file.c:136
+kernfs_fop_write_iter+0x3fc/0x610 fs/kernfs/file.c:338
+call_write_iter include/linux/fs.h:2083 [inline]
+new_sync_write+0x1b4/0x2d0 fs/read_write.c:493
+vfs_write+0x76c/0xb00 fs/read_write.c:586
+ksys_write+0x127/0x250 fs/read_write.c:639
+do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+do_syscall_64+0x70/0x120 arch/x86/entry/common.c:81
+entry_SYSCALL_64_after_hwframe+0x78/0xe2
+
+Freed by task 244687:
+kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+kasan_save_free_info+0x2b/0x50 mm/kasan/generic.c:522
+____kasan_slab_free mm/kasan/common.c:236 [inline]
+__kasan_slab_free+0x12a/0x1b0 mm/kasan/common.c:244
+kasan_slab_free include/linux/kasan.h:164 [inline]
+slab_free_hook mm/slub.c:1815 [inline]
+slab_free_freelist_hook mm/slub.c:1841 [inline]
+slab_free mm/slub.c:3807 [inline]
+__kmem_cache_free+0xe4/0x520 mm/slub.c:3820
+blk_free_flush_queue+0x40/0x60 block/blk-flush.c:520
+blk_mq_hw_sysfs_release+0x4a/0x170 block/blk-mq-sysfs.c:37
+kobject_cleanup+0x136/0x410 lib/kobject.c:689
+kobject_release lib/kobject.c:720 [inline]
+kref_put include/linux/kref.h:65 [inline]
+kobject_put+0x119/0x140 lib/kobject.c:737
+blk_mq_release+0x24f/0x3f0 block/blk-mq.c:4144
+blk_free_queue block/blk-core.c:298 [inline]
+blk_put_queue+0xe2/0x180 block/blk-core.c:314
+blkg_free_workfn+0x376/0x6e0 block/blk-cgroup.c:144
+process_one_work+0x7c4/0x1450 kernel/workqueue.c:2631
+process_scheduled_works kernel/workqueue.c:2704 [inline]
+worker_thread+0x804/0xe40 kernel/workqueue.c:2785
+kthread+0x346/0x450 kernel/kthread.c:388
+ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:293
+
+Other than blk_mq_clear_flush_rq_mapping(), the flag is only used in
+blk_register_queue() from initialization path, hence it's safe not to
+clear the flag in del_gendisk. And since QUEUE_FLAG_REGISTERED already
+make sure that queue should only be registered once, there is no need
+to test the flag as well.
+
+Fixes: 6cfeadbff3f8 ("blk-mq: don't clear flush_rq from tags->rqs[]")
+Depends-on: commit aec89dc5d421 ("block: keep q_usage_counter in atomic mode after del_gendisk")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-sysfs.c | 6 ++----
+ block/genhd.c     | 9 +++------
+ 2 files changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 741b95dfdbf6..a7c540728f3f 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -821,10 +821,8 @@ int blk_register_queue(struct gendisk *disk)
+ 	 * faster to shut down and is made fully functional here as
+ 	 * request_queues for non-existent devices never get registered.
+ 	 */
+-	if (!blk_queue_init_done(q)) {
+-		blk_queue_flag_set(QUEUE_FLAG_INIT_DONE, q);
+-		percpu_ref_switch_to_percpu(&q->q_usage_counter);
+-	}
++	blk_queue_flag_set(QUEUE_FLAG_INIT_DONE, q);
++	percpu_ref_switch_to_percpu(&q->q_usage_counter);
+ 
+ 	return ret;
+ 
+diff --git a/block/genhd.c b/block/genhd.c
+index dfee66146bd1..87f9c2457ca6 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -742,13 +742,10 @@ void del_gendisk(struct gendisk *disk)
+ 	 * If the disk does not own the queue, allow using passthrough requests
+ 	 * again.  Else leave the queue frozen to fail all I/O.
+ 	 */
+-	if (!test_bit(GD_OWNS_QUEUE, &disk->state)) {
+-		blk_queue_flag_clear(QUEUE_FLAG_INIT_DONE, q);
++	if (!test_bit(GD_OWNS_QUEUE, &disk->state))
+ 		__blk_mq_unfreeze_queue(q, true);
+-	} else {
+-		if (queue_is_mq(q))
+-			blk_mq_exit_queue(q);
+-	}
++	else if (queue_is_mq(q))
++		blk_mq_exit_queue(q);
+ 
+ 	if (start_drain)
+ 		blk_unfreeze_release_lock(q, true, queue_dying);
+-- 
+2.39.2
+
