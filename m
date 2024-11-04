@@ -1,116 +1,90 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC49820326;
-	Mon,  4 Nov 2024 16:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E4833FE
+	for <linux-block@vger.kernel.org>; Mon,  4 Nov 2024 17:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730738287; cv=none; b=I/UHe6VZlb6iS4c+8scJ1gEJSdHYRZPAeQgjSixoYZAP8zolzF7Rvj/uccppTbQ3I0vCZHZmY+PWdB2n6z3SDxJtnN8lExemzwKzzW3Pt3S6Qobo1JcxoCiGvTNRCBPWapEZV+4NyaFFmKFikmwYuv49F3VT1wmvOEkmoLfgCjk=
+	t=1730741737; cv=none; b=ERd8Zf/mmKIYz7mnWSwzrXO/scVMuGmEROwMiwxRS0vZhqKwPpJxjHiS+p+HQ2tgjUFBBDyrcRUT2U9bxJqf9lUtRGnnJ8Bki8NcnMFvnmP7KRWcawaU9mHuzPKg0gayqZ/ku7LoRo8w7V9VRbjlg+RGRpZKeU4HKQRuNv0cuP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730738287; c=relaxed/simple;
-	bh=8pX11qNfWYxJfjipQQ48vfCsg1LLtSOf23BJJFU9rLg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kk3dTl6NXIm8jminflLXjgtwO4BCLxbPYJ+sdx4Qgjw1QVWxedDXvdivQ1N+WkzJ55xnxyI702Vl/nhwAoo2VtBEz/n7gDhmrYuTeguBMnQ8aZh1giT5yJrn2BYmTyqqp/VnZDB1p19N9QW3WXRsxwze0tt+rGrJa/xZdK4tzuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SUjvwnkb; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1730741737; c=relaxed/simple;
+	bh=3Oe7sdt7Dz4180bx4K2bBcbboI5TfwwQJ4UEgB2xiTs=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=AjRf0Yqy9Uhu6hRlmNZm7Jllh/ZUe9bo6E+nxUt0iKF09EIZ4RpTuRPSYrK0YMcP8obV3sGQmUlYt2RRwvvDZ26INg2T2+9v500qAxdhwh3DoKZACZJ4ey3Hg2dxPZQ17L/c24gxCZKoDDtAajmMqQPq7szuIEkPBW2EZf3F8v8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Q5s24xfW; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SUjvwnkb"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5cec93719ccso2779595a12.2;
-        Mon, 04 Nov 2024 08:38:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q5s24xfW"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a6c3230858so6727425ab.0
+        for <linux-block@vger.kernel.org>; Mon, 04 Nov 2024 09:35:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730738284; x=1731343084; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aG7p/v+GZb8kUzbIL7r3HcUkBQkE1tJdxNXPjnP871c=;
-        b=SUjvwnkbtcjB5cUWSQ0z10SBvMcjYYfRQ3IGdPbbxGCiJpy/oP4ojGQQOeIt/S/lTK
-         8pW0ZTozLSE4Qd8Rv9fNMSRP/mkbZGopbgQKaZkAevALMuWmv4s372qa/hiuaocupl9A
-         G0g2UcRMKcOVHGNN8f7W/UnSAUVLsjyTabvcu/V+Gcsuy/So8YioruvInY0JuzWz9WNm
-         jQmeDj50j7L5Oa0yroYG4vWSdiSzD16JrYrSJj35yuw1yoDXCapd31jB7oP5YZS0j8bZ
-         jtwUe2EeGfRECwfZAw/70+LtAfydSwkrUOImqkl+52wKSxgzDx30YrhLC5oTofQmYBWj
-         URUQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730741735; x=1731346535; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iRF8r++0JFoOVgUo9JtQrZ4091Ij/LqOddUiT1AY4pQ=;
+        b=Q5s24xfWM8HEkqVCgAJ6Q28ILfg8JJLIyS/nulxgjcjcP8L8JuiQ0z2mrZzmgtgFhd
+         dAD3gDzO0EHIIq05gnf52lOrQ8wMf44kIRLDuY4CMIojxdBFdZrK8Y+P7WD2D7XSEua+
+         gjBY/e0geEuL92hESBIGT5UghSq4T6OcsEgkFEPEldgmyA/UUrurRUrPIM6nfGE68Xue
+         Q4JcF8VJiXvX0tZiH+1oqmFU7CMuJFt5Khxw63jDCq/xQuZn4GB7aY5+4NSedwpG+Hxy
+         kEFZIixQgsgq1unfAq2Fvlpi93kEp3L2oswhkeJ+aoBIgArS5sBJLPJp2oL8Rq126CSe
+         G+Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730738284; x=1731343084;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aG7p/v+GZb8kUzbIL7r3HcUkBQkE1tJdxNXPjnP871c=;
-        b=gxJQgSSR1JZ1ihLbXG76lH3bnRQQjxyt7KvvoIdYkkT+JW9jhOlusw9Kj/sJEQGtD0
-         q2B2Y2xnw/CSXvjLxrMA760CvO4rxSCgSUfNk+5r9m0nyNI2YDZUa4rdg6lgSOTTsXYb
-         u7Llns0GeXdnzOO6QXEDUujaCK8siI/+79KVTbnxUVFFhuL9SdDC0Uhykm1bmRClGZjw
-         ZLHqxl6l29/NJ6uKjO5gasEFWEQCGbmG2ygqE53rWAfulcSqk5fELYSCezi2YQCYcHkt
-         I06kUmmUYn2CD5oD2Nr/ojRwA+C0m+P7cgDfDNeZBnnQTclYd8SbbkP+yl91KOTGBXNN
-         mNxw==
-X-Forwarded-Encrypted: i=1; AJvYcCX8A1Yy4Z9eJHffVd2fjJMuCcpdU0ryhMPg/orXp8Q9HC+v6ZpxEApvk8jPGMUis7pWtzTJoGTsCT5cCVw=@vger.kernel.org, AJvYcCXsKdf35qpJ5TRFzfqeZsGPb+ws0DEqUEU2/C5vuQRm/AQN41QQJ+DiIFVAmmCIYFOXkWDxPqgOmQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPM5bg+SrA3fl1d4bshx4hlsKYmBDRUs1g4rD2BgMWJTjX9V3r
-	idvdmy+LHWba96jjrAs18YASewsdKadGAqTZ/J9+3Rb2IA4tl9ul
-X-Google-Smtp-Source: AGHT+IFDt7hOTdk9sS+VlYN+AKPR3L7iFyEPeziAofYDvfU4KtFjjdIljT8FpR9H4cWsxjRSbmJGag==
-X-Received: by 2002:a05:6402:518a:b0:5c9:76ca:705b with SMTP id 4fb4d7f45d1cf-5cd54afde73mr15176013a12.34.1730738283805;
-        Mon, 04 Nov 2024 08:38:03 -0800 (PST)
-Received: from [192.168.42.71] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cee6afe451sm26846a12.67.2024.11.04.08.38.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Nov 2024 08:38:03 -0800 (PST)
-Message-ID: <0e4d8bda-459c-41f0-af8d-30c9d81bfb80@gmail.com>
-Date: Mon, 4 Nov 2024 16:38:08 +0000
+        d=1e100.net; s=20230601; t=1730741735; x=1731346535;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iRF8r++0JFoOVgUo9JtQrZ4091Ij/LqOddUiT1AY4pQ=;
+        b=BVJyzD6XRTK5Y0lkHlLH8SDM1YM3runTYHUJkdT9zBn+z8wwIETr/H9O5kSv84OnT9
+         vG8D2832wgj1wuPiror+WkZVxc3nQkWA5vWSwEbjJyIad/eshMZTX/2jTFjmx5OtEgQj
+         t4zENNRP4eHAHJY74+zRhoowWu258EeVhNJUKAL/A4nuIWXI9BzKUpacqClZXlp5MUVS
+         ZLCrj8wIzCufhUoyemaopqtW2sAKawPRLhwQDyGmtYU1YQQGouTlbyFroJfoe5nuKmBO
+         sUQdht5tEmIPq+LnVMLCXFsb+WVhdc/3Nq4Xim/rSeoZepavCbklx9BadQaylxgx6n+h
+         gUCw==
+X-Gm-Message-State: AOJu0Yy2khTei5TuxA/JMJLIGL/Oy/XA1b6vr7Q+pDbYC6xMxSwLRXJt
+	tSH6698eQR0wVHq1jgKU2j0gQxij/RHu4x672sRDPRrNkOnuCRLXaJ8Xt2jq1oxCLGhq4ecPb/7
+	kVIc=
+X-Google-Smtp-Source: AGHT+IHz4FrlB7OyherwgPODOxkRZaL9EEGhWWZfyRudaX+9Tg8BzUlsCTVOSOkXddkJEAYdqproWQ==
+X-Received: by 2002:a05:6e02:1e07:b0:3a4:e9b3:22ad with SMTP id e9e14a558f8ab-3a602f7fbabmr175854245ab.0.1730741734852;
+        Mon, 04 Nov 2024 09:35:34 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4de049a44a7sm2000870173.154.2024.11.04.09.35.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 09:35:34 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20241104054218.45596-1-hch@lst.de>
+References: <20241104054218.45596-1-hch@lst.de>
+Subject: Re: [PATCH] block: update blk_stack_limits documentation
+Message-Id: <173074173405.399771.17722839859019485619.b4-ty@kernel.dk>
+Date: Mon, 04 Nov 2024 10:35:34 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V8 5/7] io_uring: support leased group buffer with
- REQ_F_GROUP_KBUF
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
- linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
- Akilesh Kailash <akailash@google.com>
-References: <ZyGURQ-LgIY9DOmh@fedora>
- <40107636-651f-47ea-8086-58953351c462@gmail.com> <ZyQpH8ttWAhS9C5G@fedora>
- <4802ef4c-84ca-4588-aa34-6f1ffa31ac49@gmail.com> <ZygSWB08t1PPyPyv@fedora>
- <0cd7e62b-3e5d-46f2-926b-5e3c3f65c7dd@gmail.com> <ZyghmwcI1U4WizyX@fedora>
- <74d8d323-789c-4b4d-8ce6-ada6a567b552@gmail.com> <ZyjHQN9VITpOlyPA@fedora>
- <8fc4d419-5d16-4f58-ae66-8267edaff6ef@gmail.com> <ZyjNq92M8qhJFEKm@fedora>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZyjNq92M8qhJFEKm@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-On 11/4/24 13:35, Ming Lei wrote:
-> On Mon, Nov 04, 2024 at 01:24:09PM +0000, Pavel Begunkov wrote:
-...
->>>>>> any private data, then the buffer should've already been initialised by
->>>>>> the time it was lease. Initialised is in the sense that it contains no
->>>>>
->>>>> For block IO the practice is to zero the remainder after short read, please
->>>>> see example of loop, lo_complete_rq() & lo_read_simple().
->>>>
->>>> It's more important for me to understand what it tries to fix, whether
->>>> we can leak kernel data without the patch, and whether it can be exploited
->>>> even with the change. We can then decide if it's nicer to zero or not.
->>>>
->>>> I can also ask it in a different way, can you tell is there some security
->>>> concern if there is no zeroing? And if so, can you describe what's the exact
->>>> way it can be triggered?
->>>
->>> Firstly the zeroing follows loop's handling for short read
->>
->>> Secondly, if the remainder part of one page cache buffer isn't zeroed, it might
->>> be leaked to userspace via another read() or mmap() on same page.
->>
->> What kind of data this leaked buffer can contain? Is it uninitialised
->> kernel memory like a freshly kmalloc'ed chunk would have? Or is it private
->> data of some user process?
+
+On Mon, 04 Nov 2024 06:42:18 +0100, Christoph Hellwig wrote:
+> Listing every single features that needs to be pre-set by stacking
+> drivers does not scale.
 > 
-> Yes, the page may be uninitialized, and might contain random kernel data.
+> 
 
-I see now, the user is obviously untrusted, but you're saying the ublk
-server user space is trusted enough to see that kind of kernel data.
-Sounds like a security concern, is there a precedent allowing such? Is
-it what ublk normally does even without this zero copy proposal?
+Applied, thanks!
 
+[1/1] block: update blk_stack_limits documentation
+      (no commit info)
+
+Best regards,
 -- 
-Pavel Begunkov
+Jens Axboe
+
+
+
