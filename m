@@ -1,115 +1,171 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E48C1B6CE2
-	for <linux-block@vger.kernel.org>; Mon,  4 Nov 2024 12:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F26881B0F2B;
+	Mon,  4 Nov 2024 12:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730722770; cv=none; b=Ue+B8XSFuKrwQrb1tOlDxXx6Jsc1lms4Um5QYjSU6slz8UiUepT7oAQ6OcTV6v2qckYe79Vc2IKQt5i0vQW0GvuB6ZkJCQeUwu7uOF9mFaPe2SbfE9IFzXCbM/mEWwIprlTovhFrsZ3jAanykI8t/W8Zj7+Zoqu96+zAOUR/HSk=
+	t=1730722983; cv=none; b=MkX6JcAFMghbgIJSzUFIhK5oGt6UyhrTu2jc+idGCXSnAVqEoMhpgL0+OHenGiV28RCXmg0Bdqpzk8WcjGv/+ldS+ZXMmtXvuh+PrH/0qlXppY0gYwCeNMrIELv+1Y+FobHrrramp/MDuoWPrE7unnuvRSDVG5eg6FeUCcqCx9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730722770; c=relaxed/simple;
-	bh=WafvJUVr8z2C1zDRQCvtKO+6K1W+UrIoTEdLDQdvuUQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VCW6e9RoABZNNPoHoy0z4F9lN/TiOtQH54m8rOFxQfrEF4Z48gNghBo2jj9pLvEGKn1rV920w1EuE7SaBuH5rxgucvmx0a0d2D6lWtdQzsY+gdRlbAjKbpXXmJV4Vf1IOlSCPNl81dZTbFyltEb19XViv2wMYeML6uddFaQiONk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=bU/bwQTR; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1730722983; c=relaxed/simple;
+	bh=UNB5dAGqZBZMKtij4B7IaVvStzBIeAGWY8rbC2gJgno=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G+rYqONyKmxxVmTwO66CgcSaHlbXKLYaVVMgIWMzbVoxjOAZaE07ynVwvuX5c0Z2mM0fXvgu7kLmw29UNHEkBXinoziLnsdnsCP0TmKIyMQUMA9ToDxmkzI6F0rGef8m2tRfJZo11Z+RLVzldzKPDaGSW3MWc7CupkEwrqFJo4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DDeL8W8a; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="bU/bwQTR"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6cbe9e8bbb1so30847196d6.1
-        for <linux-block@vger.kernel.org>; Mon, 04 Nov 2024 04:19:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DDeL8W8a"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a9aa8895facso752796866b.2;
+        Mon, 04 Nov 2024 04:23:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1730722767; x=1731327567; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tx1bOostXz+VH0GPtKgcyKswUQOWFhDDl/A9OfJb8HU=;
-        b=bU/bwQTRIAnSnu3ity+sjC0E2sq7Lx/G0WwuhQK1tFta0i+JHHb4ZgDaI+BwMp0GjP
-         mTuJkPdog3bS5cRlvNdXCOGo6r9C6lL8DpawfLdS9WQBuXkSkb3uRvVJ+3Jft2TU0l4z
-         Z7KQQ+bkelEINXuk6QjGwNJ1comMgCWJsIkvNFZ5eRsjDjojgELoEC7yc5lG8mAlNej8
-         74E5s7BmIpYr0/slUqyH43XmVbIAUeR4ArRinA/7yHVjpHr70CAydaCZc60vL5kQVRHN
-         60rPc+umLegF9M1e2Yl3TaNdXedLwfhi/5tJn9HzowNouiuDeuDVDwHWq3Uougepuohw
-         t3eQ==
+        d=gmail.com; s=20230601; t=1730722980; x=1731327780; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=p6Tl7EKZ/k0uMg7GseFNiZxjC4umBMtaB6MbOBSq7F8=;
+        b=DDeL8W8aLBdl93cdlH7EHLKTcOmIEkl8RSh7nc5B2gBsz7QJm++fQtaQZz6jbSeDsh
+         7UZlPkepFU0ZA7BZXbAYqVQexon5VIDgeQql182EV07qHGNgeUb26hrJsB+BGLfU7Xwn
+         GmPoaCSZJa3jHbypW88AlCljHpcw7oyQIsHNJslmk75KSj24ydyOPNJZMluV6noO1fw9
+         xWyrntlZsnbVdatCx4OBp9QccCYP6cBeLMTMlF1iYRRCKeZwdmI6S7SD19NmsxWfQe5l
+         Z0AXuX5pwXU09qQzVY22fSwtvLlMBPJj+Il/lE++GcqlX3QP+ONedtokd91hJ8O06Ftq
+         6VUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730722767; x=1731327567;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tx1bOostXz+VH0GPtKgcyKswUQOWFhDDl/A9OfJb8HU=;
-        b=Dsm60JnWbGBfNbCCBni5O/u4ZDLGKhVjb6/X9Fr/jJUlyjD/r3yt6pl5kW8kFJ5tgj
-         9Iz2Xf7X0cBl5J3iZlaFPXlRQU6fBeyHNqWOtjVMMy85M9PplUjWDlsCuTO7OoiPUGag
-         zVi+KuQsPoliYFPMYR9bf17hF3Evui/DcHd96WOu5UcpVpu9oEAoN5muSsaFCsN/LUis
-         iZ9+cDc+kTYLax4ZfqbOzPQoc6ZvcN7Rfslp+vL1qTMHc827JIUyr1AxHaO1L7d48yZ5
-         Rg9yHNYKdC96CWPSTCYRNWx8Mf4dOkXhKqptnWBT1qYgn+W1j8gXCM+YoYZZaJZksrC0
-         Q7uw==
-X-Forwarded-Encrypted: i=1; AJvYcCXKy+e1cR4L9Vx06AC6xo2YYKB5J7ozohXTgFBB+PaXxI8F1YoxeOXlgPmb4G5xllaOJeBOtrmlSf2NHw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9VeG184m1mcS6fDJuH8TMUTCmslKZGhgWAPwsr4p+3RpRGskD
-	VmMBmhPrW6OfYjhY6YVdeZ0m507nS4Okw3wSClTKOdlWtrk0K4VYJF2Zk0XJKp4=
-X-Google-Smtp-Source: AGHT+IGGw97HgDqXEc70DPdglFSAiLC2/hvL6iix2sWZheUlrSMhSyN4gGvDNAQMyTZfPVibvICZkw==
-X-Received: by 2002:a05:6214:3a8b:b0:6cb:c199:462a with SMTP id 6a1803df08f44-6d35c137657mr208089456d6.27.1730722766648;
-        Mon, 04 Nov 2024 04:19:26 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d353fc718csm47611946d6.38.2024.11.04.04.19.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 04:19:25 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1t7w3I-00000000hJn-3gHO;
-	Mon, 04 Nov 2024 08:19:24 -0400
-Date: Mon, 4 Nov 2024 08:19:24 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Robin Murphy <robin.murphy@arm.com>, Leon Romanovsky <leon@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 07/17] dma-mapping: Implement link/unlink ranges API
-Message-ID: <20241104121924.GC35848@ziepe.ca>
-References: <cover.1730298502.git.leon@kernel.org>
- <f8c7f160c9ae97fef4ccd355f9979727552c7374.1730298502.git.leon@kernel.org>
- <51c5a5d5-6f90-4c42-b0ef-b87791e00f20@arm.com>
- <20241104091048.GA25041@lst.de>
+        d=1e100.net; s=20230601; t=1730722980; x=1731327780;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=p6Tl7EKZ/k0uMg7GseFNiZxjC4umBMtaB6MbOBSq7F8=;
+        b=WnashLwnSPH1kk7j7atgIIT2PvKywLDJWHkH7aLBRAbezVuCNAC/+ItgHYX/bLqShQ
+         VbnauF+acWy3NIA57MxjhTb3/mDFp1w6c4LncMaG4U7qH+EZvgVnOdoD4OajCyjBsq5b
+         7/t2uO70Utg2x5q20v+GGJD6nUQ+IunPsNXvMSa/9zfQUHHZ/HnhNsNmce26NjZG5Myp
+         4wV3qjnHYPj2hLuOY1BF8q8DFDE3fo4knI4q1DMA/RJUcGHMnFyhl8Umx6YXljkobBLZ
+         NVmqoBR2K2rXBOENVXnkstV5gNAnkC7sbHN0hL8pYvsZiYQUycW5o7e9TGIS2Y1lTMZU
+         Uetw==
+X-Forwarded-Encrypted: i=1; AJvYcCVb0xGQ7tQCDZy/wTAw0dR6bPRiEMM2b1ZzB9gVuOvMimEaPWeX3gUbty8J/LHNcGphsv8VEgFozg==@vger.kernel.org, AJvYcCVu0LriU5qjzuObBfl0adijJ+ififeZyxPmcYmjGYx5HHc57mjtVeEg0gtvISqUsFcRc+xoILKvEE2iyiY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5iE3wD8aO3vOwFsKbN/rkZ41+uVNQJEbyyrl9WuZ2hVqEfTTF
+	ithJqyhr4L4gVURrSHRgOw9bsAcn2q17c8chw6TBo9BoZFYpPQKJmAOESQ==
+X-Google-Smtp-Source: AGHT+IFVsrfdy7L7/lgOtsNNxxO99riTrwuc8748ExSDguZwZvdfGHkqb2/grLnVG1D8SDZB7zgJFQ==
+X-Received: by 2002:a17:907:7216:b0:a99:ef65:58d0 with SMTP id a640c23a62f3a-a9de6440cbbmr3261830066b.65.1730722978377;
+        Mon, 04 Nov 2024 04:22:58 -0800 (PST)
+Received: from [192.168.42.177] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9e56681a76sm547039066b.199.2024.11.04.04.22.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Nov 2024 04:22:57 -0800 (PST)
+Message-ID: <74d8d323-789c-4b4d-8ce6-ada6a567b552@gmail.com>
+Date: Mon, 4 Nov 2024 12:23:04 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241104091048.GA25041@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V8 5/7] io_uring: support leased group buffer with
+ REQ_F_GROUP_KBUF
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+ linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
+ Akilesh Kailash <akailash@google.com>
+References: <20241025122247.3709133-6-ming.lei@redhat.com>
+ <4576f723-5694-40b5-a656-abd1c8d05d62@gmail.com> <ZyGBlWUt02xJRQii@fedora>
+ <bbf2612e-e029-460f-91cf-e1b00de3e656@gmail.com> <ZyGURQ-LgIY9DOmh@fedora>
+ <40107636-651f-47ea-8086-58953351c462@gmail.com> <ZyQpH8ttWAhS9C5G@fedora>
+ <4802ef4c-84ca-4588-aa34-6f1ffa31ac49@gmail.com> <ZygSWB08t1PPyPyv@fedora>
+ <0cd7e62b-3e5d-46f2-926b-5e3c3f65c7dd@gmail.com> <ZyghmwcI1U4WizyX@fedora>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ZyghmwcI1U4WizyX@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 04, 2024 at 10:10:48AM +0100, Christoph Hellwig wrote:
-> >> +		arch_sync_dma_for_device(phys, size, dir);
-> >
-> > Plus if the aim is to pass P2P and whatever arbitrary physical addresses 
-> > through here as well, how can we be sure this isn't going to explode?
+On 11/4/24 01:21, Ming Lei wrote:
+> On Mon, Nov 04, 2024 at 01:08:04AM +0000, Pavel Begunkov wrote:
+>> On 11/4/24 00:16, Ming Lei wrote:
+...
+>>>>>>>> I agree, it's not hot, it's a failure path, and the recv side
+>>>>>>>> is of medium hotness, but the main concern is that the feature
+>>>>>>>> is too actively leaking into other requests.
+>>>>>>> The point is that if you'd like to support kernel buffer. If yes, this
+>>>>>>> kind of change can't be avoided.
+>>>>>>
+>>>>>> There is no guarantee with the patchset that there will be any IO done
+>>>>>> with that buffer, e.g. place a nop into the group, and even then you
+>>>>>
+>>>>> Yes, here it depends on user. In case of ublk, the application has to be
+>>>>> trusted, and the situation is same with other user-emulated storage, such
+>>>>> as qemu.
+>>>>>
+>>>>>> have offsets and length, so it's not clear what the zeroying is supposed
+>>>>>> to achieve.
+>>>>>
+>>>>> The buffer may bee one page cache page, if it isn't initialized
+>>>>> completely, kernel data may be leaked to userspace via mmap.
+>>>>>
+>>>>>> Either the buffer comes fully "initialised", i.e. free of
+>>>>>> kernel private data, or we need to track what parts of the buffer were
+>>>>>> used.
+>>>>>
+>>>>> That is why the only workable way is to zero the remainder in
+>>>>> consumer of OP, imo.
+>>>>
+>>>> If it can leak kernel data in some way, I'm afraid zeroing of the
+>>>> remainder alone won't be enough to prevent it, e.g. the recv/read
+>>>> len doesn't have to match the buffer size.
+>>>
+>>> The leased kernel buffer size is fixed, and the recv/read len is known
+>>> in case of short read/recv, the remainder part is known too, so can you
+>>> explain why zeroing remainder alone isn't enough?
+>>
+>> "The buffer may bee one page cache page, if it isn't initialized
+>> completely, kernel data may be leaked to userspace via mmap."
+>>
+>> I don't know the exact path you meant in this sentence, but let's
+>> take an example:
+>>
+>> 1. The leaser, e.g. ublk cmd, allocates an uninitialised page and
+>> leases it to io_uring.
+>>
+>> 2. User space (e.g. ublk user space impl) does some IO to fill
+>> the buffer, but it's buggy or malicious and fills only half of
+>> the buffer:
+>>
+>> recv(leased_buffer, offset=0, len = 2K);
+>>
+>> So, one half is filled with data, the other half is still not
+>> initialsed.
 > 
-> That's a good point.  Only mapped through host bridge P2P can even
-> end up here, so the address is a perfectly valid physical address
-> in the host.  But I'm not sure if all arch_sync_dma_for_device
-> implementations handle IOMMU memory fine.
+> io_req_zero_remained() is added in this patch and called after the
+> half is done for both io_read() and net recv().
 
-I was told on x86 if you do a cache flush operation on MMIO there is a
-chance it will MCE. Recently had some similar discussions about ARM
-where it was asserted some platforms may have similar.
+It zeroes what's left of the current request, but requests
+don't have to cover the entire buffer.
 
-It would be safest to only call arch flushing calls on memory that is
-mapped cachable. We can assume that a P2P target is never CPU
-mapped cachable, regardless of how the DMA is routed.
+>> 3. The lease ends, and we copy full 4K back to user space with the
+>> unitialised chunk.
+>>
+>> You can correct me on ublk specifics, I assume 3. is not a copy and
+>> the user in 3 is the one using a ublk block device, but the point I'm
+>> making is that if something similar is possible, then just zeroing is not
+>> enough, the user can skip the step filling the buffer. If it can't leak
+> 
+> Can you explain how user skips the step given read IO is member of one group?
 
-Jason
+(2) Illustrates it, it can also be a nop with no read/recv
+
+>> any private data, then the buffer should've already been initialised by
+>> the time it was lease. Initialised is in the sense that it contains no
+> 
+> For block IO the practice is to zero the remainder after short read, please
+> see example of loop, lo_complete_rq() & lo_read_simple().
+
+It's more important for me to understand what it tries to fix, whether
+we can leak kernel data without the patch, and whether it can be exploited
+even with the change. We can then decide if it's nicer to zero or not.
+
+I can also ask it in a different way, can you tell is there some security
+concern if there is no zeroing? And if so, can you describe what's the exact
+way it can be triggered?
+
+-- 
+Pavel Begunkov
