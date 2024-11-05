@@ -1,36 +1,55 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1E81D45FD;
-	Tue,  5 Nov 2024 13:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DBC11D5160
+	for <linux-block@vger.kernel.org>; Tue,  5 Nov 2024 14:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730815026; cv=none; b=J+JiFvD/p/HyohCRGbGGp+LhSWfWQ+KwOnAGQepxiKkY6MO1xDlj5cyD49ekUAsyHZ6vvle7Zl6MW9VjtahlViaxeghB/mH7ztVvP7zg/HHj2BKQGx2SCVnDFKIZNaH44LVrK5baV0xood+4UCP2GMRCcJOqqg0n3O8H+KBrGEI=
+	t=1730815405; cv=none; b=mOoyejXcWVPfsvv17T/bjJ8RoCK3ImCexe0BQ6F6tH/xcyaYs3IcHjHUaellVTJUkMuxHotAOluSKq8XPs6O/Rrci2hyiVP0lX6CuSwwWzTMMuUKrJ0atnUV9MoVbPsbfOvN0sP0sJoQcM701JMWt92lE2VnEejGn29aDR991X0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730815026; c=relaxed/simple;
-	bh=xnApAfOCVcI5XWfGu7l/qg4TZxgZYjy0NexAotGmOdg=;
+	s=arc-20240116; t=1730815405; c=relaxed/simple;
+	bh=QPXikWOJYnKKdTHfQ2UVKCqW6j61xPnR09C89pKA6pE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uz+oQPqxbw9kwrjQfoI4FzmCXzbMTYDjPkzN50sVyQ/6zNKPBZuV6nmJZV+DKVk994O68GatctqvFHTyZq/EfiuNZBaDSNgMwx4Xc+kiDChW7z3TP05QZEm51wr0nYBMy9XIQ76DTfvNNE2tA64vtngpkY/TasSMDTUO+S3apWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id E87FE68CFE; Tue,  5 Nov 2024 14:56:57 +0100 (CET)
-Date: Tue, 5 Nov 2024 14:56:57 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Anuj gupta <anuj1072538@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>, Anuj Gupta <anuj20.g@samsung.com>,
-	axboe@kernel.dk, kbusch@kernel.org, martin.petersen@oracle.com,
-	asml.silence@gmail.com, brauner@kernel.org, jack@suse.cz,
-	viro@zeniv.linux.org.uk, io-uring@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com, linux-scsi@vger.kernel.org,
-	vishak.g@samsung.com, linux-fsdevel@vger.kernel.org,
-	Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v7 06/10] io_uring/rw: add support to send metadata
- along with read/write
-Message-ID: <20241105135657.GA4775@lst.de>
-References: <20241104140601.12239-1-anuj20.g@samsung.com> <CGME20241104141459epcas5p27991e140158b1e7294b4d6c4e767373c@epcas5p2.samsung.com> <20241104140601.12239-7-anuj20.g@samsung.com> <20241105095621.GB597@lst.de> <CACzX3AuNFoE-EC_xpDPZkoiUk1uc0LXMNw-mLnhrKAG4dnJzQw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GdgPxcLtmSgASEy26VYmZ9zjtfrp+FbdTgAJ3fKgvFsImyUut+dfoOyTVbM8EgX6Ux/gL8oD95C6yuomZkg3D6Jfabf+yAiCCbghg2gpDR5US6uznxStUaZlotC5GvCH3wNzdJn61jhMI+eHlYhqTf8Nbo3oEenqghWzXXofjGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N2V/eNOO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N2V/eNOO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730815402;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a1YWEvpIV/hv1nANf3AYEhUmp9gUGHsaAanTGJypJ+s=;
+	b=N2V/eNOOaY2wCQURQ2H+wAEXLId+tJqWx9I5Cn59jFrQhgavtmOuzwJcHRlyZtExCtTjzq
+	7ALqDEnz+7zXm0dB2qGkqA8CyVvDClZyQ3/gQCyoZrDN1Au1oj3WdHFNS6O3kO8O2TXzOc
+	Qt6MsCmcWK99ZuSEtgF805hW8FvQqkc=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-272-w_GfUYeSPoiWKWPj3daBmw-1; Tue,
+ 05 Nov 2024 09:03:17 -0500
+X-MC-Unique: w_GfUYeSPoiWKWPj3daBmw-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9FE4A1955F67;
+	Tue,  5 Nov 2024 14:03:12 +0000 (UTC)
+Received: from redhat.com (unknown [10.39.194.127])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 92849300018D;
+	Tue,  5 Nov 2024 14:03:09 +0000 (UTC)
+Date: Tue, 5 Nov 2024 15:03:06 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, nbd@other.debian.org, eblake@redhat.com,
+	vincent.chen@sifive.com, Leon Schuermann <leon@is.currently.online>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH V3] nbd: fix partial sending
+Message-ID: <ZyolmjfJvYWmhcbS@redhat.com>
+References: <20241029011941.153037-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,16 +58,59 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACzX3AuNFoE-EC_xpDPZkoiUk1uc0LXMNw-mLnhrKAG4dnJzQw@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20241029011941.153037-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tue, Nov 05, 2024 at 06:34:29PM +0530, Anuj gupta wrote:
-> The field is used only at io_uring level, and it helps there in using the
-> SQE space flexibly.
+Am 29.10.2024 um 02:19 hat Ming Lei geschrieben:
+> nbd driver sends request header and payload with multiple call of
+> sock_sendmsg, and partial sending can't be avoided. However, nbd driver
+> returns BLK_STS_RESOURCE to block core in this situation. This way causes
+> one issue: request->tag may change in the next run of nbd_queue_rq(), but
+> the original old tag has been sent as part of header cookie, this way
+> confuses nbd driver reply handling, since the real request can't be
+> retrieved any more with the obsolete old tag.
+> 
+> Fix it by retrying sending directly in per-socket work function,
+> meantime return BLK_STS_OK to block layer core.
+> 
+> Cc: vincent.chen@sifive.com
+> Cc: Leon Schuermann <leon@is.currently.online>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Reported-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-How so?  There is absolutely no documentation for it in either the
-code or commit log.  And if it is about sqe space management, meta_type
-is about the most confusing possible name as well.  So someone please
-needs to write down how it is supposed to work and come up with a name
-that remotely makes sense for that.
+> @@ -770,6 +798,14 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
+>  	return BLK_STS_OK;
+>  
+>  requeue:
+> +	/*
+> +	 * Can't requeue in case we are dealing with partial send
+> +	 *
+> +	 * We must run from pending work function.
+> +	 * */
+> +	if (test_bit(NBD_CMD_PARTIAL_SEND, &cmd->flags))
+> +		return BLK_STS_OK;
+> +
+>  	/* retry on a different socket */
+>  	dev_err_ratelimited(disk_to_dev(nbd->disk),
+>  			    "Request send failed, requeueing\n");
+
+This hunk doesn't feel ideal: The assumption in the normal code path
+here is that the socket is dead, i.e. the error isn't recoverable. With
+this way to handle it, nbd_pending_cmd_work() will keep retrying until
+the request finally times out. We could probably return an error right
+away.
+
+In fact, I think even requeuing (and ideally still completing the
+request successfully in the end) would be fine in this case because
+we'll shut down the socket and never send any additional data on it, so
+the server will never see a complete command. We would just have to make
+sure that nbd_pending_cmd_work() doesn't try to complete sending the
+command any more.
+
+But even though this error path isn't optimal, I feel it might be
+acceptable. Let's see if someone else has an opinion on it.
+
+Tested-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
