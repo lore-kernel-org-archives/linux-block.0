@@ -1,42 +1,43 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DAB1D2F46
-	for <linux-block@vger.kernel.org>; Tue,  5 Nov 2024 11:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36021D31B5;
+	Tue,  5 Nov 2024 11:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730804849; cv=none; b=XDWekWW8x9hwnMJl8EkEOT5Bi68J+zYu5E5rlTqv9vxfksR1Xn723Kh7hnUNf2oX4CmHmF7iOjw1Po05/DE0QF/6hly+/yDX6uanyhrxNQYHFpdABd9GIs8oqLnbWXd5jclG2MiB5PMt88M4kDcV2xUH7a1SYgY3C2WYRGrYgd0=
+	t=1730805553; cv=none; b=ZWKNL1G66DpKobLBg+XCloB85x6c8nhFa10RzCGwqd3z4Y8d7zlY2vp8esfwnojr/m5hJ+GmVsq0v9Sn+K1vvBnRsfVK+YVWyIVk72j29QVoqVQ4yz77i9bEEEhnBAv4iMOjrcvWiGGJR2SC8yRdBUkMhFXf3ld8A7BAj1NrSy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730804849; c=relaxed/simple;
-	bh=0UTtxMe/wXh/DXRcmwgTQp3zqxNkzYeGvXtA88ILtSU=;
+	s=arc-20240116; t=1730805553; c=relaxed/simple;
+	bh=0P/4LXaYYS8+VaEJEHeR1hBpRu520J/avOVUHolKaq8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fatuwaWXvdVf6/kblZgyyKs+exFedIuK6k35HFdYEx8Xca2vYkovyYW0/xJ1gu9qKF58gcKCzh3TvWnccYgvZOV0MwmEJCkumyYyitgEsOiJxtfA23Z9wEbsDDm4WTnVmRcsVNtAXGoiL/ySVcjNcIM2+3GjN2IsOLH5KP7ociI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XkBuF1Jl; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=PxRxqOOiWFGX/RaPeJHO0yo72Kxt7/lz37dMiKKJBd/I7BQKk7xh4Wx/Dl4WfL9lDEvfMHspz77c9Gws2DTKzQOQHznLcrct2gqFd/4u7RQrWc10a9codXcIfxmbIItHtCEGxyoyqWPgbILF7zkT1EvYjVSPu0/wjKDeTx0gKXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g6yl9Oeb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XkBuF1Jl"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=0UTtxMe/wXh/DXRcmwgTQp3zqxNkzYeGvXtA88ILtSU=; b=XkBuF1JleOhYUg3+tjsfIgWKge
-	ZjcHtqf2yhNbr9DxSYuK4k4DV+Md57IAIb45Xsoowm+6vgDaGuw/+XVm9aLXBTG7PRJuem/3A6aOA
-	FTKyqg8ZeyLaJRPXZZcx2f4zrDFzkL0xbPChnhqp3thIUujrSRqC2nW/P+YxKQ7Q65BouWgQGo20i
-	V5gIcZXTsOZj/9S62EI4LaKVjSxdw1M5QX2wrZ90lMWwUAZg4CY/u/FIF69D14Vla+K9BR/8LQIVB
-	As4zN9s+ZWxXXSOJ0GykF73R668HNG6Pzs7i6dFVP0RvZYw2PGAeLiRnv+uFllul4lMSa+IO/4SK3
-	V390asfA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1t8HPD-0000000GmuX-1NSr;
-	Tue, 05 Nov 2024 11:07:27 +0000
-Date: Tue, 5 Nov 2024 03:07:27 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: LongPing Wei <weilongping@oppo.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: fix the initial value of wp_offset for npo2 zone
- size
-Message-ID: <Zyn8b12XCJyjr0rr@infradead.org>
-References: <20241105101120.1207567-1-weilongping@oppo.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g6yl9Oeb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC7EFC4CECF;
+	Tue,  5 Nov 2024 11:19:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730805552;
+	bh=0P/4LXaYYS8+VaEJEHeR1hBpRu520J/avOVUHolKaq8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g6yl9OeblARBBnmH9SCJbpxLuUkCoFi8Nz6Qv0lVFiP/JJqeOQ92A8atAcOK4vg1x
+	 dsGofW0Cjw/mWaQpBrHEu0p8HlkpnmkXZfbtjjgRdYldMwlJWrWK81vPqIlXgNps4m
+	 8mLJZLGy0qcSGn+/sAcb6RDBE6ue8fWKQdnt8PnB9DLfKhYx6s6pnMKvtuCAYJUf4u
+	 Wo4Ho/HKsAfUmTEjAobvLh557kGGJoGOhKcK4yN39O24N0YZshp9ALWBx/Uh9aEvsQ
+	 BeCmrOdmFlnGReYZkDscsqwW0x8A79NgT8kG9MsYATfDNarijX61yDu7jatzKuOt3g
+	 H7iaEjgvmIo8Q==
+Date: Tue, 5 Nov 2024 12:19:05 +0100
+From: Carlos Maiolino <cem@kernel.org>
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, 
+	John Garry <john.g.garry@oracle.com>, brauner@kernel.org, Catherine Hoang <catherine.hoang@oracle.com>, 
+	linux-ext4@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, Jan Kara <jack@suse.cz>, 
+	Christoph Hellwig <hch@infradead.org>, Ojaswin Mujoo <ojaswin@linux.ibm.com>, 
+	linux-block@vger.kernel.org, Dave Chinner <david@fromorbit.com>, linux-kernel@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [ANNOUNCE] work tree for untorn filesystem writes
+Message-ID: <fegazz7mxxhrpn456xek54vtpc7p4eec3pv37f2qznpeexyrvn@iubpqvjzl36k>
+References: <20241105004341.GO21836@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,11 +46,35 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241105101120.1207567-1-weilongping@oppo.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20241105004341.GO21836@frogsfrogsfrogs>
 
-On Tue, Nov 05, 2024 at 06:11:22PM +0800, LongPing Wei wrote:
-> The zone size of Zoned UFS may be not power of 2.
+On Mon, Nov 04, 2024 at 04:43:41PM -0800, Darrick J. Wong wrote:
+> Hi everyone,
+> 
+> Nobody else has stepped up to do this, so I've created a work branch for
+> the fs side of untorn writes:
+> https://git.kernel.org/pub/scm/linux/kernel/git/djwong/xfs-linux.git/log/?h=fs-atomic_2024-11-04
+> 
+> Can you all check this to make sure that I merged it correctly?  And
+> maybe go test this on your storage hardware? :)
+> 
+> If all goes well then I think the next step is to ask brauner very
+> nicely if he'd consider adding this to the vfs trees for 6.13.  If not
+> then I guess we can submit it ourselves, though we probably ought to ask
+> rothwell to add the branch to for-next asap.
+> 
+> PS: We're now past -rc6 so please reply quickly so that this doesn't
+> slip yet another cycle.
+> 
+> Catherine: John's on vacation all week, could you please send me the
+> latest versions of the xfs_io pwrite-atomic patch and the fstest for it?
 
-.. which is not supported by Linux to start with.
+I am kind confused here now. IIRC Jens pulled the first three patches from
+John's series into his tree, and John asked me to pull the other ones. I'm much
+happier to see a single person pulling the whole series instead of splitting it
+into different maintainers though.
 
+Giving how spread the series is, I'd say going through vfs tree would be the
+best place, but I'm not opposed to pull them myself.
+
+Carlos
