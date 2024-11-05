@@ -1,186 +1,109 @@
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7894383;
-	Tue,  5 Nov 2024 06:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730786973; cv=fail; b=KJm2Z4yt3VRySRu2ChAlm/+2E+GyON2w0M3oPkwmEd1oZsa9vaEiIWMjsA/LxuOFASuo6W0fw7GQ2squQqacmjCbag9wI2iSUWxSsx09FJCzSPl2sqUxZBZKdD1CqJ+6PbQ9joLVKlx+edyjAJXz1BbZwfogQsFMtNYfj2odGLg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730786973; c=relaxed/simple;
-	bh=XVMIgLIJE/aYWrm/0UlzHMni1jmR78wiw87AApTanhA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=hWxcZ2Lsh7t/TXi9mdTbChNgjqrLrdjaAiD0FG8026+FehTaMoctNzA+wIW98szhpcVpRQBvl+s8QKg5Sx8nEemsmysqBxFpgKS87ba5z2+CmqGlPxHW/tW6lCUhcN5W9DT0bjCU9u4EFU+jnZwJrnHNZ6zKPo1PxA2GxpvS/2I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=hd3R3+3j; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=myyoOC0W; arc=fail smtp.client-ip=216.71.154.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79366186284
+	for <linux-block@vger.kernel.org>; Tue,  5 Nov 2024 06:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730789278; cv=none; b=tfh+QAcd+YwBMK3VYcHOUufOqCG0hUZpx94s51bKh3THBx2DeF6lOXPFFYgu+EE7haIrfHIH7fMiuXemR/V0NvDiSZ3pNPGiu/n4zKge7A/gQhwtAypFAYbzSa2NrLODy4yRK/GFgHKI2ir5hFDNwk3s0bkvsgtw1g6/bHv8SAY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730789278; c=relaxed/simple;
+	bh=4OSZ+Dr/HYpgzBe5gCu5KbSQJAbV4zx4N9uOqpFpgBc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cegSLJ2SRCz5KsLjvPrk3GTF4uIjLO0U+MfzZ7nc46AFiEuC04iAu6vX2coJqIPXjJ34r08Efgco3pP7m+aq6RbhCP1C3pDZsWgnkYZ1QFRZWkuDQyJoaWcnfe3rhpD/2YzuizMsNXC2wy79Lzn2rIOJAqB0nSYPgDq7J3QlrX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d6xslsmW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hd3R3+3j";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="myyoOC0W"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1730786972; x=1762322972;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=XVMIgLIJE/aYWrm/0UlzHMni1jmR78wiw87AApTanhA=;
-  b=hd3R3+3j1bEtXJDAJd0RHa7YfKxA4vVVy8nM0Xv/UdMDp9rqjMCrqMrm
-   m3lXpFbrxkLbhW5BwY2xIq9C7UbCnfN2aTvGuU9SYTvwRCjwVviQlopu5
-   zWJB1pIWp70gLS4SYi3nq3CGBOxCKG/H/aG2wkyaf3VEF95Y50BDcevy7
-   m/qIvYJss7BwgVID5N6tnj6BsddRS62vMoQ/cfWR0bfwZf9sgk722u6iX
-   eOOvuCV8yD11oUpLZWTRHtiAv//VEhcFr/KWRv12ek0c1t2+afq3gEvB7
-   vWVxR3OrrfEt9fKERJMoeCq3MTFMn8yRsQ7+6gYLpjixWg2E4ylSaYqOE
-   w==;
-X-CSE-ConnectionGUID: Okejn3ZkTRKy/tLUSROI3A==
-X-CSE-MsgGUID: ZUeKGMJ8SM+ep1gN5dKrdA==
-X-IronPort-AV: E=Sophos;i="6.11,259,1725292800"; 
-   d="scan'208";a="30046304"
-Received: from mail-westusazlp17012038.outbound.protection.outlook.com (HELO SJ2PR03CU001.outbound.protection.outlook.com) ([40.93.1.38])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Nov 2024 14:09:30 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WKG4flV5pAanucpnzmGKvWyJwU2njvjkXS82Hny04b2pVucOsKOa5TytVX2wU3DR+bldPyydTYChleOSMTx3ztWP+CDKlO6QiEML29WlKts6/mTG3m6eAWtXwF7gFLmKgxH0L5vtyYBj7TF/KrcYEjMIjgfyazlJwa1zoLYoJGpPbICMrtarVg1id8mdWdJFjQQssBUIccrQjDyY4pmHfRrLUMTBNMNwjO4Y+UT3olTT1H8YyoOA0gxjKk/PGtboxaIdyIP1Vn8q33xPNL0zp7iubbFAzVIlxxBdQlyk2kpm/JMaGMK1YBQBG0iWs6M7juKmtxur4iKcRu4eGBj/7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=etPIcyLmlpb6oWECHI51VR/3JMR+ThmIXUh4zWpQIJk=;
- b=CPcKTOB2P+AuIccdVW+/QgKyfjcz/ZWMuXBVHQmCaW+MIw2Js7bZ2YR5NlRPB08Ix5TCimS2bCc1le6FoVbSYL8Rwt799QFYgXxbafrucwb7RWtUBdVJey88xof0IooScjIYTsHW+6IO5u3fxbbZU8NXUj/ZkECSESzm9Q9TkPKHbuNbojb53qpsM9vTccBZVu5tiNXkaf+vvsQIYPnjLgcgzkMXbuduCIyz/OY8tpu25mT9Js/jAGozw2Sv4neekKRAk+pxz/Iy/RModcFD1OL7AMUdYDj/VGPDvyoGfnrLXeOgo5bWgIuG/QwyNGrFbZ1WIkFQGuGZNUiDx7OoBw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=etPIcyLmlpb6oWECHI51VR/3JMR+ThmIXUh4zWpQIJk=;
- b=myyoOC0WYOkyII9R93VuvLrxVmU1glkmYN2tRlab5IpWzLa/8L80Bf5/RL5TPu6we+E4EA+/ZpSyq/ErlKlm83U0hR+CyBd+iE95h2hOOXG94VIvKrHVgRaamYsz7+wltKTOPv/XA6GHLiF5PWNP34vQFJRl+0EL0zTSlRLnCn8=
-Received: from SJ0PR04MB7776.namprd04.prod.outlook.com (2603:10b6:a03:300::11)
- by PH0PR04MB7173.namprd04.prod.outlook.com (2603:10b6:510:16::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Tue, 5 Nov
- 2024 06:09:28 +0000
-Received: from SJ0PR04MB7776.namprd04.prod.outlook.com
- ([fe80::5266:472:a4e5:a9c2]) by SJ0PR04MB7776.namprd04.prod.outlook.com
- ([fe80::5266:472:a4e5:a9c2%5]) with mapi id 15.20.8114.015; Tue, 5 Nov 2024
- 06:09:28 +0000
-From: Naohiro Aota <Naohiro.Aota@wdc.com>
-To: hch <hch@lst.de>
-CC: Jens Axboe <axboe@kernel.dk>, Chris Mason <clm@fb.com>, Josef Bacik
-	<josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Damien Le Moal
-	<Damien.LeMoal@wdc.com>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-btrfs@vger.kernel.org"
-	<linux-btrfs@vger.kernel.org>
-Subject: Re: [PATCH 3/4] btrfs: use bio_is_zone_append in the completion
- handler
-Thread-Topic: [PATCH 3/4] btrfs: use bio_is_zone_append in the completion
- handler
-Thread-Index: AQHbLB4W1pj/Sl9DOkO09PmDigzILbKoOk2A
-Date: Tue, 5 Nov 2024 06:09:28 +0000
-Message-ID: <3whvw5lwr4zrajppxgwwqzlvwoismrmom54m63ozcom2kaiaxk@yotli2pvckfv>
-References: <20241101052206.437530-1-hch@lst.de>
- <20241101052206.437530-4-hch@lst.de>
-In-Reply-To: <20241101052206.437530-4-hch@lst.de>
-Accept-Language: ja-JP, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR04MB7776:EE_|PH0PR04MB7173:EE_
-x-ms-office365-filtering-correlation-id: c608c608-a710-4b30-55ac-08dcfd606842
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?2nOzbGE79zfZU4Gaq8CD5jy4oYhfOuWoKSIqf7mKCFXxTQJVqBgYO7Dv16oo?=
- =?us-ascii?Q?9+oyaWWVeioCujstVuBCGdf26cyibxwd0mFFK4sV6lTBLmDF+k7mH5cn+YCg?=
- =?us-ascii?Q?AId119Jj6PfEMur8QttVycLHoFKHhSV2sR6V/5mLy9CDvEf1+ygfSIzl3BuE?=
- =?us-ascii?Q?L3A+Yvr/WXNMDRnqJ8MukLxM56UvOES54BYyTsE98fncOYv4ptehssZOKNkB?=
- =?us-ascii?Q?tcHk/v9crU/bolNwv0e0ir38ThUr4cRpezVSwO1KkziR9lTzXzM31t1m0wjH?=
- =?us-ascii?Q?Q71yV1oUCbB3zZ3zvNpdOPzAtZT99S49r2xJNughyyPC14rBJ86NEeeR1ADH?=
- =?us-ascii?Q?NBVnUWuWkZ7HHeLJ3xFRUAy3IrWBwMYjtY3x5WebVTdWq9ex7JGjwEzpxZpV?=
- =?us-ascii?Q?C698a+rYTWN4T+h8lWMrp4XF6khQeZ4hABh7DFQhjtWBqutrrZKIeCewyXqn?=
- =?us-ascii?Q?VjfHX8BnUFp1Sgfrb7VAu8+bIq8kyBh2bSJJJn+3cDxPGyTlofz0tBgbXZf/?=
- =?us-ascii?Q?a/WptSCq/idwN2sHwrr4LvRr8qpgCSC9v0fnOFnFn0AblaIpOsh3MTPobJCl?=
- =?us-ascii?Q?Wip7lg4U31kWJMbfydLyXAN1FHlTKW1L/Ag0VqOVQA57hzJ2ewEqWv6JUIZk?=
- =?us-ascii?Q?5G9I5Ayit9wcvLT/3810ViXP5ufzeFEEb0/Z27KMkVvtvz5wZ2mjEttCB90h?=
- =?us-ascii?Q?GSE7V8TPr1od5dAYrFDADGJtrxULY9OrY8XdoV3bu4ekw3eDAB6e/qcLMiwi?=
- =?us-ascii?Q?fUa4Vrmo/NkoTIRQEJ/aGgzSa7zlVjgBM6cnYu2SQh5I8zMj2a2VbPOXfSaL?=
- =?us-ascii?Q?78cP5vmpTAapPrEy5V6fK6XCfBkv17/ar0Jg24MduL3DTcuvDAM3tkXstZTr?=
- =?us-ascii?Q?Lql7QG402RUizal8wfPH7kTM0cRFxGxg3YZ4c/hQLFpYIc7l2SYXYCz6cDwi?=
- =?us-ascii?Q?hCItr6QR0hOohOrvxS6whJMECm8tiUo/84Xi4dq/E3zon1/gvzg89jAtZpkk?=
- =?us-ascii?Q?th9MOfsteez7jjmiKZvAaGN9/B6hApk0FBCDMjmRZf8Rp1WDBmZKbAqQ7CaU?=
- =?us-ascii?Q?Li/kC8dYaoXxI+38nLVEZQm0EfdGDDDwEl7GD1AulSQXOR6ygU2A8pxjXcbI?=
- =?us-ascii?Q?fCrueeS6Bpic0ySoUHZ7WHnGJr6T1Eu4VpYL+fXycRFYqcxOuPyBx1FcSiww?=
- =?us-ascii?Q?RLFQGswEweU4EVqCvAPKpa7eVhVrCpHpYlLfOJ5I6oFJF6H7vbDx5SFOPbbv?=
- =?us-ascii?Q?qTJn5Mf3kxbxpelW77MPhVJB5ZNWtdrxIoGaDM1idPQ/mJj3cl8qBEK6iraQ?=
- =?us-ascii?Q?A/AlvU2KNlIvS+tI/rk7VnVe3oSr9bbNihyFWBzdoUBmHlZ3NQ19ms+1yIMk?=
- =?us-ascii?Q?sOq9OBE=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR04MB7776.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?3KTtKK7tQY+xmWqFTV5jtWbHCt9s3JSWy+MgEjYN7R9Py1UTUeoK6yfCrrS3?=
- =?us-ascii?Q?lp5Clkqw9cgu08IBrkEs+ECanP5n8jrJlkT9qHq3MxSphJAteHV6scG3bhqg?=
- =?us-ascii?Q?sKMMD9laAtoO6+QkerafyZCDBOTtMIL+cJvte/WTTL+AaTjJzMh3o8uqJJOF?=
- =?us-ascii?Q?Qy93yiWi9U+BldHOgiC0JwEvUrXghtED2zwVmRI8jvbYEWIra1CqI/LpxZwF?=
- =?us-ascii?Q?+sEHaPsG07AIq8LLwrLyJ+/xP/yQY6EIo3qaQac2h8QFycIVblajtrZMLQP1?=
- =?us-ascii?Q?uebDHi6dDCtk4cEQDd/qjNAs3DnvjmHHy57FHzw9qWX8DyyD/8KYhtC5YjKc?=
- =?us-ascii?Q?CgbYVzz8Orqo6NVYLUbcLVdLOGB1x4D4cqP5PzFSFPeBULAsKqVqVn22KNDW?=
- =?us-ascii?Q?vefijgTdkTxk84t9hm30BZdW8Y8W39lEpe495yzuYNzGA1+HrIR5vtAaKfgF?=
- =?us-ascii?Q?UahDErxyPI/IqcbNw//lVN7/QT/Ig3ugS8CGlzBDpjtkRKmibqK+wpRPEhFP?=
- =?us-ascii?Q?zAiZo7weMySNjHhGLEqAJ/EciusTNxLcYpXTW+rT7jmQl+s8Gzfld9PICs5r?=
- =?us-ascii?Q?Bgli43yV0K17hePhEz5KQsbeUuQb8fjdTlH+ErofiVRaN34RjtZNgRSqPNW0?=
- =?us-ascii?Q?+U/jdMZIRKiXjKN0dyRqg4XyA07Rrwbof9EIFK/uxeEG56eUwMoBwDRS9h8f?=
- =?us-ascii?Q?0DeHmKiMlRbJt5A8BOnYCRZWQcS40RVdDDiQ8VcXlUhwvj7mWchNi+xyiC8D?=
- =?us-ascii?Q?HgQ+6+6rh0sKcNP5xeDj9U+EbzWhjIcyWoiT3nlzYvCNR7runLhFPy9Vvpfe?=
- =?us-ascii?Q?ZfScnefZVIsdPi12KxqEX2ob67veOIcFtmiueNlnWjmUYaVL1pK5YTvgvuI0?=
- =?us-ascii?Q?EERN4nx5HnnQRCt9xIAbU5Bz7fgdY/nQxnqCfFwcA1ajr1C3/nPUJCq+e5xJ?=
- =?us-ascii?Q?6JoIOL/HULmjgQ+0eXJcf5DWmk9OmoW2V8IXUsocjgGmtc2oF7bb9mmoXUQj?=
- =?us-ascii?Q?Ch4OKEF9hwNr3Eoau1htjpfr4CQrFbNAd+2e2ZWj/Hw7admvUdJ4MDH8WIWJ?=
- =?us-ascii?Q?VGHJtXsxgyNOhfMXa+10vJIv6HDwWZ9rLCnZjflO3Sw50mHFAfsowHcl6VaM?=
- =?us-ascii?Q?3j5IbYOPE08ToI++Lfya2ga4gFV8DxziHHtoN9QyPGgwqtZT5eNNux1kLejX?=
- =?us-ascii?Q?dW/zk2fB+Bf1vYnZYQkKqLf/mt0cJBBcUjVLsqRj0u1IkdkjskxnrwjThxsu?=
- =?us-ascii?Q?hk7RyU8d+UUDJhoLVBQMei5UjLUFb62KqCW+klZx9FbZ4b7uqEmdpoMYJpMO?=
- =?us-ascii?Q?qFEaeA/XXhCAlN+hIVM4fcgxt++7WAczpucHvMDuqc/sk3NsCWHWTnP/x+4b?=
- =?us-ascii?Q?RrODqV/revzXsMWm3PL1sb9FHIJ2d6/MEOkBOTc5UbX5JSN1azptJEjvov5g?=
- =?us-ascii?Q?GV0T4+XclwZuNUwXAcyDEGTFwdrqLMrNkNabqfjxFH/dAEMrrBaX9JT66vi1?=
- =?us-ascii?Q?VtM2c4MfBrxnMesRHgyhGuHDSKprX8zDt3m/27QFk+GLWdBc81hOEEbXEcxS?=
- =?us-ascii?Q?uMj+5JasDeA77Z/BU3KQhRWUW2ZVuGDSiyfr0JzmGg+V70vBzG6SFvfH2hzF?=
- =?us-ascii?Q?rA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <10A9265E51C1AB40839E005E140DE726@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6xslsmW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730789274;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OSSiISjBEV9S7jAitSAByWMNKJbvVYBfy3jJPVgWuvQ=;
+	b=d6xslsmWd/MQBpwMzgOlrts30lUYFHnnW9T3MoLNtKA5W+7+8qMGx3AMak3R1GtxMiVQ+b
+	x6qhDPM1jsMZoxWy9RKCS5L8Fab8cJlF0I27NC9ecrFfIHB5O9+TIhl3Oea9+vrRoB5dkB
+	HMAe4iVPG2IvgLK6izCkNpXZT/m2aW4=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-232-UWolMrigNN-kY1t1Lc4-Xw-1; Tue,
+ 05 Nov 2024 01:47:51 -0500
+X-MC-Unique: UWolMrigNN-kY1t1Lc4-Xw-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0C4A11955F54;
+	Tue,  5 Nov 2024 06:47:49 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.156])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA2E919560A2;
+	Tue,  5 Nov 2024 06:47:41 +0000 (UTC)
+Date: Tue, 5 Nov 2024 14:47:35 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: syzbot <syzbot+a3c16289c8c99b02cac1@syzkaller.appspotmail.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	mathieu.desnoyers@efficios.com, mhiramat@kernel.org,
+	rostedt@goodmis.org, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [block?] [trace?] possible deadlock in blk_trace_ioctl
+Message-ID: <Zym_h_EYRVX18dSw@fedora>
+References: <67251e01.050a0220.529b6.0161.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	C/hbdF5UlQYTG9s3rdQxymS1jw/vuVdr8iHdOMKHDUCM73VEw6W7AT0Eie+ZuqyH1GwRusmO0ccuO7B1iOME3Jy/xLXvL/nh/Dfw7+9YQiZ9wDG1ilNgSSARfVqmm+MSPYEGUf9yfj1rVQZy0vBt+SZHOycZG/WNNOVc+1UFW/fXkjW81L4sKR026NnYlyu66Qk1xffFjC9Z+2+jdHNlDeLFDRKOgft9HjYXW9KtIY7PEiYHFqYOCyRG309a9vIuQLRsCyMAn6VNKMgKHjLfLuhHZuPQU0iYWZrzg+WQh4BfGmkrMUy5eKQbZP7/dQ4A7OmIage/wMiJkCYFyBeDFcF4eDTUN7Ait4eXwbaYBjUHiaP4O5GFQ6GXgKIFbHsOfFV84o8yhzLAscByxebYGJf9/Ws7wHTR9kupSpjOCMLD/WCsfT7+ZIxLtl88ylyxarHMIHPKgyiojsn1AQdF8xrv1+C9iBLuw24zWvXf8bdaTXKUsEv1UvT4iM4B6Z/jUl/esHh0xwv98lzY3geN5yFaKDwI2LcuDmxIaVAuDuGNClfVrHYK5I8YVFri3Hf/wxTE3zzIZkiLmGTtAXqDPaZhqA2I0SisaDV0tN/930bVyIbc385aCLH4WNf8Jhlm
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR04MB7776.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c608c608-a710-4b30-55ac-08dcfd606842
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Nov 2024 06:09:28.7171
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hdxvkRq6CgCiTJ8bvom9HoApyNzMq05tEJ5J/iHZjwvzFkfacUMX9Ic0omR407iKSLd4/SVr801/kVZ45ITUBQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7173
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <67251e01.050a0220.529b6.0161.GAE@google.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, Nov 01, 2024 at 06:21:46AM GMT, Christoph Hellwig wrote:
-> Otherwise it won't catch bios turned into regular writes by the
-> block level zone write plugging.
->=20
-> Fixes: 9b1ce7f0c6f8 ("block: Implement zone append emulation")
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Fri, Nov 01, 2024 at 11:29:21AM -0700, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    f9f24ca362a4 Add linux-next specific files for 20241031
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=10016630580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=328572ed4d152be9
+> dashboard link: https://syzkaller.appspot.com/bug?extid=a3c16289c8c99b02cac1
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=125a9340580000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/eb84549dd6b3/disk-f9f24ca3.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/beb29bdfa297/vmlinux-f9f24ca3.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/8881fe3245ad/bzImage-f9f24ca3.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+a3c16289c8c99b02cac1@syzkaller.appspotmail.com
+> 
+
+...
+
+> 
+> 
 > ---
->  fs/btrfs/bio.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
 
-Reviewed-by: Naohiro Aota <naohiro.aota@wdc.com>=
+#syz test: https://github.com/ming1/linux.git for-next
+
+Thanks,
+Ming
+
