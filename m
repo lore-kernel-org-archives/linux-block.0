@@ -1,34 +1,42 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE3C1C07C8;
-	Tue,  5 Nov 2024 11:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DAB1D2F46
+	for <linux-block@vger.kernel.org>; Tue,  5 Nov 2024 11:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730804683; cv=none; b=aB0zMj4kcApqhpUV6svCbqlWWcTqs9qQsAMJl9V/QukqYoeQT/PeoPRFN5u0G4zGBcOPllVEj6EfHx9FowzngdnNBx1LSmxE/5ZpxgAnVqzzPuCNuTE9IbCq8J8qburZ741yXDXqu5nlMz31SRDQYXOVJWwJ8+wmVBXRjjrjUa4=
+	t=1730804849; cv=none; b=XDWekWW8x9hwnMJl8EkEOT5Bi68J+zYu5E5rlTqv9vxfksR1Xn723Kh7hnUNf2oX4CmHmF7iOjw1Po05/DE0QF/6hly+/yDX6uanyhrxNQYHFpdABd9GIs8oqLnbWXd5jclG2MiB5PMt88M4kDcV2xUH7a1SYgY3C2WYRGrYgd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730804683; c=relaxed/simple;
-	bh=wo1zgfGnEXM+JgIeRtdAg2C2V/ondOuwWv27eag6hiU=;
+	s=arc-20240116; t=1730804849; c=relaxed/simple;
+	bh=0UTtxMe/wXh/DXRcmwgTQp3zqxNkzYeGvXtA88ILtSU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sY5TRTwWsARcyC5/1to4LaabwMM9x8VTnx/zKLa8u7FkoLLTYpJVY7RhN0MsTdSvzWcydu+RdLhhuFypFZSOUA+mzivdUVPtVu3a1FyFq/K6p6GT2NVRWeZ9/n+damhnK9ixkb0zSzGZtp297hQfXA2ojv4WaO1obAEDUhd/6M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1270F68CFE; Tue,  5 Nov 2024 12:04:36 +0100 (CET)
-Date: Tue, 5 Nov 2024 12:04:35 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Matias =?iso-8859-1?Q?Bj=F8rling?= <m@bjorling.me>,
-	dlemoal@kernel.org, cassel@kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, wangyugui@e16-tech.com,
-	martin.petersen@oracle.com, hare@suse.de,
-	Matias =?iso-8859-1?Q?Bj=F8rling?= <matias.bjorling@wdc.com>
-Subject: Re: [PATCH 1/3 v2] nvme: make independent ns identify default
-Message-ID: <20241105110435.GA1822@lst.de>
-References: <20241010123951.1226105-1-m@bjorling.me> <20241010123951.1226105-2-m@bjorling.me> <20241011081452.GA3337@lst.de> <ZyVZ_T4HtnqSWTm0@kbusch-mbp.dhcp.thefacebook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fatuwaWXvdVf6/kblZgyyKs+exFedIuK6k35HFdYEx8Xca2vYkovyYW0/xJ1gu9qKF58gcKCzh3TvWnccYgvZOV0MwmEJCkumyYyitgEsOiJxtfA23Z9wEbsDDm4WTnVmRcsVNtAXGoiL/ySVcjNcIM2+3GjN2IsOLH5KP7ociI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XkBuF1Jl; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XkBuF1Jl"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=0UTtxMe/wXh/DXRcmwgTQp3zqxNkzYeGvXtA88ILtSU=; b=XkBuF1JleOhYUg3+tjsfIgWKge
+	ZjcHtqf2yhNbr9DxSYuK4k4DV+Md57IAIb45Xsoowm+6vgDaGuw/+XVm9aLXBTG7PRJuem/3A6aOA
+	FTKyqg8ZeyLaJRPXZZcx2f4zrDFzkL0xbPChnhqp3thIUujrSRqC2nW/P+YxKQ7Q65BouWgQGo20i
+	V5gIcZXTsOZj/9S62EI4LaKVjSxdw1M5QX2wrZ90lMWwUAZg4CY/u/FIF69D14Vla+K9BR/8LQIVB
+	As4zN9s+ZWxXXSOJ0GykF73R668HNG6Pzs7i6dFVP0RvZYw2PGAeLiRnv+uFllul4lMSa+IO/4SK3
+	V390asfA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1t8HPD-0000000GmuX-1NSr;
+	Tue, 05 Nov 2024 11:07:27 +0000
+Date: Tue, 5 Nov 2024 03:07:27 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: LongPing Wei <weilongping@oppo.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: fix the initial value of wp_offset for npo2 zone
+ size
+Message-ID: <Zyn8b12XCJyjr0rr@infradead.org>
+References: <20241105101120.1207567-1-weilongping@oppo.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,20 +45,11 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZyVZ_T4HtnqSWTm0@kbusch-mbp.dhcp.thefacebook.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20241105101120.1207567-1-weilongping@oppo.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Nov 01, 2024 at 04:45:17PM -0600, Keith Busch wrote:
-> I've got the rest of the required logs and identifications implemented
-> in nvmet to support this.
+On Tue, Nov 05, 2024 at 06:11:22PM +0800, LongPing Wei wrote:
+> The zone size of Zoned UFS may be not power of 2.
 
-Cool!
+.. which is not supported by Linux to start with.
 
-> There's one more issue, though, if we do
-> restrict the identify to >= 2.0 or 2.1. nvmet reports 1.3, and I suspect
-> there's a bit more work than just changing the value of NVMET_DEFAULT_VS
-> in order to comply with claiming that version.
-
-I don't think there were a lot of new mandatory requirements added that
-we didn't already do, or already we already ignored anyway, but it is
-worth a double check.
