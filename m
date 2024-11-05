@@ -1,130 +1,230 @@
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFC5DF5C;
-	Tue,  5 Nov 2024 03:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D9D15666D
+	for <linux-block@vger.kernel.org>; Tue,  5 Nov 2024 03:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730775650; cv=none; b=G6lWt0K/FiHl7So/A4m1dT46p7lxUbHq7xkMr6P0Z6m+qa0jkkpKw4jvHaVCtPplCsFoXC+2XHJ8HQ8eZdccxQlnSThmsz9SsGd3mziEZq/+irUSoSZ4a7P0BuVAVDruZu65nTBqFCQy7XZYCXnxqo4lZRdE2lUKgw7IkhM0Ky0=
+	t=1730776199; cv=none; b=Gw9+cpvplXoN7Cr5fMDyyKJCkcQFvBHRN5yXwk5uE9+jHoHAX44HQM5Ot3Rtxf/seCZHnM52UTr5ZvAgKKFDDXg9HpawnMS+yp6e1Eig8bSopQ5VVYKI9Y3nrVOr7SmNUkqOZvsN6N049x+cH425b//ZfPsZwJ2UAylr5eZFxes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730775650; c=relaxed/simple;
-	bh=J4hH2bIq0QeSNnK6wcb1FrSMqUdGkUkwZYvooy+BnoI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=he/IEQsLInP12mKFQOSVd77Js/H6/fhMZcogH/2g4/9GM+6VFg+12rbcWXJbiylbqdQg6Hru7slOJtNhXJx0YHkU+IaZU34MRXPr0UDC/xizQPZQCXoIKC23hdWLYeeYORVBufoUKzJIz/ESiy6KQBlXtvfGo6JNWsarafbNNFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZlsJloln; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1730776199; c=relaxed/simple;
+	bh=iJiqEI4jeiISFUYA5z9mrx3IXzLlVPZzv4h1oYlPJgI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SOvu9kqClGurNN/mZ+URWXrgpNdHxVQsAfMHe/UNIRLeWSSy5WkBJHNsLxNB8xbtMcvtiL1ASqvJUEeumvrhL8XqAx/WXmdlqsZfwBOUyRCkdfWpon6u0DyAJoPFlYhptTryzBu1SQsUZIlUiV3haViwJ1L5YsUXl8Ag7YYlbEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=itvJaTGM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZlsJloln"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1730775644; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=55NEy9DHeGDhSrsAwciZjYZ9pkn8zq6dUKZVxyN3tD0=;
-	b=ZlsJlolnOLnR2aMhmPuMJmP6jd7dBSxZLps8VmL/urhdCo5p1yaZ3oSyXAvTZw2BXLw0mwL0YRn4nW076OaObQgZjQW5QttkkrhDXqI75qJMxljrL/BbwHBZnmcY/5KWjQIFQSDtpj50wa96pgr2XNXp3pqPl0DXoaGSMwY2Xg4=
-Received: from 30.178.81.152(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0WIlHpxb_1730775643 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 05 Nov 2024 11:00:44 +0800
-Message-ID: <45a15c19-cc26-4015-8f86-a258026acb01@linux.alibaba.com>
-Date: Tue, 5 Nov 2024 11:00:41 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="itvJaTGM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730776196;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e798jqlARNKREu5f9NYLA+kZVVjz8QYT2h6TT0fZ7qY=;
+	b=itvJaTGMvq3pnNwJwXHX235F7FA/TuQiXyXlSYWmuaoHSJVjSrlQnOhXNma497nf6/IavG
+	eqYzJU2UH+BY6fAMGkIVsc1wGQb4kizJBQCSx9DmjuJY5DwS8COUMEMUKPSuI5UsKx9xGV
+	iy+4YvLROVopYnNDFOCFlCCThCLmmzs=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-82-hJ221DKTMAWDFkWwvHGENw-1; Mon, 04 Nov 2024 22:09:55 -0500
+X-MC-Unique: hJ221DKTMAWDFkWwvHGENw-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2e2ca4fb175so5074515a91.3
+        for <linux-block@vger.kernel.org>; Mon, 04 Nov 2024 19:09:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730776194; x=1731380994;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e798jqlARNKREu5f9NYLA+kZVVjz8QYT2h6TT0fZ7qY=;
+        b=ttM2VFbvRkdnQsB6PuqWe3DI8ULNtAlT9L1Cx9qB9Ov+3UTKmkpQixLjJpEpBwWEQu
+         Bs5U4HFetKjnBP1eEJ2OfXx78jx1L8N/l9Quor/ktWustUKC8jgBwUWht8RMYez5P0Xg
+         kHM8Nj5lgKzoHKSy6atLu83RJABLKVJwlY1VFymVSLI4avCtpQWhdbI9R26SpmKFPTcd
+         tipLtaTK1EtxMGM4Bq+xNOO6gwjIYpPylsqgorUKWu/apz4Zg+KnzViEI/KGhB5nlYiB
+         Z4bV3e+bFHnYNjVEMedqhmfbLSm+IKf5vQLglklTvK90nJCr43wAyYfFTG4nBg+nwcr6
+         +rZA==
+X-Forwarded-Encrypted: i=1; AJvYcCUJqlJOyLXB/nUDm7Q9Ij/+wQr3Fb+/Nwf93iW7pw1Qwa7PCuYWBHrsQIUWOVhy6pm4d1AAL3yeNTfi1Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFUf0aRiCT3sFnz8B/sddVYf4uk8cQhicQN1WyYeljkKZm1beU
+	vg72zoYR7H1JKV9xBCgXh+WjRXAv//4YMFtn1n9+dSl5VngHpOvCR/HJbH8cnIO8uJ2bTneMzy8
+	RZFowPvNBUPqZZaYGi7UnXKxnh3wbyibajChW5bg+eLBgs2ORoVIv2gYV8buQZn0kNNZ9mqg7bL
+	AB+ot7IMEgTPwLgUGHoQaTTSfmRu/2yT8/+tQ=
+X-Received: by 2002:a17:90a:bc87:b0:2d3:da6d:8330 with SMTP id 98e67ed59e1d1-2e92ce32e36mr24812064a91.4.1730776193976;
+        Mon, 04 Nov 2024 19:09:53 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGYJVUVsmrlOV42/z3JLwA/lW5WLQWpnOFROwOF4DJyTXxU3SnSQkWNTS+6YVqbPJsVSZBiin0tuQPsU4ebyy8=
+X-Received: by 2002:a17:90a:bc87:b0:2d3:da6d:8330 with SMTP id
+ 98e67ed59e1d1-2e92ce32e36mr24812003a91.4.1730776193416; Mon, 04 Nov 2024
+ 19:09:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: =?UTF-8?B?TW96aWxsYSBUaHVuZGVyYmlyZCDmtYvor5XniYg=?=
-Subject: Re: [PATCH 3/3 v2] nvmet: add rotational support
-To: =?UTF-8?Q?Matias_Bj=C3=B8rling?= <m@bjorling.me>, kbusch@kernel.org,
- hch@lst.de, dlemoal@kernel.org, cassel@kernel.org,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, wangyugui@e16-tech.com,
- martin.petersen@oracle.com, hare@suse.de
-References: <20241010123951.1226105-1-m@bjorling.me>
- <20241010123951.1226105-4-m@bjorling.me>
-From: Guixin Liu <kanie@linux.alibaba.com>
-In-Reply-To: <20241010123951.1226105-4-m@bjorling.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com>
+ <20241101015101.98111-1-qiang4.zhang@linux.intel.com> <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
+ <ZyRlC-5V_NTKgzXh@dev-qz>
+In-Reply-To: <ZyRlC-5V_NTKgzXh@dev-qz>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 5 Nov 2024 11:09:41 +0800
+Message-ID: <CACGkMEvc+eA7KdJJAtjNPwqve8CwLZYzAmMhf0RWwQ-GwonaUw@mail.gmail.com>
+Subject: Re: [PATCH v2] virtio: only reset device and restore status if needed
+ in device resume
+To: Qiang Zhang <qiang4.zhang@linux.intel.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jens Axboe <axboe@kernel.dk>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
+	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	"Chen, Jian Jun" <jian.jun.chen@intel.com>, Andi Shyti <andi.shyti@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, David Hildenbrand <david@redhat.com>, 
+	Gerd Hoffmann <kraxel@redhat.com>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Qiang Zhang <qiang4.zhang@intel.com>, 
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-在 2024/10/10 20:39, Matias Bjørling 写道:
-> From: Keith Busch <kbusch@kernel.org>
+On Fri, Nov 1, 2024 at 1:23=E2=80=AFPM Qiang Zhang <qiang4.zhang@linux.inte=
+l.com> wrote:
 >
-> Rotational block devices can be detected in NVMe through the rotational
-> attribute in the independent namespace identify data structure.
+> On Fri, Nov 01, 2024 at 10:11:11AM +0800, Jason Wang wrote:
+> > On Fri, Nov 1, 2024 at 9:54=E2=80=AFAM <qiang4.zhang@linux.intel.com> w=
+rote:
+> > >
+> > > From: Qiang Zhang <qiang4.zhang@intel.com>
+> > >
+> > > Virtio core unconditionally reset and restore status for all virtio
+> > > devices before calling restore method. This breaks some virtio driver=
+s
+> > > which don't need to do anything in suspend and resume because they
+> > > just want to keep device state retained.
+> >
+> > The challenge is how can driver know device doesn't need rest.
 >
-> Extend nvmet with support for the independent namespace identify data
-> structure and expose the rotational support of the backend device.
+> Hi,
 >
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->   drivers/nvme/target/admin-cmd.c | 32 ++++++++++++++++++++++++++++++++
->   1 file changed, 32 insertions(+)
+> Per my understanding to PM, in the suspend flow, device drivers need to
+> 1. First manage/stop accesses from upper level software and
+> 2. Store the volatile context into in-memory data structures.
+> 3. Put devices into some low power (suspended) state.
+> The resume process does the reverse.
+> If a device context won't loose after entering some low power state
+> (optional), it's OK to skip step 2.
 >
-> diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
-> index f7e1156ac7ec..f08f1226c897 100644
-> --- a/drivers/nvme/target/admin-cmd.c
-> +++ b/drivers/nvme/target/admin-cmd.c
-> @@ -675,6 +675,35 @@ static void nvmet_execute_identify_ctrl_nvm(struct nvmet_req *req)
->   		   nvmet_zero_sgl(req, 0, sizeof(struct nvme_id_ctrl_nvm)));
->   }
->   
-> +static void nvmet_execute_id_cs_indep(struct nvmet_req *req)
-> +{
-> +	struct nvme_id_ns_cs_indep *id;
-> +	u16 status;
-> +
-> +	status = nvmet_req_find_ns(req);
-> +	if (status)
-> +		goto out;
-> +
-> +	id = kzalloc(sizeof(*id), GFP_KERNEL);
-> +	if (!id) {
-> +		status = NVME_SC_INTERNAL;
-> +		goto out;
-> +	}
-> +
-> +	id->nstat = NVME_NSTAT_NRDY;
-> +	id->anagrpid = req->ns->anagrpid;
+> For virtio devices, spec doesn't define whether their states will lost
+> after platform entering suspended state.
 
-Hi Matias,
+This is exactly what suspend patch tries to define.
 
-Here should use "cpu_to_le32(req->ns->anagrpid)",
+> So to work with different
+> hypervisors, virtio drivers typically trigger a reset in suspend/resume
+> flow. This works fine for virtio devices if following conditions are met:
+> - Device state can be totally recoverable.
+> - There isn't any working behaviour expected in suspended state, i.e. the
+>   suspended state should be sub-state of reset.
+> However, the first point may be hard to implement from driver side for so=
+me
+> devices. The second point may be unacceptable for some kind of devices.
+>
+> For your question, for devices whose suspended state is alike reset state=
+,
+> the hypervisor have the flexibility to retain its state or not, kernel
+> driver can unconditionally reset it with proper re-initialization to
+> accomplish better compatibility. For others, hypervisor *must* retain
+> device state and driver just keeps using it.
 
-And I send 3 patches to support ns's respective vwc which depends on 
-your patch,
+Right, so my question is how did the driver know the behaviour of a
+device? We usually do that via a feature bit.
 
-you can search "[PATCH RFC 0/3] set nvme ns's vwc respectively" to find 
-my patches,
+Note that the thing that matters here is the migration compatibility.
 
-waiting for your patch applied, and I will work continue.
+>
+> >
+> > For example, PCI has no_soft_reset which has been done in the commit
+> > "virtio: Add support for no-reset virtio PCI PM".
+> >
+> > And there's a ongoing long discussion of adding suspend support in the
+> > virtio spec, then driver know it's safe to suspend/resume without
+> > reset.
+>
+> That's great! Hopefully it can fill the gap.
+> Currently, I think we can safely move the reset to drivers' freeze method=
+s,
+> virtio core has no reason to take it as a common action required by all
+> devices. And the reset operation can be optional skipped if driver have
+> hints from device that it can retain state.
 
-Best Regards,
+The problem here is whether the device can be resumed without "soft
+reset" seems a general feature which could be either the knowledge of
 
-Guixin Liu
+1) virtio core (a feature bit or not)
 
-> +	id->nmic = NVME_NS_NMIC_SHARED;
-> +	if (req->ns->readonly)
-> +		id->nsattr |= NVME_NS_ATTR_RO;
-> +	if (req->ns->bdev && !bdev_nonrot(req->ns->bdev))
-> +		id->nsfeat |= NVME_NS_ROTATIONAL;
-> +
-> +	status = nvmet_copy_to_sgl(req, 0, id, sizeof(*id));
-> +	kfree(id);
-> +out:
-> +	nvmet_req_complete(req, status);
-> +}
-> +
->   static void nvmet_execute_identify(struct nvmet_req *req)
->   {
->   	if (!nvmet_check_transfer_len(req, NVME_IDENTIFY_DATA_SIZE))
-> @@ -719,6 +748,9 @@ static void nvmet_execute_identify(struct nvmet_req *req)
->   			break;
->   		}
->   		break;
-> +	case NVME_ID_CNS_NS_CS_INDEP:
-> +		nvmet_execute_id_cs_indep(req);
-> +		return;
->   	}
->   
->   	pr_debug("unhandled identify cns %d on qid %d\n",
+or
+
+2) transport layer (like PCI)
+
+>
+> >
+> > >
+> > > Virtio GPIO is a typical example. GPIO states should be kept unchange=
+d
+> > > after suspend and resume (e.g. output pins keep driving the output) a=
+nd
+> > > Virtio GPIO driver does nothing in freeze and restore methods. But th=
+e
+> > > reset operation in virtio_device_restore breaks this.
+> >
+> > Is this mandated by GPIO or virtio spec? If yes, let's quote the revela=
+nt part.
+>
+> No. But in actual hardware design (e.g. Intel PCH GPIO), or from the
+> requirement perspective, GPIO pin state can be (should support) retained
+> in suspended state.
+> If Virtio GPIO is used to let VM operate such physical GPIO chip indirect=
+ly,
+> it can't be reset in suspend and resume. Meanwhile the hypervisor will
+> retain pin states after suspension.
+>
+> >
+> > >
+> > > Since some devices need reset in suspend and resume while some needn'=
+t,
+> > > create a new helper function for the original reset and status restor=
+e
+> > > logic so that virtio drivers can invoke it in their restore method
+> > > if necessary.
+> >
+> > How are those drivers classified?
+>
+> I think this depends whether hypervisor will keep devices state in platfo=
+rm
+> suspend process.
+
+So the problem is that the actual implementation (hypervisor, physical
+device or mediation) is transparent to the driver. Driver needs a
+general way to know whether it's safe (or not) to reset during the
+suspend/resume.
+
+> I think hypervisor should because suspend and reset are
+> conceptually two different things.
+
+Probably, but rest is and doing software state load/save is common
+practice for devices that will lose their state during PM.
+
+Thanks
+
+>
+>
+> Thanks
+> Qiang
+>
+
