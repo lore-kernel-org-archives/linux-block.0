@@ -1,60 +1,60 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7481E7C35
-	for <linux-block@vger.kernel.org>; Tue,  5 Nov 2024 20:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A201C1CCB2D
+	for <linux-block@vger.kernel.org>; Tue,  5 Nov 2024 22:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730839732; cv=none; b=Uo9gwb01h19ETzEedafrYufBuFcW93FlR94GMrLBEXx3MVxDCHlnCxwi8eFd2KruJq+ikFOJpJ/fqdxCYw0u2fhbv9NvNRIqqk3Jvo077jsnp4jyTHO0+ZMJTsXkg/bhQAV/+dA2Cw4ywl/sYvpxcAIrZ3+JWD6tAVBQApIVRZg=
+	t=1730846634; cv=none; b=DkZeCdC+9a+HKTMCRKXpPE+FeKPagGD9/ExYd33/0tqo/ORK/xwrURiqxZqRI2rw+KIifQmU5c9dqxwGMaw5YIwn5/AwUz7rxfHESgm37Dm94dk1MSrarEwPDDBGTeMIx5PF+wCBYJCl/3LSSIRgcqFY6+P1vxVq43UXHQOZrh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730839732; c=relaxed/simple;
-	bh=lCnGrYIbQZZpxOfahoBMX3vu8HuSRWRJRjBHPwwlppw=;
+	s=arc-20240116; t=1730846634; c=relaxed/simple;
+	bh=uvRMY8hQokzZD51R5s8UPXXu6THQmKDB8iJWHfPk0Tg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q7sYG/GTZp9xxTUq6GwdCBoD9adJShd0yWgnvRVTjFRxaO/ChmSV8kg1UY6zXp5zqoQ6HhexCD0Kb9/joUAxMT/20hanF7bgwAUbUsExlkvTNVVzynt05JKwSuSCI95ETgTSKnpd/CitcFeiI9jPduONosYA6O0hLH3kpcYJMYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jDgzBguD; arc=none smtp.client-ip=198.175.65.15
+	 Content-Type:Content-Disposition:In-Reply-To; b=EUOh/TBvjpf7ArZrEd8RindP/8xXU+6dN0qkFddH0LyzD6cU1F2pT1cWAL+NpPn4atfP1hPiHF1NxxnGMgQoed1uccaBBv3FYHysCAsc/nHCIebDsIuyBy2ZyyGnTQnl4yEeCn0cFHREaS2QjmnFRvg4yzlCT3xjQixuIeDW7B0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iE5z1jzx; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jDgzBguD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iE5z1jzx"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730839731; x=1762375731;
+  t=1730846633; x=1762382633;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=lCnGrYIbQZZpxOfahoBMX3vu8HuSRWRJRjBHPwwlppw=;
-  b=jDgzBguDE3F7XxVhCgaXv8IH3ysrLsQyog26Bg1apm+LNTttSOwS06v8
-   NC/ZLt0uGs5+qDN9rP2ghsrj3qitAZUjdBXiulvQ7v6A4XTH9lT8Hc6As
-   dZwVvJasblFQWfL5uFuu39CjxW9aq6oLYftfFNyTLyD07eiIazXDDholJ
-   jbayFkXj9845q5EpIINokJZ1oSqx/iBqYfCSv0EgKXBwoq5U/Cy+lYRp4
-   AutLPA2yh5gYC97wQ6mA23yFlmhCXrLgMjjrW5zkr/TsJoR8vJHWPO79d
-   pmxMmn5a0gjMgbNKO/1GBTXRJJ45sk3czzD560LSyTvNOKnpuEKzVZoq9
+  bh=uvRMY8hQokzZD51R5s8UPXXu6THQmKDB8iJWHfPk0Tg=;
+  b=iE5z1jzxKPmPrcDTr6HWvH/PLrSm9hoX6+sdW7x9I/NonLd0Fnw0jV4F
+   TTljP6CYHV3upzsbx8CO6OKOUWos+NhwfHulzsCMrqFBuWWWxgyq5Jg3K
+   n+cmSX0VJlEY+mJWVx86urYLmJsb7YoT0CPEq0H/Mby7yAzu8/nvq64r1
+   Y4VWlcbEQ9asopkb1/SrV9R0IKuG0HugGrQrlpG65FJl7k5PEJ9MCTmnh
+   FRn8RoqKIb16Einc2KjFAzs99k1REvQkKGwb1iyZnWA14VuiWwCo9/Tfz
+   doSa0aga5tvijCTGYPlN2QTXc8kZ1HwvquvrNyfT0eVdq+Ozcd7XdOECS
    w==;
-X-CSE-ConnectionGUID: bP9IF6urTKib5gaCwh79hw==
-X-CSE-MsgGUID: L9JpR6fDQtC6lRNAkDs1lQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="34307218"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="34307218"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 12:48:50 -0800
-X-CSE-ConnectionGUID: /ek+0I3VQpmFnZALxCgNMg==
-X-CSE-MsgGUID: 0Vm47jXKTG2Ftp7CQkdV3g==
+X-CSE-ConnectionGUID: UeAwlh+zSlCoArOUI0wbUA==
+X-CSE-MsgGUID: XHy3eMAjT1ehyvP+kABVUA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="41249491"
+X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
+   d="scan'208";a="41249491"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 14:43:52 -0800
+X-CSE-ConnectionGUID: vSfeQLRaRkeJvS8iZXo+fg==
+X-CSE-MsgGUID: GHrXa8UWT06oPy6YDhGrQw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="88117722"
+   d="scan'208";a="84327066"
 Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 05 Nov 2024 12:48:48 -0800
+  by fmviesa009.fm.intel.com with ESMTP; 05 Nov 2024 14:43:51 -0800
 Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1t8QTl-000mSF-2h;
-	Tue, 05 Nov 2024 20:48:45 +0000
-Date: Wed, 6 Nov 2024 04:48:16 +0800
+	id 1t8SH6-000mXn-2H;
+	Tue, 05 Nov 2024 22:43:48 +0000
+Date: Wed, 6 Nov 2024 06:43:32 +0800
 From: kernel test robot <lkp@intel.com>
 To: LongPing Wei <weilongping@oppo.com>, axboe@kernel.dk
 Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
 	LongPing Wei <weilongping@oppo.com>
 Subject: Re: [PATCH] block: fix the initial value of wp_offset for npo2 zone
  size
-Message-ID: <202411060401.MveGdWg2-lkp@intel.com>
+Message-ID: <202411060615.u1WE9nlu-lkp@intel.com>
 References: <20241105101120.1207567-1-weilongping@oppo.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -68,10 +68,10 @@ In-Reply-To: <20241105101120.1207567-1-weilongping@oppo.com>
 
 Hi LongPing,
 
-kernel test robot noticed the following build warnings:
+kernel test robot noticed the following build errors:
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on linus/master v6.12-rc6 next-20241105]
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master v6.12-rc6 next-20241105]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch#_base_tree_information]
@@ -80,19 +80,19 @@ url:    https://github.com/intel-lab-lkp/linux/commits/LongPing-Wei/block-fix-th
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
 patch link:    https://lore.kernel.org/r/20241105101120.1207567-1-weilongping%40oppo.com
 patch subject: [PATCH] block: fix the initial value of wp_offset for npo2 zone size
-config: x86_64-rhel-8.3-func (https://download.01.org/0day-ci/archive/20241106/202411060401.MveGdWg2-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241106/202411060401.MveGdWg2-lkp@intel.com/reproduce)
+config: arm-allmodconfig (https://download.01.org/0day-ci/archive/20241106/202411060615.u1WE9nlu-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241106/202411060615.u1WE9nlu-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411060401.MveGdWg2-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411060615.u1WE9nlu-lkp@intel.com/
 
-All warnings (new ones prefixed by >>):
+All errors (new ones prefixed by >>):
 
    block/blk-zoned.c: In function 'disk_get_and_lock_zone_wplug':
->> block/blk-zoned.c:540:56: warning: passing argument 1 of 'bio_offset_from_zone_start' makes pointer from integer without a cast [-Wint-conversion]
+>> block/blk-zoned.c:540:56: error: passing argument 1 of 'bio_offset_from_zone_start' makes pointer from integer without a cast [-Wint-conversion]
      540 |         zwplug->wp_offset = bio_offset_from_zone_start(sector);
          |                                                        ^~~~~~
          |                                                        |
