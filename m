@@ -1,60 +1,60 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3605C1F7570
-	for <linux-block@vger.kernel.org>; Tue,  5 Nov 2024 20:39:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7481E7C35
+	for <linux-block@vger.kernel.org>; Tue,  5 Nov 2024 20:48:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730839149; cv=none; b=mVKhTfAyyWEViOixpa1wjo7856QX9zzrmd7Iv4Jn8w1HnTqExYiCu2dUXIFHwSIlvfc2AsJPaCJ2JEnrOYvUA4Yt5n3FnQ5g3dXj5VtFwRSrobTXfn2k76QD6PT8XTyzFmnRNKohTy6BGoknHpwFMVKRTxbovTydOJkZII2H1oM=
+	t=1730839732; cv=none; b=Uo9gwb01h19ETzEedafrYufBuFcW93FlR94GMrLBEXx3MVxDCHlnCxwi8eFd2KruJq+ikFOJpJ/fqdxCYw0u2fhbv9NvNRIqqk3Jvo077jsnp4jyTHO0+ZMJTsXkg/bhQAV/+dA2Cw4ywl/sYvpxcAIrZ3+JWD6tAVBQApIVRZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730839149; c=relaxed/simple;
-	bh=2/MlzhKoh44yrorz/XVydm1palRfWk9z4YDY4t7UfdA=;
+	s=arc-20240116; t=1730839732; c=relaxed/simple;
+	bh=lCnGrYIbQZZpxOfahoBMX3vu8HuSRWRJRjBHPwwlppw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WV0IOMhUvj2M6/BOQjvM5KURt+qvnyet2LPHe7dUpszvo9cG/FYSJN1aF5Ob+P2lrVfnibm7LNgbOcIo6GMgIwO7/JqlAg+WB21+gPCa2M0HxINGReZMUzi9Z5o/v5a/pbZeHCa5G+DApcsmAapkyck60lXDF5R7JFzZ6NRjXXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W266Cgc8; arc=none smtp.client-ip=192.198.163.16
+	 Content-Type:Content-Disposition:In-Reply-To; b=q7sYG/GTZp9xxTUq6GwdCBoD9adJShd0yWgnvRVTjFRxaO/ChmSV8kg1UY6zXp5zqoQ6HhexCD0Kb9/joUAxMT/20hanF7bgwAUbUsExlkvTNVVzynt05JKwSuSCI95ETgTSKnpd/CitcFeiI9jPduONosYA6O0hLH3kpcYJMYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jDgzBguD; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W266Cgc8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jDgzBguD"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730839147; x=1762375147;
+  t=1730839731; x=1762375731;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=2/MlzhKoh44yrorz/XVydm1palRfWk9z4YDY4t7UfdA=;
-  b=W266Cgc8uGa84OIaLdCN5vLpAI0s+Vs6H6ufdTVbnfD4GhZfEVNkaCeZ
-   KgNs8LCHcL8bTp4mdHXQvFK5BGVRHajwaX1/x42xfAI3FeL1dgKKKmhKh
-   DCdAVu02XbtuwI3Nlnqj1Iyr9C+Uksbzj+cpavzpl9gA9w8Ax/c/5jg+L
-   N377N2Cd9WDmvc8ShMoxLS5VE7KjBViP4u1DrFxxgER5Xy8aZ4woDJB/N
-   eEbAftTnl3Gtbkp9bhbQMZr5RJUiXTarlyVojdA5bTfltqDF3Sk9hwDep
-   RKFwsUnzRjwsnebSlxtxp4G9fC7OLOzgUof9QYOtHVRtVwb6VH4nqayYd
-   A==;
-X-CSE-ConnectionGUID: u4pmTw5eSayNLllIjGSDNw==
-X-CSE-MsgGUID: CK8vgNGjTXmXV/Kc7YuN+w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="18231081"
-X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="18231081"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 12:39:06 -0800
-X-CSE-ConnectionGUID: wpUO2zOPTKKppmm6WwZHVQ==
-X-CSE-MsgGUID: UQ58kimxTBeUOj0eW6DUcA==
+  bh=lCnGrYIbQZZpxOfahoBMX3vu8HuSRWRJRjBHPwwlppw=;
+  b=jDgzBguDE3F7XxVhCgaXv8IH3ysrLsQyog26Bg1apm+LNTttSOwS06v8
+   NC/ZLt0uGs5+qDN9rP2ghsrj3qitAZUjdBXiulvQ7v6A4XTH9lT8Hc6As
+   dZwVvJasblFQWfL5uFuu39CjxW9aq6oLYftfFNyTLyD07eiIazXDDholJ
+   jbayFkXj9845q5EpIINokJZ1oSqx/iBqYfCSv0EgKXBwoq5U/Cy+lYRp4
+   AutLPA2yh5gYC97wQ6mA23yFlmhCXrLgMjjrW5zkr/TsJoR8vJHWPO79d
+   pmxMmn5a0gjMgbNKO/1GBTXRJJ45sk3czzD560LSyTvNOKnpuEKzVZoq9
+   w==;
+X-CSE-ConnectionGUID: bP9IF6urTKib5gaCwh79hw==
+X-CSE-MsgGUID: L9JpR6fDQtC6lRNAkDs1lQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="34307218"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="34307218"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 12:48:50 -0800
+X-CSE-ConnectionGUID: /ek+0I3VQpmFnZALxCgNMg==
+X-CSE-MsgGUID: 0Vm47jXKTG2Ftp7CQkdV3g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="121646957"
+   d="scan'208";a="88117722"
 Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 05 Nov 2024 12:38:47 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 05 Nov 2024 12:48:48 -0800
 Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1t8QK5-000mRV-1Q;
-	Tue, 05 Nov 2024 20:38:45 +0000
-Date: Wed, 6 Nov 2024 04:38:00 +0800
+	id 1t8QTl-000mSF-2h;
+	Tue, 05 Nov 2024 20:48:45 +0000
+Date: Wed, 6 Nov 2024 04:48:16 +0800
 From: kernel test robot <lkp@intel.com>
 To: LongPing Wei <weilongping@oppo.com>, axboe@kernel.dk
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-block@vger.kernel.org, LongPing Wei <weilongping@oppo.com>
+Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+	LongPing Wei <weilongping@oppo.com>
 Subject: Re: [PATCH] block: fix the initial value of wp_offset for npo2 zone
  size
-Message-ID: <202411060445.EVXgwLvF-lkp@intel.com>
+Message-ID: <202411060401.MveGdWg2-lkp@intel.com>
 References: <20241105101120.1207567-1-weilongping@oppo.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -68,10 +68,10 @@ In-Reply-To: <20241105101120.1207567-1-weilongping@oppo.com>
 
 Hi LongPing,
 
-kernel test robot noticed the following build errors:
+kernel test robot noticed the following build warnings:
 
-[auto build test ERROR on axboe-block/for-next]
-[also build test ERROR on linus/master v6.12-rc6 next-20241105]
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.12-rc6 next-20241105]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch#_base_tree_information]
@@ -80,53 +80,30 @@ url:    https://github.com/intel-lab-lkp/linux/commits/LongPing-Wei/block-fix-th
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
 patch link:    https://lore.kernel.org/r/20241105101120.1207567-1-weilongping%40oppo.com
 patch subject: [PATCH] block: fix the initial value of wp_offset for npo2 zone size
-config: x86_64-buildonly-randconfig-002-20241106 (https://download.01.org/0day-ci/archive/20241106/202411060445.EVXgwLvF-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241106/202411060445.EVXgwLvF-lkp@intel.com/reproduce)
+config: x86_64-rhel-8.3-func (https://download.01.org/0day-ci/archive/20241106/202411060401.MveGdWg2-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241106/202411060401.MveGdWg2-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411060445.EVXgwLvF-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411060401.MveGdWg2-lkp@intel.com/
 
-All errors (new ones prefixed by >>):
+All warnings (new ones prefixed by >>):
 
-   In file included from block/blk-zoned.c:15:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/x86/include/asm/cacheflush.h:5:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
->> block/blk-zoned.c:540:49: error: incompatible integer to pointer conversion passing 'sector_t' (aka 'unsigned long long') to parameter of type 'struct bio *' [-Wint-conversion]
+   block/blk-zoned.c: In function 'disk_get_and_lock_zone_wplug':
+>> block/blk-zoned.c:540:56: warning: passing argument 1 of 'bio_offset_from_zone_start' makes pointer from integer without a cast [-Wint-conversion]
      540 |         zwplug->wp_offset = bio_offset_from_zone_start(sector);
          |                                                        ^~~~~~
-   include/linux/blkdev.h:1371:63: note: passing argument to parameter 'bio' here
+         |                                                        |
+         |                                                        sector_t {aka long long unsigned int}
+   In file included from block/blk-zoned.c:15:
+   include/linux/blkdev.h:1371:63: note: expected 'struct bio *' but argument is of type 'sector_t' {aka 'long long unsigned int'}
     1371 | static inline sector_t bio_offset_from_zone_start(struct bio *bio)
-         |                                                               ^
-   4 warnings and 1 error generated.
+         |                                                   ~~~~~~~~~~~~^~~
 
 
-vim +540 block/blk-zoned.c
+vim +/bio_offset_from_zone_start +540 block/blk-zoned.c
 
    494	
    495	/*
