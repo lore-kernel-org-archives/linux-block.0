@@ -1,112 +1,211 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA0C166F1A;
-	Tue,  5 Nov 2024 16:44:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0681DD0F0
+	for <linux-block@vger.kernel.org>; Tue,  5 Nov 2024 16:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730825070; cv=none; b=S4DNuQGYfVuSRzjKvyTeZ3+7wy9bUTKuEcDu2bZMwMwHS3fg3ti0nbaX+2cMUxxlgcmyT+EVM546bs5Dn8gOCvKBDrdYugNZ3yDCaKueIFAIj+j/FeK6RPsNNamvNqI1ab9gRAi7THyuSfxdvYK+oxInsmY/wAMv4QWbnjNhfws=
+	t=1730825452; cv=none; b=oF317BuVAvLmUC3i1/jwxfG3Jp9UNA0omwTDYuExB41Vurj4T2jpmU9Pf8/mlUCAqquIkADaqWEIB/ytbJAGy9bkqqGQpBWKnZOjn1I3X7FPL8PNuB3iCQQ7uwjYieziCpPbHKbYk/DzWr0aUWurnmMYIZe/Rd4SROUHs57zd2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730825070; c=relaxed/simple;
-	bh=xoo0q5V8wjvE7q4lC7VQmHKa9nUZeAijOvblSEeRZm4=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References; b=uwgAl7TaApjTRjjSyGPXEdkTWsUrGSatIHrO8OuCsy77KwuAUAEjP3EdZAifnWbqrHQVAtZBdRaRLDqnsDatGyVgkJcE3IZKYvjkEjTJZCTH9zM5ZftszTLNv4qSNqBdyCMaO7ZXcF5EKQ5O69zFzNaWh/c4Yfcj4si4NhJV2s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=at77DxNn; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1730825452; c=relaxed/simple;
+	bh=TBHNa1mBwNztVqpf9vZSIGflr1LT65lmNTiFXHO2MjM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=P5UZ1+g8gfAVStPQC7UvIL8osqYt9t9TGaxxaDTCpeLrq3QVqEERTL717A0mlkpTbL4jvbbMyhv1S1bkGO8iKYoh6tznChKuIqSmBKcJRCD1cdYQvZk5Tk3PnntQDJOMAHZXQTt6Z080x2W9BzzQiP9qolU9tErG3u43JJjJwyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=f34x1gIA; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="at77DxNn"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71e52582cf8so4907458b3a.2;
-        Tue, 05 Nov 2024 08:44:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730825068; x=1731429868; darn=vger.kernel.org;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3rhwRI9JuhsZtMEiJ0JD5YM4F04aW09mvO+gxbR/BxI=;
-        b=at77DxNnUCxbQ9cfuKwfPifgxOpb83UMSNzKbDVc5puFqhu5ZWy8GdWuC7ejCIbLyE
-         Ww/baMcPVcHd3WlNNzxKTPNlIoCPLgtGZ9VFj6Sr3S0mTbS3J6cc1uGsxilA7Pq9Hh1Y
-         32Y2iw9bfpvAU5mhXRDzAldxbT1bbeexNkw4NgID4/2+mM4hG0p9La3/IyHG1bhhIiJW
-         CyaeRkWBhijSlP0k2L9cU64FrrPoLFt2hK3mHoEom0rGhisMTNALBEif1nRMyID2rrT4
-         f4+sSlB5UqSLYZI+xxg+rixiCeWVMHihutuqhNP+y6gt7oezBQzL8NziG9JQv8i2Tf5g
-         IEIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730825068; x=1731429868;
-        h=references:message-id:date:in-reply-to:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3rhwRI9JuhsZtMEiJ0JD5YM4F04aW09mvO+gxbR/BxI=;
-        b=ZIF4qmJKo7X3vef2CMyPcM+Ap3C+NGcI27YK4NucVjBJbzt77JrgEy09FBReUA7Tgo
-         Xk5DKLFi/KqCmQgBdgDOKjCU8RllE8pdGmtpIwwl1pt8sdLzLrYI4PZLkv1zENG7Qtb/
-         3fTv0kPSyJ7OZiwoXQuUZ1hQvhkTNkBzG2rdDn92ZNvF9XV2s5PrdCFKrUqbUxM8084k
-         0VlxFuFKZj0tzudJZN0GnKt9rFuiM1Ifx6X+4oSgVHSuWpSY7cg6ILSODwM9S68i0g32
-         eIdauYEXqZTMRexZfknnWM+5wK5x3Lcy+ceqghCdnF6qRpUsm9PzvondoBC+Bwr9dw4r
-         2fzg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4vbPPcpnBqTayBhFieG1Gqd7SSRY31Iqnzzt/7mgw5L/f+OPc3L1s+pZbtnWi7Kq1wjADFXaU4e5PPv+8DA==@vger.kernel.org, AJvYcCVPiFUi9HO/1dhHwNYupNbGlULRQYuxE5irBO1O7BIs8qdIhdxHTUBwwcFn3CHP9NXd0tLwKtTQ040H/Wmm@vger.kernel.org, AJvYcCWkEdDlAsrst4pZc+bh8L53mdDfbRZuyCy/tOf/EqjMHYcwLEBuFXzFSVHHCgYGTNCm8Si7V/JM7jH3sA==@vger.kernel.org, AJvYcCXVnjlR5hCE2Rvl6JDuFsMjfTsm0vvR7LU1L9/HMyffbyIl6QdfQYTFVXwQ5K7rX0Xy4LewpVUHbMbu@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2BF4oYAIHyiq0lX2zTF06FHJPFWQQMvdi3Rv0SlSawciZMYfv
-	00vppsddv4DOToFVBvYp8lW1cMbfrQg72EKEETZQMP8zXEQ66gS4bStqHT6q
-X-Google-Smtp-Source: AGHT+IE+msBBk5xTD+37yuN0TqDTIzB8QG+0iDim6ovw09YJxH9+iCpRyCjKlpFHLHdMZJSNAaLlBQ==
-X-Received: by 2002:a05:6a00:2d89:b0:71e:21:d2d8 with SMTP id d2e1a72fcca58-720c98d32c6mr23148208b3a.7.1730825067732;
-        Tue, 05 Nov 2024 08:44:27 -0800 (PST)
-Received: from dw-tp ([49.36.182.29])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc2eb586sm10159932b3a.149.2024.11.05.08.44.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 08:44:27 -0800 (PST)
-From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-To: "Darrick J. Wong" <djwong@kernel.org>, John Garry <john.g.garry@oracle.com>, brauner@kernel.org, Catherine Hoang <catherine.hoang@oracle.com>
-Cc: linux-ext4@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>, Ojaswin Mujoo <ojaswin@linux.ibm.com>, linux-block@vger.kernel.org, Dave Chinner <david@fromorbit.com>, linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [ANNOUNCE] work tree for untorn filesystem writes
-In-Reply-To: <20241105004341.GO21836@frogsfrogsfrogs>
-Date: Tue, 05 Nov 2024 21:56:45 +0530
-Message-ID: <87pln9sl2y.fsf@gmail.com>
-References: <20241105004341.GO21836@frogsfrogsfrogs>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="f34x1gIA"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20241105165047epoutp01059d5dfb069c439c3f90f6b8a9ba9c82~FIJMbuK841908819088epoutp01E
+	for <linux-block@vger.kernel.org>; Tue,  5 Nov 2024 16:50:47 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20241105165047epoutp01059d5dfb069c439c3f90f6b8a9ba9c82~FIJMbuK841908819088epoutp01E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1730825448;
+	bh=9Oo01NJ+5BGBwgGuyg9+kxfl0D65gIoALN5fW4g3F0E=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=f34x1gIA2REbwQzBENPmzkTL0Bnj1XjfihidhR3I86+zE5m7CerZczFQaqj6yaT7N
+	 LeNJSy63Q7opW2/EgP/D9jPHx/04B/O0g2UhLQ5pZf8x4JhMfPI/feNyalFJwHUBGQ
+	 QUIpEA3VJhMt+hDYHAk3k4bob/n4CjBA6rJsQD5Q=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20241105165047epcas5p20032739673366c1a2f4739483c360614~FIJL3a08r2130621306epcas5p2E;
+	Tue,  5 Nov 2024 16:50:47 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.177]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4XjZ8j47Njz4x9Pt; Tue,  5 Nov
+	2024 16:50:45 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	76.26.09420.5EC4A276; Wed,  6 Nov 2024 01:50:45 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20241105165044epcas5p174fe1869737e521eaa9c70f8ab45f803~FIJJj2BlM0806608066epcas5p1C;
+	Tue,  5 Nov 2024 16:50:44 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241105165044epsmtrp2767f7f600e8cb8f825583a702e289a62~FIJJi63Kf1665016650epsmtrp2c;
+	Tue,  5 Nov 2024 16:50:44 +0000 (GMT)
+X-AuditID: b6c32a49-0d5ff700000024cc-63-672a4ce59c07
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	9E.E4.35203.4EC4A276; Wed,  6 Nov 2024 01:50:44 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20241105165042epsmtip299babc66819b546d119798ffe0ff196b~FIJHFfUZx2499724997epsmtip2h;
+	Tue,  5 Nov 2024 16:50:42 +0000 (GMT)
+Message-ID: <2cebf7b9-b1e5-4118-ace0-ee18c4c19a25@samsung.com>
+Date: Tue, 5 Nov 2024 22:20:41 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 06/10] io_uring/rw: add support to send metadata
+ along with read/write
+To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: Anuj gupta <anuj1072538@gmail.com>, Anuj Gupta <anuj20.g@samsung.com>,
+	axboe@kernel.dk, martin.petersen@oracle.com, asml.silence@gmail.com,
+	brauner@kernel.org, jack@suse.cz, viro@zeniv.linux.org.uk,
+	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	linux-scsi@vger.kernel.org, vishak.g@samsung.com,
+	linux-fsdevel@vger.kernel.org
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <ZypGd_-HzEekrcMs@kbusch-mbp.dhcp.thefacebook.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMJsWRmVeSWpSXmKPExsWy7bCmhu5TH610g3UrZC0+fv3NYtE04S+z
+	xZxV2xgtVt/tZ7N4ffgTo8XNAzuZLFauPspk8a71HIvF7OnNTBaTDl1jtNh7S9tiz96TLBbz
+	lz1lt+i+voPNYvnxf0wW5/8eZ7U4P2sOu4Ogx85Zd9k9Lp8t9di0qpPNY/OSeo/dNxvYPD4+
+	vcXi0bdlFaPHmQVH2D0+b5Lz2PTkLVMAV1S2TUZqYkpqkUJqXnJ+SmZeuq2Sd3C8c7ypmYGh
+	rqGlhbmSQl5ibqqtkotPgK5bZg7QO0oKZYk5pUChgMTiYiV9O5ui/NKSVIWM/OISW6XUgpSc
+	ApMCveLE3OLSvHS9vNQSK0MDAyNToMKE7IzGmV/YCrbIVsw4/ISlgfGXWBcjJ4eEgInEk1Mv
+	GLsYuTiEBHYzSkzav4gdwvnEKPFkfhMzhPONUWJi/wUWmJZ/nyaxQST2MkpsO9nMDJIQEnjL
+	KLHsngOIzStgJzFjxWk2EJtFQEWieXofM0RcUOLkzCdgg0QF5CXu35rBDmILC8RLLF94HCwu
+	IuAs8bf3PBPIAmaBycwSV94tBUswC4hL3HoyHyjBwcEmoClxYXIpSJhTwF5i3ukfbBAl8hLb
+	384Bu1pC4AuHxPUtT1ghrnaRuPt7ITOELSzx6vgWdghbSuLzu71sEHa2xINHD6C+rJHYsbkP
+	qtdeouHPDVaQvcxAe9fv0ofYxSfR+/sJ2DkSArwSHW1CENWKEvcmPYXqFJd4OGMJlO0hsXLD
+	Umi4nWOWWHbsJvMERoVZSMEyC8mXs5C8Mwth8wJGllWMkqkFxbnpqcWmBYZ5qeXwCE/Oz93E
+	CE7tWp47GO8++KB3iJGJg/EQowQHs5II77xU9XQh3pTEyqrUovz4otKc1OJDjKbA+JnILCWa
+	nA/MLnkl8YYmlgYmZmZmJpbGZoZK4ryvW+emCAmkJ5akZqemFqQWwfQxcXBKNTCJf7q60Xzf
+	4ndbOiruZ65adi3ic/63dQtLC2+cOmZYZWm0hdFMJmfyoTIWp6lT5t/REEisu3Hn3Wy713H2
+	G+PPPHNdazxJsfWIn/W96//DfxUueGVvl639Kqd/CtObsB5H2x0X+fdPkeB29+r3NjNfrLLm
+	6JTGvWeXblqSHGrTLzrtydb5Ah5brqTt0d79Xin13Jd7TMyPfJ+uOlc/rZTr8UTviXLN+zl+
+	GSfu7/t1KetKTk5I98v9Lgd60rLXapjoibG8zdBZUyVbbfJrtkGASIPjW6Usp7/7Z9kcXMf5
+	QvSw+Toe36QzrBI6Lwvt+DLXVwbqfb+65svfhv71n08r51rqLX5/+nzZ852Xar7GKLEUZyQa
+	ajEXFScCAMA70Lh2BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrAIsWRmVeSWpSXmKPExsWy7bCSvO4TH610gxtn9Sw+fv3NYtE04S+z
+	xZxV2xgtVt/tZ7N4ffgTo8XNAzuZLFauPspk8a71HIvF7OnNTBaTDl1jtNh7S9tiz96TLBbz
+	lz1lt+i+voPNYvnxf0wW5/8eZ7U4P2sOu4Ogx85Zd9k9Lp8t9di0qpPNY/OSeo/dNxvYPD4+
+	vcXi0bdlFaPHmQVH2D0+b5Lz2PTkLVMAVxSXTUpqTmZZapG+XQJXRuPML2wFW2QrZhx+wtLA
+	+Eusi5GTQ0LAROLfp0lsXYxcHEICuxklXuxrYoJIiEs0X/vBDmELS6z895wdoug1o8SM3oks
+	IAleATuJGStOs4HYLAIqEs3T+5gh4oISJ2c+AasRFZCXuH9rBtggYYF4ieaJS8BqRAScJf72
+	nmcCGcosMJlZovlFH9SGc8wSK3d3g01lBjrj1pP5QFUcHGwCmhIXJpeChDkF7CXmnf4BVWIm
+	0bW1ixHClpfY/nYO8wRGoVlI7piFZNIsJC2zkLQsYGRZxSiZWlCcm55bbFhgmJdarlecmFtc
+	mpeul5yfu4kRHMlamjsYt6/6oHeIkYmD8RCjBAezkgjvvFT1dCHelMTKqtSi/Pii0pzU4kOM
+	0hwsSuK84i96U4QE0hNLUrNTUwtSi2CyTBycUg1MwUpXZDbMbWTVj3q/1Ge58rLDcrKyjqWK
+	r9u0Cwz1UxlULcN5MvwS/VdM/zhf1ZeV02iW8r7UbT9EtPa3bfXPeOLw0lV0/QOP427d5yff
+	yA5g9N+3ve1A6BXzC2LTY2W509bdOjevzkBrpVr1c8eN2l5ip1yDBf/xX7K+nbAgO/vY53+m
+	kv7xz5s//IluezZzS/6XfbpVWdOWpW94G+nsrH7kbmU/s2m0qXvk91/vs22Ws79x5ziwMkrl
+	lO2uzN3qU7dbr/NsEiv3+bo2eX59knJIK9eOvae61729cudrWbDM49l7917btlhtUqNkngzv
+	7Irlb0W1DQJusv9L5lVy7fikqSe7Z7fuuZcFh/4qsRRnJBpqMRcVJwIAb2CzT1MDAAA=
+X-CMS-MailID: 20241105165044epcas5p174fe1869737e521eaa9c70f8ab45f803
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20241104141459epcas5p27991e140158b1e7294b4d6c4e767373c
+References: <20241104140601.12239-1-anuj20.g@samsung.com>
+	<CGME20241104141459epcas5p27991e140158b1e7294b4d6c4e767373c@epcas5p2.samsung.com>
+	<20241104140601.12239-7-anuj20.g@samsung.com> <20241105095621.GB597@lst.de>
+	<CACzX3AuNFoE-EC_xpDPZkoiUk1uc0LXMNw-mLnhrKAG4dnJzQw@mail.gmail.com>
+	<20241105135657.GA4775@lst.de>
+	<b52ecf88-1786-4b6f-b8f3-86cccaa51917@samsung.com>
+	<20241105160051.GA7599@lst.de>
+	<ZypGd_-HzEekrcMs@kbusch-mbp.dhcp.thefacebook.com>
 
-"Darrick J. Wong" <djwong@kernel.org> writes:
+On 11/5/2024 9:53 PM, Keith Busch wrote:
+> On Tue, Nov 05, 2024 at 05:00:51PM +0100, Christoph Hellwig wrote:
+>> On Tue, Nov 05, 2024 at 09:21:27PM +0530, Kanchan Joshi wrote:
+>>> Can add the documentation (if this version is palatable for Jens/Pavel),
+>>> but this was discussed in previous iteration:
+>>>
+>>> 1. Each meta type may have different space requirement in SQE.
+>>>
+>>> Only for PI, we need so much space that we can't fit that in first SQE.
+>>> The SQE128 requirement is only for PI type.
+>>> Another different meta type may just fit into the first SQE. For that we
+>>> don't have to mandate SQE128.
+>>
+>> Ok, I'm really confused now.  The way I understood Anuj was that this
+>> is NOT about block level metadata, but about other uses of the big SQE.
+>>
+>> Which version is right?  Or did I just completely misunderstand Anuj?
+> 
+> Let's not call this "meta_type". Can we use something that has a less
+> overloaded meaning, like "sqe_extended_capabilities", or "ecap", or
+> something like that.
+>   
 
-> Hi everyone,
->
-> Nobody else has stepped up to do this, so I've created a work branch for
-> the fs side of untorn writes:
-> https://git.kernel.org/pub/scm/linux/kernel/git/djwong/xfs-linux.git/log/?h=fs-atomic_2024-11-04
->
-> Can you all check this to make sure that I merged it correctly?
+Right, something like that. We need to change it.
+Seems a useful thing is not being seen that way because of its name.
 
-Sorry, I couldn't reply earlier(I am currently on travel). Yes, the ext4
-merge looks correct to me. You have taken the latest v4 of the ext4
-atomic write series [1]. 
+>>> 2. If two meta types are known not to co-exist, they can be kept in the
+>>> same place within SQE. Since each meta-type is a flag, we can check what
+>>> combinations are valid within io_uring and throw the error in case of
+>>> incompatibility.
+>>
+>> And this sounds like what you refer to is not actually block metadata
+>> as in this patchset or nvme, (or weirdly enough integrity in the block
+>> layer code).
+>>
+>>> 3. Previous version was relying on SQE128 flag. If user set the ring
+>>> that way, it is assumed that PI information was sent.
+>>> This is more explicitly conveyed now - if user passed META_TYPE_PI flag,
+>>> it has sent the PI. This comment in the code:
+>>>
+>>> +       /* if sqe->meta_type is META_TYPE_PI, last 32 bytes are for PI */
+>>> +       union {
+>>>
+>>> If this flag is not passed, parsing of second SQE is skipped, which is
+>>> the current behavior as now also one can send regular (non pi)
+>>> read/write on SQE128 ring.
+>>
+>> And while I don't understand how this threads in with the previous
+>> statements, this makes sense.  If you only want to send a pointer (+len)
+>> to metadata you can use the normal 64-byte SQE.  If you want to send
+>> a PI tuple you need SEQ128.  Is that what the various above statements
+>> try to express?  If so the right API to me would be to have two flags:
+>>
+>>   - a flag that a pointer to metadata is passed.  This can work with
+>>     a 64-bit SQE.
+>>   - another flag that a PI tuple is passed.  This requires a 128-byte
+>>     and also the previous flag.
+> 
+> I don't think anything done so far aligns with what Pavel had in mind.
+> Let me try to lay out what I think he's going for. Just bare with me,
+> this is just a hypothetical example.
 
-[1]: https://lore.kernel.org/linux-ext4/cover.1730437365.git.ritesh.list@gmail.com/
-
-> And maybe go test this on your storage hardware? :)
-
-Due to limited connectivity during my travel, I don't have the access to
-the hardware. But as I mentioned the merge looks correct to me and I had
-tested those patches earlier on Power and x86.
-But I will in general re-test the mentioned fs branch for both XFS and
-ext4 once I reach back but I don't think we need to wait for that as the
-merge looks good to me.
-
-Also, I noticed that we might have missed to add a Tested-by from
-Ojaswin for XFS series here [2]. Although Ojaswin mentioned that he
-might also re-test the mentioned FS atomic write branch for both XFS and
-EXT4.
-
-[2]: https://lore.kernel.org/linux-xfs/Zxnp8bma2KrMDg5m@li-bb2b2a4c-3307-11b2-a85c-8fa5c3a69313.ibm.com/
+I have the same example in mind.
 
 
--ritesh
+>    This patch adds a PI extension.
+>    Later, let's say write streams needs another extenion.
+>    Then key per-IO wants another extention.
+>    Then someone else adds wizbang-awesome-feature extention.
+> 
+> Let's say you have device that can do all 4, or any combination of them.
+> Pavel wants a solution that is future proof to such a scenario. So not
+> just a single new "meta_type" with its structure, but a list of types in
+> no particular order, and their structures.
+> 
+> That list can exist either in the extended SQE, or in some other user
+> address that the kernel will need copy.
 
-> If all goes well then I think the next step is to ask brauner very
-> nicely if he'd consider adding this to the vfs trees for 6.13.  If not
-> then I guess we can submit it ourselves, though we probably ought to ask
-> rothwell to add the branch to for-next asap.
->
-> PS: We're now past -rc6 so please reply quickly so that this doesn't
-> slip yet another cycle.
->
-> Catherine: John's on vacation all week, could you please send me the
-> latest versions of the xfs_io pwrite-atomic patch and the fstest for it?
->
-> --D
+That list is the meta_type bit-flags this series creates.
+
+For some future meta_type there can be "META_TYPE_XYZ_INDIRECT" flag and 
+that will mean extra-information needs to fetched via copy_from_user.
