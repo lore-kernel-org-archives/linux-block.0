@@ -1,105 +1,75 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4BE1D63D2
-	for <linux-block@vger.kernel.org>; Wed,  6 Nov 2024 09:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB85F1DA63F;
+	Wed,  6 Nov 2024 09:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730885780; cv=none; b=CnpggHPvGx681HisTwGsnjH6YmGj4mCNqSti1uHQq+q9+9IY0n1v20stYgdyXV8k5pkFp+CRH5Z1Zs/1QHtL5iWNBDnbTbZ7Yf1xyWau7n6z2qXZRSUZmks1MMmNU58pCJX5k5hdWYZOTPmSlff+jeZdeUv3S0KNc11N2sz6Izc=
+	t=1730886629; cv=none; b=h39O/SthVbfGD1hFFN+NshvzpUlwY5A8pf513JFZEm7snv35ZlR3X/RXjIUs7oTiGI7s7YCfDah9DleXtvrWf3ufJwkbaNl/7APXPW9vEcMx1yiiCo7nAaSIzcFGCbv4StoxJV/7tBVlFu3IuTzRf5eVFif9qPOkBarTlUTEaXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730885780; c=relaxed/simple;
-	bh=pAWsZFGR7vRBs+tUqRgY1CcKLBgrZYN59VI9W1bGOFA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uYKqs9vsmlseFNfeSTjgig9CeA3htCtFfneQL2KW4kA01fITr8S5qcSaozRsADj3z9OqULQOFGjKrBNp6V6fB4wiiG+MPfvlXupWH0FGxR94BJFQERYaBW+X3M0bdaNYk51/7LKkm2C5hCdNbSj31VGrv/OwbmLnqo73pAyg4+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e7eVPUk8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1730886629; c=relaxed/simple;
+	bh=3IYck0Jb+qA3j7/LD2LcqSk3StFna7qHYLbxuaE47Vc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c9tmUE8/XH+2gLj3Gkqnc1wEHXMzZYmZH2on1z+WfLXtkVUqCVRuQt9xybtNBAZalG9AIrLedsiWLNl/kooj4ycVGIVePFxuH0hP6Ri2L1yOVcn3uHQY6Vd6lKVW8Cb8FTJgLgC+NvvJ7Y6HQ3V5iwtc21ZCQ3wTJCqML2pl5ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OcScvpXA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e7eVPUk8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730885777;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7RJubEVF3mvzPrwjIuVHDasSpsNtDJhejFOGO49WUPA=;
-	b=e7eVPUk86oVkNh+R16LWe+wiLKYe+zR0RRObgIcQHYjgt7aahW5A/AMkccMr05JUdnorKS
-	Bxt5OyfzmtIJhP4dYALKeecodwouWufyJK6v4tCRTlZeYlOnjwXasZt+ULFMpjouhpJdRh
-	QH/hX9M9TdwBueaIeFpQ0VVsKq/Fdbs=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-322-pNZ2A1kMOfSKax7u3wDuLg-1; Wed, 06 Nov 2024 04:36:16 -0500
-X-MC-Unique: pNZ2A1kMOfSKax7u3wDuLg-1
-X-Mimecast-MFC-AGG-ID: pNZ2A1kMOfSKax7u3wDuLg
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2fc969f6e27so31319551fa.3
-        for <linux-block@vger.kernel.org>; Wed, 06 Nov 2024 01:36:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730885775; x=1731490575;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7RJubEVF3mvzPrwjIuVHDasSpsNtDJhejFOGO49WUPA=;
-        b=adpzE+1MoG0WeZfiY2U0rnNWqqU2GSsZl+P9zAFOZDqB+F0umWvTwWs3B8i2rPuYGZ
-         9tZXxS1V48mjeVscfSf5T3M2uLvh7QKuFup32CCnH6JRfe2MIiLfW/cOJuazcD7Pbj+s
-         gfjgapNnfkMHZM53RsBEd3Lp5Mp8I949I2zHIsh9at52jRboq0exeduQW67YCvheo85z
-         EI1Epa1QD8BJqcOsyvJGAd/IIxV7qjx253m6v5ex0v1/YHpbSJ25noEv409lTDPkVwwx
-         a0jBpdQcno54lxbtSJMmEVA3eNFKM0NiOLas4E8tX6msNro4hgBgoNwU9n/gDTqHNQGC
-         liRA==
-X-Gm-Message-State: AOJu0YyAxWCkab2A0GW5DPwGgCzHQG7twTshkNT1dpuvPlsI9dosS/nc
-	rWmlacyFQmS23IZMl952q91FyJMjEWYxOiVtxSgUMALUxhoQsgDOPpt74B68YxbsazwW3J5VG/O
-	k2+55plEgjQSCTLRUVa9rZZ8nOQclwqnLb9nt/3Y92lj2EDnSkmxeCGqhKcosLLpMM6Ee1DRdKx
-	1leJuA540ztQ5cfQQN6EUNFj4XWgFQqJLf2qo=
-X-Received: by 2002:a2e:a99e:0:b0:2fb:5a7e:504c with SMTP id 38308e7fff4ca-2fcbdfae76bmr201954851fa.13.1730885774854;
-        Wed, 06 Nov 2024 01:36:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFFkUXf1c0q1tYT6tGNkKpr6tyalOiSFB66rWomJUX6Z243+g0yItOwmfq/5SyzoRa4izFMf5x1gbO2hvSVEwo=
-X-Received: by 2002:a2e:a99e:0:b0:2fb:5a7e:504c with SMTP id
- 38308e7fff4ca-2fcbdfae76bmr201954771fa.13.1730885774382; Wed, 06 Nov 2024
- 01:36:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OcScvpXA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7378C4CED0;
+	Wed,  6 Nov 2024 09:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730886629;
+	bh=3IYck0Jb+qA3j7/LD2LcqSk3StFna7qHYLbxuaE47Vc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OcScvpXA2uD4UHi7gjOhG7xzBaRI313+k+xSFkx8gSeLcWoEDuKxJoQKA3+nXqdSa
+	 Armr1qF0VqelXLFWdbzDqojj4q5zvoQOf+AMLGPoaCLUZeV9qYCuOYrmxJxSjqMKCY
+	 +wq3xrCUi3mytHwGzjFMbOLR7W1kzqxtRpbBneivHLGaFXbXfDgaqIT6ohv62i3GLc
+	 Bmlt9bT8Z40tGfDsEV9iHDV2D71Wt65eXWaUzxkxn1cQxjYjru1QyOJKSe3tkTReO1
+	 IPMe7uoYBny66gSkHI4v7RJHEezSbSetI+x/KOn+eT4ZSA8k1l3MahHJWOvX9Xgd6v
+	 lj/afQw9BPdhw==
+Date: Wed, 6 Nov 2024 10:50:21 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, 
+	John Garry <john.g.garry@oracle.com>, Catherine Hoang <catherine.hoang@oracle.com>, 
+	linux-ext4@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, Jan Kara <jack@suse.cz>, 
+	Christoph Hellwig <hch@infradead.org>, Ojaswin Mujoo <ojaswin@linux.ibm.com>, 
+	linux-block@vger.kernel.org, Dave Chinner <david@fromorbit.com>, linux-kernel@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [ANNOUNCE v2] work tree for untorn filesystem writes
+Message-ID: <20241106-zerkleinern-verzweifeln-7ec8173c56ad@brauner>
+References: <20241106005740.GM2386201@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHj4cs-61uwDYDdMduh+UNp5er9x3=1snH6j78JGP7uWF2V5YA@mail.gmail.com>
- <CAFj5m9LZbNasB3+Ma1FzrLCFc-7C5mC3AREipvuXMnB+QLP7_w@mail.gmail.com>
-In-Reply-To: <CAFj5m9LZbNasB3+Ma1FzrLCFc-7C5mC3AREipvuXMnB+QLP7_w@mail.gmail.com>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Wed, 6 Nov 2024 17:36:02 +0800
-Message-ID: <CAHj4cs_d7EKUpAWUyv9fmdbcemCWg5_YR5iwEO_8ovjbXUQ6-Q@mail.gmail.com>
-Subject: Re: [bug report] possible circular locking dependency detected with
- blktests block/002
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Christoph Hellwig <hch@lst.de>, Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241106005740.GM2386201@frogsfrogsfrogs>
 
-On Wed, Nov 6, 2024 at 5:07=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrote=
-:
->
-> On Wed, Nov 6, 2024 at 4:29=E2=80=AFPM Yi Zhang <yi.zhang@redhat.com> wro=
-te:
-> >
-> > Hello
-> > I found this circular locking with blktests block/002 on the latest
-> > linux-block/for-next, please help check it, thanks.
->
-> It should be fixed by the following patchset:
->
+On Tue, Nov 05, 2024 at 04:57:40PM -0800, Darrick J. Wong wrote:
+> Hi everyone,
+> 
+> Here's a slightly updated working branch for the filesystem side of
+> atomic write changes for 6.13:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/djwong/xfs-linux.git/log/?h=fs-atomic_2024-11-05
+> 
+> This branch is, like yesterday's, based off of axboe's
+> for-6.13/block-atomic branch:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=for-6.13/block-atomic
+> 
+> The only difference is that I added Ojaswin's Tested-by: tags to the end
+> of the xfs series.  I have done basic testing with the shell script at
+> the end of this email and am satisfied that it at least seems to do the
+> (limited) things that I think we're targeting for 6.13.
+> 
+> Christian: Could you pull this fs-atomic branch into your vfs.git work
+> for 6.13, please?
 
-Verified the issue was fixed by the patch, thanks.
+Of course!
 
->  [PATCH V2 0/4] block: freeze/unfreeze lockdep fixes
->
-> https://lore.kernel.org/linux-block/Zyq3N8VrrUcxoxrR@fedora/T/#t
->
-> Thanks,
->
-
-
---=20
-Best Regards,
-  Yi Zhang
-
+I did git pull fs-atomic_2024-11-05 from your tree. It should show up in
+-next tomorrow.
