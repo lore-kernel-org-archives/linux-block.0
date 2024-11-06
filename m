@@ -1,130 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E05E2D613;
-	Wed,  6 Nov 2024 00:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B283D66
+	for <linux-block@vger.kernel.org>; Wed,  6 Nov 2024 01:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730854662; cv=none; b=eJBPvOeenoUD0FTUHi6xTfQTRIfWUxypzfcqArBAJ+xiNkdhQqdKNV6XU2UtLUz589jq5YF7ccPiET5Gw7voWnOU0YDpa11MAOTa6FoYeaXIskMN8e5+dDfEEwkPOA3SOYDdtSHhMCcAAZn0HcgvW3bdHZgYgGqmapVFu4Cuoa4=
+	t=1730856869; cv=none; b=jRKWeaeUKl5/5dgfEkliNllh4Lcxz47h9tkYm0pTshiiozwF6jmMAaNjF5fJ6y2dUBvzrl2jJMWXO2YlnBYz0VxjrB8Fp/+vTZPvSqU3lcj5twZ9Nb7m9MRO9mnXpnXZjln7gXagi+bupLfmkqNa6MfrTiuHlIIxKOQdQcXp7E4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730854662; c=relaxed/simple;
-	bh=goa/cIX22Cl5f7cGc755k5BLCpVCIYhtzQep8rQrGi0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=hm6Yf36QRTQl5eKrPsngiMZ4KT8PsfEfDO8rZHuTjYELQSDmK3eWSbLxkqOvxMQApxwFUnMEYuTuNE2z5kAWTZf4LAYclLNmIiovTSmGlJxK7OGf35VOIGgbBlyiYKDL8LABcsuDY7xf5MmzbeBQ2/a5ULFVO0y5ns2Fari1dGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GU1x2eZA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730856869; c=relaxed/simple;
+	bh=CMF/E8yae+LLRnb/qTWJ9AgQL1xKUZbtD1ApFpOaKjE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mXHeBYbsQUancDyVPf50VBKZ9uu8fPBlIEUgBSZM13G3fmf/AAesC+5Snkxt497fB0PFGX/RMbOp1iX7DiWuQH+btA3+pVMPWVruIw8yhRC6J2y/KvBZju0hgPZRAVxZE6Lnq5Fsm5I3Np0uVejKwe0quxUWsrW3RqYUW4p0qCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N3DkdCvk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GU1x2eZA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A296CC4CECF;
-	Wed,  6 Nov 2024 00:57:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730854661;
-	bh=goa/cIX22Cl5f7cGc755k5BLCpVCIYhtzQep8rQrGi0=;
-	h=Date:From:To:Cc:Subject:From;
-	b=GU1x2eZA9XHMIO4M9v9jE9MleHLUATw50umb4dKqqzAEKt47KLmAA6I8BlfHVpUuI
-	 4cszwID984YUqCVHKuybA9ufRga2t32Vw7E76eUX8x34o0iYOoWzJsQV10izZAZi3M
-	 CfqQLlG5mYjIm8f9shAsfW2P1tIrmcssBxDEZTe1x9Z0ejacqlQi4nIBd/TDxTdxdY
-	 6zBaiD3ZB3yme3ZLRWjwYH15wJPbeYu+qs/MCHGeLiinSkjAYfV7rDk1ih+fYysaOa
-	 3lpINihHVT5hRJGRDSSYKmK1OJy59oN4Ajqdtrg0gP0tWrV/nyeZoqZW0uYjnDWiXF
-	 +AYpsq2O36OjQ==
-Date: Tue, 5 Nov 2024 16:57:40 -0800
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: brauner@kernel.org
-Cc: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
-	John Garry <john.g.garry@oracle.com>,
-	Catherine Hoang <catherine.hoang@oracle.com>,
-	linux-ext4@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-	Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
-	Ojaswin Mujoo <ojaswin@linux.ibm.com>, linux-block@vger.kernel.org,
-	Dave Chinner <david@fromorbit.com>, linux-kernel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [ANNOUNCE v2] work tree for untorn filesystem writes
-Message-ID: <20241106005740.GM2386201@frogsfrogsfrogs>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3DkdCvk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730856866;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/ooQJqlbYM/ySrgPiTM2o1pseu04s91YciPs6oL2YxA=;
+	b=N3DkdCvkhcZEAZVFsp1NX+YQiakzzPSErsYL2jqjXcV5Z3Dc9w3vpbyTcAmpbJbhJWCv9p
+	pEdm1YB1CaIeGFYu7UTtXC2ODW5dvkSmvnrsQXal44wclCyQ9ftuvYIijIyAIUovQls8y1
+	t6TSweozMF/bNslGeivZT32mPk5mZn0=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-44-dwg4Ddz9OTisjEBVJleObQ-1; Tue, 05 Nov 2024 20:34:25 -0500
+X-MC-Unique: dwg4Ddz9OTisjEBVJleObQ-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2fb4c35f728so48189971fa.2
+        for <linux-block@vger.kernel.org>; Tue, 05 Nov 2024 17:34:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730856861; x=1731461661;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/ooQJqlbYM/ySrgPiTM2o1pseu04s91YciPs6oL2YxA=;
+        b=rThGwihfDcKllFuHNA0yl4owzsGSnR7UtJvtAYRySC8pO/pDR4lN1I4z971MCaij17
+         xL5BmfXt2uHbgZkMMThI8HMh7cUyr3VKvYPuAkizSrxQQlpGxUCTa4qPsjWWeWVz/FnY
+         y1qGi2Pb+iyDSfT1gN4PnYuhJGVmcfVWFF/tl8c4g1JDDY7aqmy8DsimH+myvVAwtA4S
+         NyAEy/slNEFkfMtmAdiIgiAWAT6k09g0YZwT4C1ZDIUsrLPCdQ+569T0xaNEWFApdXQD
+         bhifBwy/DbGhEylfs0F6uQIrdZX9dM/dPCCLCLX5ZsSrH/JwSAQ5jUgstxweGbvgJ0/r
+         p7aQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVTm8Bz80Ca5IMqDVT/YHX3YskOEwWBpspBIxtVBno1SaNFZJfIWg+MThOXu45BILIZc0zh9iHdstwJDQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTWIF5bG8VmYq5eqHIZmPytkiRLZ1ompH+lA7dwg3r+bSAuc1X
+	qL8Yf5/FW9ktiFc5nvjq8WYsACr6oq99nTZFgWCVbklH++BC0FKMvOW7bIgnt+GiNE+lsbx/aS7
+	qJ2OsulVCNg2279BxbC1C6W5jOP8K2eoU/91TfeiYQ/i5sVZFZePYV10M9icI4/eV89RmR1+Jvl
+	tD+PQmwvoQzMeDAeN2EJG2xgMa2H5hYLDe/7BUeA9hGr1oKdpI
+X-Received: by 2002:a2e:a9a2:0:b0:2fb:5ae7:24e7 with SMTP id 38308e7fff4ca-2fedb794b69mr137292411fa.4.1730856861606;
+        Tue, 05 Nov 2024 17:34:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFMSRjD0BFPGk6GjcQFn/YJ8mmHxPvY0pShjAW2ZDAdj3GD7z0cHCu5Mi2xlk2PN9cHVtQm4yFUcuq2RmGXogs=
+X-Received: by 2002:a2e:a9a2:0:b0:2fb:5ae7:24e7 with SMTP id
+ 38308e7fff4ca-2fedb794b69mr137292221fa.4.1730856861250; Tue, 05 Nov 2024
+ 17:34:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20241105154817.459638-1-hch@lst.de>
+In-Reply-To: <20241105154817.459638-1-hch@lst.de>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Wed, 6 Nov 2024 09:34:09 +0800
+Message-ID: <CAHj4cs_g=qeZQzZO21ws8gx7iHEfGsSRDF65M_SbJSznKunhng@mail.gmail.com>
+Subject: Re: max_hw_zone_append_sectos fixes
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi everyone,
+Verified the reported issue was fixed by this series:
 
-Here's a slightly updated working branch for the filesystem side of
-atomic write changes for 6.13:
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
 
-https://git.kernel.org/pub/scm/linux/kernel/git/djwong/xfs-linux.git/log/?h=fs-atomic_2024-11-05
+On Tue, Nov 5, 2024 at 11:48=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrot=
+e:
+>
+> Hi Jens,
+>
+> this series has a fix and a cleanup for the max_hw_zone_append_sectors
+> change.
+>
+> Diffstat:
+>  block/blk-settings.c          |    2 +-
+>  drivers/nvme/host/multipath.c |    2 --
+>  2 files changed, 1 insertion(+), 3 deletions(-)
+>
 
-This branch is, like yesterday's, based off of axboe's
-for-6.13/block-atomic branch:
 
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=for-6.13/block-atomic
+--=20
+Best Regards,
+  Yi Zhang
 
-The only difference is that I added Ojaswin's Tested-by: tags to the end
-of the xfs series.  I have done basic testing with the shell script at
-the end of this email and am satisfied that it at least seems to do the
-(limited) things that I think we're targeting for 6.13.
-
-Christian: Could you pull this fs-atomic branch into your vfs.git work
-for 6.13, please?  Or would you rather I ask rothwell to include this
-branch into for-next/fs-next and send the PR to Linus myself?
-
-(Actually I might just ask rothwell to do that tomorrow regardless...)
-
---D
-
-#!/bin/bash -x
-
-# Mess around with atomic writes via scsi_debug
-
-mnt=/opt
-
-true "${FSTYP:=xfs}"
-true "${MIN_ATOMIC:=32768}"
-true "${SECTOR_SIZE:=512}"
-true "${FSBLOCK_SIZE:=4096}"
-
-umount $mnt
-rmmod "$FSTYP"
-
-rmmod scsi_debug
-modprobe scsi_debug atomic_wr=1 dev_size_mb=300 \
-	SECTOR_SIZE=$SECTOR_SIZE \
-	atomic_wr_align=$((MIN_ATOMIC / SECTOR_SIZE)) \
-	atomic_wr_gran=$((MIN_ATOMIC / SECTOR_SIZE))
-
-sleep 1
-dev="$(readlink -m /dev/disk/by-id/wwn-0x3333333000*)"
-sysfs=/sys/block/$(basename "$dev")
-
-sysfs-dump $sysfs/queue/atomic_write_*
-
-for ((i = 9; i < 20; i++)); do
-	xfs_io -d -c "pwrite -b 1m -V 1 -AD $((2 ** i)) $((2 ** i))" $dev
-done
-
-case "$FSTYP" in
-"xfs")
-	mkfs.xfs -f $dev -b size=$MIN_ATOMIC
-	;;
-"ext4")
-	mkfs.ext4 -F $dev -b $FSBLOCK_SIZE -C $MIN_ATOMIC -O bigalloc
-	;;
-*)
-	echo "$FSTYP: not recognized"
-	exit 1
-	;;
-esac
-mount $dev $mnt
-
-xfs_io -f -c 'falloc 0 1m' -c fsync $mnt/a
-filefrag -v $mnt/a
-
-for ((i = 9; i < 20; i++)); do
-	xfs_io -d -c "pwrite -b 1m -V 1 -AD $((2 ** i)) $((2 ** i))" $mnt/a
-done
-
-# does not support buffered io
-xfs_io -c "pwrite -b 1m -V 1 -AD 0 $MIN_ATOMIC" $mnt/a
-# does not support unaligned directio
-xfs_io -c "pwrite -b 1m -V 1 -AD $SECTOR_SIZE $MIN_ATOMIC" $mnt/a
