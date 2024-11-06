@@ -1,307 +1,92 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1A67D3F4;
-	Wed,  6 Nov 2024 08:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0AF31D61B9
+	for <linux-block@vger.kernel.org>; Wed,  6 Nov 2024 09:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730882125; cv=none; b=F8LKGgX9x3Yxbm9idKe/a8Bv/YSaRfS5YqZ7n9Lh4hFVFq+jJf8KhwP+swPnFU2nH+aD5k9G+MYvo9NPcirC/nC3PYHUFVf313omJacACowRMw1K8dxopY6SUkAbfBF2Jomuqf/S9pUe3d09fGRjRd+5DeRP2LMYjTHUsWdfdXI=
+	t=1730884026; cv=none; b=Gi8OLNfdqYSCLjBWbVdno/LOku6r0IEFHi2VHodnDvS8NthBpdy2qdNg7jYjQeCuio4kpXkdsfC+tQa6tWJUNxP36/oCWJBg1Lw4HhqZTUJ/43mOdgFABE6BGcSzqJSovCL6b6V3eXO3EGPu3DwOjByTfqE9UvKj91Wz9MLqCsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730882125; c=relaxed/simple;
-	bh=kUqqIKgiFFJzv4HHJPiP76Qc9eSoiFnLNkgz2X/wvhA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KczLn5bG4gOvk5uKFMldmhM1wbvhF7jjUvhTEYRlVNdX0piYW5PffpcDAvMpoecgmZSBXXcpDH8OL5fpvkdU45P4tnpWzTrQXeNiZ2+g8unklf+dkj+0qAP/HnK2eu9/ueTQ26jeZLOb8b5YWRRLgYeD+ESURmyIddiIsIT0wTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 0afa3f969c1a11efa216b1d71e6e1362-20241106
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME
-	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_UNTRUSTED, SA_LOWREP
-	SA_EXISTED, SN_UNTRUSTED, SN_LOWREP, SN_EXISTED, SPF_NOPASS
-	DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD, CIE_GOOD_SPF
-	GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_T1, AMN_GOOD
-	AMN_C_TI, AMN_C_BU, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:fef56355-aea7-4b62-830e-eb23ce805836,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:5
-X-CID-INFO: VERSION:1.1.38,REQID:fef56355-aea7-4b62-830e-eb23ce805836,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:5
-X-CID-META: VersionHash:82c5f88,CLOUDID:4455244deb510a9d99aeef8ea48b9635,BulkI
-	D:241106163515CSSO1HLZ,BulkQuantity:0,Recheck:0,SF:44|66|841|38|24|72|19|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC
-	:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: 0afa3f969c1a11efa216b1d71e6e1362-20241106
-X-User: zhangguopeng@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <zhangguopeng@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1740170890; Wed, 06 Nov 2024 16:35:13 +0800
-From: zhangguopeng <zhangguopeng@kylinos.cn>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org
-Cc: hch@lst.de,
-	ming.lei@redhat.com,
-	yukuai3@huawei.com,
-	linux-kernel@vger.kernel.org,
-	zhangguopeng <zhangguopeng@kylinos.cn>
-Subject: [PATCH] block: Replace sprintf() with sysfs_emit()
-Date: Wed,  6 Nov 2024 16:34:54 +0800
-Message-Id: <20241106083454.45887-1-zhangguopeng@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1730884026; c=relaxed/simple;
+	bh=t2NEksvuyCLtRHWGJdBHHbhf71fHxG/Xzlny5xheyx8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r5JZGO7hETGeH5TobYIJFhawB3TxJPxqz1/37BPOJBX6VeA1CCdDl993dGL7NsJ9IhdotIfIU4am4uguczVJeJJUlihKwCCXSvOHuh4pdR5iFj4BWiUrbT5jHy8CKCzV35xUTENm+g19g8uXc1VD54Qw1cBe9WBHaHfdPs1nJWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LAqbj09W; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LAqbj09W"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730884023;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t2NEksvuyCLtRHWGJdBHHbhf71fHxG/Xzlny5xheyx8=;
+	b=LAqbj09W+Ijn+YvRGfcM3oTm4SkXwTAk+hpr7prejfih1hx2cu0NidPi4JNLsVH6wMbjH0
+	s8lXREt8wUZJG2VKSDCbiyd7J1kO4tdu+l9DqYiKheA7aUYSQs8W1w8kgWXcovVBxz32+l
+	Rk7Oo9PKty2sP6uUFkHw9wfVXQGRDNM=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-549-vMqQ0eE9NWSst1g3TF4h2g-1; Wed, 06 Nov 2024 04:07:02 -0500
+X-MC-Unique: vMqQ0eE9NWSst1g3TF4h2g-1
+X-Mimecast-MFC-AGG-ID: vMqQ0eE9NWSst1g3TF4h2g
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-8501337720fso2252359241.2
+        for <linux-block@vger.kernel.org>; Wed, 06 Nov 2024 01:07:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730884022; x=1731488822;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=t2NEksvuyCLtRHWGJdBHHbhf71fHxG/Xzlny5xheyx8=;
+        b=VZG2Hqpgj8uoYmKbTt3mFPgNDsTQE2igFGa2HeCLttggAK5+dP49fLggnB8XolRgyx
+         tyBG5RgfQ4PJNNt5zgjb+JCCKQbNLh4mihJNMqvYewXpDVezSzIDbCoKf7lourmlUi88
+         pPWCpmPaqV1+ma2q42vEb/lApDvsJkMDo1zEScxRhFnzGVPc6tNkuXydn9znOdh6aqsV
+         21oXl1DLv+PmXZdkdvqlIULO1fE095LncLpKGxgzPEVU31AoQ8RfCkM39qfS/tLbe/tQ
+         7M/H1+3EJe3EJMyOTL951lBjxe5dFjd0xswGznstvUTcHXyqQWcLc8GYJY6B1S2uMa1w
+         9Mlg==
+X-Gm-Message-State: AOJu0YwT++Yp+Eb1Ns3gPnXdTtsjJudxDPxWTF9zW/1uNnCRbw4gGQlS
+	DcbVaGCSwtZafb8RtaSHeFgJyWplAAQvmAZnvJPid6uSqVlsSp2mZk89EpBUCJI77oGTa4y9Smv
+	P4Ibb3NrH7E6Y7MEPNkZsPGL9Wmvic1u/3doMCu0u2sMg6ykP5mkpS41SiOQB1acsVCjoZfTQC6
+	0hoIJcK6gvtTL8imOgW+ccYn+K9BM47uyN+0w=
+X-Received: by 2002:a05:6102:5127:b0:4a4:8346:186d with SMTP id ada2fe7eead31-4a9543ee82bmr21916585137.26.1730884021900;
+        Wed, 06 Nov 2024 01:07:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH7N2o3kpNWhNXEs36XEzk/WdpcmfQEN0nS+q3NJ0OkbjHc3WyCEEEvIYpClSwK4ekDjNLB8Q16DECkcwkwRLg=
+X-Received: by 2002:a05:6102:5127:b0:4a4:8346:186d with SMTP id
+ ada2fe7eead31-4a9543ee82bmr21916575137.26.1730884021622; Wed, 06 Nov 2024
+ 01:07:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAHj4cs-61uwDYDdMduh+UNp5er9x3=1snH6j78JGP7uWF2V5YA@mail.gmail.com>
+In-Reply-To: <CAHj4cs-61uwDYDdMduh+UNp5er9x3=1snH6j78JGP7uWF2V5YA@mail.gmail.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Wed, 6 Nov 2024 17:06:50 +0800
+Message-ID: <CAFj5m9LZbNasB3+Ma1FzrLCFc-7C5mC3AREipvuXMnB+QLP7_w@mail.gmail.com>
+Subject: Re: [bug report] possible circular locking dependency detected with
+ blktests block/002
+To: Yi Zhang <yi.zhang@redhat.com>
+Cc: linux-block <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Christoph Hellwig <hch@lst.de>, Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Per Documentation/filesystems/sysfs.rst, show() should only use
-sysfs_emit() or sysfs_emit_at() when formatting the value to be
-returned to user space.
+On Wed, Nov 6, 2024 at 4:29=E2=80=AFPM Yi Zhang <yi.zhang@redhat.com> wrote=
+:
+>
+> Hello
+> I found this circular locking with blktests block/002 on the latest
+> linux-block/for-next, please help check it, thanks.
 
-No functional change intended.
+It should be fixed by the following patchset:
 
-Signed-off-by: zhangguopeng <zhangguopeng@kylinos.cn>
----
- block/blk-sysfs.c | 24 ++++++++++++------------
- block/genhd.c     | 30 +++++++++++++++---------------
- 2 files changed, 27 insertions(+), 27 deletions(-)
+ [PATCH V2 0/4] block: freeze/unfreeze lockdep fixes
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index d9f22122ae2f..6f25d2ca76c0 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -30,7 +30,7 @@ struct queue_sysfs_entry {
- static ssize_t
- queue_var_show(unsigned long var, char *page)
- {
--	return sprintf(page, "%lu\n", var);
-+	return sysfs_emit(page, "%lu\n", var);
- }
- 
- static ssize_t
-@@ -121,7 +121,7 @@ QUEUE_SYSFS_LIMIT_SHOW(atomic_write_unit_max)
- #define QUEUE_SYSFS_LIMIT_SHOW_SECTORS_TO_BYTES(_field)			\
- static ssize_t queue_##_field##_show(struct gendisk *disk, char *page)	\
- {									\
--	return sprintf(page, "%llu\n",					\
-+	return sysfs_emit(page, "%llu\n",					\
- 		(unsigned long long)disk->queue->limits._field <<	\
- 			SECTOR_SHIFT);					\
- }
-@@ -145,7 +145,7 @@ QUEUE_SYSFS_LIMIT_SHOW_SECTORS_TO_KB(max_hw_sectors)
- #define QUEUE_SYSFS_SHOW_CONST(_name, _val)				\
- static ssize_t queue_##_name##_show(struct gendisk *disk, char *page)	\
- {									\
--	return sprintf(page, "%d\n", _val);				\
-+	return sysfs_emit(page, "%d\n", _val);				\
- }
- 
- /* deprecated fields */
-@@ -224,7 +224,7 @@ static ssize_t queue_feature_store(struct gendisk *disk, const char *page,
- #define QUEUE_SYSFS_FEATURE(_name, _feature)				\
- static ssize_t queue_##_name##_show(struct gendisk *disk, char *page)	\
- {									\
--	return sprintf(page, "%u\n",					\
-+	return sysfs_emit(page, "%u\n",					\
- 		!!(disk->queue->limits.features & _feature));		\
- }									\
- static ssize_t queue_##_name##_store(struct gendisk *disk,		\
-@@ -241,7 +241,7 @@ QUEUE_SYSFS_FEATURE(stable_writes, BLK_FEAT_STABLE_WRITES);
- #define QUEUE_SYSFS_FEATURE_SHOW(_name, _feature)			\
- static ssize_t queue_##_name##_show(struct gendisk *disk, char *page)	\
- {									\
--	return sprintf(page, "%u\n",					\
-+	return sysfs_emit(page, "%u\n",					\
- 		!!(disk->queue->limits.features & _feature));		\
- }
- 
-@@ -252,8 +252,8 @@ QUEUE_SYSFS_FEATURE_SHOW(dax, BLK_FEAT_DAX);
- static ssize_t queue_zoned_show(struct gendisk *disk, char *page)
- {
- 	if (blk_queue_is_zoned(disk->queue))
--		return sprintf(page, "host-managed\n");
--	return sprintf(page, "none\n");
-+		return sysfs_emit(page, "host-managed\n");
-+	return sysfs_emit(page, "none\n");
- }
- 
- static ssize_t queue_nr_zones_show(struct gendisk *disk, char *page)
-@@ -366,7 +366,7 @@ static ssize_t queue_poll_store(struct gendisk *disk, const char *page,
- 
- static ssize_t queue_io_timeout_show(struct gendisk *disk, char *page)
- {
--	return sprintf(page, "%u\n", jiffies_to_msecs(disk->queue->rq_timeout));
-+	return sysfs_emit(page, "%u\n", jiffies_to_msecs(disk->queue->rq_timeout));
- }
- 
- static ssize_t queue_io_timeout_store(struct gendisk *disk, const char *page,
-@@ -387,8 +387,8 @@ static ssize_t queue_io_timeout_store(struct gendisk *disk, const char *page,
- static ssize_t queue_wc_show(struct gendisk *disk, char *page)
- {
- 	if (blk_queue_write_cache(disk->queue))
--		return sprintf(page, "write back\n");
--	return sprintf(page, "write through\n");
-+		return sysfs_emit(page, "write back\n");
-+	return sysfs_emit(page, "write through\n");
- }
- 
- static ssize_t queue_wc_store(struct gendisk *disk, const char *page,
-@@ -519,9 +519,9 @@ static ssize_t queue_wb_lat_show(struct gendisk *disk, char *page)
- 		return -EINVAL;
- 
- 	if (wbt_disabled(disk->queue))
--		return sprintf(page, "0\n");
-+		return sysfs_emit(page, "0\n");
- 
--	return sprintf(page, "%llu\n",
-+	return sysfs_emit(page, "%llu\n",
- 		div_u64(wbt_get_min_lat(disk->queue), 1000));
- }
- 
-diff --git a/block/genhd.c b/block/genhd.c
-index dfee66146bd1..1971c91d6f72 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -783,7 +783,7 @@ static ssize_t disk_badblocks_show(struct device *dev,
- 	struct gendisk *disk = dev_to_disk(dev);
- 
- 	if (!disk->bb)
--		return sprintf(page, "\n");
-+		return sysfs_emit(page, "\n");
- 
- 	return badblocks_show(disk->bb, page, 0);
- }
-@@ -931,7 +931,7 @@ static ssize_t disk_range_show(struct device *dev,
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 
--	return sprintf(buf, "%d\n", disk->minors);
-+	return sysfs_emit(buf, "%d\n", disk->minors);
- }
- 
- static ssize_t disk_ext_range_show(struct device *dev,
-@@ -939,7 +939,7 @@ static ssize_t disk_ext_range_show(struct device *dev,
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 
--	return sprintf(buf, "%d\n",
-+	return sysfs_emit(buf, "%d\n",
- 		(disk->flags & GENHD_FL_NO_PART) ? 1 : DISK_MAX_PARTS);
- }
- 
-@@ -948,7 +948,7 @@ static ssize_t disk_removable_show(struct device *dev,
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 
--	return sprintf(buf, "%d\n",
-+	return sysfs_emit(buf, "%d\n",
- 		       (disk->flags & GENHD_FL_REMOVABLE ? 1 : 0));
- }
- 
-@@ -957,7 +957,7 @@ static ssize_t disk_hidden_show(struct device *dev,
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 
--	return sprintf(buf, "%d\n",
-+	return sysfs_emit(buf, "%d\n",
- 		       (disk->flags & GENHD_FL_HIDDEN ? 1 : 0));
- }
- 
-@@ -966,13 +966,13 @@ static ssize_t disk_ro_show(struct device *dev,
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 
--	return sprintf(buf, "%d\n", get_disk_ro(disk) ? 1 : 0);
-+	return sysfs_emit(buf, "%d\n", get_disk_ro(disk) ? 1 : 0);
- }
- 
- ssize_t part_size_show(struct device *dev,
- 		       struct device_attribute *attr, char *buf)
- {
--	return sprintf(buf, "%llu\n", bdev_nr_sectors(dev_to_bdev(dev)));
-+	return sysfs_emit(buf, "%llu\n", bdev_nr_sectors(dev_to_bdev(dev)));
- }
- 
- ssize_t part_stat_show(struct device *dev,
-@@ -989,7 +989,7 @@ ssize_t part_stat_show(struct device *dev,
- 		part_stat_unlock();
- 	}
- 	part_stat_read_all(bdev, &stat);
--	return sprintf(buf,
-+	return sysfs_emit(buf,
- 		"%8lu %8lu %8llu %8u "
- 		"%8lu %8lu %8llu %8u "
- 		"%8u %8u %8u "
-@@ -1031,14 +1031,14 @@ ssize_t part_inflight_show(struct device *dev, struct device_attribute *attr,
- 	else
- 		part_in_flight_rw(bdev, inflight);
- 
--	return sprintf(buf, "%8u %8u\n", inflight[0], inflight[1]);
-+	return sysfs_emit(buf, "%8u %8u\n", inflight[0], inflight[1]);
- }
- 
- static ssize_t disk_capability_show(struct device *dev,
- 				    struct device_attribute *attr, char *buf)
- {
- 	dev_warn_once(dev, "the capability attribute has been deprecated.\n");
--	return sprintf(buf, "0\n");
-+	return sysfs_emit(buf, "0\n");
- }
- 
- static ssize_t disk_alignment_offset_show(struct device *dev,
-@@ -1047,7 +1047,7 @@ static ssize_t disk_alignment_offset_show(struct device *dev,
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 
--	return sprintf(buf, "%d\n", bdev_alignment_offset(disk->part0));
-+	return sysfs_emit(buf, "%d\n", bdev_alignment_offset(disk->part0));
- }
- 
- static ssize_t disk_discard_alignment_show(struct device *dev,
-@@ -1056,7 +1056,7 @@ static ssize_t disk_discard_alignment_show(struct device *dev,
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 
--	return sprintf(buf, "%d\n", bdev_alignment_offset(disk->part0));
-+	return sysfs_emit(buf, "%d\n", bdev_alignment_offset(disk->part0));
- }
- 
- static ssize_t diskseq_show(struct device *dev,
-@@ -1064,13 +1064,13 @@ static ssize_t diskseq_show(struct device *dev,
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 
--	return sprintf(buf, "%llu\n", disk->diskseq);
-+	return sysfs_emit(buf, "%llu\n", disk->diskseq);
- }
- 
- static ssize_t partscan_show(struct device *dev,
- 		struct device_attribute *attr, char *buf)
- {
--	return sprintf(buf, "%u\n", disk_has_partscan(dev_to_disk(dev)));
-+	return sysfs_emit(buf, "%u\n", disk_has_partscan(dev_to_disk(dev)));
- }
- 
- static DEVICE_ATTR(range, 0444, disk_range_show, NULL);
-@@ -1092,7 +1092,7 @@ static DEVICE_ATTR(partscan, 0444, partscan_show, NULL);
- ssize_t part_fail_show(struct device *dev,
- 		       struct device_attribute *attr, char *buf)
- {
--	return sprintf(buf, "%d\n",
-+	return sysfs_emit(buf, "%d\n",
- 		       bdev_test_flag(dev_to_bdev(dev), BD_MAKE_IT_FAIL));
- }
- 
--- 
-2.25.1
+https://lore.kernel.org/linux-block/Zyq3N8VrrUcxoxrR@fedora/T/#t
+
+Thanks,
 
