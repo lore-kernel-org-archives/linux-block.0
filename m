@@ -1,72 +1,75 @@
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876E92038A1
-	for <linux-block@vger.kernel.org>; Wed,  6 Nov 2024 14:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D611B202F8D
+	for <linux-block@vger.kernel.org>; Wed,  6 Nov 2024 14:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730903391; cv=none; b=iZ9YWqtVgFllGkYskL6L39l9cF8ivDpmjkGdkju4H8ynDS337b2C6McKOxbc73tAUevjukqVSCe3+NgQJExtB7pmOU3nJqQdw+DLjbSpxaYCYW3phWQX4tZekr11g8R1Pqg7EyjjWxoCkN8ywm21hZTaStARGycJByrO3RA/x9k=
+	t=1730904813; cv=none; b=RJDeDZikChS/n8VbtCPuIFhxN/bFXy8H52RjC0yyyCgjWvWSH3+jiz9317Pl5JuozwXXuu7zLN00QZbr5DshDKsqYULme2YaDAlWqxbiCeAvtiaRJDS5ADVr5sOVIjkWtyMOYRLKAwujtqHfNOLreUwkgfOJY/fCcD4mBRNXzC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730903391; c=relaxed/simple;
-	bh=3+EpeSIcCbF/6ZjkqBAtW4O9T46NdqwVVHXXGudPBqs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=IYrs9nwDJvEWt3Y9dVsxThzLSvAbbYmW+dSQ4Y7+hcHOklSAyeqgLVs2MB8gBF7sJSCbbtICaQF5XMfRvZqqnpOFRqtqptDPP3L3XOFf+wmNW4PcsZ7TAeO8jeuB10aXIk0nMcLA7Rru1VEW4kLTX7WQajq+cErwmo8sw3IM+ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=u8KgZ9Qs; arc=none smtp.client-ip=203.254.224.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1730904813; c=relaxed/simple;
+	bh=VnePaPHmlv7i/nnnyChjq6x43YKF5Ar7+3PST2zxv8w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V78faF7n4An0RhJBrPTDeWZDRJYedbl1CqZY66dxrtMD32Xh/PeV4VO6ih5H50iQtAzUHHIG6TrXMCCB9qmDuBNxidGOMBD7et5K2zFccXccTXgIM2r1U4479z3w1+l16TTAAp5BFTn5AL/jAhra0buTrBzcDHK0VecBfgFOw6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DhPh6hAm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="u8KgZ9Qs"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20241106142946epoutp017275d7a5b85a572a9715e17e8a4557ce~FZ3WpFnq62053720537epoutp01h
-	for <linux-block@vger.kernel.org>; Wed,  6 Nov 2024 14:29:46 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20241106142946epoutp017275d7a5b85a572a9715e17e8a4557ce~FZ3WpFnq62053720537epoutp01h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1730903386;
-	bh=wQsh5MEv2xvuMdMfRC5hx+1fVZ+6hqXmEyHQLubiY3A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=u8KgZ9Qsq6feXaF7qxnAd3ZCDRMympaaZ/iZZFZtpNEs1K8irKt4x9kNp7IsiQ164
-	 XioTRCJ29pNvcFjOWmkTxiSlXTdaqQaPHmX8pEpKg0nA/DHpBrR58B8dXlb0lUEFLQ
-	 9piy2KrNXEgXtidv5Dy62+/m21RKZVOjSey/X6sQ=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20241106142945epcas5p27b22bc354b85cff6c487990cf84f314e~FZ3V1wriO1484514845epcas5p2L;
-	Wed,  6 Nov 2024 14:29:45 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.178]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4Xk6zX2Kfvz4x9Pv; Wed,  6 Nov
-	2024 14:29:44 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	AE.E2.09800.85D7B276; Wed,  6 Nov 2024 23:29:44 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20241106122721epcas5p3849e3582fcb6547be2b1b10b031138d4~FYMdpOSTa1876718767epcas5p3z;
-	Wed,  6 Nov 2024 12:27:21 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20241106122721epsmtrp1bdd1f5a15dcf3734ec183b4cc1275f08~FYMdnuyhZ2054020540epsmtrp1T;
-	Wed,  6 Nov 2024 12:27:21 +0000 (GMT)
-X-AuditID: b6c32a4b-4a7fa70000002648-7e-672b7d58f2f4
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	CA.01.35203.9A06B276; Wed,  6 Nov 2024 21:27:21 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20241106122718epsmtip1f4f0cccb196ed013747170516d7b45df~FYMbJ800Q0829608296epsmtip1F;
-	Wed,  6 Nov 2024 12:27:18 +0000 (GMT)
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
-	martin.petersen@oracle.com, asml.silence@gmail.com, anuj1072538@gmail.com,
-	brauner@kernel.org, jack@suse.cz, viro@zeniv.linux.org.uk
-Cc: io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com,
-	linux-scsi@vger.kernel.org, vishak.g@samsung.com,
-	linux-fsdevel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>, Anuj
-	Gupta <anuj20.g@samsung.com>
-Subject: [PATCH v8 10/10] block: add support to pass user meta buffer
-Date: Wed,  6 Nov 2024 17:48:42 +0530
-Message-Id: <20241106121842.5004-11-anuj20.g@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241106121842.5004-1-anuj20.g@samsung.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DhPh6hAm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730904809;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zhNdkFjEuaL+ue96DDquelqda/uA2K1QZKXu3ul/egA=;
+	b=DhPh6hAmrleixfpy7mNdCk8NyaFSI72k7QQprGLmjPK6ckRFvKn8SBhfUwkPd4kJoanuxY
+	cWTFNvGnmr+3xfMv6GEB365sUAUH9peHrBZcsEcAPVQuIOJZmcnEsZwMTSHLfqYfYYzqc9
+	1qh6yzNTDoirxyceDnFNNE3nqaV3mwU=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-610-7ve69LrVM1qrvvgg2ZNzWA-1; Wed, 06 Nov 2024 09:53:28 -0500
+X-MC-Unique: 7ve69LrVM1qrvvgg2ZNzWA-1
+X-Mimecast-MFC-AGG-ID: 7ve69LrVM1qrvvgg2ZNzWA
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7092f2d50ceso5282432a34.2
+        for <linux-block@vger.kernel.org>; Wed, 06 Nov 2024 06:53:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730904808; x=1731509608;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zhNdkFjEuaL+ue96DDquelqda/uA2K1QZKXu3ul/egA=;
+        b=Tq6zd4dchOtBvlYb8vc1SopBz+s8CCtG1HRVGRkbftrq/VxqGYDaSP96J1xrcQiS90
+         emxP9EXAbMGO+GalCeBd6LpmL2t9BcTqEhN/9fxnZx6WYYoIj5S5wUDhyma6XMcma0Kk
+         JtXXSsqAkOKtTKaGZmKNIZaeCPdUAfdp83zvtcIbM8liXNoIRPkRg1/BRpo3lL+itUy1
+         uDcrh/vbgHobRscue38DcFnWrQX0genWxqF6YAhROhDXaPcAHGWSC2Bq457SN7nXO5QP
+         V0pJbXsCO3PIiq1+wlnwqn0tTQsBbG/1T+Ax2eAXJ3xjeT7Jnra2EKE2nOzDl/gAXlOO
+         dO4g==
+X-Gm-Message-State: AOJu0YzlHIjK+X9YdM0gjXdTE7qWVfGzMhFY9f4tAi2xCYFMNjAa3kr2
+	DL7BumMnkZSHGi02eox5jRpkojpEncFeJEk1IAt2BS/2naCzJcb9GgiBgmV0/dBbGZ8O4wtZKsl
+	WgTnsAHaevRV4pR4o7CFuSssZ10UwJ1cxksj7SJs/93CcmesepUge+Ddvn+p8
+X-Received: by 2002:a05:6830:350a:b0:710:f879:a15a with SMTP id 46e09a7af769-719ca25bec7mr20442523a34.27.1730904808168;
+        Wed, 06 Nov 2024 06:53:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGsq51w47iT662Km72nLQPeQu8djAs8QboqY5C1WT4nq+oW7/h0uMI2jzD2Ad6z5rq3DVB1ng==
+X-Received: by 2002:a05:6830:350a:b0:710:f879:a15a with SMTP id 46e09a7af769-719ca25bec7mr20442500a34.27.1730904807836;
+        Wed, 06 Nov 2024 06:53:27 -0800 (PST)
+Received: from eisenberg.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7189cc69cf6sm2910192a34.26.2024.11.06.06.53.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2024 06:53:27 -0800 (PST)
+From: Philipp Stanner <pstanner@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Hannes Reinecke <hare@suse.de>,
+	John Garry <john.g.garry@oracle.com>,
+	Li Zetao <lizetao1@huawei.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Al Viro <viro@zeniv.linux.org.uk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] mtip32xx: Replace deprecated PCI functions
+Date: Wed,  6 Nov 2024 15:52:50 +0100
+Message-ID: <20241106145249.108996-2-pstanner@redhat.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,281 +77,52 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Ta0xTZxj2O+fQ62oORbdvDczuZLoAgbbQ1lPHbRsuJ8FEkv1RtgQLPSmM
-	0na9zEE0a0TQ4SoMQbQi1MkUqs7Bym1Q4xBoQC4bbEi97CbIxKEiY+qaylpaNv897/s+z/Pm
-	+S4slP8zQ8DK15pog1apIRgcrP1KdHTcjr2xavGls2vJhSUvRu6r9KFknaMdkOduVTDIe1ce
-	AdJzuQshm8/1I+T90lGMPFFbgpD9y/MMsqp3EpCu67Fkj2sQIxvOzDDJQ9c6GeRZ9zOEHPO5
-	w8gxWx0zjU912W4xqYkRM9Xq+JRBfdP4CdXtsTCohZnrGHXY6QDUsL2PSS22vkK1Ts8jmZys
-	gqQ8WqmiDUJam6tT5WvVyUTGu9lvZ8vkYkmcREFuJoRaZSGdTKRvy4x7J1/jz0QIP1JqzP5W
-	ptJoJEQpSQad2UQL83RGUzJB61UavVQfb1QWGs1adbyWNm2RiMUJMj9xV0HeQNsvQH9I8fG1
-	iWZgAd/HlwM2C+JSeH5wjFkOOCw+3g2gfXYpLFg8AnDCdzE0+RvAG47LyKrEu9+LBAcuACc7
-	/gwViwBedU6tsBj467BvthQEBuvwHgCtp65igQLFKxFor3WiAVYEvhVOWuuxAMbwjbDl/rRf
-	wWLxcAV8UMIMrtsAj48/XsFsf3tksR0EMA8Ph4PHp1ekqJ9T0nYCDfhD/CYLjtvtKz4QT4dH
-	uzODPhFwzu0MeQrg3YqyEFbDJxMzoWh6WDJwCQRxKiwdqkADNigeDS9+Kwq2o2DN0FdIcO1a
-	aPVOh6Q82Fm/igl4oLkuhCF0jVpCmIItz6qx4GF9BqDLOoVUAqHtuTi25+LY/l9tB6gDvEzr
-	jYVq2ijTJ2rp3f9dc66usBWsPPSYjE7w+68P43sBwgK9ALJQYh1ve1asms9TKYuKaYMu22DW
-	0MZeIPMf9+eoYH2uzv9TtKZsiVQhlsrlcqkiUS4hXuLdKz2p4uNqpYkuoGk9bVjVISy2wIK4
-	jwi2nvRxl5e3DMjWi7kJOZFzPyCGXJugxdOwOWXhdocNd4saI97fkWtOS22rjEkZlj4pmTdV
-	l+0UCedaNsx1NaQn981bR+Tb+qeLtbtq65cuyM6/Ov6dew3bEj5k6XC8UJTYy1aNJvy4pqw6
-	h3eq4CHoThXd4C6hvtNRjPf2v9E9eLAtv2g2z/MbV9QklKWmvWmpOPh13Z3wxeap8tP7nOV1
-	j61ZNTc3fVBpq/miqW03J4M7jIXtKf7y2B9H0eq7rx3AZ6oEnEhFXIHbt/dFh7yxZ6GJeWfP
-	TvbTM3/dbt7kiUro+Ccn3hXpcyZ1XjicVPWgjCv3lvYfeTry01v9sg8JzJinlMSgBqPyX8jA
-	fZRxBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprMIsWRmVeSWpSXmKPExsWy7bCSnO7KBO10g40H+Sw+fv3NYtE04S+z
-	xZxV2xgtVt/tZ7N4ffgTo8XNAzuZLFauPspk8a71HIvF7OnNTBZH/79ls5h06Bqjxd5b2hZ7
-	9p5ksZi/7Cm7Rff1HWwWy4//Y7I4//c4q8X5WXPYHYQ8ds66y+5x+Wypx6ZVnWwem5fUe+y+
-	2cDm8fHpLRaPvi2rGD3OLDjC7vF5k5zHpidvmQK4orhsUlJzMstSi/TtErgyjm29z1jQbVlx
-	/fJKxgbGC3pdjJwcEgImEr9bfjN1MXJxCAnsZpR43HeaGSIhIXHq5TJGCFtYYuW/5+wgtpDA
-	R0aJhwfDQWw2AXWJI89bwWpEBE4wSsyf6AYyiFlgBpPE7z8LWEASwgKuEtd654HZLAKqEhvf
-	PQFq4ODgFbCUeN/MDjFfXmLmpe9gNidQ+OznbYwQuywk/izoA7uHV0BQ4uTMJ2BjmIHqm7fO
-	Zp7AKDALSWoWktQCRqZVjJKpBcW56bnFhgWGeanlesWJucWleel6yfm5mxjB8aaluYNx+6oP
-	eocYmTgYDzFKcDArifD6R2mnC/GmJFZWpRblxxeV5qQWH2KU5mBREucVf9GbIiSQnliSmp2a
-	WpBaBJNl4uCUamDKuPD/xKHcKp9tF/xzJjmfbKxJinljlVP7m/1vWeW/CJeHkcXbs+4+fW+4
-	4vbtpXsKlk96pBdX8bvE/q2WjrzqwwnVtvujFPvLUnhX/FvW6qQW2PDqE+vNzufvXqRmZe8P
-	27U/tz39/nSHL0JMb1/WNss+msr88emTmS3yGlO+rzw4gc/x0KytDAuPrFx25O73aRGT3Dv0
-	P52Kdtn0oF/ATaqX5VXHubX/WB+Xc3tGM2rnrDpn+nj+zaoCwayH23hckuc1O6f8ad3r6533
-	Mrr5ieL7dX8471sl1LW3T+b3zDmzQluCoecv80HO22tPFspESBsEMEi1uZUuP8L+49Us3X12
-	4m2sm39y3wnV3/tDiaU4I9FQi7moOBEAz/uG0iYDAAA=
-X-CMS-MailID: 20241106122721epcas5p3849e3582fcb6547be2b1b10b031138d4
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20241106122721epcas5p3849e3582fcb6547be2b1b10b031138d4
-References: <20241106121842.5004-1-anuj20.g@samsung.com>
-	<CGME20241106122721epcas5p3849e3582fcb6547be2b1b10b031138d4@epcas5p3.samsung.com>
 
-From: Kanchan Joshi <joshi.k@samsung.com>
+pcim_iomap_table() and pcim_request_regions() have been deprecated in
+commit e354bb84a4c1 ("PCI: Deprecate pcim_iomap_table(),
+pcim_iomap_regions_request_all()") and commit d140f80f60358 ("PCI:
+Deprecate pcim_iomap_regions() in favor of pcim_iomap_region()"),
+respectively.
 
-If an iocb contains metadata, extract that and prepare the bip.
-Based on flags specified by the user, set corresponding guard/app/ref
-tags to be checked in bip.
+Replace these functions with pcim_iomap_region().
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
+Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 ---
- block/bio-integrity.c         | 50 +++++++++++++++++++++++++++++++++++
- block/fops.c                  | 45 ++++++++++++++++++++++++-------
- include/linux/bio-integrity.h |  7 +++++
- 3 files changed, 92 insertions(+), 10 deletions(-)
+ drivers/block/mtip32xx/mtip32xx.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 3bee43b87001..5d81ad9a3d20 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -364,6 +364,55 @@ int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
- 	return ret;
- }
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 223faa9d5ffd..43701b7b10a7 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -2701,7 +2701,12 @@ static int mtip_hw_init(struct driver_data *dd)
+ 	int rv;
+ 	unsigned long timeout, timetaken;
  
-+static void bio_uio_meta_to_bip(struct bio *bio, struct uio_meta *meta)
-+{
-+	struct bio_integrity_payload *bip = bio_integrity(bio);
-+
-+	if (meta->flags & IO_INTEGRITY_CHK_GUARD)
-+		bip->bip_flags |= BIP_CHECK_GUARD;
-+	if (meta->flags & IO_INTEGRITY_CHK_APPTAG)
-+		bip->bip_flags |= BIP_CHECK_APPTAG;
-+	if (meta->flags & IO_INTEGRITY_CHK_REFTAG)
-+		bip->bip_flags |= BIP_CHECK_REFTAG;
-+
-+	bip->app_tag = meta->app_tag;
-+}
-+
-+int bio_integrity_map_iter(struct bio *bio, struct uio_meta *meta)
-+{
-+	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
-+	unsigned int integrity_bytes;
-+	int ret;
-+	struct iov_iter it;
-+
-+	if (!bi)
-+		return -EINVAL;
-+	/*
-+	 * original meta iterator can be bigger.
-+	 * process integrity info corresponding to current data buffer only.
-+	 */
-+	it = meta->iter;
-+	integrity_bytes = bio_integrity_bytes(bi, bio_sectors(bio));
-+	if (it.count < integrity_bytes)
-+		return -EINVAL;
-+
-+	/* should fit into two bytes */
-+	BUILD_BUG_ON(IO_INTEGRITY_VALID_FLAGS >= (1 << 16));
-+
-+	if (meta->flags && (meta->flags & ~IO_INTEGRITY_VALID_FLAGS))
-+		return -EINVAL;
-+
-+	it.count = integrity_bytes;
-+	ret = bio_integrity_map_user(bio, &it);
-+	if (!ret) {
-+		bio_uio_meta_to_bip(bio, meta);
-+		bip_set_seed(bio_integrity(bio), meta->seed);
-+		iov_iter_advance(&meta->iter, integrity_bytes);
-+		meta->seed += bio_integrity_intervals(bi, bio_sectors(bio));
-+	}
-+	return ret;
-+}
-+
- /**
-  * bio_integrity_prep - Prepare bio for integrity I/O
-  * @bio:	bio to prepare
-@@ -564,6 +613,7 @@ int bio_integrity_clone(struct bio *bio, struct bio *bio_src,
- 	bip->bip_vec = bip_src->bip_vec;
- 	bip->bip_iter = bip_src->bip_iter;
- 	bip->bip_flags = bip_src->bip_flags & BIP_CLONE_FLAGS;
-+	bip->app_tag = bip_src->app_tag;
- 
- 	return 0;
- }
-diff --git a/block/fops.c b/block/fops.c
-index 2d01c9007681..412ae74032ad 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -54,6 +54,7 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
- 	struct bio bio;
- 	ssize_t ret;
- 
-+	WARN_ON_ONCE(iocb->ki_flags & IOCB_HAS_METADATA);
- 	if (nr_pages <= DIO_INLINE_BIO_VECS)
- 		vecs = inline_vecs;
- 	else {
-@@ -124,12 +125,16 @@ static void blkdev_bio_end_io(struct bio *bio)
- {
- 	struct blkdev_dio *dio = bio->bi_private;
- 	bool should_dirty = dio->flags & DIO_SHOULD_DIRTY;
-+	bool is_sync = dio->flags & DIO_IS_SYNC;
- 
- 	if (bio->bi_status && !dio->bio.bi_status)
- 		dio->bio.bi_status = bio->bi_status;
- 
-+	if (!is_sync && (dio->iocb->ki_flags & IOCB_HAS_METADATA))
-+		bio_integrity_unmap_user(bio);
-+
- 	if (atomic_dec_and_test(&dio->ref)) {
--		if (!(dio->flags & DIO_IS_SYNC)) {
-+		if (!is_sync) {
- 			struct kiocb *iocb = dio->iocb;
- 			ssize_t ret;
- 
-@@ -221,14 +226,16 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 			 * a retry of this from blocking context.
- 			 */
- 			if (unlikely(iov_iter_count(iter))) {
--				bio_release_pages(bio, false);
--				bio_clear_flag(bio, BIO_REFFED);
--				bio_put(bio);
--				blk_finish_plug(&plug);
--				return -EAGAIN;
-+				ret = -EAGAIN;
-+				goto fail;
- 			}
- 			bio->bi_opf |= REQ_NOWAIT;
- 		}
-+		if (!is_sync && (iocb->ki_flags & IOCB_HAS_METADATA)) {
-+			ret = bio_integrity_map_iter(bio, iocb->private);
-+			if (unlikely(ret))
-+				goto fail;
-+		}
- 
- 		if (is_read) {
- 			if (dio->flags & DIO_SHOULD_DIRTY)
-@@ -269,6 +276,12 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 
- 	bio_put(&dio->bio);
- 	return ret;
-+fail:
-+	bio_release_pages(bio, false);
-+	bio_clear_flag(bio, BIO_REFFED);
-+	bio_put(bio);
-+	blk_finish_plug(&plug);
-+	return ret;
- }
- 
- static void blkdev_bio_end_io_async(struct bio *bio)
-@@ -286,6 +299,9 @@ static void blkdev_bio_end_io_async(struct bio *bio)
- 		ret = blk_status_to_errno(bio->bi_status);
- 	}
- 
-+	if (iocb->ki_flags & IOCB_HAS_METADATA)
-+		bio_integrity_unmap_user(bio);
-+
- 	iocb->ki_complete(iocb, ret);
- 
- 	if (dio->flags & DIO_SHOULD_DIRTY) {
-@@ -330,10 +346,8 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
- 		bio_iov_bvec_set(bio, iter);
- 	} else {
- 		ret = bio_iov_iter_get_pages(bio, iter);
--		if (unlikely(ret)) {
--			bio_put(bio);
--			return ret;
--		}
-+		if (unlikely(ret))
-+			goto out_bio_put;
- 	}
- 	dio->size = bio->bi_iter.bi_size;
- 
-@@ -346,6 +360,13 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
- 		task_io_account_write(bio->bi_iter.bi_size);
- 	}
- 
-+	if (iocb->ki_flags & IOCB_HAS_METADATA) {
-+		ret = bio_integrity_map_iter(bio, iocb->private);
-+		WRITE_ONCE(iocb->private, NULL);
-+		if (unlikely(ret))
-+			goto out_bio_put;
+-	dd->mmio = pcim_iomap_table(dd->pdev)[MTIP_ABAR];
++	dd->mmio = pcim_iomap_region(dd->pdev, MTIP_ABAR, MTIP_DRV_NAME);
++	if (IS_ERR(dd->mmio)) {
++		dev_err(&dd->pdev->dev, "Unable to request / ioremap PCI region\n");
++		return PTR_ERR(dd->mmio);
 +	}
 +
- 	if (iocb->ki_flags & IOCB_ATOMIC)
- 		bio->bi_opf |= REQ_ATOMIC;
  
-@@ -360,6 +381,10 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
- 		submit_bio(bio);
+ 	mtip_detect_product(dd);
+ 	if (dd->product_type == MTIP_PRODUCT_UNKNOWN) {
+@@ -3710,13 +3715,6 @@ static int mtip_pci_probe(struct pci_dev *pdev,
+ 		goto iomap_err;
  	}
- 	return -EIOCBQUEUED;
-+
-+out_bio_put:
-+	bio_put(bio);
-+	return ret;
- }
  
- static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
-diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.h
-index 2195bc06dcde..de0a6c9de4d1 100644
---- a/include/linux/bio-integrity.h
-+++ b/include/linux/bio-integrity.h
-@@ -23,6 +23,7 @@ struct bio_integrity_payload {
- 	unsigned short		bip_vcnt;	/* # of integrity bio_vecs */
- 	unsigned short		bip_max_vcnt;	/* integrity bio_vec slots */
- 	unsigned short		bip_flags;	/* control flags */
-+	u16			app_tag;	/* application tag value */
- 
- 	struct bvec_iter	bio_iter;	/* for rewinding parent bio */
- 
-@@ -78,6 +79,7 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio, gfp_t gfp,
- int bio_integrity_add_page(struct bio *bio, struct page *page, unsigned int len,
- 		unsigned int offset);
- int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter);
-+int bio_integrity_map_iter(struct bio *bio, struct uio_meta *meta);
- void bio_integrity_unmap_user(struct bio *bio);
- bool bio_integrity_prep(struct bio *bio);
- void bio_integrity_advance(struct bio *bio, unsigned int bytes_done);
-@@ -108,6 +110,11 @@ static int bio_integrity_map_user(struct bio *bio, struct iov_iter *iter)
- 	return -EINVAL;
- }
- 
-+static inline int bio_integrity_map_iter(struct bio *bio, struct uio_meta *meta)
-+{
-+	return -EINVAL;
-+}
-+
- static inline void bio_integrity_unmap_user(struct bio *bio)
- {
- }
+-	/* Map BAR5 to memory. */
+-	rv = pcim_iomap_regions(pdev, 1 << MTIP_ABAR, MTIP_DRV_NAME);
+-	if (rv < 0) {
+-		dev_err(&pdev->dev, "Unable to map regions\n");
+-		goto iomap_err;
+-	}
+-
+ 	rv = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+ 	if (rv) {
+ 		dev_warn(&pdev->dev, "64-bit DMA enable failed\n");
 -- 
-2.25.1
+2.47.0
 
