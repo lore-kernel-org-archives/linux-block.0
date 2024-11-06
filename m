@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1921DF992
-	for <linux-block@vger.kernel.org>; Wed,  6 Nov 2024 12:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4D51DF98C
+	for <linux-block@vger.kernel.org>; Wed,  6 Nov 2024 12:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730896056; cv=none; b=C6oNExRRCGZmSEuSVFDOK5Cc8x2lvpeCck2gDBAA6b+kB5x7D9TbSktLGwOE/e34v9+qZ7FXVwNowRdg0cNclhGz/d/+7OoakHWOu/mh9b859iUx8PuSnsPjh4Xo8fBkc4PFEsLiHXIA8qaImXCoPgbbCcILa62mOTRkfwgr5Do=
+	t=1730896060; cv=none; b=ub3cMB2yjxe55Lx3B5MNft3CDjPSrHfAABNeaeNJJl4HdgwgyoURivHFzGwEgeIGKuxqlDBDU/te3M/2k/ovjVex4YMkyx85K8aEYlWf2RwZs2PiTve1QVTm64URdKmNMsxZH4zZpiEZ57o030C7Rha4gLRsHHXhKrIJZUjJCO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730896056; c=relaxed/simple;
-	bh=lWy3gMaaLgVUMpofx8sCUJYhQg7wxEzpSW70O0prnh0=;
+	s=arc-20240116; t=1730896060; c=relaxed/simple;
+	bh=Sa4Gnl9J/SnoJIEA4GJcjY48+pimkSxJKcj3R9Jjx6o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OeMeA/jOddGbNmM8JQRyMnYsx1wOIl5uc8K8ie+y6oZYijsKErfxaL5ExFM/tmrmcuoNeofUiBe1pRAfPQH6TlErhVHA8ALbgvU10CGWjG1RV31s7+aLc9bYnTBzb3BZm4Ax0rFtOM8l3P0BQ/JgJeKNWvNjb3twRrBgaHhVxaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QfXKn/FR; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=TacUCKP7Ognny4N480jMWIaGCCVU5kicmZ8jkcYNUPwHh53vdPVzhyvssE0JR2bSeizbYnlP3QGnV4/kndZX7ranzYGYzwykePdEIGsCsJYMMqrZb54NE37U0tSr948+Bpfe54b/jLqsdbRBPZ/wKLtDL07mjxLoYA9rM+MnDsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NzHQ1tjB; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QfXKn/FR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NzHQ1tjB"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730896054;
+	s=mimecast20190719; t=1730896057;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QJy5oiJoIue39dNqC8Dha4XLX5LUbQASeo3V+CBBROU=;
-	b=QfXKn/FRBXrb+evhefAEov896BXRjBKLH7lpXTCe2ZpoM7fSzkVP3GWsyk6gkpzMQKHh+3
-	4t6Ni/js4+Ef+Oh6oeR25tj4o2LYNKY/zANpi8I2ynrQ+bcEsQwfqVN5ALlFPkJWcKh2no
-	VMda1v/RsBsbCmXXq0ZqgcYMPpRxYXw=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+	bh=whxH4SPRWv0Hdf9zeWiFlnJwp/WHJ7cyfCorPtQzbjg=;
+	b=NzHQ1tjBqXPJ6JMsG7HO+ZrgdQDW8YD+ZBJTDzDBH4R50uA3IebFu0bmq9jV225nlzHM8c
+	xc+sBdrIvLHTbtznRsHdpWlxCH8DQm5E/+qEnoWQCYdSQyQLTVextRAIj+TFWvhZQs3dB+
+	EXI3mvzE48ptlZ8w4CCb0IwMK6MKhtI=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-677-wyOfM9wFPz2dI-_hyGsBwQ-1; Wed,
- 06 Nov 2024 07:27:30 -0500
-X-MC-Unique: wyOfM9wFPz2dI-_hyGsBwQ-1
-X-Mimecast-MFC-AGG-ID: wyOfM9wFPz2dI-_hyGsBwQ
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-173-thiCYAPVP2-iuInWaWcFmQ-1; Wed,
+ 06 Nov 2024 07:27:34 -0500
+X-MC-Unique: thiCYAPVP2-iuInWaWcFmQ-1
+X-Mimecast-MFC-AGG-ID: thiCYAPVP2-iuInWaWcFmQ
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C8CD41944ABF;
-	Wed,  6 Nov 2024 12:27:28 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DC176195608B;
+	Wed,  6 Nov 2024 12:27:32 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.107])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 870BB195607C;
-	Wed,  6 Nov 2024 12:27:26 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D64C319560AA;
+	Wed,  6 Nov 2024 12:27:31 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	io-uring@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: linux-block@vger.kernel.org,
 	Uday Shankar <ushankar@purestorage.com>,
 	Akilesh Kailash <akailash@google.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V9 4/7] io_uring: reuse io_mapped_buf for kernel buffer
-Date: Wed,  6 Nov 2024 20:26:53 +0800
-Message-ID: <20241106122659.730712-5-ming.lei@redhat.com>
+Subject: [PATCH V9 5/7] io_uring: support leased group buffer with REQ_F_GROUP_BUF
+Date: Wed,  6 Nov 2024 20:26:54 +0800
+Message-ID: <20241106122659.730712-6-ming.lei@redhat.com>
 In-Reply-To: <20241106122659.730712-1-ming.lei@redhat.com>
 References: <20241106122659.730712-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -62,158 +62,523 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Prepare for supporting kernel buffer in case of io group, in which group
-leader leases kernel buffer to io_uring, and consumed by io_uring OPs.
+SQE group introduces one new mechanism to share resource among one
+group of requests, and all member requests can consume the resource
+leased by group leader efficiently in parallel.
 
-So reuse io_mapped_buf for group kernel buffer, and unfortunately
-io_import_fixed() can't be reused since userspace fixed buffer is
-virt-contiguous, but it isn't true for kernel buffer.
+This patch uses the added SQE group to lease kernel buffer from group
+leader(driver) to members(io_uring) in sqe group:
 
-Also kernel buffer lifetime is bound with group leader request, it isn't
-necessary to use rsrc_node for tracking its lifetime, especially it needs
-extra allocation of rsrc_node for each IO.
+- this kernel buffer is owned by kernel device(driver), and has very
+  short lifetime, such as, it is often aligned with block IO lifetime
+
+- group leader leases the kernel buffer from driver to member requests
+  of io_uring subsystem
+
+- member requests uses the leased buffer to do FS or network IO,
+  IOSQE_IO_DRAIN bit isn't used for group member IO, so it is mapped to
+  GROUP_KBUF; the actual use becomes very similar with buffer select.
+
+- this kernel buffer is returned back after all member requests are
+  completed
+
+io_uring builtin provide/register buffer isn't one good match for this
+use case:
+
+- complicated dependency on add/remove buffer
+  this buffer has to be added/removed to one global table by add/remove OPs,
+  and all consumer OPs have to sync with the add/remove OPs; either
+  consumer OPs have to by issued one by one with IO_LINK; or two extra
+  syscall are added for one time of buffer lease & consumption, this way
+  slows down ublk io handling, and may lose zero copy value
+
+- application becomes more complicated
+
+- application may panic and the kernel buffer is left in io_uring, which
+  complicates io_uring shutdown handling since returning back buffer
+  needs to cowork with buffer owner
+
+- big change is needed in io_uring provide/register buffer
+
+- the requirement is just to lease the kernel buffer to io_uring subsystem for
+  very short time, not necessary to move it into io_uring and make it global
+
+This way looks a bit similar with kernel's pipe/splice, but there are some
+important differences:
+
+- splice is for transferring data between two FDs via pipe, and fd_out can
+only read data from pipe, but data can't be written to; this feature can
+lease buffer from group leader(driver subsystem) to members(io_uring subsystem),
+so member request can write data to this buffer if the buffer direction is
+allowed to write to.
+
+- splice implements data transfer by moving pages between subsystem and
+pipe, that means page ownership is transferred, and this way is one of the
+most complicated thing of splice; this patch supports scenarios in which
+the buffer can't be transferred, and buffer is only borrowed to member
+requests for consumption, and is returned back after member requests
+consume the leased buffer, so buffer lifetime is aligned with group leader
+lifetime, and buffer lifetime is simplified a lot. Especially the buffer
+is guaranteed to be returned back.
+
+- splice can't run in async way basically
+
+It can help to implement generic zero copy between device and related
+operations, such as ublk, fuse.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/io_uring_types.h | 23 +++++++++++++++++++++++
- io_uring/kbuf.c                | 34 ++++++++++++++++++++++++++++++++++
- io_uring/kbuf.h                |  3 +++
- io_uring/rsrc.c                |  1 +
- io_uring/rsrc.h                | 10 ----------
- 5 files changed, 61 insertions(+), 10 deletions(-)
+ include/linux/io_uring_types.h | 29 +++++++++++++++++-
+ io_uring/io_uring.c            | 32 ++++++++++++++++----
+ io_uring/io_uring.h            |  5 ++++
+ io_uring/kbuf.c                | 55 ++++++++++++++++++++++++++++++++--
+ io_uring/kbuf.h                | 49 ++++++++++++++++++++++++++++--
+ io_uring/net.c                 | 27 ++++++++++++++++-
+ io_uring/rw.c                  | 37 +++++++++++++++++++----
+ 7 files changed, 216 insertions(+), 18 deletions(-)
 
 diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
-index bc883078c1ed..9af83cf214c2 100644
+index 9af83cf214c2..f3d891fded55 100644
 --- a/include/linux/io_uring_types.h
 +++ b/include/linux/io_uring_types.h
-@@ -2,6 +2,7 @@
- #define IO_URING_TYPES_H
- 
- #include <linux/blkdev.h>
-+#include <linux/bvec.h>
- #include <linux/hashtable.h>
- #include <linux/task_work.h>
- #include <linux/bitmap.h>
-@@ -39,6 +40,28 @@ enum io_uring_cmd_flags {
+@@ -40,8 +40,16 @@ enum io_uring_cmd_flags {
  	IO_URING_F_COMPAT		= (1 << 12),
  };
  
-+struct io_mapped_buf {
-+	u64		start;
-+	unsigned int	len;
-+	unsigned int	nr_bvecs;
++struct io_mapped_buf;
++typedef void (io_uring_kbuf_ack_t) (const struct io_mapped_buf *);
 +
-+	/* kbuf hasn't refs and accounting, its lifetime is bound with req */
+ struct io_mapped_buf {
+-	u64		start;
++	/* start is always 0 for kernel buffer */
 +	union {
-+		struct {
-+			refcount_t	refs;
-+			unsigned int	acct_pages;
-+		};
-+		/* pbvec is only for kbuf */
-+		const struct bio_vec	*pbvec;
++		u64			start;
++		/* called for returning back the kernel buffer */
++		io_uring_kbuf_ack_t	*kbuf_ack;
 +	};
-+	unsigned int	folio_shift:6;
-+	unsigned int	dir:1;		/* ITER_DEST or ITER_SOURCE */
-+	unsigned int	kbuf:1;		/* kernel buffer or not */
-+	/* offset in the 1st bvec, for kbuf only */
-+	unsigned int	offset;
-+	struct bio_vec	bvec[] __counted_by(nr_bvecs);
-+};
-+
- struct io_wq_work_node {
- 	struct io_wq_work_node *next;
+ 	unsigned int	len;
+ 	unsigned int	nr_bvecs;
+ 
+@@ -504,6 +512,7 @@ enum {
+ 	REQ_F_BUFFERS_COMMIT_BIT,
+ 	REQ_F_GROUP_LEADER_BIT,
+ 	REQ_F_BUF_NODE_BIT,
++	REQ_F_GROUP_BUF_BIT,
+ 
+ 	/* not a real bit, just to check we're not overflowing the space */
+ 	__REQ_F_LAST_BIT,
+@@ -588,6 +597,16 @@ enum {
+ 	REQ_F_GROUP_LEADER	= IO_REQ_FLAG(REQ_F_GROUP_LEADER_BIT),
+ 	/* buf node is valid */
+ 	REQ_F_BUF_NODE		= IO_REQ_FLAG(REQ_F_BUF_NODE_BIT),
++	/*
++	 * Use group leader's buffer
++	 *
++	 * For group member, this flag is mapped from IOSQE_IO_DRAIN which
++	 * isn't used for group member
++	 *
++	 * Group buffer has to be imported in ->issue() since it depends on
++	 * group leader.
++	 */
++	REQ_F_GROUP_BUF	= IO_REQ_FLAG(REQ_F_GROUP_BUF_BIT),
  };
+ 
+ typedef void (*io_req_tw_func_t)(struct io_kiocb *req, struct io_tw_state *ts);
+@@ -670,6 +689,14 @@ struct io_kiocb {
+ 		struct io_buffer_list	*buf_list;
+ 
+ 		struct io_rsrc_node	*buf_node;
++
++		/* valid IFF REQ_F_GROUP_BUF is set */
++		union {
++			/* store group buffer for group leader */
++			const struct io_mapped_buf *grp_buf;
++			/* for group member */
++			bool	grp_buf_imported;
++		};
+ 	};
+ 
+ 	union {
+diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+index 076171977d5e..0a87312083bd 100644
+--- a/io_uring/io_uring.c
++++ b/io_uring/io_uring.c
+@@ -114,7 +114,7 @@
+ 
+ #define IO_REQ_CLEAN_FLAGS (REQ_F_BUFFER_SELECTED | REQ_F_NEED_CLEANUP | \
+ 				REQ_F_POLLED | REQ_F_INFLIGHT | REQ_F_CREDS | \
+-				REQ_F_ASYNC_DATA)
++				REQ_F_ASYNC_DATA | REQ_F_GROUP_BUF)
+ 
+ #define IO_REQ_CLEAN_SLOW_FLAGS (REQ_F_REFCOUNT | REQ_F_LINK | REQ_F_HARDLINK |\
+ 				 REQ_F_GROUP | IO_REQ_CLEAN_FLAGS)
+@@ -391,6 +391,8 @@ static bool req_need_defer(struct io_kiocb *req, u32 seq)
+ 
+ static void io_clean_op(struct io_kiocb *req)
+ {
++	if (req->flags & REQ_F_GROUP_BUF)
++		io_drop_group_buf(req);
+ 	if (req->flags & REQ_F_BUFFER_SELECTED) {
+ 		spin_lock(&req->ctx->completion_lock);
+ 		io_kbuf_drop(req);
+@@ -925,14 +927,20 @@ static void io_queue_group_members(struct io_kiocb *req)
+ 	req->grp_link = NULL;
+ 	while (member) {
+ 		struct io_kiocb *next = member->grp_link;
++		bool grp_buf = member->flags & REQ_F_GROUP_BUF;
+ 
+ 		member->grp_leader = req;
+ 		if (unlikely(member->flags & REQ_F_FAIL))
+ 			io_req_task_queue_fail(member, member->cqe.res);
++		else if (unlikely(grp_buf && member->flags & REQ_F_BUF_NODE))
++			io_req_task_queue_fail(member, -EINVAL);
+ 		else if (unlikely(req->flags & REQ_F_FAIL))
+ 			io_req_task_queue_fail(member, -ECANCELED);
+-		else
++		else {
++			if (grp_buf)
++				io_req_mark_group_buf(member, false);
+ 			io_req_task_queue(member);
++		}
+ 		member = next;
+ 	}
+ }
+@@ -997,6 +1005,11 @@ static enum group_mem io_prep_free_group_req(struct io_kiocb *req,
+ 			io_queue_group_members(req);
+ 		return GROUP_LEADER;
+ 	}
++
++	/* we are done with leased group buffer */
++	if (req->flags & REQ_F_GROUP_BUF)
++		req->flags &= ~REQ_F_GROUP_BUF;
++
+ 	if (!req_is_last_group_member(req))
+ 		return GROUP_OTHER_MEMBER;
+ 
+@@ -2196,9 +2209,18 @@ static int io_init_req(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 		if (sqe_flags & IOSQE_CQE_SKIP_SUCCESS)
+ 			ctx->drain_disabled = true;
+ 		if (sqe_flags & IOSQE_IO_DRAIN) {
+-			if (ctx->drain_disabled)
+-				return io_init_fail_req(req, -EOPNOTSUPP);
+-			io_init_req_drain(req);
++			/* IO_DRAIN is mapped to GROUP_BUF for group members */
++			if (ctx->submit_state.group.head) {
++				/* can't do buffer select */
++				if (sqe_flags & IOSQE_BUFFER_SELECT)
++					return io_init_fail_req(req, -EINVAL);
++				req->flags &= ~REQ_F_IO_DRAIN;
++				req->flags |= REQ_F_GROUP_BUF;
++			} else {
++				if (ctx->drain_disabled)
++					return io_init_fail_req(req, -EOPNOTSUPP);
++				io_init_req_drain(req);
++			}
+ 		}
+ 	}
+ 	if (unlikely(ctx->restricted || ctx->drain_active || ctx->drain_next)) {
+diff --git a/io_uring/io_uring.h b/io_uring/io_uring.h
+index 57b0d0209097..dd61529cd382 100644
+--- a/io_uring/io_uring.h
++++ b/io_uring/io_uring.h
+@@ -364,6 +364,11 @@ static inline bool req_is_group_leader(struct io_kiocb *req)
+ 	return req->flags & REQ_F_GROUP_LEADER;
+ }
+ 
++static inline bool req_is_group_member(struct io_kiocb *req)
++{
++	return (req->flags & REQ_F_GROUP) && !req_is_group_leader(req);
++}
++
+ /*
+  * Don't complete immediately but use deferred completion infrastructure.
+  * Protected by ->uring_lock and can only be used either with
 diff --git a/io_uring/kbuf.c b/io_uring/kbuf.c
-index d407576ddfb7..c4a776860cb4 100644
+index c4a776860cb4..1a8ed35d4d6c 100644
 --- a/io_uring/kbuf.c
 +++ b/io_uring/kbuf.c
-@@ -838,3 +838,37 @@ int io_pbuf_mmap(struct file *file, struct vm_area_struct *vma)
- 	io_put_bl(ctx, bl);
- 	return ret;
+@@ -847,9 +847,9 @@ int io_pbuf_mmap(struct file *file, struct vm_area_struct *vma)
+  * Also kernel buffer lifetime is bound with request, and we needn't
+  * to use rsrc_node to track its lifetime
+  */
+-int io_import_kbuf(int ddir, struct iov_iter *iter,
+-		    const struct io_mapped_buf *kbuf,
+-		    u64 buf_off, size_t len)
++static int io_import_kbuf(int ddir, struct iov_iter *iter,
++			  const struct io_mapped_buf *kbuf,
++			  u64 buf_off, size_t len)
+ {
+ 	unsigned long offset = kbuf->offset;
+ 
+@@ -872,3 +872,52 @@ int io_import_kbuf(int ddir, struct iov_iter *iter,
+ 
+ 	return 0;
  }
 +
-+/*
-+ * kernel buffer is built over generic bvec, and can't be always
-+ * virt-contiguous, which is different with userspace fixed buffer,
-+ * so we can't reuse io_import_fixed() here
-+ *
-+ * Also kernel buffer lifetime is bound with request, and we needn't
-+ * to use rsrc_node to track its lifetime
-+ */
-+int io_import_kbuf(int ddir, struct iov_iter *iter,
-+		    const struct io_mapped_buf *kbuf,
-+		    u64 buf_off, size_t len)
++int io_import_group_buf(struct io_kiocb *req, int dir, struct iov_iter *iter,
++			unsigned long buf_off, unsigned int len)
 +{
-+	unsigned long offset = kbuf->offset;
++	struct io_kiocb *lead = req->grp_leader;
++	int ret;
 +
-+	WARN_ON_ONCE(!kbuf->kbuf);
-+
-+	if (ddir != kbuf->dir)
++	if (!req_is_group_member(req))
 +		return -EINVAL;
 +
-+	if (unlikely(buf_off > kbuf->len))
-+		return -EFAULT;
++	if (!lead || !(lead->flags & REQ_F_GROUP_BUF))
++		return -EINVAL;
 +
-+	if (unlikely(len > kbuf->len - buf_off))
-+		return -EFAULT;
++	/* buffer node may be assigned just before importing */
++	if (req->flags & REQ_F_BUF_NODE)
++		return -EINVAL;
 +
-+	offset += buf_off;
-+	iov_iter_bvec(iter, ddir, kbuf->pbvec, kbuf->nr_bvecs, offset + len);
++	if (io_req_group_buf_imported(req))
++		return 0;
 +
-+	if (offset)
-+		iov_iter_advance(iter, offset);
++	ret = io_import_kbuf(dir, iter, lead->grp_buf, buf_off, len);
++	if (!ret)
++		io_req_mark_group_buf(req, true);
++	return ret;
++}
 +
++int io_lease_group_kbuf(struct io_kiocb *req,
++			const struct io_mapped_buf *grp_buf)
++{
++	if (!(req->flags & REQ_F_GROUP_LEADER))
++		return -EINVAL;
++
++	if (req->flags & (REQ_F_BUFFER_SELECT | REQ_F_BUF_NODE))
++		return -EINVAL;
++
++	if (!grp_buf->kbuf_ack || !grp_buf->pbvec || !grp_buf->kbuf)
++		return -EINVAL;
++
++	/*
++	 * Allow io_uring OPs to borrow this leased kbuf, which is returned
++	 * back by calling `kbuf_ack` when the group leader is freed.
++	 *
++	 * Not like pipe/splice, this kernel buffer is always owned by the
++	 * provider, and has to be returned back.
++	 */
++	req->grp_buf = grp_buf;
++	req->flags |= REQ_F_GROUP_BUF;
 +	return 0;
 +}
 diff --git a/io_uring/kbuf.h b/io_uring/kbuf.h
-index 36aadfe5ac00..04ccd52dd0ad 100644
+index 04ccd52dd0ad..f98e2d8dc48c 100644
 --- a/io_uring/kbuf.h
 +++ b/io_uring/kbuf.h
-@@ -88,6 +88,9 @@ void io_put_bl(struct io_ring_ctx *ctx, struct io_buffer_list *bl);
+@@ -88,9 +88,11 @@ void io_put_bl(struct io_ring_ctx *ctx, struct io_buffer_list *bl);
  struct io_buffer_list *io_pbuf_get_bl(struct io_ring_ctx *ctx,
  				      unsigned long bgid);
  int io_pbuf_mmap(struct file *file, struct vm_area_struct *vma);
-+int io_import_kbuf(int ddir, struct iov_iter *iter,
-+		    const struct io_mapped_buf *kbuf,
-+		    u64 buf_off, size_t len);
+-int io_import_kbuf(int ddir, struct iov_iter *iter,
+-		    const struct io_mapped_buf *kbuf,
+-		    u64 buf_off, size_t len);
++
++int io_import_group_buf(struct io_kiocb *req, int dir, struct iov_iter *iter,
++			unsigned long buf_off, unsigned int len);
++int io_lease_group_kbuf(struct io_kiocb *req,
++			const struct io_mapped_buf *grp_buf);
  
  static inline bool io_kbuf_recycle_ring(struct io_kiocb *req)
  {
-diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-index 16f5abe03d10..5f35641c55ab 100644
---- a/io_uring/rsrc.c
-+++ b/io_uring/rsrc.c
-@@ -771,6 +771,7 @@ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
- 	imu->len = iov->iov_len;
- 	imu->nr_bvecs = nr_pages;
- 	imu->folio_shift = PAGE_SHIFT;
-+	imu->kbuf = 0;
- 	if (coalesced)
- 		imu->folio_shift = data.folio_shift;
- 	refcount_set(&imu->refs, 1);
-diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
-index 255ec94ea172..d54a5f84b9ed 100644
---- a/io_uring/rsrc.h
-+++ b/io_uring/rsrc.h
-@@ -26,16 +26,6 @@ struct io_rsrc_node {
- 	};
- };
+@@ -223,4 +225,45 @@ static inline unsigned int io_put_kbufs(struct io_kiocb *req, int len,
+ {
+ 	return __io_put_kbufs(req, len, nbufs, issue_flags);
+ }
++
++static inline bool io_use_group_buf(struct io_kiocb *req)
++{
++	return req->flags & REQ_F_GROUP_BUF;
++}
++
++static inline bool io_use_group_kbuf(struct io_kiocb *req)
++{
++	if (io_use_group_buf(req))
++		return req->grp_leader && req->grp_leader->grp_buf->kbuf;
++	return false;
++}
++
++static inline void io_drop_group_buf(struct io_kiocb *req)
++{
++	const struct io_mapped_buf *gbuf = req->grp_buf;
++
++	if (gbuf && gbuf->kbuf)
++		gbuf->kbuf_ack(gbuf);
++}
++
++/* zero remained bytes of kernel buffer for avoiding to leak data */
++static inline void io_req_zero_remained(struct io_kiocb *req, struct iov_iter *iter)
++{
++	size_t left = iov_iter_count(iter);
++
++	if (iov_iter_rw(iter) == READ && left > 0)
++		iov_iter_zero(left, iter);
++}
++
++/* For group member only */
++static inline void io_req_mark_group_buf(struct io_kiocb *req, bool imported)
++{
++	req->grp_buf_imported = imported;
++}
++
++/* For group member only */
++static inline bool io_req_group_buf_imported(struct io_kiocb *req)
++{
++	return req->grp_buf_imported;
++}
+ #endif
+diff --git a/io_uring/net.c b/io_uring/net.c
+index 2ccc2b409431..e87b67498733 100644
+--- a/io_uring/net.c
++++ b/io_uring/net.c
+@@ -88,6 +88,13 @@ struct io_sr_msg {
+  */
+ #define MULTISHOT_MAX_RETRY	32
  
--struct io_mapped_buf {
--	u64		start;
--	unsigned int	len;
--	unsigned int	nr_bvecs;
--	refcount_t	refs;
--	unsigned int	acct_pages;
--	unsigned int	folio_shift:6;
--	struct bio_vec	bvec[] __counted_by(nr_bvecs);
--};
--
- struct io_imu_folio_data {
- 	/* Head folio can be partially included in the fixed buf */
- 	unsigned int	nr_pages_head;
++#define user_ptr_to_u64(x) (		\
++{					\
++	typecheck(void __user *, (x));	\
++	(u64)(unsigned long)(x);	\
++}					\
++)
++
+ int io_shutdown_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ {
+ 	struct io_shutdown *shutdown = io_kiocb_to_cmd(req, struct io_shutdown);
+@@ -384,7 +391,7 @@ static int io_send_setup(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 		kmsg->msg.msg_name = &kmsg->addr;
+ 		kmsg->msg.msg_namelen = addr_len;
+ 	}
+-	if (!io_do_buffer_select(req)) {
++	if (!io_do_buffer_select(req) && !io_use_group_buf(req)) {
+ 		ret = import_ubuf(ITER_SOURCE, sr->buf, sr->len,
+ 				  &kmsg->msg.msg_iter);
+ 		if (unlikely(ret < 0))
+@@ -599,6 +606,15 @@ int io_send(struct io_kiocb *req, unsigned int issue_flags)
+ 	if (issue_flags & IO_URING_F_NONBLOCK)
+ 		flags |= MSG_DONTWAIT;
+ 
++	if (io_use_group_buf(req)) {
++		ret = io_import_group_buf(req, ITER_SOURCE,
++					  &kmsg->msg.msg_iter,
++					  user_ptr_to_u64(sr->buf),
++					  sr->len);
++		if (unlikely(ret))
++			return ret;
++	}
++
+ retry_bundle:
+ 	if (io_do_buffer_select(req)) {
+ 		struct buf_sel_arg arg = {
+@@ -889,6 +905,8 @@ static inline bool io_recv_finish(struct io_kiocb *req, int *ret,
+ 		*ret = IOU_STOP_MULTISHOT;
+ 	else
+ 		*ret = IOU_OK;
++	if (io_use_group_kbuf(req))
++		io_req_zero_remained(req, &kmsg->msg.msg_iter);
+ 	io_req_msg_cleanup(req, issue_flags);
+ 	return true;
+ }
+@@ -1161,6 +1179,13 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
+ 			goto out_free;
+ 		}
+ 		sr->buf = NULL;
++	} else if (io_use_group_buf(req)) {
++		ret = io_import_group_buf(req, ITER_DEST,
++					  &kmsg->msg.msg_iter,
++					  user_ptr_to_u64(sr->buf),
++					  sr->len);
++		if (unlikely(ret))
++			goto out_free;
+ 	}
+ 
+ 	kmsg->msg.msg_flags = 0;
+diff --git a/io_uring/rw.c b/io_uring/rw.c
+index e368b9afde03..c5ab464dd51d 100644
+--- a/io_uring/rw.c
++++ b/io_uring/rw.c
+@@ -488,6 +488,11 @@ static bool __io_complete_rw_common(struct io_kiocb *req, long res)
+ 		}
+ 		req_set_fail(req);
+ 		req->cqe.res = res;
++		if (io_use_group_kbuf(req)) {
++			struct io_async_rw *io = req->async_data;
++
++			io_req_zero_remained(req, &io->iter);
++		}
+ 	}
+ 	return false;
+ }
+@@ -629,11 +634,15 @@ static inline loff_t *io_kiocb_ppos(struct kiocb *kiocb)
+  */
+ static ssize_t loop_rw_iter(int ddir, struct io_rw *rw, struct iov_iter *iter)
+ {
++	struct io_kiocb *req = cmd_to_io_kiocb(rw);
+ 	struct kiocb *kiocb = &rw->kiocb;
+ 	struct file *file = kiocb->ki_filp;
+ 	ssize_t ret = 0;
+ 	loff_t *ppos;
+ 
++	if (io_use_group_kbuf(req))
++		return -EOPNOTSUPP;
++
+ 	/*
+ 	 * Don't support polled IO through this interface, and we can't
+ 	 * support non-blocking either. For the latter, this just causes
+@@ -832,20 +841,32 @@ static int io_rw_init_file(struct io_kiocb *req, fmode_t mode, int rw_type)
+ 	return 0;
+ }
+ 
++static int rw_import_group_buf(struct io_kiocb *req, int dir,
++			       struct io_rw *rw, struct io_async_rw *io)
++{
++	int ret = io_import_group_buf(req, dir, &io->iter, rw->addr, rw->len);
++
++	if (!ret)
++		iov_iter_save_state(&io->iter, &io->iter_state);
++	return ret;
++}
++
+ static int __io_read(struct io_kiocb *req, unsigned int issue_flags)
+ {
+ 	bool force_nonblock = issue_flags & IO_URING_F_NONBLOCK;
+ 	struct io_rw *rw = io_kiocb_to_cmd(req, struct io_rw);
+ 	struct io_async_rw *io = req->async_data;
+ 	struct kiocb *kiocb = &rw->kiocb;
+-	ssize_t ret;
++	ssize_t ret = 0;
+ 	loff_t *ppos;
+ 
+-	if (io_do_buffer_select(req)) {
++	if (io_do_buffer_select(req))
+ 		ret = io_import_iovec(ITER_DEST, req, io, issue_flags);
+-		if (unlikely(ret < 0))
+-			return ret;
+-	}
++	else if (io_use_group_buf(req))
++		ret = rw_import_group_buf(req, ITER_DEST, rw, io);
++	if (unlikely(ret < 0))
++		return ret;
++
+ 	ret = io_rw_init_file(req, FMODE_READ, READ);
+ 	if (unlikely(ret))
+ 		return ret;
+@@ -1028,6 +1049,12 @@ int io_write(struct io_kiocb *req, unsigned int issue_flags)
+ 	ssize_t ret, ret2;
+ 	loff_t *ppos;
+ 
++	if (io_use_group_buf(req)) {
++		ret = rw_import_group_buf(req, ITER_SOURCE, rw, io);
++		if (unlikely(ret < 0))
++			return ret;
++	}
++
+ 	ret = io_rw_init_file(req, FMODE_WRITE, WRITE);
+ 	if (unlikely(ret))
+ 		return ret;
 -- 
 2.47.0
 
