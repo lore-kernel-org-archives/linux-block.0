@@ -1,42 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E653820821C;
-	Wed,  6 Nov 2024 18:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4763436D
+	for <linux-block@vger.kernel.org>; Wed,  6 Nov 2024 18:41:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730918189; cv=none; b=SSTGyg+WIfc+i3JPEGr4WObLZ43elR9wJhrItYWoZTGXGHvpkAP75kM5uVsKfQuhT/I4STJa1FDh+REDEVzX+uaGQPgT3CxAUZZ9Aj8u8ESQQRHsi+Ww+SZIPXigw07Vffi24upgvUYBV0Md2+wdo2pUC4Zyt1eqCi31/3VWURQ=
+	t=1730918497; cv=none; b=MKnqzSrnR7xpPfmNOipMk/Nww/TJaeBBRv4+hUCBfUt98jQIeH99t/iF3cSi2rJ6oKF93nZFsVfOlE3xFOWINn8bRpeAfGNNxgYSHgcEtFpwEgB55P7tyYvciigkvLAWPna9XYcWqHFmy5t7XqefzsyeC7HvC4W/nmUCf3PhVjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730918189; c=relaxed/simple;
-	bh=d7uZUo4EgxYYzo5iZ+B5585cT/fKf9oBOEL1ue47x3A=;
+	s=arc-20240116; t=1730918497; c=relaxed/simple;
+	bh=q7sxD0h5sNBrbaEgmzUwvS0OwTu/1CWdVpn37xS4yI0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GJub9SePFePiUawo/MuTAm/TVjlShieFM1Fyp0dJ4uKn9lBZd4eEe1diPCX+MjfmEWR0fQ/l7pE4A5mqkOY15YQNuzxqYg8LYLcZ4sK5iwGC8hfP79xK7Jp8RG0EueqqJoTCLJxfKxKAvi1Ki35Tvm5acYDGk6jdJaDyxhYXLTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OHNvOBeT; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=FY+s/zk3OfWxXDih3WE54Zvt8nTHnj5EvoH6OpWUPEkeRpZRHkjW0SPOfSqGBJ6WmaeeG19r2YZ6PbAYOEPcazpqMVEYfr8j9qTw7KQyNH6jLpoLR+a/lS3qAQwTzKMx8vMOO8SeQe48oCPbeKEUAL/ep2cLuv/o9nd9ye32LrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dKlVDzah; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OHNvOBeT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB575C4CEC6;
-	Wed,  6 Nov 2024 18:36:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dKlVDzah"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8708EC4CEC6;
+	Wed,  6 Nov 2024 18:41:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730918188;
-	bh=d7uZUo4EgxYYzo5iZ+B5585cT/fKf9oBOEL1ue47x3A=;
+	s=k20201202; t=1730918496;
+	bh=q7sxD0h5sNBrbaEgmzUwvS0OwTu/1CWdVpn37xS4yI0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OHNvOBeT5vC90TwmRCctaWZjktJQY//J9y+dUKRTZs/9ChtFgZFgQEB7o4YNJfvNe
-	 /SdUnQfudr+KzKo4DuKK1wyB76/c2wrLk5CW84KbqybdoTxkjw1Ek7UqvQaYtDageE
-	 6vuU54XngSAekFTEfRjsJLx6DqBZlAfcWjTE9P/4ZLS1otP1Pg2fKVibQM9PaWsG0t
-	 YZq/oULdXhmLM/XzujfxXSjmwFZYADeny+5Z02aGACmzVn/s7XIBF/89cANd6nYkmk
-	 BKnx/1/yWLdOPoO2P74o7pcv7guF9NpBCXjkHQGID0OFJvPTKy2c0APWJOjGkhoXxZ
-	 gCbmYUbFs1Vew==
-Date: Wed, 6 Nov 2024 11:36:25 -0700
+	b=dKlVDzahtjJYybEsZjbxHjMCbi7xp0KA7NCSIXl3Uk3MBSQZUtkYiq03aFF74V5XN
+	 swPwsLJJx/pvi8JGLWf1lfno9ECd1fWwdNbmIR94JFEuLyZai409i7hr0YihbKyy6D
+	 VWR9Ewq9lY7xU6Pvytupf30Len2BgOExHrJ4dEqtJUtCeZIl4nUjv3yqu5fZ34eWd1
+	 0iWG3c1gkfzfzwgp5IYF8hSs5JxQopgb4GTnQNt+hqdByC97D19GsxPTHS0WigLzuB
+	 ExXEK0aQZMmUuk88AfX4vUXWAfDTB8sF7mPb2qH4soKxa+dT185VoVaWW47vlzIICU
+	 nstOV59VHi8Cw==
+Date: Wed, 6 Nov 2024 11:41:34 -0700
 From: Keith Busch <kbusch@kernel.org>
 To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	joshi.k@samsung.com, javier.gonz@samsung.com, bvanassche@acm.org
-Subject: Re: [PATCHv10 0/9] write hints with nvme fdp, scsi streams
-Message-ID: <Zyu3Kc2j8CjcEkiJ@kbusch-mbp>
-References: <20241029151922.459139-1-kbusch@meta.com>
- <20241105155014.GA7310@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: pre-calculate max_zone_append_sectors
+Message-ID: <Zyu4XuKxAoVEHKp1@kbusch-mbp>
+References: <20241104073955.112324-1-hch@lst.de>
+ <20241104073955.112324-3-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,27 +43,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241105155014.GA7310@lst.de>
+In-Reply-To: <20241104073955.112324-3-hch@lst.de>
 
-On Tue, Nov 05, 2024 at 04:50:14PM +0100, Christoph Hellwig wrote:
-> I've pushed my branch that tries to make this work with the XFS
-> data separation here:
-> 
-> http://git.infradead.org/?p=users/hch/xfs.git;a=shortlog;h=refs/heads/xfs-zoned-streams
-> 
-> This is basically my current WIP xfs zoned (aka always write out place)
-> work optimistically destined for 6.14 + the patch set in this thread +
-> a little fix to make it work for nvme-multipath plus the tiny patch to
-> wire it up.
-> 
-> The good news is that the API from Keith mostly works.  I don't really
-> know how to cope with the streams per partition bitmap, and I suspect
-> this will need to be dealt with a bit better.  One option might be
-> to always have a bitmap, which would also support discontiguous
-> write stream numbers as actually supported by the underlying NVMe
-> implementation, another option would be to always map to consecutive
-> numbers.
+On Mon, Nov 04, 2024 at 08:39:32AM +0100, Christoph Hellwig wrote:
+> diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+> index 6a15873055b9..c26cb7d3a2e5 100644
+> --- a/drivers/nvme/host/multipath.c
+> +++ b/drivers/nvme/host/multipath.c
+> @@ -636,7 +636,7 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
+>  	if (head->ids.csi == NVME_CSI_ZNS)
+>  		lim.features |= BLK_FEAT_ZONED;
+>  	else
+> -		lim.max_zone_append_sectors = 0;
+> +		lim.max_hw_zone_append_sectors = 0;
 
-Thanks for sharing that. Seeing the code makes it much easier to
-understand where you're trying to steer this. I'll take a look and
-probably have some feedback after a couple days going through it.
+I think you need to continue clearing max_zone_append_sectors here. The
+initial stack limits sets max_zone_append_sectors to UINT_MAX, and
+blk_validate_zoned_limits() wants it to be zero.
