@@ -1,73 +1,91 @@
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E54318C00E
-	for <linux-block@vger.kernel.org>; Wed,  6 Nov 2024 04:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FEF12F44;
+	Wed,  6 Nov 2024 05:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730867947; cv=none; b=mwx+2XLRahIt75sVMyGxdL23Arax+3GXvjiPoNq6xVwXO7xM/mroLyfoB68ccdNbgE4He9FUtOa+nLuUBwobEesj5c04Yo4Y7NYV/3faJlI43oL5yas1pSdrv+LIK1wjrf/mDCrEEN/a6pD/bjnSn4gaYAsFRC3IEe15x2mlvn8=
+	t=1730870977; cv=none; b=Nmg/UpjFiRnoRChrDUS+Nii1cTVivwePnNEKqNx26s1AgKfcl2e9/CoFqWuCKHiLJTZCqaYHIj3osCh2VzoeTsP9O0x7drsAqoDaFC5X799sQW+t5MoHbBGF8CtMqeptdyWU4KBlw0wc5sHoPQuefqc1b6VyAosXJqZkflW/NrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730867947; c=relaxed/simple;
-	bh=rm1UBE0CqeZHg1Jk4aoaflriHOdb4zRQAcypzSQsKFc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=KcYeJZJb4KtXMzkViUP4TpEMe4uww0ldm67wvmSPE4KgTHtgymGvF/o/LhEGdTquQhF4QlhtHWqQRpxqvGgt0FhX9xfJZdskOccTqvjfKpIBd4UvlpAvSQPb0BrNeO3XJHzTSCGFNbdrdir1yw3UyivIKBxORSJoAL9kaN5SdUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-83b567c78c3so45866639f.1
-        for <linux-block@vger.kernel.org>; Tue, 05 Nov 2024 20:39:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730867943; x=1731472743;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EcZnI7H/Pxr0UqsUJcun+RXdk/Sg3hZT78LKpGEaC0k=;
-        b=FcVX0KlMCBtKXiRKOwUInYRMgqSGmaMsuEzC8J9ceEwf8pzhs03oBovUB1KR0m2vze
-         IbEPGUDBtmp0IrrKVWSupGM0gDFClO5d9Yse4heKfKEZRqrelBPtWrSULGbU2P607+dj
-         V4JD7OnZMAthHo6uqBux6D/bjWwcC288Hksj1LlJgEjWnNPL8H/1K1ZkLseFSS8u0WFA
-         lZvvrTYqF/nOWg9ju0Mlp8Y0ynExtIRWfp05Hy4vUkc+vj7DS208WbYvYsrcEFk67Cqy
-         hKfapWminC/OSgZyVfIdNa12WVn1NVX+QAGHaNN7lZ3ilyzcuFVxAXlQcqmlqxeA4teY
-         n9Sw==
-X-Forwarded-Encrypted: i=1; AJvYcCXT7taoF+Hh7acvEfVfaxUbd5A0yhY6pMn8AS+/AL1S7+Tt8xLMHJvBAyLU8FsZbRSgO1hjYK+oQCaO+A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxa0JQACn2jYKq/uoLqS4GYmsM4Xm64XR/1t8+GPM5a+hH1GCGS
-	xcQUqkEbCn/eLlzoicWB/ECBjUu3WGc8jZFdgrlK+fiX3qq98bnwy11+Ti02tM7N0rjx5GSb542
-	SqSQfYyKG54oFakb1FHCK0qS6NX2a7Ewr70ABVLKeGYBdhkvlpdWNSVw=
-X-Google-Smtp-Source: AGHT+IG4XL9G/ifuAc5sYaDmLvA6D8ZYi4XBYf/FQ5JB1IfTP9XmdheFWB/itY7y28HmblSWCLXzrxyQM6JxrgNj/8hvVYfpnpxC
+	s=arc-20240116; t=1730870977; c=relaxed/simple;
+	bh=G/W0FWjwz88CzxVriYuO/Agcx8YeZPgLoc8aiRbUc10=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IWszFIc4z911UyY93tz1nAhQWhzOatbiLJqddZwimkKkafvJgpXbbQmdnkMQW/5mv/H1q984IJVtCDK7y3MUcFAnx0wNqQtwSpNfOGNj/GvsThflUhrHbDcx6vSm0AUHW9EhVpE0RWwmJrkP17WCO9m/RGyfvaJceOdk8XfiEu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id ADF7868AFE; Wed,  6 Nov 2024 06:29:28 +0100 (CET)
+Date: Wed, 6 Nov 2024 06:29:28 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
+	Anuj gupta <anuj1072538@gmail.com>,
+	Anuj Gupta <anuj20.g@samsung.com>, axboe@kernel.dk,
+	martin.petersen@oracle.com, asml.silence@gmail.com,
+	brauner@kernel.org, jack@suse.cz, viro@zeniv.linux.org.uk,
+	io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	linux-scsi@vger.kernel.org, vishak.g@samsung.com,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v7 06/10] io_uring/rw: add support to send metadata
+ along with read/write
+Message-ID: <20241106052927.GA31192@lst.de>
+References: <20241104140601.12239-1-anuj20.g@samsung.com> <CGME20241104141459epcas5p27991e140158b1e7294b4d6c4e767373c@epcas5p2.samsung.com> <20241104140601.12239-7-anuj20.g@samsung.com> <20241105095621.GB597@lst.de> <CACzX3AuNFoE-EC_xpDPZkoiUk1uc0LXMNw-mLnhrKAG4dnJzQw@mail.gmail.com> <20241105135657.GA4775@lst.de> <b52ecf88-1786-4b6f-b8f3-86cccaa51917@samsung.com> <20241105160051.GA7599@lst.de> <ZypGd_-HzEekrcMs@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20e1:b0:3a6:c000:4490 with SMTP id
- e9e14a558f8ab-3a6e2a15bf7mr11210695ab.1.1730867943519; Tue, 05 Nov 2024
- 20:39:03 -0800 (PST)
-Date: Tue, 05 Nov 2024 20:39:03 -0800
-In-Reply-To: <CAFj5m9+1dZtWufO0xzGgWPyMjD1NZ_a-kfeW+Q3ujH_rnR09hg@mail.gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <672af2e7.050a0220.2a847.1b38.GAE@google.com>
-Subject: Re: [syzbot] [block?] [usb?] WARNING: bad unlock balance in blk_mq_update_tag_set_shared
-From: syzbot <syzbot+5007209c85ecdb50b5da@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-usb@vger.kernel.org, ming.lei@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZypGd_-HzEekrcMs@kbusch-mbp.dhcp.thefacebook.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Hello,
+On Tue, Nov 05, 2024 at 09:23:19AM -0700, Keith Busch wrote:
+> > > The SQE128 requirement is only for PI type.
+> > > Another different meta type may just fit into the first SQE. For that we 
+> > > don't have to mandate SQE128.
+> > 
+> > Ok, I'm really confused now.  The way I understood Anuj was that this
+> > is NOT about block level metadata, but about other uses of the big SQE.
+> > 
+> > Which version is right?  Or did I just completely misunderstand Anuj?
+> 
+> Let's not call this "meta_type". Can we use something that has a less
+> overloaded meaning, like "sqe_extended_capabilities", or "ecap", or
+> something like that.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+So it's just a flag that a 128-byte SQE is used?  Don't we know that
+implicitly from the sq?
 
-Reported-by: syzbot+5007209c85ecdb50b5da@syzkaller.appspotmail.com
-Tested-by: syzbot+5007209c85ecdb50b5da@syzkaller.appspotmail.com
+> >  - a flag that a pointer to metadata is passed.  This can work with
+> >    a 64-bit SQE.
+> >  - another flag that a PI tuple is passed.  This requires a 128-byte
+> >    and also the previous flag.
+> 
+> I don't think anything done so far aligns with what Pavel had in mind.
+> Let me try to lay out what I think he's going for. Just bare with me,
+> this is just a hypothetical example.
+> 
+>   This patch adds a PI extension.
+>   Later, let's say write streams needs another extenion.
+>   Then key per-IO wants another extention.
+>   Then someone else adds wizbang-awesome-feature extention.
+> 
+> Let's say you have device that can do all 4, or any combination of them.
+> Pavel wants a solution that is future proof to such a scenario. So not
+> just a single new "meta_type" with its structure, but a list of types in
+> no particular order, and their structures.
 
-Tested on:
+But why do we need the type at all?  Each of them obvious needs two
+things:
 
-commit:         72697401 block: don't verify IO lock for freeze/unfree..
-git tree:       https://github.com/ming1/linux.git for-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=109436a7980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=dfea72efa3e2aef2
-dashboard link: https://syzkaller.appspot.com/bug?extid=5007209c85ecdb50b5da
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+ 1) some space to actually store the extra fields
+ 2) a flag that the additional values are passed
 
-Note: no patches were applied.
-Note: testing is done by a robot and is best-effort only.
+any single value is not going to help with supporting arbitrary
+combinations, because well, you can can mix and match, and you need
+space for all them even if you are not using all of them.
+
