@@ -1,59 +1,59 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4711C17E473
-	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 02:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B18579F6
+	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 02:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730945399; cv=none; b=mWR9T4V5sEjoug/j88y4XLCMxAwG+ENvcbJlcpdEzIZjzekeEKmK+8XifKbsZQCDfzV3XU3rWdDpQfArZyRSAaT/q0/bLlo5B9lr3c6OIUblrM3zw3kI33+3WcLVIovpT+9RSofOJkqbBf0EinnaSTwhrMY+Kv9KTcWiDXmLlkc=
+	t=1730945634; cv=none; b=JuQVAEl0RzeMevC1BxrgmrPqtWYZ3cBUQAgDz28xCbaYnrfWVIQsYpsat8nVwk0Bho/ECiclHi7NRs2p0lhNfmWgRC0MVNFqW4DpLrYz1PfMJZBT4YLHBB7XvPVQ3QUukrCNkx6chSA9j3OKPLSaP/gUQmdBGSLsDtZyBTQRa+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730945399; c=relaxed/simple;
-	bh=U9UwNAev20LVjIzoelIDNy9digyaRx9q0qybyVFRXUk=;
+	s=arc-20240116; t=1730945634; c=relaxed/simple;
+	bh=QmOKJoLbXfCPhoujyLUCs8eC+8ymTGJFjTfT6H8QI4k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=slF782oIJzS/fJMFEpvqwwF1wqAANADknRvLvaXnutI/npEeMWlX9T2xYBbNyKs9O/9V6uKJzcGQx/GsY3s3Q/yUwQrAIexYOw8xx2vSxpxTCqgzAn6bibPWz+Hq0cd8D4z3XiebD9BpiczjzRaDMY6j3wA+zRvsgGq8Qggo2Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=o37u+N6W; arc=none smtp.client-ip=209.85.210.172
+	 In-Reply-To:Content-Type; b=jQ6uy7Jr5laDmcWTJztDp1EJjZhFw4YQx85N8JyQcW0KMxpkveGsPsrGj82Jz1x/3/XcN575Q9juVgdbMQWF5npOfGuQK+RKvY2r8gM+z8hudkwFza8P8EqrHsjstzPDbBJaNH9Z/BIBJJq4J3ccTDcZFzMqcASkdSUItWzTWKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=aE2BWeL2; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="o37u+N6W"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-71e5130832aso307630b3a.0
-        for <linux-block@vger.kernel.org>; Wed, 06 Nov 2024 18:09:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="aE2BWeL2"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71e7086c231so324643b3a.0
+        for <linux-block@vger.kernel.org>; Wed, 06 Nov 2024 18:13:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730945395; x=1731550195; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730945633; x=1731550433; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=M5VEXH/UjVZxKSBS42OsN1z+40kpn9n52otycPhBNjg=;
-        b=o37u+N6W5u5b2gtR/PZami0YGkuUQpsCQQQEwzHS9f3Axo8vf06/YD7OxwHceCDcni
-         GgUsy1fNvkpaQ5+7HkNf3OqCq8s7KjrvfGh56TLOVTGqyE3SaMrT5tqhCm5ZK4BrekFX
-         el08KYfIIqcbYQpO2RCRXxj9CImDomBNJGsYFmPN4OexxtmDCf4YYQlYAtBWGlraC+TX
-         erQxB8PN6CjVZhmoIpI7pZetZDkqnZr94yF2VIB4CVOqHnvIZamELJG950Rv9C2pmf0a
-         GxOh6J65yKCwRohGmy+SJWTFG7/63TIfZUcnzJUT1ihbvl3zq3ajUPqAjGXiAQo4AGNp
-         f/dA==
+        bh=lP/wxxYW0vPUOe2ZOLRbZuJHsjp8tE+TnM0HGbQAiL8=;
+        b=aE2BWeL23g1yKhbBROLFVdNrToQa+JEMSYKA4hrwJTj7RNEKU7EdLNSXa/mpVQ2ddR
+         M8F4U7+58wKFVWCAKNrRM7dIoeW7VyD+1o3d272U6c/LNIeE0SFZsXH5dRnK+kpd7Nsy
+         RHt9nN+pG2C5eRWkSDQOFX+I+CwNfNFEpUeJJhdGWNoOtxlZT3yqBK8ltK/DY0n/Rkxm
+         18kX2ANF0w0YlFAzQboB2M23MgitkVcmQxTKeG6EdtlNy3A7S74Xnh483LATR5RqmTqL
+         72m5n4F3OV1qe+iMIofaD2XJWwGBMWwQNc/ufrxot2+bUTSFOdSehk/mrkGk223cTZQ/
+         lTJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730945395; x=1731550195;
+        d=1e100.net; s=20230601; t=1730945633; x=1731550433;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M5VEXH/UjVZxKSBS42OsN1z+40kpn9n52otycPhBNjg=;
-        b=hGA03mcjNczz8423bnqwe8TISZeU+eNNBkuvYWG7Q17d8AqvWSly8mOgInnBtgd8N0
-         nHWE9jolayUXWJCtxckDFiy144FwsuXqBkAOfTXr6ZpVMjiRpcACElcAvm71OLGjYYPw
-         N900gkFUNlsW4bcusJ0Tw2TkpkMjCjYdP30TJwgCrvMvRxh2h1HtLD9p/UUI2MUCptaf
-         WsqlMauzm4b3ZovkVKokCNTWeSMBEgh54+6vdSlm9P3LD0b1YDYQdL+yERtK0cvFY8Bn
-         Yp2YgI3qxjR61YoT82SFZQFVZvhaYKWXWw+aS63zXsrfLTkDFKVadhJrdula0USMlQgD
-         MJbA==
-X-Forwarded-Encrypted: i=1; AJvYcCXZ118FgnkS+HCEXCCsZrAsgfjci/JbJLjsKOBcclcab7uqtI/Kr+IzHpplJwBCIZl4jLgMZttO5B0V6w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxfps8Fz136v/shMSmwzeEv+qdc82IN5xgKJVFhBZVQTSZbwDYn
-	svQVsoKBVa3sqGEn0qhXYaKBhlj9JJEJdH0WgSlfM8bfcno+Z7LKBPAiOHRQtuM=
-X-Google-Smtp-Source: AGHT+IE4FdVcCFM7JfMcQ3SKmd1UC6mzCGq6q6jfwTYIDNNfVDV6mTuEsMVwx/N+IlnX034mAbpOSg==
-X-Received: by 2002:a05:6a00:170d:b0:71e:1314:899a with SMTP id d2e1a72fcca58-720c998d8b9mr30360940b3a.20.1730945395467;
-        Wed, 06 Nov 2024 18:09:55 -0800 (PST)
+        bh=lP/wxxYW0vPUOe2ZOLRbZuJHsjp8tE+TnM0HGbQAiL8=;
+        b=N+yuEcGylmJeN2fOlLyna64JQ7ehGBTO1H1BuaY7Mia/q8CDQpiT1AO/4jvvnQHl+J
+         r1xh11ZH6HFnYJ1MfQ8y0fCTSOtYR72g/amQdbenOSZpnngS7DjvhMOCMj7RqpSHpv14
+         ZMIga+TFyHgxOFVeC/51v1YsZV9J7vSJ5lbC6FeGOOHFwePjARJPtYx+zDlwKPH7RnHN
+         Olqk5HGYSjcEdr4rgqVyuXRvg+IJwk2eWiqdNAm8SdgTJI9992DVimRhe7aoJLH9hmzY
+         oUS4vpjS5m/o2uLxajTocSZ+tSQsESioO7qIEaZoWyF8WhTEhUFfdCETZVZU5F51xHri
+         ngwg==
+X-Forwarded-Encrypted: i=1; AJvYcCW7+DLov6noiUpJvrECnDfLfMytFaDjyFVZKG2CbC6kGA1HFOWbdqzFPZ1lF/eA+suLjyUqnzdZpGFZkA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhzycDxqp1v8MmQOjbgWAUG9LVrkZ4uKJUhGWEgIOisHeSDONA
+	uJLRTqsH4TKOljPL+Npa+HAeEPXTXIwHlecUp0NQPGixW+E+R2ksHtvVsUIoBMs=
+X-Google-Smtp-Source: AGHT+IEI+2EDnXUDsL4ApqSMlUwwcThkDyc6C/xIv61vUcxwn/TRearptDuzS2ixi5/9nsrgJRz3QQ==
+X-Received: by 2002:a05:6a00:3cc8:b0:71e:780e:9c1 with SMTP id d2e1a72fcca58-7206306ecf4mr59445175b3a.18.1730945632596;
+        Wed, 06 Nov 2024 18:13:52 -0800 (PST)
 Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72407a50512sm256626b3a.173.2024.11.06.18.09.54
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724079a4177sm264801b3a.99.2024.11.06.18.13.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Nov 2024 18:09:54 -0800 (PST)
-Message-ID: <e757bfa0-0c21-41d6-a072-ce85f4ea8a04@kernel.dk>
-Date: Wed, 6 Nov 2024 19:09:53 -0700
+        Wed, 06 Nov 2024 18:13:51 -0800 (PST)
+Message-ID: <08c15db1-288b-4190-9b97-ccd7ff9519ff@kernel.dk>
+Date: Wed, 6 Nov 2024 19:13:51 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,57 +61,64 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv10 6/9] io_uring: enable per-io hinting capability
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- io-uring@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, hch@lst.de, joshi.k@samsung.com,
- javier.gonz@samsung.com, bvanassche@acm.org,
- Nitesh Shetty <nj.shetty@samsung.com>, Keith Busch <kbusch@kernel.org>
-References: <20241029151922.459139-1-kbusch@meta.com>
- <20241029151922.459139-7-kbusch@meta.com>
+Subject: Re: [PATCH V9 3/7] io_uring: shrink io_mapped_buf
+To: Ming Lei <ming.lei@redhat.com>
+Cc: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>,
+ linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
+ Akilesh Kailash <akailash@google.com>
+References: <20241106122659.730712-1-ming.lei@redhat.com>
+ <20241106122659.730712-4-ming.lei@redhat.com>
+ <44abdb96-3210-45d2-b673-ec2eb309bac2@kernel.dk> <ZywSJCDsogZ0wl_o@fedora>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241029151922.459139-7-kbusch@meta.com>
+In-Reply-To: <ZywSJCDsogZ0wl_o@fedora>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/29/24 9:19 AM, Keith Busch wrote:
-> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-> index 0247452837830..6e1985d3b306c 100644
-> --- a/include/uapi/linux/io_uring.h
-> +++ b/include/uapi/linux/io_uring.h
-> @@ -92,6 +92,10 @@ struct io_uring_sqe {
->  			__u16	addr_len;
->  			__u16	__pad3[1];
->  		};
-> +		struct {
-> +			__u16	write_hint;
-> +			__u16	__pad4[1];
-> +		};
+On 11/6/24 6:04 PM, Ming Lei wrote:
+> On Wed, Nov 06, 2024 at 08:09:38AM -0700, Jens Axboe wrote:
+>> On 11/6/24 5:26 AM, Ming Lei wrote:
+>>> `struct io_mapped_buf` will be extended to cover kernel buffer which
+>>> may be in fast IO path, and `struct io_mapped_buf` needs to be per-IO.
+>>>
+>>> So shrink sizeof(struct io_mapped_buf) by the following ways:
+>>>
+>>> - folio_shift is < 64, so 6bits are enough to hold it, the remained bits
+>>>   can be used for the coming kernel buffer
+>>>
+>>> - define `acct_pages` as 'unsigned int', which is big enough for
+>>>   accounting pages in the buffer
+>>>
+>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>> ---
+>>>  io_uring/rsrc.c | 2 ++
+>>>  io_uring/rsrc.h | 6 +++---
+>>>  2 files changed, 5 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+>>> index 9b8827c72230..16f5abe03d10 100644
+>>> --- a/io_uring/rsrc.c
+>>> +++ b/io_uring/rsrc.c
+>>> @@ -685,6 +685,8 @@ static bool io_try_coalesce_buffer(struct page ***pages, int *nr_pages,
+>>>  		return false;
+>>>  
+>>>  	data->folio_shift = folio_shift(folio);
+>>> +	WARN_ON_ONCE(data->folio_shift >= 64);
+>>
+>> Since folio_shift is 6 bits, how can that be try?
+>>
+>> I think you'd want:
+>>
+>> 	WARN_ON_ONCE(folio_shift(folio) >= 64);
+>>
+>> instead.
+> 
+> imu->folio_shift is 6 bits, and it is only copied from data->folio_shift(char),
+> that is why the warning is added for data->folio_shift.
 
-Might make more sense to have this overlap further down, with the
-passthrough command. That'd put it solidly out of anything that isn't
-passthrough or needs addr3.
-
-> diff --git a/io_uring/rw.c b/io_uring/rw.c
-> index 7ce1cbc048faf..b5dea58356d93 100644
-> --- a/io_uring/rw.c
-> +++ b/io_uring/rw.c
-> @@ -279,7 +279,8 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
->  		rw->kiocb.ki_ioprio = get_current_ioprio();
->  	}
->  	rw->kiocb.dio_complete = NULL;
-> -
-> +	if (ddir == ITER_SOURCE)
-> +		rw->kiocb.ki_write_hint = READ_ONCE(sqe->write_hint);
->  	rw->addr = READ_ONCE(sqe->addr);
->  	rw->len = READ_ONCE(sqe->len);
->  	rw->flags = READ_ONCE(sqe->rw_flags);
-
-Can't we just read it unconditionally? I know it's a write hint, hence
-why checking for ITER_SOURCE, but if we can just set it regardless, then
-we don't need to branch around that.
+Ah yes that is fine then, for some reason I read that as 'data' being
+an io_mapped_buffer.
 
 -- 
 Jens Axboe
+
