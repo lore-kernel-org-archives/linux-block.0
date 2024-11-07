@@ -1,102 +1,89 @@
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E60366
-	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 18:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8749820F5DA
+	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 18:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731004059; cv=none; b=JobkK1NDkCcAICabAlaYrL0+vifbZ0hzt1akg6NON4JQUmEW44JTKBXzOlDm/9by7EavBq4GpsGUvpxsAZdcEPdIKALpscaf6BgAy/dN2zkZwV5S9qQETrOXAaacNokAIw5ea6dakCtMIwD98YfA3Qe6CG6THk/h9VJryLQKeeI=
+	t=1731004112; cv=none; b=QO6siK3w6drkhxF5Ylg6NSzCB8bj7VgwENvNqcXIWUrBbvcw+fcT/9R+aqNhi54fiumW6yDfYoFXWRtCOwiPT4Yqz3mDpdEhVw18sa50e6zJMzHI2LA9nYSCA13MgMEeG1RstcOiDA7/wLX11bC3iPcZ+cD5oYx/rIJno550X1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731004059; c=relaxed/simple;
-	bh=20LrKDdXKwohLrR7m/+QaoGSjbWanGlIA0WTQG1VuBE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YLYvVX2ScsbkQeFjpPBno7KDjfgFPtKXLkye9TsXF1djdX31fJptRb23Xf4QCqcgCerNTkFXcqmv4peG3FwLCEkViQRaMjLc6xOxbwAFxevL40xxAGM/semGKBk6iT+FqwGW5J3tOG+gGuNFg31crm8pRdO0gdGjeB3A+GdIPSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gjT+5qAO; arc=none smtp.client-ip=209.85.160.44
+	s=arc-20240116; t=1731004112; c=relaxed/simple;
+	bh=wC/oWyNcX/2qw/vu1KXDTflHxEgJiDzIcD0RLaEM3XE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=BsSlX/TSak01aTnlidYT2HMJJOj3KRrP44/mtBibo4+GqbL8XdnUsJ/v3wZKQmaEPO3ivt0h861xSThyWpbIIp9tIkP+Jrc6+X4klvojLuyukOme8nRyrsf9uTGnveWKFA1Hwrn77PQfocf0qEy2PIM/ljO/iGTQ/j2Ltp90J9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=So5HkojA; arc=none smtp.client-ip=209.85.161.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gjT+5qAO"
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-29538198f2fso852415fac.1
-        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 10:27:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="So5HkojA"
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5ee53b30470so241222eaf.3
+        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 10:28:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731004057; x=1731608857; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uVnaoenE/nrPuz7L1JcnZlXT27mO9irch1BC/+wWZcY=;
-        b=gjT+5qAOs6q+hOnTQLfvkunfI2tkPZ9VwKkZIDzUu2L0pYWahtTs8cwco7Pf2qe0sM
-         mx7+dQaKkcwEpx6cq6+3VeVOJgBThU4Yx0TSL2CvOI1xNLYjl7oikVhmSCFNKyTj5MFw
-         VU6z8LSL4lMtVha4IyXb41aT1LcvQ+f87OsIUlRpX43S3z6sUSEHOv+ghc7ggObIx/z7
-         wdPRKnNx9coOdSrl3Tzg8OkeqYwpVoLsbNOBDbfsogk0/txzNVM8gIGT/Q555/+CUb4x
-         1Cz9CkvESPRyz5SHYrUNKMbstSRlUI14EKnIpG0MbYqt4+D2j1cBUF19sl+L4spzDyxY
-         q/rQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731004109; x=1731608909; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RfkZ5vVPRthfg8DCWHf1TRm0P4AJoRMsICGEYROxCeA=;
+        b=So5HkojAYk0W5gdaPquCXmAt4gqo3tLTF8uMlBgASG8/B7xMNSsHel5MvY1TysBh1n
+         j0kiYudSKCJplwWIDFIVQLG1Ut2lYNfiHVjnMNjJ8AG4uRjkobzdzOAtxgy80vCCMImy
+         rtKKwlEMax8vcgiyy4RiiDMtuqR34S0k3i2YQ3Bqu0jz+6OvhIojqsOF828Rb/xmI5+d
+         0xITVzNrtEJNRlu2JkvmbckK4Xf67yozYaVfQqWsTkr+7q18XWB2o6VwW34VoxrpN8/B
+         FWYUxKVTjC+gWFbE27y4azjU9eS6MPOL9KNLguf4RNfMqSaq3l536HBT2U5z3TsEkFsG
+         FwAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731004057; x=1731608857;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uVnaoenE/nrPuz7L1JcnZlXT27mO9irch1BC/+wWZcY=;
-        b=i+zmFbFv7ByfQkCI3zldCU2l7TtYp2ctl6Cl1Zy2fcCeyfLQSNSmcORL4Mdl8quH5y
-         lTFiL5D57BcC7FYRRCiM5Bq3HJ8OFRncCIz7Wd/35Rlmt/oZUaaQNRb4UsnmT6s1jdT3
-         xWB99XA7pHfw1T6cKZJcxE77+KpjYZYKpBS6DyCLxDyy/N0Ug1uCiKoOp7ppKKKg1Nj8
-         6NjR1ox4vzhqRtows42W618DVmmoHC6qPSYiLsZxbNfx/4khsZBHNjHFjumyiKltDfXY
-         shRXC54vmbwf16laWM2dZjTxts6XlF0xvLxtTJZ2HEpwnpWrUjfNthYr6812kggamG0W
-         n1OA==
-X-Forwarded-Encrypted: i=1; AJvYcCU7+ijoZ88UAaL3uP8HkO0ha51g4GA8ENgIsH6CNXCyV8b2P6iJGbIhtIcgFNUqv4hja8HySyQJYPwSKw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyEzWxf/lJS6oBwoveGMp0dEp1Xm2srMsQlkPba0biovTTBskg
-	Y+NbVWuWOoUI5TDt5pjFQKo3MhN05qKBq81DhEbn1AgTNiIucfvHEmGOKSn436E=
-X-Google-Smtp-Source: AGHT+IHmQOgwVXtosc5C3zjOqsrNAr1v/lfSp7QNRqpm1iXYwNBCmnKvsMh+W3pIhyccXko0ObQGvA==
-X-Received: by 2002:a05:6871:5891:b0:288:59d3:2a03 with SMTP id 586e51a60fabf-2949f07a886mr21485563fac.39.1731004056679;
-        Thu, 07 Nov 2024 10:27:36 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-29546f3f58dsm490090fac.49.2024.11.07.10.27.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Nov 2024 10:27:35 -0800 (PST)
-Message-ID: <26049689-238e-4f04-9a68-db002ed5c1e0@kernel.dk>
-Date: Thu, 7 Nov 2024 11:27:34 -0700
+        d=1e100.net; s=20230601; t=1731004109; x=1731608909;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RfkZ5vVPRthfg8DCWHf1TRm0P4AJoRMsICGEYROxCeA=;
+        b=s1aa6YjbO1FXOcgt1/Yde27NS3JVCALFP8pBtxQVw2FFVb9u1f7z5/Ga7uzDBLNKt+
+         EQT5GOxSiUnOs0vD8dEJ3c6/pZLE0nyHLvxLEJEe/2rgtfalnsi1zfg+vE8odc/xF/E6
+         nUT5yumIhLyzjNgQJsz1S0duOr5WuWlpy0S0PmNiuzFQGawqph69DKVTej62oSzJPOMP
+         bR/1BNXQs61bAOKYf9k7xaZmKTeZTkVgGtBx+vy5DcqO8ewA7T9X70ahTPjpD2E7qWBb
+         ud7vy8xhQs1gzeZP/SIDaVRDb4+nFRcUJK3QiM68QNgpCr+p2bFwQtrjOx2dt5jgBhlW
+         dJ5Q==
+X-Gm-Message-State: AOJu0Yx9KGC0qXOip828xnfw60wAZWDd5B5Hto//Xf2V5wJRdxDD9VsE
+	GTMJQdRs6MUWM6Ql/Oem8UOT+WnFGTt9l21PDqP/BvupG6clByQLA9b9VuCBCsM=
+X-Google-Smtp-Source: AGHT+IEaJbCM1Zp0ALVPFRY2YG9piHnZCsfYwBEzR/BBe3g7PcJVulRrLVG1fwQZgkFbGktMPTiiPA==
+X-Received: by 2002:a05:6820:1f08:b0:5eb:c72e:e29c with SMTP id 006d021491bc7-5ee57d296eemr61006eaf.8.1731004109632;
+        Thu, 07 Nov 2024 10:28:29 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5ee4970a150sm318578eaf.36.2024.11.07.10.28.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 10:28:29 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20241107065438.236348-1-dlemoal@kernel.org>
+References: <20241107065438.236348-1-dlemoal@kernel.org>
+Subject: Re: [PATCH] block: Switch to using refcount_t for zone write plugs
+Message-Id: <173100410869.752525.9713906876157995574.b4-ty@kernel.dk>
+Date: Thu, 07 Nov 2024 11:28:28 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/6] bio_split() error handling rework
-To: John Garry <john.g.garry@oracle.com>, song@kernel.org,
- yukuai3@huawei.com, hch@lst.de
-Cc: martin.petersen@oracle.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org, hare@suse.de,
- Johannes.Thumshirn@wdc.com
-References: <20241031095918.99964-1-john.g.garry@oracle.com>
- <e0a82859-6c9e-43d4-b6ee-4b96fa193fa9@oracle.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <e0a82859-6c9e-43d4-b6ee-4b96fa193fa9@oracle.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-On 11/6/24 11:49 PM, John Garry wrote:
-> On 31/10/2024 09:59, John Garry wrote:
+
+On Thu, 07 Nov 2024 15:54:38 +0900, Damien Le Moal wrote:
+> Replace the raw atomic_t reference counting of zone write plugs with a
+> refcount_t.  No functional changes.
 > 
-> Hi Jens,
 > 
-> Could you kindly consider picking up this series via the block tree?
-> 
-> Please note that the raid 0/1/10 atomic write support in https://lore.kernel.org/linux-block/20241101144616.497602-1-john.g.garry@oracle.com/ depends on this series, so maybe you would also be willing to pick that one up (when it's fully reviewed). Or create a branch with all the block changes, like which was done for the atomic writes XFS support.
 
-The series doesn't apply to for-6.13/block - the 3rd patch for bio
-splitting conflicts with:
+Applied, thanks!
 
-commit b35243a447b9fe6457fa8e1352152b818436ba5a
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Mon Aug 26 19:37:54 2024 +0200
+[1/1] block: Switch to using refcount_t for zone write plugs
+      commit: 4122fef16b172f7c1838fcf74340268c86ed96db
 
-    block: rework bio splitting
-
-which was in long before for-6.13/block, which it's supposed to be based
-on?
-
-Please double check and resend a v4.
-
+Best regards,
 -- 
 Jens Axboe
+
+
+
