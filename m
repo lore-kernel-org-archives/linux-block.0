@@ -1,88 +1,50 @@
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8282210189
-	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 13:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D3E2076A5;
+	Thu,  7 Nov 2024 13:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730986094; cv=none; b=qoX+rnw5H5WyLK/xaAsjss/VkDGDQil2zoPNqxoDEHKU5y3d+9Qdt22JqqhlmkRpbRHad7eSDPFI7C6AectYR7/ABuIg1L1nEawRgywK9DvISQRmWcy6s8CKdUE8oeZwG+Fl+Q7E1N+g9h07DIHJJkMEsc9ozGVoREGFoCIbNMA=
+	t=1730986738; cv=none; b=TzGeSMnq/3oXfJDWl5LCkrS0QD+0lUanVPfRn82mdqiu+5dJ0N/iQ1/xqdqXV+hDMPRalWICHQOgDQeGr+ZPJvLy32y9se3a8tUnyAIzTXUEPQws5QbfUpFmOTocbfhH8fa2SSRSiJwyHf6YDPDW7l1bctywdEPNz8yCCBZCV5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730986094; c=relaxed/simple;
-	bh=hYzChVDIuLb/8YgK+xhHVl47Zu6a9Yg+4tjwX8ly6HM=;
+	s=arc-20240116; t=1730986738; c=relaxed/simple;
+	bh=vHDvps/nhQ8488k0taybkc8hL6eOd+QGxgTaKd9As+M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rEfxZRpiNp63ACOJX5FVUYEdGsFU0ZubnWpmbRFeJHK1lZDzLtfNgcOxLdi2j/I/uyABzoyedcj93RiEPj3GcIy7B7FxT0q5MPsiAkmvPI2p5Z1nMCP7n8MriNhUHwOnC8uQoZoaRSLr96kzH/5cp0THHbXhXsbmDqwiypV3BRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Klf8FF6K; arc=none smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	 Content-Type:Content-Disposition:In-Reply-To; b=H3w5Bc0M6u7WG4NSdD153G7pTwfok4qc2Wy0sLDngWyelMR/NxiCiGrdsCNaFj2gFvN9OlEAg93fxtT2f5LV8ZnTYN7eQbqtNPfXukhIk0mTVKZuQxY5S8YzYHcSOH+zhv9a/t83TlntW1y2mkQvL+ngIlOVFEwhwdozuwo3kTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=juXJ4pPt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Klf8FF6K"
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7092dd03223so426110a34.1
-        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 05:28:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1730986091; x=1731590891; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wLc6Cp3t0rRD6tSmNJMVeZRKi1v5LF88UUzndPTrhYc=;
-        b=Klf8FF6K6orux3fA7PlvEdFcnRWTsOhFc40v1LA1SLLrLlHk2tQvyVplk7vmmUJIFC
-         UknOQnoTmeFAm3yBhadTv54U2nvVsfR+DQmMYLaE8n8nDpWBCfnXoY7h3v1hnNBtylx+
-         FcWkAhNvr7b2fdDexWxLAmN1Y8fpneFLvut4gMB+b5yUNWHJzBoxK3Q4J/bwP8Vkas9y
-         LCmuRRtb6blTYR8N574C41llrNMyF91vMlNSv+uhzhETTkYMfCnpR2WZdzPPv+gBuDkX
-         1hFTYnCnnf3XxUJWxBtc7T+Z0T/qqIilo82AZKp5b/1TTffI3gJmDHnnIbLqyrxXR9FL
-         AU/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730986091; x=1731590891;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wLc6Cp3t0rRD6tSmNJMVeZRKi1v5LF88UUzndPTrhYc=;
-        b=aGQzTeR6+FUCiFXYpGcKx3anfY4XSJr2HEdHSUz1e9ptyQpYCXboGkq7BV2ltFed4h
-         WLIXhbl7uusMPEnjNVFueXXCMeaGfZVOWlGSGtayuXqQ+Md6gjjU+JC/5E0o7f9IajRn
-         1qhBWCp8dyJFZSeecOZtYAuwOC5dCf+RGw1H9gOuRF0TQ4DlnEjPfsG5HZrtR6/luSik
-         wVOZRd5Ll9ORRzOH2vEIPMW+Fcn4UXfTco+HSqkZsHO/tKJnerd0qZU7AOzZ3QcYtTZw
-         7UgBr0zScvd9yvCsE/DvVSuAUwyo63wz48uJvXxYpfFTuRWf7xHICSYjJSLBkeNicSmy
-         iPcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVo/jz7yNo9BpES2EOd2vSL/TDK91LB9HZw+BxqjAhzztnLw1jifBlqE/DWw78Cv0M5JiWjK8OlmgyQgg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxumJ+eG/BLj9dtg71xibmR6m8B0EZbbRKk/LP/rxl7CoQsbsUs
-	/d6D726XrRbk1oh4eKuWAMypoJXx90/hENFnVqMgZPFxX2GFOfnu21jhzYNhMJ4=
-X-Google-Smtp-Source: AGHT+IF+tw+3lLnZf4WnNvvo/ldJVal46tJah/6dRwkTid9yDCpRNCjr9NuPNVZcVYNIHAZNA7U8ew==
-X-Received: by 2002:a05:6358:9696:b0:1c3:39ad:7c6c with SMTP id e5c5f4694b2df-1c5f99fec97mr1284772555d.17.1730986090941;
-        Thu, 07 Nov 2024 05:28:10 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3961ecc4esm7389226d6.44.2024.11.07.05.28.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 05:28:09 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1t92YS-00000002FM3-2zqJ;
-	Thu, 07 Nov 2024 09:28:08 -0400
-Date: Thu, 7 Nov 2024 09:28:08 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Robin Murphy <robin.murphy@arm.com>, Leon Romanovsky <leon@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241107132808.GK35848@ziepe.ca>
-References: <cover.1730298502.git.leon@kernel.org>
- <3567312e-5942-4037-93dc-587f25f0778c@arm.com>
- <20241104095831.GA28751@lst.de>
- <20241105195357.GI35848@ziepe.ca>
- <20241107083256.GA9071@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="juXJ4pPt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47EFDC4CECC;
+	Thu,  7 Nov 2024 13:38:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730986738;
+	bh=vHDvps/nhQ8488k0taybkc8hL6eOd+QGxgTaKd9As+M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=juXJ4pPt2PnZFm5le1ouU2RhyRQP7aToB7moKQNrxCqsSNdgzB5pCSh85zyQijc+u
+	 m3dbDJY5g5D6JLp+TOXf2yfMKCl964FFlAXl4u2cUVaE7m7EhcYnxn81GWvditUtvn
+	 2GLSgAH2Shc5AM/fX6n4CSUUpethrUeQesF3ve3Y3hn3a0OnqCtmfNMRj3PNyM19nt
+	 a0f6M69PV7grt0l7hmVxqh6NPzs9Y3Sm/O1Ln75+Rw3A70uSTtTOx4wtLIuKD47kq0
+	 rprl1oT0Fd7cXbE9BnxazG04YwTwuMAxOqZnznfXiPpwy8d1bi+DdAWhAJtfKUXjnb
+	 /xzOuTFcKP1hA==
+Date: Thu, 7 Nov 2024 14:38:49 +0100
+From: Carlos Maiolino <cem@kernel.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, "Darrick J. Wong" <djwong@kernel.org>, 
+	Theodore Ts'o <tytso@mit.edu>, "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>, 
+	John Garry <john.g.garry@oracle.com>, Catherine Hoang <catherine.hoang@oracle.com>, 
+	linux-ext4@vger.kernel.org, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>, 
+	Ojaswin Mujoo <ojaswin@linux.ibm.com>, linux-block@vger.kernel.org, Dave Chinner <david@fromorbit.com>, 
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [ANNOUNCE] work tree for untorn filesystem writes
+Message-ID: <g6jwjmlvs7oqnotb4esj52hff7bt5vos4csdhounkgxtw7x5hz@dikdatdyzfcv>
+References: <20241105004341.GO21836@frogsfrogsfrogs>
+ <fegazz7mxxhrpn456xek54vtpc7p4eec3pv37f2qznpeexyrvn@iubpqvjzl36k>
+ <72515c41-4313-4287-97cc-040ec143b3c5@kernel.dk>
+ <20241105150812.GA227621@mit.edu>
+ <5557bb8e-0ab8-4346-907e-a6cfea1dabf8@kernel.dk>
+ <20241105154044.GD2578692@frogsfrogsfrogs>
+ <00618fda-985d-4d6b-ada1-2d93a5380492@kernel.dk>
+ <20241106-hupen-phosphor-f4e126535131@brauner>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -91,73 +53,68 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241107083256.GA9071@lst.de>
+In-Reply-To: <20241106-hupen-phosphor-f4e126535131@brauner>
 
-On Thu, Nov 07, 2024 at 09:32:56AM +0100, Christoph Hellwig wrote:
-> On Tue, Nov 05, 2024 at 03:53:57PM -0400, Jason Gunthorpe wrote:
-> > > Yeah, I don't really get the struct page argument.  In fact if we look
-> > > at the nitty-gritty details of dma_map_page it doesn't really need a
-> > > page at all. 
+On Wed, Nov 06, 2024 at 11:40:00AM +0100, Christian Brauner wrote:
+> On Tue, Nov 05, 2024 at 08:54:40AM -0700, Jens Axboe wrote:
+> > On 11/5/24 8:40 AM, Darrick J. Wong wrote:
+> > > On Tue, Nov 05, 2024 at 08:11:52AM -0700, Jens Axboe wrote:
+> > >> On 11/5/24 8:08 AM, Theodore Ts'o wrote:
+> > >>> On Tue, Nov 05, 2024 at 05:52:05AM -0700, Jens Axboe wrote:
+> > >>>>
+> > >>>> Why is this so difficult to grasp? It's a pretty common method for
+> > >>>> cross subsystem work - it avoids introducing conflicts when later
+> > >>>> work goes into each subsystem, and freedom of either side to send a
+> > >>>> PR before the other.
+> > >>>>
+> > >>>> So please don't start committing the patches again, it'll just cause
+> > >>>> duplicate (and empty) commits in Linus's tree.
+> > >>>
+> > >>> Jens, what's going on is that in order to test untorn (aka "atomic"
+> > >>> although that's a bit of a misnomer) writes, changes are needed in the
+> > >>> block, vfs, and ext4 or xfs git trees.  So we are aware that you had
+> > >>> taken the block-related patches into the block tree.  What Darrick has
+> > >>> done is to apply the the vfs patches on top of the block commits, and
+> > >>> then applied the ext4 and xfs patches on top of that.
+> > >>
+> > >> And what I'm saying is that is _wrong_. Darrick should be pulling the
+> > >> branch that you cut from my email:
+> > >>
+> > >> for-6.13/block-atomic
+> > >>
+> > >> rather than re-applying patches. At least if the intent is to send that
+> > >> branch to Linus. But even if it's just for testing, pretty silly to have
+> > >> branches with duplicate commits out there when the originally applied
+> > >> patches can just be pulled in.
+> > > 
+> > > I *did* start my branch at the end of your block-atomic branch.
+> > > 
+> > > Notice how the commits I added yesterday have a parent commitid of
+> > > 1eadb157947163ca72ba8963b915fdc099ce6cca, which is the head of your
+> > > for-6.13/block-atomic branch?
 > > 
-> > Today, if you want to map a P2P address you must have a struct page,
-> > because page->pgmap is the only source of information on the P2P
-> > topology.
+> > Ah that's my bad, I didn't see a merge commit, so assumed it was just
+> > applied on top. Checking now, yeah it does look like it's done right!
+> > Would've been nicer on top of current -rc and with a proper merge
+> > commit, but that's really more of a style preference. Though -rc1 is
+> > pretty early...
 > > 
-> > So the logic is, to get P2P without struct page we need a way to have
-> > all the features of dma_map_sg() but without a mandatory scatterlist
-> > because we cannot remove struct page from scatterlist.
+> > > But, it's my fault for not explicitly stating that I did that.  One of
+> > > the lessons I apparently keep needing to learn is that senior developers
+> > > here don't actually pull and examine the branches I link to in my emails
+> > > before hitting Reply All to scold.  You obviously didn't.
+> > 
+> > I did click the link, in my defense it was on the phone this morning.
+> > And this wasn't meant as a scolding, nor do I think my wording really
+> > implies any scolding. My frustration was that I had explained this
+> > previously, and this seemed like another time to do the exact same. So
+> > my apologies if it came off like that, was not the intent.
 > 
-> Well, that is true but also not the point.  The hard part is to
-> find the P2P routing information without the page.  After that
-> any physical address based interface will work, including a trivial
-> dma_map_phys.
-
-Once we are freed from scatterlist we can explore a design that would
-pass the P2P routing information directly. For instance imagine
-something like:
-
-   dma_map_p2p(dev, phys, p2p_provider);
-
-Then dma_map_page(dev, page) could be something like
-
-   if (is_pci_p2pdma_page(page))
-      dev_map_p2p(dev, page_to_phys(page), page->pgmap->p2p_provider)
-
-From there we could then go into DRM/VFIO/etc and give them
-p2p_providers without pgmaps. p2p_provider is some light refactoring
-of what is already in drivers/pci/p2pdma.c
-
-For the dmabuf use cases it is not actually hard to find the P2P
-routing information - the driver constructing the dmabuf has it. The
-challenge is carrying that information from the originating driver,
-through the dmabuf apis to the final place that does the dma mapping.
-
-So I'm thinking of a datastructure for things like dmabuf/rdma MR
-that is sort of like this:
-
-   struct phys_list {
-         enum type; // CPU, p2p, encrypted, whatever
-         struct p2p_provider *p2p_provider;
-         struct phys_list *next;
-         struct phys_range frags[];
-   }
-
-Where each phys_list would be a single uniform dma operation and
-easily carries the extra meta data. No struct page, no serious issue
-transfering the P2P routing information.
-
-> > I saw the Intel XE team make a complicated integration with the DMA
-> > API that wasn't so good. They were looking at an earlier version of
-> > this and I think the feedback was positive. It should make a big
-> > difference, but we will need to see what they come up and possibly
-> > tweak things.
+> Fwiw, I pulled the branch that Darrick provided into vfs.untorn.writes
+> and it all looks sane to me.
 > 
-> Not even sure what XE is, but do you have a pointer to it?  It would
-> really be great if people having DMA problems talked to the dma-mapping
-> and iommu maintaines / list..
 
-GPU driver
+Sounds good, will you submit a pull-request from it or shall I still submit the
+remaining ones to Linus?
 
-https://lore.kernel.org/dri-devel/20240117221223.18540-7-oak.zeng@intel.com/
-
-Jason
+Carlos
