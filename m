@@ -1,111 +1,100 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF212170B2
-	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 23:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A0F2170B2
+	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 23:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731022033; cv=none; b=TNVuQxIMawml6gLgHH5XBxYxj7CF7MMzlG2yrqLF5O8ni2NeauW20PexKCX4g1vv7PoUXyZ2v7HwXkLZjU1UCAteEep2NLKsNZcMaDpuL99fXIsohhbTS/LQQ9/H+GTXOp1osJK0gFQ+Uq6vo4IrJczJy2liqrcCKhz/SAdgiRc=
+	t=1731022060; cv=none; b=Ds+uQ1LTPvE4C54kZt4NQc+qE7chzv4iXD4Z1fidfRVoM1Sy/zDMSM1bFu/iXYz6em/cmIaPtl7nroQTajmXvfZCbHsBVFtyJeOvVG7zfcZDZokrfVHYapZsjPnd0vtIi2EtXf5m3ZtsBwflqT+DcLAf7GLMzLPCCzaBn3DgZCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731022033; c=relaxed/simple;
-	bh=R24pBbUsLdcjrGFo+digg2Qk/kM/BAe7DQQ8kqbMOJM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gxjsx2WMpA5hZ+YuHRaXOKmPrBFpa7i1wF0n0Ta2DAlFqa4WUcJDFXfFO7fV2G9eR097Lf83ycYL14RTgui9mzvwXmEac4Ex2Xc3ejshrzv1khM6phW4ZTit2MfYJKIhht/y3WA0Qbdplg1keH5KLAnAJDxz4k0WZ65HC2YNx4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xcxYtj6m; arc=none smtp.client-ip=209.85.210.177
+	s=arc-20240116; t=1731022060; c=relaxed/simple;
+	bh=hv9C51HwlWtOyl5PkOmhBisURfjT5kkvK7Ix7Aq0wQ8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=r+UbHYbwGg6Hz9dJBdjOV/N7iqqL1qBOS5YcQzvjMXn9WjfzuOkyqyh/v0co2HSzYOLyr3rObOhw/ToJNSqrYpYJPxJPqO9TQQVSKz+y7HZ50TYa/Ynh5spxlpW420YpMTNiCLj8pW9DpCn+hM92VNaPvCz6nUbUioSG6g5aj4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=jvQdNjQp; arc=none smtp.client-ip=209.85.210.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xcxYtj6m"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-72410cc7be9so680504b3a.0
-        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 15:27:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jvQdNjQp"
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-718066adb47so999002a34.0
+        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 15:27:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731022030; x=1731626830; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sMndnABs/yn3sDeZnRicouWrldSwOMd0CcgOdJuPLfI=;
-        b=xcxYtj6mDBQSYhU8d96gbwuyz1cgduguBYFiWXeyLcveLkR+t0YBal/2j+1amDZvZf
-         6Ojx0stCwdu6McK4eJ6wgWzAod4W2GQvfi2ivVA3SqbMb4IZZl3eDjs6nodmOOIVjjne
-         8jZvpvSmMAA+J6rvcwn5pBuUoeybDOt7lSvB0Cmx1/0moPK5mQD0SYYfU6iB1vbS6JAK
-         I2MDL3qeUwxBtyAUEhNBR+7YBBHrsbwsS1PBdPKrjAkSQJBArrVfB/aRJrC4I3ZwRKbd
-         XbA5HG/uIPxqQQoznIl/BJDoCC7njffxoYP0lzctUw5Fn0z5QK2HryMftK41+V9/dUpr
-         9yCg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731022056; x=1731626856; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+WnWqwK9t70JgCc24ZAMW/wCoGuQtUhjWvayipWZGVA=;
+        b=jvQdNjQphPdesgg6uqk7uyPP7FkTlpA06H1RQROTsyQoMW04EeVhG3wVOAF88NBi64
+         IJXAErNhDZn/202fKsml2cVuZqonQZ1GxOT1JWX1UoO7Vb6nJadPZXyhXUJZlzZ60S9j
+         hTX5V30mRGmqUIkGdlgZJ/gnO6y3644zVBTgUJ4kBzx0dzLx4tmM4a7tC+T+0iak1q4H
+         PztXPRyEuw9aQNpsMEFqEOcRLxSBIIdZNC240Mj4PvAHRDZ1F1tEUelYVHfemhVf5ptj
+         SoSLal8oq1IkZcN1r3Jq07oVFgPU6t6fJBpdCil+b40VCNspy8SqBK6dfWXekReB7YSv
+         32qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731022030; x=1731626830;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sMndnABs/yn3sDeZnRicouWrldSwOMd0CcgOdJuPLfI=;
-        b=dJLjuG0N81MeFeAX1YcRdcCzmHE1pbxT63GidABshRz9MbkajRvFhya1q0XTPccJoR
-         LhAwO/IJcuoJEyrUBEadX3VLhs3lM5LgKICT4fsu6MW0J0IylNZTgf4kG4jFIxXy+2vB
-         o2IEjlAD3QpEMeIL9jsDylaAy5RT6/+DV0kVzcDN0sHhreikvYmzaJlJtH199PzRPaI2
-         dwrOhyTinoVU8tbOFoPW41IBXVupF3PYNl/DwJmGehtcVeep381JWs3s/8Cr+EQSMwBP
-         I5x0uvaYSffxGi+JQqvWd7xZ7jw/J4sHinRzKg0AwZng4BF9AyKNYf5Luaxhllz+CM2c
-         axPA==
-X-Forwarded-Encrypted: i=1; AJvYcCXh2PmytFIgEkI/lkdgmfNbc0iqy+ATCgNczcaDWXpB572oWSZw/6/mL2e8yfoIZHV4E/k2epBYZzd3bQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZVN9yyZP93jcYJLq/133cDPo6lbSwZJJgF07oWscE6WF7mBC+
-	18vEfIvvYzaOb+YKgagNjX5yuAGGLf0OZzFTzW6GQgyhGv3IrjNwE9/pWhb2wssLzGwubmtSYOh
-	kYgs=
-X-Google-Smtp-Source: AGHT+IGpB+vXErS9MgmD97K6d3f0kRDSpM+myUS7KQvvZp4jUSIxK3kmidroSr7Q11jXuBBZPi/Vfw==
-X-Received: by 2002:a05:6a21:788f:b0:1db:f98b:ddbf with SMTP id adf61e73a8af0-1dc22b43bb4mr1069672637.40.1731022030314;
-        Thu, 07 Nov 2024 15:27:10 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7f41f65aa9csm2065002a12.74.2024.11.07.15.27.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Nov 2024 15:27:09 -0800 (PST)
-Message-ID: <cccc9209-29c2-49c5-92e9-b7e76fab65b4@kernel.dk>
-Date: Thu, 7 Nov 2024 16:27:08 -0700
+        d=1e100.net; s=20230601; t=1731022056; x=1731626856;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+WnWqwK9t70JgCc24ZAMW/wCoGuQtUhjWvayipWZGVA=;
+        b=JkY/m9nBkO0W0BjSvRDBL1gVKh/C6gVoYccgfwx3QiYNGmZRwT5lTnAzOoNujLikh1
+         BUxfT5Y8CgTUP2TJu+wUKl9NpMLVZyAmnvLhwyt3P0CCnVOKGMLoao1Q7qVbgbLHvlww
+         h2JMALgFG6F6JuJwNL1t/Catof0UGP4Hg/paCTxXg8tgGUxbx6T2HAaURVm4AMGlLMef
+         1cnnUHZc/dNGLzjotpq8Kh2D15CfMkF3C83aXTD99fVzD7QLEkgppuIedTRbJD6mUIDc
+         etulFdcvu7LBN9aHO3g8HvWw/ZngLYiQG5Y1W/8uAZ5CiIWKN2X/CjTxhzVHxUaVvVZy
+         jhWA==
+X-Gm-Message-State: AOJu0Ywg9MNDdxasqDKGIPp8GxNNOoPYNbljOa5ftddjdgLCBTmtBEdV
+	ttteUnLDyWusnsM/Rb2LXUqZ4u4u2hfit9VyjOB3/b8+MrO+/fa8ukFY3oC8kdNawecagjECrKt
+	2UoQ=
+X-Google-Smtp-Source: AGHT+IGyYIqTuYbajAan5NZyCPasIZzSVxfRuQGSsTkDwoqpweEn1BLHUzptxf5l1TPvjDwD5dZIfw==
+X-Received: by 2002:a05:6830:2aa5:b0:709:4757:973 with SMTP id 46e09a7af769-71a1c2860f9mr1083633a34.23.1731022056541;
+        Thu, 07 Nov 2024 15:27:36 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7f41f643448sm2107935a12.52.2024.11.07.15.27.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 15:27:35 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20241031133723.303835-1-ming.lei@redhat.com>
+References: <20241031133723.303835-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2 0/4] block: freeze/unfreeze lockdep fixes
+Message-Id: <173102205564.1016704.12158859510789956148.b4-ty@kernel.dk>
+Date: Thu, 07 Nov 2024 16:27:35 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 0/4] block: freeze/unfreeze lockdep fixes
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20241031133723.303835-1-ming.lei@redhat.com>
- <Zyq3N8VrrUcxoxrR@fedora>
- <CAFj5m9KV0gnUr3jy-sU_5Msv86wQgqoHwAoyS_0h_inGybR1Rg@mail.gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAFj5m9KV0gnUr3jy-sU_5Msv86wQgqoHwAoyS_0h_inGybR1Rg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-On 11/7/24 4:21 PM, Ming Lei wrote:
-> On Wed, Nov 6, 2024 at 8:24?AM Ming Lei <ming.lei@redhat.com> wrote:
->>
->> On Thu, Oct 31, 2024 at 09:37:16PM +0800, Ming Lei wrote:
->>> Hello,
->>>
->>> The 1st patch removes blk_freeze_queue().
->>>
->>> The 2nd patch fixes freeze uses in rbd.
->>>
->>> The 3rd patches fixes potential unfreeze lock verification on non-owner
->>> context.
->>>
->>> The 4th patch doesn't verify io lock in elevator_init_mq() for fixing
->>> false lockdep warning.
->>>
->>> V2:
->>>       - drop patch 1 and fix rbd by adding unfreeze (Christoph)
->>>       - add reviewed-by
->>
->> Hi Jens,
->>
->> This patchset fixes several lockdep false positive warnings, can you
->> merge them if you are fine?
->>
->> https://lore.kernel.org/linux-block/Zym_h_EYRVX18dSw@fedora/
+
+On Thu, 31 Oct 2024 21:37:16 +0800, Ming Lei wrote:
+> The 1st patch removes blk_freeze_queue().
 > 
-> Hi Jens,
+> The 2nd patch fixes freeze uses in rbd.
 > 
-> There are lots of lockdep reports which need the fixes, so ping...
+> The 3rd patches fixes potential unfreeze lock verification on non-owner
+> context.
+> 
+> [...]
 
-Oops indeed, not sure why I missed this one.
+Applied, thanks!
 
+[1/4] block: remove blk_freeze_queue()
+      commit: 54027869df83aceccd18c4a799b263a2b318b065
+[2/4] rbd: unfreeze queue after marking disk as dead
+      commit: a471977780cc8ba809f84e3e2289d676063e7547
+[3/4] block: always verify unfreeze lock on the owner task
+      commit: 6a78699838a0ddeed3620ddf50c1521f1fe1e811
+[4/4] block: don't verify IO lock for freeze/unfreeze in elevator_init_mq()
+      commit: 357e1b7f730bd85a383e7afa75a3caba329c5707
+
+Best regards,
 -- 
 Jens Axboe
+
+
+
