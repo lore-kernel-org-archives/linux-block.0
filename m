@@ -1,58 +1,59 @@
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A0C218306
-	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 22:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2808212D2D
+	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 22:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731018364; cv=none; b=TvZMe9dmCw0ZaQoOTP1IqMfgxLhABXTLBFqHi9ZmDlNv51R2UP4CeqDxaD4lmUMyl6D++E5NM9PJLZT6LPUlKMwSnVy+gOHoiBjYzkPenUL38dxJi6L7lat3usUM4nHBbR9RKqy64rbGjfkC0wlhzKvW5mcX+8hoQmDbi8qgFfI=
+	t=1731018919; cv=none; b=pux6gk/mi1vVqj4c02x399R1RSFlzpmz90uznhU6pPHxcYUH2IC8cWWC1mF4WSRPDKsDVjxoTrYQHHUP0IIdez8ODqvExn8B6xThLtd8WVKAh0uP6yWvlfwgeFbyIRxlt7aqnQKg2pJuWgk4hHg5lTIc46eZnNwJTk6LASHmhh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731018364; c=relaxed/simple;
-	bh=1aHsB/zKiQbMlmmGU8Nt65GTi06r96XtuPpx3Rw94cM=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=sZ/jfepdsEs7pvCEKIq9lfVtWclb8WG5ekbrjjZoLQwwrMpgi6B7N6O0D10c/uCbufVXP/BlVLF9jDFzU2G8BSYxL1vJJUzYr81tDHt9O45+oLdxl5IOaUhfYGttOYz/NrFuihTap3OZDKArfhq2gXl064OfG57GYQnwY2Stg1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=yPzFmgSt; arc=none smtp.client-ip=209.85.160.51
+	s=arc-20240116; t=1731018919; c=relaxed/simple;
+	bh=N58G+7PoMtdGK55O+huUvX9TsumHn5fE2Vu64Zfuhew=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R5ZusW1MN9J+NwKsEuTwVgMvRZ1ooDKsuwSqp1yd3d4GOBY9QOHR3rjX331Br6HFdmr6u8KNb9br/YxKGh4VYnlvQanBCw0yomyGN2MPQYRm7M+zeDl+1rHXcvVE/UAd0TG2Iv55eAqt977KzrgXR97LNGJw/oQHLdSuZygCcXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=jxGRWxAO; arc=none smtp.client-ip=209.85.210.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="yPzFmgSt"
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2951f3af3ceso1037548fac.1
-        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 14:26:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jxGRWxAO"
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7180e07185bso740265a34.3
+        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 14:35:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731018361; x=1731623161; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ic3moIW2xzE9kekqow/yFFuj4gT8GFTls4K6Xfp4vq0=;
-        b=yPzFmgStmaNZdI5uukrDIiGL50XmI7Qj5aoyaMw/jvB23GSuByS8nzdGihE8fHOlKi
-         tWhzdG17Qa/5VMtSGFEi00dE9qCMM46Uiuu/O/zaIi4SFeiEvGTAM235GqD/PVMVEtQc
-         S/cp4l4Wn2PVrkV+PB8WcXZ2Q0jvvGZCWhUjjIUy/2PqurV97ns9aEZHYvylp9wi9+ZJ
-         M8wvhJBGCGiA9NpgwOPjR+l8FD84sxLDaHjOGIoiM5OVQH9tRINu1fEi6AptaIDG8VvY
-         Pb44vsXb+lkJ5IHAsdCZWNsAI6ybGX4Om1TFTTCiNk9OIN9a/lE9PSt/OLKwVWwHcvHP
-         Gfxg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731018916; x=1731623716; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bm7ibeqstmEcA5eOTi0gF/ZvnGd+OvKq5Op4/quU6Xc=;
+        b=jxGRWxAOZysvjCVIytXYSnLXc0EQDsWpTSjdCfhSM9Ob9m6UM5r+wr652UjHSJB2BT
+         OEj/z4RGOedhv9y6v5Gu6vx68YqQCFe+D7QecGVutRQnpnMypOVFsVeClzQ4n+CtSbGa
+         eilG9qbgGG5CDwZdD4HmLGzfuPd/6UXmKJo/PRkSufaoqLM4ykp56MEEhBLRTHAFycYR
+         xveBSEslNTAq2crXE9r+jHm9zuGr/nnwbZDO0nfKspzF+wKLi52RiS9ZDkt/Uvr4McBO
+         ibeOfWQAuWeJNCQmHA1xzqgSZ96MRFfNs0bPtIoDWVBeREfoENYTi3o1hC3mxJ7go709
+         dgGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731018361; x=1731623161;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1731018916; x=1731623716;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ic3moIW2xzE9kekqow/yFFuj4gT8GFTls4K6Xfp4vq0=;
-        b=B1LzLlzghqmed/n4h5AL/Oxysh/P5qXM3o2bpTsxL7EqLZbiMTkOyS1uqd7BXDfeD5
-         336scGq2w6djRjcbC4ejnk1V+vF8hk0qn8rcRImp5mRf/H8zUEdkPSpYQzALmzlYOQ9y
-         1P9yrqmx6I5srF+t9zAFk2vXwrp0S/2XoGmBd3WQ7Nmaw36B3bExAC2FmBsm/K8Hpod2
-         wd6rIRaMFHOJmrBbhYkMqmTdPMxAWOW0SK4tAiX9G+C5EBH+X9sC+zpp0zWSho1c7y2u
-         224oD//ELz+SSIHyNbDTjXcvAGnAMxPdBuWk+piaezclVWTbjqEyrTvEkztZlDmfVoyT
-         TzmA==
-X-Gm-Message-State: AOJu0YzO5P/ve6gBVApebdJWUmWQhSuNPnKOp0DEXAC1dhhn8fTH7Lkt
-	/CBKMXlMvOvbk1GIKJxxeRF5Xg1Qcc+QJvqXu/Q3CSme5evppburHbsWlqxNOsE=
-X-Google-Smtp-Source: AGHT+IFuI5q1Mb4wqDT2YjLU822jxP2SRwO92t0Qytb10bAEIacogw+MK0uT+tmaS89AoFiDN2AjvQ==
-X-Received: by 2002:a05:6871:1cd:b0:277:d8ee:6dda with SMTP id 586e51a60fabf-2956011f91amr585507fac.23.1731018361266;
-        Thu, 07 Nov 2024 14:26:01 -0800 (PST)
+        bh=bm7ibeqstmEcA5eOTi0gF/ZvnGd+OvKq5Op4/quU6Xc=;
+        b=SIJ8j7taZLivq4lXW9lWTDmZASUZrgkvOwPvBMhGZ2DD7GYXSJmb47RLBasTAK/hg9
+         dShvf/b48wQSstfJWNXVkucXgzbKvEM0wFKng0ayV7p9kmUXpUf0bZ0387b/6ln2RTzX
+         AUoh5P//duuHNbGi9Gn5tuJjQ8eGD6ZI9eSV1TQn5a7hYvY3ye1kG0VU7DPgA06P1PPX
+         IfMRO1iUnHqOohPLvBzJktzN6UR8F6Xcyj1MF5bgnr0dr1bFQgfu/i2kcB5UNLl+2pV7
+         uQJ0ikG0inw0280QTfpLFDKldZdTTNNqtvs+6+FtQKQF9dI2BhRpmsjvm4N6kT0tjjz7
+         HofQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWzS62ufASD00g1/fR4Mq8YRdJO7sTBH7YN834J7u7hKMMFPBjf2RqsIwrIWscjte698dkLX8iseECnww==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsIBZK3YCzwHjclY1kmIJrF+K7aSPYhgWTmsoOhCGlrGOZA+Xj
+	qzipTOsOzIYFE9XAoEFWSUFJ1BLlpIYXVQwIKnTb2yAgdsMcMY0MBtFfiCwiaRo=
+X-Google-Smtp-Source: AGHT+IGgriZZOL2MwwQHyXNmxP+/rXldRyNEbZu1L+A9ytDXvav22m77BTbEFTSlZj5iIAblyvh/ZQ==
+X-Received: by 2002:a05:6830:2a8f:b0:719:cc74:dfd9 with SMTP id 46e09a7af769-71a1c1cfed3mr946578a34.3.1731018915967;
+        Thu, 07 Nov 2024 14:35:15 -0800 (PST)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-29546ed7ab3sm642504fac.42.2024.11.07.14.26.00
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-71a1083630bsm488503a34.34.2024.11.07.14.35.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Nov 2024 14:26:00 -0800 (PST)
-Message-ID: <b0004544-91f7-47b8-a8d6-da7c6e925883@kernel.dk>
-Date: Thu, 7 Nov 2024 15:25:59 -0700
+        Thu, 07 Nov 2024 14:35:15 -0800 (PST)
+Message-ID: <bfc380c1-c198-4a41-97f7-f286e3692879@kernel.dk>
+Date: Thu, 7 Nov 2024 15:35:14 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,46 +61,30 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: (subset) [PATCH V10 0/12] io_uring: support group buffer & ublk
- zc
-From: Jens Axboe <axboe@kernel.dk>
-To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>,
- Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
- Akilesh Kailash <akailash@google.com>
-References: <20241107110149.890530-1-ming.lei@redhat.com>
- <173101830487.993487.13218873496602462534.b4-ty@kernel.dk>
+Subject: Re: max_hw_zone_append_sectos fixes
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20241105154817.459638-1-hch@lst.de>
 Content-Language: en-US
-In-Reply-To: <173101830487.993487.13218873496602462534.b4-ty@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241105154817.459638-1-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/7/24 3:25 PM, Jens Axboe wrote:
+On 11/5/24 8:48 AM, Christoph Hellwig wrote:
+> Hi Jens,
 > 
-> On Thu, 07 Nov 2024 19:01:33 +0800, Ming Lei wrote:
->> Patch 1~3 cleans rsrc code.
->>
->> Patch 4~9 prepares for supporting kernel buffer.
->>
->> The 10th patch supports group buffer, so far only kernel buffer is
->> supported, but it is pretty easy to extend for userspace group buffer.
->>
->> [...]
+> this series has a fix and a cleanup for the max_hw_zone_append_sectors
+> change.
 > 
-> Applied, thanks!
-> 
-> [01/12] io_uring/rsrc: pass 'struct io_ring_ctx' reference to rsrc helpers
->         commit: 0d98c509086837a8cf5a32f82f2a58f39a539192
-> [02/12] io_uring/rsrc: remove '->ctx_ptr' of 'struct io_rsrc_node'
->         commit: 4f219fcce5e4366cc121fc98270beb1fbbb3df2b
-> [03/12] io_uring/rsrc: add & apply io_req_assign_buf_node()
->         commit: 039c878db7add23c1c9ea18424c442cce76670f9
+> Diffstat:
+>  block/blk-settings.c          |    2 +-
+>  drivers/nvme/host/multipath.c |    2 --
+>  2 files changed, 1 insertion(+), 3 deletions(-)
 
-Applied the first three as they stand alone quite nicely. I did ponder
-on patch 1 to skip the make eg io_alloc_file_tables() not take both
-the ctx and &ctx->file_table, but we may as well keep it symmetric.
-
-I'll take a look at the rest of the series tomorrow.
+Given the recent revert, will you respin the parts that makes sense?
 
 -- 
 Jens Axboe
