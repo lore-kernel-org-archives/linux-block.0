@@ -1,133 +1,168 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0FB21501F
-	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 18:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B61B9802;
+	Thu,  7 Nov 2024 19:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731004517; cv=none; b=CkFggr9x1LMMN8cLxidOWdiKQFpgIXXG9rt1A5Jw54HLNXWGekIZFzKZ452vZjdUWfG8udjTW5bmWqN410OCvkHxRyrzbEgpg+vjiGK14tQ1B+2ym6CB2+qP+jviEW17ndi5ZxWGyT/z7vvRZl9NKmmtJmB4+0Psb1BEZGJIHcw=
+	t=1731007896; cv=none; b=h0UvWUyBAiIQxU6yW9vv8eugldI+Hb4jPMq+JsO7wYxNlxpEf6tRYnVILTJf2ePeVTRpbr7bP8a0hUOmlka9nZNOW6StWe1pSjSCVwiliEOFoegGCpZMqOpDouKEnCoCUFZsA4kOzkXPBcRnKKzqzJaEyWBgdsq+DUA5pDPXzvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731004517; c=relaxed/simple;
-	bh=Dr3iBqAxUkSSUIfdL2QO5ZpRjAKqgwn4ITBFIpDTva0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e4xOdaOIAr82VTJnEmgxfdbuM+lNd5SMDMPaP4IZtaMrvTGoHsI4+VQMoaFPFQ7SVHiaOt61BdIwVmZwnys36XfDIgRkD/uyLlFhrRIJ4mCIXjdIrrTDNMg7+ym/Y8+YqOxLd1apked+efmO60RJjl5Ipvw4bKqSxbyPEAEqLIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EDOjt9bn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1731007896; c=relaxed/simple;
+	bh=2NhBq2Rvaw3AwygHdmYrlmMK0IZQwrr0BGDPozBcT8U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IQA9KKLLbZab9qKbfUmryMH5nPu56iG0MEej616FeyKmkYK5vHO0xOMZ/+Htb33C0K1s5dLO/nQOLhILVMi+JLndWXTrWx2d2vKDtfmk+Kw2MLnvO2lVoVLVhP1cU2vnuXSiIhynL+8iAYkPoxz3Co6owPVMHGWEQ7lDhui3ZkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Li9WGaIa; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EDOjt9bn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731004514;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0BV4cQjK6r4k+nnOA3H++TZCIX5jl2A4n+o/usvE3U4=;
-	b=EDOjt9bnoRQr9DH5X9PqRiT/4RwoY08buS96+G5gb/JSPZM2tSQuwzptc6+emIPkl9XEgz
-	YK8SUzMSTW6dlLXJh3v75h28ebFNsi+neS76WG/0iM8FK5Sx/1/7Q4zq0V9uaRrLaH+8NA
-	H/YKkTSHUKpfW3SisgSoDbAR9kt5rd8=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-594-hY2Lgo2jObuaFFDtiQ22ow-1; Thu,
- 07 Nov 2024 13:35:13 -0500
-X-MC-Unique: hY2Lgo2jObuaFFDtiQ22ow-1
-X-Mimecast-MFC-AGG-ID: hY2Lgo2jObuaFFDtiQ22ow
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 505F819792FC;
-	Thu,  7 Nov 2024 18:35:09 +0000 (UTC)
-Received: from [10.22.88.108] (unknown [10.22.88.108])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DC8651956054;
-	Thu,  7 Nov 2024 18:35:05 +0000 (UTC)
-Message-ID: <643e61a8-b0cb-4c9d-831a-879aa86d888e@redhat.com>
-Date: Thu, 7 Nov 2024 13:35:04 -0500
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Li9WGaIa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731007895; x=1762543895;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=2NhBq2Rvaw3AwygHdmYrlmMK0IZQwrr0BGDPozBcT8U=;
+  b=Li9WGaIav3shDzDKNcNWJtyfZDaoNqz9nQgy2YTLzlAGXmE+JfOzWPji
+   DdgbhVuc3gZgty8ZFJlBI1/2cLnFMR2C6Q18Dd+M5G2R1DayzzNbjTsOE
+   7wWz2Tk2CabPRyQGm+eETmS827gbPvGE6K+LsWas68V/uqomR4ygBRxlm
+   LnGTkslkCobHPN8fcOCBw2uNdPyTU0O2Zn4+BK6b86Zg1Ou+06+WCyjH3
+   bSeq5YBhcQfFTtyZlEFXGQAIuQugw4VNIztROeZTZkg4t6Z3J712z1rJA
+   THn8BIfeMu7WEGBpt0x5OtyCfwC9ppDmVwnA43KrrMwRLrWMVI4E2ciIP
+   A==;
+X-CSE-ConnectionGUID: uJLmkPukSW250ApFE9OU+Q==
+X-CSE-MsgGUID: YkTGK/S3Swam68fOGBLFDQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31044369"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="31044369"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 11:31:32 -0800
+X-CSE-ConnectionGUID: FwaUpT0wTmCFsegJmHSnGQ==
+X-CSE-MsgGUID: lONXDlkQRryYdIGHChLV4g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,135,1728975600"; 
+   d="scan'208";a="85205060"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 07 Nov 2024 11:31:30 -0800
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t98E3-000qcF-0i;
+	Thu, 07 Nov 2024 19:31:27 +0000
+Date: Fri, 8 Nov 2024 03:30:32 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Akilesh Kailash <akailash@google.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH V10 11/12] io_uring/uring_cmd: support leasing device
+ kernel buffer to io_uring
+Message-ID: <202411080354.5JXKXPEW-lkp@intel.com>
+References: <20241107110149.890530-12-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: DMMP request-queue vs. BiO
-To: linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-scsi@vger.kernel.org
-Cc: Chris Leech <cleech@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Christoph Hellwig <hch@lst.de>, snitzer@kernel.org,
- Ming Lei <minlei@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>,
- Jonathan Brassow <jbrassow@redhat.com>, Ewan Milne <emilne@redhat.com>,
- Mikulas Patocka <mpatocka@redhat.com>, bmarson@redhat.com,
- Jeff Moyer <jmoyer@redhat.com>, "spetrovi@redhat.com" <spetrovi@redhat.com>,
- Rob Evers <revers@redhat.com>
-References: <2d5fe016-2941-43a4-8b7c-850b8ee1d6ce@redhat.com>
- <20241104073547.GA20614@lst.de>
- <d9733713-eb7b-4efa-ad6b-e6b41d1df93b@suse.de> <20241105103307.GA1385@lst.de>
-Content-Language: en-US
-From: John Meneghini <jmeneghi@redhat.com>
-Organization: RHEL Core Storge Team
-In-Reply-To: <20241105103307.GA1385@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241107110149.890530-12-ming.lei@redhat.com>
 
-I've been asked to move this conversation to a public thread on the upstream email distros.
+Hi Ming,
 
-Background:
+kernel test robot noticed the following build errors:
 
-At ALPSS last month (Sept. 2024) Hannes and Christoph spoke with Chris and I about how they'd like to remove the 
-request-interface from DMMP and asked if Red Hat would be willing to help out by running some DMMP/Bio vs. DMMP/req performance 
-tests and share the results.The idea was: with some of the recent performance improvements in the BIO path upstream we believe 
-there may not be much of a performance difference between these two code paths and would like Red Hat's help in demonstrating that.
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on next-20241107]
+[cannot apply to linus/master v6.12-rc6]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-So Chris and I returned to Red Hat and broached this subject here internally. The Red Hat performance team has agreed to work 
-work with us on an ad hoc basis to do this and we've made some preliminary plans to build a test bed that can used to do some 
-performance tests with DMMP on an upstream kernel using iSCSI and FCP. Then we talked to the DMMP guys about it. They have some 
-questions and asked me discuss this topic in an email thread on linux-scsi, linux-block and dm-devel.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/io_uring-rsrc-pass-struct-io_ring_ctx-reference-to-rsrc-helpers/20241107-190456
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20241107110149.890530-12-ming.lei%40redhat.com
+patch subject: [PATCH V10 11/12] io_uring/uring_cmd: support leasing device kernel buffer to io_uring
+config: arm64-randconfig-001-20241108 (https://download.01.org/0day-ci/archive/20241108/202411080354.5JXKXPEW-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 592c0fe55f6d9a811028b5f3507be91458ab2713)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241108/202411080354.5JXKXPEW-lkp@intel.com/reproduce)
 
-Some questions are:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411080354.5JXKXPEW-lkp@intel.com/
 
-What are the exact patches which make us think the BIO path is now performant?
+All errors (new ones prefixed by >>):
 
-Is it Ming's immutable bvecs and moving the splitting down to the driver?
+   In file included from block/ioctl.c:4:
+   In file included from include/linux/blkdev.h:9:
+   In file included from include/linux/blk_types.h:10:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:8:
+   In file included from include/linux/cacheflush.h:5:
+   In file included from arch/arm64/include/asm/cacheflush.h:11:
+   In file included from include/linux/kgdb.h:19:
+   In file included from include/linux/kprobes.h:28:
+   In file included from include/linux/ftrace.h:13:
+   In file included from include/linux/kallsyms.h:13:
+   In file included from include/linux/mm.h:2213:
+   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     505 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     512 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   In file included from block/ioctl.c:15:
+>> include/linux/io_uring/cmd.h:89:1: error: expected identifier or '('
+      89 | {
+         | ^
+   3 warnings and 1 error generated.
 
-I've been told these changes are only applicable if a filesystem is involved. Databases can make direct use of the dmmp device, 
-so late bio splitting not applicable for them. It is filesystems that are building larger bios. See the comments from Hannes and 
-Christoph below.
 
-I think Red Hat can help out with the performance testing but we will need to answer some of these questions. It will also be 
-important to determine exactly what kind of workload we should use with any DMMP performance tests. Will a simple workload 
-generated with fio work, or do we need to test some actual data base work loads as well?
+vim +89 include/linux/io_uring/cmd.h
 
-Please reply to this public thread with your thoughts and ideas.
+    62	
+    63	int io_uring_cmd_lease_kbuf(struct io_uring_cmd *ioucmd,
+    64				    struct io_rsrc_node *node);
+    65	#else
+    66	static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+    67				      struct iov_iter *iter, void *ioucmd)
+    68	{
+    69		return -EOPNOTSUPP;
+    70	}
+    71	static inline void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret,
+    72			ssize_t ret2, unsigned issue_flags)
+    73	{
+    74	}
+    75	static inline void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+    76				    void (*task_work_cb)(struct io_uring_cmd *, unsigned),
+    77				    unsigned flags)
+    78	{
+    79	}
+    80	static inline void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+    81			unsigned int issue_flags)
+    82	{
+    83	}
+    84	static inline void io_uring_cmd_issue_blocking(struct io_uring_cmd *ioucmd)
+    85	{
+    86	}
+    87	static inline int io_uring_cmd_lease_kbuf(struct io_uring_cmd *ioucmd,
+    88						  struct io_rsrc_node *node);
+  > 89	{
+    90		return -EOPNOTSUPP;
+    91	}
+    92	#endif
+    93	
 
-Thanks,
-
-John A. Meneghini
-Senior Principal Platform Storage Engineer
-RHEL SST - Platform Storage Group
-jmeneghi@redhat.com
-
-On 11/5/24 05:33, Christoph Hellwig wrote:
-> On Tue, Nov 05, 2024 at 08:44:45AM +0100, Hannes Reinecke wrote:
->>> I think the big change is really Ming's immutable bvecs and moving the
->>> splitting down to the driver.  This means bios are much bigger (and
->>> even bigger now with large folios for file systems supporting it).
->>>
->> Exactly. With the current code we should never merge requests; all
->> data should be assembled in the bio already.
->> (I wonder if we could trigger a WARN_ON if request merging is
->> attempted ...)
-> 
-> Request merging is obviosuly still pretty common.  For one because
-> a lot of crappy file systems submit a buffer_head per block (none of
-> the should be relevant for multipathing), but also because we reach
-> the bio size at some point and just need to split.  While large folios
-> reduce that a lot, not all file systems that matter support that.
-> (that what the plug callback would fix IFF it turns out to be an
-> issue) and last but not least I/O schedulers delay I/O to be able to
-> do better merging.  My theory is that this not important for the kind
-> of storage we use multipathing for, or rather not for the pathing
-> decisions.
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
