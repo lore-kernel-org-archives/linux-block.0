@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABF51EE024
-	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 11:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653231F4286
+	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 11:02:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730977352; cv=none; b=BXu7EeGeLkg3yJK5Ie4Pdux74EJOow6Jh/A5clkbAiMHEPnq1AHqYLNrfhxpJlClYi+8rugWR1/AzhJUpHgbYEbJGccUOqbafnPJSLw4I8qkwueh6PKpY19CDDzGApnl00dNflbO4oaRbZsoqXftq4Ipe2z+R4H/u5FbVbV6+vY=
+	t=1730977359; cv=none; b=M0AsHdXiWPFeP3tFGXe/9VQHMn/7eB9H6VCKoZgl/Rt8gq+i5AOyr8CR+pjltOG6If3Djgo/kdGut1P11r3g87OwqCL89jGXDL3W96fJMyy0SrcSUOYO8W29fIs38RCCEIOabzZwGRkf1kquf0QoRkQji+rLHwd8GVF0g8q6jjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730977352; c=relaxed/simple;
-	bh=4F/eQLyt7fZU/1nE3xYwdURyTRkBywW2ceBXmGIM698=;
+	s=arc-20240116; t=1730977359; c=relaxed/simple;
+	bh=NQ+bwr1JB4p3kwCzYVnZV2mYuii1jbMOo79wlSQxK5g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZbpMdJOu9K3J0g584JgtcGAgVE0qthBYMYb8gvY6pbB9v9LZTSVNR14yYl7UNRb44iQb9NTjR+ypYi8sBNjKLXi90vqPSevk+wjNTPR2C8kbNIglGy6Jdeu6Vk7kDEIhKgd7z3/d4vlZRVOZ2b3/aUTTtE+oGLF1zp1zcFIXBSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jcb1uQpD; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=t+Itvkz7mIqMegkpmp5tseYpnP4NIOmT23/UiYolJ5UPKfGlk8vKHI9JMJAtgooH6FCSoSCm14aL8Z6RfgBgIN3t08veBPi5rqAOpAXE1aLC6t2yHJAOfI/bhKxCKYvCtoNP0Q9uyaEMmwXPRz0H/Q/yHh1g8h1ZxFHHi572Jwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PsICLdFQ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jcb1uQpD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PsICLdFQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730977349;
+	s=mimecast20190719; t=1730977356;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=i0iUgUH84D+XrrmkG/wx4I+A+vYyGBAwJCNYHpW9PhY=;
-	b=Jcb1uQpDtKiezbbileb+HGsBl/wSVcKvwlnM/TlNEsl+OT94tx6khFhvB93FKAv58xwaSm
-	LnPtBomRrJtlMFKDUG+TgZjVvpAuljb8Re5wUcIrgoXpuykPvPEOKhBAexBz1ylvfRxPxi
-	VQsNRX4ZwLkSjM/CvbTOda5JIRui6dg=
+	bh=V0VSqFzf1J9PU1pJLz6JPLAs1jAHK7dRkghElujlsZ8=;
+	b=PsICLdFQR/eDMpvufmhBDBGCj/NTz6gMoCdJEuMuULtRAtuirMZC5dadzDyEuvdOpmSToo
+	MTy4UoFZQX/pWlcpAynkwasXUEmc7rwuwuS9LFTo7Ygcjrqpl4sDO6mL6e1kDr6Gd5Xpie
+	sI/Ll9sD0VjU59Ah7mZIuEut8VGV4tM=
 Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-347-dqsWXi6DNDyuaoYjwVOwGA-1; Thu,
- 07 Nov 2024 06:02:26 -0500
-X-MC-Unique: dqsWXi6DNDyuaoYjwVOwGA-1
-X-Mimecast-MFC-AGG-ID: dqsWXi6DNDyuaoYjwVOwGA
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-624-3mZzLQx5Op2Hni-UDMWQGQ-1; Thu,
+ 07 Nov 2024 06:02:31 -0500
+X-MC-Unique: 3mZzLQx5Op2Hni-UDMWQGQ-1
+X-Mimecast-MFC-AGG-ID: 3mZzLQx5Op2Hni-UDMWQGQ
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4839B195608B;
-	Thu,  7 Nov 2024 11:02:25 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D4F3D1956095;
+	Thu,  7 Nov 2024 11:02:29 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.54])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E50EB195E480;
-	Thu,  7 Nov 2024 11:02:23 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5D0AE196BC05;
+	Thu,  7 Nov 2024 11:02:27 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	io-uring@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: linux-block@vger.kernel.org,
 	Uday Shankar <ushankar@purestorage.com>,
 	Akilesh Kailash <akailash@google.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V10 06/12] io_uring: rename io_mapped_buf->ubuf as io_mapped_buf->addr
-Date: Thu,  7 Nov 2024 19:01:39 +0800
-Message-ID: <20241107110149.890530-7-ming.lei@redhat.com>
+Subject: [PATCH V10 07/12] io_uring: shrink io_mapped_buf
+Date: Thu,  7 Nov 2024 19:01:40 +0800
+Message-ID: <20241107110149.890530-8-ming.lei@redhat.com>
 In-Reply-To: <20241107110149.890530-1-ming.lei@redhat.com>
 References: <20241107110149.890530-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -62,75 +62,63 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-->addr of `io_mapped_buf` stores the start address of userspace fixed
-buffer. `io_mapped_buf` will be extended for covering kernel buffer,
-so rename ->ubuf as ->addr.
+`struct io_mapped_buf` will be extended to cover kernel buffer which
+may be in fast IO path, and `struct io_mapped_buf` needs to be per-IO.
+
+So shrink sizeof(struct io_mapped_buf) by the following ways:
+
+- folio_shift is < 64, so 6bits are enough to hold it, the remained bits
+  can be used for the coming kernel buffer
+
+- define `acct_pages` as 'unsigned int', which is big enough for
+  accounting pages in the buffer
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- io_uring/fdinfo.c | 2 +-
- io_uring/rsrc.c   | 6 +++---
- io_uring/rsrc.h   | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ io_uring/rsrc.c | 2 ++
+ io_uring/rsrc.h | 6 +++---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/io_uring/fdinfo.c b/io_uring/fdinfo.c
-index 9ca95f877312..1fd05e78ce15 100644
---- a/io_uring/fdinfo.c
-+++ b/io_uring/fdinfo.c
-@@ -223,7 +223,7 @@ __cold void io_uring_show_fdinfo(struct seq_file *m, struct file *file)
- 		if (ctx->buf_table.nodes[i])
- 			buf = ctx->buf_table.nodes[i]->buf;
- 		if (buf)
--			seq_printf(m, "%5u: 0x%llx/%u\n", i, buf->ubuf, buf->len);
-+			seq_printf(m, "%5u: 0x%llx/%u\n", i, buf->addr, buf->len);
- 		else
- 			seq_printf(m, "%5u: <none>\n", i);
- 	}
 diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-index a4a553bbbbfa..f57c4d295f09 100644
+index f57c4d295f09..99ff2797e6ec 100644
 --- a/io_uring/rsrc.c
 +++ b/io_uring/rsrc.c
-@@ -765,7 +765,7 @@ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
+@@ -685,6 +685,8 @@ static bool io_try_coalesce_buffer(struct page ***pages, int *nr_pages,
+ 		return false;
  
- 	size = iov->iov_len;
- 	/* store original address for later verification */
--	imu->ubuf = (unsigned long) iov->iov_base;
-+	imu->addr = (unsigned long) iov->iov_base;
- 	imu->len = iov->iov_len;
- 	imu->nr_bvecs = nr_pages;
- 	imu->folio_shift = PAGE_SHIFT;
-@@ -877,14 +877,14 @@ int io_import_fixed(int ddir, struct iov_iter *iter,
- 	if (unlikely(check_add_overflow(buf_addr, (u64)len, &buf_end)))
- 		return -EFAULT;
- 	/* not inside the mapped region */
--	if (unlikely(buf_addr < imu->ubuf || buf_end > (imu->ubuf + imu->len)))
-+	if (unlikely(buf_addr < imu->addr || buf_end > (imu->addr + imu->len)))
- 		return -EFAULT;
- 
+ 	data->folio_shift = folio_shift(folio);
++	WARN_ON_ONCE(data->folio_shift >= 64);
++
  	/*
- 	 * Might not be a start of buffer, set size appropriately
- 	 * and advance us to the beginning.
- 	 */
--	offset = buf_addr - imu->ubuf;
-+	offset = buf_addr - imu->addr;
- 	iov_iter_bvec(iter, ddir, imu->bvec, imu->nr_bvecs, offset + len);
- 
- 	if (offset) {
+ 	 * Check if pages are contiguous inside a folio, and all folios have
+ 	 * the same page count except for the head and tail.
 diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
-index 0867dc304f4f..c8a4db4721ca 100644
+index c8a4db4721ca..bf0824b4beb6 100644
 --- a/io_uring/rsrc.h
 +++ b/io_uring/rsrc.h
-@@ -29,7 +29,7 @@ struct io_rsrc_node {
- };
- 
- struct io_mapped_buf {
--	u64		ubuf;
-+	u64		addr;
+@@ -32,9 +32,9 @@ struct io_mapped_buf {
+ 	u64		addr;
  	unsigned int	len;
  	unsigned int	nr_bvecs;
- 	unsigned int    folio_shift;
+-	unsigned int    folio_shift;
+ 	refcount_t	refs;
+-	unsigned long	acct_pages;
++	unsigned int	acct_pages;
++	unsigned int	folio_shift:6;
+ 	struct bio_vec	bvec[] __counted_by(nr_bvecs);
+ };
+ 
+@@ -43,7 +43,7 @@ struct io_imu_folio_data {
+ 	unsigned int	nr_pages_head;
+ 	/* For non-head/tail folios, has to be fully included */
+ 	unsigned int	nr_pages_mid;
+-	unsigned int	folio_shift;
++	unsigned char	folio_shift;
+ };
+ 
+ struct io_rsrc_node *io_rsrc_node_alloc(struct io_ring_ctx *ctx, int type);
 -- 
 2.47.0
 
