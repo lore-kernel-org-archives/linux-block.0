@@ -1,224 +1,164 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2050.outbound.protection.outlook.com [40.107.236.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6075A212D0A;
-	Thu,  7 Nov 2024 14:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730991041; cv=none; b=KF1Pi/XPDLudh8YngSWkiZQfPfA67vcde1o+dVB+msGB+TC37M7B+cQcpsCi76LIWCTnP+2MThiJtBS2OtFzEQrbtQgQ/22JT7mxsvCvyF+GDNWJ4Qna7UZbVZY3sNkS09h1k6wrpVeM9OzLonE7Zn9dIQT+6XIdUY0eU16SK94=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730991041; c=relaxed/simple;
-	bh=jRpyuqPS/RfPxFE82RRibgYz8lq1+WOk8OnAFcqr9HY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TseYEo9Sc1rogDpsbz6SqeZrzllntPZvdl3T5EDO0NCyrZvyJvbm/SuKHvd6oTBQEsPO6BCgeafQXB2hZhBcAIPEHYI6S+e2uh8JcWkoZvKypBSbbXu819N199ik9jwWJFqJxUcovGwklrpp5+8ociNIZWuWem51q4EcIayKLCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HrTTNVLG; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA677DA9C;
+	Thu,  7 Nov 2024 15:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730992652; cv=fail; b=IbSfEfq2ePPsGCzp8wWM64izKPwFNhsjbakMLTSdgelxdGV51I+yXC5Mw2lmA1eHxNAz8/UpNiwT9BaTqWRHIOt/3kj+Au62PJTCqa7Z0d/gvcBL0uqx+6w5m6dgkbb6bF5YtUppE07kafAmH3inNYf1ui2CF+CMG5V/jcm39TA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730992652; c=relaxed/simple;
+	bh=MM8cVFU2EqXLPXWY8HotRO+3m2j8QJWlNZWGUZc1uLU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Hi9DxT8xNkWd4kOCnxUoWrlyZV7ytjYyNtDj7oI2stwfUNrZhuS7nWgdk/VK0R0xXLfP5qgz7ia9DlQl/UKzBd6TFFOmrblogYw5uAp0AyrpijKKSYyDQF+m4mD2r5yUtBTowNVHcuYfo/z5vypsG4KObPp4R8WFYCqC6dLRBYg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=leFFkb5B; arc=fail smtp.client-ip=40.107.236.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HrTTNVLG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3FA6C4CECC;
-	Thu,  7 Nov 2024 14:50:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730991041;
-	bh=jRpyuqPS/RfPxFE82RRibgYz8lq1+WOk8OnAFcqr9HY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HrTTNVLGr0k6BbKW0dEb6ZIQo/RQQdIVrWJQhWAQa6JALjw5Uelh67HLaTrZXT/Je
-	 mIj8OIN2KIw7OAdV8IRlUiwd1QctmZrFFKGXfzc0aWRWBVRkbHZd3v4Ma0JjAH5r4o
-	 RllAPWRCzhb8AxRbCdK9JWFR5uvuvXaq57Bcp6JVx0/+/n0Vcd0FTwQpD0C13UseaK
-	 zsbYe92XLKd6seRM8ug+RJKv9lk+J/tjBGwOyqeU8B+pQc9OZ32dNHSW1nTVwFmSDB
-	 FF5TUjLYtNLjZJdK1mLn10lmaVO1g0mDZm3TMUsuhwXHoQmZjhgnckwVIp3naxiGmO
-	 N7zfMcFtrOHMw==
-Date: Thu, 7 Nov 2024 16:50:34 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 07/17] dma-mapping: Implement link/unlink ranges API
-Message-ID: <20241107145034.GO5006@unreal>
-References: <cover.1730298502.git.leon@kernel.org>
- <f8c7f160c9ae97fef4ccd355f9979727552c7374.1730298502.git.leon@kernel.org>
- <51c5a5d5-6f90-4c42-b0ef-b87791e00f20@arm.com>
- <20241104091048.GA25041@lst.de>
- <20241104121924.GC35848@ziepe.ca>
- <20241104125302.GA11168@lst.de>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="leFFkb5B"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yzQG7GuhrbTguKrc+c+zZWHU4dWBUHH6/xdBFCwmyk9rgr7SUWHkR9DIa0ApqLS9VW+4eA2f3E3L2yVqpLzJBz/5o/jumjUjkuSQDM5KLp5ImeDOcNT9l7BbHNnS7tevfPAKeFWvYusJDm1b3j75Q2cdIz6TqP5pPHmEdP5t+I5i8yaYT7ZwnakIanmBPkxZ2ZhYLKZm18kdiELroWAzczU+pGYoruRFzDmcvmszE7R62Cwv8/AwlHCQpwIUXr+u90AxpGhCTyhH+Plec4Rq3JXOeLEr1ByR4iT3XaS/oPlkXZZxBdkXf7PEWHUp44GmEIOgEJMFiX30yGGMsFpsmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0IhWdHmKZZLlhmEt6tpEZkcL9qZ2evldY3i/eGi/GGI=;
+ b=bHW1k5feLBgpjkh+LO+hLZMATvB1dIXkmBumJMcrA9rWiGZEwEkm+fOykd6nyYGgoaVKT3zp3ydAPS3B+crVa4TqfyIh7vo7BXVkGZzr8MF9Z1RLaMrG4PYwvYrIGT9bW5Ot3p2m6KoSBJ/fBbRKNtFAPYEiyGNk7l5c3U6xKqphz2szTYvNXI4WNCzDmYOkAL1bUkG4246SP+308+Wct6L6u+J+OS9sBqv8uV4VZ+xXPvvrfn9dzm0d7YN8opIPBsZhMKvT6JZpRZAEXUl7xd3uawAzvs9UeHEXmyeOmFwe+QjrhLVoh9oD04jFrA2IbZeE+ZnGuX1Vaa5zeSuUxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0IhWdHmKZZLlhmEt6tpEZkcL9qZ2evldY3i/eGi/GGI=;
+ b=leFFkb5BsaVn6Y1EI89Y7uGCWJvyVEXHSPAjXK6+KThWsZ54WLy1ktXwObOrUqtTG7w9FeWkIjC3VpX/7FC5MrsHEF6mhPXFIwpceayidv2n0roSsu9GSU1LoASIDsUQgGRkwcp4k5tCkq4iwIR+yTbRwCGV/ADlqD7Ib/2uiG0xlwoW2AKcagrT4Tn0yhhZsnX4MLN/DKAP1zC53l4dZNWU1NRd1LOKijJcRSV9sGl7k2CNnSMSM6ZIZlgDigQBFdHAzcMVVK2jeGb1stz38ebeGZA7sCrJo5k52yGyaid90Xn/LCqkLCfnMGzdKY6tSUp1pF/tFGI4Rfx0jl6xcg==
+Received: from DM6PR02CA0115.namprd02.prod.outlook.com (2603:10b6:5:1b4::17)
+ by DM4PR12MB6038.namprd12.prod.outlook.com (2603:10b6:8:ab::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.19; Thu, 7 Nov
+ 2024 15:17:24 +0000
+Received: from DS1PEPF00017090.namprd03.prod.outlook.com
+ (2603:10b6:5:1b4:cafe::bb) by DM6PR02CA0115.outlook.office365.com
+ (2603:10b6:5:1b4::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.19 via Frontend
+ Transport; Thu, 7 Nov 2024 15:17:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS1PEPF00017090.mail.protection.outlook.com (10.167.17.132) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8137.17 via Frontend Transport; Thu, 7 Nov 2024 15:17:24 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 7 Nov 2024
+ 07:17:11 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 7 Nov 2024
+ 07:17:11 -0800
+Received: from rsws30.mtr.labs.mlnx (10.127.8.12) by mail.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 7 Nov 2024 07:17:08 -0800
+From: Israel Rukshin <israelr@nvidia.com>
+To: Max Gurtovoy <mgurtovoy@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
+	Parav Pandit <parav@nvidia.com>, <stefanha@redhat.com>,
+	<virtualization@lists.linux.dev>, <mst@redhat.com>, Linux-block
+	<linux-block@vger.kernel.org>
+CC: Nitzan Carmi <nitzanc@nvidia.com>, <kvm@vger.kernel.org>, Israel Rukshin
+	<israelr@nvidia.com>
+Subject: [PATCH 0/2] Add Error Recovery support for Virtio PCI devices
+Date: Thu, 7 Nov 2024 17:16:58 +0200
+Message-ID: <1730992620-201192-1-git-send-email-israelr@nvidia.com>
+X-Mailer: git-send-email 1.8.4.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241104125302.GA11168@lst.de>
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017090:EE_|DM4PR12MB6038:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2f2372d5-e695-4de2-6e42-08dcff3f4886
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Z0IvmLO/0Fym11v40JVvTfwjXg22Ti7Cao3i329MvjmW1OLjdsTe+ORqxe25?=
+ =?us-ascii?Q?rRSBDTDKoBUa8qXPc8lw7jDytt+nEwy7qccDl3ZTxC5HCkjf7H5BRgxoG1HR?=
+ =?us-ascii?Q?H6JeCynS3DeZwxqA6NQoTceBqj3wnrw2j7OVj67UepXY7Lr5R4zOf9pVpEB9?=
+ =?us-ascii?Q?skGfr5cvmoqSmS76JkOv/F0ySSFbyYJTGu+N8NWQNgWnKbdrHQkmulVQNuwF?=
+ =?us-ascii?Q?u8lFt5OCnKhuask3HwjNKioCoti1zQGZG9PkC4IEDGvsClq/TAz8tEOkci6L?=
+ =?us-ascii?Q?Ie4bfkBkcjEdip6pjJgYZsQGptvJMx8TwlQK5gtmElvLURzoqeDVTNqDYzeT?=
+ =?us-ascii?Q?abQxAouLPWvfLDzNOL3h52rT6D7PhUfWkaXKewVIVgOAKAbSpxqGsHIxhnaL?=
+ =?us-ascii?Q?Yg4L4u80KKWgOt0+xwz4iOVmQVfujR/lCEmNePMtoGjEqZaOQMjzoONKwdCq?=
+ =?us-ascii?Q?u6mnRTelUeYjppdgSvh/Vmu0++N5UMHU7GK3///H+9Zjj1GYh7uvqrEJ+Vwn?=
+ =?us-ascii?Q?jUlFgQesX2ZsGo8TS+JNzRLVr1svQxYOnEV/xEM2afVVvumUlTq5Nmxcodov?=
+ =?us-ascii?Q?l0FPx/Fi9KNv1qCYVSITkbJCCbh6G2ODpGDPssWWMcMplxLTmAmfZfX1Ww3Z?=
+ =?us-ascii?Q?Nfp49K3j35bcko5+5pSESWZGisDYRLMaGFJUV8lI/s1wNIqpXc9il+cFne4m?=
+ =?us-ascii?Q?9V2mtd2rKFVY5CHprEGaUtEsAfwtCs/OeuCe1R3J5zbueCYh1drs5mhthpAI?=
+ =?us-ascii?Q?vQDxx1wi1boGFUNO/vGw0DrN/cmZ82xsXxnC7KMAGhVRQNUanVkNYsggW0H+?=
+ =?us-ascii?Q?HmyDq7C/Kfqwi+vpXdvTUe4O/FIFXe/N3kDdifTqQ6HNwHXYgKMXA9WB2FCp?=
+ =?us-ascii?Q?SWbtQsheoa5bw4Oq585AH8/mG9aLdcuNiWT8ShSxezV398TJiCI9sp2CtaJ6?=
+ =?us-ascii?Q?92My4Ov5HTslozzuBg6gubOUJlgR+j8wOD2kR4Y+mwgOOzrNeoyeevxeI6Ao?=
+ =?us-ascii?Q?cqazyXGz28tY8nrNJk7qCS6Z4mSLQVsNVleSc8O9IWpykHQPgCNO0GN2YI39?=
+ =?us-ascii?Q?NMoIQao8FfG4FLeLgdueLfpvsXBJbZxWH4eGkqO+i6le2jd9mSB8IATWSdUf?=
+ =?us-ascii?Q?Ml6Ko33RqvkyDzIKxv1q2vQbq36w2Tk3ZimfJkhu0iKnAkhu6RBQsPkY4fuK?=
+ =?us-ascii?Q?O9alacZ3NJ6EYBv44zCU8AWJZPiGOBfCo2J9dSq3ZscDKHTbvk8jITUHUZLg?=
+ =?us-ascii?Q?cmmIXMbVq17MqG2Jh8ftG/aSri+4XrqPR0hFoeDnmIvfiRR6G8OZs1Iz4Mjk?=
+ =?us-ascii?Q?QRT3ctEjYludUdP3nNtG3SHD6tAIc+FmTE94WZtsN/ETwBg8dhF/8Jlpv4eV?=
+ =?us-ascii?Q?acuocrhwwpIK33+aBCp78p99kC85hd2/PtMruyWMlKMAMTIIoA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2024 15:17:24.3153
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f2372d5-e695-4de2-6e42-08dcff3f4886
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS1PEPF00017090.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6038
 
-On Mon, Nov 04, 2024 at 01:53:02PM +0100, Christoph Hellwig wrote:
-> On Mon, Nov 04, 2024 at 08:19:24AM -0400, Jason Gunthorpe wrote:
-> > > That's a good point.  Only mapped through host bridge P2P can even
-> > > end up here, so the address is a perfectly valid physical address
-> > > in the host.  But I'm not sure if all arch_sync_dma_for_device
-> > > implementations handle IOMMU memory fine.
-> > 
-> > I was told on x86 if you do a cache flush operation on MMIO there is a
-> > chance it will MCE. Recently had some similar discussions about ARM
-> > where it was asserted some platforms may have similar.
-> 
-> On x86 we never flush caches for DMA operations anyway, so x86 isn't
-> really the concern here, but architectures that do cache incoherent DMA
-> to PCIe devices.  Which isn't a whole lot as most SOCs try to avoid that
-> for PCIe even if they lack DMA coherent for lesser peripherals, but I bet
-> there are some on arm/arm64 and maybe riscv or mips.
-> 
-> > It would be safest to only call arch flushing calls on memory that is
-> > mapped cachable. We can assume that a P2P target is never CPU
-> > mapped cachable, regardless of how the DMA is routed.
-> 
-> Yes.  I.e. force DMA_ATTR_SKIP_CPU_SYNC for P2P.
+This patch series introduces an initial PCI Error Recovery support for
+Virtio PCI devices, focusing on Function Level Reset (FLR) recovery.
+The implementation aligns with the existing PCI error recovery
+framework,
+which provides a mechanism for coordinating between affected device
+drivers and PCI controllers during reset and recovery phases.
 
-What do you think?
+By integrating Virtio PCI devices into this framework, we enhance the
+system's ability to handle and recover from PCI errors, particularly
+those requiring FLR (this patch set). This capability was previously
+unavailable for Virtio PCI devices post-probe, and its addition
+significantly improves system reliability and resiliency.
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 38bcb3ecceeb..065bdace3344 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -559,14 +559,19 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
- {
- 	enum dma_data_direction dir = rq_dma_dir(req);
- 	unsigned int mapped = 0;
-+	unsigned long attrs = 0;
- 	int error = 0;
- 
- 	iter->addr = state->addr;
- 	iter->len = dma_iova_size(state);
-+	if (req->cmd_flags & REQ_P2PDMA) {
-+		attrs |= DMA_ATTR_SKIP_CPU_SYNC;
-+		req->cmd_flags &= ~REQ_P2PDMA;
-+	}
- 
- 	do {
- 		error = dma_iova_link(dma_dev, state, vec->paddr, mapped,
--				vec->len, dir, 0);
-+				vec->len, dir, attrs);
- 		if (error)
- 			goto error_unmap;
- 		mapped += vec->len;
-@@ -578,7 +583,7 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
- 
- 	return true;
- error_unmap:
--	dma_iova_destroy(dma_dev, state, mapped, rq_dma_dir(req), 0);
-+	dma_iova_destroy(dma_dev, state, mapped, rq_dma_dir(req), attrs);
- 	iter->status = errno_to_blk_status(error);
- 	return false;
- }
-@@ -633,7 +638,6 @@ bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
- 			 * P2P transfers through the host bridge are treated the
- 			 * same as non-P2P transfers below and during unmap.
- 			 */
--			req->cmd_flags &= ~REQ_P2PDMA;
- 			break;
- 		default:
- 			iter->status = BLK_STS_INVAL;
-@@ -644,6 +648,8 @@ bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
- 	if (blk_can_dma_map_iova(req, dma_dev) &&
- 	    dma_iova_try_alloc(dma_dev, state, vec.paddr, total_len))
- 		return blk_rq_dma_map_iova(req, dma_dev, state, iter, &vec);
-+
-+	req->cmd_flags &= ~REQ_P2PDMA;
- 	return blk_dma_map_direct(req, dma_dev, iter, &vec);
- }
- EXPORT_SYMBOL_GPL(blk_rq_dma_map_iter_start);
-diff --git a/include/linux/hmm.h b/include/linux/hmm.h
-index 62980ca8f3c5..5fe30fbc42b0 100644
---- a/include/linux/hmm.h
-+++ b/include/linux/hmm.h
-@@ -23,6 +23,7 @@ struct mmu_interval_notifier;
-  * HMM_PFN_WRITE - if the page memory can be written to (requires HMM_PFN_VALID)
-  * HMM_PFN_ERROR - accessing the pfn is impossible and the device should
-  *                 fail. ie poisoned memory, special pages, no vma, etc
-+ * HMM_PFN_P2PDMA - P@P page, not bus mapped
-  * HMM_PFN_P2PDMA_BUS - Bus mapped P2P transfer
-  * HMM_PFN_DMA_MAPPED - Flag preserved on input-to-output transformation
-  *                      to mark that page is already DMA mapped
-@@ -41,6 +42,7 @@ enum hmm_pfn_flags {
- 	HMM_PFN_ERROR = 1UL << (BITS_PER_LONG - 3),
- 
- 	/* Sticky flag, carried from Input to Output */
-+	HMM_PFN_P2PDMA     = 1UL << (BITS_PER_LONG - 5),
- 	HMM_PFN_P2PDMA_BUS = 1UL << (BITS_PER_LONG - 6),
- 	HMM_PFN_DMA_MAPPED = 1UL << (BITS_PER_LONG - 7),
- 
-diff --git a/mm/hmm.c b/mm/hmm.c
-index 4ef2b3815212..b2ec199c2ea8 100644
---- a/mm/hmm.c
-+++ b/mm/hmm.c
-@@ -710,6 +710,7 @@ dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
- 	struct page *page = hmm_pfn_to_page(pfns[idx]);
- 	phys_addr_t paddr = hmm_pfn_to_phys(pfns[idx]);
- 	size_t offset = idx * map->dma_entry_size;
-+	unsigned long attrs = 0;
- 	dma_addr_t dma_addr;
- 	int ret;
- 
-@@ -740,6 +741,9 @@ dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
- 
- 	switch (pci_p2pdma_state(p2pdma_state, dev, page)) {
- 	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-+		attrs |= DMA_ATTR_SKIP_CPU_SYNC;
-+		pfns[idx] |= HMM_PFN_P2PDMA;
-+		fallthrough;
- 	case PCI_P2PDMA_MAP_NONE:
- 		break;
- 	case PCI_P2PDMA_MAP_BUS_ADDR:
-@@ -752,7 +756,8 @@ dma_addr_t hmm_dma_map_pfn(struct device *dev, struct hmm_dma_map *map,
- 
- 	if (dma_use_iova(state)) {
- 		ret = dma_iova_link(dev, state, paddr, offset,
--				    map->dma_entry_size, DMA_BIDIRECTIONAL, 0);
-+				    map->dma_entry_size, DMA_BIDIRECTIONAL,
-+				    attrs);
- 		if (ret)
- 			return DMA_MAPPING_ERROR;
- 
-@@ -793,6 +798,7 @@ bool hmm_dma_unmap_pfn(struct device *dev, struct hmm_dma_map *map, size_t idx)
- 	struct dma_iova_state *state = &map->state;
- 	dma_addr_t *dma_addrs = map->dma_list;
- 	unsigned long *pfns = map->pfn_list;
-+	unsigned long attrs = 0;
- 
- #define HMM_PFN_VALID_DMA (HMM_PFN_VALID | HMM_PFN_DMA_MAPPED)
- 	if ((pfns[idx] & HMM_PFN_VALID_DMA) != HMM_PFN_VALID_DMA)
-@@ -801,14 +807,16 @@ bool hmm_dma_unmap_pfn(struct device *dev, struct hmm_dma_map *map, size_t idx)
- 
- 	if (pfns[idx] & HMM_PFN_P2PDMA_BUS)
- 		; /* no need to unmap bus address P2P mappings */
--	else if (dma_use_iova(state))
-+	else if (dma_use_iova(state)) {
-+		if (pfns[idx] & HMM_PFN_P2PDMA)
-+			attrs |= DMA_ATTR_SKIP_CPU_SYNC;
- 		dma_iova_unlink(dev, state, idx * map->dma_entry_size,
--				map->dma_entry_size, DMA_BIDIRECTIONAL, 0);
--	else if (dma_need_unmap(dev))
-+				map->dma_entry_size, DMA_BIDIRECTIONAL, attrs);
-+	} else if (dma_need_unmap(dev))
- 		dma_unmap_page(dev, dma_addrs[idx], map->dma_entry_size,
- 			       DMA_BIDIRECTIONAL);
- 
--	pfns[idx] &= ~(HMM_PFN_DMA_MAPPED | HMM_PFN_P2PDMA_BUS);
-+	pfns[idx] &= ~(HMM_PFN_DMA_MAPPED | HMM_PFN_P2PDMA | HMM_PFN_P2PDMA_BUS);
- 	return true;
- }
- EXPORT_SYMBOL_GPL(hmm_dma_unmap_pfn);
+The series consists of two main patches:
+
+1. Virtio PCI: implement the necessary infrastructure and callbacks
+   in the virtio_pci driver to handle FLR events properly.
+
+2. Virtio Block: Implement proper cleanup and recovery procedures upon
+   FLR events.
+
+Israel Rukshin (2):
+  virtio_pci: Add support for PCIe Function Level Reset
+  virtio_blk: Add support for transport error recovery
+
+ drivers/block/virtio_blk.c         | 28 ++++++++-
+ drivers/virtio/virtio.c            | 94 ++++++++++++++++++++++--------
+ drivers/virtio/virtio_pci_common.c | 39 +++++++++++++
+ include/linux/virtio.h             |  8 +++
+ 4 files changed, 141 insertions(+), 28 deletions(-)
+
+-- 
+2.34.1
+
