@@ -1,57 +1,57 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B8B1E8856
-	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 10:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441491D7E42
+	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 10:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730974239; cv=none; b=JQMDg/Vx8EGL8rD0ohJ4SSj7uDVocNA1vb0tk7/zEi73NdqnFA8wRyI2Gu+WIPwViuxg9ZosctkxT9i6j/CTx7jOEp5jnqeo9OnTzgEzh3Z2uU6njFlsEDdswzjK+pecB47tcaL1Rwh8fujBc61VhfLBGimzUbuVWbgpNUOlPNk=
+	t=1730974255; cv=none; b=ZOW5ynXto737TR236pGTYgUdH2+fp69v2zgd2w5besuJfcXTbhlbfNSS+485le85Q+DEmmhBheOsruK1DPRakpNJ3YoqFarv8TRO1+BWGsNDS2/N89qEyvUuK78nEXD5Fe2Zdb7WMFZhZSTaiSDsZKCCM6zR3ANWHk//XmdtkRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730974239; c=relaxed/simple;
-	bh=Hf4u1UYtJknU/bcSNYfKZHRSGZc7GJpBXMSlAjcp0f4=;
+	s=arc-20240116; t=1730974255; c=relaxed/simple;
+	bh=7LY4n2/vacqV/ijjFDTJKicoBZSUkwr9gv3fUKCRNs4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bEV1RhDlWkS48SDAdfKY8HmWqv5zNtMCqJbdx4jT4CONND+PuexTDk9sg9Y4cl0dBeRJM1OPTLTg95K3eTiceGGTDoH93YCxn0+vqW49eM7xSmHuorcpggq6hO57kMcj1UM+pcU0LdU1MSmligAI1eHEiYsmdCUFllq4JYPQ5LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KBAhZkxY; arc=none smtp.client-ip=209.85.216.48
+	 MIME-Version; b=pb+HW4rh90cT9RYChI5vGzgbGfpDNKwX/f/BQZbRSoIXcHM43a1mg49TYuEXJyTCrhUtJ0a2i0glyaKbvojLPYmLKRzYGyN0HWb+JgemeQYtr+CAOBNsLNnktGPH7nA0AeXujyghnpk0cBXUl2OEThyrWcpBVr2JUiLtIRwjAaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J7mmUT7O; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KBAhZkxY"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2e2bd0e2c4fso615794a91.3
-        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 02:10:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J7mmUT7O"
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2e5a0177531so594158a91.2
+        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 02:10:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730974236; x=1731579036; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730974252; x=1731579052; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yxt8RT8Bygj0k5mYA26DJr1opTR3RFz4U7zBrOCycHM=;
-        b=KBAhZkxYpQrKCwL8akDnS5p+TaiAzq1tWQPL8nr2y1y1+Oku80mZd7ByM9XeUj6+uQ
-         BB1tbZnXh8mm/uBlwNudsqgRDOWpWVrtrBVcJZrldSMv6yKOoiDfi2sWtsHaF4iy5k5/
-         FlNriEibCrRjixax+NM+71tzCX+0j+jWJLX3ttQTizveC32Qd3Lr7k4ac9bbN5AKqXRu
-         G7G5yb6ZscuMUzpgjzGC1zKdfmPVzQrPMTVdFc9UNyek+jHQ7fs9j3k1ot/Ovd50dgq8
-         QSCBIpF9uvvGyLEGSHXUZQErpQdrFWlY3v/5+G16Z4BxtB4yuqYVUkAc12S+M89aqfZU
-         4M7Q==
+        bh=S5Qnwb4tWFAS0N1rP9lc88RyeqFl5o2R3xp6bWPppf0=;
+        b=J7mmUT7Om26OHkFDvmtGOCAfRc8pRxC/2bH8ES9l7ouu/ODz4KZHDmq7Xm8SDwttMc
+         VbleXzgsihBX8wldKU6sdCi7vV7eyBWpLH+xvYByF+ove6sw5MLqs2JeRmicMCcRy2Uz
+         /Z++mshZXgB2JU5PnWywsUo969+4FwGAcu2Rm0SXRmjXT3qIhdf0sO+ccOiiTqplahLT
+         9rKNZkRc+/11maQwUMeK7MT7CaWspZILerXuujAELeabAkP/eWxT6TnvZ20CFB+qd3il
+         zppCAWEQAhsHwWg2xXNh/m97LecRR1bRgzMmLRByF+82mDg2FolehPs+JZL4dI5Xbz/X
+         /2pQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730974236; x=1731579036;
+        d=1e100.net; s=20230601; t=1730974252; x=1731579052;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yxt8RT8Bygj0k5mYA26DJr1opTR3RFz4U7zBrOCycHM=;
-        b=JJevX1SiPw3dGJMT9n+7tt4z8+gG/biE53nCYIYnKVIw0lRTfgXfY25CLBUMJ4UM8d
-         i7FU9xgXsYgVfAd2qmSuzoRWR+h/F5igXlhZ+LTA2mjTvL6bnnjkJlKmG0xKl+anMRrN
-         jyOoUFY54gLIpv1/xPhbsV6fGxmexrjYTGG2BPao7EFfxUxa6Fs6ft94qM1ulPnV3W5c
-         KKsKiL9ejN2ZtFlsL1kDHcYte6sLghLYCbfD4mnih6ukZ6qWlvAnvVsXaXR1RtG9Vr65
-         KzZOW0uDaCYdyrNJ7D/7XUtdQFaELVyrfcm42zqxEk8anThg7uO92ZrQPGIr2VnaH1dg
-         4dsg==
-X-Forwarded-Encrypted: i=1; AJvYcCUsEm6se3/gF2n3EQ8eRfoaS2BJTxzzccAVvvR3XHhIHScuf/W9fo6TOsF1eV3K867vWahBTjoj2gin0w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxN9JzCh1RjhanVwcGtE+/keN0WhMHG2FQAOOxOD0y2mpN3OTs7
-	/HgH6O6/22AStjaF1tDJS+gzJ/8Wmn1KyiQXx24bQpbqtIyPydLZ
-X-Google-Smtp-Source: AGHT+IGkobDPHX5sAaCxvHkebL5hALrpV2Dg8LC3c+W0XbEg1N8DE06RTp/5mtnWP2SaL4Ngh8681A==
-X-Received: by 2002:a17:90b:4c05:b0:2e2:ddfa:24d5 with SMTP id 98e67ed59e1d1-2e9ab01695amr547816a91.15.1730974236057;
-        Thu, 07 Nov 2024 02:10:36 -0800 (PST)
+        bh=S5Qnwb4tWFAS0N1rP9lc88RyeqFl5o2R3xp6bWPppf0=;
+        b=A6QB9RzPbMIp9O5t8q2Ucow5KPWUQnAocPyDTikeBBpF7qxuzbuErzz1E5tZwdV2XM
+         xg/bU0iZx3BtRr4pCTseB4urtUP/dbR9XSewHJpwC0pX3GgQdTVo+QUz1uU9I4hhK8sl
+         kZZXrgLARjReIqVfJoMJnFZihDHWOPjUVjIGwa4hyzFoEPQu0oG+FoznmTYN9AVep4v+
+         mcnycWP9etxZJ0RW1S9+ET9ePdD8fUKghWzVzi5ftQqPwmcR+Wf+mgnYhYQHF5Ou+RPw
+         /EePWItJoLFvDUoHFge3LpU+2j1bljimAef74dDQFbbEGUADP2VvyJ5GfASS1v1VCF3W
+         Gv+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU05hWjczzugDeZ/IuuCaV2maYBVEh4baQNVWrKQ/yuwfzPkNUwvXpFLpCBqQhCwxk6/WyFZQxM3u/2QA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOXQg4FE6R/DNsF3DxyYe0JMTMnORuNXjz6IH0dNhHklHSB9Lp
+	MXKnFJPW0R10BNT7ZGHAgSqM8qmSyFV24AxNnWSX8XCLMTNopSqo
+X-Google-Smtp-Source: AGHT+IEkM0WIZbTnMgz0E1S7i4DJkJtptTxleP8YqXSNqDh8+b4uq90l/cTneEPKVmlsbhKVeMk4Wg==
+X-Received: by 2002:a17:90b:1dce:b0:2e9:5360:22b2 with SMTP id 98e67ed59e1d1-2e953602acbmr23852276a91.20.1730974252273;
+        Thu, 07 Nov 2024 02:10:52 -0800 (PST)
 Received: from Barrys-MBP.hub ([2407:7000:8942:5500:507e:2219:6f85:3a5f])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e99a5fd6b0sm3076415a91.34.2024.11.07.02.10.27
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e99a5fd6b0sm3076415a91.34.2024.11.07.02.10.43
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 07 Nov 2024 02:10:35 -0800 (PST)
+        Thu, 07 Nov 2024 02:10:51 -0800 (PST)
 From: Barry Song <21cnbao@gmail.com>
 To: linux-mm@kvack.org
 Cc: akpm@linux-foundation.org,
@@ -78,9 +78,9 @@ Cc: akpm@linux-foundation.org,
 	zhouchengming@bytedance.com,
 	usamaarif642@gmail.com,
 	ryan.roberts@arm.com
-Subject: [PATCH RFC v2 1/2] mm: zsmalloc: support objects compressed based on multiple pages
-Date: Thu,  7 Nov 2024 23:10:03 +1300
-Message-Id: <20241107101005.69121-2-21cnbao@gmail.com>
+Subject: [PATCH RFC v2 2/2] zram: support compression at the granularity of multi-pages
+Date: Thu,  7 Nov 2024 23:10:04 +1300
+Message-Id: <20241107101005.69121-3-21cnbao@gmail.com>
 X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 In-Reply-To: <20241107101005.69121-1-21cnbao@gmail.com>
 References: <20241107101005.69121-1-21cnbao@gmail.com>
@@ -94,673 +94,902 @@ Content-Transfer-Encoding: 8bit
 
 From: Tangquan Zheng <zhengtangquan@oppo.com>
 
-This patch introduces support for zsmalloc to store compressed objects
-based on multi-pages. Previously, a large folio with nr_pages subpages
-would undergo compression one by one, each at the granularity of
-PAGE_SIZE. However, by compressing them at a larger granularity, we
-can conserve both memory and CPU resources.
+Currently, when a large folio with nr_pages is submitted to zram, it is
+divided into nr_pages parts for compression and storage individually.
+By transitioning to a higher granularity, we can notably enhance
+compression rates while simultaneously reducing CPU consumption.
 
-We define the granularity with a configuration option called
-ZSMALLOC_MULTI_PAGES_ORDER, set to a default value of 2, which matches
-the minimum order of anonymous mTHP. As a result, a large folio with
-8 subpages will now be split into 2 parts instead of 8.
+This patch introduces the capability for large folios to be divided
+based on the granularity specified by ZSMALLOC_MULTI_PAGES_ORDER, which
+defaults to 2. For instance, for folios sized at 128KiB, compression
+will occur in eight 16KiB multi-pages.
 
-The introduction of the multi-pages feature necessitates the creation
-of new size classes to accommodate it.
+This modification will notably reduce CPU consumption and enhance
+compression ratios. The following data illustrates the time and
+compressed data for typical anonymous pages gathered from Android
+phones.
 
 Signed-off-by: Tangquan Zheng <zhengtangquan@oppo.com>
 Co-developed-by: Barry Song <v-songbaohua@oppo.com>
 Signed-off-by: Barry Song <v-songbaohua@oppo.com>
 ---
- drivers/block/zram/zram_drv.c |   3 +-
- include/linux/zsmalloc.h      |  10 +-
- mm/Kconfig                    |  18 +++
- mm/zsmalloc.c                 | 232 ++++++++++++++++++++++++++--------
- 4 files changed, 205 insertions(+), 58 deletions(-)
+ drivers/block/zram/Kconfig    |   9 +
+ drivers/block/zram/zcomp.c    |  17 +-
+ drivers/block/zram/zcomp.h    |  12 +-
+ drivers/block/zram/zram_drv.c | 449 +++++++++++++++++++++++++++++++---
+ drivers/block/zram/zram_drv.h |  45 ++++
+ 5 files changed, 495 insertions(+), 37 deletions(-)
 
+diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
+index 402b7b175863..716e92c5fdfe 100644
+--- a/drivers/block/zram/Kconfig
++++ b/drivers/block/zram/Kconfig
+@@ -145,3 +145,12 @@ config ZRAM_MULTI_COMP
+ 	  re-compress pages using a potentially slower but more effective
+ 	  compression algorithm. Note, that IDLE page recompression
+ 	  requires ZRAM_TRACK_ENTRY_ACTIME.
++
++config ZRAM_MULTI_PAGES
++	bool "Enable multiple pages compression and decompression"
++	depends on ZRAM && ZSMALLOC_MULTI_PAGES
++	help
++	  Initially, zram divided large folios into blocks of nr_pages, each sized
++	  equal to PAGE_SIZE, for compression. This option fine-tunes zram to
++	  improve compression granularity by dividing large folios into larger
++	  parts defined by the configuration option ZSMALLOC_MULTI_PAGES_ORDER.
+diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
+index bb514403e305..44f5b404495a 100644
+--- a/drivers/block/zram/zcomp.c
++++ b/drivers/block/zram/zcomp.c
+@@ -52,6 +52,11 @@ static void zcomp_strm_free(struct zcomp *comp, struct zcomp_strm *zstrm)
+ 
+ static int zcomp_strm_init(struct zcomp *comp, struct zcomp_strm *zstrm)
+ {
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++	unsigned long page_size = ZCOMP_MULTI_PAGES_SIZE;
++#else
++	unsigned long page_size = PAGE_SIZE;
++#endif
+ 	int ret;
+ 
+ 	ret = comp->ops->create_ctx(comp->params, &zstrm->ctx);
+@@ -62,7 +67,7 @@ static int zcomp_strm_init(struct zcomp *comp, struct zcomp_strm *zstrm)
+ 	 * allocate 2 pages. 1 for compressed data, plus 1 extra for the
+ 	 * case when compressed size is larger than the original one
+ 	 */
+-	zstrm->buffer = vzalloc(2 * PAGE_SIZE);
++	zstrm->buffer = vzalloc(2 * page_size);
+ 	if (!zstrm->buffer) {
+ 		zcomp_strm_free(comp, zstrm);
+ 		return -ENOMEM;
+@@ -119,13 +124,13 @@ void zcomp_stream_put(struct zcomp *comp)
+ }
+ 
+ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+-		   const void *src, unsigned int *dst_len)
++		   const void *src, unsigned int src_len, unsigned int *dst_len)
+ {
+ 	struct zcomp_req req = {
+ 		.src = src,
+ 		.dst = zstrm->buffer,
+-		.src_len = PAGE_SIZE,
+-		.dst_len = 2 * PAGE_SIZE,
++		.src_len = src_len,
++		.dst_len = src_len * 2,
+ 	};
+ 	int ret;
+ 
+@@ -136,13 +141,13 @@ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+ }
+ 
+ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
+-		     const void *src, unsigned int src_len, void *dst)
++		     const void *src, unsigned int src_len, void *dst, unsigned int dst_len)
+ {
+ 	struct zcomp_req req = {
+ 		.src = src,
+ 		.dst = dst,
+ 		.src_len = src_len,
+-		.dst_len = PAGE_SIZE,
++		.dst_len = dst_len,
+ 	};
+ 
+ 	return comp->ops->decompress(comp->params, &zstrm->ctx, &req);
+diff --git a/drivers/block/zram/zcomp.h b/drivers/block/zram/zcomp.h
+index ad5762813842..471c16be293c 100644
+--- a/drivers/block/zram/zcomp.h
++++ b/drivers/block/zram/zcomp.h
+@@ -30,6 +30,13 @@ struct zcomp_ctx {
+ 	void *context;
+ };
+ 
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++#define ZCOMP_MULTI_PAGES_ORDER	(_AC(CONFIG_ZSMALLOC_MULTI_PAGES_ORDER, UL))
++#define ZCOMP_MULTI_PAGES_NR	(1 << ZCOMP_MULTI_PAGES_ORDER)
++#define ZCOMP_MULTI_PAGES_SIZE	(PAGE_SIZE * ZCOMP_MULTI_PAGES_NR)
++#define MULTI_PAGE_SHIFT (ZCOMP_MULTI_PAGES_ORDER + PAGE_SHIFT)
++#endif
++
+ struct zcomp_strm {
+ 	local_lock_t lock;
+ 	/* compression buffer */
+@@ -80,8 +87,9 @@ struct zcomp_strm *zcomp_stream_get(struct zcomp *comp);
+ void zcomp_stream_put(struct zcomp *comp);
+ 
+ int zcomp_compress(struct zcomp *comp, struct zcomp_strm *zstrm,
+-		   const void *src, unsigned int *dst_len);
++		   const void *src, unsigned int src_len, unsigned int *dst_len);
+ int zcomp_decompress(struct zcomp *comp, struct zcomp_strm *zstrm,
+-		     const void *src, unsigned int src_len, void *dst);
++		     const void *src, unsigned int src_len, void *dst,
++		     unsigned int dst_len);
+ 
+ #endif /* _ZCOMP_H_ */
 diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index cee49bb0126d..051e6efe1c3d 100644
+index 051e6efe1c3d..2cbf37bf74be 100644
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -1461,8 +1461,7 @@ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+@@ -50,7 +50,7 @@ static unsigned int num_devices = 1;
+  * Pages that compress to sizes equals or greater than this are stored
+  * uncompressed in memory.
+  */
+-static size_t huge_class_size;
++static size_t huge_class_size[ZSMALLOC_TYPE_MAX];
+ 
+ static const struct block_device_operations zram_devops;
+ 
+@@ -296,11 +296,11 @@ static inline void zram_fill_page(void *ptr, unsigned long len,
+ 	memset_l(ptr, value, len / sizeof(unsigned long));
+ }
+ 
+-static bool page_same_filled(void *ptr, unsigned long *element)
++static bool page_same_filled(void *ptr, unsigned long *element, unsigned int page_size)
+ {
+ 	unsigned long *page;
+ 	unsigned long val;
+-	unsigned int pos, last_pos = PAGE_SIZE / sizeof(*page) - 1;
++	unsigned int pos, last_pos = page_size / sizeof(*page) - 1;
+ 
+ 	page = (unsigned long *)ptr;
+ 	val = page[0];
+@@ -1426,13 +1426,40 @@ static ssize_t debug_stat_show(struct device *dev,
+ 	return ret;
+ }
+ 
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++static ssize_t multi_pages_debug_stat_show(struct device *dev,
++		struct device_attribute *attr, char *buf)
++{
++	struct zram *zram = dev_to_zram(dev);
++	ssize_t ret = 0;
++
++	down_read(&zram->init_lock);
++	ret = scnprintf(buf, PAGE_SIZE,
++			"zram_bio write/read multi_pages count:%8llu %8llu\n"
++			"zram_bio failed write/read multi_pages count%8llu %8llu\n"
++			"zram_bio partial write/read multi_pages count%8llu %8llu\n"
++			"multi_pages_miss_free %8llu\n",
++			(u64)atomic64_read(&zram->stats.zram_bio_write_multi_pages_count),
++			(u64)atomic64_read(&zram->stats.zram_bio_read_multi_pages_count),
++			(u64)atomic64_read(&zram->stats.multi_pages_failed_writes),
++			(u64)atomic64_read(&zram->stats.multi_pages_failed_reads),
++			(u64)atomic64_read(&zram->stats.zram_bio_write_multi_pages_partial_count),
++			(u64)atomic64_read(&zram->stats.zram_bio_read_multi_pages_partial_count),
++			(u64)atomic64_read(&zram->stats.multi_pages_miss_free));
++	up_read(&zram->init_lock);
++
++	return ret;
++}
++#endif
+ static DEVICE_ATTR_RO(io_stat);
+ static DEVICE_ATTR_RO(mm_stat);
+ #ifdef CONFIG_ZRAM_WRITEBACK
+ static DEVICE_ATTR_RO(bd_stat);
+ #endif
+ static DEVICE_ATTR_RO(debug_stat);
+-
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++static DEVICE_ATTR_RO(multi_pages_debug_stat);
++#endif
+ static void zram_meta_free(struct zram *zram, u64 disksize)
+ {
+ 	size_t num_pages = disksize >> PAGE_SHIFT;
+@@ -1449,6 +1476,7 @@ static void zram_meta_free(struct zram *zram, u64 disksize)
+ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+ {
+ 	size_t num_pages, index;
++	int i;
+ 
+ 	num_pages = disksize >> PAGE_SHIFT;
+ 	zram->table = vzalloc(array_size(num_pages, sizeof(*zram->table)));
+@@ -1461,7 +1489,10 @@ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
  		return false;
  	}
  
--	if (!huge_class_size)
--		huge_class_size = zs_huge_class_size(zram->mem_pool);
-+	huge_class_size = zs_huge_class_size(zram->mem_pool, 0);
+-	huge_class_size = zs_huge_class_size(zram->mem_pool, 0);
++	for (i = 0; i < ZSMALLOC_TYPE_MAX; i++) {
++		if (!huge_class_size[i])
++			huge_class_size[i] = zs_huge_class_size(zram->mem_pool, i);
++	}
  
  	for (index = 0; index < num_pages; index++)
  		spin_lock_init(&zram->table[index].lock);
-diff --git a/include/linux/zsmalloc.h b/include/linux/zsmalloc.h
-index a48cd0ffe57d..9fa3e7669557 100644
---- a/include/linux/zsmalloc.h
-+++ b/include/linux/zsmalloc.h
-@@ -33,6 +33,14 @@ enum zs_mapmode {
- 	 */
- };
- 
-+enum zsmalloc_type {
-+	ZSMALLOC_TYPE_BASEPAGE,
-+#ifdef CONFIG_ZSMALLOC_MULTI_PAGES
-+	ZSMALLOC_TYPE_MULTI_PAGES,
-+#endif
-+	ZSMALLOC_TYPE_MAX,
-+};
-+
- struct zs_pool_stats {
- 	/* How many pages were migrated (freed) */
- 	atomic_long_t pages_compacted;
-@@ -46,7 +54,7 @@ void zs_destroy_pool(struct zs_pool *pool);
- unsigned long zs_malloc(struct zs_pool *pool, size_t size, gfp_t flags);
- void zs_free(struct zs_pool *pool, unsigned long obj);
- 
--size_t zs_huge_class_size(struct zs_pool *pool);
-+size_t zs_huge_class_size(struct zs_pool *pool, enum zsmalloc_type type);
- 
- void *zs_map_object(struct zs_pool *pool, unsigned long handle,
- 			enum zs_mapmode mm);
-diff --git a/mm/Kconfig b/mm/Kconfig
-index 33fa51d608dc..6b302b66fc0a 100644
---- a/mm/Kconfig
-+++ b/mm/Kconfig
-@@ -237,6 +237,24 @@ config ZSMALLOC_CHAIN_SIZE
- 
- 	  For more information, see zsmalloc documentation.
- 
-+config ZSMALLOC_MULTI_PAGES
-+	bool "support zsmalloc multiple pages"
-+	depends on ZSMALLOC && !CONFIG_HIGHMEM
-+	help
-+	  This option configures zsmalloc to support allocations larger than
-+	  PAGE_SIZE, enabling compression across multiple pages. The size of
-+	  these multiple pages is determined by the configured
-+	  ZSMALLOC_MULTI_PAGES_ORDER.
-+
-+config ZSMALLOC_MULTI_PAGES_ORDER
-+	int "zsmalloc multiple pages order"
-+	default 2
-+	range 1 9
-+	depends on ZSMALLOC_MULTI_PAGES
-+	help
-+	  This option is used to configure zsmalloc to support the compression
-+	  of multiple pages.
-+
- menu "Slab allocator options"
- 
- config SLUB
-diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
-index 64b66a4d3e6e..20b99d12fd5a 100644
---- a/mm/zsmalloc.c
-+++ b/mm/zsmalloc.c
-@@ -70,6 +70,12 @@
- 
- #define ZSPAGE_MAGIC	0x58
- 
-+#ifdef CONFIG_ZSMALLOC_MULTI_PAGES
-+#define ZSMALLOC_MULTI_PAGES_ORDER	(_AC(CONFIG_ZSMALLOC_MULTI_PAGES_ORDER, UL))
-+#define ZSMALLOC_MULTI_PAGES_NR		(1 << ZSMALLOC_MULTI_PAGES_ORDER)
-+#define ZSMALLOC_MULTI_PAGES_SIZE	(PAGE_SIZE * ZSMALLOC_MULTI_PAGES_NR)
-+#endif
-+
- /*
-  * This must be power of 2 and greater than or equal to sizeof(link_free).
-  * These two conditions ensure that any 'struct link_free' itself doesn't
-@@ -120,7 +126,8 @@
- 
- #define HUGE_BITS	1
- #define FULLNESS_BITS	4
--#define CLASS_BITS	8
-+#define CLASS_BITS	9
-+#define ISOLATED_BITS	5
- #define MAGIC_VAL_BITS	8
- 
- #define ZS_MAX_PAGES_PER_ZSPAGE	(_AC(CONFIG_ZSMALLOC_CHAIN_SIZE, UL))
-@@ -129,7 +136,11 @@
- #define ZS_MIN_ALLOC_SIZE \
- 	MAX(32, (ZS_MAX_PAGES_PER_ZSPAGE << PAGE_SHIFT >> OBJ_INDEX_BITS))
- /* each chunk includes extra space to keep handle */
-+#ifdef CONFIG_ZSMALLOC_MULTI_PAGES
-+#define ZS_MAX_ALLOC_SIZE	(ZSMALLOC_MULTI_PAGES_SIZE)
-+#else
- #define ZS_MAX_ALLOC_SIZE	PAGE_SIZE
-+#endif
- 
- /*
-  * On systems with 4K page size, this gives 255 size classes! There is a
-@@ -144,9 +155,22 @@
-  *  ZS_MIN_ALLOC_SIZE and ZS_SIZE_CLASS_DELTA must be multiple of ZS_ALIGN
-  *  (reason above)
-  */
--#define ZS_SIZE_CLASS_DELTA	(PAGE_SIZE >> CLASS_BITS)
--#define ZS_SIZE_CLASSES	(DIV_ROUND_UP(ZS_MAX_ALLOC_SIZE - ZS_MIN_ALLOC_SIZE, \
--				      ZS_SIZE_CLASS_DELTA) + 1)
-+
-+#define ZS_PAGE_SIZE_CLASS_DELTA	(PAGE_SIZE >> (CLASS_BITS - 1))
-+#define ZS_PAGE_SIZE_CLASSES	(DIV_ROUND_UP(PAGE_SIZE - ZS_MIN_ALLOC_SIZE, \
-+				      ZS_PAGE_SIZE_CLASS_DELTA) + 1)
-+
-+#ifdef CONFIG_ZSMALLOC_MULTI_PAGES
-+#define ZS_MULTI_PAGES_SIZE_CLASS_DELTA	(ZSMALLOC_MULTI_PAGES_SIZE >> (CLASS_BITS - 1))
-+#define ZS_MULTI_PAGES_SIZE_CLASSES	(DIV_ROUND_UP(ZS_MAX_ALLOC_SIZE - PAGE_SIZE, \
-+				      ZS_MULTI_PAGES_SIZE_CLASS_DELTA) + 1)
-+#endif
-+
-+#ifdef CONFIG_ZSMALLOC_MULTI_PAGES
-+#define ZS_SIZE_CLASSES	(ZS_PAGE_SIZE_CLASSES + ZS_MULTI_PAGES_SIZE_CLASSES)
-+#else
-+#define ZS_SIZE_CLASSES	(ZS_PAGE_SIZE_CLASSES)
-+#endif
- 
- /*
-  * Pages are distinguished by the ratio of used memory (that is the ratio
-@@ -182,7 +206,8 @@ struct zs_size_stat {
- static struct dentry *zs_stat_root;
- #endif
- 
--static size_t huge_class_size;
-+/* huge_class_size[0] for page, huge_class_size[1] for multiple pages. */
-+static size_t huge_class_size[ZSMALLOC_TYPE_MAX];
- 
- struct size_class {
- 	spinlock_t lock;
-@@ -260,6 +285,29 @@ struct zspage {
- 	rwlock_t lock;
- };
- 
-+#ifdef CONFIG_ZSMALLOC_MULTI_PAGES
-+static inline unsigned int class_size_to_zs_order(unsigned long size)
-+{
-+	unsigned int order = 0;
-+
-+	/* used large order to alloc page for zspage when class_size > PAGE_SIZE */
-+	if (size > PAGE_SIZE)
-+		return ZSMALLOC_MULTI_PAGES_ORDER;
-+
-+	return order;
-+}
-+#else
-+static inline unsigned int class_size_to_zs_order(unsigned long size)
-+{
-+	return 0;
-+}
-+#endif
-+
-+static inline unsigned long class_size_to_zs_size(unsigned long size)
-+{
-+	return PAGE_SIZE * (1 << class_size_to_zs_order(size));
-+}
-+
- struct mapping_area {
- 	local_lock_t lock;
- 	char *vm_buf; /* copy buffer for objects that span pages */
-@@ -510,11 +558,22 @@ static int get_size_class_index(int size)
+@@ -1476,10 +1507,17 @@ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+ static void zram_free_page(struct zram *zram, size_t index)
  {
- 	int idx = 0;
+ 	unsigned long handle;
++	int nr_pages = 1;
  
-+#ifdef CONFIG_ZSMALLOC_MULTI_PAGES
-+	if (size > PAGE_SIZE + ZS_HANDLE_SIZE) {
-+		idx = ZS_PAGE_SIZE_CLASSES;
-+		idx += DIV_ROUND_UP(size - PAGE_SIZE,
-+				ZS_MULTI_PAGES_SIZE_CLASS_DELTA);
+ #ifdef CONFIG_ZRAM_TRACK_ENTRY_ACTIME
+ 	zram->table[index].ac_time = 0;
+ #endif
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++	if (zram_test_flag(zram, index, ZRAM_COMP_MULTI_PAGES)) {
++		zram_clear_flag(zram, index, ZRAM_COMP_MULTI_PAGES);
++		nr_pages = ZCOMP_MULTI_PAGES_NR;
++	}
++#endif
+ 
+ 	zram_clear_flag(zram, index, ZRAM_IDLE);
+ 	zram_clear_flag(zram, index, ZRAM_INCOMPRESSIBLE);
+@@ -1503,7 +1541,7 @@ static void zram_free_page(struct zram *zram, size_t index)
+ 	 */
+ 	if (zram_test_flag(zram, index, ZRAM_SAME)) {
+ 		zram_clear_flag(zram, index, ZRAM_SAME);
+-		atomic64_dec(&zram->stats.same_pages);
++		atomic64_sub(nr_pages, &zram->stats.same_pages);
+ 		goto out;
+ 	}
+ 
+@@ -1516,7 +1554,7 @@ static void zram_free_page(struct zram *zram, size_t index)
+ 	atomic64_sub(zram_get_obj_size(zram, index),
+ 		     &zram->stats.compr_data_size);
+ out:
+-	atomic64_dec(&zram->stats.pages_stored);
++	atomic64_sub(nr_pages, &zram->stats.pages_stored);
+ 	zram_set_handle(zram, index, 0);
+ 	zram_set_obj_size(zram, index, 0);
+ }
+@@ -1526,7 +1564,7 @@ static void zram_free_page(struct zram *zram, size_t index)
+  * Corresponding ZRAM slot should be locked.
+  */
+ static int zram_read_from_zspool(struct zram *zram, struct page *page,
+-				 u32 index)
++				 u32 index, enum zsmalloc_type zs_type)
+ {
+ 	struct zcomp_strm *zstrm;
+ 	unsigned long handle;
+@@ -1534,6 +1572,12 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
+ 	void *src, *dst;
+ 	u32 prio;
+ 	int ret;
++	unsigned long page_size = PAGE_SIZE;
 +
-+		return min_t(int, ZS_SIZE_CLASSES - 1, idx);
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++	if (zs_type == ZSMALLOC_TYPE_MULTI_PAGES)
++		page_size = ZCOMP_MULTI_PAGES_SIZE;
++#endif
+ 
+ 	handle = zram_get_handle(zram, index);
+ 	if (!handle || zram_test_flag(zram, index, ZRAM_SAME)) {
+@@ -1542,28 +1586,28 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
+ 
+ 		value = handle ? zram_get_element(zram, index) : 0;
+ 		mem = kmap_local_page(page);
+-		zram_fill_page(mem, PAGE_SIZE, value);
++		zram_fill_page(mem, page_size, value);
+ 		kunmap_local(mem);
+ 		return 0;
+ 	}
+ 
+ 	size = zram_get_obj_size(zram, index);
+ 
+-	if (size != PAGE_SIZE) {
++	if (size != page_size) {
+ 		prio = zram_get_priority(zram, index);
+ 		zstrm = zcomp_stream_get(zram->comps[prio]);
+ 	}
+ 
+ 	src = zs_map_object(zram->mem_pool, handle, ZS_MM_RO);
+-	if (size == PAGE_SIZE) {
++	if (size == page_size) {
+ 		dst = kmap_local_page(page);
+-		copy_page(dst, src);
++		memcpy(dst, src, page_size);
+ 		kunmap_local(dst);
+ 		ret = 0;
+ 	} else {
+ 		dst = kmap_local_page(page);
+ 		ret = zcomp_decompress(zram->comps[prio], zstrm,
+-				       src, size, dst);
++				       src, size, dst, page_size);
+ 		kunmap_local(dst);
+ 		zcomp_stream_put(zram->comps[prio]);
+ 	}
+@@ -1579,7 +1623,7 @@ static int zram_read_page(struct zram *zram, struct page *page, u32 index,
+ 	zram_slot_lock(zram, index);
+ 	if (!zram_test_flag(zram, index, ZRAM_WB)) {
+ 		/* Slot should be locked through out the function call */
+-		ret = zram_read_from_zspool(zram, page, index);
++		ret = zram_read_from_zspool(zram, page, index, ZSMALLOC_TYPE_BASEPAGE);
+ 		zram_slot_unlock(zram, index);
+ 	} else {
+ 		/*
+@@ -1636,13 +1680,24 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
+ 	struct zcomp_strm *zstrm;
+ 	unsigned long element = 0;
+ 	enum zram_pageflags flags = 0;
++	unsigned long page_size = PAGE_SIZE;
++	int huge_class_idx = ZSMALLOC_TYPE_BASEPAGE;
++	int nr_pages = 1;
++
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++	if (folio_size(page_folio(page)) >= ZCOMP_MULTI_PAGES_SIZE) {
++		page_size = ZCOMP_MULTI_PAGES_SIZE;
++		huge_class_idx = ZSMALLOC_TYPE_MULTI_PAGES;
++		nr_pages = ZCOMP_MULTI_PAGES_NR;
++	}
++#endif
+ 
+ 	mem = kmap_local_page(page);
+-	if (page_same_filled(mem, &element)) {
++	if (page_same_filled(mem, &element, page_size)) {
+ 		kunmap_local(mem);
+ 		/* Free memory associated with this sector now. */
+ 		flags = ZRAM_SAME;
+-		atomic64_inc(&zram->stats.same_pages);
++		atomic64_add(nr_pages, &zram->stats.same_pages);
+ 		goto out;
+ 	}
+ 	kunmap_local(mem);
+@@ -1651,7 +1706,7 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
+ 	zstrm = zcomp_stream_get(zram->comps[ZRAM_PRIMARY_COMP]);
+ 	src = kmap_local_page(page);
+ 	ret = zcomp_compress(zram->comps[ZRAM_PRIMARY_COMP], zstrm,
+-			     src, &comp_len);
++			     src, page_size, &comp_len);
+ 	kunmap_local(src);
+ 
+ 	if (unlikely(ret)) {
+@@ -1661,8 +1716,8 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
+ 		return ret;
+ 	}
+ 
+-	if (comp_len >= huge_class_size)
+-		comp_len = PAGE_SIZE;
++	if (comp_len >= huge_class_size[huge_class_idx])
++		comp_len = page_size;
+ 	/*
+ 	 * handle allocation has 2 paths:
+ 	 * a) fast path is executed with preemption disabled (for
+@@ -1691,7 +1746,7 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
+ 		if (IS_ERR_VALUE(handle))
+ 			return PTR_ERR((void *)handle);
+ 
+-		if (comp_len != PAGE_SIZE)
++		if (comp_len != page_size)
+ 			goto compress_again;
+ 		/*
+ 		 * If the page is not compressible, you need to acquire the
+@@ -1715,10 +1770,10 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
+ 	dst = zs_map_object(zram->mem_pool, handle, ZS_MM_WO);
+ 
+ 	src = zstrm->buffer;
+-	if (comp_len == PAGE_SIZE)
++	if (comp_len == page_size)
+ 		src = kmap_local_page(page);
+ 	memcpy(dst, src, comp_len);
+-	if (comp_len == PAGE_SIZE)
++	if (comp_len == page_size)
+ 		kunmap_local(src);
+ 
+ 	zcomp_stream_put(zram->comps[ZRAM_PRIMARY_COMP]);
+@@ -1732,7 +1787,7 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
+ 	zram_slot_lock(zram, index);
+ 	zram_free_page(zram, index);
+ 
+-	if (comp_len == PAGE_SIZE) {
++	if (comp_len == page_size) {
+ 		zram_set_flag(zram, index, ZRAM_HUGE);
+ 		atomic64_inc(&zram->stats.huge_pages);
+ 		atomic64_inc(&zram->stats.huge_pages_since);
+@@ -1745,10 +1800,19 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
+ 		zram_set_handle(zram, index, handle);
+ 		zram_set_obj_size(zram, index, comp_len);
+ 	}
++
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++	if (page_size == ZCOMP_MULTI_PAGES_SIZE) {
++		/* Set multi-pages compression flag for free or overwriting */
++		for (int i = 0; i < ZCOMP_MULTI_PAGES_NR; i++)
++			zram_set_flag(zram, index + i, ZRAM_COMP_MULTI_PAGES);
 +	}
 +#endif
 +
-+	idx = 0;
- 	if (likely(size > ZS_MIN_ALLOC_SIZE))
--		idx = DIV_ROUND_UP(size - ZS_MIN_ALLOC_SIZE,
--				ZS_SIZE_CLASS_DELTA);
-+		idx += DIV_ROUND_UP(size - ZS_MIN_ALLOC_SIZE,
-+				ZS_PAGE_SIZE_CLASS_DELTA);
+ 	zram_slot_unlock(zram, index);
  
--	return min_t(int, ZS_SIZE_CLASSES - 1, idx);
-+	return  min_t(int, ZS_PAGE_SIZE_CLASSES - 1, idx);
+ 	/* Update stats */
+-	atomic64_inc(&zram->stats.pages_stored);
++	atomic64_add(nr_pages, &zram->stats.pages_stored);
+ 	return ret;
  }
  
- static inline void class_stat_add(struct size_class *class, int type,
-@@ -564,11 +623,11 @@ static int zs_stats_size_show(struct seq_file *s, void *v)
- 	unsigned long total_freeable = 0;
- 	unsigned long inuse_totals[NR_FULLNESS_GROUPS] = {0, };
+@@ -1861,7 +1925,7 @@ static int recompress_slot(struct zram *zram, u32 index, struct page *page,
+ 	if (comp_len_old < threshold)
+ 		return 0;
  
--	seq_printf(s, " %5s %5s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %13s %10s %10s %16s %8s\n",
--			"class", "size", "10%", "20%", "30%", "40%",
-+	seq_printf(s, " %5s %5s %5s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %13s %10s %10s %16s %16s %8s\n",
-+			"class", "size", "order", "10%", "20%", "30%", "40%",
- 			"50%", "60%", "70%", "80%", "90%", "99%", "100%",
- 			"obj_allocated", "obj_used", "pages_used",
--			"pages_per_zspage", "freeable");
-+			"pages_per_zspage", "objs_per_zspage", "freeable");
+-	ret = zram_read_from_zspool(zram, page, index);
++	ret = zram_read_from_zspool(zram, page, index, ZSMALLOC_TYPE_BASEPAGE);
+ 	if (ret)
+ 		return ret;
  
- 	for (i = 0; i < ZS_SIZE_CLASSES; i++) {
+@@ -1892,7 +1956,7 @@ static int recompress_slot(struct zram *zram, u32 index, struct page *page,
+ 		zstrm = zcomp_stream_get(zram->comps[prio]);
+ 		src = kmap_local_page(page);
+ 		ret = zcomp_compress(zram->comps[prio], zstrm,
+-				     src, &comp_len_new);
++				     src, PAGE_SIZE, &comp_len_new);
+ 		kunmap_local(src);
  
-@@ -579,7 +638,7 @@ static int zs_stats_size_show(struct seq_file *s, void *v)
- 
- 		spin_lock(&class->lock);
- 
--		seq_printf(s, " %5u %5u ", i, class->size);
-+		seq_printf(s, " %5u %5u %5u", i, class->size, class_size_to_zs_order(class->size));
- 		for (fg = ZS_INUSE_RATIO_10; fg < NR_FULLNESS_GROUPS; fg++) {
- 			inuse_totals[fg] += class_stat_read(class, fg);
- 			seq_printf(s, "%9lu ", class_stat_read(class, fg));
-@@ -594,9 +653,9 @@ static int zs_stats_size_show(struct seq_file *s, void *v)
- 		pages_used = obj_allocated / objs_per_zspage *
- 				class->pages_per_zspage;
- 
--		seq_printf(s, "%13lu %10lu %10lu %16d %8lu\n",
-+		seq_printf(s, "%13lu %10lu %10lu %16d %16d %8lu\n",
- 			   obj_allocated, obj_used, pages_used,
--			   class->pages_per_zspage, freeable);
-+			   class->pages_per_zspage, objs_per_zspage, freeable);
- 
- 		total_objs += obj_allocated;
- 		total_used_objs += obj_used;
-@@ -863,7 +922,8 @@ static void __free_zspage(struct zs_pool *pool, struct size_class *class,
- 	cache_free_zspage(pool, zspage);
- 
- 	class_stat_sub(class, ZS_OBJS_ALLOCATED, class->objs_per_zspage);
--	atomic_long_sub(class->pages_per_zspage, &pool->pages_allocated);
-+	atomic_long_sub(class->pages_per_zspage * (1 << class_size_to_zs_order(class->size)),
-+			&pool->pages_allocated);
- }
- 
- static void free_zspage(struct zs_pool *pool, struct size_class *class,
-@@ -892,6 +952,7 @@ static void init_zspage(struct size_class *class, struct zspage *zspage)
- 	unsigned int freeobj = 1;
- 	unsigned long off = 0;
- 	struct page *page = get_first_page(zspage);
-+	unsigned long page_size = class_size_to_zs_size(class->size);
- 
- 	while (page) {
- 		struct page *next_page;
-@@ -903,7 +964,7 @@ static void init_zspage(struct size_class *class, struct zspage *zspage)
- 		vaddr = kmap_local_page(page);
- 		link = (struct link_free *)vaddr + off / sizeof(*link);
- 
--		while ((off += class->size) < PAGE_SIZE) {
-+		while ((off += class->size) < page_size) {
- 			link->next = freeobj++ << OBJ_TAG_BITS;
- 			link += class->size / sizeof(*link);
+ 		if (ret) {
+@@ -2056,7 +2120,7 @@ static ssize_t recompress_store(struct device *dev,
  		}
-@@ -925,7 +986,7 @@ static void init_zspage(struct size_class *class, struct zspage *zspage)
- 		}
- 		kunmap_local(vaddr);
- 		page = next_page;
--		off %= PAGE_SIZE;
-+		off %= page_size;
  	}
  
- 	set_freeobj(zspage, 0);
-@@ -975,6 +1036,8 @@ static struct zspage *alloc_zspage(struct zs_pool *pool,
- 	struct page *pages[ZS_MAX_PAGES_PER_ZSPAGE];
- 	struct zspage *zspage = cache_alloc_zspage(pool, gfp);
+-	if (threshold >= huge_class_size)
++	if (threshold >= huge_class_size[ZSMALLOC_TYPE_BASEPAGE])
+ 		return -EINVAL;
  
-+	unsigned int order = class_size_to_zs_order(class->size);
-+
- 	if (!zspage)
- 		return NULL;
- 
-@@ -984,12 +1047,14 @@ static struct zspage *alloc_zspage(struct zs_pool *pool,
- 	for (i = 0; i < class->pages_per_zspage; i++) {
- 		struct page *page;
- 
--		page = alloc_page(gfp);
-+		if (order > 0)
-+			gfp &= ~__GFP_MOVABLE;
-+		page = alloc_pages(gfp | __GFP_COMP, order);
- 		if (!page) {
- 			while (--i >= 0) {
- 				dec_zone_page_state(pages[i], NR_ZSPAGES);
- 				__ClearPageZsmalloc(pages[i]);
--				__free_page(pages[i]);
-+				__free_pages(pages[i], order);
- 			}
- 			cache_free_zspage(pool, zspage);
- 			return NULL;
-@@ -1047,7 +1112,9 @@ static void *__zs_map_object(struct mapping_area *area,
- 			struct page *pages[2], int off, int size)
- {
- 	size_t sizes[2];
-+	void *addr;
- 	char *buf = area->vm_buf;
-+	unsigned long page_size = class_size_to_zs_size(size);
- 
- 	/* disable page faults to match kmap_local_page() return conditions */
- 	pagefault_disable();
-@@ -1056,12 +1123,16 @@ static void *__zs_map_object(struct mapping_area *area,
- 	if (area->vm_mm == ZS_MM_WO)
- 		goto out;
- 
--	sizes[0] = PAGE_SIZE - off;
-+	sizes[0] = page_size - off;
- 	sizes[1] = size - sizes[0];
- 
- 	/* copy object to per-cpu buffer */
--	memcpy_from_page(buf, pages[0], off, sizes[0]);
--	memcpy_from_page(buf + sizes[0], pages[1], 0, sizes[1]);
-+	addr = kmap_local_page(pages[0]);
-+	memcpy(buf, addr + off, sizes[0]);
-+	kunmap_local(addr);
-+	addr = kmap_local_page(pages[1]);
-+	memcpy(buf + sizes[0], addr, sizes[1]);
-+	kunmap_local(addr);
- out:
- 	return area->vm_buf;
+ 	down_read(&zram->init_lock);
+@@ -2178,7 +2242,7 @@ static void zram_bio_discard(struct zram *zram, struct bio *bio)
+ 	bio_endio(bio);
  }
-@@ -1070,7 +1141,9 @@ static void __zs_unmap_object(struct mapping_area *area,
- 			struct page *pages[2], int off, int size)
+ 
+-static void zram_bio_read(struct zram *zram, struct bio *bio)
++static void zram_bio_read_page(struct zram *zram, struct bio *bio)
  {
- 	size_t sizes[2];
-+	void *addr;
- 	char *buf;
-+	unsigned long page_size = class_size_to_zs_size(size);
+ 	unsigned long start_time = bio_start_io_acct(bio);
+ 	struct bvec_iter iter = bio->bi_iter;
+@@ -2209,7 +2273,7 @@ static void zram_bio_read(struct zram *zram, struct bio *bio)
+ 	bio_endio(bio);
+ }
  
- 	/* no write fastpath */
- 	if (area->vm_mm == ZS_MM_RO)
-@@ -1081,12 +1154,16 @@ static void __zs_unmap_object(struct mapping_area *area,
- 	size -= ZS_HANDLE_SIZE;
- 	off += ZS_HANDLE_SIZE;
+-static void zram_bio_write(struct zram *zram, struct bio *bio)
++static void zram_bio_write_page(struct zram *zram, struct bio *bio)
+ {
+ 	unsigned long start_time = bio_start_io_acct(bio);
+ 	struct bvec_iter iter = bio->bi_iter;
+@@ -2239,6 +2303,311 @@ static void zram_bio_write(struct zram *zram, struct bio *bio)
+ 	bio_endio(bio);
+ }
  
--	sizes[0] = PAGE_SIZE - off;
-+	sizes[0] = page_size - off;
- 	sizes[1] = size - sizes[0];
- 
- 	/* copy per-cpu buffer to object */
--	memcpy_to_page(pages[0], off, buf, sizes[0]);
--	memcpy_to_page(pages[1], 0, buf + sizes[0], sizes[1]);
-+	addr = kmap_local_page(pages[0]);
-+	memcpy(addr + off, buf, sizes[0]);
-+	kunmap_local(addr);
-+	addr = kmap_local_page(pages[1]);
-+	memcpy(addr, buf + sizes[0], sizes[1]);
-+	kunmap_local(addr);
- 
- out:
- 	/* enable page faults to match kunmap_local() return conditions */
-@@ -1184,6 +1261,8 @@ void *zs_map_object(struct zs_pool *pool, unsigned long handle,
- 	struct mapping_area *area;
- 	struct page *pages[2];
- 	void *ret;
-+	unsigned long page_size;
-+	unsigned long page_mask;
- 
- 	/*
- 	 * Because we use per-cpu mapping areas shared among the
-@@ -1208,12 +1287,14 @@ void *zs_map_object(struct zs_pool *pool, unsigned long handle,
- 	read_unlock(&pool->migrate_lock);
- 
- 	class = zspage_class(pool, zspage);
--	off = offset_in_page(class->size * obj_idx);
-+	page_size = class_size_to_zs_size(class->size);
-+	page_mask = ~(page_size - 1);
-+	off = (class->size * obj_idx) & ~page_mask;
- 
- 	local_lock(&zs_map_area.lock);
- 	area = this_cpu_ptr(&zs_map_area);
- 	area->vm_mm = mm;
--	if (off + class->size <= PAGE_SIZE) {
-+	if (off + class->size <= page_size) {
- 		/* this object is contained entirely within a page */
- 		area->vm_addr = kmap_local_page(page);
- 		ret = area->vm_addr + off;
-@@ -1243,15 +1324,20 @@ void zs_unmap_object(struct zs_pool *pool, unsigned long handle)
- 
- 	struct size_class *class;
- 	struct mapping_area *area;
-+	unsigned long page_size;
-+	unsigned long page_mask;
- 
- 	obj = handle_to_obj(handle);
- 	obj_to_location(obj, &page, &obj_idx);
- 	zspage = get_zspage(page);
- 	class = zspage_class(pool, zspage);
--	off = offset_in_page(class->size * obj_idx);
++#ifdef CONFIG_ZRAM_MULTI_PAGES
 +
-+	page_size = class_size_to_zs_size(class->size);
-+	page_mask = ~(page_size - 1);
-+	off = (class->size * obj_idx) & ~page_mask;
- 
- 	area = this_cpu_ptr(&zs_map_area);
--	if (off + class->size <= PAGE_SIZE)
-+	if (off + class->size <= page_size)
- 		kunmap_local(area->vm_addr);
- 	else {
- 		struct page *pages[2];
-@@ -1281,9 +1367,9 @@ EXPORT_SYMBOL_GPL(zs_unmap_object);
-  *
-  * Return: the size (in bytes) of the first huge zsmalloc &size_class.
++/*
++ * The index is compress by multi-pages when any index ZRAM_COMP_MULTI_PAGES flag is set.
++ * Return: 0	: compress by page
++ *         > 0	: compress by multi-pages
++ */
++static inline int __test_multi_pages_comp(struct zram *zram, u32 index)
++{
++	int i;
++	int count = 0;
++	int head_index = index & ~((unsigned long)ZCOMP_MULTI_PAGES_NR - 1);
++
++	for (i = 0; i < ZCOMP_MULTI_PAGES_NR; i++) {
++		if (zram_test_flag(zram, head_index + i, ZRAM_COMP_MULTI_PAGES))
++			count++;
++	}
++
++	return count;
++}
++
++static inline bool want_multi_pages_comp(struct zram *zram, struct bio *bio)
++{
++	u32 index = bio->bi_iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
++
++	if (bio->bi_io_vec->bv_len >= ZCOMP_MULTI_PAGES_SIZE)
++		return true;
++
++	zram_slot_lock(zram, index);
++	if (__test_multi_pages_comp(zram, index)) {
++		zram_slot_unlock(zram, index);
++		return true;
++	}
++	zram_slot_unlock(zram, index);
++
++	return false;
++}
++
++static inline bool test_multi_pages_comp(struct zram *zram, struct bio *bio)
++{
++	u32 index = bio->bi_iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
++
++	return !!__test_multi_pages_comp(zram, index);
++}
++
++static inline bool is_multi_pages_partial_io(struct bio_vec *bvec)
++{
++	return bvec->bv_len != ZCOMP_MULTI_PAGES_SIZE;
++}
++
++static int zram_read_multi_pages(struct zram *zram, struct page *page, u32 index,
++			  struct bio *parent)
++{
++	int ret;
++
++	zram_slot_lock(zram, index);
++	if (!zram_test_flag(zram, index, ZRAM_WB)) {
++		/* Slot should be locked through out the function call */
++		ret = zram_read_from_zspool(zram, page, index, ZSMALLOC_TYPE_MULTI_PAGES);
++		zram_slot_unlock(zram, index);
++	} else {
++		/*
++		 * The slot should be unlocked before reading from the backing
++		 * device.
++		 */
++		zram_slot_unlock(zram, index);
++
++		ret = read_from_bdev(zram, page, zram_get_element(zram, index),
++				     parent);
++	}
++
++	/* Should NEVER happen. Return bio error if it does. */
++	if (WARN_ON(ret < 0))
++		pr_err("Decompression failed! err=%d, page=%u\n", ret, index);
++
++	return ret;
++}
++
++static int zram_read_partial_from_zspool(struct zram *zram, struct page *page,
++				 u32 index, enum zsmalloc_type zs_type, int offset)
++{
++	struct zcomp_strm *zstrm;
++	unsigned long handle;
++	unsigned int size;
++	void *src, *dst;
++	u32 prio;
++	int ret;
++	unsigned long page_size = PAGE_SIZE;
++
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++	if (zs_type == ZSMALLOC_TYPE_MULTI_PAGES)
++		page_size = ZCOMP_MULTI_PAGES_SIZE;
++#endif
++
++	handle = zram_get_handle(zram, index);
++	if (!handle || zram_test_flag(zram, index, ZRAM_SAME)) {
++		unsigned long value;
++		void *mem;
++
++		value = handle ? zram_get_element(zram, index) : 0;
++		mem = kmap_local_page(page);
++		atomic64_inc(&zram->stats.zram_bio_read_multi_pages_partial_count);
++		zram_fill_page(mem, PAGE_SIZE, value);
++		kunmap_local(mem);
++		return 0;
++	}
++
++	size = zram_get_obj_size(zram, index);
++
++	if (size != page_size) {
++		prio = zram_get_priority(zram, index);
++		zstrm = zcomp_stream_get(zram->comps[prio]);
++	}
++
++	src = zs_map_object(zram->mem_pool, handle, ZS_MM_RO);
++	if (size == page_size) {
++		dst = kmap_local_page(page);
++		atomic64_inc(&zram->stats.zram_bio_read_multi_pages_partial_count);
++		memcpy(dst, src + offset, PAGE_SIZE);
++		kunmap_local(dst);
++		ret = 0;
++	} else {
++		dst = kmap_local_page(page);
++		/* use zstrm->buffer to store decompress thp and copy page to dst */
++		atomic64_inc(&zram->stats.zram_bio_read_multi_pages_partial_count);
++		ret = zcomp_decompress(zram->comps[prio], zstrm, src, size, zstrm->buffer, page_size);
++		memcpy(dst, zstrm->buffer + offset, PAGE_SIZE);
++		kunmap_local(dst);
++		zcomp_stream_put(zram->comps[prio]);
++	}
++	zs_unmap_object(zram->mem_pool, handle);
++	return ret;
++}
++
++/*
++ * Use a temporary buffer to decompress the page, as the decompressor
++ * always expects a full page for the output.
++ */
++static int zram_bvec_read_multi_pages_partial(struct zram *zram, struct page *page, u32 index,
++			  struct bio *parent, int offset)
++{
++	int ret;
++
++	zram_slot_lock(zram, index);
++	if (!zram_test_flag(zram, index, ZRAM_WB)) {
++		/* Slot should be locked through out the function call */
++		ret = zram_read_partial_from_zspool(zram, page, index, ZSMALLOC_TYPE_MULTI_PAGES, offset);
++		zram_slot_unlock(zram, index);
++	} else {
++		/*
++		 * The slot should be unlocked before reading from the backing
++		 * device.
++		 */
++		zram_slot_unlock(zram, index);
++
++		ret = read_from_bdev(zram, page, zram_get_element(zram, index),
++				     parent);
++	}
++
++	/* Should NEVER happen. Return bio error if it does. */
++	if (WARN_ON(ret < 0))
++		pr_err("Decompression failed! err=%d, page=%u offset=%d\n", ret, index, offset);
++
++	return ret;
++}
++
++static int zram_bvec_read_multi_pages(struct zram *zram, struct bio_vec *bvec,
++			  u32 index, int offset, struct bio *bio)
++{
++	if (is_multi_pages_partial_io(bvec))
++		return zram_bvec_read_multi_pages_partial(zram, bvec->bv_page, index, bio, offset);
++	return zram_read_multi_pages(zram, bvec->bv_page, index, bio);
++}
++
++/*
++ * This is a partial IO. Read the full page before writing the changes.
++ */
++static int zram_bvec_write_multi_pages_partial(struct zram *zram, struct bio_vec *bvec,
++				   u32 index, int offset, struct bio *bio)
++{
++	struct page *page = alloc_pages(GFP_NOIO | __GFP_COMP, ZCOMP_MULTI_PAGES_ORDER);
++	int ret;
++	void *src, *dst;
++
++	if (!page)
++		return -ENOMEM;
++
++	ret = zram_read_multi_pages(zram, page, index, bio);
++	if (!ret) {
++		src = kmap_local_page(bvec->bv_page);
++		dst = kmap_local_page(page);
++		memcpy(dst + offset, src + bvec->bv_offset, bvec->bv_len);
++		kunmap_local(dst);
++		kunmap_local(src);
++
++		atomic64_inc(&zram->stats.zram_bio_write_multi_pages_partial_count);
++		ret = zram_write_page(zram, page, index);
++	}
++	__free_pages(page, ZCOMP_MULTI_PAGES_ORDER);
++	return ret;
++}
++
++static int zram_bvec_write_multi_pages(struct zram *zram, struct bio_vec *bvec,
++			   u32 index, int offset, struct bio *bio)
++{
++	if (is_multi_pages_partial_io(bvec))
++		return zram_bvec_write_multi_pages_partial(zram, bvec, index, offset, bio);
++	return zram_write_page(zram, bvec->bv_page, index);
++}
++
++
++static void zram_bio_read_multi_pages(struct zram *zram, struct bio *bio)
++{
++	unsigned long start_time = bio_start_io_acct(bio);
++	struct bvec_iter iter = bio->bi_iter;
++
++	do {
++		/* Use head index, and other indexes are used as offset */
++		u32 index = (iter.bi_sector >> SECTORS_PER_PAGE_SHIFT) &
++				~((unsigned long)ZCOMP_MULTI_PAGES_NR - 1);
++		u32 offset = (iter.bi_sector & (SECTORS_PER_MULTI_PAGE - 1)) << SECTOR_SHIFT;
++		struct bio_vec bv = multi_pages_bio_iter_iovec(bio, iter);
++
++		atomic64_add(1, &zram->stats.zram_bio_read_multi_pages_count);
++		bv.bv_len = min_t(u32, bv.bv_len, ZCOMP_MULTI_PAGES_SIZE - offset);
++
++		if (zram_bvec_read_multi_pages(zram, &bv, index, offset, bio) < 0) {
++			atomic64_inc(&zram->stats.multi_pages_failed_reads);
++			bio->bi_status = BLK_STS_IOERR;
++			break;
++		}
++		flush_dcache_page(bv.bv_page);
++
++		zram_slot_lock(zram, index);
++		zram_accessed(zram, index);
++		zram_slot_unlock(zram, index);
++
++		bio_advance_iter_single(bio, &iter, bv.bv_len);
++	} while (iter.bi_size);
++
++	bio_end_io_acct(bio, start_time);
++	bio_endio(bio);
++}
++
++static void zram_bio_write_multi_pages(struct zram *zram, struct bio *bio)
++{
++	unsigned long start_time = bio_start_io_acct(bio);
++	struct bvec_iter iter = bio->bi_iter;
++
++	do {
++		/* Use head index, and other indexes are used as offset */
++		u32 index = (iter.bi_sector >> SECTORS_PER_PAGE_SHIFT) &
++				~((unsigned long)ZCOMP_MULTI_PAGES_NR - 1);
++		u32 offset = (iter.bi_sector & (SECTORS_PER_MULTI_PAGE - 1)) << SECTOR_SHIFT;
++		struct bio_vec bv = multi_pages_bio_iter_iovec(bio, iter);
++
++		bv.bv_len = min_t(u32, bv.bv_len, ZCOMP_MULTI_PAGES_SIZE - offset);
++
++		atomic64_add(1, &zram->stats.zram_bio_write_multi_pages_count);
++		if (zram_bvec_write_multi_pages(zram, &bv, index, offset, bio) < 0) {
++			atomic64_inc(&zram->stats.multi_pages_failed_writes);
++			bio->bi_status = BLK_STS_IOERR;
++			break;
++		}
++
++		zram_slot_lock(zram, index);
++		zram_accessed(zram, index);
++		zram_slot_unlock(zram, index);
++
++		bio_advance_iter_single(bio, &iter, bv.bv_len);
++	} while (iter.bi_size);
++
++	bio_end_io_acct(bio, start_time);
++	bio_endio(bio);
++}
++#else
++static inline bool test_multi_pages_comp(struct zram *zram, struct bio *bio)
++{
++	return false;
++}
++
++static inline bool want_multi_pages_comp(struct zram *zram, struct bio *bio)
++{
++	return false;
++}
++static void zram_bio_read_multi_pages(struct zram *zram, struct bio *bio) {}
++static void zram_bio_write_multi_pages(struct zram *zram, struct bio *bio) {}
++#endif
++
++static void zram_bio_read(struct zram *zram, struct bio *bio)
++{
++	if (test_multi_pages_comp(zram, bio))
++		zram_bio_read_multi_pages(zram, bio);
++	else
++		zram_bio_read_page(zram, bio);
++}
++
++static void zram_bio_write(struct zram *zram, struct bio *bio)
++{
++	if (want_multi_pages_comp(zram, bio))
++		zram_bio_write_multi_pages(zram, bio);
++	else
++		zram_bio_write_page(zram, bio);
++}
++
+ /*
+  * Handler function for all zram I/O requests.
   */
--size_t zs_huge_class_size(struct zs_pool *pool)
-+size_t zs_huge_class_size(struct zs_pool *pool, enum zsmalloc_type type)
- {
--	return huge_class_size;
-+	return huge_class_size[type];
+@@ -2276,6 +2645,25 @@ static void zram_slot_free_notify(struct block_device *bdev,
+ 		return;
+ 	}
+ 
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++	int comp_count = __test_multi_pages_comp(zram, index);
++
++	if (comp_count > 1) {
++		zram_clear_flag(zram, index, ZRAM_COMP_MULTI_PAGES);
++		zram_slot_unlock(zram, index);
++		return;
++	} else if (comp_count == 1) {
++		zram_clear_flag(zram, index, ZRAM_COMP_MULTI_PAGES);
++		zram_slot_unlock(zram, index);
++		/*only need to free head index*/
++		index &= ~((unsigned long)ZCOMP_MULTI_PAGES_NR - 1);
++		if (!zram_slot_trylock(zram, index)) {
++			atomic64_inc(&zram->stats.multi_pages_miss_free);
++			return;
++		}
++	}
++#endif
++
+ 	zram_free_page(zram, index);
+ 	zram_slot_unlock(zram, index);
  }
- EXPORT_SYMBOL_GPL(zs_huge_class_size);
+@@ -2493,6 +2881,9 @@ static struct attribute *zram_disk_attrs[] = {
+ #endif
+ 	&dev_attr_io_stat.attr,
+ 	&dev_attr_mm_stat.attr,
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++	&dev_attr_multi_pages_debug_stat.attr,
++#endif
+ #ifdef CONFIG_ZRAM_WRITEBACK
+ 	&dev_attr_bd_stat.attr,
+ #endif
+diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+index 134be414e210..ac4eb4f39cb7 100644
+--- a/drivers/block/zram/zram_drv.h
++++ b/drivers/block/zram/zram_drv.h
+@@ -28,6 +28,10 @@
+ #define ZRAM_SECTOR_PER_LOGICAL_BLOCK	\
+ 	(1 << (ZRAM_LOGICAL_BLOCK_SHIFT - SECTOR_SHIFT))
  
-@@ -1298,13 +1384,21 @@ static unsigned long obj_malloc(struct zs_pool *pool,
- 	struct page *m_page;
- 	unsigned long m_offset;
- 	void *vaddr;
-+	unsigned long page_size;
-+	unsigned long page_mask;
-+	unsigned long page_shift;
- 
- 	class = pool->size_class[zspage->class];
- 	obj = get_freeobj(zspage);
- 
- 	offset = obj * class->size;
--	nr_page = offset >> PAGE_SHIFT;
--	m_offset = offset_in_page(offset);
-+	page_size = class_size_to_zs_size(class->size);
-+	page_shift = PAGE_SHIFT + class_size_to_zs_order(class->size);
-+	page_mask = ~(page_size - 1);
-+
-+	nr_page = offset >> page_shift;
-+	m_offset = offset & ~page_mask;
-+
- 	m_page = get_first_page(zspage);
- 
- 	for (i = 0; i < nr_page; i++)
-@@ -1385,12 +1479,14 @@ unsigned long zs_malloc(struct zs_pool *pool, size_t size, gfp_t gfp)
- 	obj_malloc(pool, zspage, handle);
- 	newfg = get_fullness_group(class, zspage);
- 	insert_zspage(class, zspage, newfg);
--	atomic_long_add(class->pages_per_zspage, &pool->pages_allocated);
-+	atomic_long_add(class->pages_per_zspage * (1 << class_size_to_zs_order(class->size)),
-+			&pool->pages_allocated);
- 	class_stat_add(class, ZS_OBJS_ALLOCATED, class->objs_per_zspage);
- 	class_stat_add(class, ZS_OBJS_INUSE, 1);
- 
- 	/* We completely set up zspage so mark them as movable */
--	SetZsPageMovable(pool, zspage);
-+	if (class_size_to_zs_order(class->size) == 0)
-+		SetZsPageMovable(pool, zspage);
- out:
- 	spin_unlock(&class->lock);
- 
-@@ -1406,9 +1502,14 @@ static void obj_free(int class_size, unsigned long obj)
- 	unsigned long f_offset;
- 	unsigned int f_objidx;
- 	void *vaddr;
-+	unsigned long page_size;
-+	unsigned long page_mask;
- 
- 	obj_to_location(obj, &f_page, &f_objidx);
--	f_offset = offset_in_page(class_size * f_objidx);
-+	page_size = class_size_to_zs_size(class_size);
-+	page_mask = ~(page_size - 1);
-+
-+	f_offset = (class_size * f_objidx) & ~page_mask;
- 	zspage = get_zspage(f_page);
- 
- 	vaddr = kmap_local_page(f_page);
-@@ -1469,20 +1570,22 @@ static void zs_object_copy(struct size_class *class, unsigned long dst,
- 	void *s_addr, *d_addr;
- 	int s_size, d_size, size;
- 	int written = 0;
-+	unsigned long page_size = class_size_to_zs_size(class->size);
-+	unsigned long page_mask =  ~(page_size - 1);
- 
- 	s_size = d_size = class->size;
- 
- 	obj_to_location(src, &s_page, &s_objidx);
- 	obj_to_location(dst, &d_page, &d_objidx);
- 
--	s_off = offset_in_page(class->size * s_objidx);
--	d_off = offset_in_page(class->size * d_objidx);
-+	s_off = (class->size * s_objidx) & ~page_mask;
-+	d_off = (class->size * d_objidx) & ~page_mask;
- 
--	if (s_off + class->size > PAGE_SIZE)
--		s_size = PAGE_SIZE - s_off;
-+	if (s_off + class->size > page_size)
-+		s_size = page_size - s_off;
- 
--	if (d_off + class->size > PAGE_SIZE)
--		d_size = PAGE_SIZE - d_off;
-+	if (d_off + class->size > page_size)
-+		d_size = page_size - d_off;
- 
- 	s_addr = kmap_local_page(s_page);
- 	d_addr = kmap_local_page(d_page);
-@@ -1507,7 +1610,7 @@ static void zs_object_copy(struct size_class *class, unsigned long dst,
- 		 * kunmap_local(d_addr). For more details see
- 		 * Documentation/mm/highmem.rst.
- 		 */
--		if (s_off >= PAGE_SIZE) {
-+		if (s_off >= page_size) {
- 			kunmap_local(d_addr);
- 			kunmap_local(s_addr);
- 			s_page = get_next_page(s_page);
-@@ -1517,7 +1620,7 @@ static void zs_object_copy(struct size_class *class, unsigned long dst,
- 			s_off = 0;
- 		}
- 
--		if (d_off >= PAGE_SIZE) {
-+		if (d_off >= page_size) {
- 			kunmap_local(d_addr);
- 			d_page = get_next_page(d_page);
- 			d_addr = kmap_local_page(d_page);
-@@ -1541,11 +1644,12 @@ static unsigned long find_alloced_obj(struct size_class *class,
- 	int index = *obj_idx;
- 	unsigned long handle = 0;
- 	void *addr = kmap_local_page(page);
-+	unsigned long page_size = class_size_to_zs_size(class->size);
- 
- 	offset = get_first_obj_offset(page);
- 	offset += class->size * index;
- 
--	while (offset < PAGE_SIZE) {
-+	while (offset < page_size) {
- 		if (obj_allocated(page, addr + offset, &handle))
- 			break;
- 
-@@ -1765,6 +1869,7 @@ static int zs_page_migrate(struct page *newpage, struct page *page,
- 	unsigned long handle;
- 	unsigned long old_obj, new_obj;
- 	unsigned int obj_idx;
-+	unsigned int page_size = PAGE_SIZE;
- 
- 	VM_BUG_ON_PAGE(!PageIsolated(page), page);
- 
-@@ -1781,6 +1886,7 @@ static int zs_page_migrate(struct page *newpage, struct page *page,
- 	 */
- 	write_lock(&pool->migrate_lock);
- 	class = zspage_class(pool, zspage);
-+	page_size = class_size_to_zs_size(class->size);
- 
- 	/*
- 	 * the class lock protects zpage alloc/free in the zspage.
-@@ -1796,10 +1902,10 @@ static int zs_page_migrate(struct page *newpage, struct page *page,
- 	 * Here, any user cannot access all objects in the zspage so let's move.
- 	 */
- 	d_addr = kmap_local_page(newpage);
--	copy_page(d_addr, s_addr);
-+	memcpy(d_addr, s_addr, page_size);
- 	kunmap_local(d_addr);
- 
--	for (addr = s_addr + offset; addr < s_addr + PAGE_SIZE;
-+	for (addr = s_addr + offset; addr < s_addr + page_size;
- 					addr += class->size) {
- 		if (obj_allocated(page, addr, &handle)) {
- 
-@@ -2085,6 +2191,7 @@ static int calculate_zspage_chain_size(int class_size)
- {
- 	int i, min_waste = INT_MAX;
- 	int chain_size = 1;
-+	unsigned long page_size = class_size_to_zs_size(class_size);
- 
- 	if (is_power_of_2(class_size))
- 		return chain_size;
-@@ -2092,7 +2199,7 @@ static int calculate_zspage_chain_size(int class_size)
- 	for (i = 1; i <= ZS_MAX_PAGES_PER_ZSPAGE; i++) {
- 		int waste;
- 
--		waste = (i * PAGE_SIZE) % class_size;
-+		waste = (i * page_size) % class_size;
- 		if (waste < min_waste) {
- 			min_waste = waste;
- 			chain_size = i;
-@@ -2138,18 +2245,33 @@ struct zs_pool *zs_create_pool(const char *name)
- 	 * for merging should be larger or equal to current size.
- 	 */
- 	for (i = ZS_SIZE_CLASSES - 1; i >= 0; i--) {
--		int size;
-+		unsigned int size = 0;
- 		int pages_per_zspage;
- 		int objs_per_zspage;
- 		struct size_class *class;
- 		int fullness;
-+		int order = 0;
-+		int idx = ZSMALLOC_TYPE_BASEPAGE;
-+
-+		if (i < ZS_PAGE_SIZE_CLASSES)
-+			size = ZS_MIN_ALLOC_SIZE + i * ZS_PAGE_SIZE_CLASS_DELTA;
-+#ifdef CONFIG_ZSMALLOC_MULTI_PAGES
-+		if (i >= ZS_PAGE_SIZE_CLASSES)
-+			size = PAGE_SIZE + (i - ZS_PAGE_SIZE_CLASSES) *
-+					   ZS_MULTI_PAGES_SIZE_CLASS_DELTA;
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++#define SECTORS_PER_MULTI_PAGE_SHIFT	(MULTI_PAGE_SHIFT - SECTOR_SHIFT)
++#define SECTORS_PER_MULTI_PAGE	(1 << SECTORS_PER_MULTI_PAGE_SHIFT)
 +#endif
  
--		size = ZS_MIN_ALLOC_SIZE + i * ZS_SIZE_CLASS_DELTA;
- 		if (size > ZS_MAX_ALLOC_SIZE)
- 			size = ZS_MAX_ALLOC_SIZE;
--		pages_per_zspage = calculate_zspage_chain_size(size);
--		objs_per_zspage = pages_per_zspage * PAGE_SIZE / size;
- 
-+#ifdef CONFIG_ZSMALLOC_MULTI_PAGES
-+		order = class_size_to_zs_order(size);
-+		if (order == ZSMALLOC_MULTI_PAGES_ORDER)
-+			idx = ZSMALLOC_TYPE_MULTI_PAGES;
+ /*
+  * ZRAM is mainly used for memory efficiency so we want to keep memory
+@@ -38,7 +42,15 @@
+  *
+  * We use BUILD_BUG_ON() to make sure that zram pageflags don't overflow.
+  */
++
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++#define ZRAM_FLAG_SHIFT (PAGE_SHIFT +  \
++	CONFIG_ZSMALLOC_MULTI_PAGES_ORDER + 1)
++#else
+ #define ZRAM_FLAG_SHIFT (PAGE_SHIFT + 1)
 +#endif
 +
-+		pages_per_zspage = calculate_zspage_chain_size(size);
-+		objs_per_zspage = pages_per_zspage * PAGE_SIZE * (1 << order) / size;
- 		/*
- 		 * We iterate from biggest down to smallest classes,
- 		 * so huge_class_size holds the size of the first huge
-@@ -2157,8 +2279,8 @@ struct zs_pool *zs_create_pool(const char *name)
- 		 * endup in the huge class.
- 		 */
- 		if (pages_per_zspage != 1 && objs_per_zspage != 1 &&
--				!huge_class_size) {
--			huge_class_size = size;
-+				!huge_class_size[idx]) {
-+			huge_class_size[idx] = size;
- 			/*
- 			 * The object uses ZS_HANDLE_SIZE bytes to store the
- 			 * handle. We need to subtract it, because zs_malloc()
-@@ -2168,7 +2290,7 @@ struct zs_pool *zs_create_pool(const char *name)
- 			 * class because it grows by ZS_HANDLE_SIZE extra bytes
- 			 * right before class lookup.
- 			 */
--			huge_class_size -= (ZS_HANDLE_SIZE - 1);
-+			huge_class_size[idx] -= (ZS_HANDLE_SIZE - 1);
- 		}
++#define ENABLE_HUGEPAGE_ZRAM_DEBUG 1
  
- 		/*
+ /* Only 2 bits are allowed for comp priority index */
+ #define ZRAM_COMP_PRIORITY_MASK	0x3
+@@ -55,6 +67,10 @@ enum zram_pageflags {
+ 	ZRAM_COMP_PRIORITY_BIT1, /* First bit of comp priority index */
+ 	ZRAM_COMP_PRIORITY_BIT2, /* Second bit of comp priority index */
+ 
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++	ZRAM_COMP_MULTI_PAGES,	/* Compressed by multi-pages */
++#endif
++
+ 	__NR_ZRAM_PAGEFLAGS,
+ };
+ 
+@@ -90,6 +106,16 @@ struct zram_stats {
+ 	atomic64_t bd_reads;		/* no. of reads from backing device */
+ 	atomic64_t bd_writes;		/* no. of writes from backing device */
+ #endif
++
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++	atomic64_t zram_bio_write_multi_pages_count;
++	atomic64_t zram_bio_read_multi_pages_count;
++	atomic64_t multi_pages_failed_writes;
++	atomic64_t multi_pages_failed_reads;
++	atomic64_t zram_bio_write_multi_pages_partial_count;
++	atomic64_t zram_bio_read_multi_pages_partial_count;
++	atomic64_t multi_pages_miss_free;
++#endif
+ };
+ 
+ #ifdef CONFIG_ZRAM_MULTI_COMP
+@@ -141,4 +167,23 @@ struct zram {
+ #endif
+ 	atomic_t pp_in_progress;
+ };
++
++#ifdef CONFIG_ZRAM_MULTI_PAGES
++ #define multi_pages_bvec_iter_offset(bvec, iter)				\
++	(mp_bvec_iter_offset((bvec), (iter)) % ZCOMP_MULTI_PAGES_SIZE)
++
++#define multi_pages_bvec_iter_len(bvec, iter)				\
++	min_t(unsigned int, mp_bvec_iter_len((bvec), (iter)),		\
++	      ZCOMP_MULTI_PAGES_SIZE - bvec_iter_offset((bvec), (iter)))
++
++#define multi_pages_bvec_iter_bvec(bvec, iter)				\
++((struct bio_vec) {						\
++	.bv_page	= bvec_iter_page((bvec), (iter)),	\
++	.bv_len		= multi_pages_bvec_iter_len((bvec), (iter)),	\
++	.bv_offset	= multi_pages_bvec_iter_offset((bvec), (iter)),	\
++})
++
++#define multi_pages_bio_iter_iovec(bio, iter)				\
++	multi_pages_bvec_iter_bvec((bio)->bi_io_vec, (iter))
++#endif
+ #endif
 -- 
 2.39.3 (Apple Git-146)
 
