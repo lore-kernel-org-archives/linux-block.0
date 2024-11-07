@@ -1,99 +1,163 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1F518FDAF
-	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 12:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8282210189
+	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 13:28:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730983687; cv=none; b=BGcBVnZg26vi6I5Z77lC1c9ExJctVQrt9DVuhHRopmdh2VrHWX1irtZZCuhy0n+lh4W1zbRORiUrWcgdhg8dRDPVRvgQYfol6DVa2ppsASUnDbSXO6v6Wc3PZtXuJ2kcLbGTRw9HOiTgicxl6MrcZJGy6NqMpfZ6euFED5UyfVU=
+	t=1730986094; cv=none; b=qoX+rnw5H5WyLK/xaAsjss/VkDGDQil2zoPNqxoDEHKU5y3d+9Qdt22JqqhlmkRpbRHad7eSDPFI7C6AectYR7/ABuIg1L1nEawRgywK9DvISQRmWcy6s8CKdUE8oeZwG+Fl+Q7E1N+g9h07DIHJJkMEsc9ozGVoREGFoCIbNMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730983687; c=relaxed/simple;
-	bh=8S9Wp0rXgfqU5JLV+zvmEO4WY2V20JAjTvxoLMwcExc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r8qMgSQB6rdRrhHJN4TCVU1YnmzauH1IVAAZUr2dF9VLQ9N65INUCHEDy3qWHWQJXGYZCIE/TUAPCFuxALXOsplHf6ZYhvmDAtYQnIwSvGZz1id62NkptO2WKi9eC4yXe8PSePzf5bd824jfiU8s3nBqgeXgm+GQXOPH0sVl+M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FYZ+LGK+; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1730986094; c=relaxed/simple;
+	bh=hYzChVDIuLb/8YgK+xhHVl47Zu6a9Yg+4tjwX8ly6HM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rEfxZRpiNp63ACOJX5FVUYEdGsFU0ZubnWpmbRFeJHK1lZDzLtfNgcOxLdi2j/I/uyABzoyedcj93RiEPj3GcIy7B7FxT0q5MPsiAkmvPI2p5Z1nMCP7n8MriNhUHwOnC8uQoZoaRSLr96kzH/5cp0THHbXhXsbmDqwiypV3BRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Klf8FF6K; arc=none smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FYZ+LGK+"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20e576dbc42so10265595ad.0
-        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 04:48:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Klf8FF6K"
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7092dd03223so426110a34.1
+        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 05:28:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730983684; x=1731588484; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RIv42M26B+iX5ioGoXpDz+2DZqGog9g0S9f69Z7niOQ=;
-        b=FYZ+LGK+8t6Z+2VDfJHZ77KJ9ivklibFO9L424fYfGEguBe4VKUiPK03zvxoYvgj05
-         ziLonsiL9TX15PZlYBs8iwZk4fjjM66cYYp6hxlcuRI817vLJ8XrTN5+qouq/tBJugbK
-         ffT/Cr9mKqPcJF1vupcG7BHkOFQbSh5Br3zowgMMVOO+7WZ297+cz5k17puxp7A/qenR
-         ynk8Qyn8AAkEmLffCSYfQDhJFENuZQeADZqB/ccIZZbVNcnDuhSkal26rI2X3zwBAlX9
-         15WkGibjSTVqgriDsG+hUsbw4BtcDc3cDOZ0Frp/zlpsz0RvKNK4pL9Z7YF/DSlcB9ou
-         n57Q==
+        d=ziepe.ca; s=google; t=1730986091; x=1731590891; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wLc6Cp3t0rRD6tSmNJMVeZRKi1v5LF88UUzndPTrhYc=;
+        b=Klf8FF6K6orux3fA7PlvEdFcnRWTsOhFc40v1LA1SLLrLlHk2tQvyVplk7vmmUJIFC
+         UknOQnoTmeFAm3yBhadTv54U2nvVsfR+DQmMYLaE8n8nDpWBCfnXoY7h3v1hnNBtylx+
+         FcWkAhNvr7b2fdDexWxLAmN1Y8fpneFLvut4gMB+b5yUNWHJzBoxK3Q4J/bwP8Vkas9y
+         LCmuRRtb6blTYR8N574C41llrNMyF91vMlNSv+uhzhETTkYMfCnpR2WZdzPPv+gBuDkX
+         1hFTYnCnnf3XxUJWxBtc7T+Z0T/qqIilo82AZKp5b/1TTffI3gJmDHnnIbLqyrxXR9FL
+         AU/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730983684; x=1731588484;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RIv42M26B+iX5ioGoXpDz+2DZqGog9g0S9f69Z7niOQ=;
-        b=JDfEyRYG7uMsVXdMoYLKCycOJSWTyO5HBchQ2iPGdg0Z0rVKXvcv6rkqMmWKtHpDvc
-         l79zlp9RVz7MEkRVj8C9cBtF/Sr4SxP0gBt+2yrNAfwy4n5T2p3w2U6FNmKgWpkVQ0tA
-         D/2fmFYo6vyX0Ml9BKlC8CZvvVZavv0eawjgaI4S3zgGRTnEAiRQMTbzZe0LGWPIGZZ7
-         AzZeuEJomVtzWqU1ZIDGpDokRv68skZQa0/3CYC0vxbkt+R/7nMJ3OW2JYWFAzTrW7r2
-         myVDrBZyMpXlK3vVZDJM/SSUO9m4nCTNXUhQpwz4GyPpb5DS7b1m+LhDWDJYOLUOoyM0
-         pVaw==
-X-Forwarded-Encrypted: i=1; AJvYcCUit0FDqA9JfO0extIYSb0YKIefMwJOkP5BX8BOJSYcejcZ9/AzOh8gWx7dpPwweh60g8CUTR7l/UkvJg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9OUk++BmxQFYj3om9cvdELUHSyUMINsHMNvdTCCJXLsyyLM8h
-	3XZGltf1CsiXD8xCU/Tk5Nmb0c+czwhWs5KeK7xY4kgPdfqUFpBUaQNCv0q+NhwkHZMeZvSZXn+
-	aXk8=
-X-Google-Smtp-Source: AGHT+IGlD+pTDzxoAnBiGDswUUWkRF874aGZbcz0m34zr4KhDG2O2oHfvWuIKzhKWs+kpKqjuyIoeQ==
-X-Received: by 2002:a17:903:22c3:b0:20b:707c:d688 with SMTP id d9443c01a7336-2117d230791mr10505775ad.18.1730983683683;
-        Thu, 07 Nov 2024 04:48:03 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177dde241sm11260255ad.81.2024.11.07.04.48.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Nov 2024 04:48:03 -0800 (PST)
-Message-ID: <32d2e110-5d2a-47bd-b912-385c13599548@kernel.dk>
-Date: Thu, 7 Nov 2024 05:48:02 -0700
+        d=1e100.net; s=20230601; t=1730986091; x=1731590891;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wLc6Cp3t0rRD6tSmNJMVeZRKi1v5LF88UUzndPTrhYc=;
+        b=aGQzTeR6+FUCiFXYpGcKx3anfY4XSJr2HEdHSUz1e9ptyQpYCXboGkq7BV2ltFed4h
+         WLIXhbl7uusMPEnjNVFueXXCMeaGfZVOWlGSGtayuXqQ+Md6gjjU+JC/5E0o7f9IajRn
+         1qhBWCp8dyJFZSeecOZtYAuwOC5dCf+RGw1H9gOuRF0TQ4DlnEjPfsG5HZrtR6/luSik
+         wVOZRd5Ll9ORRzOH2vEIPMW+Fcn4UXfTco+HSqkZsHO/tKJnerd0qZU7AOzZ3QcYtTZw
+         7UgBr0zScvd9yvCsE/DvVSuAUwyo63wz48uJvXxYpfFTuRWf7xHICSYjJSLBkeNicSmy
+         iPcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVo/jz7yNo9BpES2EOd2vSL/TDK91LB9HZw+BxqjAhzztnLw1jifBlqE/DWw78Cv0M5JiWjK8OlmgyQgg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxumJ+eG/BLj9dtg71xibmR6m8B0EZbbRKk/LP/rxl7CoQsbsUs
+	/d6D726XrRbk1oh4eKuWAMypoJXx90/hENFnVqMgZPFxX2GFOfnu21jhzYNhMJ4=
+X-Google-Smtp-Source: AGHT+IF+tw+3lLnZf4WnNvvo/ldJVal46tJah/6dRwkTid9yDCpRNCjr9NuPNVZcVYNIHAZNA7U8ew==
+X-Received: by 2002:a05:6358:9696:b0:1c3:39ad:7c6c with SMTP id e5c5f4694b2df-1c5f99fec97mr1284772555d.17.1730986090941;
+        Thu, 07 Nov 2024 05:28:10 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3961ecc4esm7389226d6.44.2024.11.07.05.28.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 05:28:09 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1t92YS-00000002FM3-2zqJ;
+	Thu, 07 Nov 2024 09:28:08 -0400
+Date: Thu, 7 Nov 2024 09:28:08 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Robin Murphy <robin.murphy@arm.com>, Leon Romanovsky <leon@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
+Message-ID: <20241107132808.GK35848@ziepe.ca>
+References: <cover.1730298502.git.leon@kernel.org>
+ <3567312e-5942-4037-93dc-587f25f0778c@arm.com>
+ <20241104095831.GA28751@lst.de>
+ <20241105195357.GI35848@ziepe.ca>
+ <20241107083256.GA9071@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block: pre-calculate max_zone_append_sectors
-To: Christoph Hellwig <hch@lst.de>, Klara Modin <klarasmodin@gmail.com>
-Cc: Keith Busch <kbusch@kernel.org>, Damien Le Moal <dlemoal@kernel.org>,
- linux-block@vger.kernel.org
-References: <20241104073955.112324-1-hch@lst.de>
- <20241104073955.112324-3-hch@lst.de> <Zyu4XuKxAoVEHKp1@kbusch-mbp>
- <16adf8b3-e7b2-40ca-881f-ecb5056c3342@gmail.com>
- <20241107053104.GB1947@lst.de>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241107053104.GB1947@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241107083256.GA9071@lst.de>
 
-On 11/6/24 10:31 PM, Christoph Hellwig wrote:
-> On Wed, Nov 06, 2024 at 10:50:01PM +0100, Klara Modin wrote:
->>> I think you need to continue clearing max_zone_append_sectors here. The
->>> initial stack limits sets max_zone_append_sectors to UINT_MAX, and
->>> blk_validate_zoned_limits() wants it to be zero.
->>>
->>
->> This appears to be the case. I hit this on a 32-bit x86 machine. Clearing 
->> max_zone_append_sectors here as well resolves the issue for me.
+On Thu, Nov 07, 2024 at 09:32:56AM +0100, Christoph Hellwig wrote:
+> On Tue, Nov 05, 2024 at 03:53:57PM -0400, Jason Gunthorpe wrote:
+> > > Yeah, I don't really get the struct page argument.  In fact if we look
+> > > at the nitty-gritty details of dma_map_page it doesn't really need a
+> > > page at all. 
+> > 
+> > Today, if you want to map a P2P address you must have a struct page,
+> > because page->pgmap is the only source of information on the P2P
+> > topology.
+> > 
+> > So the logic is, to get P2P without struct page we need a way to have
+> > all the features of dma_map_sg() but without a mandatory scatterlist
+> > because we cannot remove struct page from scatterlist.
 > 
-> Yes, indeed.
+> Well, that is true but also not the point.  The hard part is to
+> find the P2P routing information without the page.  After that
+> any physical address based interface will work, including a trivial
+> dma_map_phys.
+
+Once we are freed from scatterlist we can explore a design that would
+pass the P2P routing information directly. For instance imagine
+something like:
+
+   dma_map_p2p(dev, phys, p2p_provider);
+
+Then dma_map_page(dev, page) could be something like
+
+   if (is_pci_p2pdma_page(page))
+      dev_map_p2p(dev, page_to_phys(page), page->pgmap->p2p_provider)
+
+From there we could then go into DRM/VFIO/etc and give them
+p2p_providers without pgmaps. p2p_provider is some light refactoring
+of what is already in drivers/pci/p2pdma.c
+
+For the dmabuf use cases it is not actually hard to find the P2P
+routing information - the driver constructing the dmabuf has it. The
+challenge is carrying that information from the originating driver,
+through the dmabuf apis to the final place that does the dma mapping.
+
+So I'm thinking of a datastructure for things like dmabuf/rdma MR
+that is sort of like this:
+
+   struct phys_list {
+         enum type; // CPU, p2p, encrypted, whatever
+         struct p2p_provider *p2p_provider;
+         struct phys_list *next;
+         struct phys_range frags[];
+   }
+
+Where each phys_list would be a single uniform dma operation and
+easily carries the extra meta data. No struct page, no serious issue
+transfering the P2P routing information.
+
+> > I saw the Intel XE team make a complicated integration with the DMA
+> > API that wasn't so good. They were looking at an earlier version of
+> > this and I think the feedback was positive. It should make a big
+> > difference, but we will need to see what they come up and possibly
+> > tweak things.
 > 
-> Jens, can you revert this patch (only the second one), please?
-> 
-> Sorry for the mess.
+> Not even sure what XE is, but do you have a pointer to it?  It would
+> really be great if people having DMA problems talked to the dma-mapping
+> and iommu maintaines / list..
 
-Reverted.
+GPU driver
 
--- 
-Jens Axboe
+https://lore.kernel.org/dri-devel/20240117221223.18540-7-oak.zeng@intel.com/
 
+Jason
