@@ -1,118 +1,160 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886D32913
-	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 02:16:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CC1D51C
+	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 02:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730945814; cv=none; b=QuNpbpTwEc0TxW/5aX+gXzSipBqpKchBgR3nK7qHvphQJgyE1SeuVETOGuYBy1iAfP0eAbjs8D8FBY8Thmk3wsPcFhF8THU0wyGC85deSfVf0YJaqaD8MwiWhxGVe/tJSzapetyVsslZ0JLgkT+kHBLCpfkG6SLubnfwcThcq4g=
+	t=1730947654; cv=none; b=d+4jlzz0pjLkkpjuI+VfvNthLOO9/UMiQWEZbyzBwI3nLSnz5/eCLY7vg7AVWdEnq3vdlCIVWPavof+tful+lcNykK12Q1Z765DOJbXM+FNytT/HdJvlMUJ0mYMqdfEY7xSDB3Ep7gUpBmCwwLYOsstRDVDk2ojzEFm2f9UybCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730945814; c=relaxed/simple;
-	bh=OJ14XdTv1tu3Kkitd6JIAbJSYe4fefgtpEhkTm46bZc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ra6/FYVDX0pWuZUeqsDwu+zidI8oRZSiMgiHk8vy5rWW8ukIJlmEPMwrKX65EJnEgkc9kYu+IWWAEMDP+xJmeFL14JJofUuMqPi/teviiQBOZXHzMs24SnOZAuNMsaUhoPy36HDYlxPkhCFh+o46lZQKKnZmrOI7nqZwSjSLSfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2aTOnY0Q; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2aTOnY0Q"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20ca1b6a80aso5484705ad.2
-        for <linux-block@vger.kernel.org>; Wed, 06 Nov 2024 18:16:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1730945812; x=1731550612; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kFV1BDQBhll90BH2DcL4n38cLizHsHuts0MSkfqFk2Y=;
-        b=2aTOnY0QNxLh9dhFWOLG6RGwfg9tFJfHyHYzZ6Mp5h5VriBF4B/IMNzOBEMNGIfLeS
-         CSv5VIY7tlf/a2TnnqS6FmJZX+j6Q1/Rx6Rh15iiQxZcdhwhFG8Pt7m/t34t0INDxmH6
-         uTEJHbrqlcOKkeMqOpnapKHbeUXF0elaD7ZlzDHvBqCPusniTJqzuNi0BVFIzPe2QwnY
-         ifRG0zIrhB/MgXvmVVSlF65LqH9RDkh6/sK06nBmECCmyAXRE7IITTXtzLwwwpUBYwA1
-         SjQa94/aRhqa8XTfWQlFlDemPLSPKIQ1+WNHBivW760m62G2ZRTDjpbLjURnOtnpU2DV
-         TJ7g==
+	s=arc-20240116; t=1730947654; c=relaxed/simple;
+	bh=bm90jDI8Ej0DYvaaEtbwzUiDu0QOV5wcZv450KxnmRw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=GV7lpZrG9VVtCoBKCII+EQe4No7M/E94GKE2rrB7dJtqg6XkJHajpcaoSuFBmMrn7bYM/XZA+IA9Owc3K8Of9PPEikxXtGfhjTqvB5W02GZoN8y2yoA3PrsaazlfSbP7ZETPHsmyzoO6qUmbgQqYoeJsvxugJrmUHQ5GIDdmQaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a6c355b3f5so6001725ab.3
+        for <linux-block@vger.kernel.org>; Wed, 06 Nov 2024 18:47:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730945812; x=1731550612;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kFV1BDQBhll90BH2DcL4n38cLizHsHuts0MSkfqFk2Y=;
-        b=M7n+jSXoJTv9d7YrskfeXEVxZ+0+1bPj5l1rgCwVS+yObaojvnPz7Mr0/ChES8kLC6
-         V518a+ER45UjsVoFv1vAgW4l8NABJk7Le2Pepx1ySoXGZksraT0DAb5Ypj0AJoZ1wDeC
-         CSPHCIHJGzCjdx9p74VXABp7l5eg9IUrEdrXW78/IQrcF7n58q2+rzDT4StTtrVxVIPa
-         t3z60rvTbZsRsvaJxkvYLRB2vAHeWS8Lndcr+dL0WxhSKtqUVIqzGkNOSISunqH7oDZs
-         rxKdYulVvn+IeKAg+j585hyabdYR5AXnVJmyeJJuCVerpJJJgDggq/8EdQ4WPfI6nbkj
-         jSAg==
-X-Forwarded-Encrypted: i=1; AJvYcCUHGA8Kop5Btnu8YNxmsZRcZnFmV+EHpN175dvBjkJj4k9/s8lSX2w90NHVZy5dTeGrA83EqM9vTko4gA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywc1hND7GU3OL9pT191QcB6LXmzkUSLR/NT1Hl34gOpJ+l0ikQ+
-	ajKlpr3o8qXbIHEN/0x1v+nj1dXFKMcQVmm0zID/azblfsD87CpzqKSXje+iXCs=
-X-Google-Smtp-Source: AGHT+IEpCkLPyN3SfMnMFVrXgMGvflWs9M30B6PYyzwSWaXMSerBsjSAY97lYBYM1aE0B1Rs6t06Ug==
-X-Received: by 2002:a17:902:e805:b0:202:cbf:2d6f with SMTP id d9443c01a7336-2111b0181b5mr297683785ad.57.1730945811875;
-        Wed, 06 Nov 2024 18:16:51 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177ddf7c7sm1553275ad.101.2024.11.06.18.16.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Nov 2024 18:16:51 -0800 (PST)
-Message-ID: <1884fb1f-b24d-4807-83ed-0017351c8516@kernel.dk>
-Date: Wed, 6 Nov 2024 19:16:50 -0700
+        d=1e100.net; s=20230601; t=1730947652; x=1731552452;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LD+Utao4/CGuzFO+zQjWs0boxzV6TvrdAHiSkX8IMQM=;
+        b=NVm86d48ouyUYnBYRJxTxHajPuzpHcapWx4pq27pQqABRbqAYgdmz8jHTCX0cA4+LJ
+         BJ9iUDVevS5Fq+4PpkkSNMphw55o7VrKiRQJssB1II6/YXkQfjXiTq8HmzrlDxcoWkl9
+         P23TFhoYMMMBmxhd8u337WperutjVXO0edmCVtOrnT+STAloCxHPU77rQvPU7KQaf1rV
+         f4lwMIax05ptJBh0lHnd5bS+EQ6kJgWtX7cjwinu9HxyQnjXp+JpcsMUtZcLAPr6+AJT
+         XF/BiQUWCKzg5UOHuK+qGL1mcYHNmsZQcpgyDnFc5W+zbwlq6MDWwV3na8oTfJV26Ul4
+         V4AA==
+X-Forwarded-Encrypted: i=1; AJvYcCWh/Pv3I1aICkDT7+k2dB9Dsfb5tvZ485kKaaRpYKh/+yUBvMr9kdjGg15FAxTe4NtZYRoBTZUV4B2Oug==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/t0QcPTIocrSeA1eiOwznh7u3Gsml/bW4JHqeezfeoxeHd3Vo
+	6etOpv0p3FF1SxQK/BFin9eYV3su8LXvsERrvjBEuvWSaAGcZLs9nZFV8IN9SrhckKuhv34LSlI
+	bdkTFmjutpCDj6nPEP1vdPV/0skgCtXdHK3R2IC7pOMJDi9EPXCCY0MA=
+X-Google-Smtp-Source: AGHT+IEYIX1kLJ9D0g+wSHWcXimE/udYx4Qw5b7gi/Ng8dTdM07EtGPI9m8+XxvR7ApAgMCCnopQwTo5YAZdoBIKcd9XBbAyakRJ
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V9 4/7] io_uring: reuse io_mapped_buf for kernel buffer
-To: Ming Lei <ming.lei@redhat.com>
-Cc: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>,
- linux-block@vger.kernel.org, Uday Shankar <ushankar@purestorage.com>,
- Akilesh Kailash <akailash@google.com>
-References: <20241106122659.730712-1-ming.lei@redhat.com>
- <20241106122659.730712-5-ming.lei@redhat.com>
- <e27c7b11-4fa0-4c51-a596-67c0773a657a@kernel.dk> <ZywWbb_RmuA9hp3Z@fedora>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZywWbb_RmuA9hp3Z@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1746:b0:3a6:c716:ab1f with SMTP id
+ e9e14a558f8ab-3a6c716ae23mr167873565ab.9.1730947652453; Wed, 06 Nov 2024
+ 18:47:32 -0800 (PST)
+Date: Wed, 06 Nov 2024 18:47:32 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <672c2a44.050a0220.350062.0283.GAE@google.com>
+Subject: [syzbot] [block?] [usb?] WARNING: bad unlock balance in elevator_init_mq
+From: syzbot <syzbot+a95fab8e491d4ac8cbe9@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/6/24 6:22 PM, Ming Lei wrote:
-> On Wed, Nov 06, 2024 at 08:15:13AM -0700, Jens Axboe wrote:
->> On 11/6/24 5:26 AM, Ming Lei wrote:
->>> Prepare for supporting kernel buffer in case of io group, in which group
->>> leader leases kernel buffer to io_uring, and consumed by io_uring OPs.
->>>
->>> So reuse io_mapped_buf for group kernel buffer, and unfortunately
->>> io_import_fixed() can't be reused since userspace fixed buffer is
->>> virt-contiguous, but it isn't true for kernel buffer.
->>>
->>> Also kernel buffer lifetime is bound with group leader request, it isn't
->>> necessary to use rsrc_node for tracking its lifetime, especially it needs
->>> extra allocation of rsrc_node for each IO.
->>
->> While it isn't strictly necessary, I do think it'd clean up the io_kiocb
->> parts and hopefully unify the assign and put path more. So I'd strongly
->> suggest you do use an io_rsrc_node, even if it does just map the
->> io_mapped_buf for this.
-> 
-> Can you share your idea about how to unify buffer? I am also interested
-> in this area, so I may take it into account in this patch.
+Hello,
 
-I just mean use an io_rsrc_node rather than an io_mapped_buf. The node
-holds the buf, and then it should not need extra checking. Particularly
-with the callback, which I think needs to go in the io_rsrc_node.
+syzbot found the following issue on:
 
-Hence I don't think you need to change much. Yes your mapping side will
-need to allocate an io_rsrc_node for this, but that's really not too
-bad. The benefits would be that the node assignment to an io_kiocb and
-putting of the node would follow normal registered buffers.
+HEAD commit:    c88416ba074a Add linux-next specific files for 20241101
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=16e21aa7980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=704b6be2ac2f205f
+dashboard link: https://syzkaller.appspot.com/bug?extid=a95fab8e491d4ac8cbe9
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1722ab40580000
 
-> Will you plan to use io_rsrc_node for all buffer type(include buffer
-> select)?
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/760a8c88d0c3/disk-c88416ba.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/46e4b0a851a2/vmlinux-c88416ba.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/428e2c784b75/bzImage-c88416ba.xz
 
-Probably not - the provided ring buffers are very low overhead and
-shared between userspace and the kernel, so it would not make much sense
-to shove an io_rsrc_node in between. But for anything else, yeah I'd
-love to see it just use the resource node.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a95fab8e491d4ac8cbe9@syzkaller.appspotmail.com
 
--- 
-Jens Axboe
+sd 4:0:0:1: [sdb] 0-byte physical blocks
+sd 4:0:0:1: [sdb] Test WP failed, assume Write Enabled
+sd 4:0:0:1: [sdb] Asking for cache data failed
+sd 4:0:0:1: [sdb] Assuming drive cache: write through
+=====================================
+WARNING: bad unlock balance detected!
+6.12.0-rc5-next-20241101-syzkaller #0 Not tainted
+-------------------------------------
+kworker/u8:4/67 is trying to release lock (&q->q_usage_counter(queue)) at:
+[<ffffffff849207a2>] elevator_init_mq+0x1e2/0x2d0 block/elevator.c:607
+but there are no more locks to release!
+
+other info that might help us debug this:
+3 locks held by kworker/u8:4/67:
+ #0: ffff88801d681148 ((wq_completion)async){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff88801d681148 ((wq_completion)async){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc900020bfd00 ((work_completion)(&entry->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc900020bfd00 ((work_completion)(&entry->work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffff8880327ca378 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:1014 [inline]
+ #2: ffff8880327ca378 (&dev->mutex){....}-{4:4}, at: __device_attach_async_helper+0xfc/0x300 drivers/base/dd.c:973
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 67 Comm: kworker/u8:4 Not tainted 6.12.0-rc5-next-20241101-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Workqueue: async async_run_entry_fn
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_unlock_imbalance_bug+0x25b/0x2d0 kernel/locking/lockdep.c:5287
+ __lock_release kernel/locking/lockdep.c:5526 [inline]
+ lock_release+0x5cb/0xa30 kernel/locking/lockdep.c:5870
+ blk_unfreeze_release_lock block/blk.h:745 [inline]
+ blk_mq_unfreeze_queue+0xd2/0x140 block/blk-mq.c:213
+ elevator_init_mq+0x1e2/0x2d0 block/elevator.c:607
+ add_disk_fwnode+0x10d/0xf80 block/genhd.c:413
+ sd_probe+0xba6/0x1100 drivers/scsi/sd.c:4024
+ really_probe+0x2b8/0xad0 drivers/base/dd.c:658
+ __driver_probe_device+0x1a2/0x390 drivers/base/dd.c:800
+ driver_probe_device+0x50/0x430 drivers/base/dd.c:830
+ __device_attach_driver+0x2d6/0x530 drivers/base/dd.c:958
+ bus_for_each_drv+0x24e/0x2e0 drivers/base/bus.c:459
+ __device_attach_async_helper+0x22d/0x300 drivers/base/dd.c:987
+ async_run_entry_fn+0xa8/0x420 kernel/async.c:129
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+sd 4:0:0:1: [sdb] Attached SCSI removable disk
+sd 5:0:0:0: [sdc] Media removed, stopped polling
+sd 5:0:0:0: [sdc] Attached SCSI removable disk
+sd 2:0:0:0: [sdb] Media removed, stopped polling
+sd 2:0:0:0: [sdb] Attached SCSI removable disk
+sd 1:0:0:0: [sdb] Media removed, stopped polling
+sd 1:0:0:0: [sdb] Attached SCSI removable disk
+sd 4:0:0:0: [sdb] Media removed, stopped polling
+sd 4:0:0:0: [sdb] Attached SCSI removable disk
+sd 1:0:0:1: [sdf] Media removed, stopped polling
+sd 1:0:0:1: [sdf] Attached SCSI removable disk
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
