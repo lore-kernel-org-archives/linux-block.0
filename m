@@ -1,89 +1,144 @@
-Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8749820F5DA
-	for <linux-block@vger.kernel.org>; Thu,  7 Nov 2024 18:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2296216A15;
+	Thu,  7 Nov 2024 18:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731004112; cv=none; b=QO6siK3w6drkhxF5Ylg6NSzCB8bj7VgwENvNqcXIWUrBbvcw+fcT/9R+aqNhi54fiumW6yDfYoFXWRtCOwiPT4Yqz3mDpdEhVw18sa50e6zJMzHI2LA9nYSCA13MgMEeG1RstcOiDA7/wLX11bC3iPcZ+cD5oYx/rIJno550X1s=
+	t=1731004114; cv=none; b=UGNDL68mmyNRsW+ahPqPMdxqaSAlHvwHAPemMRwOBrMYnpsl5keLT6OsxE7Hk+S80ThepGb+kcdYOIblYqqn33rn6O01TDU4SzfzqLbFr2CVrenw8fH7DnH3LkNOk6mvqssRFZ6N4e34TDzgomnO4kHw4D2VEUpTsfwU+IRWl0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731004112; c=relaxed/simple;
-	bh=wC/oWyNcX/2qw/vu1KXDTflHxEgJiDzIcD0RLaEM3XE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=BsSlX/TSak01aTnlidYT2HMJJOj3KRrP44/mtBibo4+GqbL8XdnUsJ/v3wZKQmaEPO3ivt0h861xSThyWpbIIp9tIkP+Jrc6+X4klvojLuyukOme8nRyrsf9uTGnveWKFA1Hwrn77PQfocf0qEy2PIM/ljO/iGTQ/j2Ltp90J9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=So5HkojA; arc=none smtp.client-ip=209.85.161.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1731004114; c=relaxed/simple;
+	bh=+Wo6r82THbUjNXMk4MeQeta3Cu/1ECzHE0kWbvDojkQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R7bGvil6enXac/5gff9t0qvx+qcKtAAsuUvxybGn/6+c6URzD9GlBjhbU1yZgh5f9Tdc/+ItD6/h621vbAQ7YNWuweWp6ve/d6sy/NeccsNHzArOn7LfWb77pBLnjHNPu2ryQ/C+mD5xHNj6B9GliT2xNEiXnx7zEB5HnZlhDQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zx73TQEF; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="So5HkojA"
-Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-5ee53b30470so241222eaf.3
-        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 10:28:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731004109; x=1731608909; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RfkZ5vVPRthfg8DCWHf1TRm0P4AJoRMsICGEYROxCeA=;
-        b=So5HkojAYk0W5gdaPquCXmAt4gqo3tLTF8uMlBgASG8/B7xMNSsHel5MvY1TysBh1n
-         j0kiYudSKCJplwWIDFIVQLG1Ut2lYNfiHVjnMNjJ8AG4uRjkobzdzOAtxgy80vCCMImy
-         rtKKwlEMax8vcgiyy4RiiDMtuqR34S0k3i2YQ3Bqu0jz+6OvhIojqsOF828Rb/xmI5+d
-         0xITVzNrtEJNRlu2JkvmbckK4Xf67yozYaVfQqWsTkr+7q18XWB2o6VwW34VoxrpN8/B
-         FWYUxKVTjC+gWFbE27y4azjU9eS6MPOL9KNLguf4RNfMqSaq3l536HBT2U5z3TsEkFsG
-         FwAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731004109; x=1731608909;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RfkZ5vVPRthfg8DCWHf1TRm0P4AJoRMsICGEYROxCeA=;
-        b=s1aa6YjbO1FXOcgt1/Yde27NS3JVCALFP8pBtxQVw2FFVb9u1f7z5/Ga7uzDBLNKt+
-         EQT5GOxSiUnOs0vD8dEJ3c6/pZLE0nyHLvxLEJEe/2rgtfalnsi1zfg+vE8odc/xF/E6
-         nUT5yumIhLyzjNgQJsz1S0duOr5WuWlpy0S0PmNiuzFQGawqph69DKVTej62oSzJPOMP
-         bR/1BNXQs61bAOKYf9k7xaZmKTeZTkVgGtBx+vy5DcqO8ewA7T9X70ahTPjpD2E7qWBb
-         ud7vy8xhQs1gzeZP/SIDaVRDb4+nFRcUJK3QiM68QNgpCr+p2bFwQtrjOx2dt5jgBhlW
-         dJ5Q==
-X-Gm-Message-State: AOJu0Yx9KGC0qXOip828xnfw60wAZWDd5B5Hto//Xf2V5wJRdxDD9VsE
-	GTMJQdRs6MUWM6Ql/Oem8UOT+WnFGTt9l21PDqP/BvupG6clByQLA9b9VuCBCsM=
-X-Google-Smtp-Source: AGHT+IEaJbCM1Zp0ALVPFRY2YG9piHnZCsfYwBEzR/BBe3g7PcJVulRrLVG1fwQZgkFbGktMPTiiPA==
-X-Received: by 2002:a05:6820:1f08:b0:5eb:c72e:e29c with SMTP id 006d021491bc7-5ee57d296eemr61006eaf.8.1731004109632;
-        Thu, 07 Nov 2024 10:28:29 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5ee4970a150sm318578eaf.36.2024.11.07.10.28.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 10:28:29 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20241107065438.236348-1-dlemoal@kernel.org>
-References: <20241107065438.236348-1-dlemoal@kernel.org>
-Subject: Re: [PATCH] block: Switch to using refcount_t for zone write plugs
-Message-Id: <173100410869.752525.9713906876157995574.b4-ty@kernel.dk>
-Date: Thu, 07 Nov 2024 11:28:28 -0700
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zx73TQEF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731004112; x=1762540112;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+Wo6r82THbUjNXMk4MeQeta3Cu/1ECzHE0kWbvDojkQ=;
+  b=Zx73TQEF16YHYX2GUNQI+E4egK3tFzSpXEgO6wma4wYC/9bod4jPV7AK
+   V/+eDkGaCxfdsa0cASC+xkkNNfSzl9FFlm7LZk5/MKIYhRAifGADtRID9
+   s49Fqwq7Ux0vuQc9WlYLrj6IrgbKfgogsQWo44qyXJRkVeVIzoH6/r+xT
+   GtyBVAd7n4EJJOoXnzmuSAekmRi0fyzJfeZyKNf2OdoY56ehaI3dktYKJ
+   D/5a7847ECiwLp1bzoGortKjHMoXEmPSPDFvZCJf4544oidPV2+QlNrhH
+   Amgk/5/GdaKU8mS0WB94IJ/CrcjkasyIJshE3f+XO+Bz+8XkPpHme533z
+   g==;
+X-CSE-ConnectionGUID: tlONnJXGTzyoVTGB2g19vQ==
+X-CSE-MsgGUID: olUyjysCSTKeX58uz4Tycw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11249"; a="48380865"
+X-IronPort-AV: E=Sophos;i="6.12,135,1728975600"; 
+   d="scan'208";a="48380865"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 10:28:31 -0800
+X-CSE-ConnectionGUID: zurYR6BgQBuTRkxzKAxxFg==
+X-CSE-MsgGUID: jgQgNA92TbqFNgqvtzw1+Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,135,1728975600"; 
+   d="scan'208";a="85984316"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 07 Nov 2024 10:28:29 -0800
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t97F3-000qZq-3B;
+	Thu, 07 Nov 2024 18:28:25 +0000
+Date: Fri, 8 Nov 2024 02:27:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Akilesh Kailash <akailash@google.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH V10 11/12] io_uring/uring_cmd: support leasing device
+ kernel buffer to io_uring
+Message-ID: <202411080218.NHuzJ77W-lkp@intel.com>
+References: <20241107110149.890530-12-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241107110149.890530-12-ming.lei@redhat.com>
+
+Hi Ming,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on next-20241107]
+[cannot apply to linus/master v6.12-rc6]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/io_uring-rsrc-pass-struct-io_ring_ctx-reference-to-rsrc-helpers/20241107-190456
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20241107110149.890530-12-ming.lei%40redhat.com
+patch subject: [PATCH V10 11/12] io_uring/uring_cmd: support leasing device kernel buffer to io_uring
+config: arc-randconfig-001-20241108 (https://download.01.org/0day-ci/archive/20241108/202411080218.NHuzJ77W-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241108/202411080218.NHuzJ77W-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411080218.NHuzJ77W-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+   In file included from block/fops.c:20:
+>> include/linux/io_uring/cmd.h:89:1: error: expected identifier or '(' before '{' token
+      89 | {
+         | ^
+>> include/linux/io_uring/cmd.h:87:19: warning: 'io_uring_cmd_lease_kbuf' declared 'static' but never defined [-Wunused-function]
+      87 | static inline int io_uring_cmd_lease_kbuf(struct io_uring_cmd *ioucmd,
+         |                   ^~~~~~~~~~~~~~~~~~~~~~~
 
 
-On Thu, 07 Nov 2024 15:54:38 +0900, Damien Le Moal wrote:
-> Replace the raw atomic_t reference counting of zone write plugs with a
-> refcount_t.  No functional changes.
-> 
-> 
+vim +89 include/linux/io_uring/cmd.h
 
-Applied, thanks!
+    62	
+    63	int io_uring_cmd_lease_kbuf(struct io_uring_cmd *ioucmd,
+    64				    struct io_rsrc_node *node);
+    65	#else
+    66	static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+    67				      struct iov_iter *iter, void *ioucmd)
+    68	{
+    69		return -EOPNOTSUPP;
+    70	}
+    71	static inline void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret,
+    72			ssize_t ret2, unsigned issue_flags)
+    73	{
+    74	}
+    75	static inline void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+    76				    void (*task_work_cb)(struct io_uring_cmd *, unsigned),
+    77				    unsigned flags)
+    78	{
+    79	}
+    80	static inline void io_uring_cmd_mark_cancelable(struct io_uring_cmd *cmd,
+    81			unsigned int issue_flags)
+    82	{
+    83	}
+    84	static inline void io_uring_cmd_issue_blocking(struct io_uring_cmd *ioucmd)
+    85	{
+    86	}
+  > 87	static inline int io_uring_cmd_lease_kbuf(struct io_uring_cmd *ioucmd,
+    88						  struct io_rsrc_node *node);
+  > 89	{
+    90		return -EOPNOTSUPP;
+    91	}
+    92	#endif
+    93	
 
-[1/1] block: Switch to using refcount_t for zone write plugs
-      commit: 4122fef16b172f7c1838fcf74340268c86ed96db
-
-Best regards,
 -- 
-Jens Axboe
-
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
