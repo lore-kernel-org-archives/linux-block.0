@@ -1,82 +1,78 @@
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9ADA208A0
-	for <linux-block@vger.kernel.org>; Fri,  8 Nov 2024 05:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEC938DE0
+	for <linux-block@vger.kernel.org>; Fri,  8 Nov 2024 05:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731042041; cv=fail; b=LbH4DlhP92WRFy3FsOrxJxEfZww/Jkbt8ypRu9+5OHha9nZ8Xgn27fVgJNEonAR5KpWmo6xm9RDqwPq7N5Go98f977Y6LBN8iEfq2/V9ZGhVa/ihcRcYUlpte4RB9KOsGKkUiEzi1MDcBmXhkpb6TTnvvxax44oUqhNlGKTN0NI=
+	t=1731043292; cv=fail; b=KS0aoeeG1WC+bB8UnPRCwJMzHJt6zvI0S7lXmDgsm+rxUrFWlTQzIpFSkXp4BPQ9hsxQRoBkao35WkMNRPHYEbEAprMGjzpgyRyyRwJ4QC7pzwmfkps7ncE8scEATiT+7ayBV0z2kAnUHz3q4VlfCMmY1zql3ER9j6Q6FgzpTIs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731042041; c=relaxed/simple;
-	bh=4Atp+KexUYe1ID/6Mqf3YuOUu4JCEPvjcsTVGfnHNvE=;
+	s=arc-20240116; t=1731043292; c=relaxed/simple;
+	bh=k0rRo+kFfHrf0sgBrpOD0i5YyweHJf8mq0jolF3jvWs=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DsyU7G3S2LSYJUfLuM+a79qrYc9zP6nHEdjqH4EtMJvJ3fSmhjJV8tTFrtAXkUcsx6gLXsVOjRwI0ikpUd44s0PggApRpOMJvCKGqEh9shioGLWqFiLbx5MXCdDN4IfJ242oHJf78MkphawsQpGLR1Wtl3fboAsE8T3I58NTCUY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=TWmXYiEy; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=xDRi2bZM; arc=fail smtp.client-ip=216.71.153.144
+	 Content-Type:MIME-Version; b=U979LjLmBcI6LaobYkoLqk5A8wbLz0ElEiHUg74hznwax9H9yzo5wrPvUZ+hhdpoB3La6c/EIjXEGj2nWStyx6PhpiKNzgIBFXUrPDfoEyBGTRJrtd4Wu5nRQbRvVgJU1VI3mBkinK/mb4n2qPICrxl/4E5k33yVl3kLQFCgeic=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=oVhXeJDo; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=Y7dmQWNu; arc=fail smtp.client-ip=68.232.141.245
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="TWmXYiEy";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="xDRi2bZM"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="oVhXeJDo";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Y7dmQWNu"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1731042039; x=1762578039;
+  t=1731043289; x=1762579289;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-id:content-transfer-encoding:
    mime-version;
-  bh=4Atp+KexUYe1ID/6Mqf3YuOUu4JCEPvjcsTVGfnHNvE=;
-  b=TWmXYiEyVG6XuWbfKFp2zfIbTe5CnYGwClBGlARoo+JsKliKyD5qkpPd
-   hZNWxC6tPkb+PgV6CJItqya8dX4x1BYtEZkzYlnzE9Tvyxg+QRQb1u55x
-   ErGFHFUpTMtkls48HEk4v++viER3KP1C9e6FvhzsBQ5691XFR1FMfB4EH
-   ko/mdyR1nr1ICLGU4BWyuyILdofc52l5SEmqjOfgA29vUoFYEJVk/rd2E
-   ju2aHXW4xOFWWeyXq1upgYMU0ONAFeNvQEqChRHagdrqO/HJr2eynQNoj
-   dDQJ3nsxvwhkrQjSmF7h4j0G8/EYp5NXunVOgN9Q+q3SQyXYtvw9Ce04B
-   A==;
-X-CSE-ConnectionGUID: 7+11sBq3SqGxpIzqG6ZqIA==
-X-CSE-MsgGUID: cOYFJ/nYQBCbkilZiZ0Alw==
-X-IronPort-AV: E=Sophos;i="6.12,136,1728921600"; 
-   d="scan'208";a="32053482"
-Received: from mail-westus2azlp17010006.outbound.protection.outlook.com (HELO CO1PR03CU002.outbound.protection.outlook.com) ([40.93.10.6])
-  by ob1.hgst.iphmx.com with ESMTP; 08 Nov 2024 13:00:33 +0800
+  bh=k0rRo+kFfHrf0sgBrpOD0i5YyweHJf8mq0jolF3jvWs=;
+  b=oVhXeJDop+LGKENMro79A7PO8tIqmImJwhdZpXViEiQSbo0mnbfImMEv
+   +JsfOEx6foLC8/gAH6f4x6K0a/pN5sweGzZWb5f4JStQXeMPA7G576PBd
+   BDvKgpwMADVv6vQinGnuAdIdTEKxqlfUfyMAf2MS/YabzXNr+2qhFD0u6
+   D7UOUEiWNatxa1gtVphBo+57zdg51aS/PgST/2FIgJLTlN8yt8wGM0/CH
+   MAraek4kCFbKn6xKbEfjzWT18K5zLf9AyYRVunfd2JO3APYn8UH4c8w+Q
+   r31HFpm5jukX8pgM5w+jGXPz18siOaE2xDg+CgzRWtE3FqMEqe2Ixvy0h
+   g==;
+X-CSE-ConnectionGUID: Ty2me9XIQ/a8mB6H9ihB7Q==
+X-CSE-MsgGUID: /fCGIR1yS2SdYW5Sd1aQnQ==
+X-IronPort-AV: E=Sophos;i="6.12,137,1728921600"; 
+   d="scan'208";a="31954438"
+Received: from mail-westcentralusazlp17010002.outbound.protection.outlook.com (HELO CY4PR05CU001.outbound.protection.outlook.com) ([40.93.6.2])
+  by ob1.hgst.iphmx.com with ESMTP; 08 Nov 2024 13:21:23 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xu27WsYXgbLxV9r6yEey0GQ8+TYIQZYvNS4GC9nNx6Lp5EQR3r50Xq4rIZYFTQA5yjjo5/hYZ3QEwHQTk1gyY5jkhpuOvs3OolWY0KnSflwTMMcocBTueCLjFAWgLY3Yc0KtS4ozQ71+QgF22HdkjQ+ylqE9815WsVDkn5rg+BlclhxhkcoWwo2LhZanFdSP6SK6BZyNGIx8JuUFomhlxM248vtpjc1M0uY5Ymks5K+i1uhTF9sbYtBikKivTsB0a7352Yr+hOwf5xFez7NGBUnZJYieUL9YsMTBn6i3K8tTBSh+7sCe8Qne8NnxK8h6Kliozwz48fSjmFfLqujg1g==
+ b=zDS+aU8tl8Zart5erJjSfSAHJSBxVsV8a0OEkg0hYH7+98lq4LmzsbptB/esqvb4q0/7T9p0oz/uKVo0IEGxy1SrqaAUB5ekd2S3BRhKehH9FuWnPTBB46P5mPbE+4UQz33GsweUaNoHYYy9pwF3n4OoUcEvseWtxE0ui4apkIYrmNPov0PMkXSPB7bGRxLMG7alOguD7L0/W34CGkOI0Bo0VuBxrcvXZu03VpPI1YhtybUFlI1GgDYGehvkDIXjfvagjb19LqmfDfk9Dca1cZ61KTtyIApr9JieFzm6ZPNYduQIu1kDgpdslhpJuq7BEOM2GC05h5RtbMjBAeQX8w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N3HvizoBPG9t3LNgW8jwsZYyg6bOf72C1kyZ4/e2X/c=;
- b=nXfDy4b4g0GKfzm5qar3Mam+AV5eHXmN+sFHCwFdNdix0XrA6GmnYxQhP0gialj57un3o2ydgH/1gDbc3jpFdZ5RPCqYO6EvvbAG/YmPCW54N0uY2gpXzRlePxW6bLbpdvtuuIZnHYCKJ/TM+3j8kDCiuJc2W5eOwXLW9IV5GPeO+8Ox5Ubm4nEdUhHT6RgSp4RjOLKhdOzc5FQUzF4xRx8vqhvR/7lWoWCr5M94xjhhMIDYkQw9Qzxa0/LK2IsS06/qDdqd09Y9SiZZ+ZDiViMym1IiDZIM0gFaplX4VKJoFZ+nGFLWlIlnhD+Y3q2hPX/oCzg1X9Wr/4dfs74vgg==
+ bh=JnZD4D7Pt+nfUdYGWJHNYrHd3TK2aD1EFwEqDYPLdfQ=;
+ b=uIfOZ96tPQLtqxGiWjjtTfLVJEROYN2KHqE25WBPkOafl4maTTjrPfRl2ThNc2dLkCPFwn5st6x+WkgfzyMmZyLBv77zMKpjMP+FmwpQEtS2vKK3/d2l7ObZgVBMlnvmdzrbRXtv+L5VE5WrTAKYSGtHqggz8kZDAVl9UWhS3dIHWamSfBYm6jd9BigtpO5QqxOyy2JYBpDWfcx0NClRrP+eW9UCtf6IeG7hgROneP+MXXmQJXru06pnSmkG0gDGmmmoCjRgRfByO/ZeifekyyxsQisqy5X4H8HyHRyvcXJl5f/oD+hrbEY4J+X9kQYLdcTp4+HX1OUdCMTWOcODcA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N3HvizoBPG9t3LNgW8jwsZYyg6bOf72C1kyZ4/e2X/c=;
- b=xDRi2bZMthx+DY15Ypj/Ee+ImgjEXV18WBxgdABygHDl4rieoV1xNz1Z3LJJk2bwfgalqp6f2smBTnr/cUT2L60wDeqfTqCBKai1lKFUBhYtV/tVPzfcW4SrKsn/xWlONiwe/4Q/njOLSCv9+ohmypMYDt407eGzcQLsSU1SxC4=
+ bh=JnZD4D7Pt+nfUdYGWJHNYrHd3TK2aD1EFwEqDYPLdfQ=;
+ b=Y7dmQWNuLmO6eae85/hmz0pOnoCHhICbQHQEwfirfWVv4OFTaSaYHtLOze1aqbhw6aMNNPrOelrB/dpe/zQVIQRddLhkV00FgOUg1H0S8qh0E+U7XR1Iib04nwALtl2ab7OJvkvF25m9tyHaOcdsj0j4e7cMNojrRdyS3DFuqI4=
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- BY5PR04MB6455.namprd04.prod.outlook.com (2603:10b6:a03:1ed::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.21; Fri, 8 Nov
- 2024 05:00:30 +0000
+ PH0PR04MB7833.namprd04.prod.outlook.com (2603:10b6:510:e2::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8137.19; Fri, 8 Nov 2024 05:21:21 +0000
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::b27f:cdfa:851:e89a%4]) with mapi id 15.20.8137.019; Fri, 8 Nov 2024
- 05:00:29 +0000
+ 05:21:20 +0000
 From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Daniel Wagner <dwagner@suse.de>
-CC: Chaitanya Kulkarni <chaitanyak@nvidia.com>, "kanie@linux.alibaba.com"
-	<kanie@linux.alibaba.com>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>
+To: Chaitanya Kulkarni <kch@nvidia.com>
+CC: "kanie@linux.alibaba.com" <kanie@linux.alibaba.com>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"dwagner@suse.de" <dwagner@suse.de>
 Subject: Re: [PATCH] nvme: test nvmet-wq sysfs interface
 Thread-Topic: [PATCH] nvme: test nvmet-wq sysfs interface
-Thread-Index: AQHbLu/o7uVXkmU4Vkas0lacIZBpRLKoQ2WAgAFbpACAAI2qAIACq68A
-Date: Fri, 8 Nov 2024 05:00:29 +0000
-Message-ID: <gkkr6tngxtb2kdfhlbl3n7mwxh2qkudgjxmd6djcc5umbpqh6j@7xpviqxh4nju>
+Thread-Index: AQHbLu/o7uVXkmU4Vkas0lacIZBpRLKs3jWA
+Date: Fri, 8 Nov 2024 05:21:20 +0000
+Message-ID: <32ge2scpracxiqw7hcqeb4xnfowofw2cjods5rr3ckecgpxxdj@fqny5zqdcelw>
 References: <20241104192907.21358-1-kch@nvidia.com>
- <5d603860-33be-42a2-86c9-a10c224c813d@flourine.local>
- <bd5ea038-42ab-433a-943f-d385ccd96770@nvidia.com>
- <ed4782f6-8fb1-464c-afd2-e03c51030768@flourine.local>
-In-Reply-To: <ed4782f6-8fb1-464c-afd2-e03c51030768@flourine.local>
+In-Reply-To: <20241104192907.21358-1-kch@nvidia.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -84,71 +80,71 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BY5PR04MB6455:EE_
-x-ms-office365-filtering-correlation-id: 2faf532e-2b86-4957-6a59-08dcffb24436
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|PH0PR04MB7833:EE_
+x-ms-office365-filtering-correlation-id: ce2fbec9-e6bd-45b4-acf4-08dcffb52e08
 wdcipoutbound: EOP-TRUE
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
 x-microsoft-antispam-message-info:
- =?us-ascii?Q?quCq8ugNpMbnHjoXTpz/rZewNuc0x7AR83IyooXeZfD24JCnmBb9+yhJyJ+5?=
- =?us-ascii?Q?MmlzEJVIS5LU+nKGdkiY7lpTRSt7o2gZr4eBAVgm3/gP9m9Dcajz2O6SCPVE?=
- =?us-ascii?Q?oyaY3j7Zo4G7ZYirGzkNxPcDh4NlEUnNucaFHKEhSWile0VSqUpHkWCwpABW?=
- =?us-ascii?Q?7CGWpY/1RsUN11T8OS8YaUH9HxB6TvAxqFXQ9tHdhzO3AEmwDZqdRiZTZU8A?=
- =?us-ascii?Q?oV6K7UZ+wrZrI+NSzlKJtpkyZTkvk5aLVHusZiiJAfy/4hYsXWQJQYZsWFLk?=
- =?us-ascii?Q?6A3OTgHZmNrsZPcI++DOIxT1rJTt58MfavkVoVX9ZEWY53eG4WM5m6eXsRme?=
- =?us-ascii?Q?uDoLIU1EvVc7B/3RQ11ovDgT6i4ZVBlzPkUS2EV0HsLzjR/T1HUE5JAqOwmr?=
- =?us-ascii?Q?+llozSPmSOsukqcbEg4Yp/UKwDSVPD0tvIb5FQO7zk27moCAxcliBf74cY+M?=
- =?us-ascii?Q?a5KbhXjcsrtu8KL92fmXJLpkffpPkqhdHRiCX1PpqMyPf3Dxz1EK6EVnR6Ke?=
- =?us-ascii?Q?cHPlMCz5rcB2pcv2T6anUg98d0nfdAij51XoH96m4mt2PdD4Q3It5Jq828F+?=
- =?us-ascii?Q?IwEnX8Xrd1F6mKJ+TrtS8ewsO+e6JeDIpubXT5tVEqph86rh2rsyOQO8OZsl?=
- =?us-ascii?Q?ef3t2SCQioxeOakaXxZg6izPhomI4dDMZuSfp5RAM/wGPnULAQCQwK/iCANQ?=
- =?us-ascii?Q?17532Q5+S4LBCQs8Ll2v89FVcUX7hxN13k7UD7aMl3KShDnispluNm8tw4X5?=
- =?us-ascii?Q?4YX+AARox4Ik0J5pDqNo0M+W6Vvi84jK9FEe84qs6fv6CJ2c/8ykHrfHaoYK?=
- =?us-ascii?Q?wT+foKjeO2nxyDckE3g/kcxoAzo6EVuEvXCKjpru8Tcy9XhxhKUaGYQsMspl?=
- =?us-ascii?Q?iwMwKtbCE289lWkh9xdnZouqBECL7ryG8YJPxrRaBlsqkna3p2F++rVkYPPa?=
- =?us-ascii?Q?zTLEzM7FEs9qb+uTySVyHnM0fTZgqLkwBxhooFXZ74CBN1XNXtmTMuMBtQT6?=
- =?us-ascii?Q?NHkHok7+N9pG18ooEhYqMmoohJRzgQlL1u5d5e2AIUvzk1a4k6AkbeRstDvp?=
- =?us-ascii?Q?ALlRXEWCn74NwT/KqOz5RTrQ3ykNW+LTJX6qcOZpwMcqPWoO6XBWBsowBX+4?=
- =?us-ascii?Q?b4TlLThnbNGqARL71RcpjKHNn6fIy3y2nrso7ajcxpwYyMSOXH0GD60QQkYE?=
- =?us-ascii?Q?VM6PgNI6w/ywFn/INh6wRPlk02JUTy2JEIx0lEpzlISgz0c2vhHILruxg1cV?=
- =?us-ascii?Q?USBqSU1GsnYRj6Vs/G/8NZuINyLpP8mvmz24jzairPsA03Dx4mXnTy5nkWLV?=
- =?us-ascii?Q?uawNMnex9hTnLDR9cLxv1WKkIYYYHnjuoZQ/tvifLn5fib38hMm2BBItwAWk?=
- =?us-ascii?Q?6H/u1CI=3D?=
+ =?us-ascii?Q?6VA9gEqjjRgOFR2LSjUABvJpAgakmrDoh7bRYAiJYlfkXjcggAVqVVpQcKWw?=
+ =?us-ascii?Q?TxGTT5p6qUSaaECke9s6EoIlq36uVdC26wjeDGLcNpAXnMwiL5iTxDKDVdXR?=
+ =?us-ascii?Q?YKSkiHkiNj7ACjkzu+vB5qwPYp5uuABqpyCa91u8y/t8lqajZ5EARdt4+SBA?=
+ =?us-ascii?Q?SHMZ/Ps7Y6y4Ls6tG6huZPvv8TgoGdz13PWTSvmaaH5NQge2UARcTyVecjnQ?=
+ =?us-ascii?Q?DnSBJAwNkTk+85YFPFLlRWH/7CfW1n9cQ/YsH1LYluC6fS9KsZQewArcWs12?=
+ =?us-ascii?Q?9Br/pDl/7FJyrAgxOXsAI6yT5oUvSKI2AHqCJDh4V5Cua6UrTLWWUrvStKOr?=
+ =?us-ascii?Q?HG6dI54iiWO3JpNZ92CcUnJE40DPJnoUjjQt0wDFS1vLvIpARZ68JLEhEr3J?=
+ =?us-ascii?Q?cCoippUIpQlzEjDB/Gp4C5DIi23FIDW8QrmOg0sZwGEH/NG3A43nKA4E+jXn?=
+ =?us-ascii?Q?D+ikklKJIT29DeXDmwEtMNn90Nypeztu+XtckxKtfndtDz0b7yGBE0hYj63H?=
+ =?us-ascii?Q?ylmS/4Tfix9w49GW37Qeo+wAe4fFsP745+GBBeOnpHCBX1YpRTeXAuJapd6e?=
+ =?us-ascii?Q?n1KKCq9DCxqtA9/naTa+izWky2/IXCRiKZXzoc33DtraFfZNz5x0dZgJt/aN?=
+ =?us-ascii?Q?DFUrOX6vCCvKb0jRudF9Rm933qMb4vXLiZa1PLyC1k/jKUVIZtbq5RQeTe5F?=
+ =?us-ascii?Q?suDok1CNvhJmpDWI5KeXR7rfNNQBnocVj2fWiusTNJNi0sdLWj2UxcvzbAno?=
+ =?us-ascii?Q?TbE6Xqd1ZRCV+7lb8YcbukKfnlQ0EFn1F4jTJc94Il7ZV7KY3Mh8+8Hb9FTK?=
+ =?us-ascii?Q?wfaljDcQJzxmJihOKKrQGwtUHBGUp17Iivpkl++hyv9ydQjBu4YuLy2lhlZO?=
+ =?us-ascii?Q?qOpYUD+taRx8nIkKpfWJCbfkLFmohar4RVFW4wkuWyiXAFVM061iEX5HRoUz?=
+ =?us-ascii?Q?9V6xu3WCAoXjmOVOarI5UR2/lxeFwlbrOrL2tmiWnL6G0GSkQ3Ehq9vRWVOi?=
+ =?us-ascii?Q?L6dPT18/sNU3lenrO4GmJZblznXTAwBo1cSmTLHl6MyIaNDx3kgxkZlIs/rP?=
+ =?us-ascii?Q?6EkCWiPDxEq7Iab56QhFB4XndfMCiPdfYAz6g5f0MbqSUfUEWVblrCRmhs7S?=
+ =?us-ascii?Q?P6N+UHFiie6RsiCDCibu0qXiWI0ZTZOs931eM+3gYVurUM3NaUFaRUtibduU?=
+ =?us-ascii?Q?Dpg5WLFCnUhiPO8iFiq5V+wK5J+SE/5mkapTjWvE2NKeOFnhQo8aukft3dC+?=
+ =?us-ascii?Q?mgdk3ZNL4CVZ9oTGUK0oXELk9bdiL7Lrfw5cLKUUQVNERyq3Mn1BhQjMtjvg?=
+ =?us-ascii?Q?9k1enapU2xtconHmD6RkLgVY4G4B8wH7QJEiYcHNWau+cUrcHZcRXXRXSzVI?=
+ =?us-ascii?Q?hGY/JEo=3D?=
 x-forefront-antispam-report:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?jRPxKJ3ELRycYpBubkJ2nASzk/Q8iejaareCs59O2nNDVV/gPHBC5LRbpHAR?=
- =?us-ascii?Q?ECtJmXr+wxdOEUdl2hC54EqvqUOUBTVjOZlmY87f7HPyMDYgxYKoFoBizNca?=
- =?us-ascii?Q?0pzqfzNqllq78yPcFT5UKntoyG+Ssbe15uXZIqGeCiKXRYkuSdfCeWoz9lXy?=
- =?us-ascii?Q?yN/1BXDbYrY7aiB+eWoAQXnMvdGc0vvfVn2YM5quOlZLKGDuSx8ROJXG5+kr?=
- =?us-ascii?Q?ZzNSB2sWj9FOa5rZ0cnL7d7/2bRFn/17v+fGDdwqwxW7AQNtoXiiieLhGgLb?=
- =?us-ascii?Q?2R0uzRPPXgWOsMDUoG+x3b1XzsFmOlol321CkhPrQ33SBo5X4jr5IhbHP1Bc?=
- =?us-ascii?Q?jj75KIRtWPQinuI2s6cjuDiDm4CU4J62zKyym/KiVVgF4Sf5UjocobzNMw0Q?=
- =?us-ascii?Q?gdvJAF3vStonFn5YDVs0In4rBkO8IkfrbfCkmfRRWV8mYI7YNGFmCiwos1bi?=
- =?us-ascii?Q?zACN+RGbWXGlBszJ6EAshEoCiZxwgJC2RX6vIzyMuElGRBRMvlU2tJu7lpB1?=
- =?us-ascii?Q?GbqyuRTnYSfBpaIGyGR3Vu8VEb/bPfZGj0cEIHF8ya8k6buU85VLwrbn4/6a?=
- =?us-ascii?Q?jwEX138zMX/JEsHewp3Lbg4b481wM94TZIXuiwyw5vSri2z9GRCLiMCSPMoz?=
- =?us-ascii?Q?Zc7WCCsREV9uc7OgjdDmlibo8900ER+m3Mz9Z2Ro4e/sHciHjI1dI3bk0BpH?=
- =?us-ascii?Q?dUK9xKCeEt+VO3qF73P81stE8RF5TvGJEADJPEjIPJVVf4aGIjhZAIIgnOH2?=
- =?us-ascii?Q?xmaCwrbGQVcNciuh2+wXa8VlnEUQNY7w37KF7e8bJd6bhTNPDj18ZB87FYF1?=
- =?us-ascii?Q?vzRJkvcCrQVonkHcIY42Ji2d+XOnwfyl+K1CJMJxwVd+S7P5m1BGQLAP1DO7?=
- =?us-ascii?Q?YiWbqwpl8W5Mt0my8iLXbFj99TiwyMjBLCsj69fCExDZ3RUFHAp0EyzzeSp8?=
- =?us-ascii?Q?FrJ4EgSkoWhFd0POXWeSdOsIe99ErFRrK+u7RKnSTX4Ey3jAN1USeqmmbWTs?=
- =?us-ascii?Q?FELQcLmyKOpIKuGklzG4jGj4AaiRwISw/PYFdN4Dqg8cf9lj/VSw4KAloGF/?=
- =?us-ascii?Q?GdJGS/Ylaasu1L0QGPvsa8RHiL2WTVCG+t0pcFAkNs+Q3xtpo0l1OUaSu085?=
- =?us-ascii?Q?3+541T3kj9TPm42Fr6LpPT86pe27pTgIn+31YsA3rCaLM3+qJd4RYz1w1xQV?=
- =?us-ascii?Q?wkMY9G7VaiTfNS69/XhVr7FVa/aAdnOOocUV7R+nFMpDCbtquSxQkGb2wo+a?=
- =?us-ascii?Q?t1HuYipiVC6+g464IfODehiTsjrnU4dDWxKsbvVd2VhnvATsTV2c/fvcLFrY?=
- =?us-ascii?Q?HwHY3UAhbvjCVJiqEiBYxucykvVoa4sqiarF7i+j9GBWBWgxUmfzyUHkanCw?=
- =?us-ascii?Q?Z1XMTiLKH/0q4ut5ulNlt70UMHVCAo0rVd/irV1zkJyc1+a+85flNvulqV0X?=
- =?us-ascii?Q?nNAa/K4Vl5dVCpefXDEpNuJbc6yu45zqI7oadvOy08qCO6qw6fA+pbgQ0Uw2?=
- =?us-ascii?Q?vLSYJRZjOWiYRuoylsjYrUI7YF09H5BHJWcIUPd86b2rnkfjDPgKT0nFGPVT?=
- =?us-ascii?Q?uDlJMWs2UYfF+L3tXh8ebZmWto3Q1h8lUWBP3at7HjGGvryqUVk0nfwuxegH?=
- =?us-ascii?Q?8HfQ0EGSAC0ggi97zsuFo2k=3D?=
+ =?us-ascii?Q?l6jB6zOcDw4QgWj/DA7tMb3ZoDcAMuji4ZZJqUpl4W7uk+oKZY0d7SjW2/Dq?=
+ =?us-ascii?Q?DeFeSssgFZ3BIJEBPZbsGCUkPpdADy+OXlu5+tpEk8uM5Obc2AtB06AleZ7k?=
+ =?us-ascii?Q?Ftfqc1TyO0HXWYiXMFgRpiggHoairiRrdUZgAdLyykA1Jvbdl77faT+jTWtU?=
+ =?us-ascii?Q?vW4PIB4u6NyReKYNPJ1aVuG5noIo7e1Z5M2WKc4U0f29AL8neithlRq0426b?=
+ =?us-ascii?Q?BbxbfN1dPlFRLdiDMcX8hWtmOzhGUnc14tXI+RK0HHJuhzG0zB9MI8NJE99O?=
+ =?us-ascii?Q?i5SDS/2/XPFJbOmVPiA2apjgnc0EHRLjLXZGsgautZE9lUx/nE54GerwUlrl?=
+ =?us-ascii?Q?GoXyPItSavvzYkuWD5xGrK5dUaY9jqpQ+AZOMON61hOhAlIuPezbAAXEqcPm?=
+ =?us-ascii?Q?oTvUkltuWzrUXKUaKgzVFlJW6e+OXZetJFEvJbm/OVCI6EzfNYoEp9NTDXDp?=
+ =?us-ascii?Q?rJTU3Ms45ZMz0VTxlKi6xmE9KIkqFcOVPAjKk2RZdgd0+FzFornBYsVWZsPv?=
+ =?us-ascii?Q?KRg1Vm4jn/eYRydqZVHL+Kf3Fq23TAXiL4wwvQjeHtIA0bUs/UBRKfoAar0N?=
+ =?us-ascii?Q?BladPjuvrbRJK5tfFqGDtxJ4Aovx106AEngjvanYHOVCxAdENZHvMiCI0OyB?=
+ =?us-ascii?Q?aPQQyE8Y1NuZ+rhkViz5HYDcEhJ7mKlCOUTGQOXKhoJAtxob53X7Kbuj98Z3?=
+ =?us-ascii?Q?6pAGCQS3Bb1foOpELgkVnBzVy+Ea5X3XyVIaukcIylBg+AMnSgQi1WisQ8l8?=
+ =?us-ascii?Q?t/TtHSlPgPHt8IEFmK+D34e6dqtDCE69+5dK1tDBYE3dOJioIXxRQCMSDcha?=
+ =?us-ascii?Q?OpuIhiL+z+ERUL87hXOtcO4e8KxhqncpAVft/ibuGyrJCW2qBlfSw0iBYAJX?=
+ =?us-ascii?Q?dhOaxhd3G2ltX0+07KKjduOlZNvjDzrzNTGGfeINR2F/4CEjnA/i1ZD27gR4?=
+ =?us-ascii?Q?U2FLs8g4hWYkrAJbvBwQILLutbYfRnrkKFhe5OnVvGuaY3kfNvB/2oWlzrSX?=
+ =?us-ascii?Q?nShI3wKQDMlt6EhChcCyAA7tSjh6nitb0eluUJz9h+AbbY8ZyvA3kVSD7QA+?=
+ =?us-ascii?Q?xtUifJxz/7eji5ejnQRAdjDh8z0CoYNKa7Rg/QY2eJXtTxKYajpIrbdKp5Xb?=
+ =?us-ascii?Q?oRpxMDQVKRPvCIXBFWC1Z6zHTI9QseA7Cn/moPlTJl4l2VRGYABmtOo5viHk?=
+ =?us-ascii?Q?q+BTON9X6NNjioDBvdWkN+ssNFAtdk8IPGfpZFkbDuR0dd5RoiKP9aYJJaqB?=
+ =?us-ascii?Q?ohOKF0RI2mUZ6uenbIJyBk47/5++JneGru5uYXDb4BfptxOchmB61XgObODw?=
+ =?us-ascii?Q?4qhDVoyTO53cJfGDy8adrIgjtqO34kD4ZqKt5CUPZxIKelHKvD3Foquvnw14?=
+ =?us-ascii?Q?+FMLdE0V93riRQrz4C1+H/CLcmhRrZVStCyniXAbOO37G5W9/hkEY0nGDfRJ?=
+ =?us-ascii?Q?WgC2g73FoNCjdAQQUG6uZh3pe1ovGLl7nCPcF6YbZwncYORFy8ufRWN0MJA+?=
+ =?us-ascii?Q?cmaH4K2ZR1sYyqND3VZaA0KtFPC4F3mhgQw883+4Qm9Dwpc+mRMDb7yNdZ5X?=
+ =?us-ascii?Q?exIPXBOFXYgxMOKLPa9ea2aWkznqoZxg6RNyPwwB9wbXM7x5uXykz4AXddjC?=
+ =?us-ascii?Q?xkMD6pVazF14wtFjm1E2UJs=3D?=
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <F7C23EB0AE8D3042A2E541AD8341A705@namprd04.prod.outlook.com>
+Content-ID: <B6FD3898A14F964F8854355B80F3BE82@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -158,138 +154,209 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	JV1LasKEz/8mQF2jr0mSeWKwZi0qoV/mKZMFhnOGFn1hYP832NwtNyu0CW+G4t4vJAFNPi1YHnF50B70fZA++e8lImyXaKyprpx2xEwa/9tpKhJVsorsWmif6WvWLkX5LDBCTv86vLsOQU0T+zFw7PZMyLqCPECucVvCnQB+Tj3saS+sZPeLwkNy39ZcT1oHygp6j22y3O0xR2xTDt0ooNkTXURzJcRObd9RA/StsjjQaRUG0vi2zIuegeqVvdWd7VZT3UblQGkI8kZjkH3eoHHi6XvSNBpXtx/iv8fal1te4c47gQQ6AZ1xGcZCf4JebCoA9C0S9PNdDY0rekarwdV7FJNtCnnw0Lbb28o9aaDq+R2Y1nVhlpeeBl1/be4oO3Q2bLABTjHX4NurNIAyCrvZKCzTl+NHmp/xMZ69xbgoH4kCXTEjdiHH6GTaZEwVlXQqzaIxU3lQM2wxOi5Ysb0+R5MGmZ061p7EZAXS46gHZDJ9YMLJP/WULKSgDk/Cx3WX3tjUdyCcCwLds0sYX9Ms0WSmV9eUXqLBZMQMIZfC7iOKqwheR6nEEu3rtwfUS0Bove9ruE4oCpGZI1Dk8Ff1YPcRxEuOZmm1G7e9yMQ9rklItn07Qy0B0838Zh0x
+	QzqwdZgzlZ+I0AEKHZHHhlv4x3m01fGBYD6eISHfrxv0H5nCXpnH7somsjhX3bWesQNvfx2/YNGdYUv5bY2s37FoVzWNBvV/GI6zQP2wu4c8X7RnkfnjV7yBX3ioht1bvnwhSNNPCl7oETYijaNG5/KxaxysuKNRhDDcOKjNb5wc52nmCHJj3+Kp2H8yOyk6Xr52r1VtXGi+dWr45lBAQgvzI+KZCd90BYHugoetSvOdWSlxdf+ir+dflfgr7VJ0PPkd3PJi8Ys8RNJuW1KIxD4GZNk1FAz4PdH3gUsX8yzHuS1CAQrUPT+3WIrMEXT4Q/hrw8BsHgVonNmNHCqZCR3C6ZS/q3cqJG0Tk+ayf3fXafwVsdkjgPXmXq8+HFfqssMIDVDEiKL42KgLbDDAWu0Ly3EWFT3hgDUukPB9bMuYKJqNzpU69XgjXanGac9L/N3Sc8vZvmr2ohFQHcN2B9Txw2DcqLeA8JyXpgg6K9sIUVrd2XV482sequxviM0x5h7yu74GF6L02GjQTyFwvuzBNLqdnNgomBYrNP0JYv3zZWCovm8RsqSzb+cVsC8SwE+Py8EKy3efail0+EAiPtMua4ZXZyEIvunSxLgTqfOP0EzvCFP7RLVYe9Z1V2tR
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2faf532e-2b86-4957-6a59-08dcffb24436
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2024 05:00:29.2878
+X-MS-Exchange-CrossTenant-Network-Message-Id: ce2fbec9-e6bd-45b4-acf4-08dcffb52e08
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2024 05:21:20.6015
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: EjQYJV5tMSQTIE4VMCO+EQ5Iu4oWTn9VUbZUbosocLdqeETBXDP+O/Cxylqv/Ss/q5yBWhSCDPN3voyj7Mcg4RF+kXasTFpO3DLcUmff+2Y=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6455
+X-MS-Exchange-CrossTenant-userprincipalname: 330+Jc8Nd3EYvNMeKj0CXsg0k/3OtFkErK0rjc9Y762Xt++Q12K8Tl6zvcvufHzaAHEE3bAu/xi26MV5DI8zpD9yjrmXim5zI4wuJmnFSRo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7833
 
-On Nov 06, 2024 / 13:13, Daniel Wagner wrote:
-> On Wed, Nov 06, 2024 at 03:46:26AM GMT, Chaitanya Kulkarni wrote:
-> > On 11/4/24 23:02, Daniel Wagner wrote:
-> > > On Mon, Nov 04, 2024 at 11:29:07AM GMT, Chaitanya Kulkarni wrote:
-> > >> +# Test nvmet-wq cpumask sysfs attribute with NVMe-oF and fio worklo=
-ad=20
-> > > What do you want to test here? What's the objective? I don't see any=
-=20
-> > > block layer related parts or do I miss something?=20
-> >=20
-> > For NVMeOF target we have exported nvmet-wq to userspace with
-> > recent patch. This behavior is new and I don't think there is any test
-> > exists that runs the fio workload while changing the CPUMASK randomly
-> > to ensure the stability for nvmet-wq when application is using the bloc=
-k
-> > layer. Hence we need the test for latest patch we have added to the
-> > 6.13.
+On Nov 04, 2024 / 11:29, Chaitanya Kulkarni wrote:
+> Add a test that randomly sets the cpumask from available CPUs for
+> the nvmet-wq while running the fio workload. This patch has been
+> tested on nvme-loop and nvme-tcp transport.
 >=20
-> Though this is not a performance measurement just a functional testing if
-> the scheduler works. I don't think we should add such tests
-> because it will add to the overall runtime for little benefit. I am
-> pretty sure there already tests (e.g. kunit) which do more elaborate
-> scheduler tests.
+> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
 
-When I ran the test case on my test system using the kernel v6.12-rc6 and t=
-he
-patch "nvmet: make nvmet_wq visible in sysfs", I observed a kernel INFO [1]=
-.
-This INFO looks indicating a bug in nvmet driver. Is this a known issue? Th=
-e
-INFO is stably recreated with loop, rdma and tcp transports on my test syst=
-em.
+Thanks. As I noted in another mail, this test case generates a kernel
+INFO message, and it looks like catching a new bug. So I think this
+test case worth adding. Please find my review comments in line.
 
-If this is a new, unknown issue, this test case a good test to exercise nvm=
-et
-driver. It looks worth adding to blktests.
+> ---
+>  tests/nvme/055     | 99 ++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/nvme/055.out |  3 ++
+>  2 files changed, 102 insertions(+)
+>  create mode 100755 tests/nvme/055
+>  create mode 100644 tests/nvme/055.out
+>=20
+> diff --git a/tests/nvme/055 b/tests/nvme/055
+> new file mode 100755
+> index 0000000..9fe27a3
+> --- /dev/null
+> +++ b/tests/nvme/055
+> @@ -0,0 +1,99 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0+
+> +# Copyright (C) 2024 Chaitanya Kulkarni
+> +#
+> +# Test nvmet-wq cpumask sysfs attribute with NVMe-oF and fio workload
+> +#
+> +
+> +. tests/nvme/rc
+> +
+> +DESCRIPTION=3D"Test nvmet-wq cpumask sysfs attribute with fio on NVMe-oF=
+ device"
+> +TIMED=3D1
+> +
+> +requires() {
+> +	_nvme_requires
+> +	 _have_fio && _have_loop
 
-As for the runtime cost, I think the test case can be modified to reflect t=
-he
-TIMEOUT variable users set. This will allow users to control the runtime co=
-st to
-some extent.
+Nit, a unneccesaary space.
 
-[1]
+> +	_require_nvme_trtype_is_fabrics
+> +}
 
-[   87.365354][  T963] run blktests nvme/055 at 2024-11-08 09:32:42
-[   87.433572][ T1011] loop0: detected capacity change from 0 to 2097152
-[   87.452511][ T1014] nvmet: adding nsid 1 to subsystem blktests-subsystem=
--1
-[   87.478018][ T1019] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
-[   87.565565][  T226] nvmet: creating nvm controller 1 for subsystem blkte=
-sts-subsystem-1 for NQN nqn.20.
-[   87.570700][ T1026] nvme nvme1: Please enable CONFIG_NVME_MULTIPATH for =
-full support of multi-port dev.
-[   87.573064][ T1026] nvme nvme1: creating 4 I/O queues.
-[   87.577041][ T1026] nvme nvme1: mapped 4/0/0 default/read/poll queues.
-[   87.580437][ T1026] nvme nvme1: new ctrl: NQN "blktests-subsystem-1", ad=
-dr 127.0.0.1:4420, hostnqn: nq9
-[  101.337422][ T1073] nvme nvme1: Removing ctrl: NQN "blktests-subsystem-1=
-"
-[  101.383814][  T104] INFO: trying to register non-static key.
-[  101.384456][  T104] The code is fine but needs lockdep annotation, or ma=
-ybe
-[  101.385136][  T104] you didn't initialize this object before use?
-[  101.385758][  T104] turning off the locking correctness validator.
-[  101.386392][  T104] CPU: 1 UID: 0 PID: 104 Comm: kworker/u16:4 Not taint=
-ed 6.12.0-rc6+ #361
-[  101.387197][  T104] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996=
-), BIOS 1.16.3-3.fc41 04/01/204
-[  101.388109][  T104] Workqueue: nvmet-wq nvmet_tcp_release_queue_work [nv=
-met_tcp]
-[  101.388868][  T104] Call Trace:
-[  101.389203][  T104]  <TASK>
-[  101.389484][  T104]  dump_stack_lvl+0x6a/0x90
-[  101.389927][  T104]  register_lock_class+0xe2a/0x10a0
-[  101.390444][  T104]  ? __lock_acquire+0xd1b/0x5f20
-[  101.390921][  T104]  ? __pfx_register_lock_class+0x10/0x10
-[  101.391479][  T104]  __lock_acquire+0x81e/0x5f20
-[  101.391939][  T104]  ? lock_is_held_type+0xd5/0x130
-[  101.392434][  T104]  ? find_held_lock+0x2d/0x110
-[  101.392891][  T104]  ? __pfx___lock_acquire+0x10/0x10
-[  101.393399][  T104]  ? lock_release+0x460/0x7a0
-[  101.393853][  T104]  ? __pfx_lock_release+0x10/0x10
-[  101.394351][  T104]  lock_acquire.part.0+0x12d/0x360
-[  101.394841][  T104]  ? xa_erase+0xd/0x30
-[  101.395255][  T104]  ? __pfx_lock_acquire.part.0+0x10/0x10
-[  101.395793][  T104]  ? rcu_is_watching+0x11/0xb0
-[  101.396271][  T104]  ? trace_lock_acquire+0x12f/0x1a0
-[  101.396770][  T104]  ? __pfx___flush_work+0x10/0x10
-[  101.397266][  T104]  ? xa_erase+0xd/0x30
-[  101.397658][  T104]  ? lock_acquire+0x2d/0xc0
-[  101.398089][  T104]  ? xa_erase+0xd/0x30
-[  101.398501][  T104]  _raw_spin_lock+0x2f/0x40
-[  101.398933][  T104]  ? xa_erase+0xd/0x30
-[  101.400167][  T104]  xa_erase+0xd/0x30
-[  101.401359][  T104]  nvmet_ctrl_destroy_pr+0x10e/0x1c0 [nvmet]
-[  101.402767][  T104]  ? __pfx_nvmet_ctrl_destroy_pr+0x10/0x10 [nvmet]
-[  101.404235][  T104]  ? __pfx___might_resched+0x10/0x10
-[  101.405558][  T104]  nvmet_ctrl_free+0x2f0/0x830 [nvmet]
-[  101.406900][  T104]  ? lockdep_hardirqs_on+0x78/0x100
-[  101.408192][  T104]  ? __cancel_work+0x166/0x230
-[  101.409398][  T104]  ? __pfx_nvmet_ctrl_free+0x10/0x10 [nvmet]
-[  101.410726][  T104]  ? rcu_is_watching+0x11/0xb0
-[  101.411938][  T104]  ? kfree+0x13e/0x4a0
-[  101.413073][  T104]  ? lockdep_hardirqs_on+0x78/0x100
-[  101.414318][  T104]  nvmet_sq_destroy+0x1f2/0x3a0 [nvmet]
-[  101.415556][  T104]  nvmet_tcp_release_queue_work+0x4c0/0xe40 [nvmet_tcp=
-]
-[  101.416912][  T104]  process_one_work+0x85a/0x1460
-[  101.418064][  T104]  ? __pfx_lock_acquire.part.0+0x10/0x10
-[  101.419266][  T104]  ? __pfx_process_one_work+0x10/0x10
-[  101.420427][  T104]  ? assign_work+0x16c/0x240
-[  101.421486][  T104]  ? lock_is_held_type+0xd5/0x130
-[  101.422555][  T104]  worker_thread+0x5e2/0xfc0
-[  101.423574][  T104]  ? __pfx_worker_thread+0x10/0x10
-[  101.424639][  T104]  kthread+0x2d1/0x3a0
-[  101.425587][  T104]  ? _raw_spin_unlock_irq+0x24/0x50
-[  101.426644][  T104]  ? __pfx_kthread+0x10/0x10
-[  101.427637][  T104]  ret_from_fork+0x30/0x70
-[  101.428596][  T104]  ? __pfx_kthread+0x10/0x10
-[  101.429562][  T104]  ret_from_fork_asm+0x1a/0x30
-[  101.430535][  T104]  </TASK>=
+I suggest to add set_conditions() here as below. Without it, the test case =
+is
+skipped when users do not se NVMET_TRTYPES variable. If we add set_conditio=
+ns(),
+_have_loop call in requires() can be removed.
+
+set_conditions() {
+       _set_nvme_trtype "$@"
+}
+
+> +
+> +cleanup_setup() {
+> +	_nvme_disconnect_subsys
+> +	_nvmet_target_cleanup
+> +}
+> +
+> +test() {
+> +	local cpumask_path=3D"/sys/devices/virtual/workqueue/nvmet-wq/cpumask"
+> +	local original_cpumask
+> +	local min_cpus
+> +	local max_cpus
+> +	local numbers
+> +	local idx
+> +	local ns
+> +
+> +	echo "Running ${TEST_NAME}"
+> +
+> +	_setup_nvmet
+> +	_nvmet_target_setup
+> +	_nvme_connect_subsys
+> +
+> +	if [ ! -f "$cpumask_path" ]; then
+> +		SKIP_REASONS+=3D("nvmet_wq cpumask sysfs attribute not found.")
+> +		cleanup_setup
+> +		return 1
+> +	fi
+> +
+> +	ns=3D$(_find_nvme_ns "${def_subsys_uuid}")
+> +
+> +	original_cpumask=3D$(cat "$cpumask_path")
+> +
+> +	num_cpus=3D$(nproc)
+> +	max_cpus=3D$(( num_cpus < 20 ? num_cpus : 20 ))
+> +	min_cpus=3D0
+> +	#shellcheck disable=3DSC2207
+> +	numbers=3D($(seq $min_cpus $max_cpus))
+
+Nit: the shellcheck error can be vaoided with this:
+
+        read -a numbers -d '' < <(seq $min_cpus $max_cpus)
+
+> +
+> +	_run_fio_rand_io --filename=3D"/dev/${ns}" --time_based --runtime=3D130=
+s \
+
+The --time_based and --runtime=3D130s options are not required, because fio=
+ helper
+bash functions will add them.
+
+Instead, let's add this line before the fio command.
+
+         : ${TIMEOUT:=3D60}
+
+The fio helper functions will refect this TIMEOUT value to the --runtime
+option. This will allow users to control runtime cost as TIMED=3D1 indicate=
+s.
+
+> +			 --iodepth=3D8 --size=3D"${NVME_IMG_SIZE}" &> "$FULL" &
+> +
+> +	# Let the fio settle down else we will break in the loop for fio check
+> +	sleep 1
+> +	for ((i =3D 0; i < max_cpus; i++)); do
+> +		if ! pgrep -x fio &> /dev/null ; then
+
+pgrep command is not in the GNU coreutils. I suggest to keep the fio proces=
+s id
+in a variable and check with "kill -0" command. The test case block/005 doe=
+s it.
+
+> +			break
+> +		fi
+> +
+> +		if [[ ${#numbers[@]} -eq 0 ]]; then
+> +			break
+> +		fi
+> +
+> +		idx=3D$((RANDOM % ${#numbers[@]}))
+> +
+> +		#shellcheck disable=3DSC2004
+> +		cpu_mask=3D$(printf "%X" $((1 << ${numbers[idx]})))
+> +		echo "$cpu_mask" > "$cpumask_path"
+
+When I ran this test case, I observed an error at this line:
+
+    echo: write error: Value too large for defined data type
+
+I think the cpu_mask calculation is wrong, and it should be like this:
+
+               cpu_mask=3D0
+               for ((n =3D 0; n < numbers[idx]; n++)); do
+                       cpu_mask=3D$((cpu_mask + (1 << n)))
+               done
+               cpu_mask=3D$(printf "%X" $((cpu_mask)))
+
+
+> +		if [[ $(cat "$cpumask_path") =3D~ ^[0,]*${cpu_mask}\n$ ]]; then
+> +			echo "Test Failed: cpumask was not set correctly "
+> +			echo "Expected ${cpu_mask} found $(cat "$cpumask_path")"
+> +			cleanup_setup
+> +			return 1
+> +		fi
+> +		sleep 3
+> +		# Remove the selected number
+> +		numbers=3D("${numbers[@]:0:$idx}" "${numbers[@]:$((idx + 1))}")
+> +	done
+> +
+> +	killall fio &> /dev/null
+
+killall is not in GNU coreutils either (blktests already uses it at other
+places though...)   Does "kill -9" work instead?
+
+> +
+> +	# Restore original cpumask
+> +	echo "$original_cpumask" > "$cpumask_path"
+> +	restored_cpumask=3D$(cat "$cpumask_path")
+> +
+> +	if [[ "$restored_cpumask" !=3D "$original_cpumask" ]]; then
+> +		echo "Failed to restore original cpumask."
+> +		cleanup_setup
+> +		return 1
+> +	fi
+> +
+> +	cleanup_setup
+> +	echo "Test complete"
+> +}
+> diff --git a/tests/nvme/055.out b/tests/nvme/055.out
+> new file mode 100644
+> index 0000000..427dfee
+> --- /dev/null
+> +++ b/tests/nvme/055.out
+> @@ -0,0 +1,3 @@
+> +Running nvme/055
+> +disconnected 1 controller(s)
+> +Test complete
+> --=20
+> 2.40.0
+> =
