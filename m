@@ -1,88 +1,48 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C761D0400;
-	Fri,  8 Nov 2024 15:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D01C8CE;
+	Fri,  8 Nov 2024 15:05:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731078228; cv=none; b=Qynit+vu8cyvj3FxoDnXLV9r4mh6aRd2DwDbDa/M2AbHGcrfX+92LxBsIuAp+OoBiGxdH5QpFZKIuTAMxEeQs/fM5nedVkKaau6aNp+FKryX7GTMqTrLpsJCfgugMtQfYXaKVnxQ9NAPb3K31L2SoUIN2EpcYZu0c8gcRPqfIoY=
+	t=1731078312; cv=none; b=dYFN2sxvmDI2/9NqsVP1FrsAwrhUNiXSPD1lb/26xtt+Rh05LfMgDyrFFsRxE57YZr8KjuWU2SJTg4mnOgkL4dXo7yh7uOFe9rwZEACZD5ROILgocm7Wt0MzjMRSMc2CPIWtkMvCINnfm6zWnki5n9rqXIY5YxCoRv1230tEznY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731078228; c=relaxed/simple;
-	bh=F2BBCV5UtSfasZHSEbvfSPmOvKCtm5srso/IOGQxV60=;
+	s=arc-20240116; t=1731078312; c=relaxed/simple;
+	bh=OIsdftTaHk1yZNuKlnX6gWl7hjUIgMKtYk0UjJl66XU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IWs+0Hk2YQjNuHjG2RC+KwaY3or69SKvvUZ58FDA7kWIeyqri83Rn+j6R+Ap9GTnNRKR9TGj/PEO7iSltkfHkhD2stnW40T41oGEyHoldc+kKZ12em4uqoKAiDgz76D1dtZGGVqKf+Tj77gr6TgETaFjm0WuGNiBGANFW3BSfgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=xDwP9Iku; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WSrHRIUN; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=xDwP9Iku; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=WSrHRIUN; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xDwP9Iku";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WSrHRIUN";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xDwP9Iku";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="WSrHRIUN"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 873081FF98;
-	Fri,  8 Nov 2024 15:03:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1731078224;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VJE4Kk/PK6/AdtEAxBANfQL9F2PVsBSMImx2Gx8nC4A=;
-	b=xDwP9IkunwwfK6Te4YiEGV22jj6jTI41X0cYpvjaI7anGA6aAEEG7RMPq4L6Vu2tObcK24
-	zkU8jYFUyEY3XxLJpC57KGIL7wx4OayFp7RJPrgiFP5mCpZAM/suCvrVcoyyPQrOJ4KYPO
-	u/Y6hGKx2WLq8YU4vnfQA7uSYpZUtBc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1731078224;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VJE4Kk/PK6/AdtEAxBANfQL9F2PVsBSMImx2Gx8nC4A=;
-	b=WSrHRIUNs6iFnRE/8DSLlsHF+k9S8m6YpNBSQH60nU/tBVTUvoW0CVqNLbKQ2QVoILTKuG
-	EpyekGqnMkgAoxCw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1731078224;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VJE4Kk/PK6/AdtEAxBANfQL9F2PVsBSMImx2Gx8nC4A=;
-	b=xDwP9IkunwwfK6Te4YiEGV22jj6jTI41X0cYpvjaI7anGA6aAEEG7RMPq4L6Vu2tObcK24
-	zkU8jYFUyEY3XxLJpC57KGIL7wx4OayFp7RJPrgiFP5mCpZAM/suCvrVcoyyPQrOJ4KYPO
-	u/Y6hGKx2WLq8YU4vnfQA7uSYpZUtBc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1731078224;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VJE4Kk/PK6/AdtEAxBANfQL9F2PVsBSMImx2Gx8nC4A=;
-	b=WSrHRIUNs6iFnRE/8DSLlsHF+k9S8m6YpNBSQH60nU/tBVTUvoW0CVqNLbKQ2QVoILTKuG
-	EpyekGqnMkgAoxCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5CECA1394A;
-	Fri,  8 Nov 2024 15:03:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id cLY1FlAoLmfgEQAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Fri, 08 Nov 2024 15:03:44 +0000
-Date: Fri, 8 Nov 2024 16:03:43 +0100
-From: David Sterba <dsterba@suse.cz>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
-	Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org
-Subject: Re: fix a few zoned append issues v2 (now with Ccs)
-Message-ID: <20241108150343.GN31418@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20241104062647.91160-1-hch@lst.de>
- <20241108144857.GA8543@lst.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IjAQWX4IB43OZRUOeRQfaAvr8LOc1H1dxKjP4oV4YZDR1SAWv+QF43vMk4p361q+fiPmXAjMm7jrnnBzkWRveR6ZLBD+8/BZJwXKbbO/ycoeXbMmPnOA22R5Whv10mHfSxhbU09iKClbn7V2RjJaY/34Gn6Em0s6kJmH9u+UdfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 0848268AA6; Fri,  8 Nov 2024 16:05:01 +0100 (CET)
+Date: Fri, 8 Nov 2024 16:05:00 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Christoph Hellwig <hch@lst.de>, Robin Murphy <robin.murphy@arm.com>,
+	Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org, matthew.brost@intel.com,
+	Thomas.Hellstrom@linux.intel.com, brian.welty@intel.com,
+	himal.prasad.ghimiray@intel.com, krishnaiah.bommu@intel.com,
+	niranjana.vishwanathapura@intel.com
+Subject: Re: [PATCH v1 00/17] Provide a new two step DMA mapping API
+Message-ID: <20241108150500.GA10102@lst.de>
+References: <cover.1730298502.git.leon@kernel.org> <3567312e-5942-4037-93dc-587f25f0778c@arm.com> <20241104095831.GA28751@lst.de> <20241105195357.GI35848@ziepe.ca> <20241107083256.GA9071@lst.de> <20241107132808.GK35848@ziepe.ca> <20241107135025.GA14996@lst.de> <20241108150226.GM35848@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -91,39 +51,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241108144857.GA8543@lst.de>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Score: -4.00
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Level: 
+In-Reply-To: <20241108150226.GM35848@ziepe.ca>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, Nov 08, 2024 at 03:48:57PM +0100, Christoph Hellwig wrote:
-> On Mon, Nov 04, 2024 at 07:26:28AM +0100, Christoph Hellwig wrote:
-> > Hi Jens, hi Damien, hi btrfs maintainers,
-> 
-> How should we proceed with this?  Should Jens just pick up the block
-> bits and the btrfs maintainers pick up the btrfs once they are
-> ready and the block bits made it upstream?
+On Fri, Nov 08, 2024 at 11:02:26AM -0400, Jason Gunthorpe wrote:
+> It is fully OK? Can't dma_map_page() trigger swiotlb? It must not do
+> that for P2P. How does it know the difference if it just gets a phys?
 
-Sounds ok for me from the btrfs side.
+dma_direct_map_page checks for p2p pages in the swiotlb bounce
+path already in the current kernel, and dma_map_sg relies on exactly
+that check to prevent bouncing for p2p.
+
