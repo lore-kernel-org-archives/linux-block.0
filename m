@@ -1,36 +1,58 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091517464;
-	Fri,  8 Nov 2024 05:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7B81CB333;
+	Fri,  8 Nov 2024 05:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731044731; cv=none; b=dMzPp+3pQbUNR8lrwInNbcT8NR9L51wdFUBdKPccnHUBSrriztLA2aDFx+zJmD1okdKH3gYwfoUxpzTZlrgYweX3Szzpu15nEEqwP8z6NicddXvmQ4h0rQvAlhaSvfKKmf5LSBMR9zqzWuMpmuj88osKTCeMBhWAKTCMxS04b9M=
+	t=1731045001; cv=none; b=qgP478Myi7CBjFvx9l1UBLH/GEivaVK7rivnYfCAY25rn8BYO2Er0+0BP2snFuBObIuWX9u4CBMnrV6ekF2Hfjn1V9409zVycJLoQ0gE0O096AFFQnnR3W0zP4TR2XHQ1uDiteci4qp8HfX1suEAp6SeJ6BBWni1y1uQRAU6rpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731044731; c=relaxed/simple;
-	bh=VLlq4g5rm4UHn+2jdmGwFnyCo7uIRE8W8YkYXJ4bG74=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=L3ucB4pbEPtFH7xjsnIM0zYGGCFtP3V22HOKjm1TZZODmET1lowZxZ1/ZPpVOsYIlqUU2BlaVyYvsCHiHaeKDre8q5QnMUpv7e/VWcU1qbCxsEe2Jf8QfLC5mFtFIfru2GrxZa0GFeclYspe0NCh0/13x12KA2fa2G62hjLWfng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=S18GCDHG; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="S18GCDHG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=Bt+Jk
-	l72MFjik7CIlL5r5sM/qwYsSKvqIcgcbWbeB50=; b=S18GCDHG8TZi8o/FltuTG
-	aVb7XA51TD5ixr+NDjRsNqbOG6fZv54o37HtxdG5h004MNOzvCJmOUilNJ+M0n9a
-	8eIOr3wJlPBfevpARDNbKpKQcNmzOIKychR2up0JtAAWuzM7PoVl1P0W+KQxt4mO
-	HIqmBDZ9r/ZkU5kgHKkRKs=
-Received: from localhost.localdomain (unknown [111.35.191.191])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgCHoyxdpS1nIJ8PCw--.6298S4;
-	Fri, 08 Nov 2024 13:45:16 +0800 (CST)
-From: David Wang <00107082@163.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
+	s=arc-20240116; t=1731045001; c=relaxed/simple;
+	bh=4xR53PDd98NzuHtm+coyCSCBhYZ8NGUQWuYXvFMdskQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eD8SP7VdmJhJS/IgRdpNv9PTvzHSnSXH301X1GRuCi29+P+m25uXIWXH4/e9/L6BhKGMOhhjiOOBVxKVdwsUwq4mFs8Ecbqcub2GUxkWUwBY36EjpaI/kvWR+1iUx/DtDM5EXjuzqHoOfJ89q49HhwdTdeE7FqmBBXFQwrZMhJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4315abed18aso15432005e9.2;
+        Thu, 07 Nov 2024 21:49:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731044997; x=1731649797;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yjrFbWx5GMxfzojIwOC1+rm9ruecZ0O8uYiOirOduV4=;
+        b=lk5++fyipn5yUAby0jDAHMsntnxlf1XKhjOVNmAzai+LkW/Wrlk8HWPq+UlEMMcx//
+         J3gBHK+IeilUvik6VQ6KJ9URcFgQWbJPSUgFCB9dsapSMukAe+P6Y1RKtHJt06XBGQ4I
+         2uCfnvEUJJOuhXyiGt7weXvU89Sw1O2JAiLPNoSNP617DCKrgFfAMDNFrPK8gI500L16
+         uCn+RdyxECGYz5VvCBGajq4vaLMs4fr1Jz7qa0iyyOAO9WtnJVjZCdu2NuM5z8hc1TUP
+         DSLw70WEmt9PKChJKidDrwse2lynH7wHhN5LEL5drWm2wsg4bE76XcjSdmkqqpXxoj0Q
+         CWEw==
+X-Forwarded-Encrypted: i=1; AJvYcCW5LDzcjSwQ83GMtGIMkJ3Kg0Puhx7Kn3vTwsjTHI38+3Rf2jWmH4N20dUHxV9z6rstQex2s285@vger.kernel.org, AJvYcCWMEsV2+rbOUnA+8mamXUIcAdVarfgWBKiaJn+/vza86om9pDyuFgYyBrFc1zu4YnZU6paYJNmLoyc/3tH9@vger.kernel.org, AJvYcCX4EcyoryQvFD8Q64u0MTCE5aWTcBz7Ri1o5jDbxM9poUsZngYadubn4OjkMEa5Y1caydAOSh8488uFzZU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk8Hw9+47n7PQ1f6zbecPT91UDEpBoR0KKJ9tO+VGQGSvlufVS
+	eRcUqZVWFMTt3n1MGYoRs3jex/GJYM5lwOMOt4bANhoEau8olIc0yGwvbVXeYJk=
+X-Google-Smtp-Source: AGHT+IFzviccxJHzJWJN3Rz0zs35SXPPkUsqbCz5gPgCEJvg2M+bZQVPkHvz/bBLz2AFkrOMflrFOA==
+X-Received: by 2002:a05:6000:470f:b0:37d:5113:cdff with SMTP id ffacd0b85a97d-381f18805c8mr1209692f8f.37.1731044997106;
+        Thu, 07 Nov 2024 21:49:57 -0800 (PST)
+Received: from costa-tp.redhat.com ([2a00:a041:e280:5300:9068:704e:a31a:c135])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05c26e3sm50505655e9.33.2024.11.07.21.49.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 21:49:55 -0800 (PST)
+From: Costa Shulyupin <costa.shul@redhat.com>
+To: ming.lei@redhat.com,
+	Jens Axboe <axboe@kernel.dk>,
+	Waiman Long <longman@redhat.com>,
+	Zefan Li <lizefan.x@bytedance.com>,
+	Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	David Wang <00107082@163.com>
-Subject: [PATCH] block:genhd:/proc/diskstats: use seq_put_decimal_ull for decimal values
-Date: Fri,  8 Nov 2024 13:45:00 +0800
-Message-Id: <20241108054500.4251-1-00107082@163.com>
-X-Mailer: git-send-email 2.39.2
+	cgroups@vger.kernel.org
+Cc: Costa Shulyupin <costa.shul@redhat.com>
+Subject: [RFC PATCH v1] blk-mq: isolate CPUs from hctx
+Date: Fri,  8 Nov 2024 07:48:30 +0200
+Message-ID: <20241108054831.2094883-3-costa.shul@redhat.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,122 +60,108 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgCHoyxdpS1nIJ8PCw--.6298S4
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWr1rKr4fJw1fXFyrKF1Dtrb_yoWrWF1Up3
-	ZIk3Z5X3yfJas0gF15Aws2gFWUJFyUZFyqvwsIyrWxW3Z0vw17Xr4fArZ7ta4UW39Fka1U
-	Zr17Wa47KF4rXaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRn2-nUUUUU=
-X-CM-SenderInfo: qqqrilqqysqiywtou0bp/1tbiqRSRqmctoVRm6wAAs0
 
-seq_printf is costy, for each block device, 19 decimal values are
-yielded in /proc/diskstats via seq_printf; On a system with 16
-logical block devices, profiling for open/read/close sequences
-shows seq_printf took ~75% samples of diskstats_show:
+The housekeeping CPU masks, set up by the "isolcpus" and "nohz_full"
+boot command line options, are used at boot time to exclude selected
+CPUs from running some kernel housekeeping subsystems to minimize
+disturbance to latency sensitive userspace applications such as DPDK.
+This options can only be changed with a reboot. This is a problem for
+containerized workloads running on OpenShift/Kubernetes where a
+mix of low latency and "normal" workloads can be created/destroyed
+dynamically and the number of CPUs allocated to each workload is often
+not known at boot time.
 
-	diskstats_show(92.626% 2269372/2450040)
-	    seq_printf(76.026% 1725313/2269372)
-		vsnprintf(99.163% 1710866/1725313)
-		    format_decode(26.597% 455040/1710866)
-		    number(19.554% 334542/1710866)
-		    memcpy_orig(4.183% 71570/1710866)
-			...
-		srso_return_thunk(0.009% 148/1725313)
-	    part_stat_read_all(8.030% 182236/2269372)
+Cgroups allow configuring isolated_cpus at runtime.
+However, blk-mq may still use managed interrupts on the
+newly isolated CPUs.
 
-One million rounds of open/read/close /proc/diskstats takes:
+Rebuild hctx->cpumask considering isolated CPUs to avoid
+managed interrupts on those CPUs and reclaim non-isolated ones.
 
-	real	0m37.687s
-	user	0m0.264s
-	sys	0m32.911s
-On average, each sequence tooks ~0.032ms
+The patch is based on
+isolation: Exclude dynamically isolated CPUs from housekeeping masks:
+https://lore.kernel.org/lkml/20240821142312.236970-1-longman@redhat.com/
 
-With this patch, most decimal values are yield via seq_put_decimal_ull,
-performance is significantly improved:
-
-	real	0m20.792s
-	user	0m0.316s
-	sys	0m20.463s
-On average, each sequence tooks ~0.020ms, a ~37.5% improvement.
-
-Signed-off-by: David Wang <00107082@163.com>
+Signed-off-by: Costa Shulyupin <costa.shul@redhat.com>
 ---
- block/genhd.c | 63 ++++++++++++++++++++++++---------------------------
- 1 file changed, 29 insertions(+), 34 deletions(-)
+ block/blk-mq.c         | 30 ++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h |  1 +
+ kernel/cgroup/cpuset.c |  2 ++
+ 3 files changed, 33 insertions(+)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 1c05dd4c6980..72f481a82fa4 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1264,40 +1264,35 @@ static int diskstats_show(struct seq_file *seqf, void *v)
- 			part_stat_unlock();
- 		}
- 		part_stat_read_all(hd, &stat);
--		seq_printf(seqf, "%4d %7d %pg "
--			   "%lu %lu %lu %u "
--			   "%lu %lu %lu %u "
--			   "%u %u %u "
--			   "%lu %lu %lu %u "
--			   "%lu %u"
--			   "\n",
--			   MAJOR(hd->bd_dev), MINOR(hd->bd_dev), hd,
--			   stat.ios[STAT_READ],
--			   stat.merges[STAT_READ],
--			   stat.sectors[STAT_READ],
--			   (unsigned int)div_u64(stat.nsecs[STAT_READ],
--							NSEC_PER_MSEC),
--			   stat.ios[STAT_WRITE],
--			   stat.merges[STAT_WRITE],
--			   stat.sectors[STAT_WRITE],
--			   (unsigned int)div_u64(stat.nsecs[STAT_WRITE],
--							NSEC_PER_MSEC),
--			   inflight,
--			   jiffies_to_msecs(stat.io_ticks),
--			   (unsigned int)div_u64(stat.nsecs[STAT_READ] +
--						 stat.nsecs[STAT_WRITE] +
--						 stat.nsecs[STAT_DISCARD] +
--						 stat.nsecs[STAT_FLUSH],
--							NSEC_PER_MSEC),
--			   stat.ios[STAT_DISCARD],
--			   stat.merges[STAT_DISCARD],
--			   stat.sectors[STAT_DISCARD],
--			   (unsigned int)div_u64(stat.nsecs[STAT_DISCARD],
--						 NSEC_PER_MSEC),
--			   stat.ios[STAT_FLUSH],
--			   (unsigned int)div_u64(stat.nsecs[STAT_FLUSH],
--						 NSEC_PER_MSEC)
--			);
-+		seq_put_decimal_ull_width(seqf, "",  MAJOR(hd->bd_dev), 4);
-+		seq_put_decimal_ull_width(seqf, " ", MINOR(hd->bd_dev), 7);
-+		seq_printf(seqf, " %pg", hd);
-+		seq_put_decimal_ull(seqf, " ", stat.ios[STAT_READ]);
-+		seq_put_decimal_ull(seqf, " ", stat.merges[STAT_READ]);
-+		seq_put_decimal_ull(seqf, " ", stat.sectors[STAT_READ]);
-+		seq_put_decimal_ull(seqf, " ", (unsigned int)div_u64(stat.nsecs[STAT_READ],
-+								     NSEC_PER_MSEC));
-+		seq_put_decimal_ull(seqf, " ", stat.ios[STAT_WRITE]);
-+		seq_put_decimal_ull(seqf, " ", stat.merges[STAT_WRITE]);
-+		seq_put_decimal_ull(seqf, " ", stat.sectors[STAT_WRITE]);
-+		seq_put_decimal_ull(seqf, " ", (unsigned int)div_u64(stat.nsecs[STAT_WRITE],
-+								     NSEC_PER_MSEC));
-+		seq_put_decimal_ull(seqf, " ", inflight);
-+		seq_put_decimal_ull(seqf, " ", jiffies_to_msecs(stat.io_ticks));
-+		seq_put_decimal_ull(seqf, " ", (unsigned int)div_u64(stat.nsecs[STAT_READ] +
-+								     stat.nsecs[STAT_WRITE] +
-+								     stat.nsecs[STAT_DISCARD] +
-+								     stat.nsecs[STAT_FLUSH],
-+								     NSEC_PER_MSEC));
-+		seq_put_decimal_ull(seqf, " ", stat.ios[STAT_DISCARD]);
-+		seq_put_decimal_ull(seqf, " ", stat.merges[STAT_DISCARD]);
-+		seq_put_decimal_ull(seqf, " ", stat.sectors[STAT_DISCARD]);
-+		seq_put_decimal_ull(seqf, " ", (unsigned int)div_u64(stat.nsecs[STAT_DISCARD],
-+								     NSEC_PER_MSEC));
-+		seq_put_decimal_ull(seqf, " ", stat.ios[STAT_FLUSH]);
-+		seq_put_decimal_ull(seqf, " ", (unsigned int)div_u64(stat.nsecs[STAT_FLUSH],
-+								     NSEC_PER_MSEC));
-+		seq_putc(seqf, '\n');
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 12ee37986331..d5786b953d17 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4145,6 +4145,36 @@ static void blk_mq_map_swqueue(struct request_queue *q)
  	}
- 	rcu_read_unlock();
+ }
  
++/**
++ * blk_mq_isolate_cpus() - rebuild hctx->cpumask considering isolated CPUs
++ * to avoid managed interrupts on those CPUs.
++ */
++
++void blk_mq_isolate_cpus(const struct cpumask *isolcpus)
++{
++	struct class_dev_iter iter;
++	struct device *dev;
++
++	class_dev_iter_init(&iter, &block_class, NULL, &disk_type);
++	while ((dev = class_dev_iter_next(&iter))) {
++		struct request_queue *q = bdev_get_queue(dev_to_bdev(dev));
++		struct blk_mq_hw_ctx *hctx;
++		unsigned long i;
++
++		if (!queue_is_mq(q))
++			continue;
++
++		blk_mq_map_swqueue(q);
++		/*
++		 * Postcondition:
++		 * cpumask must not intersect with isolated CPUs.
++		 */
++		queue_for_each_hw_ctx(q, hctx, i)
++			WARN_ON_ONCE(cpumask_intersects(hctx->cpumask, isolcpus));
++	}
++	class_dev_iter_exit(&iter);
++}
++
+ /*
+  * Caller needs to ensure that we're either frozen/quiesced, or that
+  * the queue isn't live yet.
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 2035fad3131f..a1f57b5ad46d 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -924,6 +924,7 @@ void blk_freeze_queue_start_non_owner(struct request_queue *q);
+ 
+ void blk_mq_map_queues(struct blk_mq_queue_map *qmap);
+ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
++void blk_mq_isolate_cpus(const struct cpumask *isolcpus);
+ 
+ void blk_mq_quiesce_queue_nowait(struct request_queue *q);
+ 
+diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
+index 5066397899c9..cad17f3f3315 100644
+--- a/kernel/cgroup/cpuset.c
++++ b/kernel/cgroup/cpuset.c
+@@ -41,6 +41,7 @@
+ #include <linux/sched/isolation.h>
+ #include <linux/wait.h>
+ #include <linux/workqueue.h>
++#include <linux/blk-mq.h>
+ 
+ #undef pr_fmt
+ #define pr_fmt(fmt)    "%s:%d: %s " fmt, __FILE__, __LINE__, __func__
+@@ -1317,6 +1318,7 @@ static void update_isolation_cpumasks(bool isolcpus_updated)
+ 		return;
+ 	ret = housekeeping_exlude_isolcpus(isolated_cpus, HOUSEKEEPING_FLAGS);
+ 	WARN_ON_ONCE((ret < 0) && (ret != -EOPNOTSUPP));
++	blk_mq_isolate_cpus(isolated_cpus);
+ }
+ 
+ /**
 -- 
-2.39.2
+2.47.0
 
