@@ -1,75 +1,78 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176F621B45D
-	for <linux-block@vger.kernel.org>; Fri,  8 Nov 2024 15:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D46521B42E;
+	Fri,  8 Nov 2024 15:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731080828; cv=none; b=I41mVZGNTHGT6wNwQFFPdV1VcE6Rhpo5IwK3EwtrOmGSGsAaEo5V12QZcZF5kmmz3rdM1VooRNGE5cbUOM9Vf+1Kqax+jgyQWJrT5mp3lT4m1qIglhKyc1WGhbUs03T1feSG9sQ+c3JyUyb+lju03oXf1PvP99BrGUvlEMElEo8=
+	t=1731081093; cv=none; b=oSEacQi74yNhKmI9G5aGZ3/iYpizXcPBYc4QETn5MKt503fWNM5Jy1AmqrEjcg7iiVHwSZ9x5TF9AWY/7PooKpR/LQ64mI3sale3Mx0hNw/jW45X+bIa55SKHJ+YW5az3cJ2GZO+W1p65rm+HF/da9p04RrtQF96I6EW6XMNzOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731080828; c=relaxed/simple;
-	bh=ctJqDrzhar5r6p2ftiRxP6lLdozMnhy8hLmOe6TABlM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mXB6f0/1wpjMGWiAI3yg4v0OzJMTNViM3S+tcCaVqoelJZKi8gNoV5Jh+xwGXhTc8dzi+9iGWPbP2qpFCadCnNDIISxVAOf8hSTLoPYXQa9kBbaUorBxnvLDtSMc0ekgWzlAh3ElOsNi1xYrThbfgzZacAc5NM6twugflD8WOpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3D6ktTIP; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1731081093; c=relaxed/simple;
+	bh=mOMvtGK40YQ3w77ykrXsI3BGNXP4DVCCfcRaNvLRXC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gDguCtixnm7qfemKEk3jVVTkMr3yZXNBkjFMH2dCfhcC/W8+Zla6J5JCTa4nMEeKiyNSa8ThQkQJxdD33ik3DEc8fFFh+egOPZdR/Gc9fhhsQxdKpPIW3UpS+G07sgSffBwW1w+LOyfGwDAId19DWYIVC7p0IFPws+cCtxhQrC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WbzJMLFh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3D6ktTIP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=O2pI4muBBDotpdXxdR5iT9OwjkhWYqDjshZgezWHTJk=; b=3D6ktTIP58WA0EFvOgay2Os+YY
-	1uX0QBHg/ELmCIYZr/CMF6KRLIfpFGaTV01HZrLyUmtmkfrbpt6GApW/yCY7Roj7fIrtCpY/lvbr7
-	4Zqk8rHnfGOU/qkIX7gB3f4SqIOZLeVrLvElN0BMSrKL0WRv/tf90S9CtU7lUefTm26oUTD4BBAbY
-	euxnF55W1dqMxmJuBTD6w/9wHS1HNIu9dNilrYALr7cE1SE1BGWTiaEC3acqTpP3n3CxwdNRwCO91
-	+ytVUA/Vhxk4kibL2KRh5aSXFrQXAdnjHx8k30Lehnmwmzj5Czkkey2gn0pSS7bwNdCyyAk7M5nxg
-	DAoYp5wQ==;
-Received: from [212.185.66.19] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1t9RCU-0000000B5cq-1N3V;
-	Fri, 08 Nov 2024 15:47:06 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/2] nvme-multipath: don't bother clearing max_hw_zone_append_sectors
-Date: Fri,  8 Nov 2024 16:46:52 +0100
-Message-ID: <20241108154657.845768-3-hch@lst.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241108154657.845768-1-hch@lst.de>
-References: <20241108154657.845768-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WbzJMLFh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3747C4CECD;
+	Fri,  8 Nov 2024 15:51:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731081093;
+	bh=mOMvtGK40YQ3w77ykrXsI3BGNXP4DVCCfcRaNvLRXC8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WbzJMLFhJ8MFKHcEYj94OUODGQgdpKtvpquZXfUUW/usquKC6kMnB0VWo6b5HPyyH
+	 bld0Af7AjvcwnKBQbk5rdCymUKo2uErcYMDs8jJoW1SkR2ajpIDZoLdmnbCoJgcX8o
+	 Jx6qtKbNNtuo1oBAJ5e0ylhkMweLyh7QHjTjPAZdvNA+G6ylvpUbHhx3ZqetevQute
+	 h0vxxkeeb0XlGAjcYGeh7HldbzjimC+He1taEWYRbqIlhMxKcZdM72Qsk9xKpJX0m4
+	 mJHKMhlFFB7/BKLrF6kPr/Cb6PoOZ9aW34B3rP20bKbWSChtXksfYE+zUts+/8/mXC
+	 PSth57QGQ/Vdw==
+Date: Fri, 8 Nov 2024 08:51:31 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+	io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	joshi.k@samsung.com, javier.gonz@samsung.com, bvanassche@acm.org
+Subject: Re: [PATCHv10 0/9] write hints with nvme fdp, scsi streams
+Message-ID: <Zy4zgwYKB1f6McTH@kbusch-mbp>
+References: <20241029151922.459139-1-kbusch@meta.com>
+ <20241105155014.GA7310@lst.de>
+ <Zy0k06wK0ymPm4BV@kbusch-mbp>
+ <20241108141852.GA6578@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241108141852.GA6578@lst.de>
 
-The limits stacking now properly zeroes it if at least one of the
-underlying limits clears it.
+On Fri, Nov 08, 2024 at 03:18:52PM +0100, Christoph Hellwig wrote:
+> On Thu, Nov 07, 2024 at 01:36:35PM -0700, Keith Busch wrote:
+> > The zone block support all looks pretty neat, but I think you're making
+> > this harder than necessary to support streams. You don't need to treat
+> > these like a sequential write device. The controller side does its own
+> > garbage collection, so no need to duplicate the effort on the host. And
+> > it looks like the host side gc potentially merges multiple streams into
+> > a single gc stream, so that's probably not desirable.
+> 
+> We're not really duplicating much.  Writing sequential is pretty easy,
+> and tracking reclaim units separately means you need another tracking
+> data structure, and either that or the LBA one is always going to be
+> badly fragmented if they aren't the same.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/multipath.c | 2 --
- 1 file changed, 2 deletions(-)
+You're getting fragmentation anyway, which is why you had to implement
+gc. You're just shifting who gets to deal with it from the controller to
+the host. The host is further from the media, so you're starting from a
+disadvantage. The host gc implementation would have to be quite a bit
+better to justify the link and memory usage necessary for the copies
+(...queue a copy-offload discussion? oom?).
 
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index c26cb7d3a2e5..f04cfe3fb936 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -635,8 +635,6 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
- 	lim.features |= BLK_FEAT_IO_STAT | BLK_FEAT_NOWAIT | BLK_FEAT_POLL;
- 	if (head->ids.csi == NVME_CSI_ZNS)
- 		lim.features |= BLK_FEAT_ZONED;
--	else
--		lim.max_hw_zone_append_sectors = 0;
- 
- 	head->disk = blk_alloc_disk(&lim, ctrl->numa_node);
- 	if (IS_ERR(head->disk))
--- 
-2.45.2
+This xfs implementation also has logic to recover from a power fail. The
+device already does that if you use the LBA abstraction instead of
+tracking sequential write pointers and free blocks.
 
+I think you are underestimating the duplication of efforts going on
+here.
