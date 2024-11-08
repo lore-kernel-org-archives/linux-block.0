@@ -1,109 +1,199 @@
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A786233D79;
-	Fri,  8 Nov 2024 19:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E07A1AA1E2
+	for <linux-block@vger.kernel.org>; Fri,  8 Nov 2024 19:43:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731094464; cv=none; b=i/+n+UOmpYgHvq0ZprUE369CeVOoxJiLHPFhlSIWN5CHcalR7Vj2RgIgKh1KZ8qxBEWwYUFE08fLKJMCEG2ktsELhOEsHsNVbLMGMwNiC1ZSmAutjAx+WfOvzbIl+0wDnKfz8oI8G2MciDZPr5v/dIsxOyODGu8bhVxbFw2robM=
+	t=1731094986; cv=none; b=sbS1g5YJnB3WbFIv5vT4KjTGNPTAVWI30rLHJ4cRJiJEvuQeuQE3U+1I4VMTa10k6/GrOM4SpyLOXcIRylHA56UJRRlhw511CrImB8+vsmt19Sb4R2Pu1xZ7vc/kwyoJXboBqL90pjuEcZ22+AmNRiqcz2AkRkwjqFKnIsNtioc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731094464; c=relaxed/simple;
-	bh=C3uvS5ZTq0aLuBTlnvNbPqplUhDEa0uq5Q6Z92WD/yE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=h8nLlObSDSThwHelbvAKc0PmG72n10fPLiscQ2eIik98h9NVF9YplOpjleGb1XLq/desXZVGIuab4ri2KFjmftdiL2ynsIJ/Xy++W2+dIJqqhh1m3065pTvIyotaCf0I6H8ufVCOmeYyxsaGROQJIVwzq64bMP0QzdgBU3LYzy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=dnsz5YfG; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+	s=arc-20240116; t=1731094986; c=relaxed/simple;
+	bh=dghYSJUqrHxZgJ2S/xR790cnSvBl4HY9BwyiDV53ToA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OCGwqlGWJzTv9n3wl67l8aGWxGN+avJTyAzv7MEjtbgR6hySgYG9sUh/jVsaCwhqpFvs0lnxQMPo9/kdtknhgU7PF1r52zEK2ZiowG5ESCV0s/SqJ9msjz9uK1LMcqM4mXVwIk79N7cCApqtpM+cHzMffBTjxOWf+angcLIqEG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=XHHgGm7d; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="dnsz5YfG"
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 443C842C17
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1731094462; bh=2mf7KL6RauZLJCGVMslddkfvUkwUMRQBSzo8JS8PbOo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=dnsz5YfGWANp6sFnIUKjORH9aQENZDGixeRFgCKU+EHYtfew50seKAGvAytaFY9oj
-	 05nxCVWbEfcD++04BAkjYS67T71ZQKhzyu6q3WZ8JM+Nq5axZuGUldvxslQ6IDBgXj
-	 4TWkgRvZmPQDP4+rVCptcrXwBOfBXoMDeUZRH8Wp3ugkYqZvGKmWHOgN92MEiBDxr5
-	 9u5STRUt+O2euSBwkgcMhfsaH0RnwMEO/iN2P0oM2sZd22f5AUcPoAVVdjXDvknK/o
-	 T3zwqzKkVrYA3KBU7u+ycHZvQ7dYicPF4vGfmge7fq9Ntn0IbVNJL2+Ng+Nux9U4bj
-	 j2d2WZj3WBcbQ==
-Received: from localhost (unknown [IPv6:2601:280:5e00:625::1fe])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 443C842C17;
-	Fri,  8 Nov 2024 19:34:22 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>, Jason
- Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>, Joerg
- Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Christoph Hellwig
- <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
-Cc: Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
- Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian
- <kevin.tian@intel.com>, Alex Williamson <alex.williamson@redhat.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, =?utf-8?B?SsOpcsO0bWU=?=
- Glisse
- <jglisse@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
- iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 09/17] docs: core-api: document the IOVA-based API
-In-Reply-To: <881ef0bcf9aa971e995fbdd00776c5140a7b5b3d.1730298502.git.leon@kernel.org>
-References: <cover.1730298502.git.leon@kernel.org>
- <881ef0bcf9aa971e995fbdd00776c5140a7b5b3d.1730298502.git.leon@kernel.org>
-Date: Fri, 08 Nov 2024 12:34:21 -0700
-Message-ID: <87ttchwmde.fsf@trenco.lwn.net>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="XHHgGm7d"
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A8IANqP004929
+	for <linux-block@vger.kernel.org>; Fri, 8 Nov 2024 11:43:03 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
+	 bh=EBbt1Sz3anE/DwELXc/1XodO6Fo/C1FtndRt7TOnDpo=; b=XHHgGm7d9IZ+
+	xPIQvIHhw2W7woWQpGp5uLIN1BQ998I7hfP3T3MlEkP1FQNrC72XCYKJam2OOCZA
+	4wjLdRhkyWxiQhuPnBs6aUvDL9cymh1zu1S49udr66QZ+9c1Pn/F2RHjZRycxt+S
+	a6YtJ36+pTovLHK2Ejbd/0tz7pK8kko0mdw8VDOYZoxQln3lk1iSLC8oAmqIvmVp
+	ENq8gnFwQ796cHoAVVgU3NjHB0NPv7Ckzc9BKVvfG7besnHfeO6S6G3gGqJXl3ms
+	CtbSSbTXO3n5x4MFLrKRaij+U/BWhIT7AeF4xtrvMVPF/mRbWFiPjl/dQHw89/lM
+	QE1Igv+Ifw==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 42sqpc0qye-6
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 08 Nov 2024 11:43:03 -0800 (PST)
+Received: from twshared29075.03.ash8.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.11; Fri, 8 Nov 2024 19:43:00 +0000
+Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
+	id 7135514E3A02E; Fri,  8 Nov 2024 11:36:58 -0800 (PST)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        <linux-scsi@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <io-uring@vger.kernel.org>, <axboe@kernel.dk>
+CC: <hch@lst.de>, <martin.petersen@oracle.com>, <asml.silence@gmail.com>,
+        <javier.gonz@samsung.com>, <joshi.k@samsung.com>,
+        Keith Busch
+	<kbusch@kernel.org>
+Subject: [PATCHv11 2/9] block: introduce max_write_hints queue limit
+Date: Fri, 8 Nov 2024 11:36:22 -0800
+Message-ID: <20241108193629.3817619-3-kbusch@meta.com>
+X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20241108193629.3817619-1-kbusch@meta.com>
+References: <20241108193629.3817619-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
 Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: HTYwPIDQFdOxx1ywOrs4yefCEU8S-NJv
+X-Proofpoint-GUID: HTYwPIDQFdOxx1ywOrs4yefCEU8S-NJv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
-Leon Romanovsky <leon@kernel.org> writes:
+From: Keith Busch <kbusch@kernel.org>
 
-> From: Christoph Hellwig <hch@lst.de>
->
-> Add an explanation of the newly added IOVA-based mapping API.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  Documentation/core-api/dma-api.rst | 70 ++++++++++++++++++++++++++++++
->  1 file changed, 70 insertions(+)
->
-> diff --git a/Documentation/core-api/dma-api.rst b/Documentation/core-api/dma-api.rst
-> index 8e3cce3d0a23..6095696a65a7 100644
-> --- a/Documentation/core-api/dma-api.rst
-> +++ b/Documentation/core-api/dma-api.rst
-> @@ -530,6 +530,76 @@ routines, e.g.:::
->  		....
->  	}
->  
-> +Part Ie - IOVA-based DMA mappings
-> +---------------------------------
-> +
-> +These APIs allow a very efficient mapping when using an IOMMU.  They are an
-> +optional path that requires extra code and are only recommended for drivers
-> +where DMA mapping performance, or the space usage for storing the DMA addresses
-> +matter.  All the consideration from the previous section apply here as well.
-> +
-> +::
-> +
-> +    bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
-> +		phys_addr_t phys, size_t size);
-> +
-> +Is used to try to allocate IOVA space for mapping operation.  If it returns
-> +false this API can't be used for the given device and the normal streaming
-> +DMA mapping API should be used.  The ``struct dma_iova_state`` is allocated
-> +by the driver and must be kept around until unmap time.
+Drivers with hardware that support write streams need a way to export how
+many are available so applications can generically query this.
 
-So, I see that you have nice kernel-doc comments for these; why not just
-pull them in here with a kernel-doc directive rather than duplicating
-the information?
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ Documentation/ABI/stable/sysfs-block |  7 +++++++
+ block/blk-settings.c                 |  3 +++
+ block/blk-sysfs.c                    |  3 +++
+ include/linux/blkdev.h               | 12 ++++++++++++
+ 4 files changed, 25 insertions(+)
 
-Thanks,
+diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/sta=
+ble/sysfs-block
+index 8353611107154..f2db2cabb8e75 100644
+--- a/Documentation/ABI/stable/sysfs-block
++++ b/Documentation/ABI/stable/sysfs-block
+@@ -506,6 +506,13 @@ Description:
+ 		[RO] Maximum size in bytes of a single element in a DMA
+ 		scatter/gather list.
+=20
++What:		/sys/block/<disk>/queue/max_write_hints
++Date:		October 2024
++Contact:	linux-block@vger.kernel.org
++Description:
++		[RO] Maximum number of write hints supported, 0 if not
++		supported. If supported, valid values are 1 through
++		max_write_hints, inclusive.
+=20
+ What:		/sys/block/<disk>/queue/max_segments
+ Date:		March 2010
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 5ee3d6d1448df..f9f831f104615 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -43,6 +43,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+ 	lim->seg_boundary_mask =3D BLK_SEG_BOUNDARY_MASK;
+=20
+ 	/* Inherit limits from component devices */
++	lim->max_write_hints =3D USHRT_MAX;
+ 	lim->max_segments =3D USHRT_MAX;
+ 	lim->max_discard_segments =3D USHRT_MAX;
+ 	lim->max_hw_sectors =3D UINT_MAX;
+@@ -544,6 +545,8 @@ int blk_stack_limits(struct queue_limits *t, struct q=
+ueue_limits *b,
+ 	t->max_segment_size =3D min_not_zero(t->max_segment_size,
+ 					   b->max_segment_size);
+=20
++	t->max_write_hints =3D min(t->max_write_hints, b->max_write_hints);
++
+ 	alignment =3D queue_limit_alignment_offset(b, start);
+=20
+ 	/* Bottom device has different alignment.  Check that it is
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 0ef4e13e247d9..1925ea23bd290 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -104,6 +104,7 @@ QUEUE_SYSFS_LIMIT_SHOW(max_segments)
+ QUEUE_SYSFS_LIMIT_SHOW(max_discard_segments)
+ QUEUE_SYSFS_LIMIT_SHOW(max_integrity_segments)
+ QUEUE_SYSFS_LIMIT_SHOW(max_segment_size)
++QUEUE_SYSFS_LIMIT_SHOW(max_write_hints)
+ QUEUE_SYSFS_LIMIT_SHOW(logical_block_size)
+ QUEUE_SYSFS_LIMIT_SHOW(physical_block_size)
+ QUEUE_SYSFS_LIMIT_SHOW(chunk_sectors)
+@@ -457,6 +458,7 @@ QUEUE_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_=
+kb");
+ QUEUE_RO_ENTRY(queue_max_segments, "max_segments");
+ QUEUE_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
+ QUEUE_RO_ENTRY(queue_max_segment_size, "max_segment_size");
++QUEUE_RO_ENTRY(queue_max_write_hints, "max_write_hints");
+ QUEUE_RW_LOAD_MODULE_ENTRY(elv_iosched, "scheduler");
+=20
+ QUEUE_RO_ENTRY(queue_logical_block_size, "logical_block_size");
+@@ -591,6 +593,7 @@ static struct attribute *queue_attrs[] =3D {
+ 	&queue_max_discard_segments_entry.attr,
+ 	&queue_max_integrity_segments_entry.attr,
+ 	&queue_max_segment_size_entry.attr,
++	&queue_max_write_hints_entry.attr,
+ 	&queue_hw_sector_size_entry.attr,
+ 	&queue_logical_block_size_entry.attr,
+ 	&queue_physical_block_size_entry.attr,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 1b51a7c92e9be..1477f751ad8bd 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -394,6 +394,8 @@ struct queue_limits {
+ 	unsigned short		max_integrity_segments;
+ 	unsigned short		max_discard_segments;
+=20
++	unsigned short		max_write_hints;
++
+ 	unsigned int		max_open_zones;
+ 	unsigned int		max_active_zones;
+=20
+@@ -1198,6 +1200,11 @@ static inline unsigned short queue_max_segments(co=
+nst struct request_queue *q)
+ 	return q->limits.max_segments;
+ }
+=20
++static inline unsigned short queue_max_write_hints(struct request_queue =
+*q)
++{
++	return q->limits.max_write_hints;
++}
++
+ static inline unsigned short queue_max_discard_segments(const struct req=
+uest_queue *q)
+ {
+ 	return q->limits.max_discard_segments;
+@@ -1245,6 +1252,11 @@ static inline unsigned int bdev_max_segments(struc=
+t block_device *bdev)
+ 	return queue_max_segments(bdev_get_queue(bdev));
+ }
+=20
++static inline unsigned short bdev_max_write_hints(struct block_device *b=
+dev)
++{
++	return queue_max_write_hints(bdev_get_queue(bdev));
++}
++
+ static inline unsigned queue_logical_block_size(const struct request_que=
+ue *q)
+ {
+ 	return q->limits.logical_block_size;
+--=20
+2.43.5
 
-jon
