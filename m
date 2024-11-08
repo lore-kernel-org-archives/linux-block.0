@@ -1,38 +1,69 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015744431;
-	Fri,  8 Nov 2024 10:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9A41E0B66;
+	Fri,  8 Nov 2024 13:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731060235; cv=none; b=rwn7zNub7DbVy2k+D+TsCXgDovoUqQC7rrew1wcoysOS+DBeTtRh8ojRMODFilUBV+Zc7p9kbY+DMVEM1fEnlpTXZyo7n1Db9G6eV7EcjgY7X8hdT6jcw3nqJoDPiM3vIdewsVD6vKnIjLFAadTQsaLEM7TzutstDzb6O2gT+hI=
+	t=1731073907; cv=none; b=tEhOohRMzUWBJpRVQEW7aP/ys963ZYVpwtKcxIb5oGbN4w4wQn80tfLRNaphjCPLw41hkOaHi/bDM0QSbFmEZl8A+wRPEj72rZsEtzwxS/2a/Juf8ODGNV56z3cNESVlGjnJ+/FMMyLcwJcAAYDb1gr8FgrmQpfGfA0mnz/cgwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731060235; c=relaxed/simple;
-	bh=l5DnvzL4sy5C2lpQdy/WOoP4Io2r2vU4GWYByRNWdbw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Tw8SaDTVc9oztkLMYQGr44KSW0PUonNvQC2TbbfdcK/5YG0E3U3CHmosGOj4l+9KRSbR0RmB5OSVvbAxLZBnLN46AenB+ISoqMUcKnPzPbye8Vt+IjyPkEcTEYTXZ4B4pMEFqrR4DMEtiWk06xDnVsQZ7MDTskLH20a7rMbh9iM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XlDx23Xptz1T9vC;
-	Fri,  8 Nov 2024 18:01:26 +0800 (CST)
-Received: from kwepemg200013.china.huawei.com (unknown [7.202.181.64])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0AC6A1400DC;
-	Fri,  8 Nov 2024 18:03:49 +0800 (CST)
-Received: from huawei.com (10.175.113.32) by kwepemg200013.china.huawei.com
- (7.202.181.64) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 8 Nov
- 2024 18:03:48 +0800
-From: Liu Shixin <liushixin2@huawei.com>
-To: Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky
-	<senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Andrew Morton
-	<akpm@linux-foundation.org>
-CC: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>, Liu Shixin
-	<liushixin2@huawei.com>
-Subject: [PATCH] zram: fix NULL pointer in comp_algorithm_show()
-Date: Fri, 8 Nov 2024 18:01:47 +0800
-Message-ID: <20241108100147.3776123-1-liushixin2@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1731073907; c=relaxed/simple;
+	bh=3/5nmr5NBbioTwgKYO0EQACI+Yl3205RM+UAMkwZXx8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cFnbmQJR4DDDiXdxgvwgdd3Btd0sRAMuPpiICGxRWxkUilrtKeCqSOQ8eB9MwgQZyNqjsiBuiA7s02pri9J3mvEUIoO8yyvRoMDgt1QB/rfKDIpzI8o7HTOIWTfhMNP/qhalNVJ2VSp0uEoHleanUOMP5MPRg9/a9ArPZxN9mow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=anAFhAZm; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="anAFhAZm"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A8DAbJA032765;
+	Fri, 8 Nov 2024 13:51:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=eFQPU7rxNgHWF8Lid+E/gHU5NgoPhsn8T1OLodKsF
+	OY=; b=anAFhAZmZ4YbPbw62a098nClzQYfB6H3smcADkufRFnVJ0YmdwEhGuFfs
+	ZxYdvc/XTI3NSs++SwAKDhB3nOsmNfXhNp80an9wJF9GM9GoDVeyDyyPWLauP+18
+	7zMwJihFuj853+rglGpp2pEKz7Q0tsEXbqLy+hYMAO9u/uUTi+P1Dh0z+YkoT2Ot
+	DH54EgzamNZVjmvmuaDFVfsXJPdUIqwA40FeTr3trTKInUigAod1mXxVtdVPbtwQ
+	+wBu4I+60g3wjCZSsUPXD2ECPja4UmP26dOevXUManiRlNmTt3P2DMLjsJBEVYZf
+	f+vDd3wuykDakivjJrXRGOgvPE15A==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42sk9s85n5-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Nov 2024 13:51:41 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A8BHupx019503;
+	Fri, 8 Nov 2024 13:39:20 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 42p0mja6kh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Nov 2024 13:39:20 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A8DdE9k16056792
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 8 Nov 2024 13:39:14 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 608A520040;
+	Fri,  8 Nov 2024 13:39:14 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4D7A52004B;
+	Fri,  8 Nov 2024 13:39:14 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri,  8 Nov 2024 13:39:14 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
+	id E904CE03BB; Fri, 08 Nov 2024 14:39:13 +0100 (CET)
+From: Stefan Haberland <sth@linux.ibm.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Miroslav Franc <mfranc@suse.cz>, Yu Jiaoliang <yujiaoliang@vivo.com>
+Subject: [PATCH 0/2] s390/dasd: two small fixes
+Date: Fri,  8 Nov 2024 14:39:11 +0100
+Message-ID: <20241108133913.3068782-1-sth@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,83 +71,35 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemg200013.china.huawei.com (7.202.181.64)
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ZQars5CAWD4e7SjG7yVMAT9qkwXkZlIt
+X-Proofpoint-ORIG-GUID: ZQars5CAWD4e7SjG7yVMAT9qkwXkZlIt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ phishscore=0 suspectscore=0 mlxlogscore=507 clxscore=1011
+ priorityscore=1501 lowpriorityscore=0 spamscore=0 mlxscore=0
+ impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2409260000 definitions=main-2411080113
 
-LTP reported a NULL pointer dereference as followed:
+Hi Jens,
 
- CPU: 7 UID: 0 PID: 5995 Comm: cat Kdump: loaded Not tainted 6.12.0-rc6+ #3
- Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
- pstate: 40400005 (nZcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
- pc : __pi_strcmp+0x24/0x140
- lr : zcomp_available_show+0x60/0x100 [zram]
- sp : ffff800088b93b90
- x29: ffff800088b93b90 x28: 0000000000000001 x27: 0000000000400cc0
- x26: 0000000000000ffe x25: ffff80007b3e2388 x24: 0000000000000000
- x23: ffff80007b3e2390 x22: ffff0004041a9000 x21: ffff80007b3e2900
- x20: 0000000000000000 x19: 0000000000000000 x18: 0000000000000000
- x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
- x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
- x11: 0000000000000000 x10: ffff80007b3e2900 x9 : ffff80007b3cb280
- x8 : 0101010101010101 x7 : 0000000000000000 x6 : 0000000000000000
- x5 : 0000000000000040 x4 : 0000000000000000 x3 : 00656c722d6f7a6c
- x2 : 0000000000000000 x1 : ffff80007b3e2900 x0 : 0000000000000000
- Call trace:
-  __pi_strcmp+0x24/0x140
-  comp_algorithm_show+0x40/0x70 [zram]
-  dev_attr_show+0x28/0x80
-  sysfs_kf_seq_show+0x90/0x140
-  kernfs_seq_show+0x34/0x48
-  seq_read_iter+0x1d4/0x4e8
-  kernfs_fop_read_iter+0x40/0x58
-  new_sync_read+0x9c/0x168
-  vfs_read+0x1a8/0x1f8
-  ksys_read+0x74/0x108
-  __arm64_sys_read+0x24/0x38
-  invoke_syscall+0x50/0x120
-  el0_svc_common.constprop.0+0xc8/0xf0
-  do_el0_svc+0x24/0x38
-  el0_svc+0x38/0x138
-  el0t_64_sync_handler+0xc0/0xc8
-  el0t_64_sync+0x188/0x190
+please apply the following two small fixes for the upcoming merge window.
+Thanks.
 
-The zram->comp_algs[ZRAM_PRIMARY_COMP] can be NULL in zram_add() if
-comp_algorithm_set() has not been called. User can access the zram device
-by sysfs after device_add_disk(), so there is a time window to trigger
-the NULL pointer dereference. Move it ahead device_add_disk() to make sure
-when user can access the zram device, it is ready. comp_algorithm_set() is
-protected by zram->init_lock in other places and no such problem.
+Miroslav Franc (1):
+  s390/dasd: fix redundant /proc/dasd* entries removal
 
-Fixes: 7ac07a26dea7 ("zram: preparation for multi-zcomp support")
-Signed-off-by: Liu Shixin <liushixin2@huawei.com>
----
- drivers/block/zram/zram_drv.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Yu Jiaoliang (1):
+  s390/dasd: Fix typo in comment
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index ad9c9bc3ccfc..5223a03cb10e 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -2381,6 +2381,8 @@ static int zram_add(void)
- 	zram->disk->fops = &zram_devops;
- 	zram->disk->private_data = zram;
- 	snprintf(zram->disk->disk_name, 16, "zram%d", device_id);
-+	zram_comp_params_reset(zram);
-+	comp_algorithm_set(zram, ZRAM_PRIMARY_COMP, default_compressor);
- 
- 	/* Actual capacity set using sysfs (/sys/block/zram<id>/disksize */
- 	set_capacity(zram->disk, 0);
-@@ -2388,9 +2390,6 @@ static int zram_add(void)
- 	if (ret)
- 		goto out_cleanup_disk;
- 
--	zram_comp_params_reset(zram);
--	comp_algorithm_set(zram, ZRAM_PRIMARY_COMP, default_compressor);
--
- 	zram_debugfs_register(zram);
- 	pr_info("Added device: %s\n", zram->disk->disk_name);
- 	return device_id;
+ drivers/s390/block/dasd.c        | 2 +-
+ drivers/s390/block/dasd_devmap.c | 2 +-
+ drivers/s390/block/dasd_eckd.c   | 2 +-
+ drivers/s390/block/dasd_proc.c   | 5 +++++
+ 4 files changed, 8 insertions(+), 3 deletions(-)
+
 -- 
-2.34.1
+2.45.2
 
