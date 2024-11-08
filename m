@@ -1,174 +1,193 @@
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993501BD9D8
-	for <linux-block@vger.kernel.org>; Fri,  8 Nov 2024 06:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731048686; cv=none; b=W1HnXFYpAw+NpLWnlCdSCniB1oWt4DQtssqPbQJaSuijo8YChomWWyvVvMKGkprD1m/QGxi+GvFnHxGwnIlzeTuXBFVE9zOGiEusHE81yUTkZu+lSDyhMKFc9Z7RY/R/Ei864pyIIbczzUOh2NU0vW7gxjQfK5EuxyHNv9NRdw0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731048686; c=relaxed/simple;
-	bh=Uwj8TZfhAdUXNOP0gmz6Rozx/iAres4gBdo+x6A1W6Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DetpvvWRklkdiOt1sl2W6A9in8FeHr1K3kxjC/AVCpRKRCyN0JXsDwiXwkDhsxlIznCGPH/F59k/o8O5ITwwpRuDaflW7WGHd2h3k6o7194SmkF317vFPJStpfu6/Ks4pah7QDNsjt0N6hslnpANbbFHQ1DabhYasYzgryY8Dc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Srr7hZ7+; arc=none smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A554DDDA8;
+	Fri,  8 Nov 2024 07:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731049671; cv=fail; b=J5LQYAyifPkJYjy7GP0ECIdSUpXDvaEKkTcxXsvapm9h05++P9kguKEpPYkZ4gm6zUy/KEw2I/wiUb4In+4Rq5QgUvxerZEkxyl778IivWyYekV73B7OEaYmzNcut2mmvngJggJgBUz5K73kfZpGMm7WnGteP4e21kx6YugQWYQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731049671; c=relaxed/simple;
+	bh=Vk2hUJbB8x1kfmvsTSguaM0YPcY6xrQ/6geYb6UO5dM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=o2FZdR929JxbaIOutdkMlctPM11w0QqjHSF5KCvz8sFx6kDesfloeoKi5bg5pVPZE+iJElKdCSNfi2ggcJplz45BlIjbgGAKrfjzuA+nnDyiDljosF1sgMTP7/YOiwNZFyeihMsSzT+Z8j+54ztGmtfOuZfK9wUlt+lgAkmaY6M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=OouHHqkU; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=yqyJDLeK; arc=fail smtp.client-ip=216.71.153.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Srr7hZ7+"
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-50d34db4edeso1312324e0c.0
-        for <linux-block@vger.kernel.org>; Thu, 07 Nov 2024 22:51:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="OouHHqkU";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="yqyJDLeK"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1731049668; x=1762585668;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Vk2hUJbB8x1kfmvsTSguaM0YPcY6xrQ/6geYb6UO5dM=;
+  b=OouHHqkU0/bxpsmZvxtpg69McZFiPm+2gWUluAA3Dwou/8TKqlTHIqR3
+   KGie8c/rQPa3p2fnRm5NPk1e+Wyv9Hrp1jbLKpKEIbet+vfKfeHiU9SuS
+   Y4o/kcSFirgKJiiWWtPfiqDeOdrcjW3EtynHst2K/rb4wkMgJ/rqBwoC0
+   0hAhyK0imzjAZN75Z1hnR5+/W1En2qubE72+dBAgVPYUIXgiUxfuaYvk4
+   HAnSM7dJYQagtZtpek/cWGXDE6KBwdo3GwxxPtS1KsS33AbzLAYTPmSBh
+   Wgb+0xc4PYypQAdhO/lLopJdgpB/zKCinQYge8rZGbjy/21GbEpvAzzOZ
+   A==;
+X-CSE-ConnectionGUID: pDSQDe0OTraJZEouRm5g3w==
+X-CSE-MsgGUID: UuvDEr/uS3C72lvmjVeotg==
+X-IronPort-AV: E=Sophos;i="6.12,137,1728921600"; 
+   d="scan'208";a="32061880"
+Received: from mail-westcentralusazlp17013075.outbound.protection.outlook.com (HELO CY3PR05CU001.outbound.protection.outlook.com) ([40.93.6.75])
+  by ob1.hgst.iphmx.com with ESMTP; 08 Nov 2024 15:07:47 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iofd7KGa6RsRmuqEiH05sCZDGsyFj6g7jEIJb6zVFQrVJrulLuxDvqbtQ5t7oq8UtVNj3aWJvbOa0xJIYjUtnUKZxpbqnNLM4oPkBxtIb8OmSFrBgQXNDyHz0750cfhl0eSH+ZL0U5CSGsgLa6qnwDrEPu1NV4PlwLRRJd45MW9pXjJhmYikKR0kGE3e4nF9BBaOV8PxqfK58x6FlGkVx0y0h9ucmHWkpZ4izWn3DmvuJEdvUhgYloI4Z1kT5kC3mi+64GwgeUaButggaMPwptB4mcjGjlT3jQJtT8JwA4NfQ+q3Ut8MHYZCFDnKnyydzmYqJSuzhLCHlsfJj3Ah5A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Vk2hUJbB8x1kfmvsTSguaM0YPcY6xrQ/6geYb6UO5dM=;
+ b=o2LZCo36ss3ghKka7h/dsELXwbB9rq8kdda8ARKeKae7AQkvSv6FE7AgAhg0eB79Mi5Mdr7fNZUeGhHkQdk72E+BsluNgO5u78Y7Co3J0kKagad86CHLt+qKcYM7YGxzB9lNh5TWW4lJDGG9TVYMS0qioV1qSc9sxmOh9khkx8soqZnC4Qwgh1kdIMxCilWFgIYKnueEhW9jM1W1eVDmdFE+jtGYHpOKJtt+4x1lsf6/rqLBojdq0eloNx5Ygq+/oZpdjnt6rIceOzHPg0MR8IujWcO/qxUKs3ma4rqrW2pNVqz6ojHIgs9BMGkQRvLpR9AY39vM5KKXvZpGqTGVHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731048683; x=1731653483; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u/x8OS/dbVQbN/39ZA54E6EOHTTw1AI3bxvOtuzpiWo=;
-        b=Srr7hZ7+oOUWqtMtt6gd+feGUwwJzdnUsShP79nRi1Jr7fBW3iOGd9F7c5bimttxo7
-         rLsOs9SJC9MqCf2MuAwmF2S3az2NjJBiEEQAuNhki5quAnTihETrvhJ1o/e8u2OMFgSZ
-         XpHD+R8Zq9ra1FYzFzKriToPhUMyDqG9+4ZoHcgN8ARtuY1SiBe1dDqQN04SYIJfwZ1Q
-         5aNgt7IsFZwUNS2wN/gV2JNQMR5Qaps9Brvex5HMC5BYVKsjZ5mEsW2gi1JGt863Y42w
-         nDOS6bQ9fVpCEUPdKKjwx/l2pdF57SfW1bJOjMaP15fvC6Zv72+UzpnsNtGvCEaXQOkH
-         e2zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731048683; x=1731653483;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u/x8OS/dbVQbN/39ZA54E6EOHTTw1AI3bxvOtuzpiWo=;
-        b=HonQbQIXeCUAlZh7zgC359E1n/+DU5s9DwhAkQIey7qYsjB+5Rrj79hEuRyqbXY9XU
-         8H8t5ctQKfsvsXSAEDt7RJ3Lv7W3Wo68n1FyODBCRWXd8EXX+TyQahTm6DrY2fPZMDV1
-         cj8YVyK5toLad/7EfPEyCAdzo+LGEDtytgZ/uO4OUrYb/z+aEjSPiIz6MaeAx9yN9dSw
-         zD8oYC2SWgTBKSIRnKfd6dNgbihjEwNXsJ0+GEgPhD6NWvtZk6zHex5htz+vLJ5F6qzz
-         6kGNFjvX9RARcTwzVki8f+OMFkE8iBrJV7iItfwPKuJRYHP7te6ZrekVoMc3Hrc+epxV
-         4y4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUcntzEF+H3izCjwbHcy+yQz7EhpvB6DJzICnf0fgWsnvyrup2rwdDKqQVbrlRSTQmgN05fodCVAU1oNQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaXM31ySiq2SnTNvlsf1aPwFb9FFpBiY0WGYHLvr6/G3XflB13
-	+wrdyYnPbp4gAZqxWOS7Ijp/Pj/iV6p3pfraU5Zx55icMfc9hzPpTvgfM4DmtxuY1rCQ/Jd1woP
-	6QoUgMkKEoTKTePwuw2jwH19R52g=
-X-Google-Smtp-Source: AGHT+IH7kUuIZa2vfKwPYPTg9nq9/C2sMTAeKq8r3tJMucaNqEigVgTz4bKbe03UFM9znsRNLTpYPaK+o9Pzpot+Wqw=
-X-Received: by 2002:a05:6122:1d56:b0:50d:6cfc:ac4d with SMTP id
- 71dfb90a1353d-514026152dcmr1169824e0c.5.1731048683318; Thu, 07 Nov 2024
- 22:51:23 -0800 (PST)
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Vk2hUJbB8x1kfmvsTSguaM0YPcY6xrQ/6geYb6UO5dM=;
+ b=yqyJDLeKwCrZBNfR2wXq7o26MZYG5WyvSTbAeTM9lG3dLKAgrBPUNDuDsGXONJR5g2KGL5quXFwnyWat9Y85wSYUIEwaKFUunkmcEdlR71bLt3bRQxVB2CnaTAa4dy9SF/LWN0TrpWN2ndkawsMpSkm1sPX/LlICBnnwSzxtu5w=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by DS1PR04MB9537.namprd04.prod.outlook.com (2603:10b6:8:220::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.20; Fri, 8 Nov
+ 2024 07:07:45 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::ee22:5d81:bfcf:7969]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::ee22:5d81:bfcf:7969%4]) with mapi id 15.20.8137.018; Fri, 8 Nov 2024
+ 07:07:45 +0000
+From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To: hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Chris Mason <clm@fb.com>,
+	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Damien
+ Le Moal <Damien.LeMoal@wdc.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>
+Subject: Re: [PATCH 2/5] block: fix bio_split_rw_at to take
+ zone_write_granularity into account
+Thread-Topic: [PATCH 2/5] block: fix bio_split_rw_at to take
+ zone_write_granularity into account
+Thread-Index: AQHbLoKZb0mXgEZCTESQ1KjTNcn0LLKs/MsA
+Date: Fri, 8 Nov 2024 07:07:45 +0000
+Message-ID: <ba51c228-00c8-4995-a9da-edf13c39dd86@wdc.com>
+References: <20241104062647.91160-1-hch@lst.de>
+ <20241104062647.91160-3-hch@lst.de>
+In-Reply-To: <20241104062647.91160-3-hch@lst.de>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|DS1PR04MB9537:EE_
+x-ms-office365-filtering-correlation-id: b38ef00e-ed5f-435f-535e-08dcffc40bc3
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?d3k5YWNCRUVvc2M5N1cvQm9RNS9iQ2gzS2FBeHpZSUpmNGs0bGlDM1gwV1hT?=
+ =?utf-8?B?ejh6MVpidlJpQW03WFRqTHNrMk03OW9tRVN3RUtETWl2WEhjV2gwcjZ5d214?=
+ =?utf-8?B?aUlIUUZHZHVMd0RxU0pOeTRPSVB3SHVMNXpjakgrT3BFZmUwRWNOb2JkQ3Fp?=
+ =?utf-8?B?UjMrTDhqdzFtckNyZlgvVWRyRG1iQ2ZPS1hMTHVIeXhJUXFqNUxBeDFSMCtr?=
+ =?utf-8?B?ZVVkd2tPVmljRDZRdXpTdC9HaVFPcnhDN1ZIQXNYZUZaeTVTVGFXQm9MaVNj?=
+ =?utf-8?B?SDdxZ243TzZPcTBlT1VkU2VDWE9MQUN0QnVCeFozeW1oUFhvbEZ5T3gxcE9J?=
+ =?utf-8?B?dmh0RENYcGtLME5NWE4xRnBrL1JNZ1ltTmZuSjZrdEhqb1N3VyttcUFKZWQw?=
+ =?utf-8?B?aVNYV0FoSlEwcHRRUVN4dkN4ZGgwQ3pnZS95TUdsVU56TDFtR0Q4MlVQUWYy?=
+ =?utf-8?B?eFoyL1BDMStJTGswQXduYklyUGZML1NxckpZVnZVUTV0d1RVdm9yVmhCeks3?=
+ =?utf-8?B?My9jemx3dEdQdmsvL1dZSlU2K09pYVBkU1pnUFkvUkw4K2dwNWJDU0ZjYkI1?=
+ =?utf-8?B?RUVUL3liNnljalJaQklFMytWWUZlZ1lTSjdBTHJ4VzUxTG5oOGd5QnFacFNW?=
+ =?utf-8?B?YWZxbnl4V2hrZVorVnhlMWEyUG0rNWV4NlIrR0RPNjRRR0V1RGM5OUxvR1ky?=
+ =?utf-8?B?aE1IWlluVjhtYWtVK085a2xOODRLcCtOWFFjeHltWS94dXdpUEtqSHZKbVUz?=
+ =?utf-8?B?K1hIdXVCbXRiR3RHczB4ejBtbVNNWHpjQ3NPQzlyNmVuNlg4L2hOekdHbnpt?=
+ =?utf-8?B?NkdrTGhLV29VbGVsSzdrd3ZkaFNBRmtoRkxSMlpqbkFhMDNZY3JhVjhTL2Y3?=
+ =?utf-8?B?TmI3NnM0cVI4YTg5bUFuOXh1WnFDM0FJeVRQSUI5Q2RMdEhycXNzN0JkaGov?=
+ =?utf-8?B?S05wSFlIVThQVUtLQU8xMkowSGFXYlNiN09mQ0FkQmY3Y0ZYWGdmb3BsNFlt?=
+ =?utf-8?B?OHZGQVZRUmdpL3V3clhPdkpUTUhvQ3BtdmRtVTB4VjkxRFFOTlUwNWV6UjJv?=
+ =?utf-8?B?ZUN4djZNL0wrdVQ1T0VmVjVWcUlJak5hemJUZFhmRDhpVHh2dWc5cWkybmY0?=
+ =?utf-8?B?S1RZUEgvS3ZOaEtndllxNnN2RGo4aDRzZExVWXVPd29OZHlhbXFuY3VTMVdF?=
+ =?utf-8?B?ZXoxNXFQUWhaWnJLN0cxVzBQS2cvWFR4dWtjaVdUVUhvaXNENEhDQk1WNG1L?=
+ =?utf-8?B?bVJ3cnBIMTNDTzVkYUtweTJLcVczQU9JUHNQd2NjVS84aFU1MjZ2UnRxQ29Z?=
+ =?utf-8?B?R2hBQWhNejA3ZGZtV2hmbHltUm9SUktsN0lhL0hoUEdibWxHV243aWw3SlFu?=
+ =?utf-8?B?NEtodUU0MFlaZ2N4ZGg5T2k4ZVM5VCs3SUNrMlFDWTU2SzNVNFRnZ0UrTzhB?=
+ =?utf-8?B?NUJvZUZpZG4wR0RqNmNhcjc3KzBjSWR0RENVazdodGxsTkd1MHN2OUpYbTRz?=
+ =?utf-8?B?ZGFYeVhOOGFyamZ4OHViOVNZc1pmcGRka3A4ZW1rd2haQTY3L2J5bEJJcFJV?=
+ =?utf-8?B?cFl1UXplb1Zsb1RCMXRSY0c4ckNmc3N5bmVFeXRUbUpCRFdwQUI0TUZ3M2Vk?=
+ =?utf-8?B?OHpVSlZ6MUt6YzkrbndDTnlNLzFBbHR0bCt1WlVHOGoxZFJZNzNYZ0E1WTVo?=
+ =?utf-8?B?NE1MQ3I0cE5CMG5KRzYySGNCS0FHTU9OL3J6SjZ1NVRSWHVVQmVpNVFLbnlx?=
+ =?utf-8?B?TDVTQVJmYis0c2hZV29xVjJQd3lTZ0cyQ21Yai9JWFpyNEhxTVo0VTl3bitW?=
+ =?utf-8?Q?fpjVcgdyenChPMTJmyRC4geN2kEZR4nwQn3K8=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?OGtyWFd1WjU5MzRVNy8wSis5LzJobVNpN3BiMllLNjFHK29oTFNydzRkZ2tH?=
+ =?utf-8?B?VDhybEhCeklwZU1DRGZBd2xmUVBwWjA5ZVVqNlBudnI2UTE5MWpYVlBNR0FZ?=
+ =?utf-8?B?WXB2U3FkVWZ4QTcwOGZRRGlESGJUTkpZSHJ0NTgrdHZWSzk1RkpXZU50c0NH?=
+ =?utf-8?B?a01jRm94cDgvOWRlVWdKT1pXT3VxUnJsRkpCeG1xRTY3OHpSTi9LZFZlRkhT?=
+ =?utf-8?B?cTFaNThkajIvaHdib24wU28rTTNWbndDNlNoM3lRNmFuYkNOVkRveTJuLzQz?=
+ =?utf-8?B?SGxEdGwzYmRGQnlFMmVQTXhLMk4wbTQwQVp4amxJZm9JVGtpWkk1MllMRjR1?=
+ =?utf-8?B?TUlwanE2MGlFd243Z3k0S0crcUpXLzc5MU9OV1pOMUROQ05saWd4MGJ5ZHNy?=
+ =?utf-8?B?VVFkSTVZY2lrWDd0WW9jR1RFSFRsNm1QK2FraFdrcTFUSXVGTTFLQncxK1Jp?=
+ =?utf-8?B?ZGRtbXBNTEllT2NFc1A1VjB5eGVwcEh3UFBWUnRoeDNENmg5Uk45YnpBM1N3?=
+ =?utf-8?B?K2hGNitmQjN4YWdUSzgvNnl3akl1dmNOOW8rWjM1TllaS2hFeUNMRGFUSlN5?=
+ =?utf-8?B?Ty8vZnBkbEFlY2VBdTlhODZ1OFU0NjJzUnJKY29LMW9RNUlRSjk1bFhSTll4?=
+ =?utf-8?B?Rm8xeEdMd3RGMk45K1dUZUdKelBWdlBrbXdmVnhLRlE2U0dCVHNYcGw4MTFq?=
+ =?utf-8?B?SXFQb1U5MFJveEpiU09KM0ZyWUQ5dlN1WEFIYnkwKzg3SDYxR1U5NmpsVFB4?=
+ =?utf-8?B?NUptNlErcVpzU0hiTkdGdHM4UFFkUWs4OHdWNEsyU2llajkwMHJ2NUp2bDJ3?=
+ =?utf-8?B?N1p4SHZoWHB5dmw5Q1pFOVpENGJ1c2lkd0JkRFZUbGtFQnpsQzBpUVJqOGRL?=
+ =?utf-8?B?L2NvV0Q5NGRVbFBjanZuL0dSZTQraU80UUlsa09iRlhSVjBCWHZZV0NTcTg4?=
+ =?utf-8?B?MVVjVjdCOGdNS0FQNk1XN0ZpZTdRY21CcTdaU1U3SFFyak42cGxyMnV6OXhJ?=
+ =?utf-8?B?K1BiRU5TRnNrMVRQN2FwY1k4Vmk4bGVYMVhGM01ST01nQitaaVJSL1BMQnFU?=
+ =?utf-8?B?aEtsK1RaUVZ3b2VxcVhJaHlWTkw1WXVNeXdrVWxHMDZuOXBxK0FZMGhyVGFw?=
+ =?utf-8?B?K1RXVGYvN3pKSXl5SlJDT0t5WTlLckErMHZDS09qRWprQ25JNG1zUUllcE4z?=
+ =?utf-8?B?OEJoNTAxOVdRZEtVNTVMSXZSakF6SW5TSC84OC85VklraEk2eDdpQU5BSDJ5?=
+ =?utf-8?B?bCtscnNoQnFSOFJKTGI4ZFZuTDg3eFJCakhIZ0NiaDdadjBadURrNUErREFP?=
+ =?utf-8?B?QVBLell1em53a3BLMk9wd2w1SDJDbjh4SU5MTks5ODZzdFZhbUNBSXVyWWZh?=
+ =?utf-8?B?Q3VkK1lKRjNvR0t3amhqVFdYUUR1bDhxRDlaNWYwV3VDRy9CTGRvaUVTM0NV?=
+ =?utf-8?B?Q3BpZyt2QzFYQm1IZzZmQXFveUxJb29FR29XeklNOWR3Z04zMkdBTWNrMUI2?=
+ =?utf-8?B?bXo4TlhmYUkxRmkvaFRTVThUeW5CVmpOc2gvTWtIUzFvTDVrL29GQUV5YmN0?=
+ =?utf-8?B?aCt1dVJGYnBidkJsbVVzMFpHd2k0UE92YVBMZzhyaitLUG5DalJhTXRWSDNE?=
+ =?utf-8?B?WlVTR0FFeUlob1BNak1QeTVyUkxBSXdhaE05MG4zWjJWTzd3a1ZLYjVJRU0x?=
+ =?utf-8?B?UDZjWkxyRlRJaTNRMW0wUFVSWmdBQUtYNnlQUXp4bHVHTzduYVFIK0ViNm9w?=
+ =?utf-8?B?eVpaUkdoSTFZb0hNM3M0NEJCMzlXRzlOWDRZL0cxeUk4VlF3c2RRRk5NQmd2?=
+ =?utf-8?B?Rm1Ucm55eTRRTE1ZbVZDbGRVTllHeWpDeHZuTFZ5eUNGZTBiSDh0TnJjcktv?=
+ =?utf-8?B?eTczbC9lNFdQdWNjTmhXMkJIY3VoZU1TTitXaEo3MjNvWWhkcityN1V0bldB?=
+ =?utf-8?B?Q01UbmxEbmVmdzBmMmdhakpDK1BzUEpGOHM3cE1iK3JySlVtaytpa040YjVL?=
+ =?utf-8?B?UnUzOFdYbFpUYWZTcHZ5M2xaSDh0ZTY2WGk3SEtKM0xUbnl0UkU3dlJLL2FS?=
+ =?utf-8?B?WEpDSFl2UmVKNTFwdlVLWlZFMUFoRis4Yk1Xam5kNFdvNTRIM0tDY3QzV1li?=
+ =?utf-8?B?TTVGRCt4eXNHUzJFZWNVQWxLSnNIWEhueU4zYm5uVzVQOXl1T3A4NmxVRmtD?=
+ =?utf-8?B?NEE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <310B1ACCF44C9D44B900943745C70986@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241107101005.69121-1-21cnbao@gmail.com> <87iksy5mkh.fsf@yhuang6-desk2.ccr.corp.intel.com>
-In-Reply-To: <87iksy5mkh.fsf@yhuang6-desk2.ccr.corp.intel.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Fri, 8 Nov 2024 19:51:12 +1300
-Message-ID: <CAGsJ_4wOGPbGQgqDidnYUCCpAT8sw+S92NEU+trAQL_rnC10ZA@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 0/2] mTHP-friendly compression in zsmalloc and zram
- based on multi-pages
-To: "Huang, Ying" <ying.huang@intel.com>
-Cc: linux-mm@kvack.org, akpm@linux-foundation.org, axboe@kernel.dk, 
-	bala.seshasayee@linux.intel.com, chrisl@kernel.org, david@redhat.com, 
-	hannes@cmpxchg.org, kanchana.p.sridhar@intel.com, kasong@tencent.com, 
-	linux-block@vger.kernel.org, minchan@kernel.org, nphamcs@gmail.com, 
-	senozhatsky@chromium.org, surenb@google.com, terrelln@fb.com, 
-	v-songbaohua@oppo.com, wajdi.k.feghali@intel.com, willy@infradead.org, 
-	yosryahmed@google.com, yuzhao@google.com, zhengtangquan@oppo.com, 
-	zhouchengming@bytedance.com, usamaarif642@gmail.com, ryan.roberts@arm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	t6LhI+iUWfVKn70zbz1o7uh47/MBPHOwauLTnYbaB5HiUjCd8D1SGHndrzcDnTLa2RxCPsfMALI6gaGq82hDiZGEpCHvoDExIt6yDWFXbzBP0+PTnPFBoC4Y0vL/lYuVGn2+Udroc2ToxxEnhKEqfk1Oqd+Mx5j81hbe1be6Pd83yNNKFk2sZRd3Fm09GHaBdIDCGtXpFGfHdILGrkJmJPilkaSNvpjvL2zuNbO0KQTJ1alwvKAS7Mqy9pUO1UMZZcalrhMRi/KoWVtxzGeHvRXpBaCScu0ZKh55phanjVj3sVx3NvB/wd+IX7LwVttJX6RJhBHs4c2fzwHQLm9b7RX08mfmQe6uI2Sz9rC9L9hR07t8p3vUK6zQ4aPp6Lov2j5uSeNHvMiZ14tAUNUYOSL+uf7oLQEPIXE0VBtDpd/m4o3rXsAUwERoQYosGw2BQfkMFExQvIZ8x7k6ZeB23/m2RENZBiob74IaGKTKB1wsIwi8NeMnnmpgFhMQIqU2RRATNA40ZAKj3aAzXOXkar5DLbms1dPGFWtqicfmufWj4PwavWJHs0UzAlMGL7V9b430De1AtIq78HH+yxMJnnXS0b38lYRkNv50YJJxACMzC7u5+LeIaCgSlSHRQLO9
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b38ef00e-ed5f-435f-535e-08dcffc40bc3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2024 07:07:45.5224
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: op9bCen2jY3ttyZSHJYx2Zb8jiykeVvl1jFeY12UPbIxF4CdUtXbQNEhNgjMeMU4cvqNQgWq8tj9sTsRE9kZqN+bWoGpCig3QwtEdraBpRw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS1PR04MB9537
 
-On Fri, Nov 8, 2024 at 6:23=E2=80=AFPM Huang, Ying <ying.huang@intel.com> w=
-rote:
->
-> Hi, Barry,
->
-> Barry Song <21cnbao@gmail.com> writes:
->
-> > From: Barry Song <v-songbaohua@oppo.com>
-> >
-> > When large folios are compressed at a larger granularity, we observe
-> > a notable reduction in CPU usage and a significant improvement in
-> > compression ratios.
-> >
-> > mTHP's ability to be swapped out without splitting and swapped back in
-> > as a whole allows compression and decompression at larger granularities=
-.
-> >
-> > This patchset enhances zsmalloc and zram by adding support for dividing
-> > large folios into multi-page blocks, typically configured with a
-> > 2-order granularity. Without this patchset, a large folio is always
-> > divided into `nr_pages` 4KiB blocks.
-> >
-> > The granularity can be set using the `ZSMALLOC_MULTI_PAGES_ORDER`
-> > setting, where the default of 2 allows all anonymous THP to benefit.
-> >
-> > Examples include:
-> > * A 16KiB large folio will be compressed and stored as a single 16KiB
-> >   block.
-> > * A 64KiB large folio will be compressed and stored as four 16KiB
-> >   blocks.
-> >
-> > For example, swapping out and swapping in 100MiB of typical anonymous
-> > data 100 times (with 16KB mTHP enabled) using zstd yields the following
-> > results:
-> >
-> >                         w/o patches        w/ patches
-> > swap-out time(ms)       68711              49908
-> > swap-in time(ms)        30687              20685
-> > compression ratio       20.49%             16.9%
->
-> The data looks good.  Thanks!
->
-> Have you considered the situation that the large folio fails to be
-> allocated during swap-in?  It's possible because the memory may be very
-> fragmented.
-
-That's correct, good question. On phones, we use a large folio pool to main=
-tain
-a relatively high allocation success rate. When mTHP allocation fails, we h=
-ave
-a workaround to allocate nr_pages of small folios and map them together to
-avoid partial reads.  This ensures that the benefits of larger block compre=
-ssion
-and decompression are consistently maintained.  That was the code running
-on production phones.
-
-We also previously experimented with maintaining multiple buffers for
-decompressed
-large blocks in zRAM, allowing upcoming do_swap_page() calls to use them wh=
-en
-falling back to small folios. In this setup, the buffers achieved a
-high hit rate, though
-I don=E2=80=99t recall the exact number.
-
-I'm concerned that this fault-around-like fallback to nr_pages small
-folios may not
-gain traction upstream. Do you have any suggestions for improvement?
-
->
-> > -v2:
-> >  While it is not mature yet, I know some people are waiting for
-> >  an update :-)
-> >  * Fixed some stability issues.
-> >  * rebase againest the latest mm-unstable.
-> >  * Set default order to 2 which benefits all anon mTHP.
-> >  * multipages ZsPageMovable is not supported yet.
-> >
-> > Tangquan Zheng (2):
-> >   mm: zsmalloc: support objects compressed based on multiple pages
-> >   zram: support compression at the granularity of multi-pages
-> >
-> >  drivers/block/zram/Kconfig    |   9 +
-> >  drivers/block/zram/zcomp.c    |  17 +-
-> >  drivers/block/zram/zcomp.h    |  12 +-
-> >  drivers/block/zram/zram_drv.c | 450 +++++++++++++++++++++++++++++++---
-> >  drivers/block/zram/zram_drv.h |  45 ++++
-> >  include/linux/zsmalloc.h      |  10 +-
-> >  mm/Kconfig                    |  18 ++
-> >  mm/zsmalloc.c                 | 232 +++++++++++++-----
-> >  8 files changed, 699 insertions(+), 94 deletions(-)
->
-> --
-> Best Regards,
-> Huang, Ying
-
-Thanks
-barry
+UmV2aWV3ZWQtYnk6IEpvaGFubmVzIFRodW1zaGlybiA8am9oYW5uZXMudGh1bXNoaXJuQHdkYy5j
+b20+DQo=
