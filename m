@@ -1,164 +1,122 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27FE28EB;
-	Fri,  8 Nov 2024 09:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015744431;
+	Fri,  8 Nov 2024 10:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731056673; cv=none; b=uywnirMG85sZnsmb5Jtyqp60mt6S0qvxa3XWw2qpx8twkFoNtdvCs3MjmrhpJNoxi1dagrrWjGYCxTKFRcbjMzvNpUQEcyh9+8aGY88RExMRPkzMLfpOByhAIt0aMM/Yi1SnXjhrAMitc7xtjBn0m+LzKEVVsDrw+odcX6WXbG4=
+	t=1731060235; cv=none; b=rwn7zNub7DbVy2k+D+TsCXgDovoUqQC7rrew1wcoysOS+DBeTtRh8ojRMODFilUBV+Zc7p9kbY+DMVEM1fEnlpTXZyo7n1Db9G6eV7EcjgY7X8hdT6jcw3nqJoDPiM3vIdewsVD6vKnIjLFAadTQsaLEM7TzutstDzb6O2gT+hI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731056673; c=relaxed/simple;
-	bh=AyeEwDBun6w6uaXopmqvpdcKmSZAcU23Z7sFvkx30EA=;
-	h=Date:Message-ID:From:Subject:To:Cc:In-Reply-To:References; b=IoaRMjgbARno/1KuiebqJSkfB7uuqikguVb+DMhfnZ3AoH7GpwyndU0llWiiBqFUNU+kWBWUYXngl/DAqFWQUz64R5fwFxOCKPBnmA6e7e/Uig8kr1SeijAlOejXMeyHBNIr45uvP9JRQ1ytIW5N2fx5RRjMhRW57zZcGYfxMtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D/vhihQB; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D/vhihQB"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-53c779ef19cso2140177e87.3;
-        Fri, 08 Nov 2024 01:04:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731056670; x=1731661470; darn=vger.kernel.org;
-        h=references:in-reply-to:cc:to:subject:from:message-id:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Ukb0WhkCUjRfInWYD6LunpJsHMp747p0BjeFB9MCAbc=;
-        b=D/vhihQB32XPBevEm4yzG/vmqW8CkoH8hs5+7bEhgZuvYdwBGTcUVKESya5iy7zYb1
-         yv/zAkQuQB0UqIo/f8RXFqGXZG3hWn7kIiDUufIfDK9vOJP7VETXVdQxzRRCVXUkozol
-         uPXVlhrwPCef0xb5iwvFFRTj+UuP36++8TF8goQZePPQpJAKBt+Qb5NIEPPk5UjGxinA
-         m/rePocDz3l3Dyk1OrGhJj7uQJeeRm7Ka242G7McQBlADe1aGBcw+DI1BAjwwNNxCPEQ
-         wsFGdfprMK9ZPHiUVs0HiEr/vKeGoSrwWDalSAGr6kITwsVdzardZdNS0COC+p/spkJ+
-         XRTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731056670; x=1731661470;
-        h=references:in-reply-to:cc:to:subject:from:message-id:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ukb0WhkCUjRfInWYD6LunpJsHMp747p0BjeFB9MCAbc=;
-        b=LqW1m13dzOEp4RXeXP2fvmKMGIRX2FpAU0euCYPxWkitwIuDztl50Sm3XDXLgZhbWP
-         Nr8RF/oKtSw1ja4ZoD5yVO6uKnEVubeYj7+6AwiRlQRv9i5tPMBpwR8f9PBbsjAzAPa1
-         3fOTkBTA06DSWT7HcQn5OG/1xkLalbNuJ620c9d94YVSZwimVzT7GmUQzx5H8uqUU67R
-         CD4bb+x+5m6rLz1PiP1gfzHtNXf4+tiJnH6z8kDoTBR8sd+mqo8Ng+yytcAKfnzc1hxl
-         3Hnod/35+k3IOzjQhKpbBz5WUR2/BEuLUnuZyLvLfIuO+qobA4QHd4P/pV/Uy/wehkJp
-         BGAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfzMGRKIhRle9zTX+0TqDpBlsXlS6/FwcMrjBZd/7u89hnli7GnI7B73RFURX22iwC9Y5POIMHawV2dA==@vger.kernel.org, AJvYcCWlNB2rFK/HUUSUZC+0/gyEWpHmQAsMJ+odg4Cli0UIFdf1T351piyqMNgNB43SZts4+q3Xv0BvI2In@vger.kernel.org, AJvYcCX67hWynzqhlhh+hqeup54dhfbPMS/n0GyFSxd9DVdTMFnn5fiPOXSGSnNN3OGcvq9B9zHqDjA92iHGKvqh@vger.kernel.org
-X-Gm-Message-State: AOJu0Yweh9HluLb2U/TMaK1h+R1NpTpuxT8Om6cLP6A7MnJ5a4SFs0mk
-	yn5T1dXiWLyBqJZxtbN9Z34lEvXUziN8I7jeTWidt+BtqGR3DTKl3d6gbz2k
-X-Google-Smtp-Source: AGHT+IFOpAxizeoWAsAf1Ig+nqrd38luvrclBvzCYJOG2h7JJE69AHUF22najhZFnz4M6jEFU735Hg==
-X-Received: by 2002:a05:6512:1288:b0:539:fa3d:a73 with SMTP id 2adb3069b0e04-53d862be309mr1001057e87.39.1731056669460;
-        Fri, 08 Nov 2024 01:04:29 -0800 (PST)
-Received: from localhost (host-82-56-18-47.retail.telecomitalia.it. [82.56.18.47])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed987d33sm4037872f8f.43.2024.11.08.01.04.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 01:04:28 -0800 (PST)
-Date: Fri, 08 Nov 2024 10:04:27 +0100
-Message-ID: <c6d634d088f77abd956dbd125c26d43d@gmail.com>
-From: Matteo Martelli <matteomartelli3@gmail.com>
-Subject: Re: iio, syfs, devres: devm_kmalloc not aligned to pow2 size argument
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jonathan Cameron <jic23@kernel.org>, Joe Perches <joe@perches.com>, Jens Axboe <axboe@kernel.dk>, Peter Zijlstra <peterz@infradead.org>
-Cc: Marc Gonzalez <marc.w.gonzalez@free.fr>, Peter Rosin <peda@axentia.se>, "Rafael J. Wysocki" <rafael@kernel.org>, linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <c486a1cf98a8b9ad093270543e8d2007@gmail.com>
-References: <c486a1cf98a8b9ad093270543e8d2007@gmail.com>
+	s=arc-20240116; t=1731060235; c=relaxed/simple;
+	bh=l5DnvzL4sy5C2lpQdy/WOoP4Io2r2vU4GWYByRNWdbw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Tw8SaDTVc9oztkLMYQGr44KSW0PUonNvQC2TbbfdcK/5YG0E3U3CHmosGOj4l+9KRSbR0RmB5OSVvbAxLZBnLN46AenB+ISoqMUcKnPzPbye8Vt+IjyPkEcTEYTXZ4B4pMEFqrR4DMEtiWk06xDnVsQZ7MDTskLH20a7rMbh9iM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XlDx23Xptz1T9vC;
+	Fri,  8 Nov 2024 18:01:26 +0800 (CST)
+Received: from kwepemg200013.china.huawei.com (unknown [7.202.181.64])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0AC6A1400DC;
+	Fri,  8 Nov 2024 18:03:49 +0800 (CST)
+Received: from huawei.com (10.175.113.32) by kwepemg200013.china.huawei.com
+ (7.202.181.64) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 8 Nov
+ 2024 18:03:48 +0800
+From: Liu Shixin <liushixin2@huawei.com>
+To: Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky
+	<senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Andrew Morton
+	<akpm@linux-foundation.org>
+CC: <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>, Liu Shixin
+	<liushixin2@huawei.com>
+Subject: [PATCH] zram: fix NULL pointer in comp_algorithm_show()
+Date: Fri, 8 Nov 2024 18:01:47 +0800
+Message-ID: <20241108100147.3776123-1-liushixin2@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemg200013.china.huawei.com (7.202.181.64)
 
-On Mon, 28 Oct 2024 13:04:10 +0100, matteomartelli3@gmail.com wrote:
-> Hi everyone,
-> 
-> I found an issue that might interest iio, sysfs and devres, about a
-> particular usage of devm_kmalloc() for buffers that later pass through
-> sysfs_emit() or sysfs_emit_at(). These sysfs helpers require the output
-> buffer to be PAGE_SIZE aligned since commit 2efc459d06f1 ("sysfs: Add
-> sysfs_emit and sysfs_emit_at to format sysfs output"). Such requirement
-> is satisfied when kmalloc(PAGE_SIZE, ...) is used but not when
-> devm_kmalloc(PAGE_SIZE,...) is used as it actually returns a pointer to
-> a buffer located after the devres metadata and thus aligned to
-> PAGE_SIZE+sizeof(struct devres).
-> 
-> Specifically, I came across this issue during some testing of the
-> pac1921 iio driver together with the iio-mux iio consumer driver, which
-> allocates a page sized buffer to copy the ext_info of the producer
-> pac1921 iio producer driver. To fill the buffer, the latter calls
-> iio_format_value(), and so sysfs_emit_at() which fails due to the buffer
-> not being page aligned. This pattern seems common for many iio drivers
-> which fill the ext_info attributes through sysfs_emit*() helpers, likely
-> necessary as they are exposed on sysfs.
-> 
-> I could reproduce the same error behavior with a minimal dummy char
-> device driver completely unrelated to iio. I will share the entire dummy
-> driver code if needed but essentially this is the only interesting part:
-> 
-> 	data->info_buf = devm_kzalloc(data->dev, PAGE_SIZE, GFP_KERNEL);
-> 	if (!data->info_buf)
-> 		return -ENOMEM;
-> 
-> 	if (offset_in_page(data->info_buf))
-> 		pr_err("dummy_test: buf not page algined\n");
-> 
-> When running this, the error message is printed out for the reason above.
-> 
-> I am not sure whether this should be addressed in the users of
-> devm_kmalloc() or in the devres implementation itself. I would say that
-> it would be more clear if devm_kmalloc() would return the pointer to the
-> size aligned buffer, as it would also comply to the following kmalloc
-> requirement (introduced in [1]):
-> 
-> The address of a chunk allocated with `kmalloc` is aligned to at least
-> ARCH_KMALLOC_MINALIGN bytes. For sizes of power of two bytes, the
-> alignment is also guaranteed to be at least to the respective size.
-> 
-> To do so I was thinking to try to move the devres metadata after the
-> data buffer, so that the latter would directly correspond to pointer
-> returned by kmalloc. I then found out that it had been already suggested
-> previously to address a memory optimization [2]. Thus I am reporting the
-> issue before submitting any patch as some discussions might be helpful
-> first.
-> 
-> I am sending this to who I think might be interested based on previous
-> related activity. Feel free to extend the cc list if needed.
+LTP reported a NULL pointer dereference as followed:
 
-Adding some more context to better understand the impact of this.
+ CPU: 7 UID: 0 PID: 5995 Comm: cat Kdump: loaded Not tainted 6.12.0-rc6+ #3
+ Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
+ pstate: 40400005 (nZcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+ pc : __pi_strcmp+0x24/0x140
+ lr : zcomp_available_show+0x60/0x100 [zram]
+ sp : ffff800088b93b90
+ x29: ffff800088b93b90 x28: 0000000000000001 x27: 0000000000400cc0
+ x26: 0000000000000ffe x25: ffff80007b3e2388 x24: 0000000000000000
+ x23: ffff80007b3e2390 x22: ffff0004041a9000 x21: ffff80007b3e2900
+ x20: 0000000000000000 x19: 0000000000000000 x18: 0000000000000000
+ x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+ x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
+ x11: 0000000000000000 x10: ffff80007b3e2900 x9 : ffff80007b3cb280
+ x8 : 0101010101010101 x7 : 0000000000000000 x6 : 0000000000000000
+ x5 : 0000000000000040 x4 : 0000000000000000 x3 : 00656c722d6f7a6c
+ x2 : 0000000000000000 x1 : ffff80007b3e2900 x0 : 0000000000000000
+ Call trace:
+  __pi_strcmp+0x24/0x140
+  comp_algorithm_show+0x40/0x70 [zram]
+  dev_attr_show+0x28/0x80
+  sysfs_kf_seq_show+0x90/0x140
+  kernfs_seq_show+0x34/0x48
+  seq_read_iter+0x1d4/0x4e8
+  kernfs_fop_read_iter+0x40/0x58
+  new_sync_read+0x9c/0x168
+  vfs_read+0x1a8/0x1f8
+  ksys_read+0x74/0x108
+  __arm64_sys_read+0x24/0x38
+  invoke_syscall+0x50/0x120
+  el0_svc_common.constprop.0+0xc8/0xf0
+  do_el0_svc+0x24/0x38
+  el0_svc+0x38/0x138
+  el0t_64_sync_handler+0xc0/0xc8
+  el0t_64_sync+0x188/0x190
 
-With a trivial grep it looks like there are only few instances where
-devm_k*alloc() is used to allocate a PAGE_SIZE buffer:
+The zram->comp_algs[ZRAM_PRIMARY_COMP] can be NULL in zram_add() if
+comp_algorithm_set() has not been called. User can access the zram device
+by sysfs after device_add_disk(), so there is a time window to trigger
+the NULL pointer dereference. Move it ahead device_add_disk() to make sure
+when user can access the zram device, it is ready. comp_algorithm_set() is
+protected by zram->init_lock in other places and no such problem.
 
-$ git grep -n 'devm_.*alloc.*(.*PAGE_SIZE'
-block/badblocks.c:1584:         bb->page = devm_kzalloc(dev, PAGE_SIZE, GFP_KERNEL);
-drivers/iio/multiplexer/iio-mux.c:287:          page = devm_kzalloc(dev, PAGE_SIZE, GFP_KERNEL);
-drivers/mtd/nand/raw/mxc_nand.c:1702:   host->data_buf = devm_kzalloc(&pdev->dev, PAGE_SIZE, GFP_KERNEL);
-drivers/usb/gadget/udc/gr_udc.c:1987:           buf = devm_kzalloc(dev->dev, PAGE_SIZE, GFP_DMA | GFP_ATOMIC);
-sound/soc/sof/debug.c:277:              dfse->buf = devm_kmalloc(sdev->dev, PAGE_SIZE, GFP_KERNEL);
+Fixes: 7ac07a26dea7 ("zram: preparation for multi-zcomp support")
+Signed-off-by: Liu Shixin <liushixin2@huawei.com>
+---
+ drivers/block/zram/zram_drv.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-What takes my attention is the bb->page in blocks/badblocks.c, being the
-buffer named "page" maybe it is supposed to be page aligned?
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index ad9c9bc3ccfc..5223a03cb10e 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -2381,6 +2381,8 @@ static int zram_add(void)
+ 	zram->disk->fops = &zram_devops;
+ 	zram->disk->private_data = zram;
+ 	snprintf(zram->disk->disk_name, 16, "zram%d", device_id);
++	zram_comp_params_reset(zram);
++	comp_algorithm_set(zram, ZRAM_PRIMARY_COMP, default_compressor);
+ 
+ 	/* Actual capacity set using sysfs (/sys/block/zram<id>/disksize */
+ 	set_capacity(zram->disk, 0);
+@@ -2388,9 +2390,6 @@ static int zram_add(void)
+ 	if (ret)
+ 		goto out_cleanup_disk;
+ 
+-	zram_comp_params_reset(zram);
+-	comp_algorithm_set(zram, ZRAM_PRIMARY_COMP, default_compressor);
+-
+ 	zram_debugfs_register(zram);
+ 	pr_info("Added device: %s\n", zram->disk->disk_name);
+ 	return device_id;
+-- 
+2.34.1
 
-Also in [3] it was suggested to add the page alignment check for
-sysfs_emit() and sysfs_emit_at(), but I haven't found why that's
-necessary. My guess is for optimizations to avoid the buffer to spread
-in more than one page. Is this correct? Are there other reasons? Can
-anyone add more details? I think it would help to understand whether
-page alignment is necessary in the other instances of devm_k*alloc().
-
-Beside page alignment, there are plenty of devm_k*alloc() around the
-code base, is there any way to spot whether any of those instances
-expect the allocated buffer to be aligned to the provided size?
-
-If this is a limited use-case it can be worked around with just regular
-k*alloc() + devm_add_action_or_reset() as Jonathan suggested. However, I
-still think it can be easy to introduce some alignment related bug,
-especially when transitioning from k*alloc() to devm_k*alloc() in an old
-implementation since it can be assumed that they have the same alignment
-guarantees. Maybe some comment in the devres APIs or documentation would
-help in this case?
-
-Any thoughts?
-
-> 
-> [1]: https://lore.kernel.org/all/20190826111627.7505-3-vbabka@suse.cz/
-> [2]: https://lore.kernel.org/all/20191220140655.GN2827@hirez.programming.kicks-ass.net/
-
-[3]: https://lore.kernel.org/all/743a648dc817cddd2e7046283c868f1c08742f29.camel@perches.com/
-
-Best regards,
-Matteo Martelli
