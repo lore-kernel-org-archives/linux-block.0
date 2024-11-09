@@ -1,106 +1,133 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B620726281
-	for <linux-block@vger.kernel.org>; Sat,  9 Nov 2024 02:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DF43FB8B
+	for <linux-block@vger.kernel.org>; Sat,  9 Nov 2024 02:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731119103; cv=none; b=fgrfJDhHJbjBh6FfDeILqvv032hkGDPlROFSLhYv8wd3fP9kbK7SCwlYGHiEDPn6QH7W/Jegxr1iFUxUH4bKTJKfckHubr39TnDYf3IhvvkqEE/73sLrrvx5jjvD1FwBQiW8onay9weCtETg+nXNyPdtroKrisRoNND8aWo2rEo=
+	t=1731119280; cv=none; b=O+KKmArW9/jNBnMEc47UX4YW6jL9mgTxc2i6vK7ScWPxN76NmTrFq/RCDlDMr2shH0L/4vJoTqNoLOeg+UjLm/LDcFCCcJcSbehOPnCzBy/SSfV7Jz0hkchBoE3covqHiNE3ZmL+3parvtgNSk5qEGzUdsFJgp0mqeH8IRTS4vY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731119103; c=relaxed/simple;
-	bh=fZ0/smuwsbYLNpyeD5r4VwBPZwD9amTMgle2MFXazmk=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=nKroH1M/VXYmtxSjURp8FarVZCyM8pij9eg+7iyIxbp6Ktfoq/RUTBhE45scMtX50QFZW1jjU9Jos56Ttd8SDIg2Wjuk67uoIklAe2IGRrUdnVi6h2s41pcUDHPWncOc6h+7e3nl4FWRhdcpDVZ/YdlzLC48pnOM7MdTsjFckuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=lmCxHcsn; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1731119280; c=relaxed/simple;
+	bh=ViDUck4i+N5EpNg1wEOZXbt6ZtrxItQMeVSl3T9oDFw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IedAwrO6AbGsC/HcaHAyr1RAkF9jyyclD3YrxQsoTzhHPGpbY7m+26wN4TJPxz083RWrrs8SGSRF6nsh12hRl2lxglffsO26EX9IZhPFgPFx/Esp5wKKrNOBFNG7w4Y3PmQftPuZKO85YNq8/j89valGbr1cVPTZDHdOV4E3A8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DwJHDR1P; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="lmCxHcsn"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-71e681bc315so2105559b3a.0
-        for <linux-block@vger.kernel.org>; Fri, 08 Nov 2024 18:24:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731119098; x=1731723898; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tuoFJmTt1hgN33UXL368GDLh19kX9dWZ+eFKeRLTNNM=;
-        b=lmCxHcsnRZWcBcLWw57ws2NQ624P0t8guEsA+nC60JOkeQsRHmIy7BOV9PuaXW0US6
-         l3oooywNnjLHvJSledih07Qd4bur+66z8KqnkR+Vx29yaGrhdXUsuY868cp0uMieMSSf
-         hfrQpsw9cvVDjAhJPfM2aus9eudcnfYS8GfTaRUFXf5y2uMhOh0BY9IfVHpi/Nxd818u
-         xwxp+844hMIaCn3OcUq+SEdBb5+JtJ46Z7mCKLwfgSGhKUqpLplCts54NUQowReuWFVn
-         XtW+CZn7bfPgJ1ih4ds1uFhsj/Pn39pydW2cx8bHxAgIHDk2eNHiedKP8CP5jlh29XmH
-         aMCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731119098; x=1731723898;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tuoFJmTt1hgN33UXL368GDLh19kX9dWZ+eFKeRLTNNM=;
-        b=AL7BsILJY1Tw4RHaOW0teqWPuZRPOLUCpj4ZdaLxjm/d6AmXHsER/AVs2WyvnRut3d
-         dy19S3hVXArSBc9MtDqURikm27neO0AIAfnANmhRddKWQfjK4tDTXcb3ad6EfDUdlr+3
-         ewfmBE3K8KHpSAjURfes8V9TmxlxKTNngQz5xQQshA9Sl+tvVC7t6u9yeBiTLJTMXjUi
-         OKW+JA/JgPjhHKm2vnIIHcz2O/lB6se3kktVakGMSsTWajIWhV73MW5kG4I2WVfTvEiw
-         u8LHjZHLKLxAdUM+cZKvqDhq+LFisIKarsQ+dFBsKIhMMx4/dgoJlNh2MDoeEPBBi7LK
-         sDQw==
-X-Gm-Message-State: AOJu0Yzrdku5vHXHdyZV3mk2SNhLDiemPEkBehZ4PGcmHvUzfot0giul
-	Tjqir1t9GpGB8ASio2qK3biUKGwBHHp42iiGDT5lcUcBjYQEMdgt8ONJDv9zyWsCdlnRoLCBRKk
-	fuig=
-X-Google-Smtp-Source: AGHT+IG9yJ9ixl1j6BZAq4TEsE2DdcSl94UnYx+xQmftgA/JJip4uP6aR92uMSbOTmdvE5zA9PHZog==
-X-Received: by 2002:a05:6a00:140f:b0:71e:6fcb:7693 with SMTP id d2e1a72fcca58-724140a4ddfmr8233826b3a.12.1731119098357;
-        Fri, 08 Nov 2024 18:24:58 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724079aa8efsm4674348b3a.124.2024.11.08.18.24.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Nov 2024 18:24:57 -0800 (PST)
-Message-ID: <1178b3b9-6b42-4577-9cad-60fd899f391a@kernel.dk>
-Date: Fri, 8 Nov 2024 19:24:56 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DwJHDR1P"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731119277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=o4i2n7EuPgV3NJ6Yg+CPY7/orplxgDOJQtxtk6kTi3U=;
+	b=DwJHDR1PgY/06nB4iq0DzXCMyR2mNrMivNt0FSzcx/75rR1s+jmKYI1mbbPsLyqxCGVCpG
+	m2SHq8k0YXY6x2JxHJPTIWxblTajHlvqrG0uPTNOW1KcWexTad88GCOFRM8oog8g55zQmO
+	Qm4QK/Q8bMEHHtDGcmzd9xcBdBcPn6o=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-133-unuwCi9UNruoP2P06HqVCQ-1; Fri,
+ 08 Nov 2024 21:27:55 -0500
+X-MC-Unique: unuwCi9UNruoP2P06HqVCQ-1
+X-Mimecast-MFC-AGG-ID: unuwCi9UNruoP2P06HqVCQ
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1B745195608A;
+	Sat,  9 Nov 2024 02:27:54 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.23])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 059B91953880;
+	Sat,  9 Nov 2024 02:27:51 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Li Wang <liwang@redhat.com>,
+	John Garry <john.g.garry@oracle.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Jan Stancek <jstancek@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3] loop: fix type of block size
+Date: Sat,  9 Nov 2024 10:27:44 +0800
+Message-ID: <20241109022744.1126003-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 6.12-rc7
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi Linus,
+From: Li Wang <liwang@redhat.com>
 
-Single fix for an issue triggered with PROVE_RCU=y, with nvme using the
-wrong iterators for an SRCU protected list.
+PAGE_SIZE may be 64K, and the max block size can be PAGE_SIZE, so any
+variable for holding block size can't be defined as 'unsigned short'.
 
-Please pull!
+Unfortunately commit 473516b36193 ("loop: use the atomic queue limits
+update API") passes 'bsize' with type of 'unsigned short' to
+loop_reconfigure_limits(), and causes LTP/ioctl_loop06 test failure:
 
+  12 ioctl_loop06.c:76: TINFO: Using LOOP_SET_BLOCK_SIZE with arg > PAGE_SIZE
+  13 ioctl_loop06.c:59: TFAIL: Set block size succeed unexpectedly
+  ...
+  18 ioctl_loop06.c:76: TINFO: Using LOOP_CONFIGURE with block_size > PAGE_SIZE
+  19 ioctl_loop06.c:59: TFAIL: Set block size succeed unexpectedly
 
-The following changes since commit d0c6cc6c6a6164a853e86206309b5a5bc5e3e72b:
+Fixes the issue by defining 'block size' variable with 'unsigned int', which is
+aligned with block layer's definition.
 
-  Merge tag 'nvme-6.12-2024-10-31' of git://git.infradead.org/nvme into block-6.12 (2024-10-31 09:10:07 -0600)
+Fixes: 473516b36193 ("loop: use the atomic queue limits update API")
+Cc: John Garry <john.g.garry@oracle.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Jan Stancek <jstancek@redhat.com>
+Signed-off-by: Li Wang <liwang@redhat.com>
+(improve commit log & add fixes tag)
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V3:
+	- improve commit log
+	- add fixes tag
 
-are available in the Git repository at:
+ drivers/block/loop.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-  git://git.kernel.dk/linux.git tags/block-6.12-20241108
-
-for you to fetch changes up to 52ff8e91f916fa05dd47b5c30afa3286c30db444:
-
-  Merge tag 'nvme-6.12-2024-11-07' of git://git.infradead.org/nvme into block-6.12 (2024-11-07 13:57:12 -0700)
-
-----------------------------------------------------------------
-block-6.12-20241108
-
-----------------------------------------------------------------
-Breno Leitao (1):
-      nvme/host: Fix RCU list traversal to use SRCU primitive
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.12-2024-11-07' of git://git.infradead.org/nvme into block-6.12
-
- drivers/nvme/host/core.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index f21f4254b038..fe9bb4fb5f1b 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -173,7 +173,7 @@ static loff_t get_loop_size(struct loop_device *lo, struct file *file)
+ static bool lo_bdev_can_use_dio(struct loop_device *lo,
+ 		struct block_device *backing_bdev)
+ {
+-	unsigned short sb_bsize = bdev_logical_block_size(backing_bdev);
++	unsigned int sb_bsize = bdev_logical_block_size(backing_bdev);
+ 
+ 	if (queue_logical_block_size(lo->lo_queue) < sb_bsize)
+ 		return false;
+@@ -976,7 +976,7 @@ loop_set_status_from_info(struct loop_device *lo,
+ 	return 0;
+ }
+ 
+-static unsigned short loop_default_blocksize(struct loop_device *lo,
++static unsigned int loop_default_blocksize(struct loop_device *lo,
+ 		struct block_device *backing_bdev)
+ {
+ 	/* In case of direct I/O, match underlying block size */
+@@ -985,7 +985,7 @@ static unsigned short loop_default_blocksize(struct loop_device *lo,
+ 	return SECTOR_SIZE;
+ }
+ 
+-static int loop_reconfigure_limits(struct loop_device *lo, unsigned short bsize)
++static int loop_reconfigure_limits(struct loop_device *lo, unsigned int bsize)
+ {
+ 	struct file *file = lo->lo_backing_file;
+ 	struct inode *inode = file->f_mapping->host;
 -- 
-Jens Axboe
+2.44.0
 
