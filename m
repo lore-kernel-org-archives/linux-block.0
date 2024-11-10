@@ -1,63 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387D042069
-	for <linux-block@vger.kernel.org>; Sat,  9 Nov 2024 22:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41C22CAB
+	for <linux-block@vger.kernel.org>; Sun, 10 Nov 2024 03:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731189651; cv=none; b=UbLsOTWvzVV/anJMp5Ug03OYO/ouOd44sms5a7kwDIsM2ew1J3UhRUYbjh5l1ZWGDe3qd+A2RP718GVz8EVZFDIj88LRe2O3qV0jgN15JQu48u0wMSg26LluHSe2ZawMtqEjbObRpf53DtR/oFmBGxqGYy/niRzFPnixls9znzg=
+	t=1731208072; cv=none; b=KbAksTSRZ/R9efIKhUTLceFhOw691dDgt/BMDR7LY/lp+/KjEmIt9vu5U3F2KD5xwHps1ZhGbUUE8KSp93jhOCQI/qOvBdFPXx6NTx+UK9BwMXCquVL4gZKkS0ilgSDk9iPuGXTrBIXfJczjvryvh+HloEyBM+z35iUGi3sVJ9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731189651; c=relaxed/simple;
-	bh=MAV58+L2Gr0ymJabbq2rCbzIFRP6ka2mt8xip1zAf9Y=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=XTN7vJfr4fEeJMBFgu++2QClj9kemW7f/HWvLCxRPUl9W0veCIfmsD/L6CiP/j6rYNMS+p8QgwpfejZdxfJo1BxH7rVdaGIbuVWdWgZ/qkTWZq4mz1oSEiLrZ3+hoOI9x6S6hXa3XKxwSrkTlTqKodkBS0dJDiIB6H6G0CGtrgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U+7uIUzO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731208072; c=relaxed/simple;
+	bh=nJFTTZb2T8v24Pdhp2OGNGD2MfnUvaN+8qgQWcHfEiw=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=WDosgtRe1wC2uxmeVYBNQfkx9BSwhuRlt51V337aJIgoHxnbSo9lV98vvuwbBn2zYMH7CBZ9fS24s4Znb2QrQQZEd4jYmDKgwMMQpWNevLhCjrs6gad8AxR2ss/2VvzKYK273ab2QEGg6VTWsD+b8wpM7z/9WX5pfPVjTBTaXRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=VHYbPL8z; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U+7uIUzO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17791C4CECE;
-	Sat,  9 Nov 2024 22:00:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731189651;
-	bh=MAV58+L2Gr0ymJabbq2rCbzIFRP6ka2mt8xip1zAf9Y=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=U+7uIUzO5qL2a8kDfeBdKTy+6XQuJ8oXU2k9IrunPXk6JXbRddN6TBm0MfLQV0zSZ
-	 OUTZpr9+HABMpmNSuzRYAYZ+x8hMpshpEbbwPz1avMv1G7yFveEHvNmlupTz1LXGhH
-	 NUCc9ttq3EJnHi35gaiMMo3orfOLdaHH5vfUn0VjAZ1anhetGOvQQD5hzL09S73hFo
-	 Sbg1TIFPrGi98nOSNR6OTNyJKOyroFI4X4ntmrpS9JjyQXUQAe6zp3OUJWjIyG1UIw
-	 Cd9xPSQ5YVTXLsubKMM+F18H+OmBTnHFlZyK+jUsLEgQ2644IxKEVcG5J4PHxRxo9u
-	 eJfwLEK2ziibw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1B83809A80;
-	Sat,  9 Nov 2024 22:01:01 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fix for 6.12-rc7
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <1178b3b9-6b42-4577-9cad-60fd899f391a@kernel.dk>
-References: <1178b3b9-6b42-4577-9cad-60fd899f391a@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <1178b3b9-6b42-4577-9cad-60fd899f391a@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.12-20241108
-X-PR-Tracked-Commit-Id: 52ff8e91f916fa05dd47b5c30afa3286c30db444
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: a58f4dd9526abbb83523ea515508ba714a1e6881
-Message-Id: <173118966048.3021408.15592184473982699114.pr-tracker-bot@kernel.org>
-Date: Sat, 09 Nov 2024 22:01:00 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VHYbPL8z"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7240fa50694so2316818b3a.1
+        for <linux-block@vger.kernel.org>; Sat, 09 Nov 2024 19:07:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731208070; x=1731812870; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ygceEVSXrW7M0Kct/MMvW5URAdXYw4XxgxQNqTqjxDs=;
+        b=VHYbPL8zl3GKZTPf0k0JEHFzJ93QcOH1n0H5oCXx3GogS/YlRDbzeGLGWGNHLIsOd8
+         iZCTtBvfsput84BKPxYTRHpDJ3pjhdewuJWcCh5gPum21Oy+CvLetRcmds8wGxF/vduE
+         qO0qrVlIHC0B1wUuGYZshsv2YuurHUV2uRdaQlUOsV1Qytmpo6OL6Cx9DOV9I+AxWEry
+         8nQAZNEAzCwLoTfABNZWqAp1yjYB6A0EVRtQh1lRHywccqJl/hpQw8UzadjILrmeUoE7
+         SzGomPMsduqaeAMgEXu347w+ukHJaXAs9gzOQryhky502Go/AZVhT/cImfkEp8w9qrgU
+         tqkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731208070; x=1731812870;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ygceEVSXrW7M0Kct/MMvW5URAdXYw4XxgxQNqTqjxDs=;
+        b=GwimeNguG6ZFDl1QK7FUfvyLmotL16EumuQQUEPZ9TpddHtODQZUiL1bx2jFHZaQz1
+         KXxcUzYApP2yoC9PkicSFqfEbR+MdBgGtx0wmTIflRqZkrtITWJzJZf259rJEBC/SWYm
+         ZfUKxPYAtYscRgZrpDJEqwLShLiCa5ejI/KyM4XLnJVppK3yfWhCuvUcA30wyKGG4ijL
+         PvapjV/RnvJYwzWX1FqcnvtmVxEwnt4AGZBUVvFks3vmJ05W7jSwy9aoYNICDLZv74bu
+         sM+9jdGmvmiZ1ZZkdxm+KGZULwaTMtk+KrhyYI+mcHq1H6UTk89tmWKRnSvj8Tlcy76u
+         PrnA==
+X-Gm-Message-State: AOJu0YzpddXahcLpeTkn6azN2kb9p33ryBlY25FvPhoIE69jEnlcuJqh
+	g9OhwZO2/saqqIYMT5MhMkhtHjqfxQiWq5rnJVwxgqmUPrMamklr90gLprpYAnic7dHSyfqLcOz
+	OdAA=
+X-Google-Smtp-Source: AGHT+IFh+XaiFPVABy8TFFyuVlHt9H2lvf7SddIWTaKsifNPa3mlGku+yz1NnyWF/kMz9B/M/MrRoA==
+X-Received: by 2002:a05:6a20:72ab:b0:1db:d8fe:9d4 with SMTP id adf61e73a8af0-1dc229a6b5dmr10932478637.16.1731208069956;
+        Sat, 09 Nov 2024 19:07:49 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7f41f65ba92sm5922982a12.80.2024.11.09.19.07.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Nov 2024 19:07:49 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Li Wang <liwang@redhat.com>, John Garry <john.g.garry@oracle.com>, 
+ Stefan Hajnoczi <stefanha@redhat.com>, Christoph Hellwig <hch@lst.de>, 
+ Damien Le Moal <dlemoal@kernel.org>, Jan Stancek <jstancek@redhat.com>
+In-Reply-To: <20241109022744.1126003-1-ming.lei@redhat.com>
+References: <20241109022744.1126003-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V3] loop: fix type of block size
+Message-Id: <173120806863.1615597.8815561681706905908.b4-ty@kernel.dk>
+Date: Sat, 09 Nov 2024 20:07:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-The pull request you sent on Fri, 8 Nov 2024 19:24:56 -0700:
 
-> git://git.kernel.dk/linux.git tags/block-6.12-20241108
+On Sat, 09 Nov 2024 10:27:44 +0800, Ming Lei wrote:
+> PAGE_SIZE may be 64K, and the max block size can be PAGE_SIZE, so any
+> variable for holding block size can't be defined as 'unsigned short'.
+> 
+> Unfortunately commit 473516b36193 ("loop: use the atomic queue limits
+> update API") passes 'bsize' with type of 'unsigned short' to
+> loop_reconfigure_limits(), and causes LTP/ioctl_loop06 test failure:
+> 
+> [...]
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/a58f4dd9526abbb83523ea515508ba714a1e6881
+Applied, thanks!
 
-Thank you!
+[1/1] loop: fix type of block size
+      commit: 8e604cac499248c75ad3a26695a743ff879ded5c
 
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Jens Axboe
+
+
+
