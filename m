@@ -1,56 +1,104 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7B150276;
-	Mon, 11 Nov 2024 06:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B70154BFF;
+	Mon, 11 Nov 2024 07:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731307915; cv=none; b=rXn0Mkr41eYYidPe30T+sukrb3YgsO5oG7f7mwmIWxYuJ56SZvbjSiK0Q06ipFy+12AjA7fHngiECQkFrpwUrH5Tm7LKqA2sX3bfql1ZHFiUCAX9FMFFHETjZCkLNyawSQ3hYrAP3KNPtX1Ywo1vyQgHclKGn+tIXXZBLqOIJps=
+	t=1731309603; cv=none; b=cHr8+TVze2RAQL+nSThBmDcuCVIDVm6ctBE5+ln9QzedQaoWJNOzuMmkqcO7BzcO37rvN3gqkxeVmnEH2egLaOzsL+EI7fwlhnUWIKi2LelCYxhw7CDd/QnqwFDREZ9fpdtJ/JtQ14n+UVhmdOpTVtxDL1eF7kKf3FUyfYkiJoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731307915; c=relaxed/simple;
-	bh=dNg5OUTs7eYh41E8GdwTE3yqH4TylN03QsfQRqUTRY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Re1YvX1wFSwv+I0Yjwv6D1Mm/56fDUlmMsx3MLfdIYloLO5D9TGLl4wSup/ei18oOKJ0NAdpXV3ql5k6ufR/bDhpfZ3XrGbgQ5m1uL9cdSdfwFcexA7K06/GmJ6EH2ccSacV/pE+iXLXlzxnnoOcvVeg9MurAFf5AwMCxS0deL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id EBD4668C7B; Mon, 11 Nov 2024 07:51:48 +0100 (CET)
-Date: Mon, 11 Nov 2024 07:51:48 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Javier Gonzalez <javier.gonz@samsung.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"joshi.k@samsung.com" <joshi.k@samsung.com>,
-	"bvanassche@acm.org" <bvanassche@acm.org>
-Subject: Re: [PATCHv10 0/9] write hints with nvme fdp, scsi streams
-Message-ID: <20241111065148.GC24107@lst.de>
-References: <20241029151922.459139-1-kbusch@meta.com> <20241105155014.GA7310@lst.de> <Zy0k06wK0ymPm4BV@kbusch-mbp> <20241108141852.GA6578@lst.de> <Zy4zgwYKB1f6McTH@kbusch-mbp> <CGME20241108165444eucas1p183f631e2710142fbbc7dee9300baf77a@eucas1p1.samsung.com> <Zy5CSgNJtgUgBH3H@casper.infradead.org> <d7b7a759dd9a45a7845e95e693ec29d7@CAMSVWEXC02.scsc.local>
+	s=arc-20240116; t=1731309603; c=relaxed/simple;
+	bh=2rkhCrabTh+dME1AyXeh+UGUqDM4G2Qwh/eeTBLxHOA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Q6EhhXROBPwKBZVp6OEEVNVhfBqGX8htN8GO4ndW6ZmmLTb57qc+iM2Iu7QS49Ects0qhrICZaX4ACG2tPU2tzEGdpKA0XsNjv11cRqettA3wVI6gIA+oxg9AXqJyGZjMAHzVjxKcUZ/knhMghyadsmig4bJwMvavss+XIo1Dms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L2RmQqTK; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L2RmQqTK"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7f45ab88e7fso467767a12.1;
+        Sun, 10 Nov 2024 23:20:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731309601; x=1731914401; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WOmU+DqOTssuNxVDSw47mJh+RLlQKxt2hGA3wP7JifE=;
+        b=L2RmQqTK9Wjh02aoHCm+tihh3do5fBjvlJSbNcIiGrPFQtaYDWDY8yALCxaMhTkG4e
+         EsrTixWvGiydwQp5LSsvTvIjMFx34pczwzwrKxPJJcVoywalDU89kyRiov6/WDDRRPfp
+         QDXg02VzuHLdtRdxN1JUkDfQxBuyyMXYihEgnU6uigADRGFvDG9Gbsbtew7HotBxfop5
+         0almtxKQsAsAK3zuLbaFNPvxPlvFOxQeZMObxnoBHXUDLG8Il4z/52h3dp1JZ7pLRKZj
+         ftZgbZUZ6MzD+s6bqBhauDTT+P2Jp1uSMdrF49GMxu3GXLyaLtNWWFOoYqaTZs06gUEy
+         TvgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731309601; x=1731914401;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WOmU+DqOTssuNxVDSw47mJh+RLlQKxt2hGA3wP7JifE=;
+        b=XqcCpmmUEBxWGZqoBnztay4JwghJ3jG9SgFurZ5P75LSsTi/5XLtS+cAWPo8zu4/o+
+         rGcARBZrKBB7Fv/6ZppYTCST0iSYGH7xrUo5PeMgp57E+5eBKJVBd0N7z6ambkh9DxEQ
+         5AEJHkVrajcRelIg+iBQkYIa9sHODjOuAcFZoITzeHOEJCMLB9qYRzV2rcPyQZOWozTW
+         Xw2QOuIiAgXmM3fS75IPfeTTFuWkfrxrsv7PE+UQMpCtvPmjghj6+IAUAi57MLJzB8//
+         50XgLhsDm8ROrGeuNmftQ33E7nL9gDRh0N1+UTvn6WftGtJ9oA+khzfHwdvLcn99HWWD
+         LfUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvbZEbbeBSFK+dUQA9GDrfVKQ99W5UeSTp5Udx68OESljjB9JlNlxKimrgg0LMIjwtfZrQSViL9KPkXAM=@vger.kernel.org, AJvYcCW09/ecr8sfSxKyLFXOGiys0X8myX2no7joL1/U2PniEXSFeR2X/KJXwH4UGBTbr6HnmAOb5WA8S3i6@vger.kernel.org, AJvYcCXPPnEU/jd0eDGa1VoJLL1oPQP4NSQg9PyAJWtDC1Ej7D+m0u/cE2x8C0f957tTf1QEeac+lPzWobUA0Q==@vger.kernel.org, AJvYcCXQDw6QO6jlTllfm8aq5DCi27WhpPFJKyhNL3BKZmKxnO48E4ta4hEJXRsp4AHueRbkFuw=@vger.kernel.org, AJvYcCXe3CKp5mxhSW4cxE8DhwWPwhfh/C0MHkq7JViaMDjg7aPlG9qCI12jTejWaXRn79MMg281IHD4dBqI/xVy@vger.kernel.org, AJvYcCXhP9h2PLfzFkxIusU1wAY8aAX0s8EZGsOLNrcvNPHFI4x1uiRtfXoS5p7219+LQK3LCicg1Jak/EMv@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJpsF9F2ds85IKGzCGkAFdmO6oUR8bxDoNz50yDuwmZIz9RoLB
+	0G5FX+cGFeMIURANWK3p5j947r6u/cFEyVX0AWYGeYBT1fqporW0T8sWDU3klGp+MWttnhisxul
+	LtNyL7yycDM1e7U8/v7yEYnVXI+M=
+X-Google-Smtp-Source: AGHT+IE2GbhyhHM7VLZoUXFICAIpmggZuUxeUy9Xke7HCQ1ScZ37Bf1N00DNPtc+BrABfZWGfVXnr9FTBKVDLWlkvX0=
+X-Received: by 2002:a05:6a20:6a1c:b0:1d8:d880:2069 with SMTP id
+ adf61e73a8af0-1dc228395camr18138782637.3.1731309601118; Sun, 10 Nov 2024
+ 23:20:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d7b7a759dd9a45a7845e95e693ec29d7@CAMSVWEXC02.scsc.local>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <cover.1730298502.git.leon@kernel.org> <9515f330b9615de92a1864ab46acbd95e32634b6.1730298502.git.leon@kernel.org>
+ <5ea594b3-7451-4553-92c1-2590c8baef20@linux.dev> <20241111063932.GC23992@lst.de>
+In-Reply-To: <20241111063932.GC23992@lst.de>
+From: Greg Sword <gregsword0@gmail.com>
+Date: Mon, 11 Nov 2024 15:19:48 +0800
+Message-ID: <CAEz=LcshavSrtGDjhKBPZU9o+5Mr8rPiBPmVL4dxcOmEiqHQSQ@mail.gmail.com>
+Subject: Re: [PATCH v1 04/17] dma-mapping: Add check if IOVA can be used
+To: Christoph Hellwig <hch@lst.de>
+Cc: Zhu Yanjun <yanjun.zhu@linux.dev>, Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>, 
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, Leon Romanovsky <leonro@nvidia.com>, 
+	Keith Busch <kbusch@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>, 
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>, 
+	Alex Williamson <alex.williamson@redhat.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	=?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 08, 2024 at 05:43:44PM +0000, Javier Gonzalez wrote:
-> We have been iterating in the patches for years, but it is unfortunately
-> one of these series that go in circles forever. I don't think it is due
-> to any specific problem, but mostly due to unaligned requests form
-> different folks reviewing. Last time I talked to Damien he asked me to 
-> send the patches again; we have not followed through due to bandwidth.
+On Mon, Nov 11, 2024 at 2:39=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrot=
+e:
+>
+> On Sun, Nov 10, 2024 at 04:09:11PM +0100, Zhu Yanjun wrote:
+> >> +
+> >> +/*
+> >> + * Use the high bit to mark if we used swiotlb for one or more ranges=
+.
+> >> + */
+> >> +#define DMA_IOVA_USE_SWIOTLB                (1ULL << 63)
+> >
+> > A trivial problem.
+> > In the above macro, using BIT_ULL(63) is better?
+>
+> No, and can people please stop suggesting it?  That macro is so fucking
+> pointless that it's revolting,
 
-A big problem is that it actually lacks a killer use case.  If you'd
-actually manage to plug it into an in-kernel user and show a real
-speedup people might actually be interested in it and help optimizing
-for it.
+Why do you hate this macro so much, have you considered the feelings
+of the macro author?
 
+>
+>
