@@ -1,97 +1,113 @@
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C428B39ACC
-	for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 16:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDBFC13C80D;
+	Mon, 11 Nov 2024 16:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731342057; cv=none; b=YQU8/2UpkegH54cfYD3rfirwpFbHks5TCvpy5YFno3QfUukJgIPvbXHkQsN/phx2SPwXOlFXJOsBUteKNNSWDD2CdJVkl/H6uynJo5zyIFrYpCTG67UXBTxBaH3BDFN23dOytup/SZJ4lf4jiMkxskgakH9GoM/6wwpolu3F/oA=
+	t=1731342457; cv=none; b=iGkauuVESVmIqTZqAK8150+PC/HexAegDBLMKogttE/9ihZmuaLWv0cVBiWnzIsvX/APHRhGqltrPVRYUI3cFA8dTxLgf7lJvraUuQvO/xoI086w7BngIOJpadLvr0P3KlCzao7QZAkxN3Aur7+CkAht71SR9hLNltX/jHA2SrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731342057; c=relaxed/simple;
-	bh=Gr80+VG7J/BXlMJjw8FPIb7lsgXVutSgJO+NHKLGMP8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=VMtsRzPh/y+7ORUKMUg+5VgRt9caq/ZbhRPq5IGs6S43oWopmhIue8bmLW+Sag4XjYJ6odsIBhVfk5e1NBTETOr057Lcf65GyXGpGF/9sJ6RHVZ8NBHTJj82eQDbwETWUZiI+zp7axWT41VFL14dTMrqB9kMorJLaY0rqJmLbyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=oSt/OytT; arc=none smtp.client-ip=209.85.160.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1731342457; c=relaxed/simple;
+	bh=fJMQuYsECNO8SL8MoMztWuhXknHywKxO6bpFKaQ4/tk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fl27/5nMtgrN2AE1d8QkC7NJWUGPiOo3sVHJ1GFtm4+t2S2lA6B6GKIaOVLbS5DWBEppk6RZXFsTcAXewLx6+5Smw4vq55YaEidK0okb8/a6EDac+X0ZbdMMB6D+l6XIzZjDfucnK7SP55PwczSs14KqlIzgPaGM3+Mby6VFB0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rZQf0+4y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="oSt/OytT"
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-290ff24354dso2044302fac.0
-        for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 08:20:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731342055; x=1731946855; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A8E0oe1Bn/VItUcYMvLcUh14F0RpsrF/kYUOTvmjo10=;
-        b=oSt/OytTtzcZydIFmrRN2AqCUJ21BeXV0dKlzpeFZUpvR9RQzEJkXIad50i9ftuqjP
-         DanXX9NV+kiSlixfbSdcJt/09NtxI/RK2zn71wPKfWxr0AL2OhhVnQ1mqbjcEIc86hwI
-         T3Md4wwXjmjpbXylDe1PI5tB+xj65B2v6F15nt5TY3CAisTsY2KPATvZNani6fjX413x
-         QIK8+4EtYBX+GSXv+/akznZKNIHvgJ/lI/lIgE21xhn2sEs6WjGTCWTlTDpePfR78eUB
-         +ALUSc+puBhcAgpbPzPt51FfbDLaN+N+LHb5wW/8vpKXuDaUBeixY2xwJns5Qv/j6RWZ
-         zh/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731342055; x=1731946855;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A8E0oe1Bn/VItUcYMvLcUh14F0RpsrF/kYUOTvmjo10=;
-        b=vofLL+gPm6gwlv4uSqTp9wzW9RW/gSkf5iTqK0mGjAgboz7DT7hs3h18RjRQqNHmz0
-         InSLhn3lnLdSQ60/GGrGQm60aYkiYDWRMEABTCjAu6dvqYWA1YCWSvhSEc2w5trBxuj/
-         /vZNSitoSjx0o4TjVHUT/pXotM51//6oI36yp7Y9iH6xfhIjjvaFjR6kijS78sQI8Aa3
-         Yi9+68d7fj5zMFPGFdSMA29rFkU6R48vNJgam7Pz6p+HcYtSK06PUJR4rlxt0dyAILBU
-         OpZ+bNTQIunF4U67j1WECjIWOlXCU6Hz75kbgotZsIZ2rP3lRXK9nlfsPzBR1TKWwyZY
-         Dmsg==
-X-Forwarded-Encrypted: i=1; AJvYcCXFPc6oBA7oC7n1cJ0ZDk7fONjRloD3eGsAtL0m4hITAspK5Ch2VUHKhOKzpgfX7nzYI+6BQmfZWDEqmQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdgzEnWS6hisc7vPbdvCAcrjSBo+J2rFBEw4GLCDAK8Yx1z4TN
-	HHXlZ+lN4u0r+ABTyy892qUx9RENt2gf3YOB6HvtBGcWo1Pj+AE8E+bKLAk2Uv/DTLDNmGmfHZM
-	1P04=
-X-Google-Smtp-Source: AGHT+IEqbL/XLujJeiHX0bUsKtZMEDX13bH7NGSuhQ5qyhhQ/3gVPpJHqC0jtcydmzbbJoZZ0nz+uQ==
-X-Received: by 2002:a05:6870:209:b0:26c:5312:a13b with SMTP id 586e51a60fabf-295603611e8mr11017504fac.30.1731342054703;
-        Mon, 11 Nov 2024 08:20:54 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-29546c3d9cdsm2893893fac.1.2024.11.11.08.20.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2024 08:20:54 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rZQf0+4y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 555DAC4CECF;
+	Mon, 11 Nov 2024 16:27:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731342457;
+	bh=fJMQuYsECNO8SL8MoMztWuhXknHywKxO6bpFKaQ4/tk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rZQf0+4yfZt5LKsbrtjWZLo88wX1EU9zpd2YctRXKMVU2fN+CkFXHpbROUtJe9O15
+	 /kvN6WXl0rbXesHJ9B4wWSh8aCTrBBS3SIAtmhOFzGpuEEqWhzh0RaYs1XKEIUI4hX
+	 jTCd+eGz8qgqTgz2lTuCmRmo0/lsl6Rv3brNNr5Kyh94rFdbCbHMAoGyIe/5WSlVSS
+	 KDyUpkbgXIp5Isx+39PNn0sYUtTAIv/aoK10rcaNSI2qUKBKih0Gu5/UpFCwEycIoe
+	 rebe0foqrYFiPhXRxGui7NFwBduK/0JiigPipoP54RuVXtPlZ/JmOoVxRlVChkz9X8
+	 R2MQ0jI6pEHiQ==
+Date: Mon, 11 Nov 2024 09:27:33 -0700
+From: Keith Busch <kbusch@kernel.org>
 To: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
-In-Reply-To: <20241108154657.845768-1-hch@lst.de>
-References: <20241108154657.845768-1-hch@lst.de>
-Subject: Re: pre-calculate max_zone_append_sectors v2
-Message-Id: <173134205389.1888032.3263693227897431533.b4-ty@kernel.dk>
-Date: Mon, 11 Nov 2024 09:20:53 -0700
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+	axboe@kernel.dk, martin.petersen@oracle.com, asml.silence@gmail.com,
+	javier.gonz@samsung.com, joshi.k@samsung.com
+Subject: Re: [PATCHv11 0/9] write hints with nvme fdp and scsi streams
+Message-ID: <ZzIwdW0-yn6uglDF@kbusch-mbp>
+References: <20241108193629.3817619-1-kbusch@meta.com>
+ <20241111102914.GA27870@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241111102914.GA27870@lst.de>
 
-
-On Fri, 08 Nov 2024 16:46:50 +0100, Christoph Hellwig wrote:
-> this series makes max_zone_append behave like the other queue limits in
-> that the final value to be used for splitting is pre-calculated.
+On Mon, Nov 11, 2024 at 11:29:14AM +0100, Christoph Hellwig wrote:
+> On Fri, Nov 08, 2024 at 11:36:20AM -0800, Keith Busch wrote:
+> >   Default partition split so partition one gets all the write hints
+> >   exclusively
 > 
-> Changes since v1:
->  - fold in the previously posted fixup patch
->  - add the nvme cleanup patch
+> I still don't think this actually works as expected, as the user
+> interface says the write streams are contigous, and with the bitmap
+> they aren't.
 > 
-> [...]
+> As I seem to have a really hard time to get my point across, I instead
+> spent this morning doing a POC of what I mean, and pushed it here:
+> 
+> http://git.infradead.org/?p=users/hch/misc.git;a=shortlog;h=refs/heads/block-write-streams
 
-Applied, thanks!
+Just purely for backward compatibility, I don't think you can have the
+nvme driver error out if a stream is too large. The fcntl lifetime hint
+never errored out before, which gets set unconditionally from the
+file_inode without considering the block device's max write stream.
 
-[1/2] block: pre-calculate max_zone_append_sectors
-      commit: 559218d43ec9dde3d2847c7aa127e88d6ab1c9ed
-[2/2] nvme-multipath: don't bother clearing max_hw_zone_append_sectors
-      commit: 0b4ace9da58df62c1763635ab10ae1bc8ed8182a
+> The big differences are:
+> 
+>  - there is a separate write_stream value now instead of overloading
+>    the write hint.  For now it is an 8-bit field for the internal
+>    data structures so that we don't have to grow the bio, but all the
+>    user interfaces are kept at 16 bits (or in case of statx reduced to
+>    it).  If this becomes now enough because we need to support devices
+>    with multiple reclaim groups we'll have to find some space by using
+>    unions or growing structures
 
-Best regards,
--- 
-Jens Axboe
+As far as I know, 255 possible streams exceeds any use case I know
+about.
 
+>  - block/fops.c is the place to map the existing write hints into
+>    the write streams instead of the driver
 
+I might be something here, but that part sure looks the same as what's
+in this series.
 
+>  - the stream granularity is added, because adding it to statx at a
+>    later time would be nasty.  Getting it in nvme is actually amazingly
+>    cumbersome so I gave up on that and just fed a dummy value for
+>    testing, though
+
+Just regarding the documentation on the write_stream_granularity, you
+don't need to discard the entire RU in a single command. You can
+invalidate the RU simply by overwriting the LBAs without ever issuing
+any discard commands.
+
+If you really want to treat it this way, you need to ensure the first
+LBA written to an RU is always aligned to NPDA/NPDAL.
+
+If this is really what you require to move this forward, though, that's
+fine with me.
+
+>  - the partitions remapping is now done using an offset into the global
+>    write stream space so that the there is a contiguous number space.
+>    The interface for this is rather hacky, so only treat it as a start
+>    for interface and use case discussions.
+>  - the generic stack limits code stopped stacking the max write
+>    streams.  While it does the right thing for simple things like
+>    multipath and mirroring/striping is is wrong for anything non-trivial
+>    like parity raid.  I've left this as a separate fold patch for the
+>    discussion.
