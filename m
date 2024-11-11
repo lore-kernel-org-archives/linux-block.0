@@ -1,101 +1,79 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC318136A;
-	Mon, 11 Nov 2024 06:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBE017F7;
+	Mon, 11 Nov 2024 06:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731307402; cv=none; b=TwiFmNwdh0Nu5MB/tFeS+33hUMLA5qVfh0TYX+2liISorGlrcreL9TdH9dd8sI0yQKfPhpAHOeQ3fcjezvgmNHh7Pepsj1xDue+/jF3MfpQGSnwkxSLpfisBuPXpvW12FtVE1y3tUvXNU78uLANXD9aeH5nljZkyJN0o2/cVBpg=
+	t=1731307727; cv=none; b=Hgnjtkp1+pWkMXi5M0N0yQG/vD1jmgw5dsE/KPeTqnbNV4K6sjJ8d13Y0bvRfF+u72LgxKrg1guW05j7ypDFjblb8LrHA4zYwweGoE1lZ+e+BKgEi+UQc6F4yu+DSEcr5hNEXQdHPSe9kiWri0t7RGL0EX/OttPE0MHdCSFAbxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731307402; c=relaxed/simple;
-	bh=OSWugjKTomfPMjmF51CbHUYzDzMD4jhQH03P9Uh6PXw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lpY53/NFBAkS3CZyHYMI70xmmlhMSdiVLFsiHkHQNnRpvT5PLfXj49N33kDS7vKSDxz3Ja97LwwXVPG6qyrhAGIIHZhBAfGe23fFwhUYS4DgiV+1vFey5K8TlaiKvY4VniJISJb5ezAe24UsE4r/HIwrPghT5j2JER6Oxf54DxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O6QxBhI0; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6QxBhI0"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-539f1292a9bso5031271e87.2;
-        Sun, 10 Nov 2024 22:43:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731307397; x=1731912197; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9qv7O8dew7I+B9eEJJt0qBNM8IZdD1sLJueFsW4bvsc=;
-        b=O6QxBhI0qB3sNjAHdFuUeyBpxfxUxG2hi1ERqYoIRe2jDIGHj+TxuroRoNDech0r1e
-         JCq4uvUppYin9VhCiCstiEEg+R7P2mgQfGOXhy2sCqF2wQGUmwHcF4RgVNxWX2Tvu+Lg
-         yghFqdu1mQfxOoW33fwIuxwFICEOGOD1PYxsO1udOvw2MZ6l3aA0PXelf0gGzhWs5MxP
-         8ktpsClOr/BoKyorc2r1FSO7I0RgJ9db/LWC83n0OyqzSzBD/m60rOIUJ3wdT9zNnj6j
-         qkmryFzFOdMezfxFuultGOd1eXi0rxx2/2U97XCcrSbiTP1v2V95GZvAqxe/uQkUXIdy
-         pnFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731307397; x=1731912197;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9qv7O8dew7I+B9eEJJt0qBNM8IZdD1sLJueFsW4bvsc=;
-        b=F6vMUpAFjzidLiyLPFhVOhWkOGZv2/pcmQrJ/6lk+aY3+in8vg2Ze22VsVJu9M/AIz
-         cozRc0n8GQHVISlcPdg4KzP9PuHtR5jOVlSRifyqK65JEfCwR+9WKv3Gf1TV8IryqMUC
-         +/cSqvzCcCu6hb+S+Z/Pn5dOy3vQ1RUjjIAFwzNMHoollsKA+GtRWSg9jddQgGShj0Ys
-         LNNP8ewV47gzbRJV6zrj0V7bYo8ikp1zfQ+5mHPz5Av3M2v1jTDrT7B64BzF/YNXv0fp
-         meABr1Mlreu+KVnsx6nd+PNmh/S4bLTyFBfpj26uNy8mhhMrz01LBON90Delew8CtI1H
-         k0UQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6jZCZFGEQAWL3nFzRtIkIGrexxYfPkCZu83Qm+8oxxP57QgrHh3jtlYvmMvn9eLHa42SVw7K4tla3kw==@vger.kernel.org, AJvYcCUC4HUVWHOSwcifCoAFzUlhzYb5GfZfieunzqCeLM5uPKhER/dbWBpShSJMqGhlryxA8L0=@vger.kernel.org, AJvYcCUM+3voRGtbI0ATsFqHq/BSZzSypfCOOFhhCSZB1/sPhyI5veUSF/5OW7ErdMovDq+DNxNFa1rhnmk8G+8=@vger.kernel.org, AJvYcCV3dnZ9E8g1x65IPZTxTwwTpze1fsNAWMthQk+CHGvujHqF1JqVvA2t8LRaFLRT6V3hY9LFwk4Ygul+@vger.kernel.org, AJvYcCVmLcZhb6KHEvpFqmguGW0wqKhT6jY3XiEVh0JlsEcLronKCGimJmykw5zLmofndGG1sKqHhMTChfmE@vger.kernel.org, AJvYcCXxLdlStODtTSTZbLWDuE1afFYq1eITI34dChROWk7c5BGoi5FcfemNaJ7ZSP4s5f2Y+X+jfQ7YlXfy9rj0@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0G0f5g4fA56pqPohpyvL8+eKDYbfpO8/Y7f4oxIFuJe5582/S
-	DHHQ5twYfkN7FjpchN5RS3KdVnLxbvPjBkvxtHzz6h3aoqMxsrrd8S9bdsbPZCX/PU6Frt/KKgw
-	6h0BD1lbZIDRUnF3yqR1Vx3qP33k=
-X-Google-Smtp-Source: AGHT+IHutgQAlXklRgMYNRidcA41kXnbJbGiEJGtaB5sYolGWbh343PWRuG4ZkC83mQMH8VsiDxXBWb3iwvgsLPw2Uo=
-X-Received: by 2002:a2e:a813:0:b0:2fe:fec7:8adf with SMTP id
- 38308e7fff4ca-2ff2029fed5mr47426781fa.38.1731307396466; Sun, 10 Nov 2024
- 22:43:16 -0800 (PST)
+	s=arc-20240116; t=1731307727; c=relaxed/simple;
+	bh=aXtd0QCRphRYeWp0UQGTZfRJTgzgJckEzQ4C4m8R9QM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=obTl2TcR3Xp1cMVxpe2bNfGUZdLH64miQyuBxvwOtHwJXsOOEp3MvpQASJwuggZCS4PiMgvPLZKFEvhJnRS07OKDEkPlNW9qhzEhrsB8VPl7bzyjCzSlYTdj2GwJ18q9L3VYtMrcM9g7jd7OUIVtVj2lijrlEcONCHbSmbBlElg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 8F32468C7B; Mon, 11 Nov 2024 07:48:41 +0100 (CET)
+Date: Mon, 11 Nov 2024 07:48:41 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org, io-uring@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, joshi.k@samsung.com,
+	javier.gonz@samsung.com, bvanassche@acm.org
+Subject: Re: [PATCHv10 0/9] write hints with nvme fdp, scsi streams
+Message-ID: <20241111064841.GA24107@lst.de>
+References: <20241029151922.459139-1-kbusch@meta.com> <20241105155014.GA7310@lst.de> <Zy0k06wK0ymPm4BV@kbusch-mbp> <20241108141852.GA6578@lst.de> <Zy4zgwYKB1f6McTH@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1730298502.git.leon@kernel.org> <881ef0bcf9aa971e995fbdd00776c5140a7b5b3d.1730298502.git.leon@kernel.org>
- <87ttchwmde.fsf@trenco.lwn.net> <20241108200355.GC189042@unreal>
- <87h68hwkk8.fsf@trenco.lwn.net> <20241108202736.GD189042@unreal>
- <20241110104130.GA19265@unreal> <20241111063847.GB23992@lst.de>
-In-Reply-To: <20241111063847.GB23992@lst.de>
-From: anish kumar <yesanishhere@gmail.com>
-Date: Sun, 10 Nov 2024 22:43:05 -0800
-Message-ID: <CABCoZhBVWY=aUQtQ5b=mF8hXqpgJw21_jAPf9YvEvdgPf_GALA@mail.gmail.com>
-Subject: Re: [PATCH v1 09/17] docs: core-api: document the IOVA-based API
-To: Christoph Hellwig <hch@lst.de>
-Cc: Leon Romanovsky <leon@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>, 
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, 
-	Yishai Hadas <yishaih@nvidia.com>, 
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>, 
-	Alex Williamson <alex.williamson@redhat.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	=?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev, 
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zy4zgwYKB1f6McTH@kbusch-mbp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sun, Nov 10, 2024 at 10:39=E2=80=AFPM Christoph Hellwig <hch@lst.de> wro=
-te:
->
-> On Sun, Nov 10, 2024 at 12:41:30PM +0200, Leon Romanovsky wrote:
-> > I tried this today and the output (HTML) in the new section looks
-> > so different from the rest of dma-api.rst that I lean to leave
-> > the current doc implementation as is.
->
-> Yeah.  The whole DMA API documentation shows it's age and could use
-> a major revamp, but for now I'd prefer to stick to the way it is done.
->
-> If we have any volunteers for bringing it up to standards I'd be glad
-> to help with input and review.
+On Fri, Nov 08, 2024 at 08:51:31AM -0700, Keith Busch wrote:
+> You're getting fragmentation anyway, which is why you had to implement
+> gc.
 
-Jonathan, if you agree, I can take this up?
->
->
+A general purpose file system always has fragmentation of some kind,
+even it manages to avoid those for certain workloads with cooperative
+applications.
+
+If there was magic pixies dust to ensure freespace never fragments file
+system development would be solved problem :)
+
+> You're just shifting who gets to deal with it from the controller to
+> the host. The host is further from the media, so you're starting from a
+> disadvantage.
+
+And the controller is further from the application and misses a lot of
+information like say the file structure, so it inherently is at a
+disadvantage.
+
+> The host gc implementation would have to be quite a bit
+> better to justify the link and memory usage necessary for the copies
+
+That assumes you still have to device GC.  If you do align to the
+zone/erase (super)block/reclaim unit boundaries you don't.
+
+> This xfs implementation also has logic to recover from a power fail. The
+> device already does that if you use the LBA abstraction instead of
+> tracking sequential write pointers and free blocks.
+
+Every file system has logic to recover from a power fail.  I'm not sure
+what kind of discussion you're trying to kick off here.
+
+> I think you are underestimating the duplication of efforts going on
+> here.
+
+I'm still not sure what discussion you're trying to to start here.
+There is very little work in here, and it is work required to support
+SMR drives.  It turns out for a fair amount of workloads it actually
+works really well on SSDs as well beating everything else we've tried.
