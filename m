@@ -1,68 +1,66 @@
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F73142E77
-	for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 16:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C428B39ACC
+	for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 16:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731341321; cv=none; b=mku+fxT9oSAJpJ9YE0s9wcCpIPdhjoIe+oWKycC+0bZ8i7OQgtVNiPUzbo8jVnZFo/4hjLyFFPufyRD6XxOCw/1I/72XXl5PC0R6V1EL6CGG7a7EzKbAngf2XGVS4aQ57I5PD9N7GM3988xbrHBZhUhCH6EpODaQknD5B0Mq8+Y=
+	t=1731342057; cv=none; b=YQU8/2UpkegH54cfYD3rfirwpFbHks5TCvpy5YFno3QfUukJgIPvbXHkQsN/phx2SPwXOlFXJOsBUteKNNSWDD2CdJVkl/H6uynJo5zyIFrYpCTG67UXBTxBaH3BDFN23dOytup/SZJ4lf4jiMkxskgakH9GoM/6wwpolu3F/oA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731341321; c=relaxed/simple;
-	bh=1GV+Ah4T1mLtm2EzfWz3lDp04gvlXwmJ1moROUW5axQ=;
+	s=arc-20240116; t=1731342057; c=relaxed/simple;
+	bh=Gr80+VG7J/BXlMJjw8FPIb7lsgXVutSgJO+NHKLGMP8=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=GkgpUCrpFCRHi+HOf8woFG9bGYBWo38N3qQYec215NH4GyHJhaRDXc4hT9MhHQ2x1ErWbfU5EqI+DUhfxn8nMhe9Bzm9rzzr4dkDKYMz0PRBhjOaPQpax70kFvtaKZCD94jdxBquxlcCbHAXK6CYXbj1lTrhEJYQEUvLB1TABj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KnqmP9dF; arc=none smtp.client-ip=209.85.161.47
+	 MIME-Version:Content-Type; b=VMtsRzPh/y+7ORUKMUg+5VgRt9caq/ZbhRPq5IGs6S43oWopmhIue8bmLW+Sag4XjYJ6odsIBhVfk5e1NBTETOr057Lcf65GyXGpGF/9sJ6RHVZ8NBHTJj82eQDbwETWUZiI+zp7axWT41VFL14dTMrqB9kMorJLaY0rqJmLbyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=oSt/OytT; arc=none smtp.client-ip=209.85.160.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KnqmP9dF"
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5eba976beecso2604011eaf.0
-        for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 08:08:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="oSt/OytT"
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-290ff24354dso2044302fac.0
+        for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 08:20:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731341319; x=1731946119; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731342055; x=1731946855; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HjIvuIA5jFnPZVv6BBzz9Ruzu+ShTEYVtSm7Cy9ZRdU=;
-        b=KnqmP9dF0KwcTe7QhcU9GnQjbhUEDP2RHUITyFeRXO+1Ao1s4/qQP5OP/Zh+gk+dQS
-         ytZRgMTcUJFnW9iwy7j2wlNNiQ2oSaNzBU5iciMGVJGkxmPvr3+EbWxXaQ2kOKpctrSY
-         uifHNeOGh58NTPJiO3Bj13XMLZazeLSpjRdO000YV8aApdvASewys6saWFNvURiff+MV
-         XrTj4qPBRNaqhfGIMAbDguJl/k12fjkTpbsxg0h8s/p6tLWjUZgH3jhBVcLdASuPqR48
-         R9luU/X42swcQR96Yyl5hlFr6mVvCEfmK+ANng7ZJe5RPY5gyW4enpZENDfrYBiBYfze
-         pxoQ==
+        bh=A8E0oe1Bn/VItUcYMvLcUh14F0RpsrF/kYUOTvmjo10=;
+        b=oSt/OytTtzcZydIFmrRN2AqCUJ21BeXV0dKlzpeFZUpvR9RQzEJkXIad50i9ftuqjP
+         DanXX9NV+kiSlixfbSdcJt/09NtxI/RK2zn71wPKfWxr0AL2OhhVnQ1mqbjcEIc86hwI
+         T3Md4wwXjmjpbXylDe1PI5tB+xj65B2v6F15nt5TY3CAisTsY2KPATvZNani6fjX413x
+         QIK8+4EtYBX+GSXv+/akznZKNIHvgJ/lI/lIgE21xhn2sEs6WjGTCWTlTDpePfR78eUB
+         +ALUSc+puBhcAgpbPzPt51FfbDLaN+N+LHb5wW/8vpKXuDaUBeixY2xwJns5Qv/j6RWZ
+         zh/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731341319; x=1731946119;
+        d=1e100.net; s=20230601; t=1731342055; x=1731946855;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HjIvuIA5jFnPZVv6BBzz9Ruzu+ShTEYVtSm7Cy9ZRdU=;
-        b=LvI8s76EeGdwDJAheFKBVnDRemqCskyVNovPjSEQzlrC+6tpSo2+/Bd60MK5DOcVUE
-         GzDAUk7Beb5ZmapsevbZuW0M2Hzogx1/Mt/elnxERy3l+wmJXUXqr7VB7bTY9WEGJEf/
-         MJ4HBPmm2yyEWMl7gUKtCTOAFzJhRwo909wRdFHWodHrf6o/NTiAA+aejnlbodICRVC0
-         sXhuMvCCNll7gdWFIgcKV7tMYvoXk7G837gCDrbC4Yc8OSAQVwlnt8tz+WixGjPW2vol
-         cMXNvkeZARdDL50asNtCVba/9rDXtHCnkLF9rKe23nGC6pW7kloaJFvL6hyw7xYzkzka
-         BYOA==
-X-Gm-Message-State: AOJu0YygMWsCOEO/krPHO7nYQpMxttAO2gRu97tD+mAJ1ifItDWxW8QB
-	qW3gAgu0s26MNYQE2aScB8kRq8WkEL74LTGoHQsUSOW6Q+2854zCWurcM0TIF2E=
-X-Google-Smtp-Source: AGHT+IHowPnOpLP4uVZlFDR94j4qpHHkm2mIFNi1qV3APU2D+OxEY3YHnWivc90QIFlSWMME0Ao/pg==
-X-Received: by 2002:a05:6820:1a4b:b0:5eb:5396:7896 with SMTP id 006d021491bc7-5ee569c2b90mr7934088eaf.4.1731341319056;
-        Mon, 11 Nov 2024 08:08:39 -0800 (PST)
+        bh=A8E0oe1Bn/VItUcYMvLcUh14F0RpsrF/kYUOTvmjo10=;
+        b=vofLL+gPm6gwlv4uSqTp9wzW9RW/gSkf5iTqK0mGjAgboz7DT7hs3h18RjRQqNHmz0
+         InSLhn3lnLdSQ60/GGrGQm60aYkiYDWRMEABTCjAu6dvqYWA1YCWSvhSEc2w5trBxuj/
+         /vZNSitoSjx0o4TjVHUT/pXotM51//6oI36yp7Y9iH6xfhIjjvaFjR6kijS78sQI8Aa3
+         Yi9+68d7fj5zMFPGFdSMA29rFkU6R48vNJgam7Pz6p+HcYtSK06PUJR4rlxt0dyAILBU
+         OpZ+bNTQIunF4U67j1WECjIWOlXCU6Hz75kbgotZsIZ2rP3lRXK9nlfsPzBR1TKWwyZY
+         Dmsg==
+X-Forwarded-Encrypted: i=1; AJvYcCXFPc6oBA7oC7n1cJ0ZDk7fONjRloD3eGsAtL0m4hITAspK5Ch2VUHKhOKzpgfX7nzYI+6BQmfZWDEqmQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdgzEnWS6hisc7vPbdvCAcrjSBo+J2rFBEw4GLCDAK8Yx1z4TN
+	HHXlZ+lN4u0r+ABTyy892qUx9RENt2gf3YOB6HvtBGcWo1Pj+AE8E+bKLAk2Uv/DTLDNmGmfHZM
+	1P04=
+X-Google-Smtp-Source: AGHT+IEqbL/XLujJeiHX0bUsKtZMEDX13bH7NGSuhQ5qyhhQ/3gVPpJHqC0jtcydmzbbJoZZ0nz+uQ==
+X-Received: by 2002:a05:6870:209:b0:26c:5312:a13b with SMTP id 586e51a60fabf-295603611e8mr11017504fac.30.1731342054703;
+        Mon, 11 Nov 2024 08:20:54 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5ee4950f896sm1977187eaf.12.2024.11.11.08.08.37
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-29546c3d9cdsm2893893fac.1.2024.11.11.08.20.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2024 08:08:38 -0800 (PST)
+        Mon, 11 Nov 2024 08:20:54 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
- David Sterba <dsterba@suse.com>, Damien Le Moal <damien.lemoal@wdc.com>, 
- Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
-In-Reply-To: <20241104062647.91160-2-hch@lst.de>
-References: <20241104062647.91160-1-hch@lst.de>
- <20241104062647.91160-2-hch@lst.de>
-Subject: Re: (subset) [PATCH 1/5] block: take chunk_sectors into account in
- bio_split_write_zeroes
-Message-Id: <173134131795.1866988.12993346504282877702.b4-ty@kernel.dk>
-Date: Mon, 11 Nov 2024 09:08:37 -0700
+To: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
+In-Reply-To: <20241108154657.845768-1-hch@lst.de>
+References: <20241108154657.845768-1-hch@lst.de>
+Subject: Re: pre-calculate max_zone_append_sectors v2
+Message-Id: <173134205389.1888032.3263693227897431533.b4-ty@kernel.dk>
+Date: Mon, 11 Nov 2024 09:20:53 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,25 +72,22 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.2
 
 
-On Mon, 04 Nov 2024 07:26:29 +0100, Christoph Hellwig wrote:
-> For zoned devices, write zeroes must be split at the zone boundary
-> which is represented as chunk_sectors.  For other uses like the
-> internally RAIDed NVMe devices it is probably at least useful.
+On Fri, 08 Nov 2024 16:46:50 +0100, Christoph Hellwig wrote:
+> this series makes max_zone_append behave like the other queue limits in
+> that the final value to be used for splitting is pre-calculated.
 > 
-> Enhance get_max_io_size to know about write zeroes and use it in
-> bio_split_write_zeroes.  Also add a comment about the seemingly
-> nonsensical zero max_write_zeroes limit.
+> Changes since v1:
+>  - fold in the previously posted fixup patch
+>  - add the nvme cleanup patch
 > 
 > [...]
 
 Applied, thanks!
 
-[1/5] block: take chunk_sectors into account in bio_split_write_zeroes
-      commit: 60dc5ea6bcfd078b71419640d49afa649acf9450
-[2/5] block: fix bio_split_rw_at to take zone_write_granularity into account
-      commit: 7ecd2cd4fae3e8410c0a6620f3a83dcdbb254f02
-[3/5] block: lift bio_is_zone_append to bio.h
-      commit: 0ef2b9e698dbf9ba78f67952a747f35eb7060470
+[1/2] block: pre-calculate max_zone_append_sectors
+      commit: 559218d43ec9dde3d2847c7aa127e88d6ab1c9ed
+[2/2] nvme-multipath: don't bother clearing max_hw_zone_append_sectors
+      commit: 0b4ace9da58df62c1763635ab10ae1bc8ed8182a
 
 Best regards,
 -- 
