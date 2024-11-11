@@ -1,68 +1,68 @@
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB44C148FF5
-	for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 15:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F73142E77
+	for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 16:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731339363; cv=none; b=iqOtJb/MaPHJ6cxUdrWPo5YE/l7G3atVTgqUlz+STCq4b98XwbhCoViFEtlCa9blKIdQbME41993d2Sat0rpztR+y6VfuNYY9IHX8EUHzkz45axlCMLId7lW/opfEnVP+45UAV+RODPEwX5pKryRoGXe6v5h6XnDIpcgkviY604=
+	t=1731341321; cv=none; b=mku+fxT9oSAJpJ9YE0s9wcCpIPdhjoIe+oWKycC+0bZ8i7OQgtVNiPUzbo8jVnZFo/4hjLyFFPufyRD6XxOCw/1I/72XXl5PC0R6V1EL6CGG7a7EzKbAngf2XGVS4aQ57I5PD9N7GM3988xbrHBZhUhCH6EpODaQknD5B0Mq8+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731339363; c=relaxed/simple;
-	bh=OBRfdUOhUc18FSDoG4WeOQwkCPsFwRa+ZgkLbMnSqNg=;
+	s=arc-20240116; t=1731341321; c=relaxed/simple;
+	bh=1GV+Ah4T1mLtm2EzfWz3lDp04gvlXwmJ1moROUW5axQ=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=aQ2NL0Zm9LQxrodJMz60DiY9I9OxAbnM3xOwH6l/r3BPHXjnO5E+WQcLvW1NlyqX0z3k7JtCBiNSMJ910k8kdLn2nP84/j0kaUUb1adhUDyHX09F52FLqGZtWcoABGBe1Qff1z5zXtGelre+ItUOZFpDULYZLtXEWXtVuWfQCns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZyydijVb; arc=none smtp.client-ip=209.85.167.181
+	 MIME-Version:Content-Type; b=GkgpUCrpFCRHi+HOf8woFG9bGYBWo38N3qQYec215NH4GyHJhaRDXc4hT9MhHQ2x1ErWbfU5EqI+DUhfxn8nMhe9Bzm9rzzr4dkDKYMz0PRBhjOaPQpax70kFvtaKZCD94jdxBquxlcCbHAXK6CYXbj1lTrhEJYQEUvLB1TABj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KnqmP9dF; arc=none smtp.client-ip=209.85.161.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZyydijVb"
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3e601b6a33aso2684344b6e.0
-        for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 07:36:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KnqmP9dF"
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5eba976beecso2604011eaf.0
+        for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 08:08:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731339361; x=1731944161; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731341319; x=1731946119; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=S46mhgRP3J5A5d+3Z7kJ6fAD51PqjNfpb9mTVeDYByI=;
-        b=ZyydijVb8NzYaSCxZwX/2i6atVavIRkfN1HWCHY/alR14B0HLe5/pdb8uOJyCkGhFW
-         d+GldpEbCpxyjbF8slihwR4YymWbw8ZuuaM8oA3qG58QJ861lhJSlaO58l7TzAFwQT0v
-         wxNIqBXqBIQfkr+rhZwt0ZuLlgGli4n+1Za526aQX4Z8JgVwPbCwIXwyB69AoRk0vy+k
-         Rxx96cOer2MLpJ1qXOboNTG32d1XYTnlv54DbUNsn+UfYvXZDkxJboj+Ljfqt9/riCmF
-         CsDmF7sF1NlaykDFgwmwipcIuTQcnPc7BMkTaXMin7Ntdip/9Rv6B0IJHklU4uNkMB/V
-         x2XQ==
+        bh=HjIvuIA5jFnPZVv6BBzz9Ruzu+ShTEYVtSm7Cy9ZRdU=;
+        b=KnqmP9dF0KwcTe7QhcU9GnQjbhUEDP2RHUITyFeRXO+1Ao1s4/qQP5OP/Zh+gk+dQS
+         ytZRgMTcUJFnW9iwy7j2wlNNiQ2oSaNzBU5iciMGVJGkxmPvr3+EbWxXaQ2kOKpctrSY
+         uifHNeOGh58NTPJiO3Bj13XMLZazeLSpjRdO000YV8aApdvASewys6saWFNvURiff+MV
+         XrTj4qPBRNaqhfGIMAbDguJl/k12fjkTpbsxg0h8s/p6tLWjUZgH3jhBVcLdASuPqR48
+         R9luU/X42swcQR96Yyl5hlFr6mVvCEfmK+ANng7ZJe5RPY5gyW4enpZENDfrYBiBYfze
+         pxoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731339361; x=1731944161;
+        d=1e100.net; s=20230601; t=1731341319; x=1731946119;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=S46mhgRP3J5A5d+3Z7kJ6fAD51PqjNfpb9mTVeDYByI=;
-        b=VkfgX12S73S5sSXrX2UucT2loKvhkLa0kqwqa02NDk4fRyjIakrHi5dv4EAhII3mtW
-         KtP/R0kccEB3DIHi0uoxkoHcP7EDRyVqm4YFZIWgZMDVJU2/uqE4/cUKk7YiOWtyaM8W
-         44EDgVjQVRJjZHfl/RCsWo1i6WxuNoC8LRb7eoRQ4g+pSh4sL8/nirbYj9m5MjvDfc1g
-         seNB5rJCbi83IN9L3g4gANgpECKT2+/lMk3rCv7X0ckSGy/FOzYCvFTepsVtD7mhgonp
-         zanoDbEV0mYIwCoIoW3Gw0cOgGzxbDWGYoJDrEX0msdr+9Umpa4kj0Nd8tsGlnq9d9iK
-         bjrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWNchkhamBLL6XvzRu9xFDqsxovyyWW8vG5GrNtRNPU8rldHmNqkf7y6ZZxaF8AkVJdq+DxkuzWvp6aYQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxQ8+jy9hJRmiX0c9yq65PG/9B3WT230WwYHvZesJ22Pr1Obmi
-	z9NavfFuGmlp+8HmSmb+7VPNwQreXbnm7WzHdsPG+WQrub3/B200NF4GSRAPM7U=
-X-Google-Smtp-Source: AGHT+IFvznCtuLrDpkKB0XoerwZtjF/Nue50YwF2kIdZ94QrpZpe7NHwx230HHEdCVWg6u8n84ozaQ==
-X-Received: by 2002:a05:6808:f09:b0:3e6:ad7:9a38 with SMTP id 5614622812f47-3e794685550mr10424004b6e.24.1731339360892;
-        Mon, 11 Nov 2024 07:36:00 -0800 (PST)
+        bh=HjIvuIA5jFnPZVv6BBzz9Ruzu+ShTEYVtSm7Cy9ZRdU=;
+        b=LvI8s76EeGdwDJAheFKBVnDRemqCskyVNovPjSEQzlrC+6tpSo2+/Bd60MK5DOcVUE
+         GzDAUk7Beb5ZmapsevbZuW0M2Hzogx1/Mt/elnxERy3l+wmJXUXqr7VB7bTY9WEGJEf/
+         MJ4HBPmm2yyEWMl7gUKtCTOAFzJhRwo909wRdFHWodHrf6o/NTiAA+aejnlbodICRVC0
+         sXhuMvCCNll7gdWFIgcKV7tMYvoXk7G837gCDrbC4Yc8OSAQVwlnt8tz+WixGjPW2vol
+         cMXNvkeZARdDL50asNtCVba/9rDXtHCnkLF9rKe23nGC6pW7kloaJFvL6hyw7xYzkzka
+         BYOA==
+X-Gm-Message-State: AOJu0YygMWsCOEO/krPHO7nYQpMxttAO2gRu97tD+mAJ1ifItDWxW8QB
+	qW3gAgu0s26MNYQE2aScB8kRq8WkEL74LTGoHQsUSOW6Q+2854zCWurcM0TIF2E=
+X-Google-Smtp-Source: AGHT+IHowPnOpLP4uVZlFDR94j4qpHHkm2mIFNi1qV3APU2D+OxEY3YHnWivc90QIFlSWMME0Ao/pg==
+X-Received: by 2002:a05:6820:1a4b:b0:5eb:5396:7896 with SMTP id 006d021491bc7-5ee569c2b90mr7934088eaf.4.1731341319056;
+        Mon, 11 Nov 2024 08:08:39 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3e78cc678d8sm2116943b6e.7.2024.11.11.07.35.59
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5ee4950f896sm1977187eaf.12.2024.11.11.08.08.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2024 07:36:00 -0800 (PST)
+        Mon, 11 Nov 2024 08:08:38 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: song@kernel.org, yukuai3@huawei.com, hch@lst.de, 
- John Garry <john.g.garry@oracle.com>
-Cc: martin.petersen@oracle.com, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org, hare@suse.de, 
- Johannes.Thumshirn@wdc.com
-In-Reply-To: <20241111112150.3756529-1-john.g.garry@oracle.com>
-References: <20241111112150.3756529-1-john.g.garry@oracle.com>
-Subject: Re: [PATCH v4 0/6] bio_split() error handling rework
-Message-Id: <173133935959.1861985.10564315713118419113.b4-ty@kernel.dk>
-Date: Mon, 11 Nov 2024 08:35:59 -0700
+To: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
+ David Sterba <dsterba@suse.com>, Damien Le Moal <damien.lemoal@wdc.com>, 
+ Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
+In-Reply-To: <20241104062647.91160-2-hch@lst.de>
+References: <20241104062647.91160-1-hch@lst.de>
+ <20241104062647.91160-2-hch@lst.de>
+Subject: Re: (subset) [PATCH 1/5] block: take chunk_sectors into account in
+ bio_split_write_zeroes
+Message-Id: <173134131795.1866988.12993346504282877702.b4-ty@kernel.dk>
+Date: Mon, 11 Nov 2024 09:08:37 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,31 +74,25 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.2
 
 
-On Mon, 11 Nov 2024 11:21:44 +0000, John Garry wrote:
-> bio_split() error handling could be improved as follows:
-> - Instead of returning NULL for an error - which is vague - return a
->   PTR_ERR, which may hint what went wrong.
-> - Remove BUG_ON() calls - which are generally not preferred - and instead
->   WARN and pass an error code back to the caller. Many callers of
->   bio_split() don't check the return code. As such, for an error we would
->   be getting a crash still from an invalid pointer dereference.
+On Mon, 04 Nov 2024 07:26:29 +0100, Christoph Hellwig wrote:
+> For zoned devices, write zeroes must be split at the zone boundary
+> which is represented as chunk_sectors.  For other uses like the
+> internally RAIDed NVMe devices it is probably at least useful.
+> 
+> Enhance get_max_io_size to know about write zeroes and use it in
+> bio_split_write_zeroes.  Also add a comment about the seemingly
+> nonsensical zero max_write_zeroes limit.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/6] block: Rework bio_split() return value
-      commit: e546fe1da9bd47a6fddce6b37c17b1aa1811f7d3
-[2/6] block: Error an attempt to split an atomic write in bio_split()
-      commit: 27b26f09a7e6ae3ecae460299349b31fe0b5452f
-[3/6] block: Handle bio_split() errors in bio_submit_split()
-      commit: 6eb09685885a4445da31097aa6418ee1875f9cec
-[4/6] md/raid0: Handle bio_split() errors
-      commit: 74538fdac3e85aae55eb4ed786478ed2384cb85d
-[5/6] md/raid1: Handle bio_split() errors
-      commit: b1a7ad8b5c4fa28325ee7b369a2d545d3e16ccde
-[6/6] md/raid10: Handle bio_split() errors
-      commit: 4cf58d9529097328b669e3c8693ed21e3a041903
+[1/5] block: take chunk_sectors into account in bio_split_write_zeroes
+      commit: 60dc5ea6bcfd078b71419640d49afa649acf9450
+[2/5] block: fix bio_split_rw_at to take zone_write_granularity into account
+      commit: 7ecd2cd4fae3e8410c0a6620f3a83dcdbb254f02
+[3/5] block: lift bio_is_zone_append to bio.h
+      commit: 0ef2b9e698dbf9ba78f67952a747f35eb7060470
 
 Best regards,
 -- 
