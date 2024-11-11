@@ -1,132 +1,93 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A491B14F126
-	for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 13:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD2B1E481;
+	Mon, 11 Nov 2024 14:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731333228; cv=none; b=WRZwKX09iA7NekhDip/t6ybYc7uL36DF8gI4PbkEEM3mdVdkQ3TQOuN3Xe1+zUNkOd9NdOPepSn3nE35o6IHMYtcKduf9GDLEzaocyVgL9rZi+jTD8lTy7kQ+qlm7v1ZNMagUEFRllXwOVX90fh5ZK9WA9djysd3IaTAuA7rehQ=
+	t=1731337169; cv=none; b=MtwU2kB5x4wUnF5zREa89UWPM4AlGiKzSef9HxYRmj/9wdAJ6Z/KOGLEO0TSMO68UoqDOISjUqFyxZMEkl6iJqB3BYBmWPoHZ2/wDsJyyR8vMHn+nDfyXpCvOtImR419J1TSw1vujD9hhTd7vgQkCLF6nz40gVMfVT0bemjpwaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731333228; c=relaxed/simple;
-	bh=fsMPtK+02Q8/61h9duKymu2GAy3p9uS9wobeeDtibhs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DImZQGesx+Tq0jNp8xiURj30vn9xsKYPaK6wkSuVRTbo40NUV+73pUiZYfdCSakWmqVfcCjb4l4NOhsx5QhvoI+S7uyopCsf+1hyFOXns4v/cT8PuchqLaakUuI0UEB8ZdF1LW9q2FAMAeU+9+B0jBY5aCaWAErqbhXqLbqu4a8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=PPsxJN2E; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1731337169; c=relaxed/simple;
+	bh=gg3nV1iKgs4bbxPK/uru5pPDw51yAhWHVenuhfd8RSY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=E1hbJAEALqlb5yL56DaF3Qdv35CRbOZUjo41njnTAapQEJ0PfjTeAMJlktQn6zFocYAD5AcntSDzEzxG0egw/joVNiqqGP+s2PtjzedHUpp4kPCeNPoPiPCIlkzq6cGu7gK+PF8oeOV3JldOMHb+qdPl62rL7Yt8XyMFS58xoNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=U7Qof0wu; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="PPsxJN2E"
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-539fbe22ac0so4442481e87.2
-        for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 05:53:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1731333225; x=1731938025; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vRETJB9GMYpE5zNptZDsi0D65To5Kc8GhYkf2DQ68eE=;
-        b=PPsxJN2EUAPr+oeJHtixYtHFGW/uDmqw44mJoAz9em21OpW3rICtYde39O9XaIeW8n
-         kmetz3HCrB4zdEhdpQcRfqYkb8TFyw/IlzzopTAXy93mTaDFv6HuTohHD/+zQaoVtDLN
-         120QDieKXSsRZIG1SruqkZUymdxNq8A2ErzIEyj8Xw6Xi97X0M7gYzvi/aN5GlnJ6YMd
-         7d2bci4HsASmvDyVL+kS3d6ye/glfG7aMHjkDYGkd9yukv9bcsrgH2QSN9Un+75t+MXz
-         oCsVR/V8204H+PUGrAaaVAVQRlGkwQbPhSSfHLogYTSu81YmS7m6D4A758rwFpEVLJye
-         Lqbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731333225; x=1731938025;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vRETJB9GMYpE5zNptZDsi0D65To5Kc8GhYkf2DQ68eE=;
-        b=MWU1bwgYGTDMZ8Ay048COOJw0Qs0DBVRKBOf75JZpZzz5Bp7Dzz2IrP7xDyTHmtRqK
-         O+s2iSE1d1fsywWSYx6i9c4szOZv85ZP/Yxu19PAc0TBpOtphh+9stoMhG+uTfak5mYl
-         LJ8hATmBDbvwE8aKrM9oSnbGYAxozpdv40ABWu54FqfkPegoWes4VL7T4SEfFqjaz3rF
-         w05vAe7Dwu0BaLhmBatLOdqBBLAb9yMRES5W6MIwXCtkgE73dR/mEOkgeejJQ3b3EEIQ
-         Iov7NtEXKoSenWvBiDBaRsbc5Zzbx4B3iF8PmKlOk5xkK4rRmakGkBaUO/nyG+cs/r9u
-         n4Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCXIpGg7CG69bPRllMDxEEEqBx/6ebbHrvalIiaSb/Mo344Cpl+uX0R0fKAWIZsKVFe7TeXYHqgaMRqX4Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzdc9oYc//oUjV5U+oT8j0T/Wq4qg1oGzSuiBEXvO0Ydhm9Fnqt
-	UNolFk2lLljdiv9q21zXwPWBTxFHATO1kBhU/7ngcLzYJdYZWwW30sudLSxAx89MXNJkSKoRJAf
-	7
-X-Google-Smtp-Source: AGHT+IHvrJRpNw+sfe/gOsk73gWb+wFtTC8t8WsXJCIw1abIndpgqLZlESkgswoJAksoOzwUb4KDuA==
-X-Received: by 2002:a05:6512:1319:b0:52e:7542:f469 with SMTP id 2adb3069b0e04-53d8626a7dbmr5364852e87.0.1731333224422;
-        Mon, 11 Nov 2024 05:53:44 -0800 (PST)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e99a62d686sm10616662a91.52.2024.11.11.05.53.41
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Nov 2024 05:53:43 -0800 (PST)
-Date: Mon, 11 Nov 2024 21:53:20 +0800
-From: joeyli <jlee@suse.com>
-To: Valentin Kleibel <valentin@vrvis.at>
-Cc: Chun-Yi Lee <joeyli.kernel@gmail.com>,
-	Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>,
-	Pavel Emelianov <xemul@openvz.org>,
-	Kirill Korotaev <dev@openvz.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Nicolai Stange <nstange@suse.com>,
-	Greg KH <gregkh@linuxfoundation.org>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] aoe: fix the potential use-after-free problem in more
- places
-Message-ID: <20241111135320.GF20879@linux-l9pv.suse>
-References: <20240912102935.31442-1-jlee@suse.com>
- <9371a3ab-3637-4106-bee5-9280abb5f5ae@vrvis.at>
- <20241002055338.GI3296@linux-l9pv.suse>
- <a471d233-8fbd-4a67-a50b-6686566f8103@vrvis.at>
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="U7Qof0wu"
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 45E36403F1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1731337167; bh=GwVTmx4eIglWLWGHYmk31OoK5pzNvXaKVe73vYEWSTk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=U7Qof0wuVnJGcnP06ChHK+MJPNdREQXE7RLUzC2W70ULBaY9a9VnJ9vQEtqDAf9Ah
+	 A3HwpVCu8PJVyEMghvrqu/hNDOC8sGYBt3mN173rM33gAFqU2dKpLTqp9ac4bjnapP
+	 A1UN+AgpzI588tU7KIuantdLBUeWBgXdiFu11n7kGDH4ZxFGW1T97qYFC9t3FAzyYo
+	 fgA7YQdK+SYmrHtsukzfx/wT5vFef/DoXSOK38XKAVdsxtI+fq2uPWuv8CV5NUKrxx
+	 iQj4S70o2yK54j7jT8p8fewkBThJBXMBi2CZoLIkGaK5OJDLnfOOJSXDckk3X1rExZ
+	 HhL9BYc+PyPqw==
+Received: from localhost (unknown [IPv6:2601:280:5e00:625::1fe])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 45E36403F1;
+	Mon, 11 Nov 2024 14:59:27 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: anish kumar <yesanishhere@gmail.com>, Christoph Hellwig <hch@lst.de>
+Cc: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>, Joerg
+ Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Sagi Grimberg
+ <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas
+ <yishaih@nvidia.com>, Shameer Kolothum
+ <shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>, Marek Szyprowski
+ <m.szyprowski@samsung.com>, =?utf-8?B?SsOpcsO0bWU=?= Glisse
+ <jglisse@redhat.com>, Andrew
+ Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+ kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v1 09/17] docs: core-api: document the IOVA-based API
+In-Reply-To: <CABCoZhBVWY=aUQtQ5b=mF8hXqpgJw21_jAPf9YvEvdgPf_GALA@mail.gmail.com>
+References: <cover.1730298502.git.leon@kernel.org>
+ <881ef0bcf9aa971e995fbdd00776c5140a7b5b3d.1730298502.git.leon@kernel.org>
+ <87ttchwmde.fsf@trenco.lwn.net> <20241108200355.GC189042@unreal>
+ <87h68hwkk8.fsf@trenco.lwn.net> <20241108202736.GD189042@unreal>
+ <20241110104130.GA19265@unreal> <20241111063847.GB23992@lst.de>
+ <CABCoZhBVWY=aUQtQ5b=mF8hXqpgJw21_jAPf9YvEvdgPf_GALA@mail.gmail.com>
+Date: Mon, 11 Nov 2024 07:59:26 -0700
+Message-ID: <87o72lu88h.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a471d233-8fbd-4a67-a50b-6686566f8103@vrvis.at>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Valentin,
+anish kumar <yesanishhere@gmail.com> writes:
 
-Sorry for my delay!
-
-On Mon, Nov 04, 2024 at 02:38:20PM +0100, Valentin Kleibel wrote:
-> Hi Joey,
-> 
-> > > We've tested your patch on our servers and ran into an issue.
-> > > With heavy I/O load the aoe device had stale I/Os (e.g. rsync waiting
-> > > indefinetly on one core) that can be "fixed" by running aoe-revalidate on
-> > > that device.
-> [...]> For the reference count debugging, I have sent a patch series here:
-> > 
-> > [RFC PATCH 0/2] tracking the references of net_device in aoe
-> > https://lore.kernel.org/lkml/20241002040616.25193-1-jlee@suse.com/T/#t
-> > 
-> > Base on my testing, the number of dev_hold(nd) and dev_put(nd) are balance
-> > in aoe after the this 'aoe: fix the potential use-after-free problem in more places'
-> > patch be applied on v6.11 kernel. I have tested add/modify/delete files in remote
-> > target by aoe. My testing is not a heavy I/O testing. But the result is
-> > balance.
-> > 
-> > Could you please help to try the above debug patch series for looking at the
-> > refcnt value in aoe in your side?
-> 
-> Thanks for your work, i can confirm refcnt value is balanced and the issue
-> is fixed now.
+> On Sun, Nov 10, 2024 at 10:39=E2=80=AFPM Christoph Hellwig <hch@lst.de> w=
+rote:
+>>
+>> On Sun, Nov 10, 2024 at 12:41:30PM +0200, Leon Romanovsky wrote:
+>> > I tried this today and the output (HTML) in the new section looks
+>> > so different from the rest of dma-api.rst that I lean to leave
+>> > the current doc implementation as is.
+>>
+>> Yeah.  The whole DMA API documentation shows it's age and could use
+>> a major revamp, but for now I'd prefer to stick to the way it is done.
+>>
+>> If we have any volunteers for bringing it up to standards I'd be glad
+>> to help with input and review.
 >
+> Jonathan, if you agree, I can take this up?
 
-Great! Thanks for your testing!
- 
-> However, the I/O waiting issue reported before is still there, and occurs
-> more often now.
-> This problem started with the first patch CVE-2023-6270 applied in commit
-> f98364e92662.
-> This only happens with heavy I/O on our "older" storage systems with
-> spinning disks. Unfortunately we do not know how we could debug this, have
-> you got any hints what we could do?
+I am happy to see help with the documentation, but agreement from the
+authors and maintainers of the DMA-mapping documentation is rather more
+important than agreement from me.
 
-OK, spinning disk is good information. Could you please give more information
-about your environment? e.g. CPU number, storage size shared by aoe? how heavy of
-your I/O?
-
-If the situation can be reproduced, then I think that perf can be used to analyze
-bottleneck.
-
-Regards
-Joey Lee
+jon
