@@ -1,194 +1,186 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9040418A6BD
-	for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 16:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+Received: from mail.parknet.co.jp (mail.parknet.co.jp [210.171.160.6])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D771A3A80;
+	Mon, 11 Nov 2024 16:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.171.160.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731343430; cv=none; b=NdAsE9BMTGcRFig1uGSZfplCeD3RWa+TwA/hrC4bmBAyO52xM7JtpJJ9TXGJCFopE8WRAdern3lXKoJNBdUbfK+/+CgKuaFxPbyLGti2APqRDo7sMeWhr/uRzisHV4+M5sE1fBAqBDHhN9mXtbH4z4ICx6uvvwOhA1ky9Bdg+2E=
+	t=1731343438; cv=none; b=NfpL9ejVcjvQ2Maptd6suCJOedIkc8DtXAoSVv62+ok86SmE3ZbMNuaSFpGPY40Q+8MxcYTGSJ0IcwzIegW+FgsrogrBmzjJ8pRfvUN3KByzsg+8uNv6QlTk7yAdWvA4mWK0JBAvixN+KQAZq+1GDi/z7Aif2c0QAfiOFAAjO7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731343430; c=relaxed/simple;
-	bh=sVQCtohcGK0/fAlU1SOcgZuqMvZCOlvnUR5qbzGRXEI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nlTCRrPf+SsYQSIRY2Z38Z3C5M4lqhKNaBCK5SLAV6Idk5J1a8cnp9ZIvF7NYVVV9sKGR+vbXIXfvHdUaac/78+5cMU1sXmyLvSPeBuw63MiS0bgJto2TXzgEMoMq/OpS3GgDUdD8GYrj/dm/BGsr6vkuImlqMOpUnkZh8S4oTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lfDIbyPF; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lfDIbyPF"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a9f1c590ecdso240473166b.1
-        for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 08:43:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731343427; x=1731948227; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cTdD7QysOJTqQ3CRzqhbna3iriQuo3cuHHiOE2WfJCw=;
-        b=lfDIbyPFqtyqSlWi4fE2DGgBPLLs6F/qCkYANTgh8225qtB8iPn+nliMm1CBw+GEmg
-         vMeOx7iRBNL80XToedGsrveOt/3o8u26h0X0JEbgJwFGbeSdVfJvr6QjotGdBjOqaQGp
-         TS6t+j95Jmju4W+pQbus+gWep6TJ1vnBZpmGbqlkQvBKdkslP+yzJ1fvhEOhJvv6xXxN
-         sRd5nEV8uZBj8Iz65SLTxfZOPTH3YRq59mumeckxUflF7tBL9sVfaaL6lzLhiRgSFeXa
-         RrkFsYj2D9bF5IJvIz9wmEym0TyR/DCd0E1w/6vPtJlp7vA8oYSBPCcLTCUUKkEGYbyB
-         FL5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731343427; x=1731948227;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cTdD7QysOJTqQ3CRzqhbna3iriQuo3cuHHiOE2WfJCw=;
-        b=psGGWvEfPUcX9Q+zNdu0Rshjbc+g84uIF962WnGlPCLw74eN+F9pzMkw1Nj0r3hMDU
-         9sxF3NnXWjYEGEi+U+daSFT9S8XDnaYw+bvtHbIzQdBp2vclha52YInUc4W0qTuaA3Xo
-         MOAawJdLg66sb9/8YRIWJpKDMAuE5ZPcDHEh/hEZLve4jjZZGW7Id8lP1NGptN57dfep
-         80tJkMnsUg5dR7y947aBL5lPb4i7Cat78PRHfdyz8GFI4ExyH0FTanLg6vgBvKyliu7V
-         cIY36IRZE6vscgzD3Kolb0XnBAQY17WuwsiSCNB9H7/mPC1vw3Rz/je5E5v4aHgI0smz
-         d0pA==
-X-Forwarded-Encrypted: i=1; AJvYcCUO0UNlxXtr+yonjxF9jTTgKl8NraXDBEcK3vIJUVKSWc1rYo9kv9xr9Ehdz8NZeL/x5NK1vf0rPMK2yg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ0WpkGiDdxw5s045FBX4lm+LtAvgC4QHvSNBRyPazxOpzmH5C
-	leUkARwJcgfoizHIRZ+9qNff7bj7S447IiTXU3yLC0giez56N7R1
-X-Google-Smtp-Source: AGHT+IG+pyWNBu+SfCu0aqNLnvyakYpTQxl3ePgpwKjSUtklRFNhnK3xfZR6ecdqSLB/E0KaRNGDpA==
-X-Received: by 2002:a17:907:72c3:b0:a9e:c947:d5e5 with SMTP id a640c23a62f3a-a9eeff445b3mr1266994266b.28.1731343426569;
-        Mon, 11 Nov 2024 08:43:46 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1126:4:eb:d0d0:c7fd:c82c? ([2620:10d:c092:500::4:975d])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0a46119sm610041866b.46.2024.11.11.08.43.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Nov 2024 08:43:46 -0800 (PST)
-Message-ID: <28446805-f533-44fe-988a-71dcbdb379ab@gmail.com>
-Date: Mon, 11 Nov 2024 16:43:45 +0000
+	s=arc-20240116; t=1731343438; c=relaxed/simple;
+	bh=nknNO/X4QZPpB3akptkMCCcdCYltGPKsxIrYle5JUFI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=TLSwFpZyqMrGCZPLY6E2ah7usjCwZbVlktJtZmN4qUvDqvGn+YMkBpRfyPtMgkuHA8EirYBvEakJ0GI6iDCCFsFJg3hJE2+KRqhELkY/1h69VNC3wqYVGxYe2xFIApZM2mhG+iKF3ofGifFdq+uhJ8FElwXHEXAaERHsskQ80C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mail.parknet.co.jp; spf=pass smtp.mailfrom=parknet.co.jp; arc=none smtp.client-ip=210.171.160.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mail.parknet.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=parknet.co.jp
+Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
+	by mail.parknet.co.jp (Postfix) with ESMTPSA id 5FFDA284C597;
+	Mon, 11 Nov 2024 22:07:24 +0900 (JST)
+Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
+	by ibmpc.myhome.or.jp (8.18.1/8.18.1/Debian-6) with ESMTPS id 4ABD7NTb073975
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 11 Nov 2024 22:07:24 +0900
+Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
+	by devron.myhome.or.jp (8.18.1/8.18.1/Debian-6) with ESMTPS id 4ABD7NOK740352
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 11 Nov 2024 22:07:23 +0900
+Received: (from hirofumi@localhost)
+	by devron.myhome.or.jp (8.18.1/8.18.1/Submit) id 4ABD7Lwo740344;
+	Mon, 11 Nov 2024 22:07:21 +0900
+From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+        syzbot
+ <syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com>,
+        linkinjeon@kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sj1557.seo@samsung.com,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [exfat?] possible deadlock in fat_count_free_clusters
+In-Reply-To: <67313d9e.050a0220.138bd5.0054.GAE@google.com> (syzbot's message
+	of "Sun, 10 Nov 2024 15:11:26 -0800")
+References: <67313d9e.050a0220.138bd5.0054.GAE@google.com>
+Date: Mon, 11 Nov 2024 22:07:21 +0900
+Message-ID: <8734jxsyuu.fsf@mail.parknet.co.jp>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 0/2] mTHP-friendly compression in zsmalloc and zram
- based on multi-pages
-To: Barry Song <21cnbao@gmail.com>, "Huang, Ying" <ying.huang@intel.com>
-Cc: linux-mm@kvack.org, akpm@linux-foundation.org, axboe@kernel.dk,
- bala.seshasayee@linux.intel.com, chrisl@kernel.org, david@redhat.com,
- hannes@cmpxchg.org, kanchana.p.sridhar@intel.com, kasong@tencent.com,
- linux-block@vger.kernel.org, minchan@kernel.org, nphamcs@gmail.com,
- senozhatsky@chromium.org, surenb@google.com, terrelln@fb.com,
- v-songbaohua@oppo.com, wajdi.k.feghali@intel.com, willy@infradead.org,
- yosryahmed@google.com, yuzhao@google.com, zhengtangquan@oppo.com,
- zhouchengming@bytedance.com, ryan.roberts@arm.com
-References: <20241107101005.69121-1-21cnbao@gmail.com>
- <87iksy5mkh.fsf@yhuang6-desk2.ccr.corp.intel.com>
- <CAGsJ_4wOGPbGQgqDidnYUCCpAT8sw+S92NEU+trAQL_rnC10ZA@mail.gmail.com>
-Content-Language: en-US
-From: Usama Arif <usamaarif642@gmail.com>
-In-Reply-To: <CAGsJ_4wOGPbGQgqDidnYUCCpAT8sw+S92NEU+trAQL_rnC10ZA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+
+Hi,
+
+syzbot <syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com> writes:
+
+> syzbot found the following issue on:
+>
+> HEAD commit:    929beafbe7ac Add linux-next specific files for 20241108
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1621bd87980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=75175323f2078363
+> dashboard link: https://syzkaller.appspot.com/bug?extid=a5d8c609c02f508672cc
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+This patch is to fix the above race. Please check this.
+
+Thanks
 
 
+From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Subject: [PATCH] loop: Fix ABBA locking race
+Date: Mon, 11 Nov 2024 21:53:36 +0900
 
-On 08/11/2024 06:51, Barry Song wrote:
-> On Fri, Nov 8, 2024 at 6:23 PM Huang, Ying <ying.huang@intel.com> wrote:
->>
->> Hi, Barry,
->>
->> Barry Song <21cnbao@gmail.com> writes:
->>
->>> From: Barry Song <v-songbaohua@oppo.com>
->>>
->>> When large folios are compressed at a larger granularity, we observe
->>> a notable reduction in CPU usage and a significant improvement in
->>> compression ratios.
->>>
->>> mTHP's ability to be swapped out without splitting and swapped back in
->>> as a whole allows compression and decompression at larger granularities.
->>>
->>> This patchset enhances zsmalloc and zram by adding support for dividing
->>> large folios into multi-page blocks, typically configured with a
->>> 2-order granularity. Without this patchset, a large folio is always
->>> divided into `nr_pages` 4KiB blocks.
->>>
->>> The granularity can be set using the `ZSMALLOC_MULTI_PAGES_ORDER`
->>> setting, where the default of 2 allows all anonymous THP to benefit.
->>>
->>> Examples include:
->>> * A 16KiB large folio will be compressed and stored as a single 16KiB
->>>   block.
->>> * A 64KiB large folio will be compressed and stored as four 16KiB
->>>   blocks.
->>>
->>> For example, swapping out and swapping in 100MiB of typical anonymous
->>> data 100 times (with 16KB mTHP enabled) using zstd yields the following
->>> results:
->>>
->>>                         w/o patches        w/ patches
->>> swap-out time(ms)       68711              49908
->>> swap-in time(ms)        30687              20685
->>> compression ratio       20.49%             16.9%
->>
->> The data looks good.  Thanks!
->>
->> Have you considered the situation that the large folio fails to be
->> allocated during swap-in?  It's possible because the memory may be very
->> fragmented.
-> 
-> That's correct, good question. On phones, we use a large folio pool to maintain
-> a relatively high allocation success rate. When mTHP allocation fails, we have
-> a workaround to allocate nr_pages of small folios and map them together to
-> avoid partial reads.  This ensures that the benefits of larger block compression
-> and decompression are consistently maintained.  That was the code running
-> on production phones.
-> 
+Current loop calls vfs_statfs() while holding the q->limits_lock. If
+FS takes some locking in vfs_statfs callback, this may lead to ABBA
+locking bug (at least, FAT fs has this issue actually).
 
-Thanks for sending the v2!
+So this patch calls vfs_statfs() outside q->limits_locks instead,
+because looks like there is no reason to hold q->limits_locks while
+getting discard configs.
 
-How is the large folio pool maintained. I dont think there is something in upstream
-kernel for this? The only thing that I saw on the mailing list is TAO for pmd-mappable
-THPs only? I think that was about 7-8 months ago and wasn't merged?
-The workaround to allocate nr_pages of small folios and map them
-together to avoid partial reads is also not upstream, right?
+Chain exists of:
+  &sbi->fat_lock --> &q->q_usage_counter(io)#17 --> &q->limits_lock
 
-Do you have any data how this would perform with the upstream kernel, i.e. without
-a large folio pool and the workaround and if large granularity compression is worth having
-without those patches?
+ Possible unsafe locking scenario:
 
-Thanks,
-Usama
+       CPU0                    CPU1
+       ----                    ----
+  lock(&q->limits_lock);
+                               lock(&q->q_usage_counter(io)#17);
+                               lock(&q->limits_lock);
+  lock(&sbi->fat_lock);
 
-> We also previously experimented with maintaining multiple buffers for
-> decompressed
-> large blocks in zRAM, allowing upcoming do_swap_page() calls to use them when
-> falling back to small folios. In this setup, the buffers achieved a
-> high hit rate, though
-> I don’t recall the exact number.
-> 
-> I'm concerned that this fault-around-like fallback to nr_pages small
-> folios may not
-> gain traction upstream. Do you have any suggestions for improvement?
-> 
->>
->>> -v2:
->>>  While it is not mature yet, I know some people are waiting for
->>>  an update :-)
->>>  * Fixed some stability issues.
->>>  * rebase againest the latest mm-unstable.
->>>  * Set default order to 2 which benefits all anon mTHP.
->>>  * multipages ZsPageMovable is not supported yet.
->>>
->>> Tangquan Zheng (2):
->>>   mm: zsmalloc: support objects compressed based on multiple pages
->>>   zram: support compression at the granularity of multi-pages
->>>
->>>  drivers/block/zram/Kconfig    |   9 +
->>>  drivers/block/zram/zcomp.c    |  17 +-
->>>  drivers/block/zram/zcomp.h    |  12 +-
->>>  drivers/block/zram/zram_drv.c | 450 +++++++++++++++++++++++++++++++---
->>>  drivers/block/zram/zram_drv.h |  45 ++++
->>>  include/linux/zsmalloc.h      |  10 +-
->>>  mm/Kconfig                    |  18 ++
->>>  mm/zsmalloc.c                 | 232 +++++++++++++-----
->>>  8 files changed, 699 insertions(+), 94 deletions(-)
->>
->> --
->> Best Regards,
->> Huang, Ying
-> 
-> Thanks
-> barry
+ *** DEADLOCK ***
 
+Reported-by: syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=a5d8c609c02f508672cc
+Signed-off-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+---
+ drivers/block/loop.c |   31 ++++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 78a7bb2..5f3ce51 100644
+--- a/drivers/block/loop.c	2024-09-16 13:45:20.253220178 +0900
++++ b/drivers/block/loop.c	2024-11-11 21:51:00.910135443 +0900
+@@ -770,12 +770,11 @@ static void loop_sysfs_exit(struct loop_
+ 				   &loop_attribute_group);
+ }
+ 
+-static void loop_config_discard(struct loop_device *lo,
+-		struct queue_limits *lim)
++static void loop_get_discard_config(struct loop_device *lo,
++				    u32 *granularity, u32 *max_discard_sectors)
+ {
+ 	struct file *file = lo->lo_backing_file;
+ 	struct inode *inode = file->f_mapping->host;
+-	u32 granularity = 0, max_discard_sectors = 0;
+ 	struct kstatfs sbuf;
+ 
+ 	/*
+@@ -788,8 +787,9 @@ static void loop_config_discard(struct l
+ 	if (S_ISBLK(inode->i_mode)) {
+ 		struct request_queue *backingq = bdev_get_queue(I_BDEV(inode));
+ 
+-		max_discard_sectors = backingq->limits.max_write_zeroes_sectors;
+-		granularity = bdev_discard_granularity(I_BDEV(inode)) ?:
++		*max_discard_sectors =
++			backingq->limits.max_write_zeroes_sectors;
++		*granularity = bdev_discard_granularity(I_BDEV(inode)) ?:
+ 			queue_physical_block_size(backingq);
+ 
+ 	/*
+@@ -797,16 +797,9 @@ static void loop_config_discard(struct l
+ 	 * image a.k.a. discard.
+ 	 */
+ 	} else if (file->f_op->fallocate && !vfs_statfs(&file->f_path, &sbuf)) {
+-		max_discard_sectors = UINT_MAX >> 9;
+-		granularity = sbuf.f_bsize;
++		*max_discard_sectors = UINT_MAX >> 9;
++		*granularity = sbuf.f_bsize;
+ 	}
+-
+-	lim->max_hw_discard_sectors = max_discard_sectors;
+-	lim->max_write_zeroes_sectors = max_discard_sectors;
+-	if (max_discard_sectors)
+-		lim->discard_granularity = granularity;
+-	else
+-		lim->discard_granularity = 0;
+ }
+ 
+ struct loop_worker {
+@@ -992,6 +985,7 @@ static int loop_reconfigure_limits(struc
+ 	struct inode *inode = file->f_mapping->host;
+ 	struct block_device *backing_bdev = NULL;
+ 	struct queue_limits lim;
++	u32 granularity = 0, max_discard_sectors = 0;
+ 
+ 	if (S_ISBLK(inode->i_mode))
+ 		backing_bdev = I_BDEV(inode);
+@@ -1001,6 +995,8 @@ static int loop_reconfigure_limits(struc
+ 	if (!bsize)
+ 		bsize = loop_default_blocksize(lo, backing_bdev);
+ 
++	loop_get_discard_config(lo, &granularity, &max_discard_sectors);
++
+ 	lim = queue_limits_start_update(lo->lo_queue);
+ 	lim.logical_block_size = bsize;
+ 	lim.physical_block_size = bsize;
+@@ -1010,7 +1006,12 @@ static int loop_reconfigure_limits(struc
+ 		lim.features |= BLK_FEAT_WRITE_CACHE;
+ 	if (backing_bdev && !bdev_nonrot(backing_bdev))
+ 		lim.features |= BLK_FEAT_ROTATIONAL;
+-	loop_config_discard(lo, &lim);
++	lim.max_hw_discard_sectors = max_discard_sectors;
++	lim.max_write_zeroes_sectors = max_discard_sectors;
++	if (max_discard_sectors)
++		lim.discard_granularity = granularity;
++	else
++		lim.discard_granularity = 0;
+ 	return queue_limits_commit_update(lo->lo_queue, &lim);
+ }
+ 
+_
+-- 
+OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
