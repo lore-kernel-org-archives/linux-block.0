@@ -1,93 +1,94 @@
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD2B1E481;
-	Mon, 11 Nov 2024 14:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C74D1BC58
+	for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 15:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731337169; cv=none; b=MtwU2kB5x4wUnF5zREa89UWPM4AlGiKzSef9HxYRmj/9wdAJ6Z/KOGLEO0TSMO68UoqDOISjUqFyxZMEkl6iJqB3BYBmWPoHZ2/wDsJyyR8vMHn+nDfyXpCvOtImR419J1TSw1vujD9hhTd7vgQkCLF6nz40gVMfVT0bemjpwaI=
+	t=1731338229; cv=none; b=dUsyuZjMncDOpMaD6PSDYkmWV3/PDqemdewwDN2BC7rFds0XUDxGVM4GgX7lnurlKonYbspz7qxrVNL+Qi5wSMOxfdDNr0g7tbUNy6+tCy2V1W1t/yEFq8TR8HBwmr9W0XImhndbEGoeqK4d7eDNHyBQgOF4PVrViClyQlS0k4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731337169; c=relaxed/simple;
-	bh=gg3nV1iKgs4bbxPK/uru5pPDw51yAhWHVenuhfd8RSY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=E1hbJAEALqlb5yL56DaF3Qdv35CRbOZUjo41njnTAapQEJ0PfjTeAMJlktQn6zFocYAD5AcntSDzEzxG0egw/joVNiqqGP+s2PtjzedHUpp4kPCeNPoPiPCIlkzq6cGu7gK+PF8oeOV3JldOMHb+qdPl62rL7Yt8XyMFS58xoNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=U7Qof0wu; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+	s=arc-20240116; t=1731338229; c=relaxed/simple;
+	bh=5mglLWlQDVCW9S1DxcB2RlxHNcZg1Dez/gGInZMM1Vw=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=srEfvYsgH5Uh6Zeyc/Wh+nxo26xhgyJ9PqwhSKiuc6SwqOMgks4qNvylEFoS0xGqzduo4UAlmtyo3WcJUPBpBkCxlsePm+3yq2eAIEjrIPpkJmFjhXNRl4C3nJQsjPy4IJvAvXb/G/FALJITibfqUjEsIZqZZ/j9qVs31BxjUOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=jCh/8bOE; arc=none smtp.client-ip=209.85.160.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="U7Qof0wu"
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 45E36403F1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1731337167; bh=GwVTmx4eIglWLWGHYmk31OoK5pzNvXaKVe73vYEWSTk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=U7Qof0wuVnJGcnP06ChHK+MJPNdREQXE7RLUzC2W70ULBaY9a9VnJ9vQEtqDAf9Ah
-	 A3HwpVCu8PJVyEMghvrqu/hNDOC8sGYBt3mN173rM33gAFqU2dKpLTqp9ac4bjnapP
-	 A1UN+AgpzI588tU7KIuantdLBUeWBgXdiFu11n7kGDH4ZxFGW1T97qYFC9t3FAzyYo
-	 fgA7YQdK+SYmrHtsukzfx/wT5vFef/DoXSOK38XKAVdsxtI+fq2uPWuv8CV5NUKrxx
-	 iQj4S70o2yK54j7jT8p8fewkBThJBXMBi2CZoLIkGaK5OJDLnfOOJSXDckk3X1rExZ
-	 HhL9BYc+PyPqw==
-Received: from localhost (unknown [IPv6:2601:280:5e00:625::1fe])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 45E36403F1;
-	Mon, 11 Nov 2024 14:59:27 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: anish kumar <yesanishhere@gmail.com>, Christoph Hellwig <hch@lst.de>
-Cc: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>, Jason
- Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>, Joerg
- Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Sagi Grimberg
- <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>, Bjorn Helgaas
- <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas
- <yishaih@nvidia.com>, Shameer Kolothum
- <shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>, Marek Szyprowski
- <m.szyprowski@samsung.com>, =?utf-8?B?SsOpcsO0bWU=?= Glisse
- <jglisse@redhat.com>, Andrew
- Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
- kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 09/17] docs: core-api: document the IOVA-based API
-In-Reply-To: <CABCoZhBVWY=aUQtQ5b=mF8hXqpgJw21_jAPf9YvEvdgPf_GALA@mail.gmail.com>
-References: <cover.1730298502.git.leon@kernel.org>
- <881ef0bcf9aa971e995fbdd00776c5140a7b5b3d.1730298502.git.leon@kernel.org>
- <87ttchwmde.fsf@trenco.lwn.net> <20241108200355.GC189042@unreal>
- <87h68hwkk8.fsf@trenco.lwn.net> <20241108202736.GD189042@unreal>
- <20241110104130.GA19265@unreal> <20241111063847.GB23992@lst.de>
- <CABCoZhBVWY=aUQtQ5b=mF8hXqpgJw21_jAPf9YvEvdgPf_GALA@mail.gmail.com>
-Date: Mon, 11 Nov 2024 07:59:26 -0700
-Message-ID: <87o72lu88h.fsf@trenco.lwn.net>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jCh/8bOE"
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-2884e7fadb8so2353104fac.2
+        for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 07:17:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731338227; x=1731943027; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qTNqZekwtHw/I6Wjflq64VtIvDI6PYfVEIhwmbtaRWQ=;
+        b=jCh/8bOEDmXOJT4jYtT78OtCokQ3xZr+KrTGGjVQxePRgoe1Vu5HamXnX4hGOnJYjT
+         NenMrx+tvuXzxsxsWNqvxHdftBuELYVFXEQWEXRikxu4Ub2rwcSKwB0Qzn9umPiHjw6x
+         IC1Ww/luWym5dvExYWEIKeU3M24hrBlGhJIIdj07CXppW0Nl/Biv2y6pV8uanKZ+lkE7
+         CNr4erKWI/XyNhjXXDa/b852cuoinnmkh1L2plkKdtuQvIyVWNWxfn6FlAPQBHYNajWj
+         R1oOgDrHiN7T7buOoCENa/fC6hV7X4m9BDj+5cYPq2xC2XS5Qo1/k5CKDPi8FhIugngE
+         A32Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731338227; x=1731943027;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qTNqZekwtHw/I6Wjflq64VtIvDI6PYfVEIhwmbtaRWQ=;
+        b=AhC4PS5Qn3Umd5ZuIwtRDfEH82DcLlb+M5RS9+1sg/ZX+TlPv5nJJVmGKi9NdoEgwW
+         pg5Lhvz34Gj0NcKAazd07VkmEi5qom/ztFYZC7L0kAxegLMi8wU3waFF15SAE77ttKQ1
+         Y6ZOFzAlPf6aXNfvfe9Hkn8CNK2lbSgrh/0+OeGal6EZBqP/8jiDERceWgoVqm+sneqA
+         4smXJ65sAUZvVDx+idYume8LRmZ9qBMJrXPq7cs1Cm2GZ62M0rDPEeAkpuBiIVPaEhBq
+         lU+Tvc4M6NvKSWGYk3lZ3QHFZKX3KUSvupP9oFBz5GI4YRk58L5QNGkvuj74waLizTg5
+         QtSw==
+X-Gm-Message-State: AOJu0Yz3w4km93YB+UAmd8Zv6Vocw8hZqcmQUV2MFswTMDya1Hg4teQp
+	Y2X8+n8bKrxIn8r/xVS+ImJqQk6i8hHjDU1hgQQB6+CEYN/AAF+xomNe2bCWiwweY103SL9QSY/
+	fhcY=
+X-Google-Smtp-Source: AGHT+IG7hV1F4r6SeSGVFChlgt8eEYSnrJeZ3KMhN6TIaupsFh2GLBzRcDjqlBtDr4SMVDpP3aZ3dg==
+X-Received: by 2002:a05:6871:5e03:b0:286:f9c3:ed78 with SMTP id 586e51a60fabf-2956030ecc1mr8473584fac.36.1731338226803;
+        Mon, 11 Nov 2024 07:17:06 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-29546f3f2f7sm2861968fac.46.2024.11.11.07.17.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 07:17:06 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+In-Reply-To: <20241111110718.1394001-1-ming.lei@redhat.com>
+References: <20241111110718.1394001-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] ublk: fix ublk_ch_mmap() for 64K page size
+Message-Id: <173133822582.1860965.10816573961090273161.b4-ty@kernel.dk>
+Date: Mon, 11 Nov 2024 08:17:05 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-anish kumar <yesanishhere@gmail.com> writes:
 
-> On Sun, Nov 10, 2024 at 10:39=E2=80=AFPM Christoph Hellwig <hch@lst.de> w=
-rote:
->>
->> On Sun, Nov 10, 2024 at 12:41:30PM +0200, Leon Romanovsky wrote:
->> > I tried this today and the output (HTML) in the new section looks
->> > so different from the rest of dma-api.rst that I lean to leave
->> > the current doc implementation as is.
->>
->> Yeah.  The whole DMA API documentation shows it's age and could use
->> a major revamp, but for now I'd prefer to stick to the way it is done.
->>
->> If we have any volunteers for bringing it up to standards I'd be glad
->> to help with input and review.
->
-> Jonathan, if you agree, I can take this up?
+On Mon, 11 Nov 2024 19:07:18 +0800, Ming Lei wrote:
+> In ublk_ch_mmap(), queue id is calculated in the following way:
+> 
+> 	(vma->vm_pgoff << PAGE_SHIFT) / `max_cmd_buf_size`
+> 
+> 'max_cmd_buf_size' is equal to
+> 
+> 	`UBLK_MAX_QUEUE_DEPTH * sizeof(struct ublksrv_io_desc)`
+> 
+> [...]
 
-I am happy to see help with the documentation, but agreement from the
-authors and maintainers of the DMA-mapping documentation is rather more
-important than agreement from me.
+Applied, thanks!
 
-jon
+[1/1] ublk: fix ublk_ch_mmap() for 64K page size
+      commit: d369735e02ef122d19d4c3d093028da0eb400636
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
