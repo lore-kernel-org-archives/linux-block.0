@@ -1,161 +1,106 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DDCF20495C;
-	Tue, 12 Nov 2024 01:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536EC19F13C;
+	Tue, 12 Nov 2024 04:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731375138; cv=none; b=FCoBo1H2kqSMuU7AVVdKVDKhG+LI2GivDNLCSm+pG9AGpzXctEOtAE9XtWXmaBQ1cw4GmbY59UHQEt6P/3ka78DVrZbiLvTkYACqq1TrN5rIdiNBTokifxAlp8F/rXMPR8gV+ALL7xayRocyBKH4Ucm81wnBH+ErR0oDB++yxpA=
+	t=1731386864; cv=none; b=VN1xaRSzBBYvRGFKxkAm2murO4K2OWGhczd37OdvP/ByvCTiOQB613JII9cO+cUThCx++28pXq18stZF1UPTjIvwlhKkbTXkSAaShT8UbiUyjU53aevgZUzO75hhYNYwDnZmxLHoooAhByQXIAvcE5+vdRAeyfr5jo70/0UWe14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731375138; c=relaxed/simple;
-	bh=pkJEhBHO901RWUGMZ4neCm1jieHMbZ7B7rshDp1CaYM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KWL/1yg7RG7nJhsLgivgdMT4p7NL+dNG6WBR0JL2Czs0fmmBc3HuoQWarLTveZ3z3ErGhRoJAs1qV4Qo8gpC7wVr/vVEBJsBAgWxLEenRyVSkkOuaX/o/GgzVz2MTxKjtJrMuUJSVlWw+NacwWf6SOV+FXM/5T2nc8mFKBOSglk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gE82J/Ja; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gE82J/Ja"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4315c1c7392so45052265e9.1;
-        Mon, 11 Nov 2024 17:32:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731375135; x=1731979935; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WOYYrAKsRLkotEPjA+hBse5PtLPm2vozdMcs0N4/zA4=;
-        b=gE82J/JarLuHZcIAbfi89qwthbkNAkbuNQBSIMyi9NDdDkRBLa4yeqHQcJSYCOl5Nv
-         rHtpgJ2IZD2YASJNIltE+sjUKkDixDGFCq8MPQh/oHHCoMxi8uF+qb8QRkIK8NfXoU6W
-         66dQyCjYu2VLQ/oXUtWPBKlHAVtTu8kBuwTRA6raifLx6FpQd3cItTR41AZSI5e3LSny
-         MwDvVE00AvaC+UKBuPw7W22DnZ0xwjeY5IZ9sWf6q/MpDWkT7nl+vQK/gPvlyYjgAqlq
-         ud2frSCc/aSa1Xw0vhGo2dV/33yzuH5rYlC8x/0PgHQ8awpEkBIOl+Ez9/9vjFIfLT59
-         DKJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731375135; x=1731979935;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WOYYrAKsRLkotEPjA+hBse5PtLPm2vozdMcs0N4/zA4=;
-        b=Oa6LF85wm1cyXVerm0iF2YPH157JMSudJi1GQNf5TXxFiKMbrPZp1l9weF0YN7amlb
-         BNkE/WhU03ttkj/aGg+L8qP9V5DrjwajeKfW12P1eTRRYXNOJ24JuUzhbFzYLKGIQA5M
-         gmtVYvS50kQkWPZim6I6EchdPtbk2EjDphQIi07m3akctIGR8kZ7qiLr53Ta347h73ll
-         yHHSmnyTxGmvMdsVBQjLGyZskiu5oTZE2b4CqH/9ZZ+h5VCT/UHcV8Psrbabcdu3xeiR
-         s8JKXI8fP1Vr/P6nq63mA25bQD8iY/UpLjWfdX3iCZj+XJ1uqVOXc5NDxAhDwSXcXl8C
-         FEMw==
-X-Forwarded-Encrypted: i=1; AJvYcCUfWoSA97hYfk+d8qeTFv7QqoBsB520oc3VM92EchZkXLWfOYxIFRIBMEmMgEMu1wRf1QdOEd2lFw==@vger.kernel.org, AJvYcCWb+swigtiaSTFh3b9pZt1DaO/EXdom8syiv6qvDnpxm33Czf7qFVoBFDdzdDiQGkOfHKZdZBo/HjGgBw==@vger.kernel.org, AJvYcCWzYoyZleGHwZz92tlyzfQrcmLi3Io5hply2qDE8yUslzHmGIpvRopl1F2gMPb4aNBRbEy1vNd0YjSp8VzVig==@vger.kernel.org, AJvYcCXgkoRU1w3K/2jAjhD0UpkT3goFMJRgBQGvJngZfDJ3TBz3vtE2jF/tmFIHzh7i2xk8Oa/MRM4D5vSRdFg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPl0hG07Ncp/AUMj12a+ZIKHOJpVAkJ6dxjtwofATDMtI4cUS8
-	hrw0fGVakAvNsybydpv5bQfjfvVkGuxZAO7qoVFciwL4yc6mSI0x
-X-Google-Smtp-Source: AGHT+IFUwkZdPumBasVvTtECag2f1YXtLMhxIHiAzpbsfxbCn/aAobFfjpRlKsPysUvhvUitAG5Mww==
-X-Received: by 2002:a05:600c:4f83:b0:42a:a6d2:3270 with SMTP id 5b1f17b1804b1-432b7517aa4mr116959285e9.21.1731375134452;
-        Mon, 11 Nov 2024 17:32:14 -0800 (PST)
-Received: from [192.168.42.75] ([85.255.234.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05c1c81sm194974655e9.32.2024.11.11.17.32.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Nov 2024 17:32:14 -0800 (PST)
-Message-ID: <642d46b9-0869-42a9-b7fb-c9b51cb23b8b@gmail.com>
-Date: Tue, 12 Nov 2024 01:32:58 +0000
+	s=arc-20240116; t=1731386864; c=relaxed/simple;
+	bh=LEqqJ4nFtPDR80cCFpUujkkjo5vD242bVGicW1R9Uwc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WQ0FKLCn0R1K/vkgh4DDcSEvJ9CfVJeAVVbW3m3Vv2qQr1VrYneOzi4SDg1W8DgEldUrYs51XZ0EIL29JEg4in/+yaB628tnBLwAQikKnYjnYlBjox78Cb7s+Zf0JOqIVrLY1SldnFqb0wMX5dUOBe+iazTYDIPGd3rqg7pXfSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 95CAB68D09; Tue, 12 Nov 2024 05:47:36 +0100 (CET)
+Date: Tue, 12 Nov 2024 05:47:36 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Daniel Wagner <wagi@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Bjorn Helgaas <bhelgaas@google.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+	megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
+	MPT-FusionLinux.pdl@broadcom.com, storagedev@microchip.com,
+	linux-nvme@lists.infradead.org, Daniel Wagner <dwagner@suse.de>
+Subject: Re: [PATCH v2 1/6] blk-mq: introduce blk_mq_hctx_map_queues
+Message-ID: <20241112044736.GA8883@lst.de>
+References: <20241111-refactor-blk-affinity-helpers-v2-0-f360ddad231a@kernel.org> <20241111-refactor-blk-affinity-helpers-v2-1-f360ddad231a@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 06/10] io_uring/rw: add support to send metadata along
- with read/write
-To: Kanchan Joshi <joshi.k@samsung.com>, Keith Busch <kbusch@kernel.org>
-Cc: axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
- brauner@kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
- linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, linux-block@vger.kernel.org,
- linux-scsi@vger.kernel.org, gost.dev@samsung.com, vishak.g@samsung.com,
- anuj1072538@gmail.com, Anuj Gupta <anuj20.g@samsung.com>
-References: <20241030180112.4635-1-joshi.k@samsung.com>
- <CGME20241030181013epcas5p2762403c83e29c81ec34b2a7755154245@epcas5p2.samsung.com>
- <20241030180112.4635-7-joshi.k@samsung.com>
- <ZyKghoCwbOjAxXMz@kbusch-mbp.dhcp.thefacebook.com>
- <914cd186-8d15-4989-ad4e-f7e268cd3266@gmail.com>
- <ceb58d97-b2e3-4d36-898d-753ba69476be@samsung.com>
- <b11cc81d-08b7-437d-85b4-083b84389ff1@gmail.com>
- <6bca474e-361d-40a3-b28b-93f561dbdd85@samsung.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <6bca474e-361d-40a3-b28b-93f561dbdd85@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241111-refactor-blk-affinity-helpers-v2-1-f360ddad231a@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 11/10/24 18:36, Kanchan Joshi wrote:
-> On 11/7/2024 10:53 PM, Pavel Begunkov wrote:
+On Mon, Nov 11, 2024 at 07:02:09PM +0100, Daniel Wagner wrote:
+> blk_mq_pci_map_queues and blk_mq_virtio_map_queues will create a CPU to
+> hardware queue mapping based on affinity information. These two function
+> share common code and only differ on how the affinity information is
+> retrieved. Also, those functions are located in the block subsystem
+> where it doesn't really fit in. They are virtio and pci subsystem
+> specific.
 > 
->> Let's say we have 3 different attributes META_TYPE{1,2,3}.
->>
->> How are they placed in an SQE?
->>
->> meta1 = (void *)get_big_sqe(sqe);
->> meta2 = meta1 + sizeof(?); // sizeof(struct meta1_struct)
->> meta3 = meta2 + sizeof(struct meta2_struct);
+> Introduce a new callback in struct bus_type to get the affinity mask.
+> The callbacks can then be populated by the subsystem directly.
 > 
-> Not necessary to do this kind of additions and think in terms of
-> sequential ordering for the extra information placed into
-> primary/secondary SQE.
-> 
-> Please see v8:
-> https://lore.kernel.org/io-uring/20241106121842.5004-7-anuj20.g@samsung.com/
-> 
-> It exposes a distinct flag (sqe->ext_cap) for each attribute/cap, and
-> userspace should place the corresponding information where kernel has
-> mandated.
-> 
-> If a particular attribute (example write-hint) requires <20b of extra
-> information, we should just place that in first SQE. PI requires more so
-> we are placing that into second SQE.
-> 
-> When both PI and write-hint flags are specified by user they can get
-> processed fine without actually having to care about above
-> additions/ordering.
+> All but one driver use the subsystem default affinity masks. hisi_sas v2
+> depends on a driver specific mapping, thus use the optional argument
+> get_queue_affinity to retrieve the mapping.
 
-Ok, this option is to statically define a place in SQE for each
-meta type. The problem is that we can't place everything into
-an SQE, and the next big meta would need to be a user pointer,
-at which point copy_from_user() is expensive again and we need
-to invent something new. PI becomes a special case, most likely
-handled in a special way, and either becomes one of few "optimised"
-or forces for nothing its users into SQE128 (with all additional
-costs) when it could've been aligned with other later meta types.
+This seems to mix up a few different things:
 
->> Structures are likely not fixed size (?). At least the PI looks large
->> enough to force everyone to be just aliased to it.
->>
->> And can the user pass first meta2 in the sqe and then meta1?
-> 
-> Yes. Just set the ext_cap flags without bothering about first/second.
-> User can pass either or both, along with the corresponding info. Just
-> don't have to assume specific placement into SQE.
-> 
-> 
->> meta2 = (void *)get_big_sqe(sqe);
->> meta1 = meta2 + sizeof(?); // sizeof(struct meta2_struct)
->>
->> If yes, how parsing should look like? Does the kernel need to read each
->> chunk's type and look up its size to iterate to the next one?
-> 
-> We don't need to iterate if we are not assuming any ordering.
-> 
->> If no, what happens if we want to pass meta2 and meta3, do they start
->> from the big_sqe?
-> 
-> The one who adds the support for meta2/meta3 in kernel decides where to
-> place them within first/second SQE or get them fetched via a pointer
-> from userspace.
-> 
->> How do we pass how many of such attributes is there for the request?
-> 
-> ext_cap allows to pass 16 cap/attribute flags. Maybe all can or can not
-> be passed inline in SQE, but I have no real visibility about the space
-> requirement of future users.
+ 1) adding a new bus operation
+ 2) implementations of that operation for PCI and virtio
+ 3) a block layer consumer of the operation
 
-I like ext_cap, if not in the current form / API, then as a user
-hint - quick map of what meta types are passed.
+all these really should be separate per-subsystem patches.
 
--- 
-Pavel Begunkov
+You'll also need to Cc the driver model maintainers.
+
+> +void blk_mq_hctx_map_queues(struct blk_mq_queue_map *qmap,
+> +			    struct device *dev, unsigned int offset,
+> +			    get_queue_affinity_fn *get_irq_affinity)
+> +{
+> +	const struct cpumask *mask = NULL;
+> +	unsigned int queue, cpu;
+> +
+> +	for (queue = 0; queue < qmap->nr_queues; queue++) {
+> +		if (get_irq_affinity)
+> +			mask = get_irq_affinity(dev, queue + offset);
+> +		else if (dev->bus->irq_get_affinity)
+> +			mask = dev->bus->irq_get_affinity(dev, queue + offset);
+> +
+> +		if (!mask)
+> +			goto fallback;
+> +
+> +		for_each_cpu(cpu, mask)
+> +			qmap->mq_map[cpu] = qmap->queue_offset + queue;
+> +	}
+
+This does different things with a NULL argument vs not.  Please split it
+into two separate helpers.  The non-NULL case is only uses in hisi_sas,
+so it might be worth just open coding it there as well.
+
+> +static const struct cpumask *pci_device_irq_get_affinity(struct device *dev,
+> +					unsigned int irq_vec)
+> +{
+> +	struct pci_dev *pdev = to_pci_dev(dev);
+> +
+> +	return pci_irq_get_affinity(pdev, irq_vec);
+
+Nit: this could be shortened to:
+
+	return pci_irq_get_affinity(to_pci_dev(dev), irq_vec);
+
