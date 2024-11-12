@@ -1,130 +1,139 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A6D21A707;
-	Tue, 12 Nov 2024 22:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25452230984
+	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 04:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731449310; cv=none; b=jw8FDydMtMnTUoW5ec78dDd5qIlyhTj0frvzQiapI4RClMuTwRZNHNyuEehqvN9JlOFfWKGU8iZZ99ROc+Ot9Vj6pWAOU1dJ186cJTOB8xbevqcsQo8BFzI0t3UL6ra2Kx5EyKH/WeB1h382SFgJSbdVctLThmkA0n5CSZ4sqHk=
+	t=1731471732; cv=none; b=fDu6xZTi8hpydfT0B7xRMuj6GwNhb9xo83IvAhHZaCkbQILvLL235ExIeJvSNuFb0/zGx38MCKrQjc6uoJanHz+Owchr6ia/nCthkgUjFKIeQ9XX5wMWd8dGMu1VbwPVAm6Pis8DLs09xW0Msl2bcoyB+H4umIOBGF+rcFGBTE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731449310; c=relaxed/simple;
-	bh=bwOLoyFxYfjUqtJNi/9ZCqz09dTnm3t/9bGtqoLlI8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e0Y8I01wtlYn7nu2tmnvN7ktw+OPNB5VXtgstSmU0G9iz/6oei5kDNjkgzFIYmBlzUR0GYT9Jj4MbDMmA4EvLJSQCLcvYlBfIHfyFhmt2NeUrGd0haWlFcTA00CmwRpX58NlZCs+Bv+DXrocBzHGd4cKMiAP9beYidb/ErYqzdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IVwNhomQ; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1731471732; c=relaxed/simple;
+	bh=q9R/DTzH88eDeoG6jUbTuaEnX1sa6+QdvUZnMNserYI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=lJSXW6KEK89IpVrCMdim6qMfaVfD7Sdj3tOCZYvQBqLJe1LX7sDLZAeFxAYGxBcs51yvyr6kxUGK4tlDPn0vtkbvpJeAOfOjcqdknDihPe2hsMFaIujAQal8EaWVKZ+Jc5OHuPFU5DyYMC9gCSyl0LegaG8r4U1h154h6u05ZKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=hBPY76NQ; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IVwNhomQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731449309; x=1762985309;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bwOLoyFxYfjUqtJNi/9ZCqz09dTnm3t/9bGtqoLlI8U=;
-  b=IVwNhomQF4zWvejcrdwszuAZZGj5KqtQ/UmeU88Yw7IJ0RjbOHxFqm1v
-   49CTwAyzSKjw+vliZjwNP3L/nXX/cqTLnxz7bJfwUkPjPWfwy3gpchnTR
-   P/m2vH4I59QnoULZBzWDNBe5aQeGMW7T6BeGEuVwm0HgxrXE5oZqHq7BP
-   dsIqY4o1SkbxPbOXO2Wf0l+X2M/neD7xmC6mhtSaB8gyPBvSFSDBH9LUr
-   qukDURu/Vfum2vAV876J8t+lC97simAyWSK+sVOHcgCyMH19dVOr443Jx
-   2lNPmnPpMXcBGg5ePayPlBPeO/52hGqXMbj32RaInN7kSbGwfvrDQfYoV
-   g==;
-X-CSE-ConnectionGUID: 3l5wpoqITy2Um7ytbQkcpg==
-X-CSE-MsgGUID: 7DsUB2CqTSCk5Zrms4A9zQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11254"; a="42722540"
-X-IronPort-AV: E=Sophos;i="6.12,149,1728975600"; 
-   d="scan'208";a="42722540"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2024 14:08:27 -0800
-X-CSE-ConnectionGUID: QGh9vjHLSpKorf74bKXSXg==
-X-CSE-MsgGUID: sKP0TcqbSXmgHwe8OkVCnw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,149,1728975600"; 
-   d="scan'208";a="91712794"
-Received: from lkp-server01.sh.intel.com (HELO bcfed0da017c) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 12 Nov 2024 14:08:16 -0800
-Received: from kbuild by bcfed0da017c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tAz3W-0001lf-1j;
-	Tue, 12 Nov 2024 22:08:14 +0000
-Date: Wed, 13 Nov 2024 06:07:51 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
-	megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
-	MPT-FusionLinux.pdl@broadcom.com, storagedev@microchip.com,
-	linux-nvme@lists.infradead.org, Daniel Wagner <wagi@kernel.org>
-Subject: Re: [PATCH v3 3/8] virtio: hookup irq_get_affinity callback
-Message-ID: <202411130521.UOBdW8Rv-lkp@intel.com>
-References: <20241112-refactor-blk-affinity-helpers-v3-3-573bfca0cbd8@kernel.org>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="hBPY76NQ"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20241113042206epoutp0446bd12f4f916db179731c1c5826dda37~HbFxywLGR2594125941epoutp04b
+	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 04:22:06 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20241113042206epoutp0446bd12f4f916db179731c1c5826dda37~HbFxywLGR2594125941epoutp04b
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1731471726;
+	bh=xAjZDWveay+STY/9uc+J7ivhLXMC5O7nHhCRmgSOse4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hBPY76NQsITVC6N4b/saYt/pbnbXAPsjHRAz0IQX+Kz9d/kFDQq4oLPglJB92WHjJ
+	 WOx76ObxYRO3R3QwPBj5lvPeQizLuY5SKqUGQB76btp4zwf52HGx/FaY8NIAMA2MKd
+	 f49TpfI/uIs4hF7AUD/oxEQ+mMDE4/iyktuIAJhU=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20241113042205epcas5p195b0f1698b5d478bb61adc7b7cd84c30~HbFw0AQ9W2749727497epcas5p1z;
+	Wed, 13 Nov 2024 04:22:05 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.180]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4Xp997223tz4x9Q7; Wed, 13 Nov
+	2024 04:22:03 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	CD.86.09770.B6924376; Wed, 13 Nov 2024 13:22:03 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20241112183746epcas5p40dcbbbd42a0f0be597193bf0808f8e67~HTHlnPWOf0159301593epcas5p4j;
+	Tue, 12 Nov 2024 18:37:46 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241112183746epsmtrp27cbebe5839299ba7a5e8e2ea7682af9a~HTHlmuECI0915409154epsmtrp2y;
+	Tue, 12 Nov 2024 18:37:46 +0000 (GMT)
+X-AuditID: b6c32a4a-e25fa7000000262a-4c-6734296b72be
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	E4.F7.35203.970A3376; Wed, 13 Nov 2024 03:37:45 +0900 (KST)
+Received: from ubuntu (unknown [107.99.41.245]) by epsmtip2.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20241112183745epsmtip2c54646103fb7103fe1aeef9807177d88~HTHkvdhoO1071110711epsmtip2w;
+	Tue, 12 Nov 2024 18:37:44 +0000 (GMT)
+Date: Tue, 12 Nov 2024 23:59:59 +0530
+From: Nitesh Shetty <nj.shetty@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: Re: remove two fields from struct request
+Message-ID: <20241112182943.sitierdw7awtonxh@ubuntu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20241112170050.1612998-1-hch@lst.de>
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrMKsWRmVeSWpSXmKPExsWy7bCmhm62pkm6wYct3Bar7/azWaxcfZTJ
+	Yu8tbYvu6zvYHFg8Lp8t9dh9s4HN4/MmuQDmqGybjNTElNQihdS85PyUzLx0WyXv4HjneFMz
+	A0NdQ0sLcyWFvMTcVFslF58AXbfMHKBdSgpliTmlQKGAxOJiJX07m6L80pJUhYz84hJbpdSC
+	lJwCkwK94sTc4tK8dL281BIrQwMDI1OgwoTsjH3TG5gK/rBX/Fn3nr2BcT9bFyMnh4SAicTx
+	z/+Zuxi5OIQEdjNKbHjzmAnC+cQocezaXVYI5xujRM+jZqAyDrCW24/jIeJ7GSUWrToE1fGE
+	UeLeqdWMIHNZBFQlFs64DdbAJqAtcfo/B0hYREBJ4umrs2AlzALREt0bZ4DZwgJGEv8On2EH
+	sXmB5n+cNZsVwhaUODnzCQuIzQlUM+vvOjaQXRICx9gl1q7vZ4T4wUWi6eQ7KFtY4tXxLewQ
+	tpTE53d7of4sl1g5ZQVUcwujxKzrs6Aa7CVaT/WDHcoskCHx4agKRFhWYuqpdUwQh/JJ9P5+
+	wgQR55XYMQ/GVpZYs34B1HxJiWvfG6FsD4mZX5dBQ66VUaJhzhnmCYxys5A8NAth3SywFVYS
+	nR+aWCHC0hLL/3FAmJoS63fpL2BkXcUomVpQnJueWmxaYJSXWg6P4+T83E2M4NSn5bWD8eGD
+	D3qHGJk4GA8xSnAwK4nwnnI2ThfiTUmsrEotyo8vKs1JLT7EaAqMnonMUqLJ+cDkm1cSb2hi
+	aWBiZmZmYmlsZqgkzvu6dW6KkEB6YklqdmpqQWoRTB8TB6dUA5MJ15LOC/kmu74u8fE9cnza
+	tcLbzxI+TZud3HE8cCL3hPXsB6yun0zWnP3mdFMyP5dW7aV0JyN/6/1zdI6Ua4t4zjo4Nbj0
+	SGOzVSvfs5UFKsXyLx2P+cgzbOxdH3XJhrXyoEzRqdlyl9NcmbKr9re8sQzvumFQv+fvsT0T
+	ZhXyCqg2VcvdlXg0N2br1L99ec5F6Rf7lYMOtIoyzv566q7YjxM99UpdOv/O1szTVfeI3Vdz
+	qnXD0t/yDjNEGZ86HShyFk33c1bSuGz8+pXiJunaO7NN9I5vf1M1PUpl6oKUR8s3cRhZKXbx
+	VN9Y4jjvt8U0mRcid2Zc0/Qp1fUrFviUuvzI+RC1uODXX4pn31diKc5INNRiLipOBADMJuL8
+	BgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMLMWRmVeSWpSXmKPExsWy7bCSvG7lAuN0g+87LS1W3+1ns1i5+iiT
+	xd5b2hbd13ewObB4XD5b6rH7ZgObx+dNcgHMUVw2Kak5mWWpRfp2CVwZF9efYCtYx1oxr6uL
+	uYGxm6WLkYNDQsBE4vbj+C5GTg4hgd2MEj0PQkBsCQFJiWV/jzBD2MISK/89Z+9i5AKqecQo
+	cW7KT1aQBIuAqsTCGbeZQeawCWhLnP7PARIWEVCSePrqLCOIzSwQLdG9cQaYLSxgJPHv8Bl2
+	EJsXaO3HWbNZIfYaSpz73MMCEReUODnzCQtEr5nEvM0PwcYzC0hLLP8HNp4TaMysv+vYJjAK
+	zELSMQtJxyyEjgWMzKsYJVMLinPTc4sNCwzzUsv1ihNzi0vz0vWS83M3MYLDVUtzB+P2VR/0
+	DjEycTAeYpTgYFYS4T3lbJwuxJuSWFmVWpQfX1Sak1p8iFGag0VJnFf8RW+KkEB6Yklqdmpq
+	QWoRTJaJg1Oqgcl3w7ZFHb9TV04v+z71wL+JJXu4RB6/XF0l8PB2batrl/kM/Wf5r65+/B7w
+	/HXs9IXJDxPLhTj+/GB6PFeh+MXLIuWGuv0pB7Q5xAJmnfAwye9y9fgdHv3wpqjVHWmlyAlh
+	0Zr2BeHTal58+bLIeaPim7sbLiQfqNpaGdjVHfRv18z1y2ep8SvUm1bY9ubPUNlaKe6ytGiJ
+	QMSm3s3Na8W3WObztQYcNNrCfvkw36ordx2MVv3ROtSTapZwbMrZdvEj7EY8W/435+moHzAM
+	fqNzWiVps3323vS2D8HCmY0H7X5UyM5aVvu1a/5zIY2AGoWT0pfXS+3wSvW9U3LiY//XUxP2
+	7JkVlcR+3bxE0FiJpTgj0VCLuag4EQBAJKvRxgIAAA==
+X-CMS-MailID: 20241112183746epcas5p40dcbbbd42a0f0be597193bf0808f8e67
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_c3082_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20241112183746epcas5p40dcbbbd42a0f0be597193bf0808f8e67
+References: <20241112170050.1612998-1-hch@lst.de>
+	<CGME20241112183746epcas5p40dcbbbd42a0f0be597193bf0808f8e67@epcas5p4.samsung.com>
+
+------Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_c3082_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
 Content-Disposition: inline
-In-Reply-To: <20241112-refactor-blk-affinity-helpers-v3-3-573bfca0cbd8@kernel.org>
 
-Hi Daniel,
+On 12/11/24 06:00PM, Christoph Hellwig wrote:
+>Hi Jens,
+>
+>this series removes two fields from struct request that just duplicate
+>information in the bios.  As-is it doesn't actually shrink the structure
+>size but instead just creates a 4 byte hole, but that will probably
+>become useful sooner or later.
+>
+>Diffstat:
+> block/blk-merge.c            |   26 ++++++++++++++------------
+> block/blk-mq.c               |    5 +----
+> drivers/scsi/sd.c            |    6 +++---
+> include/linux/blk-mq.h       |    8 +++-----
+> include/trace/events/block.h |    6 +++---
+> 5 files changed, 24 insertions(+), 27 deletions(-)
 
-kernel test robot noticed the following build warnings:
+Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
 
-[auto build test WARNING on c9af98a7e8af266bae73e9d662b8341da1ec5824]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Wagner/driver-core-bus-add-irq_get_affinity-callback-to-bus_type/20241112-213257
-base:   c9af98a7e8af266bae73e9d662b8341da1ec5824
-patch link:    https://lore.kernel.org/r/20241112-refactor-blk-affinity-helpers-v3-3-573bfca0cbd8%40kernel.org
-patch subject: [PATCH v3 3/8] virtio: hookup irq_get_affinity callback
-config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20241113/202411130521.UOBdW8Rv-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241113/202411130521.UOBdW8Rv-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411130521.UOBdW8Rv-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/virtio/virtio.c:389: warning: Function parameter or struct member 'irq_veq' not described in 'virtio_irq_get_affinity'
->> drivers/virtio/virtio.c:389: warning: Excess function parameter 'irq_vec' description in 'virtio_irq_get_affinity'
+------Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_c3082_
+Content-Type: text/plain; charset="utf-8"
 
 
-vim +389 drivers/virtio/virtio.c
-
-   379	
-   380	/**
-   381	 * virtio_irq_get_affinity - get IRQ affinity mask for device
-   382	 * @_d: ptr to dev structure
-   383	 * @irq_vec: interrupt vector number
-   384	 *
-   385	 * Return the CPU affinity mask for @_d and @irq_vec.
-   386	 */
-   387	static const struct cpumask *virtio_irq_get_affinity(struct device *_d,
-   388							     unsigned int irq_veq)
- > 389	{
-   390		struct virtio_device *dev = dev_to_virtio(_d);
-   391	
-   392		if (!dev->config->get_vq_affinity)
-   393			return NULL;
-   394	
-   395		return dev->config->get_vq_affinity(dev, irq_veq);
-   396	}
-   397	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+------Q5hryimWBrG20CTDo2Cycv07rC8cEZ5s1mVzGfufIajJO9l9=_c3082_--
