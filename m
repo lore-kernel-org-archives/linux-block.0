@@ -1,146 +1,103 @@
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94CC85C5E
-	for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 21:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013602010E0
+	for <linux-block@vger.kernel.org>; Tue, 12 Nov 2024 00:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731361071; cv=none; b=tyCBTaRbAmQ0hwzqHTFv5xDcFmDL9ZtrvxOVWuxMipTmqELfLAVdpbBt9O3c28dP8enNEw6Lit3bbGoqnJvHtOKzc5IMqox96H6RhhpsVO1EXfOMYL8yFHJO4gdfu+VQJVqDRJPSs1lKsxCwHQrWGW+gBjDY9GWBx6F3kGXOxZ8=
+	t=1731372815; cv=none; b=Y4SE3VEqlUZcPAmm+owJByTHZocfzAta5yzrJTygS4gN9gAxiq5y+2ni9IAkLHRvRfnRxYbduxyJG7hr23iIB2QG0NMlxnifW+56Nusxv/RJy2TVd4ieMSG5ulmD6e9zQ5yMCqw7TiDI0S992A8/2C4Cvx+guhoFKUqTNsjCNBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731361071; c=relaxed/simple;
-	bh=Zd0120qwwdJ7nQ6bQS8hCwF+ppErEZKCYVwd5Cdzc9M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eF7q8Ml+CxwvzAhMKNJDA8LYsGD8NrYzVcla8PR67ajzfM9waKX58f2Rc6G6a/ctNQnEh22YQnIqxA0PeMHm1K6JsOp7hZtoybMy4MlkvOv3M0nzDd8nrGiBDEZ5T6ZACDG6JB2jolDWnlbu7OfxxCBtJ5yXlzCEmSPJKSOn4uE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bsz3UnZV; arc=none smtp.client-ip=209.85.221.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731372815; c=relaxed/simple;
+	bh=WREVsz149TaIOToPHodBMsxdX7uGJ61iPEBX92q1dNg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m1OIVvuNw18KF207EX1RqvC0vToItm0vlCzB6pg8moEMCMGg3XZJBdbULvJKkUgKLn8vXbdvOSB8oUI3i2QBRXh0EZiO0S+Sx9WITNQLpIO1rXfLLKvHdwVWEzL/Ih2M04m06g/4wU94094uGy9IeD00TEEmjVK7NxK+MBEKJ60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UsNi4nRD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bsz3UnZV"
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-513de426863so1797173e0c.0
-        for <linux-block@vger.kernel.org>; Mon, 11 Nov 2024 13:37:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731361069; x=1731965869; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iuDxd3x4l+C+rN/QwF5MT9fpvKTkpINe3cU070JO6c0=;
-        b=bsz3UnZVtYpYhXc4b+6Hao8IqgX68r+dDeDPD8HrfQRf3u4pVmH0zZ00vWVFDi9zeF
-         tR8gkDQpEdkGdGM39YyNbOlAdeIK+drZQGLnbeTWC+0nfF/l9j/vzXtZp8Vt2lKgZoIz
-         eDgpTtC8uzwnR8w9BIlMm/SHjYw6ZpjS3vaZOHW4jRgyyb+1kVWBnFbX2NYXh/kOSql4
-         Ucq4s25R83Jz91Gt3dOacax2DFD0KnI0oa9UnzUu1tkJ6edmOACO2Nra5B6hTwNAUbEu
-         yomcXdlSaT523vWWgn7aI43j1ET631wY2EbzfJjoQQ+KVc4sBH0ScSnAG5cUp3OE2py0
-         JSRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731361069; x=1731965869;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iuDxd3x4l+C+rN/QwF5MT9fpvKTkpINe3cU070JO6c0=;
-        b=s44C8xN8YftxOodVI+A1JjO1lb383BtiDvNA1TmlfDqftrFc36wzSm1qiTJXrrWy9p
-         0vz/JK0DZrEPRVmSc03XQvx8iRYUkQFXHL/WKrtbWjMQBRikRuxKfH70BcnjixJVLIXC
-         2bZsekwTSwIOo2Z0nOuoLgX3yIII3OV1LLx8vNhTX1/0THgz+EozhGL1xpWlSE0BJrYk
-         Kw5V41tPdl7TaKXDAl99iiTUvnaXf1iXxjAuMIKppTpIMoE18m1wGal5v+I7XVT+bRpv
-         iHakIxNWD6OrsO4JPCTkOrmL1w4OQKxQv4+xAVEbWWArPb2bB1gwuLrVdfRpVI2SVxpY
-         iphA==
-X-Forwarded-Encrypted: i=1; AJvYcCX+l/RX8JVKLnML5Esrx/ryOTL60VlmKsIET1AQsyDSvOE1mnNNhS7zqDiWt5Dac0PWazNYgpmxRM/PMQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDzW9msQWI3Nt4cQjshwmm60DZLo1HspiRPIjwoy02itRnTjsG
-	iGWAjq2fzpm6A09LXLZZEmKnCHKue9K9toLfXuqf5AoZZxHjKkBQtVDL5KzU9tgfnFU5TMqldOM
-	MYg/LMlwhY2isP3XQZeSqI1x4kH4=
-X-Google-Smtp-Source: AGHT+IEZbfVH8+TjKOm7Cz6Xy1F3alpjr90SF2ywe2hZD+zQKQYhqpmH0zHzRU3SUvid+W4BwYmepJO/jJ8vuu8Pa1A=
-X-Received: by 2002:a05:6122:1816:b0:50d:bfd3:c834 with SMTP id
- 71dfb90a1353d-51401bc6114mr13314982e0c.4.1731361068531; Mon, 11 Nov 2024
- 13:37:48 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UsNi4nRD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731372812;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4XMq8gzT79OjCT69f87BgesFZNQjW/MqhG3S2Jzkuu0=;
+	b=UsNi4nRDI5R0uzEA2j+QP1xXyN5Oek2oIrA7elAraBOCCydOshrOQtd/p5Inbrky/5wq1T
+	PT0+0vlc5tmUeo2Z2nDuaCbt7vIbFqul4pbihiaoqm9cGGzHueO/1Lrh4vIlNx081aA5ql
+	+bJiLmrFxhvmJna/1ZSKaoWsTkZX+Xw=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-529-jjmjPUILNP6E7fzNju_-dQ-1; Mon,
+ 11 Nov 2024 19:53:29 -0500
+X-MC-Unique: jjmjPUILNP6E7fzNju_-dQ-1
+X-Mimecast-MFC-AGG-ID: jjmjPUILNP6E7fzNju_-dQ
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4D0971955F41;
+	Tue, 12 Nov 2024 00:53:28 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.64])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EB63C1956086;
+	Tue, 12 Nov 2024 00:53:23 +0000 (UTC)
+Date: Tue, 12 Nov 2024 08:53:18 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>,
+	linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Akilesh Kailash <akailash@google.com>
+Subject: Re: (subset) [PATCH V10 0/12] io_uring: support group buffer & ublk
+ zc
+Message-ID: <ZzKm_lN_1U_u6St7@fedora>
+References: <20241107110149.890530-1-ming.lei@redhat.com>
+ <173101830487.993487.13218873496602462534.b4-ty@kernel.dk>
+ <b0004544-91f7-47b8-a8d6-da7c6e925883@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241107101005.69121-1-21cnbao@gmail.com> <CAKEwX=OAE9r_VH38c3M0ekmBYWb5qKS-LPiBFBqToaJwEg3hJw@mail.gmail.com>
-In-Reply-To: <CAKEwX=OAE9r_VH38c3M0ekmBYWb5qKS-LPiBFBqToaJwEg3hJw@mail.gmail.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Tue, 12 Nov 2024 10:37:37 +1300
-Message-ID: <CAGsJ_4y+DeCo7oF+Ty8x9rHreh9LaS9XDU85yz81U9FQgBYE8A@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 0/2] mTHP-friendly compression in zsmalloc and zram
- based on multi-pages
-To: Nhat Pham <nphamcs@gmail.com>
-Cc: linux-mm@kvack.org, akpm@linux-foundation.org, axboe@kernel.dk, 
-	bala.seshasayee@linux.intel.com, chrisl@kernel.org, david@redhat.com, 
-	hannes@cmpxchg.org, kanchana.p.sridhar@intel.com, kasong@tencent.com, 
-	linux-block@vger.kernel.org, minchan@kernel.org, senozhatsky@chromium.org, 
-	surenb@google.com, terrelln@fb.com, v-songbaohua@oppo.com, 
-	wajdi.k.feghali@intel.com, willy@infradead.org, ying.huang@intel.com, 
-	yosryahmed@google.com, yuzhao@google.com, zhengtangquan@oppo.com, 
-	zhouchengming@bytedance.com, usamaarif642@gmail.com, ryan.roberts@arm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b0004544-91f7-47b8-a8d6-da7c6e925883@kernel.dk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Tue, Nov 12, 2024 at 8:30=E2=80=AFAM Nhat Pham <nphamcs@gmail.com> wrote=
-:
->
-> On Thu, Nov 7, 2024 at 2:10=E2=80=AFAM Barry Song <21cnbao@gmail.com> wro=
-te:
-> >
-> > From: Barry Song <v-songbaohua@oppo.com>
-> >
-> > When large folios are compressed at a larger granularity, we observe
-> > a notable reduction in CPU usage and a significant improvement in
-> > compression ratios.
-> >
-> > mTHP's ability to be swapped out without splitting and swapped back in
-> > as a whole allows compression and decompression at larger granularities=
-.
-> >
-> > This patchset enhances zsmalloc and zram by adding support for dividing
-> > large folios into multi-page blocks, typically configured with a
-> > 2-order granularity. Without this patchset, a large folio is always
-> > divided into `nr_pages` 4KiB blocks.
-> >
-> > The granularity can be set using the `ZSMALLOC_MULTI_PAGES_ORDER`
-> > setting, where the default of 2 allows all anonymous THP to benefit.
-> >
-> > Examples include:
-> > * A 16KiB large folio will be compressed and stored as a single 16KiB
-> >   block.
-> > * A 64KiB large folio will be compressed and stored as four 16KiB
-> >   blocks.
-> >
-> > For example, swapping out and swapping in 100MiB of typical anonymous
-> > data 100 times (with 16KB mTHP enabled) using zstd yields the following
-> > results:
-> >
-> >                         w/o patches        w/ patches
-> > swap-out time(ms)       68711              49908
-> > swap-in time(ms)        30687              20685
-> > compression ratio       20.49%             16.9%
->
-> The data looks very promising :) My understanding is it also results
-> in memory saving as well right? Since zstd operates better on bigger
-> inputs.
->
-> Is there any end-to-end benchmarking? My intuition is that this patch
-> series overall will improve the situations, assuming we don't fallback
-> to individual zero order page swapin too often, but it'd be nice if
-> there is some data backing this intuition (especially with the
-> upstream setup, i.e without any private patches). If the fallback
-> scenario happens frequently, the patch series can make a page fault
-> more expensive (since we have to decompress the entire chunk, and
-> discard everything but the single page being loaded in), so it might
-> make a difference.
->
-> Not super qualified to comment on zram changes otherwise - just a
-> casual observer to see if we can adopt this for zswap. zswap has the
-> added complexity of not supporting THP zswap in (until Usama's patch
-> series lands), and the presence of mixed backing states (due to zswap
-> writeback), increasing the likelihood of fallback :)
+On Thu, Nov 07, 2024 at 03:25:59PM -0700, Jens Axboe wrote:
+> On 11/7/24 3:25 PM, Jens Axboe wrote:
+> > 
+> > On Thu, 07 Nov 2024 19:01:33 +0800, Ming Lei wrote:
+> >> Patch 1~3 cleans rsrc code.
+> >>
+> >> Patch 4~9 prepares for supporting kernel buffer.
+> >>
+> >> The 10th patch supports group buffer, so far only kernel buffer is
+> >> supported, but it is pretty easy to extend for userspace group buffer.
+> >>
+> >> [...]
+> > 
+> > Applied, thanks!
+> > 
+> > [01/12] io_uring/rsrc: pass 'struct io_ring_ctx' reference to rsrc helpers
+> >         commit: 0d98c509086837a8cf5a32f82f2a58f39a539192
+> > [02/12] io_uring/rsrc: remove '->ctx_ptr' of 'struct io_rsrc_node'
+> >         commit: 4f219fcce5e4366cc121fc98270beb1fbbb3df2b
+> > [03/12] io_uring/rsrc: add & apply io_req_assign_buf_node()
+> >         commit: 039c878db7add23c1c9ea18424c442cce76670f9
+> 
+> Applied the first three as they stand alone quite nicely. I did ponder
+> on patch 1 to skip the make eg io_alloc_file_tables() not take both
+> the ctx and &ctx->file_table, but we may as well keep it symmetric.
+> 
+> I'll take a look at the rest of the series tomorrow.
 
-Correct. As I mentioned to Usama[1], this could be a problem, and we are
-collecting data. The simplest approach to work around the issue is to fall
-back to four small folios instead of just one, which would prevent the need
-for three extra decompressions.
+Hi Jens,
 
-[1] https://lore.kernel.org/linux-mm/CAGsJ_4yuZLOE0_yMOZj=3DKkRTyTotHw4g5g-=
-t91W=3DMvS5zA4rYw@mail.gmail.com/
+Any comment on the rest of the series?
 
-Thanks
-Barry
+
+thanks,
+Ming
+
