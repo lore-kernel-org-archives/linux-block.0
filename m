@@ -1,118 +1,190 @@
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB4A17837A
-	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 22:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C13018D624
+	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 23:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731536832; cv=none; b=WbhHpw0n43nWJqd7sjBsvM1yG+Z4rnWw95gn3FhSJH1U03exh5kJ+xeoYJttrfJkZk1JMyjEoRFolP7Uh2bTVCBmR/QeLG+A6wA+gUk1AyglD9UBi5P69EZIRs7+EQJzQ0SffXY21EPlKN0nn394g/7QKdgMc0n5h3515FlRERo=
+	t=1731540327; cv=none; b=MFDwtefWgA9GYntuQEeExovdrb6pOVzjqQfjkG3LLdR9bOi4IBYAajgWxCnU/5eygis4SXyayFMTtcBvLw9AjeJ8mFS51a2M0/ZgJrGdr3IGWByP+FlkWTImQrR5rSBtgK1w27W8eifCWGphQi7Q3oUvKwd8eIywJJ4g3kNIyDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731536832; c=relaxed/simple;
-	bh=nsozifW1bJaUXQvcoeJUy8/Gj7E4/mT/cosGv0myfXI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AT8kRHXyfRQVEK/qtbxopZAr1zx7lyq41LkpA0POrqdGXAf2lQcbd/vnJd3c2y78IDxilkzqWgi3WRomA0YcAE1pyHVjamc8VZ36x7y63GLCDsgDgrfyn7Ptumh/hU9jwKwSC1oC0f8mrKgjkb9XtYL0nNUpdoWrHkWwHEMl7CY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=LQv2vNHe; arc=none smtp.client-ip=209.85.161.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1731540327; c=relaxed/simple;
+	bh=c5dYtWrY11OG4lgQlqIZVJE4vP5JPLMTqoyIrqudnWI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GGiY+LWSdJwS/qXw3AflhA5+ldEIbyf/Is5q52Sll2eTaqaTKM3boaPoCxS1LtsY+CcvYVyG1Rx1JnkUosZIfXvK/tjRvRCAq0R7aVADAMAw7SjAH/RrhCR9/ETEhYYcbYjMfbqurNYNfKLOXGOTpMADO8ccWmCFPOk0/4xBkoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BXTOUsrC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="LQv2vNHe"
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5ee3c2e79aaso3236662eaf.3
-        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 14:27:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731536830; x=1732141630; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Gk4zJTuuGCZq8YdlR7rEOEIOkX+EpzyKcyBLyLJ6C58=;
-        b=LQv2vNHe3c6J/Xk7LKaqBSbsVu98sNAgAr92qlbs0SCs5PffOC3OKJGJ2iGr79I9B5
-         zGR5dXRgl69nmqXYVLtToMm9vEnVoGI93x6pH13pHDBxcg/56wluYTNvwzHA6g9TePce
-         JDT333v3qP7Ny/dOA7uABo2hFGqoWvRIRt9RAnkI4mDBsBh6x71igvmQPi64kBbDCyVl
-         K3JmIGRfPqGFoMoOjf1+VAz/iT0uiVL9wnNef2vc1ZyI6l5Ong/52Vg4eVffSD+4T5B9
-         kp9KDZeo1oJXbFr1gf2BIrtTxgrnsnKddqtm2gU46ry4pL82Wafp+yddh6KntZn5/RoN
-         Jh1g==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BXTOUsrC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731540324;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RzPWmh0C8RYeAeZIKKXP7q682GlgR+SBS+qZzgFuwNs=;
+	b=BXTOUsrCNevyvBbNGa18IYC1tXv5/XNyTlYWKMzq+1QBik4UV3h9CMn1CsIMuPUUcND8nB
+	FTAGFNek0lYHTIzc6mAihi+tPq1rocA7hvuOB8+R49BYpyhfEHz9jj5jce9Z7WwUSBOMYo
+	omRbdejwrl85+TxWosDHyN7HSR0xheE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-226-6K7mhsLcNp-nWwMCobnKEg-1; Wed, 13 Nov 2024 18:25:21 -0500
+X-MC-Unique: 6K7mhsLcNp-nWwMCobnKEg-1
+X-Mimecast-MFC-AGG-ID: 6K7mhsLcNp-nWwMCobnKEg
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43159c07193so400195e9.0
+        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 15:25:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731536830; x=1732141630;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gk4zJTuuGCZq8YdlR7rEOEIOkX+EpzyKcyBLyLJ6C58=;
-        b=oViJ4czgxeb7atFF1a0KWfE23WoipRcZwg1nVDtI6GaJiGMPWz987RadhqFgOKlLLq
-         OG1MSttOiT/BKYbYlfVodi7eHhwMeSH0vXJflpz0Mjm4R5ZU2mf9I8/oBueqlmG6oat8
-         Pm4RH7Hoyoitu6AP07Qma+STVvCAxR4MnW7bZkK0imQTKFNTV7XlJ/kAhxmZAfS/yQvk
-         jrecb9q2XJUEKcIaHSo0L3+282+SrzG4RBhcpghRMdsb4jAzPK7QQNV4mmNtEL+wjjrw
-         fq5UbkoFsZQKODAIpCpBmplXZGT7iKmOdn4fLaXwUeI6THn16QzTGOEM++zGtYcs/m2r
-         HbHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUpyPY1JEmVd/XVW5EnsG1oef1I2NOwgAgLKiNIst3c2VAuBT1DG5cC2DA90GE0uog79LtVEEQjnm7ZFg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBPLsbw+qjxDlGituPR++yMNJJVvlNPP2P6EZKf5N6wfEHciCr
-	DNnA+28bOEEIIiQXGjSnk8bUcpjFUvs5YqNpgSfsUGL4S0QZubEEIuiHJz2BkSo=
-X-Google-Smtp-Source: AGHT+IGoqd96MY7bfoXv+9tibkBAuG/6TDsL/wWWwAgL5vAB2DYrndf+hvSgNBskdlUVxt9rcbSY2A==
-X-Received: by 2002:a05:6870:a58f:b0:288:570d:8fe2 with SMTP id 586e51a60fabf-2956010ababmr20540208fac.11.1731536829597;
-        Wed, 13 Nov 2024 14:27:09 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-295e9351aeasm1230872fac.54.2024.11.13.14.27.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Nov 2024 14:27:08 -0800 (PST)
-Message-ID: <0376df05-0b60-480d-84b8-76dd2d58f1a8@kernel.dk>
-Date: Wed, 13 Nov 2024 15:27:07 -0700
+        d=1e100.net; s=20230601; t=1731540320; x=1732145120;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RzPWmh0C8RYeAeZIKKXP7q682GlgR+SBS+qZzgFuwNs=;
+        b=cXzmOLtLS+mEXbGVKZaXSpfym7JjQI9Ltag9l3tDW4Ygeij7rdJ088fgUtVu+PBxIl
+         PTnrLveycCnQN54yicZS4JK7qGcVMbFCx/8mzG+njS3V9aDYro6lhTXIhuycoir5E9JH
+         SA577isOQAE5NFRdKt39f7RBOy6XhIt+sJiJuiqH4yfCosHyFuxxz7Tf3B7c0VZxRtJ8
+         e0794OEqNuF4yRo1a5iPdiwHd7R0LgnM5/sTGuefemombgU8yViGymA52xmtzW9pyXU0
+         Kvz0r+8DqMtmKrBN8ZOXXLLeeH5W6U1vn+HdST11wc/nOf92OHNAz69bgKQ9Y1onpYs5
+         JiSg==
+X-Forwarded-Encrypted: i=1; AJvYcCXVVIIwO1DjaQTWdOjkB+EbSDltkXfC8Hcy0SIsCrK0X56bKlQxmqYgnPmp76yiaZAz0fRaZIhVb4zdVg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMYu8vX9CaqGEi/iuPX6Ec+36dop67b1h7hwR35Se69d7TE8YP
+	jLUCCe0HnxJEUenJWJfFjNoHuS+VK2q//M4Sqk4hdMEh+aUsQSU9AZYFd42sBc2yGafxYzbKhbx
+	Ke4iycNPsn62Pp7RsnsiYLhE3IlE/VGd2Ki4eG1x1aFJWO1G22z9pdiFKOOG9
+X-Received: by 2002:a05:600c:3d8d:b0:431:4847:47c0 with SMTP id 5b1f17b1804b1-432da76ec4amr935415e9.7.1731540320199;
+        Wed, 13 Nov 2024 15:25:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHDNE+4rEsYxD1YNYi7V9qyaFYVxzcxTW8otS2BtZTbP6JFcM1ds70h/SDQ68r3Vw5bW0apPw==
+X-Received: by 2002:a05:600c:3d8d:b0:431:4847:47c0 with SMTP id 5b1f17b1804b1-432da76ec4amr935285e9.7.1731540319813;
+        Wed, 13 Nov 2024 15:25:19 -0800 (PST)
+Received: from redhat.com ([2.55.171.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432d9d0a4absm4692895e9.24.2024.11.13.15.25.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Nov 2024 15:25:18 -0800 (PST)
+Date: Wed, 13 Nov 2024 18:25:13 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Wang <jasowang@redhat.com>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-block@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-nvme@lists.infradead.org, io-uring@vger.kernel.org
+Subject: Re: [PATCH 2/6] virtio_blk: reverse request order in virtio_queue_rqs
+Message-ID: <20241113182448-mutt-send-email-mst@kernel.org>
+References: <20241113152050.157179-1-hch@lst.de>
+ <20241113152050.157179-3-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: don't reorder requests passed to ->queue_rqs
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>, Christoph Hellwig <hch@lst.de>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Pavel Begunkov <asml.silence@gmail.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>
-References: <20241113152050.157179-1-hch@lst.de>
- <eb2faaba-c261-48de-8316-c8e34fdb516c@nvidia.com>
- <2f7fa13a-71d9-4a8d-b8f4-5f657fdaab60@kernel.dk>
- <8156ea70-12a2-46f4-b977-59c9d76a4a65@nvidia.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <8156ea70-12a2-46f4-b977-59c9d76a4a65@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241113152050.157179-3-hch@lst.de>
 
-On 11/13/24 3:23 PM, Chaitanya Kulkarni wrote:
-> On 11/13/2024 12:51 PM, Jens Axboe wrote:
->>> Looks good to me. I ran the quick performance numbers [1].
->>>
->>> Reviewed-by: Chaitanya Kulkarni<kch@nvidia.com>
->>>
->>> -ck
->>>
->>> fio randread iouring workload :-
->>>
->>> IOPS :-
->>> -------
->>> nvme-orig:           Average IOPS: 72,690
->>> nvme-new-no-reorder: Average IOPS: 72,580
->>>
->>> BW :-
->>> -------
->>> nvme-orig:           Average BW: 283.9 MiB/s
->>> nvme-new-no-reorder: Average BW: 283.4 MiB/s
->> Thanks for testing, but you can't verify any kind of perf change with
->> that kind of setup. I'll be willing to bet that it'll be 1-2% drop at
->> higher rates, which is substantial. But the reordering is a problem, not
->> just for zoned devices, which is why I chose to merge this.
->>
->> -- Jens Axboe
+On Wed, Nov 13, 2024 at 04:20:42PM +0100, Christoph Hellwig wrote:
+> blk_mq_flush_plug_list submits requests in the reverse order that they
+> were submitted, which leads to a rather suboptimal I/O pattern especially
+> in rotational devices.  Fix this by rewriting nvme_queue_rqs so that it
+> always pops the requests from the passed in request list, and then adds
+> them to the head of a local submit list.  This actually simplifies the
+> code a bit as it removes the complicated list splicing, at the cost of
+> extra updates of the rq_next pointer.  As that should be cache hot
+> anyway it should be an easy price to pay.
 > 
-> Agree with you. My intention was to test it, since it was touching NVMe,
-> I thought sharing results will help either way with io_uring?
-> but no intention to stop this patchset and make an argument
-> against it (if at all) for potential drop :).
+> Fixes: 0e9911fa768f ("virtio-blk: support mq_ops->queue_rqs()")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/block/virtio_blk.c | 46 +++++++++++++++++---------------------
+>  1 file changed, 21 insertions(+), 25 deletions(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 0e99a4714928..b25f7c06a28e 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -471,18 +471,18 @@ static bool virtblk_prep_rq_batch(struct request *req)
+>  	return virtblk_prep_rq(req->mq_hctx, vblk, req, vbr) == BLK_STS_OK;
+>  }
+>  
+> -static bool virtblk_add_req_batch(struct virtio_blk_vq *vq,
+> +static void virtblk_add_req_batch(struct virtio_blk_vq *vq,
+>  					struct request **rqlist)
+>  {
+> +	struct request *req;
+>  	unsigned long flags;
+> -	int err;
+>  	bool kick;
+>  
+>  	spin_lock_irqsave(&vq->lock, flags);
+>  
+> -	while (!rq_list_empty(*rqlist)) {
+> -		struct request *req = rq_list_pop(rqlist);
+> +	while ((req = rq_list_pop(rqlist))) {
+>  		struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+> +		int err;
+>  
+>  		err = virtblk_add_req(vq->vq, vbr);
+>  		if (err) {
+> @@ -495,37 +495,33 @@ static bool virtblk_add_req_batch(struct virtio_blk_vq *vq,
+>  	kick = virtqueue_kick_prepare(vq->vq);
+>  	spin_unlock_irqrestore(&vq->lock, flags);
+>  
+> -	return kick;
+> +	if (kick)
+> +		virtqueue_notify(vq->vq);
+>  }
+>  
+>  static void virtio_queue_rqs(struct request **rqlist)
+>  {
+> -	struct request *req, *next, *prev = NULL;
+> +	struct request *submit_list = NULL;
+>  	struct request *requeue_list = NULL;
+> +	struct request **requeue_lastp = &requeue_list;
+> +	struct virtio_blk_vq *vq = NULL;
+> +	struct request *req;
+>  
+> -	rq_list_for_each_safe(rqlist, req, next) {
+> -		struct virtio_blk_vq *vq = get_virtio_blk_vq(req->mq_hctx);
+> -		bool kick;
+> -
+> -		if (!virtblk_prep_rq_batch(req)) {
+> -			rq_list_move(rqlist, &requeue_list, req, prev);
+> -			req = prev;
+> -			if (!req)
+> -				continue;
+> -		}
+> +	while ((req = rq_list_pop(rqlist))) {
+> +		struct virtio_blk_vq *this_vq = get_virtio_blk_vq(req->mq_hctx);
+>  
+> -		if (!next || req->mq_hctx != next->mq_hctx) {
+> -			req->rq_next = NULL;
+> -			kick = virtblk_add_req_batch(vq, rqlist);
+> -			if (kick)
+> -				virtqueue_notify(vq->vq);
+> +		if (vq && vq != this_vq)
+> +			virtblk_add_req_batch(vq, &submit_list);
+> +		vq = this_vq;
+>  
+> -			*rqlist = next;
+> -			prev = NULL;
+> -		} else
+> -			prev = req;
+> +		if (virtblk_prep_rq_batch(req))
+> +			rq_list_add(&submit_list, req); /* reverse order */
+> +		else
+> +			rq_list_add_tail(&requeue_lastp, req);
+>  	}
+>  
+> +	if (vq)
+> +		virtblk_add_req_batch(vq, &submit_list);
+>  	*rqlist = requeue_list;
+>  }
 
-Oh all good, and like I said, the testing is appreciated! The functional
-testing is definitely useful.
 
--- 
-Jens Axboe
+
+looks ok from virtio POV
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+> -- 
+> 2.45.2
+
