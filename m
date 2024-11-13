@@ -1,160 +1,73 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7528B1F9A88;
-	Wed, 13 Nov 2024 09:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BDF1F80A6
+	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 09:55:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731491524; cv=none; b=W2mZSH6krxezRb6AHWGXan5riK8sb7egG+N8H1ZUg4AVMxOJmAf8nUAmwxxYs1EkN+5yIQCEbEazhthV9h3ON+8U3MnrJdJwJjpYQifjS0rULeRV3N8sujQ6erKh1vPy/C6Qy9YrxQdr6d2Yb/c2XNfA83izSRqdhRsDM3QeKs0=
+	t=1731491707; cv=none; b=UbcHfj7OLofJDjIRJuR7D6B7LjPApijzkfWkFAOfn8wYLDDXkLm/HiDPaoSeuXPRlhJ2+EwpGBL8IVMNeYohu3S6UIj8V/da3lOaPSa3dO8NdPzC5VlxN/RIRazMi5CYLIXg+Nn2flxIkvNaq+G/pWetY3IfefnJ6JX+JEeqq9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731491524; c=relaxed/simple;
-	bh=IFNIBl0VTxuzzi6XsWdk3q0iWZTGogl1p2ysg4YbHfk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rrKBajErewJ0I1zrIUnyBVyUx3H3Vqf4/xRJ78t7D3fVupWHDasnVG0DKXcliZFsTZ2jFwqFG6Zb/DdjeiZcdJiMFoTr/1K2tJqOMK4Ny3uDRRF32rFeLeQAmOm/MGGC56pqLYp0DMDZ5gvvqjBvVbENmsLHghK4Dgmop2P5z+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jwD8zBD+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sNoc5gOq; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jwD8zBD+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sNoc5gOq; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jwD8zBD+";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sNoc5gOq";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jwD8zBD+";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sNoc5gOq"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 9BDE61F44E;
-	Wed, 13 Nov 2024 09:52:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1731491520; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9u+NB9BalEQqk52ZyuyFFi4Aabx8cwdfVcWV7jA/8ZU=;
-	b=jwD8zBD+7TLVq0Jl3wxTBY3/X9q6doxXBUP1NqgMdTd9YfxKvWcl3eXaRQYqrzOc56vZQO
-	/ZQMQMuE1A1BuRmPQb2j5EDoHpbpGy9/oPwhIHrIh8FRH5DrUhodkWi7bRlaBLeXXku/LR
-	NK0jnCyZr78TnLQiCDcFOG+eV8jhKSA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1731491520;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9u+NB9BalEQqk52ZyuyFFi4Aabx8cwdfVcWV7jA/8ZU=;
-	b=sNoc5gOqveYMjQScvBQYt3veOBuH4Rj/SGILe63oII59XOt31Usp++u3gfFEG9VkAfeKra
-	4ipvXI/OGkTeKEAQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=jwD8zBD+;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=sNoc5gOq
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1731491520; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9u+NB9BalEQqk52ZyuyFFi4Aabx8cwdfVcWV7jA/8ZU=;
-	b=jwD8zBD+7TLVq0Jl3wxTBY3/X9q6doxXBUP1NqgMdTd9YfxKvWcl3eXaRQYqrzOc56vZQO
-	/ZQMQMuE1A1BuRmPQb2j5EDoHpbpGy9/oPwhIHrIh8FRH5DrUhodkWi7bRlaBLeXXku/LR
-	NK0jnCyZr78TnLQiCDcFOG+eV8jhKSA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1731491520;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9u+NB9BalEQqk52ZyuyFFi4Aabx8cwdfVcWV7jA/8ZU=;
-	b=sNoc5gOqveYMjQScvBQYt3veOBuH4Rj/SGILe63oII59XOt31Usp++u3gfFEG9VkAfeKra
-	4ipvXI/OGkTeKEAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6468A13A6E;
-	Wed, 13 Nov 2024 09:52:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 9LX2F8B2NGdhFgAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 13 Nov 2024 09:52:00 +0000
-Message-ID: <a04aec90-b526-4e0f-af3d-affefc4b6cf3@suse.de>
-Date: Wed, 13 Nov 2024 10:52:00 +0100
+	s=arc-20240116; t=1731491707; c=relaxed/simple;
+	bh=p/U33DStNbGxmGap1B1YFe1j3MFsLDaLtWL3WRosyzY=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=XhnTrygtT/t9LwWTsbJzQoc9YV8c8r1Zihapb8Qby5qt7iD3u3o/W/LHGc9idWqo6kpDFNwwSqNH+lxgyeA9DAJUS84wLJbXS1M0dzci0J1VNRwOtc75NWzPPnIiNn2z3HKOcbQwZZMtWvgJ1GspNkpsTmJPbBhCOd7Qc6zWP+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-83abf9b6bfaso720452439f.2
+        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 01:55:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731491704; x=1732096504;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=La6p7LDFTDd20P9Ap5B5ZW0+Q1G46jQaAsRpKQVub5U=;
+        b=QCasMU7NXYaRhCE5+VKknfyrlu2TVwmXCGq0NALsear9cUTYGOHbCNig3sxcAwL7Io
+         MuMKbcWPD2cIk3pOqQMpgBs7g6oxANwxUB/rGw8QMrAXUl7s4eqAicZU2cKNs4L7WspR
+         ZBITQ+1eaVNqEj6n+dlvQTHGanpGCJi+SpjTfSRQB8uT2niRTC6+mb0uhQXC5Edxx0zm
+         RdFBfka+aM6zdU8CO99/GU2gwYO+hS0SqRYqliQb1OeV4TVvZvccJZY74HMeF3kwuYWW
+         RCBHsdtP5B9shWKirvpir62g8YMECySkVLwKuMmpPm0BpUq97DzBcJDi+1Y9K9q9oP0z
+         SJYA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpUi/xqexejPItwA0XnzbJLQbIflkJFtqH2qWx9Hr2+2Jv74XDflM4U8Kir8IdO/EZSotoIzNNRbQdSg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYQAEKf3fHBk8bv1+ekJUfkt2kKB2/iy5YbsminCnjOqtHnnOG
+	a3aplTCLjWrPY1Ff8SnXfcju8VElTXyqqpJSLOq/chj5MBjPrvNPyOL6HiY5zsYqEoCXbtRqxgU
+	Q+IsYuJ2iHb7lOfB4XbrYAOYFl+N/OLpoANZ5WdVTXW0YsLq+4DgP1Ks=
+X-Google-Smtp-Source: AGHT+IFsfEUMQL1mZoWQN39J627bxb6mJ5re6byZtSmb+hK9QxIgcOD6z5h6xMDBkfPWZ3Gh1tpqOPLKWi/vH24BMdNnJ1sNMRxd
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 8/8] blk-mq: remove unused queue mapping helpers
-To: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Bjorn Helgaas <bhelgaas@google.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-pci@vger.kernel.org, virtualization@lists.linux.dev,
- linux-scsi@vger.kernel.org, megaraidlinux.pdl@broadcom.com,
- mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com,
- storagedev@microchip.com, linux-nvme@lists.infradead.org
-References: <20241112-refactor-blk-affinity-helpers-v3-0-573bfca0cbd8@kernel.org>
- <20241112-refactor-blk-affinity-helpers-v3-8-573bfca0cbd8@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20241112-refactor-blk-affinity-helpers-v3-8-573bfca0cbd8@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 9BDE61F44E
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:email,suse.de:dkim,suse.de:mid];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
-X-Spam-Flag: NO
+X-Received: by 2002:a05:6e02:1c87:b0:3a6:ac17:13e5 with SMTP id
+ e9e14a558f8ab-3a6f1a1ed84mr204243095ab.11.1731491704296; Wed, 13 Nov 2024
+ 01:55:04 -0800 (PST)
+Date: Wed, 13 Nov 2024 01:55:04 -0800
+In-Reply-To: <CAFj5m9+GAv4JPX=ABgwUo7RSSZ4zNsBKpiJOfuxmmwg+GDP3wA@mail.gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67347778.050a0220.2a2fcc.0006.GAE@google.com>
+Subject: Re: [syzbot] [block?] possible deadlock in loop_reconfigure_limits
+From: syzbot <syzbot+867b0179d31db9955876@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	ming.lei@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/12/24 14:26, Daniel Wagner wrote:
-> There are no users left of the pci and virtio queue mapping helpers.
-> Thus remove them.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Daniel Wagner <wagi@kernel.org>
-> ---
->   block/Makefile                |  2 --
->   block/blk-mq-pci.c            | 46 -------------------------------------------
->   block/blk-mq-virtio.c         | 46 -------------------------------------------
->   include/linux/blk-mq-pci.h    | 11 -----------
->   include/linux/blk-mq-virtio.h | 11 -----------
->   5 files changed, 116 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hello,
 
-Cheers,
+syzbot tried to test the proposed patch but the build/boot failed:
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+security/apparmor/domain.c:695:3: error: expected expression
+security/apparmor/domain.c:697:3: error: use of undeclared identifier 'new_profile'
+security/apparmor/domain.c:699:8: error: use of undeclared identifier 'new_profile'
+security/apparmor/domain.c:704:11: error: use of undeclared identifier 'new_profile'
+
+
+Tested on:
+
+commit:         6d59cab0 Add linux-next specific files for 20241111
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git next-20241111
+kernel config:  https://syzkaller.appspot.com/x/.config?x=75175323f2078363
+dashboard link: https://syzkaller.appspot.com/bug?extid=867b0179d31db9955876
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Note: no patches were applied.
