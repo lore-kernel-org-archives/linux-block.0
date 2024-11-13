@@ -1,34 +1,34 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF2A218B460;
-	Wed, 13 Nov 2024 09:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637FE1F80CF;
+	Wed, 13 Nov 2024 09:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731491255; cv=none; b=gJFM7ZSz2/4MT/+Osnh8lBkDvSznHZYk6xglOuRmUspd8wvmLPXHg4+rCnlsh0fWpJjaih443NNnzH5VtnTL8GwMdQyZMYUZKAlW1VAdyjXhVkcGVJE3jGxHeHSbE7KHxxGg7mQOium2trfsAs5cEiI2EZ6viVu05YkIHvp2K00=
+	t=1731491255; cv=none; b=D7EXTtVRTsIhsdR3u/00rN41isKTdF40/hZjOm7SYw4DOrH38etMvw5gu597FS+yVeb9aIOGjcyZ8Hmd+y0E+k2slaDqNEeJi7pvIS8+5SsYL25zrVqXBidYpG4yd+zME0W+Njb/lUM7v+vZN0vHjultyOL8WYYlJszzKNlWwy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731491255; c=relaxed/simple;
-	bh=utrpOJ55Xx9Nisul1czzp8Mu91L5n7h0eXEp6yFDifQ=;
+	bh=LuoRYrsA1zw/6T9PAg+pZUF80hnr641Lz7m1ROM3Co4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t8xcHKgtL8Lgtu9ISIUcJs+P+WF6kI/43RoUn0ETmDKF4mCNA7MahRzPrm6hALWfsTUCaAvxaUw3ZdeFh26jsuL4j0OPIIqppAh39SwyA5T8n+gXZf2ymV9itskUwDwhrTuwh3tZbiw0HV5JoZpm8OIFqUC2k0X98MPIe3erCys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=4DDs/JDa; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=nWUtqS8m5iRI9QzY5RlaGaFMF8YczZyTwfOP2SpgreFzJ4Y1d9tCk5ebJtQgkbdT5UsLjPOHdVgXvz8I3mkKHjMxUAYeVQY4ASUr48d1wmIVPsR7syU99sCoZxk02yoBsUa3IX1ymB6TPorIy1As4/K8dz/csfDZRHaVdnxPQ38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=z+/DD2ks; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="4DDs/JDa"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="z+/DD2ks"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
 	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=ns/7m4rN3Pzx9FwaAtcwSt3EF1rHNhns2eROAPx84Uw=; b=4DDs/JDaSOGto5fCjDTWI+nVjP
-	bhTdPEcjrovcFCCUG1DjV0x1blqchw5Z2Y6joGv4tEMV0M6J5mNB3sXZWi4gcwtGbbOtroBBibJc8
-	GnHPf3L+e+blGHbME6PNZvXH7yQYl8Y7vMwDalxQ8Lf0SBT9W5xYaMIcaEEPPTIl5LFQVVvD0GuOe
-	zYX5SCVyQ6CzJGMHuCXSZIkkrMiRwoohXUhIO/4tjsrDxN+8ZxV+MNtikafpHD1r0aCyge+SVAwoc
-	S5ct3gcAq2eDLY3j58Us7EOQf4mAwyYU1MNF+Bh45qYnIR4lNZHmTV2gFrwgIA4szdPWM7/wIf05B
-	D1RL9rpQ==;
+	bh=mZYiYHdxBbyR/19PnV0dX82l4+th0pXaG9WcUHT6G/o=; b=z+/DD2ksIIMD99dpwbTEHn8k4O
+	pHg7uHS7eT094skjM9TFMiJ1EniWkjT9HGAw2UunxTT+sN5NEc0TVmCFons1UrnsgzgUrFtgdMgAA
+	zpf3glrmYXKcRmnb6yD71kaZaua4QRrNfvPkOWhj9eWg8lFK/pcT+kIGHV5CWnC6rY4K05AxlyQGQ
+	MNVmgP7cOXDVgnvxewh+FESw9UIPM4X8JwlqSq1KDpZfJCJvo87OGEDT+Mg+bP2H8xuptX9LBOIk/
+	/hFwEUAGV3O/VZjpRAj6p50xbFOpUl2RhdqH8S/bLLJ6RBn47IsUnnziFAeqODl4eodR/DLjxEOJc
+	juHAjElA==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tB9yC-00000006Hcz-3lX4;
-	Wed, 13 Nov 2024 09:47:28 +0000
+	id 1tB9yD-00000006HdQ-3YUj;
+	Wed, 13 Nov 2024 09:47:29 +0000
 From: Luis Chamberlain <mcgrof@kernel.org>
 To: willy@infradead.org,
 	hch@lst.de,
@@ -47,9 +47,9 @@ Cc: john.g.garry@oracle.com,
 	da.gomez@samsung.com,
 	kernel@pankajraghav.com,
 	mcgrof@kernel.org
-Subject: [RFC 1/8] fs/mpage: use blocks_per_folio instead of blocks_per_page
-Date: Wed, 13 Nov 2024 01:47:20 -0800
-Message-ID: <20241113094727.1497722-2-mcgrof@kernel.org>
+Subject: [RFC 7/8] nvme: remove superfluous block size check
+Date: Wed, 13 Nov 2024 01:47:26 -0800
+Message-ID: <20241113094727.1497722-8-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241113094727.1497722-1-mcgrof@kernel.org>
 References: <20241113094727.1497722-1-mcgrof@kernel.org>
@@ -62,188 +62,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-From: Hannes Reinecke <hare@suse.de>
+The block layer already validates proper block sizes with
+blk_validate_block_size() for us so we can remove this now
+superfluous check.
 
-Convert mpage to folios and associate the number of blocks with
-a folio and not a page.
-
-Signed-off-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- fs/mpage.c | 40 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ drivers/nvme/host/core.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-diff --git a/fs/mpage.c b/fs/mpage.c
-index b5b5ddf9d513..5b5989c7c2a0 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -107,7 +107,7 @@ static void map_buffer_to_folio(struct folio *folio, struct buffer_head *bh,
- 		 * don't make any buffers if there is only one buffer on
- 		 * the folio and the folio just needs to be set up to date
- 		 */
--		if (inode->i_blkbits == PAGE_SHIFT &&
-+		if (inode->i_blkbits == folio_shift(folio) &&
- 		    buffer_uptodate(bh)) {
- 			folio_mark_uptodate(folio);
- 			return;
-@@ -153,7 +153,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 	struct folio *folio = args->folio;
- 	struct inode *inode = folio->mapping->host;
- 	const unsigned blkbits = inode->i_blkbits;
--	const unsigned blocks_per_page = PAGE_SIZE >> blkbits;
-+	const unsigned blocks_per_folio = folio_size(folio) >> blkbits;
- 	const unsigned blocksize = 1 << blkbits;
- 	struct buffer_head *map_bh = &args->map_bh;
- 	sector_t block_in_file;
-@@ -161,7 +161,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 	sector_t last_block_in_file;
- 	sector_t first_block;
- 	unsigned page_block;
--	unsigned first_hole = blocks_per_page;
-+	unsigned first_hole = blocks_per_folio;
- 	struct block_device *bdev = NULL;
- 	int length;
- 	int fully_mapped = 1;
-@@ -182,7 +182,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 		goto confused;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 855b42c92284..86ff872cf6bd 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2022,16 +2022,6 @@ static bool nvme_update_disk_info(struct nvme_ns *ns, struct nvme_id_ns *id,
+ 	u32 atomic_bs, phys_bs, io_opt = 0;
+ 	bool valid = true;
  
- 	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
--	last_block = block_in_file + args->nr_pages * blocks_per_page;
-+	last_block = block_in_file + args->nr_pages * blocks_per_folio;
- 	last_block_in_file = (i_size_read(inode) + blocksize - 1) >> blkbits;
- 	if (last_block > last_block_in_file)
- 		last_block = last_block_in_file;
-@@ -204,7 +204,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 				clear_buffer_mapped(map_bh);
- 				break;
- 			}
--			if (page_block == blocks_per_page)
-+			if (page_block == blocks_per_folio)
- 				break;
- 			page_block++;
- 			block_in_file++;
-@@ -216,7 +216,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 	 * Then do more get_blocks calls until we are done with this folio.
- 	 */
- 	map_bh->b_folio = folio;
--	while (page_block < blocks_per_page) {
-+	while (page_block < blocks_per_folio) {
- 		map_bh->b_state = 0;
- 		map_bh->b_size = 0;
- 
-@@ -229,7 +229,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 
- 		if (!buffer_mapped(map_bh)) {
- 			fully_mapped = 0;
--			if (first_hole == blocks_per_page)
-+			if (first_hole == blocks_per_folio)
- 				first_hole = page_block;
- 			page_block++;
- 			block_in_file++;
-@@ -247,7 +247,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 			goto confused;
- 		}
- 	
--		if (first_hole != blocks_per_page)
-+		if (first_hole != blocks_per_folio)
- 			goto confused;		/* hole -> non-hole */
- 
- 		/* Contiguous blocks? */
-@@ -260,7 +260,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 			if (relative_block == nblocks) {
- 				clear_buffer_mapped(map_bh);
- 				break;
--			} else if (page_block == blocks_per_page)
-+			} else if (page_block == blocks_per_folio)
- 				break;
- 			page_block++;
- 			block_in_file++;
-@@ -268,7 +268,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 		bdev = map_bh->b_bdev;
- 	}
- 
--	if (first_hole != blocks_per_page) {
-+	if (first_hole != blocks_per_folio) {
- 		folio_zero_segment(folio, first_hole << blkbits, PAGE_SIZE);
- 		if (first_hole == 0) {
- 			folio_mark_uptodate(folio);
-@@ -303,10 +303,10 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 	relative_block = block_in_file - args->first_logical_block;
- 	nblocks = map_bh->b_size >> blkbits;
- 	if ((buffer_boundary(map_bh) && relative_block == nblocks) ||
--	    (first_hole != blocks_per_page))
-+	    (first_hole != blocks_per_folio))
- 		args->bio = mpage_bio_submit_read(args->bio);
- 	else
--		args->last_block_in_bio = first_block + blocks_per_page - 1;
-+		args->last_block_in_bio = first_block + blocks_per_folio - 1;
- out:
- 	return args->bio;
- 
-@@ -385,7 +385,7 @@ int mpage_read_folio(struct folio *folio, get_block_t get_block)
- {
- 	struct mpage_readpage_args args = {
- 		.folio = folio,
--		.nr_pages = 1,
-+		.nr_pages = folio_nr_pages(folio),
- 		.get_block = get_block,
- 	};
- 
-@@ -456,12 +456,12 @@ static int __mpage_writepage(struct folio *folio, struct writeback_control *wbc,
- 	struct address_space *mapping = folio->mapping;
- 	struct inode *inode = mapping->host;
- 	const unsigned blkbits = inode->i_blkbits;
--	const unsigned blocks_per_page = PAGE_SIZE >> blkbits;
-+	const unsigned blocks_per_folio = folio_size(folio) >> blkbits;
- 	sector_t last_block;
- 	sector_t block_in_file;
- 	sector_t first_block;
- 	unsigned page_block;
--	unsigned first_unmapped = blocks_per_page;
-+	unsigned first_unmapped = blocks_per_folio;
- 	struct block_device *bdev = NULL;
- 	int boundary = 0;
- 	sector_t boundary_block = 0;
-@@ -486,12 +486,12 @@ static int __mpage_writepage(struct folio *folio, struct writeback_control *wbc,
- 				 */
- 				if (buffer_dirty(bh))
- 					goto confused;
--				if (first_unmapped == blocks_per_page)
-+				if (first_unmapped == blocks_per_folio)
- 					first_unmapped = page_block;
- 				continue;
- 			}
- 
--			if (first_unmapped != blocks_per_page)
-+			if (first_unmapped != blocks_per_folio)
- 				goto confused;	/* hole -> non-hole */
- 
- 			if (!buffer_dirty(bh) || !buffer_uptodate(bh))
-@@ -536,7 +536,7 @@ static int __mpage_writepage(struct folio *folio, struct writeback_control *wbc,
- 		goto page_is_mapped;
- 	last_block = (i_size - 1) >> blkbits;
- 	map_bh.b_folio = folio;
--	for (page_block = 0; page_block < blocks_per_page; ) {
-+	for (page_block = 0; page_block < blocks_per_folio; ) {
- 
- 		map_bh.b_state = 0;
- 		map_bh.b_size = 1 << blkbits;
-@@ -618,14 +618,14 @@ static int __mpage_writepage(struct folio *folio, struct writeback_control *wbc,
- 	BUG_ON(folio_test_writeback(folio));
- 	folio_start_writeback(folio);
- 	folio_unlock(folio);
--	if (boundary || (first_unmapped != blocks_per_page)) {
-+	if (boundary || (first_unmapped != blocks_per_folio)) {
- 		bio = mpage_bio_submit_write(bio);
- 		if (boundary_block) {
- 			write_boundary_block(boundary_bdev,
- 					boundary_block, 1 << blkbits);
- 		}
- 	} else {
--		mpd->last_block_in_bio = first_block + blocks_per_page - 1;
-+		mpd->last_block_in_bio = first_block + blocks_per_folio - 1;
- 	}
- 	goto out;
- 
+-	/*
+-	 * The block layer can't support LBA sizes larger than the page size
+-	 * or smaller than a sector size yet, so catch this early and don't
+-	 * allow block I/O.
+-	 */
+-	if (head->lba_shift > PAGE_SHIFT || head->lba_shift < SECTOR_SHIFT) {
+-		bs = (1 << 9);
+-		valid = false;
+-	}
+-
+ 	atomic_bs = phys_bs = bs;
+ 	if (id->nabo == 0) {
+ 		/*
 -- 
 2.43.0
 
