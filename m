@@ -1,123 +1,103 @@
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B1320515C
-	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 20:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F0A18B481
+	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 21:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731531115; cv=none; b=OTrc9YA0B/Qnz1jh0MxSJAhGCuxFd3k3jSmjdz0UgSknhgXRgDD08pd5vNLTZhFVci09aeYQymqj8TZVJQstQsNlfyxM+Lm8qyQ+zfJUfygOSvUf5+pj9u4DzKuPCrl5m/zY+ucB35sukWJkwZ0cdgTvP3dtt8cKkjX6g0yADjk=
+	t=1731531806; cv=none; b=l2D8A9yipx9jUaUDV8AGdYCCGPWCk5isre8+IXB2Kuye1uFujU8ivMUc2Tg1gVRS79wSMyaoJMDJoD3I7LSsZZPm4M2opTavynNqzi55EpcoPDbwD/3JXiErs2Ti/V4JaEeMzfn2XUBtpUotbCe2ZUX7ACr3iZr3dsOhh/ZETcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731531115; c=relaxed/simple;
-	bh=QpWF3KKY11uITtp1LyQktCr06S/wpts4SgMopMh5/iQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZrrIu4t5QRpioLmgvxaVNME7zYVDEELyTFQKTdCGAViFtfl7E7lCiVmeTlqNwHg7SBcuYbxhe5Vdbh6W3i1yaOAq4fubdlH9A/Mm/vdG0ZGC0GAaslEeTz7g3U7cKU9UVZbelNvzMFrIIBaJWDT+hvpxWTCRLozDdpOtjPPXkwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=gNhm5Tod; arc=none smtp.client-ip=209.85.160.50
+	s=arc-20240116; t=1731531806; c=relaxed/simple;
+	bh=2Z7Mft9XLc5ptgMCtjuTy2E6f4ImDEYbhaf8ozWCLuk=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=mPSaeELk/YRVCYuEF7Kny2L56LRJ/Fw0Qqm8iiKMMsV2x2WO5OGczDlhsfVm4GJI8hhctUh/jae0eNUBavXYUS6XI7dVqR4qrGbdDFEGn0d/YmtjOPMS/PvtswTYEx0cZWh/6153wQdIgV/uReG/dgoUFUZB4DoDo7WcLY80Cdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=bls6nG9q; arc=none smtp.client-ip=209.85.161.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="gNhm5Tod"
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-296085d59caso119996fac.0
-        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 12:51:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="bls6nG9q"
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5ebc0dbc566so3447639eaf.3
+        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 13:03:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731531111; x=1732135911; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FU0Uq6tZfqhLW7zTHB3UvLVsIx1+QgdH15vw3E3v+9I=;
-        b=gNhm5Tod6oasR1IHHFmKKr/qBsWGCfGIvzcg5EzVBnIqWH5okqQcMSUO9TvsRvXC8E
-         1mDevshp+fT1NjHZpybeLxDt4Ig5jVwwQiJojmz8gyHd90s9mTCYXK3zT/9XUJRckCKj
-         QRwGerEBtbLENVG8b218bZNhcavmHrmI0PxRq2n4Jqc958DN9P4ZxqVc6icKIptXnAFY
-         8T/HU+91Gh4U4X8Y9oa4EEtjXzWfHFKWzicDdhXwmjNLr+X0+dGiMqtAJ16soMRMHTMp
-         W5MSAoiQVAlbEAdqcq3GV0YaGOeSa7pgcxRR4fKJ1Tu3MjfMQOIODb/YId1WKPZUO4ZM
-         1+3w==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731531803; x=1732136603; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=impCPrA60gwXN9wwJaTYPmPlZjsc4EwtPX6toSuydpo=;
+        b=bls6nG9qC6eNybW7SI1AsnS0pxjWxPm/ot7nLkv+eNeVYRA/1FsfR34i/1XysxM/RA
+         rOh/2+OL1h+2FisTLqd4L8biVigwVK4ZjzetUO2eQJWTy0CNrG8d7tQFrnUhyAbSKDLV
+         vf84OwDn3uBSfCEtdGs4nAutysi25k/LKDLUoxFDu6FR/Y1Pl9AMGZ5/anQ4gdZhKo2k
+         TqA1nZBUJ2Ld9ceAtAA1RKxsrCFgwCx7vyfenynujKqFNYJaXQ5PsJw5gzLi/T2U+CcU
+         M5Ub21udc3bunb7nua2jzl6sD67mhDafAm/QiJ7Jej4AvqnWjZKB+GX93VpTKwIlrVh/
+         bl/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731531111; x=1732135911;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FU0Uq6tZfqhLW7zTHB3UvLVsIx1+QgdH15vw3E3v+9I=;
-        b=Ygo+/kW+EObhjDFbO60VSXA4XsBr86IsIn1u11GDqvkNNWB/WprSqfhaZMxqMHlGO6
-         57ArCkRuCYNLpfUifhLoRFzEA+6hthXKI1bDpanCWZANf5k7PuZOSNdcQnhQXZFnzjFl
-         kCDTMQysb0mhQPLi2zfGhzgZXEF/4xlOIxcJypW7bpwsdrOn7CRP/aAZhitUx1OPh1sZ
-         WC72GXt/FXoRpHo2esthDTDM9rEMYG6E7yRQ7QkjR0pEKe87+CLs3OA+ecdB56BZ9eCk
-         pypRJt+z++6JUFTLYokDhg0jthhlh12kaeFiFTeIXLLSEGNfPUQ88WdVyFYfUsPBjx2B
-         Harg==
-X-Forwarded-Encrypted: i=1; AJvYcCWhlIyBYiZxg3R4OPdEZEcyYYkf9fuYIB3Giq+9/p1fotcG+0X3qQOjqmtG2Hx+fDxHFq4PEeG5xfxlZQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJ6YzDk/ulugiBs2Kkd/cHZkarTKsQrgJ5145so6b1hXvzUEfy
-	8oNDJy6XS8US5U7kvdW55VPgkK/JchzoCDbxMF9O49SXANhPHBPOWnvK7QPqK9o=
-X-Google-Smtp-Source: AGHT+IGezMqio38lqokF3/YlzSrsEv2nuKdbrSqS8PqApuQDKwmdb/YnN439LHoKX0bRZy3D+8M0gQ==
-X-Received: by 2002:a05:6871:209:b0:288:67c0:1bbf with SMTP id 586e51a60fabf-295600f0491mr20870572fac.22.1731531111227;
-        Wed, 13 Nov 2024 12:51:51 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-295e9337321sm1169214fac.46.2024.11.13.12.51.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Nov 2024 12:51:50 -0800 (PST)
-Message-ID: <2f7fa13a-71d9-4a8d-b8f4-5f657fdaab60@kernel.dk>
-Date: Wed, 13 Nov 2024 13:51:48 -0700
+        d=1e100.net; s=20230601; t=1731531803; x=1732136603;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=impCPrA60gwXN9wwJaTYPmPlZjsc4EwtPX6toSuydpo=;
+        b=J8oamPIB3VFmz4vkSxSoM2L6bB5CIUJcvUk99gqYJl4xzBT7kZOcjF8pQp7yAf2jt/
+         GAxF1LWqyVk96bKfre0DHR/oUHli+avPx8cEDz5nsWRtdovd/exQpBXnQh1HI2ZudjjG
+         ony8e7SZd+Y7ONgZ5K4zxb24LP7xMoHkUz8DFymQDnaauX2Sns7PWgiypJhWmapoydsu
+         cXCrrszec6DGWvK5v9hrO0aBxsuFQezVs0JNmVGxsg+xmZ7CxduyTIEh7AaNK67QQ1dz
+         EIHXoM6VA7N9Ws2EINa9kt11b6iGaUFafYxrM2ZJeKlfYhCjR+YJGm2LRFe7yJItj9yL
+         GfCA==
+X-Gm-Message-State: AOJu0YxTbilzLd3kB+JiUf8TX59GpmDRPdzMESqTH2rWifNrBe+uG0IX
+	1zpew4TnKB5LkZdDaBC5wdEgTQr9zu3v5mGw0HKg9TjMFMvbrin7Ga5jAEdeM3Zez62lR7aoUUd
+	NpQQ=
+X-Google-Smtp-Source: AGHT+IF2A3iDfVgDkFq8meEOTgPbHBMDmoqMax5gN+U8pKpFh+bpOYngYUEro6r9zol1GLKxXJxutA==
+X-Received: by 2002:a05:6870:3907:b0:288:8aaa:ed0e with SMTP id 586e51a60fabf-29560001898mr19505748fac.8.1731531803553;
+        Wed, 13 Nov 2024 13:03:23 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-71a5fe67903sm962900a34.1.2024.11.13.13.03.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Nov 2024 13:03:23 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: David Wang <00107082@163.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20241108054500.4251-1-00107082@163.com>
+References: <20241108054500.4251-1-00107082@163.com>
+Subject: Re: [PATCH] block:genhd:/proc/diskstats: use seq_put_decimal_ull
+ for decimal values
+Message-Id: <173153180276.2249291.10428535421528000816.b4-ty@kernel.dk>
+Date: Wed, 13 Nov 2024 14:03:22 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: don't reorder requests passed to ->queue_rqs
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>, Christoph Hellwig <hch@lst.de>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Pavel Begunkov <asml.silence@gmail.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>
-References: <20241113152050.157179-1-hch@lst.de>
- <eb2faaba-c261-48de-8316-c8e34fdb516c@nvidia.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <eb2faaba-c261-48de-8316-c8e34fdb516c@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
-On 11/13/24 1:36 PM, Chaitanya Kulkarni wrote:
-> On 11/13/24 07:20, Christoph Hellwig wrote:
->> Hi Jens,
->>
->> currently blk-mq reorders requests when adding them to the plug because
->> the request list can't do efficient tail appends.  When the plug is
->> directly issued using ->queue_rqs that means reordered requests are
->> passed to the driver, which can lead to very bad I/O patterns when
->> not corrected, especially on rotational devices (e.g. NVMe HDD) or
->> when using zone append.
->>
->> This series first adds two easily backportable workarounds to reverse
->> the reording in the virtio_blk and nvme-pci ->queue_rq implementations
->> similar to what the non-queue_rqs path does, and then adds a rq_list
->> type that allows for efficient tail insertions and uses that to fix
->> the reordering for real and then does the same for I/O completions as
->> well.
-> 
-> Looks good to me. I ran the quick performance numbers [1].
-> 
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> 
-> -ck
-> 
-> fio randread iouring workload :-
-> 
-> IOPS :-
-> -------
-> nvme-orig:           Average IOPS: 72,690
-> nvme-new-no-reorder: Average IOPS: 72,580
-> 
-> BW :-
-> -------
-> nvme-orig:           Average BW: 283.9 MiB/s
-> nvme-new-no-reorder: Average BW: 283.4 MiB/s
 
-Thanks for testing, but you can't verify any kind of perf change with
-that kind of setup. I'll be willing to bet that it'll be 1-2% drop at
-higher rates, which is substantial. But the reordering is a problem, not
-just for zoned devices, which is why I chose to merge this.
+On Fri, 08 Nov 2024 13:45:00 +0800, David Wang wrote:
+> seq_printf is costy, for each block device, 19 decimal values are
+> yielded in /proc/diskstats via seq_printf; On a system with 16
+> logical block devices, profiling for open/read/close sequences
+> shows seq_printf took ~75% samples of diskstats_show:
+> 
+> 	diskstats_show(92.626% 2269372/2450040)
+> 	    seq_printf(76.026% 1725313/2269372)
+> 		vsnprintf(99.163% 1710866/1725313)
+> 		    format_decode(26.597% 455040/1710866)
+> 		    number(19.554% 334542/1710866)
+> 		    memcpy_orig(4.183% 71570/1710866)
+> 			...
+> 		srso_return_thunk(0.009% 148/1725313)
+> 	    part_stat_read_all(8.030% 182236/2269372)
+> 
+> [...]
 
+Applied, thanks!
+
+[1/1] block:genhd:/proc/diskstats: use seq_put_decimal_ull for decimal values
+      commit: bda9c7d92f24b693eaf0262c090de4c8c108a28e
+
+Best regards,
 -- 
 Jens Axboe
+
+
+
