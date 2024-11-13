@@ -1,129 +1,73 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B091C8FB3
-	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 09:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85BA91F77B6
+	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 09:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731489290; cv=none; b=M89guP/As95qkCmxneSsBbE2ddnYQwGuLN/qwRR7VndB5YIjQ9FXuKSJm4UmBTvtyxpLRY5f5d9gYUPbQezh1S5qsYoUXln4RFirATZONhjrLDodehp8trKuyAsVqN2aF/1PZ0e8Fy4n5N72i3ZP39y0iQClLqKuV612w2P92gE=
+	t=1731489906; cv=none; b=peK6cr3f54naPp5IbCHIP40APynd4fvjM0Wmo4vtP4gdSgMrrLjDgwsz1Gc6t/6YvEK3iOfzKz1vn3EvYGyJrc9TbJWd66+85a/n68JJirRdeZ2UiRX1Tq761dnrZaijhtpq7/CsG8OSGPhBMYnfFsDBDqzHcJOKDCcgMrm3ZdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731489290; c=relaxed/simple;
-	bh=0R+6XRenndLMIJM9nY3chba05E+5sqc+/i8cxpXHfIk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GO0cwOdBU/d1Ko91qyH0YyPYxwP1yB2l40DsCZbLt6uACrpY2Jt8RrGYWNYhk67XOShHaZr11o/cAIVWfeNKzWJXE3TnqoUmQhK3ZQISuA1I7MVUwyHq1XYvqsqZu54tjaKwGOk/lbYOTqTTnVLGu0kLh+E6ePO0wqQIyazceiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ilLXoQ2/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ilLXoQ2/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731489287;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bo+a2oJM/DzF7/2w/lozMNF13YjGxFBwuRsrvmeNqLs=;
-	b=ilLXoQ2/t+LrTXd0GAUMp+YamQZw1LgdX5G5PoVj2EkScASrIEloadJmBASL1KOrflRYzx
-	C7JmWcEbgkLWKHVsjOyl0qTV1fxxCId1wUkBVHF8yVkMOTRne+jd9ep6K254toNXy7sIDh
-	CyoNP9P5HvvYvHUWLW0jDQdIBy007YI=
-Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
- [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-251-ScJE62PzOTOuGLCjXpp4vg-1; Wed, 13 Nov 2024 04:14:46 -0500
-X-MC-Unique: ScJE62PzOTOuGLCjXpp4vg-1
-X-Mimecast-MFC-AGG-ID: ScJE62PzOTOuGLCjXpp4vg
-Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-50da7722724so705416e0c.0
-        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 01:14:46 -0800 (PST)
+	s=arc-20240116; t=1731489906; c=relaxed/simple;
+	bh=e3UrNK+8NPWtavtHg92BvMz6xoPfhy5/J5qU32bVb60=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=gaeSWcjVLfZY5rDlKIyO9E265y/lDq1rPw8vl6UQP5gZzr8S80yh2IHzA8Xq40T2Bqf9Kql92oV15W6MsAlDAyKgciRYTFjZsD8IvS6GFdgvFSmXpIFFZWLB6jBFSPzmyxGiGuwrjqdbS06B4CV3tPsJ9qev+7PjMIAk1iWQ7CA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a6f3a08573so59615545ab.3
+        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 01:25:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731489285; x=1732094085;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bo+a2oJM/DzF7/2w/lozMNF13YjGxFBwuRsrvmeNqLs=;
-        b=B71xNHkngOp9Zc14bgWYqvTSNBl/sRrefYS16og8qn2YCuhYllVSKBXr1rI3+MX04F
-         AFGvpMciD5ZkEOY2BtKibJi9X829IlF+KJAfl2c1ukBAfVHbzjQ+GKpkrQY6Im05dZrj
-         5peO3egMhS1+YzDgxqG3rV3DWMj/F8HqaPjJDgjWC0LyryJMOlti5TwzYvNTNe00zNRX
-         K+AzNCow5dTMa9S/Q7MJJ77Y5l/bf7pC5CEBt1sJHgM00ism7H8Ri8Hw9fwiU1wYRRSf
-         rdM9lK4y4P1VbUjxmN5YAPTxbCC9FBvK+/8b+MyC/NOmRDGn3mPvqUv54DCYxFYmJeRr
-         Alig==
-X-Forwarded-Encrypted: i=1; AJvYcCVihXPjiIcE1RVRMRqG9YSEbcbJIocLZMi9hUOh8z4lfAreGgyhfhjYQuq2GFyHrEmS+pcI9bT3x6r7Ww==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzMjXzVqz6Qes2pv0EE0oSBfEAYkZN+K37jJHZQkHEQjjMSSus
-	BeKU/h0BEQnUpBWkBLhCrH+jHEUrTihKPGy3BsJ0JVGohRWkarqOOIvPdR2+uC2KCK6RRFQIpQg
-	2XN+rBBH57RVv18DeHavYi+hpoK5RNgKZLNCpgCI2lQHTeNsjpreOHi8DUy/SJ6ca6ZOSp1H9Z4
-	CyHQsm/M+zr4oln0X0MqHunxdO/2jUPGtpFR8=
-X-Received: by 2002:a05:6102:3f50:b0:4a4:92f7:3611 with SMTP id ada2fe7eead31-4aae22bf83amr16647604137.12.1731489285755;
-        Wed, 13 Nov 2024 01:14:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGOl+1geTz+2YuwUXdn5bVXsVX5Z+UuowifTsSD86yBEMAnagBRJMr3rM3zLY10n9GT2KGtLlMIc44W6KxLIHg=
-X-Received: by 2002:a05:6102:3f50:b0:4a4:92f7:3611 with SMTP id
- ada2fe7eead31-4aae22bf83amr16647598137.12.1731489285487; Wed, 13 Nov 2024
- 01:14:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731489904; x=1732094704;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ayS9w16ckU16tbXa/VPShI2venzkxWB0dzj3Wvipfb0=;
+        b=eMuvhYTfuD0o6EOjHwfqtSnqnRab6AGwGH6Qna0K8xTLkjdErEAar6PxD+6yBck2qJ
+         ygtqG+PQk1Wk4tX5WHWpEa/Ua6WTvzHlcbQN4B5EHmo/n+cpFyDJzSHB+bLgL/vPnj9p
+         lUH+Vd7H5vJB3VQYdpFOI7QiVf/BRo4kxnRV9ntdK1RloZpBaybRyLx7yE/Z3uFp8cn4
+         IEB9YVLi1BwYN/tVMBx2RXrYMry2lLPlENJMVZrQ0Uzcsh83v6HH2U09scAm9mrBU4X2
+         mv+8uGqrNCm9BJjIMWUPbiPnlRRALEM5GTWAI3XpCJckEHFYB2is9dheq/tG5+ljrT+r
+         l/0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVSLzeSXZ/ATwwmuIHvrZ5mBd593IX9Yr4EjMkqdYNu6qs2Y7tHBZlHojfCxILj2+4W7FNE1uvMhqS63g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWFi04KLsNTN4jMz6zTCFNbA0/O/pTNhoxpyKrjxQOb5MGCRKO
+	FiDEmpVPP4zFxBaG+jZVVKb/yq2kZPtWOBIOCfDlHArtHObvituv3igvIzB1oHNZX6z2d38Dqj+
+	lBeGfN1vWdU7T+N5hh9zoXotZu60b24hZstV/LhtsMxIUoktY1Y8d6pQ=
+X-Google-Smtp-Source: AGHT+IGuJj1OS2MF+6vk+YiGvRYN6Tf067M2YWDsI74/oewrrtGSF4Ccm7971A7xBXi/M6rdvPHJtthKe8IAJxKXq6PatAIRxB8M
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <67336557.050a0220.a0661.041e.GAE@google.com>
-In-Reply-To: <67336557.050a0220.a0661.041e.GAE@google.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Wed, 13 Nov 2024 17:14:34 +0800
-Message-ID: <CAFj5m9+j=KNhaRruRZ7p0Nnt6PiqOVQN00vhgcwEgfKji=rJEg@mail.gmail.com>
+X-Received: by 2002:a05:6e02:1c03:b0:3a6:bb36:ac3c with SMTP id
+ e9e14a558f8ab-3a71577274dmr23393925ab.15.1731489904585; Wed, 13 Nov 2024
+ 01:25:04 -0800 (PST)
+Date: Wed, 13 Nov 2024 01:25:04 -0800
+In-Reply-To: <CAFj5m9+j=KNhaRruRZ7p0Nnt6PiqOVQN00vhgcwEgfKji=rJEg@mail.gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67347070.050a0220.1324f8.0009.GAE@google.com>
 Subject: Re: [syzbot] [block?] possible deadlock in loop_reconfigure_limits
-To: syzbot <syzbot+867b0179d31db9955876@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+From: syzbot <syzbot+867b0179d31db9955876@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	ming.lei@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 12, 2024 at 10:30=E2=80=AFPM syzbot
-<syzbot+867b0179d31db9955876@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    929beafbe7ac Add linux-next specific files for 20241108
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D16b520c058000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D75175323f2078=
-363
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D867b0179d31db99=
-55876
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
-ian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D11b520c0580=
-000
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/9705ecb6a595/dis=
-k-929beafb.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/dbdd1f64b9b8/vmlinu=
-x-929beafb.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/3f70d07a929b/b=
-zImage-929beafb.xz
-> mounted in repro: https://storage.googleapis.com/syzbot-assets/7589a4f702=
-0b/mount_2.gz
+Hello,
 
-...
+syzbot tried to test the proposed patch but the build/boot failed:
 
->
->
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
+security/apparmor/domain.c:695:3: error: expected expression
+security/apparmor/domain.c:697:3: error: use of undeclared identifier 'new_profile'
+security/apparmor/domain.c:699:8: error: use of undeclared identifier 'new_profile'
+security/apparmor/domain.c:704:11: error: use of undeclared identifier 'new_profile'
 
-#syz test: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.=
-git
- master
 
+Tested on:
+
+commit:         bd05b9a7 Add linux-next specific files for 20241113
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+kernel config:  https://syzkaller.appspot.com/x/.config?x=75175323f2078363
+dashboard link: https://syzkaller.appspot.com/bug?extid=867b0179d31db9955876
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Note: no patches were applied.
