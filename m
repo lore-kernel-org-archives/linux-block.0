@@ -1,34 +1,33 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D021F80CC;
-	Wed, 13 Nov 2024 09:47:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4467118A951;
+	Wed, 13 Nov 2024 09:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731491256; cv=none; b=T9PhiPSduxMHM5x8hoeUxNP4xLABr5069Si6kbWfhZF4GyXpBJryMneXMRJ3DaVgbP6xTIQK5ZuGOSn9cpM4F31J/qMlnAFTwe0t9H2Hw5aTjvQT+JjEJA7JV2EbszffhWFUY5a0ggIVleKzL4S0apGncHDw/fZsjOWvt10qSIs=
+	t=1731491256; cv=none; b=L7w8tPRe81sJ1knP2PHMvGvKd8W7Obw5Qk60TumPMb92wMvzWTmqP08I57rrRhWDfgVVAVWUvcUQIzjkJZsMEV6ObA+223kNvZxZ13ybhRFpIFSMCYVjysXfpR15lAoGeCrGT3Rn+EfRDczhsXNS/H9OUH2QWVGXwsVMf+mPLg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731491256; c=relaxed/simple;
-	bh=qSg4jt+PdvsngxRtEBRGA/FD6TRSDQUzeRkB8v2LbIc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uUANPRsr4GE4H8dvxRom/6e3Oo9R2EEwwzFMbLJkagKIJTzqhgpYZKwumlR2SNQ4odoRtoO7p2mj5saJnLLRoOryiW50qFPFSeODc17JEzIP3oqPbx7i9Erja0tuL4/g8RoKOQJSgAC1Sct5gBKns7kpe/9JYCcXl2k0hkpHCjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=1H770m6u; arc=none smtp.client-ip=198.137.202.133
+	bh=UzCj71djHnVlmhrgagbZpakgyKKeaOyqPK2azzUEczc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pp4NvZVyM+Ji/6dInbV3V4nRef2teni6oA1uw5RMOll8Uc2oig8N98Oe3LY1j4AJHyTOXNi/8ghuGJGd8dNxHi6bj2+W6nyieltpAvQnwovZLoLTK3xkcnRsq2C2PRXPjjBs5Oi7c/yKlGSV7YWlCG6ukH+LMf6z3Vh3/De68GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=snFQ0Z5P; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1H770m6u"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="snFQ0Z5P"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=Rvjs84UgO5xSGvxl4iuvzBP8tFGehN7pbV06CfLjg3U=; b=1H770m6uZYJRsNLnGwzs/TYE7f
-	gf32SzSFjC1OTx+9oTWzt/eb3OBbFZPEnS9eIjfXxWb2HTKI5997hOMEui1NLkZv1f7ZdY6YplmdP
-	Mn9yTxEs2W9zqrnuQ8d4vAi1CPHtUnxkWedaQYIDf6+IKguB19CZMmWo1EcTap6ncmUpff2BHGbls
-	OLQBDRaZJ95iTWnESxDGpKVS5HBnmtTigRawlaWu+fwrooEVxq4Xo3C74IjethFWPkCoB6Shaj5wN
-	f6u7NAfglv4r8Ldg9UVQvGW7LJMsZ4vtDoE7mP2PiT4MycJMnp0V90SMINbjT9496Ta+2gaUqvIUc
-	c5nUp2MQ==;
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=NogMAPzoSN85DvPt0N/0Cgk6QQiG18HIcIcgH/liG3k=; b=snFQ0Z5PJlY9VkqMDtEFeSYgtD
+	yMAPbpE4RgPcakyuL+8kKQyVKgjQ4rrp1V3uqsOWk6Nl53SQ3BZMdGLPQwiYA3iPjoR6fCmd7DaMb
+	vamzErL4wJKX3d3LT5lvxfltNLq1g3j8gqFKiMbGhqsZV1s/RpohfYHIxH+luNGY7yMz0c1bs6kRe
+	cpNKeilWuyF4a2Q8OQEy+FsWwCnS6M4Ld4IzUL7OEpDir3YxTWYoqW4nXJYfFTC/kwanqtuOiPgNJ
+	zXhY/HPqdplSCnzxWhplwraESdUvvGzBj62+DaxWaV60NodWOsXDi7/YCaZ0XAkj1UoAlh/v+xh5N
+	KLakTrOw==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tB9yF-00000006He1-03jf;
-	Wed, 13 Nov 2024 09:47:31 +0000
+	id 1tB9yC-00000006Hcw-32MC;
+	Wed, 13 Nov 2024 09:47:28 +0000
 From: Luis Chamberlain <mcgrof@kernel.org>
 To: willy@infradead.org,
 	hch@lst.de,
@@ -47,12 +46,10 @@ Cc: john.g.garry@oracle.com,
 	da.gomez@samsung.com,
 	kernel@pankajraghav.com,
 	mcgrof@kernel.org
-Subject: [RFC 8/8] bdev: use bdev_io_min() for statx block size
-Date: Wed, 13 Nov 2024 01:47:27 -0800
-Message-ID: <20241113094727.1497722-9-mcgrof@kernel.org>
+Subject: [RFC 0/8] enable bs > ps for block devices
+Date: Wed, 13 Nov 2024 01:47:19 -0800
+Message-ID: <20241113094727.1497722-1-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241113094727.1497722-1-mcgrof@kernel.org>
-References: <20241113094727.1497722-1-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,111 +59,64 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-You can use lsblk to query for a block device block device block size:
+The last time this was addressed was at LFSMM this year in May [0] and
+before LBS was on its way upstream. LBS is now on v6.12 and so the delta
+required is much smaller now.
 
-lsblk -o MIN-IO /dev/nvme0n1
-MIN-IO
- 4096
+Before the turkey massacre slows part of the world down, here's a refresh.
 
-The min-io is the minimum IO the block device prefers for optimal
-performance. In turn we map this to the block device block size.
-The current block size exposed even for block devices with an
-LBA format of 16k is 4k. Likewise devices which support 4k LBA format
-but have a larger Indirection Unit of 16k have an exposed block size
-of 4k.
+Although Hannes' patches were in PATCH form, testing showed quickly that
+it wasn't quite ready yet. I've only done cursory testing so far but have
+also incorporated all of the fixes and feedback we could accumulate over
+time. And so I'm sticking to RFC to reflect that this still needs thorough
+testing. It at least does not crash for me yet and its a major rebase
+onto v6.12-rc7.
 
-This incurs read-modify-writes on direct IO against devices with a
-min-io larger than the page size. To fix this, use the block device
-min io, which is the minimal optimal IO the device prefers.
+The biggest changes now are these last patches:
 
-With this we now get:
+  - block/bdev: lift block size restrictions and use common definition
+  - nvme: remove superfluous block size check
+  - bdev: use bdev_io_min() for statx block size
 
-lsblk -o MIN-IO /dev/nvme0n1
-MIN-IO
- 16384
+The buffer-head pathces I think should be ready.
 
-And so userspace gets the appropriate information it needs for optimal
-performance. This is verified with blkalgn against mkfs against a
-device with LBA format of 4k but an NPWG of 16k (min io size)
+If the consolidation of the max block size is good, perhaps we just also use it
+for the iomap max zero page too. Note that in theory we should be able to get
+up to a block size of 1 << (PAGE_SHIFT + MAX_PAGECACHE_ORDER), in practice
+testing that shows we need much more love [1] although prospects indeed show
+we should be able to get up to 2 MiB on x86_64. And so I think we should first
+reduce scope up to 64k for now, test all this, and then embark on the next
+64k --> 2 MiB journey next.
 
-mkfs.xfs -f -b size=16k  /dev/nvme3n1
-blkalgn -d nvme3n1 --ops Write
+Thoughts?
 
-     Block size          : count     distribution
-         0 -> 1          : 0        |                                        |
-         2 -> 3          : 0        |                                        |
-         4 -> 7          : 0        |                                        |
-         8 -> 15         : 0        |                                        |
-        16 -> 31         : 0        |                                        |
-        32 -> 63         : 0        |                                        |
-        64 -> 127        : 0        |                                        |
-       128 -> 255        : 0        |                                        |
-       256 -> 511        : 0        |                                        |
-       512 -> 1023       : 0        |                                        |
-      1024 -> 2047       : 0        |                                        |
-      2048 -> 4095       : 0        |                                        |
-      4096 -> 8191       : 0        |                                        |
-      8192 -> 16383      : 0        |                                        |
-     16384 -> 32767      : 66       |****************************************|
-     32768 -> 65535      : 0        |                                        |
-     65536 -> 131071     : 0        |                                        |
-    131072 -> 262143     : 2        |*                                       |
-Block size: 14 - 66
-Block size: 17 - 2
+If you want this in a tree you can get this from the kdevops branch
+large-block-buffer-heads-for-next [2]
 
-     Algn size           : count     distribution
-         0 -> 1          : 0        |                                        |
-         2 -> 3          : 0        |                                        |
-         4 -> 7          : 0        |                                        |
-         8 -> 15         : 0        |                                        |
-        16 -> 31         : 0        |                                        |
-        32 -> 63         : 0        |                                        |
-        64 -> 127        : 0        |                                        |
-       128 -> 255        : 0        |                                        |
-       256 -> 511        : 0        |                                        |
-       512 -> 1023       : 0        |                                        |
-      1024 -> 2047       : 0        |                                        |
-      2048 -> 4095       : 0        |                                        |
-      4096 -> 8191       : 0        |                                        |
-      8192 -> 16383      : 0        |                                        |
-     16384 -> 32767      : 66       |****************************************|
-     32768 -> 65535      : 0        |                                        |
-     65536 -> 131071     : 0        |                                        |
-    131072 -> 262143     : 2        |*                                       |
-Algn size: 14 - 66
-Algn size: 17 - 2
+[0] https://lore.kernel.org/all/20240514173900.62207-1-hare@kernel.org/
+[1] https://github.com/linux-kdevops/linux/commit/266f2c700be55bdb5626d521230597673c83c91d#diff-79b436371fdb3ddf0e7ad9bd4c9afe05160f7953438e650a77519b882904c56bL272
+[2] https://github.com/linux-kdevops/linux/tree/large-block-buffer-heads-for-next
 
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- block/bdev.c | 1 +
- fs/stat.c    | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+Hannes Reinecke (4):
+  fs/mpage: use blocks_per_folio instead of blocks_per_page
+  fs/mpage: avoid negative shift for large blocksize
+  fs/buffer: restart block_read_full_folio() to avoid array overflow
+  block/bdev: enable large folio support for large logical block sizes
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 3a5fd65f6c8e..4dcc501ed953 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -1306,6 +1306,7 @@ void bdev_statx(struct path *path, struct kstat *stat,
- 			queue_atomic_write_unit_max_bytes(bd_queue));
- 	}
- 
-+	stat->blksize = (unsigned int) bdev_io_min(bdev);
- 	blkdev_put_no_open(bdev);
- }
- 
-diff --git a/fs/stat.c b/fs/stat.c
-index 41e598376d7e..9b579c0b5153 100644
---- a/fs/stat.c
-+++ b/fs/stat.c
-@@ -268,7 +268,7 @@ static int vfs_statx_path(struct path *path, int flags, struct kstat *stat,
- 	 * obtained from the bdev backing inode.
- 	 */
- 	if (S_ISBLK(stat->mode))
--		bdev_statx(path, stat, request_mask);
-+		bdev_statx(path, stat, request_mask | STATX_DIOALIGN);
- 
- 	return error;
- }
+Luis Chamberlain (4):
+  fs/buffer fs/mpage: remove large folio restriction
+  block/bdev: lift block size restrictions and use common definition
+  nvme: remove superfluous block size check
+  bdev: use bdev_io_min() for statx block size
+
+ block/bdev.c             |  9 +++++---
+ drivers/nvme/host/core.c | 10 ---------
+ fs/buffer.c              | 21 ++++++++++++++----
+ fs/mpage.c               | 47 +++++++++++++++++++---------------------
+ fs/stat.c                |  2 +-
+ include/linux/blkdev.h   |  6 ++++-
+ 6 files changed, 51 insertions(+), 44 deletions(-)
+
 -- 
 2.43.0
 
