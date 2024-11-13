@@ -1,53 +1,47 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D221FF610;
-	Wed, 13 Nov 2024 13:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C3020262B;
+	Wed, 13 Nov 2024 14:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731506068; cv=none; b=AIkRlxnhgsHeG7b122wXzHZvmVjmKtYan4J+VwRTY7ivVCUUamU2TqlWTogGbqNzCCDDhgOxVjRI/y9mNr0diXYfZGWmgs+RYk54ysF+tvl6pwYntNm6edLXwBqEbkPoUr5PH1OcKt6aaESF0w4CkUpN2f0VDpaERAaupYy4CGw=
+	t=1731506826; cv=none; b=ZKFFY9RuN7mkVVnUtU4ODFjx6SDgEuMdSBU4hVQ2V31iC1AfpQKjGFEWmXBLOcX0BfX60ZUGmIW/hC0wQUPF6RqTSKcH5+fN6GL5u52LMkXLwKWnZHfYdQnFYI5E55H44kPYWxK9HIYIdjpWADX9Qa5FyKy1ESd3HLJLlxsECeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731506068; c=relaxed/simple;
-	bh=3B/JCdh4iX3172gc1ZApZTKHI0NdrBjDEoJdyOuJKVg=;
+	s=arc-20240116; t=1731506826; c=relaxed/simple;
+	bh=hvrsf78D8NDDYEOvAPxQVc4YqoPVqijYme2H01oDTdQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PGLn0AXO4JoHZL5f/WSTWYpmMHplXfI3BX/VG6MAqWblHDM4R98ulxuMhGUyaFWOS0xAsDL1qvpewoP6wo4w14zWoh8g0tqdxgYyJZGIacnMCUVXypxdtuD1XclJd2l81qmksgDIE9/NMkAS+gX9enhqr7efXX7aKviR0L9bHS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=GTnOZNgK; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=G3b163qeQKrXmW3w+Imskm2JmDAB3eD5to+rurr0HJ8iFk6Bf3M+WK7bok6shMPfnpJIMwDs1pum0TpjjtS+VDhg7SwiL7y3//kcZAsV74LnOkXsplE6OyYzRmoKjmSBzu1QlqF2XD6lFTChWMeUz5fIecGsaY2En1NNCQ/ltkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=inGQxMTw; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="GTnOZNgK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D5DDC4CEC3;
-	Wed, 13 Nov 2024 13:54:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1731506066;
-	bh=3B/JCdh4iX3172gc1ZApZTKHI0NdrBjDEoJdyOuJKVg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GTnOZNgKse/6G382NfGAX65+kCSYHKUzAxz0956dUBqo8v40DlGKgyR586nlN3IJw
-	 ofuXXUrwDQCp6V46XTbPsSv3ex0dB+Jo9L1ITVX0d2b4pwAhhbQ3/s/gAyosdw64y+
-	 sgZN9gs5iFNYdC0rf0Gt40QH65rx3mjQHbcDeOu0=
-Date: Wed, 13 Nov 2024 14:54:23 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Daniel Wagner <dwagner@suse.de>, Daniel Wagner <wagi@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Bjorn Helgaas <bhelgaas@google.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
-	megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
-	MPT-FusionLinux.pdl@broadcom.com, storagedev@microchip.com,
-	linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v3 1/8] driver core: bus: add irq_get_affinity callback
- to bus_type
-Message-ID: <2024111323-darkening-sappy-23fa@gregkh>
-References: <20241112-refactor-blk-affinity-helpers-v3-0-573bfca0cbd8@kernel.org>
- <20241112-refactor-blk-affinity-helpers-v3-1-573bfca0cbd8@kernel.org>
- <76da6c05-4f28-41cc-a48e-da2ae16c64c4@oracle.com>
- <2d85aa5e-037a-45c3-9f2d-e46b2159b697@flourine.local>
- <bed15207-c3d8-4e0b-b356-4880f5a4fdff@oracle.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="inGQxMTw"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=KJXNvaen1Bz/rhEZ0wYr3yvxXXNeIsAd3hY4qgJzB/M=; b=inGQxMTwLPZKyqpgIPyzxCSSm6
+	bLCxt2bPzP7//fGxa1Rbqys8CPMTp/GYxKU+oA17V9AdpIfXRuq22xedRJS4TsaPdad/Q6C/d4+fy
+	S07P45BSBklhLxAE5DYtOXrp1wfrAAmUpPCA3zOnljEqgNdpJoQuUDUo2t5myQ/dWxnT5cbB/vpwN
+	MgdBXDNpr3W8hozvV5d1tFsSIGoGWhx1FDCcspDR9ZBz2ZQMHhlyTJ9YxkU4raQ9NKDYL0l1oO/XV
+	fWPpM9Tsal3SHug4dR0UtihyzJouDViAWvGdzL/yqVrmO/CLmaj0VmrNDJtAKfnoFgwH2a2QqwHBX
+	s1eWsa7A==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tBE1K-0000000GRES-1KUI;
+	Wed, 13 Nov 2024 14:06:58 +0000
+Date: Wed, 13 Nov 2024 14:06:58 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: hch@lst.de, hare@suse.de, david@fromorbit.com, djwong@kernel.org,
+	john.g.garry@oracle.com, ritesh.list@gmail.com, kbusch@kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com,
+	kernel@pankajraghav.com, Hannes Reinecke <hare@kernel.org>
+Subject: Re: [RFC 2/8] fs/mpage: avoid negative shift for large blocksize
+Message-ID: <ZzSygjfVvyrV1jy6@casper.infradead.org>
+References: <20241113094727.1497722-1-mcgrof@kernel.org>
+ <20241113094727.1497722-3-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,70 +50,25 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bed15207-c3d8-4e0b-b356-4880f5a4fdff@oracle.com>
+In-Reply-To: <20241113094727.1497722-3-mcgrof@kernel.org>
 
-On Wed, Nov 13, 2024 at 01:44:02PM +0000, John Garry wrote:
-> On 13/11/2024 12:36, Daniel Wagner wrote:
-> > > > @@ -48,6 +48,7 @@ struct fwnode_handle;
-> > > >     *		will never get called until they do.
-> > > >     * @remove:	Called when a device removed from this bus.
-> > > My impression is that this would be better suited to "struct device_driver",
-> > > but I assume that there is a good reason to add to "struct bus_type".
-> > I think the main reason to put it here is that most of the drivers are
-> > happy with the getter on bus level and don't need special treatment. We
-> > don't have to touch all the drivers to hookup a common getter, nor do we
-> > have to install a default handler when the driver doesn't specify one.
-> > Having the callback in struct bus_driver avoids this. Though Christoph
-> > suggested it, so I can only guess.
-> > 
-> > But you bring up a good point, if we had also an irq_get_affinity
-> > callback in struct device_driver it would be possible for the
-> > hisi_sas v2 driver to provide a getter and blk_mq_hctx_map_queues could
-> > do:
-> > 
-> > 	for (queue = 0; queue < qmap->nr_queues; queue++) {
-> > 		if (dev->driver->irq_get_affinity)
-> > 			mask = dev->driver->irq_get_affinity;
-> > 		else if (dev->bus->irq_get_affinity)
-> > 			mask = dev->bus->irq_get_affinity(dev, queue + offset);
-> > 		if (!mask)
-> > 			goto fallback;
-> > 
-> > 		for_each_cpu(cpu, mask)
-> > 			qmap->mq_map[cpu] = qmap->queue_offset + queue;
-> > 	}
-> > 
-> > and with this in place the open coded version in hisi_sas v2 can also be
-> > replaced.
-> 
-> Yeah, I think that it could be plugged in like:
-> 
-> diff --git a/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
-> b/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
-> index 342d75f12051..5172af77a3f0 100644
-> --- a/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
-> +++ b/drivers/scsi/hisi_sas/hisi_sas_v2_hw.c
-> @@ -3636,6 +3636,7 @@ static struct platform_driver hisi_sas_v2_driver = {
->                .name = DRV_NAME,
->                .of_match_table = sas_v2_of_match,
->                .acpi_match_table = ACPI_PTR(sas_v2_acpi_match),
-> +               .irq_get_affinity_mask = hisi_sas_v2_get_affinity_mask,
->        },
-> };
-> 
-> 
-> > If no one objects, I go ahead and add the callback to struct
-> > device_driver.
-> 
-> I'd wait for Christoph and Greg to both agree. I was just wondering why we
-> use bus_type.
+On Wed, Nov 13, 2024 at 01:47:21AM -0800, Luis Chamberlain wrote:
+> +++ b/fs/mpage.c
+> @@ -181,7 +181,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+>  	if (folio_buffers(folio))
+>  		goto confused;
+>  
+> -	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
+> +	block_in_file = (sector_t)(((loff_t)folio->index << PAGE_SHIFT) >> blkbits);
 
-bus types are good to set it at a bus level so you don't have to
-explicitly set it at each-and-every-driver.  Depends on what you want
-this to be, if it is a "all drivers of this bus type will have the same
-callback" then put it on the bus.  otherwise if you are going to
-mix/match on a same bus, then put it in the driver structure.
+	block_in_file = folio_pos(folio) >> blkbits;
+?
 
-hope this helps,
+> @@ -527,7 +527,7 @@ static int __mpage_writepage(struct folio *folio, struct writeback_control *wbc,
+>  	 * The page has no buffers: map it to disk
+>  	 */
+>  	BUG_ON(!folio_test_uptodate(folio));
+> -	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
+> +	block_in_file = (sector_t)(((loff_t)folio->index << PAGE_SHIFT) >> blkbits);
 
-greg k-h
+Likewise.
