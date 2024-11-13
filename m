@@ -1,73 +1,146 @@
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BDF1F80A6
-	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 09:55:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155F31FAEEB;
+	Wed, 13 Nov 2024 09:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731491707; cv=none; b=UbcHfj7OLofJDjIRJuR7D6B7LjPApijzkfWkFAOfn8wYLDDXkLm/HiDPaoSeuXPRlhJ2+EwpGBL8IVMNeYohu3S6UIj8V/da3lOaPSa3dO8NdPzC5VlxN/RIRazMi5CYLIXg+Nn2flxIkvNaq+G/pWetY3IfefnJ6JX+JEeqq9Y=
+	t=1731491726; cv=none; b=ss0IifMepQBf6ktPnYJUEqCUCtgsXU0k8Q85HNksfhaxuRNOK6HG36KBuu9LyILbsfqF2s7cYYJCnPrnWO5Net80f3uLqqdcWjpvnQg/f4spMRvAyxhTiIDMW7/lbQCsdlWGxa60iqOz0jcsjZ9y/a5AJ4B/8IXt7YvoKltRwds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731491707; c=relaxed/simple;
-	bh=p/U33DStNbGxmGap1B1YFe1j3MFsLDaLtWL3WRosyzY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=XhnTrygtT/t9LwWTsbJzQoc9YV8c8r1Zihapb8Qby5qt7iD3u3o/W/LHGc9idWqo6kpDFNwwSqNH+lxgyeA9DAJUS84wLJbXS1M0dzci0J1VNRwOtc75NWzPPnIiNn2z3HKOcbQwZZMtWvgJ1GspNkpsTmJPbBhCOd7Qc6zWP+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-83abf9b6bfaso720452439f.2
-        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 01:55:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731491704; x=1732096504;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=La6p7LDFTDd20P9Ap5B5ZW0+Q1G46jQaAsRpKQVub5U=;
-        b=QCasMU7NXYaRhCE5+VKknfyrlu2TVwmXCGq0NALsear9cUTYGOHbCNig3sxcAwL7Io
-         MuMKbcWPD2cIk3pOqQMpgBs7g6oxANwxUB/rGw8QMrAXUl7s4eqAicZU2cKNs4L7WspR
-         ZBITQ+1eaVNqEj6n+dlvQTHGanpGCJi+SpjTfSRQB8uT2niRTC6+mb0uhQXC5Edxx0zm
-         RdFBfka+aM6zdU8CO99/GU2gwYO+hS0SqRYqliQb1OeV4TVvZvccJZY74HMeF3kwuYWW
-         RCBHsdtP5B9shWKirvpir62g8YMECySkVLwKuMmpPm0BpUq97DzBcJDi+1Y9K9q9oP0z
-         SJYA==
-X-Forwarded-Encrypted: i=1; AJvYcCUpUi/xqexejPItwA0XnzbJLQbIflkJFtqH2qWx9Hr2+2Jv74XDflM4U8Kir8IdO/EZSotoIzNNRbQdSg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYQAEKf3fHBk8bv1+ekJUfkt2kKB2/iy5YbsminCnjOqtHnnOG
-	a3aplTCLjWrPY1Ff8SnXfcju8VElTXyqqpJSLOq/chj5MBjPrvNPyOL6HiY5zsYqEoCXbtRqxgU
-	Q+IsYuJ2iHb7lOfB4XbrYAOYFl+N/OLpoANZ5WdVTXW0YsLq+4DgP1Ks=
-X-Google-Smtp-Source: AGHT+IFsfEUMQL1mZoWQN39J627bxb6mJ5re6byZtSmb+hK9QxIgcOD6z5h6xMDBkfPWZ3Gh1tpqOPLKWi/vH24BMdNnJ1sNMRxd
+	s=arc-20240116; t=1731491726; c=relaxed/simple;
+	bh=u75nlWdYoOAIfiX/SRtk4W69kwdJ0NHaif6vj+7/FCk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iwIhycEWflMhbsmLuoMY43oHeRXrBUGOqOI6PqtUAnOUFSRHqctBtoe68SQLGMy8JATyNeVwIPAhD4ba6ben/CHHmobKaHnKAgXvkr/t5fiMIFd4dZiE0Mfy/QfMCAg6TMk/272CoY4mlLALw1uTp/JCVnb8WjvsNA9YHIY189c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OJN6SxWk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Fn8G0Fq1; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=SBYlI74Z; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5P7awEtC; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OJN6SxWk";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Fn8G0Fq1";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="SBYlI74Z";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5P7awEtC"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B4F6D211D6;
+	Wed, 13 Nov 2024 09:55:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1731491720; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ad2+b1TP8cF2SDzj/dhwV3oe7kuZxvWjzs5XlhgBIHQ=;
+	b=OJN6SxWkqyIRcig67iNGyPUwvgoiU/Eu46L6QYIX0JzU6FKDWnDSDHHl3S6WiOs2u3bjtg
+	P3HGX8e1YA8atI4FXaNlki541dWJ5hTawIFtOKDUyeCwLuWbzcfAMgRytxLigONVnvzIIS
+	5T00/1WV9FMPozDpWKr+Fu+5jwUGrRw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1731491720;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ad2+b1TP8cF2SDzj/dhwV3oe7kuZxvWjzs5XlhgBIHQ=;
+	b=Fn8G0Fq1yiLFQ4RDLfp4pULXoTPAQv1cyhog2mJPEQRK6hxn+TD2ucnn7zijeb++S5OKev
+	H34N2jEGQspW52CQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1731491719; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ad2+b1TP8cF2SDzj/dhwV3oe7kuZxvWjzs5XlhgBIHQ=;
+	b=SBYlI74Z5Dw9c1yZfQ+bckfJxkwMimmAfSAWVqncgKTOhE07H9OPo+r2GeAJ33Tk0OVftY
+	ajPpeHIVzKv8k34YEgqAD6kCfYZmHntTlTqgFwJjH60eOJfu/TIeLDdJGWEXIyWIqjcogu
+	ZBvwZjyOGHKxNiHgDfjYeuv9101apNU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1731491719;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ad2+b1TP8cF2SDzj/dhwV3oe7kuZxvWjzs5XlhgBIHQ=;
+	b=5P7awEtCCYEqiGBHsV4aOiEizMzmX0w/Yx2JbXNC+ZQvoH5QHfnELG+wybSKHJZpjOKuog
+	EqE/e9mFqDILyPBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8DAAB13A6E;
+	Wed, 13 Nov 2024 09:55:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 5QwfIod3NGfBGAAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 13 Nov 2024 09:55:19 +0000
+Message-ID: <2ed5bf13-4a22-4b07-9885-2dd9e053d854@suse.de>
+Date: Wed, 13 Nov 2024 10:55:19 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c87:b0:3a6:ac17:13e5 with SMTP id
- e9e14a558f8ab-3a6f1a1ed84mr204243095ab.11.1731491704296; Wed, 13 Nov 2024
- 01:55:04 -0800 (PST)
-Date: Wed, 13 Nov 2024 01:55:04 -0800
-In-Reply-To: <CAFj5m9+GAv4JPX=ABgwUo7RSSZ4zNsBKpiJOfuxmmwg+GDP3wA@mail.gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67347778.050a0220.2a2fcc.0006.GAE@google.com>
-Subject: Re: [syzbot] [block?] possible deadlock in loop_reconfigure_limits
-From: syzbot <syzbot+867b0179d31db9955876@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ming.lei@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 4/8] fs/buffer fs/mpage: remove large folio restriction
+To: Luis Chamberlain <mcgrof@kernel.org>, willy@infradead.org, hch@lst.de,
+ david@fromorbit.com, djwong@kernel.org
+Cc: john.g.garry@oracle.com, ritesh.list@gmail.com, kbusch@kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-mm@kvack.org, linux-block@vger.kernel.org, gost.dev@samsung.com,
+ p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
+References: <20241113094727.1497722-1-mcgrof@kernel.org>
+ <20241113094727.1497722-5-mcgrof@kernel.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20241113094727.1497722-5-mcgrof@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_TLS_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[oracle.com,gmail.com,kernel.org,vger.kernel.org,kvack.org,samsung.com,pankajraghav.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
-Hello,
+On 11/13/24 10:47, Luis Chamberlain wrote:
+> Now that buffer-heads has been converted over to support large folios
+> we can remove the built-in VM_BUG_ON_FOLIO() checks which prevents
+> their use.
+> 
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>   fs/buffer.c | 2 --
+>   fs/mpage.c  | 3 ---
+>   2 files changed, 5 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-syzbot tried to test the proposed patch but the build/boot failed:
+Cheers,
 
-security/apparmor/domain.c:695:3: error: expected expression
-security/apparmor/domain.c:697:3: error: use of undeclared identifier 'new_profile'
-security/apparmor/domain.c:699:8: error: use of undeclared identifier 'new_profile'
-security/apparmor/domain.c:704:11: error: use of undeclared identifier 'new_profile'
-
-
-Tested on:
-
-commit:         6d59cab0 Add linux-next specific files for 20241111
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git next-20241111
-kernel config:  https://syzkaller.appspot.com/x/.config?x=75175323f2078363
-dashboard link: https://syzkaller.appspot.com/bug?extid=867b0179d31db9955876
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Note: no patches were applied.
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
