@@ -1,69 +1,69 @@
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFD916F0EB
-	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 18:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3491FAC53
+	for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 18:46:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731523610; cv=none; b=WBdHW+Z9MolZAaQRUvefYRQZOjFtwf8df4fxqgZEpUfCwa/lzcljs1A4KDFMQGs56zygaPD1YN/O0kiBO1qAF357nvE2A8qkXiEFBPkWMq9mJEtj3Fb/EeqTyoDRjqpuCAtkzwjisaUVP7zC5Oi2tw8u85JCYnzQvc0XdPYU7es=
+	t=1731523611; cv=none; b=lbKUVXq/mdsRLLJ0jYEUY/zMrVIYzAO1YRVgOcq1qwAHipVLFd08ljo6qLzVS5hNu48xKsMWQqOJsrEHeQbODdbBNzH3ZpS2MGLM/mJdB79zU+WhJQg5eZp6RP+W2L74jryiKhOMKye0M/ryiaYVY4r6Xcr6uUyqxKa27R1b47Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731523610; c=relaxed/simple;
-	bh=bjjmahyNCuDcOLFnSRDq1hTf8a7Q4M0XE3GdCGOoN+s=;
+	s=arc-20240116; t=1731523611; c=relaxed/simple;
+	bh=8RXFfY/QwFw1iJc0lFBsu6djRAxjqHBrxSI6loa3ifo=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=T/iwWDwH7R7pMG+04V/aMcHYPaK46RYZGGEu3dwydhFIwQH3FkVYgawMQYCTuT5IXKhNd/8O/QMcyH0vPYYyRKpQercO7Jrrv0hNNdo10DWTa6XX4vy9uVoxsU5kt5k4DRj9uGAu0hbY4MCkf5rBuA+Sj+Nw11X/h8Xfyjsr9tU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HrYh2Zfd; arc=none smtp.client-ip=209.85.160.43
+	 MIME-Version:Content-Type; b=oiak47veaAyjdelMvxAvYVXeA9sJIeMBgiH+IaGxsqbQXwJVB0P948AQg1SjDopRFzhlRIfojE7iJCy/cO3zenuMt3W8UWN/tdKIcPYcWlokAM0zbfcX5GrWg2sUUuWjj7z0V0bwCKrLmIs2OVP9c0AXiNTWqaliqhyNIr7GYgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dWZVDRJH; arc=none smtp.client-ip=209.85.160.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HrYh2Zfd"
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-28862804c9dso600457fac.0
-        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 10:46:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dWZVDRJH"
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-29066daf9e2so3177751fac.3
+        for <linux-block@vger.kernel.org>; Wed, 13 Nov 2024 10:46:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731523607; x=1732128407; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731523609; x=1732128409; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6Y6LZQ+uMnK0S2LY6YW0GGjZ/J1h8Erndb3dSaVvNh8=;
-        b=HrYh2Zfdu9OAmuzooQQRKHi1LLIPwilwqIlwCOffSRr2HAJ5H1VjWywPoLWDNJJ7ZX
-         1s4ZBo1n/2k5Y/LFuUaSCQMtVrNi+Is4IU0juGMyT9reMN7h9Md6hvAG9nIM2ABwNszf
-         cfMSN3iXbg5vqQ9DaopJFoBPTocTKybygj5lEJgnoJhj4znfFCR5HPWFUH2zC+7yzpKq
-         GaKV4ZudhXkS/VZfrVb5SrcQh0j33JKVR40TYaZtLjXtSJoQv85QpJmyvJ1HYLlYnuJL
-         92v6MaryJk2AC8GZTjWup8hs65V3O+ZAKtKbwR6lrsR0kPoMV6XcnIDvEKiY+RtVHrHd
-         oFWw==
+        bh=c6j4wyvW+qjOuARZZJwh1G4pDZjq38FdBGsdmUpGeUg=;
+        b=dWZVDRJHSSzrWdwEJ3S4iWXEeksE3UAi1Zv93ci/Fcor0ysgQbTXV1Eae7v1q1SxIV
+         OHm/Ga6z4iE+tzsO+x96JUOmiszBwU4vpN1ggrTlqd3TYRiJVLK/lBZcmeEaKIrPejXC
+         K66OqIKLF4CbGBGz4KIPunVZGvhAFOZVPzOS2Grd+H+2v7Ts8MX8Y8Bu2uNMdva/q4rw
+         dU7LgwEkkUBIUyuglMVAWECf5rtx0Pqk6CKXulxntQOiWDhP7KkiSlAyvtZPTXyTuc0g
+         WEzXgezDiFz7Jk1ZU0lisi4SxotKMv3XTZBiInpxilfvJI66wCLmDa7PwnO3C2oqC29Z
+         TcXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731523607; x=1732128407;
+        d=1e100.net; s=20230601; t=1731523609; x=1732128409;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6Y6LZQ+uMnK0S2LY6YW0GGjZ/J1h8Erndb3dSaVvNh8=;
-        b=EaQ61AiurV7LiuT1wlageyAMMntNrXrDUWfewRJ6MTpPUlwNWbge4lLWF/SMdHmoHN
-         zA9S3VcOvhGmQrqE6aNw4xUmCbzQ/0pKenSS5WaQCDOzmw68Jnuvhriri346okuTA4Mt
-         Owwd/kWwhXbqmrfeMgFddxxEVVCVKtfz8WqHd1znIp1UXQRnKxGQveMO1RIsc+AzRsfH
-         7QIrvG1er8lLIo57xB8eb/l7YaHNvKX5/7IPY44INicd3bmz82g98Tj2H0yLz3IWSV6d
-         zDjSHwHmHet7leTEIuo9FtUyWRh2ZZ/ZTrIOWWh386031U3wG27ktqBcrec0u28pk4Sh
-         FyFA==
-X-Forwarded-Encrypted: i=1; AJvYcCUqYoR3uZghI3xH4HlzPvFXcrTs1+VPa9tnGoYIlBdqe6ekqjuUmRTHo3byW3RsFlXuhTTpus8wJQcc1Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8kgKn3xEklBfkqIwvJJ858qIU7BW8m9TQOQutrQeUjQn10kqK
-	U4+VLB6OwnR2vNrbOotbQBllvuYB6JmqL7TXi65s1/ZxwA7gSbD+gTRvAYcu6TI2OA0sGOXCZ/i
-	B2Vk=
-X-Google-Smtp-Source: AGHT+IElqrUcRF3HfiSejpBqxBPsTzd7rzIjNzdtYsCTXlXDVD2IYEpSiVKFvfLa6IZJOe2HhDecgw==
-X-Received: by 2002:a05:6870:2b0f:b0:288:3915:db28 with SMTP id 586e51a60fabf-296069ed640mr386417fac.5.1731523607575;
-        Wed, 13 Nov 2024 10:46:47 -0800 (PST)
+        bh=c6j4wyvW+qjOuARZZJwh1G4pDZjq38FdBGsdmUpGeUg=;
+        b=rCNr3JOsame28HTv31sH1gZJSIuY0mzDcxzkWY5CSa1fYZHABB+WJtRP0WeUBmNdXw
+         CiqdOZnG2VmsnVbJMjaIVLa/5QCFLt/gtE1aJ5/ir7fbApc4KzssLJ14UvJJfvQDtruL
+         vDC+dNhmlXBgY10TRcCWGsk4Os10FubQ6HjFa6ZXIlICSDJQOlpO9cDurcv/J1rIaC9t
+         Xgr0rPgbVRMmdMxbYkEBnSnFOTP6aPjKK8fTxYMHElrSX6mWWIefxSRJD84GWG5nuTci
+         nVqr2sJ9WJp1jYMZKLa6o9Cg5jGvlfoF/rSfB6S9yc+1tL48/T6bcEntfNhvcWNNIn0q
+         6nKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWEieiWsVh6cmuu/A5vziH/GQeviBa076DfUxkMynbcwIXKDMGkWGTbJ56CY3VyBKbVuwQP+k71ELnTtA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9mnvNb39UyF5SiB1pZtC8oy6+Dy6xbEoP5QpgLhVF6NfnV5V7
+	Rm+2RCi8uyaKLlmCXxCWUN7U1tc4VdC0KtKr33cp1tik6w5PBYRccVy75NbmEeI=
+X-Google-Smtp-Source: AGHT+IGhW5wNVuxAhg949qECoPGMVp0GIeUGc7cEDZZJFiXO83xP2SEoIWQJzy2xwUop4HsywD6gWw==
+X-Received: by 2002:a05:6871:811:b0:277:d7f1:db53 with SMTP id 586e51a60fabf-29560110330mr19601816fac.17.1731523608778;
+        Wed, 13 Nov 2024 10:46:48 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-295e92afbcbsm1023381fac.40.2024.11.13.10.46.46
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-295e92afbcbsm1023381fac.40.2024.11.13.10.46.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2024 10:46:47 -0800 (PST)
+        Wed, 13 Nov 2024 10:46:48 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
 To: Christoph Hellwig <hch@lst.de>
-Cc: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
- David Sterba <dsterba@suse.com>, Yi Zhang <yi.zhang@redhat.com>, 
- linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
-In-Reply-To: <20241113084541.34315-2-hch@lst.de>
-References: <20241113084541.34315-1-hch@lst.de>
- <20241113084541.34315-2-hch@lst.de>
-Subject: Re: [PATCH 1/2] block: export blk_validate_limits
-Message-Id: <173152360663.2243093.16019874347039852484.b4-ty@kernel.dk>
-Date: Wed, 13 Nov 2024 11:46:46 -0700
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
+ Pavel Begunkov <asml.silence@gmail.com>, linux-block@vger.kernel.org, 
+ virtualization@lists.linux.dev, linux-nvme@lists.infradead.org, 
+ io-uring@vger.kernel.org
+In-Reply-To: <20241113152050.157179-1-hch@lst.de>
+References: <20241113152050.157179-1-hch@lst.de>
+Subject: Re: don't reorder requests passed to ->queue_rqs
+Message-Id: <173152360771.2243093.6096591698137056565.b4-ty@kernel.dk>
+Date: Wed, 13 Nov 2024 11:46:47 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,25 +75,30 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.2
 
 
-On Wed, 13 Nov 2024 09:45:35 +0100, Christoph Hellwig wrote:
-> While block drivers do the validation as part of committing them to the
-> queue, users that use the limit outside of a block device context have
-> to validate the limits and fill in the calculated values as well.
-> 
-> So far btrfs is the only user of queue limits without a block device,
-> and it has gotten away with that more or less by accident.  But with
-> commit 559218d43ec9 ("block: pre-calculate max_zone_append_sectors")
-> this became fatal for setups that have small max zone append size,
-> as it won't be limited now.
+On Wed, 13 Nov 2024 16:20:40 +0100, Christoph Hellwig wrote:
+> currently blk-mq reorders requests when adding them to the plug because
+> the request list can't do efficient tail appends.  When the plug is
+> directly issued using ->queue_rqs that means reordered requests are
+> passed to the driver, which can lead to very bad I/O patterns when
+> not corrected, especially on rotational devices (e.g. NVMe HDD) or
+> when using zone append.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/2] block: export blk_validate_limits
-      commit: 470d2bc3a0bc19a849cc7478c02d3f5ecaa1233e
-[2/2] btrfs: validate queue limits
-      commit: e559ee022658c70bdc07c4846bf279f5a5abc494
+[1/6] nvme-pci: reverse request order in nvme_queue_rqs
+      commit: beadf0088501d9dcf2454b05d90d5d31ea3ba55f
+[2/6] virtio_blk: reverse request order in virtio_queue_rqs
+      commit: a982a5637e91fd4491da4bb8eb79cde3fed2300e
+[3/6] block: remove rq_list_move
+      commit: dd53d238d4ca7ff1a0e10eb0205e842560f1394d
+[4/6] block: add a rq_list type
+      commit: dc56e2a78ba20c472c419c6f2ed8fb7d0c95ad90
+[5/6] block: don't reorder requests in blk_add_rq_to_plug
+      commit: 05634083a304eb3d4b5733fe8d6e2fd0c1041ca8
+[6/6] block: don't reorder requests in blk_mq_add_to_batch
+      commit: 65550dea43815d01f45d7ece38e458855d5e2962
 
 Best regards,
 -- 
