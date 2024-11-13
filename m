@@ -1,48 +1,43 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504732038B1;
-	Wed, 13 Nov 2024 18:50:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA3322611;
+	Wed, 13 Nov 2024 19:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731523822; cv=none; b=M/U5F3PGth6EjkoKG3YDcYS0hybx3pDu013h4Mce12EJBtmw1ixfh/B+sUol/PdskEkNN+Ep1q8qrOZs8yYXvyYd1lMj2z0IOW7i0EkoDmOIY8wMDEBPqDuLrZJ6qSCsVGxl1Db9meXZ0AWR0LbMIZGzRTMGfI6obfG7zIDYIKU=
+	t=1731524620; cv=none; b=TiC3IfTtKFubwniy4iX6f3CMMv+CD++6EYOqOmFcDhNc9rm37iH/R9CG+NgXMI6yWoR3ScBOw3awEHLUp7VXKODVR8Sc9sKS7S2wVBINmZ0Yd8NFXjvwz+WK4t6czVuWBgtKzF8xu7UTPWyNyddl76eRTwtr/IBrrmH6qsMRbFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731523822; c=relaxed/simple;
-	bh=lroZCjWsJZyiMWEIuQQYqpMZWiIy0VXTc6cPD6rMTr0=;
+	s=arc-20240116; t=1731524620; c=relaxed/simple;
+	bh=Ih6n3afma8hugiSd02MVTojr13PQh5SNuHn4AQX0Ya8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FRIetDFfgWA6gUTV7/iKD6TJ805R3bPzz+XqAeo6wwPANieqj21vwRXljE8Y1ENsD+duL+KrzVVj6aWl6wUSY7y7hkcJiSvJHBu2dEPaZTSaCYnzQHrBJPRaJaDRZDBK32LuA6a+JWe1YVvOPeTECJ1PZvTVEK/bOT+4xTI+1Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rt8QDIsl; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=JiBdecjgPp++bTAKyHJRUfe6b2m03AaoNAvIH3SNudhuInYKI1C2/RaFa2udqOEHlvKequjyOa2xbFqRtnMTC7JObaZCslMaOzXP9JM/0ML8wz+dCOXEoHbGhHFh4RlcHMbD8vlPXDeo9t3zWJZ5VYiygTD/IPkMrncCBlErKOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bDymXMZh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rt8QDIsl"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=nq4bIv/oWAf5S/k6VezA2o3s5y3i68pnNRbJOq/1fys=; b=rt8QDIslv6vKhdttNZX4KMHBgg
-	5rl21C15AExxBj/UuxibOZ2pLvOH/X3tEz3ttM3USKRU5DH5BxqCMPo2D7155b2C5MVBhca4QsiBr
-	Mgq35ZgaRJHrSu5zftli9ajbT1duhfPDFqr/hvIrY3y+IJM/G7i5VSGDMoD/ZKLApifIHrkVaygi7
-	sZUkmgn8iqs/c5fd4iZFI7CMAvcAp9QEw3jwAyNqraRoxBtSDdBHkZPCwQmjAICvJFXJyXdtcJD6r
-	mXXkAWh4dch5sGD4hQX9Vg0vPPGISrrf1RrQrh28zscIdV1AVQW7i8Z+o0/cV/rIfyEWvICM880k8
-	2LDKjB8w==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tBIRN-0000000GmSQ-0rjk;
-	Wed, 13 Nov 2024 18:50:09 +0000
-Date: Wed, 13 Nov 2024 18:50:08 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: hch@lst.de, hare@suse.de, david@fromorbit.com, djwong@kernel.org,
-	john.g.garry@oracle.com, ritesh.list@gmail.com, kbusch@kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-mm@kvack.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com,
-	kernel@pankajraghav.com
-Subject: Re: [RFC 3/8] fs/buffer: restart block_read_full_folio() to avoid
- array overflow
-Message-ID: <ZzT04C0iwlkxg6aL@casper.infradead.org>
-References: <20241113094727.1497722-1-mcgrof@kernel.org>
- <20241113094727.1497722-4-mcgrof@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bDymXMZh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE7ADC4CEC3;
+	Wed, 13 Nov 2024 19:03:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731524619;
+	bh=Ih6n3afma8hugiSd02MVTojr13PQh5SNuHn4AQX0Ya8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bDymXMZhLQ/Vq6S0sM45/V1tPovTNJlSfrT0cPHtmiD8HHMfGQ8PKT0jhI43uvbYl
+	 AzuinSRrll9KcFaatx/X6OO26gB06Zp710v16Qy0Iusrb8jBXtibVzv1vD59ihx7e2
+	 kpv3xJf+tKSeyjhxLS7zayx2ni9+WxH1bt8dd3uU7fouCUHxHVTRImH6o5hfRXzvi1
+	 cmwjoQZMZHZ4/gUofMCHPpV7KlxmHem54qM1fYptYarl3+1eFKNXuE0BHa6K4xof35
+	 hKElXIDUnh3N10qMNtYqewYAUEbEPtRzipapGy7V5iU2D3wpXYMbSvx1maqrtKlj5r
+	 2nhpBBd+zl0VA==
+Date: Wed, 13 Nov 2024 12:03:36 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, Sagi Grimberg <sagi@grimberg.me>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-block@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-nvme@lists.infradead.org, io-uring@vger.kernel.org
+Subject: Re: [PATCH 2/6] virtio_blk: reverse request order in virtio_queue_rqs
+Message-ID: <ZzT4CHjrmD5mW2we@kbusch-mbp>
+References: <20241113152050.157179-1-hch@lst.de>
+ <20241113152050.157179-3-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,88 +46,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241113094727.1497722-4-mcgrof@kernel.org>
+In-Reply-To: <20241113152050.157179-3-hch@lst.de>
 
-On Wed, Nov 13, 2024 at 01:47:22AM -0800, Luis Chamberlain wrote:
-> +++ b/fs/buffer.c
-> @@ -2366,7 +2366,7 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
->  {
->  	struct inode *inode = folio->mapping->host;
->  	sector_t iblock, lblock;
-> -	struct buffer_head *bh, *head, *arr[MAX_BUF_PER_PAGE];
-> +	struct buffer_head *bh, *head, *restart_bh = NULL, *arr[MAX_BUF_PER_PAGE];
+On Wed, Nov 13, 2024 at 04:20:42PM +0100, Christoph Hellwig wrote:
+> in rotational devices.  Fix this by rewriting nvme_queue_rqs so that it
 
-MAX_BUF_PER_PAGE is a pain.  There are configs like hexagon which have
-256kB pages and so this array ends up being 512 * 8 bytes = 4kB in size
-which spews stack growth warnings.  Can we just make this 8?
-
-> @@ -2385,6 +2385,7 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
->  	iblock = div_u64(folio_pos(folio), blocksize);
->  	lblock = div_u64(limit + blocksize - 1, blocksize);
->  	bh = head;
-> +restart:
->  	nr = 0;
->  	i = 0;
->  
-> @@ -2417,7 +2418,12 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
->  				continue;
->  		}
->  		arr[nr++] = bh;
-> -	} while (i++, iblock++, (bh = bh->b_this_page) != head);
-> +	} while (i++, iblock++, (bh = bh->b_this_page) != head && nr < MAX_BUF_PER_PAGE);
-> +
-> +	if (nr == MAX_BUF_PER_PAGE && bh != head)
-> +		restart_bh = bh;
-> +	else
-> +		restart_bh = NULL;
->  
->  	if (fully_mapped)
->  		folio_set_mappedtodisk(folio);
-> @@ -2450,6 +2456,15 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
->  		else
->  			submit_bh(REQ_OP_READ, bh);
->  	}
-> +
-> +	/*
-> +	 * Found more buffers than 'arr' could hold,
-> +	 * restart to submit the remaining ones.
-> +	 */
-> +	if (restart_bh) {
-> +		bh = restart_bh;
-> +		goto restart;
-> +	}
->  	return 0;
-
-This isn't right.
-
-Let's assume we need 16 blocks to fill in this folio and we have 8
-entries in 'arr'.
-
-        nr = 0;
-        i = 0;
-
-        do {
-                if (buffer_uptodate(bh))
-                        continue;
-...
-                arr[nr++] = bh;
-        } while (i++, iblock++, (bh = bh->b_this_page) != head);
-
-        for (i = 0; i < nr; i++) {
-                bh = arr[i];
-                        submit_bh(REQ_OP_READ, bh);
-
-OK, so first time round, we've submitted 8 I/Os.  Now we see that
-restart_bh is not NULL and so we go round again.
-
-This time, we happen to find that the last 8 BHs are uptodate.
-And so we take this path:
-
-        if (!nr) {
-                /*
-                 * All buffers are uptodate or get_block() returned an
-                 * error when trying to map them - we can finish the read.
-                 */
-                folio_end_read(folio, !page_error);
-
-oops, we forgot about the 8 buffers we already submitted for read.
+You copied this commit message from the previous one for the nvme
+driver. This message should say "virtio_queue_rqs".
