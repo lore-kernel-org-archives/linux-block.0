@@ -1,110 +1,117 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77761A7AF6
-	for <linux-block@vger.kernel.org>; Thu, 14 Nov 2024 19:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4161A9B5D;
+	Thu, 14 Nov 2024 20:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731614373; cv=none; b=bncNvVC9xR+WbAR58c7lrTaDWctz+3NjK0JayfRL7lYZvy0EkEwlpTavNUOwBAYfMrLx1dPS7bmF8AhIdZcrNm3KuK7uFchWh7B6EZF57bjY/lt8b7Rxczh0Volmaj7bnC9XbaesO7E/qgIhKDvN5JH6BqRVx2r/ZQD47JWv7H8=
+	t=1731615066; cv=none; b=F9iTyTzchL7SS5g9sMibw3GEJswog/U+fzA2Lf5idKyuFoSz9IxJzm00AGGTMtzXunbKkvjVLEK1Wx/z21XipbQfLUXhNFLdAFi/3e6DQAzVqo72EV6E8RmNYEDdukWfxPQz7Jr7f7YRwYdRMdCevDwNwqO1KwAyJEg4Io8KO3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731614373; c=relaxed/simple;
-	bh=H287lDYthdc77qSw5Z5/Phmq0rtxNLmCcq1CkVNWHj8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BdPdLBrRhkKzzg9o8j8xfpmXxks9IvKqDrZRJgnH35mMfk+frGat0EkHscffUcB9KKj7NA/qA5YtKWO9Ae5KDdQzzujYAb0qEK7YqM53Tkh2+KLTLXU3UkfGN3LHhFGSEzGTdopRt4TjjM8zFLdOSUZgJr+8PltxUg89Pru2XNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YthmldjE; arc=none smtp.client-ip=209.85.161.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1731615066; c=relaxed/simple;
+	bh=ASl8LSAvyQVJiieFrry6JPr3SCOWxU/QgkzXXpnO05k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=drxFhEPbMbjY39Y4iwOyuq2dsavqcNImFcqm1Z5cawbW0a2HX6rG8/C2+5JchZZpkamRHSEc2vgkDYyRtsm1Awpa8lk/YntQKSd437OFfhJVCv8VH85UgpNe0cJZxriR11G90oDEg910qbf1yQ3NQg95ojX9JPjApHuZCkRXnMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=anx91EaE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YthmldjE"
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5ebc52deca0so549110eaf.3
-        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2024 11:59:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731614370; x=1732219170; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fkFjS2wPJFkqdQm4cnKrH9Ovi0c7v3pS/9u3vIqGMDM=;
-        b=YthmldjE8fcn/KsTGQ1YDd2SXqNgZmzwg2dBUE4WaE5zizJ5eqVzSxjFa/QOCTn9Nl
-         nM1AADWYnpr9+7x5NfO2tCxUQhsD8QRw2Vu5dfcEMht4GQon/29upkszLwQ1ifZswegL
-         RVBN7hKXW9+OnAaVbM9qAezsfl09aqiNTVD0ejensa4phB1H2WJ5lfrhWCKrRblgQpQS
-         RsyhzmmRO/veIUlZMaxnSJcwDmOdBX2X35ycJ5f8JnTq/PAhFl2L4fkEn22ECyXgtuDF
-         35kldiYBRw+Lzh0rupQ23kNQ9YsT9ktU09v+zVSSUSLeaup1CvxnKHgjWLBxDVbIj0Vj
-         /21Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731614370; x=1732219170;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fkFjS2wPJFkqdQm4cnKrH9Ovi0c7v3pS/9u3vIqGMDM=;
-        b=QBAbsIamgijzH9Uawew3lyMdeiDXJ0UmKX2O6Q/P4gUdFqlq3pY7+27j0LE4Ac/DFd
-         qjPYw8VnJ6tPyRHAs+XgVG0ZSkw4RXAaxMXdHeeRC1P/rqsHN2m9BaGwOcaoy9WlaNd5
-         PuaHQpCn0H8INtu3Cl5tX1t20bAkhKRLui+3vajKLPDwYc8hW37llJOzxDB72Bs8/VBM
-         G9LdN8DBWCBG9v3Pol33yKaGxtzweddm3U0SjxsPvqBoEnodmarhp1V+ohA65JORqLTP
-         4tfS8we7+kl5snzt2dx9GacCiRs9lj6ssYC2SZYPMssKPRomPDL9Vg0vwvkpFuYMBrXS
-         JEmw==
-X-Forwarded-Encrypted: i=1; AJvYcCU7sD7vfjt/MEpsboVrnZK+1nJesXbvd7Fd83+CBOwlmo/boakSCQPJiREeXcBysijGq91Rk3F2ZS50cQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwL9m9gaoMm0AlySPlIUH6cCz00pXbTD2wPR0kYAH2uIGaAuyLK
-	EoAY5FdG0X/7V7tCxY8sLnegIDMgP0hTj/KiJHahIRNVMQmiJplrvCrqh3dPTmk=
-X-Google-Smtp-Source: AGHT+IGYhSYu010tZ5icXn0iop521N+VU/nDnRxmg9olvNYFuvdTUYp7rwb3W1+U+IQY2nDuJqyK5w==
-X-Received: by 2002:a05:6820:3107:b0:5eb:8488:c80b with SMTP id 006d021491bc7-5eeab4d76a1mr159546eaf.6.1731614369724;
-        Thu, 14 Nov 2024 11:59:29 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5eea0120029sm586318eaf.16.2024.11.14.11.59.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2024 11:59:28 -0800 (PST)
-Message-ID: <4ee9df47-c84e-44ca-9ab6-f655bfda7481@kernel.dk>
-Date: Thu, 14 Nov 2024 12:59:27 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="anx91EaE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C035C4CECD;
+	Thu, 14 Nov 2024 20:11:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731615066;
+	bh=ASl8LSAvyQVJiieFrry6JPr3SCOWxU/QgkzXXpnO05k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=anx91EaEjJy6ntu/ddhlMwoMHjGZHqXIcwlIbSxu2kcIowwLvk0UMlYby2HoawQBE
+	 sbHvq+nARD/fY8HjJLg0VQCU5jOhJpqefyvJJFZ+f+qLvTpgcBp+tjagV8VPGSTX60
+	 4kskjjjHURDBovPsnp/VTNUO8ITbMWwx2W2KL+5N2QKDS7IRQ9oAIkEmJm+59XuIOA
+	 l1VzSp7HwTt1oIQOTTmYjK82gHnErDFI3wDf+EKeei1n2xKrAKGHUEWdD7uchJoI3V
+	 PC5BtRgOOKwMQ0g+7H4HCnJlTN/H4VNZ+dTMPpc4aPLFr+AOKTMj7fybJKs94y7uhH
+	 7wMQc3PHz3+RQ==
+Date: Thu, 14 Nov 2024 13:11:03 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-block@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-nvme@lists.infradead.org, io-uring@vger.kernel.org
+Subject: Re: [PATCH 4/6] block: add a rq_list type
+Message-ID: <20241114201103.GA2036469@thelio-3990X>
+References: <20241113152050.157179-1-hch@lst.de>
+ <20241113152050.157179-5-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: add larger order folio instead of pages for
- passthrough I/O
-To: Christoph Hellwig <hch@lst.de>, Chinmay Gameti <c.gameti@samsung.com>
-Cc: kbusch@kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, joshi.k@samsung.com, anuj20.g@samsung.com,
- nj.shetty@samsung.com, kundan.kumar@samsung.com, gost.dev@samsung.com
-References: <CGME20241114140134epcas5p3474e82266c4c117919a920d1dd4ed410@epcas5p3.samsung.com>
- <20241114135335.21327-1-c.gameti@samsung.com> <20241114161744.GA2078@lst.de>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241114161744.GA2078@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241113152050.157179-5-hch@lst.de>
 
-On 11/14/24 9:17 AM, Christoph Hellwig wrote:
->> @@ -313,21 +314,35 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
->>  		if (unlikely(offs & queue_dma_alignment(rq->q)))
->>  			j = 0;
->>  		else {
->> -			for (j = 0; j < npages; j++) {
->> +			for (j = 0; j < npages; j += num_pages) {
->>  				struct page *page = pages[j];
->> -				unsigned int n = PAGE_SIZE - offs;
->> +				struct folio *folio = page_folio(page);
->>  				bool same_page = false;
->>  
->> -				if (n > bytes)
->> -					n = bytes;
->>  
->> -				if (!bio_add_hw_page(rq->q, bio, page, n, offs,
->> -						     max_sectors, &same_page))
->> +				folio_offset = ((size_t)folio_page_idx(folio,
->> +						page) << PAGE_SHIFT) + offs;
-> 
-> I'm not sure if Jens want to rush something like this in for 6.13, but if
-> we're aiming for the next merge window I actually have a 3/4 done series
-> that rips out bio_add_hw_page and all the passthrough special casing by
-> simply running the 'do we need to split the bio' helper on the free-form
-> bio and return an error if we do.  That means all this code will go away,
-> and you'll automatically get all the work done for the normal path for
-> passthrough as well.
+Hi Christoph,
 
-I'd rather it simmer a bit first, so I'd say we have time since 6.13 is
-coming up really soon.
+On Wed, Nov 13, 2024 at 04:20:44PM +0100, Christoph Hellwig wrote:
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 65f37ae70712..ce8b65503ff0 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1006,6 +1006,11 @@ extern void blk_put_queue(struct request_queue *);
+>  void blk_mark_disk_dead(struct gendisk *disk);
+>  
+>  #ifdef CONFIG_BLOCK
+> +struct rq_list {
+> +	struct request *head;
+> +	struct request *tail;
+> +};
+> +
+>  /*
+>   * blk_plug permits building a queue of related requests by holding the I/O
+>   * fragments for a short period. This allows merging of sequential requests
+> @@ -1018,10 +1023,10 @@ void blk_mark_disk_dead(struct gendisk *disk);
+>   * blk_flush_plug() is called.
+>   */
+>  struct blk_plug {
+> -	struct request *mq_list; /* blk-mq requests */
+> +	struct rq_list mq_list; /* blk-mq requests */
+>  
+>  	/* if ios_left is > 1, we can batch tag/rq allocations */
+> -	struct request *cached_rq;
+> +	struct rq_list cached_rqs;
+>  	u64 cur_ktime;
+>  	unsigned short nr_ios;
+>  
+> @@ -1683,7 +1688,7 @@ int bdev_thaw(struct block_device *bdev);
+>  void bdev_fput(struct file *bdev_file);
+>  
+>  struct io_comp_batch {
+> -	struct request *req_list;
+> +	struct rq_list req_list;
 
--- 
-Jens Axboe
+This change as commit a3396b99990d ("block: add a rq_list type") in
+next-20241114 causes errors when CONFIG_BLOCK is disabled because the
+definition of 'struct rq_list' is under CONFIG_BLOCK. Should it be moved
+out?
+
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 00212e96261a..a1fd0ddce5cf 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1006,12 +1006,12 @@ extern void blk_put_queue(struct request_queue *);
+ 
+ void blk_mark_disk_dead(struct gendisk *disk);
+ 
+-#ifdef CONFIG_BLOCK
+ struct rq_list {
+ 	struct request *head;
+ 	struct request *tail;
+ };
+ 
++#ifdef CONFIG_BLOCK
+ /*
+  * blk_plug permits building a queue of related requests by holding the I/O
+  * fragments for a short period. This allows merging of sequential requests
+
+>  	bool need_ts;
+>  	void (*complete)(struct io_comp_batch *);
+>  };
