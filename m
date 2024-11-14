@@ -1,112 +1,169 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869518F62;
-	Thu, 14 Nov 2024 13:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A0A1CABA;
+	Thu, 14 Nov 2024 13:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731591021; cv=none; b=tdaOEieY9S2AEUkDVe4S2ZBkXzZlIDUWohT8pCYD7uWaW3szyt9HJxb1t68SL+/ASYYsoVE7tetrwnqZuvBZXMdVIjNNYPLGwtsGwz2j+JRfSL7/cegUWH/4nLlMg070DUEdRTNYAKIvZT3URhMpr8f1/BEan4HPqUjMY5ntdoY=
+	t=1731592084; cv=none; b=HzGVz7Xwvx630gKfhlzcxmcwBnLQbeUPJMjji464FqIvZaMPP+c+LYqZ4Z38hgLAzVPkHty5a506eG06E2kUac58FwGIzWbTLDOWl7wydlYE6ZPu0uc3ltqoQ0PVYGqTxjA+GUM1ataO0c7KokoSEHHo3BY5XHemsSNKoEdSHdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731591021; c=relaxed/simple;
-	bh=9WziBDbWuCJavDfebCiGijovNr2dEkFb5dOslEqLDxA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=igL1OHI8dEBaKhskqo37kH25c3yEKTWH9Bcsb/7O/owj1gNPiTxqADyB7J0gyv48Q4Sraa+R2+2eiSliAYG2zGAU6mvwS3u8jDhnTrdbAXrZ89cDLzgwNEPwjZDiEbvjGIdJK9DgZuNLTXfKWbL+5RDxBc50qjlwF73bVydKVus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lrph4l+r; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731592084; c=relaxed/simple;
+	bh=Sz/HCjWcHw2fNUUcTFPW8cNaSdfsidSlAYnDLaTLs1A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FK1LxcUqb226FnOlKGKVuHOftyMMSdyjNPFUmIQbYTbi7RXIa5xBffkh1bQJWebwxdt949InGLbJzBSTa0+i99GYCbo8KV199y1D2V81hjfFA6Krt6z1Unm/UR2M691fU1B/OrT1s8bkriqTPZQkAFpS5X2OKfbr6oEsR4qs7Gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gbU7YX0a; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qwKLoy/i; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gbU7YX0a; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qwKLoy/i; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lrph4l+r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3201DC4CED4;
-	Thu, 14 Nov 2024 13:30:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731591020;
-	bh=9WziBDbWuCJavDfebCiGijovNr2dEkFb5dOslEqLDxA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lrph4l+r9SSW6Ri0yQO/ArvA5mrKpwgqxbiicodwQYX0FHUkW5FS5KI2v/78sx87r
-	 p73mV8BzATegMAtr83CJrFyMrRrUdKqASvhJn+r/yI9rHIO/4m6KxV76EsYSPZym8j
-	 VCUAgoN110ZQL9l00tP/BN7Gz6BdDwpinKAfJ5LBDL4OFafqxyWJ/CbeoUse2vhBTY
-	 7r9HCx2mL1JQWljOWXFrKyW5/bkepvwmWx/DOITJk+lWy0E+U9MdlrCzr5QlTRbtNH
-	 cX9+7de7U+/FfUqKiffWcA7DkZOnNhx55wm/AhHYvudtAa9MVpYv9xmRDGbaVy8rhH
-	 0cpO1PSEk8NLA==
-Date: Thu, 14 Nov 2024 15:30:11 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Robin Murphy <robin.murphy@arm.com>, Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>, ill Deacon <will@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v3 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241114133011.GA606631@unreal>
-References: <cover.1731244445.git.leon@kernel.org>
- <20241112072040.GG71181@unreal>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gbU7YX0a";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qwKLoy/i";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gbU7YX0a";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qwKLoy/i"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 6C1C41F395;
+	Thu, 14 Nov 2024 13:48:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1731592080; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DUjIzgo1/q6wmPt3j3IRmdHoMb98/6oVGe67aiYYv/I=;
+	b=gbU7YX0aK2DMwfWKyI22wCpxlAylAYGuTj34yv87OtWi0JQa5xVU4nagYes3DJtflsYwhm
+	t0rxqEkk4fqZS7erDiOpXHQvt+5NcYJbJuKmSjG3xwVfD9PCyxjPz/MIRQE6jD9CU4Z/le
+	051p6wEuWrSI5kZo8LAbUa6kUOOFyF8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1731592080;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DUjIzgo1/q6wmPt3j3IRmdHoMb98/6oVGe67aiYYv/I=;
+	b=qwKLoy/iki4X6i7WkAROAZFROb4gIdq0hloTOI6CBRu4QQYOz5Lc6DJz8lYL/4/35wFhHX
+	yuTdmpUbPyrQrXBw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=gbU7YX0a;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="qwKLoy/i"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1731592080; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DUjIzgo1/q6wmPt3j3IRmdHoMb98/6oVGe67aiYYv/I=;
+	b=gbU7YX0aK2DMwfWKyI22wCpxlAylAYGuTj34yv87OtWi0JQa5xVU4nagYes3DJtflsYwhm
+	t0rxqEkk4fqZS7erDiOpXHQvt+5NcYJbJuKmSjG3xwVfD9PCyxjPz/MIRQE6jD9CU4Z/le
+	051p6wEuWrSI5kZo8LAbUa6kUOOFyF8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1731592080;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DUjIzgo1/q6wmPt3j3IRmdHoMb98/6oVGe67aiYYv/I=;
+	b=qwKLoy/iki4X6i7WkAROAZFROb4gIdq0hloTOI6CBRu4QQYOz5Lc6DJz8lYL/4/35wFhHX
+	yuTdmpUbPyrQrXBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 358B013794;
+	Thu, 14 Nov 2024 13:48:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id R/KdDJD/NWe7ZQAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 14 Nov 2024 13:48:00 +0000
+Message-ID: <7ccc2ab3-4f04-4c4f-abc5-cb3d7a393031@suse.de>
+Date: Thu, 14 Nov 2024 14:47:59 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241112072040.GG71181@unreal>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 2/8] fs/mpage: avoid negative shift for large blocksize
+To: Matthew Wilcox <willy@infradead.org>, Luis Chamberlain <mcgrof@kernel.org>
+Cc: hch@lst.de, david@fromorbit.com, djwong@kernel.org,
+ john.g.garry@oracle.com, ritesh.list@gmail.com, kbusch@kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-mm@kvack.org, linux-block@vger.kernel.org, gost.dev@samsung.com,
+ p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com,
+ Hannes Reinecke <hare@kernel.org>
+References: <20241113094727.1497722-1-mcgrof@kernel.org>
+ <20241113094727.1497722-3-mcgrof@kernel.org>
+ <ZzSygjfVvyrV1jy6@casper.infradead.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <ZzSygjfVvyrV1jy6@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 6C1C41F395
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[lst.de,fromorbit.com,kernel.org,oracle.com,gmail.com,vger.kernel.org,kvack.org,samsung.com,pankajraghav.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:email,suse.de:dkim,suse.de:mid]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -3.01
+X-Spam-Flag: NO
 
-On Tue, Nov 12, 2024 at 09:20:40AM +0200, Leon Romanovsky wrote:
-> On Sun, Nov 10, 2024 at 03:46:47PM +0200, Leon Romanovsky wrote:
+On 11/13/24 15:06, Matthew Wilcox wrote:
+> On Wed, Nov 13, 2024 at 01:47:21AM -0800, Luis Chamberlain wrote:
+>> +++ b/fs/mpage.c
+>> @@ -181,7 +181,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+>>   	if (folio_buffers(folio))
+>>   		goto confused;
+>>   
+>> -	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
+>> +	block_in_file = (sector_t)(((loff_t)folio->index << PAGE_SHIFT) >> blkbits);
 > 
-> <...>
+> 	block_in_file = folio_pos(folio) >> blkbits;
+> ?
 > 
-> > ----------------------------------------------------------------------------
-> > The code can be downloaded from:
-> > https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git tag:dma-split-nov-09
+>> @@ -527,7 +527,7 @@ static int __mpage_writepage(struct folio *folio, struct writeback_control *wbc,
+>>   	 * The page has no buffers: map it to disk
+>>   	 */
+>>   	BUG_ON(!folio_test_uptodate(folio));
+>> -	block_in_file = (sector_t)folio->index << (PAGE_SHIFT - blkbits);
+>> +	block_in_file = (sector_t)(((loff_t)folio->index << PAGE_SHIFT) >> blkbits);
 > 
-> <...>
-> 
-> > 
-> > Christoph Hellwig (6):
-> >   PCI/P2PDMA: Refactor the p2pdma mapping helpers
-> >   dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
-> >   iommu: generalize the batched sync after map interface
-> >   iommu/dma: Factor out a iommu_dma_map_swiotlb helper
-> >   dma-mapping: add a dma_need_unmap helper
-> >   docs: core-api: document the IOVA-based API
-> > 
-> > Leon Romanovsky (11):
-> >   dma-mapping: Add check if IOVA can be used
-> >   dma: Provide an interface to allow allocate IOVA
-> >   dma-mapping: Implement link/unlink ranges API
-> >   mm/hmm: let users to tag specific PFN with DMA mapped bit
-> >   mm/hmm: provide generic DMA managing logic
-> >   RDMA/umem: Store ODP access mask information in PFN
-> >   RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
-> >     linkage
-> >   RDMA/umem: Separate implicit ODP initialization from explicit ODP
-> >   vfio/mlx5: Explicitly use number of pages instead of allocated length
-> >   vfio/mlx5: Rewrite create mkey flow to allow better code reuse
-> >   vfio/mlx5: Enable the DMA link API
-> 
-> Robin,
-> 
-> All technical concerns were handled and this series is ready to be merged.
-> 
-> Robin, can you please Ack the dma-iommu patches?
+> Likewise.
 
-I don't see any response, so my assumption is that this series is ready
-to be merged. Let's do it this cycle and save from us the burden of
-having dependencies between subsystems.
+Yeah. /me not being able to find proper macros ...
 
-Thanks
+Cheers,
 
-> 
-> Thanks
-> 
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
