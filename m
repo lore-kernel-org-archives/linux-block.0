@@ -1,122 +1,112 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F62C383A5;
-	Thu, 14 Nov 2024 13:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869518F62;
+	Thu, 14 Nov 2024 13:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731589738; cv=none; b=mbkr9fiN/Bt21Hv5zxsEBStPBnq4ufRkPuMwsxhexfA8+M96BdCYJHN0WVlHX+6YfPY9EdYhk/n9sYkH5XciK8BXspXvH+G0PiFTm0bUdH6Bpl6KQ9dajJuLHzCTeL8heHsa8HC1NLX0CkF74Ug8Y8NEefjQo/GAhRyQCAq7eWg=
+	t=1731591021; cv=none; b=tdaOEieY9S2AEUkDVe4S2ZBkXzZlIDUWohT8pCYD7uWaW3szyt9HJxb1t68SL+/ASYYsoVE7tetrwnqZuvBZXMdVIjNNYPLGwtsGwz2j+JRfSL7/cegUWH/4nLlMg070DUEdRTNYAKIvZT3URhMpr8f1/BEan4HPqUjMY5ntdoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731589738; c=relaxed/simple;
-	bh=WUKBai31hAzwn/m1gNuyFpU6gULUok9qnIuRCm88kKo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EqwbKWNftD7tGZxWJjmWtTYwCn0CARjWk5kQmnWsyK/ehXoVbiHWpawAt5qG3TkE+NYd4+ctqaDqIGG8DzJUQWMPfDATQ06ms1JqwgvKclvlo7ZlYmmdl942geU/iQz08kLWXkMpACjnPTGTIZwzXIiSxewvB8rv+w2IP0X0EHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bhlu/LAI; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731591021; c=relaxed/simple;
+	bh=9WziBDbWuCJavDfebCiGijovNr2dEkFb5dOslEqLDxA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=igL1OHI8dEBaKhskqo37kH25c3yEKTWH9Bcsb/7O/owj1gNPiTxqADyB7J0gyv48Q4Sraa+R2+2eiSliAYG2zGAU6mvwS3u8jDhnTrdbAXrZ89cDLzgwNEPwjZDiEbvjGIdJK9DgZuNLTXfKWbL+5RDxBc50qjlwF73bVydKVus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lrph4l+r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bhlu/LAI"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5cf7aadc8b7so542792a12.1;
-        Thu, 14 Nov 2024 05:08:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731589735; x=1732194535; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iLSvMAcvDMJIHYqWDlKkrua+nGTltpWcxj1L4JSgD7A=;
-        b=Bhlu/LAIBozgcuMLyrTgWYLS+qlVKYhm42qLcBefvho+QMwAmh5WA40kYjw81kSmwE
-         k5HbBXUfwcCZnooNi+qBf9Drzy5Djh3zYo+ofPZMV8+1O36kSlONYw4FuPAHDPFMRSqk
-         u8zAbDozzx/RJYgbDomRqaHT9EjUKwO+b5eH03wYYCLrBvYuxK37huiogVmWALocb5el
-         tx8LyrfTMXm1wjz8IFy4Zeamkv3/HsePCuHoS2Q8Y/bFnhUunzV2Vdg46uwZjq4VJfbS
-         nXBWjmR/C6lUQC+Df8XBuDCgWXA3b7f4QF+1cAuRy1LoBfdAT0+bC++K6AzxDvWNw3Uj
-         a5dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731589735; x=1732194535;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iLSvMAcvDMJIHYqWDlKkrua+nGTltpWcxj1L4JSgD7A=;
-        b=V/B2gRSjtISH8aJjDm2+Yx6/X9z8eoL5jDcMl/CyGngp5lkyeYhb1Spb1TNmf911Ez
-         HYb0FWc+7+RGvajxIdKwPe+0LBXLQi+W7/PN0vC88mpug+e9ax3e3qa21k1usNvKPyec
-         4s9UAyRuPoj1s8+C8c6TLaGS9KFJtMYW8GXtCP17tkWNAKy3prQsFiG5yTgUzaDqZ4/8
-         SAD9JEWz0Mbmezb45nRhsa5LWAKOr9zr5LPb2ABrMqGNT8WtgNQdklb3L4tCqKInnLYl
-         ME4r1k2istQ/GPJcdmAyuONe2vK+ngdqUL1lp+BEPm24paanzv1mi4ECeqQAJNRDBsqS
-         UkWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUSiIOICyve6Zch3nV0563caVznJYIteyPMaf64v0vCuPMb2l7OseuAE92dq0YBDJMOgttxxrq7B5AR8w==@vger.kernel.org, AJvYcCUy8lrJsRMow/vK3jQSt1jOaAoS6A0z/yiPuOppMzYjGb/Zdmi16wKc0287ecE5pDEjotgRHfSWSg==@vger.kernel.org, AJvYcCWcWxLblQwPe2wQycBtkD8Kjmgd+wbTxRRonfOG2Odx0DRJ1Gk2c0/cD/rL8CbfzFCnHkQ4HuMfpMHrTosh4Q==@vger.kernel.org, AJvYcCXqq5stGN+PmI5JDVIJDfUqdkVgeM0sFwodxAMeqrcZGyHWAQB0+TuJt18gPcDVdNgQhqQxhJWNgdkVRZI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEDx45WVfU63vEpHOxReAcimzNXgaHZGLGK+vPeEuWC0F/dUrZ
-	EXGevJPAYHm+pwoWxlloL2lr1jgGG4CFIna6fKRkSA83M62seVj1
-X-Google-Smtp-Source: AGHT+IHYWjN5l6K2Kq+RrDtUeiT+m7+vJWueNPIn3tnYMxsQbh1CD6IGXJhFROExTaUr6np+BDJm2A==
-X-Received: by 2002:a17:907:930e:b0:a9a:67aa:31f5 with SMTP id a640c23a62f3a-aa1f8038e76mr646269466b.10.1731589734544;
-        Thu, 14 Nov 2024 05:08:54 -0800 (PST)
-Received: from [192.168.42.163] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20e0812aesm60676366b.176.2024.11.14.05.08.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2024 05:08:54 -0800 (PST)
-Message-ID: <3fa101c9-1b38-426d-9d7c-8ed488035d4a@gmail.com>
-Date: Thu, 14 Nov 2024 13:09:44 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lrph4l+r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3201DC4CED4;
+	Thu, 14 Nov 2024 13:30:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731591020;
+	bh=9WziBDbWuCJavDfebCiGijovNr2dEkFb5dOslEqLDxA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lrph4l+r9SSW6Ri0yQO/ArvA5mrKpwgqxbiicodwQYX0FHUkW5FS5KI2v/78sx87r
+	 p73mV8BzATegMAtr83CJrFyMrRrUdKqASvhJn+r/yI9rHIO/4m6KxV76EsYSPZym8j
+	 VCUAgoN110ZQL9l00tP/BN7Gz6BdDwpinKAfJ5LBDL4OFafqxyWJ/CbeoUse2vhBTY
+	 7r9HCx2mL1JQWljOWXFrKyW5/bkepvwmWx/DOITJk+lWy0E+U9MdlrCzr5QlTRbtNH
+	 cX9+7de7U+/FfUqKiffWcA7DkZOnNhx55wm/AhHYvudtAa9MVpYv9xmRDGbaVy8rhH
+	 0cpO1PSEk8NLA==
+Date: Thu, 14 Nov 2024 15:30:11 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Robin Murphy <robin.murphy@arm.com>, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Joerg Roedel <joro@8bytes.org>, ill Deacon <will@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v3 00/17] Provide a new two step DMA mapping API
+Message-ID: <20241114133011.GA606631@unreal>
+References: <cover.1731244445.git.leon@kernel.org>
+ <20241112072040.GG71181@unreal>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 06/11] io_uring: introduce attributes for read/write
- and PI support
-To: Christoph Hellwig <hch@lst.de>, Anuj Gupta <anuj20.g@samsung.com>
-Cc: axboe@kernel.dk, kbusch@kernel.org, martin.petersen@oracle.com,
- anuj1072538@gmail.com, brauner@kernel.org, jack@suse.cz,
- viro@zeniv.linux.org.uk, io-uring@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
- gost.dev@samsung.com, linux-scsi@vger.kernel.org, vishak.g@samsung.com,
- linux-fsdevel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-References: <20241114104517.51726-1-anuj20.g@samsung.com>
- <CGME20241114105405epcas5p24ca2fb9017276ff8a50ef447638fd739@epcas5p2.samsung.com>
- <20241114104517.51726-7-anuj20.g@samsung.com> <20241114121632.GA3382@lst.de>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20241114121632.GA3382@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241112072040.GG71181@unreal>
 
-On 11/14/24 12:16, Christoph Hellwig wrote:
-> On Thu, Nov 14, 2024 at 04:15:12PM +0530, Anuj Gupta wrote:
->> PI attribute is supported only for direct IO. Also, vectored read/write
->> operations are not supported with PI currently.
+On Tue, Nov 12, 2024 at 09:20:40AM +0200, Leon Romanovsky wrote:
+> On Sun, Nov 10, 2024 at 03:46:47PM +0200, Leon Romanovsky wrote:
+> 
+> <...>
+> 
+> > ----------------------------------------------------------------------------
+> > The code can be downloaded from:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git tag:dma-split-nov-09
+> 
+> <...>
+> 
+> > 
+> > Christoph Hellwig (6):
+> >   PCI/P2PDMA: Refactor the p2pdma mapping helpers
+> >   dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
+> >   iommu: generalize the batched sync after map interface
+> >   iommu/dma: Factor out a iommu_dma_map_swiotlb helper
+> >   dma-mapping: add a dma_need_unmap helper
+> >   docs: core-api: document the IOVA-based API
+> > 
+> > Leon Romanovsky (11):
+> >   dma-mapping: Add check if IOVA can be used
+> >   dma: Provide an interface to allow allocate IOVA
+> >   dma-mapping: Implement link/unlink ranges API
+> >   mm/hmm: let users to tag specific PFN with DMA mapped bit
+> >   mm/hmm: provide generic DMA managing logic
+> >   RDMA/umem: Store ODP access mask information in PFN
+> >   RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
+> >     linkage
+> >   RDMA/umem: Separate implicit ODP initialization from explicit ODP
+> >   vfio/mlx5: Explicitly use number of pages instead of allocated length
+> >   vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+> >   vfio/mlx5: Enable the DMA link API
+> 
+> Robin,
+> 
+> All technical concerns were handled and this series is ready to be merged.
+> 
+> Robin, can you please Ack the dma-iommu patches?
 
-And my apologies Anuj, I've been busy, I hope to take a look
-at this series today / tomorrow.
+I don't see any response, so my assumption is that this series is ready
+to be merged. Let's do it this cycle and save from us the burden of
+having dependencies between subsystems.
 
-> Eww.  I know it's frustration for your if maintainers give contradicting
-> guidance, but this is really an awful interface.  Not only the pointless
+Thanks
 
-Because once you placed it at a fixed location nothing realistically
-will be able to reuse it. Not everyone will need PI, but the assumption
-that there will be more more additional types of attributes / parameters.
-
-With SQE128 it's also a problem that now all SQEs are 128 bytes regardless
-of whether a particular request needs it or not, and the user will need
-to zero them for each request.
-
-The discussion continued in the v6 thread, here
-
-https://lore.kernel.org/all/20241031065535.GA26299@lst.de/T/#m12beca2ede2bd2017796adb391bedec9c95d85c3
-
-and a little bit more here:
-
-https://lore.kernel.org/all/20241031065535.GA26299@lst.de/T/#mc3f7a95915a64551e061d37b33a643676c5d87b2
-
-> indirection which make the interface hard to use, but limiting it to
-> not support vectored I/O makes it pretty useless.
-
-I'm not sure why that's the case and need to take a look), but I
-don't immediately see how it's relevant to that part of the API. It
-shouldn't really matter where the main PI structure is located, you
-get an iovec pointer and code from there wouldn't be any different.
-
-> I guess I need to do a little read-up on why Pavel wants this, but
-> from the block/fs perspective the previous interface made so much
-> more sense.
-
--- 
-Pavel Begunkov
+> 
+> Thanks
+> 
