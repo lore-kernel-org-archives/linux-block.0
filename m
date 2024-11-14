@@ -1,73 +1,110 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118E7126C03;
-	Thu, 14 Nov 2024 17:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77761A7AF6
+	for <linux-block@vger.kernel.org>; Thu, 14 Nov 2024 19:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731603774; cv=none; b=l4GlxCOB0X8dzK6SiBc+myppYKIp1VTn7jhuGDmAUBPbvZvvWMwh1OaYS/Ma0FrUQxk6EIxPA1vx4eRJN2BpEUSAE2wjhU8dLt2FQFOxhPrJluZrRA/eh+lxAeEBi358u5bYbhAvIUaMjd//0MSh/xiBF1gbugIGqPBhGfgC0ic=
+	t=1731614373; cv=none; b=bncNvVC9xR+WbAR58c7lrTaDWctz+3NjK0JayfRL7lYZvy0EkEwlpTavNUOwBAYfMrLx1dPS7bmF8AhIdZcrNm3KuK7uFchWh7B6EZF57bjY/lt8b7Rxczh0Volmaj7bnC9XbaesO7E/qgIhKDvN5JH6BqRVx2r/ZQD47JWv7H8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731603774; c=relaxed/simple;
-	bh=36OSqPoAQyVIULHWPhuhVBJ+iSHV5/kk5o+So/6AzXs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jOEKx1njhCp0EuP66mEtEnZH17Wj2uaQEjaZDeITbB6fJjgO/3trOVgjb/mREhysx9tNIoVj+Ep0DvWnIvsEiyiPjWt0dsR4g5zabiEYmDrHTLgb7DQwpcApsoGWD8TWSYc/Q2CGWL0Dc+YZY6k/GfCddR1baEkSoxQ+aws9Hzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 51BBB68C7B; Thu, 14 Nov 2024 18:02:47 +0100 (CET)
-Date: Thu, 14 Nov 2024 18:02:47 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Robin Murphy <robin.murphy@arm.com>,
-	Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>, ill Deacon <will@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v3 00/17] Provide a new two step DMA mapping API
-Message-ID: <20241114170247.GA5813@lst.de>
-References: <cover.1731244445.git.leon@kernel.org> <20241112072040.GG71181@unreal> <20241114133011.GA606631@unreal> <20241114163622.GA3121@lst.de> <20241114164823.GB606631@unreal>
+	s=arc-20240116; t=1731614373; c=relaxed/simple;
+	bh=H287lDYthdc77qSw5Z5/Phmq0rtxNLmCcq1CkVNWHj8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BdPdLBrRhkKzzg9o8j8xfpmXxks9IvKqDrZRJgnH35mMfk+frGat0EkHscffUcB9KKj7NA/qA5YtKWO9Ae5KDdQzzujYAb0qEK7YqM53Tkh2+KLTLXU3UkfGN3LHhFGSEzGTdopRt4TjjM8zFLdOSUZgJr+8PltxUg89Pru2XNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YthmldjE; arc=none smtp.client-ip=209.85.161.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YthmldjE"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5ebc52deca0so549110eaf.3
+        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2024 11:59:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1731614370; x=1732219170; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fkFjS2wPJFkqdQm4cnKrH9Ovi0c7v3pS/9u3vIqGMDM=;
+        b=YthmldjE8fcn/KsTGQ1YDd2SXqNgZmzwg2dBUE4WaE5zizJ5eqVzSxjFa/QOCTn9Nl
+         nM1AADWYnpr9+7x5NfO2tCxUQhsD8QRw2Vu5dfcEMht4GQon/29upkszLwQ1ifZswegL
+         RVBN7hKXW9+OnAaVbM9qAezsfl09aqiNTVD0ejensa4phB1H2WJ5lfrhWCKrRblgQpQS
+         RsyhzmmRO/veIUlZMaxnSJcwDmOdBX2X35ycJ5f8JnTq/PAhFl2L4fkEn22ECyXgtuDF
+         35kldiYBRw+Lzh0rupQ23kNQ9YsT9ktU09v+zVSSUSLeaup1CvxnKHgjWLBxDVbIj0Vj
+         /21Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731614370; x=1732219170;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fkFjS2wPJFkqdQm4cnKrH9Ovi0c7v3pS/9u3vIqGMDM=;
+        b=QBAbsIamgijzH9Uawew3lyMdeiDXJ0UmKX2O6Q/P4gUdFqlq3pY7+27j0LE4Ac/DFd
+         qjPYw8VnJ6tPyRHAs+XgVG0ZSkw4RXAaxMXdHeeRC1P/rqsHN2m9BaGwOcaoy9WlaNd5
+         PuaHQpCn0H8INtu3Cl5tX1t20bAkhKRLui+3vajKLPDwYc8hW37llJOzxDB72Bs8/VBM
+         G9LdN8DBWCBG9v3Pol33yKaGxtzweddm3U0SjxsPvqBoEnodmarhp1V+ohA65JORqLTP
+         4tfS8we7+kl5snzt2dx9GacCiRs9lj6ssYC2SZYPMssKPRomPDL9Vg0vwvkpFuYMBrXS
+         JEmw==
+X-Forwarded-Encrypted: i=1; AJvYcCU7sD7vfjt/MEpsboVrnZK+1nJesXbvd7Fd83+CBOwlmo/boakSCQPJiREeXcBysijGq91Rk3F2ZS50cQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwL9m9gaoMm0AlySPlIUH6cCz00pXbTD2wPR0kYAH2uIGaAuyLK
+	EoAY5FdG0X/7V7tCxY8sLnegIDMgP0hTj/KiJHahIRNVMQmiJplrvCrqh3dPTmk=
+X-Google-Smtp-Source: AGHT+IGYhSYu010tZ5icXn0iop521N+VU/nDnRxmg9olvNYFuvdTUYp7rwb3W1+U+IQY2nDuJqyK5w==
+X-Received: by 2002:a05:6820:3107:b0:5eb:8488:c80b with SMTP id 006d021491bc7-5eeab4d76a1mr159546eaf.6.1731614369724;
+        Thu, 14 Nov 2024 11:59:29 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5eea0120029sm586318eaf.16.2024.11.14.11.59.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2024 11:59:28 -0800 (PST)
+Message-ID: <4ee9df47-c84e-44ca-9ab6-f655bfda7481@kernel.dk>
+Date: Thu, 14 Nov 2024 12:59:27 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241114164823.GB606631@unreal>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: add larger order folio instead of pages for
+ passthrough I/O
+To: Christoph Hellwig <hch@lst.de>, Chinmay Gameti <c.gameti@samsung.com>
+Cc: kbusch@kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, joshi.k@samsung.com, anuj20.g@samsung.com,
+ nj.shetty@samsung.com, kundan.kumar@samsung.com, gost.dev@samsung.com
+References: <CGME20241114140134epcas5p3474e82266c4c117919a920d1dd4ed410@epcas5p3.samsung.com>
+ <20241114135335.21327-1-c.gameti@samsung.com> <20241114161744.GA2078@lst.de>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241114161744.GA2078@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 14, 2024 at 06:48:23PM +0200, Leon Romanovsky wrote:
-> It is fine, but as a bare minimum, I would expect some sort of response,
-> so I won't sit and wait for unknown date when this API will be acknowledged/NACKed.
+On 11/14/24 9:17 AM, Christoph Hellwig wrote:
+>> @@ -313,21 +314,35 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+>>  		if (unlikely(offs & queue_dma_alignment(rq->q)))
+>>  			j = 0;
+>>  		else {
+>> -			for (j = 0; j < npages; j++) {
+>> +			for (j = 0; j < npages; j += num_pages) {
+>>  				struct page *page = pages[j];
+>> -				unsigned int n = PAGE_SIZE - offs;
+>> +				struct folio *folio = page_folio(page);
+>>  				bool same_page = false;
+>>  
+>> -				if (n > bytes)
+>> -					n = bytes;
+>>  
+>> -				if (!bio_add_hw_page(rq->q, bio, page, n, offs,
+>> -						     max_sectors, &same_page))
+>> +				folio_offset = ((size_t)folio_page_idx(folio,
+>> +						page) << PAGE_SHIFT) + offs;
 > 
-> I would like to start to work on next step, e.g removing SG from RDMA,
-> and I need to know if this foundation is stable to do so.
-> 
-> > 
-> > No changs to dma-iommu.c are going to get merged without an explicit
-> > ACK from Robin, and while there is no 100% for the core dma-mapping
-> > code I will also not merge anything that hasn't been resolved with
-> > my most trusted reviewer first, not even code I wrote myself.
-> 
-> And do you know what is not resolved here? I don't.
-> All technical questions/issues were handled.
+> I'm not sure if Jens want to rush something like this in for 6.13, but if
+> we're aiming for the next merge window I actually have a 3/4 done series
+> that rips out bio_add_hw_page and all the passthrough special casing by
+> simply running the 'do we need to split the bio' helper on the free-form
+> bio and return an error if we do.  That means all this code will go away,
+> and you'll automatically get all the work done for the normal path for
+> passthrough as well.
 
-Let's just wait a little bit, we're all overworked can't instantly
-context switch.
+I'd rather it simmer a bit first, so I'd say we have time since 6.13 is
+coming up really soon.
 
+-- 
+Jens Axboe
