@@ -1,60 +1,72 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7411DE3B7
-	for <linux-block@vger.kernel.org>; Thu, 14 Nov 2024 09:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EFA91DE4EF
+	for <linux-block@vger.kernel.org>; Thu, 14 Nov 2024 09:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731575051; cv=none; b=gyWDX4IJck6dd7OqF+L0dMOI//Kk4xXJAoDnM4M+ecR7lJLXxrawAdzwFLORNzyuKIsFaejFSLyYW6OLlVOGHgHhsanqyOiJrsFEX52uzWGp2av3w4P111E2eOWp/3L/k5NJ5ewcBsKNiYmEXveOk3IA1z7MdNNTKvLJdm4faeg=
+	t=1731575571; cv=none; b=Nul51hqZPjx02c00/WNzSRWYKOyUquwyMfUUNyfisgWhuLZCogfUnzARn9ffkXE2459vFG3m7g08SLVa5cGSVXph0e/AVFUl0S5s5i1FVe/FSDMNePCUTEe0inVAn+YA05moAG+wysJ7OQp2pPl2bqY+BsXXuYkJ0JTR12OSxTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731575051; c=relaxed/simple;
-	bh=6OL4FN7RRsvRwUk0jgnXvoAGwSh/EBTDB24Wpww0tZ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=oyAiR9zC4tChYpxEtkCdNtu/Rz/B13tDeMTWC/yMY1mJhHDy9AA1QK4naLjJKSqKyJRLq3sSsnStJDjOFSw+pcxOjIQdV7em+tNbs9B7lihcDEIpFk2y8+Jf0D27NSqgwS3Sym5gD4vQyPdQAw9xiFSDrkB3JTJ6weSbBXPereE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ydDZ89Pn; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1731575571; c=relaxed/simple;
+	bh=N0g9gDjfqfeeGTpqurtN6ckhCy5ueudC6uPPkK5E3lg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nSPe87gLNYLQRMVz/n8fb3XznyjxpNeNtd/MBl/YKkbH0lfbcX5xZHIEtTrT35xMZgj9qRXLdx2yNVZIh5cqoQ2IjblfhO39BY6/1CXUiS95Muf6oL3xmw06PElOzJ5mwzTTSbOO5EjCJWayTCRrcuzzl5PbCrW/1pycMRtzimg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OQzH16+3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ydDZ89Pn"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4315eac969aso1735085e9.1
-        for <linux-block@vger.kernel.org>; Thu, 14 Nov 2024 01:04:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731575048; x=1732179848; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sVh/3yk6A2AkZ7Fy/8aicvKmMgfUMp6OC0s3QwciX74=;
-        b=ydDZ89PnBjcogfpf3JGbK2LDecpyzTrl8Iki4q6HOkDZ52/UZD1XEsA2oCgnScx1w4
-         duKgDJmz1DrW301HiRaFjlsC8rrZBw1G0FiKfnH9bd8Z+MqmgreL9GVTnOlOK/btb9kA
-         IcejCqJ8y4LgR1QfgijBCs4fCNRWBjfs76vfejeFpazfwNtjbCPlOgYFc9hKUz1VsN9t
-         2RWTtpPgq1M8ssjTZp00CFVMESTR2sY8R/Ty6XQlzPg3tiGOtH82csYvuDJjQO1RQW43
-         piBzdCxLGK9Y6ASAzCHXBi9AMTtquiw9MqbV7Lbtgk2fZnrxP+F/apcRgXlscO/GHpre
-         15IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731575048; x=1732179848;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sVh/3yk6A2AkZ7Fy/8aicvKmMgfUMp6OC0s3QwciX74=;
-        b=TokCqRpzRlpAberr+tzGxCiikr6DeXNlH2GMTFBkQgu+jtYEIpRPVXGDU6MQGgIwMc
-         C9ft8wXAMBHz0nGbTAttkFsWzF9Q/tYxDBW7N5KAzKXlCJF5By+lvwc34T84KVH2ZNO/
-         Y8WVv3R0w4iQRjj9ehZv5KQp0pdapI8yD7eZXCpIrcckXBKEEt8KYYXqsYyHpPcmeSJc
-         8rb59y7pncKcRjGCBM0zOAgrM5tbgI1ZN8YbZiORvHzU4CUeQArrikXAM3Ms+JtyQiRl
-         +hspxPshK70UJ7LLJb9/fE2VYJ0SaRG73WPhdjCRmaLPbN+fbN3MUwBY8X0p6Mo/kwuG
-         1swA==
-X-Gm-Message-State: AOJu0YyipnoOmDin3anMRzJm6myZBIKQdON/651fdxxcLUMO6+7jFiHP
-	/4uTtppuHEzzoE6sbX3mhpO7HkUdaRpSZnQ8tl+84vmPh+tOKnXXRhDZCY+vcgA=
-X-Google-Smtp-Source: AGHT+IGWtleMMmdPaBw+8o5vdj0RC/3nuotKjeFNscva1QkcEtVt56O5mnXkgYTZbYAWyyVFxdfm0w==
-X-Received: by 2002:a05:600c:548b:b0:42c:b54c:a6d7 with SMTP id 5b1f17b1804b1-432d9767d80mr22856575e9.14.1731575048465;
-        Thu, 14 Nov 2024 01:04:08 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dac0ae5csm12893155e9.32.2024.11.14.01.04.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Nov 2024 01:04:08 -0800 (PST)
-Date: Thu, 14 Nov 2024 12:04:03 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org
-Subject: [bug report] block: remove the write_hint field from struct request
-Message-ID: <fff0e493-fc11-4ea1-a75e-454d052d23e5@stanley.mountain>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OQzH16+3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731575569;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uoMm+2i8TmKTGQpX50eO3uTG52uiWMzmm9/S5ypTMAw=;
+	b=OQzH16+3taTfBWTRo33aCI/Xkte1z8Uq5PkOAoc2j0vRGXZn/H5FZD5LglteCdzocXcAVi
+	V7rWUWgUWBly4LeCJcqbxRM75URawMW9WB5UD83KjyzSUkj5LMoCHjKJ9DyVhc52lkKISu
+	3DHDVYMhOChNzIj+KupCZdarKKM3upA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-117-hb4nU_FsNbGn6R7vUyU_-Q-1; Thu,
+ 14 Nov 2024 04:12:46 -0500
+X-MC-Unique: hb4nU_FsNbGn6R7vUyU_-Q-1
+X-Mimecast-MFC-AGG-ID: hb4nU_FsNbGn6R7vUyU_-Q
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7EA53195609E;
+	Thu, 14 Nov 2024 09:12:42 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.86])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 09DDA19560A3;
+	Thu, 14 Nov 2024 09:12:27 +0000 (UTC)
+Date: Thu, 14 Nov 2024 17:12:22 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Daniel Wagner <dwagner@suse.de>
+Cc: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	John Garry <john.g.garry@oracle.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+	megaraidlinux.pdl@broadcom.com, mpi3mr-linuxdrv.pdl@broadcom.com,
+	MPT-FusionLinux.pdl@broadcom.com, storagedev@microchip.com,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v4 05/10] blk-mq: introduce blk_mq_hctx_map_queues
+Message-ID: <ZzW-9rWvKBxFZU1E@fedora>
+References: <20241113-refactor-blk-affinity-helpers-v4-0-dd3baa1e267f@kernel.org>
+ <20241113-refactor-blk-affinity-helpers-v4-5-dd3baa1e267f@kernel.org>
+ <ZzVZQbZOYhNF08LX@fedora>
+ <9fa26099-1922-4b99-883e-bd5f6c58162a@flourine.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,38 +75,56 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <9fa26099-1922-4b99-883e-bd5f6c58162a@flourine.local>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hello Christoph Hellwig,
+On Thu, Nov 14, 2024 at 08:54:46AM +0100, Daniel Wagner wrote:
+> On Thu, Nov 14, 2024 at 09:58:25AM +0800, Ming Lei wrote:
+> > > +void blk_mq_hctx_map_queues(struct blk_mq_queue_map *qmap,
+> > 
+> > Some drivers may not know hctx at all, maybe blk_mq_map_hw_queues()?
+> 
+> I am not really attach to the name, I am fine with renaming it to
+> blk_mq_map_hw_queues.
+> 
+> > > +	if (dev->driver->irq_get_affinity)
+> > > +		irq_get_affinity = dev->driver->irq_get_affinity;
+> > > +	else if (dev->bus->irq_get_affinity)
+> > > +		irq_get_affinity = dev->bus->irq_get_affinity;
+> > 
+> > It is one generic API, I think both 'dev->driver' and
+> > 'dev->bus' should be validated here.
+> 
+> What do you have in mind here if we get two masks? What should the
+> operation be: AND, OR?
 
-This is a semi-automatic email about new static checker warnings.
+IMO you just need one callback to return the mask.
 
-Commit 61952bb73486 ("block: remove the write_hint field from struct
-request") from Nov 12, 2024, leads to the following Smatch complaint:
+I feel driver should get higher priority, but in the probe() example,
+call_driver_probe() actually tries bus->probe() first.
 
-block/blk-merge.c:1005 blk_rq_merge_ok() warn: variable dereferenced before check 'rq->bio' (see line 994)
+But looks not an issue for this patchset since only hisi_sas_v2_driver(platform_driver)
+defines ->irq_get_affinity(), but the platform_bus_type doesn't have the callback.
 
-block/blk-merge.c
-   993		/* don't merge across cgroup boundaries */
-   994		if (!blk_cgroup_mergeable(rq, bio))
-                                          ^^
-This dereferences rq->bio->
+> 
+> This brings up another topic I left out in this series.
+> blk_mq_map_queues does almost the same thing except it starts with the
+> mask returned by group_cpus_evenely. If we figure out how this could be
+> combined in a sane way it's possible to cleanup even a bit more. A bunch
+> of drivers do
+> 
+> 		if (i != HCTX_TYPE_POLL && offset)
+> 			blk_mq_hctx_map_queues(map, dev->dev, offset);
+> 		else
+> 			blk_mq_map_queues(map);
+> 
+> IMO it would be nice just to have one blk_mq_map_queues() which handles
+> this correctly for both cases.
 
-   995			return false;
-   996	
-   997		/* only merge integrity protected bio into ditto rq */
-   998		if (blk_integrity_merge_bio(rq->q, rq, bio) == false)
-   999			return false;
-  1000	
-  1001		/* Only merge if the crypt contexts are compatible */
-  1002		if (!bio_crypt_rq_ctx_compatible(rq, bio))
-  1003			return false;
-  1004	
-  1005		if (rq->bio) {
-                    ^^^^^^^
-So this check shouldn't be required.
+I guess it is doable, and the driver just setup the tag_set->map[], then call
+one generic map_queues API to do everything?
 
-  1006			/* Don't merge requests with different write hints. */
-  1007			if (rq->bio->bi_write_hint != bio->bi_write_hint)
 
-regards,
-dan carpenter
+Thanks,
+Ming
+
