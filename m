@@ -1,137 +1,106 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205AF1D5CF1
-	for <linux-block@vger.kernel.org>; Fri, 15 Nov 2024 20:25:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727391E570F
+	for <linux-block@vger.kernel.org>; Fri, 15 Nov 2024 20:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731702346; cv=none; b=JETQV0mln0Ng+9YjCNkVmDvLOVtcrQYgBmwwvXrjO8oJwNfzG0R1qFVn17oG5ukej/CT1qYOyuWHg9TW1ZnqUZ3Q54D0S6vafUBq6C2fm8vV5JkeTmQxipi2rxI81XDGPM1RhmPLmlH6bcSYav6Tq8J9hiyTLzqxOPLITntyDuM=
+	t=1731702494; cv=none; b=JQk/mX8jmi79j15xtTSKZnVm2t9bvbWJLpPmAQsrjC6XY3gLd1aOX2Ibrg0epekDtzXJnCF7GmlrPScDCX268uavya/Q1jZ3LzVtdoQIPFidPXC3zsQ4y/ZD8oK4nADOz8aR9CQRoc54CSmItMmEPvkiImoNHdrdsnNNKjxUPaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731702346; c=relaxed/simple;
-	bh=vzB88Ab0K9g7gx/HZQf5Qt3upMzQRUJK5J17p+p5qss=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XIe+QWdZQERcAgwcJzMs2QYpr8BztLCPdBoeO/6oCfGuT6bDZ6ulfDVqGx67cDd4xLjRM1wB5cXndoXhulp0kSwkqBhI+D7ipjzwLtc6Jhl2yOVKAgGwa5OBAB5o8f9QQiezu45y51NWBc3i/QW5tNDhSsK1FqsKN2MLG8TVQBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UjV/O4UL; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1731702494; c=relaxed/simple;
+	bh=qePvXLWELjUn8An+ugcMkT19H++mSExomGGTySH24C8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jtm9aBThJCH0uhWH7PNM4VbkiAxYpNZ42fa6xug9pLmEj/7bHSOoUs6ivnLvCytJWnu/+/M7sFDiK3wyItoankN5f/6SdFbDgnLi3vow8V5oWgt9YPZyUK3WxcTVpYUl9o1/2KLzMm7yflF6J22jp2LQGs+80gXkPJqN1lYMfzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SWZR4g+E; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UjV/O4UL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SWZR4g+E"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731702344;
+	s=mimecast20190719; t=1731702492;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vNLrlgsuyCSQO136ZlOgDlHV4KMR1L8gzLEmcIW3BjM=;
-	b=UjV/O4ULn/idPIrUfunUQExglOjVT2mvMVdD/UGCx9wJ1KeBZHOkLNczn26EwMhfao+RGQ
-	19KDRL5f2GBny0vlNiVWXW/RSBxQ4L7W1grxAhCscZpO+EjbZwV/3ydY4y3zu1nLGSC7+9
-	Se0BoRfJeDns0Q6ky7Ky4c94PPOGync=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-130-4h7YjqTjM0WvTOckCSWGnQ-1; Fri, 15 Nov 2024 15:25:42 -0500
-X-MC-Unique: 4h7YjqTjM0WvTOckCSWGnQ-1
-X-Mimecast-MFC-AGG-ID: 4h7YjqTjM0WvTOckCSWGnQ
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-5eb6275167dso2031370eaf.1
-        for <linux-block@vger.kernel.org>; Fri, 15 Nov 2024 12:25:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731702342; x=1732307142;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vNLrlgsuyCSQO136ZlOgDlHV4KMR1L8gzLEmcIW3BjM=;
-        b=YsEE2Sp7O3pk6m/UUoVIxoxjBjHHQmeu6DPJSfRGYaQ8Nwe0QnDEQHzCUzI3jiGV+W
-         sYtsiKY1HBP/X7k47fQdywoYOKy3x8aGM2Z3L62O/WmncQcllG4tRGGMm+/UF7G/baTM
-         nxVjJQROTQjS93wDqKsOaF5S2WW4+HNxd8ucyuVz4X6mWnzd/UMgMbutuZ6W3H+Emc/6
-         Myd4FSa756dH/hyfHEhg0bKLqW1e8a8HHvCC+oQfdDtLZXKXdMdW6NLZXgVObNeqw0Ox
-         qwEwsgW1MjHsGE3C/ikU/po6OCFKWuRKAKYwMLosJrt8xND27pDoxHqCBQxyBiDm6fJB
-         FD1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW6vxm/+AJ8URAUpxKg3D/sY6oCMfI7cObFhbta6c8psG7FvFQjdLy1sT/iyQUheFK7fOEv2+Mwkzpgdw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+ejyka2/UDblBBdDaEX0a/8euI90K9VbueVy6aSTMJWHhW0JF
-	S5EzTPRXOcX1yB5PFO6KMec6gxFvdlSB+SvYyAewdzz138kUKGHTIygytrMZxfyg4VpGIJzrnsA
-	Rc01f7rG4bh+25LAbCdfCKDUcK8xYgq0Jc6cGw40a4Ylz1guInZj04Lp+Y5BqyTXE3+TzV+kF0T
-	Yox25YQHeEBTEzbvp6yWFwEIu1qYMEvYuZWIY=
-X-Received: by 2002:a05:6871:e085:b0:295:91a0:af1 with SMTP id 586e51a60fabf-2962de09fa0mr4330105fac.19.1731702342157;
-        Fri, 15 Nov 2024 12:25:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHprnkP4mcnKY9AIEZogy1RG7ERmEnfoV7JX0QKAbhQCgxNP7EEumthj14YA/khDgoSXi5sWHjd6wPh6Z6kCCs=
-X-Received: by 2002:a05:6871:e085:b0:295:91a0:af1 with SMTP id
- 586e51a60fabf-2962de09fa0mr4330087fac.19.1731702341911; Fri, 15 Nov 2024
- 12:25:41 -0800 (PST)
+	bh=DjmFRbZ2NKDN+MKMboIHAU8fJcOIo14ejwEod7JVZFM=;
+	b=SWZR4g+E+N9eD7u3tNAdiOxSTTqVrNHkpwT98bCgq11z4PItkZqk1EDit1qJAiP2NAb+Sr
+	5NLCnfJTPjw8PMCzK8SqFPL4OjOwg83ksoyQeOer1TwVQI+f1L/wCMoDHoO2+l0cUnI80h
+	jC4D/fh0lYaVdOQGtgk54++lHxHZbdk=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-582-p-wmdLolMhiCSPd-2Bheew-1; Fri,
+ 15 Nov 2024 15:28:09 -0500
+X-MC-Unique: p-wmdLolMhiCSPd-2Bheew-1
+X-Mimecast-MFC-AGG-ID: p-wmdLolMhiCSPd-2Bheew
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9874519560AF;
+	Fri, 15 Nov 2024 20:28:07 +0000 (UTC)
+Received: from [10.22.81.39] (unknown [10.22.81.39])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 45892195DF81;
+	Fri, 15 Nov 2024 20:28:04 +0000 (UTC)
+Message-ID: <e48b533d-c28a-4e92-b459-74820957ec7d@redhat.com>
+Date: Fri, 15 Nov 2024 15:28:03 -0500
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241108054831.2094883-3-costa.shul@redhat.com> <qlq56cpm5enxoevqstziz7hxp5lqgs74zl2ohv4shynasxuho6@xb5hk5cunhfn>
-In-Reply-To: <qlq56cpm5enxoevqstziz7hxp5lqgs74zl2ohv4shynasxuho6@xb5hk5cunhfn>
-From: Costa Shulyupin <costa.shul@redhat.com>
-Date: Fri, 15 Nov 2024 22:25:05 +0200
-Message-ID: <CADDUTFwYKjbPnzdzQA0ZjW4w3pHBsoZBQ6Ua5QbFp=X2-GfGtQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v1] blk-mq: isolate CPUs from hctx
-To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
-Cc: ming.lei@redhat.com, Jens Axboe <axboe@kernel.dk>, Waiman Long <longman@redhat.com>, 
-	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	Daniel Wagner <dwagner@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: DMMP request-queue vs. BiO
+To: Christoph Hellwig <hch@lst.de>, Mikulas Patocka <mpatocka@redhat.com>
+Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-scsi@vger.kernel.org, Chris Leech <cleech@redhat.com>,
+ Hannes Reinecke <hare@suse.de>, snitzer@kernel.org,
+ Ming Lei <minlei@redhat.com>, Benjamin Marzinski <bmarzins@redhat.com>,
+ Jonathan Brassow <jbrassow@redhat.com>, Ewan Milne <emilne@redhat.com>,
+ bmarson@redhat.com, Jeff Moyer <jmoyer@redhat.com>,
+ "spetrovi@redhat.com" <spetrovi@redhat.com>, Rob Evers <revers@redhat.com>
+References: <2d5fe016-2941-43a4-8b7c-850b8ee1d6ce@redhat.com>
+ <20241104073547.GA20614@lst.de>
+ <d9733713-eb7b-4efa-ad6b-e6b41d1df93b@suse.de> <20241105103307.GA1385@lst.de>
+ <643e61a8-b0cb-4c9d-831a-879aa86d888e@redhat.com>
+ <41cf98c3-a1de-a740-01ad-53c86f3bc8a5@redhat.com>
+ <20241115170924.GB23437@lst.de>
+Content-Language: en-US
+From: John Meneghini <jmeneghi@redhat.com>
+Organization: RHEL Core Storge Team
+In-Reply-To: <20241115170924.GB23437@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hello Michal.
+On 11/15/24 12:09, Christoph Hellwig wrote:
+> On Fri, Nov 15, 2024 at 03:05:21PM +0100, Mikulas Patocka wrote:
+>> Note, that if a database uses buffered block device, performance will be
+>> suboptimal, because the buffering mechanism can't create large bios, it
+>> only sends page-sized bios. But that is expected to not be used - the
+>> database should either use a block device with direct I/O or a filesystem
+>> with or without direct I/O.
+> 
+> And, as pointed out in the private mail that John forwarded to the list
+> without my permission if we really have a workload that cares md could
 
-Isolation of CPUs from blk_mq_hw_ctx during boot is already handled on
-call hierarchy:
-...
-        nvme_probe()
-                nvme_alloc_admin_tag_set()
-                        blk_mq_alloc_queue()
-                                blk_mq_init_allocated_queue()
-                                        blk_mq_map_swqueue()
+Ah come on. I deleted most of the private thread....
 
-blk_mq_map_swqueue() performs:
-for_each_cpu(cpu, hctx->cpumask) {
-        if (cpu_is_isolated(cpu))
-                cpumask_clear_cpu(cpu, hctx->cpumask);
-}
+> implement the plugging callback as done in md to operate on a batch
+> of bios.
+> 
+> Also not building large bios is not a fundamental property of block
+> device writes but because it uses the legacy buffered head helpers.
+> That means:
+> 
+>    a) the same is applicable to file systems using them as well
+>    b) can be fixed if someone cares enough, but apparently no one does
+> 
 
-static inline bool cpu_is_isolated(int cpu)
-{
-        return !housekeeping_test_cpu(cpu, HK_TYPE_DOMAIN) ||
-                !housekeeping_test_cpu(cpu, HK_TYPE_TICK) ||
-               cpuset_cpu_is_isolated(cpu);
-}
-
-cpu_is_isolated() is introduced by  3232e7aad11e5.
+OK. Thanks, that the info I was looking for.
 
 Thanks,
-Costa
 
-
-On Fri, 15 Nov 2024 at 17:45, Michal Koutn=C3=BD <mkoutny@suse.com> wrote:
->
-> Hello.
->
-> On Fri, Nov 08, 2024 at 07:48:30AM GMT, Costa Shulyupin <costa.shul@redha=
-t.com> wrote:
-> > Cgroups allow configuring isolated_cpus at runtime.
-> > However, blk-mq may still use managed interrupts on the
-> > newly isolated CPUs.
-> >
-> > Rebuild hctx->cpumask considering isolated CPUs to avoid
-> > managed interrupts on those CPUs and reclaim non-isolated ones.
-> >
-> > The patch is based on
-> > isolation: Exclude dynamically isolated CPUs from housekeeping masks:
-> > https://lore.kernel.org/lkml/20240821142312.236970-1-longman@redhat.com=
-/
->
-> Even based on that this seems incomplete to me the CPUs that are part of
-> isolcpus mask on boot time won't be excluded from this?
-> IOW, isolating CPUs from blk_mq_hw_ctx would only be possible via cpuset
-> but not "statically" throught the cmdline option, or would it?
->
-> Thanks,
-> Michal
->
-> (-Cc: lizefan.x@bytedance.com)
+/John
 
