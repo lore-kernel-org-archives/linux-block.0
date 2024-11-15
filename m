@@ -1,90 +1,161 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCFB18D63C
-	for <linux-block@vger.kernel.org>; Fri, 15 Nov 2024 21:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95D418801A;
+	Fri, 15 Nov 2024 22:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731706982; cv=none; b=EsqdUVMtQcQdQ5IzoKAwGOzRmca7NHQGo5io4r8MmUynxsx/L78YoXt1vKIbSMVygrBdjmCvlXrCqDoM6bxLDfGkOaqBWIgLAELTY3KsJPdc6x+E7ytbL84jjl9CgAxTyQsQrFyS/jPWFpslyXBJzfGTcNoMBqbfotzdcp/9mD4=
+	t=1731708913; cv=none; b=d5mwFry7xPy638MBJ6WFHmDGtUXbpSdbU6j90rcI9eX98LiErim7E8z77mrSC+ggVHkToyzixVAUIozfnITIuDCvvANRRwDCC1lUAwCJVqeg4xRuV+eb4a3xBTj/XlZt4Fx5OirNPVRoDG9OGWvuXe3Pc3w3XW8Dnu7hebmk+o4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731706982; c=relaxed/simple;
-	bh=gFBvkETcq1C2Hh1KIu33EYtpV7rnobbQjt5TLAHwPWw=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YJANWWy6YKywjmQf7cvSPf5PAhdsxmnivKerlxj91HAMQ9J7o508WfRQRiW4cVzy1tTlhvx7JztTcE0oyqz0hNvlQ2B5GjtbdVLbLrJl1phQIALVZohVB0CLMMAx55WuLPC8D3/xxvA4cH6I4KsKTCfjmxV0NOkBZTKwk1cZqaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HthLkFBK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1731708913; c=relaxed/simple;
+	bh=/gM5S2JpghDM0ugec1ktyfCAqRVYpBpjvyLdIODChSQ=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=DCi0vMXQQNvWBwWPqW5lylvzY1Y5mijf6PaVmTesdKttTR4QwDaNvyQqyIdgqT35CzJ7uKHkhlV8p1cRaDaIGNSzRQY7bQWAEFPIoDo+SBUFqbp9mi7yUWqhXzIZLRMeSUtpld0m+Mi51PwZV21lQcijDUI2UhYJY+eRTexUNp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=N1g55SdN; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HthLkFBK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731706979;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FHagnFmNZrlzR8g5EzKTblNn1Sf23bKvns6e7SOdPzo=;
-	b=HthLkFBKPDfKmv5SJOX/rI0uvZB2wVqZNWe/RKZ3IEhddorSHz2RC3c6+JRMZoJeKGfc3u
-	u1fhpJp+sMvOVfe4uan24KHiec7yI/OUgzrrGHgO31xOpYECpywpTRp9L8PmkjLNtXlHEG
-	hPa7VPSxYExZeK05+6oci/ncWBNNRY8=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-512-frwPzo_BMC-uEFlahijKoA-1; Fri,
- 15 Nov 2024 16:42:58 -0500
-X-MC-Unique: frwPzo_BMC-uEFlahijKoA-1
-X-Mimecast-MFC-AGG-ID: frwPzo_BMC-uEFlahijKoA
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7B31A19560B1;
-	Fri, 15 Nov 2024 21:42:57 +0000 (UTC)
-Received: from redhat.com (unknown [10.2.16.7])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 566FF19560A3;
-	Fri, 15 Nov 2024 21:42:55 +0000 (UTC)
-Date: Fri, 15 Nov 2024 15:42:51 -0600
-From: Eric Blake <eblake@redhat.com>
-To: linux-block@vger.kernel.org, nbd@other.debian.org, 
-	Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: question on NBD idempotency
-Message-ID: <t6rjk7bxcyi23vg27ga3jr5qnrqyt66gxxaglbytcgsgunxrpx@rlyn24bt33r5>
-References: <2i75j4d6tt6aben6au4a3s63burx3kvtywhb3ecbh3w2eoallm@ye34afaah6ih>
- <zhoxmjoys5ikhg4uqelexincgyx5ehgowg3fretnlpquhzdevo@6rwmb7y5zvtz>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="N1g55SdN"
+Received: from [192.168.35.166] (c-73-118-245-227.hsd1.wa.comcast.net [73.118.245.227])
+	by linux.microsoft.com (Postfix) with ESMTPSA id C2E092064AEB;
+	Fri, 15 Nov 2024 14:15:08 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C2E092064AEB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1731708911;
+	bh=3z7ywabUJ27i2rb14B4LEGDccer8KYu9+MGXqf4uX30=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=N1g55SdNOAVrXtoAUWPnvUkB3x2fHI9b6jafO92eRdbbD4Gte6s/kvOokfmkgYHJe
+	 Frz5kbgdiLksPpFFaWRXGFZ7VcwJJIP77+3HbEyB4bGSyYhL140G+m7AP2fdg7ax7k
+	 BFhXHlM0RPRrW6JGtgd18IntrfjEtsdFiu0GVoGc=
+Message-ID: <8127a2e6-fa62-4c85-b7ed-24748cc9e285@linux.microsoft.com>
+Date: Fri, 15 Nov 2024 14:15:08 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <zhoxmjoys5ikhg4uqelexincgyx5ehgowg3fretnlpquhzdevo@6rwmb7y5zvtz>
-User-Agent: NeoMutt/20241002
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Cc: eahariha@linux.microsoft.com, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
+ linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Naveen N Rao <naveen@kernel.org>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Louis Peens <louis.peens@corigine.com>, Nicholas Piggin <npiggin@gmail.com>,
+ Michael Ellerman <mpe@ellerman.id.au>,
+ Christian Gmeiner <christian.gmeiner@gmail.com>,
+ Russell King <linux+etnaviv@armlinux.org.uk>,
+ Lucas Stach <l.stach@pengutronix.de>, Takashi Iwai <tiwai@suse.com>,
+ Jaroslav Kysela <perex@perex.cz>, Petr Mladek <pmladek@suse.com>,
+ Joe Lawrence <joe.lawrence@redhat.com>, Miroslav Benes <mbenes@suse.cz>,
+ Jiri Kosina <jikos@kernel.org>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Ilya Dryomov <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ Scott Branden <sbranden@broadcom.com>, Ray Jui <rjui@broadcom.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Johan Hedberg <johan.hedberg@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+ Marcel Holtmann <marcel@holtmann.org>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, =?UTF-8?Q?Roger_Pau_Monn=C3=A9?=
+ <roger.pau@citrix.com>, Jack Wang <jinpu.wang@cloud.ionos.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, James Smart <james.smart@broadcom.com>,
+ Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Maxime Ripard <mripard@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Jeroen de Borst <jeroendb@google.com>,
+ Shailend Chand <shailend@google.com>, Thomas Zimmermann
+ <tzimmermann@suse.de>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Lucas De Marchi <lucas.demarchi@intel.com>, Oded Gabbay
+ <ogabbay@kernel.org>, Ofir Bitton <obitton@habana.ai>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>, Vasily Gorbik
+ <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Russell King <linux@armlinux.org.uk>, Robert Jarzmik
+ <robert.jarzmik@free.fr>, Haojian Zhuang <haojian.zhuang@gmail.com>,
+ Daniel Mack <daniel@zonque.org>, Nicolas Palix <nicolas.palix@imag.fr>,
+ Julia Lawall <Julia.Lawall@inria.fr>, Simon Horman <horms@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ Pablo Neira Ayuso <pablo@netfilter.org>
+Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
+To: Jeff Johnson <quic_jjohnson@quicinc.com>,
+ Thomas Gleixner <tglx@linutronix.de>
+References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
+ <10ee4e8f-d8b4-4502-a5e2-0657802aeb11@linux.microsoft.com>
+ <3ac480f5-549b-4449-baa9-f766e074c409@quicinc.com>
+Content-Language: en-US
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+In-Reply-To: <3ac480f5-549b-4449-baa9-f766e074c409@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 15, 2024 at 10:29:48AM -0600, Eric Blake wrote:
-> On Fri, Nov 15, 2024 at 09:43:29AM -0600, Eric Blake wrote:
-> > 
-> > But if there are no such ioctls (and no desire to accept a patch to
-> > add them), then it looks like I _have_ to use /dev/nbd$N as the tag
-> > that I map back to server details, and just be extremely careful in my
-> > bookkeeping that I'm not racing in such a way that creates leaked
-> > devices or which closes unintended devices, regardless of whether
-> > there are secondary failures in trying to do the k8s bookkeeping to
-> > track the mappings.  Ideas on how I can make this more robust would be
-> > appreciated (for example, maybe it is more reliable to use symlinks in
-> > the filesystem as my data store of mapped tags, than to try and
-> > directly rely on k8s CR updates to synchronize).
+On 11/15/2024 1:41 PM, Jeff Johnson wrote:
+> On 11/15/2024 1:29 PM, Easwar Hariharan wrote:
+>> On 11/15/2024 1:26 PM, Easwar Hariharan wrote:
+>>> This is a series that follows up on my previous series to introduce
+>>> secs_to_jiffies() and convert a few initial users.[1] In the review for
+>>> that series, Anna-Maria requested converting other users with
+>>> Coccinelle. This is part 1 that converts users of msecs_to_jiffies()
+>>> that use the multiply pattern of either of:
+>>> - msecs_to_jiffies(N*1000), or
+>>> - msecs_to_jiffies(N*MSEC_PER_SEC)
+>>>
+>>> The entire conversion is made with Coccinelle in the script added in
+>>> patch 2. Some changes suggested by Coccinelle have been deferred to
+>>> later parts that will address other possible variant patterns.
+>>>
+>>> CC: Anna-Maria Behnsen <anna-maria@linutronix.de>
+>>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+>>>
+>>> [1] https://lore.kernel.org/all/20241030-open-coded-timeouts-v3-0-9ba123facf88@linux.microsoft.com/
+>>> [2] https://lore.kernel.org/all/8734kngfni.fsf@somnus/
+>>>
+>>> ---
+>>> Changes in v2:
+>>> - EDITME: describe what is new in this series revision.
+>>> - EDITME: use bulletpoints and terse descriptions.
+>>> - Link to v1: https://lore.kernel.org/r/20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com
+>>>
+>>
+>> Apologies, I missed out on editing the changelog here. v1 included a
+>> patch that's already been accepted, there are no other changes in v2.
+>>
+>> Thanks,
+>> Easwar
 > 
-> I wonder if xattr might be what I want for associating a user-space
-> tag with the device.
+> How do you expect this series to land since it overlaps a large number of
+> maintainer trees? Do you have a maintainer who has volunteered to take the
+> series and the maintainers should just ack? Or do you want the maintainers to
+> take the individual patches that are applicable to them?
+> 
+> /jeff
 
-Nope, it looks like setxattr(2) used on /dev/nbd0 (as seen in a
-setfattr(1) strace) fails with EPERM when attempting to assign
-attributes to anything in /dev; ie. devtmpfs does not appear to
-support extended attributes.
+I am hoping for tglx to take it through his tree since the patch
+introducing secs_to_jiffies() is in his tree, so sequencing of
+dependencies would not be an issue.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.
-Virtualization:  qemu.org | libguestfs.org
+But if tglx won't, we could push it out another cycle and individual
+maintainers can take the patches that are applicable to their tree for
+the series.
 
+Thanks,
+Easwar
