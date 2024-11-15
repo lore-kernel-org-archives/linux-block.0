@@ -1,73 +1,116 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543671CDA3F;
-	Fri, 15 Nov 2024 18:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DD616A956;
+	Fri, 15 Nov 2024 18:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731693850; cv=none; b=rAqIcITMHiCqErRmW0l3rs4XWH+0XYpQZwX/V1CDeO5SGMpj+gbVuTHnSOXSeX+ZlZE/jFIsqqa5EkvyN0k3uPMX6+s1xsSaHFO/5PKXXy6XTTk0vqPdDbwrPgyY6AOFg8YnJcgUnRxkhIV5xZquozt/PgQ9F9uRIcJ3wsSJVUQ=
+	t=1731694797; cv=none; b=Qt4fvSWyA2vIaVarr4NCHpQLwU70SMCS9YNAJ2cltyG1/KNrQg5nRzz5TvdY/pyWIdoz4r0b80aaEMIS9t4wCELkrgSUYwroLTsTTZTe+myio2NEa+B6F5X/gDZGUOAnlc1MILNxHDaW72n1I94ikyIHU7TQfhSPtRU6yjVX8F4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731693850; c=relaxed/simple;
-	bh=LPDOMZz6KV6iIi1jEYmzOnjPnCesxzIIxDTmzHaPhFo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UfsToVQmLDqKiA/k4qrDywdSqNzEAaxdl88Z4bQsB0aebLohdh/Ju6R0yCUz+C2kfnG/MHkDyYUXLv0og3mv1bP9XQd2QB2T2F27MKNlXTdfBzOIDP6IC2HB8Tx3slP7Zljc0rpzJP7JXNXUVdlOAR9yIBrUZvYVcwc3nic6rPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mLRtysRU; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1731694797; c=relaxed/simple;
+	bh=jEHg9Jrc7N9nOTJAGsOnQqFd7YCh1peV7IhURNb7O/A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bMdq4DwhPPj/z1OczdyCh26qWShH05Cfnb28QsiNWU9i8N2IWvCK8bvPHcmQcDL08ar7VlBROrygvharVLl34DhJpY7hRFs0IWadyk0vLHW2leIbGZH69XDtcDkVWQmjc0EKpu6S42NBQZHvSlK1oVBH2F0gDAV6ZifZz4QDNA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ll3B7RpA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mLRtysRU"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=E2BNdGt9ER/nWRwbgvy7UUTAJ2vjHj29ke2nprS1nqE=; b=mLRtysRUSQWEXTgW0c4C6kFIrP
-	2DbechyxUleqgdzwz+N6MegMggR0Uyr3mTxTTI9dNesYFLPGVl+DtM7fVkThDaFww6S4A9Vtm9OAC
-	T8Ux6eQr0HDmFTqJVmuhaBXyJ/hI1075TQBZUNQzmTW4xnN7twG4vu0Tmmfu2/KlQ5+Yjj5HhiTVo
-	XH0D0+YvgPnm/I8BcYTadFTYdW5uHe9MrXEluzEVrszfaQOPKAFLW2IkbuXyqZzR/bojlfPXBZKfn
-	isHFuCTBr9HyMXSo4fzJOn6H3Wg2h6FYNDpd0gzcoI70i77zpzW7XKbUZKlf2CZSvQclgdYJ+3qzR
-	onR+8a5Q==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tC0fp-00000000AIu-1usX;
-	Fri, 15 Nov 2024 18:04:01 +0000
-Date: Fri, 15 Nov 2024 18:04:01 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>, Anuj Gupta <anuj20.g@samsung.com>,
-	axboe@kernel.dk, kbusch@kernel.org, martin.petersen@oracle.com,
-	anuj1072538@gmail.com, brauner@kernel.org, jack@suse.cz,
-	viro@zeniv.linux.org.uk, io-uring@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com, linux-scsi@vger.kernel.org,
-	vishak.g@samsung.com, linux-fsdevel@vger.kernel.org,
-	Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v9 06/11] io_uring: introduce attributes for read/write
- and PI support
-Message-ID: <ZzeNEcpSKFemO30g@casper.infradead.org>
-References: <20241114104517.51726-1-anuj20.g@samsung.com>
- <CGME20241114105405epcas5p24ca2fb9017276ff8a50ef447638fd739@epcas5p2.samsung.com>
- <20241114104517.51726-7-anuj20.g@samsung.com>
- <20241114121632.GA3382@lst.de>
- <3fa101c9-1b38-426d-9d7c-8ed488035d4a@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ll3B7RpA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FA4CC4CED6;
+	Fri, 15 Nov 2024 18:19:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731694796;
+	bh=jEHg9Jrc7N9nOTJAGsOnQqFd7YCh1peV7IhURNb7O/A=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Ll3B7RpAClMKxVOgaKH06KffJRyuHZKK3D1XfJQyTeZ3STCatTHm0Wc6LvIbLvUxV
+	 2phzlli4xMFSY6v4LTQMnHp+nwSKRfD8I0xOLJWS7i7K0RIV5IXd7z/ObgWu0QPR01
+	 szOZ7hya9iBWU+0to5tghIZJG95p6R8Z2UY3H3nVh2KAu6GbAD44vMJb7RG1WL8WXY
+	 00soHgyjyvHgHtZ4Qmk8HpMZLxuJqRpVRQJEaxYN9tTDiFCBS0rhBaUmWR/08BU/Jz
+	 yVjOxpS9/7bAHRFfdrBlX3P3MByf/etJ6FI88xfOU5b71/G6W6O7VzqQfMOb26t+I/
+	 YUt0aqtZBlS/Q==
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3a4e5a7b026so3058195ab.3;
+        Fri, 15 Nov 2024 10:19:56 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUV765LGyStfRkFYrGuC7OK5Fdt5gwUuirz5y9e4YWxKgYmE3c+3rzNFAA+vuOQgzxrI+s0LRnWB3NorqGJ@vger.kernel.org, AJvYcCWu5gtBJrenmhObZlvh3+Xbi60fDd5VEPf52zaMUWFGJpn4QfMY9GfG/H7EV2EJQPMwV3CW8BHAYV1eMA==@vger.kernel.org, AJvYcCXZTgQpO+uxCHqmgPnyJIak9w2XtwC6yNewIyDg8IZUSckdVOkVQiLwhPJgReMZJ+5+ChiwAtIvYOnwDA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYOD2lfGnOwbc4fGRE3oMepcE/rB9RR2wZLC9eM2+MlHW4DeyN
+	t4YqsnPNk7jhfuVCTh55G9N6g4a4RRlRnSEl7nvHboCDmAMTANGjXE+S33mdR95Dc/sjVJTGBPT
+	MRkhqNVo+IgbIcuGPJsPjWEkf9Ok=
+X-Google-Smtp-Source: AGHT+IHKNv1rYC+zz4Cii6bXK7MNqshpluCyaThnmk06bBl2Az82hVcP1DoYGi7z0Uyi7iayM3tR7OYNqZcUsJz9f9Y=
+X-Received: by 2002:a05:6e02:16c6:b0:3a3:9471:8967 with SMTP id
+ e9e14a558f8ab-3a748023930mr35721005ab.11.1731694795973; Fri, 15 Nov 2024
+ 10:19:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3fa101c9-1b38-426d-9d7c-8ed488035d4a@gmail.com>
+References: <20241112124256.4106435-1-john.g.garry@oracle.com> <20241112124256.4106435-6-john.g.garry@oracle.com>
+In-Reply-To: <20241112124256.4106435-6-john.g.garry@oracle.com>
+From: Song Liu <song@kernel.org>
+Date: Fri, 15 Nov 2024 10:19:44 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW6nJGQMQsEzJFZasg4LuHb3Qf-+JRTgqjaBtbYj_uBNGQ@mail.gmail.com>
+Message-ID: <CAPhsuW6nJGQMQsEzJFZasg4LuHb3Qf-+JRTgqjaBtbYj_uBNGQ@mail.gmail.com>
+Subject: Re: [PATCH v4 5/5] md/raid10: Atomic write support
+To: John Garry <john.g.garry@oracle.com>
+Cc: axboe@kernel.dk, yukuai3@huawei.com, hch@lst.de, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-raid@vger.kernel.org, martin.petersen@oracle.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 14, 2024 at 01:09:44PM +0000, Pavel Begunkov wrote:
-> With SQE128 it's also a problem that now all SQEs are 128 bytes regardless
-> of whether a particular request needs it or not, and the user will need
-> to zero them for each request.
+On Tue, Nov 12, 2024 at 4:43=E2=80=AFAM John Garry <john.g.garry@oracle.com=
+> wrote:
+>
+> Set BLK_FEAT_ATOMIC_WRITES_STACKED to enable atomic writes.
+>
+> For an attempt to atomic write to a region which has bad blocks, error
+> the write as we just cannot do this. It is unlikely to find devices which
+> support atomic writes and bad blocks.
+>
+> Signed-off-by: John Garry <john.g.garry@oracle.com>
+> ---
+>  drivers/md/raid10.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+> index 8c7f5daa073a..a3936a67e1e8 100644
+> --- a/drivers/md/raid10.c
+> +++ b/drivers/md/raid10.c
+> @@ -1255,6 +1255,7 @@ static void raid10_write_one_disk(struct mddev *mdd=
+ev, struct r10bio *r10_bio,
+>         const enum req_op op =3D bio_op(bio);
+>         const blk_opf_t do_sync =3D bio->bi_opf & REQ_SYNC;
+>         const blk_opf_t do_fua =3D bio->bi_opf & REQ_FUA;
+> +       const blk_opf_t do_atomic =3D bio->bi_opf & REQ_ATOMIC;
+>         unsigned long flags;
+>         struct r10conf *conf =3D mddev->private;
+>         struct md_rdev *rdev;
+> @@ -1273,7 +1274,7 @@ static void raid10_write_one_disk(struct mddev *mdd=
+ev, struct r10bio *r10_bio,
+>         mbio->bi_iter.bi_sector =3D (r10_bio->devs[n_copy].addr +
+>                                    choose_data_offset(r10_bio, rdev));
+>         mbio->bi_end_io =3D raid10_end_write_request;
+> -       mbio->bi_opf =3D op | do_sync | do_fua;
+> +       mbio->bi_opf =3D op | do_sync | do_fua | do_atomic;
+>         if (!replacement && test_bit(FailFast,
+>                                      &conf->mirrors[devnum].rdev->flags)
+>                          && enough(conf, devnum))
+> @@ -1468,7 +1469,15 @@ static void raid10_write_request(struct mddev *mdd=
+ev, struct bio *bio,
+>                                 continue;
+>                         }
+>                         if (is_bad) {
+> -                               int good_sectors =3D first_bad - dev_sect=
+or;
+> +                               int good_sectors;
+> +
+> +                               if (bio->bi_opf & REQ_ATOMIC) {
+> +                                       /* We just cannot atomically writ=
+e this ... */
+> +                                       error =3D -EFAULT;
 
-The way we handled this in NVMe was to use a bit in the command that
-was called (iirc) FUSED, which let you use two consecutive entries for
-a single command.
+Is EFAULT the right error code here? I think we should return something
+covered by blk_errors?
 
-Some variant on that could surely be used for io_uring.  Perhaps a
-special opcode that says "the real opcode is here, and this is a two-slot
-command".  Processing gets a little spicy when one slot is the last in
-the buffer and the next is the the first in the buffer, but that's a SMOP.
+Other than this, 4/5 and 5/5 look good to me.
+
+Thanks,
+Song
