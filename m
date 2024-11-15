@@ -1,146 +1,117 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07A41D5AA0
-	for <linux-block@vger.kernel.org>; Fri, 15 Nov 2024 15:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D3C1E376C
+	for <linux-block@vger.kernel.org>; Fri, 15 Nov 2024 15:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731685414; cv=none; b=Ut3WO7xICbuJ4WJwhmdpar81dSH+tsaB+513d0BuNNgRmDU5D2G9zn/3DR3xBoKaICdgKnZHxBgoEpi/lwNOOLZkNayXKXByyTEpTkRaBm3F4twnv+1e+EcjMe5Ltnze0I3p9g2y4CFHtJYwMeSgyg0b2v39mSAqaUDHY4q5uOs=
+	t=1731685529; cv=none; b=uDNnCCCAsLD4vRAXCnD02EF+X5opjnOr0bVlA+TsHft1UFSFv7h0TBKyEUfK6+EZwLrsk06r1ZZWTdsluc8f8N7bv7FWaDjEjyGydAbtlru+OczTsrZ+i3+hc8vysgULPbkfb1Y4/QKAV4RdZEq5yDoOtOyIzQtRI+h6GeMiq4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731685414; c=relaxed/simple;
-	bh=1qyFUaQBktu8yOtf8eX4mf98EtiN3o3Pb9HEcmvihBI=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=L0gVoFITmwfMN7yL5WvzTE6ypYzNL8uPJdiv0Ad5Ml+qT0iF8/R6hDCMw6kI24kK+28nLg88wFR9VbFYQr4s01840WQJQ+4RWME8YmjcUccnHsuUKZk6Tv9flRFRX9ppE8CnxmNMI3eoaEWCgllkOM9UDR5Ux40c7yvtRH4yvqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aTGeoY0/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1731685529; c=relaxed/simple;
+	bh=9FFH6fI16GRqVNiLffzMOW91eX3sSjbt+L1GoUi8Rnk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eQ+3SVypH3bni8bM/L3G03IrrlplxYWczb1RjTFscx91bUfNoWJjxNiXkg0ap0BQRFhg8uMK57MwO+a/CES+asG0NKSDabr0nUEaSkwnZg+Gvwa93CYjA1RryRLej5+lWwLFYETMcrwtpxGtcdaEjvTeXXZYaH2DNc/5g4klvFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=CUehZe47; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aTGeoY0/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731685411;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type;
-	bh=miyu1cnSaJCJvT17HGrQe5RaBRja3jWYsTw+4Y3RWbg=;
-	b=aTGeoY0/1RCnSdeils51aBjZLAHW6qKSFt9aiPORiHnQ7nJivkohJAqJryR4kBuJZIhZ1f
-	VsOqv4FzQAK5rtQ14ge8XguWya2siI6Id0B/sR7rp3GX1AEzb80D5n2Dvt3R7cIU2yqK0/
-	PRXcEYQDJ0SgBHvEErM32AC/qI5wCmY=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-401-AUroYhlGPteRY2z9LWmzRg-1; Fri,
- 15 Nov 2024 10:43:30 -0500
-X-MC-Unique: AUroYhlGPteRY2z9LWmzRg-1
-X-Mimecast-MFC-AGG-ID: AUroYhlGPteRY2z9LWmzRg
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 43EC51977323;
-	Fri, 15 Nov 2024 15:43:29 +0000 (UTC)
-Received: from redhat.com (unknown [10.2.16.7])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D927E19560A3;
-	Fri, 15 Nov 2024 15:43:26 +0000 (UTC)
-Date: Fri, 15 Nov 2024 09:43:24 -0600
-From: Eric Blake <eblake@redhat.com>
-To: linux-block@vger.kernel.org, nbd@other.debian.org, 
-	Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Subject: question on NBD idempotency
-Message-ID: <2i75j4d6tt6aben6au4a3s63burx3kvtywhb3ecbh3w2eoallm@ye34afaah6ih>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="CUehZe47"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43169902057so16105745e9.0
+        for <linux-block@vger.kernel.org>; Fri, 15 Nov 2024 07:45:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1731685526; x=1732290326; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9FFH6fI16GRqVNiLffzMOW91eX3sSjbt+L1GoUi8Rnk=;
+        b=CUehZe47+1TmPe9L6O/qxwhEDYj2TPtGXu6a68tBrHZXYs5+YULQmyOFvc9PuGL1Kd
+         270IzO8ASD5Pn4mj/UZLg89FC1sgphhdXX4Q6/gRcFXLsXq7ADfrjdMrnnCmv1U2iWkg
+         EmDmtVkiXup6Iu0DGR8BPNrre7r970qJeW4UEZAVLwrYTIJR35i0f/hRgsx2Vy6y97LS
+         c8iD5IjV2DyU1xwSGqCbOl11qWdVXpf8ec+mYDXgN6bXqy6nchiIhYWd9bXxH20WjgAK
+         LCyY7DumUBTV0r3uCnYa22V/N256AfXRl1o/eemV3gB6lW4jc5MY8o/yNczmeY8TuUpQ
+         /yNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731685526; x=1732290326;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9FFH6fI16GRqVNiLffzMOW91eX3sSjbt+L1GoUi8Rnk=;
+        b=Nbreh+gX13rIEL489xenx1+IDAK1bIDWGkwZ2y+Xu5WTfsDjcwbKXnNbRQaiv7jYlT
+         UQwajIG54xlm6MBs/1v655nUwpMFBLhZjPDa6Rlm1B0EB8anvbIvoe5pUAvK39bP+x3D
+         BAt2l6WYBsVqyvLgG2bK1/5fEXov//qSL61txInOefQTr7bkviKmL3F+HhD7/BJR6XvN
+         W/mSJMBlyNUwRinJsFJ2h3Ke3dqSceAWjpuq0HguyUOmk0OXV9Kda528wn+7RS5Xf6BK
+         xn3RVFB6fTIaCPhGsvjsC6uQJTBkv4rBwNkU5BXm3RgK/T/H0hm2ri+JznVvX6su+eHy
+         2ODQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVp6TdkyNOu/iBuVdMgnxiw4q0ZDQesfsQK1dAwnt2YPJL2mMtX1CtNm+Q8vrfvEbwRo87/Fb7ELi1deA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yya/VBq2u9v8B6apFLf8AwaPH3mbco80i3Lp1j0ir108+0RJFe9
+	gWC1wZtpi0rxj/2+cy8t7zKPmvkHq1L5D2S9RZ7TKT91d5Y9MzAxyAWBAlzsdak=
+X-Google-Smtp-Source: AGHT+IFMzkpB5ten8aStGI5U0itCRb9SQJnUjz1+wqgAB5ntNpoiOJeeloohYfL8pax+nnjaE0HMrg==
+X-Received: by 2002:a05:600c:1c09:b0:431:5f1c:8352 with SMTP id 5b1f17b1804b1-432df71d609mr27024635e9.5.1731685525955;
+        Fri, 15 Nov 2024 07:45:25 -0800 (PST)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dac0aef0sm58557685e9.28.2024.11.15.07.45.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Nov 2024 07:45:25 -0800 (PST)
+Date: Fri, 15 Nov 2024 16:45:24 +0100
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Costa Shulyupin <costa.shul@redhat.com>
+Cc: ming.lei@redhat.com, Jens Axboe <axboe@kernel.dk>, 
+	Waiman Long <longman@redhat.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	Daniel Wagner <dwagner@suse.de>
+Subject: Re: [RFC PATCH v1] blk-mq: isolate CPUs from hctx
+Message-ID: <qlq56cpm5enxoevqstziz7hxp5lqgs74zl2ohv4shynasxuho6@xb5hk5cunhfn>
+References: <20241108054831.2094883-3-costa.shul@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="l3kcsrkvzzccsahc"
+Content-Disposition: inline
+In-Reply-To: <20241108054831.2094883-3-costa.shul@redhat.com>
+
+
+--l3kcsrkvzzccsahc
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: NeoMutt/20241002
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Transfer-Encoding: quoted-printable
 
-I'm trying to develop a Kubernetes CSI driver that, among other
-things, will be creating and tearing down NBD connections to other
-hosts in the cluster, and am looking for idempotency design ideas.
-Right now, when you call `nbd-client $host 10809`, nbd-client uses the
-netlink interface to allocate an unused /dev/nbd$N device and outputs
-the name of the device it created, then the userspace process exits
-(unless TLS is in use, in which case the userspace sticks around to do
-TLS translation of the TCP traffic into plaintext over Unix socketpair
-to the kernel).  That means that any later `nbd-client -c /dev/nbd$N`
-can output the pid of a process that no longer exists (or, less
-likely, has been recycled into use by an unrelated process), making it
-very difficult to have a race-free implementation that will be able to
-look up which server(s) are currently in use by which NBD device(s),
-since I can't use /proc/$pid/cmdline to see what server I originally
-connected to.
+Hello.
 
-In one direction, if I try to create an NBD device first and then
-record the device name in a k8s CR, I run the risk that the CR update
-fails.  A second attempt to `nbd-client $host 10809` will NOT report
-that the server is already in use, but happily allocate yet another
-device, so the only safe thing to do is if the attempt to record the
-device name in a CR fails, I must immediately call `nbd-client -d
-/dev/nbd$N` rather than use the first device, to avoid leaking it.
+On Fri, Nov 08, 2024 at 07:48:30AM GMT, Costa Shulyupin <costa.shul@redhat.=
+com> wrote:
+> Cgroups allow configuring isolated_cpus at runtime.
+> However, blk-mq may still use managed interrupts on the
+> newly isolated CPUs.
+>=20
+> Rebuild hctx->cpumask considering isolated CPUs to avoid
+> managed interrupts on those CPUs and reclaim non-isolated ones.
+>=20
+> The patch is based on
+> isolation: Exclude dynamically isolated CPUs from housekeeping masks:
+> https://lore.kernel.org/lkml/20240821142312.236970-1-longman@redhat.com/
 
-In the other direction, if I successfully record which /dev/nbd$N is
-tied to a server after the device is created (and tear down the client
-device if my recording is not successful), then I have a race in the
-opposite direction: when I know it is time to clean up the device
-because the server is going (or has already gone) away, if I try to
-call `nbd-client -d /dev/nbd$N` more than once, I risk closing an
-unrelated device on the second call if someone else allocated the same
-id to an unrelated server in the meantime.  I have to be careful that
-I don't clean up the device more than once, while still balancing
-competing cleanups (cleaning up both my mapping and the client); I
-shouldn't delete my mapping until I know the device is gone (so I
-don't leak the device), but if cleaning up my mapping fails on the
-first attempt and I need to retry it later, the second attempt should
-not retry deleting the device.
+Even based on that this seems incomplete to me the CPUs that are part of
+isolcpus mask on boot time won't be excluded from this?
+IOW, isolating CPUs from blk_mq_hw_ctx would only be possible via cpuset
+but not "statically" throught the cmdline option, or would it?
 
-It is possible to use `nbd-client -L $host $ip /dev/nbd$N` where _I_
-manage the device numbers instead of letting netlink do
-auto-allocation, but then I'm risking a race in the opposite
-direction: if any other process in the system is also trying to
-allocate NBD devices, the name I thought was unused when I called
-nbd-client could end up already tied to a different server in parallel
-by that other process, at which point I'm no longer guaranteed that
-/dev/nbd$N is connected to the server I want.  So I really _do_ want
-to use the netlink interface.
+Thanks,
+Michal
 
-Is there an existing set of ioctls where the creation of an NBD device
-could associate a user-space tag with the device, and I can then later
-query the device to get the tag back?  A finite-length string would be
-awesome (I could store "nbd://$ip:$port/$export" as the tag on
-creation, to know precisely which server the device is talking to),
-but even an integer tag (32- or 64-bit) might be enough (it's easier
-to choose an integer tag in the full 2^64 namespace that is unlikely
-to cause collisions with other processes on the system, than it is to
-avoid collisions in the limited first few $N of the /dev/nbd$N device
-names chosen to pick the lowest unused integer first).  If not, would
-it be worth adding such ioctls for the NBD driver?
+(-Cc: lizefan.x@bytedance.com)
 
-Usage-wise, I'm envisioning something like `nbd-client --tag $mytag
-$host $ip` which creates the kernel device, associates the tag with
-it, and outputs /dev/nbd$N on success; then later `nbd-client --tag -c
-/dev/nbd$N` to output the tag name in addition to the originating pid
-if the NBD device is still connected to the server.  Maybe even have a
-way for `nbd-client --tag $tag -d /dev/nbd$N` which either atomically
-succeeds (if the device indeed has that tag) or fails (if the tag does
-not match what was already associated with the device).
+--l3kcsrkvzzccsahc
+Content-Type: application/pgp-signature; name="signature.asc"
 
-But if there are no such ioctls (and no desire to accept a patch to
-add them), then it looks like I _have_ to use /dev/nbd$N as the tag
-that I map back to server details, and just be extremely careful in my
-bookkeeping that I'm not racing in such a way that creates leaked
-devices or which closes unintended devices, regardless of whether
-there are secondary failures in trying to do the k8s bookkeeping to
-track the mappings.  Ideas on how I can make this more robust would be
-appreciated (for example, maybe it is more reliable to use symlinks in
-the filesystem as my data store of mapped tags, than to try and
-directly rely on k8s CR updates to synchronize).
+-----BEGIN PGP SIGNATURE-----
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.
-Virtualization:  qemu.org | libguestfs.org
+iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZzdskQAKCRAt3Wney77B
+SVLLAQD/w8EP314EpkVv+CS8Q78tZha++i6qmCnttn45QJL5UQEA610FW1x1YqKu
+ee7dMxr0W1ccS6lUwnBt6BpNAH//NAk=
+=/uKX
+-----END PGP SIGNATURE-----
 
-
+--l3kcsrkvzzccsahc--
