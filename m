@@ -1,44 +1,34 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4161A9B5D;
-	Thu, 14 Nov 2024 20:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD2018785D;
+	Fri, 15 Nov 2024 09:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731615066; cv=none; b=F9iTyTzchL7SS5g9sMibw3GEJswog/U+fzA2Lf5idKyuFoSz9IxJzm00AGGTMtzXunbKkvjVLEK1Wx/z21XipbQfLUXhNFLdAFi/3e6DQAzVqo72EV6E8RmNYEDdukWfxPQz7Jr7f7YRwYdRMdCevDwNwqO1KwAyJEg4Io8KO3A=
+	t=1731661835; cv=none; b=JwSL/Y5Svvj23uLumpq3EhKvqKjXveSr6CmJ+YtYU515xDOWXa6Fb9Fg8xHbkn3eRg7Vo9gJLTI0Baj+x6dnJEEEgOSMkSBCQke+uEiN1EwsSESucoDC6rn6hQC3mYzgPAAh0o5KuIURhptU3CsPpLMNgk8KckJ1LZrWjt5vPWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731615066; c=relaxed/simple;
-	bh=ASl8LSAvyQVJiieFrry6JPr3SCOWxU/QgkzXXpnO05k=;
+	s=arc-20240116; t=1731661835; c=relaxed/simple;
+	bh=Pm75xYlE75CbvokVYLXl+3gSwliF/tT8QchOJ2JV2dQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=drxFhEPbMbjY39Y4iwOyuq2dsavqcNImFcqm1Z5cawbW0a2HX6rG8/C2+5JchZZpkamRHSEc2vgkDYyRtsm1Awpa8lk/YntQKSd437OFfhJVCv8VH85UgpNe0cJZxriR11G90oDEg910qbf1yQ3NQg95ojX9JPjApHuZCkRXnMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=anx91EaE; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="anx91EaE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C035C4CECD;
-	Thu, 14 Nov 2024 20:11:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731615066;
-	bh=ASl8LSAvyQVJiieFrry6JPr3SCOWxU/QgkzXXpnO05k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=anx91EaEjJy6ntu/ddhlMwoMHjGZHqXIcwlIbSxu2kcIowwLvk0UMlYby2HoawQBE
-	 sbHvq+nARD/fY8HjJLg0VQCU5jOhJpqefyvJJFZ+f+qLvTpgcBp+tjagV8VPGSTX60
-	 4kskjjjHURDBovPsnp/VTNUO8ITbMWwx2W2KL+5N2QKDS7IRQ9oAIkEmJm+59XuIOA
-	 l1VzSp7HwTt1oIQOTTmYjK82gHnErDFI3wDf+EKeei1n2xKrAKGHUEWdD7uchJoI3V
-	 PC5BtRgOOKwMQ0g+7H4HCnJlTN/H4VNZ+dTMPpc4aPLFr+AOKTMj7fybJKs94y7uhH
-	 7wMQc3PHz3+RQ==
-Date: Thu, 14 Nov 2024 13:11:03 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, "Michael S. Tsirkin" <mst@redhat.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=jI2U9m9YttDR8yQ6FFljN/Dfi3PNmOrntf81/LRKYMOpVxu3jbdIYhqLAbhApGkavVA0fbWHDY3EbkRXNIs1UjrPfhuMwsTpjiO+ZDhTb7mwsrBloU/xLdzKXDrfT+ig9l49qxZ1p0e9ieUwLjhMML7hhT41X4YIBrKC77Zy4cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 00DA968C7B; Fri, 15 Nov 2024 10:10:27 +0100 (CET)
+Date: Fri, 15 Nov 2024 10:10:27 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
 	Jason Wang <jasowang@redhat.com>, Keith Busch <kbusch@kernel.org>,
 	Sagi Grimberg <sagi@grimberg.me>,
 	Pavel Begunkov <asml.silence@gmail.com>,
 	linux-block@vger.kernel.org, virtualization@lists.linux.dev,
 	linux-nvme@lists.infradead.org, io-uring@vger.kernel.org
 Subject: Re: [PATCH 4/6] block: add a rq_list type
-Message-ID: <20241114201103.GA2036469@thelio-3990X>
-References: <20241113152050.157179-1-hch@lst.de>
- <20241113152050.157179-5-hch@lst.de>
+Message-ID: <20241115091027.GA1149@lst.de>
+References: <20241113152050.157179-1-hch@lst.de> <20241113152050.157179-5-hch@lst.de> <20241114201103.GA2036469@thelio-3990X>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,71 +37,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241113152050.157179-5-hch@lst.de>
+In-Reply-To: <20241114201103.GA2036469@thelio-3990X>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Hi Christoph,
+On Thu, Nov 14, 2024 at 01:11:03PM -0700, Nathan Chancellor wrote:
+> This change as commit a3396b99990d ("block: add a rq_list type") in
+> next-20241114 causes errors when CONFIG_BLOCK is disabled because the
+> definition of 'struct rq_list' is under CONFIG_BLOCK. Should it be moved
+> out?
 
-On Wed, Nov 13, 2024 at 04:20:44PM +0100, Christoph Hellwig wrote:
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 65f37ae70712..ce8b65503ff0 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1006,6 +1006,11 @@ extern void blk_put_queue(struct request_queue *);
->  void blk_mark_disk_dead(struct gendisk *disk);
->  
->  #ifdef CONFIG_BLOCK
-> +struct rq_list {
-> +	struct request *head;
-> +	struct request *tail;
-> +};
-> +
->  /*
->   * blk_plug permits building a queue of related requests by holding the I/O
->   * fragments for a short period. This allows merging of sequential requests
-> @@ -1018,10 +1023,10 @@ void blk_mark_disk_dead(struct gendisk *disk);
->   * blk_flush_plug() is called.
->   */
->  struct blk_plug {
-> -	struct request *mq_list; /* blk-mq requests */
-> +	struct rq_list mq_list; /* blk-mq requests */
->  
->  	/* if ios_left is > 1, we can batch tag/rq allocations */
-> -	struct request *cached_rq;
-> +	struct rq_list cached_rqs;
->  	u64 cur_ktime;
->  	unsigned short nr_ios;
->  
-> @@ -1683,7 +1688,7 @@ int bdev_thaw(struct block_device *bdev);
->  void bdev_fput(struct file *bdev_file);
->  
->  struct io_comp_batch {
-> -	struct request *req_list;
-> +	struct rq_list req_list;
+Yes, this looks good:
 
-This change as commit a3396b99990d ("block: add a rq_list type") in
-next-20241114 causes errors when CONFIG_BLOCK is disabled because the
-definition of 'struct rq_list' is under CONFIG_BLOCK. Should it be moved
-out?
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 00212e96261a..a1fd0ddce5cf 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1006,12 +1006,12 @@ extern void blk_put_queue(struct request_queue *);
- 
- void blk_mark_disk_dead(struct gendisk *disk);
- 
--#ifdef CONFIG_BLOCK
- struct rq_list {
- 	struct request *head;
- 	struct request *tail;
- };
- 
-+#ifdef CONFIG_BLOCK
- /*
-  * blk_plug permits building a queue of related requests by holding the I/O
-  * fragments for a short period. This allows merging of sequential requests
-
->  	bool need_ts;
->  	void (*complete)(struct io_comp_batch *);
->  };
