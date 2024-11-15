@@ -1,117 +1,151 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D3C1E376C
-	for <linux-block@vger.kernel.org>; Fri, 15 Nov 2024 15:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F1654769;
+	Fri, 15 Nov 2024 16:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731685529; cv=none; b=uDNnCCCAsLD4vRAXCnD02EF+X5opjnOr0bVlA+TsHft1UFSFv7h0TBKyEUfK6+EZwLrsk06r1ZZWTdsluc8f8N7bv7FWaDjEjyGydAbtlru+OczTsrZ+i3+hc8vysgULPbkfb1Y4/QKAV4RdZEq5yDoOtOyIzQtRI+h6GeMiq4U=
+	t=1731686839; cv=none; b=nyvHiF6R6ZYp/bzLdWGsuUjuCMUUCHhwqmUYF1G9WkTsLyWhibI8Y9hThnhjoAEZ2M5v2/yODJOJlzUvtSXVab7Le7KRYOOkwYlz3Ol6E7QI4U9KaYA3reooqV8tCilohnuGHYxOhn4ZSKvrVEn/hCEMqeApKpNC/bW2qetQSQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731685529; c=relaxed/simple;
-	bh=9FFH6fI16GRqVNiLffzMOW91eX3sSjbt+L1GoUi8Rnk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eQ+3SVypH3bni8bM/L3G03IrrlplxYWczb1RjTFscx91bUfNoWJjxNiXkg0ap0BQRFhg8uMK57MwO+a/CES+asG0NKSDabr0nUEaSkwnZg+Gvwa93CYjA1RryRLej5+lWwLFYETMcrwtpxGtcdaEjvTeXXZYaH2DNc/5g4klvFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=CUehZe47; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1731686839; c=relaxed/simple;
+	bh=QidJsVEDsV7iTfjHWunC7E7BKbrRE5HrjsN3+lOKs+0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M4ey9LZR/o4Dv5/+3xte9wuy4Kpm4SzOshfddMaI0nHnUUdsK3cyBfimiq2jvvYbDjYgt3TxeRh2/O4syFQLtxekFb2RDUkinhrlRHNH52Vj13gFiJ0cHS7OyU7Ae2dpmOcoCmIzLtsHb03bdirmwpAvkxHddnr7LwgZQuXeexM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+u4lta3; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="CUehZe47"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43169902057so16105745e9.0
-        for <linux-block@vger.kernel.org>; Fri, 15 Nov 2024 07:45:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+u4lta3"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7f8c7ca7f3cso471008a12.2;
+        Fri, 15 Nov 2024 08:07:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1731685526; x=1732290326; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9FFH6fI16GRqVNiLffzMOW91eX3sSjbt+L1GoUi8Rnk=;
-        b=CUehZe47+1TmPe9L6O/qxwhEDYj2TPtGXu6a68tBrHZXYs5+YULQmyOFvc9PuGL1Kd
-         270IzO8ASD5Pn4mj/UZLg89FC1sgphhdXX4Q6/gRcFXLsXq7ADfrjdMrnnCmv1U2iWkg
-         EmDmtVkiXup6Iu0DGR8BPNrre7r970qJeW4UEZAVLwrYTIJR35i0f/hRgsx2Vy6y97LS
-         c8iD5IjV2DyU1xwSGqCbOl11qWdVXpf8ec+mYDXgN6bXqy6nchiIhYWd9bXxH20WjgAK
-         LCyY7DumUBTV0r3uCnYa22V/N256AfXRl1o/eemV3gB6lW4jc5MY8o/yNczmeY8TuUpQ
-         /yNg==
+        d=gmail.com; s=20230601; t=1731686836; x=1732291636; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=20D1PWGk03rV5COuXCsG0W7radE26VyHx9rRuiqEHTc=;
+        b=S+u4lta3arbU+rou+BSHS88lZ4muhvENDb3HdmMWLZKfeaUXVw/AL5hQm3HJKiGhJu
+         OniPLDNarp/mQM3quBaJy8r8CWbQyMv/iFTRIlUQa4/YQtVFrTYgF8RuWf8qHrzMWZj1
+         iAHheCUb69BAX5hLHPEOvrLRgSrB2P+XQ745fTno8iUVJujuRSJXK7nWHPluxgUsQjL2
+         /29440ezIAgM9UsYFUf4V1Pl82GKfxuDsPle1GAgn5Zu4IB61Z3x7XS/O2REIXSPOzm7
+         ycXggExds79Y5EjYM+gOzkGQJHiaRmk8AI6j9J9T4DkkmOsTgoQKNuyWpYztkXQNA+aW
+         Ow0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731685526; x=1732290326;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9FFH6fI16GRqVNiLffzMOW91eX3sSjbt+L1GoUi8Rnk=;
-        b=Nbreh+gX13rIEL489xenx1+IDAK1bIDWGkwZ2y+Xu5WTfsDjcwbKXnNbRQaiv7jYlT
-         UQwajIG54xlm6MBs/1v655nUwpMFBLhZjPDa6Rlm1B0EB8anvbIvoe5pUAvK39bP+x3D
-         BAt2l6WYBsVqyvLgG2bK1/5fEXov//qSL61txInOefQTr7bkviKmL3F+HhD7/BJR6XvN
-         W/mSJMBlyNUwRinJsFJ2h3Ke3dqSceAWjpuq0HguyUOmk0OXV9Kda528wn+7RS5Xf6BK
-         xn3RVFB6fTIaCPhGsvjsC6uQJTBkv4rBwNkU5BXm3RgK/T/H0hm2ri+JznVvX6su+eHy
-         2ODQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVp6TdkyNOu/iBuVdMgnxiw4q0ZDQesfsQK1dAwnt2YPJL2mMtX1CtNm+Q8vrfvEbwRo87/Fb7ELi1deA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yya/VBq2u9v8B6apFLf8AwaPH3mbco80i3Lp1j0ir108+0RJFe9
-	gWC1wZtpi0rxj/2+cy8t7zKPmvkHq1L5D2S9RZ7TKT91d5Y9MzAxyAWBAlzsdak=
-X-Google-Smtp-Source: AGHT+IFMzkpB5ten8aStGI5U0itCRb9SQJnUjz1+wqgAB5ntNpoiOJeeloohYfL8pax+nnjaE0HMrg==
-X-Received: by 2002:a05:600c:1c09:b0:431:5f1c:8352 with SMTP id 5b1f17b1804b1-432df71d609mr27024635e9.5.1731685525955;
-        Fri, 15 Nov 2024 07:45:25 -0800 (PST)
-Received: from blackdock.suse.cz ([193.86.92.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dac0aef0sm58557685e9.28.2024.11.15.07.45.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 07:45:25 -0800 (PST)
-Date: Fri, 15 Nov 2024 16:45:24 +0100
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Costa Shulyupin <costa.shul@redhat.com>
-Cc: ming.lei@redhat.com, Jens Axboe <axboe@kernel.dk>, 
-	Waiman Long <longman@redhat.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
-	Daniel Wagner <dwagner@suse.de>
-Subject: Re: [RFC PATCH v1] blk-mq: isolate CPUs from hctx
-Message-ID: <qlq56cpm5enxoevqstziz7hxp5lqgs74zl2ohv4shynasxuho6@xb5hk5cunhfn>
-References: <20241108054831.2094883-3-costa.shul@redhat.com>
+        d=1e100.net; s=20230601; t=1731686836; x=1732291636;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=20D1PWGk03rV5COuXCsG0W7radE26VyHx9rRuiqEHTc=;
+        b=n41PLS+MjQrslAtzUAZI7c0xIBMdBxslAq9ShLza1/opEMlwcHZQ5Jaiz6L9dmxEil
+         7n9aYyO2BAluQdKJGg/DtA0lmcGd+AQqbJad6i1LkeWDB0QViEfg5poSR+8KMU+gUGst
+         2piE4usKs1lS/SBvAGLrrS4i30VNHzVmw4u4SoboobS3S8sGNUF+ffNXzsIn4wVumopM
+         cCoMu+E2Or9j+1ugSN6ArkM8yoqZ/7hy1cPyeJNn4Ac515bBhL2FQLGlbGSGJ36WXcQj
+         2D9N8DEMc7lOYASGa+yPlT5dQRWsHXxx/Ud28Kz3ZXYSEEZURCfM0h9/fx50bFrqv/XD
+         IHWA==
+X-Forwarded-Encrypted: i=1; AJvYcCW3hD4kDsVql5qQKMMINe74EJeri0xqz931bPKZ9njYppS4YSXSABmn0PhL7WHH0qX5Mner1RdjLLlyyzY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxC3op3y+iasuFx+waY3wqNRFcTiWrizHopZtujnTVddSaEUwS2
+	rZO9i7xisCTywCV4C0UMFiCH7eF0JjJnDA1KoIZzJVH9etHl5iYHjrl+J0LVclc=
+X-Google-Smtp-Source: AGHT+IGTxCjRkoF28Yc9OCPVjH319LHep5KM45/j/IMvA7HJmJ4iBQZTz59clttfjpoYmxMXuRTc6g==
+X-Received: by 2002:a05:6a20:158e:b0:1db:e481:3274 with SMTP id adf61e73a8af0-1dc90bc8e52mr4682121637.31.1731686836177;
+        Fri, 15 Nov 2024 08:07:16 -0800 (PST)
+Received: from [192.168.0.198] ([14.139.108.62])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724770ee95csm1560062b3a.27.2024.11.15.08.07.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2024 08:07:15 -0800 (PST)
+Message-ID: <70996029-be8a-4f97-88fc-a27cff4f5df4@gmail.com>
+Date: Fri, 15 Nov 2024 21:37:10 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="l3kcsrkvzzccsahc"
-Content-Disposition: inline
-In-Reply-To: <20241108054831.2094883-3-costa.shul@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] block: Fix uninitialized symbol 'bio' in
+ blk_rq_prep_clone
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ hch@infradead.org
+References: <20241004100842.9052-1-surajsonawane0215@gmail.com>
+ <20241008175215.23975-1-surajsonawane0215@gmail.com>
+Content-Language: en-US
+From: Suraj Sonawane <surajsonawane0215@gmail.com>
+In-Reply-To: <20241008175215.23975-1-surajsonawane0215@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 08/10/24 23:22, SurajSonawane2415 wrote:
+> Fix the uninitialized symbol 'bio' in the function blk_rq_prep_clone
+> to resolve the following error:
+> block/blk-mq.c:3199 blk_rq_prep_clone() error: uninitialized symbol 'bio'.
+> 
+> Signed-off-by: SurajSonawane2415 <surajsonawane0215@gmail.com>
+> ---
+> V1 - Initialize 'bio' to NULL.
+> V2 - Move bio_put(bio) into the bio_ctr error handling block,
+> ensuring memory cleanup occurs only when the bio_ctr fail.
+> V3 - Moved the bio declaration into the loop scope, eliminating
+> the need to set it to NULL at the end of the loop.
+> V4 - Adjusted position of arguments of bio_alloc_clone.
+> 
+>   block/blk-mq.c | 13 ++++++-------
+>   1 file changed, 6 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 4b2c8e940..89c9a6c4d 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3156,19 +3156,21 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+>   		      int (*bio_ctr)(struct bio *, struct bio *, void *),
+>   		      void *data)
+>   {
+> -	struct bio *bio, *bio_src;
+> +	struct bio *bio_src;
+>   
+>   	if (!bs)
+>   		bs = &fs_bio_set;
+>   
+>   	__rq_for_each_bio(bio_src, rq_src) {
+> -		bio = bio_alloc_clone(rq->q->disk->part0, bio_src, gfp_mask,
+> -				      bs);
+> +		struct bio *bio = bio_alloc_clone(rq->q->disk->part0, bio_src,
+> +					gfp_mask, bs);
+>   		if (!bio)
+>   			goto free_and_out;
+>   
+> -		if (bio_ctr && bio_ctr(bio, bio_src, data))
+> +		if (bio_ctr && bio_ctr(bio, bio_src, data)) {
+> +			bio_put(bio);
+>   			goto free_and_out;
+> +		}
+>   
+>   		if (rq->bio) {
+>   			rq->biotail->bi_next = bio;
+> @@ -3176,7 +3178,6 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+>   		} else {
+>   			rq->bio = rq->biotail = bio;
+>   		}
+> -		bio = NULL;
+>   	}
+>   
+>   	/* Copy attributes of the original request to the clone request. */
+> @@ -3196,8 +3197,6 @@ int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
+>   	return 0;
+>   
+>   free_and_out:
+> -	if (bio)
+> -		bio_put(bio);
+>   	blk_rq_unprep_clone(rq);
+>   
+>   	return -ENOMEM;
 
---l3kcsrkvzzccsahc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hello Jens!
 
-Hello.
+I wanted to follow up on this patch I submitted. I have done all the 
+suggested changes till v4. I was wondering if you had a chance to review 
+it and if there are any comments or feedback.
 
-On Fri, Nov 08, 2024 at 07:48:30AM GMT, Costa Shulyupin <costa.shul@redhat.=
-com> wrote:
-> Cgroups allow configuring isolated_cpus at runtime.
-> However, blk-mq may still use managed interrupts on the
-> newly isolated CPUs.
->=20
-> Rebuild hctx->cpumask considering isolated CPUs to avoid
-> managed interrupts on those CPUs and reclaim non-isolated ones.
->=20
-> The patch is based on
-> isolation: Exclude dynamically isolated CPUs from housekeeping masks:
-> https://lore.kernel.org/lkml/20240821142312.236970-1-longman@redhat.com/
+Thank you for your time and consideration. I look forward to your response.
 
-Even based on that this seems incomplete to me the CPUs that are part of
-isolcpus mask on boot time won't be excluded from this?
-IOW, isolating CPUs from blk_mq_hw_ctx would only be possible via cpuset
-but not "statically" throught the cmdline option, or would it?
-
-Thanks,
-Michal
-
-(-Cc: lizefan.x@bytedance.com)
-
---l3kcsrkvzzccsahc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZzdskQAKCRAt3Wney77B
-SVLLAQD/w8EP314EpkVv+CS8Q78tZha++i6qmCnttn45QJL5UQEA610FW1x1YqKu
-ee7dMxr0W1ccS6lUwnBt6BpNAH//NAk=
-=/uKX
------END PGP SIGNATURE-----
-
---l3kcsrkvzzccsahc--
+Best regards,
+Suraj Sonawane
