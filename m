@@ -1,116 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DD616A956;
-	Fri, 15 Nov 2024 18:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FACC1D435C;
+	Fri, 15 Nov 2024 19:02:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731694797; cv=none; b=Qt4fvSWyA2vIaVarr4NCHpQLwU70SMCS9YNAJ2cltyG1/KNrQg5nRzz5TvdY/pyWIdoz4r0b80aaEMIS9t4wCELkrgSUYwroLTsTTZTe+myio2NEa+B6F5X/gDZGUOAnlc1MILNxHDaW72n1I94ikyIHU7TQfhSPtRU6yjVX8F4=
+	t=1731697364; cv=none; b=ekRWIzxIRPXlHyDhbehgUuGjEgzw5tCbf3ih8czl8m3ddsw0+qG6146OeotsJFOi7lXWU4wtgf1FfChyGoXIE9v71KCs0/sYqp8lf01yPBu89PhAQmz4tO+qmjrgWDaoxcxRWt6o79LY7hqNs625GR004Vuu5nj6gnFNU0bIPjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731694797; c=relaxed/simple;
-	bh=jEHg9Jrc7N9nOTJAGsOnQqFd7YCh1peV7IhURNb7O/A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bMdq4DwhPPj/z1OczdyCh26qWShH05Cfnb28QsiNWU9i8N2IWvCK8bvPHcmQcDL08ar7VlBROrygvharVLl34DhJpY7hRFs0IWadyk0vLHW2leIbGZH69XDtcDkVWQmjc0EKpu6S42NBQZHvSlK1oVBH2F0gDAV6ZifZz4QDNA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ll3B7RpA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731697364; c=relaxed/simple;
+	bh=9vjLfiWYMSCyvWqNdv1hJFPdv5/hvv1FrIS5q3W2qeA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sVQvCCNMS7oidg2Ujqq3NSq0i22gnM00C/4Dv5GBw+9ndrD0dgsZsxjGpSuOxZksBRf+w7Pe1+GAqYppe8E5TzB7vvmekIzk0GQeI3ZVedsx74bwkFC9NNT5nMNbXEZxFl/VK3JSdTvc469nCMajl1PA5ieVZ3sfPvqUty98WCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RnXL55pb; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ll3B7RpA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FA4CC4CED6;
-	Fri, 15 Nov 2024 18:19:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731694796;
-	bh=jEHg9Jrc7N9nOTJAGsOnQqFd7YCh1peV7IhURNb7O/A=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Ll3B7RpAClMKxVOgaKH06KffJRyuHZKK3D1XfJQyTeZ3STCatTHm0Wc6LvIbLvUxV
-	 2phzlli4xMFSY6v4LTQMnHp+nwSKRfD8I0xOLJWS7i7K0RIV5IXd7z/ObgWu0QPR01
-	 szOZ7hya9iBWU+0to5tghIZJG95p6R8Z2UY3H3nVh2KAu6GbAD44vMJb7RG1WL8WXY
-	 00soHgyjyvHgHtZ4Qmk8HpMZLxuJqRpVRQJEaxYN9tTDiFCBS0rhBaUmWR/08BU/Jz
-	 yVjOxpS9/7bAHRFfdrBlX3P3MByf/etJ6FI88xfOU5b71/G6W6O7VzqQfMOb26t+I/
-	 YUt0aqtZBlS/Q==
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3a4e5a7b026so3058195ab.3;
-        Fri, 15 Nov 2024 10:19:56 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUV765LGyStfRkFYrGuC7OK5Fdt5gwUuirz5y9e4YWxKgYmE3c+3rzNFAA+vuOQgzxrI+s0LRnWB3NorqGJ@vger.kernel.org, AJvYcCWu5gtBJrenmhObZlvh3+Xbi60fDd5VEPf52zaMUWFGJpn4QfMY9GfG/H7EV2EJQPMwV3CW8BHAYV1eMA==@vger.kernel.org, AJvYcCXZTgQpO+uxCHqmgPnyJIak9w2XtwC6yNewIyDg8IZUSckdVOkVQiLwhPJgReMZJ+5+ChiwAtIvYOnwDA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYOD2lfGnOwbc4fGRE3oMepcE/rB9RR2wZLC9eM2+MlHW4DeyN
-	t4YqsnPNk7jhfuVCTh55G9N6g4a4RRlRnSEl7nvHboCDmAMTANGjXE+S33mdR95Dc/sjVJTGBPT
-	MRkhqNVo+IgbIcuGPJsPjWEkf9Ok=
-X-Google-Smtp-Source: AGHT+IHKNv1rYC+zz4Cii6bXK7MNqshpluCyaThnmk06bBl2Az82hVcP1DoYGi7z0Uyi7iayM3tR7OYNqZcUsJz9f9Y=
-X-Received: by 2002:a05:6e02:16c6:b0:3a3:9471:8967 with SMTP id
- e9e14a558f8ab-3a748023930mr35721005ab.11.1731694795973; Fri, 15 Nov 2024
- 10:19:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RnXL55pb"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4314b316495so8525685e9.2;
+        Fri, 15 Nov 2024 11:02:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731697361; x=1732302161; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OJeoXJwB9bUfd+K442tubIgDjv2gaR4dr6OV0PklIw8=;
+        b=RnXL55pbflDHLC5ICsWa8IiTE+Xo1XOc0q1WWBu3/EPsr93Zh0mlmOvtZzvGwxOqBG
+         +0e2ueisLkRuyd8z2YN6BCxLENBxTpNv6elEU5OWbQECHNBwGhDPvNVcRDksLPnw58nQ
+         xtKten84PhRqYZtGLpZfNlBqFTPe28yXNHvioRcooj+1wjAumSqOUqqcXyWLhD90u5f2
+         7TT5ABjP3h4x2rn4pXnt79ABHcKbZtpLgjkr22zKgzAms1V6bGgKlmuZz9ZeGQ3YzDfK
+         zZqYNCxxyrqCKZs0CP2xaS0Dyy5mOeWvDPbhCKYORZWHOvo4M4SbZlUJgnij/v6kir6a
+         NNRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731697361; x=1732302161;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OJeoXJwB9bUfd+K442tubIgDjv2gaR4dr6OV0PklIw8=;
+        b=EvabLHoaOZIPijhWFoPX1AISr9JFx0QPQHk/TAdWnOLJOEgBBzk14ZESkKPhwRU824
+         TrZq7rkpUmR9EzReCa35PN2f/7c0QlkCq/B0H+rqdtQ2y4h3WYIWeKyemrF2NBbu8Z9p
+         P2UVb+US0ZDNx2MuBQjpOkpwNI1Uu5IxXW0vIOf8fIbRUuwmWvn6Uv002bDt13FGNdzW
+         MTOFHtsuQWLxdOQ5IsnRm0EUkrNZX0hlztikcRHgLKenjdUksUmGerzI/X3miftLZ3MR
+         SQEmaeOJVUkpbl70FaDpkVFRfMx1PJntr2nJONs4lS+FNtCwAei9bh8Caqhq6N4JEvWg
+         yGyw==
+X-Forwarded-Encrypted: i=1; AJvYcCU8elI//Esjz7nlcHiFNS38mt8ygsV08ohuxg9wyxDT2yw9Jz7atIvVnDBDvcRQ+RzhmclF2OLAwA==@vger.kernel.org, AJvYcCUqWW6EcnHLCow3J11dAwDgmL+QObag4FwIKROxzn/d81kvdcpSSJZvy1CzaKfTEc8h2UVP7rxeImkO/RQ=@vger.kernel.org, AJvYcCWVoRiqdpRwrf9V+7xkbMsIqAdYFc+qL4aWf9swyQFYgthtzZRnK03B8Wigqc35iW7h2srMsxKb3kwtkg==@vger.kernel.org, AJvYcCWcslVwfHXxhoxTPIWh2NUfVSevMDpuuQ6yGk5i6Q4qxKIDsI5iXVIFA8wy3nIfJpiivxW2tLD7Ir4GMS43Bg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIXKpTLMqp+wSiz1bJNXUbUtwb4Cz3FM3scol7iLvIg4A4C/x8
+	S/e/ZGkOkRid0ZKCadys2f6T4z0SFRmWVRBMK75JTTzLKqn5C4Wd
+X-Google-Smtp-Source: AGHT+IFoafFKHLVT0DJoHOrqKEmggso2/mCTHNRA/BSnSr63wSqW4R2fLvclLi+NGyR0Zkzfqsw8DA==
+X-Received: by 2002:a05:600c:1d9e:b0:431:5ce4:bcf0 with SMTP id 5b1f17b1804b1-432df74d88bmr35454675e9.15.1731697361154;
+        Fri, 15 Nov 2024 11:02:41 -0800 (PST)
+Received: from [192.168.42.191] ([148.252.132.111])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dac0ae04sm61614265e9.33.2024.11.15.11.02.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2024 11:02:40 -0800 (PST)
+Message-ID: <397bc8b7-b569-4726-984a-46054d6b5950@gmail.com>
+Date: Fri, 15 Nov 2024 19:03:28 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241112124256.4106435-1-john.g.garry@oracle.com> <20241112124256.4106435-6-john.g.garry@oracle.com>
-In-Reply-To: <20241112124256.4106435-6-john.g.garry@oracle.com>
-From: Song Liu <song@kernel.org>
-Date: Fri, 15 Nov 2024 10:19:44 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW6nJGQMQsEzJFZasg4LuHb3Qf-+JRTgqjaBtbYj_uBNGQ@mail.gmail.com>
-Message-ID: <CAPhsuW6nJGQMQsEzJFZasg4LuHb3Qf-+JRTgqjaBtbYj_uBNGQ@mail.gmail.com>
-Subject: Re: [PATCH v4 5/5] md/raid10: Atomic write support
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, yukuai3@huawei.com, hch@lst.de, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-raid@vger.kernel.org, martin.petersen@oracle.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 06/11] io_uring: introduce attributes for read/write
+ and PI support
+To: Christoph Hellwig <hch@lst.de>
+Cc: Anuj Gupta <anuj20.g@samsung.com>, axboe@kernel.dk, kbusch@kernel.org,
+ martin.petersen@oracle.com, anuj1072538@gmail.com, brauner@kernel.org,
+ jack@suse.cz, viro@zeniv.linux.org.uk, io-uring@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+ gost.dev@samsung.com, linux-scsi@vger.kernel.org, vishak.g@samsung.com,
+ linux-fsdevel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
+References: <20241114104517.51726-1-anuj20.g@samsung.com>
+ <CGME20241114105405epcas5p24ca2fb9017276ff8a50ef447638fd739@epcas5p2.samsung.com>
+ <20241114104517.51726-7-anuj20.g@samsung.com> <20241114121632.GA3382@lst.de>
+ <3fa101c9-1b38-426d-9d7c-8ed488035d4a@gmail.com>
+ <20241114151921.GA28206@lst.de>
+ <f945c1fc-2206-45fe-8e83-ebe332a84cb5@gmail.com>
+ <20241115171205.GA23990@lst.de>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20241115171205.GA23990@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 12, 2024 at 4:43=E2=80=AFAM John Garry <john.g.garry@oracle.com=
-> wrote:
->
-> Set BLK_FEAT_ATOMIC_WRITES_STACKED to enable atomic writes.
->
-> For an attempt to atomic write to a region which has bad blocks, error
-> the write as we just cannot do this. It is unlikely to find devices which
-> support atomic writes and bad blocks.
->
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->  drivers/md/raid10.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-> index 8c7f5daa073a..a3936a67e1e8 100644
-> --- a/drivers/md/raid10.c
-> +++ b/drivers/md/raid10.c
-> @@ -1255,6 +1255,7 @@ static void raid10_write_one_disk(struct mddev *mdd=
-ev, struct r10bio *r10_bio,
->         const enum req_op op =3D bio_op(bio);
->         const blk_opf_t do_sync =3D bio->bi_opf & REQ_SYNC;
->         const blk_opf_t do_fua =3D bio->bi_opf & REQ_FUA;
-> +       const blk_opf_t do_atomic =3D bio->bi_opf & REQ_ATOMIC;
->         unsigned long flags;
->         struct r10conf *conf =3D mddev->private;
->         struct md_rdev *rdev;
-> @@ -1273,7 +1274,7 @@ static void raid10_write_one_disk(struct mddev *mdd=
-ev, struct r10bio *r10_bio,
->         mbio->bi_iter.bi_sector =3D (r10_bio->devs[n_copy].addr +
->                                    choose_data_offset(r10_bio, rdev));
->         mbio->bi_end_io =3D raid10_end_write_request;
-> -       mbio->bi_opf =3D op | do_sync | do_fua;
-> +       mbio->bi_opf =3D op | do_sync | do_fua | do_atomic;
->         if (!replacement && test_bit(FailFast,
->                                      &conf->mirrors[devnum].rdev->flags)
->                          && enough(conf, devnum))
-> @@ -1468,7 +1469,15 @@ static void raid10_write_request(struct mddev *mdd=
-ev, struct bio *bio,
->                                 continue;
->                         }
->                         if (is_bad) {
-> -                               int good_sectors =3D first_bad - dev_sect=
-or;
-> +                               int good_sectors;
-> +
-> +                               if (bio->bi_opf & REQ_ATOMIC) {
-> +                                       /* We just cannot atomically writ=
-e this ... */
-> +                                       error =3D -EFAULT;
+On 11/15/24 17:12, Christoph Hellwig wrote:
+> On Fri, Nov 15, 2024 at 04:40:58PM +0000, Pavel Begunkov wrote:
+>>> So?  If we have a strong enough requirement for something else we
+>>> can triviall add another opcode.  Maybe we should just add different
+>>> opcodes for read/write with metadata so that folks don't freak out
+>>> about this?
+>>
+>> IMHO, PI is not so special to have a special opcode for it unlike
+>> some more generic read/write with meta / attributes, but that one
+>> would have same questions.
+> 
+> Well, apparently is one the hand hand not general enough that you
+> don't want to give it SQE128 space, but you also don't want to give
+> it an opcode.
 
-Is EFAULT the right error code here? I think we should return something
-covered by blk_errors?
+Not like there are no other options. It can be user pointers,
+and now we have infra to optimise it if copy_from_user is
+expensive.
 
-Other than this, 4/5 and 5/5 look good to me.
+One thing that doesn't feel right is double indirection, i.e.
+a uptr into an array of pointers, at least if IIUC from a quick
+glance. I'll follow up on that.
 
-Thanks,
-Song
+> Maybe we just need make it uring_cmd to get out of these conflicting
+> requirements.
+> 
+> Just to make it clear: I'm not a huge fan of a separate opcode or
+> uring_cmd, but compared to the version in this patch it is much better.
+> 
+>> PI as a special case. And that's more of a problem of the static
+>> placing from previous version, e.g. it wouldn't be a problem if in the
+>> long run it becomes sth like:
+>>
+>> struct attr attr, *p;
+>>
+>> if (flags & META_IN_USE_SQE128)
+>> 	p = sqe + 1;
+>> else {
+>> 	copy_from_user(&attr);
+>> 	p = &attr;
+>> }
+>>
+>> but that shouldn't be PI specific.
+> 
+> Why would anyone not use the SQE128 version?
+
+!SQE128 with user pointer can easily be faster depending on the
+ratio of requests that use SQE128 and don't. E.g. one PI read
+following with a 100 of send/recv on average. copy_from_user
+is not _that_ expensive and we're talking about zeroing an
+extra never used afterwards cache line.
+
+Though the main reason would be when you pass 2+ different
+attributes and there is no space to put them in SQEs.
+
+-- 
+Pavel Begunkov
