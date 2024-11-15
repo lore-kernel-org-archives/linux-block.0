@@ -1,219 +1,90 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDC6200B87;
-	Fri, 15 Nov 2024 21:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCFB18D63C
+	for <linux-block@vger.kernel.org>; Fri, 15 Nov 2024 21:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731706943; cv=none; b=e7lyPABN4ydX0g+/waJxglpWgYO9TAiC9uAR6HkerqTud1kWjZSpQYrxX5/W8HPiZeNns2Pz7oxNhnQ8owEYOFWvSF5avnxn7U5b+pm68+hDTYhGQ0iEkqRlVhjO1omJAqmQFkvyhGdzX6W6cHzxPEkefXfyQFO36GEUTEHoQ4Y=
+	t=1731706982; cv=none; b=EsqdUVMtQcQdQ5IzoKAwGOzRmca7NHQGo5io4r8MmUynxsx/L78YoXt1vKIbSMVygrBdjmCvlXrCqDoM6bxLDfGkOaqBWIgLAELTY3KsJPdc6x+E7ytbL84jjl9CgAxTyQsQrFyS/jPWFpslyXBJzfGTcNoMBqbfotzdcp/9mD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731706943; c=relaxed/simple;
-	bh=dIO07mtyX82GJ0/DGwnRD8PVloBMmSemXvxtrctlntU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=BIn2USILwLhtAdI4GnPkddiHm/Iqqcs/2moDs0z2rsNP6TQ5kY+mWwmVq8hDUlAW9xqjjTcXRDTuvB6vIoaxBLLvE1GR3JlXDqHuDqzYk8KtI+hY5Std1McysvQYuntJIFLtSHO/l/PmGEEqkUV772bcl03QmiGV6+qtCXCv6+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=W4A/Q+ov; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1731706982; c=relaxed/simple;
+	bh=gFBvkETcq1C2Hh1KIu33EYtpV7rnobbQjt5TLAHwPWw=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YJANWWy6YKywjmQf7cvSPf5PAhdsxmnivKerlxj91HAMQ9J7o508WfRQRiW4cVzy1tTlhvx7JztTcE0oyqz0hNvlQ2B5GjtbdVLbLrJl1phQIALVZohVB0CLMMAx55WuLPC8D3/xxvA4cH6I4KsKTCfjmxV0NOkBZTKwk1cZqaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HthLkFBK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="W4A/Q+ov"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AF9ZiSk002915;
-	Fri, 15 Nov 2024 21:41:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	mFhCA+NOYuk8bYXlsYuRwz8vDo6+kwMYACTSSoIzGGw=; b=W4A/Q+ovpyTMIbbC
-	w26T8oqCxB9r85d4RPZa3xoW41U9P08tasWS2HjZmNxLpaZMCdFv4De8U/XKX5Ii
-	IYkJQKbRx4TJT1R6RWAIOAzblwPFrJTsVeQxbxKt5riUTGA0w8UBwMCVbKDwIQ7g
-	ISsGkWeC4L59nJ8h778Lvk5M5KO69ajgOUlmV45tFrqZ9KACxjzP5FKJrF5phUNk
-	aUYstcB8qCqhT4tXQvyeXJH2o0NfIC4Lj+vL5uwKkItKv88Dh24rsZEt/oRxzZ85
-	xxLIYdyHoTcBgqiu7oL6S1NEplQ2R7qnhAkPstvLz+c3IgBTmuIVftLZa5BkbSxD
-	OJNvxw==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42x3t9hss4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Nov 2024 21:41:25 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AFLfNwS024141
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Nov 2024 21:41:23 GMT
-Received: from [10.111.176.23] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 15 Nov
- 2024 13:41:20 -0800
-Message-ID: <3ac480f5-549b-4449-baa9-f766e074c409@quicinc.com>
-Date: Fri, 15 Nov 2024 13:41:19 -0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HthLkFBK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731706979;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FHagnFmNZrlzR8g5EzKTblNn1Sf23bKvns6e7SOdPzo=;
+	b=HthLkFBKPDfKmv5SJOX/rI0uvZB2wVqZNWe/RKZ3IEhddorSHz2RC3c6+JRMZoJeKGfc3u
+	u1fhpJp+sMvOVfe4uan24KHiec7yI/OUgzrrGHgO31xOpYECpywpTRp9L8PmkjLNtXlHEG
+	hPa7VPSxYExZeK05+6oci/ncWBNNRY8=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-512-frwPzo_BMC-uEFlahijKoA-1; Fri,
+ 15 Nov 2024 16:42:58 -0500
+X-MC-Unique: frwPzo_BMC-uEFlahijKoA-1
+X-Mimecast-MFC-AGG-ID: frwPzo_BMC-uEFlahijKoA
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7B31A19560B1;
+	Fri, 15 Nov 2024 21:42:57 +0000 (UTC)
+Received: from redhat.com (unknown [10.2.16.7])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 566FF19560A3;
+	Fri, 15 Nov 2024 21:42:55 +0000 (UTC)
+Date: Fri, 15 Nov 2024 15:42:51 -0600
+From: Eric Blake <eblake@redhat.com>
+To: linux-block@vger.kernel.org, nbd@other.debian.org, 
+	Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: question on NBD idempotency
+Message-ID: <t6rjk7bxcyi23vg27ga3jr5qnrqyt66gxxaglbytcgsgunxrpx@rlyn24bt33r5>
+References: <2i75j4d6tt6aben6au4a3s63burx3kvtywhb3ecbh3w2eoallm@ye34afaah6ih>
+ <zhoxmjoys5ikhg4uqelexincgyx5ehgowg3fretnlpquhzdevo@6rwmb7y5zvtz>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
-To: Easwar Hariharan <eahariha@linux.microsoft.com>,
-        Pablo Neira Ayuso
-	<pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Nicolas Palix
-	<nicolas.palix@imag.fr>,
-        Daniel Mack <daniel@zonque.org>,
-        Haojian Zhuang
-	<haojian.zhuang@gmail.com>,
-        Robert Jarzmik <robert.jarzmik@free.fr>,
-        Russell
- King <linux@armlinux.org.uk>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily
- Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle
-	<svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
-        Oded Gabbay
-	<ogabbay@kernel.org>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-        Rodrigo
- Vivi <rodrigo.vivi@intel.com>,
-        Maarten Lankhorst
-	<maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-        Jeroen de Borst <jeroendb@google.com>,
-        Praveen Kaligineedi <pkaligineedi@google.com>,
-        Shailend Chand
-	<shailend@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        James Smart
-	<james.smart@broadcom.com>,
-        Dick Kennedy <dick.kennedy@broadcom.com>,
-        "James
- E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        "Martin K. Petersen"
-	<martin.petersen@oracle.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=C3=A9?=
-	<roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>, Kalle Valo
-	<kvalo@kernel.org>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Catalin Marinas
-	<catalin.marinas@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jack
- Wang <jinpu.wang@cloud.ionos.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Florian Fainelli <florian.fainelli@broadcom.com>,
-        Ray Jui
-	<rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-        Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-        Xiubo Li
-	<xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-        Josh Poimboeuf
-	<jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes
-	<mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>,
-        Joe Lawrence
-	<joe.lawrence@redhat.com>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
-	<tiwai@suse.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Russell King
-	<linux+etnaviv@armlinux.org.uk>,
-        Christian Gmeiner
-	<christian.gmeiner@gmail.com>,
-        Louis Peens <louis.peens@corigine.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao
-	<naveen@kernel.org>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>
-CC: <netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <cocci@inria.fr>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-s390@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-        <intel-xe@lists.freedesktop.org>, <linux-scsi@vger.kernel.org>,
-        <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
-        <linux-wireless@vger.kernel.org>, <ath11k@lists.infradead.org>,
-        <linux-mm@kvack.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-staging@lists.linux.dev>,
-        <linux-rpi-kernel@lists.infradead.org>, <ceph-devel@vger.kernel.org>,
-        <live-patching@vger.kernel.org>, <linux-sound@vger.kernel.org>,
-        <etnaviv@lists.freedesktop.org>, <oss-drivers@corigine.com>,
-        <linuxppc-dev@lists.ozlabs.org>,
-        Anna-Maria Behnsen
-	<anna-maria@linutronix.de>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <10ee4e8f-d8b4-4502-a5e2-0657802aeb11@linux.microsoft.com>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Content-Language: en-US
-In-Reply-To: <10ee4e8f-d8b4-4502-a5e2-0657802aeb11@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: S_kpc-fxOeYei4jGvmu7Zy3HQH9VEGzh
-X-Proofpoint-ORIG-GUID: S_kpc-fxOeYei4jGvmu7Zy3HQH9VEGzh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- malwarescore=0 impostorscore=0 priorityscore=1501 clxscore=1015 mlxscore=0
- mlxlogscore=999 adultscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2411150183
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <zhoxmjoys5ikhg4uqelexincgyx5ehgowg3fretnlpquhzdevo@6rwmb7y5zvtz>
+User-Agent: NeoMutt/20241002
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 11/15/2024 1:29 PM, Easwar Hariharan wrote:
-> On 11/15/2024 1:26 PM, Easwar Hariharan wrote:
->> This is a series that follows up on my previous series to introduce
->> secs_to_jiffies() and convert a few initial users.[1] In the review for
->> that series, Anna-Maria requested converting other users with
->> Coccinelle. This is part 1 that converts users of msecs_to_jiffies()
->> that use the multiply pattern of either of:
->> - msecs_to_jiffies(N*1000), or
->> - msecs_to_jiffies(N*MSEC_PER_SEC)
->>
->> The entire conversion is made with Coccinelle in the script added in
->> patch 2. Some changes suggested by Coccinelle have been deferred to
->> later parts that will address other possible variant patterns.
->>
->> CC: Anna-Maria Behnsen <anna-maria@linutronix.de>
->> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
->>
->> [1] https://lore.kernel.org/all/20241030-open-coded-timeouts-v3-0-9ba123facf88@linux.microsoft.com/
->> [2] https://lore.kernel.org/all/8734kngfni.fsf@somnus/
->>
->> ---
->> Changes in v2:
->> - EDITME: describe what is new in this series revision.
->> - EDITME: use bulletpoints and terse descriptions.
->> - Link to v1: https://lore.kernel.org/r/20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com
->>
+On Fri, Nov 15, 2024 at 10:29:48AM -0600, Eric Blake wrote:
+> On Fri, Nov 15, 2024 at 09:43:29AM -0600, Eric Blake wrote:
+> > 
+> > But if there are no such ioctls (and no desire to accept a patch to
+> > add them), then it looks like I _have_ to use /dev/nbd$N as the tag
+> > that I map back to server details, and just be extremely careful in my
+> > bookkeeping that I'm not racing in such a way that creates leaked
+> > devices or which closes unintended devices, regardless of whether
+> > there are secondary failures in trying to do the k8s bookkeeping to
+> > track the mappings.  Ideas on how I can make this more robust would be
+> > appreciated (for example, maybe it is more reliable to use symlinks in
+> > the filesystem as my data store of mapped tags, than to try and
+> > directly rely on k8s CR updates to synchronize).
 > 
-> Apologies, I missed out on editing the changelog here. v1 included a
-> patch that's already been accepted, there are no other changes in v2.
-> 
-> Thanks,
-> Easwar
+> I wonder if xattr might be what I want for associating a user-space
+> tag with the device.
 
-How do you expect this series to land since it overlaps a large number of
-maintainer trees? Do you have a maintainer who has volunteered to take the
-series and the maintainers should just ack? Or do you want the maintainers to
-take the individual patches that are applicable to them?
+Nope, it looks like setxattr(2) used on /dev/nbd0 (as seen in a
+setfattr(1) strace) fails with EPERM when attempting to assign
+attributes to anything in /dev; ie. devtmpfs does not appear to
+support extended attributes.
 
-/jeff
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.
+Virtualization:  qemu.org | libguestfs.org
+
