@@ -1,141 +1,267 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14201193067;
-	Fri, 15 Nov 2024 23:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDCB19CD01;
+	Fri, 15 Nov 2024 23:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731712849; cv=none; b=Yqny0HZ3VwYzs1sKJOB5ctqlsHOB+mV8KUgeKS4Kw40j4uaiWv9JNlM/Pk0NOknX/7ftkn1sQamElJJYD2R23KUUVBz5KMEwc/73KCzs1UDwrpMkcPX5o1kJYjJO9cE5k9T2xTYKxhoKsugUM0MFTE3CI6vShg2izrn+ej+Ui7Y=
+	t=1731715200; cv=none; b=mWAU3H6Zm6wZ9rHzYRFhiIEffI0zREyg4iS2KSsWF+bxE0Q363Zv1Fp4Y5Zx/4bSEXUweDCIb6h1SIDA/Hc4/TnYSOVCBx3qFebGp0NOpBLmqD1C1/dxseaLDDkmn9PZcOBT6+Pl+O6ao0n2DUqTOdcEAWeVh18M96adAvuooL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731712849; c=relaxed/simple;
-	bh=aHBaGiFTzA9hi/c3ULYVgr+MH6ar7nzsPVpxqhlR3d0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=qReqhrbXA4BTNdYF06GnI1OqwyA+VAcVP2a9b+CeH7jsEZ1KpILmr9Wi2pmU34ZR6F5odXwsXVFkAVzYmYO/lGPIAlh9okqpQ+fqTGk6iXdrNNmVMvi+UMATpaAzeizp0J/0ELOX6RPLGpseXn2CqrzAB8PqkQXp3VNs1888tBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SaYzzMZW; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=o0jZxjqE; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1731715200; c=relaxed/simple;
+	bh=kMEf4uy9nCFZR+G56qL8HUWtzhq2D1KW+Xk6JWWbZws=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YLMWQ5ZqXafQtNrREHCD2xrBPIKQqcGA6CpjfyF3GRcMF4XcCuRv+Z8pic8qXkonY/bN8fW/R8Y9+maUH7lZYhvnanfwcpRshvZkp17mbuMQtob50vj2l+OC4i/itDVa5aLTfEjo0Uc6Jlk8q7LjA+qZjLDuoaQiqQc+qlB6sTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iHvcwERl; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SaYzzMZW";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="o0jZxjqE"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1731712845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ocF2UaqffllWgiGWdH3dEXBRLSQ8zx6v3UTSvYUEWBM=;
-	b=SaYzzMZW0ZsY0TGo8HlsbXzuUvCi20iDEgp+8ohYBSE4TZQXRHLKLbged2BOetLpsx4OkO
-	tbZB0k+QLCEJmNzJNJ7TX06kODrXybKEr0MN0pB2oucYCsCZhXwiPTvkrVYx4d0RSom1W9
-	M5V6DhOs4++KN4sHh/UkGD4PfYSgL/msvq0en1H26aBKpf6quxCthUWooMmyaT4o/QkfC2
-	lCNSo4ipp434fYIwklbWGy8m/kIcsHAL1J9mGF0JwBaNElltRXstfx+KSUKFTEf5oJlO1l
-	imvGv9XAnBM1fMHYuOdaaDvDY2O6X0pakSlzfvsLT9wL98INhCHIDkaV3HsBDQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1731712845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ocF2UaqffllWgiGWdH3dEXBRLSQ8zx6v3UTSvYUEWBM=;
-	b=o0jZxjqE/bb/KZAxT0liDWVEJtakeTQr/m7JfpgliBKuwvw5FjJoNIULPPZ+hcCbxwHCjD
-	VmO8h0eWyvF8dzAA==
-To: Easwar Hariharan <eahariha@linux.microsoft.com>, Jeff Johnson
- <quic_jjohnson@quicinc.com>
-Cc: eahariha@linux.microsoft.com, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
- linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- Naveen N Rao <naveen@kernel.org>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Louis Peens <louis.peens@corigine.com>,
- Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Christian Gmeiner <christian.gmeiner@gmail.com>,
- Russell King <linux+etnaviv@armlinux.org.uk>, Lucas Stach
- <l.stach@pengutronix.de>, Takashi Iwai <tiwai@suse.com>, Jaroslav Kysela
- <perex@perex.cz>, Petr Mladek <pmladek@suse.com>, Joe Lawrence
- <joe.lawrence@redhat.com>, Miroslav Benes <mbenes@suse.cz>, Jiri Kosina
- <jikos@kernel.org>, Josh Poimboeuf <jpoimboe@kernel.org>, Ilya Dryomov
- <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Scott Branden
- <sbranden@broadcom.com>, Ray Jui <rjui@broadcom.com>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>, Jens
- Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, Kalle Valo
- <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Roger Pau =?utf-8?Q?Monn=C3=A9?=
- <roger.pau@citrix.com>, Jack
- Wang <jinpu.wang@cloud.ionos.com>, Andrew Morton
- <akpm@linux-foundation.org>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Praveen Kaligineedi
- <pkaligineedi@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, James
- Smart <james.smart@broadcom.com>, Dick Kennedy
- <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, Maxime Ripard
- <mripard@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter
- <simona@ffwll.ch>, Jeroen de Borst <jeroendb@google.com>, Shailend Chand
- <shailend@google.com>, Thomas Zimmermann <tzimmermann@suse.de>, Maarten
- Lankhorst <maarten.lankhorst@linux.intel.com>, Rodrigo Vivi
- <rodrigo.vivi@intel.com>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
- <thomas.hellstrom@linux.intel.com>, Lucas De Marchi
- <lucas.demarchi@intel.com>, Oded Gabbay <ogabbay@kernel.org>, Ofir Bitton
- <obitton@habana.ai>, Sven Schnelle <svens@linux.ibm.com>, Christian
- Borntraeger <borntraeger@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Heiko
- Carstens <hca@linux.ibm.com>, Russell King <linux@armlinux.org.uk>, Robert
- Jarzmik <robert.jarzmik@free.fr>, Haojian Zhuang
- <haojian.zhuang@gmail.com>, Daniel Mack <daniel@zonque.org>, Nicolas Palix
- <nicolas.palix@imag.fr>, Julia Lawall <Julia.Lawall@inria.fr>, Simon
- Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jozsef Kadlecsik <kadlec@netfilter.org>, Pablo
- Neira Ayuso <pablo@netfilter.org>
-Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
-In-Reply-To: <8127a2e6-fa62-4c85-b7ed-24748cc9e285@linux.microsoft.com>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <10ee4e8f-d8b4-4502-a5e2-0657802aeb11@linux.microsoft.com>
- <3ac480f5-549b-4449-baa9-f766e074c409@quicinc.com>
- <8127a2e6-fa62-4c85-b7ed-24748cc9e285@linux.microsoft.com>
-Date: Sat, 16 Nov 2024 00:20:50 +0100
-Message-ID: <87plmwytgt.ffs@tglx>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iHvcwERl"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4315df7b43fso19797325e9.0;
+        Fri, 15 Nov 2024 15:59:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731715197; x=1732319997; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1Ub+hhbIuAfONcEAapKR7TEJICFZwPInFyKrgiiMvBE=;
+        b=iHvcwERlTcVPpaLjQzr5p1qIs3XC+jraKeW7EXu7E0dp9yLs4FEYi2Yd49foa38G1O
+         1Nusq9mLVB9DOWAY021MYSYoXw4KVN5bGZW/F+9sDd5hwP1Ot73muJ6qIsd8p/LSkDfk
+         0fB6AkxhOtUpTqMnCxJvH8SMOeFsmlBP2THSnx7JpT/ojadJc8BDA50xLnFWRutIEPvE
+         SNVV8QQY9k0vk2txRVaZTvZJKBR9FJcwj+/1kFHozIl1jxHg7xXbaQZQ0nY1iTsnweIM
+         +W76vKRlpuC7BxkUwujswcNMjFTsQgifT9ozbcUpZev2x2HG08KHoszjWZVjZTvshrfh
+         /Mdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731715197; x=1732319997;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1Ub+hhbIuAfONcEAapKR7TEJICFZwPInFyKrgiiMvBE=;
+        b=pCZda1cTuoO7q+rxCCjjHISTL2vKUTIu8Jzv6IrXR1N1VRmhE/hPNsll3ogX8wazNd
+         4vXDZzELgzmutEBJqL9gAUWZCwYHXOofrlQySjGDA4iSqXvuHzfpb7OOx5lTcj5GXtfB
+         XCcLU+38eAbGqIaUfYUSDO5CUZqR9Q3N352uDjurTCsE920aMkEzYvXVY8Ij7tt/MxiX
+         AgLzWI7/ObuVDHv6vDANTYAhQ37bg3hhnSMikp3U+RJadYG1sy7FV94w1RIHgneuOOPH
+         2xC2r/nLfSQebau41Y9MhLhHDL+B4hYzyKHbxje6RA9tSrBqkBekad7OvkoLL2vrn0d2
+         p/qA==
+X-Forwarded-Encrypted: i=1; AJvYcCV2aMyxJsQ2+NlpcJs5VtgZGWpTQ+VapC3xv2jnIS5akYHCw+VJ+qGSlRuL+V12kpeOzU0z7Pesu1wl008o7A==@vger.kernel.org, AJvYcCVz03zRJdGJLPyrbomBq+s1G4ak4LRwNuPy2MpA8PRrMEFMCMchpCcnbU5z0xI80S29M6BgNvNGIGGDkQ==@vger.kernel.org, AJvYcCXp6wjttpMIx7XAfKiVMOXugVfIL+BBk1qeM/XHWwzOlsLKtPcMVHZIocI9VkRGTG52E2aSBEiaIB5FLA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjizGiyOUF7a7TU/K2g4GB9LGEvfJvUT6CxA7ymHZkm2f21GwW
+	iUrcAuDoqdsdneRyxkfx7AaFnfp9de++yDENJqn9IYBr1JuKpN9H
+X-Google-Smtp-Source: AGHT+IGft1DvkMAO1kWM1kUCxMyoddKfZKvRD3xbOGm0Jf3Bj/9DDcNLrhNQNG6hJXFMXzx//UWwIg==
+X-Received: by 2002:a05:600c:3b9d:b0:432:cbe5:4f09 with SMTP id 5b1f17b1804b1-432df7211a5mr37471815e9.4.1731715196605;
+        Fri, 15 Nov 2024 15:59:56 -0800 (PST)
+Received: from [192.168.42.251] ([148.252.132.111])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab721d7sm71012105e9.9.2024.11.15.15.59.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2024 15:59:56 -0800 (PST)
+Message-ID: <c622ee8c-82f0-44d4-99da-91357af7ecac@gmail.com>
+Date: Sat, 16 Nov 2024 00:00:43 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 06/11] io_uring: introduce attributes for read/write
+ and PI support
+To: Anuj Gupta <anuj20.g@samsung.com>, axboe@kernel.dk, hch@lst.de,
+ kbusch@kernel.org, martin.petersen@oracle.com, anuj1072538@gmail.com,
+ brauner@kernel.org, jack@suse.cz, viro@zeniv.linux.org.uk
+Cc: io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org, gost.dev@samsung.com,
+ linux-scsi@vger.kernel.org, vishak.g@samsung.com,
+ linux-fsdevel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
+References: <20241114104517.51726-1-anuj20.g@samsung.com>
+ <CGME20241114105405epcas5p24ca2fb9017276ff8a50ef447638fd739@epcas5p2.samsung.com>
+ <20241114104517.51726-7-anuj20.g@samsung.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20241114104517.51726-7-anuj20.g@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 15 2024 at 14:15, Easwar Hariharan wrote:
-> On 11/15/2024 1:41 PM, Jeff Johnson wrote:
->> 
->> How do you expect this series to land since it overlaps a large number of
->> maintainer trees? Do you have a maintainer who has volunteered to take the
->> series and the maintainers should just ack? Or do you want the maintainers to
->> take the individual patches that are applicable to them?
->> 
->> /jeff
->
-> I am hoping for tglx to take it through his tree since the patch
-> introducing secs_to_jiffies() is in his tree, so sequencing of
-> dependencies would not be an issue.
+On 11/14/24 10:45, Anuj Gupta wrote:
+> Add the ability to pass additional attributes along with read/write.
+> Application can populate an array of 'struct io_uring_attr_vec' and pass
+> its address using the SQE field:
+> 	__u64	attr_vec_addr;
+> 
+> Along with number of attributes using:
+> 	__u8	nr_attr_indirect;
+> 
+> Overall 16 attributes are allowed and currently one attribute
+> 'ATTR_TYPE_PI' is supported.
 
-Right, but it's two days before the merge window opens, so no.
+Why only 16? It's possible that might need more, 256 would
+be a safer choice and fits into u8. I don't think you even
+need to commit to a number, it should be ok to add more as
+long as it fits into the given types (u8 above). It can also
+be u16 as well.
 
-> But if tglx won't, we could push it out another cycle and individual
-> maintainers can take the patches that are applicable to their tree for
-> the series.
+> With PI attribute, userspace can pass following information:
+> - flags: integrity check flags IO_INTEGRITY_CHK_{GUARD/APPTAG/REFTAG}
+> - len: length of PI/metadata buffer
+> - addr: address of metadata buffer
+> - seed: seed value for reftag remapping
+> - app_tag: application defined 16b value
 
-That's the easiest way forward as it does not create conflicts and all
-maintainers will have the base patch in their trees after rc1.
+In terms of flexibility I like it apart from small nits,
+but the double indirection could be a bit inefficient,
+this thing:
 
-Thanks,
+struct pi_attr pi = {};
+attr_array = { &pi, ... };
+sqe->attr_addr = attr_array;
 
-        tglx
+So maybe we should just flatten it? An attempt to pseudo
+code it to understand what it entails is below. Certainly
+buggy and some handling is omitted, but should show the
+idea.
+
+// uapi/.../io_uring.h
+
+struct sqe {
+	...
+	u64 attr_addr;
+	/* the total size of the array pointed by attr_addr */
+	u16 attr_size; /* max 64KB, more than enough */
+}
+
+struct io_attr_header {
+	/* bit mask of attributes passed, can be helpful in the future
+	 * for optimising processing.
+	 */
+	u64 attr_type_map;
+};
+
+/* each attribute should start with a preamble */
+struct io_uring_attr_preamble {
+	u16 attr_type;
+};
+
+// user space
+
+struct PI_param {
+	struct io_attr_header header;
+	struct io_uring_attr_preamble preamble;
+	struct io_uring_attr_pi pi;
+};
+
+struct PI_param p = {};
+p.header.map = 1 << ATTR_TYPE_PI;
+p.preamble.type = ATTR_TYPE_PI;
+p.pi = {...};
+
+sqe->attr_addr = &p;
+sqe->attr_size = sizeof(p);
+
+
+The holes b/w structures should be packed better. For the same
+reason I don't like a separate preamble structure much, maybe it
+should be embedded into the attribute structures, e.g.
+
+struct io_uring_attr_pi {
+	u16 attr_type;
+	...
+}
+
+The user side looks ok to me, should be pretty straightforward
+if the user can define a structure like PI_param, i.e. knows
+at compilation time which attributes it wants to use.
+
+// kernel space (current patch set, PI only)
+
+addr = READ_ONCE(sqe->attr_addr);
+if (addr) {
+	size = READ_ONCE(sqe->attr_size);
+	process_pi(addr, size);
+}
+
+process_pi(addr, size) {
+	struct PI_param p;
+
+	if (size != sizeof(PI_attr + struct attr_preamble + struct attr_header))
+		return -EINVAL;
+	copy_from_user(p, addr, sizeof(p));
+	if (p.preamble != ATTR_TYPE_PI)
+		return -EINVAL;
+	do_pi_setup(&p->pi);
+}
+
+This one is pretty simple as well. A bit more troublesome if
+extended with many attributes, but it'd need additional handling
+regardless:
+
+process_pi(addr, size) {
+	if (size < sizeof(header + preamble))
+		return -EINVAL;
+
+	attr_array = malloc(size); // +caching by io_uring
+	copy_from_user(attr_array);
+	handle_attributes(attr_array, size);
+}
+
+handle_attributes(attr_array, size) {
+	struct io_attr_header *hdr = attr_array;
+	offset = sizeof(*hdr);
+
+	while (1) {
+		if (offset + sizeof(struct preamble) > size)
+			break;
+
+		struct preamble *pr = attr_array + offset;
+		if (pr->type > MAX_TYPES)
+			return -EINVAL;
+		attr_size = attr_sizes[pr->type];
+		if (offset + sizeof(preamble) + attr_size > size)
+			return -EINVAL;
+		offset += sizeof(preamble) + attr_size;
+
+		process_attr(pr->type, (void *)(pr + 1));
+	}
+}
+
+Some checks can probably be optimised by playing with the uapi
+a bit.
+
+attr_type_map is unused here, but I like the idea. I'd love
+to see all actual attribute handling to move deeper into the
+stack to those who actually need it, but that's for far
+away undecided future. E.g.
+
+io_uring_rw {
+	p = malloc();
+	copy_from_user(p, sqe->attr_addr);
+	kiocb->attributes = p;
+}
+
+block_do_read {
+	hdr = kiocb->attributes;
+	type_mask = /* all types block layer recognises */
+	if (hdr->attr_type_map & type_mask)
+		use_attributes();
+}
+
+copy_from_user can be optimised, I mentioned before, we can
+have a pre-mapped area into which the indirection can point.
+The infra is already in there and even used for passing
+waiting arguments.
+
+process_pi(addr, size) {
+	struct PI_param *p, __p;
+
+	if (some_flags & USE_REGISTERED_REGION) {
+		// Glorified p = ctx->ptr; with some checks
+		p = io_uring_get_mem(addr, size);
+	} else {
+		copy_from_user(__p, addr, sizeof(__p));
+		p = &__p;
+	}
+	...
+}
+
+In this case all reads would need to be READ_ONCE, but that
+shouldn't be a problem. It might also optimise out the kmalloc
+in the extended version.
+
+-- 
+Pavel Begunkov
