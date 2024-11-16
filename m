@@ -1,124 +1,194 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-17.smtpout.orange.fr [80.12.242.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3665624;
-	Sat, 16 Nov 2024 03:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4802E18D625;
+	Sat, 16 Nov 2024 06:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731729111; cv=none; b=ZjR4EbF8jgwp2i2rwCeAsWdY9p7IKYhwEfFIQ40XVixW3OPSfW9MZ6h+Ty5ZTTarlNAWb727SaaDJMWbAOoMKV5Wc38vwKkW4NSOvAf2VCU4KY3TgefSqNqRHFmXntoU7MOSHmrPjE0V9eGbPVs4p4P8WWMvrVM8ZCBQS+WOCX0=
+	t=1731737173; cv=none; b=MhxAwLJ2c1bpXvkXFyPUWLWbMk5H5y/haIGtdEYd4iQbAknb+GSEMQYasmbp78A3RjR1TsJS8jXUngAPyDURDY8Pk7ra7nm+Cs1Jz3ynDnGsIa5S5mYGkV7T2ivR44KEYdEB7TSMYVtTqMG0oQ2QpvNVj0t7nwxikF6VxcjDEl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731729111; c=relaxed/simple;
-	bh=p7f2S8jusaL15pNY9wHipfRRF786sx+ZFLyGyZZ4BDw=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=CCTJPPXPeeLLhsK3eTr3BC0qk7oQZAO9Wc1cRCB/6mnrdjq93+kB3SDFwCxA4SFYA8HOMmW1Eq4v8yspVkHaNyzXZxZSdHastY82tptZCvA6PDGN1K0XkZxogFUTjhZMNG/kUR+4nkGJzYWcpiDng/yFgxL9vshfTcMMY2lMWeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Xr0LQ1NdTz4f3kvl;
-	Sat, 16 Nov 2024 11:51:26 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 6B7F51A018D;
-	Sat, 16 Nov 2024 11:51:45 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgB3U4fQFjhnzzSrBw--.43302S3;
-	Sat, 16 Nov 2024 11:51:45 +0800 (CST)
-Subject: Re: [PATCH v4 4/5] md/raid1: Atomic write support
-To: John Garry <john.g.garry@oracle.com>, axboe@kernel.dk, song@kernel.org,
- hch@lst.de
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-raid@vger.kernel.org, martin.petersen@oracle.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20241112124256.4106435-1-john.g.garry@oracle.com>
- <20241112124256.4106435-5-john.g.garry@oracle.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <91aaf05c-3fb8-93ac-1e91-c4c84d56a4ec@huaweicloud.com>
-Date: Sat, 16 Nov 2024 11:51:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1731737173; c=relaxed/simple;
+	bh=pH1vRRZ7ypbK8ig19ve8VTJ681CoPKnEt+e4Gii8zqE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=U5Xy6Fwq6+crFGvk27H3N5sGM046RWmreh5emx+b7pPCAl9NcnhggLl1ZJYsnJ1/RX2LhebezU6rBNhL5H5fP1SKd7QcdIkgh92pGJWHDDXrb8SQMfX2dXOlvZI9bBre535hjVqQ7MomH0oCUDkGS+a8+FD6dG5vhxMEF8n5uZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=mL98MjzV; arc=none smtp.client-ip=80.12.242.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="mL98MjzV"
+Received: from localhost.localdomain ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id CBwItlkEVyQmhCBwItrt0n; Sat, 16 Nov 2024 07:06:02 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1731737162;
+	bh=1GOO379j5kHelQgT13xeDCIW+pFPJCeiM7WSIuvag78=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=mL98MjzVZSShtzisX9zbjDjIb7KE72buAzIx9jorkgCEIlxacBGBiKDqnznYupede
+	 vEhaEvssP8Otw+abSwd4UipThVl5qw3v6w8RixuAXgrl/p9FBRiYmldRfZZljgK0OD
+	 FX0UB9px2S9OjhfpAHnQggpK1elWNH8UBNVIvO5x+AsAiYtyf4oGwInz8jFtqh7DDu
+	 OMNwG4GURPpChqfcVzLVhpacwz+NEqWf9xIvmwF/gxmCGy7nRrRkaf4TeGrlu6c0Ll
+	 o9NHONgP90fIf7c6ZsyFFLJ/v2i9NFywx5+jxHfxBiA3eBfpU5DKAu5obNXbrUQywu
+	 rI95zY+eQlUcg==
+X-ME-Helo: localhost.localdomain
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 16 Nov 2024 07:06:02 +0100
+X-ME-IP: 90.11.132.44
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: eahariha@linux.microsoft.com
+Cc: James.Bottomley@HansenPartnership.com,
+	Julia.Lawall@inria.fr,
+	agordeev@linux.ibm.com,
+	airlied@gmail.com,
+	akpm@linux-foundation.org,
+	andrew+netdev@lunn.ch,
+	anna-maria@linutronix.de,
+	ath11k@lists.infradead.org,
+	axboe@kernel.dk,
+	bcm-kernel-feedback-list@broadcom.com,
+	borntraeger@linux.ibm.com,
+	catalin.marinas@arm.com,
+	ceph-devel@vger.kernel.org,
+	christian.gmeiner@gmail.com,
+	christophe.leroy@csgroup.eu,
+	cocci@inria.fr,
+	coreteam@netfilter.org,
+	daniel@zonque.org,
+	davem@davemloft.net,
+	dick.kennedy@broadcom.com,
+	dri-devel@lists.freedesktop.org,
+	edumazet@google.com,
+	etnaviv@lists.freedesktop.org,
+	florian.fainelli@broadcom.com,
+	gor@linux.ibm.com,
+	gregkh@linuxfoundation.org,
+	haojian.zhuang@gmail.com,
+	hca@linux.ibm.com,
+	horms@kernel.org,
+	idryomov@gmail.com,
+	intel-xe@lists.freedesktop.org,
+	james.smart@broadcom.com,
+	jeroendb@google.com,
+	jikos@kernel.org,
+	jinpu.wang@cloud.ionos.com,
+	jjohnson@kernel.org,
+	joe.lawrence@redhat.com,
+	johan.hedberg@gmail.com,
+	jpoimboe@kernel.org,
+	kadlec@netfilter.org,
+	kuba@kernel.org,
+	kvalo@kernel.org,
+	l.stach@pengutronix.de,
+	linux+etnaviv@armlinux.org.uk,
+	linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-rpi-kernel@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	linux-staging@lists.linux.dev,
+	linux-wireless@vger.kernel.org,
+	linux@armlinux.org.uk,
+	linuxppc-dev@lists.ozlabs.org,
+	live-patching@vger.kernel.org,
+	louis.peens@corigine.com,
+	lucas.demarchi@intel.com,
+	luiz.dentz@gmail.com,
+	maarten.lankhorst@linux.intel.com,
+	maddy@linux.ibm.com,
+	marcel@holtmann.org,
+	martin.petersen@oracle.com,
+	mbenes@suse.cz,
+	mpe@ellerman.id.au,
+	mripard@kernel.org,
+	naveen@kernel.org,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	nicolas.palix@imag.fr,
+	npiggin@gmail.com,
+	obitton@habana.ai,
+	ogabbay@kernel.org,
+	oss-drivers@corigine.com,
+	pabeni@redhat.com,
+	pablo@netfilter.org,
+	perex@perex.cz,
+	pkaligineedi@google.com,
+	pmladek@suse.com,
+	rjui@broadcom.com,
+	robert.jarzmik@free.fr,
+	rodrigo.vivi@intel.com,
+	roger.pau@citrix.com,
+	sbranden@broadcom.com,
+	shailend@google.com,
+	simona@ffwll.ch,
+	svens@linux.ibm.com,
+	thomas.hellstrom@linux.intel.com,
+	tiwai@suse.com,
+	tzimmermann@suse.de,
+	xen-devel@lists.xenproject.org,
+	xiubli@redhat.com
+Subject: Re: [PATCH v2 02/21] coccinelle: misc: Add secs_to_jiffies script
+Date: Sat, 16 Nov 2024 07:05:40 +0100
+Message-ID: <20241116060541.5798-1-christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241115-converge-secs-to-jiffies-v2-2-911fb7595e79@linux.microsoft.com>
+References: <20241115-converge-secs-to-jiffies-v2-2-911fb7595e79@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241112124256.4106435-5-john.g.garry@oracle.com>
-Content-Type: text/plain; charset=gbk; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB3U4fQFjhnzzSrBw--.43302S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww48GFy7tF1xAF18Xw4UXFb_yoW8Zw1xp3
-	y7JFyFkryUtFy8u3srZFyUuayFkFs5KrZ2kFyfJw4Fqr1agrn8Ga1rXFyDWF1DuF93u34U
-	t3ZYkrWDCa13ZrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
-	xVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
-	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UQ6p
-	9UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-ÔÚ 2024/11/12 20:42, John Garry Ð´µÀ:
-> Set BLK_FEAT_ATOMIC_WRITES_STACKED to enable atomic writes.
-> 
-> For an attempt to atomic write to a region which has bad blocks, error
-> the write as we just cannot do this. It is unlikely to find devices which
-> support atomic writes and bad blocks.
-> 
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
+Le 15/11/2024 Ã  22:26, Easwar Hariharan a Ã©crit :
+> Suggested-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 > ---
->   drivers/md/raid1.c | 14 ++++++++++++--
->   1 file changed, 12 insertions(+), 2 deletions(-)
+>   scripts/coccinelle/misc/secs_to_jiffies.cocci | 21 +++++++++++++++++++++
+>   1 file changed, 21 insertions(+)
 > 
-
-I review the patch 5 first, it's the same, so.
-
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-
-> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-> index a5adf08ee174..cd44b4bebf49 100644
-> --- a/drivers/md/raid1.c
-> +++ b/drivers/md/raid1.c
-> @@ -1571,7 +1571,15 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
->   				continue;
->   			}
->   			if (is_bad) {
-> -				int good_sectors = first_bad - r1_bio->sector;
-> +				int good_sectors;
+> diff --git a/scripts/coccinelle/misc/secs_to_jiffies.cocci b/scripts/coccinelle/misc/secs_to_jiffies.cocci
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..af762b1c0aac8f044f21150bfaafd9efc834ee87
+> --- /dev/null
+> +++ b/scripts/coccinelle/misc/secs_to_jiffies.cocci
+> @@ -0,0 +1,21 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +///
+> +/// Find usages of:
+> +/// - msecs_to_jiffies(value*1000)
+> +/// - msecs_to_jiffies(value*MSEC_PER_SEC)
+> +///
+> +// Confidence: High
+> +// Copyright: (C) 2024 Easwar Hariharan Microsoft
+> +//
+> +// Keywords: secs, seconds, jiffies
+> +//
 > +
-> +				if (bio->bi_opf & REQ_ATOMIC) {
-> +					/* We just cannot atomically write this ... */
-> +					error = -EFAULT;
-> +					goto err_handle;
-> +				}
+> +@@ constant C; @@
 > +
-> +				good_sectors = first_bad - r1_bio->sector;
->   				if (good_sectors < max_sectors)
->   					max_sectors = good_sectors;
->   			}
-> @@ -1657,7 +1665,8 @@ static void raid1_write_request(struct mddev *mddev, struct bio *bio,
->   
->   		mbio->bi_iter.bi_sector	= (r1_bio->sector + rdev->data_offset);
->   		mbio->bi_end_io	= raid1_end_write_request;
-> -		mbio->bi_opf = bio_op(bio) | (bio->bi_opf & (REQ_SYNC | REQ_FUA));
-> +		mbio->bi_opf = bio_op(bio) |
-> +			(bio->bi_opf & (REQ_SYNC | REQ_FUA | REQ_ATOMIC));
->   		if (test_bit(FailFast, &rdev->flags) &&
->   		    !test_bit(WriteMostly, &rdev->flags) &&
->   		    conf->raid_disks - mddev->degraded > 1)
-> @@ -3224,6 +3233,7 @@ static int raid1_set_limits(struct mddev *mddev)
->   
->   	md_init_stacking_limits(&lim);
->   	lim.max_write_zeroes_sectors = 0;
-> +	lim.features |= BLK_FEAT_ATOMIC_WRITES_STACKED;
->   	err = mddev_stack_rdev_limits(mddev, &lim, MDDEV_STACK_INTEGRITY);
->   	if (err) {
->   		queue_limits_cancel_update(mddev->gendisk->queue);
+> +- msecs_to_jiffies(C * 1000)
+> ++ secs_to_jiffies(C)
+> +
+> +@@ constant C; @@
+> +
+> +- msecs_to_jiffies(C * MSEC_PER_SEC)
+> ++ secs_to_jiffies(C)
 > 
+Hi,
 
+	@@ constant C =~ "000"; @@
+
+	* msecs_to_jiffies(C)
+
+also spots things like msecs_to_jiffies(1000)
+
+I'm not sure that coccinelle is enable to capture part of the regex to automate the removal of the 000 when converting from ms to s.
+
+Just my 2c,
+
+CJ
