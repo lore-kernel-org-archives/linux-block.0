@@ -1,129 +1,77 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A867729A2;
-	Sat, 16 Nov 2024 23:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC71D38DE1
+	for <linux-block@vger.kernel.org>; Sat, 16 Nov 2024 23:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731798624; cv=none; b=oUQHQ9AzcAxB5wXKbnAXtYEQLE719eDKx6Dp70IYDUm4MXsbf9X44oEY8JdNtwpXe3YVll0yuu30fYptitlJYDAV9i0ik3qoF5jHzmLjpz47oL7jKRsBzVdofjV6lXcRig0GbXF0WFyyAxWHfuHf4LljJnHsiJ5WOXCP5oplVtU=
+	t=1731799984; cv=none; b=V7cHMukN49HWZF/qzZEw0y5x7WBFXuUIe6qzUbb7Vbh89W8koScv2aqheJKQc+fAaclAawx6HVhpENiZWUhTuqwHD5MjC4X9vPppS/L+LxG321UMdbsVVOOfQ0yYyfEUouXLn+aG8szeutYDKq1xPGpegN/Yy7JD3bdPjtc5Cgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731798624; c=relaxed/simple;
-	bh=J8TdKlbufzk8/hb67F60g16aY7BksH2lDSQzP/7KGb0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OUMHTiIgU05teSNCP9k54DG685nfPt88NPaQMsntJvcq6h2Ft9e0//mAfZoAy2QWuJSIQ/12WsGUnEmYuOdqVLvjxtLUYjITWO/ZHYPJVGcSQNECjdoJ/B69Byg9RZ1ZmbzIzIr2aVyDb+dFqsZfQlJi2JQu9qVtkl0Gq3kHfMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V+74xtRE; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V+74xtRE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731798623; x=1763334623;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=J8TdKlbufzk8/hb67F60g16aY7BksH2lDSQzP/7KGb0=;
-  b=V+74xtREoIPt+e7tjT3W3JZ9TmdD0LoOSZiJ6fQyG1Use5m5Wl9iXe5P
-   SxH75+4Botx/OlS27k49LGMVtq9BTqHFJvpVDwDQXFipzgrY7CNDBKvkj
-   mEHwneJXI8Z8PdTMkPJYWERaARV3HKMVksEQDSbWwVWFOHEKZorSMkjV5
-   UjojxUoE707MdDfDlTRD5d7lb/CjYypekU8OusDh2aLvO1gqMEGwbxQdN
-   SSmmOKk+UwuBDU6XGbuxj8zEuon2u6J4V2MoMosa2iVMXpPXbfdb++DVB
-   X12c8Qe7iMaLpmhVlzUHc67SNkZBwtYxIzuSJTh2HoZqS7704G5PJ3rYo
-   g==;
-X-CSE-ConnectionGUID: y1qfZXGCQjyjfb3+U2IUoQ==
-X-CSE-MsgGUID: Kx4mXAujRWiYYQByjrFX1w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11258"; a="19388885"
-X-IronPort-AV: E=Sophos;i="6.12,160,1728975600"; 
-   d="scan'208";a="19388885"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2024 15:10:22 -0800
-X-CSE-ConnectionGUID: 18+FoBMjQe2kvuLxiyxaXA==
-X-CSE-MsgGUID: x4jbkL5oTsSTSFJ0eVCDHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,160,1728975600"; 
-   d="scan'208";a="89284449"
-Received: from lkp-server01.sh.intel.com (HELO 1e3cc1889ffb) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 16 Nov 2024 15:10:17 -0800
-Received: from kbuild by 1e3cc1889ffb with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tCRvi-00019x-2o;
-	Sat, 16 Nov 2024 23:10:14 +0000
-Date: Sun, 17 Nov 2024 07:09:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: Anuj Gupta <anuj20.g@samsung.com>, axboe@kernel.dk, hch@lst.de,
-	kbusch@kernel.org, martin.petersen@oracle.com,
-	asml.silence@gmail.com, anuj1072538@gmail.com, brauner@kernel.org,
-	jack@suse.cz, viro@zeniv.linux.org.uk
-Cc: oe-kbuild-all@lists.linux.dev, io-uring@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com, linux-scsi@vger.kernel.org,
-	vishak.g@samsung.com, linux-fsdevel@vger.kernel.org,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v9 06/11] io_uring: introduce attributes for read/write
- and PI support
-Message-ID: <202411170724.GLZyWdlD-lkp@intel.com>
-References: <20241114104517.51726-7-anuj20.g@samsung.com>
+	s=arc-20240116; t=1731799984; c=relaxed/simple;
+	bh=ozfUCCvHD7H7cQd7d43iIoXCIgVvNpJ7H82PLjvW++Q=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=iK+ldoP+mBl/HFe56PUZXTwLRkppLZ2EMkZ+LyyjZCyHtFrmstxCbOPOhaZQVxVhQN+5LsfstMVnx521vCTDDBryQQwruYSPolo+IzInb5UoHhcnu7L06YVRWJ2GdqleQ7iZcaQhUWdkEqc3kVhEv9jVtIWFBw49dG2kjxwIHHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a3c3ecaaabso40442505ab.0
+        for <linux-block@vger.kernel.org>; Sat, 16 Nov 2024 15:33:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731799982; x=1732404782;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6pPDlMybPfT5VSrJgcwp4WOC86rQWqblOSy8gJogtjg=;
+        b=BeY7BTVDDLeb+ZaqvH/fts/25j511yvoT0fdZTWgD1azWI2pKuGFH1DjT9s4WAq64f
+         0l0DzGwulgJI+taZXmkx8Yxoe7rCNxFqNtg2F2idgkcdgVkode8yvv02TMJc8ISHVrL5
+         Hyj8rSKcgV3BJlSDoa5AMvsmZVPVeR7A04NvT3RbE8VK5lGvxid7bhik9TioWhTnvtTV
+         d1ryqf+8Eepo8BFg4iW4eB7qSsOuzEEZIgvNj9ygQeQ3kht+upeS381Op2H7UXBt9rg/
+         9Ys5P3jIQkaMjdH3bUrvZ7a4XclVLeHk/8v89vb/WAu1Aa/Yja0C1M9u0fe8a9nVCdzA
+         rCag==
+X-Forwarded-Encrypted: i=1; AJvYcCXVhaSV1p3o11mdh8PLl3JnjlrbLU0aCnihofXrcJDaX+GI7PEm9KOed3pHcJgn3AA2WddnmVXC98XDSw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1npGER2i0PbcktapRoWg6FdUY+4A69kY7MRhUQ0fE1Wi7ghvD
+	Py/xsWk9eym7MnpUSeyurpkMahTZEaNHa16/DkhY9bzDnhIIJUOBiQEWmLYxhiNx4rJLkoOZoca
+	w4z4GWNq87FacwlD7PE+v+c/SwJt6qJtJsDwFnK7rtNkZ3NWTjt4lMew=
+X-Google-Smtp-Source: AGHT+IHxQ9I2yZYOzjRu/LCFRev0gwqeF6CbR7jTx9glbHmeTnAWQobIRQzimgpPUOzK4oLe2zqzYITldOsYwITjPA3qJEI3bt+k
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241114104517.51726-7-anuj20.g@samsung.com>
+X-Received: by 2002:a05:6e02:b43:b0:3a7:158d:6510 with SMTP id
+ e9e14a558f8ab-3a74800e163mr69240285ab.5.1731799981891; Sat, 16 Nov 2024
+ 15:33:01 -0800 (PST)
+Date: Sat, 16 Nov 2024 15:33:01 -0800
+In-Reply-To: <67336557.050a0220.a0661.041e.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67392bad.050a0220.e1c64.0009.GAE@google.com>
+Subject: Re: [syzbot] [block?] possible deadlock in loop_reconfigure_limits
+From: syzbot <syzbot+867b0179d31db9955876@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	mathieu.desnoyers@efficios.com, mhiramat@kernel.org, ming.lei@redhat.com, 
+	rostedt@goodmis.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Anuj,
+syzbot has bisected this issue to:
 
-kernel test robot noticed the following build warnings:
+commit f1be1788a32e8fa63416ad4518bbd1a85a825c9d
+Author: Ming Lei <ming.lei@redhat.com>
+Date:   Fri Oct 25 00:37:20 2024 +0000
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on next-20241115]
-[cannot apply to brauner-vfs/vfs.all mkp-scsi/for-next hch-configfs/for-next linus/master jejb-scsi/for-next v6.12-rc7]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+    block: model freeze & enter queue as lock for supporting lockdep
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Anuj-Gupta/block-define-set-of-integrity-flags-to-be-inherited-by-cloned-bip/20241114-193419
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20241114104517.51726-7-anuj20.g%40samsung.com
-patch subject: [PATCH v9 06/11] io_uring: introduce attributes for read/write and PI support
-config: arc-nsimosci_hs_smp_defconfig (https://download.01.org/0day-ci/archive/20241117/202411170724.GLZyWdlD-lkp@intel.com/config)
-compiler: arc-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241117/202411170724.GLZyWdlD-lkp@intel.com/reproduce)
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=129b52c0580000
+start commit:   929beafbe7ac Add linux-next specific files for 20241108
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=119b52c0580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=169b52c0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=75175323f2078363
+dashboard link: https://syzkaller.appspot.com/bug?extid=867b0179d31db9955876
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11b520c0580000
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411170724.GLZyWdlD-lkp@intel.com/
+Reported-by: syzbot+867b0179d31db9955876@syzkaller.appspotmail.com
+Fixes: f1be1788a32e ("block: model freeze & enter queue as lock for supporting lockdep")
 
-All warnings (new ones prefixed by >>):
-
-   io_uring/rw.c: In function 'io_prep_pi_indirect':
->> io_uring/rw.c:305:38: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
-     305 |         if (copy_from_user(&pi_attr, (void __user *)pi_attr_addr, sizeof(pi_attr)))
-         |                                      ^
-   io_uring/rw.c: In function 'io_prep_attr_vec':
-   io_uring/rw.c:321:38: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
-     321 |         if (copy_from_user(attr_vec, (void __user *)attr_addr, attr_vec_size))
-         |                                      ^
-
-
-vim +305 io_uring/rw.c
-
-   298	
-   299	
-   300	static inline int io_prep_pi_indirect(struct io_kiocb *req, struct io_rw *rw,
-   301					      int ddir, u64 pi_attr_addr)
-   302	{
-   303		struct io_uring_attr_pi pi_attr;
-   304	
- > 305		if (copy_from_user(&pi_attr, (void __user *)pi_attr_addr, sizeof(pi_attr)))
-   306			return -EFAULT;
-   307		return io_prep_rw_pi(req, rw, ddir, &pi_attr);
-   308	}
-   309	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
