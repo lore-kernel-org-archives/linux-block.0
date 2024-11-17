@@ -1,76 +1,69 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8412B9DD
-	for <linux-block@vger.kernel.org>; Sun, 17 Nov 2024 08:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE3C1885A5;
+	Sun, 17 Nov 2024 12:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731831245; cv=none; b=g/TS0OT36+A3+0JEpb2qlwTOIh01vnm/XHQB0YOyBFCLsKXJhmmkLDeamIJW03nqV5P/toqWSJtSGn7zks0hqZ8Fd2Wa0L2aMsD2LBvmAnrJr4u/H56p04+hDko/TvWD8B911uuP85OnzyZ/YAGaa4c/iY9EmGtvQhzEfN8MnsY=
+	t=1731845066; cv=none; b=E3OUlUdEmIDEBQYnBYNErJoDcOQ/LN7pCV2xioLDnSwdNh/aGYb1Dwjm4fykRt9CT5JXO+hyfn3xi0B0USD97BB0Fxn+sEyuXmFVQFEtdtJ6tX//EjpJKFG5i9TLnRBb0Ul/weencjIKbEfef26z77dHQHRW7cPjRGnLkR4jOGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731831245; c=relaxed/simple;
-	bh=sITDq9pgxV0JGeUE+jutRHugAwm7EjJ+KKPhCIWr8/s=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=uCZugNq1c3m8Qr5trz+cXNC0mthaE+z+rRxVPNYwBzZmvDCVUwiwpfVzOIKMRGtKQRpyD0kIXvrkkzwxez2BEVWlPzIG5TUT+vh0tD4A5P9HlVLUTeyOnknp0+FfaiMFUtY0tBLHxxeax5e8F6ER5o4n4ck+OR/Sys/M6/dCP1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a71d035135so12845215ab.3
-        for <linux-block@vger.kernel.org>; Sun, 17 Nov 2024 00:14:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731831243; x=1732436043;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0cAXStZgVrmvMzECPpPJcbsX24KNDbw/bMwbcFv7apo=;
-        b=TjVgH/+aT+eVvPKWlpncdCDC1eHxCKpVVbN6FOhPRHV1oVwqQ+M/tpRzQnbrm1uxkK
-         wN3uqseQy+DpvwG19g2OgVlpfA5gC97jxQpKsFtc9HTiRwyCn+K/XZ6lpX5PQMhGPP5d
-         kTQiJkzpmZz7XF8as+i03m/iOUwjfDZ1/glaSYaonx9S+jk5Ji/9Jayn/ghDmEE1CTSi
-         2UKgtbOUC/J13EWcGuSi53xDxSgxxlyGaUW0P+rfin/ea14MNL0vrb9UFYLmyN6eQ6Gc
-         337DK+CvAbgpTF1Xr6VanuKn3wYwkvVkwuObkE+Kh+d6ZgRpjhe4JW2wDeReaXA4ed3Y
-         KQ3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXAilpNeklwq7e7OvZixPCKAYcwUcP4SY8Ub7RPi/kcgb8Qickr6DoGNIpMidSw5nX6TkJXmsppPROvDQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzxls25KUidsuDHjkdJARcmHAQH9XW2seniKRdO51k7FD6yjmQX
-	YRGgaiAunQYqguSr5qROVE5WibECfYFVe0t5Q+cIzp28PatTCQ3Ch+eHPuyJ4I8I3OlxZYvqWYB
-	fYHw3/sM3hGlGafwhLi5DK8c29DeV7okQuRgfSefuFx2NWLfhZ06M6dQ=
-X-Google-Smtp-Source: AGHT+IFd1nbd3dh0Rhw8u+kcphrA3gBgDy9zioD/bdGdledmXplLVHrzifgX/GQ1F/B2kxhtseYyiN1YIX4ZI/wlZ3Q4qSUI0Xzz
+	s=arc-20240116; t=1731845066; c=relaxed/simple;
+	bh=H6Q/+kkZnvVk8G0hRNlWD8uGHYHGc/V8PwsN7PfAurg=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=MhpWE9ng4LFFDiXR/Vmz3mkdbN4ryriW4f33Pnxur91l8rG2j6tiJGZBGjFPi9Ne4+eWX8URrXuVhuNQSABixFpbbXFO3n9tC/0gWmdPJB/v2lgC8grPBjfKm6zuafnN46DXVg8qGtv2rMSZnqKWAV1nPE6VCjxdFhbBie2n5ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=bHCwnzmC; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="bHCwnzmC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1731845059;
+	bh=tllPr++YWNmN/ICehcrJsGBTpJU5ev+6G1o94E8aVEA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=bHCwnzmC4Wn699TTaIvMmA7oqAQUCB0vBZAcYQFnrPziGiTbunbYU+CXdS38yDvH6
+	 YU112WNOjKnnI7JSMJzmw/a0svprG00zS9a6LPP4NJJT/jjzlFbVdAm/RM/h/U+tns
+	 TsykHb5IN7FOSJM573KL+qqNfifuTL8r1hG6UNvh5joUZD+KBNkc1Fn7IYJrs5Ptwk
+	 QPaqtA4agDbcLESUFhw4fys+mFWvc6kPxuKH/D9lsAIxlZt3ypiZTruEU9Mv61lufm
+	 a1hIO9QaUkphJcq/soI8cLFSVRrGlaI+MEFOmOa7tMCM3TlCNsxG9p8p3+SqPMR261
+	 Neh+mkXQjvunQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XrqDc2cRjz4xdS;
+	Sun, 17 Nov 2024 23:04:16 +1100 (AEDT)
+From: Michael Ellerman <patch-notifications@ellerman.id.au>
+To: linux-nfs@vger.kernel.org, Julia Lawall <Julia.Lawall@inria.fr>
+Cc: kernel-janitors@vger.kernel.org, vbabka@suse.cz, paulmck@kernel.org, Tom Talpey <tom@talpey.com>, Dai Ngo <Dai.Ngo@oracle.com>, Olga Kornievskaia <okorniev@redhat.com>, Neil Brown <neilb@suse.de>, linux-can@vger.kernel.org, bridge@lists.linux.dev, b.a.t.m.a.n@lists.open-mesh.org, linux-kernel@vger.kernel.org, wireguard@lists.zx2c4.com, netdev@vger.kernel.org, ecryptfs@vger.kernel.org, linux-block@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+In-Reply-To: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+References: <20241013201704.49576-1-Julia.Lawall@inria.fr>
+Subject: Re: (subset) [PATCH 00/17] replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+Message-Id: <173184457524.887714.2708612402334434298.b4-ty@ellerman.id.au>
+Date: Sun, 17 Nov 2024 22:56:15 +1100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1ca8:b0:3a7:1891:c5f2 with SMTP id
- e9e14a558f8ab-3a7480031bemr85191805ab.1.1731831243214; Sun, 17 Nov 2024
- 00:14:03 -0800 (PST)
-Date: Sun, 17 Nov 2024 00:14:03 -0800
-In-Reply-To: <672c2a44.050a0220.350062.0283.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6739a5cb.050a0220.87769.0006.GAE@google.com>
-Subject: Re: [syzbot] [block?] [usb?] WARNING: bad unlock balance in elevator_init_mq
-From: syzbot <syzbot+a95fab8e491d4ac8cbe9@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, ming.lei@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-syzbot has bisected this issue to:
+On Sun, 13 Oct 2024 22:16:47 +0200, Julia Lawall wrote:
+> Since SLOB was removed and since
+> commit 6c6c47b063b5 ("mm, slab: call kvfree_rcu_barrier() from kmem_cache_destroy()"),
+> it is not necessary to use call_rcu when the callback only performs
+> kmem_cache_free. Use kfree_rcu() directly.
+> 
+> The changes were done using the following Coccinelle semantic patch.
+> This semantic patch is designed to ignore cases where the callback
+> function is used in another way.
+> 
+> [...]
 
-commit f1be1788a32e8fa63416ad4518bbd1a85a825c9d
-Author: Ming Lei <ming.lei@redhat.com>
-Date:   Fri Oct 25 00:37:20 2024 +0000
+Applied to powerpc/topic/ppc-kvm.
 
-    block: model freeze & enter queue as lock for supporting lockdep
+[13/17] KVM: PPC: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+        https://git.kernel.org/powerpc/c/1db6a4e8a3fc8ccaa4690272935e02831dc6d40d
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13aa32c0580000
-start commit:   c88416ba074a Add linux-next specific files for 20241101
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=106a32c0580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17aa32c0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=704b6be2ac2f205f
-dashboard link: https://syzkaller.appspot.com/bug?extid=a95fab8e491d4ac8cbe9
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1722ab40580000
-
-Reported-by: syzbot+a95fab8e491d4ac8cbe9@syzkaller.appspotmail.com
-Fixes: f1be1788a32e ("block: model freeze & enter queue as lock for supporting lockdep")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+cheers
