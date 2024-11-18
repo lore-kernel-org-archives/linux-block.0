@@ -1,57 +1,104 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53C919F103;
-	Mon, 18 Nov 2024 13:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4443919ABCB;
+	Mon, 18 Nov 2024 13:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731935147; cv=none; b=jjDKIHImQmQesFNie2aNXo6Px/Ay1ke/z8HpmlcLuyXj9mf+A5+mScmxE2PhcMDOJ61NtoqFn68BSUhuM1Hv33yXAOVMrBFzXphn/vIEYmkB/Lwgp9CZJNumVnifXwqY1kttaLlnOT8QibJ+BrFNm7AaSlLxR2yz4z23DYRkHyo=
+	t=1731935539; cv=none; b=BPGw8fHRyQ+AcTVpb/yfMXDoOia5RkZvw8adY2T4+RoMdx20yn1O9enzjaGSc3G+L0qyDY38DmriiVQyex/yyA9QCiVCDeKyZ6D5kqp92vduhje7zQkrGQKyfHKb2PCtdo2bFnAhBPQAxSDdG+JThHdHgvNtZ4IpUvFmbLinm/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731935147; c=relaxed/simple;
-	bh=LJh0j+2v8Tr0oL6457rFlEYXiIdQLydd7fS84seABc8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ir1sDc6ECoYicFStUvPb9WW3hWFmY5AjNXJnUQSBlf7RU0JtEbcj12g6rQdK1sjAaVhIoNAoP9yBr8ukKvnCbCJ8d/jU+faRt+vEYSKXKmrMwgbabdS8K30gZpTu/RKHtcKYgAwwkdijVUQIVifZiCcMfbS5GieUV+qOEbdYrOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3C68E68D47; Mon, 18 Nov 2024 14:05:41 +0100 (CET)
-Date: Mon, 18 Nov 2024 14:05:40 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: John Meneghini <jmeneghi@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Mikulas Patocka <mpatocka@redhat.com>,
-	linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-scsi@vger.kernel.org, Chris Leech <cleech@redhat.com>,
-	Hannes Reinecke <hare@suse.de>, snitzer@kernel.org,
-	Ming Lei <minlei@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	Jonathan Brassow <jbrassow@redhat.com>,
-	Ewan Milne <emilne@redhat.com>, bmarson@redhat.com,
-	Jeff Moyer <jmoyer@redhat.com>,
-	"spetrovi@redhat.com" <spetrovi@redhat.com>,
-	Rob Evers <revers@redhat.com>
-Subject: Re: DMMP request-queue vs. BiO
-Message-ID: <20241118130540.GA29045@lst.de>
-References: <2d5fe016-2941-43a4-8b7c-850b8ee1d6ce@redhat.com> <20241104073547.GA20614@lst.de> <d9733713-eb7b-4efa-ad6b-e6b41d1df93b@suse.de> <20241105103307.GA1385@lst.de> <643e61a8-b0cb-4c9d-831a-879aa86d888e@redhat.com> <41cf98c3-a1de-a740-01ad-53c86f3bc8a5@redhat.com> <20241115170924.GB23437@lst.de> <e48b533d-c28a-4e92-b459-74820957ec7d@redhat.com>
+	s=arc-20240116; t=1731935539; c=relaxed/simple;
+	bh=WmVgkz0KTZN8na8N+JVCaFWKKPWLYbasqjQVdB8DB5U=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Y6a9qV5fjfBE47cmAh9QtKYyWlQdY8elPlweZ9la83AbVrarzx1vRZl2cac7s7UkOhTJ3uJMF2Fnu9rpa00FJcSnIhZrKxNyFkr91VWm7Fc5HyjYZ4QLZXjs3hkQW1PmQJkCOZA77gTIYLI3Gk8QZ+evwbEAKCCVOV00Pl5Uhho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LP/qL+2l; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LP/qL+2l"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C70A8C4CECC;
+	Mon, 18 Nov 2024 13:12:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731935538;
+	bh=WmVgkz0KTZN8na8N+JVCaFWKKPWLYbasqjQVdB8DB5U=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=LP/qL+2lfi/zbVVNNr0bAj+T1gDAnDi1DBew1sI7oiWN5BAK8sZY0l65P5HhilE/C
+	 5hAz+KafY56n3VNWSz/XYyg8JIgAUZjoFCg1AmHEn43dDwHoZeGB8EsJXSS1ZzvCTy
+	 XqLguAAewLyTm+EcXLACOZF5+S/+4Wx0ZbQPv8zVgMUtg432RYo4kStZvTZDYuWpg6
+	 OaE5MmAXoSB0PPWnP3Ju2URFP/9MQ08i6KT4JgNLvEA+X95JmiPbcYLdiW3XKPZq33
+	 R6ZE0SWQdF8UzUc1PEUPU/k8GFMsinLHPa3FLEmlQcOeTTPAZ8OxeASsLeK9dVy2nk
+	 9+wyGMb1ZiPiA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B06C2D4921D;
+	Mon, 18 Nov 2024 13:12:18 +0000 (UTC)
+From: Manas via B4 Relay <devnull+manas18244.iiitd.ac.in@kernel.org>
+Subject: [PATCH v2 0/3] rust: simplify Result<()> uses
+Date: Mon, 18 Nov 2024 18:42:16 +0530
+Message-Id: <20241118-simplify-result-v2-0-9d280ada516d@iiitd.ac.in>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e48b533d-c28a-4e92-b459-74820957ec7d@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADA9O2cC/3WNOw6DMBAFr4K2jpHX+Zoq94go/A0rEUC2YwUh3
+ z0OfcoZ6c3bILpALkLXbBBcpkjzVEEcGjCDmp6Oka0MgosTIl5ZpNcykl9ZcPE9JmaUlTflueR
+ GQl0twXn67MVHX3mgmOaw7gcZf/Z/KyNDdtYctRVHri76TkTJtsq0NEFfSvkC3CcBmbAAAAA=
+X-Change-ID: 20241117-simplify-result-cad98af090c9
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+ Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>
+Cc: Shuah Khan <skhan@linuxfoundation.org>, 
+ Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, Manas <manas18244@iiitd.ac.in>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1731935537; l=1033;
+ i=manas18244@iiitd.ac.in; s=20240813; h=from:subject:message-id;
+ bh=WmVgkz0KTZN8na8N+JVCaFWKKPWLYbasqjQVdB8DB5U=;
+ b=W00j64SL9Dv1dPccbNFTCfQ84f/jDzQt98GYrhDhY0xUqx+f7zICm4a6ZSQ3LBA6Y8J51Kc8A
+ cPZHxJjjyADDedbj0d7qJIBqoPCG3Z0/5kyJlzuBkArhquRYEAjYfYg
+X-Developer-Key: i=manas18244@iiitd.ac.in; a=ed25519;
+ pk=pXNEDKd3qTkQe9vsJtBGT9hrfOR7Dph1rfX5ig2AAoM=
+X-Endpoint-Received: by B4 Relay for manas18244@iiitd.ac.in/20240813 with
+ auth_id=196
+X-Original-From: Manas <manas18244@iiitd.ac.in>
+Reply-To: manas18244@iiitd.ac.in
 
-On Fri, Nov 15, 2024 at 03:28:03PM -0500, John Meneghini wrote:
->> And, as pointed out in the private mail that John forwarded to the list
->> without my permission if we really have a workload that cares md could
->
-> Ah come on. I deleted most of the private thread....
+Signed-off-by: Manas <manas18244@iiitd.ac.in>
+---
+Changes in v2:
+- rust: split patches according to various subsystems
+- rust: add rationale for change
+- qt2025: removed qt2025 patch from this series and sent it separately
+  to netdev subsystem
+  Link to qt2025 patch:
+  https://lore.kernel.org/netdev/20241118-simplify-result-qt2025-v1-1-f2d9cef17fca@iiitd.ac.in/
+- Link to v1: https://lore.kernel.org/r/20241117-simplify-result-v1-1-5b01bd230a6b@iiitd.ac.in
 
-As a rule of thumb forwarding private mail to a public list is never
-valid without previous permission.  I'm not worried about any actual
-information in this one, but it is still a breach of trust and privacy
-expectations.
+---
+Manas (3):
+      rust: block: simplify Result<()> in validate_block_size return
+      rust: uaccess: simplify Result<()> in bytes_add_one return
+      rust: macros: simplify Result<()> in function returns
+
+ rust/kernel/block/mq/gen_disk.rs | 2 +-
+ rust/kernel/uaccess.rs           | 2 +-
+ rust/macros/lib.rs               | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+---
+base-commit: b2603f8ac8217bc59f5c7f248ac248423b9b99cb
+change-id: 20241117-simplify-result-cad98af090c9
+
+Best regards,
+-- 
+Manas <manas18244@iiitd.ac.in>
+
 
