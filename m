@@ -1,167 +1,94 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977C019E998;
-	Mon, 18 Nov 2024 15:24:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242131B6CFC
+	for <linux-block@vger.kernel.org>; Mon, 18 Nov 2024 16:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731943444; cv=none; b=P0qbHzL6Q9LVDXEQRnZRH2MV3xQeT71rbFC5W5cspOh70HRKhyHa7IVBmkIfTP+hWkSB8qB1pJvWezuC3GBrp8c2XawuyJ8MSYR47Afb2Z8StYgoTEkHllIFEoUqWHWUVcatiwuSWydcffJzhQ9ZpA/kpAzGNJwa3OiPGyYRYbs=
+	t=1731945906; cv=none; b=W36TfNlF8JPO5d27uCgVZlpc1NbJxf8iCgDMRTuwTaXurkrniUamF2GN1HqxAEQHdskOHNFonq5G48BEWI+e1tasxVeEpfn+c7UI28RbqtsURf0qHDVA9lNdL0xI++bJ2NL6mRCq0NIthBzSg2nZsI5CsE10L1nLzcSHgSKJCXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731943444; c=relaxed/simple;
-	bh=p3iN8DZuOevOGnMI17kwOFArRNlkmk9v/MRI3sg5Upo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b7AukAQaIqTAUiSDjRFW/5fXFW8pmjSuTOKXNEIn3HDB4NXKWcBtRdh7U9OygWCLKYR2/HYoduxI5ZxlLzTtaBIA3duKWU1UHhnfEhPV9zNWyPLbYl9E8Z104fiPSsB9SDD/FkknuShTk7AIPRwwhsyjee/IRW+tKDae1Lfkqtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 5CDE968D31; Mon, 18 Nov 2024 16:23:57 +0100 (CET)
-Date: Mon, 18 Nov 2024 16:23:57 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"io-uring@vger.kernel.org" <io-uring@vger.kernel.org>
-Subject: Re: don't reorder requests passed to ->queue_rqs
-Message-ID: <20241118152357.GA7513@lst.de>
-References: <20241113152050.157179-1-hch@lst.de> <eb2faaba-c261-48de-8316-c8e34fdb516c@nvidia.com> <2f7fa13a-71d9-4a8d-b8f4-5f657fdaab60@kernel.dk> <20241114041603.GA8971@lst.de> <0236980b-b892-460c-802e-a87a79b7ac0b@kernel.dk>
+	s=arc-20240116; t=1731945906; c=relaxed/simple;
+	bh=5ctaaMiUW7UjccVsGGRpDLLFWn0ROHh72dZOHur0JbQ=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D+0nP0cjeJqo5WD3rBozOB0g1uDSLF/AHw8YeIn04mNaKadwnRHnbcwZXCn8/Zr16ud6qz7StKUuyvZN/fpfjgcqau20yYLU3pzP1YG39tBKczrbrjq/BAqlvpppeyS6n1AJOgE84+OzRGL4kE8NJHZC2COH1ouMfzZBfxtNFS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GHR6JQ5Z; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GHR6JQ5Z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731945904;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9Dmzb4+cxeMVzEsNyz6tayZ5fsd2SQQrSivWHjLxk98=;
+	b=GHR6JQ5ZXODoM5kaA/WCITeEf2rN/s0zc+WulHLJEOPb/+z5M2v4RfDIHjdocyA5y41PkW
+	zNlVtW2lCKSag+affpUVP0tExk05JNW1L3p4j5tgPXsb8m78QzKZbIEWQxu/UO5KA6oowi
+	TXDSkCy2KZro3muqi+YZ/0fVisZQH1E=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-193-9j1azjOPN-G_rCgil3L2kQ-1; Mon,
+ 18 Nov 2024 11:05:00 -0500
+X-MC-Unique: 9j1azjOPN-G_rCgil3L2kQ-1
+X-Mimecast-MFC-AGG-ID: 9j1azjOPN-G_rCgil3L2kQ
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C7C651955EA7;
+	Mon, 18 Nov 2024 16:04:59 +0000 (UTC)
+Received: from redhat.com (unknown [10.2.16.76])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C36853003B7E;
+	Mon, 18 Nov 2024 16:04:57 +0000 (UTC)
+Date: Mon, 18 Nov 2024 10:04:55 -0600
+From: Eric Blake <eblake@redhat.com>
+To: linux-block@vger.kernel.org, nbd@other.debian.org, 
+	Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: question on NBD idempotency
+Message-ID: <idugnvijxhmiybvyggxzeyxccbuom3pjblwhbye5fnbmp27rpj@k3lhml2c6zsh>
+References: <2i75j4d6tt6aben6au4a3s63burx3kvtywhb3ecbh3w2eoallm@ye34afaah6ih>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0236980b-b892-460c-802e-a87a79b7ac0b@kernel.dk>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <2i75j4d6tt6aben6au4a3s63burx3kvtywhb3ecbh3w2eoallm@ye34afaah6ih>
+User-Agent: NeoMutt/20241002
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, Nov 14, 2024 at 08:14:11AM -0700, Jens Axboe wrote:
-> > that goes back to the scheme currently used upstream in nvme and virtio
-> > that just cuts of the list at a hctx change instead of moving the
-> > requests one by one now that the block layer doesn't mess up the order.
-> 
-> I think that would be useful. I can test.
+On Fri, Nov 15, 2024 at 09:43:24AM -0600, Eric Blake wrote:
+> Is there an existing set of ioctls where the creation of an NBD device
+> could associate a user-space tag with the device, and I can then later
+> query the device to get the tag back?  A finite-length string would be
+> awesome (I could store "nbd://$ip:$port/$export" as the tag on
+> creation, to know precisely which server the device is talking to),
+> but even an integer tag (32- or 64-bit) might be enough (it's easier
+> to choose an integer tag in the full 2^64 namespace that is unlikely
+> to cause collisions with other processes on the system, than it is to
+> avoid collisions in the limited first few $N of the /dev/nbd$N device
+> names chosen to pick the lowest unused integer first).  If not, would
+> it be worth adding such ioctls for the NBD driver?
 
-I played with this a bit, and I really hate keeping prev for the
-unlinking.  So this version uses a slightly different approach:
+Aha - Stefan pointed me to NBD_ATTR_BACKEND_IDENTIFIER, in use in
+places such as
 
- ‐ a first pass that just rolls through all requests and does the prep
-   checks.  If they fail that is recorded in a new field in the iod
-   (could also become a request flag)
- - the submission loop inside sq_lock becomes a bit more complex
-   as it handles breaking out of the inner loop for hctx changes,
-   and to move the previously failed commands to the resubmit list.
+https://github.com/vitalif/vitastor/blob/156d0054129c43cc26262663ff2c1cbb5b206513/src/client/nbd_proxy.cpp#L164
+https://github.com/xdavidwu/ceph/blob/2f1768caeb96425877d3f5cbfa779c590a23e938/src/tools/rbd_nbd/rbd-nbd.cc#L1394
 
-But this completely gets rid of the prev tracking and all list
-manipulation except for the final list_pop.
+which looks like I can associate a given string directly with the
+netlink creation, then later modification via netlink insists that the
+same backend string be present, and where sysfs can be used to grab
+the contents of nbd->backend as stored in the kernel.  The only
+problem: nbd-client does not (yet) set this netlink parameter.  Looks
+like I get to patch nbd-client, as that netlink field sounds exactly
+like what I want.
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 5f2e3ad2cc52..3470dae73a8c 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -233,6 +233,7 @@ struct nvme_iod {
- 	struct nvme_request req;
- 	struct nvme_command cmd;
- 	bool aborted;
-+	bool batch_failed;
- 	s8 nr_allocations;	/* PRP list pool allocations. 0 means small
- 				   pool in use */
- 	unsigned int dma_len;	/* length of single DMA segment mapping */
-@@ -843,6 +844,7 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
- 	blk_status_t ret;
- 
- 	iod->aborted = false;
-+	iod->batch_failed = false;
- 	iod->nr_allocations = -1;
- 	iod->sgt.nents = 0;
- 
-@@ -904,54 +906,51 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
--static void nvme_submit_cmds(struct nvme_queue *nvmeq, struct rq_list *rqlist)
-+static void nvme_submit_cmds(struct rq_list *rqlist,
-+		struct rq_list *requeue_list)
- {
--	struct request *req;
-+	struct request *req = rq_list_peek(rqlist);
-+	struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
- 
- 	spin_lock(&nvmeq->sq_lock);
- 	while ((req = rq_list_pop(rqlist))) {
- 		struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 
--		nvme_sq_copy_cmd(nvmeq, &iod->cmd);
-+		if (iod->batch_failed)
-+			rq_list_add_tail(requeue_list, req);
-+		else
-+			nvme_sq_copy_cmd(nvmeq, &iod->cmd);
-+
-+		if (!req->rq_next || req->mq_hctx != req->rq_next->mq_hctx)
-+			break;
- 	}
- 	nvme_write_sq_db(nvmeq, true);
- 	spin_unlock(&nvmeq->sq_lock);
- }
- 
--static bool nvme_prep_rq_batch(struct nvme_queue *nvmeq, struct request *req)
--{
--	/*
--	 * We should not need to do this, but we're still using this to
--	 * ensure we can drain requests on a dying queue.
--	 */
--	if (unlikely(!test_bit(NVMEQ_ENABLED, &nvmeq->flags)))
--		return false;
--	if (unlikely(!nvme_check_ready(&nvmeq->dev->ctrl, req, true)))
--		return false;
--
--	return nvme_prep_rq(nvmeq->dev, req) == BLK_STS_OK;
--}
--
- static void nvme_queue_rqs(struct rq_list *rqlist)
- {
--	struct rq_list submit_list = { };
- 	struct rq_list requeue_list = { };
--	struct nvme_queue *nvmeq = NULL;
- 	struct request *req;
- 
--	while ((req = rq_list_pop(rqlist))) {
--		if (nvmeq && nvmeq != req->mq_hctx->driver_data)
--			nvme_submit_cmds(nvmeq, &submit_list);
--		nvmeq = req->mq_hctx->driver_data;
-+	rq_list_for_each(rqlist, req) {
-+		struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
-+		struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 
--		if (nvme_prep_rq_batch(nvmeq, req))
--			rq_list_add_tail(&submit_list, req);
--		else
--			rq_list_add_tail(&requeue_list, req);
-+		/*
-+		 * We should not need to do this, but we're still using this to
-+		 * ensure we can drain requests on a dying queue.
-+		 */
-+		if (unlikely(!test_bit(NVMEQ_ENABLED, &nvmeq->flags)) ||
-+		    unlikely(!nvme_check_ready(&nvmeq->dev->ctrl, req, true)) ||
-+		    unlikely(nvme_prep_rq(nvmeq->dev, req) != BLK_STS_OK))
-+			iod->batch_failed = true;
- 	}
- 
--	if (nvmeq)
--		nvme_submit_cmds(nvmeq, &submit_list);
-+	do {
-+		nvme_submit_cmds(rqlist, &requeue_list);
-+	} while (!rq_list_empty(rqlist));
-+
- 	*rqlist = requeue_list;
- }
- 
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.
+Virtualization:  qemu.org | libguestfs.org
+
