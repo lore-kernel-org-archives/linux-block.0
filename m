@@ -1,28 +1,28 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE01319ABC3;
-	Mon, 18 Nov 2024 11:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F090C1A00F8;
+	Mon, 18 Nov 2024 11:45:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731930319; cv=none; b=fcgp1IQoX7LQHS1SZ8rOJAH4hR3+LP9n0AurKhk32l+37eRPY9xrFURvNDNvxCx/dh7oc7PK7c9V1htfQkzwjM1mWkl4i//zFdYFp+g6Au+l5N2tvobwyo/iWOMF/NYgFSSp7pj5Wpj6WSGNrRHHTdnQuMwSOoZrmei1/Jo5Os0=
+	t=1731930320; cv=none; b=G8XcnEd4dPb7+GQW+ON9oZb9/FvIipHTYCqTyU2qTVfn60/4/nnr4sus16up+tcIWHtQHzaAViWImKQwz2PZRs/WKATkMWLh0/Uw0cesigvLA0a4soNce6UAVN3Bea/x8G3bBXAC2IFivdmGc+5CFf9XdNYI+PdUJFOYpi1yMtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731930319; c=relaxed/simple;
-	bh=fDmN+0rl4p6XTOwNk557Bs4jaQqJuN4meCMuf2wwwoI=;
+	s=arc-20240116; t=1731930320; c=relaxed/simple;
+	bh=Ie7+Y2P96jQDsIJ9iZsKmlswzDmS/OznA23gsg+kWe0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=R6Y6qhJ04Fa4wyNM64s+WzITExcSADWde4/2E06SksmxuHp6PAOW3wlGHnf9PoySFzNctFCqdQtYRBkSOKQjyAdXRDyi/Kyz6jNU79sJUu5QL86UpBFjXTwPylWR9ENOyv+Zgd4VhZWm0Z6vfPqgQmV9lMhmu8HCUvY1CdEuz5Y=
+	 MIME-Version; b=ql1TIFmWzxXlRB04iU86qMUsXquG9b0NYrsPaYI2TRGvkFp1ITQJXNfdJ/YcX6E8SMTxg7JIuIcxhpTztFyyH//jBdVO/mJOxfdaTQAlC6wtGAPJzIdKQ7XcvAHdbevRetvY8hsTS79j+kB/nglQwDMJIsCfJ6AalQ5sMitLvbw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XsQlq4PwPz4f3nV8;
-	Mon, 18 Nov 2024 19:44:55 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XsQly6Pswz4f3l91;
+	Mon, 18 Nov 2024 19:45:02 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id EA9751A0196;
-	Mon, 18 Nov 2024 19:45:14 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 44E311A0359;
+	Mon, 18 Nov 2024 19:45:16 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.101.107])
-	by APP4 (Coremail) with SMTP id gCh0CgCnzoLEKDtn3fCKCA--.48005S10;
-	Mon, 18 Nov 2024 19:45:14 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgCnzoLEKDtn3fCKCA--.48005S12;
+	Mon, 18 Nov 2024 19:45:15 +0800 (CST)
 From: Ye Bin <yebin@huaweicloud.com>
 To: viro@zeniv.linux.org.uk,
 	brauner@kernel.org,
@@ -41,9 +41,9 @@ To: viro@zeniv.linux.org.uk,
 	linux-security-module@vger.kernel.org
 Cc: yebin10@huawei.com,
 	zhangxiaoxu5@huawei.com
-Subject: [PATCH 06/11] fsnotify: use sb_for_each_inodes API
-Date: Mon, 18 Nov 2024 19:45:03 +0800
-Message-Id: <20241118114508.1405494-7-yebin@huaweicloud.com>
+Subject: [PATCH 08/11] fs/super.c: use sb_for_each_inodes API
+Date: Mon, 18 Nov 2024 19:45:05 +0800
+Message-Id: <20241118114508.1405494-9-yebin@huaweicloud.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241118114508.1405494-1-yebin@huaweicloud.com>
 References: <20241118114508.1405494-1-yebin@huaweicloud.com>
@@ -54,10 +54,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnzoLEKDtn3fCKCA--.48005S10
-X-Coremail-Antispam: 1UD129KBjvdXoWrtr1UWw13ZryfKFyrKFyUWrg_yoW3CwcEgF
-	1UZrWrKr4aqr1fKrs8G39IyFZY9r1rGr1UGrnrXFyqyF1aqF1DXaykJr98ZF4Uua15KrZ3
-	JF1ktFy3KrWIkjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+X-CM-TRANSID:gCh0CgCnzoLEKDtn3fCKCA--.48005S12
+X-Coremail-Antispam: 1UD129KBjvdXoWrtr1UWw13Zr4kGrykJw15twb_yoWxtrc_ZF
+	4xAFWjgw43XryS9r4DKws3ZFsakwnakF17Gr43JF15Aw4jqFn8J3yktryF9rn8CF45tr98
+	Ar1xtFW5ArWUGjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
 	9fnUUIcSsGvfJTRUUUbgxYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
 	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r126s
 	0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
@@ -80,22 +80,22 @@ Use sb_for_each_inodes API foreach super_block->s_inodes.
 
 Signed-off-by: Ye Bin <yebin10@huawei.com>
 ---
- fs/notify/fsnotify.c | 2 +-
+ fs/super.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/notify/fsnotify.c b/fs/notify/fsnotify.c
-index 82ae8254c068..11a4eb61b5b2 100644
---- a/fs/notify/fsnotify.c
-+++ b/fs/notify/fsnotify.c
-@@ -40,7 +40,7 @@ static void fsnotify_unmount_inodes(struct super_block *sb)
- 	struct inode *inode, *iput_inode = NULL;
+diff --git a/fs/super.c b/fs/super.c
+index c9c7223bc2a2..71bd0b41468e 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -658,7 +658,7 @@ void generic_shutdown_super(struct super_block *sb)
+ 			struct inode *inode;
  
- 	spin_lock(&sb->s_inode_list_lock);
--	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
-+	sb_for_each_inodes(inode, &sb->s_inodes) {
- 		/*
- 		 * We cannot __iget() an inode in state I_FREEING,
- 		 * I_WILL_FREE, or I_NEW which is fine because by that point
+ 			spin_lock(&sb->s_inode_list_lock);
+-			list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++			sb_for_each_inodes(inode, &sb->s_inodes) {
+ 				inode->i_op = VFS_PTR_POISON;
+ 				inode->i_sb = VFS_PTR_POISON;
+ 				inode->i_mapping = VFS_PTR_POISON;
 -- 
 2.34.1
 
