@@ -1,47 +1,33 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9FA145A16;
-	Mon, 18 Nov 2024 06:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C96973477;
+	Mon, 18 Nov 2024 07:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731911311; cv=none; b=Sf0He6NdvBZ0s/hYug1v76loQwd3Xd+9vQAWEg3JNMK5y1dMd5BIfZHnXNKVYeAP7LMh2On+ItGOhk2xsWV5lOuRJw7X8tgI3dyNzFRQ20bbmV9r0bxSg95r/wE0pjzq130v/ReS9r0q/SiUo0NUeVTIHjF2IxhCgT9FBq0fcXs=
+	t=1731913693; cv=none; b=P1qqBr8m+R2hxPBfk4+vw10ewwNjTEUd9s013TOazHc4sjOuMgTHVxLGXf/foBWmGonEJWLq3N97d4i1y6SVWz5I4OgdbbGaDLcUA41kn5FwvuvcDrWCPHEqJgckJR1jNNH0s7eZBxLi+wTtDxN+KfIVc7Ad8H10L8VqNaXVK4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731911311; c=relaxed/simple;
-	bh=OfLUomwrbK7TrYHwyGvz8j5D0IPCw/XwLpDet6Re2VI=;
+	s=arc-20240116; t=1731913693; c=relaxed/simple;
+	bh=2MjWzVhO3LoIoNwOPfZjNl8BYOQnIpzF/wwXC5X6mvM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oMrmqLOKzxO0DIPHXIFh6kYBtbxg4GSxfqjyXCCIl7sw5GNRx1w2/h7b3sRI1fXftzbr0sLTgopkJOJ9f6/vTM50CQjoh5u8Sf+0fPKZy2vox/b49OVAyZGBzvMcA/dsqcZhaVbZVzpNK2Zd659oRioamJ3QIKH3blmFZhrXaEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ePvGHaOH; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ePvGHaOH"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=neqIiB8snErKjVPML0anXES4Lrhl/U+lJb4xDHwVEew=; b=ePvGHaOHxxQ3+2uEizo+0Ty6iZ
-	zigiMRTTaKjz/IJnpt5XJm+txEUrqsIl8iNH9YQZEG/ew93RVEr3dbqoKQKk/2RXQpctAjjR+lLT3
-	qS5xZv8xacGp0Tyr3xwE21saTVqKc34CdwbWp+OzWVuwB86QB3YNs67InKzRoj1Fv5uLsOwUeRpYN
-	kXjGU8Fz2AgI2pBd1t2QiWAEbOgjylJM9GKseIJw7D3Fd4/kGkTfUkK2hMjTZJxWEtyxxJBbRMNn8
-	jg1KjDECYNRRx9p0lIlbETd4CaxaxEYTyxbyKJ0zXzPdNlikXWp6+0rrgs9PGxFG+r/cw4zETgny3
-	4aFBEcMA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tCvFJ-00000008Wcd-0Kwl;
-	Mon, 18 Nov 2024 06:28:25 +0000
-Date: Sun, 17 Nov 2024 22:28:25 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Suraj Sonawane <surajsonawane0215@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, hch@infradead.org
-Subject: Re: [PATCH v4] block: Fix uninitialized symbol 'bio' in
- blk_rq_prep_clone
-Message-ID: <ZzreiYfmoG-s5127@infradead.org>
-References: <20241004100842.9052-1-surajsonawane0215@gmail.com>
- <20241008175215.23975-1-surajsonawane0215@gmail.com>
- <70996029-be8a-4f97-88fc-a27cff4f5df4@gmail.com>
- <f6a50924-e3f8-4175-a97e-4e77ed24b72b@kernel.dk>
- <f90b485d-a78e-4bcf-bb77-94f68ad575cf@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UpPupvgKX/A3s2lZ9Zm4LM6WqPDyl9VEmZFEXzkeTJgZFg0wcb/gguy92xCMdVIAqBw8tQxB3AbM/EcpCD1yyETaargpsrJmn41jTFM8MDsn85qnlmrUyK8g3YuglOWUeVVb3QOvj+/EtuRwILBafk3A/RzvJ8BIE0gVVpVZ9nI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 66A2F68B05; Mon, 18 Nov 2024 08:08:05 +0100 (CET)
+Date: Mon, 18 Nov 2024 08:08:05 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: willy@infradead.org, hch@lst.de, hare@suse.de, david@fromorbit.com,
+	djwong@kernel.org, john.g.garry@oracle.com, ritesh.list@gmail.com,
+	kbusch@kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
+Subject: Re: [RFC 8/8] bdev: use bdev_io_min() for statx block size
+Message-ID: <20241118070805.GA932@lst.de>
+References: <20241113094727.1497722-1-mcgrof@kernel.org> <20241113094727.1497722-9-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,23 +36,33 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f90b485d-a78e-4bcf-bb77-94f68ad575cf@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20241113094727.1497722-9-mcgrof@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sat, Nov 16, 2024 at 05:02:57PM +0530, Suraj Sonawane wrote:
-> Apologies for any confusion earlier, and thank you for your attention to
-> this. After further analysis, I realize that this change isn't necessary, as
-> bio is already set to NULL by bio_alloc_clone on failure, preventing any
-> real case of uninitialized use. My initial patch aimed to clean up the code
-> and satisfy smatch, ensuring better readability and error handling.
+On Wed, Nov 13, 2024 at 01:47:27AM -0800, Luis Chamberlain wrote:
+> The min-io is the minimum IO the block device prefers for optimal
+> performance. In turn we map this to the block device block size.
+
+It's not the block size, but (to quote the man page) 'the "preferred"
+block size for efficient filesystem I/O'.  While the difference might
+sound minor it actually is important.
+
 > 
-> I appreciate your feedback and the opportunity to learn from this. I now
-> understand that no change is needed here. Thank you for your guidance and
-> understanding.
+> diff --git a/block/bdev.c b/block/bdev.c
+> index 3a5fd65f6c8e..4dcc501ed953 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -1306,6 +1306,7 @@ void bdev_statx(struct path *path, struct kstat *stat,
+>  			queue_atomic_write_unit_max_bytes(bd_queue));
+>  	}
+>  
+> +	stat->blksize = (unsigned int) bdev_io_min(bdev);
 
-FYI, I still think the change is useful.  It makes the code a lot
-better to read for humans and machines, and fixes a static checker
-false positive.  So I'd still love to see it, it just needs a better
-commit log.  Feel free to contact me off list if you need help with
-that.
+No need for the cast.
+
+>  	if (S_ISBLK(stat->mode))
+> -		bdev_statx(path, stat, request_mask);
+> +		bdev_statx(path, stat, request_mask | STATX_DIOALIGN);
+
+And this is both unrelated and wrong.
 
