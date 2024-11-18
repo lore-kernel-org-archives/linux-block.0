@@ -1,190 +1,96 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF6317BEA2;
-	Mon, 18 Nov 2024 08:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711A2153836;
+	Mon, 18 Nov 2024 09:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731918440; cv=none; b=T7HQ/l74ZOipqG0NwEmR4b6iFQKq4dvsoTx6V7vgzq2qmFRWWa0QN0LTQYxW59tEd5vhcw1PW2Qq5PI+pyt5famgM2pR129QfQVVTejJggt5CS/oIOWdSNgqG9EmcVR/furP707OMnLXvC9vEkN/kR16AfAI1ufkei36q2Szx9Q=
+	t=1731920958; cv=none; b=SuSiLriHRK/KW5xdvDsB8R4nON46U4DL2dRu2Sr6gCJRkyXE0x8TQ5odToXUE2wwTzwkBVtoDTaoCV4qSO141U2xOBd3HKoFV2p30/oHgEoDRLryeu7fRmQ/2toapSQf/FHOOYmmT3FwpPetB0pEuxby8R3NOro2SeWMi+pbd6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731918440; c=relaxed/simple;
-	bh=u+X9RPFT3w+sPXWt7gaBbAtIUXtN5oRIXDWvsAzav18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FbBt4xOCG9BMTNQZuGic69z+MhyZuokfAEB+6GlYz12sXOuUSWKDln3gnYSh5QTqD7rv1Yy3chmgh64k2bg+bdfDE27Dwn3m40s5FjIFr/ieDjPQU/V3Y8h7vSBFqEwaUYSpYZyhwgppObM8tKy9wDlawbnlbNy+HU+rIdnnaeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pVJ5a4Sb; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1731920958; c=relaxed/simple;
+	bh=YWLswSe7WZP9b/xSFZ5CYmi1IPuOZDQasiG6yEaMH7c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kPATJDQxnuDqq3HIird9NgfoYm62/XskzLCsn4tSnMO4OVudE8bHxyAoqhIkmBQHN/wSysTzBmPyu79ILaIpctipU+/Ipeq+HgwQ9xlsk3rCxvJmWXecPA1qCmgpBaWZzuDpiW/S7x9DnrG/gElmsY5c6VUY72o0XxfZRor7oYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SrHKJxVR; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pVJ5a4Sb"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AHJiO3Y023687;
-	Mon, 18 Nov 2024 08:26:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=pofVBIDpbmPXxKdXBZzlW6SKJ1mpQg
-	5f+nyOC0P54ZU=; b=pVJ5a4SbiQLc7KmL6NMVUat1TeAb+E4P6v1BT086o1mEhk
-	asPz+d9pnH3oUetVu+XCwbjmIJgCChQ2Yg76ElBtpMc3MPIe4GEIJkdBOh3EDOTs
-	BshLlGoNMECAtRDAXjrNjk0/DJ4p9T1LW6K46OwdwtMNuLDXUx7tw7C0oS59z+J9
-	QShMh32WGNHKvTgEgpik3EK5hVK4TsghRPVpOZt4uDmXgH2LYgfrkGGFgYTal2qH
-	dz0ScnJgPbYohwDb0fe9yXNM0o6w8EzUNqyOgMmUN0w1gT6xXC0tgw+yBkjkz/Fh
-	q242Ut9KG7OxmdBC6tktol2tQuFTw331MM4YUGlg==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42xgtt0eh7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Nov 2024 08:26:15 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AI73j1E030931;
-	Mon, 18 Nov 2024 08:26:14 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42y63y27mu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Nov 2024 08:26:14 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AI8QAR549479982
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Nov 2024 08:26:10 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BD6AD20043;
-	Mon, 18 Nov 2024 08:26:10 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A867E20040;
-	Mon, 18 Nov 2024 08:26:06 +0000 (GMT)
-Received: from osiris (unknown [9.171.77.223])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 18 Nov 2024 08:26:06 +0000 (GMT)
-Date: Mon, 18 Nov 2024 09:26:05 +0100
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
-        Haojian Zhuang <haojian.zhuang@gmail.com>,
-        Robert Jarzmik <robert.jarzmik@free.fr>,
-        Russell King <linux@armlinux.org.uk>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
-        Oded Gabbay <ogabbay@kernel.org>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-        Jeroen de Borst <jeroendb@google.com>,
-        Praveen Kaligineedi <pkaligineedi@google.com>,
-        Shailend Chand <shailend@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        James Smart <james.smart@broadcom.com>,
-        Dick Kennedy <dick.kennedy@broadcom.com>,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Florian Fainelli <florian.fainelli@broadcom.com>,
-        Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-        Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-        Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Russell King <linux+etnaviv@armlinux.org.uk>,
-        Christian Gmeiner <christian.gmeiner@gmail.com>,
-        Louis Peens <louis.peens@corigine.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
-        linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
-        linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
-        ath11k@lists.infradead.org, linux-mm@kvack.org,
-        linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
-        live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
-        etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
-        linuxppc-dev@lists.ozlabs.org,
-        Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH v2 04/21] s390: kernel: Convert timeouts to use
- secs_to_jiffies()
-Message-ID: <20241118082605.17002-A-hca@linux.ibm.com>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <20241115-converge-secs-to-jiffies-v2-4-911fb7595e79@linux.microsoft.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SrHKJxVR"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-211f6e1c865so3390455ad.3;
+        Mon, 18 Nov 2024 01:09:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731920956; x=1732525756; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YWLswSe7WZP9b/xSFZ5CYmi1IPuOZDQasiG6yEaMH7c=;
+        b=SrHKJxVR7m3oU7mRrxp5tp8195/a4J6qbqwx0P9bQd7Knry67ARKGLZGc/ChpUs4J6
+         qbYAKwJe+9+JZFRVNcFJ/S9ph2QAMq/XIf8m1GH44EqLZ9IpZ1m+FY4m8sqjT/TJiVih
+         m4zIzrUnyDn3S5JK3/VfiltW7ATbAkEdTzOQhNNQl9g9+pRjckhBP2e3u/edPQTbx7Pm
+         oeONCrxqOzYtmBj2ABTN8bCWRqFEKWOcj2qANX1O6CSz2HBCvCJ7gW4we0xqHCSDoWI9
+         XB0WWn5e1VC+mblw1PtkIx4Hs0Uu7lulKxRKtkdkw2WmDnVcvOCKIYdJgjV/+FgLemR7
+         TWDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731920956; x=1732525756;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YWLswSe7WZP9b/xSFZ5CYmi1IPuOZDQasiG6yEaMH7c=;
+        b=Y3h4G0aZ+M1822mX2CQnmJj6hrMKc3c+GkYktG5vi22ZmN1qlWwhO7iZhU2XvJaiOw
+         MplHCo1w5DOvwUy1d6AJtRT86Oi8fnc4F/giGvOB1HPSgw9hhFtds5ZJX+Km/5Hyvs6o
+         uLIs29bX95fquM5WwnrkJFoj8sxvotohmb4XRtEJyWk4mmt2K/noD/UdFDhV6dIi24pi
+         o165Gcz96ImiNP87qAd7Ev+H30mA91fLfKgLibk+Mk9UJKLcCcqYXGivQfmcJ2IZp4ot
+         5PXxhaVyxrTkhwUDN+Vid5QYDnDHeVB+yHSUOfqINjL9s4gtMFrjJezqf33njBTsC2wr
+         jTBA==
+X-Forwarded-Encrypted: i=1; AJvYcCU03h+yQ9j8YpWkmc8W/CafvKWk+WILvJJTyP9Ct2F7jMFVVjlBbNJMujOaiJPN9g+hHMuf0XjcVY3PzpoEfDw=@vger.kernel.org, AJvYcCVanOkH3CTEMcQgtBeinFSjgUD0dNL6pOwxSvXtVjaj1G9vanx+aBBQk02FkRyBPL0UTVSFU9/CWDyhsw==@vger.kernel.org, AJvYcCWlKh5mnQg1gyTrHyPTM/lF+rBEf0GIBcDWXfuyWUK+E0NsU71JpoVkwwvSYcZ54LdVXmZKSkN4@vger.kernel.org, AJvYcCXUk5TAd4YxOB+1GmpcWssfhQ7NDa7hbAnwfpNGVJWe22VyhqCSP+xbgHSS+UhhBFMY3+R5YugdmxcDJdCx@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQ0azNHph2gIIKIoqeTklXIexz+vGkdviQnAuJO8a9t/Q79ft4
+	u36DAp9xjSJRcmz4185sMqRUcBBZ3s7SoWYbCvosccudJMdIa+EqGLR+8Rsd3Kr48xnwXWYVlCM
+	UzB/4TYAEVGb8/xha6cfDprKAVzQ=
+X-Google-Smtp-Source: AGHT+IFpWfv5PIcWHbtZu/kn7bRyyJbKbZRumMvg1pEzQh+tSLDv2nY2KMHanrDXfZai+jdjAHxB8cHLncAz8ePurYk=
+X-Received: by 2002:a17:90b:1e50:b0:2ea:715b:72ba with SMTP id
+ 98e67ed59e1d1-2ea715b7581mr1460462a91.9.1731920955682; Mon, 18 Nov 2024
+ 01:09:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115-converge-secs-to-jiffies-v2-4-911fb7595e79@linux.microsoft.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QBYvLy3JNa8evFseixOVfcUMyMppMmNG
-X-Proofpoint-ORIG-GUID: QBYvLy3JNa8evFseixOVfcUMyMppMmNG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
- mlxscore=0 malwarescore=0 mlxlogscore=858 adultscore=0 priorityscore=1501
- bulkscore=0 impostorscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2411180066
+References: <20241117-simplify-result-v1-1-5b01bd230a6b@iiitd.ac.in>
+ <3721a7b2-4a8f-478c-bbeb-fdf22ded44c9@lunn.ch> <CANiq72kk0gsC8gohDT9aqY6r4E+pxNC6=+v8hZqthbaqzrFhLg@mail.gmail.com>
+ <q5xmd3g65jr4lmnio72pcpmkmvlha3u2q3fohe2wxlclw64adv@wjon44dqnn7e>
+ <CANiq72kQJw4=qBEPwykrWBsqmycwS+mR27OE2dTPQd3tKjx-Tw@mail.gmail.com> <5qtqdzljvzly5onzhfdq63fzcqcj26ybktm2cgomijpnfnyrbj@ln2kbp73csf6>
+In-Reply-To: <5qtqdzljvzly5onzhfdq63fzcqcj26ybktm2cgomijpnfnyrbj@ln2kbp73csf6>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 18 Nov 2024 10:09:03 +0100
+Message-ID: <CANiq72koO_gdhP_5hzNz5AH-JQNoAzpszpeVR_BV14Nw-OWhzw@mail.gmail.com>
+Subject: Re: [PATCH] rust: simplify Result<()> uses
+To: Manas <manas18244@iiitd.ac.in>
+Cc: Andrew Lunn <andrew@lunn.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Trevor Gross <tmgross@umich.edu>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Anup Sharma <anupnewsmail@gmail.com>, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 15, 2024 at 09:26:21PM +0000, Easwar Hariharan wrote:
-> Changes made with the following Coccinelle rules:
-> 
-> @@ constant C; @@
-> 
-> - msecs_to_jiffies(C * 1000)
-> + secs_to_jiffies(C)
-> 
-> @@ constant C; @@
-> 
-> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> + secs_to_jiffies(C)
-> 
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> ---
->  arch/s390/kernel/lgr.c      | 3 ++-
->  arch/s390/kernel/time.c     | 4 ++--
->  arch/s390/kernel/topology.c | 2 +-
->  3 files changed, 5 insertions(+), 4 deletions(-)
+On Mon, Nov 18, 2024 at 2:12=E2=80=AFAM Manas <manas18244@iiitd.ac.in> wrot=
+e:
+>
+> Yes.
 
-...
+I was asking because the kernel does not accept anonymous
+contributions, so when someone uses a single (common, I think?) word
+as their identity, it may not be enough to find the contributor again
+in the future if the email changes.
 
-> diff --git a/arch/s390/kernel/lgr.c b/arch/s390/kernel/lgr.c
-> index 6652e54cf3db9fbdd8cfb06f8a0dc1d4c05ae7d7..68021cb38574b122bbe3d9f70e9168305360017b 100644
-> --- a/arch/s390/kernel/lgr.c
-> +++ b/arch/s390/kernel/lgr.c
-> @@ -166,7 +166,8 @@ static struct timer_list lgr_timer;
->   */
->  static void lgr_timer_set(void)
->  {
-> -	mod_timer(&lgr_timer, jiffies + msecs_to_jiffies(LGR_TIMER_INTERVAL_SECS * MSEC_PER_SEC));
-> +	mod_timer(&lgr_timer,
-> +		  jiffies + secs_to_jiffies(LGR_TIMER_INTERVAL_SECS));
->  }
+Thanks!
 
-Please don't add a new line break, especially not if the new line
-would be shorter than the old one.
+Cheers,
+Miguel
