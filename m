@@ -1,131 +1,159 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A3315534E
-	for <linux-block@vger.kernel.org>; Mon, 18 Nov 2024 11:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CEB193435;
+	Mon, 18 Nov 2024 11:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731928120; cv=none; b=BOa0WC7N34peEnHph+vTw7Ga7dZfb1X/Lo/HGX3ZXkbMun89cenE4mftMytVI10oAk59hQ5NpSBvRzO4NZhnjmYIKCuYtA2JWmF3wxZxYXCUe0cDRBeNdIxGpHB72eWCyy4sIiXuha9UYt95SLS0JjPx8PS7jEb1WEiHF31ztjs=
+	t=1731929318; cv=none; b=JnrC+Kz56QPCbLm7I6ZVfVM0cpoO5CDPtSKEOWNVpXtSgXfVSJye83CT+cYeHUG2AfFGfEjU3RAZOqE1Ub43cdqrad51fWCka6hp472svUdaM4CAbIToFFnSJ+aDn9lkaCrtIE3s01jarq0m1HyLxtnaKenW2NNbsmOc7MiEwxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731928120; c=relaxed/simple;
-	bh=Z5bh5DnDsQDrS6FoK6+ye1rLMwWyfxDyedFBx9cd6Rc=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=U3gHdvl7SYzNehu+y3yI60sTyuXeKA4eVzELsHSR0a/FiU/EgnxA3A3UxT4ptXQGnqgop6yqAPyJ7RdZVBJIFFZA9U5SBCxAAbe/m/HTKoHtfJCMM+h21oSIbFBjyd1WUz1SkHzPFaqmS29qxOq5/Nk5XWvK3aIdkwEuL/1K7zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XsPxT3tcQz4f3pJC
-	for <linux-block@vger.kernel.org>; Mon, 18 Nov 2024 19:08:13 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id D56931A0359
-	for <linux-block@vger.kernel.org>; Mon, 18 Nov 2024 19:08:32 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgCXcYUvIDtndIGICA--.56774S3;
-	Mon, 18 Nov 2024 19:08:32 +0800 (CST)
-Subject: Re: [PATCH blktests] throtl: set "io" to subtree_control only if
- required
-To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- linux-block@vger.kernel.org
-Cc: Yi Zhang <yi.zhang@redhat.com>, "yukuai (C)" <yukuai3@huawei.com>
-References: <20241115121224.173285-1-shinichiro.kawasaki@wdc.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <15cab907-aef7-a378-5431-490ed000201c@huaweicloud.com>
-Date: Mon, 18 Nov 2024 19:08:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1731929318; c=relaxed/simple;
+	bh=eflO5BqcAdiHnObc19vuFxv1kFN4bcVh6FEadC6e/J0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=T6XTRc2TTB2/I+CZHGZuUSK0AknwoSwHSo949+Nym4GcNaA1BlRudEmeGAU281/nBBS5e6xY1e3dBX9ePi/Qa/XKhN9ezXEA2At2vFfYkmKSzjfzc8sJ9SnY2PWPA/JNZG0ZxnJH7JF2+GI77HKU6YblxQ9ubYC+HAUYgZ+eA/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m/8JdPtt; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m/8JdPtt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731929317; x=1763465317;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=eflO5BqcAdiHnObc19vuFxv1kFN4bcVh6FEadC6e/J0=;
+  b=m/8JdPttVwUXB5ZhVtJXKSa0qsOobC2hjqN6pZsmq5ZFypOQD0vpYCKi
+   6N1ldEbE7IX6cI/JPyGTLJphyOa8qs7J9LsaxXS2T3h8Mhe6xE4mY1tCq
+   la+qvukZUQkQzQX1jOk/yyCJz5ix7tej6qx7AKwllnCOC3Et+dvcKuxG9
+   LXStNjnOvrJXlYrTiY1ntu1sKAVgK/JY8xFxs4yjkzgF5gBfMcVG1hKyP
+   CzsFthbx3Wj2ZxKf6rqqMH7sS4Qcl9NdLn+cy8xySJrxnbQSORPrnwSim
+   f6cncK9WeAZ8+6pNGUyjtvGlSKM4rqt4BllKp/b4Xc/1nPtj0a8wp3UK6
+   A==;
+X-CSE-ConnectionGUID: NZT1qeH0SnGr7jSWfhdmHw==
+X-CSE-MsgGUID: FLXFwY+gRrWhIKX7RjAeSQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11259"; a="42396204"
+X-IronPort-AV: E=Sophos;i="6.12,163,1728975600"; 
+   d="scan'208";a="42396204"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2024 03:28:31 -0800
+X-CSE-ConnectionGUID: rRdUd/MrRkyoZEJD1Sac1Q==
+X-CSE-MsgGUID: apTDPmdSTQ+3Y3NYJwg9xw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,163,1728975600"; 
+   d="scan'208";a="89329614"
+Received: from mwiniars-desk2.ger.corp.intel.com (HELO [10.245.246.149]) ([10.245.246.149])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2024 03:28:08 -0800
+Message-ID: <62c1e9e941cec75cf8771761fb9981879fefcce5.camel@linux.intel.com>
+Subject: Re: [PATCH 08/22] drm/xe: Convert timeout to secs_to_jiffies()
+From: Thomas =?ISO-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
+To: Easwar Hariharan <eahariha@linux.microsoft.com>, Pablo Neira Ayuso
+ <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,  Nicolas Palix
+ <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>, Haojian Zhuang
+ <haojian.zhuang@gmail.com>, Robert Jarzmik <robert.jarzmik@free.fr>,
+ Russell King <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Ofir
+ Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>, Lucas De
+ Marchi <lucas.demarchi@intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
+ <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
+ <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>, Dick Kennedy
+ <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Roger Pau =?ISO-8859-1?Q?Monn=E9?=
+ <roger.pau@citrix.com>, Jens Axboe <axboe@kernel.dk>, Kalle Valo
+ <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, Jack
+ Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz
+ <luiz.dentz@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
+ <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, Broadcom
+ internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Xiubo
+ Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,  Josh Poimboeuf
+ <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, Miroslav Benes
+ <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, Joe Lawrence
+ <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
+ <tiwai@suse.com>, Lucas Stach <l.stach@pengutronix.de>, Russell King
+ <linux+etnaviv@armlinux.org.uk>,  Christian Gmeiner
+ <christian.gmeiner@gmail.com>, Louis Peens <louis.peens@corigine.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao
+ <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr, 
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org, 
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org,  linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org,  ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org,  linux-sound@vger.kernel.org,
+ etnaviv@lists.freedesktop.org,  oss-drivers@corigine.com,
+ linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
+Date: Mon, 18 Nov 2024 12:27:53 +0100
+In-Reply-To: <20241115-converge-secs-to-jiffies-v1-8-19aadc34941b@linux.microsoft.com>
+References: 
+	<20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
+	 <20241115-converge-secs-to-jiffies-v1-8-19aadc34941b@linux.microsoft.com>
+Autocrypt: addr=thomas.hellstrom@linux.intel.com; prefer-encrypt=mutual;
+ keydata=mDMEZaWU6xYJKwYBBAHaRw8BAQdAj/We1UBCIrAm9H5t5Z7+elYJowdlhiYE8zUXgxcFz360SFRob21hcyBIZWxsc3Ryw7ZtIChJbnRlbCBMaW51eCBlbWFpbCkgPHRob21hcy5oZWxsc3Ryb21AbGludXguaW50ZWwuY29tPoiTBBMWCgA7FiEEbJFDO8NaBua8diGTuBaTVQrGBr8FAmWllOsCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQuBaTVQrGBr/yQAD/Z1B+Kzy2JTuIy9LsKfC9FJmt1K/4qgaVeZMIKCAxf2UBAJhmZ5jmkDIf6YghfINZlYq6ixyWnOkWMuSLmELwOsgPuDgEZaWU6xIKKwYBBAGXVQEFAQEHQF9v/LNGegctctMWGHvmV/6oKOWWf/vd4MeqoSYTxVBTAwEIB4h4BBgWCgAgFiEEbJFDO8NaBua8diGTuBaTVQrGBr8FAmWllOsCGwwACgkQuBaTVQrGBr/P2QD9Gts6Ee91w3SzOelNjsus/DcCTBb3fRugJoqcfxjKU0gBAKIFVMvVUGbhlEi6EFTZmBZ0QIZEIzOOVfkaIgWelFEH
+Organization: Intel Sweden AB, Registration Number: 556189-6027
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-3.fc39) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241115121224.173285-1-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCXcYUvIDtndIGICA--.56774S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF1xXF47Cw13XF4rXr18Krg_yoW8KFW8pr
-	ZrGw4ftayfJ3ZxAr18tF10gFWfZw48X3ZrtFZ8JryfKr4fJ3WfK3yUZr15XFyrAFs3Xr4r
-	Aa90y3WfCw1qywUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyCb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
-	wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
-	I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
-	k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
-	xVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UE-erUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-ÔÚ 2024/11/15 20:12, Shin'ichiro Kawasaki Ð´µÀ:
-> It was reported the thortl test cases fail on the systems, which already
-> sets "io" in cgourp2 subtree_control files. The fail happens when
-> writing "-io" to the subtree_control files at clean up.
-> 
-> To avoid the failure, check if the system already sets "io". If so, skip
-> writing "+io" at set up, and writing "-io" at clean up.
-> 
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Link: https://github.com/osandov/blktests/issues/149
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+On Fri, 2024-11-15 at 21:22 +0000, Easwar Hariharan wrote:
+> Changes made with the following Coccinelle rules:
+>=20
+> @@ constant C; @@
+>=20
+> - msecs_to_jiffies(C * 1000)
+> + secs_to_jiffies(C)
+>=20
+> @@ constant C; @@
+>=20
+> - msecs_to_jiffies(C * MSEC_PER_SEC)
+> + secs_to_jiffies(C)
+>=20
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+Reviewed-by: Thomas Hellstr=C3=B6m <thomas.hellstrom@linux.intel.com>
+
+<
 > ---
->   tests/throtl/rc | 22 ++++++++++++++++++----
->   1 file changed, 18 insertions(+), 4 deletions(-)
-> 
-
-LGTM, thanks for the patch
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-
-> diff --git a/tests/throtl/rc b/tests/throtl/rc
-> index 2e26fd2..9c264bd 100644
-> --- a/tests/throtl/rc
-> +++ b/tests/throtl/rc
-> @@ -10,6 +10,8 @@
->   
->   THROTL_DIR=$(echo "$TEST_NAME" | tr '/' '_')
->   THROTL_DEV=dev_nullb
-> +declare THROTL_CLEAR_BASE_SUBTREE_CONTROL_IO
-> +declare THROTL_CLEAR_CGROUP2_DIR_CONTROL_IO
->   
->   group_requires() {
->   	_have_root
-> @@ -31,8 +33,16 @@ _set_up_throtl() {
->   		return 1
->   	fi
->   
-> -	echo "+io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"
-> -	echo "+io" > "$CGROUP2_DIR/cgroup.subtree_control"
-> +	THROTL_CLEAR_BASE_SUBTREE_CONTROL_IO=
-> +	THROTL_CLEAR_CGROUP2_DIR_CONTROL_IO=
-> +	if ! grep -q io "$(_cgroup2_base_dir)/cgroup.subtree_control"; then
-> +		echo "+io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"
-> +		THROTL_CLEAR_BASE_SUBTREE_CONTROL_IO=true
-> +	fi
-> +	if ! grep -q io "$CGROUP2_DIR/cgroup.subtree_control"; then
-> +		echo "+io" > "$CGROUP2_DIR/cgroup.subtree_control"
-> +		THROTL_CLEAR_CGROUP2_DIR_CONTROL_IO=true
-> +	fi
->   
->   	mkdir -p "$CGROUP2_DIR/$THROTL_DIR"
->   	return 0;
-> @@ -40,8 +50,12 @@ _set_up_throtl() {
->   
->   _clean_up_throtl() {
->   	rmdir "$CGROUP2_DIR/$THROTL_DIR"
-> -	echo "-io" > "$CGROUP2_DIR/cgroup.subtree_control"
-> -	echo "-io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"
-> +	if [[ $THROTL_CLEAR_CGROUP2_DIR_CONTROL_IO == true ]]; then
-> +		echo "-io" > "$CGROUP2_DIR/cgroup.subtree_control"
-> +	fi
-> +	if [[ $THROTL_CLEAR_BASE_SUBTREE_CONTROL_IO == true ]]; then
-> +		echo "-io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"
-> +	fi
->   
->   	_exit_cgroup2
->   	_exit_null_blk
-> 
+> =C2=A0drivers/gpu/drm/xe/xe_device.c | 2 +-
+> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/gpu/drm/xe/xe_device.c
+> b/drivers/gpu/drm/xe/xe_device.c
+> index
+> a1987b554a8d2aa42b29301f2853edddfda7fda5..bb3338ef4191e76128611eeb953
+> 1c9d2089db85a 100644
+> --- a/drivers/gpu/drm/xe/xe_device.c
+> +++ b/drivers/gpu/drm/xe/xe_device.c
+> @@ -502,7 +502,7 @@ static int wait_for_lmem_ready(struct xe_device
+> *xe)
+> =C2=A0	drm_dbg(&xe->drm, "Waiting for lmem initialization\n");
+> =C2=A0
+> =C2=A0	start =3D jiffies;
+> -	timeout =3D start + msecs_to_jiffies(60 * 1000); /* 60 sec! */
+> +	timeout =3D start + secs_to_jiffies(60); /* 60 sec! */
+> =C2=A0
+> =C2=A0	do {
+> =C2=A0		if (signal_pending(current))
+>=20
 
