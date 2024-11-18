@@ -1,28 +1,28 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6F11A0B0C;
-	Mon, 18 Nov 2024 11:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5292719AD8C;
+	Mon, 18 Nov 2024 11:45:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731930321; cv=none; b=CyE3v5iSFufWtekSMUScAnwDFzqy7fTQjpVOJ/gSTl22WyMvblKVOioD0AkzDNkaLaTxsqWr/fOlR15Yc4QOvHgxWbrWadeSD427jPQQdcr+etto5RXP9jjh53+Kms08tW3XfiJt+DuUoYARt4yrNaQFJxyCjqSfZiRI+xeEoGk=
+	t=1731930321; cv=none; b=KL/RMUyDNsq1inpPEEaFtl664C5F2K9VYe//vgk7FwYT5lZIxSs3Ow5cAiBjCw5vyX90UpnNFfrAlYHYFshCQtJGSAatcjjOlYQhhlGLZDWVrVbg0SPD+0K6hPUshNWlYA7rrOsQeRZI0O/nS0lkJOasiWDkaX8W0iY9s63xI/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731930321; c=relaxed/simple;
-	bh=bVSQkyJzzpOn0f9mMGo+Q10YPGNGo/OVRmZEMp3yFxE=;
+	bh=0gvTj1u+Nh96S3z8U1HSnGFASw5nn0sz0706NVg2GlI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kDptvAd2XTggNLhG8gIHMGMyzKjxrjb3ACMpG8TvlNr0p2+tQZfOyYS53JwdnGV5OFn3QRcpX8/iLNx8108Iolx/b4DKBhLd5OcUMixVfIETFM6JlRkIBiYrnpzpkCw7clhMbAjfuEzqLwN8Sze6oK9y2dMaDbKU8ORLaU6WaCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+	 MIME-Version; b=ec3egEtKqj2QKn6HxsT+CMxrPeoBnjeZ2K0tdVtsde7Si9j6XjKtodgU2pAlyVaCnFqenUcUC0dCDzLdqKO23zwUMUUGqoi1t++HdClcTpADJR8PzqYC5qiVTf+w4pewPowPWqjl8t51ITw7i6Y0rEImwX7QE3e8SoM+cyNRWLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XsQls4ByNz4f3nZr;
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4XsQls1JDYz4f3jM1;
 	Mon, 18 Nov 2024 19:44:57 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id E6A721A0196;
-	Mon, 18 Nov 2024 19:45:16 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 95FCC1A0197;
+	Mon, 18 Nov 2024 19:45:15 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.101.107])
-	by APP4 (Coremail) with SMTP id gCh0CgCnzoLEKDtn3fCKCA--.48005S13;
-	Mon, 18 Nov 2024 19:45:16 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgCnzoLEKDtn3fCKCA--.48005S11;
+	Mon, 18 Nov 2024 19:45:15 +0800 (CST)
 From: Ye Bin <yebin@huaweicloud.com>
 To: viro@zeniv.linux.org.uk,
 	brauner@kernel.org,
@@ -41,9 +41,9 @@ To: viro@zeniv.linux.org.uk,
 	linux-security-module@vger.kernel.org
 Cc: yebin10@huawei.com,
 	zhangxiaoxu5@huawei.com
-Subject: [PATCH 09/11] landlock: use sb_for_each_inodes API
-Date: Mon, 18 Nov 2024 19:45:06 +0800
-Message-Id: <20241118114508.1405494-10-yebin@huaweicloud.com>
+Subject: [PATCH 07/11] quota: use sb_for_each_inodes API
+Date: Mon, 18 Nov 2024 19:45:04 +0800
+Message-Id: <20241118114508.1405494-8-yebin@huaweicloud.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241118114508.1405494-1-yebin@huaweicloud.com>
 References: <20241118114508.1405494-1-yebin@huaweicloud.com>
@@ -54,10 +54,10 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnzoLEKDtn3fCKCA--.48005S13
-X-Coremail-Antispam: 1UD129KBjvdXoWrtr1UWw13Zr47Gr47KrWruFg_yoW3GrbEkF
-	18AF4Uur13ZrnagwsYyanavF9a9w1rGr4Uur97KF1DAwnIvF98tw4xtF95Zry3ua17tas8
-	WFnagFy3K397KjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+X-CM-TRANSID:gCh0CgCnzoLEKDtn3fCKCA--.48005S11
+X-Coremail-Antispam: 1UD129KBjvdXoWrtr1UWw13ZrW5tFy8CF4xXrb_yoWkAFX_CF
+	yfAr1UCr4fXrsagr4qyrsxXF9Y9ws5Ga1UWrW7tFnxAr1jqas5XF4Dtr98Zrn7Ca13K398
+	Crs7JFy3GFWfKjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
 	9fnUUIcSsGvfJTRUUUbgxYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
 	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r126s
 	0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
@@ -80,22 +80,31 @@ Use sb_for_each_inodes API foreach super_block->s_inodes.
 
 Signed-off-by: Ye Bin <yebin10@huawei.com>
 ---
- security/landlock/fs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/quota/dquot.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/security/landlock/fs.c b/security/landlock/fs.c
-index dd9a7297ea4e..ccb7951f1404 100644
---- a/security/landlock/fs.c
-+++ b/security/landlock/fs.c
-@@ -1217,7 +1217,7 @@ static void hook_sb_delete(struct super_block *const sb)
- 		return;
+diff --git a/fs/quota/dquot.c b/fs/quota/dquot.c
+index b40410cd39af..414f92bb762c 100644
+--- a/fs/quota/dquot.c
++++ b/fs/quota/dquot.c
+@@ -1027,7 +1027,7 @@ static int add_dquot_ref(struct super_block *sb, int type)
+ 	int err = 0;
  
  	spin_lock(&sb->s_inode_list_lock);
 -	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
 +	sb_for_each_inodes(inode, &sb->s_inodes) {
- 		struct landlock_object *object;
+ 		spin_lock(&inode->i_lock);
+ 		if ((inode->i_state & (I_FREEING|I_WILL_FREE|I_NEW)) ||
+ 		    !atomic_read(&inode->i_writecount) ||
+@@ -1083,7 +1083,7 @@ static void remove_dquot_ref(struct super_block *sb, int type)
+ #endif
  
- 		/* Only handles referenced inodes. */
+ 	spin_lock(&sb->s_inode_list_lock);
+-	list_for_each_entry(inode, &sb->s_inodes, i_sb_list) {
++	sb_for_each_inodes(inode, &sb->s_inodes) {
+ 		/*
+ 		 *  We have to scan also I_NEW inodes because they can already
+ 		 *  have quota pointer initialized. Luckily, we need to touch
 -- 
 2.34.1
 
