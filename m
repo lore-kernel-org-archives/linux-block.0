@@ -1,166 +1,143 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7211E0DDC;
-	Mon, 18 Nov 2024 18:18:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642CD3BBF2;
+	Mon, 18 Nov 2024 18:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731953934; cv=none; b=I+ewMs+jcwTdrR8H33kTqiA9Yr1bbEAp05CDIfhAZIu20HO8ST6T9O1PHTvrshWT6SHrBjJgZn/OMoxqTACkAPYM5xGyzFL9FD3HgeR7Rqukdnu28NreQ8/iMpVRG5c/ALXQmZuodmpKOgHjsPqE6YXBRW7tq1lPBdbN1heGRaI=
+	t=1731956139; cv=none; b=Rt0hyiJsRkxLgocbJoJD14VQ08GhqPTBymMtZE4krnyvqJbXcq0pDHjwtvCCrXSxxANjePgPx2xpVMj+zA8cajIm/FwQ1UYwFQ+WIenusoGvkfqtQPTh6RxX9qmXHoQnmhGA2UXjMWZVjALw7Oqf6lPIfBi3Wi5ax19V3nngYSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731953934; c=relaxed/simple;
-	bh=hgF/oIRVcDsAwDmsucM+0Q7Wf268WYzD9jbj6ZltTbU=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ge0ajBIp7g5bZWroHoPSHnHz1ATCi8P64xMb2XEsiEFoM5S8vlgUuwMaiNadmiwaQ87PFZ23AJTV3GgYhIW6FztWGSipIh+TyupGuqFNTbOFD5L8Wwc7BaEwAcZpfSh+IIDiIgZ1VZl92uOur7SetGSMAgkb3KL3r7B9leyF4X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=AG9s/uyD; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1731956139; c=relaxed/simple;
+	bh=/gmHJa/TBxEDstIIvnX3KmYFWImvFtyFP0gjXaeuHFM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=os4d5qnBaJPvYWbQvRegf5IevZMGsSTIqJVhZ8Igx44DJK/yk7+/aHpM1+6sO5pJ8Scn6hpcRIRJ4wAgI5oiPmn6mtq9E8w4knq07m7W5aXf02WYzMDajYfZN5EX/PUywlLsGtLgIvbEmPtaqd52olRU2isnfsrJ6MfvuhjBK4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P67NkgKp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="AG9s/uyD"
-Received: from [192.168.35.166] (c-73-118-245-227.hsd1.wa.comcast.net [73.118.245.227])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 7B6DB206BCF9;
-	Mon, 18 Nov 2024 10:18:49 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7B6DB206BCF9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1731953932;
-	bh=fIQzgF1WsNR1uKKNTq0/EQo7zmlio+cixqR17RrtuRg=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=AG9s/uyDx0OBII3cr4HUzEtCn4nG6edMY2UD6tMYQJ1OpbxvtlkXS/eCyyKzQSDkC
-	 KcdCHl5p58vf39EYGhD7mqQUrW1VKQADyz79vhjulvgZLmWmAZisUXU71InKFz7Poi
-	 T4lQlDCJsC2Y9ZlNmbnEUe8f/zo4dQilCRsXYjpY=
-Message-ID: <96f3b51b-c28c-4ea8-b61e-a4982196215f@linux.microsoft.com>
-Date: Mon, 18 Nov 2024 10:18:49 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P67NkgKp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45CA9C4CECC;
+	Mon, 18 Nov 2024 18:55:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731956138;
+	bh=/gmHJa/TBxEDstIIvnX3KmYFWImvFtyFP0gjXaeuHFM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=P67NkgKpagD5QPwkoLn48IDjtjZ7XiI7hB74ktXAOzTjzFx25SdPGIQTsJPn3c/+1
+	 7mKXhe/08HVsqBRSEOx0tOKdadCpjOBrUyOGIzap4a8CF3tcQQzVYOpA4KCKlbL9eG
+	 FZDNA127wqunzK1pyu+ixL9pn3cpHGQTiZ/HklwS4zlyqRfWpfZR7WpwvZo4s6XE1b
+	 33uAWW/5I0UcpudrKi/56u1/L85PdWYLjkcUUGZXni1xcq/PN0bKJ29dpyNBUK3NkQ
+	 hg7XGXtOx8q1P8cuRCDFQtSWlcXwLibDCDFZaRJ8t0FlQaoTBba1d1kPOW8eXaQxfI
+	 AghFYrjiJkifw==
+Date: Mon, 18 Nov 2024 20:55:33 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v3 07/17] dma-mapping: Implement link/unlink ranges API
+Message-ID: <20241118185533.GA24154@unreal>
+References: <cover.1731244445.git.leon@kernel.org>
+ <f8c7f160c9ae97fef4ccd355f9979727552c7374.1731244445.git.leon@kernel.org>
+ <20241118145929.GB27795@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
- eahariha@linux.microsoft.com, Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
- Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
- Haojian Zhuang <haojian.zhuang@gmail.com>,
- Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
- <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
- Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
- <lucas.demarchi@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>,
- Dick Kennedy <dick.kennedy@broadcom.com>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>,
- Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann
- <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
- <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
- Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
- Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
- Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Lucas Stach <l.stach@pengutronix.de>,
- Russell King <linux+etnaviv@armlinux.org.uk>,
- Christian Gmeiner <christian.gmeiner@gmail.com>,
- Louis Peens <louis.peens@corigine.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
- linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH v2 19/21] livepatch: Convert timeouts to secs_to_jiffies()
-To: Petr Mladek <pmladek@suse.com>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <20241115-converge-secs-to-jiffies-v2-19-911fb7595e79@linux.microsoft.com>
- <718febc4-59ee-4701-ad62-8b7a8fa7a910@csgroup.eu>
- <Zzsfuuv3AVomkMxn@pathway.suse.cz>
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Content-Language: en-US
-In-Reply-To: <Zzsfuuv3AVomkMxn@pathway.suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241118145929.GB27795@willie-the-truck>
 
-On 11/18/2024 3:06 AM, Petr Mladek wrote:
-> On Sat 2024-11-16 11:10:52, Christophe Leroy wrote:
->>
->>
->> Le 15/11/2024 à 22:26, Easwar Hariharan a écrit :
->>> [Vous ne recevez pas souvent de courriers de eahariha@linux.microsoft.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
->>>
->>> Changes made with the following Coccinelle rules:
->>>
->>> @@ constant C; @@
->>>
->>> - msecs_to_jiffies(C * 1000)
->>> + secs_to_jiffies(C)
->>>
->>> @@ constant C; @@
->>>
->>> - msecs_to_jiffies(C * MSEC_PER_SEC)
->>> + secs_to_jiffies(C)
->>>
->>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
->>> ---
->>>   samples/livepatch/livepatch-callbacks-busymod.c |  2 +-
->>>   samples/livepatch/livepatch-shadow-fix1.c       |  2 +-
->>>   samples/livepatch/livepatch-shadow-mod.c        | 10 +++++-----
->>>   3 files changed, 7 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/samples/livepatch/livepatch-callbacks-busymod.c b/samples/livepatch/livepatch-callbacks-busymod.c
->>> index 378e2d40271a9717d09eff51d3d3612c679736fc..d0fd801a7c21b7d7939c29d83f9d993badcc9aba 100644
->>> --- a/samples/livepatch/livepatch-callbacks-busymod.c
->>> +++ b/samples/livepatch/livepatch-callbacks-busymod.c
->>> @@ -45,7 +45,7 @@ static int livepatch_callbacks_mod_init(void)
->>>   {
->>>          pr_info("%s\n", __func__);
->>>          schedule_delayed_work(&work,
->>> -               msecs_to_jiffies(1000 * 0));
->>> +               secs_to_jiffies(0));
->>
->> Using secs_to_jiffies() is pointless, 0 is universal, should become
->> schedule_delayed_work(&work, 0);
+On Mon, Nov 18, 2024 at 02:59:30PM +0000, Will Deacon wrote:
+> On Sun, Nov 10, 2024 at 03:46:54PM +0200, Leon Romanovsky wrote:
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > Introduce new DMA APIs to perform DMA linkage of buffers
+> > in layers higher than DMA.
+> > 
+> > In proposed API, the callers will perform the following steps.
+> > In map path:
+> > 	if (dma_can_use_iova(...))
+> > 	    dma_iova_alloc()
+> > 	    for (page in range)
+> > 	       dma_iova_link_next(...)
+> > 	    dma_iova_sync(...)
+> > 	else
+> > 	     /* Fallback to legacy map pages */
+> >              for (all pages)
+> > 	       dma_map_page(...)
+> > 
+> > In unmap path:
+> > 	if (dma_can_use_iova(...))
+> > 	     dma_iova_destroy()
+> > 	else
+> > 	     for (all pages)
+> > 		dma_unmap_page(...)
+> > 
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> >  drivers/iommu/dma-iommu.c   | 259 ++++++++++++++++++++++++++++++++++++
+> >  include/linux/dma-mapping.h |  32 +++++
+> >  2 files changed, 291 insertions(+)
 > 
-> Yes, schedule_delayed_work(&work, 0) looks like the right solution.
-> 
-> Or even better, it seems that the delayed work might get replaced by
-> a normal workqueue work.
-> 
-> Anyway, I am working on a patchset which would remove this sample
-> module. There is no need to put much effort into the clean up
-> of this particular module. Do whatever is easiest for you.
-> 
-> Best Regards,
-> Petr
 
-If we're removing the module, I'll drop it from the series. Just to
-clarify, do you mean to remove all of samples/livepatch/* or some
-particular file(s)?
+<...>
 
-Thanks,
-Easwar
+> > +static void __iommu_dma_iova_unlink(struct device *dev,
+> > +		struct dma_iova_state *state, size_t offset, size_t size,
+> > +		enum dma_data_direction dir, unsigned long attrs,
+> > +		bool free_iova)
+> > +{
+> > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+> > +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+> > +	struct iova_domain *iovad = &cookie->iovad;
+> > +	dma_addr_t addr = state->addr + offset;
+> > +	size_t iova_start_pad = iova_offset(iovad, addr);
+> > +	struct iommu_iotlb_gather iotlb_gather;
+> > +	size_t unmapped;
+> > +
+> > +	if ((state->__size & DMA_IOVA_USE_SWIOTLB) ||
+> > +	    (!dev_is_dma_coherent(dev) && !(attrs & DMA_ATTR_SKIP_CPU_SYNC)))
+> > +		iommu_dma_iova_unlink_range_slow(dev, addr, size, dir, attrs);
+> > +
+> > +	iommu_iotlb_gather_init(&iotlb_gather);
+> > +	iotlb_gather.queued = free_iova && READ_ONCE(cookie->fq_domain);
+> > +
+> > +	size = iova_align(iovad, size + iova_start_pad);
+> > +	addr -= iova_start_pad;
+> > +	unmapped = iommu_unmap_fast(domain, addr, size, &iotlb_gather);
+> > +	WARN_ON(unmapped != size);
+> 
+> Does the new API require that the 'size' passed to dma_iova_unlink()
+> exactly match the 'size' passed to the corresponding call to
+> dma_iova_link()? I ask because the IOMMU page-table code is built around
+> the assumption that partial unmap() operations never occur (i.e.
+> operations which could require splitting a huge mapping). We just
+> removed [1] that code from the Arm IO page-table implementations, so it
+> would be good to avoid adding it back for this.
+
+dma_iova_link/dma_iova_unlink() don't have any assumptions in addition
+to already existing for dma_map_sg/dma_unmap_sg(). In reality, it means
+that all calls to unlink will have same size as for link.
+
+Thanks
+
+> 
+> Will
+> 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/iommu/linux.git/commit/?h=arm/smmu&id=33729a5fc0caf7a97d20507acbeee6b012e7e519
