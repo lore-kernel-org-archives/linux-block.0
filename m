@@ -1,193 +1,109 @@
-Received: from mail.parknet.co.jp (mail.parknet.co.jp [210.171.160.6])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7EB1482E7;
-	Tue, 19 Nov 2024 07:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.171.160.6
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF9413D8B4;
+	Tue, 19 Nov 2024 07:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732001637; cv=none; b=MqYynjYpwlH8xpgVH5n9HrQUdrRfttJtaDAChAef5AswSWLUnanPbpN9y2l0OO4GmcVOoKqC12E8L6W3sN2qQV9KNCpee2tvom+xLt05zSVojb3XDWUsjG/2IjMR2iuo0pLU35HdLNUTv/0Vb2epB/+FlhGO7fmB+O60dH5CYrs=
+	t=1732001839; cv=none; b=ENmYsGBvGo1fp7/Gct9a1q2GRUSKFGtXU1y4jYN9UcOxrYfMMn+agFVPdEsKgcS3ywCFcnYh2TZZi3yVV5FbHsjo2faQR/BJlvJe/8kugIP39PuOZ4iMYB1DbGxEVEI3lFCTElT3L3FwZC/NctkGcxzbAGdKZ7bck2FMG0holVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732001637; c=relaxed/simple;
-	bh=C07DGh76ZAQSfyYMy8dgyW7f/7AWcTO46Ds6XvbbYhw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QuIdSvHVRX4L43Cchjk/cYnELDYlZqDF9mMF+sJPTcpqbG5vf+nmUccMNSlo/22XITS13mJ+t/ID8RD3qEDiKcbgw1z1OIpcsCbLZr+fgJmBOiMr71MZ4SeTr2gHA69arTMOskGPPvOoVMNQf/8vKuOetoYjT3oJL0ETj2quWqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mail.parknet.co.jp; spf=pass smtp.mailfrom=parknet.co.jp; arc=none smtp.client-ip=210.171.160.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mail.parknet.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=parknet.co.jp
-Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
-	by mail.parknet.co.jp (Postfix) with ESMTPSA id A87E62051589;
-	Tue, 19 Nov 2024 16:27:40 +0900 (JST)
-Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
-	by ibmpc.myhome.or.jp (8.18.1/8.18.1/Debian-6) with ESMTPS id 4AJ7Rdj4047655
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 19 Nov 2024 16:27:40 +0900
-Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
-	by devron.myhome.or.jp (8.18.1/8.18.1/Debian-6) with ESMTPS id 4AJ7RdUL293067
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 19 Nov 2024 16:27:39 +0900
-Received: (from hirofumi@localhost)
-	by devron.myhome.or.jp (8.18.1/8.18.1/Submit) id 4AJ7RbCD293063;
-	Tue, 19 Nov 2024 16:27:37 +0900
-From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-        syzbot
- <syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com>,
-        linkinjeon@kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sj1557.seo@samsung.com,
-        syzkaller-bugs@googlegroups.com
-Subject: [PATCH] loop: Fix ABBA locking race (Re: [syzbot] [exfat?] possible
- deadlock in fat_count_free_clusters)
-In-Reply-To: <8734jxsyuu.fsf@mail.parknet.co.jp> (OGAWA Hirofumi's message of
-	"Mon, 11 Nov 2024 22:07:21 +0900")
-References: <67313d9e.050a0220.138bd5.0054.GAE@google.com>
-	<8734jxsyuu.fsf@mail.parknet.co.jp>
-Date: Tue, 19 Nov 2024 16:27:37 +0900
-Message-ID: <871pz7adjq.fsf_-_@mail.parknet.co.jp>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1732001839; c=relaxed/simple;
+	bh=hfGMSViygS8YzL3zpj2rpnB5iyPwjZVWafsVw9LNY9A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u34rbPz66m7/MqiwCDf4ELO8RLVa5jIUXYfN0FZniBCWLY4phweNdS+18sQlOkgUlOGOpDnHBfilI8yok0j28QYbZ82pGFqSkrc1BRHM8DTay6S0TERw4XqgW9/LGXFD1UeZKaho9F1iZvSAEQUmqGqpcOJ+TwLq6/br2GFBeWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vQQoaqJ0; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vQQoaqJ0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EC9EC4CECF;
+	Tue, 19 Nov 2024 07:37:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732001838;
+	bh=hfGMSViygS8YzL3zpj2rpnB5iyPwjZVWafsVw9LNY9A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vQQoaqJ0xQ8YSlzg2uTSyU/eDPykizndVpHrzwbVRvGt1oXkgd1IJG7e5wQCH3o+H
+	 847aAKIMl3A/VcfifHWgVjEkScZoPEoBCv8rL04wuBtNEYsRGIvsvE67CEQM2p4izc
+	 df8ZHkZInZIw2mMC6CGWiFvDRI1FNoUg1iRwW7RKUqZ071+9bmnIMlJnTeQP4Qu8cs
+	 IP07jDJcf4F5+XidfumzLdkbEUPUUdx0DB+1B14He7FeqPSSx4o+AHROsagkFq/B19
+	 icecTqDPa4Gl2tMJMp1IkjdENEyUYhQetFv5ZrauWx1PnPrgcmFmpgtMTvwwtCE6ju
+	 WsMBUqCjAQYdg==
+Message-ID: <a11b4023-5647-419b-9de3-f48024872cc6@kernel.org>
+Date: Tue, 19 Nov 2024 16:37:16 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 07/26] block: Support block drivers that preserve the
+ order of write requests
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>, Jaegeuk Kim <jaegeuk@kernel.org>,
+ Hannes Reinecke <hare@suse.de>, Nitesh Shetty <nj.shetty@samsung.com>,
+ Ming Lei <ming.lei@redhat.com>
+References: <20241119002815.600608-1-bvanassche@acm.org>
+ <20241119002815.600608-8-bvanassche@acm.org>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20241119002815.600608-8-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-OGAWA Hirofumi <hirofumi@mail.parknet.co.jp> writes:
-
-ping?
-
-> Hi,
->
-> syzbot <syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com> writes:
->
->> syzbot found the following issue on:
->>
->> HEAD commit:    929beafbe7ac Add linux-next specific files for 20241108
->> git tree:       linux-next
->> console output: https://syzkaller.appspot.com/x/log.txt?x=1621bd87980000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=75175323f2078363
->> dashboard link: https://syzkaller.appspot.com/bug?extid=a5d8c609c02f508672cc
->> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
->
-> This patch is to fix the above race. Please check this.
->
-> Thanks
->
->
-> From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-> Subject: [PATCH] loop: Fix ABBA locking race
-> Date: Mon, 11 Nov 2024 21:53:36 +0900
->
-> Current loop calls vfs_statfs() while holding the q->limits_lock. If
-> FS takes some locking in vfs_statfs callback, this may lead to ABBA
-> locking bug (at least, FAT fs has this issue actually).
->
-> So this patch calls vfs_statfs() outside q->limits_locks instead,
-> because looks like there is no reason to hold q->limits_locks while
-> getting discard configs.
->
-> Chain exists of:
->   &sbi->fat_lock --> &q->q_usage_counter(io)#17 --> &q->limits_lock
->
->  Possible unsafe locking scenario:
->
->        CPU0                    CPU1
->        ----                    ----
->   lock(&q->limits_lock);
->                                lock(&q->q_usage_counter(io)#17);
->                                lock(&q->limits_lock);
->   lock(&sbi->fat_lock);
->
->  *** DEADLOCK ***
->
-> Reported-by: syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=a5d8c609c02f508672cc
-> Signed-off-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+On 11/19/24 09:27, Bart Van Assche wrote:
+> Many but not all storage controllers require serialization of zoned
+> writes. Introduce a new request queue limit member variable related to
+> write serialization. 'driver_preserves_write_order' allows block drivers
+> to indicate that the order of write commands is preserved per hardware
+> queue and hence that serialization of writes per zone is not required if
+> all pending writes are submitted to the same hardware queue.
+> 
+> Cc: Damien Le Moal <dlemoal@kernel.org>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Cc: Nitesh Shetty <nj.shetty@samsung.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
->  drivers/block/loop.c |   31 ++++++++++++++++---------------
->  1 file changed, 16 insertions(+), 15 deletions(-)
->
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 78a7bb2..5f3ce51 100644
-> --- a/drivers/block/loop.c	2024-09-16 13:45:20.253220178 +0900
-> +++ b/drivers/block/loop.c	2024-11-11 21:51:00.910135443 +0900
-> @@ -770,12 +770,11 @@ static void loop_sysfs_exit(struct loop_
->  				   &loop_attribute_group);
->  }
->  
-> -static void loop_config_discard(struct loop_device *lo,
-> -		struct queue_limits *lim)
-> +static void loop_get_discard_config(struct loop_device *lo,
-> +				    u32 *granularity, u32 *max_discard_sectors)
->  {
->  	struct file *file = lo->lo_backing_file;
->  	struct inode *inode = file->f_mapping->host;
-> -	u32 granularity = 0, max_discard_sectors = 0;
->  	struct kstatfs sbuf;
->  
->  	/*
-> @@ -788,8 +787,9 @@ static void loop_config_discard(struct l
->  	if (S_ISBLK(inode->i_mode)) {
->  		struct request_queue *backingq = bdev_get_queue(I_BDEV(inode));
->  
-> -		max_discard_sectors = backingq->limits.max_write_zeroes_sectors;
-> -		granularity = bdev_discard_granularity(I_BDEV(inode)) ?:
-> +		*max_discard_sectors =
-> +			backingq->limits.max_write_zeroes_sectors;
-> +		*granularity = bdev_discard_granularity(I_BDEV(inode)) ?:
->  			queue_physical_block_size(backingq);
->  
->  	/*
-> @@ -797,16 +797,9 @@ static void loop_config_discard(struct l
->  	 * image a.k.a. discard.
->  	 */
->  	} else if (file->f_op->fallocate && !vfs_statfs(&file->f_path, &sbuf)) {
-> -		max_discard_sectors = UINT_MAX >> 9;
-> -		granularity = sbuf.f_bsize;
-> +		*max_discard_sectors = UINT_MAX >> 9;
-> +		*granularity = sbuf.f_bsize;
+>  block/blk-settings.c   | 2 ++
+>  include/linux/blkdev.h | 5 +++++
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index f1d4dfdc37a7..329d8b65a8d7 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -633,6 +633,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
 >  	}
-> -
-> -	lim->max_hw_discard_sectors = max_discard_sectors;
-> -	lim->max_write_zeroes_sectors = max_discard_sectors;
-> -	if (max_discard_sectors)
-> -		lim->discard_granularity = granularity;
-> -	else
-> -		lim->discard_granularity = 0;
->  }
+>  	t->max_secure_erase_sectors = min_not_zero(t->max_secure_erase_sectors,
+>  						   b->max_secure_erase_sectors);
+> +	t->driver_preserves_write_order = t->driver_preserves_write_order &&
+> +		b->driver_preserves_write_order;
+>  	t->zone_write_granularity = max(t->zone_write_granularity,
+>  					b->zone_write_granularity);
+>  	if (!(t->features & BLK_FEAT_ZONED)) {
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index a1fd0ddce5cf..72be33d02d1f 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -397,6 +397,11 @@ struct queue_limits {
 >  
->  struct loop_worker {
-> @@ -992,6 +985,7 @@ static int loop_reconfigure_limits(struc
->  	struct inode *inode = file->f_mapping->host;
->  	struct block_device *backing_bdev = NULL;
->  	struct queue_limits lim;
-> +	u32 granularity = 0, max_discard_sectors = 0;
+>  	unsigned int		max_open_zones;
+>  	unsigned int		max_active_zones;
+> +	/*
+> +	 * Whether or not the block driver preserves the order of write
+> +	 * requests. Set by the block driver.
+> +	 */
+> +	bool			driver_preserves_write_order;
+
+Why not make this a q->features flag ?
+
 >  
->  	if (S_ISBLK(inode->i_mode))
->  		backing_bdev = I_BDEV(inode);
-> @@ -1001,6 +995,8 @@ static int loop_reconfigure_limits(struc
->  	if (!bsize)
->  		bsize = loop_default_blocksize(lo, backing_bdev);
->  
-> +	loop_get_discard_config(lo, &granularity, &max_discard_sectors);
-> +
->  	lim = queue_limits_start_update(lo->lo_queue);
->  	lim.logical_block_size = bsize;
->  	lim.physical_block_size = bsize;
-> @@ -1010,7 +1006,12 @@ static int loop_reconfigure_limits(struc
->  		lim.features |= BLK_FEAT_WRITE_CACHE;
->  	if (backing_bdev && !bdev_nonrot(backing_bdev))
->  		lim.features |= BLK_FEAT_ROTATIONAL;
-> -	loop_config_discard(lo, &lim);
-> +	lim.max_hw_discard_sectors = max_discard_sectors;
-> +	lim.max_write_zeroes_sectors = max_discard_sectors;
-> +	if (max_discard_sectors)
-> +		lim.discard_granularity = granularity;
-> +	else
-> +		lim.discard_granularity = 0;
->  	return queue_limits_commit_update(lo->lo_queue, &lim);
->  }
->  
-> _
+>  	/*
+>  	 * Drivers that set dma_alignment to less than 511 must be prepared to
+
 
 -- 
-OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Damien Le Moal
+Western Digital Research
