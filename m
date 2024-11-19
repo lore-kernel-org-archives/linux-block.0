@@ -1,91 +1,61 @@
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE911D0BA6
-	for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 16:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1DA146A9F;
+	Tue, 19 Nov 2024 16:22:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732033218; cv=none; b=LPD0QXcXN8LKU5VUXKSjwLjH5fgtnubMfRNIfYL5gOwHKdyswQ/YR3I1vrIfKotzvDIrGTDSUKRHE9CWc33VnvGVwH0apZF1kvaI48JEcHPUO++PVACq6iH7KEUvMFq488se2vtAATA6aiOfX4RMtRlIRVLmzsmb8E41D8GDJ0A=
+	t=1732033330; cv=none; b=ajaROiEQpZCUBI5faAVNtIqgd4RMfgIvdOSmh0CBi5c4OJfELl9s8ikci9OUO/bYAXq5NGc5eK/uJUV2gHYNj6pbLlTHRHsxPSHbQKVPwG8bf+/vqMJzc7T7NOJDrzYQUBR6uDDfJfD7HfhGRGDPsz58flAOEaA7WdlpN5xSvpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732033218; c=relaxed/simple;
-	bh=OdIfCpg1AbVHgB2T9ispri3GwOHonibskh7udt0tJSk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=IzINTM9GZ96KnYERmMqHhFbBGhO9LX6At9qHU66rob7VbTc2EQpgdptnsY5Pn0dqMNDio8RF25qLRwV1vxooPUuPVDUnYfCLr8w/qCu2tk5Xlt4I5LDvt1SlalhRhfL/zSqPpiGfVsEmxz81THY9hyu+Hr+sJT7PD4VZmeuoSAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=yvmoqkUK; arc=none smtp.client-ip=209.85.160.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1732033330; c=relaxed/simple;
+	bh=q0lwnzu1MyEalyW02TIxHamhqE5g+l+C4qb/JxUuUGU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R5SbJeJooTQgKcNpEdRp9VvotQ+nmkzQcLQ+b1tJNJUjdVjnhTPqEeMQOmalMcTfYCME+zx62fS5ob59WkvmP5E/PHGML/Th0iK1jLEThjXKbQSarAP41PMSS+UpL7fPK4argJw9LnBj33n8ZKC6GkjGTTjq3Ctif76TxKWV70E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3Enm5gSs; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="yvmoqkUK"
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-29685066b8dso1287321fac.1
-        for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 08:20:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732033215; x=1732638015; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o/Ft9aR9yRqj3mw2lSDRrmazp16w7rI4C6akOruFlLg=;
-        b=yvmoqkUK4R2/JO3S/Gl7TzLvr/fR0uP7B5AswRkbupwIzK5pZ2ZazZ8j19TJbEWilU
-         yqNheA3JwVWg3FHTlgZ8g8yqJlUX6R21p/MDEN5tDcXySREt/odX07g4h323DUB6asse
-         6WVUcgDkDlQlm+TrmOMdXnQ8+yklOF0iGhUmrc7ugHxVg7mYBo4c1W0+dgOL5S+bOrr6
-         q2mCBBU4i3dADEv3xJ9YHM9mjCHxu0sG02316e2wDNYth5gLAhtyNQc+G2pwRchO6ljW
-         YNdtz3NwQrZP7/ccji5Hy+XdGFhyhMmqOPGOWt7WyhoZ4mPz+EtJ3naVpAGvtgUVFv2T
-         Q1rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732033215; x=1732638015;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o/Ft9aR9yRqj3mw2lSDRrmazp16w7rI4C6akOruFlLg=;
-        b=o1H2d4SSYjGzUiMtRkjU3wnQ6FCfnP1IUNLcrS5HUvFPqVe+b/w1VH5hAYrX+GY+sZ
-         ZE6trQLhSF56pYt7RpTBnD8JNTqU8gaXCrISzYydE/cDu/y8ATOqi7O1uFxJIwlrQkmB
-         0CuHf12focb2GltNWNrWmXHBqfKqBJz95fjLsf3Q/ZouYfd0q/AYksq1fNLIl2MXECtk
-         o/gexvzXDU4e/911R4jHep4lASkisL/Cpgi9JbP1bE5Tn+v7uaw6HKt1qYOzyds+c0yi
-         tk4b8coz55Mec5GaNkKfZ52igsr3eZQ80X1udKvggFoY/gmkzdG8rnMi7zuYpKRdTCE/
-         bxCQ==
-X-Gm-Message-State: AOJu0YxZIXVtX+U84SX3IMOHcebhKckYwwzQajHaclqlLodeTZ3UxWPX
-	ujL6hC+5HVKiZdY5+zz1nISDQesG+qgC5DgI2NPcdnOAhA6CPcK58YjVjoR9qQQdiDezc7CST5k
-	kaEU=
-X-Google-Smtp-Source: AGHT+IHUSAcx5cc3Rj7yHOAXiycIRvr9L9h13LXraWwRqkP6IfzKdhaJyzOX6qpSjqqWjmH+Y1RfDg==
-X-Received: by 2002:a05:6870:bacd:b0:296:1e98:6846 with SMTP id 586e51a60fabf-2962e34d157mr13773103fac.40.1732033215025;
-        Tue, 19 Nov 2024 08:20:15 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-29651ac449bsm3588807fac.37.2024.11.19.08.20.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 08:20:14 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: stable@vger.kernel.org
-In-Reply-To: <20241119030646.2319030-1-ming.lei@redhat.com>
-References: <20241119030646.2319030-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] ublk: fix error code for unsupported command
-Message-Id: <173203321410.117382.14501473576821099671.b4-ty@kernel.dk>
-Date: Tue, 19 Nov 2024 09:20:14 -0700
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3Enm5gSs"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=q5I5Tfd+TSQ97R3pAX5ux88NHYxJGXlNPr7zVvLk/KI=; b=3Enm5gSsqBA/P4SpCyweTZ4htA
+	lLysqfE3LkFhgmOpnCpe8+eCDiOuHk9MLAA3nmZjmSO/lFNdQyPkmnTNiTrjfV2P43/vGx+ppHG03
+	XYR8tB+eXaflcL3C/0a5pBRd60NHFrsyLHbBq7vufiy1ZEmHxuDeesEWVyi0opodNIp8BeSA1Pcxn
+	1aXdcYuZd61OJ1sxaO8dInuK7OweT0oZzES6UNaKvJ0M92Cc8Ctc64YbtYra9XahV6Vbozd7doHje
+	NJZUe3uiHrALMJJGPYYGkknu0xWfmgg5npW3Xogapq4/tK3VG9A/0S9uK62YMWLJzytE3wxI9U5Dy
+	hYUvAcCQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tDQzQ-0000000D0GF-3uA5;
+	Tue, 19 Nov 2024 16:22:08 +0000
+Date: Tue, 19 Nov 2024 08:22:08 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Alexey Dobriyan <adobriyan@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-api@vger.kernel.org
+Subject: Re: [PATCH] uapi: add EROBLK
+Message-ID: <Zzy7MGyTp9yw1ntQ@infradead.org>
+References: <9184b5e8-7070-4395-b179-4975b2e3fbc3@p183>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-86319
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9184b5e8-7070-4395-b179-4975b2e3fbc3@p183>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-
-On Tue, 19 Nov 2024 11:06:46 +0800, Ming Lei wrote:
-> ENOTSUPP is for kernel use only, and shouldn't be sent to userspace.
+On Tue, Nov 19, 2024 at 06:54:52PM +0300, Alexey Dobriyan wrote:
+> Block drivers and DM sometimes use EROFS to report errors. There is
+> no confusion about what happens but naive error reporting code might
+> pass -EROFS to strerror(3) which will print "filesystem" when clearly
+> there is no filesystem anywhere, it is layer above.
 > 
-> Fix it by replacing it with EOPNOTSUPP.
-> 
-> 
+> Or in other words, if EROFS exists, why not EROBLK?
+> It is not like there is a tax on errno values.
 
-Applied, thanks!
-
-[1/1] ublk: fix error code for unsupported command
-      commit: 34c1227035b3ab930a1ae6ab6f22fec1af8ab09e
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+And where would you return this value without breaking existing
+userspace?
