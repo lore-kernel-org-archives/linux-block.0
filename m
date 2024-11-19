@@ -1,79 +1,78 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A6114A60C;
-	Tue, 19 Nov 2024 21:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E231876;
+	Tue, 19 Nov 2024 22:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732051247; cv=none; b=hx1C1mE2Vu8wqhWBe+6pQxkBu0Ou2CaXxevBwjHI3SpnmXPZFZmIiGx7LPhUqUMtE3wfSNeWs3t1RiAge/Iv2rnYRLlXaNGD8X1RmqKzkVsewm73hqKjLATpEjD/qvadufkYGeM2SKRg0Ur0JY7Q1ftbQPlctWrIZA+6w3e6iFo=
+	t=1732056559; cv=none; b=VU1M55dvlu6Jysx118sauTa30wEylzE8DuPk3/B1OnfmNOCZ4Lz5LKX7AcxbVs0bMGS8+AY35sW+vRxTJ9QiSIqPrbw28EqdevfSm1bobCI2E5A16wZC8nZOdMvy/CjPYlJUVwgehXYiGj09FJghy/YW5vvNHEQ7wbQScyTJ1Yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732051247; c=relaxed/simple;
-	bh=La/tZKDMvnd6geD6wQ/REDbXwfQjuTcF4tkMki9i7Mo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PN3N7LZ+142Cm8jLe2iJU2PJRfHXWpEnfj6dMHdqpwTvJb7EWT6iajgv8Lh8Lq91UPS8eGuIqnl0gT5xrym4WhXyKCibO9QfFAHd6nc4bXidRegkUFg3u9kB8v6PQ9na6J2trWS+YRDfaYoF5A6CjL/XlhsW7JNw8+Jm54v7Vx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=5LjeNWcu; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1732056559; c=relaxed/simple;
+	bh=da9J+92L3X12EP6GZGUAqszUOKZLRzsWW/faOD90Lhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=isUmP7n4pQaxsvnu6aCxS0SA5ryia+mbz0yCFjKt9dGO9WpiQ65jIRYYYa26zm/KEOTRfTrwg6RUzWOZSexk3ewoXAnHwSIua2kEs0ADzMR26bVU04UK8XWEEdi0TZ0Lvi1PXY1hz2yspghvazEjn370eWKhch9WIup40BuyzlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EQMYYfAv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="5LjeNWcu"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4XtHTn0ZlLzlgTWM;
-	Tue, 19 Nov 2024 21:20:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1732051242; x=1734643243; bh=La/tZKDMvnd6geD6wQ/REDbX
-	wfQjuTcF4tkMki9i7Mo=; b=5LjeNWcublckqn2qUegDkSMVwwbpCTUx8oMz5Q8q
-	U+9HhOWlpx5MNDlz4massq2xjrQdmlCO1IZiurPc1lG8XtsCT2LrIAdPmuUpEd4U
-	TXCaJ9VgYBAKxv9aef53Wz3fkDkQMFMtAllJLpTS6e3dMhM98QrdvzTeAVyHrxql
-	ywe3DViR2LFY1RoxhXpH6PRorUFykp509pnar2mgsevB4RIfI4cB9cVprLfI2Jhh
-	18AJtjkE2OtY0hJVcG9zeScA/whGxqGExs56xVfuCNnvk3abCgSEExLDzOsoPdP2
-	wRR8MmKaibn03yKX5o9rv+O3p36dHtQGrdTxA+9oVcOQtQ==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id oFpXu3aL5zlT; Tue, 19 Nov 2024 21:20:42 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4XtHTj1BKmzlgTWG;
-	Tue, 19 Nov 2024 21:20:40 +0000 (UTC)
-Message-ID: <c95b067d-b39f-49b2-8428-1897609041c3@acm.org>
-Date: Tue, 19 Nov 2024 13:20:39 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EQMYYfAv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD82DC4CECF;
+	Tue, 19 Nov 2024 22:49:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732056557;
+	bh=da9J+92L3X12EP6GZGUAqszUOKZLRzsWW/faOD90Lhk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EQMYYfAvgBdeCX3/hPmuzjpTYLWV6cZlwiM+NkrUuDw11qmQJVftoDRGF+8WiAuPd
+	 2MUbbSjfZ3JkSEYD02t6VkNyS4o0+G0Iu69z+h4Fb/R/QEme9n6tOqLymU6OJmIL1L
+	 2EcOjQvM+6By+fq6prjX3SGHshpSCT86qrBmwr73sg1eFcCSlKYc2PARlcko3AssaE
+	 XQQtkxykStWspXRy7UmNUb/UzQNL5U5hC9/5IA+8m48JjiokbdJ4XTn8+93yLpXTkk
+	 5hSXLYvEdIzftE6p37qgfiAQXeYTSBysScW8nhxW6VpH3nvLeMizLivSCA3bwus0E7
+	 qOptCU2Po2Cww==
+Date: Tue, 19 Nov 2024 15:49:14 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Kanchan Joshi <joshi.k@samsung.com>, Hui Qi <hui81.qi@samsung.com>,
+	Nitesh Shetty <nj.shetty@samsung.com>, Jan Kara <jack@suse.cz>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+	io-uring@vger.kernel.org
+Subject: Re: [PATCH 14/15] nvme: enable FDP support
+Message-ID: <Zz0V6qv3oyKV_Kzp@kbusch-mbp.dhcp.thefacebook.com>
+References: <20241119121632.1225556-1-hch@lst.de>
+ <20241119121632.1225556-15-hch@lst.de>
+ <ZzzWQFyq0Sv7cuHb@kbusch-mbp>
+ <20241119182427.GA20997@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 17/26] blk-zoned: Uninline functions that are not in
- the hot path
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20241119002815.600608-1-bvanassche@acm.org>
- <20241119002815.600608-18-bvanassche@acm.org>
- <c8cd9037-4487-48b5-80dc-2ee35c1fc972@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <c8cd9037-4487-48b5-80dc-2ee35c1fc972@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241119182427.GA20997@lst.de>
 
-On 11/18/24 11:55 PM, Damien Le Moal wrote:
-> I do not really see the point... Anyway, looks OK.
-Hi Damien,
+On Tue, Nov 19, 2024 at 07:24:27PM +0100, Christoph Hellwig wrote:
+> On Tue, Nov 19, 2024 at 11:17:36AM -0700, Keith Busch wrote:
+> > > +	if (le32_to_cpu(configs[result.fdpcidx].nrg) > 1) {
+> > > +		dev_warn(ns->ctrl->device, "FDP NRG > 1 not supported\n");
+> > 
+> > Why not support multiple reclaim groups?
+> 
+> Can you come up with a sane API for that? 
 
-One of the approaches I used to debug this patch series is to add
-trace_printk() calls to track zwplug state changes. trace_printk()
-reports the function name in front of the information in its argument
-list. I noticed that the function name reported by trace_printk() is
-incorrect for inlined functions. Hence this patch.
+Haven't really thought about it. If it's there, it's probably useful for
+RU's that are not "Persistently Isolated". But let's not worry about it
+now, we can just say you don't get to use write streams for these.
 
-Thanks,
+> And can you find devices in
+> the wild that actually support it?
 
-Bart.
+I haven't come across any, no.
+
+But more about the return codes for pretty much all the errors here.
+They'll prevent the namespace from being visible, but I think you just
+want to set the limits to disable write streams instead. Otherwise it'd
+be a regression since namespaces configured this way are currently
+usable.
