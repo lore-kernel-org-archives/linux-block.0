@@ -1,127 +1,105 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3492D1D220E
-	for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 17:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B1D1D2709
+	for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 17:30:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732037409; cv=none; b=BbQQybXR68S1ivKCn5Y4XHWuc9/21gkCsjVcXmxfsmBRyOlxvXk5A73gMgW0AcTFAQR4h9803KYlI3jlzCxS+a30C0dRb46XqcGayZg55wHbuOJ5a0qv946GYf3VKA5dPhiECYFGeCgpgFDZcG/o2F2DNrjkLCQQhzq0tyim8Ds=
+	t=1732037418; cv=none; b=p0C69KYxRO3m0ZGenn3o9++gsWpXciZ3HZ6v7xwGZPd806f2XXcif5W0kP1klNModhzWGldYv61toGexMBLnB27DV6EjZcLbeckpGDxoEMM0cBSlYvv9XwYBpIyp89t2CxSi+/capMQ7Zjuh2pFg1TEeGN+PhzwxpzzF/3gj0pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732037409; c=relaxed/simple;
-	bh=iJAspBGFRcgVzY4bKp3lb6zrw26/GFw5AyKc0Z0Pg6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LP93c4aTrYNf3WoVNQfk704fTF1Hn9zGPPU9Eisfwo7bzBGMprp0XYPa46YqsCFRZHk5kie0sM3kNYKSn1AbL88dh5Y7RnD62R4EQc67qDdW4gQ/i6WOxHuhk32OvhGcJqZvypI7X6qVt1EDB68K+rH8p2Rahwxu9NpkvA7Hym4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=FvkC43Ya; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1732037418; c=relaxed/simple;
+	bh=8HJq7NwqhChQyegz0sCYyZp2xmSM4MBTlZm9RLzRPyU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=tFv/VtqlVyLq2YDdzw8/rCKflbTq8yJAN24EalsK4PhZvu7qBRSYpYI+j+FMc7Kyyyrwd9tYf1igkYmbiRKjW1pzBLM5yr4xs/vnuJSKgAvEOAvQEWIqlnIa1SCGY+ASe1u1V8lCOWZOGIWb43WEJUWIyd/vQZp+AzMjpPeCJ1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Ja7JW4AE; arc=none smtp.client-ip=209.85.160.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="FvkC43Ya"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7b147a2ff04so252544085a.3
-        for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 09:30:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Ja7JW4AE"
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-29678315c06so1334414fac.1
+        for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 09:30:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1732037406; x=1732642206; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P2RZbmw8j/hv2SNzaAYY1BO4WuVS0Sj8NBeQ9Pxkopo=;
-        b=FvkC43YaD8+d6wNMNRd0+xw8SRuKxj9GtQEGGF9P4KwpEodRvUMCA1HZXIoQL8VmPk
-         y/A4iJxrqhwVDiMjkrWRyeqHbxv+/THdnXD9cfmcG6BF976poH2j9CJdt0H9yXd/8Rb8
-         FvPe0yIRumaJnmPcKRf5m7PVS1x3I9hZCfNlTBiWmXGE5QXlMdUqxD5egVFA7vjSBIr0
-         Ifu0kR7lYX8bJgRBspWaUZxC+qfs97R8LkA8AqtGzK6Q4a7rew6zcyR1Fn1No8IMZ40q
-         CHs07ac33zopJjrM/fp8vmfldfQscuxNJIjOLwSuoXpWCexhcNQWuSK+GTy9X9jYUsQN
-         0K4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732037406; x=1732642206;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732037416; x=1732642216; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=P2RZbmw8j/hv2SNzaAYY1BO4WuVS0Sj8NBeQ9Pxkopo=;
-        b=m4YYEv0NrvGZYMmuuS/vtokfdgS3TO3XcgJ6sm0KK/Vw35Na4VlLnnywysrevC/ME7
-         4lUpPnJ03pVkC/ifGuEgQXFjETdamsN7cSRCxbVDP6/odUY7ZAq86B9SRDEO6D6pmx/S
-         Erfub3CXxh7jF1pXKs6jx4W7404CPDPmTPWl8/1I1VNKYKUNm64VaPBdu74LzkO4MNVB
-         xHcyclCr4gGDVu1+OBjI+ToxNYct/4kyk84MeNSnrvAUBaEaHALC/cQcb+ZxayQDKN9J
-         /RfYVaRp7GV4juEBqBDlJKGW/STVW1x6Y877JEY8UMHtRm3KdXhJpV8sD7sBQHbodmKR
-         OHIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOfj3/5DTpxdxyJxvbwPusH8w7zwTmUUbOyUvLEihzyJWPSS2E/BcKjLzVgCPfGJy4bpFl8+nNvNOv5Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKKzJOxdO1GSZ9TdYbd+0mkC6Qt1I0jG/E1NZ+wcVNB8r4GkF5
-	60phgpZnNkOa1Es+JOec26mYVHs2nv+xH8v7X75HwccdQ6O+YE+sfBqLp+5nOsg=
-X-Google-Smtp-Source: AGHT+IEw2hhta4tF97+ZTqDEn97k4/qPKPWIxcDYewixCIGPDLkcCaqZGpK5GII/9x88g1PJnE+WXg==
-X-Received: by 2002:a05:620a:1992:b0:7b1:4330:634f with SMTP id af79cd13be357-7b362384ee1mr2344165985a.61.1732037405973;
-        Tue, 19 Nov 2024 09:30:05 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b37a866319sm113013385a.69.2024.11.19.09.30.04
+        bh=E1XwymtzFptex07g8t0oBCz32E5vUvl6qwiNVcfZVz0=;
+        b=Ja7JW4AE6B7mFJ8OwRjahcijJhgkhfgGBeOyVXVDo0IZsKir0IIFrWU7k73D+35swg
+         jjvh9L7Ck3IgLSHRNFX3Ccw6Z6XZlwvUnCpISxlWQqIyL2uSDyYSQmL/JaypK+K/NRPN
+         6j/wTbvQOkNhSc7C8xDUoJ/cmlGhiuYY4W49WzqvdzCpDFSj9T//N8sB4e5WM7PpCtLk
+         TwoT4QryzlqhYFqIe4I9JMxYhD5XS1p4tQq8AcTce5NSCrgCJYVrrILmdchEPlxPW4Sy
+         RKDizfCBPo8SwILEOO5vrWOOD0TactJwf7ozsYwFbs3wGDyjApjugkYPjfsbojQbJv0I
+         X5BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732037416; x=1732642216;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E1XwymtzFptex07g8t0oBCz32E5vUvl6qwiNVcfZVz0=;
+        b=BrIH+Mz5N9BNs/oBZv28RC6nyXeXgYwFv15DrtCSA4F8XNeNXR1zZ6YXQiI9WLXQ1R
+         22ZxcZlHPzVMDD0Kx67cPHZrmmYP/MbihZhm1v6dpOybWLf7ladrrLijph9zbzzU3mAg
+         d2EOe1OZkk0+Dg0/WhokOTAf97+O6fC/lmmxXqzaWPQRS68muyQu5ObxNc+vM4xWggBB
+         h1cEjEkyu5p1Ph/EzD0F6f1xJs5tWs80uTlzhXTnBN8B+L9oOKu+ypI74iqcOkAU6pl9
+         eg+vFrLlIN/quo9RRF9bJzW04lrT29RoHNvBKrhSulkUYJkY+NxvWcfjhWtmk1cFy97K
+         /U/w==
+X-Gm-Message-State: AOJu0YyFi9kVpidLXsu0zkMdhfQvU575JMBPfk3Gu3+9MfHTRYhsLQaR
+	LtIisOhQnfmdVvetjs1zxIAOnsZyIawrrIGVwzWmPFx3PO0g5mcmV4jgslKsEqlCFR3HjLDALEC
+	wCbs=
+X-Google-Smtp-Source: AGHT+IFbst9trImFfYVW3CX067lMGhsuhKjR8MGYTNOoJM+ovbJqMJ/SvIsnK0nojAHbjy2eogmP3g==
+X-Received: by 2002:a05:6871:3a0a:b0:27b:5abb:7def with SMTP id 586e51a60fabf-2962ddd314emr15082932fac.20.1732037415966;
+        Tue, 19 Nov 2024 09:30:15 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-296518bb670sm3595531fac.12.2024.11.19.09.30.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 09:30:04 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tDS3A-00000003GSP-14at;
-	Tue, 19 Nov 2024 13:30:04 -0400
-Date: Tue, 19 Nov 2024 13:30:04 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v3 07/17] dma-mapping: Implement link/unlink ranges API
-Message-ID: <20241119173004.GA773835@ziepe.ca>
-References: <cover.1731244445.git.leon@kernel.org>
- <f8c7f160c9ae97fef4ccd355f9979727552c7374.1731244445.git.leon@kernel.org>
- <20241118145929.GB27795@willie-the-truck>
- <20241118185533.GA24154@unreal>
- <20241119090507.GB28466@willie-the-truck>
- <20241119135743.GB26101@unreal>
+        Tue, 19 Nov 2024 09:30:15 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: song@kernel.org, yukuai3@huawei.com, hch@lst.de, 
+ John Garry <john.g.garry@oracle.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-raid@vger.kernel.org, martin.petersen@oracle.com
+In-Reply-To: <20241118105018.1870052-1-john.g.garry@oracle.com>
+References: <20241118105018.1870052-1-john.g.garry@oracle.com>
+Subject: Re: [PATCH v5 0/5] RAID 0/1/10 atomic write support
+Message-Id: <173203741480.120673.1977109756276902670.b4-ty@kernel.dk>
+Date: Tue, 19 Nov 2024 10:30:14 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241119135743.GB26101@unreal>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-86319
 
-On Tue, Nov 19, 2024 at 03:57:43PM +0200, Leon Romanovsky wrote:
 
-> > > dma_iova_link/dma_iova_unlink() don't have any assumptions in addition
-> > > to already existing for dma_map_sg/dma_unmap_sg(). In reality, it means
-> > > that all calls to unlink will have same size as for link.
-> > 
-> > Ok, great. Any chance you could call that out in the documentation patch,
-> > please?
+On Mon, 18 Nov 2024 10:50:13 +0000, John Garry wrote:
+> This series introduces atomic write support for software RAID 0/1/10.
 > 
-> Can you suggest what should I add there, as it is not specific to new
-> API, but general note applicable to all __iommu_unmap() callers?
+> The main changes are to ensure that we can calculate the stacked device
+> request_queue limits appropriately for atomic writes. Fundamentally, if
+> some bottom does not support atomic writes, then atomic writes are not
+> supported for the top device. Furthermore, the atomic writes limits are
+> the lowest common supported limits from all bottom devices.
+> 
+> [...]
 
-This is what I wrote:
+Applied, thanks!
 
-+/**
-+ * iommu_unmap() - Remove mappings from a range of IOVA
-+ * @domain: Domain to manipulate
-+ * @iova: IO virtual address to start
-+ * @size: Length of the range starting from @iova
-+ *
-+ * iommu_unmap() will remove a translation created by iommu_map(). It cannot
-+ * subdivide a mapping created by iommu_map(), so it should be called with IOVA
-+ * ranges that match what was passed to iommu_map(). The range can aggregate
-+ * contiguous iommu_map() calls so long as no individual range is split.
-+ *
-+ * Returns: Number of bytes of IOVA unmapped. iova + res will be the point
-+ * unmapping stopped.
-+ */
+[1/5] block: Add extra checks in blk_validate_atomic_write_limits()
+      commit: d00eea91deaf363f83599532cb49fa528ab8e00e
+[2/5] block: Support atomic writes limits for stacked devices
+      commit: d7f36dc446e894e0f57b5f05c5628f03c5f9e2d2
+[3/5] md/raid0: Atomic write support
+      commit: fa6fec82811bc6ebd3c4337ae4dae36c802c0fc1
+[4/5] md/raid1: Atomic write support
+      commit: f2a38abf5f1c5aeb3be8e9f4d3d815c867fff7ca
+[5/5] md/raid10: Atomic write support
+      commit: a1d9b4fd42d93f46c11e7e9d919a55a3f6ca6126
 
-Jason
+Best regards,
+-- 
+Jens Axboe
+
+
+
