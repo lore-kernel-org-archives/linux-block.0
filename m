@@ -1,72 +1,193 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A9029CA
-	for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 07:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+Received: from mail.parknet.co.jp (mail.parknet.co.jp [210.171.160.6])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7EB1482E7;
+	Tue, 19 Nov 2024 07:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.171.160.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732001168; cv=none; b=toWhrK1S5oJmBR56tr0drmZlJ/qA3q4Kb1lVOVh6dVESfAwKA67+VqwA6rUlvnG36HDGztETAXlm1lcw6+GYWcHXpCjy0Y3yzSoKweSZY1UCFX5KWwbdXhQ3pUrPofck83NkYrfp6evO+87msvdMNMQirqXFLMEV815blX4z+5k=
+	t=1732001637; cv=none; b=MqYynjYpwlH8xpgVH5n9HrQUdrRfttJtaDAChAef5AswSWLUnanPbpN9y2l0OO4GmcVOoKqC12E8L6W3sN2qQV9KNCpee2tvom+xLt05zSVojb3XDWUsjG/2IjMR2iuo0pLU35HdLNUTv/0Vb2epB/+FlhGO7fmB+O60dH5CYrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732001168; c=relaxed/simple;
-	bh=cBatbZr622U5CNCIH9TjzBORC/eHVZU15PkRfqEswy0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ScTEcVwKuM2vLs4cHSZm55gTg2TdNkAdRo0h1EANzUpJ0CWWw/OfbMv58wEDOZ+2ZhtFFn4uXXeAdkFdqtgX7H3ZrxOrCPD5sdQW02Imfc2Bh/Yc8i1X8SP3S2uil80/GGCE31XPv9Bw+SpDBBSwoXKzRUsCTO48YA4/5ywp1oM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RdmTGXHn; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RdmTGXHn"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=GKxgkXQzfx+n3tB2rjJOyveqCdtXchCNXCGE0ggBlRw=; b=RdmTGXHn3JkZJT19HFKqoaVZsI
-	ifMgsUyAl84a7ogBTVliimr/1JdtBsSd1rLY1noHI2Cf89ewqPKwrIRGipNk1cqcUYxmVoLFbAcP/
-	qW23/N6Q2W7QPZvPFrzJMWhQwXqSaL2c0G27+2oilk3MXPCWNkIhCCVT9DYGJLCwt4TfBzMcT4d/Y
-	s96P8itN5rK1KsF6Q4zzzg7W17GCLneEOHMdseqpm7jkV7m5x1/9GpgtYX0qAtqffAbwZO7hDuGlp
-	wLl4amUuPtTGVIZ7eQ+1ulVmQKBk6E/BTneLcqaTYXH+GmVtWUGNpM4bjMinUpWuoSvlurCPiB9El
-	+OmM4+LA==;
-Received: from 2a02-8389-2341-5b80-1731-a089-d2b1-3edf.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:1731:a089:d2b1:3edf] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tDIcf-0000000BdT5-47g8;
-	Tue, 19 Nov 2024 07:26:06 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH] block: return unsigned int from bdev_io_min
-Date: Tue, 19 Nov 2024 08:26:02 +0100
-Message-ID: <20241119072602.1059488-1-hch@lst.de>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1732001637; c=relaxed/simple;
+	bh=C07DGh76ZAQSfyYMy8dgyW7f/7AWcTO46Ds6XvbbYhw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=QuIdSvHVRX4L43Cchjk/cYnELDYlZqDF9mMF+sJPTcpqbG5vf+nmUccMNSlo/22XITS13mJ+t/ID8RD3qEDiKcbgw1z1OIpcsCbLZr+fgJmBOiMr71MZ4SeTr2gHA69arTMOskGPPvOoVMNQf/8vKuOetoYjT3oJL0ETj2quWqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mail.parknet.co.jp; spf=pass smtp.mailfrom=parknet.co.jp; arc=none smtp.client-ip=210.171.160.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mail.parknet.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=parknet.co.jp
+Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
+	by mail.parknet.co.jp (Postfix) with ESMTPSA id A87E62051589;
+	Tue, 19 Nov 2024 16:27:40 +0900 (JST)
+Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
+	by ibmpc.myhome.or.jp (8.18.1/8.18.1/Debian-6) with ESMTPS id 4AJ7Rdj4047655
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 19 Nov 2024 16:27:40 +0900
+Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
+	by devron.myhome.or.jp (8.18.1/8.18.1/Debian-6) with ESMTPS id 4AJ7RdUL293067
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 19 Nov 2024 16:27:39 +0900
+Received: (from hirofumi@localhost)
+	by devron.myhome.or.jp (8.18.1/8.18.1/Submit) id 4AJ7RbCD293063;
+	Tue, 19 Nov 2024 16:27:37 +0900
+From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+        syzbot
+ <syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com>,
+        linkinjeon@kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sj1557.seo@samsung.com,
+        syzkaller-bugs@googlegroups.com
+Subject: [PATCH] loop: Fix ABBA locking race (Re: [syzbot] [exfat?] possible
+ deadlock in fat_count_free_clusters)
+In-Reply-To: <8734jxsyuu.fsf@mail.parknet.co.jp> (OGAWA Hirofumi's message of
+	"Mon, 11 Nov 2024 22:07:21 +0900")
+References: <67313d9e.050a0220.138bd5.0054.GAE@google.com>
+	<8734jxsyuu.fsf@mail.parknet.co.jp>
+Date: Tue, 19 Nov 2024 16:27:37 +0900
+Message-ID: <871pz7adjq.fsf_-_@mail.parknet.co.jp>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
 
-The underlying limit is defined as an unsigned int, so return that from
-bdev_io_min as well.
+OGAWA Hirofumi <hirofumi@mail.parknet.co.jp> writes:
 
-Fixes: ac481c20ef8f ("block: Topology ioctls")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- include/linux/blkdev.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ping?
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 00212e96261a..4825469c2fa1 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1261,7 +1261,7 @@ static inline unsigned int queue_io_min(const struct request_queue *q)
- 	return q->limits.io_min;
- }
- 
--static inline int bdev_io_min(struct block_device *bdev)
-+static inline unsigned int bdev_io_min(struct block_device *bdev)
- {
- 	return queue_io_min(bdev_get_queue(bdev));
- }
+> Hi,
+>
+> syzbot <syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com> writes:
+>
+>> syzbot found the following issue on:
+>>
+>> HEAD commit:    929beafbe7ac Add linux-next specific files for 20241108
+>> git tree:       linux-next
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=1621bd87980000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=75175323f2078363
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=a5d8c609c02f508672cc
+>> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+>
+> This patch is to fix the above race. Please check this.
+>
+> Thanks
+>
+>
+> From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+> Subject: [PATCH] loop: Fix ABBA locking race
+> Date: Mon, 11 Nov 2024 21:53:36 +0900
+>
+> Current loop calls vfs_statfs() while holding the q->limits_lock. If
+> FS takes some locking in vfs_statfs callback, this may lead to ABBA
+> locking bug (at least, FAT fs has this issue actually).
+>
+> So this patch calls vfs_statfs() outside q->limits_locks instead,
+> because looks like there is no reason to hold q->limits_locks while
+> getting discard configs.
+>
+> Chain exists of:
+>   &sbi->fat_lock --> &q->q_usage_counter(io)#17 --> &q->limits_lock
+>
+>  Possible unsafe locking scenario:
+>
+>        CPU0                    CPU1
+>        ----                    ----
+>   lock(&q->limits_lock);
+>                                lock(&q->q_usage_counter(io)#17);
+>                                lock(&q->limits_lock);
+>   lock(&sbi->fat_lock);
+>
+>  *** DEADLOCK ***
+>
+> Reported-by: syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=a5d8c609c02f508672cc
+> Signed-off-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+> ---
+>  drivers/block/loop.c |   31 ++++++++++++++++---------------
+>  1 file changed, 16 insertions(+), 15 deletions(-)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 78a7bb2..5f3ce51 100644
+> --- a/drivers/block/loop.c	2024-09-16 13:45:20.253220178 +0900
+> +++ b/drivers/block/loop.c	2024-11-11 21:51:00.910135443 +0900
+> @@ -770,12 +770,11 @@ static void loop_sysfs_exit(struct loop_
+>  				   &loop_attribute_group);
+>  }
+>  
+> -static void loop_config_discard(struct loop_device *lo,
+> -		struct queue_limits *lim)
+> +static void loop_get_discard_config(struct loop_device *lo,
+> +				    u32 *granularity, u32 *max_discard_sectors)
+>  {
+>  	struct file *file = lo->lo_backing_file;
+>  	struct inode *inode = file->f_mapping->host;
+> -	u32 granularity = 0, max_discard_sectors = 0;
+>  	struct kstatfs sbuf;
+>  
+>  	/*
+> @@ -788,8 +787,9 @@ static void loop_config_discard(struct l
+>  	if (S_ISBLK(inode->i_mode)) {
+>  		struct request_queue *backingq = bdev_get_queue(I_BDEV(inode));
+>  
+> -		max_discard_sectors = backingq->limits.max_write_zeroes_sectors;
+> -		granularity = bdev_discard_granularity(I_BDEV(inode)) ?:
+> +		*max_discard_sectors =
+> +			backingq->limits.max_write_zeroes_sectors;
+> +		*granularity = bdev_discard_granularity(I_BDEV(inode)) ?:
+>  			queue_physical_block_size(backingq);
+>  
+>  	/*
+> @@ -797,16 +797,9 @@ static void loop_config_discard(struct l
+>  	 * image a.k.a. discard.
+>  	 */
+>  	} else if (file->f_op->fallocate && !vfs_statfs(&file->f_path, &sbuf)) {
+> -		max_discard_sectors = UINT_MAX >> 9;
+> -		granularity = sbuf.f_bsize;
+> +		*max_discard_sectors = UINT_MAX >> 9;
+> +		*granularity = sbuf.f_bsize;
+>  	}
+> -
+> -	lim->max_hw_discard_sectors = max_discard_sectors;
+> -	lim->max_write_zeroes_sectors = max_discard_sectors;
+> -	if (max_discard_sectors)
+> -		lim->discard_granularity = granularity;
+> -	else
+> -		lim->discard_granularity = 0;
+>  }
+>  
+>  struct loop_worker {
+> @@ -992,6 +985,7 @@ static int loop_reconfigure_limits(struc
+>  	struct inode *inode = file->f_mapping->host;
+>  	struct block_device *backing_bdev = NULL;
+>  	struct queue_limits lim;
+> +	u32 granularity = 0, max_discard_sectors = 0;
+>  
+>  	if (S_ISBLK(inode->i_mode))
+>  		backing_bdev = I_BDEV(inode);
+> @@ -1001,6 +995,8 @@ static int loop_reconfigure_limits(struc
+>  	if (!bsize)
+>  		bsize = loop_default_blocksize(lo, backing_bdev);
+>  
+> +	loop_get_discard_config(lo, &granularity, &max_discard_sectors);
+> +
+>  	lim = queue_limits_start_update(lo->lo_queue);
+>  	lim.logical_block_size = bsize;
+>  	lim.physical_block_size = bsize;
+> @@ -1010,7 +1006,12 @@ static int loop_reconfigure_limits(struc
+>  		lim.features |= BLK_FEAT_WRITE_CACHE;
+>  	if (backing_bdev && !bdev_nonrot(backing_bdev))
+>  		lim.features |= BLK_FEAT_ROTATIONAL;
+> -	loop_config_discard(lo, &lim);
+> +	lim.max_hw_discard_sectors = max_discard_sectors;
+> +	lim.max_write_zeroes_sectors = max_discard_sectors;
+> +	if (max_discard_sectors)
+> +		lim.discard_granularity = granularity;
+> +	else
+> +		lim.discard_granularity = 0;
+>  	return queue_limits_commit_update(lo->lo_queue, &lim);
+>  }
+>  
+> _
+
 -- 
-2.45.2
-
+OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
