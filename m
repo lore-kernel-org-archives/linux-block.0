@@ -1,90 +1,209 @@
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B482E22067
-	for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 14:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+Received: from mail.parknet.co.jp (mail.parknet.co.jp [210.171.160.6])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67291CC174;
+	Tue, 19 Nov 2024 14:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.171.160.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732026012; cv=none; b=DkojfnGifAoVmu9Zm4PVxFRA8EcULQSp9nAtfyuSTFREVAOD+7fu00eHK2FuKRQ9Ym/iswoV9minGgEGbVUM+1zrFmQR+UUBKWSDBpCFG3cqxMhg72vJw1MbCEqVL8DxeYHGy2zGd+o9TowuiMl327EkZeg8En33gDSi+Q+d6yE=
+	t=1732027599; cv=none; b=Fal9I8LzKKL0rNruyX/x1/JohW5juBfiFLO9D9Sqefb3DdNKSLXkpP2RLXMZBGsrNSlMh4DnRqXQ5zpaWDamJTkYgv3MpVsPTzFSdK5Z+Do9GdzI6LaQfTvBnIRDiWDPiBFdmeqZDBe0x/CQcnIMC12UbfhU2kuv5fVLWoxCXC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732026012; c=relaxed/simple;
-	bh=722xs0nvFuWjs9/R2m8p6hGDpp9l7PFBIm2FPJL466g=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=e6lXKJ5jCh2lo/tbTqmJu3hGO1FSE9+o0B9PGV+cHU5bYibSNfH8BayOaYsfxgZELchWVb1K8GqFE2hHV+ko1qVvydSD7AiTO4UcBvKwK6btOjocG+h+db5sG2TOJz02y8sC9wiCMflxPPIm9Sxrlv7w3JY316SHXAdsQyfO1K8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Ls/wXta5; arc=none smtp.client-ip=209.85.160.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Ls/wXta5"
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-2689e7a941fso2343120fac.3
-        for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 06:20:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732026008; x=1732630808; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ow4Dl2rGHQ0YkrcNYLK7P+rSrOpzrx6eTf2P7HdF1Sc=;
-        b=Ls/wXta5F/X9SUbfPmtH5wFdCjP8WzWZ2CfA9NPhGtr6EEZMeCYOvp939B2YOKwg60
-         KWLCSaAT0qqoOPmV7jSYlOmAxnZqTLknGnGXLU+jBW9/SSfxhKMIB2nsf0q5lsnTw77D
-         wkl7nf5UdMM6cZ5h3UoIKaGlTbYjRnQ1A6/fu025L7fRWl9cufboe+A+mRKbzFCz41hV
-         URtuD8MsJ2GSf+936ZAKIVO/VJ4iOh8Ei2KBxI7hO2wJB/UX2ScdbTIkpWMgxOqLr4/+
-         WwOApAyNJqeaMOhTrBb7cNurWLejT0bSzLaAMWKMFoRup6uTzXc+v+an8+BEtGfZoiWw
-         ezOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732026008; x=1732630808;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ow4Dl2rGHQ0YkrcNYLK7P+rSrOpzrx6eTf2P7HdF1Sc=;
-        b=LfY3ifhWH9NPf+Rbl1NIBfCD/trhKhFYRqk9Lac7S9CoCS2j0UR0zy4Xd7ZgV3VuVo
-         +EcI9IoI6OqnTSWYgU7utDjeMVz2TQJA86lgSfQ09m/IvO7zqdKZoitV3c+SUauT/lpx
-         RzjSWhTX76M6i/qX4w+MjnuxsZz4/1X2al6gg2salahdolLB1AINuRtD7cGKsdDPRKaV
-         CaFFDa12e+gQOv8sL/8riYHIfrc28sKfy+zaW1Hhtf+kQSoINB7KAubG2mBQn2rMzpse
-         FuNfIVZj6hD+6SNEPI6RPpxlLGPHwJGqcs8G+yiwRoGWKyv/I22JaGSEHpKVC2azfKfH
-         eoSw==
-X-Gm-Message-State: AOJu0YwhUqSiHAwf0qWEJZZ2fmejZU0b1CtFP7c3bgc3/cPOlQTXujM0
-	+UW2UEGFjhY6L5GXmfyqQU2XsHzclRogrnwdnIGPAXkGzq9pakOAqchrbKUAWpfRHvc6cw8V09b
-	Z7d4=
-X-Google-Smtp-Source: AGHT+IGppwoRa6CVC7AIE6wGFY3IurArJIF/MTaVzYhWCh/UJm8hoMdstPwTIthdyvlX3kv1RdjzvQ==
-X-Received: by 2002:a05:687c:2c58:b0:296:7bb0:675f with SMTP id 586e51a60fabf-2967bb07ea8mr7074890fac.6.1732026008449;
-        Tue, 19 Nov 2024 06:20:08 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-71a780ea614sm3364459a34.11.2024.11.19.06.20.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 06:20:05 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20241119072602.1059488-1-hch@lst.de>
-References: <20241119072602.1059488-1-hch@lst.de>
-Subject: Re: [PATCH] block: return unsigned int from bdev_io_min
-Message-Id: <173202600419.64264.10508287534167273949.b4-ty@kernel.dk>
-Date: Tue, 19 Nov 2024 07:20:04 -0700
+	s=arc-20240116; t=1732027599; c=relaxed/simple;
+	bh=lRSgxDGGlWLJ/B/qkh7AVttXoTuu5ra6roLtOVhvZnk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ofw2KWF1sUG0bw1NgvgMPQk17b+xZRh7YkXrtspfxG4acl2T2bGoU1NClWi1VJNoyhDMj2GYGysKjthjpAOedXplwdaZrKMBZ7mQVeXz9gaUcpDCyCDAJL7C/wX95B/maCOQ43CizftInJI5YcHvr7al3++4HQC2Qog0gXSCc+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mail.parknet.co.jp; spf=pass smtp.mailfrom=parknet.co.jp; arc=none smtp.client-ip=210.171.160.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mail.parknet.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=parknet.co.jp
+Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
+	by mail.parknet.co.jp (Postfix) with ESMTPSA id 679C12051589;
+	Tue, 19 Nov 2024 23:46:35 +0900 (JST)
+Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
+	by ibmpc.myhome.or.jp (8.18.1/8.18.1/Debian-6) with ESMTPS id 4AJEkYRt056398
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 19 Nov 2024 23:46:35 +0900
+Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
+	by devron.myhome.or.jp (8.18.1/8.18.1/Debian-6) with ESMTPS id 4AJEkYWs352030
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 19 Nov 2024 23:46:34 +0900
+Received: (from hirofumi@localhost)
+	by devron.myhome.or.jp (8.18.1/8.18.1/Submit) id 4AJEkXwk352026;
+	Tue, 19 Nov 2024 23:46:33 +0900
+From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        syzbot
+ <syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com>,
+        linkinjeon@kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sj1557.seo@samsung.com,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [exfat?] possible deadlock in fat_count_free_clusters
+In-Reply-To: <74141e63-d946-421a-be4e-4823944dd8c9@kernel.dk> (Jens Axboe's
+	message of "Tue, 19 Nov 2024 07:18:12 -0700")
+References: <67313d9e.050a0220.138bd5.0054.GAE@google.com>
+	<8734jxsyuu.fsf@mail.parknet.co.jp>
+	<CAFj5m9+FmQLLQkO7EUKnuuj+mpSUOY3EeUxSpXjJUvWtKfz26w@mail.gmail.com>
+	<74141e63-d946-421a-be4e-4823944dd8c9@kernel.dk>
+Date: Tue, 19 Nov 2024 23:46:33 +0900
+Message-ID: <87wmgz8enq.fsf@mail.parknet.co.jp>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-86319
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Jens Axboe <axboe@kernel.dk> writes:
+
+> On 11/19/24 5:10 AM, Ming Lei wrote:
+>> On Tue, Nov 12, 2024 at 12:44=E2=80=AFAM OGAWA Hirofumi
+>> <hirofumi@mail.parknet.co.jp> wrote:
+>>>
+>>> Hi,
+>>>
+>>> syzbot <syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com> writes:
+>>>
+>>>> syzbot found the following issue on:
+>>>>
+>>>> HEAD commit:    929beafbe7ac Add linux-next specific files for 20241108
+>>>> git tree:       linux-next
+>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=3D1621bd8798=
+0000
+>>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D75175323f2=
+078363
+>>>> dashboard link: https://syzkaller.appspot.com/bug?extid=3Da5d8c609c02f=
+508672cc
+>>>> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for =
+Debian) 2.40
+
+[...]
+
+>>=20
+>> Looks fine,
+>>=20
+>> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+>
+> The patch doesn't apply to the for-6.13/block tree, Ogawa can you send
+> an updated one please?
+
+Updated the patch for linux-block:for-6.13/block. Please apply.
+
+Thanks.
 
 
-On Tue, 19 Nov 2024 08:26:02 +0100, Christoph Hellwig wrote:
-> The underlying limit is defined as an unsigned int, so return that from
-> bdev_io_min as well.
-> 
-> 
+From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Subject: [PATCH] loop: Fix ABBA locking race
+Date: Tue, 19 Nov 2024 23:42:23 +0900
 
-Applied, thanks!
+Current loop calls vfs_statfs() while holding the q->limits_lock. If
+FS takes some locking in vfs_statfs callback, this may lead to ABBA
+locking bug (at least, FAT fs has this issue actually).
 
-[1/1] block: return unsigned int from bdev_io_min
-      commit: 46fd48ab3ea3eb3bb215684bd66ea3d260b091a9
+So this patch calls vfs_statfs() outside q->limits_locks instead,
+because looks like no reason to hold q->limits_locks while getting
+discord configs.
 
-Best regards,
--- 
-Jens Axboe
+Chain exists of:
+  &sbi->fat_lock --> &q->q_usage_counter(io)#17 --> &q->limits_lock
 
+ Possible unsafe locking scenario:
 
+       CPU0                    CPU1
+       ----                    ----
+  lock(&q->limits_lock);
+                               lock(&q->q_usage_counter(io)#17);
+                               lock(&q->limits_lock);
+  lock(&sbi->fat_lock);
 
+ *** DEADLOCK ***
+
+Reported-by: syzbot+a5d8c609c02f508672cc@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=3Da5d8c609c02f508672cc
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+---
+ drivers/block/loop.c |   30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index fe9bb4f..8f6761c 100644
+--- a/drivers/block/loop.c	2024-11-19 23:37:54.760751014 +0900
++++ b/drivers/block/loop.c	2024-11-19 23:38:55.645461107 +0900
+@@ -770,12 +770,11 @@ static void loop_sysfs_exit(struct loop_
+ 				   &loop_attribute_group);
+ }
+=20
+-static void loop_config_discard(struct loop_device *lo,
+-		struct queue_limits *lim)
++static void loop_get_discard_config(struct loop_device *lo,
++				    u32 *granularity, u32 *max_discard_sectors)
+ {
+ 	struct file *file =3D lo->lo_backing_file;
+ 	struct inode *inode =3D file->f_mapping->host;
+-	u32 granularity =3D 0, max_discard_sectors =3D 0;
+ 	struct kstatfs sbuf;
+=20
+ 	/*
+@@ -788,24 +787,17 @@ static void loop_config_discard(struct l
+ 	if (S_ISBLK(inode->i_mode)) {
+ 		struct block_device *bdev =3D I_BDEV(inode);
+=20
+-		max_discard_sectors =3D bdev_write_zeroes_sectors(bdev);
+-		granularity =3D bdev_discard_granularity(bdev);
++		*max_discard_sectors =3D bdev_write_zeroes_sectors(bdev);
++		*granularity =3D bdev_discard_granularity(bdev);
+=20
+ 	/*
+ 	 * We use punch hole to reclaim the free space used by the
+ 	 * image a.k.a. discard.
+ 	 */
+ 	} else if (file->f_op->fallocate && !vfs_statfs(&file->f_path, &sbuf)) {
+-		max_discard_sectors =3D UINT_MAX >> 9;
+-		granularity =3D sbuf.f_bsize;
++		*max_discard_sectors =3D UINT_MAX >> 9;
++		*granularity =3D sbuf.f_bsize;
+ 	}
+-
+-	lim->max_hw_discard_sectors =3D max_discard_sectors;
+-	lim->max_write_zeroes_sectors =3D max_discard_sectors;
+-	if (max_discard_sectors)
+-		lim->discard_granularity =3D granularity;
+-	else
+-		lim->discard_granularity =3D 0;
+ }
+=20
+ struct loop_worker {
+@@ -991,6 +983,7 @@ static int loop_reconfigure_limits(struc
+ 	struct inode *inode =3D file->f_mapping->host;
+ 	struct block_device *backing_bdev =3D NULL;
+ 	struct queue_limits lim;
++	u32 granularity =3D 0, max_discard_sectors =3D 0;
+=20
+ 	if (S_ISBLK(inode->i_mode))
+ 		backing_bdev =3D I_BDEV(inode);
+@@ -1000,6 +993,8 @@ static int loop_reconfigure_limits(struc
+ 	if (!bsize)
+ 		bsize =3D loop_default_blocksize(lo, backing_bdev);
+=20
++	loop_get_discard_config(lo, &granularity, &max_discard_sectors);
++
+ 	lim =3D queue_limits_start_update(lo->lo_queue);
+ 	lim.logical_block_size =3D bsize;
+ 	lim.physical_block_size =3D bsize;
+@@ -1009,7 +1004,12 @@ static int loop_reconfigure_limits(struc
+ 		lim.features |=3D BLK_FEAT_WRITE_CACHE;
+ 	if (backing_bdev && !bdev_nonrot(backing_bdev))
+ 		lim.features |=3D BLK_FEAT_ROTATIONAL;
+-	loop_config_discard(lo, &lim);
++	lim.max_hw_discard_sectors =3D max_discard_sectors;
++	lim.max_write_zeroes_sectors =3D max_discard_sectors;
++	if (max_discard_sectors)
++		lim.discard_granularity =3D granularity;
++	else
++		lim.discard_granularity =3D 0;
+ 	return queue_limits_commit_update(lo->lo_queue, &lim);
+ }
+=20
+_
+--=20
+OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
