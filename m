@@ -1,154 +1,63 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53241B813
-	for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 00:30:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0721A29A
+	for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 01:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731976203; cv=none; b=buZpFV0beXkAsgYUKnoGQ5Jd29Vrw7KvZjeKbul7Yrg8yfueWQvwprVmY4OnV2o56fw4rhVC/nWwpTyGQjpPXXopKqlwW4Uf20pDCD+5LQPNagmF+dhJCJpFOktqjpIGUUhhfiDN3JtCuCh1DycMxaZKzYu+2WEgfjDgNYFsXXk=
+	t=1731978586; cv=none; b=AQ3HFKdvdtCUY8EtUieI1Tc8oE7KgJoLNZlXf2PMJ6xg0e38iqMaA55/RiSvhvm7VjN5lK8I5LGUIZvke7ZeMqfEQWsDBgmdFICpZghUiTecrTiuS/RJM7FT+2wQyyllbzuuLLRVG8pX524TlijlP9k6e8kGQe/Ub5PHxrMZmWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731976203; c=relaxed/simple;
-	bh=nbKybIocLaJsDERu+tKuByUmjOL7ZeBtmP+3Ia+NPvo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fVuTnN7HcKnqVv1Vya7Ee/fJp9F7U99gqpETL1fcCh2R3plyZbvH5h7zO6iYrFEvpRoueb1YmKH5hT+Skk2HbPJyJ1kAoOBHeT0MoDweov5VAP0n9+TkCwWluSrLn9aR/HiUYAgm/9XF4oKma8cbDVv9c8Lqdv12gvz4Ivc88hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f3rUi3MA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1731978586; c=relaxed/simple;
+	bh=8EDc2GwUGXoY3fNRBC5wut1tw6A4VeUG1riGxBnBnfw=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=CwbcE3pQaafW6dUUU5miBA/kCPSdSPw2cTPCJyVJAA+g2VdfBD1jZ6iELmPVf5hDtqEboV25kITIhfkNJlLE9ugkIB30C8oBxCNZeZ00SVZPsHdGomRnlpuxM9+NeVpXvcem5rps/Kv7P2gtUflp9Tc8x/s/wkdPeF8gwSSYVeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VP0muQXj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f3rUi3MA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731976200;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jJ4QyAi1edaD+l9HnJ0KjSAONsSZ3MFU1c/LvjhfpbQ=;
-	b=f3rUi3MAtCQMILFbR6ccC+NuEMN9mBR6ZyudMOTnmPO+JY0F/KGKkVuNHt1T/yceGxNNso
-	iQEQa/OZopgwOWhE+sGjV+2TF4nOzSycpTmYaJTVszvTZVv74C05vfZtuEa999if4clS6V
-	03RsjBiUPIBrXBNDk1fql7pvi7q9wvA=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-397-d9rVwu8WPJqXkMcUcK9YPg-1; Mon, 18 Nov 2024 19:29:59 -0500
-X-MC-Unique: d9rVwu8WPJqXkMcUcK9YPg-1
-X-Mimecast-MFC-AGG-ID: d9rVwu8WPJqXkMcUcK9YPg
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2fcdfdef26dso10706561fa.3
-        for <linux-block@vger.kernel.org>; Mon, 18 Nov 2024 16:29:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731976198; x=1732580998;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jJ4QyAi1edaD+l9HnJ0KjSAONsSZ3MFU1c/LvjhfpbQ=;
-        b=Spuf/9bANAsxN4iSR2r1z6Z2bSvPfIHhuzvIR1/mKDyIdc4IoAOWriVdGtEWpLRa4h
-         ZsUd+79g5cRywYJrAFUqoq85DnB4851uT9JoicfI9YbxBcUja5oZjBAUYVUNUR4BgG/0
-         70YBYje8w6CL28gNhIkGjLofAlMENlz2npGo6XKz7frjzP9Wzhr5a93lUhoS8DXQtGC2
-         8MsksrgwhZNiovPi10ZLhxISp3hrGd5BV+7O+pL1UX8DiMlnOW/EWjtSV7wuj9NUPLWN
-         4vdQ09gAMaGYGEVbPaBFiUnkFHhr2PxOomncCN2ilVpXHF0ypEENsQVvcLIg9mcbc/qj
-         zqJw==
-X-Gm-Message-State: AOJu0YxwtnKUpuus1RwO8J06VQWeZ2kHR7PasFeQkhkvjbA9yAXGf857
-	B1SnipS8uxLj3bGDu1jX8nxbOAqdNEp5vgLnbmwBr9Bany45Fp9wcHh4nBLOIs73VI0P9MXxlFL
-	xf0faqSoRu+7VhHzzjxYDCxJcLS6urrHr3/VdeIG7d2jAmuXxQMfJODYtGjZUpGmv48bJWY9aJ8
-	1mGrmgeOrLv2T2tRNUTFa7ltmYiCRcBOIyCLI=
-X-Received: by 2002:a2e:a9a7:0:b0:2fb:4f0c:e40c with SMTP id 38308e7fff4ca-2ff60765548mr65603081fa.34.1731976197675;
-        Mon, 18 Nov 2024 16:29:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEyvrOMbusuuajE8tmnecXn/ALWrTs1c5t0rpxZ+zaTBCo/48JODmP/Z2X19JdXOne0Xpzzy1EsX5ZBZqgj4E0=
-X-Received: by 2002:a2e:a9a7:0:b0:2fb:4f0c:e40c with SMTP id
- 38308e7fff4ca-2ff60765548mr65602961fa.34.1731976197253; Mon, 18 Nov 2024
- 16:29:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VP0muQXj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3C18C4CECF;
+	Tue, 19 Nov 2024 01:09:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731978586;
+	bh=8EDc2GwUGXoY3fNRBC5wut1tw6A4VeUG1riGxBnBnfw=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=VP0muQXj6c2EUYeHZPikwz78qJbubtZegBGro48GL/SileDHfSJ+9bWe9b3AavGF2
+	 Pcwo/u9Dk1gzBeXRzy+KURMIFTRbCspnz1jc+AeeN6kxJQJawXp2RGVYffjD76JA9Y
+	 Y3iWWhEFSAFYv7TZQz+crqcvmWXWT6jrqBI14D1X9WwAy6Q6+LZt6ubZWfCPterj5J
+	 IHw2UOcS7TKJH4gYe+4s5Dbh9thS8w3DbXwJp+KaACPdzCnxbARU2PzhSBplRrtmQn
+	 SIy062wInldmkpC1IT5VFVe167pnCghJGkERPN4cizR02V3AGSMoX2CbIZv8vJZIqf
+	 E7ipBSDY9733A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D6C3809A80;
+	Tue, 19 Nov 2024 01:09:59 +0000 (UTC)
+Subject: Re: [GIT PULL] Block updates for 6.13-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <968b578f-146c-4e94-a68e-e7451762a81a@kernel.dk>
+References: <968b578f-146c-4e94-a68e-e7451762a81a@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <968b578f-146c-4e94-a68e-e7451762a81a@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/for-6.13/block-20241118
+X-PR-Tracked-Commit-Id: 88d47f629313730f26a3b00224d1e1a5e3b7bb79
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 77a0cfafa9af9c0d5b43534eb90d530c189edca1
+Message-Id: <173197859826.48692.17565201871589682047.pr-tracker-bot@kernel.org>
+Date: Tue, 19 Nov 2024 01:09:58 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241115121224.173285-1-shinichiro.kawasaki@wdc.com>
-In-Reply-To: <20241115121224.173285-1-shinichiro.kawasaki@wdc.com>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Tue, 19 Nov 2024 08:29:45 +0800
-Message-ID: <CAHj4cs_d2BuZn0ir_PvMgbhJigir=7Jz4b3KWp19xewnNKjytQ@mail.gmail.com>
-Subject: Re: [PATCH blktests] throtl: set "io" to subtree_control only if required
-To: "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Thanks for the quick fix.
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
+The pull request you sent on Mon, 18 Nov 2024 07:38:04 -0700:
 
-On Fri, Nov 15, 2024 at 8:12=E2=80=AFPM Shin'ichiro Kawasaki
-<shinichiro.kawasaki@wdc.com> wrote:
->
-> It was reported the thortl test cases fail on the systems, which already
-> sets "io" in cgourp2 subtree_control files. The fail happens when
-> writing "-io" to the subtree_control files at clean up.
->
-> To avoid the failure, check if the system already sets "io". If so, skip
-> writing "+io" at set up, and writing "-io" at clean up.
->
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Link: https://github.com/osandov/blktests/issues/149
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> ---
->  tests/throtl/rc | 22 ++++++++++++++++++----
->  1 file changed, 18 insertions(+), 4 deletions(-)
->
-> diff --git a/tests/throtl/rc b/tests/throtl/rc
-> index 2e26fd2..9c264bd 100644
-> --- a/tests/throtl/rc
-> +++ b/tests/throtl/rc
-> @@ -10,6 +10,8 @@
->
->  THROTL_DIR=3D$(echo "$TEST_NAME" | tr '/' '_')
->  THROTL_DEV=3Ddev_nullb
-> +declare THROTL_CLEAR_BASE_SUBTREE_CONTROL_IO
-> +declare THROTL_CLEAR_CGROUP2_DIR_CONTROL_IO
->
->  group_requires() {
->         _have_root
-> @@ -31,8 +33,16 @@ _set_up_throtl() {
->                 return 1
->         fi
->
-> -       echo "+io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"
-> -       echo "+io" > "$CGROUP2_DIR/cgroup.subtree_control"
-> +       THROTL_CLEAR_BASE_SUBTREE_CONTROL_IO=3D
-> +       THROTL_CLEAR_CGROUP2_DIR_CONTROL_IO=3D
-> +       if ! grep -q io "$(_cgroup2_base_dir)/cgroup.subtree_control"; th=
-en
-> +               echo "+io" > "$(_cgroup2_base_dir)/cgroup.subtree_control=
-"
-> +               THROTL_CLEAR_BASE_SUBTREE_CONTROL_IO=3Dtrue
-> +       fi
-> +       if ! grep -q io "$CGROUP2_DIR/cgroup.subtree_control"; then
-> +               echo "+io" > "$CGROUP2_DIR/cgroup.subtree_control"
-> +               THROTL_CLEAR_CGROUP2_DIR_CONTROL_IO=3Dtrue
-> +       fi
->
->         mkdir -p "$CGROUP2_DIR/$THROTL_DIR"
->         return 0;
-> @@ -40,8 +50,12 @@ _set_up_throtl() {
->
->  _clean_up_throtl() {
->         rmdir "$CGROUP2_DIR/$THROTL_DIR"
-> -       echo "-io" > "$CGROUP2_DIR/cgroup.subtree_control"
-> -       echo "-io" > "$(_cgroup2_base_dir)/cgroup.subtree_control"
-> +       if [[ $THROTL_CLEAR_CGROUP2_DIR_CONTROL_IO =3D=3D true ]]; then
-> +               echo "-io" > "$CGROUP2_DIR/cgroup.subtree_control"
-> +       fi
-> +       if [[ $THROTL_CLEAR_BASE_SUBTREE_CONTROL_IO =3D=3D true ]]; then
-> +               echo "-io" > "$(_cgroup2_base_dir)/cgroup.subtree_control=
-"
-> +       fi
->
->         _exit_cgroup2
->         _exit_null_blk
-> --
-> 2.47.0
->
+> git://git.kernel.dk/linux.git tags/for-6.13/block-20241118
 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/77a0cfafa9af9c0d5b43534eb90d530c189edca1
 
---
-Best Regards,
-  Yi Zhang
+Thank you!
 
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
