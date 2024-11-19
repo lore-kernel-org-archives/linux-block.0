@@ -1,63 +1,107 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 673641D417B;
-	Tue, 19 Nov 2024 17:27:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034AF1D12EA
+	for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 17:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732037271; cv=none; b=YP+YBIHNVnzJszKs5CZ2hJvm3Y3Qw3lL6ml6sP+cPhT6ZohZ3oJOL3Y6imJ6fl4/SzMEZ/sTG+KOoOPoNhvgLiWGDtuiOWGNGhKrYGD7tvo/tr55dO0bJeLkN9OOvmd1vK9ejAMt3qdK+H7IhOF+ESfuS1GmbOobPKoqVif+PLI=
+	t=1732037352; cv=none; b=jkCyaEgt1dSPJsFBp4Ui32EsS5WTSeZMjSsv/82OnoAyMfM4XTfs/0crHhGAAzxTKKvNSpCLNScAAsX+ZNoiL15FnLKkWHxkKF14lEgr3llokk3C4SZ8zQq92DAW4myoMcgnncWL2HY+Ee8RWRuw8g1RxOsIG6IORftcmtuh/NA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732037271; c=relaxed/simple;
-	bh=0Ua1U+0mkSGBw1rjVXE82HHLs/omPUwMVGtC0fSMRaw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T111LvGr92QVC0Sj/6P4/lRv1mNZ6riKI4GI/XEpyCyQPhKpS+28rX6CTID2ut2j8lP3qE55XOo1QpCwZ8Wacm6Np8+ONW+eg0Lp194sj6KLGn/0skAPvf7vodD/m5+u4NBgVQ2SUzbc5pvX4jGG7+N+iukUnXvi5Tts/OEizw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=1lbeCtMl; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1732037352; c=relaxed/simple;
+	bh=NAR/nYD1ONObW9M5Y6Nu7xBND2z6aY9gheHLZ5QECSg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gtKVe4X0AHuTCYPeOkmvvJrDwMHqPUkt8/VmbHnDtN1KYiJX9gjaeWSFEABCd62JXGLdXWeF2o48SD/2rc+qGNPBPBB7tA3jpMiNUc3BR4nBes5rI5/0MRlaM6UCkSF6MY9z7JNx9E3IwzsB3qcXXdtn39V+HdRH/TYBXkXcWyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=TmEqkdsc; arc=none smtp.client-ip=209.85.160.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1lbeCtMl"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=CFZrYTXphcS3wMV/SPN5+lHC5syvqQD1NtobLQyDd1Q=; b=1lbeCtMlVttCXvtfL8ukHS251g
-	5ij0mBhhTWV3LmPOvFWCQWgNNPvqAsLYc5APaXCiJYU16rHv6HoDmy0NcYVLqVcWR3cQHpvREpY65
-	+Hg8EmcNSMtZnjLzfWSYkoPsAQDX9sc0eFUZPWJBLYb6Z4cl+pzd9CrsfXueuB/phxzeKGPDVqr99
-	VTqeyFdvLFj4ppCkIrLqm1wmp8o4ynh2BApyKR1eT22MU5z2QFnKtzvL7nVtofkj3nEQKOVIXMjct
-	OMBSyrV113MLJCoWAkSTrgt5GIlClkd19FBKRS9/ckDgCWe5xaVDUp0q8vJtiBgN8YfcDYcniNeTO
-	2ajDS29w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tDS0z-0000000DDD7-0Ah8;
-	Tue, 19 Nov 2024 17:27:49 +0000
-Date: Tue, 19 Nov 2024 09:27:49 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Alexey Dobriyan <adobriyan@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-api@vger.kernel.org
-Subject: Re: [PATCH] uapi: add EROBLK
-Message-ID: <ZzzKlex5MhE1YD3E@infradead.org>
-References: <9184b5e8-7070-4395-b179-4975b2e3fbc3@p183>
- <Zzy7MGyTp9yw1ntQ@infradead.org>
- <dee8868f-45fa-40d7-bcaf-a46bf768e400@p183>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="TmEqkdsc"
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-2968322f5feso1137305fac.0
+        for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 09:29:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732037348; x=1732642148; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zZqf/rzV/enyEQoKu+qG5C16+XBOSUGmk2XCOowBhkg=;
+        b=TmEqkdscN0C10IKLN3NqGqyBSGuEVQPafNARpri8B6+16briaoGzrE84zo87hkkerk
+         1RyYq3QuveKf9pSlGcPWudRdIYQIP+P97Hu23Z8pjP/ULPYaOb1iz8soWi+v7lpBT4uh
+         X6mLK1raxJh/aoWD3r7iQP8MmlNY9ydvjYSXqGy6In+SBrHaU+x+TMcdt9IzIQ2p3NB6
+         9h7t3GaCa8D2zAn/DqaazNc4WA1dioB25t52MSitKa+8X4+tP0a5YvpNfJh4lpvOnKJn
+         yfgWmVjVBMwLLJR7PbuwZ1ZceECZvVb1aVvxzAnF/V0uzAO2NEmVBDtYV79BhKMomZs9
+         dx6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732037348; x=1732642148;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zZqf/rzV/enyEQoKu+qG5C16+XBOSUGmk2XCOowBhkg=;
+        b=rR+dzO6r3Ps0R6XjqMdFvz+HKN7EUEM49+KVtHKeiufs4XSjFxnWjKIrBA4GsI7CYy
+         k8CypNcj9J0vB1bbNKttx5Bdp1/dhbSHlaKsLm0NjdLCe/xpzC28iYtx+zh1ZRU2IVPb
+         Bf1Bq2eBAgKHHZJELdzmcxo+5xjtLTuK4ryT3NkYI3jZb4uIuLnN0FLxxB2d5Z6ORZLA
+         Ow6YuPnFOOJTVDdJYSeVZc5wA3OoT33AWpS1ApkDJCzLPTqRyavK0QcdHs3Omlcjapnd
+         R/VrkJY1MeLe1lcA1OCKGNJ3rAltG+eI6NDlwEQeMc8cC6Q7hBgHCFDnUM9iBWcTPAyK
+         C16A==
+X-Gm-Message-State: AOJu0Yy24XHDZmchZrlvBuvfkMEQtTz3XC9s5MXdZzqztJAXEvhjG7MX
+	OD2ZeCMqCcKEv9juhgnwYQhy2D+RKiqpE5eyxFpjBmOD9jST3mKEkG9RtTclBI8T0X4QNZV1B7p
+	rmwM=
+X-Google-Smtp-Source: AGHT+IHJ6klaCz+cZRMPU55WfhGfvbrqxerpIOI/Kc/FHDZ2o8+OUXcPX54+5uCKm12FYPvc3lDXEw==
+X-Received: by 2002:a05:6871:7b03:b0:296:a888:8bc7 with SMTP id 586e51a60fabf-296a888ad79mr5001318fac.11.1732037347947;
+        Tue, 19 Nov 2024 09:29:07 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-29651945b8esm3640928fac.31.2024.11.19.09.29.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Nov 2024 09:29:07 -0800 (PST)
+Message-ID: <4daaa186-14f6-4d25-939d-90b9b2088051@kernel.dk>
+Date: Tue, 19 Nov 2024 10:29:05 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dee8868f-45fa-40d7-bcaf-a46bf768e400@p183>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/5] RAID 0/1/10 atomic write support
+To: John Garry <john.g.garry@oracle.com>, song@kernel.org,
+ yukuai3@huawei.com, hch@lst.de
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-raid@vger.kernel.org, martin.petersen@oracle.com
+References: <20241118105018.1870052-1-john.g.garry@oracle.com>
+ <ef021fd8-1cfe-49d6-a6a2-c9745cf61441@oracle.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ef021fd8-1cfe-49d6-a6a2-c9745cf61441@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 19, 2024 at 08:20:33PM +0300, Alexey Dobriyan wrote:
-> > And where would you return this value without breaking existing
-> > userspace?
+On 11/19/24 10:05 AM, John Garry wrote:
+> On 18/11/2024 10:50, John Garry wrote:
+>> This series introduces atomic write support for software RAID 0/1/10.
+>>
+>> The main changes are to ensure that we can calculate the stacked device
+>> request_queue limits appropriately for atomic writes. Fundamentally, if
+>> some bottom does not support atomic writes, then atomic writes are not
+>> supported for the top device. Furthermore, the atomic writes limits are
+>> the lowest common supported limits from all bottom devices.
+>>
+>> Flag BLK_FEAT_ATOMIC_WRITES_STACKED is introduced to enable atomic writes
+>> for stacked devices selectively. This ensures that we can analyze and test
+>> atomic writes support per individual md/dm personality (prior to
+>> enabling).
+>>
+>> Based on 88d47f629313 (block/for-6.13/block) Merge tag
+>> 'md-6.13-20241115' ofhttps://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into for-6.13/block
 > 
-> New code may start returning it right away.
+> Hi Jens,
 > 
-> Old code may start checking for both and in ~100 years delete EROFS
-> clause.
+> In case you are planning on sending a 2nd batch of new dev for 6.13, I
+> think that this is in mergeable state.
+> 
+> If not, I'll repost for 6.14 later.
 
-In other word it's all hypothetical, you have no actual users in mind
-and no ral problem to solve?
+I think we can do 6.13 for this one, I always do a later pull week after
+merge window starts. And this has been posted previously as well, so
+probably no reason to further delay it.
+
+-- 
+Jens Axboe
