@@ -1,59 +1,60 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E1B199E84;
-	Wed, 20 Nov 2024 09:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C71F1C9B87
+	for <linux-block@vger.kernel.org>; Wed, 20 Nov 2024 14:07:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732094300; cv=none; b=lr9tOexaX+arrPV69lBxasS5BqSuiobItsIcISkCR12IUkYEU5wcBbjwiYHsumAgjCyHho1cB0hLYDUmFcHA0DMDsRAKLXEN8kAZ27qQK5aWfZ4ooK+3FXvd4aoKdoJeDA2BkR0c94f6cWkUsKlCymFXjTs+d96r6z8zu1tstvk=
+	t=1732111631; cv=none; b=cG4Ra3ys8uFwvl9pFd4svNuu1+u2WTe5IXaiAKp6gnJAs7ca+v2zG67UjgXZc9+HhTfcPzawmuoMjmq9aa/bcMgwRbY4z+RNlzFkvW7UjZK+HdKCnYqxhfX3VaMqwSxR2H46emUDf4OgI31tTq0+JuWlGLTz5S4BnPZkmisaWOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732094300; c=relaxed/simple;
-	bh=RQe4qxk3Ec1zQwrzOpzqrFQ+eM9ByiUfT2lAu5S2CTw=;
+	s=arc-20240116; t=1732111631; c=relaxed/simple;
+	bh=9/MZ4ziZbpMhT6/DxH2odM2OKnJvPXTUsqHPAN0ntUQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KLO7hxmScgXfl97MEAjWYIOCIjt+n2ZzeutxU7u3zEd0wUdQRBw8gYR/5HmxytUfpeqHWEL199Q+4SRH8U2iQ7el2nOfr5N8dVU3NTh4WgD+6FYiuIVRcDBtpLQl1RFOeYQqo8q8E96WZbuJmdCnFUP7zGV2zu/UUV40EwZaI/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P3+muXXx; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=mQ3auEjw+vqVSiZAbT+vhfhr2sKQCgq4bS15Wde9qkxfhgfjqIx3zuShJbrbA7+8imkUI/Fb5xkTMo6TNJUjebHtl5zOljiZEdQNMpLw6IpSzCAx4DOsXj9SpYkZ+Jrz1ba1Vbh6CFk+QHU5ihVKeK9GwrDEvRLRFh/cpGb8aNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OWEGsKqn; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P3+muXXx"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7f450f7f11dso3043273a12.2;
-        Wed, 20 Nov 2024 01:18:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732094298; x=1732699098; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lcVN3Jdae/34UfDNTnVWZvRwthuxsod5WOI/U7hm32s=;
-        b=P3+muXXxdBmsPSDQ0eA8kd2BEtSwMo4cpxyNPDZuer2Y4hUkcb3IQXDqZXKWTcIp7x
-         jxAifGrBb6ZO0ldubzclIjkoa3VKE7mberVl0753ftOdvq3LlGme6y+My4Mt+5ZJNwhK
-         0N0qLzeP4nVJlmzcpNeA73gLzb/Oj9eyjdOofTq+1cMEK00YQQ6NFb5D05wYHrB+YcJ+
-         njFR6gXvP7SdcDGQsNRyK1PjYAULi0gVqRYHO5jSmTzNjOEHLdErVwSJCGED2WnhEIT+
-         +GVmdb4GNusy5mKonj6XDILdDqNENpvj7guTAQ34uQPuS9tTHQcKkQbqiwIZCxCVVmoR
-         yZoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732094298; x=1732699098;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lcVN3Jdae/34UfDNTnVWZvRwthuxsod5WOI/U7hm32s=;
-        b=P0IDLw2d2Hm+544LP6ftGmfeYKg1VrSWUGD7Wg9nbpYvt07Fn1azB9hCa0GBcgAvc/
-         149by/Uo9F6bdoIgcwt9TZM/9ZGUzw7yXja3v6j8WX4Oc2F7Lf+20VuB35xqJ+DvRpB4
-         43AoLOlESH3hjdoHTPJA2dxRaLzdqnykcl4IWXJoX/rYymPGlVbDKPK6jrf7HhhXSwJ1
-         l9lh5WlOx+7UV1kTJFSlmyJJrdIs2YDvxIZLh/gQ4cjphBsJ8k8nSlCEJwyGr7NeBy8r
-         uwTcYDbRkYWSqtrrMtdTyVb0pUmvlS4b0nQJZhqa/2tvSR7XMujQp/v1KrJDQdMQI4Sv
-         QIcw==
-X-Forwarded-Encrypted: i=1; AJvYcCUiIKMYdAaxnAosOP5PuvgeE4Oed6PpM42gwTOER+CYYKaJoQXTUGjfm1zBanSwZIw7ygqjMObE3uLEQyw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+B8nN/6ZfBkTAbLIrL6h6ybCNij/NovQCn0u1+J06vGpvEOKh
-	GTygvHr5k0ttbzbg6R0sjnWMMxh3ho03suRgSTjrEW7NTXtndl99
-X-Google-Smtp-Source: AGHT+IE5qBNpPrE4P+vZYRI/OV6G5NqY568aGUhN8/36GNPvukImlh0PPDNwOf2dfGXkozRvvB8w0w==
-X-Received: by 2002:a05:6a20:6a06:b0:1db:e508:cf68 with SMTP id adf61e73a8af0-1ddaebd6caemr3201947637.24.1732094298245;
-        Wed, 20 Nov 2024 01:18:18 -0800 (PST)
-Received: from ?IPV6:2409:40c0:11a2:6510:b9eb:15c5:a64d:93da? ([2409:40c0:11a2:6510:b9eb:15c5:a64d:93da])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7f8c1c176b0sm9217732a12.2.2024.11.20.01.18.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Nov 2024 01:18:17 -0800 (PST)
-Message-ID: <3a73d963-36ef-44db-8fd0-7b4a5c73609c@gmail.com>
-Date: Wed, 20 Nov 2024 14:48:12 +0530
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OWEGsKqn"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AK7lm3g002773;
+	Wed, 20 Nov 2024 14:07:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=1GuDeF
+	Uj6LqwrNYgCSdn4xFiJPa0CXZ9bYmm3HhkVBE=; b=OWEGsKqnDiW7wXpc6UWAUH
+	TgUeHP8N5xmqlhtvNfforfRljWbSrnIZzvm1Unl8AG6JbaOg4Vq9COVxh1wdKs0P
+	E0QTrfVjuW2LnKOH2Hj1omdWMmL7Lf+Y75dEFNNWobg65KUvdTnOucCz4CUzOF4K
+	Ikjlljap9WbSYJtC7q3HugcxEUOPJ9mHyw+spGzdDh8kjyHIjJ8tyZCS6X+Q/biH
+	THtvW/ulbX+lW6tmUX6XDgdbYAoRRyMVokmt+c9wlpxdYjsQn2ew8Jealtj8jRXg
+	tUXKFIF2u8uJ4P7fKqITvmcs5zqc5/5so57YXzADGU1CR5hzGp/ce8FTDN6rw0Bg
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42xhtjw88p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Nov 2024 14:07:02 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AKDSLKN000576;
+	Wed, 20 Nov 2024 14:07:02 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42y77mbg24-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Nov 2024 14:07:02 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AKE71GX56230284
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 20 Nov 2024 14:07:01 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8E4F05805E;
+	Wed, 20 Nov 2024 14:07:01 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B27875805A;
+	Wed, 20 Nov 2024 14:06:59 +0000 (GMT)
+Received: from [9.109.198.240] (unknown [9.109.198.240])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 20 Nov 2024 14:06:59 +0000 (GMT)
+Message-ID: <7f35cbe9-9e12-498b-b46a-be1f570772fc@linux.ibm.com>
+Date: Wed, 20 Nov 2024 19:36:58 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -61,38 +62,71 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5] block: blk-mq: fix uninit-value in blk_rq_prep_clone
- and refactor
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- hch@infradead.org, hare@suse.de, kbusch@kernel.org
-References: <20241119164412.37609-1-surajsonawane0215@gmail.com>
- <173206838768.183842.958207443357457539.b4-ty@kernel.dk>
+Subject: Re: [bug report][regression] blktests nvme/029 failed on latest
+ linux-block/for-next
+To: Yi Zhang <yi.zhang@redhat.com>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>
+Cc: Keith Busch <kbusch@kernel.org>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <CAHj4cs8OVyxmn4XTvA=y4uQ3qWpdw-x3M3FSUYr-KpE-nhaFEA@mail.gmail.com>
 Content-Language: en-US
-From: Suraj Sonawane <surajsonawane0215@gmail.com>
-In-Reply-To: <173206838768.183842.958207443357457539.b4-ty@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <CAHj4cs8OVyxmn4XTvA=y4uQ3qWpdw-x3M3FSUYr-KpE-nhaFEA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: rU-Xj3lsQs21YkDwzdMlCRvWdMKZNC-i
+X-Proofpoint-GUID: rU-Xj3lsQs21YkDwzdMlCRvWdMKZNC-i
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ clxscore=1011 malwarescore=0 spamscore=0 bulkscore=0 priorityscore=1501
+ impostorscore=0 mlxscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2411200092
 
-On 20/11/24 07:36, Jens Axboe wrote:
-> 
-> On Tue, 19 Nov 2024 22:14:12 +0530, Suraj Sonawane wrote:
->> Fix an issue detected by the `smatch` tool:
->>
->> block/blk-mq.c:3314 blk_rq_prep_clone() error: uninitialized
->> symbol 'bio'.
->>
->> This patch refactors `blk_rq_prep_clone()` to improve code
->> readability and ensure safety by addressing potential misuse of
->> the `bio` variable:
->>
->> [...]
-> 
-> Applied, thanks!
-> 
-> [1/1] block: blk-mq: fix uninit-value in blk_rq_prep_clone and refactor
->        commit: dcbb598e689e30d4636201d35582e167d1b8dfa4
-> 
-> Best regards,
 
-Thank you for applying the patch and for your time reviewing it.
+
+On 11/19/24 16:34, Yi Zhang wrote:
+> Hello
+> 
+> CKI recently reported the blktests nvme/029 failed[1] on the
+> linux-block/for-next, and bisect shows it was introduced from [2],
+> please help check it and let me know if you need any info/test for it, thanks.
+> 
+> [1]
+> nvme/029 (tr=loop) (test userspace IO via nvme-cli read/write
+> interface) [failed]
+>     runtime    ...  1.568s
+>     --- tests/nvme/029.out 2024-11-19 08:13:41.379272231 +0000
+>     +++ /root/blktests/results/nodev_tr_loop/nvme/029.out.bad
+> 2024-11-19 10:55:13.615939542 +0000
+>     @@ -1,2 +1,8 @@
+>      Running nvme/029
+>     +FAIL
+>     +FAIL
+>     +FAIL
+>     +FAIL
+>     +FAIL
+>     +FAIL
+>     ...
+>     (Run 'diff -u tests/nvme/029.out
+> /root/blktests/results/nodev_tr_loop/nvme/029.out.bad' to see the
+> entire diff)
+> [2]
+> 64a51080eaba (HEAD) nvmet: implement id ns for nvm command set
+> 
+> 
+> --
+> Best Regards,
+>   Yi Zhang
+> 
+> 
+I couldn't reproduce it even after running nvme/029 in a loop 
+for multiple times. Are you following any specific steps to 
+recreate it?
+
+Thanks,
+--Nilay
