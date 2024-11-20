@@ -1,95 +1,81 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF26A10A3E
-	for <linux-block@vger.kernel.org>; Wed, 20 Nov 2024 03:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACE1155757
+	for <linux-block@vger.kernel.org>; Wed, 20 Nov 2024 03:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732071807; cv=none; b=GfVFTa2GTiDwJXxsg+igecDpwahc4Cr3QPoHujfbsC3GLQu8C7YSTPgb9nbliJf5BMR9M7BRPI0+vOtc7fRI5oGXiUGtqPZjPJ6wRWhQ3Lxe4+qXbfPNH5g3C8vYTza9Vgqrz+4bpNBR0s3VhO6vNww6GnWAphowmRoZ3kw3wP8=
+	t=1732072536; cv=none; b=QXABX/KJEF6fX0tKIGevq6g1AKfUpGy9ktJUl7Dh2grn3hMUsxEFPrIachDxPzixjkalc94ndo8hOahu1EvNfQ2Zz3KF6/JEl1sKDkwjgXZkjLw6kCIyMByY4VTNZZe1jGkvPrAw4v2T2YP0OIBTSUMJj4hODBk5eI10S3aqFPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732071807; c=relaxed/simple;
-	bh=49m9qBu3lATzCLeqb67gSnvAfQPDJxt7vXlt+uD5OVI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uup8E7Aiyg2LgYbfok27Rb7rtDSJ1FNi09/OuPTXmTu7GAxB7ynZ7wOK7gYTVxc0hWmSTfhwDCtGgmemHIgvittzA8JMkNxXsuEKn4ZiuDr/3zoBgXkxNV8CbVAULeu0kLm99tx9jR0lN+e/9vp3BYY+jx6DxtIZgIw3chl3B+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R2HxUq2K; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1732072536; c=relaxed/simple;
+	bh=QYBilDzkSkb1abEzANyeRxgYDytG7KjEI9bskxW5MZs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sUtw4OgoLlFsBdi2S/GfkVvQqDounRxnfzLFHIRg7FSnmuQmE4RlViJA/SfEgi9zQGIskBv9HrmuQ9eBJTwvlKwUqhWZL5JkCPRfbJdhnLVixN6e0fUgXahC/iQ3DCmg8Bg4cgfvF9VujDQSX34XGcbtRXozwElQY8fMLp9Trak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Hvi3dn/X; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R2HxUq2K"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732071804;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=2izUDURaRNSUCsPxbB5/AV6z/0BbH/iA3UrWDhYORS4=;
-	b=R2HxUq2KG/wAouAXfbizx9c5MkNDJpazzWTX5H9PdezkDIdGysS3RpiDuy0OAAZggrJG1H
-	eeKt9PPnH7Og5dYB8pqfxq2ZK+zYDhgv4HWMjvW2HGfS5fyHc5zcjuabVE7aUHtZiOb2TW
-	NshiCsA/84va019TNbEgK7nHCAhuiuc=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-538-ns8c121-OLKO-eGKC5Zeyg-1; Tue,
- 19 Nov 2024 22:02:20 -0500
-X-MC-Unique: ns8c121-OLKO-eGKC5Zeyg-1
-X-Mimecast-MFC-AGG-ID: ns8c121-OLKO-eGKC5Zeyg
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 849BE1954B1A;
-	Wed, 20 Nov 2024 03:02:14 +0000 (UTC)
-Received: from vm-10-0-76-146.hosted.upshift.rdu2.redhat.com (vm-10-0-76-146.hosted.upshift.rdu2.redhat.com [10.0.76.146])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8A87D19560A3;
-	Wed, 20 Nov 2024 03:02:13 +0000 (UTC)
-From: Yi Zhang <yi.zhang@redhat.com>
-To: hare@suse.de,
-	shinichiro.kawasaki@wdc.com
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH blktests] nvme/052: don't remove the def_nsid namespace during the test
-Date: Tue, 19 Nov 2024 21:49:25 -0500
-Message-ID: <20241120024925.1397864-1-yi.zhang@redhat.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Hvi3dn/X"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-720cb6ac25aso1346411b3a.3
+        for <linux-block@vger.kernel.org>; Tue, 19 Nov 2024 19:15:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1732072534; x=1732677334; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kZSva+QoTVrzF7+bpQWC+3EfbJTYWWaNpUIOffyDhLA=;
+        b=Hvi3dn/XAmTNYe+8vH8ukkVnKxZT+d7BMrNIDTK4D8c7NBzlf8uu38QD5vNpd6mKql
+         wBStoRmb4ecEwfHJIr8A+3k+MwmShhyELPnycSNN1vsvLo4otjzWmmYZumO5xpMLku2F
+         nopBWMSjiXKqyY383d/IXcllHMqh4ktEdrZfA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732072534; x=1732677334;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kZSva+QoTVrzF7+bpQWC+3EfbJTYWWaNpUIOffyDhLA=;
+        b=g/Dkh3Wz28YLOE9FJITJ1qgwR/a2lMsqDS6ofwO3GwDVpTahgu5z3UMws43Oh7M8xx
+         /CfkTtZFAk5hBTRHFah32Vy/YpPxzWgEQMQFM+MeB3FUf2rH+kpbK370nu/h/EEE1Vdx
+         Gyul9rXRl/cu5zf/+52OZk3215gQ6jf0HPForRgQ7CnoRSdUw15Qr0aMh1t8maO4fjAg
+         eQMi/akzPGR2a5QRsUdR8Z9rwB1wlChc2Ol9C51g9z9pqwulUep8/kTxF2REy8DEqBWo
+         zm/GCkF9Q6xIRLGOOSOhZjT6thfrFnFdk9bI1jKtUCAw7tvpP6JPe/cr82fpk/gf4xnl
+         unLA==
+X-Forwarded-Encrypted: i=1; AJvYcCURXYw5iKgy+tNoEOhaATG/OaqLsCtwR187svfUPGVDSzn3g1veHBNflm/HrSF6ntWxk/3og2awWnMn7Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEL/lSobvM2IDjuGEN6GrO9EqPv9axHOz9Oy8ljkbpfxwytRe9
+	4bkWunc4cICgEs9/l5uFydOudPVhfDxWhkstwPIkRPBfFudatrw/XxHNibVIDw==
+X-Google-Smtp-Source: AGHT+IFoBDOvjfjxm45eiDb4JEPWT0CGtuUdJ+ZNfMLgP5G2wdqCKEPQK923zWmyBPd4CEQnJkbjkg==
+X-Received: by 2002:a17:902:fc8e:b0:212:3f13:d4d5 with SMTP id d9443c01a7336-2126c11226amr11032255ad.27.1732072534058;
+        Tue, 19 Nov 2024 19:15:34 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:5534:f54c:1465:9438])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21232eabc04sm37897005ad.155.2024.11.19.19.15.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Nov 2024 19:15:33 -0800 (PST)
+Date: Wed, 20 Nov 2024 12:15:29 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Alexey Romanov <avromanov@salutedevices.com>
+Cc: minchan@kernel.org, senozhatsky@chromium.org, axboe@kernel.dk,
+	terrelln@fb.com, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, kernel@salutedevices.com
+Subject: Re: [PATCH v1 0/3] zram: introduce crypto-backend api
+Message-ID: <20241120031529.GD2668855@google.com>
+References: <20241119122713.3294173-1-avromanov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241119122713.3294173-1-avromanov@salutedevices.com>
 
-Skip def_nsid(1) namespace removal during the test as it will be removed
-from _remove_nvmet_ns during _nvmet_target_cleanup phase
+On (24/11/19 15:27), Alexey Romanov wrote:
+> Since we use custom backend implementation, we remove the ability
+> for users to use algorithms from crypto backend. This breaks
+> backward compatibility, user doesn't necessarily use one of the
+> algorithms from "custom" backends defined in zram folder.
 
-$ ./check nvme/052
-nvme/052 (tr=loop) (Test file-ns creation/deletion under one subsystem) [failed]
-    runtime  3.273s  ...  3.299s
-    --- tests/nvme/052.out	2024-11-19 19:29:36.873210200 -0500
-    +++ /root/blktests/results/nodev_tr_loop/nvme/052.out.bad	2024-11-19 21:29:26.016088521 -0500
-    @@ -1,2 +1,4 @@
-     Running nvme/052
-    +common/nvme: line 635: /sys/kernel/config/nvmet//subsystems/blktests-subsystem-1/namespaces/1/enable: No such file or directory
-    +rmdir: failed to remove '/sys/kernel/config/nvmet//subsystems/blktests-subsystem-1/namespaces/1': No such file or directory
-     Test complete
+Sorry, no, we are not adding this for a hypothetical scenario.
 
-Fixes: 67e25d7 ("nvme/052: do not create namespace when setting up the target")
-Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
----
- tests/nvme/052 | 2 ++
- 1 file changed, 2 insertions(+)
+> For example, he can use some driver with hardware compression support.
 
-diff --git a/tests/nvme/052 b/tests/nvme/052
-index 8443c90..2ff9e53 100755
---- a/tests/nvme/052
-+++ b/tests/nvme/052
-@@ -71,6 +71,8 @@ test() {
- 			break
- 		fi
- 
-+		[ ${nsid} -eq 1 ] && continue
-+
- 		_remove_nvmet_ns "${def_subsysnqn}" "${nsid}"
- 
- 		# wait until async request is processed and ns is removed
--- 
-2.45.1
-
+Such as?  Pretty much all H/W compression modules (I'm aware of)
+that people use with zram are out-of-tree.
