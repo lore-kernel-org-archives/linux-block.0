@@ -1,152 +1,112 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B0013E898;
-	Thu, 21 Nov 2024 15:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5522AD00
+	for <linux-block@vger.kernel.org>; Thu, 21 Nov 2024 15:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732203890; cv=none; b=NNMmloW3URj93Gw6Z8wqnvuGv1AxzIjAhofcbgRt79YLs2ZYIhSEwqBtu+Qlo9H/0oYkpVigMfwJ5Vq8lPdTMybfSN4jJwPlpS3OaZaclTpGE3L4x+RRQMKV/ZGMcbnG/NrZdZxpI0BYEdMGyvSuXeTFvs/ZWdEGNxHJSBEpGak=
+	t=1732204394; cv=none; b=r6vpzXK8WuIq/MddPl4HX02oK7hkWsZ7cEoewXgDSXS0rrGJww8ux7Z4NBy4oWkMDU2BW4Ae20/sHxZNpHzVO1LepBfuJ166XjIXVSL2WQi2bzmJhtKPxSArktkAtQ870LQVemLcALQzLJpmGJIapFfHjw8ZkgwXuqBRqIir3jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732203890; c=relaxed/simple;
-	bh=MB6iJnnXYaZmNl56XT3EwoAa/w2SBxfGpUrAsPhuyX4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JlpSFEMpVb995iKYZ2OD3Oq7gAM2np9dUX0scdIoPu7+HQBwQOwgRzWsDU1KwuyGkK1qLTUjNVGuM8Vh2N2qN6WcbH057oInP+XQpyf5BaNgP0wrOHBMTniBuE/5qLhMP/ZdXl5lUiI61CpoFCYxDjmy8iNj3Oyohq8d/F+slLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YcfmLjbD; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1732204394; c=relaxed/simple;
+	bh=gQ/7o3NtNQdkt1xIyshCgRb4euFWzBcL0D8LiXhMi8I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ov6NDBjSN18fbtklHsseBlEvO3pwxBAM2qNbA7ubtp3t08V8EX3acQkXa+CuV8GMIKwDki+IRD/uBd0yEJ9FOaz9sEPZJbzpFYzkXJT2aMbq6yBJ46NwkZvOC2HCe1j3hFzYwcEoekQlZuteA3uOVWU9PktAQvhUB0Htkg2JPLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=BuF1eEtC; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YcfmLjbD"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-53da353eb2eso1763386e87.3;
-        Thu, 21 Nov 2024 07:44:48 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="BuF1eEtC"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-212583bd467so10506665ad.3
+        for <linux-block@vger.kernel.org>; Thu, 21 Nov 2024 07:53:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732203887; x=1732808687; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Yq70YJzrFfkaT6vO9+6QOQ5rfwZ7sR/Fpz34vhs1TzQ=;
-        b=YcfmLjbDeg66naza7X6STJigEBriur9xptPGujJR+V3z6VB4JHvuTY8yLxORIEIV4s
-         U9RYnrj3vrJd/zgVFI3KVRDqZ+7RqQgz+JfUEDiRKGDgZ7GxizBQno/6qdlVuPGdey9b
-         E1qZcZ/5vs0F1LeGD69q+asMGfw5Gz/JmwkHp+BWee5piVG4W0qCuyl/EDnSqRy2h7ON
-         hJzSkiKfQgXBOmOd9pMkZJVwWHPWdeob/iclISYrbMKPo5F4saBlUI9sR0bu4l2ZyisV
-         bBHX/6oZpVAjUeeAk3YrYUhkpGnxxeOmx+sM6PdO9HzfIa5KG9ftJmCjjh+RD0Sreszr
-         sHuw==
+        d=chromium.org; s=google; t=1732204392; x=1732809192; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rvge4gVLXbEkzNxyNWuzrgHVGstxhxPYrLjNP2/nbGw=;
+        b=BuF1eEtCOBnbv5Emc1wfPA/e8TErV9NGEFfLj6sle9dBortvh+3ogEzhunQDRmgTkK
+         rMLymbh/EJhfAVzbTlPUWBwGCKHd79Jc4QLorMBvDZJg18PuccWpFhVMjs69SSdNzOQ5
+         4xA8oQN2tLRfrC5i8l31qhq4p9nzNUhcs3Dr0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732203887; x=1732808687;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yq70YJzrFfkaT6vO9+6QOQ5rfwZ7sR/Fpz34vhs1TzQ=;
-        b=Xvdb35BOvkkK+32ZmA+uPRclcfqdGuMfPeYG/zxFb0QXjIo8IGRM5DwlyELSvvxw/n
-         V3DW//cA/zAZaIP/cPBHdKBukkiD/AumqIaWygg3M6rIW+uukcQqlxKTyGjrrJCMlVj+
-         uDi9xLtLWVb49fBYm+/o9u2k9lJEkOR4dbNxHdki0LcPixcbjBaqZ5RnQVCumFWgXASy
-         qOs7VE1EKMFTkIjZm+S/XVk17/J/ZMLcY524snbhCrL0Rw0j3PijROcz3z7zod4cWBJL
-         KaDE5QtWZiI2cgP0lKewUWLuP1BDUTZSsdJMpmsrpnmUXi6P+/es9KvWQD2dMYLqP22s
-         RdSg==
-X-Forwarded-Encrypted: i=1; AJvYcCVUVi1YwvnhcO9JfK4cTqLFqj+RuIqkkBm9Fh8gQwVzVgiYqqfB1TD574vR2Y3Vgdj2LBrfMeDK5eOG4Q==@vger.kernel.org, AJvYcCWRikq9ntiwj4+3BKevlsUabH2W+AmMcdapDnKrVX0aifHQWwQzrm79zIOTebuuzR6A0c83t5uN70Zxg8omiQ==@vger.kernel.org, AJvYcCWc3ieakZ6cug5KHBvPyBn7cwERmYAsMdlHhVs7XoEo4FmImqOSJ6UBiJzJh78n+gEc9+h0+t9oYohyThk=@vger.kernel.org, AJvYcCXUebid6tj+qHDw5TgWM9fHGm7gCiXhRRNVXWpHkI4b4NMM5XRPA/6ZlTWTyQIrW5NQrCYPi7/+0Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCQUO/PRY/nU2rTt9iCjdcPfGrcU1lB/fP5y8ibKhJTzuTJMXE
-	vhOrRSRp5c+O29NAfYdo0kgpmSeaoTdMrEyAlHLt/cJpZHr9iZGm
-X-Gm-Gg: ASbGnctCOFphGJpIgpIaA0dz00SawXrx0fKhgi5kT3LPuZqc9dUY5KRdH/etO+NlkSD
-	rG9crNq9xT0ROi2MjLCq7CBxzkt1JQub0Cj8X/gV3x8YVvFcJUNrJSM0FenB2lcXpl/oMaFaPvr
-	uD7N2/7jCEzbrYNRyh/hShypwLMCT7Tuw89PSqPLSrRxnvyfGQEcfTVCN3TvJPCfX6G2UMF4afv
-	H+BP2Qp0ZsyB/UZpYOQrggsOT/rSGZOX+bAy79bULyIjpXBYVKDDdEeugZZCQ==
-X-Google-Smtp-Source: AGHT+IF++NRQF74gXAH6xM1W4Qh3AQIH8KSN5zEQe3RTf9TGDltr4dR/aWa+g/x4zzyWxju6+0KAMw==
-X-Received: by 2002:a05:6512:1195:b0:535:6a34:b8c3 with SMTP id 2adb3069b0e04-53dc13230b4mr6167738e87.5.1732203886812;
-        Thu, 21 Nov 2024 07:44:46 -0800 (PST)
-Received: from [192.168.42.120] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa4f43801f5sm93964866b.190.2024.11.21.07.44.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Nov 2024 07:44:46 -0800 (PST)
-Message-ID: <506ca9ff-40c2-49eb-bcc3-e1735a4f4cd9@gmail.com>
-Date: Thu, 21 Nov 2024 15:45:37 +0000
+        d=1e100.net; s=20230601; t=1732204392; x=1732809192;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Rvge4gVLXbEkzNxyNWuzrgHVGstxhxPYrLjNP2/nbGw=;
+        b=tM6dnj8ht1U81oZlralHbi/XmuW+3IgHG3zKwTOcU5dt0+gCzKHXMB03yfvaWcArT5
+         zj1Lr1F2TfiZhS/8fAAvnJQmOrw7nufI+A3VuNCbywDQmsF1kQWYiSkyWqlpTacBgeeZ
+         U51W0i9yG6hN8J/gBepCk8dC4jZ4EjvPkb+8Y2oItc1K/+AtyVYPL6b054WoscfgQUjL
+         FaUTkQPXpW2g/0nc5NtNfbwEDiidezsKW0q1FpJcGhXBWHxYfcNMrkUg9xwO1JfR8RsS
+         7fZmw5Psvdqv7JpT/kIjqo/IOwnSbyjKgGtEIXl61P2LtInKRcSl2GkoEC/wsVGhmjrN
+         HHRw==
+X-Forwarded-Encrypted: i=1; AJvYcCVpbNz9jZvRCrtGTb6Wt26B1XoFebJZj4anvrXFQ343OoQE/FPEBWMb62br5SaUkuIDqvJacgOsEBuhBg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPR5M5qXB40wlZ0TCQhkv98Gtd2jX0IQAjFxRgYNLvh1aEH7R2
+	Un8ge0yJEnaZG7QXRex0vldqLsu0Wde9hvyL2Js7wxAncIxP5utvrfwtanetmw==
+X-Gm-Gg: ASbGncvaWjthJ4DN6bPfYhWbegOnmX0GIIoaMElMD8xCpEKYr5hq/hgRsT8+fSYB9jz
+	jjr10WwkLU27vDEEyzoXpFKqATDYRScyVDP+H6AS5e1XiZLkfnr6icsDpGfLVrWGfTvl1n2KiCJ
+	5SsRYDq41xwDi3x81+Rjl11FMXOOHDtAzHNOy2CHguGx7F2lkZwdHzAA2K26mRs/F5K7ts03Fjs
+	49enfKC6HrxC8nvyIXm4e0NGXTC/A8JFn6QAbcFiSUZD9eR3NR7Dw==
+X-Google-Smtp-Source: AGHT+IE+4igqunFl1DvRHlIVf/Bz4JhFZQ5n3pWuSu4BGR0fCPYVbkpfSbpwwNCtGXhrwwn3VneJ4Q==
+X-Received: by 2002:a17:903:41c8:b0:212:b2b:6f1d with SMTP id d9443c01a7336-2126c1299f8mr101602745ad.32.1732204392296;
+        Thu, 21 Nov 2024 07:53:12 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:4a18:f901:8114:dc7d])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21287ee13fcsm15302955ad.145.2024.11.21.07.53.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2024 07:53:11 -0800 (PST)
+Date: Fri, 22 Nov 2024 00:53:07 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Alexey Romanov <avromanov@salutedevices.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	"minchan@kernel.org" <minchan@kernel.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"terrelln@fb.com" <terrelln@fb.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v1 0/3] zram: introduce crypto-backend api
+Message-ID: <20241121155307.GE2668855@google.com>
+References: <20241119122713.3294173-1-avromanov@salutedevices.com>
+ <20241120031529.GD2668855@google.com>
+ <20241121121120.ch4qbmbiuje2cjog@cab-wsm-0029881.sigma.sbrf.ru>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 06/11] io_uring: introduce attributes for read/write
- and PI support
-To: Anuj Gupta <anuj20.g@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
- martin.petersen@oracle.com, anuj1072538@gmail.com, brauner@kernel.org,
- jack@suse.cz, viro@zeniv.linux.org.uk, io-uring@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
- gost.dev@samsung.com, linux-scsi@vger.kernel.org, vishak.g@samsung.com,
- linux-fsdevel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-References: <20241114104517.51726-1-anuj20.g@samsung.com>
- <CGME20241114105405epcas5p24ca2fb9017276ff8a50ef447638fd739@epcas5p2.samsung.com>
- <20241114104517.51726-7-anuj20.g@samsung.com>
- <c622ee8c-82f0-44d4-99da-91357af7ecac@gmail.com>
- <b61e1bfb-a410-4f5f-949d-a56f2d5f7791@gmail.com>
- <20241118125029.GB27505@lst.de>
- <2a98aa33-121b-46ed-b4ae-e4049179819a@gmail.com>
- <20241121085935.GA3851@green245>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20241121085935.GA3851@green245>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241121121120.ch4qbmbiuje2cjog@cab-wsm-0029881.sigma.sbrf.ru>
 
-On 11/21/24 08:59, Anuj Gupta wrote:
-> On Mon, Nov 18, 2024 at 04:59:22PM +0000, Pavel Begunkov wrote:
->> On 11/18/24 12:50, Christoph Hellwig wrote:
->>> On Sat, Nov 16, 2024 at 12:32:25AM +0000, Pavel Begunkov wrote:
-...
->> Do we have technical arguments against the direction in the last
->> suggestion? It's extendible and _very_ simple. The entire (generic)
->> handling for the bitmask approach for this set would be sth like:
->>
->> struct sqe {
->> 	u64 attr_type_mask;
->> 	u64 attr_ptr;
->> };
->> if (sqe->attr_type_mask) {
->> 	if (sqe->attr_type_mask != TYPE_PI)
->> 		return -EINVAL;
->>
->> 	struct uapi_pi_structure pi;
->> 	copy_from_user(&pi, sqe->attr_ptr, sizeof(pi));
->> 	hanlde_pi(&pi);
->> }
->>
->> And the user side:
->>
->> struct uapi_pi_structure pi = { ... };
->> sqe->attr_ptr = &pi;
->> sqe->attr_type_mask = TYPE_PI;
->>
+On (24/11/21 12:11), Alexey Romanov wrote:
+> > Sorry, no, we are not adding this for a hypothetical scenario.
+> > 
+> > > For example, he can use some driver with hardware compression support.
+> > 
+> > Such as?  Pretty much all H/W compression modules (I'm aware of)
+> > that people use with zram are out-of-tree.
 > 
-> How about using this, but also have the ability to keep PI inline.
-> Attributes added down the line can take one of these options:
-> 1. If available space in SQE/SQE128 is sufficient for keeping attribute
-> fields, one can choose to keep them inline and introduce a TYPE_XYZ_INLINE
-> attribute flag.
-> 2. If the available space is not sufficient, pass the attribute information
-> as pointer and introduce a TYPE_XYZ attribute flag.
-> 3. One can choose to support a attribute via both pointer and inline scheme.
-> The pointer scheme can help with scenarios where user wants to avoid SQE128
-> for whatever reasons (e.g. mixed workload).
+> At least we have this:
+> 
+> drivers/crypto/nx/nx-common-powernv.c:1043:    .cra_flags        = CRYPTO_ALG_TYPE_COMPRESS,
+> drivers/crypto/nx/nx-common-pseries.c:1020:    .cra_flags        = CRYPTO_ALG_TYPE_COMPRESS,
+> drivers/crypto/cavium/zip/zip_main.c:377:    .cra_flags        = CRYPTO_ALG_TYPE_COMPRESS,
+> drivers/crypto/cavium/zip/zip_main.c:392:    .cra_flags        = CRYPTO_ALG_TYPE_COMPRESS,
+> 
+> Anyway, if we want to completely abandon Crypto API
 
-Right, the idea would work. It'd need to be not type specific but
-rather a separate flag covering all attributes of a request, though.
-IOW, either all of them are in user memory or all optimised. We probably
-don't have a good place for a flag, but then you can just chip away a
-bit from attr_type_mask as you're doing for INLINE.
+It's more complicated than that.
 
-enum {
-	TYPE_PI = 1,
-	...
-	TYPE_FLAG_INLINE = 1 << 63,
-};
+> these modules still need to be supported in zram.
 
-// sqe->attr_type_mask = TYPE_PI | TYPE_FLAG_INLINE;
+We support what we have always claimed we supported, namely
+what is listed in drivers/block/zram/Kconfig.  That's how one
+enables a particular algorithm in zram - during zram configuration.
+If those algos are not in zram's Kconfig after so many years,
+then it's most likely because people don't use them with zram.
+If we ever need backends for those H/W algos, then I really would
+prefer a patch from folks that have a corresponding hardware to
+run and test it on.  The thing is, zram, in its current form and
+shape, imposes strict requirements on comp implementation.
 
-Another question is whether it's better to use SQE or another mapping
-like reg-wait thing does. My suggestion is, send it without the INLINE
-optimisation targeting 6.14 (I assume block bits are sorted?). We'll
-figure that optimisation separately and target the same release, there
-is plenty of time for that.
-
--- 
-Pavel Begunkov
+So we should not add algos just because they are there (especially
+H/W algos) that's how we added 842, lz4hc many years ago and now
+have to carry them around.  We are not doing that again.
