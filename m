@@ -1,94 +1,73 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6AE51ABEB0
-	for <linux-block@vger.kernel.org>; Thu, 21 Nov 2024 22:26:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1E12309B4
+	for <linux-block@vger.kernel.org>; Fri, 22 Nov 2024 05:04:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732227999; cv=none; b=BAjVMVZMqSkJRS714rOyuR18EFDaGWQwuMwPutFancgEfeGODsGh5x1ho5lmpCdoZsJhCVlNwOcuFV+FrmicOM6TG4vGTtjf+E6u6QJzd1h/2xBSoYjYqAnBDG4rY23mfThM6zIHZdFoOTW+sWVwGQ2dV45vAiEusXVUAGwcGJ0=
+	t=1732251863; cv=none; b=ckBmDBnj36cS+GHNalLk2XfpOGkevRIKbwmEn1DcKZ0AWSOuLSyCl7BwZzaJALP0+fbD2b6I8RdeXt1tQebfeVQGzPrXufAfxOcRrxe4LvmxPHc3DGgdGbhnZOFIvqCqJYFaKZBuManuBjRMdsdkoi77E6ZsrCirNw69Njvf0uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732227999; c=relaxed/simple;
-	bh=E2LdAEWxZEQPoTCg5UwJe0V4hxYf0LhZnWfqs1pvwOg=;
+	s=arc-20240116; t=1732251863; c=relaxed/simple;
+	bh=A/lHaHfafAQy7OfTvmDU5OKRmJrBpX9Zmsb83aoIxoE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=F8wwSHF38GXPC7DF0fKf+0PAF6ac39YojOtonDt7fb8DbvarR87rp+HqkGI+H/eRfOL1rodMdWdBMjuPE1jU4bsic+QM4hb9oM1xyKrZW6PcMqqPnV1LXlZ0VlZ/Qt9mXH8AE7FRNhfJ/O0JpUd9GAyq65QH/KloSC88oNpdzro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZZA8/awG; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 MIME-Version; b=qEUR80QLB2gfkVxxDSfjJPWTLTt1uqfDqv2czSbqN/ewM7tfJPHhhP72pbPFcAG53GnijKlGz0QMzjxR7x3D3EjBziuUkkD+eIsTIP7iVv2FBVz97BMHEsVV5j2zKR5HZ/fH1cWYh9rxrjxY/uy3e1fMot4qC4+aWCTcTCRDfrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zFdAxetf; arc=none smtp.client-ip=209.85.167.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZZA8/awG"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2128383b86eso14641415ad.2
-        for <linux-block@vger.kernel.org>; Thu, 21 Nov 2024 14:26:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zFdAxetf"
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3e6010a3bbfso983075b6e.2
+        for <linux-block@vger.kernel.org>; Thu, 21 Nov 2024 21:04:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732227997; x=1732832797; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1732251860; x=1732856660; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pZAV40eLukdAUm3AIOVig1F6aMrQYsyjN2fkwd6I2Qs=;
-        b=ZZA8/awGzqG/HEXWV6kn0geRJcPaA5n7UHVUg2b+VfK0MssxL+fnWdDf4+yUOrxFJQ
-         U4pgMbv2DSexq8zSdpkL6EsTl0mWPROnyA21sXNbgalFzR7+I//kcNm+9a/WS5g8Tk3f
-         YzaH3hF9kLpmkjMnGzgu76tOzUKTb70tnxMuA/hPzJKuKeSU0eNLpucEjdlxKBeHWdhT
-         fRYdZT4xLv9Pl9WadZFopqkGW8pqtRD2CbnMMKAA1uehRFBXD7a9CbO2DPrAnUnLXpau
-         6zTciC43lopnxp4+2jpr+i1/3wKNXaGoqN9B2zy0mnTKfu5gnhKmHNCqBjVkWTL2IFpl
-         czLg==
+        bh=kIzDwcozFWCn4iWIZHsgYfF1wjH7Z9fC00bR+vHVLs8=;
+        b=zFdAxetfqdy6vjgAlPnY8dcPszsTDct+6mOTzaz8OaYYhujrNWdIyDm6DWDXklwxD9
+         htk6uVhmakXRcC2Fjd+gf0VKabBgujYbdZJXpGtUEjMEEtaaIRE7vqvmJ5hR+wAFI5U8
+         L5I8GNSP3CIuT9SyFp6pG9PwV5p5HISLTOyaBErkch3CTIh7aqGsWYvgFPU1j1pqziiy
+         uKEPXqCROjEj5IyAkIC6yldMzfaMXQ/1Z9Xuj1AZ+dwr52LyscyQch1pg5tlhHkcQpqf
+         NnNm4QFDdYbsyt0pDXl38nk7FdXVag61wo0cD2DJ/VZhdCGE8Q2jpBj3wJrxcG0OJ0Lw
+         5wMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732227997; x=1732832797;
+        d=1e100.net; s=20230601; t=1732251860; x=1732856660;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pZAV40eLukdAUm3AIOVig1F6aMrQYsyjN2fkwd6I2Qs=;
-        b=bbR41KLLOIRsbro5gvl8EoIvGSsHQJbkkZ7Csv21vh3LL4nQJxt+Dh1u3YDyxqev30
-         lL1R4R7paUvlxbINurWRuyd1BD5Rtfi3nsWz0O0mExL3lzUUOR/CuzlcWx6Y/ejYfT5z
-         S6/GwNbySW2aah3HOCWQWzexx+87VNHIr97DUIN2BABYjfFRAv4lhr0ghNtNJWeb6xTW
-         xxCzcqYRuKhSxPikGi64AzYeb8FzmD51dUR9vWD70DOS6BtN/Jc3ULc30iaL2oLFRYBA
-         XxgL9gkcSbdzuMjrVaigxUqfxSdC0IWiQ2oAUfrjmXAvaB4CbfzinEgMJ7OXb5VtUSXj
-         iLqA==
-X-Forwarded-Encrypted: i=1; AJvYcCVY/IGM9VNB/ljN5q83sKRD1S97nwUlGaQeyp2kTDWZqMBKSWS8Zmq6nC3MhyY5yllJ7DgH72iSSx9jyg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZ9GV+ZRsHE46tGEqbhNAXs6VZF8/7wA3ImxVAn5kH6lhD5W9N
-	Oy1m1cU8IIgXmqTAcahYtbC4Gy/RbUWdSXtvvJ77dQdPaaNaVH0C
-X-Gm-Gg: ASbGncvStpNzsIu8et1Wn44WHtEqke9KvQzsHVOV7GmOxpJvVmuXCYP9k5MXWFrbG1A
-	ujsvu6TmYN2zsbQn3bn7p0vR2zzs7LKgPs+z74m+B9BjClP4ZpmSExLkSXmT7z4uik1F4BmxqJ+
-	Z18HDZaDxBXy5RIrOrScAbPAW/d9JJU8BOQgDYijw9cJHRlHSVZ07Hn48Yl4mm+tRa8rHjzXIyW
-	GKMr0s1fjmF+ntb9ukmQpA51JON3k8px/R/xyeV+Vn6fNZoBDppnoVpdZ+oLYxndhNlTfhU
-X-Google-Smtp-Source: AGHT+IFk8IcOaVtDODSKrSa6m+UG9KLonALKh/GnCgbMtgcUZBCu3HpUQkp54L4Z2yATbp/3yYDCjw==
-X-Received: by 2002:a17:903:244b:b0:211:f6e4:d68e with SMTP id d9443c01a7336-2129fce2e23mr6801055ad.10.1732227996748;
-        Thu, 21 Nov 2024 14:26:36 -0800 (PST)
-Received: from Barrys-MBP.hub ([2407:7000:8942:5500:9d64:b0ba:faf2:680e])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2129dba22f4sm3334745ad.100.2024.11.21.14.26.28
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 21 Nov 2024 14:26:36 -0800 (PST)
-From: Barry Song <21cnbao@gmail.com>
-To: akpm@linux-foundation.org,
-	linux-mm@kvack.org
+        bh=kIzDwcozFWCn4iWIZHsgYfF1wjH7Z9fC00bR+vHVLs8=;
+        b=baQjHb44EBX/Su0nZqvqOULikmK2JLOEgDiwxQR5xb0tjL4Ccz7zExWS64WnuAuKAa
+         hz9KTzhs0mzHBnWau1I5gBhjb5gyv7AZRyC4jujILwhJ4O/S/mhc8KQPqWQbcSD5rQkD
+         3O6cVdkUThbiNf9mfO0WiYO9ZoVCw7GJwozXSvgQtbSjGYugtgszZ2a1HmePfjq+mx7B
+         yyNd87XD8c5zq2URNlfi9X8hwP2xdr99i5aEDcKdSaYqoC+16pqenviOg747dg3oaPVT
+         8bS/4bp3CUgGjc0cg7tpAXcrKRV/KGYH7g+fhOSqLVeefQejn2txOVEFMg3CSC9X0LTO
+         KKsw==
+X-Forwarded-Encrypted: i=1; AJvYcCWbTqsDjEj9vYw5gbuOjPuzkBTbZ8um23qe7l1B7Il9ZhcsxbmcY/gUqk1D+1v5XxupwqUu9on92WYmcA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuWdHJpsWVc2U09PbfvoE5WrO/lvK3cWzvN1dowIPORHVPoIQx
+	HFP9fOH+e8opbP9NwVoSVj1nls/JZ/HTfifbJMXgvL4+HUJ8gmI8OE6KdZNPuJc=
+X-Gm-Gg: ASbGncvycIeE52XTs+eQSzwx8F7aC5O++NiKYeh+u9Ta8e17PO2ZgX31AHVPCryutS/
+	pIYDja69/AtBnwdpKL+xxxfbwlKG0DFBPqiVySnwLdLvZaYsVPkL09Xf2GNKBWa76JIbxGHuS2/
+	Zk0oyGNI1uRn+Fs4Y8GkgGCfrtqreRvidE/Lj4Q0oj8UhZb7sYM6H5WHTCNB9Y8X3GGBDGJ9kQB
+	76mnuCh+zFjvTAes+LamX/ekx0/samf2CxSRd/PsJvDHmYe1E/itqY=
+X-Google-Smtp-Source: AGHT+IGL6MagCY83L4jKNjJ+b2nvEUCxXAYn80qUw2BRxv2rEU4IPc31obmxQrilm0WF+k6fB1jevg==
+X-Received: by 2002:a05:6808:1b0e:b0:3e7:9f14:26cd with SMTP id 5614622812f47-3e9157a3724mr2224346b6e.8.1732251860540;
+        Thu, 21 Nov 2024 21:04:20 -0800 (PST)
+Received: from localhost ([136.62.192.75])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-71c0383ba69sm280935a34.61.2024.11.21.21.04.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2024 21:04:20 -0800 (PST)
+From: Sam Protsenko <semen.protsenko@linaro.org>
+To: hch@lst.de
 Cc: axboe@kernel.dk,
-	bala.seshasayee@linux.intel.com,
-	chrisl@kernel.org,
-	david@redhat.com,
-	hannes@cmpxchg.org,
-	kanchana.p.sridhar@intel.com,
-	kasong@tencent.com,
 	linux-block@vger.kernel.org,
-	minchan@kernel.org,
-	nphamcs@gmail.com,
-	ryan.roberts@arm.com,
-	senozhatsky@chromium.org,
-	surenb@google.com,
-	terrelln@fb.com,
-	usamaarif642@gmail.com,
-	v-songbaohua@oppo.com,
-	wajdi.k.feghali@intel.com,
-	willy@infradead.org,
-	ying.huang@intel.com,
-	yosryahmed@google.com,
-	yuzhao@google.com,
-	zhengtangquan@oppo.com,
-	zhouchengming@bytedance.com,
-	Chuanhua Han <chuanhuahan@gmail.com>
-Subject: [PATCH RFC v3 4/4] mm: fall back to four small folios if mTHP allocation fails
-Date: Fri, 22 Nov 2024 11:25:21 +1300
-Message-Id: <20241121222521.83458-5-21cnbao@gmail.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20241121222521.83458-1-21cnbao@gmail.com>
-References: <20241121222521.83458-1-21cnbao@gmail.com>
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: remove the ioprio field from struct request
+Date: Thu, 21 Nov 2024 23:04:19 -0600
+Message-Id: <20241122050419.21973-1-semen.protsenko@linaro.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20241112170050.1612998-3-hch@lst.de>
+References: <20241112170050.1612998-3-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -97,350 +76,26 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Barry Song <v-songbaohua@oppo.com>
+Hi Christoph,
 
-The swapfile can compress/decompress at 4 * PAGES granularity, reducing
-CPU usage and improving the compression ratio. However, if allocating an
-mTHP fails and we fall back to a single small folio, the entire large
-block must still be decompressed. This results in a 16 KiB area requiring
-4 page faults, where each fault decompresses 16 KiB but retrieves only
-4 KiB of data from the block. To address this inefficiency, we instead
-fall back to 4 small folios, ensuring that each decompression occurs
-only once.
+This patch causes a regression on E850-96 board. Specifically, there are
+two noticeable time lags when booting Debian rootfs:
 
-Allowing swap_read_folio() to decompress and read into an array of
-4 folios would be extremely complex, requiring extensive changes
-throughout the stack, including swap_read_folio, zeromap,
-zswap, and final swap implementations like zRAM. In contrast,
-having these components fill a large folio with 4 subpages is much
-simpler.
+  1. When systemd reports this stage:
 
-To avoid a full-stack modification, we introduce a per-CPU order-2
-large folio as a buffer. This buffer is used for swap_read_folio(),
-after which the data is copied into the 4 small folios. Finally, in
-do_swap_page(), all these small folios are mapped.
+         "Reached target getty.target - Login Prompts."
 
-Co-developed-by: Chuanhua Han <chuanhuahan@gmail.com>
-Signed-off-by: Chuanhua Han <chuanhuahan@gmail.com>
-Signed-off-by: Barry Song <v-songbaohua@oppo.com>
----
- mm/memory.c | 203 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 192 insertions(+), 11 deletions(-)
+     it hangs for 5 seconds or so, before going further.
 
-diff --git a/mm/memory.c b/mm/memory.c
-index 209885a4134f..e551570c1425 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -4042,6 +4042,15 @@ static struct folio *__alloc_swap_folio(struct vm_fault *vmf)
- 	return folio;
- }
- 
-+#define BATCH_SWPIN_ORDER 2
-+#define BATCH_SWPIN_COUNT (1 << BATCH_SWPIN_ORDER)
-+#define BATCH_SWPIN_SIZE (PAGE_SIZE << BATCH_SWPIN_ORDER)
-+
-+struct batch_swpin_buffer {
-+	struct folio *folio;
-+	struct mutex mutex;
-+};
-+
- #ifdef CONFIG_TRANSPARENT_HUGEPAGE
- static inline int non_swapcache_batch(swp_entry_t entry, int max_nr)
- {
-@@ -4120,7 +4129,101 @@ static inline unsigned long thp_swap_suitable_orders(pgoff_t swp_offset,
- 	return orders;
- }
- 
--static struct folio *alloc_swap_folio(struct vm_fault *vmf)
-+static DEFINE_PER_CPU(struct batch_swpin_buffer, swp_buf);
-+
-+static int __init batch_swpin_buffer_init(void)
-+{
-+	int ret, cpu;
-+	struct batch_swpin_buffer *buf;
-+
-+	for_each_possible_cpu(cpu) {
-+		buf = per_cpu_ptr(&swp_buf, cpu);
-+		buf->folio = (struct folio *)alloc_pages_node(cpu_to_node(cpu),
-+				GFP_KERNEL | __GFP_COMP, BATCH_SWPIN_ORDER);
-+		if (!buf->folio) {
-+			ret = -ENOMEM;
-+			goto err;
-+		}
-+		mutex_init(&buf->mutex);
-+	}
-+	return 0;
-+
-+err:
-+	for_each_possible_cpu(cpu) {
-+		buf = per_cpu_ptr(&swp_buf, cpu);
-+		if (buf->folio) {
-+			folio_put(buf->folio);
-+			buf->folio = NULL;
-+		}
-+	}
-+	return ret;
-+}
-+core_initcall(batch_swpin_buffer_init);
-+
-+static struct folio *alloc_batched_swap_folios(struct vm_fault *vmf,
-+		struct batch_swpin_buffer **buf, struct folio **folios,
-+		swp_entry_t entry)
-+{
-+	unsigned long haddr = ALIGN_DOWN(vmf->address, BATCH_SWPIN_SIZE);
-+	struct batch_swpin_buffer *sbuf = raw_cpu_ptr(&swp_buf);
-+	struct folio *folio = sbuf->folio;
-+	unsigned long addr;
-+	int i;
-+
-+	if (unlikely(!folio))
-+		return NULL;
-+
-+	for (i = 0; i < BATCH_SWPIN_COUNT; i++) {
-+		addr = haddr + i * PAGE_SIZE;
-+		folios[i] = vma_alloc_folio(GFP_HIGHUSER_MOVABLE, 0, vmf->vma, addr);
-+		if (!folios[i])
-+			goto err;
-+		if (mem_cgroup_swapin_charge_folio(folios[i], vmf->vma->vm_mm,
-+					GFP_KERNEL, entry))
-+			goto err;
-+	}
-+
-+	mutex_lock(&sbuf->mutex);
-+	*buf = sbuf;
-+#ifdef CONFIG_MEMCG
-+	folio->memcg_data = (*folios)->memcg_data;
-+#endif
-+	return folio;
-+
-+err:
-+	for (i--; i >= 0; i--)
-+		folio_put(folios[i]);
-+	return NULL;
-+}
-+
-+static void fill_batched_swap_folios(struct vm_fault *vmf,
-+		void *shadow, struct batch_swpin_buffer *buf,
-+		struct folio *folio, struct folio **folios)
-+{
-+	unsigned long haddr = ALIGN_DOWN(vmf->address, BATCH_SWPIN_SIZE);
-+	unsigned long addr;
-+	int i;
-+
-+	for (i = 0; i < BATCH_SWPIN_COUNT; i++) {
-+		addr = haddr + i * PAGE_SIZE;
-+		__folio_set_locked(folios[i]);
-+		__folio_set_swapbacked(folios[i]);
-+		if (shadow)
-+			workingset_refault(folios[i], shadow);
-+		folio_add_lru(folios[i]);
-+		copy_user_highpage(&folios[i]->page, folio_page(folio, i),
-+				addr, vmf->vma);
-+		if (folio_test_uptodate(folio))
-+			folio_mark_uptodate(folios[i]);
-+	}
-+
-+	folio->flags &= ~(PAGE_FLAGS_CHECK_AT_PREP & ~(1UL << PG_head));
-+	mutex_unlock(&buf->mutex);
-+}
-+
-+static struct folio *alloc_swap_folio(struct vm_fault *vmf,
-+		struct batch_swpin_buffer **buf,
-+		struct folio **folios)
- {
- 	struct vm_area_struct *vma = vmf->vma;
- 	unsigned long orders;
-@@ -4180,6 +4283,9 @@ static struct folio *alloc_swap_folio(struct vm_fault *vmf)
- 
- 	pte_unmap_unlock(pte, ptl);
- 
-+	if (!orders)
-+		goto fallback;
-+
- 	/* Try allocating the highest of the remaining orders. */
- 	gfp = vma_thp_gfp_mask(vma);
- 	while (orders) {
-@@ -4194,14 +4300,29 @@ static struct folio *alloc_swap_folio(struct vm_fault *vmf)
- 		order = next_order(&orders, order);
- 	}
- 
-+	/*
-+	 * During swap-out, a THP might have been compressed into multiple
-+	 * order-2 blocks to optimize CPU usage and compression ratio.
-+	 * Attempt to batch swap-in 4 smaller folios to ensure they are
-+	 * decompressed together as a single unit only once.
-+	 */
-+	return alloc_batched_swap_folios(vmf, buf, folios, entry);
-+
- fallback:
- 	return __alloc_swap_folio(vmf);
- }
- #else /* !CONFIG_TRANSPARENT_HUGEPAGE */
--static struct folio *alloc_swap_folio(struct vm_fault *vmf)
-+static struct folio *alloc_swap_folio(struct vm_fault *vmf,
-+		struct batch_swpin_buffer **buf,
-+		struct folio **folios)
- {
- 	return __alloc_swap_folio(vmf);
- }
-+static inline void fill_batched_swap_folios(struct vm_fault *vmf,
-+		void *shadow, struct batch_swpin_buffer *buf,
-+		struct folio *folio, struct folio **folios)
-+{
-+}
- #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
- 
- static DECLARE_WAIT_QUEUE_HEAD(swapcache_wq);
-@@ -4216,6 +4337,8 @@ static DECLARE_WAIT_QUEUE_HEAD(swapcache_wq);
-  */
- vm_fault_t do_swap_page(struct vm_fault *vmf)
- {
-+	struct folio *folios[BATCH_SWPIN_COUNT] = { NULL };
-+	struct batch_swpin_buffer *buf = NULL;
- 	struct vm_area_struct *vma = vmf->vma;
- 	struct folio *swapcache, *folio = NULL;
- 	DECLARE_WAITQUEUE(wait, current);
-@@ -4228,7 +4351,7 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
- 	pte_t pte;
- 	vm_fault_t ret = 0;
- 	void *shadow = NULL;
--	int nr_pages;
-+	int nr_pages, i;
- 	unsigned long page_idx;
- 	unsigned long address;
- 	pte_t *ptep;
-@@ -4296,7 +4419,7 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
- 		if (data_race(si->flags & SWP_SYNCHRONOUS_IO) &&
- 		    __swap_count(entry) == 1) {
- 			/* skip swapcache */
--			folio = alloc_swap_folio(vmf);
-+			folio = alloc_swap_folio(vmf, &buf, folios);
- 			if (folio) {
- 				__folio_set_locked(folio);
- 				__folio_set_swapbacked(folio);
-@@ -4327,10 +4450,10 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
- 				mem_cgroup_swapin_uncharge_swap(entry, nr_pages);
- 
- 				shadow = get_shadow_from_swap_cache(entry);
--				if (shadow)
-+				if (shadow && !buf)
- 					workingset_refault(folio, shadow);
--
--				folio_add_lru(folio);
-+				if (!buf)
-+					folio_add_lru(folio);
- 
- 				/* To provide entry to swap_read_folio() */
- 				folio->swap = entry;
-@@ -4361,6 +4484,16 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
- 		count_vm_event(PGMAJFAULT);
- 		count_memcg_event_mm(vma->vm_mm, PGMAJFAULT);
- 		page = folio_file_page(folio, swp_offset(entry));
-+		/*
-+		 * Copy data into batched small folios from the large
-+		 * folio buffer
-+		 */
-+		if (buf) {
-+			fill_batched_swap_folios(vmf, shadow, buf, folio, folios);
-+			folio = folios[0];
-+			page = &folios[0]->page;
-+			goto do_map;
-+		}
- 	} else if (PageHWPoison(page)) {
- 		/*
- 		 * hwpoisoned dirty swapcache pages are kept for killing
-@@ -4415,6 +4548,7 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
- 			lru_add_drain();
- 	}
- 
-+do_map:
- 	folio_throttle_swaprate(folio, GFP_KERNEL);
- 
- 	/*
-@@ -4431,8 +4565,8 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
- 	}
- 
- 	/* allocated large folios for SWP_SYNCHRONOUS_IO */
--	if (folio_test_large(folio) && !folio_test_swapcache(folio)) {
--		unsigned long nr = folio_nr_pages(folio);
-+	if ((folio_test_large(folio) || buf) && !folio_test_swapcache(folio)) {
-+		unsigned long nr = buf ? BATCH_SWPIN_COUNT : folio_nr_pages(folio);
- 		unsigned long folio_start = ALIGN_DOWN(vmf->address, nr * PAGE_SIZE);
- 		unsigned long idx = (vmf->address - folio_start) / PAGE_SIZE;
- 		pte_t *folio_ptep = vmf->pte - idx;
-@@ -4527,6 +4661,42 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
- 		}
- 	}
- 
-+	/* Batched mapping of allocated small folios for SWP_SYNCHRONOUS_IO */
-+	if (buf) {
-+		for (i = 0; i < nr_pages; i++)
-+			arch_swap_restore(swp_entry(swp_type(entry),
-+				swp_offset(entry) + i), folios[i]);
-+		swap_free_nr(entry, nr_pages);
-+		add_mm_counter(vma->vm_mm, MM_ANONPAGES, nr_pages);
-+		add_mm_counter(vma->vm_mm, MM_SWAPENTS, -nr_pages);
-+		rmap_flags |= RMAP_EXCLUSIVE;
-+		for (i = 0; i < nr_pages; i++) {
-+			unsigned long addr = address + i * PAGE_SIZE;
-+
-+			pte = mk_pte(&folios[i]->page, vma->vm_page_prot);
-+			if (pte_swp_soft_dirty(vmf->orig_pte))
-+				pte = pte_mksoft_dirty(pte);
-+			if (pte_swp_uffd_wp(vmf->orig_pte))
-+				pte = pte_mkuffd_wp(pte);
-+			if ((vma->vm_flags & VM_WRITE) && !userfaultfd_pte_wp(vma, pte) &&
-+			    !pte_needs_soft_dirty_wp(vma, pte)) {
-+				pte = pte_mkwrite(pte, vma);
-+				if ((vmf->flags & FAULT_FLAG_WRITE) && (i == page_idx)) {
-+					pte = pte_mkdirty(pte);
-+					vmf->flags &= ~FAULT_FLAG_WRITE;
-+				}
-+			}
-+			flush_icache_page(vma, &folios[i]->page);
-+			folio_add_new_anon_rmap(folios[i], vma, addr, rmap_flags);
-+			set_pte_at(vma->vm_mm, addr, ptep + i, pte);
-+			arch_do_swap_page_nr(vma->vm_mm, vma, addr, pte, pte, 1);
-+			if (i == page_idx)
-+				vmf->orig_pte = pte;
-+			folio_unlock(folios[i]);
-+		}
-+		goto wp_page;
-+	}
-+
- 	/*
- 	 * Some architectures may have to restore extra metadata to the page
- 	 * when reading from swap. This metadata may be indexed by swap entry
-@@ -4612,6 +4782,7 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
- 		folio_put(swapcache);
- 	}
- 
-+wp_page:
- 	if (vmf->flags & FAULT_FLAG_WRITE) {
- 		ret |= do_wp_page(vmf);
- 		if (ret & VM_FAULT_ERROR)
-@@ -4638,9 +4809,19 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
- 	if (vmf->pte)
- 		pte_unmap_unlock(vmf->pte, vmf->ptl);
- out_page:
--	folio_unlock(folio);
-+	if (!buf) {
-+		folio_unlock(folio);
-+	} else {
-+		for (i = 0; i < BATCH_SWPIN_COUNT; i++)
-+			folio_unlock(folios[i]);
-+	}
- out_release:
--	folio_put(folio);
-+	if (!buf) {
-+		folio_put(folio);
-+	} else {
-+		for (i = 0; i < BATCH_SWPIN_COUNT; i++)
-+			folio_put(folios[i]);
-+	}
- 	if (folio != swapcache && swapcache) {
- 		folio_unlock(swapcache);
- 		folio_put(swapcache);
--- 
-2.39.3 (Apple Git-146)
+  2. When I'm logging in, the system hangs for 60 seconds or so before
+     the shell prompt appears.
 
+It only seems to reproduce the first time (during the boot). My attempt to
+re-start the mentioned systemd target or run "login" command again worked
+fine.
+
+Reverting commit 6975c1a486a4 ("block: remove the ioprio field from
+struct request") fixes the issue for me. Do you have any ideas by chance
+what might be the reason? Or maybe you have any pointers on debugging it?
+
+Thanks!
