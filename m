@@ -1,86 +1,121 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CFA1DF97C;
-	Fri, 22 Nov 2024 18:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2768D189909
+	for <linux-block@vger.kernel.org>; Fri, 22 Nov 2024 21:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732299639; cv=none; b=RGB9toori5rZh4oLcQch6xEZ0+fljLuvDKwiADDAl3tyiHK1LPyP/vJU1tHh9lKLkdxeh2BMpPYlJ7P0CUKPg0bEtGuWSYmE7I8YqBgBW0fJqpWygTboXhT/kDwgpixl7GVWVkBQWCHM1ASzSkrNp1MdduWF/Zc+71uQG7XS0js=
+	t=1732312537; cv=none; b=bWcyelcZjdAioX7NkX5agnbBTUbO4Uu1rnWHrCtQl6Y6W22ayVXKchMZHYyk7LT4FOoKekGjw6ZWkA6Lk2++yz273sLjiko2bkTQBIqku8cYZfgwlCuQZ9Zn7+mOoRXCnB895vsUuycYWoFebv52tPfGIJ5gvvj2wSd65uIcHaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732299639; c=relaxed/simple;
-	bh=WnliFglmUfZeWNLF2kN4Yt+995PvKostfOMpqFxOexs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F1ODOLC6BkJ9Nz07Fi3jwVyjNYHa7IMZ8SqgbIIV2a2h4nCWsfMRek1QYF8glPgnZKI9HifZXaL+xxOQ/1T54MDCP/YcGg8QbnzywRCK65z7kU7CAmz6u22Mx7NMmD+ingSbsERn9GkU4Putv0lUW+UqZiY+kHDUy7Nl4ExecqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=RnPA3kY8; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1732312537; c=relaxed/simple;
+	bh=Ivt34dLadzx+dY3zrPHdwzCxKtw0aya58zcMXS9yIKE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hqsRAI7vVs5pbvERKaLcRPy+K45PlYodDKyFFTv9Yv+wONomVXgS1YSSTvM3jcVvRznsM6BlFcEz9ILafWMl1VfwpNNXNQk6XLJSj4SfNn8hz41tvPTKejQuNKndVsfay2POYzulZUDgtYukY5M+fFLEY+bxROqVGLSOyO50Z0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=inXTmVs7; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="RnPA3kY8"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Xw3LR4mGZzlgMVS;
-	Fri, 22 Nov 2024 18:20:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1732299628; x=1734891629; bh=xGwZPVbAGLVdk9OY447HfJib
-	RxdKJ1Ggqw1YBrON7Ts=; b=RnPA3kY830DsYlvbNuBVVIvjBZcsN2dcjzjknuiy
-	f17B3qw1/2qKQUGJvjQxrcljkII8tF+KdTk5EI1nBfCo4KHQnK767HIjxFYhfcEo
-	ZybduC8pJXYMwHQMUZ0bBMy6+RbOy6Il92L8uNg3G9ILqm0jWxqHK3oL1NMOD9+K
-	/DQHcIUUxzSwPMzXLI2H2vJMOT06LeElWw4hurHarWLLZgGbS3u1V6U1Cx8lZz4T
-	K0NwGVKEvvcng2G14nntkxIZ9MCg98KiQmt9E3GzJX41C2YSkCufSS7YIjuBmL2N
-	dVs9Za2YSedaZp6A5ZIQwBTfDeTcuTwXifYl2aABUJFxTA==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id wUOjuKAzGPkT; Fri, 22 Nov 2024 18:20:28 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Xw3LL0V1ZzlgMVP;
-	Fri, 22 Nov 2024 18:20:25 +0000 (UTC)
-Message-ID: <82649541-7db9-4b50-a1e1-e38a9078761c@acm.org>
-Date: Fri, 22 Nov 2024 10:20:24 -0800
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="inXTmVs7"
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6e5e5c43497so21463647b3.3
+        for <linux-block@vger.kernel.org>; Fri, 22 Nov 2024 13:55:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1732312534; x=1732917334; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q4w0V8piCFy/xNq9WrRvW2FpZEM6c30Db54nbhmRpaA=;
+        b=inXTmVs7FaJfgcJfMD5LVQez/2iX2xemFQpOgtwKAzF82NKXsQEDT6b52v3o5OVvtC
+         IiAMc8h5AJ7GGl1BFjlOemOFXY19GpShZK3t6j238qfrZ6MPGe4f3nNNyNwfj8GAQneK
+         PLBTwkR770HWt8srkqyIx4toz1p4Sc2sCEk2+IIZueH6cG0UAFSYq99AYOLvtH9z3Bxh
+         i/l1ENbnr81bC4P9xvw2zIM3+27zRMgLYBrGX6gafflMxwMHy06Wq72XbRbdQ1X4Xgpd
+         9h8vapaQAbyuOp3cQRuJRfM7t9yq5xMl9S2/GZsh5BAvwVMLyXbWFVzd68FZ+xfEYGZ1
+         xMhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732312534; x=1732917334;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q4w0V8piCFy/xNq9WrRvW2FpZEM6c30Db54nbhmRpaA=;
+        b=Hb1KeB7FVBzrpzMgPMfdPt+le2EHnya6SvNbFSNUEfryLbLVTZGbuuOZNnzseu3P+6
+         z54WDErRRWhgS0/oHSnQrMfB6gSmWN9KMsGBTuEgggBd8cpP6N9N7yvBlw7qrjQWP+0n
+         Do6ntscifJ3xpfyL3k8TVgdELt6CPxJbcfx7uz5/FKIZZTyDhXherXcNtzSBVWl5OYVa
+         tuFhJlKymsi3d1OMBdFz1dB9O7aslVl1vprajIklkPMfG0jLaLBxlpbF2Y+Ddorgo92s
+         Q6w1VgPsP8DGw7iJDT55Uy5FxHHCCIzisW/UZHCqAzgTnFJ67sZu3QvpXLO2pCEuDS6J
+         KdUw==
+X-Forwarded-Encrypted: i=1; AJvYcCXu5433pmtBHwNSre9GqTCs6qzwV9yAI/L0NGpIEvSGANGJCLU1R6VEfYhlfBafszeUDV8eINYgCciWJQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxL1aFL4BUX3mwZxvhbVkjfodxTX9JIQJe/Gh/rQm4VFOqqBQt5
+	ytb5zfsvDRpulE2/EWGITDwWG0jIVhuGVNq1i4Acm2kPzO7Q0ecsNZiInznM4L4AH5uXKX/nwuL
+	Ngk+GJmm/OYHj0EeD7vNGLjUBQ5vGbwC8eCXicA==
+X-Gm-Gg: ASbGncuDO1g4CLQoQImokIKkyAP2hT7XE5aOtkVhmQfV6gN8Cw08r53AUihzUwGMS56
+	cfVtze3CuJxtdqd5+tbK6mhRykO8aHfs=
+X-Google-Smtp-Source: AGHT+IGRq1VZsNlaYrCF8hcYwGMmdJ3cPmaBbMhayTP0BZfNZaqlKQg8YaIV/vhw18gRsEQlgZOx8XVaet9ohYoKAfM=
+X-Received: by 2002:a05:690c:881:b0:6ee:b38c:b6e1 with SMTP id
+ 00721157ae682-6eee089e833mr61356057b3.14.1732312534045; Fri, 22 Nov 2024
+ 13:55:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 26/26] scsi: ufs: Inform the block layer about write
- ordering
-To: Can Guo <quic_cang@quicinc.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
- Jaegeuk Kim <jaegeuk@kernel.org>, "Bao D. Nguyen"
- <quic_nguyenb@quicinc.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Avri Altman <avri.altman@wdc.com>
-References: <20241119002815.600608-1-bvanassche@acm.org>
- <20241119002815.600608-27-bvanassche@acm.org>
- <37f95f44-ab1d-20db-e0c7-94946cb9d4eb@quicinc.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <37f95f44-ab1d-20db-e0c7-94946cb9d4eb@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241112170050.1612998-3-hch@lst.de> <20241122050419.21973-1-semen.protsenko@linaro.org>
+ <20241122120444.GA25679@lst.de>
+In-Reply-To: <20241122120444.GA25679@lst.de>
+From: Sam Protsenko <semen.protsenko@linaro.org>
+Date: Fri, 22 Nov 2024 15:55:23 -0600
+Message-ID: <CAPLW+4==a515TCD93Kp-8zC8iYyYdh92U=j_emnG5sT_d7z64w@mail.gmail.com>
+Subject: Re: [PATCH 2/2] block: remove the ioprio field from struct request
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/21/24 6:58 PM, Can Guo wrote:
-> So, in MCQ mode, we are re-directing all zoned writes to one HW queue to 
-> preserve the write order, is my understanding correct?
-That's somewhat but not entirely correct. As one can see in patch 20/26,
-the software queue (and hence also the hardware queue) that was selected
-for zoned writes is unselected after all pending zoned writes for a
-given zone have completed:
+On Fri, Nov 22, 2024 at 6:04=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
+e:
+>
+> On Thu, Nov 21, 2024 at 11:04:19PM -0600, Sam Protsenko wrote:
+> > Hi Christoph,
+> >
+> > This patch causes a regression on E850-96 board. Specifically, there ar=
+e
+> > two noticeable time lags when booting Debian rootfs:
+>
+> What storage driver does this board use?  Anything else interesting
+> about the setup?
+>
 
-+	if (refcount_read(&zwplug->ref) == 2)
-+		zwplug->swq_cpu = -1;
+It's an Exynos based board with eMMC, so it uses DW MMC driver, with
+Exynos glue layer on top of it, so:
 
-So the next time a write bio or write request is submitted a different
-queue may be selected.
+    drivers/mmc/host/dw_mmc.c
+    drivers/mmc/host/dw_mmc-exynos.c
 
-Thanks,
+I'm using the regular ARM64 defconfig. Nothing fancy about this setup
+neither, the device tree with eMMC definition (mmc_0) is here:
 
-Bart.
+    arch/arm64/boot/dts/exynos/exynos850-e850-96.dts
+
+FWIW, I was able to narrow down the issue to dd_insert_request()
+function. With this hack the freeze is gone:
+
+8<-------------------------------------------------------------------->8
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index acdc28756d9d..83d272b66e71 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -676,7 +676,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx
+*hctx, struct request *rq,
+        struct request_queue *q =3D hctx->queue;
+        struct deadline_data *dd =3D q->elevator->elevator_data;
+        const enum dd_data_dir data_dir =3D rq_data_dir(rq);
+-       u16 ioprio =3D req_get_ioprio(rq);
++       u16 ioprio =3D 0; /* the same as old req->ioprio */
+        u8 ioprio_class =3D IOPRIO_PRIO_CLASS(ioprio);
+        struct dd_per_prio *per_prio;
+        enum dd_prio prio;
+8<-------------------------------------------------------------------->8
+
+Does it tell you anything about where the possible issue can be?
+
+Thanks!
