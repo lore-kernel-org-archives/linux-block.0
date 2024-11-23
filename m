@@ -1,52 +1,44 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp134-33.sina.com.cn (smtp134-33.sina.com.cn [180.149.134.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DA21A76B5;
-	Sat, 23 Nov 2024 22:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3367D1AB52D
+	for <linux-block@vger.kernel.org>; Sun, 24 Nov 2024 00:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.149.134.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732400948; cv=none; b=k3xWgYHZxIMwNP7kczrNg/FTpvNivLTKA5wgr2x1RbCZRalKMTxLhtDF/H/qM4y4FUQoWN4sxiwWWkDC0nS0zlMXnO/PK1zbmLiIyYql+Y+Iz+Rygs6jqyNGRYzAKv/198mbZrmKOMYUYUmOIJzTkJPuGxGN5V/aET+2878DABk=
+	t=1732406430; cv=none; b=cVw6oKBduyw3A3qR7PEfcFeUbWupZHv6MN5ZxzRl2yk2gkkqcF8ZMyqXni+F1moLMe2o1pveT9efFQysVe2N5qX2YU4CdJla9I4x1LVNylldE7n9XyXRjH9Y23FlwqmhZmwd7n2XIN14rfTrml14wMEc4SDer58Vuivi4n5zhVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732400948; c=relaxed/simple;
-	bh=EfqQMqbewNi5Q0JETOl053CaTiHNe0XxlEiK6n0WTGk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VA3AeI8P8B8HMSL4EY8iH9joioJMawvuTunzAe0oDgxo7OtbS6Uyc/UjhYooSlcYhA5/xrTFdoRYFdaQU1iM0s6nE203Udm7aXD9tWeJs5lFBEcoCasbyJI/RLJ9IySXiLPKkAvbHXnANV3uRJviTnAzsrI2QppU7GHPe68gPwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tw5Zgmrl; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tw5Zgmrl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01AC8C4CED0;
-	Sat, 23 Nov 2024 22:29:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732400947;
-	bh=EfqQMqbewNi5Q0JETOl053CaTiHNe0XxlEiK6n0WTGk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tw5ZgmrlXhLVac5/eeFisRRhfh29LiVwhkYm0odzharzUiqUcp8lThKgCZGNcU1HC
-	 do6GhTC6NcF3wEfAOCMFm0Z06ZvHvosAtUTiBWGiacoem9oSuNC1esAvkDHWYW1n7g
-	 HRXCP1gtiEOVO1xcIbDoCzHJx4pbFX+A25/94t+L8utZ8v82vzMrAlXom574nUwh7h
-	 T6AZdQRtJ0AZEOkzWTgvxPdvplSf43NNu9E8rzJbyGdfqEP0Bk0vSrMvXen7x48crW
-	 FeLOQM0eSmdixOkRfLCgJtHUTfEbOqaCaVFyCf6y1XFTnS4xjEja4DsjXicQY2RKl8
-	 3ptb0NN3oQhXg==
-From: Miguel Ojeda <ojeda@kernel.org>
-To: Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Boqun Feng <boqun.feng@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	rust-for-linux@vger.kernel.org,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1732406430; c=relaxed/simple;
+	bh=VrhYO+11xxcyw/RpgOGX0ADgYrecW3+uIwfMgBm8FIU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=VAWiHOr2hfDSjskSt5KMi5tFV8OMAT4hj7QRF9cSbIpI6hop7LLsWz17Ud4nDeqQYAteNP4DGKI31K3gLjKGCU4ijw2yhFkKRX5tBT8Q+McPvfbDSjq/VmAUsRtR0Ki0zCUPzqwp70NeXLvbt3LgEDpvVS3mVAl/xyH4ZoIc/kA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=180.149.134.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([116.24.9.183])
+	by sina.com (10.185.250.21) with ESMTP
+	id 67426C8800004506; Sun, 24 Nov 2024 08:00:13 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 4120793408439
+X-SMAIL-UIID: 9B7DC2014CAE44C4AFDB5D715206D302-20241124-080013-1
+From: Hillf Danton <hdanton@sina.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: syzbot <syzbot+5218c85078236fc46227@syzkaller.appspotmail.com>,
+	axboe@kernel.dk,
 	linux-block@vger.kernel.org,
+	Boqun Feng <boqun.feng@gmail.com>,
 	linux-kernel@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: [PATCH 3/3] rust: add `build_error!` to the prelude
-Date: Sat, 23 Nov 2024 23:28:49 +0100
-Message-ID: <20241123222849.350287-3-ojeda@kernel.org>
-In-Reply-To: <20241123222849.350287-1-ojeda@kernel.org>
-References: <20241123222849.350287-1-ojeda@kernel.org>
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [block?] possible deadlock in blk_mq_submit_bio
+Date: Sun, 24 Nov 2024 07:59:58 +0800
+Message-Id: <20241123235958.1489-1-hdanton@sina.com>
+In-Reply-To: <6741f6b2.050a0220.1cc393.0017.GAE@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -55,165 +47,111 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The sibling `build_assert!` is already in the prelude, it makes sense
-that a "core"/"language" facility like this is part of the prelude and
-users should not be defining their own one (thus there should be no risk
-of future name collisions and we would want to be aware of them anyway).
+On Sat, 23 Nov 2024 07:37:22 -0800
+> syzbot found the following issue on:
+> 
+> HEAD commit:    06afb0f36106 Merge tag 'trace-v6.13' of git://git.kernel.o..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=148bfec0580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b011a14ee4cb9480
+> dashboard link: https://syzkaller.appspot.com/bug?extid=5218c85078236fc46227
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> userspace arch: i386
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-06afb0f3.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/aae0561fd279/vmlinux-06afb0f3.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/faa3af3fa7ce/bzImage-06afb0f3.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+5218c85078236fc46227@syzkaller.appspotmail.com
+> 
+> ======================================================
+> WARNING: possible circular locking dependency detected
+> 6.12.0-syzkaller-07834-g06afb0f36106 #0 Not tainted
+> ------------------------------------------------------
+> kswapd0/112 is trying to acquire lock:
+> ffff88801f3f1438 (&q->q_usage_counter(io)#68){++++}-{0:0}, at: bio_queue_enter block/blk.h:79 [inline]
+> ffff88801f3f1438 (&q->q_usage_counter(io)#68){++++}-{0:0}, at: blk_mq_submit_bio+0x7ca/0x24c0 block/blk-mq.c:3092
+> 
+> but task is already holding lock:
+> ffffffff8df4de60 (fs_reclaim){+.+.}-{0:0}, at: balance_pgdat+0xcd9/0x18f0 mm/vmscan.c:6976
+> 
+> which lock already depends on the new lock.
+> 
+> 
+> the existing dependency chain (in reverse order) is:
+> 
+> -> #1 (fs_reclaim){+.+.}-{0:0}:
+>        __fs_reclaim_acquire mm/page_alloc.c:3851 [inline]
+>        fs_reclaim_acquire+0x102/0x150 mm/page_alloc.c:3865
+>        might_alloc include/linux/sched/mm.h:318 [inline]
+>        slab_pre_alloc_hook mm/slub.c:4036 [inline]
+>        slab_alloc_node mm/slub.c:4114 [inline]
+>        __do_kmalloc_node mm/slub.c:4263 [inline]
+>        __kmalloc_node_noprof+0xb7/0x440 mm/slub.c:4270
+>        __kvmalloc_node_noprof+0xad/0x1a0 mm/util.c:658
+>        sbitmap_init_node+0x1ca/0x770 lib/sbitmap.c:132
+>        scsi_realloc_sdev_budget_map+0x2c7/0x610 drivers/scsi/scsi_scan.c:246
+>        scsi_add_lun+0x11b4/0x1fd0 drivers/scsi/scsi_scan.c:1106
+>        scsi_probe_and_add_lun+0x4fa/0xda0 drivers/scsi/scsi_scan.c:1287
+>        __scsi_add_device+0x24b/0x290 drivers/scsi/scsi_scan.c:1622
+>        ata_scsi_scan_host+0x215/0x780 drivers/ata/libata-scsi.c:4575
+>        async_run_entry_fn+0x9c/0x530 kernel/async.c:129
+>        process_one_work+0x958/0x1b30 kernel/workqueue.c:3229
+>        process_scheduled_works kernel/workqueue.c:3310 [inline]
+>        worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+>        kthread+0x2c1/0x3a0 kernel/kthread.c:389
+>        ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+>        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> 
+> -> #0 (&q->q_usage_counter(io)#68){++++}-{0:0}:
+>        check_prev_add kernel/locking/lockdep.c:3161 [inline]
+>        check_prevs_add kernel/locking/lockdep.c:3280 [inline]
+>        validate_chain kernel/locking/lockdep.c:3904 [inline]
+>        __lock_acquire+0x249e/0x3c40 kernel/locking/lockdep.c:5226
+>        lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5849
+>        __bio_queue_enter+0x4c6/0x740 block/blk-core.c:361
+>        bio_queue_enter block/blk.h:79 [inline]
 
-Thus add `build_error!` into the prelude.
+Another splat in bio_queue_enter() [1]
 
-Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
----
- rust/kernel/block/mq/operations.rs |  3 ++-
- rust/kernel/build_assert.rs        |  1 -
- rust/kernel/net/phy.rs             | 18 +++++++++---------
- rust/kernel/prelude.rs             |  2 +-
- rust/macros/lib.rs                 |  8 ++++----
- 5 files changed, 16 insertions(+), 16 deletions(-)
+[1] https://lore.kernel.org/lkml/20241104112732.3144-1-hdanton@sina.com/
 
-diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-index 962f16a5a530..864ff379dc91 100644
---- a/rust/kernel/block/mq/operations.rs
-+++ b/rust/kernel/block/mq/operations.rs
-@@ -9,6 +9,7 @@
-     block::mq::request::RequestDataWrapper,
-     block::mq::Request,
-     error::{from_result, Result},
-+    prelude::*,
-     types::ARef,
- };
- use core::{marker::PhantomData, sync::atomic::AtomicU64, sync::atomic::Ordering};
-@@ -35,7 +36,7 @@ pub trait Operations: Sized {
-     /// Called by the kernel to poll the device for completed requests. Only
-     /// used for poll queues.
-     fn poll() -> bool {
--        crate::build_error!(crate::error::VTABLE_DEFAULT_ERROR)
-+        build_error!(crate::error::VTABLE_DEFAULT_ERROR)
-     }
- }
- 
-diff --git a/rust/kernel/build_assert.rs b/rust/kernel/build_assert.rs
-index 347ba5ce50f4..6331b15d7c4d 100644
---- a/rust/kernel/build_assert.rs
-+++ b/rust/kernel/build_assert.rs
-@@ -14,7 +14,6 @@
- /// # Examples
- ///
- /// ```
--/// # use kernel::build_error;
- /// #[inline]
- /// fn foo(a: usize) -> usize {
- ///     a.checked_add(1).unwrap_or_else(|| build_error!("overflow"))
-diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index f488f6c55e9a..654311a783e9 100644
---- a/rust/kernel/net/phy.rs
-+++ b/rust/kernel/net/phy.rs
-@@ -587,17 +587,17 @@ pub trait Driver {
- 
-     /// Issues a PHY software reset.
-     fn soft_reset(_dev: &mut Device) -> Result {
--        kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+        build_error!(VTABLE_DEFAULT_ERROR)
-     }
- 
-     /// Sets up device-specific structures during discovery.
-     fn probe(_dev: &mut Device) -> Result {
--        kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+        build_error!(VTABLE_DEFAULT_ERROR)
-     }
- 
-     /// Probes the hardware to determine what abilities it has.
-     fn get_features(_dev: &mut Device) -> Result {
--        kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+        build_error!(VTABLE_DEFAULT_ERROR)
-     }
- 
-     /// Returns true if this is a suitable driver for the given phydev.
-@@ -609,32 +609,32 @@ fn match_phy_device(_dev: &Device) -> bool {
-     /// Configures the advertisement and resets auto-negotiation
-     /// if auto-negotiation is enabled.
-     fn config_aneg(_dev: &mut Device) -> Result {
--        kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+        build_error!(VTABLE_DEFAULT_ERROR)
-     }
- 
-     /// Determines the negotiated speed and duplex.
-     fn read_status(_dev: &mut Device) -> Result<u16> {
--        kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+        build_error!(VTABLE_DEFAULT_ERROR)
-     }
- 
-     /// Suspends the hardware, saving state if needed.
-     fn suspend(_dev: &mut Device) -> Result {
--        kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+        build_error!(VTABLE_DEFAULT_ERROR)
-     }
- 
-     /// Resumes the hardware, restoring state if needed.
-     fn resume(_dev: &mut Device) -> Result {
--        kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+        build_error!(VTABLE_DEFAULT_ERROR)
-     }
- 
-     /// Overrides the default MMD read function for reading a MMD register.
-     fn read_mmd(_dev: &mut Device, _devnum: u8, _regnum: u16) -> Result<u16> {
--        kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+        build_error!(VTABLE_DEFAULT_ERROR)
-     }
- 
-     /// Overrides the default MMD write function for writing a MMD register.
-     fn write_mmd(_dev: &mut Device, _devnum: u8, _regnum: u16, _val: u16) -> Result {
--        kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+        build_error!(VTABLE_DEFAULT_ERROR)
-     }
- 
-     /// Callback for notification of link change.
-diff --git a/rust/kernel/prelude.rs b/rust/kernel/prelude.rs
-index 8bdab9aa0d16..ed076b3062ae 100644
---- a/rust/kernel/prelude.rs
-+++ b/rust/kernel/prelude.rs
-@@ -19,7 +19,7 @@
- #[doc(no_inline)]
- pub use macros::{module, pin_data, pinned_drop, vtable, Zeroable};
- 
--pub use super::build_assert;
-+pub use super::{build_assert, build_error};
- 
- // `super::std_vendor` is hidden, which makes the macro inline for some reason.
- #[doc(no_inline)]
-diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
-index 1a30c8075ebd..d61bc6a56425 100644
---- a/rust/macros/lib.rs
-+++ b/rust/macros/lib.rs
-@@ -123,12 +123,12 @@ pub fn module(ts: TokenStream) -> TokenStream {
- /// used on the Rust side, it should not be possible to call the default
- /// implementation. This is done to ensure that we call the vtable methods
- /// through the C vtable, and not through the Rust vtable. Therefore, the
--/// default implementation should call `kernel::build_error!`, which prevents
-+/// default implementation should call `build_error!`, which prevents
- /// calls to this function at compile time:
- ///
- /// ```compile_fail
- /// # // Intentionally missing `use`s to simplify `rusttest`.
--/// kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+/// build_error!(VTABLE_DEFAULT_ERROR)
- /// ```
- ///
- /// Note that you might need to import [`kernel::error::VTABLE_DEFAULT_ERROR`].
-@@ -145,11 +145,11 @@ pub fn module(ts: TokenStream) -> TokenStream {
- /// #[vtable]
- /// pub trait Operations: Send + Sync + Sized {
- ///     fn foo(&self) -> Result<()> {
--///         kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+///         build_error!(VTABLE_DEFAULT_ERROR)
- ///     }
- ///
- ///     fn bar(&self) -> Result<()> {
--///         kernel::build_error!(VTABLE_DEFAULT_ERROR)
-+///         build_error!(VTABLE_DEFAULT_ERROR)
- ///     }
- /// }
- ///
--- 
-2.47.0
-
+>        blk_mq_submit_bio+0x7ca/0x24c0 block/blk-mq.c:3092
+>        __submit_bio+0x384/0x540 block/blk-core.c:629
+>        __submit_bio_noacct_mq block/blk-core.c:710 [inline]
+>        submit_bio_noacct_nocheck+0x698/0xd70 block/blk-core.c:739
+>        submit_bio_noacct+0x93a/0x1e20 block/blk-core.c:868
+>        swap_writepage_bdev_async mm/page_io.c:449 [inline]
+>        __swap_writepage+0x3a3/0xf50 mm/page_io.c:472
+>        swap_writepage+0x403/0x1040 mm/page_io.c:288
+>        pageout+0x3b2/0xaa0 mm/vmscan.c:689
+>        shrink_folio_list+0x3025/0x42d0 mm/vmscan.c:1367
+>        evict_folios+0x6d6/0x1970 mm/vmscan.c:4589
+>        try_to_shrink_lruvec+0x612/0x9b0 mm/vmscan.c:4784
+>        shrink_one+0x3e3/0x7b0 mm/vmscan.c:4822
+>        shrink_many mm/vmscan.c:4885 [inline]
+>        lru_gen_shrink_node mm/vmscan.c:4963 [inline]
+>        shrink_node+0xbbc/0x3ed0 mm/vmscan.c:5943
+>        kswapd_shrink_node mm/vmscan.c:6771 [inline]
+>        balance_pgdat+0xc1f/0x18f0 mm/vmscan.c:6963
+>        kswapd+0x5f8/0xc30 mm/vmscan.c:7232
+>        kthread+0x2c1/0x3a0 kernel/kthread.c:389
+>        ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+>        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> 
+> other info that might help us debug this:
+> 
+>  Possible unsafe locking scenario:
+> 
+>        CPU0                    CPU1
+>        ----                    ----
+>   lock(fs_reclaim);
+>                                lock(&q->q_usage_counter(io)#68);
+>                                lock(fs_reclaim);
+>   rlock(&q->q_usage_counter(io)#68);
+> 
+>  *** DEADLOCK ***
