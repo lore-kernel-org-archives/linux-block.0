@@ -1,649 +1,424 @@
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767CD2500BA
-	for <linux-block@vger.kernel.org>; Sun, 24 Nov 2024 21:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD88614F9F7
+	for <linux-block@vger.kernel.org>; Sun, 24 Nov 2024 23:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732484845; cv=none; b=Vxe3xAzHy9aCSw8yeV2DtwbA0Pl1Re/XbHDE1X7LXQA0mpcvr+XQhg51EKPxdQkDpd4Oo84tSFq6UVetiA9WD6vVko6zEAJ1uVyGnKiFcg5Q/SF2RmDwFZjmzflfan2NgTJdSBi78sdjZOwXFs+Hr2rgQ/ik4FOYdhR61enTIGs=
+	t=1732490000; cv=none; b=ddfYSUr5TiVSyim2uThAMUNwa0nh7b2kTeAnpOnvRg8yg60l5/mULJgTw9kdTfCA5TS2N9QoI+XBzM99/OJLOIJigGU0PPd7Zmt2B8NHODhtZv0TSEBcyRpbwLm9MyOtAF9SeNPTF7eS0LrvyDqR/mpKqMVuf3n7qQpJsF5eFr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732484845; c=relaxed/simple;
-	bh=KsAK9rs9Xbh42LL2LV2GYZ8OYISsWgvODdAH6QK1ADI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bMjPCbv8lEFovdO0RjWyYJlfbi14BItpGuuc7JKev859FYRZk2Jw3WNYTMKyNAP0nAl+FrnWIwbNcAu1tIV1UbDFR3/r4aVv8SOSjodIMveekJXRaTg1lcEZmfqU/Hp1vqRqyi7y1CBJiytjZBuZadmVVH6cEHr4EG1+4pM1w4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S13uqz2x; arc=none smtp.client-ip=209.85.217.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S13uqz2x"
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-4af1578d288so178284137.3
-        for <linux-block@vger.kernel.org>; Sun, 24 Nov 2024 13:47:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732484842; x=1733089642; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Eu0TB/V7oqFEe+lDchGLszfbJsxC0JpZQV7RTnBmzBc=;
-        b=S13uqz2xAWQSvVfwoMCjq+Oj3owNZDWI1/hOFE2kyc3bddjO/b8X7itf2+vep/LWwO
-         Ft2RQFmyqS5W50tInSbpNgxbswpd5ntJ9pc54OgPeyNu+SN726y/ozajE/yuAoAAE+oR
-         NY7/01Od1On+e+yzhGx9/8aMAmrASFf0BhECtAz1DAVccVJGaRbi7z9+CX6P2Mt82/QO
-         tDhNwIUTD+QZxtybl58XeTgQ1nvIvDbS5fr9VY3FecptaA/EjZ7Hd2JTA0NgywH150p0
-         KWqQfqpB3MBYl8NoB08tEGYMBV7XVNzCoxZJzGk0mneDrAwURSgw8fOEpbdsxToq1WiW
-         IYpA==
+	s=arc-20240116; t=1732490000; c=relaxed/simple;
+	bh=9531LjBZV1Xv0wsbzbNx6HGuw1jKS8W0+M26/EFREIg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Zi5qmk1tJf1rrQVE7tDEUJZvZuBxi8XPah1a54jt1vzkgFs6aRQ/z2VE46Rsc/ePX29rNx4GREaMxE+1mShpL5VySwbtrJYIVEUWU/UVgBDya/XuF5qEOBP6oWVWgshWFYMtDCgtJ19QHJjjzQmuQqyQC6MBP8cbUwaUkmOhZyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a77a0ca771so27430315ab.0
+        for <linux-block@vger.kernel.org>; Sun, 24 Nov 2024 15:13:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732484842; x=1733089642;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Eu0TB/V7oqFEe+lDchGLszfbJsxC0JpZQV7RTnBmzBc=;
-        b=M66MSNzV8ELTozfcL0tkpLqu/oyG2kWIMTP7gzQbgWkHCnX5IOulk2bG2mzbRAPz/t
-         9H/3bvBsLb7XKBh5j/ZlTu+n74KafRSovrVKG7kRvPKw3Tz7umbGOQr0elMIfzThCXWl
-         RKsBoRBWcVMc1vXDECrVMu0ZHzqdveMmW2A+JBSUohbmd5jwkdvT7jjhNmQimKeXv0xJ
-         m0nQYZS6z3FKPGBvflCvidsvy5SGH/bcr0gR+/ztDbYQXaIHsTtrX5yutErq7h1KpopW
-         1Rgl0JVHKCGzzY9Rw8E1CsB0Uwf2VpVYTpIOjVYNpyijQC8GyFtSuWKaN/HVWFqWyc4K
-         fyRA==
-X-Forwarded-Encrypted: i=1; AJvYcCUdT4iMor3bYwNt+SNsk8coNUGO4VzIrM43bKufdmqGlEeF0aTaarS/4n4bZ4AjJCMV+rPcbWPUd+QsjQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1c+vdq+VMr+1mpYEwkhOROlLuljqRC15MuS9unRL9cs6UrbQD
-	Bx1RBKHwsZsS90Ivu/wZazial7ctWt+rKOJjtTi1eboJe2xmGXBsqb05eB8aEaR8mnyl5yAUHNB
-	2a58YIVgZySSa2xrwwTlNRZ0Qbyg=
-X-Gm-Gg: ASbGncuW+o9hXviUNdnttsrcMuEQOKRLWiH9M/4reHBAKjaMbilVNnw725/bibC5MBK
-	0J3Lpwxbn/+nHyS1crYpe2yTtkvFYjpH6ckShPedOi7fKPoSKaET33/IoWpj/++YPgA==
-X-Google-Smtp-Source: AGHT+IEPN2NNNSrJpEn/f5lFWsbUf0DODZzY9QjggEOm3fcnwsgl+2tZVf7A+UwS/bHkvIWRhU7NgPSQ0dbUrlAqqEQ=
-X-Received: by 2002:a05:6102:358c:b0:4a4:781f:167e with SMTP id
- ada2fe7eead31-4addcc83b71mr10928936137.16.1732484842183; Sun, 24 Nov 2024
- 13:47:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732489998; x=1733094798;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aIp1r+MfuM69bclMjMD0bqrhiNUlLBDaI+hfxS56xEg=;
+        b=Ad1csSIkpIScv1Kg+AHecVfJ1E0ElbCdmZQjzz231zBjq/mUSw77Zdd+VYLujGKehw
+         e2hk7BMyQO/8xL8vc4DtRZ/7uFsvKrnqnH397oZvWAEvwAiKY7c2NeyDTTdWlT7p3pVY
+         1mgSw9f2OthZUuJFmbTvjpcRz1+1NAo5YeINdcSeTrZrFOZ2SfkpoKRDn92/Rkb+sUAv
+         eEXQf0+OD8MLn9QBTnb4Wmy3IUUYTx4eIDvmwXmfHPyWeq5UsRQylcReI67SBK5m8GAK
+         gpU+mI5E7w51LDiUTzyRcDYJEcMEVK0zY1RavtDZI+DaRDwZCaOXA0ZnCcSLNRPhNa8r
+         UMrw==
+X-Forwarded-Encrypted: i=1; AJvYcCUO3sMIbVc4OqmoIVYYR4ops+4JycToGQm3pQzMIUD9Fh5fUolCCTEv3xtT/XwTybcejGZ5NOrg7SEOPQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YytGNtstMhQna462bR+7ex17PZv/MQ6E0I0lei1bQ5V6pyl6CvB
+	o97chtA3DL4EG/ZPIQf4ARrJmzvPa9Md9dq4R6ijE/WIJlyNKlL0/J5ROjx3wU6B3NzejNe6kSD
+	168rU33eil/chz/0D0YQJ+YF2Q+VmzFDg5JX7adztIWv+esyhcS5VQL0=
+X-Google-Smtp-Source: AGHT+IGyC0PK5gs0d5ShK/KKN68y1WnlJ8S3Qm4QaVjqam5JOR6NlReBhTWXCtWOaYIZbVZuOc9KBjdXgzc5JhhYTGQFdHL179cc
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241121222521.83458-1-21cnbao@gmail.com> <20241121222521.83458-5-21cnbao@gmail.com>
- <24f7d8a0-ab92-4544-91dd-5241062aad23@gmail.com>
-In-Reply-To: <24f7d8a0-ab92-4544-91dd-5241062aad23@gmail.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Mon, 25 Nov 2024 10:47:11 +1300
-Message-ID: <CAGsJ_4wL=CgXdCt+2QC+aSKPh1873QyD_4ZkRSBniUipKX9AVA@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 4/4] mm: fall back to four small folios if mTHP
- allocation fails
-To: Usama Arif <usamaarif642@gmail.com>
-Cc: akpm@linux-foundation.org, linux-mm@kvack.org, axboe@kernel.dk, 
-	bala.seshasayee@linux.intel.com, chrisl@kernel.org, david@redhat.com, 
-	hannes@cmpxchg.org, kanchana.p.sridhar@intel.com, kasong@tencent.com, 
-	linux-block@vger.kernel.org, minchan@kernel.org, nphamcs@gmail.com, 
-	ryan.roberts@arm.com, senozhatsky@chromium.org, surenb@google.com, 
-	terrelln@fb.com, v-songbaohua@oppo.com, wajdi.k.feghali@intel.com, 
-	willy@infradead.org, ying.huang@intel.com, yosryahmed@google.com, 
-	yuzhao@google.com, zhengtangquan@oppo.com, zhouchengming@bytedance.com, 
-	Chuanhua Han <chuanhuahan@gmail.com>
+X-Received: by 2002:a05:6e02:1a03:b0:3a7:81a4:a557 with SMTP id
+ e9e14a558f8ab-3a79afd9ab5mr110281855ab.24.1732489997917; Sun, 24 Nov 2024
+ 15:13:17 -0800 (PST)
+Date: Sun, 24 Nov 2024 15:13:17 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6743b30d.050a0220.1cc393.004e.GAE@google.com>
+Subject: [syzbot] [block?] possible deadlock in blk_mq_update_nr_hw_queues
+From: syzbot <syzbot+6279b273d888c2017726@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 23, 2024 at 3:54=E2=80=AFAM Usama Arif <usamaarif642@gmail.com>=
- wrote:
->
->
->
-> On 21/11/2024 22:25, Barry Song wrote:
-> > From: Barry Song <v-songbaohua@oppo.com>
-> >
-> > The swapfile can compress/decompress at 4 * PAGES granularity, reducing
-> > CPU usage and improving the compression ratio. However, if allocating a=
-n
-> > mTHP fails and we fall back to a single small folio, the entire large
-> > block must still be decompressed. This results in a 16 KiB area requiri=
-ng
-> > 4 page faults, where each fault decompresses 16 KiB but retrieves only
-> > 4 KiB of data from the block. To address this inefficiency, we instead
-> > fall back to 4 small folios, ensuring that each decompression occurs
-> > only once.
-> >
-> > Allowing swap_read_folio() to decompress and read into an array of
-> > 4 folios would be extremely complex, requiring extensive changes
-> > throughout the stack, including swap_read_folio, zeromap,
-> > zswap, and final swap implementations like zRAM. In contrast,
-> > having these components fill a large folio with 4 subpages is much
-> > simpler.
-> >
-> > To avoid a full-stack modification, we introduce a per-CPU order-2
-> > large folio as a buffer. This buffer is used for swap_read_folio(),
-> > after which the data is copied into the 4 small folios. Finally, in
-> > do_swap_page(), all these small folios are mapped.
-> >
-> > Co-developed-by: Chuanhua Han <chuanhuahan@gmail.com>
-> > Signed-off-by: Chuanhua Han <chuanhuahan@gmail.com>
-> > Signed-off-by: Barry Song <v-songbaohua@oppo.com>
-> > ---
-> >  mm/memory.c | 203 +++++++++++++++++++++++++++++++++++++++++++++++++---
-> >  1 file changed, 192 insertions(+), 11 deletions(-)
-> >
-> > diff --git a/mm/memory.c b/mm/memory.c
-> > index 209885a4134f..e551570c1425 100644
-> > --- a/mm/memory.c
-> > +++ b/mm/memory.c
-> > @@ -4042,6 +4042,15 @@ static struct folio *__alloc_swap_folio(struct v=
-m_fault *vmf)
-> >       return folio;
-> >  }
-> >
-> > +#define BATCH_SWPIN_ORDER 2
->
-> Hi Barry,
->
-> Thanks for the series and the numbers in the cover letter.
->
-> Just a few things.
->
-> Should BATCH_SWPIN_ORDER be ZSMALLOC_MULTI_PAGES_ORDER instead of 2?
+Hello,
 
-Technically, yes. I'm also considering removing ZSMALLOC_MULTI_PAGES_ORDER
-and always setting it to 2, which is the minimum anonymous mTHP order.  The=
- main
-reason is that it may be difficult for users to select the appropriate Kcon=
-fig?
+syzbot found the following issue on:
 
-On the other hand, 16KB provides the most advantages for zstd compression a=
-nd
-decompression with larger blocks. While increasing from 16KB to 32KB or 64K=
-B
-can offer additional benefits, the improvement is not as significant
-as the jump from
-4KB to 16KB.
+HEAD commit:    06afb0f36106 Merge tag 'trace-v6.13' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=168001c0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=95b76860fd16c857
+dashboard link: https://syzkaller.appspot.com/bug?extid=6279b273d888c2017726
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-As I use zstd to compress and decompress the 'Beyond Compare' software
-package:
+Unfortunately, I don't have any reproducer for this issue yet.
 
-root@barry-desktop:~# ./zstd
-File size: 182502912 bytes
-4KB Block: Compression time =3D 0.765915 seconds, Decompression time =3D
-0.203366 seconds
-  Original size: 182502912 bytes
-  Compressed size: 66089193 bytes
-  Compression ratio: 36.21%
-16KB Block: Compression time =3D 0.558595 seconds, Decompression time =3D
-0.153837 seconds
-  Original size: 182502912 bytes
-  Compressed size: 59159073 bytes
-  Compression ratio: 32.42%
-32KB Block: Compression time =3D 0.538106 seconds, Decompression time =3D
-0.137768 seconds
-  Original size: 182502912 bytes
-  Compressed size: 57958701 bytes
-  Compression ratio: 31.76%
-64KB Block: Compression time =3D 0.532212 seconds, Decompression time =3D
-0.127592 seconds
-  Original size: 182502912 bytes
-  Compressed size: 56700795 bytes
-  Compression ratio: 31.07%
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/112cedff0255/disk-06afb0f3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f65020d28328/vmlinux-06afb0f3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4fb4cb7df5b1/bzImage-06afb0f3.xz
 
-In that case, would we no longer need to rely on ZSMALLOC_MULTI_PAGES_ORDER=
-?
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6279b273d888c2017726@syzkaller.appspotmail.com
 
->
-> Did you check the performance difference with and without patch 4?
+======================================================
+WARNING: possible circular locking dependency detected
+6.12.0-syzkaller-07834-g06afb0f36106 #0 Not tainted
+------------------------------------------------------
+syz.2.2220/13838 is trying to acquire lock:
+ffff8880257485d8 (&q->sysfs_lock){+.+.}-{4:4}, at: blk_mq_elv_switch_none block/blk-mq.c:4847 [inline]
+ffff8880257485d8 (&q->sysfs_lock){+.+.}-{4:4}, at: __blk_mq_update_nr_hw_queues block/blk-mq.c:4925 [inline]
+ffff8880257485d8 (&q->sysfs_lock){+.+.}-{4:4}, at: blk_mq_update_nr_hw_queues+0x3fa/0x1ae0 block/blk-mq.c:4985
 
-I retested after reverting patch 4, and the sys time increased to over
-40 minutes
-again, though it was slightly better than without the entire series.
+but task is already holding lock:
+ffff8880257480a8 (&q->q_usage_counter(io)#51){++++}-{0:0}, at: nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
 
-*** Executing round 1 ***
-
-real 7m49.342s
-user 80m53.675s
-sys 42m28.393s
-pswpin: 29965548
-pswpout: 51127359
-64kB-swpout: 0
-32kB-swpout: 0
-16kB-swpout: 11347712
-64kB-swpin: 0
-32kB-swpin: 0
-16kB-swpin: 6641230
-pgpgin: 147376000
-pgpgout: 213343124
-
-*** Executing round 2 ***
-
-real 7m41.331s
-user 81m16.631s
-sys 41m39.845s
-pswpin: 29208867
-pswpout: 50006026
-64kB-swpout: 0
-32kB-swpout: 0
-16kB-swpout: 11104912
-64kB-swpin: 0
-32kB-swpin: 0
-16kB-swpin: 6483827
-pgpgin: 144057340
-pgpgout: 208887688
+which lock already depends on the new lock.
 
 
-*** Executing round 3 ***
+the existing dependency chain (in reverse order) is:
 
-real 7m47.280s
-user 78m36.767s
-sys 37m32.210s
-pswpin: 26426526
-pswpout: 45420734
-64kB-swpout: 0
-32kB-swpout: 0
-16kB-swpout: 10104304
-64kB-swpin: 0
-32kB-swpin: 0
-16kB-swpin: 5884839
-pgpgin: 132013648
-pgpgout: 190537264
+-> #7 (&q->q_usage_counter(io)#51){++++}-{0:0}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+       bio_queue_enter block/blk.h:75 [inline]
+       blk_mq_submit_bio+0x1536/0x23a0 block/blk-mq.c:3092
+       __submit_bio+0x2c6/0x560 block/blk-core.c:629
+       __submit_bio_noacct_mq block/blk-core.c:710 [inline]
+       submit_bio_noacct_nocheck+0x4d3/0xe30 block/blk-core.c:739
+       submit_bh fs/buffer.c:2824 [inline]
+       block_read_full_folio+0x93b/0xcd0 fs/buffer.c:2451
+       filemap_read_folio+0x14d/0x630 mm/filemap.c:2367
+       filemap_update_page mm/filemap.c:2451 [inline]
+       filemap_get_pages+0x17af/0x2540 mm/filemap.c:2572
+       filemap_read+0x45c/0xf50 mm/filemap.c:2647
+       blkdev_read_iter+0x2d8/0x430 block/fops.c:767
+       new_sync_read fs/read_write.c:484 [inline]
+       vfs_read+0x993/0xb70 fs/read_write.c:565
+       ksys_read+0x18f/0x2b0 fs/read_write.c:708
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-*** Executing round 4 ***
+-> #6 (mapping.invalidate_lock#2){++++}-{4:4}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+       down_read+0xb1/0xa40 kernel/locking/rwsem.c:1524
+       filemap_invalidate_lock_shared include/linux/fs.h:873 [inline]
+       filemap_fault+0xd54/0x1950 mm/filemap.c:3352
+       __do_fault+0x137/0x460 mm/memory.c:4882
+       do_read_fault mm/memory.c:5297 [inline]
+       do_fault mm/memory.c:5431 [inline]
+       do_pte_missing mm/memory.c:3965 [inline]
+       handle_pte_fault+0x2d1c/0x6820 mm/memory.c:5766
+       __handle_mm_fault mm/memory.c:5909 [inline]
+       handle_mm_fault+0x1106/0x1bb0 mm/memory.c:6077
+       faultin_page mm/gup.c:1187 [inline]
+       __get_user_pages+0x1c82/0x49e0 mm/gup.c:1485
+       populate_vma_page_range+0x264/0x330 mm/gup.c:1923
+       __mm_populate+0x27a/0x460 mm/gup.c:2026
+       do_mlock+0x61f/0x7e0 mm/mlock.c:653
+       __do_sys_mlock mm/mlock.c:661 [inline]
+       __se_sys_mlock mm/mlock.c:659 [inline]
+       __x64_sys_mlock+0x60/0x70 mm/mlock.c:659
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-real 7m56.723s
-user 80m36.837s
-sys 41m35.979s
-pswpin: 29367639
-pswpout: 50059254
-64kB-swpout: 0
-32kB-swpout: 0
-16kB-swpout: 11116176
-64kB-swpin: 0
-32kB-swpin: 0
-16kB-swpin: 6514064
-pgpgin: 144593828
-pgpgout: 209080468
+-> #5 (&mm->mmap_lock){++++}-{4:4}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+       __might_fault+0xc6/0x120 mm/memory.c:6716
+       _copy_from_iter+0x114/0x1e70 lib/iov_iter.c:259
+       copy_from_iter include/linux/uio.h:219 [inline]
+       copy_from_iter_full include/linux/uio.h:236 [inline]
+       skb_do_copy_data_nocache include/net/sock.h:2187 [inline]
+       skb_copy_to_page_nocache include/net/sock.h:2213 [inline]
+       tcp_sendmsg_locked+0x18a5/0x4f30 net/ipv4/tcp.c:1222
+       tcp_sendmsg+0x30/0x50 net/ipv4/tcp.c:1358
+       sock_sendmsg_nosec net/socket.c:711 [inline]
+       __sock_sendmsg+0x1a6/0x270 net/socket.c:726
+       sock_write_iter+0x2d7/0x3f0 net/socket.c:1147
+       new_sync_write fs/read_write.c:586 [inline]
+       vfs_write+0xaed/0xd30 fs/read_write.c:679
+       ksys_write+0x18f/0x2b0 fs/read_write.c:731
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-*** Executing round 5 ***
+-> #4 (sk_lock-AF_INET){+.+.}-{0:0}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+       lock_sock_nested+0x48/0x100 net/core/sock.c:3622
+       lock_sock include/net/sock.h:1617 [inline]
+       inet_autobind net/ipv4/af_inet.c:178 [inline]
+       inet_send_prepare net/ipv4/af_inet.c:837 [inline]
+       inet_sendmsg+0x120/0x390 net/ipv4/af_inet.c:848
+       sock_sendmsg_nosec net/socket.c:711 [inline]
+       __sock_sendmsg+0x1a6/0x270 net/socket.c:726
+       sock_sendmsg+0x134/0x200 net/socket.c:749
+       __sock_xmit+0x219/0x4e0 drivers/block/nbd.c:577
+       sock_xmit drivers/block/nbd.c:605 [inline]
+       nbd_send_cmd drivers/block/nbd.c:691 [inline]
+       nbd_handle_cmd drivers/block/nbd.c:1113 [inline]
+       nbd_queue_rq+0x163c/0x2f30 drivers/block/nbd.c:1143
+       blk_mq_dispatch_rq_list+0xad5/0x19d0 block/blk-mq.c:2120
+       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:170 [inline]
+       blk_mq_do_dispatch_sched block/blk-mq-sched.c:184 [inline]
+       __blk_mq_sched_dispatch_requests+0xb8a/0x1840 block/blk-mq-sched.c:309
+       blk_mq_sched_dispatch_requests+0xd6/0x190 block/blk-mq-sched.c:331
+       blk_mq_run_hw_queue+0x354/0x500 block/blk-mq.c:2354
+       blk_mq_flush_plug_list+0x118e/0x1870 block/blk-mq.c:2915
+       __blk_flush_plug+0x420/0x500 block/blk-core.c:1213
+       blk_finish_plug block/blk-core.c:1240 [inline]
+       __submit_bio+0x46a/0x560 block/blk-core.c:637
+       __submit_bio_noacct_mq block/blk-core.c:710 [inline]
+       submit_bio_noacct_nocheck+0x4d3/0xe30 block/blk-core.c:739
+       submit_bh fs/buffer.c:2824 [inline]
+       block_read_full_folio+0x93b/0xcd0 fs/buffer.c:2451
+       filemap_read_folio+0x14d/0x630 mm/filemap.c:2367
+       do_read_cache_folio+0x3f5/0x850 mm/filemap.c:3827
+       read_mapping_folio include/linux/pagemap.h:1011 [inline]
+       read_part_sector+0xb3/0x330 block/partitions/core.c:722
+       adfspart_check_ICS+0xd9/0x9a0 block/partitions/acorn.c:360
+       check_partition block/partitions/core.c:141 [inline]
+       blk_add_partitions block/partitions/core.c:589 [inline]
+       bdev_disk_changed+0x72e/0x13f0 block/partitions/core.c:693
+       blkdev_get_whole+0x2d2/0x450 block/bdev.c:707
+       bdev_open+0x2d4/0xc50 block/bdev.c:916
+       blkdev_open+0x389/0x4f0 block/fops.c:627
+       do_dentry_open+0xbe3/0x1b70 fs/open.c:945
+       vfs_open+0x3e/0x330 fs/open.c:1075
+       do_open fs/namei.c:3828 [inline]
+       path_openat+0x2c84/0x3590 fs/namei.c:3987
+       do_filp_open+0x27f/0x4e0 fs/namei.c:4014
+       do_sys_openat2+0x13e/0x1d0 fs/open.c:1402
+       do_sys_open fs/open.c:1417 [inline]
+       __do_sys_openat fs/open.c:1433 [inline]
+       __se_sys_openat fs/open.c:1428 [inline]
+       __x64_sys_openat+0x247/0x2a0 fs/open.c:1428
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-real 7m53.806s
-user 80m30.953s
-sys 40m14.870s
-pswpin: 28091760
-pswpout: 48495748
-64kB-swpout: 0
-32kB-swpout: 0
-16kB-swpout: 10779720
-64kB-swpin: 0
-32kB-swpin: 0
-16kB-swpin: 6244819
-pgpgin: 138813124
-pgpgout: 202885480
+-> #3 (&nsock->tx_lock){+.+.}-{4:4}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+       __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
+       nbd_handle_cmd drivers/block/nbd.c:1079 [inline]
+       nbd_queue_rq+0x29c/0x2f30 drivers/block/nbd.c:1143
+       blk_mq_dispatch_rq_list+0xad5/0x19d0 block/blk-mq.c:2120
+       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:170 [inline]
+       blk_mq_do_dispatch_sched block/blk-mq-sched.c:184 [inline]
+       __blk_mq_sched_dispatch_requests+0xb8a/0x1840 block/blk-mq-sched.c:309
+       blk_mq_sched_dispatch_requests+0xd6/0x190 block/blk-mq-sched.c:331
+       blk_mq_run_hw_queue+0x354/0x500 block/blk-mq.c:2354
+       blk_mq_flush_plug_list+0x118e/0x1870 block/blk-mq.c:2915
+       __blk_flush_plug+0x420/0x500 block/blk-core.c:1213
+       blk_finish_plug block/blk-core.c:1240 [inline]
+       __submit_bio+0x46a/0x560 block/blk-core.c:637
+       __submit_bio_noacct_mq block/blk-core.c:710 [inline]
+       submit_bio_noacct_nocheck+0x4d3/0xe30 block/blk-core.c:739
+       submit_bh fs/buffer.c:2824 [inline]
+       block_read_full_folio+0x93b/0xcd0 fs/buffer.c:2451
+       filemap_read_folio+0x14d/0x630 mm/filemap.c:2367
+       do_read_cache_folio+0x3f5/0x850 mm/filemap.c:3827
+       read_mapping_folio include/linux/pagemap.h:1011 [inline]
+       read_part_sector+0xb3/0x330 block/partitions/core.c:722
+       adfspart_check_ICS+0xd9/0x9a0 block/partitions/acorn.c:360
+       check_partition block/partitions/core.c:141 [inline]
+       blk_add_partitions block/partitions/core.c:589 [inline]
+       bdev_disk_changed+0x72e/0x13f0 block/partitions/core.c:693
+       blkdev_get_whole+0x2d2/0x450 block/bdev.c:707
+       bdev_open+0x2d4/0xc50 block/bdev.c:916
+       blkdev_open+0x389/0x4f0 block/fops.c:627
+       do_dentry_open+0xbe3/0x1b70 fs/open.c:945
+       vfs_open+0x3e/0x330 fs/open.c:1075
+       do_open fs/namei.c:3828 [inline]
+       path_openat+0x2c84/0x3590 fs/namei.c:3987
+       do_filp_open+0x27f/0x4e0 fs/namei.c:4014
+       do_sys_openat2+0x13e/0x1d0 fs/open.c:1402
+       do_sys_open fs/open.c:1417 [inline]
+       __do_sys_openat fs/open.c:1433 [inline]
+       __se_sys_openat fs/open.c:1428 [inline]
+       __x64_sys_openat+0x247/0x2a0 fs/open.c:1428
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-I guess it is due to the occurrence of numerous partial reads
-(about 10%, 3505537/35159852).
+-> #2 (&cmd->lock){+.+.}-{4:4}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+       __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
+       nbd_queue_rq+0xfe/0x2f30 drivers/block/nbd.c:1135
+       blk_mq_dispatch_rq_list+0xad5/0x19d0 block/blk-mq.c:2120
+       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:170 [inline]
+       blk_mq_do_dispatch_sched block/blk-mq-sched.c:184 [inline]
+       __blk_mq_sched_dispatch_requests+0xb8a/0x1840 block/blk-mq-sched.c:309
+       blk_mq_sched_dispatch_requests+0xd6/0x190 block/blk-mq-sched.c:331
+       blk_mq_run_hw_queue+0x354/0x500 block/blk-mq.c:2354
+       blk_mq_flush_plug_list+0x118e/0x1870 block/blk-mq.c:2915
+       __blk_flush_plug+0x420/0x500 block/blk-core.c:1213
+       blk_finish_plug block/blk-core.c:1240 [inline]
+       __submit_bio+0x46a/0x560 block/blk-core.c:637
+       __submit_bio_noacct_mq block/blk-core.c:710 [inline]
+       submit_bio_noacct_nocheck+0x4d3/0xe30 block/blk-core.c:739
+       submit_bh fs/buffer.c:2824 [inline]
+       block_read_full_folio+0x93b/0xcd0 fs/buffer.c:2451
+       filemap_read_folio+0x14d/0x630 mm/filemap.c:2367
+       do_read_cache_folio+0x3f5/0x850 mm/filemap.c:3827
+       read_mapping_folio include/linux/pagemap.h:1011 [inline]
+       read_part_sector+0xb3/0x330 block/partitions/core.c:722
+       adfspart_check_ICS+0xd9/0x9a0 block/partitions/acorn.c:360
+       check_partition block/partitions/core.c:141 [inline]
+       blk_add_partitions block/partitions/core.c:589 [inline]
+       bdev_disk_changed+0x72e/0x13f0 block/partitions/core.c:693
+       blkdev_get_whole+0x2d2/0x450 block/bdev.c:707
+       bdev_open+0x2d4/0xc50 block/bdev.c:916
+       blkdev_open+0x389/0x4f0 block/fops.c:627
+       do_dentry_open+0xbe3/0x1b70 fs/open.c:945
+       vfs_open+0x3e/0x330 fs/open.c:1075
+       do_open fs/namei.c:3828 [inline]
+       path_openat+0x2c84/0x3590 fs/namei.c:3987
+       do_filp_open+0x27f/0x4e0 fs/namei.c:4014
+       do_sys_openat2+0x13e/0x1d0 fs/open.c:1402
+       do_sys_open fs/open.c:1417 [inline]
+       __do_sys_openat fs/open.c:1433 [inline]
+       __se_sys_openat fs/open.c:1428 [inline]
+       __x64_sys_openat+0x247/0x2a0 fs/open.c:1428
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-root@barry-desktop:~# cat /sys/block/zram0/multi_pages_debug_stat
+-> #1 (set->srcu){.+.+}-{0:0}:
+       lock_sync+0x18b/0x310 kernel/locking/lockdep.c:5897
+       srcu_lock_sync include/linux/srcu.h:170 [inline]
+       __synchronize_srcu+0xb1/0x400 kernel/rcu/srcutree.c:1418
+       elevator_disable+0x8c/0x3f0 block/elevator.c:671
+       blk_mq_elv_switch_none block/blk-mq.c:4861 [inline]
+       __blk_mq_update_nr_hw_queues block/blk-mq.c:4925 [inline]
+       blk_mq_update_nr_hw_queues+0x646/0x1ae0 block/blk-mq.c:4985
+       nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
+       nbd_start_device_ioctl drivers/block/nbd.c:1464 [inline]
+       __nbd_ioctl drivers/block/nbd.c:1539 [inline]
+       nbd_ioctl+0x5dc/0xf40 drivers/block/nbd.c:1579
+       blkdev_ioctl+0x57f/0x6a0 block/ioctl.c:693
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:906 [inline]
+       __se_sys_ioctl+0xf7/0x170 fs/ioctl.c:892
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-zram_bio write/read multi_pages count:54452828 35159852
-zram_bio failed write/read multi_pages count       0        0
-zram_bio partial write/read multi_pages count       4  3505537
-multi_pages_miss_free        0
+-> #0 (&q->sysfs_lock){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3161 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3280 [inline]
+       validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
+       __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+       __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
+       blk_mq_elv_switch_none block/blk-mq.c:4847 [inline]
+       __blk_mq_update_nr_hw_queues block/blk-mq.c:4925 [inline]
+       blk_mq_update_nr_hw_queues+0x3fa/0x1ae0 block/blk-mq.c:4985
+       nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
+       nbd_start_device_ioctl drivers/block/nbd.c:1464 [inline]
+       __nbd_ioctl drivers/block/nbd.c:1539 [inline]
+       nbd_ioctl+0x5dc/0xf40 drivers/block/nbd.c:1579
+       blkdev_ioctl+0x57f/0x6a0 block/ioctl.c:693
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:906 [inline]
+       __se_sys_ioctl+0xf7/0x170 fs/ioctl.c:892
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-This workload doesn't cause fragmentation in the buddy allocator, so it=E2=
-=80=99s
-likely due to the failure of MEMCG_CHARGE.
+other info that might help us debug this:
 
->
-> I know that it wont help if you have a lot of unmovable pages
-> scattered everywhere, but were you able to compare the performance
-> of defrag=3Dalways vs patch 4? I feel like if you have space for 4 folios
-> then hopefully compaction should be able to do its job and you can
-> directly fill the large folio if the unmovable pages are better placed.
-> Johannes' series on preventing type mixing [1] would help.
->
-> [1] https://lore.kernel.org/all/20240320180429.678181-1-hannes@cmpxchg.or=
-g/
+Chain exists of:
+  &q->sysfs_lock --> mapping.invalidate_lock#2 --> &q->q_usage_counter(io)#51
 
-I believe this could help, but defragmentation is a complex issue. Especial=
-ly on
-phones, where various components like drivers, DMA-BUF, multimedia, and
-graphics utilize memory.
+ Possible unsafe locking scenario:
 
-We observed that a fresh system could initially provide mTHP, but after a f=
-ew
-hours, obtaining mTHP became very challenging. I'm happy to arrange a test
-of Johannes' series on phones (sometimes it is quite hard to backport to th=
-e
-Android kernel) to see if it brings any improvements.
+       CPU0                    CPU1
+       ----                    ----
+  lock(&q->q_usage_counter(io)#51);
+                               lock(mapping.invalidate_lock#2);
+                               lock(&q->q_usage_counter(io)#51);
+  lock(&q->sysfs_lock);
 
->
-> Thanks,
-> Usama
->
-> > +#define BATCH_SWPIN_COUNT (1 << BATCH_SWPIN_ORDER)
-> > +#define BATCH_SWPIN_SIZE (PAGE_SIZE << BATCH_SWPIN_ORDER)
-> > +
-> > +struct batch_swpin_buffer {
-> > +     struct folio *folio;
-> > +     struct mutex mutex;
-> > +};
-> > +
-> >  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
-> >  static inline int non_swapcache_batch(swp_entry_t entry, int max_nr)
-> >  {
-> > @@ -4120,7 +4129,101 @@ static inline unsigned long thp_swap_suitable_o=
-rders(pgoff_t swp_offset,
-> >       return orders;
-> >  }
-> >
-> > -static struct folio *alloc_swap_folio(struct vm_fault *vmf)
-> > +static DEFINE_PER_CPU(struct batch_swpin_buffer, swp_buf);
-> > +
-> > +static int __init batch_swpin_buffer_init(void)
-> > +{
-> > +     int ret, cpu;
-> > +     struct batch_swpin_buffer *buf;
-> > +
-> > +     for_each_possible_cpu(cpu) {
-> > +             buf =3D per_cpu_ptr(&swp_buf, cpu);
-> > +             buf->folio =3D (struct folio *)alloc_pages_node(cpu_to_no=
-de(cpu),
-> > +                             GFP_KERNEL | __GFP_COMP, BATCH_SWPIN_ORDE=
-R);
-> > +             if (!buf->folio) {
-> > +                     ret =3D -ENOMEM;
-> > +                     goto err;
-> > +             }
-> > +             mutex_init(&buf->mutex);
-> > +     }
-> > +     return 0;
-> > +
-> > +err:
-> > +     for_each_possible_cpu(cpu) {
-> > +             buf =3D per_cpu_ptr(&swp_buf, cpu);
-> > +             if (buf->folio) {
-> > +                     folio_put(buf->folio);
-> > +                     buf->folio =3D NULL;
-> > +             }
-> > +     }
-> > +     return ret;
-> > +}
-> > +core_initcall(batch_swpin_buffer_init);
-> > +
-> > +static struct folio *alloc_batched_swap_folios(struct vm_fault *vmf,
-> > +             struct batch_swpin_buffer **buf, struct folio **folios,
-> > +             swp_entry_t entry)
-> > +{
-> > +     unsigned long haddr =3D ALIGN_DOWN(vmf->address, BATCH_SWPIN_SIZE=
-);
-> > +     struct batch_swpin_buffer *sbuf =3D raw_cpu_ptr(&swp_buf);
-> > +     struct folio *folio =3D sbuf->folio;
-> > +     unsigned long addr;
-> > +     int i;
-> > +
-> > +     if (unlikely(!folio))
-> > +             return NULL;
-> > +
-> > +     for (i =3D 0; i < BATCH_SWPIN_COUNT; i++) {
-> > +             addr =3D haddr + i * PAGE_SIZE;
-> > +             folios[i] =3D vma_alloc_folio(GFP_HIGHUSER_MOVABLE, 0, vm=
-f->vma, addr);
-> > +             if (!folios[i])
-> > +                     goto err;
-> > +             if (mem_cgroup_swapin_charge_folio(folios[i], vmf->vma->v=
-m_mm,
-> > +                                     GFP_KERNEL, entry))
-> > +                     goto err;
-> > +     }
-> > +
-> > +     mutex_lock(&sbuf->mutex);
-> > +     *buf =3D sbuf;
-> > +#ifdef CONFIG_MEMCG
-> > +     folio->memcg_data =3D (*folios)->memcg_data;
-> > +#endif
-> > +     return folio;
-> > +
-> > +err:
-> > +     for (i--; i >=3D 0; i--)
-> > +             folio_put(folios[i]);
-> > +     return NULL;
-> > +}
-> > +
-> > +static void fill_batched_swap_folios(struct vm_fault *vmf,
-> > +             void *shadow, struct batch_swpin_buffer *buf,
-> > +             struct folio *folio, struct folio **folios)
-> > +{
-> > +     unsigned long haddr =3D ALIGN_DOWN(vmf->address, BATCH_SWPIN_SIZE=
-);
-> > +     unsigned long addr;
-> > +     int i;
-> > +
-> > +     for (i =3D 0; i < BATCH_SWPIN_COUNT; i++) {
-> > +             addr =3D haddr + i * PAGE_SIZE;
-> > +             __folio_set_locked(folios[i]);
-> > +             __folio_set_swapbacked(folios[i]);
-> > +             if (shadow)
-> > +                     workingset_refault(folios[i], shadow);
-> > +             folio_add_lru(folios[i]);
-> > +             copy_user_highpage(&folios[i]->page, folio_page(folio, i)=
-,
-> > +                             addr, vmf->vma);
-> > +             if (folio_test_uptodate(folio))
-> > +                     folio_mark_uptodate(folios[i]);
-> > +     }
-> > +
-> > +     folio->flags &=3D ~(PAGE_FLAGS_CHECK_AT_PREP & ~(1UL << PG_head))=
-;
-> > +     mutex_unlock(&buf->mutex);
-> > +}
-> > +
-> > +static struct folio *alloc_swap_folio(struct vm_fault *vmf,
-> > +             struct batch_swpin_buffer **buf,
-> > +             struct folio **folios)
-> >  {
-> >       struct vm_area_struct *vma =3D vmf->vma;
-> >       unsigned long orders;
-> > @@ -4180,6 +4283,9 @@ static struct folio *alloc_swap_folio(struct vm_f=
-ault *vmf)
-> >
-> >       pte_unmap_unlock(pte, ptl);
-> >
-> > +     if (!orders)
-> > +             goto fallback;
-> > +
-> >       /* Try allocating the highest of the remaining orders. */
-> >       gfp =3D vma_thp_gfp_mask(vma);
-> >       while (orders) {
-> > @@ -4194,14 +4300,29 @@ static struct folio *alloc_swap_folio(struct vm=
-_fault *vmf)
-> >               order =3D next_order(&orders, order);
-> >       }
-> >
-> > +     /*
-> > +      * During swap-out, a THP might have been compressed into multipl=
-e
-> > +      * order-2 blocks to optimize CPU usage and compression ratio.
-> > +      * Attempt to batch swap-in 4 smaller folios to ensure they are
-> > +      * decompressed together as a single unit only once.
-> > +      */
-> > +     return alloc_batched_swap_folios(vmf, buf, folios, entry);
-> > +
-> >  fallback:
-> >       return __alloc_swap_folio(vmf);
-> >  }
-> >  #else /* !CONFIG_TRANSPARENT_HUGEPAGE */
-> > -static struct folio *alloc_swap_folio(struct vm_fault *vmf)
-> > +static struct folio *alloc_swap_folio(struct vm_fault *vmf,
-> > +             struct batch_swpin_buffer **buf,
-> > +             struct folio **folios)
-> >  {
-> >       return __alloc_swap_folio(vmf);
-> >  }
-> > +static inline void fill_batched_swap_folios(struct vm_fault *vmf,
-> > +             void *shadow, struct batch_swpin_buffer *buf,
-> > +             struct folio *folio, struct folio **folios)
-> > +{
-> > +}
-> >  #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
-> >
-> >  static DECLARE_WAIT_QUEUE_HEAD(swapcache_wq);
-> > @@ -4216,6 +4337,8 @@ static DECLARE_WAIT_QUEUE_HEAD(swapcache_wq);
-> >   */
-> >  vm_fault_t do_swap_page(struct vm_fault *vmf)
-> >  {
-> > +     struct folio *folios[BATCH_SWPIN_COUNT] =3D { NULL };
-> > +     struct batch_swpin_buffer *buf =3D NULL;
-> >       struct vm_area_struct *vma =3D vmf->vma;
-> >       struct folio *swapcache, *folio =3D NULL;
-> >       DECLARE_WAITQUEUE(wait, current);
-> > @@ -4228,7 +4351,7 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
-> >       pte_t pte;
-> >       vm_fault_t ret =3D 0;
-> >       void *shadow =3D NULL;
-> > -     int nr_pages;
-> > +     int nr_pages, i;
-> >       unsigned long page_idx;
-> >       unsigned long address;
-> >       pte_t *ptep;
-> > @@ -4296,7 +4419,7 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
-> >               if (data_race(si->flags & SWP_SYNCHRONOUS_IO) &&
-> >                   __swap_count(entry) =3D=3D 1) {
-> >                       /* skip swapcache */
-> > -                     folio =3D alloc_swap_folio(vmf);
-> > +                     folio =3D alloc_swap_folio(vmf, &buf, folios);
-> >                       if (folio) {
-> >                               __folio_set_locked(folio);
-> >                               __folio_set_swapbacked(folio);
-> > @@ -4327,10 +4450,10 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
-> >                               mem_cgroup_swapin_uncharge_swap(entry, nr=
-_pages);
-> >
-> >                               shadow =3D get_shadow_from_swap_cache(ent=
-ry);
-> > -                             if (shadow)
-> > +                             if (shadow && !buf)
-> >                                       workingset_refault(folio, shadow)=
-;
-> > -
-> > -                             folio_add_lru(folio);
-> > +                             if (!buf)
-> > +                                     folio_add_lru(folio);
-> >
-> >                               /* To provide entry to swap_read_folio() =
-*/
-> >                               folio->swap =3D entry;
-> > @@ -4361,6 +4484,16 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
-> >               count_vm_event(PGMAJFAULT);
-> >               count_memcg_event_mm(vma->vm_mm, PGMAJFAULT);
-> >               page =3D folio_file_page(folio, swp_offset(entry));
-> > +             /*
-> > +              * Copy data into batched small folios from the large
-> > +              * folio buffer
-> > +              */
-> > +             if (buf) {
-> > +                     fill_batched_swap_folios(vmf, shadow, buf, folio,=
- folios);
-> > +                     folio =3D folios[0];
-> > +                     page =3D &folios[0]->page;
-> > +                     goto do_map;
-> > +             }
-> >       } else if (PageHWPoison(page)) {
-> >               /*
-> >                * hwpoisoned dirty swapcache pages are kept for killing
-> > @@ -4415,6 +4548,7 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
-> >                       lru_add_drain();
-> >       }
-> >
-> > +do_map:
-> >       folio_throttle_swaprate(folio, GFP_KERNEL);
-> >
-> >       /*
-> > @@ -4431,8 +4565,8 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
-> >       }
-> >
-> >       /* allocated large folios for SWP_SYNCHRONOUS_IO */
-> > -     if (folio_test_large(folio) && !folio_test_swapcache(folio)) {
-> > -             unsigned long nr =3D folio_nr_pages(folio);
-> > +     if ((folio_test_large(folio) || buf) && !folio_test_swapcache(fol=
-io)) {
-> > +             unsigned long nr =3D buf ? BATCH_SWPIN_COUNT : folio_nr_p=
-ages(folio);
-> >               unsigned long folio_start =3D ALIGN_DOWN(vmf->address, nr=
- * PAGE_SIZE);
-> >               unsigned long idx =3D (vmf->address - folio_start) / PAGE=
-_SIZE;
-> >               pte_t *folio_ptep =3D vmf->pte - idx;
-> > @@ -4527,6 +4661,42 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
-> >               }
-> >       }
-> >
-> > +     /* Batched mapping of allocated small folios for SWP_SYNCHRONOUS_=
-IO */
-> > +     if (buf) {
-> > +             for (i =3D 0; i < nr_pages; i++)
-> > +                     arch_swap_restore(swp_entry(swp_type(entry),
-> > +                             swp_offset(entry) + i), folios[i]);
-> > +             swap_free_nr(entry, nr_pages);
-> > +             add_mm_counter(vma->vm_mm, MM_ANONPAGES, nr_pages);
-> > +             add_mm_counter(vma->vm_mm, MM_SWAPENTS, -nr_pages);
-> > +             rmap_flags |=3D RMAP_EXCLUSIVE;
-> > +             for (i =3D 0; i < nr_pages; i++) {
-> > +                     unsigned long addr =3D address + i * PAGE_SIZE;
-> > +
-> > +                     pte =3D mk_pte(&folios[i]->page, vma->vm_page_pro=
-t);
-> > +                     if (pte_swp_soft_dirty(vmf->orig_pte))
-> > +                             pte =3D pte_mksoft_dirty(pte);
-> > +                     if (pte_swp_uffd_wp(vmf->orig_pte))
-> > +                             pte =3D pte_mkuffd_wp(pte);
-> > +                     if ((vma->vm_flags & VM_WRITE) && !userfaultfd_pt=
-e_wp(vma, pte) &&
-> > +                         !pte_needs_soft_dirty_wp(vma, pte)) {
-> > +                             pte =3D pte_mkwrite(pte, vma);
-> > +                             if ((vmf->flags & FAULT_FLAG_WRITE) && (i=
- =3D=3D page_idx)) {
-> > +                                     pte =3D pte_mkdirty(pte);
-> > +                                     vmf->flags &=3D ~FAULT_FLAG_WRITE=
-;
-> > +                             }
-> > +                     }
-> > +                     flush_icache_page(vma, &folios[i]->page);
-> > +                     folio_add_new_anon_rmap(folios[i], vma, addr, rma=
-p_flags);
-> > +                     set_pte_at(vma->vm_mm, addr, ptep + i, pte);
-> > +                     arch_do_swap_page_nr(vma->vm_mm, vma, addr, pte, =
-pte, 1);
-> > +                     if (i =3D=3D page_idx)
-> > +                             vmf->orig_pte =3D pte;
-> > +                     folio_unlock(folios[i]);
-> > +             }
-> > +             goto wp_page;
-> > +     }
-> > +
-> >       /*
-> >        * Some architectures may have to restore extra metadata to the p=
-age
-> >        * when reading from swap. This metadata may be indexed by swap e=
-ntry
-> > @@ -4612,6 +4782,7 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
-> >               folio_put(swapcache);
-> >       }
-> >
-> > +wp_page:
-> >       if (vmf->flags & FAULT_FLAG_WRITE) {
-> >               ret |=3D do_wp_page(vmf);
-> >               if (ret & VM_FAULT_ERROR)
-> > @@ -4638,9 +4809,19 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
-> >       if (vmf->pte)
-> >               pte_unmap_unlock(vmf->pte, vmf->ptl);
-> >  out_page:
-> > -     folio_unlock(folio);
-> > +     if (!buf) {
-> > +             folio_unlock(folio);
-> > +     } else {
-> > +             for (i =3D 0; i < BATCH_SWPIN_COUNT; i++)
-> > +                     folio_unlock(folios[i]);
-> > +     }
-> >  out_release:
-> > -     folio_put(folio);
-> > +     if (!buf) {
-> > +             folio_put(folio);
-> > +     } else {
-> > +             for (i =3D 0; i < BATCH_SWPIN_COUNT; i++)
-> > +                     folio_put(folios[i]);
-> > +     }
-> >       if (folio !=3D swapcache && swapcache) {
-> >               folio_unlock(swapcache);
-> >               folio_put(swapcache);
->
+ *** DEADLOCK ***
 
-Thanks
-Barry
+4 locks held by syz.2.2220/13838:
+ #0: ffff8880256d9198 (&nbd->config_lock){+.+.}-{4:4}, at: nbd_ioctl+0x13c/0xf40 drivers/block/nbd.c:1572
+ #1: ffff8880256d90d8 (&set->tag_list_lock){+.+.}-{4:4}, at: blk_mq_update_nr_hw_queues+0xc2/0x1ae0 block/blk-mq.c:4984
+ #2: ffff8880257480a8 (&q->q_usage_counter(io)#51){++++}-{0:0}, at: nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
+ #3: ffff8880257480e0 (&q->q_usage_counter(queue)#35){+.+.}-{0:0}, at: nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 13838 Comm: syz.2.2220 Not tainted 6.12.0-syzkaller-07834-g06afb0f36106 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2074
+ check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2206
+ check_prev_add kernel/locking/lockdep.c:3161 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3280 [inline]
+ validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
+ __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+ __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+ __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
+ blk_mq_elv_switch_none block/blk-mq.c:4847 [inline]
+ __blk_mq_update_nr_hw_queues block/blk-mq.c:4925 [inline]
+ blk_mq_update_nr_hw_queues+0x3fa/0x1ae0 block/blk-mq.c:4985
+ nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
+ nbd_start_device_ioctl drivers/block/nbd.c:1464 [inline]
+ __nbd_ioctl drivers/block/nbd.c:1539 [inline]
+ nbd_ioctl+0x5dc/0xf40 drivers/block/nbd.c:1579
+ blkdev_ioctl+0x57f/0x6a0 block/ioctl.c:693
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0xf7/0x170 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f1bdd97e819
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f1bde6e7038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f1bddb35fa0 RCX: 00007f1bdd97e819
+RDX: 0000000000000000 RSI: 000000000000ab03 RDI: 0000000000000003
+RBP: 00007f1bdd9f175e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f1bddb35fa0 R15: 00007ffeb92d6118
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
