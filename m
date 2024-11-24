@@ -1,189 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4621B4C35;
-	Sun, 24 Nov 2024 12:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC4118B468
+	for <linux-block@vger.kernel.org>; Sun, 24 Nov 2024 12:43:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732452030; cv=none; b=uy3m4BkLxgU+ZIlseUCdqASMDQ161LtNFratRlmMe+hYq/dNVUXXbHMAWeOyx8wGsHPCYUtbxo7vr+lAWowtPbetSeR8ypBhOAOurXRZG9t2XmauHp8b9VCtVUfgfZmhadPD73D9gBKzgmwrdMcplFod3WoXSCpFfjH6GIXDVe8=
+	t=1732452230; cv=none; b=uKaTv6mY/xhFW6O1UXIIgamG8mUaDWiKmcvkamIpvzdBW0TZaiu/mTd9HwwFzEG3TCDxJXc6Xn5R1SoN5XGeS0/8xnP5m0wayJBQJ3W1kSUMczcEteWOx+0jkN+EymkzmORvWw3nC/s2Dz2kH3cZNQaxUpXCj2We8yHghWG2b8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732452030; c=relaxed/simple;
-	bh=KTfCYc6h3kcuPD3tzTwJCQ/vsS7zuOHczUbuje/d6bs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pfi8dchr7ie6O/IH/RR3a70toEZfhj2cwpv5POUaG0fZTJK2fZ6NZlaaYxzUJ64jkxyrQdVPpA/Yht5PV7SI974JWmeOX3COVDQh5watrtEk3xe+juEfolg3ha/Pz/gpaxrM/49MfiJ/LIYFGvWK++u8+OBHPFlzSXUFTvCuwbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOBlu8p8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1732452230; c=relaxed/simple;
+	bh=G+FghIvKQCDq40Re2j/XTvw4oud93iSSegNr04gQZjo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hH9Tn611ZWB9YIrVXWOtuw8S1HjXq7Ht95hnl2hPJmCjlpwWXc0eBxP/+132jd83w4IcVauMAAo2+fyL6pWY9Cd1UHw/aWDVo74CtmVy8RO/4gfmceqdhyK30bPygvEY/zeCXEcEU0lT0+X5lBrwRawHUMyKDyUNuyG12XxzOJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oCSs7T1S; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOBlu8p8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27DD0C4CED3;
-	Sun, 24 Nov 2024 12:40:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732452030;
-	bh=KTfCYc6h3kcuPD3tzTwJCQ/vsS7zuOHczUbuje/d6bs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aOBlu8p8ZRhhAaYXcPlttemfZlJbqMhJLzT9MheYAE8sFICX5d/c0DQM7La1/DrT5
-	 3KI7GG3ximo0mofvFgkcM4Oi0d5eOENYZMcmFoCNVHit76foZqLn+D3KwR3YbpsxeK
-	 FGxKxXREXFKCIOTfg1Zxxx7mmzIzjm3NF0WxibSbDOXmuaTM5uF/3PRCjptHDkeX2x
-	 mwcxqiFSLj8OGnox9o54YSyujuAVJAssF7K0J5qcFFWhJCq0fWoWsNz/i65QA3kWfn
-	 FuF7HnrT/Yzg5gWxcesDtaQQ+I4x2Qc6ej3bZzI0HeczwOviOgtygcTEXENf+fuzdp
-	 Nj6vvAaRz2ibQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 07/16] block: RCU protect disk->conv_zones_bitmap
-Date: Sun, 24 Nov 2024 07:39:44 -0500
-Message-ID: <20241124124009.3336072-7-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241124124009.3336072-1-sashal@kernel.org>
-References: <20241124124009.3336072-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oCSs7T1S"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AOBjqAS014663;
+	Sun, 24 Nov 2024 12:43:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=njF8xi
+	HlKW1gepR/5HbPE7eYM9cc7ArAKPjzVCMZzNs=; b=oCSs7T1SS1MBmmrNXzb7Ew
+	lEQ3PvZz/ZqlclPhi+hPw5ZBI34HIrOtZBXAKJCvEtqyGNgCyU3mc4UZhWgLx/UD
+	AA/RDlqYWXxgQOnYFNzp4iNv9mYNRv8C2kMosbbXqPHx0xgc0VVrzOjs0tU+AQ0u
+	+jAbHkvdfhEgBDp2t+ZWtgOCce+b/kQVW7KgzCPiE5bmQcz7x78dPxO9iwAiEdeQ
+	H+2WCJ+DbJSbTzGZABBpqsyqNc7pJSFjWXhPwMgysaMBXUuCndeTKluB2y+7SVNK
+	TONoCHXY7t0TLo0GUh4Ces1G5AZxdY/6zM9B4YB06Q304Z8AXrcDd48h5KhIW1lQ
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43386n45yp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 24 Nov 2024 12:43:25 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AO3FOAM026337;
+	Sun, 24 Nov 2024 12:43:24 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 433v30rjh0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 24 Nov 2024 12:43:24 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AOChN1h48693644
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 24 Nov 2024 12:43:23 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6318E58055;
+	Sun, 24 Nov 2024 12:43:23 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9ACAE5804B;
+	Sun, 24 Nov 2024 12:43:19 +0000 (GMT)
+Received: from [9.179.4.180] (unknown [9.179.4.180])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Sun, 24 Nov 2024 12:43:19 +0000 (GMT)
+Message-ID: <54d2875b-0658-46a6-9bc0-4fb5faf5d816@linux.ibm.com>
+Date: Sun, 24 Nov 2024 18:13:17 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.11.10
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nvmet: fix the use of ZERO_PAGE in
+ nvme_execute_identify_ns_nvm()
+To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        sagi@grimberg.me, axboe@fb.com, chaitanyak@nvidia.com,
+        yi.zhang@redhat.com, shinichiro.kawasaki@wdc.com, mlombard@redhat.com,
+        gjoyce@linux.ibm.com
+References: <20241122085113.2487839-1-nilay@linux.ibm.com>
+ <20241122120828.GB25707@lst.de>
+ <Z0CqnBhIpmf2snuY@kbusch-mbp.dhcp.thefacebook.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <Z0CqnBhIpmf2snuY@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5fqu_IulKl6aVlfSOAiS-Qa45HVd_2T3
+X-Proofpoint-ORIG-GUID: 5fqu_IulKl6aVlfSOAiS-Qa45HVd_2T3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ mlxlogscore=992 suspectscore=0 impostorscore=0 malwarescore=0 spamscore=0
+ clxscore=1015 adultscore=0 lowpriorityscore=0 bulkscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2411240110
 
-From: Damien Le Moal <dlemoal@kernel.org>
 
-[ Upstream commit d7cb6d7414ea1b33536fa6d11805cb8dceec1f97 ]
 
-Ensure that a disk revalidation changing the conventional zones bitmap
-of a disk does not cause invalid memory references when using the
-disk_zone_is_conv() helper by RCU protecting the disk->conv_zones_bitmap
-pointer.
+On 11/22/24 21:30, Keith Busch wrote:
+> On Fri, Nov 22, 2024 at 01:08:28PM +0100, Christoph Hellwig wrote:
+>> On Fri, Nov 22, 2024 at 02:20:36PM +0530, Nilay Shroff wrote:
+>>> The nvme_execute_identify_ns_nvm function uses ZERO_PAGE
+>>> for copying SG list with all zeros. As ZERO_PAGE would not
+>>> necessarily return the virtual-address of the zero page, we
+>>> need to first convert the page address to kernel virtual-
+>>> address and then use it as source address for copying the
+>>> data to SG list with all zeros.
+>>>
+>>> Using return address of ZERO_PAGE(0) as source address for
+>>> copying data to SG list would fill the target buffer with
+>>> random value and causes the undesired side effect. This patch
+>>> implements the fix ensuring that we use virtual-address of the
+>>> zero page for copying all zeros to the SG list buffers.
+>>
+>> I wonder if using ZERO_PAGE() is simply a little too smart for it's
+>> own sake and it should just use kzalloc like a bunch of other identify
+>> implementation..
+> 
+> Sure. That'll make it easier to report non-zero values if we decide to
+> implement a non-stubbed version of this identification later.
 
-disk_zone_is_conv() is modified to operate under the RCU read lock and
-the function disk_set_conv_zones_bitmap() is added to update a disk
-conv_zones_bitmap pointer using rcu_replace_pointer() with the disk
-zone_wplugs_lock spinlock held.
+Ok, so if we prefer using kzalloc instead of ZERO_PAGE() in 
+nvme_execute_identify_ns_nvm function, as we're using kzalloc 
+at other identify call sites, then I would update the patch 
+and send v2 where we would replace ZERO_PAGE() with kzalloc. 
 
-disk_free_zone_resources() is modified to call
-disk_update_zone_resources() with a NULL bitmap pointer to free the disk
-conv_zones_bitmap. disk_set_conv_zones_bitmap() is also used in
-disk_update_zone_resources() to set the new (revalidated) bitmap and
-free the old one.
-
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Link: https://lore.kernel.org/r/20241107064300.227731-2-dlemoal@kernel.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-zoned.c      | 43 ++++++++++++++++++++++++++++++------------
- include/linux/blkdev.h |  2 +-
- 2 files changed, 32 insertions(+), 13 deletions(-)
-
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index af19296fa50df..74e39545562d5 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -350,9 +350,15 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, blk_mode_t mode,
- 
- static inline bool disk_zone_is_conv(struct gendisk *disk, sector_t sector)
- {
--	if (!disk->conv_zones_bitmap)
--		return false;
--	return test_bit(disk_zone_no(disk, sector), disk->conv_zones_bitmap);
-+	unsigned long *bitmap;
-+	bool is_conv;
-+
-+	rcu_read_lock();
-+	bitmap = rcu_dereference(disk->conv_zones_bitmap);
-+	is_conv = bitmap && test_bit(disk_zone_no(disk, sector), bitmap);
-+	rcu_read_unlock();
-+
-+	return is_conv;
- }
- 
- static bool disk_zone_is_last(struct gendisk *disk, struct blk_zone *zone)
-@@ -1455,6 +1461,24 @@ static void disk_destroy_zone_wplugs_hash_table(struct gendisk *disk)
- 	disk->zone_wplugs_hash_bits = 0;
- }
- 
-+static unsigned int disk_set_conv_zones_bitmap(struct gendisk *disk,
-+					       unsigned long *bitmap)
-+{
-+	unsigned int nr_conv_zones = 0;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&disk->zone_wplugs_lock, flags);
-+	if (bitmap)
-+		nr_conv_zones = bitmap_weight(bitmap, disk->nr_zones);
-+	bitmap = rcu_replace_pointer(disk->conv_zones_bitmap, bitmap,
-+				     lockdep_is_held(&disk->zone_wplugs_lock));
-+	spin_unlock_irqrestore(&disk->zone_wplugs_lock, flags);
-+
-+	kfree_rcu_mightsleep(bitmap);
-+
-+	return nr_conv_zones;
-+}
-+
- void disk_free_zone_resources(struct gendisk *disk)
- {
- 	if (!disk->zone_wplugs_pool)
-@@ -1478,8 +1502,7 @@ void disk_free_zone_resources(struct gendisk *disk)
- 	mempool_destroy(disk->zone_wplugs_pool);
- 	disk->zone_wplugs_pool = NULL;
- 
--	bitmap_free(disk->conv_zones_bitmap);
--	disk->conv_zones_bitmap = NULL;
-+	disk_set_conv_zones_bitmap(disk, NULL);
- 	disk->zone_capacity = 0;
- 	disk->last_zone_capacity = 0;
- 	disk->nr_zones = 0;
-@@ -1538,17 +1561,15 @@ static int disk_update_zone_resources(struct gendisk *disk,
- 				      struct blk_revalidate_zone_args *args)
- {
- 	struct request_queue *q = disk->queue;
--	unsigned int nr_seq_zones, nr_conv_zones = 0;
-+	unsigned int nr_seq_zones, nr_conv_zones;
- 	unsigned int pool_size;
- 	struct queue_limits lim;
- 
- 	disk->nr_zones = args->nr_zones;
- 	disk->zone_capacity = args->zone_capacity;
- 	disk->last_zone_capacity = args->last_zone_capacity;
--	swap(disk->conv_zones_bitmap, args->conv_zones_bitmap);
--	if (disk->conv_zones_bitmap)
--		nr_conv_zones = bitmap_weight(disk->conv_zones_bitmap,
--					      disk->nr_zones);
-+	nr_conv_zones =
-+		disk_set_conv_zones_bitmap(disk, args->conv_zones_bitmap);
- 	if (nr_conv_zones >= disk->nr_zones) {
- 		pr_warn("%s: Invalid number of conventional zones %u / %u\n",
- 			disk->disk_name, nr_conv_zones, disk->nr_zones);
-@@ -1823,8 +1844,6 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
- 		disk_free_zone_resources(disk);
- 	blk_mq_unfreeze_queue(q);
- 
--	kfree(args.conv_zones_bitmap);
--
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(blk_revalidate_disk_zones);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index b7664d593486a..44f084811de23 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -194,7 +194,7 @@ struct gendisk {
- 	unsigned int		nr_zones;
- 	unsigned int		zone_capacity;
- 	unsigned int		last_zone_capacity;
--	unsigned long		*conv_zones_bitmap;
-+	unsigned long __rcu	*conv_zones_bitmap;
- 	unsigned int            zone_wplugs_hash_bits;
- 	spinlock_t              zone_wplugs_lock;
- 	struct mempool_s	*zone_wplugs_pool;
--- 
-2.43.0
-
+Thanks,
+--Nilay
