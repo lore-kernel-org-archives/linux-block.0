@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5651118FDC6;
-	Sun, 24 Nov 2024 12:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4621B4C35;
+	Sun, 24 Nov 2024 12:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732451972; cv=none; b=Z8+0S+m1SwM/+rcWjGd2dFWgSrbboRve9rloDuJ/mNTNCdWxXq329+ueveIICATglOMKb89ML0I/ujGgSTAYBRrfVKGUXG5AU166m47G2Mv8oyZmUs3mL5nFbLcfms9m9Sr8ULtR9OfFttYo+jnHks6eYMxwByT98ctphCcnbzM=
+	t=1732452030; cv=none; b=uy3m4BkLxgU+ZIlseUCdqASMDQ161LtNFratRlmMe+hYq/dNVUXXbHMAWeOyx8wGsHPCYUtbxo7vr+lAWowtPbetSeR8ypBhOAOurXRZG9t2XmauHp8b9VCtVUfgfZmhadPD73D9gBKzgmwrdMcplFod3WoXSCpFfjH6GIXDVe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732451972; c=relaxed/simple;
-	bh=SXWHt8SbzafIDkqGgo5pke2eN672Mm5UBnWqgLv4YQw=;
+	s=arc-20240116; t=1732452030; c=relaxed/simple;
+	bh=KTfCYc6h3kcuPD3tzTwJCQ/vsS7zuOHczUbuje/d6bs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bKYQNt8YZ8iRvVJp2QJsAuo/g/GI4DPOLVZLYWCjKy6fX9XYRYKGaJyhWPcvEEsKBz+8HQBI9TzgU3hf4RnuiufxSDzJo64riU92/WVOrUckaSGevAE0rj5O494F0DlgzUvkWkuKmqSYowMRmDlCEITQOm4HpamGgN42q8CAAHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fg60NTo3; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Pfi8dchr7ie6O/IH/RR3a70toEZfhj2cwpv5POUaG0fZTJK2fZ6NZlaaYxzUJ64jkxyrQdVPpA/Yht5PV7SI974JWmeOX3COVDQh5watrtEk3xe+juEfolg3ha/Pz/gpaxrM/49MfiJ/LIYFGvWK++u8+OBHPFlzSXUFTvCuwbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOBlu8p8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fg60NTo3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E61AAC4CED3;
-	Sun, 24 Nov 2024 12:39:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOBlu8p8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27DD0C4CED3;
+	Sun, 24 Nov 2024 12:40:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732451971;
-	bh=SXWHt8SbzafIDkqGgo5pke2eN672Mm5UBnWqgLv4YQw=;
+	s=k20201202; t=1732452030;
+	bh=KTfCYc6h3kcuPD3tzTwJCQ/vsS7zuOHczUbuje/d6bs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fg60NTo34fgQlmB89lbqUvsrhfnwQMLSaFd9QvAhX4gevFkXlko8zi9gujxBKcLpD
-	 tHsFqYvD/S3bed6+HKUHoAc8iZCKyIiHP5d+JTP7wck4VbIYGgwbjUxvWXQzjxr1VW
-	 Hve7K6GatoE+pzuJEjmI0md5klv2N2vdvscjv4qJYG5x6LJfmCtYkvHKJQWqHOQHoN
-	 gb9FopoE1CDE0lPU+LTHqRvycw5k3t8zyvpPW7cjichWrHS70/MU4zErMvPGRxrCma
-	 F3eo31BDlMRbJL/hVi+SVdtt0ONsxToIUaP2fCZ/ja930UY7lKISSOGKWh2OBTuTSS
-	 nPoKfIrrmkmTA==
+	b=aOBlu8p8ZRhhAaYXcPlttemfZlJbqMhJLzT9MheYAE8sFICX5d/c0DQM7La1/DrT5
+	 3KI7GG3ximo0mofvFgkcM4Oi0d5eOENYZMcmFoCNVHit76foZqLn+D3KwR3YbpsxeK
+	 FGxKxXREXFKCIOTfg1Zxxx7mmzIzjm3NF0WxibSbDOXmuaTM5uF/3PRCjptHDkeX2x
+	 mwcxqiFSLj8OGnox9o54YSyujuAVJAssF7K0J5qcFFWhJCq0fWoWsNz/i65QA3kWfn
+	 FuF7HnrT/Yzg5gWxcesDtaQQ+I4x2Qc6ej3bZzI0HeczwOviOgtygcTEXENf+fuzdp
+	 Nj6vvAaRz2ibQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Damien Le Moal <dlemoal@kernel.org>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 07/19] block: RCU protect disk->conv_zones_bitmap
-Date: Sun, 24 Nov 2024 07:38:42 -0500
-Message-ID: <20241124123912.3335344-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.11 07/16] block: RCU protect disk->conv_zones_bitmap
+Date: Sun, 24 Nov 2024 07:39:44 -0500
+Message-ID: <20241124124009.3336072-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241124123912.3335344-1-sashal@kernel.org>
-References: <20241124123912.3335344-1-sashal@kernel.org>
+In-Reply-To: <20241124124009.3336072-1-sashal@kernel.org>
+References: <20241124124009.3336072-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.1
+X-stable-base: Linux 6.11.10
 Content-Transfer-Encoding: 8bit
 
 From: Damien Le Moal <dlemoal@kernel.org>
@@ -172,7 +172,7 @@ index af19296fa50df..74e39545562d5 100644
  }
  EXPORT_SYMBOL_GPL(blk_revalidate_disk_zones);
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 50c3b959da281..3027ce2de7319 100644
+index b7664d593486a..44f084811de23 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
 @@ -194,7 +194,7 @@ struct gendisk {
