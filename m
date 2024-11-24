@@ -1,257 +1,83 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7099F18A6BC;
-	Sun, 24 Nov 2024 13:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+Received: from mx10.didiglobal.com (mx10.didiglobal.com [111.202.70.125])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 557481F9A87;
+	Sun, 24 Nov 2024 13:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.202.70.125
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732455259; cv=none; b=IyTcXnvGBhnJd7TlCinHzwzJAGWvyHX27grVwjnkLA1yn6yTyew3fp+6hNFERTvH6pxwj+fM8oYpAdQiFfCoD45VFV8On24EA5MofPOnzf/HWJj92tZuSdI2jFxwvLB1O32+L6jtC5UngXiwA0SVPg2HSuutPqWlyBPzaPWD9YY=
+	t=1732455774; cv=none; b=A4y9yVWceCz9UpC1QX+VOHAl0L9ibUHMBah8OkWsm9DqPywziowxphGESXnXfOaCS7nM2yxQG5Um5VyLMDBkG8kZf95A1uxlPcnjH9xQILmTmFizhqwY7arGv9atD0eW9xabEOqzH6QE3T0Vx7k8i908uWS6UxTDPn7MtpBI6W8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732455259; c=relaxed/simple;
-	bh=Uk6qoM3/bi3PrMVZDpuNfQE44d1ttBqWG2E468pnZ/E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=cfbh0Sc0HF/osC9fWkzRZNzab1fhTeZnAkmQ6n+Otv4XIA/oCAo3R8QXoPmKQKO4cOJKFdx7sdRVugzIBIwOu1j+6VAU+Q+qUCoHfjRD8ewoCKK3aVuwYad7peaccE4hNCUjvUtp/yy5hi4ox6SMuO99CTXanZyBO7hGU4RlLpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=axu04URF; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="axu04URF"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2126e293192so7039615ad.0;
-        Sun, 24 Nov 2024 05:34:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732455257; x=1733060057; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:cc:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qtitWj7mwZUOuapDYi1rlQN8mBEo2KiG1ezv0q6gsEE=;
-        b=axu04URFhBpwR/Ea6AeSmDS8gwu7/uzyiYbLurQf9eCHnJGwc1lrHLryVF53eHvj0T
-         Qe4Mw1AF+DyfPQ/iJt/RnbXBHZV/vD2hceFnX9VEeYqehldovrGlwuI5CqvJxqOQRqgW
-         Ex9Bt8cmfQ8rydFLU6JM/4B/oVhrPFWc51xGTxrCbxzf5b5GpdGNuaQlUbCnL+OVjr93
-         YUXYdGxoKGW91ljazTcwVZZC9KE7xJHr0+csYMRFty84oSHWo7YTYekQr3NmiBpyJHDi
-         x5vMBg1aKop4TNyuAFDcxNNLUIY6gWWPq9yi0B5bPp7j1/f8YD88MXeu9dXdmmqRsClZ
-         yM8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732455257; x=1733060057;
-        h=content-transfer-encoding:in-reply-to:from:cc:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qtitWj7mwZUOuapDYi1rlQN8mBEo2KiG1ezv0q6gsEE=;
-        b=Q7bsBE/MmH+G9oEu7ZeovFPhry0X76W1eIHadFyJGNMD5nUOk1T6rQVVXhJWLYIfZk
-         8os1rATfHTYWVx2dDjqgIvawfFlJ1ikUXG25fEtAYI6Pq0edub8OVd89kB1UYBBC1baz
-         /HlS5n1yBxHGDMmP/CCAlu4JWnpkg52tKC2g60TogOZjAX+IJBFfk5/rsk15YI7b+MjZ
-         6cm8syA8n72O5C2x5IvJTBmhVcHYJLAFFBzkRsdNurCeAD9vaGaSX4jpDUP6FBlrMqq0
-         8P+LuT/DOlC/pHQ8/YB/xnivEfSH6vcBz3FRKIZHeKuc8Jy9+bXx2VYhtpHo5ZJXcAy1
-         Bdkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUqUFv8VaDe6IYeaO2F43oLhfZ4VrFVlC1/hqafrLOmJHCJL451rLahhIIqu+CSkwycxRpeMCbuT7k2eg==@vger.kernel.org, AJvYcCUw6Bt7T6Bz0KEDqWwvT/z3HtqwXYe0t+7u0yLaS9sZEkYSy4sP/FBKbuPiDGA+MTILZ3SUmrDp/Q4sYMzFGQ==@vger.kernel.org, AJvYcCVrursYBu2zs+8Xq8RqZiieblCyjuJ9S86+uDkIo92ItJ0o24eCY+dSZuImIDftgg1cwJRuCjPutWrE@vger.kernel.org, AJvYcCXk97jTnGzcvP8hohvl8a6g/kfUFMtovfTPjdiY1wMjd3eAr0nh/yGpHYzea4eDyifMMvwaSq6Q8Lp7KQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGU6o+RjTW5PmTWn3c2EDr+jrmmg7yf/D3AIp4Yzl0TM8UKdDe
-	s8EJWaNMjp5pqRlIpkWFUEetTIX7d+GffowfJRoGLEkW8AuTT1y5
-X-Gm-Gg: ASbGncu9+4Ncxqj+r8otf815/jiPaqW7+TYQ4LXgluZ9kq7kuoaiZ2uHU3eKThUrien
-	FxNdLtZx7p37E1Kpz4EL75YRz3rII7m5OSCYkWi18thvCdSxOqfOu2yvI+QTiZjiAGWICRZPnxn
-	me0lSeBLCyf0oDnUz8y7fudxoPx7yjd3pfjCkW7q2Tsj6kHbkd/lZXi6zhXxYMaYhtBjWdCE9o2
-	czoE9M8BQYPvvfo5M7mzuc/s839WLcX6/HMrwcpzU2JhuHVoiBQUEeruGRxpQ==
-X-Google-Smtp-Source: AGHT+IHLvekYbaPwVuQbj7uVMH6+WJbm/aay5oOW+hS7R6I1jLZXbkDtIA8gi64je3notGAilm7kDw==
-X-Received: by 2002:a05:6a20:3d8d:b0:1dc:77fc:1cd1 with SMTP id adf61e73a8af0-1e09e4004cfmr5341156637.3.1732455256584;
-        Sun, 24 Nov 2024 05:34:16 -0800 (PST)
-Received: from [192.168.50.136] ([118.32.98.101])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724ed55099asm3151173b3a.49.2024.11.24.05.34.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Nov 2024 05:34:16 -0800 (PST)
-Message-ID: <489d941f-c4e8-4d1f-92ee-02074c713dd1@gmail.com>
-Date: Sun, 24 Nov 2024 22:34:02 +0900
+	s=arc-20240116; t=1732455774; c=relaxed/simple;
+	bh=MmwMCPrM9AuWrKSPKRDw0/46E7tEcIxq2BmimQ4Ulbg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:Content-Type:
+	 MIME-Version; b=jr50pG8N7yVpD9E3x4lYnZiTCwAI9DVm1oQXFPfSbtVQZhz7yxhd+lIYdRtJmmThVWO7eJ+0E/NtA88aYsGDom1kwYcFnh1AJpQ3CiZYyyJkgX7W/K6OXwhcRcQYHtFWMnJ7ODqO0KwXco9yMWHGgs1OBx6crzE9A4yD7hZvGt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com; spf=pass smtp.mailfrom=didiglobal.com; arc=none smtp.client-ip=111.202.70.125
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=didiglobal.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=didiglobal.com
+Received: from mail.didiglobal.com (unknown [10.79.71.37])
+	by mx10.didiglobal.com (MailData Gateway V2.8.8) with ESMTPS id A8159186D6C8E0;
+	Sun, 24 Nov 2024 21:42:05 +0800 (CST)
+Received: from BJ02-ACTMBX-03.didichuxing.com (10.79.65.11) by
+ BJ03-ACTMBX-01.didichuxing.com (10.79.71.37) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sun, 24 Nov 2024 21:42:23 +0800
+Received: from BJ02-ACTMBX-03.didichuxing.com ([fe80::9c02:2754:e1db:e82e]) by
+ BJ02-ACTMBX-03.didichuxing.com ([fe80::9c02:2754:e1db:e82e%5]) with mapi id
+ 15.02.1544.011; Sun, 24 Nov 2024 21:42:23 +0800
+X-MD-Sfrom: daikunhai@didiglobal.com
+X-MD-SrcIP: 10.79.71.37
+From: =?utf-8?B?5oi05Z2k5rW3IFRvbnkgRGFp?= <daikunhai@didiglobal.com>
+To: "tj@kernel.org" <tj@kernel.org>, "josef@toxicpanda.com"
+	<josef@toxicpanda.com>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC: "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] block: iocost: ensure hweight_inuse is at least 1
+Thread-Topic: [PATCH] block: iocost: ensure hweight_inuse is at least 1
+Thread-Index: AQHbPK/ZVOMoLGOycU+ydueJcsx/wrLGdAAA
+Date: Sun, 24 Nov 2024 13:42:23 +0000
+Message-ID: <191E5CDE-1E1C-4035-91BF-322CBB05E651@didiglobal.com>
+In-Reply-To: <20241122072609.29429-1-daikunhai@didiglobal.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2E36976AACDB324CA4AC64918F709B0A@didichuxing.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 2/28] dept: Implement Dept(Dependency Tracker)
-To: Byungchul Park <byungchul@sk.com>
-References: <20240508094726.35754-3-byungchul@sk.com>
-Content-Language: en-US
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel_team@skhynix.com,
- torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
- linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
- linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
- will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
- joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
- duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
- willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
- gregkh@linuxfoundation.org, kernel-team@lge.com, linux-mm@kvack.org,
- akpm@linux-foundation.org, mhocko@kernel.org, minchan@kernel.org,
- hannes@cmpxchg.org, vdavydov.dev@gmail.com, sj@kernel.org,
- jglisse@redhat.com, dennis@kernel.org, cl@linux.com, penberg@kernel.org,
- rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
- linux-block@vger.kernel.org, josef@toxicpanda.com,
- linux-fsdevel@vger.kernel.org, jack@suse.cz, jlayton@kernel.org,
- dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
- dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
- melissa.srw@gmail.com, hamohammed.sa@gmail.com, 42.hyeyoo@gmail.com,
- chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
- max.byungchul.park@gmail.com, boqun.feng@gmail.com, longman@redhat.com,
- hdanton@sina.com, her0gyugyu@gmail.com, Yeoreum Yun <yeoreum.yun@arm.com>
-From: Yunseong Kim <yskelg@gmail.com>
-In-Reply-To: <20240508094726.35754-3-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-Hi Byungchul,
-
-Thank you for the great feature. Currently, DEPT has a bug in the
-'dept_key_destroy()' function that must be fixed to ensure proper
-operation in the upstream Linux kernel.
-
-On 5/8/24 6:46 오후, Byungchul Park wrote:
-> CURRENT STATUS
-> --------------
-> Lockdep tracks acquisition order of locks in order to detect deadlock,
-> and IRQ and IRQ enable/disable state as well to take accident
-> acquisitions into account.
-> 
-> Lockdep should be turned off once it detects and reports a deadlock
-> since the data structure and algorithm are not reusable after detection
-> because of the complex design.
-> 
-> PROBLEM
-> -------
-> *Waits* and their *events* that never reach eventually cause deadlock.
-> However, Lockdep is only interested in lock acquisition order, forcing
-> to emulate lock acqusition even for just waits and events that have
-> nothing to do with real lock.
-> 
-> Even worse, no one likes Lockdep's false positive detection because that
-> prevents further one that might be more valuable. That's why all the
-> kernel developers are sensitive to Lockdep's false positive.
-> 
-> Besides those, by tracking acquisition order, it cannot correctly deal
-> with read lock and cross-event e.g. wait_for_completion()/complete() for
-> deadlock detection. Lockdep is no longer a good tool for that purpose.
-> 
-> SOLUTION
-> --------
-> Again, *waits* and their *events* that never reach eventually cause
-> deadlock. The new solution, Dept(DEPendency Tracker), focuses on waits
-> and events themselves. Dept tracks waits and events and report it if
-> any event would be never reachable.
-> 
-> Dept does:
->    . Works with read lock in the right way.
->    . Works with any wait and event e.i. cross-event.
->    . Continue to work even after reporting multiple times.
->    . Provides simple and intuitive APIs.
->    . Does exactly what dependency checker should do.
-> 
-> Q & A
-> -----
-> Q. Is this the first try ever to address the problem?
-> A. No. Cross-release feature (b09be676e0ff2 locking/lockdep: Implement
->    the 'crossrelease' feature) addressed it 2 years ago that was a
->    Lockdep extension and merged but reverted shortly because:
-> 
->    Cross-release started to report valuable hidden problems but started
->    to give report false positive reports as well. For sure, no one
->    likes Lockdep's false positive reports since it makes Lockdep stop,
->    preventing reporting further real problems.
-> 
-> Q. Why not Dept was developed as an extension of Lockdep?
-> A. Lockdep definitely includes all the efforts great developers have
->    made for a long time so as to be quite stable enough. But I had to
->    design and implement newly because of the following:
-> 
->    1) Lockdep was designed to track lock acquisition order. The APIs and
->       implementation do not fit on wait-event model.
->    2) Lockdep is turned off on detection including false positive. Which
->       is terrible and prevents developing any extension for stronger
->       detection.
-> 
-> Q. Do you intend to totally replace Lockdep?
-> A. No. Lockdep also checks if lock usage is correct. Of course, the
->    dependency check routine should be replaced but the other functions
->    should be still there.
-> 
-> Q. Do you mean the dependency check routine should be replaced right
->    away?
-> A. No. I admit Lockdep is stable enough thanks to great efforts kernel
->    developers have made. Lockdep and Dept, both should be in the kernel
->    until Dept gets considered stable.
-> 
-> Q. Stronger detection capability would give more false positive report.
->    Which was a big problem when cross-release was introduced. Is it ok
->    with Dept?
-> A. It's ok. Dept allows multiple reporting thanks to simple and quite
->    generalized design. Of course, false positive reports should be fixed
->    anyway but it's no longer as a critical problem as it was.
-> 
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
-
-If a module previously checked for dependencies by DEPT is loaded and
-then would be unloaded, a kernel panic shall occur when the kernel
-reuses the corresponding memory area for other purposes. This issue must
-be addressed as a priority to enable the use of DEPT. Testing this patch
-on the Ubuntu kernel confirms the problem.
-
-> +void dept_key_destroy(struct dept_key *k)
-> +{
-> +	struct dept_task *dt = dept_task();
-> +	unsigned long flags;
-> +	int sub_id;
-> +
-> +	if (unlikely(!dept_working()))
-> +		return;
-> +
-> +	if (dt->recursive == 1 && dt->task_exit) {
-> +		/*
-> +		 * Need to allow to go ahead in this case where
-> +		 * ->recursive has been set to 1 by dept_off() in
-> +		 * dept_task_exit() and ->task_exit has been set to
-> +		 * true in dept_task_exit().
-> +		 */
-> +	} else if (dt->recursive) {
-> +		DEPT_STOP("Key destroying fails.\n");
-> +		return;
-> +	}
-> +
-> +	flags = dept_enter();
-> +
-> +	/*
-> +	 * dept_key_destroy() should not fail.
-> +	 *
-> +	 * FIXME: Should be fixed if dept_key_destroy() causes deadlock
-> +	 * with dept_lock().
-> +	 */
-> +	while (unlikely(!dept_lock()))
-> +		cpu_relax();
-> +
-> +	for (sub_id = 0; sub_id < DEPT_MAX_SUBCLASSES; sub_id++) {
-> +		struct dept_class *c;
-> +
-> +		c = lookup_class((unsigned long)k->base + sub_id);
-> +		if (!c)
-> +			continue;
-> +
-> +		hash_del_class(c);
-> +		disconnect_class(c);
-> +		list_del(&c->all_node);
-> +		invalidate_class(c);
-> +
-> +		/*
-> +		 * Actual deletion will happen on the rcu callback
-> +		 * that has been added in disconnect_class().
-> +		 */
-> +		del_class(c);
-> +	}
-> +
-> +	dept_unlock();
-> +	dept_exit(flags);
-> +
-> +	/*
-> +	 * Wait until even lockless hash_lookup_class() for the class
-> +	 * returns NULL.
-> +	 */
-> +	might_sleep();
-> +	synchronize_rcu();
-> +}
-> +EXPORT_SYMBOL_GPL(dept_key_destroy);
-
-Best regards,
-Yunseong Kim
+SW4gZmFjdCwgd2UgZGlkIGVuY291bnRlciBzdWNoIGEgc3BlY2lhbCBzaXR1YXRpb24gd2hlcmUg
+dGhlIGtlcm5lbCBwcmludGVkIG91dCBgaW9jZzogaW52YWxpZCBkb25hdGlvbiB3ZWlnaHRzIGlu
+IC9hL2IvYzogYWN0aXZlPTEgZG9uYXRpbmc9MSBhZnRlcj0wYCwgYW5kIHRoZW4gaXQgaW1tZWRp
+YXRlbHkgcGFuaWMuIEkgYW5hbHl6ZWQgdGhlIGNvZGUgYnV0IGNvdWxkIG5vdCBmaWd1cmUgb3V0
+IGhvdyB0aGlzIGhhcHBlbmVkOyBpdCBtaWdodCBiZSBhIGNvbmN1cnJlbmN5IGlzc3VlIG9yIHNv
+bWUgb3RoZXIgaGlkZGVuIGJ1Zy4NCg0KT3VyIGtlcm5lbCBpcyBub3QgdGhlIGxhdGVzdCwgYnV0
+IGl0IGluY2x1ZGVzIHRoZSBwYXRjaCBlZGFhMjYzMzRjMTE3YTU4NGFkZDYwNTNmNDhkNjNhOTg4
+ZDI1YTZlIChpb2Nvc3Q6IEZpeCBkaXZpZGUtYnktemVybyBvbiBkb25hdGlvbiBmcm9tIGxvdyBo
+d2VpZ2h0IGNncm91cCkuDQoNCu+7v+WcqCAyMDI0LzExLzIyIDE1OjI277yM4oCc5oi05Z2k5rW3
+IFRvbnkgRGFp4oCdPGRhaWt1bmhhaUBkaWRpZ2xvYmFsLmNvbSA8bWFpbHRvOmRhaWt1bmhhaUBk
+aWRpZ2xvYmFsLmNvbT4+IOWGmeWFpToNCg0KDQpUaGUgaHdlaWdodF9pbnVzZSBjYWxjdWxhdGlv
+biBpbiB0cmFuc2Zlcl9zdXJwbHVzZXMoKSBjb3VsZCBwb3RlbnRpYWxseQ0KcmVzdWx0IGluIGEg
+dmFsdWUgb2YgMCwgd2hpY2ggd291bGQgbGVhZCB0byBkaXZpc2lvbiBieSB6ZXJvIGVycm9ycyBp
+bg0Kc3Vic2VxdWVudCBjYWxjdWxhdGlvbnMgdGhhdCB1c2UgdGhpcyB2YWx1ZSBhcyBhIGRpdmlz
+b3IuDQoNCg0KU2lnbmVkLW9mZi1ieTogS3VuaGFpIERhaSA8ZGFpa3VuaGFpQGRpZGlnbG9iYWwu
+Y29tIDxtYWlsdG86ZGFpa3VuaGFpQGRpZGlnbG9iYWwuY29tPj4NCi0tLQ0KYmxvY2svYmxrLWlv
+Y29zdC5jIHwgNyArKysrLS0tDQoxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspLCAzIGRl
+bGV0aW9ucygtKQ0KDQoNCmRpZmYgLS1naXQgYS9ibG9jay9ibGstaW9jb3N0LmMgYi9ibG9jay9i
+bGstaW9jb3N0LmMNCmluZGV4IDM4NGFhMTVlODI2MC4uNjVjZGI1NWQzMGNjIDEwMDY0NA0KLS0t
+IGEvYmxvY2svYmxrLWlvY29zdC5jDQorKysgYi9ibG9jay9ibGstaW9jb3N0LmMNCkBAIC0xOTk5
+LDkgKzE5OTksMTAgQEAgc3RhdGljIHZvaWQgdHJhbnNmZXJfc3VycGx1c2VzKHN0cnVjdCBsaXN0
+X2hlYWQgKnN1cnBsdXNlcywgc3RydWN0IGlvY19ub3cgKm5vdykNCnBhcmVudCA9IGlvY2ctPmFu
+Y2VzdG9yc1tpb2NnLT5sZXZlbCAtIDFdOw0KDQoNCi8qIGInID0gZ2FtbWEgKiBiX2YgKyBiX3Qn
+ICovDQotIGlvY2ctPmh3ZWlnaHRfaW51c2UgPSBESVY2NF9VNjRfUk9VTkRfVVAoDQotICh1NjQp
+Z2FtbWEgKiAoaW9jZy0+aHdlaWdodF9hY3RpdmUgLSBpb2NnLT5od2VpZ2h0X2RvbmF0aW5nKSwN
+Ci0gV0VJR0hUX09ORSkgKyBpb2NnLT5od2VpZ2h0X2FmdGVyX2RvbmF0aW9uOw0KKyBpb2NnLT5o
+d2VpZ2h0X2ludXNlID0gbWF4X3QodTY0LCAxLA0KKyBESVY2NF9VNjRfUk9VTkRfVVAoDQorICh1
+NjQpZ2FtbWEgKiAoaW9jZy0+aHdlaWdodF9hY3RpdmUgLSBpb2NnLT5od2VpZ2h0X2RvbmF0aW5n
+KSwNCisgV0VJR0hUX09ORSkgKyBpb2NnLT5od2VpZ2h0X2FmdGVyX2RvbmF0aW9uKTsNCg0KDQov
+KiB3JyA9IHMnICogYicgLyBiJ19wICovDQppbnVzZSA9IERJVjY0X1U2NF9ST1VORF9VUCgNCi0t
+IA0KMi4yNy4wDQoNCg0KDQoNCg0K
