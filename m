@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679387FD
-	for <linux-block@vger.kernel.org>; Mon, 25 Nov 2024 02:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D701426C
+	for <linux-block@vger.kernel.org>; Mon, 25 Nov 2024 02:38:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732502202; cv=none; b=Oad5hkJpiYyJlwAmvM/VYLkDv79hsJs/rlR1AxNgWXpwZw9pzPDsFFfy3TicCe4gM5LHXkiA9M2n1dfGvr2qzS7hGtShL+Ct0tG7EEsUTkdDtHDX0jKWkiIuvlHfI9cjm/v5rQ1FYShanszO4vhGGwqz7EEV+2YPA/pQiM8kLzk=
+	t=1732502324; cv=none; b=DBruGmkRDOlC4s874ZEGyTNY8m5RoJo4Ep2uFJaFRunqjHAL8+zbQsQyi9Ul80m10Wf2+yiMGc12sCeoJSIY2L+G+uAuqfozRA3BYnDAT8xzXTb5MuyvBpmF4A+m3KI/qR3WsLDjx6nRNIvHbPaQWJGBNDaucbwKbjmz7p2m+Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732502202; c=relaxed/simple;
-	bh=bxdS2VWEHX7/s5aWm8JFDGqqmI4olLS2+JiurWQBgkE=;
+	s=arc-20240116; t=1732502324; c=relaxed/simple;
+	bh=R6gJyhPnknzDw5M8X8bYMVbHMwHY0isZNIRe6aO3UoU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gUiA/7O6ekeQJPj7S6tB51QT/aF33YWz6vXDNjW4lABfLmXSFyHJ2XQFHwWdYhMqZlmhH6btzfX148kXnFnmduEOlkBjpeqgf9ThyKjucvM2gwO0OFvmVTG7Ia/8vdZg7gbEsgzovYyBp6aFZeTchACPM7NyxABaxqKOKue2U6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KmAW3YJP; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=Jqbb1LXSaTlQvTZZEzd7UoL6qS+RiOP+mnIA1rQLViCYCqLHQgalCdPE1pTXaREcQOZEakov4y1nW8qXI3RghprtPdzMVXQY2bc5VwFMPH1LjCaml5Tubm9V457QGpzrDGLw1U33Eg0+gBM0hHt2mFQgQcxKh53StV6p5l5QKU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8LUymUd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KmAW3YJP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 966B7C4CED1;
-	Mon, 25 Nov 2024 02:36:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8LUymUd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B03BDC4CECC;
+	Mon, 25 Nov 2024 02:38:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732502202;
-	bh=bxdS2VWEHX7/s5aWm8JFDGqqmI4olLS2+JiurWQBgkE=;
+	s=k20201202; t=1732502324;
+	bh=R6gJyhPnknzDw5M8X8bYMVbHMwHY0isZNIRe6aO3UoU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=KmAW3YJPk9b7AtYoCKsLgXuD/kpWv8cUSQQXZpV644//ugvp5T7q+Xyv1hDsttOBd
-	 TGRJTxdTFlevwNMdKBIkHzn61nuP5dYy1nHT/hZl8U6q3eouHkFblvBvCnuTeqq+ao
-	 bjKvkMPsVbSwpzrxUO1scI+CFYdjr/G3u4aChuQ+G5q5Kon1/FaFt8z0CrKmOTQWcP
-	 5aWT9yaCKSTo9FmEPeeDPwgWECsFOL0FmRl2PnTiehhieyfx/mCHkT9KUQIwQ/EDn6
-	 ZL0Hqr5NZJQAP5e0vCcRU2Xc6fogjjqvwOa/RBwNWdnSnDkoMm1Sc1yMRH1lJv74b9
-	 ijWWGNSb+LXgA==
-Message-ID: <73427797-9620-4cb7-bc9e-3f073eaa57fe@kernel.org>
-Date: Mon, 25 Nov 2024 11:36:27 +0900
+	b=C8LUymUdIwiZ7bCZs96VTzutvyrp41UzvtSPV1Xe9lzSp8hczcNIicGGEYaOgIa4V
+	 d1c59hSGe7aD1BFstvBqucgi3mFyLpNyConpa9obJMzki3QYBCOKfSOBW54RP5o61n
+	 6A0lld7WXu17ctC/cZHcWmk7MMFlI+9uRReYGjtKrTJKNfCUGGtN1OrQ1VudS0UGDp
+	 4TtJCfgxhCgjvtiY12YcGAdC47yRVjLxmAsrbqpNCh/4/nLhITZ92bOWuzoAM8ZZt0
+	 aFjGa+53lr/cb4AAmKzLQriVXP8PAk0c+305sumPNOM24VM8eyBw7AoGOafhu5H+Wb
+	 C4w3LtL8ZBS+Q==
+Message-ID: <972b3e03-b393-41f8-845d-3b5628481849@kernel.org>
+Date: Mon, 25 Nov 2024 11:38:29 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,25 +60,6 @@ On 11/23/24 12:08 PM, Bart Van Assche wrote:
 >     if [ -e /dev/"${bdev}" ]; then break; fi
 >     sleep .1
 > done
-
-Running this script, I never get out of this loop... Weird. I changed the
-script to this:
-
-...
-while true; do
-	bdev="$(lsscsi -g | grep scsi_debug | cut -d'/' -f3)"
-	if [ ! -z "${bdev}" ]; then
-		break;
-       	fi
-	sleep .1
-done
-dev="/dev/${bdev}"
-[ -b "${dev}" ]
-...
-
-and then it runs, but I do not see anything blocked. All is fine. Could you
-share your kernel config to see what I am missing may be ?
-
 > dev=/dev/"${bdev}"
 > [ -b "${dev}" ]
 > fio --direct=1 --filename=$dev --iodepth=1 --ioengine=io_uring \
@@ -86,44 +67,86 @@ share your kernel config to see what I am missing may be ?
 >     --runtime=30 --rw=rw --time_based=1 --zonemode=zbd &
 > sleep 2
 > echo w > /proc/sysrq-trigger
-> 
-> then the following appears in the kernel log:
-> 
->     sysrq: Show Blocked State
->     task:(udev-worker)   state:D stack:0     pid:3121  tgid:3121 ppid:2191   fl
-> ags:0x00000006
->     Call Trace:
->      <TASK>
->      __schedule+0x3e8/0x1410
->      schedule+0x27/0xf0
->      blk_mq_freeze_queue_wait+0x6f/0xa0
->      queue_attr_store+0x60/0xc0
->      kernfs_fop_write_iter+0x13e/0x1f0
->      vfs_write+0x25b/0x420
->      ksys_write+0x65/0xe0
->      do_syscall_64+0x82/0x160
->      entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> Do you agree that the above indicates that blk_mq_freeze_queue_wait()
-> hangs? I think it is waiting for a q_usage_counter reference that is
-> held by a bio on a zwplug->bio_list.
-> 
-> Do you agree that the best way to solve this is to modify
-> blk_mq_submit_bio() by moving the blk_zone_plug_bio() call after the
-> blk_crypto_rq_get_keyslot() call and also to change the zwplug bio list
-> into a request list?
 
-I am not following... blk_zone_plug_bio() acts on BIOs, not on requests, but
-blk_crypto_rq_get_keyslot() is a request operation. Also, a requeue list is a
-list of requests, not BIOs. One of the main point of zone write plugs is to
-operate on BIOs so that:
-1) we have code that is common for regular block devices and for BIO based
-device-mapper devices.
-2) Blocking writes to preserve per-zone write ordering does not result in
-device resources (TAGS !) being held for nothing and potentially
-delaying/starving read accesses or other operations that do not need ordering.
+Another thing, probably unrelated. Running the above script with Linus current
+tree, when killing fio, I got this:
 
-How can a requeue list help ? Please provide details.
+[ 2302.022055] ------------[ cut here ]------------
+[ 2302.028312] WARNING: CPU: 2 PID: 252 at io_uring/io_uring.c:2889
+io_ring_exit_work+0x160/0x4d6
+[ 2302.038566] Modules linked in: scsi_debug rpcsec_gss_krb5 auth_rpcgss nfsv4
+dns_resolver nfs lockd grace netfs nft_fib_inet nft_fib_ipv4 nft_fib_ipv6
+nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct
+nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip_set
+nf_tables sunrpc intel_rapl_common intel_uncore_frequency
+intel_uncore_frequency_common nls_ascii vfat fat x86_pkg_temp_thermal
+intel_powerclamp coretemp kvm_intel kvm rapl intel_cstate iTCO_wdt
+iTCO_vendor_support btrfs ipmi_ssif intel_uncore lpc_ich igb mfd_core i2c_i801
+ioatdma xor intel_pch_thermal dca ipmi_si ipmi_devintf ipmi_msghandler
+acpi_power_meter raid6_pq zstd_decompress zstd_compress zstd_common mq_deadline
+bfq loop dm_mod nfnetlink sd_mod usbhid crct10dif_pclmul crc32_pclmul
+crc32c_intel ast ghash_clmulni_intel drm_client_lib i2c_algo_bit ahci
+sha512_ssse3 mpt3sas sha256_ssse3 smartpqi raid_class drm_shmem_helper libahci
+xhci_pci xhci_hcd sha1_ssse3 scsi_transport_sas drm_kms_helper nvme libata
+usbcore usb_common sg
+[ 2302.038813]  scsi_mod scsi_common pkcs8_key_parser fuse [last unloaded:
+scsi_debug]
+[ 2302.140759] CPU: 2 UID: 0 PID: 252 Comm: kworker/u64:5 Not tainted 6.12.0+ #2107
+[ 2302.148854] Hardware name: Supermicro Super Server/X11SPL-F, BIOS 3.8a
+10/28/2022
+[ 2302.157033] Workqueue: iou_exit io_ring_exit_work
+[ 2302.162466] RIP: 0010:io_ring_exit_work+0x160/0x4d6
+[ 2302.168044] Code: ff 4c 89 ff e8 c1 45 a1 ff 4c 89 e7 e8 e9 f5 ff ff 31 ff
+48 89 bd 40 ff ff ff 48 8b 05 19 3f 9c 00 48 39 85 38 ff ff ff 79 08 <0f> 0b 41
+bd 60 ea 00 00 48 8d 7b 58 4c 89 ee e8 2c 97 03 00 48 85
+[ 2302.187537] RSP: 0018:ffff9c1d8335fd50 EFLAGS: 00010287
+[ 2302.193510] RAX: 00000001001e8356 RBX: ffff8ef8ccd3a658 RCX: 0000000000000000
+[ 2302.201389] RDX: 0000000000000000 RSI: ffffffffa4c482d7 RDI: 0000000000000000
+[ 2302.209266] RBP: ffff9c1d8335fe20 R08: 0000000000000000 R09: 0000000000000000
+[ 2302.217139] R10: 0000000000000000 R11: 00000000004debf3 R12: ffff8ef8ccd3a000
+[ 2302.225008] R13: 0000000000000032 R14: ffff8ef8ccd3a040 R15: 0000000000000000
+[ 2302.232878] FS:  0000000000000000(0000) GS:ffff8f07c0e80000(0000)
+knlGS:0000000000000000
+[ 2302.241711] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2302.248202] CR2: 00002241ff81a000 CR3: 0000000c35637006 CR4: 00000000007726f0
+[ 2302.256083] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 2302.263968] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 2302.271834] PKRU: 55555554
+[ 2302.275280] Call Trace:
+[ 2302.278465]  <TASK>
+[ 2302.281294]  ? __warn.cold+0xb7/0x156
+[ 2302.285679]  ? io_ring_exit_work+0x160/0x4d6
+[ 2302.290749]  ? report_bug+0xfb/0x140
+[ 2302.295064]  ? handle_bug+0x4f/0x90
+[ 2302.299280]  ? exc_invalid_op+0x17/0x60
+[ 2302.303827]  ? asm_exc_invalid_op+0x1a/0x20
+[ 2302.308729]  ? io_ring_exit_work+0x147/0x4d6
+[ 2302.313709]  ? io_ring_exit_work+0x160/0x4d6
+[ 2302.318691]  ? lock_release+0x1fa/0x290
+[ 2302.323239]  ? lock_release+0x1fa/0x290
+[ 2302.327766]  ? process_one_work+0x21f/0x5a0
+[ 2302.332649]  ? process_one_work+0x1f9/0x5a0
+[ 2302.337532]  process_one_work+0x21f/0x5a0
+[ 2302.342246]  worker_thread+0x1dc/0x3c0
+[ 2302.346690]  ? rescuer_thread+0x480/0x480
+[ 2302.351382]  kthread+0xe0/0x110
+[ 2302.355220]  ? kthread_insert_work_sanity_check+0x60/0x60
+[ 2302.361303]  ret_from_fork+0x31/0x50
+[ 2302.365553]  ? kthread_insert_work_sanity_check+0x60/0x60
+[ 2302.371623]  ret_from_fork_asm+0x11/0x20
+[ 2302.376227]  </TASK>
+[ 2302.379085] irq event stamp: 9210
+[ 2302.383074] hardirqs last  enabled at (9209): [<ffffffffa4c8af28>]
+_raw_spin_unlock_irq+0x28/0x40
+[ 2302.392619] hardirqs last disabled at (9210): [<ffffffffa4c8052e>]
+__schedule+0xede/0x1700
+[ 2302.401558] softirqs last  enabled at (9172): [<ffffffffa40a1027>]
+__irq_exit_rcu+0xc7/0xf0
+[ 2302.410573] softirqs last disabled at (9131): [<ffffffffa40a1027>]
+__irq_exit_rcu+0xc7/0xf0
+[ 2302.419587] ---[ end trace 0000000000000000 ]---
+
+Did you see anything similar ?
 
 -- 
 Damien Le Moal
