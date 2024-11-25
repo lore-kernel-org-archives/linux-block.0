@@ -1,224 +1,95 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295631B0F30;
-	Mon, 25 Nov 2024 14:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBA71B395F
+	for <linux-block@vger.kernel.org>; Mon, 25 Nov 2024 15:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732546656; cv=none; b=gyj7zhLR+P9lTsb0yYcpjguvUSn473iUJRi8m9jWvnVLZodxibb5Rvm51D2G9EsbQDM9Z3XvuHnjrTnbgge52500Vbs6qsAMX2UdLwunntygqIXJdlgCIxfBI/RvBg/9YFWWjsWv23xVP/05dLbmUobKv+g0TuGl1bHOLmBpBds=
+	t=1732549370; cv=none; b=A/nAyK3kYkUPvqazO6/99O2ssLvsaeS8H2AGIfMGa9N/T6elUYivovhaeFkGjUkXHqaDPXJ0lytAGTIU5NIZZP2aJ2kuMDWizIZ5ZZxeyi2kO6+i+WWGYA73h1zoJrB0o3OopmrhFKov7JcH9cwYbOL1StaP1P6KeXgBtuMBKyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732546656; c=relaxed/simple;
-	bh=pKNluBWP/OdjdtjZRI6OsprT85cpi/zCHYe2a9DKN2U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BKixeC9OO09I5xL+BCQRDupSu5n1FUpOfNFi45QFxpN320ucnaO/gDN1DOR193o4gKe23GogLwxfFMGpAjHqLx0DMQt3XkGRpgwVcuHE1opK4hnTK1szekQ43RDfcudPHFgr6aXiDeM1pbB1Qx0T3lu3FNc3vDa4bTXacJxXBLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fXb67NMm; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1732549370; c=relaxed/simple;
+	bh=3qfaGKvrmcZpSYyOs5ufvgBqAGe3QaXdrn6DVtKyQMQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=fdgcFlsR3I+MqTiY34bZQawoe1psKSZTs8+pN5QhFkJ+jw6LtnNZeAjkiQjNMYsa7EW6ADDQyQ56tiQV8iJldzIaL3s5ORo9l1PLQ/PkmqNjHiFUA0q+0W5/lWIXjlxZxNtVu3dM38Mku7u+SOzCVmwkWiMa8oYYFNZDxaX5q+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=vcbTVFYW; arc=none smtp.client-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fXb67NMm"
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-aa545dc7105so242026166b.3;
-        Mon, 25 Nov 2024 06:57:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="vcbTVFYW"
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3ea53011deaso217905b6e.1
+        for <linux-block@vger.kernel.org>; Mon, 25 Nov 2024 07:42:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732546652; x=1733151452; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Mwycz/MiAZLiFKmS9hGPG2W/0xImNpvKNhmHBM//itM=;
-        b=fXb67NMm8haEGFgVopgyzguNDr8TnnglrBuzDpKocu33i3pGYfIXur55aDOyxBJpwo
-         e1NJJoWny4hegrVz2kHBC9svlxjwuSu8f8PdzOFzpjDWM0eeKoxkMj6KCirMeLZwxdK4
-         Kj1hRuqoQLyKj0pj0MG4op7SgnHW8meNQpCyQpCpqOtoRW5T0Qjv/bjNLjUtKK01ECHX
-         8/6XVxwLHARrU1jhizvg72/FqUDjPRpRYjxnjqCpB90cyB4If2kZZQEbROtc7KQrIG1y
-         GuN3yVIboG7tw/kP+yOvXJEQyF/2Wc/0Qr0hx+P28iWjNmQ/SLTmQIhjRXqIewXIebbR
-         K7Og==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732549366; x=1733154166; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qGQKLVi2g7XMVrzZl+9pMy5LJRBb15i9OHUSIDCOuTI=;
+        b=vcbTVFYWp8fchIgwgtGpd9IatKNmj6O/LktO/kfdUXEzKYpfnY6p3/hVyhSt2Caxgq
+         qafVODsvb4cNU/D4RpME4n4q3Q5eZsnBn0JGzk6EaDJNHsQTyohFd1U6UZTg0CxFPb6P
+         vtCgJDd6WUPPFae2eR2AzeYmownjHoeUv2praGVm0Mq9vtAu6wCF1Hwg9uYe/xuRx+Yo
+         UqhkCyU4YSjARf06lWVr+saPJdw+nmz6NsN15/2AJY7N5ToXPcwJHnKDZm26IHRvuij5
+         D6XACd3JuY7biBDQ+iSBYg2ckbbS+UTlH7o4OxMfTK57Poxb5DflTcxdou5z6tlqr+tX
+         I8pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732546652; x=1733151452;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mwycz/MiAZLiFKmS9hGPG2W/0xImNpvKNhmHBM//itM=;
-        b=Lc7L9ZY7qTEek4eNu3vsfW/NbZgDWqthJyN8TKW9oW0ztG1DkUQG0/MgH2L+9lh4Xe
-         Q8EjDY+dboVa6YLA1DyxnW1TJrRpXqeXwiXKLt1tHoTwTHv6gmow6wgovwHDfL2qlszH
-         hkedTjG462n2tJ5Z4WvF4s9l3aLZDWRnqXpdnDOV3q8CbVllqmPF3ZdtfIifBVozcY9u
-         +IYAmpJA7/h8xqsHrFtxgyHWulxT4LYWCOA0iliEr6FfH/MEEPx1EeCi3YqgX+UwDiVb
-         OgwvmMNcuWKmvBKveTv9harbjQLGGOhNIOTTEHROpqdoAUNyjTfWgLxCwvOAtrb83bhe
-         MvwA==
-X-Forwarded-Encrypted: i=1; AJvYcCVObs41tu51Pc3oDQBsKqnA+tRhVjgtSUa4oWo9y7wK7q38Mcdh0nI/yuBxF5Ce2uJbHnu8KxP4aLLw9A==@vger.kernel.org, AJvYcCWGnb2S1Ranf4jFsuG8arZlD10Sg1er3v+iy/BbBDMCxVVjojTJJaLwqWUyIguL1YKeZhKHwlFnhPfG5DYBPA==@vger.kernel.org, AJvYcCXWgPSmoBUisOy1ggs4K3zs3UWfidRETdF+ihIXT8+pApHHR82G3vAUYscvG5s3OEDvV2UY58sqvy+LgQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVCUVZ9W2+7aKwK8xQhBGr9PddWSC0yQZ3sRhzXbk6O63huhIP
-	8x0XzumwKI0aCm1cIvzyWQcVXLYXTTSsivBUcW7fWjF6x+csWDV1
-X-Gm-Gg: ASbGncvWflhKapIN+gf0mM1eVypMUHmu1yLp/LRg+M46HqxGUFf3OgKU4Q9AVTDPjmw
-	eIThweOHar0+TE1BwL0utvu+uTvp4qVMhyc6yr7B+v8qA/6eu2ZPJl25kDX6VzwGSci0cxi0oI1
-	AKGmYhZBGJOKBr9rC4mFaagXZRHD6UOj3cWXl0mL3c5groiWU6GuqJ3s7xTsoBxJ5mRKY9VyNNs
-	z9RRtHAReHKW+/W6Zcz1HO58beOh+a3ppw46K18DbUUxzuB1ovDjrrzUtrmOw==
-X-Google-Smtp-Source: AGHT+IEzNyoWXmldDRbK4hugvlNPC35UUFsvEms5CLemQoA8167zZU/Ipeyzrkp+FtvQyJR2Aj95nA==
-X-Received: by 2002:a17:906:3194:b0:aa5:28af:f0e with SMTP id a640c23a62f3a-aa528af0f4amr1066397166b.15.1732546651154;
-        Mon, 25 Nov 2024 06:57:31 -0800 (PST)
-Received: from [192.168.42.132] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa50b52fd20sm473799366b.111.2024.11.25.06.57.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Nov 2024 06:57:30 -0800 (PST)
-Message-ID: <a28b46a0-9eb5-45db-80ec-93fdc0eec35e@gmail.com>
-Date: Mon, 25 Nov 2024 14:58:19 +0000
+        d=1e100.net; s=20230601; t=1732549366; x=1733154166;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qGQKLVi2g7XMVrzZl+9pMy5LJRBb15i9OHUSIDCOuTI=;
+        b=Td4eAi/D3lee7Fe1+KeBFnQdeejIZXQhmUA3+NaDbE5EwgUNzDEqlsTsPsjib5K/fB
+         3ztHmzfmdRwchkA5bzM+6ymfmosKX7NprbB9xZBf8bWQIL/HA9t69CPnT7Gn80xsvGPt
+         TYupO9r49uysh/srj6nwMOV0aqJm+hg43YD9dv6V+Oyxo35Mv5SijtHdWh8/REO5VTKR
+         gEOcigtZ8oQgehHczTM5Is9ZenM0zob8BsCYAqCyoVHIH+r+FQeHeV0GrNxV7nJgAWKr
+         Zwwy/pvOioJdYw6X+cV0SGSP5pLvdhglAQLMMqVepviId0hZZU4WsrI0lSPiYUj+ajbY
+         Hseg==
+X-Gm-Message-State: AOJu0Yzkxzeuc1RXNs3Lc8frH9Ed7WVHxMLJU9XFLAXxR2jgWv0YyGuD
+	oP+xYZSC1ryR00B8DkuEvjFhjBKZTJv3Q+Zieu/uzTRbVQ1YVpD/XQwyDNnmcyd9Y0k5KvChNSm
+	wGDA=
+X-Gm-Gg: ASbGnctU78IYnMWrDb1fFkQ2N/cwpRvt/GbdS4GRaUAbaLaU+HX+Mich4qYrP4uGqIw
+	p8ZUHM3kEGz9iVMSXpCfr0nCTfLcyWTlPuj0C/5kkToE/uZi2uW72HuiK5cEBMqjC24riCIfJOO
+	BNAcHegL4A8NBWp1dejKl7YQJZpoFBY66/bvdUQD9ghsvABz3VA7SW7vmReGpCyY1TSiHUGaEKW
+	enVvzaNAH9MftIHwcUU9koV56IoRNmwaWniU256
+X-Google-Smtp-Source: AGHT+IH17Mk8W5OEETM80r1GLFohk1Pyc8dyg2KyV4CpNWaEaBBrAwHRzAS/tBgVkQ2WITd3F+JA3Q==
+X-Received: by 2002:a05:6808:4448:b0:3e8:1ed7:e6cf with SMTP id 5614622812f47-3e9157ab353mr14008449b6e.7.1732549365866;
+        Mon, 25 Nov 2024 07:42:45 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3e914e8adcdsm2326437b6e.20.2024.11.25.07.42.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Nov 2024 07:42:45 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: John Garry <john.g.garry@oracle.com>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20241125100258.4172774-1-john.g.garry@oracle.com>
+References: <20241125100258.4172774-1-john.g.garry@oracle.com>
+Subject: Re: [PATCH] block: Remove extra part pointer NULLify in
+ blk_rq_init()
+Message-Id: <173254936500.18678.5955333216581652520.b4-ty@kernel.dk>
+Date: Mon, 25 Nov 2024 08:42:45 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 06/10] io_uring: introduce attributes for read/write
- and PI support
-To: Anuj Gupta <anuj20.g@samsung.com>, axboe@kernel.dk, hch@lst.de,
- kbusch@kernel.org, martin.petersen@oracle.com, anuj1072538@gmail.com,
- brauner@kernel.org, jack@suse.cz, viro@zeniv.linux.org.uk
-Cc: io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org, gost.dev@samsung.com,
- linux-scsi@vger.kernel.org, vishak.g@samsung.com,
- linux-fsdevel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-References: <20241125070633.8042-1-anuj20.g@samsung.com>
- <CGME20241125071502epcas5p46c373574219a958b565f20732797893f@epcas5p4.samsung.com>
- <20241125070633.8042-7-anuj20.g@samsung.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20241125070633.8042-7-anuj20.g@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-86319
 
-On 11/25/24 07:06, Anuj Gupta wrote:
-> Add the ability to pass additional attributes along with read/write.
-> Application can populate attribute type and attibute specific information
-> in 'struct io_uring_attr' and pass its address using the SQE field:
-> 	__u64	attr_ptr;
+
+On Mon, 25 Nov 2024 10:02:58 +0000, John Garry wrote:
+> The rq->part pointer is already NULLified in the memset() call, so - like
+> for other pointers in rq - don't re-NULLify.
 > 
-> Along with setting a mask indicating attributes being passed:
-> 	__u64	attr_type_mask;
 > 
-> Overall 64 attributes are allowed and currently one attribute
-> 'ATTR_TYPE_PI' is supported.
-> 
-> With PI attribute, userspace can pass following information:
-> - flags: integrity check flags IO_INTEGRITY_CHK_{GUARD/APPTAG/REFTAG}
-> - len: length of PI/metadata buffer
-> - addr: address of metadata buffer
-> - seed: seed value for reftag remapping
-> - app_tag: application defined 16b value
 
-The API and io_uring parts look good, I'll ask to address the
-ATTR_TYPE comment below, the rest are nits, which that can be
-ignored and/or delayed.
+Applied, thanks!
 
-> Process this information to prepare uio_meta_descriptor and pass it down
-> using kiocb->private.
+[1/1] block: Remove extra part pointer NULLify in blk_rq_init()
+      commit: edc80c585772cac59ef780899269436a0823fe67
 
-I'm not sure using ->private is a good thing, but I assume it
-was discussed, so I'll leave it to Jens and other folks.
-
-
-> PI attribute is supported only for direct IO.
-> 
-> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> ---
->   include/uapi/linux/io_uring.h | 31 +++++++++++++
->   io_uring/io_uring.c           |  2 +
->   io_uring/rw.c                 | 82 ++++++++++++++++++++++++++++++++++-
->   io_uring/rw.h                 | 14 +++++-
->   4 files changed, 126 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-> index aac9a4f8fa9a..bf28d49583ad 100644
-> --- a/include/uapi/linux/io_uring.h
-> +++ b/include/uapi/linux/io_uring.h
-> @@ -98,6 +98,10 @@ struct io_uring_sqe {
->   			__u64	addr3;
->   			__u64	__pad2[1];
->   		};
-> +		struct {
-> +			__u64	attr_ptr; /* pointer to attribute information */
-> +			__u64	attr_type_mask; /* bit mask of attributes */
-> +		};
->   		__u64	optval;
->   		/*
->   		 * If the ring is initialized with IORING_SETUP_SQE128, then
-> @@ -107,6 +111,33 @@ struct io_uring_sqe {
->   	};
->   };
->   
-> +
-> +/* Attributes to be passed with read/write */
-> +enum io_uring_attr_type {
-> +	ATTR_TYPE_PI,
-> +	/* max supported attributes */
-> +	ATTR_TYPE_LAST = 64,
-
-ATTR_TYPE sounds too generic, too easy to get a symbol collision
-including with user space code.
-
-Some options: IORING_ATTR_TYPE_PI, IORING_RW_ATTR_TYPE_PI.
-If it's not supposed to be io_uring specific can be
-IO_RW_ATTR_TYPE_PI
-
-> +};
-> +
-> +/* sqe->attr_type_mask flags */
-> +#define ATTR_FLAG_PI	(1U << ATTR_TYPE_PI)
-> +/* PI attribute information */
-> +struct io_uring_attr_pi {
-> +		__u16	flags;
-> +		__u16	app_tag;
-> +		__u32	len;
-> +		__u64	addr;
-> +		__u64	seed;
-> +		__u64	rsvd;
-> +};
-> +
-> +/* attribute information along with type */
-> +struct io_uring_attr {
-> +	enum io_uring_attr_type	attr_type;
-
-I'm not against it, but adding a type field to each attribute is not
-strictly needed, you can already derive where each attr placed purely
-from the mask. Are there some upsides? But again I'm not against it.
-
-> +	/* type specific struct here */
-> +	struct io_uring_attr_pi	pi;
-> +};
-> +
->   /*
->    * If sqe->file_index is set to this for opcodes that instantiate a new
->    * direct descriptor (like openat/openat2/accept), then io_uring will allocate
-> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-> index c3a7d0197636..02291ea679fb 100644
-> --- a/io_uring/io_uring.c
-> +++ b/io_uring/io_uring.c
-> @@ -3889,6 +3889,8 @@ static int __init io_uring_init(void)
->   	BUILD_BUG_SQE_ELEM(46, __u16,  __pad3[0]);
->   	BUILD_BUG_SQE_ELEM(48, __u64,  addr3);
->   	BUILD_BUG_SQE_ELEM_SIZE(48, 0, cmd);
-> +	BUILD_BUG_SQE_ELEM(48, __u64, attr_ptr);
-> +	BUILD_BUG_SQE_ELEM(56, __u64, attr_type_mask);
->   	BUILD_BUG_SQE_ELEM(56, __u64,  __pad2);
->   
->   	BUILD_BUG_ON(sizeof(struct io_uring_files_update) !=
-> diff --git a/io_uring/rw.c b/io_uring/rw.c
-> index 0bcb83e4ce3c..71bfb74fef96 100644
-> --- a/io_uring/rw.c
-> +++ b/io_uring/rw.c
-> @@ -257,11 +257,54 @@ static int io_prep_rw_setup(struct io_kiocb *req, int ddir, bool do_import)
->   	return 0;
->   }
-...
-> @@ -902,6 +976,8 @@ static int __io_read(struct io_kiocb *req, unsigned int issue_flags)
->   	 * manually if we need to.
->   	 */
->   	iov_iter_restore(&io->iter, &io->iter_state);
-> +	if (kiocb->ki_flags & IOCB_HAS_METADATA)
-> +		io_meta_restore(io);
-
-That can be turned into a helper, but that can be done as a follow up.
-
-I'd also add a IOCB_HAS_METADATA into or around of
-io_rw_should_retry(). You're relying on O_DIRECT checks, but that
-sounds a bit fragile in the long run.
-
+Best regards,
 -- 
-Pavel Begunkov
+Jens Axboe
+
+
+
