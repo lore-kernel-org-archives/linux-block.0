@@ -1,424 +1,263 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD88614F9F7
-	for <linux-block@vger.kernel.org>; Sun, 24 Nov 2024 23:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BCD10F9;
+	Mon, 25 Nov 2024 01:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732490000; cv=none; b=ddfYSUr5TiVSyim2uThAMUNwa0nh7b2kTeAnpOnvRg8yg60l5/mULJgTw9kdTfCA5TS2N9QoI+XBzM99/OJLOIJigGU0PPd7Zmt2B8NHODhtZv0TSEBcyRpbwLm9MyOtAF9SeNPTF7eS0LrvyDqR/mpKqMVuf3n7qQpJsF5eFr4=
+	t=1732496763; cv=none; b=ukOSmSJYdLvCGfE+DD9AMF6qTqR7lUTzNjtR6IecnwgNIfokpQNv4iJhkMWMsS9hUzsw0O1mJ35kUwTwRKA8livafxsYQyFQ3jnyjwTizMYkNy8nYeYJHlUTpl27uRAY84EnBUAJ9gNSsqmbBihk6YYkadyE8a9RKHaAX2Rphe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732490000; c=relaxed/simple;
-	bh=9531LjBZV1Xv0wsbzbNx6HGuw1jKS8W0+M26/EFREIg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Zi5qmk1tJf1rrQVE7tDEUJZvZuBxi8XPah1a54jt1vzkgFs6aRQ/z2VE46Rsc/ePX29rNx4GREaMxE+1mShpL5VySwbtrJYIVEUWU/UVgBDya/XuF5qEOBP6oWVWgshWFYMtDCgtJ19QHJjjzQmuQqyQC6MBP8cbUwaUkmOhZyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a77a0ca771so27430315ab.0
-        for <linux-block@vger.kernel.org>; Sun, 24 Nov 2024 15:13:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732489998; x=1733094798;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aIp1r+MfuM69bclMjMD0bqrhiNUlLBDaI+hfxS56xEg=;
-        b=Ad1csSIkpIScv1Kg+AHecVfJ1E0ElbCdmZQjzz231zBjq/mUSw77Zdd+VYLujGKehw
-         e2hk7BMyQO/8xL8vc4DtRZ/7uFsvKrnqnH397oZvWAEvwAiKY7c2NeyDTTdWlT7p3pVY
-         1mgSw9f2OthZUuJFmbTvjpcRz1+1NAo5YeINdcSeTrZrFOZ2SfkpoKRDn92/Rkb+sUAv
-         eEXQf0+OD8MLn9QBTnb4Wmy3IUUYTx4eIDvmwXmfHPyWeq5UsRQylcReI67SBK5m8GAK
-         gpU+mI5E7w51LDiUTzyRcDYJEcMEVK0zY1RavtDZI+DaRDwZCaOXA0ZnCcSLNRPhNa8r
-         UMrw==
-X-Forwarded-Encrypted: i=1; AJvYcCUO3sMIbVc4OqmoIVYYR4ops+4JycToGQm3pQzMIUD9Fh5fUolCCTEv3xtT/XwTybcejGZ5NOrg7SEOPQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YytGNtstMhQna462bR+7ex17PZv/MQ6E0I0lei1bQ5V6pyl6CvB
-	o97chtA3DL4EG/ZPIQf4ARrJmzvPa9Md9dq4R6ijE/WIJlyNKlL0/J5ROjx3wU6B3NzejNe6kSD
-	168rU33eil/chz/0D0YQJ+YF2Q+VmzFDg5JX7adztIWv+esyhcS5VQL0=
-X-Google-Smtp-Source: AGHT+IGyC0PK5gs0d5ShK/KKN68y1WnlJ8S3Qm4QaVjqam5JOR6NlReBhTWXCtWOaYIZbVZuOc9KBjdXgzc5JhhYTGQFdHL179cc
+	s=arc-20240116; t=1732496763; c=relaxed/simple;
+	bh=a2FpWNrjnAnywCChizhNMKhReBpsf1ERMjw8kG0RmsM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R94G2xhM6K2Dr0bo+pPOYXwAVBHAjKoaabMC8gpHqyfq+wRxoveOncKVQ3o7sW11Du+cXfV8h/quYJhOpg4JimEzsWE+dHEp6pRDTKOnhGx0bGlLxSzXwiIw7YsNKA7WERQaWOaN5ZzmFLba1HEiDgLTzSkZRW2yeOvtH0C3QPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-3c9ff7000001d7ae-64-6743cd6c65e0
+Date: Mon, 25 Nov 2024 10:05:43 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Yunseong Kim <yskelg@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel_team@skhynix.com,
+	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, 42.hyeyoo@gmail.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
+	longman@redhat.com, hdanton@sina.com, her0gyugyu@gmail.com,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: Re: [PATCH v14 2/28] dept: Implement Dept(Dependency Tracker)
+Message-ID: <20241125010543.GA9137@system.software.com>
+References: <20240508094726.35754-3-byungchul@sk.com>
+ <489d941f-c4e8-4d1f-92ee-02074c713dd1@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a03:b0:3a7:81a4:a557 with SMTP id
- e9e14a558f8ab-3a79afd9ab5mr110281855ab.24.1732489997917; Sun, 24 Nov 2024
- 15:13:17 -0800 (PST)
-Date: Sun, 24 Nov 2024 15:13:17 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6743b30d.050a0220.1cc393.004e.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in blk_mq_update_nr_hw_queues
-From: syzbot <syzbot+6279b273d888c2017726@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <489d941f-c4e8-4d1f-92ee-02074c713dd1@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sb0xTVxjGPfee3ntpWnIpGo5g1NSpC4sKROeb6IiGBG/iTEy2zERNtBl3
+	tFlB0gLKsk2glThQBBJklD+WgqWUKlhkc05IxYBWojJEQAWCjESRf8pst0rjbCFGvpz88rzn
+	PL/3w+FoRTkTyWlS00VdqkqrZKRYOi2r2aS9l5Acc/H3bVB8JgY8b05jqGxyMNBzuRGB42oO
+	BROde2DAO4Vg/t4DGspKexDUPBum4WrXCII2Wy4DD8dDoc8zy4C7tIABQ20TA39N+ikYOl9C
+	QaNzH3QXWShw+Z5jKJtgoKLMQAWOFxT4rHYWrNnrYcxmYsH/LBbcI/0SaHvyGZRXDzFwo82N
+	oevaGAUPr1cyMOL4XwLdXXcw9BSflcClGQsDk14rDVbPLAu9LjMFzcZAUd4/7yRw+6yLgry6
+	KxT0Pf4TQfvpUQqcjn4GbnmmKGhxltLwtr4TwVjhNAunzvhYqMgpRFBw6jwG49A2mP8vYKx6
+	Ews5F5rxrh2Co9qBhFtTs7RgbDkutHnNWLhrIcIfpmFWMLY/YQWzM0NosUULtTcmKKFmziMR
+	nPZfGME5V8IK+dN9lDBz/z4r3Pl1Hu+POijdmSRqNZmibkv8Uam6y+XAaXVxJx4MZGSjpg35
+	KIQj/FbivVBC5SNugcdfyoIx5teTR/XjKMgMv5EMDvroIC/n15GGVvsC0/wrKSl5/F2Qw/lE
+	Mmu/iYM1cn47+dcYHYwVvJpU+Q0LNXI+jLjLx/Hi043EX91LB6/TfBSpf8ctxmuIobVioT2E
+	/4L03W2WBHlFwOr67XZgSWlgyf4Q0lTbSi9uv5LctA3iIhRmWqIwLVGYPipMSxRmhO1IoUnN
+	TFFptFs3q7NSNSc2f3ssxYkCH9b6k//QNTTX81UH4jmklMmLDiUkKySqTH1WSgciHK1cLg+N
+	CETyJFXWD6Lu2BFdhlbUd6AoDisj5HHe40kKPlmVLn4vimmi7sOU4kIis9Gy3sPup+LBk3tj
+	ataasyaHGn5uzO3exNErVsuiwxLo+Pi5fZdfDreHJ9jsfIfF0DqqHfzasmWVZ+D6VGzV3vSC
+	1598mcasjBkdPWeIjGtekzeh/HsyVxdBds4kdtq2h2pt6mW7N3B10FB4KfHT+ulSX/GBzwt/
+	dBvCq2Xf6Cvda5VYr1bFRtM6veo9bUSmFqwDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0yTZxTH8zzvtdWSdx3qO9w06+bMICpMiSfRbUa2+WzL1OzDlmimNvpK
+	G8utlUuNbrAWIjcHLMAsggVMYaUTLOLcFNaBVKoiTFDBUKaERBGUBSmKdG4txsiXk1/+55zf
+	+XJ4SjnDhPHa+P2SPl6tU7FyWr55nWmFrjMmNtKbEwaFeZHgmzxMw7F6BwvdJ+sQOE5nYBhp
+	3wQ3p8YQzHR2UVBa3I2g8o6XgtPuQQTNtd+z0DMcAr2+cRY8xbksmKrrWfhr1I9hoKQIQ53z
+	C7hcUIXBNX2XhtIRFspKTThQ7mGYttk5sKUvg6FaCwf+O1HgGbzBQFu5h4HmWxFwtGKAhfPN
+	HhrcZ4cw9Px+jIVBx38MXHZ30NBdmM/ALw+rWBidslFg841zcM1lxdBgDtiyHj1j4GK+C0PW
+	iVMYevvPIWg5fBuD03GDhTbfGIZGZzEFT2vaEQwdecBBZt40B2UZRxDkZpbQYB6IhpkngYvl
+	k1GQcbyB3rCeOCociLSNjVPE3JhKmqesNLlUJZLfLF6OmFtuccTqTCaNteGk+vwIJpUTPoY4
+	7dkscU4UcSTnQS8mD69e5UjHTzP01te3ydfvkXTaFEm/6oNdco3b5aATT7yX1nUzOR3Vv5OD
+	eF4U1ojD9+fnIBlPC8vE6zXDKMissFzs65umghwqvCX+3GSfZUr4Ry4W9e8N8qvCJ+K4/U86
+	qFEIa8XH5vBgrBQ0YrnfNKtRCK+InqPD9PPV5aK/4hoVHKeExWLNM/55vFQ0NZXN2mXC+2Lv
+	pQYmyAsCV11nLuICFGKZY7LMMVlemixzTFZE21GoNj4lTq3VRa807NMY47VpK3cnxDlR4CVt
+	h/yFZ9Fkz6ZWJPBINV9RsD0mVsmoUwzGuFYk8pQqVBGyKBAp9qiNByR9wk59sk4ytKLFPK1a
+	pPjsa2mXUohV75f2SVKipH/RxbwsLB3hPuOXO1jl6h/NlQWRh2xRuRv83o/0m7c+yvx0Xlp0
+	xVdv56m8JCImf2L7uxsNtuye1G8+r7NJXVvCtmR6/CVNSzTeJOOv5h9kf7cs3Taq+df6XWJ1
+	Ula/W3YqWy4lvHFw5/HXTqYKMbc70w8mXdDtcH18pfjMwvbHb35o//aPCxEpHe0q2qBRR4VT
+	eoP6f9kzxoeOAwAA
+X-CFilter-Loop: Reflected
 
-Hello,
+On Sun, Nov 24, 2024 at 10:34:02PM +0900, Yunseong Kim wrote:
+> Hi Byungchul,
+> 
+> Thank you for the great feature. Currently, DEPT has a bug in the
+> 'dept_key_destroy()' function that must be fixed to ensure proper
+> operation in the upstream Linux kernel.
+> 
+> On 5/8/24 6:46 오후, Byungchul Park wrote:
+> > CURRENT STATUS
+> > --------------
+> > Lockdep tracks acquisition order of locks in order to detect deadlock,
+> > and IRQ and IRQ enable/disable state as well to take accident
+> > acquisitions into account.
+> > 
+> > Lockdep should be turned off once it detects and reports a deadlock
+> > since the data structure and algorithm are not reusable after detection
+> > because of the complex design.
+> > 
+> > PROBLEM
+> > -------
+> > *Waits* and their *events* that never reach eventually cause deadlock.
+> > However, Lockdep is only interested in lock acquisition order, forcing
+> > to emulate lock acqusition even for just waits and events that have
+> > nothing to do with real lock.
+> > 
+> > Even worse, no one likes Lockdep's false positive detection because that
+> > prevents further one that might be more valuable. That's why all the
+> > kernel developers are sensitive to Lockdep's false positive.
+> > 
+> > Besides those, by tracking acquisition order, it cannot correctly deal
+> > with read lock and cross-event e.g. wait_for_completion()/complete() for
+> > deadlock detection. Lockdep is no longer a good tool for that purpose.
+> > 
+> > SOLUTION
+> > --------
+> > Again, *waits* and their *events* that never reach eventually cause
+> > deadlock. The new solution, Dept(DEPendency Tracker), focuses on waits
+> > and events themselves. Dept tracks waits and events and report it if
+> > any event would be never reachable.
+> > 
+> > Dept does:
+> >    . Works with read lock in the right way.
+> >    . Works with any wait and event e.i. cross-event.
+> >    . Continue to work even after reporting multiple times.
+> >    . Provides simple and intuitive APIs.
+> >    . Does exactly what dependency checker should do.
+> > 
+> > Q & A
+> > -----
+> > Q. Is this the first try ever to address the problem?
+> > A. No. Cross-release feature (b09be676e0ff2 locking/lockdep: Implement
+> >    the 'crossrelease' feature) addressed it 2 years ago that was a
+> >    Lockdep extension and merged but reverted shortly because:
+> > 
+> >    Cross-release started to report valuable hidden problems but started
+> >    to give report false positive reports as well. For sure, no one
+> >    likes Lockdep's false positive reports since it makes Lockdep stop,
+> >    preventing reporting further real problems.
+> > 
+> > Q. Why not Dept was developed as an extension of Lockdep?
+> > A. Lockdep definitely includes all the efforts great developers have
+> >    made for a long time so as to be quite stable enough. But I had to
+> >    design and implement newly because of the following:
+> > 
+> >    1) Lockdep was designed to track lock acquisition order. The APIs and
+> >       implementation do not fit on wait-event model.
+> >    2) Lockdep is turned off on detection including false positive. Which
+> >       is terrible and prevents developing any extension for stronger
+> >       detection.
+> > 
+> > Q. Do you intend to totally replace Lockdep?
+> > A. No. Lockdep also checks if lock usage is correct. Of course, the
+> >    dependency check routine should be replaced but the other functions
+> >    should be still there.
+> > 
+> > Q. Do you mean the dependency check routine should be replaced right
+> >    away?
+> > A. No. I admit Lockdep is stable enough thanks to great efforts kernel
+> >    developers have made. Lockdep and Dept, both should be in the kernel
+> >    until Dept gets considered stable.
+> > 
+> > Q. Stronger detection capability would give more false positive report.
+> >    Which was a big problem when cross-release was introduced. Is it ok
+> >    with Dept?
+> > A. It's ok. Dept allows multiple reporting thanks to simple and quite
+> >    generalized design. Of course, false positive reports should be fixed
+> >    anyway but it's no longer as a critical problem as it was.
+> > 
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> 
+> If a module previously checked for dependencies by DEPT is loaded and
+> then would be unloaded, a kernel panic shall occur when the kernel
 
-syzbot found the following issue on:
+Hi,
 
-HEAD commit:    06afb0f36106 Merge tag 'trace-v6.13' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=168001c0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=95b76860fd16c857
-dashboard link: https://syzkaller.appspot.com/bug?extid=6279b273d888c2017726
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Thank you for sharing the issue.  Yes.  I'm aware of what you are
+mentioning.  I will fix it with high priority.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Thanks again.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/112cedff0255/disk-06afb0f3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f65020d28328/vmlinux-06afb0f3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4fb4cb7df5b1/bzImage-06afb0f3.xz
+	Byungchul
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6279b273d888c2017726@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.12.0-syzkaller-07834-g06afb0f36106 #0 Not tainted
-------------------------------------------------------
-syz.2.2220/13838 is trying to acquire lock:
-ffff8880257485d8 (&q->sysfs_lock){+.+.}-{4:4}, at: blk_mq_elv_switch_none block/blk-mq.c:4847 [inline]
-ffff8880257485d8 (&q->sysfs_lock){+.+.}-{4:4}, at: __blk_mq_update_nr_hw_queues block/blk-mq.c:4925 [inline]
-ffff8880257485d8 (&q->sysfs_lock){+.+.}-{4:4}, at: blk_mq_update_nr_hw_queues+0x3fa/0x1ae0 block/blk-mq.c:4985
-
-but task is already holding lock:
-ffff8880257480a8 (&q->q_usage_counter(io)#51){++++}-{0:0}, at: nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #7 (&q->q_usage_counter(io)#51){++++}-{0:0}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
-       bio_queue_enter block/blk.h:75 [inline]
-       blk_mq_submit_bio+0x1536/0x23a0 block/blk-mq.c:3092
-       __submit_bio+0x2c6/0x560 block/blk-core.c:629
-       __submit_bio_noacct_mq block/blk-core.c:710 [inline]
-       submit_bio_noacct_nocheck+0x4d3/0xe30 block/blk-core.c:739
-       submit_bh fs/buffer.c:2824 [inline]
-       block_read_full_folio+0x93b/0xcd0 fs/buffer.c:2451
-       filemap_read_folio+0x14d/0x630 mm/filemap.c:2367
-       filemap_update_page mm/filemap.c:2451 [inline]
-       filemap_get_pages+0x17af/0x2540 mm/filemap.c:2572
-       filemap_read+0x45c/0xf50 mm/filemap.c:2647
-       blkdev_read_iter+0x2d8/0x430 block/fops.c:767
-       new_sync_read fs/read_write.c:484 [inline]
-       vfs_read+0x993/0xb70 fs/read_write.c:565
-       ksys_read+0x18f/0x2b0 fs/read_write.c:708
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #6 (mapping.invalidate_lock#2){++++}-{4:4}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
-       down_read+0xb1/0xa40 kernel/locking/rwsem.c:1524
-       filemap_invalidate_lock_shared include/linux/fs.h:873 [inline]
-       filemap_fault+0xd54/0x1950 mm/filemap.c:3352
-       __do_fault+0x137/0x460 mm/memory.c:4882
-       do_read_fault mm/memory.c:5297 [inline]
-       do_fault mm/memory.c:5431 [inline]
-       do_pte_missing mm/memory.c:3965 [inline]
-       handle_pte_fault+0x2d1c/0x6820 mm/memory.c:5766
-       __handle_mm_fault mm/memory.c:5909 [inline]
-       handle_mm_fault+0x1106/0x1bb0 mm/memory.c:6077
-       faultin_page mm/gup.c:1187 [inline]
-       __get_user_pages+0x1c82/0x49e0 mm/gup.c:1485
-       populate_vma_page_range+0x264/0x330 mm/gup.c:1923
-       __mm_populate+0x27a/0x460 mm/gup.c:2026
-       do_mlock+0x61f/0x7e0 mm/mlock.c:653
-       __do_sys_mlock mm/mlock.c:661 [inline]
-       __se_sys_mlock mm/mlock.c:659 [inline]
-       __x64_sys_mlock+0x60/0x70 mm/mlock.c:659
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #5 (&mm->mmap_lock){++++}-{4:4}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
-       __might_fault+0xc6/0x120 mm/memory.c:6716
-       _copy_from_iter+0x114/0x1e70 lib/iov_iter.c:259
-       copy_from_iter include/linux/uio.h:219 [inline]
-       copy_from_iter_full include/linux/uio.h:236 [inline]
-       skb_do_copy_data_nocache include/net/sock.h:2187 [inline]
-       skb_copy_to_page_nocache include/net/sock.h:2213 [inline]
-       tcp_sendmsg_locked+0x18a5/0x4f30 net/ipv4/tcp.c:1222
-       tcp_sendmsg+0x30/0x50 net/ipv4/tcp.c:1358
-       sock_sendmsg_nosec net/socket.c:711 [inline]
-       __sock_sendmsg+0x1a6/0x270 net/socket.c:726
-       sock_write_iter+0x2d7/0x3f0 net/socket.c:1147
-       new_sync_write fs/read_write.c:586 [inline]
-       vfs_write+0xaed/0xd30 fs/read_write.c:679
-       ksys_write+0x18f/0x2b0 fs/read_write.c:731
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #4 (sk_lock-AF_INET){+.+.}-{0:0}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
-       lock_sock_nested+0x48/0x100 net/core/sock.c:3622
-       lock_sock include/net/sock.h:1617 [inline]
-       inet_autobind net/ipv4/af_inet.c:178 [inline]
-       inet_send_prepare net/ipv4/af_inet.c:837 [inline]
-       inet_sendmsg+0x120/0x390 net/ipv4/af_inet.c:848
-       sock_sendmsg_nosec net/socket.c:711 [inline]
-       __sock_sendmsg+0x1a6/0x270 net/socket.c:726
-       sock_sendmsg+0x134/0x200 net/socket.c:749
-       __sock_xmit+0x219/0x4e0 drivers/block/nbd.c:577
-       sock_xmit drivers/block/nbd.c:605 [inline]
-       nbd_send_cmd drivers/block/nbd.c:691 [inline]
-       nbd_handle_cmd drivers/block/nbd.c:1113 [inline]
-       nbd_queue_rq+0x163c/0x2f30 drivers/block/nbd.c:1143
-       blk_mq_dispatch_rq_list+0xad5/0x19d0 block/blk-mq.c:2120
-       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:170 [inline]
-       blk_mq_do_dispatch_sched block/blk-mq-sched.c:184 [inline]
-       __blk_mq_sched_dispatch_requests+0xb8a/0x1840 block/blk-mq-sched.c:309
-       blk_mq_sched_dispatch_requests+0xd6/0x190 block/blk-mq-sched.c:331
-       blk_mq_run_hw_queue+0x354/0x500 block/blk-mq.c:2354
-       blk_mq_flush_plug_list+0x118e/0x1870 block/blk-mq.c:2915
-       __blk_flush_plug+0x420/0x500 block/blk-core.c:1213
-       blk_finish_plug block/blk-core.c:1240 [inline]
-       __submit_bio+0x46a/0x560 block/blk-core.c:637
-       __submit_bio_noacct_mq block/blk-core.c:710 [inline]
-       submit_bio_noacct_nocheck+0x4d3/0xe30 block/blk-core.c:739
-       submit_bh fs/buffer.c:2824 [inline]
-       block_read_full_folio+0x93b/0xcd0 fs/buffer.c:2451
-       filemap_read_folio+0x14d/0x630 mm/filemap.c:2367
-       do_read_cache_folio+0x3f5/0x850 mm/filemap.c:3827
-       read_mapping_folio include/linux/pagemap.h:1011 [inline]
-       read_part_sector+0xb3/0x330 block/partitions/core.c:722
-       adfspart_check_ICS+0xd9/0x9a0 block/partitions/acorn.c:360
-       check_partition block/partitions/core.c:141 [inline]
-       blk_add_partitions block/partitions/core.c:589 [inline]
-       bdev_disk_changed+0x72e/0x13f0 block/partitions/core.c:693
-       blkdev_get_whole+0x2d2/0x450 block/bdev.c:707
-       bdev_open+0x2d4/0xc50 block/bdev.c:916
-       blkdev_open+0x389/0x4f0 block/fops.c:627
-       do_dentry_open+0xbe3/0x1b70 fs/open.c:945
-       vfs_open+0x3e/0x330 fs/open.c:1075
-       do_open fs/namei.c:3828 [inline]
-       path_openat+0x2c84/0x3590 fs/namei.c:3987
-       do_filp_open+0x27f/0x4e0 fs/namei.c:4014
-       do_sys_openat2+0x13e/0x1d0 fs/open.c:1402
-       do_sys_open fs/open.c:1417 [inline]
-       __do_sys_openat fs/open.c:1433 [inline]
-       __se_sys_openat fs/open.c:1428 [inline]
-       __x64_sys_openat+0x247/0x2a0 fs/open.c:1428
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #3 (&nsock->tx_lock){+.+.}-{4:4}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
-       nbd_handle_cmd drivers/block/nbd.c:1079 [inline]
-       nbd_queue_rq+0x29c/0x2f30 drivers/block/nbd.c:1143
-       blk_mq_dispatch_rq_list+0xad5/0x19d0 block/blk-mq.c:2120
-       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:170 [inline]
-       blk_mq_do_dispatch_sched block/blk-mq-sched.c:184 [inline]
-       __blk_mq_sched_dispatch_requests+0xb8a/0x1840 block/blk-mq-sched.c:309
-       blk_mq_sched_dispatch_requests+0xd6/0x190 block/blk-mq-sched.c:331
-       blk_mq_run_hw_queue+0x354/0x500 block/blk-mq.c:2354
-       blk_mq_flush_plug_list+0x118e/0x1870 block/blk-mq.c:2915
-       __blk_flush_plug+0x420/0x500 block/blk-core.c:1213
-       blk_finish_plug block/blk-core.c:1240 [inline]
-       __submit_bio+0x46a/0x560 block/blk-core.c:637
-       __submit_bio_noacct_mq block/blk-core.c:710 [inline]
-       submit_bio_noacct_nocheck+0x4d3/0xe30 block/blk-core.c:739
-       submit_bh fs/buffer.c:2824 [inline]
-       block_read_full_folio+0x93b/0xcd0 fs/buffer.c:2451
-       filemap_read_folio+0x14d/0x630 mm/filemap.c:2367
-       do_read_cache_folio+0x3f5/0x850 mm/filemap.c:3827
-       read_mapping_folio include/linux/pagemap.h:1011 [inline]
-       read_part_sector+0xb3/0x330 block/partitions/core.c:722
-       adfspart_check_ICS+0xd9/0x9a0 block/partitions/acorn.c:360
-       check_partition block/partitions/core.c:141 [inline]
-       blk_add_partitions block/partitions/core.c:589 [inline]
-       bdev_disk_changed+0x72e/0x13f0 block/partitions/core.c:693
-       blkdev_get_whole+0x2d2/0x450 block/bdev.c:707
-       bdev_open+0x2d4/0xc50 block/bdev.c:916
-       blkdev_open+0x389/0x4f0 block/fops.c:627
-       do_dentry_open+0xbe3/0x1b70 fs/open.c:945
-       vfs_open+0x3e/0x330 fs/open.c:1075
-       do_open fs/namei.c:3828 [inline]
-       path_openat+0x2c84/0x3590 fs/namei.c:3987
-       do_filp_open+0x27f/0x4e0 fs/namei.c:4014
-       do_sys_openat2+0x13e/0x1d0 fs/open.c:1402
-       do_sys_open fs/open.c:1417 [inline]
-       __do_sys_openat fs/open.c:1433 [inline]
-       __se_sys_openat fs/open.c:1428 [inline]
-       __x64_sys_openat+0x247/0x2a0 fs/open.c:1428
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #2 (&cmd->lock){+.+.}-{4:4}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
-       nbd_queue_rq+0xfe/0x2f30 drivers/block/nbd.c:1135
-       blk_mq_dispatch_rq_list+0xad5/0x19d0 block/blk-mq.c:2120
-       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:170 [inline]
-       blk_mq_do_dispatch_sched block/blk-mq-sched.c:184 [inline]
-       __blk_mq_sched_dispatch_requests+0xb8a/0x1840 block/blk-mq-sched.c:309
-       blk_mq_sched_dispatch_requests+0xd6/0x190 block/blk-mq-sched.c:331
-       blk_mq_run_hw_queue+0x354/0x500 block/blk-mq.c:2354
-       blk_mq_flush_plug_list+0x118e/0x1870 block/blk-mq.c:2915
-       __blk_flush_plug+0x420/0x500 block/blk-core.c:1213
-       blk_finish_plug block/blk-core.c:1240 [inline]
-       __submit_bio+0x46a/0x560 block/blk-core.c:637
-       __submit_bio_noacct_mq block/blk-core.c:710 [inline]
-       submit_bio_noacct_nocheck+0x4d3/0xe30 block/blk-core.c:739
-       submit_bh fs/buffer.c:2824 [inline]
-       block_read_full_folio+0x93b/0xcd0 fs/buffer.c:2451
-       filemap_read_folio+0x14d/0x630 mm/filemap.c:2367
-       do_read_cache_folio+0x3f5/0x850 mm/filemap.c:3827
-       read_mapping_folio include/linux/pagemap.h:1011 [inline]
-       read_part_sector+0xb3/0x330 block/partitions/core.c:722
-       adfspart_check_ICS+0xd9/0x9a0 block/partitions/acorn.c:360
-       check_partition block/partitions/core.c:141 [inline]
-       blk_add_partitions block/partitions/core.c:589 [inline]
-       bdev_disk_changed+0x72e/0x13f0 block/partitions/core.c:693
-       blkdev_get_whole+0x2d2/0x450 block/bdev.c:707
-       bdev_open+0x2d4/0xc50 block/bdev.c:916
-       blkdev_open+0x389/0x4f0 block/fops.c:627
-       do_dentry_open+0xbe3/0x1b70 fs/open.c:945
-       vfs_open+0x3e/0x330 fs/open.c:1075
-       do_open fs/namei.c:3828 [inline]
-       path_openat+0x2c84/0x3590 fs/namei.c:3987
-       do_filp_open+0x27f/0x4e0 fs/namei.c:4014
-       do_sys_openat2+0x13e/0x1d0 fs/open.c:1402
-       do_sys_open fs/open.c:1417 [inline]
-       __do_sys_openat fs/open.c:1433 [inline]
-       __se_sys_openat fs/open.c:1428 [inline]
-       __x64_sys_openat+0x247/0x2a0 fs/open.c:1428
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (set->srcu){.+.+}-{0:0}:
-       lock_sync+0x18b/0x310 kernel/locking/lockdep.c:5897
-       srcu_lock_sync include/linux/srcu.h:170 [inline]
-       __synchronize_srcu+0xb1/0x400 kernel/rcu/srcutree.c:1418
-       elevator_disable+0x8c/0x3f0 block/elevator.c:671
-       blk_mq_elv_switch_none block/blk-mq.c:4861 [inline]
-       __blk_mq_update_nr_hw_queues block/blk-mq.c:4925 [inline]
-       blk_mq_update_nr_hw_queues+0x646/0x1ae0 block/blk-mq.c:4985
-       nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
-       nbd_start_device_ioctl drivers/block/nbd.c:1464 [inline]
-       __nbd_ioctl drivers/block/nbd.c:1539 [inline]
-       nbd_ioctl+0x5dc/0xf40 drivers/block/nbd.c:1579
-       blkdev_ioctl+0x57f/0x6a0 block/ioctl.c:693
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:906 [inline]
-       __se_sys_ioctl+0xf7/0x170 fs/ioctl.c:892
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&q->sysfs_lock){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3161 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3280 [inline]
-       validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
-       __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
-       blk_mq_elv_switch_none block/blk-mq.c:4847 [inline]
-       __blk_mq_update_nr_hw_queues block/blk-mq.c:4925 [inline]
-       blk_mq_update_nr_hw_queues+0x3fa/0x1ae0 block/blk-mq.c:4985
-       nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
-       nbd_start_device_ioctl drivers/block/nbd.c:1464 [inline]
-       __nbd_ioctl drivers/block/nbd.c:1539 [inline]
-       nbd_ioctl+0x5dc/0xf40 drivers/block/nbd.c:1579
-       blkdev_ioctl+0x57f/0x6a0 block/ioctl.c:693
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:906 [inline]
-       __se_sys_ioctl+0xf7/0x170 fs/ioctl.c:892
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &q->sysfs_lock --> mapping.invalidate_lock#2 --> &q->q_usage_counter(io)#51
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&q->q_usage_counter(io)#51);
-                               lock(mapping.invalidate_lock#2);
-                               lock(&q->q_usage_counter(io)#51);
-  lock(&q->sysfs_lock);
-
- *** DEADLOCK ***
-
-4 locks held by syz.2.2220/13838:
- #0: ffff8880256d9198 (&nbd->config_lock){+.+.}-{4:4}, at: nbd_ioctl+0x13c/0xf40 drivers/block/nbd.c:1572
- #1: ffff8880256d90d8 (&set->tag_list_lock){+.+.}-{4:4}, at: blk_mq_update_nr_hw_queues+0xc2/0x1ae0 block/blk-mq.c:4984
- #2: ffff8880257480a8 (&q->q_usage_counter(io)#51){++++}-{0:0}, at: nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
- #3: ffff8880257480e0 (&q->q_usage_counter(queue)#35){+.+.}-{0:0}, at: nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 13838 Comm: syz.2.2220 Not tainted 6.12.0-syzkaller-07834-g06afb0f36106 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2074
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2206
- check_prev_add kernel/locking/lockdep.c:3161 [inline]
- check_prevs_add kernel/locking/lockdep.c:3280 [inline]
- validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
- __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
- __mutex_lock_common kernel/locking/mutex.c:585 [inline]
- __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
- blk_mq_elv_switch_none block/blk-mq.c:4847 [inline]
- __blk_mq_update_nr_hw_queues block/blk-mq.c:4925 [inline]
- blk_mq_update_nr_hw_queues+0x3fa/0x1ae0 block/blk-mq.c:4985
- nbd_start_device+0x16c/0xaa0 drivers/block/nbd.c:1413
- nbd_start_device_ioctl drivers/block/nbd.c:1464 [inline]
- __nbd_ioctl drivers/block/nbd.c:1539 [inline]
- nbd_ioctl+0x5dc/0xf40 drivers/block/nbd.c:1579
- blkdev_ioctl+0x57f/0x6a0 block/ioctl.c:693
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:906 [inline]
- __se_sys_ioctl+0xf7/0x170 fs/ioctl.c:892
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1bdd97e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1bde6e7038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f1bddb35fa0 RCX: 00007f1bdd97e819
-RDX: 0000000000000000 RSI: 000000000000ab03 RDI: 0000000000000003
-RBP: 00007f1bdd9f175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1bddb35fa0 R15: 00007ffeb92d6118
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> reuses the corresponding memory area for other purposes. This issue must
+> be addressed as a priority to enable the use of DEPT. Testing this patch
+> on the Ubuntu kernel confirms the problem.
+> 
+> > +void dept_key_destroy(struct dept_key *k)
+> > +{
+> > +	struct dept_task *dt = dept_task();
+> > +	unsigned long flags;
+> > +	int sub_id;
+> > +
+> > +	if (unlikely(!dept_working()))
+> > +		return;
+> > +
+> > +	if (dt->recursive == 1 && dt->task_exit) {
+> > +		/*
+> > +		 * Need to allow to go ahead in this case where
+> > +		 * ->recursive has been set to 1 by dept_off() in
+> > +		 * dept_task_exit() and ->task_exit has been set to
+> > +		 * true in dept_task_exit().
+> > +		 */
+> > +	} else if (dt->recursive) {
+> > +		DEPT_STOP("Key destroying fails.\n");
+> > +		return;
+> > +	}
+> > +
+> > +	flags = dept_enter();
+> > +
+> > +	/*
+> > +	 * dept_key_destroy() should not fail.
+> > +	 *
+> > +	 * FIXME: Should be fixed if dept_key_destroy() causes deadlock
+> > +	 * with dept_lock().
+> > +	 */
+> > +	while (unlikely(!dept_lock()))
+> > +		cpu_relax();
+> > +
+> > +	for (sub_id = 0; sub_id < DEPT_MAX_SUBCLASSES; sub_id++) {
+> > +		struct dept_class *c;
+> > +
+> > +		c = lookup_class((unsigned long)k->base + sub_id);
+> > +		if (!c)
+> > +			continue;
+> > +
+> > +		hash_del_class(c);
+> > +		disconnect_class(c);
+> > +		list_del(&c->all_node);
+> > +		invalidate_class(c);
+> > +
+> > +		/*
+> > +		 * Actual deletion will happen on the rcu callback
+> > +		 * that has been added in disconnect_class().
+> > +		 */
+> > +		del_class(c);
+> > +	}
+> > +
+> > +	dept_unlock();
+> > +	dept_exit(flags);
+> > +
+> > +	/*
+> > +	 * Wait until even lockless hash_lookup_class() for the class
+> > +	 * returns NULL.
+> > +	 */
+> > +	might_sleep();
+> > +	synchronize_rcu();
+> > +}
+> > +EXPORT_SYMBOL_GPL(dept_key_destroy);
+> 
+> Best regards,
+> Yunseong Kim
