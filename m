@@ -1,69 +1,70 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B60D18FC72
-	for <linux-block@vger.kernel.org>; Mon, 25 Nov 2024 09:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB58C18FDDB
+	for <linux-block@vger.kernel.org>; Mon, 25 Nov 2024 09:14:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732525884; cv=none; b=kU2WZ8WYF9ls4GQr0FKG52neRn4F50m906qTM9Ar48W20Zf8SsD/cBngMAEeq2WXbS7rkGtNrc44lOwIUBZTClTu0R1TgF8+G8QQT3vc2n9cB+pwjk56gsw0/ugeHz57uMCbFr+CW3QBmpCpkDW2p3UCrG/odeNJ1zv2XEnq60Y=
+	t=1732526065; cv=none; b=SBw6I9SdLiVNgEyEviD0NlHmky22LxqGTjIi5J57O/PZrUjX/pxWlTd66R0r1ltcHQWyug6zJd1JzU8aZC/vsrtglnChRR7mI/gZlYJopBVaq3+KoCTRypL4yIfSNh9O2PNM2c9qONRN7mwSKCdsSwlAN/76FlMFNnlr0ZiZjOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732525884; c=relaxed/simple;
-	bh=wT2QX0BLl+SGVNLChvroK93Yxa+Mm8ft6/n++IH3SKg=;
+	s=arc-20240116; t=1732526065; c=relaxed/simple;
+	bh=uSsPtNnVteIM2BzthXpkxL9YoGLmPqhmZKg37rTE7Tk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CUkfuqWcMPF3VxFDDoB6qOdn/dbWRB8exr/Jr2sNxQnuBjlJMR947/GmJY35ZDUinDUwqso9WQ/nkZCZT+YRScDu0ObCsZsDrZdkz9tuTTrv3lStJliH/vhjry8XU9TID/J8ypd+89gl9PT1eiBobeRwuKDlrECoSzetbrftPyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O3K5WG7m; arc=none smtp.client-ip=209.85.221.41
+	 To:Cc:Content-Type; b=dyRfxOoetEaYCOnBZgx4iv0pT3Vh7FLzZzXvkj0MeDx+I2Y1mZLe7B3UXaQiIpyUbPInOCdWjRSc5BUMgTXu/d3PnspGyur5lMwYdq5Yo6obtjctMEJdIbIgOm4UbgaQ5TJt+fkzM3Ht0/jSnki8d9aaSiCd/elEBvOCPJBJo9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rddv+XPM; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O3K5WG7m"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-382376fcc4fso2381091f8f.2
-        for <linux-block@vger.kernel.org>; Mon, 25 Nov 2024 01:11:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rddv+XPM"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-382423f4082so2959368f8f.3
+        for <linux-block@vger.kernel.org>; Mon, 25 Nov 2024 01:14:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732525882; x=1733130682; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1732526061; x=1733130861; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wT2QX0BLl+SGVNLChvroK93Yxa+Mm8ft6/n++IH3SKg=;
-        b=O3K5WG7mm/Wg/xhuw1n88U8ZiYPFBM/huCT0K5mNdAogN2McMQsT2l0xXqf0My0Qbe
-         eFVsvzo+258sVQZricwUkvpxasVigyhIWqIiOiFIDAK8crBnZx8Ie5YsHAJlJbhLXjA2
-         TaTCroHUd9zHLcbScwLaQtD1h/ohYJ+n7tBO/9qALh8HSLFq9566ftL87J8QjyCVEvdh
-         Da1QY8jCqeg5Ncp3LSMET5i8jXvCyrCfDpFHEAxX78DgavFVpkEHgf2lK37YDS4alq7Q
-         eiUOxHfxF1mnP4HsKmzJonJzGSRsrCdr4vb0DtiyO+6gzlyiYQbqR+LDR7ZIAQd/ms55
-         c3eg==
+        bh=PrdMiDJt5vduIxa0PY5GoA+617/ZMEzbh2yCH7ixs2Q=;
+        b=rddv+XPMAIXrLkGAPOpX+Lxk/dHpmmSxHz+copGp430O29dLB3W1ClZdOX+PFwLS//
+         83AS6KyGKm80EEsweut4Hrt31pFzll/QEVyrT/2MXtevBUUhLol+Sa+TM7CLxorntGe/
+         GvY/4a9NlXFbw1y1DoxxSMKIPiKBp1l5PjZGcJH3krTV7wfnD/gJ6AoMbQUxUb3I4NAR
+         DQ57y1qXaoISH4PPTihcIm4sbfQdzYYL7PUJUIRF531mWo0SAnJ74Jsm415Ge+MxLKST
+         KvqXJkrkEupqKZSCSh2vHNPiuLVlNd2SIXcVgmReAXtwv8N7r0+EaBe1adauWWHXXXix
+         ghfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732525882; x=1733130682;
+        d=1e100.net; s=20230601; t=1732526061; x=1733130861;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wT2QX0BLl+SGVNLChvroK93Yxa+Mm8ft6/n++IH3SKg=;
-        b=s1cmPVZdUunrrbQa7hAXhapdb9N7+16bN/0smAlBvwG8UNLFb4uoPYVk2/aZ+nD2dU
-         l+cFnnXp+w7dCQZUFIkWMc36+1v3ByQkX0AvTPvTeabq5TIeu+nd/YbPYopLSMTJLotb
-         +nmE2vIVQ0YFSIPX6CYOxFYudZLmd0hv9SNQJQQlwMEiN/2Hj0FmIXNkFZYGoZOHK4SQ
-         Blpa6deVgQc2MiWahSEz3tgotKODQvh7SJoQh/J/bgQ9YTJGlLR1JiDjRB2b7Dg+RD9g
-         K7d1+7aiedgy0wTraL2quR6wNzuu1KmxEg8rwKy9cOCmCyHu+sV+5ovt7ecoZWhQdD+I
-         byXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVEjmixjdLd2eo22wU/49gyj+s8ZGu9SjYFfxsNznTtUfI40izAlpxKFXVN6M+jFl6Q31IvldbkjjhoXA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOAtJn8tKoJ61T5Td7E0b4i3+2c8SQSHi0FeBV0GV1MqJxJxgl
-	Go4mSjeBLHT9YDa/9pZXX0iqU7qls3gSp3LFX/cqiAYAK59dzylisOlKi/BSCBkrSo7O8jt86Jk
-	ubX/rxz5kHj/QOeS90SMUsO7SE8LxXp+a84uP
-X-Gm-Gg: ASbGncvEw+RM2MEmSGQ9M1ox9eooykiFkiBigmAKX4cPI282qVhe7IwGQn0VsnKrOIc
-	CSIayaX2nNSxsRKDd+dKaJEGs7t0C+w1l35996D0xSxDFRJvBj17XCweqKeNmwg==
-X-Google-Smtp-Source: AGHT+IH8xUhObePFMXX+6uJ4DZH46fnDECSOgfgui5FdlJfDvg099oVJfy7l8jGXt9Hpo3OEBqlpkGLGHf9ruibw67E=
-X-Received: by 2002:a5d:5849:0:b0:382:59c1:ccdf with SMTP id
- ffacd0b85a97d-38260bcbb70mr8904576f8f.46.1732525881617; Mon, 25 Nov 2024
- 01:11:21 -0800 (PST)
+        bh=PrdMiDJt5vduIxa0PY5GoA+617/ZMEzbh2yCH7ixs2Q=;
+        b=gFA2Gtz4ir4Aj0Hh7NTDdUUMB+UoJgNZ9ndsI7BS0LZaKZbvzIzu2Z4n2aoDizXVAg
+         KKcB3gzaP3iripFimocPcQ6JDTN4NL+tZ1/BloePRVh7A+6UR1/w1JsiJ+2INU50Elvl
+         O/b6//6uO4n8bOmMC8WAudugAV211piuJlbNYHEO3+Ue4fXbLlc5iVSo0vT272xkq0u+
+         uEAeml/GFVAyIVJ8TF+Hf+LUzT5ApQnmvEF27XSUUGQW+dyA062xyS3WcocSyaro9UCD
+         4Oen4cvZ69EJt76ZqhICk24LRf0rvDX68pf41/mbGE3LL5CZB6s8CopAVkIQcyHvii1q
+         50xg==
+X-Forwarded-Encrypted: i=1; AJvYcCWwnZ2Vhcb86N4uk1GToWaocOrOLgpuQZo2BW/yKluP4am0D9h+mFMP2+bk+PHx3Gv2NEiRMs4bDrO8EQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCFuZ3WKPVN5aa6oEwQ4/mNpL5pxgJNABrkTJhwvM21Fw83PDF
+	Ox6Ynx1UN6J/08hccuWgMm6grmz0YWtxM6b358pbmdi+Om+PuKFcuKZuQIv+j0k5Smgkai1J0mA
+	lobZBzpkIqdlOnZs9wHgpj7uLZ80fT1sAiozc
+X-Gm-Gg: ASbGncvYPSYPKmAoi3FoJTWHJmJDQCbsTznuPM3wzO7WuImEnPZlvm9gj52goya/IgO
+	lb7o6rwLrxsQ1w9J9+aMxjxwINm2k6bPDF9Pi7MA3ECGEfClLWz1x78ghQED2RQ==
+X-Google-Smtp-Source: AGHT+IEOwMk3vapdbNHpELN0oZ6s3oro3YnZRn8GCOYxBikHFeMCXOFfPD4cUTzyUloMpcTHt84sQUv4Gf+wLfw8W4o=
+X-Received: by 2002:a05:6000:23c5:b0:382:3e51:4b1d with SMTP id
+ ffacd0b85a97d-38260b59530mr6868816f8f.20.1732526061276; Mon, 25 Nov 2024
+ 01:14:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241123222849.350287-1-ojeda@kernel.org>
-In-Reply-To: <20241123222849.350287-1-ojeda@kernel.org>
+References: <20241123222849.350287-1-ojeda@kernel.org> <20241123222849.350287-2-ojeda@kernel.org>
+In-Reply-To: <20241123222849.350287-2-ojeda@kernel.org>
 From: Alice Ryhl <aliceryhl@google.com>
-Date: Mon, 25 Nov 2024 10:11:09 +0100
-Message-ID: <CAH5fLgiOHnX14CtN2rtC8ssUT03ECLOAGNLYPfA5ELSch9fONg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] rust: use the `build_error!` macro, not the hidden function
+Date: Mon, 25 Nov 2024 10:14:09 +0100
+Message-ID: <CAH5fLggK_uL0izyDogqdxqp+UEiDbMW555zgS6jk=gw3n07f6A@mail.gmail.com>
+Subject: Re: [PATCH 2/3] rust: kernel: move `build_error` hidden function to
+ prevent mistakes
 To: Miguel Ojeda <ojeda@kernel.org>
 Cc: Alex Gaynor <alex.gaynor@gmail.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
 	Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
@@ -78,17 +79,53 @@ Content-Transfer-Encoding: quoted-printable
 On Sat, Nov 23, 2024 at 11:29=E2=80=AFPM Miguel Ojeda <ojeda@kernel.org> wr=
 ote:
 >
-> Code and some examples were using the function, rather than the macro. Th=
-e
-> macro is what is documented.
+> Users were using the hidden exported `kernel::build_error` function
+> instead of the intended `kernel::build_error!` macro, e.g. see the
+> previous commit.
 >
-> Thus move users to the macro.
+> To force to use the macro, move it into the `build_assert` module,
+> thus making it a compilation error and avoiding a collision in the same
+> "namespace". Using the function now would require typing the module name
+> (which is hidden), not just a single character.
+>
+> Now attempting to use the function will trigger this error with the
+> right suggestion by the compiler:
+>
+>       error[E0423]: expected function, found macro `kernel::build_error`
+>       --> samples/rust/rust_minimal.rs:29:9
+>          |
+>       29 |         kernel::build_error();
+>          |         ^^^^^^^^^^^^^^^^^^^ not a function
+>          |
+>       help: use `!` to invoke the macro
+>          |
+>       29 |         kernel::build_error!();
+>          |                            +
+>
+> An alternative would be using an alias, but it would be more complex
+> and moving it into the module seems right since it belongs there and
+> reduces the amount of code at the crate root.
+>
+> Keep the `#[doc(hidden)]` inside `build_assert` in case the module is
+> not hidden in the future.
 >
 > Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 
-I've introduced a few more instances of this in the miscdevices
-series, so you probably want to amend this to also fix those.
-
-Either way:
-
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+
+> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+> index bf8d7f841f94..73e33a41ea04 100644
+> --- a/rust/kernel/lib.rs
+> +++ b/rust/kernel/lib.rs
+> @@ -32,7 +32,8 @@
+>  pub mod alloc;
+>  #[cfg(CONFIG_BLOCK)]
+>  pub mod block;
+> -mod build_assert;
+> +#[doc(hidden)]
+> +pub mod build_assert;
+
+You could also put #![doc(hidden)] at the top of build_assert.rs to
+simplify the lib.rs list. Not sure what is best.
+
+Alice
