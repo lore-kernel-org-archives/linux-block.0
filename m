@@ -1,142 +1,152 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03921940B3;
-	Mon, 25 Nov 2024 10:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A6F199947
+	for <linux-block@vger.kernel.org>; Mon, 25 Nov 2024 12:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732531844; cv=none; b=jCScvSjiwHwdd42OriygoVg//hzx+MEbBfSTYe9up3W6LOj27Mb52Flf2GOHzRpa0LFCd5vLpmQAd26fnhgfaIeCxogdpk7o4c0/LFE/LgtsA01uuX0lDgj2txHu+jqcJNM0CAwoEE2eY9aLtIb7HAKzkc6bY9roVKevEds8lfQ=
+	t=1732539431; cv=none; b=Roorsh0rydSfl8oOAPV+jjvLxjuryVvYqIS+1j7aFfPzlIXJxc0Q0Io/lAqTD45UdwYUPcBaL1clm4HzZxmwTkcLPKpVyr6KyKzfk7l+iRz/y4k1cnHRtDMk22T6Rr1h614G1WTLkY0biKkyqd3nQmA2Rfl32CEj+w29Pm/8yZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732531844; c=relaxed/simple;
-	bh=9hXOVBNdgVCWJqpNWpCcCp/Lejcixifw+eGIIr0WdSA=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=n7jBh8BM/34jO6ZC24NXeC2b2cebAxa0sesGb2pUZT7BLydH1PPVkB+X69c95LOm0xdBeNIEtPtjw5GA6C+RIlUs2/v1MyZ1WxR5EhmCqkRTczY2wRdoFtIaIGlq3se0R2lDYmXCYLmKQxuWRmduF80/b71lXOxzao3xmEcF9q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4XxjCT0KHrz4f3jXK;
-	Mon, 25 Nov 2024 18:50:13 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id B6D8F1A0197;
-	Mon, 25 Nov 2024 18:50:31 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgCngYV1VkRnOnwnCw--.39352S3;
-	Mon, 25 Nov 2024 18:50:31 +0800 (CST)
-Subject: Re: [PATCH] block: iocost: ensure hweight_inuse is at least 1
-To: =?UTF-8?B?5oi05Z2k5rW3IFRvbnkgRGFp?= <daikunhai@didiglobal.com>,
- Yu Kuai <yukuai1@huaweicloud.com>, "tj@kernel.org" <tj@kernel.org>,
- "josef@toxicpanda.com" <josef@toxicpanda.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <3B8BC663-3B34-454D-AE79-4FCE50001D6E@didiglobal.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <3e69ac2d-aa3b-2065-2bb6-d3888fddfe5a@huaweicloud.com>
-Date: Mon, 25 Nov 2024 18:50:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1732539431; c=relaxed/simple;
+	bh=WZuzBvqHJN0MOv2tHja27NlRZn0wiM51wx+X4Vb7BcM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pbinYgrlNQ5SxyrTnDHjXdJRbmRHJVXzS2L5czvfOXk0Q688eKbce+JQgd7d7O4ZwTD2ugyoUYxGgI15eJTiUEXnDxi+WQ81YTKn2f1dBwRxGqZW0hteInQ77+zmf0ow+ChVljuPLVHCy3Zs7HF2z1A+Y4lBIHBpFtS6n5DsEAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I300CLwz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I300CLwz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732539428;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LQtxieVHWM9koiiuYBNm81cZWH/nCFoP0WhoMzOLjH0=;
+	b=I300CLwzzeJyaT7bC6ZzDJM3sIY7GGCCK90i3LyYpUaQ9dpfAElfe7G0O6HqGTtm8QFttG
+	EhrHBleEFwcaizXSFA/r5TjUt6jKwaOfAoH7tJNxOiWvm3shqTjnpiz07OAsRNMV2671Mr
+	YpDcfVY+B5QdSrpp8YqzGkloIQHo0fc=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-113-eDKgbebKO9y1rtGEP7mVhQ-1; Mon, 25 Nov 2024 07:57:06 -0500
+X-MC-Unique: eDKgbebKO9y1rtGEP7mVhQ-1
+X-Mimecast-MFC-AGG-ID: eDKgbebKO9y1rtGEP7mVhQ
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ffc44ab459so3752591fa.1
+        for <linux-block@vger.kernel.org>; Mon, 25 Nov 2024 04:57:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732539425; x=1733144225;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LQtxieVHWM9koiiuYBNm81cZWH/nCFoP0WhoMzOLjH0=;
+        b=QPmf2dY+Udo9jU4ae+HvZiH0QxbDeMAVoc9D7ZySNoAzW8LyXWFh5d3bOTO2J29wEw
+         V2uPpq2HATjEtfnumtlC+e9NfgyXTbKHBFKPlmcddkkr3xBVVgl46XorpKcpbsGAINW8
+         4pvxgplaQL1Q0034rYkI+2jOlyZIssBOoCK9MFcRD24emMgku2BJrOAJ/v09rTs25iYa
+         mr3CWmAheKLhhO3hNlSHnVryPUxrk03363vCPoVdOnBnjeW09WXUNK7Yx5gKW6dfv6zU
+         5e7Wuo7DWxWDkHzttHI37A05/sQlrtJjFHKXCK38B0GG+AA8EpjHX3M50TPOTn/8Tv6i
+         Rt1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXsnzS1t/+YsM1HqbE1Xj5XqTMt5S3XbdEB9u9YCJMOB/Gral/HXF6sRIaMcEt9II8j8sfHjBxSUmllng==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnBT9i9a98CZyqiYAsnXiODp/0/0TPw3vleaa1i3PAy4ooJy87
+	+p3LxtE2NDRJq4kB8NwhCdNIfchHg7OE4MfzLuqsG1RXsSka0MrLADrOQPzqPiICPgTz3Opikso
+	LahVk65eQRGXLbjvwxMSU5bIpBt2UV1rgA6PDgHwpe5y7Se6jyZ7g8AAbBBLJrNuekFVqoxKi6S
+	G66RJ6/RUL7ucrD6hdj7Zqi9a97DiQYRqjyTU=
+X-Gm-Gg: ASbGncvvU3K1eb0eJRpnOisgkBr0J8/+zrIdok0YrhGpxQwyNu0sKiptSWTMC7q8aKS
+	/1vxCapy0zSoSvODWkt9m9zkk8YHHy6SD
+X-Received: by 2002:a2e:a902:0:b0:2ff:a4c6:b144 with SMTP id 38308e7fff4ca-2ffa7180014mr61759961fa.25.1732539425229;
+        Mon, 25 Nov 2024 04:57:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFGoW36c4SyCt5Ts8vLHdgIannr8YCBy1YoI+9/Owz/30pylNnh+a/YieDIdSzpYFQ4KlSpF/uVJUK+vghkyPA=
+X-Received: by 2002:a2e:a902:0:b0:2ff:a4c6:b144 with SMTP id
+ 38308e7fff4ca-2ffa7180014mr61759821fa.25.1732539424847; Mon, 25 Nov 2024
+ 04:57:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <3B8BC663-3B34-454D-AE79-4FCE50001D6E@didiglobal.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCngYV1VkRnOnwnCw--.39352S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7KF4rKFy7tr18Jr1DCw4kJFb_yoW5JryDpr
-	WrW3WYyFZrGF4I93WrKr129wn0vws3WF4xKrn3Z3yxCr48Gr9Ikr1xKF4DW34rXrsaqr4I
-	vw17KFyrG3y7Cr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-	IcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <20241124125628.2532658-1-nilay@linux.ibm.com>
+In-Reply-To: <20241124125628.2532658-1-nilay@linux.ibm.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Mon, 25 Nov 2024 20:56:53 +0800
+Message-ID: <CAHj4cs9EE0Ty0TVEF-ChV=fK_fghoigzCJmV1zNGJGBc2toEjg@mail.gmail.com>
+Subject: Re: [PATCHv2] nvmet: use kzalloc instead of ZERO_PAGE in nvme_execute_identify_ns_nvm()
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, 
+	kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, axboe@fb.com, 
+	chaitanyak@nvidia.com, shinichiro.kawasaki@wdc.com, mlombard@redhat.com, 
+	gjoyce@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi
+Thanks for the fix.
 
-在 2024/11/24 21:44, 戴坤海 Tony Dai 写道:
-> In fact, we did encounter such a special situation where the kernel printed out `iocg: invalid donation weights in /a/b/c: active=1 donating=1 after=0`, and then it immediately panic. I analyzed the code but could not figure out how this happened; it might be a concurrency issue or some other hidden bug.
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
 
-Do you have a reporducer for this? I'd like to take a look at the
-WARN first.
+On Sun, Nov 24, 2024 at 8:57=E2=80=AFPM Nilay Shroff <nilay@linux.ibm.com> =
+wrote:
+>
+> The nvme_execute_identify_ns_nvm function uses ZERO_PAGE for copying
+> SG list with all zeros. As ZERO_PAGE would not necessarily return the
+> virtual-address of the zero page, we need to first convert the page
+> address to kernel virtual-address and then use it as source address
+> for copying the data to SG list with all zeros. Using return address
+> of ZERO_PAGE(0) as source address for copying data to SG list would
+> fill the target buffer with random/garbage value and causes the
+> undesired side effect.
+>
+> As other identify implemenations uses kzalloc for allocating a zero
+> filled buffer, we decided use kzalloc for allocating a zero filled
+> buffer in nvme_execute_identify_ns_nvm function and then use this
+> buffer for copying all zeros to SG list buffers. So esentially, we
+> now avoid using ZERO_PAGE.
+>
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Fixes: 64a51080eaba ("nvmet: implement id ns for nvm command set")
+> Link: https://lore.kernel.org/all/CAHj4cs8OVyxmn4XTvA=3Dy4uQ3qWpdw-x3M3FS=
+UYr-KpE-nhaFEA@mail.gmail.com/
+> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+> ---
+> Changes from v1:
+>     - Use kzalloc instead of ZERO_PAGE() for allocating zero filled
+>           buffer (Christoph Hellwing, Keith Busch)
+>
+>  drivers/nvme/target/admin-cmd.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-=
+cmd.c
+> index 934b401fbc2f..f92c5cb1a25b 100644
+> --- a/drivers/nvme/target/admin-cmd.c
+> +++ b/drivers/nvme/target/admin-cmd.c
+> @@ -901,13 +901,18 @@ static void nvmet_execute_identify_ctrl_nvm(struct =
+nvmet_req *req)
+>  static void nvme_execute_identify_ns_nvm(struct nvmet_req *req)
+>  {
+>         u16 status;
+> +       struct nvme_id_ns_nvm *id;
+>
+>         status =3D nvmet_req_find_ns(req);
+>         if (status)
+>                 goto out;
+>
+> -       status =3D nvmet_copy_to_sgl(req, 0, ZERO_PAGE(0),
+> -                                  NVME_IDENTIFY_DATA_SIZE);
+> +       id =3D kzalloc(sizeof(*id), GFP_KERNEL);
+> +       if (!id) {
+> +               status =3D NVME_SC_INTERNAL;
+> +               goto out;
+> +       }
+> +       status =3D nvmet_copy_to_sgl(req, 0, id, sizeof(*id));
+>  out:
+>         nvmet_req_complete(req, status);
+>  }
+> --
+> 2.45.2
+>
 
-Thanks,
-Kuai
 
-> 
-> Our kernel is not the latest, but it includes the patch edaa26334c117a584add6053f48d63a988d25a6e (iocost: Fix divide-by-zero on donation from low hweight cgroup).
-> 
-> ﻿在 2024/11/22 16:16，“Yu Kuai”<yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> 写入:
-> 
-> 
-> Hi,
-> 
-> 
-> 在 2024/11/22 15:26, Kunhai Dai 写道:
->> The hweight_inuse calculation in transfer_surpluses() could potentially
->> result in a value of 0, which would lead to division by zero errors in
->> subsequent calculations that use this value as a divisor.
->>
->> Signed-off-by: Kunhai Dai <daikunhai@didiglobal.com <mailto:daikunhai@didiglobal.com>>
->> ---
->> block/blk-iocost.c | 7 ++++---
->> 1 file changed, 4 insertions(+), 3 deletions(-)
->>
->> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
->> index 384aa15e8260..65cdb55d30cc 100644
->> --- a/block/blk-iocost.c
->> +++ b/block/blk-iocost.c
->> @@ -1999,9 +1999,10 @@ static void transfer_surpluses(struct list_head *surpluses, struct ioc_now *now)
->> parent = iocg->ancestors[iocg->level - 1];
->>
->> /* b' = gamma * b_f + b_t' */
->> - iocg->hweight_inuse = DIV64_U64_ROUND_UP(
->> - (u64)gamma * (iocg->hweight_active - iocg->hweight_donating),
->> - WEIGHT_ONE) + iocg->hweight_after_donation;
->> + iocg->hweight_inuse = max_t(u64, 1,
->> + DIV64_U64_ROUND_UP(
->> + (u64)gamma * (iocg->hweight_active - iocg->hweight_donating),
->> + WEIGHT_ONE) + iocg->hweight_after_donation);
-> 
-> 
-> I'm confused, how could DIV64_U64_Round_UP() end up less than 1?
-> 
-> 
-> #define DIV64_U64_ROUND_UP(ll, d) \
-> ({ u64 _tmp = (d); div64_u64((ll) + _tmp - 1, _tmp); })
-> 
-> 
-> AFAIK, the only case that could happen is that
-> iocg->hweight_active - iocg->hweight_donating is 0, then I don't
-> get it now how cound active iocg donate all the hweight, if this
-> really happend perhaps the better solution is to avoid such case.
-> 
-> 
-> Thanks,
-> Kuai
-> 
-> 
->>
->> /* w' = s' * b' / b'_p */
->> inuse = DIV64_U64_ROUND_UP(
->>
-> 
-> 
-> 
-> 
-> 
+--=20
+Best Regards,
+  Yi Zhang
 
