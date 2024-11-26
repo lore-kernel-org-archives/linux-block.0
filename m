@@ -1,31 +1,30 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554CA17BB0D;
-	Tue, 26 Nov 2024 06:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF24158DD9;
+	Tue, 26 Nov 2024 06:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732603963; cv=none; b=iZXcRchH3D72bmp1iC+w19Yqxd1rWDAIqAg4LF8be0QtSe/rw30T/UEkHoqD2jxP44DqsocflbvmAh3nn1QZOCF/jJX2WiiUMwwI6vcTFVQIwNsOB0RyVAH007jkeqpE4CG60pkzV+I2oep1hoGkLs3uSb0pUeenuFxaMlb4se0=
+	t=1732603979; cv=none; b=RVAOLBdtMgSggt2xMyTwgTdQAndCYMK+y4dvt0ejU3YPoPNEp2WoDg7M2AgnOy/5x20b77mRYvilo1k75DUgqCbHlYHbaDa3+MVLdL2E8+IZrqYcwlvcMv4UqSa5APQ61cRtpzrUpMIiKoXhujmCnKWAclUS2nzvK1iZniB8ufY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732603963; c=relaxed/simple;
-	bh=fZ3MdI0uHsT8GRAXYo0ivhqyqC0NqYb3/xfCtKxRiJc=;
+	s=arc-20240116; t=1732603979; c=relaxed/simple;
+	bh=WhuUvJO4mQBl1gJX1yaFM0Pszn18mRnvT+cgm78quZs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ail/0e0qmy2wQeuveA/dyLzsQpdRfnT7VPvDZF/J9XZi+gfc0owqIhpvVYlMVt/Tf3DyBxVshBf5tw408kFhYVOOKA2j62m+th3osy9choMOjlmW+/cmVh0O9Xtx0rzcPQZZFMHzC2DT12cLCd19FOIJi2PZ+YyHGXQujskv3+o=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ubEgF4MvxQmAyHCsqFyvSyEdIZ0cG0u8/akhOEtyUZnR7t79jgIYPiQdm8WQhl2tnUWSar/j93qiQfRdziRIBsATWS5/Wj4Ud5BsNhNmDKJRYzdRfFz4nigFHXEZufR4d/bu/uVeXjQ0JqW9dAvG2XlHTm7pbc0GBUr0IZnyQWM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id DB08668D80; Tue, 26 Nov 2024 07:52:28 +0100 (CET)
-Date: Tue, 26 Nov 2024 07:52:28 +0100
+	id D551668D80; Tue, 26 Nov 2024 07:52:53 +0100 (CET)
+Date: Tue, 26 Nov 2024 07:52:53 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Chris Bainbridge <chris.bainbridge@gmail.com>
-Cc: hch@lst.de, LKML <linux-kernel@vger.kernel.org>, axboe@kernel.dk,
-	bvanassche@acm.org,
-	Linux regressions mailing list <regressions@lists.linux.dev>,
-	linux-block@vger.kernel.org, semen.protsenko@linaro.org
-Subject: Re: [REGRESSION] ioprio performance hangs, bisected
-Message-ID: <20241126065228.GA1133@lst.de>
-References: <CAP-bSRbCo7=wfUBZ8H7c3Q-7XSG+SB=R4MHHNNGPvBoinsVSZg@mail.gmail.com> <CAP-bSRab1C-_aaATfrgWjt9w0fcYUCQCG7u+TCb1FSPSd6CEaA@mail.gmail.com>
+To: Sam Protsenko <semen.protsenko@linaro.org>
+Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: remove the ioprio field from struct request
+Message-ID: <20241126065253.GB1133@lst.de>
+References: <20241112170050.1612998-3-hch@lst.de> <20241122050419.21973-1-semen.protsenko@linaro.org> <20241122120444.GA25679@lst.de> <CAPLW+4==a515TCD93Kp-8zC8iYyYdh92U=j_emnG5sT_d7z64w@mail.gmail.com> <20241125073658.GA15834@lst.de> <CAPLW+4=kuHze3=+g80CsY6OkLno5gyjRfMWLXTFHu3N_=XcmqA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,21 +33,12 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAP-bSRab1C-_aaATfrgWjt9w0fcYUCQCG7u+TCb1FSPSd6CEaA@mail.gmail.com>
+In-Reply-To: <CAPLW+4=kuHze3=+g80CsY6OkLno5gyjRfMWLXTFHu3N_=XcmqA@mail.gmail.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Nov 25, 2024 at 05:16:39PM +0000, Chris Bainbridge wrote:
-> I did a bit of debugging.
+Hi Sam,
 
-Thanks, this was extremely helpful!
-
-mq-deadlink not only looks at the priority in the submission path,
-but also in the completion path, which is rather unexpected.  Now
-for drivers that consume bios, req->bio will eventually become
-NULL before the completion.
-
-Fortunately fixing this is not only easy but also improves the
-code in mq-deadline.  Can you test the patch below?
+please try the patch below:
 
 diff --git a/block/mq-deadline.c b/block/mq-deadline.c
 index acdc28756d9d..91b3789f710e 100644
