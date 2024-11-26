@@ -1,73 +1,100 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47F41D432F
-	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 14:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB36E282F4
+	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 15:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732629983; cv=none; b=k3DYpteMmeAEDe9RnqgH5HkC04+n7rW6erF2fjIjWeEwkRHsierki1kaQst0cIkCfyc4xoj4sHot6fu4oYgHJ1LMU3LjV+3+SX4Zf9aC3B5SaCsUdTHm1Uu7p8707wXjBWuZIsvp3OJmFZux4qg39ued3B4QpjlU1bCmHucOGkE=
+	t=1732633218; cv=none; b=CBn/z54mBQgaHGf2l+vhK6p+wXVYauaakTGgYd/1aB3/0xkrKVBmRtbEa36Rp/SAoJa11Aj41fJyc99GugU3OTW6a4VQ7DFrjaPZfPi/OfesYihgComXU3IPtH0trD+b//3rDh5ZxJ/KE6mS8HbGfWP4XIL/dpFEHVm5CQawO5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732629983; c=relaxed/simple;
-	bh=nJPqcGlmhXt+lEqV0jIz7WymRiBlx5Wqn+tu58LF7CA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KU5KrvFr3J3yA42KndPY7Wz5kp2EWP2diRJvD3h+3uTUBEOjFiYpdhhKqN0JiYKHSK2fwpl5D6iVLm5k+GRc0ksosj3EU2m7R5N5gr2JmhvKBBKD/mPzeXqZpDgCoCViPAXL6nvwd+P+t4zdqpjudPCPEBm5TTH54roEcaJxfXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=DMJnzHgR; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1732633218; c=relaxed/simple;
+	bh=QrKEW8nVo+nGUq4yf8SgcRklLa2XBc7LnpAQ76JVsS8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=PkQ1P+3mMG7xXa2ZlwO58Iltluw7B/lucrfV0G0iEUsppUyGMgK74F3SJrnpZxOHW4cCZzyJ/DPgrhUha39l96VOPOUj4lLGONZ/F5yziNt0VjgrdlYc0b3of+Qw8oBrekPMBIKbZ59NI+x1/Z/DwyLjkOYoSIocDBZPAOBq/Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=RdyQQJ6J; arc=none smtp.client-ip=209.85.160.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="DMJnzHgR"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4XyPWH1LkWz6CmQtQ;
-	Tue, 26 Nov 2024 14:06:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1732629976; x=1735221977; bh=nKnAVO3xid0jOVICSX12SUd4
-	BFeSrFzAvuvx7x13B0E=; b=DMJnzHgRPA+HaFjJT0p3aPdjQC5K2CU7tIdcjXkr
-	u3jwFElqN+63k4OPcpQPMhwz6v3+mtQgUQlMJ8CF4RNK9rhE0bYxiTH5ZH2IjkNk
-	Fdw09pLZ54RDaLHXbeEBV4aPUfjKA424FQ4xhzktau5Z7WUbi2+QfyGpAiOVC/pe
-	984XHp3YbLAVKcsWhTqOrf9OlZTFAb1FkXnT2fn2p9hiEOlxGBrEtFslze/lipBR
-	qekjKKmFYmcyfsE6igDrMKyS3+1yv16oHxFf/OCIKIY5NxTyQXc5Mhqe5nvhgS4q
-	VCm++XK75iHiRO1m3T1ULX9WcWJ9WNKdQ1kGU4fnBfllFg==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 5l4ElaTkNf96; Tue, 26 Nov 2024 14:06:16 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4XyPW91JXQz6CmQwT;
-	Tue, 26 Nov 2024 14:06:12 +0000 (UTC)
-Message-ID: <285a140f-4ed0-4e79-9da8-2f82d60c5a8a@acm.org>
-Date: Tue, 26 Nov 2024 06:06:09 -0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="RdyQQJ6J"
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-294ec8e1d8aso4520758fac.1
+        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 07:00:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732633212; x=1733238012; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a6IdjAZOz2pOHK755VOQK4GiXsiZimMhvVYGeCqSuh4=;
+        b=RdyQQJ6JQ6zFDFa/tuwOxmsU3NgLRWYLXkb1TYR710MW22JFWGdZETctJ9yER5Y0kd
+         mTZLoOpsCdQdQ/buHknG1CWihtoETGUlEWkB4kIX3cE1es7AAumRYz9BI0daDddqZ4vc
+         8MST1h1JqQS2P7Q7/F6l8HO7GZZMgTvK6vOxIRr+Irv+87X9yeetBuQJJUZ60V9lOtWk
+         bbGBBsDOLUnZrRYkuyFZiLmRAfeHjcfiMwTqb0AgW9DKWXaj46zeVTV4ARCeck0ukcHO
+         BRAZG6mSaQTrorHeYu6Dm48u/6Yf2dxne7UmUfqigGiaonyVREUX8pkH831bf1A4e+Tm
+         KAxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732633212; x=1733238012;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a6IdjAZOz2pOHK755VOQK4GiXsiZimMhvVYGeCqSuh4=;
+        b=eXIfRiiVot4Rqo4NXUThQ9j+TjPxJoxzywDqvE6F3vRcgpbIshqvAY3j0GjSa1MeIb
+         98MkFAgAP1oy4k78ydv9lEQ39JicG1IPejxcLD1zLLAAMQzmr5h2yjMbBsMZaE+EnC+e
+         D/O+4fZAkpQcGCCpBWrM7RA1LR2+34nxiXRORYXFs/yXc0Tc4v4EB1TI6MJvRz022k7P
+         BYPhRbe7eoSIzGpEOoYj3B8kcbqRPumT0oT/qDN8qXwqSCp3+62P204WtlYBAaz+XCSy
+         dAaGL6bL6UcAbj5f07We4qUXbgLPBz7A/NKe0KZd/Cw+/O8ov25VpvvuNtNg26QRX7t5
+         bcLQ==
+X-Gm-Message-State: AOJu0YzJWc+xR6VtbaAIXJZFgzUExdMJfJndYE3c179eus/iPqXvqVpF
+	C9Dpzv4Qk0swV1Qjr0r3ZqbtCEAPukizNxMjcZqgYbd05GTBFMNCryfdTnGc1lS1VMLb9WYq6VE
+	Et78=
+X-Gm-Gg: ASbGncs6MtKIM6h27x5TQW5gT7Iu8x+ojRw3wbevSCBg3ylaAuDlbyVKQZlCAGSXJ2b
+	NIcxbckI33sXXKswmGQ8QM/i9lhDx3wRFEG2xkcAR/SIMUw74j/W1Hhf0hfRY9KCkg+Ut5wpcLY
+	pvsGbxXtOTUC0PRUKrExbH8zjmRdDDZkjxMtRJx31xXOIHev1IO2flNPGJIdLg9WXBoCTy+RVpw
+	Fnn5lRKQ/9LfwRruUZFQxdhP86H0PcdWy9JP51j
+X-Google-Smtp-Source: AGHT+IFk2t3KY/qlsxHcVtm5Z69BK3BnmG+g8a9FY9ehSPX9KXZVVnc9yKS1fUsrD7sE64sUBlg7Yg==
+X-Received: by 2002:a05:6870:4725:b0:270:1f1e:e3ea with SMTP id 586e51a60fabf-29720dbdb85mr11965737fac.28.1732633211590;
+        Tue, 26 Nov 2024 07:00:11 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2971d56cfdfsm3998512fac.5.2024.11.26.07.00.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Nov 2024 07:00:11 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20241126104705.183996-1-dlemoal@kernel.org>
+References: <20241126104705.183996-1-dlemoal@kernel.org>
+Subject: Re: [PATCH v2] block: Prevent potential deadlock in
+ blk_revalidate_disk_zones()
+Message-Id: <173263321075.43959.8582658266330387427.b4-ty@kernel.dk>
+Date: Tue, 26 Nov 2024 08:00:10 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mq-deadline: don't call req_get_ioprio from the I/O
- completion handler
-To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, Chris Bainbridge
- <chris.bainbridge@gmail.com>, Sam Protsenko <semen.protsenko@linaro.org>
-References: <20241126102136.619067-1-hch@lst.de>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20241126102136.619067-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-86319
 
-On 11/26/24 2:21 AM, Christoph Hellwig wrote:
-> req_get_ioprio looks at req->bio to find the I/O priority, which is not
-> set when completing bios that the driver fully iterated through.
+
+On Tue, 26 Nov 2024 19:47:05 +0900, Damien Le Moal wrote:
+> The function blk_revalidate_disk_zones() calls the function
+> disk_update_zone_resources() after freezing the device queue. In turn,
+> disk_update_zone_resources() calls queue_limits_start_update() which
+> takes a queue limits mutex lock, resulting in the ordering:
+> q->q_usage_counter check -> q->limits_lock. However, the usual ordering
+> is to always take a queue limit lock before freezing the queue to commit
+> the limits updates, e.g., the code pattern:
 > 
-> Stash away the dd_per_prio in the elevator private data instead of looking
-> it up again to optimize the code a bit while fixing the regression from
-> removing the per-request ioprio value.
+> [...]
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Applied, thanks!
+
+[1/1] block: Prevent potential deadlock in blk_revalidate_disk_zones()
+      commit: 0b83c86b444ab467134b0e618f45ad2216a4973c
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
