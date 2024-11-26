@@ -1,33 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27379139D07
-	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 11:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001A327442
+	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 12:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732620375; cv=none; b=nhWK8zJ5rABCBBDCCrvFoRa7swSYOhTJf6RJyWKmSfM4kmaVswqaNQkPcNI86371YIFEAOPm6hu0K/cgh2yzmyri+pzJKvhMzHn9bm6+OfrPjMaAmzQ8rv6hSJVqABxsWCeUvbY4MCqCbQcTcrLHG+YFZgJGiTQEmncBWU+veqI=
+	t=1732624971; cv=none; b=HqtYNk4svT+RRjxLs4kms1YPleOr3eQyRk4CqbBQXzhzRTQf1NtWwL5GI5oX5qpWmEkZJBzK+XXs6GsmKd6WGS08+dTkAt3E5ms5mgjE7e8WqOxnwFXxxB6MVDnIF523YEejqPbsDps970XYUIu63SwsWhPC9ZWHUZMK3YQiyP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732620375; c=relaxed/simple;
-	bh=2uPFKntty9yAqlswKATDZ/036+Gt9NO0knS5lsoR6cs=;
+	s=arc-20240116; t=1732624971; c=relaxed/simple;
+	bh=W0hr2u+OCoELdr9LSdCi8T7Qlo6djA0oJTS5lVa89wY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tLNGL3j3oAMAGyhtyUyzWhMQAEQxZ+v+5jU8XQKiCcBqzuIK+A0p1kr/AFrM6a9/mbAwn21L0x5fqLq+JZu2YZpE7mabjg6BIQcMmUZuwAw+s1EuTHmQY8ydt7ku3aa9nPKI+nSnJynsXE4Q7m6wWTLS9+sAYuzkObnfk+Tv/+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVAWuzll; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=temc9TyIQgkSXsxw6eGUoeW5nd4m89A8fxgkuNHycgtEBuS5fcpG46dXTlGDcknmPwEAQCcNvy9q6oD4Dacl0LcG47/jEfxH0UC3wJzKXxLkG8TNmPJ9gAI8rlXfdZerx8DoKTfUOsH9fP4JhotdihR9t2lPUFmRM8FyJv2iU+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dxqanH+v; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NaLNisZC; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uKDMh2WP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=stZa6brV; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVAWuzll"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51255C4CECF;
-	Tue, 26 Nov 2024 11:26:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732620374;
-	bh=2uPFKntty9yAqlswKATDZ/036+Gt9NO0knS5lsoR6cs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EVAWuzlloDlR3+FsAOQfMK5+AIxe5on1rszlXiJUeRLiLQMnDlOBVA9VR0vIhXjy5
-	 tuVv6inpVftAB7lkiVugk+e3EpC15zrHiLX6e9xYUM2eJTFn4vKR9vVeChbnkPcajg
-	 vebpEhzcYnzXJvntCBFSxIBP9VZWdOAZmT70dpCC2WL7MmORSwTUwjO01GWx1olwv0
-	 Ucw7kv8D9rjbWjhuJY2yEhToqWLXIFu/PbOw1fuzYxXlOjWzpM9FsIlIqkhDbVqlyg
-	 wZQ6V5pva04rLdUFfPPbyIT/J3UOgi8OmqPZfNDh7TFuXmWWOJyOXN+07jE2Vy4i3w
-	 2Zc3zsETik0cQ==
-Message-ID: <1e5a1594-a945-4302-bdf9-1a57cc140b9d@kernel.org>
-Date: Tue, 26 Nov 2024 20:26:13 +0900
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dxqanH+v";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NaLNisZC";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="uKDMh2WP";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="stZa6brV"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 298A31F74B;
+	Tue, 26 Nov 2024 12:42:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1732624968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RWYQgGBlPjwADyty9JXPNBFaS02BPkZ3fBUHGg00k5Q=;
+	b=dxqanH+v/e165knU/ws4o+T1/vq897t3F35vB9d07Ux3Ss4xSUonwi5vtoQBHFMdOncwwU
+	qucI98OCc1mHUzOiiLxoe0jSTLkAhWep5aD66JIAuVAP7PbKHcn4rvyC7YLVzTd1PzGeWW
+	1d9tHXjMDPTQENaTyARu8t9ISIHZJ1M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1732624968;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RWYQgGBlPjwADyty9JXPNBFaS02BPkZ3fBUHGg00k5Q=;
+	b=NaLNisZC/9AC5nDbicwDufR+F0Hyiqczmp4wbquEX7rH5obeTkSx3s+w4odQlPmbmy+dQN
+	Qxo22cGp14D62pAA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1732624967; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RWYQgGBlPjwADyty9JXPNBFaS02BPkZ3fBUHGg00k5Q=;
+	b=uKDMh2WP9yW9nhjLNmNNC2JhTHSgszZRBqFDbSbAQgbBrK9ETVNfqnBGeFv4tRFQCapBpu
+	0+01NYVjFww05thObGEADp6/vDYs2gfin1GIExYhmS73unsu735A5Nt2yweA3OfvSg4MXP
+	9nt6vvZ0ZtVtCKkwxgm8xMCicTsTtE4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1732624967;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RWYQgGBlPjwADyty9JXPNBFaS02BPkZ3fBUHGg00k5Q=;
+	b=stZa6brVzRWin90qgCaVLycwwK80bPK9IBwkS2v80LTNV2hUtq4i9/ebAIlG9DOlqOtip4
+	/IftCBy/2DtdJRAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0623C139AA;
+	Tue, 26 Nov 2024 12:42:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id +GbjAEfCRWe/UwAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 26 Nov 2024 12:42:47 +0000
+Message-ID: <2f3dd703-f979-47e9-9952-e5777c31b255@suse.de>
+Date: Tue, 26 Nov 2024 13:42:46 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,160 +82,60 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [blktests] zbd/012: Test requeuing of zoned writes and queue
- freezing
-To: Bart Van Assche <bvanassche@acm.org>,
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: linux-block@vger.kernel.org
-References: <20241125211048.1694246-1-bvanassche@acm.org>
-From: Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [PATCH] null_blk: Add rotational feature support
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+References: <20241126000956.95983-1-dlemoal@kernel.org>
 Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20241125211048.1694246-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20241126000956.95983-1-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-On 11/26/24 06:10, Bart Van Assche wrote:
-> Test concurrent requeuing of zoned writes and request queue freezing. While
-> test test passes with kernel 6.9, it triggers a hang with kernels 6.10 and
-> later. This shows that this hang is a regression introduced by the zone
-> write plugging code.
+On 11/26/24 01:09, Damien Le Moal wrote:
+> To facilitate testing of kernel functions related to the rotational
+> feature (BLK_FEAT_ROTATIONAL) of a block device (e.g. NVMe rotational
+> bit support), add the rotational boolean configfs attribute and module
+> parameter to the null_blk driver. If set, a null block device will
+> report being a rotational device through it queue limits features with
+> the BLK_FEAT_ROTATIONAL flag.
 > 
-> sysrq: Show Blocked State
-> task:(udev-worker)   state:D stack:0     pid:75392 tgid:75392 ppid:2178   flags:0x00000006
-> Call Trace:
->  <TASK>
->  __schedule+0x3e8/0x1410
->  schedule+0x27/0xf0
->  blk_mq_freeze_queue_wait+0x6f/0xa0
->  queue_attr_store+0x60/0xc0
->  kernfs_fop_write_iter+0x13e/0x1f0
->  vfs_write+0x25b/0x420
->  ksys_write+0x65/0xe0
->  do_syscall_64+0x82/0x160
->  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 > ---
->  tests/zbd/012     | 70 +++++++++++++++++++++++++++++++++++++++++++++++
->  tests/zbd/012.out |  2 ++
->  2 files changed, 72 insertions(+)
->  create mode 100644 tests/zbd/012
->  create mode 100644 tests/zbd/012.out
+>   drivers/block/null_blk/main.c     | 13 ++++++++++++-
+>   drivers/block/null_blk/null_blk.h |  1 +
+>   2 files changed, 13 insertions(+), 1 deletion(-)
 > 
-> diff --git a/tests/zbd/012 b/tests/zbd/012
-> new file mode 100644
-> index 000000000000..0551d01011af
-> --- /dev/null
-> +++ b/tests/zbd/012
-> @@ -0,0 +1,70 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Copyright (C) 2024 Google LLC
-> +
-> +. tests/scsi/rc
-> +. common/scsi_debug
-> +
-> +DESCRIPTION="test requeuing of zoned writes and queue freezing"
-> +QUICK=1
-> +
-> +requires() {
-> +	_have_fio_zbd_zonemode
-> +}
-> +
-> +toggle_iosched() {
-> +	while true; do
-> +		for iosched in none mq-deadline; do
-> +			echo "${iosched}" > "/sys/class/block/$(basename "$zdev")/queue/scheduler"
-> +			sleep .1
-> +		done
-> +	done
-> +}
-> +
-> +test() {
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	local qd=1
-> +	local scsi_debug_params=(
-> +		delay=0
-> +		dev_size_mb=1024
-> +		every_nth=$((2 * qd))
-> +		max_queue="${qd}"
-> +		opts=0x8000          # SDEBUG_OPT_HOST_BUSY
-> +		sector_size=4096
-> +		statistics=1
-> +		zbc=host-managed
-> +		zone_nr_conv=0
-> +		zone_size_mb=4
-> +	)
-> +	_init_scsi_debug "${scsi_debug_params[@]}" &&
-> +	local zdev="/dev/${SCSI_DEBUG_DEVICES[0]}" fail &&
-> +	ls -ld "${zdev}" >>"${FULL}" &&
-> +	{ toggle_iosched & } &&
-> +	toggle_iosched_pid=$! &&
-> +	local fio_args=(
-> +		--direct=1
-> +		--filename="${zdev}"
-> +		--iodepth="${qd}"
-> +		--ioengine=io_uring
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Something very odd is going on here: this fio run is supposed to be qd=1 but
-when I get the hang, I see plugged BIOs (at least always 1, and very often more
-than 1 in different zones). But with a QD=1 workload, this should *NEVER*
-happen. No write command should ever enter a zone write plug (as long as the
-write BIO does not get split). So it looks to me like fio, or io_uring
-submission context, is sending weird writes...
+Cheers,
 
-If I change --ioengine=io_uring to --ioengine=libaio, then the test passes, always.
-
-I am not sure what is going on.
-
-But I do think there is a potential deadlock anyway: if a write command fails,
-zone write plug error recovery will be triggered. If that zone write plug has
-BIOs plugged and the call to queue freeze when changing the scheduler happens
-before the report zone command is issued for the zone write plug error recovery,
-then we will deadlock on the queue freeze.
-So this is a definitive bug, even though this test does not create this
-situation. As already discussed, given the need to properly recover errors for
-emulated zone append commands, I am not sure how to fix this yet...
-
-If you can also look into why io_uring IO engine does not respect the iodepth=1
-argument, that would be great.
-
-Note that I tried qd > 1 with libaio and everything works just fine: the test
-passes. Things are strange only with io_uring.
-
-> +		--ioscheduler=none
-> +		--name=pipeline-zoned-writes
-> +		--output="${RESULTS_DIR}/fio-output-zbd-092.txt"
-> +		--runtime="${TIMEOUT:-30}"
-> +		--rw=randwrite
-> +		--time_based
-> +		--zonemode=zbd
-> +	) &&
-> +	_run_fio "${fio_args[@]}" >>"${FULL}" 2>&1 ||
-> +	fail=true
-> +
-> +	kill "${toggle_iosched_pid}" 2>&1
-> +	_exit_scsi_debug
-> +
-> +	if [ -z "$fail" ]; then
-> +		echo "Test complete"
-> +	else
-> +		echo "Test failed"
-> +		return 1
-> +	fi
-> +}
-> diff --git a/tests/zbd/012.out b/tests/zbd/012.out
-> new file mode 100644
-> index 000000000000..8ff654950c5f
-> --- /dev/null
-> +++ b/tests/zbd/012.out
-> @@ -0,0 +1,2 @@
-> +Running zbd/012
-> +Test complete
-
-
+Hannes
 -- 
-Damien Le Moal
-Western Digital Research
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
