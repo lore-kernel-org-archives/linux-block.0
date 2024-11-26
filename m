@@ -1,47 +1,47 @@
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2046.outbound.protection.outlook.com [40.107.243.46])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2058.outbound.protection.outlook.com [40.107.244.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24ED8831
-	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 20:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0E88831
+	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 20:39:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.58
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732653583; cv=fail; b=PlsopgtN2fNW8hRHdWP37M/vbqtfLF6mnoM8IKQ15g7MrAHA/CGCIbUPumu99xxlApX52uBBuBzROPnT9T6jKG2VWXieiWH5Mt+S4kZJB+m9BAPGsnelnA8Wld0AgdiKQ4MCT7Mp6IYNnSWwJ7wsfMd/28a0bbvLSS9+jkrfRWE=
+	t=1732653594; cv=fail; b=f9j1W1HbEaeUA+2BfCtabsJ4BJzwK8sgL6qI/v5JaeFUSZ+xmj2duympevAnTC2VqHqXlmgLVIAgctITAzxAWcWG2AGeo3uul/9fJOziVNVhajoakZwjUMOSy8alVS4A2ognY8WoBY5+dtreuPjHIGdnmXrNewfOLh7knix0DuU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732653583; c=relaxed/simple;
-	bh=RLCnhaXNJjacmqyj6sJgmUy9o/OtD4y1V6IobTtbty8=;
+	s=arc-20240116; t=1732653594; c=relaxed/simple;
+	bh=qD6DEvVMwX0Felrq4VLQZyXkccyE0ON/5jb2PJv+2xE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nR9LF8vAc665X1WcIfSLX0fdqkEls7ZQoRZZ6gDUMLA5PIPbnH88CNLC8sxwy4b1ZFppQEOdFaL2QJf73yvEsyD2wX626iU+7qUfidMEFI2xgKme30H7/NbuSzv4sCW7APQNY/DJZ73JEL+ry4Tg8HkTSranMLeanuUoe38so3o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VZY74kjo; arc=fail smtp.client-ip=40.107.243.46
+	 Content-Type:MIME-Version; b=UbrMctA0q3auCEhIboi+ApX48QnxcVSJweRhzKeBoZql/LKCQMxNRilgCcKJQBy9MZtgCiHYSqsQkw69K3HuM9b4eNYsTPNTGmby/YD7uADokhUvRQtsNq/z9oOPvWMo/L6+iwhwa3OXgXww7+msOVahIuvlpdSk1syFcrQJYsk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Wh2mOf3F; arc=fail smtp.client-ip=40.107.244.58
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="VZY74kjo"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Wh2mOf3F"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=j9QLGaFCAkuUavEwDMc8Y2r4VnQtumPvvuJVw8u/c/Y8Mz9D+Q8WBPQSImGPbQkfbtbneIxri0v792+du0jl31WIYMQXIEW5tmsVrLd/2RLio3SM/eNEff0jslaKvj/t2LvAYHyDp8U0UEakuSISGZi594N9AzUMFHoqRqqHaM1DtrHAI4IY5J1VzmbmH3jB7C/LeZZc1DoAGsCjw3bUo1Tf68LwQddwaILBX395ZHxXFQPRAG8WLArByTBtcc3wAa70mrUIW3uRM5petnAChCzxn9qSgA7vgJ5CQYFmSwsGkkvhpvHLLM98oHll+WxP1bNLesE6IEA99TiKX/hGSg==
+ b=g8uY4ajJurWUMoo+lDHn2wQOxMXHOZrUThegdLXHpvDIFMUZoTaExS5DV0HpuU2OjNSJdLBAVbRfA0xMxLQYAh+s8nK+cVve06KNdGYkgK/0C+SKRh/JiifMIqu2849u9Yrz+1KJzKEohgjkaoZdNoORSxgcTmK78O2avaO+fDkjctgtduQ/dnkrvwfn8uPnVUg8E7sYa2J5kKrGqB11rHDRPLhkIfUlvxSYaf8F8LINjmzD1FravASxwgSlyV6TTBiiN3wJcGD8rZ5BxSiSRhfRlpUOHsQVi9vqt0ZBpAh2tTfXe8eizBArvFNmJixs3oGsMof+C1Vw8buWSSAgJg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hEkjaBFN6bFN0SYaBG9boKuGJbuRL2X5cdHeCjirrSc=;
- b=ibw6WqSnzZnU5SQ2UQSzzHIBu+lbc73lTL4o9XyPUBwbF6YZYbTQCrLtcXib2cvIMMkwzXJJQeUWv9uHdC9JmYQn5G6zALnZ/WylIOlKVH21jmxcRWoWyR0pMc01fAEH3vmftI6zts31sVJuQzW9spcf70jqeRNhQBKu3Og1Cp2qsU1oXVh6zmc9nV0Q1KFH7qrQ8DfECtbAYU3XBqOLWDbS1YZH8cVE6gYbJHX97u8rgvqwkwlM8pVcdw3bmrjaDutXn4LDxl4SNYIThIrPfqNIrRQ0FR8mcdLW9DPliYeHc6MDPFzM8z661gnvbrAEbYERxcjzQ2R+baNLMz45eA==
+ bh=O0jB3iFC7HdxiCP7MJ8rxsJPEWyC+PI7oPlcclDFtjo=;
+ b=JwAECEZklaEQ+IKOK5Vg+jyXmMZWFwbEMze4TjsqgWFxkZTblQS87Fn2b2unhrK/dS97KSTJ5LY1EvkR4t5pBUVH9xk8zmG7xOfzk2kF7/UprjSasLerVf5PPj/9iyd20ekvHB0ZXlmi9OrReIGU3KFDuIYBCgno229CxjxryVvEPhTgw52FzHGcJ4ff+ufijlsws1cu2aG1cASMcacGsDFEQZy78NnGNibbjWDtcZK4+jHXZinq8RljEkbuWRZooD9OXTglNi0IHPVeAGLfF1iInvTnU479RMrRNVlYYFwe4ecq+KC6j4RamYR1lEvniAUFUr0+pFkLDb91o785MQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hEkjaBFN6bFN0SYaBG9boKuGJbuRL2X5cdHeCjirrSc=;
- b=VZY74kjokH+3cGoTTE1PvWDIjpU+XQv4uT6NtSClKiCcA1qBAS54DqKRkD+0cRIz0qoImGmOa/Pm5yS71qC62q499BN8vNXVQK7I0NdmjRfN86h2ND7Z6EGBrp9bnmAKS47xVh5DZaBrUwZS2M4xcemOqJPzrJQlUIIOw8TB5JObOxyTr1CY7MWfedFaEUNujnnUHeLFfi/hC6rKIdDVWLdiSSk0qxc4wk23gfEo88nIoq5WbfZOhPDOomyzOC93zuskyUwDj5MvKlgHipoZQF/lU84jPdwb5PtBoSQGx7XAiqa8o0xMw8zTXoRxhFN9/LgjH2Qrjask256E6T4AMA==
+ bh=O0jB3iFC7HdxiCP7MJ8rxsJPEWyC+PI7oPlcclDFtjo=;
+ b=Wh2mOf3Fbnxurj3SxgfGPSB+aw3NVYY5mi+h/QQR5GLq8duqH66j/dSvUr/TRtj7+6FUdhj7Bhwi/GN+MV4K3sxXlgE/p9V5YRXcSVwG6AfU7lYSauBT2tSEmdrF7bBKNAsVtBYM/izf6OUh5KzrMmRlF6/o+PrIo6WmJTwsdPau6kx4C033ytdaRH6x31CGG5S+Bn2NN65fiMIscMjUujTzHGZAHYsoNoZS6GnEbMq/2rPJyuh+c2wKL39AdNtLQuuTz8JtI494JObh+BxJqCTnS5pEEtCkyqFJDlubR9FuAYdGW/iciwuqJlMW93yvxbIaZGjAmJnBl3VFJx1PVA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from SJ2PR12MB8943.namprd12.prod.outlook.com (2603:10b6:a03:547::17)
- by SA3PR12MB7859.namprd12.prod.outlook.com (2603:10b6:806:305::7) with
+ by SA1PR12MB8697.namprd12.prod.outlook.com (2603:10b6:806:385::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.13; Tue, 26 Nov
- 2024 20:39:38 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.18; Tue, 26 Nov
+ 2024 20:39:46 +0000
 Received: from SJ2PR12MB8943.namprd12.prod.outlook.com
  ([fe80::7577:f32f:798c:87cc]) by SJ2PR12MB8943.namprd12.prod.outlook.com
  ([fe80::7577:f32f:798c:87cc%7]) with mapi id 15.20.8182.019; Tue, 26 Nov 2024
- 20:39:38 +0000
+ 20:39:46 +0000
 From: Aurelien Aptel <aaptel@nvidia.com>
 To: aaptel@nvidia.com,
 	linux-block@vger.kernel.org,
@@ -50,16 +50,16 @@ Cc: Daniel Wagner <dwagner@suse.de>,
 	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
 	Shai Malin <smalin@nvidia.com>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v4 3/5] nvme/030: only run against kernel soft target
-Date: Tue, 26 Nov 2024 22:38:54 +0200
-Message-Id: <20241126203857.27210-4-aaptel@nvidia.com>
+Subject: [PATCH blktests v4 4/5] contrib: add remote target setup/cleanup script
+Date: Tue, 26 Nov 2024 22:38:55 +0200
+Message-Id: <20241126203857.27210-5-aaptel@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241126203857.27210-1-aaptel@nvidia.com>
 References: <20241126203857.27210-1-aaptel@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0004.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:c8::16) To SJ2PR12MB8943.namprd12.prod.outlook.com
+X-ClientProxiedBy: FR3P281CA0061.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:4b::9) To SJ2PR12MB8943.namprd12.prod.outlook.com
  (2603:10b6:a03:547::17)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -68,123 +68,364 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR12MB8943:EE_|SA3PR12MB7859:EE_
-X-MS-Office365-Filtering-Correlation-Id: 75d2130c-646e-45f3-22aa-08dd0e5a727b
+X-MS-TrafficTypeDiagnostic: SJ2PR12MB8943:EE_|SA1PR12MB8697:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1b149d7f-5f7b-46c2-a1b3-08dd0e5a76cb
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?HyF7JAszEy9U1CAO9AcE0evPg4fpCyAvPM6uVkGRbn5BQs52emq3NioNvVOT?=
- =?us-ascii?Q?Bcia3jSrMO9DWKH+7sRi4kdDbga3lnkCQe8zRntcuMpONL20jiAe7t+yaEPF?=
- =?us-ascii?Q?lmKe6D/Rqe0D8JPBeWOBPJL6xpUWt2a6j6f0BL0xP8ypKCEUEQHjRhtwaN7X?=
- =?us-ascii?Q?fs+VxfXiNvKEu8pq+lrGAgc8fAKEYR9ckPeZvmYtkYu6njud+TFeiZTeHBcv?=
- =?us-ascii?Q?tfAYBZPp2Q++RW4mWMOEW3dWWH3LOEHu15PzIIgPu+aEa+M2eLlvulVmpYL1?=
- =?us-ascii?Q?bsotgfmSJ4cdusasxi6LKI846+rxyBWmeCz4otwKQqU5pkKA8a4/gtptgTMB?=
- =?us-ascii?Q?XiMzamX6n70te7st5ZgLhjesNLj4BibXqHF8FXLw9iNPFxCxSsyiqSRbVKXL?=
- =?us-ascii?Q?+D7xvcra8fwUyikfvVIYEdJ34e8dzXA7c4q1sUz4pGFhJmy7tvOGyfhLgQl1?=
- =?us-ascii?Q?hmRnxsn5lhomBBTXdaEknsfmM9jZHP7mrGhWrun4Eq3S9y63nM5pF3Yf5Z7c?=
- =?us-ascii?Q?EcFWvAB9mgxMcgK+KSIdDv8Tu82WfOLgKjusOJoqF87KueMuhC+FVY+n31se?=
- =?us-ascii?Q?g+oHOldYVR12Xh+w1NIFpUpKCbXlQeJPTlWaHV4Nw4j5Xavh8zakf/UyR3RP?=
- =?us-ascii?Q?OK+X/2pk6Kkg5YnROxQ5yB06SGVT5xQCA3hUlkozSpqKteVJAPPOwRwvhA7v?=
- =?us-ascii?Q?laV71acdbUfGan3uLP/k6JK8NDbvrILsM/KchOGq/YBB/fQvWtIqrvZ9Qyr/?=
- =?us-ascii?Q?gJ7OWUbtQcpdZNY6Li0LsDv3z0ivnX+wFDAljTZpBnzup8X2UKTzbiHsj8ax?=
- =?us-ascii?Q?GXyvryWuXN/zyFSPAYlfGDeKuI4zyGBGqtev/6Zs6zMmA3QQKl269dav2fYC?=
- =?us-ascii?Q?ApEE5e/ua7kumphk3m6UFGmkSbsyTeId22FwhL+E5Qo0NZqkxVowayBM3onl?=
- =?us-ascii?Q?9Zu//Zdbg8txcgiBbL7mVVPUegzwTAuh7W7eNCPsFc4fXgq0VnafwWNcRZMz?=
- =?us-ascii?Q?6svIfCLh2NKuepsZJNDvICswRexbqXLp5XmSIa+0E437BV6cpWD+vdXHmGR1?=
- =?us-ascii?Q?UADQXEyt2MRMh4jhCYKaCXAiIyjZ4VcZnHGAcO5yMgF6C5f1BagIwRFGjOwF?=
- =?us-ascii?Q?lr1JOhVZkhn9X1XpJRn9YUuUgsWA9HpVlE+UyoFc0+Ag9z6sUvlbtEKdMmn5?=
- =?us-ascii?Q?kexaz+fDPJftbnRTbTFrsd2qsNajzEt6sGE+hGS8WS9l8BpSpti+SAlkiHZK?=
- =?us-ascii?Q?x85qgS9T7XGDLHTHTeRFNI+tvHGV+FrAY2wnJpMFWELAmOcAW9QOHqlyvJLo?=
- =?us-ascii?Q?32q8i2ougJXs7qnLp/5H1pW9Ch7MQt8a1fX1+fNRHGyzRg=3D=3D?=
+	=?us-ascii?Q?xGqdSzuBcY4dHZYMJUHhm7+VMGMNTPvUxjCqfO0fdj3VJIHpImGMIfINYJMd?=
+ =?us-ascii?Q?xQcsS8FKMU9kQh/g5hDkV3ZZBOU+y2FD65uwduwRI6HC3EgZgeuw1DD6B2Rx?=
+ =?us-ascii?Q?ILzLJBbvxsV8/kMSQpq3Al+QHTCtKQ83vzazTvlq8b2ozdK4QL3v+QOKI+Z0?=
+ =?us-ascii?Q?RKDSxchVkfzeqtIgnAmH+v7qWHhgxKmdjJWMYh8Fd7mULa5v3I5e7w/xI0Gn?=
+ =?us-ascii?Q?tzeUQOExoPO84RbmOc6N6mYf/RgNhTTH4f/tdoTNqEqk9WeF1m8x/rcfK2+z?=
+ =?us-ascii?Q?Uadc6F5NuVWif8w7dQVlUjn9W6krDifwH3NrpAfbbJTGVBUSopLc6HKLn2w1?=
+ =?us-ascii?Q?ylxJPsyCWVqtbmDS5U1E74BIcek0OtOBNR1mJOYE3wbU4lokzFjQAYYQw0Ra?=
+ =?us-ascii?Q?InyYNhbzBnpol0UxmAZJ9xvO1YmC8bsOsr3Ueo7xPmL9uawkcG8n2EyqQNpi?=
+ =?us-ascii?Q?J+ilpGfdizb9rt0mM3T69dAECwh2S2D3BQGF/urDgTfBoKsmnGe7YHtIAYGL?=
+ =?us-ascii?Q?6H21vmPilE1STaMFypG+NRf7dm8hZH078Aey7yPIHqRtP1PdAJL699vxdCwI?=
+ =?us-ascii?Q?b/x2O25qnF8undKTGuaWtnpS23+iLrw+r0nR1U/NvzNdGXZx9u0MBOnNkvGO?=
+ =?us-ascii?Q?LKdtnQw2VSkmaNLRNSZnZCrsAesi44/pPEmGYJ/tTzv8r41NFw0v/gx+MFpV?=
+ =?us-ascii?Q?kRB6Wc8JeTfm9+QPpVzFOm5RjZ4xiNsx6CrsfH4IW4GksrwdXsh0seTqVJGE?=
+ =?us-ascii?Q?g2rKmr/Y7ALPTe+FZXKPJcLXXhYZ9B33q6OKusWH02I9abXaNYS7CLSQcFxx?=
+ =?us-ascii?Q?b+AHUeC9KEpOtfLkmIbBydNvaNyu7psHpf6Mi+abGr0rZwjnxRFYlrlsZAE3?=
+ =?us-ascii?Q?0edXXmXJT+pVQeTJ5sLtUOCOd/4scQ8657u0CW3GfmZrlSjU7IUPe6yZM0qO?=
+ =?us-ascii?Q?V6/83LWT6Nn+r5wJ6gCD5mmtozX7KL0Ge+Spkc+tnbcNxk9iUSAl3RG7TEVb?=
+ =?us-ascii?Q?JUeApfaxjxL4bGCIg2NGqoPr/cVnuNcmir8cuHWXtxl1dcOuVet2JH603qu+?=
+ =?us-ascii?Q?grAOe/u34fCFIQCRlSZG8Ic+K3yDU/BErIx/u6RehJ7hpRu1LS1d4HuJSjSu?=
+ =?us-ascii?Q?+5mDUZIeEGIOWqOgAcRyj/kRtI8KpkZFhqkoKJUk3VQxGaKCXbjo6jjhaLHY?=
+ =?us-ascii?Q?j7ndkEDTvwXGD/lsOTYPDehV1bpw4kFHBQ95VKBDHnlAyJ8XRAtbsFWQeV0C?=
+ =?us-ascii?Q?D81WLTLVnVqbXE57ePClnn9fHqlKdSBx4AVrq71dbHcB/ZlG44UHR1/OxITS?=
+ =?us-ascii?Q?bdLCBzlg0M419M0QNHA0miIlKBEIw+HUy13KnuW4Dt1OyA=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8943.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8943.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ZsAWD7dNdK2Ie2wWaLzXdyI3iw00PB2Wt1Mz/YjiBLuZguu5loakdAB2XyLo?=
- =?us-ascii?Q?2KyAE3S3zFsfSJcfUxjF1D+euUvQeWo30MVUhwl7REZhIT/mhA1Jd4BR4wvs?=
- =?us-ascii?Q?EVfj7Q5QZKd7dUdy07I8uOyu79/lyPIOLVO1kn39Jgll3tj3K648dXzOMsre?=
- =?us-ascii?Q?/yjiHCRn6yIHxOWnywlcEbGnjUXIEHMEUC5em8k804UBcVI0TreIE5aOQlN1?=
- =?us-ascii?Q?hi/UnXCSc5fAh6jhJkMDQXxXrRkgxfJjbjhke3T6Qdswo+3u9YdkRji6AMV3?=
- =?us-ascii?Q?6I4tbZMWB6Je4lghTZuiJGSFI3kfSgY2H/giS1hJmh6LDP9XisZgYrwqjQzP?=
- =?us-ascii?Q?sQp5WHzjHwjz12alj6RaaQB8KMAiWhh/tx7ef5btVXvWqWVcD+tuKyP2FDp3?=
- =?us-ascii?Q?0K7MOdzS28mhZPz0nnurXhFJwmi0562vyWVDYRl4/yyFi9/NZUPSo2gRRrds?=
- =?us-ascii?Q?sX2K8QmnlXAXajRWoT1dfoCtMrt12aGiNXHAxhCjgFz5LirLlwqU3nPXbJ9c?=
- =?us-ascii?Q?kdHKwMib1UObiRjc0JatVKeY9TJWBznEDdgxTAGNqMq5BYsFJzJ/RvcLH2WP?=
- =?us-ascii?Q?zkVgmEVABG8/P/uJsicQwczFrA6cd7VjXcuuFuS3Ky6NNQdTMRcdEhDMeiXH?=
- =?us-ascii?Q?ZIsjMf/+7oWdzsAsWzmrgf9FKShVD1lQLz01tP4/CVr7JJptIThpbpSNac8f?=
- =?us-ascii?Q?3qWzBnckKqDRjXNbw9jp7qTrIWVvm7bnuk4zDG3a6epy+izoRZlxlRay3TvF?=
- =?us-ascii?Q?ojd/2kfOg/T9yYUktEhrYLJ1YwfNmAT2tQqILd5KZoyO4WTACkBLQoUM0aHV?=
- =?us-ascii?Q?OMynfpJwZgff3LasdRFeGvtaThP2PFI7wCw6TWwhpU0YgdbsJxQ5xB9Duv8r?=
- =?us-ascii?Q?iEN78i0SkI/pfd2tHigO+qg3JLvItyN/vzBBB++27ChpyaUFWFCucycTNBPN?=
- =?us-ascii?Q?t6TKsgDEOV1zE5+kYcHYRGIFTxhzDodQ6CcIRJjIfIGy1fU4jBCmEi92OAc3?=
- =?us-ascii?Q?ai6W2UKFdpHyGY+NR5ZJft7MXUpHwDW+FerR5R6lU7LKk5VRMhip1L2NItTy?=
- =?us-ascii?Q?yOFs3tQy/NRXyg8NVaLFAFiugMBb9SzqtLEw+Ge/32jZJbBGpHYJnMKEml3I?=
- =?us-ascii?Q?PckQ1hCyAUNd6n6Trl5HcWCU1/taY1KVrXjXvsIaz0A4K0BJEIrAIXl18W4/?=
- =?us-ascii?Q?Ay58nSn+I/Df9CFosk1gA9/ASWjAnhupObh5TXNEy6rZPM+8gS3GRBC6aQR2?=
- =?us-ascii?Q?PM7l/Ecc/VWcbklGLUsI8kOk1xwnV6T3EhiM4UgE6tXKBNy9KrcQU4+bXD2L?=
- =?us-ascii?Q?XPLHOLgsnJVjtZHWW63Vkf9MnoTD5dAEYV+aQWLi7H7p9uu70KqC8y0t7ABw?=
- =?us-ascii?Q?sqa1zKvWU0YeJznjo5CL9c0mfwnIC0jkH2agrRhru9URO6ZFkUqIv1ZVqMCl?=
- =?us-ascii?Q?1Nu3vKelQT/X8mpRH2HJJSu+C03s36kIHgH7AQGqS3Vo4N5xB7aR5SX12d0v?=
- =?us-ascii?Q?sLIm9rvYArR1j2H5L1UjaEA3h4b+pRXZE3APVRYyFNU40VgjRVC67WE4376y?=
- =?us-ascii?Q?J+CP9apWIuvMlvpF2njHBdoSeiI6RsdTubCaKFhd?=
+	=?us-ascii?Q?W5mS+pJMcP6vd0TbDaeJgkrJoUczgZ9ryOZhjD4z4UZ5Xf/ObB5+evs7piS1?=
+ =?us-ascii?Q?JUFmHIWUCOpVix/hQtXAh8tQexJ1vdJVz/gv0RP0xR+7MXLlRU7vIihYaVKr?=
+ =?us-ascii?Q?lbZeOFrdszTi0p6fOLLoBInhhLT20RgFgNU0sZyFUSImPwD6NZxM5/Wzp7fh?=
+ =?us-ascii?Q?shrXk/y3QScXnZi23QoxWU2ZoBLLww6ToYLkMNdXiIkP8inswLKF7AOxTihd?=
+ =?us-ascii?Q?1ww+zTf9gNI4A5+ee2YlkEeM5/5trMlXztFupLxeYHJVmOFRxVgAGOlp433N?=
+ =?us-ascii?Q?B/JAqTtH8fyqf/zeKmZwjjkQTHqYteSXt7gps2lYYUcvsfwYtaxklReemJ/B?=
+ =?us-ascii?Q?Yerb6KzvVF5YxUZJVMVi9qyVW2Pevdn0RflgyjzDTfwBruistZhOm61LPC4B?=
+ =?us-ascii?Q?+3j/XU7gkv7CSG8355pGWkKoirjBetdlHY/gzgH7UUa2JGP1wGR3RI+UB2z7?=
+ =?us-ascii?Q?vDAC69EVfnUJLegsfDhrobGrVh0ar1rRtSnZoZmo4EWE2oR4zSQGD3qUkHmO?=
+ =?us-ascii?Q?gqsYvXTufuTeRP1fgdTiOVGMTizCpCQdP6w3dP7iVqbGdOUSkgt23myWfmWs?=
+ =?us-ascii?Q?FEr13LxKZFnfB/6wh0z+8baeTOBuiOOwNB1lUYUwd2bdb0FztNZ3pa4ADn9b?=
+ =?us-ascii?Q?LbJPAmfloUpdUCRw87ljHWmZl6t1qIO/iOXasNwVzJMe1IoH4tT0Ag+Hbu2Y?=
+ =?us-ascii?Q?82J5kuJU40WA1yHZ2r38zRt0lZRuZ8FtbCnFRyiXed+ufOW5gnPI+pf6w3cT?=
+ =?us-ascii?Q?4j0IywwOxjrz2Zi0/Tq6ZemrYb5fvrxUlx0LkB2rBzg2hXXp2kHr61TSyCEZ?=
+ =?us-ascii?Q?W0VtFdDB6u/LGz9SOU+F2M4UEnudR5ICDC32pKSRP9aRbkwzdBhLiciFxCY2?=
+ =?us-ascii?Q?UE1d6b/SdcwwDejmGwfMdEWjqGsu9q2S220VKErp9se2xFJNXg7ZZlqJudGz?=
+ =?us-ascii?Q?U9C8YAtOpOKYgaWfYB7nHD+lg1sfV0LSTiSUJRuu9+d/owSd52CezQxYNxWE?=
+ =?us-ascii?Q?5brt3hhcSV9J1+ixv+gIj1J25pjfVF42AuTo0hm4a6AkaQfj3JsJrKB5v2yR?=
+ =?us-ascii?Q?9exPa6RAwgkuhnnZgnZZ8gVjx4CZmvEHBlvOi3UGUxh3J/S0KU9f94phBFFj?=
+ =?us-ascii?Q?7t4N3bBCMapWky18vrOgvK2NSwofVPaFex5BBUWjzlKorzof+rr6r8+rpZOu?=
+ =?us-ascii?Q?81vaYQlw6V0JqqM+2PCcT3J7bTTzcHAvPnUBkeLx9OSHgCGlMvp1Kur79oFI?=
+ =?us-ascii?Q?MueK5eJpNq19FrOoaqLZGyaL/alEPaVBOCks9wBICsHgIMJhrGci/Ou5gamD?=
+ =?us-ascii?Q?LLQnSkcf+zEY/y1wBQYxC0ArlP/T3M8cmIDnAZKeWMIlRjgr0RsqoW3N3Pi5?=
+ =?us-ascii?Q?ZGpGwgqrylwSU2YuRahYS29A1GqMc8++5MjuMnf16q9CgjJEIjUbTXGhpPhY?=
+ =?us-ascii?Q?o9xlB1Buhss9v3faiX34Rmz+YoVpxfZDF79BzDCp2eYj63dgGIdxPnUR8w/U?=
+ =?us-ascii?Q?Koyk0WDtptZHjtWl9opKlrZIndvxeuzDEJYgApe+cBPAS6paZmRzzVnN7PCt?=
+ =?us-ascii?Q?OSW0zrMg97gjVr4CYQsovOrZRLzD8taOg4dFc8Ji?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 75d2130c-646e-45f3-22aa-08dd0e5a727b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1b149d7f-5f7b-46c2-a1b3-08dd0e5a76cb
 X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8943.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2024 20:39:38.8199
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2024 20:39:46.1436
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WhPJ8XzLuQIXnfgiLxgxbhmVO2pSb4XXcXIu+PpGnfurftPFKdgI3wOhVMZ7O5Bfz0V0yc7F93hqwmy9mes5TA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7859
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9bgCjLoxdFrCgGEwpgcz4vh81vwiMAlir9BoVH2SOIPuJZmFBxUCLtaCLG5LHJ3anISV+uvBW5J0x1bTvnm6gw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8697
 
 From: Daniel Wagner <dwagner@suse.de>
 
-This tests is exercising the target code and not so much the host side.
-The problem with nvme/030 is that it depends on interface to interact
-with the target which is not covered by the standard. Thus we can't
-run it against an arbitrary target. Just skip it when we run against a
-arbitrary target.
+Use nvmetcli to setup/cleanup a remote soft target.
 
 Signed-off-by: Daniel Wagner <dwagner@suse.de>
+Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
 ---
- tests/nvme/030 | 1 +
- tests/nvme/rc  | 8 ++++++++
- 2 files changed, 9 insertions(+)
+ contrib/nvme_target_control.py | 190 +++++++++++++++++++++++++++++++++
+ contrib/nvmet-subsys.jinja2    |  71 ++++++++++++
+ 2 files changed, 261 insertions(+)
+ create mode 100755 contrib/nvme_target_control.py
+ create mode 100644 contrib/nvmet-subsys.jinja2
 
-diff --git a/tests/nvme/030 b/tests/nvme/030
-index 596e411..fe74849 100755
---- a/tests/nvme/030
-+++ b/tests/nvme/030
-@@ -13,6 +13,7 @@ requires() {
- 	_nvme_requires
- 	_have_loop
- 	_require_nvme_trtype_is_fabrics
-+	_require_kernel_nvme_target
- }
- 
- set_conditions() {
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 9ad9a52..d1a4c01 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -191,6 +191,14 @@ _require_kernel_nvme_fabrics_feature() {
- 	return 0
- }
- 
-+_require_kernel_nvme_target() {
-+	if [[ -n "${nvme_target_control}" ]]; then
-+		SKIP_REASONS+=("Linux kernel soft target not available")
-+		return 1;
-+	fi
-+	return 0
-+}
+diff --git a/contrib/nvme_target_control.py b/contrib/nvme_target_control.py
+new file mode 100755
+index 0000000..db77fe3
+--- /dev/null
++++ b/contrib/nvme_target_control.py
+@@ -0,0 +1,190 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-3.0+
 +
- _test_dev_nvme_ctrl() {
- 	echo "/dev/char/$(cat "${TEST_DEV_SYSFS}/device/dev")"
- }
++# blktests calls this script to setup/teardown remote targets. blktests passes
++# all relevant information via the command line, e.g. --hostnqn.
++#
++# This script uses nvmetcli to setup the remote target (it depends on the REST
++# API feature [1]). There is not technical need for nvmetcli to use but it makes
++# it simple to setup a remote Linux box. If you want to setup someting else
++# you should to replace this part.
++#
++# There are couple of global configuration options which need to be set.
++# Add ~/.config/blktests/nvme_target_control.toml file with something like:
++#
++# [main]
++# skip_setup_cleanup=false
++# nvmetcli='/usr/bin/nvmetcli'
++# remote='http://nvmet.local:5000'
++#
++# [host]
++# blkdev_type='device'
++# trtype='tcp'
++# hostnqn='nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349'
++# hostid='0f01fb42-9f7f-4856-b0b3-51e60b8de349'
++# host_traddr='192.168.154.187'
++#
++# [subsys_0]
++# traddr='192.168.19.189'
++# trsvid='4420'
++# subsysnqn='blktests-subsystem-1'
++# subsys_uuid='91fdba0d-f87b-4c25-b80f-db7be1418b9e'
++#
++# This expects nvmetcli with the restapi service running on target.
++#
++# Alternatively, you can skip the the target setup/cleanup completely
++# (skip_setup_cleanup) and run against a previously configured target.
++#
++# [main]
++# skip_setup_cleanup=true
++# nvmetcli='/usr/bin/nvmetcli'
++# remote='http://nvmet.local:5000'
++#
++# [host]
++# blkdev_type='device'
++# trtype='tcp'
++# hostnqn='nqn.2014-08.org.nvmexpress:uuid:1a9e23dd-466e-45ca-9f43-a29aaf47cb21'
++# hostid='1a9e23dd-466e-45ca-9f43-a29aaf47cb21'
++# host_traddr='10.161.16.48'
++#
++# [subsys_0]
++# traddr='10.162.198.45'
++# trsvid='4420'
++# subsysnqn='nqn.1988-11.com.dell:powerstore:00:f03028e73ef7D032D81E'
++# subsys_uuid='3a5c104c-ee41-38a1-8ccf-0968003d54e7'
++# blkdev='/dev/nullb0'
++#
++# nvmetcli uses JSON configuration, thus this script creates a JSON configuration
++# using a jinja2 template. After this step we simple have to set the blktests
++# variable correctly and start blktests.
++#
++#   NVME_TARGET_CONTROL=~/blktests/contrib/nvme_target_control.py ./check nvme
++#
++# [1] https://github.com/hreinecke/nvmetcli/tree/restapi
++
++import os
++
++# workaround for python<3.11
++TOML_OPEN_MODE="rb"
++try:
++    import tomllib
++except ModuleNotFoundError:
++    import pip._vendor.tomli as tomllib
++    TOML_OPEN_MODE="r"
++
++import argparse
++import subprocess
++from jinja2 import Environment, FileSystemLoader
++
++
++XDG_CONFIG_HOME = os.environ.get("XDG_CONFIG_HOME")
++if not XDG_CONFIG_HOME:
++    XDG_CONFIG_HOME = os.environ.get('HOME') + '/.config'
++
++
++with open(f'{XDG_CONFIG_HOME}/blktests/nvme_target_control.toml', TOML_OPEN_MODE) as f:
++    config = tomllib.load(f)
++    nvmetcli = config['main']['nvmetcli']
++    remote = config['main']['remote']
++
++
++def gen_conf(conf):
++    basepath = os.path.dirname(__file__)
++    environment = Environment(loader=FileSystemLoader(basepath))
++    template = environment.get_template('nvmet-subsys.jinja2')
++    filename = f'{conf["subsysnqn"]}.json'
++    content = template.render(conf)
++    with open(filename, mode='w', encoding='utf-8') as outfile:
++        outfile.write(content)
++
++
++def target_setup(args):
++    if config['main']['skip_setup_cleanup']:
++        return
++
++    conf = {
++        'subsysnqn': args.subsysnqn,
++        'subsys_uuid': args.subsys_uuid,
++        'hostnqn': args.hostnqn,
++        'allowed_hosts': args.hostnqn,
++        'ctrlkey': args.ctrlkey,
++        'hostkey': args.hostkey,
++        'blkdev': config['subsys_0']['blkdev'],
++    }
++
++    gen_conf(conf)
++
++    subprocess.call(['python3', nvmetcli, '--remote=' + remote,
++                     'restore', args.subsysnqn + '.json'])
++
++
++def target_cleanup(args):
++    if config['main']['skip_setup_cleanup']:
++        return
++
++    subprocess.call(['python3', nvmetcli, '--remote=' + remote,
++                     'clear', args.subsysnqn + '.json'])
++
++
++def target_config(args):
++	if args.show_blkdev_type:
++		print(config['host']['blkdev_type'])
++	elif args.show_trtype:
++		print(config['host']['trtype'])
++	elif args.show_hostnqn:
++		print(config['host']['hostnqn'])
++	elif args.show_hostid:
++		print(config['host']['hostid'])
++	elif args.show_host_traddr:
++		print(config['host']['host_traddr'])
++	elif args.show_traddr:
++		print(config['subsys_0']['traddr'])
++	elif args.show_trsvid:
++		print(config['subsys_0']['trsvid'])
++	elif args.show_subsysnqn:
++		print(config['subsys_0']['subsysnqn'])
++	elif args.show_subsys_uuid:
++		print(config['subsys_0']['subsys_uuid'])
++
++
++def build_parser():
++    parser = argparse.ArgumentParser()
++    sub = parser.add_subparsers(required=True)
++
++    setup = sub.add_parser('setup')
++    setup.add_argument('--subsysnqn', required=True)
++    setup.add_argument('--subsys-uuid', required=True)
++    setup.add_argument('--hostnqn', required=True)
++    setup.add_argument('--ctrlkey', default='')
++    setup.add_argument('--hostkey', default='')
++    setup.set_defaults(func=target_setup)
++
++    cleanup = sub.add_parser('cleanup')
++    cleanup.add_argument('--subsysnqn', required=True)
++    cleanup.set_defaults(func=target_cleanup)
++
++    config = sub.add_parser('config')
++    config.add_argument('--show-blkdev-type', action='store_true')
++    config.add_argument('--show-trtype', action='store_true')
++    config.add_argument('--show-hostnqn', action='store_true')
++    config.add_argument('--show-hostid', action='store_true')
++    config.add_argument('--show-host-traddr', action='store_true')
++    config.add_argument('--show-traddr', action='store_true')
++    config.add_argument('--show-trsvid', action='store_true')
++    config.add_argument('--show-subsys-uuid', action='store_true')
++    config.add_argument('--show-subsysnqn', action='store_true')
++    config.set_defaults(func=target_config)
++
++    return parser
++
++
++def main():
++    import sys
++
++    parser = build_parser()
++    args = parser.parse_args()
++    args.func(args)
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/contrib/nvmet-subsys.jinja2 b/contrib/nvmet-subsys.jinja2
+new file mode 100644
+index 0000000..a446fbd
+--- /dev/null
++++ b/contrib/nvmet-subsys.jinja2
+@@ -0,0 +1,71 @@
++{
++  "hosts": [
++    {
++      "nqn": "{{ hostnqn }}"
++    }
++  ],
++  "ports": [
++    {
++      "addr": {
++        "adrfam": "ipv4",
++        "traddr": "0.0.0.0",
++        "treq": "not specified",
++        "trsvcid": "4420",
++        "trtype": "tcp",
++        "tsas": "none"
++      },
++      "ana_groups": [
++        {
++          "ana": {
++            "state": "optimized"
++          },
++          "grpid": 1
++        }
++      ],
++      "param": {
++        "inline_data_size": "16384",
++        "pi_enable": "0"
++      },
++      "portid": 0,
++      "referrals": [],
++      "subsystems": [
++        "{{ subsysnqn }}"
++      ]
++    }
++  ],
++  "subsystems": [
++    {
++      "allowed_hosts": [
++        "{{ allowed_hosts }}"
++      ],
++      "attr": {
++        "allow_any_host": "0",
++        "cntlid_max": "65519",
++        "cntlid_min": "1",
++        "firmware": "yada",
++        "ieee_oui": "0x000000",
++        "model": "Linux",
++        "pi_enable": "0",
++        "qid_max": "128",
++        "serial": "0c74361069d9db6c65ef",
++        "version": "1.3"
++      },
++      "namespaces": [
++        {
++          "ana": {
++            "grpid": "1"
++          },
++          "ana_grpid": 1,
++          "device": {
++            "nguid": "00000000-0000-0000-0000-000000000000",
++            "path": "{{ blkdev }}",
++            "uuid": "{{ subsys_uuid }}"
++          },
++          "enable": 1,
++          "nsid": 1
++        }
++      ],
++      "nqn": "{{ subsysnqn }}"
++    }
++  ]
++}
 -- 
 2.34.1
 
