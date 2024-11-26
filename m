@@ -1,141 +1,60 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001A327442
-	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 12:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB0A17D355
+	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 12:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732624971; cv=none; b=HqtYNk4svT+RRjxLs4kms1YPleOr3eQyRk4CqbBQXzhzRTQf1NtWwL5GI5oX5qpWmEkZJBzK+XXs6GsmKd6WGS08+dTkAt3E5ms5mgjE7e8WqOxnwFXxxB6MVDnIF523YEejqPbsDps970XYUIu63SwsWhPC9ZWHUZMK3YQiyP0=
+	t=1732625385; cv=none; b=N8kCIag+SS5SUnPaX37/D74WuoGdKnS/TEXTWLZKjRPshCoG3CDERpHyDK+Ngu8F+ymCQZnEu5tBc4RquaAq9tzLz5HG8cRZXjtguz9eNdJVUZCAWbGbxuIRS69XkFLf7GbbNDbqL9ZjruWQHjyiiAHUC7/YTsN6nMfvFXjX/Ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732624971; c=relaxed/simple;
-	bh=W0hr2u+OCoELdr9LSdCi8T7Qlo6djA0oJTS5lVa89wY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=temc9TyIQgkSXsxw6eGUoeW5nd4m89A8fxgkuNHycgtEBuS5fcpG46dXTlGDcknmPwEAQCcNvy9q6oD4Dacl0LcG47/jEfxH0UC3wJzKXxLkG8TNmPJ9gAI8rlXfdZerx8DoKTfUOsH9fP4JhotdihR9t2lPUFmRM8FyJv2iU+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dxqanH+v; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NaLNisZC; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uKDMh2WP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=stZa6brV; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1732625385; c=relaxed/simple;
+	bh=tvRwVs7C6B+pTaoY3DDJ/NHAWtnVoFz5mWPK7mepY/o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hC7AqWD6SHAvWvCFxOej4evxFPKk70XxI2tkXhsT85RjUrHsT0+KvOboVM36EyfN74Bd6qAxacgKuY3zMuwZmWD7N6cVm9bVAZ4xnVWrNPHMPGvn2ct+NSfb3slpZuE0w5XWDbly3fMyMD0/DeqGC986RdCDLUm6zbe/qW8LyQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mCoFizkP; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dxqanH+v";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NaLNisZC";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="uKDMh2WP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="stZa6brV"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 298A31F74B;
-	Tue, 26 Nov 2024 12:42:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1732624968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RWYQgGBlPjwADyty9JXPNBFaS02BPkZ3fBUHGg00k5Q=;
-	b=dxqanH+v/e165knU/ws4o+T1/vq897t3F35vB9d07Ux3Ss4xSUonwi5vtoQBHFMdOncwwU
-	qucI98OCc1mHUzOiiLxoe0jSTLkAhWep5aD66JIAuVAP7PbKHcn4rvyC7YLVzTd1PzGeWW
-	1d9tHXjMDPTQENaTyARu8t9ISIHZJ1M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1732624968;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RWYQgGBlPjwADyty9JXPNBFaS02BPkZ3fBUHGg00k5Q=;
-	b=NaLNisZC/9AC5nDbicwDufR+F0Hyiqczmp4wbquEX7rH5obeTkSx3s+w4odQlPmbmy+dQN
-	Qxo22cGp14D62pAA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1732624967; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RWYQgGBlPjwADyty9JXPNBFaS02BPkZ3fBUHGg00k5Q=;
-	b=uKDMh2WP9yW9nhjLNmNNC2JhTHSgszZRBqFDbSbAQgbBrK9ETVNfqnBGeFv4tRFQCapBpu
-	0+01NYVjFww05thObGEADp6/vDYs2gfin1GIExYhmS73unsu735A5Nt2yweA3OfvSg4MXP
-	9nt6vvZ0ZtVtCKkwxgm8xMCicTsTtE4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1732624967;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RWYQgGBlPjwADyty9JXPNBFaS02BPkZ3fBUHGg00k5Q=;
-	b=stZa6brVzRWin90qgCaVLycwwK80bPK9IBwkS2v80LTNV2hUtq4i9/ebAIlG9DOlqOtip4
-	/IftCBy/2DtdJRAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0623C139AA;
-	Tue, 26 Nov 2024 12:42:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +GbjAEfCRWe/UwAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 26 Nov 2024 12:42:47 +0000
-Message-ID: <2f3dd703-f979-47e9-9952-e5777c31b255@suse.de>
-Date: Tue, 26 Nov 2024 13:42:46 +0100
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mCoFizkP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=tvRwVs7C6B+pTaoY3DDJ/NHAWtnVoFz5mWPK7mepY/o=; b=mCoFizkPNk/kL2vO6pJ39RulgL
+	+LTfGSmy71EvCvQb4T55N1KkKp9fogdjtcZ0Qcx7RVsiVZeN+O3L3OeGf6hPCXY8kOrQbyMI0hmg4
+	MpQMdgZk3LamOq8O5rRVKLMDbojrM9ylH76md5Noi4QBYygM+DD5yVD0llMy41XWCMLhJpkP2hMDZ
+	YQJB7eAWkrcoe+jIQxLcakWd4zVt0wwGL9d0xDpvREF2ip9awJq/5JRrb71L3n/aCDTGH8MXrrqDi
+	mpFNkrUjPnjl8jANdN8uo80dFErbLCkdrvggQpFfndLt5wzIhwt+B7joRRuVSS6EWT8r5z0iU8nV3
+	9qbygxIw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tFv0h-0000000AbOY-2FeI;
+	Tue, 26 Nov 2024 12:49:43 +0000
+Date: Tue, 26 Nov 2024 04:49:43 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Bart Van Assche <bvanassche@acm.org>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	linux-block@vger.kernel.org
+Subject: Re: [blktests] zbd/012: Test requeuing of zoned writes and queue
+ freezing
+Message-ID: <Z0XD54wTNpI-6ahJ@infradead.org>
+References: <20241125211048.1694246-1-bvanassche@acm.org>
+ <1e5a1594-a945-4302-bdf9-1a57cc140b9d@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] null_blk: Add rotational feature support
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-References: <20241126000956.95983-1-dlemoal@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20241126000956.95983-1-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1e5a1594-a945-4302-bdf9-1a57cc140b9d@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 11/26/24 01:09, Damien Le Moal wrote:
-> To facilitate testing of kernel functions related to the rotational
-> feature (BLK_FEAT_ROTATIONAL) of a block device (e.g. NVMe rotational
-> bit support), add the rotational boolean configfs attribute and module
-> parameter to the null_blk driver. If set, a null block device will
-> report being a rotational device through it queue limits features with
-> the BLK_FEAT_ROTATIONAL flag.
-> 
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->   drivers/block/null_blk/main.c     | 13 ++++++++++++-
->   drivers/block/null_blk/null_blk.h |  1 +
->   2 files changed, 13 insertions(+), 1 deletion(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+On Tue, Nov 26, 2024 at 08:26:13PM +0900, Damien Le Moal wrote:
+> Note that I tried qd > 1 with libaio and everything works just fine: the test
+> passes. Things are strange only with io_uring.
 
-Cheers,
+It might be worth checking if it has something to do with REQ_NOWAIT
+writes and error handling for their EAGAIN case.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
