@@ -1,131 +1,196 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919D7161
-	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 00:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE6A3FE4
+	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 01:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732579811; cv=none; b=NqZtlkg4RCuUom8Ikt/z/2f0BUWoEuVu2mpHwV5zQWe94o5xlkTIVjyjLyaHg4YPzXH65IYdvIDRxG5bZ2BRNnNZoCSeo57t7O/6osJQBg5c8LDTQekSKmHwfAL3PXFkvLx6ZW/PLeuxuNBf3H7IWJwodFNSqV5wwssv8o2AgM0=
+	t=1732585034; cv=none; b=FveEdW7VrB5SQ4ZQCHgqCEbvkbV/WhxCc9mfILSm66sHgPwGah7cJ+xfma/cwW7LrqLyaCue+anX02lI/fOK2/7Php8fcpE9X65AGXQfyFjC/rrpcDMZFf80ydp8V5duJFhYJz7pkYNclDVNC1f4/0Tl7NgQQ5jz49VtZCB+Xbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732579811; c=relaxed/simple;
-	bh=C99p26Y6QTsIsLOSy793KVh8/ldNsZdy9uvaXrlJidY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q1jdNGrqfq6nBL6YQbDJPQnaL7abpGtHYiwYy8FVn4aVSuLMInJMymVSTUIfATxTTRhD8BPpejjI8Vwz6dNpV6oV5UnRsrT1+8dyAzsIHBHcxAUuaiSCeEudF9g82QTc7DAfoNHLOfX8hVRgljSE5GCMbr+kncciQ6tqHdEIMXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B0eyLbHg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1732585034; c=relaxed/simple;
+	bh=tCYSZSRxi+7C53edvKVUlthPBvV7N/B+KQYy/4ufv98=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DPEn7edmBoZr/v8T0fvxegMBe3eLnfN78NdH2h1Z8OYYwffy2VbMs7rwg4z03Na9ZTi0EU2Hnw4qFSmrUJqNo7ZLrYzyTpKY4QXwrVVjsXDJcg/F91DnKDwptsB5lktFAI/utL4EHFUzuHAfsIOVdRBW+TOIRsZ9i7k9lNhDc3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Hot8eh+8; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B0eyLbHg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C405C4CECE;
-	Tue, 26 Nov 2024 00:10:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732579811;
-	bh=C99p26Y6QTsIsLOSy793KVh8/ldNsZdy9uvaXrlJidY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=B0eyLbHgxf2ufqS3LXAgj6C3d29WQItFqkrdYoKKJaSa7r1aQLwtceMVv/s9JMA8A
-	 rSeiA8EIPX0sbuXZ0yr/sSAwUZELZiDCXf6i7ILo2jEtz/CeIp1lPwHgT6C0I88cE+
-	 u+gNmrhXXEIjoIBm+Ekm6tY0aoVR8oI3xyeCUSmOry3+L42ug+abvgaqdTSJ9CHPLO
-	 DodSZtsKxGMGSKu++MlUrw6vnN51ogaN9+60RsVSgEsOYjf51XmpojFIlo7qB/eX7W
-	 SXuR1LqcS04VdO5/FSiUvnFQ9TghHynzMfWVQhKla89I1N505qybXtlEdbypwAIX2D
-	 7lx0Wdc+H8cBg==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] null_blk: Add rotational feature support
-Date: Tue, 26 Nov 2024 09:09:56 +0900
-Message-ID: <20241126000956.95983-1-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.47.0
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hot8eh+8"
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6ef0c64d75cso16701407b3.2
+        for <linux-block@vger.kernel.org>; Mon, 25 Nov 2024 17:37:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1732585031; x=1733189831; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zdjL6zUjj2z/LYq4V/LFmBNcTXQqiOxOfUuvMmMBGKc=;
+        b=Hot8eh+8rUOhaFt8ScRbfa0SJyxv9WSxRZ9iGf3kCkO/XGGoowYJV2d5exDNE4qGyV
+         dlCJSj91VMeUGaMKuu9N5OdyPl9v6zHk7/rIGtr107VyxUMqdZsfSoB4lGg8/rZX0Or6
+         Z/iPesB1rKdsj6oA1CjsgzvtEzEzSIhVoGepjPWMN90Bh23ynpdfCVOtXvBMXJlrN1kp
+         Pqr7Ngr42EnTZ73Jjm1uAuRm5Epdt9CVwQHgFKNQlPa8iY0EJsrwKI7MePIdhQWn2dUR
+         /wMfMp4tQruCtQqLC6IFSQQE/bmDTXCjBuwRKiHxVqit41pkuV0sF5TeXak5lh45FaBI
+         qhgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732585031; x=1733189831;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zdjL6zUjj2z/LYq4V/LFmBNcTXQqiOxOfUuvMmMBGKc=;
+        b=ex+MRHSelEV4sICrQ9pbFcjDSdbm2qHecm29RGMFBfimwqnquLezzfhaOQpz0cVYnV
+         TiHNhNQXRL/dUM1l3Zn6tsFOMvB6rKRkO6jqKCTSDaCqm7DNSgBVi7QIwzfM/aGWdGRd
+         qUYy0sdPxOotStWBhIGOWGKQnUhinu1bft2YHge3tbhgQFgjv565X025vDnpVRhsM9sM
+         y4KZYAjCWXyrymgnrRR7+NQYYTcGW33K6yicnEKA0mA9pDyUt2SUpJxXfUo0NtWdkUPx
+         WsxdB9iACBHMeD2t7zltqAk+lwvuhU/29tzFTI8avNPX9lW92hWNBij+vaIcNG4XBWse
+         VK6A==
+X-Forwarded-Encrypted: i=1; AJvYcCXrpyrlL3m1Xav+Lw+oRV9pDoK2EL6QORD8hao5Cijub4sqY9ba1yzg4JuF69dYNpt4b/5c9nDw1VOb5w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/LLli9yJ28nqOL/hGa2oVbiPoWS8d3QHxji/0guUiPHE73I4S
+	KtfXjnF+G29m2xG24/+UWvoFgoou/3C1J1CJi6HckodjmE6HP1WSmmlaE0YPxmfIMlBKm0bnYnG
+	O1kPxyHrXo95jj9xZGm0dJwNZHyoi/vUXfodsY/GvcXJRRoDuKePw+w==
+X-Gm-Gg: ASbGncsLwfOvpOmI0knco5v/bbTJL6dM5LhAZnEBaUaNqMuzciTW9r7dvRnZ/oVfe+z
+	Fq43yO32uDQJ35YbNtrSKw7Nny/fMC44=
+X-Google-Smtp-Source: AGHT+IHyAm521vhyAlEkTFZiSAXUWeUNoBTSz6Vwajou6E+EBUOBcOw0y6/xJsa+g+nihPuDKwmDkBpKLfuUmPaBiA0=
+X-Received: by 2002:a05:690c:2504:b0:6ea:8d6f:b1bf with SMTP id
+ 00721157ae682-6eee0779a6dmr165221367b3.0.1732585031470; Mon, 25 Nov 2024
+ 17:37:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241112170050.1612998-3-hch@lst.de> <20241122050419.21973-1-semen.protsenko@linaro.org>
+ <20241122120444.GA25679@lst.de> <CAPLW+4==a515TCD93Kp-8zC8iYyYdh92U=j_emnG5sT_d7z64w@mail.gmail.com>
+ <20241125073658.GA15834@lst.de>
+In-Reply-To: <20241125073658.GA15834@lst.de>
+From: Sam Protsenko <semen.protsenko@linaro.org>
+Date: Mon, 25 Nov 2024 19:37:00 -0600
+Message-ID: <CAPLW+4=kuHze3=+g80CsY6OkLno5gyjRfMWLXTFHu3N_=XcmqA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] block: remove the ioprio field from struct request
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-To facilitate testing of kernel functions related to the rotational
-feature (BLK_FEAT_ROTATIONAL) of a block device (e.g. NVMe rotational
-bit support), add the rotational boolean configfs attribute and module
-parameter to the null_blk driver. If set, a null block device will
-report being a rotational device through it queue limits features with
-the BLK_FEAT_ROTATIONAL flag.
+Hi Christoph,
 
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
----
- drivers/block/null_blk/main.c     | 13 ++++++++++++-
- drivers/block/null_blk/null_blk.h |  1 +
- 2 files changed, 13 insertions(+), 1 deletion(-)
+On Mon, Nov 25, 2024 at 1:37=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
+e:
+>
+> On Fri, Nov 22, 2024 at 03:55:23PM -0600, Sam Protsenko wrote:
+> > It's an Exynos based board with eMMC, so it uses DW MMC driver, with
+> > Exynos glue layer on top of it, so:
+> >
+> >     drivers/mmc/host/dw_mmc.c
+> >     drivers/mmc/host/dw_mmc-exynos.c
+> >
+> > I'm using the regular ARM64 defconfig. Nothing fancy about this setup
+> > neither, the device tree with eMMC definition (mmc_0) is here:
+> >
+> >     arch/arm64/boot/dts/exynos/exynos850-e850-96.dts
+>
+> Thanks.  eMMC itself never looks at the ioprio field.
+>
+> > FWIW, I was able to narrow down the issue to dd_insert_request()
+> > function. With this hack the freeze is gone:
+>
+> Sounds like it isn't the driver that matters here, but the scheduler.
+>
+> >
+> > 8<-------------------------------------------------------------------->=
+8
+> > diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> > index acdc28756d9d..83d272b66e71 100644
+> > --- a/block/mq-deadline.c
+> > +++ b/block/mq-deadline.c
+> > @@ -676,7 +676,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx
+> > *hctx, struct request *rq,
+> >         struct request_queue *q =3D hctx->queue;
+> >         struct deadline_data *dd =3D q->elevator->elevator_data;
+> >         const enum dd_data_dir data_dir =3D rq_data_dir(rq);
+> > -       u16 ioprio =3D req_get_ioprio(rq);
+> > +       u16 ioprio =3D 0; /* the same as old req->ioprio */
+> >         u8 ioprio_class =3D IOPRIO_PRIO_CLASS(ioprio);
+> >         struct dd_per_prio *per_prio;
+> >         enum dd_prio prio;
+> > 8<-------------------------------------------------------------------->=
+8
+> >
+> > Does it tell you anything about where the possible issue can be?
+>
+> Can you dump the ioprities you see here with and without the reverted
+> patch?
+>
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 3c3d8d200abb..32bd232cceef 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -266,6 +266,10 @@ static bool g_zone_full;
- module_param_named(zone_full, g_zone_full, bool, S_IRUGO);
- MODULE_PARM_DESC(zone_full, "Initialize the sequential write required zones of a zoned device to be full. Default: false");
- 
-+static bool g_rotational;
-+module_param_named(rotational, g_rotational, bool, S_IRUGO);
-+MODULE_PARM_DESC(rotational, "Set the rotational feature for the device. Default: false");
-+
- static struct nullb_device *null_alloc_dev(void);
- static void null_free_dev(struct nullb_device *dev);
- static void null_del_dev(struct nullb *nullb);
-@@ -468,6 +472,7 @@ NULLB_DEVICE_ATTR(no_sched, bool, NULL);
- NULLB_DEVICE_ATTR(shared_tags, bool, NULL);
- NULLB_DEVICE_ATTR(shared_tag_bitmap, bool, NULL);
- NULLB_DEVICE_ATTR(fua, bool, NULL);
-+NULLB_DEVICE_ATTR(rotational, bool, NULL);
- 
- static ssize_t nullb_device_power_show(struct config_item *item, char *page)
+Collected the logs for you:
+  - with patch reverted (ioprio is always 0): [1]
+  - with patch present: [2]
+
+This code was added for printing the traces:
+
+8<---------------------------------------------------------------------->8
+ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *=
+rq,
+                               blk_insert_t flags, struct list_head *free)
  {
-@@ -621,6 +626,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_shared_tags,
- 	&nullb_device_attr_shared_tag_bitmap,
- 	&nullb_device_attr_fua,
-+	&nullb_device_attr_rotational,
- 	NULL,
- };
- 
-@@ -706,7 +712,8 @@ static ssize_t memb_group_features_show(struct config_item *item, char *page)
- 			"shared_tags,size,submit_queues,use_per_node_hctx,"
- 			"virt_boundary,zoned,zone_capacity,zone_max_active,"
- 			"zone_max_open,zone_nr_conv,zone_offline,zone_readonly,"
--			"zone_size,zone_append_max_sectors,zone_full\n");
-+			"zone_size,zone_append_max_sectors,zone_full,"
-+			"rotational\n");
- }
- 
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -793,6 +800,7 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->shared_tags = g_shared_tags;
- 	dev->shared_tag_bitmap = g_shared_tag_bitmap;
- 	dev->fua = g_fua;
-+	dev->rotational = g_rotational;
- 
- 	return dev;
- }
-@@ -1938,6 +1946,9 @@ static int null_add_dev(struct nullb_device *dev)
- 			lim.features |= BLK_FEAT_FUA;
- 	}
- 
-+	if (dev->rotational)
-+		lim.features |= BLK_FEAT_ROTATIONAL;
-+
- 	nullb->disk = blk_mq_alloc_disk(nullb->tag_set, &lim, nullb);
- 	if (IS_ERR(nullb->disk)) {
- 		rv = PTR_ERR(nullb->disk);
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index a7bb32f73ec3..6f9fe6171087 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -107,6 +107,7 @@ struct nullb_device {
- 	bool shared_tags; /* share tag set between devices for blk-mq */
- 	bool shared_tag_bitmap; /* use hostwide shared tags */
- 	bool fua; /* Support FUA */
-+	bool rotational; /* Fake rotational device */
- };
- 
- struct nullb {
--- 
-2.47.0
++#define IOPRIO_N_LIMIT 100
++       static int ioprio_prev =3D 0, ioprio_n =3D 0;
+        struct request_queue *q =3D hctx->queue;
+        struct deadline_data *dd =3D q->elevator->elevator_data;
+        const enum dd_data_dir data_dir =3D rq_data_dir(rq);
+        u16 ioprio =3D req_get_ioprio(rq);
+        u8 ioprio_class =3D IOPRIO_PRIO_CLASS(ioprio);
+        struct dd_per_prio *per_prio;
+        enum dd_prio prio;
 
++       ioprio_n++;
++       if (ioprio !=3D ioprio_prev || ioprio_n =3D=3D IOPRIO_N_LIMIT) {
++               pr_err("### %-20d : %d times\n", ioprio_prev, ioprio_n);
++               ioprio_n =3D 0;
++       }
++       ioprio_prev =3D ioprio;
++
+        lockdep_assert_held(&dd->lock);
+8<---------------------------------------------------------------------->8
+
+Specifically I'd pay attention to the next two places in [2], where
+the delays were introduced:
+
+1. Starting getty service (5 second delay):
+
+8<---------------------------------------------------------------------->8
+[   14.875199] ### 24580                : 1 times
+...
+[  OK  ] Started getty@tty1.service - Getty on tty1.
+[  OK  ] Started serial-getty@ttySA=C3=A2ice - Serial Getty on ttySAC0.
+[  OK  ] Reached target getty.target - Login Prompts.
+[   19.425354] ### 0                    : 100 times
+...
+8<---------------------------------------------------------------------->8
+
+2. Login (more than 60 seconds delay):
+
+8<---------------------------------------------------------------------->8
+runner-vwmj3eza-project-40964107-concurrent-0 login: root
+...
+[   22.827432] ### 0                    : 100 times
+...
+[  100.100402] ### 24580                : 1 times
+#
+8<---------------------------------------------------------------------->8
+
+I guess the results look similar to the logs from the neighboring
+thread [3]. Not sure if those tools (getty service and login tool) are
+running ioprio_set() internally, or it's just I/O scheduler acting up,
+but the freeze is happening consistently in those two places. Please
+let me know if I can help you debug that further. Not a block layer
+expert by any means, but that looks like a regression, at least on
+E850-96 board. Wonder if it's possible to reproduce that on other
+platforms.
+
+Thanks!
+
+[1] https://termbin.com/aus7
+[2] https://termbin.com/za3t
+[3] https://lore.kernel.org/all/CAP-bSRab1C-_aaATfrgWjt9w0fcYUCQCG7u+TCb1FS=
+PSd6CEaA@mail.gmail.com/
