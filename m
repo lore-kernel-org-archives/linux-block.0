@@ -1,93 +1,184 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910FC366
-	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 10:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8993F1C4A3D
+	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 10:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732618388; cv=none; b=YRbn3gPtpWgfeO5VJdw2/wLY9+2a+YwVx4Nu7qOt3e0Xaf2/WLYv+62/8kzUOmNFdYL6T7Wznhu3eJtAPgFwFn9+DTJXrRSaH/Z8bWd/PhjWo6jVfXL7CxrPqf8ebeHnZWT/txUrS3Bblo/cbtyXkUjioR5aijFipIzlc/8oASQ=
+	t=1732618499; cv=none; b=iak5rcs2hMGfpb9nRPfHi+5wmJw9aZLA0cP/KszBPYHyjsbzH/MuKf414TcvSmtYJliF7vfbgWw6Z2I9ZHv9J29NyQ3/rckFVIKr4/IzNndASCcNFB54pLNKhj0S6vXdkPaZKSIHJxvlCbnta54zLS4SpXu/tpmFu0wU8dD2XNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732618388; c=relaxed/simple;
-	bh=/YbZf5Fn9LbpelUmEwBC32jaMI6S+tSn+Ps+Q3aHypQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nWs+0m5uaDHPet8/UIPsEks/gqX8neFeXvagWGluVmu16n7uBsXf9Wy2rPsWEScB9/g146w7ex/6Fte1X+YUie+EzGV5wi9//cpE/iPXA7mgsZ8hDEqBtecpOGkY3hIpq/928Ek2rqunFCtLgKV0TOv6UH5f0qRxqt5/Jb7n/3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=DrEUROak; arc=none smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1732618499; c=relaxed/simple;
+	bh=tZ974RW9AUv+NuVLNE+vVbBMYcQ2vSB5JDeMR0yl8cQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=lG9Jt/Ff42YZodNCejPq3CKKJceIwh/1b3qarpTAQL18JoRJFRC5toQnbD+4jV1oIMmv0m9LxZf/HUVmU80bewR1BzZmKXa3KgyqXgyzxBMgGAYAfe4KOZVdKd3kQMVmMLVKDWyET5i7MCIO1jhfqcYtzmTerTEwxAeFaFVBGOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=r5YzjVUn; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DrEUROak"
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-71d4fceec9aso826307a34.3
-        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 02:53:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1732618385; x=1733223185; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xLxX3fqZ63MUpmJR6uoNHWqb6sJsRbD2Q41zd6ClOoY=;
-        b=DrEUROakKr/VvY7EX69GpVF6HJ06RnqpVgC5GP8b6WqX7RJhQNI+d5pXCIFnetX4Ad
-         9HbZ9r3e14zXkLKcF5q74Yi33fRfxLLErL+FfRnNRvS0MUcB3IJujbQDP33+B17s9MAu
-         ULDF/DUm/g8LDzW9eYVOSYwwt+8u4bQyFRPJM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732618385; x=1733223185;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xLxX3fqZ63MUpmJR6uoNHWqb6sJsRbD2Q41zd6ClOoY=;
-        b=wmJsLuOs7A8cptn1TIDy5Focd1m54hJJiDUUWSATiNMD2QDjdaOF1EAgPMuLiQedZq
-         /rZ3mLpMR4Ov1N/2B7AbfO5hnAV/ljaJQ0hz5XjEaQdIB+usMGLZ5lNNg+vuxLtHHjt3
-         JC9Tst7YZgFgaq4Aj74b7Q9JItJ7Ht03hOy5GBlZOS73t99X9SYlhLdUqg4473ONWJiz
-         FfYVnPWqiOec+KiRiWueFgUCz6xF5ce6Q/7EyoP1aB5ouQvwPhfUufUY71qy0F9w3a8E
-         BZ1UKHsVE0JX+hpyUqTqMZtTkSEDE8vk9JiJo4r4DnAvv2k8dxFFEBIh+Qt4yiTBFwli
-         oQTw==
-X-Forwarded-Encrypted: i=1; AJvYcCVOJiTj2PcHX1tLvG5c7ZhlOD5QyYhmSclYQDt+FpI1TGFBAAiz1+wKS6a7PvPDBnpdLS+JciYKtcD2dA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzArkmwTkVZGSG/hngZrkP4yCHgCaYOJwH1BxXLNe9PJ20JzctR
-	W5MRA2pVhfHI4ZVf/bUk5B2nsAd/lmFHIhjck4ime02Aqi9+8GflKMBGwVCl/g==
-X-Gm-Gg: ASbGncssDXQ01H3zNy8GgzLJ/jydmadUe28s2wUpno7LwbgYQSj29dIDQeMytPA5o8G
-	nNX4O6TPDOFVxZW4AqLSyJa7CYFVH2IN3aqBJA64sNOn6/iTy4b7pL5We/aS1GOd4ti6zqH6GnS
-	O0LBm4E0NUIjZ83Vs/rtCQpFPIv0XGyhOrkGWqfxZ6a6zQh7L4dJ8N/YCcVG/CfvMiBg2eCXKwK
-	Jm+kgezK5TqywEGwD+7nlnBH/WfiuVagva9KzpgQ+C+ZUtFBMrv
-X-Google-Smtp-Source: AGHT+IGajRjL89O7bO+/DCWKBN63WTQf/pItm4UqG98nob5Dg5f1i9I49Fpsa3xPr+v+FFH1dIk2tA==
-X-Received: by 2002:a05:6830:488f:b0:71d:4f4b:6250 with SMTP id 46e09a7af769-71d4f4b62b7mr6941021a34.24.1732618385569;
-        Tue, 26 Nov 2024 02:53:05 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:7631:203f:1b91:cbb])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fbcc1d21d3sm8402126a12.21.2024.11.26.02.53.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Nov 2024 02:53:05 -0800 (PST)
-Date: Tue, 26 Nov 2024 19:52:58 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Barry Song <21cnbao@gmail.com>
-Cc: akpm@linux-foundation.org, linux-mm@kvack.org, axboe@kernel.dk,
-	bala.seshasayee@linux.intel.com, chrisl@kernel.org,
-	david@redhat.com, hannes@cmpxchg.org, kanchana.p.sridhar@intel.com,
-	kasong@tencent.com, linux-block@vger.kernel.org, minchan@kernel.org,
-	nphamcs@gmail.com, ryan.roberts@arm.com, surenb@google.com,
-	terrelln@fb.com, usamaarif642@gmail.com, v-songbaohua@oppo.com,
-	wajdi.k.feghali@intel.com, willy@infradead.org,
-	ying.huang@intel.com, yosryahmed@google.com, yuzhao@google.com,
-	zhengtangquan@oppo.com, zhouchengming@bytedance.com,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [PATCH RFC v3 0/4] mTHP-friendly compression in zsmalloc and
- zram based on multi-pages
-Message-ID: <20241126105258.GE440697@google.com>
-References: <20241121222521.83458-1-21cnbao@gmail.com>
- <20241126050917.GC440697@google.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="r5YzjVUn"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20241126105450epoutp0327638affa46647f7368545b92e2fee59~Lf1ZC1YvK3043630436epoutp03M
+	for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 10:54:50 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20241126105450epoutp0327638affa46647f7368545b92e2fee59~Lf1ZC1YvK3043630436epoutp03M
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1732618490;
+	bh=k+0BqZF1ChaDe8890ovcJaZ1K9CV9Mo6R5Hpp1BGuOQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=r5YzjVUnQY0LD2jnUvbhdskcxB2kEjebQI9Ubx8mUudOKMfVQORMlWvMVwtNbuldW
+	 tjUH8W4G+kaJFieeytFwvIUFSDRxbPAdrGmJDaDa/3+MTwqiMKm0qZWEdgX7C8VsmI
+	 uJfjBHKWsYVrbMh5A8L5k53NUYvVqvueRr2t5VwU=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20241126105449epcas5p21cc42b22d52099f70f408e93d9aa7daa~Lf1YdQRAz0284302843epcas5p2m;
+	Tue, 26 Nov 2024 10:54:49 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.174]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4XyKGH5SfCz4x9Pq; Tue, 26 Nov
+	2024 10:54:47 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	FA.16.19956.7F8A5476; Tue, 26 Nov 2024 19:54:47 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20241126104844epcas5p32e5daec6d0ea68da92a2700c0b0227d2~LfwE5JIZG0979309793epcas5p3l;
+	Tue, 26 Nov 2024 10:48:44 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241126104844epsmtrp2a2753bac8d9c3138192609efedb80f1d~LfwE3pIgX0346103461epsmtrp2V;
+	Tue, 26 Nov 2024 10:48:44 +0000 (GMT)
+X-AuditID: b6c32a4b-fd1f170000004df4-79-6745a8f7e207
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	3D.05.19220.C87A5476; Tue, 26 Nov 2024 19:48:44 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20241126104841epsmtip164d5a7e57201074fb4fc09633e5aa812~LfwCDBKRu0773507735epsmtip1T;
+	Tue, 26 Nov 2024 10:48:41 +0000 (GMT)
+Date: Tue, 26 Nov 2024 16:10:50 +0530
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+	martin.petersen@oracle.com, anuj1072538@gmail.com, brauner@kernel.org,
+	jack@suse.cz, viro@zeniv.linux.org.uk, io-uring@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, linux-scsi@vger.kernel.org, vishak.g@samsung.com,
+	linux-fsdevel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [PATCH v10 06/10] io_uring: introduce attributes for read/write
+ and PI support
+Message-ID: <20241126104050.GA22537@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <a28b46a0-9eb5-45db-80ec-93fdc0eec35e@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTdxTH87stt7dkxcsr/ugisjuNooLtaLtbHkImmLuBGQvL2JwKN/Su
+	ZUDb9THcyBiOsCGoTBZ0PHSMOCtlwwQEUaiPglZFIKyZChF04yUwiNTBusBgLbcs/vc553y/
+	+f3OOb8fxvEbRYVYptrA6NR0NoF6c1s7Q7eG/X0+QSmacoaSc/OLXLLG3ArIhqEylJzudABy
+	4PplhKxvuImQs0W9XLL6VCFC3lyZQcly631AWga3kx2WO1zyh3NjPLL0QRtKmmzLCNn3r82L
+	7Kuq4cX5UperhniUvcdINZmPoFTz2S+p9oEClJobG+RSxy+aAXWvtotHPW8KpppGZ5Bk731Z
+	0SqGVjC6EEadoVFkqpUxRGJK2u40qUwkDhPLydeJEDWdw8QQ8UnJYXsys13tECGf0tlGVyqZ
+	1uuJnbuidRqjgQlRafSGGILRKrK1Em24ns7RG9XKcDVjiBSLRK9JXcL0LFX5tQGgHV53qObH
+	Ra8CcFhQAvgYxCXQVjHPLQHemB/eDuDCXK8XGzgAnOyeAGywAGBHwSPOmsUx14myBQuA5Y02
+	TzAO4KC9DCkBGMbFN8OVyWS3AcW3wK6JIuDmAHw7nH5g5bn1HPwYBzY7jyLugj9+AJ5bGFsV
+	CfAw+GfpcYRlX3incpTrZj4eAy/M/4O6ORB/FV5vtSHsjZ5i8K/6LSzHw6n+Sk/eH07ZLvJY
+	FsLnsxaUZSV02sc8Gi0svHUVsBwLi+6WrXbJwVWwvKWdy+Y3wIq7jQib94HHFkc9XgFsO7PG
+	BPymvsbDEFp6CzxMwdumDs+AZwE88X0X8i3YWPVCb1UvnMfyDljb7kCrXHPk4C9D0zLGYii8
+	cGVnLfAygyBGq89RMnqpNkLN5P6/8QxNThNYfe7bEtvAH0+ehVsBggErgBiHCBD4rN+t9BMo
+	6M8+Z3SaNJ0xm9FbgdS1qxMcYWCGxvVf1IY0sUQukshkMok8QiYm1gumi04r/HAlbWCyGEbL
+	6NZ8CMYXFiB5qY8TSvc5vxAebN5QF8VvWbwxld9TvLHGxzR8/qHJXP9wbDJa2uOIjdw83j6d
+	sNeUWj8S8UnwaLFPTFnv8Mmg9+I2vTt8SbJE2GuvpgSs636y41Tkz9aovIxGKFmIHfldGnVm
+	1/umFO2zXNycXzfz9V7Zx1lf9Xph/vmFcYj81+8OjPOFZb7vVMS/be/rVlT3VWNLy3mV6dWL
+	H6UkP06nD791JDHvBpXbOSL3abHXpjY2CvcnDXxweqL72qU3fzFvfUV2T+scCko6mFjE2VOZ
+	Gwhvt4oUlvvKEhy7Qr50trx/MmdJVXdo4tajN4p/6pBHGxv4sYVPV5z9pg8NGZbfgkv3E1y9
+	ihZv4+j09H/a1ImmdwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrGIsWRmVeSWpSXmKPExsWy7bCSnG7Pctd0gz9X9Sw+fv3NYjFn1TZG
+	i9V3+9ksXh/+xGhx88BOJouVq48yWbxrPcdiMXt6M5PF0f9v2SwmHbrGaLH3lrbFnr0nWSzm
+	L3vKbtF9fQebxfLj/5gszv89zmpxftYcdgdBj52z7rJ7XD5b6rFpVSebx+Yl9R67bzaweXx8
+	eovFo2/LKkaPMwuOsHt83iTnsenJW6YArigum5TUnMyy1CJ9uwSujF3PD7EXzOOtWDz9KVsD
+	4y2uLkZODgkBE4lPHw+zdTFycQgJ7GaU6Fp5iQ0iISFx6uUyRghbWGLlv+fsEEVPGCUu7P4C
+	VMTBwSKgKvH/ZQBIDZuAusSR561g9SIC2hKvrx8Cq2cW6GeW2PvtPhNIQlggVmLZt6dgRbwC
+	uhJvuvuYIIa+Y5T4uuwUK0RCUOLkzCcsIDazgJbEjX8vmUCWMQtISyz/xwES5hSwlVj/9SfY
+	oaICyhIHth1nmsAoOAtJ9ywk3bMQuhcwMq9ilEwtKM5Nzy02LDDKSy3XK07MLS7NS9dLzs/d
+	xAiOSi2tHYx7Vn3QO8TIxMF4iFGCg1lJhJdP3DldiDclsbIqtSg/vqg0J7X4EKM0B4uSOO+3
+	170pQgLpiSWp2ampBalFMFkmDk6pBqaNkR1enlVaO/1tbp1eF7Y/d+m+Uy0pzJVvNy90OGZc
+	q5P7ZI71XccvCzvcZ/c8+Fa6mYXfNrmfeZrLzZlJawR4ex+sZnvNFWSyqWKp2TWlVxyPPiZZ
+	qc583cJb1DlzyfYexfdBn93y54RufhKZyWKzfwOHJL+bQ7n7zwP9ly5rlf+YwzyxIbI4+51I
+	i1lfiLJiq6StZs72CdEeM6yrdxruDQg8YjGDQ2Dz7ln/J8msKNTIcZ4TE7oq7G5FzZryxm+p
+	ORJuD/3iWaez7F+g3O9bbyFS81PnxM6c1oJJDxz5Tk/SXKVRUBe09XnQ7SitvaLZB/3O9d6X
+	NK9a6H5JUcnqo/ZD8dWPTqr8Tc/QVWIpzkg01GIuKk4EAJwwAuE5AwAA
+X-CMS-MailID: 20241126104844epcas5p32e5daec6d0ea68da92a2700c0b0227d2
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----lzW.cJR_-6sCvQYD.lREqa.H-32Z9TKwpDxBjmCjs3VZTSBT=_33907_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20241125071502epcas5p46c373574219a958b565f20732797893f
+References: <20241125070633.8042-1-anuj20.g@samsung.com>
+	<CGME20241125071502epcas5p46c373574219a958b565f20732797893f@epcas5p4.samsung.com>
+	<20241125070633.8042-7-anuj20.g@samsung.com>
+	<a28b46a0-9eb5-45db-80ec-93fdc0eec35e@gmail.com>
+
+------lzW.cJR_-6sCvQYD.lREqa.H-32Z9TKwpDxBjmCjs3VZTSBT=_33907_
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20241126050917.GC440697@google.com>
 
-On (24/11/26 14:09), Sergey Senozhatsky wrote:
-> > swap-out time(ms)       68711              49908
-> > swap-in time(ms)        30687              20685
-> > compression ratio       20.49%             16.9%
+On Mon, Nov 25, 2024 at 02:58:19PM +0000, Pavel Begunkov wrote:
+> On 11/25/24 07:06, Anuj Gupta wrote:
+> 
+> ATTR_TYPE sounds too generic, too easy to get a symbol collision
+> including with user space code.
+> 
+> Some options: IORING_ATTR_TYPE_PI, IORING_RW_ATTR_TYPE_PI.
+> If it's not supposed to be io_uring specific can be
+> IO_RW_ATTR_TYPE_PI
+> 
 
-I'm also sort of curious if you'd use zstd with pre-trained user
-dictionary [1] (e.g. based on a dump of your swap-file under most
-common workloads) would it give you desired compression ratio
-improvements (on current zram, that does single page compression).
+Sure, will change to a different name in the next iteration.
 
-[1] https://github.com/facebook/zstd?tab=readme-ov-file#the-case-for-small-data-compression
+> > +
+> > +/* attribute information along with type */
+> > +struct io_uring_attr {
+> > +	enum io_uring_attr_type	attr_type;
+> 
+> I'm not against it, but adding a type field to each attribute is not
+> strictly needed, you can already derive where each attr placed purely
+> from the mask. Are there some upsides? But again I'm not against it.
+> 
+
+The mask indicates what all attributes have been passed. But while
+processing we would need to know where exactly the attributes have been
+placed, as attributes are of different sizes (each attribute is of
+fixed size though) and they could be placed in any order. Processing when
+multiple attributes are passed would look something like this:
+
+attr_ptr = READ_ONCE(sqe->attr_ptr);
+attr_mask = READ_ONCE(sqe->attr_type_mask);
+size = total_size_of_attributes_passed_from_attr_mask;
+
+copy_from_user(attr_buf, attr_ptr, size);
+
+while (size > 0) {
+	if (sizeof(io_uring_attr_type) > size)
+		break;
+
+	attr_type = get_type(attr_buf);
+	attr_size = get_size(attr_type);
+
+	process_attr(attr_type, attr_buf);
+	attr_buf += attr_size;
+	size -= attr_size;
+}
+
+We cannot derive where exactly the attribute information is placed
+purely from the mask, so we need the type field. Do you see it
+differently?
+
+------lzW.cJR_-6sCvQYD.lREqa.H-32Z9TKwpDxBjmCjs3VZTSBT=_33907_
+Content-Type: text/plain; charset="utf-8"
+
+
+------lzW.cJR_-6sCvQYD.lREqa.H-32Z9TKwpDxBjmCjs3VZTSBT=_33907_--
