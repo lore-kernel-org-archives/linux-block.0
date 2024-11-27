@@ -1,81 +1,76 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D61213D89D;
-	Wed, 27 Nov 2024 06:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE19F9DD
+	for <linux-block@vger.kernel.org>; Wed, 27 Nov 2024 06:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732688770; cv=none; b=kNsmK2/zKmL4YPjIvuJEfl9LtDb2FyTsWfNb79XgGKitNMDa5f+rEMkIB1wwpBznWQZB5I9V3Pe1mBHlPVqowv9ejQAHgbefkUnJrzJD1tu1ok3IhLRshukwEhWTrcC4zz3B5r3hhUFdOrgcM9jzjow03Pn2reTN3TmBkdJVf8U=
+	t=1732689141; cv=none; b=VXZNIq5AGiihr6bBaZ90GdbLNUZIfQ+0mjFPk6x+92mOgXcR8pwHpmRin6iy46OqdA0109q7ftWyjto+wbWue9PI9rRJNbV9r0DDWWH4+lGHAFeKJDmUcOO4+DXRhU4zBGVGRkrIxJngXhUnIeR1ynDNiGJoUyptZJzgio6UqTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732688770; c=relaxed/simple;
-	bh=r1oaQkGAyH/8lQKbLazzknsvywjf44WNEKmpHFiMJCE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y25YheF4T0fhJ/DqnIGcWSW7bn/rJ/iq+iov3+c9hqUh1BXtbMuPt1LQ+8klGnOmp+JuKnISbMhhqFUr3LnKhkfpDh9Ngss8dUSdcNtHJJhXw4V9qT6Nf+y/dzo6ROKoRlVOSG4zPjVI6Z8cGD2Di4LOS/FIgJ14S/adwXaxKq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gSmtkFMG; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1732689141; c=relaxed/simple;
+	bh=oCHQT0dHY6NRBI1jqPKAm5SLeD3ijf3+cLQdDcRoLNk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EdVywUNI6xPLz7mO1aNhnYMnaKyC+0dkPco0tdWkL5S08DZsw9kGZ7xSjbyms3tUt892/ak3bZNSvhbvf1UaIxdxrCkLinCtHb9RW16+zBoE7/D/SUOJxTCVUEzgFFOLOreyplNZsw+WSRecBep9SP/nnXhcWCnb9YCQsdPktE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F0VdqtMG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gSmtkFMG"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=svFKMDnIpssns1GfQO/ozEz62VHItFor5LMbPjt5/PU=; b=gSmtkFMG3LekA1oRJCL/pMlRR/
-	blHE5zUXFIXc3dUe3ILhknUcfniIcelNCziYoQoAmdbxXIgy9rbJNhjWs1ZzCVIq9cpdg+doj7GgS
-	8aqEnuKZaOi9gntZjKDnXJzYHw4LG+96EM+ZxgpcIV3NOdtErehV9RRsHIHq11LC2NePj2XNwysUO
-	QRSBnXhhPn3CX/HChXPHVAyacVX732l1bQFLq7LsXk191V/RN6qqzUyNrH6tPMxVJo3pt5eTO++ym
-	bbKouJRaC5D93wFFB4ctKOHSyXofEK/rwrRbN1ei8359ZAF8LIQ5aQduW1N7ZY+HzlnKx39xAp8CP
-	8G0TUrsA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tGBV1-0000000CKH0-27tB;
-	Wed, 27 Nov 2024 06:26:07 +0000
-Date: Tue, 26 Nov 2024 22:26:07 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Bharata B Rao <bharata@amd.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, nikunj@amd.com,
-	willy@infradead.org, vbabka@suse.cz, david@redhat.com,
-	akpm@linux-foundation.org, yuzhao@google.com, mjguzik@gmail.com,
-	axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	jack@suse.cz, joshdon@google.com, clm@meta.com
-Subject: Re: [RFC PATCH 1/1] block/ioctl: Add an ioctl to enable large folios
- for block buffered IO path
-Message-ID: <Z0a7f9T5lRPO_sEC@infradead.org>
-References: <20241127054737.33351-1-bharata@amd.com>
- <20241127054737.33351-2-bharata@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F0VdqtMG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93040C4CED2;
+	Wed, 27 Nov 2024 06:32:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732689141;
+	bh=oCHQT0dHY6NRBI1jqPKAm5SLeD3ijf3+cLQdDcRoLNk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=F0VdqtMGPXBSEKlUBuFvFMkhGk5ry1mD+bO5s+elmZB53H8+/1y+1kw0I8jrIKqGF
+	 mg+GB1YnAwL9XkblkOra0yuzxGqxs9UFG3/8AagBOyugrln9lcZUQ8dCrO+S2zXo7b
+	 d5tjS/zfWWRV6ScOLEYQ59zPHqe4KkuketJzyWR0oGk384AJEogwRYVB4Oh1ms5cha
+	 c4FFZmozIoYiTYKkMUxaElyrVQAIv6w6/ubWXH8gRBM/JMfIA7g+6km7Le1j3yzdTS
+	 gGZMm8X15iUYiFw4Pv22zEXBBPv5+k0BD9WOCi1EubdgohhMeJIR7Gx7MCnJiubnNE
+	 lLVb1G30JAM8w==
+Message-ID: <73fb6bae-a265-43c3-a362-3cece4b42bbe@kernel.org>
+Date: Wed, 27 Nov 2024 15:32:04 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241127054737.33351-2-bharata@amd.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [blktests] zbd/012: Test requeuing of zoned writes and queue
+ freezing
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bvanassche@acm.org>,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ linux-block@vger.kernel.org
+References: <20241125211048.1694246-1-bvanassche@acm.org>
+ <18022e10-6c05-4f7a-af8a-9a82fdb3bbc5@kernel.org>
+ <ef0b613a-d692-4b04-b106-0a244bf4bfc1@acm.org>
+ <12c5ee53-dcc6-4c78-b027-8c861e147540@kernel.org>
+ <Z0a5Mjqhrvw6DxyM@infradead.org> <Z0a6ehUQ0tqPPsfn@infradead.org>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <Z0a6ehUQ0tqPPsfn@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 27, 2024 at 11:17:37AM +0530, Bharata B Rao wrote:
-> In order to experiment using large folios for block devices read/write
-> operations, expose an ioctl that userspace can selectively use on the
-> raw block devices.
+On 11/27/24 3:21 PM, Christoph Hellwig wrote:
+> On Tue, Nov 26, 2024 at 10:16:18PM -0800, Christoph Hellwig wrote:
+>> Did you trace where the bio_wouldblock_error is coming from?  Probably
+>> a failing request allocation?  Can we call the guts of blk_zone_plug_bio
+>> after allocating the request to avoid this?
 > 
-> For the write path, this forces iomap layer to provision large
-> folios (via iomap_file_buffered_write()).
+> The easier option might be to simply to "unprepare" the bio
+> (i.e. undo the append op rewrite and sector adjustment), decrement
+> wp_offset and retun.  Given that no one else could issue I/O
+> while we were trying to allocate the bio this should work just fine.
 
-Well, unless CONFIG_BUFFER_HEAD is disabled, the block device uses
-the buffer head based write path, which currently doesn't fully
-support large folios (although there is series out to do so on
-fsdevel right now), so I don't think this will fully work.
+Might be good enough. But will also need to clear the REQ_NOWAIT flag for the
+BIO if it is issued from the zone write plug BIO work. Because that one should
+not have to deal with all this.
 
-But the more important problem, and the reason why we don't use
-the non-buffer_head path by default is that the block device mapping
-is reused by a lot of file systems, which are not aware of large
-folios, and will get utterly confused.  So if we want to do anything
-smart on the block device mapping, we'll have to ensure we're back
-to state compatible with these file systems before calling into
-their mount code, and stick to the old code while file systems are
-mounted.
+Let me try.
 
-Of course the real question is:  why do you care about buffered
-I/O performance on the block device node?
 
+-- 
+Damien Le Moal
+Western Digital Research
