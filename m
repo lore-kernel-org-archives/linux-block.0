@@ -1,48 +1,48 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327CE145FE4
-	for <linux-block@vger.kernel.org>; Wed, 27 Nov 2024 06:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D61213D89D;
+	Wed, 27 Nov 2024 06:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732688508; cv=none; b=Rr2pDWsck4S9G1fRjn4bdVIhACmyGDfhFjdNHIWOoC0JpT/aMj3d+F2bH9pDKfrbVggozQ9S7jG4QTZJoL6aGmrOHrrbQvGCM801jX0LSnLBPzcFWl4wljdwO6W6nubmBaEimwleP0B7iKeS4JvsFVFkuyxdsbmTArfKCKqV2Xs=
+	t=1732688770; cv=none; b=kNsmK2/zKmL4YPjIvuJEfl9LtDb2FyTsWfNb79XgGKitNMDa5f+rEMkIB1wwpBznWQZB5I9V3Pe1mBHlPVqowv9ejQAHgbefkUnJrzJD1tu1ok3IhLRshukwEhWTrcC4zz3B5r3hhUFdOrgcM9jzjow03Pn2reTN3TmBkdJVf8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732688508; c=relaxed/simple;
-	bh=qwvFJvzUm46CclAP1i7/YGoRnQMrlajM2M6zRYl/eRw=;
+	s=arc-20240116; t=1732688770; c=relaxed/simple;
+	bh=r1oaQkGAyH/8lQKbLazzknsvywjf44WNEKmpHFiMJCE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZY1wkjsipfajfMwoRU3lAa36I2GWmydZIpaKt8fBfaVOcmKMVB1JWf/IT3r4cf+4zGJfp75hLiH9uYwvntChwifon4mn+I8yTkN4oo52IsoZ3bHlb2/hpMTE6VFftX8opaLgWzyFYhzbKUJ12FcgOdKPBfs+e0tXh57bzqggNds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=NMjaZu2/; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y25YheF4T0fhJ/DqnIGcWSW7bn/rJ/iq+iov3+c9hqUh1BXtbMuPt1LQ+8klGnOmp+JuKnISbMhhqFUr3LnKhkfpDh9Ngss8dUSdcNtHJJhXw4V9qT6Nf+y/dzo6ROKoRlVOSG4zPjVI6Z8cGD2Di4LOS/FIgJ14S/adwXaxKq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gSmtkFMG; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NMjaZu2/"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gSmtkFMG"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=gS1ZgyqgW/Wgkz8S1a6B7BY+UNLEbiaij9gai5Xe2eY=; b=NMjaZu2/Mzwch53KhSW0cJ+tUx
-	OBe4mV+gtI+Y1hsPrZBx3DtjShSuBfPmzSaU/EtdSYxEwR1DobeYSvRq2FZEqV/Ci2VgabcbUjpOM
-	UP2zE+JXl7Q3zCXcutDqQffUK1uDPmpWhfFUuDRjcB9onDkcgAJDP60pRXOcLwIBvBRAhpbjvgTWc
-	97EUb4NweIn0WnnqOyjkXL9BHJ8deKVGoXv/Xsk6aO2ireV0iIY1JlCzTSnuZDm8/dAREDfEcJJ8G
-	WO0x/K9k3scAeLai3SFmcnfTisRev+bXeg9UjWNrdBDfcE4JGLH6ReQ+DsusSlF6xL4PJjUWLDrvg
-	Jlxyre1Q==;
+	bh=svFKMDnIpssns1GfQO/ozEz62VHItFor5LMbPjt5/PU=; b=gSmtkFMG3LekA1oRJCL/pMlRR/
+	blHE5zUXFIXc3dUe3ILhknUcfniIcelNCziYoQoAmdbxXIgy9rbJNhjWs1ZzCVIq9cpdg+doj7GgS
+	8aqEnuKZaOi9gntZjKDnXJzYHw4LG+96EM+ZxgpcIV3NOdtErehV9RRsHIHq11LC2NePj2XNwysUO
+	QRSBnXhhPn3CX/HChXPHVAyacVX732l1bQFLq7LsXk191V/RN6qqzUyNrH6tPMxVJo3pt5eTO++ym
+	bbKouJRaC5D93wFFB4ctKOHSyXofEK/rwrRbN1ei8359ZAF8LIQ5aQduW1N7ZY+HzlnKx39xAp8CP
+	8G0TUrsA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tGBQo-0000000CK1S-2sxq;
-	Wed, 27 Nov 2024 06:21:46 +0000
-Date: Tue, 26 Nov 2024 22:21:46 -0800
+	id 1tGBV1-0000000CKH0-27tB;
+	Wed, 27 Nov 2024 06:26:07 +0000
+Date: Tue, 26 Nov 2024 22:26:07 -0800
 From: Christoph Hellwig <hch@infradead.org>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Bart Van Assche <bvanassche@acm.org>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	linux-block@vger.kernel.org
-Subject: Re: [blktests] zbd/012: Test requeuing of zoned writes and queue
- freezing
-Message-ID: <Z0a6ehUQ0tqPPsfn@infradead.org>
-References: <20241125211048.1694246-1-bvanassche@acm.org>
- <18022e10-6c05-4f7a-af8a-9a82fdb3bbc5@kernel.org>
- <ef0b613a-d692-4b04-b106-0a244bf4bfc1@acm.org>
- <12c5ee53-dcc6-4c78-b027-8c861e147540@kernel.org>
- <Z0a5Mjqhrvw6DxyM@infradead.org>
+To: Bharata B Rao <bharata@amd.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, nikunj@amd.com,
+	willy@infradead.org, vbabka@suse.cz, david@redhat.com,
+	akpm@linux-foundation.org, yuzhao@google.com, mjguzik@gmail.com,
+	axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	jack@suse.cz, joshdon@google.com, clm@meta.com
+Subject: Re: [RFC PATCH 1/1] block/ioctl: Add an ioctl to enable large folios
+ for block buffered IO path
+Message-ID: <Z0a7f9T5lRPO_sEC@infradead.org>
+References: <20241127054737.33351-1-bharata@amd.com>
+ <20241127054737.33351-2-bharata@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,16 +51,31 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z0a5Mjqhrvw6DxyM@infradead.org>
+In-Reply-To: <20241127054737.33351-2-bharata@amd.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Nov 26, 2024 at 10:16:18PM -0800, Christoph Hellwig wrote:
-> Did you trace where the bio_wouldblock_error is coming from?  Probably
-> a failing request allocation?  Can we call the guts of blk_zone_plug_bio
-> after allocating the request to avoid this?
+On Wed, Nov 27, 2024 at 11:17:37AM +0530, Bharata B Rao wrote:
+> In order to experiment using large folios for block devices read/write
+> operations, expose an ioctl that userspace can selectively use on the
+> raw block devices.
+> 
+> For the write path, this forces iomap layer to provision large
+> folios (via iomap_file_buffered_write()).
 
-The easier option might be to simply to "unprepare" the bio
-(i.e. undo the append op rewrite and sector adjustment), decrement
-wp_offset and retun.  Given that no one else could issue I/O
-while we were trying to allocate the bio this should work just fine.
+Well, unless CONFIG_BUFFER_HEAD is disabled, the block device uses
+the buffer head based write path, which currently doesn't fully
+support large folios (although there is series out to do so on
+fsdevel right now), so I don't think this will fully work.
+
+But the more important problem, and the reason why we don't use
+the non-buffer_head path by default is that the block device mapping
+is reused by a lot of file systems, which are not aware of large
+folios, and will get utterly confused.  So if we want to do anything
+smart on the block device mapping, we'll have to ensure we're back
+to state compatible with these file systems before calling into
+their mount code, and stick to the old code while file systems are
+mounted.
+
+Of course the real question is:  why do you care about buffered
+I/O performance on the block device node?
 
