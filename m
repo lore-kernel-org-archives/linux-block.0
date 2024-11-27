@@ -1,132 +1,97 @@
-Received: from 001.lax.mailroute.net (001.lax.mailroute.net [199.89.1.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BCC140E38;
-	Wed, 27 Nov 2024 21:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDED4154C07
+	for <linux-block@vger.kernel.org>; Wed, 27 Nov 2024 22:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732741754; cv=none; b=MiQ5Hw5aYT/+pJivCPZWu/lBJvjfWOkc+pNle+jOUvbFaSKpWZMB9+ZIAjhV70x1naekDpBEAOhXBU2mn8SdGUn6DRV/9zGJH95c6qznuoM0wbG0yffpaon7f3aF7DmbVA9Dh1FEjNb2x+IRz1hxbQmyd8Z63Lrk8mair08M2zc=
+	t=1732745131; cv=none; b=uuXoI98t7Na0+YODthqGoyFzqxJNFnqicNoUCEtZOpfinArJSNvGvOxCXIQC339d//Jx0eP4n7ywX7UxU2s8qWXH6YsVeUUfaXTZjcfDmWbQCbvbyct0HNn8hjulplq+f45ORFxDo1bsKBnkSM0LdFny7S0ghAFMSxluURKLebc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732741754; c=relaxed/simple;
-	bh=D5XBnnBSHb+YFe5/5cmsGkYiGUO3cyT7bmOr+0fb0Ys=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YE6TLVd2k7NpuElKYxRaiFnhiYlxOV3cdw25vQB+k8OQm1kICgVpJmae5cRMf7hjXDElJGOlUEVruok2V5ixptbRlZMtM5G3RDvwjTNQqY11rriotfCaLPp97cY+wIm9kG7sYmP5ZK6cIu6s/WSkv03yA/wHd4onfjMtzj7XAB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=uCEoSSMJ; arc=none smtp.client-ip=199.89.1.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1732745131; c=relaxed/simple;
+	bh=EJxsfnbE9EPKEjS1IYxhe790wfgTroUR5XpbPnLylrM=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=jQcOROegC2y3aL3pXsLK2UJ/l4B9ic7RxcX7eCDRnWjUzvpqBZ77UzvfenIl1dq6iofcfCri94mvKYbn/EZI6rSaiABcaUAUMvTvb+bLtAAbA/RkqjonMvrZVcj8vlw2pz6Z8dP15KtQxCsGbh5Yhtydu/qu/PbhM0Jos/PV6Mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Q2LwP0iR; arc=none smtp.client-ip=209.85.160.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="uCEoSSMJ"
-Received: from localhost (localhost [127.0.0.1])
-	by 001.lax.mailroute.net (Postfix) with ESMTP id 4XzBnh0yn9zCm9g;
-	Wed, 27 Nov 2024 21:06:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1732741585; x=1735333586; bh=ISWmwIbPKWfnjDw9QIg1JLPO
-	j+G2EW60oaWfrSMy0X4=; b=uCEoSSMJdJz7xp88pY1TWob0jGDsqDNccGMqS43u
-	t5Z4bVukZBCn6nC6PMTFXOnHMzPBWW2zKn/aCxyRBv4nwjGB7o5mw659cFHHaYM4
-	HXR1VdI28t5MqtRgLAccV10Xn9SQbt6vuR+yU+Ot3NCOtIUehoYfemN/zz4dMywy
-	lmfUsQA/pf/KYtnsGVSShANNiEx7oCSbheaKC5pZRww61kY0mUq5ASvHtczAaX2n
-	wlG1kxyWGAXUY0rcNElD+heejviIukL/DvU79d56l6Z/RT7YZWxA0N3q9mxIa/ee
-	kJMK3rsFLKILTjEKHplUUCazHjODyGjOQvo+7SkBzixi3w==
-X-Virus-Scanned: by MailRoute
-Received: from 001.lax.mailroute.net ([127.0.0.1])
- by localhost (001.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 9S9ba-RE9LAW; Wed, 27 Nov 2024 21:06:25 +0000 (UTC)
-Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 001.lax.mailroute.net (Postfix) with ESMTPSA id 4XzBnR0q0kzCm9f;
-	Wed, 27 Nov 2024 21:06:18 +0000 (UTC)
-Message-ID: <7835e7e2-2209-4727-ad74-57db09e4530f@acm.org>
-Date: Wed, 27 Nov 2024 13:06:17 -0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q2LwP0iR"
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2965e10da1bso178849fac.0
+        for <linux-block@vger.kernel.org>; Wed, 27 Nov 2024 14:05:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732745129; x=1733349929; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TEfa3YKLFju9/80RVLy+Veo+Kl0tn6kt9Hl9/TiHPag=;
+        b=Q2LwP0iRnL+MNiswgzCsdMmEna93I4HlqxTD1cu6s2WTljJoKb71bunLvgaB4rppYV
+         D8nGBe61gJB/2Ktd2dk0tekzrwbPN5nQ0C2CVVCuCdYhm0CtQe04lUVJFMGZHMxyGJX1
+         9QlK3iFCWfbRLDe+mhcxUgMK7zSF9E+41bRRSwMoHLLjpIvF5+gNwGysVBnAfi8fBiRN
+         ezWOcEK+dxdK0T9UpWQWxsDXb7HENBQ+UbkhyzGOWuc4+GfiMat9fSWgM/wFdJ8hTB+f
+         WOkn4lOnrixQkoPVk2f2g542io5x5vbE/BM59QLlGmZdqPLkpOiVWh5MbNzK0Ba8aqx4
+         oCvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732745129; x=1733349929;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TEfa3YKLFju9/80RVLy+Veo+Kl0tn6kt9Hl9/TiHPag=;
+        b=Ow59tLxW2KyQeTm/97oQkvHpKoFBBSuSOmFUJT8bvsozC8OWrDVQ3LFmL65XWz6LK2
+         Wwh4ezG5dCAxa/n16kuhhVWrCwPkS3fkJwrB6r+2tqPsbVkyGkb1h9N94meaiLQildwj
+         54v6CRCvLUa1ERu7L6sN94RSxisdehrqwlkwph9DM/uweWTDTu8L4TtcbPDBRZWQ0TJg
+         FZiyXWkVqR/r7qXSe5WVDsRlThiVy9p/R4PvMyL9yt+PX82okdNnWaUm8mOnrmCXJFxV
+         LY6hTStBdaCVaDRU27xFer37yB5a2LK3sLIOu1mnRYl6rSi45vme50yYsvKNsEn8pBgv
+         iaKA==
+X-Gm-Message-State: AOJu0YyxQ1JwTirjSzjh3lpWhFNoqIZTwTBNrbFEgmY+4BZ3J7E5SkiZ
+	mkgj+P78yRQvKPgZIfaByIVwIff/g0sHYnLBNpOXXIXshy0tHFQDP8m7cjIfJ7fbXoynor1/9V4
+	GZ78=
+X-Gm-Gg: ASbGnctCUJ89NHtafFl7jYrMNd7s0AdlZKU3et+anANecFbGvZu/RH5baq7MbuRv7i8
+	IwPvAb6AJd6Tas0267Cm4RDPTdpSb/CZ6/mQ/XhH+esBK7GxtEbIvIuIwvzRAutANt7Bvb/gBr0
+	mh02imb+0GkVPYmt4un2YXji0sX+5DBw8xicAOaOJXjyaNaT9qBjRoC1459HsRTHMV+p8F0XXmf
+	mU+nO95LGJ5bkZztFoStTOV+0kZhCkBmfCMIUms
+X-Google-Smtp-Source: AGHT+IE1R39IjlAIR+j32d1e7PLp2vYrx2zuqAjw4hHGajIQVbWJpBlQun5JPpNgXzT11ISb+V5wDg==
+X-Received: by 2002:a05:6870:ed99:b0:296:504b:8f2e with SMTP id 586e51a60fabf-29dc3f9ad26mr4709544fac.6.1732745128841;
+        Wed, 27 Nov 2024 14:05:28 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-29de92d8246sm49660fac.25.2024.11.27.14.05.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Nov 2024 14:05:28 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: John Garry <john.g.garry@oracle.com>
+Cc: linux-block@vger.kernel.org, hare@suse.de, hch@lst.de, 
+ martin.petersen@oracle.com
+In-Reply-To: <20241127092318.632790-1-john.g.garry@oracle.com>
+References: <20241127092318.632790-1-john.g.garry@oracle.com>
+Subject: Re: [PATCH] block: Don't allow an atomic write be truncated in
+ blkdev_write_iter()
+Message-Id: <173274512783.579859.15917530879505552793.b4-ty@kernel.dk>
+Date: Wed, 27 Nov 2024 15:05:27 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv10 0/9] write hints with nvme fdp, scsi streams
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Nitesh Shetty <nj.shetty@samsung.com>,
- Javier Gonzalez <javier.gonz@samsung.com>,
- Matthew Wilcox <willy@infradead.org>, Keith Busch <kbusch@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "joshi.k@samsung.com" <joshi.k@samsung.com>
-References: <20241105155014.GA7310@lst.de> <Zy0k06wK0ymPm4BV@kbusch-mbp>
- <20241108141852.GA6578@lst.de> <Zy4zgwYKB1f6McTH@kbusch-mbp>
- <CGME20241108165444eucas1p183f631e2710142fbbc7dee9300baf77a@eucas1p1.samsung.com>
- <Zy5CSgNJtgUgBH3H@casper.infradead.org>
- <d7b7a759dd9a45a7845e95e693ec29d7@CAMSVWEXC02.scsc.local>
- <2b5a365a-215a-48de-acb1-b846a4f24680@acm.org>
- <20241111093154.zbsp42gfiv2enb5a@ArmHalley.local>
- <a7ebd158-692c-494c-8cc0-a82f9adf4db0@acm.org>
- <20241112135233.2iwgwe443rnuivyb@ubuntu>
- <yq1ed38roc9.fsf@ca-mkp.ca.oracle.com>
- <9d61a62f-6d95-4588-bcd8-de4433a9c1bb@acm.org>
- <yq1plmhv3ah.fsf@ca-mkp.ca.oracle.com>
- <8ef1ec5b-4b39-46db-a4ed-abf88cbba2cd@acm.org>
- <yq1jzcov5am.fsf@ca-mkp.ca.oracle.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <yq1jzcov5am.fsf@ca-mkp.ca.oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-86319
 
-On 11/27/24 12:14 PM, Martin K. Petersen wrote:
-> Once I had support for token-based copy offload working, it became clear
-> to me that this approach is much simpler than pointer matching, bio
-> pairs, etc. The REQ_OP_COPY_IN operation and the REQ_OP_COPY_OUT
-> operation are never in flight at the same time. There are no
-> synchronization hassles, no lifetimes, no lookup tables in the sd
-> driver, no nonsense. Semantically, it's a read followed by a write.
 
-What if the source LBA range does not require splitting but the
-destination LBA range requires splitting, e.g. because it crosses a
-chunk_sectors boundary? Will the REQ_OP_COPY_IN operation succeed in
-this case and the REQ_OP_COPY_OUT operation fail? Does this mean that a
-third operation is needed to cancel REQ_OP_COPY_IN operations if the
-REQ_OP_COPY_OUT operation fails?
+On Wed, 27 Nov 2024 09:23:18 +0000, John Garry wrote:
+> A write which goes past the end of the bdev in blkdev_write_iter() will
+> be truncated. Truncating cannot tolerated for an atomic write, so error
+> that condition.
+> 
+> 
 
-Additionally, how to handle bugs in REQ_OP_COPY_* submitters where a
-large number of REQ_OP_COPY_IN operations is submitted without
-corresponding REQ_OP_COPY_OUT operation? Is perhaps a mechanism required
-to discard unmatched REQ_OP_COPY_IN operations after a certain time?
+Applied, thanks!
 
-> Aside from making things trivially simple, the COPY_IN/COPY_OUT semantic
-> is a *requirement* for token-based offload devices.
+[1/1] block: Don't allow an atomic write be truncated in blkdev_write_iter()
+      commit: 2cbd51f1f8739fd2fdf4bae1386bcf75ce0176ba
 
-Hmm ... we may each have a different opinion about whether or not the 
-COPY_IN/COPY_OUT semantics are a requirement for token-based copy
-offloading.
-
-Additionally, I'm not convinced that implementing COPY_IN/COPY_OUT for
-ODX devices is that simple. The COPY_IN and COPY_OUT operations have
-to be translated into three SCSI commands, isn't it? I'm referring to
-the POPULATE TOKEN, RECEIVE ROD TOKEN INFORMATION and WRITE USING TOKEN
-commands. What is your opinion about how to translate the two block
-layer operations into these three SCSI commands?
-
-> Why would we even consider having two incompatible sets of copy
-> offload semantics coexist in the block layer?
-I am not aware of any proposal to implement two sets of copy operations
-in the block layer. All proposals I have seen so far involve adding a
-single set of copy operations to the block layer. Opinions differ
-however about whether to add a single copy operation primitive or
-separate IN and OUT primitives.
-
-Thanks,
-
-Bart.
+Best regards,
+-- 
+Jens Axboe
 
 
 
