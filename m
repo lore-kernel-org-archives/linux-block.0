@@ -1,58 +1,59 @@
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D5F4689
-	for <linux-block@vger.kernel.org>; Wed, 27 Nov 2024 04:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A9913A24A
+	for <linux-block@vger.kernel.org>; Wed, 27 Nov 2024 05:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732683154; cv=none; b=g+UHTMPddj2BZimShrGu14vfXu6m3BRI5E93D9pR8Nlc+a9tp1T0GhOQgupJCqNxUfdW2b3A9HAQ4Gw+JvMBfRaLgfMEdJZc+xzALx1212tKXOI/JK0as27K0tcaq2hhmZHhf2mAO62seokaAjcHwQLUtWf6CoUyGNTjvlSEJ3w=
+	t=1732683895; cv=none; b=f58cGx8og2GTUO5I32ZTZJTeOJPBpiT2KKjNC0dRwwrg4Ti4py+o+phwka85F0mBjL4b+GS/bdXZK9LRwpj2hIalLP9WxFzChepGIaJHjwD+OUwKGK0Iowo1qzj4QTGUSpxf+f34J25MucliKBZQE9AB+OW3mwCkNOLa0KOZLqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732683154; c=relaxed/simple;
-	bh=GELYA9wTAXhMSGcsmdKZCc+Dc9ucb7cWRhg2i6IHIMQ=;
+	s=arc-20240116; t=1732683895; c=relaxed/simple;
+	bh=u/eH54xtDsWuxKbSNDv6Vxgz0D6zyql7xjPO0KWd/CA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SGMy5LKBqZP1/VlX4TUp9os1ih3blutakSZ9ULCMUQSWwifyjutdSxU5FeCH5pxdsFDtpIitFzCgw/Rn56ZmiFhBQA3k6a/b5qkVX8mN10y6jlbTMPJ+owg5B0WjfOfCJQAxAuu8d7ohWsix53X6zE25DmgR7DVS7hvihMuKbuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=FQAIltwQ; arc=none smtp.client-ip=209.85.167.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=NT0Hpo8VKUSPSsmsF13YZkhk4Elg5UkYCPwrr6C5G3hqu421KbALq1bQKVh+DrhW5KfIWR4hwTZLqwcoxaAK/N+y8Zn4Hc01B2mJh/q5/YeJChtq7ykiroSLg1bncFMVFK9kTiFprQ0krKZ8Uojvu/k5scmbxfcX00g+lzFjln0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=cagm0fEP; arc=none smtp.client-ip=209.85.210.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="FQAIltwQ"
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3ea55e95d0fso1091514b6e.2
-        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 20:52:32 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="cagm0fEP"
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-71d47201b3fso1448668a34.2
+        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 21:04:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1732683152; x=1733287952; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z69UMzqeol1IWD5ILb806Pk7wLeAX+Rnixn/3FIcMLk=;
-        b=FQAIltwQZu+eHKdfOOZQ1RpKKGVbAJIFLEpY/1qmIEI9LClwhvjSTejFm5KGQusBN7
-         HBpwchvBljNjsqMMuOztpEUWJE7QohJf3EJOknLuyUi+FHpZh1ZLVYXn2117UXg8Fbxx
-         ByUqFALJico7uEFOpqhu2VynKeZMludhFDqBI=
+        d=chromium.org; s=google; t=1732683893; x=1733288693; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=F9c+Y5f2jAHQ4Swx7mfQpva9qVpb6j1FoF2WaSf7AxU=;
+        b=cagm0fEPc/U8YbvM7ZRQ6Fd9GzAi1J7jDTNNdyHAO4jmMfAcS7j4DppClImnkUjffs
+         xtShswRZaWZhP94iG6xQkd+1UQAkpBPSPsEBCtekm6zO9eITlQvYvx0EmkLuLffXupXn
+         hqmCC4QcC1dncI4mMt5HOOtyV6UCzxZDvINAU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732683152; x=1733287952;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z69UMzqeol1IWD5ILb806Pk7wLeAX+Rnixn/3FIcMLk=;
-        b=WYY72IUasvC1UsmeTvSz7SI1wTG35/TJPXkHRO2iDtNCVppEi3yGr3HB8cRZH/LQoa
-         45OMA9r1KkM94AoE8aDM7AoxH4eqTQMe6fEwewpGLBqIprfwhowjy2YaKyZb3SvKR0Cj
-         irnadaIHxo/t1OYLVCSp10YQB6HYNj7JV1P0hrhdTRkIIpjJrf2ndx3FOK6cficmnLPO
-         d8cCHme8aJg26WN4Gq00xO1B69zzRUG2eA742iytgBOK1V/bb+X4kUOTyHYeoaxPL5Xp
-         11v8a7HUTKOHKGhN51CcYnj/3SW7aiR8crJPdbrQhpU3nOvNFJmDr4czroN4RGMRtXBv
-         MVpg==
-X-Forwarded-Encrypted: i=1; AJvYcCVP0PHwRRh2fRzX6BHQDkg3VL9sUzTX5rYa+tc15UjVADdouoIHbXazBeGHn+bE4goZhk+mTEGm1/VzOA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfyBj+2LIvrsYcReJqn9+WQgGhI6Z0w7jXfW31zlLLgOCWMQIP
-	A6/8/zMiZ8nvFQvFP4aJADgiso99TsMXBQz4ESReHBDlIvIKuIwHoBWNZXlsYw==
-X-Gm-Gg: ASbGncsoQaV8olypbGRd88taJI3UIwLm4PCpNCiq0O1fu//bD8k4UHfd9ZmK+ol3+p9
-	qQlQXRjZV5ytlvfAQoBYVrjMyTbNu2sdVuvwMRLA8YwXszA6RjuRDCsjaFcO2T98cVThLp1dQ+M
-	eKFsy9hgb5UeIwFtcpXY2iyw5W0AMSMEXqIY1nfNoAGuYrH4h4dKnqm39lAaHinRQ1x+SN12sig
-	+okvpYHbm+CFgPJJLA6VBFTSp0G+wkdAg5KV3MW7OfAkZ86C77otA==
-X-Google-Smtp-Source: AGHT+IEFX6h+L0daWFK8yJBkoXQpIAAzSGJOv1MG9EkZoRksU5/Y6YZrI63cmmZAPQ7BtBeS03+jhQ==
-X-Received: by 2002:a05:6808:d51:b0:3ea:5be6:a697 with SMTP id 5614622812f47-3ea6dbdfe3fmr1606964b6e.13.1732683151825;
-        Tue, 26 Nov 2024 20:52:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732683893; x=1733288693;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F9c+Y5f2jAHQ4Swx7mfQpva9qVpb6j1FoF2WaSf7AxU=;
+        b=SMO4gs5qS4eZdZmhRA3BLLKdMQTEFJqbDoW2A1CmPK3tvd512VniAVGMav62Tl+XFG
+         yqHPKf3xiolUBQo/aVY1sz3U/d9XnV45tPutiGj1eNF75m5I/5l9GynVc7mFh7yxQqkS
+         ZzFTgDaFlyS8lIA9OKUMd7jDX30/vUb8weVpHwnwhJCDj5Mj3tjqAY0+9qhy0BsCF6Su
+         4uA5EnHgY2ovLh6aFgsdLr4/IzN5wzaMVL3X5KmcCxw05rJ3WN0mBFPmGFNz2JBluMQh
+         PBUADONDbFIORPDh5yuWvGfUSKjSvCLcGL+iLEjTa2P7n3rpVPyumcICDvTb8swmT6hU
+         O6+w==
+X-Forwarded-Encrypted: i=1; AJvYcCXfRu+AR+LEYLuvIzL9gyTP9OuQN2OzGh9b9xxSsQJWwpvsl4MoIGwteMGxFiA7IeraTr6JbdFqos/77Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhYFBIswYA+s1T47D7JZ0QrqL9iDk4wzP4HkCm51x6Ys/H37Xd
+	4Z25vlrvCSfXtxUvasrl3A3tJ/feuSDiJIlr0MoU4y4bUl2i5M9t1NKH/UERNw==
+X-Gm-Gg: ASbGncs4FP6OI7/EuxkX0iY7trFDSh8RhPtD28Fdj7FCQcH9taDwziSefPBPo4dULKw
+	/MNGzn6FTnofftyewDblWmphUnkjjwFf5RjjyC+qpYTdLd0skvxswkMwcQdcZLPX85tnBpGukKX
+	by1HJU4aBhCDLZFpBVHHGmHY/GsFpZ7QqbOzMPT3BzBF3NzugV2mZ8JZKsjN8X3PJZsQ1sjhsYK
+	gm8nXqrzwSUf2n65d0ruKck0DbgujnmzBODrn2q0mAywbVwlyHbXA==
+X-Google-Smtp-Source: AGHT+IFUH/TU6QwHVNcWTTll/6bNgy/3+v7SQl5cBPmYmRbyQJXOKtcTtfuOPhu4Pvbmsxc8XceNuw==
+X-Received: by 2002:a05:6830:2584:b0:71d:54fb:da4e with SMTP id 46e09a7af769-71d65c7e043mr1657222a34.3.1732683893233;
+        Tue, 26 Nov 2024 21:04:53 -0800 (PST)
 Received: from google.com ([2401:fa00:8f:203:cda8:c605:6e79:8b60])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fbcbfc0857sm9655057a12.10.2024.11.26.20.52.27
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fbcc422d0bsm8262535a12.84.2024.11.26.21.04.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Nov 2024 20:52:31 -0800 (PST)
-Date: Wed, 27 Nov 2024 13:52:24 +0900
+        Tue, 26 Nov 2024 21:04:52 -0800 (PST)
+Date: Wed, 27 Nov 2024 14:04:45 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Barry Song <21cnbao@gmail.com>
 Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
@@ -67,82 +68,57 @@ Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
 	zhengtangquan@oppo.com, zhouchengming@bytedance.com
 Subject: Re: [PATCH RFC v3 0/4] mTHP-friendly compression in zsmalloc and
  zram based on multi-pages
-Message-ID: <20241127045224.GF440697@google.com>
+Message-ID: <20241127050445.GG440697@google.com>
 References: <20241121222521.83458-1-21cnbao@gmail.com>
  <20241126050917.GC440697@google.com>
- <CAGsJ_4z8BM3SwSsjUd5LMA82y-Ju9Bgo_re18wW2k-nKpLWXyA@mail.gmail.com>
+ <20241126105258.GE440697@google.com>
+ <CAGsJ_4w5WSpVUr1yybwZsp0QKapzOLW0qU0+_F-8WJnXKK9_pA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAGsJ_4z8BM3SwSsjUd5LMA82y-Ju9Bgo_re18wW2k-nKpLWXyA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGsJ_4w5WSpVUr1yybwZsp0QKapzOLW0qU0+_F-8WJnXKK9_pA@mail.gmail.com>
 
-On (24/11/27 09:20), Barry Song wrote:
-[..]
-> >    390 12736
-> >    395 13056
-> >    404 13632
-> >    410 14016
-> >    415 14336
-> >    418 14528
-> >    447 16384
+On (24/11/27 09:31), Barry Song wrote:
+> On Tue, Nov 26, 2024 at 11:53 PM Sergey Senozhatsky
+> <senozhatsky@chromium.org> wrote:
 > >
-> > E.g. 13632 and 13056 are more than 500 bytes apart.
+> > On (24/11/26 14:09), Sergey Senozhatsky wrote:
+> > > > swap-out time(ms)       68711              49908
+> > > > swap-in time(ms)        30687              20685
+> > > > compression ratio       20.49%             16.9%
 > >
-> > > swap-out time(ms)       68711              49908
-> > > swap-in time(ms)        30687              20685
-> > > compression ratio       20.49%             16.9%
+> > I'm also sort of curious if you'd use zstd with pre-trained user
+> > dictionary [1] (e.g. based on a dump of your swap-file under most
+> > common workloads) would it give you desired compression ratio
+> > improvements (on current zram, that does single page compression).
 > >
-> > These are not the only numbers to focus on, really important metrics
-> > are: zsmalloc pages-used and zsmalloc max-pages-used.  Then we can
-> > calculate the pool memory usage ratio (the size of compressed data vs
-> > the number of pages zsmalloc pool allocated to keep them).
+> > [1] https://github.com/facebook/zstd?tab=readme-ov-file#the-case-for-small-data-compression
 >
-> To address this, we plan to collect more data and get back to you
-> afterwards. From my understanding, we still have an opportunity
-> to refine the CHAIN SIZE?
+> Not yet, but it might be worth trying. A key difference between servers and
+> Android phones is that phones have millions of different applications
+> downloaded from the Google Play Store or other sources.
 
-Do you mean changing the value?  It's configurable.
+Maybe yes maybe not, I don't know.  It could be that that 99% of users
+use the same 1% apps out of those millions.
 
-> Essentially, each small object might cause some waste within the
-> original PAGE_SIZE. Now, with 4 * PAGE_SIZE, there could be a
-> single instance of waste. If we can manage the ratio, this could be
-> optimized?
+> In this case, would using a dictionary be a feasible approach? Apologies
+> if my question seems too naive.
 
-All size classes work the same and we merge size-classes with equal
-characteristics.  So in the example above
+It's a good question, and there is probably only one way to answer
+it - through experiments, it's data dependent, so it's case-by-case.
 
-		395 13056
-		404 13632
+> On the other hand, the advantage of a pre-trained user dictionary
+> doesn't outweigh the benefits of large block compression? Can’t both
+> be used together?
 
-size-classes #396-403 are merged with size-class #404.  And #404 size-class
-splits zspage into 13632-byte chunks, any smaller objects (e.g. an object
-from size-class #396 (which can be just one byte larger than #395
-objects)) takes that entire chunk and the rest of the space in the chunk
-is just padding.
-
-CHAIN_SIZE is how we find the optimal balance.  The larger the zspage
-the more likely we squeeze some space for extra objects, which otherwise
-would have been just a waste.  With large CHAIN_SIZE we also change
-characteristics of many size classes so we merge less classes and have
-more clusters.  The price, on the other hand, is more physical 0-order
-pages per zspage, which can be painful.  On all the tests I ran 8 or 10
-worked best.
-
-[..]
-> > another option might be to just use a faster algorithm and then utilize
-> > post-processing (re-compression with zstd or writeback) for memory
-> > savings?
->
-> The concern lies in power consumption
-
-But the power consumption concern is also in "decompress just one middle
-page from very large object" case, and size-classes de-fragmentation
-which requires moving around lots of objects in order to form more full
-zspage and release empty zspages.  There are concerns everywhere, how
-many of them are measured and analyzed and either ruled out or confirmed
-is another question.
+Well, so far the approach has many unmeasured unknowns and corner
+cases, I don't think I personally even understand all of them to begin
+with.  Not sure if I have a way to measure and analyze, that mTHP
+swapout seems like a relatively new thing and it also seems that you
+are still fixing some of its issues/shortcomings.
