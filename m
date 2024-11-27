@@ -1,122 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5038143C69
-	for <linux-block@vger.kernel.org>; Wed, 27 Nov 2024 05:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260DA144D0A
+	for <linux-block@vger.kernel.org>; Wed, 27 Nov 2024 05:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732687172; cv=none; b=SKBk1AnFOqj37BEjOueDv6urfzg8NnGlbip1Fk8x1IXBY7kOTUHb2SaMSPNBAfZHDy99J+Nz6m6ROHq8MztT0inJV5FnQWX1hkEFRXxzQ/zI+aBiHSzuRdjfig5B2t2QgiB2C7JFNOUz1Jo5dike9yWP7YUTp4YDFOAWuHumKTg=
+	t=1732687173; cv=none; b=ZMwyHq7pFdZt151UpqMJJgPRDH9YPHSx1zeBtwDQz50eHh5Mh3nJuj3bqAG1WhFEt3O6NiOBs8nJFDukPNSyqhdlL7frRL1pvlDqAMjyD8NMT24wA3WoJp1YDg9UPRLm09Z4K32Agb2HGB8JgBFA3Id4SHpxvTMjNyJHoCJYUEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732687172; c=relaxed/simple;
-	bh=2xLVoQahYDG/Yy0AV3UFbWueQ8rm1/faUzaNAFbsF1U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NRm156NOYGsXQ8bn/VkUs2pupsv92Dj44sjHlPpvWUCsFS+y0h22gjIf04m2KcKZu0+H3uadBIJbKwDA2h9HGW/WE2jfL1FnJB7tcP1XpGC3F0EdkWDIoUsU+CkasamNc9WjY/59BEhJOzBfR3EKbUJ893XpcAtqXTf4t8VwaEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S6Ui+qa2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S6Ui+qa2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732687169;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o/fjIUkQ27yd9Z8Hs7Zp53yDHC5wrDnKDcAqHCnJGWY=;
-	b=S6Ui+qa299TYQR6gAAH8hidszYvW1Smlo//rvAyzgB4ajUxlR4D6bwFZgIAeaU5tUTlVVW
-	6b1GoGclD328zgH3t4BZstTLX2GKyOLZLIU0DbLygJKAbZ0qQ/U8Lm7fRVuKTIRJ+ccO0j
-	mpHaUiQo4cj5ZvHlOjOrByQA/a1YKgI=
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
- [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-258-HhOjGBo5PH-wVPF_iZ2LIA-1; Wed, 27 Nov 2024 00:59:27 -0500
-X-MC-Unique: HhOjGBo5PH-wVPF_iZ2LIA-1
-X-Mimecast-MFC-AGG-ID: HhOjGBo5PH-wVPF_iZ2LIA
-Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-4a46b27749eso1893420137.0
-        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 21:59:27 -0800 (PST)
+	s=arc-20240116; t=1732687173; c=relaxed/simple;
+	bh=EM36v8ghERBtXXNw/SzJc/eIWdVY+FWna6XekeNhXl4=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=M9ITPpjrCwHQviaQPDU5i2VURR4XHEwIvAalw2w0MwtB6y0BTR1k7bxSI92hBsrp/pYr0KiUA2o+tqkOFJJ1EAl0wFWWuGuZBTaVd7pHKLsAvhtmkceLw8Vk13LYXaEvOKVe+sm0KrnFD4lv4RnyASwHjh31ol+xdwRcPbQB2j4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a77085a3d7so4699555ab.1
+        for <linux-block@vger.kernel.org>; Tue, 26 Nov 2024 21:59:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732687166; x=1733291966;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o/fjIUkQ27yd9Z8Hs7Zp53yDHC5wrDnKDcAqHCnJGWY=;
-        b=k/rZz5dGApG90tXSCR9VtRUv4WlF1ckNgX1z0j2VnB7oUZL7w1gL6hGh3YSGCtjEjA
-         GvTkmbAuwSCJEMZChBrtkv7zQOUxfhTOX22ajLFSmE+6xSZasveMw6ZnyO52oaS37jS4
-         4iSYs6wLM3IcIfzobfDyhbvs+7mpy3a3aNOFRABTedHbTK+ChQIm+pyBuWvX417vMbtf
-         P8iYw5qMXlGHSU3KDVvM6ywKuv9NEoo9n6QNjgm9eh9caLCflHtFRPfTTcaICN78suyM
-         iifBeciep+SWzI2SnFF9fMuzRt3lVQQdACsUZHzONKIAu8AHdDyOoGMBQ5iAw6DZaRU/
-         AkDg==
-X-Forwarded-Encrypted: i=1; AJvYcCXRlXmggBEqR8MYo7heyNznI1cNn6GMbyNglJNmVL+WqDdZxDZciY/w8P6kUtu7kLKjESnKRAakSVw3ig==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQ3QPMuE5x5Fe1Ugwq9aKPP0Cg/oBy3vg4eeHqUFQEmnEjF7az
-	UL5y6Q1sIyOUr+aF3N96ySlNabrTcP+KhzOIETgBRABZVE5HnQ0KIktjxOpXm+EHCiR0M6NbTUP
-	HT8uLjdT9aewufa259y7pL7+WGZT62CYKdBKWTnqSUI6XqpwnwRa7mfvBEoUGMYnUbdcNkXboMD
-	o0HvzEiDLFkHZWLC+xI/vEG5LzbTtGS/HqMp3jaYS2AeZFps/m
-X-Gm-Gg: ASbGnculTXnSzcytRCHqXfUn21BlWpvqPG3nIulU1ER30M7mZ2DCKrwTyi1duc0bz88
-	r+omermnd+i93Z1V1u+jAy6UgpEQVj5G1
-X-Received: by 2002:a05:6102:f0a:b0:4af:3f3c:515d with SMTP id ada2fe7eead31-4af447ba11amr2730466137.4.1732687166719;
-        Tue, 26 Nov 2024 21:59:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH2TQ15E4W1Ojy9i9gQaYjKOCM7Cc7smqBFyBhqtgupb5Nxx5IMgBRjxp6hWjbGXcqRPwQNKJwsG7sA0LlUiwk=
-X-Received: by 2002:a05:6102:f0a:b0:4af:3f3c:515d with SMTP id
- ada2fe7eead31-4af447ba11amr2730459137.4.1732687166533; Tue, 26 Nov 2024
- 21:59:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732687171; x=1733291971;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:in-reply-to
+         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rTovsUnFQLNpXr4OQ1i7aG29GnjFVAgjz5nr+IKaBLE=;
+        b=Na2v/VMMAuXvOcLxi+vFJ6KiSgWaXmwvxgswQUJDx3LALCjui6zW3iZE6jU1jQB8Nc
+         z3I9NY4zQfFJV5e1ONN7S5B/ccAsriyGMaK+16qKhZdRVLHc0gvLpKGkdXkGF4AX7g0z
+         VQVRAMkA8PipSz5Bj6HRhn8Qrgl4ZRB2dBL6mKdC1CgU7G2qhJzp1yI7wi8wpVG8hmhh
+         zKHGw0NXfKTSs6ASck7MatVUwynQQMaq2rupeOjGk40SgyT9PbwMLk5RGUXwa1FgSb29
+         tIUM06LaQKqKVmJBhh8kmAf0BZvzPqogXBBlWntd23oJP5NHnPdSI0c4ITT2owBx2XI3
+         yOEA==
+X-Forwarded-Encrypted: i=1; AJvYcCVqZmu9ALdv9C31TZeqNXekXd71jtu9jSDLq9Ly3evdumrxzC1cBbOqueCEFKrdM2jaPjplnb2JpsfhYg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfjA6+0aGyBsDXozLG4cyoee9H1Qn3ygRlIN/CFkLOt1ihvutn
+	JOUARsXJNZRdHOnhLsY2Cs6qnKR1dAoxsLD5z677bL36FVpH3o6+xZexb4ot9U2+2FIhqITI2We
+	gqGVwpsrgoGuWXsI1DXNzwVvipBUulsGOTqj61MMqPOPKZb0Tvrq8SkI=
+X-Google-Smtp-Source: AGHT+IFzmOZzVVt14aLz9y/fopTi8rjINh8cnqihEFxUBARGCm9hLP3FW3unHyZseo9uSZGyo0dKUY3YDbMj0ewsYv8vrT6NIsAU
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6741f6b2.050a0220.1cc393.0017.GAE@google.com>
-In-Reply-To: <6741f6b2.050a0220.1cc393.0017.GAE@google.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Wed, 27 Nov 2024 13:59:15 +0800
-Message-ID: <CAFj5m9JTrOdETvLY=pO=6oXC6NXPumAPa82281qra0sfakjr=g@mail.gmail.com>
+X-Received: by 2002:a05:6e02:12c3:b0:3a7:c53e:a0ef with SMTP id
+ e9e14a558f8ab-3a7c53ea31bmr13932335ab.7.1732687171437; Tue, 26 Nov 2024
+ 21:59:31 -0800 (PST)
+Date: Tue, 26 Nov 2024 21:59:31 -0800
+In-Reply-To: <CAFj5m9JTrOdETvLY=pO=6oXC6NXPumAPa82281qra0sfakjr=g@mail.gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6746b543.050a0220.1286eb.0029.GAE@google.com>
 Subject: Re: [syzbot] [block?] possible deadlock in blk_mq_submit_bio
-To: syzbot <syzbot+5218c85078236fc46227@syzkaller.appspotmail.com>
+From: syzbot <syzbot+5218c85078236fc46227@syzkaller.appspotmail.com>
+To: ming.lei@redhat.com
 Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+	ming.lei@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 23, 2024 at 11:37=E2=80=AFPM syzbot
-<syzbot+5218c85078236fc46227@syzkaller.appspotmail.com> wrote:
+> On Sat, Nov 23, 2024 at 11:37=E2=80=AFPM syzbot
+> <syzbot+5218c85078236fc46227@syzkaller.appspotmail.com> wrote:
+>>
+>> Hello,
+>>
+>> syzbot found the following issue on:
+>>
+>> HEAD commit:    06afb0f36106 Merge tag 'trace-v6.13' of git://git.kernel=
+.o..
+>> git tree:       upstream
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=3D148bfec05800=
+00
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Db011a14ee4cb=
+9480
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=3D5218c85078236f=
+c46227
+>> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for =
+Debian) 2.40
+>> userspace arch: i386
+>>
+>> Unfortunately, I don't have any reproducer for this issue yet.
+>>
+>> Downloadable assets:
+>> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/=
+7feb34a89c2a/non_bootable_disk-06afb0f3.raw.xz
+>> vmlinux: https://storage.googleapis.com/syzbot-assets/aae0561fd279/vmlin=
+ux-06afb0f3.xz
+>> kernel image: https://storage.googleapis.com/syzbot-assets/faa3af3fa7ce/=
+bzImage-06afb0f3.xz
+> ...
 >
-> Hello,
+>> If the report is already addressed, let syzbot know by replying with:
+>> #syz fix: exact-commit-title
+>>
+>> If you want to overwrite report's subsystems, reply with:
+>> #syz set subsystems: new-subsystem
+>> (See the list of subsystem names on the web dashboard)
+>>
+>> If the report is a duplicate of another one, reply with:
+>> #syz dup: exact-subject-of-another-report
 >
-> syzbot found the following issue on:
->
-> HEAD commit:    06afb0f36106 Merge tag 'trace-v6.13' of git://git.kernel.=
-o..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D148bfec058000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Db011a14ee4cb9=
-480
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D5218c85078236fc=
-46227
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for D=
-ebian) 2.40
-> userspace arch: i386
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7=
-feb34a89c2a/non_bootable_disk-06afb0f3.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/aae0561fd279/vmlinu=
-x-06afb0f3.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/faa3af3fa7ce/b=
-zImage-06afb0f3.xz
-...
+> #syz test: https://github.com/ming1/linux v6.13/block-fix
 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
->
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
+This crash does not have a reproducer. I cannot test it.
 
-#syz test: https://github.com/ming1/linux v6.13/block-fix
-
+>
