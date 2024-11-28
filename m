@@ -1,181 +1,164 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1356134BD;
-	Thu, 28 Nov 2024 05:50:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAE014BF92;
+	Thu, 28 Nov 2024 08:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732773036; cv=none; b=IbNhNxRY7hMTihUrv7BuNbiDsXHGf39UHpXa5rduJ5j7ynY5h6WhLuHz9arxNoz+xa3bGr3jvepl7oHihJqakCuuNgUZ8YqerFb5TLnKUDWi7EI36A9WLrSi6BHCUt9ZdCU7FAoj2hLPzAqKsGyjfrkZZCHfGowZ6Gc3ozE7fdY=
+	t=1732783916; cv=none; b=LbogJqZF67/rrMTVF5XX0i0F3CB9SJsL3YPYaVCherYApewDtofP2SP8AVj5//E4xKdn5pDSdvgAGpc6QWbFcfsDYsXcjeBmeGPdVbkApLQna6lrpFPpet2s8IzqSnJ1FXSZ4kwFopRNCnnmUKbI6r5G3CB5RtaTrFjYTtLX7n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732773036; c=relaxed/simple;
-	bh=jy02W4fUSO/ynBhM1FmXmxBPyqudopqiVK8oLXZwHgY=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-version:Content-type; b=Uu16RnZ9wzWHSmfGjQpm2F06NOuXieJTcdAxW5+VeUyQh3kqzAUvvcdYOtPq2LL9kwKwBHTeNxPOjtF0VninVIJS2z0fJPp+iGq3sFwvb6fHrswK8uDDKECO6f5O833Xzm+MV7fZg48o4neeF//Id7PEnzggZhAbebgChjJPKR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZF5ATNJ7; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1732783916; c=relaxed/simple;
+	bh=IvK1zy/sYlcAsuAagh9WHWt5pI9LVrBWaIhMoNQD9O4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iGcWJ+DduiJJ7YnagSbbDXEAVdwu2frrAnzIJJW1TFsciwt6rHH+Zy6dHc5eYWK6CPNlwmZmNf+qT9phMhsShHNCQLfQHOrC8jDYaaBA/L3C7Gf8WWJtqZreIbYNJZQz2DufJPHfzej3+2RI+Z+Bp/LSUTsXuNT3lRBf7ABOWK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=huPUraNV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZF5ATNJ7"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2eb1433958dso352003a91.2;
-        Wed, 27 Nov 2024 21:50:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732773034; x=1733377834; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:message-id:date
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JLjeQx75L3lYmciLRB+c43uodhAABK8j/Hm5E1oeO90=;
-        b=ZF5ATNJ7vivdlYfQlTUkIEigKH4qkCiW7aoX1AVt6N28sFMqTwNzAwsrwPtTm3cR4F
-         0uv2olTsxREnCg5v9V30ptbMQybhrUXPr9K19lNbxa9EKm9xGXiswRbUsP4tK7N54ycv
-         5lf+QlxsMLBcBeMy/HqsdFy5dT2w+OYidO5qSy+AYrToGDOHZXSiTFRsxX6FZ5N4kFdp
-         XGNcVil/+XXLRYw5BR5KINCvMXBWH9DxxdWpvstgB27O4izcBLn/rXV8+SLHjXAAx7k2
-         +pKqgdjtFp5akFjIY+oY99PiQXXjRvZ6lc81G2KiUmjjWY/a5PRCfvzlAkoBVhfcF6Gg
-         Z5hA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732773034; x=1733377834;
-        h=content-transfer-encoding:mime-version:references:message-id:date
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JLjeQx75L3lYmciLRB+c43uodhAABK8j/Hm5E1oeO90=;
-        b=kFGdU+6v6b+ObHoQc6h9hQGbhCBC0dLolrAoRkLBG1WJzWW5+zsPkSjRY/ooninF7o
-         F22z/s0hIZN3PwPB32UIWBW8smxBYakREFfZdNsUmwG8zCVzeSK6mFlejycKMFNYmPh3
-         a+Rxo13FC3aVK/slJpBPJxnddp1ezdQNSIGD9USuihVcHIQzPtU1rjo9NLhZKoDLBz2G
-         dqOlNc6GY0dHZk2fYpUOPTkcEh3Kwcj/hkO8akzeNTcHaC6Ai2CYKgYnpHWOC2tBA26k
-         WhUcvP4xUK9GRdLOQiIfK4qMf+wIdZ5vigNCm1NsQgDEzVrVkB4P1eGZNYL+2mCtk/Wb
-         9uPg==
-X-Forwarded-Encrypted: i=1; AJvYcCUD6GnKTwsC2ATMjK8JZGXScEn8EikyMspCw8pLyT1YfRB/akyxeFM0EUKAMzZuKz1A6BacEqg9CxXyPDMG@vger.kernel.org, AJvYcCUYYbupx0JUr+OHtT0V7lLwIIas0/4h4lwIIjfrKg47L/pJYS1a9Vt3KcKV4WBUkud+nAJKCLFRfCwISg==@vger.kernel.org, AJvYcCVU78qt0RIccRNDXBKd6/yw8PKYXlWqX4rb+Qf+z6hwXNCR5urku0SzeI7hq3eBSrMRuRSC6DVVdEg+Nyc2CA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh/0DraHbpDjQHVqeBFfZ/fssKGzxWLfeg9I8Z0mM6QRSzDzJd
-	Tcy9n7/tqEyOmdeXxCf4ds7avMP1sE63iFVeZkwpd1YfsN5pS6VD
-X-Gm-Gg: ASbGncsnE+V6uZw1DyMoLVzzy3tE0PW9Tx/CCH8Kynxn6Td80Y7T6WcGpPJe2fLUSqC
-	sONv2sq+esH1MyBpjD1FpYQFu5u/VIklxfgqwoNi4zk5UNS9QvVQ+1j7FuCJvRVTtlkSc0RP5Ze
-	JUYo4d9GZ6zTyDHP5mSUmXlqlPTtZsZHfrV17X68evV8cBKchRhSjaJwF9BNjIpPsT211QA5fPR
-	paG6M6XM80KBaaSUshjCKGFa7JAR4VlhvpR3LNZg0U=
-X-Google-Smtp-Source: AGHT+IGvcaRwwg7Z6lX7Dj/twWMoZA67eSUPjEvK6r1tl4fqPwjizLPoPiL2oxPD3RSEg5ww+ZcLUQ==
-X-Received: by 2002:a17:90b:4b82:b0:2ea:7329:46 with SMTP id 98e67ed59e1d1-2ee08e9f0c6mr8602080a91.5.1732773033915;
-        Wed, 27 Nov 2024 21:50:33 -0800 (PST)
-Received: from dw-tp ([171.76.82.126])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ee2b22dd01sm588999a91.27.2024.11.27.21.50.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Nov 2024 21:50:33 -0800 (PST)
-From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
-To: Jan Kara <jack@suse.cz>, Mateusz Guzik <mjguzik@gmail.com>
-Cc: Bharata B Rao <bharata@amd.com>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, nikunj@amd.com, willy@infradead.org, vbabka@suse.cz, david@redhat.com, akpm@linux-foundation.org, yuzhao@google.com, axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz, joshdon@google.com, clm@meta.com
-Subject: Re: [RFC PATCH 0/1] Large folios in block buffered IO path
-In-Reply-To: <20241127120235.ejpvpks3fosbzbkr@quack3>
-Date: Thu, 28 Nov 2024 11:10:35 +0530
-Message-ID: <87plmf3oh8.fsf@gmail.com>
-References: <20241127054737.33351-1-bharata@amd.com> <CAGudoHGup2iLPUONz=ScsK1nQsBUHf_TrTrUcoStjvn3VoOr7Q@mail.gmail.com> <CAGudoHEvrML100XBTT=sBDud5L2zeQ3ja5BmBCL2TTYYoEC55A@mail.gmail.com> <20241127120235.ejpvpks3fosbzbkr@quack3>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="huPUraNV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13FE4C4CECE;
+	Thu, 28 Nov 2024 08:51:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732783915;
+	bh=IvK1zy/sYlcAsuAagh9WHWt5pI9LVrBWaIhMoNQD9O4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=huPUraNVdlRnc/8SRCQCbFMy8iYIjMB3PAVtxdtrPxXEKBIuk8JVyvQSXKpsyKWuo
+	 SvcCUUNE7HC9Ow0pgQqrcSsjRWVD1P/g2f9kgyvtxjXhKVQQl/WoCSjhSVqKvly84z
+	 +qbNSYVsjzMQgKzuLerNaymQkOu7/fWI3nFulGMiuFWVjbrMT24B6c3AJbjRYBI9+k
+	 2CtCUhK0Q8s7rUZJyzmT8ZAu2XK9xcYNoRWhvchpzCiitbGPplCghEKZHDly179oyw
+	 92xIUGP8xGw+tApw4velQg0xPNtB+McQCWkzpwfXXOLdLYy+5+ZsUJFbkvIjOuZIee
+	 lCIVOIxNTujeQ==
+Message-ID: <9e9ca761-6356-4a97-a314-d08bd5ea0916@kernel.org>
+Date: Thu, 28 Nov 2024 17:51:52 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv10 0/9] write hints with nvme fdp, scsi streams
+To: "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Bart Van Assche <bvanassche@acm.org>
+Cc: Nitesh Shetty <nj.shetty@samsung.com>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Matthew Wilcox <willy@infradead.org>, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "joshi.k@samsung.com" <joshi.k@samsung.com>
+References: <20241105155014.GA7310@lst.de> <Zy0k06wK0ymPm4BV@kbusch-mbp>
+ <20241108141852.GA6578@lst.de> <Zy4zgwYKB1f6McTH@kbusch-mbp>
+ <CGME20241108165444eucas1p183f631e2710142fbbc7dee9300baf77a@eucas1p1.samsung.com>
+ <Zy5CSgNJtgUgBH3H@casper.infradead.org>
+ <d7b7a759dd9a45a7845e95e693ec29d7@CAMSVWEXC02.scsc.local>
+ <2b5a365a-215a-48de-acb1-b846a4f24680@acm.org>
+ <20241111093154.zbsp42gfiv2enb5a@ArmHalley.local>
+ <a7ebd158-692c-494c-8cc0-a82f9adf4db0@acm.org>
+ <20241112135233.2iwgwe443rnuivyb@ubuntu>
+ <yq1ed38roc9.fsf@ca-mkp.ca.oracle.com>
+ <9d61a62f-6d95-4588-bcd8-de4433a9c1bb@acm.org>
+ <yq1plmhv3ah.fsf@ca-mkp.ca.oracle.com>
+ <8ef1ec5b-4b39-46db-a4ed-abf88cbba2cd@acm.org>
+ <yq1jzcov5am.fsf@ca-mkp.ca.oracle.com>
+ <7835e7e2-2209-4727-ad74-57db09e4530f@acm.org>
+ <yq1ed2wupli.fsf@ca-mkp.ca.oracle.com>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <yq1ed2wupli.fsf@ca-mkp.ca.oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Jan Kara <jack@suse.cz> writes:
+On 11/28/24 11:09, Martin K. Petersen wrote:
+> 
+> Bart,
+> 
+>> What if the source LBA range does not require splitting but the
+>> destination LBA range requires splitting, e.g. because it crosses a
+>> chunk_sectors boundary? Will the REQ_OP_COPY_IN operation succeed in
+>> this case and the REQ_OP_COPY_OUT operation fail?
+> 
+> Yes.
+> 
+> I experimented with approaching splitting in an iterative fashion. And
+> thus, if there was a split halfway through the COPY_IN I/O, we'd issue a
+> corresponding COPY_OUT up to the split point and hope that the write
+> subsequently didn't need a split. And then deal with the next segment.
+> 
+> However, given that copy offload offers diminishing returns for small
+> I/Os, it was not worth the hassle for the devices I used for
+> development. It was cleaner and faster to just fall back to regular
+> read/write when a split was required.
+> 
+>> Does this mean that a third operation is needed to cancel
+>> REQ_OP_COPY_IN operations if the REQ_OP_COPY_OUT operation fails?
+> 
+> No. The device times out the token.
+> 
+>> Additionally, how to handle bugs in REQ_OP_COPY_* submitters where a
+>> large number of REQ_OP_COPY_IN operations is submitted without
+>> corresponding REQ_OP_COPY_OUT operation? Is perhaps a mechanism
+>> required to discard unmatched REQ_OP_COPY_IN operations after a
+>> certain time?
+> 
+> See above.
+> 
+> For your EXTENDED COPY use case there is no token and thus the COPY_IN
+> completes immediately.
+> 
+> And for the token case, if you populate a million tokens and don't use
+> them before they time out, it sounds like your submitting code is badly
+> broken. But it doesn't matter because there are no I/Os in flight and
+> thus nothing to discard.
+> 
+>> Hmm ... we may each have a different opinion about whether or not the
+>> COPY_IN/COPY_OUT semantics are a requirement for token-based copy
+>> offloading.
+> 
+> Maybe. But you'll have a hard time convincing me to add any kind of
+> state machine or bio matching magic to the SCSI stack when the simplest
+> solution is to treat copying like a read followed by a write. There is
+> no concurrency, no kernel state, no dependency between two commands, nor
+> two scsi_disk/scsi_device object lifetimes to manage.
 
-> On Wed 27-11-24 07:19:59, Mateusz Guzik wrote:
->> On Wed, Nov 27, 2024 at 7:13 AM Mateusz Guzik <mjguzik@gmail.com> wrote:
->> >
->> > On Wed, Nov 27, 2024 at 6:48 AM Bharata B Rao <bharata@amd.com> wrote:
->> > >
->> > > Recently we discussed the scalability issues while running large
->> > > instances of FIO with buffered IO option on NVME block devices here:
->> > >
->> > > https://lore.kernel.org/linux-mm/d2841226-e27b-4d3d-a578-63587a3aa4f3@amd.com/
->> > >
->> > > One of the suggestions Chris Mason gave (during private discussions) was
->> > > to enable large folios in block buffered IO path as that could
->> > > improve the scalability problems and improve the lock contention
->> > > scenarios.
->> > >
->> >
->> > I have no basis to comment on the idea.
->> >
->> > However, it is pretty apparent whatever the situation it is being
->> > heavily disfigured by lock contention in blkdev_llseek:
->> >
->> > > perf-lock contention output
->> > > ---------------------------
->> > > The lock contention data doesn't look all that conclusive but for 30% rwmixwrite
->> > > mix it looks like this:
->> > >
->> > > perf-lock contention default
->> > >  contended   total wait     max wait     avg wait         type   caller
->> > >
->> > > 1337359017     64.69 h     769.04 us    174.14 us     spinlock   rwsem_wake.isra.0+0x42
->> > >                         0xffffffff903f60a3  native_queued_spin_lock_slowpath+0x1f3
->> > >                         0xffffffff903f537c  _raw_spin_lock_irqsave+0x5c
->> > >                         0xffffffff8f39e7d2  rwsem_wake.isra.0+0x42
->> > >                         0xffffffff8f39e88f  up_write+0x4f
->> > >                         0xffffffff8f9d598e  blkdev_llseek+0x4e
->> > >                         0xffffffff8f703322  ksys_lseek+0x72
->> > >                         0xffffffff8f7033a8  __x64_sys_lseek+0x18
->> > >                         0xffffffff8f20b983  x64_sys_call+0x1fb3
->> > >    2665573     64.38 h       1.98 s      86.95 ms      rwsem:W   blkdev_llseek+0x31
->> > >                         0xffffffff903f15bc  rwsem_down_write_slowpath+0x36c
->> > >                         0xffffffff903f18fb  down_write+0x5b
->> > >                         0xffffffff8f9d5971  blkdev_llseek+0x31
->> > >                         0xffffffff8f703322  ksys_lseek+0x72
->> > >                         0xffffffff8f7033a8  __x64_sys_lseek+0x18
->> > >                         0xffffffff8f20b983  x64_sys_call+0x1fb3
->> > >                         0xffffffff903dce5e  do_syscall_64+0x7e
->> > >                         0xffffffff9040012b  entry_SYSCALL_64_after_hwframe+0x76
->> >
->> > Admittedly I'm not familiar with this code, but at a quick glance the
->> > lock can be just straight up removed here?
->> >
->> >   534 static loff_t blkdev_llseek(struct file *file, loff_t offset, int whence)
->> >   535 {
->> >   536 │       struct inode *bd_inode = bdev_file_inode(file);
->> >   537 │       loff_t retval;
->> >   538 │
->> >   539 │       inode_lock(bd_inode);
->> >   540 │       retval = fixed_size_llseek(file, offset, whence,
->> > i_size_read(bd_inode));
->> >   541 │       inode_unlock(bd_inode);
->> >   542 │       return retval;
->> >   543 }
->> >
->> > At best it stabilizes the size for the duration of the call. Sounds
->> > like it helps nothing since if the size can change, the file offset
->> > will still be altered as if there was no locking?
->> >
->> > Suppose this cannot be avoided to grab the size for whatever reason.
->> >
->> > While the above fio invocation did not work for me, I ran some crapper
->> > which I had in my shell history and according to strace:
->> > [pid 271829] lseek(7, 0, SEEK_SET)      = 0
->> > [pid 271829] lseek(7, 0, SEEK_SET)      = 0
->> > [pid 271830] lseek(7, 0, SEEK_SET)      = 0
->> >
->> > ... the lseeks just rewind to the beginning, *definitely* not needing
->> > to know the size. One would have to check but this is most likely the
->> > case in your test as well.
->> >
->> > And for that there is 0 need to grab the size, and consequently the inode lock.
->> 
->> That is to say bare minimum this needs to be benchmarked before/after
->> with the lock removed from the picture, like so:
+And that also would allow supporting a fake copy offload with regular read/write
+BIOs very easily, I think. So all block devices can be presented as supporting
+"copy offload". That is nice for FSes.
+
+> 
+>> Additionally, I'm not convinced that implementing COPY_IN/COPY_OUT for
+>> ODX devices is that simple. The COPY_IN and COPY_OUT operations have
+>> to be translated into three SCSI commands, isn't it? I'm referring to
+>> the POPULATE TOKEN, RECEIVE ROD TOKEN INFORMATION and WRITE USING
+>> TOKEN commands. What is your opinion about how to translate the two
+>> block layer operations into these three SCSI commands?
+> 
+> COPY_IN is translated to a NOP for devices implementing EXTENDED COPY
+> and a POPULATE TOKEN for devices using tokens.
+> 
+> COPY_OUT is translated to an EXTENDED COPY (or NVMe Copy) for devices
+> using a single command approach and WRITE USING TOKEN for devices using
+> tokens.
+
+ATA WRITE GATHERED command is also a single copy command. That matches and while
+I have not checked SAT, translation would likely work.
+
+While I was initially worried that the 2 BIO based approach would be overly
+complicated, it seems that I was wrong :)
+
+> 
+> There is no need for RECEIVE ROD TOKEN INFORMATION.
+> 
+> I am not aware of UFS devices using the token-based approach. And for
+> EXTENDED COPY there is only a single command sent to the device. If you
+> want to do power management while that command is being processed,
+> please deal with that in UFS. The block layer doesn't deal with the
+> async variants of any of the other SCSI commands either...
 >
-> Yeah, I've noticed this in the locking profiles as well and I agree
-> bd_inode locking seems unnecessary here. Even some filesystems (e.g. ext4)
-> get away without using inode lock in their llseek handler...
->
 
-Right, we don't need an inode_lock() for i_size_read(). i_size_write()
-still needs locking for serialization, mainly for 32bit SMP case, due
-to use of seqcounts.
-I guess it would be good to maybe add this in Documentation too rather
-than this info just hanging on top of i_size_write()?
 
-References
-===========
-[1]:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/filesystems/locking.rst#n557
-[2]:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/linux/fs.h#n932
-[3]: https://lore.kernel.org/all/20061016162729.176738000@szeredi.hu/
-
--ritesh
+-- 
+Damien Le Moal
+Western Digital Research
