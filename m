@@ -1,190 +1,115 @@
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2052.outbound.protection.outlook.com [40.107.236.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B41D322B;
-	Thu, 28 Nov 2024 04:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732768666; cv=fail; b=AsBHdEDQWq1YjxBl5+HTZLarnO8celJ4o9UKzfGnffo+evRiFIW/9vtDUQIcT0z7AbPzei6YdkDUHNp4h8tDjghftgyPYLfpSmkJPST/O3G7JpO0wddJkaPjlCFpMaWoFVnPm6uWhGXU2sR3+nD+7Kz0odYIj+gTofoEKHLyUA8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732768666; c=relaxed/simple;
-	bh=5y2tk8EqIvjKpq4aD4lnHv+1sKTOHukBTFvaJa/yQn0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=d6WrbpUH2jVk0CRtDUOA7jPRxRG2hvLHz67FPFF7rn6yEs6NKL1QP6Z2uNsp/n2rajwey0eypa8YB4qjo2j/qM1zZ6REtYxquGunE2S/4VRRLazMdPqX3MS1Sml3A2F0q/eRDrURmUvWBHiEdLNzUJJykhZJyMdTc/Ys7RviXDs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MEXMCEib; arc=fail smtp.client-ip=40.107.236.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E519213D891
+	for <linux-block@vger.kernel.org>; Thu, 28 Nov 2024 04:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732768669; cv=none; b=fOSKJv9lEsW7Y6FpHECQ4w4aLAhCL+ea2ErTeL1NSfIM7VIaGp2jA/W8+JjeTqw+/3135mptiaTRcPehtJAkS2UNTU1NCye2C5SEyOo8hFdiiOXQAVy9LrWiSdf4KhFno/Avbhr8bWymPuK3ij4Y1G+kACIUrXSDTG8P6PIHQhc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732768669; c=relaxed/simple;
+	bh=tf9sSKbB9pqCRhDsRdvSz4cswSxBOC29e41WzRObwI4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FdJiE9LeSszhiMamK7r1fTemej+a7WPqPxG8shc5A71Aj7qRztTIiJUm+WdKg/5trty+moXNlsaEl4oL6Cv3SkJsunrTFFQtopfZy8xn+mwL2PatIDpFdiM5/pCQ8XnNvE7/k09COdCw48MQc/e/UYybbhuk4F8kJ4aThcIGyr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AtO0qyzh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MEXMCEib"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PlsxeaPepnlZLsNX7I5iy09zdvlNQVdrYGP/4KLIZo7W6iutYzITy+lauNut9Qot04qnYz0wg2sqdyhwC57oOiGNhhDJR0MPZpU9Efx2tbGSpSkN22OVHfyJWS0wGfCqybdJ7BI2DK8Pz/3bobh7IgXzO2GTfx+US+UkM0QQBytngg5hhvWh3bHBGpiHFCVf5czqeX3VVZYgdRofMhMxvlWCT8cielJx2gmVZQCyDSM7kXUHg15ijoKvAVLRJJvnw+8t6KuCj8bzjQIWTIwkirdM9jdamhFaVb0h3kS64pMKSJpIxMxK6NV7gZCas9BPurhzcpDHv3WH2uYIcRLvew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KayYo00ZMVvPQwg7iPsq6X5GTKLURylVM1dntaJWp+A=;
- b=jT3QJMfcphKJO23OpqW+l2mmZUejPXLnEREJioTqANL5vJa4PRdSGNp5xNnV24fR8XlOp0JIPazE/a1T2AVipVRmHOZI792FOccrYn9ewXmkbij9ubXD29VRwwml8RWwiaOpfL0b/kUZYGphuy/or06UznKTj53UwbGLbcO5AXgqHy8ucxlup5wT1hR1SUZByNDB8hEhZndSgyu5w19tik3Bp8b0Jdg+yMQbUgeoPuvY1bOidTyPzcXIM4/X6LnRiMDwe+2foo4v1k0xiwZ9yI6HaCDVCfAzBEWhieWwgC+OZjn4w/blGIjpaKhUUZBccyiXpVtiLXsi+qVzNp0kLw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KayYo00ZMVvPQwg7iPsq6X5GTKLURylVM1dntaJWp+A=;
- b=MEXMCEibQ/9JSuAsY6/kja3CxxqYYgP194Xvnjzv6tAhi7hVqR2bpJ9DH3FOTRjAlYijsiyCO6r0VnTZfpMoNBfAhRiBq8wr7Fc3g31kO0xQRc+Xr0dYuSdZjGroLhcgKZeNQW0fHSByynwPBG8IeL4O8QrgWkIIwdPzPrLGXDk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA1PR12MB6434.namprd12.prod.outlook.com (2603:10b6:208:3ae::10)
- by SN7PR12MB7130.namprd12.prod.outlook.com (2603:10b6:806:2a2::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.14; Thu, 28 Nov
- 2024 04:37:41 +0000
-Received: from IA1PR12MB6434.namprd12.prod.outlook.com
- ([fe80::dbf7:e40c:4ae9:8134]) by IA1PR12MB6434.namprd12.prod.outlook.com
- ([fe80::dbf7:e40c:4ae9:8134%4]) with mapi id 15.20.8182.018; Thu, 28 Nov 2024
- 04:37:40 +0000
-Message-ID: <e59466b1-c3b7-495f-b10d-77438c2f07d8@amd.com>
-Date: Thu, 28 Nov 2024 10:07:31 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/1] Large folios in block buffered IO path
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Mateusz Guzik <mjguzik@gmail.com>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, nikunj@amd.com, vbabka@suse.cz, david@redhat.com,
- akpm@linux-foundation.org, yuzhao@google.com, axboe@kernel.dk,
- viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz,
- joshdon@google.com, clm@meta.com
-References: <20241127054737.33351-1-bharata@amd.com>
- <CAGudoHGup2iLPUONz=ScsK1nQsBUHf_TrTrUcoStjvn3VoOr7Q@mail.gmail.com>
- <CAGudoHEvrML100XBTT=sBDud5L2zeQ3ja5BmBCL2TTYYoEC55A@mail.gmail.com>
- <3947869f-90d4-4912-a42f-197147fe64f0@amd.com>
- <CAGudoHEN-tOhBbdr5hymbLw3YK6OdaCSfsbOL6LjcQkNhR6_6A@mail.gmail.com>
- <5a517b3a-51b2-45d6-bea3-4a64b75dfd30@amd.com>
- <Z0fwCFCKD6lZVGg7@casper.infradead.org>
-Content-Language: en-US
-From: Bharata B Rao <bharata@amd.com>
-In-Reply-To: <Z0fwCFCKD6lZVGg7@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PNYP287CA0029.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:23d::32) To IA1PR12MB6434.namprd12.prod.outlook.com
- (2603:10b6:208:3ae::10)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AtO0qyzh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00321C4CED2;
+	Thu, 28 Nov 2024 04:37:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732768668;
+	bh=tf9sSKbB9pqCRhDsRdvSz4cswSxBOC29e41WzRObwI4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AtO0qyzhhda2mZe7GDK/baKg3yIxxMrUzy8i6wIfiVNQ5IYFXxFtxvWqV1lAR2B++
+	 P080q3JJSElxyRkkqGE3H2UxyJPDL8MrLn+G4G5eL0VQw2dg6cTreliS0KnHvWyFV2
+	 V3SRuUwEkfFeGEcazvmNwRxiIgYKylwBS35L+Kb/br448etszcJPrO10WuAIK8D7ZN
+	 3gz1okRpp5HxZPPQUdObmX4wnni1rVw6R7sA4t4tZl1KC/svoHkZzH8pECx7U1h6zQ
+	 FvHrsbhuN/DY7+LGsoZ9FPiK1CAn87TQCbnVeDtOj+AQAEZnY6p9fSmdqM8+FoT+kW
+	 VmVEn54PiwOOw==
+Message-ID: <16e543dd-c4e6-4f79-b401-8030d7ba1514@kernel.org>
+Date: Thu, 28 Nov 2024 13:37:46 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB6434:EE_|SN7PR12MB7130:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6f4deaa0-f9d8-47e2-73d0-08dd0f66647a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cWM3VFVGVTZRZ3hjMkRwWWFWazZzRDJyT0NDSDF4WSs2TG5PNGdYcTBCNzdy?=
- =?utf-8?B?SlhhVENKZGhsWkxnL0xTUENySVBUejRvNjVxSGxPVkJxY1hWck1TLzdNbFQx?=
- =?utf-8?B?VklkWlRualNOcG52bWUxdUhGRTUvbjVTRk5qVnVpajUyUWFjWkx4TVFuWU5H?=
- =?utf-8?B?VHZiSGtrbnpYcEM0ejliUThUYUp1Z1RIMTZ1ZnV2R0FaZGRFeUVNVVZrM3Vp?=
- =?utf-8?B?aDNxUTJjRXlMd3FSRWVWdzZCTmtZbDhvUFFZZDc5clVGL0xZT3dxK0hsTVBz?=
- =?utf-8?B?M214RHlIVDk0cTdSSnVMQ2lFMnlNdDc2N0xjYkUxNTNOQmxNeVJjZjFHMFNy?=
- =?utf-8?B?UkZmNmp2bmtWejd0eHFMRlZSWDQxdlJJTlgvWGFXTjBPeUl0bFRCeUNwdWk5?=
- =?utf-8?B?ZU1iaXFkRDljcDZLWStCVlZXZWRHRytNNndqMkpoWlNrcW5XcnRrcGZXM0dQ?=
- =?utf-8?B?b0t1SEgwcExYSEFPQlMrWnM0OFpvOXRqNzE0dHZtTXA1bHFkaFBXNG90QWRk?=
- =?utf-8?B?dGxvcDFNRnlnZ0lWK1NOQVF2dFdNb1FqMmtYMHR5d3J4RzFkMEhYYlFVMk56?=
- =?utf-8?B?aDN2UlR1KzhlWGhZbjlKNjNXcWd1MHdkeGk0bGVUaG1QL0g5RFIxMVZ0cjFM?=
- =?utf-8?B?WnBGV1FaMDQzamx2eEZHMy81aFp6TWFIcHJFa0k4VnozQVVNcDYzRmYvSmw3?=
- =?utf-8?B?c0M1bnpjZzNzQlRyVzZOTGR1blBWOE5ubUovYmJEVWhycnE4RkFpOUNONFFI?=
- =?utf-8?B?NHlLSmRCeWp2aXd4VEJJWjJMVlpWQUlBTW1qdVBPU3pucXVKNVllSkpxN2lq?=
- =?utf-8?B?bDUzNHJObTROVW9nWkFkOC81aTJFUis3RWtPQ2pXNktmNEUxUURnNXgzMmVY?=
- =?utf-8?B?VFUrcGdjYjM1emlkc3M0UVVvQjlUWEo2TVRyQVlsZ25vb1krLzcrdnoreDhS?=
- =?utf-8?B?R0dKc2hheXc0M3lCclFuL1ZzTVgzQVZOaFc3NXZYalpORUN3YkxSanJoekNS?=
- =?utf-8?B?Nm5kQ2ZlNGFtN2VsWnBVY2FZMFkwZGhEbStWeEY1VXBFb0I3QldJNXo1NU5H?=
- =?utf-8?B?MzQ1R2pzc05xREcvVVc2bFNEZVNqNGpjQ2pVdEFCRU5sYVJvcFd3SjhrS3ZZ?=
- =?utf-8?B?VHh3RTE5cEc0VXliZldXL3RoQzhrWExuYlZSbCthdHZxU0UrM0VhZkFub3Ro?=
- =?utf-8?B?WTN2ck82TEZvMTBCdWhEejd0RlRDZDV6dFZxK3o5ak9DOVFHOVUvQ1lxN09p?=
- =?utf-8?B?YjJXKzdHWjdmOEJIYmlTcGR4bms5cnhNaXlnVGdIb3RZdStWMGZDMlIreGhZ?=
- =?utf-8?B?dkNnVnlxdkY5TXlSWGRrMGNsQ1dMMnhpSkdrS1VVT1dHSUtNRnMvZEc2djFU?=
- =?utf-8?B?ejVWaTNnQmdCVFFWUklRZGErTkJkQ1BMcXFPenE4cnZ4Z1hCcjRuYXNsYURh?=
- =?utf-8?B?VytUTk96S0c1R0k1OUFpd0dxYlJSSjRmK2N3aDJ6SmNyYUhtRjFBOVdFTE9L?=
- =?utf-8?B?Zm1sbVdXRlB1VnBtUFJ2QTRWRzFEV0NObHVSWEJVeGw1YW9UcEphc1ZjQTJr?=
- =?utf-8?B?V3U0dXQyTE1BR2dkTUpPWmkxbml0anBndHc1Wmc5NFpYcGZEYzhLUkpZVmp1?=
- =?utf-8?B?ZjI0c1FhaCtkbHBtMG9uRitTMm96eXUrdW5IUzBpdm1hQXE1bEMyM2o3V0Rj?=
- =?utf-8?B?Sko5RXUza2dzYVRGK1ozZktDL1c1dXphb2JnQkdZbzViM1Z0a2dxazY3RXVQ?=
- =?utf-8?B?c2VsVDNxbVUzSTE5RStMclhxR1lmS0JOa1JMT25ERnZGbS9lKzBvcVdQKzVF?=
- =?utf-8?B?QnozTGdnVDE1K1Jjai81Zz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB6434.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SitxemlkRWFKWnB6V1dtVkFaMHJJdVhXWklsUlpLWWRwQUN2aENpczFlWS93?=
- =?utf-8?B?TE5sSG1NcEJkUkkvdlN6a3JZNE9EdjFtTmcwRnUxN3ZwSzgrSUV5MTJ3VjlH?=
- =?utf-8?B?Y1UyUWJrbk01b1YvZTlWZHJTU1NiRlBLMWpYcEdRck9TZXdpeEdPLy92cU9W?=
- =?utf-8?B?d2xLMU9WTTZTcHhhNHRnWkdjR3RDY2czTVM1VnV0MER2L0dRckNCc2szL3Vj?=
- =?utf-8?B?YmRWYnIwOGdtY2V0T081OGdjNlZYYnJDWm11R2VJSTFXNVVOSlFyUWtMK2o3?=
- =?utf-8?B?aU51TVlUSmlIKy9lZUdPUjh5K05FZFNkL2VMb0svK20vamFINXNwc084UDY1?=
- =?utf-8?B?UzJNREpnL0Q3R1plbW1tbE01NWIzMTgwdXF3L080Y0ozT21zdGpmd1RyWm0y?=
- =?utf-8?B?ZFVMWFpKbGt1eWFQSXdGQ3hBUUZOQjNWc1B3dVJjSm5ZZTJJdzF3SHU3Zllu?=
- =?utf-8?B?L0pjR0RhMjFiUGtrZGxVTVJ5aTQ4Z1dnbzV6cUVOVlZPZ0Zzd2hFUUlYeVc4?=
- =?utf-8?B?alMzd3Rub1NIS1dMT2drYzJyY2dlZjNXbU9WS05LK1hqZ1Q0QWk2cjI4WVpI?=
- =?utf-8?B?a2NZT3l2MWxLTnhob1dVUE9uWnpBK29ESS9mMStwQzA3a1ZocnJpSkFTK0xh?=
- =?utf-8?B?UkdySmRBTFExRDROQTdPRnVCT3pRMnVKcUcxMTdSMWJlZW1CdTdnWmZzMW5K?=
- =?utf-8?B?QVRVU3ZsTlhxV2FWK3NsTnhPL0JYUldmNmtnNThMVjNvVExRa1l1QlcyeTZD?=
- =?utf-8?B?dkIyejlvZ3lCTkcrdm5NUDhuZ2MxQXJHQm5HSFp6K1B0dXJYQW5DcmJsc01B?=
- =?utf-8?B?ZW5LcTFXU1NSV2FnejdyTmdyYTdIb1NOdlhhMlVFNlYydzE1OVZrNjRkMUFk?=
- =?utf-8?B?dUV0ZE9hOWQvMHkxcHVBNDQ1TjdUb053NU9FUXhCdEQ4dWdEbFdaYm9lM0Zy?=
- =?utf-8?B?WWE4NjRVUmFDSkpZK2NyS0ZlUVNKSHNoZnYvVk1VdUpYampuY29ScUozTk5l?=
- =?utf-8?B?NFd0ZjN2a3gzOVdEaVpRMFJGNnRPbnlGQVZQK0k0WmZzL3JaTE9vZmJYdVpo?=
- =?utf-8?B?eW1SRGxocFEyS0Q0anNnRmxBbXE0OEhCSmIrZDlMUVpOUnhzcktoOEVpUk9I?=
- =?utf-8?B?dW5ZTFNHSCtYYUxvTSs0RmNzSEVwSmJSYnViRUJkaEFHa3l1TmxaU2lPRURs?=
- =?utf-8?B?Q2ZpNk1oL2pJRE9wbVFibzdnNUlzOGFMbkNCYVQrZDNkVVlpdzcwamw4TmtU?=
- =?utf-8?B?MVZIZzZ5QmFjTVZmalMxVkdYNUhxS0hXdU1odVJCNkx0THJYTGcvOHRtQjlo?=
- =?utf-8?B?ZmFYVTJXV3B2WDJqQ1NsRnB2My9xTGVqdFlGN2U2TEZLbHdRUmNDMC93UU9Y?=
- =?utf-8?B?K1dia0N4QStVMnVObXlOVzY5L2FHNlM5SGRVRGJ3UnkrSUcrUmlrODhjd20x?=
- =?utf-8?B?M2VLNEo3VURJcnYvYmpiY2lVaHVnMDM5ZFJKWlNhS0h1TXJDeVZzOVBXRUJ6?=
- =?utf-8?B?Mnk4MWZITVZwZ1M3aWJEZHE5anpKRXFTV0Q2MVAwRUg0clZtZTE0ejlvNnkx?=
- =?utf-8?B?aUxpSXdkaXM0N080SXUzZEFWYWNiWUZJSlE0ODhvL0Jhcml3UzFsMXVDaWRj?=
- =?utf-8?B?RjcyVlVzWjE3RjVUMGhGVU95Sk5LT1NUNHNlU1JVMTlKZ2VNS1pTQ05Tc0hJ?=
- =?utf-8?B?OENHaXBKa3UyT2pDSW5WdlRyOXRNSTRHWHJIVWJtVzZrMTNtOXJIdzUvYVN5?=
- =?utf-8?B?MG8yVGRLVkF4RjVOc2tRbno5QnVURzJIN0IxNHA0cVd2YXczWXczTUVqb2V5?=
- =?utf-8?B?c00yamx4MUE5YWZPanRJRW1xUlk5QnZhei9vaFljNGphbkJyZ09tMHljaGIw?=
- =?utf-8?B?ZnMyOHRJc1FkcXh3S2tRR3hGUUk1NmhyVVo4bTRxZnpkSFlxdVR1YysxdmNy?=
- =?utf-8?B?QTZKQ1RRc2tGdVB4b21RSEx6V2w4TkdLOVZJOGpVNzFSQ2JtMjNhQ2F5SVZu?=
- =?utf-8?B?Vm1VbHNCWGd5dFJjbkVmSkFrZk1FYkFVWGp0dmNjSERRTEZMTzN3NlFwYWdO?=
- =?utf-8?B?d1dhbDhITTJrN0Rlam1ST3Zqd2l6YTF2Q09qWUh6YnJZc2tBTC9HSjZVYTh1?=
- =?utf-8?Q?shPlUtAkf1MkHxjHIEX8RQcEq?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f4deaa0-f9d8-47e2-73d0-08dd0f66647a
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB6434.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2024 04:37:40.6293
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: umJiLHFBsVUKJduEiLG2d05OYHRtaHvzIm8tycQFudsCu5CnWX43M4x4+m8yxBmDwAGlGDrg71oqiWs/SPX38A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7130
+User-Agent: Mozilla Thunderbird
+Subject: Re: [blktests] zbd/012: Test requeuing of zoned writes and queue
+ freezing
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Bart Van Assche <bvanassche@acm.org>,
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ linux-block@vger.kernel.org
+References: <Z0a9SGalQ5Sypfpf@infradead.org>
+ <9d224032-254f-4b4a-a667-d1538cdbf0dc@kernel.org>
+ <Z0bAHKD-j49ILtgv@infradead.org>
+ <52570aad-c191-4717-b91d-a555d9dfda96@kernel.org>
+ <Z0bIDopTmAaE_nxQ@infradead.org>
+ <0e2dc18f-d84e-4dcf-a5c2-134d579c480c@kernel.org>
+ <Z0bfKNMKhLkEHusz@infradead.org>
+ <3bc57ef3-4916-4bcf-ac1a-9efed89fc102@kernel.org>
+ <Z0dPn46YnLaYQcSP@infradead.org>
+ <2b7afce4-fa13-47b6-a3ed-722e0c11e79f@kernel.org>
+ <Z0fhc8i-IbxY6pQr@infradead.org>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <Z0fhc8i-IbxY6pQr@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 28-Nov-24 9:52 AM, Matthew Wilcox wrote:
-> On Thu, Nov 28, 2024 at 09:31:50AM +0530, Bharata B Rao wrote:
->> However a point of concern is that FIO bandwidth comes down drastically
->> after the change.
+On 11/28/24 12:20, Christoph Hellwig wrote:
+> On Thu, Nov 28, 2024 at 08:18:16AM +0900, Damien Le Moal wrote:
+>> The BIO that failed is not recovered. The user will see the failure. The error
+>> recovery report zones is all about avoiding more failures of plugged zone append
+>> BIOs behind that failed BIO. These can succeed with the error recovery.
 >>
->> 		default				inode_lock-fix
->> rw=30%
->> Instance 1	r=55.7GiB/s,w=23.9GiB/s		r=9616MiB/s,w=4121MiB/s
->> Instance 2	r=38.5GiB/s,w=16.5GiB/s		r=8482MiB/s,w=3635MiB/s
->> Instance 3	r=37.5GiB/s,w=16.1GiB/s		r=8609MiB/s,w=3690MiB/s
->> Instance 4	r=37.4GiB/s,w=16.0GiB/s		r=8486MiB/s,w=3637MiB/s
+>> So sure, we can fail all BIOs. The user will see more failures. If that is OK,
+>> that's easy to do. But in the end, that is not a solution because we still need
 > 
-> Something this dramatic usually only happens when you enable a debugging
-> option.  Can you recheck that you're running both A and B with the same
-> debugging options both compiled in, and enabled?
+> What is the scenario where only one I/O will fail?  The time of dust on
+> a sector failign writes to just sector are long gone these days.
+> 
+> So unless we can come up with a scenario where:
+> 
+>  - one I/O will fail, but others won't
+>  - this matters to the writer
+> 
+> optimizing for being able to just fail a single I/O seems like a
+> wasted effort.
+> 
+>> to get an updated zone write pointer to be able to restart zone append
+>> emulation. Otherwise, we are in the dark and will not know where to send the
+>> regular writes emulating zone append. That means that we still need to issue a
+>> zone report and that is racing with queue freeze and reception of a new BIO. We
+>> cannot have new BIOs "wait" for the zone report as that would create a hang
+>> situation again if a queue freeze is started between reception of the new BIO
+>> and the zone report. Do we fail these new BIOs too ? That seems extreme.
+> 
+> Just add a "need resync" flag and do the report zones before issuing the
+> next write?
 
-It is the same kernel tree with and w/o Mateusz's inode_lock changes to 
-block/fops.c. I see the config remains same for both the builds.
+The problem here would be that "before issuing the next write" needs to be
+really before we do a blk_queue_enter() for that write, so that would need to be
+on entry to blk_mq_submit_bio() or before in the stack. Otherwise, we endup with
+the write bio completing depending on the report zones, again, and the potential
+hang is back.
 
-Let me get a run for both base and patched case w/o running perf lock 
-contention to check if that makes a difference.
+But I have something now that completely remove report zones. Same idea as you
+suggested: a BLK_ZONE_WPLUG_NEED_WP_UPDATE flag that is set on error and an
+automatic update of the zone write plug to the start sector of a bio when we
+start seeing writes again for that zone. The idea is that well-behaved users
+will do a report zone after a failed write and restart writing at the correct
+position.
 
-Regards,
-Bharata.
+And for good measures, I modified report zones to also automatically update the
+wp of zones that have BLK_ZONE_WPLUG_NEED_WP_UPDATE. So the user doing a report
+zones clears everything up.
 
+Overall, that removes *a lot* of code and makes things a lot simpler. Starting
+test runs with that now.
+
+-- 
+Damien Le Moal
+Western Digital Research
