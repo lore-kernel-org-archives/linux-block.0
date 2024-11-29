@@ -1,69 +1,73 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341011474A7
-	for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 15:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDD1146A7A
+	for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 15:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732895005; cv=none; b=YCrDsOrsO8OHprg0VL1cdBwH8GJUPhnY6E5gYhWO38Bo3jnzx7Ly+cu5klGAjEQbqUEDMurpGmKNUr1R2B2xfSeqwKpzGeFo10aQbTIETIACvAHEkmaWVUmuKz1ahcIVIB+EOGu8peALnQgJ7GGwsNpSz2Z5mqMntgelkbJQfqA=
+	t=1732895081; cv=none; b=cS0711OlEwYrH8tlQK+F0IPn/OAJJNUQVh+CpARwu7JNCQOochP/Yyek8tYC8BmYuGK3iD265fzhY+kKki+Dxcb2wSZnnkFLacZc5/81ts7HHir7+pw0wJs9wG0HP0ivYHBhFIB3dnORwrIv2dfNJ1fiqOlidY/lSNy/8FZO7CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732895005; c=relaxed/simple;
-	bh=xYmKIbTZaq78vRUQAQIVFoBys4zuk0IRUj4hNQE3E/s=;
+	s=arc-20240116; t=1732895081; c=relaxed/simple;
+	bh=qvSY2i69MHb2x8oZak8wedpIpV/DBYzxn1FjcWjYZwY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=chj7swGJsJv7LszapogEGgk4a4f5I2/6QwZRIJ1PwNNAbSSVrrr2pmz8/9zcwKfnTHdb9ziPXE+cE/I76d6T3oFRSZidjCBteUU3DSY0TFMUrBhIFuk89RIIP9OqQSwp5SKs6MmiJ6ENA8sLxfHHqhWFCCIUrlhMFmF6KkkCXJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zAZucvHZ; arc=none smtp.client-ip=209.85.210.177
+	 MIME-Version:Content-Type; b=u8NvYy0cFi8ccgAot1pWg1yLrdUT9Fv6Q6BjdFe7X1c9wKwyFSugx2gVFLCZB0FrxgcSiaIUAlHsHcZoqvN4eauL1Z6Lyk0+46UkJgJxODrO76dLweGrNNBPAOydxfWPoNx6oHJz3sLfPGFlyxJeyrg69d7pUkjLFuOecwa6gOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=PoNLums7; arc=none smtp.client-ip=209.85.215.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zAZucvHZ"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7250844b0ecso1788651b3a.1
-        for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 07:43:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="PoNLums7"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7ee11ff7210so1436303a12.1
+        for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 07:44:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732895000; x=1733499800; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732895079; x=1733499879; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gFSYu9Eshs03U3sqGXLiOctfHIogy+fQwZGGk30D5GI=;
-        b=zAZucvHZMHHQ9eaW5TidCnk2SkD1b8oS4UMIzkUpTMZBr7uYgDV9V4/ztS3yNmuRSk
-         dsupiiplrPwyjk+yBxantlxjJaW7nSe7IoJeXF5LNG1nNIDxQ9VQfF4P5j/QbRABLD18
-         tDEx+En84x5WfnnlsJomFxVUkdTm6rh/3JeIWl4awbZ/Vr+OoaYTRQK4qDY7K/JCFaSh
-         Q9UhChBDv5wI6l+1zhFszSw1BBxgUlh+oBRO7DUWW1iDDcI2KOPajiqmBWbwQa59/MSy
-         /mt/J3dODZu6q83DbYRCQ9dcA620GR2ICTvGsF+QuTuLcXRXqP8iIimX1jHRuRq+D1fO
-         NFmA==
+        bh=U1jTuyrQRbvH+yCK9VE9KV/8tpfabseBlwcJXAjgtbo=;
+        b=PoNLums73prWAsMWvcGjbJPuzDIT6WSaa1m6if1T00CGGDUkzZvL59hWIflux8aC+K
+         +SlM1gSGFQZI9ORKBCaBpGj/7/kL1r8GLW+cM4aQG8oxxz3RYaltaJv1gG907phDCFju
+         1jbGhcCwXekAb7FGxblVh2sRlHcf+TVxPha3ecMaPDfoReW2rBChAV8P8LmRR6NkIieC
+         7+PDs51//0IKKSi0q+FdGrjpbogDmXDb+u6NhzFuaquEiU0xxGoAlE+BSeSY5cFKMIPa
+         y8bxzmcQ1RJRecUOHzEJGOk8SAR3G9bxdijNAv+gac4Ocfj3cXdQrei7LTY3UJBvIDV6
+         H44w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732895000; x=1733499800;
+        d=1e100.net; s=20230601; t=1732895079; x=1733499879;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gFSYu9Eshs03U3sqGXLiOctfHIogy+fQwZGGk30D5GI=;
-        b=T1dNAAp2/GY4aXjSzj7quR1kjsFUZvG+PFlDPreDPraURkx+muJ2bOk2JqJRf4ZxI4
-         PE1bayJKn8HgyTWwCTVIV56W+aIuzKBdbm7IAPSjWRPEYDZ8APmcdZ5r77ORMn7LGjm/
-         PNMwePo9xhTOsWEno+suAy0zJbpr/PxG/2VGpZv7lIGDptb6UQ90yFbTiC4Zu7lthXIQ
-         nKev5oo4kBibnmHTHXIjzwQendUPQMNcNMftjgDYDvXo+wOp+htnkzaRncnaWl8+md1U
-         g9wgY1GDQ/YP8rNnssBG7qIbdhSg1KUhMswbv9fkbfJGQpZQj+ioyJD7ysFCp+pkCLX0
-         7Lqg==
-X-Gm-Message-State: AOJu0YwKxUc4+JQLjnXRccsXY7lzNv0QCuWGWXgvMnLU0qZcfmI1nnwA
-	JUpPeVAhG01nTS7Sv5Ds6OoNjQy0yqVHMheCwR94qOBmArKIUNWBs1Vqc6CJORI=
-X-Gm-Gg: ASbGnctEKx0iQq59+yXY3S3RKV4CmlQCmGFVEDixLIrs3KedUL+8q0G/5sUgOzD9qIT
-	kzSXVUzY2NC7saNIuoGkDD1oMDyK/cKFMz/BKZwVPoQzresvUXnx+j7/d0spjFfmN6xSEAWZPAo
-	wGK1uJ6fgs2Xbb6SB38/5d96lu4IZfKcTUvVzO8poJm9rMTVUGa/itOL8K8oAZBuh3jlHZmCl/d
-	Z12oRdkjZuwONgt3p5x8s8Vk7V0UHxmgTubvCL4VA==
-X-Google-Smtp-Source: AGHT+IF0JthPLhtQASKq1yS4rBN61qQa/BJ7UOyCLt36fn8KvyOsNxjTguSP7fZBzIjUOX7fjO2Fig==
-X-Received: by 2002:a05:6a00:23cc:b0:724:e582:1a06 with SMTP id d2e1a72fcca58-7253003ea94mr15031350b3a.9.1732895000554;
-        Fri, 29 Nov 2024 07:43:20 -0800 (PST)
+        bh=U1jTuyrQRbvH+yCK9VE9KV/8tpfabseBlwcJXAjgtbo=;
+        b=B/3WvyfWHkv07S5+OXzMZZwibPA5dva13ClaE/w6D5EsLBlDbKQzhIgGct8Qfu5QGe
+         AjwMUZ4AsBLrhyzj4+ZA5WTbE8Gpdj+Xm1h1xq+bPn4SsOJ7TMzlix5uahwh64hTIc+z
+         8RRkBqZCQDHYKGzUxYBspi/G/RuFmt3jZTtpZB7fVJwr1tAW78G/gvgxuI8bZ6cvbEtK
+         e0M5LDiDPWs/PgfndSzB9j6dLzd5jKwrCIhxnQRjg5aw2EmOKMqGJUJyqJeVa8Iudabc
+         V4Le/ZurbfbFE6GM2XNLMtio5ipLJnQYlgPCSGqRMmYElXnOED6GXAEnUVfuTWQS1YNN
+         OviA==
+X-Forwarded-Encrypted: i=1; AJvYcCVzx6phT6WIq8BUUT9DYCmAH2qDu3CsHIGbVaGvW+GB+MGWh7ZVt3Abiz8IRJJfIbKGNHj7+KZg1G8Scw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7IXTkyeYI2+Z7d7OJgZYPyojtTY14vnOeI9rc8eN/s1Gi48l/
+	YDZCFathLbUU9qnUF8h4mJA9yzDuPocbzCj1tOwAmKFQYgn1QSgJ9aedsq/5mDM=
+X-Gm-Gg: ASbGncunLdYLcGH6NWU+cq05DNRp75fvAGJ1k2DR+yIn4co5Xe253DjepZ3ZevWeld+
+	uOw+je7PimFzesapEUVl90xmbVOi9FNlvfB+2rv2jx7MqFMfpzLF3rDjNfp03D3Qs45PRbiZvwc
+	Toco7Qi3UA3UfH1ZKQAhdaRhTpPK0D4QKAuRB9VYSgwe8U9dK76kqJR8sxqELqmnJgU+wQ4XYWf
+	ZxjPUSixwtnR/C0OxaaFqmQId22FN/eZ2IvyL4U6g==
+X-Google-Smtp-Source: AGHT+IEg7NVeKyqs0K98sbBSIkDWmQBzPqU2qFmbzoZtZ0e/ryuAJg8ATsu0pnHJH8SpjnApLDf61w==
+X-Received: by 2002:a05:6a20:2583:b0:1e0:c8d9:3382 with SMTP id adf61e73a8af0-1e0e0b8c5d1mr17335080637.45.1732895079241;
+        Fri, 29 Nov 2024 07:44:39 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fc9c2e2babsm3218898a12.22.2024.11.29.07.43.19
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fc9c385484sm3252382a12.59.2024.11.29.07.44.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Nov 2024 07:43:20 -0800 (PST)
+        Fri, 29 Nov 2024 07:44:38 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: yukuai3@huawei.com, jack@suse.cz, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- yi.zhang@huawei.com, yangerkun@huawei.com
-In-Reply-To: <20241129091509.2227136-1-yukuai1@huaweicloud.com>
-References: <20241129091509.2227136-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH] block, bfq: fix bfqq uaf in bfq_limit_depth()
-Message-Id: <173289499954.164764.13681710232652992672.b4-ty@kernel.dk>
-Date: Fri, 29 Nov 2024 08:43:19 -0700
+To: long.yunjian@zte.com.cn
+Cc: kbusch@kernel.org, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, mou.yi@zte.com.cn, zhang.xianwei8@zte.com.cn, 
+ cai.qu@zte.com.cn, xu.lifeng1@zte.com.cn, jiang.xuexin@zte.com.cn, 
+ jiang.yong5@zte.com.cn
+In-Reply-To: <20241128170056565nPKSz2vsP8K8X2uk2iaDG@zte.com.cn>
+References: <20241128170056565nPKSz2vsP8K8X2uk2iaDG@zte.com.cn>
+Subject: Re: [PATCH] brd: decrease the number of allocated pages which
+ discarded
+Message-Id: <173289507804.165299.4802226376466238974.b4-ty@kernel.dk>
+Date: Fri, 29 Nov 2024 08:44:38 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,20 +79,18 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-86319
 
 
-On Fri, 29 Nov 2024 17:15:09 +0800, Yu Kuai wrote:
-> Set new allocated bfqq to bic or remove freed bfqq from bic are both
-> protected by bfqd->lock, however bfq_limit_depth() is deferencing bfqq
-> from bic without the lock, this can lead to UAF if the io_context is
-> shared by multiple tasks.
+On Thu, 28 Nov 2024 17:00:56 +0800, long.yunjian@zte.com.cn wrote:
+> The number of allocated pages which discarded will not decrease.
+> Fix it.
 > 
-> For example, test bfq with io_uring can trigger following UAF in v6.6:
+> Fixes: 9ead7efc6f3f ("brd: implement discard support")
 > 
-> [...]
+> 
 
 Applied, thanks!
 
-[1/1] block, bfq: fix bfqq uaf in bfq_limit_depth()
-      commit: e8b8344de3980709080d86c157d24e7de07d70ad
+[1/1] brd: decrease the number of allocated pages which discarded
+      commit: 82734209bedd65a8b508844bab652b464379bfdd
 
 Best regards,
 -- 
