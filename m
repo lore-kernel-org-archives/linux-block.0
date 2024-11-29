@@ -1,90 +1,102 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BB914A0A4
-	for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 16:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5FF14B075
+	for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 16:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732896322; cv=none; b=jJy3xHHOMwxM7mxpC5kizWwkeUbZqyYxdmbSPJS8Gg+bVQNiXmLx2RoosSkSYOzNnuiHkLKsNjlBSM09jobP8X+Xw4p8oRoK2hvH4//lUZ3HxkTMC+IbBl09K4xTfpyU3/6veXNrHeMB5M6qhGIewDSA2hQnGly7vCQ9MFgUfJY=
+	t=1732896347; cv=none; b=IHPO+whT8uOyGqEzFK30x4QXZp9+IyIzWi5iBcYu6ZIFXad2lzNFadIl/oPAf3Zn4063rjZMBIrEh0WBbJleo5WA4SDNA0LRtAzwX2KaUqotnSh9mdy+ALCIiMDQTx9Q/pKPRSRhFSr/GbdI0zBdsv0Ail6/NHjr0SDMNOQozzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732896322; c=relaxed/simple;
-	bh=nEsxp/18XlojV7xxv+z1qsPSDIU2AJO74A3oRe6MsUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=VDlFT03qMqExNKYNRI4uxTdgEky+rSyXYxe4OafVNCDe3uydlnrV4JQUjZ4vEN170K9jtoslGlCdVRPoZzIPBEEvVqUxbJjrMVkHpzOLbA/hNa5c652NwlAIpJx9yaJk47DhS5n3nN+VaYOnWRZtCIDSBCoCIIkvEqEuB88qF0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=BPRXx32N; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1732896347; c=relaxed/simple;
+	bh=As/MSv+xoRhm+qluxK+si1wEhMytmUboEsGJtTw6GxA=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=YxDZMvg0dxK+eGzL+jszEftvgc2ICavEv9SVmjcDeU3yz9Zst77uysgYCKFpop8/yHTYLwEsssy/DGqoxY1QuKt7rxL8Ck57FSTffK8sOTn8P3ycCMIt0dTrIGA1KPyzicpTJtBdz+ZmCSCveUaLljD+FeN7ueEHcRq8z7lPlaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=XRCrfrUo; arc=none smtp.client-ip=209.85.215.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="BPRXx32N"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2127d4140bbso19283345ad.1
-        for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 08:05:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="XRCrfrUo"
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7fbd9be84bdso1513595a12.1
+        for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 08:05:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732896319; x=1733501119; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QDMgssOalwyZWOZXl7hrTVuU6/CuCfdxnlEES8/8jVI=;
-        b=BPRXx32NZB7EsTLftBVcz1z91+lwamHOtiV4cQayk7BNVwoWlidJ28xzE+gjQZiXig
-         VkFt5lffnB+zOBEoZSVH8kwt62ElN2OFJHlF0YN8cDprBLMtsynIltPk0Y+KzBgklNzw
-         k4ppTRIefonjG6RtIS78c0pMu2RCV07YU6XxpUu4bYi0EL+udwDObEvC+5Gqgm4S5Tw3
-         evtZc3q6GA7C+CT0h9a29Kj/71gvpI+3AHvQlk6Gy2PBJ7DnFLq3XT90vSFb7SKSuiIG
-         tcU1Eg89EvVfBl1riSwKQEh6e5MxOWpWKhk1jwlZylO/NF1S5gZvfikH6WnxWbI+8XmP
-         G0Pw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732896345; x=1733501145; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PS82+F3F+rTdHg56n5bGp80bnYHjUJJMQ2IK+x9kNT0=;
+        b=XRCrfrUooXHvfI5N2wPmc/wPsu+SawSaSiXgvwR1LeFvelZQezivc3gmUv7caAyCl7
+         gzD0jNgwZ4Rs4BSczj1aOiTjQaAGpKIHeOVEVRAh/bHFTdCbgtv/9mI6CGl7O+db9QT2
+         h5NKwKTiDNVxF2CulCW52gh6Rg+hxdyPCfUcO+ww8yTc8/54LeXMkW+3cx2+MqY1YAi1
+         DAhs2k3IX4Zweb36CXXmjBbFIEP4w+V9P+JTNJlLQZMdddbyAALUnkosRSUWVWdVmuiZ
+         /X+Lk0EduBrS72YgVAl72lJza71BXygyblL93tJD2SdYMoih9/nOihOXbN7wljpDH15h
+         UqKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732896319; x=1733501119;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QDMgssOalwyZWOZXl7hrTVuU6/CuCfdxnlEES8/8jVI=;
-        b=Hm736/t5YBCTWC0pYuvkR5JvXD45B7JuU8oC4qKuTwxr0Og07Mx8j2e+YBw5ruUI0u
-         AQ8A0Zdin0Nf/5BW6PadvPDA7+CtcWDzWOKx9zRz5UnCAXhPY6J7QFzZtzSsvnCU/TUz
-         cMZSBzHu0nriMhYbjL3EcMxQ1sWp2Sd4FhLHL5FyxYjleGIHUQfBojb/2DGD+UYcPevb
-         0+fO7+YliBN2UotCmE2a9sQKeMl8aZfgOiWasPohdg1JhoRXBuE+xAq/Lig64eQsNudv
-         eWxe3px0lwglxAuHAn4Dy5aFtcHoPGAe50+vbPb3VXTJyH9q5ZK2KQcD331qAf4ixX2U
-         Sn0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVthYuN3phJbMa+pEIabO+jc1VwMrgHf3ORV/tcKnsRwDe2sa29qzusBYXgs+lMXb6271rFq19l8/7/pg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKZwXrcanZjxoKLT2RFWO12l/5zrOt1ssytzrD58fyAst1zxhX
-	Rip75ai77H8YSO1RCRovv8/nIk8US5+ycOiIWupXNJJfIfp/sHD+imgGs33stBtyzAjMXdOqUkD
-	e
-X-Gm-Gg: ASbGncsvIU4Y8iu892Jj7Agd7js4GHuAOsJ7eSuYUMF3o5ZwCSi+95rK8OYjo0JRL+q
-	MvvqBBJLjarH2nJ3gsco1lS1iE5eHIxawQlm1pCQtPymExyxSGbL72aTojiI/hBuiHjNpzKcLdl
-	nRTga/KD2mCsbITRQPQ+bSf/R0bM4qARN8Q4tb8Tlv4FGVU9DKYBqce9fHY0KlSwlWtSDDo++YE
-	34wHPU2GQaL5W63VtNPwG9VHit2VVb9Ts1Ua23SRvffzzY=
-X-Google-Smtp-Source: AGHT+IGNqcVs7d31J2KaXvv0IGjDKQlEyKSxrxtya9KXHzxxbHn0zSXA1zK6vVIg2zESlxcP0m5MWg==
-X-Received: by 2002:a17:902:d2cc:b0:215:9dc:856b with SMTP id d9443c01a7336-21509dc873fmr137481005ad.35.1732896317638;
-        Fri, 29 Nov 2024 08:05:17 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2154c2b9bdcsm8349665ad.258.2024.11.29.08.05.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Nov 2024 08:05:17 -0800 (PST)
-Message-ID: <ae59fa1b-b0a1-4818-bb81-4de09f3855bb@kernel.dk>
-Date: Fri, 29 Nov 2024 09:05:16 -0700
+        d=1e100.net; s=20230601; t=1732896345; x=1733501145;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PS82+F3F+rTdHg56n5bGp80bnYHjUJJMQ2IK+x9kNT0=;
+        b=iVe/06C4JzN/+Y+59m7Xx18Eao57kusKQrk5haT0iA4AA2jM1+4EKr1SECVIYeSN0U
+         j/tMyXrwYevX7VH+SsYkM/WcGGudcNEs0cRm/pJWHPI1eTbE0k08MyyVDyChHaDI7agY
+         zlr/XS/rmX7IhF3JBN6Sin13XIc238cavLsEV0NE/AKqevT4uUKa93bEF7sykzX2KO9E
+         BMUAzHZ19Xx2JKjZ73Bp0ovR6yRP+pO1il5bJ34kIVyy2t3Qiu7mEpzq5f9dOniE99wv
+         3ghjGPDwn7E45QHd2Qc1VGzapNY2bJBwtIQlVJAN7fUFVSC10hHGPV71bg2sPNQ54PdF
+         kuNA==
+X-Gm-Message-State: AOJu0YzFDNl3FMeYnrpPkfY3lvkV1T8QYs1en9P99BLwpdu3Q9zami2N
+	d39gdXboEzrTvJ+IldHXK//3foUQ9afl6XBx9tJc5JACUDs0jd574yr8YnXYXsErSt5XKv3Kygv
+	F
+X-Gm-Gg: ASbGncvkIGYwCexuX7XNW2BbjsBpReADsQpzJu/gNzhCf19mgbctX4u95wgVlDvwtw0
+	aYkmKx2fJCA9VrnMhtEjsRf+aSiO4n145obJGI1dfKAxuECKLsFakrO4Lpn59I/EPdOawIyRDu3
+	nugOmB103PdeZRjsVAgBJc3Wj65TeR+x3qBrR3uPdn/PKRzfSFQ5JoNeoekxIb2oe7YKkJKSZRO
+	yySb9dLI9mpBR34oY2+gA91Qo/cFUX8y7iuYZjzmA==
+X-Google-Smtp-Source: AGHT+IF12KiFQg10fHkECaKVyOJUaxaSU+Ks/nJ2Z1d+Heri8r2AAtuRZtYw1pfbjwgvfCtQMMGZ+g==
+X-Received: by 2002:a17:90b:2808:b0:2ee:59af:a432 with SMTP id 98e67ed59e1d1-2ee59afa5c2mr3586728a91.31.1732896344791;
+        Fri, 29 Nov 2024 08:05:44 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ee538ab0f4sm1697053a91.1.2024.11.29.08.05.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Nov 2024 08:05:44 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+In-Reply-To: <20241128125029.4152292-1-ming.lei@redhat.com>
+References: <20241128125029.4152292-1-ming.lei@redhat.com>
+Subject: Re: [PATCH 0/2] blktrace: fix one kind of lockdep warning
+Message-Id: <173289634386.195600.7193577799069876067.b4-ty@kernel.dk>
+Date: Fri, 29 Nov 2024 09:05:43 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] blktrace: fix one kind of lockdep warning
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-References: <20241128125029.4152292-1-ming.lei@redhat.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241128125029.4152292-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-86319
 
-On 11/28/24 5:50 AM, Ming Lei wrote:
-> Hello,
-> 
+
+On Thu, 28 Nov 2024 20:50:25 +0800, Ming Lei wrote:
 > This patchset kills one big kind of lockdep warning by cutting
 > dependency between q->debugfs_lock and mm->mmap_lock around copy_to_user()
 > and copy_from_user(().
+> 
+> 
+> Ming Lei (2):
+>   blktrace: don't centralize grabbing q->debugfs_mutex in
+>     blk_trace_ioctl
+>   blktrace: move copy_[to|from]_user() out of ->debugfs_lock
+> 
+> [...]
 
-This is almost identical to one I did a month or two ago, but didn't
-get to finish. Thanks for getting this done!
+Applied, thanks!
 
+[1/2] blktrace: don't centralize grabbing q->debugfs_mutex in blk_trace_ioctl
+      commit: 36a76c9c0f6dc999834ad34d64ff85be0b2923f9
+[2/2] blktrace: move copy_[to|from]_user() out of ->debugfs_lock
+      commit: 98c00f3a7804ebdaacd80a269910f80179aa4a51
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
