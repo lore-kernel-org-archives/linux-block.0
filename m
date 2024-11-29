@@ -1,75 +1,68 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6385A168DA
-	for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 16:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A631482F3
+	for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 16:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732896256; cv=none; b=SLBz5kp1hfI/uI+yDhwzYTY4N+ZEfHD8wYZH86CZ3RhdZoJcT/Vtb1IjWe7K23zQplH5LkDi9e6UZdlFFUTqTs0PoGSbOvII9ifm8xuA4WznzSZtyO64dfoYVbA0NBh8sg9QhoVurNMHcn5t7YTX6tpTdYTk5ZgQwmLMU15RZak=
+	t=1732896258; cv=none; b=YiXUiT51zvUZ5fDV0Ms2rxtBgrikUFP1EO9K9DmhhHJZZEjOh65E2V0WyVrq/xiPGZmPdvfj+ZavbwDI/vizDDXgvom5UCbXxdbUMc6XJemTG6cJWW1gexcqbeEsedLcoL7tzM2t9cOfEJsmB1o4WqhOFcN2X+VmY1op9q4xMLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732896256; c=relaxed/simple;
-	bh=xu1NVatpA2ZXqTXPG9XzG+l/h1Z/YiWcWL2kKPmqUyE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=CXSe+aFI7j6UbL008IDiU1NpzT/IIl+sXLXIpcHrSglBjurVxZDPCTTWf8HOZN7IGytZNVgzX/xsncnOLCo6fRTy3ONkzvttejCqEDSii1scjEDtiPSy2rd5aX0wgFhQxOJ2BHF7WuBxxe/A78jayPBo9XDv0QVaP5x1q4SAPfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=kI6RdVCx; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1732896258; c=relaxed/simple;
+	bh=yDyiTJZ7PCMME/KJgTIqn/qo1ueK+4yeonUxMByXyXY=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=ngKJuopC7IbumquRtPV6rJaTp4ydiJRs79HBDiT1DlYFX0XIO2g+k+TuG2QnxPkqqBh9PWwjDDxdCQz6e++WuOBj8IMDeHqFIDbGMC3l6CNIuuqYBUT4BEiQ5DdXi1cSGg4zU5DgB0st9STs6CISTooE7llTM8xGZ+bPC7A/vSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=k8tIptTM; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="kI6RdVCx"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-214d1c6d724so16470725ad.3
-        for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 08:04:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="k8tIptTM"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-212776d6449so20098305ad.1
+        for <linux-block@vger.kernel.org>; Fri, 29 Nov 2024 08:04:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732896255; x=1733501055; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732896256; x=1733501056; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xRYCaR++kEU3PDN2eQ+b+5uSQTJ5Bb61ApyC7HopWXU=;
-        b=kI6RdVCxu3FlE+LyYaFB2fgCilkcyJVo9bctPBY3EGNmIGZH5K3ICFzTB8Z4hPt9ob
-         9GefcI/KhkjcTqglptLus/Atb0nLJ4AHV4krBujLlQvZ8MVOC7LknhlDPfEI9LeRY/DG
-         gy45bNpssy+Q3Zau0ypRGzffNtHIBUhNs4Qqikq11FZdfxvkB+a2xYp+buvP5pBWWpTP
-         aIHjknJMqT5HtFBeEzsqogI39FYl6VcZyAxg8y1lZkkjQEJfBurV4nI3rmSkmtOyMkff
-         +tiZf0R2Q2mAIQfUwx/Ub4bCGEwKEOjTM+RuWoEkZZwVSAqktcICsriDkx1GPBIS62WL
-         o5gg==
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HIoWwq7VQwCR7bigghGYzbnDItKHTQx8KTjyFFdWLAI=;
+        b=k8tIptTMqgaQUIDq2+UcuDFDWDaegM8UMz8thV1EF8zbnxpywcHcejeV3ESG2op7f/
+         Yw8/KVJbhPMmHQ+q+RmRhsK3KdbOm5UIv+rsJfM3qtQ2Db59ugl25UmsTRj+x8V5Ucms
+         6RHKolrP5Yv9TOMXbPlcI8dhWzBGzghPrwCPEUVwxjIi+G2Dyf+1df/4XWF35UUMB1nk
+         eNHe/pTXRwGN/L7DfN0DOo7iVDxCb4FKfUfgPQ+YhJ/jYzGCtxlVdzGMPbnyVXOqyw4F
+         gN1MFe9/91qNZFCPhn+8VYr+vOoTf+4sWoMKC+S+cNylB859DHUyyofwfqxWpAPz2LiS
+         dZlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732896255; x=1733501055;
+        d=1e100.net; s=20230601; t=1732896256; x=1733501056;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xRYCaR++kEU3PDN2eQ+b+5uSQTJ5Bb61ApyC7HopWXU=;
-        b=NDiZx/7Li71zXO+QeGcUum6pUhRyRKPzwoiXpvgnscWxYhDyKOmIxA7hPQo775d6F9
-         zYoQWpCab8F4x3DD1kGIZR5yh1a8hqb6xqhY4Vu5W366NQwLYUyo6aoT4RfvS2OSNLEx
-         Z2pLcHsKzdZw5oHoady67mnVP6HNnRZ54nUqDS5KE5TYsmHb9e7oYWw7UyKIIMKDF0rf
-         ZgeQiVWdXMW7nXt47D9yJcH97S4e/d4K03AzMre51/aTQhfEuSRLIs/BpeC5QsJKXKem
-         k/m0QCK4ow0YJHPV5+RVWBhgs1dm2373hXduegWw37lxpXWbobiOneOguuUGsKxOdKNN
-         rVew==
-X-Forwarded-Encrypted: i=1; AJvYcCWggF8cyMoH0VitOvLMP0pQKw7hSJJIl2Fff1A3lytS9zm09sDorUbMsQpj1yAmLjOqEpjtVGOHX4DH8A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPzaMXWJ54jusBy5VTfsJZMGDbyjdout0LrBG5qCiQEBAm/U9j
-	gTGi5i1Fqm1UmmPJHg8QOOWlmV5ro09llEVUoPxHWKO9F/EaqHARuLIenkXZaew=
-X-Gm-Gg: ASbGnct2zMakv3ro3Kst+vYaOtmiguHJQw3x+9qbsDVQ3bkltUCcZuirplbLsHM7MYI
-	BG6tMch3v9wzvxJZuHQqenZKYddmWEPYGqLW+FKAcbjXWcteqWtPS1xfRbt5jaci/Z4Shad9qWT
-	zOlk/ulxHpP2aCxC2ihKbIHsE7mYVjKNJgjtdCVzP+nDMRVZFgU7GTZBEx6CVMcud587Opds0Ij
-	itm2m1koAIuu0JLE4XSJqP64ObbI+mfTd8G6bpOMA==
-X-Google-Smtp-Source: AGHT+IGy1chS3Zs1DmbJsFkawdj66lilvO7GzDHuIuxS/pEbGyD3FpT+qxCo038R1fV7cDy/7R55Vg==
-X-Received: by 2002:a17:902:d502:b0:212:6187:6a76 with SMTP id d9443c01a7336-215010960cfmr158548025ad.14.1732896254809;
-        Fri, 29 Nov 2024 08:04:14 -0800 (PST)
+        bh=HIoWwq7VQwCR7bigghGYzbnDItKHTQx8KTjyFFdWLAI=;
+        b=SnsMs5IO8RGHpCpylzdZ7CKt7gwfsURCRez4qQxCDFK78t6ZbGJuX3VMSHnO96vPia
+         fdeMWzltSLZgR8B7bUFJ1gTcWDtVn8ZMy94xSEadU+yHvyotr2TGOkr0tyFMpEUsNr94
+         l3e1+mTtnrCJvdQhJvPuSJ/6Us1FxgXMbEIfLlizuyTKj+J26yF48eR2IjFDcQE014Rb
+         pI75RUE26SQzKplH6EmeIyotlDv6eLZexcnPPczW1LVTZmLt/VG2Dxr8/2dudRp9t+Cf
+         cWergI9FiTBi6mtbPCUOXCO+Y78W4kmOedf/NRds4YZwLuhb8yg4vZq/fH/VR5qtQaDk
+         bJhA==
+X-Gm-Message-State: AOJu0Ywl3MTlLXh6YXlnt7D4IO66N2vB2eip5fyx1rud3Y/+G67q0V8M
+	dwO0JJgm0ZAEx83ySjtQhs9U7c3Gk4LFTZp7BgwvdNislVOdKA6HVfQf6yiOP9QsJGNcih9+iR7
+	n
+X-Gm-Gg: ASbGnctXFXb0CAe56loqahxe/Dz2iDnL5VSFu9t0z1v6F3w/Ll0udbFxe61fEUzTB2w
+	0JCmAfxXNfXnKNv0mAqLaN5Fy8RtCOCiHP7acBLJt2mj3ImfnuXrwln/avTD5EKAlB6+OHsCuzu
+	O2f0Xe7GEGYG3o5uwLARph+E78FTkCgEpSl18vAm4WhIA9Z6juL3oQxJx0cu84/oDd3shfBpA1p
+	Sg8z4JHUV+UeEvY1YR8OaufAWzwGc5WNZW5gajdVA==
+X-Google-Smtp-Source: AGHT+IG+hkJ8ifUL+a8CsKrf5+jFMNu1UU7ShJujOegyuYilMPf5ufFzEIptTTJATV2ZKS4ZOseoiA==
+X-Received: by 2002:a17:902:d2c5:b0:212:4d01:d43a with SMTP id d9443c01a7336-21501d5d3c8mr189018105ad.48.1732896255968;
+        Fri, 29 Nov 2024 08:04:15 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215218f46a1sm32302925ad.39.2024.11.29.08.04.13
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215218f46a1sm32302925ad.39.2024.11.29.08.04.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Nov 2024 08:04:14 -0800 (PST)
+        Fri, 29 Nov 2024 08:04:15 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: hch@lst.de, kbusch@kernel.org, martin.petersen@oracle.com, 
- asml.silence@gmail.com, anuj1072538@gmail.com, brauner@kernel.org, 
- jack@suse.cz, viro@zeniv.linux.org.uk, Anuj Gupta <anuj20.g@samsung.com>
-Cc: io-uring@vger.kernel.org, linux-nvme@lists.infradead.org, 
- linux-block@vger.kernel.org, gost.dev@samsung.com, 
- linux-scsi@vger.kernel.org, vishak.g@samsung.com, 
- linux-fsdevel@vger.kernel.org
-In-Reply-To: <20241128112240.8867-1-anuj20.g@samsung.com>
-References: <CGME20241128113036epcas5p397ba228852b72fff671fe695c322a3ef@epcas5p3.samsung.com>
- <20241128112240.8867-1-anuj20.g@samsung.com>
-Subject: Re: [PATCH v11 00/10] Read/Write with meta/integrity
-Message-Id: <173289625329.195012.12251484320092641789.b4-ty@kernel.dk>
-Date: Fri, 29 Nov 2024 09:04:13 -0700
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+In-Reply-To: <20241127135133.3952153-1-ming.lei@redhat.com>
+References: <20241127135133.3952153-1-ming.lei@redhat.com>
+Subject: Re: [PATCH 0/4] block: cleanup queue freeze lockdep
+Message-Id: <173289625498.195012.13697470232900500446.b4-ty@kernel.dk>
+Date: Fri, 29 Nov 2024 09:04:14 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -81,38 +74,33 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-86319
 
 
-On Thu, 28 Nov 2024 16:52:30 +0530, Anuj Gupta wrote:
-> This adds a new io_uring interface to exchange additional integrity/pi
-> metadata with read/write.
+On Wed, 27 Nov 2024 21:51:26 +0800, Ming Lei wrote:
+> The 2nd patch kills false positive caused by removing disk io lock
+> modeling in blk_mq_freeze_queue().
 > 
-> Example program for using the interface is appended below [1].
+> The other patches cleanup & improve freeze lockdep model.
 > 
-> The patchset is on top of block/for-next.
+> 
+> Ming Lei (4):
+>   block: remove unnecessary check in blk_unfreeze_check_owner()
+>   block: track disk DEAD state automatically for modeling queue freeze
+>     lockdep
+>   block: don't verify queue freeze manually in elevator_init_mq()
+>   block: track queue dying state automatically for modeling queue freeze
+>     lockdep
 > 
 > [...]
 
 Applied, thanks!
 
-[01/10] block: define set of integrity flags to be inherited by cloned bip
-        commit: f64ec9926ed2fb603acf4fbc73c09ba3f68e271b
-[02/10] block: copy back bounce buffer to user-space correctly in case of split
-        commit: fcc1f91de3e3cf013e810183cb6d333b09fb5741
-[03/10] block: modify bio_integrity_map_user to accept iov_iter as argument
-        commit: 465f05a6462bb67ff51c663759ca9b4952718205
-[04/10] fs, iov_iter: define meta io descriptor
-        commit: 3e73053699fc91839e711c75d87fe3da732a323b
-[05/10] fs: introduce IOCB_HAS_METADATA for metadata
-        commit: bbcf8cb45e21c0a4d4afc45fac6cc6b97e737d8e
-[06/10] io_uring: introduce attributes for read/write and PI support
-        commit: 0ff16f75c747522b403ae8a23513afe354f98fd7
-[07/10] block: introduce BIP_CHECK_GUARD/REFTAG/APPTAG bip_flags
-        commit: ff19426ed1a805571f2a9ccff7d3432b57f4725e
-[08/10] nvme: add support for passing on the application tag
-        commit: 77a3bcc5847683baefd340f615a51e4fdaf9208e
-[09/10] scsi: add support for user-meta interface
-        commit: 1c1d47350d4eb585e2cc8f010000225b6a578322
-[10/10] block: add support to pass user meta buffer
-        commit: a757ddcd74c4b78403e4b46080de6eb73a17ab9e
+[1/4] block: remove unnecessary check in blk_unfreeze_check_owner()
+      commit: ed8c161ce6cd884490e74939607a9f240181c48f
+[2/4] block: track disk DEAD state automatically for modeling queue freeze lockdep
+      commit: 5d330161ba9b12b3b8351ae13812a6bdcb40f0d4
+[3/4] block: don't verify queue freeze manually in elevator_init_mq()
+      commit: e4916fb7a27971a645c6ab365bce64928f9ec4a0
+[4/4] block: track queue dying state automatically for modeling queue freeze lockdep
+      commit: 4583dadf81a3ff8919a82c814efa6742c0f857c1
 
 Best regards,
 -- 
