@@ -1,164 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9556E19F121
-	for <linux-block@vger.kernel.org>; Sat, 30 Nov 2024 15:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FDCD4436E
+	for <linux-block@vger.kernel.org>; Sat, 30 Nov 2024 16:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732982369; cv=none; b=oHSsVkPXtP21jZE5ChvCwDgffWTYAi5zo+AWKsbJhQcAMXBgVsaVdmbdacUXi27NHHPg++Xb3XV7CW8yZ4+touTAsGj0MiUtMJzoMrvabBnd4tbl6PcMTBs1DO5woTrFeqMEMLZtWnMHC5BdLhyxh45sBab/VYUNCdDqJpQK7uw=
+	t=1732982426; cv=none; b=p4SMjhvZQ6+T8J0jOxy2WJg6fnUbCu4mpfYWGGCzVraTervg5SVbWP4XIjndyjP7zHOouRySJxpLbSuFH0QT5vawr5H0dO2xH2k87q3B/U8uqOBMNJQu3w/L4Fw/2wxomD3XMy1m9TK4Och7nNF6umt++9mH2l1OOmSzyHu5BB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732982369; c=relaxed/simple;
-	bh=bcdNDokqH+OiVRw+A8jIObIH06ox30nu+WY3/5jH7Ok=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dQvKQ41aCQY3pbm9sKd3qo7UCyuhMXb4e7QrKWGjWp/gHyNHyrtfm4JvLHlDzOxMhoILhJOpIP78hF3iog4QtrgI6imw6b42WRX6iCFQTGO7ZmWYtiHg+kd2mxDM777TxiYBLNCDxQf7uxmB4zjUTTPJ3/6vW8LboX3dMa4bhjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DSy2boF6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1732982426; c=relaxed/simple;
+	bh=sVk+xK9OlSg6wVXyYOgSw4yWHPa2n+jrEqXIvAEe8t8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hnVxCfA/ULpZHnx6PUdc9eA7/qpN1ez4HyQ/Qw4+UxS20l17vE12mTBm/svedkCgqg+BPlII9+zyqUyBSwCryTk/5p9SP0q3x0jK/QGmnUPD88xtbSpmFN/qhJqxlfuZliGeWtTNrpAFceCU9sRbwbMcyp3Pu2dH+tr8GF6wI6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GrXOfIzX; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DSy2boF6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732982366;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L3sp9ITqS00f1w2cVwkTebqJbheBN3iCrob7vB6Qx7c=;
-	b=DSy2boF6qCclhEM9xruSnundzawP1XHeH8im2rubYOF5fF1ggIzC555AB76sBn9y/V1ynK
-	TiDS5UndU7Lv6etgHhb8KIXrMWNb6OSfuz7vsOdHfNHY3L5yxTxo97Lv8jEa4p3YYiduMf
-	ITTmdTzoGeVxyo4LtbodAbEOrQ+nij0=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-237-LjTSuliaMIu_j2jpSPusYQ-1; Sat, 30 Nov 2024 10:59:24 -0500
-X-MC-Unique: LjTSuliaMIu_j2jpSPusYQ-1
-X-Mimecast-MFC-AGG-ID: LjTSuliaMIu_j2jpSPusYQ
-Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-4af1681b7ddso589210137.3
-        for <linux-block@vger.kernel.org>; Sat, 30 Nov 2024 07:59:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GrXOfIzX"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2ee9050346cso220007a91.0
+        for <linux-block@vger.kernel.org>; Sat, 30 Nov 2024 08:00:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1732982423; x=1733587223; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fBp9IrYeZGmrlk+/+Z0GIb8sd46LxSapmHIVfvyatgc=;
+        b=GrXOfIzX6XAjAzssRobiwd01ECgDR2mym9jx5AzQeRCuGOvxUtx99697kj8J2eFh9U
+         M+4WFcRR9Aa5LlljKTSc4qMZ85YU6GyKBeR0jB+bB7idLzOrprwW0sdObMyCG+XUBHGf
+         3KjUWDLA0UNPxp2CzQ1BVDDK7FPzZ9v3tdTvJeUsUCYz+erZh7UFH96tykTlFRAOT4fM
+         59siCjV5jZ06ryJHFtloftYB3pcKLA1BKBdg6fhOl3yWHrH/cRC6o2LtswVuEIR+P16O
+         PZZKQZMrwBmtsuj6JxB7yGhZBCtfC4JAm80ZHv6rxC/QGXAGT1lV+N/wdtyaE+jTh58U
+         ELKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732982364; x=1733587164;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=L3sp9ITqS00f1w2cVwkTebqJbheBN3iCrob7vB6Qx7c=;
-        b=tJXg1zwf32iYZGgG0n2vs9SVrtBoJvyi/O42k/ULliHIeqnPKcexHk/mklQhv9AZV3
-         pb/yeveubeYPfJakIfsWItb5mHwuO2PO878VF6lYl2gwv6tMR5Sq1GwSSYzGjIsmnDUW
-         thSmwgoLSa8zE2Se0Y/RBMABxfNyM2f7Yk3klJfQETSAvsqdei8ENrJ5VLdKRm9awbn4
-         J72teqBXCMPkvZLbZVJ045I1C4yupzAq7MBm+x/TVeI9CHpPcC2N2/eTS2huvLuC9Wnr
-         EG0HgYDPD2UjHrbtu+Sqxqncml9ZajwgLB45jOf6AP7NBOFMFnIfnxR0cK72E/mLqWqZ
-         juCA==
-X-Forwarded-Encrypted: i=1; AJvYcCWsd5RjjCtOwEBVPwF6vjw26vw1bY0LafICBm39knjyeKP48oogYNs+aqNcjAzw9AifhMOVbWdsHIiCeg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVVCHX/eyA+J1Ws0wokZUbbxCt7GAegacmJ/molIxK4KGJLnd0
-	tni8E8gfkBJwjwSuBwlzge5xog5JI6FVGKWxBftbX6FnEZYqI0oOVFsvzoj0kSHR0Eka/ZCOJWI
-	LwjnWGgfufe9ZzCHQOgFSWgeOYBK7WOsdtuo1Rz4KAWlfn9V+piX6TRYuntgvKA1JDTDw+q70XS
-	pdn05O1BFkX2ndKca0u5H2YeZVDEnaRWpjZOA=
-X-Gm-Gg: ASbGncum8372E5ASEAYth/OoyjyzdK607oQSx+noOVFceUYKAs9o4PU+1Tim4KAQG58
-	gvanrvmZEPp9i4ScgF6sipkbDx6ZVlcxy
-X-Received: by 2002:a05:6102:32c1:b0:4af:4a71:e35 with SMTP id ada2fe7eead31-4af4a710f6emr17947648137.27.1732982364203;
-        Sat, 30 Nov 2024 07:59:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF4oaFHosIDKY7f3WBekgHYIqS0EOw6XcWkfbPmScRohRzmYmfm2E+p3FDCVbGkVV/07+rt3W9NEuZzOIH+9Ac=
-X-Received: by 2002:a05:6102:32c1:b0:4af:4a71:e35 with SMTP id
- ada2fe7eead31-4af4a710f6emr17947628137.27.1732982362448; Sat, 30 Nov 2024
- 07:59:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732982423; x=1733587223;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fBp9IrYeZGmrlk+/+Z0GIb8sd46LxSapmHIVfvyatgc=;
+        b=AEw9nOd6jqw+vhUENfOjNxIg84n5yJU4csKPfkpj1GH4WAyvuDwIcZnTwIpDe9elb9
+         A2UHGY8jRWr3C96VmwFJjUcqY78WToYyYU9kwES+kY833Z+zzOAT9oLuuOQFvowwqygl
+         3WdKGsmw6b8mp6GddrQ9tUcPbjKlkN5zW0LJUjRv6fcvCaWNBf1YbvIOxXs0lppIJFgy
+         r67yVoH6wIt7hlsynGGcDNhP9NWaKMduqHcPC2NqyRVnkqpaZOj0KdrFgpVZZUhRw6o4
+         QabygaL7kotiVPbt41jePPBQKd0agW7oEJRthzH9tAIOBllk61+o8NGOcqwPnnYTY462
+         HA5g==
+X-Forwarded-Encrypted: i=1; AJvYcCV3KwuSLsDVRkq6+zFev7PLrpG5qadqBAwvrJu77oyqN327qu0S9Qn2CS4ofSb7J22ST8YP9oqGc0rEEQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkEpVIsYW0Ovq3AxAUWypKmOM3EljaJFddEjoWqPMLjFdZ7e4y
+	GYSPgjK7BGJtCp3+V9lu6iVyCd2QI30kSmNlEPcMglSHn/RQzDu4cLoM2H11aK0=
+X-Gm-Gg: ASbGncviDFCCN/R9bsGdJ06FFTwvkT72fefdUMk/r2JLAlpND6cT4GHlvkaONkvYtxK
+	T15zhjtiscLroS9UdqcG5zeMYjtGtjaHzqCauNbM0cFJNSUE+8L5ehAPI0k3sEQdkcirgfiOfq8
+	DyMgDNxmpFPhZXoXPpJsz81sViGq6zj4JGB36inXZ6Si7yxdJFWjHGVzh6+VRoeu3rgWWkGNBL3
+	g5fKwfxaYstaM4YHr08lRCu1Ax3yWtkZ3VXg5dVFf5HI1Q=
+X-Google-Smtp-Source: AGHT+IG1gHPYs7dRx/9K/MKMozvZqss0Yzgyf9xmOJ+a9uwRem4JCoxPp54/uDhnsiyHbktTmr/V0Q==
+X-Received: by 2002:a17:90b:4d01:b0:2ea:59e3:2d2e with SMTP id 98e67ed59e1d1-2ee08eb1144mr20727390a91.10.1732982422887;
+        Sat, 30 Nov 2024 08:00:22 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ee0fa47ffbsm7135857a91.12.2024.11.30.08.00.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 30 Nov 2024 08:00:21 -0800 (PST)
+Message-ID: <09db95ba-b396-4734-9ff0-9331579c92b7@kernel.dk>
+Date: Sat, 30 Nov 2024 09:00:20 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <674adfe5.050a0220.253251.00da.GAE@google.com>
-In-Reply-To: <674adfe5.050a0220.253251.00da.GAE@google.com>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Sat, 30 Nov 2024 23:59:11 +0800
-Message-ID: <CAFj5m9L0f8QVtevytwmgua8ZP4qjLLpm6DnKmP3gHZ+0evA0mg@mail.gmail.com>
-Subject: Re: [syzbot] [block?] [trace?] possible deadlock in do_page_mkwrite (2)
-To: syzbot <syzbot+1682a0f52e34640bb386@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com, 
-	mhiramat@kernel.org, rostedt@goodmis.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] ioprio performance hangs, bisected
+To: David Wang <00107082@163.com>, chris.bainbridge@gmail.com
+Cc: bvanassche@acm.org, hch@lst.de, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, regressions@lists.linux.dev,
+ semen.protsenko@linaro.org
+References: <CAP-bSRZehc2BxRC_z5MXKQ6qHNPXPgZoOQTtkiK_CFd494D_Fg@mail.gmail.com>
+ <20241130060949.122381-1-00107082@163.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20241130060949.122381-1-00107082@163.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Nov 30, 2024 at 5:50=E2=80=AFPM syzbot
-<syzbot+1682a0f52e34640bb386@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    7eef7e306d3c Merge tag 'for-6.13/dm-changes' of git://git=
-...
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D11da21e858000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dba7de3ed028e6=
-710
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D1682a0f52e34640=
-bb386
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for D=
-ebian) 2.40
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/450015008b3e/dis=
-k-7eef7e30.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/9bea6e0ac594/vmlinu=
-x-7eef7e30.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/e1b46c65494c/b=
-zImage-7eef7e30.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+1682a0f52e34640bb386@syzkaller.appspotmail.com
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> WARNING: possible circular locking dependency detected
-> 6.12.0-syzkaller-09567-g7eef7e306d3c #0 Not tainted
-> ------------------------------------------------------
-> syz.5.3623/19452 is trying to acquire lock:
-> ffff88805e392518 (sb_pagefaults){++++}-{0:0}, at: do_page_mkwrite+0x17a/0=
-x380 mm/memory.c:3176
->
-> but task is already holding lock:
-> ffff888035510ba0 (&mm->mmap_lock){++++}-{4:4}, at: mmap_read_trylock incl=
-ude/linux/mmap_lock.h:163 [inline]
-> ffff888035510ba0 (&mm->mmap_lock){++++}-{4:4}, at: get_mmap_lock_carefull=
-y mm/memory.c:6149 [inline]
-> ffff888035510ba0 (&mm->mmap_lock){++++}-{4:4}, at: lock_mm_and_find_vma+0=
-x35/0x6a0 mm/memory.c:6209
->
-> which lock already depends on the new lock.
->
->
-> the existing dependency chain (in reverse order) is:
->
-> -> #6 (&mm->mmap_lock){++++}-{4:4}:
->        __might_fault mm/memory.c:6751 [inline]
->        __might_fault+0x11b/0x190 mm/memory.c:6744
->        _inline_copy_from_user include/linux/uaccess.h:162 [inline]
->        _copy_from_user+0x29/0xd0 lib/usercopy.c:18
->        copy_from_user include/linux/uaccess.h:212 [inline]
->        __blk_trace_setup+0xa8/0x180 kernel/trace/blktrace.c:626
->        blk_trace_setup+0x47/0x70 kernel/trace/blktrace.c:648
->        sg_ioctl_common drivers/scsi/sg.c:1114 [inline]
->        sg_ioctl+0x65e/0x2750 drivers/scsi/sg.c:1156
->        vfs_ioctl fs/ioctl.c:51 [inline]
->        __do_sys_ioctl fs/ioctl.c:906 [inline]
->        __se_sys_ioctl fs/ioctl.c:892 [inline]
->        __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:892
->        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->        do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> -> #5 (&q->debugfs_mutex){+.+.}-{4:4}:
+On 11/29/24 11:09 PM, David Wang wrote:
+> Would fix/revert reach 6.13-rc1? I think this regression has
+> significant nagative impact on daily usage. From time to time,
+> my system would *stuck* for seconds, sometimes even when
+>  just `cat` some small file it would take seconds, and once,
+> my desktop failed to resume from a suspend, I had to power cycle the system;
+> Polling /proc/diskstats,  I noticed Block-IO read latency,
+> delta(# of milliseconds spent reading)/delta(# of reads completed),
+> is very high, ~200ms average, and frequently reaches 10s.
+>  (Strangely block-io write latency seems normal.)
+> My bisect also land on this commit, revert or apply this patch would
+> fix it.
+> 
+> Kind of think that 6.13-rc1 would be very unpleseant to use without
+> a fix/revert for this.
 
-It should be fixed in:
+The pull including this fix has been sent off to Linus yesterday,
+it should make -rc1.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
-for-6.14/block
-
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?=
-h=3Dfor-6.14/block
+-- 
+Jens Axboe
 
