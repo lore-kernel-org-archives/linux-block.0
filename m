@@ -1,63 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDB8154429
-	for <linux-block@vger.kernel.org>; Sat, 30 Nov 2024 23:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23ED625
+	for <linux-block@vger.kernel.org>; Sun,  1 Dec 2024 00:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733010792; cv=none; b=dRroIfnKLoVI6sh6Pe1fO1DnlPTcIMyEYEDperPSePpy2S22W4sYmp5zhvCjqzgmtSGhoeWZdACjvCDXd9P+hOk5U1Or3NGSX4dMbFUR2XlAgtIEc4qBFcxgpyL9aXFbDCWsK1+TjfzLw/2WX2Yz0J29thOjlcsAvd6ugnrd3ZQ=
+	t=1733011865; cv=none; b=X+lh3u03zzOQrcRQvddzUx/r03//VBvsVKHUXuT0xJpfKfs5rPgFXISjH8YRAesmJaFIC8gbUy/vNECy1Y/RUvek6AraHEkIkjkWPF+p3/jf4B20wbgr/RREBIUuRWIn9zXshHtSrr3u/3raFgUIOxSjGNdfwbFEZbo7S3qvm4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733010792; c=relaxed/simple;
-	bh=3M3EVbOUJspyUZzgctcw8Z2gi34VF+pjNhsJ6crcsN8=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=pn7QXiyRq5zKQzIFu3GZOepQpeQy3SoOoYiTDsT3YWcjSJ55j602f8haAJKLgPIHIt7ob63U7nBGN6ntKyUvOUzZby8bqdyUEzfkl/AfmyPwXR0qSxxmk3FE+oyrhhV7ppOKKqF7LXsPgcFkeb79tInxo461UogI/DKBx2hzVxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QVkPpxF/; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QVkPpxF/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01AFAC4CECC;
-	Sat, 30 Nov 2024 23:53:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733010792;
-	bh=3M3EVbOUJspyUZzgctcw8Z2gi34VF+pjNhsJ6crcsN8=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=QVkPpxF/tuRwZCxpk72S/tWx+e/Z1U6pl+oZdtJxVYEj1iJlWDDNb9WWw/t3Xxoxv
-	 ixW2wr4XDMZtKYwJsL4TV2y854+Bg0jTJi4FfULY/6Fa0acz5a11QtE6kTzvnIWLOK
-	 KMqMwKjPm7koexD/6R39Ku+Ofw2zS8uv1FAPKPfVtuZvi+56j/sAfFVO/nI9+H6aM9
-	 CgBb2ktoEPewtm+WcCizazj2NvA8Zvn0QxxtsiwBiKa1Hkyg5fzVbamuvaFXIPRndf
-	 W2s71O/T+u2faQF3BTdl2WqG86YGJ1s7DNjrMW6PyDjBdsmfx78FjKkn+uG4/033nt
-	 RkBTAUeIWv8Ng==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEE0380A944;
-	Sat, 30 Nov 2024 23:53:26 +0000 (UTC)
-Subject: Re: [GIT PULL] Final block changes for 6.13-rc1
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <3ffcb344-2ff2-47e4-8c53-a5b6d6b9a0f1@kernel.dk>
-References: <3ffcb344-2ff2-47e4-8c53-a5b6d6b9a0f1@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <3ffcb344-2ff2-47e4-8c53-a5b6d6b9a0f1@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.13-20242901
-X-PR-Tracked-Commit-Id: 82734209bedd65a8b508844bab652b464379bfdd
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: cfd47302ac64b595beb0a67a337b81942146448a
-Message-Id: <173301080561.2511415.2512191771183364742.pr-tracker-bot@kernel.org>
-Date: Sat, 30 Nov 2024 23:53:25 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	s=arc-20240116; t=1733011865; c=relaxed/simple;
+	bh=UnACCVA7tlVE0+snJs6hfFSd9q31mo6Bh2V0d/9WTZY=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=TkGgFVaS+zcky364twpQ9seqMzxzbKgardTbTZSjRoKAqkCqADp6iO3kF3N+0KXHKNxHgYFhmkzs4rSkGvVZ2xracLCC6Zf0xL3OmgC5T4dWoeCJBvys3CrogWMpNJJ1jZxS+xnLXwCFb0q3hRpFq4mNX96Z84N91qN66+Liy2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a7e39b48a2so10926075ab.0
+        for <linux-block@vger.kernel.org>; Sat, 30 Nov 2024 16:11:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733011863; x=1733616663;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LIUUZTeJmZPeG8SX0991wAnoGzqpU1DgWIAyiJ4/+4Q=;
+        b=v5lS1t2uE2JCyiJxR+H04zKgOS8Q4CdbkQ721FgLqGJTCmgjpxMEJvsRfp47frP1sh
+         s09wFR+B01tNbs9LqAtv9MGp5T7+WNpCvsemXfjLILWqrTZnE9CliTC7T03nR46F12dU
+         eJ4Tli1/eGNwOlmssRoYMg7xRbd/Xk2NDeUU99bk9qTpVDCAReZii1/Z39v6lNQ1Pa4k
+         zAitgn0cwfEBrPcjX1Us7o0XF08eWZF3ik+6QpzOJ/BfDUASFovhq1Fql1gbxf5jQbAX
+         iGTpUq2AVG99pw2gEQ+HsL9M2PS9JGYg0jgLEB2pUULApxcP9VTEjgV7x3sPPf498Ysp
+         NvSw==
+X-Forwarded-Encrypted: i=1; AJvYcCUl1hfT44teAVqjKe79Aq8+9FW0fvY1aWgg3fPgdfJunNw8arzzn7nsC7ZhZAGol6+RLPk3XgaLfB2MSw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YySecW2eMoKssCb22GvSUH1dXhgNexM//PUDjaq4IVBrFJH1qJT
+	k6jxdFA48mCstQgWltJVgTgNFtvqib3g8KmW9Pp/+eEcxcAubqfpnM1b/P7M0tanijciMvjzO52
+	ttSLqL559pby26L3EVwCH5MEIJyWFfWs92e8L46PXQeLc70jwByQCPlc=
+X-Google-Smtp-Source: AGHT+IG13qg4YGnamlxKBNo4M0YAZ13YlT7S2DJYFqwTqU+6UUSxHU9xeLnGlTqgpnCs3Zo680wJlcaOZX3SmT9ezGeM/8L/4Vcz
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:190c:b0:3a7:6a98:3fdf with SMTP id
+ e9e14a558f8ab-3a7c5580ea4mr170467365ab.14.1733011863168; Sat, 30 Nov 2024
+ 16:11:03 -0800 (PST)
+Date: Sat, 30 Nov 2024 16:11:03 -0800
+In-Reply-To: <20241130231432.2296-1-hdanton@sina.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <674ba997.050a0220.48a03.0000.GAE@google.com>
+Subject: Re: [syzbot] [block?] possible deadlock in loop_reconfigure_limits
+From: syzbot <syzbot+867b0179d31db9955876@syzkaller.appspotmail.com>
+To: hdanton@sina.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The pull request you sent on Fri, 29 Nov 2024 09:35:06 -0700:
+Hello,
 
-> git://git.kernel.dk/linux.git tags/block-6.13-20242901
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/cfd47302ac64b595beb0a67a337b81942146448a
+Reported-by: syzbot+867b0179d31db9955876@syzkaller.appspotmail.com
+Tested-by: syzbot+867b0179d31db9955876@syzkaller.appspotmail.com
 
-Thank you!
+Tested on:
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+commit:         98c00f3a blktrace: move copy_[to|from]_user() out of -..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-6.14/block
+console output: https://syzkaller.appspot.com/x/log.txt?x=121205e8580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=131aa7b77993ec3e
+dashboard link: https://syzkaller.appspot.com/bug?extid=867b0179d31db9955876
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Note: no patches were applied.
+Note: testing is done by a robot and is best-effort only.
