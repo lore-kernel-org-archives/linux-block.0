@@ -1,228 +1,273 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40C11FF5FF
-	for <linux-block@vger.kernel.org>; Mon,  2 Dec 2024 12:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863A51FECC4
+	for <linux-block@vger.kernel.org>; Mon,  2 Dec 2024 13:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733141864; cv=none; b=hwq7r0SD0ucXE77UcvCwH0JOvxLyPP+jvWPsr383JheTtmz8Hp7836w8WZa9nFSUr/F67EFEAnR6XRmtQvpVwyc8i74KrlcaMvycUQH62lqrPfqjYyFNjTBJ7/ejV4sBqh/QSO4Y/LwiuAwomgnUS358bFsSX7IgxJiLgKSUejM=
+	t=1733147011; cv=none; b=pevhIwqpnteWgGmr/nP1pTSVYRimMIaUmDwZry7SyCNGFpvwFSU4+C4ZOAj8kQcBev4EjjZAsvi9rOxt8uTqlsdwt5ryNSIKKF/ohpr6u0h58O3gexSwOAyD6S27zaBS183IZdnFOTWd5dYon7ZF7cCPOqhKIX4wSGOCYUeN7uY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733141864; c=relaxed/simple;
-	bh=cjwiLpyces7oEH/gnZel3kh0F0XZ3KiDL4+nGbd7cRw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pU5SL+ewFqw/3kHNqdxrAtmKiy8ia529pSmnPKEVSAbZJfbh/te4mau8O2+TQQm79TJFlJF3nk1RYtP9I01j3GFTjq5yfhCFiAh6AAJvsCjIIdRu1HkKUPiFnMqd8xHfzeG7JMYqXwSd5HbDgzYyt17llhruuEbr67aw+E2NpSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q2qBpC4J; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q2qBpC4J"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-53df7f6a133so4403817e87.3
-        for <linux-block@vger.kernel.org>; Mon, 02 Dec 2024 04:17:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733141860; x=1733746660; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bUoLIZvVtbQSISsGIJiv88vjB94vxHsf2pfqlKAM26U=;
-        b=q2qBpC4JylFDvH6kZYUcKPn66I2p3ou2NUMcxustQ/c/eMgR/LSuNuKooK0/H5ETxM
-         kDa6fuZ8vkaA9f4KHBy78mrfcF6rhVdz3E2HuOk9TCQvu3gN6RsPIc7Sy0cPgGGjI/ir
-         BisdLFOuJMV6i2F64eFJbmGSCJxvGDyhKLtXMVnbxMN8hSRX9LeKtvWmDIbHOtuBYu0W
-         T1gRhQ3DqgjEf9bqm/xT4Opy3txS9qxUR/AdDhBfijNRH9IWNHSOkdmaogZkvRvdxvBu
-         d8ytAvUIsT68+YPUfxTWp9v/2YDI+23n6evqPdT3o4HHZoRemXG5yLyD8g4HPg9ToQMq
-         ArOQ==
+	s=arc-20240116; t=1733147011; c=relaxed/simple;
+	bh=5pmKYlpLxzvlS9JAnQH5MCmhwKMJcSmxx/KP5fCt9A0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rjFkkrlWKpczm5QPcX9oKINXfryyJTddTVt5oTUW7/ElUxmxrUd695/8FZeBIIK2gPJ13LVhRJdS+jfy/yx0sfAPaj+OKDJd/4i8dFs4ZCuRyeX72uQcWQa0Q72iDCfNSs2Vm2D6vTUd2OsWzDDpCqBbJQUrVfFgKXxYczqeM0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3a7cff77f99so46658625ab.3
+        for <linux-block@vger.kernel.org>; Mon, 02 Dec 2024 05:43:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733141860; x=1733746660;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bUoLIZvVtbQSISsGIJiv88vjB94vxHsf2pfqlKAM26U=;
-        b=fRXI6mLwdjm4HxT6FRHwUbyr368vfvHllVGJP/P8tGZy8rhe5swrBuK6AjaMXxl3Ay
-         ab/+YOEvcer6M82V+tP0Oimv+boHaRklhA4WntT+P2w6ygO0fxPFy+wq53vuFv4kDI/B
-         mKgPe9y1BpS/rwrNk2cFmE8wE/Xj8HO+SIJl+CLo6tEklxf2mdDl9tVed83uodSBIT9y
-         ZBhOH15Yn4Cgm/HJdRLuMP6Jg6++lEVluSCvGzZ/CFcqut/4K24D9M+OEwv7awou5Cyo
-         G0tvFNV6BCJyaLOPhXGB/sDb4+S22M7maOjCDHTGiZoQO3G48c+2+mWRa6jOg5V55z53
-         IOgw==
-X-Forwarded-Encrypted: i=1; AJvYcCUb9Lg/RgBAij+gA+7fiMtmxeMSdhe2YXCqsITCzzXn2py8WKROaBpzWcjK7h/7/qJotKQYaRjIj/S04Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YznGOtl14LXL9maXLfrrvlgTnGvsgyPIJdij+BKopGe7KhCg754
-	ZwagGcqzDIn4gQlAiuQAKWepAnDByGigNsI+TKSlOJeMU8xl2+SUDYIphn8rbeA=
-X-Gm-Gg: ASbGncunp81SwFEomhyYCoOZkqO6uWspmrS5njay86Rzgoc5pnBB1ywG6MjC8IHVr7j
-	y3fNRKPfud09PWV42Ly6LDi4JOsyw9yhfipDh1IVq06K7TXhG8TCMd+pjX96ctY5CsRQpOZQ3pL
-	A5bBKLs2gWO/cyCnAAwCTfmwNlU+qskqhMdSYavp8lONtAbsrImuKtkfKtTcSt7M/Qq6QM/bO38
-	yHwpdqDI32WuyxROkNBxS2tsOmqr7eoSf1W1hEormroyhz1TGIpnVR1mxIPk5/yVmwzY/j8G4qw
-	z8aVAbfvs7480SAJG5qqF2D5l6PUVw==
-X-Google-Smtp-Source: AGHT+IGhAvYybqFJhAz3sCBw+CQSHdAjkvqJ/iPZp81uMYhUbES1NVq6qCCpGOPW79Fcg/GhD/p3Tw==
-X-Received: by 2002:a05:6512:2304:b0:53d:e76b:5e6e with SMTP id 2adb3069b0e04-53df00d9cf4mr11692080e87.31.1733141860084;
-        Mon, 02 Dec 2024 04:17:40 -0800 (PST)
-Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--b8c.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53df6497197sm1475981e87.224.2024.12.02.04.17.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2024 04:17:38 -0800 (PST)
-Date: Mon, 2 Dec 2024 14:17:36 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>, 
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
-	Mikulas Patocka <mpatocka@redhat.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Asutosh Das <quic_asutoshd@quicinc.com>, Ritesh Harjani <ritesh.list@gmail.com>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Alim Akhtar <alim.akhtar@samsung.com>, 
-	Avri Altman <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Gaurav Kashyap <quic_gaurkash@quicinc.com>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Eric Biggers <ebiggers@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>, 
-	Jaegeuk Kim <jaegeuk@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
-	linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	dm-devel@lists.linux.dev, linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Om Prakash Singh <quic_omprsing@quicinc.com>
-Subject: Re: [PATCH RESEND v7 10/17] soc: qcom: ice: add support for hardware
- wrapped keys
-Message-ID: <45epch3o66skwhemavcqniqw62zfqyh4qrv2q4ay3esd2kxslu@qv6j4ivp4l3a>
-References: <20241202-wrapped-keys-v7-0-67c3ca3f3282@linaro.org>
- <20241202-wrapped-keys-v7-10-67c3ca3f3282@linaro.org>
+        d=1e100.net; s=20230601; t=1733147008; x=1733751808;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vboPoXwRv5cDI32OSmx/NfQx+rdINON0MH0jUkQibms=;
+        b=rLajAusVlRfgW8KW0BR8aSEnkURCCXgfevd3UsIbAx2C12+pZ9vL0MZsEi1ZacSE+f
+         bsGUDrRgKgR4KX4VbFK4n0WmXzhYylPWZboa49QUGGEzaDpY7Qek9S0qO/6XJ1sJnuJQ
+         CW6M46O8mnk83MhmurPbOHc7fYThEoe3lc4QFYpbEjAzMuBxVipXiKWjVmej2KXumfi5
+         uCCIdMm534yVmuV0JVru5035IWotUFuymjzaKoS2SmK84pPnQyySd3oYajD8/O0rJ+lr
+         uihrXVf14SyZy6LbmyQfWi6hCHzXUPiosGecXLe7rB/zgy4cFNgsMiKLUcCQ8KmKW6Os
+         KKoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPIvoh7vk4qdWTvYN/6B3rq5z7r3qyEnILAKiEYOuJ8+/69EpGW58hw8dO3OPtTRWnpHS3zEZsZqO0gQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzstr8h92L8iQBiLyC/RQV91TyTUmZG3+bSypkmFVOGKchKZx6T
+	flH3XecjVyLVQx8/Y/yeaDMsnWrSbUuJrf3RQylDLLJ8G0SCInO8TS+PSiS8c7hrJ3zpWBGM4co
+	1zJvD598nSRs00s52bmlb0bTZdVqrapqNslMVdietgywrKKco04zbGho=
+X-Google-Smtp-Source: AGHT+IGKzHQpciWn6xyEXZAsSfL5OcyDYM+FQ4UCKFX4N86xBiXvgkxLUHEN7OaG1ljKAVKJc2ExyJcZsfxwTB1hJecUAWnkL4Qs
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241202-wrapped-keys-v7-10-67c3ca3f3282@linaro.org>
+X-Received: by 2002:a05:6e02:1caf:b0:3a7:6f5a:e5c7 with SMTP id
+ e9e14a558f8ab-3a7c5528576mr233302965ab.4.1733147008652; Mon, 02 Dec 2024
+ 05:43:28 -0800 (PST)
+Date: Mon, 02 Dec 2024 05:43:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <674db980.050a0220.ad585.0052.GAE@google.com>
+Subject: [syzbot] [xfs?] INFO: task hung in xfs_ail_push_all_sync (3)
+From: syzbot <syzbot+92fbc8b664c9bbc40bf6@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, cem@kernel.org, chandan.babu@oracle.com, 
+	djwong@kernel.org, hch@lst.de, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Dec 02, 2024 at 01:02:26PM +0100, Bartosz Golaszewski wrote:
-> From: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> 
-> Now that HWKM support has been added to ICE, extend the ICE driver to
-> support hardware wrapped keys programming coming in from the storage
-> controllers (UFS and eMMC). This is similar to raw keys where the call is
-> forwarded to Trustzone, however we also need to clear and re-enable
-> CFGE before and after programming the key.
-> 
-> Derive software secret support is also added by forwarding the call to
-> the corresponding SCM API.
-> 
-> Wrapped keys are only used if the new module parameter is set AND the
-> architecture supports HWKM.
-> 
-> Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
-> Reviewed-by: Om Prakash Singh <quic_omprsing@quicinc.com>
-> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  drivers/soc/qcom/ice.c | 128 ++++++++++++++++++++++++++++++++++++++++++++-----
->  include/soc/qcom/ice.h |   4 ++
->  2 files changed, 121 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
-> index 5f138e278554c..e83e74e39e44f 100644
-> --- a/drivers/soc/qcom/ice.c
-> +++ b/drivers/soc/qcom/ice.c
-> @@ -28,6 +28,8 @@
->  #define QCOM_ICE_REG_BIST_STATUS		0x0070
->  #define QCOM_ICE_REG_ADVANCED_CONTROL		0x1000
->  #define QCOM_ICE_REG_CONTROL			0x0
-> +#define QCOM_ICE_LUT_KEYS_CRYPTOCFG_R16		0x4040
-> +
->  /* QCOM ICE HWKM registers */
->  #define QCOM_ICE_REG_HWKM_TZ_KM_CTL			0x1000
->  #define QCOM_ICE_REG_HWKM_TZ_KM_STATUS			0x1004
-> @@ -62,6 +64,8 @@
->  #define QCOM_ICE_HWKM_DISABLE_CRC_CHECKS_VAL	(BIT(1) | BIT(2))
->  #define QCOM_ICE_HWKM_RSP_FIFO_CLEAR_VAL	BIT(3)
->  
-> +#define QCOM_ICE_HWKM_CFG_ENABLE_VAL		BIT(7)
-> +
->  /* BIST ("built-in self-test") status flags */
->  #define QCOM_ICE_BIST_STATUS_MASK		GENMASK(31, 28)
->  
-> @@ -69,6 +73,8 @@
->  #define QCOM_ICE_FORCE_HW_KEY0_SETTING_MASK	0x2
->  #define QCOM_ICE_FORCE_HW_KEY1_SETTING_MASK	0x4
->  
-> +#define QCOM_ICE_LUT_KEYS_CRYPTOCFG_OFFSET	0x80
-> +
->  #define QCOM_ICE_HWKM_REG_OFFSET	0x8000
->  #define HWKM_OFFSET(reg)		((reg) + QCOM_ICE_HWKM_REG_OFFSET)
->  
-> @@ -78,6 +84,15 @@
->  #define qcom_ice_readl(engine, reg)	\
->  	readl((engine)->base + (reg))
->  
-> +#define QCOM_ICE_LUT_CRYPTOCFG_SLOT_OFFSET(slot) \
-> +	(QCOM_ICE_LUT_KEYS_CRYPTOCFG_R16 + \
-> +	 QCOM_ICE_LUT_KEYS_CRYPTOCFG_OFFSET * slot)
-> +
-> +static bool ufs_qcom_use_wrapped_keys;
-> +module_param_named(use_wrapped_keys, ufs_qcom_use_wrapped_keys, bool, 0660);
-> +MODULE_PARM_DESC(use_wrapped_keys,
-> +"Use HWKM for wrapped keys support if available on the platform");
+Hello,
 
-This should go into the previous patch and it should be handled in
-qcom_ice_check_supported() instead.
+syzbot found the following issue on:
 
-> +
->  struct qcom_ice {
->  	struct device *dev;
->  	void __iomem *base;
+HEAD commit:    f486c8aa16b8 Add linux-next specific files for 20241128
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1786f1e8580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e348a4873516af92
+dashboard link: https://syzkaller.appspot.com/bug?extid=92fbc8b664c9bbc40bf6
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122c1f5f980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13978f78580000
 
-[...]
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/beb58ebb63cf/disk-f486c8aa.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b241b5609e64/vmlinux-f486c8aa.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c9d817f665f2/bzImage-f486c8aa.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/fe4e6f4f2b2f/mount_0.gz
 
-> @@ -313,24 +378,40 @@ int qcom_ice_program_key(struct qcom_ice *ice,
->  
->  	/* Only AES-256-XTS has been tested so far. */
->  	if (algorithm_id != QCOM_ICE_CRYPTO_ALG_AES_XTS ||
-> -	    key_size != QCOM_ICE_CRYPTO_KEY_SIZE_256) {
-> +	    (key_size != QCOM_ICE_CRYPTO_KEY_SIZE_256 &&
-> +	    key_size != QCOM_ICE_CRYPTO_KEY_SIZE_WRAPPED)) {
->  		dev_err_ratelimited(dev,
->  				    "Unhandled crypto capability; algorithm_id=%d, key_size=%d\n",
->  				    algorithm_id, key_size);
->  		return -EINVAL;
->  	}
->  
-> -	memcpy(key.bytes, bkey->raw, AES_256_XTS_KEY_SIZE);
-> +	if (ufs_qcom_use_wrapped_keys &&
+The issue was bisected to:
 
-I think it's too late to have the check here.
+commit 3eb96946f0be6bf447cbdf219aba22bc42672f92
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Wed May 24 06:05:38 2023 +0000
 
-> +	    (bkey->crypto_cfg.key_type == BLK_CRYPTO_KEY_TYPE_HW_WRAPPED)) {
-> +		/* It is expected that HWKM init has completed before programming wrapped keys */
-> +		if (!ice->use_hwkm || !ice->hwkm_init_complete) {
-> +			dev_err_ratelimited(dev, "HWKM not currently used or initialized\n");
-> +			return -EINVAL;
-> +		}
-> +		err = qcom_ice_program_wrapped_key(ice, bkey, data_unit_size,
-> +						   slot);
-> +	} else {
-> +		if (bkey->size != QCOM_ICE_CRYPTO_KEY_SIZE_256)
-> +			dev_err_ratelimited(dev,
-> +					    "Incorrect key size; bkey->size=%d\n",
-> +					    algorithm_id);
-> +		return -EINVAL;
-> +		memcpy(key.bytes, bkey->raw, AES_256_XTS_KEY_SIZE);
->  
-> -	/* The SCM call requires that the key words are encoded in big endian */
-> -	for (i = 0; i < ARRAY_SIZE(key.words); i++)
-> -		__cpu_to_be32s(&key.words[i]);
-> +		/* The SCM call requires that the key words are encoded in big endian */
-> +		for (i = 0; i < ARRAY_SIZE(key.words); i++)
-> +			__cpu_to_be32s(&key.words[i]);
->  
-> -	err = qcom_scm_ice_set_key(slot, key.bytes, AES_256_XTS_KEY_SIZE,
-> -				   QCOM_SCM_ICE_CIPHER_AES_256_XTS,
-> -				   data_unit_size);
-> -
-> -	memzero_explicit(&key, sizeof(key));
-> +		err = qcom_scm_ice_set_key(slot, key.bytes, AES_256_XTS_KEY_SIZE,
-> +					   QCOM_SCM_ICE_CIPHER_AES_256_XTS,
-> +					   data_unit_size);
-> +		memzero_explicit(&key, sizeof(key));
-> +	}
->  
->  	return err;
->  }
+    block: make bio_check_eod work for zero sized devices
 
--- 
-With best wishes
-Dmitry
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11a5c7c0580000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=13a5c7c0580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=15a5c7c0580000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+92fbc8b664c9bbc40bf6@syzkaller.appspotmail.com
+Fixes: 3eb96946f0be ("block: make bio_check_eod work for zero sized devices")
+
+INFO: task syz-executor901:5953 blocked for more than 143 seconds.
+      Not tainted 6.12.0-next-20241128-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor901 state:D stack:25656 pid:5953  tgid:5899  ppid:5854   flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5369 [inline]
+ __schedule+0x1850/0x4c30 kernel/sched/core.c:6756
+ __schedule_loop kernel/sched/core.c:6833 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6848
+ xfs_ail_push_all_sync+0x236/0x310 fs/xfs/xfs_trans_ail.c:726
+ xfs_log_quiesce+0xdf/0x5b0 fs/xfs/xfs_log.c:1018
+ xfs_fs_freeze+0x8d/0x1a0 fs/xfs/xfs_super.c:940
+ freeze_super+0x81b/0xee0 fs/super.c:2121
+ fs_bdev_freeze+0x1ac/0x320 fs/super.c:1484
+ bdev_freeze+0xd6/0x220 block/bdev.c:257
+ xfs_fs_goingdown+0xa9/0x160 fs/xfs/xfs_fsops.c:442
+ xfs_file_ioctl+0x1312/0x1b20 fs/xfs/xfs_ioctl.c:1360
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f417e96c189
+RSP: 002b:00007f417e8f3168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f417e9fc4b8 RCX: 00007f417e96c189
+RDX: 0000000020000080 RSI: 000000008004587d RDI: 0000000000000004
+RBP: 00007f417e9fc4b0 R08: 00007ffc4da61c37 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f417e9fc4bc
+R13: 000000000000006e R14: 00007ffc4da61b50 R15: 00007ffc4da61c38
+ </TASK>
+INFO: task syz-executor901:5954 blocked for more than 143 seconds.
+      Not tainted 6.12.0-next-20241128-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor901 state:D stack:24688 pid:5954  tgid:5901  ppid:5852   flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5369 [inline]
+ __schedule+0x1850/0x4c30 kernel/sched/core.c:6756
+ __schedule_loop kernel/sched/core.c:6833 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6848
+ xfs_ail_push_all_sync+0x236/0x310 fs/xfs/xfs_trans_ail.c:726
+ xfs_log_quiesce+0xdf/0x5b0 fs/xfs/xfs_log.c:1018
+ xfs_fs_freeze+0x8d/0x1a0 fs/xfs/xfs_super.c:940
+ freeze_super+0x81b/0xee0 fs/super.c:2121
+ fs_bdev_freeze+0x1ac/0x320 fs/super.c:1484
+ bdev_freeze+0xd6/0x220 block/bdev.c:257
+ xfs_fs_goingdown+0xa9/0x160 fs/xfs/xfs_fsops.c:442
+ xfs_file_ioctl+0x1312/0x1b20 fs/xfs/xfs_ioctl.c:1360
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f417e96c189
+RSP: 002b:00007f417e8f3168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f417e9fc4b8 RCX: 00007f417e96c189
+RDX: 0000000020000080 RSI: 000000008004587d RDI: 0000000000000004
+RBP: 00007f417e9fc4b0 R08: 00007ffc4da61c37 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f417e9fc4bc
+R13: 000000000000006e R14: 00007ffc4da61b50 R15: 00007ffc4da61c38
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/30:
+ #0: ffffffff8e937b20 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #0: ffffffff8e937b20 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #0: ffffffff8e937b20 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6744
+1 lock held by klogd/5196:
+ #0: ffff8880b873e8d8 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:598
+2 locks held by getty/5600:
+ #0: ffff8880353b20a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc90002fde2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x6a6/0x1e00 drivers/tty/n_tty.c:2211
+5 locks held by syz-executor901/5953:
+ #0: ffff888148c8ddb0 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x2a/0x220 block/bdev.c:248
+ #1: ffff8880660c8420 (sb_writers#11){++++}-{0:0}, at: sb_wait_write fs/super.c:1910 [inline]
+ #1: ffff8880660c8420 (sb_writers#11){++++}-{0:0}, at: freeze_super+0x4e9/0xee0 fs/super.c:2099
+ #2: ffff8880660c80e0 (&type->s_umount_key#45){+.+.}-{4:4}, at: __super_lock fs/super.c:56 [inline]
+ #2: ffff8880660c80e0 (&type->s_umount_key#45){+.+.}-{4:4}, at: __super_lock_excl fs/super.c:71 [inline]
+ #2: ffff8880660c80e0 (&type->s_umount_key#45){+.+.}-{4:4}, at: freeze_super+0x4f1/0xee0 fs/super.c:2100
+ #3: ffff8880660c8518 (sb_pagefaults){+.+.}-{0:0}, at: sb_wait_write fs/super.c:1910 [inline]
+ #3: ffff8880660c8518 (sb_pagefaults){+.+.}-{0:0}, at: freeze_super+0x519/0xee0 fs/super.c:2104
+ #4: ffff8880660c8610 (sb_internal#2){++++}-{0:0}, at: sb_wait_write fs/super.c:1910 [inline]
+ #4: ffff8880660c8610 (sb_internal#2){++++}-{0:0}, at: freeze_super+0x7cc/0xee0 fs/super.c:2118
+5 locks held by syz-executor901/5954:
+ #0: ffff888148c8c6b0 (&bdev->bd_fsfreeze_mutex){+.+.}-{4:4}, at: bdev_freeze+0x2a/0x220 block/bdev.c:248
+ #1: ffff8880661e0420 (sb_writers#11){++++}-{0:0}, at: sb_wait_write fs/super.c:1910 [inline]
+ #1: ffff8880661e0420 (sb_writers#11){++++}-{0:0}, at: freeze_super+0x4e9/0xee0 fs/super.c:2099
+ #2: ffff8880661e00e0 (&type->s_umount_key#45){+.+.}-{4:4}, at: __super_lock fs/super.c:56 [inline]
+ #2: ffff8880661e00e0 (&type->s_umount_key#45){+.+.}-{4:4}, at: __super_lock_excl fs/super.c:71 [inline]
+ #2: ffff8880661e00e0 (&type->s_umount_key#45){+.+.}-{4:4}, at: freeze_super+0x4f1/0xee0 fs/super.c:2100
+ #3: ffff8880661e0518 (sb_pagefaults){+.+.}-{0:0}, at: sb_wait_write fs/super.c:1910 [inline]
+ #3: ffff8880661e0518 (sb_pagefaults){+.+.}-{0:0}, at: freeze_super+0x519/0xee0 fs/super.c:2104
+ #4: ffff8880661e0610 (sb_internal#2){++++}-{0:0}, at: sb_wait_write fs/super.c:1910 [inline]
+ #4: ffff8880661e0610 (sb_internal#2){++++}-{0:0}, at: freeze_super+0x7cc/0xee0 fs/super.c:2118
+
+=============================================
+
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 30 Comm: khungtaskd Not tainted 6.12.0-next-20241128-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:234 [inline]
+ watchdog+0xff6/0x1040 kernel/hung_task.c:397
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 UID: 0 PID: 3556 Comm: kworker/u8:10 Not tainted 6.12.0-next-20241128-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Workqueue: bat_events batadv_iv_send_outstanding_bat_ogm_packet
+RIP: 0010:kasan_check_range+0x5/0x290 mm/kasan/generic.c:188
+Code: 8e e8 ff 89 e1 ff 90 0f 0b 66 2e 0f 1f 84 00 00 00 00 00 66 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 0f 1f 00 55 <41> 57 41 56 41 54 53 b0 01 48 85 f6 0f 84 a0 01 00 00 4c 8d 04 37
+RSP: 0018:ffffc9000cac7760 EFLAGS: 00000046
+RAX: 000000000000001d RBX: 0000000000000759 RCX: ffffffff817abd42
+RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffffff942c4968
+RBP: 0000000000000000 R08: ffffffff942c4967 R09: 1ffffffff285892c
+R10: dffffc0000000000 R11: fffffbfff285892d R12: 0000000000000001
+R13: ffff8880323cc728 R14: 0000000000000001 R15: ffff8880323cc728
+FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055cd011df600 CR3: 000000000e736000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <TASK>
+ instrument_atomic_read include/linux/instrumented.h:68 [inline]
+ _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
+ hlock_class kernel/locking/lockdep.c:228 [inline]
+ check_wait_context kernel/locking/lockdep.c:4875 [inline]
+ __lock_acquire+0x8a2/0x2100 kernel/locking/lockdep.c:5176
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
+ rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ batadv_iv_ogm_slide_own_bcast_window net/batman-adv/bat_iv_ogm.c:754 [inline]
+ batadv_iv_ogm_schedule_buff net/batman-adv/bat_iv_ogm.c:825 [inline]
+ batadv_iv_ogm_schedule+0x43f/0x10a0 net/batman-adv/bat_iv_ogm.c:868
+ batadv_iv_send_outstanding_bat_ogm_packet+0x6fe/0x810 net/batman-adv/bat_iv_ogm.c:1712
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
