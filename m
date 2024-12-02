@@ -1,185 +1,66 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4C517D366;
-	Mon,  2 Dec 2024 16:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720421D9A70
+	for <linux-block@vger.kernel.org>; Mon,  2 Dec 2024 18:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733156482; cv=none; b=eqQvhRpnstC5bcw/5uBKqa8t75MLqR0xJzHtA6biUWFSoXYeaX6Jh9e3uyc8Ce7PLJid8WxWDjb4A/wPBagOaOK8Ty2UgCCdVfbvuRheasF8m5JsM+fvZu0OuLL1/KYoJeNbMAMvgdurCKrxVNaaNgcAqz9iWthY5dTgZkL1k1Q=
+	t=1733162618; cv=none; b=lrewLV9vEMWVpo44ax/9Vv2vZG6OS4dMKCXkBHLuznDcek0xJK+QGyEfzK7+JJ5LzLghIBtspqzJTk26KT5AmRqFmdCZQadas53cepum3MnZcFEc3+oRTV53UZGNxXY+8RgcvvbRTjYw5Lf6qfD/DAf6YmOTlmS6ZfAFbXo7SAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733156482; c=relaxed/simple;
-	bh=GepOY+2bSH0E/kWJpHBLyw1FRYVtuWSxRHGQ1U8w1N0=;
+	s=arc-20240116; t=1733162618; c=relaxed/simple;
+	bh=JtNSdM5QDFvtDSUFFPnRuSj8WUL4/yhIRmpd5x6qOjo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jLgbKsIif0Ob7zViez+otTGXYwqPFvPoCRkoy21eJknXplvvSu3eWIXG8F2K0Vfspprmlt2wXbCnLafq4xoU1t9vR1nOede4o58YtGdjzkpfeaULEImbQFcvMDYxD1DITIbuZl4ev2/5Z50OWYUOxAS0Z+XZnQ9DuGm45EdADpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ahqwgH8C; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RNGkqSZy; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fyYYPtB3; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jWlh3xnw; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=k5KBprMT50R7JYgPb2krQ4Tndy0CFDHG1W8wrkixPsmWoaUtnuRJmp5xKzbQ+mLQ+qnzTk/tU72Dv/ZEOR2vtg75H/yJ/GNn3oy+RwGfkIwX4fJPQhwahRWHxLQ6UyNUBO9yB7LyZahmVEVHrN1kAyty3vnGUfIUWuhRgWiyHLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=quZRxVQ6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ahqwgH8C";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RNGkqSZy";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fyYYPtB3";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jWlh3xnw"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D2ECD2116E;
-	Mon,  2 Dec 2024 16:21:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1733156478; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1z4TbU/Qkr/jvGw5g0HDhjUZVdLmjABAsTzcryF/YSQ=;
-	b=ahqwgH8Cm7IMlLSR5xUALMENPXVrfiVZYRM2EnGvSOz1cHJn9o4PPUF31fVJKP26sNONwj
-	/BNFGzGzx2KvFNH68BSPa82uwszqyhuxmMfZg0NiV6dsoXiMkakgIXNSzxpQyoJGdSyuHV
-	egZjdixQ7CgOiRl41c70hLgOAilmCFg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1733156478;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1z4TbU/Qkr/jvGw5g0HDhjUZVdLmjABAsTzcryF/YSQ=;
-	b=RNGkqSZyu8FikIALm4xcffpc0Mp2YnxHSUWMw1XbaLWfFmW1tJoLw/O/RE7tPPdsu5Di9g
-	MwNpvhoDhZ5MxiCg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=fyYYPtB3;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=jWlh3xnw
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1733156477; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1z4TbU/Qkr/jvGw5g0HDhjUZVdLmjABAsTzcryF/YSQ=;
-	b=fyYYPtB3IU3lSwDkK02nZlnsUkmLxcj3SJs69Ykiq83EpNod6P26mmQtjYymLOBE4pLYRP
-	Md6K1iSYMs+S6z+/SQxqOCDp29VJHyb6AONouXiCHMsbUhJWbMr5Se7zFdgEZm3uJSSykP
-	6tt3BE+ZeN49klRPVsjp1FTcAbbc7zo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1733156477;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1z4TbU/Qkr/jvGw5g0HDhjUZVdLmjABAsTzcryF/YSQ=;
-	b=jWlh3xnwkmNY4Q/NgVKE3IcFrN09XgEpMmPNnHxrnv3XnjUq1MMnges55t4yysr2tZ8j3h
-	X8uhfoPaiadUgJCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D865713A31;
-	Mon,  2 Dec 2024 16:21:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5Q0oJXneTWfUQgAAD6G6ig
-	(envelope-from <colyli@suse.de>); Mon, 02 Dec 2024 16:21:13 +0000
-Date: Tue, 3 Dec 2024 00:21:07 +0800
-From: Coly Li <colyli@suse.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: axboe@kernel.dk, haris.iqbal@ionos.com, jinpu.wang@ionos.com, 
-	kent.overstreet@linux.dev, agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org, 
-	dm-devel@lists.linux.dev, linux-bcachefs@vger.kernel.org, hch@lst.de
-Subject: Re: [PATCH 2/2] block: Delete bio_set_prio()
-Message-ID: <xrrvym37rltbopjxuz2cozkladm7nlklms46dnddexlpxva373@xrsrq3y54qsv>
-References: <20241202111957.2311683-1-john.g.garry@oracle.com>
- <20241202111957.2311683-3-john.g.garry@oracle.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="quZRxVQ6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28ABDC4CED2;
+	Mon,  2 Dec 2024 18:03:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733162617;
+	bh=JtNSdM5QDFvtDSUFFPnRuSj8WUL4/yhIRmpd5x6qOjo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=quZRxVQ6SqYtDWGy8JcyAYeIvx640p27rYdVOryJ0eVMVpm/poiKLk/Ln7JBx9He8
+	 yXDLZX3RP0vTEpgv80Fk97Nt3s+/ztPTTvXfMokBFn8II7121QGKmz8ynHpkTJFtZx
+	 urDNK7tlv5iuBe3vV/U4ZT2BR2Axh+k3/YYz5ARz00MmFCkl8raMBhqud/0YAVuhXw
+	 ni41iQlDaIsTAS0Nb4EBp+22IxpG8sW8W+sAoVEJjNCunib2vfwX/U3274YGp/+Gac
+	 yl56mklvboN17U0p+q2n1+V+Tk8JFO1zcHL7eRbjNQcXduvuuk0gdIIK+gzniBYYF+
+	 Ex4MZ01zgmQgA==
+Date: Mon, 2 Dec 2024 11:03:35 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, hch@lst.de,
+	sagi@grimberg.me, axboe@fb.com, chaitanyak@nvidia.com,
+	yi.zhang@redhat.com, shinichiro.kawasaki@wdc.com,
+	mlombard@redhat.com, gjoyce@linux.ibm.com
+Subject: Re: [PATCHv2] nvmet: use kzalloc instead of ZERO_PAGE in
+ nvme_execute_identify_ns_nvm()
+Message-ID: <Z032dx3uDu-m1j9i@kbusch-mbp>
+References: <20241124125628.2532658-1-nilay@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241202111957.2311683-3-john.g.garry@oracle.com>
-X-Rspamd-Queue-Id: D2ECD2116E
-X-Spam-Score: -4.01
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MISSING_XM_UA(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:dkim,oracle.com:email];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+In-Reply-To: <20241124125628.2532658-1-nilay@linux.ibm.com>
 
-On Mon, Dec 02, 2024 at 11:19:57AM +0000, John Garry wrote:
-> Since commit 43b62ce3ff0a ("block: move bio io prio to a new field"), macro
-> bio_set_prio() does nothing but set bio->bi_ioprio. All other places just
-> set bio->bi_ioprio directly, so replace bio_set_prio() remaining
-> callsites with setting bio->bi_ioprio directly and delete that macro.
+On Sun, Nov 24, 2024 at 06:25:53PM +0530, Nilay Shroff wrote:
+> The nvme_execute_identify_ns_nvm function uses ZERO_PAGE for copying
+> SG list with all zeros. As ZERO_PAGE would not necessarily return the
+> virtual-address of the zero page, we need to first convert the page
+> address to kernel virtual-address and then use it as source address
+> for copying the data to SG list with all zeros. Using return address
+> of ZERO_PAGE(0) as source address for copying data to SG list would
+> fill the target buffer with random/garbage value and causes the
+> undesired side effect.
 > 
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->  drivers/block/rnbd/rnbd-srv.c | 2 +-
->  drivers/md/bcache/movinggc.c  | 2 +-
->  drivers/md/bcache/writeback.c | 2 +-
->  fs/bcachefs/move.c            | 6 +++---
->  include/linux/bio.h           | 2 --
->  5 files changed, 6 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-> index 08ce6d96d04c..2ee6e9bd4e28 100644
-> --- a/drivers/block/rnbd/rnbd-srv.c
-> +++ b/drivers/block/rnbd/rnbd-srv.c
-> @@ -167,7 +167,7 @@ static int process_rdma(struct rnbd_srv_session *srv_sess,
->  	bio->bi_iter.bi_sector = le64_to_cpu(msg->sector);
->  	prio = srv_sess->ver < RNBD_PROTO_VER_MAJOR ||
->  	       usrlen < sizeof(*msg) ? 0 : le16_to_cpu(msg->prio);
-> -	bio_set_prio(bio, prio);
-> +	bio->bi_ioprio = prio;
->  
->  	submit_bio(bio);
->  
-> diff --git a/drivers/md/bcache/movinggc.c b/drivers/md/bcache/movinggc.c
-> index ef6abf33f926..45ca134cbf02 100644
-> --- a/drivers/md/bcache/movinggc.c
-> +++ b/drivers/md/bcache/movinggc.c
-> @@ -82,7 +82,7 @@ static void moving_init(struct moving_io *io)
->  	bio_init(bio, NULL, bio->bi_inline_vecs,
->  		 DIV_ROUND_UP(KEY_SIZE(&io->w->key), PAGE_SECTORS), 0);
->  	bio_get(bio);
-> -	bio_set_prio(bio, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0));
-> +	bio->bi_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0);
->  
->  	bio->bi_iter.bi_size	= KEY_SIZE(&io->w->key) << 9;
->  	bio->bi_private		= &io->cl;
-> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-> index c1d28e365910..453efbbdc8ee 100644
-> --- a/drivers/md/bcache/writeback.c
-> +++ b/drivers/md/bcache/writeback.c
-> @@ -334,7 +334,7 @@ static void dirty_init(struct keybuf_key *w)
->  	bio_init(bio, NULL, bio->bi_inline_vecs,
->  		 DIV_ROUND_UP(KEY_SIZE(&w->key), PAGE_SECTORS), 0);
->  	if (!io->dc->writeback_percent)
-> -		bio_set_prio(bio, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0));
-> +		bio->bi_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 0);
->  
->  	bio->bi_iter.bi_size	= KEY_SIZE(&w->key) << 9;
->  	bio->bi_private		= w;
+> As other identify implemenations uses kzalloc for allocating a zero
+> filled buffer, we decided use kzalloc for allocating a zero filled
+> buffer in nvme_execute_identify_ns_nvm function and then use this
+> buffer for copying all zeros to SG list buffers. So esentially, we
+> now avoid using ZERO_PAGE.
 
-
-For bcache part, Acked-by: Coly Li <colyli@suse.de>
-
-Thanks.
-
-Coly Li
+Thanks, applied to nvme-6.13.
