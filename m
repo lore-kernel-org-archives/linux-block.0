@@ -1,309 +1,128 @@
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2041.outbound.protection.outlook.com [40.107.96.41])
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819E36F2FE;
-	Tue,  3 Dec 2024 05:02:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733202122; cv=fail; b=KaMQzZXMJqF9C8fNkqs49yT5ZoDUSot5o3mwDjGgRAxqwVy7VRVg/G5TWYzLr6RMeO9iv7nzSa1D3SSEwLaYF0kih3JVJ1mHF7EDNeUUTJMmA33CSkxswIFO/QxBHv18M8dp5uhF34fA5nfxycnsUBhvm38ORkS/sjbk0Q7RcQE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733202122; c=relaxed/simple;
-	bh=HVmy78erRPlRuoT076t2TO5PslAngXSe7UpadWRveRo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=aktpomkvRc9mvIxsoyF7GyhoXoxCkImXCCo1zxBNO0P9aH6l0UhyO2d/1KedNv5GSPCa6RZPnI7p9c+xEtmvxY/BsjF22oZjBu+7bLiyDudUY1nsCa8I8YRRYe72OQC/aflvErz51n4jeaYGnWfpPHHlFiK+37jitrp4QNc5EIg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NY6f6TCI; arc=fail smtp.client-ip=40.107.96.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D9618FDAE;
+	Tue,  3 Dec 2024 07:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.144
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733211638; cv=none; b=MJSNlaidRinEcFUdKMXj2K9O6SNv8SISmxeURwt4qgw/SU2ClwaNDpgkwJxVYn2DPw7tdgLmzsoy8ZT2teroUhg+ZpwHZFTKiVYqe09KnKwp0xOH4t2EjBF+p24l8jYWRdUKcVMuzPU17pTLPb9DTLGDTwqTFGL+hW/w0H7FNSk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733211638; c=relaxed/simple;
+	bh=rYT/BZ5dcvbrsAD7eprabGPsFGXueO8aKflsxttUX28=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sBFvDn6+r1AYq2efJvidxo+fgd+q8306kj9FxGoL+0hEov537zl7I88nOSf6jWhzjrYmLUeHcCF5BJvms3ThDwxTh5H+VGDJlAN14kfPyGABO8Z4oH/Jq+meVuBhMTGgBvXn4vRvUvBJ56xJlowV0MaemH82quo4JC97cR1WD48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=I/gtNnJ4; arc=none smtp.client-ip=216.71.153.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NY6f6TCI"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SIG938yVTZ4jZTzdmr5aUFsNHVXwNNuASopRH9f6JJYgNTPRg9dmXVnf+19SPzYjEn/C0phHqCOA3cvR9uwBYgV9WnQXDAvxegNWEeJkxcKM/IreK8djaJUd2zxE85dshbOtieAjpxtXbV3T5Lczzt7SYniyuFf490SDZcujQx85A7v2FWc3NXZraqwqESRMuhvRPzzDisEWNuuNO+nIIySUcypC9FBUH2NfkqArWeFswW9WkSKkMFtYPD8iFbNPfIxoo6qfy45tjocj+PvHojdNGmfBdErKvzRXjUzmbLZlOOrZfL9WUqUNVNv93vUwC+lsFR4a5PaMRnSkmcRgsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ilpaYM/UDZXgtawbog2iIqRviFvZhFt1bSCLIwccudY=;
- b=PXqzVKaT7XkTrSPu4r099YvCC35qLh55+Eb4esjsWZjVDGYCd6U5xfIwshFnmoaS7EfBq8tk2GQrRNb9l0pkX2C4IHmauhA33+gP2Awceh/YdZpPLX5iTy991ZVfSTTx3c06H3oREGwB/EYnKSzxFGdgk/SVwHAYQ4MXHf0iJHy6cbsL4KKnAfLR7THucm8smWs1Nq8lUSvked5pbASIYGKwXvayzpPlIVlbCLjZ3HCpF+IzIdwTJSQBKK5f4Gxx/kTt73hbyoSPd9LO5+8CcsC7YTKG6fl9ISU5y2vm5ARn1lbDnr25YJR1ng1U2RcLEJOMU4F0zHDyRqclmwH8Sw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ilpaYM/UDZXgtawbog2iIqRviFvZhFt1bSCLIwccudY=;
- b=NY6f6TCIoqrZuD8KAMPbcrvtTUhU+MYPlRarBHVayBhLuIa/kSWs2bJpJL/jFj0gp66UICcr6vv3Vfue5eyoDeRLnTafWL4Lvf58jAoIv7DGbzASKtS+i3helul2l+kIB2k02z6NySwC96nMFGHY70jncqHXq2BpKHpeOhFS2LU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA1PR12MB6434.namprd12.prod.outlook.com (2603:10b6:208:3ae::10)
- by SN7PR12MB8171.namprd12.prod.outlook.com (2603:10b6:806:322::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.18; Tue, 3 Dec
- 2024 05:01:57 +0000
-Received: from IA1PR12MB6434.namprd12.prod.outlook.com
- ([fe80::dbf7:e40c:4ae9:8134]) by IA1PR12MB6434.namprd12.prod.outlook.com
- ([fe80::dbf7:e40c:4ae9:8134%4]) with mapi id 15.20.8207.010; Tue, 3 Dec 2024
- 05:01:57 +0000
-Message-ID: <b8422ee0-974c-43d8-9c1a-3e5e715fbd7d@amd.com>
-Date: Tue, 3 Dec 2024 10:31:48 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/1] Large folios in block buffered IO path
-To: Mateusz Guzik <mjguzik@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, nikunj@amd.com,
- willy@infradead.org, vbabka@suse.cz, david@redhat.com,
- akpm@linux-foundation.org, yuzhao@google.com, axboe@kernel.dk,
- viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz,
- joshdon@google.com, clm@meta.com
-References: <20241127054737.33351-1-bharata@amd.com>
- <CAGudoHGup2iLPUONz=ScsK1nQsBUHf_TrTrUcoStjvn3VoOr7Q@mail.gmail.com>
- <CAGudoHEvrML100XBTT=sBDud5L2zeQ3ja5BmBCL2TTYYoEC55A@mail.gmail.com>
- <3947869f-90d4-4912-a42f-197147fe64f0@amd.com>
- <CAGudoHEN-tOhBbdr5hymbLw3YK6OdaCSfsbOL6LjcQkNhR6_6A@mail.gmail.com>
- <5a517b3a-51b2-45d6-bea3-4a64b75dfd30@amd.com>
- <CAGudoHHBu663RSjQUwi14_d+Ln6mw_ESvYCc6dTec-O0Wi1-Eg@mail.gmail.com>
- <CAGudoHHo4sLNpoVw-WTGVCc-gL0xguYWfUWfV1CSsQo6-bGnFg@mail.gmail.com>
- <2220e327-5587-4d3c-917d-d0a2728a0f73@amd.com>
- <CAGudoHFSUoLXjEh8bvULXe2bysiW8S6yTcpgzCAgkuPuJxD6_Q@mail.gmail.com>
-Content-Language: en-US
-From: Bharata B Rao <bharata@amd.com>
-In-Reply-To: <CAGudoHFSUoLXjEh8bvULXe2bysiW8S6yTcpgzCAgkuPuJxD6_Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PNYP287CA0029.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:23d::32) To IA1PR12MB6434.namprd12.prod.outlook.com
- (2603:10b6:208:3ae::10)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="I/gtNnJ4"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1733211636; x=1764747636;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rYT/BZ5dcvbrsAD7eprabGPsFGXueO8aKflsxttUX28=;
+  b=I/gtNnJ4N77a86dpwWH1k3Q44Rp/vss0M5cTNKK2ECj36yTrM8vcZWMM
+   AriCefhI8oocqioPX73uzDz2PLRVD89E6Zqo5amP31uEWRVlCkHkl6/Lg
+   9QbSVITJ6pCnvnvQac/3gzll2wmNU/sgbHIH0zK34SaH6szqJg0d+numi
+   ki68qiYkpe5GeA2pevNEoJqPd/JViKzshs43S46P3b9toA/7sGODIjtyi
+   bi6hl+UjjCwTJAUUjPq4AZlci19KSvowmwdnNJoyBhCdIZ8IDRpJh+fwU
+   FSkmTGnZszVriMUxByeyhbMZSn1PnwR3kZbmzdxh4QCaT3pHIqAF1ppja
+   A==;
+X-CSE-ConnectionGUID: Dm5wGI45Tqah2hrzZ/XYew==
+X-CSE-MsgGUID: yJge25jqR3yNmvSPEvOtBA==
+X-IronPort-AV: E=Sophos;i="6.12,204,1728921600"; 
+   d="scan'208";a="33962301"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 03 Dec 2024 15:40:29 +0800
+IronPort-SDR: 674ea74a_w/hdOlMTyobnp8bSIUhA8QLF7pkm/IVD7zZZqYmSe0hvQvV
+ eztDAa/l0ZeMTqOicKsu6Kq1QuO07vP9Y0hDQNg==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Dec 2024 22:38:03 -0800
+WDCIronportException: Internal
+Received: from unknown (HELO redsun91.ssa.fujisawa.hgst.com) ([10.149.66.6])
+  by uls-op-cesaip01.wdc.com with ESMTP; 02 Dec 2024 23:40:29 -0800
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To: linux-btrfs@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	John Garry <john.g.garry@oracle.com>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	David Sterba <dsterba@suse.com>
+Subject: [PATCH RESEND v3] btrfs: handle bio_split() error
+Date: Mon,  2 Dec 2024 23:40:22 -0800
+Message-ID: <964809e5e81425b0fb28bfbee5beeb99b68b9562.1733211171.git.johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB6434:EE_|SN7PR12MB8171:EE_
-X-MS-Office365-Filtering-Correlation-Id: 27d631c2-8c79-44d3-d69a-08dd13579ce7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?L3hSSVdpZjJwSXBxdEFyOWw2ZkROUjVzWGZzUWxsemUzaGFaVVBtbWVBcEpQ?=
- =?utf-8?B?b1VSamxFditYUGtDM2VoazIxWG8vSEQrd1l6MFdaZ1NFYUVnSmZtVkxIZVoy?=
- =?utf-8?B?NUY5bWp3YnYxS08vaGc2L0dwNW12WnJvai9YTE04NFpTUDVQdnp1SXF6akdK?=
- =?utf-8?B?N1EwS2lxaHR1WHhJQm5ZTUhjWnVZMFptTDJWa05wZ3BrVjdhNmtnTkUyVWlD?=
- =?utf-8?B?SUFxRDQ3ekFqL2RPa3JCU1JMcFNld2g2L0dGWHBObW11anorbDUxL3luSFox?=
- =?utf-8?B?WHY1LytGQklWeXI0Zk5TZzJwTDRDMktEQndZUDMyeHhyMmJ5RitReVJRbGxT?=
- =?utf-8?B?Q0JPck1LV3ZVTm5iRjBhRkRjUkluSUlzczlCSE5ia3JkaFdLUWUwUWZzK2I0?=
- =?utf-8?B?VHdlRlhmRkhLb1V2Q3J1eXRham9QekRTTU5DOHJwcUgrRlFmc0cyQzkyYmtV?=
- =?utf-8?B?bUVBWG94aXlEc215SWxVOSszU2N5NUZQdFVWRUZDTEhla3NVanhzanlYZ2F1?=
- =?utf-8?B?ZkVQNzU2RHlzVnZMQklXUWZ0bS83V2xLWk83QThMTDQ5Q2JzbExTcG1VQ09l?=
- =?utf-8?B?NVI0YmxGd1ZHaDdsU0MrNWJKT0JBNSt4c2oycDVldG9HK1Vpa1ROR0QyTjdN?=
- =?utf-8?B?NEx2bGpmQ21wOGFwNTdWK0hYa0pLd2NWVkNaY1JIL2ZxODlPVnNMVlNQWEJ5?=
- =?utf-8?B?ZjdQK3pvSTAwU05RS3F3K21qQWd0SnhjdWVqNWJzbU1zTDNaVUlORXlXWUJ6?=
- =?utf-8?B?QzRGbW1nVFkwUUVIRjBhYkR3Mk5FUXM4dXp0ZDBKSHZ3V1BYRXlDRVlzeTFD?=
- =?utf-8?B?bXdKeS9JRXBtcFFwZ0RCRFMvYWdQenpBMnlydkgrVno5QjZ6RUx5UGF6dmdz?=
- =?utf-8?B?NGdUN25OV25ET1NHc2dwelVUNlZ5NS9pNzBQalZONVBZS3hrRVBqbDkzbERo?=
- =?utf-8?B?Q3VHSi81QTdxcUhvUWRES1ZvaGt1YjlwS3NWQ25pNHF3WVF3eEJUaHBXY24y?=
- =?utf-8?B?N1JLSDczRjRjSlhJT3YwTlArekZ0TlVpTktadDBkdFh5VlFzNzVuczFCRWE2?=
- =?utf-8?B?YlFXbC9QSVVOR2ZFdi9JMXdHRVNOM2JxVUp2bkEwdHlkTVRlcWowcUh3YUV3?=
- =?utf-8?B?cGpMQlArNy9wOWl6SVJzNHhtUlRaTDBUM0YxdDF1a010b21PSDcycVZHU3E2?=
- =?utf-8?B?OVRyL0hMWWV0OHZMTDd6VjdTbDlwcEVYa1p5Mk1pcTJ3WnE4TEgrUGdpdE9C?=
- =?utf-8?B?K2NQMFdWaWgvd1RmU1FpZnZVNEdDNUwwQ0lGTjFHR0h6U3RNQlJrOXlLZ25O?=
- =?utf-8?B?ZEdUaDhEYTNwTVVmYmtYN3JQdVFXT0l1YlJ1cVc0YkNEeWV2a3F5cEF0czk3?=
- =?utf-8?B?YjlyUmlhRTVEQ0huL05laVBJWEhiaFo4QXNuaHlnNXRkWTJKeGQrUXgvNlIy?=
- =?utf-8?B?a0ZpQzVTKzJQaXhuWkR1UWxOVVNjN2prRldyb2ZZc3JGamNDV1FFNE1taGhY?=
- =?utf-8?B?eEhtME1hU3F5V09yNzk5YW0wTUhFT3UyMFVuQ3BhR0pNMDlYREk2OGxEYlVW?=
- =?utf-8?B?cklKV0xmS3JRbEFwRmV3SVRCYmxjcmhVSzVNbktTKzR5UFpCKy90TWx2ZnB4?=
- =?utf-8?B?Q1VGa0UyZTZZaFFWVzZ6U3o2b3pvaFA0TzgxOVdnSDU0eHBNaFdjUmZkZ3pq?=
- =?utf-8?B?ZlhJNW05OGRWdmJYWnpldGpDNld1c3MwR3NFMnJpU1JxQmlYWjFOSUJobGJE?=
- =?utf-8?B?MEV0a0NUOTk5Q2N0bnV3cEswWmNqV0pYS1lFcnRBdFdHMHErWktZeE9pbmFS?=
- =?utf-8?B?MHJVTHNXVVVIeVRSbUhMUT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB6434.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VElNb2E2blYvOFlXY3JUT3p5bTJtNzkvMTR3N3hTaDdGbTdiODhucFVBU1lQ?=
- =?utf-8?B?VzZJSjZNSFJpYTJMa2FYWE9QbVovSlYzMDA5QXhxUWZiNTFqWk9Bb2dsNHg5?=
- =?utf-8?B?WkRLWERjcXprdXhVM2JWWVQ0cDl0NUhrc2hFdFAzeXNkMm02R1U0bHpPdGUy?=
- =?utf-8?B?bmgxQ01SbUx4N2FVT1VxajNMMURIblNPUGdRdSsvQjBpbkJTRS9qOEMvQ0Nz?=
- =?utf-8?B?TTlLRkZEOVd2YUNMa1BDM2VOYkRieTgrTEFtTHFCZGpubVFXaTFRSXhPL1Ev?=
- =?utf-8?B?SVBPOWpKaUpWN3VJSUtJdm1KUXJuUFR5eS90M3BWWnZhcFI5Q1VJQkJqMUMw?=
- =?utf-8?B?VW96NzBmL293aUttbFpkQzdWTkpSNFJZdWlXL2EreFlXc2k4WkMvRmtqMVV3?=
- =?utf-8?B?elVjRzRtQkE2ZVlBcDN1OHJyTFVBNHkwak43bytKeStuMnAveW1OY2ZnSjND?=
- =?utf-8?B?Q3BiVUFKcVpyclQxMjlkbVVxOWRwbUpUT0JsaXBGNUxYT25BRHhzZ1F6ODlW?=
- =?utf-8?B?cWpUWXJwWURmUHkweTJXWjZoalRpa2F0SFdvTVFZSjBEcTRYRmtMajZnRUdj?=
- =?utf-8?B?NFFTcUtKcGI2dEt4UFVTcTRWMERSd25ZM3FCSklpYUl2djBBVVlvd3VTeUdI?=
- =?utf-8?B?N0IxU2wxMXRrV3cyUkV0WFZGM2ZZcldEbk9aVWxxbi8rTXgraUJCbm5PVHdG?=
- =?utf-8?B?VUczaEtjM1A4eXduWmtWMEFYYkltbkV6UkhlV1Y5ZVcvbDEvU1BCWEozWDFD?=
- =?utf-8?B?MjZISjE5RzMxUEJlMzE0UEtrYXF1WXFKR1FKV0xWU1h3RUJEdVJpTWtkK0xl?=
- =?utf-8?B?bTJpcWNCU2RFN1BwQ1VTUzV4ZTdhS2hPVkRpZjBZelduUGdkQUkvYTZxWDB3?=
- =?utf-8?B?NkNxN3dkSURobVh6bElLWnFqMnF1b3dwZCtUZ1U4blYxbmV4bTA0ZFdUeFJz?=
- =?utf-8?B?UDJiYjRrQUVUaGw0UEZ4eC9EaHN5YU0zR05uRkxOczF2djhOODdDRG1XaGxW?=
- =?utf-8?B?bDZ0Z3FkYS85Q2NSazNwUjV1Q3VZRTN0S3M0bWVJMklkQzM3UExMVjFSaVZ6?=
- =?utf-8?B?NGRoT0J3Tlgvc3h6SjN4UktlOWM3OHdsZG9jd0tlWWZJWXNJa0JwOUpOdXda?=
- =?utf-8?B?eGdIc1hLankyYlh5Vyt0Uy9BWlp6Z1lWc2lOdlRYUnNaeVo1aVJ5aGVBY1hW?=
- =?utf-8?B?cnhJQlg0UmM0R1ZRZVZwT25iN0p1dUxiTGJKQWs0eVZCUDZSeFdkMVhxeUJ2?=
- =?utf-8?B?RGVJS1JNbHZZd05TWWJZcWxycGpGbWVFL2RyeVp4MHhRVTNLVlMxRUlGTjcy?=
- =?utf-8?B?TG8vWlY2cGx4VGxyOFBPS01HVEpuazl6U1plZDIzbW16LzVCdWpJVVZzQUoz?=
- =?utf-8?B?ZDFnV0FwUnNGMGRJZldTVmsyVDMzTmZIYys0TGtXamhmbnNnRmJNOVBNdkov?=
- =?utf-8?B?bUZCbTFYcmk3Wm1mcGt0VGhPZU5va2JkMkw5d2JzRzFsaUZjR1VqZXNGaXpJ?=
- =?utf-8?B?RXRHQzBCUHNyYVBSd0t1YUNNMk13bWhJM0tTdWhQTXh2RkZnOEtNTGJqMGhp?=
- =?utf-8?B?SlhyVnFvTlFVa0t4MG9UKzE2YXN4MlJ3c1JMdWpKTm95WTllOGNBRm0vcWQ5?=
- =?utf-8?B?ano0cm15b0gyd0VjUVhoREtjZVVnajZ5dmpIamhocnJjMWQ3ejg1N0VDR2F1?=
- =?utf-8?B?WVNHZjY2NU50dU9RR091RjRtaGl4M3hwRk8rNGE4L2xyYXZzL0J4MjJGVjF6?=
- =?utf-8?B?OTc3SXNhVSt5bkJvK0g2UzF4cEFIVnNJMmhPVUhQZkhTNmszSll4UjdMT2dW?=
- =?utf-8?B?cTRZRlQybks1Mk1qRTJzUWU5dEY2RUUyeW5uQlcyK3FuL09BYlViaG9IK0Vr?=
- =?utf-8?B?bFROQmVXRGpLSlVhaW1uc09NclFscjNZU2YzWGk2RXdFelRhU3JZQkVRYnZR?=
- =?utf-8?B?NklpWnNCT3hnb1JjTVFieW9OYlBpdnhaTDlFNXpud3NCcjBWeUdYUUMyVHpP?=
- =?utf-8?B?SDN6WFFvMldBSXhpT3ZZYmpqNXpDVDhNRjVIS1lWaWRTWEVpblNiZUtUbk9k?=
- =?utf-8?B?c0RuNEVXSTZRSkw3V1BzaVFOLzJSWWp0Zzd5d2hteGVnUEhGVGloSThRYmZU?=
- =?utf-8?Q?pttzsrOdKfcy0uMquHGEdnY9L?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 27d631c2-8c79-44d3-d69a-08dd13579ce7
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB6434.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2024 05:01:57.4950
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aLPuXnxaA2Vf5kPjNpKLNsGgTBKYaI6prripsYEtKYIXpn91LZaKIntBRSF7L989IdI43XHBD+2y95OLW6QzeQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8171
+Content-Transfer-Encoding: 8bit
 
-On 02-Dec-24 3:38 PM, Mateusz Guzik wrote:
-> On Mon, Dec 2, 2024 at 10:37 AM Bharata B Rao <bharata@amd.com> wrote:
->>
->> On 28-Nov-24 10:01 AM, Mateusz Guzik wrote:
->>
->>> WIlly mentioned the folio wait queue hash table could be grown, you
->>> can find it in mm/filemap.c:
->>>     1062 #define PAGE_WAIT_TABLE_BITS 8
->>>     1063 #define PAGE_WAIT_TABLE_SIZE (1 << PAGE_WAIT_TABLE_BITS)
->>>     1064 static wait_queue_head_t folio_wait_table[PAGE_WAIT_TABLE_SIZE]
->>> __cacheline_aligned;
->>>     1065
->>>     1066 static wait_queue_head_t *folio_waitqueue(struct folio *folio)
->>>     1067 {
->>>     1068 │       return &folio_wait_table[hash_ptr(folio, PAGE_WAIT_TABLE_BITS)];
->>>     1069 }
->>>
->>> Can you collect off cpu time? offcputime-bpfcc -K > /tmp/out
->>
->> Flamegraph for "perf record --off-cpu -F 99 -a -g --all-kernel
->> --kernel-callchains -- sleep 120" is attached.
->>
->> Off-cpu samples were collected for 120s at around 45th minute run of the
->> FIO benchmark that actually runs for 1hr. This run was with kernel that
->> had your inode_lock fix but no changes to PAGE_WAIT_TABLE_BITS.
->>
->> Hopefully this captures the representative sample of the scalability
->> issue with folio lock.
+Commit e546fe1da9bd ("block: Rework bio_split() return value") changed
+bio_split() so that it can return errors.
 
-Here is the data from offcputime-bpfcc -K run with inode_lock fix and no 
-change to PAGE_WAIT_TABLE_BITS. This data was captured for the entire 
-duration of FIO run (1hr). Since the data is huge, I am pasting a few 
-relevant entries.
+Add error handling for it in btrfs_split_bio() and ultimately
+btrfs_submit_chunk().
 
-The first entry in the offcputime records
+Reviewed-by: David Sterba <dsterba@suse.com>
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+---
 
-     finish_task_switch.isra.0
-     schedule
-     irqentry_exit_to_user_mode
-     irqentry_exit
-     sysvec_reschedule_ipi
-     asm_sysvec_reschedule_ipi
-     -                fio (33790)
-         2
+Resend because John asked me to do so.
 
-There are thousands of entries for read and write paths of FIO and I 
-have shown only the first and last entries for the same here.
+ fs/btrfs/bio.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-First entry for FIO read path that waits on folio_lock
+diff --git a/fs/btrfs/bio.c b/fs/btrfs/bio.c
+index 1f216d07eff6..af3db0a7ae4d 100644
+--- a/fs/btrfs/bio.c
++++ b/fs/btrfs/bio.c
+@@ -81,6 +81,9 @@ static struct btrfs_bio *btrfs_split_bio(struct btrfs_fs_info *fs_info,
+ 
+ 	bio = bio_split(&orig_bbio->bio, map_length >> SECTOR_SHIFT, GFP_NOFS,
+ 			&btrfs_clone_bioset);
++	if (IS_ERR(bio))
++		return ERR_CAST(bio);
++
+ 	bbio = btrfs_bio(bio);
+ 	btrfs_bio_init(bbio, fs_info, NULL, orig_bbio);
+ 	bbio->inode = orig_bbio->inode;
+@@ -678,7 +681,8 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
+ 				&bioc, &smap, &mirror_num);
+ 	if (error) {
+ 		ret = errno_to_blk_status(error);
+-		goto fail;
++		btrfs_bio_counter_dec(fs_info);
++		goto end_bbio;
+ 	}
+ 
+ 	map_length = min(map_length, length);
+@@ -686,7 +690,15 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
+ 		map_length = btrfs_append_map_length(bbio, map_length);
+ 
+ 	if (map_length < length) {
+-		bbio = btrfs_split_bio(fs_info, bbio, map_length);
++		struct btrfs_bio *split;
++
++		split = btrfs_split_bio(fs_info, bbio, map_length);
++		if (IS_ERR(split)) {
++			ret = errno_to_blk_status(PTR_ERR(split));
++			btrfs_bio_counter_dec(fs_info);
++			goto end_bbio;
++		}
++		bbio = split;
+ 		bio = &bbio->bio;
+ 	}
+ 
+@@ -760,6 +772,7 @@ static bool btrfs_submit_chunk(struct btrfs_bio *bbio, int mirror_num)
+ 
+ 		btrfs_bio_end_io(remaining, ret);
+ 	}
++end_bbio:
+ 	btrfs_bio_end_io(bbio, ret);
+ 	/* Do not submit another chunk */
+ 	return true;
+-- 
+2.47.0
 
-     finish_task_switch.isra.0
-     schedule
-     io_schedule
-     folio_wait_bit_common
-     filemap_get_pages
-     filemap_read
-     blkdev_read_iter
-     vfs_read
-     ksys_read
-     __x64_sys_read
-     x64_sys_call
-     do_syscall_64
-     entry_SYSCALL_64_after_hwframe
-     -                fio (34143)
-         3381769535
-
-Last entry for FIO read path that waits on folio_lock
-
-     finish_task_switch.isra.0
-     schedule
-     io_schedule
-     folio_wait_bit_common
-     filemap_get_pages
-     filemap_read
-     blkdev_read_iter
-     vfs_read
-     ksys_read
-     __x64_sys_read
-     x64_sys_call
-     do_syscall_64
-     entry_SYSCALL_64_after_hwframe
-     -                fio (34171)
-         3516224519
-
-First entry for FIO write path that waits on folio_lock
-
-     finish_task_switch.isra.0
-     schedule
-     io_schedule
-     folio_wait_bit_common
-     __filemap_get_folio
-     iomap_get_folio
-     iomap_write_begin
-     iomap_file_buffered_write
-     blkdev_write_iter
-     vfs_write
-     ksys_write
-     __x64_sys_write
-     x64_sys_call
-     do_syscall_64
-     entry_SYSCALL_64_after_hwframe
-     -                fio (33842)
-         48900
-
-Last entry for FIO write path that waits on folio_lock
-
-     finish_task_switch.isra.0
-     schedule
-     io_schedule
-     folio_wait_bit_common
-     __filemap_get_folio
-     iomap_get_folio
-     iomap_write_begin
-     iomap_file_buffered_write
-     blkdev_write_iter
-     vfs_write
-     ksys_write
-     __x64_sys_write
-     x64_sys_call
-     do_syscall_64
-     entry_SYSCALL_64_after_hwframe
-     -                fio (34187)
-         1815993
-
-The last entry in the offcputime records
-
-     finish_task_switch.isra.0
-     schedule
-     futex_wait_queue
-     __futex_wait
-     futex_wait
-     do_futex
-     __x64_sys_futex
-     x64_sys_call
-     do_syscall_64
-     entry_SYSCALL_64_after_hwframe
-     -                multipathd (6308)
-         3698877753
-
-Regards,
-Bharata.
