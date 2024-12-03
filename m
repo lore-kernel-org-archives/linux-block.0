@@ -1,137 +1,105 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC3F1632F3
-	for <linux-block@vger.kernel.org>; Tue,  3 Dec 2024 17:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA057207A3E
+	for <linux-block@vger.kernel.org>; Tue,  3 Dec 2024 22:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733248048; cv=none; b=V6ejJ4iQfJ8TSb87v6p0Y74FFkU3/oEtqFmQmaiJLpAVNVG/ebyUU2hcG66DqCe2cDgj4isYJtSv92yDt7HM1BOT768QOpU6aknD6IwmTxMGGbT7MIXwmclT1GMhw1QP+yGSAD37Wre/XOqsPtLLsdmmMbzX8pn0lCT8r0ODk1k=
+	t=1733266591; cv=none; b=JBu/ArdydUM+GF03Uq3XHw93oylj7ZRSqLqlgW8lSXOK5TJ5flbSI783yaOA35FaG4OVguTwDLFyF7yveO7CvEBiEBeLa6FGWAFsPFRTDKiTCnWXCL6gZzc2j1mydpHgYqGfBoicg0EHk5xXzJaz/moa5rB4/BWnG64wXY5m6DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733248048; c=relaxed/simple;
-	bh=Q95+gOI7pTAZtpI5+UrdylhdkgXfWijiKSsgRKgGNcI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uydcbLUxU2k4HTxCa9rxgGc7DB5E4toOPREUoNlrjHkwtq4O1QIWVD2aH4feFaJkG9hglO03Q/Y04P0yP9wJcF20jRNnlzrztwOT/7On6sN9b2EKvf+RiQqhTHDa9ttpqWwWLdOc82aTcgQVXO1Q0lgTlXlOr1Q8ZaqrtaBK+FU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[IPv6:::1])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <l.stach@pengutronix.de>)
-	id 1tIWyE-0003sq-Mm; Tue, 03 Dec 2024 18:45:58 +0100
-Message-ID: <fc624e3fd4a4a38dedf02e31be9e4f1c85fb40a0.camel@pengutronix.de>
-Subject: Re: [PATCH 09/22] drm/etnaviv: Convert timeouts to secs_to_jiffies()
-From: Lucas Stach <l.stach@pengutronix.de>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>, Pablo Neira Ayuso
- <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,  Nicolas Palix
- <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>, Haojian Zhuang
- <haojian.zhuang@gmail.com>, Robert Jarzmik <robert.jarzmik@free.fr>,
- Russell King <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Ofir
- Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>, Lucas De
- Marchi <lucas.demarchi@intel.com>, Thomas =?ISO-8859-1?Q?Hellstr=F6m?=
- <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
- <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>, Dick Kennedy
- <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Roger Pau =?ISO-8859-1?Q?Monn=E9?=
- <roger.pau@citrix.com>, Jens Axboe <axboe@kernel.dk>, Kalle Valo
- <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, Jack
- Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
- <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, Broadcom
- internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Xiubo
- Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,  Josh Poimboeuf
- <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, Miroslav Benes
- <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, Joe Lawrence
- <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
- <tiwai@suse.com>, Russell King <linux+etnaviv@armlinux.org.uk>, Christian
- Gmeiner <christian.gmeiner@gmail.com>,  Louis Peens
- <louis.peens@corigine.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
- Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr, 
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org, 
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org,  linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org,  ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org,  linux-sound@vger.kernel.org,
- etnaviv@lists.freedesktop.org,  oss-drivers@corigine.com,
- linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
-Date: Tue, 03 Dec 2024 18:45:50 +0100
-In-Reply-To: <20241115-converge-secs-to-jiffies-v1-9-19aadc34941b@linux.microsoft.com>
-References: 
-	<20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
-	 <20241115-converge-secs-to-jiffies-v1-9-19aadc34941b@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	s=arc-20240116; t=1733266591; c=relaxed/simple;
+	bh=9J3YtjJVaIzs2sqlqTmw9Ioc2v4jB8siZkMzuKRLfIE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=qYEXK6XVgqVUQ/cto6Bp8A/OVozm6SPLRicBWk7khR6tleZliapVDLdAm4/mXPGUIQisRS8fSI1olqoWdgJl9SZalcmic/9b54HZNI/2Oy6aikM56UMnoeDZ4YJX3lZP3A9n5vTjDVQaljqsISq/MfF+3RbZatKT0WMMWPqPwLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KA3rpXIt; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KA3rpXIt"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7252fba4de1so5369560b3a.0
+        for <linux-block@vger.kernel.org>; Tue, 03 Dec 2024 14:56:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1733266589; x=1733871389; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TNuRSE0qt5OotBDZPQRc+y7yttPjFAS0Rpx1zXr0078=;
+        b=KA3rpXItETAFyjPwew5p1REjVcnq8+5bDecMBk3+CYYzviVr/D9nYIn92Z0ph6XvGg
+         Ir9G5OXm+yT4kHkLIl4QBtv81V1F0z9M3ZFywQEsb2Iu87QkljSExfVAvj+/KVIOoAfR
+         Ey0CgrHQQXA6g1phWixmwgRU1grS9dLN6MWiurHfFPxJhmqFJXD//VrqrlgHfP9eFBvx
+         b1TBY5eXB+VhlkPh1m2AwQhDKQGuWyWc0PTWUaqpdO4mlamOAbQ9hJWqkNINygxqeBgi
+         /nIwn6iUUjq9OzbNqJHxXILXT6aEJ7RD6lXkl4wigSgEGGH26bFoO3ynazxf11cAWLtc
+         JuUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733266589; x=1733871389;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TNuRSE0qt5OotBDZPQRc+y7yttPjFAS0Rpx1zXr0078=;
+        b=RcWyMeiw1ty/T4W2E3RXKQimz+y3FPjcyp7aYrinyGbrUQkcl0zaVLgfPWI1jDeQTC
+         FbxSyIJlBt8wzM670WgugtDdUg4KmCEEHAQmVLekak0niCf8afoLxoEVfApnYS2mtKuH
+         WY7O0sLv3low2FTBAs1JGGQd8R7rmkcMXQoao6juiK4EbkBQqGfVFQiAvu3Yt7D4HHVn
+         8Nm7MR1BcsdG1mJ4Tdwjswoz5IYYJb+sqFmuvhJDIyPZDnPOHAqN/1/umOh4ihdBuCzH
+         J5u1B1TVIO19JleDCVBUUvpB4xn/ESS/gMUwLnkSo/Y3ooVEAkA8dxrPhCwvTC9Hi0+L
+         2Gng==
+X-Forwarded-Encrypted: i=1; AJvYcCWu2l+lQtWhPh9B39oLb0SVAGppM5RLNHHyDw4WWhNkTIdNSM99EqLTxjXnjDoAJdB3T4GgHilU+tS49g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxwHKO5D8/Lh6Ja5dcOIaF4dgXjZ1bQVWTeye1gspxNsmr5Clq
+	3KLH64SUy7wCUGGHYJe8vRfvjERLw70iKvmuhUJFNISHQXuPXpTsYnptDa3wMOk=
+X-Gm-Gg: ASbGncuDAQGVeXXANV8eVpwWOUqjPey6SNrss5kplSaG2a4E7OZySUq5cRCGGtw2xj4
+	G+FcYyY+0DQcakiEhYH+vZeBHbhOppNGRfavpDGA9PMt41H7Ndzfo556GA1/x1A02t7ViSNgAQE
+	TRRQM0zEwCPPomd4sBVrUeTsOU3tyolrhy+VE5rDo/ZTvYFPLYsIVZSS99EYamUHePyc066egmO
+	/maUOQc/OWiPKMrK3YMxr1UlL5mJoayPqyHCOyPOyVL5P8=
+X-Google-Smtp-Source: AGHT+IFwbu5Mn9fY8ujvfbEmhblgpduelrIHva3SSxokjUMLrmvWEB884oPumQCB8f8AE8L3tnBedA==
+X-Received: by 2002:a05:6a00:14d5:b0:71e:60fc:ad11 with SMTP id d2e1a72fcca58-7257fcb04ddmr5761701b3a.16.1733266589105;
+        Tue, 03 Dec 2024 14:56:29 -0800 (PST)
+Received: from [127.0.0.1] ([2600:380:c150:9b72:bfcd:78a4:798a:3876])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72541845526sm11049954b3a.171.2024.12.03.14.56.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 14:56:28 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Coly Li <colyli@suse.de>
+Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org, 
+ Liequan Che <cheliequan@inspur.com>, stable@vger.kernel.org, 
+ Zheng Wang <zyytlz.wz@163.com>, Mingzhe Zou <mingzhe.zou@easystack.cn>
+In-Reply-To: <20241202115638.28957-1-colyli@suse.de>
+References: <20241202115638.28957-1-colyli@suse.de>
+Subject: Re: [PATCH] bcache: revert replacing IS_ERR_OR_NULL with IS_ERR
+ again
+Message-Id: <173326658691.273410.3875499792580275735.b4-ty@kernel.dk>
+Date: Tue, 03 Dec 2024 15:56:26 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: l.stach@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-86319
 
-Am Freitag, dem 15.11.2024 um 21:22 +0000 schrieb Easwar Hariharan:
-> Changes made with the following Coccinelle rules:
->=20
-> @@ constant C; @@
->=20
-> - msecs_to_jiffies(C * 1000)
-> + secs_to_jiffies(C)
->=20
-> @@ constant C; @@
->=20
-> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> + secs_to_jiffies(C)
->=20
-Thanks, applied to etnaviv/next.
 
-Regards,
-Lucas
+On Mon, 02 Dec 2024 19:56:38 +0800, Coly Li wrote:
+> Commit 028ddcac477b ("bcache: Remove unnecessary NULL point check in
+> node allocations") leads a NULL pointer deference in cache_set_flush().
+> 
+> 1721         if (!IS_ERR_OR_NULL(c->root))
+> 1722                 list_add(&c->root->list, &c->btree_cache);
+> 
+> >From the above code in cache_set_flush(), if previous registration code
+> fails before allocating c->root, it is possible c->root is NULL as what
+> it is initialized. __bch_btree_node_alloc() never returns NULL but
+> c->root is possible to be NULL at above line 1721.
+> 
+> [...]
 
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> ---
->  drivers/gpu/drm/etnaviv/etnaviv_cmdbuf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/gpu/drm/etnaviv/etnaviv_cmdbuf.c b/drivers/gpu/drm/e=
-tnaviv/etnaviv_cmdbuf.c
-> index 721d633aece9d4c81f0019e4c55884f26ee61c60..0f5a2c885d0ab7029c7248e15=
-d6ea3c31823b782 100644
-> --- a/drivers/gpu/drm/etnaviv/etnaviv_cmdbuf.c
-> +++ b/drivers/gpu/drm/etnaviv/etnaviv_cmdbuf.c
-> @@ -100,7 +100,7 @@ int etnaviv_cmdbuf_init(struct etnaviv_cmdbuf_suballo=
-c *suballoc,
->  		mutex_unlock(&suballoc->lock);
->  		ret =3D wait_event_interruptible_timeout(suballoc->free_event,
->  						       suballoc->free_space,
-> -						       msecs_to_jiffies(10 * 1000));
-> +						       secs_to_jiffies(10));
->  		if (!ret) {
->  			dev_err(suballoc->dev,
->  				"Timeout waiting for cmdbuf space\n");
->=20
+Applied, thanks!
+
+[1/1] bcache: revert replacing IS_ERR_OR_NULL with IS_ERR again
+      commit: b2e382ae12a63560fca35050498e19e760adf8c0
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
