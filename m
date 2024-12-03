@@ -1,70 +1,73 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39ED91F7579
-	for <linux-block@vger.kernel.org>; Tue,  3 Dec 2024 13:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42961F76AF
+	for <linux-block@vger.kernel.org>; Tue,  3 Dec 2024 13:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733233334; cv=none; b=EomHwkSTTbhnKrQfQkKpQ1eC+vbOLjFZS05VUBKJOh8aQN6P5EjRQ465BSitg2sNQtfTPuU5Y2Mo9GQAOXIo7JaZPCqf2l6m9Sl50bOaAou+l4Y99XIMICvjBr1N+BtFlWUVS6BjTa98NHlWr/DA/95n8/UNGBRbYviuh7Ft2Og=
+	t=1733233336; cv=none; b=BrEqTwqYiyOebK9+8xxiMINeRLgS/oCM86VwbazygC+4R+Zkee4V2S25CLOKR/SbnSN0ljkhjUGRfkEwUuc+Wl/FXP+q7B4ZqD/J8j/HXRoJARX/T9+SuEUyy3gU4QvVaXG6+lQUbe/6JfatljX4M1RXgXVVpAjDAn+gG2ZtG+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733233334; c=relaxed/simple;
-	bh=swAdhm2eapOPHzUUlpD6v5igVWTBbj4YrPwfSTMXPjE=;
+	s=arc-20240116; t=1733233336; c=relaxed/simple;
+	bh=BPqo/+vJ9OA99wMkdAF6vWPVOkXo/UQOziFQPIlW/1E=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=EWCk0hL1HgJmafaC2g5VJ9sM0IkS8gaqDLOY5ZPq9WSsCyZ2ZyQYvZG5/NXDHjW4uWjbZmoWNI0PgLjSlpdStXQA1SoB59aJW1SfbRGqTc6mb16cnfO5h0rmsMeH+YpS7N90aYFHPsMB5xmxKPyIefne+6ELzSFIeSMq78Suf1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=pbubcHWY; arc=none smtp.client-ip=209.85.161.44
+	 MIME-Version:Content-Type; b=P9NsK3qzrJ/I6iqvSdjcmc0NXHRWouELVBq3vCfgWEzYGnBi7pIWl63QvfIxXDlFxfVdanWDSlXr/Y2ooE+vAJg7OUG6n90ZtoH22es0CD6td2jtPrEtbbzT3rpQR7V03rLuZLOZ1tDMNe/m3UO71yF9Hf/tZqtNjqz/O3wm4ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=LjxLmdEk; arc=none smtp.client-ip=209.85.161.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="pbubcHWY"
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5f25da4f999so267526eaf.3
-        for <linux-block@vger.kernel.org>; Tue, 03 Dec 2024 05:42:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="LjxLmdEk"
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5f1d1068451so1906759eaf.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Dec 2024 05:42:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1733233331; x=1733838131; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1733233333; x=1733838133; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OC808OH4fso6bInT9VuepjDrgNBDvQNxVS3LcD0axiE=;
-        b=pbubcHWYfsTdwHTRs66yTuNa4iXGgrc/XFdHnPvMQ40zYwLONntpGo12bVLni6w9Yc
-         wdBo3n3Uz2u2JXdVXkDpeptJHUcj+M0GJ2f4V+6bToKfMOyo/zhoaQceu0urmgL3PAB5
-         CwPsjkvRlpD5/tv0iBGal2d9wiNgaSB60BuSewN7IBtGB3jvw7qvcFqEEveaQ1w/ye5d
-         plsYly6TLxWPrahgvOqmAOWHpFZY2qPOTSH83yEezVWK5AKk/BnONFi4nxB9mWLK52Ex
-         JzMPTRzchYpDaPB0a+v8z2K0wRH5YN8YyNEt9LvsW66uZnnFa8LTyI7+c0BC8UrhYnq9
-         iAZw==
+        bh=TPziSiz6FIPz1llFZL4/mtv70ocOZmo18hfdyDsh/VQ=;
+        b=LjxLmdEkeOzRdv2LOy8MDnd9IqaiNPf9AwmUCLMdGor82amWTMEVsYs886T7eymnrB
+         zy8yYZDY14DZBsGdWmoreADl7hEbgNxly+iMObL2qjPO96HYxRFEMFESudSPrIrCorcR
+         pN+ddZMBHAZGjOilYlZu3wGLqsmLvLhmRK6B6WTWkWx+Gwg3aJwrbmEcJtGqStUMLWo4
+         5rFsmQDKA5/pJyD9px7Z8bfH1jM8OQvEJy2YnJ5LT9/9tPEaVmlge6SEKDrJKq/Kp095
+         LUHrm3vRacst7YQRSd4WbhxJxCrvuRECNqC0Mq45G8cYccbtqc/wCGNoMVpKdDrOAZVm
+         Qs0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733233331; x=1733838131;
+        d=1e100.net; s=20230601; t=1733233333; x=1733838133;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OC808OH4fso6bInT9VuepjDrgNBDvQNxVS3LcD0axiE=;
-        b=D7tRC+cafa71SaJNmAmMllTbL8CwCCsfVOPw8u1xf2CKMAVS6Ysi2NPc8YeS/50668
-         m6BcoVwcRGLF7YwVWLxm5xf9SP18PgtQ1vckHbD9ulNxhVIujqAT/X28Luv60SyfJ4u/
-         F30SWlXyQ9tzTiAciZxPpjiKWR+2UJwi+ePy5OtKEytul4UaspvBzYx0Yy+pJ2pwIVoZ
-         ugCFr8dSr2WyZeERgW4qtNMupg+3jiGsXK4BOucK/c48DbRcnJgmw9o/+ANp3D02wbUR
-         sYlhLHeEreKQ6yXuf/1qPVxvLjqJagX3cPBr0QYkHEnTHtYgmmuzTG3Kgb7CKjLKQ6FX
-         aVtQ==
-X-Gm-Message-State: AOJu0YyPRxK2L096NYP1dw8SUfywl41C9WUhpPVe0SVL/LMFBZ7512+f
-	O7c5Kiz6rj7TwTG4AK2H2Nc0m4E6wG6X9CKRJH72bUTvC6QpUS32x9cbeGFHPGE=
-X-Gm-Gg: ASbGncs+xC8xtGHpNhMenPaS7+jtGXWDtM6c46zeGn2FESadmzkyjvd5yaYtBMnje3m
-	tYBecG0kd//frAeGx5ZhuNrp2ucNts8Zm8scXuHXBqJ5MafZ6wydST+v/inQh7XYyutagdr2Jpw
-	lZYP3Okxs7M6C3tUJty72EKmsLtexcRQ2TvFJhNv1rKIho9x+1OelX5aPbsN2QpsJ+dP5HHZ7A7
-	KiGMDeT3/L+5aP+n6Z4GMHerSF+0+uN0nzvYuaTA0qNfQ==
-X-Google-Smtp-Source: AGHT+IG9pT2mrXevy6o0bm52Erkrf+w3fU0scfAFMj0oTw55yoG0N65LlD1tXQIzU6UaLc+dmzgsgA==
-X-Received: by 2002:a4a:e918:0:b0:5f1:e905:bc93 with SMTP id 006d021491bc7-5f25ae0e5c4mr2010026eaf.5.1733233331308;
-        Tue, 03 Dec 2024 05:42:11 -0800 (PST)
+        bh=TPziSiz6FIPz1llFZL4/mtv70ocOZmo18hfdyDsh/VQ=;
+        b=Pj19uIwgYm8QAI2Gr5nUq4pv+E9bZ1Of9V7RSZgQTkFYO1ANrrqwb2lU7BqEbj2B3Q
+         vOmmaY70jyB6FMwpdI6s6IR4Un/dqqmsFg03lpBAtR50OzS/tCFot+aA6YvIghbYkl6w
+         5unx3/uLtiKc7eKyi9uEj16eWp1Iky4HwEovcmwAzezWWk680bBAU+5I0YcbehChkjlu
+         zShXnbHJcTOsRv51GR7ncfLN2Jz/8FD3+C+AxcVrg0bnkahZI2ER4/XaDSh9qIfLbrlW
+         r2efl8NZKcCO2jKkr01Q9BQZ8Fbiy60sEOqKD9hh9wOudhunl4i9Mt4DhB5gCqnPjhoH
+         q9Kw==
+X-Forwarded-Encrypted: i=1; AJvYcCVFL8V/ddqdq9Q9IjOGhBkhJSnHWmx3DmTZUmDFCzbTo1No8gZBzEYCh7oKthdAuiP+Kdjwnu7cPSDjPQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwC/J+P2QVcyO96x8Km3wS6fUvO57S+4KBaNs1o0R+BhIti2XOL
+	jH1tOJZQOS9AauczwwGrskJI9lXBjAzqRzPmutMfC1f6dvv+YFsYsTq+RHAjin4=
+X-Gm-Gg: ASbGnctXrvWEojyF96RIZaaHWgqAeAWssb0gxw3RquwXLapgWlDIx6soIdWI0zY29q5
+	7oF+/nFUChnymVWC2Gq6/xP//3Xj1cIGjym+KzW2IlPGfGQqcImwK8tXwdRDKRKFnW/oQTW/rI7
+	sDgzUGR9eqScc2D0OidB6ouioQXhn5SekYLmb6M/Btt/EmdbVmBYaMQav1Rv4fOT4nP5U4KNRDd
+	CqvcGr/lO5p+W9n4K2HPyvGR8pXKvd/T2KMSL46z/yP/Q==
+X-Google-Smtp-Source: AGHT+IF3JxViCcZr46UetkoBs9MyylLeqwOA8mylprKsogFh27HKGMF5642pWucfOY8iKk1uqQ4f1w==
+X-Received: by 2002:a05:6820:50c:b0:5ee:d89f:1d2c with SMTP id 006d021491bc7-5f25ad40e71mr1942008eaf.1.1733233333038;
+        Tue, 03 Dec 2024 05:42:13 -0800 (PST)
 Received: from [127.0.0.1] ([130.250.255.163])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5f21a4cd86bsm2782124eaf.29.2024.12.03.05.42.09
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5f21a4cd86bsm2782124eaf.29.2024.12.03.05.42.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2024 05:42:09 -0800 (PST)
+        Tue, 03 Dec 2024 05:42:12 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, 
- FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: a.hindborg@kernel.org, boqun.feng@gmail.com, 
- rust-for-linux@vger.kernel.org
-In-Reply-To: <20241130094521.193924-1-fujita.tomonori@gmail.com>
-References: <20241130094521.193924-1-fujita.tomonori@gmail.com>
-Subject: Re: [PATCH] block: rnull: add missing MODULE_DESCRIPTION
-Message-Id: <173323332913.59116.9985316859123945765.b4-ty@kernel.dk>
-Date: Tue, 03 Dec 2024 06:42:09 -0700
+To: John Garry <john.g.garry@oracle.com>
+Cc: haris.iqbal@ionos.com, jinpu.wang@ionos.com, colyli@suse.de, 
+ kent.overstreet@linux.dev, agk@redhat.com, snitzer@kernel.org, 
+ mpatocka@redhat.com, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org, 
+ dm-devel@lists.linux.dev, linux-bcachefs@vger.kernel.org, hch@lst.de
+In-Reply-To: <20241202111957.2311683-1-john.g.garry@oracle.com>
+References: <20241202111957.2311683-1-john.g.garry@oracle.com>
+Subject: Re: [PATCH 0/2] block: Delete bio_set_prio() and bio_prio()
+Message-Id: <173323333147.59116.15700360793401292347.b4-ty@kernel.dk>
+Date: Tue, 03 Dec 2024 06:42:11 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,17 +79,25 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-86319
 
 
-On Sat, 30 Nov 2024 18:45:21 +0900, FUJITA Tomonori wrote:
-> Add the missing description to fix the following warning:
+On Mon, 02 Dec 2024 11:19:55 +0000, John Garry wrote:
+> Macros bio_set_prio() and bio_prio() do nothing special in terms of
+> setting and getting the bio io prio member, so just delete them.
 > 
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/block/rnull_mod.o
+> Prior to commit 43b62ce3ff0a, they would actually encode and decode the
+> prio in the now-deleted bi_rw member.
 > 
+> John Garry (2):
+>   block: Delete bio_prio()
+>   block: Delete bio_set_prio()
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] block: rnull: add missing MODULE_DESCRIPTION
-      (no commit info)
+[1/2] block: Delete bio_prio()
+      commit: 099d214fc7abc3fec0f38d10bec31ac7acce8d13
+[2/2] block: Delete bio_set_prio()
+      commit: 77cfdf838d8467d3ca44058caff7c1727080efb2
 
 Best regards,
 -- 
