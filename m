@@ -1,148 +1,223 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from pv50p00im-zteg10011501.me.com (pv50p00im-zteg10011501.me.com [17.58.6.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B19173;
-	Tue,  3 Dec 2024 00:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0186A954
+	for <linux-block@vger.kernel.org>; Tue,  3 Dec 2024 00:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733184714; cv=none; b=f2Jm8SpbNfed6yAOJXqEr6Bjh+vEiyfq38mveA/Kx243eqXAZuevrCML7X7YA4b2fm9FcEdpQSLHylUiS1vb/aZ4As4qem60avIwby/dp6zmQix/rM2njVyIZjujVeE7WtWrbtJ3GcOgjcryclku71vg9Y+npxbtX9e2Fa6wwKE=
+	t=1733186103; cv=none; b=dzn+We5CRaeCXTFhBYDULVN60V4SNlh/SPYbLc/QFFTKXAresCNhDBjgUqg2ZEYgBk8PEVOAEW7Loux953dN5tmpylfI9Y3YQyKAKz0elXaKX8T8Vyw3CANLqJ+4frNF+F8HgcMffVDK2PZih0WMN3xVm5UJZ+Y1TveDBa54u3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733184714; c=relaxed/simple;
-	bh=ow+zWbQweIAuNl4Su7qk5EX3gpm4kMrbYNuFNjhZSHY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X45aapIMqJp2bRAiankj1G7/DYESNk4AEXuDfW3rr1arkwoUC6zwp/Bwe0a3FwRQcxiV37s5jom5WIhPKEIWrnjSKLFEXPhImctkawIGx0DznjceQRblENoe6L5XxyhjSe6XRPLBwaMMqZNmTAFoZ7JzPoM2CqXhqCxcGeWa7i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aDSI65nh; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1733186103; c=relaxed/simple;
+	bh=90Z3uIVjxiaduJ4fj5p/v/pFRaVs8rKzXxaWEN8s1Fs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jJLHz+DhdYA44HMsS0SVnwnyf05bn8QaBuf3ot4Jv690B+8otuSqIwIsdzI9jemv6lINn1btfQ7DvhEFbJY03u+wcfSTDOTIkwNelPhxj2yJla+fIJifyiDRITEY0btAHReGgPFbTYLXLcvB8MJ+jq+A08ncfqyFwbJgtm/JyyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=miqyYlVd; arc=none smtp.client-ip=17.58.6.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aDSI65nh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733184713; x=1764720713;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ow+zWbQweIAuNl4Su7qk5EX3gpm4kMrbYNuFNjhZSHY=;
-  b=aDSI65nhHXh4aAq/mIHuKDxF+ydmOQI8epvC3ZjuG/ukq95BtvJG36Pc
-   5vGoVbp0nlKT0CJmu7zB9JUNMc2bBRbWjz5DTEDb8xEXPf0CPpH1d8wEi
-   k/f3bc3b1JBAzo9VajsHgZGWL/bif4enUUvASrq4Xb9f7QWPMDlYfCK/1
-   Tl/Jy5taSvy8sd0uko6ZM9Hjv4tTayC0YU6pAwo7cbV7Mm+6WzhMoJtaq
-   Ui+LqwmZ8IOJcangBeEVXObRZzXa0ZWLRPnlFtsZjgHr5Gb1U73YZIATL
-   Ws1axk1wHQ0o41oKsYX38WFfr6Pr5R0gj0SiL0l49GLZQDsJ/5ykMpqC1
-   Q==;
-X-CSE-ConnectionGUID: B7m+DBCmT8e8yca9Qw7z+A==
-X-CSE-MsgGUID: HycnrI9lTiObaB3qUpoSpA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="36233205"
-X-IronPort-AV: E=Sophos;i="6.12,203,1728975600"; 
-   d="scan'208";a="36233205"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2024 16:11:52 -0800
-X-CSE-ConnectionGUID: CmkdaC4oTp+1o4OEq1/jRg==
-X-CSE-MsgGUID: G/8VFtyyRMGnLf0dl8ms8w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="98278120"
-Received: from lkp-server02.sh.intel.com (HELO 36a1563c48ff) ([10.239.97.151])
-  by orviesa003.jf.intel.com with ESMTP; 02 Dec 2024 16:11:45 -0800
-Received: from kbuild by 36a1563c48ff with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tIGVu-00033p-2y;
-	Tue, 03 Dec 2024 00:11:40 +0000
-Date: Tue, 3 Dec 2024 08:11:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Bartosz Golaszewski <brgl@bgdev.pl>, Jens Axboe <axboe@kernel.dk>,
-	Jonathan Corbet <corbet@lwn.net>, Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Asutosh Das <quic_asutoshd@quicinc.com>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Alim Akhtar <alim.akhtar@samsung.com>,
-	Avri Altman <avri.altman@wdc.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev
-Subject: Re: [PATCH RESEND v7 11/17] soc: qcom: ice: add support for
- generating, importing and preparing keys
-Message-ID: <202412030742.vCplCxJb-lkp@intel.com>
-References: <20241202-wrapped-keys-v7-11-67c3ca3f3282@linaro.org>
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="miqyYlVd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1733186099;
+	bh=oHbx7nufqBC9FciDzS/LGxt7hmN8dQX6iuRN6cbwUA4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:
+	 x-icloud-hme;
+	b=miqyYlVd243flQ1IvVsliQiE9DHrrSD+z1j3Ao2U3BsVp7icRgsik+yX27rSCj4D+
+	 T5K/safPmJG6H2G4WE9j7bBQvaFexypWm7FZEDou1MHIH9tDRRWMiQ1UPriELs/+hg
+	 sXJNUkBBU1moy8uzw4v/v66n2uZ4nRbGFXnHbTcyy0JERpSfQmvHQ8NAx4kDoEqPtw
+	 K44qvDlYPQIBfuW/hOl+sPtWJcXOrD96VbESU02KGCiiJXJdFSzYBJ54ViTlBPnRB9
+	 QOAY9cdzyUWJL5EMG594jIK63Bf2SXcNzUNd7nw2qi11pPaZME4OnmSK9qWoRG15E/
+	 2icgiJHx3EH4g==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-zteg10011501.me.com (Postfix) with ESMTPSA id A517C4A0115;
+	Tue,  3 Dec 2024 00:34:38 +0000 (UTC)
+From: Zijun Hu <zijun_hu@icloud.com>
+Subject: [PATCH v2 00/32] driver core: Constify API device_find_child() and
+ adapt for various existing usages
+Date: Tue, 03 Dec 2024 08:33:22 +0800
+Message-Id: <20241203-const_dfc_done-v2-0-7436a98c497f@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241202-wrapped-keys-v7-11-67c3ca3f3282@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANJRTmcC/2XMQQ6CMBCF4auQWVvTFozgynsYQsp0KrOwxRaJh
+ vTuVrYu/5e8b4NEkSnBpdog0sqJgy+hDxXgZPydBNvSoKVulJZKYPBpGazDwQZPwhjCs6J6HMl
+ AOc2RHL938NaXnjgtIX52f1W/dadkq/6oVQkpOtueqHZdU+N4fb4Y2eMRwwP6nPMXYHxV6a4AA
+ AA=
+X-Change-ID: 20241201-const_dfc_done-aaec71e3bbea
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Chun-Kuang Hu <chunkuang.hu@kernel.org>, 
+ Philipp Zabel <p.zabel@pengutronix.de>, David Airlie <airlied@gmail.com>, 
+ Simona Vetter <simona@ffwll.ch>, Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Jean Delvare <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>, 
+ Martin Tuma <martin.tuma@digiteqautomotive.com>, 
+ Mauro Carvalho Chehab <mchehab@kernel.org>, 
+ Andreas Noever <andreas.noever@gmail.com>, 
+ Michael Jamet <michael.jamet@intel.com>, 
+ Mika Westerberg <mika.westerberg@linux.intel.com>, 
+ Yehezkel Bernat <YehezkelShB@gmail.com>, 
+ Linus Walleij <linus.walleij@linaro.org>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>, 
+ Dan Williams <dan.j.williams@intel.com>, 
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, 
+ Ira Weiny <ira.weiny@intel.com>, Takashi Sakamoto <o-takashi@sakamocchi.jp>, 
+ Jiri Slaby <jirislaby@kernel.org>, 
+ Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
+ Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, 
+ Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>, 
+ Mike Christie <michael.christie@oracle.com>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Nilesh Javali <njavali@marvell.com>, 
+ Manish Rangankar <mrangankar@marvell.com>, 
+ GR-QLogic-Storage-Upstream@marvell.com, Davidlohr Bueso <dave@stgolabs.net>, 
+ Jonathan Cameron <jonathan.cameron@huawei.com>, 
+ Alison Schofield <alison.schofield@intel.com>, 
+ Andreas Larsson <andreas@gaisler.com>, Stuart Yoder <stuyoder@gmail.com>, 
+ Laurentiu Tudor <laurentiu.tudor@nxp.com>, Jens Axboe <axboe@kernel.dk>, 
+ Sudeep Holla <sudeep.holla@arm.com>, 
+ Cristian Marussi <cristian.marussi@arm.com>, 
+ Ard Biesheuvel <ardb@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Mathieu Poirier <mathieu.poirier@linaro.org>
+Cc: Zijun Hu <zijun_hu@icloud.com>, linux-kernel@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org, 
+ linux-arm-kernel@lists.infradead.org, linux-hwmon@vger.kernel.org, 
+ linux-media@vger.kernel.org, linux-usb@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-pwm@vger.kernel.org, nvdimm@lists.linux.dev, 
+ linux1394-devel@lists.sourceforge.net, linux-serial@vger.kernel.org, 
+ linux-sound@vger.kernel.org, open-iscsi@googlegroups.com, 
+ linux-scsi@vger.kernel.org, linux-cxl@vger.kernel.org, 
+ sparclinux@vger.kernel.org, linux-block@vger.kernel.org, 
+ arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org, 
+ linux-remoteproc@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+X-Mailer: b4 0.14.2
+X-Proofpoint-GUID: cTyu1VL48UqVhY7zPwUQPPYeAfZYowdo
+X-Proofpoint-ORIG-GUID: cTyu1VL48UqVhY7zPwUQPPYeAfZYowdo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-02_14,2024-12-02_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0
+ mlxlogscore=999 mlxscore=0 spamscore=0 suspectscore=0 malwarescore=0
+ clxscore=1011 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412030002
+X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
 
-Hi Bartosz,
+This patch series is to constify the following API:
+struct device *device_find_child(struct device *dev, void *data,
+		int (*match)(struct device *dev, void *data));
+To :
+struct device *device_find_child(struct device *dev, const void *data,
+				 device_match_t match);
+typedef int (*device_match_t)(struct device *dev, const void *data);
 
-kernel test robot noticed the following build warnings:
+Why to constify the API?
 
-[auto build test WARNING on f486c8aa16b8172f63bddc70116a0c897a7f3f02]
+- Protect caller's match data @*data which is for comparison and lookup
+  and the API does not actually need to modify @*data.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bartosz-Golaszewski/blk-crypto-add-basic-hardware-wrapped-key-support/20241202-201228
-base:   f486c8aa16b8172f63bddc70116a0c897a7f3f02
-patch link:    https://lore.kernel.org/r/20241202-wrapped-keys-v7-11-67c3ca3f3282%40linaro.org
-patch subject: [PATCH RESEND v7 11/17] soc: qcom: ice: add support for generating, importing and preparing keys
-config: i386-buildonly-randconfig-006-20241203 (https://download.01.org/0day-ci/archive/20241203/202412030742.vCplCxJb-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241203/202412030742.vCplCxJb-lkp@intel.com/reproduce)
+- Make the API's parameters (@match)() and @data have the same type as
+  all of other device finding APIs (bus|class|driver)_find_device().
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412030742.vCplCxJb-lkp@intel.com/
+- All kinds of existing device matching functions can be directly taken
+  as the API's argument, they were exported by driver core.
 
-All warnings (new ones prefixed by >>):
+How to constify the API?
 
->> drivers/soc/qcom/ice.c:528: warning: Function parameter or struct member 'ice' not described in 'qcom_ice_import_key'
+- Now, no (@match)() argument of the API usages is modifying its match
+  data @*data after previous cleanup, so it is easy and safe to make its
+  parameter @data take const void * as type.
 
+- Simplify involved codes further if it is possbile with benefits
+  brought by constifying the API.
 
-vim +528 drivers/soc/qcom/ice.c
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+Changes in v2:
+- Series v1 have no code review comments and are posted a long time ago, so may ignore differences.
+- Link to v1: https://lore.kernel.org/r/20240811-const_dfc_done-v1-0-9d85e3f943cb@quicinc.com
+- Motivation link: https://lore.kernel.org/lkml/917359cc-a421-41dd-93f4-d28937fe2325@icloud.com
 
-   512	
-   513	/**
-   514	 * qcom_ice_import_key() - Import a raw key for inline encryption
-   515	 * ice: ICE driver data
-   516	 * @imp_key: raw key that has to be imported
-   517	 * @imp_key_size: size of the imported key
-   518	 * @lt_key: longterm wrapped key that is imported, which is
-   519	 *          BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE in size.
-   520	 *
-   521	 * Make a scm call into trustzone to import a raw key for storage encryption
-   522	 * and generate a longterm wrapped key using hwkm.
-   523	 *
-   524	 * Return: 0 on success; -errno on failure.
-   525	 */
-   526	int qcom_ice_import_key(struct qcom_ice *ice, const u8 *imp_key, size_t imp_key_size,
-   527				u8 lt_key[BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE])
- > 528	{
-   529		size_t wk_size = QCOM_ICE_HWKM_WRAPPED_KEY_SIZE(ice->hwkm_version);
-   530	
-   531		if (!qcom_scm_import_ice_key(imp_key, imp_key_size, lt_key, wk_size))
-   532			return wk_size;
-   533	
-   534		return 0;
-   535	}
-   536	EXPORT_SYMBOL_GPL(qcom_ice_import_key);
-   537	
+---
+Zijun Hu (32):
+      driver core: Constify API device_find_child()
+      driver core: Introduce device_match_type() to match device with a device type
+      drm/mediatek: Adapt for constified device_find_child()
+      hwmon: Adapt for constified device_find_child()
+      media: pci: mgb4: Adapt for constified device_find_child()
+      thunderbolt: Adapt for constified device_find_child()
+      gpio: sim: Remove gpio_sim_dev_match_fwnode()
+      net: dsa: Adapt for constified device_find_child()
+      pwm: Adapt for constified device_find_child()
+      nvdimm: Adapt for constified device_find_child()
+      libnvdimm: Simplify nd_namespace_store() implementation
+      firewire: core: Adapt for constified device_find_child()
+      serial: core: Adapt for constified device_find_child()
+      usb: typec: class: Remove both cable_match() and partner_match()
+      usb: typec: class: Adapt for constified device_find_child()
+      slimbus: core: Simplify of_find_slim_device() implementation
+      slimbus: core: Constify slim_eaddr_equal()
+      slimbus: core: Adapt for constified device_find_child()
+      scsi: iscsi: Constify API iscsi_find_flashnode_sess()
+      scsi: qla4xxx: Adapt for constified iscsi_find_flashnode_sess()
+      scsi: iscsi: Adapt for constified device_find_child()
+      cxl/region: Adapt for constified device_find_child()
+      cxl/pmem: Remove match_nvdimm_bridge()
+      cxl/core/pci: Adapt for constified device_find_child()
+      cxl/test: Adapt for constified device_find_child()
+      sparc: vio: Adapt for constified device_find_child()
+      bus: fsl-mc: Adapt for constified device_find_child()
+      block: sunvdc: Adapt for constified device_find_child()
+      firmware: arm_scmi: Adapt for constified device_find_child()
+      efi: dev-path-parser: Adapt for constified device_find_child()
+      rpmsg: core: Adapt for constified device_find_child()
+      driver core: Simplify API device_find_child_by_name() implementation
 
+ arch/sparc/kernel/vio.c                |  6 +++---
+ drivers/base/core.c                    | 30 ++++++++++--------------------
+ drivers/block/sunvdc.c                 |  6 +++---
+ drivers/bus/fsl-mc/dprc-driver.c       |  6 +++---
+ drivers/cxl/core/pci.c                 |  4 ++--
+ drivers/cxl/core/pmem.c                |  9 +++------
+ drivers/cxl/core/region.c              | 21 ++++++++++++---------
+ drivers/firewire/core-device.c         |  4 ++--
+ drivers/firmware/arm_scmi/bus.c        |  4 ++--
+ drivers/firmware/efi/dev-path-parser.c |  4 ++--
+ drivers/gpio/gpio-sim.c                |  7 +------
+ drivers/gpu/drm/mediatek/mtk_drm_drv.c |  2 +-
+ drivers/hwmon/hwmon.c                  |  2 +-
+ drivers/media/pci/mgb4/mgb4_core.c     |  4 ++--
+ drivers/nvdimm/bus.c                   |  2 +-
+ drivers/nvdimm/claim.c                 |  9 +--------
+ drivers/pwm/core.c                     |  2 +-
+ drivers/rpmsg/rpmsg_core.c             |  4 ++--
+ drivers/scsi/qla4xxx/ql4_os.c          |  3 ++-
+ drivers/scsi/scsi_transport_iscsi.c    | 10 +++++-----
+ drivers/slimbus/core.c                 | 17 +++++------------
+ drivers/thunderbolt/retimer.c          |  2 +-
+ drivers/thunderbolt/xdomain.c          |  2 +-
+ drivers/tty/serial/serial_core.c       |  4 ++--
+ drivers/usb/typec/class.c              | 31 ++++++++++++++-----------------
+ include/linux/device.h                 |  4 ++--
+ include/linux/device/bus.h             |  1 +
+ include/scsi/scsi_transport_iscsi.h    |  4 ++--
+ net/dsa/dsa.c                          |  2 +-
+ tools/testing/cxl/test/cxl.c           |  2 +-
+ 30 files changed, 89 insertions(+), 119 deletions(-)
+---
+base-commit: 40384c840ea1944d7c5a392e8975ed088ecf0b37
+change-id: 20241201-const_dfc_done-aaec71e3bbea
+
+Best regards,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Zijun Hu <quic_zijuhu@quicinc.com>
+
