@@ -1,93 +1,170 @@
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from pv50p00im-hyfv10011601.me.com (pv50p00im-hyfv10011601.me.com [17.58.6.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1391EF0A7;
-	Tue,  3 Dec 2024 12:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB04B1E5019
+	for <linux-block@vger.kernel.org>; Tue,  3 Dec 2024 12:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733228086; cv=none; b=FeobCaoGLsp/oOErCg7J0p4tnjiO1YwsaQgFynoTicOybvA+z1ggKKHUcyIlXAGwYiCM3v1UHTHs4VNW+l8XaV7hSP3Ye8p8wjMKsMulbHH+vFaOyHKjh9sxlVUMJUAqs5lQs5fadyUi1NegNZdhgQJQFXumf9cCH+VE6D+4m1M=
+	t=1733228657; cv=none; b=Ep3l9po4gL80rMZfiPDaaeer0BvnUiGvPsjJ0Iv1oZ+rkdRiYu8baMivpw7nujHNI5fpH1F2Ebo9Fh9P0gn5Z6inXqssAeWRqoxWS7q0dOeoSjIceG20MF7PYr4hn3pnHs3574eeii5lV5+bde+rUg53m1kquy0vcGfCuxA7TaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733228086; c=relaxed/simple;
-	bh=hmgTYvyKwTUsLw4N96/c501UhYL9t4E16VnIBneOYok=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hfLtqAL4UxhaQwgTy+We+Pwwkp9wTACCWrg9Uo+O8Ss7JNq7HRIB2nWLEEgcKCAOKBQGqzz0u7QdwBhIm2jkCMwQLcjmVy628ks76e0wU9rjpqlLEmqEfelcBkvyKgnCIpFUqkJyqUQYVLXjH/PrIuVBoPBW2upvTBMYW8vWaV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=rAAKCrdO; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1733228657; c=relaxed/simple;
+	bh=mCIHbMTp8TXOIpl1+nubIptrAHWq3pU6doVeMEipNVc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tevQA9ArlRT1+O9NrOf8zJqLVGPaq1sM83SqP0xlR2iQ1CiGjdoac6/k204JiQy6TSdCEQNahc/S5g3/RGng4PnwXoPxE6IIMc+Wr+RbhNuv3ZO6cF8qLjo70Qs90MXm8v1wMmT/8ViLx22RSYkSeRTJjoWoq0M10up3OzHRgkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=PgY5nn9U; arc=none smtp.client-ip=17.58.6.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="rAAKCrdO"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1733228075; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=7qI5Tpti/q7G+Vv+zck9DF1myBpIVdZteXJ2iz09tI4=;
-	b=rAAKCrdOe5Pq504FkpldHyMq8folfVOrypXM4urq8NKC5RYzCArQXzTZ6+k3sTvVw2xNHkTEljQb6nszjJkRYCWJyGgjETCKU1luoe/HqKAinIihpfDHYffBHp2OPARN9qvuV253Vv4G4MSA0pf2NBmHojHQ5OTxXfjj5f4tPI0=
-Received: from j66c13357.sqa.eu95.tbsite.net(mailfrom:mengferry@linux.alibaba.com fp:SMTPD_---0WKmboUw_1733228074 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 03 Dec 2024 20:14:34 +0800
-From: Ferry Meng <mengferry@linux.alibaba.com>
-To: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	virtualization@lists.linux.dev
-Cc: linux-kernel@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Ferry Meng <mengferry@linux.alibaba.com>
-Subject: [PATCH 3/3] virtio-blk: add uring_cmd iopoll support.
-Date: Tue,  3 Dec 2024 20:14:24 +0800
-Message-Id: <20241203121424.19887-4-mengferry@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20241203121424.19887-1-mengferry@linux.alibaba.com>
-References: <20241203121424.19887-1-mengferry@linux.alibaba.com>
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="PgY5nn9U"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1733228654;
+	bh=CgCScBX/+fgZ0roCuYsgonJhaxWB8rsl1yCC6V0WM+E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
+	 x-icloud-hme;
+	b=PgY5nn9UjaNQNnW4ZpJ9WuRQx6im5psJe58NOrhuMYaP81TCjCoqg7OOKUTCf/GiQ
+	 U5NzWhh2P25K5ajpXMvRXYX0Q0QlkR8pgL3oTItbqVZutGKevLmlI66ZBGBcrDMdzZ
+	 tMmlV2WZ2o8x16WpoGlJ/JnV1zI3oqt06fGl4I8/qI7wYj0KQ1QQr5n3xLSgizk9fw
+	 TQ9xaKi2nZyOPqodk3YoZL2QcRqFeCLp3CsTqDDtllnMk1q4GHXKVq7SsECnBkg8jm
+	 H9mCDktUr1zn+c+7ek7cGPeMoLhQxufGfyCDPYAJQXskQd4pXIE2C7c2QiBSj9B4RB
+	 vRrMl0+rr+jVw==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-hyfv10011601.me.com (Postfix) with ESMTPSA id 675CEC8010E;
+	Tue,  3 Dec 2024 12:23:51 +0000 (UTC)
+Message-ID: <9d34bd6f-b120-428a-837b-5a5813e14618@icloud.com>
+Date: Tue, 3 Dec 2024 20:23:45 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/32] driver core: Constify API device_find_child()
+ and adapt for various existing usages
+To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Chun-Kuang Hu <chunkuang.hu@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jean Delvare <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>,
+ Martin Tuma <martin.tuma@digiteqautomotive.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>,
+ Andreas Noever <andreas.noever@gmail.com>,
+ Michael Jamet <michael.jamet@intel.com>,
+ Mika Westerberg <mika.westerberg@linux.intel.com>,
+ Yehezkel Bernat <YehezkelShB@gmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+ Jiri Slaby <jirislaby@kernel.org>,
+ Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+ Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+ Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+ Mike Christie <michael.christie@oracle.com>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Nilesh Javali <njavali@marvell.com>,
+ Manish Rangankar <mrangankar@marvell.com>,
+ GR-QLogic-Storage-Upstream@marvell.com, Davidlohr Bueso <dave@stgolabs.net>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Alison Schofield <alison.schofield@intel.com>,
+ Andreas Larsson <andreas@gaisler.com>, Stuart Yoder <stuyoder@gmail.com>,
+ Laurentiu Tudor <laurentiu.tudor@nxp.com>, Jens Axboe <axboe@kernel.dk>,
+ Sudeep Holla <sudeep.holla@arm.com>,
+ Cristian Marussi <cristian.marussi@arm.com>, Ard Biesheuvel
+ <ardb@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-hwmon@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pwm@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux1394-devel@lists.sourceforge.net, linux-serial@vger.kernel.org,
+ linux-sound@vger.kernel.org, open-iscsi@googlegroups.com,
+ linux-scsi@vger.kernel.org, linux-cxl@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+ arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20241203-const_dfc_done-v2-0-7436a98c497f@quicinc.com>
+ <g32cigmktmj4egkq2tof27el2yss4liccfxgebkgqvkil32mlb@e3ta4ezv7y4m>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <g32cigmktmj4egkq2tof27el2yss4liccfxgebkgqvkil32mlb@e3ta4ezv7y4m>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: HfN3ugOwn0RD4lT0NgRrMbrQZDyUcr0J
+X-Proofpoint-ORIG-GUID: HfN3ugOwn0RD4lT0NgRrMbrQZDyUcr0J
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-03_01,2024-12-03_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 suspectscore=0
+ clxscore=1015 adultscore=0 malwarescore=0 mlxlogscore=903 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412030107
 
-Add polling support for uring_cmd polling support for virtblk, which
-will be called during completion-polling.
+On 2024/12/3 20:00, Uwe Kleine-König wrote:
+> Hello,
+> 
+> On Tue, Dec 03, 2024 at 08:33:22AM +0800, Zijun Hu wrote:
+>> This patch series is to constify the following API:
+>> struct device *device_find_child(struct device *dev, void *data,
+>> 		int (*match)(struct device *dev, void *data));
+>> To :
+>> struct device *device_find_child(struct device *dev, const void *data,
+>> 				 device_match_t match);
+>> typedef int (*device_match_t)(struct device *dev, const void *data);
+> 
+> This series isn't bisectible. With only the first two patches applied I
+> hit:
 
-Signed-off-by: Ferry Meng <mengferry@linux.alibaba.com>
----
- drivers/block/virtio_blk.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+yes. such patch series needs to be merge as atomic way.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 1a4bac3dc044..7888789a3eb8 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -1469,6 +1469,18 @@ static int virtblk_chr_uring_cmd(struct io_uring_cmd *ioucmd, unsigned int issue
- 	return virtblk_uring_cmd(vblk, ioucmd, issue_flags);
- }
- 
-+static int virtblk_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd,
-+				 struct io_comp_batch *iob,
-+				 unsigned int poll_flags)
-+{
-+	struct virtblk_uring_cmd_pdu *pdu = virtblk_get_uring_cmd_pdu(ioucmd);
-+	struct request *req = pdu->req;
-+
-+	if (req && blk_rq_is_poll(req))
-+		return blk_rq_poll(req, iob, poll_flags);
-+	return 0;
-+}
-+
- static void virtblk_cdev_rel(struct device *dev)
- {
- 	ida_free(&vd_chr_minor_ida, MINOR(dev->devt));
-@@ -1517,6 +1529,7 @@ static int virtblk_cdev_add(struct virtio_blk *vblk,
- static const struct file_operations virtblk_chr_fops = {
- 	.owner		= THIS_MODULE,
- 	.uring_cmd	= virtblk_chr_uring_cmd,
-+	.uring_cmd_iopoll = virtblk_chr_uring_cmd_iopoll,
- };
- 
- static unsigned int virtblk_queue_depth;
--- 
-2.43.5
+Hi Greg,
+
+is it possible to ONLY merge such patch series by atomic way into your
+driver-core tree?
+
+or squash such patch series into a single patch ?
+
+various subsystem maintainers may not like squashing way.
+
+> 
+>   CC      drivers/pwm/core.o
+> drivers/pwm/core.c: In function ‘pwm_unexport_child’:
+> drivers/pwm/core.c:1292:55: error: passing argument 3 of ‘device_find_child’ from incompatible pointer type [-Wincompatible-pointer-types]
+>  1292 |         pwm_dev = device_find_child(pwmchip_dev, pwm, pwm_unexport_match);
+>       |                                                       ^~~~~~~~~~~~~~~~~~
+>       |                                                       |
+>       |                                                       int (*)(struct device *, void *)
+> In file included from include/linux/acpi.h:14,
+>                  from drivers/pwm/core.c:11:
+> include/linux/device.h:1085:49: note: expected ‘device_match_t’ {aka ‘int (*)(struct device *, const void *)’} but argument is of type ‘int (*)(struct device *, void *)’
+>  1085 |                                  device_match_t match);
+>       |                                  ~~~~~~~~~~~~~~~^~~~~
+> drivers/pwm/core.c: In function ‘pwm_class_get_state’:
+> drivers/pwm/core.c:1386:55: error: passing argument 3 of ‘device_find_child’ from incompatible pointer type [-Wincompatible-pointer-types]
+>  1386 |         pwm_dev = device_find_child(pwmchip_dev, pwm, pwm_unexport_match);
+>       |                                                       ^~~~~~~~~~~~~~~~~~
+>       |                                                       |
+>       |                                                       int (*)(struct device *, void *)
+> include/linux/device.h:1085:49: note: expected ‘device_match_t’ {aka ‘int (*)(struct device *, const void *)’} but argument is of type ‘int (*)(struct device *, void *)’
+>  1085 |                                  device_match_t match);
+>       |                                  ~~~~~~~~~~~~~~~^~~~~
+> make[5]: *** [scripts/Makefile.build:194: drivers/pwm/core.o] Error 1
+> make[4]: *** [scripts/Makefile.build:440: drivers/pwm] Error 2
+> make[3]: *** [scripts/Makefile.build:440: drivers] Error 2
+> make[2]: *** [Makefile:1989: .] Error 2
+> make[1]: *** [Makefile:372: __build_one_by_one] Error 2
+> make: *** [Makefile:251: __sub-make] Error 2
+> 
+> Best regards
+> Uwe
 
