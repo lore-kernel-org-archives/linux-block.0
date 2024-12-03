@@ -1,95 +1,138 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408091AA792;
-	Tue,  3 Dec 2024 11:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585A26FC3;
+	Tue,  3 Dec 2024 11:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733226089; cv=none; b=bE7TpBwRjyo4fyiBNffx4YUB28C5qnoCoA5QVnsYtFc3Imno2cfeUYHzWtssnpSa09JbN8raF48UWNBtugrTMgab2mt+esP8rI6DYSCoCURsssBcQ4mRBI4FnBLNCmPFBkjFEM4OEIUK67xpBg1HnEEwPSj74jVwO1bC4eY5hok=
+	t=1733227188; cv=none; b=NMydsAGsljvqLVaTc5nC0VOKsac2A9Dr8oHk959iuCEcQeerqIKsb54thzuTNVKLQ8KkklAGmA7aMJZYrFdPQ0BRi+/n14+7jxwZfpLl85qaQ/hwO1BMTgb59IboJrTvJR/2SwamACJO4W/WhPabbPU8wjCUQEvPmxD3Rm8Xi8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733226089; c=relaxed/simple;
-	bh=B9NyZcAaR4dHU+SFxKhpBXk/nUrfP0ctbNkEv4HqWK0=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=SUPIVIqVDm2tzDRO1RIwQhdYgPoorkDOS59ks4bFY22DeTQmiZuS1qhiCqVRQ5w0kypN/A1A/opTffvgOvTkQhEdbCUhZdGpN7LLyVwtPUz6KxQgGzuII4FLMn0s8m9yJLGdbkTlii6GzmxdAXxvYA6O3qekGxnX3xl84MQEpIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZMjmq0ri; arc=none smtp.client-ip=209.85.210.174
+	s=arc-20240116; t=1733227188; c=relaxed/simple;
+	bh=5f7uC9CEMYhOatLZfF783ior1u8CO4DdxN0J/XgPd+w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KeWOKdxxJ7xue1A3CIbrZEVWuEykftFuKDfnEQjIM/0FM6aT20eJebRQzZgidxTeynYt4iocL+LIrVr8Ls6htZrm4y4yKvhQPYw35i2/E0XbLILSb9ocL6H5rC27UaDgxm5yxalrNKfU53zCAwNv15ILvmjaYjEjGnATdXZA5mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IN/x506m; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZMjmq0ri"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-723f37dd76cso4810483b3a.0;
-        Tue, 03 Dec 2024 03:41:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IN/x506m"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-aa5500f7a75so850678766b.0;
+        Tue, 03 Dec 2024 03:59:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733226087; x=1733830887; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1JmCZyJxo1oZx8BP1akGMDqMWLT87OYERFkBVgJHnAw=;
-        b=ZMjmq0riqCRlZGC+4E4jPltWs5poIvud4lDsq7dOJOhgWPc/KKusHd/gKuVw2RFKgb
-         rgnDctKY9VT0IPcEXGg21X/DK8AZ789X5+gk/VJVuWn29D+XvxNRkWuphIiJZ94Kd2ux
-         y4cDG+9KNIcHP9vAot06pL+DCDHan0ITpEGgzJDanJRzr8DgJWIBPhH9P0zD3tsDvmPt
-         rjK/ICT4zlls9IkQqGvQVLt05hvPFcQ97Nxi4jInL6qEHbpHl4tGJ5f8B47zxoTCNBUd
-         urCQd7F33E6nlZW6qRcTEyVyQog6+JDzIA0Yuqfot0lVo+k1odch6CJ/gRTyqeRP6xSR
-         TmMw==
+        d=gmail.com; s=20230601; t=1733227186; x=1733831986; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Wrpw/gEIImhg5C05XMjsYpabyaleC2cQZtMyShGtK8A=;
+        b=IN/x506mhVwHF1Qi9PZrYjU89q+0UbAJU+23B6rIZ8dbO3HywuwXxh2SufNLRMK2wE
+         jihhFSRToujKVT5gSImhcNzw2AicdK09hoiZ4BPPY50fb2GIvNGfwNQE2BOEKr1i7lcu
+         2gfI/Vyh8jXqS5UHXs4FgjSHmdFZwxst2SFsxoNClQnaJauqBhfgVgcWYA+Qgu3nq38A
+         8ujEcWz0qpXf2GenuexK3PHikGL/lGzuWfJUbVp7GL7lZNDugvROysNE4q3Aj5c5E0Wc
+         L8+QRdBzOo+Y9AQmfkx1cIaNQFso+ZbAB3xkibc5kWaLG0VlSjIYAW1PEqOb/B8c9cn4
+         VRzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733226087; x=1733830887;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1JmCZyJxo1oZx8BP1akGMDqMWLT87OYERFkBVgJHnAw=;
-        b=vHgkGl00VPKP4TWFgAvmogFELLV9b0UVkgawl5q90ubbQohfH8/+5xgmKf7qkyV9cO
-         2FBLmMp3a/ZkXmFthNPoLorMkYacKIyuBOUFnMMJc4vGVdcJYesd8oEJDKnzj1TZnNEx
-         tnrxgTRqsrGYXhvEO8cDnywpxVIIL7K6+2AfwNxtFab8IRKytVvE0SZq1CCnW6T3D+vp
-         eMD6R6vpPq6UxMP6wNYHLLTGkeuudUQeZPA95bPWOlREqgK5Jy8bXxJAJP2uFK+nnVv2
-         +ZyUmq9pMIwraeH5Cee2QXnu7Kp7fY7PR+KXIoO9caQsKy+SjHErCYSJqiQbmfZZB7tk
-         eHkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUb1kSC2tUnWl+xW/ndsjS2v3ELgwBXoFXg2BDUJv88A7MwqDBTRWVyiVqiMybmQYcZk6n8wHeVDIM4Iw==@vger.kernel.org, AJvYcCViDRdrkS+ArYWUZfFYjYfIsymEGfmH9EpFPdnKH2WGp7BFwlHz2wDzz5iKfFO17HQMb3kp7pKJx6Wn9U8SUIg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRiFEGv8+MFrCBS6O5xtNAnF4LCikXaa7YhUssCcjtxgufNrDE
-	JpL6d145N4dxME6yFvXlXVWHkRsHvHVHzwspoHvzeSsvFJdCzCT5nQDnyQ==
-X-Gm-Gg: ASbGncuJqx1857Xyu8xLJSXXW6blXIURp86rlxu0mm/6tL7xe+EqrobU0fTw0ItzB/O
-	LqPjgediKu9snMUvz/H5YeLhkfDX05tSCbXv5X2JWhrTmPu+q6RnpzGGyZgIX54m0oT7CGpqcLP
-	ncPxKptAvm0WxM2/H5ndU4U3MxslQHODuB3bChQ72/DL9NzITjqd/FLPuuIuFL5gUysfopyt85N
-	FF5Si8dQvpuzt97KrYM7JRkZBGbzt7pvxhJThedrSUshntDKvN7mmP6fhf3BWfyAGaCsMd7f3C6
-	glsdyiBEInQm5ye4J9gk+Fz5M5VGUw==
-X-Google-Smtp-Source: AGHT+IFISRLho6NzL9PASWk92b6pc9qbusCNbuSmHTfEMDbRY7HUidBn4oTRBF1wcsz6L7L6Mb8cBw==
-X-Received: by 2002:a05:6a00:98d:b0:725:418b:90e6 with SMTP id d2e1a72fcca58-7257fa59b72mr2983008b3a.2.1733226087440;
-        Tue, 03 Dec 2024 03:41:27 -0800 (PST)
-Received: from localhost (p4007189-ipxg22601hodogaya.kanagawa.ocn.ne.jp. [180.53.81.189])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72544269fedsm9943301b3a.82.2024.12.03.03.41.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2024 03:41:27 -0800 (PST)
-Date: Tue, 03 Dec 2024 20:41:13 +0900 (JST)
-Message-Id: <20241203.204113.1049111619349862214.fujita.tomonori@gmail.com>
-To: a.hindborg@kernel.org
-Cc: fujita.tomonori@gmail.com, linux-block@vger.kernel.org,
- boqun.feng@gmail.com, axboe@kernel.dk, rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH] block: rnull: add missing MODULE_DESCRIPTION
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <87plm9f362.fsf@kernel.org>
-References: <nxIB6ABobvhiDA2z5gk5pNpCwflPD7Faqf6s4WWaJseb8VIkFsYa2Vl3aeMLZyC0G2HecJ0D1_GPf3FczGjCww==@protonmail.internalid>
-	<20241130094521.193924-1-fujita.tomonori@gmail.com>
-	<87plm9f362.fsf@kernel.org>
+        d=1e100.net; s=20230601; t=1733227186; x=1733831986;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wrpw/gEIImhg5C05XMjsYpabyaleC2cQZtMyShGtK8A=;
+        b=GyZHsXOriMd0DwgXoHUyaQGMjkJ1Tlk9J6LfUywRPkEQ2A4RLfAr1DyFPYdWAHK0b1
+         +NnIRlXGOXeycIPaUNU4KskJXDKyOLefzdd36HDgQnHDW0ixJrnO5GW60vQ4aj9GOdpu
+         dj16h0stFjSECkgnr+O3xNXR1NZgSw/9nLTyhC+1TvvaFw+4vXIcTX5RO47ZyCGH0w4Q
+         kd2whAsehVjjtb3m5O3/a0gtKWUtBk6C7wL26JS/K+xa/EbTUbZPdsYbgPDKrautAA/C
+         B63Yj/JF8CRijEnHqOaUUFILSgMjwd7F+GhLA1IpyV3wjw+cFH9Apr3BgEH50W34nkz0
+         +Mdg==
+X-Forwarded-Encrypted: i=1; AJvYcCVY+L2Vbo/CUMFYHOTz4v+W8sFTPHyzAQG905oneOA4JsUZXJhRabBwDPeyQbyFTk6s4kcG4gwZrScn8w==@vger.kernel.org, AJvYcCX1ougLJK+81c3ybFd21Fu+eVyQfoJ1EePRIqYZ+wE9T9bSAfBfhWxGu0zeiVzYfMdraa8VsQFSNvO447sCRA==@vger.kernel.org, AJvYcCXPr33tD5q8iFqO4Y0FIXSzcPlEpl2gXFZvw52nrRMeJhLCo9UG/91bqzrpoQLPAFyVmIPrMYXCdJRvHXw=@vger.kernel.org, AJvYcCXug9OwHMNQ98db0RYsAtSzRj2us187VX7FKWEjce0zwnH+4k2c6r1spXfCc8PT7hNKqckz+EtD6g==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8BYXWO5UOWnGHc+Zp7eTgcCixoz1cDBPkBFdFQiqxt+SSD8fO
+	w1NAns2zPdz1WwnC7PG0bSG4+vRXjjVvnBkwuc7pIhaw1vlhKSNa
+X-Gm-Gg: ASbGncvgyWBEYcUMX8x1RDvLaajy4ByFSKXbrUAfTe37VRKRLOIEq+X0D7GdN1pxKF0
+	UpqA23VsOedIi33dWsZWMwn8Rj8AqA+zVWpa1srHIVBvCH8eR0l3LGonqdgtvZfSFORKat9y6iB
+	fK2Aaqw3vtN66oW9ZF/Sr9Vha6KIXbv3aikzFdzhOkph+jsnYPlSJJecZWx5vIPi7ixztJaaONY
+	ppx0YY8w/3TRbymtYcm8Vsn5xZf7svY2reTbVe0vIHTyYy6hkFKiOGlRsOjFg==
+X-Google-Smtp-Source: AGHT+IG4y9LGZwq9NfK9cdHd+NVO7Xgo2sU20E7rmPmT2a1si682Vjey0TVrQO9Z6X+iYPB4Df14SQ==
+X-Received: by 2002:a17:906:4c9:b0:aa5:44cf:3ea7 with SMTP id a640c23a62f3a-aa5f7f4773dmr171377066b.56.1733227185269;
+        Tue, 03 Dec 2024 03:59:45 -0800 (PST)
+Received: from [192.168.42.213] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa599801591sm605350766b.91.2024.12.03.03.59.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Dec 2024 03:59:44 -0800 (PST)
+Message-ID: <b8574010-e2fc-4566-9df8-80046fec2845@gmail.com>
+Date: Tue, 3 Dec 2024 12:00:41 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 06/10] io_uring: introduce attributes for read/write
+ and PI support
+To: Anuj Gupta <anuj20.g@samsung.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: axboe@kernel.dk, hch@lst.de, kbusch@kernel.org, anuj1072538@gmail.com,
+ brauner@kernel.org, jack@suse.cz, viro@zeniv.linux.org.uk,
+ io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org, gost.dev@samsung.com,
+ linux-scsi@vger.kernel.org, vishak.g@samsung.com,
+ linux-fsdevel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
+References: <20241128112240.8867-1-anuj20.g@samsung.com>
+ <CGME20241128113109epcas5p46022c85174da65853c85a8848b32f164@epcas5p4.samsung.com>
+ <20241128112240.8867-7-anuj20.g@samsung.com>
+ <yq1r06psey3.fsf@ca-mkp.ca.oracle.com> <20241203065645.GA19359@green245>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20241203065645.GA19359@green245>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Tue, 03 Dec 2024 11:53:41 +0100
-Andreas Hindborg <a.hindborg@kernel.org> wrote:
-
->> Add the missing description to fix the following warning:
+On 12/3/24 06:56, Anuj Gupta wrote:
+> On Mon, Dec 02, 2024 at 09:13:14PM -0500, Martin K. Petersen wrote:
 >>
->> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/block/rnull_mod.o
+>> I have things running on my end on top of Jens' tree (without error
+>> injection, that's to come).
 >>
->> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>> One question, though: How am I to determine that the kernel supports
+>> attr_ptr and IORING_RW_ATTR_FLAG_PI? Now that we no longer have separate
+>> IORING_OP_{READ,WRITE}_META commands I can't use IO_URING_OP_SUPPORTED
+>> to find out whether the running kernel supports PI passthrough.
 > 
-> Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
+> Martin, right currently there is no way to probe whether the kernel
+> supports read/write attributes or not.
 > 
-> Thanks for adding the description string. I am curious about the
-> warning, since I don't get it. Do I need to enable anything special to
-> get this warning?
+> Jens, Pavel how about introducing a new IO_URING_OP_* flag (something
+> like IO_URING_OP_RW_ATTR_SUPPORTED) to probe whether read/write attributes
+> are supported or not. Something like this [*]
 
-You just need to enable extra warnings, e.g., `make W=1`.
+An IORING_FEAT_ flag might be simpler for now. Or is it in plans to
+somehow support IORING_OP_READ_MULTISHOT as well?
+
+I have to say Adding a good probing infra is long overdue. For example a
+user might want to know which attributes are supported. And beyond
+io_uring it might be interesting to probe whether a particular file
+supports it.
+
+
+> [*]
+> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+> index 38f0d6b10eaf..787a2df8037f 100644
+> --- a/include/uapi/linux/io_uring.h
+> +++ b/include/uapi/linux/io_uring.h
+> @@ -723,6 +723,7 @@ struct io_uring_rsrc_update2 {
+>   #define IORING_REGISTER_FILES_SKIP	(-2)
+>   
+>   #define IO_URING_OP_SUPPORTED	(1U << 0)
+> +#define IO_URING_OP_RW_ATTR_SUPPORTED	(1U << 1)
+>   
+>   struct io_uring_probe_op {
+>   	__u8 op;
+> diff --git a/io_uring/opdef.c b/io_uring/opdef.c
+> index 3de75eca1c92..64e1e5d48dec 100644
+> --- a/io_uring/opdef.c
+> +++ b/io_uring/opdef.c
+> @@ -67,6 +67,7 @@ const struct io_issue_def io_issue_defs[] = {
+
+io_cold_defs would be better
+
+-- 
+Pavel Begunkov
+
