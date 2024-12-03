@@ -1,154 +1,96 @@
-Received: from mr85p00im-ztdg06021801.me.com (mr85p00im-ztdg06021801.me.com [17.58.23.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344481EC012
-	for <linux-block@vger.kernel.org>; Tue,  3 Dec 2024 13:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.23.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39ED91F7579
+	for <linux-block@vger.kernel.org>; Tue,  3 Dec 2024 13:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733231023; cv=none; b=NjFDTuWM7VGf+F6t+OydTgAZZxWr3rmG5mGblRXpNWG4MzQmyJ5dyq3bjUp51JcOIUoKCha9mpU+oy2OTNqdWbFtTHeLBwnYTdONjehumSpe359Q7oLJvbOsqAjSdwsVm5vKaaOiCg+zG7++UYq+dNw7t4M1FdzZxw7FLRH8cYs=
+	t=1733233334; cv=none; b=EomHwkSTTbhnKrQfQkKpQ1eC+vbOLjFZS05VUBKJOh8aQN6P5EjRQ465BSitg2sNQtfTPuU5Y2Mo9GQAOXIo7JaZPCqf2l6m9Sl50bOaAou+l4Y99XIMICvjBr1N+BtFlWUVS6BjTa98NHlWr/DA/95n8/UNGBRbYviuh7Ft2Og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733231023; c=relaxed/simple;
-	bh=PMZl124fAJi/9a12repkCEPo/NdFlnbWHM0+eGs6QGw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lul9/hltVfO8Te0SCeeKfs+8EmJrRxmx4eI1zsiUwW0kVVN4TDhXAVOpcDt+WLa9sF1sab5jl1oblGCN+ddFxUV0M3EoK/XtcKODkdBflIZyehY7k+TSoPIwaoqIDbPuDlLQ1NAieAwWH6tkbFm8epKndtPRqzuJA4rRoc6y+hU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=Kc4yhuXu; arc=none smtp.client-ip=17.58.23.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+	s=arc-20240116; t=1733233334; c=relaxed/simple;
+	bh=swAdhm2eapOPHzUUlpD6v5igVWTBbj4YrPwfSTMXPjE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=EWCk0hL1HgJmafaC2g5VJ9sM0IkS8gaqDLOY5ZPq9WSsCyZ2ZyQYvZG5/NXDHjW4uWjbZmoWNI0PgLjSlpdStXQA1SoB59aJW1SfbRGqTc6mb16cnfO5h0rmsMeH+YpS7N90aYFHPsMB5xmxKPyIefne+6ELzSFIeSMq78Suf1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=pbubcHWY; arc=none smtp.client-ip=209.85.161.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="Kc4yhuXu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1733231020;
-	bh=QEJ75x+TqYUJVxmVF6uQZZWFOEl0WJRfUhXN2h5KpKM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
-	 x-icloud-hme;
-	b=Kc4yhuXugc/D/qtZZ41v8wAnuwEzwggEWUway63IXkClqixwU1cfn/v3YVm8Qsiaw
-	 28NLlORRwJjFZX7JY4DZlIgrQ1s8zKvPJAQ+RXHBAEkcNRuUPk0OyxBiAs9kB0GBL/
-	 4jgwTolEa8TiqyUyeuv6tr/7DG898UMLRPOw8P2qzUVkHb/i6BK0gmuVjOCVuRaOL4
-	 yVOUtS8ijY+iNGs/3oFthLPmtWg3RPz3zQCNIexvybyNTkT8kJ+0hPmRIWLu7xxlpo
-	 9HqUza+TM66+s3TNEHqlu5QAj7PkxbSr1VPZfaRzmcsea2BKweNx4LzKqRftuLVcUB
-	 Ma8BwRHqOq26Q==
-Received: from [192.168.1.26] (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-	by mr85p00im-ztdg06021801.me.com (Postfix) with ESMTPSA id 67D49442839;
-	Tue,  3 Dec 2024 13:03:18 +0000 (UTC)
-Message-ID: <b9885785-d4d4-4c72-b425-3dc552651d7e@icloud.com>
-Date: Tue, 3 Dec 2024 21:02:59 +0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="pbubcHWY"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5f25da4f999so267526eaf.3
+        for <linux-block@vger.kernel.org>; Tue, 03 Dec 2024 05:42:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1733233331; x=1733838131; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OC808OH4fso6bInT9VuepjDrgNBDvQNxVS3LcD0axiE=;
+        b=pbubcHWYfsTdwHTRs66yTuNa4iXGgrc/XFdHnPvMQ40zYwLONntpGo12bVLni6w9Yc
+         wdBo3n3Uz2u2JXdVXkDpeptJHUcj+M0GJ2f4V+6bToKfMOyo/zhoaQceu0urmgL3PAB5
+         CwPsjkvRlpD5/tv0iBGal2d9wiNgaSB60BuSewN7IBtGB3jvw7qvcFqEEveaQ1w/ye5d
+         plsYly6TLxWPrahgvOqmAOWHpFZY2qPOTSH83yEezVWK5AKk/BnONFi4nxB9mWLK52Ex
+         JzMPTRzchYpDaPB0a+v8z2K0wRH5YN8YyNEt9LvsW66uZnnFa8LTyI7+c0BC8UrhYnq9
+         iAZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733233331; x=1733838131;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OC808OH4fso6bInT9VuepjDrgNBDvQNxVS3LcD0axiE=;
+        b=D7tRC+cafa71SaJNmAmMllTbL8CwCCsfVOPw8u1xf2CKMAVS6Ysi2NPc8YeS/50668
+         m6BcoVwcRGLF7YwVWLxm5xf9SP18PgtQ1vckHbD9ulNxhVIujqAT/X28Luv60SyfJ4u/
+         F30SWlXyQ9tzTiAciZxPpjiKWR+2UJwi+ePy5OtKEytul4UaspvBzYx0Yy+pJ2pwIVoZ
+         ugCFr8dSr2WyZeERgW4qtNMupg+3jiGsXK4BOucK/c48DbRcnJgmw9o/+ANp3D02wbUR
+         sYlhLHeEreKQ6yXuf/1qPVxvLjqJagX3cPBr0QYkHEnTHtYgmmuzTG3Kgb7CKjLKQ6FX
+         aVtQ==
+X-Gm-Message-State: AOJu0YyPRxK2L096NYP1dw8SUfywl41C9WUhpPVe0SVL/LMFBZ7512+f
+	O7c5Kiz6rj7TwTG4AK2H2Nc0m4E6wG6X9CKRJH72bUTvC6QpUS32x9cbeGFHPGE=
+X-Gm-Gg: ASbGncs+xC8xtGHpNhMenPaS7+jtGXWDtM6c46zeGn2FESadmzkyjvd5yaYtBMnje3m
+	tYBecG0kd//frAeGx5ZhuNrp2ucNts8Zm8scXuHXBqJ5MafZ6wydST+v/inQh7XYyutagdr2Jpw
+	lZYP3Okxs7M6C3tUJty72EKmsLtexcRQ2TvFJhNv1rKIho9x+1OelX5aPbsN2QpsJ+dP5HHZ7A7
+	KiGMDeT3/L+5aP+n6Z4GMHerSF+0+uN0nzvYuaTA0qNfQ==
+X-Google-Smtp-Source: AGHT+IG9pT2mrXevy6o0bm52Erkrf+w3fU0scfAFMj0oTw55yoG0N65LlD1tXQIzU6UaLc+dmzgsgA==
+X-Received: by 2002:a4a:e918:0:b0:5f1:e905:bc93 with SMTP id 006d021491bc7-5f25ae0e5c4mr2010026eaf.5.1733233331308;
+        Tue, 03 Dec 2024 05:42:11 -0800 (PST)
+Received: from [127.0.0.1] ([130.250.255.163])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5f21a4cd86bsm2782124eaf.29.2024.12.03.05.42.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 05:42:09 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: a.hindborg@kernel.org, boqun.feng@gmail.com, 
+ rust-for-linux@vger.kernel.org
+In-Reply-To: <20241130094521.193924-1-fujita.tomonori@gmail.com>
+References: <20241130094521.193924-1-fujita.tomonori@gmail.com>
+Subject: Re: [PATCH] block: rnull: add missing MODULE_DESCRIPTION
+Message-Id: <173323332913.59116.9985316859123945765.b4-ty@kernel.dk>
+Date: Tue, 03 Dec 2024 06:42:09 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/32] driver core: Constify API device_find_child()
- and adapt for various existing usages
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Chun-Kuang Hu <chunkuang.hu@kernel.org>,
- Philipp Zabel <p.zabel@pengutronix.de>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Jean Delvare <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>,
- Martin Tuma <martin.tuma@digiteqautomotive.com>,
- Mauro Carvalho Chehab <mchehab@kernel.org>,
- Andreas Noever <andreas.noever@gmail.com>,
- Michael Jamet <michael.jamet@intel.com>,
- Mika Westerberg <mika.westerberg@linux.intel.com>,
- Yehezkel Bernat <YehezkelShB@gmail.com>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
- Ira Weiny <ira.weiny@intel.com>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
- Jiri Slaby <jirislaby@kernel.org>,
- Heikki Krogerus <heikki.krogerus@linux.intel.com>,
- Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
- Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
- Mike Christie <michael.christie@oracle.com>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Nilesh Javali <njavali@marvell.com>,
- Manish Rangankar <mrangankar@marvell.com>,
- GR-QLogic-Storage-Upstream@marvell.com, Davidlohr Bueso <dave@stgolabs.net>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Alison Schofield <alison.schofield@intel.com>,
- Andreas Larsson <andreas@gaisler.com>, Stuart Yoder <stuyoder@gmail.com>,
- Laurentiu Tudor <laurentiu.tudor@nxp.com>, Jens Axboe <axboe@kernel.dk>,
- Sudeep Holla <sudeep.holla@arm.com>,
- Cristian Marussi <cristian.marussi@arm.com>, Ard Biesheuvel
- <ardb@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
- linux-arm-kernel@lists.infradead.org, linux-hwmon@vger.kernel.org,
- linux-media@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
- linux-pwm@vger.kernel.org, nvdimm@lists.linux.dev,
- linux1394-devel@lists.sourceforge.net, linux-serial@vger.kernel.org,
- linux-sound@vger.kernel.org, open-iscsi@googlegroups.com,
- linux-scsi@vger.kernel.org, linux-cxl@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
- arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org,
- linux-remoteproc@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20241203-const_dfc_done-v2-0-7436a98c497f@quicinc.com>
- <g32cigmktmj4egkq2tof27el2yss4liccfxgebkgqvkil32mlb@e3ta4ezv7y4m>
- <9d34bd6f-b120-428a-837b-5a5813e14618@icloud.com>
- <2024120320-manual-jockey-dfd1@gregkh>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <2024120320-manual-jockey-dfd1@gregkh>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: CNFmwAOF9NCRr2KajfMjTjtFd_qlM54K
-X-Proofpoint-GUID: CNFmwAOF9NCRr2KajfMjTjtFd_qlM54K
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-03_02,2024-12-03_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0
- clxscore=1015 malwarescore=0 adultscore=0 phishscore=0 mlxscore=0
- suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2412030113
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-86319
 
-On 2024/12/3 20:41, Greg Kroah-Hartman wrote:
-> On Tue, Dec 03, 2024 at 08:23:45PM +0800, Zijun Hu wrote:
->> On 2024/12/3 20:00, Uwe Kleine-König wrote:
->>> Hello,
->>>
->>> On Tue, Dec 03, 2024 at 08:33:22AM +0800, Zijun Hu wrote:
->>>> This patch series is to constify the following API:
->>>> struct device *device_find_child(struct device *dev, void *data,
->>>> 		int (*match)(struct device *dev, void *data));
->>>> To :
->>>> struct device *device_find_child(struct device *dev, const void *data,
->>>> 				 device_match_t match);
->>>> typedef int (*device_match_t)(struct device *dev, const void *data);
->>>
->>> This series isn't bisectible. With only the first two patches applied I
->>> hit:
->>
->> yes. such patch series needs to be merge as atomic way.
->>
->> Hi Greg,
->>
->> is it possible to ONLY merge such patch series by atomic way into your
->> driver-core tree?
+
+On Sat, 30 Nov 2024 18:45:21 +0900, FUJITA Tomonori wrote:
+> Add the missing description to fix the following warning:
 > 
-> Nope!
+> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/block/rnull_mod.o
 > 
->> or squash such patch series into a single patch ?
->>
->> various subsystem maintainers may not like squashing way.
-> 
-> Agreed, so look into either doing it in a bisectable way if at all
-> possible.  As I don't see a full series here, I can't suggest how it
-> needs to happen :(
 > 
 
-let me send you a full series later and discuss how to solve this issue.
+Applied, thanks!
 
-> thanks,
-> 
-> greg k-h
+[1/1] block: rnull: add missing MODULE_DESCRIPTION
+      (no commit info)
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
