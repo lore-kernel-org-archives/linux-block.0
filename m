@@ -1,166 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E26B3398B;
-	Tue,  3 Dec 2024 12:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870751E570A;
+	Tue,  3 Dec 2024 12:14:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733227262; cv=none; b=FzO7zdcCbOGmFYMs76UesdXZ0Fc7Nl77VPhE/Ky8oPsmxh/+t/NuBngY4P11WQjiQKcoLXZUEeL+oLyj6J/lIYtd2avhg8Q37+X7gzST0DfTkg1ND5XKKKL2m2xNT2XRxgIuOqLRSGQZaCkfxUqnU/RvX7tcXDXl2ecIS5xu6yE=
+	t=1733228079; cv=none; b=rllMAx6GBkXDV0m3zNhYJF9x0PYutRlTp8KTLmaddZlKf7DF1sLTp4J9nggZJyXE8so1s5HgSRgTwAzqSMYRMS/uuIB5/Pmgg94o2CTPT744sj7ZAeibMED3C0ytbKtzEa/y8Wk/Rfbp/i1nx5lLN/gxEGAHNhm3u5o87KBOfmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733227262; c=relaxed/simple;
-	bh=rlz53vWDp5E/pYVOEj1URbYGt1AREB4Xo9ogjRjCu50=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rKPWitPTPIjPGJJtxcIdmX9tRnFLzlNuAIpWz2zE5F6v0tYsKpF7koC+Eb9bnpcfT39KKfLnppZUfH1YZHoE/zenBBuGQYVTNY9OhPRt+8L0D+bhGfVOiUWog413yWrdxB93lVnyAt02SIsC/sAreWOlPPF9/n13xvOgo4IWFA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fdDeCtLV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733228079; c=relaxed/simple;
+	bh=QdBxzNQs/JcMK80Dvkj/Snot7CWTforQH5lu/RdEUjs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=O9nW9oMV+3CZB3Zi91coEs5ZkO85EKTqnSCUHp4Ymlg5zqVDFJ/S/KedW5eXNK2w1+lWXG1GU5I9MDGeWUA/T/dG6gjP6YbA1b3rmN7O9TIh4xvEJYErPGvHcI0nhqq3s91BQiz3V1Hvol+ZCrufgc1aNOO73lUWnJ5dnaRgjio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=NlGZAjfV; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fdDeCtLV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBAF4C4CECF;
-	Tue,  3 Dec 2024 12:01:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733227261;
-	bh=rlz53vWDp5E/pYVOEj1URbYGt1AREB4Xo9ogjRjCu50=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fdDeCtLVqECfRfNoqbCzzD0S2R+ze8fu4xgXlPdQFJQ+STayO+czgml6vxR6gAr9u
-	 SfvYrgXRdRmOjMEDiUcIg8Ywi35riI0nUxeZrJIGAla7/uurms7YmN220IRsCbVxR6
-	 0RLGXO472a27O/MHnrmTkWCsCE1MnHGszPPpy+ATOMh/r4ZUNj1XVz+G2aEnELC83Q
-	 5zXc30+JHwj5J8xXpxDpdRcwIa3kank2REKqd9CMrbu3SZA6RQSEQqgx6shuUaL3BU
-	 er9sxGEV01E1uZex0+a/6+JDYf3SqBVZ3ELFg7wS+IFimmHwT30DsHPjPlqmlPz8Tg
-	 GqLyWYoqGameA==
-Date: Tue, 3 Dec 2024 13:00:58 +0100
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
-To: Zijun Hu <zijun_hu@icloud.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Chun-Kuang Hu <chunkuang.hu@kernel.org>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Jean Delvare <jdelvare@suse.com>, 
-	Guenter Roeck <linux@roeck-us.net>, Martin Tuma <martin.tuma@digiteqautomotive.com>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, Andreas Noever <andreas.noever@gmail.com>, 
-	Michael Jamet <michael.jamet@intel.com>, Mika Westerberg <mika.westerberg@linux.intel.com>, 
-	Yehezkel Bernat <YehezkelShB@gmail.com>, Linus Walleij <linus.walleij@linaro.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Dan Williams <dan.j.williams@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
-	Takashi Sakamoto <o-takashi@sakamocchi.jp>, Jiri Slaby <jirislaby@kernel.org>, 
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>, Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>, 
-	Mike Christie <michael.christie@oracle.com>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Nilesh Javali <njavali@marvell.com>, 
-	Manish Rangankar <mrangankar@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com, 
-	Davidlohr Bueso <dave@stgolabs.net>, Jonathan Cameron <jonathan.cameron@huawei.com>, 
-	Alison Schofield <alison.schofield@intel.com>, Andreas Larsson <andreas@gaisler.com>, 
-	Stuart Yoder <stuyoder@gmail.com>, Laurentiu Tudor <laurentiu.tudor@nxp.com>, 
-	Jens Axboe <axboe@kernel.dk>, Sudeep Holla <sudeep.holla@arm.com>, 
-	Cristian Marussi <cristian.marussi@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Mathieu Poirier <mathieu.poirier@linaro.org>, 
-	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-mediatek@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	nvdimm@lists.linux.dev, linux1394-devel@lists.sourceforge.net, 
-	linux-serial@vger.kernel.org, linux-sound@vger.kernel.org, open-iscsi@googlegroups.com, 
-	linux-scsi@vger.kernel.org, linux-cxl@vger.kernel.org, sparclinux@vger.kernel.org, 
-	linux-block@vger.kernel.org, arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org, 
-	linux-remoteproc@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH v2 00/32] driver core: Constify API device_find_child()
- and adapt for various existing usages
-Message-ID: <g32cigmktmj4egkq2tof27el2yss4liccfxgebkgqvkil32mlb@e3ta4ezv7y4m>
-References: <20241203-const_dfc_done-v2-0-7436a98c497f@quicinc.com>
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="NlGZAjfV"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1733228074; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
+	bh=HuqGAvbN2L/LVkbTrKAfpTJN10lUOcd/PL9tmLaFQ8g=;
+	b=NlGZAjfV5YqUdQ2Dju/QcLIgN2Xyx+TSPhYiEEF7pm9QiJYd6iH2n9nxX/aDkSRrWK0flChp6aIvMm4aw1lu8RzF3syrBRMxkphZ9+ZPmSlIlrs8M4YdRMK67j6yePPZ1Wo6N8ZXHK3v2FjQ7FmolWnQgwUQV8vP8r9zsyCw3Ok=
+Received: from j66c13357.sqa.eu95.tbsite.net(mailfrom:mengferry@linux.alibaba.com fp:SMTPD_---0WKmboQr_1733228066 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 03 Dec 2024 20:14:33 +0800
+From: Ferry Meng <mengferry@linux.alibaba.com>
+To: "Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	virtualization@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org,
+	io-uring@vger.kernel.org,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Jeffle Xu <jefflexu@linux.alibaba.com>,
+	Ferry Meng <mengferry@linux.alibaba.com>
+Subject: [PATCH 0/3][RFC] virtio-blk: add io_uring passthrough support for virtio-blk
+Date: Tue,  3 Dec 2024 20:14:21 +0800
+Message-Id: <20241203121424.19887-1-mengferry@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="35h4iyqfzzpzpkno"
-Content-Disposition: inline
-In-Reply-To: <20241203-const_dfc_done-v2-0-7436a98c497f@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+We seek to develop a more flexible way to use virtio-blk and bypass the block
+layer logic in order to accomplish certain performance optimizations. As a
+result, we referred to the implementation of io_uring passthrough in NVMe
+and implemented it in the virtio-blk driver. This patch series adds io_uring
+passthrough support for virtio-blk devices, resulting in lower submit latency
+and increased flexibility when utilizing virtio-blk.
 
---35h4iyqfzzpzpkno
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2 00/32] driver core: Constify API device_find_child()
- and adapt for various existing usages
-MIME-Version: 1.0
+To test this patch series, I changed fio's code: 
+1. Added virtio-blk support to engines/io_uring.c.
+2. Added virtio-blk support to the t/io_uring.c testing tool.
+Link: https://github.com/jdmfr/fio 
 
-Hello,
+Using t/io_uring-vblk, the performance of virtio-blk based on uring-cmd
+scales better than block device access. (such as below, Virtio-Blk with QEMU,
+1-depth fio) 
+(passthru) read: IOPS=17.2k, BW=67.4MiB/s (70.6MB/s) 
+slat (nsec): min=2907, max=43592, avg=3981.87, stdev=595.10 
+clat (usec): min=38, max=285,avg=53.47, stdev= 8.28 
+lat (usec): min=44, max=288, avg=57.45, stdev= 8.28
+(block) read: IOPS=15.3k, BW=59.8MiB/s (62.7MB/s) 
+slat (nsec): min=3408, max=35366, avg=5102.17, stdev=790.79 
+clat (usec): min=35, max=343, avg=59.63, stdev=10.26 
+lat (usec): min=43, max=349, avg=64.73, stdev=10.21
 
-On Tue, Dec 03, 2024 at 08:33:22AM +0800, Zijun Hu wrote:
-> This patch series is to constify the following API:
-> struct device *device_find_child(struct device *dev, void *data,
-> 		int (*match)(struct device *dev, void *data));
-> To :
-> struct device *device_find_child(struct device *dev, const void *data,
-> 				 device_match_t match);
-> typedef int (*device_match_t)(struct device *dev, const void *data);
+Testing the virtio-blk device with fio using 'engines=io_uring_cmd'
+and 'engines=io_uring' also demonstrates improvements in submit latency.
+(passthru) taskset -c 0 t/io_uring-vblk -b4096 -d8 -c4 -s4 -p0 -F1 -B0 -O0 -n1 -u1 /dev/vdcc0 
+IOPS=189.80K, BW=741MiB/s, IOS/call=4/3
+IOPS=187.68K, BW=733MiB/s, IOS/call=4/3 
+(block) taskset -c 0 t/io_uring-vblk -b4096 -d8 -c4 -s4 -p0 -F1 -B0 -O0 -n1 -u0 /dev/vdc 
+IOPS=101.51K, BW=396MiB/s, IOS/call=4/3
+IOPS=100.01K, BW=390MiB/s, IOS/call=4/4
 
-This series isn't bisectible. With only the first two patches applied I
-hit:
+The performance overhead of submitting IO can be decreased by 25% overall
+with this patch series. The implementation primarily references 'nvme io_uring
+passthrough', supporting io_uring_cmd through a separate character interface
+(temporarily named /dev/vdXc0). Since this is an early version, many
+details need to be taken into account and redesigned, like:
+● Currently, it only considers READ/WRITE scenarios, some more complex operations 
+not included like discard or zone ops.(Normal sqe64 is sufficient, in my opinion;
+following upgrades, sqe128 and cqe32 might not be needed).
+● ......
 
-  CC      drivers/pwm/core.o
-drivers/pwm/core.c: In function =E2=80=98pwm_unexport_child=E2=80=99:
-drivers/pwm/core.c:1292:55: error: passing argument 3 of =E2=80=98device_fi=
-nd_child=E2=80=99 from incompatible pointer type [-Wincompatible-pointer-ty=
-pes]
- 1292 |         pwm_dev =3D device_find_child(pwmchip_dev, pwm, pwm_unexpor=
-t_match);
-      |                                                       ^~~~~~~~~~~~~=
-~~~~~
-      |                                                       |
-      |                                                       int (*)(struc=
-t device *, void *)
-In file included from include/linux/acpi.h:14,
-                 from drivers/pwm/core.c:11:
-include/linux/device.h:1085:49: note: expected =E2=80=98device_match_t=E2=
-=80=99 {aka =E2=80=98int (*)(struct device *, const void *)=E2=80=99} but a=
-rgument is of type =E2=80=98int (*)(struct device *, void *)=E2=80=99
- 1085 |                                  device_match_t match);
-      |                                  ~~~~~~~~~~~~~~~^~~~~
-drivers/pwm/core.c: In function =E2=80=98pwm_class_get_state=E2=80=99:
-drivers/pwm/core.c:1386:55: error: passing argument 3 of =E2=80=98device_fi=
-nd_child=E2=80=99 from incompatible pointer type [-Wincompatible-pointer-ty=
-pes]
- 1386 |         pwm_dev =3D device_find_child(pwmchip_dev, pwm, pwm_unexpor=
-t_match);
-      |                                                       ^~~~~~~~~~~~~=
-~~~~~
-      |                                                       |
-      |                                                       int (*)(struc=
-t device *, void *)
-include/linux/device.h:1085:49: note: expected =E2=80=98device_match_t=E2=
-=80=99 {aka =E2=80=98int (*)(struct device *, const void *)=E2=80=99} but a=
-rgument is of type =E2=80=98int (*)(struct device *, void *)=E2=80=99
- 1085 |                                  device_match_t match);
-      |                                  ~~~~~~~~~~~~~~~^~~~~
-make[5]: *** [scripts/Makefile.build:194: drivers/pwm/core.o] Error 1
-make[4]: *** [scripts/Makefile.build:440: drivers/pwm] Error 2
-make[3]: *** [scripts/Makefile.build:440: drivers] Error 2
-make[2]: *** [Makefile:1989: .] Error 2
-make[1]: *** [Makefile:372: __build_one_by_one] Error 2
-make: *** [Makefile:251: __sub-make] Error 2
+I would appreciate any useful recommendations.
 
-Best regards
-Uwe
+Ferry Meng (3):
+  virtio-blk: add virtio-blk chardev support.
+  virtio-blk: add uring_cmd support for I/O passthru on chardev.
+  virtio-blk: add uring_cmd iopoll support.
 
---35h4iyqfzzpzpkno
-Content-Type: application/pgp-signature; name="signature.asc"
+ drivers/block/virtio_blk.c      | 325 +++++++++++++++++++++++++++++++-
+ include/uapi/linux/virtio_blk.h |  16 ++
+ 2 files changed, 336 insertions(+), 5 deletions(-)
 
------BEGIN PGP SIGNATURE-----
+-- 
+2.43.5
 
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmdO8vgACgkQj4D7WH0S
-/k5hrwgAmMfv4tgQM/zHhRunXZer+6rbqIrp5LbiXSYngMgHSWkkF/Aqcp/Uejmb
-FQwdlGB47gyVlHT5SP4HCDeST+PhX0lg3vHxP2lg0HaHp7/vgJRZAI65iOfy7DY7
-xqXQ+U2+YvtY+lwSneGFeXo9VZZtuu/YfpP8Qg6jH8dGaIojaU57rB+uJCpdvZmt
-VJhc51IAA6eHPcPMGf5mvS8/A7M8uPDwyEgWBDP/MRE0z6oKEjVLPWYFzXjUaVnZ
-MMOmGyzIfvhHTMxlkisgCC+PwmjrO2lZFsM1jD6SVNzMp6XeT2jiGa7lbfXaK9Rk
-7TvM1d7dwtqa42JTuIjTWWBR7AfmBA==
-=Sef0
------END PGP SIGNATURE-----
-
---35h4iyqfzzpzpkno--
