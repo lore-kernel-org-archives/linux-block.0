@@ -1,178 +1,104 @@
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F3E1DC182
-	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 10:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC121B0F2E;
+	Wed,  4 Dec 2024 11:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733308285; cv=none; b=r3yweYzYZwRN2+cAkSJyFnQi1FCWVUfBG5mEMCq7HLaaRbutXV/etT3BuBvoWHKntxf+H2Gsz0VThO5YugKz4VT6Js+BR1+3Vf9Er1O5T4goaI4O/ZautDICQNnYZlSTmeIFc3A59p34crvszkIbSbbABABYZzxKVqY2yj/qL/A=
+	t=1733310308; cv=none; b=Cg4oPqiNOp1Re6WSAZn/K7wfICwDeM9RgasVLrZk6lc7U95ANBVHUtV8+5Kjatafy5+pwQbV+0SrbWHecwWGtQRypXHNnVJXAgZuB+cWJjSFpY2pEbMdO9r6uFFyFkyIj2coTjo8skiPrV3/7iccfZwXOg3av/Jo9Ty+BTDQG6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733308285; c=relaxed/simple;
-	bh=vAsH6MnaEk9q60JG7f9rI5ko+v1PT6qYTJsjyeNqYbI=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ZMfpPpMPvmzPL370VgSW/aKFIGkiIK5pkK8aHaW6UbDFynTdbGOl1QXYSSXXy5ENzPPR1xDBUO5ewJQ75kP7c29xvk6GANiigSw9cjVWlqyExk00Xfn/4IWcq37cgUihuT2t7evI4p5cyImslmWNsdqafnLk8ZT6qe0U2nVLpPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kaFXz3tY; arc=none smtp.client-ip=209.85.221.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1733310308; c=relaxed/simple;
+	bh=51TdTifeSvLvI83JsA7+gyBk7k4Ry9GmmMnPVzQefmc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kyruJTIhQCB3ZmuY55GcfFffu8Y74ClKNz3s4L44IJaFkg17zDU0b0rafcBjAZcKipoXnEL1rRIc+JIdkpTKroi/Xu/wr8QiMmEtU6rhfHLRXfSr93274O5c/Y10KOghKO3OvXO0M3euTukdZWCwJ4ofD+mRL+P37Iz0Qt0IqWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XNFra3BR; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kaFXz3tY"
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-514ec8ea37bso1624542e0c.0
-        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2024 02:31:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XNFra3BR"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d0bde80b4bso6875169a12.2;
+        Wed, 04 Dec 2024 03:05:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733308282; x=1733913082; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MHZqGoUWlClziZon67vL+ZIDd0uUbSc5vRlqScvdhAg=;
-        b=kaFXz3tY0GIbrT1g86GIl81ycSxWM5x/AYiH1t7zEmCioFYr3RPsV0/V7/JF3cYCzE
-         Z0b/7d0FWEHLBD8QMTmMDV55NOqy7WIyRnO6ZWa5ZLQ4G5i+vlPE19nlIZLTKe4w+8du
-         Oyw2oqRkwc5R9NFRZEkXmb64szvafHkK9RmwBbXTR9aY2WzCve8y69lAOCyk9KWtFUA2
-         AE9WEnzm/9C1QGOgZ4BS9F4XZCQxsdruZt4tnPcdRszREbAgo2dJq9lc0ZNLxNIZoi9B
-         cWVRjFhyH3Mw3d2iOwVsZwVx08mKPBzfBehuHzCkOAruWN90WcbvfijtNHynBNO/ontZ
-         Nsbg==
+        d=gmail.com; s=20230601; t=1733310305; x=1733915105; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=U8iOMTKaSNU+mizzDkRbhYPc/Yr2+80O2QZAV03wO8Y=;
+        b=XNFra3BRSNxQ0JGfFwZsixN3qxkLWucpgaNH+qivsFlbxmRR4Rk9HdP1AGnlQ38mlR
+         2ahxxAaLueqEYEOLAxJzbUA/mfRTrSG3SVFyouD13dLw0xQ1QughsVibNT9LufrZOBsa
+         d6YU56j3VN2t9nrUy382UXdwxAbKlqi5frZ1b8s9+8sGlBb6it7k9yNqe0vGlvkh3Igo
+         QEZ1bVotSOiPdCd9f3OzJ4b9hXj1j8RNd5fzBtb7LlHLnRY+SkENuRC+pegBqrl1elwm
+         mWBtuWf/62uPXu7JOdsU3MBreZVsY3a2Smwy8p0+79FcUutL1eFXTkqmWxy0dpfbn06M
+         cPmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733308282; x=1733913082;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MHZqGoUWlClziZon67vL+ZIDd0uUbSc5vRlqScvdhAg=;
-        b=qNQ9rwSbk2dd5sThFDusFdMmp4mEhSLXRXkfc4/vWTtU0l4fdZRwxVC9qDnTcT5eDx
-         e7/LlUdy4SQ0cce8Fd8DoB4cSm3+xBszO/XkcJBby6NR+PMrzKmhM0Ty/juhfFDc7CFB
-         fznrlk5g5H0YXTbsVzTCCn0srR/w+t6t24zZZMp7tNwIpKxZoN0bCgm2YFJ3AYgV2q7f
-         tUkBysFr5tY/qx9GKVOII5kxwkQDQOhUsfd/yqY55cwmQBhulzVRLXpReEKpZsY91ckn
-         ZQ7TCYbvG/eZiZo70tC/bMX3MYskI/qFj31kXPHU7CgHu/4rll9pBsS3keoKhCywrW+j
-         s7ww==
-X-Forwarded-Encrypted: i=1; AJvYcCWvhL2Z/9VVSbf/LKaPWThCVJaoB64AsiDgzyQ3nIaCNCgoAKESOIR0rhRrQK7P0o8VhXnkokIQplD2xQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+JrJQiMQdALaNdlfvTEu2rcHI/978XjEZGOsnkypKk5U9jdrf
-	h18at+Vmp1BQ5nt1GMkCHuM3UmTS9Sc3KmAweKZSF996w8npFdduNp5dw8JK1Dxyi1Ph5QN60Dd
-	gtwmkCDo5D8OIBQ2xNkZx8DOBdb8DSAuh9dQnkg==
-X-Gm-Gg: ASbGncs+cSPNYcYkzKJFG7/d9eaHyc+k0jS6/vsdEieAuZwHOhwQFPwkCSinnIB6K7E
-	d7IdZjiZuM8AcyiuXalmSy34PARBAJB6p
-X-Google-Smtp-Source: AGHT+IGzmWUJVmPN1eOgu9kN8rAcGofAl+lpuZp+XiCWblexF4Qy5RN+9yN7Hxl4Y5rZ7gNdO/a89AZ+ZMppZu2Bfcc=
-X-Received: by 2002:a05:6102:26d5:b0:4af:3fc1:e02 with SMTP id
- ada2fe7eead31-4af973825d7mr6798788137.27.1733308281831; Wed, 04 Dec 2024
- 02:31:21 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733310305; x=1733915105;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U8iOMTKaSNU+mizzDkRbhYPc/Yr2+80O2QZAV03wO8Y=;
+        b=T1rz+gZCFY8xfOVtSbzG3/Lcy/pwV48RczFt/ffhJlHpGi/FfXzz4i+cY/DZ/cML8a
+         dC+M9S9OOkIK0knfG5w2BcG4MvezRoQExIWr2vnrIKg5zxN4eQhSZX76hxqyx7XRlt8I
+         LxW4JDXQuIqN0vVw8fsZxi0uKo5VwSE2hVe5z4fJ8siB23VtOR24GYWyHymjte/HAz12
+         5yS7qU+WGgyiYU29upuaYzUj7NpVMHMTt9gGRLli7Kzc74TwfESMLjuKVN0XHdynrQK0
+         7BuJehraJaf80dSUf1i+TnHP4ZWAyvUMxsm2vcsy6SvaBYg8Nbi+1NMIKVp+XOzJK8AX
+         oQGA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDqGD++2vLMK3FW6oW0eiW/3WcbrbtnS/LM4b3G90INOFqruOYQzUysCrZni3diCRxJzBDMp4xC3yXJqJ81A==@vger.kernel.org, AJvYcCUu3/mqwN93U8/4W4GHgMAmsm+exTQUjFbXDqg/USVYlG94kloidJfgm8s1CiRww3wVbiFXTok4jFuPqNmQD+YSU3lGKYoH@vger.kernel.org, AJvYcCXDPeCroWPyKDNYW/TgBDtn3gG6RYwYGm2rFsNVO4NFVz6YcZP6zvr97Fr5+/VTNMY1Lta1MGOiHwIMcA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx44lp4b+7clVojpXg+akI/+Hm4KrpQ4rNl4EDvrFwJM6H5jxXg
+	3RNKpn0zY84jXMy3Sz+v/sWU6g/IZOeNsUW2CpenKnwMlBFp0hZq
+X-Gm-Gg: ASbGnctLGF1TFdtc1QS7pEicRVOwcoMEMeV7nUKe/N4g2Ukj2fALGOiWlkYBt6OsAlo
+	JTBoUjLfMWs3J/sVYw5E1LgGs1ko4Nk/0vjwDmERea3saHGa3nYomO60cyNS8aIInTIK4Xu9u9s
+	sR05DG2yYAVxmYNepM6vsxPVsLchPV8enfefmaOAM+whATYFyjmHciNNuqdaNYewyQGj7N4LsmW
+	gslXaQejQf94Ix2p7u6uLs6KoE29qeBT6PYaPxytjeIx1ADaxAuZGuItpN5fqI=
+X-Google-Smtp-Source: AGHT+IHKPs8LBcfpZx6PibQeJxtDt6cqZyCFXJ3okqVzv0rezJbiLU2OBMvmFMVtFGSmEBG7F0FqMQ==
+X-Received: by 2002:a05:6402:2113:b0:5d0:d610:caa2 with SMTP id 4fb4d7f45d1cf-5d10cb81015mr6132139a12.26.1733310304739;
+        Wed, 04 Dec 2024 03:05:04 -0800 (PST)
+Received: from f (cst-prg-17-59.cust.vodafone.cz. [46.135.17.59])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d0cfcfe774sm4701654a12.88.2024.12.04.03.05.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 03:05:03 -0800 (PST)
+Date: Wed, 4 Dec 2024 12:04:55 +0100
+From: Mateusz Guzik <mjguzik@gmail.com>
+To: Ye Bin <yebin@huaweicloud.com>
+Cc: viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz, 
+	linux-fsdevel@vger.kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org, 
+	agruenba@redhat.com, gfs2@lists.linux.dev, amir73il@gmail.com, mic@digikod.net, 
+	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, 
+	linux-security-module@vger.kernel.org, yebin10@huawei.com, zhangxiaoxu5@huawei.com
+Subject: Re: [PATCH 00/11] fix hungtask due to repeated traversal of inodes
+ list
+Message-ID: <7t3guwcsncthkznwxxhtfd73ihho55qwqcaw6pr7h5sqriylxc@vkf7fkbgk2cd>
+References: <20241118114508.1405494-1-yebin@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Wed, 4 Dec 2024 16:01:09 +0530
-Message-ID: <CA+G9fYsD7mw13wredcZn0L-KBA3yeoVSTuxnss-AEWMN3ha0cA@mail.gmail.com>
-Subject: s390: block/blk-iocost.c:1101:11: error: call to '__compiletime_assert_557'
- declared with 'error' attribute: clamp() low limit 1 greater than high limit active
-To: linux-s390@vger.kernel.org, clang-built-linux <llvm@lists.linux.dev>, 
-	linux-block <linux-block@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
-	lkft-triage@lists.linaro.org, Linux Regressions <regressions@lists.linux.dev>
-Cc: Anders Roxell <anders.roxell@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241118114508.1405494-1-yebin@huaweicloud.com>
 
-The s390 builds failed with clang-19 with defconfig on the
-Linux next-20241203 tag due to following build warnings / errors.
-Build pass with gcc-13 defconfig for s390.
+On Mon, Nov 18, 2024 at 07:44:57PM +0800, Ye Bin wrote:
+> From: Ye Bin <yebin10@huawei.com>
+> 
+> As commit 04646aebd30b ("fs: avoid softlockups in s_inodes iterators")
+> introduces the retry logic. In the problem environment, the 'i_count'
+> of millions of files is not zero. As a result, the time slice for each
+> traversal to the matching inode process is almost used up, and then the
+> traversal is started from scratch. The worst-case scenario is that only
+> one inode can be processed after each wakeup. Because this process holds
+> a lock, other processes will be stuck for a long time, causing a series
+> of problems.
+> To solve the problem of repeated traversal from the beginning, each time
+> the CPU needs to be freed, a cursor is inserted into the linked list, and
+> the traversal continues from the cursor next time.
+> 
 
-First seen on Linux next-20241203 tag
-GOOD: Linux next-20241128 tag
-BAD: Linux next-20241203 tag
+I'm surprised this was not sorted out eons ago.
 
-List of arch and toolchains :
-  s390 defconfig with clang-19
+My non-maintainer $0,03 is as follows:
 
-s390:
-  build:
-    * clang-19-defconfig
-    * korg-clang-19-lkftconfig-lto-full
-    * korg-clang-19-lkftconfig-hardening
-    * korg-clang-19-lkftconfig-lto-thing
+Insertion of a marker is indeed the idiomatic way to fix this, but I
+disagree with the specific implementation.
 
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-
-Build log:
-===========
-block/blk-iocost.c:1101:11: error: call to '__compiletime_assert_557'
-declared with 'error' attribute: clamp() low limit 1 greater than high
-limit active
- 1101 |                 inuse = clamp_t(u32, inuse, 1, active);
-      |                         ^
-include/linux/minmax.h:218:36: note: expanded from macro 'clamp_t'
-  218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
-      |                                    ^
-include/linux/minmax.h:195:2: note: expanded from macro '__careful_clamp'
-  195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_),
-__UNIQUE_ID(l_), __UNIQUE_ID(h_))
-      |         ^
-include/linux/minmax.h:188:2: note: expanded from macro '__clamp_once'
-  188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),
-                 \
-      |         ^
-note: (skipping 2 expansions in backtrace; use
--fmacro-backtrace-limit=0 to see all)
-include/linux/compiler_types.h:530:2: note: expanded from macro
-'_compiletime_assert'
-  530 |         __compiletime_assert(condition, msg, prefix, suffix)
-      |         ^
-include/linux/compiler_types.h:523:4: note: expanded from macro
-'__compiletime_assert'
-  523 |                         prefix ## suffix();
-         \
-      |                         ^
-<scratch space>:38:1: note: expanded from here
-   38 | __compiletime_assert_557
-      | ^
-block/blk-iocost.c:1101:11: error: call to '__compiletime_assert_557'
-declared with 'error' attribute: clamp() low limit 1 greater than high
-limit active
-include/linux/minmax.h:218:36: note: expanded from macro 'clamp_t'
-  218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
-      |                                    ^
-include/linux/minmax.h:195:2: note: expanded from macro '__careful_clamp'
-  195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_),
-__UNIQUE_ID(l_), __UNIQUE_ID(h_))
-      |         ^
-include/linux/minmax.h:188:2: note: expanded from macro '__clamp_once'
-  188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),
-                 \
-      |         ^
-note: (skipping 2 expansions in backtrace; use
--fmacro-backtrace-limit=0 to see all)
-include/linux/compiler_types.h:530:2: note: expanded from macro
-'_compiletime_assert'
-  530 |         __compiletime_assert(condition, msg, prefix, suffix)
-      |         ^
-include/linux/compiler_types.h:523:4: note: expanded from macro
-'__compiletime_assert'
-  523 |                         prefix ## suffix();
-         \
-      |                         ^
-<scratch space>:38:1: note: expanded from here
-   38 | __compiletime_assert_557
-      | ^
-2 errors generated.
-
-Links:
----
-- https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241203/testrun/26188938/suite/build/test/clang-19-defconfig/log
-- https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241203/testrun/26188938/suite/build/test/clang-19-defconfig/history/
-- https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241203/testrun/26188938/suite/build/test/clang-19-defconfig/details/
-
-Steps to reproduce:
-------------
-# tuxmake --runtime podman --target-arch s390 --toolchain clang-19
---kconfig defconfig LLVM_IAS=1
-
-metadata:
-----
-  git describe: next-20241203
-  git repo: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
-  git sha: c245a7a79602ccbee780c004c1e4abcda66aec32
-  kernel config:
-https://storage.tuxsuite.com/public/linaro/lkft/builds/2pjAPS9UrJkbAKFHktQei7eqW4Y/config
-  build url: https://storage.tuxsuite.com/public/linaro/lkft/builds/2pjAPS9UrJkbAKFHktQei7eqW4Y/
-  toolchain: clang-19
-  config: clang-19-defconfig
-  arch: s390
-
---
-Linaro LKFT
-https://lkft.linaro.org
+All cond_resched() handling should be moved into the magic iteration
+machinery, instead of random consumers open-coding it.
