@@ -1,133 +1,178 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1198A1990C4;
-	Wed,  4 Dec 2024 08:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F3E1DC182
+	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 10:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733301939; cv=none; b=fxutrGNlXD7xTQWPN8ygyciv76Ve8TkU+57Pl659h9u0Mmuve/M2RCI/eqZ8OTC+BQHwVnL2mR4jbsurUreGGmmk8s6dFwL218RQfB0Hw7/XC9QcUaP7HEPq5RhS9eZmxHyhjvqpP0sFWFl1duSx8jQRQhnMEd0EpsFmQp3i9fY=
+	t=1733308285; cv=none; b=r3yweYzYZwRN2+cAkSJyFnQi1FCWVUfBG5mEMCq7HLaaRbutXV/etT3BuBvoWHKntxf+H2Gsz0VThO5YugKz4VT6Js+BR1+3Vf9Er1O5T4goaI4O/ZautDICQNnYZlSTmeIFc3A59p34crvszkIbSbbABABYZzxKVqY2yj/qL/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733301939; c=relaxed/simple;
-	bh=cxBWfMZH2U+jwIDZvQvJEXLqWIblgWr8+ybOCIolbnc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iqCfdbCDvdX5gAhtrbLAt1OCMXMPrW7rVOsfHaskPq9qwKnncgfuPl1W3EDlEp/alK8qGDg2TEm8k6/I0rvt2ALWRcqjszZnmJDUDk32sl8AtpWI95BoLHh1maTzdWrZ+G+A/SK/X92kGVIKd3SFsvKjrgW+mFkB6M6px5GtAc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dugarreau.fr; spf=none smtp.mailfrom=dugarreau.fr; arc=none smtp.client-ip=217.72.192.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dugarreau.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dugarreau.fr
-Received: from [127.0.1.1] ([185.116.133.150]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M1IRY-1tLW5B02fK-00CGAz; Wed, 04 Dec 2024 09:40:03 +0100
-From: =?utf-8?q?Beno=C3=AEt_du_Garreau?= <benoit@dugarreau.fr>
-Date: Wed, 04 Dec 2024 09:38:39 +0100
-Subject: [PATCH] block: rnull: Initialize the module in place
+	s=arc-20240116; t=1733308285; c=relaxed/simple;
+	bh=vAsH6MnaEk9q60JG7f9rI5ko+v1PT6qYTJsjyeNqYbI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ZMfpPpMPvmzPL370VgSW/aKFIGkiIK5pkK8aHaW6UbDFynTdbGOl1QXYSSXXy5ENzPPR1xDBUO5ewJQ75kP7c29xvk6GANiigSw9cjVWlqyExk00Xfn/4IWcq37cgUihuT2t7evI4p5cyImslmWNsdqafnLk8ZT6qe0U2nVLpPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kaFXz3tY; arc=none smtp.client-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kaFXz3tY"
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-514ec8ea37bso1624542e0c.0
+        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2024 02:31:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1733308282; x=1733913082; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MHZqGoUWlClziZon67vL+ZIDd0uUbSc5vRlqScvdhAg=;
+        b=kaFXz3tY0GIbrT1g86GIl81ycSxWM5x/AYiH1t7zEmCioFYr3RPsV0/V7/JF3cYCzE
+         Z0b/7d0FWEHLBD8QMTmMDV55NOqy7WIyRnO6ZWa5ZLQ4G5i+vlPE19nlIZLTKe4w+8du
+         Oyw2oqRkwc5R9NFRZEkXmb64szvafHkK9RmwBbXTR9aY2WzCve8y69lAOCyk9KWtFUA2
+         AE9WEnzm/9C1QGOgZ4BS9F4XZCQxsdruZt4tnPcdRszREbAgo2dJq9lc0ZNLxNIZoi9B
+         cWVRjFhyH3Mw3d2iOwVsZwVx08mKPBzfBehuHzCkOAruWN90WcbvfijtNHynBNO/ontZ
+         Nsbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733308282; x=1733913082;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MHZqGoUWlClziZon67vL+ZIDd0uUbSc5vRlqScvdhAg=;
+        b=qNQ9rwSbk2dd5sThFDusFdMmp4mEhSLXRXkfc4/vWTtU0l4fdZRwxVC9qDnTcT5eDx
+         e7/LlUdy4SQ0cce8Fd8DoB4cSm3+xBszO/XkcJBby6NR+PMrzKmhM0Ty/juhfFDc7CFB
+         fznrlk5g5H0YXTbsVzTCCn0srR/w+t6t24zZZMp7tNwIpKxZoN0bCgm2YFJ3AYgV2q7f
+         tUkBysFr5tY/qx9GKVOII5kxwkQDQOhUsfd/yqY55cwmQBhulzVRLXpReEKpZsY91ckn
+         ZQ7TCYbvG/eZiZo70tC/bMX3MYskI/qFj31kXPHU7CgHu/4rll9pBsS3keoKhCywrW+j
+         s7ww==
+X-Forwarded-Encrypted: i=1; AJvYcCWvhL2Z/9VVSbf/LKaPWThCVJaoB64AsiDgzyQ3nIaCNCgoAKESOIR0rhRrQK7P0o8VhXnkokIQplD2xQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+JrJQiMQdALaNdlfvTEu2rcHI/978XjEZGOsnkypKk5U9jdrf
+	h18at+Vmp1BQ5nt1GMkCHuM3UmTS9Sc3KmAweKZSF996w8npFdduNp5dw8JK1Dxyi1Ph5QN60Dd
+	gtwmkCDo5D8OIBQ2xNkZx8DOBdb8DSAuh9dQnkg==
+X-Gm-Gg: ASbGncs+cSPNYcYkzKJFG7/d9eaHyc+k0jS6/vsdEieAuZwHOhwQFPwkCSinnIB6K7E
+	d7IdZjiZuM8AcyiuXalmSy34PARBAJB6p
+X-Google-Smtp-Source: AGHT+IGzmWUJVmPN1eOgu9kN8rAcGofAl+lpuZp+XiCWblexF4Qy5RN+9yN7Hxl4Y5rZ7gNdO/a89AZ+ZMppZu2Bfcc=
+X-Received: by 2002:a05:6102:26d5:b0:4af:3fc1:e02 with SMTP id
+ ada2fe7eead31-4af973825d7mr6798788137.27.1733308281831; Wed, 04 Dec 2024
+ 02:31:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20241204-rnull_in_place-v1-1-efe3eafac9fb@dugarreau.fr>
-X-B4-Tracking: v=1; b=H4sIAA4VUGcC/zXM0QrCMAxA0V8ZebaQtRPFXxEZbZdtgRJHOkUY+
- 3fjwMfzcO8GlZSpwq3ZQOnNlZ9iaE8N5DnKRI4HM3j0XesxOJVXKT1Lv5SYyZ0J0yUM14CYwaJ
- FaeTPMbw/zClWckmj5Pm3+Xc24BX2/Que9xuTgAAAAA==
-X-Change-ID: 20241203-rnull_in_place-5e0b73d8300c
-To: Andreas Hindborg <a.hindborg@kernel.org>, 
- Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- =?utf-8?q?Beno=C3=AEt_du_Garreau?= <benoit@dugarreau.fr>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1733301602; l=2218;
- i=benoit@dugarreau.fr; s=20241203; h=from:subject:message-id;
- bh=cxBWfMZH2U+jwIDZvQvJEXLqWIblgWr8+ybOCIolbnc=;
- b=+hLAeDCGQO4R2Of+/EAJ8WlTlZvIWp6dmrjrTOXGwjmFyMSxS1/HN+XeuTDv6ZRacpw3rbFCj
- ymEpD2FdCI3Dw6DfvNbh7MRlIUVg2lE1AUCvKuOPV/2jHV+klaQHUzA
-X-Developer-Key: i=benoit@dugarreau.fr; a=ed25519;
- pk=l4tCZw3UpEkwtwhwsl5BV1HlPvHlXLQQRh96sL21/FU=
-X-Provags-ID: V03:K1:z91Ow9ERORgj5fKYQthmbNT+6lMCY18u9hLuV/E5/6LtiMa4kk4
- Wf0CXcNkh4cIajEQC8M//B96h5ZFxQgVV05hyJQBSEjqaGX1rW534aHVOVkfaK5t1WAYRsy
- cnpJGT0zy2DESxKG7j4vy4JozRvow6GF0xGLUmD4N2NvI6VzbB28xXsv1y+yQBzkuk1mGNQ
- fgr7NQV81+lgXtbcjZ/aw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:/6RFLwCjgX8=;d84qXBJWLhfQt80OPCIh+zxgg+M
- M6Nv0N+L+GG0waOM00OTFLldTlBKm6+eLpJeepFlDW7pN24TRw59GzlMiSww58WGiGxbV8eg+
- wNm+DWbcg0J+tgeL7nmxQqEohtBHXZpEx7FnV9DPnvg69hkvzmBWnVJ6Ze/X4HPBkhJeyi+xA
- cZWEb/LF4Vw18NjUVAhzPG33wF6btEzgqkhF9uGlQl3HGaXEuc5PEm4lMvZegwy+TslhvC79a
- GqRpWp+7+zUbohGeqQKb52yltN/kRacOtGlLVpTpLGJWxKqPcD7fj1fo5SwVqCkaaBKnve6nZ
- bMLYtDgEdVFCxtzc8zhTOQAMcWZu2qsJod2sEii2kVW3hroLfXyhJV+yLEMmrdc6/Kn4JgeaZ
- eIhY/glpwJtukb05JH6y4oQD7ZQSoOOx4yjhD+FwgPIKG5cx36Wcymwzhu14WDGb4jQNbA08O
- HsL+m/5vsCYGoxj0LI+0Ed7X3X8CHeUidQXN8ZCvoqnWvPDrIPbRzkzXe76kz3HDIL+LIEvgL
- 1nnV4Nz+53k5QEoTUlihezzBWJD2oMY+7+AYwJ59vug6lO3zMF7yojLsEjWQOON5Y3l1RZT8Q
- TPtMVve/wJJO7gz56ExFitPMNY6CLthRm3hPCZOvmADVU16nTMbIR8xZgytFsLU6hpaUrXKJ2
- FZaDWG1jEUI08NHOx4Sd9DkcTFsEc56XbKHygtX8cY+KJv93Hh4Z3o4rEbQQ0dxT3AMTtMD5z
- h3Rapi1BICvqXRHRYAEYcsHMdQo7vxIg7rIdoQSaB3LUfA6lktGXLss+osaTNPFWq7FUr+1Ib
- 32CPdyQCqtFUJp5RnymurtjPGwp1xcloeoHo4xbcVmVIcSWQriMmJERaxqNzXWmqwnYs0SokP
- ZMdVjLYx/+vTjBLAfZboWHGbGvuR2nAcBUp9abo3DV5C//51Eo9FPKqN81AjJ9kQW+9ASFJP+
- wyiqHOmFtaHaUJYln1/5w+aLOeCuw08wB7LZidz8xQUvFk+qMsBtkDxkO5I1Why/gCrGMoyl5
- XT/NpeEhS9KZ/VO8HPYaw3vJuia5FJnvdDr6DyG
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Wed, 4 Dec 2024 16:01:09 +0530
+Message-ID: <CA+G9fYsD7mw13wredcZn0L-KBA3yeoVSTuxnss-AEWMN3ha0cA@mail.gmail.com>
+Subject: s390: block/blk-iocost.c:1101:11: error: call to '__compiletime_assert_557'
+ declared with 'error' attribute: clamp() low limit 1 greater than high limit active
+To: linux-s390@vger.kernel.org, clang-built-linux <llvm@lists.linux.dev>, 
+	linux-block <linux-block@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
+	lkft-triage@lists.linaro.org, Linux Regressions <regressions@lists.linux.dev>
+Cc: Anders Roxell <anders.roxell@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 
-Using `InPlaceModule` avoids an allocation and an indirection.
+The s390 builds failed with clang-19 with defconfig on the
+Linux next-20241203 tag due to following build warnings / errors.
+Build pass with gcc-13 defconfig for s390.
 
-Signed-off-by: Benoît du Garreau <benoit@dugarreau.fr>
+First seen on Linux next-20241203 tag
+GOOD: Linux next-20241128 tag
+BAD: Linux next-20241203 tag
+
+List of arch and toolchains :
+  s390 defconfig with clang-19
+
+s390:
+  build:
+    * clang-19-defconfig
+    * korg-clang-19-lkftconfig-lto-full
+    * korg-clang-19-lkftconfig-hardening
+    * korg-clang-19-lkftconfig-lto-thing
+
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+
+Build log:
+===========
+block/blk-iocost.c:1101:11: error: call to '__compiletime_assert_557'
+declared with 'error' attribute: clamp() low limit 1 greater than high
+limit active
+ 1101 |                 inuse = clamp_t(u32, inuse, 1, active);
+      |                         ^
+include/linux/minmax.h:218:36: note: expanded from macro 'clamp_t'
+  218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
+      |                                    ^
+include/linux/minmax.h:195:2: note: expanded from macro '__careful_clamp'
+  195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_),
+__UNIQUE_ID(l_), __UNIQUE_ID(h_))
+      |         ^
+include/linux/minmax.h:188:2: note: expanded from macro '__clamp_once'
+  188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),
+                 \
+      |         ^
+note: (skipping 2 expansions in backtrace; use
+-fmacro-backtrace-limit=0 to see all)
+include/linux/compiler_types.h:530:2: note: expanded from macro
+'_compiletime_assert'
+  530 |         __compiletime_assert(condition, msg, prefix, suffix)
+      |         ^
+include/linux/compiler_types.h:523:4: note: expanded from macro
+'__compiletime_assert'
+  523 |                         prefix ## suffix();
+         \
+      |                         ^
+<scratch space>:38:1: note: expanded from here
+   38 | __compiletime_assert_557
+      | ^
+block/blk-iocost.c:1101:11: error: call to '__compiletime_assert_557'
+declared with 'error' attribute: clamp() low limit 1 greater than high
+limit active
+include/linux/minmax.h:218:36: note: expanded from macro 'clamp_t'
+  218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
+      |                                    ^
+include/linux/minmax.h:195:2: note: expanded from macro '__careful_clamp'
+  195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_),
+__UNIQUE_ID(l_), __UNIQUE_ID(h_))
+      |         ^
+include/linux/minmax.h:188:2: note: expanded from macro '__clamp_once'
+  188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),
+                 \
+      |         ^
+note: (skipping 2 expansions in backtrace; use
+-fmacro-backtrace-limit=0 to see all)
+include/linux/compiler_types.h:530:2: note: expanded from macro
+'_compiletime_assert'
+  530 |         __compiletime_assert(condition, msg, prefix, suffix)
+      |         ^
+include/linux/compiler_types.h:523:4: note: expanded from macro
+'__compiletime_assert'
+  523 |                         prefix ## suffix();
+         \
+      |                         ^
+<scratch space>:38:1: note: expanded from here
+   38 | __compiletime_assert_557
+      | ^
+2 errors generated.
+
+Links:
 ---
- drivers/block/rnull.rs | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+- https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241203/testrun/26188938/suite/build/test/clang-19-defconfig/log
+- https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241203/testrun/26188938/suite/build/test/clang-19-defconfig/history/
+- https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241203/testrun/26188938/suite/build/test/clang-19-defconfig/details/
 
-diff --git a/drivers/block/rnull.rs b/drivers/block/rnull.rs
-index 5de7223beb4d5b4224010c86fca826967a019c27..6cdd2589c4621369cd57af66a2b817889321ed15 100644
---- a/drivers/block/rnull.rs
-+++ b/drivers/block/rnull.rs
-@@ -31,25 +31,31 @@
-     license: "GPL v2",
- }
- 
-+#[pin_data]
- struct NullBlkModule {
--    _disk: Pin<KBox<Mutex<GenDisk<NullBlkDevice>>>>,
-+    #[pin]
-+    _disk: Mutex<GenDisk<NullBlkDevice>>,
- }
- 
--impl kernel::Module for NullBlkModule {
--    fn init(_module: &'static ThisModule) -> Result<Self> {
-+impl kernel::InPlaceModule for NullBlkModule {
-+    fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-         pr_info!("Rust null_blk loaded\n");
--        let tagset = Arc::pin_init(TagSet::new(1, 256, 1), flags::GFP_KERNEL)?;
- 
--        let disk = gen_disk::GenDiskBuilder::new()
--            .capacity_sectors(4096 << 11)
--            .logical_block_size(4096)?
--            .physical_block_size(4096)?
--            .rotational(false)
--            .build(format_args!("rnullb{}", 0), tagset)?;
-+        // Use a immediately-called closure as a stable `try` block
-+        let disk = /* try */ (|| {
-+            let tagset = Arc::pin_init(TagSet::new(1, 256, 1), flags::GFP_KERNEL)?;
- 
--        let disk = KBox::pin_init(new_mutex!(disk, "nullb:disk"), flags::GFP_KERNEL)?;
-+            gen_disk::GenDiskBuilder::new()
-+                .capacity_sectors(4096 << 11)
-+                .logical_block_size(4096)?
-+                .physical_block_size(4096)?
-+                .rotational(false)
-+                .build(format_args!("rnullb{}", 0), tagset)
-+        })();
- 
--        Ok(Self { _disk: disk })
-+        try_pin_init!(Self {
-+            _disk <- new_mutex!(disk?, "nullb:disk"),
-+        })
-     }
- }
- 
+Steps to reproduce:
+------------
+# tuxmake --runtime podman --target-arch s390 --toolchain clang-19
+--kconfig defconfig LLVM_IAS=1
 
----
-base-commit: 4d6f8ba6e0a7b0627b4a559747948ee0d6797a3a
-change-id: 20241203-rnull_in_place-5e0b73d8300c
+metadata:
+----
+  git describe: next-20241203
+  git repo: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
+  git sha: c245a7a79602ccbee780c004c1e4abcda66aec32
+  kernel config:
+https://storage.tuxsuite.com/public/linaro/lkft/builds/2pjAPS9UrJkbAKFHktQei7eqW4Y/config
+  build url: https://storage.tuxsuite.com/public/linaro/lkft/builds/2pjAPS9UrJkbAKFHktQei7eqW4Y/
+  toolchain: clang-19
+  config: clang-19-defconfig
+  arch: s390
 
-Best regards,
--- 
-Benoît du Garreau <benoit@dugarreau.fr>
-
+--
+Linaro LKFT
+https://lkft.linaro.org
