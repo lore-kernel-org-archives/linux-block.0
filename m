@@ -1,94 +1,77 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCC7198A05;
-	Wed,  4 Dec 2024 14:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00F620A5C6
+	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 14:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733321789; cv=none; b=J2YdmHIrArro6Z8mo1wEQHR4xLjkuQs41GeoaQSOfLQLOJfaFIIDBcO1WsJzJJ5F+1d98mbX/+q9mP1I7ewSCatA5NQzz/jpKvgcALD+KdoPMUletJwkUZpJbwOeH40ng2mPbi1WEpupjCx021d39eu3+coz9pKuvBjakWW0ec0=
+	t=1733323176; cv=none; b=SjdGefPR3b3vLId05Ec+rLNlDW8zxEi1NhLstxhqKbxuTQn1yQD10g6MJt6OwYZRYkxTJ3EhRDMpPHypWDqSPXMA6knORNoaYAbH5GwvpZmgKKyUoTLStqa64R9/exTwcPi1SsCvfIJaWb/Bs3OAWVVTc9g83X1/WAIhJ8pd+NU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733321789; c=relaxed/simple;
-	bh=2NphvdYGP+L8TFS0HvJb+8sv55gVIVlXhNiYd4mpN4w=;
+	s=arc-20240116; t=1733323176; c=relaxed/simple;
+	bh=7vm+GgU7IzYoJVoPQmQEkbgSGw3DdebIEtgOIlj7sr4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LXD+i8jANayF4sRu8Ap0se7QnGfZXBB7URbolGgBUOpNA7Q14LIgQa65K1AN51iOdEzkpy6GNlwvY5DTiIw3deY+NIPDF0y8AAVnWx6xQcxFtjWLJNF2fvB/stYsheDuHqakTZ/qrhL5jSSGpeWf769TRF3oRdNDz/zh/SSUIsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=QwVOoBAr; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=+LOObUuD; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=QwVOoBAr; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=+LOObUuD; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	 Content-Type:Content-Disposition:In-Reply-To; b=TIxAOg3tTV4HXzli3C3M+cNcsFl+4GhFdzFZKOqmR0kWzYJBBzL3w1HLW1Eddc+3NIfxtrcM7oS6aRYZ/tE6kTMx5pqMgmXjziPd4u/jcB5WsVazbsZPpL14LHhUKiY7ppMgKgPfJO+7hDcOMInFPB9S0neq2/Pnkmzls3lk6Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q6l0doVf; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="QwVOoBAr";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="+LOObUuD";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="QwVOoBAr";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="+LOObUuD"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 2EBC21F45E;
-	Wed,  4 Dec 2024 14:16:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1733321785; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RVkF49mdhG2bNkwqIFQoszmuhSLJBjghgd/zVPLuZAk=;
-	b=QwVOoBArMEYC4SsZ8VqzQpiUpwxzfI5bGUtLBplUQnKzf3DYAkGo+i4oIVIlnum0o7NWTI
-	iATaeaXNdPz0QMKOJiX+589fT7gIWpG1swRwRXr+IWejfqiIbbapgROiKnmhpwiWJurr1D
-	3oV/O2qCDuaYAHVby7dcb6/vvdsI4IU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1733321785;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RVkF49mdhG2bNkwqIFQoszmuhSLJBjghgd/zVPLuZAk=;
-	b=+LOObUuDLjZ5NFPY3efFduuyFwRPImtJAH+iKR7BVOhkXpKkIICA1QEwDcZMZz1hzFnQN8
-	+nLSy+NDGepJ/2AQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=QwVOoBAr;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=+LOObUuD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1733321785; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RVkF49mdhG2bNkwqIFQoszmuhSLJBjghgd/zVPLuZAk=;
-	b=QwVOoBArMEYC4SsZ8VqzQpiUpwxzfI5bGUtLBplUQnKzf3DYAkGo+i4oIVIlnum0o7NWTI
-	iATaeaXNdPz0QMKOJiX+589fT7gIWpG1swRwRXr+IWejfqiIbbapgROiKnmhpwiWJurr1D
-	3oV/O2qCDuaYAHVby7dcb6/vvdsI4IU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1733321785;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RVkF49mdhG2bNkwqIFQoszmuhSLJBjghgd/zVPLuZAk=;
-	b=+LOObUuDLjZ5NFPY3efFduuyFwRPImtJAH+iKR7BVOhkXpKkIICA1QEwDcZMZz1hzFnQN8
-	+nLSy+NDGepJ/2AQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1A0CB1396E;
-	Wed,  4 Dec 2024 14:16:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id W8TiBTlkUGcPSQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Wed, 04 Dec 2024 14:16:25 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id ADEECA0918; Wed,  4 Dec 2024 15:16:20 +0100 (CET)
-Date: Wed, 4 Dec 2024 15:16:20 +0100
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Ye Bin <yebin@huaweicloud.com>, viro@zeniv.linux.org.uk, jack@suse.cz,
-	linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
-	linux-block@vger.kernel.org, agruenba@redhat.com,
-	gfs2@lists.linux.dev, amir73il@gmail.com, mic@digikod.net,
-	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org,
-	serge@hallyn.com, linux-security-module@vger.kernel.org,
-	yebin10@huawei.com, zhangxiaoxu5@huawei.com,
-	Dave Chinner <david@fromorbit.com>
-Subject: Re: [PATCH 10/11] fs: fix hungtask due to repeated traversal of
- inodes list
-Message-ID: <20241204141620.vgklclfh5guezcvb@quack3>
-References: <20241118114508.1405494-1-yebin@huaweicloud.com>
- <20241118114508.1405494-11-yebin@huaweicloud.com>
- <20241204-worden-tontechnik-3ce77e9f3bad@brauner>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q6l0doVf"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-434a8b94fb5so6281235e9.0
+        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2024 06:39:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1733323173; x=1733927973; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=u7Deb6ozPBCd5HaUFhdz6hCVVIOvpic/u3v2HTGhW9U=;
+        b=q6l0doVfthszIGrrzjjOf+4PrPTNF2YKj8VPyhcjxIkXjY2BXcpn+1zK4No3MOd7DE
+         eA6Urr0lz9isJYDloS+E71oJYyULmvpICeKNH/pmS8GfhZI7k9DVznEWnRWELKjHDEFF
+         lGLrfp6RYfo9oFyacfthTbLHHhHshRSMmGmeyPKU4MoDCt9YGRe4sHjML9r1ypD/9dwa
+         +mfOO1wJn3P5F1dBe6J7M7MUAdNJ3zlLuF9nA+wMs5ds9+rNeIHQ65ppKteUSsWxrymP
+         5Ap3/aYcLbM7HK/E+aYtteo+fikcxVyWJOBkHUm274EhKrLNty3y430RgFNMRyJjKD4p
+         e1/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733323173; x=1733927973;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u7Deb6ozPBCd5HaUFhdz6hCVVIOvpic/u3v2HTGhW9U=;
+        b=CEDEaTQCoiPq8ZRJxvIvaAzf6y0s4wzLqjyVgG3KVFfnAeBN13IRL+EpUegZdTPgT5
+         gNYj0kchPSiHDIsI0w3XUYjYQATF1a9xdw62TrX+1olz3UI250u4VzzuRPv0PCI2hVfj
+         j5r1R1ztFdee+Fk06bCTnNE5524FynA38jKEQE3JaEKtWFfziJ/35LBlOW6mgKC4a9Dg
+         XsEv0qoVxB51UVRNL+aIJecsifji7k0Qxg+smfXBx52Y3EUk7jyXsu0MMCJsPNCxaZJl
+         UsLesnZT+vXnqyxAClXhm6fzv0imYuWR0uhAdoUpczAFUUbJ5iA6nmpNCqqWOGQ0dVsL
+         iYzA==
+X-Forwarded-Encrypted: i=1; AJvYcCVXebs8/9guTnI66srERJCUdZ/WP17eiJCh85jpdFKV/PKnq1vc1chTI1ZHlC5eDu5uJealIB4i8yz5NQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXeD4qB2tPHYRltQWeQYUZgcPlSfTLLvoNIRA6I/M4HvM0BFWB
+	nLDl5ui28ATacc117C+l7iXfP+vyEPneRgIalCGu7P1jSNIpMGU/n+HjiHTYbyQ=
+X-Gm-Gg: ASbGncu4skMcJiKh6kg6Wga5q/9tII0jNPcmoC2hd813bbKVyrJqfgF01HGiKQ/4sdD
+	RJkTFuIoAnQrfKMWjO7fYwKNnSmLSBg5Y0iRT8h6T9UNdsa7jItozpyWzYuoq/ZwmC2Fv6oBmM3
+	I5WbWx2a/LIdsf4O/0SxPE4zChBVLJB5puYxFnAonB6dmNACTgcUt9O6UpoImOIQTmRN1vd7cBQ
+	rQTUuhq+p254cPbpbZkXYBtOtuNF9dput/fxbwipf/V4WT2zWAl218=
+X-Google-Smtp-Source: AGHT+IFgNAhlHmTZM9dIRgErvl8+0lGzD3UNMNEnIcEA1d5Rnbb0Ap2o8TKx3zX6wtjKyR3FwkoocA==
+X-Received: by 2002:a05:600c:198e:b0:434:9cf6:a2a5 with SMTP id 5b1f17b1804b1-434afb9ecc7mr229792735e9.8.1733323173202;
+        Wed, 04 Dec 2024 06:39:33 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d528ab4esm26074105e9.26.2024.12.04.06.39.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 06:39:32 -0800 (PST)
+Date: Wed, 4 Dec 2024 17:39:29 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Naresh Kamboju <naresh.kamboju@linaro.org>,
+	David Laight <David.Laight@aculab.com>
+Cc: linux-s390@vger.kernel.org, clang-built-linux <llvm@lists.linux.dev>,
+	linux-block <linux-block@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	lkft-triage@lists.linaro.org,
+	Linux Regressions <regressions@lists.linux.dev>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Nathan Chancellor <nathan@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: s390: block/blk-iocost.c:1101:11: error: call to
+ '__compiletime_assert_557' declared with 'error' attribute: clamp() low
+ limit 1 greater than high limit active
+Message-ID: <5ffa868f-cbf0-42ae-ae10-5c39b0de05e7@stanley.mountain>
+References: <CA+G9fYsD7mw13wredcZn0L-KBA3yeoVSTuxnss-AEWMN3ha0cA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -97,129 +80,119 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241204-worden-tontechnik-3ce77e9f3bad@brauner>
-X-Rspamd-Queue-Id: 2EBC21F45E
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[huaweicloud.com,zeniv.linux.org.uk,suse.cz,vger.kernel.org,kernel.dk,redhat.com,lists.linux.dev,gmail.com,digikod.net,google.com,paul-moore.com,namei.org,hallyn.com,huawei.com,fromorbit.com];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.01
-X-Spam-Flag: NO
+In-Reply-To: <CA+G9fYsD7mw13wredcZn0L-KBA3yeoVSTuxnss-AEWMN3ha0cA@mail.gmail.com>
 
-On Wed 04-12-24 12:17:49, Christian Brauner wrote:
-> On Mon, Nov 18, 2024 at 07:45:07PM +0800, Ye Bin wrote:
-> > From: Ye Bin <yebin10@huawei.com>
-> > 
-> > There's a issue when remove scsi disk, the invalidate_inodes() function
-> > cannot exit for a long time, then trigger hungtask:
-> > INFO: task kworker/56:0:1391396 blocked for more than 122 seconds.
-> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> > Workqueue: events_freezable virtscsi_handle_event [virtio_scsi]
-> > Call Trace:
-> >  __schedule+0x33c/0x7f0
-> >  schedule+0x46/0xb0
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.constprop.0+0x22b/0x490
-> >  mutex_lock+0x52/0x70
-> >  scsi_scan_target+0x6d/0xf0
-> >  virtscsi_handle_event+0x152/0x1a0 [virtio_scsi]
-> >  process_one_work+0x1b2/0x350
-> >  worker_thread+0x49/0x310
-> >  kthread+0xfb/0x140
-> >  ret_from_fork+0x1f/0x30
-> > 
-> > PID: 540499  TASK: ffff9b15e504c080  CPU: 44  COMMAND: "kworker/44:0"
-> > Call trace:
-> >  invalidate_inodes at ffffffff8f3b4784
-> >  __invalidate_device at ffffffff8f3dfea3
-> >  invalidate_partition at ffffffff8f526b49
-> >  del_gendisk at ffffffff8f5280fb
-> >  sd_remove at ffffffffc0186455 [sd_mod]
-> >  __device_release_driver at ffffffff8f738ab2
-> >  device_release_driver at ffffffff8f738bc4
-> >  bus_remove_device at ffffffff8f737f66
-> >  device_del at ffffffff8f73341b
-> >  __scsi_remove_device at ffffffff8f780340
-> >  scsi_remove_device at ffffffff8f7803a2
-> >  virtscsi_handle_event at ffffffffc017204f [virtio_scsi]
-> >  process_one_work at ffffffff8f1041f2
-> >  worker_thread at ffffffff8f104789
-> >  kthread at ffffffff8f109abb
-> >  ret_from_fork at ffffffff8f001d6f
-> > 
-> > As commit 04646aebd30b ("fs: avoid softlockups in s_inodes iterators")
-> > introduces the retry logic. In the problem environment, the 'i_count'
-> > of millions of files is not zero. As a result, the time slice for each
-> > traversal to the matching inode process is almost used up, and then the
-> > traversal is started from scratch. The worst-case scenario is that only
-> > one inode can be processed after each wakeup. Because this process holds
-> > a lock, other processes will be stuck for a long time, causing a series
-> > of problems.
-> > To solve the problem of repeated traversal from the beginning, each time
-> > the CPU needs to be freed, a cursor is inserted into the linked list, and
-> > the traversal continues from the cursor next time.
-> > 
-> > Fixes: 04646aebd30b ("fs: avoid softlockups in s_inodes iterators")
-> > Signed-off-by: Ye Bin <yebin10@huawei.com>
-> > ---
-> >  fs/inode.c | 22 ++++++++++++++++++++--
-> >  1 file changed, 20 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/fs/inode.c b/fs/inode.c
-> > index dc966990bda6..b78895af8779 100644
-> > --- a/fs/inode.c
-> > +++ b/fs/inode.c
-> > @@ -857,11 +857,16 @@ static void dispose_list(struct list_head *head)
-> >  void evict_inodes(struct super_block *sb)
-> >  {
-> >  	struct inode *inode, *next;
-> > +	struct inode cursor;
+Let's add David to the Cc list because he's the expert on clamp().
+
+regards,
+dan carpenter
+
+On Wed, Dec 04, 2024 at 04:01:09PM +0530, Naresh Kamboju wrote:
+> The s390 builds failed with clang-19 with defconfig on the
+> Linux next-20241203 tag due to following build warnings / errors.
+> Build pass with gcc-13 defconfig for s390.
 > 
-> It seems pretty adventurous to me to just add in a random inode whose
-> only fiels that is initialized is i_state. That would need a proper
-> analysis and argument that this is safe to do and won't cause trouble
-> for any filesystem.
+> First seen on Linux next-20241203 tag
+> GOOD: Linux next-20241128 tag
+> BAD: Linux next-20241203 tag
 > 
-> Jan, do you have thoughts on this?
-
-Yeah, I think in the current state where there are several instances of
-hand-crafted inode iteration code it is somewhat fragile to use the cursor
-approach. I was staying silent because I was hoping Dave Chinner's patches
-to clean up inode iteration get to a more ready state. Then either we have
-well consolidated inode iteration code so additions like this can be easily
-verified for correctness or we could even get as far as removing
-sb->s_inodes list altogether as Dave outlined [1] which would nicely deal
-with the issue solved here as well. Sadly that patch series seems to have
-lost traction. Hopefully we can either revive it or at least scavenge the
-nice preparatory cleanups...
-
-								Honza
-
-[1] https://lore.kernel.org/all/ZwRvshM65rxXTwxd@dread.disaster.area
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> List of arch and toolchains :
+>   s390 defconfig with clang-19
+> 
+> s390:
+>   build:
+>     * clang-19-defconfig
+>     * korg-clang-19-lkftconfig-lto-full
+>     * korg-clang-19-lkftconfig-hardening
+>     * korg-clang-19-lkftconfig-lto-thing
+> 
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> 
+> Build log:
+> ===========
+> block/blk-iocost.c:1101:11: error: call to '__compiletime_assert_557'
+> declared with 'error' attribute: clamp() low limit 1 greater than high
+> limit active
+>  1101 |                 inuse = clamp_t(u32, inuse, 1, active);
+>       |                         ^
+> include/linux/minmax.h:218:36: note: expanded from macro 'clamp_t'
+>   218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
+>       |                                    ^
+> include/linux/minmax.h:195:2: note: expanded from macro '__careful_clamp'
+>   195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_),
+> __UNIQUE_ID(l_), __UNIQUE_ID(h_))
+>       |         ^
+> include/linux/minmax.h:188:2: note: expanded from macro '__clamp_once'
+>   188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),
+>                  \
+>       |         ^
+> note: (skipping 2 expansions in backtrace; use
+> -fmacro-backtrace-limit=0 to see all)
+> include/linux/compiler_types.h:530:2: note: expanded from macro
+> '_compiletime_assert'
+>   530 |         __compiletime_assert(condition, msg, prefix, suffix)
+>       |         ^
+> include/linux/compiler_types.h:523:4: note: expanded from macro
+> '__compiletime_assert'
+>   523 |                         prefix ## suffix();
+>          \
+>       |                         ^
+> <scratch space>:38:1: note: expanded from here
+>    38 | __compiletime_assert_557
+>       | ^
+> block/blk-iocost.c:1101:11: error: call to '__compiletime_assert_557'
+> declared with 'error' attribute: clamp() low limit 1 greater than high
+> limit active
+> include/linux/minmax.h:218:36: note: expanded from macro 'clamp_t'
+>   218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
+>       |                                    ^
+> include/linux/minmax.h:195:2: note: expanded from macro '__careful_clamp'
+>   195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_),
+> __UNIQUE_ID(l_), __UNIQUE_ID(h_))
+>       |         ^
+> include/linux/minmax.h:188:2: note: expanded from macro '__clamp_once'
+>   188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),
+>                  \
+>       |         ^
+> note: (skipping 2 expansions in backtrace; use
+> -fmacro-backtrace-limit=0 to see all)
+> include/linux/compiler_types.h:530:2: note: expanded from macro
+> '_compiletime_assert'
+>   530 |         __compiletime_assert(condition, msg, prefix, suffix)
+>       |         ^
+> include/linux/compiler_types.h:523:4: note: expanded from macro
+> '__compiletime_assert'
+>   523 |                         prefix ## suffix();
+>          \
+>       |                         ^
+> <scratch space>:38:1: note: expanded from here
+>    38 | __compiletime_assert_557
+>       | ^
+> 2 errors generated.
+> 
+> Links:
+> ---
+> - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241203/testrun/26188938/suite/build/test/clang-19-defconfig/log
+> - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241203/testrun/26188938/suite/build/test/clang-19-defconfig/history/
+> - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241203/testrun/26188938/suite/build/test/clang-19-defconfig/details/
+> 
+> Steps to reproduce:
+> ------------
+> # tuxmake --runtime podman --target-arch s390 --toolchain clang-19
+> --kconfig defconfig LLVM_IAS=1
+> 
+> metadata:
+> ----
+>   git describe: next-20241203
+>   git repo: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
+>   git sha: c245a7a79602ccbee780c004c1e4abcda66aec32
+>   kernel config:
+> https://storage.tuxsuite.com/public/linaro/lkft/builds/2pjAPS9UrJkbAKFHktQei7eqW4Y/config
+>   build url: https://storage.tuxsuite.com/public/linaro/lkft/builds/2pjAPS9UrJkbAKFHktQei7eqW4Y/
+>   toolchain: clang-19
+>   config: clang-19-defconfig
+>   arch: s390
+> 
+> --
+> Linaro LKFT
+> https://lkft.linaro.org
