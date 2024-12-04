@@ -1,75 +1,72 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089351547C3
-	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 16:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7C720C00E
+	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 16:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733330009; cv=none; b=eRdea5XrV9ffYH42IhvX8fMXJe5Mwdeq2nAsQNzHxyScMfdP0wcDPMbKdT2J7CUz3r4fecsFDisACIkOnCJUeoWp2/2MSKlNCbsAqoThhPHZ4Un+pkJkvhJ30e2UKqMBQMU6U6lTC+yWJWJ04GGsf3/E5wZcGoWjdYL+YmiDqi4=
+	t=1733330010; cv=none; b=Ba+cnb68t0qqF86pKv9L6S/hEi70QA/wVY0tuDrGWWsSxunUlhfvJXaDBIo/Uz/ISr/s76qnxns4lSTrIImR5mTnmTfS/anGhKCQsqrj6MA3GKFbQO95KgynOOi8QhQ9e3kDWGOw5EpvByBBigSkllONDG7yRFcM1tKauCTuzag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733330009; c=relaxed/simple;
-	bh=YLqX/28N5thdvuWAhBCT6xbYIfwdHgRjjlYUHnZfPww=;
+	s=arc-20240116; t=1733330010; c=relaxed/simple;
+	bh=jjpAsfnDViEPTArEMDoLsQjV/xeaagtYm84LbRevTPk=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=EdcIf5Vguq3reLna3/TIKADCmabjBWfg/+ZP89Q9UVndkHshzAcAnwW/T7kxfV8TDiJ4KoHb5eWzQ74C6N+EON1FTpNEo9v6qPn4KuiXPgKHKn7FFGUPCxTWB7g0evcFa1JMhMOjzvTyzPwJRO+DHQx9ewhG04LAvrEnHfG4tfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=cbOP1qWm; arc=none smtp.client-ip=209.85.210.179
+	 MIME-Version:Content-Type; b=Ib+LnzhrdDW8VdqQNAkHviIKSGm6t0cyDu07e3brm9wsH3akWZ4dqWfDtUImaww09DDP2Jew3XeF00Jjiv3LfKMrz/HWhqkbDjdylGBR+3vn1lDVxjHo+47bWv/JDrL6DlgbnK8UWKpcmDCBEkPxZ+HkZm7G33NxUrXDsLMYMLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Q/+2DcYx; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="cbOP1qWm"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7242f559a9fso21311b3a.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2024 08:33:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q/+2DcYx"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7259a26ad10so9501b3a.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2024 08:33:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1733330006; x=1733934806; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1733330007; x=1733934807; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8HFpbZOKpkO7AeS8bDe3st3+sWFuj7iai+TcTZhQd9c=;
-        b=cbOP1qWmavkAFYTjIGGtxmICesXawjm7Tw0HYbCU1e44Cjsq1mwqI9RYGBfu4ZdzCK
-         etKRraOqeFHs+Ev7wG0NXqYDvsRggihA2pOCYbBGpiJviaXUzVZmna5PzJxDURJv+Cm7
-         5Xvk9nJxjTGRomDor9qKlDvik1uEDVH1o8ZsiaeKN5p8J/oyplIlNkbF5iX7vdlw2FOF
-         DxeKZo2qOalyVhtPNcerN3p9rSaWa517MC2NdiNs5wmvWOoIjmX8enlrB2XluUmce7PB
-         zjdgkdN25dDPEYQ9iH4uN90fOFkmqKuhbeTqYDPD/tT5+20PN3jNwbfzMa/vZs79YmSa
-         6epQ==
+        bh=Hb5hc3qgWT9L6cng9NISv31Ehv7llzw2Vl8uDpnsua4=;
+        b=Q/+2DcYxxT6g/pM9QwL+1fSTK1kRbq1P6IgWb/Rv+dPmn7PBTZZjF3+VTyhrbLSn0H
+         kv3aeHSGxOfcDPYlTwx3THE3tTAGEp9cEdccq6kfHDz/2g6lYP1jD40nb3U+5EM+NkIs
+         H5prj+UuDenOoB4vMGAOvvw3ANcHudneUU+Rq74Rz2mgJovQO8vHVzMYal/RaEXcg0sA
+         QpZHI79qxQBaEks5wnJYTju1CMpK5eJX3Hwug62bNLANPnKpQ9qnc/2VXiFucODz0wCN
+         2NPwPwRWdVw2ElxTrtXfpCm8kJhGkG9hrhYGiJKc90tSMha3djazlEQmYr0b0IOLbvGl
+         JyAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733330006; x=1733934806;
+        d=1e100.net; s=20230601; t=1733330007; x=1733934807;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8HFpbZOKpkO7AeS8bDe3st3+sWFuj7iai+TcTZhQd9c=;
-        b=pgtkSc2CyvhoSbBd2aIa/HyyMq8D9+LvcVKG9p5wv45iL52ipqHNp3rM8qlD8rusAi
-         4qLpkmrVOVsvR4Q8QPowF0L0kfx1/AQl+cFMoCBsWzXs3YKoRolKMGBt9hQHnUKdP7lW
-         Cef2+oojetYDYzrRfsI0x5cIxBPza/HnPJ+VZh9tM+zWpoJGuQDvoxGHyTYCjNvXU1oc
-         TfvB4Zg1RTtfQAF4C/jbAt/P3vSVz8YImADY6tFbHIAozAHZiUelFFzk7ylpZUlwYqYI
-         XAKY4BKm+MNg+XlsptcZPXwZPxgC3Wzos3+Dh9sTfpAgM26MinVgwQF48UJAlkx2vVdB
-         rNOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXLmOI5ITQ/sK/tguSNHldEl2GNstnug7eci/5EPjZu7PwxHlu6Yp5CFOcSSJyokSzM1tMImOLOy4L5Fw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCHu6InSKFEcnu8Oxh3DL4Up9/ibx9QleQ867XgAXgf4Nidi62
-	83JmaILTGV8OgtFAu9nSsFE0MjBVm9GsIPhgJ9Wma9yYTcX/0LmpaWtpGh67O2jX2kXBRaKIK0y
-	p
-X-Gm-Gg: ASbGnctTGoaqa3R2PSTGctF+hssnwrWPO9x+6AV5CuczHrkQb2YOPqfZU7d4Hkva4k+
-	mSU0HR5fzh5Q7wvrKnRHvnaaaPRkMVpXLHMDsRlOV2VxCf08tQfNg7w8fguGtxp17xxz3p0/rwc
-	UoOmXmVzIiEuS9k4TcJNjwQefVgoYyiI2/atkP7KEQKv3Q0xUf2HGNnV6z9Q4mOuFE55n7KUoMA
-	/7+LnDzIK9v8YA9m63YJJ8QWAstqQ==
-X-Google-Smtp-Source: AGHT+IHGetUSTLBEO7g1Mr54/8uXPJm1zbpOiVPZj2JidglSRGFFA2sX/e54bN5zcvRXs+5U75O04g==
-X-Received: by 2002:a05:6a00:995:b0:725:2b93:3583 with SMTP id d2e1a72fcca58-7257fcbc006mr8373190b3a.21.1733330005713;
-        Wed, 04 Dec 2024 08:33:25 -0800 (PST)
+        bh=Hb5hc3qgWT9L6cng9NISv31Ehv7llzw2Vl8uDpnsua4=;
+        b=cVNkAcEV1EtHJmUMwzY+VM8AL2+/P59piWEgZ81hgZj18j/U/BVGRc6wTxk6IhTc7X
+         VF/zUSpqpNQ4wg93t8cilafyPCu88RUD6opyntze64E/Rpac/Oo6bR+mTgsgmUcYr5cp
+         89bHBEJmQj96VPzGg/8x4BvjDdm0lVfClECw3biSCjR74sXEUfpLQQHlRvGSbVYaCfDC
+         Mr+uTbH+BLQ7SQ1ETAqD2Fy4uS2b18OVI7+Gh4tmUZqon5IPDJnLQrja3V7d8S+ItOdQ
+         Rl+Em6U+DHM4HTp1Nmhn8TE3XKcWttKi1MmJ2EcII2gjlcjepdisR2a4m4iVlRZ9Nwqz
+         ojxg==
+X-Gm-Message-State: AOJu0Yx6iqY+q1d+Y0tpYtiiVnL3+zhQSn0p+62G7frd9oktkSyEPRZq
+	9oOoAZLGjNWY4uWSeiTc8vCsQ+1wh5IE8brRY5NlvkKlhqUEMhQi9cx2KSXgoXafda4jtoYVdAZ
+	Y
+X-Gm-Gg: ASbGncvjBlLJ5MaNy97ROXONkD9XSWObbI17vJIM3EnlNL22jDQS2i3bRX68i2xSHA/
+	tfQpj/oJUJgMhj59euj3RmGcS+rWE25pUz0t604YpkBeCyei6hGqXXjMMFSZJAj27xD21etg9Un
+	asMNveHZ+vrh680m6rc5GKpGY21u5FKCIMkAIgStYuhLLefM/fknofFia3tE7tklAuRHGiGsmhD
+	vkYcGFM/Jc8VPXYmSBB/YeNeOxq3Q==
+X-Google-Smtp-Source: AGHT+IGEY5dtfqqu7yQqDHuO3mHKg1f9S+1DRwm5m5EOLxdsx+PQqoK1BhMnJkgc7n3v5DxDmYv9oQ==
+X-Received: by 2002:a05:6a00:cc3:b0:725:4915:c0f with SMTP id d2e1a72fcca58-7259d6008e4mr10467b3a.11.1733330007187;
+        Wed, 04 Dec 2024 08:33:27 -0800 (PST)
 Received: from [127.0.0.1] ([2620:10d:c090:600::1:a7a9])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7254184952csm12955492b3a.185.2024.12.04.08.33.24
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7254184952csm12955492b3a.185.2024.12.04.08.33.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2024 08:33:25 -0800 (PST)
+        Wed, 04 Dec 2024 08:33:26 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
- linux-trace-kernel@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20241204150450.399005-1-colin.i.king@gmail.com>
-References: <20241204150450.399005-1-colin.i.king@gmail.com>
-Subject: Re: [PATCH][next] blktrace: remove redundant return at end of
- function
-Message-Id: <173333000444.511414.17569005007152720429.b4-ty@kernel.dk>
-Date: Wed, 04 Dec 2024 09:33:24 -0700
+To: Andreas Hindborg <a.hindborg@kernel.org>, 
+ Boqun Feng <boqun.feng@gmail.com>, 
+ =?utf-8?q?Beno=C3=AEt_du_Garreau?= <benoit@dugarreau.fr>
+Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20241204-rnull_in_place-v1-1-efe3eafac9fb@dugarreau.fr>
+References: <20241204-rnull_in_place-v1-1-efe3eafac9fb@dugarreau.fr>
+Subject: Re: [PATCH] block: rnull: Initialize the module in place
+Message-Id: <173333000587.511414.15268819552143079818.b4-ty@kernel.dk>
+Date: Wed, 04 Dec 2024 09:33:25 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,24 +74,19 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Mailer: b4 0.14.3-dev-86319
 
 
-On Wed, 04 Dec 2024 15:04:50 +0000, Colin Ian King wrote:
-> A recent change added return 0 before an existing return statement
-> at the end of function blk_trace_setup. The final return is now
-> redundant, so remove it.
-> 
-> Fixes: 64d124798244 ("blktrace: move copy_[to|from]_user() out of ->debugfs_lock")
+On Wed, 04 Dec 2024 09:38:39 +0100, Benoît du Garreau wrote:
+> Using `InPlaceModule` avoids an allocation and an indirection.
 > 
 > 
-> [...]
 
 Applied, thanks!
 
-[1/1] blktrace: remove redundant return at end of function
-      commit: 62047e8946da6269cf9bcec578298dd194ee4b7f
+[1/1] block: rnull: Initialize the module in place
+      commit: c018ec9dd144dd29b4a664bf69e486f14bb4ee87
 
 Best regards,
 -- 
