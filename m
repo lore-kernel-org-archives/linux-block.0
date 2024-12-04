@@ -1,84 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C9728F4;
-	Wed,  4 Dec 2024 18:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from bout3.ijzerbout.nl (bout3.ijzerbout.nl [136.144.140.114])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92B217335C
+	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 20:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.144.140.114
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733337124; cv=none; b=IJtnyjsGem24k3h4yghxpV/R8BoVdB8O1CQITSu/HsZpaJqNaRJeaEsZYLsdCLXBObJgGVU6Z+dyJ9v7FacIfxvc0rmTy62pZiX9fQCgb7nrrHun5OHeiiITd5cJh6rC6ZGi/hu6DtjnVIMjP/EUCph8vjb8TIR2UeBFdsveat0=
+	t=1733345375; cv=none; b=Eizuq3Yqygr1iYZue5oiI67k/jMfm0sj/pujFtCrVIan6J1OV52jFgsPrBXeXGkkUYU6WXsVf75v4NB0lMiGYWAVIzkvPM/hU3M/Mm1PkSPjr8zvtl40dH16MuhHzdchM4lUeffz8mvbFBGqGIf9xNWMUmd6gnGMOs+hslOft3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733337124; c=relaxed/simple;
-	bh=+4Kt8FQgX1dXK3ytxSuKT6GwIzThB5cSGjNPnJtIIl8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vo80se1xtN1cA4qWI2B0jdcvpJ26zu8oX/s1yY+G1ixLiY478v9kJWMoHCDeeAWgD5JsrkLxFGhjsKay/n/QU6fdAcD00QybpbuqBSvpiwLE+gbhQwlLj+K6TEOUnAEChLF2xIkXPS5JoMDJEEPWYzm9gq5a/p+WmIn2SKZyUgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JUO+PTki; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733345375; c=relaxed/simple;
+	bh=7RgwpnjtZfjN6CCvXlv8wtHGBwExeTD4IIoLBag0vh4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KGVjBgITGBTyX2055IC10AIOHgMI2u5gTOQyOP8n2sCB4wM2u+D/2Gd6uJU4KY6PcsAhKXnyLgewvNcpMSm0imEywkoo5Jh3nw55DEGgy42WSx5vos9ZhQ72+MId/yc2B3bfoepThkD4V0CMDzELGM5QOmXJSYznIyYMiRswGq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl; spf=pass smtp.mailfrom=ijzerbout.nl; dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b=qZKHz80U; arc=none smtp.client-ip=136.144.140.114
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ijzerbout.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JUO+PTki"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21332C4CECD;
-	Wed,  4 Dec 2024 18:32:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733337124;
-	bh=+4Kt8FQgX1dXK3ytxSuKT6GwIzThB5cSGjNPnJtIIl8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JUO+PTkifvg77tFPDqbocLqM6dde9ocUoP4m2IB3JQLJtlAZU+s2xxdOivSy9ruGW
-	 E7gSkIWcMxzAbL+FcC2L/5hZVB6/SpCfcJJxo7Vqm8zGhKzrgQvh19blEGfic7huPq
-	 sj3GcqlXZYb+fhkQNCH/KbQWYRj/j/2aMBNMam8FP+WYetLCPshfWGc4EulIiLaZoi
-	 A5ohewiy3XzIF2m8stkhUIr15z/sy9m4rj64Qo8VrQu41bhSbFiW4tuvznog1UPuam
-	 kS8qE7kX9mHbS3OLMF3CoEMXW1yQREzjXkcdZUY8NRXLRAnL70L3GHpzpKjH4QNmqm
-	 uJsXHybtpxiXA==
-Date: Wed, 4 Dec 2024 08:32:03 -1000
-From: 'Tejun Heo' <tj@kernel.org>
-To: David Laight <David.Laight@aculab.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	clang-built-linux <llvm@lists.linux.dev>,
-	linux-block <linux-block@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"lkft-triage@lists.linaro.org" <lkft-triage@lists.linaro.org>,
-	Linux Regressions <regressions@lists.linux.dev>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nathan Chancellor <nathan@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Subject: Re: s390: block/blk-iocost.c:1101:11: error: call to
- '__compiletime_assert_557' declared with 'error' attribute: clamp() low
- limit 1 greater than high limit active
-Message-ID: <Z1CgIzluYZzNVpuK@slm.duckdns.org>
-References: <CA+G9fYsD7mw13wredcZn0L-KBA3yeoVSTuxnss-AEWMN3ha0cA@mail.gmail.com>
- <5ffa868f-cbf0-42ae-ae10-5c39b0de05e7@stanley.mountain>
- <7920126775c74fa5915afbeedcfe2058@AcuMS.aculab.com>
- <c795c090-430a-45a6-88b2-94033d50dea2@stanley.mountain>
- <Z1CUIT8zAqWOnot-@slm.duckdns.org>
- <be025b385bb94e0c92cd02ab57dc984b@AcuMS.aculab.com>
+	dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b="qZKHz80U"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ijzerbout.nl; s=key;
+	t=1733344809; bh=7RgwpnjtZfjN6CCvXlv8wtHGBwExeTD4IIoLBag0vh4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qZKHz80UendupyMRI53cKLWiKmoIQ/+N/D8H+7B3tftsG50ahV9N00nrhXsx460OM
+	 9jz+DJurfFE4yT6GZXI8f1m2czoc3WyW8811QmQ0lsqT4fhEvLyF319CKbCivRuyGa
+	 MBREMIimjoL+cS9SO2NwzxI11cwh3o+yPeJjyDkc/F+zraLLky/ZL/xqeGoXWo40dF
+	 XM1jPdCjO2c3ECBZ54K3pTEv68zLREn7d3PFAkDjo68CXyRCKYBx5J975IZtLkyVFe
+	 9BFvhkfO/RymaZB1iZUZl+W/3XSbH6feGppVBAhoCogT4HZG54BJtwYqcBYltqDE9V
+	 rsYyPCeVAk21JHdGNuEa/YsLn3GT/ehtsEbfY1rO+jqibq5Q0Q3KBuDbgsnwCCJOjK
+	 6UxO57XFLYDmZ67wPOod01+pDZ0IMsT+dJuYfJQYfupkYv+VOPP81y7PWc5Lde2pYN
+	 bOI89bGC0mVXx0+4CjT3sw7kETtaeZWF0A8uZZKelRAK10KUxIA4hhypQP4Kiu0hj9
+	 yrOSWrMtAImAei6+Ep13S4kTpaK6WosZV52BtFZMT2Um9Ms9tbUaQYvDmDR0RUUQIf
+	 IDHPIDHi0BWtox6T5MOklJh+Vkg+Lr3ZPk9ARNuzXvRszwDBjZEzJ8hlYvSTEQEsQF
+	 5QxtY2nlNl7grvoHw7x5S8rg=
+Received: from [IPV6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a] (racer.ijzerbout.nl [IPv6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a])
+	by bout3.ijzerbout.nl (Postfix) with ESMTPSA id 6661116827E;
+	Wed,  4 Dec 2024 21:40:09 +0100 (CET)
+Message-ID: <d35c5de3-ad63-45f6-91ce-c3aa67bf4965@ijzerbout.nl>
+Date: Wed, 4 Dec 2024 21:40:06 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <be025b385bb94e0c92cd02ab57dc984b@AcuMS.aculab.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] blktrace: move copy_[to|from]_user() out of
+ ->debugfs_lock
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: syzbot+91585b36b538053343e4@syzkaller.appspotmail.com
+References: <20241128125029.4152292-1-ming.lei@redhat.com>
+ <20241128125029.4152292-3-ming.lei@redhat.com>
+Content-Language: en-US
+From: Kees Bakker <kees@ijzerbout.nl>
+In-Reply-To: <20241128125029.4152292-3-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+Op 28-11-2024 om 13:50 schreef Ming Lei:
+> Move copy_[to|from]_user() out of ->debugfs_lock and cut the dependency
+> between mm->mmap_lock and q->debugfs_lock, then we avoids lots of
+> lockdep false positive warning. Obviously ->debug_lock isn't needed
+> for copy_[to|from]_user().
+>
+> The only behavior change is to call blk_trace_remove() in case of setup
+> failure handling by re-grabbing ->debugfs_lock, and this way is just
+> fine since we do cover concurrent setup() & remove().
+>
+> Reported-by: syzbot+91585b36b538053343e4@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/linux-block/67450fd4.050a0220.1286eb.0007.GAE@google.com/
+> Closes: https://lore.kernel.org/linux-block/6742e584.050a0220.1cc393.0038.GAE@google.com/
+> Closes: https://lore.kernel.org/linux-block/6742a600.050a0220.1cc393.002e.GAE@google.com/
+> Closes: https://lore.kernel.org/linux-block/67420102.050a0220.1cc393.0019.GAE@google.com/
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   kernel/trace/blktrace.c | 26 +++++++++-----------------
+>   1 file changed, 9 insertions(+), 17 deletions(-)
+>
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> index f01aae3a2f7b..18c81e6aa496 100644
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -617,8 +617,9 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+>   	return ret;
+>   }
+>   
+> -static int __blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+> -			     struct block_device *bdev, char __user *arg)
+> +int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+> +		    struct block_device *bdev,
+> +		    char __user *arg)
+>   {
+>   	struct blk_user_trace_setup buts;
+>   	int ret;
+> @@ -627,26 +628,17 @@ static int __blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+>   	if (ret)
+>   		return -EFAULT;
+>   
+> +	mutex_lock(&q->debugfs_mutex);
+>   	ret = do_blk_trace_setup(q, name, dev, bdev, &buts);
+> +	mutex_unlock(&q->debugfs_mutex);
+>   	if (ret)
+>   		return ret;
+>   
+>   	if (copy_to_user(arg, &buts, sizeof(buts))) {
+> -		__blk_trace_remove(q);
+> +		blk_trace_remove(q);
+>   		return -EFAULT;
+>   	}
+>   	return 0;
+> -}
+> -
+> -int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+> -		    struct block_device *bdev,
+> -		    char __user *arg)
+> -{
+> -	int ret;
+> -
+> -	mutex_lock(&q->debugfs_mutex);
+> -	ret = __blk_trace_setup(q, name, dev, bdev, arg);
+> -	mutex_unlock(&q->debugfs_mutex);
+>   
+>   	return ret;
+You forgot to delete "return ret;" from function blk_trace_setup()
+>   }
+> [...]
 
-On Wed, Dec 04, 2024 at 06:26:16PM +0000, David Laight wrote:
-> > This is a good catch. It's impressive that this can be caught at compile
-> > time. The upper limit can become zero but the lower limit should win as
-> > that's there to protect against divide by zero, so I think the right thinig
-> > to do is replacing clamp() with max(min()). Is someone interested in writing
-> > up the patch and sending it Jens' way?
-> 
-> Perhaps if written as:
-> 	inuse = min(inuse, active) ?: 1;
-> it might stop someone changing it back.
-
-And maybe some comments too. When I was writing that clamp(), the case of
-min and max crossing each other didn't even cross my mind and I was dumbly
-thinking just "oh, this protects the value on both fronts", so yeah, there's
-some chance of someone (including myself) converting it back to clamp().
-
-Thanks.
-
--- 
-tejun
