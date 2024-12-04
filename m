@@ -1,139 +1,157 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38E924B26
-	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 03:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BD980BF8;
+	Wed,  4 Dec 2024 06:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733283070; cv=none; b=AgCbKnduikCUWDnVb6ZyovtMdfGmQ9DtAw/m8UQQIoycPpzt9ZFXmxe1v2yRoY1KP1DjSnmrzau9wMzHHzof9V77mIS2XJ3XTv8NsxqsMY5x228uvOyXbLB8nAz7LeTi+FhbRKhHQ9uGvfFGmbHh+uhC5MzgSYPECmytWn1xzS4=
+	t=1733292835; cv=none; b=uJ7DN8+hwIKZU5Lo0N9epiWgd6dvxH0N4U+IvsqRgHFV/Lc5nn6NZ6UpS6axjeI1n3Rc3agz+o0s4H0a/KoIe5nDhfKaXbCwjkZ790DHkqwe3TwoldM/LItNigwc+o6HafvkxTp2SMoe67fJFZA2MyYdYIJKncmfjQC9CnTKlWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733283070; c=relaxed/simple;
-	bh=78xKjgzmKccYqk9MN+2ZNSKEy04PeIayLcppN3YuoZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l4fZnMgK6zxZ0liACpmhUWJ5FRx7NVr2OhJqXXeWCucX3Yhj5PutZVGXjhluaLnv1t+UGocAsl66rwgiugNFFPnJy6BNeGNTiO2wXvlmuz5sZ5zn1Ry7aE61GBTwq4WPh05YAL8FHYMu0GY0pKmqpk6dpa80se0UJ0WpIMKHjf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QBDVUjiC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1733292835; c=relaxed/simple;
+	bh=oiJcmzV0ir7YgFDiZnJqjaI0Xbe0k0RUZf4lk8e1sl4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jooyJRKzDcehzd1SWFoJNCa2gmYeUIi1LHMjvpyRCjX/poX6hE4lTW8EOrLzfESEiIDpycP4I/oiJofY0QPP5qV4EfZTG0oZDhwKA3Z7b6A5LNqZQ2K4hBZKJprh1BW07G+Duy/Iy+V41iTG6IxjxSkINeoO9ygagRK+VKFf2Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com; spf=pass smtp.mailfrom=gmx.com; dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b=n6ukyLqk; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QBDVUjiC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733283068;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zFVN9L1M5C/3rUxYgdCRn6LmESJ5h77zt+6Lt3J9p9Q=;
-	b=QBDVUjiCEOGeO5yD65MFLfzepGR5Ibfg6RlqyVdjTdaUoHKJX+bwcXHq3/ETDGBhZWhiRP
-	g00DFmOK3sfRB6ffDRwWjjOFrvtHWwS18YGlpg2ARFWmVXrYD7Lj6v3ph/tphM5gd/rwC3
-	nWDEyIYjW5Y4a10T/5qTyJabMQ56mZg=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-660-GdOrHiRDM6K5BbDCZBGbzw-1; Tue,
- 03 Dec 2024 22:31:04 -0500
-X-MC-Unique: GdOrHiRDM6K5BbDCZBGbzw-1
-X-Mimecast-MFC-AGG-ID: GdOrHiRDM6K5BbDCZBGbzw
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 30479195608C;
-	Wed,  4 Dec 2024 03:31:02 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.77])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B30AB30000DF;
-	Wed,  4 Dec 2024 03:30:53 +0000 (UTC)
-Date: Wed, 4 Dec 2024 11:30:47 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: "Lai, Yi" <yi1.lai@linux.intel.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	linux-kernel@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-	yi1.lai@intel.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH V2 3/3] block: model freeze & enter queue as lock for
- supporting lockdep
-Message-ID: <Z0_M5_lbObp-EbZW@fedora>
-References: <20241025003722.3630252-1-ming.lei@redhat.com>
- <20241025003722.3630252-4-ming.lei@redhat.com>
- <ZyHV7xTccCwN8j7b@ly-workstation>
- <ZyHchfaUe2cEzFMm@fedora>
- <ZyHzb8ExdDG4b8lo@ly-workstation>
- <CAFj5m9+bL23T7mMwR7g_8umTzkNJa14n8AhR3_g6QjB2YCcc5A@mail.gmail.com>
- <ZyIM0dWzxC9zBIuf@ly-workstation>
- <ZyITwN0ihIFiz9M2@fedora>
- <Z0/K0bDHBUWlt0Hl@ly-workstation>
+	dkim=pass (2048-bit key) header.d=gmx.com header.i=quwenruo.btrfs@gmx.com header.b="n6ukyLqk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.com;
+	s=s31663417; t=1733292820; x=1733897620; i=quwenruo.btrfs@gmx.com;
+	bh=BAwWjXxGKBbQhZ6mZqExeu75S8gB0Lu4Aby/AgVIbUs=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=n6ukyLqkKeG5oM3666lFNrr6pPK8Ojc+wY47vgjqD9xfhEmu6q1WFH4rhgHtT70O
+	 /KN6Uy1Jv6zCVRJetO4SkEdZXvRWBb4k7l+AR/zLmeiCHQsfg+hngIE8LNGZP0n80
+	 YVwomCU2j4+/nAaSWoJvQT8pWVgcmPfKiHeNaFKNDwPu4Z5q/uvkOfcOE9iXgIqLM
+	 qS0cNswhFI3l/Q9ngc+9slXHqjomcmEdsYpl4wBnvYQcfE6D47xrtzroj08p7Q0jZ
+	 1MWQmhBGhnkPq7jPoLH3xpuTi/FXxy66YsRWYVxcpGXciBQTTS1/Gr2ITXUUudJpJ
+	 SdFAqJHUQhFDmMmD9w==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [172.16.0.191] ([159.196.52.54]) by mail.gmx.net (mrgmx004
+ [212.227.17.184]) with ESMTPSA (Nemesis) id 1MFsZ3-1tRkfD170h-007TMu; Wed, 04
+ Dec 2024 07:13:40 +0100
+Message-ID: <e299045e-34a9-4f09-ba86-49134293af61@gmx.com>
+Date: Wed, 4 Dec 2024 16:43:35 +1030
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z0/K0bDHBUWlt0Hl@ly-workstation>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: fix a few zoned append issues v2 (now with Ccs)
+To: Christoph Hellwig <hch@lst.de>, David Sterba <dsterba@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>, Chris Mason <clm@fb.com>,
+ Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org,
+ linux-btrfs@vger.kernel.org
+References: <20241104062647.91160-1-hch@lst.de> <20241108144857.GA8543@lst.de>
+ <20241203170120.GE31418@twin.jikos.cz> <20241204001718.GA22411@lst.de>
+Content-Language: en-US
+From: Qu Wenruo <quwenruo.btrfs@gmx.com>
+Autocrypt: addr=quwenruo.btrfs@gmx.com; keydata=
+ xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
+ 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
+ 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
+ 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
+ gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
+ AAHNIlF1IFdlbnJ1byA8cXV3ZW5ydW8uYnRyZnNAZ214LmNvbT7CwJQEEwEIAD4CGwMFCwkI
+ BwIGFQgJCgsCBBYCAwECHgECF4AWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1YAUJEP5a
+ sQAKCRDCPZHzoSX+qF+mB/9gXu9C3BV0omDZBDWevJHxpWpOwQ8DxZEbk9b9LcrQlWdhFhyn
+ xi+l5lRziV9ZGyYXp7N35a9t7GQJndMCFUWYoEa+1NCuxDs6bslfrCaGEGG/+wd6oIPb85xo
+ naxnQ+SQtYLUFbU77WkUPaaIU8hH2BAfn9ZSDX9lIxheQE8ZYGGmo4wYpnN7/hSXALD7+oun
+ tZljjGNT1o+/B8WVZtw/YZuCuHgZeaFdhcV2jsz7+iGb+LsqzHuznrXqbyUQgQT9kn8ZYFNW
+ 7tf+LNxXuwedzRag4fxtR+5GVvJ41Oh/eygp8VqiMAtnFYaSlb9sjia1Mh+m+OBFeuXjgGlG
+ VvQFzsBNBFnVga8BCACqU+th4Esy/c8BnvliFAjAfpzhI1wH76FD1MJPmAhA3DnX5JDORcga
+ CbPEwhLj1xlwTgpeT+QfDmGJ5B5BlrrQFZVE1fChEjiJvyiSAO4yQPkrPVYTI7Xj34FnscPj
+ /IrRUUka68MlHxPtFnAHr25VIuOS41lmYKYNwPNLRz9Ik6DmeTG3WJO2BQRNvXA0pXrJH1fN
+ GSsRb+pKEKHKtL1803x71zQxCwLh+zLP1iXHVM5j8gX9zqupigQR/Cel2XPS44zWcDW8r7B0
+ q1eW4Jrv0x19p4P923voqn+joIAostyNTUjCeSrUdKth9jcdlam9X2DziA/DHDFfS5eq4fEv
+ ABEBAAHCwHwEGAEIACYCGwwWIQQt33LlpaVbqJ2qQuHCPZHzoSX+qAUCZxF1gQUJEP5a0gAK
+ CRDCPZHzoSX+qHGpB/kB8A7M7KGL5qzat+jBRoLwB0Y3Zax0QWuANVdZM3eJDlKJKJ4HKzjo
+ B2Pcn4JXL2apSan2uJftaMbNQbwotvabLXkE7cPpnppnBq7iovmBw++/d8zQjLQLWInQ5kNq
+ Vmi36kmq8o5c0f97QVjMryHlmSlEZ2Wwc1kURAe4lsRG2dNeAd4CAqmTw0cMIrR6R/Dpt3ma
+ +8oGXJOmwWuDFKNV4G2XLKcghqrtcRf2zAGNogg3KulCykHHripG3kPKsb7fYVcSQtlt5R6v
+ HZStaZBzw4PcDiaAF3pPDBd+0fIKS6BlpeNRSFG94RYrt84Qw77JWDOAZsyNfEIEE0J6LSR/
+In-Reply-To: <20241204001718.GA22411@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:EejO+n5DQ44tR1jajDbozWvo7584/d7UUHsgMTx3MiRt1okUNG2
+ 3wjnW5A+VeyhjD5pa8K16hx9DYjz16gEF5qPAYbmqPrixo2OsfH33dVzLxnGZVnu/6RcXKc
+ J19xQT1UitbSOPSsMFoor1VFf/5BKNTLyEjg5Bm+OUG1XHa0VQoKlTwCJQu0ud5wvqETMtY
+ ibjVNoHxfWNlOyg+9jVxA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:+L1n8U/Vz9M=;xhwRtnGzpSNnVd12WBv2YzCdnP8
+ l+qDKEvQug2rfIFuP1Q0RB0txM7ap/R7DqMUMXgHrYmoJ9Bug1SITRoA8AQf4K69VxWrVPCD+
+ WDDxWIfzFsM+7tH3LDz9we/djLmNKJ+t7aILxll3E00JKlfaPRVvC5SxrFspnw9pnUCN7DSdx
+ 7jFXTCFV/L1ZjJmJ/HA8vbPltSb7s/clOIpZJ/eppIaKhQzRkHNq/KwOk8Ymdv+9TI7uZP8/x
+ lfXQnanBMPTVm+wbTlBtnFy4X6zeE0b+Aqk+GiMsa9lD9BWgkMP1fh57WRx3WaMqCfna4ekwm
+ FsWXmth879K1cyXXeflQ0Ota/oOolTX7pAsoTc1hrpvQw85R8WxSvBH4YDoLhYZxlo/8XHxBE
+ DTZ49BzN9eCXSfMGWpug8WAhffw8SKGFVtO7hcMXblVuhuK72v7EH8pKXRt7MOCarf+PwFs5E
+ vSPjS/yGOYOJOTqcj4bsFIk/LjdMhEUvndtk+bew7W6bbk/Nb0DW0q4uR5unUhkULTVXyRIcl
+ xAME5D+A+b1SkuZ5lwywEmho9b6JDtYfe/ERJpby9AyVcWoVmXEpDpaQ0B0SiM+KMC8jy0khw
+ pJdAzQKaCHHNDaCB9lnr39pqP3SUIKKFVUzqa9ijX0+n6E0n0hbfsGJtN0iaq+T5QsvlX/AyV
+ arTcSuinHdZPq2OcyX6jRpCZdlFGoOZ4ihyoRgD/8RkxvQFAyJ1EM+xdYAuoZfW6+hgGWcJUJ
+ ZPsct3ssRQ+rJFFZj4YXGB4SF3LhWms+mB0AWZaRzFllKvt4xWWwTcE3goRfIObB2LCDIzL/1
+ xhk/EtShAj41Wi5BeWv+2u44sDQ61zLq2kPmeGUkIRNnnsn49HmLlYbyMQBqeXLCppDRLRNR0
+ 10tHeQ2KhMEJsSKw9qF6Yjrnnc13cypMhPs45IWEYo8Oh2FYk68/8UunA2xGrYZ802t7tvsmk
+ a96CQT1B7w9MEg2a/RRx5nLMbAPSJlgXZW84BtW9tTrm5kBo6h3SxT4Wsltxly98CUIzFHExS
+ /sl1ZbxvTNTxWIWeiGAw50uxXgy2wwslf8ACbSQCVs82EX0LYFMlUWWiZBCbNyfzGnzYkdnrL
+ nurOU/wuQNPs+NY0wRhMYCZ669wpsA
 
-On Wed, Dec 04, 2024 at 11:21:53AM +0800, Lai, Yi wrote:
-> On Wed, Oct 30, 2024 at 07:08:48PM +0800, Ming Lei wrote:
-> > On Wed, Oct 30, 2024 at 06:39:13PM +0800, Lai, Yi wrote:
-> > > On Wed, Oct 30, 2024 at 05:50:15PM +0800, Ming Lei wrote:
-> > > > On Wed, Oct 30, 2024 at 4:51 PM Lai, Yi <yi1.lai@linux.intel.com> wrote:
-> > > > >
-> > > > > On Wed, Oct 30, 2024 at 03:13:09PM +0800, Ming Lei wrote:
-> > > > > > On Wed, Oct 30, 2024 at 02:45:03PM +0800, Lai, Yi wrote:
-> > > > ...
-> > > > > >
-> > > > > > It should be addressed by the following patch:
-> > > > > >
-> > > > > > https://lore.kernel.org/linux-block/ZyEGLdg744U_xBjp@fedora/
-> > > > > >
-> > > > >
-> > > > > I have applied proposed fix patch on top of next-20241029. Issue can
-> > > > > still be reproduced.
-> > > > >
-> > > > > It seems the dependency chain is different from Marek's log and mine.
-> > > > 
-> > > > Can you post the new log since q->q_usage_counter(io)->fs_reclaim from
-> > > > blk_mq_init_sched is cut down by the patch?
-> > > >
-> > > 
-> > > New possible deadlock log after patch applied:
-> > 
-> > This one looks like one real deadlock, any memory allocation with
-> > q->sysfs_lock held has such risk.
-> > 
-> > There is another similar report related with queue sysfs store operation:
-> > 
-> > https://lore.kernel.org/linux-scsi/ZxG38G9BuFdBpBHZ@fedora/
-> >  
-> >
-> For v6.13-rc3, there is possible deadlock in
-> blk_trace_ioctl/perf_event_ctx_lock_nested/in blk_trace_ioctl. Based on
-> my bisection log, it all bisected to your commit f1be1788a32e block:
-> model freeze & enter queue as lock for supporting lockdep.
-> 
-> I am hoping this will be insightful to you.
-> 
-> possible deadlock in blk_trace_ioctl:
-> [   33.317360] ffff88800fc8f3e0 (&mm->mmap_lock){++++}-{4:4}, at: __might_fault+0xf1/0x1b0
-> [   33.317859]
-> [   33.317859] but task is already holding lock:
-> [   33.318206] ffff8880109b92e0 (&q->debugfs_mutex){+.+.}-{4:4}, at: blk_trace_ioctl+0xaa/0x290
-> [   33.318722]
-> [   33.318722] which lock already depends on the new lock.
-> [   33.318722]
 
-The warning has been fixed by the following patches in for-6.14/block:
 
-blktrace: move copy_[to|from]_user() out of ->debugfs_lock
-blktrace: don't centralize grabbing q->debugfs_mutex in blk_trace_ioctl
+=E5=9C=A8 2024/12/4 10:47, Christoph Hellwig =E5=86=99=E9=81=93:
+> On Tue, Dec 03, 2024 at 06:01:20PM +0100, David Sterba wrote:
+>> On Fri, Nov 08, 2024 at 03:48:57PM +0100, Christoph Hellwig wrote:
+>>> On Mon, Nov 04, 2024 at 07:26:28AM +0100, Christoph Hellwig wrote:
+>>>> Hi Jens, hi Damien, hi btrfs maintainers,
+>>>
+>>> How should we proceed with this?  Should Jens just pick up the block
+>>> bits and the btrfs maintainers pick up the btrfs once they are
+>>> ready and the block bits made it upstream?
+>>
+>> The block layer patches are now in master, I'm adding the remaining
+>> patches to btrfs for-next.
+>
+> Thanks.  I wanted to resend them, but my baseline testing still showed
+> crashes in generic/475 so I was looking into an expunge config to
+> check if there are no regressions first (there really shouldn't, but
+> I wanted to double check).
+>
 
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=for-6.14/block
+Talking about generic/475 crash, it looks like there is something wrong
+inside btrfs' space reservation code, which causes run_delalloc_range()
+to fail with ENOSPC (which should not happen).
 
+If my memory works correctly, at least 3 release ago we didn't hit such
+ENOSPC during run_delalloc_range().
+
+
+I'm working on fixing the involved error handling, there are some
+patches to reduce involved crashes:
+
+For ordered extent double freeing:
+https://lore.kernel.org/linux-btrfs/cover.1732695237.git.wqu@suse.com/
+
+For ENOSPC error handling in run_delalloc_range():
+https://lore.kernel.org/linux-btrfs/0b4675971b718709497ca35c0d69e06db0c69d=
+58.1732867087.git.wqu@suse.com/
+https://lore.kernel.org/linux-btrfs/3e5d5665ef36ee43e310be321073210785b89a=
+dc.1733273653.git.wqu@suse.com/
+
+Which can help you to continue, but at least on my aarch64 VMs with 64K
+page size and 4K block size, I can still hit random failures related to
+unfinished iput or run-away locked pages.
+
+
+Unfortunately I'm not educated enough to pin down the
+run_delalloc_range() ENOSPC errors, but only use this chance to fix the
+error handling...
 
 Thanks,
-Ming
-
+Qu
