@@ -1,124 +1,121 @@
-Received: from bout3.ijzerbout.nl (bout3.ijzerbout.nl [136.144.140.114])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92B217335C
-	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 20:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.144.140.114
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA4518FC83
+	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 21:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733345375; cv=none; b=Eizuq3Yqygr1iYZue5oiI67k/jMfm0sj/pujFtCrVIan6J1OV52jFgsPrBXeXGkkUYU6WXsVf75v4NB0lMiGYWAVIzkvPM/hU3M/Mm1PkSPjr8zvtl40dH16MuhHzdchM4lUeffz8mvbFBGqGIf9xNWMUmd6gnGMOs+hslOft3w=
+	t=1733347922; cv=none; b=gxMPt+bZ7JQnFK/RJ9LQ+PkCNH8lEtEGKJb53batnqkkyVHm80JmJmaYElKz3CMx3Okp9SZCF4eOF38zkGnXf4W64UbqqGJZAoo3Sm1Hbu+1RUQDqRfY6L6+x1jrYQOrdvgmq48NUEctpxZ9wSPZ97g9+GnQoagiHBLyz7vG+GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733345375; c=relaxed/simple;
-	bh=7RgwpnjtZfjN6CCvXlv8wtHGBwExeTD4IIoLBag0vh4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KGVjBgITGBTyX2055IC10AIOHgMI2u5gTOQyOP8n2sCB4wM2u+D/2Gd6uJU4KY6PcsAhKXnyLgewvNcpMSm0imEywkoo5Jh3nw55DEGgy42WSx5vos9ZhQ72+MId/yc2B3bfoepThkD4V0CMDzELGM5QOmXJSYznIyYMiRswGq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl; spf=pass smtp.mailfrom=ijzerbout.nl; dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b=qZKHz80U; arc=none smtp.client-ip=136.144.140.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ijzerbout.nl
+	s=arc-20240116; t=1733347922; c=relaxed/simple;
+	bh=CKZ41b7anoIcewRlZGypq0WD1LM26YxEtKSCzP+mD+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cHjOyauNHdzW1DVQddTwpjYyFlsIMrfE81DKBrxR2bm+8GeDJc6oob8/5IPEpjz6P6dVP+OkHhnE5dkCNNY2SjrfPnIzg2ncr6eHAS1RU+J0t4RjO668u9JWGCulGlZOcn/EdtF5MtkaBq3jEjyDpJM7Zs7KDAcNEhoiwWNNm8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EDSwgT0r; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b="qZKHz80U"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ijzerbout.nl; s=key;
-	t=1733344809; bh=7RgwpnjtZfjN6CCvXlv8wtHGBwExeTD4IIoLBag0vh4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qZKHz80UendupyMRI53cKLWiKmoIQ/+N/D8H+7B3tftsG50ahV9N00nrhXsx460OM
-	 9jz+DJurfFE4yT6GZXI8f1m2czoc3WyW8811QmQ0lsqT4fhEvLyF319CKbCivRuyGa
-	 MBREMIimjoL+cS9SO2NwzxI11cwh3o+yPeJjyDkc/F+zraLLky/ZL/xqeGoXWo40dF
-	 XM1jPdCjO2c3ECBZ54K3pTEv68zLREn7d3PFAkDjo68CXyRCKYBx5J975IZtLkyVFe
-	 9BFvhkfO/RymaZB1iZUZl+W/3XSbH6feGppVBAhoCogT4HZG54BJtwYqcBYltqDE9V
-	 rsYyPCeVAk21JHdGNuEa/YsLn3GT/ehtsEbfY1rO+jqibq5Q0Q3KBuDbgsnwCCJOjK
-	 6UxO57XFLYDmZ67wPOod01+pDZ0IMsT+dJuYfJQYfupkYv+VOPP81y7PWc5Lde2pYN
-	 bOI89bGC0mVXx0+4CjT3sw7kETtaeZWF0A8uZZKelRAK10KUxIA4hhypQP4Kiu0hj9
-	 yrOSWrMtAImAei6+Ep13S4kTpaK6WosZV52BtFZMT2Um9Ms9tbUaQYvDmDR0RUUQIf
-	 IDHPIDHi0BWtox6T5MOklJh+Vkg+Lr3ZPk9ARNuzXvRszwDBjZEzJ8hlYvSTEQEsQF
-	 5QxtY2nlNl7grvoHw7x5S8rg=
-Received: from [IPV6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a] (racer.ijzerbout.nl [IPv6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a])
-	by bout3.ijzerbout.nl (Postfix) with ESMTPSA id 6661116827E;
-	Wed,  4 Dec 2024 21:40:09 +0100 (CET)
-Message-ID: <d35c5de3-ad63-45f6-91ce-c3aa67bf4965@ijzerbout.nl>
-Date: Wed, 4 Dec 2024 21:40:06 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EDSwgT0r"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733347919;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=txF8K16b654IOGX6oIdHIrFapKIX2rqndCM20eru+gY=;
+	b=EDSwgT0rkV27K55cNDNW2hCPwMLMZbQLfL1i+XvmlVStSyDnbudKr4Tv5fbjkY4GFJcVUZ
+	7sAOn/X2ckW0IEPfxUMGYEnwf1g7zGXuxvvho1Ltmepa/y7vbJfxLe3+qhFGPLLxHE9UWs
+	XStu0Rk8spnh4vTRxwHrSfh5CNLB7Zc=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-402-tikMS4sJO3KpzdJgOBc1Jw-1; Wed,
+ 04 Dec 2024 16:31:56 -0500
+X-MC-Unique: tikMS4sJO3KpzdJgOBc1Jw-1
+X-Mimecast-MFC-AGG-ID: tikMS4sJO3KpzdJgOBc1Jw
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8A0441955D4C;
+	Wed,  4 Dec 2024 21:31:54 +0000 (UTC)
+Received: from localhost (unknown [10.2.16.246])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F160A1956094;
+	Wed,  4 Dec 2024 21:31:52 +0000 (UTC)
+Date: Wed, 4 Dec 2024 16:31:51 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Yi Sun <yi.sun@unisoc.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, virtualization@lists.linux.dev,
+	Marek Szyprowski <m.szyprowski@samsung.com>
+Subject: Re: [PATCH] virtio-blk: don't keep queue frozen during system suspend
+Message-ID: <20241204213151.GF48585@fedora>
+References: <20241112125821.1475793-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] blktrace: move copy_[to|from]_user() out of
- ->debugfs_lock
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Cc: syzbot+91585b36b538053343e4@syzkaller.appspotmail.com
-References: <20241128125029.4152292-1-ming.lei@redhat.com>
- <20241128125029.4152292-3-ming.lei@redhat.com>
-Content-Language: en-US
-From: Kees Bakker <kees@ijzerbout.nl>
-In-Reply-To: <20241128125029.4152292-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="wTmESElQuqfsdl3v"
+Content-Disposition: inline
+In-Reply-To: <20241112125821.1475793-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Op 28-11-2024 om 13:50 schreef Ming Lei:
-> Move copy_[to|from]_user() out of ->debugfs_lock and cut the dependency
-> between mm->mmap_lock and q->debugfs_lock, then we avoids lots of
-> lockdep false positive warning. Obviously ->debug_lock isn't needed
-> for copy_[to|from]_user().
->
-> The only behavior change is to call blk_trace_remove() in case of setup
-> failure handling by re-grabbing ->debugfs_lock, and this way is just
-> fine since we do cover concurrent setup() & remove().
->
-> Reported-by: syzbot+91585b36b538053343e4@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/linux-block/67450fd4.050a0220.1286eb.0007.GAE@google.com/
-> Closes: https://lore.kernel.org/linux-block/6742e584.050a0220.1cc393.0038.GAE@google.com/
-> Closes: https://lore.kernel.org/linux-block/6742a600.050a0220.1cc393.002e.GAE@google.com/
-> Closes: https://lore.kernel.org/linux-block/67420102.050a0220.1cc393.0019.GAE@google.com/
+
+--wTmESElQuqfsdl3v
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Nov 12, 2024 at 08:58:21PM +0800, Ming Lei wrote:
+> Commit 4ce6e2db00de ("virtio-blk: Ensure no requests in virtqueues before
+> deleting vqs.") replaces queue quiesce with queue freeze in virtio-blk's
+> PM callbacks. And the motivation is to drain inflight IOs before suspendi=
+ng.
+>=20
+> block layer's queue freeze looks very handy, but it is also easy to cause
+> deadlock, such as, any attempt to call into bio_queue_enter() may run into
+> deadlock if the queue is frozen in current context. There are all kinds
+> of ->suspend() called in suspend context, so keeping queue frozen in the
+> whole suspend context isn't one good idea. And Marek reported lockdep
+> warning[1] caused by virtio-blk's freeze queue in virtblk_freeze().
+>=20
+> [1] https://lore.kernel.org/linux-block/ca16370e-d646-4eee-b9cc-87277c89c=
+43c@samsung.com/
+>=20
+> Given the motivation is to drain in-flight IOs, it can be done by calling
+> freeze & unfreeze, meantime restore to previous behavior by keeping queue
+> quiesced during suspend.
+>=20
+> Cc: Yi Sun <yi.sun@unisoc.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: virtualization@lists.linux.dev
+> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->   kernel/trace/blktrace.c | 26 +++++++++-----------------
->   1 file changed, 9 insertions(+), 17 deletions(-)
->
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index f01aae3a2f7b..18c81e6aa496 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -617,8 +617,9 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
->   	return ret;
->   }
->   
-> -static int __blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
-> -			     struct block_device *bdev, char __user *arg)
-> +int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
-> +		    struct block_device *bdev,
-> +		    char __user *arg)
->   {
->   	struct blk_user_trace_setup buts;
->   	int ret;
-> @@ -627,26 +628,17 @@ static int __blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
->   	if (ret)
->   		return -EFAULT;
->   
-> +	mutex_lock(&q->debugfs_mutex);
->   	ret = do_blk_trace_setup(q, name, dev, bdev, &buts);
-> +	mutex_unlock(&q->debugfs_mutex);
->   	if (ret)
->   		return ret;
->   
->   	if (copy_to_user(arg, &buts, sizeof(buts))) {
-> -		__blk_trace_remove(q);
-> +		blk_trace_remove(q);
->   		return -EFAULT;
->   	}
->   	return 0;
-> -}
-> -
-> -int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
-> -		    struct block_device *bdev,
-> -		    char __user *arg)
-> -{
-> -	int ret;
-> -
-> -	mutex_lock(&q->debugfs_mutex);
-> -	ret = __blk_trace_setup(q, name, dev, bdev, arg);
-> -	mutex_unlock(&q->debugfs_mutex);
->   
->   	return ret;
-You forgot to delete "return ret;" from function blk_trace_setup()
->   }
-> [...]
+>  drivers/block/virtio_blk.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--wTmESElQuqfsdl3v
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmdQykcACgkQnKSrs4Gr
+c8iXYwf+OWXdBcGkOnMhvsirOA7ovep+560L0W8aeugZNMuas47ncyK7fR6Iez7E
+A9TjS6w64YSx58/L9aM3Xl84xjuFkLKBhfrJ1lTzHB9MGN7iShw/NNxUfu0DCfxW
+f8M81RpqIJxZ0I2lB0U4PBatQHaaF3QJbgwGvUwBJ+FLqrIysIWNmfpCxiMtvymo
+mHLiZA53kcQH/vEAGLJpfjGOwj07Ph+9hsZzzvXrDEojSwRSa7Rk+rL3lFOsxI7y
+p4ymE8TPNGAG+NPYzCurTABcADEXy2kuVP9mnl40ScGYEdvkgsx11OGFOisvKgtM
+cTcuxFuXZLoaYvT0mLzpk1qaRmHK7w==
+=PIaA
+-----END PGP SIGNATURE-----
+
+--wTmESElQuqfsdl3v--
 
