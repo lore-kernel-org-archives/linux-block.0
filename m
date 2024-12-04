@@ -1,100 +1,104 @@
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48537156F3C
-	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 16:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089351547C3
+	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 16:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733328742; cv=none; b=Z6HKnfTwiiN0LX45StYRuzAZ8s33DGLJQMiHRja6J02ov3D25aAp5OajLDgtMYzqEWC3j/MO2Od9OJU2daHkky3WCtuK/4UBQbGDke70yKGkMSVZ0jNulRAwfMtUdqv6OBrTfXDQeK427dd1O88S8FYewTgDWNoViRQ07I0ZsWI=
+	t=1733330009; cv=none; b=eRdea5XrV9ffYH42IhvX8fMXJe5Mwdeq2nAsQNzHxyScMfdP0wcDPMbKdT2J7CUz3r4fecsFDisACIkOnCJUeoWp2/2MSKlNCbsAqoThhPHZ4Un+pkJkvhJ30e2UKqMBQMU6U6lTC+yWJWJ04GGsf3/E5wZcGoWjdYL+YmiDqi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733328742; c=relaxed/simple;
-	bh=oPJAZmjGz3hig5ERXVpw1rcG2SyM62QcVUOtlyK08xs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=hXJfuUL4a4PsYBP1NwXvMVJOr+P0YXsX0rsXG7c5e209clOpO3SImwFQdn4KRYwT+GBysTj8wZfe+7N+vyJ1Hl8eUCHZGzPKDLvbUwk9oelHCehPzjAt/65kthgQq6mLs1die8oAZd8gau6w0ikU6KDTfW3U7Q0SW0CXbUMTudg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-155-GqQcbuu3MrGacAW_QlZAsw-1; Wed, 04 Dec 2024 16:12:11 +0000
-X-MC-Unique: GqQcbuu3MrGacAW_QlZAsw-1
-X-Mimecast-MFC-AGG-ID: GqQcbuu3MrGacAW_QlZAsw
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 4 Dec
- 2024 16:11:33 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 4 Dec 2024 16:11:33 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Dan Carpenter' <dan.carpenter@linaro.org>, Naresh Kamboju
-	<naresh.kamboju@linaro.org>
-CC: "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	clang-built-linux <llvm@lists.linux.dev>, linux-block
-	<linux-block@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>,
-	"lkft-triage@lists.linaro.org" <lkft-triage@lists.linaro.org>, "Linux
- Regressions" <regressions@lists.linux.dev>, Anders Roxell
-	<anders.roxell@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor
-	<nathan@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Subject: RE: s390: block/blk-iocost.c:1101:11: error: call to
- '__compiletime_assert_557' declared with 'error' attribute: clamp() low limit
- 1 greater than high limit active
-Thread-Topic: s390: block/blk-iocost.c:1101:11: error: call to
- '__compiletime_assert_557' declared with 'error' attribute: clamp() low limit
- 1 greater than high limit active
-Thread-Index: AQHbRlpA05groSrCOUKR/Ly6shl2PrLWPxCw
-Date: Wed, 4 Dec 2024 16:11:33 +0000
-Message-ID: <7920126775c74fa5915afbeedcfe2058@AcuMS.aculab.com>
-References: <CA+G9fYsD7mw13wredcZn0L-KBA3yeoVSTuxnss-AEWMN3ha0cA@mail.gmail.com>
- <5ffa868f-cbf0-42ae-ae10-5c39b0de05e7@stanley.mountain>
-In-Reply-To: <5ffa868f-cbf0-42ae-ae10-5c39b0de05e7@stanley.mountain>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1733330009; c=relaxed/simple;
+	bh=YLqX/28N5thdvuWAhBCT6xbYIfwdHgRjjlYUHnZfPww=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=EdcIf5Vguq3reLna3/TIKADCmabjBWfg/+ZP89Q9UVndkHshzAcAnwW/T7kxfV8TDiJ4KoHb5eWzQ74C6N+EON1FTpNEo9v6qPn4KuiXPgKHKn7FFGUPCxTWB7g0evcFa1JMhMOjzvTyzPwJRO+DHQx9ewhG04LAvrEnHfG4tfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=cbOP1qWm; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="cbOP1qWm"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7242f559a9fso21311b3a.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2024 08:33:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1733330006; x=1733934806; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8HFpbZOKpkO7AeS8bDe3st3+sWFuj7iai+TcTZhQd9c=;
+        b=cbOP1qWmavkAFYTjIGGtxmICesXawjm7Tw0HYbCU1e44Cjsq1mwqI9RYGBfu4ZdzCK
+         etKRraOqeFHs+Ev7wG0NXqYDvsRggihA2pOCYbBGpiJviaXUzVZmna5PzJxDURJv+Cm7
+         5Xvk9nJxjTGRomDor9qKlDvik1uEDVH1o8ZsiaeKN5p8J/oyplIlNkbF5iX7vdlw2FOF
+         DxeKZo2qOalyVhtPNcerN3p9rSaWa517MC2NdiNs5wmvWOoIjmX8enlrB2XluUmce7PB
+         zjdgkdN25dDPEYQ9iH4uN90fOFkmqKuhbeTqYDPD/tT5+20PN3jNwbfzMa/vZs79YmSa
+         6epQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733330006; x=1733934806;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8HFpbZOKpkO7AeS8bDe3st3+sWFuj7iai+TcTZhQd9c=;
+        b=pgtkSc2CyvhoSbBd2aIa/HyyMq8D9+LvcVKG9p5wv45iL52ipqHNp3rM8qlD8rusAi
+         4qLpkmrVOVsvR4Q8QPowF0L0kfx1/AQl+cFMoCBsWzXs3YKoRolKMGBt9hQHnUKdP7lW
+         Cef2+oojetYDYzrRfsI0x5cIxBPza/HnPJ+VZh9tM+zWpoJGuQDvoxGHyTYCjNvXU1oc
+         TfvB4Zg1RTtfQAF4C/jbAt/P3vSVz8YImADY6tFbHIAozAHZiUelFFzk7ylpZUlwYqYI
+         XAKY4BKm+MNg+XlsptcZPXwZPxgC3Wzos3+Dh9sTfpAgM26MinVgwQF48UJAlkx2vVdB
+         rNOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXLmOI5ITQ/sK/tguSNHldEl2GNstnug7eci/5EPjZu7PwxHlu6Yp5CFOcSSJyokSzM1tMImOLOy4L5Fw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCHu6InSKFEcnu8Oxh3DL4Up9/ibx9QleQ867XgAXgf4Nidi62
+	83JmaILTGV8OgtFAu9nSsFE0MjBVm9GsIPhgJ9Wma9yYTcX/0LmpaWtpGh67O2jX2kXBRaKIK0y
+	p
+X-Gm-Gg: ASbGnctTGoaqa3R2PSTGctF+hssnwrWPO9x+6AV5CuczHrkQb2YOPqfZU7d4Hkva4k+
+	mSU0HR5fzh5Q7wvrKnRHvnaaaPRkMVpXLHMDsRlOV2VxCf08tQfNg7w8fguGtxp17xxz3p0/rwc
+	UoOmXmVzIiEuS9k4TcJNjwQefVgoYyiI2/atkP7KEQKv3Q0xUf2HGNnV6z9Q4mOuFE55n7KUoMA
+	/7+LnDzIK9v8YA9m63YJJ8QWAstqQ==
+X-Google-Smtp-Source: AGHT+IHGetUSTLBEO7g1Mr54/8uXPJm1zbpOiVPZj2JidglSRGFFA2sX/e54bN5zcvRXs+5U75O04g==
+X-Received: by 2002:a05:6a00:995:b0:725:2b93:3583 with SMTP id d2e1a72fcca58-7257fcbc006mr8373190b3a.21.1733330005713;
+        Wed, 04 Dec 2024 08:33:25 -0800 (PST)
+Received: from [127.0.0.1] ([2620:10d:c090:600::1:a7a9])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7254184952csm12955492b3a.185.2024.12.04.08.33.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 08:33:25 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+ Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
+ linux-trace-kernel@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20241204150450.399005-1-colin.i.king@gmail.com>
+References: <20241204150450.399005-1-colin.i.king@gmail.com>
+Subject: Re: [PATCH][next] blktrace: remove redundant return at end of
+ function
+Message-Id: <173333000444.511414.17569005007152720429.b4-ty@kernel.dk>
+Date: Wed, 04 Dec 2024 09:33:24 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: J3N2cj3nF6aDxykrMwFK5qlfovSuRZEbSoX8DncAgv0_1733328730
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-86319
 
-From: Dan Carpenter <dan.carpenter@linaro.org>
-> Sent: 04 December 2024 14:39
->=20
-> Let's add David to the Cc list because he's the expert on clamp().
 
-The traceback info misses the important point.
-I can't see the 'inlined from line 2225' message.
+On Wed, 04 Dec 2024 15:04:50 +0000, Colin Ian King wrote:
+> A recent change added return 0 before an existing return statement
+> at the end of function blk_trace_setup. The final return is now
+> redundant, so remove it.
+> 
+> Fixes: 64d124798244 ("blktrace: move copy_[to|from]_user() out of ->debugfs_lock")
+> 
+> 
+> [...]
 
-We have (line 1084):
-static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse,
-=09=09=09=09bool save, struct ioc_now *now)
-followed by:
-=09=09inuse =3D clamp_t(u32, inuse, 1, active);
+Applied, thanks!
 
-But line 2225 has:
-=09__propagate_weights(iocg, 0, 0, false, now);
+[1/1] blktrace: remove redundant return at end of function
+      commit: 62047e8946da6269cf9bcec578298dd194ee4b7f
 
-With aggressive inlining the compiler sees 'active =3D=3D 0'
-and the lo > hi test correctly triggers.
+Best regards,
+-- 
+Jens Axboe
 
-The previous version only verified 'lo <=3D hi' if it was a constant
-integer expression - which it isn't here.
 
-No idea what the code is trying to do, nor what value it expects
-clamp(val, 1, 0) to generate - likely to be 0 or 1 depending on
-the order of the comparisons.
-
-=09David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
 
