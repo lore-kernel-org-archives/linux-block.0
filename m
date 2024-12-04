@@ -1,106 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CEF152E12;
-	Wed,  4 Dec 2024 17:40:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C00149E00;
+	Wed,  4 Dec 2024 18:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733334051; cv=none; b=c/5XT2+yPUP1Ebej8MYVdLdSadeT1NEeHm84lk9UCFb1NW9NHDb6LlpcsovWMNTc2H9ozWCnCYFsIWz72L3BUjbvDYhGnaXjXYlms+am4kWDPx7/FtCbfOVelviopIp88IaKmVc1SK5JzeOJ0hqcQQE4lPEzl3kn2XoiNWdX4rE=
+	t=1733335353; cv=none; b=W4ptzcmY9Nl8q2juSV+SHyOHGd7jJb1Pw0T1j0EQJVJQLGBBRJnfXzdfZ7DWl8+j4NCfWmZNpK/7al1gD0pRpbN0MaDGFBVm19Cz32Cm6otsjN0vNp5tPCNNis1N+72Lm1/NpCJkv2t08iIrMyR15TdnrqAam0EWH5XRqev2V4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733334051; c=relaxed/simple;
-	bh=LxkpU69xnQRzVLx5RpprBjdsbPTfZlN2KukOZTd+EfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=chkQqIWFEzACmvkeEwmD6ng6KjO7ip6oA5tb/uxfThXfSGiYgrCslJQV5tHZ5tb19RGUPf1NRvQEnrDaB0SRyYboNJPaT25lq9lxRsjPYmfCZIR1qSP95maRfjg4AeFgNAMJsOjmWwjM7D8I7lMHouX9XISjNoCh9pD3EV18Ssw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W0o+6MGi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733335353; c=relaxed/simple;
+	bh=FD0/ht03WRBQ73VDBnTDMvETY2iUI2vT16e4cTuLWOg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uw8jKGYgJ9smjiD045nSm9HZxslWp1cuntgQnneHb33KTbAJtCtFAfanXiFVX1e4Yi/uDGM794jQTF71mkWnmSHLt9+YhcPUlUye1bFkg9F2eKM1x/EkXKtXTbWWOWuDLKzJt9TdzVuGHoHiQ1vYBBWdRRbRLvQk/0CtEFxIQzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U/4LTYQ7; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W0o+6MGi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31D9AC4CECD;
-	Wed,  4 Dec 2024 17:40:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733334050;
-	bh=LxkpU69xnQRzVLx5RpprBjdsbPTfZlN2KukOZTd+EfQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W0o+6MGi/wfSfQDbviNlNP+lYxR+zz8vT1Crl7fh/xTX4Jh181+4KxWEO2v9s36BS
-	 WYS7yjwzaQsVi1v0/yxcDMk8/xXOD9DAWKvQm4WMI/SiaQuB0jW8aF0WnLZye/9VQO
-	 gU1NCyetAZCaMreIT5NwzD7jGEhsrxUMCqTPNoCOQ8UmivXus38CJD7DS36qK83YDj
-	 tS01Sm1v2zIrUW3SZbYSATO2Z0Nfd3/Q8GlGVl8wcn0WQ0fC8p3UFhPQGSQW/Bsz86
-	 fOIkKi+38RkqLiWFIgHeQodQlGOpqABRbMGFgHJS0rI+BSgKQiGhdxRBB0wPblMN2k
-	 xkXpDUaI6NtQg==
-Date: Wed, 4 Dec 2024 07:40:49 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: David Laight <David.Laight@aculab.com>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	clang-built-linux <llvm@lists.linux.dev>,
-	linux-block <linux-block@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"lkft-triage@lists.linaro.org" <lkft-triage@lists.linaro.org>,
-	Linux Regressions <regressions@lists.linux.dev>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nathan Chancellor <nathan@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Subject: Re: s390: block/blk-iocost.c:1101:11: error: call to
- '__compiletime_assert_557' declared with 'error' attribute: clamp() low
- limit 1 greater than high limit active
-Message-ID: <Z1CUIT8zAqWOnot-@slm.duckdns.org>
-References: <CA+G9fYsD7mw13wredcZn0L-KBA3yeoVSTuxnss-AEWMN3ha0cA@mail.gmail.com>
- <5ffa868f-cbf0-42ae-ae10-5c39b0de05e7@stanley.mountain>
- <7920126775c74fa5915afbeedcfe2058@AcuMS.aculab.com>
- <c795c090-430a-45a6-88b2-94033d50dea2@stanley.mountain>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/4LTYQ7"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7253bc4d25eso90896b3a.0;
+        Wed, 04 Dec 2024 10:02:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733335351; x=1733940151; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:reply-to:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yo8oLvFvp2Cdm2QkdpOsus4N8Of9qDc0gvg/6YYERto=;
+        b=U/4LTYQ7/aNc/luj3MVee/0n5xy+94dsryg8WCeCSJnweTR/0lVGkI0GS34rje5Bcz
+         dbImJpSlOxQ2NPkbp4Swfv0hFbqFVrJF2Wt3kJ4lcpYpx8s2Mnadk3n5r6pcOnXQd45z
+         Ki7jtjVqNk1+9v35NQ0bYx4E0OE7FeHXp+ZXfIZZsW/+SmrO+B8yrcaAa2YW6X8c4M9O
+         8UrYJ5IP4Kjetq0KTUYsA1VoYAqUuWXfUreb/FXN/lCPSahspN5tgdw4OnFQ+rAg5zRq
+         bSlylGzZ8eSKgU4+5DuoBdML3iflrzXGwg32M/Bjbc/Yywp6bakmZFwjDUncUqdnIXpM
+         HGQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733335351; x=1733940151;
+        h=content-transfer-encoding:mime-version:reply-to:message-id:date
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yo8oLvFvp2Cdm2QkdpOsus4N8Of9qDc0gvg/6YYERto=;
+        b=h5k6pHh1PoZkckJjV//1lZ/jN47jeNmEZkUpNQYycUw7FVgmzxxiVgCwsa80XS8K9J
+         1dxsk1Y4AqNhAh67vZMD5elXjXM0O+4aAT6pBXUYxrxk5bBf2Axw7R3N4/Jv/by5ueWs
+         ojCEhGN++iVJ8S5ISjoPBYsIKOCwcd8zTiaNC/2WZm64xPz4Ugrp8UevZdbFN1yfu89Z
+         yJiGcvyn7GnrtH3BvVwpIyxFt9YGR+xtjFwON+syg0b54iOtnWm1s270BZUylMligwZu
+         zyMJ5d9qe8fBZywv2pAzqYILPTDLd8E+FPqjgZBUXqQiDdjb6/HbsAkHBI67+9hHgPrF
+         USAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCViLUqUAM7bfVaf9OeuvnBYiZsK7aOGyMFeQX3UUAxlBm2pUukD2n6lnDF5q/7Dr8zcAtCfmSIyEKZC0A==@vger.kernel.org, AJvYcCWUgydJxNXbedrDAeaIlJ9K7drtI7VzIVbguO6OLieSazm5puajJ1R0uYiPTZu3dkzSzb5FosJtl/yc7UnY@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhvZLRCPGU92PozAPrXtPoyOfx4COYGk7ZzaJXpswhtqcs9x9u
+	WwSMK3jUsFV1Ho8Ywpf5wVjPf6CWe3MMg9/NkstHZDyZcsNXkxCd
+X-Gm-Gg: ASbGncvlU1ctNferwXXOO+kb7ZJbzijPmy5QoxMH5WcGf90zDZHppirYwp2RF9H1gvL
+	fYyJJsuQ1Apege48Q+MXbqgq1e+z3UzEo7OZ3vgXYjf/4AmxfiF0Jp6vGmRRMkmjs+i9rx158wi
+	IsXdMIFsAySbkHe5wt4oAL6Y7EbVtRwJ7DkxbcZI96OSAQReY3GXkaYzf/FkHFgv7fvarmbPSnw
+	yrGcUkDWvM9XiO+AzKFyZ7ZnTttzldaltwkU3Q/VQyBjKupyQz6xYDlxzcy3kTZ0Cd/YhY=
+X-Google-Smtp-Source: AGHT+IH2CjLl7GpfCImh5nXrWR251HH3lwwOJlzvSb3HK65i5oIna5wpFc6Xf720CRDjEYag1bQMfw==
+X-Received: by 2002:a05:6a00:14cc:b0:71e:60d9:910d with SMTP id d2e1a72fcca58-7259d5a971emr384560b3a.6.1733335350874;
+        Wed, 04 Dec 2024 10:02:30 -0800 (PST)
+Received: from KASONG-MC4.tencent.com ([101.32.222.185])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7258947b48fsm2064736b3a.47.2024.12.04.10.02.28
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 04 Dec 2024 10:02:30 -0800 (PST)
+From: Kairui Song <ryncsn@gmail.com>
+To: linux-mm@kvack.org
+Cc: Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kairui Song <kasong@tencent.com>
+Subject: [PATCH 0/2] zram: fix backing device setup issue
+Date: Thu,  5 Dec 2024 02:02:22 +0800
+Message-ID: <20241204180224.31069-1-ryncsn@gmail.com>
+X-Mailer: git-send-email 2.47.0
+Reply-To: Kairui Song <kasong@tencent.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c795c090-430a-45a6-88b2-94033d50dea2@stanley.mountain>
+Content-Transfer-Encoding: 8bit
 
-Hello,
+From: Kairui Song <kasong@tencent.com>
 
-On Wed, Dec 04, 2024 at 07:50:14PM +0300, Dan Carpenter wrote:
-> Tejun probably reads everything to linux-block, but let's CC him explicitly.
+This series fixes two bugs of backing device setting:
 
-Oh, I'm not. Thanks for cc'ing.
+- ZRAM should reject using a zero sized (or the uninitialized ZRAM
+  device itself) as the backing device.
+- Fix backing device leaking when removing a uninitialized ZRAM
+  device.
 
-> block/blk-iocost.c
->   2222                          TRACE_IOCG_PATH(iocg_idle, iocg, now,
->   2223                                          atomic64_read(&iocg->active_period),
->   2224                                          atomic64_read(&ioc->cur_period), vtime);
->   2225                          __propagate_weights(iocg, 0, 0, false, now);
->                                                           ^
-> Why is "active" zero?  __propagate_weights() does a clamp() to 1 as minimum and
-> we've added new build time asserts so this breaks the build.
-> 
->   2226                          list_del_init(&iocg->active_list);
-> 
-> The other way to solve this would be to something stupid like:
-> 
-> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-> index 384aa15e8260..551edd2f661f 100644
-> --- a/block/blk-iocost.c
-> +++ b/block/blk-iocost.c
-> @@ -1094,7 +1094,7 @@ static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse,
->          * @active. An active internal node's inuse is solely determined by the
->          * inuse to active ratio of its children regardless of @inuse.
->          */
-> -       if (list_empty(&iocg->active_list) && iocg->child_active_sum) {
-> +       if ((list_empty(&iocg->active_list) && iocg->child_active_sum) || active == 0) {
->                 inuse = DIV64_U64_ROUND_UP(active * iocg->child_inuse_sum,
->                                            iocg->child_active_sum);
->         } else {
-> 
-> But that seems really stupid.
+Kairui Song (2):
+  zram: refuse to use zero sized block device as backing device
+  zram: fix uninitialized ZRAM not releasing backing device
 
-This is a good catch. It's impressive that this can be caught at compile
-time. The upper limit can become zero but the lower limit should win as
-that's there to protect against divide by zero, so I think the right thinig
-to do is replacing clamp() with max(min()). Is someone interested in writing
-up the patch and sending it Jens' way?
-
-Thanks.
+ drivers/block/zram/zram_drv.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 -- 
-tejun
+2.47.0
+
