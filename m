@@ -1,106 +1,127 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C35720ADDD;
-	Wed,  4 Dec 2024 15:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6108320B81B;
+	Wed,  4 Dec 2024 15:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733324697; cv=none; b=aZD3wx89aMiyPRfS6gCQSYoEyfe2VsOSaw+2b+LHcrv5EjBpvcVGrNk4zwC9RyMDjfL5leb1lbxelimRyxy5hCMP8PpVZucMONXbgOamhT/dsuT8EnrzJYPK1on5+SrnSZaRzpNbTUbh5K8U/wXUppQhrMq2u4uPi0lSZ3g8SC0=
+	t=1733325654; cv=none; b=PGyS5pSQZ30IbhqN2jUmjHulbPaABnHGwEMtp1WZvjGUCknzu8m++xulgNAGRo1s4aktcVVuV2kaMaLne0UTWP0Q9E8R1s+Vz0Ky+lZklof3Grc2FcX0cdU3lSdOBlthSKyKwQSUBfNgsSF11JDMtaS9tgKaClPMSO0UuDWXFd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733324697; c=relaxed/simple;
-	bh=hewadqbWLJKRts95eOYXdwWNooML3XA7/3FBG/3C6lg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ZttceMr9Cl5J6yp7vOkA17PHUubHvIzaIpZWgOyKM1plmd0JPCmsZRcftx2zP/UrIwC6Av2ucg2OTySGsuWiSZ+9qu5dBnfCPCjCVCIXyv68E0cgqDCQDZTWmy0s8Ty55wtm0JYS3xQrsRQFQNN5nT6cEpZ2a4wWt2BVtVngGjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R7pvPyRr; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733325654; c=relaxed/simple;
+	bh=WyRjM3dv0HfOFrfDDpXygkHRnEpGiIWkVJqm3wA3pXE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WP1xifmo43o7r1a69TfJsipNaGSI+2LROX0dOCUGTuzHhKy+Z0+5FiEOOtgkBp6ax6TCXaGWdqxTH0x6M+BYE3sRUTedfV45HcpQt1bUhR1rERsMdQVR3EEzCOAhv2ALu89EU4Syx4iFemP7nGEIVemlVHeKs2GC783/Ebju/mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ni1PLMfM; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R7pvPyRr"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-434a1833367so6400285e9.1;
-        Wed, 04 Dec 2024 07:04:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733324694; x=1733929494; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EA+h0saep05HaBgoBiILoVwh5Jsa3eA0cCo7gYVbZ2A=;
-        b=R7pvPyRrIUbSB/5kgooy2b5aBCjVY0DwgUSJCvVTDU6K8jATal5gN6ul9V4OdaPVrd
-         vLxTq2ZuYUI0SL8Qe5YsAuVwVPvesSQ6/tM+dOBV02v8k8fCiZFNrxkJCXpEgWHXb9v+
-         nue2kuFm0kLc9bhgDuWnY0FILN22JU1l4/53IFRAPNSltdmCMb6I0PAhmaOzpmkP03Fg
-         D/QXISpTPdPMMD/keri/h6q9rzwKFBGJtEHCcantVX/0xQf7MnQeFnSZ1OePnLGvqmte
-         xWmyLU+8pbcmBEKeY6a2k+72BkvFz0BFYnOk+Yh4+8IYZ2nir33nhuH89NtTmF7qJzlz
-         966A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733324694; x=1733929494;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EA+h0saep05HaBgoBiILoVwh5Jsa3eA0cCo7gYVbZ2A=;
-        b=uSLajtFj7BgsT0TkwoIhWsvUv43H36od8Hvd2FrYpuYqiF6b76gW4KX/6oQ2RqkEiI
-         NZNu8/LWeUUwzhMVgD14UXNS2q65DcrGP1u2ln+VkfJG89RoXIOq/yvlPO/bvizXbUkw
-         qXkBo7Xaezxf8xBOJUj2V+2nmhC8fC16eUcJuwEBJKtuenBNPIKprEK8GHNL5OLE1ed+
-         meA016dyvc2w8PbwZMnkklZbWgQj+WnJg4rQbLOX34fAkIkCE4vuiAjw0pLedzDL0MLK
-         OHRKbKof+TrXaapFPNTt7zGo18Lt7u2+0tmg4DWsR9xxzdqlohDRLcVOpxYnLieIb5h1
-         bi2w==
-X-Forwarded-Encrypted: i=1; AJvYcCUhSbMpqzO7hmrJ2NIkolyc7mMGR+ILeQ7g4g/YpoC4qPYl9qzDPzjItJGlI/b0BVVDlJIdXd7Au7FXVg==@vger.kernel.org, AJvYcCVJ6koNaLoPv9TbHeu9OQ5g7TZILGDaPTtTMMEZ4hE61L59Mh6ZaVPyzFBzj7NEXQ5ryC77x4pfVfSbxlqkTBY0mJJ2@vger.kernel.org, AJvYcCWocS+p/HBu6vy39TmRsqqzb0McPgorJkJSz0oA0MLnUxDPfBerKUonbabmdwSJNAF2wgmjjbUF4gEF9ElN@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQi8ffZ5U67Iyat/4HFBp1mn0DUr/35lVzqMS4xWOh0ba7wZ8P
-	9J80fd/068TtPx9RqxKKc/dd6+tLtJCeSOQ3xQSSdMwDiG0gQJGs
-X-Gm-Gg: ASbGnctzC6Is0Q/j1u5ZR/pD7ZMDWqf+hsshFElQHa2+zkm6HN2oEJCuN9QtC0wPdQA
-	CKQXVcfGU7Epzv4x7xhU0hlAFvJMbTJrB7KhTYfIcc78qR9zGVSbNjs9Z89HZ4yjvfbyLgFUmF3
-	ry9oWFsecsDKrT8zc6HIRLRC7lJ0K7PtkX7csmOQRUWoqCClcmdvE4VEIvj7YtTSStyi2MOhYD7
-	8OlXRfH39A+JyV1ie4iRjx4iXLMumGVgQWfV2XdxH+cy7nDae4=
-X-Google-Smtp-Source: AGHT+IG9QX67ZxBd606G3QR1uTGV5YwZCnPF29rocVK9K7/R3gYKV4ItXJrojh7qMPNmn18OgiE1Zg==
-X-Received: by 2002:a05:600c:458e:b0:431:4a82:97f2 with SMTP id 5b1f17b1804b1-434afb944bbmr222608275e9.6.1733324691930;
-        Wed, 04 Dec 2024 07:04:51 -0800 (PST)
-Received: from localhost ([194.120.133.65])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d5273b1dsm27157315e9.15.2024.12.04.07.04.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2024 07:04:51 -0800 (PST)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Ming Lei <ming.lei@redhat.com>,
-	linux-block@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] blktrace: remove redundant return at end of function
-Date: Wed,  4 Dec 2024 15:04:50 +0000
-Message-Id: <20241204150450.399005-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ni1PLMfM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1733325652; x=1764861652;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WyRjM3dv0HfOFrfDDpXygkHRnEpGiIWkVJqm3wA3pXE=;
+  b=Ni1PLMfMIhvWYxOwDp4jN0JepGI+OKx/wOAjaO3qV0I15y8hB/1BxbSC
+   R2A9GJ4KsA/QkQ+RvgTFYr5V/e5uXk7mruRWgdcy6wmSq3pcZgwvTInmR
+   e2k9gX45OAFjAhPh5BxUsjHcmmnicTEAwzedFAXxm/oUGPOi//R0MD4/z
+   1uEaQns2Rr9JSKt10cMlNizv/2f1aIk0EQTh44EgGRghIdPkI057l1Fq8
+   PHFccOGM06dSJc9elSMzLEgncWACK7GEe6Rcgw7Ulxad2sxDHVgHK1xFE
+   k2B69JLJZamGm+C+JDxZunr2TL6TxLKicpg9iJpbhQ/jyNNGI+bHIl7JQ
+   A==;
+X-CSE-ConnectionGUID: OV03fxL9Sy6iri83F8Z/Bg==
+X-CSE-MsgGUID: 9RQ31si5SZOMXjIB0qwQ4g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="51129354"
+X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
+   d="scan'208";a="51129354"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 07:20:52 -0800
+X-CSE-ConnectionGUID: hBni0WmKRv2OsT7jczMqAg==
+X-CSE-MsgGUID: vC0+38RLS1mXsFi1u5XvFQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
+   d="scan'208";a="97861589"
+Received: from lkp-server02.sh.intel.com (HELO 1f5a171d57e2) ([10.239.97.151])
+  by fmviesa003.fm.intel.com with ESMTP; 04 Dec 2024 07:20:49 -0800
+Received: from kbuild by 1f5a171d57e2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tIrBC-0003Cf-0n;
+	Wed, 04 Dec 2024 15:20:43 +0000
+Date: Wed, 4 Dec 2024 23:19:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ferry Meng <mengferry@linux.alibaba.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, virtualization@lists.linux.dev
+Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	io-uring@vger.kernel.org, Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Jeffle Xu <jefflexu@linux.alibaba.com>,
+	Ferry Meng <mengferry@linux.alibaba.com>
+Subject: Re: [PATCH 2/3] virtio-blk: add uring_cmd support for I/O passthru
+ on chardev.
+Message-ID: <202412042324.uKQ5KdkE-lkp@intel.com>
+References: <20241203121424.19887-3-mengferry@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241203121424.19887-3-mengferry@linux.alibaba.com>
 
-A recent change added return 0 before an existing return statement
-at the end of function blk_trace_setup. The final return is now
-redundant, so remove it.
+Hi Ferry,
 
-Fixes: 64d124798244 ("blktrace: move copy_[to|from]_user() out of ->debugfs_lock")
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- kernel/trace/blktrace.c | 2 --
- 1 file changed, 2 deletions(-)
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.13-rc1 next-20241203]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 18c81e6aa496..3679a6d18934 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -639,8 +639,6 @@ int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 		return -EFAULT;
- 	}
- 	return 0;
--
--	return ret;
- }
- EXPORT_SYMBOL_GPL(blk_trace_setup);
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/Ferry-Meng/virtio-blk-add-virtio-blk-chardev-support/20241203-202032
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20241203121424.19887-3-mengferry%40linux.alibaba.com
+patch subject: [PATCH 2/3] virtio-blk: add uring_cmd support for I/O passthru on chardev.
+config: i386-randconfig-063-20241204 (https://download.01.org/0day-ci/archive/20241204/202412042324.uKQ5KdkE-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241204/202412042324.uKQ5KdkE-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412042324.uKQ5KdkE-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/block/virtio_blk.c:144:28: sparse: sparse: restricted __virtio32 degrades to integer
+>> drivers/block/virtio_blk.c:1337:53: sparse: sparse: restricted blk_opf_t degrades to integer
+>> drivers/block/virtio_blk.c:1337:59: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted blk_opf_t [usertype] opf @@     got unsigned int @@
+   drivers/block/virtio_blk.c:1337:59: sparse:     expected restricted blk_opf_t [usertype] opf
+   drivers/block/virtio_blk.c:1337:59: sparse:     got unsigned int
+>> drivers/block/virtio_blk.c:1405:26: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __virtio64 [assigned] [usertype] sector @@     got restricted __virtio32 @@
+   drivers/block/virtio_blk.c:1405:26: sparse:     expected restricted __virtio64 [assigned] [usertype] sector
+   drivers/block/virtio_blk.c:1405:26: sparse:     got restricted __virtio32
+>> drivers/block/virtio_blk.c:1410:26: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned int rq_flags @@     got restricted blk_opf_t [usertype] @@
+   drivers/block/virtio_blk.c:1410:26: sparse:     expected unsigned int rq_flags
+   drivers/block/virtio_blk.c:1410:26: sparse:     got restricted blk_opf_t [usertype]
+>> drivers/block/virtio_blk.c:1414:26: sparse: sparse: invalid assignment: |=
+   drivers/block/virtio_blk.c:1414:26: sparse:    left side has type unsigned int
+   drivers/block/virtio_blk.c:1414:26: sparse:    right side has type restricted blk_opf_t
+   drivers/block/virtio_blk.c: note: in included file (through include/linux/mmzone.h, include/linux/gfp.h, include/linux/slab.h):
+   include/linux/page-flags.h:237:46: sparse: sparse: self-comparison always evaluates to false
+   include/linux/page-flags.h:237:46: sparse: sparse: self-comparison always evaluates to false
+
+vim +144 drivers/block/virtio_blk.c
+
+   141	
+   142	static bool virtblk_is_write(struct virtblk_command *cmd)
+   143	{
+ > 144		return cmd->out_hdr.type & VIRTIO_BLK_T_OUT;
+   145	}
+   146	
+
 -- 
-2.39.5
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
