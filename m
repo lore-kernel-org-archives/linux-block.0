@@ -1,142 +1,133 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D05D18C034
-	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 08:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1198A1990C4;
+	Wed,  4 Dec 2024 08:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733300455; cv=none; b=ATlLqk1xrJ7Vb2VEt68urbk8KoxRYDzn/VHPU9BOnQ5GTauNxN+osFs8lxz5xKZ2V7KD/nlMoGUgw4nmXzLReejGTWLgT8PF9inJ4vLsuREsmagb2UwL26leLoceQtRlkT8azwZEL2HRNbw5Lfzvyfjwy7c6zN2adogNiP19zcg=
+	t=1733301939; cv=none; b=fxutrGNlXD7xTQWPN8ygyciv76Ve8TkU+57Pl659h9u0Mmuve/M2RCI/eqZ8OTC+BQHwVnL2mR4jbsurUreGGmmk8s6dFwL218RQfB0Hw7/XC9QcUaP7HEPq5RhS9eZmxHyhjvqpP0sFWFl1duSx8jQRQhnMEd0EpsFmQp3i9fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733300455; c=relaxed/simple;
-	bh=O13DDcLQ25KD340z4Z5Yyhmco6vbF1qHXsYOqTV1yBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=LYndzwn5gMmX74bmxj/9eWF15myZJlz6Xtza1LPMBq9xhpdvrU75UeVcf1F5271P1LDoTDksyypviL9GPrDT1wtF45Z3cVK7//JfwmvoWKaxurUyoCFNgCDm18AwAVUdjL9pQe5YVbuFxdMvDjYfdi674Vc9TfnehaZXwkvHegE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=KaDd1ZGj; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="KaDd1ZGj"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20241204082050epoutp03523973e1cb07d5240af8f3c4eaf74462~N65N39_mF1011810118epoutp03d
-	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 08:20:50 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20241204082050epoutp03523973e1cb07d5240af8f3c4eaf74462~N65N39_mF1011810118epoutp03d
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1733300450;
-	bh=ijTn2RZpszgvF0yCphU0nJ2OjpujKXhxXXTisuwagvk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KaDd1ZGj49Fjeg/Fa2m4PtI0DfEES9tYH8rcgKS6uPAnGv1QDMJqJNh97AyGgRMVf
-	 zhNbOBG/bo0B73kD3c+UF284DIVK+dmuXOhOwRDuElyzTFOFzpeUtI67zZS6Oebx4i
-	 ChVV5sRBoEDBsIzLwwXEuZ2cgiJA5XbO1p0SVs1Y=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-	20241204082049epcas5p231edcf7fc51b73b40ceca6afe8b6667d~N65NKIjfV2555925559epcas5p2m;
-	Wed,  4 Dec 2024 08:20:49 +0000 (GMT)
-Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.178]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4Y39Sw14YQz4x9Q1; Wed,  4 Dec
-	2024 08:20:48 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	C6.75.19710.FD010576; Wed,  4 Dec 2024 17:20:48 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20241204081706epcas5p40981cc87d05ff313b42b8a11e28deafb~N619v5uft1247712477epcas5p4P;
-	Wed,  4 Dec 2024 08:17:06 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20241204081706epsmtrp282362d787953a8683ebae90061f2fc31~N619t515O2674426744epsmtrp2V;
-	Wed,  4 Dec 2024 08:17:06 +0000 (GMT)
-X-AuditID: b6c32a44-36bdd70000004cfe-84-675010df9bff
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	4A.92.18729.20010576; Wed,  4 Dec 2024 17:17:06 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20241204081704epsmtip231987e4d4f9c94a17b31717e6e6df6e0~N617YUVNO3208632086epsmtip21;
-	Wed,  4 Dec 2024 08:17:04 +0000 (GMT)
-Date: Wed, 4 Dec 2024 13:39:03 +0530
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>, axboe@kernel.dk,
-	hch@lst.de, kbusch@kernel.org, anuj1072538@gmail.com, brauner@kernel.org,
-	jack@suse.cz, viro@zeniv.linux.org.uk, io-uring@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com, linux-scsi@vger.kernel.org, vishak.g@samsung.com,
-	linux-fsdevel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v11 06/10] io_uring: introduce attributes for read/write
- and PI support
-Message-ID: <20241204080903.GA16700@green245>
+	s=arc-20240116; t=1733301939; c=relaxed/simple;
+	bh=cxBWfMZH2U+jwIDZvQvJEXLqWIblgWr8+ybOCIolbnc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iqCfdbCDvdX5gAhtrbLAt1OCMXMPrW7rVOsfHaskPq9qwKnncgfuPl1W3EDlEp/alK8qGDg2TEm8k6/I0rvt2ALWRcqjszZnmJDUDk32sl8AtpWI95BoLHh1maTzdWrZ+G+A/SK/X92kGVIKd3SFsvKjrgW+mFkB6M6px5GtAc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dugarreau.fr; spf=none smtp.mailfrom=dugarreau.fr; arc=none smtp.client-ip=217.72.192.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dugarreau.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dugarreau.fr
+Received: from [127.0.1.1] ([185.116.133.150]) by mrelayeu.kundenserver.de
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M1IRY-1tLW5B02fK-00CGAz; Wed, 04 Dec 2024 09:40:03 +0100
+From: =?utf-8?q?Beno=C3=AEt_du_Garreau?= <benoit@dugarreau.fr>
+Date: Wed, 04 Dec 2024 09:38:39 +0100
+Subject: [PATCH] block: rnull: Initialize the module in place
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <b8574010-e2fc-4566-9df8-80046fec2845@gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMJsWRmVeSWpSXmKPExsWy7bCmuu4DgYB0gydTmCw+fv3NYjFn1TZG
-	i9V3+9ksXh/+xGhx88BOJouVq48yWbxrPcdiMXt6M5PF0f9v2SwmHbrGaLH3lrbFnr0nWSzm
-	L3vKbtF9fQebxfLj/5gszv89zmpxftYcdgdBj52z7rJ7XD5b6rFpVSebx+Yl9R67bzaweXx8
-	eovFo2/LKkaPMwuOsHt83iTnsenJW6YArqhsm4zUxJTUIoXUvOT8lMy8dFsl7+B453hTMwND
-	XUNLC3MlhbzE3FRbJRefAF23zBygd5QUyhJzSoFCAYnFxUr6djZF+aUlqQoZ+cUltkqpBSk5
-	BSYFesWJucWleel6eaklVoYGBkamQIUJ2Rnnrx5mLdjGWvH98TuWBsarLF2MnBwSAiYSV7de
-	Yu9i5OIQEtjNKHH43T9mkISQwCdGibfPciES3xglLvw8A9cx+0gPI0RiL6PEnp3X2CCcZ4wS
-	m/Z8B6tiEVCR+PRuHiOIzSagLnHkeSuYLSKgLfH6+iGwfcwCS5glrrybC7ZPWCBWYufMNWA2
-	r4CuxN6Pj1ggbEGJkzOfgNmcArYSG7ctYgexRQWUJQ5sO84EMkhC4AGHxL3vV5gg7nOR6Ola
-	zAhhC0u8Or6FHcKWkvj8bi8bhJ0u8ePyU6j6AonmY/ug6u0lWk/1gx3BLJAhcXvjK6heWYmp
-	p9YxQcT5JHp/P4Hq5ZXYMQ/GVpJoXzkHypaQ2HuuAcjmALI9JO605EDCdCeTxNQ5xhMY5Wch
-	eW0Wkm0Qto7Egt2f2GYBdTMLSEss/8cBYWpKrN+lv4CRdRWjZGpBcW56arJpgWFeajk8wpPz
-	czcxglO7lssOxhvz/+kdYmTiYDzEKMHBrCTCG7jEP12INyWxsiq1KD++qDQntfgQoykwriYy
-	S4km5wOzS15JvKGJpYGJmZmZiaWxmaGSOO/r1rkpQgLpiSWp2ampBalFMH1MHJxSDUx1xYLp
-	T5vzJ9ZO89oQXPJXvVzjy3THq4dL5Ovc2/49+9IWuperwXSDRva0/fKX1WJez18mVv0ogeHi
-	P26Zg0yOJwPT12fpdyzw7a9MYegXV84PmaBsPn/z06TFqRl7HlRy8HLX+FyW0b4edP9BV8/r
-	25UMucLT3+jdPr15v0aXId9On2OcG603F16VuHbviKBC7yf91OXeDBwaF69f6PWqPPcx4piB
-	qdLaeRxLS/1+sYdc+Fym8e7Qys/Nt3MyHlf0rZXd6r4whmsR9w97u58Zq0P4OU1UOSxTKxs9
-	VU7LpBc1qG6sPZs0Udcru/aBqM+tdgft/1tnJC1X4jfRcLTbwZb7V3vXyV9teVxhSizFGYmG
-	WsxFxYkATdakJnYEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrGIsWRmVeSWpSXmKPExsWy7bCSvC6TQEC6wbH36hYfv/5msZizahuj
-	xeq7/WwWrw9/YrS4eWAnk8XK1UeZLN61nmOxmD29mcni6P+3bBaTDl1jtNh7S9tiz96TLBbz
-	lz1lt+i+voPNYvnxf0wW5/8eZ7U4P2sOu4Ogx85Zd9k9Lp8t9di0qpPNY/OSeo/dNxvYPD4+
-	vcXi0bdlFaPHmQVH2D0+b5Lz2PTkLVMAVxSXTUpqTmZZapG+XQJXxq0ukYJvTBVPjnezNzCu
-	Y+pi5OSQEDCRmH2kh7GLkYtDSGA3o8TKu3+YIRISEqdeLmOEsIUlVv57zg5R9IRR4s2CHnaQ
-	BIuAisSnd/PAitgE1CWOPG8Fs0UEtCVeXz8E1sAssIxZ4v/TNlaQhLBArMTOmWvANvAK6Ers
-	/fiIBWo1k8SFCb0sEAlBiZMzn4DZzAJaEjf+vQS6lQPIlpZY/o8DJMwpYCuxcdsisCNEBZQl
-	Dmw7zjSBUXAWku5ZSLpnIXQvYGRexSiZWlCcm55bbFhgmJdarlecmFtcmpeul5yfu4kRHJVa
-	mjsYt6/6oHeIkYmD8RCjBAezkghv4BL/dCHelMTKqtSi/Pii0pzU4kOM0hwsSuK84i96U4QE
-	0hNLUrNTUwtSi2CyTBycUg1MEtf9c4//n1/x3Dn9W26m0CTj5s4uZv91xbN/+Z80ZrPUqc0N
-	PR72ncWYVXCivuKyx7o6cWeYdsfXvnGxyDbibueVCjmybOdHsdS1c5LZfjR2LtC4JSp0uzB0
-	bU+RxkaL513a0UtjRGa4GZzjtp/+wyo0a33IUrvaD1IfBJOjag8tmxpcWzE/fdnjd6c5Xb1+
-	Zp+TkVt5u19XfbKDWLgc7xmW3SLW0vk7JgnN2fCy+1RjbWy/5ES/Q/JHlipxT6gO7oyIkgta
-	PcVK8I5aemr5nSJJWw+d9XbaLgwF5413nzk1r9VU1fXby3evuK7OPipcbd/8THGK5+ETv8IZ
-	DBq3RX64L6EU3j31nN3TEiWW4oxEQy3mouJEAFYvDgw5AwAA
-X-CMS-MailID: 20241204081706epcas5p40981cc87d05ff313b42b8a11e28deafb
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----QQbx9Hk6-Xl4D1oMwM2uYkP7uAkYtjoi7zPie6od2LiHNIsi=_57c7d_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20241128113109epcas5p46022c85174da65853c85a8848b32f164
-References: <20241128112240.8867-1-anuj20.g@samsung.com>
-	<CGME20241128113109epcas5p46022c85174da65853c85a8848b32f164@epcas5p4.samsung.com>
-	<20241128112240.8867-7-anuj20.g@samsung.com>
-	<yq1r06psey3.fsf@ca-mkp.ca.oracle.com> <20241203065645.GA19359@green245>
-	<b8574010-e2fc-4566-9df8-80046fec2845@gmail.com>
-
-------QQbx9Hk6-Xl4D1oMwM2uYkP7uAkYtjoi7zPie6od2LiHNIsi=_57c7d_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-
-On Tue, Dec 03, 2024 at 12:00:41PM +0000, Pavel Begunkov wrote:
-> On 12/3/24 06:56, Anuj Gupta wrote:
-> > On Mon, Dec 02, 2024 at 09:13:14PM -0500, Martin K. Petersen wrote:
-> An IORING_FEAT_ flag might be simpler for now. Or is it in plans to
-> somehow support IORING_OP_READ_MULTISHOT as well?
-> 
-No, multishot doesn't fit wel. Will add a IORING_FEAT_RW_ATTR flag.
-
-------QQbx9Hk6-Xl4D1oMwM2uYkP7uAkYtjoi7zPie6od2LiHNIsi=_57c7d_
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20241204-rnull_in_place-v1-1-efe3eafac9fb@dugarreau.fr>
+X-B4-Tracking: v=1; b=H4sIAA4VUGcC/zXM0QrCMAxA0V8ZebaQtRPFXxEZbZdtgRJHOkUY+
+ 3fjwMfzcO8GlZSpwq3ZQOnNlZ9iaE8N5DnKRI4HM3j0XesxOJVXKT1Lv5SYyZ0J0yUM14CYwaJ
+ FaeTPMbw/zClWckmj5Pm3+Xc24BX2/Que9xuTgAAAAA==
+X-Change-ID: 20241203-rnull_in_place-5e0b73d8300c
+To: Andreas Hindborg <a.hindborg@kernel.org>, 
+ Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ =?utf-8?q?Beno=C3=AEt_du_Garreau?= <benoit@dugarreau.fr>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1733301602; l=2218;
+ i=benoit@dugarreau.fr; s=20241203; h=from:subject:message-id;
+ bh=cxBWfMZH2U+jwIDZvQvJEXLqWIblgWr8+ybOCIolbnc=;
+ b=+hLAeDCGQO4R2Of+/EAJ8WlTlZvIWp6dmrjrTOXGwjmFyMSxS1/HN+XeuTDv6ZRacpw3rbFCj
+ ymEpD2FdCI3Dw6DfvNbh7MRlIUVg2lE1AUCvKuOPV/2jHV+klaQHUzA
+X-Developer-Key: i=benoit@dugarreau.fr; a=ed25519;
+ pk=l4tCZw3UpEkwtwhwsl5BV1HlPvHlXLQQRh96sL21/FU=
+X-Provags-ID: V03:K1:z91Ow9ERORgj5fKYQthmbNT+6lMCY18u9hLuV/E5/6LtiMa4kk4
+ Wf0CXcNkh4cIajEQC8M//B96h5ZFxQgVV05hyJQBSEjqaGX1rW534aHVOVkfaK5t1WAYRsy
+ cnpJGT0zy2DESxKG7j4vy4JozRvow6GF0xGLUmD4N2NvI6VzbB28xXsv1y+yQBzkuk1mGNQ
+ fgr7NQV81+lgXtbcjZ/aw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:/6RFLwCjgX8=;d84qXBJWLhfQt80OPCIh+zxgg+M
+ M6Nv0N+L+GG0waOM00OTFLldTlBKm6+eLpJeepFlDW7pN24TRw59GzlMiSww58WGiGxbV8eg+
+ wNm+DWbcg0J+tgeL7nmxQqEohtBHXZpEx7FnV9DPnvg69hkvzmBWnVJ6Ze/X4HPBkhJeyi+xA
+ cZWEb/LF4Vw18NjUVAhzPG33wF6btEzgqkhF9uGlQl3HGaXEuc5PEm4lMvZegwy+TslhvC79a
+ GqRpWp+7+zUbohGeqQKb52yltN/kRacOtGlLVpTpLGJWxKqPcD7fj1fo5SwVqCkaaBKnve6nZ
+ bMLYtDgEdVFCxtzc8zhTOQAMcWZu2qsJod2sEii2kVW3hroLfXyhJV+yLEMmrdc6/Kn4JgeaZ
+ eIhY/glpwJtukb05JH6y4oQD7ZQSoOOx4yjhD+FwgPIKG5cx36Wcymwzhu14WDGb4jQNbA08O
+ HsL+m/5vsCYGoxj0LI+0Ed7X3X8CHeUidQXN8ZCvoqnWvPDrIPbRzkzXe76kz3HDIL+LIEvgL
+ 1nnV4Nz+53k5QEoTUlihezzBWJD2oMY+7+AYwJ59vug6lO3zMF7yojLsEjWQOON5Y3l1RZT8Q
+ TPtMVve/wJJO7gz56ExFitPMNY6CLthRm3hPCZOvmADVU16nTMbIR8xZgytFsLU6hpaUrXKJ2
+ FZaDWG1jEUI08NHOx4Sd9DkcTFsEc56XbKHygtX8cY+KJv93Hh4Z3o4rEbQQ0dxT3AMTtMD5z
+ h3Rapi1BICvqXRHRYAEYcsHMdQo7vxIg7rIdoQSaB3LUfA6lktGXLss+osaTNPFWq7FUr+1Ib
+ 32CPdyQCqtFUJp5RnymurtjPGwp1xcloeoHo4xbcVmVIcSWQriMmJERaxqNzXWmqwnYs0SokP
+ ZMdVjLYx/+vTjBLAfZboWHGbGvuR2nAcBUp9abo3DV5C//51Eo9FPKqN81AjJ9kQW+9ASFJP+
+ wyiqHOmFtaHaUJYln1/5w+aLOeCuw08wB7LZidz8xQUvFk+qMsBtkDxkO5I1Why/gCrGMoyl5
+ XT/NpeEhS9KZ/VO8HPYaw3vJuia5FJnvdDr6DyG
 
+Using `InPlaceModule` avoids an allocation and an indirection.
 
-------QQbx9Hk6-Xl4D1oMwM2uYkP7uAkYtjoi7zPie6od2LiHNIsi=_57c7d_--
+Signed-off-by: Benoît du Garreau <benoit@dugarreau.fr>
+---
+ drivers/block/rnull.rs | 30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/block/rnull.rs b/drivers/block/rnull.rs
+index 5de7223beb4d5b4224010c86fca826967a019c27..6cdd2589c4621369cd57af66a2b817889321ed15 100644
+--- a/drivers/block/rnull.rs
++++ b/drivers/block/rnull.rs
+@@ -31,25 +31,31 @@
+     license: "GPL v2",
+ }
+ 
++#[pin_data]
+ struct NullBlkModule {
+-    _disk: Pin<KBox<Mutex<GenDisk<NullBlkDevice>>>>,
++    #[pin]
++    _disk: Mutex<GenDisk<NullBlkDevice>>,
+ }
+ 
+-impl kernel::Module for NullBlkModule {
+-    fn init(_module: &'static ThisModule) -> Result<Self> {
++impl kernel::InPlaceModule for NullBlkModule {
++    fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+         pr_info!("Rust null_blk loaded\n");
+-        let tagset = Arc::pin_init(TagSet::new(1, 256, 1), flags::GFP_KERNEL)?;
+ 
+-        let disk = gen_disk::GenDiskBuilder::new()
+-            .capacity_sectors(4096 << 11)
+-            .logical_block_size(4096)?
+-            .physical_block_size(4096)?
+-            .rotational(false)
+-            .build(format_args!("rnullb{}", 0), tagset)?;
++        // Use a immediately-called closure as a stable `try` block
++        let disk = /* try */ (|| {
++            let tagset = Arc::pin_init(TagSet::new(1, 256, 1), flags::GFP_KERNEL)?;
+ 
+-        let disk = KBox::pin_init(new_mutex!(disk, "nullb:disk"), flags::GFP_KERNEL)?;
++            gen_disk::GenDiskBuilder::new()
++                .capacity_sectors(4096 << 11)
++                .logical_block_size(4096)?
++                .physical_block_size(4096)?
++                .rotational(false)
++                .build(format_args!("rnullb{}", 0), tagset)
++        })();
+ 
+-        Ok(Self { _disk: disk })
++        try_pin_init!(Self {
++            _disk <- new_mutex!(disk?, "nullb:disk"),
++        })
+     }
+ }
+ 
+
+---
+base-commit: 4d6f8ba6e0a7b0627b4a559747948ee0d6797a3a
+change-id: 20241203-rnull_in_place-5e0b73d8300c
+
+Best regards,
+-- 
+Benoît du Garreau <benoit@dugarreau.fr>
+
