@@ -1,127 +1,100 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6108320B81B;
-	Wed,  4 Dec 2024 15:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48537156F3C
+	for <linux-block@vger.kernel.org>; Wed,  4 Dec 2024 16:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733325654; cv=none; b=PGyS5pSQZ30IbhqN2jUmjHulbPaABnHGwEMtp1WZvjGUCknzu8m++xulgNAGRo1s4aktcVVuV2kaMaLne0UTWP0Q9E8R1s+Vz0Ky+lZklof3Grc2FcX0cdU3lSdOBlthSKyKwQSUBfNgsSF11JDMtaS9tgKaClPMSO0UuDWXFd0=
+	t=1733328742; cv=none; b=Z6HKnfTwiiN0LX45StYRuzAZ8s33DGLJQMiHRja6J02ov3D25aAp5OajLDgtMYzqEWC3j/MO2Od9OJU2daHkky3WCtuK/4UBQbGDke70yKGkMSVZ0jNulRAwfMtUdqv6OBrTfXDQeK427dd1O88S8FYewTgDWNoViRQ07I0ZsWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733325654; c=relaxed/simple;
-	bh=WyRjM3dv0HfOFrfDDpXygkHRnEpGiIWkVJqm3wA3pXE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WP1xifmo43o7r1a69TfJsipNaGSI+2LROX0dOCUGTuzHhKy+Z0+5FiEOOtgkBp6ax6TCXaGWdqxTH0x6M+BYE3sRUTedfV45HcpQt1bUhR1rERsMdQVR3EEzCOAhv2ALu89EU4Syx4iFemP7nGEIVemlVHeKs2GC783/Ebju/mM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ni1PLMfM; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ni1PLMfM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733325652; x=1764861652;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WyRjM3dv0HfOFrfDDpXygkHRnEpGiIWkVJqm3wA3pXE=;
-  b=Ni1PLMfMIhvWYxOwDp4jN0JepGI+OKx/wOAjaO3qV0I15y8hB/1BxbSC
-   R2A9GJ4KsA/QkQ+RvgTFYr5V/e5uXk7mruRWgdcy6wmSq3pcZgwvTInmR
-   e2k9gX45OAFjAhPh5BxUsjHcmmnicTEAwzedFAXxm/oUGPOi//R0MD4/z
-   1uEaQns2Rr9JSKt10cMlNizv/2f1aIk0EQTh44EgGRghIdPkI057l1Fq8
-   PHFccOGM06dSJc9elSMzLEgncWACK7GEe6Rcgw7Ulxad2sxDHVgHK1xFE
-   k2B69JLJZamGm+C+JDxZunr2TL6TxLKicpg9iJpbhQ/jyNNGI+bHIl7JQ
-   A==;
-X-CSE-ConnectionGUID: OV03fxL9Sy6iri83F8Z/Bg==
-X-CSE-MsgGUID: 9RQ31si5SZOMXjIB0qwQ4g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11276"; a="51129354"
-X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="51129354"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2024 07:20:52 -0800
-X-CSE-ConnectionGUID: hBni0WmKRv2OsT7jczMqAg==
-X-CSE-MsgGUID: vC0+38RLS1mXsFi1u5XvFQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,207,1728975600"; 
-   d="scan'208";a="97861589"
-Received: from lkp-server02.sh.intel.com (HELO 1f5a171d57e2) ([10.239.97.151])
-  by fmviesa003.fm.intel.com with ESMTP; 04 Dec 2024 07:20:49 -0800
-Received: from kbuild by 1f5a171d57e2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tIrBC-0003Cf-0n;
-	Wed, 04 Dec 2024 15:20:43 +0000
-Date: Wed, 4 Dec 2024 23:19:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ferry Meng <mengferry@linux.alibaba.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, virtualization@lists.linux.dev
-Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-	io-uring@vger.kernel.org, Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Ferry Meng <mengferry@linux.alibaba.com>
-Subject: Re: [PATCH 2/3] virtio-blk: add uring_cmd support for I/O passthru
- on chardev.
-Message-ID: <202412042324.uKQ5KdkE-lkp@intel.com>
-References: <20241203121424.19887-3-mengferry@linux.alibaba.com>
+	s=arc-20240116; t=1733328742; c=relaxed/simple;
+	bh=oPJAZmjGz3hig5ERXVpw1rcG2SyM62QcVUOtlyK08xs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=hXJfuUL4a4PsYBP1NwXvMVJOr+P0YXsX0rsXG7c5e209clOpO3SImwFQdn4KRYwT+GBysTj8wZfe+7N+vyJ1Hl8eUCHZGzPKDLvbUwk9oelHCehPzjAt/65kthgQq6mLs1die8oAZd8gau6w0ikU6KDTfW3U7Q0SW0CXbUMTudg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-155-GqQcbuu3MrGacAW_QlZAsw-1; Wed, 04 Dec 2024 16:12:11 +0000
+X-MC-Unique: GqQcbuu3MrGacAW_QlZAsw-1
+X-Mimecast-MFC-AGG-ID: GqQcbuu3MrGacAW_QlZAsw
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 4 Dec
+ 2024 16:11:33 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Wed, 4 Dec 2024 16:11:33 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Dan Carpenter' <dan.carpenter@linaro.org>, Naresh Kamboju
+	<naresh.kamboju@linaro.org>
+CC: "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	clang-built-linux <llvm@lists.linux.dev>, linux-block
+	<linux-block@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>,
+	"lkft-triage@lists.linaro.org" <lkft-triage@lists.linaro.org>, "Linux
+ Regressions" <regressions@lists.linux.dev>, Anders Roxell
+	<anders.roxell@linaro.org>, Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor
+	<nathan@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Subject: RE: s390: block/blk-iocost.c:1101:11: error: call to
+ '__compiletime_assert_557' declared with 'error' attribute: clamp() low limit
+ 1 greater than high limit active
+Thread-Topic: s390: block/blk-iocost.c:1101:11: error: call to
+ '__compiletime_assert_557' declared with 'error' attribute: clamp() low limit
+ 1 greater than high limit active
+Thread-Index: AQHbRlpA05groSrCOUKR/Ly6shl2PrLWPxCw
+Date: Wed, 4 Dec 2024 16:11:33 +0000
+Message-ID: <7920126775c74fa5915afbeedcfe2058@AcuMS.aculab.com>
+References: <CA+G9fYsD7mw13wredcZn0L-KBA3yeoVSTuxnss-AEWMN3ha0cA@mail.gmail.com>
+ <5ffa868f-cbf0-42ae-ae10-5c39b0de05e7@stanley.mountain>
+In-Reply-To: <5ffa868f-cbf0-42ae-ae10-5c39b0de05e7@stanley.mountain>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241203121424.19887-3-mengferry@linux.alibaba.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: J3N2cj3nF6aDxykrMwFK5qlfovSuRZEbSoX8DncAgv0_1733328730
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Ferry,
+From: Dan Carpenter <dan.carpenter@linaro.org>
+> Sent: 04 December 2024 14:39
+>=20
+> Let's add David to the Cc list because he's the expert on clamp().
 
-kernel test robot noticed the following build warnings:
+The traceback info misses the important point.
+I can't see the 'inlined from line 2225' message.
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on linus/master v6.13-rc1 next-20241203]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+We have (line 1084):
+static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse,
+=09=09=09=09bool save, struct ioc_now *now)
+followed by:
+=09=09inuse =3D clamp_t(u32, inuse, 1, active);
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ferry-Meng/virtio-blk-add-virtio-blk-chardev-support/20241203-202032
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20241203121424.19887-3-mengferry%40linux.alibaba.com
-patch subject: [PATCH 2/3] virtio-blk: add uring_cmd support for I/O passthru on chardev.
-config: i386-randconfig-063-20241204 (https://download.01.org/0day-ci/archive/20241204/202412042324.uKQ5KdkE-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241204/202412042324.uKQ5KdkE-lkp@intel.com/reproduce)
+But line 2225 has:
+=09__propagate_weights(iocg, 0, 0, false, now);
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412042324.uKQ5KdkE-lkp@intel.com/
+With aggressive inlining the compiler sees 'active =3D=3D 0'
+and the lo > hi test correctly triggers.
 
-sparse warnings: (new ones prefixed by >>)
->> drivers/block/virtio_blk.c:144:28: sparse: sparse: restricted __virtio32 degrades to integer
->> drivers/block/virtio_blk.c:1337:53: sparse: sparse: restricted blk_opf_t degrades to integer
->> drivers/block/virtio_blk.c:1337:59: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted blk_opf_t [usertype] opf @@     got unsigned int @@
-   drivers/block/virtio_blk.c:1337:59: sparse:     expected restricted blk_opf_t [usertype] opf
-   drivers/block/virtio_blk.c:1337:59: sparse:     got unsigned int
->> drivers/block/virtio_blk.c:1405:26: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __virtio64 [assigned] [usertype] sector @@     got restricted __virtio32 @@
-   drivers/block/virtio_blk.c:1405:26: sparse:     expected restricted __virtio64 [assigned] [usertype] sector
-   drivers/block/virtio_blk.c:1405:26: sparse:     got restricted __virtio32
->> drivers/block/virtio_blk.c:1410:26: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned int rq_flags @@     got restricted blk_opf_t [usertype] @@
-   drivers/block/virtio_blk.c:1410:26: sparse:     expected unsigned int rq_flags
-   drivers/block/virtio_blk.c:1410:26: sparse:     got restricted blk_opf_t [usertype]
->> drivers/block/virtio_blk.c:1414:26: sparse: sparse: invalid assignment: |=
-   drivers/block/virtio_blk.c:1414:26: sparse:    left side has type unsigned int
-   drivers/block/virtio_blk.c:1414:26: sparse:    right side has type restricted blk_opf_t
-   drivers/block/virtio_blk.c: note: in included file (through include/linux/mmzone.h, include/linux/gfp.h, include/linux/slab.h):
-   include/linux/page-flags.h:237:46: sparse: sparse: self-comparison always evaluates to false
-   include/linux/page-flags.h:237:46: sparse: sparse: self-comparison always evaluates to false
+The previous version only verified 'lo <=3D hi' if it was a constant
+integer expression - which it isn't here.
 
-vim +144 drivers/block/virtio_blk.c
+No idea what the code is trying to do, nor what value it expects
+clamp(val, 1, 0) to generate - likely to be 0 or 1 depending on
+the order of the comparisons.
 
-   141	
-   142	static bool virtblk_is_write(struct virtblk_command *cmd)
-   143	{
- > 144		return cmd->out_hdr.type & VIRTIO_BLK_T_OUT;
-   145	}
-   146	
+=09David
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
