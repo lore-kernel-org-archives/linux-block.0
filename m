@@ -1,71 +1,70 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6197C1A8F6D
-	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 07:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D331E194C85
+	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 07:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733382358; cv=none; b=KLK3UOCzadfwA32/y7lqctjCfazc7Y24E1IbmcFmdySjK/SSK5mkkvV2bwEGnWX/eUs7139JqiNCAb/wYXKOnPzlOSoorfmdySLZHoYdaW/9pMwD0QFlWJ46XKRooyW5iPrv2ThdZ0PfcFCVsnI0D+x7EQRDYN2byG/sYOmPwps=
+	t=1733382586; cv=none; b=UrOJF6NS+YUM+DpTfZAnJ3j+ELeASr5TbqTFAEWdvFi9EIrW2XYHyjR53k48F6gIq2ueKYsSoeqAsjG7KUDRneWZ4gJnCZOvnhX+cbbu9Nj8Mi+cfe/pQVjh5eUi7rSeXro5FhMcr6pLiqB1lsshMD2CWPeQbraiQo0OD70Y0AY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733382358; c=relaxed/simple;
-	bh=zjJgxmY2y1deqyKR6Stt9PT+fsWAX390mIy9QNV8za8=;
+	s=arc-20240116; t=1733382586; c=relaxed/simple;
+	bh=grkbsRH6D4ZYbAuOb1wmAAyXnV7iDlG0b6TewkJIGas=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LgDMHcX4k9CD64FBoysOYrjZ84aqaCpVykbAgznwmF/xq8IJ9qKwZ/qMUzIBoQvkuqWJMNlCFT5solP7IEOjlphluwXxsvWu7jk0/Mn9HdBVwhRGRdJg/gDW6FNrhDhEZ5LwKfaMD4KO30n3MQPTpgRYuiMDBMNzGE3Jsdss9zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=YsJncUg1; arc=none smtp.client-ip=209.85.214.175
+	 Content-Type:Content-Disposition:In-Reply-To; b=A9godCG7hLSBFpr5BDXbTwG/aQSO8GpfogPyXyzY4atpxVqOX8pqyRC55IOPuhwNpRS9sOmGrX3HFzD9xgYR5cWrxSUFyKW6Jz8Kbwbe9uypIfBDpHrhA/GNdxsvXsAG5IxPbMqBvd4inYnCbv0axxUiZsG79G8WX8LI8BLINFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=NsO9kCsX; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YsJncUg1"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21577f65bdeso4965305ad.0
-        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2024 23:05:57 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NsO9kCsX"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7ee11ff7210so522712a12.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2024 23:09:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1733382357; x=1733987157; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1733382584; x=1733987384; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pnVjnK/k6GXXnPfVx21d5+g3wu4ThlrDFA24wTktnFw=;
-        b=YsJncUg1a1f6U1pWsuQgbpsAxT8+oIrE0rzyWKTp8gT/FSob/b6EzyyycQe0BbTJE9
-         ZWlqWhSXG/rlcmo+XyLQ06rTNJlSGO1tOfNG9wAf+fg6tSHr2ZVuuQjL/hQMeGDcC7Yd
-         U1FTktsfhLwuAtLKuR6KTRXHYbPcEB0ND0mGA=
+        bh=SHVMmQ/KzbcoO5ieQjC56n0uvyFf9M/Mj/sBzX0iX8s=;
+        b=NsO9kCsXqWNmeiqUXxTVF1KOXwcQtipmoak50kQZQMmK89e+Y3q7VfDOcOrUJb215S
+         30qmslclFKHLfVF0YXJ4r3429pPKL7d8uSaAXoJ5Yjw5p5liTy3VW8hQ/pxYlqYb9S4T
+         TfFaNRfkjmVRSfy/6sMdyAVzbFWBAyvcM7Ucw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733382357; x=1733987157;
+        d=1e100.net; s=20230601; t=1733382584; x=1733987384;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pnVjnK/k6GXXnPfVx21d5+g3wu4ThlrDFA24wTktnFw=;
-        b=hPELWIhqZmU3D+bMd01mZbdHS+Y+azoZVfdG5nCnqTtIz315clvsz7erpZx3b4u24l
-         rnKD8q6aexLq07QlY2HsFlUTsl2cLgkrOeOYqx1ZP/jOYQ2jqpGD39UZTWBk3IdUUyNv
-         K6h3S0mx+cZsUXXa/vH2LlnasJYxGLeJNtjw2BysP08mSNTVh4UOpjg+wKANSK/wirQq
-         5IAPpPZrsvhlysOXu7GAnfTLU76c45ExR+WB6JfS5rcr4f7SbBvkw9a9QuUg8kb/1vX+
-         k/4gM5C9W5yqkJIe78+Ii45VtUeGc+XKSmOKaYBaCie0IObRUoKkPhmmV3YYxEmKpXsv
-         FzRA==
-X-Forwarded-Encrypted: i=1; AJvYcCUZZ8LjCZ6ukdM9VjkIqM4XPNxK2pGKUbbKLdC47M9cIgzIt3llFy5rYrYBiBL0sU5OJjQMC/3q7efgQA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzattCPYCZhN0mmcyXPw2h8Snp/DTrLTr8lnPcuQHLBe+w8IHdc
-	hXT9F6XiAG29/WCTZ25s11VZYxJMU1rqhl/Pa+0dxRRUgxZcYTTykHChYqbi5yofPtGPMERGNds
-	=
-X-Gm-Gg: ASbGncvB9q/p65sUbtMkNFj2yr5DeTLd+uwCAdFjQQPRPpH+XSSfkzwSyzpLw33/FYQ
-	wGPU1Q8bnrDGSRmTs0WJcmmohWpThSl7P0eIWx6E8xO4Fcg706z9RvXVTlwBII3GqduqGEBzT5C
-	5Tf2RS9jrTbWYAY+tzX5Wpbhtn59hgmWsHNDMVujJ6IWj/MtLgKQe6sPVPVLrFREEBE9Pi5OaI9
-	o1I4H+EKY07E2oXSSpxkgPD+kxJ09+AYh2ahfEAS7Qng/5GT1HE
-X-Google-Smtp-Source: AGHT+IHmb5xrPz+rTcqYtFMLlN13EqPWRM+lusJzh9gyYi0pYOG3cg9tOPzuRPSq4iV6N8E2CP/VqA==
-X-Received: by 2002:a17:902:dace:b0:215:65c2:f3f2 with SMTP id d9443c01a7336-215f3c56e3emr34471825ad.6.1733382356790;
-        Wed, 04 Dec 2024 23:05:56 -0800 (PST)
+        bh=SHVMmQ/KzbcoO5ieQjC56n0uvyFf9M/Mj/sBzX0iX8s=;
+        b=b5xmJYFWEgCB8ZIlBwwqpt2VAvHi1bwRho0ZzeVjYc8OFtLlTFmUyANW3Nol1w1xgW
+         0eycvhSLeKIpiaJ85B4FnqSuL/gOvJnERtKJKx8IX9IBAY0wN/3ZoclUOcfoBs3uX6vP
+         /WxMrPfo/CW387nYYDfBmcwLg2Bt28KaQIngBAPWILG7Y/Dad8hOiJMitQ+sVRjpLSLp
+         t9HSbFVIUBHjMER/PSDBgvmS8VomrMPmM3VX3vX8lmHLzksr0r7VhjSeEBXzOWYfLTtD
+         9iD6GkjJfqVmg5Uegg+ZDdwPZKyIMWY6A0YwxAecwsV9vNepKcHXVt3v/7bw6zDmAg9Z
+         CEig==
+X-Forwarded-Encrypted: i=1; AJvYcCU9hccqhJyf1YJZ/iNuXeDXK7Z7bCEUqZjJ18SZuSgWIJ7jhj1X1waFBKcMenGHshj0ejgaKmcY4tyVrA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywn91sA/Inqjuo4ZS+JLKTQOViioMhs8uAgU/b2FPmi6JRLJ3EX
+	OgtKQgEFYHeLMSn3qmTgU8lhI//QKBR1gV7sx+UN1C2w4bTTwwi3h0rAIaPgAw==
+X-Gm-Gg: ASbGncufEPtKxCl1Td9DVeh9tKGXfWv2+ra/ddev32kwymjXlYb14SOFhJFl1pyks4u
+	2Av0ffbBBcjwj7O7vsCOg3id72gj5rJS8wv7Gd38LzjMSDfDxegYgQWvAcZNfl7iV92VbFZI/KD
+	blL5/yYBhQdMiXLVyJTlwOm133cPE+JJ1w9KluZgXORThVBMQ1BeR97/6/akf7I+7htwd8MCleq
+	uB5/HrVPyXzTE3t/WLIkybVsJ/6GyxIr+Xkr7VpmuExtY1ou+ac
+X-Google-Smtp-Source: AGHT+IG6kRB6dDFmeXz1ne2Hv+akOd+C09aPhvGPo0ufEzIuAUB/OWr1JBmHkYw/DqGSl8lg7DDPHQ==
+X-Received: by 2002:a05:6a21:7e89:b0:1e1:6db4:8a29 with SMTP id adf61e73a8af0-1e16db48a6cmr8797451637.41.1733382584222;
+        Wed, 04 Dec 2024 23:09:44 -0800 (PST)
 Received: from google.com ([2401:fa00:8f:203:84f:5a2a:8b5d:f44f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215f8ef9dafsm5958855ad.120.2024.12.04.23.05.54
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fd156e1e20sm652384a12.32.2024.12.04.23.09.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2024 23:05:56 -0800 (PST)
-Date: Thu, 5 Dec 2024 16:05:52 +0900
+        Wed, 04 Dec 2024 23:09:43 -0800 (PST)
+Date: Thu, 5 Dec 2024 16:09:39 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Kairui Song <kasong@tencent.com>
+To: Kairui Song <kasong@tencent.com>
 Cc: linux-mm@kvack.org, Minchan Kim <minchan@kernel.org>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Desheng Wu <deshengwu@tencent.com>, stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] zram: refuse to use zero sized block device as
- backing device
-Message-ID: <20241205070552.GE16709@google.com>
+Subject: Re: [PATCH 2/2] zram: fix uninitialized ZRAM not releasing backing
+ device
+Message-ID: <20241205070939.GF16709@google.com>
 References: <20241204180224.31069-1-ryncsn@gmail.com>
- <20241204180224.31069-2-ryncsn@gmail.com>
+ <20241204180224.31069-3-ryncsn@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,26 +73,79 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241204180224.31069-2-ryncsn@gmail.com>
+In-Reply-To: <20241204180224.31069-3-ryncsn@gmail.com>
 
 On (24/12/05 02:02), Kairui Song wrote:
 > From: Kairui Song <kasong@tencent.com>
 > 
-> Setting a zero sized block device as backing device is pointless, and
-> one can easily create a recursive loop by setting the uninitialized
-> ZRAM device itself as its own backing device by (zram0 is uninitialized):
+> Setting backing device is done before ZRAM initialization.
+> If we set the backing device, then remove the ZRAM module without
+> initializing the device, the backing device reference will be leaked
+> and the device will be hold forever.
 > 
->     echo /dev/zram0 > /sys/block/zram0/backing_dev
-> 
-> It's definitely a wrong config, and the module will pin itself,
-> kernel should refuse doing so in the first place.
-> 
-> By refusing to use zero sized device we avoided misuse cases
-> including this one above.
+> Fix this by always check and release the backing device when resetting
+> or removing ZRAM.
 > 
 > Fixes: 013bf95a83ec ("zram: add interface to specif backing device")
 > Reported-by: Desheng Wu <deshengwu@tencent.com>
 > Signed-off-by: Kairui Song <kasong@tencent.com>
 > Cc: stable@vger.kernel.org
+> ---
+>  drivers/block/zram/zram_drv.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index dd48df5b97c8..dfe9a994e437 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -2335,6 +2335,9 @@ static void zram_reset_device(struct zram *zram)
+>  	zram->limit_pages = 0;
+>  
+>  	if (!init_done(zram)) {
+> +		/* Backing device could be set before ZRAM initialization. */
+> +		reset_bdev(zram);
+> +
+>  		up_write(&zram->init_lock);
+>  		return;
+>  	}
+> -- 
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+So here I think we better remove that if entirely and always reset
+the device.  Something like this (untested):
+
+---
+
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 0ca6d55c9917..8773b12afc9d 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1438,12 +1438,16 @@ static void zram_meta_free(struct zram *zram, u64 disksize)
+ 	size_t num_pages = disksize >> PAGE_SHIFT;
+ 	size_t index;
+ 
++	if (!zram->table)
++		return;
++
+ 	/* Free all pages that are still in this zram device */
+ 	for (index = 0; index < num_pages; index++)
+ 		zram_free_page(zram, index);
+ 
+ 	zs_destroy_pool(zram->mem_pool);
+ 	vfree(zram->table);
++	zram->table = NULL;
+ }
+ 
+ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+@@ -2327,12 +2331,6 @@ static void zram_reset_device(struct zram *zram)
+ 	down_write(&zram->init_lock);
+ 
+ 	zram->limit_pages = 0;
+-
+-	if (!init_done(zram)) {
+-		up_write(&zram->init_lock);
+-		return;
+-	}
+-
+ 	set_capacity_and_notify(zram->disk, 0);
+ 	part_stat_set_all(zram->disk->part0, 0);
+ 
