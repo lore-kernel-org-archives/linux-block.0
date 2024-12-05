@@ -1,74 +1,111 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D09207DF5
-	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 09:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387291D3566;
+	Thu,  5 Dec 2024 10:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733392748; cv=none; b=Qol2etx+q7qX5vKPAEYf5kUOVtFar2JYTTbO06m/Im9gnkC9uQ1U6pXVDy8vi6TVeutUxdGmqvQ+ZBk0ad5hyfGCRDaUKNUwZWd132rSUCwYoNwb23HWNwEsj8CzCJKnpou1aeehLYAAmxvoRWBF8+fFAD9iXfaWRo1lbIM0JJ4=
+	t=1733395052; cv=none; b=ZUeEyGfyrhBpNHb6vQQyfLdJTIDJRXQUHgU6ZOBFr1vBV67tCnXM3LkPogLxrOCEt7aZ1t6PTfG+bgO3QRblaHi0e3OgW5ttH1J5v3Sfnk4qkFNgS1gRjdDqiwD+OQgWKvE4hJOwhtdT+HCXEaI7A3Saxakp882G0gnV1QbHUKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733392748; c=relaxed/simple;
-	bh=SgIHS645a0AYFH1ctRSGEAJTKS9pLtbEIGoGYT5Xrx0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=IDvORc3TMgxMPCpD+V1rVEYBFb7/yt/5l35t+7WL6ofbH9nQIee4g/2Traxl9yeaz6mu1Nx/0AuCuKuFdwUMX//0JBs09/P26B1OjPJ466CRpUbcpcZYirSqxrVCL2OmLpmYBmCn54Azbuqu2DcyIYXkAK1kaqOFsy+rrtn1KT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a7c8259214so7879265ab.2
-        for <linux-block@vger.kernel.org>; Thu, 05 Dec 2024 01:59:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733392743; x=1733997543;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8lNUCqqMwNBH1sfFW4omgrn6scda2dAGbmRIbTAv4L0=;
-        b=MS0MMtT5EOEbfzi8HCAkzuMISx0+o3pA10Whz6llHs7cHzK1XFyRL0Fp1e6hV/we6X
-         uqKKofmOFlqwX6Qxigi6zPSIao3ElJ+0R7H0IeSQ0pNfZg0PS6lXzvMqDLFEJx/QdDQ+
-         /9rh5GhJdyAWXrMw7Bb0GrXYDkGjGLosxDwcLqPvST2Lzn5G/red5WHa5GNA8cKFuhju
-         PfhGuVglcYoN9j9QB225lUDYL3TtauNfOHPDEZTIp9Sivwf6RkSOpmPIFRnszKAOEWP2
-         G+fKKkCcBLiyzOjdFdlF042Xw+hhgiwWMo6jhEKHIE38rpYgEqBsq/SOc1B3C8pz8z4m
-         agkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWe+9A3bXPgoAw0YeDytWz0HhicmZES6p2UCwULjL0miixtF91kPsT2Lx7Shp3WxpiPGQizye6nwgamGA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxF6oeY/uZntnYZHJEhA+qpuUjaH9Ri7F10+1w1ZtqxJV6e8Tj7
-	UG0wOtgjl1wwMJxv+zCWRSK6a11tX3x/VejpjZoKgnDfARGxOy0/IujLdKTKf7UWOc/kPPr0J23
-	ejhsRppjkp2SVWBlTjsCovFvfHxk8RcUVR7dMyY0H1ybcHEVrPJGoSCE=
-X-Google-Smtp-Source: AGHT+IFavLHBVe3EenRxLgzvIaeEkVCw6c2tXhFegXn7cdD53cnvfTiRuE/EybIckxER921OESEtcxvmumxOeN/nu4vsVhRDpbeN
+	s=arc-20240116; t=1733395052; c=relaxed/simple;
+	bh=k0Ri1gJvfMPkkmwOG5H5IkESAn8lv1SqrkOcLFEGEog=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GhAYxoL7+WcdIHF1+5N4BwfzLBUQvE+KMxh8x9XANRk/hHxLWFRVVLZwpiPkVFJM2iPTLiRumMG7lv7zFyflgWx81gI4Se2z17zXBjawaFnHl6wbeV36pLzHYkxiuHBoHp84nP+VElKCuIRlXfgiYwvNHWqKFHID/71xyY+Ec9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=guWl3kaO; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="guWl3kaO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 853FDC4CED1;
+	Thu,  5 Dec 2024 10:37:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733395052;
+	bh=k0Ri1gJvfMPkkmwOG5H5IkESAn8lv1SqrkOcLFEGEog=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=guWl3kaOoGEK+6hAPbImxmyWGcZsuvgDfS+SvtpN9yapsfB7pqHGGfp5hVdYv+Q5w
+	 vuRJCFOEzZPcd6Zebd/3fx8AKcwYYRIt2OSrHd1J3yxUb8h1Rom0Xy/H5DqebnGf5X
+	 2dcCaDOq9qqgy/7JnLhrUhhwK5k8bnLOoFX2Tzhd9Y9CvAuLbKVQ0fdaEysiLRWUwk
+	 SYb80dJWMM3YYx1tkOF51oLUhxScy1I23lx2EE8ZPxRTsY8jpWX6xygI0m+rKvAwdl
+	 2OBp+y6LpIANTG9T4G1GK6HuX4jdFpJVpP8FmAHs6E8qRz13DpF2xkEdujO4j3Rh0T
+	 szxkvQEuQm43Q==
+Date: Thu, 5 Dec 2024 11:37:29 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
+To: quic_zijuhu <quic_zijuhu@quicinc.com>
+Cc: Zijun Hu <zijun_hu@icloud.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, James Bottomley <James.Bottomley@hansenpartnership.com>, 
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas@t-8ch.de>, linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev, 
+	linux-sound@vger.kernel.org, sparclinux@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-cxl@vger.kernel.org, linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linux-mediatek@lists.infradead.org, linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	open-iscsi@googlegroups.com, linux-usb@vger.kernel.org, linux-serial@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 08/11] gpio: sim: Remove gpio_sim_dev_match_fwnode()
+Message-ID: <eyu7nm5hvwfqxgysnrzsvianzf7abvlovpxfo7snsxowmuuhpj@tah3gkqm5ldj>
+References: <20241205-const_dfc_done-v3-0-1611f1486b5a@quicinc.com>
+ <20241205-const_dfc_done-v3-8-1611f1486b5a@quicinc.com>
+ <7ugfaj2h3sy77jpaadco5xtjalnten3gmvozowcle3g7zcdqs4@sqf5l47onbsi>
+ <ac42e652-4128-44ea-976e-5234360d8183@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c54f:0:b0:3a7:8720:9de5 with SMTP id
- e9e14a558f8ab-3a7f9a36198mr111101565ab.1.1733392743713; Thu, 05 Dec 2024
- 01:59:03 -0800 (PST)
-Date: Thu, 05 Dec 2024 01:59:03 -0800
-In-Reply-To: <1757419.1733391531@warthog.procyon.org.uk>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67517967.050a0220.17bd51.0099.GAE@google.com>
-Subject: Re: [syzbot] [netfs?] kernel BUG in iov_iter_revert (2)
-From: syzbot <syzbot+404b4b745080b6210c6c@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, dhowells@redhat.com, jlayton@kernel.org, 
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ming.lei@redhat.com, netfs@lists.linux.dev, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ak6zeaiacfbfwyki"
+Content-Disposition: inline
+In-Reply-To: <ac42e652-4128-44ea-976e-5234360d8183@quicinc.com>
 
-Hello,
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+--ak6zeaiacfbfwyki
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3 08/11] gpio: sim: Remove gpio_sim_dev_match_fwnode()
+MIME-Version: 1.0
 
-Reported-by: syzbot+404b4b745080b6210c6c@syzkaller.appspotmail.com
-Tested-by: syzbot+404b4b745080b6210c6c@syzkaller.appspotmail.com
+On Thu, Dec 05, 2024 at 04:37:08PM +0800, quic_zijuhu wrote:
+> On 12/5/2024 4:10 PM, Uwe Kleine-K=F6nig wrote:
+> > On Thu, Dec 05, 2024 at 08:10:17AM +0800, Zijun Hu wrote:
+> >> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> >>
+> >> gpio_sim_dev_match_fwnode() is a simple wrapper of device_match_fwnode=
+()
+> >> Remvoe the unnecessary wrapper.
 
-Tested on:
+Just spotted: s/Remvoe/Remove/
 
-commit:         c018ec9d block: rnull: Initialize the module in place
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-6.14/block
-console output: https://syzkaller.appspot.com/x/log.txt?x=159ca8df980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=58639d2215ba9a07
-dashboard link: https://syzkaller.appspot.com/bug?extid=404b4b745080b6210c6c
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=14b910f8580000
+> >> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> >> ---
+> >>  drivers/gpio/gpio-sim.c | 7 +------
+> >=20
+> > I think if you move this patch before patch #4 in your series, you only
+> > have to touch this file once.
+>=20
+> the precondition of this change is patch #4, it will have building error
+> if moving it before #4.
+>=20
+> actually, we can only do simplifications with benefits brought by #4.
 
-Note: testing is done by a robot and is best-effort only.
+Ah I see. I thought that device_match_fwnode only got the const for the
+2nd parameter in patch #4.
+
+Best regards
+Uwe
+
+--ak6zeaiacfbfwyki
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmdRgmcACgkQj4D7WH0S
+/k6zeggAlBhwMJaGpQIgAi04teyouKX4a/XAJG3tLwpz4YweEcrMm/fv0N42hp/d
+7zUKHjQRRcVM6+TSObZ6uKEFMpac+G1YG1Fze2rNPdlf5IUOCrpKqKUaziMyvEc+
+hhaccpLCXjp9gi7H7tEBDfmrR6/S3i1nnYOeDn6tYmhKVx14uA57l4Isj2h+CIax
+P5d+Gq9NQl5IXDnqiEez80oo8LFhLQQIjIeO1YQM7GrbXaqoD+CfZTGXe4/woRc5
+JjzksiJqSccUbPlwM+90bh5Oj0H2VARUaJTRcHTRANM4ZFTSfWCep0Wkg8DSw343
+fYW4rY4vIXpWKVG9LM4j7NAoluIWvQ==
+=myq/
+-----END PGP SIGNATURE-----
+
+--ak6zeaiacfbfwyki--
