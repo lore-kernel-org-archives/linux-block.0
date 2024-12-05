@@ -1,84 +1,155 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E2A1DB94F
-	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 11:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6215B1F4276
+	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 11:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733397565; cv=none; b=IrU7YoWuY4Dj5cqP7177Juy+K5YnnboqPtZt25JNaGdQJ2rNscJYel2GeBHO8qJCvpYT/hgPB+cYNDau3WHv3Sjal0pwcwj+yOp3WPfFwcH2KGJ8NzpLv/XjcxKfuzhKOIqh3NM8RZA80XNbtjaFKLAUcOj5dBYzBhtVhGgyiNU=
+	t=1733397733; cv=none; b=NNt4kP7tX+Lcpr3Eu8zEL669jAEJNrVSwIyXFPjhfqfDi/WsK7OZ5lCNSWbR+Snk18WnS13o4zk9xXwBfefSJf7+PXO0syyLT3j/U+uLpS1duPdq11pyUJihQnrMBW/icVmm31EE5HVYfQjTZiJXOEf8PWupJHIw1GM9if/aTkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733397565; c=relaxed/simple;
-	bh=Dj0wl6j81BP5ezzS+B3g052+OLpTSEViE/LBIdXY3QI=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=hgAcBVjumOfSPggw2O5+W3FoVFep7fTklVceHNXbnSapOGrbNp2swL9qL8V/IH+gSNCeKktPk8QNSiDZd/9TIqhB5nhFU5ARx8fja6A1vTSIFUlN9CqHMbAAYJWKHuCUFOEUQtU1ycPlQcTfoltIfP+AigPT6hW99Z/nox8c0I0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VSxje4/z; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VSxje4/z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733397562;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Dj0wl6j81BP5ezzS+B3g052+OLpTSEViE/LBIdXY3QI=;
-	b=VSxje4/z56lreQF4bagJhvWrLwf9l2lk6G0n6Ou/1LwJVKuGpi/p9G45/H5/PVnvneVLoR
-	G0eFhzp6nHEj/sGbkkhzdfVzX9yLPR2nrqqFpvgah9t2XLp0DTZzyp2u3LMJJ/gQlr+KAn
-	vXAd/9l8h2Eqa+R+yfbs4qbQv50HJlA=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-627-vPjMI2VmMMGNcpbFZ0cZ6Q-1; Thu,
- 05 Dec 2024 06:19:19 -0500
-X-MC-Unique: vPjMI2VmMMGNcpbFZ0cZ6Q-1
-X-Mimecast-MFC-AGG-ID: vPjMI2VmMMGNcpbFZ0cZ6Q
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 499FD1955DA4;
-	Thu,  5 Dec 2024 11:19:18 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.48])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D396F1956052;
-	Thu,  5 Dec 2024 11:19:16 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <1757450.1733391577@warthog.procyon.org.uk>
-References: <1757450.1733391577@warthog.procyon.org.uk> <CAFj5m9Lsgt+iGE6JQV6OgUTNeGb1iiOsXz-eYqGC5Vg85JXL-w@mail.gmail.com> <1225307.1733323625@warthog.procyon.org.uk> <CAFj5m9KusEo=jQbt1AC=EQoOM-0EXmjjc_9WtSBCq+eMOSN8pw@mail.gmail.com> <1695261.1733381740@warthog.procyon.org.uk>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-    linux-block@vger.kernel.org,
-    syzbot+404b4b745080b6210c6c@syzkaller.appspotmail.com
-Subject: Re: Possible locking bug in the block layer [was syzbot: Re: [syzbot] [netfs?] kernel BUG in iov_iter_revert (2)]
+	s=arc-20240116; t=1733397733; c=relaxed/simple;
+	bh=z7QzahvsUpDUq/hh1dmI3rNNlgN7khulvlUbO6WYo3A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oinqQONvI0r5d/l0AVij4/7nOoZ0yIqGKUB+89ITBLup4IzI9x198xI9Dj4TvQKns9LG9FDu++aHLCRQujdPxot49/nK1Ykj94G/juDoHlxvGuYT3Pq59UukTyBrtUi4AMgRtGLN1SQeYr8L8zB6TCSgadfNOmO35pncAAxB+H4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1tJ9vK-0008Qw-3k; Thu, 05 Dec 2024 12:21:34 +0100
+Message-ID: <5e9a80d6-6c89-478e-99c9-584647661f5e@pengutronix.de>
+Date: Thu, 5 Dec 2024 12:21:24 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1762771.1733397555.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Dec 2024 11:19:15 +0000
-Message-ID: <1762772.1733397555@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Co-existence of GPT and fixed partitions (Was: Re: [PATCH v6 5/6]
+ block: add support for partition table defined in OF)
+To: Christian Marangi <ansuelsmth@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+ Jonathan Corbet <corbet@lwn.net>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
+ INAGAKI Hiroshi <musashino.open@gmail.com>,
+ Christian Brauner <brauner@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
+ Ming Lei <ming.lei@redhat.com>, Li Lingfeng <lilingfeng3@huawei.com>,
+ Christian Heusel <christian@heusel.eu>, Avri Altman <avri.altman@wdc.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ Riyan Dhiman <riyandhiman14@gmail.com>,
+ Mikko Rapeli <mikko.rapeli@linaro.org>,
+ Jorge Ramirez-Ortiz <jorge@foundries.io>, Li Zhijian
+ <lizhijian@fujitsu.com>,
+ Dominique Martinet <dominique.martinet@atmark-techno.com>,
+ Jens Wiklander <jens.wiklander@linaro.org>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
+ devicetree@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Miquel Raynal <miquel.raynal@bootlin.com>, upstream@airoha.com,
+ Christoph Hellwig <hch@infradead.org>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20241002221306.4403-1-ansuelsmth@gmail.com>
+ <20241002221306.4403-6-ansuelsmth@gmail.com>
+Content-Language: en-US
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <20241002221306.4403-6-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-block@vger.kernel.org
 
-David Howells <dhowells@redhat.com> wrote:
+Hi,
 
-> Ming Lei <ming.lei@redhat.com> wrote:
-> =
+sorry for not writing sooner. I only noticed this now.
 
-> > Sure, please forward because I may not do it without syzbot report con=
-text.
-> =
+On 03.10.24 00:11, Christian Marangi wrote:
+> Add support for partition table defined in Device Tree. Similar to how
+> it's done with MTD, add support for defining a fixed partition table in
+> device tree.
+> 
+> A common scenario for this is fixed block (eMMC) embedded devices that
+> have no MBR or GPT partition table to save storage space. Bootloader
+> access the block device with absolute address of data.
 
-> I've forwarded it with the patch for my bug on top.
+How common are these? I never worked with a system that didn't use MBR
+or GPT for the user partition.
 
-That seems to have fixed it.
+> This is to complete the functionality with an equivalent implementation
+> with providing partition table with bootargs, for case where the booargs
+> can't be modified and tweaking the Device Tree is the only solution to
+> have an usabe partition table.
+> 
+> The implementation follow the fixed-partitions parser used on MTD
+> devices where a "partitions" node is expected to be declared with
+> "fixed-partitions" compatible in the OF node of the disk device
+> (mmc-card for eMMC for example) and each child node declare a label
+> and a reg with offset and size. If label is not declared, the node name
+> is used as fallback. Eventually is also possible to declare the read-only
+> property to flag the partition as read-only.
 
-David
+barebox has for many years supported defining fixed partitions on SD/MMC
+nodes and it's used heavily to define e.g. the location of the barebox
+environment. Many who do so, do this either before the first partition
+of the MBR/GPT or overlay the fixed partition to be identical to
+an existing MBR/GPT partition.
 
+barebox also by default copies all fixed partitions it is aware of
+into the kernel DT, so if the kernel now stops parsing GPT/MBR when
+a fixed partition node is defined, this would break compatibility of
+existing barebox-booting systems with new kernels.
+
+> +config OF_PARTITION
+> +	bool "Device Tree partition support" if PARTITION_ADVANCED
+> +	depends on OF
+> +	help
+> +	  Say Y here if you want to enable support for partition table
+> +	  defined in Device Tree. (mainly for eMMC)
+> +	  The format for the device tree node is just like MTD fixed-partition
+> +	  schema.
+
+Thanks for making this configurable and disabled by default, so users
+won't experience breakage if they just do a make olddefconfig.
+
+> diff --git a/block/partitions/core.c b/block/partitions/core.c
+> index abad6c83db8f..dc21734b00ec 100644
+> --- a/block/partitions/core.c
+> +++ b/block/partitions/core.c
+> @@ -43,6 +43,9 @@ static int (*const check_part[])(struct parsed_partitions *) = {
+>  #ifdef CONFIG_CMDLINE_PARTITION
+>  	cmdline_partition,
+>  #endif
+> +#ifdef CONFIG_OF_PARTITION
+> +	of_partition,		/* cmdline have priority to OF */
+> +#endif
+>  #ifdef CONFIG_EFI_PARTITION
+>  	efi_partition,		/* this must come before msdos */
+>  #endif
+
+If I understand correctly, it's possible to have both partitions-boot1 and
+a GPT on the user area with your patch, right?
+
+So this only leaves the matter of dealing with both fixed-partitions and
+GPT for the same device node.
+
+What are the thoughts on this? An easy way out would be to make of_partition
+come later than efi_partition/mbr_partition, but I think it would be
+nice if the kernel could consume partition info out of both of_partition
+and efi_partition as long they don't collide.
+
+Thanks,
+Ahmad
+
+
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
