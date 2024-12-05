@@ -1,25 +1,37 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from pv50p00im-zteg10021301.me.com (pv50p00im-zteg10021301.me.com [17.58.6.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80F5212B33
-	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 12:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5C11F941
+	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 13:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733400793; cv=none; b=G7EIclg0509r0GgurH94v1CmV4IHmxHB5sF1QSzF50g9Xf0a/iddl1qdn7lZNo5I3Q0+i4lo80jYqBWH98laxERVPKNyYrm6LeXe4ezDfaOMmrvPyqLPeQoSckSD9FLdwb7ppkUgsK783gdcspYgj7HRVJjyqpQc9zIi98SQoVo=
+	t=1733404587; cv=none; b=GJp8x7srOTOSd0MV+JPP1AbYldqmBbDQzoZn5FLHRGPz1nRbj5yoeONYp1kfCv56BpF8WcSpA6mm82A4Qi8bldyvwweFvmso18YCvL3oLnSvRRqwzcNHPsyH6IRMVRRE6nytDNURvOiSgxjbRJIMG+YHvu+37q16Azc2BiZJJes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733400793; c=relaxed/simple;
-	bh=1J4ztAGkR97mu0rXS7CUisVilusU/16YhOa82w/ptss=;
+	s=arc-20240116; t=1733404587; c=relaxed/simple;
+	bh=tn4WSJdpVgE9M2OBdZCoiMZKyp3FTNFC8afvj7cJt8o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J27wdDQDv97twGWUTq/jDR0Q7+zOmyy3pR+2KNrJ1/HBl8tdw5Unbky07dh9FCfrs8L4J4Hq+SxBreXtp4UcZCuFaYv4G8wUD6Iw1M+0GErN62bC3E4wuS/yTze92njdLZ84ENMqEn5BHzXSq12dG1FVRTgHmh4KIe1762SoB5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1tJAik-0008Hm-P7; Thu, 05 Dec 2024 13:12:38 +0100
-Message-ID: <4218cdae-07ee-433c-8a68-bb07885e43ab@pengutronix.de>
-Date: Thu, 5 Dec 2024 13:12:33 +0100
+	 In-Reply-To:Content-Type; b=dIzSs8XIpcfab/HoFu1hmujWt/z+/BZ8oqLYpsJYqotH5jD+lh0ihoiTqeftDXk2c5xcig1Cj/fCaiydOzUOPGKwNXwma2yTFCdNxtignX14I6Lkrk8uHvVY/wp9uzGEJrBYwWF/8e8lJzFs71vUj9uurfU6ROBdjvWVBDY5q/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=MjPupEdG; arc=none smtp.client-ip=17.58.6.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="MjPupEdG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1733404584;
+	bh=DV2DLIPPHvXQjlEWI+ismKBgnjP6WxidLPVJKGZHkhg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
+	 x-icloud-hme;
+	b=MjPupEdG3LXOunytThOaHzAK+bVhMpwfidC4n4MdvWKwaw8FV9EPV38plq0FTVN0C
+	 xl5AJriUjHfG5OmhTjUfel+BiaQmCJ2o11t+HqLNUWEQy+m6PrJy5nTRDH5pAAFr3F
+	 J4kdsm/wsRNS1dCZBzSVcqt6FSBCyESPY4vVf8wVpfRnxrXl+Z7US8BNL1A1OPWxLK
+	 2GRk6Q02wvLPjNllCH4Kvi6WwRClOdscINadBncjANCtZiOXEyTZMT5H3N1gTMvQCq
+	 3a3ozKHsj1VnZvyfYLPMLSg23wNQ6MfFLBXVef/l3ga5iNw4NVuLybECqVK+bdE1jb
+	 2YeT4c6Wiec4A==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-zteg10021301.me.com (Postfix) with ESMTPSA id 5F7A7500292;
+	Thu,  5 Dec 2024 13:16:16 +0000 (UTC)
+Message-ID: <d4d49b0c-7766-4f06-b098-ceee54ceeefb@icloud.com>
+Date: Thu, 5 Dec 2024 21:16:12 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -27,165 +39,75 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Co-existence of GPT and fixed partitions (Was: Re: [PATCH v6 5/6]
- block: add support for partition table defined in OF)
-To: "Christian Marangi (Ansuel)" <ansuelsmth@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
- Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
- INAGAKI Hiroshi <musashino.open@gmail.com>,
- Christian Brauner <brauner@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
- Ming Lei <ming.lei@redhat.com>, Li Lingfeng <lilingfeng3@huawei.com>,
- Christian Heusel <christian@heusel.eu>, Avri Altman <avri.altman@wdc.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- Adrian Hunter <adrian.hunter@intel.com>,
- Riyan Dhiman <riyandhiman14@gmail.com>,
- Mikko Rapeli <mikko.rapeli@linaro.org>,
- Jorge Ramirez-Ortiz <jorge@foundries.io>, Li Zhijian
- <lizhijian@fujitsu.com>,
- Dominique Martinet <dominique.martinet@atmark-techno.com>,
- Jens Wiklander <jens.wiklander@linaro.org>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
- devicetree@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
- Miquel Raynal <miquel.raynal@bootlin.com>, upstream@airoha.com,
- Christoph Hellwig <hch@infradead.org>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Christoph Hellwig <hch@lst.de>
-References: <20241002221306.4403-1-ansuelsmth@gmail.com>
- <20241002221306.4403-6-ansuelsmth@gmail.com>
- <5e9a80d6-6c89-478e-99c9-584647661f5e@pengutronix.de>
- <CA+_ehUwa69Qa96yy0=K9AiCEJbaZt9oGCRf5gJDh-0_14shbtA@mail.gmail.com>
+Subject: Re: [PATCH v3 04/11] driver core: Constify API device_find_child()
+ then adapt for various usages
+To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ James Bottomley <James.Bottomley@hansenpartnership.com>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>,
+ linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-sound@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
+ linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+ linux-scsi@vger.kernel.org, open-iscsi@googlegroups.com,
+ linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
+ netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20241205-const_dfc_done-v3-0-1611f1486b5a@quicinc.com>
+ <20241205-const_dfc_done-v3-4-1611f1486b5a@quicinc.com>
+ <h4pndknfwvck5yjnbs5rdmrxkqeksfxldwj4qbjqyvdzs5cjbf@i4afsjsg3obw>
 Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <CA+_ehUwa69Qa96yy0=K9AiCEJbaZt9oGCRf5gJDh-0_14shbtA@mail.gmail.com>
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <h4pndknfwvck5yjnbs5rdmrxkqeksfxldwj4qbjqyvdzs5cjbf@i4afsjsg3obw>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-block@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: LL8r5U1rSRzQLinnfL26afznvBJlVJho
+X-Proofpoint-GUID: LL8r5U1rSRzQLinnfL26afznvBJlVJho
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-05_11,2024-12-05_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 clxscore=1015
+ malwarescore=0 adultscore=0 suspectscore=0 phishscore=0 mlxscore=0
+ spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412050096
 
-Hello Christian,
+On 2024/12/5 18:41, Uwe Kleine-König wrote:
+> On Thu, Dec 05, 2024 at 08:10:13AM +0800, Zijun Hu wrote:
+>> diff --git a/arch/sparc/kernel/vio.c b/arch/sparc/kernel/vio.c
+>> index 07933d75ac815160a2580dce39fde7653a9502e1..1a1a9d6b8f2e8dfedefafde846315a06a167fbfb 100644
+>> --- a/arch/sparc/kernel/vio.c
+>> +++ b/arch/sparc/kernel/vio.c
+>> @@ -419,13 +419,13 @@ struct vio_remove_node_data {
+>>  	u64 node;
+>>  };
+>>  
+>> -static int vio_md_node_match(struct device *dev, void *arg)
+>> +static int vio_md_node_match(struct device *dev, const void *arg)
+>>  {
+>>  	struct vio_dev *vdev = to_vio_dev(dev);
+>> -	struct vio_remove_node_data *node_data;
+>> +	const struct vio_remove_node_data *node_data;
+>>  	u64 node;
+>>  
+>> -	node_data = (struct vio_remove_node_data *)arg;
 
-Thanks for the prompt response.
+existing code has such cast
+>> +	node_data = (const struct vio_remove_node_data *)arg;
+>
+i just follow existing code here.
 
-On 05.12.24 12:54, Christian Marangi (Ansuel) wrote:
->> How common are these? I never worked with a system that didn't use MBR
->> or GPT for the user partition.
->>
+> You can just drop the cast here. But maybe that is better be done i a
+> separate change.
 > 
-> On router devices this is the approach for Mediatek and Airoha and also
-> other vendor for anything that have an eMMC.
 
-Good to know. Thanks.
+agree, removing such casts may be another topic.
 
->> barebox has for many years supported defining fixed partitions on SD/MMC
->> nodes and it's used heavily to define e.g. the location of the barebox
->> environment. Many who do so, do this either before the first partition
->> of the MBR/GPT or overlay the fixed partition to be identical to
->> an existing MBR/GPT partition.
->>
->> barebox also by default copies all fixed partitions it is aware of
->> into the kernel DT, so if the kernel now stops parsing GPT/MBR when
->> a fixed partition node is defined, this would break compatibility of
->> existing barebox-booting systems with new kernels.
->>
+>>  	node = vio_vdev_node(node_data->hp, vdev);
+>>  
 > 
-> I'm not following... is that a downstream thing? Also fixed-partition
-> in DT for SD/MMC were never supported, why the partition was
-> copied in DT? Userspace tools made use of them?
+> Best regards
+> Uwe
 
-The kernel isn't modified, but the barebox-state utility can parse the
-fixed partitions in the DT and map it via udev to a block device partition
-(if one exists) or to a block device + offset.
-
->> If I understand correctly, it's possible to have both partitions-boot1 and
->> a GPT on the user area with your patch, right?
->>
-> 
-> No, this array works by, first is found WIN. If OF_PARTITION is enabled
-> and an OF partition is declared in DT, then efi partition parse is skipped.
-
-Yes, but Boot partitions and the user area are different block devices,
-so it should be possible to use OF partition for the boot partitions
-and GPT for the user area, right?
-
->> So this only leaves the matter of dealing with both fixed-partitions and
->> GPT for the same device node.
->>
-> 
-> The logic is applied to skip exactly this scenario. GPT partition can
-> be edited at
-> runtime and change, DT is more deterministic. It's one or the other.
-> 
-> If downstream someone have GPT then OF_PARTITION should not
-> be used at all... Eventually downstream for this special approach, an additional
-> downstream patch can be added that define a special property in the node to
-> disable OF parsing. (it's a 3 line patch and since everything is downstream it
-> really doesn't matter)
-
-As mentioned, the kernel itself isn't patched, but there was an implicit
-assumption that MBR/GPT parsing would continue to work, even when a fixed
-partition node is specified...
-
->> What are the thoughts on this? An easy way out would be to make of_partition
->> come later than efi_partition/mbr_partition, but I think it would be
->> nice if the kernel could consume partition info out of both of_partition
->> and efi_partition as long they don't collide.
->>
-> 
-> The 2 thing would conflicts and would introduce so much complexity it might
-> be not worth at all. Also you would have situation where someone declare
-> OF partition in the space where the GPT partition table is located, adding
-> the possibility of corrupting it.
-
-If we go this way, the implementation should of course refuse creating partitions
-that conflict. The barebox implementation allows partitions only in the
-unpartitioned space or to be identical to an existing GPT partition.
-
-But I agree, this needs to be thought through thoroughly to determine how
-it should interact with  runtime repartitioning.
-
-> Again would love more explanation of your case because by the looks of it,
-> you use GPT for partition parsing and just overload the DT with the additional
-> info maybe for userspace usage. (and that case can be handled by just keeping
-> OF_PARTITION disabled or adding a little downstream patch)
-
-Yes, keeping OF_PARTITION disabled would be required to not break barebox
-users that made use of the non-upstream binding.
-
-I wonder though, if something can be done to reconcile Linux and barebox'
-view of this and allow in the future enabling both Linux OF_PARTITION
-and barebox OF partition fixups.
-
-> Or you are telling me you had a downstream patch that declares additional
-> partition in addition to a disk with a GPT partition table?
-> If that's the case, I'm confused of why the additional partition can't
-> be declared
-> directly in GPT.
-
-Many of the older boards supported by barebox used to place the barebox image
-and the environment prior to the first partition in the unpartitioned area.
-
-To still be able to access them, fixed partitions were used and the rest
-of the system was described by MBR/GPT partitions.
-
-This was partially made necessary by BootROMs having strange expectations
-of where the bootloader needs to be placed, which partially overlapped
-the MBR/GPT itself, making it difficult to define a partition for the bootloader.
-
-For newer boards, it's more common to place the bootloader in a GPT partition
-now. barebox has no DT binding for generically describing such a GPT partition
-though, so boards may create a fixed-partition "alias" and use that.
-
-Cheers,
-Ahmad 
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
