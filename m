@@ -1,151 +1,97 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D331E194C85
-	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 07:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7011B3920
+	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 07:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733382586; cv=none; b=UrOJF6NS+YUM+DpTfZAnJ3j+ELeASr5TbqTFAEWdvFi9EIrW2XYHyjR53k48F6gIq2ueKYsSoeqAsjG7KUDRneWZ4gJnCZOvnhX+cbbu9Nj8Mi+cfe/pQVjh5eUi7rSeXro5FhMcr6pLiqB1lsshMD2CWPeQbraiQo0OD70Y0AY=
+	t=1733384404; cv=none; b=VmaIprPsh7WZPF2G6j/jjFONlB/vTi0s0n/sANtwtZIryUpQQwH+K/YiXiSYTsilTUZft/ngxfgCKRU2Ce0UawBRLnknfoIUpe7XjDDy2ZTivTGLgMcc3wZe+5JTtC0ma9XV3LeToXfn/m7hxY5kZJL1j//XrGpfbxLvqK65gJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733382586; c=relaxed/simple;
-	bh=grkbsRH6D4ZYbAuOb1wmAAyXnV7iDlG0b6TewkJIGas=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A9godCG7hLSBFpr5BDXbTwG/aQSO8GpfogPyXyzY4atpxVqOX8pqyRC55IOPuhwNpRS9sOmGrX3HFzD9xgYR5cWrxSUFyKW6Jz8Kbwbe9uypIfBDpHrhA/GNdxsvXsAG5IxPbMqBvd4inYnCbv0axxUiZsG79G8WX8LI8BLINFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=NsO9kCsX; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1733384404; c=relaxed/simple;
+	bh=9ff4/8AXvGXoT23jC6UqbSxxhnB+zrWd5tFzzASQgZg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HcNM+Ff6MdPtBtvQVl3XRsXX9NPhHm3bW+AYFyHfUoQCMdbJdAS679bUo+7+xzr4gjHHwsqosmjzPrkvdKMXo9viqgg47nuPNcWqKcEg8xMlLQW5pAo/F8EX9SRFT5IIFAnzcLbhHkcMS7bOuJAlMVbMNs9jXgXkay418MGeeRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cRWPYo0f; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NsO9kCsX"
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7ee11ff7210so522712a12.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2024 23:09:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1733382584; x=1733987384; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SHVMmQ/KzbcoO5ieQjC56n0uvyFf9M/Mj/sBzX0iX8s=;
-        b=NsO9kCsXqWNmeiqUXxTVF1KOXwcQtipmoak50kQZQMmK89e+Y3q7VfDOcOrUJb215S
-         30qmslclFKHLfVF0YXJ4r3429pPKL7d8uSaAXoJ5Yjw5p5liTy3VW8hQ/pxYlqYb9S4T
-         TfFaNRfkjmVRSfy/6sMdyAVzbFWBAyvcM7Ucw=
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cRWPYo0f"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733384401;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M0qiRMFEZU2kLfdKFqOu/0E5iByZVNjbT0mmKXmaW40=;
+	b=cRWPYo0fMlWUk23hIcDUohGfKRmDxJh3drXkJXIh5g7UZmeTt9KUYk7NckqGSfYYZTTW/B
+	uHRXHBU5b5o8Tzvpv+2+90wCPTygxiZQEfftQlQmwd+aots6k59OfeuOpuIuh0tmJWhbRl
+	C+IQ/OSW5rZJeGrUJsUDbB0H05qrptk=
+Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
+ [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-626-p5ylruGdMW-pd6BdYTlxIQ-1; Thu, 05 Dec 2024 02:40:00 -0500
+X-MC-Unique: p5ylruGdMW-pd6BdYTlxIQ-1
+X-Mimecast-MFC-AGG-ID: p5ylruGdMW-pd6BdYTlxIQ
+Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-85bb5c397d4so91464241.3
+        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2024 23:40:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733382584; x=1733987384;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SHVMmQ/KzbcoO5ieQjC56n0uvyFf9M/Mj/sBzX0iX8s=;
-        b=b5xmJYFWEgCB8ZIlBwwqpt2VAvHi1bwRho0ZzeVjYc8OFtLlTFmUyANW3Nol1w1xgW
-         0eycvhSLeKIpiaJ85B4FnqSuL/gOvJnERtKJKx8IX9IBAY0wN/3ZoclUOcfoBs3uX6vP
-         /WxMrPfo/CW387nYYDfBmcwLg2Bt28KaQIngBAPWILG7Y/Dad8hOiJMitQ+sVRjpLSLp
-         t9HSbFVIUBHjMER/PSDBgvmS8VomrMPmM3VX3vX8lmHLzksr0r7VhjSeEBXzOWYfLTtD
-         9iD6GkjJfqVmg5Uegg+ZDdwPZKyIMWY6A0YwxAecwsV9vNepKcHXVt3v/7bw6zDmAg9Z
-         CEig==
-X-Forwarded-Encrypted: i=1; AJvYcCU9hccqhJyf1YJZ/iNuXeDXK7Z7bCEUqZjJ18SZuSgWIJ7jhj1X1waFBKcMenGHshj0ejgaKmcY4tyVrA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywn91sA/Inqjuo4ZS+JLKTQOViioMhs8uAgU/b2FPmi6JRLJ3EX
-	OgtKQgEFYHeLMSn3qmTgU8lhI//QKBR1gV7sx+UN1C2w4bTTwwi3h0rAIaPgAw==
-X-Gm-Gg: ASbGncufEPtKxCl1Td9DVeh9tKGXfWv2+ra/ddev32kwymjXlYb14SOFhJFl1pyks4u
-	2Av0ffbBBcjwj7O7vsCOg3id72gj5rJS8wv7Gd38LzjMSDfDxegYgQWvAcZNfl7iV92VbFZI/KD
-	blL5/yYBhQdMiXLVyJTlwOm133cPE+JJ1w9KluZgXORThVBMQ1BeR97/6/akf7I+7htwd8MCleq
-	uB5/HrVPyXzTE3t/WLIkybVsJ/6GyxIr+Xkr7VpmuExtY1ou+ac
-X-Google-Smtp-Source: AGHT+IG6kRB6dDFmeXz1ne2Hv+akOd+C09aPhvGPo0ufEzIuAUB/OWr1JBmHkYw/DqGSl8lg7DDPHQ==
-X-Received: by 2002:a05:6a21:7e89:b0:1e1:6db4:8a29 with SMTP id adf61e73a8af0-1e16db48a6cmr8797451637.41.1733382584222;
-        Wed, 04 Dec 2024 23:09:44 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:84f:5a2a:8b5d:f44f])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fd156e1e20sm652384a12.32.2024.12.04.23.09.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2024 23:09:43 -0800 (PST)
-Date: Thu, 5 Dec 2024 16:09:39 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Kairui Song <kasong@tencent.com>
-Cc: linux-mm@kvack.org, Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Desheng Wu <deshengwu@tencent.com>, stable@vger.kernel.org
-Subject: Re: [PATCH 2/2] zram: fix uninitialized ZRAM not releasing backing
- device
-Message-ID: <20241205070939.GF16709@google.com>
-References: <20241204180224.31069-1-ryncsn@gmail.com>
- <20241204180224.31069-3-ryncsn@gmail.com>
+        d=1e100.net; s=20230601; t=1733384399; x=1733989199;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M0qiRMFEZU2kLfdKFqOu/0E5iByZVNjbT0mmKXmaW40=;
+        b=ZwXVKGltkRyboF/Xs/MFiAreb1HfOqnNL6OKYY53+UCQLc5IbaQfyIVksKTlk1hLVr
+         E8HZZiJPTp4SjhDiJtAOhDPUUChG0qiQ0SriItr2mV477Vd1SsyutjZvIaxgHxNy15sc
+         LksfrVY1ApAFTxS05W/hmzAyLs55HINBIX4TGy27ViDoPF7K8c4EwUYluEMU1plHoVI1
+         iLJK1ok9bTwHC2U8KfgeBdn/mR1L5vtyfuLl8RAJpJIRIUCAw/T8xc4SgehBETgZbSlf
+         mzOf1RuhdtvfwAIgD/6xgfQHXPPdWb7yoIWcNlQGb0cto7B1NtcpRWpuAy9PdHr2rY42
+         jkzA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUPF+K2Wl65UtHPpqWkXmzEr43/ZH05Lk+xx1JgvnyMra9BzbUC53qoS8SS/CiIuKdpaYBjvTnkvZBOA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzaRyWwD9FlUW9Hjyy7jvxi2AJMQ9IIZnc209lUvrWwRMsVJJ2
+	g9Umqo+ykyowEikmrYGDFXRhQyqdy6LNQRMiiVx9cUyOjSoQMHS9oz1M+3kT7Cyr47VKRR90POH
+	UukVQpKF4QRaDgbUdF7bGiIqHe0GCO+13vNX/WELzjGzfAdf0OgI28IKEoMz58Wm58VteMS1oYN
+	sLXyJFSErS8f2GRAxUd+Q9muCPfNlsqaOHBjORjD3BYwzT/zBh
+X-Gm-Gg: ASbGncs9rbKAcTO0Ll7ZpoHQbO9ag26gQUgJV/he9GpWOL2nDQ8f2QLyJ5p4TxgkG4e
+	CcwUJYxOzrVA/DDqaKaZMkHsyrQGN28gk
+X-Received: by 2002:a05:6102:54a9:b0:4af:b475:93fb with SMTP id ada2fe7eead31-4afb47596c2mr3839652137.4.1733384399655;
+        Wed, 04 Dec 2024 23:39:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEnjMDu7v0rmT7ufZdMNbJ5xJYSmwpb364Y5/Kb84+67HxNVOUBICLz8M1awN4jvDGO4eME4i7nJvuorXyAJTg=
+X-Received: by 2002:a05:6102:54a9:b0:4af:b475:93fb with SMTP id
+ ada2fe7eead31-4afb47596c2mr3839648137.4.1733384399460; Wed, 04 Dec 2024
+ 23:39:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241204180224.31069-3-ryncsn@gmail.com>
+References: <1225307.1733323625@warthog.procyon.org.uk> <CAFj5m9KusEo=jQbt1AC=EQoOM-0EXmjjc_9WtSBCq+eMOSN8pw@mail.gmail.com>
+ <1695261.1733381740@warthog.procyon.org.uk>
+In-Reply-To: <1695261.1733381740@warthog.procyon.org.uk>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Thu, 5 Dec 2024 15:39:48 +0800
+Message-ID: <CAFj5m9Lsgt+iGE6JQV6OgUTNeGb1iiOsXz-eYqGC5Vg85JXL-w@mail.gmail.com>
+Subject: Re: Possible locking bug in the block layer [was syzbot: Re: [syzbot]
+ [netfs?] kernel BUG in iov_iter_revert (2)]
+To: David Howells <dhowells@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	syzbot+404b4b745080b6210c6c@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On (24/12/05 02:02), Kairui Song wrote:
-> From: Kairui Song <kasong@tencent.com>
-> 
-> Setting backing device is done before ZRAM initialization.
-> If we set the backing device, then remove the ZRAM module without
-> initializing the device, the backing device reference will be leaked
-> and the device will be hold forever.
-> 
-> Fix this by always check and release the backing device when resetting
-> or removing ZRAM.
-> 
-> Fixes: 013bf95a83ec ("zram: add interface to specif backing device")
-> Reported-by: Desheng Wu <deshengwu@tencent.com>
-> Signed-off-by: Kairui Song <kasong@tencent.com>
-> Cc: stable@vger.kernel.org
-> ---
->  drivers/block/zram/zram_drv.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index dd48df5b97c8..dfe9a994e437 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -2335,6 +2335,9 @@ static void zram_reset_device(struct zram *zram)
->  	zram->limit_pages = 0;
->  
->  	if (!init_done(zram)) {
-> +		/* Backing device could be set before ZRAM initialization. */
-> +		reset_bdev(zram);
-> +
->  		up_write(&zram->init_lock);
->  		return;
->  	}
-> -- 
+On Thu, Dec 5, 2024 at 2:55=E2=80=AFPM David Howells <dhowells@redhat.com> =
+wrote:
+>
+> Ming Lei <ming.lei@redhat.com> wrote:
+>
+> > #syz test: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-=
+block.git
+> > for-6.14/block
+>
+> syzbot isn't on the To: or cc: lines.  I can forward the request if you w=
+ant?
 
-So here I think we better remove that if entirely and always reset
-the device.  Something like this (untested):
+Sure, please forward because I may not do it without syzbot report context.
 
----
+Thanks,
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 0ca6d55c9917..8773b12afc9d 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1438,12 +1438,16 @@ static void zram_meta_free(struct zram *zram, u64 disksize)
- 	size_t num_pages = disksize >> PAGE_SHIFT;
- 	size_t index;
- 
-+	if (!zram->table)
-+		return;
-+
- 	/* Free all pages that are still in this zram device */
- 	for (index = 0; index < num_pages; index++)
- 		zram_free_page(zram, index);
- 
- 	zs_destroy_pool(zram->mem_pool);
- 	vfree(zram->table);
-+	zram->table = NULL;
- }
- 
- static bool zram_meta_alloc(struct zram *zram, u64 disksize)
-@@ -2327,12 +2331,6 @@ static void zram_reset_device(struct zram *zram)
- 	down_write(&zram->init_lock);
- 
- 	zram->limit_pages = 0;
--
--	if (!init_done(zram)) {
--		up_write(&zram->init_lock);
--		return;
--	}
--
- 	set_capacity_and_notify(zram->disk, 0);
- 	part_stat_set_all(zram->disk->part0, 0);
- 
