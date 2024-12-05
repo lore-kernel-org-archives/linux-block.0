@@ -1,79 +1,99 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5B417C208
-	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 06:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6197C1A8F6D
+	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 07:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733381750; cv=none; b=ETOFQBcno5HaHPVa6BBHx+P8MYcW0BJ9QKdFNygqmZisqt+UhQ1mV1O7N2A0g7wANrJq2Czwf7Z6LyXoFFD2zyOPssTl1/AtS9V5e/RB85qfT6cgBQMI9eUc/5iiDb3eNiHc9ELC42j9F8D+o6aU8roBZLuGse5vORi7hVpd82k=
+	t=1733382358; cv=none; b=KLK3UOCzadfwA32/y7lqctjCfazc7Y24E1IbmcFmdySjK/SSK5mkkvV2bwEGnWX/eUs7139JqiNCAb/wYXKOnPzlOSoorfmdySLZHoYdaW/9pMwD0QFlWJ46XKRooyW5iPrv2ThdZ0PfcFCVsnI0D+x7EQRDYN2byG/sYOmPwps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733381750; c=relaxed/simple;
-	bh=62HYgqB/RNaGRehc+TDHiBhE0EgEylU6R+8FXB/0uYk=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=S7oauYPW7wC+SGr2U6UqVGUsYxFAwUPO3lEyZR4BxDuPT0jGhfCjdSKb3ZyTI01tuGbpQX23SZMkEWQ71Wf7T13yp8Lc7uEEhQtzWe9d784YCgi60fZeSDKKx1NP6uyBC9Jxn3hgaY9mWeYFeZQv8f8QpMczwrx1YOts7NECDZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=az2r5KPJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1733382358; c=relaxed/simple;
+	bh=zjJgxmY2y1deqyKR6Stt9PT+fsWAX390mIy9QNV8za8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LgDMHcX4k9CD64FBoysOYrjZ84aqaCpVykbAgznwmF/xq8IJ9qKwZ/qMUzIBoQvkuqWJMNlCFT5solP7IEOjlphluwXxsvWu7jk0/Mn9HdBVwhRGRdJg/gDW6FNrhDhEZ5LwKfaMD4KO30n3MQPTpgRYuiMDBMNzGE3Jsdss9zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=YsJncUg1; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="az2r5KPJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733381747;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mfG3GJfBMSNs5+h7rkqIYVTKHbFzErZ/qzyn3XUiz7M=;
-	b=az2r5KPJ0ugIctPjVAqztPZBAr73NDXtt77Dotg7TaGKPFE00h/iZOqvIaJR4Zd1XsTDEF
-	aTesc8bSOgjudZef6M8MGRdvxsnJNIJqU71b5sPbLaGGEcVl8BgPXgN4zhw2L/+KRLqQVR
-	PKptLdnqlQQ7xf/01oAaEmAJE6N7arE=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-114-Cm5xet5bMG-S0-OYU2gMSA-1; Thu,
- 05 Dec 2024 01:55:45 -0500
-X-MC-Unique: Cm5xet5bMG-S0-OYU2gMSA-1
-X-Mimecast-MFC-AGG-ID: Cm5xet5bMG-S0-OYU2gMSA
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 535451944B35;
-	Thu,  5 Dec 2024 06:55:43 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.48])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6F93C19560A2;
-	Thu,  5 Dec 2024 06:55:41 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CAFj5m9KusEo=jQbt1AC=EQoOM-0EXmjjc_9WtSBCq+eMOSN8pw@mail.gmail.com>
-References: <CAFj5m9KusEo=jQbt1AC=EQoOM-0EXmjjc_9WtSBCq+eMOSN8pw@mail.gmail.com> <1225307.1733323625@warthog.procyon.org.uk>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-    linux-block@vger.kernel.org
-Subject: Re: Possible locking bug in the block layer [was syzbot: Re: [syzbot] [netfs?] kernel BUG in iov_iter_revert (2)]
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YsJncUg1"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21577f65bdeso4965305ad.0
+        for <linux-block@vger.kernel.org>; Wed, 04 Dec 2024 23:05:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1733382357; x=1733987157; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pnVjnK/k6GXXnPfVx21d5+g3wu4ThlrDFA24wTktnFw=;
+        b=YsJncUg1a1f6U1pWsuQgbpsAxT8+oIrE0rzyWKTp8gT/FSob/b6EzyyycQe0BbTJE9
+         ZWlqWhSXG/rlcmo+XyLQ06rTNJlSGO1tOfNG9wAf+fg6tSHr2ZVuuQjL/hQMeGDcC7Yd
+         U1FTktsfhLwuAtLKuR6KTRXHYbPcEB0ND0mGA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733382357; x=1733987157;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pnVjnK/k6GXXnPfVx21d5+g3wu4ThlrDFA24wTktnFw=;
+        b=hPELWIhqZmU3D+bMd01mZbdHS+Y+azoZVfdG5nCnqTtIz315clvsz7erpZx3b4u24l
+         rnKD8q6aexLq07QlY2HsFlUTsl2cLgkrOeOYqx1ZP/jOYQ2jqpGD39UZTWBk3IdUUyNv
+         K6h3S0mx+cZsUXXa/vH2LlnasJYxGLeJNtjw2BysP08mSNTVh4UOpjg+wKANSK/wirQq
+         5IAPpPZrsvhlysOXu7GAnfTLU76c45ExR+WB6JfS5rcr4f7SbBvkw9a9QuUg8kb/1vX+
+         k/4gM5C9W5yqkJIe78+Ii45VtUeGc+XKSmOKaYBaCie0IObRUoKkPhmmV3YYxEmKpXsv
+         FzRA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZZ8LjCZ6ukdM9VjkIqM4XPNxK2pGKUbbKLdC47M9cIgzIt3llFy5rYrYBiBL0sU5OJjQMC/3q7efgQA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzattCPYCZhN0mmcyXPw2h8Snp/DTrLTr8lnPcuQHLBe+w8IHdc
+	hXT9F6XiAG29/WCTZ25s11VZYxJMU1rqhl/Pa+0dxRRUgxZcYTTykHChYqbi5yofPtGPMERGNds
+	=
+X-Gm-Gg: ASbGncvB9q/p65sUbtMkNFj2yr5DeTLd+uwCAdFjQQPRPpH+XSSfkzwSyzpLw33/FYQ
+	wGPU1Q8bnrDGSRmTs0WJcmmohWpThSl7P0eIWx6E8xO4Fcg706z9RvXVTlwBII3GqduqGEBzT5C
+	5Tf2RS9jrTbWYAY+tzX5Wpbhtn59hgmWsHNDMVujJ6IWj/MtLgKQe6sPVPVLrFREEBE9Pi5OaI9
+	o1I4H+EKY07E2oXSSpxkgPD+kxJ09+AYh2ahfEAS7Qng/5GT1HE
+X-Google-Smtp-Source: AGHT+IHmb5xrPz+rTcqYtFMLlN13EqPWRM+lusJzh9gyYi0pYOG3cg9tOPzuRPSq4iV6N8E2CP/VqA==
+X-Received: by 2002:a17:902:dace:b0:215:65c2:f3f2 with SMTP id d9443c01a7336-215f3c56e3emr34471825ad.6.1733382356790;
+        Wed, 04 Dec 2024 23:05:56 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:84f:5a2a:8b5d:f44f])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215f8ef9dafsm5958855ad.120.2024.12.04.23.05.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 23:05:56 -0800 (PST)
+Date: Thu, 5 Dec 2024 16:05:52 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Kairui Song <kasong@tencent.com>
+Cc: linux-mm@kvack.org, Minchan Kim <minchan@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Desheng Wu <deshengwu@tencent.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] zram: refuse to use zero sized block device as
+ backing device
+Message-ID: <20241205070552.GE16709@google.com>
+References: <20241204180224.31069-1-ryncsn@gmail.com>
+ <20241204180224.31069-2-ryncsn@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1695260.1733381740.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Dec 2024 06:55:40 +0000
-Message-ID: <1695261.1733381740@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241204180224.31069-2-ryncsn@gmail.com>
 
-Ming Lei <ming.lei@redhat.com> wrote:
+On (24/12/05 02:02), Kairui Song wrote:
+> From: Kairui Song <kasong@tencent.com>
+> 
+> Setting a zero sized block device as backing device is pointless, and
+> one can easily create a recursive loop by setting the uninitialized
+> ZRAM device itself as its own backing device by (zram0 is uninitialized):
+> 
+>     echo /dev/zram0 > /sys/block/zram0/backing_dev
+> 
+> It's definitely a wrong config, and the module will pin itself,
+> kernel should refuse doing so in the first place.
+> 
+> By refusing to use zero sized device we avoided misuse cases
+> including this one above.
+> 
+> Fixes: 013bf95a83ec ("zram: add interface to specif backing device")
+> Reported-by: Desheng Wu <deshengwu@tencent.com>
+> Signed-off-by: Kairui Song <kasong@tencent.com>
+> Cc: stable@vger.kernel.org
 
-> #syz test: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-b=
-lock.git
-> for-6.14/block
-
-syzbot isn't on the To: or cc: lines.  I can forward the request if you wa=
-nt?
-
-David
-
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
