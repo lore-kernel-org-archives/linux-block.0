@@ -1,169 +1,171 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pv50p00im-tydg10011801.me.com (pv50p00im-tydg10011801.me.com [17.58.6.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6280B2391A0;
-	Wed,  4 Dec 2024 21:47:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E9F2107
+	for <linux-block@vger.kernel.org>; Thu,  5 Dec 2024 00:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733348854; cv=none; b=f8EPWhbB4xBFVeqjrae1G5BGQOrj+jMDkSpZdCDVAU1q0+JFM61YM6eYhueW0vR1DYA2RL5Lg9tu74TEyXPkaArsulmGBzJ18v9FsQLK2hmRrV8Zs5uxxry1i9jtZ5qctoL7hJZnPpChMEHcHCWIJoIzW5ZuH0OYRELLxnx4tIw=
+	t=1733357278; cv=none; b=CgHx3wvnewAcCae13Yth4l8dbGsd7JmP7p0nmhZ3QsFThL5TSwtTgreIDrke5S5vxZkqXlbBKu+S1OGw9jYNA+elz2OFrnDzJiUvvfpNtW1kP+86IQQDW3prKz0tp7LdYi+w9MMfOfDaqS6BQ2ZeAYnfC0BhqksPU40j3tgTZk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733348854; c=relaxed/simple;
-	bh=IJ+Tr5WrQEHCU2L/vBaaxP7MLc42N0SWwf2O9ZVrmJM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FP1uRA52T4EdiapJi7Kc7PdMRQZLvNd0WOJAMOAM1IEXD8iPxe1RgFo0KT77arbRWC6pN3MuP7DgQyd4gXJ90h+xXa3ly1YV4yfFqnJn+rDgFyruE/yjY+H8Q7c44PbV5IL36DBJhwl4IlMK/Km83nXMH6VC63Jl4GDBfnZaluI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a6It1eNo; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733357278; c=relaxed/simple;
+	bh=jXDu8pWjhuYPdMP7VqE1gBu4NrjerabEKnAlH0ltUtc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ka/GDZR5STnUm7xk67NmWWDUU3Lduypw1gYZSicxIwbFd4N2z2W8OfM+zbHnh5K/Wf9s9AYyx7tdt++5OaM6sdnxrmmDwhaNZ+OOecsw7XxDnifoifvFzvi46wFOhfkztZ61pB+R1uzMIvZqBOd49OFrl8Q04ClkM+BqnOvrYQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=viUyMPDu; arc=none smtp.client-ip=17.58.6.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a6It1eNo"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d122cf8dd1so294974a12.2;
-        Wed, 04 Dec 2024 13:47:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733348851; x=1733953651; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fKaI88AD29BFrp8QioqFZOOJyEQFk+/T1lAVWcKhhT8=;
-        b=a6It1eNoFco4bdB2bLEqkTCAfvDiOFA1Yj8yhxEGEJWgXj0oK1Q70pxpMYZrb6S/hh
-         zCgx5RDzOqKs7FLRbIXqg+zW8N5HUIeOE0kkqWvISLSym59uQL8odltQA94s4LyaHF65
-         kIg9QfljDyJMyTP6gKyTgSUrgwIsap4/VkLTCC+yTBOeUFVrkU53j9l0wGpsI11l7O58
-         kKgJekcfloZusDn0yZI/NLx7J7rkh3z51eNNm7wrBALfSbhZLxGzOmZgsauIdoNTbP/k
-         h28xrJZL/iokGC8aM/66bwy4d5fMgLmqmgQKpzllw9LM6NLDbHMBWEmuwMJJDDqxcdXX
-         0gvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733348851; x=1733953651;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fKaI88AD29BFrp8QioqFZOOJyEQFk+/T1lAVWcKhhT8=;
-        b=CZPrI2LniyuCMfx1LAoD+B1PZDSLH+zKEcNl9g+VMzj+tZdzaYVJYU6eGfyXgFAAHe
-         aIir7Fjkhu0oVk+JyQDtSsoxaExEpUpGistTWwwk+lAAaKYRghBUJRSnAFY1/GZI5ffr
-         9n3lP+m9eOVXNbeLGGHBRmc9Q2MJ7LK1IDUcrmHI+4ej1Et0WNnvSrBxnPbmVxK28nM5
-         6FiezV6XlbHveI3s1wSf+aj2BdE2l0gOUWCWxFmJ8bNKhMRq19LVSi28rMSr6oJjNEbB
-         jay7g2LQEcsr/YTocTSG3oX/or5/FKLovm0EDR/lPwX51a3+4Uteke9816oJTx3QX0gn
-         bgCg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4Lo/XiwmAIFuOc/Dvzz7X3szifUkswwnnsVZrnOKHB1nEiaqJNVEl2caKGqTFDKyqfZVad4xEIA==@vger.kernel.org, AJvYcCXxtZ/S+2evXBD/zrV8GNoYMjtIjTVBkXonD9mejsKRoHGRZRW7StbDyMAwIv3hHQkeB4E8quzmOjyXxBve@vger.kernel.org, AJvYcCXyimpqz9mCWQw9mm1YgUjXGb6Gr2c8fhK6wsgvIaZBRR4tSmtrBQZWt4Hx2mbWel84MgyNvp9wGgIAfOI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+PQjjhbwEA2VGYyg2Y8Pa0eVpJCerc1pF4/WrViEJGwHE0uEo
-	3SXGrf7Jh/PN9AY7taaROJqyEQbLXPGl4jyADvi2gyheeNT+nfkaqYd8SHbt2D72Rot/eE3DBNp
-	9Lt4fpNILrzWHIxKIQATSqagrY+I=
-X-Gm-Gg: ASbGncuQYk2+hHEUzHJwgrNUNNDnR0VS7841jig2QYDOsVUHx/FWQe8NiSZgDCFqqyX
-	rZtJpN3EUUPiW6q2Xc7oLwbSvMR8XIA==
-X-Google-Smtp-Source: AGHT+IGjeAWiYGkcl48wjHQuQfHn6HqZ1slDmfNXVWuNj+ailjPxy/721i4S3q0jxp+4ZIX1TsGbVhAz0VuLWgIFfBI=
-X-Received: by 2002:a05:6402:40c3:b0:5cf:4527:4325 with SMTP id
- 4fb4d7f45d1cf-5d113cf65c0mr7138144a12.24.1733348850513; Wed, 04 Dec 2024
- 13:47:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="viUyMPDu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1733357275;
+	bh=T0i1UIwZu179fqDDvM1SaMgHe4/s268Ao/wTXHvJFpU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
+	 x-icloud-hme;
+	b=viUyMPDupWXi4CsrMrPO0pTZeZeGxPoM+enltzZDnkb+kI0qdByPZT5LU1xBetse2
+	 NtaWPzW2mnfiL0cDcb5AxsMAlW09DyzC74O6RR3cBb+ZzhEN7re48DHO1hdcod+aXb
+	 zbl3rMYxZGrv7wQqdRJsrWCp9PSwtE6uiLaNWgjCRsBT8D1ZUgFnCeCL+arYkrJDex
+	 wriQVWYopBjYxrWk6ouKFvfzOLXBz2VSyl6NuyevHO9GGv1V4cTmquonLgabfDNxjR
+	 5eSkEUOnbtt2Et4RjPSCmjNRxtqblo8cbQN/o+14zsvC0nuehSg5FcL9uofh/yy5ZC
+	 z6tN/Ugl8ZG4Q==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-tydg10011801.me.com (Postfix) with ESMTPSA id 9CBA68001C9;
+	Thu,  5 Dec 2024 00:07:24 +0000 (UTC)
+Message-ID: <3a4de1bb-3eb2-469a-8ff7-ff706804f5bb@icloud.com>
+Date: Thu, 5 Dec 2024 08:07:20 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241203121424.19887-1-mengferry@linux.alibaba.com>
-In-Reply-To: <20241203121424.19887-1-mengferry@linux.alibaba.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 4 Dec 2024 16:47:18 -0500
-Message-ID: <CAJSP0QW2GWNCtekar68bniwB6xX=ADsh7YjFjq_bQvExRNxnyA@mail.gmail.com>
-Subject: Re: [PATCH 0/3][RFC] virtio-blk: add io_uring passthrough support for virtio-blk
-To: Ferry Meng <mengferry@linux.alibaba.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, linux-block@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org, 
-	Joseph Qi <joseph.qi@linux.alibaba.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/32] driver core: Constify API device_find_child()
+ and adapt for various existing usages
+To: James Bottomley <James.Bottomley@HansenPartnership.com>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Chun-Kuang Hu <chunkuang.hu@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Jean Delvare <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>,
+ Martin Tuma <martin.tuma@digiteqautomotive.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>,
+ Andreas Noever <andreas.noever@gmail.com>,
+ Michael Jamet <michael.jamet@intel.com>,
+ Mika Westerberg <mika.westerberg@linux.intel.com>,
+ Yehezkel Bernat <YehezkelShB@gmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
+ Ira Weiny <ira.weiny@intel.com>, Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+ Jiri Slaby <jirislaby@kernel.org>,
+ Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+ Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+ Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+ Mike Christie <michael.christie@oracle.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Nilesh Javali <njavali@marvell.com>,
+ Manish Rangankar <mrangankar@marvell.com>,
+ GR-QLogic-Storage-Upstream@marvell.com, Davidlohr Bueso <dave@stgolabs.net>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Alison Schofield <alison.schofield@intel.com>,
+ Andreas Larsson <andreas@gaisler.com>, Stuart Yoder <stuyoder@gmail.com>,
+ Laurentiu Tudor <laurentiu.tudor@nxp.com>, Jens Axboe <axboe@kernel.dk>,
+ Sudeep Holla <sudeep.holla@arm.com>,
+ Cristian Marussi <cristian.marussi@arm.com>, Ard Biesheuvel
+ <ardb@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-hwmon@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pwm@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux1394-devel@lists.sourceforge.net, linux-serial@vger.kernel.org,
+ linux-sound@vger.kernel.org, open-iscsi@googlegroups.com,
+ linux-scsi@vger.kernel.org, linux-cxl@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+ arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20241203-const_dfc_done-v2-0-7436a98c497f@quicinc.com>
+ <g32cigmktmj4egkq2tof27el2yss4liccfxgebkgqvkil32mlb@e3ta4ezv7y4m>
+ <9d34bd6f-b120-428a-837b-5a5813e14618@icloud.com>
+ <2024120320-manual-jockey-dfd1@gregkh>
+ <b9885785-d4d4-4c72-b425-3dc552651d7e@icloud.com>
+ <8eb7c0c54b280b8eb72f82032ede802c001ab087.camel@HansenPartnership.com>
+ <8fb887a0-3634-4e07-9f0d-d8d7c72ca802@t-8ch.de>
+ <f5ea7e17-5550-4658-8f4c-1c51827c7627@icloud.com>
+ <108c63c753f2f637a72c2e105ac138f80d4b0859.camel@HansenPartnership.com>
+ <235ce0a9-1db1-4558-817b-6f92f22be5ab@icloud.com>
+ <5c905df49a332b1136787a524955b46b6153c012.camel@HansenPartnership.com>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <5c905df49a332b1136787a524955b46b6153c012.camel@HansenPartnership.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: SnhSPaefh2SqVr4UPg8Q8Npi4W-Py9Af
+X-Proofpoint-ORIG-GUID: SnhSPaefh2SqVr4UPg8Q8Npi4W-Py9Af
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-04_19,2024-12-04_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0
+ mlxlogscore=999 adultscore=0 suspectscore=0 bulkscore=0 spamscore=0
+ phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412040186
 
-On Tue, 3 Dec 2024 at 07:17, Ferry Meng <mengferry@linux.alibaba.com> wrote=
-:
->
-> We seek to develop a more flexible way to use virtio-blk and bypass the b=
-lock
-> layer logic in order to accomplish certain performance optimizations. As =
-a
-> result, we referred to the implementation of io_uring passthrough in NVMe
-> and implemented it in the virtio-blk driver. This patch series adds io_ur=
-ing
-> passthrough support for virtio-blk devices, resulting in lower submit lat=
-ency
-> and increased flexibility when utilizing virtio-blk.
+On 2024/12/5 00:42, James Bottomley wrote:
+>>>>  introduce extra device_find_child_new() which is constified  ->
+>>>> use *_new() replace ALL device_find_child() instances one by one
+>>>> -> remove device_find_child() -> rename *_new() to
+>>>> device_find_child() once.
+>>> Why bother with the last step, which churns the entire code base
+>>> again?
+>> keep the good API name device_find_child().
+> Well, I think it's a good opportunity to rename the API better, but if
+> that's the goal, you can still do it with _Generic() without churning
+> the code base a second time.  The example is in
+> slab.h:kmem_cache_create
+> 
 
-First I thought this was similar to Stefano Garzarella's previous
-virtio-blk io_uring passthrough work where a host io_uring was passed
-through into the guest:
-https://static.sched.com/hosted_files/kvmforum2020/9c/KVMForum_2020_io_urin=
-g_passthrough_Stefano_Garzarella.pdf
+i understand these solutions _Generic()/_new/squashing.
+every solutions have its advantages and disadvantages.
 
-But now I see this is a uring_cmd interface for sending virtio_blk
-commands from userspace like the one offered by the NVMe driver.
+i decide to use squashing solution for this concrete scenario after some
+considerations since:
 
-Unlike NVMe, the virtio-blk command set is minimal and does not offer
-a rich set of features. Is the motivation really virtio-blk command
-passthrough or is the goal just to create a fast path for I/O?
+1) it has the minimal patch count to achieve target.
+2) every patch is valuable, but other solutions needs to undo beginning
+  patch finally.
+3) for the squashing patch, i will only make the least and simplest
+changes for various match functions, that will compensate its
+disadvantages.
 
-If the goal is just a fast path for I/O, then maybe Jens would
-consider a generic command set that is not device-specific? That way
-any driver (NVMe, virtio-blk, etc) can implement this uring_cmd
-interface and any application can use it without worrying about the
-underlying command set. I think a generic fast path would be much more
-useful to applications than driver-specific interfaces.
+>>> Why not call the new function device_find_child_const() and simply
+>>> keep it (it's descriptive of its function).  That way you can have
+>>> a patch series without merging and at the end simply remove the old
+>>> function.
+>> device_find_child is a good name for the API, 'find' already means
+>> const.
+> Not to me it doesn't, but that's actually not what I think is wrong
+> with the API name: it actually only returns the first match, so I'd
+> marginally prefer it to be called device_find_first_child() ... not
+> enough to churn the code to change it, but since you're doing that
+> anyway it might make sense as an update.
 
->
-> To test this patch series, I changed fio's code:
-> 1. Added virtio-blk support to engines/io_uring.c.
-> 2. Added virtio-blk support to the t/io_uring.c testing tool.
-> Link: https://github.com/jdmfr/fio
->
-> Using t/io_uring-vblk, the performance of virtio-blk based on uring-cmd
-> scales better than block device access. (such as below, Virtio-Blk with Q=
-EMU,
-> 1-depth fio)
-> (passthru) read: IOPS=3D17.2k, BW=3D67.4MiB/s (70.6MB/s)
-> slat (nsec): min=3D2907, max=3D43592, avg=3D3981.87, stdev=3D595.10
-> clat (usec): min=3D38, max=3D285,avg=3D53.47, stdev=3D 8.28
-> lat (usec): min=3D44, max=3D288, avg=3D57.45, stdev=3D 8.28
-> (block) read: IOPS=3D15.3k, BW=3D59.8MiB/s (62.7MB/s)
-> slat (nsec): min=3D3408, max=3D35366, avg=3D5102.17, stdev=3D790.79
-> clat (usec): min=3D35, max=3D343, avg=3D59.63, stdev=3D10.26
-> lat (usec): min=3D43, max=3D349, avg=3D64.73, stdev=3D10.21
->
-> Testing the virtio-blk device with fio using 'engines=3Dio_uring_cmd'
-> and 'engines=3Dio_uring' also demonstrates improvements in submit latency=
-.
-> (passthru) taskset -c 0 t/io_uring-vblk -b4096 -d8 -c4 -s4 -p0 -F1 -B0 -O=
-0 -n1 -u1 /dev/vdcc0
-> IOPS=3D189.80K, BW=3D741MiB/s, IOS/call=3D4/3
-> IOPS=3D187.68K, BW=3D733MiB/s, IOS/call=3D4/3
-> (block) taskset -c 0 t/io_uring-vblk -b4096 -d8 -c4 -s4 -p0 -F1 -B0 -O0 -=
-n1 -u0 /dev/vdc
-> IOPS=3D101.51K, BW=3D396MiB/s, IOS/call=3D4/3
-> IOPS=3D100.01K, BW=3D390MiB/s, IOS/call=3D4/4
->
-> The performance overhead of submitting IO can be decreased by 25% overall
-> with this patch series. The implementation primarily references 'nvme io_=
-uring
-> passthrough', supporting io_uring_cmd through a separate character interf=
-ace
-> (temporarily named /dev/vdXc0). Since this is an early version, many
-> details need to be taken into account and redesigned, like:
-> =E2=97=8F Currently, it only considers READ/WRITE scenarios, some more co=
-mplex operations
-> not included like discard or zone ops.(Normal sqe64 is sufficient, in my =
-opinion;
-> following upgrades, sqe128 and cqe32 might not be needed).
-> =E2=97=8F ......
->
-> I would appreciate any useful recommendations.
->
-> Ferry Meng (3):
->   virtio-blk: add virtio-blk chardev support.
->   virtio-blk: add uring_cmd support for I/O passthru on chardev.
->   virtio-blk: add uring_cmd iopoll support.
->
->  drivers/block/virtio_blk.c      | 325 +++++++++++++++++++++++++++++++-
->  include/uapi/linux/virtio_blk.h |  16 ++
->  2 files changed, 336 insertions(+), 5 deletions(-)
->
-> --
-> 2.43.5
->
->
+name device_find_child appeared 18 years ago, it is good to keep this
+name developers known about.
+
+the API only return one device *, it should be obvious that it is the
+first device which meet matching condition.
+
+Other device finding APIs (bus|class|driver)_find_device() does not have
+concern about 'first'
+
+So, IMO, current name is good.
+
