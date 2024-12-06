@@ -1,53 +1,53 @@
 Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A141212FAA
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 22:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0CF1F9EA9
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 22:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733524208; cv=none; b=SM9B3GhfUWHAYUqrpzmZSdlctEONMa/zIJro78KzYIsnH7qK6PBeIBZh3bw9dY0HTD+yTG3E5QRScf6i3mh9obl6KlmSK7mcBY6zRH19gzlC+5Lr55kUqF7GwwTdDeLRwTxCGSBQpp7yj18/H8+0bPeuFq3gEcSZ8zxHi0KHoOw=
+	t=1733524212; cv=none; b=oa13nr0/XpPQraOaoky2fNA745B4VUMfcmJ0pVx5MDa4K4se9lwzGkvlk3qXC9uKeW+AF63Z+eAdNtZw9ccse1ChWPIzoshi7ylvk2lKfjcC0se7KopXgJivbKfkZTtuNum98qVEtvYsWvbYEFYjX10XykFXG99ekt+Kgg73bp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733524208; c=relaxed/simple;
-	bh=3DQXd4yJtDB6BYisNYWGe/g9nDmYCbca6TMBeVLuqls=;
+	s=arc-20240116; t=1733524212; c=relaxed/simple;
+	bh=hfeQrSKzpWIy3OO3Oin2gi8VuTZqhNuFtx8UGd5jvpI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=clIjw7hxCp0X0YiYp/HFDD9r09IwEbQw2sVRtYPn30Lfn16yuROGtF7EKLtfbiDbIdOxj5Hj1YNBJXw15sjSAEwmuCc4S+PsaqILKZqjhzA/fvSNWTb/Fv/1F4T/eAkEy7nEWfP9dx9oXU2uTXBKsXf8G8K1XZdmNgyP73B3VX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=M+EE+KSh; arc=none smtp.client-ip=67.231.153.30
+	 MIME-Version:Content-Type; b=nOVI7xpVaes56A0vutJ7yAKntipmM/zKYI/bK+LfWcTRRLv2yBgTIT7sSyHfMEzRwpZniODT2lIt5XAUEL8CCVyY9B7kp2n8ZidRP0Cd+NixGzzGFZ/fRtguLn6GgusaMKJjmEVZ83Lfim7UZqHvKzisef28WVWoKeOt8Jz8ZmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=UAwEVY1r; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="M+EE+KSh"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="UAwEVY1r"
 Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 4B6Lh0CG021619
-	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 14:30:05 -0800
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 4B6Lh0CM021619
+	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 14:30:09 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=R9M24a6ylRLzXnir6ciiUs6+m+tvkucIQYlBzr9gqaU=; b=M+EE+KShOfku
-	JfkC7f/NloEFOPkHP7tJELbCox8qTlakVfbc278w65KOW30+ojsqvz6uT8v27G0J
-	qq701yzAHnwvTFOUa3+BYJpmf2klPnDsd164LJTCyBlY04xXtusYMAJ76+VwVYjF
-	vYO22fQ3Y0uVdbCDB9EQwPsRRvTrR8/CiZ+9Dw8ZnYkpRcs82jCfUHCCvX3rsRCa
-	NoQr6TBxAlj3BigunL1FxA6y+gfgy5p+mCbyd8ig1KIR25qM7Tk1pkRvXLk8lWpm
-	3GDfkEIzeA+crYIMgaSi3mzWma9LRvWjDSLJhiYKNavUJLPTW/Ld99rHocHKYGe2
-	OF0uB11I9g==
+	 bh=oxFDFgnTMRB5Y+npjeZrWa3Vc5pSM5Iq2SS4ZNMVCY0=; b=UAwEVY1r+Dn+
+	L5i1w0/5uF5t0jMe+mEAlyRkOOUyNlv2ZoCW4ooNLe4XBYNE0kAkZjC9vuq/FzZP
+	ghn3J0SkL4jX34moYIz7jehxMoHv6pzFF7FSJczOynaHMeEb+QSJOtCTWpL9RFou
+	lNHM7jpW4vUla0ynEx7PGxBe47ZT/EApws+2Iu2XcaD++HMXWynr54z5eztx5n0+
+	O/SnSP1InhNGt5kh7Cm7QKz9YjTasjPfbyz0Zlw41UQENZ0tMhhdfAEiTFENLr0F
+	AaIYFir8whBCL0R+RoO6pmOjn3U6i1a9vxkmTayvDshnY13ZoJmU1AFE35+FpygB
+	JSTvyakVNQ==
 Received: from mail.thefacebook.com ([163.114.134.16])
-	by m0001303.ppops.net (PPS) with ESMTPS id 43c7neh2ax-6
+	by m0001303.ppops.net (PPS) with ESMTPS id 43c7neh2ax-12
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 14:30:05 -0800 (PST)
-Received: from twshared8234.09.ash9.facebook.com (2620:10d:c085:208::7cb7) by
+	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 14:30:09 -0800 (PST)
+Received: from twshared24170.03.ash8.facebook.com (2620:10d:c085:108::150d) by
  mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Fri, 6 Dec 2024 22:30:00 +0000
+ 15.2.1544.11; Fri, 6 Dec 2024 22:30:02 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 4113F15B8CB82; Fri,  6 Dec 2024 14:18:27 -0800 (PST)
+	id 30F3615B8CB7B; Fri,  6 Dec 2024 14:18:27 -0800 (PST)
 From: Keith Busch <kbusch@meta.com>
 To: <axboe@kernel.dk>, <hch@lst.de>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
         <io-uring@vger.kernel.org>
 CC: <sagi@grimberg.me>, <asml.silence@gmail.com>, <anuj20.g@samsung.com>,
         <joshi.k@samsung.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv12 07/12] io_uring: enable per-io write streams
-Date: Fri, 6 Dec 2024 14:17:56 -0800
-Message-ID: <20241206221801.790690-8-kbusch@meta.com>
+Subject: [PATCHv12 06/12] block: expose write streams for block device nodes
+Date: Fri, 6 Dec 2024 14:17:55 -0800
+Message-ID: <20241206221801.790690-7-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20241206221801.790690-1-kbusch@meta.com>
 References: <20241206221801.790690-1-kbusch@meta.com>
@@ -60,74 +60,103 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: bZPH7CT6I18O_l-cTMzdMH3rnOBF4RDN
-X-Proofpoint-ORIG-GUID: bZPH7CT6I18O_l-cTMzdMH3rnOBF4RDN
+X-Proofpoint-GUID: aD2LGke4-Ox2lSmvV43ZSb5lzRjogj30
+X-Proofpoint-ORIG-GUID: aD2LGke4-Ox2lSmvV43ZSb5lzRjogj30
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
-From: Keith Busch <kbusch@kernel.org>
+From: Christoph Hellwig <hch@lst.de>
 
-Allow userspace to pass a per-I/O write stream in the SQE:
+Export statx information about the number and granularity of write
+streams, use the per-kiocb write hint and map temperature hints
+to write streams (which is a bit questionable, but this shows how it is
+done).
 
-      __u8 write_stream;
-
-The __u8 type matches the size the filesystems and block layer support.
-
-Application can query the supported values from the statx
-max_write_streams field. Unsupported values are ignored by file
-operations that do not support write streams or rejected with an error
-by those that support them.
-
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- include/uapi/linux/io_uring.h | 4 ++++
- io_uring/io_uring.c           | 2 ++
- io_uring/rw.c                 | 1 +
- 3 files changed, 7 insertions(+)
+ block/bdev.c |  6 ++++++
+ block/fops.c | 23 +++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.=
-h
-index 38f0d6b10eaf7..986a480e3b9c2 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -92,6 +92,10 @@ struct io_uring_sqe {
- 			__u16	addr_len;
- 			__u16	__pad3[1];
- 		};
-+		struct {
-+			__u8	write_stream;
-+			__u8	__pad4[3];
-+		};
- 	};
- 	union {
- 		struct {
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index a8cbe674e5d63..978d0617d7af8 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -3868,6 +3868,8 @@ static int __init io_uring_init(void)
- 	BUILD_BUG_SQE_ELEM(44, __s32,  splice_fd_in);
- 	BUILD_BUG_SQE_ELEM(44, __u32,  file_index);
- 	BUILD_BUG_SQE_ELEM(44, __u16,  addr_len);
-+	BUILD_BUG_SQE_ELEM(44, __u8,   write_stream);
-+	BUILD_BUG_SQE_ELEM(45, __u8,   __pad4[0]);
- 	BUILD_BUG_SQE_ELEM(46, __u16,  __pad3[0]);
- 	BUILD_BUG_SQE_ELEM(48, __u64,  addr3);
- 	BUILD_BUG_SQE_ELEM_SIZE(48, 0, cmd);
-diff --git a/io_uring/rw.c b/io_uring/rw.c
-index 04e4467ab0ee8..b8aa2dfcbf48c 100644
---- a/io_uring/rw.c
-+++ b/io_uring/rw.c
-@@ -322,6 +322,7 @@ static int io_prep_rw(struct io_kiocb *req, const str=
-uct io_uring_sqe *sqe,
+diff --git a/block/bdev.c b/block/bdev.c
+index 738e3c8457e7f..c23245f1fdfe3 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -1296,6 +1296,12 @@ void bdev_statx(struct path *path, struct kstat *s=
+tat,
+ 		stat->result_mask |=3D STATX_DIOALIGN;
  	}
- 	rw->kiocb.dio_complete =3D NULL;
- 	rw->kiocb.ki_flags =3D 0;
-+	rw->kiocb.ki_write_stream =3D READ_ONCE(sqe->write_stream);
 =20
- 	rw->addr =3D READ_ONCE(sqe->addr);
- 	rw->len =3D READ_ONCE(sqe->len);
++	if ((request_mask & STATX_WRITE_STREAM) &&
++	    bdev_max_write_streams(bdev)) {
++		stat->write_stream_max =3D bdev_max_write_streams(bdev);
++		stat->result_mask |=3D STATX_WRITE_STREAM;
++	}
++
+ 	if (request_mask & STATX_WRITE_ATOMIC && bdev_can_atomic_write(bdev)) {
+ 		struct request_queue *bd_queue =3D bdev->bd_queue;
+=20
+diff --git a/block/fops.c b/block/fops.c
+index 6d5c4fc5a2168..f16aa39bf5bad 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -73,6 +73,7 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *=
+iocb,
+ 	}
+ 	bio.bi_iter.bi_sector =3D pos >> SECTOR_SHIFT;
+ 	bio.bi_write_hint =3D file_inode(iocb->ki_filp)->i_write_hint;
++	bio.bi_write_stream =3D iocb->ki_write_stream;
+ 	bio.bi_ioprio =3D iocb->ki_ioprio;
+ 	if (iocb->ki_flags & IOCB_ATOMIC)
+ 		bio.bi_opf |=3D REQ_ATOMIC;
+@@ -206,6 +207,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb,=
+ struct iov_iter *iter,
+ 	for (;;) {
+ 		bio->bi_iter.bi_sector =3D pos >> SECTOR_SHIFT;
+ 		bio->bi_write_hint =3D file_inode(iocb->ki_filp)->i_write_hint;
++		bio->bi_write_stream =3D iocb->ki_write_stream;
+ 		bio->bi_private =3D dio;
+ 		bio->bi_end_io =3D blkdev_bio_end_io;
+ 		bio->bi_ioprio =3D iocb->ki_ioprio;
+@@ -333,6 +335,7 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb =
+*iocb,
+ 	dio->iocb =3D iocb;
+ 	bio->bi_iter.bi_sector =3D pos >> SECTOR_SHIFT;
+ 	bio->bi_write_hint =3D file_inode(iocb->ki_filp)->i_write_hint;
++	bio->bi_write_stream =3D iocb->ki_write_stream;
+ 	bio->bi_end_io =3D blkdev_bio_end_io_async;
+ 	bio->bi_ioprio =3D iocb->ki_ioprio;
+=20
+@@ -398,6 +401,26 @@ static ssize_t blkdev_direct_IO(struct kiocb *iocb, =
+struct iov_iter *iter)
+ 	if (blkdev_dio_invalid(bdev, iocb, iter))
+ 		return -EINVAL;
+=20
++	if (iov_iter_rw(iter) =3D=3D WRITE) {
++		u16 max_write_streams =3D bdev_max_write_streams(bdev);
++
++		if (iocb->ki_write_stream) {
++			if (iocb->ki_write_stream > max_write_streams)
++				return -EINVAL;
++		} else if (max_write_streams) {
++			enum rw_hint write_hint =3D
++				file_inode(iocb->ki_filp)->i_write_hint;
++
++			/*
++			 * Just use the write hint as write stream for block
++			 * device writes.  This assumes no file system is
++			 * mounted that would use the streams differently.
++			 */
++			if (write_hint <=3D max_write_streams)
++				iocb->ki_write_stream =3D write_hint;
++		}
++	}
++
+ 	nr_pages =3D bio_iov_vecs_to_alloc(iter, BIO_MAX_VECS + 1);
+ 	if (likely(nr_pages <=3D BIO_MAX_VECS)) {
+ 		if (is_sync_kiocb(iocb))
 --=20
 2.43.5
 
