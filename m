@@ -1,38 +1,32 @@
-Received: from forward206d.mail.yandex.net (forward206d.mail.yandex.net [178.154.239.215])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAAA1C548A;
-	Fri,  6 Dec 2024 20:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.215
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EADF1F236B;
+	Fri,  6 Dec 2024 20:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733516624; cv=none; b=fhtrTrwCv8FVwvxADf7KM2JpaWC7gNbmM8dT10DRugA22KVyskOVlatqRVefkR3OdVv498omej5kdV5kX1J57jZwVSa2EE8zteBiZgRsntG5tVo8B0f0J6j6sf5gc0llW29mt0msNiNvINn4xd84oKDtW0N5dEwHPPqyy7/9gLU=
+	t=1733518706; cv=none; b=Y1RwqErzoq6ACEd300/kcYN3oX4EV5lZ9B8De2uIPS4LgjuYgwDRaFZnzklNFrK+KbfurHan5GJVEya2SDUSzvO2Cj6o3jbtAcrZAQP81ZPaXqc+BmjlIq7Z+pkJ5vfl+yMvH4PGkY6m+0W6qTSMCVFYiqXtslZa4KvuT/fso3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733516624; c=relaxed/simple;
-	bh=nJHqvSDEzZWwHL/QPBmZ+zkpjjhrSiB8uAjMJNM1B+I=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=rwsP2RLIS4vGLCIlSwzzIYdVyTQekq844xEuWx0+Dkf6BZ0tK1BZnvFrHh2IA6mt88y8wIu/AtgX8QAOQ4ncCogjKRZOzDeIQoPOJ98fw0oN01oo8MEr7znx1SyWGkWgE5z/oGkh+F25eEZzE9PMcD/jwBVbxXeA0789xvz/NCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cirno.name; spf=pass smtp.mailfrom=cirno.name; dkim=fail (0-bit key) header.d=cirno.name header.i=@cirno.name header.b=XpptpqrD reason="key not found in DNS"; arc=none smtp.client-ip=178.154.239.215
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cirno.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cirno.name
+	s=arc-20240116; t=1733518706; c=relaxed/simple;
+	bh=AoYJEduDKAfmUXw66punVqpLvMHGpz/t+LVYPT/z7pE=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=PTE0LzgcEYhomE5+EfGy48xWLh+cLZxNq/uwTh6WHo6tb9XM1IEmlg6u+0XGOJLMFhShkwNNrnNwypY5CtJyUJCH1WfybwbICchqnIEwswWtdePDXwWQzRero4wKc5NeTVo0coPRFPDKgTxf35um/u/bVOhntIbNICecjFd5/s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=opdIpAAC; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=cirno.name header.i=@cirno.name header.b="XpptpqrD"
-Received: from forward100d.mail.yandex.net (forward100d.mail.yandex.net [IPv6:2a02:6b8:c41:1300:1:45:d181:d100])
-	by forward206d.mail.yandex.net (Yandex) with ESMTPS id F076F625CF;
-	Fri,  6 Dec 2024 23:16:41 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-99.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-99.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:26a5:0:640:547b:0])
-	by forward100d.mail.yandex.net (Yandex) with ESMTPS id 682CA60023;
-	Fri,  6 Dec 2024 23:16:34 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-99.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id UGps2S5OmW20-snDwSBOC;
-	Fri, 06 Dec 2024 23:16:33 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cirno.name; s=mail;
-	t=1733516193; bh=tSqt+eXRv/K6O8RPvlHIS317PkdnNTHI6BdZrqilh44=;
-	h=Subject:From:Cc:To:Date:Message-ID;
-	b=XpptpqrDLIolv0A/quUuGeXn+lzt53oKawT8YYQVOZCgW1jLFg/mnWMRz7gLtBkmy
-	 ErjdCCOFkZk0BUDn4qqsYYtqwUVj+awWwynSHR5Hnh+83Tx6sq2aEq7I45J1n+I82p
-	 yEkXFcFBspU/fielyRYDkcTqnvg4sWRO74kNEnR4=
-Authentication-Results: mail-nwsmtp-smtp-production-main-99.klg.yp-c.yandex.net; dkim=pass header.i=@cirno.name
-Message-ID: <7d73e19b-f264-4c31-8f5a-fb17b6bc0600@cirno.name>
-Date: Sat, 7 Dec 2024 04:16:29 +0800
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="opdIpAAC"
+Received: from [100.65.128.154] (unknown [20.236.11.102])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 8B63620ACD7A;
+	Fri,  6 Dec 2024 12:58:18 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8B63620ACD7A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1733518699;
+	bh=M9PuEUd7fHK0twjnpmT4sQ2WiGKSyXN5nPrU+06sRxI=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=opdIpAACnQeStJ33oACe6p52ZM8f0Sws7Fv8oVZEtnJ34oxYkj2Ifncn0UBE7+8VM
+	 /Rer5IHWNKL+Om4cBhthsawIs+kQdevr3ykVw21CBvfVnNLhAZ1lcWLQbVr0aJDoH2
+	 0Lv+tHrW7mbf2ysXMzyMfTT7x/zNVB+cEVkkvmJU=
+Message-ID: <dab77729-682f-4182-9fb2-cd522ac29b5f@linux.microsoft.com>
+Date: Fri, 6 Dec 2024 12:58:17 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,95 +34,69 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Cc: eahariha@linux.microsoft.com, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
+ linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
+Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
+ <b9fcb12a-b7a4-4c33-836e-67109ce07deb@intel.com>
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
 Content-Language: en-US
-To: Sergey Senozhatsky <senozhatsky@chromium.org>,
- Minchan Kim <minchan@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Nick Terrell <terrelln@fb.com>,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-From: LiviaMedeiros <9@cirno.name>
-Subject: [PATCH] zram: make default ZSTD compression level configurable
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <b9fcb12a-b7a4-4c33-836e-67109ce07deb@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-From: LiviaMedeiros <livia@cirno.name>
+On 11/29/2024 4:57 AM, Przemek Kitszel wrote:
+> 
+> [removed most non-list recipients, it's just too much]
+> 
+> On 11/15/24 10:26 PM, Easwar Hariharan wrote:
+<snip>
+>>
+>> ---
+>> Changes in v2:
+>> - EDITME: describe what is new in this series revision.
+>> - EDITME: use bulletpoints and terse descriptions.
+>> - Link to v1: https://lore.kernel.org/r/20241115-converge-secs-to-
+>> jiffies-v1-0-19aadc34941b@linux.microsoft.com
+> 
+> that is not a proper changelog, you were supposed to edit those
+> placeholder entries; please look around for examples
+> 
+> There is also just too much recipients. Please split up your patches
+> into smaller pieces. You will also learn the process on a smaller
+> sample.
+> 
+> And definitively please wait for 48h before reposting such big series.
 
-Add support for configuring the default ZSTD compression level for zram
-devices via the CONFIG_ZRAM_DEFAULT_ZSTD_LEVEL configuration option.
-If this option is not set, fallback to zstd_default_clevel() is used.
+Yes, sorry, I sent out a v2 in a moment of panic on including the
+already accepted patch in v1. I failed to edit the changelog in that
+same panic. I'll try to not panic and do better in the future.
 
-Signed-off-by: LiviaMedeiros <livia@cirno.name>
----
-Disclaimer:
-This probably should be implemented in userspace, I failed to find 
-relevant options in zram-init (v11.1) scripts nor zramctl (v2.40.2) utility.
-I also failed to make something like `echo "algo=zstd level=9" > 
-/sys/block/zram3/algorithm_params` work in runtime, but I assume I'm 
-just dumb and/or it requires extra steps.
+> 
+> Regarding code - you could also convert msecs_to_jiffies(const * HZ),
+> there are 10 that are greppable.
+> 
 
-Nevertheless IMHO it makes sense to set defaults in kernel config: when 
-kernel is built for specific hardware, it would be handy to adjust it 
-depending on amount of extra CPU power or extra RAM.
-The main usecase for adjusting the compression level that I see is 
-making zram device capable of holding _a lot_ of transparently 
-compressed text data, fitting into RAM at the cost of additional CPU time.
-Hence this patch implements this only for zstd backend, which provides 
-the best compression ratio potential (perhaps implementing xz/LZMA2 
-backend would also help with it).
-If this approach looks feasible, it can be expanded to other algos as well.
+Those seem to be mistakes. const*HZ is a seconds-denominated timeout,
+being passed to msecs_to_jiffies() which will treat it as a
+millisecond-denominated timeout resulting in an excessively long
+timeout. I suppose that's better than a too-short timeout, and
+apparently it's been working fine all along since hardware responds
+before the too-long timeout expires. Half of them are in
+drivers/scsi/arcmsr/arcmsr_hba.c and the pattern has apparently been
+there since 2010.
 
-I'm open for any suggestions.
----
-  drivers/block/zram/Kconfig        | 10 ++++++++++
-  drivers/block/zram/backend_zstd.c |  8 +++++++-
-  2 files changed, 17 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/zram/Kconfig b/drivers/block/zram/Kconfig
-index 402b7b175863..8a5e6da39834 100644
---- a/drivers/block/zram/Kconfig
-+++ b/drivers/block/zram/Kconfig
-@@ -32,6 +32,16 @@ config ZRAM_BACKEND_ZSTD
-  	select ZSTD_COMPRESS
-  	select ZSTD_DECOMPRESS
-
-+config ZRAM_DEFAULT_ZSTD_LEVEL
-+	int "Default zstd compression level"
-+	depends on ZRAM_BACKEND_ZSTD
-+	range 1 22
-+	default 3
-+	help
-+	  Sets the default compression level for zstd compression in zram.
-+	  The value can range from 1 (fastest) to 22 (maximum compression).
-+	  If not set, the system uses the zstd default (typically 3).
-+
-  config ZRAM_BACKEND_DEFLATE
-  	bool "deflate compression support"
-  	depends on ZRAM
-diff --git a/drivers/block/zram/backend_zstd.c 
-b/drivers/block/zram/backend_zstd.c
-index 1184c0036f44..af7b919ec11c 100644
---- a/drivers/block/zram/backend_zstd.c
-+++ b/drivers/block/zram/backend_zstd.c
-@@ -7,6 +7,12 @@
-
-  #include "backend_zstd.h"
-
-+#ifdef CONFIG_ZRAM_DEFAULT_ZSTD_LEVEL
-+#define ZRAM_DEFAULT_ZSTD_LEVEL CONFIG_ZRAM_DEFAULT_ZSTD_LEVEL
-+#else
-+#define ZRAM_DEFAULT_ZSTD_LEVEL zstd_default_clevel()
-+#endif
-+
-  struct zstd_ctx {
-  	zstd_cctx *cctx;
-  	zstd_dctx *dctx;
-@@ -68,7 +74,7 @@ static int zstd_setup_params(struct zcomp_params *params)
-
-  	params->drv_data = zp;
-  	if (params->level == ZCOMP_PARAM_NO_LEVEL)
--		params->level = zstd_default_clevel();
-+		params->level = ZRAM_DEFAULT_ZSTD_LEVEL;
-
-  	zp->cprm = zstd_get_params(params->level, PAGE_SIZE);
-
--- 
-2.47.1
+Thanks,
+Easwar
