@@ -1,101 +1,98 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC203D6B
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 08:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE30B3D6B
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 08:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733473367; cv=none; b=pRUGCd1u+Mg+IvLDYPmyFE1HfQLj7VeEa3zKLW1OEOOhfH8x7yMpcso3erF8nV44FDzEsM3t7EmYsVoAGFayDMOE1SWQ+Lg4MI+d06rSJo/Ty6BzFBXUIzzhi1j4l8tmcK+bMu/wBm+nHxdGIXRNYcecqbmpvOSJcxAKalRMkg4=
+	t=1733473495; cv=none; b=E0qbeM8iDAh9Qop7U6hkCK1QFHQE+yLohI/5Rolsqiaf/2+hRH4iLyd/rmtvrijL18EYY+TB+k+x+doT2vPwxAP+Ac+rLOm0sra3ODhNErObCCWvvQxMiGY4W2m05p0xIFqvAqAI/Flr+dXiNZLI17z3bVxb53P4X/KaEa706OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733473367; c=relaxed/simple;
-	bh=2oPIYu2XDu1bMFb6lG3adoh3yGDOzYdDvr+B54LR9wk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bHEQkza30nPd7jTn6/biffhGAeonK/E/APaVlGU041N6IqJTUIjdTSZisqYvc9VxkiBscUNv0s3bH8f3Xkp90KaxzT9G+deuIdyjmWO0txH3uTupO0p7vTRMEhuRdyaQaknnSg12Oy7MQsu5xbJDygkG2gkDcGuZtHMzz7Jgzrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pz/y4Ols; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1733473495; c=relaxed/simple;
+	bh=ye8J5gMpyEgoziFk1k+Gop+xzKhy4Yw7NPhZRthC9cw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=ROfH1J4NOj9Q/3NOPCeGNpq98Ozv1wSKZOAJjGNy0hC/JJLFDI25oMfuFxpxz6Kvt/daz6E72MmYGsZdzn+uh1mnYLN60pGFYRIUAV+aUXX91nc7C2y6sJrAE22Q0pfiUKU3lYGaoxI7TKVOZnU5c1j0QbHOmDT6aM+hX0MQXsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a2Qri3HO; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pz/y4Ols"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a2Qri3HO"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1733473365;
+	s=mimecast20190719; t=1733473492;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RGaaRf1WvXqk0+ZbmbiORzv6Xjsd1DlYTsaS8yOqyzk=;
-	b=Pz/y4Ols2/K/wyxDrUW0s1Sqau0B6DfrBAAIAtNtsOY02Zdw8+woMNvM864ReUx+xXy2Ai
-	KCu092GXmUq8LoYcmDj6PAYfwBFhw+oYP3oODTVbj0JDZ25PvpEIaflI3/WM0YLoH+a8OB
-	eOavhwJ3bJcVm4mo2tftgztx5W9xjeo=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-360-7oucmW5rNY-u8mrZTqMRDg-1; Fri,
- 06 Dec 2024 03:22:43 -0500
-X-MC-Unique: 7oucmW5rNY-u8mrZTqMRDg-1
-X-Mimecast-MFC-AGG-ID: 7oucmW5rNY-u8mrZTqMRDg
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A3D761956088;
-	Fri,  6 Dec 2024 08:22:42 +0000 (UTC)
-Received: from localhost (unknown [10.72.112.88])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 899F81955F3F;
-	Fri,  6 Dec 2024 08:22:41 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/3] ubd_drv: fix io command buffer mapping
-Date: Fri,  6 Dec 2024 16:21:59 +0800
-Message-ID: <20241206082202.949142-6-ming.lei@redhat.com>
-In-Reply-To: <20241206082202.949142-1-ming.lei@redhat.com>
-References: <20241206082202.949142-1-ming.lei@redhat.com>
+	bh=OS4aZvls3ix/DDflqOHJki+tFShMMQ2cafg5eO3cwRM=;
+	b=a2Qri3HOEvdJ2QFFPdATE3oYtX2LgeQDwnDqeGSCbqmlI8ofST6gpo4aDx2/WyjI72/ObK
+	AfaugpsZ+30jntLSF1BtfFIXY68jmtCSvko/3xu+wTjT9aeGbACZFTm/mHGJ4sLreTf3nM
+	kWE5pz453rVDYmSLwMJ7pLth1EGV4Cg=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-615-yb8wMwJeMrun2SgZmoyiZg-1; Fri, 06 Dec 2024 03:24:50 -0500
+X-MC-Unique: yb8wMwJeMrun2SgZmoyiZg-1
+X-Mimecast-MFC-AGG-ID: yb8wMwJeMrun2SgZmoyiZg
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-85b8acec0d8so716935241.1
+        for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 00:24:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733473490; x=1734078290;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OS4aZvls3ix/DDflqOHJki+tFShMMQ2cafg5eO3cwRM=;
+        b=lbKLuhWzfvSE08Phrck33kuKb8AtxZw9rYuw2XjUOqc8BDDoi33FRz8WUyM7+6o3I3
+         JfCvzva0p+NSvgIWfiFMQ4SW70ZbkneHo9fN2ZUFbI9ZioL+xUw8p6V4Tuile6hxrncL
+         temsV5ZSty+UXW46sJYHlVEEIV8Jui63K2/s8u/nPZwVMeEvddJPfTHDStEalY4CKBO3
+         CWMHtEbBaBeTHNQQUf62awnDmF15rbNkkEbO4P2P4BoIwHkj08MqQkAm5ddorGh8GpwT
+         R4bbNUeBoRCILwtTF9UKJZkbeswF2wUzHc9csk40EcUn8lxdPsVtkbrUYM9lCDJhtyCF
+         94/w==
+X-Forwarded-Encrypted: i=1; AJvYcCX8SiYwsWjAzaIP8IdL9A9u5zhLVKfS4LQV6IA85xffdp7wN4WVCQB/JYOueUNkcO95HWvjPyd3tcBOqg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdyWEFl7VNd7m01bht32Yry3UjZD8ugYxSDx2Zq/0NkKuQbhoy
+	BTTayjc8FioCL1uijTec62JnQA62j2YFaFRTxaSlIzJY6ZaPtuuqvaykBZXhT6knl44lK2iENSS
+	LrhkUmyP63YrE8nb0L4mC8zedvdGeNBiJ/9GduImspOULX4PKQGtuELDdWvQAYX7lazZbMa5FiU
+	5zWSdbrp3hAc8uam1udn/sUMg+4kAYV9FI/wOVsPdlEbNJSg==
+X-Gm-Gg: ASbGncsVrIk2PhXbHZGt6jkYzdr56ZcMSiBroJl9JjP7rVTz+oA1dy13/EexcW8Xw2b
+	XoZO/wpaJxnM6bXmj4XbD3qBAi4fB51G8
+X-Received: by 2002:a05:6102:374f:b0:4af:38f1:5127 with SMTP id ada2fe7eead31-4afcaaf3caamr3059576137.22.1733473490261;
+        Fri, 06 Dec 2024 00:24:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEh+tdWlzp1lbcwVot0Q+xGYh/E776emTlbGeUOspOcgTEaaKhONkTQj/e3iJ/02DvYXv0Hts/pNtPAQCOi2PY=
+X-Received: by 2002:a05:6102:374f:b0:4af:38f1:5127 with SMTP id
+ ada2fe7eead31-4afcaaf3caamr3059564137.22.1733473490010; Fri, 06 Dec 2024
+ 00:24:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+References: <20241206082202.949142-1-ming.lei@redhat.com>
+In-Reply-To: <20241206082202.949142-1-ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Fri, 6 Dec 2024 16:24:38 +0800
+Message-ID: <CAFj5m9+dkMBk8dZcOGPkry1A7UuDrK6oNfNToVbYTjbrKooY3A@mail.gmail.com>
+Subject: Re: [PATCH 0/2] blk-mq: fix lockdep warning between sysfs_lock and
+ cpuhotplug lock
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Unit of vma->vm_pgoff is PAGE_SIZE, so have to compute physical offset
-first.
+On Fri, Dec 6, 2024 at 4:22=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrote=
+:
+>
+> Hello,
+>
+> The 1st patch is one prep patch.
+>
+> The 2nd one fixes lockdep warning triggered by dependency between
+> q->sysfs_lock and cpuhotplug_lock.
+>
+>
+> Ming Lei (2):
+>   blk-mq: register cpuhp callback after hctx is added to xarray table
+>   blk-mq: move cpuhp callback registering out of q->sysfs_lock
+>
+>  block/blk-mq.c | 108 ++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 94 insertions(+), 14 deletions(-)
 
-Without this patch, io command buffer gets corrupted in case of MQ.
-
-Fixes: 54f5156aa8d1 ("ubd_drv: prepare for supporting MQ")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ubd_drv.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/block/ubd_drv.c b/drivers/block/ubd_drv.c
-index 3b3723d78084..bbcbb2f05840 100644
---- a/drivers/block/ubd_drv.c
-+++ b/drivers/block/ubd_drv.c
-@@ -558,14 +558,17 @@ static int ubd_ch_mmap(struct file *filp, struct vm_area_struct *vma)
- 	struct ubd_device *ub = filp->private_data;
- 	size_t sz = vma->vm_end - vma->vm_start;
- 	unsigned max_sz = UBD_MAX_QUEUE_DEPTH * sizeof(struct ubdsrv_io_desc);
--	unsigned long pfn, end;
-+	unsigned long pfn, end, phys_off = vma->vm_pgoff << PAGE_SHIFT;
- 	int q_id;
- 
- 	end = UBDSRV_CMD_BUF_OFFSET + ub->dev_info.nr_hw_queues * max_sz;
--	if (vma->vm_pgoff < UBDSRV_CMD_BUF_OFFSET || vma->vm_pgoff >= end)
-+	if (phys_off < UBDSRV_CMD_BUF_OFFSET || phys_off >= end)
- 		return -EINVAL;
- 
--	q_id = (vma->vm_pgoff - UBDSRV_CMD_BUF_OFFSET) / max_sz;
-+	q_id = (phys_off - UBDSRV_CMD_BUF_OFFSET) / max_sz;
-+	pr_devel("%s: qid %d, pid %d, addr %lx pg_off %lx sz %lu\n",
-+			__func__, q_id, current->pid, vma->vm_start,
-+			phys_off, sz);
- 
- 	if (sz != ubd_queue_cmd_buf_size(ub, q_id))
- 		return -EINVAL;
--- 
-2.31.1
+Please ignore the 2nd round mess, sorry for the noise again.
 
