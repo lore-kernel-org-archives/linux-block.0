@@ -1,42 +1,44 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BC014659C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D911487F6
 	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 01:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733450013; cv=none; b=n5DOTrcl7vQYar2tWJ7eBDKbdkcYwp/I8Y+GhdBDQZxAJXLL234D0qXvmQ37k3tJ01kVxbbfo0/LMRzalgMrrUmJ8INcaq2K92q1fJNDwUKjzg2OG4Lj/cdvvba11f6W4uOfjR4q7olZRExcyFnSMq542hfj5pngpJr/3IsBdsE=
+	t=1733450013; cv=none; b=D5ULgP8Eg2D5mwyHrDpbfAKI0hv0waIF5PciFDR+ustvDD/beVRYk3ZJN6ddByCKBXsIiPU7ygrbvljJG64MURwNie0p8sXGqWCbpHygp/hf7BqL2XwjMAb/xRv2zUB+NnxjczE+bZoAPz0R3IB0e+jrsK7qY16tIR8tw5fv7WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733450013; c=relaxed/simple;
-	bh=bphxMXlIQATdUL67IFgKwOjenQ9Bah68ksQgsI/+rdw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=b76qcyYdUot9fvA9Wh6PnUPjqbbZE7/tfG1MKaT5hoasCHnlHomPpMdJunmIUMmrhlSLO9MD6l+EHSHUg8meRtOat4j04m3VYh45U2hQl1I5gZ/lhOxAU7CFB4ivce5pZgSYY+Zv4XNUUlI2iQvwxf0yG+etO7VXFZayAwHcLJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=LviDA6Le; arc=none smtp.client-ip=67.231.145.42
+	bh=yHXFvDsEeK5TRGak0SpI6LYPt8+i/ACjWPHS2Ewq/9I=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O5dy/wm8Lg3DdHlY18FsFH/nN09KxYSVhY82AJkHMraz/FkZRk5Ut5P7hHgeNtuH9aerWGI5i/2P8rMGbZTNhjoHU+sSbbebE4eOVGLi8gGOjqSAaWfh+vs7zcurbqHI9Rp1utctkNlKOrg7JmyqibeegNy0soGDqvuYa9teKuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=CAmUP0Ow; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="LviDA6Le"
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B603K9Q013801
-	for <linux-block@vger.kernel.org>; Thu, 5 Dec 2024 17:53:31 -0800
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="CAmUP0Ow"
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B603Jgd014117
+	for <linux-block@vger.kernel.org>; Thu, 5 Dec 2024 17:53:30 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2021-q4; bh=N6QJZ2jdiu9UH+vLXQ
-	lsk+NJB6RNvYfSL8jeMy0Efqw=; b=LviDA6LewbUvCfamYOMr+0mwCJG9IW+FFl
-	STB3fqyTPEWWzwlRkxT6XtKmqJiFOdUtgGE+q/tEyBlNtqTOf6KMU2SCIfxmTIcU
-	pyvqlBi4SZ/yo3c/0FrzSQBsOmVFpzsHfUY5P1JT4oq1NGkPfuLSAEW4SOi5bU9o
-	Yv5jhLBSFy4icQ/eSQc0FZEc5Rj6ED5wX4oQP2u+KHF8HTKSAlDtZdOkWFJRgp1r
-	Dq+l7G2QeHJNIjKf1TzDQ/t9szsvQW4qe5oSpSXxM7gQVchDn9nQ5plTN6gbuPr1
-	CmENm6DGECC3aPVYC1cSwgFZrkH893LTAwr+blExIiwzlOj7a5lg==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 43bnx9rpvh-17
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
+	 bh=H1449KeqBHH2qLyX/UaGXiOFOGfVyFVyzOCCtWJaXls=; b=CAmUP0OwnaBe
+	AZlMffA9J5WHd+5HmYW3a3yQ1M3kgnO5N7sxx7y9FfPPT2Jh5xEtYJ0KBZi+zSZU
+	QDSfmTII3zudYRRZvi4o2iuDJHbd4o6iGy/YdHJh/kYN+d+VEpgNMKZrdiTwcxRK
+	YmcsMvcH4mIF07xzggbtOS6W/tL1eqFhI2PWWpjVQL/win9zSaSmF85hs4l04LHY
+	/0JWOCSvuOGCo+37omWz61VuSRpMio19dw0YVlywR+Q9tht44Vm7B/uMdnavV0Pa
+	NBmyh4UIBtyp8eFBqL5e8up84IbPXiyLni/YmxhhUDltrZWa2U+IzHpxFvAhB7Ji
+	+OlnwgVUzw==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 43bmru153e-8
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Thu, 05 Dec 2024 17:53:31 -0800 (PST)
-Received: from twshared11145.37.frc1.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Thu, 05 Dec 2024 17:53:30 -0800 (PST)
+Received: from twshared32179.32.frc3.facebook.com (2620:10d:c0a8:1c::11) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Fri, 6 Dec 2024 01:53:24 +0000
+ 15.2.1544.11; Fri, 6 Dec 2024 01:53:22 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id C476E15B21147; Thu,  5 Dec 2024 17:53:08 -0800 (PST)
+	id 312B315B21155; Thu,  5 Dec 2024 17:53:09 -0800 (PST)
 From: Keith Busch <kbusch@meta.com>
 To: <axboe@kernel.dk>, <hch@lst.de>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
@@ -44,10 +46,12 @@ To: <axboe@kernel.dk>, <hch@lst.de>, <linux-block@vger.kernel.org>,
 CC: <sagi@grimberg.me>, <asml.silence@gmail.com>,
         Keith Busch
 	<kbusch@kernel.org>
-Subject: [PATCHv11 00/10] block write streams with nvme fdp
-Date: Thu, 5 Dec 2024 17:52:58 -0800
-Message-ID: <20241206015308.3342386-1-kbusch@meta.com>
+Subject: [PATCHv11 06/10] block: introduce a write_stream_granularity queue limit
+Date: Thu, 5 Dec 2024 17:53:04 -0800
+Message-ID: <20241206015308.3342386-7-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20241206015308.3342386-1-kbusch@meta.com>
+References: <20241206015308.3342386-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,57 +61,101 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: NebDCPj2rai4bYSji81CyybJ7t4_y2Xb
-X-Proofpoint-GUID: NebDCPj2rai4bYSji81CyybJ7t4_y2Xb
+X-Proofpoint-GUID: o5mvnlSysK9kSsZj388PW1Rek1V5dz65
+X-Proofpoint-ORIG-GUID: o5mvnlSysK9kSsZj388PW1Rek1V5dz65
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
-From: Keith Busch <kbusch@kernel.org>
+From: Christoph Hellwig <hch@lst.de>
 
-Changes from v10:
+Export the granularity that write streams should be discarded with,
+as it is essential for making good use of them.
 
- Merged up to block for-6.14/io_uring, which required some
- new attribute handling.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ Documentation/ABI/stable/sysfs-block | 8 ++++++++
+ block/blk-sysfs.c                    | 3 +++
+ include/linux/blkdev.h               | 7 +++++++
+ 3 files changed, 18 insertions(+)
 
- Not mixing write hints usage with write streams. This effectively
- abandons any attempts to use the existing fcntl API for use with
- filesystems in this series.
-
- Exporting the stream's reclaim unit nominal size.
-
-Christoph Hellwig (5):
-  fs: add a write stream field to the kiocb
-  block: add a bi_write_stream field
-  block: introduce a write_stream_granularity queue limit
-  block: expose write streams for block device nodes
-  nvme: add a nvme_get_log_lsi helper
-
-Keith Busch (5):
-  io_uring: protection information enhancements
-  io_uring: add write stream attribute
-  block: introduce max_write_streams queue limit
-  nvme: register fdp queue limits
-  nvme: use fdp streams if write stream is provided
-
- Documentation/ABI/stable/sysfs-block |  15 +++
- block/bdev.c                         |   6 +
- block/bio.c                          |   2 +
- block/blk-crypto-fallback.c          |   1 +
- block/blk-merge.c                    |   4 +
- block/blk-sysfs.c                    |   6 +
- block/bounce.c                       |   1 +
- block/fops.c                         |  23 ++++
- drivers/nvme/host/core.c             | 160 ++++++++++++++++++++++++++-
- drivers/nvme/host/nvme.h             |   5 +
- include/linux/blk_types.h            |   1 +
- include/linux/blkdev.h               |  16 +++
- include/linux/fs.h                   |   1 +
- include/linux/nvme.h                 |  73 ++++++++++++
- include/uapi/linux/io_uring.h        |  21 +++-
- io_uring/rw.c                        |  38 ++++++-
- 16 files changed, 359 insertions(+), 14 deletions(-)
-
+diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/sta=
+ble/sysfs-block
+index f67139b8b8eff..c454c68b68fe6 100644
+--- a/Documentation/ABI/stable/sysfs-block
++++ b/Documentation/ABI/stable/sysfs-block
+@@ -514,6 +514,14 @@ Description:
+ 		supported. If supported, valid values are 1 through
+ 		max_write_streams, inclusive.
+=20
++What:		/sys/block/<disk>/queue/write_stream_granularity
++Date:		November 2024
++Contact:	linux-block@vger.kernel.org
++Description:
++		[RO] Granularity of a write stream in bytes.  The granularity
++		of a write stream is the size that should be discarded or
++		overwritten together to avoid write amplification in the device.
++
+ What:		/sys/block/<disk>/queue/max_segments
+ Date:		March 2010
+ Contact:	linux-block@vger.kernel.org
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index c514c0cb5e93c..525f4fa132cd3 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -105,6 +105,7 @@ QUEUE_SYSFS_LIMIT_SHOW(max_discard_segments)
+ QUEUE_SYSFS_LIMIT_SHOW(max_integrity_segments)
+ QUEUE_SYSFS_LIMIT_SHOW(max_segment_size)
+ QUEUE_SYSFS_LIMIT_SHOW(max_write_streams)
++QUEUE_SYSFS_LIMIT_SHOW(write_stream_granularity)
+ QUEUE_SYSFS_LIMIT_SHOW(logical_block_size)
+ QUEUE_SYSFS_LIMIT_SHOW(physical_block_size)
+ QUEUE_SYSFS_LIMIT_SHOW(chunk_sectors)
+@@ -448,6 +449,7 @@ QUEUE_RO_ENTRY(queue_max_segments, "max_segments");
+ QUEUE_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
+ QUEUE_RO_ENTRY(queue_max_segment_size, "max_segment_size");
+ QUEUE_RO_ENTRY(queue_max_write_streams, "max_write_streams");
++QUEUE_RO_ENTRY(queue_write_stream_granularity, "write_stream_granularity=
+");
+ QUEUE_RW_LOAD_MODULE_ENTRY(elv_iosched, "scheduler");
+=20
+ QUEUE_RO_ENTRY(queue_logical_block_size, "logical_block_size");
+@@ -583,6 +585,7 @@ static struct attribute *queue_attrs[] =3D {
+ 	&queue_max_integrity_segments_entry.attr,
+ 	&queue_max_segment_size_entry.attr,
+ 	&queue_max_write_streams_entry.attr,
++	&queue_write_stream_granularity_entry.attr,
+ 	&queue_hw_sector_size_entry.attr,
+ 	&queue_logical_block_size_entry.attr,
+ 	&queue_physical_block_size_entry.attr,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index ce2c3ddda2411..7be8cc57561a1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -400,6 +400,7 @@ struct queue_limits {
+ 	unsigned short		max_discard_segments;
+=20
+ 	unsigned short		max_write_streams;
++	unsigned int		write_stream_granularity;
+=20
+ 	unsigned int		max_open_zones;
+ 	unsigned int		max_active_zones;
+@@ -1249,6 +1250,12 @@ static inline unsigned short bdev_max_write_stream=
+s(struct block_device *bdev)
+ 	return bdev_limits(bdev)->max_write_streams;
+ }
+=20
++static inline unsigned int
++bdev_write_stream_granularity(struct block_device *bdev)
++{
++	return bdev_limits(bdev)->write_stream_granularity;
++}
++
+ static inline unsigned queue_logical_block_size(const struct request_que=
+ue *q)
+ {
+ 	return q->limits.logical_block_size;
 --=20
 2.43.5
 
