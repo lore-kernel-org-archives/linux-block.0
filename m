@@ -1,102 +1,167 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EADF1F236B;
-	Fri,  6 Dec 2024 20:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8271F4E33
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 22:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733518706; cv=none; b=Y1RwqErzoq6ACEd300/kcYN3oX4EV5lZ9B8De2uIPS4LgjuYgwDRaFZnzklNFrK+KbfurHan5GJVEya2SDUSzvO2Cj6o3jbtAcrZAQP81ZPaXqc+BmjlIq7Z+pkJ5vfl+yMvH4PGkY6m+0W6qTSMCVFYiqXtslZa4KvuT/fso3w=
+	t=1733523840; cv=none; b=E+u7b9zXqZDiuh+MFk1EWHEbRHg1AFMrHAza1eR94oq6JcNoAkTgVR0wlHugm64x9vHT5MMiliL1KeGXFHOmjkjlIScoCxOGPYrm5nnu8pT+xEWLT5I7ym7WxI8BGbDcIhruIGfqsj9Ccn+mLooZmfdN1h7x1C2y85o0XcabET0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733518706; c=relaxed/simple;
-	bh=AoYJEduDKAfmUXw66punVqpLvMHGpz/t+LVYPT/z7pE=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=PTE0LzgcEYhomE5+EfGy48xWLh+cLZxNq/uwTh6WHo6tb9XM1IEmlg6u+0XGOJLMFhShkwNNrnNwypY5CtJyUJCH1WfybwbICchqnIEwswWtdePDXwWQzRero4wKc5NeTVo0coPRFPDKgTxf35um/u/bVOhntIbNICecjFd5/s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=opdIpAAC; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1733523840; c=relaxed/simple;
+	bh=X03FMPt3YRruUGWT/ETkFQmoWtcDIiXUMKL9Tc4WryA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EeCpkJiEf8CyXkvTmsUoN41++y9OaGlmLKjTKkaOrr9pNLRpYoGNAmME5q1FsLXiFvoRrpNuqPMzD376K69JBcpmGodI++ZRk+EaYAvuKUFWXkDhvRLE2i7y+NMpos21Z4uLvf8s1r3ocHAYKOG24zf8rBjmIanal2eEQtYTzHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=KZ/WZCSS; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="opdIpAAC"
-Received: from [100.65.128.154] (unknown [20.236.11.102])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 8B63620ACD7A;
-	Fri,  6 Dec 2024 12:58:18 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8B63620ACD7A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1733518699;
-	bh=M9PuEUd7fHK0twjnpmT4sQ2WiGKSyXN5nPrU+06sRxI=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=opdIpAACnQeStJ33oACe6p52ZM8f0Sws7Fv8oVZEtnJ34oxYkj2Ifncn0UBE7+8VM
-	 /Rer5IHWNKL+Om4cBhthsawIs+kQdevr3ykVw21CBvfVnNLhAZ1lcWLQbVr0aJDoH2
-	 0Lv+tHrW7mbf2ysXMzyMfTT7x/zNVB+cEVkkvmJU=
-Message-ID: <dab77729-682f-4182-9fb2-cd522ac29b5f@linux.microsoft.com>
-Date: Fri, 6 Dec 2024 12:58:17 -0800
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="KZ/WZCSS"
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B6Lh3WI005683
+	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 14:23:57 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
+	 bh=/nE2U8jG/bZjifVEojFrO7fPI6rw7U6tKwDNJZHWRpQ=; b=KZ/WZCSSsx3B
+	yv6GBsOv49NpVtTqF/lxgBegB1G2TPhxWdxv1Dw0Sp+m/bKxWjy3VdZ5wmSLIev2
+	vaLFHK1/I1HhOtegUlCMiNk8ZZe1tMSYJAGLt3wDyANC5pVKiWvBYy1zOXrIrSSg
+	0YAnmvfCkWZ7zPf8ZfQFUZZlpMUmi8C1EtCDevhzlYGmBiez0Pz6whtYXcoftneY
+	KqTENp3ZEaZBzU+SDznOD80+fnfI2rsFqm5ek8MiL0uFWS4Io4R1ZzLjJLejQQVR
+	nIyOSeLXt5jfmWUwWjtEimyIkiVk2iPdE1pzwEks7h4kyMPdSPb5LScNJ+7mZ4pL
+	hBIMjRICLA==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 43c6bx9p74-6
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 14:23:57 -0800 (PST)
+Received: from twshared9216.15.frc2.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.11; Fri, 6 Dec 2024 22:23:53 +0000
+Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
+	id 7C16515B8CB94; Fri,  6 Dec 2024 14:18:27 -0800 (PST)
+From: Keith Busch <kbusch@meta.com>
+To: <axboe@kernel.dk>, <hch@lst.de>, <linux-block@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
+        <io-uring@vger.kernel.org>
+CC: <sagi@grimberg.me>, <asml.silence@gmail.com>, <anuj20.g@samsung.com>,
+        <joshi.k@samsung.com>, Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv12 12/12] nvme: use fdp streams if write stream is provided
+Date: Fri, 6 Dec 2024 14:18:01 -0800
+Message-ID: <20241206221801.790690-13-kbusch@meta.com>
+X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20241206221801.790690-1-kbusch@meta.com>
+References: <20241206221801.790690-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: eahariha@linux.microsoft.com, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
- linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <b9fcb12a-b7a4-4c33-836e-67109ce07deb@intel.com>
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Content-Language: en-US
-In-Reply-To: <b9fcb12a-b7a4-4c33-836e-67109ce07deb@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: 8B5aTYbAPfFHqzes5FyPyfHHROY6n3bp
+X-Proofpoint-ORIG-GUID: 8B5aTYbAPfFHqzes5FyPyfHHROY6n3bp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-05_02,2024-10-04_01,2024-09-30_01
 
-On 11/29/2024 4:57 AM, Przemek Kitszel wrote:
-> 
-> [removed most non-list recipients, it's just too much]
-> 
-> On 11/15/24 10:26 PM, Easwar Hariharan wrote:
-<snip>
->>
->> ---
->> Changes in v2:
->> - EDITME: describe what is new in this series revision.
->> - EDITME: use bulletpoints and terse descriptions.
->> - Link to v1: https://lore.kernel.org/r/20241115-converge-secs-to-
->> jiffies-v1-0-19aadc34941b@linux.microsoft.com
-> 
-> that is not a proper changelog, you were supposed to edit those
-> placeholder entries; please look around for examples
-> 
-> There is also just too much recipients. Please split up your patches
-> into smaller pieces. You will also learn the process on a smaller
-> sample.
-> 
-> And definitively please wait for 48h before reposting such big series.
+From: Keith Busch <kbusch@kernel.org>
 
-Yes, sorry, I sent out a v2 in a moment of panic on including the
-already accepted patch in v1. I failed to edit the changelog in that
-same panic. I'll try to not panic and do better in the future.
+Maps a user requested write stream to an FDP placement ID if possible.
 
-> 
-> Regarding code - you could also convert msecs_to_jiffies(const * HZ),
-> there are 10 that are greppable.
-> 
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ drivers/nvme/host/core.c | 32 +++++++++++++++++++++++++++++++-
+ drivers/nvme/host/nvme.h |  1 +
+ 2 files changed, 32 insertions(+), 1 deletion(-)
 
-Those seem to be mistakes. const*HZ is a seconds-denominated timeout,
-being passed to msecs_to_jiffies() which will treat it as a
-millisecond-denominated timeout resulting in an excessively long
-timeout. I suppose that's better than a too-short timeout, and
-apparently it's been working fine all along since hardware responds
-before the too-long timeout expires. Half of them are in
-drivers/scsi/arcmsr/arcmsr_hba.c and the pattern has apparently been
-there since 2010.
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 5f802e243736a..63c8a117b3b4a 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -997,6 +997,18 @@ static inline blk_status_t nvme_setup_rw(struct nvme=
+_ns *ns,
+ 	if (req->cmd_flags & REQ_RAHEAD)
+ 		dsmgmt |=3D NVME_RW_DSM_FREQ_PREFETCH;
+=20
++	if (op =3D=3D nvme_cmd_write && ns->head->nr_plids) {
++		u16 write_stream =3D req->bio->bi_write_stream;
++
++		if (WARN_ON_ONCE(write_stream > ns->head->nr_plids))
++			return BLK_STS_INVAL;
++
++		if (write_stream) {
++			dsmgmt |=3D ns->head->plids[write_stream - 1] << 16;
++			control |=3D NVME_RW_DTYPE_DPLCMT;
++		}
++	}
++
+ 	if (req->cmd_flags & REQ_ATOMIC && !nvme_valid_atomic_write(req))
+ 		return BLK_STS_INVAL;
+=20
+@@ -2194,11 +2206,12 @@ static int nvme_check_fdp(struct nvme_ns *ns, str=
+uct nvme_ns_info *info,
+=20
+ static int nvme_query_fdp_info(struct nvme_ns *ns, struct nvme_ns_info *=
+info)
+ {
++	struct nvme_fdp_ruh_status_desc *ruhsd;
+ 	struct nvme_ns_head *head =3D ns->head;
+ 	struct nvme_fdp_ruh_status *ruhs;
+ 	struct nvme_fdp_config fdp;
+ 	struct nvme_command c =3D {};
+-	int size, ret;
++	int size, ret, i;
+=20
+ 	ret =3D nvme_get_features(ns->ctrl, NVME_FEAT_FDP, info->endgid, NULL, =
+0,
+ 				&fdp);
+@@ -2231,6 +2244,19 @@ static int nvme_query_fdp_info(struct nvme_ns *ns,=
+ struct nvme_ns_info *info)
+ 	if (!head->nr_plids)
+ 		goto free;
+=20
++	head->nr_plids =3D min(head->nr_plids, NVME_MAX_PLIDS);
++	head->plids =3D kcalloc(head->nr_plids, sizeof(head->plids),
++			      GFP_KERNEL);
++	if (!head->plids) {
++		ret =3D -ENOMEM;
++		goto free;
++	}
++
++	for (i =3D 0; i < head->nr_plids; i++) {
++		ruhsd =3D &ruhs->ruhsd[i];
++		head->plids[i] =3D le16_to_cpu(ruhsd->pid);
++	}
++
+ 	kfree(ruhs);
+ 	return 0;
+=20
+@@ -2285,6 +2311,10 @@ static int nvme_update_ns_info_block(struct nvme_n=
+s *ns,
+ 				"FDP failure status:0x%x\n", ret);
+ 		if (ret < 0)
+ 			goto out;
++	} else {
++		ns->head->nr_plids =3D 0;
++		kfree(ns->head->plids);
++		ns->head->plids =3D NULL;
+ 	}
+=20
+ 	blk_mq_freeze_queue(ns->disk->queue);
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 914cc93e91f6d..49b234bfb42c4 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -495,6 +495,7 @@ struct nvme_ns_head {
+ 	struct gendisk		*disk;
+=20
+ 	u16			nr_plids;
++	u16			*plids;
+ #ifdef CONFIG_NVME_MULTIPATH
+ 	struct bio_list		requeue_list;
+ 	spinlock_t		requeue_lock;
+--=20
+2.43.5
 
-Thanks,
-Easwar
