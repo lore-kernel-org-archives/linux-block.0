@@ -1,62 +1,65 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2063.outbound.protection.outlook.com [40.107.94.63])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2055.outbound.protection.outlook.com [40.107.95.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC0F2066DE
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 13:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890912066DE
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 13:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.55
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733493101; cv=fail; b=RrYYMgzskn3pgMC1lzYQIdJ0uKXr+R5W72eKhd6afJoJgSAlR0meGEGAeV3ZGxjT2vax5K2fAYiNTEBUF7WYi4AXLZPcWuwGyCVLoEQDPB/ILYJVztbijrk5uFXbbW6+G5DyNkFto+kTFYeqx2S45i6my3ZRgHu3qd8vvKcud+8=
+	t=1733493105; cv=fail; b=Zcza97Zeo9K5Z29efDhGGc4/qfS+cK3QODFKJqXTbNrfWpOzhvq1JdGnXTHFCh6veOUOAkRpnlNhwjWzGXvtQw/cwb32VQZlVHp1bRuxxpJ10EaZ152yQzqg+/uuWj2p6uPJjyycdYgHd4AogfQqzdo7A4HFoQlpiGm2XFGVmEE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733493101; c=relaxed/simple;
-	bh=OJKPOLs9nlig0q2ngXws9Buuykqbr3LuqjzdbdQwGHE=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=UCHh11x2v3TgGi0kdSI6vKB6Z5nQJgxM/mwNsnztlLgpBVR7/UYe9zf2N1r3eV/DeuxNlIjj7vHZM6FGgOqvc3JdrvRKJOmHq4UqvsH9g46dHgeqVDEyttU7FNvxXyOT6zn8CiJC0XjFqUhg9axZ2mkNQmrrez/uKWt5LY1F9i4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WT6jq6G0; arc=fail smtp.client-ip=40.107.94.63
+	s=arc-20240116; t=1733493105; c=relaxed/simple;
+	bh=yQyRmeFCaupNPKDoGf8+0Q/nLihYn7oD/OVrnVj+5cY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=eFXHAV258r9uUyZc61FEb/mpA0Q2/L9MM2d7adkvbWrrA1F6yqAwhfZCbDh4Yeo3Ul0D2delfqT2Myi8zRdgvk2hYIw+sdmFO2t7ocwYVXYBsdGsz+o7YwAD+JD2eFBKyiWTGtorHytQobhOoAM2JlMGyKeBmWNHh/0oqO/pEb4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WQ0jxyxv; arc=fail smtp.client-ip=40.107.95.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WT6jq6G0"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WQ0jxyxv"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Hhi+jrEFli5qkE3yjZrFXjTroIB5z2nbSGcpSa//0Byw+pHITAD3u6pXeeHZfzsHqqpbNL01Dj0fGl4N1qHb33opm5yi+/g2GH6K7aj5+wJGAsnePRKvBkGh0Et6UI2Ko+4YZgdI0wFD3SzTPkhPi/j7cOcFUXf6kT0qlNWQlqPlatTaKdTYA1Zd+CH96AyeAsQJffiGaqQ+A8BBxhRvNZZEQk74T20/33KubQm3YdNw8Lieqid7hfv/d6L95Bz+QxMw3J2hggWdYsqpu8c2458M5KfE/2UNkF+u+OSc8U1qm5BwgOsFPgjfW/sddgc5/OXL6ytZQLrXMDQ4rqnLBg==
+ b=ywz6QOL2+aeesoKyWqs24La5W33gAcZSQD690G6DsKMR+hYc3FkkYa6D1ruz3Ox8tixqWEWDoyEfdg9waakcexTi2rSdhGpngMlQlxX5eFGalI5Peoy1UiY8qtsEObXes0401Unf4hugIAJWIrUkIDfPXImAkOYpI0jm4SA9RQVV6U7UQ/JvMHTyw+yDEqbM+NtI8zdJ9Td9qYjJWGB2FmQk9VPYsC90wH2pDlEp5O3/TAGPyXN5AWWgTcS0ubmuE9RAuc1V9uAzxj6nstpTEUI1Z9b0F4705640cGIcrhQVpUm6q0008fMLH2R/iYeJVWKwzQL2k21y5SaoXAGfdQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+dAbjBdG7G19qFEvQxdfoCPLdOm+eDCduLnYQKh7O0Q=;
- b=hCTaKvIcFdxNkxF6gpv1icvdPkppPJh4ci7wPYtBGkI4mrf27wRTUkQ9D5NTcJTP1nsV9bVMaMd+ouRIwh+4SCkJnBOO4YU+A/6zaC+2jF04nalAvKGR9Jb5Ltd0B7nIp0klK4VSJaJr2aBdQD5iJQGO0KgUjqPmzX4H+mzl7yOVKVtdV6Ik10TXwALFXY8p1k6AOs1oxRJO00S6kSJVBnzieTOyP4gJRZNiGUAq8LIKo9NfMpkCQQuVHLggzbOzqpYIQ8i/Ge3A1GZPEQMSXpB2EGb1SaXcGSdNEfxyBNHXqNAL5SJYOyY4tngtJphZxOuQSLrJcedHpHKfMMD+PA==
+ bh=jF4cy/WoDM4NJ6o5D5oq+/atSv8wsoG7AgCJTpOGGyc=;
+ b=qmxYDyKYdwahlOfOxPPFpn27CTgfQl2dw+9FZHEz8lrZefudrdhlIi+xiYf1VWP9Azmz5WwZIn+GdrWf8i3FPin8ffuSSzA63mawoMcZLTjgMbjL52IxPbs6dJpjQ2lXZLmuGBFGuNmecV3jNj+CcAf5Lfq33rDci5IR2IHIrYSxr3a0j4EcUzNvjG9EujR5PcHzZt87OfuKEgqUUWiOQJBq+yQ8xXrThOuniQ8Bx8WCSd2mCDgf0fALHbDl4AlB4qGkJdUa2Bg+od0xl4gMFZ/94HRNHXnieSVqcNvBI64MoRTuFjgLGuwpSFMhv7GlnFRH9GUknvKw1KT1E0jMHw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+dAbjBdG7G19qFEvQxdfoCPLdOm+eDCduLnYQKh7O0Q=;
- b=WT6jq6G0XvV6xkK0hNv7e9VnLeCf7yUb7/OOQwAqZYDmOrFc7mQOP3Odc+s1YQ/zMKtCVB0g5dnYdzI5+07PyLjWMOH7/KD7frXRYQF2vU7AiKIRfVM6SXS3/NhqgCTmKFUIgZHyYJXJIoCgsQ/yJgR6YCX+xNTibMVzYbexMxn4uuXeu9OG2IF3k/tQ9el3u9sY2sMnFD4eVxZCswEiEk94hqxC2weKwCPCeQxUl3Vc+wGrIa+1gS6qtQA98ersmyJsfykeoZ+LELTBIjTMquONdhTHv6yMbmglHjGEmutEs9TXTR4qrHzeRATwpwClUmn2YRpnsFMhCmVENLpAtg==
+ bh=jF4cy/WoDM4NJ6o5D5oq+/atSv8wsoG7AgCJTpOGGyc=;
+ b=WQ0jxyxvwlwb0sH8NE6a/SUGLnmVJjWVbHjlmuAArMAbg38zSCsL8dr/xQU7fj9oug8At9oy11Rc+EQd3hW8wcbHeHIe0a73Tg543kQl5HQ8yzHtvRT4/B+VJ/dn8b9eeEg4+14Oo4U/VeoKdDL5VJZYNzDTqiDjC9/KWNNWSa5uI5bARJObikiXyNnq3bvdM6Xgpnfzcp+EnRPGB2v2r/QF+7z8vQuMXDd3dzulrPWON2IcwY1AM3hEentnDKWcusIVTQu7R8py2UKzV0csEXGmWjfoSptp360RjJ3hYFlJ22r9Qg+EIOEXjgGBrMUzjJS2av8XmmMsm3mzhooLvw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from SJ2PR12MB8943.namprd12.prod.outlook.com (2603:10b6:a03:547::17)
  by BY5PR12MB4209.namprd12.prod.outlook.com (2603:10b6:a03:20d::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.15; Fri, 6 Dec
- 2024 13:51:36 +0000
+ 2024 13:51:40 +0000
 Received: from SJ2PR12MB8943.namprd12.prod.outlook.com
  ([fe80::7577:f32f:798c:87cc]) by SJ2PR12MB8943.namprd12.prod.outlook.com
  ([fe80::7577:f32f:798c:87cc%7]) with mapi id 15.20.8230.010; Fri, 6 Dec 2024
- 13:51:36 +0000
+ 13:51:40 +0000
 From: Aurelien Aptel <aaptel@nvidia.com>
 To: aaptel@nvidia.com,
 	linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org
-Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Daniel Wagner <dwagner@suse.de>,
+Cc: Daniel Wagner <dwagner@suse.de>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
 	Shai Malin <smalin@nvidia.com>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v5 0/5] Add support to run against arbitrary targets
-Date: Fri,  6 Dec 2024 15:51:15 +0200
-Message-Id: <20241206135120.5141-1-aaptel@nvidia.com>
+Subject: [PATCH blktests v5 1/5] nvme/rc: introduce remote target support
+Date: Fri,  6 Dec 2024 15:51:16 +0200
+Message-Id: <20241206135120.5141-2-aaptel@nvidia.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241206135120.5141-1-aaptel@nvidia.com>
+References: <20241206135120.5141-1-aaptel@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: YT3PR01CA0116.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:85::6) To SJ2PR12MB8943.namprd12.prod.outlook.com
+X-ClientProxiedBy: YT4PR01CA0479.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:d6::19) To SJ2PR12MB8943.namprd12.prod.outlook.com
  (2603:10b6:a03:547::17)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -66,137 +69,314 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SJ2PR12MB8943:EE_|BY5PR12MB4209:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8bbbce11-de74-488a-0818-08dd15fd19b8
+X-MS-Office365-Filtering-Correlation-Id: 24b8a6b3-3503-475e-078a-08dd15fd1c28
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?a1vS+32/Ee5nrjoTVNNhkvC5gojBoBo7ZcfTmdoQJvo6Z3QdxiInjfW4xzYr?=
- =?us-ascii?Q?NEE1SZXCmMx/H+2M6/CE3DSXFl4EC7IbO0MydIAir0LTJprnm48TzYAPSNr5?=
- =?us-ascii?Q?99ylK3SgAunnH2MN2Ng7yLHBLlvOsIq5qHZ3NJAGTkCpS/yh7ty9328tD77V?=
- =?us-ascii?Q?d3i9QnpdrTk8VPeV3yuRBF8zUu9YeZ972Q+nv23LWwdXSJ4SeZnFBmfMxPfF?=
- =?us-ascii?Q?0MUrxyI7FRda1ChSzUCWMRzAjj//HcX6dAZTCxHRMKnpfaIe+WucQZNCH+MG?=
- =?us-ascii?Q?onLPuIrn/AtwRyRhPLsbmmKJ6aCvd5GcGGHsaaJE5feeRB3tzK5QCAziZJUx?=
- =?us-ascii?Q?aXCwjFSrJIl5dyFYZOIm2xYBRKkpNtaXvWCRSS3vpRh/GcZnynK0IuaAsEbE?=
- =?us-ascii?Q?/fg1kRSh2i7qTvk3IW3JJc9k4D9AbWVa5wGwV/8XU6ebnVNITVD5Yg6/JwoN?=
- =?us-ascii?Q?QTfvcMDDkV6RFAZPaYGU9BUiGoKkHMyL4wZ7xlnNEL1hLEi8xyUHQFRF+XSZ?=
- =?us-ascii?Q?KNen2sNgEiN8Jqw/23NzO2ThBG/WdcS9MMnccDaScZtEtvIYbSIPWaP9OKlz?=
- =?us-ascii?Q?8nufTfh8Dp4P+6XKY0MGiQMkgGOYMvEf5hlYi+8AJIelFGGcvekYOjuwIq/m?=
- =?us-ascii?Q?9j32bWNgJXFufwpgoO/F7QjBETRrKYESdY7CbdfvPZPXtXVriBU0nLFpWHPB?=
- =?us-ascii?Q?f/gAYsaQ68ajA3vu/ldWTFyPXptIdNJnm34nEEpbppTe/ZtE4tdWhFRJNT44?=
- =?us-ascii?Q?X0LFaKUix16Eee217eUPh5lr50ZtBplMpefOZNWNmEDVsiNb/zQmi2Yf1m2q?=
- =?us-ascii?Q?jUEqDoZuoOzQUJzq3xpWB18Pmu9fODqG5//pzOsooBixF+oyyvOjmFgaoXd6?=
- =?us-ascii?Q?6agEJgNsHC1qqhJC/WACjUlnVHhtzR5tK0FPhOm69rd/hxVdryHBdxvSIv+d?=
- =?us-ascii?Q?NILC4hMOR6u3oiQcYTppBMx4eFfz3/xvvAQoQN/7561h3W7yRcjbr8y8f1nL?=
- =?us-ascii?Q?NR3KQwguvmDbIWRL9+e7rPKf68pFMJs/3/xAKjCnkqUXRNu4fDwJmOdNE3so?=
- =?us-ascii?Q?SnOiOTax7sHpPE4FlHoX/2paUd1xK0yajgtejuSymqqlQrKtD3MwROoiOz+N?=
- =?us-ascii?Q?dHqSL72pf4tVvZwR4EwHhqU3lky4rVXTs5MSh/dQpe40ktxdVSznAza6jvvr?=
- =?us-ascii?Q?yCjGrbNGoVrqQtXzA9U1iQxyI1/4T/QioX2cCllur7szQeiYZrTH0wVm+M06?=
- =?us-ascii?Q?E20jiC4vB1EryqDrgeACvmY93M6DwkkeNm8xC9ICbgkb6bNlAO06mQw4bqj7?=
- =?us-ascii?Q?9YuZAyvHphaVZZ2x7HdKrIONIa4AF8tN8FxxTxbs+tAJUNRXf3ynk1iIh44+?=
- =?us-ascii?Q?DPbX4Kc=3D?=
+	=?us-ascii?Q?v2gza2QOLJuLhVfQdp50mMcIvb4OtXVaY4/MI2IW/lj6L9jRjyZ9Y8H6UGH6?=
+ =?us-ascii?Q?lSkDl5uBUqDJVWbVyXsD54jpXRxObq/kjkXKvLja0ZR7ojqt2t9Yv5Y7/agh?=
+ =?us-ascii?Q?AqRKWntskAa2WLBuR7/ieAv7Mw8rtd7Hymakrd1Jx8ShuxoSLOprXaJWucMR?=
+ =?us-ascii?Q?QMDvQuJrs5tPGkM18cpV/cki7jZ0wzjo7Bq6YT8FIN6cw7h3hsEPssbW7xxx?=
+ =?us-ascii?Q?pHmsZ3y+bGhdu2DGkfsIjSsizN1TU1/SEIOTApH6HwhZB/jU3Vta2CdJCLBx?=
+ =?us-ascii?Q?AcD994bSPr65dnqRT071+j3cWtki/H3E6WD/34fGn69zcm0e7AG7wN8m626d?=
+ =?us-ascii?Q?K3LstL//jjGbJSz+Zh4+z7wo1alArTVrFWoD/CslAoOxT+Ud1TECtPWHWU4j?=
+ =?us-ascii?Q?0Kn2fnP0eTJjjrN+JSduDEGohlWpZ3shCyXJRc+0kFS6DfgFMc1qGaZON9eA?=
+ =?us-ascii?Q?Lkzz1k0txwtNMtQv5v9EpAJEjMVYCI1Qy0i2o82U0b9yGx2n5O2vudjyQ3H4?=
+ =?us-ascii?Q?EZ/PBURlBFKR72CJVmeL6kYxcPHg3m+s6n/pD3uePRQWME5yPxqNbp8OYf02?=
+ =?us-ascii?Q?j+uAz1KygrAcw4kXq1lY89+MRu4+UBIaII5QL43t2Gpt8C4fmNz/TZ91JMBg?=
+ =?us-ascii?Q?yMWfqM7Sir/mZ8y2g84Yt3Ti2RBY6ot1YsSfgG5DBhFGNLwkHh7kHiGQEFQ9?=
+ =?us-ascii?Q?FvMDW/Do+C84Z4jWvQmWvMg8Bnct+BF67/5+dfBHlY8lEARKbKcdcv7yG7vN?=
+ =?us-ascii?Q?cxKcKyv3s7qaRFOA6tZH3eiIRqYlLU0BASwIla1quWnOrtzhMNIkTBMYOoH4?=
+ =?us-ascii?Q?ygIBx+Rgt10wcHXB1nPjI3YLQDlKQbzTxj4IGWBS5Wh6W9CCPSOZkjG098qn?=
+ =?us-ascii?Q?5PrERK2/gZe/1b9QmZ/zeAy4jgb5UUSS445mbz8o+/TIDqmpZ0r/DXGCrYlE?=
+ =?us-ascii?Q?gh16b9wWw/cTVOhzK5HMS/3Wac+FEXcALHaH1K/vtG4gA6rJL+mKjpsRjSPx?=
+ =?us-ascii?Q?Y0dEyGbwa9SlrUHCEOubtQbrxxk8TFSXuF2VqtXaK82r2cyeBZ+TkJA7ygoV?=
+ =?us-ascii?Q?7vMru1ogRA5ZOAI27lIuoFsbQva2JB5m74OPVXk9pjf29HDzu15wDxDWffen?=
+ =?us-ascii?Q?jpXoFuCsi8jaJ24DnVjD+9wHP98KrOS0m0UKNAoyX52ukScRQ73XIfE1txoA?=
+ =?us-ascii?Q?c0Vxn3DcD96F10LAjWJYWAOOr88Od6uEuMJlAdJ8UuGHEp6fGXCVKa2Wxsw6?=
+ =?us-ascii?Q?IWQeOjBJL3mbOXqk7TS2TndyAGK5FqL6sj+8x2xK0G3Hjgd7gzgZSevveBx5?=
+ =?us-ascii?Q?VNo5mv1uq8Oo0u3rHqYXWXknJjFUKeBhqZK9Pc6Axl1n9A=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8943.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?7mM9Mt/UDvjDVk3v/GaQgp6V0inRfVavRG3xIx+mXxBmO838MbaJaipuIZ1z?=
- =?us-ascii?Q?/7qBmb3nx40ETwtMxdmr4fAh2y4aCf/5tjBqfQ0kTGGEsNtWKcipF35BTpGP?=
- =?us-ascii?Q?k3cfKrcsePDP1S/Mbhuo8J7Lzi9C9W5+DZd7ldj9eywJbaHToMMsiq3UVD5u?=
- =?us-ascii?Q?9dGFXpNkpXzA02C172mjRjAKxuPPhcpcOsoF8X5opFuSvV6yyU87zzMHrnmS?=
- =?us-ascii?Q?+DNZi8RkDYyJ0SjPCiKFN4yFVOreNULOx7s17mf7y/9nA4vHTwWIhEIUVoSr?=
- =?us-ascii?Q?PD3pMJFf9kr9pVF8e051KbYlBrwhQxqe62piWX/2Xkuyh18HIwqpinY2zNWe?=
- =?us-ascii?Q?byJNmyYXxxrDceAyns3UlW3dZRwRJKsbTp9405w3k18m9b1NM6m6cxj1z0j+?=
- =?us-ascii?Q?dLGYrQSzvexWOnOgEw3pTIFg/6f7iual1ktYAmR2uQfx8BfN03ET3SpxLWk8?=
- =?us-ascii?Q?tCH33VkzoG3xa+Z8Kq1r2WFebzti30g1xCzcgXM0kptxcCTtdzmqasc78L6B?=
- =?us-ascii?Q?CzkrddVyfxDugTU8sMN+NexEiSrLbXOCCLI10md/cxbWPKpXKM1ORdeWYGap?=
- =?us-ascii?Q?y8qe66+QXwp6Ehds528wzvEWEim4xdOQ1AaaOcOMYJ82Y3vTgqA2PHcU6Jo9?=
- =?us-ascii?Q?IhEh2oQ5LgrOsNZ21pdsU3kZF7X1AA3phM83ShlMxyRxXM1R2f2ZP+0uRMi3?=
- =?us-ascii?Q?/jEC1Auj7m+Dx6Bles+ZJQu3d4aEYnnTFZAugun0Wp9tWHuEzvE09BmmltKM?=
- =?us-ascii?Q?vgOrEjD4ci68n3SZXURd5j/5poPmCd3KisjAe8fT5y4GltYkeo/ipNqSyVC/?=
- =?us-ascii?Q?txwTXncYIkvsJSkGzmk/6j3Uo8Teuz45fABsFUifucocESZRN3bcHe5ACMNg?=
- =?us-ascii?Q?yHShMXpjtqNepaj7wN8FnQCsaZdX5nIEQPakIMEYiiIdqKTlRAvJAYTik/uC?=
- =?us-ascii?Q?KN0YhixJh0tQ0NI5ImQ2kKp3VPTmPV1eCmRvBhxKdj2BTAE0DZ3XE+V+K4ja?=
- =?us-ascii?Q?PD6Vm60+2K0AKi0Nlm1fzT4pRAmHcW9pM2WNTZ+Ueg1UsSLC77iAdwq54Js1?=
- =?us-ascii?Q?p2Z0XWPdUaqRtADd3zk0rYeUu2HZFx0iEjlkCVTwBDn00e06wFSEuKuY2Ykf?=
- =?us-ascii?Q?VfgxWOIiXKNzZvRIWQ4wJEBmdID+lJ0MAc/XKCf4EGzuFRiS5UZoOUdimI9L?=
- =?us-ascii?Q?WK85vmR8hJX3NtWaQ69U+QlOT2WWhJOk5Lkau+ONAwdjWAoalPuPPFRZtjAU?=
- =?us-ascii?Q?/78ifl3FLCZL5ZjPEX6hFWgw4MNRSjvX1pUolApasNSI3sYZ1QLbcPrO8SyW?=
- =?us-ascii?Q?OdFVK+2FnURKA2VG5p21ft9zf92m/lSRyIWUwpJ0yWwlR1e+g5FS5KOEQRyl?=
- =?us-ascii?Q?cUedAJq4XU2MkTRkSt1U2hK1GrDwXPNDhvypwciT2O/nOOseKdKWAY1OWFfg?=
- =?us-ascii?Q?WDDMD1LI8kQbQcpEnWmgb6ejAj+J1+ZNoEDnVjREZx80kf7nLGV7aVCHlbDl?=
- =?us-ascii?Q?86ut+7t/jEO2K6GA98Ce5UppfCG0N5HekxKhtxgCwUi2QryxPEJ3HNDOCW3d?=
- =?us-ascii?Q?QSoiI3UdbDkumJX9EOOy29M4CTuyt++6cgNaS856?=
+	=?us-ascii?Q?0b+3sOM8VZU6/podwONYEy81drmukYEn6Yb9khL061ZbfiniB9iEgnjwgdtu?=
+ =?us-ascii?Q?DPCkLByVag24B9pyIc9Nu5vObU0xUb0zLhkM76PeexRoN8TGsuv9aCn1/rtL?=
+ =?us-ascii?Q?TAyefJr8WaYs1PikCCcgmpqVYoFAnhONRUekZdlSkpquLYIVCwBUoAncOMU/?=
+ =?us-ascii?Q?WK41P23KKgFgRQrnhySeXxxz2ZnXnQ0Wma6iDizNlCVvilGEUfLtHCryUGKa?=
+ =?us-ascii?Q?D1q8IcRZ55w06NLq+UToaqj2GBkOMlC3xpZZ0U0vmFcQnGZ4f9ZnKtRWI2ys?=
+ =?us-ascii?Q?apejLfBwtSSRd4tfqV08psVjRjg6e0yIeo/TY7abAuOrqtc7JOC1pEM8djzZ?=
+ =?us-ascii?Q?9J1hI4bkxdozL+JA1uoIH9X/NVbuCG8Oc495XEUGYEVlTY1bqowt2LqmFM/v?=
+ =?us-ascii?Q?FGUR7aJX2bl4jmg2s2ZoiTSEEmTz2cYuL1f60l7USdqEQUTi/9Pvm32byqkt?=
+ =?us-ascii?Q?0OfmW0DUCIxee7/jHEX8JcU3PvtARcvbLxVyg7TdB+G+juchCjrPpy+QNvzk?=
+ =?us-ascii?Q?GeLvpWckSD5pdSGanynTu4fArDz/CnF9upP7NvMbRJOgBMl9BHRD98ktzftI?=
+ =?us-ascii?Q?rJJtAXtSM2/y7NruwZjnYps1AxlYdjkuEbBtCZTeqk2CN9P+ITmMSn6CpXQp?=
+ =?us-ascii?Q?dI1fgCgvdmDmy1eOG2HEi+RLBYkiBB+Ys/quNExa8aVL6T38n/Lw7Xwci4xo?=
+ =?us-ascii?Q?VWhMx4RF+wrmXYO1YaSKdXZrJint7X9QKoz5kYiFEYC/qjLri0WEAhwam3e5?=
+ =?us-ascii?Q?2VaNT7lawtV+JX6r3jxVL27oijtLHtMw3SUmLxG80AuczR//6ohw0ehUtAsx?=
+ =?us-ascii?Q?lJl4YcrfkhaJ7M5jQ6E2dqp97bimQD2qDEUgJaHTXkShEqZ/3dg34emHE5yo?=
+ =?us-ascii?Q?tXMW8P4+zgm7cA0USMgk7T5jVrBtox4OQ6nyuAWULAMEXrHjQJpSSLO6FhEq?=
+ =?us-ascii?Q?JLxgFU0UGVVrmiUFsJPE5LL4u+p0O5WPji4rd1rWNFkVHXh2MX4lfw7q2zGD?=
+ =?us-ascii?Q?U/J+aUzXmrwZGBsLGkj7L47bf+c7X08o1fAsmFEA4bPUjCFzUUJffpTQ+yAS?=
+ =?us-ascii?Q?sjr0S0kCW+DDPG3JDosSQ1MhXRIOV8bvcs9IsgZxAEVgMOt3tDkXmxHWLxJW?=
+ =?us-ascii?Q?qJMRyyB/tmDxEhS6uto8NFL7o6g99J43BoHf8ezLq1xGOcexm0ULcaWzv6rd?=
+ =?us-ascii?Q?wME3o1Q2SvNkLSwhNHuBQO76hMIDRZjjpBZgbr1Wg7HmmuJDPiVwEmZVZytz?=
+ =?us-ascii?Q?hsy7b+6VZ/ciYJfbEKqqNLZj5GlRhDtup7+prfrAwahFwT14oRKo99ehiOfI?=
+ =?us-ascii?Q?KvRCAfB3AA8jrx1umVgHLmWjEqbeVZIPjnlF50XFN2beJGrXXPOmybwauUyt?=
+ =?us-ascii?Q?mp6gc3OyQcxFI+RvcF+lBcepkm1Q24if8KBi4TEh2Jn241664XBvE6bP90wI?=
+ =?us-ascii?Q?C7eL3dcPTsNLtsIfgHKpaehnAOD9c1fBtCeQCzCN7mXYD3WoQlq5/caaiCvY?=
+ =?us-ascii?Q?l4/SBnPWgreTK4VA9xoi8z405yTizm+PZvv/z5lPUqf9WU9+xQFyUmdJJkYr?=
+ =?us-ascii?Q?O7+NA50Vl4ST+jIyfeOqtU4SF+Hur+aW7SDZ2PLc?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8bbbce11-de74-488a-0818-08dd15fd19b8
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24b8a6b3-3503-475e-078a-08dd15fd1c28
 X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8943.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2024 13:51:36.0048
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2024 13:51:40.2649
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BuJ1B0PD2q3oAGZIly7d75gNFMybFij3ostymxTX6Gy6zw7FyPkGx12L4lwPWkq8/1DR18TgPTIgwolRpoT+xw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Qp+Y16QmIBRUvrFtw5e+hSDsJMII8jS3Hd0TftnNQu5vLb+piRMi/ZVELmYcBkh8OYWsLhcjUUYAOhQct+mz+A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4209
 
-This series is based off Daniel's patches. It is rebased to work on
-current blktests. It is also available on github:
+From: Daniel Wagner <dwagner@suse.de>
 
-    https://github.com/aaptel/blktests.git branch remote-target-v5
+Most of the NVMEeoF tests are exercising the host code of the nvme
+subsystem. There is no real reason not to run these against an arbitrary
+target. We just have to skip the soft target setup and make it possible
+to setup a remote target.
 
-The last patch adds a test making explicit use of the remote target
-support by testing the new nvme-tcp offloading.
+Because all tests use now the common setup/cleanup helpers we just need
+to intercept this call and forward it to an external component.
 
-changes:
-v5:
-  - remove duplicated code, truncate regression in _nvmet_target_setup()
-  - remove def_host_traddr, use of eval
-  - fix shellcheck warnings
-  - cleanup test nvme/055
-v4:
-  - added nvme test 055 for nvme-tcp offload
-  - added 'blkdev' setting under [subsys_0] in the control script config
-  - added workaround for older python versions
-  - https://lore.kernel.org/all/20241126203857.27210-1-aaptel@nvidia.com/
-v3:
-  - added support for previous configured target
-  - renamed nvme_nvme_target to	_require_kernel_nvme_target
-  - use shorter redirect operator
-  - https://lore.kernel.org/all/20240627091016.12752-1-dwagner@suse.de/
-v2:
-  - many of the preperation patches have been merged, drop them
-  - added a python script which implements the blktests API
-  - add some documentation how to use it
-  - changed the casing of the environment variables to upper case
-  - https://lore.kernel.org/all/20240612110444.4507-1-dwagner@suse.de/
-v1:
-  - initial version
-  - https://lore.kernel.org/linux-nvme/20240318093856.22307-1-dwagner@suse.de/
-Aurelien Aptel (2):
-  common/nvme: add digest options to __nvme_connect_subsys()
-  nvme/055: add test for nvme-tcp zero-copy offload
+As we already have various nvme variables to setup the target which we
+should allow to overwrite. Also introduce a NVME_TARGET_CONTROL variable
+which points to a script which gets executed whenever a targets needs to
+be created/destroyed.
 
-Daniel Wagner (3):
-  nvme/rc: introduce remote target support
-  nvme/030: only run against kernel soft target
-  contrib: add remote target setup/cleanup script
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
+---
+ Documentation/running-tests.md | 33 ++++++++++++++++++
+ check                          |  4 +++
+ common/nvme                    | 62 +++++++++++++++++++++++++++++-----
+ tests/nvme/rc                  | 14 ++++++++
+ 4 files changed, 105 insertions(+), 8 deletions(-)
 
- Documentation/running-tests.md |  42 ++++++
- README.md                      |   1 +
- check                          |   4 +
- common/nvme                    |  78 +++++++++-
- common/rc                      |   8 +
- contrib/nvme_target_control.py | 190 +++++++++++++++++++++++
- contrib/nvmet-subsys.jinja2    |  71 +++++++++
- tests/nvme/030                 |   1 +
- tests/nvme/055                 | 268 +++++++++++++++++++++++++++++++++
- tests/nvme/055.out             |  44 ++++++
- tests/nvme/rc                  |  30 ++++
- 11 files changed, 729 insertions(+), 8 deletions(-)
- create mode 100755 contrib/nvme_target_control.py
- create mode 100644 contrib/nvmet-subsys.jinja2
- create mode 100755 tests/nvme/055
- create mode 100644 tests/nvme/055.out
-
+diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
+index 968702e..fe4f729 100644
+--- a/Documentation/running-tests.md
++++ b/Documentation/running-tests.md
+@@ -120,6 +120,9 @@ The NVMe tests can be additionally parameterized via environment variables.
+ - NVME_NUM_ITER: 1000 (default)
+   The number of iterations a test should do. This parameter had an old name
+   'nvme_num_iter'. The old name is still usable, but not recommended.
++- NVME_TARGET_CONTROL: When defined, the generic target setup/cleanup code will
++  be skipped and this script gets called. This makes it possible to run
++  the fabric nvme tests against a real target.
+ 
+ ### Running nvme-rdma and SRP tests
+ 
+@@ -167,3 +170,33 @@ if ! findmnt -t configfs /sys/kernel/config > /dev/null; then
+ 	mount -t configfs configfs /sys/kernel/config
+ fi
+ ```
++### NVME_TARGET_CONTROL
++
++When NVME_TARGET_CONTROL is set, blktests will call the script which the
++environment variable points to, to fetch the configuration values to be used for
++the runs, e.g subsysnqn or hostnqn. This allows the blktest to be run against
++external configured/setup targets.
++
++The blktests expects that the script interface implements following
++commands:
++
++config:
++  --show-blkdev-type
++  --show-trtype
++  --show-hostnqn
++  --show-hostid
++  --show-host-traddr
++  --show-traddr
++  --show-trsvid
++  --show-subsys-uuid
++  --show-subsysnqn
++
++setup:
++  --subsysnqn SUBSYSNQN
++  --subsys-uuid SUBSYS_UUID
++  --hostnqn HOSTNQN
++  --ctrlkey CTRLKEY
++  --hostkey HOSTKEY
++
++cleanup:
++  --subsysnqn SUBSYSNQN
+diff --git a/check b/check
+index 7f43a31..dad5e70 100755
+--- a/check
++++ b/check
+@@ -603,6 +603,10 @@ _run_group() {
+ 	# shellcheck disable=SC1090
+ 	. "tests/${group}/rc"
+ 
++	if declare -fF group_setup >/dev/null; then
++		group_setup
++	fi
++
+ 	if declare -fF group_requires >/dev/null; then
+ 		group_requires
+ 		if [[ -v SKIP_REASONS ]]; then
+diff --git a/common/nvme b/common/nvme
+index fd472fe..887da4d 100644
+--- a/common/nvme
++++ b/common/nvme
+@@ -22,6 +22,7 @@ _check_conflict_and_set_default NVME_IMG_SIZE nvme_img_size 1G
+ _check_conflict_and_set_default NVME_NUM_ITER nvme_num_iter 1000
+ nvmet_blkdev_type=${nvmet_blkdev_type:-"device"}
+ NVMET_BLKDEV_TYPES=${NVMET_BLKDEV_TYPES:-"device file"}
++nvme_target_control="${NVME_TARGET_CONTROL:-}"
+ NVMET_CFS="/sys/kernel/config/nvmet/"
+ nvme_trtype=${nvme_trtype:-}
+ nvme_adrfam=${nvme_adrfam:-}
+@@ -157,6 +158,10 @@ _cleanup_nvmet() {
+ 		fi
+ 	done
+ 
++	if [[ -n "${nvme_target_control}" ]]; then
++		return
++	fi
++
+ 	for port in "${NVMET_CFS}"/ports/*; do
+ 		name=$(basename "${port}")
+ 		echo "WARNING: Test did not clean up port: ${name}"
+@@ -208,6 +213,17 @@ _cleanup_nvmet() {
+ 
+ _setup_nvmet() {
+ 	_register_test_cleanup _cleanup_nvmet
++
++	if [[ -n "${nvme_target_control}" ]]; then
++		def_hostnqn="$(${nvme_target_control} config --show-hostnqn)"
++		def_hostid="$(${nvme_target_control} config --show-hostid)"
++		def_traddr="$(${nvme_target_control} config --show-traddr)"
++		def_trsvcid="$(${nvme_target_control} config --show-trsvid)"
++		def_subsys_uuid="$(${nvme_target_control} config --show-subsys-uuid)"
++		def_subsysnqn="$(${nvme_target_control} config --show-subsysnqn)"
++		return
++	fi
++
+ 	modprobe -q nvmet
+ 	if [[ "${nvme_trtype}" != "loop" ]]; then
+ 		modprobe -q nvmet-"${nvme_trtype}"
+@@ -320,17 +336,23 @@ _nvme_connect_subsys() {
+ 		esac
+ 	done
+ 
+-	if [[ -z "${port}" ]]; then
+-		local ports
+-
+-		_get_nvmet_ports "${subsysnqn}" ports
+-		port="${ports[0]##*/}"
++	if [[ -n "${nvme_target_control}" && -z "${port}" ]]; then
++		ARGS+=(--transport "$(${nvme_target_control} config --show-trtype)")
++		ARGS+=(--traddr "${def_traddr}")
++		ARGS+=(--trsvcid "${def_trsvcid}")
++	else
+ 		if [[ -z "${port}" ]]; then
+-			echo "WARNING: no port found"
+-			return 1
++			local ports
++
++			_get_nvmet_ports "${subsysnqn}" ports
++			port="${ports[0]##*/}"
++			if [[ -z "${port}" ]]; then
++				echo "WARNING: no port found"
++				return 1
++			fi
+ 		fi
++		_get_nvmet_port_params "${port}" ARGS
+ 	fi
+-	_get_nvmet_port_params "${port}" ARGS
+ 	ARGS+=(--nqn "${subsysnqn}")
+ 	ARGS+=(--hostnqn="${hostnqn}")
+ 	ARGS+=(--hostid="${hostid}")
+@@ -767,6 +789,7 @@ _nvmet_target_setup() {
+ 	local subsysnqn="${def_subsysnqn}"
+ 	local subsys_uuid
+ 	local port
++	local resv_enable=""
+ 	local -a ARGS
+ 
+ 	while [[ $# -gt 0 ]]; do
+@@ -811,6 +834,22 @@ _nvmet_target_setup() {
+ 		fi
+ 	fi
+ 
++	if [[ -n "${nvme_target_control}" ]]; then
++		if [[ -n "${hostkey}" ]]; then
++			ARGS+=(--hostkey "${hostkey}")
++		fi
++		if [[ -n "${ctrlkey}" ]]; then
++			ARGS+=(--ctrkey "${ctrlkey}")
++		fi
++
++		"${nvme_target_control}" setup \
++					 --subsysnqn "${subsysnqn}" \
++					 --subsys-uuid "${subsys_uuid:-$def_subsys_uuid}" \
++					 --hostnqn "${def_hostnqn}" \
++					 "${ARGS[@]}" &> /dev/null
++		return
++	fi
++
+ 	ARGS=(--subsysnqn "${subsysnqn}")
+ 	if [[ -n "${blkdev}" ]]; then
+ 		ARGS+=(--blkdev "${blkdev}")
+@@ -853,6 +892,13 @@ _nvmet_target_cleanup() {
+ 		esac
+ 	done
+ 
++	if [[ -n "${nvme_target_control}" ]]; then
++		"${nvme_target_control}" cleanup \
++			--subsysnqn "${subsysnqn}" \
++			> /dev/null
++		return
++	fi
++
+ 	_get_nvmet_ports "${subsysnqn}" ports
+ 
+ 	for port in "${ports[@]}"; do
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index d63afd1..9ad9a52 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -113,6 +113,13 @@ _nvme_requires() {
+ 	return 0
+ }
+ 
++group_setup() {
++	if [[ -n "${nvme_target_control}" ]]; then
++		NVMET_TRTYPES="$(${nvme_target_control} config --show-trtype)"
++		NVMET_BLKDEV_TYPES="$(${nvme_target_control} config --show-blkdev-type)"
++	fi
++}
++
+ group_requires() {
+ 	_have_root
+ 	_NVMET_TRTYPES_is_valid
+@@ -392,6 +399,13 @@ _nvmet_passthru_target_cleanup() {
+ 		esac
+ 	done
+ 
++	if [[ -n "${nvme_target_control}" ]]; then
++		eval "${nvme_target_control}" cleanup \
++			--subsysnqn "${subsysnqn}" \
++			> /dev/null
++		return
++	fi
++
+ 	_get_nvmet_ports "${subsysnqn}" ports
+ 
+ 	for port in "${ports[@]}"; do
 -- 
 2.34.1
 
