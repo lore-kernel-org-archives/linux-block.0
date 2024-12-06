@@ -1,62 +1,62 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC83196C67;
-	Fri,  6 Dec 2024 05:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACAC1D8DE8
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 06:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733462873; cv=none; b=HGhUcl1R6jGWljjBEvaogx7+eHbHgkWaUXDRf7Crr1KAk8dGprOspB7ok/EynQV0c/7uv58t+RyCLnI/M3KalAOwHADjeZgESEirXwQh8f89P/EVL0Y2eGEyD7V2Qh41ay13Ap0tp3h/yJu9SZDuEGo9Vn/e2PJa7IAxJrh87To=
+	t=1733465457; cv=none; b=KSBcWap0NIZr7QSCdSMjENcLciWz8aJCgRy/Kt+LpcgPm0aPIThLMOb141qWkpekD90QknW94Qpv5nkM6aR1+Vtt9IPp1IFj3F8kEOzmJNHgpw3wVy32G8GfwnIahgI1eYOe4OiP1ldcIWJd71uMcECI1xjk84vDBxcY5IRfSG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733462873; c=relaxed/simple;
-	bh=X9VFMKr7/fJOGLXPS8atTYCy0j+P7k6TXaVhXB6yhIM=;
+	s=arc-20240116; t=1733465457; c=relaxed/simple;
+	bh=byiOWDYq8mTgW3endEtkkX5vAx1PxeQf2rYQ0aFgvAU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n8M9YefnSIBv4yb2KtLI/SHHF31X8WJWEboCl3TcmQmSWFGuwarLUKqwP6ACXGStxaF3cS2gadtWxKnRcR/fDm8n0EIw+YLXsDme9Zo2lgoqw1uU6YdYyP7kIg5Lx1QJ+hGrlADDYoh4Zah+KxhPPFbuZ9/7gU+wQkasWtzVcpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=by6NMBS3; arc=none smtp.client-ip=198.175.65.9
+	 Content-Type:Content-Disposition:In-Reply-To; b=N0QG/1BG2RXAO8Hex0aK+0smybuDaMjCLYp/dB6mH1GZwBVfBDJUuEnTGJ1OyAzZv4lCv/20ZgWsT4KCriIDrQAeRr9phHPL02r2sHs13lFF2UKxDSJFV60nSfPyjRcPk/aEINavqvrBG9YiyzTeWnHpw8f2fED7ObuM1MkxGHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XlA303xR; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="by6NMBS3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XlA303xR"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733462871; x=1764998871;
+  t=1733465456; x=1765001456;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=X9VFMKr7/fJOGLXPS8atTYCy0j+P7k6TXaVhXB6yhIM=;
-  b=by6NMBS3uuoSS7jABjt9Zm3SNEQdWKKljeRvA2gA5evSGQVa+tuRN77R
-   E+FmhGtvHfLck/XXpnliXxwOep7ut6Oti0NmIF2zrSn3BFofTrHro9Hy9
-   b3M6oeU2hXU/JRV5yuutDkrlRavEEppee1yGMbqz1ymoEPmJWTGmk+W0n
-   DmN2OeIc0Ct6h4LLss1B8zmCbe1mkqxaBsV0LwZnir1md/5xJcf2Xb4XH
-   9ywufUdn6dwbQusn1Ukfo79lzwSf8SFUur/h1xG4NZHLwlYhEqXHlyLUi
-   S2F4fd0xg/+oTAfYuW4YkI/cVDIz6N1KCiyQaBMgSoGPC3Lh9//r7RDn4
+  bh=byiOWDYq8mTgW3endEtkkX5vAx1PxeQf2rYQ0aFgvAU=;
+  b=XlA303xRaWKdudnPMHe6JwPMisjqqd58tz4cX88CCzwjm++FOvq8r8Ab
+   ldPVOjodG69Bfi1j/K/dBYI53cma7cIy3hwZGBmtx7rpwt1OnF0139kxu
+   DFWH9meON1WYbeTHhNhUp+kYas4/dt9yK8AfyHFB/Q8d8t4l/PHz7dXh9
+   CRR7BimRR02OebJINITP/Ppbo02kkK/nUf9jWc4mBaPh73PvT2i0LevBz
+   LEdFInt+V4zqQiWdkmPYg2XnaAFP6Oxd/bGaPi8j+p5i1A0OvuXDEhEow
+   Nq572EcfP0jSAUJYttX2UJP6GLN4U137QyAF0GxNr8u29fEZXiDyhpisf
    g==;
-X-CSE-ConnectionGUID: c1q1MMzBTMSHzEULQZ/MOQ==
-X-CSE-MsgGUID: G1cJ9ZENSpGms5A9Jyq/pw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="56299061"
+X-CSE-ConnectionGUID: Iq9fl1dpRECzfvt/zgqVVg==
+X-CSE-MsgGUID: 3CxTtk68Tb6kZp3qNR1NCw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="37742512"
 X-IronPort-AV: E=Sophos;i="6.12,212,1728975600"; 
-   d="scan'208";a="56299061"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 21:27:50 -0800
-X-CSE-ConnectionGUID: 46M0KqbPSFGW7xrYdXXJNA==
-X-CSE-MsgGUID: DsKRuo40THuu3yk9bYd+6w==
+   d="scan'208";a="37742512"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 22:10:55 -0800
+X-CSE-ConnectionGUID: NjY9ySRhTZSJesLOQ+fq3w==
+X-CSE-MsgGUID: sE0ZS/2kRDOib5K2Jbwy7Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,212,1728975600"; 
-   d="scan'208";a="131724228"
+   d="scan'208";a="99267811"
 Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 05 Dec 2024 21:27:48 -0800
+  by orviesa005.jf.intel.com with ESMTP; 05 Dec 2024 22:10:53 -0800
 Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1tJQsT-0000jD-1x;
-	Fri, 06 Dec 2024 05:27:45 +0000
-Date: Fri, 6 Dec 2024 13:26:59 +0800
+	id 1tJRYA-0000l5-01;
+	Fri, 06 Dec 2024 06:10:50 +0000
+Date: Fri, 6 Dec 2024 14:10:41 +0800
 From: kernel test robot <lkp@intel.com>
-To: Keith Busch <kbusch@meta.com>, axboe@kernel.dk, hch@lst.de,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, sagi@grimberg.me,
-	asml.silence@gmail.com, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv11 09/10] nvme: register fdp queue limits
-Message-ID: <202412061328.YMG9MZn5-lkp@intel.com>
-References: <20241206015308.3342386-10-kbusch@meta.com>
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev
+Cc: oe-kbuild-all@lists.linux.dev, Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH 4/4] dm: Fix dm-zoned-reclaim zone write pointer alignment
+Message-ID: <202412061404.Utec5WgH-lkp@intel.com>
+References: <20241206015240.6862-5-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,108 +65,83 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241206015308.3342386-10-kbusch@meta.com>
+In-Reply-To: <20241206015240.6862-5-dlemoal@kernel.org>
 
-Hi Keith,
+Hi Damien,
 
 kernel test robot noticed the following build warnings:
 
 [auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on next-20241205]
-[cannot apply to brauner-vfs/vfs.all hch-configfs/for-next linus/master v6.13-rc1]
+[also build test WARNING on linus/master v6.13-rc1 next-20241205]
+[cannot apply to device-mapper-dm/for-next]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Keith-Busch/fs-add-a-write-stream-field-to-the-kiocb/20241206-095707
+url:    https://github.com/intel-lab-lkp/linux/commits/Damien-Le-Moal/block-Use-a-zone-write-plug-BIO-work-for-REQ_NOWAIT-BIOs/20241206-095452
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20241206015308.3342386-10-kbusch%40meta.com
-patch subject: [PATCHv11 09/10] nvme: register fdp queue limits
-config: i386-buildonly-randconfig-003 (https://download.01.org/0day-ci/archive/20241206/202412061328.YMG9MZn5-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241206/202412061328.YMG9MZn5-lkp@intel.com/reproduce)
+patch link:    https://lore.kernel.org/r/20241206015240.6862-5-dlemoal%40kernel.org
+patch subject: [PATCH 4/4] dm: Fix dm-zoned-reclaim zone write pointer alignment
+config: arc-randconfig-002-20241206 (https://download.01.org/0day-ci/archive/20241206/202412061404.Utec5WgH-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241206/202412061404.Utec5WgH-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412061328.YMG9MZn5-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202412061404.Utec5WgH-lkp@intel.com/
 
 All warnings (new ones prefixed by >>):
 
-   In file included from drivers/nvme/host/core.c:8:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/x86/include/asm/cacheflush.h:5:
-   In file included from include/linux/mm.h:2223:
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> drivers/nvme/host/core.c:2178:18: warning: variable 'h' is uninitialized when used here [-Wuninitialized]
-    2178 |         n = le16_to_cpu(h->numfdpc) + 1;
-         |                         ^
-   include/linux/byteorder/generic.h:91:21: note: expanded from macro 'le16_to_cpu'
-      91 | #define le16_to_cpu __le16_to_cpu
-         |                     ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   drivers/nvme/host/core.c:2157:36: note: initialize the variable 'h' to silence this warning
-    2157 |         struct nvme_fdp_config_log hdr, *h;
-         |                                           ^
-         |                                            = NULL
-   2 warnings generated.
+>> block/blk-zoned.c:1751: warning: Excess function parameter 'flags' description in 'blkdev_issue_zone_zeroout'
 
 
-vim +/h +2178 drivers/nvme/host/core.c
+vim +1751 block/blk-zoned.c
 
-  2153	
-  2154	static int nvme_check_fdp(struct nvme_ns *ns, struct nvme_ns_info *info,
-  2155				  u8 fdp_idx)
-  2156	{
-  2157		struct nvme_fdp_config_log hdr, *h;
-  2158		size_t size = sizeof(hdr);
-  2159		int i, n, ret;
-  2160		void *log;
-  2161	
-  2162		info->runs = 0;
-  2163		ret = nvme_get_log_lsi(ns->ctrl, 0, NVME_LOG_FDP_CONFIG, 0, NVME_CSI_NVM,
-  2164				   (void *)&hdr, size, 0, info->endgid);
-  2165		if (ret)
-  2166			return ret;
-  2167	
-  2168		size = le32_to_cpu(hdr.sze);
-  2169		log = kzalloc(size, GFP_KERNEL);
-  2170		if (!log)
-  2171			return 0;
-  2172	
-  2173		ret = nvme_get_log_lsi(ns->ctrl, 0, NVME_LOG_FDP_CONFIG, 0, NVME_CSI_NVM,
-  2174				   log, size, 0, info->endgid);
-  2175		if (ret)
-  2176			goto out;
-  2177	
-> 2178		n = le16_to_cpu(h->numfdpc) + 1;
-  2179		if (fdp_idx > n)
-  2180			goto out;
-  2181	
-  2182		h = log;
-  2183		log = h->configs;
-  2184		for (i = 0; i < n; i++) {
-  2185			struct nvme_fdp_config_desc *config = log;
-  2186	
-  2187			if (i == fdp_idx) {
-  2188				info->runs = le64_to_cpu(config->runs);
-  2189				break;
-  2190			}
-  2191			log += le16_to_cpu(config->size);
-  2192		}
-  2193	out:
-  2194		kfree(h);
-  2195		return ret;
-  2196	}
-  2197	
+  1735	
+  1736	/**
+  1737	 * blkdev_issue_zone_zeroout - zero-fill a block range in a zone
+  1738	 * @bdev:	blockdev to write
+  1739	 * @sector:	start sector
+  1740	 * @nr_sects:	number of sectors to write
+  1741	 * @gfp_mask:	memory allocation flags (for bio_alloc)
+  1742	 * @flags:	controls detailed behavior
+  1743	 *
+  1744	 * Description:
+  1745	 *  Zero-fill a block range in a zone (@sector must be equal to the zone write
+  1746	 *  pointer), handling potential errors due to the (initially unknown) lack of
+  1747	 *  hardware offload (See blkdev_issue_zeroout()).
+  1748	 */
+  1749	int blkdev_issue_zone_zeroout(struct block_device *bdev, sector_t sector,
+  1750			sector_t nr_sects, gfp_t gfp_mask)
+> 1751	{
+  1752		int ret;
+  1753	
+  1754		if (WARN_ON_ONCE(!bdev_is_zoned(bdev)))
+  1755			return -EIO;
+  1756	
+  1757		ret = blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask,
+  1758					   BLKDEV_ZERO_NOFALLBACK);
+  1759		if (ret != -EOPNOTSUPP)
+  1760			return ret;
+  1761	
+  1762		/*
+  1763		 * The failed call to blkdev_issue_zeroout() advanced the zone write
+  1764		 * pointer. Undo this using a report zone to update the zone write
+  1765		 * pointer to the correct current value.
+  1766		 */
+  1767		ret = disk_zone_sync_wp_offset(bdev->bd_disk, sector);
+  1768		if (ret != 1)
+  1769			return ret < 0 ? ret : -EIO;
+  1770	
+  1771		/*
+  1772		 * Retry without BLKDEV_ZERO_NOFALLBACK to force the fallback to a
+  1773		 * regular write with zero-pages.
+  1774		 */
+  1775		return blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask, 0);
+  1776	}
+  1777	EXPORT_SYMBOL(blkdev_issue_zone_zeroout);
+  1778	
 
 -- 
 0-DAY CI Kernel Test Service
