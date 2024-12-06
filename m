@@ -1,65 +1,65 @@
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2048.outbound.protection.outlook.com [40.107.212.48])
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2084.outbound.protection.outlook.com [40.107.96.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806F320764E
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 13:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79C92066DE
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 13:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.84
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733493121; cv=fail; b=uMSZH/x9GstFqK4Qr+8tBhIXlT4va2Oo8QrDVfYxH24K5wc+iY4B5XgtMdIPXAKY3X4XRNS4eCwZ0SswwMLuk3urNOHPUMW0F1eiKC+mB4X2X818fhL8CLxXWjyg2yzRnvnvmXnyNyEBoNGlLt2YDsGjDZC/W/Kmug4U4Amq77M=
+	t=1733493126; cv=fail; b=l3z0imLkbJSl326B0LiPIDAm8+pgi/8fNCq40Ju5++kXdAeteNzoOm8adTv5hP4yz+nIUg1x0JvXCguuF1H0ggMx4KffbHuxo7Bw+ewNo8wmywGBaqigeljk6cLA8/eb+PbDFlTtK28G0lxz6k3l1E6kayezBaun+fVDsjhpDsk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733493121; c=relaxed/simple;
-	bh=qD6DEvVMwX0Felrq4VLQZyXkccyE0ON/5jb2PJv+2xE=;
+	s=arc-20240116; t=1733493126; c=relaxed/simple;
+	bh=Ombqya65qYOEQIQLGu3tL0GaEVsdtyli8qpqKAuKuoU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=h/6JK1F7yZ+sysc9xTFVAKXPzUFglujLX5PcpTzVHOrZ/kGqfAVKyTHs32wLrAmdooZKtCTIQzW+umRlM7U8VkbdUvuRxew/06SIbtR+Q9zdUJpEIE1qMfkSJziAJgAygJ/Saj9sNN3nEaen7P165tI8xU5tsaCsPlPYoMXp9Zc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oUZdiBgf; arc=fail smtp.client-ip=40.107.212.48
+	 Content-Type:MIME-Version; b=ifI1wQaShOAUOH+YK95Sa19MRhFDIuMXevX9608fuj6cvy73rszRLvAe4umJAyodrkwgAaQ/MPIAwaVcUvHVAQSFHqWbDR8Aa9jqQXmsh80bjGpP5Qy/lgQ2pAj/EamTdEqASZ7b4IKz08HPGBFo/5K9aIf9kraMzovwbcWgIXY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ExqxBBfP; arc=fail smtp.client-ip=40.107.96.84
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oUZdiBgf"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ExqxBBfP"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ty4ovDEi+aCg/aiWenlO/zsvclqSezw4RT3LU5Dmw1n12wCcfAWo/ZRjwGPUMfjRABnOjz+rBOKgSxAhT89crE/BBR0XaFv+foiNG1Ljn8oPBAmbJXvwE1JeD8mLQv+lrbrI2X1F/A21r27Ws7t3lxUH+PJnCmV+JWH/l6rKrX/+xpf/LHS8Ja+quYkdsZ4knx/HtFg+sLNQR2evnfF/ql6qDFNz+z84/z+300ItQnH5BDSTydggy7HxPJyR2LZAYPIjl1TmmKOIDcoszf41MeMkujAFomQ4qf6/skWP5iY6Dp1+WRVuD/1vHZEqAZhrNegpV09mh/fRL2qSSR4ioQ==
+ b=CiJWR16XRpgHdPTnS6WfEraogZFRzZbL8IVMQF7GDU8kxVG4IhLCnkTGq6nTF/8+2yGtZF0Mg4nJ457Itm3Sf5iWkfZjUbL03y3VaYZh3BFsKn+CEboBSSGWv1DOoXYHNqjmn/5hGt6UWOZXIU40BLxoXT9wWPjatCgG+suES1XWRlj4MqrzP6FvZQfNKkEBRySn+yGdXQaQISY6bJDa5zLv8Vw3/DDBmFFNCKWI+N04hkOtolpgdGcmu2YNZ7LxX1kYBANiVJV8F8cucOq7+sz5TDbfDFzA3GKW84h3lZn7//p7tazpnSqYkAtn19zI8FQhk0vp9mc6Y+ny/dvYbg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O0jB3iFC7HdxiCP7MJ8rxsJPEWyC+PI7oPlcclDFtjo=;
- b=IMdQSzheWKeSCBNZ1sm7I6NyAHRRGzbssPsdtnozMSge1O10z3lHjc8OHD45e4QWXR7yCYl1S70NXbBofCy/qrmSs+UmQWnjNLqlDAOgtMLdNRSjKWTQfNiaVV04pprjVEDpj+6jNKoxwQNNbxVfTXyhR4JbNsydRPSHG5UNJhsXGT+X+LfPC+FDQQqCqNrraOTsuztt/Bqk50yyW+oIScpM/TiPzB/nKbnPuntlNTTECQWxe6YwKnNdm0enq/2aBAiSXvftWACjXBANKncIVoVfv1uVa2o1z+SG/GX3Fr64fMz+POasntnn1JwF7yGE4KkN0YzHx7FNat+pinKtxw==
+ bh=9mxzVhDV08ngtVVetPKZ/6KeOr5JIGxofdladdrqfs0=;
+ b=lo9uwokDgZiyLJCvnlvXUpmCe2VgNopzWzX3f3xprOlxopeb0ytKbLSqP/5pUGEteS8v5f40QhxfmGZynMd2+n1yh96W2Mo3dgIh8CSPY3ubBEgDXe7q1vGX2Pfb+lx9M9Uz6YWnRWV0voK7O4yBeF3KEJxGXF0i8dhTawPcNGQpKbeol7PjW+nI9vfJimMh3FwH0wn9t6hKHjL1Ny91njMsVOauF2tOSKY+vau0Tcq/60Wi3+YlWD08Z9RKTjKvVPCBUcWsCNbIN3rQGsZxf/plFfojnZKAJ4iHljIb2MTJXYcGeXFN8WdwIKG0X0S8FUUwSePM/nzqX3cK08fS/A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O0jB3iFC7HdxiCP7MJ8rxsJPEWyC+PI7oPlcclDFtjo=;
- b=oUZdiBgfWeddJ+M2Ajp9tPkZC7pdRF7Wfs2TA6TdzrF8I51wnJPSIe/jX41Qki6SHG4FfYL4C0XoUaO7Ri/uAyEHdeDhjFq0/6hb6T72qqdLgzME62WhWVk13stmaXrmYtOve0qhfbq/u06AZOH6WNd8tbmZgSk7jafxM33Cmfq4J5VrC1RkjiDP49wMgn59n45hD0af3wpeU+9P6OVLTpNyP4WuFK5AzFpOZBIkHjDpU3zh+SC4fvRUXfLiscfkA6h3SsFgTVIqaFUm9Pe1macJG34K8ZM8AfTtzJ9ZgRyDpXJl1pjO+4IF0uKNx7RKHKCRpJqmyGrjjMigDR2GKA==
+ bh=9mxzVhDV08ngtVVetPKZ/6KeOr5JIGxofdladdrqfs0=;
+ b=ExqxBBfPTm3oqF0EOlPLwgbvk1jQSw6Jlu2aTcVkfkMBUTKRldomYXJluJTZMWqdiGSCYcXTAcO5Q8MAs/EPXa+LprVob9jnfTN47EKHc83p9Xr90GMyIRpAuEnyU4GVcs9VulS8QIW+SoTvKC4QQfaCVOwkXGJ09r3/830U4cGVN95Y5LiS/3jJCIRIXT7tQfJd88sXlQyQN90xileP6Rrm8pmflAVE/JSUkOl6x+eDHUkOUqNcC6jb7eUy3+UnXW0l2rQcVKN0ZesohioMGXGTBUaQYC0GOzqQ+tKrVGOLLM+vumWPs1puYqgGynbQ3AnGRr48f8XOJ9OqPlg8tw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from SJ2PR12MB8943.namprd12.prod.outlook.com (2603:10b6:a03:547::17)
  by BY5PR12MB4209.namprd12.prod.outlook.com (2603:10b6:a03:20d::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.15; Fri, 6 Dec
- 2024 13:51:56 +0000
+ 2024 13:52:00 +0000
 Received: from SJ2PR12MB8943.namprd12.prod.outlook.com
  ([fe80::7577:f32f:798c:87cc]) by SJ2PR12MB8943.namprd12.prod.outlook.com
  ([fe80::7577:f32f:798c:87cc%7]) with mapi id 15.20.8230.010; Fri, 6 Dec 2024
- 13:51:56 +0000
+ 13:52:00 +0000
 From: Aurelien Aptel <aaptel@nvidia.com>
 To: aaptel@nvidia.com,
 	linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org
-Cc: Daniel Wagner <dwagner@suse.de>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Daniel Wagner <dwagner@suse.de>,
 	Shai Malin <smalin@nvidia.com>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v5 4/5] contrib: add remote target setup/cleanup script
-Date: Fri,  6 Dec 2024 15:51:19 +0200
-Message-Id: <20241206135120.5141-5-aaptel@nvidia.com>
+Subject: [PATCH blktests v5 5/5] nvme/055: add test for nvme-tcp zero-copy offload
+Date: Fri,  6 Dec 2024 15:51:20 +0200
+Message-Id: <20241206135120.5141-6-aaptel@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241206135120.5141-1-aaptel@nvidia.com>
 References: <20241206135120.5141-1-aaptel@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: YT4PR01CA0423.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:10b::7) To SJ2PR12MB8943.namprd12.prod.outlook.com
+X-ClientProxiedBy: YT4PR01CA0438.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:10d::9) To SJ2PR12MB8943.namprd12.prod.outlook.com
  (2603:10b6:a03:547::17)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -69,363 +69,493 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SJ2PR12MB8943:EE_|BY5PR12MB4209:EE_
-X-MS-Office365-Filtering-Correlation-Id: 91ca9066-0a79-4faa-49df-08dd15fd25b5
+X-MS-Office365-Filtering-Correlation-Id: 1bb06d1d-f5b0-40b2-5ccd-08dd15fd2821
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?OszKlb53I69Q28AEU9c8P6CwlcXOt22Z5VDAGKJHoP4+GMNl6kMFd1C4rb7o?=
- =?us-ascii?Q?MOK1lAEu5JXFY8LGCwGZwps4spcWDqk4fPC5YL8qqY1dtMy/BRxCcpd9pcQB?=
- =?us-ascii?Q?wCm3NScNk5tSk1iE91ckeTQ1pb0S8tX7xjR6Rr8i4xj0AjLCF25y3uB1ARXt?=
- =?us-ascii?Q?qbSaGMC1jNOHpwJzmQVOfgSuW9xONTcMpm54rXC0OBPi3hrTSWBDeI2HPUko?=
- =?us-ascii?Q?crVLgpkAJtPbzFtFmrvc2dSoOJKPTKUg2XaTLyEgy+ynoWFZgxIsCzpXcBnF?=
- =?us-ascii?Q?w0UVD1cGzx2jEnHjWdYz7msUMKZInr6QoGDO65yFzWQw6npaHw+pFEiqQd/T?=
- =?us-ascii?Q?cpb9Pj2r960cAP177xld6lq/XXy7uNWCeJJ3mOl54ko5QxKXgPDWHTNExNHa?=
- =?us-ascii?Q?iGxqhv/4gle18YMD5vYtpCwEPz/nrrWvkEEMkFGD+tmNZ1wyP77u0Z4Jsu3P?=
- =?us-ascii?Q?8CIDgoSfWM42oVqVTW456vwcurgYhLpI/SgplvAIrjWS75v+MkwSfbPapmX9?=
- =?us-ascii?Q?8T2m6trP68g20Nt41ZcnrU4Z2bZdujOxT/lURR5WHQsrvG+J68ZaSvdZZoEF?=
- =?us-ascii?Q?nqqJUFSPzfQcQyNj4cIx6VolEyNPUEJ3UmTaNHIgkwbnknvVoPOBw5+g2Gud?=
- =?us-ascii?Q?7y5L1Wm9Vr97UYmDkj6dFtB3s50TnSikayik+nthBHNIth9ZG8TZqRIZvwgK?=
- =?us-ascii?Q?H2c04B8KrvZDZVOrdvzMdHM10RbrBeNcXHnCA0wV8n6B/AxhPZNqR8I5SEsw?=
- =?us-ascii?Q?bJQKo/U1JAxL5u13ZF6aLYMLX/hk997wdj5gRNzghjImc6hOI4SWQn7zAgnZ?=
- =?us-ascii?Q?YWAT05P8rKaqXWuomebCm4bQqi9g5fvZW65bg5n+Ah+8E7hYUd7aFZE20Ts4?=
- =?us-ascii?Q?Bv3cEUy0ilWgZYhsOEUyUwTVhDEUH1gxlbkhI8SynUdoEoETxv9CoSgluwFA?=
- =?us-ascii?Q?dI7qbO+TuScJfyuQ5D25pdNI79fQ8wqrqK8lMEcgowNXnZ/nSL6N0nh5rPTs?=
- =?us-ascii?Q?z9wjlwHK6cyd3Z4Uoz8V/fFFFFvuh9Fv0UT8q3esh4oDchB3Y33Sws3p3b/2?=
- =?us-ascii?Q?PGaLAyMrg3K21xCbifHFM/9GJoKTghThJGAQh/JX5Z17G7xsSy3vfVdjPIs/?=
- =?us-ascii?Q?C+ZqbOCsDpX10Uu6u5WMXqjDVdnVLH3zmqXnDQ3fISaEttSccWNwkYKyJdzP?=
- =?us-ascii?Q?Kzn18fCvzFv9p/EyMkK23oVoy0AJMXCSBo+Em54CU9fznxAklEXW2jfwSzZe?=
- =?us-ascii?Q?Jd8YgmzHMJcOxRoIF/QiDcxGG3ZxOzbj4FVkgtKjKcjqQOYT12a70M93LJEj?=
- =?us-ascii?Q?DEGsdOsOVU4cBWEgAgZtdc1DhYCU3O7nrWomL9bDfJYw+A=3D=3D?=
+	=?us-ascii?Q?3iJyx0FJUI0KqW3V1Uqy+wWhcmtFWdwyJPCZzw1RabmUDk+bBit8rqlofJT+?=
+ =?us-ascii?Q?Fols3/X62P6gHwEG/5sBfojXpmkH96P266UULnVSqxYvL+iozvbpYGMKWVCj?=
+ =?us-ascii?Q?arkw5HgX1iEjCnSCgmLYJXVgtof06D3Fac2ExLOyibOCdErTv4pd7U78I51X?=
+ =?us-ascii?Q?GGdA8BYcBuFsnXhKuuMu6hkcyTUUkPrA9j4U2jGw+EL8m74NQOs68z95Szfs?=
+ =?us-ascii?Q?yMAA1eZxHWQW9SUC9IpPDadKY6Scu62ZXw60WhVRVqXvtXcco8I2G+jJWTyU?=
+ =?us-ascii?Q?j3oKoQfXgB1KyPYmtURkP4g6PL5cYeWYQI8WsBvgOGJadoUSr6eMloX+RJma?=
+ =?us-ascii?Q?UeDyIuHHsYYgLVEoTrQCpJToiykLGuWv5Mby/7GZINCwhaCor3S5WmQ49MB5?=
+ =?us-ascii?Q?4ktIl5B0l+keNiXDUWomkD07esRowY9tFFBIR6WQFRvaykj6y4eigzpGRRoz?=
+ =?us-ascii?Q?0+AcOl6+jgqU0J+2SzXhEDaiz7X2aazlViUKfhNn0K12LjGjrbofWWR3ad0y?=
+ =?us-ascii?Q?/GZSlDD82Xh5S9qZEHs5yfsifax9pfTkQ0ByDslP+gBmN+rj55iupTC4jaik?=
+ =?us-ascii?Q?V0aRzHtTYWRORj1eXjufa7iU4+CmQbYau0AiZHXXHQ1cmf1AQd2AroB/xwEm?=
+ =?us-ascii?Q?HzTcVru28YVGzW71j9gbqCV8D/15tD8J58riGZoeMRpOxjm+mvRTEFc6AYSE?=
+ =?us-ascii?Q?jEi1zs9H9WmQTkcnW9CNiM7NNkmuNxGD6W7BxqeuTZWNv9eoT6G00XyNet9t?=
+ =?us-ascii?Q?p3ZMv2mu2FP65/YBpP0eccNmJ05t8yEVJlypuaXATogFtrXjQUTi/xpGSyGU?=
+ =?us-ascii?Q?kifFkS25l3eTEXtSwG/w0kbNFyZj6Lh2L8GQYe+hjvnoU9TvfIzl4DZfK+Fi?=
+ =?us-ascii?Q?fVdHq0LjWGyXr4FxKW8LR9CxNwkOq6PP+5Dwgx0g1jYjY9k09x92jF77qk22?=
+ =?us-ascii?Q?9zzI1ZMx1CAIJB9fWRpvMlnn4Tvm/HNrFcduZsunZkD7bYs5Ji9I+TsTMNKT?=
+ =?us-ascii?Q?OZZa7qxIicb0MyYGfZTzTqZ4C/+kf052Clgl+iMT5SXrwCaAuuEkBHib1Ujw?=
+ =?us-ascii?Q?JwCPLMlV0riAwtJj78stoGCnea+Phif3L3N5wrmVkySyaLvBGz1FypiPA+Sy?=
+ =?us-ascii?Q?2ZmADB20QLSBf7Ki5yE0vBTKB6lfWxoBzEgdoImd1k41/p1bjlS8w+e3Ww/j?=
+ =?us-ascii?Q?PZU811g540kXEzehqqgl/OXqm2CcjmD9v+nw63iD/Q1zIe8HAOIzcY1l9ATz?=
+ =?us-ascii?Q?nv+4z+eMAZ3dzWBIb8spYKd9noHFoO1KMQCh9YwNr4Ce8KCTGTr57xKHdALQ?=
+ =?us-ascii?Q?hQYvUqIiL6K6/+IY65XUbdgMJ/zVCfHm9ciDGDf+FGEmaw=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8943.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?QAHznqaMzkwJB+rKvm+Vc62dL5YjOZzTnowy/DuEpuolhzTO2rvIDyHwkn63?=
- =?us-ascii?Q?UJMKSrgk3X+knb7xpT/NfF2pK80imyzQw+9y1kul27pLXv7x0m1OQTCjLuKm?=
- =?us-ascii?Q?uwginbO8xXKd+WW59e0hTK/06mqMc4YhVDhNL0FqYgU6zQMdFZVfnxNN5ejO?=
- =?us-ascii?Q?TdXN3zQLjSJgLpPFoJ5YCWVzsO81nSplcE6KXq/+QbDP3NUc6KvZBr1Ewjyr?=
- =?us-ascii?Q?atxWHJxxYEo8Tnc1VbgjQ+DIbNIn2NRgWrKfRX8JczY1wxd0xMXWhCJkHkf5?=
- =?us-ascii?Q?0wIr9GzCACwtz2Y74SCPxnuZVn6Yfwmjn2VEtGBco8VkyL5UfPmlpJeJsd8i?=
- =?us-ascii?Q?w0XY00lxVmJWoOcjkOKKA4B68JiOhRbDqKQiK47lPRoBERWSaswxCUyyTUPs?=
- =?us-ascii?Q?qh5FgOVkCQGU9OhmdaLtsXr/sgRD/jwM3Y560mTcNl2ObfgaGL+9weaR0vCK?=
- =?us-ascii?Q?UkiWkDRht4FJA33x3Sdb+9/P4MDCw4UOfgaZADoVHF7s7hvIPNm/ibzzE2By?=
- =?us-ascii?Q?gYjWDnzBWTNsesw9md7eRPDn7MyPwGR9e5BN4lYwRAZ/OYhrCngxCXIaQMFq?=
- =?us-ascii?Q?afc2/uvKu3mmhm9cvGti9lI0LujvzlkHpb8wlEJJK+jU/X3YraFMGQMy/hRr?=
- =?us-ascii?Q?0a1zTzPODIHcVE9q3bMtXOzYPgI01jZ0DPhCxkfwuW9EryeqK0EiJ2o1c9zD?=
- =?us-ascii?Q?vD3V8GnZ1hqkrBEcJLULdBx3EhRAOKInnn6f+iZxkTJcbfYIusw8+o5VOdYK?=
- =?us-ascii?Q?dv5kvVbsUaVUl6ymMy03zf78IWLIlL8pNn7uB7IpRbAaQRqhRVNMR9XrckE/?=
- =?us-ascii?Q?4rn34xb8r9AKPUwV2IH1m8OIgeuy/5FlCi3K1sc89qEJ1RTvGrYdr33FSzfb?=
- =?us-ascii?Q?4iAnJ8xi84ZJq0Rt+lmTdozCwQRGps8dcLe4gMdtTyvUSdE8HKxiFNcmgGjX?=
- =?us-ascii?Q?e6mZlvpyPodF7Icc/HyTgmQKPGbySCN6UPfCX/XHcz02JdWWL/PD3oE2SIjn?=
- =?us-ascii?Q?mHr17gcaUODa/KGLCnvT5ej5fyUnXnQ6oQ5tutmi3ncmSPFsxwH6NVb6+wuL?=
- =?us-ascii?Q?DiSJQe5lTaw4bdxv0P3Wd5BDaovoSYoiqzJINsXnEUIAJtDVn+TYdvhuYrLU?=
- =?us-ascii?Q?c4HKb728Ubet94v6GQQmLFfkSlaLpi5yKVmHgB9bYTjLaqYknNnLACVNbbXI?=
- =?us-ascii?Q?SvOqHhkppBoq1PE+t+ct276xjC6iE4KHfl7sCwcw6iThFNzasZjXtl9Hxvs7?=
- =?us-ascii?Q?Fgjjw3xV2MJ9YRiwSFqV+XtFDbPGZFWkBkbRqFqcsTd/c2ihnZpQqAnJCrL6?=
- =?us-ascii?Q?ZGdt3dTqyCtlUGRWcDO4zs/Rrj3oAl1T5Yd9VJThmxbjytdD/yrdJLqrR7yh?=
- =?us-ascii?Q?oPBgpjwSLmiV6VuzdCwhhO/KApMkMWi88G1FMxuao9Ubm8oeCDhHX+8LvkN8?=
- =?us-ascii?Q?iAbLz7WIkZ/wogZD0oNxV/HLggzk4BqH8RmS+xDxh1vnQGsT8Y20wgMdptvy?=
- =?us-ascii?Q?9X1WLKx0v5lvJUhLjtNkADsWj4BfEM44SpZWj9AZ26y1nlhf4lAOfEudaw4L?=
- =?us-ascii?Q?TpbvK8lUmWQmbUfKMpMTQdqKYuLypE+1lDUtIk6u?=
+	=?us-ascii?Q?JVhEu/rNlVj6l9hHMZ8T1nw/MB1zTNmLwXi1nr8XnB5GvACaZigDWizCuOvK?=
+ =?us-ascii?Q?NUI/gBS7VReFJUvJgKGGr1WpUx+SYplAF9NBoK6/eDU5SvvNvTK5/+e4tMJU?=
+ =?us-ascii?Q?IgYnxgV/emMG0OKOzERkgPcb0HM10UvmkMOsFUk4sUIAyQ+xsDzHv9QV/ajW?=
+ =?us-ascii?Q?u5vlFXrSGFm9gV57W8PJ2JRHuM3/AyW0huO20TWYOjTzT0eyTMsCouEqz/8r?=
+ =?us-ascii?Q?ap7pXrHoERCD6DPdUGpOuZ+L/qyZwgdlfQPCsQ22cPcLx8mPSuV/X1/RvZRr?=
+ =?us-ascii?Q?LuVGH0XVfvGSTjMckDbHcaOMq6niu7ylyEh1jiMKVVhWtaVN+PVaEc8SsvlM?=
+ =?us-ascii?Q?ll0CVF/3SHIq4/wsEhNCab5bcJrplmIpUhWjtcCb8StV93rqFBNnG+hYhWw8?=
+ =?us-ascii?Q?AN+0KN0UbGSlWra7JnImyKJ3KCzqeElO5L157J7XaWjV4wMxe6xDAFBpoJNM?=
+ =?us-ascii?Q?Egh9g/TXMqJqjbylpDj+zplnQWfm+6ZXCyT/1IoGTyHauVxPrxwVNbR2JAbT?=
+ =?us-ascii?Q?tN4YMrVagqDJQjRzAHIsTmDXGUx780kG8HgfmiIljYeVaW6YCZbxMbiszy7L?=
+ =?us-ascii?Q?l6TItOXQuuKf0PlpdW1hGqLRAMfVnZMLQk/pTa9tMlaLIpY8MMvsuQg6QhOv?=
+ =?us-ascii?Q?r0iXt2VmKCGM/IR9vr5bgtastYaUz5eCOoVZODfceKoSDHuxQq6ANAjjPXHB?=
+ =?us-ascii?Q?8/ISvZ3Db3ZWLnKCbwU54/q5soPBlOHhAJ24Gr50oo4GxaDWYwib/btU6j2Z?=
+ =?us-ascii?Q?+5XufCuCQn0rWsSN133rGra3Jq9+gBCzpv+vf6xknuVkAKvLtjTGpKS5CmFg?=
+ =?us-ascii?Q?v8JIk9/ORPJP6C27SwAe0sqgO3AoIjTmJ0y+CcL+rdxTyXJSa/i18r7+gyaG?=
+ =?us-ascii?Q?j8sRyn9sh3zZiM5Xn3fbwVRcd0cbj2d9/WcHwfmrGJxZ1YySWjLFIklBvUyH?=
+ =?us-ascii?Q?NQdIIEMyhxixY/NnR77dhg3nGxMpXW+0sXUHGdJzuqSIu/1bmfdkhlI1M+WB?=
+ =?us-ascii?Q?gaUDLVNQDVucO99lS9LSV2D3iK/bTSY5d/HGWRllNScavdO5f8TmmuOH0Fya?=
+ =?us-ascii?Q?TT3e4f51gy/6bccyEdB4l5xap76gh+x3tnbWu9rstKqrxaQWrn1Qj3T0y+l0?=
+ =?us-ascii?Q?Vn18y3YzvaohAKzhcL3UnPaXNk5CtekLr/Y70TtBkOD8a39AXhRnGXrQnWH3?=
+ =?us-ascii?Q?L+LgaOqmOB78C87IGXEA2BPedD92GdLrELUHyV/cvA21paUWPAbKixuk+cAe?=
+ =?us-ascii?Q?d/OLwYA3lYRITDAyJeXoH3m4ojbHz2OLuynMy0TvBCxI2PCO8Zfd4lVHUwm3?=
+ =?us-ascii?Q?l9e7TYyoWxaBvwTyTg9MJ7AVoKCS4h03svfH5q/yVsgmLcai/QqkjDfMNaeT?=
+ =?us-ascii?Q?kdAA/X/MN6gH6usEWJCiSm0215reXCOO10ZeHXoOOFRVCQ9SfWICb9scLHDf?=
+ =?us-ascii?Q?ToAPUHIItJd/bjlA7AnhfjtoEWSoT07Cvd8+JOBCBmlzuti0pwWOYUa8A+Px?=
+ =?us-ascii?Q?tx46nJQ6zpXC6qy51HAeHVjS3FeuC51OCKpqTVHUasvaCj6FyWOFPns2ty0Y?=
+ =?us-ascii?Q?3t+5lcqlTsxjIIX5Xscyp7FPGW6NYibKU6Z+8gGs?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91ca9066-0a79-4faa-49df-08dd15fd25b5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1bb06d1d-f5b0-40b2-5ccd-08dd15fd2821
 X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8943.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2024 13:51:56.1208
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2024 13:52:00.2623
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lySVD6USenz9tJk/c74Jdwd/53MLp7it0+rkMAAj0em+7CbWtQr60if19rKvLGNYaAK3j2iR9xAv/+yK2B9TBg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 38NMS7g7SUt0Og+nw1fU3Rf3zRPIhIIKo/cnphYzyvLtlJUfTgXs9EPvtxEv18ED65TdKLi8wiN38xBqA8gBkQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4209
 
-From: Daniel Wagner <dwagner@suse.de>
+This commit adds a new test for the kernel ULP DDP (Direct Data
+Placement) feature with NVMe-TCP.
 
-Use nvmetcli to setup/cleanup a remote soft target.
+Configuration of DDP is per NIC and is done through a script in the
+kernel source. For this reason we add 2 new config vars:
+- KERNELSRC: path to the running kernel sources
+- NVME_IFACE: name of the network interface to configure the offload on
 
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
 Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
+Signed-off-by: Shai Malin smalin@nvidia.com
+Reviewed-by: Daniel Wagner <dwagner@suse.de>
 ---
- contrib/nvme_target_control.py | 190 +++++++++++++++++++++++++++++++++
- contrib/nvmet-subsys.jinja2    |  71 ++++++++++++
- 2 files changed, 261 insertions(+)
- create mode 100755 contrib/nvme_target_control.py
- create mode 100644 contrib/nvmet-subsys.jinja2
+ Documentation/running-tests.md |   9 ++
+ README.md                      |   1 +
+ common/rc                      |   8 +
+ tests/nvme/055                 | 268 +++++++++++++++++++++++++++++++++
+ tests/nvme/055.out             |  44 ++++++
+ tests/nvme/rc                  |   8 +
+ 6 files changed, 338 insertions(+)
+ create mode 100755 tests/nvme/055
+ create mode 100644 tests/nvme/055.out
 
-diff --git a/contrib/nvme_target_control.py b/contrib/nvme_target_control.py
-new file mode 100755
-index 0000000..db77fe3
---- /dev/null
-+++ b/contrib/nvme_target_control.py
-@@ -0,0 +1,190 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-3.0+
+diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
+index fe4f729..a42fc91 100644
+--- a/Documentation/running-tests.md
++++ b/Documentation/running-tests.md
+@@ -124,6 +124,15 @@ The NVMe tests can be additionally parameterized via environment variables.
+   be skipped and this script gets called. This makes it possible to run
+   the fabric nvme tests against a real target.
+ 
++#### NVMe-TCP zero-copy offload
 +
-+# blktests calls this script to setup/teardown remote targets. blktests passes
-+# all relevant information via the command line, e.g. --hostnqn.
-+#
-+# This script uses nvmetcli to setup the remote target (it depends on the REST
-+# API feature [1]). There is not technical need for nvmetcli to use but it makes
-+# it simple to setup a remote Linux box. If you want to setup someting else
-+# you should to replace this part.
-+#
-+# There are couple of global configuration options which need to be set.
-+# Add ~/.config/blktests/nvme_target_control.toml file with something like:
-+#
-+# [main]
-+# skip_setup_cleanup=false
-+# nvmetcli='/usr/bin/nvmetcli'
-+# remote='http://nvmet.local:5000'
-+#
-+# [host]
-+# blkdev_type='device'
-+# trtype='tcp'
-+# hostnqn='nqn.2014-08.org.nvmexpress:uuid:0f01fb42-9f7f-4856-b0b3-51e60b8de349'
-+# hostid='0f01fb42-9f7f-4856-b0b3-51e60b8de349'
-+# host_traddr='192.168.154.187'
-+#
-+# [subsys_0]
-+# traddr='192.168.19.189'
-+# trsvid='4420'
-+# subsysnqn='blktests-subsystem-1'
-+# subsys_uuid='91fdba0d-f87b-4c25-b80f-db7be1418b9e'
-+#
-+# This expects nvmetcli with the restapi service running on target.
-+#
-+# Alternatively, you can skip the the target setup/cleanup completely
-+# (skip_setup_cleanup) and run against a previously configured target.
-+#
-+# [main]
-+# skip_setup_cleanup=true
-+# nvmetcli='/usr/bin/nvmetcli'
-+# remote='http://nvmet.local:5000'
-+#
-+# [host]
-+# blkdev_type='device'
-+# trtype='tcp'
-+# hostnqn='nqn.2014-08.org.nvmexpress:uuid:1a9e23dd-466e-45ca-9f43-a29aaf47cb21'
-+# hostid='1a9e23dd-466e-45ca-9f43-a29aaf47cb21'
-+# host_traddr='10.161.16.48'
-+#
-+# [subsys_0]
-+# traddr='10.162.198.45'
-+# trsvid='4420'
-+# subsysnqn='nqn.1988-11.com.dell:powerstore:00:f03028e73ef7D032D81E'
-+# subsys_uuid='3a5c104c-ee41-38a1-8ccf-0968003d54e7'
-+# blkdev='/dev/nullb0'
-+#
-+# nvmetcli uses JSON configuration, thus this script creates a JSON configuration
-+# using a jinja2 template. After this step we simple have to set the blktests
-+# variable correctly and start blktests.
-+#
-+#   NVME_TARGET_CONTROL=~/blktests/contrib/nvme_target_control.py ./check nvme
-+#
-+# [1] https://github.com/hreinecke/nvmetcli/tree/restapi
++The NVMe-TCP ZC offload tests use a couple more variables.
 +
-+import os
++- KERNELSRC: Path to running kernel sources.
++  Needed for the script to configure the offload.
++- NVME_IFACE: Name of the interface the offload should be enabled on.
++  This should be the same interface the NVMe connection is made with.
 +
-+# workaround for python<3.11
-+TOML_OPEN_MODE="rb"
-+try:
-+    import tomllib
-+except ModuleNotFoundError:
-+    import pip._vendor.tomli as tomllib
-+    TOML_OPEN_MODE="r"
-+
-+import argparse
-+import subprocess
-+from jinja2 import Environment, FileSystemLoader
-+
-+
-+XDG_CONFIG_HOME = os.environ.get("XDG_CONFIG_HOME")
-+if not XDG_CONFIG_HOME:
-+    XDG_CONFIG_HOME = os.environ.get('HOME') + '/.config'
-+
-+
-+with open(f'{XDG_CONFIG_HOME}/blktests/nvme_target_control.toml', TOML_OPEN_MODE) as f:
-+    config = tomllib.load(f)
-+    nvmetcli = config['main']['nvmetcli']
-+    remote = config['main']['remote']
-+
-+
-+def gen_conf(conf):
-+    basepath = os.path.dirname(__file__)
-+    environment = Environment(loader=FileSystemLoader(basepath))
-+    template = environment.get_template('nvmet-subsys.jinja2')
-+    filename = f'{conf["subsysnqn"]}.json'
-+    content = template.render(conf)
-+    with open(filename, mode='w', encoding='utf-8') as outfile:
-+        outfile.write(content)
-+
-+
-+def target_setup(args):
-+    if config['main']['skip_setup_cleanup']:
-+        return
-+
-+    conf = {
-+        'subsysnqn': args.subsysnqn,
-+        'subsys_uuid': args.subsys_uuid,
-+        'hostnqn': args.hostnqn,
-+        'allowed_hosts': args.hostnqn,
-+        'ctrlkey': args.ctrlkey,
-+        'hostkey': args.hostkey,
-+        'blkdev': config['subsys_0']['blkdev'],
-+    }
-+
-+    gen_conf(conf)
-+
-+    subprocess.call(['python3', nvmetcli, '--remote=' + remote,
-+                     'restore', args.subsysnqn + '.json'])
-+
-+
-+def target_cleanup(args):
-+    if config['main']['skip_setup_cleanup']:
-+        return
-+
-+    subprocess.call(['python3', nvmetcli, '--remote=' + remote,
-+                     'clear', args.subsysnqn + '.json'])
-+
-+
-+def target_config(args):
-+	if args.show_blkdev_type:
-+		print(config['host']['blkdev_type'])
-+	elif args.show_trtype:
-+		print(config['host']['trtype'])
-+	elif args.show_hostnqn:
-+		print(config['host']['hostnqn'])
-+	elif args.show_hostid:
-+		print(config['host']['hostid'])
-+	elif args.show_host_traddr:
-+		print(config['host']['host_traddr'])
-+	elif args.show_traddr:
-+		print(config['subsys_0']['traddr'])
-+	elif args.show_trsvid:
-+		print(config['subsys_0']['trsvid'])
-+	elif args.show_subsysnqn:
-+		print(config['subsys_0']['subsysnqn'])
-+	elif args.show_subsys_uuid:
-+		print(config['subsys_0']['subsys_uuid'])
-+
-+
-+def build_parser():
-+    parser = argparse.ArgumentParser()
-+    sub = parser.add_subparsers(required=True)
-+
-+    setup = sub.add_parser('setup')
-+    setup.add_argument('--subsysnqn', required=True)
-+    setup.add_argument('--subsys-uuid', required=True)
-+    setup.add_argument('--hostnqn', required=True)
-+    setup.add_argument('--ctrlkey', default='')
-+    setup.add_argument('--hostkey', default='')
-+    setup.set_defaults(func=target_setup)
-+
-+    cleanup = sub.add_parser('cleanup')
-+    cleanup.add_argument('--subsysnqn', required=True)
-+    cleanup.set_defaults(func=target_cleanup)
-+
-+    config = sub.add_parser('config')
-+    config.add_argument('--show-blkdev-type', action='store_true')
-+    config.add_argument('--show-trtype', action='store_true')
-+    config.add_argument('--show-hostnqn', action='store_true')
-+    config.add_argument('--show-hostid', action='store_true')
-+    config.add_argument('--show-host-traddr', action='store_true')
-+    config.add_argument('--show-traddr', action='store_true')
-+    config.add_argument('--show-trsvid', action='store_true')
-+    config.add_argument('--show-subsys-uuid', action='store_true')
-+    config.add_argument('--show-subsysnqn', action='store_true')
-+    config.set_defaults(func=target_config)
-+
-+    return parser
-+
-+
-+def main():
-+    import sys
-+
-+    parser = build_parser()
-+    args = parser.parse_args()
-+    args.func(args)
-+
-+
-+if __name__ == '__main__':
-+    main()
-diff --git a/contrib/nvmet-subsys.jinja2 b/contrib/nvmet-subsys.jinja2
-new file mode 100644
-index 0000000..a446fbd
---- /dev/null
-+++ b/contrib/nvmet-subsys.jinja2
-@@ -0,0 +1,71 @@
-+{
-+  "hosts": [
-+    {
-+      "nqn": "{{ hostnqn }}"
-+    }
-+  ],
-+  "ports": [
-+    {
-+      "addr": {
-+        "adrfam": "ipv4",
-+        "traddr": "0.0.0.0",
-+        "treq": "not specified",
-+        "trsvcid": "4420",
-+        "trtype": "tcp",
-+        "tsas": "none"
-+      },
-+      "ana_groups": [
-+        {
-+          "ana": {
-+            "state": "optimized"
-+          },
-+          "grpid": 1
-+        }
-+      ],
-+      "param": {
-+        "inline_data_size": "16384",
-+        "pi_enable": "0"
-+      },
-+      "portid": 0,
-+      "referrals": [],
-+      "subsystems": [
-+        "{{ subsysnqn }}"
-+      ]
-+    }
-+  ],
-+  "subsystems": [
-+    {
-+      "allowed_hosts": [
-+        "{{ allowed_hosts }}"
-+      ],
-+      "attr": {
-+        "allow_any_host": "0",
-+        "cntlid_max": "65519",
-+        "cntlid_min": "1",
-+        "firmware": "yada",
-+        "ieee_oui": "0x000000",
-+        "model": "Linux",
-+        "pi_enable": "0",
-+        "qid_max": "128",
-+        "serial": "0c74361069d9db6c65ef",
-+        "version": "1.3"
-+      },
-+      "namespaces": [
-+        {
-+          "ana": {
-+            "grpid": "1"
-+          },
-+          "ana_grpid": 1,
-+          "device": {
-+            "nguid": "00000000-0000-0000-0000-000000000000",
-+            "path": "{{ blkdev }}",
-+            "uuid": "{{ subsys_uuid }}"
-+          },
-+          "enable": 1,
-+          "nsid": 1
-+        }
-+      ],
-+      "nqn": "{{ subsysnqn }}"
-+    }
-+  ]
+ ### Running nvme-rdma and SRP tests
+ 
+ These tests will use the siw (soft-iWARP) driver by default. The rdma_rxe
+diff --git a/README.md b/README.md
+index 55227d9..5073510 100644
+--- a/README.md
++++ b/README.md
+@@ -30,6 +30,7 @@ Some tests require the following:
+ - nbd-client and nbd-server (Debian) or nbd (Fedora, openSUSE, Arch Linux)
+ - dmsetup (Debian) or device-mapper (Fedora, openSUSE, Arch Linux)
+ - rublk (`cargo install --version=^0.1 rublk`) for ublk test
++- python3, ethtool, iproute2 for nvme-tcp zero-copy offload test
+ 
+ Build blktests with `make`. Optionally, install it to a known location with
+ `make install` (`/usr/local/blktests` by default, but this can be changed by
+diff --git a/common/rc b/common/rc
+index b2e68b2..0c8b51f 100644
+--- a/common/rc
++++ b/common/rc
+@@ -148,6 +148,14 @@ _have_loop() {
+ 	_have_driver loop && _have_program losetup
+ }
+ 
++_have_kernel_source() {
++	if [ -z "${KERNELSRC}" ]; then
++		SKIP_REASONS+=("KERNELSRC not set")
++		return 1
++	fi
++	return 0
 +}
++
+ _have_blktrace() {
+ 	# CONFIG_BLK_DEV_IO_TRACE might still be disabled, but this is easier
+ 	# to check. We can fix it if someone complains.
+diff --git a/tests/nvme/055 b/tests/nvme/055
+new file mode 100755
+index 0000000..4f2f87e
+--- /dev/null
++++ b/tests/nvme/055
+@@ -0,0 +1,268 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2024 Aurelien Aptel <aaptel@nvidia.com>
++#
++# zero-copy offload
++
++. tests/nvme/rc
++
++DESCRIPTION="enable zero copy offload and run rw traffic"
++TIMED=1
++
++iface_idx=""
++
++# these vars get updated after each call to connect_run_disconnect()
++nb_packets=0
++nb_bytes=0
++nb_offload_packets=0
++nb_offload_bytes=0
++offload_bytes_ratio=0
++offload_packets_ratio=0
++
++requires() {
++	_nvme_requires
++	_require_remote_nvme_target
++	_require_nvme_trtype tcp
++	_have_kernel_option ULP_DDP
++	# require nvme-tcp as a module to be able to change the ddp_offload param
++	_have_module nvme_tcp && _have_module_param nvme_tcp ddp_offload
++	_have_fio
++	_have_program ip
++	_have_program ethtool
++	_have_kernel_source && _have_program python3 && have_netlink_cli
++	have_iface
++}
++
++have_netlink_cli() {
++	local cli
++	cli="${KERNELSRC}/tools/net/ynl/cli.py"
++
++	if ! [ -f "$cli" ]; then
++		SKIP_REASONS+=("Kernel sources do not have tools/net/ynl/cli.py")
++		return 1
++	fi
++
++	if ! "$cli" -h &> /dev/null; then
++		SKIP_REASONS+=("Cannot run the kernel tools/net/ynl/cli.py")
++		return 1;
++	fi
++
++	if ! [ -f "${KERNELSRC}/Documentation/netlink/specs/ulp_ddp.yaml" ]; then
++		SKIP_REASONS+=("Kernel sources do not have the ULP DDP netlink specs")
++		return 1
++	fi
++}
++
++have_iface() {
++	if [ -z "${NVME_IFACE}" ]; then
++		SKIP_REASONS+=("NVME_IFACE not set")
++		return 1
++	fi
++	return 0
++}
++
++set_conditions() {
++	_set_nvme_trtype "$@"
++}
++
++netlink_cli() {
++	"${KERNELSRC}/tools/net/ynl/cli.py" \
++		--spec "${KERNELSRC}/Documentation/netlink/specs/ulp_ddp.yaml" \
++		"$@"
++}
++
++eth_stat() {
++	ethtool -S "${NVME_IFACE}" | awk "/ $1:/ { print \$2 }"
++}
++
++ddp_stat() {
++	netlink_cli --do stats-get --json "{\"ifindex\": $iface_idx}" \
++		| awk -F: "/'$1'/{print \$2;}" | tr -d '{},'
++}
++
++ddp_caps() {
++	local out
++	out="$(netlink_cli --do caps-get --json "{\"ifindex\": $iface_idx}")"
++	echo "$out" | tr '{},' '\n' | tr -d ' '| awk -F: "/$1/ { print \$2 }"
++}
++
++configure_ddp() {
++	local mod_param
++	local cap
++
++	mod_param=$1
++	cap=$2
++
++	echo "=== configured with ddp_offload=$mod_param and caps=$cap ==="
++
++	# set ddp_offload module param
++	modprobe -q -r nvme-tcp
++	modprobe -q nvme-tcp ddp_offload="$mod_param"
++
++	# set capabilities
++	netlink_cli --do caps-set --json "{\"ifindex\": $iface_idx, \"wanted\": $cap, \"wanted_mask\": 3}" >> "$FULL" 2>&1
++}
++
++connect_run_disconnect() {
++	local io_size nvme_dev
++
++	# offload stat counters
++	# sockets
++	local beg_sk_add beg_sk_add_fail beg_sk_del
++	local end_sk_add end_sk_add_fail end_sk_del
++	# loss
++	local beg_drop beg_resync
++	local end_drop end_resync
++	# bw stats
++	local beg_off_bytes beg_eth_bytes beg_off_packets beg_eth_packets
++	local end_off_bytes end_eth_bytes end_off_packets end_eth_packets
++	# pdu offload setup/teardown
++	local end_setup beg_setup_fail end_setup_fail end_teardown
++
++	local nb_drop drop_ratio
++	local nb_resync resync_ratio
++
++	io_size=$1
++
++	beg_sk_add=$(ddp_stat rx-nvme-tcp-sk-add)
++	beg_sk_add_fail=$(ddp_stat rx-nvme-tcp-sk-add-fail)
++	beg_sk_del=$(ddp_stat rx-nvme-tcp-sk-del)
++	beg_setup_fail=$(ddp_stat rx-nvme-tcp-setup-fail)
++	beg_drop=$(ddp_stat rx-nvme-tcp-drop)
++	beg_resync=$(ddp_stat rx-nvme-tcp-resync)
++	beg_off_packets=$(ddp_stat rx-nvme-tcp-packets)
++	beg_off_bytes=$(ddp_stat rx-nvme-tcp-bytes)
++	beg_eth_packets=$(eth_stat rx_packets)
++	beg_eth_bytes=$(eth_stat rx_bytes)
++	_nvme_connect_subsys --hdr-digest --data-digest --nr-io-queues 8
++
++	nvme_dev="/dev/$(_find_nvme_ns "${def_subsys_uuid}")"
++
++	local common_args=(
++		--blocksize_range="$io_size"
++		--rw=randrw
++		--numjobs=8
++		--iodepth=128
++		--name=randrw
++		--ioengine=libaio
++		--time_based
++		--runtime="$TIMEOUT"
++		--direct=1
++		--invalidate=1
++		--randrepeat=1
++		--norandommap
++		--filename="$nvme_dev"
++	)
++
++	echo "IO size: $io_size"
++
++	_run_fio "${common_args[@]}"
++	_nvme_disconnect_subsys >> "$FULL" 2>&1
++
++	end_sk_add=$(ddp_stat rx-nvme-tcp-sk-add)
++	end_sk_add_fail=$(ddp_stat rx-nvme-tcp-sk-add-fail)
++	end_sk_del=$(ddp_stat rx-nvme-tcp-sk-del)
++	end_setup=$(ddp_stat rx-nvme-tcp-setup)
++	end_setup_fail=$(ddp_stat rx-nvme-tcp-setup-fail)
++	end_teardown=$(ddp_stat rx-nvme-tcp-teardown)
++	end_drop=$(ddp_stat rx-nvme-tcp-drop)
++	end_resync=$(ddp_stat rx-nvme-tcp-resync)
++	end_off_packets=$(ddp_stat rx-nvme-tcp-packets)
++	end_eth_packets=$(eth_stat rx_packets)
++	end_off_bytes=$(ddp_stat rx-nvme-tcp-bytes)
++	end_eth_bytes=$(eth_stat rx_bytes)
++
++	echo "Offloaded sockets: $((end_sk_add - beg_sk_add))"
++	echo "Failed sockets:    $((end_sk_add_fail - beg_sk_add_fail))"
++	echo "Unoffloaded sockets:   $((end_sk_del - beg_sk_del))"
++	echo "Offload packet leaked: $((end_setup - end_teardown))"
++	echo "Failed packet setup:   $((end_setup_fail - beg_setup_fail))"
++
++	# global var results
++	nb_drop=$(( end_drop - beg_drop ))
++	nb_resync=$(( end_resync - beg_resync ))
++	nb_packets=$(( end_eth_packets - beg_eth_packets ))
++	nb_offload_packets=$(( end_off_packets - beg_off_packets ))
++	nb_bytes=$(( end_eth_bytes - beg_eth_bytes ))
++	nb_offload_bytes=$(( end_off_bytes - beg_off_bytes ))
++
++	offload_packets_ratio=0
++	offload_bytes_ratio=0
++
++	# sanity check and avoid div by zero in ratio calculation
++	if [[ nb_bytes -eq 0 || nb_packets -eq 0 ]]; then
++		echo "No traffic: $nb_bytes bytes, $nb_packets packets"
++		return
++	fi
++
++	offload_packets_ratio=$(( nb_offload_packets*100/nb_packets ))
++	offload_bytes_ratio=$(( nb_offload_bytes*100/nb_bytes ))
++
++	drop_ratio=$(( nb_drop*100/nb_packets ))
++	resync_ratio=$(( nb_resync*100/nb_packets ))
++	[[ drop_ratio -gt 5 ]] && echo "High drop ratio: $drop_ratio %"
++	[[ resync_ratio -gt 5 ]] && echo "High resync ratio: $resync_ratio %"
++}
++
++test() {
++	local starting_ddp
++	local starting_cap
++
++	: "${TIMEOUT:=30}"
++
++	echo "Running ${TEST_NAME}"
++
++	# get iface index
++	iface_idx=$(ip address | awk -F: "/${NVME_IFACE}/ { print \$1; exit; }")
++
++	# check hw supports ddp
++	if [[ $(( $(ddp_caps hw) & 3)) -ne 3 ]]; then
++		SKIP_REASONS+=("${NVME_IFACE} does not support nvme-tcp ddp offload")
++		return
++	fi
++
++	_setup_nvmet
++	_nvmet_target_setup
++
++	starting_ddp="$(cat "/sys/module/nvme_tcp/parameters/ddp_offload")"
++	starting_cap="$(ddp_caps active)"
++
++	# if any of the offload knobs are disabled, no offload should occur
++	# and offloaded packets & bytes should be zero
++
++	configure_ddp N 0
++	connect_run_disconnect 32k-1M
++	echo "Offloaded packets: $nb_offload_packets"
++	echo "Offloaded bytes: $nb_offload_bytes"
++
++	configure_ddp N 3
++	connect_run_disconnect 32k-1M
++	echo "Offloaded packets: $nb_offload_packets"
++	echo "Offloaded bytes: $nb_offload_bytes"
++
++	configure_ddp Y 0
++	connect_run_disconnect 32k-1M
++	echo "Offloaded packets: $nb_offload_packets"
++	echo "Offloaded bytes: $nb_offload_bytes"
++
++	# if everything is enabled, the offload should happen for large IOs only
++	configure_ddp Y 3
++
++	connect_run_disconnect 32k-1M
++	[[ nb_offload_packets -lt 100 ]] && echo "Low offloaded packets: $nb_offload_packets"
++	[[ nb_offload_bytes -lt 32768 ]] && echo "Low offloaded bytes: $nb_offload_bytes"
++	[[ offload_bytes_ratio -lt 90 ]] && echo "Low offloaded bytes ratio: $offload_bytes_ratio %"
++	[[ offload_packets_ratio -lt 95 ]] && echo "Low offloaded packets ratio: $offload_packets_ratio %"
++
++	# small IO should be under the offload threshold, ratio should be zero
++	connect_run_disconnect 4k-16k
++	echo "Offload bytes ratio: $offload_bytes_ratio %"
++	echo "Offload packets ratio: $offload_packets_ratio %"
++
++	_nvmet_target_cleanup
++
++	# restore starting config
++	configure_ddp "$starting_ddp" "$starting_cap" > /dev/null
++
++	echo "Test complete"
++}
+diff --git a/tests/nvme/055.out b/tests/nvme/055.out
+new file mode 100644
+index 0000000..9284a6f
+--- /dev/null
++++ b/tests/nvme/055.out
+@@ -0,0 +1,44 @@
++Running nvme/055
++=== configured with ddp_offload=N and caps=0 ===
++IO size: 32k-1M
++Offloaded sockets: 0
++Failed sockets:    0
++Unoffloaded sockets:   0
++Offload packet leaked: 0
++Failed packet setup:   0
++Offloaded packets: 0
++Offloaded bytes: 0
++=== configured with ddp_offload=N and caps=3 ===
++IO size: 32k-1M
++Offloaded sockets: 0
++Failed sockets:    0
++Unoffloaded sockets:   0
++Offload packet leaked: 0
++Failed packet setup:   0
++Offloaded packets: 0
++Offloaded bytes: 0
++=== configured with ddp_offload=Y and caps=0 ===
++IO size: 32k-1M
++Offloaded sockets: 0
++Failed sockets:    0
++Unoffloaded sockets:   0
++Offload packet leaked: 0
++Failed packet setup:   0
++Offloaded packets: 0
++Offloaded bytes: 0
++=== configured with ddp_offload=Y and caps=3 ===
++IO size: 32k-1M
++Offloaded sockets: 8
++Failed sockets:    0
++Unoffloaded sockets:   8
++Offload packet leaked: 0
++Failed packet setup:   0
++IO size: 4k-16k
++Offloaded sockets: 8
++Failed sockets:    0
++Unoffloaded sockets:   8
++Offload packet leaked: 0
++Failed packet setup:   0
++Offload bytes ratio: 0 %
++Offload packets ratio: 0 %
++Test complete
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index d1a4c01..4a43e43 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -199,6 +199,14 @@ _require_kernel_nvme_target() {
+ 	return 0
+ }
+ 
++_require_remote_nvme_target() {
++	if [ -z "${nvme_target_control}" ]; then
++		SKIP_REASONS+=("Remote target required but NVME_TARGET_CONTROL is not set")
++		return 1
++	fi
++	return 0
++}
++
+ _test_dev_nvme_ctrl() {
+ 	echo "/dev/char/$(cat "${TEST_DEV_SYSFS}/device/dev")"
+ }
 -- 
 2.34.1
 
