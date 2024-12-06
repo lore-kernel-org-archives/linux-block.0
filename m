@@ -1,148 +1,118 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACAC1D8DE8
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 06:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990E71D63D1;
+	Fri,  6 Dec 2024 07:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733465457; cv=none; b=KSBcWap0NIZr7QSCdSMjENcLciWz8aJCgRy/Kt+LpcgPm0aPIThLMOb141qWkpekD90QknW94Qpv5nkM6aR1+Vtt9IPp1IFj3F8kEOzmJNHgpw3wVy32G8GfwnIahgI1eYOe4OiP1ldcIWJd71uMcECI1xjk84vDBxcY5IRfSG8=
+	t=1733469664; cv=none; b=QfeDiMMWc5Bs0wkk3k2iDmPs19vJFOuy5uQQ10oBSpu8l7bjqNFQCzslVL3uoN3tB3AMQXox7aQT0Djm7ImF8noAnb/ha8N4HYiP7Xi3EndSDIc6DIHd/ei1msZ8pmds4X4iGn3wKdKZKmYD0GUwOGNEkR+LvDnRHBMhRASU7PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733465457; c=relaxed/simple;
-	bh=byiOWDYq8mTgW3endEtkkX5vAx1PxeQf2rYQ0aFgvAU=;
+	s=arc-20240116; t=1733469664; c=relaxed/simple;
+	bh=eXgkPnSuV1DLMSpxicSxCmpRMc11qSId1Ps39ZgC62E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N0QG/1BG2RXAO8Hex0aK+0smybuDaMjCLYp/dB6mH1GZwBVfBDJUuEnTGJ1OyAzZv4lCv/20ZgWsT4KCriIDrQAeRr9phHPL02r2sHs13lFF2UKxDSJFV60nSfPyjRcPk/aEINavqvrBG9YiyzTeWnHpw8f2fED7ObuM1MkxGHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XlA303xR; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=DgGs0eLziaCw/VfWhS12larD8OcwilOKczfSyb5h9dRhYsRfc0T5NRgHEbWMkf4493OE9qUZo90pxQUTG26Pw4MyydRR2weEyiRXY0jX8tUnaDB6EPNvf/kXqmEoLglnFBpZQuvUrJnhLMeLIlzwnpql6qdp6rMooeRPbcGKHWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o+wG9rcY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XlA303xR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733465456; x=1765001456;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=byiOWDYq8mTgW3endEtkkX5vAx1PxeQf2rYQ0aFgvAU=;
-  b=XlA303xRaWKdudnPMHe6JwPMisjqqd58tz4cX88CCzwjm++FOvq8r8Ab
-   ldPVOjodG69Bfi1j/K/dBYI53cma7cIy3hwZGBmtx7rpwt1OnF0139kxu
-   DFWH9meON1WYbeTHhNhUp+kYas4/dt9yK8AfyHFB/Q8d8t4l/PHz7dXh9
-   CRR7BimRR02OebJINITP/Ppbo02kkK/nUf9jWc4mBaPh73PvT2i0LevBz
-   LEdFInt+V4zqQiWdkmPYg2XnaAFP6Oxd/bGaPi8j+p5i1A0OvuXDEhEow
-   Nq572EcfP0jSAUJYttX2UJP6GLN4U137QyAF0GxNr8u29fEZXiDyhpisf
-   g==;
-X-CSE-ConnectionGUID: Iq9fl1dpRECzfvt/zgqVVg==
-X-CSE-MsgGUID: 3CxTtk68Tb6kZp3qNR1NCw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11277"; a="37742512"
-X-IronPort-AV: E=Sophos;i="6.12,212,1728975600"; 
-   d="scan'208";a="37742512"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2024 22:10:55 -0800
-X-CSE-ConnectionGUID: NjY9ySRhTZSJesLOQ+fq3w==
-X-CSE-MsgGUID: sE0ZS/2kRDOib5K2Jbwy7Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,212,1728975600"; 
-   d="scan'208";a="99267811"
-Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 05 Dec 2024 22:10:53 -0800
-Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tJRYA-0000l5-01;
-	Fri, 06 Dec 2024 06:10:50 +0000
-Date: Fri, 6 Dec 2024 14:10:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev
-Cc: oe-kbuild-all@lists.linux.dev, Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH 4/4] dm: Fix dm-zoned-reclaim zone write pointer alignment
-Message-ID: <202412061404.Utec5WgH-lkp@intel.com>
-References: <20241206015240.6862-5-dlemoal@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o+wG9rcY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F657C4CED1;
+	Fri,  6 Dec 2024 07:21:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733469664;
+	bh=eXgkPnSuV1DLMSpxicSxCmpRMc11qSId1Ps39ZgC62E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o+wG9rcYnotlrUeuc0PL7wpQWKlXXxbgXtHgvJy7YCCwHVZ9BkccRLmauWqsz+ZV/
+	 iY49BGCvaEwufLj74wUd4KOO2j4hv4jUIw8urqblrYMJBpAv6CgCbIU/8R6GyV73VK
+	 9c58t+wda7Myy5qJF2WzOXzK3/BQJ0i/AkjHXsZFMr7s3vepRv5asoxKqYToTl/hYB
+	 VNEio9U05OacRjqjaygqmLG9eUZQ17GF0aovEsH5OsM54NY9ccCb7HeNz79C2xEmMj
+	 yLXMkRkJbjJNx0ViCQboZDxE2VKg3DG3+oa6CDnctzD5D0J8giHgftdS96ghXZOqUx
+	 A94yQD2wKTalw==
+Date: Fri, 6 Dec 2024 08:21:01 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
+To: Zijun Hu <zijun_hu@icloud.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas@t-8ch.de>, 
+	linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev, linux-sound@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-block@vger.kernel.org, linux-cxl@vger.kernel.org, 
+	linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linux-mediatek@lists.infradead.org, linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	open-iscsi@googlegroups.com, linux-usb@vger.kernel.org, linux-serial@vger.kernel.org, 
+	netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: Re: [PATCH v3 04/11] driver core: Constify API device_find_child()
+ then adapt for various usages
+Message-ID: <7ylfj462lf6g3ej6d2cmsxadawsmajogbimi7cl4pjemb7df4h@snr73pd7vaid>
+References: <20241205-const_dfc_done-v3-0-1611f1486b5a@quicinc.com>
+ <20241205-const_dfc_done-v3-4-1611f1486b5a@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="owd7bvwanf7sxd4s"
 Content-Disposition: inline
-In-Reply-To: <20241206015240.6862-5-dlemoal@kernel.org>
-
-Hi Damien,
-
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on linus/master v6.13-rc1 next-20241205]
-[cannot apply to device-mapper-dm/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Damien-Le-Moal/block-Use-a-zone-write-plug-BIO-work-for-REQ_NOWAIT-BIOs/20241206-095452
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20241206015240.6862-5-dlemoal%40kernel.org
-patch subject: [PATCH 4/4] dm: Fix dm-zoned-reclaim zone write pointer alignment
-config: arc-randconfig-002-20241206 (https://download.01.org/0day-ci/archive/20241206/202412061404.Utec5WgH-lkp@intel.com/config)
-compiler: arc-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241206/202412061404.Utec5WgH-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412061404.Utec5WgH-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> block/blk-zoned.c:1751: warning: Excess function parameter 'flags' description in 'blkdev_issue_zone_zeroout'
+In-Reply-To: <20241205-const_dfc_done-v3-4-1611f1486b5a@quicinc.com>
 
 
-vim +1751 block/blk-zoned.c
+--owd7bvwanf7sxd4s
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3 04/11] driver core: Constify API device_find_child()
+ then adapt for various usages
+MIME-Version: 1.0
 
-  1735	
-  1736	/**
-  1737	 * blkdev_issue_zone_zeroout - zero-fill a block range in a zone
-  1738	 * @bdev:	blockdev to write
-  1739	 * @sector:	start sector
-  1740	 * @nr_sects:	number of sectors to write
-  1741	 * @gfp_mask:	memory allocation flags (for bio_alloc)
-  1742	 * @flags:	controls detailed behavior
-  1743	 *
-  1744	 * Description:
-  1745	 *  Zero-fill a block range in a zone (@sector must be equal to the zone write
-  1746	 *  pointer), handling potential errors due to the (initially unknown) lack of
-  1747	 *  hardware offload (See blkdev_issue_zeroout()).
-  1748	 */
-  1749	int blkdev_issue_zone_zeroout(struct block_device *bdev, sector_t sector,
-  1750			sector_t nr_sects, gfp_t gfp_mask)
-> 1751	{
-  1752		int ret;
-  1753	
-  1754		if (WARN_ON_ONCE(!bdev_is_zoned(bdev)))
-  1755			return -EIO;
-  1756	
-  1757		ret = blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask,
-  1758					   BLKDEV_ZERO_NOFALLBACK);
-  1759		if (ret != -EOPNOTSUPP)
-  1760			return ret;
-  1761	
-  1762		/*
-  1763		 * The failed call to blkdev_issue_zeroout() advanced the zone write
-  1764		 * pointer. Undo this using a report zone to update the zone write
-  1765		 * pointer to the correct current value.
-  1766		 */
-  1767		ret = disk_zone_sync_wp_offset(bdev->bd_disk, sector);
-  1768		if (ret != 1)
-  1769			return ret < 0 ? ret : -EIO;
-  1770	
-  1771		/*
-  1772		 * Retry without BLKDEV_ZERO_NOFALLBACK to force the fallback to a
-  1773		 * regular write with zero-pages.
-  1774		 */
-  1775		return blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask, 0);
-  1776	}
-  1777	EXPORT_SYMBOL(blkdev_issue_zone_zeroout);
-  1778	
+Hello,
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+On Thu, Dec 05, 2024 at 08:10:13AM +0800, Zijun Hu wrote:
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
+>=20
+> Constify the following API:
+> struct device *device_find_child(struct device *dev, void *data,
+> 		int (*match)(struct device *dev, void *data));
+> To :
+> struct device *device_find_child(struct device *dev, const void *data,
+>                                  device_match_t match);
+> typedef int (*device_match_t)(struct device *dev, const void *data);
+> with the following reasons:
+>=20
+> - Protect caller's match data @*data which is for comparison and lookup
+>   and the API does not actually need to modify @*data.
+>=20
+> - Make the API's parameters (@match)() and @data have the same type as
+>   all of other device finding APIs (bus|class|driver)_find_device().
+>=20
+> - All kinds of existing device match functions can be directly taken
+>   as the API's argument, they were exported by driver core.
+>=20
+> Constify the API and adapt for various existing usages by simply making
+> various match functions take 'const void *' as type of match data @data.
+
+With the discussion that a new name would ease the conversion, maybe
+consider device_find_child_device() to also align the name (somewhat) to
+the above mentioned (bus|class|driver)_find_device()?
+
+Do you have a merge plan already? I guess this patch will go through
+Greg's driver core tree?
+
+Best regards
+Uwe
+
+--owd7bvwanf7sxd4s
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmdSpdoACgkQj4D7WH0S
+/k4dIQf/Zne0n0ncNUTb3GbDwFv4sf3wAVH368SbrNYMV23ZdWpNl4KZPovf5L1+
+5nMlPkc2I/CBZGE2OJcZWUhHI7cZ2ZYDHBBAf/TYhsY9f0+6wXgdi2cc+bbbQpo1
+JdabxMtgPX9tQ1Rbtv6jNu1AUvx8pONwQvUe5vmIBeLFDx5+wEwm4LppEVU+x9zB
+dApq6D2VfLguHwMf8HDycoa0nd0GL3R4KIJF4+taiSmhz9q+yjewqiXD2ag3fYrF
+1IeZ6pnyXoaq0aTwLmXXhI6se14Q+IZIVQPRXVQ5i9A8kbsWN0Fj2LfXnnNWhmHl
+YR8uP+UVLcfagxTg7ascr+SuV4OlCw==
+=cpdm
+-----END PGP SIGNATURE-----
+
+--owd7bvwanf7sxd4s--
