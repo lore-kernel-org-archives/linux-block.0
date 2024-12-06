@@ -1,87 +1,236 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D3421771C
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 16:23:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CE520627F
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 16:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733502239; cv=none; b=ahp5CGz/1FsD+JsUPzISG49myAj8fBnxIUsGoTPsIa4bZILQdEluMwId7n3unbMDUrI1RWcmjR91jEpvrkvAAliPNFwMQgvL0ATnAvsTSwnYalXt4bT2qkeVQAilo6oAYwlRfbiCqB8f17FR2JEFiRXaiNpRCyXfbzRu9U04GYk=
+	t=1733503650; cv=none; b=QmYtBNm6ozhB+bDBwgXzNAR6NnOrRN4gnfdnLKptlbpPJOHTmTicIGtdf33LO+5uG0yb3Ywp6ddCzGfD7TWZynB2RJHzbKRZjSf2KUOyrbuvkdUhcKOKzdOXfwMrbhcQCMvuUZfK4I4KCeycpGbWJ5lZHxh5tKVPFUBn+sSwkM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733502239; c=relaxed/simple;
-	bh=ByL5KlPEIfnKLV7rIZoXO+Eszw7LwEsbAk+KON6Y53w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fdhoj0Lc30b33kIOj27/Aze3GXJ+LKJlsfVu6VCVLdHuY54BohXG/0xcba03ykao8okneCT3lVJmnbv7pjVsmfUesGFrsyFWiwRtyVyGEKcJvHGo5506PPvyH223BqapTXDTlyzzCJK8YLwzd4B7zeNd+UiT5rzJOxbXth0VJ60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nd8+svdH; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1733503650; c=relaxed/simple;
+	bh=+24InzhWk0Us6nT2g6mE8gW3+EjOYv01hSYrnpDQm+g=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=fda/0ki/hLHr4NrrdrvBvu4kKz4O8Nd3anw9bmLRVgAYUxpVXUp+ikihA6Ab6uYg7Li8OzrwJDT3GiAiRKJmqo+2j4/HsKDmMviC64YGCjRNi6L8dhoR3Yrq4MMDTtkegHU+XPAhtWlRneVFBjhs4rF2ClOpS8kUFTLrBcbclEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tc4ZzM8B; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nd8+svdH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733502238; x=1765038238;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ByL5KlPEIfnKLV7rIZoXO+Eszw7LwEsbAk+KON6Y53w=;
-  b=Nd8+svdH5rogcGokRYLsKveIyYq8fVg7k+0ARN0KpEVCegjiootU9ibS
-   sZzVo+ugrcH6ZslpP5YiCQlYeFfppoFaGnI0uVUE5n4mYVXqbljVnR7mi
-   GonT9Qeuvvo1sAWr1rzZz58Ug0Aet+JcyV7EKwPUrygumj46pGYryWFfe
-   IFRaUH+Xrv194JGaL5EmNjvyNfr6Ru1z/sKrseHmaGKiIetm4vikQAeCq
-   Z+qE+41AcYVtCZW4AF5yhIH/zflbPpAdA9gAjTsrC6m83ZAuRtPnZTU8G
-   0Mz4NgQCMQMB4bG6PxAAKKhS/8HGzrc6ubSjiReE5KNtPn6igGoi6+U4/
-   A==;
-X-CSE-ConnectionGUID: 8+fz8u6KQUSjq8j/q32sxA==
-X-CSE-MsgGUID: 9qUjXpE/TaGVbSZtwJj4cQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11278"; a="33595824"
-X-IronPort-AV: E=Sophos;i="6.12,213,1728975600"; 
-   d="scan'208";a="33595824"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 08:23:57 -0800
-X-CSE-ConnectionGUID: JBAj6KXpTlGzY9P28N8BSQ==
-X-CSE-MsgGUID: yvFiyj6OSf2C8yHgshxyKw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,213,1728975600"; 
-   d="scan'208";a="94642678"
-Received: from agluck-desk3.sc.intel.com (HELO agluck-desk3) ([172.25.222.70])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2024 08:23:56 -0800
-Date: Fri, 6 Dec 2024 08:23:54 -0800
-From: "Luck, Tony" <tony.luck@intel.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH RESEND 0/2] blk-mq: fix lockdep warning between
- sysfs_lock and cpu hotplug lock
-Message-ID: <Z1MlGjnT6PrfHmnT@agluck-desk3>
-References: <20241206111611.978870-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tc4ZzM8B"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B6ATYjo011023
+	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 16:47:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=LP3VRp2FOHwpb3M1I71kz/3S4RBVAw1EYhSepgPzO
+	Qo=; b=tc4ZzM8BKBXoLMVAFUc4nlqnfvIuqy8MxqmnNGAPy6tjBxrDXZFNIej87
+	d+YWAzi+Omawx4gv7MzY3o7OXaDn4KnYjZSqOx8v4RTK/VTsNVgO76+nDBoqsUZc
+	XWv9MPwLsEVXUy8kLwOSd3MiZMQ+PpY3TMiifiX+8d9XfDeOvikzxj0M4mZe/X+E
+	szku5tidaRx9Auk+EiX/VhSDT65n/Mp0Rr93AOVpupwIZTXMniVbxi60jiJMW4O6
+	e3ouq7sK+Aw3vgifqYJCqprw/YJ7lpWIX0bay/w+EQWxPYH9Vx+erhO8eq65vJ0l
+	Mh4H4YZJCtF7j+RHJhr8ecO95HcxA==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43bk99mffs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 16:47:27 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B6DCZOo007470
+	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 16:47:26 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 438f8jyc8p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 16:47:26 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B6GlOVm55902488
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 16:47:24 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C1AA420043
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 16:47:24 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 32B4B20040
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 16:47:24 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.179.0.162])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 16:47:23 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: linux-block@vger.kernel.org
+Subject: [PATCH] block: Fix potential deadlock in queue_attr_store()
+Date: Fri,  6 Dec 2024 22:17:08 +0530
+Message-ID: <20241206164722.526114-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241206111611.978870-1-ming.lei@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: fbdgdFJAVjXOTLNQ8NY0LHseTdbbCQim
+X-Proofpoint-ORIG-GUID: fbdgdFJAVjXOTLNQ8NY0LHseTdbbCQim
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 bulkscore=0 adultscore=0 clxscore=1015 malwarescore=0
+ priorityscore=1501 spamscore=0 mlxlogscore=999 impostorscore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412060124
 
-On Fri, Dec 06, 2024 at 07:16:05PM +0800, Ming Lei wrote:
-> Hello,
-> 
-> The 1st patch is one prep patch.
-> 
-> The 2nd one fixes lockdep warning triggered by dependency between
-> q->sysfs_lock and cpuhotplug_lock.
-> 
-> 
-> Ming Lei (2):
->   blk-mq: register cpuhp callback after hctx is added to xarray table
->   blk-mq: move cpuhp callback registering out of q->sysfs_lock
-> 
->  block/blk-mq.c | 108 ++++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 94 insertions(+), 14 deletions(-)
+For storing a value to a queue attribute, the queue_attr_store function
+first freezes the queue (->q_usage_counter(io)) and then acquire
+->sysfs_lock. This seems not correct as the usual ordering should be to
+acquire ->sysfs_lock before freezing the queue. This incorrect ordering
+causes the following lockdep splat which we are able to reproduce always
+simply by accessing /sys/kernel/debug file using ls command:
 
-Ming,
+[   57.597146] WARNING: possible circular locking dependency detected
+[   57.597154] 6.12.0-10553-gb86545e02e8c #20 Tainted: G        W
+[   57.597162] ------------------------------------------------------
+[   57.597168] ls/4605 is trying to acquire lock:
+[   57.597176] c00000003eb56710 (&mm->mmap_lock){++++}-{4:4}, at: __might_fault+0x58/0xc0
+[   57.597200]
+               but task is already holding lock:
+[   57.597207] c0000018e27c6810 (&sb->s_type->i_mutex_key#3){++++}-{4:4}, at: iterate_dir+0x94/0x1d4
+[   57.597226]
+               which lock already depends on the new lock.
 
-Thanks for the patches. They work for me.
+[   57.597233]
+               the existing dependency chain (in reverse order) is:
+[   57.597241]
+               -> #5 (&sb->s_type->i_mutex_key#3){++++}-{4:4}:
+[   57.597255]        down_write+0x6c/0x18c
+[   57.597264]        start_creating+0xb4/0x24c
+[   57.597274]        debugfs_create_dir+0x2c/0x1e8
+[   57.597283]        blk_register_queue+0xec/0x294
+[   57.597292]        add_disk_fwnode+0x2e4/0x548
+[   57.597302]        brd_alloc+0x2c8/0x338
+[   57.597309]        brd_init+0x100/0x178
+[   57.597317]        do_one_initcall+0x88/0x3e4
+[   57.597326]        kernel_init_freeable+0x3cc/0x6e0
+[   57.597334]        kernel_init+0x34/0x1cc
+[   57.597342]        ret_from_kernel_user_thread+0x14/0x1c
+[   57.597350]
+               -> #4 (&q->debugfs_mutex){+.+.}-{4:4}:
+[   57.597362]        __mutex_lock+0xfc/0x12a0
+[   57.597370]        blk_register_queue+0xd4/0x294
+[   57.597379]        add_disk_fwnode+0x2e4/0x548
+[   57.597388]        brd_alloc+0x2c8/0x338
+[   57.597395]        brd_init+0x100/0x178
+[   57.597402]        do_one_initcall+0x88/0x3e4
+[   57.597410]        kernel_init_freeable+0x3cc/0x6e0
+[   57.597418]        kernel_init+0x34/0x1cc
+[   57.597426]        ret_from_kernel_user_thread+0x14/0x1c
+[   57.597434]
+               -> #3 (&q->sysfs_lock){+.+.}-{4:4}:
+[   57.597446]        __mutex_lock+0xfc/0x12a0
+[   57.597454]        queue_attr_store+0x9c/0x110
+[   57.597462]        sysfs_kf_write+0x70/0xb0
+[   57.597471]        kernfs_fop_write_iter+0x1b0/0x2ac
+[   57.597480]        vfs_write+0x3dc/0x6e8
+[   57.597488]        ksys_write+0x84/0x140
+[   57.597495]        system_call_exception+0x130/0x360
+[   57.597504]        system_call_common+0x160/0x2c4
+[   57.597516]
+               -> #2 (&q->q_usage_counter(io)#21){++++}-{0:0}:
+[   57.597530]        __submit_bio+0x5ec/0x828
+[   57.597538]        submit_bio_noacct_nocheck+0x1e4/0x4f0
+[   57.597547]        iomap_readahead+0x2a0/0x448
+[   57.597556]        xfs_vm_readahead+0x28/0x3c
+[   57.597564]        read_pages+0x88/0x41c
+[   57.597571]        page_cache_ra_unbounded+0x1ac/0x2d8
+[   57.597580]        filemap_get_pages+0x188/0x984
+[   57.597588]        filemap_read+0x13c/0x4bc
+[   57.597596]        xfs_file_buffered_read+0x88/0x17c
+[   57.597605]        xfs_file_read_iter+0xac/0x158
+[   57.597614]        vfs_read+0x2d4/0x3b4
+[   57.597622]        ksys_read+0x84/0x144
+[   57.597629]        system_call_exception+0x130/0x360
+[   57.597637]        system_call_common+0x160/0x2c4
+[   57.597647]
+               -> #1 (mapping.invalidate_lock#2){++++}-{4:4}:
+[   57.597661]        down_read+0x6c/0x220
+[   57.597669]        filemap_fault+0x870/0x100c
+[   57.597677]        xfs_filemap_fault+0xc4/0x18c
+[   57.597684]        __do_fault+0x64/0x164
+[   57.597693]        __handle_mm_fault+0x1274/0x1dac
+[   57.597702]        handle_mm_fault+0x248/0x484
+[   57.597711]        ___do_page_fault+0x428/0xc0c
+[   57.597719]        hash__do_page_fault+0x30/0x68
+[   57.597727]        do_hash_fault+0x90/0x35c
+[   57.597736]        data_access_common_virt+0x210/0x220
+[   57.597745]        _copy_from_user+0xf8/0x19c
+[   57.597754]        sel_write_load+0x178/0xd54
+[   57.597762]        vfs_write+0x108/0x6e8
+[   57.597769]        ksys_write+0x84/0x140
+[   57.597777]        system_call_exception+0x130/0x360
+[   57.597785]        system_call_common+0x160/0x2c4
+[   57.597794]
+               -> #0 (&mm->mmap_lock){++++}-{4:4}:
+[   57.597806]        __lock_acquire+0x17cc/0x2330
+[   57.597814]        lock_acquire+0x138/0x400
+[   57.597822]        __might_fault+0x7c/0xc0
+[   57.597830]        filldir64+0xe8/0x390
+[   57.597839]        dcache_readdir+0x80/0x2d4
+[   57.597846]        iterate_dir+0xd8/0x1d4
+[   57.597855]        sys_getdents64+0x88/0x2d4
+[   57.597864]        system_call_exception+0x130/0x360
+[   57.597872]        system_call_common+0x160/0x2c4
+[   57.597881]
+               other info that might help us debug this:
 
-Tested-by: Tony Luck <tony.luck@intel.com>
+[   57.597888] Chain exists of:
+                 &mm->mmap_lock --> &q->debugfs_mutex --> &sb->s_type->i_mutex_key#3
 
--Tony
+[   57.597905]  Possible unsafe locking scenario:
+
+[   57.597911]        CPU0                    CPU1
+[   57.597917]        ----                    ----
+[   57.597922]   rlock(&sb->s_type->i_mutex_key#3);
+[   57.597932]                                lock(&q->debugfs_mutex);
+[   57.597940]                                lock(&sb->s_type->i_mutex_key#3);
+[   57.597950]   rlock(&mm->mmap_lock);
+[   57.597958]
+                *** DEADLOCK ***
+
+[   57.597965] 2 locks held by ls/4605:
+[   57.597971]  #0: c0000000137c12f8 (&f->f_pos_lock){+.+.}-{4:4}, at: fdget_pos+0xcc/0x154
+[   57.597989]  #1: c0000018e27c6810 (&sb->s_type->i_mutex_key#3){++++}-{4:4}, at: iterate_dir+0x94/0x1d4
+
+Prevent the above lockdep warning by acquiring ->sysfs_lock before
+freezing the queue while storing a queue attribute in queue_attr_store
+function.
+
+Reported-by: kjain101@in.ibm.com
+Fixes: af2814149883 ("block: freeze the queue in queue_attr_store")
+Tested-by: kjain101@in.ibm.com
+Cc: hch@lst.de
+Cc: axboe@kernel.dk
+Cc: ritesh.list@gmail.com
+Cc: ming.lei@redhat.com
+Cc: gjoyce@linux.ibm.com
+Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+ block/blk-sysfs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 4241aea84161..f648b112782f 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -706,11 +706,11 @@ queue_attr_store(struct kobject *kobj, struct attribute *attr,
+ 	if (entry->load_module)
+ 		entry->load_module(disk, page, length);
+ 
+-	blk_mq_freeze_queue(q);
+ 	mutex_lock(&q->sysfs_lock);
++	blk_mq_freeze_queue(q);
+ 	res = entry->store(disk, page, length);
+-	mutex_unlock(&q->sysfs_lock);
+ 	blk_mq_unfreeze_queue(q);
++	mutex_unlock(&q->sysfs_lock);
+ 	return res;
+ }
+ 
+-- 
+2.45.2
 
