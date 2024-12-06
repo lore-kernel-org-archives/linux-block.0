@@ -1,53 +1,53 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFDF22C6F9
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 22:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702BC22C6D9
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 22:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733524216; cv=none; b=mwv48XhzIPD5ekxS9bTQZkmWhPJ+BbBTWuLgws5Yj7nGxeiqy3i4klLwL3pfXLsk5OC6l9Z+igWbz6Axcp4eTa/hHgkFSZV5hxnPuwn5W/xjsehH63wLhqLakVs6hk/gf2DycTpVSscnIk45nBN/SxwNDARI/Dl4dJ9GrtVeOfU=
+	t=1733524594; cv=none; b=XOvtJOIC0p6nj7d8SIZfOQfK55ZkQktxT1gGh1JVOaFxHQMOAPhDmNI9Y3xpz0DTTwdRtWFPPZDTjuz+SdC4rqwE/Za3csoipD5NrasHCkYCxwu9z+sOsWV1OxDEGl+s1naL7M/wvBeinSL9rmusds/T4UzOaEj5yiuFtYuug1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733524216; c=relaxed/simple;
-	bh=5JWKIlok/LlWB3ujWNzJ8mifN5u1BcG97Q8pMGFe0PM=;
+	s=arc-20240116; t=1733524594; c=relaxed/simple;
+	bh=roA9MJz3NEVEn2KFgHV5G25yCwgCNSCbMZDFMHVZt7E=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nfyxDBf66sUE9DG7x7jVGMmpm9ohxyaMU2pxtGmTKX1Lp0DJEIXOSVfsAyKu3p2vIExwsGbBrS7baJwAOVkftJNvKZStyBpZ2qAmqP5iw12SnFieDlXRw/81/cZS3L1tVcFSFuVMnIkoqzLKPU64L2yoRkavZmXSiyV7jbakvWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Eum86sH0; arc=none smtp.client-ip=67.231.153.30
+	 MIME-Version:Content-Type; b=YyZvEsANMdeWlm/UHqZy5GWNt3q7Z/u5EiqijlT2AU4KCRjHszd/4mnaEmAmSnX7tWujnyvULIhNUzb3TKfnsmKCR+tZwpZABwdSqP2smiIudRI5MF3Y3MjTuvcXL0MgK2ZOtOMNEYhhMpz+l7Ystx19jb2TmvmWIiCCycuA48I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=H9nCgfup; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Eum86sH0"
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B6LhGi7032186
-	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 14:30:13 -0800
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="H9nCgfup"
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 4B6MaPdC020886
+	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 14:36:30 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=IaesBJajvy2XJvCSejkRh5S+DvrgGK6zlymIWSzBoyc=; b=Eum86sH0zhOL
-	SXdiTRjHdzOkbdGHnJ7SExfWigZAZF9sZb+rrcCfOeuct1eCc73V04y/T6AlV1Ty
-	PgW/KwANXFQ3MqlgwY1raggd2vqxPjuTdi14nX0/ldywyCGCh59l0u2MERAc1c3N
-	Su6RDogGiINUS3U9UYGtk8DLl8SHLthpMRIP67a7ufWSmf/QyyhJQcHaSKHLD3oa
-	1BhQZfbmKkfn5kH96jlvSBltz0MRkKDyfhON5vFZ7qZipnInQZdbJW0tLxQCoQxT
-	/0ZsykbsIz3mz3v+iqpkPTJOc+Vu73AZhYswt9REOy3JJ8ugx/PgF6QoDLiJlok5
-	pbD8rcsnKg==
+	 bh=l06P/hzIb97V1tm7MFuefws7PCOG+jrPqbqmapoufhw=; b=H9nCgfuppHs9
+	hH8SeWLqrynsFmxL5Eb7peZGx08lADHP80Bh6nC/2gVJVWQAtHR7VSSf6R8HjgwN
+	iB3Lld3YJ2EAoHNSFdGh+Oq2Jqv3mo3LvjIljO2oY2XkiJRUw2f6NwSKGQ5+mmK4
+	ClvyoQYL4SnAhhpt2tlj4e4TqIva6xJzpjODbVDSZHDfNkbj33lGxxqmCATyh1gn
+	qENl/EdbEzdioLhsXSvS1GLdxCzoKAgkejXg++TmMtp/MxSR/oFdzHDUwbf04gzn
+	8vmj+cyU3fj0cJMnFQFtjoYbN0A8MirAv8yrupl8CSffDdrNWt3hZFxPTNQlRTqh
+	iH5sLdaBWw==
 Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 43bx1gn0e3-13
+	by m0001303.ppops.net (PPS) with ESMTPS id 43c7neh3hf-9
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 14:30:13 -0800 (PST)
-Received: from twshared3815.08.ash9.facebook.com (2620:10d:c0a8:1b::8e35) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 14:36:29 -0800 (PST)
+Received: from twshared7122.08.ash9.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Fri, 6 Dec 2024 22:29:58 +0000
+ 15.2.1544.11; Fri, 6 Dec 2024 22:35:50 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 0A3B815B8CB70; Fri,  6 Dec 2024 14:18:26 -0800 (PST)
+	id 5FAD215B8CB8A; Fri,  6 Dec 2024 14:18:27 -0800 (PST)
 From: Keith Busch <kbusch@meta.com>
 To: <axboe@kernel.dk>, <hch@lst.de>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
         <io-uring@vger.kernel.org>
 CC: <sagi@grimberg.me>, <asml.silence@gmail.com>, <anuj20.g@samsung.com>,
         <joshi.k@samsung.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv12 03/12] block: add a bi_write_stream field
-Date: Fri, 6 Dec 2024 14:17:52 -0800
-Message-ID: <20241206221801.790690-4-kbusch@meta.com>
+Subject: [PATCHv12 10/12] nvme.h: add FDP definitions
+Date: Fri, 6 Dec 2024 14:17:59 -0800
+Message-ID: <20241206221801.790690-11-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20241206221801.790690-1-kbusch@meta.com>
 References: <20241206221801.790690-1-kbusch@meta.com>
@@ -60,109 +60,169 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 3zbIU3xkDMkFP-gQtR9Y2mKgnMs_QadA
-X-Proofpoint-GUID: 3zbIU3xkDMkFP-gQtR9Y2mKgnMs_QadA
+X-Proofpoint-GUID: I7OkS4sHDGc8o5h_RrhILBokqH7Ozrz_
+X-Proofpoint-ORIG-GUID: I7OkS4sHDGc8o5h_RrhILBokqH7Ozrz_
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
 From: Christoph Hellwig <hch@lst.de>
 
-Add the ability to pass a write stream for placement control in the bio.
+Add the config feature result, config log page, and management receive
+commands needed for FDP.
+
+Partially based on a patch from Kanchan Joshi <joshi.k@samsung.com>.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+[kbusch: renamed some fields to match spec]
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- block/bio.c                 | 2 ++
- block/blk-crypto-fallback.c | 1 +
- block/blk-merge.c           | 4 ++++
- block/bounce.c              | 1 +
- include/linux/blk_types.h   | 1 +
- 5 files changed, 9 insertions(+)
+ include/linux/nvme.h | 77 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
 
-diff --git a/block/bio.c b/block/bio.c
-index 699a78c85c756..2aa86edc7cd6f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -251,6 +251,7 @@ void bio_init(struct bio *bio, struct block_device *b=
-dev, struct bio_vec *table,
- 	bio->bi_flags =3D 0;
- 	bio->bi_ioprio =3D 0;
- 	bio->bi_write_hint =3D 0;
-+	bio->bi_write_stream =3D 0;
- 	bio->bi_status =3D 0;
- 	bio->bi_iter.bi_sector =3D 0;
- 	bio->bi_iter.bi_size =3D 0;
-@@ -827,6 +828,7 @@ static int __bio_clone(struct bio *bio, struct bio *b=
-io_src, gfp_t gfp)
- 	bio_set_flag(bio, BIO_CLONED);
- 	bio->bi_ioprio =3D bio_src->bi_ioprio;
- 	bio->bi_write_hint =3D bio_src->bi_write_hint;
-+	bio->bi_write_stream =3D bio_src->bi_write_stream;
- 	bio->bi_iter =3D bio_src->bi_iter;
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index 13377dde4527b..7680078fa67fd 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -275,6 +275,7 @@ enum nvme_ctrl_attr {
+ 	NVME_CTRL_ATTR_HID_128_BIT	=3D (1 << 0),
+ 	NVME_CTRL_ATTR_TBKAS		=3D (1 << 6),
+ 	NVME_CTRL_ATTR_ELBAS		=3D (1 << 15),
++	NVME_CTRL_ATTR_FDPS		=3D (1 << 19),
+ };
 =20
- 	if (bio->bi_bdev) {
-diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
-index 29a205482617c..66762243a886b 100644
---- a/block/blk-crypto-fallback.c
-+++ b/block/blk-crypto-fallback.c
-@@ -173,6 +173,7 @@ static struct bio *blk_crypto_fallback_clone_bio(stru=
-ct bio *bio_src)
- 		bio_set_flag(bio, BIO_REMAPPED);
- 	bio->bi_ioprio		=3D bio_src->bi_ioprio;
- 	bio->bi_write_hint	=3D bio_src->bi_write_hint;
-+	bio->bi_write_stream	=3D bio_src->bi_write_stream;
- 	bio->bi_iter.bi_sector	=3D bio_src->bi_iter.bi_sector;
- 	bio->bi_iter.bi_size	=3D bio_src->bi_iter.bi_size;
+ struct nvme_id_ctrl {
+@@ -661,6 +662,44 @@ struct nvme_rotational_media_log {
+ 	__u8	rsvd24[488];
+ };
 =20
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index e01383c6e534b..1e5327fb6c45b 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -866,6 +866,8 @@ static struct request *attempt_merge(struct request_q=
-ueue *q,
++struct nvme_fdp_config {
++	__u8			flags;
++#define FDPCFG_FDPE	(1U << 0)
++	__u8			fdpcidx;
++	__le16			reserved;
++};
++
++struct nvme_fdp_ruh_desc {
++	__u8			ruht;
++	__u8			reserved[3];
++};
++
++struct nvme_fdp_config_desc {
++	__le16			dsze;
++	__u8			fdpa;
++	__u8			vss;
++	__le32			nrg;
++	__le16			nruh;
++	__le16			maxpids;
++	__le32			nns;
++	__le64			runs;
++	__le32			erutl;
++	__u8			rsvd28[36];
++	struct nvme_fdp_ruh_desc ruhs[];
++};
++
++struct nvme_fdp_config_log {
++	__le16			numfdpc;
++	__u8			ver;
++	__u8			rsvd3;
++	__le32			sze;
++	__u8			rsvd8[8];
++	/*
++	 * This is followed by variable number of nvme_fdp_config_desc
++	 * structures, but sparse doesn't like nested variable sized arrays.
++	 */
++};
++
+ struct nvme_smart_log {
+ 	__u8			critical_warning;
+ 	__u8			temperature[2];
+@@ -887,6 +926,7 @@ enum nvme_opcode {
+ 	nvme_cmd_resv_register	=3D 0x0d,
+ 	nvme_cmd_resv_report	=3D 0x0e,
+ 	nvme_cmd_resv_acquire	=3D 0x11,
++	nvme_cmd_io_mgmt_recv	=3D 0x12,
+ 	nvme_cmd_resv_release	=3D 0x15,
+ 	nvme_cmd_zone_mgmt_send	=3D 0x79,
+ 	nvme_cmd_zone_mgmt_recv	=3D 0x7a,
+@@ -908,6 +948,7 @@ enum nvme_opcode {
+ 		nvme_opcode_name(nvme_cmd_resv_register),	\
+ 		nvme_opcode_name(nvme_cmd_resv_report),		\
+ 		nvme_opcode_name(nvme_cmd_resv_acquire),	\
++		nvme_opcode_name(nvme_cmd_io_mgmt_recv),	\
+ 		nvme_opcode_name(nvme_cmd_resv_release),	\
+ 		nvme_opcode_name(nvme_cmd_zone_mgmt_send),	\
+ 		nvme_opcode_name(nvme_cmd_zone_mgmt_recv),	\
+@@ -1059,6 +1100,7 @@ enum {
+ 	NVME_RW_PRINFO_PRCHK_GUARD	=3D 1 << 12,
+ 	NVME_RW_PRINFO_PRACT		=3D 1 << 13,
+ 	NVME_RW_DTYPE_STREAMS		=3D 1 << 4,
++	NVME_RW_DTYPE_DPLCMT		=3D 2 << 4,
+ 	NVME_WZ_DEAC			=3D 1 << 9,
+ };
 =20
- 	if (req->bio->bi_write_hint !=3D next->bio->bi_write_hint)
- 		return NULL;
-+	if (req->bio->bi_write_stream !=3D next->bio->bi_write_stream)
-+		return NULL;
- 	if (req->bio->bi_ioprio !=3D next->bio->bi_ioprio)
- 		return NULL;
- 	if (!blk_atomic_write_mergeable_rqs(req, next))
-@@ -987,6 +989,8 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *=
-bio)
- 		return false;
- 	if (rq->bio->bi_write_hint !=3D bio->bi_write_hint)
- 		return false;
-+	if (rq->bio->bi_write_stream !=3D bio->bi_write_stream)
-+		return false;
- 	if (rq->bio->bi_ioprio !=3D bio->bi_ioprio)
- 		return false;
- 	if (blk_atomic_write_mergeable_rq_bio(rq, bio) =3D=3D false)
-diff --git a/block/bounce.c b/block/bounce.c
-index 0d898cd5ec497..fb8f60f114d7d 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -170,6 +170,7 @@ static struct bio *bounce_clone_bio(struct bio *bio_s=
-rc)
- 		bio_set_flag(bio, BIO_REMAPPED);
- 	bio->bi_ioprio		=3D bio_src->bi_ioprio;
- 	bio->bi_write_hint	=3D bio_src->bi_write_hint;
-+	bio->bi_write_stream	=3D bio_src->bi_write_stream;
- 	bio->bi_iter.bi_sector	=3D bio_src->bi_iter.bi_sector;
- 	bio->bi_iter.bi_size	=3D bio_src->bi_iter.bi_size;
+@@ -1146,6 +1188,38 @@ struct nvme_zone_mgmt_recv_cmd {
+ 	__le32			cdw14[2];
+ };
 =20
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index dce7615c35e7e..4ca3449ce9c95 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -220,6 +220,7 @@ struct bio {
- 	unsigned short		bi_flags;	/* BIO_* below */
- 	unsigned short		bi_ioprio;
- 	enum rw_hint		bi_write_hint;
-+	u8			bi_write_stream;
- 	blk_status_t		bi_status;
- 	atomic_t		__bi_remaining;
++struct nvme_io_mgmt_recv_cmd {
++	__u8			opcode;
++	__u8			flags;
++	__u16			command_id;
++	__le32			nsid;
++	__le64			rsvd2[2];
++	union nvme_data_ptr	dptr;
++	__u8			mo;
++	__u8			rsvd11;
++	__u16			mos;
++	__le32			numd;
++	__le32			cdw12[4];
++};
++
++enum {
++	NVME_IO_MGMT_RECV_MO_RUHS	=3D 1,
++};
++
++struct nvme_fdp_ruh_status_desc {
++	__le16			pid;
++	__le16			ruhid;
++	__le32			earutr;
++	__le64			ruamw;
++	__u8			reserved[16];
++};
++
++struct nvme_fdp_ruh_status {
++	__u8			rsvd0[14];
++	__le16			nruhsd;
++	struct nvme_fdp_ruh_status_desc ruhsd[];
++};
++
+ enum {
+ 	NVME_ZRA_ZONE_REPORT		=3D 0,
+ 	NVME_ZRASF_ZONE_REPORT_ALL	=3D 0,
+@@ -1281,6 +1355,7 @@ enum {
+ 	NVME_FEAT_PLM_WINDOW	=3D 0x14,
+ 	NVME_FEAT_HOST_BEHAVIOR	=3D 0x16,
+ 	NVME_FEAT_SANITIZE	=3D 0x17,
++	NVME_FEAT_FDP		=3D 0x1d,
+ 	NVME_FEAT_SW_PROGRESS	=3D 0x80,
+ 	NVME_FEAT_HOST_ID	=3D 0x81,
+ 	NVME_FEAT_RESV_MASK	=3D 0x82,
+@@ -1301,6 +1376,7 @@ enum {
+ 	NVME_LOG_ANA		=3D 0x0c,
+ 	NVME_LOG_FEATURES	=3D 0x12,
+ 	NVME_LOG_RMI		=3D 0x16,
++	NVME_LOG_FDP_CONFIGS	=3D 0x20,
+ 	NVME_LOG_DISC		=3D 0x70,
+ 	NVME_LOG_RESERVATION	=3D 0x80,
+ 	NVME_FWACT_REPL		=3D (0 << 3),
+@@ -1888,6 +1964,7 @@ struct nvme_command {
+ 		struct nvmf_auth_receive_command auth_receive;
+ 		struct nvme_dbbuf dbbuf;
+ 		struct nvme_directive_cmd directive;
++		struct nvme_io_mgmt_recv_cmd imr;
+ 	};
+ };
 =20
 --=20
 2.43.5
