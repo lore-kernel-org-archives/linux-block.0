@@ -1,61 +1,71 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CE520627F
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 16:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E1C20627F
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 16:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733503650; cv=none; b=QmYtBNm6ozhB+bDBwgXzNAR6NnOrRN4gnfdnLKptlbpPJOHTmTicIGtdf33LO+5uG0yb3Ywp6ddCzGfD7TWZynB2RJHzbKRZjSf2KUOyrbuvkdUhcKOKzdOXfwMrbhcQCMvuUZfK4I4KCeycpGbWJ5lZHxh5tKVPFUBn+sSwkM8=
+	t=1733503685; cv=none; b=LwfpLwC8BNFdIUR8kERg1iSyX+5LYVc6scra3VHkyupUeUteNBCQg3aDIr02GH4iyBOqx1LLYp9T73zCz0xZPAnpbcGAO7J/VXQ70IesTy+OLtXe/DHtLFhX27mzPgcmaNLczKVd2zjRvbN0vzzOQ5hOXJumxonckazFvnE8MXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733503650; c=relaxed/simple;
+	s=arc-20240116; t=1733503685; c=relaxed/simple;
 	bh=+24InzhWk0Us6nT2g6mE8gW3+EjOYv01hSYrnpDQm+g=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=fda/0ki/hLHr4NrrdrvBvu4kKz4O8Nd3anw9bmLRVgAYUxpVXUp+ikihA6Ab6uYg7Li8OzrwJDT3GiAiRKJmqo+2j4/HsKDmMviC64YGCjRNi6L8dhoR3Yrq4MMDTtkegHU+XPAhtWlRneVFBjhs4rF2ClOpS8kUFTLrBcbclEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tc4ZzM8B; arc=none smtp.client-ip=148.163.158.5
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QUSRAh3CsVbVjovlyXnvzFPndQd5MQ9RJzZW8dDSkHZk7JDonX7emBjxIkCPsuVV4zy/BxSLGJvodoaem4Go9/Ebd6iTP6WWFVYT4wLCAYePWujI6WAisHn7kTycK2VW00C39HdFsGWggKaOEKqy8ATbwX9wv8JaWbCkYmCET2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dxIO37Nd; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tc4ZzM8B"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B6ATYjo011023
-	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 16:47:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	content-transfer-encoding:date:from:message-id:mime-version
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dxIO37Nd"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B6FvQU8028295;
+	Fri, 6 Dec 2024 16:47:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
 	:subject:to; s=pp1; bh=LP3VRp2FOHwpb3M1I71kz/3S4RBVAw1EYhSepgPzO
-	Qo=; b=tc4ZzM8BKBXoLMVAFUc4nlqnfvIuqy8MxqmnNGAPy6tjBxrDXZFNIej87
-	d+YWAzi+Omawx4gv7MzY3o7OXaDn4KnYjZSqOx8v4RTK/VTsNVgO76+nDBoqsUZc
-	XWv9MPwLsEVXUy8kLwOSd3MiZMQ+PpY3TMiifiX+8d9XfDeOvikzxj0M4mZe/X+E
-	szku5tidaRx9Auk+EiX/VhSDT65n/Mp0Rr93AOVpupwIZTXMniVbxi60jiJMW4O6
-	e3ouq7sK+Aw3vgifqYJCqprw/YJ7lpWIX0bay/w+EQWxPYH9Vx+erhO8eq65vJ0l
-	Mh4H4YZJCtF7j+RHJhr8ecO95HcxA==
+	Qo=; b=dxIO37NdOan49dBan1Cv5mMyOrYQKwOH5K7zIamGNTavDNHfkmqpggXR4
+	J7J1xx8qJB1YFfi4DyTZoANkN8F9Gt+z8SPkwJO9fZSDNjN+8t1bghi3hSvjXIbR
+	0B/nBV+MiIBGt5XxyJVpVUMb5ALacdjzShd5hq/EJ7G9hghjR2dzYWMr7QSN0WWr
+	4MhVfmtINyX0GAe38nv5eW4Du20d+3Brm0Ldb/QnUrR9sswy376q8DTXnMkhnQOs
+	3xUbKhFSEeJbJfpb0ybjZTe4B1EVBZEYgCJuJ6DEsK3xeWc46r6aptnV4a0q3sM7
+	oY0gg4iJL2HGqDXYayMDbB4R2P+Gw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ax6633et-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Dec 2024 16:47:55 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B6Glsh8005244;
+	Fri, 6 Dec 2024 16:47:54 GMT
 Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43bk99mffs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 16:47:27 +0000 (GMT)
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ax6633eq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Dec 2024 16:47:54 +0000 (GMT)
 Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B6DCZOo007470
-	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 16:47:26 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 438f8jyc8p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 16:47:26 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B6GlOVm55902488
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 16:47:24 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C1AA420043
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 16:47:24 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 32B4B20040
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 16:47:24 +0000 (GMT)
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B6Dp3Ra006819;
+	Fri, 6 Dec 2024 16:47:53 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 438f8jycav-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Dec 2024 16:47:53 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B6Gloqd48235006
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 6 Dec 2024 16:47:50 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E379820040;
+	Fri,  6 Dec 2024 16:47:49 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D75EF20043;
+	Fri,  6 Dec 2024 16:47:47 +0000 (GMT)
 Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.179.0.162])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 16:47:23 +0000 (GMT)
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  6 Dec 2024 16:47:47 +0000 (GMT)
 From: Nilay Shroff <nilay@linux.ibm.com>
 To: linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>, kjain101@in.ibm.com, hch@lst.de,
+        axboe@kernel.dk, ritesh.list@gmail.com, ming.lei@redhat.com,
+        gjoyce@linux.ibm.com
 Subject: [PATCH] block: Fix potential deadlock in queue_attr_store()
-Date: Fri,  6 Dec 2024 22:17:08 +0530
-Message-ID: <20241206164722.526114-1-nilay@linux.ibm.com>
+Date: Fri,  6 Dec 2024 22:17:39 +0530
+Message-ID: <20241206164742.526149-1-nilay@linux.ibm.com>
 X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -65,16 +75,16 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: fbdgdFJAVjXOTLNQ8NY0LHseTdbbCQim
-X-Proofpoint-ORIG-GUID: fbdgdFJAVjXOTLNQ8NY0LHseTdbbCQim
+X-Proofpoint-ORIG-GUID: J1fo3MjQi67kKOMwVT2rwplshbPQpQjK
+X-Proofpoint-GUID: FyKbKwgva9rxOzIpp4VYBTJ_YAsLsaWr
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 bulkscore=0 adultscore=0 clxscore=1015 malwarescore=0
- priorityscore=1501 spamscore=0 mlxlogscore=999 impostorscore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412060124
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 mlxlogscore=999 malwarescore=0 spamscore=0
+ suspectscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0
+ bulkscore=0 adultscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2412060124
 
 For storing a value to a queue attribute, the queue_attr_store function
 first freezes the queue (->q_usage_counter(io)) and then acquire
