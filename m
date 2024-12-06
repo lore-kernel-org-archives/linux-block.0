@@ -1,147 +1,76 @@
-Received: from pv50p00im-ztdg10012101.me.com (pv50p00im-ztdg10012101.me.com [17.58.6.49])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3758A13A27D
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 01:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D73280054;
+	Fri,  6 Dec 2024 01:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733446993; cv=none; b=S5oa2pSMVaBvroRv85zw+3tkJXQaJ//r0attRoIe7hSh1yAxHS/RDBn6Ej58dPhki/tOK5UzId3pl85o04XTBubqEyZlY2jtk8fwrxvRGwztwGQ94OqHwwSIwv+f/8ay2a/GAnVS3k/LvmkJRV6nJvRFcn2TMKFhjL5GxyK/xOI=
+	t=1733449985; cv=none; b=qe/HjyneR/SLjyw3+XGuR4LgBmMFIUD0oJX54Q19tbBk3jTI17C0OnoMDXva/kxAneHj9Ir2d+OUMeq3fb0goSt2YAWpt0PTYR/opP5tqidElRTIciJgej+auhUa0nkaQbO6Vdep0dRDmW+D/yBOwNqEPEMXazHeRhF2Apmlc5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733446993; c=relaxed/simple;
-	bh=mXKzMLG9P0/fFy8yPc/3Wnedq5fjCqRwp/fSEiqY4jg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F3BjdAiW8bTo+xHyhDb31GrSBJtxsV2N6Di7tecxv1Q+RD1gwNXrunGNbT34vvUCx8KNJZ8WIqyirA+w8pON68ZZspzAFvjFJDR3rHuRVisXxBJlYt3G27PYveTbEyzC9R9TEkHbkNSoYd1EPwWAAT9o9y9NIFlot9r4bZ2QePE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=O0gm/SRx; arc=none smtp.client-ip=17.58.6.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+	s=arc-20240116; t=1733449985; c=relaxed/simple;
+	bh=b2hL4TIR/sZKi1XGa8dCIn9fHLArnFzKz9ua1H+i0Og=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GXVcf6trqOMyyQgfYkAkrjaLdJFYjBAVkY0L7DOpXl5qkw8l5YGlP/JbNNmxKIHLvfWvaAGN48YpK1yURQWciyFSdffWHQAD6ZLIGif5irCGQn3VNrjkFmy6ZFpFbNZHYupfKKENTdF0y2XKHNTQbNY45wJxLs0ZBeH7jQkG6DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pMMA3afH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="O0gm/SRx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1733446990;
-	bh=MLA/o3eoWdFJOEkeLQDHb3UrBR7EySOllMZRXPDaXaQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
-	 x-icloud-hme;
-	b=O0gm/SRxvbNugGvJblrfWTbeL81Zh+NhIgrv+vxCeahtE+oxwN3nZC3HwwKuihfnx
-	 4cXiY5M5FcD5fV/sMsHvjU5WBmCcNVT7ZwGkknlvZVnSXD+x6XGDkkFFIF/04e6gQZ
-	 Zg2fxY0KWh5ofbG3L8rwEFb9qCszciEJ1vWxrZ9PoginG+0DqELBU5tErjcEkVaLcU
-	 oGYsHPfXPbZWAglOVp26uGDUXsLkxY8ORVxthbd4ILpIbk0Z7w+bUHoMKXTrki4Gnv
-	 JzRHbqv5bfO46l/pgkQl/5OuD1YtgQ+8yIZfoBNlV5SY0vot5qXT1Zg0ppVHga6NSk
-	 Y07hiEdKxi0sw==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10012101.me.com (Postfix) with ESMTPSA id DC943740313;
-	Fri,  6 Dec 2024 01:03:01 +0000 (UTC)
-Message-ID: <9d2de147-8fc6-419f-bf3e-03f6b86cbb44@icloud.com>
-Date: Fri, 6 Dec 2024 09:02:58 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pMMA3afH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB685C4CED1;
+	Fri,  6 Dec 2024 01:53:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733449985;
+	bh=b2hL4TIR/sZKi1XGa8dCIn9fHLArnFzKz9ua1H+i0Og=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pMMA3afHHnPXtsddrDQEOftbfV7SwtfVDK2f6jMrSi6WitAiCA/7it8WQ4bGWBgpA
+	 KPi0QBxhl2e6c1pAA7jXeFMiD4FFOoIqe3evUNtpry5rVRuCqQZ9S8+z2jvfNw26OS
+	 YjC298UhaB2y40nb7/n+t/6EAuCiYlKY+3Vu+v6eMlW5UukAvQXMrI+w+j3rLr9di0
+	 PVkYWiMo8I31vQUhNnOvSIjCQJzKfsTUcTWwYFHmLP2ozpI0St4RH3SOOPm4vy2lWR
+	 fu3ddpVVtPv7ZzjtwEzPlz3rtqoBcIIranZnOSJaUKVl38C5bqeSw8sP1BFkJ77Zw3
+	 98hOaWNijE8OA==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	dm-devel@lists.linux.dev
+Cc: Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 0/4] Zone write plugging fixes
+Date: Fri,  6 Dec 2024 10:52:36 +0900
+Message-ID: <20241206015240.6862-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 10/11] cxl/pmem: Remove match_nvdimm_bridge()
-To: Alison Schofield <alison.schofield@intel.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
- James Bottomley <James.Bottomley@hansenpartnership.com>,
- =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>,
- linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
- linux-sound@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org,
- linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
- linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org,
- linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
- linux-scsi@vger.kernel.org, open-iscsi@googlegroups.com,
- linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
- netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20241205-const_dfc_done-v3-0-1611f1486b5a@quicinc.com>
- <20241205-const_dfc_done-v3-10-1611f1486b5a@quicinc.com>
- <Z1It83v8xuNuLrOt@aschofie-mobl2.lan>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <Z1It83v8xuNuLrOt@aschofie-mobl2.lan>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: Mj6KRfIlz3zE_ytOMK9rghPIY_t2GqYx
-X-Proofpoint-ORIG-GUID: Mj6KRfIlz3zE_ytOMK9rghPIY_t2GqYx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-05_16,2024-12-05_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=0
- malwarescore=0 bulkscore=0 phishscore=0 spamscore=0 adultscore=0
- clxscore=1015 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2412060008
+Content-Transfer-Encoding: 8bit
 
-On 2024/12/6 06:49, Alison Schofield wrote:
-> On Thu, Dec 05, 2024 at 08:10:19AM +0800, Zijun Hu wrote:
->> From: Zijun Hu <quic_zijuhu@quicinc.com>
-> 
-> Suggest conveying more detail in the commit msg:
-> 
-> cxl/pmem> Replace match_nvdimm_bridge() w device_match_type()
-> 
+Jens,
 
-good suggestions
-will take it in v4.
+These patches address potential issues with zone write plugging.
+The first 2 patches fix handling of REQ_NOWAIT BIOs as these can be
+"failed" after going through the zone write plugging and changing the
+target zone plug zone write pointer offset.
 
->>
->> match_nvdimm_bridge(), as matching function of device_find_child(), is to
->> match a device with device type @cxl_nvdimm_bridge_type, and is unnecessary
-> 
-> Prefer being clear that this function recently become needless.
-> Something like:
-> 
-> match_nvdimm_bridge(), as matching function of device_find_child(),
-> matches a device with device type @cxl_nvdimm_bridge_type. The recently
-> added API, device_match_type, simplifies that task.
->  
-> Replace match_nvdimm_bridge() usage with device_match_type().
-> 
+Patch 3 is a bigger fix and address a potential deadlock issue due to
+the zone write plugging internally issuing zone report operations to
+recover from write errors. This zone report operation is removed by this
+patch and replaced with an automatic recovery when the BIO issuer
+execute a zone report. This change in behavior results in a problem with
+REQ_OP_WRITE_ZEROES handling and failures in the dm-zoned device mapper.
+That is fixed in patch 4.
 
-sure. will do it in v4 by following these good comments.
+Damien Le Moal (4):
+  block: Use a zone write plug BIO work for REQ_NOWAIT BIOs
+  block: Ignore REQ_NOWAIT for zone reset and zone finish operations
+  block: Prevent potential deadlocks in zone write plug error recovery
+  dm: Fix dm-zoned-reclaim zone write pointer alignment
 
-> With that you can add:
-> 
-> Reviewed-by: Alison Schofield <alison.schofield@intel.com>
-> 
->>
->> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->> ---
->>  drivers/cxl/core/pmem.c | 9 +++------
->>  1 file changed, 3 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/cxl/core/pmem.c b/drivers/cxl/core/pmem.c
->> index a8473de24ebfd92f12f47e0556e28b81a29cff7c..0f8166e793e14fc0b1c04ffda79e756a743d9e6b 100644
->> --- a/drivers/cxl/core/pmem.c
->> +++ b/drivers/cxl/core/pmem.c
->> @@ -57,11 +57,6 @@ bool is_cxl_nvdimm_bridge(struct device *dev)
->>  }
->>  EXPORT_SYMBOL_NS_GPL(is_cxl_nvdimm_bridge, "CXL");
->>  
->> -static int match_nvdimm_bridge(struct device *dev, const void *data)
->> -{
->> -	return is_cxl_nvdimm_bridge(dev);
->> -}
->> -
->>  /**
->>   * cxl_find_nvdimm_bridge() - find a bridge device relative to a port
->>   * @port: any descendant port of an nvdimm-bridge associated
->> @@ -75,7 +70,9 @@ struct cxl_nvdimm_bridge *cxl_find_nvdimm_bridge(struct cxl_port *port)
->>  	if (!cxl_root)
->>  		return NULL;
->>  
->> -	dev = device_find_child(&cxl_root->port.dev, NULL, match_nvdimm_bridge);
->> +	dev = device_find_child(&cxl_root->port.dev,
->> +				&cxl_nvdimm_bridge_type,
->> +				device_match_type);
->>  
->>  	if (!dev)
->>  		return NULL;
->>
->> -- 
->> 2.34.1
->>
->>
+ block/blk-zoned.c             | 507 +++++++++++++++-------------------
+ drivers/md/dm-zoned-reclaim.c |   4 +-
+ include/linux/blkdev.h        |   5 +-
+ 3 files changed, 229 insertions(+), 287 deletions(-)
+
+-- 
+2.47.0
 
