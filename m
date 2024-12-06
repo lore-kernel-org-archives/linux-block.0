@@ -1,53 +1,53 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A9C22C6DD
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 22:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A141212FAA
+	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 22:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733524200; cv=none; b=u5OiamKGIrkCAGUCifhyGJiHpsfyGyHMShmwGF42MzuAX6usUn9wlFONXYokmp2Fvg4PJnTRViCQdRimTI/9fAYUIekXgINGJUGS4AWU0Ri8rRjkTcKPtTaYnN2kSpnQXXYP7e1HQUr++dERPk4xU0Put8yqRrWW/IjKjLdbWzc=
+	t=1733524208; cv=none; b=SM9B3GhfUWHAYUqrpzmZSdlctEONMa/zIJro78KzYIsnH7qK6PBeIBZh3bw9dY0HTD+yTG3E5QRScf6i3mh9obl6KlmSK7mcBY6zRH19gzlC+5Lr55kUqF7GwwTdDeLRwTxCGSBQpp7yj18/H8+0bPeuFq3gEcSZ8zxHi0KHoOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733524200; c=relaxed/simple;
-	bh=eOuO4i4yPLsc2Im8KihmSljRQ8rTc0TOPgnR2AUqOdU=;
+	s=arc-20240116; t=1733524208; c=relaxed/simple;
+	bh=3DQXd4yJtDB6BYisNYWGe/g9nDmYCbca6TMBeVLuqls=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uMQ0oRLxDCdcHla1+njSZr7v5OJ+2DitgfUndU5owHoCjL+eKD4BIAw2tDBwVZV+kf8vdUq0aL/44iAY2yULA1Jt3zqJ77A99gKBjT1lgQZyEGdyQYljqYlOk0rZ/wRv63h26KI1NrTn1/owHiC9Vj14FnfMNKKqU+qfIAS/UQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=EEJpDR2S; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=clIjw7hxCp0X0YiYp/HFDD9r09IwEbQw2sVRtYPn30Lfn16yuROGtF7EKLtfbiDbIdOxj5Hj1YNBJXw15sjSAEwmuCc4S+PsaqILKZqjhzA/fvSNWTb/Fv/1F4T/eAkEy7nEWfP9dx9oXU2uTXBKsXf8G8K1XZdmNgyP73B3VX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=M+EE+KSh; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="EEJpDR2S"
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B6Lh83B030247
-	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 14:29:58 -0800
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="M+EE+KSh"
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 4B6Lh0CG021619
+	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 14:30:05 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=qzN9V22hHNPCY40Lp/Ysqsn5kxkAoYivYUU6jILwvog=; b=EEJpDR2SJIhO
-	h3HfDz3yAvaNWeiwepFTxsQ/izLsizdVvQBou3TVBfm7uIltSOmrMVkcbKd03Xr9
-	3nRDBjSaFEQinCc32mHA1sXRQgE+5Z9aGPrz3D0Z68yJl9+yq01mDhDeqjhpf8qW
-	LKF3WgFxFq6p36aI+5t8uihFCgWFbIZoi8mXlkmJ3wwBlh45Le9dFgr4xJpp5//S
-	iULHXwklnd+hweRVgIqvirLkcXkyjMDxocnQ1ufSXXkeMlbVAVQQ0qOb4uFQMN8S
-	MQX+DbrFHDECZVLCAaJN9Z/xi8Jj/T11GfrzPy9saPjlOex0VQvPHD+i7M2ouVGu
-	tP0EoJN6Cg==
+	 bh=R9M24a6ylRLzXnir6ciiUs6+m+tvkucIQYlBzr9gqaU=; b=M+EE+KShOfku
+	JfkC7f/NloEFOPkHP7tJELbCox8qTlakVfbc278w65KOW30+ojsqvz6uT8v27G0J
+	qq701yzAHnwvTFOUa3+BYJpmf2klPnDsd164LJTCyBlY04xXtusYMAJ76+VwVYjF
+	vYO22fQ3Y0uVdbCDB9EQwPsRRvTrR8/CiZ+9Dw8ZnYkpRcs82jCfUHCCvX3rsRCa
+	NoQr6TBxAlj3BigunL1FxA6y+gfgy5p+mCbyd8ig1KIR25qM7Tk1pkRvXLk8lWpm
+	3GDfkEIzeA+crYIMgaSi3mzWma9LRvWjDSLJhiYKNavUJLPTW/Ld99rHocHKYGe2
+	OF0uB11I9g==
 Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 43c592tbsf-7
+	by m0001303.ppops.net (PPS) with ESMTPS id 43c7neh2ax-6
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 14:29:57 -0800 (PST)
-Received: from twshared55211.03.ash8.facebook.com (2620:10d:c085:208::f) by
+	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 14:30:05 -0800 (PST)
+Received: from twshared8234.09.ash9.facebook.com (2620:10d:c085:208::7cb7) by
  mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Fri, 6 Dec 2024 22:29:56 +0000
+ 15.2.1544.11; Fri, 6 Dec 2024 22:30:00 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 0003415B8CB6E; Fri,  6 Dec 2024 14:18:26 -0800 (PST)
+	id 4113F15B8CB82; Fri,  6 Dec 2024 14:18:27 -0800 (PST)
 From: Keith Busch <kbusch@meta.com>
 To: <axboe@kernel.dk>, <hch@lst.de>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
         <io-uring@vger.kernel.org>
 CC: <sagi@grimberg.me>, <asml.silence@gmail.com>, <anuj20.g@samsung.com>,
         <joshi.k@samsung.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv12 02/12] fs: add a write stream field to the kiocb
-Date: Fri, 6 Dec 2024 14:17:51 -0800
-Message-ID: <20241206221801.790690-3-kbusch@meta.com>
+Subject: [PATCHv12 07/12] io_uring: enable per-io write streams
+Date: Fri, 6 Dec 2024 14:17:56 -0800
+Message-ID: <20241206221801.790690-8-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20241206221801.790690-1-kbusch@meta.com>
 References: <20241206221801.790690-1-kbusch@meta.com>
@@ -60,36 +60,74 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: akKW2PWT7kJ8isuumpTyfYGRGlImS02_
-X-Proofpoint-ORIG-GUID: akKW2PWT7kJ8isuumpTyfYGRGlImS02_
+X-Proofpoint-GUID: bZPH7CT6I18O_l-cTMzdMH3rnOBF4RDN
+X-Proofpoint-ORIG-GUID: bZPH7CT6I18O_l-cTMzdMH3rnOBF4RDN
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
-From: Christoph Hellwig <hch@lst.de>
+From: Keith Busch <kbusch@kernel.org>
 
-Prepare for io_uring passthrough of write streams. The write stream
-field in the kiocb structure fits into an existing 2-byte hole, so its
-size is not changed.
+Allow userspace to pass a per-I/O write stream in the SQE:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+      __u8 write_stream;
+
+The __u8 type matches the size the filesystems and block layer support.
+
+Application can query the supported values from the statx
+max_write_streams field. Unsupported values are ignored by file
+operations that do not support write streams or rejected with an error
+by those that support them.
+
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- include/linux/fs.h | 1 +
- 1 file changed, 1 insertion(+)
+ include/uapi/linux/io_uring.h | 4 ++++
+ io_uring/io_uring.c           | 2 ++
+ io_uring/rw.c                 | 1 +
+ 3 files changed, 7 insertions(+)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 2cc3d45da7b01..26940c451f319 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -373,6 +373,7 @@ struct kiocb {
- 	void			*private;
- 	int			ki_flags;
- 	u16			ki_ioprio; /* See linux/ioprio.h */
-+	u8			ki_write_stream;
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.=
+h
+index 38f0d6b10eaf7..986a480e3b9c2 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -92,6 +92,10 @@ struct io_uring_sqe {
+ 			__u16	addr_len;
+ 			__u16	__pad3[1];
+ 		};
++		struct {
++			__u8	write_stream;
++			__u8	__pad4[3];
++		};
+ 	};
  	union {
- 		/*
- 		 * Only used for async buffered reads, where it denotes the
+ 		struct {
+diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+index a8cbe674e5d63..978d0617d7af8 100644
+--- a/io_uring/io_uring.c
++++ b/io_uring/io_uring.c
+@@ -3868,6 +3868,8 @@ static int __init io_uring_init(void)
+ 	BUILD_BUG_SQE_ELEM(44, __s32,  splice_fd_in);
+ 	BUILD_BUG_SQE_ELEM(44, __u32,  file_index);
+ 	BUILD_BUG_SQE_ELEM(44, __u16,  addr_len);
++	BUILD_BUG_SQE_ELEM(44, __u8,   write_stream);
++	BUILD_BUG_SQE_ELEM(45, __u8,   __pad4[0]);
+ 	BUILD_BUG_SQE_ELEM(46, __u16,  __pad3[0]);
+ 	BUILD_BUG_SQE_ELEM(48, __u64,  addr3);
+ 	BUILD_BUG_SQE_ELEM_SIZE(48, 0, cmd);
+diff --git a/io_uring/rw.c b/io_uring/rw.c
+index 04e4467ab0ee8..b8aa2dfcbf48c 100644
+--- a/io_uring/rw.c
++++ b/io_uring/rw.c
+@@ -322,6 +322,7 @@ static int io_prep_rw(struct io_kiocb *req, const str=
+uct io_uring_sqe *sqe,
+ 	}
+ 	rw->kiocb.dio_complete =3D NULL;
+ 	rw->kiocb.ki_flags =3D 0;
++	rw->kiocb.ki_write_stream =3D READ_ONCE(sqe->write_stream);
+=20
+ 	rw->addr =3D READ_ONCE(sqe->addr);
+ 	rw->len =3D READ_ONCE(sqe->len);
 --=20
 2.43.5
 
