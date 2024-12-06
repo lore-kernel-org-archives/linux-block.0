@@ -1,142 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5062AE9A;
-	Fri,  6 Dec 2024 02:18:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21ACF193409;
+	Fri,  6 Dec 2024 03:55:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733451483; cv=none; b=P0+y3eQwoaq6WdIzzEmMZ5WSJ5PO3GgM603C0CH+3ukrSZQ3gI6Pgi1sO+uDyB2vk1QN/FKap8mta0X5/JWJnfg/gNdvpF5Hs3YD7dRh2acBjp50g6Cm0w2dyY5/T3i2Y0jKbGbIC7WWyme4K0NF+lZhdoG57AeLVpbsDh0QyjY=
+	t=1733457328; cv=none; b=LGqQ2JK6GG2/PdRrphl8cqUsbeY+F6RDfTq0cDlt1F9a3ZCN03EiUhgT9z4kAXW5FLweuHT8Wl9WxMH9i+X95vj2mVilcVSZnqiaPbgjujtS/dIpAH22Uf8fMapnOKug1z5AbovlaPPwdrtjewywM+YC/kS5R1KGB6JjmPTNUEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733451483; c=relaxed/simple;
-	bh=r87v6RI14MYvQVvrhHKKo5H2rpySP4RbfqYlrBpFKZM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N3uKhbaPz3IQcM+yQq9woYOG+u7X/LOZoPUhw/zBxUzJ9+bfbb1Fud2DGdg6+ASYDXfwNYzS+nHMNsHkiWf8RODUyAtibU/8c8uEGtPE0J2aPb8zHe4MW4pP9iBQAiChjxAt384JEwNXDCnFj0jL9Lam0KlyhDkO+ApXjaha43o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j23gqL9N; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733457328; c=relaxed/simple;
+	bh=5diGRU2W7cSelvGSJZrcPBFdoo/g9HLXkcLr1UJqdTI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=sMwXIYDmafNxcwV830I4ABPiVhHMxBKhGHOojCGoRq+QUvEXES3ttiJkClHSVeMxMuunWWmHx7ElgIoSXMaU4mCH0RqffbIZSIeXUlr+fswwv97nbuEWwekDvZ5Xu1/PM9i+knsB0+ZoYQUggYpKMJakTb/VPkA/f5sC93U+Lds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XQtq2tAl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j23gqL9N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82697C4CED1;
-	Fri,  6 Dec 2024 02:18:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XQtq2tAl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3F5AC4CED2;
+	Fri,  6 Dec 2024 03:55:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733451482;
-	bh=r87v6RI14MYvQVvrhHKKo5H2rpySP4RbfqYlrBpFKZM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j23gqL9NEopbGtSbdZPKivdMJRqAbKO9sZrmDC9Ftd7yGWUZjm7lqHDO+LEwRqY8d
-	 ravnVsXVQyLyjxep89kWNPXh6GBbszdLpwXr949hXgA6myo8XkrUh38CEWu3Y0E3yP
-	 7VefFhA/L9eD9sJ66hry0eg642xiu0axIFqdVHWLzKa/ja1ZGPaVMuAkHxWMIo3CB/
-	 fAo/MnU4QUa0oycKNt2Mayt0BIqPwAOI8FthnQDHJLTdt/uhxBJOTc9zB3E9wQRs2O
-	 PcJnm9gXJ2c9Ka0TZKACIgHBjNatA9vsIO4mutBw3MyVnf6t1GyMe3eiD+NdyQFfLC
-	 2IYRR7LQK3HRA==
-Date: Thu, 5 Dec 2024 18:18:00 -0800
-From: Keith Busch <kbusch@kernel.org>
-To: Keith Busch <kbusch@meta.com>
-Cc: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, sagi@grimberg.me, asml.silence@gmail.com
-Subject: Re: [PATCHv11 00/10] block write streams with nvme fdp
-Message-ID: <Z1Je2Do8Tj_NYePW@kbusch-mbp.dhcp.thefacebook.com>
-References: <20241206015308.3342386-1-kbusch@meta.com>
+	s=k20201202; t=1733457327;
+	bh=5diGRU2W7cSelvGSJZrcPBFdoo/g9HLXkcLr1UJqdTI=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=XQtq2tAl45xWdiL05TahULN955UlEqqAq5ubYRFH7Yq+tJXSbaWcrGwlPiDgJeVvX
+	 u51uFKF7NvKthRyjp0PQ1EK4Sr6SbSH75RzOXjrYm8wviEbqs/3b38FOpU3LvT24jy
+	 8t/QNfGDoMT6NLApzDBF9Ma+s8wjZ7qUmuDIsd+VnxlxCP7eS4MtKQS6hyA7xJoXH8
+	 MlTBq9lStSbC13MKxHZKLn/h9hFV3sNpxB1zt69kcfidEZ7TIOMIO26ZqCSHBKM3k2
+	 V7aimArG0HkUmSTx7//SQM5DuJG0hwVB57XVvv6LDbNlFdH5MyB40hEAs8Dki3m45G
+	 2RMKwS+1/1arw==
+Message-ID: <2e94a099-51fd-4eb6-a463-53cebbc71413@kernel.org>
+Date: Fri, 6 Dec 2024 12:55:25 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241206015308.3342386-1-kbusch@meta.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/4] Zone write plugging fixes
+From: Damien Le Moal <dlemoal@kernel.org>
+To: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ dm-devel@lists.linux.dev
+Cc: Christoph Hellwig <hch@lst.de>, Bart Van Assche <bvanassche@acm.org>
+References: <20241206015240.6862-1-dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20241206015240.6862-1-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 05, 2024 at 05:52:58PM -0800, Keith Busch wrote:
-> Changes from v10:
+On 12/6/24 10:52, Damien Le Moal wrote:
+> Jens,
 > 
->  Merged up to block for-6.14/io_uring, which required some
->  new attribute handling.
+> These patches address potential issues with zone write plugging.
+> The first 2 patches fix handling of REQ_NOWAIT BIOs as these can be
+> "failed" after going through the zone write plugging and changing the
+> target zone plug zone write pointer offset.
 > 
->  Not mixing write hints usage with write streams. This effectively
->  abandons any attempts to use the existing fcntl API for use with
->  filesystems in this series.
-> 
->  Exporting the stream's reclaim unit nominal size.
-> 
-> Christoph Hellwig (5):
->   fs: add a write stream field to the kiocb
->   block: add a bi_write_stream field
->   block: introduce a write_stream_granularity queue limit
->   block: expose write streams for block device nodes
->   nvme: add a nvme_get_log_lsi helper
-> 
-> Keith Busch (5):
->   io_uring: protection information enhancements
->   io_uring: add write stream attribute
->   block: introduce max_write_streams queue limit
->   nvme: register fdp queue limits
->   nvme: use fdp streams if write stream is provided
+> Patch 3 is a bigger fix and address a potential deadlock issue due to
+> the zone write plugging internally issuing zone report operations to
+> recover from write errors. This zone report operation is removed by this
+> patch and replaced with an automatic recovery when the BIO issuer
+> execute a zone report. This change in behavior results in a problem with
+> REQ_OP_WRITE_ZEROES handling and failures in the dm-zoned device mapper.
+> That is fixed in patch 4.
 
-I fucked up the format-patch command by ommitting a single patch. The
-following should have been "PATCH 1/11", but I don't want to resend for
-just this:
+I forgot to mention that I will followup these fixes with a cleanup of the
+report zones API and its callback function interface to clean it up as patch 4
+introduces an indirect user callback call that is not very pretty.
 
-commit 9e40f4a4da6d0cef871d1c5daf55cc0497fd9c39
-Author: Keith Busch <kbusch@kernel.org>
-Date:   Tue Nov 19 13:16:15 2024 +0100
+> 
+> Damien Le Moal (4):
+>   block: Use a zone write plug BIO work for REQ_NOWAIT BIOs
+>   block: Ignore REQ_NOWAIT for zone reset and zone finish operations
+>   block: Prevent potential deadlocks in zone write plug error recovery
+>   dm: Fix dm-zoned-reclaim zone write pointer alignment
+> 
+>  block/blk-zoned.c             | 507 +++++++++++++++-------------------
+>  drivers/md/dm-zoned-reclaim.c |   4 +-
+>  include/linux/blkdev.h        |   5 +-
+>  3 files changed, 229 insertions(+), 287 deletions(-)
+> 
 
-    fs: add write stream information to statx
-    
-    Add new statx field to report the maximum number of write streams
-    supported and the granularity for them.
-    
-    Signed-off-by: Keith Busch <kbusch@kernel.org>
-    [hch: renamed hints to streams, add granularity]
-    Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-diff --git a/fs/stat.c b/fs/stat.c
-index 0870e969a8a0b..00e4598b1ff25 100644
---- a/fs/stat.c
-+++ b/fs/stat.c
-@@ -729,6 +729,8 @@ cp_statx(const struct kstat *stat, struct statx __user *buffer)
- 	tmp.stx_atomic_write_unit_min = stat->atomic_write_unit_min;
- 	tmp.stx_atomic_write_unit_max = stat->atomic_write_unit_max;
- 	tmp.stx_atomic_write_segments_max = stat->atomic_write_segments_max;
-+	tmp.stx_write_stream_granularity = stat->write_stream_granularity;
-+	tmp.stx_write_stream_max = stat->write_stream_max;
- 
- 	return copy_to_user(buffer, &tmp, sizeof(tmp)) ? -EFAULT : 0;
- }
-diff --git a/include/linux/stat.h b/include/linux/stat.h
-index 3d900c86981c5..36d4dfb291abd 100644
---- a/include/linux/stat.h
-+++ b/include/linux/stat.h
-@@ -57,6 +57,8 @@ struct kstat {
- 	u32		atomic_write_unit_min;
- 	u32		atomic_write_unit_max;
- 	u32		atomic_write_segments_max;
-+	u32		write_stream_granularity;
-+	u16		write_stream_max;
- };
- 
- /* These definitions are internal to the kernel for now. Mainly used by nfsd. */
-diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
-index 887a252864416..547c62a1a3a7c 100644
---- a/include/uapi/linux/stat.h
-+++ b/include/uapi/linux/stat.h
-@@ -132,9 +132,11 @@ struct statx {
- 	__u32	stx_atomic_write_unit_max;	/* Max atomic write unit in bytes */
- 	/* 0xb0 */
- 	__u32   stx_atomic_write_segments_max;	/* Max atomic write segment count */
--	__u32   __spare1[1];
-+	__u32   stx_write_stream_granularity;
- 	/* 0xb8 */
--	__u64	__spare3[9];	/* Spare space for future expansion */
-+	__u16   stx_write_stream_max;
-+	__u16	__sparse2[3];
-+	__u64	__spare3[8];	/* Spare space for future expansion */
- 	/* 0x100 */
- };
- 
-@@ -164,6 +166,7 @@ struct statx {
- #define STATX_MNT_ID_UNIQUE	0x00004000U	/* Want/got extended stx_mount_id */
- #define STATX_SUBVOL		0x00008000U	/* Want/got stx_subvol */
- #define STATX_WRITE_ATOMIC	0x00010000U	/* Want/got atomic_write_* fields */
-+#define STATX_WRITE_STREAM	0x00020000U	/* Want/got write_stream_* */
- 
- #define STATX__RESERVED		0x80000000U	/* Reserved for future struct statx expansion */
- 
+-- 
+Damien Le Moal
+Western Digital Research
