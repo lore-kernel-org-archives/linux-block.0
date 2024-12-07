@@ -1,153 +1,249 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A8F101EE
-	for <linux-block@vger.kernel.org>; Sat,  7 Dec 2024 02:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BDA17E0
+	for <linux-block@vger.kernel.org>; Sat,  7 Dec 2024 03:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733537856; cv=none; b=AVhKVHhNt0PfGQKLRaDEN4JGNrtti6iULVbim5ap56ZRHcANiWcbqO/ePy/OWexUqWTuKJCN4wL/qwETov+IoVulRBWgKcxjTM88rDOYpNaDnqnljXtD3lmjiBiMu39ucFI8pBkU2nsOJkAVOc59kY6RWm7pNJGBJQSImhXmjVc=
+	t=1733541485; cv=none; b=UxksTTvaRxm7+hcJ9h8EdjxzskuUGPLPwFxiG9AlEM4Qsoyti+yxELswl/dAOWOMOvT3I2YK2Mf1bVhUfEAGz7Qm9sTkegB/yHWTu0z17WCH7HBzxp1xt4qoPO0bOJ+gxHKtKii1qPV5oUAn2xnXEncpFfNY5TLjGV/MJq2a1Us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733537856; c=relaxed/simple;
-	bh=2uYHA0TjDDtm7StEcgANXzA8wqkBwLHBcQNhqUY+N/k=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=aG6GFcwO4R7JztGiQShys4+ySeWiyScLFjS19RbajqUADWfyDY1LXWJ4Coy+5XhsTBGkOqVTRI11slDT+W7LeW28jHr6HDdSP4tBN1PrE84h1Vnn4tnlcqfo12qDsodvJAuoywuxKAE0ka6hTbvu9/OJO8TMhOEgDr4lvz9/zGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Y4sFx6QFdz4f3jtQ
-	for <linux-block@vger.kernel.org>; Sat,  7 Dec 2024 10:17:09 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 013D51A0568
-	for <linux-block@vger.kernel.org>; Sat,  7 Dec 2024 10:17:23 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgBHI4cwsFNnNYuGDw--.56808S3;
-	Sat, 07 Dec 2024 10:17:21 +0800 (CST)
-Subject: Re: [PATCH v2 2/2] block/mq-deadline: Fix the tag reservation code
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Damien Le Moal <dlemoal@kernel.org>, Zhiguo Niu <zhiguo.niu@unisoc.com>,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20240509170149.7639-1-bvanassche@acm.org>
- <20240509170149.7639-3-bvanassche@acm.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <8df3fd04-08ef-7aab-77d0-a919a09838a0@huaweicloud.com>
-Date: Sat, 7 Dec 2024 10:17:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1733541485; c=relaxed/simple;
+	bh=kITkkFmRqwEVCO72oHw8CMfGWkzFfViY3zZ2aKhH2AI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S3jEpFdSW28e+bEBHByrodB1gqrCFx1l2iqB92fL5yr7HPL1xNbj0ZgPzaAUWC1r86l30iurAa11ugLx/1wieXEhiJiM/d4ydWD2dZd4Yw0RUQREe1ELJr6Np+TwMo7sdq8SUHTRnuqHcY7wUz1avGifMytRu6SuOh58sRFmJIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gh1gkhxO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gh1gkhxO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733541479;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gcilOn3agHY5GqxVttVJ4JMf4VTS9mR5uuoN5RQWKTY=;
+	b=gh1gkhxOS5tqLjMbkbALVmXJKyCfNH37z1UuE6yNRISdib/asM4BqTrJ0YSeH7Iehtecw1
+	j7r9TVElDfHOo6p2wjsiqbpeJbfiR5+TcG8VV8U+YZLZmFVUw52RslZyvqEH+nLThdrfub
+	BAOU/lfRHaIOj8F9VLEVXAQXIQ1SLH0=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-91-SP_Y5WkUMCWG-m3ENwGUdg-1; Fri, 06 Dec 2024 22:17:58 -0500
+X-MC-Unique: SP_Y5WkUMCWG-m3ENwGUdg-1
+X-Mimecast-MFC-AGG-ID: SP_Y5WkUMCWG-m3ENwGUdg
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-855c41b9f27so325227241.1
+        for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 19:17:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733541477; x=1734146277;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gcilOn3agHY5GqxVttVJ4JMf4VTS9mR5uuoN5RQWKTY=;
+        b=NtRJVca5QU/h2tor9TZAe8CMN2z1f//6MZlBerFoWsCI4MY1WHEjiF+XtH6olKOPrR
+         Sqh88V3V6zvosPXeXrjMa9OPju89NGVsmhHbDjrK5tpdyTfUVe/YyiCt49psxpoZ+Tjt
+         4uFch5v85f1Y2qOoNdmz+FKfO5KzpPK8NmWJPLaIr08jRm3Kpz4SU+bTKDwz51tHI5WX
+         Rrd7h09lH/bZyyfqvTTe7oq7qJSyRpbyGoPoqF5Fxd9mH6Mt0pOtnV9ALdrvBWJCQxF+
+         aWS1hI3zftAbB9a/WnfOIs7AOxQV8q2HsJVI0999SCesor+Nrv6AJ1CrA1nOpSOUyM07
+         TS2A==
+X-Gm-Message-State: AOJu0Yxz610akaZiCW4HoR+NJh5ZRudK4L3tWLanRCNEfcPUXMhZoBo4
+	+76oqNxUFjeyR0/w4uA+rCznQoXx8A4TsuruA7p3sWlgyAtTK9C6wV+KYkbCCeNGIyILUywXmZJ
+	CnkS2bx/EKNcWCEJ7zPrB8Hg+AkHE2HSy7isO3b33cs8fUhxx/ukbIgfXWxaf4FJbs6tSvh2y1F
+	hYVhsj0F1lSaisXsEZh7oj30nQ+wo68ckA2SE=
+X-Gm-Gg: ASbGncvU2ePsbD+1ZjHlpZwchZVpGzjz7wM/xSUQt1nEnKYzUPsTwus+uaA0NolnuB1
+	NwGRMBI7q6KDkP17u6KC/4/QCTLyAti6v
+X-Received: by 2002:a05:6102:3a13:b0:4af:a967:65c5 with SMTP id ada2fe7eead31-4afcaa28a8cmr7155635137.10.1733541477616;
+        Fri, 06 Dec 2024 19:17:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF2j0zsvaUUjWcRpA1fYb974S1tJqXk9dIhUbIvShuoZu18kp+UBKv7pv1IM8X/4wWQZm+6PwzPlIez2jaUH/I=
+X-Received: by 2002:a05:6102:3a13:b0:4af:a967:65c5 with SMTP id
+ ada2fe7eead31-4afcaa28a8cmr7155634137.10.1733541477376; Fri, 06 Dec 2024
+ 19:17:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240509170149.7639-3-bvanassche@acm.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBHI4cwsFNnNYuGDw--.56808S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxXr45Gw4fCFyfuF17Ww48Zwb_yoW5KF4DpF
-	4UJa12kr48JF1v9a1Fy39xurn5uw4furyfXF1aqw1Skr98Xan7XFn5tFW5ZFy2vrWxGa1j
-	gr4DXwn8GwnFqaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkCb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
-	j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
-	kEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v2
-	6r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
-	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCI
-	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
-	AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
-	Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUwxhLUU
-	UUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+References: <20241206164742.526149-1-nilay@linux.ibm.com>
+In-Reply-To: <20241206164742.526149-1-nilay@linux.ibm.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Sat, 7 Dec 2024 11:17:46 +0800
+Message-ID: <CAFj5m9Ke8+EHKQBs_Nk6hqd=LGXtk4mUxZUN5==ZcCjnZSBwHw@mail.gmail.com>
+Subject: Re: [PATCH] block: Fix potential deadlock in queue_attr_store()
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: linux-block@vger.kernel.org, kjain101@in.ibm.com, hch@lst.de, 
+	axboe@kernel.dk, ritesh.list@gmail.com, gjoyce@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi, Bart
-
-ÔÚ 2024/05/10 1:01, Bart Van Assche Ð´µÀ:
-> The current tag reservation code is based on a misunderstanding of the
-> meaning of data->shallow_depth. Fix the tag reservation code as follows:
-> * By default, do not reserve any tags for synchronous requests because
->    for certain use cases reserving tags reduces performance. See also
->    Harshit Mogalapalli, [bug-report] Performance regression with fio
->    sequential-write on a multipath setup, 2024-03-07
->    (https://lore.kernel.org/linux-block/5ce2ae5d-61e2-4ede-ad55-551112602401@oracle.com/)
-> * Reduce min_shallow_depth to one because min_shallow_depth must be less
->    than or equal any shallow_depth value.
-> * Scale dd->async_depth from the range [1, nr_requests] to [1,
->    bits_per_sbitmap_word].
-> 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Cc: Zhiguo Niu <zhiguo.niu@unisoc.com>
-> Fixes: 07757588e507 ("block/mq-deadline: Reserve 25% of scheduler tags for synchronous requests")
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+On Sat, Dec 7, 2024 at 12:48=E2=80=AFAM Nilay Shroff <nilay@linux.ibm.com> =
+wrote:
+>
+> For storing a value to a queue attribute, the queue_attr_store function
+> first freezes the queue (->q_usage_counter(io)) and then acquire
+> ->sysfs_lock. This seems not correct as the usual ordering should be to
+> acquire ->sysfs_lock before freezing the queue. This incorrect ordering
+> causes the following lockdep splat which we are able to reproduce always
+> simply by accessing /sys/kernel/debug file using ls command:
+>
+> [   57.597146] WARNING: possible circular locking dependency detected
+> [   57.597154] 6.12.0-10553-gb86545e02e8c #20 Tainted: G        W
+> [   57.597162] ------------------------------------------------------
+> [   57.597168] ls/4605 is trying to acquire lock:
+> [   57.597176] c00000003eb56710 (&mm->mmap_lock){++++}-{4:4}, at: __might=
+_fault+0x58/0xc0
+> [   57.597200]
+>                but task is already holding lock:
+> [   57.597207] c0000018e27c6810 (&sb->s_type->i_mutex_key#3){++++}-{4:4},=
+ at: iterate_dir+0x94/0x1d4
+> [   57.597226]
+>                which lock already depends on the new lock.
+>
+> [   57.597233]
+>                the existing dependency chain (in reverse order) is:
+> [   57.597241]
+>                -> #5 (&sb->s_type->i_mutex_key#3){++++}-{4:4}:
+> [   57.597255]        down_write+0x6c/0x18c
+> [   57.597264]        start_creating+0xb4/0x24c
+> [   57.597274]        debugfs_create_dir+0x2c/0x1e8
+> [   57.597283]        blk_register_queue+0xec/0x294
+> [   57.597292]        add_disk_fwnode+0x2e4/0x548
+> [   57.597302]        brd_alloc+0x2c8/0x338
+> [   57.597309]        brd_init+0x100/0x178
+> [   57.597317]        do_one_initcall+0x88/0x3e4
+> [   57.597326]        kernel_init_freeable+0x3cc/0x6e0
+> [   57.597334]        kernel_init+0x34/0x1cc
+> [   57.597342]        ret_from_kernel_user_thread+0x14/0x1c
+> [   57.597350]
+>                -> #4 (&q->debugfs_mutex){+.+.}-{4:4}:
+> [   57.597362]        __mutex_lock+0xfc/0x12a0
+> [   57.597370]        blk_register_queue+0xd4/0x294
+> [   57.597379]        add_disk_fwnode+0x2e4/0x548
+> [   57.597388]        brd_alloc+0x2c8/0x338
+> [   57.597395]        brd_init+0x100/0x178
+> [   57.597402]        do_one_initcall+0x88/0x3e4
+> [   57.597410]        kernel_init_freeable+0x3cc/0x6e0
+> [   57.597418]        kernel_init+0x34/0x1cc
+> [   57.597426]        ret_from_kernel_user_thread+0x14/0x1c
+> [   57.597434]
+>                -> #3 (&q->sysfs_lock){+.+.}-{4:4}:
+> [   57.597446]        __mutex_lock+0xfc/0x12a0
+> [   57.597454]        queue_attr_store+0x9c/0x110
+> [   57.597462]        sysfs_kf_write+0x70/0xb0
+> [   57.597471]        kernfs_fop_write_iter+0x1b0/0x2ac
+> [   57.597480]        vfs_write+0x3dc/0x6e8
+> [   57.597488]        ksys_write+0x84/0x140
+> [   57.597495]        system_call_exception+0x130/0x360
+> [   57.597504]        system_call_common+0x160/0x2c4
+> [   57.597516]
+>                -> #2 (&q->q_usage_counter(io)#21){++++}-{0:0}:
+> [   57.597530]        __submit_bio+0x5ec/0x828
+> [   57.597538]        submit_bio_noacct_nocheck+0x1e4/0x4f0
+> [   57.597547]        iomap_readahead+0x2a0/0x448
+> [   57.597556]        xfs_vm_readahead+0x28/0x3c
+> [   57.597564]        read_pages+0x88/0x41c
+> [   57.597571]        page_cache_ra_unbounded+0x1ac/0x2d8
+> [   57.597580]        filemap_get_pages+0x188/0x984
+> [   57.597588]        filemap_read+0x13c/0x4bc
+> [   57.597596]        xfs_file_buffered_read+0x88/0x17c
+> [   57.597605]        xfs_file_read_iter+0xac/0x158
+> [   57.597614]        vfs_read+0x2d4/0x3b4
+> [   57.597622]        ksys_read+0x84/0x144
+> [   57.597629]        system_call_exception+0x130/0x360
+> [   57.597637]        system_call_common+0x160/0x2c4
+> [   57.597647]
+>                -> #1 (mapping.invalidate_lock#2){++++}-{4:4}:
+> [   57.597661]        down_read+0x6c/0x220
+> [   57.597669]        filemap_fault+0x870/0x100c
+> [   57.597677]        xfs_filemap_fault+0xc4/0x18c
+> [   57.597684]        __do_fault+0x64/0x164
+> [   57.597693]        __handle_mm_fault+0x1274/0x1dac
+> [   57.597702]        handle_mm_fault+0x248/0x484
+> [   57.597711]        ___do_page_fault+0x428/0xc0c
+> [   57.597719]        hash__do_page_fault+0x30/0x68
+> [   57.597727]        do_hash_fault+0x90/0x35c
+> [   57.597736]        data_access_common_virt+0x210/0x220
+> [   57.597745]        _copy_from_user+0xf8/0x19c
+> [   57.597754]        sel_write_load+0x178/0xd54
+> [   57.597762]        vfs_write+0x108/0x6e8
+> [   57.597769]        ksys_write+0x84/0x140
+> [   57.597777]        system_call_exception+0x130/0x360
+> [   57.597785]        system_call_common+0x160/0x2c4
+> [   57.597794]
+>                -> #0 (&mm->mmap_lock){++++}-{4:4}:
+> [   57.597806]        __lock_acquire+0x17cc/0x2330
+> [   57.597814]        lock_acquire+0x138/0x400
+> [   57.597822]        __might_fault+0x7c/0xc0
+> [   57.597830]        filldir64+0xe8/0x390
+> [   57.597839]        dcache_readdir+0x80/0x2d4
+> [   57.597846]        iterate_dir+0xd8/0x1d4
+> [   57.597855]        sys_getdents64+0x88/0x2d4
+> [   57.597864]        system_call_exception+0x130/0x360
+> [   57.597872]        system_call_common+0x160/0x2c4
+> [   57.597881]
+>                other info that might help us debug this:
+>
+> [   57.597888] Chain exists of:
+>                  &mm->mmap_lock --> &q->debugfs_mutex --> &sb->s_type->i_=
+mutex_key#3
+>
+> [   57.597905]  Possible unsafe locking scenario:
+>
+> [   57.597911]        CPU0                    CPU1
+> [   57.597917]        ----                    ----
+> [   57.597922]   rlock(&sb->s_type->i_mutex_key#3);
+> [   57.597932]                                lock(&q->debugfs_mutex);
+> [   57.597940]                                lock(&sb->s_type->i_mutex_k=
+ey#3);
+> [   57.597950]   rlock(&mm->mmap_lock);
+> [   57.597958]
+>                 *** DEADLOCK ***
+>
+> [   57.597965] 2 locks held by ls/4605:
+> [   57.597971]  #0: c0000000137c12f8 (&f->f_pos_lock){+.+.}-{4:4}, at: fd=
+get_pos+0xcc/0x154
+> [   57.597989]  #1: c0000018e27c6810 (&sb->s_type->i_mutex_key#3){++++}-{=
+4:4}, at: iterate_dir+0x94/0x1d4
+>
+> Prevent the above lockdep warning by acquiring ->sysfs_lock before
+> freezing the queue while storing a queue attribute in queue_attr_store
+> function.
+>
+> Reported-by: kjain101@in.ibm.com
+> Fixes: af2814149883 ("block: freeze the queue in queue_attr_store")
+> Tested-by: kjain101@in.ibm.com
+> Cc: hch@lst.de
+> Cc: axboe@kernel.dk
+> Cc: ritesh.list@gmail.com
+> Cc: ming.lei@redhat.com
+> Cc: gjoyce@linux.ibm.com
+> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
 > ---
->   block/mq-deadline.c | 20 +++++++++++++++++---
->   1 file changed, 17 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index 94eede4fb9eb..acdc28756d9d 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -487,6 +487,20 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
->   	return rq;
->   }
->   
-> +/*
-> + * 'depth' is a number in the range 1..INT_MAX representing a number of
-> + * requests. Scale it with a factor (1 << bt->sb.shift) / q->nr_requests since
-> + * 1..(1 << bt->sb.shift) is the range expected by sbitmap_get_shallow().
-> + * Values larger than q->nr_requests have the same effect as q->nr_requests.
-> + */
-> +static int dd_to_word_depth(struct blk_mq_hw_ctx *hctx, unsigned int qdepth)
-> +{
-> +	struct sbitmap_queue *bt = &hctx->sched_tags->bitmap_tags;
-> +	const unsigned int nrr = hctx->queue->nr_requests;
-> +
-> +	return ((qdepth << bt->sb.shift) + nrr - 1) / nrr;
-> +}
-> +
->   /*
->    * Called by __blk_mq_alloc_request(). The shallow_depth value set by this
->    * function is used by __blk_mq_get_tag().
-> @@ -503,7 +517,7 @@ static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
->   	 * Throttle asynchronous requests and writes such that these requests
->   	 * do not block the allocation of synchronous requests.
->   	 */
-> -	data->shallow_depth = dd->async_depth;
-> +	data->shallow_depth = dd_to_word_depth(data->hctx, dd->async_depth);
->   }
->   
->   /* Called by blk_mq_update_nr_requests(). */
-> @@ -513,9 +527,9 @@ static void dd_depth_updated(struct blk_mq_hw_ctx *hctx)
->   	struct deadline_data *dd = q->elevator->elevator_data;
->   	struct blk_mq_tags *tags = hctx->sched_tags;
->   
-> -	dd->async_depth = max(1UL, 3 * q->nr_requests / 4);
-> +	dd->async_depth = q->nr_requests;
+>  block/blk-sysfs.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 4241aea84161..f648b112782f 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -706,11 +706,11 @@ queue_attr_store(struct kobject *kobj, struct attri=
+bute *attr,
+>         if (entry->load_module)
+>                 entry->load_module(disk, page, length);
+>
+> -       blk_mq_freeze_queue(q);
+>         mutex_lock(&q->sysfs_lock);
+> +       blk_mq_freeze_queue(q);
+>         res =3D entry->store(disk, page, length);
+> -       mutex_unlock(&q->sysfs_lock);
+>         blk_mq_unfreeze_queue(q);
+> +       mutex_unlock(&q->sysfs_lock);
+>         return res;
 
-We're comparing v6.6 and v5.10 performance in downstream kernel, we
-met a regression and bisect to this patch. And during review, I don't
-understand the above change.
+We freeze queue first in __blk_mq_update_nr_hw_queues() in which
+q->sysfs_lock is acquired after the freezing.
 
-For example, dd->async_depth is nr_requests, then dd_to_word_depth()
-will just return 1 << bt->sb.shift. Then nothing will be throttled.
-
-The regression is a corner test case that unlikely to happen in real
-world, I can share more if you're interested.
+So this simple fix may trigger a new ABBA warning.
 
 Thanks,
-Kuai
-
->   
-> -	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async_depth);
-> +	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
->   }
->   
->   /* Called by blk_mq_init_hctx() and blk_mq_init_sched(). */
-> 
-> .
-> 
 
