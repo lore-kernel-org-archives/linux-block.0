@@ -1,127 +1,153 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B9F1F4727
-	for <linux-block@vger.kernel.org>; Fri,  6 Dec 2024 22:36:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A8F101EE
+	for <linux-block@vger.kernel.org>; Sat,  7 Dec 2024 02:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733524598; cv=none; b=KwB8NaeMQzGXVOiUdxNMv14P1tF42+arF+OpYQ1BZ4JEJ4NPWuTccl/8xgaPfT50q42RBhEu/8EzhPp+q/z+FWE8GtsF1yP8nxksfj6L31TU+YHKJa/iGb0s/HTex4bf56Dwh+12EOlv8g6XaA9slgTmySZa9/+MgKx7+oyQqUk=
+	t=1733537856; cv=none; b=AVhKVHhNt0PfGQKLRaDEN4JGNrtti6iULVbim5ap56ZRHcANiWcbqO/ePy/OWexUqWTuKJCN4wL/qwETov+IoVulRBWgKcxjTM88rDOYpNaDnqnljXtD3lmjiBiMu39ucFI8pBkU2nsOJkAVOc59kY6RWm7pNJGBJQSImhXmjVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733524598; c=relaxed/simple;
-	bh=CHBzC+VplJqsQBK7O9+6FtU38cmqBWKdPrsSajpo3Lk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BfEvziiAj6WMB/sopuQmUhHvffD9dCBi8QLJ9zX0nTjXB750ht/KnQUEzrmp2ej7wVZPQMr3xYM0D5SS5nHds9Qwc1lJyxF3c4U233ZhPprwOUYrUZehwPYi4HHYeFyp6fiiePuUkQ/I9b+qwVRaO1QxsPksrjONp0ee+6uKDdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=SEW/b3uo; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="SEW/b3uo"
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B6MaRT5002274
-	for <linux-block@vger.kernel.org>; Fri, 6 Dec 2024 14:36:35 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=885q4w1E275nZID7YwFrzIPpvQxYrUJuHVeBYMPoQ1s=; b=SEW/b3uoyR/S
-	5uRPc7klboFCNYbnRyDEMBquoHx86w2IdhP8H7B5PI+LcwNX5xm0CbQi0bXDBLfO
-	xPjBRhcnhig8EktkfuWyhHCXADM3Em261jktOhOt0kaQY9cO17FJRwj8KLBfaoSg
-	nkzLPNgpySFVi66VWzfSXUqx+mlVePnZRVO2XFG3G97BFnXIzZhSPThqFv+YKoXV
-	2YY+600epmpXF3TtXjnlXjyfzlYsOoUo4u4uw+oDN7AGDcfkPjK7KBIQRooOs20M
-	PZcPVlt86O5NmZLYU+jvlycqOzEAaIQw/ZHGPYr7FYE+bZucu9bNMI1I+pQm8CRA
-	/lAxPVGg8A==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 43c8kv8nyk-10
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 06 Dec 2024 14:36:35 -0800 (PST)
-Received: from twshared7122.08.ash9.facebook.com (2620:10d:c0a8:1b::30) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Fri, 6 Dec 2024 22:35:50 +0000
-Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 5591415B8CB87; Fri,  6 Dec 2024 14:18:27 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <axboe@kernel.dk>, <hch@lst.de>, <linux-block@vger.kernel.org>,
-        <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
-        <io-uring@vger.kernel.org>
-CC: <sagi@grimberg.me>, <asml.silence@gmail.com>, <anuj20.g@samsung.com>,
-        <joshi.k@samsung.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv12 09/12] nvme: pass a void pointer to nvme_get/set_features for the result
-Date: Fri, 6 Dec 2024 14:17:58 -0800
-Message-ID: <20241206221801.790690-10-kbusch@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241206221801.790690-1-kbusch@meta.com>
-References: <20241206221801.790690-1-kbusch@meta.com>
+	s=arc-20240116; t=1733537856; c=relaxed/simple;
+	bh=2uYHA0TjDDtm7StEcgANXzA8wqkBwLHBcQNhqUY+N/k=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=aG6GFcwO4R7JztGiQShys4+ySeWiyScLFjS19RbajqUADWfyDY1LXWJ4Coy+5XhsTBGkOqVTRI11slDT+W7LeW28jHr6HDdSP4tBN1PrE84h1Vnn4tnlcqfo12qDsodvJAuoywuxKAE0ka6hTbvu9/OJO8TMhOEgDr4lvz9/zGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Y4sFx6QFdz4f3jtQ
+	for <linux-block@vger.kernel.org>; Sat,  7 Dec 2024 10:17:09 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 013D51A0568
+	for <linux-block@vger.kernel.org>; Sat,  7 Dec 2024 10:17:23 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP4 (Coremail) with SMTP id gCh0CgBHI4cwsFNnNYuGDw--.56808S3;
+	Sat, 07 Dec 2024 10:17:21 +0800 (CST)
+Subject: Re: [PATCH v2 2/2] block/mq-deadline: Fix the tag reservation code
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Damien Le Moal <dlemoal@kernel.org>, Zhiguo Niu <zhiguo.niu@unisoc.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240509170149.7639-1-bvanassche@acm.org>
+ <20240509170149.7639-3-bvanassche@acm.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <8df3fd04-08ef-7aab-77d0-a919a09838a0@huaweicloud.com>
+Date: Sat, 7 Dec 2024 10:17:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: qbDEIB5UewjFw_PZFB9mvMivmsWrNJ2J
-X-Proofpoint-ORIG-GUID: qbDEIB5UewjFw_PZFB9mvMivmsWrNJ2J
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
+In-Reply-To: <20240509170149.7639-3-bvanassche@acm.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBHI4cwsFNnNYuGDw--.56808S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxXr45Gw4fCFyfuF17Ww48Zwb_yoW5KF4DpF
+	4UJa12kr48JF1v9a1Fy39xurn5uw4furyfXF1aqw1Skr98Xan7XFn5tFW5ZFy2vrWxGa1j
+	gr4DXwn8GwnFqaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkCb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
+	j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
+	kEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v2
+	6r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
+	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCI
+	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
+	AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
+	Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUwxhLUU
+	UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-From: Christoph Hellwig <hch@lst.de>
+Hi, Bart
 
-That allows passing in structures instead of the u32 result, and thus
-reduce the amount of bit shifting and masking required to parse the
-result.
+ÔÚ 2024/05/10 1:01, Bart Van Assche Ð´µÀ:
+> The current tag reservation code is based on a misunderstanding of the
+> meaning of data->shallow_depth. Fix the tag reservation code as follows:
+> * By default, do not reserve any tags for synchronous requests because
+>    for certain use cases reserving tags reduces performance. See also
+>    Harshit Mogalapalli, [bug-report] Performance regression with fio
+>    sequential-write on a multipath setup, 2024-03-07
+>    (https://lore.kernel.org/linux-block/5ce2ae5d-61e2-4ede-ad55-551112602401@oracle.com/)
+> * Reduce min_shallow_depth to one because min_shallow_depth must be less
+>    than or equal any shallow_depth value.
+> * Scale dd->async_depth from the range [1, nr_requests] to [1,
+>    bits_per_sbitmap_word].
+> 
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Damien Le Moal <dlemoal@kernel.org>
+> Cc: Zhiguo Niu <zhiguo.niu@unisoc.com>
+> Fixes: 07757588e507 ("block/mq-deadline: Reserve 25% of scheduler tags for synchronous requests")
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>   block/mq-deadline.c | 20 +++++++++++++++++---
+>   1 file changed, 17 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index 94eede4fb9eb..acdc28756d9d 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -487,6 +487,20 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
+>   	return rq;
+>   }
+>   
+> +/*
+> + * 'depth' is a number in the range 1..INT_MAX representing a number of
+> + * requests. Scale it with a factor (1 << bt->sb.shift) / q->nr_requests since
+> + * 1..(1 << bt->sb.shift) is the range expected by sbitmap_get_shallow().
+> + * Values larger than q->nr_requests have the same effect as q->nr_requests.
+> + */
+> +static int dd_to_word_depth(struct blk_mq_hw_ctx *hctx, unsigned int qdepth)
+> +{
+> +	struct sbitmap_queue *bt = &hctx->sched_tags->bitmap_tags;
+> +	const unsigned int nrr = hctx->queue->nr_requests;
+> +
+> +	return ((qdepth << bt->sb.shift) + nrr - 1) / nrr;
+> +}
+> +
+>   /*
+>    * Called by __blk_mq_alloc_request(). The shallow_depth value set by this
+>    * function is used by __blk_mq_get_tag().
+> @@ -503,7 +517,7 @@ static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+>   	 * Throttle asynchronous requests and writes such that these requests
+>   	 * do not block the allocation of synchronous requests.
+>   	 */
+> -	data->shallow_depth = dd->async_depth;
+> +	data->shallow_depth = dd_to_word_depth(data->hctx, dd->async_depth);
+>   }
+>   
+>   /* Called by blk_mq_update_nr_requests(). */
+> @@ -513,9 +527,9 @@ static void dd_depth_updated(struct blk_mq_hw_ctx *hctx)
+>   	struct deadline_data *dd = q->elevator->elevator_data;
+>   	struct blk_mq_tags *tags = hctx->sched_tags;
+>   
+> -	dd->async_depth = max(1UL, 3 * q->nr_requests / 4);
+> +	dd->async_depth = q->nr_requests;
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- drivers/nvme/host/core.c | 4 ++--
- drivers/nvme/host/nvme.h | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+We're comparing v6.6 and v5.10 performance in downstream kernel, we
+met a regression and bisect to this patch. And during review, I don't
+understand the above change.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 36c44be98e38c..c2a3585a3fa59 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1678,7 +1678,7 @@ static int nvme_features(struct nvme_ctrl *dev, u8 =
-op, unsigned int fid,
-=20
- int nvme_set_features(struct nvme_ctrl *dev, unsigned int fid,
- 		      unsigned int dword11, void *buffer, size_t buflen,
--		      u32 *result)
-+		      void *result)
- {
- 	return nvme_features(dev, nvme_admin_set_features, fid, dword11, buffer=
-,
- 			     buflen, result);
-@@ -1687,7 +1687,7 @@ EXPORT_SYMBOL_GPL(nvme_set_features);
-=20
- int nvme_get_features(struct nvme_ctrl *dev, unsigned int fid,
- 		      unsigned int dword11, void *buffer, size_t buflen,
--		      u32 *result)
-+		      void *result)
- {
- 	return nvme_features(dev, nvme_admin_get_features, fid, dword11, buffer=
-,
- 			     buflen, result);
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 611b02c8a8b37..c1995d89ffdb8 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -890,10 +890,10 @@ int __nvme_submit_sync_cmd(struct request_queue *q,=
- struct nvme_command *cmd,
- 		int qid, nvme_submit_flags_t flags);
- int nvme_set_features(struct nvme_ctrl *dev, unsigned int fid,
- 		      unsigned int dword11, void *buffer, size_t buflen,
--		      u32 *result);
-+		      void *result);
- int nvme_get_features(struct nvme_ctrl *dev, unsigned int fid,
- 		      unsigned int dword11, void *buffer, size_t buflen,
--		      u32 *result);
-+		      void *result);
- int nvme_set_queue_count(struct nvme_ctrl *ctrl, int *count);
- void nvme_stop_keep_alive(struct nvme_ctrl *ctrl);
- int nvme_reset_ctrl(struct nvme_ctrl *ctrl);
---=20
-2.43.5
+For example, dd->async_depth is nr_requests, then dd_to_word_depth()
+will just return 1 << bt->sb.shift. Then nothing will be throttled.
+
+The regression is a corner test case that unlikely to happen in real
+world, I can share more if you're interested.
+
+Thanks,
+Kuai
+
+>   
+> -	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, dd->async_depth);
+> +	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
+>   }
+>   
+>   /* Called by blk_mq_init_hctx() and blk_mq_init_sched(). */
+> 
+> .
+> 
 
