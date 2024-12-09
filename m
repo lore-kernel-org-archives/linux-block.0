@@ -1,45 +1,37 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22D20198E75;
-	Sun,  8 Dec 2024 22:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F76E374D1
+	for <linux-block@vger.kernel.org>; Mon,  9 Dec 2024 02:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733698709; cv=none; b=hN78hdru0J4A54heWP0jjQ3IXpwbgrgJdkYQMCUwxASe7qnSUU7+b9X1j++TTgnt5bioWpIfh5cflmIWOar19DgU2aSpqZ6slKaNJd7w8Gj5eFVgrMXl+r/OC3njGMeo1kEldeVfQpbE50Ir1q8EIaNSOxpqY5XjwsznmNjYEek=
+	t=1733711011; cv=none; b=s8xHo1eHfX+5TtqLv5ADD6dYBbaI3WGukqx730Y7XS4HL+8ZE1JIZH3/4+0OmJYqkA72ZYWFFgeVI4/5qe6Ajw1mLTvqXw6nysTtbXXkaG1vvF7iPXH7k/uL45XOUXD4hSySzIXuQfph+cA3cSR3qPKLVyHrmm5xiyVCVkcONaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733698709; c=relaxed/simple;
-	bh=naaHmVa1xXF1w9vzqh7Bb52GrZQLJ2MlhUpqffZX1As=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eqp1Uxm4COfjrOSxqswDgLQGsCFB0IupVk/MtgNfsJ0dHLjFmzUn6vfoZqy4JQDamLhc1jiOiVqFV4LeYf3sg2KQsqdF8+RWfGhTuaWs459gm24wIs0pP1UlxGjPiLBfM2+busZLqGQcrFz3sGFAgWo9fJBTbtStjgtIPHlxnq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=unpkp3qV; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="unpkp3qV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DA4EC4CEE0;
-	Sun,  8 Dec 2024 22:58:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733698708;
-	bh=naaHmVa1xXF1w9vzqh7Bb52GrZQLJ2MlhUpqffZX1As=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=unpkp3qVh9ZE00vnt8vFgDiZyIHtgGkOSdZZf5oR4BkQqLXIAEMB9IyD2d3ul22fe
-	 MJJ83no1vXIo7pnYzf+zjXA3ZkOUTIxNhov7ieATJwT5a6KgPh6PDIGqnrGLND8iEH
-	 EgLgLRa9xKgRAcyEwtgDtpJQNMf1T0oV/bXezqHp0ZNosj0H2jAejWDk33lRsXMECs
-	 c4iNcqw6pDe75tIC5CHB6QaJkwvaNhLBAFN7DzMXf9E+oXpMig9GTYoG2cuUarz139
-	 So5G2PwN/m8nPCbjTOZmyArMCgvluFvu2EkK1rdlPjsjpLoq1Cf2ruugfWBPMiMS/z
-	 tr0EhH467D2Hw==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	dm-devel@lists.linux.dev
-Cc: Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v2 4/4] dm: Fix dm-zoned-reclaim zone write pointer alignment
-Date: Mon,  9 Dec 2024 07:57:58 +0900
-Message-ID: <20241208225758.219228-5-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241208225758.219228-1-dlemoal@kernel.org>
-References: <20241208225758.219228-1-dlemoal@kernel.org>
+	s=arc-20240116; t=1733711011; c=relaxed/simple;
+	bh=I7sIlq4zUqoU1JL5OQa51FB7RPaAYcBswu+zmXyMTNA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HsrElR8q4ouF6CjJbcrQh59Bp7HIp8b9OwVG6aR90kGpz2XYbeyW0PVlngvgMdCLu9kSNYOuxdZuGQhqxrw38EY4bn4pDl1VHibKVjPJtUXVJjD/WoHobh5Qr5HjVB6vMkUojhqItsSF5XvhtDWhVXZf5gcEJP2QC5c/IRsUOF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Y65Hk19Sfz4f3lDq
+	for <linux-block@vger.kernel.org>; Mon,  9 Dec 2024 10:22:58 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id 599B41A058E
+	for <linux-block@vger.kernel.org>; Mon,  9 Dec 2024 10:23:18 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.112.188])
+	by APP3 (Coremail) with SMTP id _Ch0CgDHWMWQVFZnhqTODw--.40212S4;
+	Mon, 09 Dec 2024 10:23:18 +0800 (CST)
+From: Yang Erkun <yangerkun@huawei.com>
+To: axboe@kernel.dk,
+	hch@lst.de
+Cc: linux-block@vger.kernel.org,
+	yangerkun@huawei.com,
+	yangerkun@huaweicloud.com
+Subject: [PATCH] block: retry call probe after request_module in blk_request_module
+Date: Mon,  9 Dec 2024 10:20:33 +0800
+Message-ID: <20241209022033.288596-1-yangerkun@huawei.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,162 +39,86 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgDHWMWQVFZnhqTODw--.40212S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7tr17Aw17Kw43Jw1kCw4fAFb_yoW8CFWrpr
+	4fJan8Kr9F9rs8Xa1fXa4UW3W5Ca4IgFWFqwnxJFyfJrykKr43ZrWUtw1Y9a4jkr93Zan3
+	WF48WFy5GFW0kF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Cb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0aVACjI8F5VA0II8E6IAqYI8I648v4I1l
+	c7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07x20x
+	yl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAv
+	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
+	v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07UZvtAUUUUU=
+Sender: yangerkun@huaweicloud.com
+X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-The zone reclaim processing of the dm-zoned device mapper uses
-blkdev_issue_zeroout() to align the write pointer of a zone being used
-for reclaiming zones, to write valid data blocks at the correct zone
-start relative offset. However, the first call to blkdev_issue_zeroout()
-will try to use hardware offload through a REQ_OP_WRITE_ZEROES
-operation, if the device reports a non-zero max zero sectors limit. If
-this operation fails, blkdev_issue_zeroout() falls back to using a
-regular write operation with zeror-pages.
+Set kernel config:
 
-With the removal of the zone write plug automatic write pointer recovery
-after a write error, the first attempt using a REQ_OP_WRITE_ZEROES
-leaves the target zone write pointer out of sync with the drive current
-value as the zone writ eplugging code advanced the zone write plug write
-pointer offset on submission of the REQ_OP_WRITE_ZEROES operation. The
-target zone is marked with BLK_ZONE_WPLUG_NEED_WP_UPDATE, which causes
-the fallback regular write operation to also fail.
+ CONFIG_BLK_DEV_LOOP=m
+ CONFIG_BLK_DEV_LOOP_MIN_COUNT=0
 
-blkdev_issue_zeroout() callers such as dmz_reclaim_align_wp() can
-recover from such situation by executing a report zones and retrying the
-call to blkdev_issue_zeroout() to handle this recoverable error
-situation. Given that such pattern will be common to all users of
-blkdev_issue_zeroout(), introduce the function
-blkdev_issue_zone_zeroout() to automatically handle such recovery. This
-function calls blkdev_issue_zeroout() with the BLKDEV_ZERO_NOFALLBACK
-flag to intercept failures on the first execution which attempt to use
-the device hardware offload with a REQ_OP_WRITE_ZEROES. If this attempt
-fails, blkdev_report_zones() is executed to recover the target zone to a
-good state and execute again blkdev_issue_zeroout() without the
-BLKDEV_ZERO_NOFALLBACK flag.
+Do latter:
 
-Replacing the call to blkdev_issue_zeroout() with a call to
-blkdev_issue_zone_zeroout() in dmz_reclaim_align_wp() thus solves
-irrecoverable write errors triggered by the removal of the zone write
-plugging automatic recovery (commit "block: Prevent potential deadlocks
-in zone write plug error recovery").
+ mknod loop0 b 7 0
+ exec 4<> loop0
 
-Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
-Cc: stable@vger.kernel.org
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+Before commit e418de3abcda ("block: switch gendisk lookup to a simple
+xarray"), open loop0 will success. lookup_gendisk will first use
+base_probe to load module loop, and then the retry will call loop_probe
+to prepare the loop disk. Finally open for this disk will success.
+However, after this commit, we lose the retry logic, and open will fail
+with ENXIO. Block device autoloading is deprecated and will be removed
+soon, but maybe we should keep open success until we really remove it.
+So, give a retry to fix it.
+
+Fixes: e418de3abcda ("block: switch gendisk lookup to a simple xarray")
+Signed-off-by: Yang Erkun <yangerkun@huawei.com>
 ---
- block/blk-zoned.c             | 55 +++++++++++++++++++++++++++++++++++
- drivers/md/dm-zoned-reclaim.c |  4 +--
- include/linux/blkdev.h        |  3 ++
- 3 files changed, 60 insertions(+), 2 deletions(-)
+ block/genhd.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index d709f12d5935..c5400792de13 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -129,6 +129,9 @@ static int disk_report_zones_cb(struct blk_zone *zone, unsigned int idx,
- 	if (disk->zone_wplugs_hash)
- 		disk_zone_wplug_sync_wp_offset(disk, zone);
- 
-+	if (!args->user_cb)
-+		return 0;
-+
- 	return args->user_cb(zone, idx, args->user_data);
- }
- 
-@@ -663,6 +666,16 @@ static void disk_zone_wplug_sync_wp_offset(struct gendisk *disk,
- 	disk_put_zone_wplug(zwplug);
- }
- 
-+static int disk_zone_sync_wp_offset(struct gendisk *disk, sector_t sector)
-+{
-+	struct disk_report_zones_cb_args args = {
-+		.disk = disk,
-+	};
-+
-+	return disk->fops->report_zones(disk, sector, 1,
-+					disk_report_zones_cb, &args);
-+}
-+
- static bool blk_zone_wplug_handle_reset_or_finish(struct bio *bio,
- 						  unsigned int wp_offset)
+diff --git a/block/genhd.c b/block/genhd.c
+index 79230c109fca..950fdabaef2e 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -802,7 +802,10 @@ void blk_request_module(dev_t devt)
  {
-@@ -1720,6 +1733,48 @@ int blk_revalidate_disk_zones(struct gendisk *disk)
+ 	unsigned int major = MAJOR(devt);
+ 	struct blk_major_name **n;
++	int retry = 0;
++	int error;
+ 
++retry:
+ 	mutex_lock(&major_names_lock);
+ 	for (n = &major_names[major_to_index(major)]; *n; n = &(*n)->next) {
+ 		if ((*n)->major == major && (*n)->probe) {
+@@ -813,9 +816,16 @@ void blk_request_module(dev_t devt)
+ 	}
+ 	mutex_unlock(&major_names_lock);
+ 
+-	if (request_module("block-major-%d-%d", MAJOR(devt), MINOR(devt)) > 0)
+-		/* Make old-style 2.4 aliases work */
+-		request_module("block-major-%d", MAJOR(devt));
++	if (retry++)
++		return;
++
++	error = request_module("block-major-%d-%d", MAJOR(devt), MINOR(devt));
++	if (!error)
++		goto retry;
++
++	/* Make old-style 2.4 aliases work */
++	if (error > 0 && !request_module("block-major-%d", MAJOR(devt)))
++		goto retry;
  }
- EXPORT_SYMBOL_GPL(blk_revalidate_disk_zones);
+ #endif /* CONFIG_BLOCK_LEGACY_AUTOLOAD */
  
-+/**
-+ * blkdev_issue_zone_zeroout - zero-fill a block range in a zone
-+ * @bdev:	blockdev to write
-+ * @sector:	start sector
-+ * @nr_sects:	number of sectors to write
-+ * @gfp_mask:	memory allocation flags (for bio_alloc)
-+ *
-+ * Description:
-+ *  Zero-fill a block range in a zone (@sector must be equal to the zone write
-+ *  pointer), handling potential errors due to the (initially unknown) lack of
-+ *  hardware offload (See blkdev_issue_zeroout()).
-+ */
-+int blkdev_issue_zone_zeroout(struct block_device *bdev, sector_t sector,
-+		sector_t nr_sects, gfp_t gfp_mask)
-+{
-+	int ret;
-+
-+	if (WARN_ON_ONCE(!bdev_is_zoned(bdev)))
-+		return -EIO;
-+
-+	ret = blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask,
-+				   BLKDEV_ZERO_NOFALLBACK);
-+	if (ret != -EOPNOTSUPP)
-+		return ret;
-+
-+	/*
-+	 * The failed call to blkdev_issue_zeroout() advanced the zone write
-+	 * pointer. Undo this using a report zone to update the zone write
-+	 * pointer to the correct current value.
-+	 */
-+	ret = disk_zone_sync_wp_offset(bdev->bd_disk, sector);
-+	if (ret != 1)
-+		return ret < 0 ? ret : -EIO;
-+
-+	/*
-+	 * Retry without BLKDEV_ZERO_NOFALLBACK to force the fallback to a
-+	 * regular write with zero-pages.
-+	 */
-+	return blkdev_issue_zeroout(bdev, sector, nr_sects, gfp_mask, 0);
-+}
-+EXPORT_SYMBOL(blkdev_issue_zone_zeroout);
-+
- #ifdef CONFIG_BLK_DEBUG_FS
- 
- int queue_zone_wplugs_show(void *data, struct seq_file *m)
-diff --git a/drivers/md/dm-zoned-reclaim.c b/drivers/md/dm-zoned-reclaim.c
-index d58db9a27e6c..b085a929e64e 100644
---- a/drivers/md/dm-zoned-reclaim.c
-+++ b/drivers/md/dm-zoned-reclaim.c
-@@ -76,9 +76,9 @@ static int dmz_reclaim_align_wp(struct dmz_reclaim *zrc, struct dm_zone *zone,
- 	 * pointer and the requested position.
- 	 */
- 	nr_blocks = block - wp_block;
--	ret = blkdev_issue_zeroout(dev->bdev,
-+	ret = blkdev_issue_zone_zeroout(dev->bdev,
- 				   dmz_start_sect(zmd, zone) + dmz_blk2sect(wp_block),
--				   dmz_blk2sect(nr_blocks), GFP_NOIO, 0);
-+				   dmz_blk2sect(nr_blocks), GFP_NOIO);
- 	if (ret) {
- 		dmz_dev_err(dev,
- 			    "Align zone %u wp %llu to %llu (wp+%u) blocks failed %d",
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 15e7dfc013b7..696fdafcfe91 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1419,6 +1419,9 @@ static inline bool bdev_zone_is_seq(struct block_device *bdev, sector_t sector)
- 	return is_seq;
- }
- 
-+int blkdev_issue_zone_zeroout(struct block_device *bdev, sector_t sector,
-+			      sector_t nr_sects, gfp_t gfp_mask);
-+
- static inline unsigned int queue_dma_alignment(const struct request_queue *q)
- {
- 	return q->limits.dma_alignment;
 -- 
-2.47.1
+2.46.1
 
