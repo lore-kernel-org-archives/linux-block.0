@@ -1,166 +1,183 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB9915574E;
-	Mon,  9 Dec 2024 04:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2381922C0;
+	Mon,  9 Dec 2024 04:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733717170; cv=none; b=dQKLXGkQarS8I6GG6LUoHgf/iv2GKreYPi/QjtWY0kEhQTlAjqg9l4/b3tvY3OJhyK1dpPbT2EWzg+gML1O0SeZiYWJCW7n7IX9/A32n/TEcfeohVK9m+1Z0XUm4zkGUbPtQbT6BYHB9JAW9vYXACBSDftDRtKaRK9UkypHDI2E=
+	t=1733720219; cv=none; b=l2RL2x6tCL531wBoZrucyigJCb5T91Wa1XffVPxQ7t+SGLsaetjMjdhT4MjyMaeNyG8Ch3E72SN0rXi7CK6l6azQ/qQJ5ze2TtxUACqGUZ7w9iGu/Yrjn2eqHzHcfXiiLUfA/b6NYdOfeOVfLItfWZC2Rne2+D3KDb/fBYCjBJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733717170; c=relaxed/simple;
-	bh=9BZ3Vp8ClbzYwVR5+MOqxWZF2tgpKKxLlNgbbyHpqPA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WAlxklNZ217BCeCcYYaorbPtXOJChx7UXRefVnuYWo1Ur3kd+LLjwupT4snFUpHO41lDQD+/zXneX/KkOax7A4pV8DNFbYnVOUaul1viEYfvah5/cDMASmI9H9WJaNG/hNnjYPUaUZv/tFzNpzsz8PoSAYgUQL1mgX7bIiLEphg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KIlV67hi; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1733720219; c=relaxed/simple;
+	bh=Q4qXw6u0QnVWnTLxcFvhi8tAx/uPHNBoJYh1c3lbTGA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tp7Or7/LmH1WePvCaV3zdoCdjMq58rDljKExrooTARimbhV5MVRaNxg28AEaszgj9y3sd0sWtmcCb6CON6DpetWbqZwY9kfeR4X2f1jC3GOysEXRH6dlXD/LsrKussGN8IWz43DyOgvld6DUvNuG+HVUcZvYQ5iidNqBiP6GL9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UJ8Z59pT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KIlV67hi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733717169; x=1765253169;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9BZ3Vp8ClbzYwVR5+MOqxWZF2tgpKKxLlNgbbyHpqPA=;
-  b=KIlV67hi4vDPp9ni0omCPcxDQpXydCqQnbVcOyUlaB3KS9O0ZPlJlY+q
-   xbO3Wrtjpr0Tp4QyFwE7IAk4ykKvwPasb0zub2MJJeZLYea5jOjd6QuqE
-   CcEFgRr7tnaj1oTYy5EfTuUprs3y/x53NPF2clUICMQErzHYLiZtpnO7t
-   eLkzZ1wlD9dretD+3PBFJqWMCzXSv/8Fkd/5HVh0bM1RQ199r1kI2EKcH
-   ywDYka2nHLL3CaUJqBv08bWD9xC+f0Tu1mWRFk+0FZX70avASQS3y8Kep
-   bqsSxn32nqDv1dHabQKfdFJWLA00pQKmKk6EFe2Qg5vD+P84JbhJXS3G9
-   w==;
-X-CSE-ConnectionGUID: tqSPOhdRR2CwP2DZA3IU2Q==
-X-CSE-MsgGUID: GgvHEhi4R1yFala2WivsTw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11280"; a="59402294"
-X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
-   d="scan'208";a="59402294"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2024 20:06:08 -0800
-X-CSE-ConnectionGUID: 5VScRe/8TWaEic8tbsZI0A==
-X-CSE-MsgGUID: 0aG8DFmkSZ6aaWljP+LPYg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,218,1728975600"; 
-   d="scan'208";a="100003027"
-Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 08 Dec 2024 20:06:05 -0800
-Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tKV22-0003mr-0s;
-	Mon, 09 Dec 2024 04:06:02 +0000
-Date: Mon, 9 Dec 2024 12:05:27 +0800
-From: kernel test robot <lkp@intel.com>
-To: Keith Busch <kbusch@meta.com>, axboe@kernel.dk, hch@lst.de,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, sagi@grimberg.me,
-	asml.silence@gmail.com, anuj20.g@samsung.com, joshi.k@samsung.com,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv12 11/12] nvme: register fdp parameters with the block
- layer
-Message-ID: <202412071144.9uXFLnls-lkp@intel.com>
-References: <20241206221801.790690-12-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UJ8Z59pT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FAD2C4CED1;
+	Mon,  9 Dec 2024 04:56:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733720218;
+	bh=Q4qXw6u0QnVWnTLxcFvhi8tAx/uPHNBoJYh1c3lbTGA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UJ8Z59pTP1FvU+F/ffL2U5GeXaTz2WS6b5mYydTseoix8Rs3scr0mpy2aqbDpDK4q
+	 4Wiz9nnSeecyHGvvNI7HQCtAVY1B/nLMWpZKXb6zTQ92Qo+DmHeAKdhyStZKUAq2hF
+	 5vgS1lHK3+pzBtQ7yagOw3I1zegoA5SuuuVJ3UHg5fEEGTP/v/YSoRmzBnzEgimE60
+	 iV6ADyWoh/Q1OjLMvYIA7GJVKu/lek4MMlRnyAWxmgX9akXwmVmfhs1QpKtz9q2ZLF
+	 uTra7No/X2l4WqMIi6HUZh/0YtBRFCyERBXKv2JqRSahCtVv2SQrRAwUJfzLa6WJ9z
+	 lU2liyyLF4csg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-block@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Gaurav Kashyap <quic_gaurkash@quicinc.com>
+Cc: Adrian Hunter <adrian.hunter@intel.com>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	"James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Subject: [PATCH v9 00/12] Support for hardware-wrapped inline encryption keys
+Date: Sun,  8 Dec 2024 20:55:18 -0800
+Message-ID: <20241209045530.507833-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241206221801.790690-12-kbusch@meta.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Keith,
+This patchset is also available in git via:
 
-kernel test robot noticed the following build warnings:
+    git fetch https://git.kernel.org/pub/scm/fs/fscrypt/linux.git wrapped-keys-v9
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on next-20241206]
-[cannot apply to brauner-vfs/vfs.all hch-configfs/for-next linus/master v6.13-rc1]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This is a reworked version of the patchset
+https://lore.kernel.org/linux-fscrypt/20241202-wrapped-keys-v7-0-67c3ca3f3282@linaro.org/T/#u
+that was recently sent by Bartosz Golaszewski.  It turned out there were a lot
+of things I wanted to fix, and it would have taken much too long to address them
+in a code review.  For now this is build-tested only; I've errored on the side
+of sending this out early since others are working on this too.  Besides many
+miscellaneous fixes and cleanups, I've made the following notable changes:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Keith-Busch/fs-add-write-stream-information-to-statx/20241207-063826
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20241206221801.790690-12-kbusch%40meta.com
-patch subject: [PATCHv12 11/12] nvme: register fdp parameters with the block layer
-config: i386-buildonly-randconfig-001-20241207 (https://download.01.org/0day-ci/archive/20241207/202412071144.9uXFLnls-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241207/202412071144.9uXFLnls-lkp@intel.com/reproduce)
+- ufs-qcom and sdhci-msm now just initialize the blk_crypto_profile themselves,
+  like what ufs-exynos was doing.  This avoids needing to add all the
+  host-specific hooks for wrapped key support to the MMC and UFS core drivers.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202412071144.9uXFLnls-lkp@intel.com/
+- When passing the blk_crypto_key further down the stack, it now replaces
+  parameters like the algorithm ID, to avoid creating two sources of truth.
 
-All warnings (new ones prefixed by >>):
+- The module parameter qcom_ice.use_wrapped_keys should work correctly now.
 
-   In file included from drivers/nvme/host/core.c:8:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/x86/include/asm/cacheflush.h:5:
-   In file included from include/linux/mm.h:2223:
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> drivers/nvme/host/core.c:2187:11: warning: variable 'i' is uninitialized when used here [-Wuninitialized]
-    2187 |         } while (i++ < fdp_idx);
-         |                  ^
-   drivers/nvme/host/core.c:2160:7: note: initialize the variable 'i' to silence this warning
-    2160 |         int i, n, ret;
-         |              ^
-         |               = 0
-   2 warnings generated.
+- The fscrypt support no longer uses a policy flag to indicate when a file is
+  protected by a HW-wrapped key, since it was already implied by the file's key
+  identifier being that of a HW-wrapped key.  Originally there was an issue
+  where raw and HW-wrapped keys could share key identifiers, but I had fixed
+  that earlier by introducing a new HKDF context byte.
+
+- The term "standard keys" is no longer used.  Now "raw keys" is consistently
+  used instead.  I've found that people find the term "raw keys" to be more
+  intuitive.  Also HW-wrapped keys could in principle be standardized.
+
+- I've reordered the patchset to place preparatory patches that don't depend on
+  the actual HW-wrapped key support first.
+
+My current thinking is that for 6.14 we should just aim to get the preparatory
+patches 1-5 merged via the ufs and mmc trees, while the actual HW-wrapped key
+support continues to be finalized and properly tested.  But let me know if
+anyone has any other thoughts.
+
+A quick intro to the patchset for anyone who hasn't been following along:
+
+This patchset adds support for hardware-wrapped inline encryption keys, a
+security feature supported by some SoCs and that has already seen a lot of
+real-world use downstream.  It adds the block and fscrypt framework for the
+feature as well as support for it with UFS on Qualcomm SoCs.
+
+This feature is described in full detail in the included Documentation changes.
+But to summarize, hardware-wrapped keys are inline encryption keys that are
+wrapped (encrypted) by a key internal to the hardware so that they can only be
+unwrapped (decrypted) by the hardware.  Initially keys are wrapped with a
+permanent hardware key, but during actual use they are re-wrapped with a
+per-boot ephemeral key for improved security.  The hardware supports importing
+keys as well as generating keys itself.
+
+This differs from the existing support for hardware-wrapped keys in the kernel
+crypto API (which also goes by names such as "hardware-bound keys", depending on
+the driver) in the same way that the crypto API differs from blk-crypto: the
+crypto API is for general crypto operations, whereas blk-crypto is for inline
+storage encryption.
+
+This feature is already being used by Android downstream for several years
+(https://source.android.com/docs/security/features/encryption/hw-wrapped-keys),
+but on other platforms userspace support will be provided via fscryptctl and
+tests via xfstests (I have some old patches for this that need to be updated).
+
+Eric Biggers (10):
+  ufs: crypto: add ufs_hba_from_crypto_profile()
+  ufs: qcom: convert to use UFSHCD_QUIRK_CUSTOM_CRYPTO_PROFILE
+  mmc: crypto: add mmc_from_crypto_profile()
+  mmc: sdhci-msm: convert to use custom crypto profile
+  soc: qcom: ice: make qcom_ice_program_key() take struct blk_crypto_key
+  blk-crypto: add basic hardware-wrapped key support
+  blk-crypto: show supported key types in sysfs
+  blk-crypto: add ioctls to create and prepare hardware-wrapped keys
+  fscrypt: add support for hardware-wrapped keys
+  ufs: qcom: add support for wrapped keys
+
+Gaurav Kashyap (2):
+  firmware: qcom: scm: add calls for wrapped key support
+  soc: qcom: ice: add HWKM support to the ICE driver
+
+ Documentation/ABI/stable/sysfs-block          |  18 +
+ Documentation/block/inline-encryption.rst     | 251 +++++++++++-
+ Documentation/filesystems/fscrypt.rst         | 201 +++++++--
+ .../userspace-api/ioctl/ioctl-number.rst      |   2 +
+ block/blk-crypto-fallback.c                   |   7 +-
+ block/blk-crypto-internal.h                   |  10 +
+ block/blk-crypto-profile.c                    | 103 +++++
+ block/blk-crypto-sysfs.c                      |  35 ++
+ block/blk-crypto.c                            | 196 ++++++++-
+ block/ioctl.c                                 |   5 +
+ drivers/firmware/qcom/qcom_scm.c              | 214 ++++++++++
+ drivers/firmware/qcom/qcom_scm.h              |   4 +
+ drivers/md/dm-table.c                         |   1 +
+ drivers/mmc/host/cqhci-crypto.c               |  38 +-
+ drivers/mmc/host/cqhci.h                      |   8 +-
+ drivers/mmc/host/sdhci-msm.c                  | 102 +++--
+ drivers/soc/qcom/ice.c                        | 383 +++++++++++++++++-
+ drivers/ufs/core/ufshcd-crypto.c              |  33 +-
+ drivers/ufs/host/ufs-exynos.c                 |   3 +-
+ drivers/ufs/host/ufs-qcom.c                   | 137 +++++--
+ fs/crypto/fscrypt_private.h                   |  75 +++-
+ fs/crypto/hkdf.c                              |   4 +-
+ fs/crypto/inline_crypt.c                      |  42 +-
+ fs/crypto/keyring.c                           | 157 +++++--
+ fs/crypto/keysetup.c                          |  63 ++-
+ fs/crypto/keysetup_v1.c                       |   4 +-
+ include/linux/blk-crypto-profile.h            |  73 ++++
+ include/linux/blk-crypto.h                    |  73 +++-
+ include/linux/firmware/qcom/qcom_scm.h        |   8 +
+ include/linux/mmc/host.h                      |   8 +
+ include/soc/qcom/ice.h                        |  34 +-
+ include/uapi/linux/blk-crypto.h               |  44 ++
+ include/uapi/linux/fs.h                       |   6 +-
+ include/uapi/linux/fscrypt.h                  |   7 +-
+ include/ufs/ufshcd.h                          |  11 +-
+ 35 files changed, 2091 insertions(+), 269 deletions(-)
+ create mode 100644 include/uapi/linux/blk-crypto.h
 
 
-vim +/i +2187 drivers/nvme/host/core.c
-
-  2153	
-  2154	static int nvme_check_fdp(struct nvme_ns *ns, struct nvme_ns_info *info,
-  2155				  u8 fdp_idx)
-  2156	{
-  2157		struct nvme_fdp_config_log hdr, *h;
-  2158		struct nvme_fdp_config_desc *desc;
-  2159		size_t size = sizeof(hdr);
-  2160		int i, n, ret;
-  2161		void *log;
-  2162	
-  2163		info->runs = 0;
-  2164		ret = nvme_get_log_lsi(ns->ctrl, 0, NVME_LOG_FDP_CONFIGS, 0, NVME_CSI_NVM,
-  2165				   (void *)&hdr, size, 0, info->endgid);
-  2166		if (ret)
-  2167			return ret;
-  2168	
-  2169		size = le32_to_cpu(hdr.sze);
-  2170		h = kzalloc(size, GFP_KERNEL);
-  2171		if (!h)
-  2172			return 0;
-  2173	
-  2174		ret = nvme_get_log_lsi(ns->ctrl, 0, NVME_LOG_FDP_CONFIGS, 0, NVME_CSI_NVM,
-  2175				   h, size, 0, info->endgid);
-  2176		if (ret)
-  2177			goto out;
-  2178	
-  2179		n = le16_to_cpu(h->numfdpc) + 1;
-  2180		if (fdp_idx > n)
-  2181			goto out;
-  2182	
-  2183		log = h + 1;
-  2184		do {
-  2185			desc = log;
-  2186			log += le16_to_cpu(desc->dsze);
-> 2187		} while (i++ < fdp_idx);
-  2188	
-  2189		info->runs = le64_to_cpu(desc->runs);
-  2190	out:
-  2191		kfree(h);
-  2192		return ret;
-  2193	}
-  2194	
-
+base-commit: f486c8aa16b8172f63bddc70116a0c897a7f3f02
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.47.1
+
