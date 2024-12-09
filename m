@@ -1,108 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191731E515;
-	Mon,  9 Dec 2024 20:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A91E19D090;
+	Mon,  9 Dec 2024 22:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733777756; cv=none; b=mJIfikm5/UxCY6nr+rBRGupdtWERgJzTGxmLPtYatq/uz6uW2KV5fx/8FlnjEHOIy3g7VbgT1hp7Z9MeHp8JKL567+Hq0jJdHloBwiQXOAXQ8Wr10XQFiAaWqrCm0/4nBjQQyTnKXtNobxX2BQNFbVWUsrro3nv0oVoOhmEXM00=
+	t=1733782437; cv=none; b=dvE8rGeVIMBRW/NDws6dugIfz8cekkhWvYopguqlrJWAOm8hnGoOF9h/hJSgD2ZLoZwIUr4ir91bwAR2rNbgm5yz0h8T+nL2LTSgrDpzUPiIiHkdTDz66V75Sl+boteLc/iLRODMRY09wdlX2z7xB0karAuN3uUYdcewnPzF2wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733777756; c=relaxed/simple;
-	bh=sOgXmVXOEnzT7dUlGozpoOeQowFqZSP83pipX0+N+CQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k2Zcp7iz/t3WiJ+tVbMByNlJzHxy8SUrH10YJovHSCOtYx7jzmg6JNTRNhHvcKmqjxhfbOeuD1nek2irHPOxvDgN21reOnERBEc+2C5t5vWIaVbzooZtCKAnwbYICEhwb6KfVDay5s0M+aZ+K3PHrKqCcZiaclxHxRg6KqaYe7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kc7T0fp7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733782437; c=relaxed/simple;
+	bh=Zoicv6FCB+iFzMQfrU4Z9XfeuHWSrSqyKjxadK6Xa+M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MLDV5Aw7cIbs5lup6f/Mgy5Jxd5JWGkxqGRVre65B9kh0wTyQvtm5wYiOvahzkI3eG6nC+vTFQ+SUuvypmZNXuqY6zx24kpDg1NGWvAc9eM4936HevFtt0fI+UnYJYH0xWUcN4Zb2XbgOQSDKjR0K6KAJULQ2zvhtxFJSUhh7BU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=jDq10gFK; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kc7T0fp7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 684BEC4CEDF;
-	Mon,  9 Dec 2024 20:55:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733777756;
-	bh=sOgXmVXOEnzT7dUlGozpoOeQowFqZSP83pipX0+N+CQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kc7T0fp7U/kfgCVYqCSBWyEw5nXhU+20/Q/1Kp5gy5q8ilJzSe8m7+5RUOtBM2oq/
-	 et4sz5xMsvxFRRuLWae9iPhdrEJnUjTyJVfenzh2Z2t+Ct90H/yEs310Vafb0KaoVg
-	 DCTCJHmOwTLO8e4uiANX/d7Rk72R+4QytWyw8AQBH3JdZgXjSLH38K5fl0K9XE+vjN
-	 DyStQ+w0tz1HHTKw8vMHkoxexcWRBTtbTOIOdFqNZyImqKzcbbt2JvvB2F4Gf4d6Ev
-	 dLIkK1tev0HW7zh+50gWRVzP9QWsuY6GVYa55Ei8/RNnWRlBOa9ciIAfDiE/Y8bXPQ
-	 R8ANvT3YcVRZw==
-Date: Mon, 9 Dec 2024 12:55:53 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Alim Akhtar <alim.akhtar@samsung.com>,
-	Avri Altman <avri.altman@wdc.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Subject: Re: [PATCH v9 00/12] Support for hardware-wrapped inline encryption
- keys
-Message-ID: <20241209205553.GC1742@sol.localdomain>
-References: <20241209045530.507833-1-ebiggers@kernel.org>
- <CAMRc=MfLzuNjRqURpVwLzVTsdr8OmtK+NQZ6XU4hUsawKWTcqQ@mail.gmail.com>
- <20241209201516.GA1742@sol.localdomain>
- <CAMRc=Me7kEBHW1BTDkJ6w+3GjucCfC+GNZBch3kX=gsZniFHvA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="jDq10gFK"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Y6bjv2dDszlfflB;
+	Mon,  9 Dec 2024 22:13:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1733782429; x=1736374430; bh=IQKVDEMj0TrHltVURdtOup6I
+	IRHQAQ4lIbXGduLnT6I=; b=jDq10gFK/44haFYNLdurY4fNR+uBNg0nU4knZqPa
+	ibGTnIO0Rl5EA+MPlZ4I5pCwvbTrPvQCB0DiYqmkZrE3zzRRmiECLY4uOJmZeKv7
+	OvGmexAE5Z2hai0js6fM7Rxwg9PbyphTBqFEKalOQQwR3nhHwRigEY0paW1OxGug
+	M4l/G846p7QRGdNb/z3j99331bgyzQ4FIDPiarmykDUolWZSB4WwgRcPCZmftVms
+	Djmn6GlTt3+3AMAUhRq8HUJHiFM0NdmTdZ3XvlxPqfEGKY9Aqo41s+CwgyysZ5v1
+	fcIIUCBF06cRgzg2HVDqMe/aiIe8MCu1CPv879TXpzViqQ==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id jToVKEuMeHKC; Mon,  9 Dec 2024 22:13:49 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Y6bjf55d1zlfflY;
+	Mon,  9 Dec 2024 22:13:41 +0000 (UTC)
+Message-ID: <c639f90f-bdd1-4808-aeb7-e9b667822413@acm.org>
+Date: Mon, 9 Dec 2024 14:13:40 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMRc=Me7kEBHW1BTDkJ6w+3GjucCfC+GNZBch3kX=gsZniFHvA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv10 0/9] write hints with nvme fdp, scsi streams
+To: Nitesh Shetty <nj.shetty@samsung.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Javier Gonzalez <javier.gonz@samsung.com>,
+ Matthew Wilcox <willy@infradead.org>, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "joshi.k@samsung.com" <joshi.k@samsung.com>
+References: <d7b7a759dd9a45a7845e95e693ec29d7@CAMSVWEXC02.scsc.local>
+ <2b5a365a-215a-48de-acb1-b846a4f24680@acm.org>
+ <20241111093154.zbsp42gfiv2enb5a@ArmHalley.local>
+ <a7ebd158-692c-494c-8cc0-a82f9adf4db0@acm.org>
+ <20241112135233.2iwgwe443rnuivyb@ubuntu>
+ <yq1ed38roc9.fsf@ca-mkp.ca.oracle.com>
+ <9d61a62f-6d95-4588-bcd8-de4433a9c1bb@acm.org>
+ <yq1plmhv3ah.fsf@ca-mkp.ca.oracle.com>
+ <8ef1ec5b-4b39-46db-a4ed-abf88cbba2cd@acm.org>
+ <yq1jzcov5am.fsf@ca-mkp.ca.oracle.com>
+ <CGME20241205081138epcas5p2a47090e70c3cf19e562f63cd9fc495d1@epcas5p2.samsung.com>
+ <20241205080342.7gccjmyqydt2hb7z@ubuntu>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20241205080342.7gccjmyqydt2hb7z@ubuntu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 09, 2024 at 02:35:29PM -0600, Bartosz Golaszewski wrote:
-> On Mon, 9 Dec 2024 21:15:16 +0100, Eric Biggers <ebiggers@kernel.org> said:
-> > On Mon, Dec 09, 2024 at 04:00:18PM +0100, Bartosz Golaszewski wrote:
-> >>
-> >> I haven't gotten to the bottom of this yet but the
-> >> FS_IOC_ADD_ENCRYPTION_KEY ioctl doesn't work due to the SCM call
-> >> returning EINVAL. Just FYI. I'm still figuring out what's wrong.
-> >>
-> >> Bart
-> >>
-> >
-> > Can you try the following?
-> >
-> > diff --git a/drivers/firmware/qcom/qcom_scm.c b/drivers/firmware/qcom/qcom_scm.c
-> > index 180220d663f8b..36f3ddcb90207 100644
-> > --- a/drivers/firmware/qcom/qcom_scm.c
-> > +++ b/drivers/firmware/qcom/qcom_scm.c
-> > @@ -1330,11 +1330,11 @@ int qcom_scm_derive_sw_secret(const u8 *eph_key, size_t eph_key_size,
-> >  								  sw_secret_size,
-> >  								  GFP_KERNEL);
-> >  	if (!sw_secret_buf)
-> >  		return -ENOMEM;
-> >
-> > -	memcpy(eph_key_buf, eph_key_buf, eph_key_size);
-> > +	memcpy(eph_key_buf, eph_key, eph_key_size);
-> >  	desc.args[0] = qcom_tzmem_to_phys(eph_key_buf);
-> >  	desc.args[1] = eph_key_size;
-> >  	desc.args[2] = qcom_tzmem_to_phys(sw_secret_buf);
-> >  	desc.args[3] = sw_secret_size;
-> >
-> >
-> 
-> That's better, thanks. Now it's fscryptctl set_policy that fails like this:
-> 
-> ioctl(3, FS_IOC_SET_ENCRYPTION_POLICY, 0xffffcaf8bb20) = -1 EINVAL
-> (Invalid argument)
-> 
+On 12/5/24 12:03 AM, Nitesh Shetty wrote:
+> But where do we store the read sector info before sending write.
+> I see 2 approaches here,
+> 1. Should it be part of a payload along with write ?
+>  =C2=A0=C2=A0=C2=A0=C2=A0We did something similar in previous series wh=
+ich was not liked
+>  =C2=A0=C2=A0=C2=A0=C2=A0by Christoph and Bart.
+> 2. Or driver should store it as part of an internal list inside
+> namespace/ctrl data structure ?
+>  =C2=A0=C2=A0=C2=A0=C2=A0As Bart pointed out, here we might need to sen=
+d one more fail
+>  =C2=A0=C2=A0=C2=A0=C2=A0request later if copy_write fails to land in s=
+ame driver.
 
-Yes, as I mentioned I decided to drop the new encryption policy flag and go back
-to just relying on the key.  I assume you were using
-https://github.com/ebiggers/fscryptctl/tree/wip-wrapped-keys?  I have pushed out
-an updated version of that that should work.
+Hi Nitesh,
 
-- Eric
+Consider the following example: dm-linear is used to concatenate two
+block devices. An NVMe device (LBA 0..999) and a SCSI device (LBA
+1000..1999). Suppose that a copy operation is submitted to the dm-linear
+device to copy LBAs 1..998 to LBAs 2..1998. If the copy operation is
+submitted as two separate operations (REQ_OP_COPY_SRC and
+REQ_OP_COPY_DST) then the NVMe device will receive the REQ_OP_COPY_SRC
+operation and the SCSI device will receive the REQ_OP_COPY_DST
+operation. The NVMe and SCSI device drivers should fail the copy=20
+operations after a timeout because they only received half of the copy
+operation. After the timeout the block layer core can switch from
+offloading to emulating a copy operation. Waiting for a timeout is
+necessary because requests may be reordered.
+
+I think this is a strong argument in favor of representing copy
+operations as a single operation. This will allow stacking drivers
+as dm-linear to deal in an elegant way with copy offload requests
+where source and destination LBA ranges map onto different block
+devices and potentially different block drivers.
+
+Thanks,
+
+Bart.
