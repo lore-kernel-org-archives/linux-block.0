@@ -1,197 +1,286 @@
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2073.outbound.protection.outlook.com [40.107.96.73])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BA614F9E7;
-	Mon,  9 Dec 2024 17:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733765747; cv=fail; b=JqfglilSpxsfyybUgEiNxxuNi/l0hlnPerBprNYYBHn4293lfAky/AvN+lbFQIyYkUyvdgrLtD8JWV2dpotiaEryRVvPQSBOREhzjEGpAfRdKPkAHV2QW/iF2Crh2R1rj8/4zJW5dEOu5q5x2ONlZsSrPWdL0oyRzZd8su31QH4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733765747; c=relaxed/simple;
-	bh=Zuoy2BcZP6Xx9puSGc6pef17F4/e16uOrFigwuOyJsU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Ky2nzgKj/KNvSh6A/naMZuJygYHGBV+iDcSp+Cgta2ovR+01jRRQ+m3tz9T0GV7RA7mxWBj6FVsHwiFyPt0gR5jpaDF8oUfxzK1jXaAg/VsnFDmMJLGycp1J6oKodlp1rPu9PWDShtSeGhpb6qoW0rTh/a6zEu3SJm5c6vjuDyU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=micron.com; spf=pass smtp.mailfrom=micron.com; dkim=pass (2048-bit key) header.d=micron.com header.i=@micron.com header.b=FgjATeW1; arc=fail smtp.client-ip=40.107.96.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=micron.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=micron.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579EF233151
+	for <linux-block@vger.kernel.org>; Mon,  9 Dec 2024 17:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733766069; cv=none; b=PmSRH4YLpFtURBHs5uld4nSDgAMljxLNVzGl1jSQKSftKN60+5VfMiSfMjoqvrp33AgCAgoeokFvikZxBHBZ5dI6VF133PvtjcnHDDmksJhOipuTe+aDmwGMj/E1Dgcm5RiA7S+yoQPgogi+EODi1RdHqDYXW4Hj1CO42KCFxho=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733766069; c=relaxed/simple;
+	bh=1Q4hZCNXy3GeAgOLsp3hkLLN0Ze/u3UMHQJ6ykzoPJA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=poeEVu1t+gTEslV0xv46Vg5f7Iu/jV6zoltFd6IHV8m5F13/a2IcBGOtvRNYP5822Fh9+8QXy4otBRFeRt4KFF0qUMRs5QOLJqxZI9eH051nIAu1cHdoU37Mrv1iwhwgEnDZImTEXbS4OIG4IypIkGekrmK2Ufj9WNgKWx4cn+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NzTAq/5x; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=micron.com header.i=@micron.com header.b="FgjATeW1"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ihka5erUGs1QNP6p2ckmm8i8y2mcY0fDxPY5u/YRKB/CWS9YSNmONaeUewslwemlmTqxRBFEBGvHqREDae5kmCLssPD5pyhy4fbJ1PrfZM07oJMPi9xvfrul/8y5PsZF3kD448TafHD0DJuRiT8mLU55PCwxmz/JdNE15TbgijOBAw8H77NkaGrM3d34l54G1ycU6hqs7Sy5G+CbF1BgeYX/9aPpi/yx5RKzztLTMICFT5HLqpMJzFOkVDHnbBfQ9LN2VinFhIJL6vD2CvlyU4+yS0/7SXZkCkgBtk5ll4FYuAdg+J25Lh5JbGh2wCAPsFpqlW5Up4JJYPUmFc1OwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Zuoy2BcZP6Xx9puSGc6pef17F4/e16uOrFigwuOyJsU=;
- b=jkm8pojJktOr9eYWsVFProAQ9//y6dLHSrURtMBEvdywatLpJ5QnOBZIV4RCsZKJJ0XqtS4JWWq4Fr0kQGRrCnBkq4kzCqC5+9yCQVv5TQO5gMwczqTliiqsffOTsWIi5VM2ApXXYzJdtJJIncvTbUgcWE+gprgLuNJYxsMoQqVXRE1XzZrfEjcw+Lj/qQitFArJj2E33zESpV+D+e18V+ZEGWP+hyHtke96mG9IrM44m3LAo8ETTbuNH96NdUkc7Gv8y0GFXiFaNvdXT6N+lQyUSKTNhB9DUr4YmtRNYTH262FEfuipsD+a3SsXMagbYhyIwwS15P1UVi3N/I5PnA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=micron.com; dmarc=pass action=none header.from=micron.com;
- dkim=pass header.d=micron.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=micron.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Zuoy2BcZP6Xx9puSGc6pef17F4/e16uOrFigwuOyJsU=;
- b=FgjATeW1BuOMuBlls5eAo4Vc5lzJ5eJuey7WVrUvYsn7FP4EZtEj1LJ2F139gsx1B9tiE6eClIcAvGXBVpAbOlbTpI1ujCKX6FHReHWnVgGqlQiREg21GAzU3uZU3CQcN7WBW9ns52QAtLd5VVMqo0dOSXlN87Jgnx+1ApxopRqCJjXgNPf8yFmu/1AEMAVLRoR/uwTAfTUacjybCH0TedSfW9nhivwzin2fQRrJwLykOyrXuxFg2bRchu1AOkmuaE98R9gmRyJpENqz9hHORZvrVdrfxsYCxznjKRAbzrGroO9BCzV3A371RkXf0X7uEHAXCwvYrDV0dTpOP1E81g==
-Received: from DS0PR08MB8541.namprd08.prod.outlook.com (2603:10b6:8:116::17)
- by SA1PR08MB7213.namprd08.prod.outlook.com (2603:10b6:806:186::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8230.12; Mon, 9 Dec
- 2024 17:35:40 +0000
-Received: from DS0PR08MB8541.namprd08.prod.outlook.com
- ([fe80::fb1c:d78b:e57:bc81]) by DS0PR08MB8541.namprd08.prod.outlook.com
- ([fe80::fb1c:d78b:e57:bc81%2]) with mapi id 15.20.8230.010; Mon, 9 Dec 2024
- 17:35:39 +0000
-From: Pierre Labat <plabat@micron.com>
-To: Keith Busch <kbusch@kernel.org>
-CC: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "io-uring@vger.kernel.org"
-	<io-uring@vger.kernel.org>, "sagi@grimberg.me" <sagi@grimberg.me>,
-	"asml.silence@gmail.com" <asml.silence@gmail.com>
-Subject: RE: [EXT] Re: [PATCHv11 00/10] block write streams with nvme fdp
-Thread-Topic: [EXT] Re: [PATCHv11 00/10] block write streams with nvme fdp
-Thread-Index: AQHbSjkfn7E40X+xN02QKPCe64Si9rLeJePwgAAERQCAAAFGcA==
-Date: Mon, 9 Dec 2024 17:35:39 +0000
-Message-ID:
- <DS0PR08MB8541FB9AF1CCA39239E85861AB3C2@DS0PR08MB8541.namprd08.prod.outlook.com>
-References: <20241206015308.3342386-1-kbusch@meta.com>
- <20241209125132.GA14316@lst.de>
- <DS0PR08MB85414C2FDCFE1F98424C0366AB3C2@DS0PR08MB8541.namprd08.prod.outlook.com>
- <Z1cn-LLW3pGqJFqC@kbusch-mbp.dhcp.thefacebook.com>
-In-Reply-To: <Z1cn-LLW3pGqJFqC@kbusch-mbp.dhcp.thefacebook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_6fdea275-d6f3-438f-b8d8-013cab2023d3_ActionId=49b88dd5-cfa6-4cf2-97e3-e6d7998f96cd;MSIP_Label_6fdea275-d6f3-438f-b8d8-013cab2023d3_ContentBits=0;MSIP_Label_6fdea275-d6f3-438f-b8d8-013cab2023d3_Enabled=true;MSIP_Label_6fdea275-d6f3-438f-b8d8-013cab2023d3_Method=Privileged;MSIP_Label_6fdea275-d6f3-438f-b8d8-013cab2023d3_Name=Public;MSIP_Label_6fdea275-d6f3-438f-b8d8-013cab2023d3_SetDate=2024-12-09T17:30:01Z;MSIP_Label_6fdea275-d6f3-438f-b8d8-013cab2023d3_SiteId=f38a5ecd-2813-4862-b11b-ac1d563c806f;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=micron.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR08MB8541:EE_|SA1PR08MB7213:EE_
-x-ms-office365-filtering-correlation-id: 0fc804bb-9945-4661-d6ce-08dd1877e63a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?0z2D0Z2wlQvXbgnT03g8cHe88pcR/NfOT+id88iArSMeyzKQWiu1+PijfzbT?=
- =?us-ascii?Q?cGgYRYdNyP/nfW9IfjJ2TiXDt7JNQw0siAwV28kbSEAqYMEiPcR3kLWs2TEz?=
- =?us-ascii?Q?YEOVvlS75q/O/YmIh9SDj3SYmpVQL/IhFO5wGwSQkxFk6pQRR9m+bmaESbfq?=
- =?us-ascii?Q?raJ2bmgaFyCAsgqGGLXx8AdkSh/wMGiJ+7QCE2Ew8XWQ6cYCUf2yD5+M1oBV?=
- =?us-ascii?Q?MwoxFv4WZaWNC8o4AR7yPsgxDr6cPJkZUcjSxhYUa7P3w4LmMuw+vu8oLbbT?=
- =?us-ascii?Q?RJAa6/EgY4uGSzqR3jFAeg5u5BXP+ymL4gLFw7JgwfB/y+/kIKkR/pVlgrY7?=
- =?us-ascii?Q?SieJwY7sjHQIEBLJyWekEV7rhtjpXLo869hMBR4t3HFwSbQM5YiZ8F85BkJX?=
- =?us-ascii?Q?pUlrSm/7Hh47LmTOM1DOreug4UkLZFjHPOHSPCf+/exaqO20E/qPr23ABZqb?=
- =?us-ascii?Q?CKRoXItR7mFiMVuKDZrlBxmsBLqlEV7OI/XPIuSlRoi+UtNqyOxApDIVMJwE?=
- =?us-ascii?Q?aKmE8wkonH448BB5YMpXWlPAB0BGJ9q3jzi/26IwHhLs6I6kl0poTI7ZR0hu?=
- =?us-ascii?Q?s3uFqDeCXkYaSiDGtb8UM+6nb6XJAOAJxz3e7nar0oO9G9Wln9So5JRhZWcN?=
- =?us-ascii?Q?YCBEN7OrIYpFWxrHpDhZHPtWPLsEfLN6FIeaCs74wn130AqIBAcOoKb1vQR2?=
- =?us-ascii?Q?LYTIUEjzF+MGJI79L2ywnvr/eV88XSg6Vu1ArLcpWysfYPR4bVLpLdV2UjcC?=
- =?us-ascii?Q?aU5tRkgLfkC8wovwAEEsOl/wNL+rleU0IBSrLWeWpk3cnGbTopeZk6LW0euG?=
- =?us-ascii?Q?ZlvkIQ09UXocQ3KsAx17KuUfVYXbz0Cu6pp36Ibc5XbUn/7QXED9lM2TKw/Y?=
- =?us-ascii?Q?aOk6YfoLGGhKm8u9tns7KJtCiZ24cwmSm6wxYDwJzYXiW0EOEPZ4gdRldTZz?=
- =?us-ascii?Q?H0UtkVPXklHAD43wTC56lCJjXBu0vuLkzyn+i5Iwna5NWXOYJbeyELb36rQa?=
- =?us-ascii?Q?gW4O4b7ho5lU3YTzQAX0XmNiwBOwPNa+x193wZ03AMfTRB0NjoGdmQt5680q?=
- =?us-ascii?Q?3Fyr0lVaPA/LhPhsJnpjWkPfZWOhsL9+UOpd3SSBSmu0Dpx1A3iCvZ0/xL4M?=
- =?us-ascii?Q?S2c6qtV+xSnsGy9AxZFfFLk2vlh/fMJCz5BIvP6yWe8J/+1BEJHbeeGNK9FQ?=
- =?us-ascii?Q?ud+B51BPKNv7zpyA5OAYhgRkxS1lmS3DfIAGOR/96iVwfBLHDAmT/UBVGJsR?=
- =?us-ascii?Q?XvFOc5veYFDxgtCcVq4l8QltTkfAGaxvXcdlPhr70PTbkssLrfEmDczJM2rb?=
- =?us-ascii?Q?mQLXeIXaT8S32A9igLLnxhTt4JLLCKDl38SNwk4oE8WCTzc3Pdk6BlLxk+pV?=
- =?us-ascii?Q?sOyC/Ds75vtiuotm0liEgarVOUyb1H2grU7dISUhmnEilnmNOQ=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR08MB8541.namprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?9lCY7ktPEy3fPBtayTjfbEE8D9VcFwNMfOWkHbeRwbCxrD7HZrRtQFd1B/wg?=
- =?us-ascii?Q?+9h/lOx7As7KOBWeEOjeMHWpXNC9fZSiX2Eg4WlZd3tdcAcK6DifgPEDRbqY?=
- =?us-ascii?Q?IiF8PZNVh3EWwHt21UFx3MLqpcCg0NerJ702Myxyl2BnxRdzMI0IXdkZtcQa?=
- =?us-ascii?Q?8DG8jyp40u1ZaUf7BUv3gzgukDUtLlLtaHxs+hsJfTm5axDRSsCLe8jny3iq?=
- =?us-ascii?Q?W8NBtgV5A2fA5X7DeazvPNumEuFsGDkdvqc38PCxySEbW41P1DbpNbUK1Xqi?=
- =?us-ascii?Q?NZ5w+Zp8tk/TF0bjJ+/uAt9T2ZD5YKpf+6HoyrEkGADmbsh+1hQN2yvqj7De?=
- =?us-ascii?Q?Ss+iC78K1B9pxsg20hcMoy/uocJmPfn6H9B7ZuLfKietR6CxYx8bu8j3yu0D?=
- =?us-ascii?Q?sW8LiYnlhigDyJczanXHiF3BXJkFiD/G8PHRuAYcWOe+cwh7K5isHx9MXtgG?=
- =?us-ascii?Q?1VTS0Uaf1XH0TikxWDS+MWmYiCAjAibdMRYisGtedzvoE9f/NHuHpVHhaD9F?=
- =?us-ascii?Q?QgrpoaXVmZgiClaOmdqdCx4JotGT1R0CaUJ4cZvJFYxNzSjBVddi7KZe+hW6?=
- =?us-ascii?Q?nSbbuHcScTDz60UsSAVk+qSHppFeLlLar2ZHV6cH9jkmePhFj6eu7RUN11Qx?=
- =?us-ascii?Q?TQHVSgKqQJn5/eUp9cjx2AmNvdNIylzyrsjgZi+Zfrllu6kb9TAOKHTmiyYO?=
- =?us-ascii?Q?O+XUEqMOuiVovbFdoVYlLx+EbjCsKUIR46SfErLsAKcFcsH8QysDrwUG5Hfr?=
- =?us-ascii?Q?sTX/bjmDLYYzVtZ3iuTi17IjUy7jOZrWkxj3JU2w3TORwJHg8SLs717DKHLA?=
- =?us-ascii?Q?ZPXaaZdVKxnaVASJHF9CIEO5cjZE3+PfNpxZz0mMUQJnd9wLbAcj8GRwYNeJ?=
- =?us-ascii?Q?EOP1SxNq0esJ93znb3k2BiJV2VXi2KMCdwlLzQSkdCcNy/8k5RDsmxvEGoak?=
- =?us-ascii?Q?Ki4eMJ2ub3SofOpsaKY3MPKuUDQHphQmRgcjub3kdzHuzFCO2zyhzzDQd7mS?=
- =?us-ascii?Q?4k3n6xnlkRjgqqGY/SbSJPQTtmyK/4jsXYhVg2ffNCIhvUFxKmHtcamhPvIF?=
- =?us-ascii?Q?FKJcSBnEBH2fruyNVF3k7W3kNmaFQEyhC4JZTVlAooRQAnAMLOIM7B4B/pCP?=
- =?us-ascii?Q?kWOboSRvxIGj3U0B0abeqpzMV518XVqdt3E2jbbo6jZg/U5jgzeNtKLCxIgK?=
- =?us-ascii?Q?dhWAg1o3n3xHWUuDpj3LkgsJx/LRkuRJxIarkNtl31atpVTE3bzCB7MKx9eX?=
- =?us-ascii?Q?AQgQQ10ys56MQCkVKvN5b1hp0+2cTucIBdEQvuJiKbJ1qtE/3bNc7Uvqvh38?=
- =?us-ascii?Q?/wnwajQlWYQ7vqtgj+WzrA5XTwNP5WEIGsU49RNxBUX1JF7NxsORARK2KX6v?=
- =?us-ascii?Q?tre2VS16OJhHvwHeS2q9ghqVdcz9b5l+92KcfPtfI1jZBCPq9Tc7ObSvpHmQ?=
- =?us-ascii?Q?r14v9z+L+c8AfqK8E/BHm3xkelvgJO9ShTMaIfT9Hm7dxpI/56tJiM3XvIBG?=
- =?us-ascii?Q?rOQR1NoiTC1lhdZlEXV7c/URE4Mw0wR7xX+90w0q1k6sG+Zqqs0p/7r0WCob?=
- =?us-ascii?Q?6rXl33ewXXiGTUxqnkQ=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NzTAq/5x"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B9DHK0c008130;
+	Mon, 9 Dec 2024 17:41:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=ng7Ea6
+	2buaZk9T8dQuRoVMDpb4vecnZ8BThp47kRzA0=; b=NzTAq/5xqig33zM8Pg+zhN
+	+TezWdcF6hulRIPO498gF3G+1DUSe7fi9WrHiIvFEIIgfGkV6fx9O6QFCs/YBGQu
+	jFSZgRT3st+QLZL0rS0O0ZUlMpP3WyP9/4L/s6+GVuMXs6DSqZt717XbOsMYdOY+
+	eMOQr8bj7PXtwE9g32OsimCchAxWmVbQD4jRI0VWzQI5MkSizu/93suwv8DYZlsH
+	VMQU3X6EPDDZGuqnzIibDwRBjhPQasMKRBMFg/y9FBAlNm/fRKcTVJdZprGT7UN7
+	HC7Kl7EwC9+KIOcAAlDDLwY72CaZtrWq21gfirAWzIdJYViq5PVrCKBl+NBclHtA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsq244b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 17:41:01 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B9Hf0V0023569;
+	Mon, 9 Dec 2024 17:41:00 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsq244a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 17:41:00 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B9EsLJm018636;
+	Mon, 9 Dec 2024 17:41:00 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43d26k7m81-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Dec 2024 17:40:59 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B9HewPC9306830
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 9 Dec 2024 17:40:59 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D5EBD58054;
+	Mon,  9 Dec 2024 17:40:58 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EEF6C58045;
+	Mon,  9 Dec 2024 17:40:55 +0000 (GMT)
+Received: from [9.171.71.154] (unknown [9.171.71.154])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  9 Dec 2024 17:40:55 +0000 (GMT)
+Message-ID: <21c2b7af-917d-4152-92ba-cefdc06a6f8c@linux.ibm.com>
+Date: Mon, 9 Dec 2024 23:10:54 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: micron.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR08MB8541.namprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0fc804bb-9945-4661-d6ce-08dd1877e63a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Dec 2024 17:35:39.9205
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: f38a5ecd-2813-4862-b11b-ac1d563c806f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: F2HJi0sEieaqJy/FXqCMO5+wEySqDN5WlxZDhdvJe021PrVhJCmQusbSzzoEoOgairjxoQVh+hMyyRS0CqiF7w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR08MB7213
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Fix potential deadlock in queue_attr_store()
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, kjain101@in.ibm.com, hch@lst.de,
+        axboe@kernel.dk, ritesh.list@gmail.com, gjoyce@linux.ibm.com
+References: <20241206164742.526149-1-nilay@linux.ibm.com>
+ <CAFj5m9Ke8+EHKQBs_Nk6hqd=LGXtk4mUxZUN5==ZcCjnZSBwHw@mail.gmail.com>
+ <42c6f7bd-c429-4879-9f9f-21a7b706d936@linux.ibm.com>
+ <Z1a1bXT15IxJpUDH@fedora>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <Z1a1bXT15IxJpUDH@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: JKhex8EEaJJDp92FEZPAAadtyb_oh4yt
+X-Proofpoint-GUID: U5w3oDxqHG7DXvcLSjsxERLY_iQpaOUE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
+ lowpriorityscore=0 clxscore=1015 phishscore=0 impostorscore=0
+ suspectscore=0 spamscore=0 mlxscore=0 priorityscore=1501 malwarescore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412090136
 
-Thanks Keith for the clarification.
-If I got it right, that will be decided later by the filesystem maintainers=
- if they went to convert the write hint assigned to a file via fcntl() into=
- a write_stream that is the one used by the block drivers (for FDP for nvme=
-).
-Regards,
-Pierre
 
-> -----Original Message-----
-> From: Keith Busch <kbusch@kernel.org>
-> Sent: Monday, December 9, 2024 9:25 AM
-> To: Pierre Labat <plabat@micron.com>
-> Cc: Christoph Hellwig <hch@lst.de>; Keith Busch <kbusch@meta.com>;
-> axboe@kernel.dk; linux-block@vger.kernel.org; linux-
-> nvme@lists.infradead.org; linux-fsdevel@vger.kernel.org; io-
-> uring@vger.kernel.org; sagi@grimberg.me; asml.silence@gmail.com
-> Subject: Re: [EXT] Re: [PATCHv11 00/10] block write streams with nvme fdp
->=20
-> CAUTION: EXTERNAL EMAIL. Do not click links or open attachments unless yo=
-u
-> recognize the sender and were expecting this message.
->=20
->=20
-> On Mon, Dec 09, 2024 at 05:14:16PM +0000, Pierre Labat wrote:
-> > I was under the impression that passing write hints via fcntl() on any
-> > legacy filesystem stays. The hint is attached to the inode, and the fs
-> > simply picks it up from there when sending it down with write related
-> > to that inode.
-> > Aka per file write hint.
-> >
-> > I am right?
->=20
-> Nothing is changing with respect to those write hints as a result of this=
- series,
-> if that's what you mean. The driver hadn't been checking the write hint b=
-efore,
-> and this patch set continues that pre-existing behavior. For this series,=
- the
-> driver utilizes a new field:
-> "write_stream".
->=20
-> Mapping the inode write hint to an FDP stream for other filesystems remai=
-ns
-> an open topic to follow on later.
+
+On 12/9/24 14:46, Ming Lei wrote:
+> On Sun, Dec 08, 2024 at 03:41:18PM +0530, Nilay Shroff wrote:
+>>
+>>
+>> On 12/7/24 08:47, Ming Lei wrote:
+>>> On Sat, Dec 7, 2024 at 12:48 AM Nilay Shroff <nilay@linux.ibm.com> wrote:
+>>>>
+>>>> For storing a value to a queue attribute, the queue_attr_store function
+>>>> first freezes the queue (->q_usage_counter(io)) and then acquire
+>>>> ->sysfs_lock. This seems not correct as the usual ordering should be to
+>>>> acquire ->sysfs_lock before freezing the queue. This incorrect ordering
+>>>> causes the following lockdep splat which we are able to reproduce always
+>>>> simply by accessing /sys/kernel/debug file using ls command:
+>>>>
+>>>> [   57.597146] WARNING: possible circular locking dependency detected
+>>>> [   57.597154] 6.12.0-10553-gb86545e02e8c #20 Tainted: G        W
+>>>> [   57.597162] ------------------------------------------------------
+>>>> [   57.597168] ls/4605 is trying to acquire lock:
+>>>> [   57.597176] c00000003eb56710 (&mm->mmap_lock){++++}-{4:4}, at: __might_fault+0x58/0xc0
+>>>> [   57.597200]
+>>>>                but task is already holding lock:
+>>>> [   57.597207] c0000018e27c6810 (&sb->s_type->i_mutex_key#3){++++}-{4:4}, at: iterate_dir+0x94/0x1d4
+>>>> [   57.597226]
+>>>>                which lock already depends on the new lock.
+>>>>
+>>>> [   57.597233]
+>>>>                the existing dependency chain (in reverse order) is:
+>>>> [   57.597241]
+>>>>                -> #5 (&sb->s_type->i_mutex_key#3){++++}-{4:4}:
+>>>> [   57.597255]        down_write+0x6c/0x18c
+>>>> [   57.597264]        start_creating+0xb4/0x24c
+>>>> [   57.597274]        debugfs_create_dir+0x2c/0x1e8
+>>>> [   57.597283]        blk_register_queue+0xec/0x294
+>>>> [   57.597292]        add_disk_fwnode+0x2e4/0x548
+>>>> [   57.597302]        brd_alloc+0x2c8/0x338
+>>>> [   57.597309]        brd_init+0x100/0x178
+>>>> [   57.597317]        do_one_initcall+0x88/0x3e4
+>>>> [   57.597326]        kernel_init_freeable+0x3cc/0x6e0
+>>>> [   57.597334]        kernel_init+0x34/0x1cc
+>>>> [   57.597342]        ret_from_kernel_user_thread+0x14/0x1c
+>>>> [   57.597350]
+>>>>                -> #4 (&q->debugfs_mutex){+.+.}-{4:4}:
+>>>> [   57.597362]        __mutex_lock+0xfc/0x12a0
+>>>> [   57.597370]        blk_register_queue+0xd4/0x294
+>>>> [   57.597379]        add_disk_fwnode+0x2e4/0x548
+>>>> [   57.597388]        brd_alloc+0x2c8/0x338
+>>>> [   57.597395]        brd_init+0x100/0x178
+>>>> [   57.597402]        do_one_initcall+0x88/0x3e4
+>>>> [   57.597410]        kernel_init_freeable+0x3cc/0x6e0
+>>>> [   57.597418]        kernel_init+0x34/0x1cc
+>>>> [   57.597426]        ret_from_kernel_user_thread+0x14/0x1c
+>>>> [   57.597434]
+>>>>                -> #3 (&q->sysfs_lock){+.+.}-{4:4}:
+>>>> [   57.597446]        __mutex_lock+0xfc/0x12a0
+>>>> [   57.597454]        queue_attr_store+0x9c/0x110
+>>>> [   57.597462]        sysfs_kf_write+0x70/0xb0
+>>>> [   57.597471]        kernfs_fop_write_iter+0x1b0/0x2ac
+>>>> [   57.597480]        vfs_write+0x3dc/0x6e8
+>>>> [   57.597488]        ksys_write+0x84/0x140
+>>>> [   57.597495]        system_call_exception+0x130/0x360
+>>>> [   57.597504]        system_call_common+0x160/0x2c4
+>>>> [   57.597516]
+>>>>                -> #2 (&q->q_usage_counter(io)#21){++++}-{0:0}:
+>>>> [   57.597530]        __submit_bio+0x5ec/0x828
+>>>> [   57.597538]        submit_bio_noacct_nocheck+0x1e4/0x4f0
+>>>> [   57.597547]        iomap_readahead+0x2a0/0x448
+>>>> [   57.597556]        xfs_vm_readahead+0x28/0x3c
+>>>> [   57.597564]        read_pages+0x88/0x41c
+>>>> [   57.597571]        page_cache_ra_unbounded+0x1ac/0x2d8
+>>>> [   57.597580]        filemap_get_pages+0x188/0x984
+>>>> [   57.597588]        filemap_read+0x13c/0x4bc
+>>>> [   57.597596]        xfs_file_buffered_read+0x88/0x17c
+>>>> [   57.597605]        xfs_file_read_iter+0xac/0x158
+>>>> [   57.597614]        vfs_read+0x2d4/0x3b4
+>>>> [   57.597622]        ksys_read+0x84/0x144
+>>>> [   57.597629]        system_call_exception+0x130/0x360
+>>>> [   57.597637]        system_call_common+0x160/0x2c4
+>>>> [   57.597647]
+>>>>                -> #1 (mapping.invalidate_lock#2){++++}-{4:4}:
+>>>> [   57.597661]        down_read+0x6c/0x220
+>>>> [   57.597669]        filemap_fault+0x870/0x100c
+>>>> [   57.597677]        xfs_filemap_fault+0xc4/0x18c
+>>>> [   57.597684]        __do_fault+0x64/0x164
+>>>> [   57.597693]        __handle_mm_fault+0x1274/0x1dac
+>>>> [   57.597702]        handle_mm_fault+0x248/0x484
+>>>> [   57.597711]        ___do_page_fault+0x428/0xc0c
+>>>> [   57.597719]        hash__do_page_fault+0x30/0x68
+>>>> [   57.597727]        do_hash_fault+0x90/0x35c
+>>>> [   57.597736]        data_access_common_virt+0x210/0x220
+>>>> [   57.597745]        _copy_from_user+0xf8/0x19c
+>>>> [   57.597754]        sel_write_load+0x178/0xd54
+>>>> [   57.597762]        vfs_write+0x108/0x6e8
+>>>> [   57.597769]        ksys_write+0x84/0x140
+>>>> [   57.597777]        system_call_exception+0x130/0x360
+>>>> [   57.597785]        system_call_common+0x160/0x2c4
+>>>> [   57.597794]
+>>>>                -> #0 (&mm->mmap_lock){++++}-{4:4}:
+>>>> [   57.597806]        __lock_acquire+0x17cc/0x2330
+>>>> [   57.597814]        lock_acquire+0x138/0x400
+>>>> [   57.597822]        __might_fault+0x7c/0xc0
+>>>> [   57.597830]        filldir64+0xe8/0x390
+>>>> [   57.597839]        dcache_readdir+0x80/0x2d4
+>>>> [   57.597846]        iterate_dir+0xd8/0x1d4
+>>>> [   57.597855]        sys_getdents64+0x88/0x2d4
+>>>> [   57.597864]        system_call_exception+0x130/0x360
+>>>> [   57.597872]        system_call_common+0x160/0x2c4
+>>>> [   57.597881]
+>>>>                other info that might help us debug this:
+>>>>
+>>>> [   57.597888] Chain exists of:
+>>>>                  &mm->mmap_lock --> &q->debugfs_mutex --> &sb->s_type->i_mutex_key#3
+>>>>
+>>>> [   57.597905]  Possible unsafe locking scenario:
+>>>>
+>>>> [   57.597911]        CPU0                    CPU1
+>>>> [   57.597917]        ----                    ----
+>>>> [   57.597922]   rlock(&sb->s_type->i_mutex_key#3);
+>>>> [   57.597932]                                lock(&q->debugfs_mutex);
+>>>> [   57.597940]                                lock(&sb->s_type->i_mutex_key#3);
+>>>> [   57.597950]   rlock(&mm->mmap_lock);
+>>>> [   57.597958]
+>>>>                 *** DEADLOCK ***
+>>>>
+>>>> [   57.597965] 2 locks held by ls/4605:
+>>>> [   57.597971]  #0: c0000000137c12f8 (&f->f_pos_lock){+.+.}-{4:4}, at: fdget_pos+0xcc/0x154
+>>>> [   57.597989]  #1: c0000018e27c6810 (&sb->s_type->i_mutex_key#3){++++}-{4:4}, at: iterate_dir+0x94/0x1d4
+>>>>
+>>>> Prevent the above lockdep warning by acquiring ->sysfs_lock before
+>>>> freezing the queue while storing a queue attribute in queue_attr_store
+>>>> function.
+>>>>
+>>>> Reported-by: kjain101@in.ibm.com
+>>>> Fixes: af2814149883 ("block: freeze the queue in queue_attr_store")
+>>>> Tested-by: kjain101@in.ibm.com
+>>>> Cc: hch@lst.de
+>>>> Cc: axboe@kernel.dk
+>>>> Cc: ritesh.list@gmail.com
+>>>> Cc: ming.lei@redhat.com
+>>>> Cc: gjoyce@linux.ibm.com
+>>>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+>>>> ---
+>>>>  block/blk-sysfs.c | 4 ++--
+>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+>>>> index 4241aea84161..f648b112782f 100644
+>>>> --- a/block/blk-sysfs.c
+>>>> +++ b/block/blk-sysfs.c
+>>>> @@ -706,11 +706,11 @@ queue_attr_store(struct kobject *kobj, struct attribute *attr,
+>>>>         if (entry->load_module)
+>>>>                 entry->load_module(disk, page, length);
+>>>>
+>>>> -       blk_mq_freeze_queue(q);
+>>>>         mutex_lock(&q->sysfs_lock);
+>>>> +       blk_mq_freeze_queue(q);
+>>>>         res = entry->store(disk, page, length);
+>>>> -       mutex_unlock(&q->sysfs_lock);
+>>>>         blk_mq_unfreeze_queue(q);
+>>>> +       mutex_unlock(&q->sysfs_lock);
+>>>>         return res;
+>>>
+>>> We freeze queue first in __blk_mq_update_nr_hw_queues() in which
+>>> q->sysfs_lock is acquired after the freezing.
+>>>
+>>> So this simple fix may trigger a new ABBA warning.
+>>>
+>> Oops! yes I agree. 
+>>
+>> How about (in addition to the current patch) updating __blk_mq_update_nr_hw_queues()
+>> so that we acquire q->sysfs_lock before freezing the queue? In fact, I tried it (and
+>> ensured that __blk_mq_update_nr_hw_queues() is triggered so that lockdep can track lock 
+>> state and its dependencies) and that appears to be working good - no more lockdep 
+>> warning. For reference attached the diff, in case, you want to have a look. Please let
+>> me know. 
+> 
+> I think the idea is good since we grab ->syfs_lock before freezing queue
+> for long time, and the lock order is changed just since af2814149883 ("block: freeze
+> the queue in queue_attr_store"). And no one should try to acquire
+> ->syfs_lock in io code path.
+> 
+> Also the patch improves the naughty updating_hw_queues code path too.
+> 
+Thanks for reviewing the patch! 
+I'll submit a formal patch with those changes included.
+
+Thanks,
+--Nilay
+
