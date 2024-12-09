@@ -1,61 +1,61 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43C0153BFC;
-	Mon,  9 Dec 2024 16:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1012216E29;
+	Mon,  9 Dec 2024 16:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733763468; cv=none; b=hRtSnEoVxo5cZDhRpBH98M93ay1mE7Gv1h8YNj8jtNR4gGbNoYtytRgaryHBT7hdleClZ/ifWf2rcqK80mnpGUBQMHj/b2aPJuJyi/5aQp83BOQaNYUKn/zDvlNxPMvT5yFgxwDqRZZ9fVxntXUg0yA7RRzXC+FjMWNqe6PMtw4=
+	t=1733763471; cv=none; b=GFpwcby8ZMM6wYIIiL2ujU78SZuZXHC5Is77EW9sdfnUmHD7Wqj0nFTCrOws404Qy76HvCalhgEdEsdwVuYzFVVU567/ew0V+lJA0U1pozQyFVF23QhzGZCnLlxC4LC7Q8QkaIHPV94Ne6MbyiEJ1A6qC+yhUoeGzJ8EEX29ZLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733763468; c=relaxed/simple;
-	bh=o73P0u9wkOskRPgIGm239nyVo3oCprnaYIYczJzZ2bQ=;
+	s=arc-20240116; t=1733763471; c=relaxed/simple;
+	bh=UL1umb3+OKKP4NIwwX2YKxMLyMq+sGP8UkjwENxBpNc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JH5lRNNHBUhRmhd2k1Ec05TraEgjCMpssW6RJ92yWzQB8X4IlQ8O8+UBleB7a9tlqVhFAYbPlQPKqDtXliNArEM3ehPvqAO2PyFFHu1299ZRxk3h/hXNTOdXjm5elc1RnPC3cor4LRE6phZ6yHzEHNboKuSB0YDeNSix6Gdkf7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KQOUEAq5; arc=none smtp.client-ip=209.85.210.179
+	 MIME-Version; b=SkumpaCdf2Qh6JL7s7A0b029zftk8xQ9u2SlNR7bRW4Pniv5JGSb4yeJSS4G6TLuMtJh6PfCpLiapNxWM5Mcz3cemCgS8DjTForWC73q9CE8fOSAWF60LtbYzzv5MROZSPFB8kfgzQ25GsP2K5zt25faWcw+zLl8Z/9pk8C8GOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Si5W1kj1; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KQOUEAq5"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-725ad59ad72so3183673b3a.2;
-        Mon, 09 Dec 2024 08:57:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Si5W1kj1"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-725ee27e905so1286034b3a.2;
+        Mon, 09 Dec 2024 08:57:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733763466; x=1734368266; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733763469; x=1734368269; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:reply-to:references
          :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=sUP+2JyKnLRQco8QsCJe4ce6gkYVIGp7F338G8iPtHg=;
-        b=KQOUEAq5KJCGoew+Ng+S+2PA9fmvr2sHX0DX154tUgwXhOq2YQKQ4yGGS7U6AwCLRk
-         jWH7erumn7Nl7Aspfx23opOnitVe4cm3sRUS8J9x2TFAcZKJPJG2MBZMB+9GEd3ySqTd
-         ePtUO65Bn6u3z94RvVx+SpoTdNrLk6uM5wcBtonKBa7UOcWLqS5wmm82IanlXH2ygPq4
-         Az4ToMGVVxOnjRQQMoJUfcqpGlIIKCQU2P8bjW2jSI7ZbR/YOxIZZ/akiwtsKchHPrzy
-         vA1+/FeK4Rhu9gKKO6QAYS5T9/H/FNfgbiEI9OhSU2FyzS0JCaPCap85yOHBKwkIQKAc
-         zIPQ==
+        bh=TWIw0hhAH4VJQ0Z+LUoADX7ca43ciXjofF1Ce/M4dOk=;
+        b=Si5W1kj1kx6JtFcVJodNDB0BX3JJq8N+xV7UBfjg42LQTNglJTMhe7v2g8AnrlwLUU
+         uEmXSyuFll5qwCSvkoyMdxwivH0v/dwxrLyQtpxHEDG7rUwAtCcSpTz3oSONoEhx25vY
+         RPuaGW7rPupDp2rUjRDlaudBPb90iehiprXzN6wfip7tCRWx1fW9Fcbht9iBBPNJMzW0
+         2zqEPN90XTtmxN3gCIJ7nAFEiM2fScTunQSJPIncsNl5MOSFBFNS1teVh06pNQ3PvXlc
+         kjmpbHiR/gBfkatW7qqViYz7Ivud1mCXRGqn6o30tlXoBz3GsUmPmj3OPTHX1ot4KUPw
+         Mu2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733763466; x=1734368266;
+        d=1e100.net; s=20230601; t=1733763469; x=1734368269;
         h=content-transfer-encoding:mime-version:reply-to:references
          :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=sUP+2JyKnLRQco8QsCJe4ce6gkYVIGp7F338G8iPtHg=;
-        b=TikSqwZF5MscpF0f8IZ2L9UBdXT/KL3itylf3ckCT31OFKnRNZWfLoaA8JA2vxvejm
-         yhynmhDNfzhWME6+bN9/d4njjJPpjrXFq7FMzGfHcMGgE044Y9Ky/runu49/WNb7y7zn
-         6g3myrKj8QZvPqZcUEyk2lcslYEPLtPbmi9TBwyePBATKmR+mao8M0PFkUjyfAH+vt4a
-         eBviV0WeN8lE3yDtdzh8aYgbO3oMiZFYhb3LEkOeQPq9o6MSqtK7m+vwb7KF5oPu5XR2
-         Yrz59vXzbw+ocqk+DhCy2csk5mxZi/+uxttYNkntZ0lq20B730ZwQmPOpm+UTsdpILZ3
-         MujA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5vb7pIFRzqBu3xHhkIVaI5Ba3Sl5mNB1vhOWSA6oCS9t39guhAGfaHY0S03xZzbxyTBKjjQAzhdPuST7s@vger.kernel.org, AJvYcCUYdcEMUj6zCMl4dwhSgC5hscduckIpMcFzgIO7G40tN0LcP9ghhQPgPVlJCn8yMnuzgw0QmPVMKmyP/w==@vger.kernel.org, AJvYcCXk2tBx664d0PJ62mGw0010PiyVV8uyBBh+RdiK24xSaueCjmEIuEaB5Lx0frkwXgYmn8zdyEAm@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8jOVYjuk8e7ybOGF3iBPC7ti1PJntowhcTRsmmRlPW29E6uID
-	4IB8Iq9CRNYVebjpoVNxIZp6Q2ZbJImp4CE2SdWcF4b2Ku6rttQiMcIODIKekPpgHg==
-X-Gm-Gg: ASbGncs35upb5W7t7WOLTLPuOULj32+SXsByluTeiwLAfk6B2L/o4KpvfyPL3tjg7WH
-	mYVssM3wo8017deqD8wIV1b3BYXJSmxW06c+BINTQ24owP5geuedS/q1bCBKuIt0PwElLBZ4PWG
-	BGZbamYoMYTXWjCigm3jEUmAhhOTgJHMsyDZC8muYwYJSLiLtoq/TM9YXMghlar9eKcRAjRZGae
-	yuEyyHYHJ7cwqd3nTHXX+kjJcTA/2Ri/XpXYUixsig3qeHH7Ktdo33mMP4QbdPF+bsglEQ=
-X-Google-Smtp-Source: AGHT+IFU9XNL4TYYMN57+MI1JthzbOjTs3oeXC9tvV2S1ujsyt7L/AjZO37t5fVZBxfj6fd+QgbvFA==
-X-Received: by 2002:a05:6a21:e88:b0:1e1:a6a6:848 with SMTP id adf61e73a8af0-1e1a6a60975mr9194204637.25.1733763466179;
-        Mon, 09 Dec 2024 08:57:46 -0800 (PST)
+        bh=TWIw0hhAH4VJQ0Z+LUoADX7ca43ciXjofF1Ce/M4dOk=;
+        b=m5kHAXtwdDvdyz5vqr3bvlV7TFbUJfH3uUosrL5FgU4aEbwuKZCbLxGorLgHzJgvx2
+         I4sJ/y1JwC8prn5fR71Uj2ZAuIJDreWkG2lPjDKxdOI4uu4O6DlvycziohgP+mc9W+Ho
+         GwjwTZpnM2zwpoKS5taRO/DCBa584ZRuhk6qfMYekXWQj9LSGLwhGOn1Fx9xPDdmLkjR
+         WLlq6HrFPCgTXcWTU33Lc2MgqXdbdjzvHhhWn1zF713afK6nxP2s1TElLzspuYMektbS
+         Qy36FGRW70xbL6Ivw1lWPvmYTer07pGUFCm9032rl2cHiO863Am3cPXOtuhn2OXOLIcZ
+         LqVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWA5+vD6po7hJAgIjMCqTTWHhNTEWHlHCkvrqtCfy0EErRck3pEPFHDs20Ks5+jd2tR2sc2b9LS@vger.kernel.org, AJvYcCWYgQRfIvXzYzGjZTfj5TkD4XsiQqtfPzKeeuHBGqO2tCCQjLKQUWo7isVOWRsB66YdKKADPjnmzeIivQ==@vger.kernel.org, AJvYcCWs/o2xaxmryXty5LMAsX7KtPz7FbgsZZVpAwV7r2knj+miriteInGZLxs9SemG2rEzMv0lrQxEO1uNcOVr@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyfAeZOBrWyxWA7xU44mv/vRunwGbVK4ajIClJ0xqregk1hciN
+	ZwVRczVQ5l3hdHiRJxA5C39su++BgReP2mmJe0e3EyU+JYngh0Tt
+X-Gm-Gg: ASbGncvwIY2+4EtuBiX68lUpkBGOQBaeUgBOdGEX7mSx08nD3ggl0081qcgAkapC/Sd
+	SDV8CY6/Uj/laKnOlETyzJ1soLFwVI62X8MY41pdcrgyK+5LwCu3qoBZ94anL7oG9cY41BpK1MG
+	obzEuJj54gaPWgsq91WmetaY0Xr8EaM/Qkhwe3ZgMXqS7OoGjAzT3Rdv1ldm10Nq6JSJonsmhsg
+	LmrhqXVLmH1QXS+zHOTgLN+RA7jvAyrbWIdHhJaeRTaKMgZvUgXEOkqPQWK7Rxnkf0J8pY=
+X-Google-Smtp-Source: AGHT+IGPb5h1KzA7h2yK1etF1SPW3948xDox8qr2YCpFm0ctolrhSkaAbYueqzrsyOSh5QsXCLFdsg==
+X-Received: by 2002:a05:6a00:2e0f:b0:726:f7c9:7b28 with SMTP id d2e1a72fcca58-726f7c97e8emr3032663b3a.8.1733763468992;
+        Mon, 09 Dec 2024 08:57:48 -0800 (PST)
 Received: from KASONG-MC4.tencent.com ([106.37.120.120])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7273c7f3f1fsm514201b3a.13.2024.12.09.08.57.43
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7273c7f3f1fsm514201b3a.13.2024.12.09.08.57.46
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 09 Dec 2024 08:57:45 -0800 (PST)
+        Mon, 09 Dec 2024 08:57:48 -0800 (PST)
 From: Kairui Song <ryncsn@gmail.com>
 To: linux-mm@kvack.org
 Cc: Minchan Kim <minchan@kernel.org>,
@@ -66,9 +66,9 @@ Cc: Minchan Kim <minchan@kernel.org>,
 	Kairui Song <kasong@tencent.com>,
 	Desheng Wu <deshengwu@tencent.com>,
 	stable@vger.kernel.org
-Subject: [PATCH v2 1/2] zram: refuse to use zero sized block device as backing device
-Date: Tue, 10 Dec 2024 00:57:15 +0800
-Message-ID: <20241209165717.94215-2-ryncsn@gmail.com>
+Subject: [PATCH v2 2/2] zram: fix uninitialized ZRAM not releasing backing device
+Date: Tue, 10 Dec 2024 00:57:16 +0800
+Message-ID: <20241209165717.94215-3-ryncsn@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241209165717.94215-1-ryncsn@gmail.com>
 References: <20241209165717.94215-1-ryncsn@gmail.com>
@@ -83,44 +83,55 @@ Content-Transfer-Encoding: 8bit
 
 From: Kairui Song <kasong@tencent.com>
 
-Setting a zero sized block device as backing device is pointless, and
-one can easily create a recursive loop by setting the uninitialized
-ZRAM device itself as its own backing device by (zram0 is uninitialized):
+Setting backing device is done before ZRAM initialization.
+If we set the backing device, then remove the ZRAM module without
+initializing the device, the backing device reference will be leaked
+and the device will be hold forever.
 
-    echo /dev/zram0 > /sys/block/zram0/backing_dev
-
-It's definitely a wrong config, and the module will pin itself,
-kernel should refuse doing so in the first place.
-
-By refusing to use zero sized device we avoided misuse cases
-including this one above.
+Fix this by always reset the ZRAM fully on rmmod or reset store.
 
 Fixes: 013bf95a83ec ("zram: add interface to specif backing device")
 Reported-by: Desheng Wu <deshengwu@tencent.com>
+Suggested-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 Signed-off-by: Kairui Song <kasong@tencent.com>
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: stable@vger.kernel.org
 ---
- drivers/block/zram/zram_drv.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/block/zram/zram_drv.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 3dee026988dc..e86cc3d2f4d2 100644
+index e86cc3d2f4d2..45df5eeabc5e 100644
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -614,6 +614,12 @@ static ssize_t backing_dev_store(struct device *dev,
- 	}
+@@ -1444,12 +1444,16 @@ static void zram_meta_free(struct zram *zram, u64 disksize)
+ 	size_t num_pages = disksize >> PAGE_SHIFT;
+ 	size_t index;
  
- 	nr_pages = i_size_read(inode) >> PAGE_SHIFT;
-+	/* Refuse to use zero sized device (also prevents self reference) */
-+	if (!nr_pages) {
-+		err = -EINVAL;
-+		goto out;
-+	}
++	if (!zram->table)
++		return;
 +
- 	bitmap_sz = BITS_TO_LONGS(nr_pages) * sizeof(long);
- 	bitmap = kvzalloc(bitmap_sz, GFP_KERNEL);
- 	if (!bitmap) {
+ 	/* Free all pages that are still in this zram device */
+ 	for (index = 0; index < num_pages; index++)
+ 		zram_free_page(zram, index);
+ 
+ 	zs_destroy_pool(zram->mem_pool);
+ 	vfree(zram->table);
++	zram->table = NULL;
+ }
+ 
+ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+@@ -2326,11 +2330,6 @@ static void zram_reset_device(struct zram *zram)
+ 
+ 	zram->limit_pages = 0;
+ 
+-	if (!init_done(zram)) {
+-		up_write(&zram->init_lock);
+-		return;
+-	}
+-
+ 	set_capacity_and_notify(zram->disk, 0);
+ 	part_stat_set_all(zram->disk->part0, 0);
+ 
 -- 
 2.47.1
 
