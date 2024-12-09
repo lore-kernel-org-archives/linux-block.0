@@ -1,48 +1,48 @@
 Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7469A35940;
-	Mon,  9 Dec 2024 18:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC32E19343B
+	for <linux-block@vger.kernel.org>; Mon,  9 Dec 2024 19:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733768156; cv=none; b=aFQiIVT9iNLY8NeEjnwVubVCqjoV5nH5TKV4KR6M7P65MLgknTpxqWgV74F67vyyr6WuJXWM3bTrSQ+7q9LcIPmvTvGwJwwAyaBgPlLfdMbGzajePPmFLJRqsv3w44MOG0G+7+yvguE6tWz93jquYiLXZAiOS5xmrYK/whDx0vY=
+	t=1733771331; cv=none; b=n434T9B898gSzlVRMboJHZwGmH8ldXsd7u4r6vAFGlcB9BCx/bF2dqy5jVnOtHpmHzWjI5LsQJkqU3OUMTjnmBmNMb1AkRv+IqgVkJMax8t9yUS8o9oFY7lVBCY1q9YNe5PH+Jg2LXlT8HaUxozAvjkWW/C2Lkm/RvqkI7iPuBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733768156; c=relaxed/simple;
-	bh=+VNaXCdCBUo8fhtWnSkUoEHA3l1GNctqMXNx4aGLi8Y=;
+	s=arc-20240116; t=1733771331; c=relaxed/simple;
+	bh=27BVwxEAkS+WJUucjkmgo+xMS2RqIJk2ppibsi24YeE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Et+R1bb8Su9p6VzVWgdwM9XVr4TpBkEZZAHDto7zN/Kpstyxh77e7wkf2BhYe0M4QuYqSMhkso8Vh+nolp6l1zdWYkIXQrBoq5GpkTXW641t2y5gFT9B9N2IUuzwUGUpvmJYYPwTECm75o+E9mUUMTEJVXOnd0enBWwzKMSAREM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=OvG1zj3y; arc=none smtp.client-ip=199.89.1.12
+	 In-Reply-To:Content-Type; b=ZLuzSnkIxX/VrGxvm9r8nvqAvle5cFDB/NkL57GdTV27ojXwymjO5poZ/H8QaJWW1YVUNebfxRF4zTxUPjEuGI569u8aQQxkA0VC3uvWu5/6+8E5iOuFrsmivjhCBpsxUxPyxjV3eSqPSnMPONQ2pDSW/dFoCXsZagsvRU7CXUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=R0JdtDmf; arc=none smtp.client-ip=199.89.1.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="OvG1zj3y"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="R0JdtDmf"
 Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Y6VLt4w3zzlfflY;
-	Mon,  9 Dec 2024 18:12:06 +0000 (UTC)
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Y6WcK1tFMzlfflk;
+	Mon,  9 Dec 2024 19:08:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1733767922; x=1736359923; bh=XbavAQT2tBD2N+OkH44rTIHU
-	HOUIf131SRpW4H9G6FU=; b=OvG1zj3yKFBbYeIZ9j8he6IvAsj/VekkQ5ILAncq
-	sLJnLVNmkrqzVCuPfp2hhVM1TR2IRjTwSyYkLmgH6K9AOsvf2DTSzH80vamGk4xM
-	s8WUM89nhXayBB+9HVkaCYHSSdkcbaoQvj65SJbw+0HBRivsSI/RlxbeKfbg/VbF
-	Pii3izARckdqeC3cdUkl4dHN7GEQAYrf3P3pDCTnG6iwA6PydSaM17txTn6QgPLK
-	jpHyyPdpnaMpiYrGRv/RwSvhL7csJhHmyA4d/TkXM6XH7dQbX3OFccnZFgYgbhnU
-	UyxSkfdo8xNa3fvTwZch5dsHnVEEV2YVRCn/c3p8tVMQug==
+	 s=mr01; t=1733771326; x=1736363327; bh=zG7nlKwna2RWVUMn4gBhjGga
+	oO2d8yzxCwG9qi6Wcb8=; b=R0JdtDmf7c/M87aCZesuCpzioiPUrWX2foPYuBxS
+	QC2mrkl9CTPrlMfFzKvCUAy4WrVfxy9sKHxjrJHpmxe2AHm9wzpYE5hSSM2Y2yeO
+	qbNqkBLWCBGxm7KcZtQxXhun4fvJXKNHIqiS3y8+csF4CC67cxpXbGRnWStiI8Ax
+	qKSXcCyAtQF4xm9ipmWfcRd4QMiPfKHaf3G1ArAEy+e63M3ftQJMh807AEDq6EPk
+	MuvVxmmuwVc2e+nRxyyZTa7JTyKKLuF/kz1ep6hKAnq0u6KCMDaEnY4dFxlbzyaV
+	4tstlE5YTKVCL/ewl6Oyzkg+Lc2l3Ll4PxdnwBZIMDnr9A==
 X-Virus-Scanned: by MailRoute
 Received: from 009.lax.mailroute.net ([127.0.0.1])
  by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id G_7sSOhAz231; Mon,  9 Dec 2024 18:12:02 +0000 (UTC)
-Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+ id cY6Hy3_GoWU3; Mon,  9 Dec 2024 19:08:46 +0000 (UTC)
+Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Y6VLh2NrQzlfflB;
-	Mon,  9 Dec 2024 18:11:55 +0000 (UTC)
-Message-ID: <3e401555-e971-44c2-b9a4-5c746baaca8a@acm.org>
-Date: Mon, 9 Dec 2024 10:11:54 -0800
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Y6WcC6vdCzlgVnf;
+	Mon,  9 Dec 2024 19:08:43 +0000 (UTC)
+Message-ID: <b3bb69a1-9b0c-4d77-9498-c8bbd536452d@acm.org>
+Date: Mon, 9 Dec 2024 11:08:42 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,38 +50,35 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 3/3] lib/sbitmap: fix shallow_depth tag allocation
-To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
- akpm@linux-foundation.org, yang.yang@vivo.com, ming.lei@redhat.com,
- yukuai3@huawei.com, osandov@fb.com, paolo.valente@linaro.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com
-References: <20241209115522.3741093-1-yukuai1@huaweicloud.com>
- <20241209115522.3741093-4-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH v2 2/2] block/mq-deadline: Fix the tag reservation code
+To: Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Damien Le Moal <dlemoal@kernel.org>, Zhiguo Niu <zhiguo.niu@unisoc.com>,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20240509170149.7639-1-bvanassche@acm.org>
+ <20240509170149.7639-3-bvanassche@acm.org>
+ <8df3fd04-08ef-7aab-77d0-a919a09838a0@huaweicloud.com>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20241209115522.3741093-4-yukuai1@huaweicloud.com>
+In-Reply-To: <8df3fd04-08ef-7aab-77d0-a919a09838a0@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/9/24 7:55 PM, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On 12/6/24 6:17 PM, Yu Kuai wrote:
+> We're comparing v6.6 and v5.10 performance in downstream kernel, we
+> met a regression and bisect to this patch. And during review, I don't
+> understand the above change.
 > 
-> Currently, shallow_depth is used by bfq, kyber and mq-deadline, they both
-> pass in the value for the whole sbitmap, while sbitmap treate the value
-> for just one word. Which means, shallow_depth never work as expected,
-> and there really is no such functional tests to covert it.
+> For example, dd->async_depth is nr_requests, then dd_to_word_depth()
+> will just return 1 << bt->sb.shift. Then nothing will be throttled.
 
-treate -> treats
+(just back from traveling)
 
-The above text is incorrect. I have verified that shallow_depth 
-restricts the queue depth of asynchronous requests for mq-deadline if it
-is reduced from its default value. The function dd_word_to_depth() in
-mq-deadline converts the value written into the sysfs attribute into a
-value that is appropriate for the sbitmap implementation.
-
-That being said, it seems like a good idea to me to modify how the
-sbitmap code interprets 'shallow_depth'.
+As explained in the description of commit 39823b47bbd4 ("block/mq-
+deadline: Fix the tag reservation code"), the default value of
+async_depth has been changed from 3 * q->nr_requests / 4 into
+q->nr_requests to fix a performance regression. The value of
+dd->async_depth can be changed through sysfs.
 
 Thanks,
 
