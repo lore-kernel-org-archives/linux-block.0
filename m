@@ -1,299 +1,76 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3CF23ED5E
-	for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 20:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C61E23ED5E;
+	Tue, 10 Dec 2024 20:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733862043; cv=none; b=kGYT64nnBINX+U8wCRBXr/yRNuR6/bhqGcgh3hvQWOvbVHPZ7iwf60ILgbXTDRsLyIuHfTkZFV6C5joxhDedi0qI+j1vVO4HYOrJQRQ0D+fge2HS7GGXDoEEPjlZLGE7+zlOPd2H8Msg4r5M2RjhKAKU2I0WHxPuo8qTYYLM6u0=
+	t=1733862133; cv=none; b=DdGJHHB4pf0OyEeT+reQn4REAxyFLknSjcQ91EpJzMxS9V1E1FbfGhDUOETBTUYV+Y+mW1Kg6bnfsXeVy0vzSQULiF7+wqTLTjh0RTrfjuDLaht+tZ5VoaG+Zee8si7Ew/jgiE2HUBDYsC4d4i0yW97a9mlSZB+w1FSZhNz8F1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733862043; c=relaxed/simple;
-	bh=XSYbfQssCKJmZyH36P/jxlzPZAATgx4U8L30BcYUU2k=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PDu8AyPkY/nFnEM/oo43gVf8lFySqNMW9mmwyklNyzfs8vj2TGpzSDaHp7NuRFTIY2PUq3ndaiJHsc96gPUeEZASfmvDEYyudlbJUwkgjKxCehL28memFVlHPeIkr2BzRNAxiXzpTW0AEOy5oADobkF8EEz4Ljd4UjG3ytbLTco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=a9wj6GLM; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1733862133; c=relaxed/simple;
+	bh=6QRlDVT8aAvhb9sv6+l39Em9VkkXoSHVkNDik7ogRdM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g0NqlAwdMeYRyagE6Donh41NfHhwmnkY5H449B2e5tXuq98yqZ6C/FXJY6X1no0OD6P0eiJxYM1a/MUz5Km1zgSjbMJTveeiFOasG+rtztkpnwL9MSvOGIG4qkxTN9mVFWwctOYKXUmJ6iIo/OcvC8PG1sUo/I7NwXSL4QdiDcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=nKGMjNBq; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="a9wj6GLM"
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BAHutNh029191
-	for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 12:20:41 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=OeAFDFh9nDrzvjn6Ci3E1x+se/W+HHmUUWFaWlwZTnk=; b=a9wj6GLMA11F
-	WEUqOQTu37AEgKkKLivQe+NgFDwUvbubrwBFIl+6dXGMVweiglEyUfqQkQ3yW+Nf
-	mrcjbDvcFwKjBxjd1fL0hn3sGicoowq/3f+UAocB8dWBK+J3XTeDmRbKeSVeVsN5
-	DefdKEB0NZNDlyQ9DPjHPHTVWmBmSyHFRbG0HIsjFy6McwPqqdzhVHh+omJ1O3Ic
-	EfEtPwRq+zYwdYCMUqoxE7qdWxoIH8YCNQDiwVmE+FzYIda8WqTXExtnMjms01E/
-	TABJev7V3INYhRrVjdh9l5idp6eJXiG8uw/0VgUTeKPN+p3WBosm7NMfI+mkhVXT
-	EWxMMC9A5Q==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 43etg995w9-5
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 12:20:41 -0800 (PST)
-Received: from twshared40462.17.frc2.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Tue, 10 Dec 2024 20:20:37 +0000
-Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id D0DAD15D5C7D4; Tue, 10 Dec 2024 11:48:08 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <axboe@kernel.dk>, <hch@lst.de>, <linux-block@vger.kernel.org>,
-        <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
-        <io-uring@vger.kernel.org>
-CC: <sagi@grimberg.me>, <asml.silence@gmail.com>, <anuj20.g@samsung.com>,
-        <joshi.k@samsung.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv13 10/11] nvme: register fdp parameters with the block layer
-Date: Tue, 10 Dec 2024 11:47:21 -0800
-Message-ID: <20241210194722.1905732-11-kbusch@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241210194722.1905732-1-kbusch@meta.com>
-References: <20241210194722.1905732-1-kbusch@meta.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="nKGMjNBq"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Y79BW36MVzlffky;
+	Tue, 10 Dec 2024 20:22:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1733862129; x=1736454130; bh=lbBlmFrFypE/E4umxPXn1kWk
+	zm2D7qTPxypNvNpiZn8=; b=nKGMjNBqnpBRURL735CgULKSmDr34vl4MUr96Ofo
+	cwRu2HlWG4CcMRGoBsSj5f/PyqzxEibOIfyLnYLj82DoEQsnkG3ooVwcQrNQGFFV
+	cdH07JLChMdAxYJUG5QBma1yabhkOuQI48rHVygnmdTqOZYCIypjLXmrvqZhmyLr
+	vCBkz6H6PynS06XtvtR5o6SJRjfpDIZGFlGOD6fhZGOp5P9TIYgcUj6uL5ZHdzK4
+	qrweTe6NAACnuGJ9ACcaaUmP0KJQs/O0NbTLHgsVGpcfhQa3mSB6JhiM0OZRBfCj
+	bbF7/u8PcynsHOHrYbhTGrW5wPAqOsSCswzhA5idwF24Eg==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id efo6L0c1psa2; Tue, 10 Dec 2024 20:22:09 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Y79BS48ybzlfl5W;
+	Tue, 10 Dec 2024 20:22:08 +0000 (UTC)
+Message-ID: <ad413055-1f98-4f72-af03-80a07d261de2@acm.org>
+Date: Tue, 10 Dec 2024 12:22:07 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: BEOA_qgTDev16uzxd7EFgYIBS9Gn9ZHt
-X-Proofpoint-GUID: BEOA_qgTDev16uzxd7EFgYIBS9Gn9ZHt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] THE INITIAL VALUE OF wp_offset MAY BE NOT THE POWER OF 2
+To: Atharva Tiwari <evepolonium@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241210062340.2386-1-evepolonium@gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20241210062340.2386-1-evepolonium@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Keith Busch <kbusch@kernel.org>
+On 12/9/24 10:23 PM, Atharva Tiwari wrote:
+> @@ -530,7 +531,7 @@ static struct blk_zone_wplug *disk_get_and_lock_zone_wplug(struct gendisk *disk,
+>   	spin_lock_init(&zwplug->lock);
+>   	zwplug->flags = 0;
+>   	zwplug->zone_no = zno;
+> -	zwplug->wp_offset = sector & (disk->queue->limits.chunk_sectors - 1);
+> +	zwplug->wp_offset = bdev_offset_from_zone_start(disk->part0, sector);
+>   	bio_list_init(&zwplug->bio_list);
+>   	INIT_WORK(&zwplug->bio_work, blk_zone_wplug_bio_work);
+>   	zwplug->disk = disk;
 
-Register the device data placement limits if supported. This is just
-registering the limits with the block layer. Nothing beyond reporting
-these attributes is happening in this patch.
-
-Merges parts from a patch by Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/linux-nvme/20241119121632.1225556-15-hch@ls=
-t.de/=20
-
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- drivers/nvme/host/core.c | 139 +++++++++++++++++++++++++++++++++++++++
- drivers/nvme/host/nvme.h |   2 +
- 2 files changed, 141 insertions(+)
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index c2a3585a3fa59..f7aeda601fcd6 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -38,6 +38,8 @@ struct nvme_ns_info {
- 	u32 nsid;
- 	__le32 anagrpid;
- 	u8 pi_offset;
-+	u16 endgid;
-+	u64 runs;
- 	bool is_shared;
- 	bool is_readonly;
- 	bool is_ready;
-@@ -1613,6 +1615,7 @@ static int nvme_ns_info_from_identify(struct nvme_c=
-trl *ctrl,
- 	info->is_shared =3D id->nmic & NVME_NS_NMIC_SHARED;
- 	info->is_readonly =3D id->nsattr & NVME_NS_ATTR_RO;
- 	info->is_ready =3D true;
-+	info->endgid =3D le16_to_cpu(id->endgid);
- 	if (ctrl->quirks & NVME_QUIRK_BOGUS_NID) {
- 		dev_info(ctrl->device,
- 			 "Ignoring bogus Namespace Identifiers\n");
-@@ -1653,6 +1656,7 @@ static int nvme_ns_info_from_id_cs_indep(struct nvm=
-e_ctrl *ctrl,
- 		info->is_ready =3D id->nstat & NVME_NSTAT_NRDY;
- 		info->is_rotational =3D id->nsfeat & NVME_NS_ROTATIONAL;
- 		info->no_vwc =3D id->nsfeat & NVME_NS_VWC_NOT_PRESENT;
-+		info->endgid =3D le16_to_cpu(id->endgid);
- 	}
- 	kfree(id);
- 	return ret;
-@@ -2147,6 +2151,127 @@ static int nvme_update_ns_info_generic(struct nvm=
-e_ns *ns,
- 	return ret;
- }
-=20
-+static int nvme_query_fdp_granularity(struct nvme_ctrl *ctrl,
-+				      struct nvme_ns_info *info, u8 fdp_idx)
-+{
-+	struct nvme_fdp_config_log hdr, *h;
-+	struct nvme_fdp_config_desc *desc;
-+	size_t size =3D sizeof(hdr);
-+	int i, n, ret;
-+	void *log;
-+
-+	ret =3D nvme_get_log_lsi(ctrl, 0, NVME_LOG_FDP_CONFIGS, 0,
-+			       NVME_CSI_NVM, &hdr, size, 0, info->endgid);
-+	if (ret) {
-+		dev_warn(ctrl->device,
-+			 "FDP configs log header status:0x%x endgid:%x\n", ret,
-+			 info->endgid);
-+		return ret;
-+	}
-+
-+	size =3D le32_to_cpu(hdr.sze);
-+	h =3D kzalloc(size, GFP_KERNEL);
-+	if (!h) {
-+		dev_warn(ctrl->device,
-+			 "failed to allocate %lu bytes for FDP config log\n",
-+			 size);
-+		return -ENOMEM;
-+	}
-+
-+	ret =3D nvme_get_log_lsi(ctrl, 0, NVME_LOG_FDP_CONFIGS, 0,
-+			       NVME_CSI_NVM, h, size, 0, info->endgid);
-+	if (ret) {
-+		dev_warn(ctrl->device,
-+			 "FDP configs log status:0x%x endgid:%x\n", ret,
-+			 info->endgid);
-+		goto out;
-+	}
-+
-+	n =3D le16_to_cpu(h->numfdpc) + 1;
-+	if (fdp_idx > n) {
-+		dev_warn(ctrl->device, "FDP index:%d out of range:%d\n",
-+			 fdp_idx, n);
-+		/* Proceed without registering FDP streams */
-+		ret =3D 0;
-+		goto out;
-+	}
-+
-+	log =3D h + 1;
-+	desc =3D log;
-+	for (i =3D 0; i < fdp_idx; i++) {
-+		log +=3D le16_to_cpu(desc->dsze);
-+		desc =3D log;
-+	}
-+
-+	if (le32_to_cpu(desc->nrg) > 1) {
-+		dev_warn(ctrl->device, "FDP NRG > 1 not supported\n");
-+		ret =3D 0;
-+		goto out;
-+	}
-+
-+	info->runs =3D le64_to_cpu(desc->runs);
-+out:
-+	kfree(h);
-+	return ret;
-+}
-+
-+static int nvme_query_fdp_info(struct nvme_ns *ns, struct nvme_ns_info *=
-info)
-+{
-+	struct nvme_ns_head *head =3D ns->head;
-+	struct nvme_ctrl *ctrl =3D ns->ctrl;
-+	struct nvme_fdp_ruh_status *ruhs;
-+	struct nvme_fdp_config fdp;
-+	struct nvme_command c =3D {};
-+	size_t size;
-+	int ret;
-+
-+	/*
-+	 * The FDP configuration is static for the lifetime of the namespace,
-+	 * so return immediately if we've already registered this namespaces's
-+	 * streams.
-+	 */
-+	if (head->nr_plids)
-+		return 0;
-+
-+	ret =3D nvme_get_features(ctrl, NVME_FEAT_FDP, info->endgid, NULL, 0,
-+				&fdp);
-+	if (ret) {
-+		dev_warn(ctrl->device, "FDP get feature status:0x%x\n", ret);
-+		return ret;
-+	}
-+
-+	if (!(fdp.flags & FDPCFG_FDPE))
-+		return 0;
-+
-+	ret =3D nvme_query_fdp_granularity(ctrl, info, fdp.fdpcidx);
-+	if (!info->runs)
-+		return ret;
-+
-+	size =3D struct_size(ruhs, ruhsd, S8_MAX - 1);
-+	ruhs =3D kzalloc(size, GFP_KERNEL);
-+	if (!ruhs) {
-+		dev_warn(ctrl->device,
-+			 "failed to allocate %lu bytes for FDP io-mgmt\n",
-+			 size);
-+		return -ENOMEM;
-+	}
-+
-+	c.imr.opcode =3D nvme_cmd_io_mgmt_recv;
-+	c.imr.nsid =3D cpu_to_le32(head->ns_id);
-+	c.imr.mo =3D NVME_IO_MGMT_RECV_MO_RUHS;
-+	c.imr.numd =3D cpu_to_le32(nvme_bytes_to_numd(size));
-+	ret =3D nvme_submit_sync_cmd(ns->queue, &c, ruhs, size);
-+	if (ret) {
-+		dev_warn(ctrl->device, "FDP io-mgmt status:0x%x\n", ret);
-+		goto free;
-+	}
-+
-+	head->nr_plids =3D le16_to_cpu(ruhs->nruhsd);
-+free:
-+	kfree(ruhs);
-+	return ret;
-+}
-+
- static int nvme_update_ns_info_block(struct nvme_ns *ns,
- 		struct nvme_ns_info *info)
- {
-@@ -2183,6 +2308,12 @@ static int nvme_update_ns_info_block(struct nvme_n=
-s *ns,
- 			goto out;
- 	}
-=20
-+	if (ns->ctrl->ctratt & NVME_CTRL_ATTR_FDPS) {
-+		ret =3D nvme_query_fdp_info(ns, info);
-+		if (ret < 0)
-+			goto out;
-+	}
-+
- 	blk_mq_freeze_queue(ns->disk->queue);
- 	ns->head->lba_shift =3D id->lbaf[lbaf].ds;
- 	ns->head->nuse =3D le64_to_cpu(id->nuse);
-@@ -2216,6 +2347,12 @@ static int nvme_update_ns_info_block(struct nvme_n=
-s *ns,
- 	if (!nvme_init_integrity(ns->head, &lim, info))
- 		capacity =3D 0;
-=20
-+	lim.max_write_streams =3D ns->head->nr_plids;
-+	if (lim.max_write_streams)
-+		lim.write_stream_granularity =3D max(info->runs, U32_MAX);
-+	else
-+		lim.write_stream_granularity =3D 0;
-+
- 	ret =3D queue_limits_commit_update(ns->disk->queue, &lim);
- 	if (ret) {
- 		blk_mq_unfreeze_queue(ns->disk->queue);
-@@ -2318,6 +2455,8 @@ static int nvme_update_ns_info(struct nvme_ns *ns, =
-struct nvme_ns_info *info)
- 			ns->head->disk->flags |=3D GENHD_FL_HIDDEN;
- 		else
- 			nvme_init_integrity(ns->head, &lim, info);
-+		lim.max_write_streams =3D ns_lim->max_write_streams;
-+		lim.write_stream_granularity =3D ns_lim->write_stream_granularity;
- 		ret =3D queue_limits_commit_update(ns->head->disk->queue, &lim);
-=20
- 		set_capacity_and_notify(ns->head->disk, get_capacity(ns->disk));
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index c1995d89ffdb8..4b412cd8001f1 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -491,6 +491,8 @@ struct nvme_ns_head {
- 	struct device		cdev_device;
-=20
- 	struct gendisk		*disk;
-+
-+	u16			nr_plids;
- #ifdef CONFIG_NVME_MULTIPATH
- 	struct bio_list		requeue_list;
- 	spinlock_t		requeue_lock;
---=20
-2.43.5
-
+The above looks like a duplicate of this patch:
+https://lore.kernel.org/linux-block/20241107020439.1644577-1-weilongping@oppo.com/
