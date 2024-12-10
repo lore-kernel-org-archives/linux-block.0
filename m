@@ -1,205 +1,140 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D02199EA3
-	for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 08:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5BE33985
+	for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 09:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733820350; cv=none; b=uEnM/E02WJxaiT9Am8hcPDoN0B9f75LbhbcRa+olUdmsCaNsH77q0f79/8XvMvUQP3rAplg20eeNDNAYYhXeFdcWlQc/7d27nzzdlZPv0srnQnXwV7C2x7420UqWlAaBhAChgLv9ACG24Q828bm7M3IMBZkLYuqvWEBtXv21IyU=
+	t=1733822031; cv=none; b=a16VBLtMlIk3w5125EnOc9Ru8m5j3u3h4tLR2oLLQRDuOvWO4w5PvHNBtdmZvRw4HqhP/4BO7DsiuMw2eaBDAKVBSgYB97wf6rQCcSOWt3bu1OOUpXnh1m4xDXyAKVFgNgvXEBz489i0TEr41bw7MY9AfZdLCCtAbqcFT65sK0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733820350; c=relaxed/simple;
-	bh=WIWAsIkTD/ygTaEqJZlgomNhVL+0e/j6V2MWkNKDLuo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=tMyGlfMxnyla+CjceZNxSY/iaOMSZ/MbYAYsiYdZjr305X8MgzaxIN3BgfHi9N1D4XALmq2XJBxqdCaJRWctZswZ9/QxMT33xNzN/i+XANaG8UYkuxyX9BIiJMqa/zKzLdHe2b5Z/JwIk29StZiGDvTirGMGPGF3iZONuKSp7PU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bf4YECzl; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1733822031; c=relaxed/simple;
+	bh=jcAy7slIcGpuWxQPTeOKSm5z2zc/NNEUZ6qqDVcSXCQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YiNnqZ0NYuEYV47jibl/oESXroRDTtIC67DqjixXi34xPc+yJy8IqPpd6yGKBWCHC3Wb+KknE/+Ol1+zJtxg0c5ItolA3Vu4Kl3RVu6hcPTvQB9zEbLysVhPXerMroqUwA3doI0GrgyGwq0q3Cq/3xYVHHKIJJ2fgUt3j0wxFHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=WuEp2und; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bf4YECzl"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-434e398d28cso21209505e9.3
-        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 00:45:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="WuEp2und"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5401bd6cdb4so2267455e87.2
+        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 01:13:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733820347; x=1734425147; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jblJqgnONYB3Ttb04kcM1REB0r64XNYjHV8iVLuGuGg=;
-        b=bf4YECzlvCJBBvcz4bkEyZ4gxTe01o6uC3yBlu2RnA3G8huebiT4V6qTP3t0OIPQ+S
-         voTQCa9l8oj5y6pHJLC7MVBza0hxCafznlB12ZLUEs9ZVPPrKyubYuRzS3K5gAU46M2t
-         fDhjnfH9m2acYtGKgPqXV6SIfYU600lMxXTJ8UYwu47RQbd439sHfzn2kZS+w3K4iaeZ
-         t1ePVBOD2utvFaUTPB5OtPgkJr8lMCAAWJe5afrflzUKJ9TQWPAhtBQRStoDCc8Kf76R
-         e5tdNHM0Sy39JJ52IVXp5oyFKuuL9n8Yn6kryOzZctvyHT4xZMYeiBigeH2ZTJSjWWQa
-         BHmA==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1733822027; x=1734426827; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2XlZtoi6YzM5n0bDbE6udezF/JySf6HZqcQtjtNfkAs=;
+        b=WuEp2und3JnixXs54iXHHkzWwuLEkX1kTEQUhHFqeC9/gr9BKy8xrztVRlArWatnuA
+         /JzAvJmGpXWzvioUozNMgWhJD1IqDkR1ioL6/anBUwi1iBNWiWR3IDwmujAGLyMGH3j3
+         OwWzX4tdsd0E96tthfSL4ZsCm0faqPA96FOo63z4Y6ejL3jorvLfHHHF1cmwtuG9Lx+d
+         jIX7oaLQWi6A1+7B7KUh4mda9Rs9+75iKIUuopIc2U5UEXkNqvR5FG/6VyMxAElsyKGG
+         yqSTU0IzJMJjTOcgpvO+VlrpmQ3wHyJJjIwi8XQf09vUf3nvXx201kxv1N2eoLdU1d4M
+         2/Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733820347; x=1734425147;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jblJqgnONYB3Ttb04kcM1REB0r64XNYjHV8iVLuGuGg=;
-        b=ppXBcceihdPmYVeC4RSbp4JhNIvaH/j5XJYqvMYtGNNHNrzQ8hfO9AST1EUY6/NnTl
-         N2JikoYbXjIwUAoEgowBkwTsNryp9GTQvW7nmLTrSw1CxNWFSHzGoBW1bYjZAQhSkoFs
-         +1VC2U1UUs/JiDys2kKpEY6Q53XIOMpV7OKwhoe34MKq5B0zKSsPbMaW1QOHh7bLLy4H
-         nhuqH6zQD5bDFwisNOEO7RKuxgu5TV+0C70GTBy2BYXP4pSQ5DsjWpEwID0S9knBfxnw
-         8lQ4p0k8dY+ax9lwU6bIi8XsYMbbKEwQeTfNN9r10jcmPq42tSu18MylDL4s82ToXD8S
-         HDiA==
-X-Forwarded-Encrypted: i=1; AJvYcCV47gxspImzLo7LZUykX4nZUKyVYTsy4FTo+MN9q1J2MfQxgVqM/jYiwKRE61/B7+xZBHuI5BmYeHaf4A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhveXzBniB2/azbw9gZEsNp6HdQJkI9ESccoMm/4z7WiC3l1c7
-	ECpZkZz8YcyoV/qfws2uLcqvbLFXDWu7ERVifkE8HIrLfRlmvRVpxCfP6aY2E34=
-X-Gm-Gg: ASbGncvBbMAFEtl0J0vd6oGqtbQPqHg8I2O/4O4JZi2FPWvx+ahTfu+oZfZUUuKYCMo
-	BKYYvc2Q+EORVIkGgMwikkTIc9jCmzOhoPEnEoCalMaRLhO+iZEvUJSi46TMsZTxlsuCgqLHhU6
-	2NCC3V3Jb4JD80jyWN4Y09c2zzM7LugzKyyFsrMK56On6AKQ6Axy+ff9CagXKUDEW20JOqeOTRa
-	HZCcQAnbC6Gk/G8uXhdVNrUmdd7lDNxMpoqU4AV9ZyXP1uyccqM7J32BIA=
-X-Google-Smtp-Source: AGHT+IHBg7FH0RfI63+Vg3g5RF/j5aX39c5DAnNY2YHqX7RE5+k+C41N38XjDYzZeGnDTOmqptoH7w==
-X-Received: by 2002:a05:600c:4e8a:b0:434:ffd7:6fca with SMTP id 5b1f17b1804b1-434fff36e7cmr31129635e9.2.1733820346746;
-        Tue, 10 Dec 2024 00:45:46 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434d526b577sm224504225e9.3.2024.12.10.00.45.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 00:45:46 -0800 (PST)
-Date: Tue, 10 Dec 2024 11:45:43 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Keith Busch <kbusch@meta.com>,
-	axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, sagi@grimberg.me,
-	asml.silence@gmail.com, anuj20.g@samsung.com, joshi.k@samsung.com,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv12 11/12] nvme: register fdp parameters with the block
- layer
-Message-ID: <8d69680a-a958-4e9d-a1ba-097489fe98d1@stanley.mountain>
+        d=1e100.net; s=20230601; t=1733822027; x=1734426827;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2XlZtoi6YzM5n0bDbE6udezF/JySf6HZqcQtjtNfkAs=;
+        b=sv0H3PD3P4WiBUEOdu5o7wZr1fNx9j62TbzfhMhzBJTxjrY3JcbBjBZI58Ceh6McUW
+         QKDlbap9e1djWmCU663tdODkPZ8XYt+3BY3W6JiVGJ3fL3UKjpdMS7rEEklPqd2ZB9xh
+         u1kjZeBot/ECa2MrUF0JuD2Nm/aAFa94XMGTWqCD9Fmg2uqKEWJLPTpOPCtKgxpW7DOa
+         yc58hRz8DRWPyirKjbnpl5DF1DoJakeqnRXhZWhc+bZW/XxByazk3pUuHwXyljzURAwD
+         W3NPuWUZO0mrsu2wYdpQIWZ2NTuMQS+9gj7LuzDHst7D+4KhLntl2Ff7Fh0eRIAAyB2G
+         6MCg==
+X-Gm-Message-State: AOJu0YwWr0v3eIlacPxVU7jsFk3s9bLrddvb5RpC04horN1psBO4sRSC
+	BGTHoWXXWUez5KwKLW1MtRSAy0wHxmkDBCyqXyePZTEzJbPAmOppHArNTqzJTO5LpIKXCR4Yuut
+	3LR+jcTMQpw2luuDGRX9CT+6IzpRUfF33wE1D0w==
+X-Gm-Gg: ASbGncuukxhup6gCq2CgyN9ig4s6g17KRtkXIe1JpvAu8x9TUXc1b7nq3z47nfw0NA5
+	pTSg3uegAwsZMBpIFE67OrjELHykfaVwivHzna9dHpYyOVJB5zASLfGSXgzTHaEQ9S00=
+X-Google-Smtp-Source: AGHT+IFjRegof2ukNHU+84c0sXZPqXeN99k3K+KrjVEgjHV3fxYxmBk/8ZtZxdRPpXl74bQebew8g+3ZAX59iNKhK34=
+X-Received: by 2002:a05:6512:3988:b0:53e:398c:bf9e with SMTP id
+ 2adb3069b0e04-5402411a8f4mr1268009e87.55.1733822026680; Tue, 10 Dec 2024
+ 01:13:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241206221801.790690-12-kbusch@meta.com>
+References: <20241209045530.507833-1-ebiggers@kernel.org> <CAMRc=MfLzuNjRqURpVwLzVTsdr8OmtK+NQZ6XU4hUsawKWTcqQ@mail.gmail.com>
+ <20241209201516.GA1742@sol.localdomain> <CAMRc=Me7kEBHW1BTDkJ6w+3GjucCfC+GNZBch3kX=gsZniFHvA@mail.gmail.com>
+ <20241209205553.GC1742@sol.localdomain>
+In-Reply-To: <20241209205553.GC1742@sol.localdomain>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 10 Dec 2024 10:13:35 +0100
+Message-ID: <CAMRc=Meh5dW6oSexiR2riHkbiFcJz1XQ=xA5VEDMgcX4UTb5-Q@mail.gmail.com>
+Subject: Re: [PATCH v9 00/12] Support for hardware-wrapped inline encryption keys
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, Gaurav Kashyap <quic_gaurkash@quicinc.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, Alim Akhtar <alim.akhtar@samsung.com>, 
+	Avri Altman <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
+	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>, Jens Axboe <axboe@kernel.dk>, 
+	Konrad Dybcio <konradybcio@kernel.org>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+	"Martin K . Petersen" <martin.petersen@oracle.com>, Ulf Hansson <ulf.hansson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Keith,
+On Mon, Dec 9, 2024 at 9:55=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> w=
+rote:
+>
+> On Mon, Dec 09, 2024 at 02:35:29PM -0600, Bartosz Golaszewski wrote:
+> > On Mon, 9 Dec 2024 21:15:16 +0100, Eric Biggers <ebiggers@kernel.org> s=
+aid:
+> > > On Mon, Dec 09, 2024 at 04:00:18PM +0100, Bartosz Golaszewski wrote:
+> > >>
+> > >> I haven't gotten to the bottom of this yet but the
+> > >> FS_IOC_ADD_ENCRYPTION_KEY ioctl doesn't work due to the SCM call
+> > >> returning EINVAL. Just FYI. I'm still figuring out what's wrong.
+> > >>
+> > >> Bart
+> > >>
+> > >
+> > > Can you try the following?
+> > >
+> > > diff --git a/drivers/firmware/qcom/qcom_scm.c b/drivers/firmware/qcom=
+/qcom_scm.c
+> > > index 180220d663f8b..36f3ddcb90207 100644
+> > > --- a/drivers/firmware/qcom/qcom_scm.c
+> > > +++ b/drivers/firmware/qcom/qcom_scm.c
+> > > @@ -1330,11 +1330,11 @@ int qcom_scm_derive_sw_secret(const u8 *eph_k=
+ey, size_t eph_key_size,
+> > >                                                               sw_secr=
+et_size,
+> > >                                                               GFP_KER=
+NEL);
+> > >     if (!sw_secret_buf)
+> > >             return -ENOMEM;
+> > >
+> > > -   memcpy(eph_key_buf, eph_key_buf, eph_key_size);
+> > > +   memcpy(eph_key_buf, eph_key, eph_key_size);
+> > >     desc.args[0] =3D qcom_tzmem_to_phys(eph_key_buf);
+> > >     desc.args[1] =3D eph_key_size;
+> > >     desc.args[2] =3D qcom_tzmem_to_phys(sw_secret_buf);
+> > >     desc.args[3] =3D sw_secret_size;
+> > >
+> > >
+> >
+> > That's better, thanks. Now it's fscryptctl set_policy that fails like t=
+his:
+> >
+> > ioctl(3, FS_IOC_SET_ENCRYPTION_POLICY, 0xffffcaf8bb20) =3D -1 EINVAL
+> > (Invalid argument)
+> >
+>
+> Yes, as I mentioned I decided to drop the new encryption policy flag and =
+go back
+> to just relying on the key.  I assume you were using
+> https://github.com/ebiggers/fscryptctl/tree/wip-wrapped-keys?  I have pus=
+hed out
+> an updated version of that that should work.
+>
+> - Eric
 
-kernel test robot noticed the following build warnings:
+Thanks, with that and the memcpy() fix:
 
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Keith-Busch/fs-add-write-stream-information-to-statx/20241207-063826
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20241206221801.790690-12-kbusch%40meta.com
-patch subject: [PATCHv12 11/12] nvme: register fdp parameters with the block layer
-config: csky-randconfig-r072-20241209 (https://download.01.org/0day-ci/archive/20241210/202412100319.Y5vv98P8-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 14.2.0
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202412100319.Y5vv98P8-lkp@intel.com/
-
-New smatch warnings:
-drivers/nvme/host/core.c:2187 nvme_check_fdp() error: uninitialized symbol 'i'.
-drivers/nvme/host/core.c:2232 nvme_query_fdp_info() warn: missing error code 'ret'
-
-vim +/i +2187 drivers/nvme/host/core.c
-
-04ca0849938146 Keith Busch   2024-12-06  2154  static int nvme_check_fdp(struct nvme_ns *ns, struct nvme_ns_info *info,
-04ca0849938146 Keith Busch   2024-12-06  2155  			  u8 fdp_idx)
-04ca0849938146 Keith Busch   2024-12-06  2156  {
-04ca0849938146 Keith Busch   2024-12-06  2157  	struct nvme_fdp_config_log hdr, *h;
-04ca0849938146 Keith Busch   2024-12-06  2158  	struct nvme_fdp_config_desc *desc;
-04ca0849938146 Keith Busch   2024-12-06  2159  	size_t size = sizeof(hdr);
-04ca0849938146 Keith Busch   2024-12-06  2160  	int i, n, ret;
-04ca0849938146 Keith Busch   2024-12-06  2161  	void *log;
-04ca0849938146 Keith Busch   2024-12-06  2162  
-04ca0849938146 Keith Busch   2024-12-06  2163  	info->runs = 0;
-04ca0849938146 Keith Busch   2024-12-06  2164  	ret = nvme_get_log_lsi(ns->ctrl, 0, NVME_LOG_FDP_CONFIGS, 0, NVME_CSI_NVM,
-04ca0849938146 Keith Busch   2024-12-06  2165  			   (void *)&hdr, size, 0, info->endgid);
-04ca0849938146 Keith Busch   2024-12-06  2166  	if (ret)
-04ca0849938146 Keith Busch   2024-12-06  2167  		return ret;
-04ca0849938146 Keith Busch   2024-12-06  2168  
-04ca0849938146 Keith Busch   2024-12-06  2169  	size = le32_to_cpu(hdr.sze);
-04ca0849938146 Keith Busch   2024-12-06  2170  	h = kzalloc(size, GFP_KERNEL);
-04ca0849938146 Keith Busch   2024-12-06  2171  	if (!h)
-04ca0849938146 Keith Busch   2024-12-06  2172  		return 0;
-04ca0849938146 Keith Busch   2024-12-06  2173  
-04ca0849938146 Keith Busch   2024-12-06  2174  	ret = nvme_get_log_lsi(ns->ctrl, 0, NVME_LOG_FDP_CONFIGS, 0, NVME_CSI_NVM,
-04ca0849938146 Keith Busch   2024-12-06  2175  			   h, size, 0, info->endgid);
-04ca0849938146 Keith Busch   2024-12-06  2176  	if (ret)
-04ca0849938146 Keith Busch   2024-12-06  2177  		goto out;
-04ca0849938146 Keith Busch   2024-12-06  2178  
-04ca0849938146 Keith Busch   2024-12-06  2179  	n = le16_to_cpu(h->numfdpc) + 1;
-04ca0849938146 Keith Busch   2024-12-06  2180  	if (fdp_idx > n)
-04ca0849938146 Keith Busch   2024-12-06  2181  		goto out;
-04ca0849938146 Keith Busch   2024-12-06  2182  
-04ca0849938146 Keith Busch   2024-12-06  2183  	log = h + 1;
-04ca0849938146 Keith Busch   2024-12-06  2184  	do {
-04ca0849938146 Keith Busch   2024-12-06  2185  		desc = log;
-04ca0849938146 Keith Busch   2024-12-06  2186  		log += le16_to_cpu(desc->dsze);
-04ca0849938146 Keith Busch   2024-12-06 @2187  	} while (i++ < fdp_idx);
-                                                         ^
-i needs to be initialized to zero at the start.
-
-04ca0849938146 Keith Busch   2024-12-06  2188  
-04ca0849938146 Keith Busch   2024-12-06  2189  	info->runs = le64_to_cpu(desc->runs);
-04ca0849938146 Keith Busch   2024-12-06  2190  out:
-04ca0849938146 Keith Busch   2024-12-06  2191  	kfree(h);
-04ca0849938146 Keith Busch   2024-12-06  2192  	return ret;
-04ca0849938146 Keith Busch   2024-12-06  2193  }
-04ca0849938146 Keith Busch   2024-12-06  2194  
-04ca0849938146 Keith Busch   2024-12-06  2195  static int nvme_query_fdp_info(struct nvme_ns *ns, struct nvme_ns_info *info)
-04ca0849938146 Keith Busch   2024-12-06  2196  {
-04ca0849938146 Keith Busch   2024-12-06  2197  	struct nvme_ns_head *head = ns->head;
-04ca0849938146 Keith Busch   2024-12-06  2198  	struct nvme_fdp_ruh_status *ruhs;
-04ca0849938146 Keith Busch   2024-12-06  2199  	struct nvme_fdp_config fdp;
-04ca0849938146 Keith Busch   2024-12-06  2200  	struct nvme_command c = {};
-04ca0849938146 Keith Busch   2024-12-06  2201  	int size, ret;
-04ca0849938146 Keith Busch   2024-12-06  2202  
-04ca0849938146 Keith Busch   2024-12-06  2203  	ret = nvme_get_features(ns->ctrl, NVME_FEAT_FDP, info->endgid, NULL, 0,
-04ca0849938146 Keith Busch   2024-12-06  2204  				&fdp);
-04ca0849938146 Keith Busch   2024-12-06  2205  	if (ret)
-04ca0849938146 Keith Busch   2024-12-06  2206  		goto err;
-04ca0849938146 Keith Busch   2024-12-06  2207  
-04ca0849938146 Keith Busch   2024-12-06  2208  	if (!(fdp.flags & FDPCFG_FDPE))
-04ca0849938146 Keith Busch   2024-12-06  2209  		goto err;
-04ca0849938146 Keith Busch   2024-12-06  2210  
-04ca0849938146 Keith Busch   2024-12-06  2211  	ret = nvme_check_fdp(ns, info, fdp.fdpcidx);
-04ca0849938146 Keith Busch   2024-12-06  2212  	if (ret || !info->runs)
-04ca0849938146 Keith Busch   2024-12-06  2213  		goto err;
-04ca0849938146 Keith Busch   2024-12-06  2214  
-04ca0849938146 Keith Busch   2024-12-06  2215  	size = struct_size(ruhs, ruhsd, NVME_MAX_PLIDS);
-04ca0849938146 Keith Busch   2024-12-06  2216  	ruhs = kzalloc(size, GFP_KERNEL);
-04ca0849938146 Keith Busch   2024-12-06  2217  	if (!ruhs) {
-04ca0849938146 Keith Busch   2024-12-06  2218  		ret = -ENOMEM;
-04ca0849938146 Keith Busch   2024-12-06  2219  		goto err;
-04ca0849938146 Keith Busch   2024-12-06  2220  	}
-04ca0849938146 Keith Busch   2024-12-06  2221  
-04ca0849938146 Keith Busch   2024-12-06  2222  	c.imr.opcode = nvme_cmd_io_mgmt_recv;
-04ca0849938146 Keith Busch   2024-12-06  2223  	c.imr.nsid = cpu_to_le32(head->ns_id);
-04ca0849938146 Keith Busch   2024-12-06  2224  	c.imr.mo = NVME_IO_MGMT_RECV_MO_RUHS;
-04ca0849938146 Keith Busch   2024-12-06  2225  	c.imr.numd = cpu_to_le32(nvme_bytes_to_numd(size));
-04ca0849938146 Keith Busch   2024-12-06  2226  	ret = nvme_submit_sync_cmd(ns->queue, &c, ruhs, size);
-04ca0849938146 Keith Busch   2024-12-06  2227  	if (ret)
-04ca0849938146 Keith Busch   2024-12-06  2228  		goto free;
-04ca0849938146 Keith Busch   2024-12-06  2229  
-04ca0849938146 Keith Busch   2024-12-06  2230  	head->nr_plids = le16_to_cpu(ruhs->nruhsd);
-04ca0849938146 Keith Busch   2024-12-06  2231  	if (!head->nr_plids)
-04ca0849938146 Keith Busch   2024-12-06 @2232  		goto free;
-
-ret = -EINVAL?
-
-04ca0849938146 Keith Busch   2024-12-06  2233  
-04ca0849938146 Keith Busch   2024-12-06  2234  	kfree(ruhs);
-04ca0849938146 Keith Busch   2024-12-06  2235  	return 0;
-04ca0849938146 Keith Busch   2024-12-06  2236  
-04ca0849938146 Keith Busch   2024-12-06  2237  free:
-04ca0849938146 Keith Busch   2024-12-06  2238  	kfree(ruhs);
-04ca0849938146 Keith Busch   2024-12-06  2239  err:
-04ca0849938146 Keith Busch   2024-12-06  2240  	head->nr_plids = 0;
-04ca0849938146 Keith Busch   2024-12-06  2241  	info->runs = 0;
-04ca0849938146 Keith Busch   2024-12-06  2242  	return ret;
-04ca0849938146 Keith Busch   2024-12-06  2243  }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+Tested-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org> # sm8650
