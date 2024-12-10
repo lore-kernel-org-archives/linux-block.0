@@ -1,33 +1,34 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3589A23EA66;
-	Tue, 10 Dec 2024 22:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3C123A59C;
+	Tue, 10 Dec 2024 22:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733868168; cv=none; b=n3zhN6nY0YimcxdBi5YDhzV2qnkmAd+MsvUbLvth8SWO9gv5ZlyUzw/P5oWYz6HhXgleF8hX7iOT9uWwO4Kw9WWvnyv2+4wrOU4DNIZRrRGJuJWhzlLYQY/nzWiQ0rQmrv8sDAperMy2QaLqt3/nSadvzy4ACFkG9E+uBc6EPDA=
+	t=1733868169; cv=none; b=fgJPmjxqAQJIsbgQUUSAWvZg239KX/wN7WGdYDUnZcGlGDNfrRpNACIvZeTMRUqmAp7HGIU+agq8eIP1nyjUTlDsqyyYOp+vA+tyGY8osgmD4vGbQ7KudirHSemZzHCNGOsbQrkJ8VF9hWVV2A2BbTtpcpxclI/KGXyITrk/uok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733868168; c=relaxed/simple;
-	bh=Z8shQorNdAVVBXW89PJ8z16tdPckgC3+mqGh+YMMQ6A=;
+	s=arc-20240116; t=1733868169; c=relaxed/simple;
+	bh=nACRMoll1gJ79dVFouA4XmHlSJk2izLB4wuQTmJ0fMY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=iT7Vhp2GtqB0+OzsehswV7mmtLhzmi5YTHtGnYVm77y8H6Dg+a42FazGPvqkY6reH0Mk3OGxZG9iwKG3Rgi1hmYUcSm5lCbSbyk4jSiIErI3tm1PHadEg4kJKiEdSJLf34xU9F+eks0Wuq9xz0VBFYjBlHyvR/BmX1QQON6ZCVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=IIAWMyJ8; arc=none smtp.client-ip=13.77.154.182
+	 In-Reply-To:To:Cc; b=SCQkoqcloEo6DOw2fjXkSQxW9PA3MkELtBskG5UzWGfh+gCWARiUW6vQer8MFvzpcZMhpxIupMX24FnABJUGuIzjsEVxiaNqCCCEAnvjK7w8n3mD7IrAscE0ch17xO+wny1hLzZnvFK+QSMf2xZuRE/jFsgQ+W8owWPkuJgX87g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=f8FLrazo; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="IIAWMyJ8"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="f8FLrazo"
 Received: from eahariha-devbox.internal.cloudapp.net (unknown [40.91.112.99])
-	by linux.microsoft.com (Postfix) with ESMTPSA id D4E6A204722D;
-	Tue, 10 Dec 2024 14:02:37 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D4E6A204722D
+	by linux.microsoft.com (Postfix) with ESMTPSA id 40433204722F;
+	Tue, 10 Dec 2024 14:02:38 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 40433204722F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
 	s=default; t=1733868158;
-	bh=DhJBfAD2d6ET0f+MR7PDWaX6CpgYhpsGb+RQrMGIOAY=;
+	bh=BGnsC+198VTSc2YUOR+tnnzodlQEmbpaf1xRkHMeOLA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=IIAWMyJ8NzQC8a9Pk8dz0U3jdNgu9NGd3SiawGSbAFHI2lBJj9kVVY+Jrn6mOAaem
-	 Wm2Q0riPqkUNNLsJAJDVn84Us2zbSxk2FObucA7BvA+Ci0Obga6BtVUEDHD7pm4PpM
-	 tPAQA1jtOYji99byX6HP0p2SzC0hDQD6638LF7MQ=
+	b=f8FLrazoOSnG7X8aDWVI3nVNlHmQntetz0EU8Jiq9ArRSLgklxjGdYHhwJFkuGOqx
+	 IH/VjuOQp54aRZNV03h5piA8Q49loXnKOX2ThzuLLFf9IwCIw5oEVNJs8TgQ/6gM17
+	 zOuBTvw2xYfRYO0jrQtMw2wpWhKIeaajYB7zt3gs=
 From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Date: Tue, 10 Dec 2024 22:02:39 +0000
-Subject: [PATCH v3 08/19] drm/xe: Convert timeout to secs_to_jiffies()
+Date: Tue, 10 Dec 2024 22:02:41 +0000
+Subject: [PATCH v3 10/19] scsi: arcmsr: Convert timeouts to
+ secs_to_jiffies()
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,8 +36,8 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20241210-converge-secs-to-jiffies-v3-8-ddfefd7e9f2a@linux.microsoft.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241210-converge-secs-to-jiffies-v3-10-ddfefd7e9f2a@linux.microsoft.com>
 References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
 In-Reply-To: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
 To: Pablo Neira Ayuso <pablo@netfilter.org>, 
@@ -119,25 +120,24 @@ the following Coccinelle rules:
 - msecs_to_jiffies(C * MSEC_PER_SEC)
 + secs_to_jiffies(C)
 
-Reviewed-by: Thomas Hellström <thomas.hellstrom@linux.intel.com>
 Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 ---
- drivers/gpu/drm/xe/xe_device.c | 2 +-
+ drivers/scsi/arcmsr/arcmsr_hba.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/gpu/drm/xe/xe_device.c b/drivers/gpu/drm/xe/xe_device.c
-index 56d4ffb650dade8622cc25026a96155fa5572434..9093469a275f46f7bf58ff1049c1c9cc712cdd33 100644
---- a/drivers/gpu/drm/xe/xe_device.c
-+++ b/drivers/gpu/drm/xe/xe_device.c
-@@ -519,7 +519,7 @@ static int wait_for_lmem_ready(struct xe_device *xe)
- 	drm_dbg(&xe->drm, "Waiting for lmem initialization\n");
+diff --git a/drivers/scsi/arcmsr/arcmsr_hba.c b/drivers/scsi/arcmsr/arcmsr_hba.c
+index 6a32e3e0d516881fd87a56a394607930582644ee..fe7de7705b7e2c84324f1a493f7825343d6476c6 100644
+--- a/drivers/scsi/arcmsr/arcmsr_hba.c
++++ b/drivers/scsi/arcmsr/arcmsr_hba.c
+@@ -1045,7 +1045,7 @@ static void arcmsr_init_get_devmap_timer(struct AdapterControlBlock *pacb)
+ static void arcmsr_init_set_datetime_timer(struct AdapterControlBlock *pacb)
+ {
+ 	timer_setup(&pacb->refresh_timer, arcmsr_set_iop_datetime, 0);
+-	pacb->refresh_timer.expires = jiffies + msecs_to_jiffies(60 * 1000);
++	pacb->refresh_timer.expires = jiffies + secs_to_jiffies(60);
+ 	add_timer(&pacb->refresh_timer);
+ }
  
- 	start = jiffies;
--	timeout = start + msecs_to_jiffies(60 * 1000); /* 60 sec! */
-+	timeout = start + secs_to_jiffies(60); /* 60 sec! */
- 
- 	do {
- 		if (signal_pending(current))
 
 -- 
 2.43.0
