@@ -1,94 +1,102 @@
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605941A073F
-	for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 16:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976BE23ED63;
+	Tue, 10 Dec 2024 19:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733847464; cv=none; b=uSKl/b2SDWzDtEJ/L17Evuy4NpWgIJ795BfnvVSQpHlCjgxNHduXgnCYsLWRVzf8dJE1q9sBzvSQ+V5sEYdGWfJ3q2eyPTHEOXzOeM6jscQiCt33NGKzmPhsrDP04RTEtOAspqKhSYGZuO7syHmWeIKtL2fELWYd4r4xLJaw1+0=
+	t=1733858497; cv=none; b=s97EW7qXxH2GUyl80A7nsFlwY2jgIjxFzZ8ccovBjS0TsCeOw3o9WpVElEpvf6QXYuBIsRNtsiL98uh9f2LC7xKQGjmiJVxPvUWnEezIvLVjZODuEo3SuSpLJVhqtM+DpOJyRVRrfL9RiCOAB++w1SIkk1C1Yd5uipi4PX6nV4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733847464; c=relaxed/simple;
-	bh=WFGbp/rJV46bRkoFg19L3FZC6MzfgqNyYAz3I0W4PEI=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Vvns7RJZwc+Q7hpmhlE4lZJENiCkA5atOyXAAuNV4aEfU6OgMd+djuWfTnxbDgQWLLlhBy3lOsxF9qLgIt+Brgerk3srRFvk9GIeIpx5Shc0iTjx8ncePucUpULyGO6J9wkYU+wYMYK2z3o7Wr5O87cHotRcPW+DctjoBXGG5ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nka1w8jW; arc=none smtp.client-ip=209.85.160.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1733858497; c=relaxed/simple;
+	bh=3IuxfdZlkeKKdy0z0s/LC0FJPtMGyWmWmj3MdGBivHQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=syE+4FP6t588ImF4/YcY5SQZS94HhcemK+n1OIDLJFiPXv4SmtAbEQJzMBvN30mInR4iI3mzsuJ5Utb28h363K8Az8TrfnLcdjiuEOQyKsvF5FukOpEzh5LrwRVJ8YtiHZgVPo7lf3QwKTN0NyP6b6RVE1hACKUvG4iUjnFYpMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=H8w++Jtt; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nka1w8jW"
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-29ff8053384so477122fac.3
-        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 08:17:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1733847461; x=1734452261; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TtugL1GOMmkuSroetbFeNzVAId+uZTGj9FtiYpIZXco=;
-        b=nka1w8jWniSf5XnKtkJrN8MeuMrQXTpFokDRq6p+sRt3Q/cV7g9lESNAR99PjJ26PU
-         Au9afg/1qCRQV9nGfbp0m/K5VzuXaxNxlhWNfy1v6ebuoTSr8AtZVxxj5wBnrbBzPAOd
-         P/G+5h/uEKIBiDHqIQR0UxUNLVQ6wx4HarJpf59eqeiDbKY+AQjC6GAvrtd65k/3zYhB
-         OD3sT6CGpt5V1uAKorf5qSWPWf2ZzVNfAZQu+RqBIng4YAuE2UiEAXw0UBBEFgyv28Jo
-         94UHUyNJ1NRwqYrT0H7pGjymEJOQBaSZLa8NAF4swczy5AJl9TfhYSpnNPUAvAvY+HdV
-         mAIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733847461; x=1734452261;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TtugL1GOMmkuSroetbFeNzVAId+uZTGj9FtiYpIZXco=;
-        b=PZO2v9yZqC5dtAEDSKIQVPdNCqJfMZ1FwDuhwKT9TfIncQ4dC0ZYrqfUXepYF61c9I
-         kQ5PmNYlwgRpsV1EPpgV2dud2ieAZ/I1OJLSZGOhdxVF0//B65N2391ryOkdmSQtUkiT
-         DD/n4sZPWaW1sDRsmuAOqrslji8LfjyLSpEz2pmM9phez8jmu3QxUX6Dbz5B3ZEXU2wm
-         1c6eW85Vh5OkROny1YPN/jUZl3+qIY6SaGuP1HlsX0XPSyPpOwUC4rRN+tK/WGr6PPWX
-         pjKzAMpqgzOLcNvEsG0fRTOeeybkTpr0V42eM9f3LQw0gjN52FoipmsxKfxG2hYiqcnX
-         jnLg==
-X-Forwarded-Encrypted: i=1; AJvYcCVytn9P5mTm/GWqS+a7czPpKK7HOEyXBwPGr2MNPjuo3CgZcD8xiVc605/M3k9am94V7j6Te70tPk48JA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yya/rrIJOdDKcENGfpC1/iriQzj184gqKcGRE+o0lsdcNG6g7uc
-	Jlk+FD5OX5ZUd1wH4YT4wKMkauUcNOonK8MPxsWnRmFggWPv7mqIg9y2NclfwOq7cHWmE4JVrvA
-	L
-X-Gm-Gg: ASbGncs9B0CI3pxUhLLq5xpHl/N0vRaR+6xKyANcFKZT4DUezVVrf/sXPjPeIyQcpkB
-	dTtDo1vn6TVJgirN7bqttoILjvTnBc7sTtylPuredppGouHun/xDHLXymXeHdxG/7uVOt61nVku
-	zCH1O88zRWsHjXqZopvQ3y+axcuXl0bAQMmz/hsRD0zcz2pyzWIOI8h4PY0NTQPYTPPa1gC1SJh
-	w2uUsR28uKDYJDrStqqIg5gBfgq6yF/t8oUafzE8dwG
-X-Google-Smtp-Source: AGHT+IGVY/C8GN4QT+IFfl31u/lE/DASrDNbbdZOWmsimrsPCEqJemJOZBakQcoij+eK/vXgBKsQPA==
-X-Received: by 2002:a05:6871:358c:b0:29e:547f:e1e1 with SMTP id 586e51a60fabf-29f7389c541mr14202348fac.29.1733847461475;
-        Tue, 10 Dec 2024 08:17:41 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5f279324914sm2639115eaf.36.2024.12.10.08.17.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 08:17:40 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: colyli@kernel.org
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <20241208115350.85103-1-colyli@kernel.org>
-References: <20241208115350.85103-1-colyli@kernel.org>
-Subject: Re: [PATCH] MAINTAINERS: update Coly Li's email address
-Message-Id: <173384746036.444526.10848476315219885523.b4-ty@kernel.dk>
-Date: Tue, 10 Dec 2024 09:17:40 -0700
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="H8w++Jtt"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Y77rT0hT9zlfl5W;
+	Tue, 10 Dec 2024 19:21:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1733858483; x=1736450484; bh=kGRxI4MvkczRgURGuKE/NkzS
+	kR8ERW6zUvwscihee5Y=; b=H8w++JttLWyRmupBTpStBzQYxt04HXVU8MKEQp/A
+	QDh5jwvvB7s/UP9el/mzXENVIjN+SNQL050OLkUB5F4NIzwf7R6EUjlXHqRPlKov
+	1u51rm2LezO45wdEDr6Uid0qCWKiscKLy5sfj5krUU0B9bTVdq9P6jO0WzAjshJ8
+	0vnnMakugglrPj/CaTcLAVyWNSFkva6ccpFCmNr+hFUfHByiRhjCwfWjBss37wjc
+	+Qb2yUvJDvJvNGJsIGh/Avom64luqQdXa/qRFoRiehYjX0xMZaZfTmgJFP16eCI+
+	93n+QYDTSoYErgf2t0pn9JC36n/iVCi5CnmzCkklf/KarA==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id v14CjmZSqQuW; Tue, 10 Dec 2024 19:21:23 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Y77rJ3qwkzlgd6J;
+	Tue, 10 Dec 2024 19:21:20 +0000 (UTC)
+Message-ID: <a10da3f8-9a71-4794-9473-95385ac4e59f@acm.org>
+Date: Tue, 10 Dec 2024 11:21:19 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-86319
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv10 0/9] write hints with nvme fdp, scsi streams
+To: hch <hch@lst.de>, Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Nitesh Shetty <nj.shetty@samsung.com>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Matthew Wilcox <willy@infradead.org>, Keith Busch <kbusch@kernel.org>,
+ Keith Busch <kbusch@meta.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "joshi.k@samsung.com" <joshi.k@samsung.com>
+References: <yq1ed38roc9.fsf@ca-mkp.ca.oracle.com>
+ <9d61a62f-6d95-4588-bcd8-de4433a9c1bb@acm.org>
+ <yq1plmhv3ah.fsf@ca-mkp.ca.oracle.com>
+ <8ef1ec5b-4b39-46db-a4ed-abf88cbba2cd@acm.org>
+ <yq1jzcov5am.fsf@ca-mkp.ca.oracle.com>
+ <CGME20241205081138epcas5p2a47090e70c3cf19e562f63cd9fc495d1@epcas5p2.samsung.com>
+ <20241205080342.7gccjmyqydt2hb7z@ubuntu>
+ <yq1a5d9op6p.fsf@ca-mkp.ca.oracle.com> <20241210071253.GA19956@lst.de>
+ <2a272dbe-a90a-4531-b6a2-ee7c4c536233@wdc.com> <20241210105822.GA3123@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20241210105822.GA3123@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
+On 12/10/24 2:58 AM, hch wrote:
+> On Tue, Dec 10, 2024 at 08:05:31AM +0000, Johannes Thumshirn wrote:
+>>> Generally agreeing with all you said, but do we actually have any
+>>> serious use case for cross-LU copies?  They just seem incredibly
+>>> complex any not all that useful.
+>>
+>> One use case I can think of is (again) btrfs balance (GC, convert, etc=
+)
+>> on a multi drive filesystem. BUT this use case is something that can
+>> just use the fallback read-write path as it is doing now.
+>=20
+> Who uses multi-device file systems on multiple LUs of the same SCSI
+> target =C6=A1r multiple namespaces on the same nvme subsystem?
 
-On Sun, 08 Dec 2024 19:53:50 +0800, colyli@kernel.org wrote:
-> This patch updates Coly Li's email addres to colyli@kernel.org.
-> 
-> 
+On Android systems F2FS combines a small conventional logical unit and a
+large zoned logical unit into a single filesystem. This use case will
+benefit from copy offloading between different logical units on the same
+SCSI device. While there may be disagreement about how desirable this
+setup is from a technical point of view, there is a real use case today
+for offloading data copying between different logical units.
 
-Applied, thanks!
-
-[1/1] MAINTAINERS: update Coly Li's email address
-      commit: 6f604b59c2841168131523e25f5e36afa17306f4
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Bart.
