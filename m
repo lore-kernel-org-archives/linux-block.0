@@ -1,63 +1,48 @@
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C0623ED5E
-	for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 20:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D6B14E2CC;
+	Tue, 10 Dec 2024 20:33:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733862305; cv=none; b=KTG5KP8VSz35OrO32nazA9ZIdNph+oNGDKnVTNnk/2F/bNPKtQ5lue7D9jWzGKGVwNIN0ZQ0/p4ReIbkx16wpozxdJlmMnB248bLbxmBQgSQ7jTk0nhFm3SGd+GKVOiEjU7CNWJd7mHlpFFKyOB1UEN8i4sAwDhLJ9wm4HDZ6oQ=
+	t=1733862829; cv=none; b=fCVYCHIRhQWeKP9ivvFAz1UlfuV5smcB7fSqq5Bb6WNx5xpiRBkQiE8ZYgS39fSojdPgqUHtcD9SFiOyFDk6njU+WbccEeCUmNTbP489J/1zXVtXYCLsGkdklS18wDhEz73URw67OyYONdL3VFe5d2EoOd3p2RR3L7HhNhaJWWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733862305; c=relaxed/simple;
-	bh=UNDFKh6EtR41sLGf3n/jLNncxCVeGRiamWNjmyGihgE=;
+	s=arc-20240116; t=1733862829; c=relaxed/simple;
+	bh=gCX3Kg2zrlybcZgIZASFW4SayKABZoVZVYeRec8AoMM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eXlH+Okj79Jt3lQDF+fAiokFPyyU4BEVaEEAzPk1GOvHcOA5sNuBZ8fc6nY65ekRNao3tRyeWMGV16EXHqfU6OntCbbz4IDDeutv6LqMcuYFVE9puoqt4vAZJQQg68K8dAXTlUgJ++C0zECAELo3Ob9d+4ST0TUJCNmXuoOoDU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=r0SLMtR7; arc=none smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=MqVWXJw+EF0BC1bxx+nzmH0Yncg35n058HiJmXZ2nH8BB2HosGLry/gtJfXial1FH9F+eGNR1xCxb1QOhSepQA79Tq8VwH0xXAza3feZTjZnTWSTQ9oPrH4uCiHOPENwlMqPa3EafoHccqCX/j3YM8pLsXuuXuGFaPx4W9FlprU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=xtueQlW0; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="r0SLMtR7"
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3eb4684f3cbso1465575b6e.3
-        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 12:25:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1733862302; x=1734467102; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B4uVKrnhOb5OPOrCkL+Fhl0678KDfsGNRP28fCC0i1g=;
-        b=r0SLMtR73vNy0NdMNMKYVqTM84grN3iHvWA+OAGsHjHJcUzeNqSrHaZ4PMMGNumGFq
-         LJugvYdRof4PKN5yx63sj1HDyy2rEFKA9yWWfDMqZEvwMFrNjdNhAuAmg+dx9Ciul8c5
-         4W/2+L1oMfejWTdqC49T8AchVdJbvA3qK9SfzBTLbCK4bw3dsuvdOLbDsfYJAOHrSAEY
-         tXlq8WVsT47mfZ77qsZGseK7ApmF2zBEYk0BPfV6wMNO4RK3Z9mb4za1SKm5GqLVEuVd
-         zWOLCxXyTvGd76sRfogCi33hQXhVWVGH0Z1xIYt94yAec7GiIHu1FsZhNp6bMR8q9C9g
-         RdvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733862302; x=1734467102;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B4uVKrnhOb5OPOrCkL+Fhl0678KDfsGNRP28fCC0i1g=;
-        b=nAJGanxiSNBH9JsCHjuFJjMGP9c4nEGtupKbQtj6FJ6rjdNxIaa/j2w0P1+E6Fzvln
-         /z/1AiC1I2Z2t11jIbcnJ1PMVH1f7ytBJsEtMzVtbiMjnFJIdCuZH4hMlLCdIkpTb1nv
-         NA4Rh6N8qb7r+CHTtZd91XG3wjhyLJbsnhGwdSwfuZOGKQRc1/qSax9zQOI5gf5iROYe
-         KIZbDo1rh4VByE+7YFhb+Pg4e0sSP+tnZzDXN8c7uI+uUapnYGzzogtaBd8Ar7u4kCNm
-         DB2OgpIJZHxlxClj/rpcC/XqhQAdtyW64aHxTIdueNAr7xXek+2Vjz+hG8Yago8ag/Uy
-         S9Eg==
-X-Gm-Message-State: AOJu0YzpzmIRvOa7TgO1qIDq81nrHsnzmODz9AarzE6Y3LPP9WSFByKO
-	twV8AFOrUtd3ua9MPplyVgH89zdfDz9WB00c1lbtVeCnql3Ho8Sxkhz7BoxnIswygrfdKguTGLa
-	l
-X-Gm-Gg: ASbGncvw8dzuSAqiuyp32Y8BjgeknQUMNU3Qb8NyyhxULrDsyj6IIUr8ihQcasrfaQI
-	VX2gpmtgyVtb7Z0eI7+nQtt4XaQjDYdK2T3mb8m8YyyCQZbhsv6ce+Ek8LMbNt4XTOjz+GM3UW5
-	uUI3UaY9iOw/9LdwH0khg1kRNHUeKn+f3hzfi0mtNMi22zv//zhFYEjUKu5vw7Qhqerh3lqJOrA
-	JprtSh2vak+cw8XhR+/THjrQh0nR3dZvlb4lVQE5ZV0VkzhwA==
-X-Google-Smtp-Source: AGHT+IENz/N20lGE1Cb9LYPVC1rDkVHiBlms49Lx+SUk0dw7nu41xde2awBttDC5mO+hqAQkijpQkQ==
-X-Received: by 2002:a05:6808:1981:b0:3eb:6044:5a7e with SMTP id 5614622812f47-3eb85ba8b46mr220181b6e.19.1733862302366;
-        Tue, 10 Dec 2024 12:25:02 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3eb7ca77f07sm225349b6e.35.2024.12.10.12.25.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2024 12:25:01 -0800 (PST)
-Message-ID: <12eec6ff-8ddd-4a94-85c7-efc30cf70241@kernel.dk>
-Date: Tue, 10 Dec 2024 13:25:00 -0700
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="xtueQlW0"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4Y79Rn0vTSz6Cl4Pk;
+	Tue, 10 Dec 2024 20:33:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1733862814; x=1736454815; bh=2U7gKiL8ugvTpuPKu/6BqFFj
+	wbiz86mIkeXs667F/Yw=; b=xtueQlW0zQb/YC92NBgEyoOTPLXcUENDwUqPsOD9
+	29FuTLNbNGJbWz+Rh2H/39DS8uSKeJQOwD+0L9l7PvtUxojnZRFqciA+k21N2832
+	0V9Cb2qBqGAK0hGQdPxfHOfHl7Ly2d3940OgHKnCkRINo4FE3HNAjvF2bYybooQi
+	9pIZvPcQrswIyIqn5qkznsNgv5a6nMC4OfdVn2va91Xb0nu1C1ZOn1mdsjTFgvio
+	TICGY+LnEGI1PHJaU/Wy1mTQx2/caGtCEtqoL22i+ZlrisjX2UtFunnkchXoj8gu
+	VJ+xP69l09NdL4tJccpvxv+vBVP0kjFFuglCZEf9JOGOIA==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id PhYZ8bO0RNb2; Tue, 10 Dec 2024 20:33:34 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4Y79Rc1LY2z6ClL94;
+	Tue, 10 Dec 2024 20:33:31 +0000 (UTC)
+Message-ID: <d9733af5-b16b-4644-9d6d-84fbacf334e0@acm.org>
+Date: Tue, 10 Dec 2024 12:33:31 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,50 +50,46 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] block: get wp_offset by bdev_offset_from_zone_start
-To: Bart Van Assche <bvanassche@acm.org>, LongPing Wei <weilongping@oppo.com>
-Cc: linux-block@vger.kernel.org, bvanassche@google.com, dlemoal@kernel.org
-References: <20241107020439.1644577-1-weilongping@oppo.com>
- <4ba9633b-472d-4d63-9282-bd68b79fba18@acm.org>
+Subject: Re: [PATCH RFC 1/3] block/mq-deadline: Revert "block/mq-deadline: Fix
+ the tag reservation code"
+To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
+ akpm@linux-foundation.org, yang.yang@vivo.com, ming.lei@redhat.com,
+ osandov@fb.com, paolo.valente@linaro.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20241209115522.3741093-1-yukuai1@huaweicloud.com>
+ <20241209115522.3741093-2-yukuai1@huaweicloud.com>
+ <bef7b96c-a6cc-4b83-99b2-848cecb3d3b1@acm.org>
+ <6e384b29-50d2-64bd-0d08-fc0f086c1cbd@huaweicloud.com>
+ <7081765f-28d7-f594-1221-6034b9e88899@huaweicloud.com>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <4ba9633b-472d-4d63-9282-bd68b79fba18@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <7081765f-28d7-f594-1221-6034b9e88899@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 12/10/24 1:23 PM, Bart Van Assche wrote:
-> On 11/6/24 6:04 PM, LongPing Wei wrote:
->> Call bdev_offset_from_zone_start() instead of open-coding it.
->>
->> Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
->> Signed-off-by: LongPing Wei <weilongping@oppo.com>
->> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
->> ---
->> v4: update commit message
->> ---
->>   block/blk-zoned.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
->> index af19296fa50d..77a448952bbd 100644
->> --- a/block/blk-zoned.c
->> +++ b/block/blk-zoned.c
->> @@ -537,7 +537,7 @@ static struct blk_zone_wplug *disk_get_and_lock_zone_wplug(struct gendisk *disk,
->>       spin_lock_init(&zwplug->lock);
->>       zwplug->flags = 0;
->>       zwplug->zone_no = zno;
->> -    zwplug->wp_offset = sector & (disk->queue->limits.chunk_sectors - 1);
->> +    zwplug->wp_offset = bdev_offset_from_zone_start(disk->part0, sector);
->>       bio_list_init(&zwplug->bio_list);
->>       INIT_WORK(&zwplug->bio_work, blk_zone_wplug_bio_work);
->>       zwplug->disk = disk;
+On 12/9/24 10:22 PM, Yu Kuai wrote:
+> First of all, are we in the agreement that it's not acceptable to
+> sacrifice performance in the default scenario just to make sure
+> functional correctness if async_depth is set to 1?
+
+How much does this affect performance? If this affects performance
+significantly I agree that this needs to be fixed.
+
+> If so, following are the options that I can think of to fix this:
 > 
-> Hi LongPing Wei,
-> 
-> Since this patch has not yet been merged, how about reposting it?
+> 1) make async_depth read-only, if 75% tags will hurt performance in some
+> cases, user can increase nr_requests to prevent it.
+> 2) refactor elevator sysfs api, remove eq->sysfs_lock and replace it
+> with q->sysfs_lock, so deadline_async_depth_store() will be protected
+> against changing hctxs, and min_shallow_depth can be updated here.
+> 3) other options?
 
-No need, bubbled to the top and I got it applied.
+Another option is to remove the ability to configure async_depth. If it
+is too much trouble to get the implementation right without causing
+regressions for existing workloads, one possibility is to remove support
+for restricting the number of asynchronous requests in flight.
 
--- 
-Jens Axboe
+Thanks,
 
+Bart.
