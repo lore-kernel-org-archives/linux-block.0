@@ -1,93 +1,114 @@
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9637F21422C
-	for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 20:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C0623ED5E
+	for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 20:25:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733862290; cv=none; b=BsQw5IcTzFzW+BZ3xZU8DWekXVfG8k0VvxZUx6Kus8FRil0rEbAu/mZkwIZJwTu5FMGqHr8bIVEAGhmnmbPnT3Sr7oYlPDRWBb9WvtqutYpqJb5lNKIhpIqgI61932bkVb9jDWqvLA1xgPK21t5WI6fDKtUY6K3oeNvpPfLQPLU=
+	t=1733862305; cv=none; b=KTG5KP8VSz35OrO32nazA9ZIdNph+oNGDKnVTNnk/2F/bNPKtQ5lue7D9jWzGKGVwNIN0ZQ0/p4ReIbkx16wpozxdJlmMnB248bLbxmBQgSQ7jTk0nhFm3SGd+GKVOiEjU7CNWJd7mHlpFFKyOB1UEN8i4sAwDhLJ9wm4HDZ6oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733862290; c=relaxed/simple;
-	bh=OjUDrTzFkxV8xSogins9C7+MzayhWkm9mYNApfos4iE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=pFQFBS2NcAcKYeRPanjweErd9ubUfw3jzxPthGGfXNIybFFFMbNzYIgPV/27emCndBbV5dhKgRKwJ6vSEQXxRVSGTBBqjUaiWKQq4wessdVzbSVH7rqoy4lgIA0kgISP/ua29RNi98Ehu/fQtDo63NKDV6w/BmKFsxIutLoN/tE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=QMMMCe5C; arc=none smtp.client-ip=209.85.167.170
+	s=arc-20240116; t=1733862305; c=relaxed/simple;
+	bh=UNDFKh6EtR41sLGf3n/jLNncxCVeGRiamWNjmyGihgE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eXlH+Okj79Jt3lQDF+fAiokFPyyU4BEVaEEAzPk1GOvHcOA5sNuBZ8fc6nY65ekRNao3tRyeWMGV16EXHqfU6OntCbbz4IDDeutv6LqMcuYFVE9puoqt4vAZJQQg68K8dAXTlUgJ++C0zECAELo3Ob9d+4ST0TUJCNmXuoOoDU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=r0SLMtR7; arc=none smtp.client-ip=209.85.167.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="QMMMCe5C"
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3eb7e725aa0so231719b6e.0
-        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 12:24:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="r0SLMtR7"
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3eb4684f3cbso1465575b6e.3
+        for <linux-block@vger.kernel.org>; Tue, 10 Dec 2024 12:25:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1733862286; x=1734467086; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dz7JV4e7nhtTLCyitE4tGv1i/S/7sfwY6uqrvo43keE=;
-        b=QMMMCe5CegsJcdYEZREz9uhjsAa/tYpBOfURty77IJQyXx4dBJvppHgCitzt58mIAD
-         7MPjiIZuDwXaVz+3SacjIPBKmluhL5uaJDRob5GYtbVoVvzgUeS2G/xixTRvnuifNaMn
-         7JehQvvNVm4Ei0Dp0CjeaSF9ipzfhls/H5lehVeiO0UlVROAWFVOGZ6rMUPwoYnlDsUd
-         ZsLeg3ZTf9iIBcfO8TtjRZkaYkO2eNnEBTu1kcuWWVb8GnUR+hX/b8VFgVxlGzV/jL9+
-         ZikFhsD3EiFy8mdk1vNXSLnJ7yTfHqS4PxY8ss+AxfMbywemZ1sp43JSz+LPwyldXw0a
-         NQFg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1733862302; x=1734467102; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B4uVKrnhOb5OPOrCkL+Fhl0678KDfsGNRP28fCC0i1g=;
+        b=r0SLMtR73vNy0NdMNMKYVqTM84grN3iHvWA+OAGsHjHJcUzeNqSrHaZ4PMMGNumGFq
+         LJugvYdRof4PKN5yx63sj1HDyy2rEFKA9yWWfDMqZEvwMFrNjdNhAuAmg+dx9Ciul8c5
+         4W/2+L1oMfejWTdqC49T8AchVdJbvA3qK9SfzBTLbCK4bw3dsuvdOLbDsfYJAOHrSAEY
+         tXlq8WVsT47mfZ77qsZGseK7ApmF2zBEYk0BPfV6wMNO4RK3Z9mb4za1SKm5GqLVEuVd
+         zWOLCxXyTvGd76sRfogCi33hQXhVWVGH0Z1xIYt94yAec7GiIHu1FsZhNp6bMR8q9C9g
+         RdvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733862286; x=1734467086;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dz7JV4e7nhtTLCyitE4tGv1i/S/7sfwY6uqrvo43keE=;
-        b=XUo5xaOk9jCvb/gERFPR2Kyja/4cFpoBaw6WKtqqhOz9i3JvS41nKktLxLyhNCulEW
-         zXjgDok6Bp6CSdt0leMP8yjzAdWQDSr6efaw54l3lepFbo8Kn/13SpHa5+iIRdEgI7Ek
-         n8VoSYacV+SsMVrIIdZ/7kzI4bm5hbwQBfndiLAYGUfNTL4Ct1dl+yjgD+DpisTNYRuU
-         2jtrkN2xu5yEfJ88ihAQX4uMn40BSgDC7Gd5Pf10bjmo+q5dylm23BydYn/EKBWj34La
-         mesy53A+t6qn2puIOhH6P+PYS04uqm/73cG729IFsO8EEEVdbdxJVM8No4yCwZa0B6/0
-         SJjg==
-X-Gm-Message-State: AOJu0YzlGYWx+ThsT8vD10iCSU0EBS8wO5n81EL4abvT06etbU8Ojxle
-	9BWYFquz7q+CFyFiMr9V05DP8T95QWuKWzeyn2tvuLMGjkucKFWuuzthBFY5LHJxMU6vvZz/G0j
-	o
-X-Gm-Gg: ASbGncvdbfbFL3GewQBD2NmYmYBbbJ7jutvEAteCYQgRD03KvXMX7iD8mtVz6xWy8ho
-	a8aulfmxJa3wvRrPoLbKqhJLvZD01aJEjUGLFxCd07vW8pJw/E0XgRWyNMvgOH8160ZPrQmHXpm
-	rCCp/UoEmp7k0Gnz6UGZGo7mRNI/qIjpR/GpOYTeuGhDpAoRSy2OG65zTOUtwDkZFIH27YOw4bA
-	okmo9MqA4MOcgnJVT8icdzAn0oZvnJaEFwVSwd/92rt
-X-Google-Smtp-Source: AGHT+IHCFkLDK5vw13xHumY+LZl7gl7/7bb3anCD0gtOEMPH7vZQ2IMM8MPeCpyBD0IYuMVRr7FgEA==
-X-Received: by 2002:a05:6870:d106:b0:29e:1e77:71a2 with SMTP id 586e51a60fabf-2a012bb502cmr240840fac.3.1733862286017;
-        Tue, 10 Dec 2024 12:24:46 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5f279223948sm2738866eaf.14.2024.12.10.12.24.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2024 12:24:45 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: LongPing Wei <weilongping@oppo.com>
-Cc: linux-block@vger.kernel.org, bvanassche@google.com, dlemoal@kernel.org
-In-Reply-To: <20241107020439.1644577-1-weilongping@oppo.com>
-References: <20241107020439.1644577-1-weilongping@oppo.com>
-Subject: Re: [PATCH v4] block: get wp_offset by bdev_offset_from_zone_start
-Message-Id: <173386228506.539031.5085315548244677015.b4-ty@kernel.dk>
-Date: Tue, 10 Dec 2024 13:24:45 -0700
+        d=1e100.net; s=20230601; t=1733862302; x=1734467102;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B4uVKrnhOb5OPOrCkL+Fhl0678KDfsGNRP28fCC0i1g=;
+        b=nAJGanxiSNBH9JsCHjuFJjMGP9c4nEGtupKbQtj6FJ6rjdNxIaa/j2w0P1+E6Fzvln
+         /z/1AiC1I2Z2t11jIbcnJ1PMVH1f7ytBJsEtMzVtbiMjnFJIdCuZH4hMlLCdIkpTb1nv
+         NA4Rh6N8qb7r+CHTtZd91XG3wjhyLJbsnhGwdSwfuZOGKQRc1/qSax9zQOI5gf5iROYe
+         KIZbDo1rh4VByE+7YFhb+Pg4e0sSP+tnZzDXN8c7uI+uUapnYGzzogtaBd8Ar7u4kCNm
+         DB2OgpIJZHxlxClj/rpcC/XqhQAdtyW64aHxTIdueNAr7xXek+2Vjz+hG8Yago8ag/Uy
+         S9Eg==
+X-Gm-Message-State: AOJu0YzpzmIRvOa7TgO1qIDq81nrHsnzmODz9AarzE6Y3LPP9WSFByKO
+	twV8AFOrUtd3ua9MPplyVgH89zdfDz9WB00c1lbtVeCnql3Ho8Sxkhz7BoxnIswygrfdKguTGLa
+	l
+X-Gm-Gg: ASbGncvw8dzuSAqiuyp32Y8BjgeknQUMNU3Qb8NyyhxULrDsyj6IIUr8ihQcasrfaQI
+	VX2gpmtgyVtb7Z0eI7+nQtt4XaQjDYdK2T3mb8m8YyyCQZbhsv6ce+Ek8LMbNt4XTOjz+GM3UW5
+	uUI3UaY9iOw/9LdwH0khg1kRNHUeKn+f3hzfi0mtNMi22zv//zhFYEjUKu5vw7Qhqerh3lqJOrA
+	JprtSh2vak+cw8XhR+/THjrQh0nR3dZvlb4lVQE5ZV0VkzhwA==
+X-Google-Smtp-Source: AGHT+IENz/N20lGE1Cb9LYPVC1rDkVHiBlms49Lx+SUk0dw7nu41xde2awBttDC5mO+hqAQkijpQkQ==
+X-Received: by 2002:a05:6808:1981:b0:3eb:6044:5a7e with SMTP id 5614622812f47-3eb85ba8b46mr220181b6e.19.1733862302366;
+        Tue, 10 Dec 2024 12:25:02 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3eb7ca77f07sm225349b6e.35.2024.12.10.12.25.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2024 12:25:01 -0800 (PST)
+Message-ID: <12eec6ff-8ddd-4a94-85c7-efc30cf70241@kernel.dk>
+Date: Tue, 10 Dec 2024 13:25:00 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-86319
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] block: get wp_offset by bdev_offset_from_zone_start
+To: Bart Van Assche <bvanassche@acm.org>, LongPing Wei <weilongping@oppo.com>
+Cc: linux-block@vger.kernel.org, bvanassche@google.com, dlemoal@kernel.org
+References: <20241107020439.1644577-1-weilongping@oppo.com>
+ <4ba9633b-472d-4d63-9282-bd68b79fba18@acm.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <4ba9633b-472d-4d63-9282-bd68b79fba18@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-On Thu, 07 Nov 2024 10:04:41 +0800, LongPing Wei wrote:
-> Call bdev_offset_from_zone_start() instead of open-coding it.
+On 12/10/24 1:23 PM, Bart Van Assche wrote:
+> On 11/6/24 6:04 PM, LongPing Wei wrote:
+>> Call bdev_offset_from_zone_start() instead of open-coding it.
+>>
+>> Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
+>> Signed-off-by: LongPing Wei <weilongping@oppo.com>
+>> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+>> ---
+>> v4: update commit message
+>> ---
+>>   block/blk-zoned.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+>> index af19296fa50d..77a448952bbd 100644
+>> --- a/block/blk-zoned.c
+>> +++ b/block/blk-zoned.c
+>> @@ -537,7 +537,7 @@ static struct blk_zone_wplug *disk_get_and_lock_zone_wplug(struct gendisk *disk,
+>>       spin_lock_init(&zwplug->lock);
+>>       zwplug->flags = 0;
+>>       zwplug->zone_no = zno;
+>> -    zwplug->wp_offset = sector & (disk->queue->limits.chunk_sectors - 1);
+>> +    zwplug->wp_offset = bdev_offset_from_zone_start(disk->part0, sector);
+>>       bio_list_init(&zwplug->bio_list);
+>>       INIT_WORK(&zwplug->bio_work, blk_zone_wplug_bio_work);
+>>       zwplug->disk = disk;
 > 
+> Hi LongPing Wei,
 > 
+> Since this patch has not yet been merged, how about reposting it?
 
-Applied, thanks!
+No need, bubbled to the top and I got it applied.
 
-[1/1] block: get wp_offset by bdev_offset_from_zone_start
-      commit: 790eb09e59709a1ffc1c64fe4aae2789120851b0
-
-Best regards,
 -- 
 Jens Axboe
-
-
 
