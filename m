@@ -1,59 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259531DA0FE;
-	Wed, 11 Dec 2024 21:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65CD81C304A;
+	Wed, 11 Dec 2024 22:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733952108; cv=none; b=m/R7pVuk/8WefpJXKgN2XHJQzP9oEFgVwjbK/Fya98P+sQlPhqI7LCirGprPjjKyEXEtIHCc7SWsPn4h38mLvE7zQS1ZXnYluxuqToVI46qCQNuUzzb0GOQtV91o/Tq5s93A6e9S/dm+Y8EpRqti0xALwruJyOEyF8cVrOUrDq0=
+	t=1733955609; cv=none; b=hLhP/vjTndfso2Xf3efgEI4kZFPcEV7MM467tRizoEbkaenisa9GdQgmvQyq0IORFqes/8ee/UAejThLiX4h2rhw4SShHtcjuEPd/NkWw/CFfgWTnYHt/J5/Q9w1tS/j46eYOXCe2oy93+eyCSkCV5iCw6KMwEAOV/FJiiZuHt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733952108; c=relaxed/simple;
-	bh=IaVdboK9++5RQ3hFpt89sE9pHIWJBLcZbpQWyCDkaME=;
+	s=arc-20240116; t=1733955609; c=relaxed/simple;
+	bh=VLhIlSr54TL2QmDP8JRM72GWULbrO+1dbQF3pJw1ea8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JpCwbA1QfvXPzN6dfGRd7tNrzT4AhJAGz+vh06BnS1dPz5v68hUA5Iae2IvZZl8AKykrMfaJqoug2VGPfGOQY2tD8WEr+fEBlbI6ROgwYQAij+csyNnKFcgBfOH0YQQqfz7K8SFj5mWBlJIjuhE9UryLLiTcCqL5CtlrnEU21ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M36mERpS; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=elv6m3HdSOdEICY/3aSSgbWXYNWERWVQvLHMz7jD+zQ5MPv52a+Ojl5HhSdtYC77lVZ9iESwHsvGc+MKnEAWdKjTCT3pPr5ThpQjkSNRYcPKX0UZGQkU0aRg9bEt5blGlf5OPECdYn7Ax1f0iOCkpbnZ9VWavFsACWBFOPOEfhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBNirnu6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M36mERpS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7C98C4CEDD;
-	Wed, 11 Dec 2024 21:21:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBNirnu6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4576FC4CED2;
+	Wed, 11 Dec 2024 22:20:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733952107;
-	bh=IaVdboK9++5RQ3hFpt89sE9pHIWJBLcZbpQWyCDkaME=;
+	s=k20201202; t=1733955609;
+	bh=VLhIlSr54TL2QmDP8JRM72GWULbrO+1dbQF3pJw1ea8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M36mERpSl2KG6yGOKVFPVUFiFJoJmnzxAr9I9L0WRvuAX9uAMuEwLz0+1j5JVZivX
-	 980NduCXsymeKnFsx+atJRTapwFUrOe9lfsH9y+ryYZYSPAUAwBlbFpTsw70lRABVN
-	 CrlfulJbyhNZ+n0BHHUZiftbqrf+PqCwsbRHR00oOynDbcF76Xy+PW9tvdG9iWUWO7
-	 dsAcCE2tmN3aKOWA4w2MaDqy7C/O3UyRXScbhCnxNAhncze022rUqPFlfFmp6wTfUI
-	 ATi05tkiy0cSiSAw7rPPjseZuS1empUiTdZdTuNNZ/GyLEhodhPC7IdjVwWH9sIgRF
-	 pzOluCzKOlsoA==
-Date: Wed, 11 Dec 2024 21:21:44 +0000
-From: Jaegeuk Kim <jaegeuk@kernel.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Damien Le Moal <dlemoal@kernel.org>, hch <hch@lst.de>,
-	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Javier Gonzalez <javier.gonz@samsung.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Keith Busch <kbusch@kernel.org>, Keith Busch <kbusch@meta.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"joshi.k@samsung.com" <joshi.k@samsung.com>
-Subject: Re: [PATCHv10 0/9] write hints with nvme fdp, scsi streams
-Message-ID: <Z1oCaLF8-xclgFB_@google.com>
-References: <yq1jzcov5am.fsf@ca-mkp.ca.oracle.com>
- <CGME20241205081138epcas5p2a47090e70c3cf19e562f63cd9fc495d1@epcas5p2.samsung.com>
- <20241205080342.7gccjmyqydt2hb7z@ubuntu>
- <yq1a5d9op6p.fsf@ca-mkp.ca.oracle.com>
- <20241210071253.GA19956@lst.de>
- <2a272dbe-a90a-4531-b6a2-ee7c4c536233@wdc.com>
- <20241210105822.GA3123@lst.de>
- <a10da3f8-9a71-4794-9473-95385ac4e59f@acm.org>
- <6ff84297-d133-48d4-b847-807a75cab0f6@kernel.org>
- <97ed9def-7dfd-4170-9e60-6c081da409bc@acm.org>
+	b=kBNirnu6kCr1d7gsDMgZrNuAXLYpD8uzILmzzbrNO1Mnk09f4n481Cndxfrau3+jJ
+	 FpLkwRUeISCmz/SpemPgohhlQ3XgJzMdmIoVZ+IhBa91qhgYo51NaglvZU5BDtIZwB
+	 //WGIgbYueq/MY8+Vmm6UVkGftTY+5cuZd/vROmxV6NP1K5rtWTWqMiA7gXfNGL2rJ
+	 x8QxUc2OB1rxoUChWT6mPdO+zhCO+RaRL8TgtaiQ2BKywx4s0f0kj5Ngw6pkMs+dfE
+	 zgxHiHxwQbMNfdTxhMs7Xm5RVvG80KHa9zyTwAQzCJbyWkRaNGRYrBbAH41l/rU6DO
+	 Lf0Zf/ATio7bQ==
+Date: Wed, 11 Dec 2024 22:20:00 +0000
+From: Will Deacon <will@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v4 04/18] iommu: add kernel-doc for iommu_unmap and
+ iommu_unmap_fast
+Message-ID: <20241211222000.GH17486@willie-the-truck>
+References: <cover.1733398913.git.leon@kernel.org>
+ <da4827fda833e69dbe487ef404a9333c51d8ed2e.1733398913.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,27 +63,57 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <97ed9def-7dfd-4170-9e60-6c081da409bc@acm.org>
+In-Reply-To: <da4827fda833e69dbe487ef404a9333c51d8ed2e.1733398913.git.leon@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On 12/11, Bart Van Assche wrote:
-> On 12/10/24 8:07 PM, Damien Le Moal wrote:
-> > But for F2FS, the conventional unit is used for metadata and the other zoned LU
-> > for data. How come copying from one to the other can be useful ?
+On Thu, Dec 05, 2024 at 03:21:03PM +0200, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
 > 
-> Hi Damien,
+> Add kernel-doc section for iommu_unmap and iommu_unmap_fast to document
+> existing limitation of underlying functions which can't split individual
+> ranges.
 > 
-> What you wrote is correct in general. If a conventional and zoned LU are
-> combined, data is only written to the conventional LU once the zoned LU
-> is full. The data on the conventional LU may be migrated to the zoned LU
-> during garbage collection. This is why copying from the conventional LU
-> to the zoned LU is useful.
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  drivers/iommu/iommu.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 > 
-> Jaegeuk, please correct me if I got this wrong.
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index ec75d14497bf..9eb7c7d7aa70 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2590,6 +2590,24 @@ size_t iommu_unmap(struct iommu_domain *domain,
+>  }
+>  EXPORT_SYMBOL_GPL(iommu_unmap);
+>  
+> +/**
+> + * iommu_unmap_fast() - Remove mappings from a range of IOVA without IOTLB sync
+> + * @domain: Domain to manipulate
+> + * @iova: IO virtual address to start
+> + * @size: Length of the range starting from @iova
+> + * @iotlb_gather: range information for a pending IOTLB flush
+> + *
+> + * iommu_unmap_fast() will remove a translation created by iommu_map(). It cannot
+> + * subdivide a mapping created by iommu_map(), so it should be called with IOVA
+> + * ranges that match what was passed to iommu_map(). The range can aggregate
+> + * contiguous iommu_map() calls so long as no individual range is split.
+> + *
+> + * Basicly iommu_unmap_fast() as the same as iommu_unmap() but for callers
 
-Bart is correct. It doesn't make sense forcing to use conventional LU for
-metadata only, but shows the remaining conventional LU space to user as well.
-In order to do that, we exploited the multi-partition support in F2FS by
-aligning the section to zoned partition offset simply.
+Typo: s/Basicly/Basically/
+Typo: s/as the same/is the same/
 
-> 
-> Bart.
+> + * which manage IOTLB flush range externaly to perform batched sync.
+
+Grammar: s/manage IOTLB flush range/manage the IOTLB flushing/
+Typo: s/externaly/externally/
+Grammar: s/to perform batched sync/to perform a batched sync/
+
+With those:
+
+Acked-by: Will Deacon <will@kernel.org>
+
+Thank you for doing this!
+
+Will
