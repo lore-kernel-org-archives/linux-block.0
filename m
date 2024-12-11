@@ -1,49 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1499246B3C;
-	Wed, 11 Dec 2024 18:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08BBE24B223;
+	Wed, 11 Dec 2024 18:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733943119; cv=none; b=abXGzsoN1G6dI0rLyLu0T7iolEAaGMC/h1VCFmIfVG6uJyOCAWKLDLov9LUKjbaCAdcNlqy1fHk3Pa4iw/WhN6fe0B9r3EeaAgn56UzarLItNcTmcEYBaOzYGnn/QJ9OTFtGepxs1uqdPkJGrTXY4WGsAS/9GDU3n+IDsMxOKaA=
+	t=1733943183; cv=none; b=Ir5fJzFrWU8LnfNZLuXtu3fr5Ydn3bZCH0mzi5/fLGmB5lPnP6I4/FgFbFj1RmP3V0+Mtiai/J3wc1lrkvd2UKnseE4S0hW7O4kumnP+baYUBdkdT8vAkfM8DHxl4vfHAPYFR5KNypKHaOpwL6LKrNdGXgqoew/pJT5KvnClN1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733943119; c=relaxed/simple;
-	bh=0ApqLa5ohk2HCuhaPK/iP86UCfKeLgHYSZtpGd/yALg=;
+	s=arc-20240116; t=1733943183; c=relaxed/simple;
+	bh=8kki7GOkDcpBKwlX5O3xG+axtdzfkUuTvuV/co7Ssn4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u6VLRLQ6l9xKFa3gau7ej1U5RM7aNy2aaZ6cCyzjtqAv/RCuGQqZf8KjsmsXFQQNWGt9QMV4TQBARnPwbeRTI7OxAspEGi1vBnteqy1yVsdgh/mq8xVZNWxyNU/2g3vLEipjbldBe34CsnYlEKjWj07tAM16Rx6kBbnnXmkVJjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOpaReZU; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=SaPH7r/QRkHHSFxA+UJ/cGwRqQTlK0gXpW2YB5lQG9xn7t415ax/I5eWMTUb5zDDRHn9x5o6v+miMD0jWjPXfWOqjBccasB9Q16XNdmZR8ktXvgT5M+x+Zrzhi8dUVfflKgiCGiE9zAWaUGkEh96cXByBi+GMn25qNA8p9dAEOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gso5fNYQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOpaReZU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 367CDC4CED2;
-	Wed, 11 Dec 2024 18:51:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gso5fNYQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B0A0C4CEE2;
+	Wed, 11 Dec 2024 18:53:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733943119;
-	bh=0ApqLa5ohk2HCuhaPK/iP86UCfKeLgHYSZtpGd/yALg=;
+	s=k20201202; t=1733943182;
+	bh=8kki7GOkDcpBKwlX5O3xG+axtdzfkUuTvuV/co7Ssn4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fOpaReZUKhy+fuXAy+2RsPvfXZE6U3+8nqjBozNG560ApGWbQmmIi6Gts6UfKcdAa
-	 VaqTUMZYE0xV13A3Kf4nJAuS9HR07iTlnqo9eIBGB56uxurmSNTVgHZEOqWbWdqJfy
-	 885snMzhfa72aFjp52drRlPg4qLPJibHZBStHt/qvhPW73JG2BseUswGALalaojzG1
-	 2MoxlRXvqzMCnutZlESgp1KBxY45+QZ0PU46XGa0Rn0Gk+PowEXepUBTIu+JuAq/fU
-	 koDFz+HKLlQe4cf0hkYuRLtHu1c56HgHHNn26vFOR7UbKSwqmhtG7EIAsQaW9Jseks
-	 69ZE3Mb8ML2Ow==
+	b=gso5fNYQIO3yFugm47SixGr90SRwZpAyLl67ush1TA8slMPcEfZVlzuqh5XnIeMNF
+	 FygVMS3Sk1ZPPCNEl3gfFax1ueHESf1N7VWPR+2qhTEr89LQ8gg9DoyWLPhS6AhOKH
+	 2fk+lWqX1b0SUqbgMj8gNQXHnyx9I3ceF3nWR7EkG4zlSVDulw6hrA2WQAD3PuqHcB
+	 gOU1JSqH4ng+J0pJ6W9PcuV0g3WsprYg/ZK97QPwd+0gXhNzp1fQSKp/+yJZ/ml6XB
+	 /aku7egXgQAwWiZupXH/UneKRDZiE6L62aCC1l9ZBqrtRzgXrUwtWby6ppm605U66e
+	 N0h8dsMrv2vNA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
 Cc: Ming Lei <ming.lei@redhat.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Fenghua Yu <fenghua.yu@intel.com>,
-	Peter Newman <peternewman@google.com>,
-	Babu Moger <babu.moger@amd.com>,
-	Luck Tony <tony.luck@intel.com>,
+	Yi Sun <yi.sun@unisoc.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	virtualization@lists.linux.dev,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 36/36] blk-mq: move cpuhp callback registering out of q->sysfs_lock
-Date: Wed, 11 Dec 2024 13:49:52 -0500
-Message-ID: <20241211185028.3841047-36-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 21/23] virtio-blk: don't keep queue frozen during system suspend
+Date: Wed, 11 Dec 2024 13:51:58 -0500
+Message-ID: <20241211185214.3841978-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241211185028.3841047-1-sashal@kernel.org>
-References: <20241211185028.3841047-1-sashal@kernel.org>
+In-Reply-To: <20241211185214.3841978-1-sashal@kernel.org>
+References: <20241211185214.3841978-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,199 +53,73 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.4
+X-stable-base: Linux 6.6.65
 Content-Transfer-Encoding: 8bit
 
 From: Ming Lei <ming.lei@redhat.com>
 
-[ Upstream commit 22465bbac53c821319089016f268a2437de9b00a ]
+[ Upstream commit 7678abee0867e6b7fb89aa40f6e9f575f755fb37 ]
 
-Registering and unregistering cpuhp callback requires global cpu hotplug lock,
-which is used everywhere. Meantime q->sysfs_lock is used in block layer
-almost everywhere.
+Commit 4ce6e2db00de ("virtio-blk: Ensure no requests in virtqueues before
+deleting vqs.") replaces queue quiesce with queue freeze in virtio-blk's
+PM callbacks. And the motivation is to drain inflight IOs before suspending.
 
-It is easy to trigger lockdep warning[1] by connecting the two locks.
+block layer's queue freeze looks very handy, but it is also easy to cause
+deadlock, such as, any attempt to call into bio_queue_enter() may run into
+deadlock if the queue is frozen in current context. There are all kinds
+of ->suspend() called in suspend context, so keeping queue frozen in the
+whole suspend context isn't one good idea. And Marek reported lockdep
+warning[1] caused by virtio-blk's freeze queue in virtblk_freeze().
 
-Fix the warning by moving blk-mq's cpuhp callback registering out of
-q->sysfs_lock. Add one dedicated global lock for covering registering &
-unregistering hctx's cpuhp, and it is safe to do so because hctx is
-guaranteed to be live if our request_queue is live.
+[1] https://lore.kernel.org/linux-block/ca16370e-d646-4eee-b9cc-87277c89c43c@samsung.com/
 
-[1] https://lore.kernel.org/lkml/Z04pz3AlvI4o0Mr8@agluck-desk3/
+Given the motivation is to drain in-flight IOs, it can be done by calling
+freeze & unfreeze, meantime restore to previous behavior by keeping queue
+quiesced during suspend.
 
-Cc: Reinette Chatre <reinette.chatre@intel.com>
-Cc: Fenghua Yu <fenghua.yu@intel.com>
-Cc: Peter Newman <peternewman@google.com>
-Cc: Babu Moger <babu.moger@amd.com>
-Reported-by: Luck Tony <tony.luck@intel.com>
+Cc: Yi Sun <yi.sun@unisoc.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: virtualization@lists.linux.dev
+Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Tested-by: Tony Luck <tony.luck@intel.com>
-Link: https://lore.kernel.org/r/20241206111611.978870-3-ming.lei@redhat.com
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Link: https://lore.kernel.org/r/20241112125821.1475793-1-ming.lei@redhat.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-mq.c | 103 +++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 92 insertions(+), 11 deletions(-)
+ drivers/block/virtio_blk.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c4012cb3adbf1..6dd849d607c03 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -43,6 +43,7 @@
- 
- static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
- static DEFINE_PER_CPU(call_single_data_t, blk_cpu_csd);
-+static DEFINE_MUTEX(blk_mq_cpuhp_lock);
- 
- static void blk_mq_insert_request(struct request *rq, blk_insert_t flags);
- static void blk_mq_request_bypass_insert(struct request *rq,
-@@ -3740,13 +3741,91 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
- 	return 0;
- }
- 
--static void blk_mq_remove_cpuhp(struct blk_mq_hw_ctx *hctx)
-+static void __blk_mq_remove_cpuhp(struct blk_mq_hw_ctx *hctx)
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 997106fe73e49..65a1f1576e55f 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -1624,9 +1624,12 @@ static void virtblk_remove(struct virtio_device *vdev)
+ static int virtblk_freeze(struct virtio_device *vdev)
  {
--	if (!(hctx->flags & BLK_MQ_F_STACKING))
-+	lockdep_assert_held(&blk_mq_cpuhp_lock);
-+
-+	if (!(hctx->flags & BLK_MQ_F_STACKING) &&
-+	    !hlist_unhashed(&hctx->cpuhp_online)) {
- 		cpuhp_state_remove_instance_nocalls(CPUHP_AP_BLK_MQ_ONLINE,
- 						    &hctx->cpuhp_online);
--	cpuhp_state_remove_instance_nocalls(CPUHP_BLK_MQ_DEAD,
--					    &hctx->cpuhp_dead);
-+		INIT_HLIST_NODE(&hctx->cpuhp_online);
-+	}
-+
-+	if (!hlist_unhashed(&hctx->cpuhp_dead)) {
-+		cpuhp_state_remove_instance_nocalls(CPUHP_BLK_MQ_DEAD,
-+						    &hctx->cpuhp_dead);
-+		INIT_HLIST_NODE(&hctx->cpuhp_dead);
-+	}
-+}
-+
-+static void blk_mq_remove_cpuhp(struct blk_mq_hw_ctx *hctx)
-+{
-+	mutex_lock(&blk_mq_cpuhp_lock);
-+	__blk_mq_remove_cpuhp(hctx);
-+	mutex_unlock(&blk_mq_cpuhp_lock);
-+}
-+
-+static void __blk_mq_add_cpuhp(struct blk_mq_hw_ctx *hctx)
-+{
-+	lockdep_assert_held(&blk_mq_cpuhp_lock);
-+
-+	if (!(hctx->flags & BLK_MQ_F_STACKING) &&
-+	    hlist_unhashed(&hctx->cpuhp_online))
-+		cpuhp_state_add_instance_nocalls(CPUHP_AP_BLK_MQ_ONLINE,
-+				&hctx->cpuhp_online);
-+
-+	if (hlist_unhashed(&hctx->cpuhp_dead))
-+		cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD,
-+				&hctx->cpuhp_dead);
-+}
-+
-+static void __blk_mq_remove_cpuhp_list(struct list_head *head)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+
-+	lockdep_assert_held(&blk_mq_cpuhp_lock);
-+
-+	list_for_each_entry(hctx, head, hctx_list)
-+		__blk_mq_remove_cpuhp(hctx);
-+}
-+
-+/*
-+ * Unregister cpuhp callbacks from exited hw queues
-+ *
-+ * Safe to call if this `request_queue` is live
-+ */
-+static void blk_mq_remove_hw_queues_cpuhp(struct request_queue *q)
-+{
-+	LIST_HEAD(hctx_list);
-+
-+	spin_lock(&q->unused_hctx_lock);
-+	list_splice_init(&q->unused_hctx_list, &hctx_list);
-+	spin_unlock(&q->unused_hctx_lock);
-+
-+	mutex_lock(&blk_mq_cpuhp_lock);
-+	__blk_mq_remove_cpuhp_list(&hctx_list);
-+	mutex_unlock(&blk_mq_cpuhp_lock);
-+
-+	spin_lock(&q->unused_hctx_lock);
-+	list_splice(&hctx_list, &q->unused_hctx_list);
-+	spin_unlock(&q->unused_hctx_lock);
-+}
-+
-+/*
-+ * Register cpuhp callbacks from all hw queues
-+ *
-+ * Safe to call if this `request_queue` is live
-+ */
-+static void blk_mq_add_hw_queues_cpuhp(struct request_queue *q)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned long i;
-+
-+	mutex_lock(&blk_mq_cpuhp_lock);
-+	queue_for_each_hw_ctx(q, hctx, i)
-+		__blk_mq_add_cpuhp(hctx);
-+	mutex_unlock(&blk_mq_cpuhp_lock);
- }
+ 	struct virtio_blk *vblk = vdev->priv;
++	struct request_queue *q = vblk->disk->queue;
  
- /*
-@@ -3797,8 +3876,6 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
+ 	/* Ensure no requests in virtqueues before deleting vqs. */
+-	blk_mq_freeze_queue(vblk->disk->queue);
++	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue_nowait(q);
++	blk_mq_unfreeze_queue(q);
  
--	blk_mq_remove_cpuhp(hctx);
--
- 	xa_erase(&q->hctx_table, hctx_idx);
+ 	/* Ensure we don't receive any more interrupts */
+ 	virtio_reset_device(vdev);
+@@ -1650,8 +1653,8 @@ static int virtblk_restore(struct virtio_device *vdev)
+ 		return ret;
  
- 	spin_lock(&q->unused_hctx_lock);
-@@ -3815,6 +3892,7 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if (i == nr_queue)
- 			break;
-+		blk_mq_remove_cpuhp(hctx);
- 		blk_mq_exit_hctx(q, set, hctx, i);
- 	}
- }
-@@ -3838,11 +3916,6 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 	if (xa_insert(&q->hctx_table, hctx_idx, hctx, GFP_KERNEL))
- 		goto exit_flush_rq;
+ 	virtio_device_ready(vdev);
++	blk_mq_unquiesce_queue(vblk->disk->queue);
  
--	if (!(hctx->flags & BLK_MQ_F_STACKING))
--		cpuhp_state_add_instance_nocalls(CPUHP_AP_BLK_MQ_ONLINE,
--				&hctx->cpuhp_online);
--	cpuhp_state_add_instance_nocalls(CPUHP_BLK_MQ_DEAD, &hctx->cpuhp_dead);
--
+-	blk_mq_unfreeze_queue(vblk->disk->queue);
  	return 0;
- 
-  exit_flush_rq:
-@@ -3877,6 +3950,8 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
- 	INIT_DELAYED_WORK(&hctx->run_work, blk_mq_run_work_fn);
- 	spin_lock_init(&hctx->lock);
- 	INIT_LIST_HEAD(&hctx->dispatch);
-+	INIT_HLIST_NODE(&hctx->cpuhp_dead);
-+	INIT_HLIST_NODE(&hctx->cpuhp_online);
- 	hctx->queue = q;
- 	hctx->flags = set->flags & ~BLK_MQ_F_TAG_QUEUE_SHARED;
- 
-@@ -4415,6 +4490,12 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 	xa_for_each_start(&q->hctx_table, j, hctx, j)
- 		blk_mq_exit_hctx(q, set, hctx, j);
- 	mutex_unlock(&q->sysfs_lock);
-+
-+	/* unregister cpuhp callbacks for exited hctxs */
-+	blk_mq_remove_hw_queues_cpuhp(q);
-+
-+	/* register cpuhp for new initialized hctxs */
-+	blk_mq_add_hw_queues_cpuhp(q);
  }
- 
- int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ #endif
 -- 
 2.43.0
 
