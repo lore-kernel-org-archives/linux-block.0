@@ -1,113 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA2BC148;
-	Wed, 11 Dec 2024 02:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13351ABEA5;
+	Wed, 11 Dec 2024 02:38:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733884295; cv=none; b=s4wcAaULzzWZ00h1h/tt6qi16QhniJZ5YHz2fNLZcN4Aa7gAjg7K9ZmXTrgWxnE0KInZtSWBNEqxXxYBY3QGXzGKdHyX14NaNo/Ryk2atCifwflf0/N4x6hJPOGA1QMG0+skpqELiShnR6ceFM4bNT0I0AABh69VgQd7CpVWQ6k=
+	t=1733884722; cv=none; b=dUmdP8UV5aN/rGXFiWKBodYD3X72o3vkkpBEnqdqMeHkJ9rFpJVq/WeOh1kvbTmyWuhhkTmf0TK7n1/UitY0kiHX1tkFtgiIDRJiPK+34Bsh1UKtTt2BTNqVD9O392x0Fe34yqAFzt1iMSDWmfoaUd1hyQQJPBMWcXR7cxmpPcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733884295; c=relaxed/simple;
-	bh=sLhMhQmowIvyDOZaQSUrMhLsPhwddTfrbVNYlnBcDH4=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=uefrOuJeVPpLTfC8VG6bYss8t07pU7qrDi7zY6nKHt4oolFmeNWPnL+IssELiYZ/WMqYxnLwp9W8HlGJhLDrLGjn9r8pzMRtrtBgMxS7ll7xkvQth/NlutdyUTdMw5bMqy35vdZnLoDin5nvdp+eKjdlccAXhJjWe9pXx9uJKNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=LFzIAbje; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733884722; c=relaxed/simple;
+	bh=4OLQwQO0LdwaulrgdF6TOJDcMwzUcT+bJ7H1QUHqX3M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nhd3sMZTSpfLRLWhZNhssbxHzM1RIXV6/XYRV1NTr0YMspcq/dulZnXiHpDjrKhcFiPq2hiz7Lh+OuyjvcgawwLGFSP1dWcc2LZTOFaJvuDD6DhGisFib8fEQAZUJkLmVVDz2ibgI5b8JFZ6dKiPeOEXRrm5+NWa4GxsKHdd7Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kEm3QReU; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="LFzIAbje"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88D37C4CED6;
-	Wed, 11 Dec 2024 02:31:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1733884294;
-	bh=sLhMhQmowIvyDOZaQSUrMhLsPhwddTfrbVNYlnBcDH4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LFzIAbjeVxr5ODQPOZZgTBsZ9VPv2qRYsjzufXTmy2VjrkolY7we/T3El5L3bI4tv
-	 ZwBBxonZW6D/7UDB8GmpeizZX1si0/2Sixxb/Y/AoqhAb098fytUnRjDBW3AgAqPQ/
-	 xwSsay0w7F9KyDeJ3A+YhVB7Vf6NOdXZjnEFoERY=
-Date: Tue, 10 Dec 2024 18:31:30 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Easwar Hariharan <eahariha@linux.microsoft.com>, Jeff Johnson
- <jeff.johnson@oss.qualcomm.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Julia Lawall
- <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack
- <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, Robert
- Jarzmik <robert.jarzmik@free.fr>, Russell King <linux@armlinux.org.uk>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Ofir
- Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>, Lucas De
- Marchi <lucas.demarchi@intel.com>, Thomas =?ISO-8859-1?Q?Hellstr=F6m?=
- <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
- <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>, Dick Kennedy
- <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Roger Pau =?ISO-8859-1?Q?Monn=E9?=
- <roger.pau@citrix.com>, Jens Axboe <axboe@kernel.dk>, Kalle Valo
- <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel
- Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Ray Jui <rjui@broadcom.com>, Scott Branden
- <sbranden@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>, Ilya
- Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jiri
- Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>, Petr Mladek
- <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Louis Peens
- <louis.peens@corigine.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
- Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan
- <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
- <anna-maria@linutronix.de>
-Subject: Re: [PATCH v3 00/19] Converge on using secs_to_jiffies()
-Message-Id: <20241210183130.81111d05148c41278a299aad@linux-foundation.org>
-In-Reply-To: <20241210173548.5d32efe0@kernel.org>
-References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
-	<315e9178-5b10-4de0-bdcf-7243e0e355bb@oss.qualcomm.com>
-	<20241210153604.cf99699f264f12740ffce5c7@linux-foundation.org>
-	<20241210173548.5d32efe0@kernel.org>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kEm3QReU"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3862f11a13dso449327f8f.2;
+        Tue, 10 Dec 2024 18:38:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733884718; x=1734489518; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eI+hPb6isny6xU/Mw22BE9CM1MN0WgOmna79UINL7uE=;
+        b=kEm3QReU+eIh//SNf2o9MMDCWgSfpDCx59tMTHtrZlzZFsBUl5H4CefsmDQtdYc3qj
+         r1UCKE+M4vFoHObaZL06eOzDT5K1odflNIpTT/Ti+Jex1YrZvbQCqR8E0baFOYILxApj
+         qLaPofD+uU1yM8U58UN/MrkC8wS1Fxa6aj9B8mQQWdg+OOXq01FC4qqRq/bn1FRyVJXf
+         Kqvzvz2WDaCR1I2GBDWqcDFOjoSOu8xYsf60T6Z1D5xvCuylehYRfeV6l12AlQAzaW1f
+         pL8FtGMzV9gZOnsIp2H3qf1TU55sxW3NFSscu1Sn7docH7wclrBw1p3XIJM2tqUnMnZr
+         n35A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733884718; x=1734489518;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eI+hPb6isny6xU/Mw22BE9CM1MN0WgOmna79UINL7uE=;
+        b=D/zdOOIUNDeWuc1FiK6209eH4oESzowZ3T41mUP84WlElJGfgZPMX30SwucOw7kZ3d
+         qVUONwYJX+49/zGpbpFIfmllonTN5wtnific7qWRmwPxGxMU9SruuKSQq98mUkXnH3n4
+         S8nStx0ZRaflyXLMQp8uPSXzWKnXsHsM6K6P4lC7FZdztL4K0kWxjzu4R9S85tBEVsT2
+         om/Hau5CP2D4GVLxSYf74JvH56P6/kZa/ZMtlceSrTukx/d9mFUR5Umy58Cj8SwrY/In
+         3GYWJLopZpQWTuzJyLaMGnc+wdkCniqoABNY4gTFe9ICVx+ImuZy3KCsFkHG1iLjohEc
+         fSxg==
+X-Forwarded-Encrypted: i=1; AJvYcCV10E5mQl8Vetxiw0EpKcg8/SJmoWqjVfu8vX2NDbfNk9xUOUK2g8ziR7j3gzNmFsdB35OMoYu2WBJgQg==@vger.kernel.org, AJvYcCWoPUcMpYpcrJsVDxp+isJi67aJfBPLMKOku1mP44d2DuEQqp8BbSNk8Txh26v/ocYzYP8tFweK/d6YuHQy@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4VGlCicTVId3thTy5QC3DMfkpJ0IeniBzwVfmzzmsiau1gk43
+	WEWV+rADEwYd93OcDFp01LrhDxQM/kY8LP11hGJD6C4FqUhjueHF17Y/ZLf8fTq07wf01di0iim
+	U54KoI2tMTJA3C807Vwm1h4I67Ds=
+X-Gm-Gg: ASbGnct4jLazk/bIDUo5K0g0n/J2Kr9Z/0c/hE7VulMGmAmd38VbFvVKbHG9rJRElfe
+	tRhXfmKXQGCuEDGF7CJcOcWUPnC70mqtX/LIx
+X-Google-Smtp-Source: AGHT+IEXrBFHN2Zc2n+KTcO5hImGo+X0S04uITF8TJNMKxHmx8tnI06cHhfEH6FkFqf6i2PcWNNYECd772oeGVJ362I=
+X-Received: by 2002:a05:600c:510e:b0:434:fecf:cb2f with SMTP id
+ 5b1f17b1804b1-4361c3af2bemr2303305e9.5.1733884717627; Tue, 10 Dec 2024
+ 18:38:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20241209115522.3741093-1-yukuai1@huaweicloud.com>
+ <20241209115522.3741093-2-yukuai1@huaweicloud.com> <bef7b96c-a6cc-4b83-99b2-848cecb3d3b1@acm.org>
+ <6e384b29-50d2-64bd-0d08-fc0f086c1cbd@huaweicloud.com> <7081765f-28d7-f594-1221-6034b9e88899@huaweicloud.com>
+ <d9733af5-b16b-4644-9d6d-84fbacf334e0@acm.org>
+In-Reply-To: <d9733af5-b16b-4644-9d6d-84fbacf334e0@acm.org>
+From: Zhiguo Niu <niuzhiguo84@gmail.com>
+Date: Wed, 11 Dec 2024 10:38:26 +0800
+Message-ID: <CAHJ8P3J-KwGU_ZffmSmoFkhUX1q=9Q7Dk15yPEXYME_JQHH5tA@mail.gmail.com>
+Subject: Re: [PATCH RFC 1/3] block/mq-deadline: Revert "block/mq-deadline: Fix
+ the tag reservation code"
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, akpm@linux-foundation.org, 
+	yang.yang@vivo.com, ming.lei@redhat.com, osandov@fb.com, 
+	paolo.valente@linaro.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com, 
+	"yukuai (C)" <yukuai3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 10 Dec 2024 17:35:48 -0800 Jakub Kicinski <kuba@kernel.org> wrote:
-
-> On Tue, 10 Dec 2024 15:36:04 -0800 Andrew Morton wrote:
-> > > I have the same question as before: How do you expect these to land?
-> > > Do you now have a maintainer who will take all of them?
-> > > Or do you want individual maintainers to take the ones applicable to them?  
-> > 
-> > I'll just grab everything and see if anyone complains ;)
-> 
-> I may, if this leads to a conflict :(
-
-Very unlikely, and any such conflict will be trivial.
-
-> Easwar, please break this up per subsystem.
-
-The series is already one-patch-per-changed-file.
+Bart Van Assche <bvanassche@acm.org> =E4=BA=8E2024=E5=B9=B412=E6=9C=8811=E6=
+=97=A5=E5=91=A8=E4=B8=89 04:33=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On 12/9/24 10:22 PM, Yu Kuai wrote:
+> > First of all, are we in the agreement that it's not acceptable to
+> > sacrifice performance in the default scenario just to make sure
+> > functional correctness if async_depth is set to 1?
+>
+> How much does this affect performance? If this affects performance
+> significantly I agree that this needs to be fixed.
+>
+> > If so, following are the options that I can think of to fix this:
+> >
+> > 1) make async_depth read-only, if 75% tags will hurt performance in som=
+e
+> > cases, user can increase nr_requests to prevent it.
+> > 2) refactor elevator sysfs api, remove eq->sysfs_lock and replace it
+> > with q->sysfs_lock, so deadline_async_depth_store() will be protected
+> > against changing hctxs, and min_shallow_depth can be updated here.
+> > 3) other options?
+>
+> Another option is to remove the ability to configure async_depth. If it
+> is too much trouble to get the implementation right without causing
+> regressions for existing workloads, one possibility is to remove support
+> for restricting the number of asynchronous requests in flight.
+Hi Bart,
+I think it is very useful to restrict asynchronous requests when IO
+loading is very heavy by aysnc_depth.
+the following is my androidbench experiment in android device(sched_tag=3D1=
+28):
+1. setting heavy IO
+while true; do fio -directory=3D/data -direct=3D0 -rw=3Dwrite -bs=3D64M
+-size=3D1G -numjobs=3D5 -name=3Dfiotest
+2. run androidbench  and results=EF=BC=9A
+                orignial async_depth
+async_depth=3Dnr_requests*3/4      delta
+seq read             33.176                                216.49
+                      183.314
+seq write             28.57                                  62.152
+                         33.582
+radom read         1.518                                  1.648
+                        0.13
+radom write         3.546                                  4.27
+                          0.724
+and our customer also feedback there is optimization when they test
+APP cold start and benchmark after tunning async_depth.
+thanks=EF=BC=81
+>
+> Thanks,
+>
+> Bart.
+>
