@@ -1,144 +1,160 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9AC8635A
-	for <linux-block@vger.kernel.org>; Wed, 11 Dec 2024 06:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6571BEF75;
+	Wed, 11 Dec 2024 07:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733897125; cv=none; b=MbnUTN7GAR1focMQJmdwhGUaSQv2Hwsmv/cjQvBy4UG42+yWP3aI0u5XqrmHr5DGVZabpZ1DeCuUmbO69tp9O6wJJFNcG6DjtOzjjuyFa588kZI1aw+omyiiHrSPHYt+xGALuuLSRSXkgb6DQ27Rn/AGYtTSoreJpmevqDltKw8=
+	t=1733900417; cv=none; b=f0dT4/voX78QtJDqOhY9/1RLKtX564bXHfl0GFtf8hzOqspGM2GSJcCrxgwju3Oop0Mc9CX6uwuRcqlkamJO4VVvfzIg6yKJO/48yB/FQ/phVAZJjw0bPY43woCUsD5v7YKgkDpyOv9QkUxFpFcCXWJCT3XKwhqSKAGREt4uIu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733897125; c=relaxed/simple;
-	bh=Vm19+8sOgCyjcKR5yqhjiOJVXNKsya0wck8wtg9WOpM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=kAV20o6hz0nbacTaq51aPNUtZxyNJrhqodFQEdZTW5CTpdbdUWhE/1gz0jLoVR3mpY0hiiN1nnYOzp0TgUtgVZCvaHRmvSb9U3YyB78DIK+Mqs64pm/mELIQfXMh8B0MCB5L7jvSyvveiaiS2MjJMwEl1RZlZmXSNev/evBBReE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=ucsq29td; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ucsq29td"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20241211060518epoutp04f7f06f7f5bb9be55601ae129fafd6c78~QCj4fF9qh0136701367epoutp04L
-	for <linux-block@vger.kernel.org>; Wed, 11 Dec 2024 06:05:18 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20241211060518epoutp04f7f06f7f5bb9be55601ae129fafd6c78~QCj4fF9qh0136701367epoutp04L
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1733897118;
-	bh=Vm19+8sOgCyjcKR5yqhjiOJVXNKsya0wck8wtg9WOpM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ucsq29tdHx5dcoWteh5TVMXildanDu5GhhiQht0z+TdjXJd0Aj6aafWlge6iyJl+C
-	 o0p34nSj9VmKYdqsJcrNJNQ4ocOk0RyLIOwR6tQ5d7ilEC/aC/Z+3biYkHvb9483ql
-	 4nKMnxiWfb3nHXAgKXX1fYz/L7v8qo3CuZV1tWAU=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20241211060518epcas5p4ef4139564e0b0712747035d944e65bb1~QCj4NAmn23068330683epcas5p4s;
-	Wed, 11 Dec 2024 06:05:18 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.177]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4Y7Q7J4BBrz4x9QH; Wed, 11 Dec
-	2024 06:05:16 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	B4.CF.19956.C9B29576; Wed, 11 Dec 2024 15:05:16 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20241211060149epcas5p4d16e78bd3d184e57465c3622a2c8e98d~QCg1bUOvW1834618346epcas5p4_;
-	Wed, 11 Dec 2024 06:01:49 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20241211060149epsmtrp296e709724194137f267d2e9faf7ed067~QCg1aWPr_1301813018epsmtrp27;
-	Wed, 11 Dec 2024 06:01:49 +0000 (GMT)
-X-AuditID: b6c32a4b-fe9f470000004df4-da-67592b9c33aa
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	F4.6D.33707.CCA29576; Wed, 11 Dec 2024 15:01:48 +0900 (KST)
-Received: from ubuntu (unknown [107.99.41.245]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20241211060146epsmtip1e124f3dc0500e8c37c58f735158b5ae7~QCgzfbfBH1931819318epsmtip18;
-	Wed, 11 Dec 2024 06:01:46 +0000 (GMT)
-Date: Wed, 11 Dec 2024 11:23:54 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Keith Busch <kbusch@meta.com>
-Cc: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, sagi@grimberg.me, asml.silence@gmail.com,
-	anuj20.g@samsung.com, joshi.k@samsung.com, Hannes Reinecke <hare@suse.de>,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv13 05/11] block: expose write streams for block device
- nodes
-Message-ID: <20241211055354.ozous6df7gpgjcpp@ubuntu>
+	s=arc-20240116; t=1733900417; c=relaxed/simple;
+	bh=B1wGhrvFoDOmFrhgO6ctmjhLDhnpcrjN7YBDBIx3Y40=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zbkfh3dL1b7iasJkAfL69EL8Qe3d8Q2Sz9+hV9kejnq/UWQXhvsbJlBQIkHRGJUoxh3iycHwuVm2cU5z6INBgR0lUR/QvN1ug4eEh8BN/Ljsj4LlPJ0pO94qkylEnLKlbWi1RGM0oiy5GEVfhBFWEFd7icP5yUEmhUCitxwLwfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4Y7RLj3GV8z9t4d;
+	Wed, 11 Dec 2024 08:00:13 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id c0Dk1hMGM9_h; Wed, 11 Dec 2024 08:00:13 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4Y7RLY2gbNz9t4Z;
+	Wed, 11 Dec 2024 08:00:05 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 3FA418B76E;
+	Wed, 11 Dec 2024 08:00:05 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id lblUBnLQKeTT; Wed, 11 Dec 2024 08:00:05 +0100 (CET)
+Received: from [10.25.209.139] (unknown [10.25.209.139])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id A13268B763;
+	Wed, 11 Dec 2024 08:00:03 +0100 (CET)
+Message-ID: <07784753-6874-4dda-a080-2d2812f4a10a@csgroup.eu>
+Date: Wed, 11 Dec 2024 08:00:02 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241210194722.1905732-6-kbusch@meta.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrAJsWRmVeSWpSXmKPExsWy7bCmlu4c7ch0g3Mb5S2aJvxltpizahuj
-	xeq7/WwWexZNYrJYufook8W71nMsFkf/v2WzmHToGqPFmasLWSz23tK22LP3JIvF/GVP2S3W
-	vX7P4sDrsXPWXXaP8/c2snhcPlvqsWlVJ5vH5iX1HrtvNrB5nLtY4dG3ZRWjx+bT1R6fN8kF
-	cEVl22SkJqakFimk5iXnp2TmpdsqeQfHO8ebmhkY6hpaWpgrKeQl5qbaKrn4BOi6ZeYAHa6k
-	UJaYUwoUCkgsLlbSt7Mpyi8tSVXIyC8usVVKLUjJKTAp0CtOzC0uzUvXy0stsTI0MDAyBSpM
-	yM54dsivYC1bxZ81zg2MJ1m7GDk5JARMJGZsmc3WxcjFISSwm1HiZudfFgjnE6PErWmzEZxX
-	jasYYVqaPyxihkjsZJT4d/MQVNUTRon7N9axg1SxCKhKPJiyHWgwBwebgLbE6f8cIGERAUWJ
-	88DAAKlnFtjMJPGxsx/sEGGBIIntRz4zg9TzAm3YuqkaJMwrIChxcuYTFhCbU8Bc4uWy/2C9
-	EgJbOCRe7WmEushFYvatW0wQtrDEq+Nb2CFsKYnP7/ayQdjlEiunrIBqbmGUmHV9FlSzvUTr
-	qX5mEJtZIEPi6+LPLBBxWYmpp9YxQcT5JHp/P4FawCuxYx6MrSyxZv0CqAWSEte+N4I9LCHg
-	IfFqYR0kULYzSny9v49xAqPcLCQPzUKyDsK2kuj80MQ6C6idWUBaYvk/DghTU2L9Lv0FjKyr
-	GCVTC4pz01OLTQuM81LL4XGcnJ+7iRGclLW8dzA+evBB7xAjEwfjIUYJDmYlEV4O79B0Id6U
-	xMqq1KL8+KLSnNTiQ4ymwPiZyCwlmpwPzAt5JfGGJpYGJmZmZiaWxmaGSuK8r1vnpggJpCeW
-	pGanphakFsH0MXFwSjUwXW0KnlIju/HZtrqfOdc8OwtlZ3+f+UlMvPRwf/jFPYrSJtO8Feff
-	M+EILE56KL4qSal0/uuLKtyct91u+83S/bpj504Hft10J9mldz/cbj7R/mRV8wyjeaY8Crr7
-	uH0OPzP2/XGzYc8b55+3pYu4T0W9nHZS8pzkmXs1x5V0b6zgjJb9uDS8j2nZ72klfa9L56Sf
-	CzO3NS/53j87mWOJaPGyBL9n5xtu267//8jdgVNym0D0RLa7u8RSbp6eZs1V7DshYf7flFKO
-	3/FxzisWpQkpzt4XmNgVd1DjyIQ+bx5BnXObH73YZp08e5/p0x/5e3gjd7W9U6v33H7FbrPS
-	Gz2NA4VXjyXfcV/g6G5kr8RSnJFoqMVcVJwIACLN3OVTBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrLLMWRmVeSWpSXmKPExsWy7bCSnO4Zrch0gwPfzSyaJvxltpizahuj
-	xeq7/WwWexZNYrJYufook8W71nMsFkf/v2WzmHToGqPFmasLWSz23tK22LP3JIvF/GVP2S3W
-	vX7P4sDrsXPWXXaP8/c2snhcPlvqsWlVJ5vH5iX1HrtvNrB5nLtY4dG3ZRWjx+bT1R6fN8kF
-	cEVx2aSk5mSWpRbp2yVwZTxac5G94D5zxZunIQ2MU5m7GDk5JARMJJo/LAKyuTiEBLYzSnTs
-	XAOVkJRY9vcIlC0ssfLfc3aIokeMElNnXWICSbAIqEo8mLKdrYuRg4NNQFvi9H8OkLCIgKLE
-	eaCLQOqZBTYzSezt/c8CkhAWCJLYfuQzM0g9L9DmrZuqQcJCAskSH/Z/ANvFKyAocXLmE7By
-	ZgEziXmbH4KVMwtISyz/BzaeU8Bc4uWy/2wTGAVmIemYhaRjFkLHAkbmVYyiqQXFuem5yQWG
-	esWJucWleel6yfm5mxjBMaQVtINx2fq/eocYmTgYDzFKcDArifByeIemC/GmJFZWpRblxxeV
-	5qQWH2KU5mBREudVzulMERJITyxJzU5NLUgtgskycXBKNTBZrZLWUNvobnFnmyWv/Dvr/rXz
-	FszaZqmxK1/2TFzlikUbqm+cer5CP+vMye9zruxR/f1bL7E8Ocn3Ae/y9O2t81+aPHczf9/o
-	/+Vg/Ey759rC5o1SKctsPy2Wq9t05X/hrpieVVc/ByS4sF7ervWva2ZsrZn2TnbplIedyUpr
-	GYPCkze22f068s0p+ZLe8n9XbGc8ip/ntV6+Y5/o3GN5FX2P+Z58tNBeEy4ubaxy/x3X5D1m
-	Nkmd/A++9VcGnmtc4Ptsy4S8nb2VF/MLVD9/qovy+sDuyjjpx/EJMsInotbI9ptEih2eVu56
-	wb/z7D2mW5wMV+MvFtiu03YUS5X6rHwi9VNTFp9qMNeGcDclluKMREMt5qLiRAB/NER6EAMA
-	AA==
-X-CMS-MailID: 20241211060149epcas5p4d16e78bd3d184e57465c3622a2c8e98d
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----K2gkAqOuxZFCoC8EFRwgD_6KeXKZsv69xmv6PgBjcdVDR2et=_75e31_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20241211060149epcas5p4d16e78bd3d184e57465c3622a2c8e98d
-References: <20241210194722.1905732-1-kbusch@meta.com>
-	<20241210194722.1905732-6-kbusch@meta.com>
-	<CGME20241211060149epcas5p4d16e78bd3d184e57465c3622a2c8e98d@epcas5p4.samsung.com>
-
-------K2gkAqOuxZFCoC8EFRwgD_6KeXKZsv69xmv6PgBjcdVDR2et=_75e31_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
-
-On 10/12/24 11:47AM, Keith Busch wrote:
->From: Christoph Hellwig <hch@lst.de>
->
->Use the per-kiocb write stream if provided, or map temperature hints to
->write streams (which is a bit questionable, but this shows how it is
->done).
->
->Reviewed-by: Hannes Reinecke <hare@suse.de>
->Signed-off-by: Christoph Hellwig <hch@lst.de>
->[kbusch: removed statx reporting]
->Signed-off-by: Keith Busch <kbusch@kernel.org>
->---
-
-Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
-
-------K2gkAqOuxZFCoC8EFRwgD_6KeXKZsv69xmv6PgBjcdVDR2et=_75e31_
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 18/19] livepatch: Convert timeouts to secs_to_jiffies()
+To: Easwar Hariharan <eahariha@linux.microsoft.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
+ Haojian Zhuang <haojian.zhuang@gmail.com>,
+ Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
+ <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
+ Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
+ <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>,
+ Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann
+ <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
+ <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
+ Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
+ Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Louis Peens <louis.peens@corigine.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>
+References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
+ <20241210-converge-secs-to-jiffies-v3-18-ddfefd7e9f2a@linux.microsoft.com>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <20241210-converge-secs-to-jiffies-v3-18-ddfefd7e9f2a@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-------K2gkAqOuxZFCoC8EFRwgD_6KeXKZsv69xmv6PgBjcdVDR2et=_75e31_--
+
+Le 10/12/2024 à 23:02, Easwar Hariharan a écrit :
+> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
+> secs_to_jiffies(). As the value here is a multiple of 1000, use
+> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
+> 
+> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
+> the following Coccinelle rules:
+> 
+> @@ constant C; @@
+> 
+> - msecs_to_jiffies(C * 1000)
+> + secs_to_jiffies(C)
+> 
+> @@ constant C; @@
+> 
+> - msecs_to_jiffies(C * MSEC_PER_SEC)
+> + secs_to_jiffies(C)
+> 
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+> ---
+>   samples/livepatch/livepatch-callbacks-busymod.c |  3 +--
+>   samples/livepatch/livepatch-shadow-fix1.c       |  3 +--
+>   samples/livepatch/livepatch-shadow-mod.c        | 15 +++++----------
+>   3 files changed, 7 insertions(+), 14 deletions(-)
+> 
+> diff --git a/samples/livepatch/livepatch-callbacks-busymod.c b/samples/livepatch/livepatch-callbacks-busymod.c
+> index 378e2d40271a9717d09eff51d3d3612c679736fc..69105596e72e6826aa2815cb2599eea56a0055ba 100644
+> --- a/samples/livepatch/livepatch-callbacks-busymod.c
+> +++ b/samples/livepatch/livepatch-callbacks-busymod.c
+> @@ -44,8 +44,7 @@ static void busymod_work_func(struct work_struct *work)
+>   static int livepatch_callbacks_mod_init(void)
+>   {
+>   	pr_info("%s\n", __func__);
+> -	schedule_delayed_work(&work,
+> -		msecs_to_jiffies(1000 * 0));
+> +	schedule_delayed_work(&work, 0);
+
+This hunk is not in line with the patch description.
+
+This is probably OK to have in this patch, but you should add additional 
+description to mention that special case with a 0 delay.
+
+Allthough you should probably change it to schedule_work() instead of 
+using a 0 delay.
+
+Christophe
