@@ -1,158 +1,134 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from st43p00im-ztfb10071701.me.com (st43p00im-ztfb10071701.me.com [17.58.63.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6A0213E84;
-	Thu, 12 Dec 2024 13:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9494C2101A0
+	for <linux-block@vger.kernel.org>; Thu, 12 Dec 2024 13:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.63.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734009256; cv=none; b=C3+OhEo1tOAEsGQu2bNzdoEvJQag17sHO48AvC3grNiY9HoShyFvBMpje0YC0r+4lmcyiEujDZTTU9r0jXPlV/k+L1tiePyABJRedSlvSdr45dazMIB3nHc+xrGDeMc0XARVyyPu7K/a1xVYMjJXyNK/MKI7sxEKL+lg2R9CMQg=
+	t=1734010761; cv=none; b=luz8UiajJ+SQzEPBqCM73jbvifUo5Q9ZbuoQMX8AY/jT00DAEprsqAFfAYInWd0CV80atxVQxs0GKpPje6HVrYs0MVOOhWdn5ctNRFj3f1Rrxd263hPbnbDN4+Vh5K25BKoNTdobSGIMt12RZysCtQw8ynynzDL/OFbi0OfGank=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734009256; c=relaxed/simple;
-	bh=VdsrmDh/jsl2Cx7SgccfTdErXAO6t50Y02RJzT/pqbk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eih2NZHViVR7/Mo7tXuxWNUwxI0UNpvaG1j5B9r7UWOMCQPn85YGwoMVg96o1tdfYkblx+lnXhrMLXEw+rkZ0tk79T10Sby66miE2xyoGjG7ZxYyyDn/uhd4IdcWrG3msP6GocmyrwdNr2hs/LlzKnC4pm5757dUXBIw6SBzdlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gtWBHBP+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kwzDA7ab; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gtWBHBP+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kwzDA7ab; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1734010761; c=relaxed/simple;
+	bh=2jrvVsx2RIa0RV5EyHAFqJ1UM43l3qMuGJWqPFA6iiA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mz5i8Ve2IRqJAZoewknAru0bzDVopS4vDozr38/QSBovKS/gzlSy7aDYm++0482BBk1hIA/iW5BRWodk9hhMmoWv84tk8ltq2t+95hVf5VzgpGJuSNiCI5wpMedTavgDNXSbGdN/KFRXm3uF3/9J0A4Y34mOMoxgPPgU6HaHchs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=h77d4NB+; arc=none smtp.client-ip=17.58.63.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gtWBHBP+";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kwzDA7ab";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gtWBHBP+";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kwzDA7ab"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 7B7BF1F383;
-	Thu, 12 Dec 2024 13:14:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1734009252; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RvKJQCY4UAGhGZ5rWD6wzbX/j5iNZb8I49LUPn4nhpY=;
-	b=gtWBHBP+YtqrUAN3iawUKFdx0R9yJ0QDJ3JxPhvdy19qazHC2MmwZDzXsu5jWgKXOUN2Mw
-	tpAQdQiBdVqqhat8HZbstu01mU1SB982ml2xxS69csoaOHr99Yb0ovhPT23C1PBOCgITrJ
-	ZT7cp0a6GTq8zl7abbk5tf+5uV7N2xI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1734009252;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RvKJQCY4UAGhGZ5rWD6wzbX/j5iNZb8I49LUPn4nhpY=;
-	b=kwzDA7ab2xM2vAay11d3F+S8hk7ft4K1IePIdVEv67PGeCoGEgC3uXNlCjPpR2gQiqbT5H
-	om4zqWXEs3X2kiAA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=gtWBHBP+;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=kwzDA7ab
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1734009252; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RvKJQCY4UAGhGZ5rWD6wzbX/j5iNZb8I49LUPn4nhpY=;
-	b=gtWBHBP+YtqrUAN3iawUKFdx0R9yJ0QDJ3JxPhvdy19qazHC2MmwZDzXsu5jWgKXOUN2Mw
-	tpAQdQiBdVqqhat8HZbstu01mU1SB982ml2xxS69csoaOHr99Yb0ovhPT23C1PBOCgITrJ
-	ZT7cp0a6GTq8zl7abbk5tf+5uV7N2xI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1734009252;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RvKJQCY4UAGhGZ5rWD6wzbX/j5iNZb8I49LUPn4nhpY=;
-	b=kwzDA7ab2xM2vAay11d3F+S8hk7ft4K1IePIdVEv67PGeCoGEgC3uXNlCjPpR2gQiqbT5H
-	om4zqWXEs3X2kiAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2F04713508;
-	Thu, 12 Dec 2024 13:14:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id h63/CqThWmeGVwAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 12 Dec 2024 13:14:12 +0000
-Message-ID: <b796253f-73f3-4a05-ad88-1fb118e0171f@suse.de>
-Date: Thu, 12 Dec 2024 14:14:11 +0100
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="h77d4NB+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1734010758;
+	bh=VUEKRgBCANiJKzI+jVMX+MwQUzbz+CtH2wDUFRlHHLQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:
+	 x-icloud-hme;
+	b=h77d4NB+TKx6IRA0ovKbRuP+o9KfvIPwb2zigCmj+BmI6oOJ4TAolqgCmMxot8B/p
+	 nusI0F+UlTHwEVdEBRPC8KiNNEcYNtBb5xmE7A+ufiYOkUaaDmkZE29PsL6sG/c/W5
+	 LSdYknd4pSnJuNVFFs6b58V35wykVEiJOT9ZIztd2dXBHLyo4SWFnYarCSWy1STtV0
+	 NAl5OCtqVAilHat9WRMbhSDsmEzJShxUgtYXxahnrml1+E4fWkpT7tJn9DdvdRpg11
+	 D8+L4MCoApG5cg6hfkoNx0oO701NP+9OSkYT9fHVvJgwnrB7LZd5owHswfOlYtfl7w
+	 1rfAMPkPX234w==
+Received: from [192.168.1.26] (st43p00im-dlb-asmtp-mailmevip.me.com [17.42.251.41])
+	by st43p00im-ztfb10071701.me.com (Postfix) with ESMTPSA id 28718CC058E;
+	Thu, 12 Dec 2024 13:39:08 +0000 (UTC)
+From: Zijun Hu <zijun_hu@icloud.com>
+Subject: [PATCH v3 0/9] driver core: class: Fix bug and code improvements
+ for class APIs
+Date: Thu, 12 Dec 2024 21:38:36 +0800
+Message-Id: <20241212-class_fix-v3-0-04e20c4f0971@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv14 10/11] nvme: register fdp parameters with the block
- layer
-To: Keith Busch <kbusch@meta.com>, axboe@kernel.dk, hch@lst.de,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org
-Cc: sagi@grimberg.me, asml.silence@gmail.com, anuj20.g@samsung.com,
- joshi.k@samsung.com, Keith Busch <kbusch@kernel.org>
-References: <20241211183514.64070-1-kbusch@meta.com>
- <20241211183514.64070-11-kbusch@meta.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20241211183514.64070-11-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7B7BF1F383
-X-Spam-Score: -3.01
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[grimberg.me,gmail.com,samsung.com,kernel.org];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFznWmcC/12Q0WqEMBBFf0Xy3JRMjNH41P8oRSaZsRvo6tZYa
+ Vn23zvrUpA+3pvcw2GuqvCSuai+uqqFt1zyPEmonyqVTji9s84kWVljHYBxOn1gKcOYv/UIrY8
+ UOKK1Sv5fFpZ6Z72+ST7lss7Lz47e4N7+UZoDZQNtdGc678cQgsPm5fMrpzyl5zSf1Z2z2cMW7
+ HFrZdvWBKEjg4b+bW8PqYWlLXl9mKmIhbW8n/PaV4moNhwjxDDWHppA4mG6LnpAZusdexeoRXW
+ 8R1/tLtaAcKayDjSmgeaJNSKnFriOkbHfnCjcfgHZvJ3HYgEAAA==
+X-Change-ID: 20241104-class_fix-f176bd9eba22
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>, 
+ Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, 
+ Boris Burkov <boris@bur.io>, Davidlohr Bueso <dave@stgolabs.net>, 
+ Jonathan Cameron <jonathan.cameron@huawei.com>, 
+ Dave Jiang <dave.jiang@intel.com>, 
+ Alison Schofield <alison.schofield@intel.com>, 
+ Vishal Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+ Dan Williams <dan.j.williams@intel.com>
+Cc: Zijun Hu <zijun_hu@icloud.com>, linux-kernel@vger.kernel.org, 
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-cxl@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>, 
+ stable@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-Proofpoint-GUID: 6qORa1iOtrNDRli4AFpyHQ82i5YMLoVo
+X-Proofpoint-ORIG-GUID: 6qORa1iOtrNDRli4AFpyHQ82i5YMLoVo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-12_09,2024-12-12_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxlogscore=980
+ malwarescore=0 bulkscore=0 clxscore=1011 phishscore=0 mlxscore=0
+ adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412120098
+X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
 
-On 12/11/24 19:35, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Register the device data placement limits if supported. This is just
-> registering the limits with the block layer. Nothing beyond reporting
-> these attributes is happening in this patch.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->   drivers/nvme/host/core.c | 145 +++++++++++++++++++++++++++++++++++++++
->   drivers/nvme/host/nvme.h |   2 +
->   2 files changed, 147 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+This patch series is to fix bugs and improve codes regarding various
+driver core device iterating APIs
 
-Cheers,
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+Changes in v3:
+- Correct commit message, add fix tag, and correct pr_crit() message for 1st patch
+- Add more patches regarding driver core device iterating APIs.
+- Link to v2: https://lore.kernel.org/r/20241112-class_fix-v2-0-73d198d0a0d5@quicinc.com
 
-Hannes
+Changes in v2:
+- Remove both fix and stable tag for patch 1/3
+- drop patch 3/3
+- Link to v1: https://lore.kernel.org/r/20241105-class_fix-v1-0-80866f9994a5@quicinc.com
+
+---
+Zijun Hu (9):
+      driver core: class: Fix wild pointer dereferences in API class_dev_iter_next()
+      blk-cgroup: Fix class @block_class's subsystem refcount leakage
+      driver core: bus: Move true expression out of if condition in API bus_find_device()
+      driver core: Move true expression out of if condition in API driver_find_device()
+      driver core: Move true expression out of if condition in API device_find_child()
+      driver core: Rename declaration parameter name for API device_find_child() cluster
+      driver core: Correct parameter check for API device_for_each_child_reverse_from()
+      driver core: Correct API device_for_each_child_reverse_from() prototype
+      driver core: Introduce device_iter_t for device iterating APIs
+
+ block/blk-cgroup.c            |  1 +
+ drivers/base/bus.c            |  9 ++++++---
+ drivers/base/class.c          | 11 +++++++++--
+ drivers/base/core.c           | 17 ++++++++++-------
+ drivers/base/driver.c         |  9 ++++++---
+ drivers/cxl/core/hdm.c        |  2 +-
+ drivers/cxl/core/region.c     |  2 +-
+ include/linux/device.h        | 14 +++++++-------
+ include/linux/device/bus.h    |  7 +++++--
+ include/linux/device/class.h  |  4 ++--
+ include/linux/device/driver.h |  2 +-
+ 11 files changed, 49 insertions(+), 29 deletions(-)
+---
+base-commit: cdd30ebb1b9f36159d66f088b61aee264e649d7a
+change-id: 20241104-class_fix-f176bd9eba22
+prerequisite-change-id: 20241201-const_dfc_done-aaec71e3bbea:v4
+prerequisite-patch-id: 536aa56c0d055f644a1f71ab5c88b7cac9510162
+prerequisite-patch-id: 39b0cf088c72853d9ce60c9e633ad2070a0278a8
+prerequisite-patch-id: 60b22c42b67ad56a3d2a7b80a30ad588cbe740ec
+prerequisite-patch-id: 119a167d7248481987b5e015db0e4fdb0d6edab8
+prerequisite-patch-id: 133248083f3d3c57beb16473c2a4c62b3abc5fd0
+prerequisite-patch-id: 4cda541f55165650bfa69fb19cbe0524eff0cb85
+prerequisite-patch-id: 2b4193c6ea6370c07e6b66de04be89fb09448f54
+prerequisite-patch-id: 73c675db18330c89fd8ca4790914d1d486ce0db8
+prerequisite-patch-id: 88c50fc851fd7077797fd4e63fb12966b1b601bd
+prerequisite-patch-id: 47b93916c1b5fb809d7c99aeaa05c729b1af01c5
+prerequisite-patch-id: 52ffb42b5aae69cae708332e0ddc7016139999f1
+
+Best regards,
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Zijun Hu <quic_zijuhu@quicinc.com>
+
