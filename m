@@ -1,95 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF91204C1D;
-	Thu, 12 Dec 2024 08:54:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1B41F0E57
+	for <linux-block@vger.kernel.org>; Thu, 12 Dec 2024 11:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733993697; cv=none; b=sJZEOsjdS3tGEskKn8wPdMuzWVtBcKvkgru15bMqHF8UHt2tYyXbDCSAan3bqk+rNbBI9ezHROcQDaQsZlZDDBYxHrJAfk19bifIqOaKQ0irlWOJCs79XxFOhWksz99GdEfT4XJuIKZAoI0Lpiw5EkbNrBlD1PpfpOLy6hD0tkQ=
+	t=1734003601; cv=none; b=a6Y+Nf1YAH051FeY31PTHoGFBpY6PEL6rj0NAonVzYV7sN6ensE2VLZ0KttRBfeo68lcTSWw+UzWgRyTM2gqAjhzcP2xlI31fPrTbozRToSRt2m06xqV0fzVF/wLZMl9FXz5pZewCSI9OkkMWCLlmakv6sQYzBjwvfQSRSWeqZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733993697; c=relaxed/simple;
-	bh=Fy4YngrVcpagRsu5yXaXhy6khObq1+63mtDUkXZu0Hs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DQ2wKUH+T7OjfNi/2jo8pes7/nQNW0dIYlRGh3kSL9F8Qau7LkxTW02S5/YTajzQLPMkVae3yiyESHD7kb16wtlBt9yKds/u4UTS+WGA9rHDPK+V+CjC8O17UZQrEO7f1tFEQtj2LHHGy/M3q72LLQ+qDNxxZBfDBEyzEA0Ei9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ojj28dCC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734003601; c=relaxed/simple;
+	bh=gq5HIoLOaRrwWTFMhl4akmkUagye1PVMUPy8Br/WayU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=a31++B2NqUc4dKxXmKKJ7GvfOji688Bz+PCYyab3a6J+Ji8vgvE53uJ9QCg9z8NrRXL9qQHvtUpw+71/GPW9aQD+N78JIZjtFrd6m23P+n5VUuRJdEo1RiiJfMqFkPAEoRPS1Xo/ft0iKOpPGkdDhUa1h+iMxmUK+00iWGLGf24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=AZExY53S; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ojj28dCC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE6C8C4CECE;
-	Thu, 12 Dec 2024 08:54:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733993696;
-	bh=Fy4YngrVcpagRsu5yXaXhy6khObq1+63mtDUkXZu0Hs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ojj28dCCyJsYWCQ3nZtMUHqqKD7pLZ/ITymNq/65CKEPSxvMwaKmSBEcXxLYPPKy0
-	 bCCF3nZPaJ7k//9SBQ/rYhvwJimsjRdm+91sZWCtORRbzPjDtteY0DSoFIUcv1x+Lr
-	 1CBtlVjnuOx8tTbgfpy+LEAsfWvTLFFTYZp7gkMuh4x2UvzAENWOExWVLSc4743UO9
-	 JCTRe0c+Y4hkv7hgXehu2a9IN4oO88rQf5qeTV3yngqTzQ8uA8ZEtTJYYWl8RkEd5C
-	 CPaD72/jVRnOkLoezb3tHNft0IcASYCJ/ywixjCc6QTi7fbpx3tk7LTpPjb2MxQzXP
-	 gZjbGel83uyhg==
-Date: Thu, 12 Dec 2024 10:54:52 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v4 11/18] mm/hmm: let users to tag specific PFN with DMA
- mapped bit
-Message-ID: <20241212085452.GI1245331@unreal>
-References: <cover.1733398913.git.leon@kernel.org>
- <e4551571fc10d9c73ab9e38a75ea701c1b492686.1733398913.git.leon@kernel.org>
- <20241212084856.GE9376@lst.de>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="AZExY53S"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20241212113956epoutp0111d7885761bd3dd5a212551b706bfdaa~QaxVk6P4V2498324983epoutp01L
+	for <linux-block@vger.kernel.org>; Thu, 12 Dec 2024 11:39:56 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20241212113956epoutp0111d7885761bd3dd5a212551b706bfdaa~QaxVk6P4V2498324983epoutp01L
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1734003596;
+	bh=gq5HIoLOaRrwWTFMhl4akmkUagye1PVMUPy8Br/WayU=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=AZExY53StDExVRIy9il+SoWJcySMFVIAGu+MKUFU/uC87U4rv/5XfTFtzBxcnBaj3
+	 qsQ4Tm7liNMXmXO1jyMfcrlqyLWprW0+RytxoY9RulaUCYpRjejNhLdrQt5eByflks
+	 tXdA2DACaj9nPBf6yiG/nIZFisttvtdoS6heK/yc=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20241212113955epcas5p4ba3542ee4c4267058ee4f5bdc727415b~QaxUt9OAM2487724877epcas5p4l;
+	Thu, 12 Dec 2024 11:39:55 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.181]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4Y89Vy0JxZz4x9Pt; Thu, 12 Dec
+	2024 11:39:54 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	B6.3B.19933.98BCA576; Thu, 12 Dec 2024 20:39:53 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20241212113953epcas5p42a9eb3b5e449b08d18402016f6657ea8~QaxTPVz2S2487624876epcas5p4f;
+	Thu, 12 Dec 2024 11:39:53 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20241212113953epsmtrp2f2b12fd0c7e22158831e27899ce2d073~QaxTOa7wi2144721447epsmtrp2c;
+	Thu, 12 Dec 2024 11:39:53 +0000 (GMT)
+X-AuditID: b6c32a4a-c1fda70000004ddd-51-675acb897929
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	5F.F2.33707.98BCA576; Thu, 12 Dec 2024 20:39:53 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20241212113951epsmtip1dbc895aaaa00061ddf03ca96691ec892~QaxRqadna2973429734epsmtip1i;
+	Thu, 12 Dec 2024 11:39:51 +0000 (GMT)
+Message-ID: <6cf38922-2dfc-4788-8cea-304f16d3abfc@samsung.com>
+Date: Thu, 12 Dec 2024 17:09:50 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241212084856.GE9376@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv14 00/11] block write streams with nvme fdp
+To: Keith Busch <kbusch@meta.com>, axboe@kernel.dk, hch@lst.de,
+	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org
+Cc: sagi@grimberg.me, asml.silence@gmail.com, anuj20.g@samsung.com, Keith
+	Busch <kbusch@kernel.org>
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20241211183514.64070-1-kbusch@meta.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrDJsWRmVeSWpSXmKPExsWy7bCmpm7n6ah0g7f3rS2aJvxltpizahuj
+	xeq7/WwWK1cfZbJ413qOxWLSoWuMFmeuLmSx2HtL22LP3pMsFvOXPWW3WPf6PYsDt8fOWXfZ
+	Pc7f28jicflsqcemVZ1sHpuX1HvsvtnA5nHuYoVH35ZVjB6fN8kFcEZl22SkJqakFimk5iXn
+	p2TmpdsqeQfHO8ebmhkY6hpaWpgrKeQl5qbaKrn4BOi6ZeYAnaqkUJaYUwoUCkgsLlbSt7Mp
+	yi8tSVXIyC8usVVKLUjJKTAp0CtOzC0uzUvXy0stsTI0MDAyBSpMyM5o+f2RuaCg4uXSi0wN
+	jHFdjJwcEgImEmdP9bJ2MXJxCAnsZpT4tPgzM4TziVHi5uwpjHDOlXnzmWFadhyfxApiCwns
+	ZJQ4ci8Eougto8TTTQdYQBK8AnYS3bs+MYHYLAKqEt3P3rJCxAUlTs58AlYjKiAvcf/WDHYQ
+	W1jAXuL38xksIINEBHYwSnS+fArWzCyQKjHh53FmCFtc4taT+UBxDg42AU2JC5NLQcKcAqYS
+	Xx7chyqRl9j+dg7YCxICezgkDn3oY4G42kXizvmLbBC2sMSr41vYIWwpic/v9kLFsyUePHoA
+	VV8jsWNzHyuEbS/R8OcGK8heZqC963fpQ+zik+j9/QTsHAkBXomONiGIakWJe5OeQnWKSzyc
+	sYQVosRDYuFNN0hQdTBK/DnSwDyBUWEWUqjMQvLkLCTfzEJYvICRZRWjZGpBcW56arFpgVFe
+	ajk8tpPzczcxgpOxltcOxocPPugdYmTiYDzEKMHBrCTCe8M+Ml2INyWxsiq1KD++qDQntfgQ
+	oykweiYyS4km5wPzQV5JvKGJpYGJmZmZiaWxmaGSOO/r1rkpQgLpiSWp2ampBalFMH1MHJxS
+	DUyWTfcnuHQ+dkhM2uQr3/1/4UzLnu3J0cUnytb4PnsQU9LH9usf021Nk0k6hv7c1tH1rtdj
+	t/c8+van9+7BS7s1Fukm72N5+Tcjd1KBwPSU6n8hE488i+XKCJ1YvEJ96xZBmeYHWzecuH9a
+	uGGW95rVYbLLSpeELGJR3VJlI3Y4cPt8wZBKdX0fvjeFkn+fakl1xW39e0pp6Sz9WBe1h57m
+	U/7N5LYJucrgtk3jSzenXMSCIobwnU+3a5ys7Tr3xa6Z79aVf5vL7hxd2tZUu+u0C5/W0wUz
+	xD+qJp6QX7rCrFgm6ubpVpm0nkl2M8Sl/NRf3JPeNy3j8+ONn/Ofmep3SPcdjgrd9n2Lp8hT
+	PTklluKMREMt5qLiRADFMo4TTwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprGIsWRmVeSWpSXmKPExsWy7bCSnG7n6ah0g6fTVCyaJvxltpizahuj
+	xeq7/WwWK1cfZbJ413qOxWLSoWuMFmeuLmSx2HtL22LP3pMsFvOXPWW3WPf6PYsDt8fOWXfZ
+	Pc7f28jicflsqcemVZ1sHpuX1HvsvtnA5nHuYoVH35ZVjB6fN8kFcEZx2aSk5mSWpRbp2yVw
+	ZbT8/shcUFDxculFpgbGuC5GTg4JAROJHccnsXYxcnEICWxnlNjwdDsbREJcovnaD3YIW1hi
+	5b/n7BBFrxklXl+czQiS4BWwk+je9YkJxGYRUJXofvaWFSIuKHFy5hMWEFtUQF7i/q0ZYIOE
+	Bewlfj+fwQIySERgB6PE/3U7wbYxC6RKzP64kA1iQwejxIFn09ghEuISt57MB9rAwcEmoClx
+	YXIpSJhTwFTiy4P7zBAlZhJdW7sYIWx5ie1v5zBPYBSaheSOWUgmzULSMgtJywJGllWMoqkF
+	xbnpuckFhnrFibnFpXnpesn5uZsYwVGnFbSDcdn6v3qHGJk4GA8xSnAwK4nw3rCPTBfiTUms
+	rEotyo8vKs1JLT7EKM3BoiTOq5zTmSIkkJ5YkpqdmlqQWgSTZeLglGpgYlfe9aJPdbeh9/rr
+	11JX/lE6lr3sd9rmy74JOpuqftjniugdDZQWLbMvblb0dK++Oc+k8/z+yT8t7J2mLnJbYH69
+	+KXd31ldQkGsqxteLb/O9ebEAil2IS6FzyYfjAzKp7w7+GX7ibhfBdNMjfe9uu0d5PfYfeI1
+	/rkLzseY5Hg4Rh4qTGyY+zt2y4/nTMZa1dU3n6e72SfPCSp5F8s0R7ar5/mafaXexvuMn/Kd
+	b8ts+DtDfvrpBTfajj5KbcqP/ii4g2XBzur4suKNd7ligucraX14/kayjIF/r7PrP6mzPFJB
+	H9Onfj0wIU+LYa7bkhnGJf+Fow4pLt+1puzdpDuHRNzfR9Wvrd/gsen3VCWW4oxEQy3mouJE
+	AI0/9NApAwAA
+X-CMS-MailID: 20241212113953epcas5p42a9eb3b5e449b08d18402016f6657ea8
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20241211190851epcas5p2a359c12000fc73df8920e4801563504c
+References: <CGME20241211190851epcas5p2a359c12000fc73df8920e4801563504c@epcas5p2.samsung.com>
+	<20241211183514.64070-1-kbusch@meta.com>
 
-On Thu, Dec 12, 2024 at 09:48:56AM +0100, Christoph Hellwig wrote:
-> On Thu, Dec 05, 2024 at 03:21:10PM +0200, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Introduce new sticky flag (HMM_PFN_DMA_MAPPED), which isn't overwritten
-> > by HMM range fault. Such flag allows users to tag specific PFNs with information
-> > if this specific PFN was already DMA mapped.
-> 
-> Missing line wrap at 73 characters here.
-> 
-> >  
-> > @@ -253,14 +262,14 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
-> >  			cpu_flags = HMM_PFN_VALID;
-> >  			if (is_writable_device_private_entry(entry))
-> >  				cpu_flags |= HMM_PFN_WRITE;
-> > -			*hmm_pfn = swp_offset_pfn(entry) | cpu_flags;
-> > +			*hmm_pfn = (*hmm_pfn & HMM_PFN_INOUT_FLAGS) | swp_offset_pfn(entry) | cpu_flags;
-> 
-> Please avoid the overly long line here.
-> 
-> That being said I hate the structure here.  Can't we just have a local
-> variable for the actual new pfn value, and then a single goto label
-> at the end that takes the keeper flags from the argument and assigning
-> the new out value to *hmm_pfn instead of duplicating this in half a
-> dozen places?
+For
+> 16 files changed, 341 insertions(+), 6 deletions(-)
 
-Yes, sure, it makes sense, will do.
-
-> 
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
