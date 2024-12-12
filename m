@@ -1,75 +1,95 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA132139C9
-	for <linux-block@vger.kernel.org>; Thu, 12 Dec 2024 14:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B10322332A
+	for <linux-block@vger.kernel.org>; Thu, 12 Dec 2024 15:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734012751; cv=none; b=RAkS9sbkoVUviIFzShRF3M+2SIbKo8u/TbRcD2A3U4LDhChfGyd67WbhmdEbudpRqabWh+IYMn0DjfFXKLOvEq89wxy0uMEU/HYQiwA+IivxFKblrp0hD+W7WK1x3yGfYgkxnf6mAkJdPypANOoF3DdfgGBFwjBAsR23/APIfo8=
+	t=1734018220; cv=none; b=bAoUGpIC3hAfp/k7n2q2k1raY9zYnyb5r5ii+5X9K36a5JgymCfOWlBNOOUSosKNzqZpDYMO09O3zUsneoqQ6anA/g3fjVzlcgWCaMW5NH1huQId561F8VWuEcZCcejius6wC3rEbeRgbnjoMT2O0FsxBkZI0BzZdEu1D6fis8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734012751; c=relaxed/simple;
-	bh=fMIPUSjAwwy+axFu6NySo4r9+/ptfI/0mV99yxA0usE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MNFUmsraGN/0sJOgLEnZ4ik/IYufX8ILOp8fuQyjpU9F2hbxRLP551GINtVD/0ABMyhEx9GnFIpTlpK8j6zw5QquIggjBv5jJoklGtbX0ocKpVblV2A9gcd+Ir/WnOgVVrMUcQGX7BNj3Au0Yq2upTXuVnBbZW4st/6gLzM7M9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=OaCIR3CD; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+	s=arc-20240116; t=1734018220; c=relaxed/simple;
+	bh=1SDY9BVwo+PHBpCEZR5tvl/g9xNA+nMDaWcxqlH5GFA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=tovCckiKrbjG7qDpglAtohqOSOoRYjNRrsmdSq9Xl7s/LLShxyO7dXIVvvWHf5NIF7c0i663uY4ut4JJhIP5mnwas8QdoKmcD1NQjUdoc7f2PauhZE8ilanmqxYxCgGP1Xs4JndCMFua3j46Ekotm+kn3lrCV3LiXZDD70Ctim4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YQfzEoml; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="OaCIR3CD"
-Received: from cwcc.thunk.org (pool-173-48-82-226.bstnma.fios.verizon.net [173.48.82.226])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 4BCECKkE024517
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 09:12:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1734012742; bh=7Jxb65opHWfpZ7IWV0B2Mylwq9EqJlQLaqwzBAA8q1Q=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=OaCIR3CDtaIGUNRmh2V0lZ4i7ZItG9YYU0YJ0n0KhAFW9mDpJRfK7tfxtMkpOYk4A
-	 mw23T99m1mseHjtUMvu4LZ5y4JrsGcZTuz/TdbAos6tEMstKcGFuOYRpGbMNwTpi4W
-	 qDC1Cy5DHLMLV4IlpT43E2f+UbhMD3A2axH7kG1SZZpfmYu4FIzlnX2ov++0+s36Lt
-	 qVnvwco1L9+b1VcQaUlM7zMz7YqV39Zv6nsJd4K2IXXw6ztbssmIBfxqwqe0qwS837
-	 VGSRVHW9vT/cToQUzxC6Pi0u5Z/EZAm7yHQ1REm7UuZy2Erz70ymAZG6Hq6uUjmkaH
-	 fH+Sk1C+Mt8NA==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-	id 4B66515C028A; Thu, 12 Dec 2024 09:12:20 -0500 (EST)
-Date: Thu, 12 Dec 2024 09:12:20 -0500
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>, caiqingfu <baicaiaichibaicai@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-ext4@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [bugzilla:219548] the kernel crashes when storing an EXT4 file
- system in a ZRAM device
-Message-ID: <20241212141220.GE1265540@mit.edu>
-References: <20241212035826.GH2091455@google.com>
- <20241212053739.GC1265540@mit.edu>
- <Z1qSTM_Eibvw0bM5@infradead.org>
- <20241212140437.GD1265540@mit.edu>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YQfzEoml"
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-844ce6d0716so59473839f.1
+        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2024 07:43:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734018216; x=1734623016; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O46WXKsb1Pja6RWO4Q1M7/YVo+n25hZKtG9k7XGJdts=;
+        b=YQfzEomlF2Bin/CYLKtlhDpTZQu8lJmVy9QpDoUVtI1FJ0t/VoWYi9rYFygVHHVxqJ
+         C0eJzA8+myFV23UjhDB7GL5bnRL/HljWUJEv9ktBomrNXZClLUv2Wp0JvaxHSsQaG6ch
+         t1tTMf9nWmtADpyyWcUa6vS5imHmLRx4rbJrZ+vC4QtpM7Jt4Tv2VE0vM4dLHusNDAej
+         W+IjNYiJyVnuee9HFkfeepR+Pwvt3zCs5L8EO7uY8dypaGmcXfIkEpEePiCRynpeqTA4
+         LogArdAGG35BF7xXwsCjADB+By55SHN2aYkfiXfXTaj/gmro5EtJ9cbqmG1ejdxRQhgF
+         DmHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734018216; x=1734623016;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O46WXKsb1Pja6RWO4Q1M7/YVo+n25hZKtG9k7XGJdts=;
+        b=dZ2CptpJDgJ4uma5OLJQ1cYMGRnpY+CnlOpRiPkQw/h5BNL/Dsn/ZCJSf8oVP91ad2
+         nZnUerRxCfCwxwXIER7VSY8OAb2LN9nw1RMvU/yXk4Y5cCTuRDKGiUGMv9Ph48QlrhXF
+         Nx2ydbJ4Et8fBE65Siu1u7LXCZaLt62aNft/rptJ5UQRxVX4OUB36xWKMPCBD6fztKNb
+         2QlnnhcjnQpeTkmYQ4+kHFb5VJGe77CH7qBhgkO4iaItxtPUVTl9dZchekyx01f2aTdL
+         R5aNO6TqF0ksaYkhpJyo4UZwgMKpj5Fe2oiN3yI3jd6AIVDKbns4tzPDFVfUg3BP8Xv5
+         wITQ==
+X-Gm-Message-State: AOJu0Yz/WwGUoGGRCvDeagCUcg8GnwMMLoZpPwN2K9Oj4HxZjYrlKPXn
+	gEkwmgv3hVtLV8ic55KfQ8oT40cVNGNiuomCN9E+0EavIo5wYmZjiHnwQhtxoQ0=
+X-Gm-Gg: ASbGnctdRIfziUrunrb/9fnQOv2Lyk7QlLKeLftBa3FH7b5jHGqcKpQoaC/xjztUp0P
+	3Vo6MNIpp2P6XXccTnj6XhEmUK6QVJR/c6wX6HbqZpn7e1vq4WVeo0u4d+0EZHGQ0MAsCGnBS8s
+	fREU84ct6rossFvEwxTjNDNcVfovuOFcPgr8xx/x/bltYt0hpKuGHmJCG0GoY2D4kCQ1I1v8veB
+	yNdaFXP5RpoFOOQu5Xl3J18ozgIXGIBXmOemdi8rDu0WFo=
+X-Google-Smtp-Source: AGHT+IE58rjv7YCLLhGyEmwWvn+LLdNSd0VwA6xZR1Khddu57Fz1eLXFJrQLcrzF7mTNyvBggLiV3Q==
+X-Received: by 2002:a05:6602:3f95:b0:83a:db84:41a8 with SMTP id ca18e2360f4ac-844e56ac920mr91508939f.10.1734018216669;
+        Thu, 12 Dec 2024 07:43:36 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e2d845dcf0sm1122658173.79.2024.12.12.07.43.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Dec 2024 07:43:35 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: John Garry <john.g.garry@oracle.com>
+Cc: linux-block@vger.kernel.org, hch@lst.de
+In-Reply-To: <20241202115727.2320401-1-john.g.garry@oracle.com>
+References: <20241202115727.2320401-1-john.g.garry@oracle.com>
+Subject: Re: [PATCH] block: Make bio_iov_bvec_set() accept pointer to const
+ iov_iter
+Message-Id: <173401821584.916607.16305637467269534844.b4-ty@kernel.dk>
+Date: Thu, 12 Dec 2024 08:43:35 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241212140437.GD1265540@mit.edu>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-86319
 
-On Thu, Dec 12, 2024 at 09:04:37AM -0500, Theodore Ts'o wrote:
-> For this particular use case, which is running VM's on
-> Chromium/ChromeOS, I suspect we do need to have some kind of solution
-> other than triggering a WARN_ON.
 
-Sorry, I didn't complete my thought here.  We could just say, "don't
-use ext4 without a journal in a Chrome VM."  But if the are going to
-allow the VM's access to external USB storage, then ext4 in no-journal
-mode will be the least of their problems.  People trying to access USB
-thumbdrives or sdcards from their digital cameras using FAT file
-sytems will be trigerring ZBLK buffer overflow kernel crashes left,
-right, and center.  Especially if they are on a low-cost ChromeOS
-device with a tiny amount of meory, such that memory pressure should
-be considered a foregone conclusion.  :-)
+On Mon, 02 Dec 2024 11:57:27 +0000, John Garry wrote:
+> Make bio_iov_bvec_set() accept a pointer to const iov_iter, which means
+> that we can drop the undesirable casting to struct iov_iter pointer in
+> blk_rq_map_user_bvec().
+> 
+> 
 
-						- Ted
+Applied, thanks!
+
+[1/1] block: Make bio_iov_bvec_set() accept pointer to const iov_iter
+      commit: 2f4873f9b5f8a49113045ad91c021347486de323
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
