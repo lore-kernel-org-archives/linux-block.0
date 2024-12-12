@@ -1,48 +1,50 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A6A25949C;
-	Thu, 12 Dec 2024 07:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35FF153BF6;
+	Thu, 12 Dec 2024 08:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733988943; cv=none; b=q3Pa+G4OYXvVMCZCQLRA7c5Cuuk3RuoS3yX4osC4iKsCz5JVDA1mglGLYlvjEqhQOcbQpDjwwNppn1uz1siVVMar/lUFD5CtMJt3r2HKE8nD3FW77E2re1pzbqkwrsRwm7TwNq9S0AZkQCjjZqhZVUx1QKjlIaVbg22S2SHJvX8=
+	t=1733992402; cv=none; b=RFHgyqljImpmVbDsdC5Aw51V4z7ud7VtqqPEXQHeHHtW+jpPSgIQOHp7bOYbnBtDYaq/yEXf5Zu40jeell3RHbDBQ6H8GRHB5d+DaZvVC5iAsb5B8RZdYZ2fPWdQa0tvEta2L49hEb3+uha7LmxLv/aXgGlFwqIP80YQXk/K+Lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733988943; c=relaxed/simple;
-	bh=3ltvJd4vSayo7oNWmuVZwsuYSzOIKQd29lGuWvmJf5Y=;
+	s=arc-20240116; t=1733992402; c=relaxed/simple;
+	bh=ot48Ik4V4v5EQENxhTEcEi66UwS0ekYW2KvZvqQWfBA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PTHfNcOCAXIhD/bkPlVAHrKSShaIRgFqPLaTHDF2HQzo9ja8GNSLhMtQKmTmGzbwzMY8lDdUaNUCmgdhjuMHRl/5L7fLNs3IDI2uF+PNchPI2A/98y7f2SyzDFvoi4Lm5BOXS6qUTgy3AifsGAMiIbewVy64GY5nBxh7pjkkILU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=zJ6LoV72; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="zJ6LoV72"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=2IMVeQPDjRFleRhmLpYSZl9TIQWaafKA1ATOJjikNqI=; b=zJ6LoV72PBtd6AP1dC9AMezy5h
-	abZs5lD9BIfXkc5BdrPU0Ji9uQ4lIgUzGWVv5lyhNJgOVauWRWQAu6PjxQLZwx1kLkulKC46NPa5i
-	/lmCTm4fgARUdUNIEabH4t8z6uIwXPZHuKzTLMFUVVolgCmcpAxIl/ANuOlMjd0+ylLYjJril0bvn
-	Oq4kDwcx4t5sJLOVIqK7+/Ya6wsEieimyluhQRZSehmVnJf17hQx1T1A1Dhe/MwJ8i2rfe5dmV64z
-	DvuT4NM/Gnx+Bfnw7ZD3kNxOFehW981t8bzEjxGWFKT+Vt1WnAoUfAtad5zYCA7xXyh90I+F6BJdG
-	ZcfVq5uA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tLdjY-0000000HAhU-3ixM;
-	Thu, 12 Dec 2024 07:35:40 +0000
-Date: Wed, 11 Dec 2024 23:35:40 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Theodore Ts'o <tytso@mit.edu>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	caiqingfu <baicaiaichibaicai@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=DVeJiktYN+MkZG2G6TlNw3U/MNHUbG0AoObaU5cMemLGMvk6idHBM4Zet+tskyzZoufpW/KNqd4NcxSc1p8Ivt/RF8rcULpeY62cLS20OtFru7TW5MysSY8lrNbeU5ONgk7vTFWUffbDJy1m8pbd3LxIXyqaIhtKcoPHGMLd/ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 9FDD768D0E; Thu, 12 Dec 2024 09:33:12 +0100 (CET)
+Date: Thu, 12 Dec 2024 09:33:12 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
-	linux-ext4@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [bugzilla:219548] the kernel crashes when storing an EXT4 file
- system in a ZRAM device
-Message-ID: <Z1qSTM_Eibvw0bM5@infradead.org>
-References: <20241212035826.GH2091455@google.com>
- <20241212053739.GC1265540@mit.edu>
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v4 04/18] iommu: add kernel-doc for iommu_unmap and
+ iommu_unmap_fast
+Message-ID: <20241212083312.GA9376@lst.de>
+References: <cover.1733398913.git.leon@kernel.org> <da4827fda833e69dbe487ef404a9333c51d8ed2e.1733398913.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,17 +53,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241212053739.GC1265540@mit.edu>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <da4827fda833e69dbe487ef404a9333c51d8ed2e.1733398913.git.leon@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Dec 12, 2024 at 12:37:39AM -0500, Theodore Ts'o wrote:
-> More generally, any file system which uses the buffer cache, and
-> doesn't use jbd2 to control when writeback happens, I think is going
-> to be at risk with a block device which requires stable writes.  The
-> only way to fix this, really, is to have the buffer cache code copy
-> the data to a bounce buffer, and then issue the write from the bounce
-> buffer.
+On Thu, Dec 05, 2024 at 03:21:03PM +0200, Leon Romanovsky wrote:
+> +/**
+> + * iommu_unmap_fast() - Remove mappings from a range of IOVA without IOTLB sync
+> + * @domain: Domain to manipulate
+> + * @iova: IO virtual address to start
+> + * @size: Length of the range starting from @iova
+> + * @iotlb_gather: range information for a pending IOTLB flush
+> + *
+> + * iommu_unmap_fast() will remove a translation created by iommu_map(). It cannot
 
-Should there be a pr_warn_once when using a file systems using the legacy
-buffer cache interfaces on a device that requires stable pages?
+Please avoid the overly long line here.
 
+Otherwise looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
