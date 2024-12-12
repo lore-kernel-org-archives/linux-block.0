@@ -1,109 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D808225A21;
-	Thu, 12 Dec 2024 17:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA2718B470
+	for <linux-block@vger.kernel.org>; Thu, 12 Dec 2024 18:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734025489; cv=none; b=gosvCpc09dkOQsPYLSaurKO59YTEiEZIYgkgqoxsAuQMwSzh/zq5fKKV3VPe8SiDdMXyLqAbdbdPFYjeOV1mEJKIOfTRNz1YZ4cAYKdzPDhftKFKsmIX6jWeNU1zlrT+/ATILhzB37ThcBNY0DVhHCr/F1j++RHM5FC7LwOs2r8=
+	t=1734029330; cv=none; b=W8zOXtJO1ZMtm8JVGTTA3fYMcxICFN0ntbxePRk5hjZMBCp/8BOB3vWP14OfRYwNbMvCVD5qOsVwLg3mn27z7r8fSOXROGdB3irDolE5zjOpfojcFks8ucCmFH7d7ut058WM1BvMsumloX65yzfTkQLpUqbr1+RS2BOIa/WRtWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734025489; c=relaxed/simple;
-	bh=9tKjhSY0qkGEtTedwIdJnqlX2zVR0a9N/gnmnBVr8Xg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BStbIw/mfA6PsMPcSof8VvpOHmOplCypNzT035tBA/MQjl4qtr6Jt+D2K86ivP1CNW7bXAfNpBx2UvHhhWkEMZt6yBh0Ftk+w87yyuBbIRgcHusCZ4tfOc0l42/UdZfE/1l6KkW/4EH6xkJLsYJwEqHOysfJL4uu12bBz7AG/eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AZ/lQM3Z; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734029330; c=relaxed/simple;
+	bh=QKQL4MS5nZa+ROMEXkXGLP2EpoqfuvY8r+Y2F7K489w=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=m+tM4sBNgMVq83S34gRYF5M6/Q/uHf4urm2SNVC6gZDOMfSDmi1Q9CDm6BjvY6TG5S7HYv8n+usRzCaJGh62Ewr7yAHv5Rr5dusESJcpErB0daRTa0uvRPM+bFBygJAvr24HeDhRTjD+YGRm3XzM7BXdeN5NxXB6ciVrloc6e6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ZGr9K8KF; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AZ/lQM3Z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0240C4CECE;
-	Thu, 12 Dec 2024 17:44:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734025489;
-	bh=9tKjhSY0qkGEtTedwIdJnqlX2zVR0a9N/gnmnBVr8Xg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AZ/lQM3ZxOQj99+ru5U9GsTlZXmtrv+GycdFGABcKJfO9Q+DJwIQDnhUhtIo2WGDD
-	 0O7N12jymgot0QCYpOQsOQWkA4IlP7n5+kS1u5HGaRIFZ1n+TlnqoEHJaE2cNyM1GK
-	 yVDuEx5J3ZBDI5UfdmEWkDJtHEr/xuOCwvKbCHKdkPj0BFq+CIhRji3Jj/I+Tu4rOr
-	 F2jaTLwG29mt7Yf1PjVYwms8TI08NDirPHha8hmieFpPg+CpkSphA8Jw1gojDo1txk
-	 PNfR0bmasi8JPKfolBueyWqBpfWZ3NKX9O/Jzq/1wFXsLhprLL+bdrMv/ZbX9lfv9u
-	 3cOKTDkWORYJw==
-Date: Thu, 12 Dec 2024 10:44:44 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Tejun Heo <tj@kernel.org>
-Cc: Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-	llvm@lists.linux.dev, patches@lists.linux.dev,
-	David Laight <david.laight@aculab.com>,
-	Linux Kernel Functional Testing <lkft@linaro.org>,
-	kernel test robot <lkp@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ZGr9K8KF"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-844d7f81dd1so38625539f.2
+        for <linux-block@vger.kernel.org>; Thu, 12 Dec 2024 10:48:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734029326; x=1734634126; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+NEanoTkIUxCO+RPtP6A6ijL8u3YML6PUoYR1PXvvOM=;
+        b=ZGr9K8KF6jzbh4QlihwqRMvktw/IL6nKVyTHU1qyW2/CU1xdPuAOV1PRyeVtu3tTCd
+         zZJDaqZFsyRsYX6Pg6GzSppdxe+2q6jZQV387vx1Uw3NBjfMZ6qKuZpNc6TucqwahFtr
+         ef7lZwP1DWziBEWUdeWRCN5mV+Gv9pCfHw3X3SIr0OAScNQ+d3ewVYRzGhPjlS0TVa79
+         Kvc13rsbpWOfvxySgOm9zER29oZARlI6Wz/5uD0NDeWx3x685Q0Pqf+bp4DEpJD5+5Pr
+         ND3e8pJ9CeW2L7ZH0o19oMohC8dP2X76W0c/AnerMrlc9g5X9xuKM+HZbF/cqe7qaj5e
+         NwWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734029326; x=1734634126;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+NEanoTkIUxCO+RPtP6A6ijL8u3YML6PUoYR1PXvvOM=;
+        b=PTpOixdM4gvPpY2ilSWQKEQTADR3mWb8hAq8/uxBoFsUcn1UJauZs1Pg+7x+qFiamr
+         HXwLThpk4Vm7MfUEf4BqYWby/dKDfRsC4eEvtACnvfS6rrVWdPcTMF4wWxjXqlb40K0t
+         QC9/C+BpahA7gHkllueQ3LgF0NQe0j2Uawbzg/KQEklJMttDDX2oA/WxBJq5kHbgLBt7
+         +c6Fbfn2n8jcj/zGBqaDj4XVoUV9LFMmfppJ1Tjahy6+BaARw3wgTm6taeH2qTT++sdb
+         UspGijK3wqheTs9ULxZygmWJTCgQfaRgBJDeDK5lXEAeAY3HAEvAvXlJMeq7p5rkYzaE
+         Fyxw==
+X-Forwarded-Encrypted: i=1; AJvYcCX3lAkYnRB4y+7wQlAgeeqdnH6fRAE7zHwpCFHamBaO21qas8DfXzQ9HW0CjAXQeJI12LMiJmsD8u2Frw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgrzCVuWgzc7GWBZlzgMZKUmkmOEwkGqcL6T16V7CFcbYgZQUc
+	Z5+J5U+6gDXzmiCKDe2eQUGNQQKdd3ngdZGW9WdANwkEBW6Lsr5niiDYcqqPQYM=
+X-Gm-Gg: ASbGncsykFgDemrOiqw4Obm4SCMCmBpNKyu1FBBqlfDtCVgf/5U/VIizWdtIjAIISqw
+	gRLbRHZ0Rt5DSXsL3kO/tabROKzA9DiJGjrUVi9iusFKqjXEfltKVA7+DB9iit97mKtPs7/jJ0n
+	jFF+EXazSMv2NdHxfNXZgLyGyN9qb3GW/CnM7VUc2b21o7UeI5v+J7vtMk2BlZxh5bV9nmxVcIF
+	zoneqK6TIQM1F6JyWPOVdwqjSE0KUaDoMdxwo+K1Wk68Nw=
+X-Google-Smtp-Source: AGHT+IGhhvkFg5+OlRRW7dAh+LXxFzeHxLNLeGbrpzVSX1Hr5klBw9D+P9RZ3N63ZKwQ7KiNLlXZng==
+X-Received: by 2002:a05:6e02:1707:b0:3a7:fe8c:b015 with SMTP id e9e14a558f8ab-3ae5953b1fdmr15053365ab.24.1734029326669;
+        Thu, 12 Dec 2024 10:48:46 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a819dd4ac9sm33682775ab.12.2024.12.12.10.48.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Dec 2024 10:48:45 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
+ Nathan Chancellor <nathan@kernel.org>
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ llvm@lists.linux.dev, patches@lists.linux.dev, 
+ David Laight <david.laight@aculab.com>, 
+ Linux Kernel Functional Testing <lkft@linaro.org>, 
+ kernel test robot <lkp@intel.com>
+In-Reply-To: <20241212-blk-iocost-fix-clamp-error-v1-1-b925491bc7d3@kernel.org>
+References: <20241212-blk-iocost-fix-clamp-error-v1-1-b925491bc7d3@kernel.org>
 Subject: Re: [PATCH] blk-iocost: Avoid using clamp() on inuse in
  __propagate_weights()
-Message-ID: <20241212174444.GB2149156@ax162>
-References: <20241212-blk-iocost-fix-clamp-error-v1-1-b925491bc7d3@kernel.org>
- <Z1sbG2zh8xmb-lxu@slm.duckdns.org>
+Message-Id: <173402932544.982680.529127077152903218.b4-ty@kernel.dk>
+Date: Thu, 12 Dec 2024 11:48:45 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z1sbG2zh8xmb-lxu@slm.duckdns.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-86319
 
-On Thu, Dec 12, 2024 at 07:19:23AM -1000, Tejun Heo wrote:
-> On Thu, Dec 12, 2024 at 10:13:29AM -0700, Nathan Chancellor wrote:
-> > After a recent change to clamp() and its variants [1] that increases the
-> > coverage of the check that high is greater than low because it can be
-> > done through inlining, certain build configurations (such as s390
-> > defconfig) fail to build with clang with:
-> > 
-> >   block/blk-iocost.c:1101:11: error: call to '__compiletime_assert_557' declared with 'error' attribute: clamp() low limit 1 greater than high limit active
-> >    1101 |                 inuse = clamp_t(u32, inuse, 1, active);
-> >         |                         ^
-> >   include/linux/minmax.h:218:36: note: expanded from macro 'clamp_t'
-> >     218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
-> >         |                                    ^
-> >   include/linux/minmax.h:195:2: note: expanded from macro '__careful_clamp'
-> >     195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_), __UNIQUE_ID(l_), __UNIQUE_ID(h_))
-> >         |         ^
-> >   include/linux/minmax.h:188:2: note: expanded from macro '__clamp_once'
-> >     188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),                            \
-> >         |         ^
-> > 
-> > __propagate_weights() is called with an active value of zero in
-> > ioc_check_iocgs(), which results in the high value being less than the
-> > low value, which is undefined because the value returned depends on the
-> > order of the comparisons.
-> > 
-> > The purpose of this expression is to ensure inuse is not more than
-> > active and at least 1. This could be written more simply with a ternary
-> > expression that uses min(inuse, active) as the condition so that the
-> > value of that condition can be used if it is not zero and one if it is.
-> > Do this conversion to resolve the error and add a comment to deter
-> > people from turning this back into clamp().
-> > 
-> > Link: https://lore.kernel.org/r/34d53778977747f19cce2abb287bb3e6@AcuMS.aculab.com/ [1]
-> > Suggested-by: David Laight <david.laight@aculab.com>
-> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> > Closes: https://lore.kernel.org/llvm/CA+G9fYsD7mw13wredcZn0L-KBA3yeoVSTuxnss-AEWMN3ha0cA@mail.gmail.com/
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > Closes: https://lore.kernel.org/oe-kbuild-all/202412120322.3GfVe3vF-lkp@intel.com/
-> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+
+On Thu, 12 Dec 2024 10:13:29 -0700, Nathan Chancellor wrote:
+> After a recent change to clamp() and its variants [1] that increases the
+> coverage of the check that high is greater than low because it can be
+> done through inlining, certain build configurations (such as s390
+> defconfig) fail to build with clang with:
 > 
-> Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks for the quick response!
-
-> This likely deserves:
+>   block/blk-iocost.c:1101:11: error: call to '__compiletime_assert_557' declared with 'error' attribute: clamp() low limit 1 greater than high limit active
+>    1101 |                 inuse = clamp_t(u32, inuse, 1, active);
+>         |                         ^
+>   include/linux/minmax.h:218:36: note: expanded from macro 'clamp_t'
+>     218 | #define clamp_t(type, val, lo, hi) __careful_clamp(type, val, lo, hi)
+>         |                                    ^
+>   include/linux/minmax.h:195:2: note: expanded from macro '__careful_clamp'
+>     195 |         __clamp_once(type, val, lo, hi, __UNIQUE_ID(v_), __UNIQUE_ID(l_), __UNIQUE_ID(h_))
+>         |         ^
+>   include/linux/minmax.h:188:2: note: expanded from macro '__clamp_once'
+>     188 |         BUILD_BUG_ON_MSG(statically_true(ulo > uhi),                            \
+>         |         ^
 > 
-> Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost")
-> Cc: stable@vger.kernel.org # v5.4+
+> [...]
 
-Thanks, I was wondering if I should have provided those. I'll carry them
-forward on any future revisions, as I assume Jens can pick those up with
-your tag if this is good enough.
+Applied, thanks!
 
-> 
-> -- 
-> tejun
-> 
+[1/1] blk-iocost: Avoid using clamp() on inuse in __propagate_weights()
+      commit: 57e420c84f9ab55ba4c5e2ae9c5f6c8e1ea834d2
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
