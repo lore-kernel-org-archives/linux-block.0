@@ -1,60 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65CD81C304A;
-	Wed, 11 Dec 2024 22:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B10913F43A
+	for <linux-block@vger.kernel.org>; Thu, 12 Dec 2024 03:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733955609; cv=none; b=hLhP/vjTndfso2Xf3efgEI4kZFPcEV7MM467tRizoEbkaenisa9GdQgmvQyq0IORFqes/8ee/UAejThLiX4h2rhw4SShHtcjuEPd/NkWw/CFfgWTnYHt/J5/Q9w1tS/j46eYOXCe2oy93+eyCSkCV5iCw6KMwEAOV/FJiiZuHt8=
+	t=1733975913; cv=none; b=L1q2ASMnr7zRRIwvmjIpE2vLV03OAaYBFr+AuTwhKb+U6vSoSlMfMPn1+ZjjSna1ItH/ltd1/klu6qznLVJhMyNk/jMxyFd1sqdRVLmp3SnRXnGgh0HBa2ArvMdKtEUplBjJGSyn9UBDdZgtNTIjrmkbEOzUiEAl5kvnRNzvjwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733955609; c=relaxed/simple;
-	bh=VLhIlSr54TL2QmDP8JRM72GWULbrO+1dbQF3pJw1ea8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=elv6m3HdSOdEICY/3aSSgbWXYNWERWVQvLHMz7jD+zQ5MPv52a+Ojl5HhSdtYC77lVZ9iESwHsvGc+MKnEAWdKjTCT3pPr5ThpQjkSNRYcPKX0UZGQkU0aRg9bEt5blGlf5OPECdYn7Ax1f0iOCkpbnZ9VWavFsACWBFOPOEfhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBNirnu6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733975913; c=relaxed/simple;
+	bh=F36O0Dgg1mhlcRno/fBPjRyjEsASJc7EpOfe35xMwec=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Ygw+NXnx9nNvyl7IoJsexdM4aXEPE3Ws6sFMh2ki2MFywBlqmOqLv4HLQe15hx+e9AAW801quK2LZoaop/aOcNInO8RFhy1xawXWBeOsKuL0UlpEhgXcqVQzWkZIp1nDvmbS1TUHShgnMiYJp29KVRPIgwF3t5cb0d05k3JZ0cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=GIHOvg4U; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBNirnu6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4576FC4CED2;
-	Wed, 11 Dec 2024 22:20:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733955609;
-	bh=VLhIlSr54TL2QmDP8JRM72GWULbrO+1dbQF3pJw1ea8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kBNirnu6kCr1d7gsDMgZrNuAXLYpD8uzILmzzbrNO1Mnk09f4n481Cndxfrau3+jJ
-	 FpLkwRUeISCmz/SpemPgohhlQ3XgJzMdmIoVZ+IhBa91qhgYo51NaglvZU5BDtIZwB
-	 //WGIgbYueq/MY8+Vmm6UVkGftTY+5cuZd/vROmxV6NP1K5rtWTWqMiA7gXfNGL2rJ
-	 x8QxUc2OB1rxoUChWT6mPdO+zhCO+RaRL8TgtaiQ2BKywx4s0f0kj5Ngw6pkMs+dfE
-	 zgxHiHxwQbMNfdTxhMs7Xm5RVvG80KHa9zyTwAQzCJbyWkRaNGRYrBbAH41l/rU6DO
-	 Lf0Zf/ATio7bQ==
-Date: Wed, 11 Dec 2024 22:20:00 +0000
-From: Will Deacon <will@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v4 04/18] iommu: add kernel-doc for iommu_unmap and
- iommu_unmap_fast
-Message-ID: <20241211222000.GH17486@willie-the-truck>
-References: <cover.1733398913.git.leon@kernel.org>
- <da4827fda833e69dbe487ef404a9333c51d8ed2e.1733398913.git.leon@kernel.org>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GIHOvg4U"
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7feffe7cdb7so144452a12.1
+        for <linux-block@vger.kernel.org>; Wed, 11 Dec 2024 19:58:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1733975911; x=1734580711; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WgpWYN8QlsUV56/RVatR17L4XIXA6XIYGaqKFNGgJR8=;
+        b=GIHOvg4UbiVaM9uJK6lQZFuZiHZSvykDeyOlu3rgwhXtP6D+dr37wy+QXu/W5zv+vB
+         o4+ODtk4V/0FJZFwHC2d9UtjHmDpDyoXn4mCwJkMYXw9dw0A4MDCzhFdnEtE7qhoeCcd
+         FkrAjSio9mns5VLH1IHWv8giyxJN5OIfO3NXg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733975911; x=1734580711;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WgpWYN8QlsUV56/RVatR17L4XIXA6XIYGaqKFNGgJR8=;
+        b=ltpT3mh6UCD2yWygtCwmjLeneauwXH3kFU37nCqONAty37Bik5gM+3+1F3Joi5s7OQ
+         PGKLNkRGPaI6eiMmpuyNpjpWMpZ/nCB2CgLO8uMcuF1A6FDLXuyB/8sy+lycti0eHkbE
+         FX20fk4BzyHL8l50TIj7pZvjlHreR5VwEknF026mNWCuifx5lR9ndCTOzC0rImPCY6po
+         s2vjKrLY3GeeS17w63i7CquRR9Gnu1PlK/VCqlx1O3qTmwBMzhRW2IPLrA+b7whUu4r2
+         581V5xURhr6S/XNFymv7na99JKuG+UJQUZuN8hYugewjfSWeDhS4GxrVmGzzM0MXMuC/
+         M6mA==
+X-Forwarded-Encrypted: i=1; AJvYcCUuee/x9YlNPjgYbMnrtbiF7WnTeWXCpKnpeZrHjgFZkj24niUb/BvcYbtnNB+jGkpsQh+wB1ugwWHMwg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQSuKlBSui7+V7bfncDfk6b0914P1GHHmIQokLacBqqWMHGOX0
+	jSR1QAlsSy13jp3FczX+9lPKrniL1pYBNhzmJ00LywWYK+YC7q5RfVNlfyVIPA==
+X-Gm-Gg: ASbGncuav/SftKVwWszXGxFVNKnTY8jfrWEkiyNIqY1f8ce0h8Gnfa9rOtQ1N7m0Z5B
+	MYzBv3kOlgU92hlUz1m+b25X8Edo4b7quwX17anBYa5ccX6xK7txBozBV6ajIg4rQ2z2VpZtiCP
+	SeHqjZrnWPjaMEhsnIaHe8vZUoP97h+/0hVDHM5MC+H6RLEydKRnBaKS7qQArc+lKQ+5f4pf0Jp
+	uonhzNf73Y2X6VWG5i3lC4uPC9CKLbUO8Hz+YpcK9VbyWK9hJGfPrF0556P
+X-Google-Smtp-Source: AGHT+IHKkfFoUJmuviCWJxeHOxw/i7OyuK3tNEwkKuGLCgFdomsJz63utqGvLX0dQV2QgpKkzX7kug==
+X-Received: by 2002:a17:90b:3ec6:b0:2ee:8031:cdbc with SMTP id 98e67ed59e1d1-2f13930b92amr3181455a91.23.1733975911667;
+        Wed, 11 Dec 2024 19:58:31 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:d087:4c7f:6de6:41eb])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f142d90d3asm218413a91.7.2024.12.11.19.58.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Dec 2024 19:58:31 -0800 (PST)
+Date: Thu, 12 Dec 2024 12:58:26 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Theodore Ts'o <tytso@mit.edu>, Christoph Hellwig <hch@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	caiqingfu <baicaiaichibaicai@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	linux-ext4@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: [bugzilla:219548] the kernel crashes when storing an EXT4 file
+ system in a ZRAM device
+Message-ID: <20241212035826.GH2091455@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,57 +71,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <da4827fda833e69dbe487ef404a9333c51d8ed2e.1733398913.git.leon@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, Dec 05, 2024 at 03:21:03PM +0200, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Add kernel-doc section for iommu_unmap and iommu_unmap_fast to document
-> existing limitation of underlying functions which can't split individual
-> ranges.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  drivers/iommu/iommu.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-> 
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index ec75d14497bf..9eb7c7d7aa70 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -2590,6 +2590,24 @@ size_t iommu_unmap(struct iommu_domain *domain,
->  }
->  EXPORT_SYMBOL_GPL(iommu_unmap);
->  
-> +/**
-> + * iommu_unmap_fast() - Remove mappings from a range of IOVA without IOTLB sync
-> + * @domain: Domain to manipulate
-> + * @iova: IO virtual address to start
-> + * @size: Length of the range starting from @iova
-> + * @iotlb_gather: range information for a pending IOTLB flush
-> + *
-> + * iommu_unmap_fast() will remove a translation created by iommu_map(). It cannot
-> + * subdivide a mapping created by iommu_map(), so it should be called with IOVA
-> + * ranges that match what was passed to iommu_map(). The range can aggregate
-> + * contiguous iommu_map() calls so long as no individual range is split.
-> + *
-> + * Basicly iommu_unmap_fast() as the same as iommu_unmap() but for callers
+Hi,
 
-Typo: s/Basicly/Basically/
-Typo: s/as the same/is the same/
+We've got two reports [1] [2] (could be the same person) which
+suggest that ext4 may change page content while the page is under
+write().  The particular problem here the case when ext4 is on
+the zram device.  zram compresses every page written to it, so if
+the page content can be modified concurrently with zram's compression
+then we can't really use zram with ext4.
 
-> + * which manage IOTLB flush range externaly to perform batched sync.
+Can you take a look please?
 
-Grammar: s/manage IOTLB flush range/manage the IOTLB flushing/
-Typo: s/externaly/externally/
-Grammar: s/to perform batched sync/to perform a batched sync/
-
-With those:
-
-Acked-by: Will Deacon <will@kernel.org>
-
-Thank you for doing this!
-
-Will
+[1] https://bugzilla.kernel.org/show_bug.cgi?id=219548
+[2] https://lore.kernel.org/linux-kernel/20241129115735.136033-1-baicaiaichibaicai@gmail.com
