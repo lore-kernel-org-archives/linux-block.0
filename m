@@ -1,168 +1,153 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68671EB9E2;
-	Fri, 13 Dec 2024 19:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CADEB189BAC
+	for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 20:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734116430; cv=none; b=ZX6VygxdeuBuikbBH/vcpvEcELNTd6fJiJIP1SQUGvq08ythvQEI1p3igQA03v/C7QnIjoQgL7xIw4IDlF+yHy+W5WaaAIZpGVysMrpQ1egxrbgwJ2WtrTDPSM1KxEnFIfqL0RUsVyxe3eRyvPwlJsBdAt3WBYNIbm+Hz1hJAnM=
+	t=1734122923; cv=none; b=H13d5yw7/l355QVsdFrr0PJhfdaW4jKZg5J6Dwx/5IlILacT+n6eiNnVINCg3A8DVLJn5fDc/4LjuTtqWi6qnVba9DskPmGM6unUJLTCDaKX6xhu/to+0JhRSRuIW520tf4XFsykiVa+FBFulE6hbQKJ0mSnEIhtWpjnx5KMwIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734116430; c=relaxed/simple;
-	bh=4cQrfh6BfHc3IlT0NVwr6zi0Zv3UEuEKb0NBjH4L2/o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GBJU6T4EZvXYpgzUl2xXd4kcifa19KJ71XN5xvZ8Wj55wRT9jAVU2tVsAx3iD21T2hq/EzNAnUiWit9RHqfRYhzjIuULundpBeptUsqN+SJJiSVElX0EwcODsCL8v2F3MUNxY3u/3DCMqnkbRvRXPr8v1lMMBviw+XKuPS7LwNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aTdyCVo0; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1734122923; c=relaxed/simple;
+	bh=Mq7bWhatGkG58ih9K3DVUt02PdUa8dYdfx3U5DHnIVY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=RVbX8fwI0K1naWOcFPQ0q2zjreC2PJNu5GTSvI5T0yj6oIkOTg4MRvuYyCO/vHT4gOj3RuJCaLnSIvqYkuPl/IqrUKjf617FcubzJoVPp14JW/v8EqKRVz2+IwK57ksC8y682ppGHgeq/7UpYu+liXc+NOM048F2uMPuJ3KmCjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=UQjfKSZh; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aTdyCVo0"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=Q2Hh7i1IvMPkDPyJ+H+GPqol4Inldj3eRd/RH+IyPWA=; b=aTdyCVo0A04ii9Be59koxPyCGw
-	E2Tc3gu9An0oYSw9mHUF4BGt68XuQnuY7+qEv5mkl8S/1Mb8OjHTdPRLU0Y8nSm9EmCuNg7Z3wqqy
-	Gg5gNAXSG5wpcILgrKOSICOswOFwoAOw2xu5W3peK6/AB0NW9WDuFXCZ7pkBtkOFbvrxQ/H/Wso/7
-	vup/1RzSjj5IdPAXwNmGeAuD9eAGVay0ADicmlvi1bgfEe78EBpB3K0vpdptd3ZJgBtpkK/k30Da6
-	mWavV6+5CbolAjztRsfwtkpu703L7ZYCER9Q3dAaS2BVWWPNc2kEPctCfSAxVGrJ7DNTtle0nUDG7
-	bbwW1yNA==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tMAtg-0000000F6TE-2gCj;
-	Fri, 13 Dec 2024 19:00:20 +0000
-Date: Fri, 13 Dec 2024 19:00:20 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Michal Hocko <mhocko@suse.com>
-Cc: lsf-pc@lists.linuxfoundation.org, linux-scsi@vger.kernel.org,
-	linux-ide@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: LSF/MM/BPF: 2025: Call for Proposals
-Message-ID: <Z1yERChJxMKlZ5nZ@casper.infradead.org>
-References: <Z1wQcKKw14iei0Va@tiehlicka>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="UQjfKSZh"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-728e3826211so1856931b3a.0
+        for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 12:48:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734122920; x=1734727720; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uCBIpej8Bar3OmRXFKc1fy+D4p8b1SV4OEjdinqmxcU=;
+        b=UQjfKSZhNfWt0TIqSN12oyUUn4Fz1+SNyfXX+1GjNzM5En3b7qIkZKqupdP3t164W6
+         Hjb8cYlFQIaC/YzUh65LEh2Le1QXW0eA1G7szG+Z9sOBH2SZcuekoqnzI3+IlCur95QP
+         VaHB23ihUIHokrl/WLWOfMqSfSuucp6AcVjz+ECawDePLwktw9+lEvFNMrvUa4M4QrTI
+         BevdcYl6x47yWrgAGM71nK/XlCHR+hbI6o4tam1zzVsz+y/a6I6Nj1sQ1AK1rjQUr/8l
+         tDfJ+4BE3Ttc2dhYToovDtPijf+gbNnrRnFzY5VUO+6TYwMjTzCqESaH2UQ8I1i4bp1x
+         o+5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734122920; x=1734727720;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uCBIpej8Bar3OmRXFKc1fy+D4p8b1SV4OEjdinqmxcU=;
+        b=k5Uw05B+XsAJd4T5Z0e1G3Cv566baBCFWMVE5XUECacU81dYQrNm3mBJon2IELldEI
+         yP6HZYUkbGXi6fOBuQwRcVf5bH84PiNLFrpfNZPdUaIa493gArDJupl/b8MBOIiks7QE
+         eplMNrkIzZ2sqXnPS0jnC/eg3JsH6cUB9TFw1Crc3rcN+wio+x10/dqNYK8Oh4M/FwV9
+         Sj/qMaKcEOy2KantAphW06nBRJc1WD+jL1rchXa7wfd1+x0aoJEH9rWf54pvv2Vjlniu
+         M5HuQKggnDWmIaUb4bLlIJnrgsAWdSnkp8vM0MUo2hTe9seKk087UIPWa3U03auGe5OE
+         JSzQ==
+X-Gm-Message-State: AOJu0YzJvRYjt/LxRPkrB+Emh21APm+k4iF3lHLyZw4/jNeUyYxyWMJ0
+	8RKGSJ/OzlGAdum700gcOWDbV5h40/RKyjLXK4XdFEWnz4TshllIYvKUztcsWhSMGr2XbY0yzHe
+	s
+X-Gm-Gg: ASbGncsY7dT69TsjLPJQwjwiOvJfPcV1rhhO351ZOADctmUsK9Mn2hgiIvdYlRpcCrf
+	BdXv+52OI6OYAEZ5NRE9ejMdLEAOpdDWlU6m30AxOh8zSLujpfU0bIPGZj66SfFl4IA9mLnnRvV
+	seA7O3F8Uda6xqDHgQgWIOgdmZhn+76xUoeYlVHIzQpvxgzAIYX9WFo6LhHnYGjxwj9b58/UXD3
+	dZOgi6nabV8XjMPIlUQa46HJuN1pqCxjAie5ZzZ/1gypFkY0gE0aw==
+X-Google-Smtp-Source: AGHT+IFHdmM6EXwify/Qy89AwlgbrmSe1GAVm3qfPI7T7j0DudiX+SDcv8sCR+ARbLC6Vc5swYxWig==
+X-Received: by 2002:a05:6a00:288a:b0:728:cd4f:d5d7 with SMTP id d2e1a72fcca58-7290be874e5mr6198089b3a.0.1734122920174;
+        Fri, 13 Dec 2024 12:48:40 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72918ac5296sm218570b3a.22.2024.12.13.12.48.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Dec 2024 12:48:39 -0800 (PST)
+Message-ID: <d2acd3cb-188c-4ad5-91db-efbc6e50a1c1@kernel.dk>
+Date: Fri, 13 Dec 2024 13:48:38 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z1wQcKKw14iei0Va@tiehlicka>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.13-rc3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 13, 2024 at 11:46:08AM +0100, Michal Hocko wrote:
-> The annual Linux Storage, Filesystem, Memory Management, and BPF
-> (LSF/MM/BPF) Summit for 2025 will be held March 24–26, 2025
-> at the Delta hotel Montreal
+Hi Linus,
 
-I've written an opinionated guide to Montreal.
-Patches accepted, latest version can be found at
-https://www.infradead.org/~willy/linux/lsfmm2025.txt
+A collection of fixes for the block area, which should go into the
+6.13-rc3 release. This pull request contains:
+
+- Series from Damien fixing issues with the zoned write plugging
+
+- Fix for a potential UAF in block cgroups
+
+- Fix deadlock around queue freezing and the sysfs lock
+
+- Various little cleanups and fixes
+
+Please pull!
 
 
-Montreal
-========
+The following changes since commit 22465bbac53c821319089016f268a2437de9b00a:
 
-Montreal is the second-largest French-speaking city in the world.
-Despite that, you can generally manage without speaking any French;
-they are accustomed to tourists.
+  blk-mq: move cpuhp callback registering out of q->sysfs_lock (2024-12-06 09:48:46 -0700)
 
-Transport
-=========
+are available in the Git repository at:
 
-Montreal primarily uses the metro; it is an entirely underground system.
-Entrances are indicated with a blue downward pointing arrow.  The Delta
-hotel is between McGill and Place-des-Arts metro stops on the green line.
-Train announcements are only in French but signage is bilingual.
+  git://git.kernel.dk/linux.git tags/block-6.13-20241213
 
-Tickets for the STM (https://www.stm.info/en) are valid on both busses
-& metro (but not local rail which is a different system that you won't
-need to care about anyway).  Travel to and from the airport is a special
-$11 fare which includes 24 hours of travel.  You can use a credit card
-to buy fares from a big orange machine; while you can pay on the bus,
-everybody will look askance at you for slowing them down.  You'll get
-a credit-card sized piece of card with an embedded antenna; you can
-break it by folding it, and it is not recyclable.  While you could buy
-a plastic OPUS card, this will not be a wise investment decision.
+for you to fetch changes up to be26ba96421ab0a8fa2055ccf7db7832a13c44d2:
 
-From the airport, you'll want to take the 747 bus to Lionel-Groulx, go
-down into the Metro and catch a green line train towards Honore-Beaugrand,
-getting off at McGill.  For getting back to the airport, you will again
-need to buy an $11 ticket for the 747 bus.  If you're travelling, say,
-Thursday evening, you might want to buy your special $11 ticket on
-Thursday morning, use it to travel around the city and eventually catch
-the 747 in time to catch your plane.
+  block: Fix potential deadlock while freezing queue and acquiring sysfs_lock (2024-12-13 10:51:58 -0700)
 
-I would not recommend driving in Montreal.  It is confusing and expensive.
-I'm going to take the train from Ottawa, but taking the train from New
-York is a 11+ hour ride.  I'm told it's very pretty!  There are also
-coaches (Flixbus / Greyhound / etc) but I have no experience with those.
+----------------------------------------------------------------
+block-6.13-20241213
 
-You can rent a bicycle by the minute: https://bixi.com/en/
-Scooters are probably not available to rent during winter.
+----------------------------------------------------------------
+Bart Van Assche (3):
+      mq-deadline: Remove a local variable
+      blk-mq: Clean up blk_mq_requeue_work()
+      block: Fix queue_iostats_passthrough_show()
 
-Beer
-====
+Coly Li (1):
+      MAINTAINERS: update Coly Li's email address
 
-The closest brewer to the conference is Benelux.  They don't open until
-mid-afternoon, but the Provigo grocery store across the street sells
-their beer if they're not open.  It's not generally legal to drink on
-the street; take the beer back to the hotel before opening it.
+Damien Le Moal (4):
+      block: Use a zone write plug BIO work for REQ_NOWAIT BIOs
+      block: Ignore REQ_NOWAIT for zone reset and zone finish operations
+      dm: Fix dm-zoned-reclaim zone write pointer alignment
+      block: Prevent potential deadlocks in zone write plug error recovery
 
-Other worthwhile breweries include Dieu de Ciel, 4 Origines, Saint Bock,
-Brewsky and McAuslan (aka St Ambroise).  Don't be afraid to use the
-metro to visit them.  There are many pubs on Crescent and de la Montagne
-streets; most will serve local beer.  Cans of beer are readily available
-at corner shops (referred to as "dep", short for Depanneur).
+John Garry (1):
+      block: Make bio_iov_bvec_set() accept pointer to const iov_iter
 
-Molson is headquartered in Montreal.  It is not usually considered
-local beer.
+LongPing Wei (1):
+      block: get wp_offset by bdev_offset_from_zone_start
 
-Food
-====
+Nathan Chancellor (1):
+      blk-iocost: Avoid using clamp() on inuse in __propagate_weights()
 
-Montreal prides itself on food.  Classic dishes include poutine, smoked
-meat and tourtiere.  As a major city, there is plenty of international
-food.  Montreal and New York have different styles of bagels from each
-other and much ink has been spilled on the subject of which is superior;
-try St Viateur or Fairmont for a fair example of Montreal bagels.
+Nilay Shroff (1):
+      block: Fix potential deadlock while freezing queue and acquiring sysfs_lock
 
-There is also fierce competition as to whether Quebec, Ontario or
-Vermont produces the best maple syrup.  You should probably find a
-Cabane a Sucre / Sugar Shack to form an opinion of your own, eg
-https://www.parcjeandrapeau.com/en/urban-sugar-shack-spring-restaurant-sainte-helene-bistro-terrace-montreal/
+Tejun Heo (1):
+      blk-cgroup: Fix UAF in blkcg_unpin_online()
 
-Outside
-=======
+ MAINTAINERS                   |   2 +-
+ block/bio.c                   |   2 +-
+ block/blk-cgroup.c            |   6 +-
+ block/blk-iocost.c            |   9 +-
+ block/blk-map.c               |   2 +-
+ block/blk-mq-sysfs.c          |  16 +-
+ block/blk-mq.c                |  39 ++--
+ block/blk-sysfs.c             |   6 +-
+ block/blk-zoned.c             | 508 +++++++++++++++++++-----------------------
+ block/mq-deadline.c           |   5 +-
+ drivers/md/dm-zoned-reclaim.c |   6 +-
+ include/linux/bio.h           |   2 +-
+ include/linux/blkdev.h        |   5 +-
+ 13 files changed, 279 insertions(+), 329 deletions(-)
 
-We're going to be there in March.  It could be -30C or +20C.  Montreal
-has an underground city (RESO) which has shops and restaurants, as
-well as being a sheltered route between office towers and the metro.
-There's an entrance at Union street, just two blocks from the hotel.
-https://www.mtl.org/en/experience/guide-underground-city-shopping
-(yes, that is a chunk of the Berlin wall in the picture)
+-- 
+Jens Axboe
 
-If the weather is clement, Mont Royal is a popular destination, but it
-can be icy and not much fun at this time of year.  The Lachine canal may
-be a better bet, or you can walk or cycle on the Formula 1 circuit on
-Ile Notre Dame.  It's not the Nurburgring; while you can drive on it,
-the speed limit is 30kph.  A more unusual route would be the Samuel
-De Champlain bridge Multiuse Path which is some of the best tarmac in
-the city (but ends on an unsurfaced path that connects to the Formula
-1 circuit).
-
-The local sport is hockey.  The Habs are not having a good year, so you
-may be able to buy tickets to a game.  The Colorado Avalanche are in town
-on Saturday 22nd; otherwise you should be able to watch a game in a pub.
-Women's hockey is gaining in popularity, and the Montreal Victoire are
-playing Toronto at Place Bell at noon on Sunday 23rd.
-
-St Catherine, St Laurent & St Denis are the major shopping streets.
-There are markets at Atwater and Jean Talon.  The Vieux Port area
-is full of tourist tat (but maybe you want a sweatshirt with Montreal
-written on it).
-
-The Biodome and Biosphere are both worth a visit.  There's also a
-planetarium, the Musee des Beaux Arts and the botanic gardens.  I like
-the Archaeology museum.
