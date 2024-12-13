@@ -1,60 +1,102 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99251E04BF;
-	Fri, 13 Dec 2024 14:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5882A1E25EB
+	for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 15:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734100437; cv=none; b=ocbjXczkHG9dwN5wZ4ILrC0icLaoetEkM367+mPD5XLRXxAVWoBltO7JeWSwGzTIaTvf43WyZp2sINSmjYg6YzsC7ooGvYajeD5dNUio+LvzmIDgUYRC84GPMJVv5BOHouMwGC2hrV4pkv+41fplPTejIQh5FEdeQj7/zedMckQ=
+	t=1734102596; cv=none; b=NOeloOdz4V9jC0/cYwTe9SRLhLwCG5msPy/8Ls9I9ynusUydsLwgpGMUCZ+IjVkGmo4o7lTqAOd1C182p0kzZZYKwiSeIW6fymdcH7wNusekVVU/AsetTIq/XmM5hiAQpxd/oDdZQcZihUYyXSTbqCAd58df4iLg2yXdgZr9L6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734100437; c=relaxed/simple;
-	bh=f9c9IFBC1K3O3m/EYe+GtyRkm0WHPIplnL+SfvMSmLw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t9o1ek1MRiLtCbe/R4VzSFb1YitOUyNT9UNVoKti9ND8lBIEKIodiHOpRdcQr+nQwujsMEQop/+ZpMhiCkgyy7EwrUqjyt6ZebMdhZkQ6kjH5d3I3+z1VtH6JB/D5DHWVbjNt2/hjz5fKQLsOCcXrcgxhkz6nSCDKIpUktsGoB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 19E5C68AA6; Fri, 13 Dec 2024 15:33:52 +0100 (CET)
-Date: Fri, 13 Dec 2024 15:33:51 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: M Nikhil <nikh1092@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
-	linux-scsi@vger.kernel.org, hare@suse.de, hch@lst.de,
-	steffen Maier <maier@linux.ibm.com>,
-	Benjamin Block <bblock@linux.ibm.com>,
-	Nihar Panda <niharp@linux.ibm.com>
-Subject: Re: Change in reported values of some block integrity sysfs
- attributes
-Message-ID: <20241213143351.GB16111@lst.de>
-References: <f6130475-3ccd-45d2-abde-3ccceada0f0a@linux.ibm.com>
+	s=arc-20240116; t=1734102596; c=relaxed/simple;
+	bh=UhqKArA3mQltFfnUF2tcX+pV3IabnBmzdBC2jT6MdCo=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=F8JNj4Uua/VyYo+4ar4OhX2xUZ5jdmvewUyELDDeqePO1z5nTpZG2QJE0ZtYvW/pAxrhYrWMYHo1Frgzbv/mgXz7AW9CpIiea6mwkGfq2AdcPQJ5zEjKSuvbdHbZttO0fuPUxnCm75WMsB0xDoOff8nJJ51rOXbaDlD1ArNaqhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=MdPK9mVz; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="MdPK9mVz"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a9cb667783so14812225ab.1
+        for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 07:09:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734102592; x=1734707392; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MxKtYNm+o7Qqldvs4k038B4Y1fztU6/dUSELdpzM86E=;
+        b=MdPK9mVz69zFqRdMu+U7GAqmd4R5DoLb5NqgpAXMdvCQrXxPhcSFw9fwHVQ66pCl3V
+         +fNs0MPJ4cpP+C2vI8wg03h4+4LsxSMt2P5Uy5Qb9orKwV+I5FHnki9tqxSWmzK6VV3B
+         4xhy3Wllw96hNnUJmOaSB1Alm/dedIksPKHNK0JqbpOduDR9SAfgw6Zyb6/L5uneMA3F
+         4bHvupA+x4fTFPP4jC4vPlu6qp3HlHLiowtu3nxcjqGWmucm7gZXsr+Jf+h61yfytv0j
+         q5sEIWyPkYdUOZC3vOcKdNtwc/B1AXjxcwLNI2sZlXOErkNlL9bAX9X/1V/oP9N+cpEP
+         k4Eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734102592; x=1734707392;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MxKtYNm+o7Qqldvs4k038B4Y1fztU6/dUSELdpzM86E=;
+        b=Aa+ceEIs2bnR5jnJrQR6Hg4A5FV4cwRZxsd7hAv5D+aOOlPmFu1ZBIh0XEYDK59VUf
+         eZdX8+69lWC0+A2VOEU3kiBqHC5N3OPx18rEHN5q4SLaIU6Mn/7ar0FSZ6F1Sws8GWbL
+         lQISkTLtdT5EjedJoB8/yljS4+a1BGXFW2azFNFKYccDZrrVyNgvJZc+p1M66qgcpkWV
+         11b7bqenMVdWOEPy8OqKg68szsdlPnhWeR0bXFMii/mY7r33m+ck6RC0BZw+58gpi3Ga
+         pKJaCjPS8b2jv6EPrFk6uDAGqyz1Ej5E5lb04qOPRnd+CHtgK8N8w88PBigHOSMxoUsT
+         smyA==
+X-Gm-Message-State: AOJu0YxuVl9sbFAUIeTUCKIII6IiE/tnjn7CBlIb659sX6F60X81H0PI
+	+FSKJQO5D6Cbzk7d484H2SYzYg5ECsVp7mLGyguzbyljVEOn2tfuWNzePLNyeUmtHVaYE2dLojb
+	I
+X-Gm-Gg: ASbGncsrtcb351sye85Jy7ssGNfjtLU9/Dy2Q3Xsq9QA9/t3xYw8Euw+HFPw1U2bR+I
+	1vqeF13k54XVv2A2ZUBFQVnoJVmmyGe0VOWWmlMGPFFhuRKS/kFKePFzT048T1IJsSOlwMWFLhE
+	F+4HS01RjGGLxZBd3we3glVRIqM/OH96Ds6AItEaCQB2b1jGC8mdnJ5mr/poZ5inJn1YrMtzFs7
+	dfHAnXg3LeCQulYXE3+P+SJMPYCOc+JtibvgF/AwTdrAXA=
+X-Google-Smtp-Source: AGHT+IH2+v3oEn9vDQYTnc/rsgmweHif+WFAxL3LKl2ws3acYhLHE5GLHKG8L4oseAmBeTxaTVumQg==
+X-Received: by 2002:a05:6e02:18cd:b0:3a7:e047:733f with SMTP id e9e14a558f8ab-3aff4613b80mr42090075ab.1.1734102592385;
+        Fri, 13 Dec 2024 07:09:52 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e2d08c1cc2sm1969605173.52.2024.12.13.07.09.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Dec 2024 07:09:51 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20241212212941.1268662-1-bvanassche@acm.org>
+References: <20241212212941.1268662-1-bvanassche@acm.org>
+Subject: Re: [PATCH 0/3] Three small block layer patches
+Message-Id: <173410259165.85123.3274530523792619700.b4-ty@kernel.dk>
+Date: Fri, 13 Dec 2024 08:09:51 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f6130475-3ccd-45d2-abde-3ccceada0f0a@linux.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-86319
 
-Hi M,
 
-On Fri, Dec 13, 2024 at 12:46:14PM +0530, M Nikhil wrote:
-> Hi Everyone,
->
->  * We have observed change in the values of some of the block integrity
->    sysfs attributes for the block devices on the master branch. The
->    sysfs attributes related to block device integrity , write_generate
->    and read_verify are  enabled for the block device when the parameter
->    device_is_integrity_capable is disabled. This behaviour is seen on
->    the scsi disks irrespective of DIF protection enabled or disabled on
->    the disks.
+On Thu, 12 Dec 2024 13:29:38 -0800, Bart Van Assche wrote:
+> This series includes two code cleanup patches and one bug fix.
+> 
+> Please consider the three patches in this series for inclusion in the upstream
+> kernel.
+> 
+> Thanks,
+> 
+> [...]
 
-As in after a "echo 1 > /sys/.../device_is_integrity_capable" ?
+Applied, thanks!
 
-I'll look into it.
+[1/3] mq-deadline: Remove a local variable
+      commit: e01424fab35d77439956ea98c915c639fbf16db0
+[2/3] blk-mq: Clean up blk_mq_requeue_work()
+      commit: 312ccd4b755a09dc44e8a25f9c9526a4587ab53c
+[3/3] block: Fix queue_iostats_passthrough_show()
+      commit: a6fe7b70513fbf11ffa5e85f7b6ba444497a5a3d
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
