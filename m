@@ -1,102 +1,86 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5882A1E25EB
-	for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 15:09:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEA01E3DC4
+	for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 16:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734102596; cv=none; b=NOeloOdz4V9jC0/cYwTe9SRLhLwCG5msPy/8Ls9I9ynusUydsLwgpGMUCZ+IjVkGmo4o7lTqAOd1C182p0kzZZYKwiSeIW6fymdcH7wNusekVVU/AsetTIq/XmM5hiAQpxd/oDdZQcZihUYyXSTbqCAd58df4iLg2yXdgZr9L6o=
+	t=1734107218; cv=none; b=eWKWCrRl/ks7Vo5xMXDIqtSjuZCIEiDWoq3hNTrw3NnaToQIyfSWAeXf4Jes2TZ7QITXfIhZwZz1YgxoGn4IMS8LyxvQhALpPnicxMJqTjC69keQITKkZfoXXYHsUw3390fywbLC/9ebAf5Ggd9ad8rh3CsLpS6HBBjdHJ4Yy+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734102596; c=relaxed/simple;
-	bh=UhqKArA3mQltFfnUF2tcX+pV3IabnBmzdBC2jT6MdCo=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=F8JNj4Uua/VyYo+4ar4OhX2xUZ5jdmvewUyELDDeqePO1z5nTpZG2QJE0ZtYvW/pAxrhYrWMYHo1Frgzbv/mgXz7AW9CpIiea6mwkGfq2AdcPQJ5zEjKSuvbdHbZttO0fuPUxnCm75WMsB0xDoOff8nJJ51rOXbaDlD1ArNaqhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=MdPK9mVz; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1734107218; c=relaxed/simple;
+	bh=t9uUYn7FXJf3DyErtJP571abEiJcq9vAwPK5Sq5flJ8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZSfCwsLhdFZ11M8J0vLzkFetGsnejD+LXX5y7Fu/8NS639+8mGY/HcWe6lMtBXggd9zsNfWf3bVP5Cg4ZS8X5ulVOg98lQbYHIuoNYAcfyFapIFQSilEpfYOmtjoFOAYCdr2e81mY6MHSGWM50RXgGlDcOQvx7ZisZf8Wx8xLr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=sCFmYUpF; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="MdPK9mVz"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a9cb667783so14812225ab.1
-        for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 07:09:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734102592; x=1734707392; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MxKtYNm+o7Qqldvs4k038B4Y1fztU6/dUSELdpzM86E=;
-        b=MdPK9mVz69zFqRdMu+U7GAqmd4R5DoLb5NqgpAXMdvCQrXxPhcSFw9fwHVQ66pCl3V
-         +fNs0MPJ4cpP+C2vI8wg03h4+4LsxSMt2P5Uy5Qb9orKwV+I5FHnki9tqxSWmzK6VV3B
-         4xhy3Wllw96hNnUJmOaSB1Alm/dedIksPKHNK0JqbpOduDR9SAfgw6Zyb6/L5uneMA3F
-         4bHvupA+x4fTFPP4jC4vPlu6qp3HlHLiowtu3nxcjqGWmucm7gZXsr+Jf+h61yfytv0j
-         q5sEIWyPkYdUOZC3vOcKdNtwc/B1AXjxcwLNI2sZlXOErkNlL9bAX9X/1V/oP9N+cpEP
-         k4Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734102592; x=1734707392;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MxKtYNm+o7Qqldvs4k038B4Y1fztU6/dUSELdpzM86E=;
-        b=Aa+ceEIs2bnR5jnJrQR6Hg4A5FV4cwRZxsd7hAv5D+aOOlPmFu1ZBIh0XEYDK59VUf
-         eZdX8+69lWC0+A2VOEU3kiBqHC5N3OPx18rEHN5q4SLaIU6Mn/7ar0FSZ6F1Sws8GWbL
-         lQISkTLtdT5EjedJoB8/yljS4+a1BGXFW2azFNFKYccDZrrVyNgvJZc+p1M66qgcpkWV
-         11b7bqenMVdWOEPy8OqKg68szsdlPnhWeR0bXFMii/mY7r33m+ck6RC0BZw+58gpi3Ga
-         pKJaCjPS8b2jv6EPrFk6uDAGqyz1Ej5E5lb04qOPRnd+CHtgK8N8w88PBigHOSMxoUsT
-         smyA==
-X-Gm-Message-State: AOJu0YxuVl9sbFAUIeTUCKIII6IiE/tnjn7CBlIb659sX6F60X81H0PI
-	+FSKJQO5D6Cbzk7d484H2SYzYg5ECsVp7mLGyguzbyljVEOn2tfuWNzePLNyeUmtHVaYE2dLojb
-	I
-X-Gm-Gg: ASbGncsrtcb351sye85Jy7ssGNfjtLU9/Dy2Q3Xsq9QA9/t3xYw8Euw+HFPw1U2bR+I
-	1vqeF13k54XVv2A2ZUBFQVnoJVmmyGe0VOWWmlMGPFFhuRKS/kFKePFzT048T1IJsSOlwMWFLhE
-	F+4HS01RjGGLxZBd3we3glVRIqM/OH96Ds6AItEaCQB2b1jGC8mdnJ5mr/poZ5inJn1YrMtzFs7
-	dfHAnXg3LeCQulYXE3+P+SJMPYCOc+JtibvgF/AwTdrAXA=
-X-Google-Smtp-Source: AGHT+IH2+v3oEn9vDQYTnc/rsgmweHif+WFAxL3LKl2ws3acYhLHE5GLHKG8L4oseAmBeTxaTVumQg==
-X-Received: by 2002:a05:6e02:18cd:b0:3a7:e047:733f with SMTP id e9e14a558f8ab-3aff4613b80mr42090075ab.1.1734102592385;
-        Fri, 13 Dec 2024 07:09:52 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e2d08c1cc2sm1969605173.52.2024.12.13.07.09.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 07:09:51 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20241212212941.1268662-1-bvanassche@acm.org>
-References: <20241212212941.1268662-1-bvanassche@acm.org>
-Subject: Re: [PATCH 0/3] Three small block layer patches
-Message-Id: <173410259165.85123.3274530523792619700.b4-ty@kernel.dk>
-Date: Fri, 13 Dec 2024 08:09:51 -0700
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="sCFmYUpF"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4Y8vqZ13cxzlff05;
+	Fri, 13 Dec 2024 16:26:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1734107208; x=1736699209; bh=s5s3NkdmjGElpsH5FsFf4or4
+	stF03C2uY6pc+Qj0XwQ=; b=sCFmYUpFk8pV70nBpcgI6nn9xZwjRS/y4/GUOhDb
+	lzPQhKS+/t7Q7pBAy5wQTgOovo1/wqRCndwH+PcdDG5Yj1CK8X5BkihJs0SLOw1J
+	jzHUEkexGU9VDl2zWn2MDq5EEB1CTqSIlg0/pD4VfzDuNSrapLEaHwkFLP6DufSX
+	aFYtu8zzd2tj6Wy6O3UKBrlc2catGmY0zez5ooQ7h+H6y4p/xXzxeTdKnU04aIM8
+	TeRnHhx4mbOxeGa8r2GA86HsgvAVefn+Tuz1HqDhxmhS4SaemIiHsnCyRN6EtzSy
+	BGcZp0GhDX9g3EFH3GwLkUz0wAZR+KZ9+E9Qdwas1ciq9g==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id OQ4qNgmJXL6n; Fri, 13 Dec 2024 16:26:48 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Y8vqV2lSvzlff0Z;
+	Fri, 13 Dec 2024 16:26:45 +0000 (UTC)
+Message-ID: <7399171c-6cf3-4e07-b4e5-1d5d362198ba@acm.org>
+Date: Fri, 13 Dec 2024 08:26:44 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] block: Fix queue_iostats_passthrough_show()
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Keith Busch <kbusch@kernel.org>
+References: <20241212212941.1268662-1-bvanassche@acm.org>
+ <20241212212941.1268662-4-bvanassche@acm.org> <20241213044615.GC5281@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20241213044615.GC5281@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-86319
 
-
-On Thu, 12 Dec 2024 13:29:38 -0800, Bart Van Assche wrote:
-> This series includes two code cleanup patches and one bug fix.
+On 12/12/24 8:46 PM, Christoph Hellwig wrote:
+> On Thu, Dec 12, 2024 at 01:29:41PM -0800, Bart Van Assche wrote:
+>> Make queue_iostats_passthrough_show() report 0/1 in sysfs instead of 0/4.
+>>
+>> This patch fixes the following sparse warning:
+>> block/blk-sysfs.c:266:31: warning: incorrect type in argument 1 (different base types)
+>> block/blk-sysfs.c:266:31:    expected unsigned long var
+>> block/blk-sysfs.c:266:31:    got restricted blk_flags_t
 > 
-> Please consider the three patches in this series for inclusion in the upstream
-> kernel.
-> 
-> Thanks,
-> 
-> [...]
+> Maybe turn blk_queue_passthrough_stat into a an inline wrapper so
+> that it automatically does the bool propagation and callers don't
+> have to bother?
 
-Applied, thanks!
+Hi Christoph,
 
-[1/3] mq-deadline: Remove a local variable
-      commit: e01424fab35d77439956ea98c915c639fbf16db0
-[2/3] blk-mq: Clean up blk_mq_requeue_work()
-      commit: 312ccd4b755a09dc44e8a25f9c9526a4587ab53c
-[3/3] block: Fix queue_iostats_passthrough_show()
-      commit: a6fe7b70513fbf11ffa5e85f7b6ba444497a5a3d
+There are about 16 functions in include/linux/blkdev.h that test a 
+single bit in q->queue_flags or q->limits.features. Do you really want
+me to convert all these macros into inline functions?
 
-Best regards,
--- 
-Jens Axboe
+Thanks,
 
-
-
+Bart.
