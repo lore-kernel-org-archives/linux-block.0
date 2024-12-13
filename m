@@ -1,139 +1,163 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B508F18A6BC
-	for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 06:01:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3B818A6D7;
+	Fri, 13 Dec 2024 07:16:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734069700; cv=none; b=IUHZU5n5fNVs8cpXcpyAsL3rtJktY3Fe9IyQ+iLMf/MpS0qVKwK2c0ZIjfCKj2ZBD3iJMFBaCfG6IHTSOG4xRV0hxyc9SPjgZreo0U3GE/1F3M4kG246kWSll8H+JI0Mw3jJltzo8VaJla92WIu9wnAl7Ozfu9n226aDnAh5fAs=
+	t=1734074193; cv=none; b=WzudXPiGB+0tthCoSfhkqjqzLZ1ZGHIwfITiT2ev5yRmeTUSIiNUe4GMZ6q716IWYNjVFmh+zAava+ysPyII3XEjQ0o8WxGzfQsNmenxQCQmosv9yS3NpYKJG3wpeFnFH+SidOL0ed0Zbf8Kw6ocKRTypmTFkWFZjDXK4gQpegA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734069700; c=relaxed/simple;
-	bh=Gc3Jt8blBw7jT0/gisSOyP9+e9/2TScJtmc2wxbTh64=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=gbDl9oFhb/0ux2iawYYDIqixYa/SHPBSasuu7dJSQvUh7w0OVQgBQ1cKhq8a61IdlBy1OVhhskFkmJg6j6weswxJtMOGiw5Zd5CYMjXDDHVsB6IpOpVhyS7i8fEPgNMnNx3nlMPo/DofdvMCZUUGCAECPb9vJjZk0LdjPYyjJIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=agigrxIn; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1734074193; c=relaxed/simple;
+	bh=Hr3hwFuzFkYYHl1m8O4baQEsPK0Xs3hONmPqtZrPWYc=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=SqRwDNHCjLwfLwIYSOpDazt7mUNajp+YWVJvDrrzS4ys6r9DrBIO9tbpPixl8gh3iMA+yXE4Yak/2ihPSmzSsvaYd7pPhYqVM9E+8Jf6NruLmUGeoDToTXdE9MIwBp1aMCabMNB8TkiKibXwwKjuho8VQH96BWxq0IViEkox8Jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VNxsQp+m; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="agigrxIn"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20241213060129epoutp03a3b02478432893a0f8dbb23913f1db0c~QpzHbNL3G2755627556epoutp03d
-	for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 06:01:29 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20241213060129epoutp03a3b02478432893a0f8dbb23913f1db0c~QpzHbNL3G2755627556epoutp03d
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1734069689;
-	bh=Gc3Jt8blBw7jT0/gisSOyP9+e9/2TScJtmc2wxbTh64=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=agigrxInquIQZrTdhkRMRkqOGXx/4s/QFzpHTRsh7kS7CqbhB7hdEbJGAkjFf6A3u
-	 0boOSjWgPD8ApQ+3v+IZfV0DbT8P1Gh/WGHGxuDGSPkBibRwpdaP2k4GaPFDtl1jHQ
-	 swEfaLTEOnb9V26Z2gcSQ29lfXaUCK56nXykN9Eg=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20241213060128epcas5p14ff115b9b8eb9a4ad609393dabc21f08~QpzHIUKrT1879718797epcas5p1J;
-	Fri, 13 Dec 2024 06:01:28 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.183]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4Y8dxz08p9z4x9QB; Fri, 13 Dec
-	2024 06:01:27 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	D6.8F.19933.5BDCB576; Fri, 13 Dec 2024 15:01:25 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20241213060117epcas5p33e93030b04f8d51f0367d375faa2adaf~Qpy871bXn1217912179epcas5p3q;
-	Fri, 13 Dec 2024 06:01:17 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20241213060117epsmtrp16131439c5b74bccf83c6d6a2b4a078b4~Qpy84dGvw1127611276epsmtrp1l;
-	Fri, 13 Dec 2024 06:01:17 +0000 (GMT)
-X-AuditID: b6c32a4a-b87c770000004ddd-80-675bcdb5a785
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	ED.91.18729.DADCB576; Fri, 13 Dec 2024 15:01:17 +0900 (KST)
-Received: from ubuntu (unknown [107.99.41.245]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20241213060115epsmtip1db0b0c6b8b3b9dd4cfe4ed6ce87873c1~Qpy7HlTGq1086010860epsmtip1m;
-	Fri, 13 Dec 2024 06:01:15 +0000 (GMT)
-Date: Fri, 13 Dec 2024 11:23:21 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Keith Busch <kbusch@meta.com>
-Cc: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	io-uring@vger.kernel.org, sagi@grimberg.me, asml.silence@gmail.com,
-	anuj20.g@samsung.com, joshi.k@samsung.com, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv14 10/11] nvme: register fdp parameters with the block
- layer
-Message-ID: <20241213055321.rh6qdkru53ao5wr4@ubuntu>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VNxsQp+m"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BD3xiEj029658;
+	Fri, 13 Dec 2024 07:16:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=IgZ7cZ+16ESsDPfDeuwM+zyJIXs1
+	iIg6IinIyl1DzJY=; b=VNxsQp+mfl4yyF6yv0wlkFqu4pQMv8j2C+IyyJ7o4WeS
+	iNdKgImEqbT/dCfeIdQbSsrrdIOz6xTA4j0psqeF0Ft8S89xpNe91aq/CE0dkqlm
+	OBSVL9vM+HHNG5iMBDHH1yK8AYBnHx+H1Kl9/JtkoAn6+PGgBLQqUalDvkfjoG/Q
+	q1Xyx+VU5ZTrOJRg1NPfPl18gUimPD11vu+5qWwRpSrzOlQEJAVgRvMK9YclgZCp
+	XXrek4mIKi4Ux/T/zPg9lpB7Pgz0Y8e2vrvxVsDUY0UYqoPCP/3SwG7v87TV16oG
+	tdmyWzrhYhtwtIytIT8REy0mImLTHL47dW+XJFCiTg==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ccsjyfc9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Dec 2024 07:16:22 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BD34Fih029309;
+	Fri, 13 Dec 2024 07:16:22 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43gcprrv2n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Dec 2024 07:16:22 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BD7GKuM25297624
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 13 Dec 2024 07:16:20 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 959E15805F;
+	Fri, 13 Dec 2024 07:16:20 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AF8B35805D;
+	Fri, 13 Dec 2024 07:16:16 +0000 (GMT)
+Received: from [9.43.77.91] (unknown [9.43.77.91])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 13 Dec 2024 07:16:16 +0000 (GMT)
+Message-ID: <f6130475-3ccd-45d2-abde-3ccceada0f0a@linux.ibm.com>
+Date: Fri, 13 Dec 2024 12:46:14 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241211183514.64070-11-kbusch@meta.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCJsWRmVeSWpSXmKPExsWy7bCmuu7Ws9HpBse36Fk0TfjLbDFn1TZG
-	i9V3+9ksVq4+ymTxrvUci8XR/2/ZLCYdusZocebqQhaLvbe0LfbsPcliMX/ZU3aLda/fszjw
-	eOycdZfd4/y9jSwel8+Wemxa1cnmsXlJvcfumw1sHucuVnj0bVnF6PF5k1wAZ1S2TUZqYkpq
-	kUJqXnJ+SmZeuq2Sd3C8c7ypmYGhrqGlhbmSQl5ibqqtkotPgK5bZg7QvUoKZYk5pUChgMTi
-	YiV9O5ui/NKSVIWM/OISW6XUgpScApMCveLE3OLSvHS9vNQSK0MDAyNToMKE7IxJezrYCi6w
-	Vsy8OpetgfEnSxcjB4eEgInEzkflXYycHEICuxklZv5y6mLkArI/MUo8W93IDpH4xiixfzU/
-	TP2Pw4IQNXsZJebfuMUI4TwBqrl6nhmkgUVAVeLk7yZmkAY2AW2J0/85QMIiAooS54HBAFLP
-	LDCRSeL3oSawBcICQRJ/JjwC6+UFWnB293E2CFtQ4uTMJywgNqeAmURT22owW0JgKYfEqTXR
-	EAe5SPRfk4YIC0u8Or6FHcKWknjZ3wZll0usnLICbK+EQAujxKzrsxghEvYSraf6wfYyC2RI
-	XLh/CqpBVmLqqXVMEHE+id7fT5gg4rwSO+bB2MoSa9YvYIOwJSWufW+Esj0k5kxdwgoJuC2M
-	EodOq09glJuF5J1ZSNZB2FYSnR+aWGcBvcMsIC2x/B8HhKkpsX6X/gJG1lWMkqkFxbnpqcWm
-	BUZ5qeXwCE7Oz93ECE6+Wl47GB8++KB3iJGJg/EQowQHs5II7w37yHQh3pTEyqrUovz4otKc
-	1OJDjKbA6JnILCWanA9M/3kl8YYmlgYmZmZmJpbGZoZK4ryvW+emCAmkJ5akZqemFqQWwfQx
-	cXBKNTD1Hcx598B0zdEfz5XqZ8i/3DbD7LvY/nXqTbMKUxwOt+2bEtX/2cI+zebCgShVjagn
-	L9+J3FxiK/zAWqK6oWa++3sju//lRTk2OxdpVq750rrU5Ns7+cuOf35Om//X4tndLxPuBB2S
-	jM9ZUj45tcu+eqnDLKXahggO5xdnA59vcTjx9WGh8azPjFc23HN61cW9Y45xefC+x7v7zYK1
-	m+5xte6+IFC868H3+ZcqA/YbejtMP/fIvWT2P+UQRrEsLj/BWOkN/7/tEBGPlXXNlmlvVwp8
-	NDc/NoTF4XrmDaZqs9kz+LgKfeqCPe6r9ic4+s6JqCrrtL6gc0x50vte1w3/zE5MiakIP7p7
-	l1SZiIcSS3FGoqEWc1FxIgD7RCtcRwQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrBLMWRmVeSWpSXmKPExsWy7bCSnO7as9HpBk/W6lg0TfjLbDFn1TZG
-	i9V3+9ksVq4+ymTxrvUci8XR/2/ZLCYdusZocebqQhaLvbe0LfbsPcliMX/ZU3aLda/fszjw
-	eOycdZfd4/y9jSwel8+Wemxa1cnmsXlJvcfumw1sHucuVnj0bVnF6PF5k1wAZxSXTUpqTmZZ
-	apG+XQJXxoeVZxgLmpgrml/FNTAeZepi5OCQEDCR+HFYsIuRi0NIYDejxO3DFxm7GDmB4pIS
-	y/4eYYawhSVW/nvODlH0iFFi9oMFLCAJFgFViZO/m5hBBrEJaEuc/s8BEhYRUJQ4D3QMSD2z
-	wGQmieczj4HVCwsESfyZ8AhsKC/Q4rO7j7OB2EICCRId156wQcQFJU7OfAJWzyxgJjFv80Ow
-	+cwC0hLL/4HN5wQKN7WtZpnAKDALSccsJB2zEDoWMDKvYpRMLSjOTc8tNiwwzEst1ytOzC0u
-	zUvXS87P3cQIjhwtzR2M21d90DvEyMTBeIhRgoNZSYT3hn1kuhBvSmJlVWpRfnxRaU5q8SFG
-	aQ4WJXFe8Re9KUIC6YklqdmpqQWpRTBZJg5OqQam3eL9GxkyHAu4XNMnr19eYFzwc+aG6tml
-	bw5PnGTH8F75Z6rc84UeiXYie180d62eYqfccviXsDmDpLdY+ddV18QVJ3e5cQoXHy92jlKy
-	Sl/+QSdykVNjwVq1sE4trj0pF+s4n1RO/el2tXVXTUZBm95jkbe5c52OpFU2V+++9KBuhxDL
-	vbYEOYOzFX5FTGeM3y9ec13Wz7vznUG/oVD9MTPOXuerx/T3xAQeXvx6W1PKa4P6k1/Ny3uL
-	8p5PmtH6uTA7OsP7xtpZy552MW+rO6sv5xNbt0V7Vn4Oz/mQy17Fq231UlTL/jyX//3hzBbH
-	NTscJO67Vfud2Hew4uXTRsOEhwZfC936bgETlhJLcUaioRZzUXEiACUZdmcLAwAA
-X-CMS-MailID: 20241213060117epcas5p33e93030b04f8d51f0367d375faa2adaf
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----OTMyRIxA-vjvkyMBIEVTa8B.hsA2RhXFaIa_oKBleWSyrD67=_806f4_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20241213060117epcas5p33e93030b04f8d51f0367d375faa2adaf
-References: <20241211183514.64070-1-kbusch@meta.com>
-	<20241211183514.64070-11-kbusch@meta.com>
-	<CGME20241213060117epcas5p33e93030b04f8d51f0367d375faa2adaf@epcas5p3.samsung.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: M Nikhil <nikh1092@linux.ibm.com>
+Subject: Change in reported values of some block integrity sysfs attributes
+To: linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+        linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
+        linux-scsi@vger.kernel.org, hare@suse.de, hch@lst.de
+Cc: steffen Maier <maier@linux.ibm.com>,
+        Benjamin Block
+ <bblock@linux.ibm.com>,
+        Nihar Panda <niharp@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: pNrUCGEOCIZLXuwnpAdUiLLv66Vx_bzk
+X-Proofpoint-ORIG-GUID: pNrUCGEOCIZLXuwnpAdUiLLv66Vx_bzk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 adultscore=0
+ impostorscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 mlxlogscore=554
+ mlxscore=0 priorityscore=1501 suspectscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2412130049
 
-------OTMyRIxA-vjvkyMBIEVTa8B.hsA2RhXFaIa_oKBleWSyrD67=_806f4_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+Hi Everyone,
 
-On 11/12/24 10:35AM, Keith Busch wrote:
->From: Keith Busch <kbusch@kernel.org>
->
->Register the device data placement limits if supported. This is just
->registering the limits with the block layer. Nothing beyond reporting
->these attributes is happening in this patch.
->
->Signed-off-by: Keith Busch <kbusch@kernel.org>
->---
+  * We have observed change in the values of some of the block integrity
+    sysfs attributes for the block devices on the master branch. The
+    sysfs attributes related to block device integrity , write_generate
+    and read_verify are  enabled for the block device when the parameter
+    device_is_integrity_capable is disabled. This behaviour is seen on
+    the scsi disks irrespective of DIF protection enabled or disabled on
+    the disks.
 
-Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
+    *Logs of the block integrity sysfs attributes for one of the block
+    device:*
 
-------OTMyRIxA-vjvkyMBIEVTa8B.hsA2RhXFaIa_oKBleWSyrD67=_806f4_
-Content-Type: text/plain; charset="utf-8"
+a3560030:~ # cat /sys/block/sda/integrity/write_generate
+
+1
+
+a3560030:~ # cat /sys/block/sda/integrity/read_verify
+
+1
+
+a3560030:~ # cat /sys/block/sda/integrity/device_is_integrity_capable
+
+0
+
+  * Similarly unexpected values of block integrity sysfs attributes are
+    seen for multipath devices as well. Multipath device reporting value
+    1 for device_is_integrity_capable even though it is based on SCSI
+    disk devices, which all have 0 for device_is_integrity_capable.
+
+a3560030:~ # cat /sys/block/dm-0/integrity/device_is_integrity_capable
+
+1
+
+a3560030:~ # cat /sys/block/dm-0/integrity/read_verify
+
+1
+
+a3560030:~ # cat /sys/block/dm-0/integrity/write_generate
+
+1
+
+  * Earlier the block integrity sysfs parameters "write_generate" and
+    "read_verify" reported value 0 when the sysfs attribute
+    device_is_integrity_capable was not set. But when tested with a
+    recent upstream kernel, there is a change in the block device
+    integrity sysfs attributes.
+  * In the process of finding the kernel changes which might have caused
+    the change in functionality, we have identified the below commit
+    which was leading to the change in the sysfs attributes.
+    9f4aa46f2a74 ("block: invert the BLK_INTEGRITY_{GENERATE,VERIFY} flags")
+  * By reverting the code changes which are part of above commit and
+    when tested the values of attributes read_verify and write_generate
+    were set to 0 which was the older functionality.
+   * From the description in the patch related to above commit, what we
+    understand is that the changes are meant to invert the block
+    integrity flags(READ_VERIFY and WRITE_GENERATE) vs the values in
+    sysfs for making the user values persistent.
+  * We would like to know if the change in the values of sysfs
+    attributes write_generate and read_verify is expected?
+  * And some additional information on in which scenario the attributes
+    will be disabled or set to 0 and the affect of other block integrity
+    attribute device_is_integrity_capable on attributes read_verify and
+    write_generate.
 
 
-------OTMyRIxA-vjvkyMBIEVTa8B.hsA2RhXFaIa_oKBleWSyrD67=_806f4_--
+Regards,
+
+*M Nikhil
+*
+
+Software Engineer
+
+ISDL, Bangalore, India
+
+Linux on IBM Z and LinuxONE
+
