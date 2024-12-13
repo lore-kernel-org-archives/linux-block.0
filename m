@@ -1,90 +1,73 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from arara2.ipen.br (arara2.ipen.br [200.136.52.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32E818DF7C
-	for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 08:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FEF19993E
+	for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 08:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=200.136.52.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734076827; cv=none; b=AokBcoRYIzcRy7DIuFs8DABpTBzWqBGutQmwIVgWg1gur0sbuwmP5KlBp4pYhW2rT92MV8c1OqazVSyeBAva2j4TtDK6RVIgwdwfBdzMiQQXUaOZF6wvex4p3wou12jwfFmCEg+lZH40w6TOlK5c6T4UOU9jAUCuU02YBANOjk0=
+	t=1734078285; cv=none; b=sz2aFuFl0Q5omnUH6OWKQ2ZiJk8DZwJvR5mahJ74lt4wAbS59VFClnn6ynEjFie4nr96qFBIHtUmFEDiTRpE6ojOWEWMO4makL9NuQRVetfwKd5Eo6kfllaT8UBz/ZkmFDiGRni6HMRrFghJTzIa6IwMyfw1OR1FiVFWp7gGrg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734076827; c=relaxed/simple;
-	bh=De+XKUlxdDAtzt4S9WN2Ib9SR9euZ6C9SeLMwL3zAMo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MzQxXMtpiAvxuSzGP3k5Huh/SMMHCfrC7EXUtsgq6uP50x78LUFJpBM2fqrtu6U4T1FHGFKIfgW8oCBSg1AmMZY3KiT35T0m33klb/BETOt8I7QwSK3ayFWFsjzD1447ENKVqmzeNpZ1TFd45e1LdK/SWIOa5sIWkNxQKnt+zbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=VgkXP/nL; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VgkXP/nL"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ee6c2d6db0so1266028a91.1
-        for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 00:00:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1734076825; x=1734681625; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=d+VcW/gT5gahGNm/Yx5OtnhIWsW1Q4wxzsxZW8CFyCo=;
-        b=VgkXP/nLdEA6wgw/NvGoRuAJeAEpUjcdfMp4a5fRrfAWYR0JrMRaJ9G+KXZXZT8vjy
-         sP4/8vt8amw5LQJ69+aa53IVMzVACCrL5lwVr5Ie0BYtYfcd0QDn2JdxMyrBQQjRnv8I
-         lHccFaybScCGD3AIhDw8Vd8mqx2R4z7ZNOgtg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734076825; x=1734681625;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d+VcW/gT5gahGNm/Yx5OtnhIWsW1Q4wxzsxZW8CFyCo=;
-        b=ZJgPuGtfxJOGdMBbJ8TyA5AaknwkgceJ8485qsgDzvvCgxlhGZwnflqDTMF7Mhta+v
-         Dl8Ba0AhXHMMR2Ew9UpVc07o2zNIcxqDCW5S19Sujpa/VJE1EiKE8tROBzPPg0s9qvYG
-         0zBZP3Du1g39yZ2rwiRl7D0BGM7jpujbrHkt75QQpsx476BIIsAlVG4RsI1nfM8KEPq+
-         aYjK7+rnye6Inu9gwkJxeGOQ4kX5dREVTTAGvaQ0Tywq8x3g7A7u31gtR9Tsw7/ocBeg
-         VYaz9aKlTPJKWMmv6fy+XNbL2aGk4R8Xjg7L+nkWmCfDZ5UJ9m//hA6toMjtGcoJOAlp
-         XTlg==
-X-Forwarded-Encrypted: i=1; AJvYcCVdsCjlCCVOuEqqzf4Iy5704fgbB0n0pMt/NEzl7Xv1EUW0ufY45Av1bipeJxgj5BEs4Afa65gBu23x3w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNF2+gcEoL3VO5VgaHV/anTascYv0IInyWTL8KuKUsbwJXuEJZ
-	8vjwLgepIRMw+fZ3qAcHpGAp+tooztTU7iSwkj/CSHGU/QPFb6eWD0HvYy9YBA==
-X-Gm-Gg: ASbGncsKHaoAExuR52M0XChp7Mg8hoH4ej40fTEPLAZNBhPKxccg6Q0Q7BnxcDx8XGV
-	b09rsK1c8YN1iTxo6py2LeHVkjLqhUGQfrfzQRGpEuzxhfA8UK5WGvWC39f2DU/GAcsPdrjPDdw
-	juTPVdR3g2KE+m2N22Ev2RKtp4ukxqa4XK59JvGIYmJgmX73WStl33vXoqpmtZ4/Zwf9RnDu+rj
-	tdhUxf9GJk0p5ilpybcyD5fZnP5MLZn0rrqXne8d/sMSxngce+GVwIeTjRs
-X-Google-Smtp-Source: AGHT+IGAG3di1prCf2zZpmnUtKcuvJ11czBwkHzRleM6YVn0pT7NTaRRJDPHKzAHCHVn3u7r0aeXMQ==
-X-Received: by 2002:a17:90b:38c5:b0:2ea:8aac:6aa9 with SMTP id 98e67ed59e1d1-2f28fd77f87mr2308613a91.21.1734076825081;
-        Fri, 13 Dec 2024 00:00:25 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:2d7e:d20a:98ca:2039])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f12cd09293sm2245435a91.1.2024.12.13.00.00.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2024 00:00:24 -0800 (PST)
-Date: Fri, 13 Dec 2024 17:00:20 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-Cc: minchan@kernel.org, senozhatsky@chromium.org, axboe@kernel.dk, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: Clarification on last_comp_len logic in zram_write_page
-Message-ID: <zod7krcdvew5ntmcpbpgzpan2yph6jz7tfao2xowh7c2wmbckm@vc3bsf4fsoyf>
-References: <Z1vf/ladGMjeGpfi@HOME-PC>
+	s=arc-20240116; t=1734078285; c=relaxed/simple;
+	bh=Cgr97JBiSX1QIcd2ZZZsKVChGTY1ZlWJ/4AhaVFA7Wc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AgWwXIqqJlIl7iZa9vltMItxbNMpy0FeFuQ4GT0lPkjiG0pgcS4iTwpb5Uc4dYyYjc+sQDDgaVtDxRJXLL+Vol7BsTxZsmfmFMeDhRxawk+yG62gMEhWfYRqCUmNiQOyKlzvzDok34cyUszFwBLYVTJWapdwsUNSSpN6bmfrvDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ipen.br; spf=pass smtp.mailfrom=ipen.br; arc=none smtp.client-ip=200.136.52.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ipen.br
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ipen.br
+X-ASG-Debug-ID: 1734078239-055fc729eb1499f70009-Cu09wu
+Received: from arara.ipen.br (webmail.ip.ipen.br [10.0.10.11]) by arara2.ipen.br with ESMTP id vONdl7U2NRsu4cWm for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 05:24:38 -0300 (BRT)
+X-Barracuda-Envelope-From: TCWM178842@ipen.br
+X-Barracuda-RBL-Trusted-Forwarder: 10.0.10.11
+Received: from ipen.br (unknown [102.129.145.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by arara.ipen.br (Postfix) with ESMTPSA id D764BFB4A5A
+	for <linux-block@vger.kernel.org>; Fri, 13 Dec 2024 01:24:51 -0300 (-03)
+Reply-To: t.mazowieckie@mazowieckie.org
+X-Barracuda-Effective-Source-IP: UNKNOWN[102.129.145.191]
+X-Barracuda-Apparent-Source-IP: 102.129.145.191
+X-Barracuda-RBL-IP: 102.129.145.191
+From: <TCWM178842@ipen.br>
+To: linux-block@vger.kernel.org
+Subject:  I urge you to understand my viewpoint accurately.
+Date: 13 Dec 2024 12:24:51 +0800
+X-ASG-Orig-Subj: I urge you to understand my viewpoint accurately.
+Message-ID: <20241213122450.F1B328676DC73937@ipen.br>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z1vf/ladGMjeGpfi@HOME-PC>
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Barracuda-Connect: webmail.ip.ipen.br[10.0.10.11]
+X-Barracuda-Start-Time: 1734078278
+X-Barracuda-URL: https://10.40.40.18:443/cgi-mod/mark.cgi
+X-Barracuda-Scan-Msg-Size: 512
+X-Virus-Scanned: by bsmtpd at ipen.br
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-BRTS-Evidence: 34fbb5788938ad5710ad28835fd12206-499-txt
+X-Barracuda-Spam-Score: 1.09
+X-Barracuda-Spam-Status: No, SCORE=1.09 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=DATE_IN_PAST_03_06, DATE_IN_PAST_03_06_2, NO_REAL_NAME
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.45577
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
+	0.00 NO_REAL_NAME           From: does not include a real name
+	0.01 DATE_IN_PAST_03_06     Date: is 3 to 6 hours before Received: date
+	1.08 DATE_IN_PAST_03_06_2   DATE_IN_PAST_03_06_2
 
-On (24/12/13 12:49), Dheeraj Reddy Jonnalagadda wrote:
-> I am writing to seek clarification regarding the use of last_comp_len
-> variable in zram_write_page function. Specifically, Coverity has flagged 
-> the issue (CID 1602439) in zram/zram_drv.c
-> 
-> Currently, last_comp_len is initialized to 0 but never updated within the
-> function. This renders the conditional block shown below as dead code.
-> 
-> 	if (last_comp_len && (last_comp_len != comp_len)) {
->     		zs_free(zram->mem_pool, handle);
->     		handle = -ENOMEM;
-> 	}
+I am Tomasz Chmielewski, a Portfolio Manager and Chartered=20
+Financial Analyst affiliated with Iwoca Poland Sp. Z OO in=20
+Poland. I have the privilege of working with distinguished=20
+investors who are eager to support your company's current=20
+initiatives, thereby broadening their investment portfolios. If=20
+this proposal aligns with your interests, I invite you to=20
+respond, and I will gladly share more information to assist you.
 
-That's a "known issue" [1], I deleted one extra line during rebase.
-However, I expect last_comp_len patch do get withdrawn soon [2].
-
-[1] https://lore.kernel.org/linux-kernel/20241211100638.GA2228457@google.com
-[2] https://lore.kernel.org/mm-commits/3awo2svbnsv2mvozhaqspwztgxhifphj7ffpmykc35py6wp6ol@xlt2q5qgv6c3
+=20
+Yours sincerely,=20
+Tomasz Chmielewski Warsaw, Mazowieckie,
+=20
+Poland.
