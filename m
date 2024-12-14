@@ -1,100 +1,129 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5384A13FEE;
-	Sat, 14 Dec 2024 02:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944C417BA0;
+	Sat, 14 Dec 2024 03:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734144287; cv=none; b=FP8GnsHmyYNeFM3STpeQGf271rUtYeFbYPvvNPtwYdRF8lPtzCwBv1x6bv9Eii1n4ZvQn5DxEOz7h8tQT3xooU3+0BSClpaFPSEHhzK0gloOQScGwh1bOrz4L3sy6atNiE1bXLCaiIRJE2z38JGwKBhqEwTk9EuyiVkhdxoUMOE=
+	t=1734145860; cv=none; b=HNGm8YBifu1YP+dv0xH5j/nuthycCFCvZtDJ6qAXXBWU8UINzQGw+t9vUCDWD5EII2Z1BJzQa5l7b5LjJnDTVdsTOsDfnJVtUIvGDa11stCtrvj/oYgsweLvIrs6iitAJGOvqajYDKg5+94QdSY/QwmarYqkW81qnmsOtyUINls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734144287; c=relaxed/simple;
-	bh=LXQ424kNl0hkFT7GE2IZ60/jBTpGcgsKLpzUxMya2PI=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=bw78ZGDDpMiBuJckfnzhhXyTHo0uQ/gKbLgB4w+nnmWGRzpEEmQtHD0rc8OUZua/ZcAJJGrUYo7GQYYc0Wi3XpPsf+fWr03T7V45tgKjhcnRNj/OruSHEkl6F8Gkutic6J2p/rov8dESRJ4GZFukMCAGez6zTRGsc7d90nwjllo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Y99Wy4M3Zz4f3jRC;
-	Sat, 14 Dec 2024 10:44:14 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id EF4FB1A0359;
-	Sat, 14 Dec 2024 10:44:33 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgDHo4cQ8VxnjzcoEg--.42921S3;
-	Sat, 14 Dec 2024 10:44:33 +0800 (CST)
-Subject: Re: [PATCH RFC 1/3] block/mq-deadline: Revert "block/mq-deadline: Fix
- the tag reservation code"
-To: Bart Van Assche <bvanassche@acm.org>, Yu Kuai <yukuai1@huaweicloud.com>,
- axboe@kernel.dk, akpm@linux-foundation.org, yang.yang@vivo.com,
- ming.lei@redhat.com, osandov@fb.com, paolo.valente@linaro.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20241209115522.3741093-1-yukuai1@huaweicloud.com>
- <20241209115522.3741093-2-yukuai1@huaweicloud.com>
- <bef7b96c-a6cc-4b83-99b2-848cecb3d3b1@acm.org>
- <6e384b29-50d2-64bd-0d08-fc0f086c1cbd@huaweicloud.com>
- <7081765f-28d7-f594-1221-6034b9e88899@huaweicloud.com>
- <d9733af5-b16b-4644-9d6d-84fbacf334e0@acm.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <2562353d-bfe3-a2b1-5427-76426cbda7b4@huaweicloud.com>
-Date: Sat, 14 Dec 2024 10:44:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1734145860; c=relaxed/simple;
+	bh=P3uVfLlVLJfHe4TSb4QwF1TtpfSmrcrLSBF0vRF6L7U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AuWxW44nlSOTV4BV1Rcc7y4PJ61/xqdOCIhMPkvwIp3123AQeSOQMBLa58M86jVv+VX2TaUcpevNzF2soltlrdKI7w6Q1Jq1/1iVL/cCuutyMy3wiKNF4qmfdHMvJgJQKHrporNUphQbi946dvB5sqzk4h2CQ92mBUWS4dlyqok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qL6vJdTy; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qL6vJdTy"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+	Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=nLfCbW88XZtUGGKLjWBTHyDCe42vAPNXKRBtJR7DxnY=; b=qL6vJdTyzDGrY9BTzxUAOzoxWR
+	GmyxjXs/ypIzQ4OBwJwjxzVHxTYl5WowwA8PlpzdvxsYCfAWKCxVKGzklNbFg+j9lyRrusBf2H2bo
+	GLkVMnOTVZV/lpZd85GFZ1MVi81ANkvcUeR+JJE+WC+Wr3Z0gWG3fCONYfibpZ6l3jyduDgskVKBw
+	zGXlDz4JQevtASwNKCWNnNAOsApI5OkuvhXNNNIaNtVIY0GOanrmRiewmyM4XTWoW+VYaF9Ch6GO/
+	jAb+ekAcuFvILM50r3oh8PDu2OVvOax56B8d0fV1YdR3Auj0Fd26/gnSmPf68M1AcX68Sws/msj8r
+	Mx/t0qRA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tMIYO-00000005c3p-05r5;
+	Sat, 14 Dec 2024 03:10:52 +0000
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: willy@infradead.org,
+	hch@lst.de,
+	hare@suse.de,
+	dave@stgolabs.net,
+	david@fromorbit.com,
+	djwong@kernel.org
+Cc: john.g.garry@oracle.com,
+	ritesh.list@gmail.com,
+	kbusch@kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	gost.dev@samsung.com,
+	p.raghav@samsung.com,
+	da.gomez@samsung.com,
+	kernel@pankajraghav.com,
+	mcgrof@kernel.org
+Subject: [RFC v2 09/11] block/bdev: lift block size restrictions and use common definition
+Date: Fri, 13 Dec 2024 19:10:47 -0800
+Message-ID: <20241214031050.1337920-10-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20241214031050.1337920-1-mcgrof@kernel.org>
+References: <20241214031050.1337920-1-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <d9733af5-b16b-4644-9d6d-84fbacf334e0@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgDHo4cQ8VxnjzcoEg--.42921S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7Gw47Gw1xtrWfXr4UWF4UJwb_yoWkWrXEgw
-	4qyryDGw4jqr1fCr47GayrGrZ0qrWDta4UArykKF4UX34IkwsxCF90kryfZa13XFyUKrn3
-	Xw1jyry5AwnF9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbfAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-	6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-	c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-Hi, Bart
+We now can support blocksizes larger than PAGE_SIZE, so lift
+the restriction up to the max supported page cache order and
+just bake this into a common helper used by the block layer.
 
-在 2024/12/11 4:33, Bart Van Assche 写道:
->> If so, following are the options that I can think of to fix this:
->>
->> 1) make async_depth read-only, if 75% tags will hurt performance in some
->> cases, user can increase nr_requests to prevent it.
->> 2) refactor elevator sysfs api, remove eq->sysfs_lock and replace it
->> with q->sysfs_lock, so deadline_async_depth_store() will be protected
->> against changing hctxs, and min_shallow_depth can be updated here.
->> 3) other options?
-> 
-> Another option is to remove the ability to configure async_depth. If it
-> is too much trouble to get the implementation right without causing
-> regressions for existing workloads, one possibility is to remove support
-> for restricting the number of asynchronous requests in flight.
+We bound ourselves to 64k as a sensible limit. The hard limit,
+however is 1 << (PAGE_SHIFT + MAX_PAGECACHE_ORDER).
 
-If you agree, I'll use following option in the next version:
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ block/bdev.c           |  5 ++---
+ include/linux/blkdev.h | 11 ++++++++++-
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-4) set min_async_depth to 64 (after treating min_shallow_depth for the
-whole sbitmap instead of one word).
-
-The good thing is that user can still set async_depth without changing
-wake_batch, the side effect is that async_depth can't be used if
-nr_requests <= 64;
-
-Thanks,
-Kuai
+diff --git a/block/bdev.c b/block/bdev.c
+index 167d82b46781..b57dc4bff81b 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -157,8 +157,7 @@ int set_blocksize(struct file *file, int size)
+ 	struct inode *inode = file->f_mapping->host;
+ 	struct block_device *bdev = I_BDEV(inode);
+ 
+-	/* Size must be a power of two, and between 512 and PAGE_SIZE */
+-	if (size > PAGE_SIZE || size < 512 || !is_power_of_2(size))
++	if (blk_validate_block_size(size))
+ 		return -EINVAL;
+ 
+ 	/* Size cannot be smaller than the size supported by the device */
+@@ -185,7 +184,7 @@ int sb_set_blocksize(struct super_block *sb, int size)
+ 	if (set_blocksize(sb->s_bdev_file, size))
+ 		return 0;
+ 	/* If we get here, we know size is power of two
+-	 * and it's value is between 512 and PAGE_SIZE */
++	 * and its value is larger than 512 */
+ 	sb->s_blocksize = size;
+ 	sb->s_blocksize_bits = blksize_bits(size);
+ 	return sb->s_blocksize;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 08a727b40816..a7303a55ed2a 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -269,10 +269,19 @@ static inline dev_t disk_devt(struct gendisk *disk)
+ 	return MKDEV(disk->major, disk->first_minor);
+ }
+ 
++#ifdef CONFIG_TRANSPARENT_HUGEPAGE
++/*
++ * The hard limit is (1 << (PAGE_SHIFT + MAX_PAGECACHE_ORDER).
++ */
++#define BLK_MAX_BLOCK_SIZE      (SZ_64K)
++#else
++#define BLK_MAX_BLOCK_SIZE      (PAGE_SIZE)
++#endif
++
+ /* blk_validate_limits() validates bsize, so drivers don't usually need to */
+ static inline int blk_validate_block_size(unsigned long bsize)
+ {
+-	if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
++	if (bsize < 512 || bsize > BLK_MAX_BLOCK_SIZE || !is_power_of_2(bsize))
+ 		return -EINVAL;
+ 
+ 	return 0;
+-- 
+2.43.0
 
