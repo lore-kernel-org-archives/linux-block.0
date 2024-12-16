@@ -1,87 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AEE51C5A;
-	Mon, 16 Dec 2024 20:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B541CDA2F
+	for <linux-block@vger.kernel.org>; Mon, 16 Dec 2024 20:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734379555; cv=none; b=cONa9ZogmA+UJvMrVIf0U+K8voNhm9YlYLQiUYhajm4/jgSjiFOcrg4pSs7hFHy7GcM8hhc00ub+4WEy7ZYufK5CM6kMvtRd5kWBTICBlMjWHShK//4Xnwvo8E7a8C5EkCYXFM8uhIeKhv3JXF/ow3VPXSkS6rUuLoJIMQMjG5o=
+	t=1734380373; cv=none; b=g1Xpp3l71PhfDyVOU6S8460b863aVWBZDkVTUti3PhIj3LqmYCaTRTBO23V1DmxArKqofKPkHB0G8YNrbvbqOcWmh2FSczDuQa3d91wzexCQABNKBvfzxoi4V3AjNMu6uAryK1ig4FQckKkm+J7cNFVOgS4x3ruAnQNfYJhEnS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734379555; c=relaxed/simple;
-	bh=35Co1S/1Poie0EARm6OXu1nE4eBJSWFsXTiavSp7hyI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pAttfAbHLkwYyFN9Vx/TsjWOUCr+IKoohSvEV6U/gvmXpt0viuX8eu1qBpsSSp82iNl+QD+NtFyX31liTPzBHeFIJEzHJBrIj7RMQNuLJylPFHwptWEzKMCxUJ7Gaxn2Ak2zxEPcAtRmI1b5Ia959SsI0RhOCKyia0zmjRlhsX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jV2LGe8W; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734380373; c=relaxed/simple;
+	bh=bC49ZfSuj/kXJ7rpHD//YHAErooSqHW8GyK85AbpmCE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GzoLZ1t1f/6yqkJ5M3hlwWit2saHU085esCZ0U4sFjcXyTAnjChwvibWxNwB2lyxBNpZLJy0P+Sswdw/CSEj4Ls4uty4ZpmM5NiOBQKUbzaTV4kRiQwI12MMxsxjHlWGuARqgUKavmIwm45+LiOkJLnxGq2wIGrIDKhJWSCQLuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=nXO4Q1z2; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jV2LGe8W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F6A7C4CED4;
-	Mon, 16 Dec 2024 20:05:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734379554;
-	bh=35Co1S/1Poie0EARm6OXu1nE4eBJSWFsXTiavSp7hyI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jV2LGe8WJFr6mlDlQPEUpEKIp0jPi4IN6oEbGlUsGeER8moYRXa2b9GqRXk4LgVHl
-	 D6sD8L3/veVwSaAjLsB0ik4hyQ6YEPvs5TIaNvQqbF6bmhrQhyjo39MGHa7TIcy8Sa
-	 tRjX/k75JwXH9++raMFiJscOzue6PJB3C2v69A1W6WADCTFoxUL/TSRHoJlTjJ4tcr
-	 +6ijciQrzn5BUPhWexsZGmc21u8BdW6jBj9HC7R+u1Lax9h7l0G8Co7ngkK0Fjmrc+
-	 4ENcMRZWGFH0Rk87Do4uOGbQCREgcA71YRhEYqHS3uNVkshtRU6RyBEWsGTRJzEaGc
-	 OPBxiq1iJHigg==
-Date: Mon, 16 Dec 2024 12:05:52 -0800
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: hch@lst.de, hare@suse.de, dave@stgolabs.net, david@fromorbit.com,
-	djwong@kernel.org, john.g.garry@oracle.com, ritesh.list@gmail.com,
-	kbusch@kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com,
-	p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
-Subject: Re: [RFC v2 02/11] fs/buffer: add a for_each_bh() for
- block_read_full_folio()
-Message-ID: <Z2CIIArEF_NekLxs@bombadil.infradead.org>
-References: <20241214031050.1337920-1-mcgrof@kernel.org>
- <20241214031050.1337920-3-mcgrof@kernel.org>
- <Z10DbUnisJJMl0zW@casper.infradead.org>
- <Z2B36lejOx434hAR@bombadil.infradead.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="nXO4Q1z2"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YBrrg2rzKzlff09;
+	Mon, 16 Dec 2024 20:19:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1734380367; x=1736972368; bh=RuOwozuAcgKMcp5sgcvRu66+2Q3a3JMGNXK
+	q0m5bWos=; b=nXO4Q1z2Ncp5Zef8MzcqxJZhek9COsKFnWxWgSaVSHWnYcJhBj+
+	swPWSS0Eq3bnUzBM6rJtskYyvX+MrrdY6R4SuYztNmv3J3UOEAoM+dhC6zWVAsQ7
+	ThlmwvkRI3rdHoA5MGn4J/JgeInDIa4Ul25wFpWegS+M4111RbLGiHHvy2nLiN8V
+	N/1SNYphuJvdA67wzvPOHhcirsJfHaF7QRAdhGQTlWN74b8TLBSvu1D6DFwNG5UK
+	zREgO9zO/roAzVAVuY0tZIE1CDiH/VO502W1suYjuj+gb3ZLMVpUKGWPXNqSgcKe
+	H0W03flWt2eOF8No0EcIEBiErmOKNkqXjZg==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id cXOgZWN1Vq_L; Mon, 16 Dec 2024 20:19:27 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YBrrG1Xt9zlff0d;
+	Mon, 16 Dec 2024 20:19:09 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 0/2] Move blk_mq_submit_bio() error handling
+Date: Mon, 16 Dec 2024 12:18:59 -0800
+Message-ID: <20241216201901.2670237-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z2B36lejOx434hAR@bombadil.infradead.org>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 16, 2024 at 10:56:44AM -0800, Luis Chamberlain wrote:
-> On Sat, Dec 14, 2024 at 04:02:53AM +0000, Matthew Wilcox wrote:
-> > On Fri, Dec 13, 2024 at 07:10:40PM -0800, Luis Chamberlain wrote:
-> > > -	do {
-> > > +	for_each_bh(bh, head) {
-> > >  		if (buffer_uptodate(bh))
-> > >  			continue;
-> > >  
-> > > @@ -2454,7 +2464,9 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
-> > >  				continue;
-> > >  		}
-> > >  		arr[nr++] = bh;
-> > > -	} while (i++, iblock++, (bh = bh->b_this_page) != head);
-> > > +		i++;
-> > > +		iblock++;
-> > > +	}
-> > 
-> > This is non-equivalent.  That 'continue' you can see would increment i
-> > and iblock.  Now it doesn't.
-> 
-> Thanks, not sure how I missed that! With that fix in place I ran a full
-> baseline against ext4 and all XFS profiles.
-> 
-> For ext4 the new failures I see are just:
-> 
->   * generic/044
->   * generic/045
->   * generic/046
+Hi Jens,
 
-Oh my, these all fail on vanilla v6.12-rc2 so its not the code which is
-at fault.
+Some of the blk_mq_submit_bio() error handling occurs in that function it=
+self
+while the remaining error handling code occurs in functions called by
+blk_mq_submit_bio(). This patch series makes blk_mq_submit_bio() easier t=
+o
+understand by moving all error handling code into blk_mq_submit_bio(). No
+functionality has been changed.
 
- Luis
+Please consider this patch series for the next merge window.
+
+Thanks,
+
+Bart.
+
+Bart Van Assche (2):
+  block: Optimize blk_mq_submit_bio() for the cache hit scenario
+  blk-mq: Move more error handling into blk_mq_submit_bio()
+
+ block/blk-mq.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
