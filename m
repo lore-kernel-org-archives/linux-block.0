@@ -1,101 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF291D9A76
-	for <linux-block@vger.kernel.org>; Mon, 16 Dec 2024 20:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898F41DDA31
+	for <linux-block@vger.kernel.org>; Mon, 16 Dec 2024 21:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734382463; cv=none; b=ky2Exw6cz0+XNvVG+t67Yzo9/497mvRlDhGFlnMnj7/GFsj9G0kaDODaWhMKsjZoolUrEMp6yFl6JJc4EPKFpNqg5TXHLd1pV7oi9OE1cK/3Lix7N87tl6n7VLC98k9Tvgsel0DXuEPyDFf5qg+I9ogf6Gqhc3SH/QABMcLHTRM=
+	t=1734382991; cv=none; b=F4HrtR4cFbxyHRjZZYFgSec/dY7d51oH3KiE/E6ZjDIxcc3tRPj7WOS/qKXpvdc3jeJ2/RQcixga+caX+4t3/R0mWizKqQ7R9aHI2CQ/WOAdvUCtgSd3IKQhG4G8lVhv37tX7GNWOuiVFuzKHL2vcGfqRHzFjcYQT39xuMuPK9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734382463; c=relaxed/simple;
-	bh=UGr3gv7driZPKRHCMvH3nWIVSXSnFvnG/eLjLAMUoY4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kRWSDWmxpABOmgzDpFRE/yyKLE7w+YY0i/qHmsIB+OaVQUNH6O+2KGMtpdMdCTFRc94c4+aRKEt2TeDOMgmy92eyKT8OaZSvQYn9OvT11Z3RyYCrIpCIyq9wy6GZxaZlA0QvumL0A3pZl0xTqefavHfNipckxm5HnnDmZAHwwx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EC0vq86X; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734382991; c=relaxed/simple;
+	bh=OwYGdLFUonBanDIx/aewJFj5Mvv5oBl9cCL+gLWu4XQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SFEG4yQC/4/DeI81s0eWAEtlts11iqluu48z2z646pOFBszsuLN4fQtFyH1/8W3RyOgx0KK8JsMSdonuqZrBx72Yy2eXwPPm30ApbXlrBOYYQWIEs0VwG0uwrXneqrSHFatClkv7GIvwp4wfi8ailNMCnMVKlgA7r4qjRVH00w0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=3c3eAN1A; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EC0vq86X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4F9C4CED0;
-	Mon, 16 Dec 2024 20:54:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734382463;
-	bh=UGr3gv7driZPKRHCMvH3nWIVSXSnFvnG/eLjLAMUoY4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EC0vq86XysvnkweYSIKFcaIJnavvAjiew1KHOyGYbq5MbvXx2WYiAaXkXOAtaqVnj
-	 hR0eVM/IFF/IiQFsBfMT+rRHtiXBJtngdY1CLgEilmMc+ivzR8uw/7Q6bZDTDXITXk
-	 ZhaSrwa4uexvkyv67x6uBPeOsb6sdjI7o8z2UoWlPyQgSkASKhmDzDW/Pkle0Nx0SU
-	 q31MPE0jWfBMmP0PBMN+IF8bqQg+bJRV7qaC2syjx8BmYmI3FRadznlAe0u8APAVQ2
-	 ScVW9k09WJFPyfs22SxXmDuQKX2R2ug4x4e+BCQy16eJNy1JMFCMaAd+LjEXZ3mhxb
-	 GmlqYCtTkmjpg==
-Message-ID: <3bc4b958-73ea-47d4-9b94-299db1f7ee3e@kernel.org>
-Date: Mon, 16 Dec 2024 12:54:22 -0800
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="3c3eAN1A"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YBsq05lvvz6ClL9C;
+	Mon, 16 Dec 2024 21:03:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1734382986; x=1736974987; bh=WYSOlgzuD9MM6UKRicdMilQFciqr1FqXfIz
+	VVUMFrCc=; b=3c3eAN1A62dZw4JCmYZD8zYr+/r+GqZNfYbJ7ul+lr3HFqCOvFZ
+	Z8mARP4NwJjIvPp7yOwE1j6JM6O1UiABXCk1O5E9cHcv0pp/Rfjrg5y4gkfDqgql
+	Omfrp8epMhfE0ZT3CR16vSFMUW7nxzpYdxvZTmm3auV5l2W1UXUBlSbQ5Xh/Rzly
+	uBrJrMXB3NNioRQCxi0Ukz3sw6oalThOwT/YvsP0OZ5sUwhHu81MsdpAz8UshYqI
+	8nU2yY1FjVO0oF76hMCCJ+ps5QypN9scPBywHroVgkOl4O/nyBbdDKQhAqIoczYI
+	wBfKKFa0E1ql4IYx9ms/d4jpNUkzBRx/wJA==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id YUXCnFlFmvHu; Mon, 16 Dec 2024 21:03:06 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YBspw2ZsDz6ClL92;
+	Mon, 16 Dec 2024 21:03:03 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 0/6] Minor improvements for the zoned block storage code
+Date: Mon, 16 Dec 2024 13:02:38 -0800
+Message-ID: <20241216210244.2687662-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Zoned storage and BLK_STS_RESOURCE
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>
-References: <e75812ec-9b91-42d0-9ca5-d4bae031e319@acm.org>
- <ed186d84-1652-4446-8da1-df2ed0d21566@kernel.org>
- <ba8caf98-8b09-4494-add8-31381b04cd33@acm.org>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <ba8caf98-8b09-4494-add8-31381b04cd33@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/12/16 12:42, Bart Van Assche wrote:
-> 
-> On 12/16/24 12:23 PM, Damien Le Moal wrote:
->> On 2024/12/16 11:24, Bart Van Assche wrote:
->>> If 'qd=1' is changed into 'qd=2' in tests/zbd/012 then this test fails
->>> against all kernel versions I tried, including kernel version 6.9. Do
->>> you agree that this test should pass? If you agree with this, do you
->>> agree that the only solution is to postpone error handling of zoned
->>> writes until all pending zoned writes have completed and only to
->>> resubmit failed writes after all pending writes have completed?
->>
->> Well, of course: if one write fails, the target zone write pointer will not
->> advance as it should have, so all writes for the same zone after the failed one
->> will be unaligned and fail. Is that what you are talking about ?
->>
->> With the fixes applied to rc3, the automatic error recovery in the block layer
->> is gone. So it is up to the user (FS, DM or application) to do the right thing.
-> 
-> Hi Damien,
-> 
-> For non-zoned storage the BLK_STS_RESOURCE status is not reported to the
-> I/O submitter (filesystem). The BLK_STS_RESOURCE status causes the block
-> layer to retry a request. For zoned storage if the block driver reports
-> the BLK_STS_RESOURCE status and if QD > 1 then the submitter
-> (filesystem) has to retry the I/O. Isn't that inconsistent? Solving this
-> inconsistency is one reason why I would like to postpone handling of
-> zoned write errors until all pending I/O has either completed or failed.
+Hi Jens,
 
-As I said, if one write does not work, whatever the reason, all other writes
-behind it for the same zone will also not work. So yes, handling of errors in
-the end needs to be done after all writes come back to the issuer. Nothing new
-here. I do not see the issue. And I am not sure where you want to go with this.
+This patch series includes several minor improvements for the zoned block
+storage code. None of these patches changes the behavior of that code.
 
-> Another reason is that this behavior change is an essential step towards
-> supporting write pipelining. If multiple zoned writes are outstanding,
-> and the block driver postpones execution of any of these writes (unit
-> attention, BLK_STS_RESOURCE, ...) then any zoned writes must only be
-> resubmitted after all pending zoned writes have either completed or failed.
+Please consider these patches for the next merge window.
 
-Yes. But I am still confused. Where is the problem ?
+Thanks,
 
-> 
-> Thanks,
-> 
-> Bart.
+Bart.
 
+Bart Van Assche (6):
+  blk-zoned: Minimize #include directives
+  blk-zoned: Document the locking order
+  blk-zoned: Document locking assumptions
+  blk-zoned: Improve the queue reference count strategy documentation
+  blk-zoned: Uninline functions that are not in the hot path
+  blk-zoned: Split queue_zone_wplugs_show()
 
--- 
-Damien Le Moal
-Western Digital Research
+ block/blk-zoned.c | 67 +++++++++++++++++++++++++----------------------
+ 1 file changed, 35 insertions(+), 32 deletions(-)
+
