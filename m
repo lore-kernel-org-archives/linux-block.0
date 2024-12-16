@@ -1,133 +1,93 @@
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DACB38FA6;
-	Mon, 16 Dec 2024 12:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34851304AB;
+	Mon, 16 Dec 2024 15:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734350843; cv=none; b=n/2JycBHXmxakdm9iEiAtVNKcR3jb9RcYdeuMFZ07qQ4Y8uQNV6bpwsTYgjfP2eiepYlQjeLI0YVPEcQYG8GK4hItUNwjlWQKTy4x26n8A10nFGLMgovncrcAmHpC8KOBY3wdiL82NU1/BENxfXKIdSW6uXGY3xyqiyvsgxq40c=
+	t=1734362048; cv=none; b=Lfkhj99sZUZxxtiVqgf3EkK3o+FTEmgd7DZ1OQBYtTcxF/27lzylJjcZYeFZycY2iI1J6YnVH/CtjzZsUMOgdSg5+/Xi1PkWvLbMSeBVTBs2n4sGeKPpkj9GJVQjvKr1IULidCWe2uHr4BEbsyFSXlln/jV0v/o0HKB2wFflneQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734350843; c=relaxed/simple;
-	bh=iqh5XOjrIPBtDSeYr9JPy6x0FGs3THMaULE0vFFzThQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f2uIaCe3APA2iiwtOjZnE0PS0Iul08Q6rRKAEwSit8NbMA75DuHUtWYV1fs6OLTk/S9Vi5KNKL3dvNdrfvYeVtNZcnzUmuPI6aKT1jbE+V2qm8eJ86yDYNeI2KeUDBzst7WPvjRoogV6cF9Jos4RiE10ECfOne0nGNrPnDFkKPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=B0m6Ufqb; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="B0m6Ufqb"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1734350832; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=1OmVpZqZxthyjz0j/R+PbOfKwTbA3aCpAvSvnBaqQIs=;
-	b=B0m6UfqbZvOm6pH/oHifyK8Cuqod1lUEKNN7L7R0PgpptP9LXuThSg4okyO3zVvImDFNzD+llOaCEcO65fYaGINp/kG9h0GGtjrCSAncp4PO5CQYQ9WgDCezfyDDTIkZkIjE7sLvhKSYVFBFRFcROD4hatRLTHoBSGwkx9t0zIk=
-Received: from 30.221.131.67(mailfrom:mengferry@linux.alibaba.com fp:SMTPD_---0WLazs5j_1734350830 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 16 Dec 2024 20:07:11 +0800
-Message-ID: <60fd6f1a-ddf5-4b53-8353-18dcd8f6f93c@linux.alibaba.com>
-Date: Mon, 16 Dec 2024 20:07:09 +0800
+	s=arc-20240116; t=1734362048; c=relaxed/simple;
+	bh=UTmAQ3gsUGW+ygdC2778WAcuFjzVeA37GZ135sqL5b0=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=trrHWt+Xx7nWCTrG5rlBgStLqMMiwjXqLPBgh+JxHPik8PDRbKg1gsVYZRJNfDRXsaDuSABZCqRraIbrxa5pbG039DqpmeWLLlw1aaaOLjXew/q1hO3XEUgN8Pq/cOQ1JPlqkurTSfaQbWIhzR9+/M8Fh2Ab0mmSnziXkyQMy10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YBk303lNxz6LDXj;
+	Mon, 16 Dec 2024 23:13:00 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8B2BC140A90;
+	Mon, 16 Dec 2024 23:14:02 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 16 Dec
+ 2024 16:14:01 +0100
+Date: Mon, 16 Dec 2024 15:14:00 +0000
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Zijun Hu <zijun_hu@icloud.com>
+CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+	<rafael@kernel.org>, Tejun Heo <tj@kernel.org>, Josef Bacik
+	<josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, Boris Burkov
+	<boris@bur.io>, Davidlohr Bueso <dave@stgolabs.net>, Dave Jiang
+	<dave.jiang@intel.com>, Alison Schofield <alison.schofield@intel.com>, Vishal
+ Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>, Dan
+ Williams <dan.j.williams@intel.com>, <linux-kernel@vger.kernel.org>,
+	<cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+	<linux-cxl@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: Re: [PATCH v3 3/9] driver core: bus: Move true expression out of if
+ condition in API bus_find_device()
+Message-ID: <20241216151400.00006242@huawei.com>
+In-Reply-To: <20241212-class_fix-v3-3-04e20c4f0971@quicinc.com>
+References: <20241212-class_fix-v3-0-04e20c4f0971@quicinc.com>
+	<20241212-class_fix-v3-3-04e20c4f0971@quicinc.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3][RFC] virtio-blk: add io_uring passthrough support for
- virtio-blk
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, linux-block@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
- Joseph Qi <joseph.qi@linux.alibaba.com>,
- Jeffle Xu <jefflexu@linux.alibaba.com>
-References: <20241203121424.19887-1-mengferry@linux.alibaba.com>
- <2d4ad724-f9da-4502-9079-432935f5719d@linux.alibaba.com>
- <CACGkMEuAgAcCDrCMhNHr7gcRB6NtMPPLdSFAOGdt4dXGoQr4Yg@mail.gmail.com>
-Content-Language: en-US
-From: Ferry Meng <mengferry@linux.alibaba.com>
-In-Reply-To: <CACGkMEuAgAcCDrCMhNHr7gcRB6NtMPPLdSFAOGdt4dXGoQr4Yg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
+On Thu, 12 Dec 2024 21:38:39 +0800
+Zijun Hu <zijun_hu@icloud.com> wrote:
 
-On 12/16/24 3:38 PM, Jason Wang wrote:
-> On Mon, Dec 16, 2024 at 10:01 AM Ferry Meng <mengferry@linux.alibaba.com> wrote:
->>
->> On 12/3/24 8:14 PM, Ferry Meng wrote:
->>> We seek to develop a more flexible way to use virtio-blk and bypass the block
->>> layer logic in order to accomplish certain performance optimizations. As a
->>> result, we referred to the implementation of io_uring passthrough in NVMe
->>> and implemented it in the virtio-blk driver. This patch series adds io_uring
->>> passthrough support for virtio-blk devices, resulting in lower submit latency
->>> and increased flexibility when utilizing virtio-blk.
->>>
->>> To test this patch series, I changed fio's code:
->>> 1. Added virtio-blk support to engines/io_uring.c.
->>> 2. Added virtio-blk support to the t/io_uring.c testing tool.
->>> Link: https://github.com/jdmfr/fio
->>>
->>> Using t/io_uring-vblk, the performance of virtio-blk based on uring-cmd
->>> scales better than block device access. (such as below, Virtio-Blk with QEMU,
->>> 1-depth fio)
->>> (passthru) read: IOPS=17.2k, BW=67.4MiB/s (70.6MB/s)
->>> slat (nsec): min=2907, max=43592, avg=3981.87, stdev=595.10
->>> clat (usec): min=38, max=285,avg=53.47, stdev= 8.28
->>> lat (usec): min=44, max=288, avg=57.45, stdev= 8.28
->>> (block) read: IOPS=15.3k, BW=59.8MiB/s (62.7MB/s)
->>> slat (nsec): min=3408, max=35366, avg=5102.17, stdev=790.79
->>> clat (usec): min=35, max=343, avg=59.63, stdev=10.26
->>> lat (usec): min=43, max=349, avg=64.73, stdev=10.21
->>>
->>> Testing the virtio-blk device with fio using 'engines=io_uring_cmd'
->>> and 'engines=io_uring' also demonstrates improvements in submit latency.
->>> (passthru) taskset -c 0 t/io_uring-vblk -b4096 -d8 -c4 -s4 -p0 -F1 -B0 -O0 -n1 -u1 /dev/vdcc0
->>> IOPS=189.80K, BW=741MiB/s, IOS/call=4/3
->>> IOPS=187.68K, BW=733MiB/s, IOS/call=4/3
->>> (block) taskset -c 0 t/io_uring-vblk -b4096 -d8 -c4 -s4 -p0 -F1 -B0 -O0 -n1 -u0 /dev/vdc
->>> IOPS=101.51K, BW=396MiB/s, IOS/call=4/3
->>> IOPS=100.01K, BW=390MiB/s, IOS/call=4/4
->>>
->>> The performance overhead of submitting IO can be decreased by 25% overall
->>> with this patch series. The implementation primarily references 'nvme io_uring
->>> passthrough', supporting io_uring_cmd through a separate character interface
->>> (temporarily named /dev/vdXc0). Since this is an early version, many
->>> details need to be taken into account and redesigned, like:
->>> ● Currently, it only considers READ/WRITE scenarios, some more complex operations
->>> not included like discard or zone ops.(Normal sqe64 is sufficient, in my opinion;
->>> following upgrades, sqe128 and cqe32 might not be needed).
->>> ● ......
->>>
->>> I would appreciate any useful recommendations.
->>>
->>> Ferry Meng (3):
->>>     virtio-blk: add virtio-blk chardev support.
->>>     virtio-blk: add uring_cmd support for I/O passthru on chardev.
->>>     virtio-blk: add uring_cmd iopoll support.
->>>
->>>    drivers/block/virtio_blk.c      | 325 +++++++++++++++++++++++++++++++-
->>>    include/uapi/linux/virtio_blk.h |  16 ++
->>>    2 files changed, 336 insertions(+), 5 deletions(-)
->> Hi, Micheal & Jason :
->>
->> What about yours' opinion? As virtio-blk maintainer. Looking forward to
->> your reply.
->>
->> Thanks
-> If I understand this correctly, this proposal wants to make io_uring a
-> transport of the virito-blk command. So the application doesn't need
-> to worry about compatibility etc. This seems to be fine.
->
-> But I wonder what's the security consideration, for example do we
-> allow all virtio-blk commands to be passthroughs and why.
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> For bus_find_device(), get_device() in the if condition always returns
+> true, move it to if body to make the API's logic more clearer.
+> 
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+I agree this is easier to read and the reasoning is sound.
 
-About 'security consideration', the generic char-dev belongs to root, so 
-only root can use this passthrough path.
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> ---
+>  drivers/base/bus.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/base/bus.c b/drivers/base/bus.c
+> index 657c93c38b0dc2a2247e5f482fadd3a9376a58e8..73a56f376d3a05962ce0931a2fe8b4d8839157f2 100644
+> --- a/drivers/base/bus.c
+> +++ b/drivers/base/bus.c
+> @@ -402,9 +402,12 @@ struct device *bus_find_device(const struct bus_type *bus,
+>  
+>  	klist_iter_init_node(&sp->klist_devices, &i,
+>  			     (start ? &start->p->knode_bus : NULL));
+> -	while ((dev = next_device(&i)))
+> -		if (match(dev, data) && get_device(dev))
+> +	while ((dev = next_device(&i))) {
+> +		if (match(dev, data)) {
+> +			get_device(dev);
+>  			break;
+> +		}
+> +	}
+>  	klist_iter_exit(&i);
+>  	subsys_put(sp);
+>  	return dev;
+> 
 
-On the other hand, to what I know, virtio-blk commands are all related 
-to 'I/O operations', so we can support all those opcodes with bypassing 
-vfs&block layer (if we want). I just realized the most  basic read/write 
-in this RFC patch series, others will be considered later.
-
-> Thanks
->
