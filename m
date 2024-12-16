@@ -1,140 +1,61 @@
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66E220767C;
-	Mon, 16 Dec 2024 18:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B2420629F
+	for <linux-block@vger.kernel.org>; Mon, 16 Dec 2024 18:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734372191; cv=none; b=sTH80DQ/XWIw2GRT+zGD99wHFgtdTaXZgozIlU2hzPQDdBFH2t2/knYzR8AArtUC6JsY/bTK4bm/SpJMtthTuUYvrphgvfYmkc1ULbXXVT8ZgWoR8JgiIYGRKO4FKDurY2VNL0wKaJCzA7TAGMIFDFduswZHZUjlsT59n1bTCwE=
+	t=1734372518; cv=none; b=UPpUlwzQp/x4WspYMuhI8VB2gZClr9EcnRfI/H8GGSiG3ilqzjw4ga89f79AQXtjKC6mspVxR+vnGF4ULtyE8FDQgtYh8qytyZrR+w0h7FI5BMtTp5t16f6icvNF6inP2B0Nbax01Tv43LNiXt2UtXQgDjzoZqi1ps+OMDnTgDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734372191; c=relaxed/simple;
-	bh=tgXHpOhhfApP7bL3hgeAzYLtIP8gzh7N3YzHp9Ad8FA=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R+aT/EkcwvsMpHACAb/INZhZand2PwCR6Xj0HX4MmMqkOaQmFQFwRDBjQKhHRBrcGmbqUmB/ej67ztr6apoyU5lYj7yRJWT6Fu9Hjrn9grubOM/2aPDgAL7hIfLzTRqut7RqyTzpEmnOhfy7p41XTCefBs+IEUtO83ILsxdWZoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kkAiTTIV; arc=none smtp.client-ip=209.85.219.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1734372518; c=relaxed/simple;
+	bh=L1KYahfg7s0u3hnWbyUAoHDTwqQyvl3ZELjQYmuKc0o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PSad7+pGUPw7c1Bxh+6g/p+k6nNqBUW+QsEmG/2XyFSjyCCW0uFaKTDPqOm84ZN38kYjuxyKm9zYtnEr+jeUjYyhb+tbZqwTEjIA1jJqrh6CFrS0onUDbPT1EuJQYPP1FEf9ednEpm/8RqKILN5tL03+n2jeXoxG0eyVtzWICO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qVL2nHHo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kkAiTTIV"
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e3988fdb580so3364069276.2;
-        Mon, 16 Dec 2024 10:03:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734372188; x=1734976988; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4nIslkjr/lUzk8Ro5349W5wK/vcKAZ1po65rXKiQgFA=;
-        b=kkAiTTIVL78apN+8BVyHDFVOkXi+2X7/j2sAZdVqCYF/9bUsyMMhyrHYCNqM798w8y
-         a1ciYZkwqUXJdDZ6DMq4hf1CrX/DLePmTv5SnGCzArfVpWz2CS1TZ6H6DhAaX/JcnyM7
-         kLzVCFIYtsERBEZ19MlJE2ihBw+YA958+meHjcli3atzmu7ELpFLT+7OMARiR+DWxiis
-         Y/OeVSm6UcapazXn/tiUL+98+UJAzxSGhiaZPNYi22yVGfY0yArzx8IjZXPE0dQLLVzq
-         6eGBlGUD4qBMrN6LCRSl6amlB8EEivX1vvi5aUHxMo8Ga2gc3kAVygiTC6w289Cz4KLs
-         gUnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734372188; x=1734976988;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4nIslkjr/lUzk8Ro5349W5wK/vcKAZ1po65rXKiQgFA=;
-        b=YsfojtQ4cOCCVc1n2WtAmdMTbEDoGaq70Q5kXRUAUHQIun6D02/YZvFVcZwg2w8D+e
-         b7Go5x0S3FBSgXV1cvvxhmxcFXv9OIze15CBv1XqdA8S7qC+nkl1VkJENBi6qJwy/0mO
-         OBnpbpAPQo/eAdDfc3Z3MZmIiTBNEHSEC2AkXhqS9Zg+YgXcoQBESAfyXua77sBx6jW3
-         HtVgF1wu6RdzPAEAGUcG6rfYMmZ87RDZQt3hS6ZIuqRE3c8ErzRb4XWvXBXskd4xBvsJ
-         SSOMliXVxjVyC3/AqzVEGF9g1io263ane4R3lP0Ye5c1RSgLwCFQcJs5s+egzsL21K4R
-         urpg==
-X-Forwarded-Encrypted: i=1; AJvYcCUY5qz60/pHi/y0COS/R2tGW9RGTrljkKyHJwZIWVpkHbCbvCnH3bhl3wTR6+3bcbOQKtvOOdnCADTH+0w4@vger.kernel.org, AJvYcCW9JxkIsiPvPC37bn8iXh4WCQf1ucbAs52XCC029bHE83ar7cPa5jAsK7ha1v9E8oPshBbIwTCz@vger.kernel.org, AJvYcCWi0xZO9MvbjiA/PfucWaCXnKTq19aRhdLARqpjGeiwHHgcjHHGj1RBRhvkGl7t9BINONXaszx/P3PK6hc=@vger.kernel.org, AJvYcCX2/l5ypKS1kwUozf9QlDpm563AnQkAoFWUYyWgUocaCj5tcG2aFldlsbG0hejdJ8TXaVvug8XEIvaN@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXfKo37xvWAB6aeH1d2vgqoABS1GZml2k4w9jrRycLvt7LBOUs
-	BFEPbL9UnSbx9igtHou+OjWlloQ0rK/X2pU11K8tishRDDT0FDqu
-X-Gm-Gg: ASbGnctTY5xy0+wYojLw9c+meiiDpzQlxYNnx3FcKEbvj3IyR8gykLa9uqnusdRFOTr
-	XRJLk+I6/NEWG/Q7uRdcHqd0m7kfJb/KIPT8wJCXCRK9G217LRTKy6dfrpU210o0qb4qeVqGX4K
-	mYcTcVcIru81dtcS5Cd/wvD4PFCJanuRhlSHQbvMtlFSL6WVk+rPDTdCRo0/iZ06vIN+Q00nep6
-	KeVIqlYtqQc0coqZ2qKs3gAS0ygOFnyJ1GTV/x/Jw==
-X-Google-Smtp-Source: AGHT+IHbMbxHrOKtpfB9BT158a0MMZO5ami5tF3rRdJSbwLQ0+B/eWD1BHZNxjsis/raQoDDdfrmPw==
-X-Received: by 2002:a05:6902:274a:b0:e3a:36e0:483b with SMTP id 3f1490d57ef6-e4352f5767emr9850012276.40.1734372188647;
-        Mon, 16 Dec 2024 10:03:08 -0800 (PST)
-Received: from fan ([50.205.20.42])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e46f7467145sm1446400276.0.2024.12.16.10.03.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Dec 2024 10:03:08 -0800 (PST)
-From: Fan Ni <nifan.cxl@gmail.com>
-X-Google-Original-From: Fan Ni <fan.ni@samsung.com>
-Date: Mon, 16 Dec 2024 10:02:55 -0800
-To: Zijun Hu <zijun_hu@icloud.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-	Boris Burkov <boris@bur.io>, Davidlohr Bueso <dave@stgolabs.net>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Alison Schofield <alison.schofield@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
-	Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH v3 6/9] driver core: Rename declaration parameter name
- for API device_find_child() cluster
-Message-ID: <Z2BrT8KEWdSSL12P@fan>
-References: <20241212-class_fix-v3-0-04e20c4f0971@quicinc.com>
- <20241212-class_fix-v3-6-04e20c4f0971@quicinc.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qVL2nHHo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AC78C4CED0;
+	Mon, 16 Dec 2024 18:08:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734372517;
+	bh=L1KYahfg7s0u3hnWbyUAoHDTwqQyvl3ZELjQYmuKc0o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qVL2nHHo9uwhOIY2JKR/1ePZA0inqBFatTHn0hM7DC6uPl8VvsKArujAgIe01zmoe
+	 sVAsckvuKE7VRgiHVXbe3Dz+JVE8PS+sezmtUcD9SKZeVPFA9+HRd3WRtzxqF5tCV5
+	 TwaYQqZCNso3H1egZJor8txjSoq2kbAftGybdYTrfwKRprSyXv/5PkW4vdBW82TC+2
+	 RNuWqSr/snoBqGdkGaIe0sg5ygHx+bOmyDp8qfSuwQ+XYBsWSOGpDkJuKDQwqK2cbm
+	 xZYNAF5s7w9S+iwWozKje4VyB4FgPaDdG6u70lsVsEEvc12t6bN0y+BsEMukhgtPdz
+	 y1hez8/87bvkA==
+Message-ID: <039352ff-68a7-4ad8-8430-99061e46317e@kernel.org>
+Date: Mon, 16 Dec 2024 10:08:36 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241212-class_fix-v3-6-04e20c4f0971@quicinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] null_blk: Remove accesses to page->index
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+References: <20241216160849.31739-1-willy@infradead.org>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20241216160849.31739-1-willy@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 12, 2024 at 09:38:42PM +0800, Zijun Hu wrote:
-> From: Zijun Hu <quic_zijuhu@quicinc.com>
+On 2024/12/16 8:08, Matthew Wilcox (Oracle) wrote:
+> Use page->private to store the index instead of page->index.
 > 
-> For APIs:
-> device_find_child()
-> device_for_each_child()
-> device_for_each_child_reverse()
-> 
-> Their declaration has parameter name 'dev', but their defination
-> changes the name to 'parent'.
-> 
-> Rename declaration name to defination 'parent' to make both have
-> the same name.
-> 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 
-Reviewed-by: Fan Ni <fan.ni@samsung.com>
+Looks OK to me.
 
-> ---
->  include/linux/device.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/linux/device.h b/include/linux/device.h
-> index 0e0bc9bfe0d15a8734bf3d34106300f4df6b5364..a9d928398895b062094b94f2c188cbe9951d7ac1 100644
-> --- a/include/linux/device.h
-> +++ b/include/linux/device.h
-> @@ -1074,14 +1074,14 @@ void device_del(struct device *dev);
->  
->  DEFINE_FREE(device_del, struct device *, if (_T) device_del(_T))
->  
-> -int device_for_each_child(struct device *dev, void *data,
-> +int device_for_each_child(struct device *parent, void *data,
->  			  int (*fn)(struct device *dev, void *data));
-> -int device_for_each_child_reverse(struct device *dev, void *data,
-> +int device_for_each_child_reverse(struct device *parent, void *data,
->  				  int (*fn)(struct device *dev, void *data));
->  int device_for_each_child_reverse_from(struct device *parent,
->  				       struct device *from, const void *data,
->  				       int (*fn)(struct device *, const void *));
-> -struct device *device_find_child(struct device *dev, const void *data,
-> +struct device *device_find_child(struct device *parent, const void *data,
->  				 device_match_t match);
->  struct device *device_find_child_by_name(struct device *parent,
->  					 const char *name);
-> 
-> -- 
-> 2.34.1
-> 
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
 -- 
-Fan Ni
+Damien Le Moal
+Western Digital Research
