@@ -1,48 +1,62 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830ED158DD1
-	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 18:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632A49461
+	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 18:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734460750; cv=none; b=Lhu4R73jAsY/5tWOHvLuku1f57RqmixAfag/vDKKNP+vafz+ddXJ8HxtdcGlDUJPxxfhNP/K5D9QLmU+vmkZKJR5dXbk2x91ngWLUd84GptOEy9w2LXOXP/95hJtQ0TLXSY62Kri4t/yqNlfFT94PF7Rd5wAqq5efqUSf/l5jT4=
+	t=1734461172; cv=none; b=t8vmtwCuyDO4A3E6XrgDDWwig1Ved53vlupsi5cuJhJS6mONik+mqGY73kNIDZZoIU2ANis1uzfmivw+k9T6BNL15mcVWZUlTLy2biTkvt5gMC3MGHld3+8h2J8vkN+o7Gcucwf1MBPQuejBlnB833D5iEcckMuWrhrGdH+zsJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734460750; c=relaxed/simple;
-	bh=JQHscseQBbHQQnhOAR2H7xIfOOxihelK2lbYNTZ16I0=;
+	s=arc-20240116; t=1734461172; c=relaxed/simple;
+	bh=woeNW6J9oV3Wr3y2WgCFFAhr/UOYK1xAcW/t8sJsA0c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nir3FrL+grQXqsHOOwIGvO9GYNBwxvM8H3Yob2HnPuS58NBQImahHpOR7iqghIEmD6GC6YKKGtkIb/7P0j8lwad1H/B60WZvqc5i44hA8K0ECIvMKFkv6fva2NceYgeud2mF7/ba4eC8ZwAyNKvN2X44u839fkSoO+/n1C6jOH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=IBULp8z/; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=rt7Zfmdg97j1FF4GzgfcWai+lebPqUa80yw3/rSINxzGPCHNrgvezuZuqTscgDuiUBkf2BIm86f9NC+odsYcB8uJSefduWPE0QpqHRx3Tiwyr8oGuT9aOa++2+TaG3DYZjN1Y9p/p32xC5VpCwx9l5rDyfQ6jIbWC1j9cZ7Cx70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0DoCPAOX; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="IBULp8z/"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YCQZG2lSWzlff0M;
-	Tue, 17 Dec 2024 18:39:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1734460740; x=1737052741; bh=pXz3jsV+/MlbXz5KyAtbEoMm
-	B3nF1NuMMgw3l6s/oTc=; b=IBULp8z/69ns/LNh90sX70IlFNGqgXPgGFYxcJOC
-	HNx9o0K5H/ndRPV8jz6Pd1czE6XSYNp0esNzI0WLAo70l39nuJR/hY5dcEN1NTn/
-	Fn/oGHyxZ/sETbxV66Iqv+Y0CStGBPItLACWFQwJ9biy90WOzg52tOfwJdxuyHlw
-	99VHIPuUVxeAJMIHctayMr/dUL4R69udWmGizVTiUupaKbfLIrVh1WrdsdGt4tsn
-	CT+XRIFe4yvbERNqSje92OQWLFDGHsH7cIY9d2gxU7Hr2nPGeTsoV26WBWcvWvlz
-	ufEBT+hXRXATcaLA7yfTejCrzn9b3cJlmM2ROk36ax+F0Q==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 7FiZOU2eVJxX; Tue, 17 Dec 2024 18:39:00 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YCQZC64RDzlff0K;
-	Tue, 17 Dec 2024 18:38:59 +0000 (UTC)
-Message-ID: <edd45063-f6ea-4315-8ae6-d9d8d73ff37d@acm.org>
-Date: Tue, 17 Dec 2024 10:38:58 -0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0DoCPAOX"
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a8146a8ddaso17801825ab.1
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 10:46:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734461168; x=1735065968; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=trSjqAS3n7XY8gfJxtVldmrJMUh4rh9OA7lv5j0nbHE=;
+        b=0DoCPAOXa6z5q5gKISTRj28xPK+neBWQrmEqcp11hGGSKE/H/7cX7XCsJhqmOPnurH
+         BfzmCEUcXcNI7v/QagyhTy7oUg+fwhyCn6DM+AKuJxsXU3Jxwkm1VnefouMoqjlXkl2P
+         T3I/qG8VVaGajl/9DFdqjSIx2TxLid7hcSKNKTWzYgRN+pJ5STHyt2YhI886Uo+68TGQ
+         E5lOmVwTbF/me0viBhDjeRNRqqQwiMJki2Xm8J3tqB8J7ge2/9cjHX3j30ie/5rUjRJ7
+         TD8nVtkGptt14tM3eYJTAJSEgtaxrlMjyz4S96J+mpF60NOhw9qPDUaGzNf8HLsC3SEu
+         PpZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734461168; x=1735065968;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=trSjqAS3n7XY8gfJxtVldmrJMUh4rh9OA7lv5j0nbHE=;
+        b=uceAb3IFTA17Zln7FjAAr6xg0LFRukAkLJkLr5RrNFUE+5/4+jHMHnnoo7nKQAK0aD
+         EZlgtqf9R9SEYsQBytIKska+efUqbf6buGzdYyZVX8LNMKr1lBc3RM18mJzQHw0MoqK+
+         /hUw5id16SmlJBAPmSZ4zpOtYZBzJJoumY7hI1GgLlHbZ/ctOKlVogOStWR1cz3o/yXu
+         kogIJOtTRHa2+tFBjwFLwspmWJhik8doHKpVViANF7HtI/Mx92YGxN6fi4yTmRQ9FYis
+         UNcGRzGLvZVPlhv3XZJU1GsrTkTAlLLVzeUYx1SGTgThCiOt4sjnUa1SutqRcwIoaZIl
+         uX2g==
+X-Gm-Message-State: AOJu0YxelND82ODlQTGGZ2uWA1lKezBULh6zAP45MlO80PrpRZMJgDxz
+	ur8tfPu4go40iHbjHerwCZpI+GKrqTPZ0g3rS/zJBVwElXlMo8dxK2V6gn54e5g=
+X-Gm-Gg: ASbGnctmil1bN3RnKPbEYzr3Buxwq26lNhSOBmLP+giI//vDgyxzz1V4Udn+urUplNl
+	bDKNMtnpbdRRpAnhMteV/eNnFF63ut71eoYBajU7+ys/Kl4MKUgwn9Sy6MF9arUGnhtZ8k1uq8T
+	whg1PHbFAfTgHKhKbD7Uf+YrJjgD6a3EWk1DcmFd7xWShB5p2dsMs1ySazw+PA/US0tieFILTV0
+	9wpLSFGk1BKE3oPXrpkuJ30/4BdGVrv9jxe7OzRyhQ9xh/5omYO
+X-Google-Smtp-Source: AGHT+IHgDmbCVpIRwDzk+bhRMPkfMMC7F7MrOLwjZGUAX1yYr+PUS45/+CQBTnoW3ZX9GVlRdQVUUQ==
+X-Received: by 2002:a05:6e02:1a2b:b0:3a7:8ee6:cd6e with SMTP id e9e14a558f8ab-3bdc0bc8524mr1067735ab.8.1734461168442;
+        Tue, 17 Dec 2024 10:46:08 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3b24e557df0sm22460255ab.80.2024.12.17.10.46.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2024 10:46:07 -0800 (PST)
+Message-ID: <bf847491-e18a-4685-8fa2-66e31c41f8e8@kernel.dk>
+Date: Tue, 17 Dec 2024 11:46:07 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,61 +65,42 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: Zoned storage and BLK_STS_RESOURCE
-To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Bart Van Assche <bvanassche@acm.org>
 Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <e75812ec-9b91-42d0-9ca5-d4bae031e319@acm.org>
  <20241217041515.GA15100@lst.de>
  <b8af6e10-6a00-4553-9a8c-32d5d0301082@kernel.org>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
+From: Jens Axboe <axboe@kernel.dk>
 In-Reply-To: <b8af6e10-6a00-4553-9a8c-32d5d0301082@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/17/24 7:04 AM, Damien Le Moal wrote:
-> On 2024/12/16 20:15, Christoph Hellwig wrote:
->> On Mon, Dec 16, 2024 at 11:24:24AM -0800, Bart Van Assche wrote:
->>>
->>> Hi Damien,
->>>
->>> If 'qd=1' is changed into 'qd=2' in tests/zbd/012 then this test fails
->>> against all kernel versions I tried, including kernel version 6.9. Do
->>> you agree that this test should pass?
->>
->> That test case is not very well documented and you're not explaining
->> how it fails.
->>
->> As far as I can tell the test uses fio to write to a SCSI debug device
->> using the zbd randwrite mode and the io_uring I/O engine of fio.
-> 
-> Of note about io_uring: if writes are submitted from multiple jobs to multiple
-> queues, then you will see unaligned write errors, but the same test with libaio
-> will work just fine. The reason is that io_uring fio engine IO submission only
-> adds write requests to the io rings, which will then be submitted by the kernel
-> ring handling later. But at that time, the ordering information is lost and if
-> the rings are processed in the wrong order, you'll get unaligned errors.
-> 
-> io_uring is thus unsafe for writes to zoned block devices. Trying to do
-> something about it has been on my to-do list for a while. Been too busy to do
-> anything yet. The best solution is of course zone append. If the user wants to
-> use regular writes, then it better tightly control its write IO issuing to be
-> QD=1 per zone itself as relying on zone write plugging will not be enough.
-> 
->> We've ever guaranteed ordering of multiple outstanding asynchronous user
->> writes on zoned block devices, so from that point of view a "failure" due
->> to write pointer violations when changing the test to use QD=2 is
->> entirely expected.
-> 
-> Not for libaio since the io_submit() call goes down to submit_bio(). So if the
-> issuer user application does the right synchronization (which fio does), libaio
-> is safe as we are guaranteed that the writes are placed in order in the zone
-> write plugs. As explained above, that is not the case with io_uring though.
+> Of note about io_uring: if writes are submitted from multiple jobs to
+> multiple queues, then you will see unaligned write errors, but the
+> same test with libaio will work just fine. The reason is that io_uring
+> fio engine IO submission only adds write requests to the io rings,
+> which will then be submitted by the kernel ring handling later. But at
+> that time, the ordering information is lost and if the rings are
+> processed in the wrong order, you'll get unaligned errors.
 
-Thanks Damien for having shared this information. After having switched
-to libaio, the higher queue depth test cases pass with Jens'
-block-for-next branch. See also 
-https://github.com/osandov/blktests/pull/156.
+Sorry, but this is woefully incorrect.
 
-Bart.
+Submissions are always in order, I suspect the main difference here is
+that some submissions would block, and that will certainly cause the
+effective issue point to be reordered, as the initial issue will get
+-EAGAIN. This isn't a problem on libaio as it simply blocks on
+submission instead. Because the actual issue is the same, and the kernel
+will absolutely see the submissions in order when io_uring_enter() is
+called, just like it would when io_submit() is called.
 
+If you stay within the queue limits of the device, then there should be
+no reordering. Unless the kernel side prevents non-blocking issues for
+some reason.
 
+It's either that, or something being broken with REQ_NOWAIT handling for
+zoned writes.
+
+-- 
+Jens Axboe
