@@ -1,62 +1,62 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6585E148850
-	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 19:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 971411F758B
+	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 19:58:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734465250; cv=none; b=YHE4E3ie4/ZY4jy9aYUvOAQ0swE5l6X3I6I0wiV1yuBDLouPPcyvAFvfULERQLeTOxMUPEUHZd3PDw2oP2tFWYGmChLyhkc52gV++jFmv0adW6Ul+c4YYoUSP8M5/PI59usgEgE5UJ4bbey5qsY3helmyIVl2tt/WoliMbmcSQY=
+	t=1734465495; cv=none; b=GvyOYbttHmIogzbEVoRFXo252d3nL8HzuoBcW+qtUVmyQ37wrOnQOqltk+ilU67ny7MJYqh53i93yUYZRy6nPH0Kj0rUIk3tVbT/pgoMI/Yh31u3PF1cO5+8Zxd3gbWCoDrZ0rMIPbxVhXwxdZv8bxIM3YfvCKR44DdYHRv8EtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734465250; c=relaxed/simple;
-	bh=vMTa5+jGV0JVXWX09IJE+JjobNEbCIpEcS+VrrdUlAs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fUvTAYc5vT+Mw3jUDovBxU8y1UrQFIDPqvpXWSUpvsx2x1cBA2EmY+QYsc/tFiluhVUDQ54i2+8PkjUBxq6Tad9uOlw+okkq98OehZ6p0P4IKrm6Cxba+y4Q1RcHAMsM8mzQfmVWg5w3sslVJDv3en+0LwucdBZfAQuJd2tkxbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=b8ZccOyi; arc=none smtp.client-ip=209.85.166.171
+	s=arc-20240116; t=1734465495; c=relaxed/simple;
+	bh=UnvBIXC3ldkNp7evp6fGMPhmh8+yi3fB7ajmH6+6BQQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=VIdnnULVZQ1a9gRXzPU0TZIAgo9aI73SB9Q2AzyI/fCXidPmV3YCqZ2rEbBWR1riLyo3tYQAdf6B3zn59KoKuW1ekbZM9xCOY3XfKf1qtWS5KujW20aBgRAU0y7H8QMpqOFRN4Q4+0+bb65m+yuesavyCz13Q+nuXOVWqeWgXg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xRWzzOn5; arc=none smtp.client-ip=209.85.166.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="b8ZccOyi"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a817ee9936so19972495ab.2
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 11:54:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xRWzzOn5"
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3a7e108b491so48527005ab.3
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 11:58:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734465246; x=1735070046; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Oyifk5tjkmf9aKwHSxll/tA2YWs3zT03FY2kaEC4gO8=;
-        b=b8ZccOyi2ZUoS4Aa7hyC/LCZ5dU41PkrMJsDY6LAmGA0GLXustEIE1sxt1k4JhuXqZ
-         1/IWar/ims2KUd8voqOqxguGuqyJug7j2PACDGneGV5rGn+ickUzfhs2RHDKqn78ZU8y
-         aOqbg4puVTZg5fdBbSarHLcWSaGuGAMcvXAFVGZHKoWTSkk3N9diI4UuWat5CVvqcPUu
-         zOj2lUK7wvvEiqWOm9/v5XJOaAQjuMcBFuS/CNBS9T/Q6TI2G23gZTHRyhL98KmwmNl1
-         6MeD6kl6VBT39rzWfi3iFV8Nx6kJJ2B7sG3X0EFGzgON5A+MrD1UDSoasNWzDltezk9E
-         r4sw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734465493; x=1735070293; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+tnT2q6KuOf3Nam94RIaXeeFc2nOYRoOvjzUKW8b+9o=;
+        b=xRWzzOn5d/6KXOMIq47JaQpCnfszkshxAzQ1KfCkU0g0cZu3KJ4iemfoLdyxzTlpvQ
+         cTo06Kj/RtII+zRsSeJq3v8jdJ4bVQdDjbj8hb1t47y4nJKHW06qLjKrU1cKtmyrBM1b
+         bF7iyaecM8E1EpoB90RdQmMbOM/WesjB0NxVlZX6pLQGOm8QWow6GNCN92URV8jiyvXX
+         Havc8zoUfwNBifmmZPCSRWLDguJ5wNc/iomKm4Rma7GnXi+fYznrvVvDJ4KmmfxYou3o
+         PegPg+ecIsglNFFFZf+tLKVCAB1euFTk04k//zByCuCqr0T20CRWToVOozuXa1dTTmsW
+         j9jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734465246; x=1735070046;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1734465493; x=1735070293;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Oyifk5tjkmf9aKwHSxll/tA2YWs3zT03FY2kaEC4gO8=;
-        b=r47yn6zX0mJXOs27G7Sx+Ve23hWuDTb9G6YBOAOQkiFKQb7elE+X065BDohvuLTUQ0
-         H05KOHifNfJo8c8EA2tXoxeTeUMTtnrj52U+abmLmQFAeducRDTIV1J9Xi1nmf66cdwm
-         vv37/eL9yIheOnnDUIasTS8xglc9YdBRvnthecP5/ccoexnHfi/GbmoTdTetR4o7bS5F
-         FwHdbmq4GQQcyOD0PesYtOOXuPQLoskrsjNYtKVrBVqcXyvvjtH3Irqjo4f1sEoalGM5
-         sRvRXdBt+lqRS7YwvCHOe7sAnpmCqffjcGhj0zmcRkhtXuwLw4fIvIXGYTAMD4q0bcbR
-         i33w==
-X-Gm-Message-State: AOJu0YzJNibB9fF5LqK0uLUH7meysaPWU4h5QeUEDdhgNcHXT1NR01tT
-	MuPwi/mP3bLa4SsGQBhhaogp8ZbN+5TcYZmrks+JylBtDqjbsbVFKq9ymljv1fc=
-X-Gm-Gg: ASbGnctZwm2hRs1NL3mXNogGI4U7ONjudpjznEFs4VQCQkn4ELMF8wYl4zorkftLkbo
-	Sd6+6T23LTiqs+MeuzpusJunYQauokLpG67+nOUgGJiz3Muk13oPxEx8BYQVI2X3dnggI3JgxGa
-	oBkLAq/2QbWD073qf+wHYWzU/n1QJYn6DjyJAeGIYaytad7WqPxCeZ97YGyDrHqrrEB5UPfVAfg
-	jG2BpTny0o8fF8Zb6ZPI/43qmr7pYxWUkw2rzUxUX95hUrvjyeD
-X-Google-Smtp-Source: AGHT+IFPV3kCoIzTrw9/NLWp82IP4Q/f6klD7mMqSoovshseW8f/tvu/Fkqj5FHHcYkHpn84KwY6Vg==
-X-Received: by 2002:a05:6e02:1fc9:b0:3a7:a29b:c181 with SMTP id e9e14a558f8ab-3bdc174e846mr2866145ab.13.1734465246546;
-        Tue, 17 Dec 2024 11:54:06 -0800 (PST)
+        bh=+tnT2q6KuOf3Nam94RIaXeeFc2nOYRoOvjzUKW8b+9o=;
+        b=UZBF1AyiJkKaxGcX3ozOiGhrqBk899TKbpNq/hX9Drw2EFLaLMiaaBi7QmnC2l2G81
+         Lu8Qmk6hLrqjz23uFvfeMoLBYcmFnG6hNQICz5SpJ66u/cHDzd18eZQFhV+Zo7YnAqE0
+         pTu0VzGwQ0VhQ8fNB4gMkVLfAfkHji5tYm8G9avYSslruMGnekGwSnEpq+/AW1SIDre/
+         AvaGMdG26nMwlpenPE/f5z+6Um0x5Ov7k2Sk41fJdmd1zVlVtGjFaIo+hLT4ZjAwB1A+
+         vz8FvmucDqp864a0ZlzZEqRQCKBSgOuj5s5M2PL9xpbGs5apPVfATT1fu3rnepIA7H6l
+         lmLQ==
+X-Gm-Message-State: AOJu0YxXVdeFbq06sJnTn9h9Tcggp+tVzbnUiHEGUWZjUqhcU/SUoWSm
+	io4BBs8mrmE+UCZ7nugALO0yaVSYIFvRwmjUtbu7aKqFsGpU8dD2REL+3FxvOy0=
+X-Gm-Gg: ASbGncv6GOvhx6pQ6IH4//CVxAEP6TaxUNyQNdWas9zhoTrp/P098z4QYTRQgWr7XB0
+	4SQDoYcVRrfO2fTHgDeM6mkvQ3PblJJFrW9eXeCKRcVpwVVwwQ0vXgv4msH23qqlV8GreIvGTBg
+	pZ7gLQomeyu5B/IDCohu5aBkdlOdZOvgsgyAKivOKFMlioTAW3uhLgwrdwiMbZtdu5hBBZ7Eqxw
+	Tm0oQWYizgyWmdw7MjpfQiQLipMoWeDkTGAHkseikVdpOhsJRI0
+X-Google-Smtp-Source: AGHT+IHTf2IGPqpm1ry8cilRlQcSbbBbsJpf/oWPzJS34G/Jk4VY4IjGJnspIcRDvESzbHJhBMrOHQ==
+X-Received: by 2002:a05:6e02:1d11:b0:3a7:6e97:9877 with SMTP id e9e14a558f8ab-3bdc5b99a46mr2713695ab.24.1734465492741;
+        Tue, 17 Dec 2024 11:58:12 -0800 (PST)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3b2475b010esm22724825ab.16.2024.12.17.11.54.05
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e5e378ceb9sm1810285173.136.2024.12.17.11.58.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Dec 2024 11:54:05 -0800 (PST)
-Message-ID: <e299e652-2904-417c-9f76-b7aec5fd066b@kernel.dk>
-Date: Tue, 17 Dec 2024 12:54:05 -0700
+        Tue, 17 Dec 2024 11:58:12 -0800 (PST)
+Message-ID: <fb292dc8-7092-45c1-ae8a-fca1d61c6c9a@kernel.dk>
+Date: Tue, 17 Dec 2024 12:58:11 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,6 +65,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: Zoned storage and BLK_STS_RESOURCE
+From: Jens Axboe <axboe@kernel.dk>
 To: Damien Le Moal <dlemoal@kernel.org>, Bart Van Assche
  <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>
 Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
@@ -81,74 +82,31 @@ References: <e75812ec-9b91-42d0-9ca5-d4bae031e319@acm.org>
  <5fb36d77-44cc-4ad7-8d64-b819bc7ae42a@kernel.org>
  <eb61f282-0e23-428a-8e6a-77c24cfd0e83@kernel.dk>
  <f41ffec1-9d05-47ed-bb0e-2c66136298b6@kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
+ <e299e652-2904-417c-9f76-b7aec5fd066b@kernel.dk>
 Content-Language: en-US
-In-Reply-To: <f41ffec1-9d05-47ed-bb0e-2c66136298b6@kernel.org>
+In-Reply-To: <e299e652-2904-417c-9f76-b7aec5fd066b@kernel.dk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/17/24 12:48 PM, Damien Le Moal wrote:
-> On 2024/12/17 11:41, Jens Axboe wrote:
->> On 12/17/24 12:37 PM, Damien Le Moal wrote:
->>> On 2024/12/17 11:33, Jens Axboe wrote:
->>>> On 12/17/24 12:28 PM, Damien Le Moal wrote:
->>>>> On 2024/12/17 11:25, Bart Van Assche wrote:
->>>>>> On 12/17/24 11:20 AM, Damien Le Moal wrote:
->>>>>>> For a simple fio "--zonemode=zbd --rw=randwrite --numjobs=X" for X > 1
->>>>>>
->>>>>> Please note that this e-mail thread started by discussing a testcase
->>>>>> with --numjobs=1.
->>>>>
->>>>> I missed that. Then io_uring should be fine and behave the same way as libaio.
->>>>> Since it seems to not be working, we may have a bug beyond the recently fixed
->>>>> REQ_NOWAIT handling I think. That needs to be looked at.
->>>>
->>>> Inflight collision, yes that's what I was getting at - there seems to be
->>>> another bug here, and misunderstandings on how io_uring works is causing
->>>> it to be ignored and/or not understood.
->>>
->>> OK. Will dig into this because I definitely do not fully understand where the
->>> issue is.
->>
->> As per earlier replies, it's either -EAGAIN being mishandled, OR it's
->> driving more IOs than the device supports. For the latter case, io_uring
->> will NOT block, but libaio will. This means that libaio will sit there
->> waiting on previous IO to complete, and then issue the next one.
->> io_uring will punt that IO to io-wq, and then all bets are off in terms
->> of ordering if you have multiple of these threads blocking on tags and
->> doing issues. The test case looks like it's freezing the queue, which
->> means you don't even need more than QD number of IOs inflight. When that
->> happens, guess what libaio does? That's right, it blocks waiting on the
->> queue, and io_uring will not block but rather punt those IOs to io-wq.
->> If you have QD=2, then you now have 2 threads doing IO submission, and
->> either of them could wake and submit before the other.
-> 
-> That sounds like a very good analysis :)
-> 
->> Like Christoph alluded to in his first reply, driving more than 1
->> request inflight is going to be trouble, potentially.
-> 
-> Yes. I think the confusion is with which "inflight" we are talking
-> about. Between the block layer and the device, zone write plugging
-> prevents more than 1 write per zone, so things are OK (modulo
-> bugs...). But between the application and the block layer, that is not
-> well managed and as your analysis above shows, bad things can happen.
-> I will look into it to see if we can do something sensible. If not, we
-> should at least warn the user, or just outright fail using io_uring
-> with zoned block devices to avoid bad surprises.
+On 12/17/24 12:54 PM, Jens Axboe wrote:
+> io_uring does support ordering writes - not because of zoning, but to
+> avoid buffered writes being spread over a bunch of threads and hence
+> just hammering the inode mutex rather than doing actual useful work. You
+> could potentially use that. Then all pending writes for that inode would
+> be ordered, even if punted to io-wq.
 
-The only reason it happens to work is because libaio is broken, and just
-blocks rather than be an actual async issue method. If the queue is
-frozen or you run out of tags, you'll just sleep, and hence preserve
-ordering. For anything that actually works the way it's supposed to, eg
-don't block on submit, yes you can run into trouble with having multiple
-IOs inflight. That seems like a no-brainer to me.
+See io_uring/io_uring.c:io_prep_async_work(), which is called when an IO
+is added for io-wq execution, io_wq_hash_work() makes sure it'll be
+ordered. However, this will still not work if you're driving beyond the
+limit of the device queue depth, or if you're doing IOs that may trigger
+-EAGAIN spuriously for -EAGAIN as you can still have two issuers - the
+task itself submitting IO, and the one io-wq worker tasked with doing
+blocking writes on this zoned device.
 
-io_uring does support ordering writes - not because of zoning, but to
-avoid buffered writes being spread over a bunch of threads and hence
-just hammering the inode mutex rather than doing actual useful work. You
-could potentially use that. Then all pending writes for that inode would
-be ordered, even if punted to io-wq.
+At the end of the day, expecting device side ordering and allowing > 1
+in QD will always be inherently broken for zoned devices imho. Just
+don't do that... If you allow that and expect ordering, you're always
+going to be chasing cases where it breaks.
 
 -- 
 Jens Axboe
