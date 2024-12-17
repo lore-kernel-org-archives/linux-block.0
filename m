@@ -1,215 +1,110 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294DDEEB2;
-	Tue, 17 Dec 2024 10:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6111EC014
+	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 10:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734429950; cv=none; b=Ma/SO0oDFA/jWszx4WbI02zNNzs6t56UW4WyHotuAZmA7VR471rAeYiY/iCVlxTzL/291QHoVCYqS50WKOv/qFpC41IVvQQ617eOqRZFtz4uNiE0G4gl7sxvozIBbXuSXFkFqBopy7etqTvLK24W9xkNxIQvW1gvD44TItEcTR0=
+	t=1734432813; cv=none; b=kTYe+TugzUrXp9lcAf+Sc9ZGIfMKM4posxEcjK2r8YnR9biA4Uiwk1POdaG4FVAOjX4gUGogqKQt5OilSaKJRBVqPbpEWZysttGyA+vGNQF4tHaiYcmrTFvb71QXHXLBsIme35twe3sh9zUJoWvz3TZuMupJBn4JTI6q3h9JSYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734429950; c=relaxed/simple;
-	bh=j1dyIoKVJtimQxhRxJCg8Dvp2eZVpJ9EKHcWkAZv/qk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E8ZNVeHTeVe3fsxViDy0JF4AZ75AYhnU9NCFukOEfYIDoDdBz1b/zy29VhB9KQ9etuV2zarzUqho8TFGiTGoZug6GPoE/uXF3KQABQ8hpOAQI/YGXjgbopLtUrqBcmjdOly98Pe+rW1W0X8PQMri8DZ5o8ApMoMhY4IFrNDX5es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vhqtP1oE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=AcM1u5LR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vhqtP1oE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=AcM1u5LR; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1734432813; c=relaxed/simple;
+	bh=A/aM+u9cBp0KR4NFJb/LlpGJ+AOLbCqCZ9EikrcXiNI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hOClWZjxrm4ZfrH9sQcGfmF0pB20MTE8I06Rjj8SW1fdeHXnOco8pvXdBwRiySadfK0J5SijUB7W/FULhjkbp0SG+45wPoCn+/RxQ8LU7AJgpQQg7tEedd/5S3CL4vnXhCtaBZQAjNzYIJEnfSMcn2elf+8B4H5al8BlPmgymcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=RuEIcyqL; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vhqtP1oE";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="AcM1u5LR";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vhqtP1oE";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="AcM1u5LR"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 19EDC1F392;
-	Tue, 17 Dec 2024 10:05:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1734429947; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8/6NS1ssR6spHYiu3y0Y1SnfsByi/sQPG7A7syHmwAI=;
-	b=vhqtP1oENdHaVHJtPBNZOLB8F8gGPgoX6XF9TP4fGrJSkvYFHxT4m3jSQnPqPHuFa6aswP
-	TgwEc4Ud4n+LPpF0h/vKRRESZW/Nuf89W/6fLQsIVBeEweAH6gtukXwlmJMMLvYagK4j3a
-	/ZhmSaz9uERbLrH2ULnxlK1YnoJec+Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1734429947;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8/6NS1ssR6spHYiu3y0Y1SnfsByi/sQPG7A7syHmwAI=;
-	b=AcM1u5LRYaa5tmevPECZZnduWTT4DHNLGNBXbF1r5Jp/ppnxucuDYYY/z8SRUdedowohd5
-	lUwJsq790dU+RADg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=vhqtP1oE;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=AcM1u5LR
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1734429947; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8/6NS1ssR6spHYiu3y0Y1SnfsByi/sQPG7A7syHmwAI=;
-	b=vhqtP1oENdHaVHJtPBNZOLB8F8gGPgoX6XF9TP4fGrJSkvYFHxT4m3jSQnPqPHuFa6aswP
-	TgwEc4Ud4n+LPpF0h/vKRRESZW/Nuf89W/6fLQsIVBeEweAH6gtukXwlmJMMLvYagK4j3a
-	/ZhmSaz9uERbLrH2ULnxlK1YnoJec+Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1734429947;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8/6NS1ssR6spHYiu3y0Y1SnfsByi/sQPG7A7syHmwAI=;
-	b=AcM1u5LRYaa5tmevPECZZnduWTT4DHNLGNBXbF1r5Jp/ppnxucuDYYY/z8SRUdedowohd5
-	lUwJsq790dU+RADg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6BD6A13A3C;
-	Tue, 17 Dec 2024 10:05:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id CdKzGPpMYWe0OwAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 17 Dec 2024 10:05:46 +0000
-Message-ID: <6053c010-a623-485d-89b7-de34f05a5c8a@suse.de>
-Date: Tue, 17 Dec 2024 11:05:45 +0100
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="RuEIcyqL"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43618283d48so37062655e9.1
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 02:53:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1734432808; x=1735037608; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=akvBumgmgr5EIX4fsmxm3FaGCKKx1kkyhh6tnIk6jL0=;
+        b=RuEIcyqLtXGY0Wia1+4OIYR4i6LOWGRFTaeKSVoZkVd7xBH/+zd0Qxd3IT7QuLo4rl
+         IJmelTW4mz/jLrYgwmTM8SNrchjJHvuJg8kGPcLojkpmAYbJQZyYogOnnxJxIYb9XAMv
+         5Jaqf2hU//XJs2uoDADybpCef7N4v0zDNeXhsbc5TADdwx122vjoP2VfsyOYue/5dxF+
+         Yt/bXYoXiopqFOE799RCVtcbsWkUGqjMaKdHO7IrGfWeOWP5j8auRh6GqzOsyVfrhjZq
+         6PGVh0jXKBJY9qFEqJz6A2cPOWviaIMNDX5wvmDYSfqOjr3Cb/aUqi8lqV1gnlTZ7kNu
+         44XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734432808; x=1735037608;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=akvBumgmgr5EIX4fsmxm3FaGCKKx1kkyhh6tnIk6jL0=;
+        b=FX8CexT1W3KNC9LMzEp5+gNm+sishssgwT99dLyCHZApkPG9Hyu80/dHUIKJ9ZbAn6
+         chL3cRHtrKo8M4VGWH06zbqE8QOxQZ/4NpsPv2CVTpOTgn94vwksWBlK9N1FFEPa98bI
+         WFspYl/tAwtNxfRDAwMlbh3g6mLuRO16LfNBc0njRO4ohu72W64uIo3qt4aQkQ7AkEAW
+         m2soSeolscKCBsfKwaevL/c/zhoosOKB2gwHf5SsFedCawXZ87XERTNwtXIRhOxbik8y
+         Q299d/Cndcct/fRm+AERYZKCtdDQ3mZWpA+k7dtxDwY5TeeeBtb1RtaDpZPNXTtfqzPb
+         E7eA==
+X-Forwarded-Encrypted: i=1; AJvYcCUp7/Vkz7CpZgqQHUJlFY/q6TBTJvwOkkTd9gKaNbgVzz4x4xku6nc+HDb5Dd05NclVVh2/i1HCIirEIg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yztwnk0mtgjIUrZv0EtQzoHevToZgcTZnyQM+SF7ebVDJtpX3ps
+	SBcALmhkIJWKCCcysgkIlNkfNqKt6QeDX2bBhqCAYWHcOYt3n+jOMuUJ0/8t8do=
+X-Gm-Gg: ASbGncu1Irtyh65S+mvs5O7DmSTYeogyhG/+qzLKK6iESOb0CjbnO4c5YT46u8J9UO8
+	rBghzbfNwDleJusrwwrtaijh3EPKM89owI8M/4bLH8XmL3BfqNvnnfOUT6ydhPdXGpE/faiQvD7
+	dAx3yuTXpHg7BjLLZIeLrMKbDFfqqm/aTZ1ucJOzHAzWzFcGEJRX3g8aNJsmy4wgiwwnRGqzCcf
+	DZeBhiHWkIPa4y0Aey0bq7RkgwfN3wAzVt+0Ka60MeWCjpOLG+hImTLSh4=
+X-Google-Smtp-Source: AGHT+IGp92CezacwNyyBgdqfZsg/E3xcoJ1kubOcalO3L3TCWN+rSaASKAUrZ56PuWjll0XGl+cLFg==
+X-Received: by 2002:a05:600c:1c95:b0:434:f2bf:1708 with SMTP id 5b1f17b1804b1-4364767f07cmr27712575e9.7.1734432808447;
+        Tue, 17 Dec 2024 02:53:28 -0800 (PST)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4363602cd11sm113466875e9.14.2024.12.17.02.53.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Dec 2024 02:53:28 -0800 (PST)
+Date: Tue, 17 Dec 2024 11:53:26 +0100
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Zijun Hu <zijun_hu@icloud.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
+	Jens Axboe <axboe@kernel.dk>, Boris Burkov <boris@bur.io>, Davidlohr Bueso <dave@stgolabs.net>, 
+	Jonathan Cameron <jonathan.cameron@huawei.com>, Dave Jiang <dave.jiang@intel.com>, 
+	Alison Schofield <alison.schofield@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Dan Williams <dan.j.williams@intel.com>, 
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-cxl@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v3 2/9] blk-cgroup: Fix class @block_class's subsystem
+ refcount leakage
+Message-ID: <xsq3bdzz2tbz64rlvmqrbjkjddiguvveuqo7rrozyyl6srrrsb@aclt6fr2qxvc>
+References: <20241212-class_fix-v3-0-04e20c4f0971@quicinc.com>
+ <20241212-class_fix-v3-2-04e20c4f0971@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v2 09/11] block/bdev: lift block size restrictions and use
- common definition
-To: Luis Chamberlain <mcgrof@kernel.org>, willy@infradead.org, hch@lst.de,
- dave@stgolabs.net, david@fromorbit.com, djwong@kernel.org
-Cc: john.g.garry@oracle.com, ritesh.list@gmail.com, kbusch@kernel.org,
- linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-mm@kvack.org, linux-block@vger.kernel.org, gost.dev@samsung.com,
- p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
-References: <20241214031050.1337920-1-mcgrof@kernel.org>
- <20241214031050.1337920-10-mcgrof@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20241214031050.1337920-10-mcgrof@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 19EDC1F392
-X-Spam-Score: -3.01
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[oracle.com,gmail.com,kernel.org,vger.kernel.org,kvack.org,samsung.com,pankajraghav.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="civnhrgjz2qrd32h"
+Content-Disposition: inline
+In-Reply-To: <20241212-class_fix-v3-2-04e20c4f0971@quicinc.com>
 
-On 12/14/24 04:10, Luis Chamberlain wrote:
-> We now can support blocksizes larger than PAGE_SIZE, so lift
-> the restriction up to the max supported page cache order and
-> just bake this into a common helper used by the block layer.
-> 
-> We bound ourselves to 64k as a sensible limit. The hard limit,
-> however is 1 << (PAGE_SHIFT + MAX_PAGECACHE_ORDER).
-> 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
->   block/bdev.c           |  5 ++---
->   include/linux/blkdev.h | 11 ++++++++++-
->   2 files changed, 12 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index 167d82b46781..b57dc4bff81b 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -157,8 +157,7 @@ int set_blocksize(struct file *file, int size)
->   	struct inode *inode = file->f_mapping->host;
->   	struct block_device *bdev = I_BDEV(inode);
->   
-> -	/* Size must be a power of two, and between 512 and PAGE_SIZE */
-> -	if (size > PAGE_SIZE || size < 512 || !is_power_of_2(size))
-> +	if (blk_validate_block_size(size))
->   		return -EINVAL;
->   
->   	/* Size cannot be smaller than the size supported by the device */
-> @@ -185,7 +184,7 @@ int sb_set_blocksize(struct super_block *sb, int size)
->   	if (set_blocksize(sb->s_bdev_file, size))
->   		return 0;
->   	/* If we get here, we know size is power of two
-> -	 * and it's value is between 512 and PAGE_SIZE */
-> +	 * and its value is larger than 512 */
->   	sb->s_blocksize = size;
->   	sb->s_blocksize_bits = blksize_bits(size);
->   	return sb->s_blocksize;
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 08a727b40816..a7303a55ed2a 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -269,10 +269,19 @@ static inline dev_t disk_devt(struct gendisk *disk)
->   	return MKDEV(disk->major, disk->first_minor);
->   }
->   
-> +#ifdef CONFIG_TRANSPARENT_HUGEPAGE
-> +/*
-> + * The hard limit is (1 << (PAGE_SHIFT + MAX_PAGECACHE_ORDER).
-As this is the hard limit, one wonders why we don't use it ...
-So please add a comment why we restrict it to 64k.
 
-> + */
-> +#define BLK_MAX_BLOCK_SIZE      (SZ_64K)
-> +#else
-> +#define BLK_MAX_BLOCK_SIZE      (PAGE_SIZE)
-> +#endif
-> +
->   /* blk_validate_limits() validates bsize, so drivers don't usually need to */
->   static inline int blk_validate_block_size(unsigned long bsize)
->   {
-> -	if (bsize < 512 || bsize > PAGE_SIZE || !is_power_of_2(bsize))
-> +	if (bsize < 512 || bsize > BLK_MAX_BLOCK_SIZE || !is_power_of_2(bsize))
->   		return -EINVAL;
->   
->   	return 0;
+--civnhrgjz2qrd32h
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Otherwise:
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+On Thu, Dec 12, 2024 at 09:38:38PM GMT, Zijun Hu <zijun_hu@icloud.com> wrot=
+e:
+>  block/blk-cgroup.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-Cheers,
+Well caught,
+Reviewed-by: Michal Koutn=FD <mkoutny@suse.com>
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+--civnhrgjz2qrd32h
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZ2FYJAAKCRAt3Wney77B
+SY6qAPwOR82VBxA4fcXuVjjlE50/+vko8njeFm9ZpNrkqTGBXgEAhl3ipTTb7Auy
+jtbygdF076YfrTkoHALOll+fPhlPtQI=
+=AXzW
+-----END PGP SIGNATURE-----
+
+--civnhrgjz2qrd32h--
