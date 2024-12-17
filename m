@@ -1,33 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA151586FE
-	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 19:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6F01F8EED
+	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 19:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734463242; cv=none; b=hGr7oTL4E1ygMbxl5wxhyYV6hkUay9GqP9EPqAaV0YzoP/xtR+PpQTD3a58/aZYloxlh5JhMGEtyZGl1xz+4myhuBUx3UTI+dfgh+NTnUHiHUvmB1QLI52MlcxqP3PklJTBkeA+dJOhTJY090Zd70crC9xy6klYlNPowlwhiglA=
+	t=1734463373; cv=none; b=d5ICXxrTwnye2m+hGy/dKLqecexH3HEs8y+iCsaXQOfMH6SO/cRPWU5aWmV6ldRGmakO7AXosS9e44HUuNxVYdxPBSCOq0rDIs4TOhXvGKlTCOwSJ/sG+wjFlVV1gIx55ciHFdgGwhVEsJgjsOBxVe0pVXX00s63Y4iBS0ipLGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734463242; c=relaxed/simple;
-	bh=gfZyNyUjnzWPQK0viZ96FTQ+tr1HhTN5RN1dDpo3I1U=;
+	s=arc-20240116; t=1734463373; c=relaxed/simple;
+	bh=CLFuq/nlRq01UQsE6qLFi0QZQN8a5QaQk7DJGb9zdhI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uIAEFvo50TtMjL8qKw8tEZuvTb+mVCK7W6K1KTT96i5ii+IExS8I4TFZ07oNSGvbKKS0GY4oCywfX7Ic6F3fg8msJAXScS4fG17MZZlO3oW4hZWAKPCpn/KbL3ER909Ouz2uAQ15eHXB1wptdvd2m7nPodkv72QAV211SJue0vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uUB+5SKJ; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=mhE9VtbMkoopryycdbEiqJdVf8Vwpu2s4729bHGIh1/hQOH0vvZE1OKEN6BIfCu2Nw9we+oxs23PR94dro9DiL/HjqA06ZEbIC4azNUO2uHm8lGaTbEUkaCssSa0yF2j3jt9n5ujk0DgzYTv4lN/Stv1hZl0D2VKLoHsYcTRz20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=d03tnq2/; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uUB+5SKJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37F4EC4CED3;
-	Tue, 17 Dec 2024 19:20:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734463242;
-	bh=gfZyNyUjnzWPQK0viZ96FTQ+tr1HhTN5RN1dDpo3I1U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uUB+5SKJOcsPwgH1NpyqBQ62IJbRduRbXhQ/SC+fNDCYNOlIto/yyGBxjz4Of4YCB
-	 IFRfYefaYC6p/1jmaHs9jNfPFDE+C7F/BVC2TwktDnPx9R3B8VEqtBXMS0rXxp9bkn
-	 dyX0H2RIvqHrsBLKnN3EfGXg98PBzhPkC5QksXXDq4dGRTefDl9anOjy9lBr340Pqa
-	 TB3mS+RPMCfz84DmJy4Uo217LECDkau1+i1RcVn04xXY55SxtS+yKehAd0FxwxSeba
-	 JABUXwIKcLrSAzyYgJ1XrGT3MfE0qix24ZJtFyWQngsZ6LCxoPWaGDyBXouiBNwKDe
-	 WSp+My5DPtKjw==
-Message-ID: <3eb6ba65-daf8-4d8f-a37f-61bea129b165@kernel.org>
-Date: Tue, 17 Dec 2024 11:20:41 -0800
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="d03tnq2/"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YCRXq4TnYzlff0M;
+	Tue, 17 Dec 2024 19:22:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1734463369; x=1737055370; bh=dEwKEx2tG7+1TCzKnZgOqZHR
+	Tp7Bw8qb6XDKb5vr+xM=; b=d03tnq2/zI6Dx5mmjPOsAqmuouRbfm0oyBSuX2tX
+	019AcsRzfI8s4YoWBLNodgyZDIZJHPLrFVSpjxtGN3TxrednJCFoK8CDEVGDNrg1
+	TEDG0qixb+DmjN7CVrThsO4yJRrA9EPAq821or3klGi7qQ0HuGc/GNudmZNrLJKv
+	iTywq+4UY3kP/ab91ZJDF9QSolWkIfKpbNfp6nfGkOPz6z9c+I3/ieCjAYX/atWl
+	QmgndFqNvqgp1M5GZPBX8vL2JVi70t36uR0uyCEdtAvvOEIKkE51d+FYbcHLIXgt
+	y1hESna9+zoRDsIWtn6EeuUqw0nQHegjViyCPp3QJMOlKQ==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 71d9ba3vIlmf; Tue, 17 Dec 2024 19:22:49 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YCRXm6hCwzlff02;
+	Tue, 17 Dec 2024 19:22:48 +0000 (UTC)
+Message-ID: <d655783d-185e-4ecc-aea9-875789cfa9b4@acm.org>
+Date: Tue, 17 Dec 2024 11:22:47 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,82 +50,38 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Zoned storage and BLK_STS_RESOURCE
-To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- Bart Van Assche <bvanassche@acm.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <e75812ec-9b91-42d0-9ca5-d4bae031e319@acm.org>
- <20241217041515.GA15100@lst.de>
- <b8af6e10-6a00-4553-9a8c-32d5d0301082@kernel.org>
- <bf847491-e18a-4685-8fa2-66e31c41f8e8@kernel.dk>
- <79a93f9d-12e1-4aed-8d6c-f475cdcd6aab@kernel.org>
- <96e900ed-4984-4fbe-a74d-06a15fd7f3f7@kernel.dk>
+Subject: Re: [PATCH 1/2] block: Optimize blk_mq_submit_bio() for the cache hit
+ scenario
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Damien Le Moal <dlemoal@kernel.org>
+References: <20241216201901.2670237-1-bvanassche@acm.org>
+ <20241216201901.2670237-2-bvanassche@acm.org> <20241217041647.GA15286@lst.de>
 Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <96e900ed-4984-4fbe-a74d-06a15fd7f3f7@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20241217041647.GA15286@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2024/12/17 11:07, Jens Axboe wrote:
-> On 12/17/24 11:51 AM, Damien Le Moal wrote:
->> On 2024/12/17 10:46, Jens Axboe wrote:
->>>> Of note about io_uring: if writes are submitted from multiple jobs to
->>>> multiple queues, then you will see unaligned write errors, but the
->>>> same test with libaio will work just fine. The reason is that io_uring
->>>> fio engine IO submission only adds write requests to the io rings,
->>>> which will then be submitted by the kernel ring handling later. But at
->>>> that time, the ordering information is lost and if the rings are
->>>> processed in the wrong order, you'll get unaligned errors.
->>>
->>> Sorry, but this is woefully incorrect.
->>>
->>> Submissions are always in order, I suspect the main difference here is
->>> that some submissions would block, and that will certainly cause the
->>> effective issue point to be reordered, as the initial issue will get
->>> -EAGAIN. This isn't a problem on libaio as it simply blocks on
->>> submission instead. Because the actual issue is the same, and the kernel
->>> will absolutely see the submissions in order when io_uring_enter() is
->>> called, just like it would when io_submit() is called.
->>
->> I did not mean to say that the processing of requests in each
->> queue/ring is done out of order. They are not. What I meant to say is
->> that multiple queues/rings may be processed in parallel, so if
->> sequential writes are submitted to different queues, the BIOs for
->> these write IOs may endup being issued out of order to the zone. Is
->> that an incorrect assumption ? Reading the io_uring code, I think
->> there is one work item per ring and these are not synchronized.
+On 12/16/24 8:16 PM, Christoph Hellwig wrote:
+> On Mon, Dec 16, 2024 at 12:19:00PM -0800, Bart Van Assche wrote:
+>> Help the CPU branch predictor in case of a cache hit by handling the cache
+>> hit scenario first.
 > 
-> Sure, if you have multiple rings, there's no synchronization between
-> them. Within each ring, reordering in terms of issue can only happen if
-> the target response with -EAGAIN to a REQ_NOWAIT request, as they are
-> always issued in order. If that doesn't happen, there should be no
-> difference to what the issue looks like with multiple rings or contexts
-> for io_uring or libaio - any kind of ordering could be observed.
+> Numbers, please.
 
-Yes. The fixes that went into rc3 addressed the REQ_NOWAIT issue. So we are good
-on this front.
+For a single CPU core and with the brd driver and fio and the io_uring
+I/O engine, I see the following performance in a VM (three test runs for
+each test case):
 
-> Unsure of which queues you are talking about here, are these the block
-> level queues?
+Without this patch:      1619K, 1641K, 1638K IOPS or 1633 K +/- 10 K.
+With this patch applied: 1650K, 1633K, 1635K IOPS or 1639 K +/-  8 K.
 
-My bad. I was talking about the io_uring rings. Not the block layer queues.
+So there is a small performance improvement but the improvement is
+smaller than the measurement error. Is this sufficient data to proceed
+with this patch?
 
-> And ditto on the io_uring question, which work items are we talking
-> about? There can be any number of requests for any given ring, inflight.
+Thanks,
 
-I was talking about the work that gets IOs submitted by the user from the rings
-and turn them into BIOs for submission. My understanding is that these are not
-synchronized. For a simple fio "--zonemode=zbd --rw=randwrite --numjobs=X" for X
-> 1, the fio level synchronization will serialize the calls to io_submit() for
-libaio, thus delivering the BIOs to a zone in order in the kernel. With io_uring
-as the I/O engine, the same fio level synchronization happens but is only around
-the IO getting in the ring. The IOs being turned into BIOs and submitted will be
-done outside of the fio serialization and can thus can endup being issued out of
-order if multiple rings are used. At least, that is my understanding of
-io_uring... Am I getting this wrong ?
+Bart.
 
-
--- 
-Damien Le Moal
-Western Digital Research
