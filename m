@@ -1,33 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A555150994
-	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 20:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362DB1F9F44;
+	Tue, 17 Dec 2024 21:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734469141; cv=none; b=OqjnnpJPyEvbHOwY44pdAsSGz7L26rENmUxKcB6sCyw+lStNuIcAuLxH/VOkhmAnLQPDVep+ThGJ+79XqrJWzpE2Dn6LpxetzeMF57P/UF5mxgcDvsq2Uk/FobsRFpU6ZdaL8KfSUgXVrkA+ImoB35CzHFL+vruXrqKEuIXUV8A=
+	t=1734469244; cv=none; b=uXaIJFAzHJ4daQVlvmr/cRwYLS8W8P3K3EB2J2770MJ/63VJygd3U2rNv9LtDyaIe982BxkAVWdwmjagZ6zUOpatBsRtlLz3+UowdPkUQROHJUt5KqMa2qM+cPdRpauz0QcUM+79jAd50HYGGlfRNi2gt3VCDpptOwc+ISCUz2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734469141; c=relaxed/simple;
-	bh=iz/aHwsVP+p2eoJcXgPpPR95H1xcXMbLEFnsNbZJHxI=;
+	s=arc-20240116; t=1734469244; c=relaxed/simple;
+	bh=wHSJk7+FHuZRJv7x/7v1vpPWsIMv2AxP6jZhoIxoF34=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hi7OZU/1lbDqGsq8ye4SPnSc1+cXrr0w3L9FuVCe7G+B9HwrB7Szx9zawSiANqFVgnI9gHFx8wDPiMXCQiO+XjxTmuuT4tGzlMg5TzBrnAf0SMwr0GQyiS+gyCE9Gegbgspfw4LlPMW+VzxwUuMqekrHaEpDQUk1F9DQVEDMD4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dvpS5WAU; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=Bqe1eXESYpLYZPI4xC66gRDMTGd8nmmIQmUeOeHgxWz9osIW2TVQMoQ1SuiIxmNYg7wRdhi0/RUoKJBuBCfi3umY9BY/EPkzV9cigi8qTL+4PWY7yYopqF6MxbTm/jRUfZptJR9RKDsrx2sCmIbv41wWa217aHsgaTqDL7zxpq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=xMsxShaM; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dvpS5WAU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCC61C4CED3;
-	Tue, 17 Dec 2024 20:59:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734469141;
-	bh=iz/aHwsVP+p2eoJcXgPpPR95H1xcXMbLEFnsNbZJHxI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dvpS5WAUa+sHcTIXzEntgMnRIFNlZ0IjaK7SgAioTaNhmf3ZJ7+8PlNmAexY4az3Z
-	 X84De1Zw3HFIDflQc8xx9WRsVUjGInQx89JdxX36DdeEB71mWXM1dg8Wj9mr5avKOJ
-	 qJJbLefG5Sm3FWYM+rB2Iealrn1mZ6eQTri0p4CNrgWulbJ7xbQdqc7Uoap5sNj91s
-	 /091KHSQ4w1zN6nj774Nh+atTV/O3TtrMOm+ZBjZuBmjJ80CbCGnaCcJkBc2WwmkhO
-	 2EzRB1W+2TLXlvaGVNzM1xfuJbQ/ePC//NeHJ0wGr12tNpGK8nOaVGrzwngQexaYkK
-	 8+2maLlS0ZSFg==
-Message-ID: <9e8e2410-53b5-4dad-8b54-b7e72647703b@kernel.org>
-Date: Tue, 17 Dec 2024 12:59:00 -0800
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="xMsxShaM"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YCTjk2KGPz6ClY9B;
+	Tue, 17 Dec 2024 21:00:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1734469234; x=1737061235; bh=yzGOi3NneZYR9bDxI9UvolmG
+	dtoJM/NJwZQblAerzBw=; b=xMsxShaMUHaL8dRP4HYD6O66fFleU39uHO+HIuCD
+	GQ5jN4D1DZysGFmgqmPeiaGjpi8kwNKj0tpW6ZjU7SZ7f0RMNvYxDtnIr0RV9VjO
+	yeagNhzqgBBcZzEMMCcz0MTL2mNcKczlvbuwaXZJp6O6kjK2l+wEEC6l8lGydl8K
+	x6UXJovpiGP6PuuKldfeS4jIY9kmcruq9UnGDf/aGvk2vymwSZptfURnVYlVyAGC
+	6jxONNxHNQKL8T265JNhVfSwbwT0tKLoBmbVsSSwa1b0icoyI3sY65XbuQx94ZHe
+	op93Kjghvd2xrWGjy/sVnbD5mgU/PTo/zFFpF0WfkfYCvQ==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id aFjAikwuH6uN; Tue, 17 Dec 2024 21:00:34 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YCTjT2220z6ClY97;
+	Tue, 17 Dec 2024 21:00:28 +0000 (UTC)
+Message-ID: <df925ada-24a0-4f69-bb46-4f2b7b94217b@acm.org>
+Date: Tue, 17 Dec 2024 13:00:27 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,52 +50,39 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Zoned storage and BLK_STS_RESOURCE
-To: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
- Christoph Hellwig <hch@lst.de>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <e75812ec-9b91-42d0-9ca5-d4bae031e319@acm.org>
- <20241217041515.GA15100@lst.de>
- <b8af6e10-6a00-4553-9a8c-32d5d0301082@kernel.org>
- <bf847491-e18a-4685-8fa2-66e31c41f8e8@kernel.dk>
- <79a93f9d-12e1-4aed-8d6c-f475cdcd6aab@kernel.org>
- <96e900ed-4984-4fbe-a74d-06a15fd7f3f7@kernel.dk>
- <3eb6ba65-daf8-4d8f-a37f-61bea129b165@kernel.org>
- <63aae174-a478-48ea-8a74-ab348e21ab65@acm.org>
- <83bfb006-0a7d-4ce0-8a94-01590fb3bbbb@kernel.org>
- <548e98ee-b46e-476a-9d4a-05a60c78b068@kernel.dk>
- <5fb36d77-44cc-4ad7-8d64-b819bc7ae42a@kernel.org>
- <eb61f282-0e23-428a-8e6a-77c24cfd0e83@kernel.dk>
- <f41ffec1-9d05-47ed-bb0e-2c66136298b6@kernel.org>
- <e299e652-2904-417c-9f76-b7aec5fd066b@kernel.dk>
- <fb292dc8-7092-45c1-ae8a-fca1d61c6c9a@kernel.dk>
+Subject: Re: [RFC v2 09/11] block/bdev: lift block size restrictions and use
+ common definition
+To: Luis Chamberlain <mcgrof@kernel.org>, willy@infradead.org, hch@lst.de,
+ hare@suse.de, dave@stgolabs.net, david@fromorbit.com, djwong@kernel.org
+Cc: john.g.garry@oracle.com, ritesh.list@gmail.com, kbusch@kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-mm@kvack.org, linux-block@vger.kernel.org, gost.dev@samsung.com,
+ p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
+References: <20241214031050.1337920-1-mcgrof@kernel.org>
+ <20241214031050.1337920-10-mcgrof@kernel.org>
 Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <fb292dc8-7092-45c1-ae8a-fca1d61c6c9a@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20241214031050.1337920-10-mcgrof@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2024/12/17 11:58, Jens Axboe wrote:
-> On 12/17/24 12:54 PM, Jens Axboe wrote:
->> io_uring does support ordering writes - not because of zoning, but to
->> avoid buffered writes being spread over a bunch of threads and hence
->> just hammering the inode mutex rather than doing actual useful work. You
->> could potentially use that. Then all pending writes for that inode would
->> be ordered, even if punted to io-wq.
-> 
-> See io_uring/io_uring.c:io_prep_async_work(), which is called when an IO
-> is added for io-wq execution, io_wq_hash_work() makes sure it'll be
-> ordered. However, this will still not work if you're driving beyond the
-> limit of the device queue depth, or if you're doing IOs that may trigger
-> -EAGAIN spuriously for -EAGAIN as you can still have two issuers - the
-> task itself submitting IO, and the one io-wq worker tasked with doing
-> blocking writes on this zoned device.
+On 12/13/24 7:10 PM, Luis Chamberlain wrote:
+> +#ifdef CONFIG_TRANSPARENT_HUGEPAGE
+> +/*
+> + * The hard limit is (1 << (PAGE_SHIFT + MAX_PAGECACHE_ORDER).
+> + */
 
-Thanks for the pointer. Will have a look. It may be as simple as always using
-the io-wq worker for zone writes and have these ordered (__WQ_ORDERED). Maybe.
+A closing parenthesis is missing from the above comment.
 
+> +#define BLK_MAX_BLOCK_SIZE      (SZ_64K)
+> +#else
+> +#define BLK_MAX_BLOCK_SIZE      (PAGE_SIZE)
+> +#endif
 
--- 
-Damien Le Moal
-Western Digital Research
+Parentheses are never necessary around constants since the definition of
+the constant should include parenthesis if necessary.
+
+Thanks,
+
+Bart.
+
