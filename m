@@ -1,151 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAE21FAC53;
-	Tue, 17 Dec 2024 18:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830ED158DD1
+	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 18:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734460206; cv=none; b=KYk/yTpEXcpA8q37MdzzpRbXYIji01CuoABEy0omzoDgpemrSlK9n1sU/HqZG7pYwiks09Ailcu0zLek1gbYpam3ZkrnPGUj+9Oj+pvo9nLnsUqll01NYZIkEefbROlyvdlHXnSNA1tzyF1oMefmTjB6BKdFdOI5M+V4+tV4yyk=
+	t=1734460750; cv=none; b=Lhu4R73jAsY/5tWOHvLuku1f57RqmixAfag/vDKKNP+vafz+ddXJ8HxtdcGlDUJPxxfhNP/K5D9QLmU+vmkZKJR5dXbk2x91ngWLUd84GptOEy9w2LXOXP/95hJtQ0TLXSY62Kri4t/yqNlfFT94PF7Rd5wAqq5efqUSf/l5jT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734460206; c=relaxed/simple;
-	bh=6NgFV7+SLJHkzCci3gNbm7cBYHWTyZIkNamwDIlbLeY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Bj6HiztUGL39yxOUV/zzs8LHw7kcroQFEP5yfrXmmVy+nwmnyZ/+4M9TpiJ3a0W0cY1QmPrtBQWlqpb43catXnn5MPco1XktayKkFMdmuL8F7UAqY1gQ9wU5l3IZaRqyDbKR39rKyGIlQ0qj3Fb5jSel4PlrHIpuO7/9xQSkVZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s6Kv27+R; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734460750; c=relaxed/simple;
+	bh=JQHscseQBbHQQnhOAR2H7xIfOOxihelK2lbYNTZ16I0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nir3FrL+grQXqsHOOwIGvO9GYNBwxvM8H3Yob2HnPuS58NBQImahHpOR7iqghIEmD6GC6YKKGtkIb/7P0j8lwad1H/B60WZvqc5i44hA8K0ECIvMKFkv6fva2NceYgeud2mF7/ba4eC8ZwAyNKvN2X44u839fkSoO+/n1C6jOH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=IBULp8z/; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s6Kv27+R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEEDBC4CED7;
-	Tue, 17 Dec 2024 18:30:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734460206;
-	bh=6NgFV7+SLJHkzCci3gNbm7cBYHWTyZIkNamwDIlbLeY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=s6Kv27+RnXSPrl2jQCg0fkmNWjHVSiB/hAypqxFY66hSV7caMFNcFSK9tefnE2j9D
-	 4VbA1/GbM9ZVKy8tWqx699sdcqv9NCX8Pbgz/cDonCQ1O4uhOltf/ng8vOftMg8qLI
-	 lmxKzV9+CUUzhx85La7dhEaQgYdecAI5Ogz0N/F6chL7REarIP7YADQY4s+x45YeFH
-	 vV5ptlSjGSqA+RYyXOk99DPYju/HT35KkViwL5WI2VvpjJK6uNHYY5ZLa1KLPSUkk7
-	 xMfjlLKxelpJ/H5zZtseSfB/nl/OowQ7AE/vSLMPBeemE+TXvoPmt90w9y20mhLuQh
-	 bglrtOGwWgJRA==
-From: Daniel Wagner <wagi@kernel.org>
-Date: Tue, 17 Dec 2024 19:29:43 +0100
-Subject: [PATCH v4 9/9] blk-mq: issue warning when offlining hctx with
- online isolcpus
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="IBULp8z/"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YCQZG2lSWzlff0M;
+	Tue, 17 Dec 2024 18:39:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1734460740; x=1737052741; bh=pXz3jsV+/MlbXz5KyAtbEoMm
+	B3nF1NuMMgw3l6s/oTc=; b=IBULp8z/69ns/LNh90sX70IlFNGqgXPgGFYxcJOC
+	HNx9o0K5H/ndRPV8jz6Pd1czE6XSYNp0esNzI0WLAo70l39nuJR/hY5dcEN1NTn/
+	Fn/oGHyxZ/sETbxV66Iqv+Y0CStGBPItLACWFQwJ9biy90WOzg52tOfwJdxuyHlw
+	99VHIPuUVxeAJMIHctayMr/dUL4R69udWmGizVTiUupaKbfLIrVh1WrdsdGt4tsn
+	CT+XRIFe4yvbERNqSje92OQWLFDGHsH7cIY9d2gxU7Hr2nPGeTsoV26WBWcvWvlz
+	ufEBT+hXRXATcaLA7yfTejCrzn9b3cJlmM2ROk36ax+F0Q==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 7FiZOU2eVJxX; Tue, 17 Dec 2024 18:39:00 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YCQZC64RDzlff0K;
+	Tue, 17 Dec 2024 18:38:59 +0000 (UTC)
+Message-ID: <edd45063-f6ea-4315-8ae6-d9d8d73ff37d@acm.org>
+Date: Tue, 17 Dec 2024 10:38:58 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: Zoned storage and BLK_STS_RESOURCE
+To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <e75812ec-9b91-42d0-9ca5-d4bae031e319@acm.org>
+ <20241217041515.GA15100@lst.de>
+ <b8af6e10-6a00-4553-9a8c-32d5d0301082@kernel.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <b8af6e10-6a00-4553-9a8c-32d5d0301082@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241217-isolcpus-io-queues-v4-9-5d355fbb1e14@kernel.org>
-References: <20241217-isolcpus-io-queues-v4-0-5d355fbb1e14@kernel.org>
-In-Reply-To: <20241217-isolcpus-io-queues-v4-0-5d355fbb1e14@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, 
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
- Kashyap Desai <kashyap.desai@broadcom.com>, 
- Sumit Saxena <sumit.saxena@broadcom.com>, 
- Shivasharan S <shivasharan.srikanteshwara@broadcom.com>, 
- Chandrakanth patil <chandrakanth.patil@broadcom.com>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Nilesh Javali <njavali@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com, 
- Don Brace <don.brace@microchip.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
- Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Andrew Morton <akpm@linux-foundation.org>, 
- Thomas Gleixner <tglx@linutronix.de>
-Cc: Costa Shulyupin <costa.shul@redhat.com>, 
- Juri Lelli <juri.lelli@redhat.com>, 
- Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, 
- Ming Lei <ming.lei@redhat.com>, 
- =?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
- Frederic Weisbecker <frederic@kernel.org>, Mel Gorman <mgorman@suse.de>, 
- Hannes Reinecke <hare@suse.de>, 
- Sridhar Balaraman <sbalaraman@parallelwireless.com>, 
- "brookxu.cn" <brookxu.cn@gmail.com>, linux-kernel@vger.kernel.org, 
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, 
- storagedev@microchip.com, virtualization@lists.linux.dev, 
- Daniel Wagner <wagi@kernel.org>
-X-Mailer: b4 0.14.2
 
-When we offlining a hardware context which also serves isolcpus mapped
-to it, any IO issued by the isolcpus will stall as there is nothing
-which handles the interrupts etc.
+On 12/17/24 7:04 AM, Damien Le Moal wrote:
+> On 2024/12/16 20:15, Christoph Hellwig wrote:
+>> On Mon, Dec 16, 2024 at 11:24:24AM -0800, Bart Van Assche wrote:
+>>>
+>>> Hi Damien,
+>>>
+>>> If 'qd=1' is changed into 'qd=2' in tests/zbd/012 then this test fails
+>>> against all kernel versions I tried, including kernel version 6.9. Do
+>>> you agree that this test should pass?
+>>
+>> That test case is not very well documented and you're not explaining
+>> how it fails.
+>>
+>> As far as I can tell the test uses fio to write to a SCSI debug device
+>> using the zbd randwrite mode and the io_uring I/O engine of fio.
+> 
+> Of note about io_uring: if writes are submitted from multiple jobs to multiple
+> queues, then you will see unaligned write errors, but the same test with libaio
+> will work just fine. The reason is that io_uring fio engine IO submission only
+> adds write requests to the io rings, which will then be submitted by the kernel
+> ring handling later. But at that time, the ordering information is lost and if
+> the rings are processed in the wrong order, you'll get unaligned errors.
+> 
+> io_uring is thus unsafe for writes to zoned block devices. Trying to do
+> something about it has been on my to-do list for a while. Been too busy to do
+> anything yet. The best solution is of course zone append. If the user wants to
+> use regular writes, then it better tightly control its write IO issuing to be
+> QD=1 per zone itself as relying on zone write plugging will not be enough.
+> 
+>> We've ever guaranteed ordering of multiple outstanding asynchronous user
+>> writes on zoned block devices, so from that point of view a "failure" due
+>> to write pointer violations when changing the test to use QD=2 is
+>> entirely expected.
+> 
+> Not for libaio since the io_submit() call goes down to submit_bio(). So if the
+> issuer user application does the right synchronization (which fio does), libaio
+> is safe as we are guaranteed that the writes are placed in order in the zone
+> write plugs. As explained above, that is not the case with io_uring though.
 
-This configuration/setup is not supported at this point thus just issue
-a warning.
+Thanks Damien for having shared this information. After having switched
+to libaio, the higher queue depth test cases pass with Jens'
+block-for-next branch. See also 
+https://github.com/osandov/blktests/pull/156.
 
-Signed-off-by: Daniel Wagner <wagi@kernel.org>
----
- block/blk-mq.c | 43 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 42 insertions(+), 1 deletion(-)
+Bart.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index de15c0c76f874a2a863b05a23e0f3dba20cb6488..f9af0f5dd6aac8da855777acf2ffc61128f15a74 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3619,6 +3619,45 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
- 	return data.has_rq;
- }
- 
-+static void blk_mq_hctx_check_isolcpus_online(struct blk_mq_hw_ctx *hctx, unsigned int cpu)
-+{
-+	const struct cpumask *hk_mask;
-+	int i;
-+
-+	if (!housekeeping_enabled(HK_TYPE_MANAGED_IRQ))
-+		return;
-+
-+	hk_mask = housekeeping_cpumask(HK_TYPE_MANAGED_IRQ);
-+
-+	for (i = 0; i < hctx->nr_ctx; i++) {
-+		struct blk_mq_ctx *ctx = hctx->ctxs[i];
-+
-+		if (ctx->cpu == cpu)
-+			continue;
-+
-+		/*
-+		 * Check if this context has at least one online
-+		 * housekeeping CPU in this case the hardware context is
-+		 * usable.
-+		 */
-+		if (cpumask_test_cpu(ctx->cpu, hk_mask) &&
-+		    cpu_online(ctx->cpu))
-+			break;
-+
-+		/*
-+		 * The context doesn't have any online housekeeping CPUs
-+		 * but there might be an online isolated CPU mapped to
-+		 * it.
-+		 */
-+		if (cpu_is_offline(ctx->cpu))
-+			continue;
-+
-+		pr_warn("%s: offlining hctx%d but there is still an online isolcpu CPU %d mapped to it, IO stalls expected\n",
-+			hctx->queue->disk->disk_name,
-+			hctx->queue_num, ctx->cpu);
-+	}
-+}
-+
- static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
- 		unsigned int this_cpu)
- {
-@@ -3638,8 +3677,10 @@ static bool blk_mq_hctx_has_online_cpu(struct blk_mq_hw_ctx *hctx,
- 			continue;
- 
- 		/* this hctx has at least one online CPU */
--		if (this_cpu != cpu)
-+		if (this_cpu != cpu) {
-+			blk_mq_hctx_check_isolcpus_online(hctx, this_cpu);
- 			return true;
-+		}
- 	}
- 
- 	return false;
-
--- 
-2.47.1
 
