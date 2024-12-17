@@ -1,128 +1,206 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BACE84D3E
-	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 02:12:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9EB84E1C;
+	Tue, 17 Dec 2024 02:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734401566; cv=none; b=FzBQ+/MjUN4DoPZpc0Xa8R39bqAk11+w2qSx+jFBmhFo8g1kCt9oItRfyVguAfnyg+cVXVT5WmOzk6SJL34VKcK/6rJApGNheNUYgus2BFB/mkxdhYxO8Re8YXlacnBa3igpkD+9smL53uwke6+XXHn+HMsH2sRuezYjpHFaMoI=
+	t=1734403475; cv=none; b=ey6Ks335GhyyDeKh7hxsIgLiWtOWYapdzBdclSN1VuC3jtWNz3Mge1auM4MNZryvEWI/XUMCaf2mYKYswJhPyUVLWdvXHOSB/j9weOaDKQMeIUQ/HlPyTep5xmKF7RtN5WfRHp3ElxDpixb5bQjNrwq/OYmHU8mTAmJPMbBsyLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734401566; c=relaxed/simple;
-	bh=yLTlIFC32POHxZiPY9cw5QEBfX1gSNNQz6nVW4ixP5A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EpeULAlrYlew85Tx4fy5R/eXgvoSjhpKBI7kjW8jHf6b+6W7Y+K2/129VmmcYftTF2xRmg8nXbZMDVBkDTOVSU637mc+guWSvbD4bNJJPcWNgX2EMmbBYPuGxL/eED3P6mAVr3AdJ0zM3b0uwCZgWg3uGBX5HCj7sSbAc3Ixrd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ae6+Y59R; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ae6+Y59R"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734401564;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lx1OsaaoolFeL7wbx64aXWvFu5/zVMeLGy2oXijyrkI=;
-	b=ae6+Y59R3k51Y0Rl0RWdOQt7FVU4XnuC6y1uMpPGKv7i1oR54XW84OTMiTDcifhPDxlq97
-	fROxBoBeS1FFUe9R3UMKibXa6Khr1IrSxTArFQiU6G1uu5Mw/lkVhi7woLmiNskUje+ZQ/
-	7c28ZoXiCnb/ZvRBcQ1F4kENvpFa4bc=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-621-uObgL6jCNWCNnTioLO4P5g-1; Mon, 16 Dec 2024 21:12:43 -0500
-X-MC-Unique: uObgL6jCNWCNnTioLO4P5g-1
-X-Mimecast-MFC-AGG-ID: uObgL6jCNWCNnTioLO4P5g
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2ef7fbd99a6so4238971a91.1
-        for <linux-block@vger.kernel.org>; Mon, 16 Dec 2024 18:12:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734401561; x=1735006361;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lx1OsaaoolFeL7wbx64aXWvFu5/zVMeLGy2oXijyrkI=;
-        b=vvroLwVmj3rOpLY9Z1sUN1PDttLrfmMfeXYU6jMEaAoO5AnytImHOgLuwBRVT4Z9/f
-         UEm+56c/Qib7xgLEQ/h7s7dYVkvw28eZhfI9nEw+FgJ0GmFyj27KsjMqpGZloGn1Pj0k
-         f8oTyx7w6RmsYJueH2D60FQFo2kn9kPdpt10HvPo22nzMdxv4hV/ZEtNbVVTh/VKgbFE
-         dQ++lP4Rg/LZdJLPNWQbGiWkCiwm81A/lShTK13JCQLYr5A5z2ed1jW0xRlQzH6kiDxx
-         n1kOq6rkyw708vMfAkeoQRB5Uagx8i3W0TsSJHD5nTAWH5v22rV9uSUOCxQ0KFpRNcPZ
-         SwJA==
-X-Forwarded-Encrypted: i=1; AJvYcCWgf7/9e7FL+GkgGmrDBZ7ey/oIrRN0TVIs8KuL5uU65qnU1BCLeyj1ieSCYVv75HPTyW6XBhUn1dHIeA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrtZENX3XKex9erVz+WxZk1pZwbY2RhoMM0QVEJEknyldUFib/
-	yE9CiL/ShHPFCS/edfNaqjtPro5Q3X3i9eP0z6GGKkKhnKHWNhPe93GxT6i3xTX7fb72YzLJBFm
-	L54YZA0DMSXiu6g7+6Bry09Izthk+kmP7UwxSkbYIFepOAg7U3oaMYM5qytumVL/onAUHZJUH/t
-	xO5E3zAl+tpX3aydM4s8CZy8Hxxn+XsNVT/FVpP1NvIOXJxg==
-X-Gm-Gg: ASbGncuXP/D1OfiiwTuEBnNoDztGcqeGOua+TZGVHh/q5eZuItL2/s3bkRuQxza6Z5S
-	itGjz4XAt5DOfVdJ16q9JnmSV/6CbzmPsRzBD0I0=
-X-Received: by 2002:a17:90a:c2c6:b0:2f2:a664:df33 with SMTP id 98e67ed59e1d1-2f2d7d6d6c9mr2562032a91.1.1734401561235;
-        Mon, 16 Dec 2024 18:12:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEWfOMwLE4xN7EgIgUmoj8RBxxJhD+t49TCaL2tr59Vru/vF26Eb336KxLuaGzGJG7u8TB7F89vPmau4TDvCMc=
-X-Received: by 2002:a17:90a:c2c6:b0:2f2:a664:df33 with SMTP id
- 98e67ed59e1d1-2f2d7d6d6c9mr2561996a91.1.1734401560849; Mon, 16 Dec 2024
- 18:12:40 -0800 (PST)
+	s=arc-20240116; t=1734403475; c=relaxed/simple;
+	bh=j+LT9LQcC+fMKtmYV6yS0Laov4aaG0UX4qIxbAPTanE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=kwA/ZD2eaoNzB1dVkjMJSFDB6ia2civ1gcuWSEqhU6ohFPOzbwf7cn14mTOSKbOGDApg3M6QqwCoq/qHwgJHx/wLa7BMgXr80/WP5qnSBeNzEcAtkyZ4rOJtHxGQYwOFtBWmUqYN48fGHZ4Qja0LlO6HGb/jyP9YM9DXZmBK/qU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YC1NM4CLSz4f3lW6;
+	Tue, 17 Dec 2024 10:44:03 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 137411A0196;
+	Tue, 17 Dec 2024 10:44:24 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgAHMYWE5WBndhZJEw--.48443S6;
+	Tue, 17 Dec 2024 10:44:23 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: axboe@kernel.dk,
+	akpm@linux-foundation.org,
+	ming.lei@redhat.com,
+	yang.yang@vivo.com,
+	bvanassche@acm.org,
+	osandov@fb.com,
+	paolo.valente@linaro.org
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH v2 RFC 2/4] lib/sbitmap: fix shallow_depth tag allocation
+Date: Tue, 17 Dec 2024 10:40:45 +0800
+Message-Id: <20241217024047.1091893-3-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20241217024047.1091893-1-yukuai1@huaweicloud.com>
+References: <20241217024047.1091893-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241203121424.19887-1-mengferry@linux.alibaba.com>
- <Z2BNHWFWgLjEMiAn@infradead.org> <CAJSP0QXU_uNqL-9LmLRkDdPPSdUAGdesQ2DFuCMHnjyEuREvXQ@mail.gmail.com>
-In-Reply-To: <CAJSP0QXU_uNqL-9LmLRkDdPPSdUAGdesQ2DFuCMHnjyEuREvXQ@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 17 Dec 2024 10:12:28 +0800
-Message-ID: <CACGkMEtPdhrXnTYgF4eCC7x7fbh53hgOJ9TytYmZR=z+nFexTQ@mail.gmail.com>
-Subject: Re: [PATCH 0/3][RFC] virtio-blk: add io_uring passthrough support for virtio-blk
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, 
-	Ferry Meng <mengferry@linux.alibaba.com>, "Michael S . Tsirkin" <mst@redhat.com>, 
-	linux-block@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org, 
-	Joseph Qi <joseph.qi@linux.alibaba.com>, Jeffle Xu <jefflexu@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAHMYWE5WBndhZJEw--.48443S6
+X-Coremail-Antispam: 1UD129KBjvJXoW3WF47uFy7Wr4DKF4xGF48WFg_yoW7GF48pF
+	4xK3WxGrWFyryj9rn8G3yDZF90qw4DGwnxGF4fWw1Fkr45Janavr9YkFyaqa4xCFWkZFWU
+	ZFWrXry8G34UXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUm014x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+	xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67
+	kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY
+	6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0x
+	vEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVj
+	vjDU0xZFpf9x0JUQXo7UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Tue, Dec 17, 2024 at 12:14=E2=80=AFAM Stefan Hajnoczi <stefanha@gmail.co=
-m> wrote:
->
-> On Mon, 16 Dec 2024 at 10:54, Christoph Hellwig <hch@infradead.org> wrote=
-:
-> >
-> > Hacking passthrough into virtio_blk seems like not very good layering.
-> > If you have a use case where you want to use the core kernel virtio cod=
-e
-> > but not the protocol drivers we'll probably need a virtqueue passthroug=
-h
-> > option of some kind.
->
-> I think people are finding that submitting I/O via uring_cmd is faster
-> than traditional io_uring. The use case isn't really passthrough, it's
-> bypass :).
->
-> That's why I asked Jens to weigh in on whether there is a generic
-> block layer solution here. If uring_cmd is faster then maybe a generic
-> uring_cmd I/O interface can be defined without tying applications to
-> device-specific commands. Or maybe the traditional io_uring code path
-> can be optimized so that bypass is no longer attractive.
->
-> The virtio-level virtqueue passthrough idea is interesting for use
-> cases that mix passthrough applications with non-passthrough
-> applications. VFIO isn't enough because it prevents sharing and
-> excludes non-passthrough applications. Something similar to  VDPA
-> might be able to pass through just a subset of virtqueues that
-> userspace could access via the vhost_vdpa driver.
+From: Yu Kuai <yukuai3@huawei.com>
 
-I thought it could be reused as a mixing approach like this. The vDPA
-driver might just do a shadow virtqueue so in fact we just replace
-io_uring here with the virtqueue. Or if we think vDPA is heavyweight,
-vhost-blk could be another way.
+Currently, shallow_depth is used by bfq, kyber and mq-deadline, they both
+pass in the value for the whole sbitmap, while sbitmap treats the value
+for just one word. Which means, shallow_depth never work as expected,
+and there really is no such functional tests to covert it.
 
-> This approach
-> doesn't scale if many applications are running at the same time
-> because the number of virtqueues is finite and often the same as the
-> number of CPUs.
->
-> Stefan
->
+Consider that callers doesn't know which word will be used, and it's
+not possible to distinguish the last word and previous word. Fix this
+problem by treating shallow_depth for the whole sbitmap in
+sbitmap_find_bit().
 
-Thanks
+Fixes: 00e043936e9a ("blk-mq: introduce Kyber multiqueue I/O scheduler")
+Fixes: a52a69ea89dc ("block, bfq: limit tags for writes and async I/O")
+Fixes: 07757588e507 ("block/mq-deadline: Reserve 25% of scheduler tags for synchronous requests")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ include/linux/sbitmap.h |  6 ++---
+ lib/sbitmap.c           | 55 +++++++++++++++++++++--------------------
+ 2 files changed, 31 insertions(+), 30 deletions(-)
+
+diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+index 189140bf11fc..92e77bc13cf6 100644
+--- a/include/linux/sbitmap.h
++++ b/include/linux/sbitmap.h
+@@ -213,12 +213,12 @@ int sbitmap_get(struct sbitmap *sb);
+  * sbitmap_get_shallow() - Try to allocate a free bit from a &struct sbitmap,
+  * limiting the depth used from each word.
+  * @sb: Bitmap to allocate from.
+- * @shallow_depth: The maximum number of bits to allocate from a single word.
++ * @shallow_depth: The maximum number of bits to allocate from the bitmap.
+  *
+  * This rather specific operation allows for having multiple users with
+  * different allocation limits. E.g., there can be a high-priority class that
+  * uses sbitmap_get() and a low-priority class that uses sbitmap_get_shallow()
+- * with a @shallow_depth of (1 << (@sb->shift - 1)). Then, the low-priority
++ * with a @shallow_depth of (sb->depth << 1). Then, the low-priority
+  * class can only allocate half of the total bits in the bitmap, preventing it
+  * from starving out the high-priority class.
+  *
+@@ -478,7 +478,7 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
+  * sbitmap_queue, limiting the depth used from each word, with preemption
+  * already disabled.
+  * @sbq: Bitmap queue to allocate from.
+- * @shallow_depth: The maximum number of bits to allocate from a single word.
++ * @shallow_depth: The maximum number of bits to allocate from the queue.
+  * See sbitmap_get_shallow().
+  *
+  * If you call this, make sure to call sbitmap_queue_min_shallow_depth() after
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index d3412984170c..6b8b909614a5 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -208,8 +208,27 @@ static int sbitmap_find_bit_in_word(struct sbitmap_word *map,
+ 	return nr;
+ }
+ 
++static unsigned int __map_depth_with_shallow(const struct sbitmap *sb,
++					     int index,
++					     unsigned int shallow_depth)
++{
++	unsigned int pre_word_bits = 0;
++
++	if (shallow_depth >= sb->depth)
++		return __map_depth(sb, index);
++
++	if (index > 0)
++		pre_word_bits += (index - 1) << sb->shift;
++
++	if (shallow_depth <= pre_word_bits)
++		return 0;
++
++	return min_t(unsigned int, __map_depth(sb, index),
++				   shallow_depth - pre_word_bits);
++}
++
+ static int sbitmap_find_bit(struct sbitmap *sb,
+-			    unsigned int depth,
++			    unsigned int shallow_depth,
+ 			    unsigned int index,
+ 			    unsigned int alloc_hint,
+ 			    bool wrap)
+@@ -218,12 +237,12 @@ static int sbitmap_find_bit(struct sbitmap *sb,
+ 	int nr = -1;
+ 
+ 	for (i = 0; i < sb->map_nr; i++) {
+-		nr = sbitmap_find_bit_in_word(&sb->map[index],
+-					      min_t(unsigned int,
+-						    __map_depth(sb, index),
+-						    depth),
+-					      alloc_hint, wrap);
++		unsigned int depth = __map_depth_with_shallow(sb, index,
++							      shallow_depth);
+ 
++		if (depth)
++			nr = sbitmap_find_bit_in_word(&sb->map[index], depth,
++						      alloc_hint, wrap);
+ 		if (nr != -1) {
+ 			nr += index << sb->shift;
+ 			break;
+@@ -406,27 +425,9 @@ EXPORT_SYMBOL_GPL(sbitmap_bitmap_show);
+ static unsigned int sbq_calc_wake_batch(struct sbitmap_queue *sbq,
+ 					unsigned int depth)
+ {
+-	unsigned int wake_batch;
+-	unsigned int shallow_depth;
+-
+-	/*
+-	 * Each full word of the bitmap has bits_per_word bits, and there might
+-	 * be a partial word. There are depth / bits_per_word full words and
+-	 * depth % bits_per_word bits left over. In bitwise arithmetic:
+-	 *
+-	 * bits_per_word = 1 << shift
+-	 * depth / bits_per_word = depth >> shift
+-	 * depth % bits_per_word = depth & ((1 << shift) - 1)
+-	 *
+-	 * Each word can be limited to sbq->min_shallow_depth bits.
+-	 */
+-	shallow_depth = min(1U << sbq->sb.shift, sbq->min_shallow_depth);
+-	depth = ((depth >> sbq->sb.shift) * shallow_depth +
+-		 min(depth & ((1U << sbq->sb.shift) - 1), shallow_depth));
+-	wake_batch = clamp_t(unsigned int, depth / SBQ_WAIT_QUEUES, 1,
+-			     SBQ_WAKE_BATCH);
+-
+-	return wake_batch;
++	return clamp_t(unsigned int,
++		       min(depth, sbq->min_shallow_depth) / SBQ_WAIT_QUEUES,
++		       1, SBQ_WAKE_BATCH);
+ }
+ 
+ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
+-- 
+2.39.2
 
