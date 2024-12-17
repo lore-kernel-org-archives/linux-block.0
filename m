@@ -1,110 +1,131 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6111EC014
-	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 10:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FE01F3D30;
+	Tue, 17 Dec 2024 12:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734432813; cv=none; b=kTYe+TugzUrXp9lcAf+Sc9ZGIfMKM4posxEcjK2r8YnR9biA4Uiwk1POdaG4FVAOjX4gUGogqKQt5OilSaKJRBVqPbpEWZysttGyA+vGNQF4tHaiYcmrTFvb71QXHXLBsIme35twe3sh9zUJoWvz3TZuMupJBn4JTI6q3h9JSYY=
+	t=1734439176; cv=none; b=Z5V3TDl6IpM8O+PydCVEPaKTtV7NzsP8X1bkkBM4EZNlr5NBdKAKJ5LnGaXEl8OawSEkFoQttEVk/Gy6CDeKxiJo9rcKaulisvF2yJR1kVCyuPp7GgVqL+zWTZE+17M8e9PWSaZ6AeKHhZdTbzDFyeYJxiSZkvoXl6GFXcqN6k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734432813; c=relaxed/simple;
-	bh=A/aM+u9cBp0KR4NFJb/LlpGJ+AOLbCqCZ9EikrcXiNI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hOClWZjxrm4ZfrH9sQcGfmF0pB20MTE8I06Rjj8SW1fdeHXnOco8pvXdBwRiySadfK0J5SijUB7W/FULhjkbp0SG+45wPoCn+/RxQ8LU7AJgpQQg7tEedd/5S3CL4vnXhCtaBZQAjNzYIJEnfSMcn2elf+8B4H5al8BlPmgymcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=RuEIcyqL; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1734439176; c=relaxed/simple;
+	bh=eTTRXSGbxsxTHL/T+nTZZkKk4QZw6IxtSWXoc6XFwKs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rrrHSJYA94NLWoU8v6/FxfsJwGXwFfMZBtww/jqRYulpvNzkyQD62ms01VQHYDlLGeOC39EFo7buVHhqA9wKcGP4X8KOPMnz1Y+om7DxZxF22xI8TI5skgYVOv0/u/s0JsVnHymGr6/5N4w923mpU4qAuCnd47rs4w1GYaMF2b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AomPShh7; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="RuEIcyqL"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43618283d48so37062655e9.1
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 02:53:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1734432808; x=1735037608; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=akvBumgmgr5EIX4fsmxm3FaGCKKx1kkyhh6tnIk6jL0=;
-        b=RuEIcyqLtXGY0Wia1+4OIYR4i6LOWGRFTaeKSVoZkVd7xBH/+zd0Qxd3IT7QuLo4rl
-         IJmelTW4mz/jLrYgwmTM8SNrchjJHvuJg8kGPcLojkpmAYbJQZyYogOnnxJxIYb9XAMv
-         5Jaqf2hU//XJs2uoDADybpCef7N4v0zDNeXhsbc5TADdwx122vjoP2VfsyOYue/5dxF+
-         Yt/bXYoXiopqFOE799RCVtcbsWkUGqjMaKdHO7IrGfWeOWP5j8auRh6GqzOsyVfrhjZq
-         6PGVh0jXKBJY9qFEqJz6A2cPOWviaIMNDX5wvmDYSfqOjr3Cb/aUqi8lqV1gnlTZ7kNu
-         44XQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734432808; x=1735037608;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=akvBumgmgr5EIX4fsmxm3FaGCKKx1kkyhh6tnIk6jL0=;
-        b=FX8CexT1W3KNC9LMzEp5+gNm+sishssgwT99dLyCHZApkPG9Hyu80/dHUIKJ9ZbAn6
-         chL3cRHtrKo8M4VGWH06zbqE8QOxQZ/4NpsPv2CVTpOTgn94vwksWBlK9N1FFEPa98bI
-         WFspYl/tAwtNxfRDAwMlbh3g6mLuRO16LfNBc0njRO4ohu72W64uIo3qt4aQkQ7AkEAW
-         m2soSeolscKCBsfKwaevL/c/zhoosOKB2gwHf5SsFedCawXZ87XERTNwtXIRhOxbik8y
-         Q299d/Cndcct/fRm+AERYZKCtdDQ3mZWpA+k7dtxDwY5TeeeBtb1RtaDpZPNXTtfqzPb
-         E7eA==
-X-Forwarded-Encrypted: i=1; AJvYcCUp7/Vkz7CpZgqQHUJlFY/q6TBTJvwOkkTd9gKaNbgVzz4x4xku6nc+HDb5Dd05NclVVh2/i1HCIirEIg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yztwnk0mtgjIUrZv0EtQzoHevToZgcTZnyQM+SF7ebVDJtpX3ps
-	SBcALmhkIJWKCCcysgkIlNkfNqKt6QeDX2bBhqCAYWHcOYt3n+jOMuUJ0/8t8do=
-X-Gm-Gg: ASbGncu1Irtyh65S+mvs5O7DmSTYeogyhG/+qzLKK6iESOb0CjbnO4c5YT46u8J9UO8
-	rBghzbfNwDleJusrwwrtaijh3EPKM89owI8M/4bLH8XmL3BfqNvnnfOUT6ydhPdXGpE/faiQvD7
-	dAx3yuTXpHg7BjLLZIeLrMKbDFfqqm/aTZ1ucJOzHAzWzFcGEJRX3g8aNJsmy4wgiwwnRGqzCcf
-	DZeBhiHWkIPa4y0Aey0bq7RkgwfN3wAzVt+0Ka60MeWCjpOLG+hImTLSh4=
-X-Google-Smtp-Source: AGHT+IGp92CezacwNyyBgdqfZsg/E3xcoJ1kubOcalO3L3TCWN+rSaASKAUrZ56PuWjll0XGl+cLFg==
-X-Received: by 2002:a05:600c:1c95:b0:434:f2bf:1708 with SMTP id 5b1f17b1804b1-4364767f07cmr27712575e9.7.1734432808447;
-        Tue, 17 Dec 2024 02:53:28 -0800 (PST)
-Received: from blackdock.suse.cz ([193.86.92.181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4363602cd11sm113466875e9.14.2024.12.17.02.53.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 02:53:28 -0800 (PST)
-Date: Tue, 17 Dec 2024 11:53:26 +0100
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Zijun Hu <zijun_hu@icloud.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>, 
-	Jens Axboe <axboe@kernel.dk>, Boris Burkov <boris@bur.io>, Davidlohr Bueso <dave@stgolabs.net>, 
-	Jonathan Cameron <jonathan.cameron@huawei.com>, Dave Jiang <dave.jiang@intel.com>, 
-	Alison Schofield <alison.schofield@intel.com>, Vishal Verma <vishal.l.verma@intel.com>, 
-	Ira Weiny <ira.weiny@intel.com>, Dan Williams <dan.j.williams@intel.com>, 
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-cxl@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v3 2/9] blk-cgroup: Fix class @block_class's subsystem
- refcount leakage
-Message-ID: <xsq3bdzz2tbz64rlvmqrbjkjddiguvveuqo7rrozyyl6srrrsb@aclt6fr2qxvc>
-References: <20241212-class_fix-v3-0-04e20c4f0971@quicinc.com>
- <20241212-class_fix-v3-2-04e20c4f0971@quicinc.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AomPShh7"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BH85g0H032420;
+	Tue, 17 Dec 2024 12:39:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=E7n2gj
+	Aj00rD8fcFe/8kFFfWR0pcT0QnWH6RHPNN+lk=; b=AomPShh7RXZQygmTtRzlai
+	br8ZZsvMiUoa4PXTe5PQ1SWaH7kxwNxRTu8/1HhUFb7BDVmrbFBIpVaJk2Y4oT+6
+	kWwtHM4cSJRSqDkgZZjB5YyHqLyu6oorne4ZAED72E5f+JeYxC0GnBZidpsfRlQ9
+	ehPvGeQ1Bogi2aESuIqxGaWPhY+jieTcSCd/z4imEN466xdwb16RHaYMHCRiW34O
+	SnNIsKAoxxccR3RK78hJ0EmuezdoDthsDi1tXJiud0b1T9Lr4xUS/9UKi0fg/dWZ
+	h1qZxl8HemcCoO/drXGR1oo5GkkFABa0X5zpyUDq3luBenhquwTpQweNKfVFRSvA
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43k5g2h4x6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Dec 2024 12:39:23 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BH97PPk014412;
+	Tue, 17 Dec 2024 12:39:23 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43hq21jc3m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Dec 2024 12:39:23 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BHCdMsN24052252
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 17 Dec 2024 12:39:22 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 28BAA58056;
+	Tue, 17 Dec 2024 12:39:22 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 69B915803F;
+	Tue, 17 Dec 2024 12:39:18 +0000 (GMT)
+Received: from [9.43.38.38] (unknown [9.43.38.38])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 17 Dec 2024 12:39:18 +0000 (GMT)
+Message-ID: <a39d25d3-e6ac-4166-a75e-58a258da4101@linux.ibm.com>
+Date: Tue, 17 Dec 2024 18:09:16 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="civnhrgjz2qrd32h"
-Content-Disposition: inline
-In-Reply-To: <20241212-class_fix-v3-2-04e20c4f0971@quicinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Change in reported values of some block integrity sysfs
+ attributes
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+        linux-raid@vger.kernel.org, nvdimm@lists.linux.dev,
+        linux-scsi@vger.kernel.org, hare@suse.de, hch@lst.de,
+        steffen Maier <maier@linux.ibm.com>,
+        Benjamin Block <bblock@linux.ibm.com>,
+        Nihar Panda <niharp@linux.ibm.com>
+References: <f6130475-3ccd-45d2-abde-3ccceada0f0a@linux.ibm.com>
+ <yq18qsjdz0r.fsf@ca-mkp.ca.oracle.com>
+Content-Language: en-US
+From: M Nikhil <nikh1092@linux.ibm.com>
+In-Reply-To: <yq18qsjdz0r.fsf@ca-mkp.ca.oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: hv8kafspI2C9X1TdImv_5JrFl2uNAJVP
+X-Proofpoint-GUID: hv8kafspI2C9X1TdImv_5JrFl2uNAJVP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ phishscore=0 clxscore=1011 priorityscore=1501 lowpriorityscore=0
+ impostorscore=0 suspectscore=0 spamscore=0 mlxlogscore=956 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412170101
+
+Thanks for the inputs Martin.
+
+We have observed that even though the HBA does not support DIX Type, 
+still the integrity attributes 'write_generate' and 'read_verify' are 
+set to 1 for the block devices.
 
 
---civnhrgjz2qrd32h
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+a3560030:~ # cat /sys/class/scsi_host/host0/prot_capabilities
+0
+a3560030:~ # cat /sys/class/scsi_host/host1/prot_capabilities
+0
 
-On Thu, Dec 12, 2024 at 09:38:38PM GMT, Zijun Hu <zijun_hu@icloud.com> wrot=
-e:
->  block/blk-cgroup.c | 1 +
->  1 file changed, 1 insertion(+)
 
-Well caught,
-Reviewed-by: Michal Koutn=FD <mkoutny@suse.com>
+a3560030:~ # cat /sys/block/sdc/integrity/write_generate
+1
+a3560030:~ # cat /sys/block/sdc/integrity/read_verify
+1
 
---civnhrgjz2qrd32h
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+Thanks and Regards,
 
-iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZ2FYJAAKCRAt3Wney77B
-SY6qAPwOR82VBxA4fcXuVjjlE50/+vko8njeFm9ZpNrkqTGBXgEAhl3ipTTb7Auy
-jtbygdF076YfrTkoHALOll+fPhlPtQI=
-=AXzW
------END PGP SIGNATURE-----
+Nikhil
 
---civnhrgjz2qrd32h--
+On 14/12/24 4:00 am, Martin K. Petersen wrote:
+>> The sysfs attributes related to block device integrity ,
+>> write_generate and read_verify are enabled for the block device when
+>> the parameter device_is_integrity_capable is disabled.
+> 'device_is_integrity_capable' is set if storage device (media) is
+> formatted with PI.
+>
+> That is completely orthogonal to 'write_generate' and 'read_verify'
+> which are enabled if the HBA supports DIX. If the HBA supports DIX Type
+> 0, 'write_generate' and 'read_verify' are enabled even if the attached
+> disk is not formatted with PI.
+>
+> I don't see any change in what's reported with block/for-next in a
+> regular SCSI HBA/disk setup. Will have to look at whether there is a
+> stacking issue wrt. multipathing.
+>
