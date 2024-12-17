@@ -1,32 +1,63 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A4661FA24A;
-	Tue, 17 Dec 2024 17:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496151FA179
+	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 17:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734457425; cv=none; b=uydDUNVCCdBV7WhmXD2f6HyMk008XcXZgITXqGV5/NsKx9qVQ9SJin0EPAH0XXr2gaqzYcopSo9DL0eQ1V+AmaAV+2bRpx9r/vgxQ6QuFL9wqA9QR+NdirOATWCrZ7voXo8Gi+6nkiw6hEITJOdPd7ZYwaCti3angAtKFsUUheg=
+	t=1734458070; cv=none; b=fty7dqlGNRFbHHoOUmpjQv1KNW46c7GPcVDkaGefebxrPLvdyZ/5PRq6DHSBzhYzs4LMDns+egdwna4psl/cLpoaYEw8/F1xTilLj+qBjz0JvIWIJL9XQlHjQbSqHcAOVb17Sq5rjVLVVNWnAcTJJVIIJrxVAXAl5q14v4NhlPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734457425; c=relaxed/simple;
-	bh=8L9yZu+YSSMC3BBiLERVQU5N7SevsXLGZW7h8pfgPR8=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=m6jJlDXE3BNb7ve8PvLvGuN5QqhJyyXCL5txmQb74C9QoNRa8CejS8xyT2VKDcqJa6IQqcwgo1GhhKeHdE0PwMjHM2NbRP3YpMABX1G6aeVXSqztyP8lalaVD9o9ZygrlKNftY3mNJPWJum5ekpShwxnvBdSrg6uvQMYu6gkNWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=VkPXr4Q5; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1734458070; c=relaxed/simple;
+	bh=Lyz3pxba+WfjDFPIDQ6xn8XAtkSqhUaQDO2p6HbBcnE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=txsrUupS99MOqBURrK+g8pFeoa6eqg5ASag1vmUb8WmHtugKChvEDrf28RhWZUFe8qjacmAlEPFRR1fd89RcbP7w5+W6WMi7cl64kemo0aTI0NzcuT7CiLxZVhgacTOd2FiSwL54goSLK4v6v9PcqRJL2suNUIb8RA/sb/MMNv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=RyHAqJ/m; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="VkPXr4Q5"
-Received: from [192.168.35.166] (c-73-118-245-227.hsd1.wa.comcast.net [73.118.245.227])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 4C1542171F87;
-	Tue, 17 Dec 2024 09:43:32 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4C1542171F87
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1734457414;
-	bh=qz8oz73s4rCDJSC1TgNUQNYJjOVU8exHA2BYkyw+ZD0=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=VkPXr4Q51kSzYXC6iV4Rnt0hdXMx9YWH59To4VTRyzVF/4SXLeJpUxO01knfWumzM
-	 CzAbcmQnzc2Qsz94yaL1AgsNLmsei1LV793lD8Qkn1YDLJvzyEf9X476Tc2IwzAabU
-	 HeEAso29uXPVkfVcznz9hizNBAvL5QWBolCDD9Qs=
-Message-ID: <f3f9a686-8be3-49f0-bcfb-10b864fa5a11@linux.microsoft.com>
-Date: Tue, 17 Dec 2024 09:43:31 -0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="RyHAqJ/m"
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3ab29214f45so18832235ab.0
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 09:54:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734458067; x=1735062867; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+S2KbhIrhYKECFApyJjGLk7qrmZwBnp+gEfOwbZqgUo=;
+        b=RyHAqJ/mDor0NPB6E4y9tWb453DBiOvljE6m6eiPMtOr4e2sRJSzWqNZYd1dkMO3bl
+         7vKY0s0MkSFXVmEZ3ZA8VhVNsx62cY3/jKsFeVzfY/bsR1gHnKXu4hx1iK1dKA8Cce6p
+         XrKrmuCa8p7I7qyn7u8G5SKpBrsC42+6iXol+y7UoYJ+YT3cHPwn8p2zBVyFDkfpjPyF
+         JfoaFmmD3JyyXzanbOmSUA+E8coMIOaRCGJkBDpr9Q6CgsaoyRaLZENp2i9/cgpjxPEu
+         YUaxV2SMYjK6shepU6EPMNADn+CZGuDKOYrzxXC8n+1TTnIQVopfXVRhWJe1KbHD6wMI
+         rksA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734458067; x=1735062867;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+S2KbhIrhYKECFApyJjGLk7qrmZwBnp+gEfOwbZqgUo=;
+        b=Z5wwfgZRYFwtuswfRkA19bq1V7LouQA1vicQI6fljCycYOXTSL/wJwUGltwUDcyM0/
+         R+z3U1Y6VuvFikPfsZoQJH3U0iF+7QH/496IK7O/2AzbwYEFW4rGPv7Y+ZqUIctYMFbX
+         fd7rbiTriUQp+V4WrkDgxhHO7fyDbVBhGC+Ciq+OaiStLJFZIVATm95Zh2nTBsLFboFk
+         +kOAK8mk/erGbtAIS1Hy4QBQZGGME3uyUvHdjAfG3khWOxH/oc7zr7v9q81vlEUItGe8
+         lFwOkxZLX/aZ9Z5zOZcOXPljUgJGpxilOpgULPjBJWgc1IpDbKaayQ+vCbnrS5q9IBNv
+         ZDVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWLEkuyNa/NUfOfg0KgOI7SmXx3/akJiI6ffkh51dcVQOQ/Rj6skna6fwIjKV6oMKJa4NM5zAUY23C3Jg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQCbLWlJ+pb9dWX3qkKBDPpN9WHyB/Q/H/kWTZ6zEkQevvm8YL
+	dqMvHVti/XNazyQQFyIBQF0cTXCjkWYu3Ams/3CjzU3DBGVQNdw7hpB8h4iAdVg=
+X-Gm-Gg: ASbGnctuRMCSR5LhAyIxdnpneP7dGK2nNKGREp/ufcMJPgAf97tqdsE7f7bm/65vdi3
+	O6gGJ1csD8rsO827Pp13fVkZyD7qQI4N0fSgbepr7+OifIEAJgu5AdgM1CIhA1K9z9gS1t1YOL8
+	uuwC7OEBLmw/60ylQZ4I3cdsddI54BMPycIbPXDJcUXLfPfRgJK1D9V0gRdojOsMwOjbuE9Md+r
+	eM+5IUTPeQwKSuiYMkdUkNLnsoIfUhzcAtV1mHVWS8/8WvQpwLt
+X-Google-Smtp-Source: AGHT+IEu4IjNs/5xorwpYlZBESvq5LvFi/8gufZqjoD/nmtALPkmYF9FSVwvwu7wAaOMQC3j/4k6gQ==
+X-Received: by 2002:a92:c564:0:b0:3a7:6636:eb3b with SMTP id e9e14a558f8ab-3aff800d5d2mr172047215ab.17.1734458067401;
+        Tue, 17 Dec 2024 09:54:27 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e5e32a33cdsm1793038173.81.2024.12.17.09.54.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2024 09:54:26 -0800 (PST)
+Message-ID: <acaf46f3-3f6c-44c9-86b5-98aa7845f1b6@kernel.dk>
+Date: Tue, 17 Dec 2024 10:54:26 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,143 +65,36 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: eahariha@linux.microsoft.com, Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>,
- Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>,
- Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
- <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
- Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
- <lucas.demarchi@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>,
- Dick Kennedy <dick.kennedy@broadcom.com>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>,
- Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann
- <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
- <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
- Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
- Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
- Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Louis Peens <louis.peens@corigine.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
- Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH v3 02/19] coccinelle: misc: Add secs_to_jiffies script
-To: Julia Lawall <julia.lawall@inria.fr>,
- Alexander Gordeev <agordeev@linux.ibm.com>
-References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
- <20241210-converge-secs-to-jiffies-v3-2-ddfefd7e9f2a@linux.microsoft.com>
- <Z2G02RN7VelcrjNT@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
- <alpine.DEB.2.22.394.2412171831300.3566@hadrien>
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
+Subject: Re: [PATCH 0/3][RFC] virtio-blk: add io_uring passthrough support for
+ virtio-blk
+To: Jingbo Xu <jefflexu@linux.alibaba.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Christoph Hellwig <hch@infradead.org>
+Cc: Ferry Meng <mengferry@linux.alibaba.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ linux-block@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+ Joseph Qi <joseph.qi@linux.alibaba.com>
+References: <20241203121424.19887-1-mengferry@linux.alibaba.com>
+ <Z2BNHWFWgLjEMiAn@infradead.org>
+ <CAJSP0QXU_uNqL-9LmLRkDdPPSdUAGdesQ2DFuCMHnjyEuREvXQ@mail.gmail.com>
+ <0535520b-a6a6-4578-9aca-c698e148004e@linux.alibaba.com>
 Content-Language: en-US
-In-Reply-To: <alpine.DEB.2.22.394.2412171831300.3566@hadrien>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <0535520b-a6a6-4578-9aca-c698e148004e@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/17/2024 9:33 AM, Julia Lawall wrote:
-> 
-> 
-> On Tue, 17 Dec 2024, Alexander Gordeev wrote:
-> 
->> On Tue, Dec 10, 2024 at 10:02:33PM +0000, Easwar Hariharan wrote:
->>
->> Hi Easwar,
->>
->>> This script finds and suggests conversions of timeout patterns that
->>> result in seconds-denominated timeouts to use the new secs_to_jiffies()
->>> API in include/linux/jiffies.h for better readability.
->>>
->>> Suggested-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
->>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
->>> ---
->>>  scripts/coccinelle/misc/secs_to_jiffies.cocci | 22 ++++++++++++++++++++++
->>>  1 file changed, 22 insertions(+)
->>>
->>> diff --git a/scripts/coccinelle/misc/secs_to_jiffies.cocci b/scripts/coccinelle/misc/secs_to_jiffies.cocci
->>> new file mode 100644
->>> index 0000000000000000000000000000000000000000..8bbb2884ea5db939c63fd4513cf5ca8c977aa8cb
->>> --- /dev/null
->>> +++ b/scripts/coccinelle/misc/secs_to_jiffies.cocci
->>> @@ -0,0 +1,22 @@
->>> +// SPDX-License-Identifier: GPL-2.0-only
->>> +///
->>> +/// Find usages of:
->>> +/// - msecs_to_jiffies(value*1000)
->>> +/// - msecs_to_jiffies(value*MSEC_PER_SEC)
->>> +///
->>> +// Confidence: High
->>> +// Copyright: (C) 2024 Easwar Hariharan, Microsoft
->>> +// Keywords: secs, seconds, jiffies
->>> +//
->>> +
->>> +virtual patch
->>> +
->>> +@depends on patch@ constant C; @@
->>> +
->>> +- msecs_to_jiffies(C * 1000)
->>> ++ secs_to_jiffies(C)
->>> +
->>> +@depends on patch@ constant C; @@
->>> +
->>> +- msecs_to_jiffies(C * MSEC_PER_SEC)
->>> ++ secs_to_jiffies(C)
->>
->> If you used this script only, then it did not seem to recognize line arch/s390/mm/cmm.c:207
->>
->> 	mod_timer(&cmm_timer, jiffies + msecs_to_jiffies(cmm_timeout_seconds * MSEC_PER_SEC));
-> 
-> There is the requirement that C is a constant, and cmm_timeout_seconds is
-> not considered to be a constant, ie it is not all capital letters.
-> Indeed, it doesn't seem to be a constant at all.  I don't know if the
-> requirement of being a comstant is really necessary.
-> 
-> julia
-> 
->>
->> Thanks!
->>
+On 12/16/24 11:08 PM, Jingbo Xu wrote:
+>> That's why I asked Jens to weigh in on whether there is a generic
+>> block layer solution here. If uring_cmd is faster then maybe a generic
+>> uring_cmd I/O interface can be defined without tying applications to
+>> device-specific commands. Or maybe the traditional io_uring code path
+>> can be optimized so that bypass is no longer attractive.
 
-As the cover letter says, this is part 1. I intend to do further parts
-that address the cases where the multiplicand is an expression, as well
-as the cases where the timeout provided to msecs_to_jiffies() is
-denominated in seconds (i.e. ends in 000)
+It's not that the traditional io_uring code path is slower, it's in fact
+basically the same thing. It's that all the other jazz that happens
+below io_uring slows things down, which is why passthrough ends up being
+faster.
 
-Thanks,
-Easwar
+-- 
+Jens Axboe
