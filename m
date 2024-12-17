@@ -1,60 +1,91 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B61881607AC
-	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 07:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5B8155393;
+	Tue, 17 Dec 2024 08:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734420626; cv=none; b=Bpal8hQS3EuzJPRDKWb1r5Ymbgck6qUvAHJ9eYnsFkBd13jRcXsB4yyMcPuVnnVuQ6gNK5PQQLZ2IxzPeRn9i8qKSQg4+3uIgA9vJIrHgIItV8KXQt/jmOTtRcGjgGrPozJ+QTIxnXB8iAwaPT6aocsekVza/AsPdRAD4lL/pBs=
+	t=1734423708; cv=none; b=dUZbGu/jBwQqCqJFNUpS7ww6TJaHjv7YAjfDOP3235EHnlR2NOMivvYxlIcZln5KW11b0LyA7ik7yCYMuxDastr+APFOf8uhqW769KBf4M+CVGEOhzdkOKnBTgJ8SgIrh5JYTouBvyO9b8lZRdsjhV5IJXnBQeqZpPUIED7dr7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734420626; c=relaxed/simple;
-	bh=kwGIz6L2vJ7iFxsoYHSav+90OoQXIPO2jxpoPFLRsnU=;
+	s=arc-20240116; t=1734423708; c=relaxed/simple;
+	bh=F5S4FhtmltsBwBx86PvuD+lMhYGZK3Hqs0mfpw44AcI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KN3f9b4ErGbk0aEFz0laf20x0NEJZmpX/PyuzfkR+ktU7kEnrLLYMkp6pIOMDhIfkueLyW5SM/McIjJ8Pa+MKGIosJQ3j+f5eG6hTho5rogOyQiJO3fk/prK9dWw3rshshwOLHxsA3t2wDI+yyjunHaY7hE7q/KHIWXtJppYzsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D7meyQN5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=d6JHPuOMMPzOah1f7Hv9Rq7w8MsLGBGLLONCcT1OWpYTWYnvUufnjcmWrI/a7Hebuv2jxqch8eQvg2EQkoT/+SJNQxsGWcPlJEHODICms033cREFzCTYlI/tC+b4ZrScMA1c/hFOmZNCp4jwZ9aNCAR7KR6cGDK1CwKVFTPUPME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qVwW87h9; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3iwiwvyj; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qVwW87h9; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3iwiwvyj; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D7meyQN5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734420622;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cyCnkMw2za2BRtvTxjpso1AKI6hVmxjTcrmdwWKyib4=;
-	b=D7meyQN5ADJgwlT67TFI01+1ikf591J4fhMda8iUMW6hsLSkZiRwCFyBcyvL/JLkYSZH/E
-	p9nW9E5rcAItvtm29yr6BcFzwW3uR24B7SuKQIh6afBSdlUoKGCt7srfMupDsYdJoCjH6o
-	VE3dOBwDwl3QYAMH9F115/FYg9hokAw=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-606-0Bm-RbIrOie5HZHtGVoZQA-1; Tue,
- 17 Dec 2024 02:30:21 -0500
-X-MC-Unique: 0Bm-RbIrOie5HZHtGVoZQA-1
-X-Mimecast-MFC-AGG-ID: 0Bm-RbIrOie5HZHtGVoZQA
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qVwW87h9";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3iwiwvyj";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qVwW87h9";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3iwiwvyj"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1F6F919541A9;
-	Tue, 17 Dec 2024 07:30:20 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.165])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C70FF19560AD;
-	Tue, 17 Dec 2024 07:30:16 +0000 (UTC)
-Date: Tue, 17 Dec 2024 15:30:11 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: avoid to hold q->limits_lock across APIs for
- atomic update queue limits
-Message-ID: <Z2Eog2mRqhDKjyC6@fedora>
-References: <20241216080206.2850773-1-ming.lei@redhat.com>
- <20241216080206.2850773-2-ming.lei@redhat.com>
- <20241216154901.GA23786@lst.de>
- <Z2DZc1cVzonHfMIe@fedora>
- <20241217044056.GA15764@lst.de>
- <Z2EizLh58zjrGUOw@fedora>
- <20241217071928.GA19884@lst.de>
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 3BE1821120;
+	Tue, 17 Dec 2024 08:21:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1734423705; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K0ccd5T/w72yfTNgA1rqqzypkLFYQGNqOiIvNG54Ot8=;
+	b=qVwW87h9IIRltr8VdEQKJhEHFuizPMnxm0At6YVF3qu+QiNzXpcpWmb0c3EcfdTqfazSpW
+	rFjbHnPZBb4MqKFKk758sazgfQJW8bw7GPrJyefEfU9FE6uZ8mWdlPQf4HhNdTPtmIdJIo
+	uIfhHPGBVf6Z3CqFuQIL2ayxRKzFaB8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1734423705;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K0ccd5T/w72yfTNgA1rqqzypkLFYQGNqOiIvNG54Ot8=;
+	b=3iwiwvyjFkJl+c1TbcwB8Pfq8gRzCBQ6bjAAAmtXFrCrO4FldFK7xQD1+gf7kU35PPhUF4
+	vs35Wg5oVgtVd3DA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1734423705; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K0ccd5T/w72yfTNgA1rqqzypkLFYQGNqOiIvNG54Ot8=;
+	b=qVwW87h9IIRltr8VdEQKJhEHFuizPMnxm0At6YVF3qu+QiNzXpcpWmb0c3EcfdTqfazSpW
+	rFjbHnPZBb4MqKFKk758sazgfQJW8bw7GPrJyefEfU9FE6uZ8mWdlPQf4HhNdTPtmIdJIo
+	uIfhHPGBVf6Z3CqFuQIL2ayxRKzFaB8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1734423705;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K0ccd5T/w72yfTNgA1rqqzypkLFYQGNqOiIvNG54Ot8=;
+	b=3iwiwvyjFkJl+c1TbcwB8Pfq8gRzCBQ6bjAAAmtXFrCrO4FldFK7xQD1+gf7kU35PPhUF4
+	vs35Wg5oVgtVd3DA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 19E3213A3C;
+	Tue, 17 Dec 2024 08:21:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id mA8iBJk0YWe4GQAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Tue, 17 Dec 2024 08:21:45 +0000
+Date: Tue, 17 Dec 2024 09:21:44 +0100
+From: Daniel Wagner <dwagner@suse.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+	Sagi Grimberg <sagi@grimberg.me>, John Garry <john.g.garry@oracle.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org, megaraidlinux.pdl@broadcom.com, 
+	mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com, storagedev@microchip.com, 
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v6 0/8] blk: refactor queue affinity helpers
+Message-ID: <632d25c7-ac46-4a1a-b2bc-14258a88216c@flourine.local>
+References: <20241202-refactor-blk-affinity-helpers-v6-0-27211e9c2cd5@kernel.org>
+ <c5f7f562-c8b0-422b-bb51-744ecba7ecee@flourine.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,55 +94,54 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241217071928.GA19884@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <c5f7f562-c8b0-422b-bb51-744ecba7ecee@flourine.local>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-On Tue, Dec 17, 2024 at 08:19:28AM +0100, Christoph Hellwig wrote:
-> On Tue, Dec 17, 2024 at 03:05:48PM +0800, Ming Lei wrote:
-> > On Tue, Dec 17, 2024 at 05:40:56AM +0100, Christoph Hellwig wrote:
-> > > On Tue, Dec 17, 2024 at 09:52:51AM +0800, Ming Lei wrote:
-> > > > The local copy can be updated in any way with any data, so does another
-> > > > concurrent update on q->limits really matter?
-> > > 
-> > > Yes, because that means one of the updates get lost even if it is
-> > > for entirely separate fields.
+Hi Jens,
+
+On Mon, Dec 09, 2024 at 10:42:26AM +0100, Daniel Wagner wrote:
+> On Mon, Dec 02, 2024 at 03:00:08PM +0100, Daniel Wagner wrote:
+> > I've rebased and retested the series on top of for-6.14/block and updated
+> > the docummentation as requested by John.
 > > 
-> > Right, but the limits are still valid anytime.
+> > Original cover letter:
 > > 
-> > Any suggestion for fixing this deadlock?
+> > These patches were part of 'honor isolcpus configuration' [1] series. To
+> > simplify the review process I decided to send this as separate series
+> > because I think it's a nice cleanup independent of the isolcpus feature.
+> > 
+> > Signed-off-by: Daniel Wagner <wagi@kernel.org>
 > 
-> What is "this deadlock"?
+> I've based this work on top of your tree as I think it should go your
+> tree. If this should go via different tree, let me know which one.
+> 
+> And in case the series didn't hit your inbox, I really don't know what I
+> am doing wrong. I've switched over to use b4 and korg for sending the
+> patches and on my side all looks good and the mails also appear on lore
+> completely normal.
 
-The commit log provides two reports:
-
-- lockdep warning
-
-https://lore.kernel.org/linux-block/Z1A8fai9_fQFhs1s@hovoldconsulting.com/
-
-- real deadlock report
-
-https://lore.kernel.org/linux-scsi/ZxG38G9BuFdBpBHZ@fedora/
-
-It is actually one simple ABBA lock:
-
-1) queue_attr_store()
-
-      blk_mq_freeze_queue(q);					//queue freeze lock
-      res = entry->store(disk, page, length);
-	  			queue_limits_start_update		//->limits_lock
-				...
-				queue_limits_commit_update
-      blk_mq_unfreeze_queue(q);
-
-2) sd_revalidate_disk()
-
-queue_limits_start_update					//->limits_lock
-	sd_read_capacity()
-		scsi_execute_cmd
-			scsi_alloc_request
-				blk_queue_enter					//queue freeze lock
-
+Any chance to get this merged?
 
 Thanks,
-Ming
-
+Daniel
