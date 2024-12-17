@@ -1,62 +1,48 @@
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5222C4A23
-	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 21:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE971F9F6E;
+	Tue, 17 Dec 2024 21:39:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734470715; cv=none; b=DyxBHL9Id2qemyyRNt0/S751piY69KoOSk42p5KebaCY9IL1wqtSAuL4G/ihXOqQ+MXl07N2Wce65m3h1Fn5ba0xUK596ukGrsLEnLtNbxSPufrllFNlQgE3dozVZrxyehxETbNEfnoHlC108YfgZPXhpwSIzv0JeFtqGRy+ZCQ=
+	t=1734471596; cv=none; b=ROyVBVuk025zweZk8TjgoMyYz2il+VIC4THtgOXwA+4trH0lFZqAtY9K3G6GjcT6sI5qQSUzuD3XVelBZ57m05+mkhfN8G2dPOnr6g4clUftbE7lgLxE5R306DtzalAd8Yl8iQEgo+JBbtuSZPYpCGsHn2d2bC3Y0h3LTwOwR6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734470715; c=relaxed/simple;
-	bh=PFr7UsUyr2TAMzcqgqVoGnvByQCOk9dWGLtWPFu546M=;
+	s=arc-20240116; t=1734471596; c=relaxed/simple;
+	bh=waPL8MSo91BSCASabGJTRyFGziNHSYJPmgybZVAEl5w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ClWZLFzROMi7/pZH2xKQx60u3CTda7bxXkUrDPPvN6zHmrt7pmcF2dlzAhiouWUo8063YOe66JQPc/CzG2m9ktbSpnfToxpx6o4gKf5WbBad9vF3uKbPeo//VFSX3bUik9rn9Jvuc24dEvc442bw5PLvPEPDI7NeSJjcsj8C4FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=PZVAYFOt; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=nRW1j5Ckym4rjkt0pUlYEDMUri2wjz7HHq1hg+PzDxxkhTvdNBHwft4FeX03oBJkM4SiYb7P+8Nh5MgXnSzs8Fz8uiY9xK9P8GB2mqEQqzwAWZ2yMclzJppLgljcnpXKt8mQL4Bd9unDuq+SgfSBu15/FpjJmYn2ejWXX1Sru9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=vSVfanhk; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="PZVAYFOt"
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-844de072603so497232839f.0
-        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 13:25:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734470711; x=1735075511; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PojFNCMau820oCeLSGubCfiroShMAMnTT3fazSIGivo=;
-        b=PZVAYFOt2Bx3s5RLHSw/s+DS6cwzAe8HehNNaJOHOfHubShNIW1Jxemaftu/0JsPhd
-         nFgl3zEE8CnfTbqi62BfnlZ5oW6bnpVHlHVW9WFhOkOaJ8mcnZduT0w8zsB+Y5xEG4ZY
-         nZ13uvMcYtdOr8FtoaMzDbdtiYMl8AQHhhE8z4x7NrjRUnigzoeJPxebnNCS7wcwetUn
-         caNd6R+SmKMXDnNJsHaLodLCftDERkTPUjsemXS9hCp31yx/JVCb/OXYltX96xkyTM53
-         wsZg3V6wQZ5mayLFPW5FXqxBqxQUKKaMPdCRz208igRIlgVHlu1IUzqwrDSNXN6pboyt
-         u/qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734470711; x=1735075511;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PojFNCMau820oCeLSGubCfiroShMAMnTT3fazSIGivo=;
-        b=g3k6LKnf+/2k2EFKFtVlSNfsZPWvMI0TxilGAegYl2aQcaxhc/4zcX8xzMg8paMrBA
-         0dLLVSK5cLWSwKn+16G2YJ1EOVa8MAENoDTI5dblaoVe58YJ8KWJNyd/0sHf4+mI2Ron
-         qYn8cmSq5Kdyr7UG0Zhv5Nd1bQe5hrXZN5brx/Jor7pj/JVGi9vGmApA3Ejw1fVYyOBY
-         i2LuK1ezTfJr+54AJBSlusp8t3my0JaT7jNuy6A8/6O8SupQGMZryCw1bcEirximEMxC
-         z2tsTTTYkFjVx5s2K8Eo4kzQxypKnSZQXpCVMj9utWJo2j7C6CYQwueySjm3FPlbaplg
-         C/wQ==
-X-Gm-Message-State: AOJu0YxQRdTOPa7maDuYtaGQN/o2nnPWKdqqDZbZTw9kRQZb5BDQxbO8
-	vuMUsl1OaMl7JSsc/PDQW5YriuRxfS0EnPnPoh3CPh5p0d1IYCpdxCiqPTuWm98=
-X-Gm-Gg: ASbGncvoKJj2ZEp479ibPfKaJtIVDYUvZs5WLwrUZAGkqY9FZwE2irkYdqwP/ej0CUk
-	i1jwFxv4n3/LrwrlSyHzqILqCqmmJWuIVnvhifQv9U9auF2liUpkEnk/xuTtZX8GBTWZ9xFyErD
-	o2z6naNLgj51qhyOgq1WKiYZyCGNVJ3FFcJwvrx9FOqr5Z82KQKdalqp5Pg7KMDXGnSOGyWoRQT
-	kTSsXrKl9LWj788CjsT8uIVGRJumfe5DozxtHLDJ2Ff77P/BjEH
-X-Google-Smtp-Source: AGHT+IE+3Lg/xZ76L5EkaACHWcZVeERPGnuBwQ/cMeSdEAQK/ZfXVgaRLtlpKPsYgQHFfd2qvPJjkg==
-X-Received: by 2002:a05:6602:1645:b0:841:a678:de40 with SMTP id ca18e2360f4ac-84758314defmr58251539f.0.1734470711461;
-        Tue, 17 Dec 2024 13:25:11 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e5e0367d29sm1881126173.19.2024.12.17.13.25.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Dec 2024 13:25:10 -0800 (PST)
-Message-ID: <7c65513d-740d-4cfd-a02f-ddbd840ebb3d@kernel.dk>
-Date: Tue, 17 Dec 2024 14:25:10 -0700
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="vSVfanhk"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YCVZx5Hcsz6ClY9C;
+	Tue, 17 Dec 2024 21:39:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1734471585; x=1737063586; bh=w2NSjeBFnnChdL8x6+UsuaJO
+	wEIF50BKYw1sXCgw0Sw=; b=vSVfanhkNJhsLrav09l0gN7u92Idr8Z1C2isEXyg
+	AlpYxUIbfKXvS7Nfgck9ao7UuT714+CpLfdrwAizYz2P3ZFl8vX48c45wAgl353Y
+	BqvVxCet7YROPOJ1xRyq26cqYEG6Aet8S2iejLt/QSaqPOD+tk7NVYNoPvY1a09o
+	Ks/I7AmSWLK2E54xi2KpSbOhNAqVNjrf+lzDCvoq8XozfCRNkI7Ps0M8bB6g9QnZ
+	jQmmsNYsz6QuCfH8VApUYnVhpWVLOEeQZep61g8y8xH8IUBjZG4MErEPnPLzZTsy
+	fegglZTQkwVkF8B1gKF/f8SQFCMHtwjSvAX+OZxskXcZ5w==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id abOatshre1vv; Tue, 17 Dec 2024 21:39:45 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YCVZk2xngz6ClY9B;
+	Tue, 17 Dec 2024 21:39:41 +0000 (UTC)
+Message-ID: <7e26bf70-3ff3-4cf0-870e-9d0d9c35491b@acm.org>
+Date: Tue, 17 Dec 2024 13:39:40 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -64,55 +50,100 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Zoned storage and BLK_STS_RESOURCE
-To: Damien Le Moal <dlemoal@kernel.org>, Bart Van Assche
- <bvanassche@acm.org>, Christoph Hellwig <hch@lst.de>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <e75812ec-9b91-42d0-9ca5-d4bae031e319@acm.org>
- <20241217041515.GA15100@lst.de>
- <b8af6e10-6a00-4553-9a8c-32d5d0301082@kernel.org>
- <bf847491-e18a-4685-8fa2-66e31c41f8e8@kernel.dk>
- <79a93f9d-12e1-4aed-8d6c-f475cdcd6aab@kernel.org>
- <96e900ed-4984-4fbe-a74d-06a15fd7f3f7@kernel.dk>
- <3eb6ba65-daf8-4d8f-a37f-61bea129b165@kernel.org>
- <63aae174-a478-48ea-8a74-ab348e21ab65@acm.org>
- <83bfb006-0a7d-4ce0-8a94-01590fb3bbbb@kernel.org>
- <548e98ee-b46e-476a-9d4a-05a60c78b068@kernel.dk>
- <5fb36d77-44cc-4ad7-8d64-b819bc7ae42a@kernel.org>
- <eb61f282-0e23-428a-8e6a-77c24cfd0e83@kernel.dk>
- <f41ffec1-9d05-47ed-bb0e-2c66136298b6@kernel.org>
- <e299e652-2904-417c-9f76-b7aec5fd066b@kernel.dk>
- <fb292dc8-7092-45c1-ae8a-fca1d61c6c9a@kernel.dk>
- <9e8e2410-53b5-4dad-8b54-b7e72647703b@kernel.org>
+Subject: Re: [PATCH RFC v2 1/4] block/mq-deadline: Revert "block/mq-deadline:
+ Fix the tag reservation code"
+To: Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
+ akpm@linux-foundation.org, ming.lei@redhat.com, yang.yang@vivo.com,
+ osandov@fb.com, paolo.valente@linaro.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+References: <20241217024047.1091893-1-yukuai1@huaweicloud.com>
+ <20241217024047.1091893-2-yukuai1@huaweicloud.com>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <9e8e2410-53b5-4dad-8b54-b7e72647703b@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20241217024047.1091893-2-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/17/24 1:59 PM, Damien Le Moal wrote:
-> On 2024/12/17 11:58, Jens Axboe wrote:
->> On 12/17/24 12:54 PM, Jens Axboe wrote:
->>> io_uring does support ordering writes - not because of zoning, but to
->>> avoid buffered writes being spread over a bunch of threads and hence
->>> just hammering the inode mutex rather than doing actual useful work. You
->>> could potentially use that. Then all pending writes for that inode would
->>> be ordered, even if punted to io-wq.
->>
->> See io_uring/io_uring.c:io_prep_async_work(), which is called when an IO
->> is added for io-wq execution, io_wq_hash_work() makes sure it'll be
->> ordered. However, this will still not work if you're driving beyond the
->> limit of the device queue depth, or if you're doing IOs that may trigger
->> -EAGAIN spuriously for -EAGAIN as you can still have two issuers - the
->> task itself submitting IO, and the one io-wq worker tasked with doing
->> blocking writes on this zoned device.
+On 12/16/24 6:40 PM, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> Thanks for the pointer. Will have a look. It may be as simple as
-> always using the io-wq worker for zone writes and have these ordered
-> (__WQ_ORDERED). Maybe.
+> This reverts commit 39823b47bbd40502632ffba90ebb34fff7c8b5e8.
+> 
+> 1) Set min_shallow_depth to 1 will end up setting wake_batch to 1,
+>     and this will cause performance degradation in some high concurrency
+>     test, for both IO bandwidth and cpu usage.
+> 
+>     async_depth can be changed by sysfs, and the minimal value is 1. This
+>     is why min_shallow_depth is set to 1 at initialization to make sure
+>     functional is correct if async_depth is set to 1. However, sacrifice
+>     performance in the default scenario is not acceptable.
+> 
+> 2) dd_to_word_depth() is supposed to scale down async_depth, however, user
+>     can set low nr_requests and sb->depth can be less than 1 << sb->shift,
+>     then dd_to_word_depth() will end up scale up async_depth.
 
-Right, that should work if you force everything to be served by io-wq
-and ensure it's hashed.
+Although this patch fixes a performance regression, it breaks the
+async_depth functionality. If we are going to break that functionality
+temporarily, I propose to do something like this:
 
--- 
-Jens Axboe
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 20a8a3afb88b..4cc7b5db4669 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -487,37 +487,12 @@ static struct request *dd_dispatch_request(struct 
+blk_mq_hw_ctx *hctx)
+  	return rq;
+  }
+
+-/*
+- * 'depth' is a number in the range 1..INT_MAX representing a number of
+- * requests. Scale it with a factor (1 << bt->sb.shift) / 
+q->nr_requests since
+- * 1..(1 << bt->sb.shift) is the range expected by sbitmap_get_shallow().
+- * Values larger than q->nr_requests have the same effect as 
+q->nr_requests.
+- */
+-static int dd_to_word_depth(struct blk_mq_hw_ctx *hctx, unsigned int 
+qdepth)
+-{
+-	struct sbitmap_queue *bt = &hctx->sched_tags->bitmap_tags;
+-	const unsigned int nrr = hctx->queue->nr_requests;
+-
+-	return ((qdepth << bt->sb.shift) + nrr - 1) / nrr;
+-}
+-
+  /*
+   * Called by __blk_mq_alloc_request(). The shallow_depth value set by this
+   * function is used by __blk_mq_get_tag().
+   */
+  static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+  {
+-	struct deadline_data *dd = data->q->elevator->elevator_data;
+-
+-	/* Do not throttle synchronous reads. */
+-	if (op_is_sync(opf) && !op_is_write(opf))
+-		return;
+-
+-	/*
+-	 * Throttle asynchronous requests and writes such that these requests
+-	 * do not block the allocation of synchronous requests.
+-	 */
+-	data->shallow_depth = dd_to_word_depth(data->hctx, dd->async_depth);
+  }
+
+  /* Called by blk_mq_update_nr_requests(). */
+@@ -525,11 +500,8 @@ static void dd_depth_updated(struct blk_mq_hw_ctx 
+*hctx)
+  {
+  	struct request_queue *q = hctx->queue;
+  	struct deadline_data *dd = q->elevator->elevator_data;
+-	struct blk_mq_tags *tags = hctx->sched_tags;
+
+  	dd->async_depth = q->nr_requests;
+-
+-	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, 1);
+  }
+
+  /* Called by blk_mq_init_hctx() and blk_mq_init_sched(). */
+
