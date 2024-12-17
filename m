@@ -1,30 +1,30 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77AF14AD3F
-	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 04:15:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3664320EB
+	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 04:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734408922; cv=none; b=kAumeLad/sv6NEQEK6VjdHxJLSOPYlwJ0bNUV8jsJnFRAjzS2L60bqXZ4NkqcJ5r/sfxLG4spN7Rs9o46nAMH87BPnnHZ6FVg6wZjfZeXaZ+8fKPqeSLrLM4hl3VhwAYFKL05/0DrO2Kc3eELoxlgCDlP5yeCfwyuCMVg74Bnr0=
+	t=1734409013; cv=none; b=FVz3mGGdjakxRHXvnDfv2RFttqtQ87ByEz5IyDu6V1f491WLiD9I1Xc5drjcoLZ7v/8pdjyQYCyxLCZvhdfpZK2TWkntViMoeAFONIfj3QYV3eo57902YM+QElFSws83BipwUPeTxL+n9mn2ErYuVQtOixuLjSo+zUiSDuYMH8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734408922; c=relaxed/simple;
-	bh=0SuXcgBtvXf4XUeRArgqREW2a++n+q8mlPAFybOxSWw=;
+	s=arc-20240116; t=1734409013; c=relaxed/simple;
+	bh=6dbItUdxlD4HEU27SnWfKmR8bUZ510Crs+pHt8b+2qA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dIrI0YCkWXIX+xbgCZm0mOPGkyn1V8APpWGfIjkPkXaPcMqkYKr133zxG6Mb9m3EyrXH/XGX+89D9N2vdZUMxQwOCemKutHBfxpqQF/73kLqGjPuu7D729yxwscYa82G0seYVCZFguMvvgZxEdMwD8O3pXxn5HVkb5DB9a+FVs8=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ddn4llq7MZDYkYII8NNL+97wMibrEuQTN8aWia3S9IwB9M1jbqPgEYH3yseXRe6buP6jVwcn7LwZSTHXSt4ThWIAg7eyR60tJTnJq3yGlO+nIKs5EmX4aBNHht4bTjFkdezLjyDFFbxClGDxa4SFNKIzLP9c6g35tNYBISj5tJo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 708F768BEB; Tue, 17 Dec 2024 05:15:15 +0100 (CET)
-Date: Tue, 17 Dec 2024 05:15:15 +0100
+	id 1E8E968BEB; Tue, 17 Dec 2024 05:16:48 +0100 (CET)
+Date: Tue, 17 Dec 2024 05:16:47 +0100
 From: Christoph Hellwig <hch@lst.de>
 To: Bart Van Assche <bvanassche@acm.org>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: Zoned storage and BLK_STS_RESOURCE
-Message-ID: <20241217041515.GA15100@lst.de>
-References: <e75812ec-9b91-42d0-9ca5-d4bae031e319@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [PATCH 1/2] block: Optimize blk_mq_submit_bio() for the cache
+ hit scenario
+Message-ID: <20241217041647.GA15286@lst.de>
+References: <20241216201901.2670237-1-bvanassche@acm.org> <20241216201901.2670237-2-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,25 +33,12 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e75812ec-9b91-42d0-9ca5-d4bae031e319@acm.org>
+In-Reply-To: <20241216201901.2670237-2-bvanassche@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Dec 16, 2024 at 11:24:24AM -0800, Bart Van Assche wrote:
->
-> Hi Damien,
->
-> If 'qd=1' is changed into 'qd=2' in tests/zbd/012 then this test fails
-> against all kernel versions I tried, including kernel version 6.9. Do
-> you agree that this test should pass?
+On Mon, Dec 16, 2024 at 12:19:00PM -0800, Bart Van Assche wrote:
+> Help the CPU branch predictor in case of a cache hit by handling the cache
+> hit scenario first.
 
-That test case is not very well documented and you're not explaining
-how it fails.
-
-As far as I can tell the test uses fio to write to a SCSI debug device
-using the zbd randwrite mode and the io_uring I/O engine of fio.
-
-We've ever guaranteed ordering of multiple outstanding asynchronous user
-writes on zoned block devices, so from that point of view a "failure" due
-to write pointer violations when changing the test to use QD=2 is
-entirely expected.
+Numbers, please.
 
