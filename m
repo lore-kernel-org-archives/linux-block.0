@@ -1,82 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379641CDFD3
-	for <linux-block@vger.kernel.org>; Mon, 16 Dec 2024 22:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E9F2E630
+	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 01:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734389396; cv=none; b=PMwG1YEWVqKgdKYDflmms+7RP4Na4cX3ISjDy8Pe4xz3Yhykb+mapYWaJ+ij/8ovSPOik48cZKF2/fnyjkm6ZFNookiRgnlBsk1K7iL/LqWRsbY3SbdDypqpZP69hMS6UREqHMm9zKk3fV+852O4tPQ81ZDbhbGuINEBWe6V5DE=
+	t=1734400386; cv=none; b=kb89XLx5N8hymXd6/7rVEstFOjh0Mq17n6FClNt8akaGHoC28d5dPz/Yd4cvpsWB/S8Dd/m4o6sbtX+nztC6eXWvuIROX68mG5T55O3RE46HRPArKaSo9IxrJGu92zJzhgRRR2Q1WjOOu9Q6x79r90BInJH5Kele8ZYYJGnluU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734389396; c=relaxed/simple;
-	bh=27dqV6+EdKdmGC3OctKBEZn2wyrvocivOLRr1NVRO2M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q+wuLX3SoF6mKZsUYwkC5BG1GI0ntEJ1Z2LsBj+pGGMo7SJePZ7mkM78IEaCuIkpWR8w48fKBoY71cdU1yYIDjXLDy3sQylYSMCJGZV+WRvZPTRc/Ua5SUGd8Bloke5PCQRmow0SMLWUOwInSQBddFPZBN3xp1hayxn5O9vuxQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPBZ3OEq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734400386; c=relaxed/simple;
+	bh=xPmun7YTHKfv9ewruF+nYeJYBinF+YsFNDj/FBfrumQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b3cehrlnp+JfY/+UOaMYIfWRg6UdOdOJn7XfxiSQ5nHgxzTJQYoNu17ou5H3P5dVtMSyswClUDSRSvjJR3M+J4LmFPRAnlW0xZmJ7fFFVhDuqQ+Mh+pzXZeEzC6g20flkORqO29ssXt0f8ht5uu/IA/Sb3EeOK8xm0v94dtbpjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cbzDg7vk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPBZ3OEq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5299C4CED0;
-	Mon, 16 Dec 2024 22:49:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734389395;
-	bh=27dqV6+EdKdmGC3OctKBEZn2wyrvocivOLRr1NVRO2M=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gPBZ3OEq7QuYOLA0HjitozJFqVYBx7164I4ROic6EI2WvbmKcSJ95gZjH24CRSJ1U
-	 GjeQZbns0obTJ5gkt+5F6rtE0n+YEQon7BtBRr+Wari+07jIDeqxpzwYFLD8HWqqCi
-	 HjODYWDdjBmuBgIzFBxeiEJWStlpdz1E6BkctKCdBzxsfX1JYbEuCr5t1jEXuXJ6I4
-	 mAON+RhTClsXnMj/fLS/mhdrDHMJoShTTa6Ga7A/sjnYuoGxyzdpB+W0h/hiuwZb/5
-	 b4IGYvT0Nm5M19IBIGtitpCydwbgAytGv1u/vvnUmJG8V4ZM19dzk2zsMQAQXjc7to
-	 WNkrImZndJdtQ==
-Message-ID: <f7aac753-3256-4b18-9212-79c2b043df2b@kernel.org>
-Date: Mon, 16 Dec 2024 14:49:55 -0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cbzDg7vk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734400383;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=++eaEvzxr3ipE6QxWl+JZJNd3bnUMqSdjyDxyVciy/Q=;
+	b=cbzDg7vk+02t5tbLCmnyHkAvqh7IUyNo5qx7LdI5TLVkk6L4iOgKWEuBIrL1Ps6P2dK0HP
+	ldZQf1iszZKjsj5TwrAK5JnTxb2pkiDpsxJWlV7J1c3AWgKdlalf5+98NYIGdrF1+xGg/e
+	kXgD7zsADPHPIahZa+H5Y8WLcml4M4k=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-652-sQ7dT6M_MqOeZLqvYoMCzA-1; Mon,
+ 16 Dec 2024 20:53:01 -0500
+X-MC-Unique: sQ7dT6M_MqOeZLqvYoMCzA-1
+X-Mimecast-MFC-AGG-ID: sQ7dT6M_MqOeZLqvYoMCzA
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4B3AF1956056;
+	Tue, 17 Dec 2024 01:53:00 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.120])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0421D30044C1;
+	Tue, 17 Dec 2024 01:52:56 +0000 (UTC)
+Date: Tue, 17 Dec 2024 09:52:51 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: avoid to hold q->limits_lock across APIs for
+ atomic update queue limits
+Message-ID: <Z2DZc1cVzonHfMIe@fedora>
+References: <20241216080206.2850773-1-ming.lei@redhat.com>
+ <20241216080206.2850773-2-ming.lei@redhat.com>
+ <20241216154901.GA23786@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Zoned storage and BLK_STS_RESOURCE
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>
-References: <e75812ec-9b91-42d0-9ca5-d4bae031e319@acm.org>
- <ed186d84-1652-4446-8da1-df2ed0d21566@kernel.org>
- <ba8caf98-8b09-4494-add8-31381b04cd33@acm.org>
- <3bc4b958-73ea-47d4-9b94-299db1f7ee3e@kernel.org>
- <955aacae-7dde-41a2-8eb9-3bbeae8c3d18@acm.org>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <955aacae-7dde-41a2-8eb9-3bbeae8c3d18@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241216154901.GA23786@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 2024/12/16 13:22, Bart Van Assche wrote:
-> On 12/16/24 12:54 PM, Damien Le Moal wrote:
->> Yes. But I am still confused. Where is the problem ?
+On Mon, Dec 16, 2024 at 04:49:01PM +0100, Christoph Hellwig wrote:
+> On Mon, Dec 16, 2024 at 04:02:03PM +0800, Ming Lei wrote:
+> > More importantly, queue_limits_start_update() returns one local copy of
+> > q->limits, then the API user overwrites the local copy, and commit the
+> > copy by queue_limits_commit_update() finally.
+> > 
+> > So holding q->limits_lock protects nothing for the local copy, and not see
+> > any real help by preventing new update & commit from happening, cause
+> > what matters is that we do validation & commit atomically.
 > 
-> Here: 
-> https://lore.kernel.org/linux-block/95ab028e-6cf7-474e-aa33-37ab3bccd078@kernel.org/. 
-> In that message another approach is
-> suggested than what I described in my previous message.
-> 
-> UFSHCI 3.0 controllers preserve the command order except if these are in
-> a power-saving mode called auto-hibernation (AH8). When leaving that
-> mode, commands are submitted in tag order (0..31). The approach
-> described above provides an elegant solution for the unaligned write
-> errors that can be caused by command reordering when leaving AH8 mode.
-> I'm not aware of any other elegant approach to deal with the reordering
-> that can be caused by leaving the UFSHCI AH8 mode.
+> It protects against someone else changing the copy in the queue while
+> the current thread is updating the local copy, and thus incoherent
+> updates.  So no, we can't just remove it.
 
-Sorry, but I do not know enough about UFS to fully understand the issue, or
-comment/propose a solution.
-
-> 
-> Thanks,
-> 
-> Bart.
+The local copy can be updated in any way with any data, so does another
+concurrent update on q->limits really matter?
 
 
--- 
-Damien Le Moal
-Western Digital Research
+thanks,
+Ming
+
