@@ -1,125 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259EB1F7567
-	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 16:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECCCD14A0A3
+	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 16:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734451627; cv=none; b=kBSCVgH4StJ7h6a1EsUyqmDz4/LZ0I4gvszmjp+HQaFmhJ7EygUG3z9cz4QIe0LxXZ4TBWWWFeESI/DPOXSLs4dkGnahJ+tyzEfaraN6DovW/exkjxMdAxBkNp3SCc/D51R+n1aeJWMU6BwsJDW2ic/qTWpdu49T3zKqhkmDaz8=
+	t=1734453442; cv=none; b=K9hxww+56AVBjN3IiqRGlYFHGyumcTb1PPXPU89gYLCY247vD1EvNuOXoPzjo+ZLzj1+hEK0Jg9KhULm7ToOsgdaxGmdDepXZjPgWzsiG8G9YPzrMsivr5X5VmfUwSrA/fwbRejssFASRuq8xhY0st5MmBh2tmyfn7kmNkYEeco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734451627; c=relaxed/simple;
-	bh=CwCGCpkesm9YaZdE3kKQYootMDwAuf1TrnNYqmI7PkQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hdeg47qmS5Pfc0co7tlw55ZPKznycdClQwyrwqsEAlETtZPhzt4zWn62DIP2n3RT2u05+HwCNJz3XkcKrZZ6Ygxdh7n+I6dh23x6G3P5cYIpyh8e8zkx8MCi7WEMm5+xlJishxHHqCq738ZNKpCeN2vpPskp5HJ40qAvFi1TtG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OL4LP8T7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734453442; c=relaxed/simple;
+	bh=1ATu9wgaYAQKhmswVhuoVZ2QLTUdUkiXPcR6R4v8PvA=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=L/FPcXf4knjcMMq/TTVy+J3/QmWAqMPPNHn7Y72uGYIcJ9obVXIj/t6rc3qLUgti7bK3oMSD3kOW8QxLCS0SN5Uu1dQGn9frkvW1EzcrA/on0WRVKZxU4pGPh9NnpOzp62hNualFG9WXFT9G2LeDDk9R8EYmLaPLAb9Cr9UiGpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YkvrTB0a; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OL4LP8T7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82A79C4CED3;
-	Tue, 17 Dec 2024 16:07:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734451626;
-	bh=CwCGCpkesm9YaZdE3kKQYootMDwAuf1TrnNYqmI7PkQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OL4LP8T7ZjbK3cJ8MUjKlg4dIKaMl4gA3rme+4CeOVfYG7xB56aUSsEgxcDMx7qXg
-	 idlzLeM8CGTo3btr8reialbNHrkQAEO3m92uULY41BZkCuoXEjDU7Q7EnuoJhJkSt0
-	 6qXk4GySWiWXnYEUs98YH3V/sMMOCFTGo0pYOWi+cgLqFW9qRoKr72dBWU2B8uAcIj
-	 +H8ckyWtHOM11djCQpjxkVJn2PogqU2wjhC9QWGT23jgBppLBYKVM8XcuX8OEz5tiJ
-	 hbghQZuhG7WbiLIj/BS8SqiK6jDnY22UWgiDkxq9PrMWt1gdCyDDOp9hGybZUTzLcs
-	 J392E/F5Z4rUA==
-Message-ID: <a032a3a0-0784-4260-92fd-90feffe1fe20@kernel.org>
-Date: Tue, 17 Dec 2024 08:07:06 -0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YkvrTB0a"
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3a813899384so18639545ab.1
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 08:37:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734453440; x=1735058240; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eLXAYiyU1iqMID7+HfNyBZxwgcF9EMYHiTYuuHxkZvc=;
+        b=YkvrTB0aNwKvR4xRlDpztlOMbeGYbo4Ym1ToMR0mUwdkDj9J59eG6lLIA1luzDT1tB
+         Z5GvUBO1asaMNLI0vh6XMq1oB4V3MfCWBl/JHIYoclfd+hNwEc42Rdgt3mXOMwUuCX8p
+         tcBlcLxeNkR/iMJHOTsg1OMzMJoXJwFVVKKstenMMcC9lnXvKFNoN9VgWtXaemj0AF+a
+         vTx/aA/pm+I4h7s9Rbw8T0mbO47cPcDl162FZsDTchFamGnzW2OWUeMtxLq32eb0xIa+
+         7i58HBGU0nE0yB0+R7qBns6wt3VAQldTcQL2mJ7HitNLPcK65E5mSmkcazdPuJtJUjB6
+         FN5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734453440; x=1735058240;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eLXAYiyU1iqMID7+HfNyBZxwgcF9EMYHiTYuuHxkZvc=;
+        b=cEzH69cOdceLb2RpNUutU8YMlXgM8S5v/arUfR+RumuOFhRX4PDjLrR1HpMUVzfFhM
+         v5oSB7NWNycAWNuu2qRhTaFSGi7zZSswHGZaL7h03WX81ZjT7kgG2+8cG4Xk+OW7XhkF
+         MQG/AY+W/pVksTKRjfeS02Wns+tBrvzSlGm3CO2TFM3O82FPheo/8tWXwl91cdWvYOp5
+         AD+8Mm3gNmjqRBj7QyECUJq7SmpjBMcbBoVFiZOrCBj87bYA/jb9mvhUhd0PH6f52sC5
+         MpTcAub39sviT7M4exttlydjhNf3TmjIHGJYm8xsPIse4/oW9AkYP2K5ncEnde3R9mU0
+         3pzQ==
+X-Gm-Message-State: AOJu0YzYi4L5jWhXcNmjfZ0NHR/ObofJIe1oEGvOkB9xFLPXpM0TdgIr
+	DWP+6B2sjTybnFOFVP6RqXZp/OOs6RPkCDoJ5IC+UT2kMxLT/cFpNmLIYYWwQjE=
+X-Gm-Gg: ASbGnctXxC++ZViwMNsRzAgM8V1LcKB6nLWtofJw9B/91SX9Acby5sfK9opRIhoWQGD
+	JQVozvebXbREXemxpmxa+jwDdgb5LHSKYoVlaLclv3UY3LsmQc+xiEfrzNBVbwVJcJRePyPXWGU
+	aNF/5I8ChYJezSE2DM1qO0a8s+W0xg5tE1M7GlBBIPmnIRiohvLryDHYgwOxs71nywVu7vydTN3
+	BUOM1WhGlbSOdAfRyK7vz/FF3N8JxO+D5uytokZYlgATnw=
+X-Google-Smtp-Source: AGHT+IE/HVlmxcalHVFA9B+15PGcwD/7VUAayQaHnmJ8VTv9HsAtDcrPfDzLFsYJKWRCm33fWsrd4w==
+X-Received: by 2002:a05:6e02:1d11:b0:3a7:708b:da28 with SMTP id e9e14a558f8ab-3bd8b195aa9mr912455ab.21.1734453440010;
+        Tue, 17 Dec 2024 08:37:20 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e5e0a3de5esm1774339173.51.2024.12.17.08.37.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Dec 2024 08:37:19 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Bjorn Helgaas <bhelgaas@google.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+ Sagi Grimberg <sagi@grimberg.me>, John Garry <john.g.garry@oracle.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>, 
+ Daniel Wagner <wagi@kernel.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-pci@vger.kernel.org, virtualization@lists.linux.dev, 
+ linux-scsi@vger.kernel.org, megaraidlinux.pdl@broadcom.com, 
+ mpi3mr-linuxdrv.pdl@broadcom.com, MPT-FusionLinux.pdl@broadcom.com, 
+ storagedev@microchip.com, linux-nvme@lists.infradead.org
+In-Reply-To: <20241202-refactor-blk-affinity-helpers-v6-0-27211e9c2cd5@kernel.org>
+References: <20241202-refactor-blk-affinity-helpers-v6-0-27211e9c2cd5@kernel.org>
+Subject: Re: [PATCH v6 0/8] blk: refactor queue affinity helpers
+Message-Id: <173445343855.487134.18283101203931240403.b4-ty@kernel.dk>
+Date: Tue, 17 Dec 2024 09:37:18 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: avoid to hold q->limits_lock across APIs for
- atomic update queue limits
-To: Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <20241216080206.2850773-1-ming.lei@redhat.com>
- <20241216080206.2850773-2-ming.lei@redhat.com>
- <20241216154901.GA23786@lst.de> <Z2DZc1cVzonHfMIe@fedora>
- <20241217044056.GA15764@lst.de> <Z2EizLh58zjrGUOw@fedora>
- <20241217071928.GA19884@lst.de> <Z2Eog2mRqhDKjyC6@fedora>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <Z2Eog2mRqhDKjyC6@fedora>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-
-On 2024/12/16 23:30, Ming Lei wrote:
-> On Tue, Dec 17, 2024 at 08:19:28AM +0100, Christoph Hellwig wrote:
->> On Tue, Dec 17, 2024 at 03:05:48PM +0800, Ming Lei wrote:
->>> On Tue, Dec 17, 2024 at 05:40:56AM +0100, Christoph Hellwig wrote:
->>>> On Tue, Dec 17, 2024 at 09:52:51AM +0800, Ming Lei wrote:
->>>>> The local copy can be updated in any way with any data, so does another
->>>>> concurrent update on q->limits really matter?
->>>>
->>>> Yes, because that means one of the updates get lost even if it is
->>>> for entirely separate fields.
->>>
->>> Right, but the limits are still valid anytime.
->>>
->>> Any suggestion for fixing this deadlock?
->>
->> What is "this deadlock"?
-> 
-> The commit log provides two reports:
-> 
-> - lockdep warning
-> 
-> https://lore.kernel.org/linux-block/Z1A8fai9_fQFhs1s@hovoldconsulting.com/
-> 
-> - real deadlock report
-> 
-> https://lore.kernel.org/linux-scsi/ZxG38G9BuFdBpBHZ@fedora/
-> 
-> It is actually one simple ABBA lock:
-> 
-> 1) queue_attr_store()
-> 
->       blk_mq_freeze_queue(q);					//queue freeze lock
->       res = entry->store(disk, page, length);
-> 	  			queue_limits_start_update		//->limits_lock
-> 				...
-> 				queue_limits_commit_update
->       blk_mq_unfreeze_queue(q);
-
-The locking + freeze pattern should be:
-
-	lim = queue_limits_start_update(q);
-	...
-	blk_mq_freeze_queue(q);
-	ret = queue_limits_commit_update(q, &lim);
-	blk_mq_unfreeze_queue(q);
-
-This pattern is used in most places and anything that does not use it is likely
-susceptible to a similar ABBA deadlock. We should probably look into trying to
-integrate the freeze/unfreeze calls directly into queue_limits_commit_update().
-
-Fixing queue_attr_store() to use this pattern seems simpler than trying to fix
-sd_revalidate_disk().
-
-> 
-> 2) sd_revalidate_disk()
-> 
-> queue_limits_start_update					//->limits_lock
-> 	sd_read_capacity()
-> 		scsi_execute_cmd
-> 			scsi_alloc_request
-> 				blk_queue_enter					//queue freeze lock
-> 
-> 
-> Thanks,
-> Ming
-> 
-> 
+X-Mailer: b4 0.14.3-dev-86319
 
 
+On Mon, 02 Dec 2024 15:00:08 +0100, Daniel Wagner wrote:
+> I've rebased and retested the series on top of for-6.14/block and updated
+> the docummentation as requested by John.
+> 
+> Original cover letter:
+> 
+> These patches were part of 'honor isolcpus configuration' [1] series. To
+> simplify the review process I decided to send this as separate series
+> because I think it's a nice cleanup independent of the isolcpus feature.
+> 
+> [...]
+
+Applied, thanks!
+
+[1/8] driver core: bus: add irq_get_affinity callback to bus_type
+      commit: ccddd556cfba3db6cb4d45d9f7d30c075e34808b
+[2/8] PCI: hookup irq_get_affinity callback
+      commit: 86ae920136e7c6352e7239a459544b0eae57613a
+[3/8] virtio: hookup irq_get_affinity callback
+      commit: df0e932e866b5cfad8cedafa0123ab0072a665ce
+[4/8] blk-mq: introduce blk_mq_map_hw_queues
+      commit: 2b30fab613e2ef54ae4b3fbb238245a29ba2a285
+[5/8] scsi: replace blk_mq_pci_map_queues with blk_mq_map_hw_queues
+      commit: 7c72e20573d0d350c7c087289e7b7b605100651f
+[6/8] nvme: replace blk_mq_pci_map_queues with blk_mq_map_hw_queues
+      commit: f0d672680e0b383b14add766b57db60c4c4acf92
+[7/8] virtio: blk/scsi: replace blk_mq_virtio_map_queues with blk_mq_map_hw_queues
+      commit: 5a1c50296039ca32a22015bbb9696d6a96514947
+[8/8] blk-mq: remove unused queue mapping helpers
+      commit: 737371e839a368007758be329413b3f5ec9e7976
+
+Best regards,
 -- 
-Damien Le Moal
-Western Digital Research
+Jens Axboe
+
+
+
