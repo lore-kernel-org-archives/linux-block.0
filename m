@@ -1,48 +1,63 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4CF1F2395
-	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 21:06:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE071F9ED1
+	for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 21:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734469578; cv=none; b=XoAhF027i+f8o/SZwmjxi2pijcQCZAGcWkt5awwxo03E6TBl/2ZXydr7IaItPreNz0GGQbkQTtChryUvBRLjHro37+yRMkQpKaHaA8CTHrfusIf0VolbgNAPMs8F08XIQm8c1Qu5Sf0js4GajVkJolQ+kbo+4cb/MKX2nXNe/zM=
+	t=1734469650; cv=none; b=h+sNO4BsY5OGUaxM4uSC5UJjT5uxv+yR090vymn/abSoKHigpYJV+y16hAJC8x1jJQ5NoNEy0x7/JQLU+VZk0A7/Nq97lJPdGOXhSjJYgIC8eJZsz0mESFR0f6S3ZxhsEP0ar7dfDqMBh28gYJBb7pSCE/RD2SvVvbalUiF9QZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734469578; c=relaxed/simple;
-	bh=7B0UExx/8kXvSUMbRNUWrcrX/wF9odUMxmaDZS52uJQ=;
+	s=arc-20240116; t=1734469650; c=relaxed/simple;
+	bh=DYXCpIfYdRHNRG32/Ni0pl1LzbN+rMCEr35BN5GBtqo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=chuwZ0izI1Mt/QujJ4bhCEeSmK2saFlZFAFRiaKCPVkxZFqGx70ysFd7KaAto6GDZleAre8LiGyT3HGpdr08MJlDRc7su+ie/ktCeyt508oewBEq+CRoE8r5CZYgVMPGDtjveZvuTcLl7q6XpAQGMPyPG2p83NkocVHJxea5EJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=aUcDkPYB; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=H1cGR8RgKqKbMBIodyFWCU2R4/U+BxFVtFbss5t42wWgYEBYNn6Ab3Fnf+zoEATlOV6yzlw+MlxBsQWq46J7rq4Ep/tEOlNRzY+LEh8olxSWiUR0KuwmhZYPPRXfjhw1bUDufpaY18CR0bgED4jkWaGhkOWk63W2SSZmFJWx1CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=wVQml5bX; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="aUcDkPYB"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YCTr83VrBzlff0M;
-	Tue, 17 Dec 2024 21:06:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1734469574; x=1737061575; bh=W+fxPZgBAR3X0/yYw0BBm7nx
-	R5aKjBzC98Ypb29qPHw=; b=aUcDkPYBeg04fcUUWC7ZM3OloQDRRBMHn1+Y3ocM
-	bIyHM/bKqKRzavFoooRILJL0oMhv6aUJB2UzMmDkAAMfJQYEzJwsYl2R4LR3e56e
-	aB6UMrpLc7oM2TjndsML7jaQ7tw/AlH5JkdQNS/lkoiZdldbJnafKoFSqyMKuJCP
-	i96gG8PVVlNb/6+YvcHkDCWQBftSGFM+xNEOo1jq81bxSau3fx8/qwg7kSK/FXiu
-	1jFXh1pyBMkp3xy5SeZ7EJSD2GOlwh1R6mjtwzRa5pR7YbVBrSU+qrRZeqGBNViU
-	hgg6f+FB++iACUkYUswZC6rf3zxMvzE1k2uAgRvgPBGsYA==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id YpWbAeUfoYfn; Tue, 17 Dec 2024 21:06:14 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YCTr53dv1zlffl6;
-	Tue, 17 Dec 2024 21:06:13 +0000 (UTC)
-Message-ID: <b17872ef-46ad-4a6a-9a6b-17edc4a25630@acm.org>
-Date: Tue, 17 Dec 2024 13:06:12 -0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wVQml5bX"
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-844e55a981dso168679639f.3
+        for <linux-block@vger.kernel.org>; Tue, 17 Dec 2024 13:07:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734469648; x=1735074448; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xxTHFAi0ufizCl7I67BVly4Us0FktZFreE3PeudaUmw=;
+        b=wVQml5bXEZ7p4mwj9+z84iqJaLYCrkNwAC4j9BPatt6NgC/YRtMtp+loscpqRiGnK4
+         MGw8fHj3rNiLo/Q/NwXKM16bS3y60E0uuzaBHLAVH0a/w619Vou0oPFvSOmnrLZ6wo9m
+         U8KtXAkgNNDOxLbd/sih+/xrqp7X1NLhpV6Cr0AovzHr4wfo8a9V148lxnHVLVrDq5k5
+         vk86a5ijzLZRyEds3k+sBYovbErKL72NEo1UddS/cjryOZ6fz4NQ7BJQwe6Pr/r3Q5qC
+         qX7HaXKn32Ts2L/Xg5/eWv0olVxhPos52JMp5526DGx6tlqV2PUeG4U9Br8l6nArXX1+
+         LP3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734469648; x=1735074448;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xxTHFAi0ufizCl7I67BVly4Us0FktZFreE3PeudaUmw=;
+        b=SikhkVt7CKbqzZDJrv0WncDZRAUvRniIneDtpOhGObX/hnq6u9W4Tz1XpxCHP12UZN
+         ilHXPHpLJc0snOU/jKvWI7jFuNPnkNstOcNmjehEqejQkstdUr6zj3CfrRyWEAbylnEl
+         pBJkgFTbKrqnaVtxX/TI8Jie6T3tA1i3Hy3s1rueJDvMThEzE0f5ZoW5G391iKsS96tn
+         bqV3J9ERplGS/Xgr6P4buLT/hlNZ5n/v9Wn2dUCjHYU8Vc8+Tn9hEJE5PnvLCWHAH5y9
+         JZImaplBDiJe4ZzrBTrjYB5v3uj+etQ1offZLjAUOSLTZpDT0Ambxnt16kSn+2PZ5GbW
+         Yhrg==
+X-Forwarded-Encrypted: i=1; AJvYcCWeI5RqI+ODSJOR67oCKBUxKa8RTgdkLhcBayrdg0Wsqq5FIQby9QmBfi/y1ldUUPfmMjbSP7RPAwb2Tg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0EgYjX5MIL9+4x8QjeD/nEVV3RNI+3v+c5DTCrSB9Gor630Kz
+	yry6x6NXiZl5fsJteXmdu3avScNDxWksZxCZc3dZOP7dcBn5+ZV4fpy5cn1EtGE=
+X-Gm-Gg: ASbGncsluAh5jK8NmHYWXZGZqHB7MPwbK2FA94D6zsIPdx/ePlgwfjPrWGGVLYA8tDx
+	bH8b1V0CpJj/6W/p1d43CL2XwoJmIbuZuqpMhHWZWw9fbKaubiCqagtWsZXlIw0WGo9xxTyHwkF
+	XkDaD83It+/R/3bPHHR/TCPgj7bhdTLy6HXcMlllP4tWBBtDsmAQ2fpQu1knpNmOtYeog7E76sb
+	BeAI6KsgWJZTvMCfzp6OyJ0BxJ7MDl1DrV6XSO7P1hIpcKmDw0e
+X-Google-Smtp-Source: AGHT+IEZuOks5bPSEmDavYC9qmsQ8z1l/snRQxoEwkEepPxAkIeF35dwOhWBSaIIdJE+B3U31qo95A==
+X-Received: by 2002:a05:6602:2c88:b0:803:5e55:ecb2 with SMTP id ca18e2360f4ac-8475831e21emr49355439f.0.1734469647813;
+        Tue, 17 Dec 2024 13:07:27 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-844f62583ebsm194676439f.11.2024.12.17.13.07.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2024 13:07:27 -0800 (PST)
+Message-ID: <92eafd0f-943a-4595-8df3-45128cac5ee9@kernel.dk>
+Date: Tue, 17 Dec 2024 14:07:26 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,81 +65,47 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] blk-mq: Move more error handling into
- blk_mq_submit_bio()
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Damien Le Moal <dlemoal@kernel.org>
-References: <20241216201901.2670237-1-bvanassche@acm.org>
- <20241216201901.2670237-3-bvanassche@acm.org> <20241217041819.GB15286@lst.de>
+Subject: Re: [PATCH 0/3][RFC] virtio-blk: add io_uring passthrough support for
+ virtio-blk
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Jingbo Xu <jefflexu@linux.alibaba.com>,
+ Christoph Hellwig <hch@infradead.org>,
+ Ferry Meng <mengferry@linux.alibaba.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ linux-block@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+ Joseph Qi <joseph.qi@linux.alibaba.com>
+References: <20241203121424.19887-1-mengferry@linux.alibaba.com>
+ <Z2BNHWFWgLjEMiAn@infradead.org>
+ <CAJSP0QXU_uNqL-9LmLRkDdPPSdUAGdesQ2DFuCMHnjyEuREvXQ@mail.gmail.com>
+ <0535520b-a6a6-4578-9aca-c698e148004e@linux.alibaba.com>
+ <acaf46f3-3f6c-44c9-86b5-98aa7845f1b6@kernel.dk>
+ <CAJSP0QWfSzD8Z+22SEjUMkG07nrBa+6WU_APYkrvwzNbScRRCw@mail.gmail.com>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20241217041819.GB15286@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAJSP0QWfSzD8Z+22SEjUMkG07nrBa+6WU_APYkrvwzNbScRRCw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/16/24 8:18 PM, Christoph Hellwig wrote:
-> On Mon, Dec 16, 2024 at 12:19:01PM -0800, Bart Van Assche wrote:
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 8d2aab4d9ba9..80eb91296142 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -2971,8 +2971,6 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
->>   	if (rq)
->>   		return rq;
->>   	rq_qos_cleanup(q, bio);
->> -	if (bio->bi_opf & REQ_NOWAIT)
->> -		bio_wouldblock_error(bio);
->>   	return NULL;
+On 12/17/24 2:00 PM, Stefan Hajnoczi wrote:
+> On Tue, 17 Dec 2024 at 12:54, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 12/16/24 11:08 PM, Jingbo Xu wrote:
+>>>> That's why I asked Jens to weigh in on whether there is a generic
+>>>> block layer solution here. If uring_cmd is faster then maybe a generic
+>>>> uring_cmd I/O interface can be defined without tying applications to
+>>>> device-specific commands. Or maybe the traditional io_uring code path
+>>>> can be optimized so that bypass is no longer attractive.
+>>
+>> It's not that the traditional io_uring code path is slower, it's in fact
+>> basically the same thing. It's that all the other jazz that happens
+>> below io_uring slows things down, which is why passthrough ends up being
+>> faster.
 > 
-> Please turn this into:
-> 
-> 	if (rq)
-> 		rq_qos_cleanup(q, bio);
-> 	return rq;
-> 
-> Otherwise this looks like a nice cleanup.
+> Are you happy with virtio_blk passthrough or do you want a different approach?
 
-It seems to me that there is a typo in the above code? Unless if you 
-tell me otherwise, I will assume that this is what you meant:
+I think it looks fine.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8d2aab4d9ba9..f4300e608ed8 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2968,12 +2968,9 @@ static struct request 
-*blk_mq_get_new_requests(struct request_queue *q,
-  	}
+-- 
+Jens Axboe
 
-  	rq = __blk_mq_alloc_requests(&data);
--	if (rq)
--		return rq;
--	rq_qos_cleanup(q, bio);
--	if (bio->bi_opf & REQ_NOWAIT)
--		bio_wouldblock_error(bio);
--	return NULL;
-+	if (!rq)
-+		rq_qos_cleanup(q, bio);
-+	return rq;
-  }
-
-  /*
-@@ -3106,8 +3103,11 @@ void blk_mq_submit_bio(struct bio *bio)
-  		blk_mq_use_cached_rq(rq, plug, bio);
-  	} else {
-  		rq = blk_mq_get_new_requests(q, plug, bio, nr_segs);
--		if (unlikely(!rq))
-+		if (unlikely(!rq)) {
-+			if (bio->bi_opf & REQ_NOWAIT)
-+				bio_wouldblock_error(bio);
-  			goto queue_exit;
-+		}
-  	}
-
-  	trace_block_getrq(bio);
-
-
-
-Thanks,
-
-Bart.
