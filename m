@@ -1,157 +1,80 @@
-Received: from mr85p00im-ztdg06011201.me.com (mr85p00im-ztdg06011201.me.com [17.58.23.181])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C9F19D07A
-	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 00:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.23.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8BC35945;
+	Wed, 18 Dec 2024 01:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734480195; cv=none; b=Pz0oBUf0IhEwXvm+rEEWepmliYNdxBAfox4TcI7YLZDUiu/TH7pSisdNrZz3pZ9Qbwh0flftxLhYix7RAPGNJTxVd1h2XPR8TSYIJK7vcwUKV8yxmcUSGMv6RWuYoA6poIAn/3NKpp1N9I8PIRD2dDEdRXjcyjbhQ5w5lb7fudc=
+	t=1734484462; cv=none; b=J78ktrq8fPfXFkMyy8brIoeY/iueMmH+Og+4KMXUwS8SHnSWVcII501yg1nnsOXjkmLpJBcfB2p0zOZGUEbc9y26Hfl3F6OENo6KsXh5ItYvFs6UPonm60hj4G2/j0J0+EVlFzAMAzGwvZ5skh6+0DOgIWeG8zRNT8PLiXv3Ww0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734480195; c=relaxed/simple;
-	bh=7c0hWaDRO0lYYPUw3fSJwZidpoLlvEvnQjd/RkahQfY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=K8mCP2rAypuKtUYtS+y8jOTquxydoXtXa0oqKBtQvHr6ijiR4zAKzEcLu5UBOVgbF29BUdhOddF7/1EutrYnynOrlt2K1LSfbUXWo+QLCfqbCuG/d1qMR2qB+zuSHUttnZpOhXitB9vuoJo554bSsjI88gdd5mV9LXQpO7UPqhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=MRPctL5d; arc=none smtp.client-ip=17.58.23.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="MRPctL5d"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1734480194;
-	bh=dqP9qynvc8yZXa+bnipKSS5T9b0BbFcof3abx8Gc0z8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:
-	 x-icloud-hme;
-	b=MRPctL5dFoYQ3LiwnmvxriiGc1QwXzo77zQ8JdWaoYlb27NF2n6sH3ScmReaHbiLq
-	 7WCQ76VcTlQU8AccwKGQYO5H8qogJ/e43Ko0yRgPEZrvKGw+U1/YZ2DCsoB/mbCNqL
-	 rABYg5d9XKnu58OLaNEooQ5le6l9CCwkZkN4sUgu9alT56VobjIuOgznGWiqVwJvNO
-	 camcNBZ03VQC2wyFoHcHtCj47iEZQC9lEcz28hc7HjVPzde7souSaOxe7yKSWGy/G3
-	 /ov97PmMYTfEu6rEN3UvCXey+DvbSVGSGph7dSzK0qutYFeRTG/DdpMh8XllvhriSM
-	 cJbLQV4/fqwIw==
-Received: from [192.168.1.26] (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-	by mr85p00im-ztdg06011201.me.com (Postfix) with ESMTPSA id C0DA896019F;
-	Wed, 18 Dec 2024 00:03:07 +0000 (UTC)
-From: Zijun Hu <zijun_hu@icloud.com>
-Date: Wed, 18 Dec 2024 08:01:38 +0800
-Subject: [PATCH v4 8/8] driver core: Move 2 one line device finding APIs to
- header
+	s=arc-20240116; t=1734484462; c=relaxed/simple;
+	bh=t7Td576zeqiDD4OIPxEBdUaTZdbWccbjkru7sKv3U9E=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=dOHxSMiUHXg8hC1I8p+lZQIDDOw+kItls2OYhxzq0vIEvWnVIaNIgJifZgGW4CpKs98GdK6DEeLhFRk4hZ3vNv5GKnUOMIgaNR5RkeZDufghndizHhBzJ70oR9bMQ3GRTU4UplmMpIM/bZ/fend+6lTkQZdvn5XiTtUpSQeRDyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YCbL226dwz4f3jqw;
+	Wed, 18 Dec 2024 09:14:02 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id B85341A0359;
+	Wed, 18 Dec 2024 09:14:16 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP4 (Coremail) with SMTP id gCh0CgDH7oLnIWJnEimiEw--.60686S3;
+	Wed, 18 Dec 2024 09:14:16 +0800 (CST)
+Subject: Re: [PATCH RFC v2 4/4] block/mq-deadline: introduce min_async_depth
+To: Yu Kuai <yukuai1@huaweicloud.com>, Bart Van Assche <bvanassche@acm.org>,
+ axboe@kernel.dk, akpm@linux-foundation.org, ming.lei@redhat.com,
+ yang.yang@vivo.com, osandov@fb.com, paolo.valente@linaro.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20241217024047.1091893-1-yukuai1@huaweicloud.com>
+ <20241217024047.1091893-5-yukuai1@huaweicloud.com>
+ <da924dc3-a2e5-4bfe-afb6-5fbc55bc25a3@acm.org>
+ <8fa8c620-22ff-0963-d1ee-c6fe6f13b49c@huaweicloud.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <96556f82-b511-b3ef-01b5-e9a32557db95@huaweicloud.com>
+Date: Wed, 18 Dec 2024 09:14:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241218-class_fix-v4-8-3c40f098356b@quicinc.com>
-References: <20241218-class_fix-v4-0-3c40f098356b@quicinc.com>
-In-Reply-To: <20241218-class_fix-v4-0-3c40f098356b@quicinc.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>, 
- Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, 
- Boris Burkov <boris@bur.io>, Davidlohr Bueso <dave@stgolabs.net>, 
- Jonathan Cameron <jonathan.cameron@huawei.com>, 
- Dave Jiang <dave.jiang@intel.com>, 
- Alison Schofield <alison.schofield@intel.com>, 
- Vishal Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
- Dan Williams <dan.j.williams@intel.com>
-Cc: Zijun Hu <zijun_hu@icloud.com>, linux-kernel@vger.kernel.org, 
- cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-cxl@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-X-Mailer: b4 0.14.2
-X-Proofpoint-ORIG-GUID: iQ8-mg4aEfHHSs5wuAPGnOfDbU92wXlr
-X-Proofpoint-GUID: iQ8-mg4aEfHHSs5wuAPGnOfDbU92wXlr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-17_12,2024-12-17_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=0
- malwarescore=0 adultscore=0 bulkscore=0 clxscore=1015 spamscore=0
- mlxlogscore=999 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2412170183
-X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
+In-Reply-To: <8fa8c620-22ff-0963-d1ee-c6fe6f13b49c@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDH7oLnIWJnEimiEw--.60686S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYK7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72
+	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
+	rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
+	1l4c8EcI0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
+	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r
+	43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
+	7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
+	WUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU
+	F9a9DUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-From: Zijun Hu <quic_zijuhu@quicinc.com>
+Hi,
 
-The following device finding APIs only have one line code in function body
-device_find_child_by_name()
-device_find_any_child()
+在 2024/12/18 9:12, Yu Kuai 写道:
+> 
+> Users may not like it that this parameter is read-only.
 
-Move them to header as static inline function.
+I can't make this read-write, because set lower value will cause
+problems for existing elevator, because wake_batch has to be
+updated as well.
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
----
- drivers/base/core.c    | 32 --------------------------------
- include/linux/device.h | 14 +++++++++++---
- 2 files changed, 11 insertions(+), 35 deletions(-)
-
-diff --git a/drivers/base/core.c b/drivers/base/core.c
-index 930e43a970952b20cd1c71856bdef889698f51b4..3f37a2aecb1d11561f4edd72e973a1c43368de04 100644
---- a/drivers/base/core.c
-+++ b/drivers/base/core.c
-@@ -4100,38 +4100,6 @@ struct device *device_find_child(struct device *parent, const void *data,
- }
- EXPORT_SYMBOL_GPL(device_find_child);
- 
--/**
-- * device_find_child_by_name - device iterator for locating a child device.
-- * @parent: parent struct device
-- * @name: name of the child device
-- *
-- * This is similar to the device_find_child() function above, but it
-- * returns a reference to a device that has the name @name.
-- *
-- * NOTE: you will need to drop the reference with put_device() after use.
-- */
--struct device *device_find_child_by_name(struct device *parent,
--					 const char *name)
--{
--	return device_find_child(parent, name, device_match_name);
--}
--EXPORT_SYMBOL_GPL(device_find_child_by_name);
--
--/**
-- * device_find_any_child - device iterator for locating a child device, if any.
-- * @parent: parent struct device
-- *
-- * This is similar to the device_find_child() function above, but it
-- * returns a reference to a child device, if any.
-- *
-- * NOTE: you will need to drop the reference with put_device() after use.
-- */
--struct device *device_find_any_child(struct device *parent)
--{
--	return device_find_child(parent, NULL, device_match_any);
--}
--EXPORT_SYMBOL_GPL(device_find_any_child);
--
- int __init devices_init(void)
- {
- 	devices_kset = kset_create_and_add("devices", &device_uevent_ops, NULL);
-diff --git a/include/linux/device.h b/include/linux/device.h
-index 36d1a1607712f5a6b0668ac02a6cf6b2d0651a2d..d1871a764be62e6857595bc10b9e54862c99dfa2 100644
---- a/include/linux/device.h
-+++ b/include/linux/device.h
-@@ -1083,9 +1083,17 @@ int device_for_each_child_reverse_from(struct device *parent,
- 				       device_iter_t fn);
- struct device *device_find_child(struct device *parent, const void *data,
- 				 device_match_t match);
--struct device *device_find_child_by_name(struct device *parent,
--					 const char *name);
--struct device *device_find_any_child(struct device *parent);
-+
-+static inline struct device *device_find_child_by_name(struct device *parent,
-+						       const char *name)
-+{
-+	return device_find_child(parent, name, device_match_name);
-+}
-+
-+static inline struct device *device_find_any_child(struct device *parent)
-+{
-+	return device_find_child(parent, NULL, device_match_any);
-+}
- 
- int device_rename(struct device *dev, const char *new_name);
- int device_move(struct device *dev, struct device *new_parent,
-
--- 
-2.34.1
+Thanks,
+Kuai
 
