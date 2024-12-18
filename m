@@ -1,175 +1,106 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B8B1A2396
-	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 13:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6355198822
+	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 13:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734529251; cv=none; b=LFtRbdvV9/v2TEDjCLqIouPniwho6ytxuDvKqaH92M+FbELUDAqWBLnu0S8QbBp6eo1k/61/hCyOSeRtBANyWn+ZndT/ROBYp0kj6qY//eJLlpklDNQVI4edFNqdJlEm6fUcYKSFPjtyelmdKDnqGsU/EQSZL705FZxxFgz2pbA=
+	t=1734529433; cv=none; b=mRxuz+PUFWUr1YviX+miTdfQBRZ9ZO7yalXuBTFIhNpk1TVv9OE7SEg05Zj9MmpqXn5bOSLX8Lr7Afzup877TLyjc5VfoOLhpdNDGXgsAGf8sUiH5Sz/kWwTx92/gsYFA97u3l7Vfi7XL4/hjiRY/8NJd29gJvKR+wesME8crI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734529251; c=relaxed/simple;
-	bh=OFqFqtq68qW71+1R5fMOLX4meRY7mhRN6WIODvBRcU4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IUlIK6OlKZghB3yvDXe4aIepXGWtnOsrG6rR1msk/WR6p+5OSbM9jhIBJZRJ93zRHQQKeBgoljXYw78JJVoM8mbO3Ueu/KWZGssrwmjFjCtoCFoW0r2zRGw03FUjlzXYywfBxcnafcESgPhStiGuNrIPcOB9CgX8stlde6XWXsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T0ceTQXz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1734529433; c=relaxed/simple;
+	bh=dX+iPzUhR933k8bXeD5xkk2m7shzyVAPHNh76LBqDu0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O/fMTalan5zoV42B3RWZ4r9q0zSO0SajWl6+1YtQnq+OlyUkl/WWgh8MhSRvPPh8ncg62zVZ0zP5kDxOic3sHzscrsEIub+WI2OGUZntwjl91K3a1CJheJtWygxrsTI5eSs3yyJHHf9toTnk2GNlEkG4/QjL/VaFldznLHSD5vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=m6cZDM5s; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T0ceTQXz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734529248;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gnhROUxmbVticWznK1upo6TrjbXxXzJsPKOyle7xfgs=;
-	b=T0ceTQXziZIPtoXsey+kxS6k3z6WRB++rju7d1CRLitNzFxfv5KF6OfH7UvaCcHNEq51M5
-	+pmxVI30NBLUDfzFpekR69fO9jCX1PAizSpuDnvJJC6BPTDPEjo3g4Md/B0uFfLdjN+uML
-	EnzUsoxs3kk+MA5HrEJlLLAkNOfBKlI=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-377-4nTRuFX4Pbqksi0Ce2N5aA-1; Wed,
- 18 Dec 2024 08:40:43 -0500
-X-MC-Unique: 4nTRuFX4Pbqksi0Ce2N5aA-1
-X-Mimecast-MFC-AGG-ID: 4nTRuFX4Pbqksi0Ce2N5aA
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1D15F19560B4;
-	Wed, 18 Dec 2024 13:40:42 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.10])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2AD11300F9B5;
-	Wed, 18 Dec 2024 13:40:37 +0000 (UTC)
-Date: Wed, 18 Dec 2024 21:40:32 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: avoid to hold q->limits_lock across APIs for
- atomic update queue limits
-Message-ID: <Z2LQ0PYmt3DYBCi0@fedora>
-References: <20241216080206.2850773-2-ming.lei@redhat.com>
- <20241216154901.GA23786@lst.de>
- <Z2DZc1cVzonHfMIe@fedora>
- <20241217044056.GA15764@lst.de>
- <Z2EizLh58zjrGUOw@fedora>
- <20241217071928.GA19884@lst.de>
- <Z2Eog2mRqhDKjyC6@fedora>
- <a032a3a0-0784-4260-92fd-90feffe1fe20@kernel.org>
- <Z2Iu1CAAC-nE-5Av@fedora>
- <f34f179a-4eaf-4f73-93ff-efb1ff9fe482@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="m6cZDM5s"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BICwMbL020841;
+	Wed, 18 Dec 2024 13:43:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=Es/AbkIM8u967BQVwtf5kJF/O0oo4WvyjO6elT5Fj
+	kc=; b=m6cZDM5sGUIeaMV7VPH4wOTCQDhMk+ala5fGa9tkcYhYmG5pB2mSSYa0v
+	S85vLgrsrcs4IFeKncCU8D/TVwpK2Lth+ujZSkDfm64Ix3qzA7ijFD6K3MGJN5Y1
+	n3E/AyNB7WvQ0z/sanWDHCWWin1tYE+/n4vnwemhc0Z501YSSd/mliyIDCZRQr9t
+	mRBykMoDCkLpHpKOIDQo7jSp82s7Vb+GTRkoAC0DypPzhaRC+5cyHoVY4Mc+Eiq5
+	tTFFI6JWbWRqlzvkPVMDOoCgcGcCPZiHz6DmVoodVBxrh+FI6bvN55QzhAmaeLVe
+	uP9PTHxSWFLa9Ig+AN28h5mtqzvWQ==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43kas4wp3r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Dec 2024 13:43:31 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BICN9ks005694;
+	Wed, 18 Dec 2024 13:43:31 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43hnbn83ah-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Dec 2024 13:43:30 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BIDhTwd32899462
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 18 Dec 2024 13:43:29 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ED70A2004B;
+	Wed, 18 Dec 2024 13:43:28 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8C15920040;
+	Wed, 18 Dec 2024 13:43:27 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.241])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 18 Dec 2024 13:43:27 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: linux-block@vger.kernel.org
+Cc: yukuai3@huawei.com, shinichiro.kawasaki@wdc.com, yi.zhang@redhat.com,
+        bvanassche@acm.org, gjoyce@ibm.com
+Subject: [PATCHv2 blktests 0/2] throtl: fix IO block-size and race while submitting IO
+Date: Wed, 18 Dec 2024 19:13:20 +0530
+Message-ID: <20241218134326.2164105-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f34f179a-4eaf-4f73-93ff-efb1ff9fe482@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: FHorni_Zkt1mPN_-94Lept5tL1nAak3X
+X-Proofpoint-GUID: FHorni_Zkt1mPN_-94Lept5tL1nAak3X
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
+ mlxlogscore=594 mlxscore=0 impostorscore=0 lowpriorityscore=0
+ priorityscore=1501 malwarescore=0 spamscore=0 clxscore=1011 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412180106
 
-On Wed, Dec 18, 2024 at 05:03:00PM +0530, Nilay Shroff wrote:
-> 
-> 
-> On 12/18/24 07:39, Ming Lei wrote:
-> > On Tue, Dec 17, 2024 at 08:07:06AM -0800, Damien Le Moal wrote:
-> >> On 2024/12/16 23:30, Ming Lei wrote:
-> >>> On Tue, Dec 17, 2024 at 08:19:28AM +0100, Christoph Hellwig wrote:
-> >>>> On Tue, Dec 17, 2024 at 03:05:48PM +0800, Ming Lei wrote:
-> >>>>> On Tue, Dec 17, 2024 at 05:40:56AM +0100, Christoph Hellwig wrote:
-> >>>>>> On Tue, Dec 17, 2024 at 09:52:51AM +0800, Ming Lei wrote:
-> >>>>>>> The local copy can be updated in any way with any data, so does another
-> >>>>>>> concurrent update on q->limits really matter?
-> >>>>>>
-> >>>>>> Yes, because that means one of the updates get lost even if it is
-> >>>>>> for entirely separate fields.
-> >>>>>
-> >>>>> Right, but the limits are still valid anytime.
-> >>>>>
-> >>>>> Any suggestion for fixing this deadlock?
-> >>>>
-> >>>> What is "this deadlock"?
-> >>>
-> >>> The commit log provides two reports:
-> >>>
-> >>> - lockdep warning
-> >>>
-> >>> https://lore.kernel.org/linux-block/Z1A8fai9_fQFhs1s@hovoldconsulting.com/
-> >>>
-> >>> - real deadlock report
-> >>>
-> >>> https://lore.kernel.org/linux-scsi/ZxG38G9BuFdBpBHZ@fedora/
-> >>>
-> >>> It is actually one simple ABBA lock:
-> >>>
-> >>> 1) queue_attr_store()
-> >>>
-> >>>       blk_mq_freeze_queue(q);					//queue freeze lock
-> >>>       res = entry->store(disk, page, length);
-> >>> 	  			queue_limits_start_update		//->limits_lock
-> >>> 				...
-> >>> 				queue_limits_commit_update
-> >>>       blk_mq_unfreeze_queue(q);
-> >>
-> >> The locking + freeze pattern should be:
-> >>
-> >> 	lim = queue_limits_start_update(q);
-> >> 	...
-> >> 	blk_mq_freeze_queue(q);
-> >> 	ret = queue_limits_commit_update(q, &lim);
-> >> 	blk_mq_unfreeze_queue(q);
-> >>
-> >> This pattern is used in most places and anything that does not use it is likely
-> >> susceptible to a similar ABBA deadlock. We should probably look into trying to
-> >> integrate the freeze/unfreeze calls directly into queue_limits_commit_update().
-> >>
-> >> Fixing queue_attr_store() to use this pattern seems simpler than trying to fix
-> >> sd_revalidate_disk().
-> > 
-> > This way looks good, just commit af2814149883 ("block: freeze the queue in
-> > queue_attr_store") needs to be reverted, and freeze/unfreeze has to be
-> > added to each queue attribute .store() handler.
-> > 
-> Wouldn't it be feasible to add blk-mq freeze in queue_limits_start_update()
-> and blk-mq unfreeze in queue_limits_commit_update()? If we do this then 
-> the pattern would be, 
-> 
-> queue_limits_start_update(): limit-lock + freeze
-> queue_limits_commit_update() : unfreeze + limit-unlock  
-> 
-> Then in queue_attr_store() we shall just remove freeze/unfreeze.
-> 
-> We also need to fix few call sites where we've code block,
-> 
-> {
->     blk_mq_freeze_queue()
->     ...
->     queue_limits_start_update()
->     ...    
->     queue_limits_commit_update()
->     ...
->     blk_mq_unfreeze_queue()
->     
-> }
-> 
-> In the above code block, we may then replace blk_mq_freeze_queue() with
-> queue_limits_commit_update() and similarly replace blk_mq_unfreeze_queue() 
-> with queue_limits_commit_update().
-> 
-> {
->     queue_limits_start_update()
->     ...
->     ...
->     ...
->     queue_limits_commit_update()
+Hi,
 
-In sd_revalidate_disk(), blk-mq request is allocated under queue_limits_start_update(),
-then ABBA deadlock is triggered since blk_queue_enter() implies same lock(freeze lock)
-from blk_mq_freeze_queue().
+The first patch fixes the IO block-size used for submitting IO depending
+on the throttle device max-sectors settings.
 
+The second patch fixes the potential race condition between submitting IO
+and setting PID of the background IO process to cgroup.procs.
 
-Thanks,
-Ming
+Changes from v1:
+    - Use $BASHPID to write the child sub-shell PID into cgroup.procs
+      (Shinichiro Kawasaki)
+    - Link to v1: https://lore.kernel.org/all/20241217131440.1980151-1-nilay@linux.ibm.com/
+
+Nilay Shroff (2):
+  throtl/002: calculate block-size based on device max-sectors setting
+  throtl: fix the race between submitting IO and setting cgroup.procs
+
+ tests/throtl/002 | 14 ++++++++++----
+ tests/throtl/004 |  7 ++-----
+ tests/throtl/005 |  7 ++-----
+ tests/throtl/rc  | 11 ++++++-----
+ 4 files changed, 20 insertions(+), 19 deletions(-)
+
+-- 
+2.45.2
 
