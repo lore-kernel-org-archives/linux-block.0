@@ -1,64 +1,64 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A8F198822
-	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 13:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30F9158853
+	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 13:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734529443; cv=none; b=cqHJHxPJDXmV3e0b7o0ykW3CPpOyOgNJiM3E5of6n6JAhAC3QlGPZ3EjEt8wDIKvsj7kqjxj6770wZsIZwoNp6s6YP88FOQW4lMTx8R30rb/0t5K/9SGeH5Iea0SQACxZsQBZz3eIVmtdYplZImgLK/5p53LbTeVKYLU3tsvCZA=
+	t=1734529741; cv=none; b=gxxZPYayjTHM1ecqmJQf3EkKZQN/9YBinfY+oGz5NGVC8iACSl9ajSuiCnCmJx6Q87B+1iSNlI6sXveBxyQkIvvNFnDnHnBThyq6Dv/DV/D2hEvyiXtArPSxblC7XAXKdezK9xerEenoNrBDMzIohUtoSm6bJod1v9kW+fBaPVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734529443; c=relaxed/simple;
-	bh=lC+h65E5extYhKRO73uhPfPYUsUnGB1juRy8t27RNsg=;
+	s=arc-20240116; t=1734529741; c=relaxed/simple;
+	bh=9ziGMtUxb9G4RpQP8pJEKwR+fHLxvKA9XA1MHnLmcXA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ilw9q10310hV+qtpVl+oKSD4s0JADIAlimC/iMqH1htwpGL22QImmEg1MEley9pESJKUgYJJHh+mmH4vUQAeTzI89UPRijz+1LvnC37Tdbkaa0iFNpTV7e7+EE6bwo4iKnBS9839nGdQgI5QK91543w6PDwYlrhBp73MTMNCHHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=h4oxksLa; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=nyn/tb/R/X9XdJUJKZJekB21GxouPW1LCySYS8PZfxnComACYdCjzfw8sevjn8PuC6W9O35cTc/KmuezK9mysbfkUoq8BgS9opkRFETenzBwqGCHpMsnVn0lWEOirVIvmCzGdJHqE0r2ZylM73+1oIesR4xP9vZKHLlnDRNLg9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KijQs5wu; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="h4oxksLa"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BI86TEZ028488;
-	Wed, 18 Dec 2024 13:43:35 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KijQs5wu"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BICvnaA032381;
+	Wed, 18 Dec 2024 13:43:34 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=rHcDGOgGtGrmVOIoU
-	u/akrxjCy6KbYJoqDE6eTV/XKA=; b=h4oxksLa1yb/z2Z5IjHxxf0d0n8fg3GtC
-	zZ3DD9FnIw5WM2m9+Yvser74Mgf021HGoQmEGIU//7XYHyFJNanGQXG9c0nt1Om5
-	tHpK48oJmOZ8vGsLPDZGX6DOL8gSFlM+k5UJ3qkhiI/JBbJ523fTPTfa9oEvzyGY
-	qkAMPqSdIeA2YOlHiy9/N1D3iVZGQN6zkDx7JP9hWkvOjggM271ufHYWVvemIW4P
-	8I1+CWqrVJHixez4UwgERHQIjKijaWSZSsybw676TKYEoQ5qUU0zIt/MtQJLbCid
-	gh9h4GUPAdghRNklxiDyNX64lto+z/CGR+Z0UlHQMGfSrFs04ITBA==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ktk2hed4-1
+	:mime-version:references:subject:to; s=pp1; bh=9L/6f5TRlcyaS+aNY
+	zHctSQ4jp6WHZNaa3IqBO9hSYQ=; b=KijQs5wuVGinCYqfPWYftaggDK+eekAu0
+	L2X9VAPcrow96xuJtHRtvEx0MlLuF8Gm1kIiBMJ4+ce+7aq9DOejmQXupKrcAZln
+	KFmeR5F8vxJ9HXgT/UNcaknCCvB+aFjD1NJXtRce/C/zGPNqEvSe6jef37LyfnWt
+	lae55Oz4nwqEWovtW4n5mfOnvjbG/OnqrPuSR7y02OqdrXzWmUo/KkTWP/VPiIvq
+	LnwGzmmAZBsmDoet/469vutEbhRg7qe1eZffKCzDG/VeHgtq5jh7ZdITc7ncuuLw
+	mY/rR6ud5gg4KNiK2g9FJlcbqofFBIFSAVPFd/vFO+QcvKEQ5CX2g==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43kkehb7d8-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Dec 2024 13:43:34 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BIBnVdG029329;
-	Wed, 18 Dec 2024 13:43:34 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43hmbsr9re-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Dec 2024 13:43:34 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BIDhWOC54722828
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 18 Dec 2024 13:43:33 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BICFZ5T014350;
 	Wed, 18 Dec 2024 13:43:32 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43hmqy87bj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Dec 2024 13:43:32 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BIDhUgX58917336
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 18 Dec 2024 13:43:30 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8AD6F2004F;
-	Wed, 18 Dec 2024 13:43:32 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id B6F9F2004B;
+	Wed, 18 Dec 2024 13:43:30 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0E1C220040;
-	Wed, 18 Dec 2024 13:43:31 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 3C8F620040;
+	Wed, 18 Dec 2024 13:43:29 +0000 (GMT)
 Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.in.ibm.com (unknown [9.109.198.241])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 18 Dec 2024 13:43:30 +0000 (GMT)
+	Wed, 18 Dec 2024 13:43:29 +0000 (GMT)
 From: Nilay Shroff <nilay@linux.ibm.com>
 To: linux-block@vger.kernel.org
 Cc: yukuai3@huawei.com, shinichiro.kawasaki@wdc.com, yi.zhang@redhat.com,
         bvanassche@acm.org, gjoyce@ibm.com
-Subject: [PATCHv2 blktests 2/2] throtl: fix the race between submitting IO and setting cgroup.procs
-Date: Wed, 18 Dec 2024 19:13:22 +0530
-Message-ID: <20241218134326.2164105-3-nilay@linux.ibm.com>
+Subject: [PATCHv2 blktests 1/2] throtl/002: calculate block-size based on device max-sectors setting
+Date: Wed, 18 Dec 2024 19:13:21 +0530
+Message-ID: <20241218134326.2164105-2-nilay@linux.ibm.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20241218134326.2164105-1-nilay@linux.ibm.com>
 References: <20241218134326.2164105-1-nilay@linux.ibm.com>
@@ -70,114 +70,90 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6S1uHgwzEKkoTPn_Muru1TIomJNnbGV-
-X-Proofpoint-ORIG-GUID: 6S1uHgwzEKkoTPn_Muru1TIomJNnbGV-
+X-Proofpoint-GUID: vUMIsd2p6HhE7Q_-ewL5UJBDxzZ4-xwd
+X-Proofpoint-ORIG-GUID: vUMIsd2p6HhE7Q_-ewL5UJBDxzZ4-xwd
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- spamscore=0 impostorscore=0 clxscore=1015 mlxlogscore=641 adultscore=0
- phishscore=0 priorityscore=1501 lowpriorityscore=0 malwarescore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412180106
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 clxscore=1015 spamscore=0 priorityscore=1501
+ suspectscore=0 adultscore=0 mlxscore=0 malwarescore=0 bulkscore=0
+ mlxlogscore=999 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2412180106
 
-The throttle test cases uses _throtl_issue_io function to submit IO
-to the device. This function typically runs in the background process
-however before this function starts execution and submit IO, we need
-to set the PID of the background process into cgroup.procs. The current
-implementation adds sleep 0.1 before _throtl_issue_io and it's assumed
-that during this sleep time of 0.1 second, we shall be able to write the
-PID of the background process to cgroup.procs. However this may not be
-always true as background process might starts running after sleep of 0.1
-seconds (and hence start submitting IO) before we could actually write
-the PID of background process into cgroup.procs from the parent shell.
+The commit 60fa2e3ff3ab ("update max_sectors setting") added max-sectors
+while setting up throttle device. So now we should also calculate block-
+size which matches the wiops. Typically, size of each IO which is submitted
+to the block device depends on the max-sectors setting of the block device.
+For example setting max-sectors to 128 results into 64kb of max. IO size
+which should be used for sending read/write command to the device. So take
+into account the max-sectors-kb and wiops settings and calculate the
+appropriate block-size which is then used to issue IO to the block device.
+This change would result in always submitting 256 I/O read/write commands
+to block device.
 
-This commit helps fix the above race condition by writing pid of the
-background/child process using $BASHPID into cgroup.procs. The $BASHPID
-returns the pid of the current bash process. So we leverage $BASHPID to
-first write the pid of the background/child job/process into cgroup.procs
-from within the child sub-shell and then start submitting IO. This way we
-eliminate the need of any communication between parent shell and the 
-background/child shell process and that helps avoid the race.
+Without this change on a system with 64k PAGE SIZE, using block-size of 1M
+would result in 16 I/O being submitted to the device and this operation may
+finish in a fraction of a section and result in test failure. However the
+intent of this test case is that we want to test submitting 256 I/O after
+setting wiops limit to 256.
 
+Reviewed-by: Yu Kuai <yukuai3@huawei.com>
 Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
 ---
- tests/throtl/004 | 7 ++-----
- tests/throtl/005 | 7 ++-----
- tests/throtl/rc  | 7 ++-----
- 3 files changed, 6 insertions(+), 15 deletions(-)
+ tests/throtl/002 | 14 ++++++++++----
+ tests/throtl/rc  |  4 ++++
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/tests/throtl/004 b/tests/throtl/004
-index 6e28612..d1461b9 100755
---- a/tests/throtl/004
-+++ b/tests/throtl/004
-@@ -21,16 +21,13 @@ test() {
- 	_throtl_set_limits wbps=$((1024 * 1024))
+diff --git a/tests/throtl/002 b/tests/throtl/002
+index 185e66b..02b0969 100755
+--- a/tests/throtl/002
++++ b/tests/throtl/002
+@@ -14,6 +14,9 @@ test() {
+ 	echo "Running ${TEST_NAME}"
  
- 	{
--		sleep 0.1
-+		echo "$BASHPID" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
- 		_throtl_issue_io write 10M 1
- 	} &
+ 	local page_size max_secs
++	local io_size_kb block_size
++	local iops=256
++
+ 	page_size=$(getconf PAGE_SIZE)
+ 	max_secs=$((page_size / 512))
  
--	local pid=$!
--	echo "$pid" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
--
- 	sleep 0.6
- 	echo 0 > "/sys/kernel/config/nullb/$THROTL_DEV/power"
--	wait "$pid"
-+	wait $!
+@@ -21,12 +24,15 @@ test() {
+ 		return 1;
+ 	fi
  
- 	_clean_up_throtl
- 	echo "Test complete"
-diff --git a/tests/throtl/005 b/tests/throtl/005
-index 0778258..86e52b3 100755
---- a/tests/throtl/005
-+++ b/tests/throtl/005
-@@ -20,16 +20,13 @@ test() {
- 	_throtl_set_limits wbps=$((512 * 1024))
+-	_throtl_set_limits wiops=256
+-	_throtl_test_io write 1M 1
++	io_size_kb=$(($(_throtl_get_max_io_size) * 1024))
++	block_size=$((iops * io_size_kb))
++
++	_throtl_set_limits wiops="${iops}"
++	_throtl_test_io write "${block_size}" 1
+ 	_throtl_remove_limits
  
- 	{
--		sleep 0.1
-+		echo "$BASHPID" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
- 		_throtl_issue_io write 1M 1
- 	} &
- 
--	local pid=$!
--	echo "$pid" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
--
- 	sleep 1
- 	_throtl_set_limits wbps=$((256 * 1024))
--	wait $pid
-+	wait $!
+-	_throtl_set_limits riops=256
+-	_throtl_test_io read 1M 1
++	_throtl_set_limits riops="${iops}"
++	_throtl_test_io read "${block_size}" 1
  	_throtl_remove_limits
  
  	_clean_up_throtl
 diff --git a/tests/throtl/rc b/tests/throtl/rc
-index 330e6b9..df54cb9 100644
+index 9c264bd..330e6b9 100644
 --- a/tests/throtl/rc
 +++ b/tests/throtl/rc
-@@ -97,18 +97,15 @@ _throtl_issue_io() {
- # IO and then print time elapsed to the second, blk-throttle limits should be
- # set before this function.
- _throtl_test_io() {
--	local pid
- 
- 	{
- 		local rw=$1
- 		local bs=$2
- 		local count=$3
- 
--		sleep 0.1
-+		echo "$BASHPID" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
- 		_throtl_issue_io "$rw" "$bs" "$count"
- 	} &
- 
--	pid=$!
--	echo "$pid" > "$CGROUP2_DIR/$THROTL_DIR/cgroup.procs"
--	wait $pid
-+	wait $!
+@@ -71,6 +71,10 @@ _throtl_remove_limits() {
+ 		"$CGROUP2_DIR/$THROTL_DIR/io.max"
  }
+ 
++_throtl_get_max_io_size() {
++	cat "/sys/block/$THROTL_DEV/queue/max_sectors_kb"
++}
++
+ _throtl_issue_io() {
+ 	local start_time
+ 	local end_time
 -- 
 2.45.2
 
