@@ -1,107 +1,184 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164EE35963
-	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 10:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734517002; cv=none; b=hPqDtcIlYG017sIurmbtlMV20IOQzwUup9Nb3lW7T/lf06R1QeKl05j4F+JqTEvk5KqlLRoDMFOw9LOnedaoq4lazsWxQ9DlzbZS/kx6NUnJnRjuKFbDKYIIlIiWIt8i64xk54Ld55OHGF8YklKy/Uzun7ET3nCzR1dr+gTK4i8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734517002; c=relaxed/simple;
-	bh=DhEQTH6i+r7Y0Fd6cYeeUjjesLgApibUPiA5D3o/9DY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TqzEhOHutyf4HZUmRy9GFZmUubmiP18tCbbcQzgj2gp5NcAV7Qqr5zxKmB/oyNguocJSd0qUHO+Vx2BtNMQL98vna6LwdeCfRfLxPN7tWZ/KgBEJPN74ZmmnhnAm1fLU+K/OT0RgjNmuu/l6+oaP+22nMo1V9i7FsHa1dDr0ArE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R3GU2nB4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9468718A922
+	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 10:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734517054; cv=fail; b=BqOA+zjbFQVYMxo81HIANsWI11V/B4c4KNHPAIUl2/Z8cayVSgW+ONn+EyPIm8LrZqPkLXzZdIcjnYX5TU/1+41k2D8PpF+r1C4F/6eEjZu7u92tO543b9qirtRUvTdLIUhvnjesRHiVJCjgGboz3KL+XaXP2pzEd+Nh+yrbNxg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734517054; c=relaxed/simple;
+	bh=+chAHs8nPFAQiatiKctIxghqmV3hZoJ8WjB4gEsrOVk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=W65Gyz6cYVup2Vxa2AOhGyQX2EgCDZtWF0w63jUoubNcP2OZ2WmUSitUwlXvCTWPMUXb0hnaJvRPuuwntB6vWmxnz3D5dgAvWEcZVKwZVZPHpIrZfCHc4xfdRTFERjfTYxNgB0yHdbvRpE9a8sHygnzK+K+oSMEfZQJ7dBXMZJo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=G/6zpwi6; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=gnDFvMHD; arc=fail smtp.client-ip=216.71.154.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R3GU2nB4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734517000;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iu4OatZ2f6i6XwzsZEtUgA+WOBW31S2z2FxrUChqiRw=;
-	b=R3GU2nB4F4dj72GTzB6GtDwsEZezNc8GT+XSiu9DjcVQq9GmIu5FSnjHOKm5IZIBN8Fw3b
-	QkRgNaudIB5Thyny6mbCbKnEjrV3fbdEeqjWhN4+V1EwEH7t83piA2iZEFHNuDCCD35rBP
-	qqdsfcFrpoZuXaLgvx/Jgr2m8gD/YPE=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-139-ABRm7q5WOOq70bUj5qLzGQ-1; Wed,
- 18 Dec 2024 05:16:34 -0500
-X-MC-Unique: ABRm7q5WOOq70bUj5qLzGQ-1
-X-Mimecast-MFC-AGG-ID: ABRm7q5WOOq70bUj5qLzGQ
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A527B1956086;
-	Wed, 18 Dec 2024 10:16:33 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.10])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8D898195605F;
-	Wed, 18 Dec 2024 10:16:32 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	kernel test robot <oliver.sang@intel.com>
-Subject: [PATCH 2/2] block: avoid to reuse `hctx` not removed from cpuhp callback list
-Date: Wed, 18 Dec 2024 18:16:15 +0800
-Message-ID: <20241218101617.3275704-3-ming.lei@redhat.com>
-In-Reply-To: <20241218101617.3275704-1-ming.lei@redhat.com>
-References: <20241218101617.3275704-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="G/6zpwi6";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="gnDFvMHD"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1734517052; x=1766053052;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=+chAHs8nPFAQiatiKctIxghqmV3hZoJ8WjB4gEsrOVk=;
+  b=G/6zpwi6aeLtqX2OxzQng9lycYpJeIE9p7HJbC9yQAh7CyolW3jKLnrG
+   yKcxa6tYghlzIXt8ASDnp5ugJ+9hAPh5pxNKL++On/1ezzAE/XRpu9e9u
+   l0zQflcMqw4qD1/my5tUJHJTjGq2H7l9Y0t6LXlDJzT6vIq/8di3dl+3s
+   WRkrDhah4BILAG75W5FdGuE1DyutlXPNul4hw6Sg0ci6fmEYBMyvI6UQ1
+   lNvIhWyi3+TCSvaUbYZoCZ6uQbBX3zWkVdboB9MNCG+V3d49iXLIfIn/O
+   NtqClVyw5DG45wwiQZUAuVAQIMs3fGr6qrIM47jetIl2brL4DcM8cO36H
+   Q==;
+X-CSE-ConnectionGUID: MX2iMLLVSoi9fA9MV9xQyw==
+X-CSE-MsgGUID: QAPngMwuR8m+DCw07WT3KA==
+X-IronPort-AV: E=Sophos;i="6.12,244,1728921600"; 
+   d="scan'208";a="33463057"
+Received: from mail-dm6nam04lp2049.outbound.protection.outlook.com (HELO NAM04-DM6-obe.outbound.protection.outlook.com) ([104.47.73.49])
+  by ob1.hgst.iphmx.com with ESMTP; 18 Dec 2024 18:17:26 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zWXjMkoz2+bGsr21tT75VPuDuStw87qFroea/TBLPKXBDv8vQzM2Xzm2cRT8fdcRR/KecsPBQW8P7v+L+2Wp4KMM6Db1SLR42yQd0n8tlAjyt65k0Hu8JZTKJG57LJLuD/QA5kSReDS8OjAp33MbCBOzjCuVXoE1nOMN3HReiyxPzCVxbVIG0gAo9ZokWpXqTWHWmdQWx8S03vS8SU4FzD6m57cYqYD1INWIFlKyIbXll2skizQp3IKPrmxCMw+dXm4rAOn6Ml5iFgJKbsJ7q1/QuLR4BAUsJsiSz0mn603nbkd3PQZD3JOphcHjWkPdiBfZbxdPie5GKu4rUt6RDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+chAHs8nPFAQiatiKctIxghqmV3hZoJ8WjB4gEsrOVk=;
+ b=OfTDJvA8AzRNcOjrhYaFdVXWz/3XuCEzkTT8jWFR0gtA/nJ+9do2DYeu6r5V76RYw4anU43ysF/yrWFzIgRETjeIA21XWjOmYE/+35+LV7usJKGZvyS+fhyQKcXvNXSulhnws9uFHmO4nFgYutfwX/LPfnBI1Iql8a7xaKCJnkJ+xmWWZl+CQHFRj9/WdcdrgUvYx6fECvrDSj9+CIqkVbjoj23N9ML9QBkYgiZeOK87Uzoh5CwLEAB/mFuGsX57Oc9APe9sznikzM00bfuyzzBYdSuA79h81yoP2dxYxmihvznY+7MrL2hgV6Zmp0qqdGUg4Da8jvbLCf66D/pVZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+chAHs8nPFAQiatiKctIxghqmV3hZoJ8WjB4gEsrOVk=;
+ b=gnDFvMHDeZ36rMuz9aHq4NThIchPJcA9cg9F2rHyjeDhTkgeC8CAJM8kffwn4x/sBSsDhm3Z3X3RfhpwRUPdp8ty0BBZs1MvxAiCBlFd8nlwcaaCQgRKhXCvxaf3WvUuj5Wg+fvh1q0hVQKhJsS//D+XnuPQkys7rXLV1pPJ7i8=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ DM6PR04MB6698.namprd04.prod.outlook.com (2603:10b6:5:22a::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8230.18; Wed, 18 Dec 2024 10:17:24 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a%6]) with mapi id 15.20.8272.005; Wed, 18 Dec 2024
+ 10:17:24 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Ming Lei <ming.lei@redhat.com>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Zhang Yi
+	<yi.zhang@redhat.com>
+Subject: Re: [PATCH] blktests: src/miniublk.c: fix segment fault when io_uring
+ is disabled
+Thread-Topic: [PATCH] blktests: src/miniublk.c: fix segment fault when
+ io_uring is disabled
+Thread-Index: AQHbTTHNvRo4M4q1AkS+FYuAUGaM1rLr0aqA
+Date: Wed, 18 Dec 2024 10:17:24 +0000
+Message-ID: <57fglxl5mwxugcgj3aa3hkwdvmcfsfwdamlhd3r7r4fcfx75bf@opaflvrpqa7i>
+References: <20241213073645.2347787-1-ming.lei@redhat.com>
+In-Reply-To: <20241213073645.2347787-1-ming.lei@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|DM6PR04MB6698:EE_
+x-ms-office365-filtering-correlation-id: 0140de46-6d20-4447-a426-08dd1f4d2abf
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?845P4DTR7xuxDNSAD+LaaKuPuBEYqzpIT0d7TNPWewTNWIVCXajXCf59gvFv?=
+ =?us-ascii?Q?8YRwc3TOWVfm75XcswrTD6nj1MwrGwrUo0PVcsrz0Khg4TNz79xqD2yJsCTv?=
+ =?us-ascii?Q?wcGvD1ndBClhBJ3bKuRAQMX1LnLTre+V210zhxrrxCvf0U9t//W95RmJJ7C1?=
+ =?us-ascii?Q?jEaqrMlKTMCRpfk1kHwdtzhi4URdUl8S9d5ADECue9nhkPGR26RgOQ1ZsnuS?=
+ =?us-ascii?Q?ZPVlehC6QqWfDQLojez9f5y1NcP1IRjOOjnoXe3R/B4unp+SnOB4jdz0XYyW?=
+ =?us-ascii?Q?LS7bqsJjVKrNb7+m/DYlQ7r4ULpWQazqqsHZBqe+UvDbO7sgFQwtbKuO1c78?=
+ =?us-ascii?Q?jvElNiUQV/MfnMeygogUDzIxUPBVV4YhHaSVH51DyjPyIR74kc+9ExHf4/PA?=
+ =?us-ascii?Q?nqRjnklyOb2QJcJuaewABiI1q/mzICBWBN4wOeHkiOvrq5D6np5XBjXPwF0J?=
+ =?us-ascii?Q?I8nQN2n9vepg5ppd9Hz8KKNIGL9L/u2CK7dx1Lboq/QiLky0qjHLY8KcsnwI?=
+ =?us-ascii?Q?+A+stbWcAp/7Duou2UEmcz4trccExRXCdUQP+BRzwIhZQmWHhwet2e8kNoNt?=
+ =?us-ascii?Q?MnMJcOSwKAsWYhe0qv4EfBWQwyNoR2d/q0dedeO8CbyBN29Yaxs8cfHfUI1j?=
+ =?us-ascii?Q?i7eJli0VLGixtchLweNyPZud0KaYqDcSBhCUBl02b1/TzVHdNOXmiRJrqf2X?=
+ =?us-ascii?Q?gE0zJ+B0rWr6YnE78Xb4fjLfHAJIEohX++vDPYcXvOkhXYwUbIV2TgJUIT43?=
+ =?us-ascii?Q?K47Ni+Wpf9UOFjsdkLJBOmTn9T2DZcNJ3bxchehZh8DFCilKpUQZuT5/u08K?=
+ =?us-ascii?Q?uemm8zs+TcHhMw3Du0V30wLKvQ24X4HW93SeGSkCrjCxO2XYzls0HZsufS12?=
+ =?us-ascii?Q?+tl0C8EoYuLHRvIgW5vGMXE0+syTJJNUcAOQy7t3vDOt1+xevlESLsCf0/Rz?=
+ =?us-ascii?Q?SuVXAsx5NMWJNYYiR/vZnVfL5x1wTwxjqjzb/s1DljechBzckUGQbZn0TLcJ?=
+ =?us-ascii?Q?uefHbW0OhQHVS+CO6woay07XRY8YE40Q8ZjHDyToisf6KHfPszeE+vFHdDLN?=
+ =?us-ascii?Q?7ThurlEIhqTREaqnUTHVlYVpsBfzhD0wUN6j7TzV/D05v+4MYOeGYEskV+zM?=
+ =?us-ascii?Q?Ipn/xopaB7dtY5h2m54h7liglb5h1pDt89Vo5OSd95OjvyFUOcT9X2i9Tg0p?=
+ =?us-ascii?Q?2COxaYDnQuhLnJabun1NpxKsXbwrs/OuFgLEwgdedNiRONAvh5MN8rHe25Qt?=
+ =?us-ascii?Q?/ctic++DvivvoT6ccre7B0hGagSCuH1phBIIQXftVUvH5QVVYSGLtkgOv2vv?=
+ =?us-ascii?Q?OOAYbEWhG/Io/J9iXmYNrqQk1ieSTnexrE/Qx1OxzcXCyYjk5jKzEITnwdkI?=
+ =?us-ascii?Q?jsLkJaGW3UuO7/d9cHazapPgzQyCfXczl44zen6stCukzsmcy3TB+1JKiVY7?=
+ =?us-ascii?Q?scXSuSDCjdl/jBawkBKgIij+bes47CC9?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?8vbi4o0cgP31s+XUVTqpYxcs4OUzkdh7kULYt6NtQmmpWER2rcfMZtChIgE1?=
+ =?us-ascii?Q?3/sIrAlvehBRoSvpaY/yXInrIf4yfmpr6shcwNoGtdSBEpTKcteVBxMrbbh2?=
+ =?us-ascii?Q?bf3FVz1wUsxH9HCj56mYSKpvhdllasKuh5gSkKwJCVzChbNj5SeFVsVQuVCc?=
+ =?us-ascii?Q?t9bbVyMSsCs1q09C6pp9HTo0tGttDAOROZc48TR2Xnrn2uxEOHVlLyJzR3J/?=
+ =?us-ascii?Q?JxHY3T6VkVMwsRFCmzxbU5rRrCsBNHtrYqjEOGxXkxWiM/UN/BVEKSw8F+4C?=
+ =?us-ascii?Q?fTptSqTaUARrJ6tfw+H4oAeYONC1QUw/23hO6uIFz2s06cAa2BsxsLishe+Q?=
+ =?us-ascii?Q?aoNxKErTBWKQCQhsS+9xD9JQVm/fF2QwuOsoHiVgpOtAtdd3Fw7vN8hugAQE?=
+ =?us-ascii?Q?kreYgS1ogKZp4ud4njgmHXxXDJE3G3BXYr5gY0we5CdA8YpZAb6nvJR4V91p?=
+ =?us-ascii?Q?kOnbubcI/BPjKydIVNSgixg0iB7LmJPO8WaQlZrYZPuWwKQps+SHVcL1ii68?=
+ =?us-ascii?Q?381GMJ55wGP7XVYZHkVTgb/c1fz++N3n5xvo9DoqBWFhpxZYyG5sJrImTyTG?=
+ =?us-ascii?Q?cZmWRaOdhdjNNS2k9QfMrJMcVldC4poYTEJfnPeAdk3Tp8priYwP9SV4cB2/?=
+ =?us-ascii?Q?0fQFGGC4lpRUl810+/bO1q7wtZFAcffTvAaX2eY18Wh0P0X9NNIWoOrehaUV?=
+ =?us-ascii?Q?oUHnpaDRKt+EaXdieFjhD9Rz3+6Yz9mN0RNUDcsIhvgqGEQiadu1z8RbNXgs?=
+ =?us-ascii?Q?mN7pkym1x+IGJZzOEW6PsTcukXTZYY1BwE2VS/kNBE7DsPXnqvsTr6eLv4J4?=
+ =?us-ascii?Q?hytZ6MQQXStvpryEeVlVTYOCA0SrQeINMX2CBsVJaOZqoJNlBHJGs39L/suN?=
+ =?us-ascii?Q?pTaWQJJd7EMP+/lZZ4+CESTd1/V0rokkQxXkJXXNRPbLhn4Hra1MBMqPfoI4?=
+ =?us-ascii?Q?24By5rkApOZ7SbnYGnVs4ShooiyNKfBr56V9kn8WOUy+KMCF6M8MrGHSQCB1?=
+ =?us-ascii?Q?dE8JKqVMe5nP9y2Fz8Fz3ZhjIT8wvAQYhtOaktjTp5755M2X5MC9oijtQwVa?=
+ =?us-ascii?Q?dhCxBmEJpp019tPDlD8IeILzab+WH91paQj2q5I5H2Mcx4DlEUr7/eM/4Gn5?=
+ =?us-ascii?Q?Euh86zA+yHOuYxA5P8BGb313JmuynobiBTLlMOPg0XqylJZiWyNky5U3Y64N?=
+ =?us-ascii?Q?5LBF7JtqIFz/AsPMlDaahiJ0cELZ+a8EhHDj0ylFTbaZqfYZzWVmI8pzU/tr?=
+ =?us-ascii?Q?ZOmy4WMDcx8SgGDwbfn2RirnKAsRaK2Cvbo8f/h4P4LgVPQ818CFaiYUscog?=
+ =?us-ascii?Q?fWt2DlQ8WUSknd7tR7Pg6WOOLJFY5oXFhaujTiUkP2Lw3r4EFrkNzJrmaYj/?=
+ =?us-ascii?Q?V5W5AK69BmClQ/U4z7zCQkfZai/ogpJAEaLmeVOEERFA6DavshSjzembxihE?=
+ =?us-ascii?Q?d0WvGfNIe9TXDPeVc12RMxlx766nz/UdOPrtiKjFpkG6W7I91liIqkbScxtN?=
+ =?us-ascii?Q?n/pDaCAnAHGYUZrzwsFdw7KsCnxPW74l6zuMrLH2eDa72CTiJwpKVX2UZZG/?=
+ =?us-ascii?Q?jHPl3KRhCUzbOhtULjWXvsmdg3IlAXOjvbvVtekCDnOC7eWLcKY73fMUP+p3?=
+ =?us-ascii?Q?CZu2sz3CzxPJp6aVuyPFDlg=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <E1D9FDDA386BF24DA48D77DA0291DF8D@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	HVpMn2ZOYx8Dw3kJf6Rzwt41wrHqqP7Srb9huLWL9vNevqIwebYnsy5giyffLp+7gepMj2V2E3J1YmB/SyGY2++7t0Y3yq80ccSrJAPvjOFBSN22xdlGurBuQeILHiICML2/ru+CTml422bhCn/NcFgMCFfcW26HsVlHtkR6birL1NFZ2kjGAg8Fe/X+ODyE7ZIo8COv6o/tx4GA1Vk0S3ft5G7urzJHg+dw2RwAK/BpUov0IxH/k0yWXZICMjTqL2Y6eM4KLszr3NU9zaec50DiqN2C8FnDWP9rn3VCDgdJ7vXmszcxrClzXqNBqCeWBEPXUCKV2QXr24JrZEWa73PKRkYmE2boieYDbutWI1oTA5S/YaS0KYfhUz4AAYeDEUBFlBrF8F1WQTWOGJ0ixDQ88MEmQLKbA1Z+KPZKBiLBEv5+TaWlL6Tb7G6xMQJsHoXIYim8mHb7EEh/+HvyX8p3Kb1Xd9QwLugVALtWNCdenTUmaOmxPxNH2qsnkebYz5oz/3wyTHdzRWjHW3fhJ8zK7dLUglZQRa7X2btTLskabrUjrn81cHWx4otxMPIljPgqfmvDyExX1tqhW/bU88AX30mzlfhTdT6c301VEWnrLm7EDgx0UXNCO8Jq1Dgz
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0140de46-6d20-4447-a426-08dd1f4d2abf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Dec 2024 10:17:24.6201
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6v8L7eR3q5g8qNKdNfhlebifiMiGYwWcnhVlGgx3VhMb0pxtv4xlH2/fZ71Jfg2sbS1aNmCfZa46sQSdVuSsae/4+JfkITNz0wRC3UNmMsk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6698
 
-If the 'hctx' isn't removed from cpuhp callback list, we can't reuse it,
-otherwise use-after-free may be triggered.
+On Dec 13, 2024 / 15:36, Ming Lei wrote:
+> When io_uring is disabled, ublk_ctrl_init() will return NULL, so we
+> have to check the result.
+>=20
+> Fixes segment fault reported from Yi.
 
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202412172217.b906db7c-lkp@intel.com
-Tested-by: kernel test robot <oliver.sang@intel.com>
-Fixes: 22465bbac53c ("blk-mq: move cpuhp callback registering out of q->sysfs_lock")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+Ming, let me confirm, the segmentation fault was reported in the blktests G=
+itHub
+PR 153 [1]. AFAIU, the segmentation fault cause is in liburing, not in blkt=
+ests
+src/miniublk.c. So I guess that this patch is not needed. Do you have same =
+view?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 92e8ddf34575..8ac19d4ae3c0 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4412,6 +4412,15 @@ struct gendisk *blk_mq_alloc_disk_for_queue(struct request_queue *q,
- }
- EXPORT_SYMBOL(blk_mq_alloc_disk_for_queue);
- 
-+/*
-+ * Only hctx removed from cpuhp list can be reused
-+ */
-+static bool blk_mq_hctx_is_reusable(struct blk_mq_hw_ctx *hctx)
-+{
-+	return hlist_unhashed(&hctx->cpuhp_online) &&
-+		hlist_unhashed(&hctx->cpuhp_dead);
-+}
-+
- static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
- 		struct blk_mq_tag_set *set, struct request_queue *q,
- 		int hctx_idx, int node)
-@@ -4421,7 +4430,7 @@ static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
- 	/* reuse dead hctx first */
- 	spin_lock(&q->unused_hctx_lock);
- 	list_for_each_entry(tmp, &q->unused_hctx_list, hctx_list) {
--		if (tmp->numa_node == node) {
-+		if (tmp->numa_node == node && blk_mq_hctx_is_reusable(tmp)) {
- 			hctx = tmp;
- 			break;
- 		}
--- 
-2.47.0
-
+[1] https://github.com/osandov/blktests/pull/153=
