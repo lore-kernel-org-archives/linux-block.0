@@ -1,236 +1,108 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89891B043A
-	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 14:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE03D1F543D
+	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 14:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734530752; cv=none; b=S+zRgAEviez4lcUgtyOm7T2R/MeIRyuKAt8tFaOiLxi4G6my/O0DWXoV9QTn1oFBixNdHC7QfJ++ryF0GCnmPymnRIqtnqJZ6TQg2bR7ZE/68QUhQW4gti5pJOfjsCsd7PyIhDlhfH6bWSSy59GjxsAVLLsZblXdT9RmhFsimtc=
+	t=1734531765; cv=none; b=klenzmQF3XxElhlBehfVOEE6eEezBmxNWthYs9gfJ0G4YMiUax+lpRfi4brc1ixAmxTQTFk5gqWiiKKwMdcYk9P6CbWuJQYGwZaTeET5eptuCn1Ot4aadIsncvy7HsO8X9J3iGFT7xMdwO+DH/J/6BT03Z2sWiBbrSW0mbSPvgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734530752; c=relaxed/simple;
-	bh=POUHfU1M+foAw9yypt/16Cc/3wV/6CGEcW5vDwh5T/4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aURcnWdwZCpAWQ54HYgR6H2Svfg1YsctvrSVlI/gwZekiCxs8vpH2lA2/WbXqhTQo4pYc8kExXNxfImOXPuIXys3jQd5FWIr2C74f2sBKILjp/oFqIMxG/eGucGzHgrkG6TRgOOXRDPAWQ85lC2omyBwzRkhZUdKVlXdsh+wci8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Vz6hLCFz; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1734531765; c=relaxed/simple;
+	bh=2cCO4TPIhqj1S568UCAXFktOpIrfcOCGMJSHp79/37E=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=MFDUwULC5Bq0eBZoKbPs24Jl8k/Vv8RNgdhFEmQcBkpvwDqLlOMELmb2JqpyYvTwDJ73Mn9zYvPL256/j7lEKQ5oTlUZg6SrVc9sItHXepZiyM9+nE+q4ZOUzh+57Lst3XASQhVekiCImvUTshuX/JZj+GqmUi8D8GN9OmAO99M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dOtCxDfK; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Vz6hLCFz"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BIE2mk6029644;
-	Wed, 18 Dec 2024 14:05:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=DD1Zb2
-	0RIHStWtCmA5cjzdO6EP5VavSuwyn152rFvGY=; b=Vz6hLCFzcU/l7ko6xE9rUy
-	Qj1y0y2t0StNgwfjGboXN3vIRdirTjIXyXbvZkQE9E5b6zONk8nVWcGC0QMfMzdt
-	TeQqp3mBbp/iwSzGUx6yipDBgd//CMFEkLgfK13M8TlPz8JbwtXlqFH3PCO2OOZa
-	NIYC3PWsGAgFKHCPGANCQXJH71T++pOqHLeZm8cdcBLNXkx+eF9AZWUD+jgApDp/
-	Nof54KxgDVqlejh2W51pM6vcdgEnh/uV0Tc8JAvP/yZ8xl+sFOwSpg1cdFwBag71
-	r1n3loM249tWnRoo18cKE3spIcY4lIU98ejk8TWOERUsHJxlOP2ASw9FPJrCOqVw
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43kpvbak3a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Dec 2024 14:05:41 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BIC46qU005501;
-	Wed, 18 Dec 2024 14:05:40 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43hnbn86fr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 18 Dec 2024 14:05:40 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BIE5d4l28049936
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 18 Dec 2024 14:05:40 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C81AC5805E;
-	Wed, 18 Dec 2024 14:05:39 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 117EE5805D;
-	Wed, 18 Dec 2024 14:05:38 +0000 (GMT)
-Received: from [9.109.198.241] (unknown [9.109.198.241])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 18 Dec 2024 14:05:37 +0000 (GMT)
-Message-ID: <0fdf7af6-9401-4853-8536-4295a614e6d2@linux.ibm.com>
-Date: Wed, 18 Dec 2024 19:35:36 +0530
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dOtCxDfK"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-844e39439abso178012539f.1
+        for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 06:22:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734531762; x=1735136562; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fwaa/EgDeMA9up2TWsDbHlLa7APuFdygjy4wgwg8iAg=;
+        b=dOtCxDfKkX88TBwkr+XbWIlWzsNj+EkvhG1K5cyk1ECaSGesImJfMAhwgBmImiyE+e
+         H4+66NEzR5FabKlCuDbvTwvw7kA5CWQ39wp3GRAGfTMZ1uoFqYW5zdZ3YwhHymID0ptf
+         ORZ7YfclziZSVUvf2x+M0xpJpU+SCEfMY1ASBmXnBzCzSchRb6O/XIyCjqhpq1rtlbPe
+         G6KnFg/KKhrY/CS0OMtPndDtvrtl9etQWXbSmATI0g4rXFhfLYr3Za72Q0iJUBRcUwRM
+         AYEh9urz5wqvH/PJbFz2coNjv1AlINA8mISLK3Kr/VavabotFu3z3yU/DcssuLQOBpxo
+         TEmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734531762; x=1735136562;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fwaa/EgDeMA9up2TWsDbHlLa7APuFdygjy4wgwg8iAg=;
+        b=MNjP39PjrijHRHqPmnMOOqgmKHpDBJr5HZHpmeSIWk6ORqnQ0IbZV3uxaEqNT4Lm3Y
+         F+kamjNajM4ui2cWETTTSm/huZarw1GYjGUZuBmP3WxLfGbxaUexkQeKSKFIfKjZM6CB
+         Lh8Xe7fz0yKmMqQAnD0SLgCHHNu1sSAfCYfvNjXyUBtA75YDHwtljnMbPz2Pd6lMPhvA
+         CKUTfsf8fy6NZs2cghxYgowKojx3aqB+3OfyFNhlQ+fkWibIfieh5kWVbefMgbXVhwRK
+         zhN62lG8Ngg3G2hfc/BmlpPibpz63yrhKxfx3W8DzMhpA1JunBSv0X+V18VaK+tBCzZQ
+         TvqA==
+X-Forwarded-Encrypted: i=1; AJvYcCVoMP87dqjI4qIo9MXk9UBU1ns9wKaWTKIEaq0m9Yv381P8H+zeHLYiM5kTva5EBpbhMYB0nE8Pyor5rw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOh3sX2HTLKP0Jt90EicaB/dPjWnro2F9Y0Pkb64TW/nd+PXa7
+	fZZnjTfiFOOYtg6vw44zTwbZqtWNa4m0GgTyKSU2Bipw98Zd6iyBu2zXQ0spIS0=
+X-Gm-Gg: ASbGncshGKgZw/p93K+6evizscElWfErCKX57vIQB3UYxb9mYb3BfwsStJG4MeDkbDC
+	DpwY06fuS+z9+k1Kqdyk2nvF/a+QpwJEBrV61JHEtR0Bq0lHr6NkkMTwznAvuOYz6Ybp7jQbyLD
+	iHf4Qa3YR4otvf/okNli4gzYfUCgXSTiRtVkshbepKu8McqW3jIHIEieEmADsk78mhB57UoCGum
+	VqRk4DYn6lw7z1tlF03iKiK+nU2TE5OsHVwENOFSU4tjkI=
+X-Google-Smtp-Source: AGHT+IG89IFUUyc3IF//BxitryJKyat/xuxYfF6x/T3Q0v8wGvopf45eNMGXg+AVFNkeeO+fDQ1W/A==
+X-Received: by 2002:a05:6602:14d1:b0:847:51e2:eac with SMTP id ca18e2360f4ac-8475855c0b2mr288106139f.7.1734531762581;
+        Wed, 18 Dec 2024 06:22:42 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-844f62583ebsm231384539f.11.2024.12.18.06.22.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2024 06:22:41 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: hch@lst.de, hare@suse.de, kbusch@kernel.org, sagi@grimberg.me, 
+ linux-nvme@lists.infradead.org, willy@infradead.org, dave@stgolabs.net, 
+ david@fromorbit.com, djwong@kernel.org, 
+ Luis Chamberlain <mcgrof@kernel.org>
+Cc: john.g.garry@oracle.com, ritesh.list@gmail.com, 
+ linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org, 
+ linux-mm@kvack.org, linux-block@vger.kernel.org, gost.dev@samsung.com, 
+ p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
+In-Reply-To: <20241218020212.3657139-1-mcgrof@kernel.org>
+References: <20241218020212.3657139-1-mcgrof@kernel.org>
+Subject: Re: [PATCH 0/2] block size limit cleanups
+Message-Id: <173453176105.594208.15853494245370355166.b4-ty@kernel.dk>
+Date: Wed, 18 Dec 2024 07:22:41 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: avoid to hold q->limits_lock across APIs for
- atomic update queue limits
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <20241216080206.2850773-2-ming.lei@redhat.com>
- <20241216154901.GA23786@lst.de> <Z2DZc1cVzonHfMIe@fedora>
- <20241217044056.GA15764@lst.de> <Z2EizLh58zjrGUOw@fedora>
- <20241217071928.GA19884@lst.de> <Z2Eog2mRqhDKjyC6@fedora>
- <a032a3a0-0784-4260-92fd-90feffe1fe20@kernel.org> <Z2Iu1CAAC-nE-5Av@fedora>
- <f34f179a-4eaf-4f73-93ff-efb1ff9fe482@linux.ibm.com>
- <Z2LQ0PYmt3DYBCi0@fedora>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <Z2LQ0PYmt3DYBCi0@fedora>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8YfB3FbK6BfxBcRDwCq3bgkIclvC1i7t
-X-Proofpoint-ORIG-GUID: 8YfB3FbK6BfxBcRDwCq3bgkIclvC1i7t
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- malwarescore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
- priorityscore=1501 mlxlogscore=999 clxscore=1015 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412180109
+X-Mailer: b4 0.14.3-dev-86319
 
 
-
-On 12/18/24 19:10, Ming Lei wrote:
-> On Wed, Dec 18, 2024 at 05:03:00PM +0530, Nilay Shroff wrote:
->>
->>
->> On 12/18/24 07:39, Ming Lei wrote:
->>> On Tue, Dec 17, 2024 at 08:07:06AM -0800, Damien Le Moal wrote:
->>>> On 2024/12/16 23:30, Ming Lei wrote:
->>>>> On Tue, Dec 17, 2024 at 08:19:28AM +0100, Christoph Hellwig wrote:
->>>>>> On Tue, Dec 17, 2024 at 03:05:48PM +0800, Ming Lei wrote:
->>>>>>> On Tue, Dec 17, 2024 at 05:40:56AM +0100, Christoph Hellwig wrote:
->>>>>>>> On Tue, Dec 17, 2024 at 09:52:51AM +0800, Ming Lei wrote:
->>>>>>>>> The local copy can be updated in any way with any data, so does another
->>>>>>>>> concurrent update on q->limits really matter?
->>>>>>>>
->>>>>>>> Yes, because that means one of the updates get lost even if it is
->>>>>>>> for entirely separate fields.
->>>>>>>
->>>>>>> Right, but the limits are still valid anytime.
->>>>>>>
->>>>>>> Any suggestion for fixing this deadlock?
->>>>>>
->>>>>> What is "this deadlock"?
->>>>>
->>>>> The commit log provides two reports:
->>>>>
->>>>> - lockdep warning
->>>>>
->>>>> https://lore.kernel.org/linux-block/Z1A8fai9_fQFhs1s@hovoldconsulting.com/
->>>>>
->>>>> - real deadlock report
->>>>>
->>>>> https://lore.kernel.org/linux-scsi/ZxG38G9BuFdBpBHZ@fedora/
->>>>>
->>>>> It is actually one simple ABBA lock:
->>>>>
->>>>> 1) queue_attr_store()
->>>>>
->>>>>       blk_mq_freeze_queue(q);					//queue freeze lock
->>>>>       res = entry->store(disk, page, length);
->>>>> 	  			queue_limits_start_update		//->limits_lock
->>>>> 				...
->>>>> 				queue_limits_commit_update
->>>>>       blk_mq_unfreeze_queue(q);
->>>>
->>>> The locking + freeze pattern should be:
->>>>
->>>> 	lim = queue_limits_start_update(q);
->>>> 	...
->>>> 	blk_mq_freeze_queue(q);
->>>> 	ret = queue_limits_commit_update(q, &lim);
->>>> 	blk_mq_unfreeze_queue(q);
->>>>
->>>> This pattern is used in most places and anything that does not use it is likely
->>>> susceptible to a similar ABBA deadlock. We should probably look into trying to
->>>> integrate the freeze/unfreeze calls directly into queue_limits_commit_update().
->>>>
->>>> Fixing queue_attr_store() to use this pattern seems simpler than trying to fix
->>>> sd_revalidate_disk().
->>>
->>> This way looks good, just commit af2814149883 ("block: freeze the queue in
->>> queue_attr_store") needs to be reverted, and freeze/unfreeze has to be
->>> added to each queue attribute .store() handler.
->>>
->> Wouldn't it be feasible to add blk-mq freeze in queue_limits_start_update()
->> and blk-mq unfreeze in queue_limits_commit_update()? If we do this then 
->> the pattern would be, 
->>
->> queue_limits_start_update(): limit-lock + freeze
->> queue_limits_commit_update() : unfreeze + limit-unlock  
->>
->> Then in queue_attr_store() we shall just remove freeze/unfreeze.
->>
->> We also need to fix few call sites where we've code block,
->>
->> {
->>     blk_mq_freeze_queue()
->>     ...
->>     queue_limits_start_update()
->>     ...    
->>     queue_limits_commit_update()
->>     ...
->>     blk_mq_unfreeze_queue()
->>     
->> }
->>
->> In the above code block, we may then replace blk_mq_freeze_queue() with
->> queue_limits_commit_update() and similarly replace blk_mq_unfreeze_queue() 
->> with queue_limits_commit_update().
->>
->> {
->>     queue_limits_start_update()
->>     ...
->>     ...
->>     ...
->>     queue_limits_commit_update()
+On Tue, 17 Dec 2024 18:02:10 -0800, Luis Chamberlain wrote:
+> This spins off two change which introduces no functional changes from the
+> bs > ps block device patch series [0]. These are just cleanups.
 > 
-> In sd_revalidate_disk(), blk-mq request is allocated under queue_limits_start_update(),
-> then ABBA deadlock is triggered since blk_queue_enter() implies same lock(freeze lock)
-> from blk_mq_freeze_queue().
+> [0] https://lkml.kernel.org/r/20241214031050.1337920-1-mcgrof@kernel.org
 > 
-Yeah agreed but I see sd_revalidate_disk() is probably the only exception 
-which allocates the blk-mq request. Can't we fix it? 
+> Luis Chamberlain (2):
+>   block/bdev: use helper for max block size check
+>   nvme: use blk_validate_block_size() for max LBA check
+> 
+> [...]
 
-One simple way I could think of would be updating queue_limit_xxx() APIs and
-then use it,
+Applied, thanks!
 
-queue_limits_start_update(struct request_queue *q, bool freeze) 
-{
-    ...
-    mutex_lock(&q->limits_lock);
-    if(freeze)
-        blk_mq_freeze_queue(q);
-    ...
-}
+[1/2] block/bdev: use helper for max block size check
+      commit: 26fff8a4432ffd03409346b7dae1e1a2c5318b7c
+[2/2] nvme: use blk_validate_block_size() for max LBA check
+      commit: 51588b1b77b65cd0fb3440f78f37bef7178a2715
 
-queue_limits_commit_update(struct request_queue *q,
-		struct queue_limits *lim, bool unfreeze)
-{
-    ...
-    ...
-    if(unfreeze)
-        blk_mq_unfreeze_queue(q);
-    mutex_unlock(&q->limits_lock);
-}
+Best regards,
+-- 
+Jens Axboe
 
-sd_revalidate_disk()
-{
-    ...
-    ...
-    queue_limits_start_update(q, false);
 
-    ...
-    ...
-
-    blk_mq_freeze_queue(q);
-    queue_limits_commit_update(q, lim, true);        
-}
-
-Thanks,
---Nilay
 
