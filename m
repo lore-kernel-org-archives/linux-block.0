@@ -1,48 +1,48 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65373597C;
-	Wed, 18 Dec 2024 18:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5AD31FA173;
+	Wed, 18 Dec 2024 18:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734544866; cv=none; b=u9xcqUDe7QfGRN2DD0wDctqGesYjrgpQ/PWXAErRXxz7aXCYvqqctbV5bULDsFkGYo0gWeYsNoSZUHYFQ5/vC21nDC2/aEy/dA2KPAB16/qSK536V5kAPOZsqGGveM/HPXsg1J1dI70AoY1jgp9RFVGxA/cSSbY2rVMJyuK98xQ=
+	t=1734545224; cv=none; b=LoP3DHzfzGFx7yyQxY2n3TsMQUDr/N9rQVjYNHuEdT2Iviva3Nc3BgYk/s+mAG9edIMpyU4L/0kXcn+7RdrTUBZaELz8wBWUeK9r/iUFRtq6NlXxZVzfYjEd5bvoCNAj0UtkH1y1sZLiBUanYbv/GK77pQbmuOk4yf6gfPgZHtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734544866; c=relaxed/simple;
-	bh=nCRFkNBILC2//hm4ycMs/C31IlG9+XR4ValfcPovi4Q=;
+	s=arc-20240116; t=1734545224; c=relaxed/simple;
+	bh=tr6UyiYeBOeDxGKe9LogPeEdP0gP+8kOknDF1WkJdy4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bF7DVlnHcafdyRIj/4FTu9Z4zYqVNotMXwQUvM4xS/aOej1XeeL/z0XZAvT9+4r09Z8HX+nBKpSKIgpabtJTXzEVMHnWQ2T94LGIUv3qzIblIixobnHyqoz1MHlzHzL8eNfPXH/yANXZkoQypNsXSgwPAcpDeqc0XYeG3JJkBjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=sqdkTL9d; arc=none smtp.client-ip=199.89.1.11
+	 In-Reply-To:Content-Type; b=aFvtveBibSb/G49xTrc2GbIdXqBDnzMvX8dwr3L+QfCYPUq1efAueQ7aNJ/MiQmOJNgDp2Ahx9antU1knDhnXOJOcPcVGQ4az2fcQ3zwMEHOg2WTQkwJ4Z9LnrO+J2/2ksj1SFIcw1aTGoZ6dgelE/z0i9n+7jE1HU5c+zciymc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Mfs0r3yM; arc=none smtp.client-ip=199.89.1.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="sqdkTL9d"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Mfs0r3yM"
 Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YD1h01ZFLz6ClY9q;
-	Wed, 18 Dec 2024 18:01:04 +0000 (UTC)
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YD1pt0jRrzlfflk;
+	Wed, 18 Dec 2024 18:07:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1734544858; x=1737136859; bh=nCRFkNBILC2//hm4ycMs/C31
-	IlG9+XR4ValfcPovi4Q=; b=sqdkTL9d208zyS6OhFHmoQ7TohC8NIeUo0ADklZu
-	KdbnZKEBTtdfGvDqLWslmsNMSGVPtgFA7Ui8f3pz7cWAeFfCanzWxTTP80uCNKsx
-	dr3dQOclEmC5Twf62oW7LT3YlLa//HZ56vUyl3snC4Un6ccqskqv+IkRvgnDrzj9
-	KZCvr95Hm7Jq26tS406l8ZMpYC//dlCZ6QuMfLAQdQXb9KwKunHH8d6LSMptNUta
-	gpVTG0v9CQHFF4x0k04PyyVk6D3vSgoQEXFcJ8VxEgxd/9fjEHOEYJCVYhbYOHR+
-	DWzPwBnPsvEKXPQR6j/AWAUptDKMpC5R5nQ+zhG0pt1UjQ==
+	 s=mr01; t=1734545217; x=1737137218; bh=tr6UyiYeBOeDxGKe9LogPeEd
+	P0gP+8kOknDF1WkJdy4=; b=Mfs0r3yM2d7ZznoWwA8ZW4sWnxFV6kx74b2MDZ39
+	duAEZmA24gMt6WcbCs2XQd5IoGojoTdIgHmlATpDYkrk79IuTjqqhvoCkPjoe6AM
+	3t7fuPq63nS40IXlXgNCrdxhUAvrAHis/nvdl+6gauTR1980LR0fKdmpw0yNzE+P
+	VHTpgYEoq8VtMRFK/J62tbyYYotfC4/ePvRIIF+DyFkKoDbozHhY3okLBOTNG4ir
+	o4hkWHlZ2aZRO9DvuRSqxWscf4VuYuaskND7wfP+huUpVQxsmFHxsD/7wyBbG2TS
+	Y/drrpec5IL8SRpEtHLuINhE04RaEQurPq0D4e/YLDVxqQ==
 X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 0-juHuZE_U3E; Wed, 18 Dec 2024 18:00:58 +0000 (UTC)
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id hCVkDRqFl94X; Wed, 18 Dec 2024 18:06:57 +0000 (UTC)
 Received: from [100.66.154.22] (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YD1gm3sg1z6ClY9D;
-	Wed, 18 Dec 2024 18:00:51 +0000 (UTC)
-Message-ID: <f2b95b70-f074-4f58-b03d-5e7fb20f4274@acm.org>
-Date: Wed, 18 Dec 2024 10:00:50 -0800
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YD1pk5r92zlfflB;
+	Wed, 18 Dec 2024 18:06:54 +0000 (UTC)
+Message-ID: <95d352cd-b52f-4cc8-9014-302763f401aa@acm.org>
+Date: Wed, 18 Dec 2024 10:06:53 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,21 +60,21 @@ References: <20241217024047.1091893-1-yukuai1@huaweicloud.com>
  <20241217024047.1091893-5-yukuai1@huaweicloud.com>
  <da924dc3-a2e5-4bfe-afb6-5fbc55bc25a3@acm.org>
  <8fa8c620-22ff-0963-d1ee-c6fe6f13b49c@huaweicloud.com>
- <96556f82-b511-b3ef-01b5-e9a32557db95@huaweicloud.com>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <96556f82-b511-b3ef-01b5-e9a32557db95@huaweicloud.com>
+In-Reply-To: <8fa8c620-22ff-0963-d1ee-c6fe6f13b49c@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/17/24 5:14 PM, Yu Kuai wrote:
-> I can't make this read-write, because set lower value will cause
-> problems for existing elevator, because wake_batch has to be
-> updated as well.
+On 12/17/24 5:12 PM, Yu Kuai wrote:
+> dd->async_depth is initialized to 0 now, functionally I think
+> it's the same as q->nr_requests. And I do explain this in commit
+> message, maybe it's not clear?
 
-Should the request queue perhaps be frozen before wake_batch is updated?
+It would be good to add a comment in the source code that explains that
+__blk_mq_get_tag() does not restrict tag allocation if dd->async_depth
+is zero because that causes data->shallow_depth to be zero.
 
 Thanks,
 
 Bart.
-
