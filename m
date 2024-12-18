@@ -1,86 +1,47 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD40214658C
-	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 05:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FCB14D439
+	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 06:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734498258; cv=none; b=YgccrJ6ZVehbdrYo/oCm0tGRBv3k/ITDNDe45uhPjb5/Xy33vqlFRnTdwEccyuafopDoOhlAVunTiqIoXWj1YggbPsdjRIZbxWbzi/XbPnHjbSE8lWUDZWcgeJln+zP56z6HHkLMEr3WTFSBviKvRgfm/vlj6/zpfFWmBx3sBss=
+	t=1734505153; cv=none; b=Eh12Vm0DEWTVyHhObTBUoUubaQolvfoAsa3kdst+ABWl20SRyKoYm6qtMOsOpH8G/prNhXlo9KhDEZvCjfW2qZCRik1pnXYvNRi1iubVV+vVqRgvf6G1NazyK54HF1k2u+EmBuyeMnF03EVbRll15ijE9lQTLP8YTSRlXWEWW3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734498258; c=relaxed/simple;
-	bh=kC01mZ4L52bc7lnGnqNOpqjPlXsJRbczG1gbElfsO24=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MUHiQq+att12JwHOXs5Pjg8YoW3Ew4wafOUid7Be2o3t6cpVJjRHuYfC8eTU0pwdqkLi5Jj5n6KXLGkuQR8MzfhQBHYW0QfqrK0Wps3x3zVDQk+QUSQdKQXZwnn9WhMibQW0Gsl3rGz/kNc8zu88S+zZyGPakn0eXMphdgDIUGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=LQd+LATv; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="LQd+LATv"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YChRh16Qlzlff0D;
-	Wed, 18 Dec 2024 05:04:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1734498253; x=1737090254; bh=GWAEocCU4rt9mAPtnGOULqAJ
-	7dcQhXPREYf+isHmKqc=; b=LQd+LATvyJo7P2cvcrQ5JK+0Yab+N0dC6TI7BFG/
-	OfgxodweSMmoST3zu5AMmcdP1VojVuYP5gkPsN910xY6OEVj1l5nRAB+lybfOnnJ
-	U9wE3nzSlcOXhcLQ+MyCdhEHn7Bca7N88Lw3soGJSCxcIenNlJ2d2llBWngAk2ni
-	4WWtke3MKvYnYf3jYHggvaJk9p8LZS9rvKDYOwWflvFCgAdVPWLaaaMXWL62el6k
-	wYWnAl4LNoEYX93ThITLc9HRBQbxr+aJHfdzyYB9qiovSC4sC3n6McPdMOY/cSxC
-	V/dbGyURuuZfXRzaW9P6vjBWN0uCnycI7zxBgpHwZOVRQA==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id WYDBVa-IkaQr; Wed, 18 Dec 2024 05:04:13 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YChRZ58Rqzlffkv;
-	Wed, 18 Dec 2024 05:04:09 +0000 (UTC)
-Message-ID: <329599c5-580d-4fe5-97f2-4e4e5d5d9d7b@acm.org>
-Date: Tue, 17 Dec 2024 21:04:08 -0800
+	s=arc-20240116; t=1734505153; c=relaxed/simple;
+	bh=VFpqsxC00QkIBa5N7uCjRQHQvOPGVWHnu2oLj58UQMI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Aeux2QZ0Jy5scSKnGztTUmNJz5/lX0YXdJdpvQIBfB/TVRnblPTWvm3TV8t5TjxhaeyghVSK18sSV0m1EW0V7YZHwYQa95mVeCKaYB6wy8CmWaLT2DBkMHt1I68TdrzQeqnBI1LPpXd12SdNJCRB3aaD5Bd6MaNGAS/3L5d/lcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id B50A968AA6; Wed, 18 Dec 2024 07:58:59 +0100 (CET)
+Date: Wed, 18 Dec 2024 07:58:59 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+	Christoph Hellwig <hch@lst.de>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: Zoned storage and BLK_STS_RESOURCE
+Message-ID: <20241218065859.GA25215@lst.de>
+References: <3eb6ba65-daf8-4d8f-a37f-61bea129b165@kernel.org> <63aae174-a478-48ea-8a74-ab348e21ab65@acm.org> <83bfb006-0a7d-4ce0-8a94-01590fb3bbbb@kernel.org> <548e98ee-b46e-476a-9d4a-05a60c78b068@kernel.dk> <5fb36d77-44cc-4ad7-8d64-b819bc7ae42a@kernel.org> <eb61f282-0e23-428a-8e6a-77c24cfd0e83@kernel.dk> <f41ffec1-9d05-47ed-bb0e-2c66136298b6@kernel.org> <e299e652-2904-417c-9f76-b7aec5fd066b@kernel.dk> <fb292dc8-7092-45c1-ae8a-fca1d61c6c9a@kernel.dk> <9e8e2410-53b5-4dad-8b54-b7e72647703b@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests 2/2] throtl: fix the race between submitting IO
- and setting cgroup.procs
-To: Yu Kuai <yukuai1@huaweicloud.com>, Nilay Shroff <nilay@linux.ibm.com>,
- linux-block@vger.kernel.org
-Cc: shinichiro.kawasaki@wdc.com, yi.zhang@redhat.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20241217131440.1980151-1-nilay@linux.ibm.com>
- <20241217131440.1980151-3-nilay@linux.ibm.com>
- <d2b28360-259a-8938-47eb-b14b5b4df754@huaweicloud.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <d2b28360-259a-8938-47eb-b14b5b4df754@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9e8e2410-53b5-4dad-8b54-b7e72647703b@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 12/17/24 6:24 PM, Yu Kuai wrote:
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 sleep 0.1
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 while ! cat $CGROUP2_DIR/$THROTL_DIR/cgroup.procs | grep=20
-> $pid; do
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sleep 0.1
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 _throtl_issue_io "$rw" "$bs" "$count"
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } &
+On Tue, Dec 17, 2024 at 12:59:00PM -0800, Damien Le Moal wrote:
+> Thanks for the pointer. Will have a look. It may be as simple as always using
+> the io-wq worker for zone writes and have these ordered (__WQ_ORDERED). Maybe.
 
-If this approach is used, please add the options -q (quiet) and -w
-(match whole words only) to the grep command.
-
-Thanks,
-
-Bart.
+No.  Don't force ordering on people for absolutely no reason.  Use the
+new append writes that return the written offsets we've talked about.
+Enforcing ordering on I/O submissions/commands/requests always ends up
+badly.
 
