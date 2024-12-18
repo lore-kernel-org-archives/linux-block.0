@@ -1,99 +1,183 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263717080B
-	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 02:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6D93597B;
+	Wed, 18 Dec 2024 02:26:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734488704; cv=none; b=ryH4HbVzlZWt0i+s0PTueptI2HXvf9nKfo0I6iCpyfi0g+2iN0d4+/n5hjFMUbagm4sP93Ns+90DXfx6l9cWYZ47yop00ccbE704Vguk3UZYUHyqfCba0ziUnqlZMhRqQ/oXWb5ztBqoRucA/EaEHw+H8w+RhRUpitI/YCwajbU=
+	t=1734488792; cv=none; b=s4eixCHwqUf207X8NjHveEvrb+nDUWB3S3u9k5YjDi5EjBwIhLcoBY8NpYwrNgcguA6hAqIOlVv/dIx4lrJMiWqEOuMueSStBsoeRsNPbAXaMMqruW4X3A3EAgcCWIkHS64NaAsnGFmF5FDDrJws1A1d0QaPFFvLEkg59Xvrxds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734488704; c=relaxed/simple;
-	bh=NPuWjvyeZCs+PKdpAAsn5exiv7WJwXhNNVjHh9F4cmQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=NjGqpN7SpgZrXqIyEavUJ2FteqtsCxmQC82uCpFbm67GEtEeAaSN62uul6XhoG+hBElq4v++CGFxS4tGea44JlMQZ+na1bZrb4fynnfhnwG/SOBqWKhINZR8NMUg3yzEkDSSqaf4oVgb0GpfTLCkuzvAN4M36b2YuVJtIQvanNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YCcvc0Hwvz4f3jqb
-	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 10:24:44 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 7C5291A06DA
-	for <linux-block@vger.kernel.org>; Wed, 18 Dec 2024 10:24:58 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP4 (Coremail) with SMTP id gCh0CgB3noJ4MmJn5tWmEw--.62823S3;
-	Wed, 18 Dec 2024 10:24:58 +0800 (CST)
-Subject: Re: [PATCH blktests 2/2] throtl: fix the race between submitting IO
- and setting cgroup.procs
-To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
-Cc: shinichiro.kawasaki@wdc.com, yi.zhang@redhat.com,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20241217131440.1980151-1-nilay@linux.ibm.com>
- <20241217131440.1980151-3-nilay@linux.ibm.com>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <d2b28360-259a-8938-47eb-b14b5b4df754@huaweicloud.com>
-Date: Wed, 18 Dec 2024 10:24:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1734488792; c=relaxed/simple;
+	bh=CDDlCAKlASesiZGLekB4AsPrmJInuCb09o/+qxzGaxw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sYTfYgFEJofYZnTQhRWE3ZSKRH3lvEzLpBF5Q8Djm9b3UAKoztDcaBxB2ehYgQWk/hyGe5QPElX8ct7iya9xzhE43IprKLeawE+fCyaHMjHQa5XnLMKVmgQxvIiIBY3HB/Uu5ItWOI1Bh3jOGEKANuqILOVD/nQV83M5Ftu2tY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BkxYihM/; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BkxYihM/"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+	Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=PAjepITga0a8Mt36xpxUX/NyoUbIA2AsDDdcgVOuJ40=; b=BkxYihM/ixv1x+y1GBn61vuqpI
+	9uMGmUbRsMUgI7XBDYzqLUWkOar5BL6dzU9F1tUO4CIA4n0+LWX9pCweVDBnSQEWxMvpWm1n6JBKz
+	/Dsn1uG4vzykfhqR7SvsS+CDSJHDeZ+bBrn3s4478DOW2HSvucEKQ5V8SD0zfoIKS0fwbT9gKHRj5
+	pLcksMtPjjUZFjz+Q9yHaEizn2AXP9Riv8BG6ZdIhs0Y3hhxRkhmGoPiQMmsLe+a7mNR9wk1km02m
+	Itv1KGFNuxgryqijDbmFRyzjE6ia4ohMLRGuTSuLPwnpI0nR6n1/HkGfLKzBMvShiyHd2Jsw3hKxv
+	phXnpcCg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tNjlc-0000000FOFS-0xNt;
+	Wed, 18 Dec 2024 02:26:28 +0000
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: hare@suse.de,
+	willy@infradead.org,
+	dave@stgolabs.net,
+	david@fromorbit.com,
+	djwong@kernel.org,
+	kbusch@kernel.org
+Cc: john.g.garry@oracle.com,
+	hch@lst.de,
+	ritesh.list@gmail.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	gost.dev@samsung.com,
+	p.raghav@samsung.com,
+	da.gomez@samsung.com,
+	kernel@pankajraghav.com,
+	mcgrof@kernel.org
+Subject: [PATCH 1/5] fs/buffer: move async batch read code into a helper
+Date: Tue, 17 Dec 2024 18:26:22 -0800
+Message-ID: <20241218022626.3668119-2-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20241218022626.3668119-1-mcgrof@kernel.org>
+References: <20241218022626.3668119-1-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20241217131440.1980151-3-nilay@linux.ibm.com>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB3noJ4MmJn5tWmEw--.62823S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrtw15ZFW7Jr1rAr43KFyfZwb_yoW3KFXEk3
-	s7Kryjg3yxA3srJanakr43WrW2ya1UurWrZ3WxCF42q348Aws3uF92qw17Zr13ZayIyrs8
-	W34S9w17KwnIkjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbx8YFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
-	xVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1l
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
-	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UtR6
-	wUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-Hi,
+Move the code from block_read_full_folio() which does a batch of async
+reads into a helper.
 
-ÔÚ 2024/12/17 21:14, Nilay Shroff Ð´µÀ:
-> This commit helps fix the above race condition by touching a temp file. The
-> the existence of the temp file is then polled by the background process at
-> regular interval. Until the temp file is created, the background process
-> would not forward progress and starts submitting IO and from the main
-> thread we'd touch temp file only after we write PID of the background
-> process into cgroup.procs.
+No functional changes.
 
-It's right sleep 0.1 is not appropriate here, and this can work.
-However, I think reading cgroup.procs directly is better, something
-like following:
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ fs/buffer.c | 79 +++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 49 insertions(+), 30 deletions(-)
 
-  _throtl_test_io() {
--       local pid
-+       local pid="none"
-
-         {
-                 local rw=$1
-                 local bs=$2
-                 local count=$3
-
--               sleep 0.1
-+               while ! cat $CGROUP2_DIR/$THROTL_DIR/cgroup.procs | grep 
-$pid; do
-+                       sleep 0.1
-                 _throtl_issue_io "$rw" "$bs" "$count"
-         } &
-
-
-Thanks,
-Kuai
+diff --git a/fs/buffer.c b/fs/buffer.c
+index cc8452f60251..7c6aac0742a6 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -2350,6 +2350,53 @@ bool block_is_partially_uptodate(struct folio *folio, size_t from, size_t count)
+ }
+ EXPORT_SYMBOL(block_is_partially_uptodate);
+ 
++/*
++ * Stage one is to collect an array of buffer heads which we need a read for,
++ * you can then use this afterwards. On that effort you should also check
++ * to see if you really need a read, and if we are already fully mapped.
++ */
++static void bh_read_batch_async(struct folio *folio,
++				int nr, struct buffer_head *arr[],
++				bool fully_mapped, bool no_reads,
++				bool any_get_block_error)
++{
++	int i;
++	struct buffer_head *bh;
++
++	if (fully_mapped)
++		folio_set_mappedtodisk(folio);
++
++	if (no_reads) {
++		/*
++		 * All buffers are uptodate or get_block() returned an
++		 * error when trying to map them *all* buffers we can
++		 * finish the read.
++		 */
++		folio_end_read(folio, !any_get_block_error);
++		return;
++	}
++
++	/* Stage two: lock the buffers */
++	for (i = 0; i < nr; i++) {
++		bh = arr[i];
++		lock_buffer(bh);
++		mark_buffer_async_read(bh);
++	}
++
++	/*
++	 * Stage three: start the IO.  Check for uptodateness
++	 * inside the buffer lock in case another process reading
++	 * the underlying blockdev brought it uptodate (the sct fix).
++	 */
++	for (i = 0; i < nr; i++) {
++		bh = arr[i];
++		if (buffer_uptodate(bh))
++			end_buffer_async_read(bh, 1);
++		else
++			submit_bh(REQ_OP_READ, bh);
++	}
++}
++
+ /*
+  * Generic "read_folio" function for block devices that have the normal
+  * get_block functionality. This is most of the block device filesystems.
+@@ -2383,6 +2430,7 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+ 	nr = 0;
+ 	i = 0;
+ 
++	/* Stage one - collect buffer heads we need issue a read for */
+ 	do {
+ 		if (buffer_uptodate(bh))
+ 			continue;
+@@ -2414,37 +2462,8 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+ 		arr[nr++] = bh;
+ 	} while (i++, iblock++, (bh = bh->b_this_page) != head);
+ 
+-	if (fully_mapped)
+-		folio_set_mappedtodisk(folio);
+-
+-	if (!nr) {
+-		/*
+-		 * All buffers are uptodate or get_block() returned an
+-		 * error when trying to map them - we can finish the read.
+-		 */
+-		folio_end_read(folio, !page_error);
+-		return 0;
+-	}
+-
+-	/* Stage two: lock the buffers */
+-	for (i = 0; i < nr; i++) {
+-		bh = arr[i];
+-		lock_buffer(bh);
+-		mark_buffer_async_read(bh);
+-	}
++	bh_read_batch_async(folio, nr, arr, fully_mapped, nr == 0, page_error);
+ 
+-	/*
+-	 * Stage 3: start the IO.  Check for uptodateness
+-	 * inside the buffer lock in case another process reading
+-	 * the underlying blockdev brought it uptodate (the sct fix).
+-	 */
+-	for (i = 0; i < nr; i++) {
+-		bh = arr[i];
+-		if (buffer_uptodate(bh))
+-			end_buffer_async_read(bh, 1);
+-		else
+-			submit_bh(REQ_OP_READ, bh);
+-	}
+ 	return 0;
+ }
+ EXPORT_SYMBOL(block_read_full_folio);
+-- 
+2.43.0
 
