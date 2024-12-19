@@ -1,67 +1,67 @@
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A97A224B19
-	for <linux-block@vger.kernel.org>; Thu, 19 Dec 2024 13:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C3A225768
+	for <linux-block@vger.kernel.org>; Thu, 19 Dec 2024 13:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734616126; cv=none; b=f+6U/5xcFefytU+BP6dQt/ULrCj8guILrsjendHmFRyoQStO+wwW9gvk9q3Hczm+gLYElWZrTk6j4WY8oEgFEXveBdhvqOZQckIfsk7WvKPA+MDjt8Om1dIvGPlYkFJetUgEegTmkPIZydf2vrl8qDusBjQH5u4UTW749wvRn+Q=
+	t=1734616132; cv=none; b=pYbfBAXwrNdnsgU42JiatUHqOgZswbpgleOMZoBzfLLg90Ul6O1YY0+Np/wmsthzunm8fnT5bfi0PMdQGT5KXdWkFkhViDFnDnazxkF9bDTAhCEftrPZhgh9pJyu8hrF2zSKBhOmq9S25NbM1wQn4eWp51zdhf1UQiLqY5EzP9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734616126; c=relaxed/simple;
-	bh=dx8Z8zcbcEcD/p5AehdRTmFyVw4r+v5gMACGHmVdmnE=;
+	s=arc-20240116; t=1734616132; c=relaxed/simple;
+	bh=sahhmOB/L93DxUlxEH50L3Z1bk881nM3T+bWQjC7PFU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CX2c3qyUmN0wa16GUWSprLqUC/klKSJz70xzGjdUaoGvuMlI9m26Vwdbjuw93LHuiD+SFhci/mZd5GsJ94GUr/K9mDcBCHq8IQuKgZLlNV5iL9A9jtOgIbtgo2EuqVnfW0I2L5U3+NXxB0JZztMQ7N7C6vOIpz7zmoQk1op+teQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=y0DhZ2zG; arc=none smtp.client-ip=209.85.128.182
+	 To:Cc:Content-Type; b=H3zAn6qW8DVh0BobJkyrBVr+EwLx5qryF+7s7I4iZk1MIyXZuIioxgkEJ6JfcUr+pBTl9p/TzfPvT4YcknuuG5uYlQYraDt2af3ECfv3LWN2wK5SFyk4VaudskD1/izLXqDJEKVMTfpDFKT6m9hHZyqqnHPkJ3FpyL6i+T9ZnoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sUHdSiUH; arc=none smtp.client-ip=209.85.219.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y0DhZ2zG"
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6f3d31808e3so6103167b3.3
-        for <linux-block@vger.kernel.org>; Thu, 19 Dec 2024 05:48:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sUHdSiUH"
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e3fd6cd9ef7so1593496276.1
+        for <linux-block@vger.kernel.org>; Thu, 19 Dec 2024 05:48:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1734616124; x=1735220924; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1734616128; x=1735220928; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mXO1JWc0dzqo7dfc1rG4WRHfe9+6B85YYjaXMsQpUk8=;
-        b=y0DhZ2zGrPLufsp5oM/sv6BhZoyfMB7L+eEQCEXGWZ3Fer8puvLITpgz1CDDdwCYWd
-         m3YZiBIoXqxpkbpvaofaX4jNpzOqDlyxV9CPp/xiqBKcDGz9XgSTzxCclJeImKu0CBXd
-         VhWGrOP611xZjSg6ywj6lZEIzRI2PbsWlaincQ7bIUxot36FlXRCYaveC9VeZ354CUrm
-         1s3jJbFAowsRWT0xgNxlPR5dUQUPP5ZzRT8x6jBLu4zxxr5qIlEW2gm6jxiaao3JOtmB
-         7Dijau1IQWUEWR0kfBpIdaKJbScBTmTWEx7W5eyQUZXWodXUiTui4K2zINvl5Z1enYxO
-         vsZQ==
+        bh=9/oPhJKsqUFgIAKQVmgKj7TTGgtA7Tgbo3jvbs+K6JE=;
+        b=sUHdSiUHdhJA8Pn+UXQHQnhxpUJAaNLoqkU3hq348d8wXXnrJyurbTkSrrck2U23Dt
+         +riXjlY6VwZ/zd3vdT/Yx9YnxA5DEswor2zH75acGWhON+VM1AZHy23b1wL9GUvXSFtD
+         wdlzm2kFDAfNF1UId03AjHMOzqtgl0Qv/4wOSkDLOjneHigtTjdodPGoL2fPjPUEKWIN
+         zEoMc6R1gCveiGiZi63AByI8YRUstnnjEHYinYype9726YQ1Gcd9dQsI9cPSFWkRfpRP
+         rcU4TAv5nzU0scliy3z6zt3PV8MU52tB4l/I5jGdKhSAVcXVNHt8d+TrcFJf2XdEVBLc
+         H+VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734616124; x=1735220924;
+        d=1e100.net; s=20230601; t=1734616128; x=1735220928;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mXO1JWc0dzqo7dfc1rG4WRHfe9+6B85YYjaXMsQpUk8=;
-        b=sEVv0qlG4DDzCtmKdBlFOiDkt3NRVomJ7lGjBieV0QzShO0G8DjUJ4JGX9fKn+b10z
-         ZkPDLRWPankAjTjWu/15fFIpNwNTTjnot7iKmdgg5cTbHqPX93y0I0HJRJHz9a+cPoNZ
-         3Ppx0Bh8ICZAfhZzfiPNxidVZWXO0NkCLtD61uSTG6B0zQ/obx6q0Y8sBN9pTLk+vjjR
-         S2AcTSz7/m+lEku80ngii790H97dFuklLf+9uDpWbyxLq4S9xje6fQaCkSWMchrgdyXJ
-         EVWLYVlUZUq9vobdlPUB3dfksPNUFpuQq+cpNvghwRMalDjzNnHRg9/KUdJ9CHo3IuZz
-         ZsZg==
-X-Gm-Message-State: AOJu0YzoU4cgRkZaH0PxQLHX4GvCASeI26Ad7PxZ/rhlb4Ht456h93EI
-	sesZ5dmRUwJlCQHDLVG5OCQdHiEqUfiu+0Zx+PW2/1O+aHMTHKE/Un642A36UYrExsYojJ1+AW+
-	v/ggFWMqUNVND8bhzs2x/uRbmusIlgmpkO+O7rQ==
-X-Gm-Gg: ASbGncuayKg2HI9QaxV/HLHjSgn+5TT+M7TBRARtmsw3jITdNTpdHjnF4ZQm+OZh83y
-	upxIWD0e78Jqr7PTWTFIT478QSYG3H4a29kt4nwI=
-X-Google-Smtp-Source: AGHT+IEjwcNyQmxYJWNy9sVDcxIilhG2jovJzAG4uTM2E71ZmGRx+o9hvF/TOHyKvnCLrmN7UM5vvGMWJdIs1tMfv4k=
-X-Received: by 2002:a05:690c:6f83:b0:6ef:4fba:8151 with SMTP id
- 00721157ae682-6f3d1e85c3emr52273637b3.19.1734616124150; Thu, 19 Dec 2024
- 05:48:44 -0800 (PST)
+        bh=9/oPhJKsqUFgIAKQVmgKj7TTGgtA7Tgbo3jvbs+K6JE=;
+        b=u3us2j6BLJzWByxc78TfobF6nD9jgkpsocuHOmuFDV2Vp3oUaW8rB3U8UvGmtwzbei
+         mgSc4McDO6ykI5QtIMuJUtPStk8ytrxLTE9DnrmoPYE6pzUscgxcIR29vyO+vFoGLayl
+         UI321ngnarP5yrs+t543E7ss1iTa8Fk+QnybzR3tUAu+NplDa6/m+sQP4S10V57n11w4
+         UTCJo69BGlsXIvpNPGbdvYe+Ru/RiPMs/01g6ulyl0Du4JQy2RP7CJb00yCKj8SBHlOC
+         FW328hyc/kJgLyUemmmsfGHKpZFV2hHtXCYczj1HzPsbsx9qmbmoH8sPCjmQ+t7ONmF1
+         Mg1g==
+X-Gm-Message-State: AOJu0YwSRVrX1TIWyFqJDd7vwxmH02th21s4H4bQW/kro0ba9dUCAOMR
+	ZSaXTABYJfjITjoSChhCQhm3f8sdaAxjhqyEEBz5/86+KdDUTBWkqmAivrOi2YT6G+1QnmY1apS
+	hm9zMD8X0uerngaJZs+McXv2CHOrYOCkTLN7NFA==
+X-Gm-Gg: ASbGncugPNsiGn0Kyz9qasgI609udKJ7e05atcTchr0Pk3iG4p4rMCwe8hyoW+N9Ez/
+	fzRpQ+CGlThS+8pH1k4+my9aFrE6gLetu8F3qtww=
+X-Google-Smtp-Source: AGHT+IEL6+x5PDw1SNoOjHOHyS6xS4ms/4nC8sKsqaKP4OKhBDk2JVPqXDkWfwWPbWyA+4ai6GVf5aMOhYgqUQZLN0o=
+X-Received: by 2002:a25:2e41:0:b0:e38:9227:bf06 with SMTP id
+ 3f1490d57ef6-e5376537618mr2906083276.2.1734616127811; Thu, 19 Dec 2024
+ 05:48:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241213041958.202565-1-ebiggers@kernel.org> <20241213041958.202565-7-ebiggers@kernel.org>
-In-Reply-To: <20241213041958.202565-7-ebiggers@kernel.org>
+References: <20241213041958.202565-1-ebiggers@kernel.org> <20241213041958.202565-8-ebiggers@kernel.org>
+In-Reply-To: <20241213041958.202565-8-ebiggers@kernel.org>
 From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Thu, 19 Dec 2024 14:48:08 +0100
-Message-ID: <CAPDyKFpgM4oGv=KYyiS5qE5yznAYhMuHBm5pP6S4OVenLjecrQ@mail.gmail.com>
-Subject: Re: [PATCH v10 06/15] mmc: crypto: add mmc_from_crypto_profile()
+Date: Thu, 19 Dec 2024 14:48:11 +0100
+Message-ID: <CAPDyKFoE5Rq5Kw6+X4fTu0g=yfw5znNkA5GDaZi6c=UW82VWUw@mail.gmail.com>
+Subject: Re: [PATCH v10 07/15] mmc: sdhci-msm: convert to use custom crypto profile
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
 	linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org, 
@@ -80,8 +80,12 @@ On Fri, 13 Dec 2024 at 05:20, Eric Biggers <ebiggers@kernel.org> wrote:
 >
 > From: Eric Biggers <ebiggers@google.com>
 >
-> Add a helper function that encapsulates a container_of expression.  For
-> now there is just one user but soon there will be more.
+> As is being done in ufs-qcom, make the sdhci-msm driver override the
+> full crypto profile rather than "just" key programming and eviction.
+> This makes it much more straightforward to add support for
+> hardware-wrapped inline encryption keys.  It also makes it easy to pass
+> the original blk_crypto_key down to qcom_ice_program_key() once it is
+> updated to require the key in that form.
 >
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
 
@@ -92,53 +96,337 @@ Uffe
 
 
 > ---
->  drivers/mmc/host/cqhci-crypto.c | 5 +----
->  include/linux/mmc/host.h        | 8 ++++++++
->  2 files changed, 9 insertions(+), 4 deletions(-)
+>  drivers/mmc/host/cqhci-crypto.c | 33 ++++++------
+>  drivers/mmc/host/cqhci.h        |  8 ++-
+>  drivers/mmc/host/sdhci-msm.c    | 94 ++++++++++++++++++++++++++-------
+>  3 files changed, 94 insertions(+), 41 deletions(-)
 >
 > diff --git a/drivers/mmc/host/cqhci-crypto.c b/drivers/mmc/host/cqhci-crypto.c
-> index d5f4b6972f63..2951911d3f78 100644
+> index 2951911d3f78..cb8044093402 100644
 > --- a/drivers/mmc/host/cqhci-crypto.c
 > +++ b/drivers/mmc/host/cqhci-crypto.c
-> @@ -23,14 +23,11 @@ static const struct cqhci_crypto_alg_entry {
->  };
->
->  static inline struct cqhci_host *
+> @@ -26,20 +26,17 @@ static inline struct cqhci_host *
 >  cqhci_host_from_crypto_profile(struct blk_crypto_profile *profile)
 >  {
-> -       struct mmc_host *mmc =
-> -               container_of(profile, struct mmc_host, crypto_profile);
-> -
-> -       return mmc->cqe_private;
-> +       return mmc_from_crypto_profile(profile)->cqe_private;
+>         return mmc_from_crypto_profile(profile)->cqe_private;
 >  }
 >
->  static int cqhci_crypto_program_key(struct cqhci_host *cq_host,
->                                     const union cqhci_crypto_cfg_entry *cfg,
->                                     int slot)
-> diff --git a/include/linux/mmc/host.h b/include/linux/mmc/host.h
-> index f166d6611ddb..68f09a955a90 100644
-> --- a/include/linux/mmc/host.h
-> +++ b/include/linux/mmc/host.h
-> @@ -588,10 +588,18 @@ static inline void *mmc_priv(struct mmc_host *host)
->  static inline struct mmc_host *mmc_from_priv(void *priv)
+> -static int cqhci_crypto_program_key(struct cqhci_host *cq_host,
+> -                                   const union cqhci_crypto_cfg_entry *cfg,
+> -                                   int slot)
+> +static void cqhci_crypto_program_key(struct cqhci_host *cq_host,
+> +                                    const union cqhci_crypto_cfg_entry *cfg,
+> +                                    int slot)
 >  {
->         return container_of(priv, struct mmc_host, private);
+>         u32 slot_offset = cq_host->crypto_cfg_register + slot * sizeof(*cfg);
+>         int i;
+>
+> -       if (cq_host->ops->program_key)
+> -               return cq_host->ops->program_key(cq_host, cfg, slot);
+> -
+>         /* Clear CFGE */
+>         cqhci_writel(cq_host, 0, slot_offset + 16 * sizeof(cfg->reg_val[0]));
+>
+>         /* Write the key */
+>         for (i = 0; i < 16; i++) {
+> @@ -50,11 +47,10 @@ static int cqhci_crypto_program_key(struct cqhci_host *cq_host,
+>         cqhci_writel(cq_host, le32_to_cpu(cfg->reg_val[17]),
+>                      slot_offset + 17 * sizeof(cfg->reg_val[0]));
+>         /* Write dword 16, which includes the new value of CFGE */
+>         cqhci_writel(cq_host, le32_to_cpu(cfg->reg_val[16]),
+>                      slot_offset + 16 * sizeof(cfg->reg_val[0]));
+> -       return 0;
 >  }
 >
-> +#ifdef CONFIG_MMC_CRYPTO
-> +static inline struct mmc_host *
-> +mmc_from_crypto_profile(struct blk_crypto_profile *profile)
-> +{
-> +       return container_of(profile, struct mmc_host, crypto_profile);
-> +}
-> +#endif
-> +
->  #define mmc_host_is_spi(host)  ((host)->caps & MMC_CAP_SPI)
+>  static int cqhci_crypto_keyslot_program(struct blk_crypto_profile *profile,
+>                                         const struct blk_crypto_key *key,
+>                                         unsigned int slot)
+> @@ -67,11 +63,10 @@ static int cqhci_crypto_keyslot_program(struct blk_crypto_profile *profile,
+>                         &cqhci_crypto_algs[key->crypto_cfg.crypto_mode];
+>         u8 data_unit_mask = key->crypto_cfg.data_unit_size / 512;
+>         int i;
+>         int cap_idx = -1;
+>         union cqhci_crypto_cfg_entry cfg = {};
+> -       int err;
 >
->  #define mmc_dev(x)     ((x)->parent)
->  #define mmc_classdev(x)        (&(x)->class_dev)
->  #define mmc_hostname(x)        (dev_name(&(x)->class_dev))
+>         BUILD_BUG_ON(CQHCI_CRYPTO_KEY_SIZE_INVALID != 0);
+>         for (i = 0; i < cq_host->crypto_capabilities.num_crypto_cap; i++) {
+>                 if (ccap_array[i].algorithm_id == alg->alg &&
+>                     ccap_array[i].key_size == alg->key_size &&
+> @@ -94,25 +89,26 @@ static int cqhci_crypto_keyslot_program(struct blk_crypto_profile *profile,
+>                        key->raw + key->size/2, key->size/2);
+>         } else {
+>                 memcpy(cfg.crypto_key, key->raw, key->size);
+>         }
+>
+> -       err = cqhci_crypto_program_key(cq_host, &cfg, slot);
+> +       cqhci_crypto_program_key(cq_host, &cfg, slot);
+>
+>         memzero_explicit(&cfg, sizeof(cfg));
+> -       return err;
+> +       return 0;
+>  }
+>
+>  static int cqhci_crypto_clear_keyslot(struct cqhci_host *cq_host, int slot)
+>  {
+>         /*
+>          * Clear the crypto cfg on the device. Clearing CFGE
+>          * might not be sufficient, so just clear the entire cfg.
+>          */
+>         union cqhci_crypto_cfg_entry cfg = {};
+>
+> -       return cqhci_crypto_program_key(cq_host, &cfg, slot);
+> +       cqhci_crypto_program_key(cq_host, &cfg, slot);
+> +       return 0;
+>  }
+>
+>  static int cqhci_crypto_keyslot_evict(struct blk_crypto_profile *profile,
+>                                       const struct blk_crypto_key *key,
+>                                       unsigned int slot)
+> @@ -165,20 +161,22 @@ cqhci_find_blk_crypto_mode(union cqhci_crypto_cap_entry cap)
+>  int cqhci_crypto_init(struct cqhci_host *cq_host)
+>  {
+>         struct mmc_host *mmc = cq_host->mmc;
+>         struct device *dev = mmc_dev(mmc);
+>         struct blk_crypto_profile *profile = &mmc->crypto_profile;
+> -       unsigned int num_keyslots;
+>         unsigned int cap_idx;
+>         enum blk_crypto_mode_num blk_mode_num;
+>         unsigned int slot;
+>         int err = 0;
+>
+>         if (!(mmc->caps2 & MMC_CAP2_CRYPTO) ||
+>             !(cqhci_readl(cq_host, CQHCI_CAP) & CQHCI_CAP_CS))
+>                 goto out;
+>
+> +       if (cq_host->ops->uses_custom_crypto_profile)
+> +               goto profile_initialized;
+> +
+>         cq_host->crypto_capabilities.reg_val =
+>                         cpu_to_le32(cqhci_readl(cq_host, CQHCI_CCAP));
+>
+>         cq_host->crypto_cfg_register =
+>                 (u32)cq_host->crypto_capabilities.config_array_ptr * 0x100;
+> @@ -193,13 +191,12 @@ int cqhci_crypto_init(struct cqhci_host *cq_host)
+>
+>         /*
+>          * CCAP.CFGC is off by one, so the actual number of crypto
+>          * configurations (a.k.a. keyslots) is CCAP.CFGC + 1.
+>          */
+> -       num_keyslots = cq_host->crypto_capabilities.config_count + 1;
+> -
+> -       err = devm_blk_crypto_profile_init(dev, profile, num_keyslots);
+> +       err = devm_blk_crypto_profile_init(
+> +               dev, profile, cq_host->crypto_capabilities.config_count + 1);
+>         if (err)
+>                 goto out;
+>
+>         profile->ll_ops = cqhci_crypto_ops;
+>         profile->dev = dev;
+> @@ -223,13 +220,15 @@ int cqhci_crypto_init(struct cqhci_host *cq_host)
+>                         continue;
+>                 profile->modes_supported[blk_mode_num] |=
+>                         cq_host->crypto_cap_array[cap_idx].sdus_mask * 512;
+>         }
+>
+> +profile_initialized:
+> +
+>         /* Clear all the keyslots so that we start in a known state. */
+> -       for (slot = 0; slot < num_keyslots; slot++)
+> -               cqhci_crypto_clear_keyslot(cq_host, slot);
+> +       for (slot = 0; slot < profile->num_slots; slot++)
+> +               profile->ll_ops.keyslot_evict(profile, NULL, slot);
+>
+>         /* CQHCI crypto requires the use of 128-bit task descriptors. */
+>         cq_host->caps |= CQHCI_TASK_DESC_SZ_128;
+>
+>         return 0;
+> diff --git a/drivers/mmc/host/cqhci.h b/drivers/mmc/host/cqhci.h
+> index fab9d74445ba..ce189a1866b9 100644
+> --- a/drivers/mmc/host/cqhci.h
+> +++ b/drivers/mmc/host/cqhci.h
+> @@ -287,17 +287,15 @@ struct cqhci_host_ops {
+>         void (*disable)(struct mmc_host *mmc, bool recovery);
+>         void (*update_dcmd_desc)(struct mmc_host *mmc, struct mmc_request *mrq,
+>                                  u64 *data);
+>         void (*pre_enable)(struct mmc_host *mmc);
+>         void (*post_disable)(struct mmc_host *mmc);
+> -#ifdef CONFIG_MMC_CRYPTO
+> -       int (*program_key)(struct cqhci_host *cq_host,
+> -                          const union cqhci_crypto_cfg_entry *cfg, int slot);
+> -#endif
+>         void (*set_tran_desc)(struct cqhci_host *cq_host, u8 **desc,
+>                               dma_addr_t addr, int len, bool end, bool dma64);
+> -
+> +#ifdef CONFIG_MMC_CRYPTO
+> +       bool uses_custom_crypto_profile;
+> +#endif
+>  };
+>
+>  static inline void cqhci_writel(struct cqhci_host *host, u32 val, int reg)
+>  {
+>         if (unlikely(host->ops->write_l))
+> diff --git a/drivers/mmc/host/sdhci-msm.c b/drivers/mmc/host/sdhci-msm.c
+> index 319f0ebbe652..4610f067faca 100644
+> --- a/drivers/mmc/host/sdhci-msm.c
+> +++ b/drivers/mmc/host/sdhci-msm.c
+> @@ -1805,16 +1805,23 @@ static void sdhci_msm_set_clock(struct sdhci_host *host, unsigned int clock)
+>   *                                                                           *
+>  \*****************************************************************************/
+>
+>  #ifdef CONFIG_MMC_CRYPTO
+>
+> +static const struct blk_crypto_ll_ops sdhci_msm_crypto_ops; /* forward decl */
+> +
+>  static int sdhci_msm_ice_init(struct sdhci_msm_host *msm_host,
+>                               struct cqhci_host *cq_host)
+>  {
+>         struct mmc_host *mmc = msm_host->mmc;
+> +       struct blk_crypto_profile *profile = &mmc->crypto_profile;
+>         struct device *dev = mmc_dev(mmc);
+>         struct qcom_ice *ice;
+> +       union cqhci_crypto_capabilities caps;
+> +       union cqhci_crypto_cap_entry cap;
+> +       int err;
+> +       int i;
+>
+>         if (!(cqhci_readl(cq_host, CQHCI_CAP) & CQHCI_CAP_CS))
+>                 return 0;
+>
+>         ice = of_qcom_ice_get(dev);
+> @@ -1825,12 +1832,41 @@ static int sdhci_msm_ice_init(struct sdhci_msm_host *msm_host,
+>
+>         if (IS_ERR_OR_NULL(ice))
+>                 return PTR_ERR_OR_ZERO(ice);
+>
+>         msm_host->ice = ice;
+> -       mmc->caps2 |= MMC_CAP2_CRYPTO;
+>
+> +       /* Initialize the blk_crypto_profile */
+> +
+> +       caps.reg_val = cpu_to_le32(cqhci_readl(cq_host, CQHCI_CCAP));
+> +
+> +       /* The number of keyslots supported is (CFGC+1) */
+> +       err = devm_blk_crypto_profile_init(dev, profile, caps.config_count + 1);
+> +       if (err)
+> +               return err;
+> +
+> +       profile->ll_ops = sdhci_msm_crypto_ops;
+> +       profile->max_dun_bytes_supported = 4;
+> +       profile->dev = dev;
+> +
+> +       /*
+> +        * Currently this driver only supports AES-256-XTS.  All known versions
+> +        * of ICE support it, but to be safe make sure it is really declared in
+> +        * the crypto capability registers.  The crypto capability registers
+> +        * also give the supported data unit size(s).
+> +        */
+> +       for (i = 0; i < caps.num_crypto_cap; i++) {
+> +               cap.reg_val = cpu_to_le32(cqhci_readl(cq_host,
+> +                                                     CQHCI_CRYPTOCAP +
+> +                                                     i * sizeof(__le32)));
+> +               if (cap.algorithm_id == CQHCI_CRYPTO_ALG_AES_XTS &&
+> +                   cap.key_size == CQHCI_CRYPTO_KEY_SIZE_256)
+> +                       profile->modes_supported[BLK_ENCRYPTION_MODE_AES_256_XTS] |=
+> +                               cap.sdus_mask * 512;
+> +       }
+> +
+> +       mmc->caps2 |= MMC_CAP2_CRYPTO;
+>         return 0;
+>  }
+>
+>  static void sdhci_msm_ice_enable(struct sdhci_msm_host *msm_host)
+>  {
+> @@ -1852,39 +1888,59 @@ static __maybe_unused int sdhci_msm_ice_suspend(struct sdhci_msm_host *msm_host)
+>                 return qcom_ice_suspend(msm_host->ice);
+>
+>         return 0;
+>  }
+>
+> -/*
+> - * Program a key into a QC ICE keyslot, or evict a keyslot.  QC ICE requires
+> - * vendor-specific SCM calls for this; it doesn't support the standard way.
+> - */
+> -static int sdhci_msm_program_key(struct cqhci_host *cq_host,
+> -                                const union cqhci_crypto_cfg_entry *cfg,
+> -                                int slot)
+> +static inline struct sdhci_msm_host *
+> +sdhci_msm_host_from_crypto_profile(struct blk_crypto_profile *profile)
+>  {
+> -       struct sdhci_host *host = mmc_priv(cq_host->mmc);
+> +       struct mmc_host *mmc = mmc_from_crypto_profile(profile);
+> +       struct sdhci_host *host = mmc_priv(mmc);
+>         struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
+>         struct sdhci_msm_host *msm_host = sdhci_pltfm_priv(pltfm_host);
+> -       union cqhci_crypto_cap_entry cap;
+>
+> -       if (!(cfg->config_enable & CQHCI_CRYPTO_CONFIGURATION_ENABLE))
+> -               return qcom_ice_evict_key(msm_host->ice, slot);
+> +       return msm_host;
+> +}
+> +
+> +/*
+> + * Program a key into a QC ICE keyslot.  QC ICE requires a QC-specific SCM call
+> + * for this; it doesn't support the standard way.
+> + */
+> +static int sdhci_msm_ice_keyslot_program(struct blk_crypto_profile *profile,
+> +                                        const struct blk_crypto_key *key,
+> +                                        unsigned int slot)
+> +{
+> +       struct sdhci_msm_host *msm_host =
+> +               sdhci_msm_host_from_crypto_profile(profile);
+>
+>         /* Only AES-256-XTS has been tested so far. */
+> -       cap = cq_host->crypto_cap_array[cfg->crypto_cap_idx];
+> -       if (cap.algorithm_id != CQHCI_CRYPTO_ALG_AES_XTS ||
+> -               cap.key_size != CQHCI_CRYPTO_KEY_SIZE_256)
+> -               return -EINVAL;
+> +       if (key->crypto_cfg.crypto_mode != BLK_ENCRYPTION_MODE_AES_256_XTS)
+> +               return -EOPNOTSUPP;
+>
+>         return qcom_ice_program_key(msm_host->ice,
+>                                     QCOM_ICE_CRYPTO_ALG_AES_XTS,
+>                                     QCOM_ICE_CRYPTO_KEY_SIZE_256,
+> -                                   cfg->crypto_key,
+> -                                   cfg->data_unit_size, slot);
+> +                                   key->raw,
+> +                                   key->crypto_cfg.data_unit_size / 512,
+> +                                   slot);
+>  }
+>
+> +static int sdhci_msm_ice_keyslot_evict(struct blk_crypto_profile *profile,
+> +                                      const struct blk_crypto_key *key,
+> +                                      unsigned int slot)
+> +{
+> +       struct sdhci_msm_host *msm_host =
+> +               sdhci_msm_host_from_crypto_profile(profile);
+> +
+> +       return qcom_ice_evict_key(msm_host->ice, slot);
+> +}
+> +
+> +static const struct blk_crypto_ll_ops sdhci_msm_crypto_ops = {
+> +       .keyslot_program        = sdhci_msm_ice_keyslot_program,
+> +       .keyslot_evict          = sdhci_msm_ice_keyslot_evict,
+> +};
+> +
+>  #else /* CONFIG_MMC_CRYPTO */
+>
+>  static inline int sdhci_msm_ice_init(struct sdhci_msm_host *msm_host,
+>                                      struct cqhci_host *cq_host)
+>  {
+> @@ -1986,11 +2042,11 @@ static void sdhci_msm_set_timeout(struct sdhci_host *host, struct mmc_command *c
+>
+>  static const struct cqhci_host_ops sdhci_msm_cqhci_ops = {
+>         .enable         = sdhci_msm_cqe_enable,
+>         .disable        = sdhci_msm_cqe_disable,
+>  #ifdef CONFIG_MMC_CRYPTO
+> -       .program_key    = sdhci_msm_program_key,
+> +       .uses_custom_crypto_profile = true,
+>  #endif
+>  };
+>
+>  static int sdhci_msm_cqe_add_host(struct sdhci_host *host,
+>                                 struct platform_device *pdev)
 > --
 > 2.47.1
 >
