@@ -1,34 +1,37 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BB370809;
-	Thu, 19 Dec 2024 02:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D2E54727;
+	Thu, 19 Dec 2024 03:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734575258; cv=none; b=ZXpaRPL0KgIFgqNjKlwM50e8ju5+f63LiLH+Ufkysn6R8a4Ex5WqWZlxlriNPc2CxANffbu3uj+4mZGqe5IZmz0XPkfU52vzjkZugkVz1uHv54AuewD1My/97QptNfejFZBX7kgcgSt8ezbsNWboVlQq89VujKvxUsuFEqf6fZw=
+	t=1734580304; cv=none; b=K93EKCn5hD4Y5CFAD5Th1FEzUpvHFo9myFfYzjeRyrAMFog2dH+cyFxN3n/pA614knSQ8IDCo+d69bAC4ya8fcFbFeNCWtLB/IECWKLG8VgZZKfDlXNePL/vbEpI8ncH8I4vHCPzTchV3+zKeQc+nyolFSc8tlG4lQIO0UT+aig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734575258; c=relaxed/simple;
-	bh=bAPbGjzqohXCWnf30HixS7MM1IFIRs6yG/mVWv3E8gs=;
+	s=arc-20240116; t=1734580304; c=relaxed/simple;
+	bh=FuLoU7U0xMRNGmCKElRECU7Kfai8vIdgxthTaTR16+s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EUhvBYeqNWolv+xArBF4sv8ffIoLNcxdes5O2bAegr2fm7PNSuR+LdkyHjTW3oLQv6QSebTuTwerXDGAK/sD2gIjCEzBvUeamyFW2mLElELC5Rq6Sw8SUmkx9rtoaEhEl2Lv5RY488Sos1DmzAbdzLhJDvoH5TLi+kntW5pVEz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WN9hjwlm; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=opaqBXsCfChSVxM4b4bBhWuDTHjMX9w2tAG6GNRmRMn0EzXK6zQJY4uIagpgO393U4u8O6+lM/k4SQfPAUKlmq1k7L8qF4UNP2jy348SiYOOOi4McdHQxfAapOX8SF6MtdDaCe/IScpf07MWGAdvm7lH3xLx51BxVAyZGoN9W6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LfP6ELbn; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WN9hjwlm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71CA5C4CECD;
-	Thu, 19 Dec 2024 02:27:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734575257;
-	bh=bAPbGjzqohXCWnf30HixS7MM1IFIRs6yG/mVWv3E8gs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WN9hjwlmx0HVdb4YF1Sq3oj3HwrhyUQI+IDlCYmRb6l10BP2p8TewhHz/yW/36pmr
-	 q1/+2NLql1wgw6femargLL/rf4Q+ZiKFQC9JHm7DRpbiebO1GchSNvBXANY6xS4Xcp
-	 9pk/lwCQz4Mwf+ffx6xWmRasxaX/8e3Hmgpget+YSCPC6tcrSxl7sRX89k0Auvyu+M
-	 UjXFuZObfnoXGKmfMfoylih5IGFJ88Av7h63oRo7WZFt7HQ2yUibuGVOgPt78uLJMv
-	 2jrMIMwVZlInZKczqxYqEnpP4ku47CZtPvfV1JtVba21KdzM59gA8ZzTzYgV1tLPf8
-	 Aci6vSRMIfV5w==
-Date: Wed, 18 Dec 2024 18:27:36 -0800
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Matthew Wilcox <willy@infradead.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LfP6ELbn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=aSFlG7F9RzIzrW9Hgf/vG0f//Q9KVoULX33zB6BeU64=; b=LfP6ELbnHPNdNQWgkQVyW+k95b
+	n+Al8AAcP6xhm5f/VqJq8bnnGo8i+kc+QAXLppn7Q3vLY9QDt1vFe8eFksJyJ4iy/S1SSmhIYhSzJ
+	6zQElKG2GQ6gkzOKlzY/d+O5h/7Rg55NckHN67uxrWpGg35nJl3Bg3tLmMTVTzFBkITiSnDrIbmYY
+	UDsOp7RB5PvXuA8ir72a5yOOt+kjzYUr/cNpOHx72BneZAcCd9gDIAKb9fMWVr3Tbdn43iURjZZX7
+	ovE+rajnMBeTuXTBWYLWiKxHW0I0QHJMWbnytmM5J2sfgRlmPYz8tkq4weeMcYgb5S4I8DJAyxxGL
+	PMH/XEMA==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tO7ZW-00000001VPq-3dSV;
+	Thu, 19 Dec 2024 03:51:34 +0000
+Date: Thu, 19 Dec 2024 03:51:34 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
 Cc: hare@suse.de, dave@stgolabs.net, david@fromorbit.com, djwong@kernel.org,
 	kbusch@kernel.org, john.g.garry@oracle.com, hch@lst.de,
 	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
@@ -36,9 +39,10 @@ Cc: hare@suse.de, dave@stgolabs.net, david@fromorbit.com, djwong@kernel.org,
 	linux-block@vger.kernel.org, gost.dev@samsung.com,
 	p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
 Subject: Re: [PATCH 0/5] fs/buffer: strack reduction on async read
-Message-ID: <Z2OEmALBGB8ARLlc@bombadil.infradead.org>
+Message-ID: <Z2OYRkpRcUFIOFog@casper.infradead.org>
 References: <20241218022626.3668119-1-mcgrof@kernel.org>
  <Z2MrCey3RIBJz9_E@casper.infradead.org>
+ <Z2OEmALBGB8ARLlc@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,69 +51,147 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z2MrCey3RIBJz9_E@casper.infradead.org>
+In-Reply-To: <Z2OEmALBGB8ARLlc@bombadil.infradead.org>
 
-On Wed, Dec 18, 2024 at 08:05:29PM +0000, Matthew Wilcox wrote:
-> On Tue, Dec 17, 2024 at 06:26:21PM -0800, Luis Chamberlain wrote:
-> > This splits up a minor enhancement from the bs > ps device support
-> > series into its own series for better review / focus / testing.
-> > This series just addresses the reducing the array size used and cleaning
-> > up the async read to be easier to read and maintain.
+On Wed, Dec 18, 2024 at 06:27:36PM -0800, Luis Chamberlain wrote:
+> On Wed, Dec 18, 2024 at 08:05:29PM +0000, Matthew Wilcox wrote:
+> > On Tue, Dec 17, 2024 at 06:26:21PM -0800, Luis Chamberlain wrote:
+> > > This splits up a minor enhancement from the bs > ps device support
+> > > series into its own series for better review / focus / testing.
+> > > This series just addresses the reducing the array size used and cleaning
+> > > up the async read to be easier to read and maintain.
+> > 
+> > How about this approach instead -- get rid of the batch entirely?
 > 
-> How about this approach instead -- get rid of the batch entirely?
+> Less is more! I wish it worked, but we end up with a null pointer on
+> ext4/032 (and indeed this is the test that helped me find most bugs in
+> what I was working on):
 
-Less is more! I wish it worked, but we end up with a null pointer on
-ext4/032 (and indeed this is the test that helped me find most bugs in
-what I was working on):
+Yeah, I did no testing; just wanted to give people a different approach
+to consider.
 
-[  105.942462] loop0: detected capacity change from 0 to 1342177280
-[  106.034851] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[  106.036903] #PF: supervisor read access in kernel mode
-[  106.038366] #PF: error_code(0x0000) - not-present page
-[  106.039819] PGD 0 P4D 0
-[  106.040574] Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
-[  106.041967] CPU: 2 UID: 0 PID: 29 Comm: ksoftirqd/2 Not tainted 6.13.0-rc3+ #42
-[  106.044018] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 2024.08-1 09/18/2024
-[  106.046300] RIP: 0010:end_buffer_async_read_io+0x11/0x90
-[  106.047819] Code: f2 ff 0f 1f 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 53 48 8b 47 10 48 89 fb 48 8b 40 18 <48> 8b 00 f6 40 0d 40 74 0d 0f b7 00 66 25 00 f0 66 3d 00 80 74 09
-[  106.053016] RSP: 0018:ffffa85880137dd0 EFLAGS: 00010246
-[  106.054499] RAX: 0000000000000000 RBX: ffff95e38f22e5b0 RCX: ffff95e39c8753e0
-[  106.056507] RDX: ffff95e3809f8000 RSI: 0000000000000001 RDI: ffff95e38f22e5b0
-[  106.058530] RBP: 0000000000000400 R08: ffff95e3a326b040 R09: 0000000000000001
-[  106.060546] R10: ffffffffbb6070c0 R11: 00000000002dc6c0 R12: 0000000000000000
-[  106.062426] R13: ffff95e3960ea800 R14: ffff95e39586ae40 R15: 0000000000000400
-[  106.064223] FS:  0000000000000000(0000) GS:ffff95e3fbc80000(0000) knlGS:0000000000000000
-[  106.066155] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  106.067473] CR2: 0000000000000000 CR3: 00000001226e2006 CR4: 0000000000772ef0
-[  106.069085] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  106.070571] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  106.072050] PKRU: 55555554
-[  106.072632] Call Trace:
-[  106.073176]  <TASK>
-[  106.073611]  ? __die_body.cold+0x19/0x26
-[  106.074383]  ? page_fault_oops+0xa2/0x230
-[  106.075155]  ? __smp_call_single_queue+0xa7/0x110
-[  106.076077]  ? do_user_addr_fault+0x63/0x640
-[  106.076916]  ? exc_page_fault+0x7a/0x190
-[  106.077639]  ? asm_exc_page_fault+0x22/0x30
-[  106.078394]  ? end_buffer_async_read_io+0x11/0x90
-[  106.079245]  end_bio_bh_io_sync+0x23/0x40
-[  106.079973]  blk_update_request+0x178/0x420
-[  106.080727]  ? finish_task_switch.isra.0+0x94/0x290
-[  106.081600]  blk_mq_end_request+0x18/0x30
-[  106.082281]  blk_complete_reqs+0x3d/0x50
-[  106.082954]  handle_softirqs+0xf9/0x2c0
-[  106.083607]  ? __pfx_smpboot_thread_fn+0x10/0x10
-[  106.084393]  run_ksoftirqd+0x37/0x50
-[  106.085012]  smpboot_thread_fn+0x184/0x220
-[  106.085688]  kthread+0xda/0x110
-[  106.086208]  ? __pfx_kthread+0x10/0x10
-[  106.086824]  ret_from_fork+0x2d/0x50
-[  106.087409]  ? __pfx_kthread+0x10/0x10
-[  106.088013]  ret_from_fork_asm+0x1a/0x30
-[  106.088658]  </TASK>
-[  106.089045] Modules linked in: loop sunrpc 9p nls_iso8859_1 nls_cp437 vfat fat kvm_intel kvm crct10dif_pclmul ghash_clmulni_intel sha512_ssse3 sha512_generic sha256_ssse3 sha1_ssse3 aesni_intel gf128mul crypto_simd cryptd virtio_balloon 9pnet_virtio virtio_console joydev button evdev serio_raw nvme_fabrics nvme_core dm_mod drm nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vsock autofs4 ext4 crc16 mbcache jbd2 btrfs blake2b_generic efivarfs raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq libcrc32c crc32c_generic raid1 raid0 md_mod virtio_net net_failover virtio_blk failover crc32_pclmul crc32c_intel psmouse virtio_pci virtio_pci_legacy_dev virtio_pci_modern_dev virtio virtio_ring
-[  106.097895] CR2: 0000000000000000
-[  106.098326] ---[ end trace 0000000000000000 ]---
+> [  106.034851] BUG: kernel NULL pointer dereference, address: 0000000000000000
+> [  106.046300] RIP: 0010:end_buffer_async_read_io+0x11/0x90
+> [  106.047819] Code: f2 ff 0f 1f 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 53 48 8b 47 10 48 89 fb 48 8b 40 18 <48> 8b 00 f6 40 0d 40 74 0d 0f b7 00 66 25 00 f0 66 3d 00 80 74 09
 
-  Luis
+That decodes as:
+
+   5:	53                   	push   %rbx
+   6:	48 8b 47 10          	mov    0x10(%rdi),%rax
+   a:	48 89 fb             	mov    %rdi,%rbx
+   d:	48 8b 40 18          	mov    0x18(%rax),%rax
+  11:*	48 8b 00             	mov    (%rax),%rax		<-- trapping instruction
+  14:	f6 40 0d 40          	testb  $0x40,0xd(%rax)
+
+6: bh->b_folio
+d: b_folio->mapping
+11: mapping->host
+
+So folio->mapping is NULL.
+
+Ah, I see the problem.  end_buffer_async_read() uses the buffer_async_read
+test to decide if all buffers on the page are uptodate or not.  So both
+having no batch (ie this patch) and having a batch which is smaller than
+the number of buffers in the folio can lead to folio_end_read() being
+called prematurely (ie we'll unlock the folio before finishing reading
+every buffer in the folio).
+
+Once the folio is unlocked, it can be truncated.  That's a second-order
+problem, but it's the one your test happened to hit.
+
+
+This should fix the problem; we always have at least one BH held in
+the submission path with the async_read flag set, so
+end_buffer_async_read() will not end it prematurely.
+
+By the way, do you have CONFIG_VM_DEBUG enabled in your testing?
+
+        VM_BUG_ON_FOLIO(!folio_test_locked(folio), folio);
+in folio_end_read() should have tripped before hitting the race with
+truncate.
+
+diff --git a/fs/buffer.c b/fs/buffer.c
+index cc8452f60251..fd2633e4a5d2 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -2361,9 +2361,9 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+ {
+ 	struct inode *inode = folio->mapping->host;
+ 	sector_t iblock, lblock;
+-	struct buffer_head *bh, *head, *arr[MAX_BUF_PER_PAGE];
++	struct buffer_head *bh, *head, *prev = NULL;
+ 	size_t blocksize;
+-	int nr, i;
++	int i;
+ 	int fully_mapped = 1;
+ 	bool page_error = false;
+ 	loff_t limit = i_size_read(inode);
+@@ -2380,7 +2380,6 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+ 	iblock = div_u64(folio_pos(folio), blocksize);
+ 	lblock = div_u64(limit + blocksize - 1, blocksize);
+ 	bh = head;
+-	nr = 0;
+ 	i = 0;
+ 
+ 	do {
+@@ -2411,40 +2410,33 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+ 			if (buffer_uptodate(bh))
+ 				continue;
+ 		}
+-		arr[nr++] = bh;
++
++		lock_buffer(bh);
++		if (buffer_uptodate(bh)) {
++			unlock_buffer(bh);
++			continue;
++		}
++
++		mark_buffer_async_read(bh);
++		if (prev)
++			submit_bh(REQ_OP_READ, prev);
++		prev = bh;
+ 	} while (i++, iblock++, (bh = bh->b_this_page) != head);
+ 
+ 	if (fully_mapped)
+ 		folio_set_mappedtodisk(folio);
+ 
+-	if (!nr) {
+-		/*
+-		 * All buffers are uptodate or get_block() returned an
+-		 * error when trying to map them - we can finish the read.
+-		 */
+-		folio_end_read(folio, !page_error);
+-		return 0;
+-	}
+-
+-	/* Stage two: lock the buffers */
+-	for (i = 0; i < nr; i++) {
+-		bh = arr[i];
+-		lock_buffer(bh);
+-		mark_buffer_async_read(bh);
+-	}
+-
+ 	/*
+-	 * Stage 3: start the IO.  Check for uptodateness
+-	 * inside the buffer lock in case another process reading
+-	 * the underlying blockdev brought it uptodate (the sct fix).
++	 * All buffers are uptodate or get_block() returned an error
++	 * when trying to map them - we must finish the read because
++	 * end_buffer_async_read() will never be called on any buffer
++	 * in this folio.
+ 	 */
+-	for (i = 0; i < nr; i++) {
+-		bh = arr[i];
+-		if (buffer_uptodate(bh))
+-			end_buffer_async_read(bh, 1);
+-		else
+-			submit_bh(REQ_OP_READ, bh);
+-	}
++	if (prev)
++		submit_bh(REQ_OP_READ, prev);
++	else
++		folio_end_read(folio, !page_error);
++
+ 	return 0;
+ }
+ EXPORT_SYMBOL(block_read_full_folio);
