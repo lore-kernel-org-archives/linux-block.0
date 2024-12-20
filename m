@@ -1,63 +1,60 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76323B791
-	for <linux-block@vger.kernel.org>; Fri, 20 Dec 2024 15:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E674218E95
+	for <linux-block@vger.kernel.org>; Fri, 20 Dec 2024 15:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734707399; cv=none; b=qoVlmgWPSrLRmZ5NxN9EUJAkxwLLiX42eLUn0znkoQCipbjKIJdAXlMG9v8kFdK75FiQE05N58UspWAMU6ZcRzUBuHKGtnGkfVZ1QqVRFsAKl0DYULWqve4D6BhnG7J78FoW3foUrB/ctWh2tt87sAshtLmxu3s4Kv3NVNrSyLY=
+	t=1734707891; cv=none; b=j+TMN9EifT5Qp4DpGAXh38FpdWsoJI4vkrZQ7YVPB0xSBBB6kofz1hvf7dolR3v/OTRRYwdtYci17I0ajM1lELEOXOz/aLD71gbxXv8FhduAb9R09rfjgESEsg/5eeEKclcMz81iXyAudL2KBY5jA6zEgc9yZRSPfqFk3islck8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734707399; c=relaxed/simple;
-	bh=oqQyyesnmeEbiQCOOiE1x5jiDnWP9HRhLF2l4y7c+1w=;
+	s=arc-20240116; t=1734707891; c=relaxed/simple;
+	bh=hnUL113ABOb6xlgfEv3Qo/WW8wDFu+XH4auf9YO02Is=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ZyDeJo1/qGRLsuf6cWgdRGMbkUUGA0a/qVYvGctSAtJL5DB59RgONj1D+n7gYMzuJfP15j0dIHFVgYffb0bR3NmZ1CJKZmAUvu5nFAxTregxmoO+j+4tMRDA1tOUX9G+7B7Bw2s72GxdH/mNrqQeVXa9YzwFAF/OuAoJFYI+6rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=CI7RJdL9; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=GVSnoJKyZROOBqAL2Iq+Z/YvymJZ+0IXPCAOyoili/dA0urA9DWmblNg2m0XZib7YscZ1y8/HwEy6C8TUVraNL0rf20kXmA4zulB4o2HNSwZeB1/zMaDcTIiBaSRhI6yir8WtEizyxHMYkkNEBLSNmFy4YzIwIKJwm6KJSzFR7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Sk9mIjhv; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CI7RJdL9"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-844c9993c56so165694939f.2
-        for <linux-block@vger.kernel.org>; Fri, 20 Dec 2024 07:09:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1734707396; x=1735312196; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KBICG9sn8sk18dR3CL6pM0dBSbzEMAQH0E19JdBtGM4=;
-        b=CI7RJdL9Ac7aRQT8sydgiNHli8dsE8I55POYLgTaWrKaGuGEVH5OX5DW0uu7uzKbzg
-         kVkjjJ0PTgp1J0r9/yt2fk/eF8A5aXe2JBupZOvChxFKLWJ31yO5/j8dT60gjZgXZrFv
-         UGSixoYirQfE7DiwaW5Rbfaqp/N3Epg/uaf1NST0kp5RidJxSOVKyH5+u6UGAQ6t6R9u
-         M6r0bDcdeDxJOuRXeBLYvhe/73XSzJb2HM8+qM9TROeYe3xB85LCOdYi6Y8HR5XCVnTh
-         PKhCgM5v65LjqqKKmoEVGgf7lBg239Xgy76gP1ertgU9jpfSu2NlnJ5Dja7ExMnQW40y
-         LlQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734707396; x=1735312196;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KBICG9sn8sk18dR3CL6pM0dBSbzEMAQH0E19JdBtGM4=;
-        b=M7iHFd33xrll1LHILk/vIWGWSbxdpWzNARSrYWdKbAFUDlAuBRBftxYUh2HRETR3Or
-         UQtC2jsSdjKZ1CyAc5rcG/g6tAKrR2U6LnigrxDofV2y/P2404rV8+1swwxdOVUP67Ml
-         H4UH2cl9B6vF2zanfGVKU3FJxFdddPF5LzklYeOsiUYNJOqbVCVnemvG8A0iGTC02aSw
-         sCRVe5nIETbFgDquNJD9LdBNpA+h4cVKLSGmeVJ3Rs4KfiuILFXsAv3eWmoJ3W6eakEc
-         uxCrYqXJOfdsCcTe8bYjhrj4QExFBFYm1xFWPlCdie4nwFRr5/WqL5kkyobbWiSmdCvr
-         mexw==
-X-Forwarded-Encrypted: i=1; AJvYcCVNpxEwQlIqq+zXfEV1G657YnBHzizOOw/rzmR04h2R2evxTSRKusoRFrUKY5g2Xl/GEtnJt8Tiw42ATw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbsBMMISRawLl74CgPk8adBngegSMX6ArQKdQl/x3MiESZV7KN
-	RgWzCjxajvokdNA3AiBrAvNXye8htvhI+8c+uoIIp3UtcDg0yzpdMXyPmGq4LjU=
-X-Gm-Gg: ASbGncv8p2+DdWBrlI00OUsGFk+uX3hSYd1J/d4CDt+lDDqyH/pn1llAGtB5B9GyDBG
-	xRRZNHpSENOrX6egILO1S9iW3c6t+jqaTuIdxvhyXKn43Uu9DetSYKXn5pN0vUT1AMHIiZPWusV
-	gvqKR7+mk0GmOYhQX72D2Vwz6prqPlZkYus3yhMr+2mFxgoL8/FQn8cE8JFJvoqhSZve5TPpFiR
-	uPQX1By7QPHUzBDnxISL0K4nkx6EjMsooUro2VeFQ6FojygFBYK
-X-Google-Smtp-Source: AGHT+IEAbFA9wWa17M+v/Z4qOj/20ROukuQrIJaDUh0bs/zYDwAwC5zrW2PjmNdgAWk6miATAuhxrA==
-X-Received: by 2002:a05:6602:160f:b0:844:ddde:c9cb with SMTP id ca18e2360f4ac-8499e49e7d9mr286795339f.1.1734707395799;
-        Fri, 20 Dec 2024 07:09:55 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e68c19aee5sm818743173.107.2024.12.20.07.09.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Dec 2024 07:09:55 -0800 (PST)
-Message-ID: <d48795a6-cb9f-4649-8c43-e36639a39721@kernel.dk>
-Date: Fri, 20 Dec 2024 08:09:54 -0700
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Sk9mIjhv"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BKE6qQh022901;
+	Fri, 20 Dec 2024 15:18:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=4evOy1
+	/bJXnFEaDOG+8UqlMQlK/T+NrLkK2gCZCfq30=; b=Sk9mIjhvTEUj6TXYXlsUAe
+	VlJqcIi5zEl/ZCjLuQtgkGvErgNs+kyyVTjExF5z0m89JuT2OLDpse70K8N5+O9J
+	PCfmWMmvQgorfYvS1cJ1/OALloWdkbEJWAu6r6ug26R7bvT0Pgw0ij/SkIg/1qPi
+	t1ruC+d0mDMn+F1TD4RS2oWBjL6oedUzp0+k01ca0wFdPrGjSnKH3oFiPfagjXpU
+	R1n4faC9oPTh0YeMEYmx2JUY0GtTWQvSCSyk7z7jpCIBwAZXnvfv3gJXW1mLyXuA
+	JcIawW9O3Ep28H5jCXeNDfHTPEB6kNmjrBZBUFsBSk2fwAIi4odZ6mp2rPZn/Jpg
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43na258cgy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 20 Dec 2024 15:18:05 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BKFE3qX011249;
+	Fri, 20 Dec 2024 15:18:04 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 43hpjkjec1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 20 Dec 2024 15:18:04 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BKFI3it11076220
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 20 Dec 2024 15:18:04 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DFA2558059;
+	Fri, 20 Dec 2024 15:18:03 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A69FD58043;
+	Fri, 20 Dec 2024 15:18:02 +0000 (GMT)
+Received: from [9.171.21.204] (unknown [9.171.21.204])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 20 Dec 2024 15:18:02 +0000 (GMT)
+Message-ID: <8a70f3cc-eaa2-4bf2-82fb-da01b3de7ba8@linux.ibm.com>
+Date: Fri, 20 Dec 2024 20:48:01 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,38 +64,54 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/2] block: Revert "block: Fix potential deadlock while
  freezing queue and acquiring sysfs_lock"
-To: Nilay Shroff <nilay@linux.ibm.com>, Ming Lei <ming.lei@redhat.com>,
- linux-block@vger.kernel.org
+To: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        linux-block@vger.kernel.org
 References: <20241218101617.3275704-1-ming.lei@redhat.com>
  <20241218101617.3275704-2-ming.lei@redhat.com>
  <23c3e917-9dd3-4a0f-8bf4-0a6f421aae0e@linux.ibm.com>
+ <d48795a6-cb9f-4649-8c43-e36639a39721@kernel.dk>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <23c3e917-9dd3-4a0f-8bf4-0a6f421aae0e@linux.ibm.com>
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <d48795a6-cb9f-4649-8c43-e36639a39721@kernel.dk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: T8Q8oE6LMY_-Z_7qruBQOawfgei4T0Bs
+X-Proofpoint-ORIG-GUID: T8Q8oE6LMY_-Z_7qruBQOawfgei4T0Bs
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 bulkscore=0 adultscore=0 spamscore=0 priorityscore=1501
+ mlxlogscore=999 impostorscore=0 phishscore=0 clxscore=1015 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412200123
 
-On 12/20/24 3:23 AM, Nilay Shroff wrote:
-> On 12/18/24 15:46, Ming Lei wrote:
->> This reverts commit be26ba96421ab0a8fa2055ccf7db7832a13c44d2.
+
+
+On 12/20/24 20:39, Jens Axboe wrote:
+> On 12/20/24 3:23 AM, Nilay Shroff wrote:
+>> On 12/18/24 15:46, Ming Lei wrote:
+>>> This reverts commit be26ba96421ab0a8fa2055ccf7db7832a13c44d2.
+>>>
+>>> Commit be26ba96421a ("block: Fix potential deadlock while freezing queue and
+>>> acquiring sysfs_loc") actually reverts commit 22465bbac53c ("blk-mq: move cpuhp
+>>> callback registering out of q->sysfs_lock"), and causes the original resctrl
+>>> lockdep warning.
+>>>
+>>> So revert it and we need to fix the issue in another way.
+>>>
+>> Hi Ming,
 >>
->> Commit be26ba96421a ("block: Fix potential deadlock while freezing queue and
->> acquiring sysfs_loc") actually reverts commit 22465bbac53c ("blk-mq: move cpuhp
->> callback registering out of q->sysfs_lock"), and causes the original resctrl
->> lockdep warning.
+>> Can we wait here for some more time before we revert this as this is
+>> currently being discussed[1] and we don't know yet how we may fix it?
 >>
->> So revert it and we need to fix the issue in another way.
->>
-> Hi Ming,
+>> [1]https://lore.kernel.org/all/20241219061514.GA19575@lst.de/
 > 
-> Can we wait here for some more time before we revert this as this is
-> currently being discussed[1] and we don't know yet how we may fix it?
+> It's already queued up and will go out today. Doesn't exclude people
+> working on solving this for real.
 > 
-> [1]https://lore.kernel.org/all/20241219061514.GA19575@lst.de/
+Sure, my bad. I will ensure this in future.
 
-It's already queued up and will go out today. Doesn't exclude people
-working on solving this for real.
-
--- 
-Jens Axboe
-
+Thanks,
+--Nilay
