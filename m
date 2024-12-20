@@ -1,213 +1,206 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA611C1F2C
-	for <linux-block@vger.kernel.org>; Fri, 20 Dec 2024 10:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734689194; cv=fail; b=VpvvdK+gfSKM/62TvOOHJIE+H0OIpuGjOGluatQPStetrs5Of9ghtHOQYLCfhEd03VcYdBUAw+y5qeBedxjQnzsfyGN8MaKqDeno4epnsl7XjlB52EOTohTxny0dNvXLeWwXnvwKXnoQuWM8fh2YSgvGs/lvHJvATIj7USXGZhI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734689194; c=relaxed/simple;
-	bh=2y2GeBHBlhdzPSZOnppVFzrbqJxA/XFFE+6DYYpCo0Y=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=VfBpweML1M2pnU07527i5bGVYm59WqWoLLip3RtLjofT8hnGdvK1ER7awhJZWY6YYKfOo+MwVxkT5iAvGE0dz1mvCOD+DorbIlpMFaQpxKOJgjJlJ2bYXG4jUrQq9932Xens/AFlSkm6yVc2uKKubxXtWCBO1ghQ9Orm7GOcM70=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Lvea+qZe; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=mDlXXUy1; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A56259499
+	for <linux-block@vger.kernel.org>; Fri, 20 Dec 2024 10:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734689881; cv=none; b=SluXRT6NU8DNdLtLM64VehJlTkpaz6lzDJuzt2CIM/VDc+mEDMbjaPqodo0sYH++KKpXUrXTIOnCNDaB2vD2ImK5xv8muKIWlcwgBloQ3j9POIrU/zakVCjib47ruiuswnQdu87ELkpPJ//6l93/6Lx2X1wrraZZySQu+qkOvd8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734689881; c=relaxed/simple;
+	bh=RVvqRjC/Jzv6HryJ+Gp8kC7crAwdMwiZ0asU9RjSoCk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Qn/wtuj29S15o4eQiKg/CzSK1zhP+kcNvS4P2vpq9HvFez0fEUnzRKfHm0KDfuc0VH08eMFHxqI9D0comIYbss6+IpcS7pcjfwaZCLPTQt8HTCGWM7fchJSyhQC2c+T7KObEcxRFGqdveuaVP8JhN/VAE6+HTgSQ4kie9qzXW+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Pa57yXQS; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Lvea+qZe";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="mDlXXUy1"
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BK3u3xY013851;
-	Fri, 20 Dec 2024 10:06:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=voEDRCBx5ztkijQ15pKC6PrXUcoJOckJg5LRoMvu8tM=; b=
-	Lvea+qZeW9dhasS8gY2FO9qv2040NFWucFjyg4JJ4t2DoDtLO5asPM/WRRGUGzO8
-	hBGTi+CDQABP4rjO3CvvVKEUGrz3mdWQ+HSkq7TPmEQGVuZUAHAty3QlfB/QRjKv
-	Vg5iB2cRgEjBTk+h8ibDqRm2D4/GAGAlWbnjd7yjkcoJSk+rJs0UQl2OJKs8P8yB
-	MwOLoBVRHAJXoh3iRUOdQ3w/uxU8vy7N5/oCHAKWSlXdllq5rHhO2nNFHYHl/B8h
-	gBuhFGquMganblpy+jUaFcMFQWjKMTWH9jZRqo7UKlnD+6wgRFUtTHfQLxSCN3+J
-	IT7wdQLyprvD+2QPTz3cTg==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 43jaj5jm9p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 20 Dec 2024 10:06:28 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 4BK9Wwda000596;
-	Fri, 20 Dec 2024 10:06:26 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2042.outbound.protection.outlook.com [104.47.55.42])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 43h0fcdjf9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 20 Dec 2024 10:06:26 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qApEI8/hpKGOEVMMF7IO1KL9I9FxX9hLrj7Pxbj5roOv7FhKJhzbcjEg6gAT4yVd90isMePnrzkBu96iI4nprAjnDD90BjLw5ncF1EmZz1A7GPPz9goy5Z0wNaMKkZGvBGezEw/+vlLNGJ2wPzBYAcSpRTSLQP7Occ5Gu95lCg5Ventz3elsLgjvujYdH76yUcNvgnjcN4FT3ZVvOKqazjoer9145WinwAghbJdEUsulFfUOoCH5wb8Amsi3aF+kys9aZ8ISTLBw40FI0rthUK81VCnL0Jdrn9XCE2VFLI0XPZz7vbxinU1qve9l2GrQmxyyMHBzTBuhgnZ1wZT1xQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=voEDRCBx5ztkijQ15pKC6PrXUcoJOckJg5LRoMvu8tM=;
- b=TNbEKM/ffz4xOAIrDjZ4kSrBmYaxKthmtgkRuG5OcVeZ2NcHK0i4ysiBPhKRrH4K4RxVwAZbkNsVEkINGr0kcsFjU5JNP0ZKtUjsMCzoB8k+lEhh/UhM0lht0Q45W0N35H9iUDqtGBGId1Y6bkCdwOXziXmnKROPLY1YsfnIgYqkDOMctO6UxgJTowNfAZjUh+vJNhqAyPebJA/ztKpkXr0Uv50BTYsu+27XdMTpnkEmr9fjYNhqgI1wR0dqSQWmYsG8PQCj4PI4Eqqq6+9Ay2u+diI/2O6wJD+cSyThJ+9aiVCHq9jBDtGT0zKk7ZPm2z5bupYVx2iVlaygks5nbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=voEDRCBx5ztkijQ15pKC6PrXUcoJOckJg5LRoMvu8tM=;
- b=mDlXXUy1xH/P9mKL9PKp76M0L4rBLJHgyqExrJqQjtQp7N0dsvo6PFd5j/XfCtLjwcUZ6wn+XDVJ6AZUbRhxueR95BPyiS2Ed0ecrt9SYVfk2QWohvC9TtwDdSsoktRd0HKHeHaP90p716BX1Kq3Pueou6TF8s0CnXR2MawJ6lY=
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com (2603:10b6:5:212::20)
- by CY5PR10MB5940.namprd10.prod.outlook.com (2603:10b6:930:2b::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.16; Fri, 20 Dec
- 2024 10:06:25 +0000
-Received: from DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088]) by DM6PR10MB4313.namprd10.prod.outlook.com
- ([fe80::4f45:f4ab:121:e088%4]) with mapi id 15.20.8272.013; Fri, 20 Dec 2024
- 10:06:24 +0000
-Message-ID: <6880f851-bb7c-40a7-b405-ee9134b8bb1c@oracle.com>
-Date: Fri, 20 Dec 2024 10:06:21 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: remove BLK_MQ_F_SHOULD_MERGE
-To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-References: <20241219060214.1928848-1-hch@lst.de>
-Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <20241219060214.1928848-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P265CA0002.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:62::14) To DM6PR10MB4313.namprd10.prod.outlook.com
- (2603:10b6:5:212::20)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pa57yXQS"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BK1IUd9027132;
+	Fri, 20 Dec 2024 10:17:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=CoxXbz
+	9qpc2Z5USId5wljpk/HZmjZgvU/ljcpe4Vd6g=; b=Pa57yXQSj9pe4N9jpe09iC
+	8qTCj80U8vi0a/Bpg83ig+b7UdiUMg90kLlXC4GRlphHyMXwE/XHeUYCy/QsoXTm
+	uKCepdLFAIX/wqy6f/zluqLKndGTHzgbTJSqEea4asaYROFoXtDg/5rlPPELjnMM
+	c8XGVb09BNHcgqZ0ratgBwjroh9b0ptoesniZWZC5DcC9c6dpk7Ko4wqfXDHyZ4r
+	kxkr70wFkVDbovEHjCKljObEN1pgqlD0O7nloI8dy/pTqlW0nYRSZnnXFeirk4IQ
+	1/UGtVoQ04YjzX1maf0rk8rQfvhUZ6cVNT7P/6RkT1z3+lj/1NO2TTT8Kfcs3IYg
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43mmy5cpat-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 20 Dec 2024 10:17:57 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BK8Qhjk014335;
+	Fri, 20 Dec 2024 10:17:56 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43hmqyht8x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 20 Dec 2024 10:17:56 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BKAHusl23069288
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 20 Dec 2024 10:17:56 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 59AB258053;
+	Fri, 20 Dec 2024 10:17:56 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6FACE58043;
+	Fri, 20 Dec 2024 10:17:55 +0000 (GMT)
+Received: from [9.171.21.204] (unknown [9.171.21.204])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 20 Dec 2024 10:17:55 +0000 (GMT)
+Message-ID: <cff2a318-fafa-41ce-8138-0ca379ef5774@linux.ibm.com>
+Date: Fri, 20 Dec 2024 15:47:53 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4313:EE_|CY5PR10MB5940:EE_
-X-MS-Office365-Filtering-Correlation-Id: b33d4b89-f4ee-4a9a-7337-08dd20ddf630
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dkU5QXZubHNRQXo1WDNNWFM4K3VEay9wYXBUOGh1OVpGOGFXejcrOTdwWUhM?=
- =?utf-8?B?d0R0Wm0yaHJ4ZU5JaEVibHhlSDc3WTcvMm0xT1lvbUh2MWE5cGwvejJ1RFdX?=
- =?utf-8?B?UFlGL055ampOL3NDaWFjVXllYWlNaVdDVUt6QXFwN1ViUklLVFNKRnptZlhp?=
- =?utf-8?B?V0NIY3pXZVhxMUdBY05JSVJkdUsrbzR1UmlIanNUV0hTakN1aGIxaUFTRldS?=
- =?utf-8?B?dnF3UkFwV3JqdkRQVFdXZHVmcTRreGVLRUlXcVlpMzMzL0R4Y0N2UEtlemVC?=
- =?utf-8?B?bThDTHV1UVNKMURMU1FOeUdvSnJLYTFuODZMM2t2TVNDUnBzR1lCejZOdzh5?=
- =?utf-8?B?QnFCSTkyaFRrK0dXT2wrQnF3Vm56N0Yxbjh5MjJ6MkxxVlZObWlESFI3dVh1?=
- =?utf-8?B?TGRWZEdRNEk1ZWE4aFRWRngrR0RmUVlrQUkzaW9xTWZrbmFJQ25IblVtV1dF?=
- =?utf-8?B?Ukxxc3ZobjlOdUhJVVhDZnhUaVRXb24zQVp0RHFXZEtjSStBT25aUEdLK1hY?=
- =?utf-8?B?OHR1Q01nci94dEk1OURPbHh2NGxjTmFxNENMVmVEOEQwNTFmQ3pySmdReVZ4?=
- =?utf-8?B?OXVYaE9HMVZNKzZ5dG9LQldzOFhhN2JMZHBoRWFHWmhsbitoMnhRM0VuSzZv?=
- =?utf-8?B?cW9iUWtvd2tMWis1eFVLY3pBRFMvbDNQRVVxME4wTTIrY0JyMURCcE5oYklt?=
- =?utf-8?B?NVE3alNYSnBEWFNld0txRXNzNTFlc0c0QXFhS1lZUXdMbm0wMm1xQXdsRkp1?=
- =?utf-8?B?WmV4MW1Qc0poN2cveU5vQkJYRGVlNjg3ak8yd3pBR0RWZ2xLUUxmNWlRQUc0?=
- =?utf-8?B?UEJOVnIzYnhSQzMxeVcwZnUxTFg0N1dPYkJISmZtRmpEQWExVTk0WFc1c1J3?=
- =?utf-8?B?Q3o4Szd5T0tsUDJGa2lrQ3B4N1JKYmhXNHExeER1RHVwTzJHbVlac2xxaXU5?=
- =?utf-8?B?b1M3Nzh5NldGUmUwUXYrQlRqNUdoSnAzYlFTZDhPSE5iMTRNMGsxUExiOG8v?=
- =?utf-8?B?UHMyaWpDV3hla1kxa1BrQWZaWXQ1V25BUEt6UWE5QWFNMGx1Vjk1dG9CWCtW?=
- =?utf-8?B?djdBdmYvZS9KcWNYQmZXSXA5U1lDN1RQL0FFdzVwREVoNXlnSjhDYm5BM29G?=
- =?utf-8?B?cmxpNGgzVXZrWWR1aXo4eXUrT1M2TDh1UWRPNlIvbXVrUzZPYXo3RzJOZEJP?=
- =?utf-8?B?cHh3RTYwWWxqU05WS0xSMFN4bFBHTXRXSkIrcmtiWkxGSWo2a2hCR1hnOHBL?=
- =?utf-8?B?N1RGcmNhNGd6MytUanJmUVRyWWV5N1ZLVTFPeU1hb05ZRG95WXJIRUc1VENT?=
- =?utf-8?B?MzNUWkd6dkdsS3JjU1hiMklxYlpYTk5kb2R3S3R0cjhCNGZNd2NqTVVFSThy?=
- =?utf-8?B?ZXNmWGV3MU5CQ0VVZHFUcnAraWJNSlpyRkdDSHpTUW5xSVVBTXJQZXNBaWNM?=
- =?utf-8?B?Q0kvL2Q1VVdTbGFLejFBRW5zd3JZOUFYZUtUVVhCaThBWnVBQjBDdkhWcXpq?=
- =?utf-8?B?VGpWTTgwRFl2VHB6YUh6QXU2cTdZUnpMaTJpODA4cC9IRjNwYXA1MVhCWGRj?=
- =?utf-8?B?aVF5Nm9CZjJDWTBoY3RPSVNaYUU3VHRpWGVLOVJqeVA5d0Yzb3hZNm5aT05t?=
- =?utf-8?B?RlFLSEFuS3VRcSszU2prZEhyWit4ZGlRMHVPR3lEU3kxUFJ6U3BxZTlRQ053?=
- =?utf-8?B?NFNDbzQ5Yy9QQkdtNjR5QnFHS2EvRUtSRzJMeHBkaUI2dlZsdy9oVkZTU2xs?=
- =?utf-8?B?WWdnRnlFRnV6UkpQTW12OHNHcXpwQmtXTlYyTU5JZjc1cEwveklnaGZHSkQ4?=
- =?utf-8?B?RUlneXRkeCtFOWU1MjVJbDBzSzg0bTZ3Mzh3SDFhR0FZcFBOMmRNL1lsOXlH?=
- =?utf-8?Q?Nof7cYodXy7uL?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB4313.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?N3g0YzhzOVZQN3JwYWN1WWNXMUt6Q2I3WFhOODVuMHVIbVpQNlNPcFB2WGI1?=
- =?utf-8?B?VlErTkxGNzAvU3A2bmhiYkdZN3hIN29DUHhxY1lHRHYrczMwam9la1FwcWl6?=
- =?utf-8?B?U0ZwSVEwVis0a3NnZmN3RWR3Unc2eUJLTHZzOHBSdW1nWTc4aFRJYTV5dXZE?=
- =?utf-8?B?OVJnNG9TSk85UUtRdk5ObUJwSVRiYitvNXQ1cG5NM1duRDhXTm84L29JY0NS?=
- =?utf-8?B?eFdXdEJCSFA1MkJaTy9DRVlmMXYwaTczRTBBVTE2dW9JZzJ6N0tsdkFHV2lk?=
- =?utf-8?B?NVNIU3lDOFdoVUdCUEsvOVFtN0p2NXp2U0NWckZMUUFmRmIrS3RlVERPYjUx?=
- =?utf-8?B?L05MYTJzbElseGJsWFpWRWZjcGVyck9rUS9ELzlXeUhTVTBLUUlYYU5PdWZo?=
- =?utf-8?B?c0NvVVRPN2FkcG9iZXYzTTNoTE1IZk5YeVp6MEJnUU5VMjBsaGUrRVJwUC9L?=
- =?utf-8?B?QmJ1SXFLUVZDZG1HZ01UaUZWWHRiSjMxdjUzVGtTRGZTZmtHUlYydis3YUpT?=
- =?utf-8?B?U0h4aXY2ajgvMTZ6aDBRdHk1TmZIU1h6YTNzME9zaVJmOFc1RndPRVU2a0Iy?=
- =?utf-8?B?dEY5RE0zWEk0dnlhZ0dPY1VaSk93WEV5eWhaNkF2RkpUeTlMNTl0QkdxWWJG?=
- =?utf-8?B?UFNJYmlNVFl5bnBQVmJYOE50QTBQTHE0bk5yRFRrWW9FK2YvV2g2RWdXRC9U?=
- =?utf-8?B?UW5wOWdROVY1ZWhOSy9henZiNGdqejg2ZWRrNmRqTStZQ2plcVU1K01FQm5x?=
- =?utf-8?B?NFhXS2JtalNDSlRCbis3WGRQcU1YL25PdGgwTTlNZ01pZkQwMmduVThkL0Ra?=
- =?utf-8?B?eFNURUg4Vm9NRmtyMEdST2FCNmNEUW44cjlGNFdhQUlpaVZxRFcxSlpqMUJ1?=
- =?utf-8?B?RWVJWWxtbWVwMlBwVXVtS0xjbjNGZHlRaEFuTHUvZW1UM2NMVUY0QTloZXNR?=
- =?utf-8?B?WkU4aXkxeGNKSnMycnlqdVIxV2d3aHdncXJVczB3Z1A3OEdDNHBiT0kyZVhH?=
- =?utf-8?B?R2pZWk1MMUNicFRyeDlFd0c3SHJCeVhEU05xMDFFU1pMV3Z1R0Rzd1RLRkcx?=
- =?utf-8?B?Y3Z5NnJyOUp4ZDdaYmhhSjBIZ0w1ZXVzd2hIUnVqN0FIZmNRNFBYVVNtTGxo?=
- =?utf-8?B?VE5keTBqR0U5S2V3b3hGRld6ME12emVsaitjU3NBVnJTc3FTY2RIUW1razNC?=
- =?utf-8?B?TVNFM0dvNElBb2tkS01uTTJyMTcwUkF1V2xqQnk2ZElLZ1dYeWFFbyt1ekZ3?=
- =?utf-8?B?RVJnNmtkSW00bkFCdWN1YnNwYVdhYTZ4bVloaG1FUTJVUU1oL25JcUFlWTFi?=
- =?utf-8?B?YUhZakpoQ0lib2djdkpaaTNYSGdoVHdTT1ZoSkk1WlZUbVVRdG4rcHRSQ09Q?=
- =?utf-8?B?ViszZC9Gdjh0Uy91aEVDcktmbDNEd3l1R2xhYkFCbVhYY2VwVzFqYm1nK0lG?=
- =?utf-8?B?cDMycmc2eU5za3VnOGx3WjVndGhzN0VoWk5Kbng5Qmc1ZERoM2pzM2pHNDZE?=
- =?utf-8?B?MEIrS3NKd0h2WkxDTGNLZ2FrQktPcE5zRU80M2ZYODVXeDFXMTVwOWRYUFQy?=
- =?utf-8?B?ZWloVWhtaXhGRWx0Tk5iOWhiMmJnZUxnaTBiK09qM29EN0FHUFZRVE8rbDNH?=
- =?utf-8?B?eUFwNE40Tko4OUVPUmVqRVVxdUtGODlKNTVRWVk5R2FPV25OcDcxeStNdzRu?=
- =?utf-8?B?WDlpR3F4NEluSkRCMytPNktvRGRtWVc3Q3BpVVZ3RUt5elJJT2twbWw2dUtp?=
- =?utf-8?B?aFBDVjV1Q295eFRHK2lzdGN4UmRQZlk3Q3JnUzNkTjJyejJCRzlRaHlGVW84?=
- =?utf-8?B?QUorbFRsVDVDMTJGSVZBRE56RkxDY21LVEd2NGVLeEZrSWlJS0xXSXJYdWF5?=
- =?utf-8?B?WFZOcGZtZTdnWHJYTC9BaThOWUoxNDdnREhpKzVHR2gwbmVlL3BucmFqeXBj?=
- =?utf-8?B?bGM5YUhpdC9tVzBINHhJQ1lvN2grSGNnU1lpK2c3emIrSmJmQ083ZUdZYjBK?=
- =?utf-8?B?NlRTRkhQOGdVcDhUbVpxOEgyWCtGYzVrMWxTQVF6T3dkR1Y4clBvM1VweUN3?=
- =?utf-8?B?MVdYT1pjdGl2VU9iUnZDbElvL0JORU1IM0NkQ1k3a3FUMmJ4UXV5TnEyTFZS?=
- =?utf-8?B?MkJvS2hSZUg3a0JDTy8ySFozK2JGWHRMTzZ1U0ZhNUpnQ2pjQkZ1V0lwSFVy?=
- =?utf-8?B?VkE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	RoQIx+tv2DtFbK6zeOpto5DK4WIjGaK7AzQ5NC+wPgpGwYTXULiBZhc61FPI0XkcwCJQ9/w3CvXSc8XSAcvrK1RftAH1GCRj7DrI4kRTrnbQKFzFhPJhxVtiG/O323MDKrLwpUfRxqeekUCt17MjMP4IjckTMcsZA21iEVYlBRlHsgBwIYr47cyTNMEvXPubwvFipxJNSn8fHuyRJrxq7weAu2FPSTCdzVWaOoRP2DMfA6F1EXPi0jWuROKtnN9OykOkplhKLI5TzZBYbP0x9vCSLgrlLrkb2YsGvZFF4k1JFZEgB1N2KaUw5JGZtZKZlaAHdafYAOEXrwKS13rCMQocMRJk8SamGTjc2CyuCH80wKybt3bfDsYVgYxlSq+iq4g1wJSoPYNyr2kNPsRXI0Aq3Edx1uJJBf7XQBAuJNcgMarPpZllAmAbAeal6E0YO+G9CSqWkDIWO7WQ1y3S/DAz43//UkMSfoc1VRK4h3y6I3m8kW7m/8uYXu6SJWInZxBUSoXBkdW3beLZLom/PBhM1ojOMoPDbF7XOwNV6DgEyvIyQmgB3xfxwL+9a5LdkXfmsrDJWgjIlXM2q6p7ILInwcnEaX6gXd9CK4j2/DQ=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b33d4b89-f4ee-4a9a-7337-08dd20ddf630
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB4313.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2024 10:06:24.9480
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Cq7E7v1vgLg68LmtxsoF6A+y1crtOWaZMhVP9cM+6KwudruYC9S0ihRKSnapbNpEDuRC4FfpETFramwQ8ktpgg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR10MB5940
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bug report] WARNING: possible circular locking dependency
+ detected at blk_unregister_queue+0x9c/0x290 and sd_remove+0x85/0x130 [sd_mod]
+To: Yi Zhang <yi.zhang@redhat.com>, linux-block <linux-block@vger.kernel.org>
+References: <CAHj4cs_RU-tzrtn+F8kXBP+4zCH_mA1pqzwAL8oWNGZiLxXHLQ@mail.gmail.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <CAHj4cs_RU-tzrtn+F8kXBP+4zCH_mA1pqzwAL8oWNGZiLxXHLQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: cBIeO-VrmavmV4XKBNxvdb5ik6EfrnTt
+X-Proofpoint-GUID: cBIeO-VrmavmV4XKBNxvdb5ik6EfrnTt
 X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-20_03,2024-12-19_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 bulkscore=0
- suspectscore=0 malwarescore=0 phishscore=0 mlxscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2411120000
- definitions=main-2412200083
-X-Proofpoint-GUID: v88sRWMKCOYBUIeXploanI5t6DGHOFE6
-X-Proofpoint-ORIG-GUID: v88sRWMKCOYBUIeXploanI5t6DGHOFE6
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ adultscore=0 malwarescore=0 priorityscore=1501 impostorscore=0
+ clxscore=1015 mlxlogscore=999 spamscore=0 lowpriorityscore=0
+ suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412200082
 
-On 19/12/2024 06:01, Christoph Hellwig wrote:
->   	if (shost->queuecommand_may_block)
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index c596e0e4cb75..4096d4456582 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -668,7 +668,6 @@ struct blk_mq_ops {
->   
->   /* Keep hctx_flag_name[] in sync with the definitions below */
->   enum {
-> -	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
->   	BLK_MQ_F_TAG_QUEUE_SHARED = 1 << 1,
 
-Should these be renumbered? I suppose that we can introduce an enum like 
-req_flag_bits (with separate #define for the bitmasks, like 
-REQ_FAILFAST_DEV) to avoid the need to renumber manually.
 
->   	/*
->   	 * Set when this device requires underlying blk-mq device for
+On 12/20/24 06:00, Yi Zhang wrote:
+> Hi
+> 
+> I reproduced this issue on 6.13.0-rc3 with blktests block/032, and
+> latest linux-block/for-next also has this issue,
+> please help check it and let me know if you need any info/test for it, thanks.
+> 
+> [ 8522.205802] run blktests block/032 at 2024-12-19 17:50:39
+> [ 8522.686638] scsi_debug:sdebug_driver_probe: scsi_debug: trim
+> poll_queues to 0. poll_q/nr_hw = (0/1)
+> [ 8522.714725] scsi 10:0:0:0: Power-on or device reset occurred
+> [ 8525.172661] XFS (sde): Block device removal (0x20) detected at
+> fs_bdev_mark_dead+0x7e/0xb0 (fs/xfs/xfs_super.c:1184).  Shutting down
+> filesystem.
+> [ 8525.187369] XFS (sde): Please unmount the filesystem and rectify
+> the problem(s)
+> [ 8525.208802]
+> [ 8525.210316] ======================================================
+> [ 8525.216502] WARNING: possible circular locking dependency detected
+> [ 8525.222689] 6.13.0-rc3+ #1 Not tainted
+> [ 8525.226443] ------------------------------------------------------
+> [ 8525.232630] check/29929 is trying to acquire lock:
+> [ 8525.237431] ffff8882aa0d6f38 (&q->sysfs_lock){+.+.}-{4:4}, at:
+> blk_unregister_queue+0x9c/0x290
+> [ 8525.246070]
+> [ 8525.246070] but task is already holding lock:
+> [ 8525.251903] ffff8882aa0d69f0
+> (&q->q_usage_counter(queue)#11){++++}-{0:0}, at: sd_remove+0x85/0x130
+> [sd_mod]
+> [ 8525.261681]
+> [ 8525.261681] which lock already depends on the new lock.
+> [ 8525.261681]
+> [ 8525.269862]
+> [ 8525.269862] the existing dependency chain (in reverse order) is:
+> [ 8525.277341]
+> [ 8525.277341] -> #2 (&q->q_usage_counter(queue)#11){++++}-{0:0}:
+> [ 8525.284672]        __lock_acquire+0xc94/0x1cf0
+> [ 8525.289126]        lock_acquire+0x177/0x3e0
+> [ 8525.293322]        blk_queue_enter+0x391/0x4b0
+> [ 8525.297774]        blk_mq_alloc_request+0x499/0x8c0
+> [ 8525.302663]        scsi_execute_cmd+0x10d/0x6d0
+> [ 8525.307204]        read_capacity_16+0x1ad/0xb90 [sd_mod]
+> [ 8525.312525]        sd_read_capacity+0x4c3/0x9d0 [sd_mod]
+> [ 8525.317847]        sd_revalidate_disk.isra.0+0xa98/0x2240 [sd_mod]
+> [ 8525.324035]        sd_probe+0x6e3/0xdb0 [sd_mod]
+> [ 8525.328661]        really_probe+0x1e3/0x920
+> [ 8525.332856]        __driver_probe_device+0x18a/0x3d0
+> [ 8525.337833]        driver_probe_device+0x49/0x120
+> [ 8525.342545]        __device_attach_driver+0x15e/0x270
+> [ 8525.347607]        bus_for_each_drv+0x106/0x190
+> [ 8525.352149]        __device_attach_async_helper+0x19a/0x240
+> [ 8525.357731]        async_run_entry_fn+0x96/0x4f0
+> [ 8525.362356]        process_one_work+0xe64/0x16a0
+> [ 8525.366985]        worker_thread+0x588/0xce0
+> [ 8525.371266]        kthread+0x2f6/0x3e0
+> [ 8525.375027]        ret_from_fork+0x30/0x70
+> [ 8525.379135]        ret_from_fork_asm+0x1a/0x30
+> [ 8525.383591]
+> [ 8525.383591] -> #1 (&q->limits_lock){+.+.}-{4:4}:
+> [ 8525.389699]        __lock_acquire+0xc94/0x1cf0
+> [ 8525.394145]        lock_acquire+0x177/0x3e0
+> [ 8525.398341]        __mutex_lock+0x17c/0x1570
+> [ 8525.402620]        __blk_mq_update_nr_hw_queues+0x98f/0xe80
+> [ 8525.408202]        blk_mq_update_nr_hw_queues+0x29/0x40
+> [ 8525.413430]        sdebug_change_qdepth+0x112/0x170 [scsi_debug]
+> [ 8525.419470]        scsi_debug_bus_reset+0x156/0x1a0 [scsi_debug]
+> [ 8525.425494]        configfs_write_iter+0x2b4/0x480
+> [ 8525.430295]        vfs_write+0x9b8/0xf60
+> [ 8525.434228]        ksys_write+0xf4/0x1d0
+> [ 8525.438164]        do_syscall_64+0x8c/0x180
+> [ 8525.442357]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [ 8525.447939]
+> [ 8525.447939] -> #0 (&q->sysfs_lock){+.+.}-{4:4}:
+> [ 8525.453960]        check_prev_add+0x1b7/0x2360
+> [ 8525.458406]        validate_chain+0xa42/0xe00
+> [ 8525.462767]        __lock_acquire+0xc94/0x1cf0
+> [ 8525.467221]        lock_acquire+0x177/0x3e0
+> [ 8525.471416]        __mutex_lock+0x17c/0x1570
+> [ 8525.475697]        blk_unregister_queue+0x9c/0x290
+> [ 8525.480497]        del_gendisk+0x25a/0xa10
+> [ 8525.484606]        sd_remove+0x85/0x130 [sd_mod]
+> [ 8525.489233]        device_release_driver_internal+0x36d/0x530
+> [ 8525.494989]        bus_remove_device+0x1ed/0x3f0
+> [ 8525.499617]        device_del+0x33b/0x8c0
+> [ 8525.503637]        __scsi_remove_device+0x26b/0x330
+> [ 8525.508525]        sdev_store_delete+0x83/0x120
+> [ 8525.513057]        kernfs_fop_write_iter+0x355/0x520
+> [ 8525.518032]        vfs_write+0x9b8/0xf60
+> [ 8525.521967]        ksys_write+0xf4/0x1d0
+> [ 8525.525903]        do_syscall_64+0x8c/0x180
+> [ 8525.530096]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [ 8525.535676]
+> [ 8525.535676] other info that might help us debug this:
+> [ 8525.535676]
+> [ 8525.543675] Chain exists of:
+> [ 8525.543675]   &q->sysfs_lock --> &q->limits_lock -->
+> &q->q_usage_counter(queue)#11
+> [ 8525.543675]
+> [ 8525.555601]  Possible unsafe locking scenario:
+> [ 8525.555601]
+> [ 8525.561520]        CPU0                    CPU1
+> [ 8525.566052]        ----                    ----
+> [ 8525.570586]   lock(&q->q_usage_counter(queue)#11);
+> [ 8525.575395]                                lock(&q->limits_lock);
+> [ 8525.581496]
+> lock(&q->q_usage_counter(queue)#11);
+> [ 8525.588820]   lock(&q->sysfs_lock);
+> [ 8525.592322]
+> [ 8525.592322]  *** DEADLOCK ***
+> [ 8525.592322]
+
+Well this is currently being discussed here[1]. I don't know yet how 
+it would be fixed. But we have to wait...
+
+[1]https://lore.kernel.org/all/20241216080206.2850773-1-ming.lei@redhat.com/
+
+Thanks,
+--Nilay
 
