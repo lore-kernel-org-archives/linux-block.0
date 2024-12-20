@@ -1,110 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C581B1ABEA1
-	for <linux-block@vger.kernel.org>; Fri, 20 Dec 2024 09:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DC0F4FA;
+	Fri, 20 Dec 2024 09:39:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734685497; cv=none; b=tfw8rXfSkPUuxpTrLXFZSh7K2FXzh5dtKcgZIpG0IpRetCAzTxFBqyaMaqAxKiwKt+qQbREIZMCcq31CCWMjWc+Svz22BJG1gte5qRIn43nfGALDUrhnI9XAvsrun0994hKO6W34NCRt0BsijXTqfQHcHZKcploaq4Yn7IzUryw=
+	t=1734687569; cv=none; b=umw0qFGFr0C9KnYKbpvOD7htj0mtrtU+OxqAE/51Vb8nMrFuWEXzidJjrkRR2dt9hQl5FJaPtdw0/YAxCdjluGxwtH+ltz4AYoR0VXEm5GbeemhxeZAeVJXd4Q+3j0VDGxtuzXrpGvXTSFZXEjnzP/AD+MmHUM2Lqiy+rjzwC1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734685497; c=relaxed/simple;
-	bh=23QV/Z0ncYZtoK3/rhdLeNgePmQZYVuuHiMosMT5tyo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kSTLdQvNdVA7v5zVs8Fjoxmm+lAcC5x6pbxVKAMoEsMW17i7dRvA3tfosiaiwyysE0HZlCp88QodaWWUOSrk6YBRwc2tMG3RwspiPgrp+HI++2frirFmdi1ZHjehpw39jCCkoxSW1ANGueHmZ20Tf7lKhiYthrRxjR2E8n0+2H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z1CjzjOT; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1734687569; c=relaxed/simple;
+	bh=EUqVRxG6c4pap6xeF3zCpvKsKOJGx8APATJXQJOX86A=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=E7g/cvpyMzeW4amWWNAUVYIO/CmY0CL6WHRkNovXXfDcSqewUZ2gae4BLnB8S66AaSlDYLB3I0OaEKIYuK9vyPlt2JI3uM+AltyXStTo1PUcSYf+98WZRUmN+yUI1n2ofTCe+15fH0WGzdhQSnOanZMzHa5+0SsLlU/o4dvGZO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dkmnQ5N2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z1CjzjOT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734685494;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TNCekzdNJZmUuGpzwzOxUn2DY6eci5HZ8lsy1e03Zho=;
-	b=Z1CjzjOTUcgxoiQVVrd/2vOiwtq4MA4VXlS0kHmFutuNjVBhQiVPHpjzphmJj38xux/CEs
-	8ILNyss8gmztNgAb21n012nvIcuGQWiWvpLQOx1ukqyURcyf+uTYQFW4V2Na7l4+mSawY1
-	NTZKLY43/aVHVGWI2wY663xqcOD2Uio=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-9-V_hpjVgqOaWhO_PeQOMseg-1; Fri,
- 20 Dec 2024 04:04:50 -0500
-X-MC-Unique: V_hpjVgqOaWhO_PeQOMseg-1
-X-Mimecast-MFC-AGG-ID: V_hpjVgqOaWhO_PeQOMseg
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 53E431956048;
-	Fri, 20 Dec 2024 09:04:46 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.29])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E4FDE195608A;
-	Fri, 20 Dec 2024 09:04:24 +0000 (UTC)
-Date: Fri, 20 Dec 2024 17:04:19 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Daniel Wagner <wagi@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Kashyap Desai <kashyap.desai@broadcom.com>,
-	Sumit Saxena <sumit.saxena@broadcom.com>,
-	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-	Chandrakanth patil <chandrakanth.patil@broadcom.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Nilesh Javali <njavali@marvell.com>,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	Don Brace <don.brace@microchip.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Costa Shulyupin <costa.shul@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Waiman Long <llong@redhat.com>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>,
-	Sridhar Balaraman <sbalaraman@parallelwireless.com>,
-	"brookxu.cn" <brookxu.cn@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
-	storagedev@microchip.com, virtualization@lists.linux.dev
-Subject: Re: [PATCH v4 9/9] blk-mq: issue warning when offlining hctx with
- online isolcpus
-Message-ID: <Z2UzE-CGa7YVwx0f@fedora>
-References: <20241217-isolcpus-io-queues-v4-0-5d355fbb1e14@kernel.org>
- <20241217-isolcpus-io-queues-v4-9-5d355fbb1e14@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dkmnQ5N2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62099C4CECD;
+	Fri, 20 Dec 2024 09:39:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734687568;
+	bh=EUqVRxG6c4pap6xeF3zCpvKsKOJGx8APATJXQJOX86A=;
+	h=From:Date:Subject:To:Cc:From;
+	b=dkmnQ5N2XwbzQW/fMTijM4gLJ09kaYdLLt4iviudxrJUt9UZTCrht6sOnI2qin92y
+	 i2CHJWztFvAjduV4w0p92kbODuAa72mCRFP980ajtu8rUAkBxG53m7XnVbZUvEG+FL
+	 JIXWOWeervRPxnqk2W63tasEk3idTmLUmgA6CwHxMYUMfZjAG+lVDcJlbe0CSHk+ys
+	 v9Pq4lcSlYBqKX1yaYMf1BWbJSZEkhg1D3sP7gFxFrnDIzlovVaOoV4wzRTu+ZCNt+
+	 jRHyXGoqOPXGJbCJKu28UAWXaiQogGcvg6KU0Yy4aP5yZd57eoYVrEq17UiguJN0I2
+	 8cSTH8D4t0SrA==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+Date: Fri, 20 Dec 2024 10:37:57 +0100
+Subject: [PATCH] rust: block: fix use of BLK_MQ_F_SHOULD_MERGE
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241217-isolcpus-io-queues-v4-9-5d355fbb1e14@kernel.org>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241220-merge-flag-fix-v1-1-41b7778dac06@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAPQ6ZWcC/x2MSQqAMAwAv1JytmDjAvoV8RBtqgE3WhCh+HeDx
+ xmYyZA4CifoTYbItyQ5DwVXGJhXOha24pUBS6wdYml3jirDRosN8lhk8lPniNqmAo2uyKr/4TC
+ +7wflhoHTYAAAAA==
+X-Change-ID: 20241220-merge-flag-fix-2eadb91aa653
+To: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+ Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Andreas Hindborg <a.hindborg@kernel.org>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1271; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=EUqVRxG6c4pap6xeF3zCpvKsKOJGx8APATJXQJOX86A=;
+ b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBnZTsBkwPhVsSkoTudokUqjeYQjRWaqzYo5j1ty
+ /fJfKIbGf6JAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCZ2U7AQAKCRDhuBo+eShj
+ d12GD/9KvusFX+EvE5OPYuDiZKJp3dFGyTsO0jDTgwVdfaedHEfYK7TRq3pn4mmO7wbecYuAB+R
+ 6+pNLzjuChK7JoBwNMI12tEJKz2CuBTOdNoJOQPVECndSWJEpWL39Pi9Ad/CB8cjMbncA/gBeLU
+ GK0MD6b+i0FntDF3ofseHhKyzS1CG27sOgFfEvzNmtlhM5FYWfYHZfh/fW4xAIU7ieOTP4L0WHg
+ mmgceTFPcudvWUjp9zDb5xUzXysysuTim6gP62Nm6ElSLbUtMLz9nNMK4XYrf5ieoC8/KW9OjMD
+ D+asB7WVT8ZzqvWilxjE910RVhUEM3x1iKPSvJQhHAAXwiTfmNutLB22dPT5pQ6hQxolitYMxso
+ ULkaEHh/35oWq4HNEONFcz+SqU8mQCpsyXUZMeKIRb1sKhGHp1qrSLMr7+pq5NIicC+eZOT+f74
+ M/lEHlTrKUV2R/UwP5aP8LSCyltEf2uYIFLAqxiwd6xWSFXZ5hge/jVSaWmqZXtjyJKW9mHLJ9u
+ araMeGfnK3/TN4HIK5bzvkl1ypCXccTinTEvbwdFtmobdSszuasntESfE2/nxT3V7n2VowMQq5b
+ 74b8AP1xR3WWGOuHkWscztS0REnOEk3lFY8qmImSxOF9w36M1Tw3xVQ2lTw5L9djiWcH9t882Vq
+ XLI8joru1TxezKA==
+X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
+ fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-On Tue, Dec 17, 2024 at 07:29:43PM +0100, Daniel Wagner wrote:
-> When we offlining a hardware context which also serves isolcpus mapped
-> to it, any IO issued by the isolcpus will stall as there is nothing
-> which handles the interrupts etc.
-> 
-> This configuration/setup is not supported at this point thus just issue
-> a warning.
+BLK_MQ_F_SHOULD_MERGE has was removed [1] and is now in effect by default.
+So remove the flag from tag sets of Rust block device drivers.
 
-As I mentioned on patch 8, this io hang is regression on existed
-applications which can work just fine with 'isolcpus=managed_irq'.
+Link: https://lore.kernel.org/r/20241219060214.1928848-1-hch@lst.de [1]
+Fixes: 9377b95cda73 ("block: remove BLK_MQ_F_SHOULD_MERGE")
+Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+---
+ rust/kernel/block/mq/tag_set.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Do you think the added warning will prevent people from complaining
-the regression? :-)
+diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
+index d7f175a05d992b95c0a65522fbb2b8e08a9276d2..00ddcc71dfa2a1da28d66c542b554196461bea33 100644
+--- a/rust/kernel/block/mq/tag_set.rs
++++ b/rust/kernel/block/mq/tag_set.rs
+@@ -52,7 +52,7 @@ pub fn new(
+                     numa_node: bindings::NUMA_NO_NODE,
+                     queue_depth: num_tags,
+                     cmd_size,
+-                    flags: bindings::BLK_MQ_F_SHOULD_MERGE,
++                    flags: 0,
+                     driver_data: core::ptr::null_mut::<crate::ffi::c_void>(),
+                     nr_maps: num_maps,
+                     ..tag_set
 
+---
+base-commit: 3af068412d79f2e1b8c394cde2a54ce84c8df143
+change-id: 20241220-merge-flag-fix-2eadb91aa653
 
-Thanks,
-Ming
+Best regards,
+-- 
+Andreas Hindborg <a.hindborg@kernel.org>
+
 
