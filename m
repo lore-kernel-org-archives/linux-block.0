@@ -1,152 +1,134 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7DD1EE7B6;
-	Sat, 21 Dec 2024 09:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B825B1FB
+	for <linux-block@vger.kernel.org>; Sat, 21 Dec 2024 12:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734774070; cv=none; b=J8KlYYwSuEKhXvHn9Ii/rpjImXKJO4d/pzdPTHUY5FW1E3Rb+X6qJaUGg/37nJlAuk6HcWA65vd+Q+fcwn4EYL5u9uP/UQeHatZFiDaY4debGNiIUERYD6hGBNuj+HJR2nAHHI8PQ+Ufr2rlddoaLyIgNIpuK6OZ77uGrJ7zf+Q=
+	t=1734784290; cv=none; b=J6q/1a8jfLnI02qOWieErbyHmuyl/ip8a8v8UdLDdVw3EXr82e8svZuztbtmR3Nm+VkXv/HJn5djbkEYAvLwCrf810coEUtuJ1+WfShdiVEIZ6IDRlaicyUp3/fFL57eqvHflwkXg1ZJS3jDKRHIvAaC/DVKsai+EUaiLCJ1dDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734774070; c=relaxed/simple;
-	bh=65zi5A/F+7fS+4iUI0T2GyGtTMz0l5fvVn4uxS6TX9s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KHJvEmzdY2wjYNWhu5QpfIfrSjcLAR2rebrPqU6c73qhr4ECxYUQoYPvqrTb7ZlPecOZl0PFb+JyZWRse7t/u3FnJhxtA5XdkfDyxuAnJq6n/NhT61CyGYhWjzfcSCbRkgRUo0jip2Ln1guYwX6IvG3eiTeRzKU3v6XoKZrIPdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YFfRH1kxWz4f3lCf;
-	Sat, 21 Dec 2024 17:40:43 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id DAB9E1A0568;
-	Sat, 21 Dec 2024 17:41:03 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgBHIoYqjWZnocfeFA--.21383S11;
-	Sat, 21 Dec 2024 17:41:03 +0800 (CST)
-From: Yu Kuai <yukuai1@huaweicloud.com>
-To: axboe@kernel.dk,
-	akpm@linux-foundation.org,
-	ming.lei@redhat.com,
-	yang.yang@vivo.com,
-	yukuai3@huawei.com,
-	bvanassche@acm.org
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yukuai1@huaweicloud.com,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH RFC v3 7/7] block/kyber-iosched: switch to use queue async_depth
-Date: Sat, 21 Dec 2024 17:37:10 +0800
-Message-Id: <20241221093710.926309-8-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20241221093710.926309-1-yukuai1@huaweicloud.com>
-References: <20241221093710.926309-1-yukuai1@huaweicloud.com>
+	s=arc-20240116; t=1734784290; c=relaxed/simple;
+	bh=Dt5H/Pbsxl+gEca5TEtCtYKHwbyTv5iDQOjJJJIL8Hs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aIrxqjwq/mHg2MfxQJfcK/PF8cW1+bZubYhHr8wnVa1Fq3svKIXM+Gn5Qf+xgl04BQUVzWnjEPMt/Hw/sCjPiOHx+apvkIj0CSgPUJ+N2k96esZu0dwUG77HplOTdLOYlx5nsFRjtHdOZLIqG6F+hzWK1frC6Yz7ADsMOEfkxtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=q0b0a3o7; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="q0b0a3o7"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BL5FeIh007583;
+	Sat, 21 Dec 2024 12:31:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=o8QyF6
+	PhuPD5w6oreKzKNYY0+KSEx9E8BdD19rKD20o=; b=q0b0a3o79QW4n+VC1x+q8l
+	HB06u9ZFi8J4NT+CuYSjhbGRERedXy2wUcvCRgDuvpKtfcfV4GxWv+bZBAoExB2p
+	4XiwmEEYuJTgo1I6e8R6kFHnfrwaZLNMvu8+NDly7cNE8UC7nX59V84WqMn9eouD
+	H0e7rJ/7tPOxKNYU9x4BO0dbTxCZfrVyPLIiCqLJDCq7kl8WjznqKWo8gSAVK894
+	N6UidgOEyM89SwcWHXZcclXfHIx0oCiEmmOAF4jBn04h2noubUDfEqPapsi8GPbg
+	FSRbYm0e1yk6wI83e6IG6V/fWUjZglYFldEOqbVcOMf7CrXA3PnptfCXcy+Ix9AQ
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43nqc5h0wj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 21 Dec 2024 12:31:24 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BLA4D9o014451;
+	Sat, 21 Dec 2024 12:31:24 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43hq2266yx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 21 Dec 2024 12:31:24 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BLCVN8r24642290
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 21 Dec 2024 12:31:23 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1E41D58058;
+	Sat, 21 Dec 2024 12:31:23 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 12FED58057;
+	Sat, 21 Dec 2024 12:31:22 +0000 (GMT)
+Received: from [9.179.8.248] (unknown [9.179.8.248])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Sat, 21 Dec 2024 12:31:21 +0000 (GMT)
+Message-ID: <cfbcca3c-080a-4f71-9b26-c04a0eaf1bf5@linux.ibm.com>
+Date: Sat, 21 Dec 2024 18:01:20 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: Revert "block: Fix potential deadlock while
+ freezing queue and acquiring sysfs_lock"
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+References: <20241218101617.3275704-1-ming.lei@redhat.com>
+ <20241218101617.3275704-2-ming.lei@redhat.com>
+ <23c3e917-9dd3-4a0f-8bf4-0a6f421aae0e@linux.ibm.com>
+ <d48795a6-cb9f-4649-8c43-e36639a39721@kernel.dk>
+ <CAFj5m9JKrNm75DzJGFaDDZp4Owq79EBnH5cXFETiz5pRKoGxBg@mail.gmail.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <CAFj5m9JKrNm75DzJGFaDDZp4Owq79EBnH5cXFETiz5pRKoGxBg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBHIoYqjWZnocfeFA--.21383S11
-X-Coremail-Antispam: 1UD129KBjvJXoWxCry7Ar1rtFWrCFyDCF4UArb_yoW5Ar1fpF
-	Z5ZanIyFy8tF4Uury8J397Zw1SqrsIgr43Jan3t34rtryqqanrXF4FyFy0vFWIvrWrArsr
-	urWDAFZrJrnFqF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmI14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
-	CI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnI
-	WIevJa73UjIFyTuYvjfUOyIUUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5tbQW9p5x36DmPVScVAKskAIEBP1qAU_
+X-Proofpoint-ORIG-GUID: 5tbQW9p5x36DmPVScVAKskAIEBP1qAU_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 mlxlogscore=999 priorityscore=1501
+ adultscore=0 malwarescore=0 bulkscore=0 spamscore=0 phishscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412210110
 
-From: Yu Kuai <yukuai3@huawei.com>
 
-To make code cleaner.
 
-Noted that for kyber, async_depth is still always 75% nr_requests, and
-user can't set new value for now.
+On 12/20/24 20:54, Ming Lei wrote:
+> On Fri, Dec 20, 2024 at 11:10 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 12/20/24 3:23 AM, Nilay Shroff wrote:
+>>> On 12/18/24 15:46, Ming Lei wrote:
+>>>> This reverts commit be26ba96421ab0a8fa2055ccf7db7832a13c44d2.
+>>>>
+>>>> Commit be26ba96421a ("block: Fix potential deadlock while freezing queue and
+>>>> acquiring sysfs_loc") actually reverts commit 22465bbac53c ("blk-mq: move cpuhp
+>>>> callback registering out of q->sysfs_lock"), and causes the original resctrl
+>>>> lockdep warning.
+>>>>
+>>>> So revert it and we need to fix the issue in another way.
+>>>>
+>>> Hi Ming,
+>>>
+>>> Can we wait here for some more time before we revert this as this is
+>>> currently being discussed[1] and we don't know yet how we may fix it?
+>>>
+>>> [1]https://lore.kernel.org/all/20241219061514.GA19575@lst.de/
+>>
+>> It's already queued up and will go out today. Doesn't exclude people
+>> working on solving this for real.
+> 
+> IMO, it is correct to cut the dependency between q->sysfs_lock and
+> global cpu hotplug lock, otherwise more subsystems can be involved,
+> so let's revert it first.
+> 
+Yeah agreed, we may want to in that case just remove lockdep aseert of 
+q->sysfs_lock from blk_mq_realloc_hw_ctxs() and also remove q->sysfs_lock 
+from blk_mq_init_allocated_queue(). But that's ok. Lets see how we'd pursue 
+further and solve other limits-lock and queue-freeze issue. 
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/kyber-iosched.c | 26 +++++---------------------
- 1 file changed, 5 insertions(+), 21 deletions(-)
-
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index ccfefa6a3669..0909851f22c6 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -157,9 +157,6 @@ struct kyber_queue_data {
- 	 */
- 	struct sbitmap_queue domain_tokens[KYBER_NUM_DOMAINS];
+> Christoph is also working on q->sysfs_lock warning, and we can try to
+> figure out other solutions given the involved(or most of) locks should be
+> from block layer internal.
+> 
+> https://lore.kernel.org/linux-block/20241219061514.GA19575@lst.de/
+> 
  
--	/* Number of allowed async requests. */
--	unsigned int async_depth;
--
- 	struct kyber_cpu_latency __percpu *cpu_latency;
- 
- 	/* Timer for stats aggregation and adjusting domain tokens. */
-@@ -449,11 +446,11 @@ static void kyber_ctx_queue_init(struct kyber_ctx_queue *kcq)
- 
- static void kyber_depth_updated(struct blk_mq_hw_ctx *hctx)
- {
--	struct kyber_queue_data *kqd = hctx->queue->elevator->elevator_data;
-+	struct request_queue *q = hctx->queue;
- 	struct blk_mq_tags *tags = hctx->sched_tags;
- 
--	kqd->async_depth = hctx->queue->nr_requests * KYBER_ASYNC_PERCENT / 100U;
--	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, kqd->async_depth);
-+	q->async_depth = hctx->queue->nr_requests * KYBER_ASYNC_PERCENT / 100U;
-+	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, q->async_depth);
- }
- 
- static int kyber_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
-@@ -552,11 +549,8 @@ static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
- 	 * We use the scheduler tags as per-hardware queue queueing tokens.
- 	 * Async requests can be limited at this stage.
- 	 */
--	if (!op_is_sync(opf)) {
--		struct kyber_queue_data *kqd = data->q->elevator->elevator_data;
--
--		data->shallow_depth = kqd->async_depth;
--	}
-+	if (!op_is_sync(opf))
-+		data->shallow_depth = data->q->async_depth;
- }
- 
- static bool kyber_bio_merge(struct request_queue *q, struct bio *bio,
-@@ -952,15 +946,6 @@ KYBER_DEBUGFS_DOMAIN_ATTRS(KYBER_DISCARD, discard)
- KYBER_DEBUGFS_DOMAIN_ATTRS(KYBER_OTHER, other)
- #undef KYBER_DEBUGFS_DOMAIN_ATTRS
- 
--static int kyber_async_depth_show(void *data, struct seq_file *m)
--{
--	struct request_queue *q = data;
--	struct kyber_queue_data *kqd = q->elevator->elevator_data;
--
--	seq_printf(m, "%u\n", kqd->async_depth);
--	return 0;
--}
--
- static int kyber_cur_domain_show(void *data, struct seq_file *m)
- {
- 	struct blk_mq_hw_ctx *hctx = data;
-@@ -986,7 +971,6 @@ static const struct blk_mq_debugfs_attr kyber_queue_debugfs_attrs[] = {
- 	KYBER_QUEUE_DOMAIN_ATTRS(write),
- 	KYBER_QUEUE_DOMAIN_ATTRS(discard),
- 	KYBER_QUEUE_DOMAIN_ATTRS(other),
--	{"async_depth", 0400, kyber_async_depth_show},
- 	{},
- };
- #undef KYBER_QUEUE_DOMAIN_ATTRS
--- 
-2.39.2
-
+Thanks,
+--Nilay
