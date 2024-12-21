@@ -1,63 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9350226554
-	for <linux-block@vger.kernel.org>; Fri, 20 Dec 2024 22:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032F756B8C
+	for <linux-block@vger.kernel.org>; Sat, 21 Dec 2024 08:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734732702; cv=none; b=p+eaAdQG5sizLCaUWwQVcNZxVZMTcMwfNaEQBkYs9vnRHDPe4VFvnwLc4WMFgextN2c/0jxhyFcPq89HHHGmRc1I5xv5bM3FAd9miO+KJX7I67gMBfFBU7egRJU1C7izIVfob1hTccYTRtqVzVG3SfVUUxbEjY2/TGNp5yVjuPM=
+	t=1734768647; cv=none; b=pCEcdp+JsbWDBnhezxbJGMTVuEsZ6gI3Toa4msezE/1e+x6PQ8coasK56CyxPpGQwvRxTz/2ELTBs8E7QtjUKlKGl39G9PaoI47AawZvnNLp7JRTKclPpnDIkl+jd1Wecn5o43iJfWPwt2jBj8IBM+vaK9HYppoGKVk+5zaTZAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734732702; c=relaxed/simple;
-	bh=YQnnCGGtucrT3Y7Rh1FrSb0cBM2D3wVhzKiykTf09Mw=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=IJf2ftpK71hIYv7tYljSslsULCuB5/93tw+XiO96sibYulGbBIduuruuGJmh3Mg5Vtb1pTPV+jiEksE+WccOgiEXaOTvhKmE0alel20sF3/yDHJ86lXETB7aSYo1pasMcq4JfEn5VN2zlo62iEK0xMLrMLyxchj7qp+ftHcI8dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NKp4b5qD; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NKp4b5qD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87A92C4CECD;
-	Fri, 20 Dec 2024 22:11:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734732702;
-	bh=YQnnCGGtucrT3Y7Rh1FrSb0cBM2D3wVhzKiykTf09Mw=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=NKp4b5qDaQWJz7ai7StJ4Yrtrk9JcYTEbt1cnsGJLEKjgyDjuz/4DZzf7IyyJQVTM
-	 Lo9csuha27bDAJ2mY8ePfYcB7EXrVRrMujPbRVp/rM/fB4ehPTjEeSTA7i0i4YwmFr
-	 j9W7BtiwilE+BjRJKxKijXYgZXFfokygbm8WPQYlCO9zVdXZVySrmH7SwBOB86FJUe
-	 Obz7U4s+Fh4ebEU8vkig2ryDAtiQA2nhWOwOQCGGTmdRkY0K8r464g18shF84V+8vD
-	 zqn8IbL48/SmPP6VK26dVKLnc5PM2Mx4vh+WTmkQ8IS8Ls+9EGZ7XnKn4M5SLnCUXl
-	 v/IOrkknAp/+w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCA63806656;
-	Fri, 20 Dec 2024 22:12:01 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.13-rc4
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <0369cf3f-fc02-46d0-b540-b021ce981f5c@kernel.dk>
-References: <0369cf3f-fc02-46d0-b540-b021ce981f5c@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <0369cf3f-fc02-46d0-b540-b021ce981f5c@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.13-20241220
-X-PR-Tracked-Commit-Id: 85672ca9ceeaa1dcf2777a7048af5f4aee3fd02b
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 11167b29e53b9a06635309445ead7edfd54e6616
-Message-Id: <173473272030.3035596.17626799109641921287.pr-tracker-bot@kernel.org>
-Date: Fri, 20 Dec 2024 22:12:00 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	s=arc-20240116; t=1734768647; c=relaxed/simple;
+	bh=wHhrwqBBPc+5nmpy83JPqFih8hJPWZXtDGFjRjn2VBg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OXN7pb/BWsEI/GLWXvmhIR8VYwEnpRueikF3+ShLYiL9r354SP6889SouGDW/7hcMQyfBojYjzkGIENSRNB8oBl88PDdxFM0fBkmTYdMZgURsZ/rSbUNIgl2Oiy6dojYWr1M9e+Gf0l8Uib6SWUIGfleKCSZZHKvWjok4HfCHU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id C5F3F68BEB; Sat, 21 Dec 2024 09:10:33 +0100 (CET)
+Date: Sat, 21 Dec 2024 09:10:33 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: Zoned storage and BLK_STS_RESOURCE
+Message-ID: <20241221081033.GA13103@lst.de>
+References: <83bfb006-0a7d-4ce0-8a94-01590fb3bbbb@kernel.org> <548e98ee-b46e-476a-9d4a-05a60c78b068@kernel.dk> <5fb36d77-44cc-4ad7-8d64-b819bc7ae42a@kernel.org> <eb61f282-0e23-428a-8e6a-77c24cfd0e83@kernel.dk> <f41ffec1-9d05-47ed-bb0e-2c66136298b6@kernel.org> <e299e652-2904-417c-9f76-b7aec5fd066b@kernel.dk> <fb292dc8-7092-45c1-ae8a-fca1d61c6c9a@kernel.dk> <9e8e2410-53b5-4dad-8b54-b7e72647703b@kernel.org> <20241218065859.GA25215@lst.de> <78caa04c-34b6-4801-a57a-84251dd9d253@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <78caa04c-34b6-4801-a57a-84251dd9d253@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-The pull request you sent on Fri, 20 Dec 2024 09:25:37 -0700:
+On Thu, Dec 19, 2024 at 10:04:40AM -0800, Bart Van Assche wrote:
+> On 12/17/24 10:58 PM, Christoph Hellwig wrote:
+>> Use the new append writes that return the written offsets we've
+>> talked about.
+> Here is why this is not a solution for SCSI devices:
+> * There is no Zone Append command in the relevant SCSI standard (ZBC).
 
-> git://git.kernel.dk/linux.git tags/block-6.13-20241220
+Standard exist to be changed.  It's not like UFS folks have been pushing
+all kinds of novel unproven crap all the time anyway.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/11167b29e53b9a06635309445ead7edfd54e6616
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
