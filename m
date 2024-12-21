@@ -1,28 +1,28 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59411EC4E5;
-	Sat, 21 Dec 2024 09:41:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7DD1EE7B6;
+	Sat, 21 Dec 2024 09:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734774069; cv=none; b=DfW6FYMKGBp/rLCxc9R+DRnQ7hsu4JSpfhWsLfmpoMCLBPv4ZwpYT6jfx2FtsALH3Huo2/289UyDez0+WKVeUvlJuWWljgYrKO7JVoooTIwJL0tIZ3GySqrWLaoyOhqbsEyn3pddVXYVvnPVkNy2LbdP1O+qJo1F7PiDWXKB2w4=
+	t=1734774070; cv=none; b=J8KlYYwSuEKhXvHn9Ii/rpjImXKJO4d/pzdPTHUY5FW1E3Rb+X6qJaUGg/37nJlAuk6HcWA65vd+Q+fcwn4EYL5u9uP/UQeHatZFiDaY4debGNiIUERYD6hGBNuj+HJR2nAHHI8PQ+Ufr2rlddoaLyIgNIpuK6OZ77uGrJ7zf+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734774069; c=relaxed/simple;
-	bh=b0b31nNNlAwI2VMSuGDFyRcBdjbFR0jIZlLOQe/v4cY=;
+	s=arc-20240116; t=1734774070; c=relaxed/simple;
+	bh=65zi5A/F+7fS+4iUI0T2GyGtTMz0l5fvVn4uxS6TX9s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=quSov0M71An8Ji4iUcL8O8I+Qv3cpITiXTC/drGB5eVGqWBX8ecR05Fb8PxkT6EeN60Okc6VbbjqmCs4wRZJIk6F0h94TN+AuGGJVLEfCIvFYPo/DzxPtsFx3AS8Ftm8XKY8tv1ksYlcXQeIPNb3TqP1F9b5mY2KORPT3nyYQZw=
+	 MIME-Version; b=KHJvEmzdY2wjYNWhu5QpfIfrSjcLAR2rebrPqU6c73qhr4ECxYUQoYPvqrTb7ZlPecOZl0PFb+JyZWRse7t/u3FnJhxtA5XdkfDyxuAnJq6n/NhT61CyGYhWjzfcSCbRkgRUo0jip2Ln1guYwX6IvG3eiTeRzKU3v6XoKZrIPdw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YFfRL6WNbz4f3jqx;
-	Sat, 21 Dec 2024 17:40:46 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YFfRH1kxWz4f3lCf;
+	Sat, 21 Dec 2024 17:40:43 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 6F1641A0359;
-	Sat, 21 Dec 2024 17:41:01 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id DAB9E1A0568;
+	Sat, 21 Dec 2024 17:41:03 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgBHIoYqjWZnocfeFA--.21383S6;
-	Sat, 21 Dec 2024 17:41:01 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgBHIoYqjWZnocfeFA--.21383S11;
+	Sat, 21 Dec 2024 17:41:03 +0800 (CST)
 From: Yu Kuai <yukuai1@huaweicloud.com>
 To: axboe@kernel.dk,
 	akpm@linux-foundation.org,
@@ -35,9 +35,9 @@ Cc: linux-block@vger.kernel.org,
 	yukuai1@huaweicloud.com,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com
-Subject: [PATCH RFC v3 2/7] lib/sbitmap: make sbitmap_get_shallow() internal
-Date: Sat, 21 Dec 2024 17:37:05 +0800
-Message-Id: <20241221093710.926309-3-yukuai1@huaweicloud.com>
+Subject: [PATCH RFC v3 7/7] block/kyber-iosched: switch to use queue async_depth
+Date: Sat, 21 Dec 2024 17:37:10 +0800
+Message-Id: <20241221093710.926309-8-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241221093710.926309-1-yukuai1@huaweicloud.com>
 References: <20241221093710.926309-1-yukuai1@huaweicloud.com>
@@ -48,100 +48,105 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBHIoYqjWZnocfeFA--.21383S6
-X-Coremail-Antispam: 1UD129KBjvJXoWxCF17AF45Xw18XF4xZryrZwb_yoW5AFW8pF
-	4xKa48Gr9Yvry29rnrXrWDZF90qw4kJFnxGFsagF1Fkr4Dt3Zaqrn5CFW3t343CFW8AF45
-	AFyY9ry8Cr1UXFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUm014x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-	Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-	IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-	xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
-	JVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67
-	kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY
-	6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0x
-	vEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVj
-	vjDU0xZFpf9x0JUQXo7UUUUU=
+X-CM-TRANSID:gCh0CgBHIoYqjWZnocfeFA--.21383S11
+X-Coremail-Antispam: 1UD129KBjvJXoWxCry7Ar1rtFWrCFyDCF4UArb_yoW5Ar1fpF
+	Z5ZanIyFy8tF4Uury8J397Zw1SqrsIgr43Jan3t34rtryqqanrXF4FyFy0vFWIvrWrArsr
+	urWDAFZrJrnFqF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmI14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
+	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
+	z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
+	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
+	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
+	IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
+	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
+	kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
+	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
+	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI
+	42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
+	CI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnI
+	WIevJa73UjIFyTuYvjfUOyIUUUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Because it's only used in sbitmap.c
+To make code cleaner.
+
+Noted that for kyber, async_depth is still always 75% nr_requests, and
+user can't set new value for now.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- include/linux/sbitmap.h | 17 -----------------
- lib/sbitmap.c           | 18 ++++++++++++++++--
- 2 files changed, 16 insertions(+), 19 deletions(-)
+ block/kyber-iosched.c | 26 +++++---------------------
+ 1 file changed, 5 insertions(+), 21 deletions(-)
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 4adf4b364fcd..ffb9907c7070 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -209,23 +209,6 @@ void sbitmap_resize(struct sbitmap *sb, unsigned int depth);
-  */
- int sbitmap_get(struct sbitmap *sb);
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index ccfefa6a3669..0909851f22c6 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -157,9 +157,6 @@ struct kyber_queue_data {
+ 	 */
+ 	struct sbitmap_queue domain_tokens[KYBER_NUM_DOMAINS];
  
--/**
-- * sbitmap_get_shallow() - Try to allocate a free bit from a &struct sbitmap,
-- * limiting the depth used from each word.
-- * @sb: Bitmap to allocate from.
-- * @shallow_depth: The maximum number of bits to allocate from the bitmap.
-- *
-- * This rather specific operation allows for having multiple users with
-- * different allocation limits. E.g., there can be a high-priority class that
-- * uses sbitmap_get() and a low-priority class that uses sbitmap_get_shallow()
-- * with a @shallow_depth of (sb->depth >> 1). Then, the low-priority
-- * class can only allocate half of the total bits in the bitmap, preventing it
-- * from starving out the high-priority class.
-- *
-- * Return: Non-negative allocated bit number if successful, -1 otherwise.
-- */
--int sbitmap_get_shallow(struct sbitmap *sb, unsigned long shallow_depth);
+-	/* Number of allowed async requests. */
+-	unsigned int async_depth;
 -
- /**
-  * sbitmap_any_bit_set() - Check for a set bit in a &struct sbitmap.
-  * @sb: Bitmap to check.
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index f2e90ac6b56e..5e3c35086253 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -306,7 +306,22 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
- 	return sbitmap_find_bit(sb, shallow_depth, index, alloc_hint, true);
+ 	struct kyber_cpu_latency __percpu *cpu_latency;
+ 
+ 	/* Timer for stats aggregation and adjusting domain tokens. */
+@@ -449,11 +446,11 @@ static void kyber_ctx_queue_init(struct kyber_ctx_queue *kcq)
+ 
+ static void kyber_depth_updated(struct blk_mq_hw_ctx *hctx)
+ {
+-	struct kyber_queue_data *kqd = hctx->queue->elevator->elevator_data;
++	struct request_queue *q = hctx->queue;
+ 	struct blk_mq_tags *tags = hctx->sched_tags;
+ 
+-	kqd->async_depth = hctx->queue->nr_requests * KYBER_ASYNC_PERCENT / 100U;
+-	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, kqd->async_depth);
++	q->async_depth = hctx->queue->nr_requests * KYBER_ASYNC_PERCENT / 100U;
++	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, q->async_depth);
  }
  
--int sbitmap_get_shallow(struct sbitmap *sb, unsigned long shallow_depth)
-+/**
-+ * sbitmap_get_shallow() - Try to allocate a free bit from a &struct sbitmap,
-+ * limiting the depth used from each word.
-+ * @sb: Bitmap to allocate from.
-+ * @shallow_depth: The maximum number of bits to allocate from the bitmap.
-+ *
-+ * This rather specific operation allows for having multiple users with
-+ * different allocation limits. E.g., there can be a high-priority class that
-+ * uses sbitmap_get() and a low-priority class that uses sbitmap_get_shallow()
-+ * with a @shallow_depth of (sb->depth >> 1). Then, the low-priority
-+ * class can only allocate half of the total bits in the bitmap, preventing it
-+ * from starving out the high-priority class.
-+ *
-+ * Return: Non-negative allocated bit number if successful, -1 otherwise.
-+ */
-+static int sbitmap_get_shallow(struct sbitmap *sb, unsigned long shallow_depth)
- {
- 	int nr;
- 	unsigned int hint, depth;
-@@ -321,7 +336,6 @@ int sbitmap_get_shallow(struct sbitmap *sb, unsigned long shallow_depth)
- 
- 	return nr;
+ static int kyber_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
+@@ -552,11 +549,8 @@ static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+ 	 * We use the scheduler tags as per-hardware queue queueing tokens.
+ 	 * Async requests can be limited at this stage.
+ 	 */
+-	if (!op_is_sync(opf)) {
+-		struct kyber_queue_data *kqd = data->q->elevator->elevator_data;
+-
+-		data->shallow_depth = kqd->async_depth;
+-	}
++	if (!op_is_sync(opf))
++		data->shallow_depth = data->q->async_depth;
  }
--EXPORT_SYMBOL_GPL(sbitmap_get_shallow);
  
- bool sbitmap_any_bit_set(const struct sbitmap *sb)
+ static bool kyber_bio_merge(struct request_queue *q, struct bio *bio,
+@@ -952,15 +946,6 @@ KYBER_DEBUGFS_DOMAIN_ATTRS(KYBER_DISCARD, discard)
+ KYBER_DEBUGFS_DOMAIN_ATTRS(KYBER_OTHER, other)
+ #undef KYBER_DEBUGFS_DOMAIN_ATTRS
+ 
+-static int kyber_async_depth_show(void *data, struct seq_file *m)
+-{
+-	struct request_queue *q = data;
+-	struct kyber_queue_data *kqd = q->elevator->elevator_data;
+-
+-	seq_printf(m, "%u\n", kqd->async_depth);
+-	return 0;
+-}
+-
+ static int kyber_cur_domain_show(void *data, struct seq_file *m)
  {
+ 	struct blk_mq_hw_ctx *hctx = data;
+@@ -986,7 +971,6 @@ static const struct blk_mq_debugfs_attr kyber_queue_debugfs_attrs[] = {
+ 	KYBER_QUEUE_DOMAIN_ATTRS(write),
+ 	KYBER_QUEUE_DOMAIN_ATTRS(discard),
+ 	KYBER_QUEUE_DOMAIN_ATTRS(other),
+-	{"async_depth", 0400, kyber_async_depth_show},
+ 	{},
+ };
+ #undef KYBER_QUEUE_DOMAIN_ATTRS
 -- 
 2.39.2
 
