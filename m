@@ -1,71 +1,76 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893031FF611;
-	Tue, 24 Dec 2024 16:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4EA1DA4E
+	for <linux-block@vger.kernel.org>; Tue, 24 Dec 2024 21:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735057727; cv=none; b=iEa8rHSOjoIJYUB5BAK3PfhMPNPEA5KADaU8zY6tQBwG8Qbl39q4eK4BS72DKGYjLp/miWNPoNQr1+PBnA5sKKpa8naxuUZ/Y04SRlUWFycFBDE2aI1l6JSZAP2+R30lZZqWO2JPdUcYIz/J5jxuPrA36eY5zpqiTBVZJnCwvdI=
+	t=1735077125; cv=none; b=mEmwZqd9+57IJEnuyM5D44N2VEmY0OypSjE+PYgnbG2nD4A90+Qr9/a472rUPC3SYVY/CjXpgRfNeoJ3PremVeDoD7xf/b8jBlwk5WvQnfv80nPL6bZicySEA2xknEd7YhnPhV/pZX7QnnvprjyY091HbBaTYzD7FgNAxqZLz+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735057727; c=relaxed/simple;
-	bh=Y2Z/sX7zIWVVTBzvgeRydb+NMPOhH7fJwtvn0Ra7VJ0=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e+BcTy6EqeGIqbcOcjuhgL5svpWGinbTqQ4ekEa4bhpGdsyMsu1qpC4WmlUcAEbw4+BGspnbU6x18JjrtsQk3aLn8QZ+Lr+T3VQKFfQtrLJm1itzQKF5CbmWUIMv6zxQebqu9oP758rjygnY+j27965KpcALTOgtlIoIveaq2sM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YHgLH3PjSz6K6Nl;
-	Wed, 25 Dec 2024 00:28:23 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 990E8140391;
-	Wed, 25 Dec 2024 00:28:43 +0800 (CST)
-Received: from localhost (10.48.156.150) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 24 Dec
- 2024 17:28:42 +0100
-Date: Tue, 24 Dec 2024 16:28:40 +0000
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Zijun Hu <zijun_hu@icloud.com>
-CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
-	<rafael@kernel.org>, Tejun Heo <tj@kernel.org>, Josef Bacik
-	<josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, Boris Burkov
-	<boris@bur.io>, Davidlohr Bueso <dave@stgolabs.net>, Dave Jiang
-	<dave.jiang@intel.com>, Alison Schofield <alison.schofield@intel.com>, Vishal
- Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>, Dan
- Williams <dan.j.williams@intel.com>, <linux-kernel@vger.kernel.org>,
-	<cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-	<linux-cxl@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH v5 8/8] driver core: Move two simple APIs for finding
- child device to header
-Message-ID: <20241224162840.00004ff5@huawei.com>
-In-Reply-To: <20241224-class_fix-v5-8-9eaaf7abe843@quicinc.com>
-References: <20241224-class_fix-v5-0-9eaaf7abe843@quicinc.com>
-	<20241224-class_fix-v5-8-9eaaf7abe843@quicinc.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1735077125; c=relaxed/simple;
+	bh=1SccR7/85Ev+zmlVFYTm8gst8PE56/LLci2h9RzErFQ=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=thbvzo0wWvemi2M/gOGa2oU7/sQSlCbb7f2lhVsMdPdUSe+Jc/PpGhdFZE2gKRoaCT9GPN+BkwnHMYn1ThNlAHafxULyGIFsY6cV4jhO3gpnRf/8Dya4ox2Bi3zdPuXg8AA/ARU/8ID5AWWySPUEMxjVr+aGINC2HNDBXXoZrbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a81684bac0so108492145ab.0
+        for <linux-block@vger.kernel.org>; Tue, 24 Dec 2024 13:52:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735077123; x=1735681923;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=76899iIyLRwwAHILxLbSYak/Z4CiuYUYRiqZJ99fGDw=;
+        b=l5eBdIhS3sdWukXVgLmP0fkDeskAsLFz3np1mKVLG+H5MaKR1TlX3L47OLV2dLm3yn
+         2/ukhlCWo4M7w9VoeLkEH17FjEZnQXARfeeHrrnyFxFpL74s9fKy8QoPA1XXRb5ZH0ml
+         W34VL082tzsLTO0Swo5ETVWnSKjYzoG7dZlZW4wGBbz5MwWAxBj+UiIRyWrlP2qf02cL
+         pj4HgswJDnkFCNXwGPIg2dHRRUEfd+FDTKlqg8itSiJ0QB86uak9cGoPO1Bbpo833vej
+         BqR6kIL8WKYvd3C6c9gPaU2IjYVRaBnAe/x2eBN+cnpZ5Yu3+go/mCc3PQ854l6MwXVK
+         eN6A==
+X-Forwarded-Encrypted: i=1; AJvYcCUBkqVnNaby7Xm4EZtbyhcyBz7tCdicFnFqbIkOI00NF7m9Rkrkj/TYxzlSpHlyLkexP4Xnds0WON2j4g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyLG8lsflPwR7tWPttmH1N1sZch0aeKnuT7quoEc6TN7rzbP/P
+	8u7WuYztqz9eRUm6+5pY3MkLbiSX9SZ91OpZyc9f8O151C18ryWKXizhq7l9t1InEtnWDYUk8h+
+	xpBglfBM6qiKah7ih/huLmqm9SE4poi/cmxIyjJJpalUk0E/QdkkV8pM=
+X-Google-Smtp-Source: AGHT+IELSaY2yi5q69i55hpMIsdydyqjVz5Tv2kPSL6Z/IX0juRIHGLCcQNGIr1aG/W0dl6aCjEVM/jS5ksRpa6973mBK4SA3qoP
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
- frapeml500008.china.huawei.com (7.182.85.71)
+X-Received: by 2002:a05:6e02:20e8:b0:3a7:78a8:1fb4 with SMTP id
+ e9e14a558f8ab-3c2d2f47732mr141838765ab.13.1735077123166; Tue, 24 Dec 2024
+ 13:52:03 -0800 (PST)
+Date: Tue, 24 Dec 2024 13:52:03 -0800
+In-Reply-To: <672ad483.050a0220.2edce.1518.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <676b2d03.050a0220.2f3838.0229.GAE@google.com>
+Subject: Re: [syzbot] [usb?] [block?] WARNING: bad unlock balance in blk_mq_update_tag_set_shared
+From: syzbot <syzbot+5007209c85ecdb50b5da@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, ming.lei@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 24 Dec 2024 21:37:27 +0800
-Zijun Hu <zijun_hu@icloud.com> wrote:
+syzbot has bisected this issue to:
 
-> From: Zijun Hu <quic_zijuhu@quicinc.com>
-> 
-> The following two APIs are for finding child device, and both only have
-> one line code in function body.
-> device_find_child_by_name()
-> device_find_any_child()
-> 
-> Move them to header as static inline function.
-> 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+commit f1be1788a32e8fa63416ad4518bbd1a85a825c9d
+Author: Ming Lei <ming.lei@redhat.com>
+Date:   Fri Oct 25 00:37:20 2024 +0000
 
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+    block: model freeze & enter queue as lock for supporting lockdep
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1064ffe8580000
+start commit:   c88416ba074a Add linux-next specific files for 20241101
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1264ffe8580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1464ffe8580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=704b6be2ac2f205f
+dashboard link: https://syzkaller.appspot.com/bug?extid=5007209c85ecdb50b5da
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16d34740580000
+
+Reported-by: syzbot+5007209c85ecdb50b5da@syzkaller.appspotmail.com
+Fixes: f1be1788a32e ("block: model freeze & enter queue as lock for supporting lockdep")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
