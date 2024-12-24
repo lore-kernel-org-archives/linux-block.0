@@ -1,76 +1,95 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pv50p00im-ztdg10012001.me.com (pv50p00im-ztdg10012001.me.com [17.58.6.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5031BDAAF
-	for <linux-block@vger.kernel.org>; Tue, 24 Dec 2024 12:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B895F1BCA19
+	for <linux-block@vger.kernel.org>; Tue, 24 Dec 2024 12:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735044846; cv=none; b=Cf+fCVEvLZr+0Mjlcv+EmEkBRnwBBQsENa1do3GDNAgCnJeQI9H0e5Bp1USa1yplcTBMtJ/6aonne2YVIp0bICDyVjoQ994q/3uNllT6AZnrR6XCgPaVEU6jsCQJw+G3GYFiETqCJjN1q2cAwr3RW7Pw4DOC8+DeTwSQB6YLysU=
+	t=1735044954; cv=none; b=aEVyqJL9erqutaDvk/eUr+fE4nhsl/jfdRiSE0qSxvL8SLRhiQM500tMQqYOw9Rx6HQvrPMCmMnE85YG3H1jvXXoChd9sYK3L/fXpLlWsgRGHJERv4dWehC9tG3kqT1+KaVMI0rbvTfKXry25lq46iAZivQBNKnQ/SM7B0Pe7v8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735044846; c=relaxed/simple;
-	bh=evKkQ6HRgFCs4qvyPiGUzDaLav0G3Y1QWg/On8rwMgs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=ImRkK/VY2o2RQSLxIfzyclNAP61S09kKSeRZWoPFUBNW670RSmMQlrRs04FIeiXQvpMbj5fKr6JO+m+swZ1yQ+gaSMb3F7DZLKoyw/OvMHEG8hzvVjNOMuTrmCoABgTpUdx/aoUHULS2F4mFltg8yRPXG7YAjzmDxd7pQoiSFac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a9d075bdc3so87796465ab.3
-        for <linux-block@vger.kernel.org>; Tue, 24 Dec 2024 04:54:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735044844; x=1735649644;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1AXNF3HG5kzxLMUq/sCEuz5IDc2syA6hOB1XtzvB2IU=;
-        b=mRLVybk3Ei964kbKEw2pp+lV2wCimlSFOhgfo8+AenNGsfDjwo4YPyPuerJt+2BCS0
-         9gOj1tD4G3l4fceCV6Dflf1AWy8+a1XO11HT7UCOgXI2EYjsIlwDW/CtS0KX20NaEMPs
-         Tl2V7miWF7JJm3Z8NL/PTgzACSoEJkJB+pcassns8ATWdX3PSrryhvlk/m3cP+8rE+Dg
-         7lrrPrimbcfW+jcT7Gp+XSuip6Pv4Z4oU5mkUS/7yA5TRaAzw3uIKwlFBq1PLBSg6zQm
-         vxJ+KQ64dZvzqVVTRcHamYgb1wBzIgveZ8HX5RWMppLoBjkyuUOzdJmCiJUAaYY1L/c7
-         2Fkg==
-X-Forwarded-Encrypted: i=1; AJvYcCWJzezkXMp34c9PckeRjCN5JNk8ri9MwLgi73/9qR5IcYi7OlWxFBzJTQJc/qHRZsQfP97mPiBQfszRMQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCLXzZ9QutQSCNnWj4ohWHwQu9jpAiHe5rNngnGQiEakuNiMOW
-	Cz0gQ0/TTMTjTgoJoLoOhaVJuEDhrwx+2J1BLLy2edrWeaseHoqttm7dxDTc5lCAlIPfOtU1SS2
-	GLEgZw/t18vp109fFCzglOuNN9QfRCdGlVXiId1X0zjy/y9rjgqqkcj8=
-X-Google-Smtp-Source: AGHT+IFjNd65RorbDiw7iPiMhcltosJUGUn7EAB+95J5DOXJQ45jC/wCOMvdSBeDexbbzglCBhMkkC+Z1x7VGvejquji3l3KC5+/
+	s=arc-20240116; t=1735044954; c=relaxed/simple;
+	bh=wJNmse+U2BcREgt6jHP5mffCCar/iqKYYB3PO3YxYco=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MZs+zZgWcYaH48z4jyc8Tq51fvxEOX3P9h3imDk8yHCjtIs/4bazijN3gPVMTsU6+LEUMpYrU/sXvvHw47RGVudN2auHJZw9kZ9lpzphQ3pe/DRSDpLkH9COlF8tY9UjsaTWn7FyHV1lq4GbcJLfMQdU+SXv3N5UkpdD3iK9Wh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=EG3/2JQq; arc=none smtp.client-ip=17.58.6.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="EG3/2JQq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1735044950;
+	bh=qcfWDpvVWNhEetxodKQbf9RhUrYXCg1pOSV/TOgjh8E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
+	 x-icloud-hme;
+	b=EG3/2JQqEx9JwRea3li9dBqaxu0my5/071veaECaERiiL2HaxnutzGeLfRCkdliQ+
+	 l940chB1rDnqfX/zgUAMjMfCU9KCfBl50dd3AYHL+BCjR/LpEszClrwiiaaocUKdO0
+	 Dl2mV4JdKdh/0YgEJ9BJeUrYbnqeEK32HyBu1kdqSpd48WyUj+xOOrG2TPE3uWXjqg
+	 r0ghBcmj98blLsL7LbynIl9mcuoDXs3AWmbkxfj5bUUIay9lmZdqN/eU6kd0SaVrTM
+	 GRnywuJAX30KYKqxhMDjwHXII0rz8Gc6kAVu3/J0Bdy+37cstoObgEcm810pSSyaY/
+	 iCj0P90MAhf9w==
+Received: from [192.168.1.25] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-ztdg10012001.me.com (Postfix) with ESMTPSA id 7FC60A027E;
+	Tue, 24 Dec 2024 12:55:41 +0000 (UTC)
+Message-ID: <16a5d190-29b0-46f5-9845-a1d875211729@icloud.com>
+Date: Tue, 24 Dec 2024 20:55:25 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3b85:b0:3a7:8c3f:edce with SMTP id
- e9e14a558f8ab-3c2d14d21a9mr179594035ab.3.1735044843942; Tue, 24 Dec 2024
- 04:54:03 -0800 (PST)
-Date: Tue, 24 Dec 2024 04:54:03 -0800
-In-Reply-To: <672ad716.050a0220.2a847.1a9e.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <676aaeeb.050a0220.2f3838.01aa.GAE@google.com>
-Subject: Re: [syzbot] [usb?] [block?] possible deadlock in blk_mq_alloc_request
-From: syzbot <syzbot+ca7d7c797fee31d2b474@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, ming.lei@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 05/11] driver core: Simplify API
+ device_find_child_by_name() implementation
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
+ James Bottomley <James.Bottomley@HansenPartnership.com>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>,
+ linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-sound@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
+ linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-serial@vger.kernel.org, netdev@vger.kernel.org,
+ Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20241211-const_dfc_done-v4-0-583cc60329df@quicinc.com>
+ <20241211-const_dfc_done-v4-5-583cc60329df@quicinc.com>
+ <20241223203935.00003de0@huawei.com>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <20241223203935.00003de0@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: TfHq9KcTAjJLJHGN7Cnpr8airBeAqUiz
+X-Proofpoint-GUID: TfHq9KcTAjJLJHGN7Cnpr8airBeAqUiz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-24_05,2024-12-24_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0
+ malwarescore=0 mlxlogscore=846 phishscore=0 mlxscore=0 spamscore=0
+ clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412240112
 
-syzbot has bisected this issue to:
+On 2024/12/24 04:39, Jonathan Cameron wrote:
+> There is a subtle difference.  In theory old code could dereference a NULL
+> if parent->p == NULL, now it can't.  Sounds at most like a harmless change but
+> maybe you should mention it.
+> 
 
-commit f1be1788a32e8fa63416ad4518bbd1a85a825c9d
-Author: Ming Lei <ming.lei@redhat.com>
-Date:   Fri Oct 25 00:37:20 2024 +0000
+i did not correct parameter checking for device_find_child_by_name() in
+below commit
 
-    block: model freeze & enter queue as lock for supporting lockdep
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/base/core.c?id=903c44939abc02e2f3d6f2ad65fa090f7e5df5b6
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15fd34c4580000
-start commit:   c88416ba074a Add linux-next specific files for 20241101
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=17fd34c4580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=13fd34c4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=704b6be2ac2f205f
-dashboard link: https://syzkaller.appspot.com/bug?extid=ca7d7c797fee31d2b474
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1250b630580000
+since this commit will come finally, actually, this commit is the
+original motivation of this whole patch series.
 
-Reported-by: syzbot+ca7d7c797fee31d2b474@syzkaller.appspotmail.com
-Fixes: f1be1788a32e ("block: model freeze & enter queue as lock for supporting lockdep")
+> Otherwise LGTM
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
