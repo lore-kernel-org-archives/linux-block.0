@@ -1,39 +1,39 @@
-Received: from pv50p00im-tydg10011801.me.com (pv50p00im-tydg10011801.me.com [17.58.6.52])
+Received: from pv50p00im-zteg10021401.me.com (pv50p00im-zteg10021401.me.com [17.58.6.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601891B5ECB
-	for <linux-block@vger.kernel.org>; Tue, 24 Dec 2024 13:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B111BD032
+	for <linux-block@vger.kernel.org>; Tue, 24 Dec 2024 13:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735045812; cv=none; b=kAw2bRhsvVpAWME0FAIfpt+YgdMyfrWsaY1Jl8Jax3Tc9fHapMYQ+QURbgZUSAcID7WdUhBoEo3EpDvW0lsb+G1OagBYYuZw05dqeZoCbpqyb8/ckiCdEkp7dgVz/OzHldb+RRkAUg+mNQPkGIcLOzOGS30a/zzikqyXcA82PW4=
+	t=1735047483; cv=none; b=qBWvjRncrmqxIf/N/v2leZ0OPs/BhdFRu9zsSO0d4FLfIrwAzx0G1npqV+pTkpleaD4rVlDLLc9FTT7PcePOPcEU3HT0orauRmbthlKhrPk2qc/DFr9sumi1Nryhgs7Lsob+Jo93Ft9HdMSDakcwIEOHza2T+IYadJ7kxnDCT/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735045812; c=relaxed/simple;
-	bh=d3RWbfmtjm10GAZA1NaOSKX3f3hNp1vr+fuyWoNuJcw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=AD+b5bEpcO5zi/LQ2Cf3cwOlHFMzQu1GYtVxN4hI58VirEp2bW59wg2GSnu/RFlsEPqn9pAhDj3YxW4vI/YG7cb+zpqbD097ElbVXxa8GRM1Cs/1T5eYK5/g4p0lTWDm4Z7i9FKEirjLJhCvboFmLOQFly1ndEGg3T3GowFY1zE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=AxVPJ8xE; arc=none smtp.client-ip=17.58.6.52
+	s=arc-20240116; t=1735047483; c=relaxed/simple;
+	bh=aPpvpsXi/EswvNPIWLSY3NMmTXIESW+FEK9y737W7DM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=OGSwKlLK0s8ELL0chkfZotd8Mpu+nnwwpZTK8E80xLy/tbivDwcFG+FFOul/UNEHwDv9D/xpHCtnsR4DJIPJNRlfl/+DfEhdbnauvCgKxoKyObmKadd0IzrIyj1mjTbivRrl44yN7sZRSXKv6wg5Colc8uSxnbgtDTcRCQsc27Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=iSCCEvwb; arc=none smtp.client-ip=17.58.6.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="AxVPJ8xE"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="iSCCEvwb"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1735045809;
-	bh=+P6kTmCwDbC0RwMmjYjZfzPZ5o9SCTkxH8bGJ/DVcdQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:
+	s=1a1hai; t=1735047480;
+	bh=2M+Ps+FibYYAOJJogIDlBEZcgzam9+JgkUrzpg6dnvM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:
 	 x-icloud-hme;
-	b=AxVPJ8xE7IiWw6cbo3S5ZKZH3z7Hi9BUCVDPv3Qac/bUNw+Uy7la0cfvpXstl+R4k
-	 d3OR2kxsnE9TSpGo7hvUmbo4QD9z8W53buY16wxOWexw8kdAhCGZVYEdCZpZubHHBV
-	 FY/SiAYUWqLyNhjNdzpmG1NQAJtyxSptm6XdXCGRH5Z+qqIzZuu8our/KH95GMqI+4
-	 XrQBTucyWATdZwbvxuwF251RmjTy3jciENN89GtSSAxwZNLsAzmepoHHTKruasMtEb
-	 OZHtDY4ufCWqDFkuZR/Iwudf2DFvbXwAEBZQhombPvvzSSH6bbnpLli7EPmNjXwGmD
-	 2UufvwkDZOHLw==
+	b=iSCCEvwbMfDiev3yj74Qz29bPrGor0p7hJGBQowBJl5Pq737zlAF0czSIT2fjqTKg
+	 JabxybUNk5dZmQgZjZU2c+XTaKaIMSC1uXOHdDD8C8jIjsjuFkqqyLj4QdZpsqJxUa
+	 uyqWwsOkj3JFBEhRqMvPHLFB72pBbQKxsHwNrtPOE5kkvAy4Uc6kkxsE5+iCzLgsjU
+	 Wu9rUeAzYCDK0qoAGKrFw9g6lVPbCjl3Xl/yXXQoV8NXsSsrO8qxzHfs9kQ/m6ygjU
+	 0IBv9tloinF0k2Tm+FYLTNOMNOwn3vrox4HSX6ZCDQmecwtD04j1ZPNCO7dcv3TwWs
+	 F858WPBrGAfsw==
 Received: from [192.168.1.25] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-tydg10011801.me.com (Postfix) with ESMTPSA id C8CD58001A5;
-	Tue, 24 Dec 2024 13:09:34 +0000 (UTC)
+	by pv50p00im-zteg10021401.me.com (Postfix) with ESMTPSA id C89A48E0535;
+	Tue, 24 Dec 2024 13:37:51 +0000 (UTC)
 From: Zijun Hu <zijun_hu@icloud.com>
-Date: Tue, 24 Dec 2024 21:05:11 +0800
-Subject: [PATCH v5 12/12] usb: typec: class: Remove both cable_match() and
- partner_match()
+Subject: [PATCH v5 0/8] driver core: class: Fix bug and code improvements
+ for class APIs
+Date: Tue, 24 Dec 2024 21:37:19 +0800
+Message-Id: <20241224-class_fix-v5-0-9eaaf7abe843@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,132 +42,105 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241224-const_dfc_done-v5-12-6623037414d4@quicinc.com>
-References: <20241224-const_dfc_done-v5-0-6623037414d4@quicinc.com>
-In-Reply-To: <20241224-const_dfc_done-v5-0-6623037414d4@quicinc.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>, 
- Bartosz Golaszewski <brgl@bgdev.pl>, 
- =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>, 
- James Bottomley <James.Bottomley@HansenPartnership.com>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>, 
- Zijun Hu <zijun_hu@icloud.com>, linux-kernel@vger.kernel.org, 
- nvdimm@lists.linux.dev, linux-sound@vger.kernel.org, 
- sparclinux@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-cxl@vger.kernel.org, linux1394-devel@lists.sourceforge.net, 
- arm-scmi@vger.kernel.org, linux-efi@vger.kernel.org, 
- linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org, 
- linux-mediatek@lists.infradead.org, linux-hwmon@vger.kernel.org, 
- linux-media@vger.kernel.org, linux-pwm@vger.kernel.org, 
- linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org, 
- linux-usb@vger.kernel.org, linux-serial@vger.kernel.org, 
- netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIABC5amcC/23R207DMAwG4Fepck2QnUOb9or3QGjKwWGRWDuaU
+ oGmvTveJkQnyJ2dfH8i5yQqzYWqGJqTmGkttUwjF/ahEXHvx1eSJXEtFCiDCEbGN1/rLpdPmbF
+ rQ+opeKUEnz/OxO1r1vML1/tSl2n+ukaveOn+pNhNyooSpAPXtrnve+Pt0/tHiWWMj3E6iEvOq
+ jYW1dYqtp1O2LsEHtI/Vv9adW81WzCkIJoMfYd/rdlat7WGrY4GGDpt23Bvz7dhzMTdWpbbRET
+ wlSTvH8oyNJ1LJmu+HdEGi12IIVNHERKgC7x4GgGCE9t/GJrbWwA5Z6zLLuW4S9NI0nuKHZIOg
+ fywWn7C+RtNWEdj2gEAAA==
+X-Change-ID: 20241104-class_fix-f176bd9eba22
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>, 
+ Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, 
+ Boris Burkov <boris@bur.io>, Davidlohr Bueso <dave@stgolabs.net>, 
+ Jonathan Cameron <jonathan.cameron@huawei.com>, 
+ Dave Jiang <dave.jiang@intel.com>, 
+ Alison Schofield <alison.schofield@intel.com>, 
+ Vishal Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+ Dan Williams <dan.j.williams@intel.com>
+Cc: Zijun Hu <zijun_hu@icloud.com>, linux-kernel@vger.kernel.org, 
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-cxl@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>, 
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+ =?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, stable@vger.kernel.org, 
+ Fan Ni <fan.ni@samsung.com>
 X-Mailer: b4 0.14.2
-X-Proofpoint-GUID: eTLCtiKK8Fgfs3nYwpfa688b2JqfTn65
-X-Proofpoint-ORIG-GUID: eTLCtiKK8Fgfs3nYwpfa688b2JqfTn65
+X-Proofpoint-GUID: coH3phFozP4hnAwycRiGvxyw7YgmntRK
+X-Proofpoint-ORIG-GUID: coH3phFozP4hnAwycRiGvxyw7YgmntRK
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2024-12-24_05,2024-12-24_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 clxscore=1015 mlxscore=0
- spamscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2412240114
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=846
+ bulkscore=0 adultscore=0 suspectscore=0 malwarescore=0 mlxscore=0
+ spamscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2412240118
 X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
 
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-
-cable_match(), as matching function of device_find_child(), matches
-a device with device type @typec_cable_dev_type, and its task can be
-simplified by the recently introduced API device_match_type().
-
-partner_match() is similar with cable_match() but with a different
-device type @typec_partner_dev_type.
-
-Remove both functions and use the API plus respective device type instead.
+This patch series is to fix bugs and improve codes regarding various
+driver core device iterating APIs
 
 Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 ---
- drivers/usb/typec/class.c | 27 ++++++++++++---------------
- 1 file changed, 12 insertions(+), 15 deletions(-)
+Changes in v5:
+- Add comments back and correct tile and commit messages for patch 8/8.
+- Link to v4: https://lore.kernel.org/r/20241218-class_fix-v4-0-3c40f098356b@quicinc.com
 
-diff --git a/drivers/usb/typec/class.c b/drivers/usb/typec/class.c
-index 601a81aa1e1024265f2359393dee531a7779c6ea..3a4e0bd0131774afd0d746d2f0a306190219feec 100644
---- a/drivers/usb/typec/class.c
-+++ b/drivers/usb/typec/class.c
-@@ -1282,11 +1282,6 @@ const struct device_type typec_cable_dev_type = {
- 	.release = typec_cable_release,
- };
- 
--static int cable_match(struct device *dev, const void *data)
--{
--	return is_typec_cable(dev);
--}
--
- /**
-  * typec_cable_get - Get a reference to the USB Type-C cable
-  * @port: The USB Type-C Port the cable is connected to
-@@ -1298,7 +1293,8 @@ struct typec_cable *typec_cable_get(struct typec_port *port)
- {
- 	struct device *dev;
- 
--	dev = device_find_child(&port->dev, NULL, cable_match);
-+	dev = device_find_child(&port->dev, &typec_cable_dev_type,
-+				device_match_type);
- 	if (!dev)
- 		return NULL;
- 
-@@ -2028,16 +2024,12 @@ const struct device_type typec_port_dev_type = {
- /* --------------------------------------- */
- /* Driver callbacks to report role updates */
- 
--static int partner_match(struct device *dev, const void *data)
--{
--	return is_typec_partner(dev);
--}
--
- static struct typec_partner *typec_get_partner(struct typec_port *port)
- {
- 	struct device *dev;
- 
--	dev = device_find_child(&port->dev, NULL, partner_match);
-+	dev = device_find_child(&port->dev, &typec_partner_dev_type,
-+				device_match_type);
- 	if (!dev)
- 		return NULL;
- 
-@@ -2170,7 +2162,9 @@ void typec_set_pwr_opmode(struct typec_port *port,
- 	sysfs_notify(&port->dev.kobj, NULL, "power_operation_mode");
- 	kobject_uevent(&port->dev.kobj, KOBJ_CHANGE);
- 
--	partner_dev = device_find_child(&port->dev, NULL, partner_match);
-+	partner_dev = device_find_child(&port->dev,
-+					&typec_partner_dev_type,
-+					device_match_type);
- 	if (partner_dev) {
- 		struct typec_partner *partner = to_typec_partner(partner_dev);
- 
-@@ -2334,7 +2328,9 @@ int typec_get_negotiated_svdm_version(struct typec_port *port)
- 	enum usb_pd_svdm_ver svdm_version;
- 	struct device *partner_dev;
- 
--	partner_dev = device_find_child(&port->dev, NULL, partner_match);
-+	partner_dev = device_find_child(&port->dev,
-+					&typec_partner_dev_type,
-+					device_match_type);
- 	if (!partner_dev)
- 		return -ENODEV;
- 
-@@ -2361,7 +2357,8 @@ int typec_get_cable_svdm_version(struct typec_port *port)
- 	enum usb_pd_svdm_ver svdm_version;
- 	struct device *cable_dev;
- 
--	cable_dev = device_find_child(&port->dev, NULL, cable_match);
-+	cable_dev = device_find_child(&port->dev, &typec_cable_dev_type,
-+				      device_match_type);
- 	if (!cable_dev)
- 		return -ENODEV;
- 
+Changes in v4:
+- Squich patches 3-5 into one based on Jonathan and Fan comments.
+- Add one more patch 
+- Link to v3: https://lore.kernel.org/r/20241212-class_fix-v3-0-04e20c4f0971@quicinc.com
 
+Changes in v3:
+- Correct commit message, add fix tag, and correct pr_crit() message for 1st patch
+- Add more patches regarding driver core device iterating APIs.
+- Link to v2: https://lore.kernel.org/r/20241112-class_fix-v2-0-73d198d0a0d5@quicinc.com
+
+Changes in v2:
+- Remove both fix and stable tag for patch 1/3
+- drop patch 3/3
+- Link to v1: https://lore.kernel.org/r/20241105-class_fix-v1-0-80866f9994a5@quicinc.com
+
+---
+Zijun Hu (8):
+      driver core: class: Fix wild pointer dereferences in API class_dev_iter_next()
+      blk-cgroup: Fix class @block_class's subsystem refcount leakage
+      driver core: Move true expression out of if condition in 3 device finding APIs
+      driver core: Rename declaration parameter name for API device_find_child() cluster
+      driver core: Correct parameter check for API device_for_each_child_reverse_from()
+      driver core: Correct API device_for_each_child_reverse_from() prototype
+      driver core: Introduce device_iter_t for device iterating APIs
+      driver core: Move two simple APIs for finding child device to header
+
+ block/blk-cgroup.c            |  1 +
+ drivers/base/bus.c            |  9 +++++---
+ drivers/base/class.c          | 11 ++++++++--
+ drivers/base/core.c           | 49 +++++++++----------------------------------
+ drivers/base/driver.c         |  9 +++++---
+ drivers/cxl/core/hdm.c        |  2 +-
+ drivers/cxl/core/region.c     |  2 +-
+ include/linux/device.h        | 46 +++++++++++++++++++++++++++++++---------
+ include/linux/device/bus.h    |  7 +++++--
+ include/linux/device/class.h  |  4 ++--
+ include/linux/device/driver.h |  2 +-
+ 11 files changed, 78 insertions(+), 64 deletions(-)
+---
+base-commit: 78d4f34e2115b517bcbfe7ec0d018bbbb6f9b0b8
+change-id: 20241104-class_fix-f176bd9eba22
+prerequisite-change-id: 20241201-const_dfc_done-aaec71e3bbea:v5
+prerequisite-patch-id: 536aa56c0d055f644a1f71ab5c88b7cac9510162
+prerequisite-patch-id: 39b0cf088c72853d9ce60c9e633ad2070a0278a8
+prerequisite-patch-id: 60b22c42b67ad56a3d2a7b80a30ad588cbe740ec
+prerequisite-patch-id: 119a167d7248481987b5e015db0e4fdb0d6edab8
+prerequisite-patch-id: 133248083f3d3c57beb16473c2a4c62b3abc5fd0
+prerequisite-patch-id: 4cda541f55165650bfa69fb19cbe0524eff0cb85
+prerequisite-patch-id: 2b4193c6ea6370c07e6b66de04be89fb09448f54
+prerequisite-patch-id: 73c675db18330c89fd8ca4790914d1d486ce0db8
+prerequisite-patch-id: 88c50fc851fd7077797fd4e63fb12966b1b601bd
+prerequisite-patch-id: 47b93916c1b5fb809d7c99aeaa05c729b1af01c5
+prerequisite-patch-id: 5b58c0292ea5a5e37b08e2c8287d94df958128db
+prerequisite-patch-id: 52ffb42b5aae69cae708332e0ddc7016139999f1
+
+Best regards,
 -- 
-2.34.1
+Zijun Hu <quic_zijuhu@quicinc.com>
 
