@@ -1,37 +1,37 @@
 Received: from pv50p00im-ztdg10021201.me.com (pv50p00im-ztdg10021201.me.com [17.58.6.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5942D1B414D
-	for <linux-block@vger.kernel.org>; Tue, 24 Dec 2024 12:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84591B87DA
+	for <linux-block@vger.kernel.org>; Tue, 24 Dec 2024 12:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735043637; cv=none; b=V8xiUV1M++B/u1+uTEVaFge1dl/qSxRxb3A90srjyjxTqQm6h5jPQmS3+Dr6El3TGBEugt8lc5judCdB8vvjLcKgJRhcBmr5FmzQWKullTk3ey0RuZ1mOP5ZoVIcmRNe8DDJVW32BQ4hAcm2n7kRf6U0WlXwCQRoX+1ePr9zeo4=
+	t=1735043828; cv=none; b=MDqTqMm++K949sJwcu/HrRUBqkiN0RGshuTfg6rSxZ3l8Gp7ah2atQmQHQghCqqm3elKs7PTOHztuFzjs/3OwmoGlhtrSIoP34M6MxbxRbyGvsJj2mss4vJxsFpG0e5CP9vVGVDJcP3cM/g0ZnqSzy8/maip9O7IIoxOxnNZZYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735043637; c=relaxed/simple;
-	bh=1EQ0yurKM95jBWQ00/8VBZ5AGN/p7LjsJnJEMi4OJfs=;
+	s=arc-20240116; t=1735043828; c=relaxed/simple;
+	bh=Y2aWjrUlygVLOASMCiCstQK+MExRxhb4eTy19Yziwd8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VQZztDum1ciS46k46iV60/yqREzsufYiPbiNYhycWaYFhlnhf+tljpETiueoqMr6rihUC4q7zxOySJ96mz83Q1A4JYI7LtRn0XbkLtnXV4jx1w8CabWJYmc5oVPEvHFmXvJ+ce5sqFUwWJmBH6lsafjHn72S1fChQGl+vd8VhTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=bYZwLVxp; arc=none smtp.client-ip=17.58.6.45
+	 In-Reply-To:Content-Type; b=lkcePnLR4KpespNB78+swwK6wRsf1IeqdDu5+wA7qEDYqlmRn/nTqk6VMi+ftlNffE5pj5XVEkJPsWKyu5hKWaL1VAc0RES/w4WJqdLPvb+UwzzRsWefvZugCnNy7RAsJ4f4v9G4jnlX46BN4RcJ0lLHSvmGyDg515CKPZJQvF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=NFw8nGV4; arc=none smtp.client-ip=17.58.6.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="bYZwLVxp"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="NFw8nGV4"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1735043635;
-	bh=VkUkiz3yqLlBsjFYgea5cThovJocXi+1zjk/aOOMWXM=;
+	s=1a1hai; t=1735043825;
+	bh=Gc2WCxVDa+xL90LnfPEoTmxwnPsFBGQJFu6/HAU7lKY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
 	 x-icloud-hme;
-	b=bYZwLVxpIKtIB73umt9vs3izWRVLzBuxUKHfhtuVtFqN/JVq1c8cb3B0sTa/xSH3h
-	 Ge+zVp3j9JCc5DEJsidvyOajnBzM1DukkGqILtXYHAuLZKN56ZLJg/8H/Yw5oOdvmX
-	 5/YdEbftIkjMAH8swSJcrv30ht+WBnhCA9lzmMrawWxWtwOrROI8a7TwdTBYw0n4fK
-	 k6oTWjS/wyBlLg7/lQLNUkOqLx2nBaGB7ID6cDMaLwXzaiPxMXo5ZRHqWb+6PwP61o
-	 Rd1545PmmNV9FF3oZVFVh7fNueMLIhUAXnT3lJxyaljynAFRAx+v8zYMM6H1WwI3gt
-	 0KUChOymqniQw==
+	b=NFw8nGV4mMSulnri61yzK+qJGcy9/Ch+dsuJHrKfVwVsiimtCnAG3h8rFHRxp+Uyz
+	 upQRA6wkcAq6UoCdHY35JVRQ8fAMwi0fFRWx45ifLIDKIpYYNfnCXbGxhfEOaQYXsR
+	 1vp17v6CL5aedV5Ya9jk+HyrT7k0UWB64khbCMphdv/pxVqrNG01HpV70G71hkXLci
+	 t2DsBn5eAui7bmqHM/lylU/XqVzY8Fkjio57aPrnWpZ6YDIPQmlxL9eysloKkBj+Wn
+	 CHNdKt4EUe+nfzoaAy+0w9w20JbbblWFRe+AQzyMxBHNEYMWVIIso0RplKSOHi0f8w
+	 fzQi63k6MyURg==
 Received: from [192.168.1.25] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10021201.me.com (Postfix) with ESMTPSA id D05C23118A91;
-	Tue, 24 Dec 2024 12:33:48 +0000 (UTC)
-Message-ID: <39bb2acb-b003-43b1-af6d-81c99f6b47eb@icloud.com>
-Date: Tue, 24 Dec 2024 20:33:44 +0800
+	by pv50p00im-ztdg10021201.me.com (Postfix) with ESMTPSA id 14C393118B4A;
+	Tue, 24 Dec 2024 12:36:26 +0000 (UTC)
+Message-ID: <b69310bb-0e95-4706-a43d-569e4a1b104e@icloud.com>
+Date: Tue, 24 Dec 2024 20:36:04 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,53 +39,53 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 8/8] driver core: Move 2 one line device finding APIs
- to header
+Subject: Re: [PATCH v4 03/11] bus: fsl-mc: Constify fsl_mc_device_match()
 To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>,
- Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
- Boris Burkov <boris@bur.io>, Davidlohr Bueso <dave@stgolabs.net>,
- Dave Jiang <dave.jiang@intel.com>,
- Alison Schofield <alison.schofield@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>,
- Dan Williams <dan.j.williams@intel.com>, linux-kernel@vger.kernel.org,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-cxl@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20241218-class_fix-v4-0-3c40f098356b@quicinc.com>
- <20241218-class_fix-v4-8-3c40f098356b@quicinc.com>
- <20241223201152.000012d1@huawei.com>
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
+ James Bottomley <James.Bottomley@HansenPartnership.com>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>,
+ linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
+ linux-sound@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
+ linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-serial@vger.kernel.org, netdev@vger.kernel.org,
+ Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20241211-const_dfc_done-v4-0-583cc60329df@quicinc.com>
+ <20241211-const_dfc_done-v4-3-583cc60329df@quicinc.com>
+ <20241223202635.00005a0a@huawei.com>
 Content-Language: en-US
 From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <20241223201152.000012d1@huawei.com>
+In-Reply-To: <20241223202635.00005a0a@huawei.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: 8CGMWjQZE3d2DTieq3tSpsGjx9dZnMRJ
-X-Proofpoint-GUID: 8CGMWjQZE3d2DTieq3tSpsGjx9dZnMRJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2024-12-24_04,2024-12-24_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=993 bulkscore=0 spamscore=0
- phishscore=0 mlxscore=0 malwarescore=0 suspectscore=0 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2412240108
 
-On 2024/12/24 04:11, Jonathan Cameron wrote:
+On 2024/12/24 04:26, Jonathan Cameron wrote:
+> On Wed, 11 Dec 2024 08:08:05 +0800
+> Zijun Hu <zijun_hu@icloud.com> wrote:
+> 
 >> From: Zijun Hu <quic_zijuhu@quicinc.com>
 >>
->> The following device finding APIs only have one line code in function body
->> device_find_child_by_name()
->> device_find_any_child()
+>> fsl_mc_device_match() does not modify caller's inputs.
 >>
->> Move them to header as static inline function.
-> Why drop the docs?
-> 
-thank you Jonathan for code review.
-
-will add these comments back in next revision.
-
-i do not notice the comments include important info, and think the API
-name prompts what the API does, so remove the comments. my mistake.
-
+>> Constify it by simply changing its parameter types to const pointer.
+>>
 >> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> Similar to previous patch, I'd say why you are making this change.
+> There are may places in the kernel where pointers are constant but
+> not marked so. Why does this one matter?  
+> 
+
+thank you for code review.
+make sense.
+will correct comment message for this and previous patch in v5.
+
+> With that info added
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
