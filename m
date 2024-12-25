@@ -1,55 +1,58 @@
 Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4BA915383C
-	for <linux-block@vger.kernel.org>; Wed, 25 Dec 2024 10:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37D81514DC
+	for <linux-block@vger.kernel.org>; Wed, 25 Dec 2024 10:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735121398; cv=none; b=LY9tsx34XYX8G6PRPmLwikSc8VMMyrqH3GwyOKqtb1ElHu70YcYp08GKxWlZsw5rd1v53jvWy4a5/7gIO0UZ8bb6c1st4TOHr3d09Cnc7ofgZmNSfP9bj9StAT//Ss6R/0u64GGqLcHc7YDzk0UcFoToKSm0/cuYN2JzrGI2gFc=
+	t=1735121400; cv=none; b=egGGSXFpkWkcFe3C9PGoIDCDHZVEcGcQZPIw/vAeuZsI9kmbF2yvFq5hpS4OZtXd7okpAul3zbyBvi1yHPGIBRDpg2xhNt8nxAM/2PEfNrHyGXg9lzO4J6Kk4IX5jYWQBw55UiWJgtrMyVVi57VUOuI6oK4dBQEDgV67V04zVQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735121398; c=relaxed/simple;
-	bh=b61QRsKrcyExfiUBHDKOh55337NzNl3Y5uiFW5WtyZc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rus4HvCMU4sFMnG9rtsBx5qBH9xNRtLyCJIY0oCVZAo6XdFU6Kz8p8HF3/1euasloJg40ePcm/P1APiPT0r/sLvrEKBYfJHKmxJh9+eitCCu2U4+BLWYcV/tSozxKoflZeBYdZRlEtv2iKo6DQ5ljHbh/hZDl9s8z9yTnRaAil4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=d9JKBjb1; arc=none smtp.client-ip=68.232.141.245
+	s=arc-20240116; t=1735121400; c=relaxed/simple;
+	bh=TC+1dy04XXSHSKy2pYHcUFbRo1HknDnYg6m9PLGQoJM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GZFio0r9KTrBynSB2vFNY3lF9duNpYN4ZMHRkRd6uP1m0CSqw7o0d+AmfGkvaaUnZnGg7WVMCqYrwizNrqH0HVWAToBGb/k8ZNf7KCmySPi8i2njwmt5amhH66V2opU7qHGJtuHo4ouQOsFRYNwvitAyaaZXY3m3T1C7Pym5AGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=C0prhYJw; arc=none smtp.client-ip=68.232.141.245
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="d9JKBjb1"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="C0prhYJw"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1735121396; x=1766657396;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=b61QRsKrcyExfiUBHDKOh55337NzNl3Y5uiFW5WtyZc=;
-  b=d9JKBjb1RO0e1U07zCeoYksiA0m6Ut0/ZAf/9hnrBWLyFd+X+sSQ9QkK
-   5T2DwLTMzsv2E/EMS1BQqG7Ve3pe9i/FM2xYnC9lYWJrzImRT7BgH9VwX
-   R3VFJSLtpCBOgphvs7ZnpsdR+8NmSscLXWstLNJKHbtGiuOZU1XV5FszO
-   lopqJ6tME1vuTylEUxxDSoRVW/4m2bNwNk40E7jfEt0qAmlUY3AIfSmrx
-   5+UzVNL/9L0tEslmILa/cv9/gdHP4tae0Snt6WfW71kX067HXZF0aEdX8
-   PudQPIz0PkFvfa64rcFmP35oJo47e3FC3abcUybL9tTPzhPAE0G3u1xRx
-   A==;
-X-CSE-ConnectionGUID: Aa6g6D0YS8uf4+iKdhBuzA==
-X-CSE-MsgGUID: 3aRH9wTiRw6xhrPDoOGocg==
+  t=1735121398; x=1766657398;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=TC+1dy04XXSHSKy2pYHcUFbRo1HknDnYg6m9PLGQoJM=;
+  b=C0prhYJw9p1Cou9F/+YDbA9gq1OgUljclMsZ7nIJ1qdISLFoDlW9QhVl
+   eNl6hi2ipOhNNXEC1+Pr/nGH0z04cxOERm3LxVL+q7twiQgOJkh8GSU8q
+   Wi1Zsl2Y+FKKEQm8p8jSYvqBosN9bRw5qoQamg7iMuyQO4bV0bWhgeSmO
+   HU6GBYvqW2twaHqW0qx1k9NXCD0GTIGt1ECwyIfQWpBzs83hENss+xSJX
+   RSnbTfvSyzl8XVSHuaBmxcPVp2qVmOjNfqlH475nIrUMWkutxBCkZuRA2
+   u1rxWros7cg7yFVjciB9PbdrGnes65O1dq2U09O5pe5iVeXZ8uc03bo62
+   Q==;
+X-CSE-ConnectionGUID: Xp5upOxiTF2fkELgJxxKSA==
+X-CSE-MsgGUID: e3QQzCGLRRq3VMHhwNlszQ==
 X-IronPort-AV: E=Sophos;i="6.12,263,1728921600"; 
-   d="scan'208";a="35812593"
+   d="scan'208";a="35812595"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Dec 2024 18:09:50 +0800
-IronPort-SDR: 676bcc7a_93FJN2GLxUyUi2RG4oLIEB/9ZjPfgIQF4bOzXQEQXH0Helk
- 6cBvT32F6Pjop/jfuLQyEb2gwOOBHm9mQmdraew==
+  by ob1.hgst.iphmx.com with ESMTP; 25 Dec 2024 18:09:51 +0800
+IronPort-SDR: 676bcc7b_fT/swpSAN2hMNJcbXWO235DJeoAXjlokJlavxFq246LcALS
+ jnxQngCGnBSsizLmiItUUFCTCQd7Ppa1NFPJ0aw==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Dec 2024 01:12:27 -0800
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Dec 2024 01:12:28 -0800
 WDCIronportException: Internal
 Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip02.wdc.com with ESMTP; 25 Dec 2024 02:09:49 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 25 Dec 2024 02:09:50 -0800
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org,
 	Jens Axboe <axboe@kernel.dk>
 Cc: Damien Le Moal <dlemoal@kernel.org>,
 	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH for-next v2 0/4] null_blk: improve write failure simulation
-Date: Wed, 25 Dec 2024 19:09:45 +0900
-Message-ID: <20241225100949.930897-1-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH for-next v2 1/4] null_blk: generate null_blk configfs features string
+Date: Wed, 25 Dec 2024 19:09:46 +0900
+Message-ID: <20241225100949.930897-2-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241225100949.930897-1-shinichiro.kawasaki@wdc.com>
+References: <20241225100949.930897-1-shinichiro.kawasaki@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,37 +61,145 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently, null_blk has 'badblocks' attribute to simulate IO failures
-for broken blocks. This helps checking if userland tools can handle IO
-failures. However, this badblocks feature has two differences from the
-IO failures on real storage devices. Firstly, when write operations fail
-for the badblocks, null_blk does not write any data, while real storage
-devices sometimes do partial data write. Secondly, null_blk always make
-write operations fail for the specified badblocks, while real storage
-devices can recover the bad blocks so that next write operations can
-succeed after failure. Hence, real storage devices are required to check
-if userland tools support such partial writes or bad blocks recovery.
+The null_blk configfs file 'features' provides a string that lists
+available null_blk features for userspace programs to reference.
+The string is defined as a long constant in the code, which tends to be
+forgotten for updates. It also causes checkpatch.pl to report
+"WARNING: quoted string split across lines".
 
-This series improves write failure simulation by null_blk to allow
-checking userland tools without real storage devices. The first patch
-is a preparation to make new feature addition simpler. The second and
-the third patches add partial IO support. The last patch introduces
-'badblocks_once' attribute to simulate bad blocks recovery.
+To avoid these drawbacks, generate the feature string on the fly. Refer
+to the ca_name field of each element in the nullb_device_attrs table and
+concatenate them in the given buffer. Also, modify order of the
+nullb_device_attrs table to not change the list order of the generated
+string.
 
-Changes from v1:
-* Added the first patch which avoids the long, multi-line features string
+Of note is that the feature "index" was missing before this commit.
+This commit adds it to the generated string.
 
-Shin'ichiro Kawasaki (4):
-  null_blk: generate null_blk configfs features string
-  null_blk: do partial IO for bad blocks
-  null_blk: move write pointers for partial writes
-  null_blk: introduce badblocks_once parameter
+Suggested-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ drivers/block/null_blk/main.c | 93 ++++++++++++++++++++---------------
+ 1 file changed, 54 insertions(+), 39 deletions(-)
 
- drivers/block/null_blk/main.c     | 135 ++++++++++++++++++++----------
- drivers/block/null_blk/null_blk.h |   7 ++
- drivers/block/null_blk/zoned.c    |  10 +++
- 3 files changed, 110 insertions(+), 42 deletions(-)
-
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 178e62cd9a9f..f720707b7cfb 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -591,42 +591,46 @@ static ssize_t nullb_device_zone_offline_store(struct config_item *item,
+ }
+ CONFIGFS_ATTR_WO(nullb_device_, zone_offline);
+ 
++/*
++ * Place the elements in alphabetical order to keep the confingfs
++ * 'features' string readable.
++ */
+ static struct configfs_attribute *nullb_device_attrs[] = {
+-	&nullb_device_attr_size,
+-	&nullb_device_attr_completion_nsec,
+-	&nullb_device_attr_submit_queues,
+-	&nullb_device_attr_poll_queues,
+-	&nullb_device_attr_home_node,
+-	&nullb_device_attr_queue_mode,
++	&nullb_device_attr_badblocks,
++	&nullb_device_attr_blocking,
+ 	&nullb_device_attr_blocksize,
+-	&nullb_device_attr_max_sectors,
+-	&nullb_device_attr_irqmode,
++	&nullb_device_attr_cache_size,
++	&nullb_device_attr_completion_nsec,
++	&nullb_device_attr_discard,
++	&nullb_device_attr_fua,
++	&nullb_device_attr_home_node,
+ 	&nullb_device_attr_hw_queue_depth,
+ 	&nullb_device_attr_index,
+-	&nullb_device_attr_blocking,
+-	&nullb_device_attr_use_per_node_hctx,
+-	&nullb_device_attr_power,
+-	&nullb_device_attr_memory_backed,
+-	&nullb_device_attr_discard,
++	&nullb_device_attr_irqmode,
++	&nullb_device_attr_max_sectors,
+ 	&nullb_device_attr_mbps,
+-	&nullb_device_attr_cache_size,
+-	&nullb_device_attr_badblocks,
+-	&nullb_device_attr_zoned,
+-	&nullb_device_attr_zone_size,
+-	&nullb_device_attr_zone_capacity,
+-	&nullb_device_attr_zone_nr_conv,
+-	&nullb_device_attr_zone_max_open,
+-	&nullb_device_attr_zone_max_active,
+-	&nullb_device_attr_zone_append_max_sectors,
+-	&nullb_device_attr_zone_readonly,
+-	&nullb_device_attr_zone_offline,
+-	&nullb_device_attr_zone_full,
+-	&nullb_device_attr_virt_boundary,
++	&nullb_device_attr_memory_backed,
+ 	&nullb_device_attr_no_sched,
+-	&nullb_device_attr_shared_tags,
+-	&nullb_device_attr_shared_tag_bitmap,
+-	&nullb_device_attr_fua,
++	&nullb_device_attr_poll_queues,
++	&nullb_device_attr_power,
++	&nullb_device_attr_queue_mode,
+ 	&nullb_device_attr_rotational,
++	&nullb_device_attr_shared_tag_bitmap,
++	&nullb_device_attr_shared_tags,
++	&nullb_device_attr_size,
++	&nullb_device_attr_submit_queues,
++	&nullb_device_attr_use_per_node_hctx,
++	&nullb_device_attr_virt_boundary,
++	&nullb_device_attr_zone_append_max_sectors,
++	&nullb_device_attr_zone_capacity,
++	&nullb_device_attr_zone_full,
++	&nullb_device_attr_zone_max_active,
++	&nullb_device_attr_zone_max_open,
++	&nullb_device_attr_zone_nr_conv,
++	&nullb_device_attr_zone_offline,
++	&nullb_device_attr_zone_readonly,
++	&nullb_device_attr_zone_size,
++	&nullb_device_attr_zoned,
+ 	NULL,
+ };
+ 
+@@ -704,16 +708,27 @@ nullb_group_drop_item(struct config_group *group, struct config_item *item)
+ 
+ static ssize_t memb_group_features_show(struct config_item *item, char *page)
+ {
+-	return snprintf(page, PAGE_SIZE,
+-			"badblocks,blocking,blocksize,cache_size,fua,"
+-			"completion_nsec,discard,home_node,hw_queue_depth,"
+-			"irqmode,max_sectors,mbps,memory_backed,no_sched,"
+-			"poll_queues,power,queue_mode,shared_tag_bitmap,"
+-			"shared_tags,size,submit_queues,use_per_node_hctx,"
+-			"virt_boundary,zoned,zone_capacity,zone_max_active,"
+-			"zone_max_open,zone_nr_conv,zone_offline,zone_readonly,"
+-			"zone_size,zone_append_max_sectors,zone_full,"
+-			"rotational\n");
++
++	struct configfs_attribute **entry;
++	const char *fmt = "%s,";
++	size_t left = PAGE_SIZE;
++	size_t written = 0;
++	int ret;
++
++	for (entry = &nullb_device_attrs[0]; *entry && left > 0; entry++) {
++		if (!*(entry + 1))
++			fmt = "%s\n";
++		ret = snprintf(page + written, left, fmt, (*entry)->ca_name);
++		if (ret >= left) {
++			WARN_ONCE(1, "Too many null_blk features to print\n");
++			memzero_explicit(page, PAGE_SIZE);
++			return 0;
++		}
++		left -= ret;
++		written += ret;
++	}
++
++	return written;
+ }
+ 
+ CONFIGFS_ATTR_RO(memb_group_, features);
 -- 
 2.47.0
 
