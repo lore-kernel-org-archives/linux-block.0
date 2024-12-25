@@ -1,88 +1,94 @@
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944B51925AE
-	for <linux-block@vger.kernel.org>; Wed, 25 Dec 2024 10:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4BA915383C
+	for <linux-block@vger.kernel.org>; Wed, 25 Dec 2024 10:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735121245; cv=none; b=LxeR2nGfgxGdbeAXK9QJN1Fg7/7MrMnKnRzuNsmwY1jwlU3dICKYaoEI1q9VM/rZVdjtK6TnnBMgJfUZd8TkE0sojXzNeYp2v8D9pbtg1oGg/0RWORUx3DBjAVgUrVGshfIwGfn4P3dLFTMIcNYV8H7dsgA72+on3EdGm7/M7K8=
+	t=1735121398; cv=none; b=LY9tsx34XYX8G6PRPmLwikSc8VMMyrqH3GwyOKqtb1ElHu70YcYp08GKxWlZsw5rd1v53jvWy4a5/7gIO0UZ8bb6c1st4TOHr3d09Cnc7ofgZmNSfP9bj9StAT//Ss6R/0u64GGqLcHc7YDzk0UcFoToKSm0/cuYN2JzrGI2gFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735121245; c=relaxed/simple;
-	bh=ld+H+GOZ+148+d8km0HdqbFu1AKry0FUdGlwL8yXPjg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=VTOkzj2Xxqr2a3IEONN8MZSTCqacgdFHUmXTQ3jNsoFDN/LBhrHDJxOUphYgcjkgETtttVm7/57p6LF5dy7jpKQvonRwOMRE2Nwn19OKJXDOSkLe5X0Rm4y539g9Vr4LgaD0cbQV6+cjOh1DDCw1zdDBNU63yFkmAu9wZ7gSwcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a819a4e83dso60519165ab.1
-        for <linux-block@vger.kernel.org>; Wed, 25 Dec 2024 02:07:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735121239; x=1735726039;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WNivbUa6+4Ughys9abAGbWAgtVIkfDguQE7jRYMVtB4=;
-        b=hmOjD88FOXkdnR38ovEbfc2n4+IQ5LijFNE0nBpP6jWrPluh1L22/6p8AZ6j2sWeLv
-         w05DwtW5PTJwSvtXkMKRjwwJC89VkDzVq4vHEgBaPARdJEytPK/KA1cS3T2ZVhQOCrBa
-         jzk+q+gz+lQkAU29GQbLEtDuJAQLDx/LIjg0IONH0mqzGr6GUswp7Ef+LMzPoTIcaFTh
-         pJrs9FAbYZCYZeOHFMNlILhJ8tqWy3NR+qOp58u0vdbJAdWeTvgOkGMalOq6EYKIDwA3
-         PHowY3Ad3EgPOoYGtVpNlbExjDIeIVKFuAKqyYRxd20E0YGKTGRXJRSRRhcEghTHtvls
-         qJdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6YRkpJr5jmNArCYVz2u3skAsSYlUDRQSdHnXBSpyRcjOYUGIEId3neI8c7Nf65TVmTKMWANQeV9LJGA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+G2ifEg/1tqZG2YJ4eV3W/nIgpw5tui67BAaOEqjt+PVf16MB
-	L9TXvc7B3gSZFb+T/KquYTV7ACVkWOTIHDmcYMrZqjwCem8EBjz20/7qHs6tG0qKGQK8qNdwjEt
-	k/Sz50DEvlw5eM0VAPBsdGDcyNCruNrVPY/X9p1U0fPnvMuOUDLIp5xw=
-X-Google-Smtp-Source: AGHT+IFMtVOZJVNwUJ7/iLAMok5mGb7P+w3OjPP2mflGxI1ocxud/M+iwc4qeTi9EiG+/Fxs83zn5K4Ws8T85Qo3DF7Ad4rhQlL3
+	s=arc-20240116; t=1735121398; c=relaxed/simple;
+	bh=b61QRsKrcyExfiUBHDKOh55337NzNl3Y5uiFW5WtyZc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rus4HvCMU4sFMnG9rtsBx5qBH9xNRtLyCJIY0oCVZAo6XdFU6Kz8p8HF3/1euasloJg40ePcm/P1APiPT0r/sLvrEKBYfJHKmxJh9+eitCCu2U4+BLWYcV/tSozxKoflZeBYdZRlEtv2iKo6DQ5ljHbh/hZDl9s8z9yTnRaAil4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=d9JKBjb1; arc=none smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="d9JKBjb1"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1735121396; x=1766657396;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=b61QRsKrcyExfiUBHDKOh55337NzNl3Y5uiFW5WtyZc=;
+  b=d9JKBjb1RO0e1U07zCeoYksiA0m6Ut0/ZAf/9hnrBWLyFd+X+sSQ9QkK
+   5T2DwLTMzsv2E/EMS1BQqG7Ve3pe9i/FM2xYnC9lYWJrzImRT7BgH9VwX
+   R3VFJSLtpCBOgphvs7ZnpsdR+8NmSscLXWstLNJKHbtGiuOZU1XV5FszO
+   lopqJ6tME1vuTylEUxxDSoRVW/4m2bNwNk40E7jfEt0qAmlUY3AIfSmrx
+   5+UzVNL/9L0tEslmILa/cv9/gdHP4tae0Snt6WfW71kX067HXZF0aEdX8
+   PudQPIz0PkFvfa64rcFmP35oJo47e3FC3abcUybL9tTPzhPAE0G3u1xRx
+   A==;
+X-CSE-ConnectionGUID: Aa6g6D0YS8uf4+iKdhBuzA==
+X-CSE-MsgGUID: 3aRH9wTiRw6xhrPDoOGocg==
+X-IronPort-AV: E=Sophos;i="6.12,263,1728921600"; 
+   d="scan'208";a="35812593"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Dec 2024 18:09:50 +0800
+IronPort-SDR: 676bcc7a_93FJN2GLxUyUi2RG4oLIEB/9ZjPfgIQF4bOzXQEQXH0Helk
+ 6cBvT32F6Pjop/jfuLQyEb2gwOOBHm9mQmdraew==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Dec 2024 01:12:27 -0800
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
+  by uls-op-cesaip02.wdc.com with ESMTP; 25 Dec 2024 02:09:49 -0800
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH for-next v2 0/4] null_blk: improve write failure simulation
+Date: Wed, 25 Dec 2024 19:09:45 +0900
+Message-ID: <20241225100949.930897-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a63:b0:3a8:1195:f1f9 with SMTP id
- e9e14a558f8ab-3c2d2564124mr185082775ab.6.1735121239760; Wed, 25 Dec 2024
- 02:07:19 -0800 (PST)
-Date: Wed, 25 Dec 2024 02:07:19 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <676bd957.050a0220.2f3838.02e2.GAE@google.com>
-Subject: [syzbot] Monthly nbd report (Dec 2024)
-From: syzbot <syzbot+lista56c9771895bcef0bc37@syzkaller.appspotmail.com>
-To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello nbd maintainers/developers,
+Currently, null_blk has 'badblocks' attribute to simulate IO failures
+for broken blocks. This helps checking if userland tools can handle IO
+failures. However, this badblocks feature has two differences from the
+IO failures on real storage devices. Firstly, when write operations fail
+for the badblocks, null_blk does not write any data, while real storage
+devices sometimes do partial data write. Secondly, null_blk always make
+write operations fail for the specified badblocks, while real storage
+devices can recover the bad blocks so that next write operations can
+succeed after failure. Hence, real storage devices are required to check
+if userland tools support such partial writes or bad blocks recovery.
 
-This is a 31-day syzbot report for the nbd subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/nbd
+This series improves write failure simulation by null_blk to allow
+checking userland tools without real storage devices. The first patch
+is a preparation to make new feature addition simpler. The second and
+the third patches add partial IO support. The last patch introduces
+'badblocks_once' attribute to simulate bad blocks recovery.
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 7 issues are still open and 6 have already been fixed.
+Changes from v1:
+* Added the first patch which avoids the long, multi-line features string
 
-Some of the still happening issues:
+Shin'ichiro Kawasaki (4):
+  null_blk: generate null_blk configfs features string
+  null_blk: do partial IO for bad blocks
+  null_blk: move write pointers for partial writes
+  null_blk: introduce badblocks_once parameter
 
-Ref Crashes Repro Title
-<1> 133     Yes   INFO: task hung in nbd_queue_rq
-                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
-<2> 129     Yes   INFO: task hung in nbd_ioctl (3)
-                  https://syzkaller.appspot.com/bug?extid=fe03c50d25c0188f7487
-<3> 25      No    possible deadlock in __nbd_set_size
-                  https://syzkaller.appspot.com/bug?extid=143deed0891e0c211d8f
-<4> 12      No    possible deadlock in __synchronize_srcu (2)
-                  https://syzkaller.appspot.com/bug?extid=c89fbbd2838560d51069
-<5> 5       No    possible deadlock in nbd_set_size
-                  https://syzkaller.appspot.com/bug?extid=966c3b607cb094ce7299
+ drivers/block/null_blk/main.c     | 135 ++++++++++++++++++++----------
+ drivers/block/null_blk/null_blk.h |   7 ++
+ drivers/block/null_blk/zoned.c    |  10 +++
+ 3 files changed, 110 insertions(+), 42 deletions(-)
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+-- 
+2.47.0
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
