@@ -1,58 +1,52 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E913218E764
-	for <linux-block@vger.kernel.org>; Wed, 25 Dec 2024 10:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A7614D29B
+	for <linux-block@vger.kernel.org>; Wed, 25 Dec 2024 11:06:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735121402; cv=none; b=W2O9vcw4rkaVP7/qIg6GmkzNZMUog3bBadVTgfUDNiT8n20OrIvPU2/pvXAB52BcPlOrwPb50fxAQmNyIvhPLPTF0uSnoGtwI/uorz4spPgFEWcL6BLK9jEM1I0yNlZLAeUgEguQ0vo83siNm/lDgSyfP/pfSfkhqHRC1pORG+M=
+	t=1735124816; cv=none; b=k0XaBvSRhYTaVz8YAluKtf3ZrF215IdyILSM0wp71yYIdMpEG3G/sFIAuEmqeHEqos5aWN5tKQi6j//xKEMoAKuOZagJEu+Y5DBn7ZNjRs8QCmxhQpGiAUnku1slU0O5S2kBOo8nfDIAQUWT2mzNPCuaJI3KdsfWD3C2qlOdfy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735121402; c=relaxed/simple;
-	bh=/NBE5XRhOlU64CSGQQs1kStu2qmn8wfA60ckE/L1tJs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W5sYABg1kdHPhEHF75NESZKC7DJZIRkDmaGN0yidfSnF8assr5my38u1J76H9S/tAElEE2jnEuQ9jKHSUebSktsXeJ80cNpOv+rgvII+zTFF74bKp/rYT3Tu7yTrkSw2yPlJIAkKlXvKZQiDVw28nGqOXz3Ky6PyDjhn3txXBkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=DgWwbDkJ; arc=none smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1735124816; c=relaxed/simple;
+	bh=zGUEwGJ/wau1bHgvyX1cr0nzZ8TVK/tOklVYjZs9W00=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Madn8pKHvOOBI8b1dW0DoCBr2Mcwj9GI7ZFLL/FN2lkeFDIAYax+h9aAmyUtii3WNN7zEI201ZOYLhQMPbyrhB+dowPQK1XfL2/H1xjzdD1j3GYs2ybInRVh8i/r3p7lt79WMOXpvmRhF0dhkpzvpac7+Wf6HVfhl+Esp8XkDio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BVjS9r8O; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="DgWwbDkJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1735121400; x=1766657400;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/NBE5XRhOlU64CSGQQs1kStu2qmn8wfA60ckE/L1tJs=;
-  b=DgWwbDkJyDIDz2EfD4xzTbkidB+2ZeDgpQVTeMEjxt0vj3+XUJrHRyOq
-   ui1NXCnf6WRT6dNkmJmZrQNhYN3XvuwW8NIuEKxhx1xPgrwpOa9NBDiya
-   56qyL9vmBIgFo5164c3tV5kFLQlKmt6NgrVZR0jl3y+yzUxsV/imidUn0
-   fuFHSJ1BvE5swdqtgs927lVGhdMBM13l/xxSdeDzKqmunUzj0iQ9KQ6Lp
-   E3h25Ur1eJkKV0b0XtDWJ4YHfEruBvH5eoKSuqpOtgeETJxKV8kCfXX+s
-   Viuieen10RmSYLNsGp9WLQl1rkOwnF2/M1pEvSjsNU6hTWGynUGgJVdKA
-   w==;
-X-CSE-ConnectionGUID: qo+L0r3RQnmLFACq6ef5FA==
-X-CSE-MsgGUID: gi4jY7mwRFOXJXOfDEv1Qw==
-X-IronPort-AV: E=Sophos;i="6.12,263,1728921600"; 
-   d="scan'208";a="35812600"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Dec 2024 18:09:54 +0800
-IronPort-SDR: 676bcc7e_3HwHs/Ii50aJFqfZyrrc/A9EVLKOaRMv9KPF7kJfFnVsPIY
- B9bQe6MC6gt5cBdoaBub6vyJ4NV/k5NOc3yI+ug==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Dec 2024 01:12:31 -0800
-WDCIronportException: Internal
-Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip02.wdc.com with ESMTP; 25 Dec 2024 02:09:53 -0800
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH for-next v2 4/4] null_blk: introduce badblocks_once parameter
-Date: Wed, 25 Dec 2024 19:09:49 +0900
-Message-ID: <20241225100949.930897-5-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241225100949.930897-1-shinichiro.kawasaki@wdc.com>
-References: <20241225100949.930897-1-shinichiro.kawasaki@wdc.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BVjS9r8O"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1735124812;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LZ2tMRPyaNon0seetKpGnI2A66leOyJHIg/krGqLDvs=;
+	b=BVjS9r8Ot6eneW+g9nekWhz+KjqIpFwhpymBYqZE1uYaqq2vXfskAG5ScqyaPeazWGWQrQ
+	A06iFsOe8jYbgUNO3rSsNproRSqBYKxWIrY0GB8RK1/pAVpdN2oknOsM+uIbdEqzV/ceRq
+	JRYNn6hX5YOkKFyPdSkccn75Ib6wztI=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-194-S6QT33N2M8K0xxe2zm4oYg-1; Wed,
+ 25 Dec 2024 06:06:51 -0500
+X-MC-Unique: S6QT33N2M8K0xxe2zm4oYg-1
+X-Mimecast-MFC-AGG-ID: S6QT33N2M8K0xxe2zm4oYg
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 567E2195608C;
+	Wed, 25 Dec 2024 11:06:50 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.54])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 147081956053;
+	Wed, 25 Dec 2024 11:06:48 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] ublk: detach gendisk from ublk device if add_disk() fails
+Date: Wed, 25 Dec 2024 19:06:40 +0800
+Message-ID: <20241225110640.351531-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,61 +54,75 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-When IO errors happen on real storage devices, the IOs repeated to the
-same target range can success by virtue of recovery features by devices,
-such as reserved block assignment. To simulate such IO errors and
-recoveries, introduce the new parameter badblocks_once parameter. When
-this parameter is set to 1, the specified badblocks are cleared after
-the first IO error, so that the next IO to the blocks succeed.
+Inside ublk_abort_requests(), gendisk is grabbed for aborting all
+inflight requests. And ublk_abort_requests() is called when exiting
+the uring context or handling timeout.
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+If add_disk() fails, the gendisk may have been freed when calling
+ublk_abort_requests(), so use-after-free can be caused when getting
+disk's reference in ublk_abort_requests().
+
+Fixes the bug by detaching gendisk from ublk device if add_disk() fails.
+
+Fixes: bd23f6c2c2d0 ("ublk: quiesce request queue when aborting queue")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/null_blk/main.c     | 4 ++++
- drivers/block/null_blk/null_blk.h | 1 +
- 2 files changed, 5 insertions(+)
+ drivers/block/ublk_drv.c | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 1675dec0b0e6..09d85b71b7f9 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -473,6 +473,7 @@ NULLB_DEVICE_ATTR(shared_tags, bool, NULL);
- NULLB_DEVICE_ATTR(shared_tag_bitmap, bool, NULL);
- NULLB_DEVICE_ATTR(fua, bool, NULL);
- NULLB_DEVICE_ATTR(rotational, bool, NULL);
-+NULLB_DEVICE_ATTR(badblocks_once, bool, NULL);
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index d4aed12dd436..934ab9332c80 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1618,6 +1618,21 @@ static void ublk_unquiesce_dev(struct ublk_device *ub)
+ 	blk_mq_kick_requeue_list(ub->ub_disk->queue);
+ }
  
- static ssize_t nullb_device_power_show(struct config_item *item, char *page)
++static struct gendisk *ublk_detach_disk(struct ublk_device *ub)
++{
++	struct gendisk *disk;
++
++	/* Sync with ublk_abort_queue() by holding the lock */
++	spin_lock(&ub->lock);
++	disk = ub->ub_disk;
++	ub->dev_info.state = UBLK_S_DEV_DEAD;
++	ub->dev_info.ublksrv_pid = -1;
++	ub->ub_disk = NULL;
++	spin_unlock(&ub->lock);
++
++	return disk;
++}
++
+ static void ublk_stop_dev(struct ublk_device *ub)
  {
-@@ -597,6 +598,7 @@ CONFIGFS_ATTR_WO(nullb_device_, zone_offline);
-  */
- static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_badblocks,
-+	&nullb_device_attr_badblocks_once,
- 	&nullb_device_attr_blocking,
- 	&nullb_device_attr_blocksize,
- 	&nullb_device_attr_cache_size,
-@@ -1342,6 +1344,8 @@ static inline blk_status_t null_handle_badblocks(struct nullb_cmd *cmd,
- 	int bad_sectors;
+ 	struct gendisk *disk;
+@@ -1631,14 +1646,7 @@ static void ublk_stop_dev(struct ublk_device *ub)
+ 		ublk_unquiesce_dev(ub);
+ 	}
+ 	del_gendisk(ub->ub_disk);
+-
+-	/* Sync with ublk_abort_queue() by holding the lock */
+-	spin_lock(&ub->lock);
+-	disk = ub->ub_disk;
+-	ub->dev_info.state = UBLK_S_DEV_DEAD;
+-	ub->dev_info.ublksrv_pid = -1;
+-	ub->ub_disk = NULL;
+-	spin_unlock(&ub->lock);
++	disk = ublk_detach_disk(ub);
+ 	put_disk(disk);
+  unlock:
+ 	mutex_unlock(&ub->mutex);
+@@ -2336,7 +2344,7 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
  
- 	if (badblocks_check(bb, sector, nr_sectors, &first_bad, &bad_sectors)) {
-+		if (cmd->nq->dev->badblocks_once)
-+			badblocks_clear(bb, first_bad, bad_sectors);
- 		if (!IS_ALIGNED(first_bad, block_sectors))
- 			first_bad = ALIGN_DOWN(first_bad, block_sectors);
- 		if (dev->memory_backed && sector < first_bad) {
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index c6ceede691ba..b9cd85542498 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -63,6 +63,7 @@ struct nullb_device {
- 	unsigned long flags; /* device flags */
- 	unsigned int curr_cache;
- 	struct badblocks badblocks;
-+	bool badblocks_once;
- 
- 	unsigned int nr_zones;
- 	unsigned int nr_zones_imp_open;
+ out_put_cdev:
+ 	if (ret) {
+-		ub->dev_info.state = UBLK_S_DEV_DEAD;
++		ublk_detach_disk(ub);
+ 		ublk_put_device(ub);
+ 	}
+ 	if (ret)
 -- 
-2.47.0
+2.47.1
 
