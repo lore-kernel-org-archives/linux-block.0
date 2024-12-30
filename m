@@ -1,100 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9AA47BAEC;
-	Mon, 30 Dec 2024 17:30:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B54822339
+	for <linux-block@vger.kernel.org>; Mon, 30 Dec 2024 19:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735579856; cv=none; b=GkkU/qKBuU84yzvc6OnCQ31kkBE++BjZNKYJGbKGVZgmHz27kBEv7bEfzAKrcRhqJY5mnByEv+auHJe/y79i/WFErj95Mr3CxGt740o8SB52QgW84kOyJaVem1JdgGPnAAaMd+rfA92AX0uW4D+yY+jk4IDEfTF+qe5FNjEWtGs=
+	t=1735587276; cv=none; b=Q/ZC9tSWL/0WWliFo70pm6mq+kvUhqc67+EasJ6QGGbf5y+CaOBosx8qYZB+e+JLOZ3S/cDNBX6nKakv7AqonARwoZJ3WrnezoLQ+1DQJPn2yyaPC013zB+IxbehXeV4Mq3xXUHI4i1ZkS79Ja4/iL9UCY0eZhLDAipRRCGedOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735579856; c=relaxed/simple;
-	bh=VhQbO01j9UWomptl+H9hBM8wYgb2QsoNj3GCT9fVe84=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tZZQ5r+jaFbAd+zOc6AQm2Mf+PGsikvU2QJwtXDAGLUzbDXy+9vl007Zpc1LFga93dH1yfFbAl1oN6zUdnEiysBjLxwB5REBD3qKkUsvFORYct4eomX7rHLxMx1+vQosMrdx7UCMnyscmkreJTIGABFgFV0NhLcIeQwY2Yn2H1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h4ORg4K1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1735587276; c=relaxed/simple;
+	bh=oZtlk0nVL4o/ZQQqjGWMAYcCPbd5AjG10okIgbtXlr4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XvcdM8PxgO7QvDH2DiyjCB6CRKRETl6nvvigVGIntEg16CxxtebVTGwaKSYKFp0xivZt7nzU1AkMP4y3TGUDjWHDR1M14xsWlhTjI/5gSDE9Va1guL8FM2KqUl5s1a0fCytxl7UwXmsgTxjMinvys9+0xP+RdrgTrm9iYXGnBmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk; spf=pass smtp.mailfrom=philpotter.co.uk; dkim=pass (2048-bit key) header.d=philpotter-co-uk.20230601.gappssmtp.com header.i=@philpotter-co-uk.20230601.gappssmtp.com header.b=xbfy+xfp; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=philpotter.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=philpotter.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h4ORg4K1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC3E6C4CED0;
-	Mon, 30 Dec 2024 17:30:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735579855;
-	bh=VhQbO01j9UWomptl+H9hBM8wYgb2QsoNj3GCT9fVe84=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h4ORg4K1o/s1bMTAWZD9fG2h5gt1fBDLQngLj0LpY0b3NXOo+PVQZ9NI0SOpBU/3+
-	 EWOamxppI80anrRz1cb3rQHox5+Vx1pUk4nDze4q4ZSXgDXRYVNjJWU5pElh3jomU4
-	 mdSmQ/GuIXyMSL/obAjt8sUBPmb1T/lemiIpnbWBajsnkJzp59DlMeekkUYuxbUDyY
-	 ASGj4l+P7ZK3bE55IRiUL3oemNUWEo6GR24xwA1VUvJTw700WiGODLYq7JoJFehmWa
-	 xmAFvC0nTkkbv0XiqSACw/V13p7imRewvd1WTPgLxCtv/+obfBVf4EFB8YZgKdNhTI
-	 liNXuDw6N5fbA==
-Date: Mon, 30 Dec 2024 09:30:53 -0800
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: hare@suse.de, dave@stgolabs.net, david@fromorbit.com, djwong@kernel.org,
-	kbusch@kernel.org, john.g.garry@oracle.com, hch@lst.de,
-	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com,
-	p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
-Subject: Re: [PATCH 0/5] fs/buffer: strack reduction on async read
-Message-ID: <Z3LYzWza0y5cHTlT@bombadil.infradead.org>
-References: <20241218022626.3668119-1-mcgrof@kernel.org>
- <Z2MrCey3RIBJz9_E@casper.infradead.org>
- <Z2OEmALBGB8ARLlc@bombadil.infradead.org>
- <Z2OYRkpRcUFIOFog@casper.infradead.org>
+	dkim=pass (2048-bit key) header.d=philpotter-co-uk.20230601.gappssmtp.com header.i=@philpotter-co-uk.20230601.gappssmtp.com header.b="xbfy+xfp"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43634b570c1so68340475e9.0
+        for <linux-block@vger.kernel.org>; Mon, 30 Dec 2024 11:34:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=philpotter-co-uk.20230601.gappssmtp.com; s=20230601; t=1735587273; x=1736192073; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3MpEvwZ+po6qqVfPLko9RifmMx3SKCJ8t5apEb89jIY=;
+        b=xbfy+xfpBcsC6zniCzBXMASOqmkxC4s1GyJwFGmKPJdOVKmLqVDNJ1D3ca/kTqgr2k
+         5DNpVE40Gc0lx90qJMa6+/J78OkcG4lHD2Mec4JYXVjnb7vTJ9en4L9bU5XWzFPg8EJ0
+         AVfggwJ2stKZRiIgjdzf1+gDAL+FwB75ABTlX2DQZfAwMBkzp4qUKDxTESmAxtA7ughg
+         qutMRJara3QvYPXgVIz0qnIK2PyzLqeYZVdPadTVN0Xki1YI3FUukYbp5mHN+7bisQNc
+         UUBHIziL2GpeKlxAnpn3kXiONqELxbxfCuluIz5K0MEwwVYmgldcGjvpg42gkYIkONiy
+         C3fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735587273; x=1736192073;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3MpEvwZ+po6qqVfPLko9RifmMx3SKCJ8t5apEb89jIY=;
+        b=kwkJ9VjR7DrRN8s+E6MtkDUyJg8PpiZukgP5I2o+9xDyG1N+VzNofotx8itoBu5Pma
+         GzOp1vbZGzEy/pg+61NQHbXh2xy0Cl4Z3Hszzg7nysd/4FnXF+FHOCifpdBy0a7JGlU4
+         M6rOcomB/HMM4kz3+fC95slQ6wRq3nvN6pgVEGPjyKCaW2sIj3DqG5B8ehBmpSLhuJ0s
+         2zMLLqkxLnGzIyaa8L2SP3Zw/Lw1qrDEzLo7eejwbAaZCxYfUuQNaPNKH/MORYcNN9u2
+         EiqIigSemnsczF6T6RdBTaCvfeMsss3XLeHGEuN8aRnEwY3iRX4CdWavQGL/rlbYMU77
+         ip+A==
+X-Forwarded-Encrypted: i=1; AJvYcCWqVDeL3PfrtKmmYa/SdYKgTlLb+k0YuO69d/YChT0WqpvJubZz2/Vgk2yrsytouYu62aVlqnI6I/sbQQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzC98LrBm169wCxo4b68rDs+3060yQYaSB6GckbkXFQjNxqWifu
+	cA7uRP1uY0Uwm8C8jEYQWGg1LFCegf20ZEyO6lnADv5EDxlFRLRHSH13XjiYJIyyI3BithcH1aI
+	D
+X-Gm-Gg: ASbGncvIhr1ZkLRRsY3EZStBcQ0UFPHI8xRXYytvFzHwO9rdN9AOwGlLy11VIa+MwZF
+	9fTZaZu8zV4lrK3uFON+xCNfLxW+W4lIKHXEBbXopzDEB51LeoaOw/f+UudEu9QlJivdNFgb2S+
+	OvaH5eV6oi+0FHdwS8VP7raxyuOXgjhmZgaK/KIAowyRs+dm+7XRaTTlFiCtDKNiMHUpCBK9lR0
+	t9CQPQL8GAXOfInL6MrQmQp7Z9My2FQ+4SUCxrjge2Eu2JGxyTcY6jo6Cml8XCBp/zM3JT87bU8
+	9ButOsL0fgHVV4BCFdTwCC5kLpokRy33Tgi1VB5uiKVBMOiUMCvJSaD7mQ==
+X-Google-Smtp-Source: AGHT+IHRMtHD18T4dfw7aiPpwTCbpMsH6D+wH2du7lGhySZYDYqhGiquZGq7CBxrVe6JJ5hWnAefSw==
+X-Received: by 2002:a05:6000:70a:b0:374:c4e2:3ca7 with SMTP id ffacd0b85a97d-38a221e2ea8mr31369083f8f.5.1735587272650;
+        Mon, 30 Dec 2024 11:34:32 -0800 (PST)
+Received: from localhost.localdomain (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6.1.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:df16::2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43661219a7csm362767025e9.24.2024.12.30.11.34.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Dec 2024 11:34:32 -0800 (PST)
+From: Phillip Potter <phil@philpotter.co.uk>
+To: axboe@kernel.dk
+Cc: phil@philpotter.co.uk,
+	linux-block@vger.kernel.org
+Subject: [PATCH 0/1] cdrom: typo-fixing patch for inclusion
+Date: Mon, 30 Dec 2024 19:34:30 +0000
+Message-ID: <20241230193431.441120-1-phil@philpotter.co.uk>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z2OYRkpRcUFIOFog@casper.infradead.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 19, 2024 at 03:51:34AM +0000, Matthew Wilcox wrote:
-> So folio->mapping is NULL.
-> 
-> Ah, I see the problem.  end_buffer_async_read() uses the buffer_async_read
-> test to decide if all buffers on the page are uptodate or not.  So both
-> having no batch (ie this patch) and having a batch which is smaller than
-> the number of buffers in the folio can lead to folio_end_read() being
-> called prematurely (ie we'll unlock the folio before finishing reading
-> every buffer in the folio).
-> 
-> Once the folio is unlocked, it can be truncated.  That's a second-order
-> problem, but it's the one your test happened to hit.
-> 
-> This should fix the problem; we always have at least one BH held in
-> the submission path with the async_read flag set, so
-> end_buffer_async_read() will not end it prematurely.
+Hi Jens,
 
-Oh neat, yes.
+I hope you're well and have had a decent break over the holiday seasion.
+Please apply the following patch from Steven Davis that fixes a typo in
+a cd_dbg call.
 
-> By the way, do you have CONFIG_VM_DEBUG enabled in your testing?
+Many thanks in advance.
 
-You mean DEBUG_VM ? Yes:
+Regards,
+Phil
 
-grep DEBUG_VM .config
-CONFIG_ARCH_HAS_DEBUG_VM_PGTABLE=y
-CONFIG_DEBUG_VM_IRQSOFF=y
-CONFIG_DEBUG_VM=y
-# CONFIG_DEBUG_VM_MAPLE_TREE is not set
-# CONFIG_DEBUG_VM_RB is not set
-CONFIG_DEBUG_VM_PGFLAGS=y
-# CONFIG_DEBUG_VM_PGTABLE is not set
+Steven Davis (1):
+  cdrom: Fix typo, 'devicen' to 'device'
 
->         VM_BUG_ON_FOLIO(!folio_test_locked(folio), folio);
-> in folio_end_read() should have tripped before hitting the race with
-> truncate.
+ drivers/cdrom/cdrom.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Odd that it did not, I had run into that folio_test_locked() splat but in my
-attempts to simplify this without your trick to only run into the similar
-truncate race, your resolution to this is nice.
+-- 
+2.47.1
 
-> diff --git a/fs/buffer.c b/fs/buffer.c
-
-This is a nice resolution and simplification, thanks, I've tested it and
-passes without regressions on ext4. I'll take this into this series as
-an alternative.
-
-  Luis
