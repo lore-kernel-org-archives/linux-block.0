@@ -1,405 +1,152 @@
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D2529429;
-	Mon, 30 Dec 2024 08:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3325B19E7F7
+	for <linux-block@vger.kernel.org>; Mon, 30 Dec 2024 09:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735545615; cv=none; b=NSdUZ55G0ywi85oUJmr8nRpyFgIga5F9jK/OteW4Jd6wQt2IRf6i/smiwD7mlrViDVIDkDrgFRb1h3S5tEdlDTZPoA1OYVnD3UtP8xbCiQODjhAXEV5rAfJ8Wq6wy7cvcRWdAUIw1EGRk7Kfk+u452wSvnsgE8t/gUDhg0kBT5g=
+	t=1735549375; cv=none; b=BiBtIa9n9AVcAQ07ACLb8J1eqoBd2O0+yqmOI+/xFXjpexKh7knRIVxKxf2eLv6u/4OoQ8vfRpT37a41UL1GV+uR6bVYn3No2hiTRWtkgW7iParO38I5Hw7DP8EpiHO3hRHDx3gtEZTK+ThgtHnpzgIHiORLtkyBr8+Qoh3K6CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735545615; c=relaxed/simple;
-	bh=2xVvSKNbl0kh89smik+yEoWkYfUgEiamMvaepodSEto=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kBK8Ps+e/QBLRxRPq9NgkN3BZkm4Rr3rqNObRyGecqnfun6RkcnIst0F2XaL/z1lgPed9Ky1a0doCleyysLnNefpjFfQPyWxoH2IeFzp22MzwVBOURZg/aSIKV9C+RuKOiM5hzbuIoRB9jARobnhK223T78kVh0WSDHV5zCe/SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=NUB2Q8mg; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1735549375; c=relaxed/simple;
+	bh=1GiCINEX2dbQLDr0vdOqgC6hmrHqMgfm+CjUqJHO9pc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SAh5wfsgSup+sss9pNAjiO6G9Mj7CI7r3xG/kt0ytU3KckcAlmnQUDIHoBQPH8G143WNRJ4gxb5EUnN7wEXwF1NTvdbzjMIaVGI6JAyJoeMkS8LWdIfc0jdDxhltHywWwEbFz1fe64IYYflF03V1ekq5JmAVqcdkgOtDXxY1Miw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V3ZmCLe0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="NUB2Q8mg"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1735545604; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=5trBrHfvKfMxQ+2tUGMOcOXwoS1i2hhiAbOn+/ehfDo=;
-	b=NUB2Q8mg4Ne8SJyS6kz/FOpObSERiya7Nwqw6Ps9AyIJCfhaX/48ZFzauRPiXzZtcOCGdhN28MK2bzkiHX628ZK2VgTXHJafKETxrr5cx8QL57dKz8tNum00LDXMkw3z0a+FzA/Ccf7Nw95xXNtk8RfXThFgbPtyI+YENj5lRJs=
-Received: from 30.221.129.25(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0WMV-SM6_1735545602 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 30 Dec 2024 16:00:03 +0800
-Message-ID: <9412e93e-1e55-474d-ae8f-0ca25ce827b5@linux.alibaba.com>
-Date: Mon, 30 Dec 2024 16:00:01 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3ZmCLe0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1735549372;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PsWPl2bqWAQVZDErYQgj5ZRZio+yiu1zAU/LbBNMaCU=;
+	b=V3ZmCLe0LRKQNfqPszEu3rurZeEsNV7yDtzabtvgBSMN3EBp40cB339nFfv/I+SChNXrZI
+	z02LLmgj5piYMTCXY9mptOcolU5Og0iDSyY5NkDpjuquEeEiLKJpyQDOKnmDlGuDYhWua0
+	I4oT7NX39WNRuEKG8QBg0xl/eSa4Jp4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-493-Apbu_R1IMxi-bOR1f14plg-1; Mon,
+ 30 Dec 2024 04:02:46 -0500
+X-MC-Unique: Apbu_R1IMxi-bOR1f14plg-1
+X-Mimecast-MFC-AGG-ID: Apbu_R1IMxi-bOR1f14plg
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 50D28195609F;
+	Mon, 30 Dec 2024 09:02:45 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.32])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2C3BD19560AA;
+	Mon, 30 Dec 2024 09:02:40 +0000 (UTC)
+Date: Mon, 30 Dec 2024 17:02:35 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: avoid to hold q->limits_lock across APIs for
+ atomic update queue limits
+Message-ID: <Z3Jhq5Z4gLupIrYm@fedora>
+References: <20241217071928.GA19884@lst.de>
+ <Z2Eog2mRqhDKjyC6@fedora>
+ <a032a3a0-0784-4260-92fd-90feffe1fe20@kernel.org>
+ <Z2Iu1CAAC-nE-5Av@fedora>
+ <f34f179a-4eaf-4f73-93ff-efb1ff9fe482@linux.ibm.com>
+ <Z2LQ0PYmt3DYBCi0@fedora>
+ <0fdf7af6-9401-4853-8536-4295a614e6d2@linux.ibm.com>
+ <9e2ad956-4d20-456f-9676-8ea88dfd116e@kernel.org>
+ <20241219062026.GC19575@lst.de>
+ <cf1e007b-dcb5-43cd-84e2-fd72d8836fb8@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/3] virtio-blk: add uring_cmd support for I/O passthru
- on chardev.
-To: Ferry Meng <mengferry@linux.alibaba.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
- virtualization@lists.linux.dev
-Cc: linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Christoph Hellwig
- <hch@infradead.org>, Jeffle Xu <jefflexu@linux.alibaba.com>
-References: <20241218092435.21671-1-mengferry@linux.alibaba.com>
- <20241218092435.21671-3-mengferry@linux.alibaba.com>
-From: Joseph Qi <joseph.qi@linux.alibaba.com>
-In-Reply-To: <20241218092435.21671-3-mengferry@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cf1e007b-dcb5-43cd-84e2-fd72d8836fb8@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-
-
-On 2024/12/18 17:24, Ferry Meng wrote:
-> Add ->uring_cmd() support for virtio-blk chardev (/dev/vdXc0).
-> According to virtio spec, in addition to passing 'hdr' info into kernel,
-> we also need to pass vaddr & data length of the 'iov' requeired for the
-> writev/readv op.
+On Sat, Dec 21, 2024 at 06:33:13PM +0530, Nilay Shroff wrote:
 > 
-> Signed-off-by: Ferry Meng <mengferry@linux.alibaba.com>
-> ---
->  drivers/block/virtio_blk.c      | 223 +++++++++++++++++++++++++++++++-
->  include/uapi/linux/virtio_blk.h |  16 +++
->  2 files changed, 235 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 3487aaa67514..cd88cf939144 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -18,6 +18,9 @@
->  #include <linux/vmalloc.h>
->  #include <uapi/linux/virtio_ring.h>
->  #include <linux/cdev.h>
-> +#include <linux/io_uring/cmd.h>
-> +#include <linux/types.h>
-> +#include <linux/uio.h>
->  
->  #define PART_BITS 4
->  #define VQ_NAME_LEN 16
-> @@ -54,6 +57,20 @@ static struct class *vd_chr_class;
->  
->  static struct workqueue_struct *virtblk_wq;
->  
-> +struct virtblk_uring_cmd_pdu {
-> +	struct request *req;
-> +	struct bio *bio;
-> +	int status;
-> +};
-> +
-> +struct virtblk_command {
-> +	struct virtio_blk_outhdr out_hdr;
-> +
-> +	__u64	data;
-> +	__u32	data_len;
-> +	__u32	flag;
-> +};
-> +
->  struct virtio_blk_vq {
->  	struct virtqueue *vq;
->  	spinlock_t lock;
-> @@ -122,6 +139,11 @@ struct virtblk_req {
->  	struct scatterlist sg[];
->  };
->  
-> +static void __user *virtblk_to_user_ptr(uintptr_t ptrval)
-> +{
+> On 12/19/24 11:50, Christoph Hellwig wrote:
+> > On Wed, Dec 18, 2024 at 06:57:45AM -0800, Damien Le Moal wrote:
+> >>> Yeah agreed but I see sd_revalidate_disk() is probably the only exception 
+> >>> which allocates the blk-mq request. Can't we fix it? 
+> >>
+> >> If we change where limits_lock is taken now, we will again introduce races
+> >> between user config and discovery/revalidation, which is what
+> >> queue_limits_start_update() and queue_limits_commit_update() intended to fix in
+> >> the first place.
+> >>
+> >> So changing sd_revalidate_disk() is not the right approach.
+> > 
+> > Well, sd_revalidate_disk is a bit special in that it needs a command
+> > on the same queue to query the information.  So it needs to be able
+> > to issue commands without the queue frozen.  Freezing the queue inside
+> > the limits lock support that, sd just can't use the convenience helpers
+> > that lock and freeze.
+> > 
+> >> This is overly complicated ... As I suggested, I think that a simpler approach
+> >> is to call blk_mq_freeze_queue() and blk_mq_unfreeze_queue() inside
+> >> queue_limits_commit_update(). Doing so, no driver should need to directly call
+> >> freeze/unfreeze. But that would be a cleanup. Let's first fix the few instances
+> >> that have the update/freeze order wrong. As mentioned, the pattern simply needs
+> > 
+> > Yes, the queue only needs to be frozen for the actual update,
+> > which would remove the need for the locking.  The big question for both
+> > variants is if we can get rid of all the callers that have the queue
+> > already frozen and then start an update.
+> > 
+> After thinking for a while I found that broadly we've four categories of users
+> which need this pattern of limits-lock and/or queue-freeze:
+> 
+> 1. Callers which need acquiring limits-lock while starting the update; and freezing 
+>    queue only when committing the update:
+>    - sd_revalidate_disk
 
-Refer to nvme_to_user_ptr(), the logic for compat syscall is missing.
+sd_revalidate_disk() should be the most strange one, in which
+passthrough io command is required, so dependency on queue freeze lock
+can't be added, such as, q->limits_lock
 
-> +	return (void __user *)ptrval;
-> +}
-> +
->  static inline blk_status_t virtblk_result(u8 status)
->  {
->  	switch (status) {
-> @@ -259,9 +281,6 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
->  	if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) && op_is_zone_mgmt(req_op(req)))
->  		return BLK_STS_NOTSUPP;
->  
-> -	/* Set fields for all request types */
-> -	vbr->out_hdr.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
-> -
->  	switch (req_op(req)) {
->  	case REQ_OP_READ:
->  		type = VIRTIO_BLK_T_IN;
-> @@ -309,9 +328,11 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
->  		type = VIRTIO_BLK_T_ZONE_RESET_ALL;
->  		break;
->  	case REQ_OP_DRV_IN:
-> +	case REQ_OP_DRV_OUT:
->  		/*
->  		 * Out header has already been prepared by the caller (virtblk_get_id()
-> -		 * or virtblk_submit_zone_report()), nothing to do here.
-> +		 * virtblk_submit_zone_report() or io_uring passthrough cmd), nothing
-> +		 * to do here.
->  		 */
->  		return 0;
->  	default:
-> @@ -323,6 +344,7 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
->  	vbr->in_hdr_len = in_hdr_len;
->  	vbr->out_hdr.type = cpu_to_virtio32(vdev, type);
->  	vbr->out_hdr.sector = cpu_to_virtio64(vdev, sector);
-> +	vbr->out_hdr.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
->  
->  	if (type == VIRTIO_BLK_T_DISCARD || type == VIRTIO_BLK_T_WRITE_ZEROES ||
->  	    type == VIRTIO_BLK_T_SECURE_ERASE) {
-> @@ -832,6 +854,7 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
->  	vbr = blk_mq_rq_to_pdu(req);
->  	vbr->in_hdr_len = sizeof(vbr->in_hdr.status);
->  	vbr->out_hdr.type = cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_GET_ID);
-> +	vbr->out_hdr.ioprio = cpu_to_virtio32(vblk->vdev, req_get_ioprio(req));
->  	vbr->out_hdr.sector = 0;
->  
->  	err = blk_rq_map_kern(q, req, id_str, VIRTIO_BLK_ID_BYTES, GFP_KERNEL);
-> @@ -1250,6 +1273,197 @@ static const struct blk_mq_ops virtio_mq_ops = {
->  	.poll		= virtblk_poll,
->  };
->  
-> +static inline struct virtblk_uring_cmd_pdu *virtblk_get_uring_cmd_pdu(
-> +		struct io_uring_cmd *ioucmd)
-> +{
-> +	return (struct virtblk_uring_cmd_pdu *)&ioucmd->pdu;
-> +}
-> +
-> +static void virtblk_uring_task_cb(struct io_uring_cmd *ioucmd,
-> +		unsigned int issue_flags)
-> +{
-> +	struct virtblk_uring_cmd_pdu *pdu = virtblk_get_uring_cmd_pdu(ioucmd);
-> +	struct virtblk_req *vbr = blk_mq_rq_to_pdu(pdu->req);
-> +	u64 result = 0;
-> +
-> +	if (pdu->bio)
-> +		blk_rq_unmap_user(pdu->bio);
-> +
-> +	/* currently result has no use, it should be zero as cqe->res */
-> +	io_uring_cmd_done(ioucmd, vbr->in_hdr.status, result, issue_flags);
-> +}
-> +
-> +static enum rq_end_io_ret virtblk_uring_cmd_end_io(struct request *req,
-> +						   blk_status_t err)
-> +{
-> +	struct io_uring_cmd *ioucmd = req->end_io_data;
-> +	struct virtblk_uring_cmd_pdu *pdu = virtblk_get_uring_cmd_pdu(ioucmd);
-> +
-> +	/*
-> +	 * For iopoll, complete it directly. Note that using the uring_cmd
-> +	 * helper for this is safe only because we check blk_rq_is_poll().
-> +	 * As that returns false if we're NOT on a polled queue, then it's
-> +	 * safe to use the polled completion helper.
-> +	 *
-> +	 * Otherwise, move the completion to task work.
-> +	 */
-> +	if (blk_rq_is_poll(req)) {
-> +		if (pdu->bio)
-> +			blk_rq_unmap_user(pdu->bio);
-> +		io_uring_cmd_iopoll_done(ioucmd, 0, pdu->status);
-> +	} else {
-> +		io_uring_cmd_do_in_task_lazy(ioucmd, virtblk_uring_task_cb);
-> +	}
-> +
-> +	return RQ_END_IO_FREE;
-> +}
-> +
-> +static struct virtblk_req *virtblk_req(struct request *req)
-> +{
-> +	return blk_mq_rq_to_pdu(req);
-> +}
+Actually the current queue limits structure aren't well-organized, otherwise
+limit lock isn't needed for reading queue limits from hardware, since
+sd_revalidate_disk() just overwrites partial limits. Or it can be
+done by refactoring sd_revalidate_disk(). However, the change might
+be a little big, and I guess that is the reason why Damien don't like
+it.
 
-Don't think this helper is necessary.
-You've already open-coded in other places.
+>    - nvme_init_identify
+>    - loop_clear_limits
+>    - few more...
+> 
+> 2. Callers which need both freezing the queue and acquiring limits-lock while starting
+>    the update:
+>    - nvme_update_ns_info_block
+>    - nvme_update_ns_info_generic
+>    - few more... 
+> 
+> 3. Callers which neither need acquiring limits-lock nor require freezing queue as for 
+>    these set of callers in the call stack limits-lock is already acquired and queue is 
+>    already frozen:
+>    - __blk_mq_update_nr_hw_queues
+>    - queue_xxx_store and helpers
 
-> +
-> +static inline enum req_op virtblk_req_op(const struct virtblk_uring_cmd *cmd)
-> +{
-> +	return (cmd->type & VIRTIO_BLK_T_OUT) ? REQ_OP_DRV_OUT : REQ_OP_DRV_IN;
-> +}
-> +
-> +static struct request *virtblk_alloc_user_request(
-> +		struct request_queue *q, struct virtblk_command *cmd,
-> +		blk_opf_t rq_flags, blk_mq_req_flags_t blk_flags)
-> +{
-> +	struct request *req;
-> +
-> +	req = blk_mq_alloc_request(q, rq_flags, blk_flags);
-> +	if (IS_ERR(req))
-> +		return req;
-> +
-> +	req->rq_flags |= RQF_DONTPREP;
+I think it isn't correct.
 
-Do we have to do some other initialization? e.g. REQ_POLLED.
+The queue limits are applied on fast IO path, in theory anywhere
+updating q->limits need to drain IOs in submission path at least
+after gendisk is added.
 
-> +	memcpy(&virtblk_req(req)->out_hdr, &cmd->out_hdr, sizeof(struct virtio_blk_outhdr));
-> +	return req;
-> +}
-> +
-> +static int virtblk_map_user_request(struct request *req, u64 ubuffer,
-> +		unsigned int bufflen, struct io_uring_cmd *ioucmd,
-> +		bool vec)
-> +{
-> +	struct request_queue *q = req->q;
-> +	struct virtio_blk *vblk = q->queuedata;
-> +	struct block_device *bdev = vblk ? vblk->disk->part0 : NULL;
-> +	struct bio *bio = NULL;
-> +	int ret;
-> +
-> +	if (ioucmd && (ioucmd->flags & IORING_URING_CMD_FIXED)) {
-> +		struct iov_iter iter;
-> +
-> +		/* fixedbufs is only for non-vectored io */
-> +		if (WARN_ON_ONCE(vec))
-> +			return -EINVAL;
-> +		ret = io_uring_cmd_import_fixed(ubuffer, bufflen,
-> +				rq_data_dir(req), &iter, ioucmd);
-> +		if (ret < 0)
-> +			goto out;
-> +		ret = blk_rq_map_user_iov(q, req, NULL,
-> +			&iter, GFP_KERNEL);
-> +	} else {
-> +		ret = blk_rq_map_user_io(req, NULL,
-> +				virtblk_to_user_ptr(ubuffer),
-> +				bufflen, GFP_KERNEL, vec, 0,
-> +				0, rq_data_dir(req));
-> +	}
-> +	if (ret)
-> +		goto out;
-> +
-> +	bio = req->bio;
-> +	if (bdev)
-> +		bio_set_dev(bio, bdev);
-> +	return 0;
-> +
-> +out:
-> +	blk_mq_free_request(req);
-> +	return ret;
-> +}
-> +
-> +static int virtblk_uring_cmd_io(struct virtio_blk *vblk,
-> +		struct io_uring_cmd *ioucmd, unsigned int issue_flags, bool vec)
-> +{
-> +	struct virtblk_uring_cmd_pdu *pdu = virtblk_get_uring_cmd_pdu(ioucmd);
-> +	const struct virtblk_uring_cmd *cmd = io_uring_sqe_cmd(ioucmd->sqe);
-> +	struct request_queue *q = vblk->disk->queue;
-> +	struct virtblk_req *vbr;
-> +	struct virtblk_command d;
+Also Christoph adds limits-lock for avoiding to lose other concurrent
+update, which makes the problem more hard to solve.
 
-Or use 'c' for command?
 
-> +	struct request *req;
-> +	blk_opf_t rq_flags = REQ_ALLOC_CACHE | virtblk_req_op(cmd);
-> +	blk_mq_req_flags_t blk_flags = 0;
-> +	int ret;
-> +
-> +	if (!capable(CAP_SYS_ADMIN))
-> +		return -EACCES;
-> +
-> +	d.out_hdr.ioprio = cpu_to_virtio32(vblk->vdev, READ_ONCE(cmd->ioprio));
-> +	d.out_hdr.type = cpu_to_virtio32(vblk->vdev, READ_ONCE(cmd->type));
-> +	d.out_hdr.sector = cpu_to_virtio64(vblk->vdev, READ_ONCE(cmd->sector));
-> +	d.data = READ_ONCE(cmd->data);
-> +	d.data_len = READ_ONCE(cmd->data_len);
-> +
-> +	if (issue_flags & IO_URING_F_NONBLOCK) {
-> +		rq_flags |= REQ_NOWAIT;
-> +		blk_flags = BLK_MQ_REQ_NOWAIT;
-> +	}
-> +	if (issue_flags & IO_URING_F_IOPOLL)
-> +		rq_flags |= REQ_POLLED;
-> +
-> +	req = virtblk_alloc_user_request(q, &d, rq_flags, blk_flags);
-> +	if (IS_ERR(req))
-> +		return PTR_ERR(req);
-> +
-> +	vbr = virtblk_req(req);
-> +	vbr->in_hdr_len = sizeof(vbr->in_hdr.status);
-> +	if (d.data && d.data_len) {
-> +		ret = virtblk_map_user_request(req, d.data, d.data_len, ioucmd, vec);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	/* to free bio on completion, as req->bio will be null at that time */
-> +	pdu->bio = req->bio;
-> +	pdu->req = req;
-> +	req->end_io_data = ioucmd;
-> +	req->end_io = virtblk_uring_cmd_end_io;
-> +	blk_execute_rq_nowait(req, false);
-> +	return -EIOCBQUEUED;
-> +}
-> +
-> +
-> +static int virtblk_uring_cmd(struct virtio_blk *vblk, struct io_uring_cmd *ioucmd,
-> +			     unsigned int issue_flags)
-> +{
-> +	int ret;
-> +
-> +	BUILD_BUG_ON(sizeof(struct virtblk_uring_cmd_pdu) > sizeof(ioucmd->pdu));
 
-io_uring passthrough requires big sqe/cqe support.
-So it is deserved a check here.
-
-Thanks,
-Joseph
-
-> +
-> +	switch (ioucmd->cmd_op) {
-> +	case VIRTBLK_URING_CMD_IO:
-> +		ret = virtblk_uring_cmd_io(vblk, ioucmd, issue_flags, false);
-> +		break;
-> +	case VIRTBLK_URING_CMD_IO_VEC:
-> +		ret = virtblk_uring_cmd_io(vblk, ioucmd, issue_flags, true);
-> +		break;
-> +	default:
-> +		ret = -ENOTTY;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static int virtblk_chr_uring_cmd(struct io_uring_cmd *ioucmd, unsigned int issue_flags)
-> +{
-> +	struct virtio_blk *vblk = container_of(file_inode(ioucmd->file)->i_cdev,
-> +			struct virtio_blk, cdev);
-> +
-> +	return virtblk_uring_cmd(vblk, ioucmd, issue_flags);
-> +}
-> +
->  static void virtblk_cdev_rel(struct device *dev)
->  {
->  	ida_free(&vd_chr_minor_ida, MINOR(dev->devt));
-> @@ -1297,6 +1511,7 @@ static int virtblk_cdev_add(struct virtio_blk *vblk,
->  
->  static const struct file_operations virtblk_chr_fops = {
->  	.owner		= THIS_MODULE,
-> +	.uring_cmd	= virtblk_chr_uring_cmd,
->  };
->  
->  static unsigned int virtblk_queue_depth;
-> diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-> index 3744e4da1b2a..93b6e1b5b9a4 100644
-> --- a/include/uapi/linux/virtio_blk.h
-> +++ b/include/uapi/linux/virtio_blk.h
-> @@ -313,6 +313,22 @@ struct virtio_scsi_inhdr {
->  };
->  #endif /* !VIRTIO_BLK_NO_LEGACY */
->  
-> +struct virtblk_uring_cmd {
-> +	/* VIRTIO_BLK_T* */
-> +	__u32 type;
-> +	/* io priority. */
-> +	__u32 ioprio;
-> +	/* Sector (ie. 512 byte offset) */
-> +	__u64 sector;
-> +
-> +	__u64 data;
-> +	__u32 data_len;
-> +	__u32 flag;
-> +};
-> +
-> +#define VIRTBLK_URING_CMD_IO		1
-> +#define VIRTBLK_URING_CMD_IO_VEC	2
-> +
->  /* And this is the final byte of the write scatter-gather list. */
->  #define VIRTIO_BLK_S_OK		0
->  #define VIRTIO_BLK_S_IOERR	1
+Thanks, 
+Ming
 
