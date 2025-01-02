@@ -1,131 +1,81 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C2A4A00
-	for <linux-block@vger.kernel.org>; Thu,  2 Jan 2025 01:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347E8184E
+	for <linux-block@vger.kernel.org>; Thu,  2 Jan 2025 02:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735782994; cv=none; b=FRe68t87X+hHyjnycVw63kix8YwM7gC0tZKZGuXGlkWCLj866tg49q4xmL7rah11TUrQsjUVk9/22947bopWfH3oV1d5FWi/XtMXYxejztrwfI23Q0mASV9wy+i3bpW3H8kM4Pd112LzmsXztn89Gw17+JKHpqzBoqeORZTYTF0=
+	t=1735785260; cv=none; b=sT2/fpy8t4AuR3rNh83XOaTJO2ShJV5DwC4VK/avobwzMAsFtnx5GNYtw6CVwqgnP8pnBcJPQsdN0MHMPBkXXu4qkoXop1/ImIwhhMBR8nWDabpRvFcKa9E+o+BUll7Q5h7hk079oSJjViAGcgCWLvKPlnH52LKWPWbQoLGLoXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735782994; c=relaxed/simple;
-	bh=NFPvyoW/A2Xv/GnzBEa1G/J1irquFvFj7InOa+Szg80=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IUmhMtFPR0P9kEtMbY0Ea1mu1Ncut2DZEMRbztPAGEdAD5Ct9G1PMcAhk3bjPZWaHGSkkRH1Xhe8soEeFScl2YfkPv9wpmv0xxzyP+mVvbpOXX6Bj0FeH2XVgMOE87rHXtQ7/kXhp9ZM9Q7ollec2gbCyCO0OmOb55ba/smGywM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IqSMXJ5g; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1735785260; c=relaxed/simple;
+	bh=neQbh182/Vj5CAAhSvAo1QdjtK6pj+NdTX9tTpZmX8g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GtgkmD3eM7mWsZ558c6pgpbCOmuL9Tq3g448VGXgiIXytwSn/0Fobzg/PnvHDSrYX+GNLjuz03VB0sm4Pp0UfN5vXrnTlf15+nDGJTCwtwq3sQGutVaF4TpIcag2OfCwzZTXrf4lSTI7caeLng2c6Q3mHOGJTuersneVpd6i5q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=WQno930f; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IqSMXJ5g"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1735782991;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=FY0LbQTym8kFi5yPGPWe1CqQs/gOC6lmG8lg5IOIgvc=;
-	b=IqSMXJ5giIZCHvhGg5ZS9fqRg956CApd+IEtPSU5Y3edNoMRIP6RN8dWrFpAu4ZrfpdYo6
-	Fukf8AYmee6NLvpLnblZEd6vYg2XIk6OmmBGZ/aoOD54ORq+c/sIuQLBgt1NQ4wAKi7FWY
-	0F/wYsea/MlOB60lOdfYQYQ3GTcb0g0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-517-g_9w_SxtMA-WPo7X4UKqMQ-1; Wed,
- 01 Jan 2025 20:56:29 -0500
-X-MC-Unique: g_9w_SxtMA-WPo7X4UKqMQ-1
-X-Mimecast-MFC-AGG-ID: g_9w_SxtMA-WPo7X4UKqMQ
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="WQno930f"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YNrKW0bwkz6ClbJB;
+	Thu,  2 Jan 2025 02:30:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1735785035; x=1738377036; bh=wSBPS9SC25qKskmKmm35wcdM
+	KMZDCL1U803BqmTv1t0=; b=WQno930f1LDE/4O6DFuZAvHllULAIBegCM/LO022
+	D7oQKkMR/iUUuaUsjW9sugJCnQHwele96tE664BycLY9nagtgpraWz2VtKO2AC6d
+	/wXsuTpFYpcZ4XojsXk8ej/QDBH0X+rva69ugOwMED/JEQrHa6uv1/0u4d6YiXzB
+	jZyeYo3SmA9ZRHuq+mu6zfDJI9vN9XCgQ/U0t6KydZHrtksPARxWSbQhxQ1A4A/l
+	40yNrBZNRJlysqXq9qNWRdQkx2n9IFPdjCqowPZ2Tvzh8FlKR1tKJU2i3tOmlJK/
+	gsBozI0h72EnDaDFuCpvf1B3C/cg9pnY4iz6Q1CVts3XEQ==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id K0ATU3qzacRS; Thu,  2 Jan 2025 02:30:35 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EAA79195609D;
-	Thu,  2 Jan 2025 01:56:28 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.50])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AB1971956052;
-	Thu,  2 Jan 2025 01:56:27 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Yi Zhang <yi.zhang@redhat.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	John Garry <john.g.garry@oracle.com>
-Subject: [PATCH] block: make queue limits workable in case of 64K PAGE_SIZE
-Date: Thu,  2 Jan 2025 09:56:20 +0800
-Message-ID: <20250102015620.500754-1-ming.lei@redhat.com>
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YNrKN4sRdz6CmQyc;
+	Thu,  2 Jan 2025 02:30:31 +0000 (UTC)
+Message-ID: <0b423229-f928-4210-9351-dca353071231@acm.org>
+Date: Wed, 1 Jan 2025 18:30:30 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: make queue limits workable in case of 64K
+ PAGE_SIZE
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Yi Zhang <yi.zhang@redhat.com>, Luis Chamberlain <mcgrof@kernel.org>,
+ John Garry <john.g.garry@oracle.com>, Christoph Hellwig <hch@lst.de>
+References: <20250102015620.500754-1-ming.lei@redhat.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250102015620.500754-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-PAGE_SIZE is applied in some block device queue limits, this way is
-very fragile and is wrong:
+On 1/1/25 5:56 PM, Ming Lei wrote:
+> In RH lab, it has been found that max segment size of some mmc card is
+> less than 64K, then this kind of card can't work in case of 64K PAGE_SIZE.
 
-- queue limits are read from hardware, which is often one readonly
-hardware property
+That means that that MMC card is incompatible with the 64K page size.
 
-- PAGE_SIZE is one config option which can be changed during build time.
+Additionally, this patch looks wrong to me. There are good reasons why 
+the block layer requires that the DMA segment size is at least as large
+as the page size.
 
-In RH lab, it has been found that max segment size of some mmc card is
-less than 64K, then this kind of card can't work in case of 64K PAGE_SIZE.
+You may want to take a look at this rejected patch series:
+Bart Van Assche, "PATCH v6 0/8] Support limits below the page size",
+June 2023 
+(https://lore.kernel.org/linux-block/20230612203314.17820-1-bvanassche@acm.org/).
 
-Fix this issue by using SZ_4K in related code for dealing with queue
-limits.
-
-Cc: Yi Zhang <yi.zhang@redhat.com>
-Cc: Luis Chamberlain <mcgrof@kernel.org>
-Cc: John Garry <john.g.garry@oracle.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-settings.c | 6 +++---
- block/blk.h          | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 8f09e33f41f6..3b6918c134b1 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -300,7 +300,7 @@ int blk_validate_limits(struct queue_limits *lim)
- 	max_hw_sectors = min_not_zero(lim->max_hw_sectors,
- 				lim->max_dev_sectors);
- 	if (lim->max_user_sectors) {
--		if (lim->max_user_sectors < PAGE_SIZE / SECTOR_SIZE)
-+		if (lim->max_user_sectors < SZ_4K / SECTOR_SIZE)
- 			return -EINVAL;
- 		lim->max_sectors = min(max_hw_sectors, lim->max_user_sectors);
- 	} else if (lim->io_opt > (BLK_DEF_MAX_SECTORS_CAP << SECTOR_SHIFT)) {
-@@ -338,7 +338,7 @@ int blk_validate_limits(struct queue_limits *lim)
- 	 */
- 	if (!lim->seg_boundary_mask)
- 		lim->seg_boundary_mask = BLK_SEG_BOUNDARY_MASK;
--	if (WARN_ON_ONCE(lim->seg_boundary_mask < PAGE_SIZE - 1))
-+	if (WARN_ON_ONCE(lim->seg_boundary_mask < SZ_4K - 1))
- 		return -EINVAL;
- 
- 	/*
-@@ -359,7 +359,7 @@ int blk_validate_limits(struct queue_limits *lim)
- 		 */
- 		if (!lim->max_segment_size)
- 			lim->max_segment_size = BLK_MAX_SEGMENT_SIZE;
--		if (WARN_ON_ONCE(lim->max_segment_size < PAGE_SIZE))
-+		if (WARN_ON_ONCE(lim->max_segment_size < SZ_4K))
- 			return -EINVAL;
- 	}
- 
-diff --git a/block/blk.h b/block/blk.h
-index 2c26abf505b8..570d66f1e338 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -357,7 +357,7 @@ static inline bool bio_may_need_split(struct bio *bio,
- 		const struct queue_limits *lim)
- {
- 	return lim->chunk_sectors || bio->bi_vcnt != 1 ||
--		bio->bi_io_vec->bv_len + bio->bi_io_vec->bv_offset > PAGE_SIZE;
-+		bio->bi_io_vec->bv_len + bio->bi_io_vec->bv_offset > SZ_4K;
- }
- 
- /**
--- 
-2.44.0
-
+Bart.
