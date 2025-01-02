@@ -1,76 +1,56 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail115-69.sinamail.sina.com.cn (mail115-69.sinamail.sina.com.cn [218.30.115.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783E628E3F;
-	Thu,  2 Jan 2025 09:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B611AC458
+	for <linux-block@vger.kernel.org>; Thu,  2 Jan 2025 10:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735811387; cv=none; b=EN0QmiDhdwW5F3fejKgTkNB67W2KzqddZNaMEdQB7S2FX2BVBhN1EC3pTt1OvqSTDHsrRwEo1KDEEyRQU8ha4OKC1tgM+36sxqncUwT32QhVIrTYbflaHbFAMy8qBVKP1X2nTPN8YRj2+1rRH/v+/EFcO7wSEd/KQb4aJaRHFHY=
+	t=1735813755; cv=none; b=I/jhYWJYbuxxFeraC7w1YOn9JWhjKChn9bs9iEofU9ZoBS1vMLQVcTY9bUdn4hswJ1AX+Wn7N/L9nfu1ifC41In0RrPfy53+NPRxPitBvDZft81OCjSWd/pcqguxpw1htF9SIhiIg9y/XMJ1ZggYIrLlwyWleC8vFtiwKLpGIA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735811387; c=relaxed/simple;
-	bh=tXfAAU26K170fcnqh0owN8PXAjsnMTBCFumiGjaOeBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qqpbtACp+SFyDlStRog/3fF/TESpqgR6+NUs4uVvZGi5M7M+LwEjzHUom+WQj5j9s5oynOL7Y3Svida0l04dGx4LspDHjlenSI9S34b4KdHkFtc2Q8HzajnLe1Sw4LxQ/PD2umxVdE1TzXO6GcbP76EIbJw/jBY2NsCBsgDEByU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jymOAf3D; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jymOAf3D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2992C4CED6;
-	Thu,  2 Jan 2025 09:49:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735811387;
-	bh=tXfAAU26K170fcnqh0owN8PXAjsnMTBCFumiGjaOeBg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jymOAf3D7m3mfa7J4H+4AdQp8u9ITBFukQZjQSGCcf1jCIi+tFh8LUPsn93CKUekn
-	 ZV+A3NPZPdfCraH+d/Df8654DTUCWxocnkDuxolncQhl6spIpsAgKyCU6S0/vd+FPo
-	 fM+UTBqmZag9Re3Wm509djGWaeGHZGqbHDI/1lMV9dUloHcwcZM5hZ/2pBOCyoPbXD
-	 a2QgPtWadwW1B1HFWk37zRFS8bWsstfnpydiYRy7k+2ZSi/vyfWAqp/uu7C3tJlkfG
-	 djL+YkI4j1sLsY3lz31p9rzKQ8EhaRP45bHWa57AUvECyfDSI0mBWdfkYR4gBscK2p
-	 i06VwGFRO/JNg==
-Date: Thu, 2 Jan 2025 10:49:41 +0100
-From: Niklas Cassel <cassel@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Oliver Sang <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, linux-kernel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
-	Damien Le Moal <dlemoal@kernel.org>
-Subject: Re: [linus:master] [block]  e70c301fae: stress-ng.aiol.ops_per_sec
- 49.6% regression
-Message-ID: <Z3ZhNYHKZPMpv8Cz@ryzen>
-References: <202412122112.ca47bcec-lkp@intel.com>
- <20241213143224.GA16111@lst.de>
- <20241217045527.GA16091@lst.de>
- <Z2EgW8/WNfzZ28mn@xsang-OptiPlex-9020>
- <20241217065614.GA19113@lst.de>
+	s=arc-20240116; t=1735813755; c=relaxed/simple;
+	bh=Vx5GO7PyIWzEGTIeSdDqDqz7LuV7VBS9VwqozIFlvAs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=e2TVFueMHksXfe0u9n4QcABQz44RDnqhqxum1DOC/bHaGU0/8VpDYjrpd1lpuKpDAiKev6iL5Wq0Xe8Odnevyypz1EocGNw7J0iBFgjnjerd49oS1KKp7we3WSHKsCviQL82fYSj4HAudOEQO7jPcT78Hk9fgY/qZjOaQFcOPKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.118.64.128])
+	by sina.com (10.185.250.22) with ESMTP
+	id 67766A4A00003252; Thu, 2 Jan 2025 18:28:28 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 6959147602503
+X-SMAIL-UIID: 5DD46E63FE364BF6A7A4FFFE105F2AFC-20250102-182828-1
+From: Hillf Danton <hdanton@sina.com>
+To: syzbot <syzbot+566d48f3784973a22771@syzkaller.appspotmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	linux-block@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [scsi?] possible deadlock in sd_remove
+Date: Thu,  2 Jan 2025 18:28:15 +0800
+Message-ID: <20250102102816.1261-1-hdanton@sina.com>
+In-Reply-To: <6773a494.050a0220.2f3838.04da.GAE@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241217065614.GA19113@lst.de>
+Content-Transfer-Encoding: 8bit
 
-Hello Oliver, Christoph,
-
-On Tue, Dec 17, 2024 at 07:56:14AM +0100, Christoph Hellwig wrote:
-> On Tue, Dec 17, 2024 at 02:55:23PM +0800, Oliver Sang wrote:
-> > from below information, it seems an 'ahci' to me. but since I have limited
-> > knowledge about storage driver, maybe I'm wrong. if you want more information,
-> > please let us know. thanks a lot!
+On Tue, 31 Dec 2024 00:00:20 -0800
+> syzbot has found a reproducer for the following issue on:
 > 
-> Yes, this looks like ahci.  Thanks a lot!
+> HEAD commit:    573067a5a685 Merge branch 'for-next/core' into for-kernelci
+> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14a09818580000
 
-Did this ever get resolved?
-
-I haven't seen a patch that seems to address this.
-
-AHCI (ata_scsi_queuecmd()) only issues a single command, so if there is any
-reordering when issuing a batch of commands, my guess is that the problem
-also affects SCSI / the problem is in upper layers above AHCI, i.e. SCSI lib
-or block layer.
-
-
-Kind regards,
-Niklas
+#syz test: https://github.com/ming1/linux v6.13/block-fix
