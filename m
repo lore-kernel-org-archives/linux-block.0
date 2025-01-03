@@ -1,374 +1,165 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5BF1CCB21;
-	Fri,  3 Jan 2025 07:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CEA1C9DCB;
+	Fri,  3 Jan 2025 07:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735890181; cv=none; b=kRmcmCFyDLNPdNLsl2ql1RwHsEJKDYVYePqAfTSMsb6q+/ybHPaEV8Xz8C68yYevCnSij2WSM05otXv/xTHQSZADLGK1CpFSkQwyILXPg7G2cpyu5sLxmWmuYvqJWA/TXB6e/hln+2I2ECwA1hX5sAb7PCb76URNlNJIispN5QE=
+	t=1735890420; cv=none; b=kJH+FdUGYU2SQ3QKEQxhi81yYKj5GpowEUNBIWKZUzEL+uoW54C9wZEpLNzJPIu7wzQGU9CAqKtjtcSaXzXSHiAqG2k7XOQNpbhwwBe5xBf4ZJXLCsSTT+zzee1mL2DtY6RpFUe6tkPBXfWyRvGef0X6EeAlMTxT8pKKZdsTVIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735890181; c=relaxed/simple;
-	bh=cmnFPRdmNHGSmIFP9wsFVuZoBHoNJ5aCIrcOc4JOE3I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IP6fIzCCWktdB4YI5iYO1J/X6NrEyC+i2G3PqTrDSSMPzAlr6XaaBKoHlTocL8sEESBGSlXryCOwQzYnm+zEfdJgVBAlTZhAr9as6KeuXjvaRoLPQ1ZNF2d6P/qlCjrZClwfqqwoxKb25Odw4+B5qFWkL/l8T7+s5Mvm+JeEZ9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=du3+Jsdv; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1735890420; c=relaxed/simple;
+	bh=VLt9rpwPV38FGYOwb5OaugI89cfATc3txcCVxFgmiMk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=i1pIooaY1UvBCjXZzelcMPQcRWy+IlM/JxQIel8luTkWE8N/rIWk782fjYBae3KiU8TIDW1P5CzA6RnLxW8vQRudsa9B+eGmi4bzbXwFo+BV1F331CKcCJyEoDVQ/W70x+eGwFBJisdD0lZF7wZ/sSisKWw2os7YmXc9csqMqcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RgTwUipC; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="du3+Jsdv"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=Xntezr4FFqGDtbIoa9fW3h4Pb/lvUtiHVx5o6yV+c5Y=; b=du3+JsdvNKHQfMsTfi+dwtuZLR
-	rUbhOriocJdQjfYXvN/Obf0qt67jcg2eGJvRzvGcXeXaMBzJaYFUH3l4QkxcLq2yqYaxq6Q55eSft
-	rQ4bPQxhLoOV57obvyaINBhm/4fzcAc7Iwi0bRWhMuNQh10VnIJEbLmhQML0OdlhU2Zrc2+tj3evr
-	r2oIWRZPktKEzeQd8HnTZ8DV1i9DiEWqqPAuTOHXZlHOSnM/A925mSd5BtWbEpqmPazIgo3yRWp24
-	KB6bdy3Dn/ZadWhQevzofYYiP+UIv8hDPZau2BFIuWDUgekUD4kUTCk8yAa4qy3YyVmTcn3H9oVVu
-	nnYk8b2g==;
-Received: from [2001:4bb8:2dc:484c:63c3:48c7:ceee:8370] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tTcKY-0000000CNtb-3WWr;
-	Fri, 03 Jan 2025 07:42:51 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	John Garry <john.g.garry@oracle.com>,
-	linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 4/4] block: simplify tag allocation policy selection
-Date: Fri,  3 Jan 2025 08:42:12 +0100
-Message-ID: <20250103074237.460751-5-hch@lst.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250103074237.460751-1-hch@lst.de>
-References: <20250103074237.460751-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RgTwUipC"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaec111762bso1796608666b.2;
+        Thu, 02 Jan 2025 23:46:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1735890416; x=1736495216; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VLt9rpwPV38FGYOwb5OaugI89cfATc3txcCVxFgmiMk=;
+        b=RgTwUipC9Eq1QyfY7AvX13gXvPTfFoqPCsPI8AKSxvfNLzglLPafzliDKlNya3TDTq
+         oAhu3roXw9c7EKTnelEhd1tPlrTs4VUMwDLdIZkwBjKFykn5Ftst4QqBzByTdPd/wxSG
+         +B5/otBqsu9AAr3BGCFA9Txxq14kydF9O+9UitlEEgT+J4VcWj+OA7ccvF7FaMyEyjiO
+         B2JtJryRIiFWB3yjmoCSev3Aw34EAlWMl59ar1cNEWFJg9Vtj8E8bWIgr1Szz/Q5TRZD
+         3tTWdmIgTFgP13zZ+w/++ZZsspPQBidvgLdysEGNe3lUVIg/bXvsXmGwjCWCGZqkU9yc
+         iIfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735890416; x=1736495216;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VLt9rpwPV38FGYOwb5OaugI89cfATc3txcCVxFgmiMk=;
+        b=UUOZvPvXfxspHpSLcHPV7Zey7ogy7HXKe9i3DibhDcNY4AhfV2524fonkb4uCVFX/X
+         pdcHbHYqd7Yqg48HoOYUkWv4/TwUlP3kOu548K1vgOFq5k3gJOrn1N3mC2TJjvoMLvmH
+         mRwvIB3P+NL+jhJHh2K/mNOIBNI8ZG50jzddanaq6016AX4msw/eQ5buIhQaDODOsTbN
+         4GlUTG1LvjepQjv8C+27Y8conbMQ+hQ1BHPeJmxShZFR6jknAhQKVRzoiQf2HhPIiLS+
+         69c5BQsqChx/2fNP1eRVyL988WuO6oCRkzdODAydwvTnb6Q3EIkgf1v3Bg8z10TNHcdv
+         h86w==
+X-Forwarded-Encrypted: i=1; AJvYcCUpL7zIrlnn5kqaejE6IM0PFsQVrv977IfhIn5xcpLF9cqvuTYDSLcS/WrA1NU5P4cXztC3pEyjjeYbsZA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3H7AMHwQum6lgQY35gRcmVdXA6fOpjihpoUhz1Mfao76AVDPh
+	ZLVDg1IZ8SepBk3fbWr5DH7mWlW9X8WwWhgNdq4WVIXwIRhi5StY1efdKoBLceQTWkqjb74PHkR
+	ong1grK3gSUlso7DXBb76GnI3a0qyr8+3
+X-Gm-Gg: ASbGnctuSsn7qwPhLTJNsMn2eId/qlHXz6/Mec69QfTFkU8R+8/mWom7w6EVpCKUn9N
+	ybdIrF+GFkT3Ab0fEL1SXIpXjhvoVNsEdIf/+dOY=
+X-Google-Smtp-Source: AGHT+IEZUPbSlf8xxy/SsQbELadrGeTro9c6B8RiW/xRv0iupRA8J3s5KFLBZqIZKz/2G8pgkC6IxIGVrSyK42i8J5w=
+X-Received: by 2002:a17:906:fd87:b0:aae:bd4c:2683 with SMTP id
+ a640c23a62f3a-aaebd4c2951mr3913754666b.49.1735890415722; Thu, 02 Jan 2025
+ 23:46:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+From: cheung wall <zzqq0103.hey@gmail.com>
+Date: Fri, 3 Jan 2025 15:46:43 +0800
+Message-ID: <CAKHoSAsdOYRU2BzqyURmfsKqaCLGXnsXGZ=kj+zkt5wjYVAg0g@mail.gmail.com>
+Subject: "WARNING in del_gendisk" in Linux kernel version 5.15.169
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Use a plain BLK_MQ_F_* flag to select the round robin tag selection
-instead of overlaying an enum with just two possible values into the
-flags space.  Keep the value based selection inside of SCSI as the
-BLK_MQ_F_ flags aren't directly exposed to SCSI LLDDs.
+Hello,
 
-Doing so allows adding a BLK_MQ_F_MAX sentinel for simplified overflow
-checking in the messy debugfs helpers.
+I am writing to report a potential vulnerability identified in the
+Linux Kernel version 5.15.169. This issue was discovered using our
+custom vulnerability discovery tool.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq-debugfs.c                 | 25 ++++---------------------
- block/blk-mq-tag.c                     |  5 ++---
- block/blk-mq.c                         |  3 +--
- block/blk-mq.h                         |  2 +-
- drivers/ata/ahci.h                     |  2 +-
- drivers/ata/pata_macio.c               |  2 +-
- drivers/ata/sata_mv.c                  |  2 +-
- drivers/ata/sata_nv.c                  |  4 ++--
- drivers/ata/sata_sil24.c               |  2 +-
- drivers/scsi/hisi_sas/hisi_sas_v3_hw.c |  2 +-
- drivers/scsi/scsi_lib.c                |  4 ++--
- include/linux/blk-mq.h                 | 22 +++++++---------------
- include/linux/libata.h                 |  4 ++--
- include/scsi/scsi_host.h               |  7 ++++++-
- 14 files changed, 32 insertions(+), 54 deletions(-)
+Affected File: block/genhd.c
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 64b3c333aa47..adf5f0697b6b 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -172,19 +172,13 @@ static int hctx_state_show(void *data, struct seq_file *m)
- 	return 0;
- }
- 
--#define BLK_TAG_ALLOC_NAME(name) [BLK_TAG_ALLOC_##name] = #name
--static const char *const alloc_policy_name[] = {
--	BLK_TAG_ALLOC_NAME(FIFO),
--	BLK_TAG_ALLOC_NAME(RR),
--};
--#undef BLK_TAG_ALLOC_NAME
--
- #define HCTX_FLAG_NAME(name) [ilog2(BLK_MQ_F_##name)] = #name
- static const char *const hctx_flag_name[] = {
- 	HCTX_FLAG_NAME(TAG_QUEUE_SHARED),
- 	HCTX_FLAG_NAME(STACKING),
- 	HCTX_FLAG_NAME(TAG_HCTX_SHARED),
- 	HCTX_FLAG_NAME(BLOCKING),
-+	HCTX_FLAG_NAME(TAG_RR),
- 	HCTX_FLAG_NAME(NO_SCHED_BY_DEFAULT),
- };
- #undef HCTX_FLAG_NAME
-@@ -192,22 +186,11 @@ static const char *const hctx_flag_name[] = {
- static int hctx_flags_show(void *data, struct seq_file *m)
- {
- 	struct blk_mq_hw_ctx *hctx = data;
--	const int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(hctx->flags);
- 
--	BUILD_BUG_ON(ARRAY_SIZE(hctx_flag_name) !=
--			BLK_MQ_F_ALLOC_POLICY_START_BIT);
--	BUILD_BUG_ON(ARRAY_SIZE(alloc_policy_name) != BLK_TAG_ALLOC_MAX);
-+	BUILD_BUG_ON(ARRAY_SIZE(hctx_flag_name) != ilog2(BLK_MQ_F_MAX));
- 
--	seq_puts(m, "alloc_policy=");
--	if (alloc_policy < ARRAY_SIZE(alloc_policy_name) &&
--	    alloc_policy_name[alloc_policy])
--		seq_puts(m, alloc_policy_name[alloc_policy]);
--	else
--		seq_printf(m, "%d", alloc_policy);
--	seq_puts(m, " ");
--	blk_flags_show(m,
--		       hctx->flags ^ BLK_ALLOC_POLICY_TO_MQ_FLAG(alloc_policy),
--		       hctx_flag_name, ARRAY_SIZE(hctx_flag_name));
-+	blk_flags_show(m, hctx->flags, hctx_flag_name,
-+			ARRAY_SIZE(hctx_flag_name));
- 	seq_puts(m, "\n");
- 	return 0;
- }
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index ab4a66791a20..b9f417d980b4 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -545,11 +545,10 @@ static int bt_alloc(struct sbitmap_queue *bt, unsigned int depth,
- }
- 
- struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
--				     unsigned int reserved_tags,
--				     int node, int alloc_policy)
-+		unsigned int reserved_tags, unsigned int flags, int node)
- {
- 	unsigned int depth = total_tags - reserved_tags;
--	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
-+	bool round_robin = flags & BLK_MQ_F_TAG_RR;
- 	struct blk_mq_tags *tags;
- 
- 	if (total_tags > BLK_MQ_TAG_MAX) {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 17f10683d640..2e6132f778fd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3476,8 +3476,7 @@ static struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 
--	tags = blk_mq_init_tags(nr_tags, reserved_tags, node,
--				BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags));
-+	tags = blk_mq_init_tags(nr_tags, reserved_tags, set->flags, node);
- 	if (!tags)
- 		return NULL;
- 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 3bb9ea80f9b6..c872bbbe6411 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -163,7 +163,7 @@ struct blk_mq_alloc_data {
- };
- 
- struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags,
--		unsigned int reserved_tags, int node, int alloc_policy);
-+		unsigned int reserved_tags, unsigned int flags, int node);
- void blk_mq_free_tags(struct blk_mq_tags *tags);
- 
- unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data);
-diff --git a/drivers/ata/ahci.h b/drivers/ata/ahci.h
-index 8f40f75ba08c..64ce2f83feaa 100644
---- a/drivers/ata/ahci.h
-+++ b/drivers/ata/ahci.h
-@@ -396,7 +396,7 @@ extern const struct attribute_group *ahci_sdev_groups[];
- 	.shost_groups		= ahci_shost_groups,			\
- 	.sdev_groups		= ahci_sdev_groups,			\
- 	.change_queue_depth     = ata_scsi_change_queue_depth,		\
--	.tag_alloc_policy       = BLK_TAG_ALLOC_RR,             	\
-+	.tag_alloc_policy	= SCSI_TAG_ALLOC_RR,			\
- 	.device_configure	= ata_scsi_device_configure
- 
- extern struct ata_port_operations ahci_ops;
-diff --git a/drivers/ata/pata_macio.c b/drivers/ata/pata_macio.c
-index f2f36e55a1f4..5a3ee6417b57 100644
---- a/drivers/ata/pata_macio.c
-+++ b/drivers/ata/pata_macio.c
-@@ -935,7 +935,7 @@ static const struct scsi_host_template pata_macio_sht = {
- 	.device_configure	= pata_macio_device_configure,
- 	.sdev_groups		= ata_common_sdev_groups,
- 	.can_queue		= ATA_DEF_QUEUE,
--	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,
-+	.tag_alloc_policy	= SCSI_TAG_ALLOC_RR,
- };
- 
- static struct ata_port_operations pata_macio_ops = {
-diff --git a/drivers/ata/sata_mv.c b/drivers/ata/sata_mv.c
-index b8f363370e1a..fb70c8cf233c 100644
---- a/drivers/ata/sata_mv.c
-+++ b/drivers/ata/sata_mv.c
-@@ -672,7 +672,7 @@ static const struct scsi_host_template mv6_sht = {
- 	.dma_boundary		= MV_DMA_BOUNDARY,
- 	.sdev_groups		= ata_ncq_sdev_groups,
- 	.change_queue_depth	= ata_scsi_change_queue_depth,
--	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,
-+	.tag_alloc_policy	= SCSI_TAG_ALLOC_RR,
- 	.device_configure	= ata_scsi_device_configure
- };
- 
-diff --git a/drivers/ata/sata_nv.c b/drivers/ata/sata_nv.c
-index 36d99043ef50..56bc598c8f72 100644
---- a/drivers/ata/sata_nv.c
-+++ b/drivers/ata/sata_nv.c
-@@ -385,7 +385,7 @@ static const struct scsi_host_template nv_adma_sht = {
- 	.device_configure	= nv_adma_device_configure,
- 	.sdev_groups		= ata_ncq_sdev_groups,
- 	.change_queue_depth     = ata_scsi_change_queue_depth,
--	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,
-+	.tag_alloc_policy	= SCSI_TAG_ALLOC_RR,
- };
- 
- static const struct scsi_host_template nv_swncq_sht = {
-@@ -396,7 +396,7 @@ static const struct scsi_host_template nv_swncq_sht = {
- 	.device_configure	= nv_swncq_device_configure,
- 	.sdev_groups		= ata_ncq_sdev_groups,
- 	.change_queue_depth     = ata_scsi_change_queue_depth,
--	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,
-+	.tag_alloc_policy	= SCSI_TAG_ALLOC_RR,
- };
- 
- /*
-diff --git a/drivers/ata/sata_sil24.c b/drivers/ata/sata_sil24.c
-index 72c03cbdaff4..d51eeba4da3c 100644
---- a/drivers/ata/sata_sil24.c
-+++ b/drivers/ata/sata_sil24.c
-@@ -378,7 +378,7 @@ static const struct scsi_host_template sil24_sht = {
- 	.can_queue		= SIL24_MAX_CMDS,
- 	.sg_tablesize		= SIL24_MAX_SGE,
- 	.dma_boundary		= ATA_DMA_BOUNDARY,
--	.tag_alloc_policy	= BLK_TAG_ALLOC_FIFO,
-+	.tag_alloc_policy	= SCSI_TAG_ALLOC_FIFO,
- 	.sdev_groups		= ata_ncq_sdev_groups,
- 	.change_queue_depth	= ata_scsi_change_queue_depth,
- 	.device_configure	= ata_scsi_device_configure
-diff --git a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-index 79129c977704..cb23d2d3b29f 100644
---- a/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-+++ b/drivers/scsi/hisi_sas/hisi_sas_v3_hw.c
-@@ -3345,7 +3345,7 @@ static const struct scsi_host_template sht_v3_hw = {
- 	.slave_alloc		= hisi_sas_slave_alloc,
- 	.shost_groups		= host_v3_hw_groups,
- 	.sdev_groups		= sdev_groups_v3_hw,
--	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,
-+	.tag_alloc_policy	= SCSI_TAG_ALLOC_RR,
- 	.host_reset             = hisi_sas_host_reset,
- 	.host_tagset		= 1,
- 	.mq_poll		= queue_complete_v3_hw,
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 5cf124e13097..94869a0e4ba4 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2065,8 +2065,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
- 	tag_set->queue_depth = shost->can_queue;
- 	tag_set->cmd_size = cmd_size;
- 	tag_set->numa_node = dev_to_node(shost->dma_dev);
--	tag_set->flags |=
--		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
-+	if (shost->hostt->tag_alloc_policy == SCSI_TAG_ALLOC_RR)
-+		tag_set->flags |= BLK_MQ_F_TAG_RR;
- 	if (shost->queuecommand_may_block)
- 		tag_set->flags |= BLK_MQ_F_BLOCKING;
- 	tag_set->driver_data = shost;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index f2ff0ffa0535..a0a9007cc1e3 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -296,13 +296,6 @@ enum blk_eh_timer_return {
- 	BLK_EH_RESET_TIMER,
- };
- 
--/* Keep alloc_policy_name[] in sync with the definitions below */
--enum {
--	BLK_TAG_ALLOC_FIFO,	/* allocate starting from 0 */
--	BLK_TAG_ALLOC_RR,	/* allocate starting from last allocated tag */
--	BLK_TAG_ALLOC_MAX
--};
--
- /**
-  * struct blk_mq_hw_ctx - State for a hardware queue facing the hardware
-  * block device
-@@ -677,20 +670,19 @@ enum {
- 	BLK_MQ_F_TAG_HCTX_SHARED = 1 << 3,
- 	BLK_MQ_F_BLOCKING	= 1 << 4,
- 
-+	/*
-+	 * Alloc tags on a round-robin base instead of the first available one.
-+	 */
-+	BLK_MQ_F_TAG_RR		= 1 << 5,
-+
- 	/*
- 	 * Select 'none' during queue registration in case of a single hwq
- 	 * or shared hwqs instead of 'mq-deadline'.
- 	 */
- 	BLK_MQ_F_NO_SCHED_BY_DEFAULT	= 1 << 6,
--	BLK_MQ_F_ALLOC_POLICY_START_BIT = 7,
--	BLK_MQ_F_ALLOC_POLICY_BITS = 1,
-+
-+	BLK_MQ_F_MAX = 1 << 7,
- };
--#define BLK_MQ_FLAG_TO_ALLOC_POLICY(flags) \
--	((flags >> BLK_MQ_F_ALLOC_POLICY_START_BIT) & \
--		((1 << BLK_MQ_F_ALLOC_POLICY_BITS) - 1))
--#define BLK_ALLOC_POLICY_TO_MQ_FLAG(policy) \
--	((policy & ((1 << BLK_MQ_F_ALLOC_POLICY_BITS) - 1)) \
--		<< BLK_MQ_F_ALLOC_POLICY_START_BIT)
- 
- #define BLK_MQ_MAX_DEPTH	(10240)
- #define BLK_MQ_NO_HCTX_IDX	(-1U)
-diff --git a/include/linux/libata.h b/include/linux/libata.h
-index c1a85d46eba6..73a038ee0500 100644
---- a/include/linux/libata.h
-+++ b/include/linux/libata.h
-@@ -1467,13 +1467,13 @@ extern const struct attribute_group *ata_common_sdev_groups[];
- #define ATA_SUBBASE_SHT(drv_name)				\
- 	__ATA_BASE_SHT(drv_name),				\
- 	.can_queue		= ATA_DEF_QUEUE,		\
--	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,		\
-+	.tag_alloc_policy	= SCSI_TAG_ALLOC_RR,		\
- 	.device_configure	= ata_scsi_device_configure
- 
- #define ATA_SUBBASE_SHT_QD(drv_name, drv_qd)			\
- 	__ATA_BASE_SHT(drv_name),				\
- 	.can_queue		= drv_qd,			\
--	.tag_alloc_policy	= BLK_TAG_ALLOC_RR,		\
-+	.tag_alloc_policy	= SCSI_TAG_ALLOC_RR,		\
- 	.device_configure	= ata_scsi_device_configure
- 
- #define ATA_BASE_SHT(drv_name)					\
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index 2b4ab0369ffb..6163f2de4cbd 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -39,6 +39,11 @@ enum scsi_timeout_action {
- 	SCSI_EH_NOT_HANDLED,
- };
- 
-+enum scsi_tag_alloc_policy {
-+	SCSI_TAG_ALLOC_FIFO,	/* allocate starting from 0 */
-+	SCSI_TAG_ALLOC_RR,	/* allocate starting from last allocated tag */
-+};
-+
- struct scsi_host_template {
- 	/*
- 	 * Put fields referenced in IO submission path together in
-@@ -439,7 +444,7 @@ struct scsi_host_template {
- 	short cmd_per_lun;
- 
- 	/* If use block layer to manage tags, this is tag allocation policy */
--	int tag_alloc_policy;
-+	enum scsi_tag_alloc_policy tag_alloc_policy;
- 
- 	/*
- 	 * Track QUEUE_FULL events and reduce queue depth on demand.
--- 
-2.45.2
+File: block/genhd.c
 
+Function: del_gendisk
+
+Detailed Call Stack:
+
+------------[ cut here begin]------------
+
+RIP: 0010:del_gendisk+0x63b/0x830 block/genhd.c:586
+Code: 3c 03 0f 8e df 01 00 00 8b ab a0 00 00 00 31 ff 81 e5 00 04 00
+00 89 ee e8 82 fe 54 ff 85 ed 0f 85 a8 fa ff ff e8 d5 fb 54 ff <0f> 0b
+e9 71 ff ff ff e8 c9 fb 54 ff 48 8b 14 24 48 b8 00 00 00 00
+netlink: 'syz.4.3926': attribute type 4 has an invalid length.
+RSP: 0018:ffff888113ff7df8 EFLAGS: 00010216
+RAX: 000000000000008c RBX: ffff88810af7c800 RCX: ffffc9000749c000
+RDX: 0000000000040000 RSI: ffffffff81ed737b RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000000 R09: ffff888113ff7dbf
+R10: 0000000000000000 R11: 0000000000000001 R12: ffff88810af7c8a0
+R13: ffff88810b351400 R14: ffff88810b351000 R15: ffff88810a70b1c0
+FS: 00007f620e2b66c0(0000) GS:ffff88811af80000(0000) knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 00000001090f6000 CR4: 0000000000350ee0
+Call Trace:
+<TASK>
+loop_remove+0x39/0xf0 drivers/block/loop.c:2452
+loop_control_remove drivers/block/loop.c:2509 [inline]
+loop_control_ioctl+0x44d/0x4d0 drivers/block/loop.c:2547
+vfs_ioctl fs/ioctl.c:51 [inline]
+__do_sys_ioctl fs/ioctl.c:874 [inline]
+__se_sys_ioctl fs/ioctl.c:860 [inline]
+__x64_sys_ioctl+0x19a/0x210 fs/ioctl.c:860
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x33/0x80 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x6c/0xd6
+RIP: 0033:0x7f620f6e89c9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f620e2b6038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f620f904f80 RCX: 00007f620f6e89c9
+RDX: 0000000020002540 RSI: 0000000000004c81 RDI: 0000000000000003
+RBP: 00007f620f7951b6 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f620f904f80 R15: 00007ffe5d3a2638
+</TASK>
+irq event stamp: 553
+hardirqs last enabled at (559): [<ffffffff812b32ca>]
+console_trylock_spinning kernel/printk/printk.c:1891 [inline]
+hardirqs last enabled at (559): [<ffffffff812b32ca>]
+vprintk_emit+0x3da/0x420 kernel/printk/printk.c:2273
+hardirqs last disabled at (710): [<ffffffff812acf9d>]
+__up_console_sem+0x5d/0x80 kernel/printk/printk.c:255
+softirqs last enabled at (244): [<ffffffff81166c99>] __do_softirq
+kernel/softirq.c:592 [inline]
+softirqs last enabled at (244): [<ffffffff81166c99>] invoke_softirq
+kernel/softirq.c:432 [inline]
+softirqs last enabled at (244): [<ffffffff81166c99>] __irq_exit_rcu
+kernel/softirq.c:641 [inline]
+softirqs last enabled at (244): [<ffffffff81166c99>]
+irq_exit_rcu+0xe9/0x130 kernel/softirq.c:653
+softirqs last disabled at (187): [<ffffffff81166c99>] __do_softirq
+kernel/softirq.c:592 [inline]
+softirqs last disabled at (187): [<ffffffff81166c99>] invoke_softirq
+kernel/softirq.c:432 [inline]
+softirqs last disabled at (187): [<ffffffff81166c99>] __irq_exit_rcu
+kernel/softirq.c:641 [inline]
+softirqs last disabled at (187): [<ffffffff81166c99>]
+irq_exit_rcu+0xe9/0x130 kernel/softirq.c:653
+
+------------[ cut here end]------------
+
+Root Cause:
+
+The kernel crash is triggered by the del_gendisk function within the
+block/genhd.c file at line 586. The root cause appears to be an
+improperly formatted netlink message, specifically an attribute of
+type 4 that has an invalid length. This malformed netlink message is
+processed by the loop device driver (drivers/block/loop.c),
+particularly during the removal of a loop device (loop_remove and
+loop_control_remove functions). The invalid attribute leads to
+incorrect handling within the loop device's ioctl operations
+(loop_control_ioctl), ultimately causing del_gendisk to malfunction.
+This sequence results in a kernel oops, crashing the system. The issue
+likely stems from the loop device driver not adequately validating the
+length of netlink message attributes before processing them, allowing
+malformed data to disrupt kernel operations.
+
+Thank you for your time and attention.
+
+Best regards
+
+Wall
