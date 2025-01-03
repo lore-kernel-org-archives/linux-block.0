@@ -1,50 +1,43 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367181D4610;
-	Fri,  3 Jan 2025 09:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25A21119A;
+	Fri,  3 Jan 2025 09:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735895360; cv=none; b=UlWDeMzUrG8ROmARTx0gHq7HHy/Y12zRAxFcv4x8QQmeNpVppcIqsOQXP0BnKVEKWjDZeTmTx930ruS6N2zNM48HH6BJfIXq9VqxoDtLq0qSesCP7AMiwFu7DzZwGZKnM0s1LMFrL+0XUUS+DYA6qvyg38cOmcEmEmJDhVgepBQ=
+	t=1735896408; cv=none; b=K/8Ntiy4bYw3ogh//DjfHkcHhHu1trwKtjeKC5WVl8gU2ZyRu5ryoRvZklVQJ9zBvtVpmaCXhZUfS0xgbfmfwbZBQ/qCbEs90lgvL3ThBlqmGBB2/VV1jMwkjtxE9zLzrauPkpqNEWAzhCFH4OTPA9V1u/XPYJWbbjih1lDbDW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735895360; c=relaxed/simple;
-	bh=EV+hiXpMnVwPGQUO7JrQyTZCFrVUBDW19vmgMtQRWGg=;
+	s=arc-20240116; t=1735896408; c=relaxed/simple;
+	bh=r12MOnn1uesY7j1pRUihCeTf3pHRkYo3YfSJvunhVU8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iyG5dDRmR1dCRCqvAwVGpvgCWVw5yh835bv0ahlbnUg7sfLTICHQ4hk/MozQhXJ9wDJu4SuLVI+NEf9d857GWUaAw1urT7cA/WrlhNFSSVhd163kZce/jja02DmIHqa8DUH6ARROxTviKC0EyOS3pgsrkw4Uze+JYfjRTpLaKsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eOPpH7Z1; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=BMr6v1PxbnMQ2LoBzfobyFW3dD1xFrBZnJOh3TxCS6yS/D1808ynLt+WXAmzS0FxNFU+VE/uGXeEy+pKjbh/Z2UvJgyxFlGPZlcFzUhg1u8VYXY22R+vm31Xk3XTspBwCda2mI3I6QdZWABg4acGasZlMAPOc772TSyOoRF1gnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qxl5Awe0; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eOPpH7Z1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27344C4CECE;
-	Fri,  3 Jan 2025 09:09:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735895359;
-	bh=EV+hiXpMnVwPGQUO7JrQyTZCFrVUBDW19vmgMtQRWGg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eOPpH7Z1DWY+qC+ZswNYpEj1NogUVt18Le5PmNjKRycWQMWFCXz5ZLu/ps6JGuouv
-	 YSRXpSielIWAG4ix5MM9Ly/Bue7AivSVToUq8B4/BO/uVX4jr/jg4rg3eP+2SNDEUL
-	 44mc7IJ9OfPI5JQsikHpGMEibSRHvEs/rBPlE6w4zebF34+H49VhgEMNJjevnkXpJq
-	 sF6JIRKKHop6Iz5soaFjfVKtPAMAu5fFp6/IasYWTFyXhJZ30e4piw20lSDqRQdUJL
-	 zy3JPS0vSxCPQDWkerdOHwvXMT5v7NOsqhiTJW/U4huW6LtT4kQBvtn0daaSZ8Ix0R
-	 1x37gPSi3R4Kw==
-Date: Fri, 3 Jan 2025 10:09:14 +0100
-From: Niklas Cassel <cassel@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Oliver Sang <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, linux-kernel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
-	Damien Le Moal <dlemoal@kernel.org>, linux-btrfs@vger.kernel.org,
-	linux-aio@kvack.org
-Subject: Re: [linus:master] [block]  e70c301fae: stress-ng.aiol.ops_per_sec
- 49.6% regression
-Message-ID: <Z3epOlVGDBqj72xC@ryzen>
-References: <202412122112.ca47bcec-lkp@intel.com>
- <20241213143224.GA16111@lst.de>
- <20241217045527.GA16091@lst.de>
- <Z2EgW8/WNfzZ28mn@xsang-OptiPlex-9020>
- <20241217065614.GA19113@lst.de>
- <Z3ZhNYHKZPMpv8Cz@ryzen>
- <20250103064925.GB27984@lst.de>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qxl5Awe0"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=jmVJJz+38rmIB/8qMaixIq1CEISbYL2BWv1447YsIio=; b=qxl5Awe00UrxQyzxcnu9RkYyU0
+	fF7vfHF92LW1CXnqoogPXuc5wSjvtp0ZbkUgKPyloKemOnkrKKemSlIuSYlX/kxcb4ivp5N/rhZA9
+	fYZl6bCab7DquVIsYm4heHU/+qg8Iqt3exliDH8vijZTaC15RV9m5iToT8tIhJRYUozjlgYZgfwTT
+	jDsAr6t6nskr1oZ6o8xQI6W1tSq//M6oqZQJSOTvmbKVoLDMoLasZE5zFrhrWFVnOGnhahFlmYN27
+	k6KH0W04gIETO3ueK1k7r5mBmTuDgecZQrXZt+DRalO/3+27/qFhlzwFB94QKStzxvjK07nKTXNJj
+	eVLla9jQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tTdx8-0000000Cbaw-0eXi;
+	Fri, 03 Jan 2025 09:26:46 +0000
+Date: Fri, 3 Jan 2025 01:26:46 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Vishnu ks <ksvishnu56@gmail.com>
+Cc: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+	bpf@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [LSF/MM/BPF TOPIC] Improving Block Layer Tracepoints for
+ Next-Generation Backup Systems
+Message-ID: <Z3etVqYMWjh9n7s5@infradead.org>
+References: <CAJHDoJac2Qa6QjhDFi7YZf0D05=Svc13ZQyX=92KsM7pkkVbJA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,48 +46,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250103064925.GB27984@lst.de>
+In-Reply-To: <CAJHDoJac2Qa6QjhDFi7YZf0D05=Svc13ZQyX=92KsM7pkkVbJA@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Jan 03, 2025 at 07:49:25AM +0100, Christoph Hellwig wrote:
-> On Thu, Jan 02, 2025 at 10:49:41AM +0100, Niklas Cassel wrote:
-> > > > from below information, it seems an 'ahci' to me. but since I have limited
-> > > > knowledge about storage driver, maybe I'm wrong. if you want more information,
-> > > > please let us know. thanks a lot!
-> > > 
-> > > Yes, this looks like ahci.  Thanks a lot!
-> > 
-> > Did this ever get resolved?
-> > 
-> > I haven't seen a patch that seems to address this.
-> > 
-> > AHCI (ata_scsi_queuecmd()) only issues a single command, so if there is any
-> > reordering when issuing a batch of commands, my guess is that the problem
-> > also affects SCSI / the problem is in upper layers above AHCI, i.e. SCSI lib
-> > or block layer.
-> 
-> I started looking into this before the holidays.  blktrace shows perfectly
-> sequential writes without any reordering using ahci, directly on the
-> block device or using xfs and btrfs when using dd.  I also started
-> looking into what the test does and got as far as checking out the
-> stress-ng source tree and looking at stress-aiol.c.  AFAICS the default
-> submission does simple reads and writes using increasing offsets.
-> So if the test result isn't a fluke either the aio code does some
-> weird reordering or btrfs does.
-> 
-> Oliver, did the test also show any interesting results on non-btrfs
-> setups?
-> 
+On Wed, Jan 01, 2025 at 12:04:56PM +0530, Vishnu ks wrote:
+> - I'm developing a continuous data protection system using eBPF to
+> monitor block request completions
+> - The system aims to achieve reliable live data replication for block devices
+> Current tracepoints present challenges in capturing the complete
+> lifecycle of write operations
 
-One thing that came to mind.
-Some distros (e.g. Fedora and openSUSE) ship with an udev rule that sets
-the I/O scheduler to BFQ for single-queue HDDs.
+This is nuts.  No, we don't guarantee any stability in the trace points,
+and certainly not for data integrity operations.
 
-It could very well be the I/O scheduler that reorders.
-
-Oliver, which I/O scheduler are you using?
-$ cat /sys/block/sdb/queue/scheduler 
-none mq-deadline kyber [bfq]
-
-
-Kind regards,
-Niklas
+Please make sure this never gets near any production system.
