@@ -1,113 +1,223 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa11.hc1455-7.c3s2.iphmx.com (esa11.hc1455-7.c3s2.iphmx.com [207.54.90.137])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6450187876
-	for <linux-block@vger.kernel.org>; Fri,  3 Jan 2025 02:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C7414F9CC;
+	Fri,  3 Jan 2025 03:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.54.90.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735869748; cv=none; b=YqBmRR3GtOYfNRfWVBH5IWEwLgTHqoWhtjWPxURoZjIbXyS6+6M0AOVBE5CY/qsHacrWAO4H3W4BGOThyxa33Aku2rl0ubTUHRfQmTR6OzdJNIezCKEkpCu5xvrfI+JjIeS/gIj6m9nU6euSnChWgxCa5hN56GioPoSLmW3C/mk=
+	t=1735874450; cv=none; b=Uh4+qMdp2JfwbMRzaA66/xgkgNzzZeUgc0XuhoVK6CDLOAHRiijB161ETjudq4jamIkGtNYlfzFv7U6LODSTSaVVIPpVyjIM+gB4Oy1WQvZMv10SGYDmKfJ5jCUANR9Ct7VZCSyrIzy8i4FtsmZoqy35YPZ4s96MUICjDNhsFvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735869748; c=relaxed/simple;
-	bh=AvQQVDSrd9xkqZBOsEiocP3W85bxnnolZeMdrhUPfIs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U5z9haACXV1pUM+9LdsNhkYxlf9BYpW4+BICwh2U7Ycwb3tahZMBmbRoCc6PpoLUbDCro44iA6FsYp3BWurK0egYNN5NWQc8OIYLRReF90kdH0tkI8q2YSogs6DbBiQPQu8MsghFda0B2E9gIEO0K5LMg8jwSf69d0eoGfAKfi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dpKNnUPI; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1735874450; c=relaxed/simple;
+	bh=VY/DZvQ7xxG17pv9B+6tSdMOli3NPVxZ+1o5uUXxVEo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C/3EHB3CEO4lXf+p5ZlJxpPUjdAK0F+tEhdo3dfftGXNEK+CGgqooVyblX01HcymNCiY6d/yYxHzXrU4A9xDWP5PjOLBTDUnVUBl+uVepLHh378wJNHjBDp6SZZ9cyYekYyo9IgQkxW1AykHTC9OR19IRTWivUSfmxLPkkL4Mro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=NsBBP7FZ; arc=none smtp.client-ip=207.54.90.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpKNnUPI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1735869745;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wJjtyfJ1LBYN6rLvzwpWerDYB1UtCFcfHX9G1CeQQx0=;
-	b=dpKNnUPIb+FjigDZVYJ1ntJOo7qrJZGd771qu9dSmDYaP+7MkUpsMH6WM1mG+XwXsP5QkO
-	LCoyFkwZMTNsrt2dUw8OvR6K8WUBjolfUyls1bvVvxFbatj/L5cEcok0Po71KTWpNm/FML
-	1+sTfv5Yu4k8i2EUFyvvrvMvbFSBTUM=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-257-B3hk8V-sMVOaamjZRSJ2nQ-1; Thu,
- 02 Jan 2025 21:02:20 -0500
-X-MC-Unique: B3hk8V-sMVOaamjZRSJ2nQ-1
-X-Mimecast-MFC-AGG-ID: B3hk8V-sMVOaamjZRSJ2nQ
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 84D09184AB36;
-	Fri,  3 Jan 2025 02:01:53 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.47])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 29BA0196BBC3;
-	Fri,  3 Jan 2025 02:01:46 +0000 (UTC)
-Date: Fri, 3 Jan 2025 10:01:41 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Yi Zhang <yi.zhang@redhat.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	John Garry <john.g.garry@oracle.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] block: make queue limits workable in case of 64K
- PAGE_SIZE
-Message-ID: <Z3dFBQIiik6FWLut@fedora>
-References: <20250102015620.500754-1-ming.lei@redhat.com>
- <0b423229-f928-4210-9351-dca353071231@acm.org>
- <Z3X-xMeMuF8j0RDA@fedora>
- <0b34bfc9-2cd3-40a8-8153-3207a6d62f8c@acm.org>
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="NsBBP7FZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1735874450; x=1767410450;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VY/DZvQ7xxG17pv9B+6tSdMOli3NPVxZ+1o5uUXxVEo=;
+  b=NsBBP7FZy4rpJZBoXnXYErlEcSxMb30WUkqYxV8z3oM+doevsLSYkx8h
+   xiE5hYDPUV+/6fyloOFvq2d09aFnK7KjcwCBWJFMjnlpygDLuQ700KwrY
+   EKmQtJoZps/9Gt8JqrdFbdrtwWg3Sj0mFtna/cD2OjHLaucmvynkUl649
+   uXY/bTnN4IKC4QggqC9T9WjiU5YffIMFBcvS0e1pDv94eg4VXnLT9fmWK
+   7M62/iW1+1kG9hPt8iYwzH+hh4TaRaON+vSd4UItqI/KJI3yFhDAcQF8b
+   zalRGitlIdKeezbGF+9wz0iaAhmg44Wul4FtVqa3mWnp/Dv3m7Qu0jHLY
+   g==;
+X-CSE-ConnectionGUID: 43OuyuT1TVWaBXVR7hIKHw==
+X-CSE-MsgGUID: CtdEMU9nQp2lpE3SyV+dkg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11303"; a="164934654"
+X-IronPort-AV: E=Sophos;i="6.12,286,1728918000"; 
+   d="scan'208";a="164934654"
+Received: from unknown (HELO yto-r4.gw.nic.fujitsu.com) ([218.44.52.220])
+  by esa11.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2025 12:19:38 +0900
+Received: from yto-m2.gw.nic.fujitsu.com (yto-nat-yto-m2.gw.nic.fujitsu.com [192.168.83.65])
+	by yto-r4.gw.nic.fujitsu.com (Postfix) with ESMTP id E57EED4F43;
+	Fri,  3 Jan 2025 12:19:34 +0900 (JST)
+Received: from kws-ab3.gw.nic.fujitsu.com (kws-ab3.gw.nic.fujitsu.com [192.51.206.21])
+	by yto-m2.gw.nic.fujitsu.com (Postfix) with ESMTP id ADC54D5050;
+	Fri,  3 Jan 2025 12:19:34 +0900 (JST)
+Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
+	by kws-ab3.gw.nic.fujitsu.com (Postfix) with ESMTP id 438F120076D0E;
+	Fri,  3 Jan 2025 12:19:34 +0900 (JST)
+Received: from iaas-rpma.. (unknown [10.167.135.44])
+	by edo.cn.fujitsu.com (Postfix) with ESMTP id 72C2D1A006C;
+	Fri,  3 Jan 2025 11:19:33 +0800 (CST)
+From: Li Zhijian <lizhijian@fujitsu.com>
+To: linux-block@vger.kernel.org
+Cc: shinichiro.kawasaki@wdc.com,
+	linux-rdma@vger.kernel.org,
+	Li Zhijian <lizhijian@fujitsu.com>,
+	Jack Wang <jinpu.wang@ionos.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>
+Subject: [PATCH blktests v3 1/2] tests/rnbd: Add a basic RNBD test
+Date: Fri,  3 Jan 2025 11:19:19 +0800
+Message-Id: <20250103031920.2868-1-lizhijian@fujitsu.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b34bfc9-2cd3-40a8-8153-3207a6d62f8c@acm.org>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28898.004
+X-TM-AS-User-Approved-Sender: Yes
+X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28898.004
+X-TMASE-Result: 10--10.419300-10.000000
+X-TMASE-MatchedRID: ZAkTtSyZ7B4IT+bl0YsmPsaw71DJbaIE9LMB0hXFSehiJsO4rdorwRk5
+	KK4/zwVMZRUjkVFROF4pVSN22QMNplK4l8RZlJB8qoeab9Xgz88yhLY8urUHvownGKAoIKJLdTe
+	gpK7QnXFSHmZoogkDH+affHI8kAmiHY/bzRmIaZEZgmFGHqyx6x+KaaVwAG43J8lOf52acVAaZW
+	50SGemhDZM29W+gPjuxiCFVySb1XRIh3lzWiNI44knvYO5kHScJ7AUYFBH3aZ1l69bBW+lDFC3w
+	t5mVI6EuxYW/imZLK2dqC2fLtk9xB8TzIzimOwPC24oEZ6SpSkj80Za3RRg8CIH00BBjDgQjgbS
+	npB9VHWRDJJHdMqrs4TsYuhBnTQ1RDIvEhuXQz0=
+X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
 
-On Wed, Jan 01, 2025 at 07:46:41PM -0800, Bart Van Assche wrote:
-> On 1/1/25 6:49 PM, Ming Lei wrote:
-> > On Wed, Jan 01, 2025 at 06:30:30PM -0800, Bart Van Assche wrote:
-> > > Additionally, this patch looks wrong to me. There are good reasons why the
-> > > block layer requires that the DMA segment size is at least as large
-> > > as the page size.
-> > 
-> > Do you think 512byte sector can't be DMAed?
-> 
-> A clarification: I was referring to the maximum DMA segment size. The
-> 512 byte number in your email refers to the actual DMA transfer size. My
-> statement does not apply to the actual DMA transfer size.
+It attempts to connect and disconnect the rnbd service on localhost.
+Actually, It also reveals a real kernel issue[0].
 
-But why does DMA segment size have to be >= PAGE_SIZE(4KB, 64KB)?
+Please note that currently, only RTRS over RXE is supported.
 
-I don't think that the constraint is from hardware because DMA controller is
-capable of doing DMA on buffer with smaller alignment & size.
+[0] https://lore.kernel.org/linux-rdma/20241231013416.1290920-1-lizhijian@fujitsu.com/
 
-IMO, the limit is actually from block layer, that is why I posted out
-this patch.
+Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
+---
+V3:
+  new patch, add a seperate basic rnbd test and simplify the _start_rnbd_client
 
-> 
-> > > You may want to take a look at this rejected patch series:
-> > > Bart Van Assche, "PATCH v6 0/8] Support limits below the page size",
-> > > June 2023 (https://lore.kernel.org/linux-block/20230612203314.17820-1-bvanassche@acm.org/).
-> > 
-> > '502 Bad Gateway' is returned for the above link.
-> 
-> That link works fine here on multiple devices (laptop, workstation,
-> smartphone) so please check your setup.
+Copy to the RDMA/rtrs guys:
 
-It is reachable now.
+Cc: Jack Wang <jinpu.wang@ionos.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Leon Romanovsky <leon@kernel.org>
+Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
+Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
+---
+ tests/rnbd/001     | 39 +++++++++++++++++++++++++++++++++++
+ tests/rnbd/001.out |  2 ++
+ tests/rnbd/rc      | 51 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 92 insertions(+)
+ create mode 100755 tests/rnbd/001
+ create mode 100644 tests/rnbd/001.out
+ create mode 100644 tests/rnbd/rc
 
-From the link, you have storage controllers with DMA segment size which
-is less than 4K, which may never get supported by linux kernel.
-
-I am looking at hardware which works fine on kernel with 4K page size, but
-it becomes not workable when kernel is built as 64K page size, which confuses
-final kernel users.
-
-
-Thanks,
-Ming
+diff --git a/tests/rnbd/001 b/tests/rnbd/001
+new file mode 100755
+index 000000000000..ace2f8ea8a2b
+--- /dev/null
++++ b/tests/rnbd/001
+@@ -0,0 +1,39 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (c) 2024 FUJITSU LIMITED. All Rights Reserved.
++#
++# Basic RNBD test
++#
++. tests/rnbd/rc
++
++DESCRIPTION="Start Stop RNBD"
++CHECK_DMESG=1
++QUICK=1
++
++requires() {
++	_have_rnbd
++	_have_loop
++}
++
++test_start_stop()
++{
++	_setup_rnbd || return
++
++	local loop_dev
++	loop_dev="$(losetup -f)"
++
++	if _start_rnbd_client "${loop_dev}"; then
++		sleep 0.5
++		_stop_rnbd_client || echo "Failed to disconnect rnbd"
++	else
++		echo "Failed to connect rnbd"
++	fi
++
++	_cleanup_rnbd
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++	test_start_stop
++	echo "Test complete"
++}
+diff --git a/tests/rnbd/001.out b/tests/rnbd/001.out
+new file mode 100644
+index 000000000000..c1f9980d0f7b
+--- /dev/null
++++ b/tests/rnbd/001.out
+@@ -0,0 +1,2 @@
++Running rnbd/001
++Test complete
+diff --git a/tests/rnbd/rc b/tests/rnbd/rc
+new file mode 100644
+index 000000000000..1cf98ad5c498
+--- /dev/null
++++ b/tests/rnbd/rc
+@@ -0,0 +1,51 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (c) 2024 FUJITSU LIMITED. All Rights Reserved.
++#
++# RNBD tests.
++
++. common/rc
++. common/multipath-over-rdma
++
++_have_rnbd() {
++	if [[ "$USE_RXE" != 1 ]]; then
++		SKIP_REASONS+=("Only USE_RXE=1 is supported")
++	fi
++	_have_driver rdma_rxe
++	_have_driver rnbd_server
++	_have_driver rnbd_client
++}
++
++_setup_rnbd() {
++	start_soft_rdma
++	for i in $(rdma_network_interfaces)
++	do
++		ipv4_addr=$(get_ipv4_addr "$i")
++		if [[ -n "${ipv4_addr}" ]]; then
++			def_traddr=${ipv4_addr}
++		fi
++	done
++}
++
++_cleanup_rnbd()
++{
++	stop_soft_rdma
++}
++
++_stop_rnbd_client() {
++	local s sessions
++
++	sessions=$(ls -d /sys/block/rnbd* 2>/dev/null)
++	for s in $sessions
++	do
++		grep -qx blktest "$s"/rnbd/session && echo "normal" > "$s"/rnbd/unmap_device
++	done
++}
++
++_start_rnbd_client() {
++	local blkdev=$1
++
++	# Stop potential remaining blktest sessions first
++	_stop_rnbd_client
++	echo "sessname=blktest path=ip:$def_traddr device_path=$blkdev" > /sys/devices/virtual/rnbd-client/ctl/map_device
++}
+-- 
+2.47.0
 
