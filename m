@@ -1,62 +1,62 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DABDE442C
-	for <linux-block@vger.kernel.org>; Fri,  3 Jan 2025 15:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A1C2563
+	for <linux-block@vger.kernel.org>; Fri,  3 Jan 2025 15:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735917188; cv=none; b=ngKQeEbCq+wpDCRqhroSHQecyUZ36MgCXCcQCe7oRVjBuxp7EE5oLEmnjird2F2nC+Y3XrT4MqlXbB3LCjvxdAs4wfpa5zCOqRktpqyYVyiHFLJeLXTDPmkQgLurHkYUvkvo62ge4C/o5fmmu/v9ae8gA1s7lK2krP/SOGaD120=
+	t=1735917900; cv=none; b=cfmmWuTdZBErWAzmBb5XEIZjC/dRj5vqS7cWqvBvpC2VwEWcKbKr5i+gQohAdmF1p4P7AvMQUoKmU+XEYIFagIPKhLO116wi3kuJ9+GLDAs8657Mw8ULaI3IYYE1CUSLcYcAhruFjstUHA4Y8j4Cl7Dv+apyrpwjRZPwlZgsIvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735917188; c=relaxed/simple;
-	bh=+AfZuFvCS3fgc1EA+P+zkg87IdI0SBkNtCn9+vexS2w=;
+	s=arc-20240116; t=1735917900; c=relaxed/simple;
+	bh=vNoO6/RTa0+Cs8SCWZP2GdkyKrBoaUCJuB6YPQLrcrg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bPND8jhd+XpqWNJvRgptZxhRQLV69+ZO8/YVrZnxEZqJAtDNZSmNpaZObt3vuOgrSDFkZPCUOgGuMbMMxTZJlVytT4IrWZ+WWET+oJxIfdqyKnLU+oD0/jkhXI/TipqZjJkccpRcYkOKVeYL7hij6fX9d+jbgu3v2UuKkRHRMWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qCIbPH5F; arc=none smtp.client-ip=209.85.214.181
+	 In-Reply-To:Content-Type; b=GN7ZaoAJtp6euVyg5WUptrKUjnA2SsUNWNDZi14XkIJJtEvR1GaLcEufxIVS7q/jhSlBflt0ifSSZG346+x/AWsPyh0GqxDnudjlv6DAki+7TYheubqUHfTLl4DMkKFylGG7C/FHKoXmHKWHGFD5eivkVjbpCxWu6GFryWqceIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Nw2qxk5G; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qCIbPH5F"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21680814d42so147062335ad.2
-        for <linux-block@vger.kernel.org>; Fri, 03 Jan 2025 07:13:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Nw2qxk5G"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21619108a6bso160242945ad.3
+        for <linux-block@vger.kernel.org>; Fri, 03 Jan 2025 07:24:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1735917185; x=1736521985; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1735917898; x=1736522698; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=9Wj258D+kUTkxTWmQR0Kz0eot3ear1X5orgKLKx7nHc=;
-        b=qCIbPH5FTpt8witIbIn2xlBqwdRxz9FNUDUfHj1bLSP8PRsBk4+RuNrgqXvvdOKe1X
-         O0q0SqIwxy3QUSc5OHtgms4UcJ6JMzBwekCHVc2DgzUHjBfcGvpLgAlhTMX9HRIYQatC
-         3qH59FCVXlCXNt/BXMYPVj94oHQszGWFvpeEAvK+eIWtmqelM/kt0zp8xf/8OgRznUpi
-         0IhlfUbBoRkI5vCIYv8LMIDA0YeBzW00znBKtfL+wq93c36xa1ba0NGgVFrniNfV9Fnj
-         V3MmD/Zl1s8DtMPS9oz7l0ooNJ+rIXWIzBNTaFImF2BeR/IL1n/UKDU3Lw0h6TK5xLjS
-         1jUg==
+        bh=zctGW0WvkBYyGiHlWFyGzlm6qvTACwcFPwZXCT6d7uc=;
+        b=Nw2qxk5GxdeNJFxmMV64s1KDAOBvx0Rr34+3LLy17zTlRfdLPR9Hdrxvv1Kr/hI8h9
+         bgYXnq0/SztOmQHOveAfLiSrMZIoRpYki87sqYxGMM553L0ABu8vVMH4wG0rcuNgqWnk
+         +slEADzKMtCwQrutr7esmV2mX99F8vlgxJOaddrBdxqiYbUQUDUMYVfzdABcG34slvJc
+         Tqy8bmd1fbAg2cQgOOqT7hS07UKraaFt4qh6mb7yXDTqcbsRPZNyc3sYwsolM++2MGRr
+         juXFWncfE1BkFMKUXfZRszLHPkwXpm1khHwIhNc8batKB2gtDbpT9Yq2sCMhwY4aEcF8
+         N8iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735917185; x=1736521985;
-        h=content-transfer-encoding:in-reply-to:content-language:from
+        d=1e100.net; s=20230601; t=1735917898; x=1736522698;
+        h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Wj258D+kUTkxTWmQR0Kz0eot3ear1X5orgKLKx7nHc=;
-        b=qKH2Ut5G89uGOvD0ualBHbz/FCylx1SckUoqeZoHAoxFOXyar+eZwObIEjZm8ajTw8
-         LZKUDraxvnpBSsYZvA1D0EkdFFthoVSBnHAQNGIWgzeJ5Nbr8qgWUIHc3B+FP4wcHB9e
-         48h0TT0qHu0wCpaDgzSLVqyHtnOBvv/lyh9FcXdyjmYC7yFvV2D4JyH8hgRRJrEfd8ZB
-         hpdBVJp6i4p+9J3nmckiP0+BywESqVZJozu/Qncl+GG5xkdHGO5z9sNJKMvom2tMZl5P
-         8G7P+ZgslXnnDHip1PszVJFUQcEGLQ1seJwf9cm7CYMdOB4ZY38A+S4uNwGA428U33m2
-         DRQA==
-X-Gm-Message-State: AOJu0YzOACQ/ecxKrPdkBYu2/SHv+IsHK4XUWN9UkZX+AqRG924EUl6C
-	Vd9zD8imQM1fi8QQXJmfAMArDNoCvQIocaKAkcz3huC2oigTSPrrhc3AfmAVJ18=
-X-Gm-Gg: ASbGnctYWM9WWFK5NCqcqc792X4Gk7v1DJT6fljT4Voee+CdKBWamNP7L/UVNx4JaFi
-	/CCnfjCDbTh/99qo3DRNQGzXN1BUpkEmHYc6UGlwjUPL1QSFH1QYQOlaCxcQLib6AmBA2YlsE3+
-	AtdnvAVQeKcrLKSMNEJQLgOxE4d/Jyf0YIpJJF1DKDX4ZgxglJLHdbeFVeywB8Gd9Y/kbI9a0n7
-	geceBWhuLPgXfne3JiKN/Gwn4rMSTgQpfVf9D4tHJCUvJFCOIG5dw==
-X-Google-Smtp-Source: AGHT+IEoqL2cuJXspR6TceLnFsxTlvfAd+xzR9pwBGT9mfOKcCotE6EmVlySvM5C8VJacktOARfgYQ==
-X-Received: by 2002:a17:903:2a8c:b0:215:9091:4f56 with SMTP id d9443c01a7336-219e6e9f997mr729542615ad.14.1735917184982;
-        Fri, 03 Jan 2025 07:13:04 -0800 (PST)
+        bh=zctGW0WvkBYyGiHlWFyGzlm6qvTACwcFPwZXCT6d7uc=;
+        b=qdK25qCPoM6mbRN69AjPVzyklP6LJBN7/VgZzI5Ky5SyjH9ZvV4axkGS75/xDJro0T
+         zy+jLrk2kirAUdv4V37A2A1q77n5/mN1MBjn+vhn3J2gqqZ3JfDKNXQkdY96eP+lqUZG
+         eBwQiDBBoLA/myRxfKUqVgkFrF5SPIht6uM4k6f+nPF7ZhuyJi5Fp/85qCoBBHqwvkUS
+         eXQJk1BHYeBpjKhSltMyc2OgcNUj9rbOY+T9G+stahdXnl+45O/4NmE3cBGIy1ln8O0b
+         hHZaxFLfT4wus1/vollPeKKyYbKrUE/1w1XKL4JVa6YODXRwEMD4nlaoL28fpzo7Pt8z
+         mxLg==
+X-Gm-Message-State: AOJu0YxpMKx6Q9JCDKoX5QijyylFU4d+tiMgL2o0ihHbkEbKTFhz/12b
+	Uc17lDLIbYUHaftfkKD5Ipd86F+kicx3fSf3R7MWPaVxgM+gPsVb2/4zRbM/lUA=
+X-Gm-Gg: ASbGncscUuQfj1XEPfPAQ9AINHN36t8EarQ1n40oWdG0CHE6Nu4Qbo2Z6bf6fMzhPkc
+	BeSgD6ttmJMafJeSgFIK0+9XUfaUNr5/WafbFGQjhxvROZsQoWcxnHEcpzI16cG3asPeJwEF+8o
+	AGKd7hBraOYxHGAZhRJHCbgTRl3Y9bY1ICnj9OwrAtVtmhILH8pPSDiRD2TIM96vIRGscUYHUUg
+	p/xuJDrKNuSBou+mTPGwz7mOzEu2MEpMkrur1TC8J2uw2UB3JqjkQ==
+X-Google-Smtp-Source: AGHT+IHawLdmw6Z6xjOgGX3iTd3wlVJYov0tgtK9a2wvFPRQFW8H5uHpJYePAdZk23JdFu260Mvxjg==
+X-Received: by 2002:a05:6a00:4485:b0:724:e80a:33a with SMTP id d2e1a72fcca58-72abdebc149mr77018351b3a.23.1735917897619;
+        Fri, 03 Jan 2025 07:24:57 -0800 (PST)
 Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f2ee06dcb0sm30389485a91.35.2025.01.03.07.13.03
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad8fd820sm26343502b3a.170.2025.01.03.07.24.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Jan 2025 07:13:04 -0800 (PST)
-Message-ID: <c4a93b03-2053-40f1-b10c-af979118ad7e@kernel.dk>
-Date: Fri, 3 Jan 2025 08:13:03 -0700
+        Fri, 03 Jan 2025 07:24:56 -0800 (PST)
+Message-ID: <4308c0dd-2c42-4792-8264-4109913fc443@kernel.dk>
+Date: Fri, 3 Jan 2025 08:24:55 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -64,30 +64,118 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] block: Use enum for blk-mq tagset flags
-To: Christoph Hellwig <hch@lst.de>, John Garry <john.g.garry@oracle.com>
-Cc: linux-block@vger.kernel.org
-References: <20250102144426.24241-1-john.g.garry@oracle.com>
- <20250103064427.GA27984@lst.de>
- <f3852e75-dff7-4cc9-b64c-01ebf1020808@oracle.com>
- <20250103082723.GA30419@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
+Subject: Re: "WARNING in del_gendisk" in Linux kernel version 5.15.169
+To: cheung wall <zzqq0103.hey@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CAKHoSAsdOYRU2BzqyURmfsKqaCLGXnsXGZ=kj+zkt5wjYVAg0g@mail.gmail.com>
 Content-Language: en-US
-In-Reply-To: <20250103082723.GA30419@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAKHoSAsdOYRU2BzqyURmfsKqaCLGXnsXGZ=kj+zkt5wjYVAg0g@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/3/25 1:27 AM, Christoph Hellwig wrote:
->> - catch missing blk-mq debugfs array names
->> 	- this has been a problem in the past
+On 1/3/25 12:46 AM, cheung wall wrote:
+> Hello,
 > 
-> Again who really cares?
+> I am writing to report a potential vulnerability identified in the
+> Linux Kernel version 5.15.169. This issue was discovered using our
+> custom vulnerability discovery tool.
+> 
+> Affected File: block/genhd.c
+> 
+> File: block/genhd.c
+> 
+> Function: del_gendisk
+> 
+> Detailed Call Stack:
+> 
+> ------------[ cut here begin]------------
+> 
+> RIP: 0010:del_gendisk+0x63b/0x830 block/genhd.c:586
+> Code: 3c 03 0f 8e df 01 00 00 8b ab a0 00 00 00 31 ff 81 e5 00 04 00
+> 00 89 ee e8 82 fe 54 ff 85 ed 0f 85 a8 fa ff ff e8 d5 fb 54 ff <0f> 0b
+> e9 71 ff ff ff e8 c9 fb 54 ff 48 8b 14 24 48 b8 00 00 00 00
+> netlink: 'syz.4.3926': attribute type 4 has an invalid length.
+> RSP: 0018:ffff888113ff7df8 EFLAGS: 00010216
+> RAX: 000000000000008c RBX: ffff88810af7c800 RCX: ffffc9000749c000
+> RDX: 0000000000040000 RSI: ffffffff81ed737b RDI: 0000000000000005
+> RBP: 0000000000000000 R08: 0000000000000000 R09: ffff888113ff7dbf
+> R10: 0000000000000000 R11: 0000000000000001 R12: ffff88810af7c8a0
+> R13: ffff88810b351400 R14: ffff88810b351000 R15: ffff88810a70b1c0
+> FS: 00007f620e2b66c0(0000) GS:ffff88811af80000(0000) knlGS:0000000000000000
+> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000000 CR3: 00000001090f6000 CR4: 0000000000350ee0
+> Call Trace:
+> <TASK>
+> loop_remove+0x39/0xf0 drivers/block/loop.c:2452
+> loop_control_remove drivers/block/loop.c:2509 [inline]
+> loop_control_ioctl+0x44d/0x4d0 drivers/block/loop.c:2547
+> vfs_ioctl fs/ioctl.c:51 [inline]
+> __do_sys_ioctl fs/ioctl.c:874 [inline]
+> __se_sys_ioctl fs/ioctl.c:860 [inline]
+> __x64_sys_ioctl+0x19a/0x210 fs/ioctl.c:860
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x33/0x80 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x6c/0xd6
+> RIP: 0033:0x7f620f6e89c9
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48
+> 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+> 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007f620e2b6038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> RAX: ffffffffffffffda RBX: 00007f620f904f80 RCX: 00007f620f6e89c9
+> RDX: 0000000020002540 RSI: 0000000000004c81 RDI: 0000000000000003
+> RBP: 00007f620f7951b6 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 0000000000000000 R14: 00007f620f904f80 R15: 00007ffe5d3a2638
+> </TASK>
+> irq event stamp: 553
+> hardirqs last enabled at (559): [<ffffffff812b32ca>]
+> console_trylock_spinning kernel/printk/printk.c:1891 [inline]
+> hardirqs last enabled at (559): [<ffffffff812b32ca>]
+> vprintk_emit+0x3da/0x420 kernel/printk/printk.c:2273
+> hardirqs last disabled at (710): [<ffffffff812acf9d>]
+> __up_console_sem+0x5d/0x80 kernel/printk/printk.c:255
+> softirqs last enabled at (244): [<ffffffff81166c99>] __do_softirq
+> kernel/softirq.c:592 [inline]
+> softirqs last enabled at (244): [<ffffffff81166c99>] invoke_softirq
+> kernel/softirq.c:432 [inline]
+> softirqs last enabled at (244): [<ffffffff81166c99>] __irq_exit_rcu
+> kernel/softirq.c:641 [inline]
+> softirqs last enabled at (244): [<ffffffff81166c99>]
+> irq_exit_rcu+0xe9/0x130 kernel/softirq.c:653
+> softirqs last disabled at (187): [<ffffffff81166c99>] __do_softirq
+> kernel/softirq.c:592 [inline]
+> softirqs last disabled at (187): [<ffffffff81166c99>] invoke_softirq
+> kernel/softirq.c:432 [inline]
+> softirqs last disabled at (187): [<ffffffff81166c99>] __irq_exit_rcu
+> kernel/softirq.c:641 [inline]
+> softirqs last disabled at (187): [<ffffffff81166c99>]
+> irq_exit_rcu+0xe9/0x130 kernel/softirq.c:653
+> 
+> ------------[ cut here end]------------
+> 
+> Root Cause:
+> 
+> The kernel crash is triggered by the del_gendisk function within the
+> block/genhd.c file at line 586. The root cause appears to be an
+> improperly formatted netlink message, specifically an attribute of
+> type 4 that has an invalid length. This malformed netlink message is
+> processed by the loop device driver (drivers/block/loop.c),
+> particularly during the removal of a loop device (loop_remove and
+> loop_control_remove functions). The invalid attribute leads to
+> incorrect handling within the loop device's ioctl operations
+> (loop_control_ioctl), ultimately causing del_gendisk to malfunction.
+> This sequence results in a kernel oops, crashing the system. The issue
+> likely stems from the loop device driver not adequately validating the
+> length of netlink message attributes before processing them, allowing
+> malformed data to disrupt kernel operations.
 
-I do care about that one, it's pretty fragile and I can remember at
-least 2 or 3 times when an issue like that has been discovered and it
-was introduced several releases ago. Yeah not a huge issue as it's just
-debugging, but it's annoying that it's so fragile and easy to get out of
-sync.
+What kind of nonsense is this? It reads very much like it was
+auto-generated, it definitely did not have a real human try and
+understand what could possibly be going on here.
+
+If this is the level of effort put into your "custom vulnerability
+discovery" tool, then please just don't bother.
 
 -- 
 Jens Axboe
