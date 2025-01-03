@@ -1,110 +1,113 @@
-Received: from mr85p00im-ztdg06011101.me.com (mr85p00im-ztdg06011101.me.com [17.58.23.185])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF41199B9
-	for <linux-block@vger.kernel.org>; Fri,  3 Jan 2025 00:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.23.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6450187876
+	for <linux-block@vger.kernel.org>; Fri,  3 Jan 2025 02:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735864200; cv=none; b=Q30y8uzSI0xzGiM01p+njqvEyvtexOTvMfqmxwAsx8PlRKZl312yLXcMO9PkPhjF9a8d6GAyja6VFWXJveISjnHHGhGZoyU1hetTLneO1f1Y5zqRm+RMdWcu6CDwWa+VJ/U6BmeXQ24SsYMSzONYa7QV2mcuiFXLef2A8amv2t8=
+	t=1735869748; cv=none; b=YqBmRR3GtOYfNRfWVBH5IWEwLgTHqoWhtjWPxURoZjIbXyS6+6M0AOVBE5CY/qsHacrWAO4H3W4BGOThyxa33Aku2rl0ubTUHRfQmTR6OzdJNIezCKEkpCu5xvrfI+JjIeS/gIj6m9nU6euSnChWgxCa5hN56GioPoSLmW3C/mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735864200; c=relaxed/simple;
-	bh=9OKtjR1OqVgdyYo7PBAJ2n+E+ZuEA9Qci0SNdsRT6zM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iNBc8NQv9vuAxtT+Z7T7Mnpy7J+6dt2xuKjH3YRY0tAvQhXIXJtKt4AFZDrcYVuFk2SMwn3BuviNQMNi17GD16XaIBf24T+UKGtLy8cmbYHPU8pAWwLquz4JSDzdh/Fiyp31EQI8ZG5ZP4NxPScEJMZEvlCtYyjLg/FahoFhkrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=mOkTDaQ/; arc=none smtp.client-ip=17.58.23.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+	s=arc-20240116; t=1735869748; c=relaxed/simple;
+	bh=AvQQVDSrd9xkqZBOsEiocP3W85bxnnolZeMdrhUPfIs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U5z9haACXV1pUM+9LdsNhkYxlf9BYpW4+BICwh2U7Ycwb3tahZMBmbRoCc6PpoLUbDCro44iA6FsYp3BWurK0egYNN5NWQc8OIYLRReF90kdH0tkI8q2YSogs6DbBiQPQu8MsghFda0B2E9gIEO0K5LMg8jwSf69d0eoGfAKfi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dpKNnUPI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="mOkTDaQ/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1735864198;
-	bh=sX00kjdMMkpbEo7t/2MEjZFR57bisypxfIJ+Q9mKzxY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
-	 x-icloud-hme;
-	b=mOkTDaQ/GuVii6DBvUjnFzJIAdLAeaaL2tmFlRCZ4P+A6TYAVQrRWp9Er4PXba69V
-	 7uSsUCLtOa63r9/3gMumkZmwFIEJtfG9H7DrHOBn8VlVz1XIhdLGUpypXWFkWu6bB8
-	 12Lwz3XHfyn//c8VkfZ/5/nckvSnkCoTO1R/fPwDGARAEbrdQkb/xTRlQjO1qZxC/z
-	 RJBK/KTEi6Bfsh1R4xlfoaQqy05mCIS0oWki+dsxYfz4DoTRws4M1be+zF4Ihp8ZaV
-	 YgKVNniBsmJEp1/jlXOCVacxKat31ZnCxX15TS4W0gpYAvwSUtQIuTLSHGpxBZ/hrZ
-	 LrwcTpexf4FRQ==
-Received: from [192.168.1.25] (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-	by mr85p00im-ztdg06011101.me.com (Postfix) with ESMTPSA id 0B02FDA0388;
-	Fri,  3 Jan 2025 00:29:47 +0000 (UTC)
-Message-ID: <2f8abbad-a70c-4ff0-94c7-8a8a37ad0845@icloud.com>
-Date: Fri, 3 Jan 2025 08:29:43 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpKNnUPI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1735869745;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wJjtyfJ1LBYN6rLvzwpWerDYB1UtCFcfHX9G1CeQQx0=;
+	b=dpKNnUPIb+FjigDZVYJ1ntJOo7qrJZGd771qu9dSmDYaP+7MkUpsMH6WM1mG+XwXsP5QkO
+	LCoyFkwZMTNsrt2dUw8OvR6K8WUBjolfUyls1bvVvxFbatj/L5cEcok0Po71KTWpNm/FML
+	1+sTfv5Yu4k8i2EUFyvvrvMvbFSBTUM=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-257-B3hk8V-sMVOaamjZRSJ2nQ-1; Thu,
+ 02 Jan 2025 21:02:20 -0500
+X-MC-Unique: B3hk8V-sMVOaamjZRSJ2nQ-1
+X-Mimecast-MFC-AGG-ID: B3hk8V-sMVOaamjZRSJ2nQ
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 84D09184AB36;
+	Fri,  3 Jan 2025 02:01:53 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.47])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 29BA0196BBC3;
+	Fri,  3 Jan 2025 02:01:46 +0000 (UTC)
+Date: Fri, 3 Jan 2025 10:01:41 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Yi Zhang <yi.zhang@redhat.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	John Garry <john.g.garry@oracle.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: make queue limits workable in case of 64K
+ PAGE_SIZE
+Message-ID: <Z3dFBQIiik6FWLut@fedora>
+References: <20250102015620.500754-1-ming.lei@redhat.com>
+ <0b423229-f928-4210-9351-dca353071231@acm.org>
+ <Z3X-xMeMuF8j0RDA@fedora>
+ <0b34bfc9-2cd3-40a8-8153-3207a6d62f8c@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 01/11] libnvdimm: Replace namespace_match() with
- device_find_child_by_name()
-To: Fan Ni <nifan.cxl@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
- James Bottomley <James.Bottomley@hansenpartnership.com>,
- =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>,
- linux-kernel@vger.kernel.org, nvdimm@lists.linux.dev,
- linux-sound@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, arm-scmi@vger.kernel.org,
- linux-efi@vger.kernel.org, linux-gpio@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org,
- linux-hwmon@vger.kernel.org, linux-media@vger.kernel.org,
- linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-serial@vger.kernel.org, netdev@vger.kernel.org,
- Zijun Hu <quic_zijuhu@quicinc.com>,
- Alison Schofield <alison.schofield@intel.com>
-References: <20241211-const_dfc_done-v4-0-583cc60329df@quicinc.com>
- <20241211-const_dfc_done-v4-1-583cc60329df@quicinc.com>
- <Z3bYMiOG0u3Jtv3h@smc-140338-bm01>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <Z3bYMiOG0u3Jtv3h@smc-140338-bm01>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: ybkBbilc0XTCT_YEDgTjyLJ9DRFrwcwH
-X-Proofpoint-ORIG-GUID: ybkBbilc0XTCT_YEDgTjyLJ9DRFrwcwH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-02_03,2025-01-02_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 bulkscore=0
- mlxlogscore=738 mlxscore=0 suspectscore=0 adultscore=0 phishscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2501030002
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0b34bfc9-2cd3-40a8-8153-3207a6d62f8c@acm.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 2025/1/3 02:17, Fan Ni wrote:
->> -
->>  static bool is_idle(struct device *dev, struct nd_namespace_common *ndns)
->>  {
->>  	struct nd_region *nd_region = to_nd_region(dev->parent);
->> @@ -168,7 +161,7 @@ ssize_t nd_namespace_store(struct device *dev,
->>  		goto out;
->>  	}
->>  
->> -	found = device_find_child(dev->parent, name, namespace_match);
->> +	found = device_find_child_by_name(dev->parent, name);
-> Looks good to me.
-> Just one general question.
-> The function device_find_child checks parent and parent->p, but
-> device_find_child_by_name only checks parent although they share the
-> code except the match function. Why that?
+On Wed, Jan 01, 2025 at 07:46:41PM -0800, Bart Van Assche wrote:
+> On 1/1/25 6:49 PM, Ming Lei wrote:
+> > On Wed, Jan 01, 2025 at 06:30:30PM -0800, Bart Van Assche wrote:
+> > > Additionally, this patch looks wrong to me. There are good reasons why the
+> > > block layer requires that the DMA segment size is at least as large
+> > > as the page size.
+> > 
+> > Do you think 512byte sector can't be DMAed?
 > 
+> A clarification: I was referring to the maximum DMA segment size. The
+> 512 byte number in your email refers to the actual DMA transfer size. My
+> statement does not apply to the actual DMA transfer size.
 
-Thank you Fan for code review.
+But why does DMA segment size have to be >= PAGE_SIZE(4KB, 64KB)?
 
-I did not touch device_find_child_by_name() parameter checking at
-that time.
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=903c44939abc02e2f3d6f2ad65fa090f7e5df5b6
+I don't think that the constraint is from hardware because DMA controller is
+capable of doing DMA on buffer with smaller alignment & size.
 
-since
-[PATCH v5 05/12] will come finally.
-https://lore.kernel.org/all/20241224-const_dfc_done-v5-5-6623037414d4@quicinc.com/
+IMO, the limit is actually from block layer, that is why I posted out
+this patch.
+
+> 
+> > > You may want to take a look at this rejected patch series:
+> > > Bart Van Assche, "PATCH v6 0/8] Support limits below the page size",
+> > > June 2023 (https://lore.kernel.org/linux-block/20230612203314.17820-1-bvanassche@acm.org/).
+> > 
+> > '502 Bad Gateway' is returned for the above link.
+> 
+> That link works fine here on multiple devices (laptop, workstation,
+> smartphone) so please check your setup.
+
+It is reachable now.
+
+From the link, you have storage controllers with DMA segment size which
+is less than 4K, which may never get supported by linux kernel.
+
+I am looking at hardware which works fine on kernel with 4K page size, but
+it becomes not workable when kernel is built as 64K page size, which confuses
+final kernel users.
 
 
-> Fan
+Thanks,
+Ming
 
