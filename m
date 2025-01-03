@@ -1,87 +1,63 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1831BD9C2
-	for <linux-block@vger.kernel.org>; Fri,  3 Jan 2025 22:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A02B1C4A25
+	for <linux-block@vger.kernel.org>; Fri,  3 Jan 2025 23:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735942370; cv=none; b=sdnxkir77wUMvZVDHVZ3ydie48upPxFTWsgVEFEpo4aL+VjZGc6BGctj6bV7jFs/Pra4lwQb+TITieB1I0dCu+Ksmkmnu2+OVk85pBBT72Xw8f7YQYu+9xz+T3UQPi0iuc0ZZ1P3fWRKRFLiv4Pnq1F9Hh99OCpVMpFyXIoI0ws=
+	t=1735946540; cv=none; b=mjsnlIa8ur43I4NAmcDADwBwyFAb9YkPTg+FGZ6TEqywVFOjMBnB0aP+qh5+Ng4uA+LJr3e19CP9Iqol4JFha1ESRj7HAPR1bOzk8G5EJDmdTOMmoRsonXJiaRD+8n7NKaPSVNmaXEVjVYbg+NCo9NUvrRMNOwFtRzI8at8Orak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735942370; c=relaxed/simple;
-	bh=Hhx6nnjmWQQ5H9KEPn0rSMjUwALg95RecFhahughkO4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Owzz7y3Cb3oGG7AfXKTZuVYv3o6go5n4Mnukod2mv3Bzl+2Qnf1+V90ADpsvr+45bUP9HNc22N3+M28+Ad2Y1N2xdgiM60Q7atW55yGzp0RhWRrZqjxGUyedcTyyZ+qERE1bdVd/RRHsaNSVLeSAg6+6pXcqOUN/Z+UaGk57GNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Ex36IbkI; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1735946540; c=relaxed/simple;
+	bh=CsBzFYKg1/w4c2guyLRD+KTBdzBxzTZr7XBsNAwgbrE=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=ci8W9E71z/Vdep2oMZnXiCXGoz1F0zXzFY8s10AnO1mScdNcgIeEllRuKMInCtkDOIrZGcx67F6QOfctHtkHHW/jn+MbxtUKT3U90bV2zfGciFa87tOEBb1NpK0xT7m/WQyauYMzQWuMYvHc7rZx+tMEegjd+LbL2rMB32uqk80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FRnSE/7C; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Ex36IbkI"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YPyVy38grz6ClbJ9;
-	Fri,  3 Jan 2025 22:12:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1735942359; x=1738534360; bh=Hhx6nnjmWQQ5H9KEPn0rSMjU
-	wALg95RecFhahughkO4=; b=Ex36IbkIiLduhzw9mKP/LkPM+1IjQQfELyDe/CRb
-	txS5W8gsGvSYacp8fCHOohtsvLDg1r62f5/V6LzECw6Gda0IpRIcAwA9rGDeNcNk
-	mEklOhoxYLfVv5jVORBK85SRWqvnB3llErEhr4MZpuznCIet/mRu/XOX1St/mnz4
-	oU+Mp83PPDUZ+ig8LkNhDTcuqz13/LzOXmcNHs+QFya5qyg4F4b/c577+o+neBZj
-	K6KQW58RZ5I+t/LnhP3hrc1bETava3iErZCArJjYEFQ8jfdIQYZG5IyvkseCK3Uo
-	Ndljx02SHZ2NCP6jUenf34UeTmc2ruT/F4f0iZS3gEFGLQ==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id G430Tf08iSU1; Fri,  3 Jan 2025 22:12:39 +0000 (UTC)
-Received: from [192.168.3.219] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YPyVs21Tqz6ClY9Q;
-	Fri,  3 Jan 2025 22:12:36 +0000 (UTC)
-Message-ID: <1b1bf316-359a-4bec-8195-0152cd706001@acm.org>
-Date: Fri, 3 Jan 2025 14:12:36 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FRnSE/7C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59C7CC4CEDD;
+	Fri,  3 Jan 2025 23:22:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735946540;
+	bh=CsBzFYKg1/w4c2guyLRD+KTBdzBxzTZr7XBsNAwgbrE=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=FRnSE/7ClecK9rJHFg68v/9cIl6asvdVp+iOM0WjbK9pHrFcQR2yIWzSTEsPSnYXV
+	 MRERmijQT8fN2edquRVdiO4tdIkJoLFf5ta18tnZ7tZnH7ngIY/Yk8gf5Z7B/So8zu
+	 kOcv95Xq5BDFFoFs3tCyf6b+F9ewUAN08TBC8uwP2HlmUbogpdDJ3pbooENZBQEIl7
+	 RHpJJrx3nxZa5KgAfPIe/N53xyYmZAcCPyCJ3ZSJ7waWn3jxnmn5x0e7v3LurybQ6M
+	 RV2WFxCs5zJoa7KL7tL3Fi0Fjlds+7ZK7CNGVoMtS+13W9EN4Y6mj/9I+JC/LGFS8L
+	 jpJdOWSYHhavA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34434380A974;
+	Fri,  3 Jan 2025 23:22:42 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.13-rc6
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <4aec2afc-01c5-4e58-baf4-c9ba9dcb29b9@kernel.dk>
+References: <4aec2afc-01c5-4e58-baf4-c9ba9dcb29b9@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <4aec2afc-01c5-4e58-baf4-c9ba9dcb29b9@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.13-20250103
+X-PR-Tracked-Commit-Id: cc0331e29fce4c3c2eaedeb7029360be6ed1185c
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 2ae3aab55781428eaefecc10dc40ae65071150ed
+Message-Id: <173594656075.2324745.12778029342954230920.pr-tracker-bot@kernel.org>
+Date: Fri, 03 Jan 2025 23:22:40 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: make queue limits workable in case of 64K
- PAGE_SIZE
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Yi Zhang <yi.zhang@redhat.com>, Luis Chamberlain <mcgrof@kernel.org>,
- John Garry <john.g.garry@oracle.com>, Christoph Hellwig <hch@lst.de>
-References: <20250102015620.500754-1-ming.lei@redhat.com>
- <0b423229-f928-4210-9351-dca353071231@acm.org> <Z3X-xMeMuF8j0RDA@fedora>
- <0b34bfc9-2cd3-40a8-8153-3207a6d62f8c@acm.org> <Z3dFBQIiik6FWLut@fedora>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <Z3dFBQIiik6FWLut@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 1/2/25 6:01 PM, Ming Lei wrote:
-> But why does DMA segment size have to be >= PAGE_SIZE(4KB, 64KB)?
+The pull request you sent on Fri, 3 Jan 2025 13:05:41 -0700:
 
- From the description of patch 5/8 of my patch series: "If the segment
-size is smaller than the page size there may be multiple segments per
-bvec even if a bvec only contains a single page." The current block
-layer implementation is based on the assumption that a single page
-fits in a single DMA segment. Please take a look at patch 5/8 of my
-patch series.
+> git://git.kernel.dk/linux.git tags/block-6.13-20250103
 
-> From the link, you have storage controllers with DMA segment size which
-> is less than 4K, which may never get supported by linux kernel.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/2ae3aab55781428eaefecc10dc40ae65071150ed
 
-As mentioned in the cover letter of that patch series, I came up with
-that patch series to support a DMA controller with max_segment_size of
-4 KiB on a system with a PAGE_SIZE of 16 KiB.
+Thank you!
 
-Thanks,
-
-Bart.
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
