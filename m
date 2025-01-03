@@ -1,115 +1,128 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2281B4233;
-	Fri,  3 Jan 2025 09:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133221F2361;
+	Fri,  3 Jan 2025 09:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735896711; cv=none; b=sjhKvRw2cP4pISKa5qBNOtA+46XTA3KmssJpP8oDzXVt/25N4Sj9EuYUmi/BKhHOdUywQcKkh6BuLbjNjLAc8dUjXvS6uXZ7+Y0BcEdhUNATH9v5C8GxY9mBVQAjU4QdAzf8zHTaY9goWP5vJcR2KN6IeFQ3neOlhXeTN/Rl3Is=
+	t=1735896830; cv=none; b=pxwRuAs51CoYGr0JTUZ+R9fNIRsFL2TQt3pJvE2JuuxMKqZ+GFyEVufKiuxMqlVysi0KGBrrArARWUyh97vu36pIpQntmHW5MzXeP5q1BEneK8fnw03Y211eQl/l3GLSovpuVZ7b/iyOVOcDSYnHUC8i1k8RgFK/hsuf1ZK/3/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735896711; c=relaxed/simple;
-	bh=vL8zDs9vvT2j0AHZ8aofhM6OxrOvk8EtkwYTL3E3/3M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jL9IQIN5VEwkC3fPNQBFaNgNkTD4DBDRxINdYA+w5GLir+ATFubxyLkmTOlrbB592cBHx1p05jhyEvdqCfXizdmtvxidiiku/sRJIDSUD1J+2axoUn4lxn8UZvvJ2N/vkk6dwskOxCk9L0kExh/2EAMG8ju+eNXRwfbTE4PEqbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aa69107179cso1978460266b.0;
-        Fri, 03 Jan 2025 01:31:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735896706; x=1736501506;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bhvKQFYrEHAPSyOkSeOFfnhuFEMUFCuy5EuswH6w1MU=;
-        b=J6gfIz6tTUtllrSNaj72qZeepKo2TagKDGgPl8L6t2ODOrxnuPOA04EWLXF+CQrTz2
-         19w3y4aZWJr1gTg5xz5QYTlROLLQa/RG2EcYj18ynmK0M3AQe5arq1kEGRcs9QIzhgq2
-         qgUnTl9WOz0z8cp3tfvL0y8ZadoUmvzUDDlrSsjaAK8CwyhoKtH1reuDEyOrS50Yac7e
-         gaqPpLFbu+Y0qderhiL5FtMRqGZygr1zfYFThwminAmhDeG+3ZA/a9+kbg3HsFlW7xgu
-         907VHqGlsqrLU6GlgLcWDT8SDHeR8iCha5ASAlzcB32G9tSpzeJzyAyaOlJ//uUEKY2W
-         Y7dw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTmZRM9OyZkOY2hPuJVEWd01bvOxXEe4umFdkg+ev7kWKc6X9SttO+TjmGXI6CoWP44zHtarxfiqe5Ew==@vger.kernel.org, AJvYcCVOU8dH0zT2jXaCKzS9hZfjv/aa+DXOS7C3+bpB/HgT1sTas4psYCxoWbHN7Z5KShrfwn7D3Kni3nHz3xKv@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6R56HBuG2zwJTFBAFyld6Yd2Xd0XTn4engfOaRDYvK/B+i36f
-	75pu0j/jyZrYNkm0t54zVDaUp2Vd8nq2VV94C6ARvezjwKuEBPbHqKjk081yugg=
-X-Gm-Gg: ASbGncvFcMATKTVaz5jorZLcuPhijXROUeqTGsbYUDCVEkrGqNh0jdLUAMyG+IfZmeG
-	KC25UzPZEQ6ILyOahhN+7c+4SBaVuLfTWOFzdU6NAxVFmdT/mX2j6NOPWKACfljP/rBSk03Zaud
-	GSzPhlxfV3LM44/kRuhwJJTaHAZ4J+0v58KBJuWXjLzTPS4GH5T56VU6d3FOneRnCuT9rmisQvk
-	UOSimwCs6ApInB3iqhY2te8Hbuwouf+ob0/L9IIoookzZJ6fAf/7uEIHivP3+OODPKG3WUXPl27
-	0Ff8U/b3sle24JzDlEk=
-X-Google-Smtp-Source: AGHT+IEUPiaMGp890myqJ7psHgu4MOGcR6lVOjAlefn9jbzS6cPB7xjEtHETuedq2nozlSJ2i1USMw==
-X-Received: by 2002:a17:907:c20d:b0:aae:8490:9429 with SMTP id a640c23a62f3a-aae84909672mr3432582766b.34.1735896705481;
-        Fri, 03 Jan 2025 01:31:45 -0800 (PST)
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com. [209.85.218.45])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d806fedaebsm19869872a12.57.2025.01.03.01.31.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Jan 2025 01:31:45 -0800 (PST)
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aaec61d0f65so1933144766b.1;
-        Fri, 03 Jan 2025 01:31:45 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUPjEEpnV2USubVrezfigCJv6hhuujSQnk680fCUOW61+/T0+prYdZbSWr8MtWZlPGyxCSClHooREmxPg==@vger.kernel.org, AJvYcCVzc/21a3Boep/w703hvNXwYlCVTx1FtmlX526s2PSgNc5hArYNfJsXkJ0/+JtIj/QocW4iy/3q9nUnB3Ss@vger.kernel.org
-X-Received: by 2002:a17:907:7f2a:b0:aab:cdbd:595a with SMTP id
- a640c23a62f3a-aac2702986emr4003780166b.3.1735896704686; Fri, 03 Jan 2025
- 01:31:44 -0800 (PST)
+	s=arc-20240116; t=1735896830; c=relaxed/simple;
+	bh=qtK9bKDYHIPaP6M5tyZKbkucjZn1GTPb89j9Zev9Rzc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o0Tu8ZlwvE0a0tcIpBZgK38PVW8fxd0Mhv3fOmh6ntB8orRAnT1EqLVo/T0Dm4vF5H65aRr4MeBa6JmdR2cBp/mq8zBClPArQ00s351gzk1KnylnpykdfUA8jKFNW9H0DebTDkW0rtJdQ9XYrwIKxHZBvwFCvWU36O0SwmTBVZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YPdfp5crvz4f3jks;
+	Fri,  3 Jan 2025 17:33:22 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id A18181A08C1;
+	Fri,  3 Jan 2025 17:33:37 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgCXcYXurndnpXOuGQ--.4390S4;
+	Fri, 03 Jan 2025 17:33:36 +0800 (CST)
+From: Yu Kuai <yukuai1@huaweicloud.com>
+To: josef@toxicpanda.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	nbd@other.debian.org,
+	linux-kernel@vger.kernel.org,
+	yukuai3@huawei.com,
+	yukuai1@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH] nbd: don't allow reconnect after disconnect
+Date: Fri,  3 Jan 2025 17:28:59 +0800
+Message-Id: <20250103092859.3574648-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <06988f959ea6885b8bd7fb3b9059dd54bc6bbad7.1735894216.git.geert+renesas@glider.be>
- <20250103085652.GA31691@lst.de>
-In-Reply-To: <20250103085652.GA31691@lst.de>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 3 Jan 2025 10:31:30 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdUw23VNeO44dPzwbzMnCBws+twM2JVm7mQ745Ey1Cq4FQ@mail.gmail.com>
-Message-ID: <CAMuHMdUw23VNeO44dPzwbzMnCBws+twM2JVm7mQ745Ey1Cq4FQ@mail.gmail.com>
-Subject: Re: [PATCH] ps3disk: Do not use dev->bounce_size before it is set
-To: Christoph Hellwig <hch@lst.de>
-Cc: Philipp Hortmann <philipp.g.hortmann@gmail.com>, Geoff Levand <geoff@infradead.org>, 
-	Jens Axboe <axboe@kernel.dk>, linuxppc-dev@lists.ozlabs.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCXcYXurndnpXOuGQ--.4390S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7KFyrJFyrur4fXw4Uuw15urg_yoW8CrW8pF
+	W3AFsrGrW8Ga15JF4kJ34xuFyDKasIgrW3WrW3Z345ZrWfZrZIyw48Ka4Fqr4DGF97Xw43
+	ZF4rW3W0y3ZYkrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUU
+	UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Hi Christoph,
+From: Yu Kuai <yukuai3@huawei.com>
 
-On Fri, Jan 3, 2025 at 9:56=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrote=
-:
-> On Fri, Jan 03, 2025 at 09:51:25AM +0100, Geert Uytterhoeven wrote:
-> > dev->bounce_size is only initialized after it is used to set the queue
-> > limits.  Fix this by using BOUNCE_SIZE instead.
-> >
-> > Fixes: a7f18b74dbe17162 ("ps3disk: pass queue_limits to blk_mq_alloc_di=
-sk")
-> > Reported-by: Philipp Hortmann <philipp.g.hortmann@gmail.com>
-> > Closes: https://lore.kernel.org/39256db9-3d73-4e86-a49b-300dfd670212@gm=
-ail.com
-> > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
->
-> Looks fine:
->
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+Following process can cause nbd_config UAF:
 
-Thanks!
+1) grab nbd_config temporarily;
 
-> But looking at the report it seems like no one cares about ps3 upstream,
-> and in fact the only person caring at all rather rants on youtube than
-> helping upstream, so maybe we should just remove the ps3 support entirely=
-?
+2) nbd_genl_disconnect() flush all recv_work() and release the
+initial reference:
 
-I am a bit surprised Geoff Levand didn't catch this in his regular testing.=
-..
-Hmm, looks like his last Tested-by tag predates v6.9.
+  nbd_genl_disconnect
+   nbd_disconnect_and_put
+    nbd_disconnect
+     flush_workqueue(nbd->recv_workq)
+    if (test_and_clear_bit(NBD_RT_HAS_CONFIG_REF, ...))
+     nbd_config_put
+     -> due to step 1), reference is still not zero
 
-Gr{oetje,eeting}s,
+3) nbd_genl_reconfigure() queue recv_work() again;
 
-                        Geert
+  nbd_genl_reconfigure
+   config = nbd_get_config_unlocked(nbd)
+   if (!config)
+   -> succeed
+   if (!test_bit(NBD_RT_BOUND, ...))
+   -> succeed
+   nbd_reconnect_socket
+    queue_work(nbd->recv_workq, &args->work)
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+4) step 1) release the reference;
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+5) Finially, recv_work() will trigger UAF:
+
+  recv_work
+   nbd_config_put(nbd)
+   -> nbd_config is freed
+   atomic_dec(&config->recv_threads)
+   -> UAF
+
+Fix the problem by clearing NBD_RT_BOUND in nbd_genl_disconnect(), so
+that nbd_genl_reconfigure() will fail.
+
+Fixes: b7aa3d39385d ("nbd: add a reconfigure netlink command")
+Reported-by: syzbot+6b0df248918b92c33e6a@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/675bfb65.050a0220.1a2d0d.0006.GAE@google.com/
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ drivers/block/nbd.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index b1a5af69a66d..259bd57fc529 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -2179,6 +2179,7 @@ static void nbd_disconnect_and_put(struct nbd_device *nbd)
+ 	flush_workqueue(nbd->recv_workq);
+ 	nbd_clear_que(nbd);
+ 	nbd->task_setup = NULL;
++	clear_bit(NBD_RT_BOUND, &nbd->config->runtime_flags);
+ 	mutex_unlock(&nbd->config_lock);
+ 
+ 	if (test_and_clear_bit(NBD_RT_HAS_CONFIG_REF,
+-- 
+2.39.2
+
