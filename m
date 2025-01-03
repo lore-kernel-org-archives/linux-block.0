@@ -1,70 +1,69 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC3C18E3F;
-	Fri,  3 Jan 2025 06:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89B001C36;
+	Fri,  3 Jan 2025 07:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735886972; cv=none; b=I6xooidL7YDiwFZp/b8A0sSEfT+tl+lFuqEiJBkgbXxCjMSlK0ABggD6jkPUSAp8Fu+C9418xpRQ6lXsRxT5jXMZ2zBpkyEjpKy5gSASkJyrFonGtI+P/S8fR3ZmwKvmxoBECYcNDw/UXYJ82uRuDOZjIisQU4X8xpuNTzrZqTc=
+	t=1735889664; cv=none; b=eMEuMx+jdW4lI0Eq/lTG7Y03hBRstRkYH3xv2F+ePh0TdlMVrkNXHSZ6wUdLzEM0oYxP2XgGwkiuhnEPtFTM86Zpk0957qtU+Monpv4ulwtoOOPXhXrHGpqpvLcuRFe7pcQmJVoK8m98LZzmzrVsGvGfRghZNfa9WTdVcalCuuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735886972; c=relaxed/simple;
-	bh=hlWHq0OMSTWoCnf+7Roi9teoijwZHWsV5MnA9LcUc0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LZMHvlyWyp0iroB1cLwWWtro4WQj1huL6HrHgis2p4vQPRjoEk9Z5cXZjZJpn8PvlfsKJuWCqmxFK5KduVru2CDXlElbKej3WIMx1asg8Ld+8Tq35cSH25nHt94rV9xzmrin0kg+IFB7XihM4SlJ/h8HQhk1CcsJVwgymJn6MRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+	s=arc-20240116; t=1735889664; c=relaxed/simple;
+	bh=oj0BNvd07UZUPrtMHOvLjYx0oGDSmv382N2KH5QMnqQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EFXJmeVgzNZRTqabag8unOmVJjwWxSN/WXSu5kLxE5x6KZXq7fiy9c8bixxjP4q0TNRqqysjQc4/rk1YBjCu8nkUDcfNi+gnIdLKvUi4sec0tVaDj1UVODkKBGOPI186NX7N5NwOBVGGBvTaRQ1CgIfrbh1roV88vySa30OjY0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vrFJwQXV; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 03BAE68BEB; Fri,  3 Jan 2025 07:49:26 +0100 (CET)
-Date: Fri, 3 Jan 2025 07:49:25 +0100
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vrFJwQXV"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=YMdPlpNXgCMaksxcreVbW0oQ3YoG3YbUI3RMdbhf/xY=; b=vrFJwQXViQsUmDbxz+ngtQExai
+	qXZoYdpJ/3ljhMFQGhIIyiTUR5HZLtVlHU9suWtBKR14FBnWYk2d9/BDsUMlC29nwjIP0kXduZDtY
+	LTBnRRuy8K0GJtBmX7YtqnY+s0Ql/sRdGQ4/vG2OabNw6vGkS9FdPmKW5nbpIjsEi3NLgshApBU/2
+	JZEr6TrfKttUXTjeyqbUzpVFa7TadWpk/E/QK71cZ4LqqKYxsstLVrgsHpYX6Wlz3FgoSSdUyjLXp
+	wYP/vWZD4d3Pgyv5D4KJlnYdZr9v2kerMq3+uN1qt1EVIlHAEsYMxHHS8ooQ2eEFjkxPnU3Nq+In8
+	g3ovb4/w==;
+Received: from [2001:4bb8:2dc:484c:63c3:48c7:ceee:8370] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tTcCK-0000000CM56-162F;
+	Fri, 03 Jan 2025 07:34:20 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: Niklas Cassel <cassel@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Oliver Sang <oliver.sang@intel.com>,
-	oe-lkp@lists.linux.dev, lkp@intel.com, linux-kernel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
-	Damien Le Moal <dlemoal@kernel.org>, linux-btrfs@vger.kernel.org,
-	linux-aio@kvack.org
-Subject: Re: [linus:master] [block]  e70c301fae: stress-ng.aiol.ops_per_sec
- 49.6% regression
-Message-ID: <20250103064925.GB27984@lst.de>
-References: <202412122112.ca47bcec-lkp@intel.com> <20241213143224.GA16111@lst.de> <20241217045527.GA16091@lst.de> <Z2EgW8/WNfzZ28mn@xsang-OptiPlex-9020> <20241217065614.GA19113@lst.de> <Z3ZhNYHKZPMpv8Cz@ryzen>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org
+Subject: simplify passthrough bio handling
+Date: Fri,  3 Jan 2025 08:33:56 +0100
+Message-ID: <20250103073417.459715-1-hch@lst.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z3ZhNYHKZPMpv8Cz@ryzen>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Jan 02, 2025 at 10:49:41AM +0100, Niklas Cassel wrote:
-> > > from below information, it seems an 'ahci' to me. but since I have limited
-> > > knowledge about storage driver, maybe I'm wrong. if you want more information,
-> > > please let us know. thanks a lot!
-> > 
-> > Yes, this looks like ahci.  Thanks a lot!
-> 
-> Did this ever get resolved?
-> 
-> I haven't seen a patch that seems to address this.
-> 
-> AHCI (ata_scsi_queuecmd()) only issues a single command, so if there is any
-> reordering when issuing a batch of commands, my guess is that the problem
-> also affects SCSI / the problem is in upper layers above AHCI, i.e. SCSI lib
-> or block layer.
+Hi Jens,
 
-I started looking into this before the holidays.  blktrace shows perfectly
-sequential writes without any reordering using ahci, directly on the
-block device or using xfs and btrfs when using dd.  I also started
-looking into what the test does and got as far as checking out the
-stress-ng source tree and looking at stress-aiol.c.  AFAICS the default
-submission does simple reads and writes using increasing offsets.
-So if the test result isn't a fluke either the aio code does some
-weird reordering or btrfs does.
+this series removes the special casing when adding pages to passthrough
+bios in favor of simply checking that they match the queue limits once
+before submissions.  This mirrors where the zone append users have been
+moving and a recent doing the same for a single optimizes passthrough
+user.
 
-Oliver, did the test also show any interesting results on non-btrfs
-setups?
-
+Diffstat:
+ block/bio.c                        |  107 +-----------------------------
+ block/blk-map.c                    |  128 ++++++++++---------------------------
+ block/blk-mq.c                     |    4 -
+ block/blk.h                        |    8 --
+ drivers/nvme/target/passthru.c     |   18 +++--
+ drivers/nvme/target/zns.c          |    3 
+ drivers/target/target_core_pscsi.c |    6 -
+ include/linux/bio.h                |    2 
+ include/linux/blk-mq.h             |    8 --
+ 9 files changed, 57 insertions(+), 227 deletions(-)
