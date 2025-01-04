@@ -1,401 +1,213 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4190211C
-	for <linux-block@vger.kernel.org>; Sat,  4 Jan 2025 16:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52291C5F1D;
+	Sat,  4 Jan 2025 17:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736008005; cv=none; b=j9PHmUM0JY01GQh4MBd2kJ9X7wdg/hRto3VgBjvChrueHf1U5etJhOk20gj8SzLryawyzRoOiTjyi7HUsNJ/vKmHGm440mcd1yYRS3W0rOJVY2xiySe3rM4ux/REebGXpLA9quI0gT5UK/0iwmFfmW+aMOpA97OD5tWg7L6xMnA=
+	t=1736013176; cv=none; b=CJy6SYeZIACGH0d4n4RNR4Zhlr/Yl7hkMQSY4bQUXB6qTNG30KPWYNAVA31qvvJG6bMOUKSgpHx8q/n72XqngaYq4Hizk8TGiirs6JWpn8bEe1ODguqL351LOs0k0qNoKM9ORi1EVdu+Y7l5UWSXjbh5/q+HOidlDSbydtYPjNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736008005; c=relaxed/simple;
-	bh=lZljbLEzKhmJQ6PQ1shcI/B18qGrDXKpnxL3pHczJ5o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PjWpDKP18Y5KOz9WchC3hIgjjHxbIC+Mzx8zfrMvfXQV9KqyObVhwbGRW7CBvoXG3yR2b55pHhRkbvgYm280C9hFr9K7rO6Pb3eK2RHI7/78CnHXlvO/h+893WNgXtTFl3dUSQzjU/+s5+9cl/RSnK10OThAO3ydnpzXmHOqjfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=l+1htDWx; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1736013176; c=relaxed/simple;
+	bh=mSgp80ZWf5vN4PcBPj5bIokW4wJz12MpukMGR8EW56c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rfDOYB1GGil0aifGdp04iEtUAYjwIaUb0TPPHUTXNMFyzDziUkS4As5NGiSTQK1AslS4/V1n3CraMkP68d+Fg6oKDOgmIQF6UpNflcsJ/eY6sesqnNCjH3rHkmCThqomRvIF3BtK/bcQ+of2OrtQm/4dhlBJqFN9EehC6aeCzCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IP/PDCEs; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l+1htDWx"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 504AhxQI013932;
-	Sat, 4 Jan 2025 16:26:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=WD2d7x
-	yX6tq18qWFDmiwpNZfKZWynPyaVB1Cjq/OlWk=; b=l+1htDWx5pYYzwTX6l85xK
-	wUyvOx6rgLsbHEgtUim0Jv4+4MZBT8f4JOaTQp4k6QuZQLkfXGrG9fPkawN1Csk1
-	GZBnxoq/FtB2j5AntStUnVHgaU19OI6nftcauIToMWo31x8MpT84SNE1U/kat07t
-	llMJfPsoUSfgny9UB1eGVs4fSI4l3EI8uH+hv+jbnUgz3Bk/JJJTQyrbtuTs7R7v
-	rwmPPEudLWIN8eaOxlTCL9a3nY3ZCpi62zgxYDMfzOgKzTq+xA6yk9+PYrt08nCa
-	ZUgqxz6YiUSz0cL3wcIHdfgQXI49n/BZU6GIKJsfTglclgPGOQEfuSqWmXK7Es7g
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43xwfb9nw2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 04 Jan 2025 16:26:19 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 504Dn65D016708;
-	Sat, 4 Jan 2025 16:26:18 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43tw5ktw12-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 04 Jan 2025 16:26:18 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 504GQIbM26804756
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 4 Jan 2025 16:26:18 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0772358055;
-	Sat,  4 Jan 2025 16:26:18 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8303458043;
-	Sat,  4 Jan 2025 16:26:15 +0000 (GMT)
-Received: from [9.171.91.57] (unknown [9.171.91.57])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Sat,  4 Jan 2025 16:26:15 +0000 (GMT)
-Message-ID: <977ab809-ba06-4537-b568-cc25f56b5b7a@linux.ibm.com>
-Date: Sat, 4 Jan 2025 21:56:14 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IP/PDCEs"
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e549dd7201cso1293436276.0;
+        Sat, 04 Jan 2025 09:52:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736013174; x=1736617974; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LUjkPGj47hm11KTQsm2hKqLSxMMo/hgYDvHHmf6hkiE=;
+        b=IP/PDCEsd0PVRsWsHD0JmXSRKSEwEO1HcGf6VnDvvvjMw0z5SiNrnrsnFzM+hKIcL4
+         0idEuJQELCrbUDcXnFTxTQLRnkfnlczbXDdVeWhw+NKbYCF9gFhq9jZijwfQsHmuy3XJ
+         xoIpXdU4AhkADryqy8LegOAsNuXgW0d+g+M9aMENw9T8Gx5Bc4DsuogE8qIwqsWJWqr1
+         16ibO8psp8ROAJMwMuHbwkriKxPU2HTFAqSFh1aw77pf/S11uFB0pSX0T3izotuCqott
+         wsA6H3vl4h2vYz4s2yRXf2ZY46V+8tE79m38OGrD7CMjlA3rU8gy/fdfCSb/w9DITXL8
+         Z2Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736013174; x=1736617974;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LUjkPGj47hm11KTQsm2hKqLSxMMo/hgYDvHHmf6hkiE=;
+        b=EbUx6eoifXEeqSoR53W2aqillTqCl2xTfJ3OPRWALhzVUfF3GQezAo3U5AtACPjZXR
+         bnGY6NMpCCr49+VQVUwlGWO57l6PWwyJYgVzuxHNH5mMyEfp8QiNmys3PxkuKTiOOl48
+         kerNCeECuEQ17JAUJAT9t64kv/zt+YhQ9pGFwkVUYSO/nItXqVjutVi4+0Qw3s+stNbn
+         eMk6cyRtHrQHf6uIm2a2QadsHNS2L5dozRX6Kh+YG1aZJAtlZLbXJHMUQTeSMt8t7CNC
+         qIomOjGwgyC80oGnW/DUWTYNdIkKSvOvpPxdql3Fp+BOR9Gm7icx3OADVpZFPr75NPa9
+         hKAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVs4OQ2H6bdqXaH4ZaXIyZWxQDAE6Wgk3PReBeuaV88bFxoxzhV5GQwgBryW9Dw0/euRY=@vger.kernel.org, AJvYcCXrdIQvnASAj2PWdanLjSZDG4DqLYnXiek1p3q+9AFnLzSpNY9NoL+2oKlm9Gewe+U+vImX47Tu9fl79Ew=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqu5bFIfVlSgudb23LgmQ0ieknNml+tTdRyCc6shueEIaDX59b
+	RrEOx328ApnKTCEtY9X4FnwQMKEINNZ3HawBAjr/JCrngWhIMl1DdEnNZRG6hvz5RfJ9rNEHwQ2
+	8qrC+qppsqTmu4R+oO+ZqzaiwgiY=
+X-Gm-Gg: ASbGnctOzdMY7Xrs6/TC5ECqfw2zxJwMnF992snGZ6EK6Ml5hHdV10JZIEgxujmzV1Z
+	DT4yB42a2t924hH3AQjjtZA7ztx7+v68lTuBevkdG
+X-Google-Smtp-Source: AGHT+IG7KRbfgRYvJrxcZgctdUiqfo+/iWiuWGtHyeYRqcBAPLNuiD8tFKWpsZsOjnyhO1nbDBXrZ5pr9sZU7MnA6P8=
+X-Received: by 2002:a05:690c:7109:b0:6ef:6178:404a with SMTP id
+ 00721157ae682-6f3f820d3a0mr354863937b3.33.1736013173669; Sat, 04 Jan 2025
+ 09:52:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] block: Fix sysfs queue freeze and limits lock order
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>
-Cc: Ming Lei <ming.lei@redhat.com>
-References: <20250104132522.247376-1-dlemoal@kernel.org>
- <20250104132522.247376-2-dlemoal@kernel.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250104132522.247376-2-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ShOvUFRYE3DlLhYdwVPEZxwNXQLJ-QLl
-X-Proofpoint-GUID: ShOvUFRYE3DlLhYdwVPEZxwNXQLJ-QLl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- mlxlogscore=999 lowpriorityscore=0 impostorscore=0 suspectscore=0
- phishscore=0 malwarescore=0 priorityscore=1501 spamscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501040141
+References: <CAJHDoJac2Qa6QjhDFi7YZf0D05=Svc13ZQyX=92KsM7pkkVbJA@mail.gmail.com>
+ <CAPhsuW7+ORExwn5fkRykEmEp-wm0YE788Tkd39rK5cZ-Q3dfUw@mail.gmail.com>
+In-Reply-To: <CAPhsuW7+ORExwn5fkRykEmEp-wm0YE788Tkd39rK5cZ-Q3dfUw@mail.gmail.com>
+From: Vishnu ks <ksvishnu56@gmail.com>
+Date: Sat, 4 Jan 2025 23:22:40 +0530
+Message-ID: <CAJHDoJYESDzDf9KJgfSfGGit6JPyxtf3miNbnM7BzNfjOi7CQw@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Improving Block Layer Tracepoints for
+ Next-Generation Backup Systems
+To: Song Liu <song@kernel.org>, hch@infradead.org, yanjun.zhu@linux.dev
+Cc: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Thank you all for your valuable feedback. I'd like to provide more
+technical context about our implementation and the specific challenges
+we're facing.
+
+System Architecture:
+We've built a block-level continuous data protection system that:
+1. Uses eBPF to monitor block_rq_complete tracepoint to track modified sect=
+ors
+2. Captures sector numbers (not data) of changed blocks in real-time
+3. Periodically syncs the actual data from these sectors based on
+configurable RPO
+4. Layers these incremental changes on top of base snapshots
+
+Current Implementation:
+- eBPF program attached to block_rq_complete tracks sector ranges from
+bio requests
+- Changed sector numbers are transmitted to a central dispatcher via websoc=
+ket
+- Dispatcher initiates periodic data sync (1-2 min intervals)
+requesting data from tracked sectors
+- Base snapshot + incremental changes provide point-in-time recovery capabi=
+lity
+
+@Christoph: Regarding stability concerns - we're not using tracepoints
+for data integrity, but rather for change detection. The actual data
+synchronization happens through standard block device reads.
+
+Technical Challenge:
+The core issue we've identified is the gap between write completion
+notification and data availability:
+- block_rq_complete tracepoint triggers before data is actually
+persisted to disk
+- Reading sectors immediately after block_rq_complete often returns stale d=
+ata
+- Observed delay between completion and actual disk persistence ranges
+from 3-7 minutes
+- Data becomes immediately available only after unmount/sync/reboot
+
+@Song: Our approach fundamentally differs from md/raid in several ways:
+
+1. Network-based vs Local:
+   - Our system operates over network, allowing replication across
+geographically distributed systems
+   - md/raid works only with locally attached storage devices
+
+2. Replication Model:
+   - We use asynchronous replication with configurable RPO windows
+   - md/raid requires synchronous, immediate mirroring of data
+
+3. Recovery Capabilities:
+   - We provide point-in-time recovery through incremental sector tracking
+   - md/raid focuses on immediate redundancy without historical state
+
+@Zhu: The eBPF performance impact is minimal as we're only tracking
+sector numbers, not actual data. The main overhead comes from the
+periodic data sync operations.
+
+Proposed Enhancement:
+We're looking for ways to:
+1. Detect when data is actually flushed to disk
+2. Track the relationship between bio requests and cache flushes
+3. Potentially add tracepoints around such operations
+
+Questions for the community:
+1. Are there existing tracepoints that could help track actual disk persist=
+ence?
+2. Would adding tracepoints in the page cache writeback path be feasible?
+3. Are there alternative approaches to detecting when data is actually
+persisted?
+
+Would love to hear the community's thoughts on this specific challenge
+and potential approaches to addressing it.
+
+Best regards,
+Vishnu KS
 
 
+On Sat, 4 Jan 2025 at 06:41, Song Liu <song@kernel.org> wrote:
+>
+> Hi Vishnu,
+>
+> On Tue, Dec 31, 2024 at 10:35=E2=80=AFPM Vishnu ks <ksvishnu56@gmail.com>=
+ wrote:
+> >
+> > Dear Community,
+> >
+> > I would like to propose a discussion topic regarding the enhancement
+> > of block layer tracepoints, which could fundamentally transform how
+> > backup and recovery systems operate on Linux.
+> >
+> > Current Scenario:
+> >
+> > - I'm developing a continuous data protection system using eBPF to
+> > monitor block request completions
+>
+> This makes little sense. It is not clear how this works.
+>
+> > - The system aims to achieve reliable live data replication for block d=
+evices
+> > Current tracepoints present challenges in capturing the complete
+> > lifecycle of write operations
+>
+> What's the difference between this approach and existing data
+> replication solutions, such as md/raid?
+>
+> >
+> > Potential Impact:
+> >
+> > - Transform Linux Backup Systems:
+> > - Enable true continuous data protection at block level
+> > - Eliminate backup windows by capturing changes in real-time
+> > - Reduce recovery point objectives (RPO) to near-zero
+> > - Allow point-in-time recovery at block granularity
+> >
+> > Current Technical Limitations:
+> >
+> > - Inconsistent visibility into write operation completion
+> > - Gaps between write operations and actual data flushes
+> > - Potential missing instrumentation points
+>
+> If a tracepoint is missing or misplaced, we can fix it in a patch.
+>
+> > - Challenges in ensuring data consistency across replicated volumes
+> >
+> > Proposed Improvements:
+> >
+> > - Additional tracepoints for better write operation visibility
+> > - Optimal placement of existing tracepoints
+> > - New instrumentation points for reliable block-level monitoring
+>
+> Some details in these would help this topic proposal.
+>
+> Thanks,
+> Song
 
-On 1/4/25 6:55 PM, Damien Le Moal wrote:
-> queue_attr_store() always freezes a device queue before calling the
-> attribute store operation. For attributes that control queue limits, the
-> store operation will also lock the queue limits with a call to
-> queue_limits_start_update(). However, some drivers (e.g. SCSI sd) may
-> need to issue commands to a device to obtain limit values from the
-> hardware with the queue limits locked. This creates a potential ABBA
-> deadlock situation if a user attempts to modify a limit (thus freezing
-> the device queue) while the device driver starts a revalidation of the
-> device queue limits.
-> 
-> Avoid such deadlock by introducing the ->store_limit() operation in
-> struct queue_sysfs_entry and use this operation for all attributes that
-> modify the device queue limits through the QUEUE_RW_LIMIT_ENTRY() macro
-> definition. queue_attr_store() is modified to call the ->store_limit()
-> operation (if it is defined) without the device queue frozen. The device
-> queue freeze for attributes defining the ->stor_limit() operation is
-> moved to after the operation completes and is done only around the call
-> to queue_limits_commit_update().
-> 
-> Cc: stable@vger.kernel.org # v6.9+
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->  block/blk-sysfs.c | 123 ++++++++++++++++++++++++----------------------
->  1 file changed, 64 insertions(+), 59 deletions(-)
-> 
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 767598e719ab..4fc0020c73a5 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -24,6 +24,8 @@ struct queue_sysfs_entry {
->  	struct attribute attr;
->  	ssize_t (*show)(struct gendisk *disk, char *page);
->  	ssize_t (*store)(struct gendisk *disk, const char *page, size_t count);
-> +	ssize_t (*store_limit)(struct gendisk *disk, struct queue_limits *lim,
-> +			       const char *page, size_t count);
->  	void (*load_module)(struct gendisk *disk, const char *page, size_t count);
->  };
->  
-> @@ -154,55 +156,46 @@ QUEUE_SYSFS_SHOW_CONST(write_same_max, 0)
->  QUEUE_SYSFS_SHOW_CONST(poll_delay, -1)
->  
->  static ssize_t queue_max_discard_sectors_store(struct gendisk *disk,
-> -		const char *page, size_t count)
-> +		struct queue_limits *lim, const char *page, size_t count)
->  {
->  	unsigned long max_discard_bytes;
-> -	struct queue_limits lim;
->  	ssize_t ret;
-> -	int err;
->  
->  	ret = queue_var_store(&max_discard_bytes, page, count);
->  	if (ret < 0)
->  		return ret;
->  
-> -	if (max_discard_bytes & (disk->queue->limits.discard_granularity - 1))
-> +	if (max_discard_bytes & (lim->discard_granularity - 1))
->  		return -EINVAL;
->  
->  	if ((max_discard_bytes >> SECTOR_SHIFT) > UINT_MAX)
->  		return -EINVAL;
->  
-> -	lim = queue_limits_start_update(disk->queue);
-> -	lim.max_user_discard_sectors = max_discard_bytes >> SECTOR_SHIFT;
-> -	err = queue_limits_commit_update(disk->queue, &lim);
-> -	if (err)
-> -		return err;
-> -	return ret;
-> +	lim->max_user_discard_sectors = max_discard_bytes >> SECTOR_SHIFT;
-> +
-> +	return count;
->  }
->  
->  static ssize_t
-> -queue_max_sectors_store(struct gendisk *disk, const char *page, size_t count)
-> +queue_max_sectors_store(struct gendisk *disk, struct queue_limits *lim,
-> +			const char *page, size_t count)
->  {
->  	unsigned long max_sectors_kb;
-> -	struct queue_limits lim;
->  	ssize_t ret;
-> -	int err;
->  
->  	ret = queue_var_store(&max_sectors_kb, page, count);
->  	if (ret < 0)
->  		return ret;
->  
-> -	lim = queue_limits_start_update(disk->queue);
-> -	lim.max_user_sectors = max_sectors_kb << 1;
-> -	err = queue_limits_commit_update(disk->queue, &lim);
-> -	if (err)
-> -		return err;
-> -	return ret;
-> +	lim->max_user_sectors = max_sectors_kb << 1;
-> +
-> +	return count;
->  }
->  
-> -static ssize_t queue_feature_store(struct gendisk *disk, const char *page,
-> +static ssize_t queue_feature_store(struct gendisk *disk,
-> +		struct queue_limits *lim, const char *page,
->  		size_t count, blk_features_t feature)
->  {
-> -	struct queue_limits lim;
->  	unsigned long val;
->  	ssize_t ret;
->  
-> @@ -210,14 +203,10 @@ static ssize_t queue_feature_store(struct gendisk *disk, const char *page,
->  	if (ret < 0)
->  		return ret;
->  
-> -	lim = queue_limits_start_update(disk->queue);
->  	if (val)
-> -		lim.features |= feature;
-> +		lim->features |= feature;
->  	else
-> -		lim.features &= ~feature;
-> -	ret = queue_limits_commit_update(disk->queue, &lim);
-> -	if (ret)
-> -		return ret;
-> +		lim->features &= ~feature;
->  	return count;
->  }
->  
-> @@ -228,9 +217,10 @@ static ssize_t queue_##_name##_show(struct gendisk *disk, char *page)	\
->  		!!(disk->queue->limits.features & _feature));		\
->  }									\
->  static ssize_t queue_##_name##_store(struct gendisk *disk,		\
-> +		struct queue_limits *lim,				\
->  		const char *page, size_t count)				\
->  {									\
-> -	return queue_feature_store(disk, page, count, _feature);	\
-> +	return queue_feature_store(disk, lim, page, count, _feature);	\
->  }
->  
->  QUEUE_SYSFS_FEATURE(rotational, BLK_FEAT_ROTATIONAL)
-> @@ -267,9 +257,8 @@ static ssize_t queue_iostats_passthrough_show(struct gendisk *disk, char *page)
->  }
->  
->  static ssize_t queue_iostats_passthrough_store(struct gendisk *disk,
-> -					       const char *page, size_t count)
-> +		struct queue_limits *lim, const char *page, size_t count)
->  {
-> -	struct queue_limits lim;
->  	unsigned long ios;
->  	ssize_t ret;
->  
-> @@ -277,15 +266,10 @@ static ssize_t queue_iostats_passthrough_store(struct gendisk *disk,
->  	if (ret < 0)
->  		return ret;
->  
-> -	lim = queue_limits_start_update(disk->queue);
->  	if (ios)
-> -		lim.flags |= BLK_FLAG_IOSTATS_PASSTHROUGH;
-> +		lim->flags |= BLK_FLAG_IOSTATS_PASSTHROUGH;
->  	else
-> -		lim.flags &= ~BLK_FLAG_IOSTATS_PASSTHROUGH;
-> -
-> -	ret = queue_limits_commit_update(disk->queue, &lim);
-> -	if (ret)
-> -		return ret;
-> +		lim->flags &= ~BLK_FLAG_IOSTATS_PASSTHROUGH;
->  
->  	return count;
->  }
-> @@ -391,12 +375,10 @@ static ssize_t queue_wc_show(struct gendisk *disk, char *page)
->  	return sysfs_emit(page, "write through\n");
->  }
->  
-> -static ssize_t queue_wc_store(struct gendisk *disk, const char *page,
-> -			      size_t count)
-> +static ssize_t queue_wc_store(struct gendisk *disk, struct queue_limits *lim,
-> +			      const char *page, size_t count)
->  {
-> -	struct queue_limits lim;
->  	bool disable;
-> -	int err;
->  
->  	if (!strncmp(page, "write back", 10)) {
->  		disable = false;
-> @@ -407,14 +389,10 @@ static ssize_t queue_wc_store(struct gendisk *disk, const char *page,
->  		return -EINVAL;
->  	}
->  
-> -	lim = queue_limits_start_update(disk->queue);
->  	if (disable)
-> -		lim.flags |= BLK_FLAG_WRITE_CACHE_DISABLED;
-> +		lim->flags |= BLK_FLAG_WRITE_CACHE_DISABLED;
->  	else
-> -		lim.flags &= ~BLK_FLAG_WRITE_CACHE_DISABLED;
-> -	err = queue_limits_commit_update(disk->queue, &lim);
-> -	if (err)
-> -		return err;
-> +		lim->flags &= ~BLK_FLAG_WRITE_CACHE_DISABLED;
->  	return count;
->  }
->  
-> @@ -439,9 +417,16 @@ static struct queue_sysfs_entry _prefix##_entry = {		\
->  	.store		= _prefix##_store,			\
->  }
->  
-> +#define QUEUE_RW_LIMIT_ENTRY(_prefix, _name)				\
-> +static struct queue_sysfs_entry _prefix##_entry = {		\
-> +	.attr		= { .name = _name, .mode = 0644 },	\
-> +	.show		= _prefix##_show,			\
-> +	.store_limit	= _prefix##_store,			\
-> +}
-> +
->  QUEUE_RW_ENTRY(queue_requests, "nr_requests");
->  QUEUE_RW_ENTRY(queue_ra, "read_ahead_kb");
-> -QUEUE_RW_ENTRY(queue_max_sectors, "max_sectors_kb");
-> +QUEUE_RW_LIMIT_ENTRY(queue_max_sectors, "max_sectors_kb");
->  QUEUE_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_kb");
->  QUEUE_RO_ENTRY(queue_max_segments, "max_segments");
->  QUEUE_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
-> @@ -457,7 +442,7 @@ QUEUE_RO_ENTRY(queue_io_opt, "optimal_io_size");
->  QUEUE_RO_ENTRY(queue_max_discard_segments, "max_discard_segments");
->  QUEUE_RO_ENTRY(queue_discard_granularity, "discard_granularity");
->  QUEUE_RO_ENTRY(queue_max_hw_discard_sectors, "discard_max_hw_bytes");
-> -QUEUE_RW_ENTRY(queue_max_discard_sectors, "discard_max_bytes");
-> +QUEUE_RW_LIMIT_ENTRY(queue_max_discard_sectors, "discard_max_bytes");
->  QUEUE_RO_ENTRY(queue_discard_zeroes_data, "discard_zeroes_data");
->  
->  QUEUE_RO_ENTRY(queue_atomic_write_max_sectors, "atomic_write_max_bytes");
-> @@ -477,11 +462,11 @@ QUEUE_RO_ENTRY(queue_max_open_zones, "max_open_zones");
->  QUEUE_RO_ENTRY(queue_max_active_zones, "max_active_zones");
->  
->  QUEUE_RW_ENTRY(queue_nomerges, "nomerges");
-> -QUEUE_RW_ENTRY(queue_iostats_passthrough, "iostats_passthrough");
-> +QUEUE_RW_LIMIT_ENTRY(queue_iostats_passthrough, "iostats_passthrough");
->  QUEUE_RW_ENTRY(queue_rq_affinity, "rq_affinity");
->  QUEUE_RW_ENTRY(queue_poll, "io_poll");
->  QUEUE_RW_ENTRY(queue_poll_delay, "io_poll_delay");
-> -QUEUE_RW_ENTRY(queue_wc, "write_cache");
-> +QUEUE_RW_LIMIT_ENTRY(queue_wc, "write_cache");
->  QUEUE_RO_ENTRY(queue_fua, "fua");
->  QUEUE_RO_ENTRY(queue_dax, "dax");
->  QUEUE_RW_ENTRY(queue_io_timeout, "io_timeout");
-> @@ -494,10 +479,10 @@ static struct queue_sysfs_entry queue_hw_sector_size_entry = {
->  	.show = queue_logical_block_size_show,
->  };
->  
-> -QUEUE_RW_ENTRY(queue_rotational, "rotational");
-> -QUEUE_RW_ENTRY(queue_iostats, "iostats");
-> -QUEUE_RW_ENTRY(queue_add_random, "add_random");
-> -QUEUE_RW_ENTRY(queue_stable_writes, "stable_writes");
-> +QUEUE_RW_LIMIT_ENTRY(queue_rotational, "rotational");
-> +QUEUE_RW_LIMIT_ENTRY(queue_iostats, "iostats");
-> +QUEUE_RW_LIMIT_ENTRY(queue_add_random, "add_random");
-> +QUEUE_RW_LIMIT_ENTRY(queue_stable_writes, "stable_writes");
->  
->  #ifdef CONFIG_BLK_WBT
->  static ssize_t queue_var_store64(s64 *var, const char *page)
-> @@ -693,9 +678,11 @@ queue_attr_store(struct kobject *kobj, struct attribute *attr,
->  	struct queue_sysfs_entry *entry = to_queue(attr);
->  	struct gendisk *disk = container_of(kobj, struct gendisk, queue_kobj);
->  	struct request_queue *q = disk->queue;
-> +	struct queue_limits lim = { };
->  	ssize_t res;
-> +	int ret;
->  
-> -	if (!entry->store)
-> +	if (!entry->store && !entry->store_limit)
->  		return -EIO;
->  
->  	/*
-> @@ -706,12 +693,30 @@ queue_attr_store(struct kobject *kobj, struct attribute *attr,
->  	if (entry->load_module)
->  		entry->load_module(disk, page, length);
->  
-> -	blk_mq_freeze_queue(q);
-> +	if (entry->store) {
-> +		blk_mq_freeze_queue(q);
-> +		mutex_lock(&q->sysfs_lock);
-> +		res = entry->store(disk, page, length);
-> +		mutex_unlock(&q->sysfs_lock);
-> +		blk_mq_unfreeze_queue(q);
-> +		return res;
-> +	}
-> +
-Can we move ->sysfs_lock before freezing queue? We follow the locking order 
-of acquiring ->sysfs_lock before freeze lock. For instance, we've these 
-call sites (elevator_disable(), elevator_switch()) where we first acquire 
-->sysfs_lock and then freezes the queue. It's OK if you think this patchset
-fixes locking order between limits lock and queue freeze and so we may address 
-it in another patch. 
-
-> +	lim = queue_limits_start_update(q);
-> +
->  	mutex_lock(&q->sysfs_lock);
-> -	res = entry->store(disk, page, length);
-> +	res = entry->store_limit(disk, &lim, page, length);
->  	mutex_unlock(&q->sysfs_lock);
-> +	if (res < 0) {
-> +		queue_limits_cancel_update(q);
-> +		return res;
-> +	}
-> +
-> +	blk_mq_freeze_queue(q);
-> +	ret = queue_limits_commit_update(disk->queue, &lim);
->  	blk_mq_unfreeze_queue(q);
-> -	return res;
-> +
-> +	return ret ? ret : res;
->  }
->  
->  static const struct sysfs_ops queue_sysfs_ops = {
-
-Thanks,
---Nilay
+--=20
+Vishnu KS,
+Opensource contributor and researcher,
+https://iamvishnuks.com
