@@ -1,114 +1,71 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326C92F36;
-	Sat,  4 Jan 2025 01:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A72EC5
+	for <linux-block@vger.kernel.org>; Sat,  4 Jan 2025 01:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735953077; cv=none; b=Cq7G80y9qepWVj7vrCOrahbAhZcobXsMIBm4Rfk1NXvjginIqbxg9h71vhl2EMbsHCLen7W63zUcU2J/4jv0gYhmwiaPhwcExiM0Ts5xVKtRos74tUdHvN1XfbL8TmbxLHhzV9PBe3LvYdfpquRg6mq4iD/WDVzh/s5cWB0106Y=
+	t=1735955223; cv=none; b=fnIZnBGuh0+jVXIDqSyLyC6BlKa081Di9QAnFT41wuN51VzynP4JOLjWoL9vdp5AJ4me9UprMQWjD/J4CFVQAM1/Mn4upeRN8fiEVSpTsF5eKFFgjWJOmnBCphnnozTYaBaSwLCmnbWilcaNwb3i4YSpeSd7MywflzopDn8D67Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735953077; c=relaxed/simple;
-	bh=wmWc/77/LQw1qXjfBth30rSS1ne9bLH3axy43XapDEY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U4Lua3Bx/dLiZADcvzEQRqHkeFq/8pD4VSlprrOJpk2BTYXJil6dhLo9w5XGgGSpp9Qjg5DKoLcPfjmEcktjUHSGOgI/Kn84Q7o253DrdSmW3UnrTQmKZ3TS82RnyRLlbeFEVcd3Vakbttaie7kYLTWV3CP8/1UCyeNivRWbEhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bqJLpKw0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1735955223; c=relaxed/simple;
+	bh=iS3GsS+Bvag0lDhoiuduXF1ScdC0uYQGuTdJJzhAMPw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ldF1800HjTsSg47tnvs4rg9vG0Sjt2D9LAcj1CAhmJCbpk1TvVvF0pKMcQ7ySCvZ0Zih3V5IPWEwxZ/pAGc3PH9Ub5kJWGqoFGwekZa9M+5XF2B9czp+OQsskNDxfHMKXWFipsJMDJI6oVBPzcXNgAu2LEGYdCGr40mP6zQZyzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldwf7niU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqJLpKw0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFD42C4CEDE;
-	Sat,  4 Jan 2025 01:11:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldwf7niU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04254C4CED6;
+	Sat,  4 Jan 2025 01:47:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735953077;
-	bh=wmWc/77/LQw1qXjfBth30rSS1ne9bLH3axy43XapDEY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=bqJLpKw07XoGSy1s/RnWX7CW13aqgAa363xnGnoBSlocZfIOAbPgPuqrJI+bWPjQW
-	 r0zgnqpg7mr4upZIaDqhkA/jiifoDPu1WcjFVUqcRTppNXhGAuWDISahRigYuELu1Z
-	 2gjTGCJLAsjIbff0lG3kIlEXFMj61KAcwZsu1Vj3qPYedJhN8bLyZzcWt9PcspSLvz
-	 kpI/71dzbt+JfYR6Qk5WcjjMIjOlR36MUB8vDkQrPYBPthOcrXT4zrPtPPRxDcyQ01
-	 ZTg1qGIeohV/aE8iuTiJrWzumtRCXpeoCA/L8fiE8xQXcIR1TJCaykRv5DSHe3qd8E
-	 EfoXc5SM6k8Yg==
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3cddfa9a331so1078135ab.3;
-        Fri, 03 Jan 2025 17:11:16 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCURdo8w9CNDfQgr3abuC9DD41nXfazCcPb7CBAnpQR+tHdHQ4/VC+1nKsfk/OqI4CbF7xs=@vger.kernel.org, AJvYcCX6xk4SpTr7uz+Wc8sD423ClRQfILwI0NYI8oGqVBfFBtu/uoi12lE52TdtxGVNrAN3/THaBc7xVpPL2ck=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBrMfU+LC4ijDnyErjt2xhJYGIJ+4o665FS5c1AZPDfMPnCyXC
-	JDLebh4+wbusKgpzZd9OPoe4F6RF/Na7PLTEoIQwxIXZVY00jf7TTDsZZJZf2M5Q3Rq3abhkBW5
-	6vm7D6iJKWM5CkIq+cBKxIQSxszw=
-X-Google-Smtp-Source: AGHT+IGTA5mtmUi1e5ekRsHIG12mFpFa5wf8eXRP6b6qWFlz3OJQR4sTw+SV7jM2yAMOh4Ck6+8eVMdDAjf6weeDmGU=
-X-Received: by 2002:a05:6e02:20ca:b0:3a7:86ab:bebe with SMTP id
- e9e14a558f8ab-3c2d514f966mr429152675ab.16.1735953076345; Fri, 03 Jan 2025
- 17:11:16 -0800 (PST)
+	s=k20201202; t=1735955223;
+	bh=iS3GsS+Bvag0lDhoiuduXF1ScdC0uYQGuTdJJzhAMPw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ldwf7niU/ZgZaJB6+GY0R/UTfx204sTZiGOsSN7RWrzjeZpDUmHlFSIed4PbY4pvp
+	 XfsqY4E8XAGHPsSKEFxDtBlrZNDn/m/QuNlsY4wOyADSXfWG3k4ak2zfLS+i3La5ar
+	 stkwsRQBdi8sAqDukoSyHE6QfXI0kAfjZgGkLMtrN/URkb3r66xZV1DP0Wt8fGciru
+	 TOB4t/21dtIGgp48l83hQOhkdYW/p6o62h7TiMOgVmeIFygwZCfpyKeXjPJ+3ALlCa
+	 1c1a2QvUnaWbpF7SRLExpbdAbTp5br3XqFiJFLBINBI8Zs+qqi20yp6CbQ5J4wM14F
+	 22v1myzqZxlzA==
+Date: Fri, 3 Jan 2025 17:47:01 -0800
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>,
+	John Garry <john.g.garry@oracle.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: make queue limits workable in case of 64K
+ PAGE_SIZE
+Message-ID: <Z3iTFSBxKY4Z8xZg@bombadil.infradead.org>
+References: <20250102015620.500754-1-ming.lei@redhat.com>
+ <0b423229-f928-4210-9351-dca353071231@acm.org>
+ <Z3X-xMeMuF8j0RDA@fedora>
+ <0b34bfc9-2cd3-40a8-8153-3207a6d62f8c@acm.org>
+ <Z3dFBQIiik6FWLut@fedora>
+ <1b1bf316-359a-4bec-8195-0152cd706001@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAJHDoJac2Qa6QjhDFi7YZf0D05=Svc13ZQyX=92KsM7pkkVbJA@mail.gmail.com>
-In-Reply-To: <CAJHDoJac2Qa6QjhDFi7YZf0D05=Svc13ZQyX=92KsM7pkkVbJA@mail.gmail.com>
-From: Song Liu <song@kernel.org>
-Date: Fri, 3 Jan 2025 17:11:05 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW7+ORExwn5fkRykEmEp-wm0YE788Tkd39rK5cZ-Q3dfUw@mail.gmail.com>
-X-Gm-Features: AbW1kvYvND5wrLCJdMk5CZBrLIhjlv6180Ove4rv7MC2kdmdU3zFjiIWHq56MBY
-Message-ID: <CAPhsuW7+ORExwn5fkRykEmEp-wm0YE788Tkd39rK5cZ-Q3dfUw@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] Improving Block Layer Tracepoints for
- Next-Generation Backup Systems
-To: Vishnu ks <ksvishnu56@gmail.com>
-Cc: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1b1bf316-359a-4bec-8195-0152cd706001@acm.org>
 
-Hi Vishnu,
+On Fri, Jan 03, 2025 at 02:12:36PM -0800, Bart Van Assche wrote:
+> On 1/2/25 6:01 PM, Ming Lei wrote:
+> > But why does DMA segment size have to be >= PAGE_SIZE(4KB, 64KB)?
+> 
+> From the description of patch 5/8 of my patch series: "If the segment
+> size is smaller than the page size there may be multiple segments per
+> bvec even if a bvec only contains a single page." The current block
+> layer implementation is based on the assumption that a single page
+> fits in a single DMA segment. Please take a look at patch 5/8 of my
+> patch series.
 
-On Tue, Dec 31, 2024 at 10:35=E2=80=AFPM Vishnu ks <ksvishnu56@gmail.com> w=
-rote:
->
-> Dear Community,
->
-> I would like to propose a discussion topic regarding the enhancement
-> of block layer tracepoints, which could fundamentally transform how
-> backup and recovery systems operate on Linux.
->
-> Current Scenario:
->
-> - I'm developing a continuous data protection system using eBPF to
-> monitor block request completions
+While that addresses a smaller segment then page size this still leaves
+open the question of if a dma segment can be larger than page size,
+given our adoption of folios I don't see why we would constrain
+ourselves to a page size. I already have PoC code which enables this.
 
-This makes little sense. It is not clear how this works.
-
-> - The system aims to achieve reliable live data replication for block dev=
-ices
-> Current tracepoints present challenges in capturing the complete
-> lifecycle of write operations
-
-What's the difference between this approach and existing data
-replication solutions, such as md/raid?
-
->
-> Potential Impact:
->
-> - Transform Linux Backup Systems:
-> - Enable true continuous data protection at block level
-> - Eliminate backup windows by capturing changes in real-time
-> - Reduce recovery point objectives (RPO) to near-zero
-> - Allow point-in-time recovery at block granularity
->
-> Current Technical Limitations:
->
-> - Inconsistent visibility into write operation completion
-> - Gaps between write operations and actual data flushes
-> - Potential missing instrumentation points
-
-If a tracepoint is missing or misplaced, we can fix it in a patch.
-
-> - Challenges in ensuring data consistency across replicated volumes
->
-> Proposed Improvements:
->
-> - Additional tracepoints for better write operation visibility
-> - Optimal placement of existing tracepoints
-> - New instrumentation points for reliable block-level monitoring
-
-Some details in these would help this topic proposal.
-
-Thanks,
-Song
+  Luis
