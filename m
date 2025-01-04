@@ -1,111 +1,88 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB27615622E
-	for <linux-block@vger.kernel.org>; Sat,  4 Jan 2025 22:27:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B844E1D63C5
+	for <linux-block@vger.kernel.org>; Sat,  4 Jan 2025 22:30:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736029678; cv=none; b=gzkFLk1agBhGCTCD3MSrV04fA3NM30iiWjv2CcLDfFF/Up0AFva+vG8yRHIEhcU1cji6z5JfUc/SLXP74byEzRPzNstTf6eluv0uk/fniZ93EDFJOPIfuhWvWMe1fRZtgQm3vB4+hS97yy60+Q6KUUwyIN6tHRtHk5Yooifa1E8=
+	t=1736029854; cv=none; b=qhzcqdJRM0T8h1ownIbR1o5Vn7iTdCxwca4SwRNgfK5JwCrYo1J8xBGFvwYIqCyDCw6gRjj3OGlDqm8rpoR/wwXqriVm+5sqr27Pfgch/X5hy0tOM244TkA+ZyAOzJg6YHDcl8BVW/qDV0jHAjHxQAA9zILx584Tfg+B0KEVVO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736029678; c=relaxed/simple;
-	bh=dbW9sZ4K4CVni2WzfS5PIhq9YPepuP+wgQlHyfd4Js0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=SZYrOMSW1bMYzfd/eXtttTSkoOpjkywdsWcViJPR5DgTrA8qcl5bnljiY3T1be0BTO7xO8/ml32xhQ5reJUUWEb+p1f13aXplKE1QtX+AyQIDDQ5HeB0FKDxbdyR9w0lsv6YInvKhuh21M64cTtfpxM4bpVE6w6vaY6W6TFezyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xoYooiqn; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1736029854; c=relaxed/simple;
+	bh=qSzgXugY8+ywSHYX0Jh5DiSY9/RYR0BqmD0qJojkzEg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KqcVTqmHNkRliygnbFzprIlaNh7outsut8OgRulECmaLIOcY/bmsQC8AXOr11ziW5eERn2Ci12EqIaQ3J1J229G5SVJnM6o4BvJHCHiM1XV6faTyfvPHe7vuAm0f5XiuxTfe+993IM9pG9r43Zl5clt1Vv8QhNQzyHo6FQ70YPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=MpohBqgi; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xoYooiqn"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21628b3fe7dso181622515ad.3
-        for <linux-block@vger.kernel.org>; Sat, 04 Jan 2025 14:27:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736029674; x=1736634474; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ydW0TG4z7XBo7HBBH7ij90+wnNI4JxxB1fs88STRyos=;
-        b=xoYooiqnsEbhRX7oNLMe+4zSKtiFsQwy8/aciLwR5MW3a6ReCHKk8eZipkbBAx9V5X
-         mHYHz7rcg1tUUyQ6Yqf8fi4GmvZcQbh2o/byeXJiT0EvxL88mAJvZ4zYPx1HaVPufL7z
-         572+GXzuEpX+yVbDLRp7jRi3O7IR9AIjcCmnmNqZfHWp63qdaBqFhhGUDljGkfj03OLr
-         DqFHc7rwsLT3E2pTPGVxrCl6xKYiB53u2lFSVi1L84K1Cnl0XM6YKWhHZ3wy1+h7Y6mQ
-         /+5vIRZlags29GTRIJ+fRIdig73iwZHSd2gEIkrp7K+yhrt6woslPZ5YYeER5UNv6UHS
-         aOdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736029674; x=1736634474;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ydW0TG4z7XBo7HBBH7ij90+wnNI4JxxB1fs88STRyos=;
-        b=B1JORlKDDRvZHi4LpKVeVZEVhR8eWGLHZSLWxaM1KdG/rxCYh35+3B4oTK3EG6Izsf
-         No7aPuYiE5xeLthu5lWO6zKTm9mFbuVoSARAc6eYkOISpaXmyfIPO9tfDOhHvAotH8dz
-         WpyYOYf+lYlUmhmYwaaYVF2OrPXm7C/gu3ODIFUuc2CPzMMuzooyjzNBAtI0m2Ifp8uJ
-         zNmU7gVq+5ZVOcTKHOpDFlDmtDQlrjzgsRFTmSiHi6wqM14fzNCmOhnE9ACw8v700rKz
-         FzENAxHOD6uWVBzCZqB/YSuXFP/X3ow6uTKx/CHwNPIy6peg3YOGzfdxhRMX3cRTt/jV
-         CkVA==
-X-Gm-Message-State: AOJu0Yw469zKtUn9Gt9aglp21vnJ2zpWFQXiW3SmaaRAM9agg1mstxbK
-	lquCsr9exlYfWez81KvJm/yyaqykpgpaeWTz2b4htkWfMnzG93EswAmOoojIS6Y=
-X-Gm-Gg: ASbGnctB/lvQk+vhZiw0QmN7yUa7V5sye3BZi+19e+37mHr1Y0tWDO942VTBYKPKwwU
-	Iwl7dXYi4PrRBdFWNRDTTNtjoZYmGO9DJp6KxSXieruFTQgwR/dbCggcXAHq1+zCraJDPRw3gTy
-	8/P/uCZyWe54T9Vfqq9h1C5qAODUnqYYkd20+rlCXV/zzcoRbWxqDBC8hDDIhVnV+9F9Aabhxtv
-	myCDIyiuulZUxZ6MflDnKc+2pexoXS6UGMMUi51CdEWxEaj
-X-Google-Smtp-Source: AGHT+IF+L+86xLxNKDCy3NJpJ1Whra//RstFOL/I1FY0ppQLvIlzdnb8Hv8hv/Dxi+bSvhcBNsb4Ww==
-X-Received: by 2002:a05:6a20:6f06:b0:1e1:b014:aec9 with SMTP id adf61e73a8af0-1e5e080c77fmr83798682637.29.1736029674019;
-        Sat, 04 Jan 2025 14:27:54 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad81641esm28451472b3a.3.2025.01.04.14.27.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Jan 2025 14:27:53 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
-In-Reply-To: <20250103073417.459715-1-hch@lst.de>
-References: <20250103073417.459715-1-hch@lst.de>
-Subject: Re: simplify passthrough bio handling
-Message-Id: <173602967287.135972.1134077263108813311.b4-ty@kernel.dk>
-Date: Sat, 04 Jan 2025 15:27:52 -0700
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="MpohBqgi"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YQZsQ6Xj0zlfflk;
+	Sat,  4 Jan 2025 22:30:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1736029848; x=1738621849; bh=t+6/jz/0ZK+YrvWJBp82+/p7
+	hn2yXaPORGwxg5VN618=; b=MpohBqgitUAl3IUoOIoWXe/d9pjUqevBNgNTn8gh
+	DN+Kg6DDxFpeLL6RZR0G7R4AJx7fGPKslwVfKPzjamkD7ZDb2Fs59yoB0yJ2MrKI
+	dl1HiEeA01k3aZU0xtQ93ofkKiOqFHPebdFDl4u16GUQRqJzweD3R/tjUIy03w2y
+	e+CzHVvxry6WWurba/qgY8l1v5YUqrKyFRN35sMO2nqb9VlSUOIpo2kr6Sr6beTV
+	9EnywlIJHWVvgLIg2fTbafjexqAP1TyKXe1hlG1pHS+ESpXS37pNg5VsIr3/zVrw
+	NpMf5vtuGaPTK1xL4iCThQqY4ZyzYuiDkCCJSNigqE8D6w==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id XP1LuN8MIRqh; Sat,  4 Jan 2025 22:30:48 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YQZsJ66HmzlfflY;
+	Sat,  4 Jan 2025 22:30:44 +0000 (UTC)
+Message-ID: <cbda6cc0-9781-4214-a6fd-e9852141bd64@acm.org>
+Date: Sat, 4 Jan 2025 14:30:42 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: make queue limits workable in case of 64K
+ PAGE_SIZE
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>,
+ John Garry <john.g.garry@oracle.com>, Christoph Hellwig <hch@lst.de>
+References: <20250102015620.500754-1-ming.lei@redhat.com>
+ <0b423229-f928-4210-9351-dca353071231@acm.org> <Z3X-xMeMuF8j0RDA@fedora>
+ <0b34bfc9-2cd3-40a8-8153-3207a6d62f8c@acm.org> <Z3dFBQIiik6FWLut@fedora>
+ <1b1bf316-359a-4bec-8195-0152cd706001@acm.org>
+ <Z3iTFSBxKY4Z8xZg@bombadil.infradead.org>
+ <386a5388-1b1b-4e5a-ad9c-0da1840f12ee@acm.org>
+ <Z3izUEIPTdvRg5Xe@bombadil.infradead.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <Z3izUEIPTdvRg5Xe@bombadil.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-14bd6
 
+On 1/3/25 8:04 PM, Luis Chamberlain wrote:
+> Try aiming high for a single 2 MiB for a single IO on x86_64 on NVMe, that is
+> currently not possible. At the max 128 NVMe number of DMA segments, and we have
+> 4 KiB per DMA segment, for a 512 KiB IO limit. Should multi-page bvec
+> enable to lift this?
 
-On Fri, 03 Jan 2025 08:33:56 +0100, Christoph Hellwig wrote:
-> this series removes the special casing when adding pages to passthrough
-> bios in favor of simply checking that they match the queue limits once
-> before submissions.  This mirrors where the zone append users have been
-> moving and a recent doing the same for a single optimizes passthrough
-> user.
-> 
-> Diffstat:
->  block/bio.c                        |  107 +-----------------------------
->  block/blk-map.c                    |  128 ++++++++++---------------------------
->  block/blk-mq.c                     |    4 -
->  block/blk.h                        |    8 --
->  drivers/nvme/target/passthru.c     |   18 +++--
->  drivers/nvme/target/zns.c          |    3
->  drivers/target/target_core_pscsi.c |    6 -
->  include/linux/bio.h                |    2
->  include/linux/blk-mq.h             |    8 --
->  9 files changed, 57 insertions(+), 227 deletions(-)
-> 
-> [...]
+4 KiB per DMA segment for NVMe? I think that the DMA segment size limit 
+for PRP and SGL modes is much larger than 4 KiB. See also the
+description of the CC.MPS parameter and PRP Lists in the NVMe base
+specification. From a system with an NVMe controller:
 
-Applied, thanks!
+$ cat /sys/block/nvme0n1/queue/max_segment_size
+4294967295
 
-[1/2] block: remove bio_add_pc_page
-      commit: 6aeb4f836480617be472de767c4cb09c1060a067
-[2/2] block: remove blk_rq_bio_prep
-      commit: 02ee5d69e3baf2796ba75b928fcbc9cf7884c5e9
+Thanks,
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+Bart.
