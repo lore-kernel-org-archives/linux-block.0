@@ -1,81 +1,137 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pv50p00im-zteg10011501.me.com (pv50p00im-zteg10011501.me.com [17.58.6.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D3622F11
-	for <linux-block@vger.kernel.org>; Sun,  5 Jan 2025 00:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0854F136E28
+	for <linux-block@vger.kernel.org>; Sun,  5 Jan 2025 08:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736038788; cv=none; b=gpcb3erILWV1+K0y4XX9y7HRtgySjczEJgxrVUqqnZQwmGeKN7glxYo2vBr5cvdRBXlJ55AgYB0FIKaJI2+BlACrVDSBGsdmclxpHUzWVFYaKIJuMfQzqtBRCDYwVT9CRsdRnQ/PoqIFbUxixNjcPue/6QZ3AJovjlRmF03HhGI=
+	t=1736066091; cv=none; b=EX5Ozjl0KP94qVsSuy3YIZIDu2Fjng+H4m0qJjUHO1FPpkhK9GXKoVAZh9pj9AR0spY/9D9yDJaBo7Ti9VAH4aPF9PICyvAwztmhbN0lVVL5dEzvW3PnTgZ7A8/fMfvBpQDemEjuubqRLpYqul9HwKdytiyLbat1iRK/hUvwqUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736038788; c=relaxed/simple;
-	bh=z0kIylCu2GjlwT3qu7R5tmVWdSooWkIR8RS9q4usGBo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qSELuNHeMcoTWkYBG9YJanvLe1xq8qNEKrmivyDcLlEUleYhMOWxycOuDOib4BdThZOjqQzash95Bn7Uh3FCP2n6PkbvqEB9gf9XHRnmNveiG8kO8+1Rs2SJxEV6Y5kKW9dyB+OMTN1mK9LsAkY8pGLFGb97IXc9phV+Zyp3mM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PKpBkc9f; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736066091; c=relaxed/simple;
+	bh=DkgMovNbJ4a5tpyYOqHC6gsDgeClMXlb7XTcpIa+o+4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=B8mnAsGRSuAyM18TZL8yV/WZaLHMOyRwrl6RyITD2HwuciblAnWsDd9M2FBYssCpfkMfZ/hWJtwtCPdhNcQ6mYX+XwM4RSttLom7BM7pnBNbWOX4KBt0t1aps/NL9ZbUQBq+IH0DotDaSsY+SqFgUosIeRpJKiiLU6yQPsVOqzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=krJ/Er0a; arc=none smtp.client-ip=17.58.6.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PKpBkc9f"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 886D6C4CED1;
-	Sun,  5 Jan 2025 00:59:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736038788;
-	bh=z0kIylCu2GjlwT3qu7R5tmVWdSooWkIR8RS9q4usGBo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PKpBkc9fh2mgJGWEeMzdfBqFT/6yZxfvP4GSls2IhhzCBzGq1RgPFjHGB64tfAVZ5
-	 4HZ9F90+bvcAUD9z7QYKE20aT/W8JgWOLSvH4pgaIRkWeYJt/L8N3QBomY6jigcCvF
-	 D19Y7s51gsd2vJ9k3tx/VTyblNJCHfhS3Qac0TmhXuKxh471jkKl+D9WVf0XWh4cQs
-	 xQXgybEZtHde0HDkp6IrESXob4rXfDn1pJfM9M3G5Ohq+IWldrx1zsoIWeMHN9afs5
-	 avD19A1pSnrN9T9Bai5L9R5BVR7qsObI+zGeoxe2g6hl3Q5B8hA+IvKnaVCnqoEZtV
-	 5pFOp42KsTRtw==
-Date: Sat, 4 Jan 2025 16:59:39 -0800
-From: Keith Busch <kbusch@kernel.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Bart Van Assche <bvanassche@acm.org>, Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Yi Zhang <yi.zhang@redhat.com>,
-	John Garry <john.g.garry@oracle.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] block: make queue limits workable in case of 64K
- PAGE_SIZE
-Message-ID: <Z3nZe3nRS5KyaLzr@kbusch-mbp>
-References: <20250102015620.500754-1-ming.lei@redhat.com>
- <0b423229-f928-4210-9351-dca353071231@acm.org>
- <Z3X-xMeMuF8j0RDA@fedora>
- <0b34bfc9-2cd3-40a8-8153-3207a6d62f8c@acm.org>
- <Z3dFBQIiik6FWLut@fedora>
- <1b1bf316-359a-4bec-8195-0152cd706001@acm.org>
- <Z3iTFSBxKY4Z8xZg@bombadil.infradead.org>
- <386a5388-1b1b-4e5a-ad9c-0da1840f12ee@acm.org>
- <Z3izUEIPTdvRg5Xe@bombadil.infradead.org>
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="krJ/Er0a"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1736066088;
+	bh=iLev11glECapIGWYouhDBrl9UTSez4lwtraWMRecsc0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:
+	 x-icloud-hme;
+	b=krJ/Er0acCZbjFvRvjD7pXSwwczi0x4ZmEgPOrtrjlsd6TSycAevFZ2e5ybzTXsaJ
+	 wIlTVumz4rO86MtvHLC9wj27pDlyDaeDGSCATQYdjbiHtDMpUsEQosjGiRWzUL2608
+	 zpoTKLTAbvHcksx0L1ZYvSvBDyCSXTKdfpWYOu9y+fuaOIVm7pFQ6fJZCkxthoNjGB
+	 7hffud6yYkfeQNvWNEVqZEDH9mtRC/12/49KwrQHtSBHmN5ostB2jDs6kSQpMc2xdF
+	 DRh1TXfLDXrzP1Gonf9hMFmH3mGWXyMWDphti+Ql6S4u2z3RMSMD07o+E0nxVOGDZt
+	 xoJF8Ol/ODxaw==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-zteg10011501.me.com (Postfix) with ESMTPSA id 62EE84A037B;
+	Sun,  5 Jan 2025 08:34:36 +0000 (UTC)
+From: Zijun Hu <zijun_hu@icloud.com>
+Subject: [PATCH v6 0/8] driver core: class: Fix bug and code improvements
+ for class APIs
+Date: Sun, 05 Jan 2025 16:34:01 +0800
+Message-Id: <20250105-class_fix-v6-0-3a2f1768d4d4@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z3izUEIPTdvRg5Xe@bombadil.infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPpDemcC/23Q20oDMRAG4FcpuTaSw+TUK99DRJJJ1gbsbt2si
+ 1L67k5bxJR6E5iZfP/Ff2StzLU0tt0c2VzW2uo00mAfNgx3cXwrvGaamRIKpBTA8T229jrULz5
+ IZ1MOJUWlGP0/zIXWl6znF5p3tS3T/H2JXuV5+5tiupRVcsG98NYOIQSI5unjs2Id8RGnPTvnr
+ KqzUvVWkXU6y+CziCL/Y/WfVbdWkxVQlEAYRHDy3kJvfW+BrEYQBL02Nt1b01nVt7YasqHEOLi
+ Yigd9a0/XIudC21aXa5ssxVY43fd12W6c9Q6tRenpzYCYqbeAdrAgURSXjHMavKaw0w+SmZRx4
+ AEAAA==
+X-Change-ID: 20241104-class_fix-f176bd9eba22
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Tejun Heo <tj@kernel.org>, 
+ Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>, 
+ Boris Burkov <boris@bur.io>, Davidlohr Bueso <dave@stgolabs.net>, 
+ Jonathan Cameron <jonathan.cameron@huawei.com>, 
+ Dave Jiang <dave.jiang@intel.com>, 
+ Alison Schofield <alison.schofield@intel.com>, 
+ Vishal Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+ Dan Williams <dan.j.williams@intel.com>, Danilo Krummrich <dakr@kernel.org>, 
+ Zijun Hu <zijun_hu@icloud.com>, linux-kernel@vger.kernel.org, 
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-cxl@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>, 
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+ =?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, stable@vger.kernel.org, 
+ Fan Ni <fan.ni@samsung.com>
+X-Mailer: b4 0.14.2
+X-Proofpoint-GUID: ZHCW9wfDTYnYPzcVt8S9Ov2UvbT4HqfG
+X-Proofpoint-ORIG-GUID: ZHCW9wfDTYnYPzcVt8S9Ov2UvbT4HqfG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-02_03,2025-01-02_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011 malwarescore=0
+ phishscore=0 bulkscore=0 mlxscore=0 spamscore=0 mlxlogscore=776
+ suspectscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2308100000 definitions=main-2501050078
+X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
 
-On Fri, Jan 03, 2025 at 08:04:32PM -0800, Luis Chamberlain wrote:
-> On Fri, Jan 03, 2025 at 06:15:55PM -0800, Bart Van Assche wrote:
-> > On 1/3/25 5:47 PM, Luis Chamberlain wrote:
-> > > While that addresses a smaller segment then page size this still leaves
-> > > open the question of if a dma segment can be larger than page size,
-> > Hmm ... aren't max_segment_size values that are larger than the page
-> > size supported since day one of the Linux kernel? Or are you perhaps
-> > referring to Ming's multi-page bvec patch series that was merged about
-> > six years ago?
-> 
-> Try aiming high for a single 2 MiB for a single IO on x86_64 on NVMe, that is
-> currently not possible. At the max 128 NVMe number of DMA segments, and we have
-> 4 KiB per DMA segment, for a 512 KiB IO limit. Should multi-page bvec
-> enable to lift this?
+This patch series is to fix bugs and improve codes regarding various
+driver core device iterating APIs
 
-You need huge pages to guarantee you can reach those transfer sizes in a
-single command. Otherwise you need to get lucky with larger contiguous
-folios, which can certainly happen but it's just not as desterministic.
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+Changes in v6:
+- Remove dependencies since they have been merged into driver-core tree
+- Link to v5: https://lore.kernel.org/r/20241224-class_fix-v5-0-9eaaf7abe843@quicinc.com
 
-There are many nvme devices that absoulutely require 4KiB as the largest
-segment, but the driver says it can handle much larger segments anyway.
-It's trivial for the driver to split a large bio vec into a bunch of
-smaller device specific descriptors.
+Changes in v5:
+- Add comments back and correct tile and commit messages for patch 8/8.
+- Link to v4: https://lore.kernel.org/r/20241218-class_fix-v4-0-3c40f098356b@quicinc.com
+
+Changes in v4:
+- Squich patches 3-5 into one based on Jonathan and Fan comments.
+- Add one more patch 
+- Link to v3: https://lore.kernel.org/r/20241212-class_fix-v3-0-04e20c4f0971@quicinc.com
+
+Changes in v3:
+- Correct commit message, add fix tag, and correct pr_crit() message for 1st patch
+- Add more patches regarding driver core device iterating APIs.
+- Link to v2: https://lore.kernel.org/r/20241112-class_fix-v2-0-73d198d0a0d5@quicinc.com
+
+Changes in v2:
+- Remove both fix and stable tag for patch 1/3
+- drop patch 3/3
+- Link to v1: https://lore.kernel.org/r/20241105-class_fix-v1-0-80866f9994a5@quicinc.com
+
+---
+Zijun Hu (8):
+      driver core: class: Fix wild pointer dereferences in API class_dev_iter_next()
+      blk-cgroup: Fix class @block_class's subsystem refcount leakage
+      driver core: Move true expression out of if condition in 3 device finding APIs
+      driver core: Rename declaration parameter name for API device_find_child() cluster
+      driver core: Correct parameter check for API device_for_each_child_reverse_from()
+      driver core: Correct API device_for_each_child_reverse_from() prototype
+      driver core: Introduce device_iter_t for device iterating APIs
+      driver core: Move two simple APIs for finding child device to header
+
+ block/blk-cgroup.c            |  1 +
+ drivers/base/bus.c            |  9 +++++---
+ drivers/base/class.c          | 11 ++++++++--
+ drivers/base/core.c           | 49 +++++++++----------------------------------
+ drivers/base/driver.c         |  9 +++++---
+ drivers/cxl/core/hdm.c        |  2 +-
+ drivers/cxl/core/region.c     |  2 +-
+ include/linux/device.h        | 46 +++++++++++++++++++++++++++++++---------
+ include/linux/device/bus.h    |  7 +++++--
+ include/linux/device/class.h  |  4 ++--
+ include/linux/device/driver.h |  2 +-
+ 11 files changed, 78 insertions(+), 64 deletions(-)
+---
+base-commit: 7687c66c18c66d4ccd9949c6f641c0e7b5773483
+change-id: 20241104-class_fix-f176bd9eba22
+
+Best regards,
+-- 
+Zijun Hu <quic_zijuhu@quicinc.com>
+
