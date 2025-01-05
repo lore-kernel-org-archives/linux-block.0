@@ -1,88 +1,81 @@
-Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B844E1D63C5
-	for <linux-block@vger.kernel.org>; Sat,  4 Jan 2025 22:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D3622F11
+	for <linux-block@vger.kernel.org>; Sun,  5 Jan 2025 00:59:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736029854; cv=none; b=qhzcqdJRM0T8h1ownIbR1o5Vn7iTdCxwca4SwRNgfK5JwCrYo1J8xBGFvwYIqCyDCw6gRjj3OGlDqm8rpoR/wwXqriVm+5sqr27Pfgch/X5hy0tOM244TkA+ZyAOzJg6YHDcl8BVW/qDV0jHAjHxQAA9zILx584Tfg+B0KEVVO4=
+	t=1736038788; cv=none; b=gpcb3erILWV1+K0y4XX9y7HRtgySjczEJgxrVUqqnZQwmGeKN7glxYo2vBr5cvdRBXlJ55AgYB0FIKaJI2+BlACrVDSBGsdmclxpHUzWVFYaKIJuMfQzqtBRCDYwVT9CRsdRnQ/PoqIFbUxixNjcPue/6QZ3AJovjlRmF03HhGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736029854; c=relaxed/simple;
-	bh=qSzgXugY8+ywSHYX0Jh5DiSY9/RYR0BqmD0qJojkzEg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KqcVTqmHNkRliygnbFzprIlaNh7outsut8OgRulECmaLIOcY/bmsQC8AXOr11ziW5eERn2Ci12EqIaQ3J1J229G5SVJnM6o4BvJHCHiM1XV6faTyfvPHe7vuAm0f5XiuxTfe+993IM9pG9r43Zl5clt1Vv8QhNQzyHo6FQ70YPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=MpohBqgi; arc=none smtp.client-ip=199.89.1.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1736038788; c=relaxed/simple;
+	bh=z0kIylCu2GjlwT3qu7R5tmVWdSooWkIR8RS9q4usGBo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qSELuNHeMcoTWkYBG9YJanvLe1xq8qNEKrmivyDcLlEUleYhMOWxycOuDOib4BdThZOjqQzash95Bn7Uh3FCP2n6PkbvqEB9gf9XHRnmNveiG8kO8+1Rs2SJxEV6Y5kKW9dyB+OMTN1mK9LsAkY8pGLFGb97IXc9phV+Zyp3mM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PKpBkc9f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="MpohBqgi"
-Received: from localhost (localhost [127.0.0.1])
-	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YQZsQ6Xj0zlfflk;
-	Sat,  4 Jan 2025 22:30:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1736029848; x=1738621849; bh=t+6/jz/0ZK+YrvWJBp82+/p7
-	hn2yXaPORGwxg5VN618=; b=MpohBqgitUAl3IUoOIoWXe/d9pjUqevBNgNTn8gh
-	DN+Kg6DDxFpeLL6RZR0G7R4AJx7fGPKslwVfKPzjamkD7ZDb2Fs59yoB0yJ2MrKI
-	dl1HiEeA01k3aZU0xtQ93ofkKiOqFHPebdFDl4u16GUQRqJzweD3R/tjUIy03w2y
-	e+CzHVvxry6WWurba/qgY8l1v5YUqrKyFRN35sMO2nqb9VlSUOIpo2kr6Sr6beTV
-	9EnywlIJHWVvgLIg2fTbafjexqAP1TyKXe1hlG1pHS+ESpXS37pNg5VsIr3/zVrw
-	NpMf5vtuGaPTK1xL4iCThQqY4ZyzYuiDkCCJSNigqE8D6w==
-X-Virus-Scanned: by MailRoute
-Received: from 009.lax.mailroute.net ([127.0.0.1])
- by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id XP1LuN8MIRqh; Sat,  4 Jan 2025 22:30:48 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YQZsJ66HmzlfflY;
-	Sat,  4 Jan 2025 22:30:44 +0000 (UTC)
-Message-ID: <cbda6cc0-9781-4214-a6fd-e9852141bd64@acm.org>
-Date: Sat, 4 Jan 2025 14:30:42 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PKpBkc9f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 886D6C4CED1;
+	Sun,  5 Jan 2025 00:59:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736038788;
+	bh=z0kIylCu2GjlwT3qu7R5tmVWdSooWkIR8RS9q4usGBo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PKpBkc9fh2mgJGWEeMzdfBqFT/6yZxfvP4GSls2IhhzCBzGq1RgPFjHGB64tfAVZ5
+	 4HZ9F90+bvcAUD9z7QYKE20aT/W8JgWOLSvH4pgaIRkWeYJt/L8N3QBomY6jigcCvF
+	 D19Y7s51gsd2vJ9k3tx/VTyblNJCHfhS3Qac0TmhXuKxh471jkKl+D9WVf0XWh4cQs
+	 xQXgybEZtHde0HDkp6IrESXob4rXfDn1pJfM9M3G5Ohq+IWldrx1zsoIWeMHN9afs5
+	 avD19A1pSnrN9T9Bai5L9R5BVR7qsObI+zGeoxe2g6hl3Q5B8hA+IvKnaVCnqoEZtV
+	 5pFOp42KsTRtw==
+Date: Sat, 4 Jan 2025 16:59:39 -0800
+From: Keith Busch <kbusch@kernel.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Bart Van Assche <bvanassche@acm.org>, Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Yi Zhang <yi.zhang@redhat.com>,
+	John Garry <john.g.garry@oracle.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: make queue limits workable in case of 64K
+ PAGE_SIZE
+Message-ID: <Z3nZe3nRS5KyaLzr@kbusch-mbp>
+References: <20250102015620.500754-1-ming.lei@redhat.com>
+ <0b423229-f928-4210-9351-dca353071231@acm.org>
+ <Z3X-xMeMuF8j0RDA@fedora>
+ <0b34bfc9-2cd3-40a8-8153-3207a6d62f8c@acm.org>
+ <Z3dFBQIiik6FWLut@fedora>
+ <1b1bf316-359a-4bec-8195-0152cd706001@acm.org>
+ <Z3iTFSBxKY4Z8xZg@bombadil.infradead.org>
+ <386a5388-1b1b-4e5a-ad9c-0da1840f12ee@acm.org>
+ <Z3izUEIPTdvRg5Xe@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: make queue limits workable in case of 64K
- PAGE_SIZE
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>,
- John Garry <john.g.garry@oracle.com>, Christoph Hellwig <hch@lst.de>
-References: <20250102015620.500754-1-ming.lei@redhat.com>
- <0b423229-f928-4210-9351-dca353071231@acm.org> <Z3X-xMeMuF8j0RDA@fedora>
- <0b34bfc9-2cd3-40a8-8153-3207a6d62f8c@acm.org> <Z3dFBQIiik6FWLut@fedora>
- <1b1bf316-359a-4bec-8195-0152cd706001@acm.org>
- <Z3iTFSBxKY4Z8xZg@bombadil.infradead.org>
- <386a5388-1b1b-4e5a-ad9c-0da1840f12ee@acm.org>
- <Z3izUEIPTdvRg5Xe@bombadil.infradead.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <Z3izUEIPTdvRg5Xe@bombadil.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 1/3/25 8:04 PM, Luis Chamberlain wrote:
+On Fri, Jan 03, 2025 at 08:04:32PM -0800, Luis Chamberlain wrote:
+> On Fri, Jan 03, 2025 at 06:15:55PM -0800, Bart Van Assche wrote:
+> > On 1/3/25 5:47 PM, Luis Chamberlain wrote:
+> > > While that addresses a smaller segment then page size this still leaves
+> > > open the question of if a dma segment can be larger than page size,
+> > Hmm ... aren't max_segment_size values that are larger than the page
+> > size supported since day one of the Linux kernel? Or are you perhaps
+> > referring to Ming's multi-page bvec patch series that was merged about
+> > six years ago?
+> 
 > Try aiming high for a single 2 MiB for a single IO on x86_64 on NVMe, that is
 > currently not possible. At the max 128 NVMe number of DMA segments, and we have
 > 4 KiB per DMA segment, for a 512 KiB IO limit. Should multi-page bvec
 > enable to lift this?
 
-4 KiB per DMA segment for NVMe? I think that the DMA segment size limit 
-for PRP and SGL modes is much larger than 4 KiB. See also the
-description of the CC.MPS parameter and PRP Lists in the NVMe base
-specification. From a system with an NVMe controller:
+You need huge pages to guarantee you can reach those transfer sizes in a
+single command. Otherwise you need to get lucky with larger contiguous
+folios, which can certainly happen but it's just not as desterministic.
 
-$ cat /sys/block/nvme0n1/queue/max_segment_size
-4294967295
-
-Thanks,
-
-Bart.
+There are many nvme devices that absoulutely require 4KiB as the largest
+segment, but the driver says it can handle much larger segments anyway.
+It's trivial for the driver to split a large bio vec into a bunch of
+smaller device specific descriptors.
