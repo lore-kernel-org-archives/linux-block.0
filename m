@@ -1,33 +1,32 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC05114900B;
-	Mon,  6 Jan 2025 15:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C1082D98
+	for <linux-block@vger.kernel.org>; Mon,  6 Jan 2025 15:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736177274; cv=none; b=iKGEoAhNkvX1XQhTN+zGIP7eGC5oJ5GaSyKuE8aIK3Wi7uHoXw1rTRQuMVoAkOzixC4LKwjrX9su0LJiXv5YZh8QwOgvxUatpLWqPl/k7yHYIBpP6swK0UrvBGOO3ye9oqraa5S/OfcOyTZGtdfyE8+ZYeqUxHTFpuHM6MRypZ0=
+	t=1736177378; cv=none; b=iFUh9h8mLdE0/KY4FgEMtmyFghmEOugOjT8oP0WTEu5BTjXVAhppD+nDsMLvrXdHgheStqQC+HmYz4tn7/2nkcT5z7JiSL3HkIRIzOZ8znx1Hb1ukmMPZC57MuOpUZonWBkzszA14ZeflsXblvA6kuIfbbXajoJ5GGp4zICNQoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736177274; c=relaxed/simple;
-	bh=Q+Sn7tP2GijySTssF07MDC+pdwKRbv7+6PiebqHDPdg=;
+	s=arc-20240116; t=1736177378; c=relaxed/simple;
+	bh=AfYAWmfGdU3HFedD1sztyr60cIzuChdD09/oRqr59cs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=unfkgThZBp85u5/zZaeH6kxAYC4pz1+u8BwNSbvU7ZZp0YReIBXFIvf9IKVxpsCvWV/DoQnq0f7cKdpYyQQuZAyL4VYGPI8KvZ2bCq0trsCfx0NqAoCMjnLJy1tD+GUXCB9HM0SFqf0+RdvH2iutr01YpWl+U/8So2r+inCzTXc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=PFicFAtW+ed2YRreiLTfN8wgpnFFPokduZAXevWw00/fbqeJJvUrwyN2Wpv4X+jPUbNmiwt+KM9CEcfXjHUjTY05Z+fkLncWEvZ5N/ior95xSKxGsh3TJeGroxharwDSuldMK8Zh85vWFSXauYVcs24CvRlkkiCfSD/FJYCBQGA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id B42BE68C7B; Mon,  6 Jan 2025 16:27:48 +0100 (CET)
-Date: Mon, 6 Jan 2025 16:27:48 +0100
+	id 20E4F68C7B; Mon,  6 Jan 2025 16:29:32 +0100 (CET)
+Date: Mon, 6 Jan 2025 16:29:31 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Ming Lei <ming.lei@redhat.com>, Nilay Shroff <nilay@linux.ibm.com>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	nbd@other.debian.org, virtualization@lists.linux.dev,
-	linux-scsi@vger.kernel.org, usb-storage@lists.one-eyed-alien.net
-Subject: Re: [PATCH 06/10] virtio_blk: use
- queue_limits_commit_update_frozen in cache_type_store
-Message-ID: <20250106152748.GB27431@lst.de>
-References: <20250106100645.850445-1-hch@lst.de> <20250106100645.850445-7-hch@lst.de> <07353499-b62d-488a-9575-12de5d9b6f2e@kernel.org> <20250106105957.GC21833@lst.de> <3cf61c5f-b53b-43b6-90de-e42272f74e3f@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Nilay Shroff <nilay@linux.ibm.com>
+Subject: Re: [PATCH 1/3] block: Fix sysfs queue freeze and limits lock order
+Message-ID: <20250106152931.GC27431@lst.de>
+References: <20250104132522.247376-1-dlemoal@kernel.org> <20250104132522.247376-2-dlemoal@kernel.org> <Z3tOn4C5i096owJc@fedora> <20250106082902.GC18408@lst.de> <Z3u7Twc4UPWvlfJJ@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,14 +35,27 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3cf61c5f-b53b-43b6-90de-e42272f74e3f@kernel.org>
+In-Reply-To: <Z3u7Twc4UPWvlfJJ@fedora>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Jan 06, 2025 at 10:09:16PM +0900, Damien Le Moal wrote:
-> Sounds good to me, but let's be consistent then: do not remove the
-> freeze/unfreeze from virtio_blk in patch 2 and do it here in this patch.
-> Otherwise, patch 2 *does* change the behavior of virtio_blk, introducing a bug
-> (missing freeze around commit update).
+On Mon, Jan 06, 2025 at 07:15:27PM +0800, Ming Lei wrote:
+> On Mon, Jan 06, 2025 at 09:29:02AM +0100, Christoph Hellwig wrote:
+> > On Mon, Jan 06, 2025 at 11:31:43AM +0800, Ming Lei wrote:
+> > > As I mentioned in another thread, freezing queue may not be needed in
+> > > ->store(), so let's discuss and confirm if it is needed here first.
+> > > 
+> > > https://lore.kernel.org/linux-block/Z3tHozKiUqWr7gjO@fedora/
+> > 
+> > We do need the freezing.  What you're proposing is playing fast and loose
+> > which is going to get us in trouble.
+> 
+> It is just soft update from sysfs interface, and both the old and new limits
+> are correct from device viewpoint.
+> 
+> What is the trouble? We have run the .store() code without freezing for
+> more than 10 years, no one report issue in the area.
 
-Yeah, I'll fix it up.  As mentioned in the cover letter I just brushed
-this up just enough to be presentable for now.
+No, we had various bug reports due to it, including racing with other
+updates.  Let's stop trying to take shortcuts that will byte us again
+later and sort this out properly.
+
