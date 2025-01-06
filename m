@@ -1,84 +1,125 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB891DB346;
-	Mon,  6 Jan 2025 11:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3B21DD874;
+	Mon,  6 Jan 2025 12:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736163430; cv=none; b=elVTtycFceWJaRSP0HtmO28qoIq7d9F+3ELIebAJAx/Eh2liiDFPoXQ2rC1m5m4UF0zW7Xdduns3NWGkG7Ojdt/XWBfTdLrbfMXYew8cFCnMdvqTmDXi8ocDG+lz2EOF0y5r62g28uK7bfCPvQcQVXaJdKe1rTE54P0zc8tdedI=
+	t=1736165243; cv=none; b=A1pT+JhLNn3Ay4CcBS9YyLauldmz8YJLzmS5/Jm4qTDGhbMYU/lV6No2+H6pyshImVCOkfvkZtyAeWG0sxA6UxkdPDPzkDvFYh8b7B0MCH09uDCwVNzCa8eZy7hzonGhsEIWyud41+VsKQdvcOo+snTgIpbFm9FZGv7/6N0Lvpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736163430; c=relaxed/simple;
-	bh=tuo7ur1MMvJQpLL7KpfDXDX3kSmGsjo1fwly76s8nts=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=l9YFIvnZynzjj/fvEqIi1sgZy7sdKHftbt/tFfqxFNdHeJfO6x5bQ7ZkSHhAHmfxQtfTK1LwBzAAMmwrc1kx+60gppkT1tUXG55kOAxuqracPBkMIC2zqqjQXBUC3ZmRCW5P477JL+36/6QA4gTm6kV8rzwDIBH3azLEf8CclQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YRXFp6YYDz4f3jqj;
-	Mon,  6 Jan 2025 19:36:46 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id D8EDE1A1928;
-	Mon,  6 Jan 2025 19:37:01 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-	by APP3 (Coremail) with SMTP id _Ch0CgCH2sRdwHtn+6_HAA--.65048S3;
-	Mon, 06 Jan 2025 19:37:01 +0800 (CST)
-Subject: Re: [PATCH] nbd: don't allow reconnect after disconnect
-To: Christoph Hellwig <hch@infradead.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org,
- nbd@other.debian.org, linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
- yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250103092859.3574648-1-yukuai1@huaweicloud.com>
- <Z3uWAGWV_kpBZ3Pn@infradead.org>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <b05548a7-2d40-b38d-61d0-1b248ebd42c8@huaweicloud.com>
-Date: Mon, 6 Jan 2025 19:37:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1736165243; c=relaxed/simple;
+	bh=E+BePA26lQ+3BE5R5hN21yCbrEw4ze4grrrgRck6UMk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xn6V1GWeC1JOW9r/177FjOsYXigieCleIyF+5Xrc/+WJ8sucKIk6CacQGBM/5cciLKfNKCkssEuyeQtdWWldw9GaLmF8wjIqRTMNThxpK4/fUyc7nJI1BKyeZru4JUESsv1oGbsfIxQkrFrj7vUT1BRx0OJfZquSq6+Lq9KD228=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MmnwOSfr; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MmnwOSfr"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50600EP9030214;
+	Mon, 6 Jan 2025 12:06:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=5VYWlz
+	s54e2fOmMAsKWa3Enn7OneHP0TVzdAjmuEUBA=; b=MmnwOSfrasbMdxNoavd2+L
+	4d7fSl3FOGZplpA4l0jmfDLoT9xlvB+sAsuxkdGIgqXdrZ+8XzudwBEaU6SRpvEn
+	1uzFkzlm0CHPNoLibzdYj0GZLuGvNj8vgKYb64JZar11tcW3EfCoXL9rYebMJkHr
+	TL1S2733SpeMdbLtDcSY6KjOxLLS1NOeodkCGC85+LwovgmIYUHHmivalelEMGPd
+	bnPzz7e6mVBOIS6DRq6zVGgz6Mxc9Wckub2qUecurHEpV8fN3pZ0R0qIC4eRPksN
+	gA62FgNVMFf6/gDTiGgv6dARaBzcBdmGVEIOMHflttA4tj6Jpo+AcwOrvvoMfuRA
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44047haeuk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Jan 2025 12:06:59 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50696WKH003630;
+	Mon, 6 Jan 2025 12:06:58 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yfaswspx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 06 Jan 2025 12:06:58 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 506C6vCc32244426
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 6 Jan 2025 12:06:57 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 62C0258058;
+	Mon,  6 Jan 2025 12:06:57 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F24FD5805C;
+	Mon,  6 Jan 2025 12:06:53 +0000 (GMT)
+Received: from [9.171.85.164] (unknown [9.171.85.164])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  6 Jan 2025 12:06:53 +0000 (GMT)
+Message-ID: <3fb212e4-8fff-45fc-9cff-f5b5eaff4231@linux.ibm.com>
+Date: Mon, 6 Jan 2025 17:36:52 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Z3uWAGWV_kpBZ3Pn@infradead.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgCH2sRdwHtn+6_HAA--.65048S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYK7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8I
-	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72
-	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
-	rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
-	1l4c8EcI0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
-	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r
-	43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
-	7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
-	WUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU
-	F9a9DUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 05/10] block: don't update BLK_FEAT_POLL in
+ __blk_mq_update_nr_hw_queues
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, nbd@other.debian.org,
+        virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+        usb-storage@lists.one-eyed-alien.net
+References: <20250106100645.850445-1-hch@lst.de>
+ <20250106100645.850445-6-hch@lst.de>
+ <4addcb5e-fc88-4a86-a464-cc25d8674267@linux.ibm.com>
+ <20250106110532.GA22062@lst.de>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20250106110532.GA22062@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FGJElPxHemmUGQZFUCCrmUdflIso0Eah
+X-Proofpoint-ORIG-GUID: FGJElPxHemmUGQZFUCCrmUdflIso0Eah
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ impostorscore=0 priorityscore=1501 malwarescore=0 spamscore=0
+ lowpriorityscore=0 phishscore=0 mlxlogscore=380 bulkscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501060106
 
-Hi,
 
-ÔÚ 2025/01/06 16:36, Christoph Hellwig Ð´µÀ:
-> Looks good:
+
+On 1/6/25 4:35 PM, Christoph Hellwig wrote:
+> On Mon, Jan 06, 2025 at 04:31:23PM +0530, Nilay Shroff wrote:
+>>> +static bool bdev_can_poll(struct block_device *bdev)
+>>> +{
+>>> +	struct request_queue *q = bdev_get_queue(bdev);
+>>> +
+>>> +	if (queue_is_mq(q))
+>>> +		return blk_mq_can_poll(q->tag_set);
+>>> +	return q->limits.features & BLK_FEAT_POLL;
+>>> +}
+>>> +
+>>
+>> Should we make bdev_can_poll() inline ?
 > 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> I don't really see the point.  It's file local and doesn't have any
+> magic that could confuse the code generator, so we might as well leave
+> it to the compiler.  Although that might be about to change per the
+> discussion with Damien, which could require it in blk-sysfs, in
+> which case it should become an inline in a header.
 > 
-Thanks for the review!
-
-> Can you wire up the reproduce to blktests?
-
-However, I don't have reliable reporducer yet, I'll try more. :)
+Oh yes, I saw that you moved blk_mq_can_poll() to blk-mq.h and 
+made it inline so thought why bdev_can_poll() can't be made inline?
+BTW, bdev_can_poll() is  called from IO fastpath and so making it inline 
+may slightly improve performance. 
+On another note, I do see that blk_mq_can_poll() is now only called 
+from bdev_can_poll(). So you may want to merge these two functions 
+in a single call and make that inline.
 
 Thanks,
-Kuai
-
-> 
-> .
-> 
-
+--Nilay
