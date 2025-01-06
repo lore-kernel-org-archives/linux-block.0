@@ -1,84 +1,100 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54241DC74A;
-	Mon,  6 Jan 2025 10:07:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4AC012F59C;
+	Mon,  6 Jan 2025 10:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736158047; cv=none; b=kt0/BnhdUhKZ2YziSOSfgn4YetyvDIPfD8HhGMGh2N4iYDC4x54V5G9DnZ8uLtQSlN0NSGL8yxD+WmPcQ2RbGBp5/twECLEVF7sNCViVMjpDv4IrntcinnqGRoAaIgGoIlkJ0umtK3Rd1zaru2/pPFjSdNi9OgalI+fqGnZ5pvc=
+	t=1736159990; cv=none; b=qZt+AY/CBRnecC/uEhDJktqk+EPO5PPhgG73P90+PnWOlmiURfIbbIQsaoKhbvrz4ji8Ud6LPM1oaKUNVHklln3kbzuPrvxdaizyDeY8QZaJesR8oJaqA5TK27LL4mzsy65ohtNUy+QmRi4UIHPEV7j2fvGDTEsf61P2mpXbQSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736158047; c=relaxed/simple;
-	bh=0cw/SfZwIVWiRGNpenbX/9Ik1CKAkxnzfH118SlsyBU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ukixtlCJpR9Sdh86OUKFB3JnnLKK8R5O1xSTfiVH5lNwqKzcniJ6OFCpZPUl5hn+6gyf+HDYpgzspdLOx30rnvigZ4jYGMrLhqY17HvQTyDy44v7p3i/skGXxjcnnD3+t/FVCR7f9cACDYX4xVM84DnuKeB+DBF3JSqnWawjZb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=uorFDHRE; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1736159990; c=relaxed/simple;
+	bh=yxjR/msICYPQyNZp7VDsz8GJNakeVo6N3uxmzscuuTY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aZ7V0HS/nF1lN3XAUck+DndM7BpX42gAHSwdEBenMkfSEAJemIQAiKjq9UxAsQlNcHRFWyjYtk8BofSJB5xWLdZNnqA6VQBJGq1UPn//arJeno8IUvcVJFDqZ10YYBT7OehBgX6Yd0zjqKVwLuIJutOBzgZYlD8TBIwJK8rtD10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UVVmQ8ZK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uorFDHRE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=3euJA8Ns15KPhEkUiWNhzNcQI81/iMSrckSXcWqOPgE=; b=uorFDHREReYWiG9VtntQ9e8Y4e
-	knOrAohZ7GSdXpgJ0ql5KsoglIrI/4AQoizpvqQxtgIF9h9oX6kwTL57AqL6FYcNQ3jcMJwsXfRyw
-	Ad+wn/BcsWKrad/djehuaG7sVtiswvLrQSjc7xszPjuNzxlv7xB5hLbg78XFRvwE1bpv66djMNrLv
-	L91a90sN7kdq2qewGkkpbQ9Yhi6fgnbTqYLJq7xlKd+ill487SJnPqMn2MMkOk/obe9fMGukkRhaD
-	XCV2m5yDT2L+bhhu+v2EOs3nkqJesZNYGP9uWl9sPlhRHST1O/ufpZ2/xjPd7toADN/8gJvnkl/Yd
-	+3Ws0ylA==;
-Received: from 2a02-8389-2341-5b80-db6b-99e8-3feb-3b4e.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:db6b:99e8:3feb:3b4e] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tUk0t-00000000ng8-2TWU;
-	Mon, 06 Jan 2025 10:07:12 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	nbd@other.debian.org,
-	virtualization@lists.linux.dev,
-	linux-scsi@vger.kernel.org,
-	usb-storage@lists.one-eyed-alien.net
-Subject: [PATCH 09/10] loop: document why loop_clear_limits updates queue limits without freezing
-Date: Mon,  6 Jan 2025 11:06:22 +0100
-Message-ID: <20250106100645.850445-10-hch@lst.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250106100645.850445-1-hch@lst.de>
-References: <20250106100645.850445-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UVVmQ8ZK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 386FBC4CED2;
+	Mon,  6 Jan 2025 10:39:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736159989;
+	bh=yxjR/msICYPQyNZp7VDsz8GJNakeVo6N3uxmzscuuTY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=UVVmQ8ZK+ThglmGt6ZKcBZ8e3Syi47x1JsCOXZmKrmzeT8NL8LNSml09e4pLj8f0q
+	 pHDd+4P6vumMFzMhsTDORIlbRMMJ4rjGHC76Vml3Sk/7tYcG2Vn/vWhAiJXJl5EGmT
+	 iyD26odNze8G9REiz4+4dDmA0loqA7KflPCNGYVjESgmfSAO28o9ClZPouZNzagXE5
+	 /g46KRsdgZckZ3u0NMMDyFJVMHNIWnwLC73TJUunDcfVDBw0ZMMOYc8KNjO85mCbr1
+	 lNDjWjuppATfLW58GzGKlE3+/LYQDLzYckJvXDH1dKkCcJuDAIw1BPoAibDflN/A+1
+	 urF5oZuX6khnQ==
+Message-ID: <89e35fd6-830c-46b7-a0c3-284bc120d424@kernel.org>
+Date: Mon, 6 Jan 2025 19:39:04 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/10] block: fix docs for freezing of queue limits
+ updates
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>, Nilay Shroff <nilay@linux.ibm.com>,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ nbd@other.debian.org, virtualization@lists.linux.dev,
+ linux-scsi@vger.kernel.org, usb-storage@lists.one-eyed-alien.net
+References: <20250106100645.850445-1-hch@lst.de>
+ <20250106100645.850445-2-hch@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20250106100645.850445-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/loop.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+On 1/6/25 7:06 PM, Christoph Hellwig wrote:
+> queue_limits_commit_update is the function that needs to operate on a
+> frozen queue, not queue_limits_start_update.  Update the kerneldoc
+> comments to reflect that.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-settings.c   | 3 ++-
+>  include/linux/blkdev.h | 3 +--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 8f09e33f41f6..4187c3e8a07f 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -413,7 +413,8 @@ int blk_set_default_limits(struct queue_limits *lim)
+>   * @lim:	limits to apply
+>   *
+>   * Apply the limits in @lim that were obtained from queue_limits_start_update()
+> - * and updated by the caller to @q.
+> + * and updated by the caller to @q.  The caller must have frozen the queue or
+> + * ensured that there is outstanding I/O by other means.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 836a53eef4b4..84b007b9c38c 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -311,6 +311,13 @@ static void loop_clear_limits(struct loop_device *lo, int mode)
- 		lim.discard_granularity = 0;
- 	}
- 
-+	/*
-+	 * XXX: this updates the queue limits without freezing the queue, which
-+	 * is against the locking protocol and dangerous.  But we can't just
-+	 * freeze the queue as we're inside the ->queue_rq method here.  So this
-+	 * should move out into a workqueue unless we get the file operations to
-+	 * advertise if they support specific fallocate operations.
-+	 */
- 	queue_limits_commit_update(lo->lo_queue, &lim);
- }
- 
+...ensure that there are no outstanding I/Os by other means.
+
+>   *
+>   * Returns 0 if successful, else a negative error code.
+>   */
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 5d40af2ef971..e781d4e6f92d 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -944,8 +944,7 @@ static inline unsigned int blk_boundary_sectors_left(sector_t offset,
+>   * the caller can modify.  The caller must call queue_limits_commit_update()
+>   * to finish the update.
+>   *
+> - * Context: process context.  The caller must have frozen the queue or ensured
+> - * that there is outstanding I/O by other means.
+> + * Context: process context.
+>   */
+>  static inline struct queue_limits
+>  queue_limits_start_update(struct request_queue *q)
+
+
 -- 
-2.45.2
-
+Damien Le Moal
+Western Digital Research
