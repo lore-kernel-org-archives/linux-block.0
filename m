@@ -1,121 +1,100 @@
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCA813775E;
-	Mon,  6 Jan 2025 18:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B9E360
+	for <linux-block@vger.kernel.org>; Mon,  6 Jan 2025 18:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736188590; cv=none; b=Ga6FtbgP8uFXMUoc8gREGbL54yLQrqq+JZsXU4AKY7eJV59gfmH66PxWfjWNrkWc5XOT2VjBc4WEU5FnYs63q/XABThneGzGb7PtnkIB5rbNunOnHEJ2+XCurkywfNyDPJ3U6jAHiPRZs3atWZHmq2MU4vmT7UwRg/8THXxE/Mk=
+	t=1736189689; cv=none; b=l6jIlQ4nqYDxCFqlohjm+RVZ/dzUZfkp5GZ8eN7q1da9xGRozIpEijCwy9CYJLKPl0WcTX1265CGMBRzF/WQpkktspfCV2wEHA8n7HL8gFz8WZANK6hGSW5a+bJgPgdF2A7aQm95rr7tRvVt+dcbumD1Uh8nFesFhAki2MlZz00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736188590; c=relaxed/simple;
-	bh=+9hUQ3YpUridodcP4SqCTVmkTe1+hPqGvwCRu8P3Aeo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q2dNrVfOZtTpMYcjLX4x7JySqQNRpfmI6USqWbwvtMVmps3NcUbaLYB5jew4oOtyD7i+MKzUzxOJGKupc8Aa2IXb20EejSJCmwLwjefwTqXld/1eE/LFShbjEBj3T9fu56LksfGb0XEf97FNPjEAkYrLdkkoynrAg9mE+wiY4Hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a99Yghzr; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736189689; c=relaxed/simple;
+	bh=2+XxHsW7KYOUa/JakZsrOPXeyANRrgO3QgX0AQdXpAY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lr9DZXfu95b4Kkt8GIM9kwtvwtzPaY+Q8d2xl7RkYtj+BFedN1SeMTiQm/c5+9UNLbJEgkk5am5ors15nJuZeO8jeEHlooupxMLQoxwKDKgsHAvzmzBMtk4Sscf+cBX6iCj1lMuDwBUrjSP+Xula5Mp6Fqv2doTQnl3r4JjXZRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=tm4J5hWE; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a99Yghzr"
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e5372a2fbddso21888832276.3;
-        Mon, 06 Jan 2025 10:36:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736188588; x=1736793388; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=VN2w7YY7FSFUfE0QVBg0AB5tbb1kjnD60fsO9HYNczI=;
-        b=a99YghzreetlEyYK9kcr7J8DSo4Qz3gtyecfibuPwxA+Uad3kLYYHEWUGAjjcDDs2w
-         GptMU6T3DSfmwScLNR1JWVMiArNO3cm7+5GLO+fbFSpyLtLnQoQro8UvMEESAwwRo4B7
-         Cbd2vCH2AOiiaZnKCXMWdTVfxBEfNAv2Nbh+Q2+C+3JbJAKCmWlG32ZgUyKbzGfS4RX/
-         EWNEzEibTu5qBnGfCPfoPlA3oNFVf8Y5hpC264/knNTIG2Jsa+/4YKJ+8RgpNmEpYLGa
-         Muc/MvnWQvP99fLEhrCcQ3qg0gvRJePhcI6CwL+WAl+f7z+eQD+HL6EszZBjNt4hcXhE
-         js8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736188588; x=1736793388;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VN2w7YY7FSFUfE0QVBg0AB5tbb1kjnD60fsO9HYNczI=;
-        b=rJO+UiL4QM7hJqUGwrKen/ffMDlZ71BXdbmdk6gynGbQsUBnBTK5G8K+rMDQJpSTSD
-         Y5cpS+5FtvcZyCZqYhsA8Pt5i7Cl5+C9Exc7sCh9DQ7nNxZ3QRCRXIwEm0IKR8ggQnXb
-         K2+3tb37DsTWXximDUKPI4NNQT0zyTDSFdzJ+UTQej3g15WUZdlugrNTSFY748KUgfCM
-         OasmtbbTgOkOCVGtf64npBXNKidv8oH6JUw50cOGpj75SuJe6hmr5SIC1LdlTbNv40oi
-         RYupisLiI0k9CbBoT6sH4e43/3IMBOeU9FITr0zztinc5wGLWYUa5Wq/K3who+u4LdAi
-         8+bw==
-X-Forwarded-Encrypted: i=1; AJvYcCVbu6452NdpskBK/UorNz/kMBUrwlcAIxbe2RspxwsWXQWSG/rjnpnh76VV3GVDmi4CiRQ=@vger.kernel.org, AJvYcCXFlwZBwF9+mXgJOoWb685b7td2dXwi4zsNXKWCLn/XSfR9E0DrUsTC12czeOYGcnyxkmA2yx5xNpxe1Ek=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztUqOpNFAqhh77hDr4Zp8VEoL4SbvgCZdg9w4NwVDff4Q3Ba9h
-	nto7+gkC0E/sn+KJZz9n7qVVDoj0rJFh06I3wpgZpvgARDkENyGvhXQl7s/Jr0IdoEjkBcSulXk
-	MMSmFnKiqT/IWvxpC5PSBznhrG0M=
-X-Gm-Gg: ASbGncsudwknIbrC46blWo9NoSD+u6rNkMTZYH/i4V4sRC5PJShfLR4sZCDYNIyxNts
-	MhwCqpmMdr7SKrqammP5oVZnCrfhbqWNtq8f5sW61
-X-Google-Smtp-Source: AGHT+IFWoEjaetOCXkyP5M8zxfOMZNipZ8dkUPXy0YYnoPeLo83JBMX14PaoDJCWB3aOTFkvuecUd63rv7lHPEs699w=
-X-Received: by 2002:a05:6902:2290:b0:e4b:6380:f4c4 with SMTP id
- 3f1490d57ef6-e538c259e83mr41698329276.15.1736188587937; Mon, 06 Jan 2025
- 10:36:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="tm4J5hWE"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YRjzC03Lyz6ClbFV;
+	Mon,  6 Jan 2025 18:54:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1736189684; x=1738781685; bh=uqTj7zr12cGop9/O79p2Ronp
+	zdl/TOKgzdECqDgrZTQ=; b=tm4J5hWEuQ2LEUYH+ikrcdo8SdnWmwXNapUqDzJv
+	bAULqGHlJK6JC19TLQ3+iLwKC/y9r/9AU34rGGRHsjfH6jYSCKa+RbxLvScbBAA/
+	VIggaBRT4yGmG7YOiBy743xl2SgKVQF6peG7nfDAU7RNMZgDk/pt6nHBxcXDEr3T
+	+8LDK2jkvKQWuSsvaDRIUjEX1QqhJOecC3hNF0X5wdzmnPbdP2CsHgy12ptqq7GU
+	MfTK7hxqWFaKIqpCnZj69bpqcwRQog8ZQJnZMrAymDkIcZ7oaj25e2vb5hntS9eS
+	t7i1BZ/vYWoc1tKnM1Jof46fXFU6tX7bU29IrfKwvHpGFg==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id wwlRCv_mCuPs; Mon,  6 Jan 2025 18:54:44 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YRjz71SNNz6ClbFS;
+	Mon,  6 Jan 2025 18:54:42 +0000 (UTC)
+Message-ID: <0d377243-d164-4cc2-b8b1-17558cb031ba@acm.org>
+Date: Mon, 6 Jan 2025 10:54:41 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAJHDoJac2Qa6QjhDFi7YZf0D05=Svc13ZQyX=92KsM7pkkVbJA@mail.gmail.com>
- <CAPhsuW7+ORExwn5fkRykEmEp-wm0YE788Tkd39rK5cZ-Q3dfUw@mail.gmail.com>
- <CAJHDoJYESDzDf9KJgfSfGGit6JPyxtf3miNbnM7BzNfjOi7CQw@mail.gmail.com>
- <Z3uIOPxr4s09qS1X@infradead.org> <6c63dd3a-378d-471f-8af0-725edc3785ed@linux.dev>
-In-Reply-To: <6c63dd3a-378d-471f-8af0-725edc3785ed@linux.dev>
-From: Vishnu ks <ksvishnu56@gmail.com>
-Date: Tue, 7 Jan 2025 00:06:16 +0530
-Message-ID: <CAJHDoJYcqAHqtLVwC=P8Q=CmF1K==A_VA8oBuAc9hhnsUBz5xg@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] Improving Block Layer Tracepoints for
- Next-Generation Backup Systems
-To: Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: Christoph Hellwig <hch@infradead.org>, Song Liu <song@kernel.org>, 
-	lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-nvme@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: Zoned storage and BLK_STS_RESOURCE
+To: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <83bfb006-0a7d-4ce0-8a94-01590fb3bbbb@kernel.org>
+ <548e98ee-b46e-476a-9d4a-05a60c78b068@kernel.dk>
+ <5fb36d77-44cc-4ad7-8d64-b819bc7ae42a@kernel.org>
+ <eb61f282-0e23-428a-8e6a-77c24cfd0e83@kernel.dk>
+ <f41ffec1-9d05-47ed-bb0e-2c66136298b6@kernel.org>
+ <e299e652-2904-417c-9f76-b7aec5fd066b@kernel.dk>
+ <fb292dc8-7092-45c1-ae8a-fca1d61c6c9a@kernel.dk>
+ <9e8e2410-53b5-4dad-8b54-b7e72647703b@kernel.org>
+ <20241218065859.GA25215@lst.de>
+ <78caa04c-34b6-4801-a57a-84251dd9d253@acm.org>
+ <20241221081033.GA13103@lst.de>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20241221081033.GA13103@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you for the suggestion about fentry/fexit monitoring. However,
-as Christoph pointed out, the fundamental issue isn't just about
-performance or number of events - it's that the sector numbers
-themselves can be modified by drivers during submission and I am not
-sure if this is notified back to the kernel somehow.
+On 12/21/24 12:10 AM, Christoph Hellwig wrote:
+> On Thu, Dec 19, 2024 at 10:04:40AM -0800, Bart Van Assche wrote:
+>> On 12/17/24 10:58 PM, Christoph Hellwig wrote:
+>>> Use the new append writes that return the written offsets we've
+>>> talked about.
+>> Here is why this is not a solution for SCSI devices:
+>> * There is no Zone Append command in the relevant SCSI standard (ZBC).
+> 
+> Standard exist to be changed.
 
-On Mon, 6 Jan 2025 at 20:09, Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
->
-> On 06.01.25 08:37, Christoph Hellwig wrote:
-> > On Sat, Jan 04, 2025 at 11:22:40PM +0530, Vishnu ks wrote:
-> >> 1. Uses eBPF to monitor block_rq_complete tracepoint to track modified sectors
-> >
-> > You can't.  Drivers can and often do change the sector during submission
-> > processing.
->
-> If I get you correctly, you mean, the action that **drivers often change
-> the sector during submission processing** will generate a lot of
-> tracepoint events. Thus, this will make difference on the performance of
-> the whole system.
->
-> If yes, can we only monitor fentry/fexit of some_important_key_function
-> to reduce the eBPF events? Thus this will not generate too many events
-> then make difference on the performance.
->
-> Zhu Yanjun
->
-> >
-> >> 2. Captures sector numbers (not data) of changed blocks in real-time
-> >> 3. Periodically syncs the actual data from these sectors based on
-> >> configurable RPO
-> >> 4. Layers these incremental changes on top of base snapshots
-> >
-> > And all of that is broken.  If you are interested in this kind of
-> > mechanism help upstreaming the blk-filter work, which has been
-> > explicitly designed to support that.
-> >
-> > Before that you should really undestand how block devices and
-> > file systems work, as the rest of the mail suggested a very dangerous
-> > misunderstanding of the basic principles.
->
+(replying to an email of two weeks ago)
 
+I'm not aware of any interest from the side of my employer regarding
+standardizing a SCSI zone append command. Additionally, last time I
+tried to make a nontrivial change to the SCSI standards (adding data
+lifetime support) I learned that it is almost impossible for anyone
+other than the longtime SCSI committee members to make nontrivial
+changes. All my attempts to introduce data lifetime support in SBC
+failed. It is only after the SBC editor took over the initiative and
+wrote a proposal that progress was made and data lifetime support was
+added to the SCSI standards.
 
--- 
-Vishnu KS,
-Opensource contributor and researcher,
-https://iamvishnuks.com
+If anyone else would like to work on standardizing a SCSI zone append
+command I would be happy to help.
+
+Bart.
+
