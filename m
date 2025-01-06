@@ -1,33 +1,25 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606081DDC3A;
-	Mon,  6 Jan 2025 13:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6606EB7C
+	for <linux-block@vger.kernel.org>; Mon,  6 Jan 2025 13:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736168959; cv=none; b=shDeLnTDyOHN9LHOHFy6qlUVn8YYASx4d6kXLpJRVZurnV+mps6gl7U+mm2fI/AFtcy8DMu1/y+Q3DOItOXqSkeCziyotieusFeJhYj19ZkyF/S6SFj/xOUcGJlnwh0qwiq0NyGNbvio8RljvaqCTpg35p+CeGRrWd11SNsCfnw=
+	t=1736170357; cv=none; b=oS6ltiCWTEDusmbIYwjAcA1SsmOLs8HMlKM+areA4ubkTL9B7pXRzGoAXET3UJo4b30wgo4SI9fWLWUIU7i4Ou3sJPBRsuSy4IX1lVyHEurbrLZ5fIzrfCxrYBS9H1FlY0ZOcSjLinY7pYFsBNMNZam1U0aZRpP2Ce52qU/4SiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736168959; c=relaxed/simple;
-	bh=LOAg8h56rNknhvkQW9bBtvxkT/tYtQaf+5iBZRhzhwI=;
+	s=arc-20240116; t=1736170357; c=relaxed/simple;
+	bh=uJXhTysw7aPAFizE9GDolxWlKW3OFYpdebjwy/OOKcw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MO/me/Dn6e4ZlrN62T15hMPfFHYwB6lC9ugfW9fwXWnXw7yeGhuSqrDFcUGx3kK/Ptd7XlffRhtOhoMhDtaPKfzQCHxs0/HmZTtQHJFZa/pmosi8UmOChTnTLV+0lXxKuDKqK91dHd4WaLOo2yxW5qVB1qaibrHR/F/iVElAb1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mVZK0Qt9; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mVZK0Qt9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FA76C4CED2;
-	Mon,  6 Jan 2025 13:09:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736168958;
-	bh=LOAg8h56rNknhvkQW9bBtvxkT/tYtQaf+5iBZRhzhwI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mVZK0Qt9V9R6rsS1of2npm5DS4L36FTlIJGY7+xPX5wx3mFAzj5FQohWkDVU2XRyz
-	 7n/2cTBTFpq2PU3nXvxCTSfirLciNWP/1MPzMKiwUYTda+mxr4rrYUdJaMdnkY1iZI
-	 uBRhncH2HZCpeSgqXKStlmme172qYcPgr0DOBWHy/wpIQl0g0OcU5FrSyzm5Ai3GFb
-	 i/VS5E8FhgHmRp2AZXt1tppN233nc4qhlIDJG7e2CDyqmeS1WNTQCNGEG+as4xTC6x
-	 mtF0jl48v/v3853HHkzxIE7MACWuOxF+uznsSW8M4uOUxYRQ9ITBNj5UPAMdVWNtUf
-	 rb3ZdCU6hgzAg==
-Message-ID: <3cf61c5f-b53b-43b6-90de-e42272f74e3f@kernel.org>
-Date: Mon, 6 Jan 2025 22:09:16 +0900
+	 In-Reply-To:Content-Type; b=t/v7IKeWqaK5Mr1xSo0+bDhANR14zmITKC/qJYf9V5i3apTTTctog+BTw6R4NsEcW0uvYxtxiBCN3oreB1Zl/+uKBpBdvrGsr/RirMBi4lXTgrYWFyuQ8Bi931G0Ox79h42pGiuEEazzTXp3ZmkyPRO/+uBCM95heT0c1zRjpCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1tUnDa-00032F-D6; Mon, 06 Jan 2025 14:32:30 +0100
+Message-ID: <86f3159b-2ef0-4c1c-97f5-a03b552b6738@pengutronix.de>
+Date: Mon, 6 Jan 2025 14:32:28 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,44 +27,118 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 06/10] virtio_blk: use queue_limits_commit_update_frozen
- in cache_type_store
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
- Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, nbd@other.debian.org,
- virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
- usb-storage@lists.one-eyed-alien.net
-References: <20250106100645.850445-1-hch@lst.de>
- <20250106100645.850445-7-hch@lst.de>
- <07353499-b62d-488a-9575-12de5d9b6f2e@kernel.org>
- <20250106105957.GC21833@lst.de>
-From: Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [PATCH RFC] docs: ABI: replace mcroce@microsoft.com with new Meta
+ address
+To: Matteo Croce <teknoraver@meta.com>, Matteo Croce <technoboy85@gmail.com>,
+ Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Daniel Lezcano <daniel.lezcano@linaro.org>, linux-block@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@pengutronix.de
+References: <20241219-fix-mcroce-mail-bounce-v1-1-4912116b6060@pengutronix.de>
 Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20250106105957.GC21833@lst.de>
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <20241219-fix-mcroce-mail-bounce-v1-1-4912116b6060@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-block@vger.kernel.org
 
-On 1/6/25 19:59, Christoph Hellwig wrote:
-> On Mon, Jan 06, 2025 at 07:56:19PM +0900, Damien Le Moal wrote:
->> On 1/6/25 7:06 PM, Christoph Hellwig wrote:
->>> So far cache_type_store didn't freeze the queue, fix that by using the
->>> queue_limits_commit_update_frozen helper.
->>>
->>> Signed-off-by: Christoph Hellwig <hch@lst.de>
->>
->> This should be squashed in patch 2, no ?
+Hi,
+
+On 19.12.24 08:51, Ahmad Fatoum wrote:
+> The Microsoft email address is bouncing:
 > 
-> patch 2 is supposed to just be a mechanical conversion, and each
-> behavior change should be in it's own patch.
+>     550 5.4.1 Recipient address rejected: Access denied.
+> 
+> So let's replace it with the address Matteo last used to sign off
+> patches two months ago.
+> 
+> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+> ---
+> @Matteo, is this ok for you or would you prefer another address (whether
+> your own or someone else's?)
+> 
+> I ran into this while submitting a series[1] touching sysfs-kernel-reboot
+> and b4/get_maintainers.pl picked off the stale address from the file.
 
-Sounds good to me, but let's be consistent then: do not remove the
-freeze/unfreeze from virtio_blk in patch 2 and do it here in this patch.
-Otherwise, patch 2 *does* change the behavior of virtio_blk, introducing a bug
-(missing freeze around commit update).
+Given that Matteo is fine with the change, can this be applied?
+
+Thanks,
+Ahmad
+
+> 
+> [1]: https://lore.kernel.org/all/20241219-hw_protection-reboot-v1-6-263a0c1df802@pengutronix.de/
+> ---
+>  Documentation/ABI/stable/sysfs-block          |  2 +-
+>  Documentation/ABI/testing/sysfs-kernel-reboot | 10 +++++-----
+>  2 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+> index 0cceb2badc836b8cbdade543deff71edef0e3da1..ee1bbb4dfd4ea65fc0aa13c03a5205b8d5816ecf 100644
+> --- a/Documentation/ABI/stable/sysfs-block
+> +++ b/Documentation/ABI/stable/sysfs-block
+> @@ -77,7 +77,7 @@ Description:
+>  
+>  What:		/sys/block/<disk>/diskseq
+>  Date:		February 2021
+> -Contact:	Matteo Croce <mcroce@microsoft.com>
+> +Contact:	Matteo Croce <teknoraver@meta.com>
+>  Description:
+>  		The /sys/block/<disk>/diskseq files reports the disk
+>  		sequence number, which is a monotonically increasing
+> diff --git a/Documentation/ABI/testing/sysfs-kernel-reboot b/Documentation/ABI/testing/sysfs-kernel-reboot
+> index 837330fb251134ffdf29cd68f0b2a845b088e5a0..fb2d21acc6627ee340a3c8327261d5727ad63e15 100644
+> --- a/Documentation/ABI/testing/sysfs-kernel-reboot
+> +++ b/Documentation/ABI/testing/sysfs-kernel-reboot
+> @@ -1,7 +1,7 @@
+>  What:		/sys/kernel/reboot
+>  Date:		November 2020
+>  KernelVersion:	5.11
+> -Contact:	Matteo Croce <mcroce@microsoft.com>
+> +Contact:	Matteo Croce <teknoraver@meta.com>
+>  Description:	Interface to set the kernel reboot behavior, similarly to
+>  		what can be done via the reboot= cmdline option.
+>  		(see Documentation/admin-guide/kernel-parameters.txt)
+> @@ -9,24 +9,24 @@ Description:	Interface to set the kernel reboot behavior, similarly to
+>  What:		/sys/kernel/reboot/mode
+>  Date:		November 2020
+>  KernelVersion:	5.11
+> -Contact:	Matteo Croce <mcroce@microsoft.com>
+> +Contact:	Matteo Croce <teknoraver@meta.com>
+>  Description:	Reboot mode. Valid values are: cold warm hard soft gpio
+>  
+>  What:		/sys/kernel/reboot/type
+>  Date:		November 2020
+>  KernelVersion:	5.11
+> -Contact:	Matteo Croce <mcroce@microsoft.com>
+> +Contact:	Matteo Croce <teknoraver@meta.com>
+>  Description:	Reboot type. Valid values are: bios acpi kbd triple efi pci
+>  
+>  What:		/sys/kernel/reboot/cpu
+>  Date:		November 2020
+>  KernelVersion:	5.11
+> -Contact:	Matteo Croce <mcroce@microsoft.com>
+> +Contact:	Matteo Croce <teknoraver@meta.com>
+>  Description:	CPU number to use to reboot.
+>  
+>  What:		/sys/kernel/reboot/force
+>  Date:		November 2020
+>  KernelVersion:	5.11
+> -Contact:	Matteo Croce <mcroce@microsoft.com>
+> +Contact:	Matteo Croce <teknoraver@meta.com>
+>  Description:	Don't wait for any other CPUs on reboot and
+>  		avoid anything that could hang.
+> 
+> ---
+> base-commit: 78d4f34e2115b517bcbfe7ec0d018bbbb6f9b0b8
+> change-id: 20241219-fix-mcroce-mail-bounce-328900169405
+> 
+> Best regards,
 
 
 -- 
-Damien Le Moal
-Western Digital Research
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
