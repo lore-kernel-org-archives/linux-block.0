@@ -1,46 +1,33 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF765184F;
-	Mon,  6 Jan 2025 07:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC3A1581F0;
+	Mon,  6 Jan 2025 07:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736149052; cv=none; b=myf+mT5OO/xow61HadbwxM9DUnK1d4Lpwxc4TuBMcTHHD5N63m6FWBeLsLzPRSWHenj8lXFDJ9XKfTCOb46yk2eQvLceNOC1cFjslqxmbkd186HnjhDD4bVoDXRkjgrRWcI3tQfO9Wi4Embig/V7bHqxlE3WdFwPx2vHWy+wHPE=
+	t=1736150311; cv=none; b=u7x1yMQJPIhKOpeIezcaDeKxQktvzVRzlps/ewcV+IEQWs1VzBOVdCO8NK+97vu+jrZIm7507df/wBPKAN/U5m3JEHGaVZHwvObXq5QQMqdcXiKST6/hudXTJDuGvUItohQ8cQ8Bcp+72ujWl5GF4HAvh2wEr/JNzmjwo/O+lBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736149052; c=relaxed/simple;
-	bh=Tyumh1CB+btpYXVfR9YsyTiQzEBfoBoQ0Hl+mVnpDqc=;
+	s=arc-20240116; t=1736150311; c=relaxed/simple;
+	bh=0Ua4bdZYE1vlc8vQaO8eCg3GpRxynX3bb4dMgOMP6JI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rSt4sR4RLKcGTqrqYGYlP5ap3hHOsymOgSdETfsaM6lC6KNow2MmguuEu4DkGiC+BpYx+nh1zXuEkKWVRxUJwnuxabDeKXN4TA9wx4FtXzucPV+2IPZvO+A074XUCr1ZkYXHuiI/aJmVVsQa02v2vQ70OKuFkChalDmDyRGHzuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VQWLAz2u; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VQWLAz2u"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=JrYxbYSuhWPmWtfO+OtFAYtumYZrpI/Z+uaU0zNmXPA=; b=VQWLAz2uoZtqQvVkvA//o23JD5
-	xaa8QRQC+d3sIhdEI3UY8U2KHGFmURkK8QMc6NEQnatRSYnDFl1cm8fEvNBbCRmg/+UufnYl6aZp/
-	OzOYsdIS9h98A2wikJxu+6r+BHlgw0YG6efH5NSvRXMpXXIETLUcenq7bh/gvMQiDcEUFL0nIEwsn
-	AJGt9ua1GKl/z/RuDYqzhJLoAE2TOR0tPmdh/7LsNQM9mZN/9hEVQ2cRyPzJADZRhYan1vPgnIP2x
-	Uu862/Yj4Xx/S6efU6dY5w9vm+8AdU6qOmbqY2VpFCN+V+CpWuBlbqOfTbMPoU2XmUIYAdfXC1GXz
-	QpmMfllQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tUhg0-00000000QBN-47yr;
-	Mon, 06 Jan 2025 07:37:29 +0000
-Date: Sun, 5 Jan 2025 23:37:28 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Vishnu ks <ksvishnu56@gmail.com>
-Cc: Song Liu <song@kernel.org>, hch@infradead.org, yanjun.zhu@linux.dev,
-	lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
-	bpf@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [LSF/MM/BPF TOPIC] Improving Block Layer Tracepoints for
- Next-Generation Backup Systems
-Message-ID: <Z3uIOPxr4s09qS1X@infradead.org>
-References: <CAJHDoJac2Qa6QjhDFi7YZf0D05=Svc13ZQyX=92KsM7pkkVbJA@mail.gmail.com>
- <CAPhsuW7+ORExwn5fkRykEmEp-wm0YE788Tkd39rK5cZ-Q3dfUw@mail.gmail.com>
- <CAJHDoJYESDzDf9KJgfSfGGit6JPyxtf3miNbnM7BzNfjOi7CQw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KNqlB+aRzCk6We7yM+81mAizPc1ywN+4tpzseagk5Yd57WnLIUuHXE9tjz/PDZaU5B5ntsnm8oHlv3WGNbfIslk2whjFCZEZUzfOkZ0DPoSt1YOgekg9rkSld6iMHS1rxyz0qLsdwCPBubQHLrr+WoZFMDCitmH9rPrhZnBPmZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 5B26968BFE; Mon,  6 Jan 2025 08:58:25 +0100 (CET)
+Date: Mon, 6 Jan 2025 08:58:24 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 4/4] block: simplify tag allocation policy selection
+Message-ID: <20250106075824.GA17919@lst.de>
+References: <20250103074237.460751-1-hch@lst.de> <20250103074237.460751-5-hch@lst.de> <d7cbbe46-ecd1-4bdc-8fe9-7df499ba9e6f@oracle.com> <20250106073520.GA17229@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,24 +36,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJHDoJYESDzDf9KJgfSfGGit6JPyxtf3miNbnM7BzNfjOi7CQw@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250106073520.GA17229@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sat, Jan 04, 2025 at 11:22:40PM +0530, Vishnu ks wrote:
-> 1. Uses eBPF to monitor block_rq_complete tracepoint to track modified sectors
+On Mon, Jan 06, 2025 at 08:35:20AM +0100, Christoph Hellwig wrote:
+> >> --- a/drivers/ata/sata_sil24.c
+> >> +++ b/drivers/ata/sata_sil24.c
+> >> @@ -378,7 +378,7 @@ static const struct scsi_host_template sil24_sht = {
+> >>   	.can_queue		= SIL24_MAX_CMDS,
+> >>   	.sg_tablesize		= SIL24_MAX_SGE,
+> >>   	.dma_boundary		= ATA_DMA_BOUNDARY,
+> >> -	.tag_alloc_policy	= BLK_TAG_ALLOC_FIFO,
+> >> +	.tag_alloc_policy	= SCSI_TAG_ALLOC_FIFO,
+> >
+> > do we actually need to set tag_alloc_policy to the default 
+> > (SCSI_TAG_ALLOC_FIFO)?
+> 
+> libata uses weird inheritance where __ATA_BASE_SHT sets default fields
+> that can then later be override, so this is indeed needed to set the
+> field back to the original default after the previous assignment changed
+> it.  (Did I mentioned I hate this style of programming? :))
 
-You can't.  Drivers can and often do change the sector during submission
-processing.
+It turns out the clearning is not needed here, as the driver only
+uses __ATA_BASE_SHT and not ATA_BASE_SHT (did I mentioned I hate this
+templating?)
 
-> 2. Captures sector numbers (not data) of changed blocks in real-time
-> 3. Periodically syncs the actual data from these sectors based on
-> configurable RPO
-> 4. Layers these incremental changes on top of base snapshots
-
-And all of that is broken.  If you are interested in this kind of
-mechanism help upstreaming the blk-filter work, which has been
-explicitly designed to support that.
-
-Before that you should really undestand how block devices and
-file systems work, as the rest of the mail suggested a very dangerous
-misunderstanding of the basic principles.
