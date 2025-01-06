@@ -1,70 +1,83 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A88B1BF58;
-	Mon,  6 Jan 2025 08:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA84C2CA8
+	for <linux-block@vger.kernel.org>; Mon,  6 Jan 2025 09:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736153761; cv=none; b=kxVNKWRwQOJkNt5lVKbTwtCmfZQBuiONHR0KvFBRm9k0jiWSVBbvB0+sUFSdpr7LJNa3p6cx8fJtQ4RWA0eOJnZ4bKf+afV5gX3jjYqMoTvSgMR0qExacvTBbvkOqj8VM6jp1p4Bi9NDtwAbKs3yNslzmr7J1rPad4vHqCb+648=
+	t=1736157525; cv=none; b=bj04TgFIqnoFJ6WOfLH80q0UOdGxvJRm23DPmCZHImo2YQUf6qxvdPUYS46BxWmI+uUl/0O1oPdUY4IExgp5fShAf4ZTt7spsEqV5BxVVT6GJkoZenwlbTt9g/Yav1d+NaHW74H462xREURcrk5LEZrCGKVCP87Tw0rVE8sy30A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736153761; c=relaxed/simple;
-	bh=Jspeq8m2DbvnilOfrGNfWiBfpTDwPOaB5foPQIunmbo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YhMkCKfLtpivB2dx5pDY80hYv+ksiSfWKBRjHuK34kqFwiM79QW60bBAF5Bt61mmGgHW4uLssnTEVw3XHW3zjJ9+0lNLrpsGXqtGR8Bw8V9zoqMMGcvAZid1pBBzidwbYMxXo72rW68ra2DWhnArf57OFocUakryeV6j9rRcYGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id F392E68BFE; Mon,  6 Jan 2025 09:55:54 +0100 (CET)
-Date: Mon, 6 Jan 2025 09:55:54 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 4/4] block: simplify tag allocation policy selection
-Message-ID: <20250106085554.GA19343@lst.de>
-References: <20250106083531.799976-1-hch@lst.de> <20250106083531.799976-5-hch@lst.de> <10f1383a-fe7e-4cf8-a15f-14cd4385a7de@oracle.com>
+	s=arc-20240116; t=1736157525; c=relaxed/simple;
+	bh=pZtgrDo+nGaUpROwpN3o7YDRFjlTkS87lF/JlVn3qJQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uMIM5svNV9+84GQ0AVUDAytv3PjJjAJWQv8WYlIkxsky3vGUvkHq8KYy0AOcUs7OvVj5I7UVQugf52Lzryej0IeFy5v4ebwOEOZPjfwS2tS501JA9dcNkoupQKIoCtI/VEayEz+ns3D+Qn9DJDdR9COocbZhilm49MBPuA7rnSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FiDI+147; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FiDI+147"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FB94C4CED2;
+	Mon,  6 Jan 2025 09:58:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736157525;
+	bh=pZtgrDo+nGaUpROwpN3o7YDRFjlTkS87lF/JlVn3qJQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FiDI+147q160Bi843SaYzy9d4AtNwPX9gUZbFV+YWJJMqNltH7YwUBXdy9RdWmNTc
+	 Zyr/ZCBHwBiLTxwipMZf8JpQ40DHIj0dqYL4sxk1NddzdLku7zYby69f1sS+BEvawW
+	 w5wDkAD6wFWlRUwldwKVLHEIDYCFhCOANHwqwuHblpPKKNv5yBuq2zVnNPjg89joEG
+	 Mk1BOuwv4+WxF4apKP1UVC2IoFT1hNGc1WgAUKnktZjS0siyTuvXQ/2jNVkipcZieL
+	 nO+H0u1I3Z0L0fSnWv3kSBROslpp1EMCGjdPw9cOhJZH6NlaX3m8AizIfg4y/Gl2o7
+	 NuR+drj6/r1Jg==
+Message-ID: <30064337-9fe1-47c7-b4ec-c999b06a1b47@kernel.org>
+Date: Mon, 6 Jan 2025 18:58:00 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <10f1383a-fe7e-4cf8-a15f-14cd4385a7de@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] block: Fix __blk_mq_update_nr_hw_queues() queue
+ freeze and limits lock order
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>,
+ Nilay Shroff <nilay@linux.ibm.com>
+References: <20250104132522.247376-1-dlemoal@kernel.org>
+ <20250104132522.247376-3-dlemoal@kernel.org> <20250106083014.GD18408@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20250106083014.GD18408@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 06, 2025 at 08:50:20AM +0000, John Garry wrote:
->>   	.can_queue		= SIL24_MAX_CMDS,
->>   	.sg_tablesize		= SIL24_MAX_SGE,
->>   	.dma_boundary		= ATA_DMA_BOUNDARY,
->> -	.tag_alloc_policy	= BLK_TAG_ALLOC_FIFO,
->
-> nit: maybe that could be a separate patch, but no biggie
+On 1/6/25 5:30 PM, Christoph Hellwig wrote:
+> On Sat, Jan 04, 2025 at 10:25:21PM +0900, Damien Le Moal wrote:
+>> __blk_mq_update_nr_hw_queues() freezes a device queues during operation,
+>> which also includes updating the BLK_FEAT_POLL feature flag for the
+>> device queues using queue_limits_start_update() and
+>> queue_limits_commit_update(). This call order thus creates an invalid
+>> ordering of a queue freeze and queue limit locking which can lead to a
+>> deadlock when the device driver must issue commands to probe the device
+>> when revalidating its limits.
+>>
+>> Avoid this issue by moving the update of the BLK_FEAT_POLL feature flag
+>> out of the main queue remapping loop to the end of
+>> __blk_mq_update_nr_hw_queues(), after the device queues have been
+>> unfrozen.
+> 
+> What happens if I/O is queued after the unfreeze, but before clearing
+> the poll flag?
 
-I though about that, but if felt a bit overkill.
+Ah, yes, that would potentially be an issue... Hmmm... Maybe a better solution
+would be to move the start update out of the main loop and do it first, before
+the freeze. What I do not fully understand with the code of this function is
+that it does freeze and limit update for each tag list of the tag set, but
+there is only a single request queue for all of them. So I am confused. Why
+does the blk_mq_freeze_queue and poll limit setting have to be done in the loop
+multiple times for each tag list ? I do not see it... If we can move these out
+of the tag list loops, then correcting the ordering becomes easy.
 
->> +	/*
->> +	 * Allocate tags starting from last allocated tag.
->> +	 */
->> +	bool tag_alloc_policy_rr : 1;
->
-> Is it proper to use bool here? I am not sure. Others use unsigned int or 
-> unsigned.
-
-Yes, you can use any unsigned type for a single-bit bitfield.  Most of
-the existing uses just predate the availability of bool or were copy
-and pasted after that.
-
->
-> nit: coding style elsewhere in scsi_host_template would be to use 
-> "tag_alloc_policy_rr:1;"
-
-Yes, but that's against the normal kernel coding style, so we'd better
-stop adding more of that.
-
+-- 
+Damien Le Moal
+Western Digital Research
