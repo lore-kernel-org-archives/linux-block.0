@@ -1,99 +1,84 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95291DCB24
-	for <linux-block@vger.kernel.org>; Mon,  6 Jan 2025 11:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB891DB346;
+	Mon,  6 Jan 2025 11:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736162147; cv=none; b=eqZeK+Xy0Sr+M6GduuBjoY4o72a0F1XCz0tEZ9/XL7F2VMES9M2A7Yi9Bcz6xIbiSUJxFrvnJipDxLJboA6O51dWsIJr6ZJZ2ul5DC2nON8h9lW5V55CGBRhyblLBmOWmbaq77uJ63Nu9hwvYRLlE1yAJx4rHeF9YciG99B8RIc=
+	t=1736163430; cv=none; b=elVTtycFceWJaRSP0HtmO28qoIq7d9F+3ELIebAJAx/Eh2liiDFPoXQ2rC1m5m4UF0zW7Xdduns3NWGkG7Ojdt/XWBfTdLrbfMXYew8cFCnMdvqTmDXi8ocDG+lz2EOF0y5r62g28uK7bfCPvQcQVXaJdKe1rTE54P0zc8tdedI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736162147; c=relaxed/simple;
-	bh=DfkaNj1QKL6aDuZlMAfZaQ54C6BtUuR9FHoah5Vg2Tw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bi0ZpOsfXBJ578ZQ6fIRC0Xtfsa3oiGOZ7zwfix5dkU5gs0QRuAiy0cnCV+XjtcE2TSPU7qfo2nv+UtKx9l+uFQC1Ks+SkXrBjFbwR9pLqIJRyL4HMY6GqkhQOnVsLW4b1h8bguxRbkAi2++Pade4vuiea+RIUFDHXIySWCerAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hmCfTfM2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hmCfTfM2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736162142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lEgqGUmmdHlI+KexeqkKfc5uGqdJkewykFHtwS7IbqQ=;
-	b=hmCfTfM2mhKhyKHJ8Wpqj1W1CRs+Iy23HwopJ4JiDScehB/hilmi2qQ9/HThtyYEybchsG
-	Ym1HmAzUrl63+hUScK/2ToLJX7D6vH3d7Uzr5csihPKV+AAjHept09NLTGWVdWAIzWLfWz
-	3e1esbW5452Y47Avla49nB7VLP8rE74=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-277-ramjuIovO8u7SQJZqBradQ-1; Mon,
- 06 Jan 2025 06:15:39 -0500
-X-MC-Unique: ramjuIovO8u7SQJZqBradQ-1
-X-Mimecast-MFC-AGG-ID: ramjuIovO8u7SQJZqBradQ
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2D39319560A2;
-	Mon,  6 Jan 2025 11:15:38 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.180])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B979D195608A;
-	Mon,  6 Jan 2025 11:15:32 +0000 (UTC)
-Date: Mon, 6 Jan 2025 19:15:27 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Nilay Shroff <nilay@linux.ibm.com>
-Subject: Re: [PATCH 1/3] block: Fix sysfs queue freeze and limits lock order
-Message-ID: <Z3u7Twc4UPWvlfJJ@fedora>
-References: <20250104132522.247376-1-dlemoal@kernel.org>
- <20250104132522.247376-2-dlemoal@kernel.org>
- <Z3tOn4C5i096owJc@fedora>
- <20250106082902.GC18408@lst.de>
+	s=arc-20240116; t=1736163430; c=relaxed/simple;
+	bh=tuo7ur1MMvJQpLL7KpfDXDX3kSmGsjo1fwly76s8nts=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=l9YFIvnZynzjj/fvEqIi1sgZy7sdKHftbt/tFfqxFNdHeJfO6x5bQ7ZkSHhAHmfxQtfTK1LwBzAAMmwrc1kx+60gppkT1tUXG55kOAxuqracPBkMIC2zqqjQXBUC3ZmRCW5P477JL+36/6QA4gTm6kV8rzwDIBH3azLEf8CclQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YRXFp6YYDz4f3jqj;
+	Mon,  6 Jan 2025 19:36:46 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id D8EDE1A1928;
+	Mon,  6 Jan 2025 19:37:01 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+	by APP3 (Coremail) with SMTP id _Ch0CgCH2sRdwHtn+6_HAA--.65048S3;
+	Mon, 06 Jan 2025 19:37:01 +0800 (CST)
+Subject: Re: [PATCH] nbd: don't allow reconnect after disconnect
+To: Christoph Hellwig <hch@infradead.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc: josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+ nbd@other.debian.org, linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+ yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250103092859.3574648-1-yukuai1@huaweicloud.com>
+ <Z3uWAGWV_kpBZ3Pn@infradead.org>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <b05548a7-2d40-b38d-61d0-1b248ebd42c8@huaweicloud.com>
+Date: Mon, 6 Jan 2025 19:37:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250106082902.GC18408@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+In-Reply-To: <Z3uWAGWV_kpBZ3Pn@infradead.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgCH2sRdwHtn+6_HAA--.65048S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYK7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+	6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72
+	CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
+	rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
+	1l4c8EcI0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
+	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r
+	43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
+	7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
+	WUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU
+	F9a9DUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On Mon, Jan 06, 2025 at 09:29:02AM +0100, Christoph Hellwig wrote:
-> On Mon, Jan 06, 2025 at 11:31:43AM +0800, Ming Lei wrote:
-> > As I mentioned in another thread, freezing queue may not be needed in
-> > ->store(), so let's discuss and confirm if it is needed here first.
-> > 
-> > https://lore.kernel.org/linux-block/Z3tHozKiUqWr7gjO@fedora/
+Hi,
+
+ÔÚ 2025/01/06 16:36, Christoph Hellwig Ð´µÀ:
+> Looks good:
 > 
-> We do need the freezing.  What you're proposing is playing fast and loose
-> which is going to get us in trouble.
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+Thanks for the review!
 
-It is just soft update from sysfs interface, and both the old and new limits
-are correct from device viewpoint.
+> Can you wire up the reproduce to blktests?
 
-What is the trouble? We have run the .store() code without freezing for
-more than 10 years, no one report issue in the area.
+However, I don't have reliable reporducer yet, I'll try more. :)
 
+Thanks,
+Kuai
 
-> While most (all?) limits are simple
-> scalars, you often can't update just one without the others without
-> having coherent state.  Having coherent state was the entire point of
-> the atomic queue limit updates.
-
-We am talking all the update in block queue sysfs store(), in each
-interface just one scalar number is updated in atomic way.
-
-The atomic update API is still applied, I meant queue freeze can be
-removed.
-
-
-Thank,s
-Ming
+> 
+> .
+> 
 
