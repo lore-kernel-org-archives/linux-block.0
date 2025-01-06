@@ -1,133 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29CEA184F;
-	Mon,  6 Jan 2025 01:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72F1DDBC
+	for <linux-block@vger.kernel.org>; Mon,  6 Jan 2025 03:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736128484; cv=none; b=BkDHKQ6ZiCMwPEZ8CuZszBKFYiJZ/LFSTXu28XC19Uybv3XNVt9fZ6Gz/h/e3wE8AbVi14jieNoZOw+J8vVWeo5Z6VSbv3Q4EnljhdbAcD2rdjEo0BF3xU7EmHRmohUHJeej3VlXjZ4Qu2wmtzmk37aGpLPD0Iay4PupMcqMKWU=
+	t=1736132532; cv=none; b=Q2fmcEoZwTh+vK44W9LWJDaVyuzACy952eZ+LqRZ+OyG4ZtFZN+y+OpMfIPDZcJBeY/qNiQb2v0BXOfvSdOrHcjyO1cqghHAQlC24TlOUZ50A97xPVtCRMj2XJ/nfFb7Ez0tWqFYsdAjZBjLrTrISTNqjnWlFgHeumH+hQCRkGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736128484; c=relaxed/simple;
-	bh=VXHTSlWVeej65C6gWEdXhGhaNxkRXr5jGN61emh9ek8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W68WIVWLBHEmaXk9fj7oqmqJF7u0nDeWhpfQ4zr7h6xHdEXU6xrZSGZfd8fpFcMyxerOhQPPrtgd7/zuf4udQCUj46JMAmk26b79lLyHZ0Xbqc2EaLWAJu6sWlDDvNb50rR4qIm0uGbI13JglPlt3d45/rFiAfUEUuxexDMBvDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eEtf3Saw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736132532; c=relaxed/simple;
+	bh=SVbK895MZQ7KlVUxguEV0bCKzTPvHgQXiJCeqiZF/IE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YK0D9lpuQaQITfeoWbtzjiZ67wcnJENOGHefByfGH+JqIc+wgZX9ApudtLd1MD081ikwNc375mJ0GDvgIbN5tngKToM3EWVcojZcQgh7lFWHy6qgMWB7C6c9cfjslNBmmekIzRqiPFe0IeFtSv8TH/ZXcLeOZhinj+9ZhiG5lW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C5tA5+V5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eEtf3Saw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEA98C4CED0;
-	Mon,  6 Jan 2025 01:54:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736128483;
-	bh=VXHTSlWVeej65C6gWEdXhGhaNxkRXr5jGN61emh9ek8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eEtf3Sawb5gYw3jcbVvK/g+/c3EDSX2rcB/mxneDgQOI9p2znVsjTklVuQxF7/DAy
-	 yuErRnUtSZXCbqRdy/KAE++Yea+gXBb12mvvaKI28WpVy5rRHvoRlPx6iPPq2hvtch
-	 CCtvF8OrHJG0Aa6lvXY7Buaf9eMZLXh7EOzquUmq9adf3LextO2sUsXV0RH2XG7eR2
-	 vBsyPAi3k4O7KXKNHQyE7HmQsd7cclN3x5HRZm4uRLrmoPIAMndZaN7R8RGYcB2mXu
-	 XGMHIiJThc2+fF0lXn+i0st5Jysv0qnhyJikf84UoqGHA0CfYkBfXqfyUVooFhFchv
-	 m0BqcxcVZSV6Q==
-Message-ID: <ee32c284-aeda-4efa-adb1-bb4af724d097@kernel.org>
-Date: Mon, 6 Jan 2025 10:53:58 +0900
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C5tA5+V5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736132528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QuJePIFMwbXTYOYRpOx/vNyM6sxPxRc6sYfg7toUIkM=;
+	b=C5tA5+V5oy0bJgNl5Tp/O3rHax/9u7PCoeOWYSEouKUS+lGnINyoILosWVxh8ANOvGQQyj
+	499/jvmE6SgboqkxbmZ32H3NbRAkvT+I4GaTwQVLzn1YLGF1AZ1TmFmeDXxRaoA/bb6bW4
+	UldlqcEs1xk0CqAjvARMedTk6qSmijI=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-275-LbBnK8huOoGU9VxByKFLmg-1; Sun,
+ 05 Jan 2025 22:02:07 -0500
+X-MC-Unique: LbBnK8huOoGU9VxByKFLmg-1
+X-Mimecast-MFC-AGG-ID: LbBnK8huOoGU9VxByKFLmg
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E8E3D19560AF;
+	Mon,  6 Jan 2025 03:02:05 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.65])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 59B451956088;
+	Mon,  6 Jan 2025 03:02:00 +0000 (UTC)
+Date: Mon, 6 Jan 2025 11:01:55 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Nilay Shroff <nilay@linux.ibm.com>
+Subject: Re: [PATCH] scsi: avoid to send scsi command with ->queue_limits
+ lock held
+Message-ID: <Z3tHozKiUqWr7gjO@fedora>
+References: <20241231042241.171227-1-ming.lei@redhat.com>
+ <770947cc-6ce9-4ef0-8577-6966c7b8d555@kernel.org>
+ <Z3srsii5EhZmnU9D@fedora>
+ <1231beed-7c85-4c72-970c-a0f9d155f99d@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] Improving Block Layer Tracepoints for
- Next-Generation Backup Systems
-To: Vishnu ks <ksvishnu56@gmail.com>, Song Liu <song@kernel.org>,
- hch@infradead.org, yanjun.zhu@linux.dev
-Cc: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
- bpf@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <CAJHDoJac2Qa6QjhDFi7YZf0D05=Svc13ZQyX=92KsM7pkkVbJA@mail.gmail.com>
- <CAPhsuW7+ORExwn5fkRykEmEp-wm0YE788Tkd39rK5cZ-Q3dfUw@mail.gmail.com>
- <CAJHDoJYESDzDf9KJgfSfGGit6JPyxtf3miNbnM7BzNfjOi7CQw@mail.gmail.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <CAJHDoJYESDzDf9KJgfSfGGit6JPyxtf3miNbnM7BzNfjOi7CQw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1231beed-7c85-4c72-970c-a0f9d155f99d@kernel.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On 1/5/25 2:52 AM, Vishnu ks wrote:
-> Thank you all for your valuable feedback. I'd like to provide more
-> technical context about our implementation and the specific challenges
-> we're facing.
+On Mon, Jan 06, 2025 at 10:30:10AM +0900, Damien Le Moal wrote:
+> On 1/6/25 10:02 AM, Ming Lei wrote:
+> > On Sat, Jan 04, 2025 at 04:17:47PM +0900, Damien Le Moal wrote:
+> >> On 12/31/24 13:22, Ming Lei wrote:
+> >>> Block request queue is often frozen before acquiring the queue
+> >>> ->limits_lock.
+> >>
+> >> "often" is rather vague. What cases are we talking about here beside the block
+> >> layer sysfs ->store() operations ? Fixing these is easy and does not need this
+> >> change.
+> > 
+> > Is it really necessary to make freeze lock to depend on ->limits_lock?
 > 
-> System Architecture:
-> We've built a block-level continuous data protection system that:
-> 1. Uses eBPF to monitor block_rq_complete tracepoint to track modified sectors
-> 2. Captures sector numbers (not data) of changed blocks in real-time
-> 3. Periodically syncs the actual data from these sectors based on
-> configurable RPO
-> 4. Layers these incremental changes on top of base snapshots
+> Yes, because you do not want to have requests in-flight when applying new limits.
+
+Thinking of further, actually almost all soft update in ->store()
+needn't to freeze queue:
+
+- all are scalar update 
+
+- we can guarantee the new value is correct by validating first, so both
+new val and old val are correct from device viewpoint
+
+- the freeze is added recently in v6.11 af2814149883 ("block: freeze the queue
+in queue_attr_store") for addressing nothing
+
+Not mention sd_revalidate_disk() can be called in sd_open() without queue
+freeze.
+
+But update from hardware need queue to be frozen, or doing that before
+disk is up.
+
+My idea is to try to cut the lock chain, and your approach is to try to
+order everything. From lock dependency viewpoint, it is simpler to
+avoid the dependency from beginning because it is too complicated to
+order everything.
+
 > 
-> Current Implementation:
-> - eBPF program attached to block_rq_complete tracks sector ranges from
-> bio requests
-> - Changed sector numbers are transmitted to a central dispatcher via websocket
-> - Dispatcher initiates periodic data sync (1-2 min intervals)
-> requesting data from tracked sectors
-> - Base snapshot + incremental changes provide point-in-time recovery capability
+> > 
+> > sd_revalidate_disk() is really one special case, so I think this patch
+> > does correct thing.
+> > 
+> >>
+> >> Furthermore, this change almost feels like a layering violation as it replicates
+> >> most of the queue limits structure inside sd. This introducing a strong
+> >> dependency to the block layer internals which we should avoid.
+> > 
+> > No.
+> > 
+> > block layer is common library, which is storage abstraction, so it is
+> > pretty reasonable for storage drivers to depend block layer. You can
+> > look at it from another way, if any related queue limits change, the
+> > current storage driver need corresponding change too, with or without
+> > this change.
 > 
-> @Christoph: Regarding stability concerns - we're not using tracepoints
-> for data integrity, but rather for change detection. The actual data
-> synchronization happens through standard block device reads.
-> 
-> Technical Challenge:
-> The core issue we've identified is the gap between write completion
-> notification and data availability:
-> - block_rq_complete tracepoint triggers before data is actually
-> persisted to disk
+> Of course block device driver layers like SCSI depend on the block layer. But
+> that dependency is at a high level API/function level. My concern is that your
+> patch mimics too much the block layer implementation internals instead of
+> relying on a high level API like we do now.
 
-Then do a flush, or disable the write cache on the device (which can totally
-kill write performance depending on the device). Nothing new here. File systems
-have journaling for this reason (among others).
+Here block layer API isn't involved, since block layer doesn't or can't
+provide API to update single field of queue_limits.
 
-> - Reading sectors immediately after block_rq_complete often returns stale data
+Also the shadow sd_limits can be thought as one scsi's own hardware property
+abstract, and its name just follows block layer queue's limits for the
+sake of simplicity.
 
-That is what POSIX mandates and also what most storage protocols specify (SCSI,
-ATA, NVMe): reading sectors that were just written give you back what you just
-wrote, regardless of the actual location of the data on the device (persisted
-to non volatile media or not).
-
-> - Observed delay between completion and actual disk persistence ranges
-> from 3-7 minutes
-
-That depends on how often/when/how the drive flushes its write cache, which you
-cannot know from the host. If you want to reduce this, explicitly flush the
-device write cache more often (execute blkdev_issue_flush() or similar).
-
-> - Data becomes immediately available only after unmount/sync/reboot
-
-??
-
-You can read data that was written even without a sync/flush.
-
-> Proposed Enhancement:
-> We're looking for ways to:
-> 1. Detect when data is actually flushed to disk
-
-If you have the write cache enabled on the device, there is no device interface
-that notifies this. This simply does not exist. If you want to guarantee data
-persistence to non-volatile media on the device, issue a synchronize cache
-command (which blkdev_issue_flush() does), or sync your file system if you are
-using one. Or as mentioned already, disable the device write cache.
-
-> 2. Track the relationship between bio requests and cache flushes
-
-That is up to you to do that. File systems do so for sync()/fsync(). Note that
-data persistence guarantees are always for write requests that have already
-completed.
-
-> 3. Potentially add tracepoints around such operations
-
-As Christoph said, tracepoints are not a stable ABI. So relying on tracepoints
-for tracking data persistence is really not a good idea.
+Long term, block layer may do similar categorization for queue_limits
+according to function, then scsi disk's shadow structure can be removed
+if scsi doesn't have special requirement.
 
 
--- 
-Damien Le Moal
-Western Digital Research
+Thanks,
+Ming
+
