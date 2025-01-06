@@ -1,53 +1,87 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2801D89EF
-	for <linux-block@vger.kernel.org>; Mon,  6 Jan 2025 08:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D59C1D5CD9;
+	Mon,  6 Jan 2025 08:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736152298; cv=none; b=JdiPmnUQlISaqib1O1UgfKd/A5RM1gzxAru7DV+Time901PdIE74SdeQzFPmFBaY3QVrE+cML+9JVLgXVCYLCapy5thkV1GZNBFEePcP4OT5+LkfTDiDJWGHZHaNsWzKa3pja9xQOYDwnjtgLrGnqBP8rCSg0qRmG1aozgC2XtM=
+	t=1736152537; cv=none; b=npBm9V4Y37ORamptoMxgeZD5A6XycpCrzQ4H2zxEVnTowkvezx/UZGv1B3w5TUJC5mNZL836eR0W+1hiAiFwXZN49Hl3Hkf9zhQMmbVUkx446RtRIuvu9iSq0/moBhFhzpXTUX2/oneQtXdSK2LSach328pqzCbC2gFwUuh1iNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736152298; c=relaxed/simple;
-	bh=/sBQbqLZVvaHd/P9BTrnbbtSvHbNZa76+IQbt0DPTFs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aoypOSFEEwUhNzi7kkDNKaQEXtTGg23esJ/NKuSCuk/HY7dZbb4NT2++Ig8Jgq6Fxt69OxIyg00STvgcsei1XruZMmKVjUzQ+KmPyPUR9UQdcJmgdMvi7+5bwXtDcrWALDl3Mznp8AqI8cGQHQ3aHFsFPfFh8wi6OMQBOvGtC70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+	s=arc-20240116; t=1736152537; c=relaxed/simple;
+	bh=AAHvtvgbPzj3tmJyOrtdyy8yNbQZ3/seQsEhentxwp0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JOJFRV8I0Kq+X5b0pdeDEDFa9ZLNiS40Xxfv2elSiSSwa4fRpp4oISq/J9VjB/YMiDY5N6azMeK8Kgy3Y8+LgnA4K8MbEEYz4LuclI+hokp/yoN9WRV5tdb7RxRxbWjy0nlcYN048jCOqPty+f2y8sGNRdmJNFMTGlJR02NuJsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YVfsptmz; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id CCA8E68BFE; Mon,  6 Jan 2025 09:31:29 +0100 (CET)
-Date: Mon, 6 Jan 2025 09:31:29 +0100
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YVfsptmz"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=euJ7YEBa7Eok7Tb9QqrqvWjNL9GyyFGQyYdt1od4F4Y=; b=YVfsptmzXAKAUGqFOzJ2NL0lfb
+	dA0okXPLIyNSvNIpi7lF4AVod8MXASS9Vo7NAL8lkL6L6Lz30Ti+aPtxcLggCcPHUxXh7o/kTsirI
+	jFQKGiMyvOSCSv2Av0KZ1ciLZnqhVGWkTGDRJxmmQqhF2yMvLPbEbln/6JD6hfjY4PuOVY5FTk1eY
+	o5jvQvK0s1/7uSEMXZifvNK8cCll6fb3Ky5+OdmFBG6fnGEUqcwniLFeohhWj0+OaEULQzDeAHFy1
+	7h8ED8J0ioExjGbRsvZfLp5g23olisj4DH1zZQVjERRCYMiaJU8spD/ef5rOAeML3cwjiyi1YvXgp
+	FhfX2p9g==;
+Received: from 2a02-8389-2341-5b80-db6b-99e8-3feb-3b4e.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:db6b:99e8:3feb:3b4e] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tUiaE-00000000XDE-1opv;
+	Mon, 06 Jan 2025 08:35:34 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Ming Lei <ming.lei@redhat.com>, Nilay Shroff <nilay@linux.ibm.com>
-Subject: Re: [PATCH 3/3] nvme: Fix queue freeze and limits lock order
-Message-ID: <20250106083129.GE18408@lst.de>
-References: <20250104132522.247376-1-dlemoal@kernel.org> <20250104132522.247376-4-dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	John Garry <john.g.garry@oracle.com>,
+	linux-block@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Subject: more BLK_MQ_F_* simplification v2
+Date: Mon,  6 Jan 2025 09:35:07 +0100
+Message-ID: <20250106083531.799976-1-hch@lst.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250104132522.247376-4-dlemoal@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Sat, Jan 04, 2025 at 10:25:22PM +0900, Damien Le Moal wrote:
-> Modify the functions nvme_update_ns_info_generic(),
-> nvme_update_ns_info_block() and nvme_update_ns_info() to freeze a
-> namespace queue using blk_mq_freeze_queue() after starting the queue
-> limits update with queue_limits_start_update() so that the queue
-> freezing is always done after obtaining the device queue limits lock (as
-> per the block layer convention for sysfs attributes).
+Hi Jens,
 
-FYI, there's a few more like this.  In my WIP series I've basically
-made the normal queue_limits_commit_update contain the freeze and add
-a special version without the freeze, which makes a lot of this
-more obvious.  Let me dust it off even before sorting out the poll
-flag so that we have a little more discussion material.
+this series removes another BLK_MQ_F_ that just duplicates an implicit
+condition and cleans up the tag allocation policy selection by using
+an actual BLK_MQ_F_ flag instead of a two-value enum awkwardly encoded
+into it.  If we'd ever grow another policy we'd be much better off just
+adding a separate field to the tagset for it.
 
+Changes since v1:
+ - use a boolean bitfield for the SCSI RR tag allocation policy selection
+
+Diffstat:
+ block/blk-mq-debugfs.c                 |   26 +++-----------------
+ block/blk-mq-tag.c                     |   41 ++++++++++-----------------------
+ block/blk-mq.c                         |    3 --
+ block/blk-mq.h                         |    5 ----
+ block/bsg-lib.c                        |    2 -
+ block/elevator.c                       |   20 ----------------
+ block/genhd.c                          |   28 ++++++++++++----------
+ drivers/ata/ahci.h                     |    2 -
+ drivers/ata/pata_macio.c               |    2 -
+ drivers/ata/sata_mv.c                  |    2 -
+ drivers/ata/sata_nv.c                  |    4 +--
+ drivers/ata/sata_sil24.c               |    1 
+ drivers/block/null_blk/main.c          |    4 +--
+ drivers/nvme/host/apple.c              |    1 
+ drivers/nvme/host/core.c               |    1 
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c |    2 -
+ drivers/scsi/scsi_lib.c                |    4 +--
+ drivers/ufs/core/ufshcd.c              |    1 
+ include/linux/blk-mq.h                 |   24 +++++--------------
+ include/linux/libata.h                 |    4 +--
+ include/scsi/scsi_host.h               |    6 +++-
+ 21 files changed, 58 insertions(+), 125 deletions(-)
