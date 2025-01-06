@@ -1,86 +1,89 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FA51DDA3C
-	for <linux-block@vger.kernel.org>; Mon,  6 Jan 2025 14:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D1C1448DC
+	for <linux-block@vger.kernel.org>; Mon,  6 Jan 2025 14:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736174391; cv=none; b=jklmE1xvX5EQ5brui+YsL6B9zZzB7DuXNdAWQkHk66HU6BvQLzP/ZkctKmg2XXrzogw1Q7C874uiWaES0UwAHubjK2gFosPssBueCUNfb3Xv+zU57/cZ7i5dWIhl7Jvcs7j+4xOlFvIVbCKK0rSwQ96uVUrmSM+WUQGqbYTYDbE=
+	t=1736175250; cv=none; b=WGbTe9hEut3vZMUPsoZm0nvH/ratheGsE9y+QoJa6pFLGrqp2OfPwLfLxFMUhP/4BvP2HFjr9AvNPdVMhlWc4CMGpR7152lXMQOgAnprwMpJyNJ0PMru6rwXU7aQ6yeEOFB6Mxv3dR24kSNeqPLJDtXahInGtV404oMXotOIR2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736174391; c=relaxed/simple;
-	bh=pEcdNS6biiuDg5Lz2TFAPdrcZP4bEIgW5De5HoGw8aA=;
+	s=arc-20240116; t=1736175250; c=relaxed/simple;
+	bh=kvaOSKkVjzUmmo8j89cHb0SZXb8wXHyD+ZVuTm1ERT4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ehgh3pRR2HD2FIsyL67HC3MBMdsYxP+mDGUa3V1oujAsoPTwQbzfKsp7/aiFOoHDKe6LE03lyv1yFPj+W/miFmB6iXbdYJdXjU2mkppQztkx0BECJIMpNq3VXF/mLJZODT/PIVDyrOMykvnZ4AwTa27+rcbSKsyj82F6L40rCEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JLi2So6Y; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 In-Reply-To:Content-Type; b=cYBPXo/Q8/swcGGBVDwobv0XsOaeSSLl/7k7iQk2TPbT6cs2b6VVpFm2K2iLClm4ZxSCkexs85v0wkE2eHB6k0t0LBDZpBhxeaulbFJ5qfQUfJ1TFWeykr9NLeQRL4xHc/CHktS1WbeNyrqjDpbnbHpzK3FqqfthruaEJ1IWA+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=sbT0UtMN; arc=none smtp.client-ip=209.85.166.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JLi2So6Y"
-Message-ID: <6c63dd3a-378d-471f-8af0-725edc3785ed@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736174377;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1QBb1SxSbkhq0fjJPP/D8igQzmWEtDwWTFQrDDQ04OM=;
-	b=JLi2So6YMgc1dnvVKl8hkq5wxmbpmbt93tP9dW3JvqKloiWUhxBzIW4jWw3BIH4IdoUiuD
-	9wXf2ugoGGIVDR78uxu6XWy1ZOr8e/zHj8vPORYlyin6Oy6bcJETw/dBqjDwmgeLJYnrPl
-	dmUulL7tkr6kcGySvUEWJOd+D5/Ekcs=
-Date: Mon, 6 Jan 2025 15:39:34 +0100
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="sbT0UtMN"
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-844d555491eso492098639f.0
+        for <linux-block@vger.kernel.org>; Mon, 06 Jan 2025 06:54:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736175247; x=1736780047; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=U2z9KsDn18F1V7k+iJeMAgiJaCVKeooIHSLCAYIzOnU=;
+        b=sbT0UtMNYNDTQW9q+v2FLAlivy9FWI7rVBiq+atLVQO8hqjD2FSnPo4bHRVeUaH3u8
+         IMZftNN1j+tAmRNKl5TtUOKJ4ZhZ6W6AFQhprZy0nKP1Bsv+EcJZcmV7dGyZUPTc6pYf
+         BEHECVLzVIdXwU2D0di+CylIq+ygyAuJyC9P414tveG+tbxWVKftjhHSWkwWoK0sH9iC
+         JoPpw8xScak206UEIv5dwpdYNph4uaGuzBDGjOxdWUttuzyh8IRxIuO7vnI6UD+blsaL
+         Zd/SmMYPXnDJhPqMjVpZ/Y/o7FXqJaPnaQbm/3WOMF7+DEAxkhwik9AUfDab9Wf2irbT
+         Gp3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736175247; x=1736780047;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U2z9KsDn18F1V7k+iJeMAgiJaCVKeooIHSLCAYIzOnU=;
+        b=xRWHq7ei+QtEc/EkqXmYotFmt6qbUIr8eq6MRnzG8oF8/QsVClNu2HXo/FG/8+j+aN
+         nzXNf1WiIoKZiIkJrYDTqN7ujKcpv5nW1i8CUKLlhUS2pSWdsOrruedx2h0m7i1n1WZy
+         7XWmI/Aw8g9/XBk4+zXEy7qDRPJ/fpVw4/ZDhYNZU+9pRMrofasAh4o1syDuBmWoUQkp
+         pkpakRNBnGXt8xggJ6e33vaORsI1FU7Bhxb0oLt6vc5RvNaWJDacAAHaMFQga4R4+0nH
+         YhHXI5mlXHxqBD108FHWRwRqGIINkW+2dzmGrSRWSkcSAlW9VVNBiIwI6GvU9qvsCb0e
+         wMIg==
+X-Forwarded-Encrypted: i=1; AJvYcCXxV72TAN2bPDdCrGXCjamv7pkAFztKW6VkZ9boOy7FfK0zXq0TrBwvKfUtqYOs8j1HjvrPiB80KS9RNw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4TM03CZr4AACRM01RedlGDpUw7w6jYNAVTgcCCnul/Iz4LLoQ
+	v31xfG2zDODJkBYpg9M6ywUtnlMYEkLOEx2SwBCQ1YMsAjd+2TZMZDlIBR+bWhEu5tBI2kwunBs
+	G
+X-Gm-Gg: ASbGncsFAgBdXEBBSQQ1KYRz5ABvgEU0aS4oKcBoIqw3hzsqkV9zl50qlRNp0lGfX+c
+	4bxMD4EGt40yaHg8oV2qVEFY+wYfIOoGHUKFZ1MTLnqZLv+BC7GhA/9HbHxZ5Are9WCYhi02pVJ
+	+uL++wMZgen89WbEitwZDbuSm4q23DBlHE9jC67ZRikOisfXEJlJKsr6nH323TWu5vJRyKEq/P2
+	0TKpPVNsFHU7Smmd5zFoOTyH1Ucu65bT11sGfalwDx9l6794N5T
+X-Google-Smtp-Source: AGHT+IHC9NQNkjvrJg9264CCHTHBlhqAe7p+Yq1/H48JbXEcKqIoEDPZxZZtj4YBdfrii+lYGwYtGQ==
+X-Received: by 2002:a05:6e02:194a:b0:3a7:7124:bd2b with SMTP id e9e14a558f8ab-3c2d514f8e4mr497256845ab.15.1736175247276;
+        Mon, 06 Jan 2025 06:54:07 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3c0debdac82sm97755665ab.22.2025.01.06.06.54.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Jan 2025 06:54:06 -0800 (PST)
+Message-ID: <2f7c9abe-a23f-4b2f-99aa-e6d220c74dd0@kernel.dk>
+Date: Mon, 6 Jan 2025 07:54:05 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [LSF/MM/BPF TOPIC] Improving Block Layer Tracepoints for
- Next-Generation Backup Systems
-To: Christoph Hellwig <hch@infradead.org>, Vishnu ks <ksvishnu56@gmail.com>
-Cc: Song Liu <song@kernel.org>, lsf-pc@lists.linux-foundation.org,
- linux-block@vger.kernel.org, bpf@vger.kernel.org,
- linux-nvme@lists.infradead.org
-References: <CAJHDoJac2Qa6QjhDFi7YZf0D05=Svc13ZQyX=92KsM7pkkVbJA@mail.gmail.com>
- <CAPhsuW7+ORExwn5fkRykEmEp-wm0YE788Tkd39rK5cZ-Q3dfUw@mail.gmail.com>
- <CAJHDoJYESDzDf9KJgfSfGGit6JPyxtf3miNbnM7BzNfjOi7CQw@mail.gmail.com>
- <Z3uIOPxr4s09qS1X@infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] New zoned loop block device driver
+To: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>
+References: <20250106142439.216598-1-dlemoal@kernel.org>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <Z3uIOPxr4s09qS1X@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20250106142439.216598-1-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 06.01.25 08:37, Christoph Hellwig wrote:
-> On Sat, Jan 04, 2025 at 11:22:40PM +0530, Vishnu ks wrote:
->> 1. Uses eBPF to monitor block_rq_complete tracepoint to track modified sectors
-> 
-> You can't.  Drivers can and often do change the sector during submission
-> processing.
+On 1/6/25 7:24 AM, Damien Le Moal wrote:
+> The first patch implements the new "zloop" zoned block device driver
+> which allows creating zoned block devices using one regular file per
+> zone as backing storage.
 
-If I get you correctly, you mean, the action that **drivers often change 
-the sector during submission processing** will generate a lot of 
-tracepoint events. Thus, this will make difference on the performance of 
-the whole system.
+Couldn't we do this with ublk and keep most of this stuff in userspace
+rather than need a whole new loop driver?
 
-If yes, can we only monitor fentry/fexit of some_important_key_function 
-to reduce the eBPF events? Thus this will not generate too many events 
-then make difference on the performance.
-
-Zhu Yanjun
-
-> 
->> 2. Captures sector numbers (not data) of changed blocks in real-time
->> 3. Periodically syncs the actual data from these sectors based on
->> configurable RPO
->> 4. Layers these incremental changes on top of base snapshots
-> 
-> And all of that is broken.  If you are interested in this kind of
-> mechanism help upstreaming the blk-filter work, which has been
-> explicitly designed to support that.
-> 
-> Before that you should really undestand how block devices and
-> file systems work, as the rest of the mail suggested a very dangerous
-> misunderstanding of the basic principles.
+-- 
+Jens Axboe
 
