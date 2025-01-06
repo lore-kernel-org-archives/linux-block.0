@@ -1,99 +1,86 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F021DED6A
-	for <linux-block@vger.kernel.org>; Mon,  6 Jan 2025 14:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FA51DDA3C
+	for <linux-block@vger.kernel.org>; Mon,  6 Jan 2025 14:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736174371; cv=none; b=MgCrXe5tpN3GO7sjHGHcfVIHLR0yPkv7YB4YFpQgOvCvzNUzbKoDILs8kR/c0wQOjD4agl0dvk7hQul3n0MdW1mjLz0tdmvEUcBm/Wc0gZLwUPuaxZxzse1EiZEjB5xvV0e3gZjtESrEkWX0y9PCFuHnX6bdhPblFIXJFqkLqdk=
+	t=1736174391; cv=none; b=jklmE1xvX5EQ5brui+YsL6B9zZzB7DuXNdAWQkHk66HU6BvQLzP/ZkctKmg2XXrzogw1Q7C874uiWaES0UwAHubjK2gFosPssBueCUNfb3Xv+zU57/cZ7i5dWIhl7Jvcs7j+4xOlFvIVbCKK0rSwQ96uVUrmSM+WUQGqbYTYDbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736174371; c=relaxed/simple;
-	bh=abhxetlHFA/fzQepQyckJfJHy3o34hCpPThf5JkI8lY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=ocB1Rv2bGLP+j0WDZcUbd9NS/z7iM0/xCtEmOxLT5HVKCZq51/IFiM2J7YdbsxUCp64ZmSk3Q2hqIRrFehoZAiWP/B00ot7WO5Q7cBVZ7UMgvn6j/fl2sBrLqmg1Q+V8YXBay8j4bXVEw6o/fyJz7z2QcSy5+2drJKHvOz2aVio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=aAtoEeTq; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1736174391; c=relaxed/simple;
+	bh=pEcdNS6biiuDg5Lz2TFAPdrcZP4bEIgW5De5HoGw8aA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ehgh3pRR2HD2FIsyL67HC3MBMdsYxP+mDGUa3V1oujAsoPTwQbzfKsp7/aiFOoHDKe6LE03lyv1yFPj+W/miFmB6iXbdYJdXjU2mkppQztkx0BECJIMpNq3VXF/mLJZODT/PIVDyrOMykvnZ4AwTa27+rcbSKsyj82F6L40rCEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JLi2So6Y; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="aAtoEeTq"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-844dac0a8f4so1074577839f.2
-        for <linux-block@vger.kernel.org>; Mon, 06 Jan 2025 06:39:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736174369; x=1736779169; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iBZ4AOeWFFW8Dd9C0Ka6etVGn5iXgyom5RPzMiqZSs8=;
-        b=aAtoEeTq5obuontLvhlqn9e8D15DBaKS63fho6WE3eChKIPNqEq5dRPsk92RWLLXq7
-         Gq7FCW/+3Y5W626PsHYWrh5zU6rmdYQtmot0ipC/e/dAKIcQNeH30Lz85/tVQWo+GziG
-         lt1zSqBVWdeqWYzfiX+9dreLUzBPiYGsIMuFZYJKwO2mcaQ19dyaw8FY6PDwABPAM9fZ
-         TReqwGZkrhxcZcqx6TfqyspMoizjLRXhiid87we7HuviTieKWC+poY0BP63avR7o0Xtb
-         7kkhFO/D1cANtfGCzgOw5V9SI7fX7x6u0wk6f+o7OQ/6dAicC0BYxZM5Ny0V1xPKyW2x
-         lPAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736174369; x=1736779169;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iBZ4AOeWFFW8Dd9C0Ka6etVGn5iXgyom5RPzMiqZSs8=;
-        b=voERAbaqb2uIIj8tDN7bW3QJ1o+Gsgck7mhtbC2C8Ygu9vI/vLfDJ53gJQ0ZZ1+gCb
-         Togu7OAuKarXcDTSyjA4m2jYn+3AktguOeFNCACBsJAWmaxQHpOdLc7iNj07MZcAvzee
-         C2DguOAYlkT7VvacClZuFjDvfikd8UuD17Fr5dHLT/VJHDtLeLlGr3iRWy5cqBHVdniz
-         LjabHO1NVTGiGCrgMmJpVvvoNmHkfj5aQz0W11NfAYafnTT84QYChbQIwsd+wZByb7TP
-         fkk0JZ08TD04YMf5gH0g2Iqewh3tT7kTCRwHDg+HZQ1l/i4DlBNtsw1rnEnVsJ0FZxbp
-         XMfQ==
-X-Gm-Message-State: AOJu0Yzl4a7Ub5aFkuI6YB/BJrQOaL3ro1lXsJFfjE7ioeSABFlLb4vm
-	C5QcLSIkSEt5cye4WbmgcB80kOPhCDPUZ+F5WA8mCgLRL12kL6+i1ECYvy0eeHs=
-X-Gm-Gg: ASbGncvdfyYcWI9FacxdHOQ5klOi6U9oIjKFmDBZzn6PdAwYxu8Wz7llVKVbvIswNCu
-	k8cRgh7dqRDE0AgE/PNKRccficVK6E+fD9wY8ptQRqWq6l/IxxaknYqYh2KSiTKYgc+23G6csJG
-	atkXVJFIJ+KVIzOUIOYiU9r5P2/yRbs3wnnzPRcr/u3uDfMRDoilhXo8CLsHHmMuSrlWYJYX7ZK
-	ZSD05BvKs2qU+9viyrdENHnkLnVK29BiivmS84SlC83yEo=
-X-Google-Smtp-Source: AGHT+IH1FLG78kLDcI08xTsYvucTGiTZynt+yZ3VkITuEG9P6/zBcgc/TiBADuCwXEDnvjNSsx0EwQ==
-X-Received: by 2002:a05:6602:1551:b0:844:debf:2c8f with SMTP id ca18e2360f4ac-8499e7d2f5dmr6473585939f.14.1736174369322;
-        Mon, 06 Jan 2025 06:39:29 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8498d7c8308sm879002839f.7.2025.01.06.06.39.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2025 06:39:28 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: josef@toxicpanda.com, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org, nbd@other.debian.org, 
- linux-kernel@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com, 
- yangerkun@huawei.com
-In-Reply-To: <20250103092859.3574648-1-yukuai1@huaweicloud.com>
-References: <20250103092859.3574648-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH] nbd: don't allow reconnect after disconnect
-Message-Id: <173617436792.57123.13624319333213614661.b4-ty@kernel.dk>
-Date: Mon, 06 Jan 2025 07:39:27 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JLi2So6Y"
+Message-ID: <6c63dd3a-378d-471f-8af0-725edc3785ed@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736174377;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1QBb1SxSbkhq0fjJPP/D8igQzmWEtDwWTFQrDDQ04OM=;
+	b=JLi2So6YMgc1dnvVKl8hkq5wxmbpmbt93tP9dW3JvqKloiWUhxBzIW4jWw3BIH4IdoUiuD
+	9wXf2ugoGGIVDR78uxu6XWy1ZOr8e/zHj8vPORYlyin6Oy6bcJETw/dBqjDwmgeLJYnrPl
+	dmUulL7tkr6kcGySvUEWJOd+D5/Ekcs=
+Date: Mon, 6 Jan 2025 15:39:34 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: [LSF/MM/BPF TOPIC] Improving Block Layer Tracepoints for
+ Next-Generation Backup Systems
+To: Christoph Hellwig <hch@infradead.org>, Vishnu ks <ksvishnu56@gmail.com>
+Cc: Song Liu <song@kernel.org>, lsf-pc@lists.linux-foundation.org,
+ linux-block@vger.kernel.org, bpf@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <CAJHDoJac2Qa6QjhDFi7YZf0D05=Svc13ZQyX=92KsM7pkkVbJA@mail.gmail.com>
+ <CAPhsuW7+ORExwn5fkRykEmEp-wm0YE788Tkd39rK5cZ-Q3dfUw@mail.gmail.com>
+ <CAJHDoJYESDzDf9KJgfSfGGit6JPyxtf3miNbnM7BzNfjOi7CQw@mail.gmail.com>
+ <Z3uIOPxr4s09qS1X@infradead.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <Z3uIOPxr4s09qS1X@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-14bd6
+X-Migadu-Flow: FLOW_OUT
 
-
-On Fri, 03 Jan 2025 17:28:59 +0800, Yu Kuai wrote:
-> Following process can cause nbd_config UAF:
+On 06.01.25 08:37, Christoph Hellwig wrote:
+> On Sat, Jan 04, 2025 at 11:22:40PM +0530, Vishnu ks wrote:
+>> 1. Uses eBPF to monitor block_rq_complete tracepoint to track modified sectors
 > 
-> 1) grab nbd_config temporarily;
+> You can't.  Drivers can and often do change the sector during submission
+> processing.
+
+If I get you correctly, you mean, the action that **drivers often change 
+the sector during submission processing** will generate a lot of 
+tracepoint events. Thus, this will make difference on the performance of 
+the whole system.
+
+If yes, can we only monitor fentry/fexit of some_important_key_function 
+to reduce the eBPF events? Thus this will not generate too many events 
+then make difference on the performance.
+
+Zhu Yanjun
+
 > 
-> 2) nbd_genl_disconnect() flush all recv_work() and release the
-> initial reference:
+>> 2. Captures sector numbers (not data) of changed blocks in real-time
+>> 3. Periodically syncs the actual data from these sectors based on
+>> configurable RPO
+>> 4. Layers these incremental changes on top of base snapshots
 > 
-> [...]
-
-Applied, thanks!
-
-[1/1] nbd: don't allow reconnect after disconnect
-      commit: 844b8cdc681612ff24df62cdefddeab5772fadf1
-
-Best regards,
--- 
-Jens Axboe
-
-
+> And all of that is broken.  If you are interested in this kind of
+> mechanism help upstreaming the blk-filter work, which has been
+> explicitly designed to support that.
+> 
+> Before that you should really undestand how block devices and
+> file systems work, as the rest of the mail suggested a very dangerous
+> misunderstanding of the basic principles.
 
