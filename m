@@ -1,30 +1,32 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FDE1E5702
-	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 10:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688D01E8847
+	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 10:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736245865; cv=none; b=c5TTIkfSv3L7voJWvVgGErcBTWBGpPgDhODbqTT4gJPPrK/cBB5ckLyiI91eb1BiDRnhx/pSpZKoTfWBiEE6LbELBKhQRAOUJr2nGxvJttjWv9Jde0c3WmYcLlYD1T7oepc3B1goYqzkAQW0h7OjpEZMN+4qiRDu77ehrpEo6vk=
+	t=1736245869; cv=none; b=ZNZMyB+v3Z8kMSuwg2PTUVKAr2JJ/5/+iInFYkdHSTT5S75gyzdHArzJ3TWL2GCFSna/ERcaW1gI9GUomSYTKBc0SzNjYDiIylfJ965lsrcmqe64YsqjbJ0D4nOmIdB369ZvgNVZmDdFLDXY8YfedTNCpOuwcdn6JuQIgi9TP+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736245865; c=relaxed/simple;
-	bh=ozV1WyixpM/ji61nxFeN2j3Li0jjPjHtHNdiUDT4q78=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Yc627tuNtGYlF1UMJ1r5jIZfqfl7PoXcLt1I9gqise/izhXrCWHOs0dT9VPcbKyjL7tPcEtmFS4DaO3I5uD+sgKWm6ym+Sv5tFF/T9CSOIa0TI8ndJdb3hkP8LZmKVpmCy+Y2eLHe+L/CmhU40MqfhQYuXwUq2NzJrLVnA8ErOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BaFUd94/; arc=none smtp.client-ip=91.218.175.172
+	s=arc-20240116; t=1736245869; c=relaxed/simple;
+	bh=BmsOyAK6sFY5bd1TMgzNx+wJVAuRK2Y62I+8s21jW74=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=L6MU2ZE2TOCfFlVLhXDDRYI69s9ui9xjy8x6+1CT398MulA10DOcEyhgyDyM1/2uoVk6ljWoIZIXH8jaZCRyK4JB9yzteEcnf0p3PC+48BfTiSd6dCsQx3vp0jMPidNGykMNaNmwKBEbFwsPGmIw9NAA0bPQJd5ALwqdVFsx5mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=W/dQrVVe; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BaFUd94/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="W/dQrVVe"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736245847;
+	t=1736245863;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=mV7we0kChanHQnwo+6cB63oe3mpIMNCFCCmvaNDYctw=;
-	b=BaFUd94/BWMA3CMNONgnYGyk+dFflcHfEZw4R2cEqZ7g7YzfaMmqPOVgYwy4tgP170jqLg
-	dHnGaOspH/MzRKUBpjsRdHNOJX2BEG6dhOCguCQa/ODhvHd0JW73A/lmZvQcL1UKDq6Phq
-	Y/KlKH6sIvPm4aex2cWIhxOj1v+DgtE=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fUKtV0V4M4Ct0Xe87xvFiPtfAJ7Jk8lSopNav9KsJCE=;
+	b=W/dQrVVeaa5UgNbBhAIGAPW0JuO5SBDHro6LAk3e+EaZOMRrfL3JQ/I4lHpfi7xy/iYCIl
+	KdWR2Q/4pbCXY5Fkanbh4vhaf1bN8T2pUFO43tDNevD2iCZ3X8BCv+Pyy64KwB+oghCs7A
+	K8DlA1+ZtTqBn1iDPq49KrQH5+8cmNo=
 From: Dongsheng Yang <dongsheng.yang@linux.dev>
 To: axboe@kernel.dk,
 	dan.j.williams@intel.com,
@@ -39,9 +41,11 @@ Cc: linux-block@vger.kernel.org,
 	linux-cxl@vger.kernel.org,
 	linux-bcache@vger.kernel.org,
 	Dongsheng Yang <dongsheng.yang@linux.dev>
-Subject: [PATCH v3 0/8] Introduce CBD (CXL Block Device)
-Date: Tue,  7 Jan 2025 10:30:16 +0000
-Message-Id: <20250107103024.326986-1-dongsheng.yang@linux.dev>
+Subject: [PATCH v3 3/8] cbd: introduce cbd_segment
+Date: Tue,  7 Jan 2025 10:30:19 +0000
+Message-Id: <20250107103024.326986-4-dongsheng.yang@linux.dev>
+In-Reply-To: <20250107103024.326986-1-dongsheng.yang@linux.dev>
+References: <20250107103024.326986-1-dongsheng.yang@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,399 +55,448 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Hi Jens,
-    Please help to take a look at this patchset. This is V3 for CBD (CXL Block Device).
-CBD supports both single-host and multi-host scenarios, and allows the use of pmem
-devices as block device cache, providing low latency and high-concurrency performance.
-    (1) Better latency:
-        1 iodepth, 1 numjobs, randwrite bs=4K: cbd 7.72us vs bcache
-25.30us, about 300% improvement
-    (2) Better iops:
-        1 iodepth, 32 numjobs, randwrite bs=4K: cbd 1,400K IOPS vs
-bcache 210K IOPS, about 600% improvement
-    (3) Better stdev:
-        1 iodepth, 1 numjobs, randwrite bs=4K: cbd stdev=36.45 vs bcache
-stdev=937.81, about 30 times improvement.
+The `cbd_segments` is an abstraction of the data area in transport. The
+data area in transport is divided into segments.
 
-V3 of the code can be found at: https://github.com/DataTravelGuide/linux.git tag cbd-v3
+The specific use of this area is determined by `cbd_seg_type`. For example,
+`cbd_blkdev` and `cbd_backend` data transfers need to access a segment of
+the type `cbds_type_channel`.
 
-Changelog from V2:
-	- Refactored the cbd_cache.c and cbd_internal.h files by splitting them into multiple files, making the structure clearer and increasing readability.
-	- Added CRC verification for all data and metadata. This means that if all CRC verification options are enabled in Kconfig, all information written to pmem, including data and metadata, will have CRC checks.
-	- Fixed some minor bugs discovered during long-term runs of xfstests.
-	- Added the cbd-utils (https://github.com/DataTravelGuide/cbd-utils) project to user-space tools, providing the cbdctrl command for cbd-related management operations.
-
-You can create a cbd using the following commands:
-
-	# cbdctrl tp-reg --path /dev/pmem0 --host node0 --format --force
-	# cbdctrl backend-start --path /dev/sda --start-dev --cache-size 1G
-	/dev/cbd0
-	# cbdctrl backend-list
-	[
-	    {
-		"backend_id": 0,
-		"host_id": 0,
-		"backend_path": "/dev/sda",
-		"alive": true,
-		"cache_segs": 64,
-		"cache_gc_percent": 70,
-		"cache_used_segs": 1,
-		"blkdevs": [
-		    {
-			"blkdev_id": 0,
-			"host_id": 0,
-			"backend_id": 0,
-			"dev_name": "/dev/cbd0",
-			"alive": true
-		    }
-		]
-	    }
-	]
-
-Additional information about CBD cache:
-
-    (1) What is CBD Cache
-  cbd cache is a *lightweight* solution that uses persistent memory as block
-device cache. It works similar with bcache, where bcache uses block
-devices as cache device, but cbd cache only supports persistent memory
-devices for caching. It accesses the cache device through DAX and
-is designed with features specifically for persistent memory scenarios,
-such as multi-cache tree structures and sync insertion of cached data.
-
-+-----------------------------------------------------------------+
-|                         single-host                             |
-+-----------------------------------------------------------------+
-|                                                                 |
-|                                                                 |
-|                                                                 |
-|                                                                 |
-|                                                                 |
-|                        +-----------+     +------------+         |
-|                        | /dev/cbd0 |     | /dev/cbd1  |         |
-|                        |           |     |            |         |
-|  +---------------------|-----------|-----|------------|-------+ |
-|  |                     |           |     |            |       | |
-|  |      /dev/pmem0     | cbd0 cache|     | cbd1 cache |       | |
-|  |                     |           |     |            |       | |
-|  +---------------------|-----------|-----|------------|-------+ |
-|                        |+---------+|     |+----------+|         |
-|                        ||/dev/sda ||     || /dev/sdb ||         |
-|                        |+---------+|     |+----------+|         |
-|                        +-----------+     +------------+         |
-+-----------------------------------------------------------------+
-
-Note: cbd cache is not intended to replace your bcache. Instead, it
-offers an alternative solution specifically suited for scenarios where
-you want to use persistent memory devices as block device cache.
-
-Another caching technique for accessing persistent memory using DAX is
-dm-writeback, but it is designed for scenarios based on device-mapper.
-On the other hand, cbd cache and bcache are caching solutions for block
-device scenarios. Therefore, I did not do a comparative analysis between
-cbd cache and dm-writeback.
-
-    (2) light software overhead cache write (low latency)
-
-For cache write, handling a write request typically involves the
-following steps: (1) Allocating cache space -> (2) Writing data to the
-cache -> (3) Recording cache index metadata -> (4) Returning the result.
-
-In cache modules using block devices as the cache (e.g., bcache), the
-steps of (2) writing data to the cache and (3) recording cache index
-metadata are asynchronous.
-
-During step (2), submit_bio is issued to the cache block device, and
-after the bi_end_io callback completes, a new process continues with
-step (3). This incurs significant overhead for persistent memory cache.
-
-However, cbd cache, which is designed for persistent memory, does not
-require asynchronous operations. It can directly proceed with steps (3)
-and (4) after completing the memcpy through DAX.
-
-This makes a significant difference for small IO. In the case of 4K
-random writes, cbd cache achieves a latency of only 7.72us (compared to
-25.30us for bcache in the same test, offering a 300% improvement).
-
-Further comparative results for various scenarios are shown in the table
-below.
-
-+------------+-------------------------+--------------------------+
-| numjobs=1  |         randwrite       |       randread           |
-| iodepth=1  +------------+------------+-------------+------------+
-| (latency)  |  cbd cache |  bcache    |  cbd cache  |  bcache    |
-+------------+------------+------------+-------------+------------+
-|  bs=512    |    6.10us  |    23.08us |      4.82us |     5.57us |
-+------------+------------+------------+-------------+------------+
-|  bs=1K     |    6.35us  |    21.68us |      5.38us |     6.05us |
-+------------+------------+------------+-------------+------------+
-|  bs=4K     |    7.72us  |    25.30us |      6.06us |     6.00us |
-+------------+------------+------------+-------------+------------+
-|  bs=8K     |    8.92us  |    27.73us |      7.24us |     7.35us |
-+------------+------------+------------+-------------+------------+
-|  bs=16K    |   12.25us  |    34.04us |      9.06us |     9.10us |
-+------------+------------+------------+-------------+------------+
-|  bs=32K    |   16.77us  |    49.24us |     14.10us |    16.18us |
-+------------+------------+------------+-------------+------------+
-|  bs=64K    |   30.52us  |    63.72us |     30.69us |    30.38us |
-+------------+------------+------------+-------------+------------+
-|  bs=128K   |   51.66us  |   114.69us |     38.47us |    39.10us |
-+------------+------------+------------+-------------+------------+
-|  bs=256K   |  110.16us  |   204.41us |     79.64us |    99.98us |
-+------------+------------+------------+-------------+------------+
-|  bs=512K   |  205.52us  |   398.70us |    122.15us |   131.97us |
-+------------+------------+------------+-------------+------------+
-|  bs=1M     |  493.57us  |   623.31us |    233.48us |   246.56us |
-+------------+------------+------------+-------------+------------+
-
-    (3) multi-queue and multi cache tree (high iops)
-
-For persistent memory, the hardware concurrency is very high. If an
-indexing tree is used to manage space indexing, the indexing will become
-a bottleneck for concurrency.
-
-cbd cache independently manages its own indexing tree for each backend.
-Meanwhile, the indexing tree for the cache corresponding to each backend
-is divided into multiple RB trees based on the logical address space.
-All IO operations will find the corresponding indexing tree based on
-their offset. This design increases concurrency while ensuring that the
-depth of the indexing tree does not become too large.
-
-From testing, in a scenario with 32 numjobs, cbd cache achieved nearly
-1,400K IOPS for 4K random write (under the same test scenario, the IOPS
-of bcache was around 210K, meaning CBD Cache provided an improvement of
-over 600%).
-
-More detailed comparison results are as follows:
-+------------+-------------------------+--------------------------+
-|  bs=4K     |         randwrite       |       randread           |
-| iodepth=1  +------------+------------+-------------+------------+
-|  (iops)    |  cbd cache |  bcache    |  cbd cache  |  bcache    |
-+------------+------------+------------+-------------+------------+
-|  numjobs=1 |    93652   |    38055   |    154101   |     142292 |
-+------------+------------+------------+-------------+------------+
-|  numjobs=2 |   205255   |    79322   |    317143   |     221957 |
-+------------+------------+------------+-------------+------------+
-|  numjobs=4 |   430588   |   124439   |    635760   |     513443 |
-+------------+------------+------------+-------------+------------+
-|  numjobs=8 |   852865   |   160980   |   1226714   |     505911 |
-+------------+------------+------------+-------------+------------+
-|  numjobs=16|  1140952   |   226094   |   2058178   |     996146 |
-+------------+------------+------------+-------------+------------+
-|  numjobs=32|  1418989   |   214447   |   2892710   |    1361308 |
-+------------+------------+------------+-------------+------------+
-    (4) better performance stablility (less stdev)
-
-CBD Cache, through a streamlined design, simplifies and makes the IO
-process more controllable, which allows for stable performance output.
-
-For example, in CBD Cache, the writeback does not need to walk through
-the indexing tree, meaning that the writeback process will not suffer
-from increased IO latency due to conflict in the indexing tree.
-
-From testing, under random write, CBD Cache achieves an average latency
-of 6.80us, with a max latency of 2794us and a latency standard deviation
-of 36.45 (under the same test, Bcache has an average latency of 24.28us,
-but a max latency of 474,622us and a standard deviation as high as
-937.81. This means that in terms of standard deviation, CBD Cache
-achieved approximately 30 times the improvement).
-
-Bcache:
-=================================================
-write: IOPS=39.1k, BW=153MiB/s (160MB/s)(5120MiB/33479msec); 0 zone
-resets
-    slat (usec): min=4, max=157364, avg=12.47, stdev=138.93
-    clat (nsec): min=1168, max=474615k, avg=11808.80, stdev=927287.74
-     lat (usec): min=11, max=474622, avg=24.28, stdev=937.81
-    clat percentiles (nsec):
-     |  1.00th=[   1256],  5.00th=[   1304], 10.00th=[   1320],
-     | 20.00th=[   1400], 30.00th=[   1448], 40.00th=[   1672],
-     | 50.00th=[   8640], 60.00th=[   9152], 70.00th=[   9664],
-     | 80.00th=[  10048], 90.00th=[  11328], 95.00th=[  19072],
-     | 99.00th=[  27776], 99.50th=[  36608], 99.90th=[ 173056],
-     | 99.95th=[ 856064], 99.99th=[2039808]
-   bw (  KiB/s): min=28032, max=214664, per=99.69%, avg=156122.03, stdev=51649.87, samples=66
-   iops        : min= 7008, max=53666, avg=39030.53, stdev=12912.50, samples=66
-  lat (usec)   : 2=41.55%, 4=4.59%, 10=32.70%, 20=16.37%, 50=4.45%
-  lat (usec)   : 100=0.10%, 250=0.17%, 500=0.02%, 750=0.01%, 1000=0.01%
-  lat (msec)   : 2=0.03%, 4=0.01%, 10=0.01%, 20=0.01%, 50=0.01%
-  lat (msec)   : 100=0.01%, 250=0.01%, 500=0.01%
-  cpu          : usr=11.93%, sys=38.61%, ctx=1311384, majf=0, minf=382
-  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
-     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     issued rwts: total=0,1310718,0,0 short=0,0,0,0 dropped=0,0,0,0
-     latency   : target=0, window=0, percentile=100.00%, depth=1
-
-Run status group 0 (all jobs):
-  WRITE: bw=153MiB/s (160MB/s), 153MiB/s-153MiB/s (160MB/s-160MB/s), io=5120MiB (5369MB), run=33479-33479msec
-
-Disk stats (read/write):
-    bcache0: ios=0/1305444, sectors=0/10443552, merge=0/0,
-ticks=0/21789, in_queue=21789, util=65.13%, aggrios=0/0, aggsectors=0/0,
-aggrmerge=0/0, aggrticks=0/0, aggrin_queue=0, aggrutil=0.00%
-  ram0: ios=0/0, sectors=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
-  pmem0: ios=0/0, sectors=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
-
-CBD cache:
-==============================================
-  write: IOPS=133k, BW=520MiB/s (545MB/s)(5120MiB/9848msec); 0 zone
-resets
-    slat (usec): min=3, max=2786, avg= 5.84, stdev=36.41
-    clat (nsec): min=852, max=132404, avg=959.09, stdev=436.60
-     lat (usec): min=4, max=2794, avg= 6.80, stdev=36.45
-    clat percentiles (nsec):
-     |  1.00th=[  884],  5.00th=[  900], 10.00th=[  908], 20.00th=[916],
-     | 30.00th=[  924], 40.00th=[  924], 50.00th=[  932], 60.00th=[940],
-     | 70.00th=[  948], 80.00th=[  964], 90.00th=[ 1004], 95.00th=[1064],
-     | 99.00th=[ 1192], 99.50th=[ 1432], 99.90th=[ 6688], 99.95th=[7712],
-     | 99.99th=[12480]
-   bw (  KiB/s): min=487088, max=552928, per=99.96%, avg=532154.95, stdev=18228.92, samples=19
-   iops        : min=121772, max=138232, avg=133038.84, stdev=4557.32, samples=19
-  lat (nsec)   : 1000=89.09%
-  lat (usec)   : 2=10.76%, 4=0.03%, 10=0.09%, 20=0.03%, 50=0.01%
-  lat (usec)   : 100=0.01%, 250=0.01%
-  cpu          : usr=23.93%, sys=76.03%, ctx=61, majf=0, minf=16
-  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
-     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     issued rwts: total=0,1310720,0,0 short=0,0,0,0 dropped=0,0,0,0
-     latency   : target=0, window=0, percentile=100.00%, depth=1
-
-Run status group 0 (all jobs):
-  WRITE: bw=520MiB/s (545MB/s), 520MiB/s-520MiB/s (545MB/s-545MB/s),
-io=5120MiB (5369MB), run=9848-9848msec
-
-Disk stats (read/write):
-  cbd0: ios=0/1280334, sectors=0/10242672, merge=0/0, ticks=0/0, in_queue=0, util=43.07%
-
-    (5) no need of formating for your existing disk
-
-As a lightweight block storage caching technology, cbd cache does not
-require storing metadata on backend disk. This allows users to easily
-add caching to existing disks without the need for any formatting
-operations and data migration. They can also easily stop using the cbd
-cache without complications, The backend disk can be used independently
-as a raw disk.
-
-    (6) backend device is crash-consistency
-
-The writeback mechanism of cbd cache strictly follows a log-structured
-approach when writeback data. Even if dirty cache data is overwritten by
-new data (e.g., the old data from 0-4K is A, and new data overwrites
-0-4K with B), the old data A is writeback first, followed by writeback
-the new data B to overwrite on the backend disk. This ensures that the
-backend disk maintains crash consistency. In the event of a failure of
-the pmem device, the data on the backend disk remains usable, though
-crash consistency is maintained while losing the data in the cache. This
-feature is particularly useful in cloud storage for disaster recovery
-scenarios.
-
-It is important to note that this approach may lead to cache space
-utilization issues if there are many overwrite operations. However,
-modern file systems, such as Btrfs and F2FS, take wear leveling of the
-disk into account, so they tend to avoid writing repeatedly to the same
-area. This means that there will not be a large number of overwrite
-writes for the disk. Additionally, modern databases, especially those
-using LSM engines, rarely perform overwrite operations.
-
-Additionally, there is an entry on the TODO list to provide a parameter
-backend_consistency=false to allow users to achieve better cache space
-utilization. That depends on how urgent the requirment is.
-
-    (7) cache space for each disk is configurable
-
-For each backend, when enabling caching, we can specify cache space size
-for this backend. This is different from bcache, where all backing
-devices can dynamically share the cache space within a single cache
-device. This improves cache utilization by achieving optimal utilization
-through time-sharing. However, this can lead to an issue where cache
-behavior becomes unpredictable. In enterprise applications, it's
-important to have a more precise understanding of the performance of
-each disk. When multiple disks dynamically share the cache, the exact
-amount of cache each disk receives becomes uncertain. cbd cache assigns
-a dedicated cache space for each disk, ensuring that the cache is
-exclusive and not affected by others, making the cache behavior more
-predictable.
-
-    (8) After all, all the performance test results mentioned
-above were executed using the `memmap=20G!4G` option to simulate the `/dev/pmem0` device.
-
-Additionally, the cbd code runs the cbd-tests daily, including the xfstests suite,
-it passes xfstests test suite. (cbd-tests: https://github.com/DataTravelGuide/cbd-tests)
-
-Thanx
-
-Dongsheng Yang (8):
-  cbd: introduce cbd_transport
-  cbd: introduce cbd_host
-  cbd: introduce cbd_segment
-  cbd: introduce cbd_channel
-  cbd: introduce cbd_blkdev
-  cbd: introduce cbd_backend
-  cbd: introduce cbd_cache
-  block: Init for CBD(CXL Block Device)
-
- MAINTAINERS                                   |    7 +
- drivers/block/Kconfig                         |    2 +
- drivers/block/Makefile                        |    2 +
- drivers/block/cbd/Kconfig                     |   89 ++
- drivers/block/cbd/Makefile                    |   14 +
- drivers/block/cbd/cbd_backend.c               |  730 ++++++++++
- drivers/block/cbd/cbd_backend.h               |  137 ++
- drivers/block/cbd/cbd_blkdev.c                |  551 ++++++++
- drivers/block/cbd/cbd_blkdev.h                |   92 ++
- drivers/block/cbd/cbd_cache/cbd_cache.c       |  489 +++++++
- drivers/block/cbd/cbd_cache/cbd_cache.h       |  157 +++
- drivers/block/cbd/cbd_cache/cbd_cache_gc.c    |  167 +++
- .../block/cbd/cbd_cache/cbd_cache_internal.h  |  536 ++++++++
- drivers/block/cbd/cbd_cache/cbd_cache_key.c   |  881 ++++++++++++
- drivers/block/cbd/cbd_cache/cbd_cache_req.c   |  921 +++++++++++++
- .../block/cbd/cbd_cache/cbd_cache_segment.c   |  268 ++++
- .../block/cbd/cbd_cache/cbd_cache_writeback.c |  197 +++
- drivers/block/cbd/cbd_channel.c               |  144 ++
- drivers/block/cbd/cbd_channel.h               |  429 ++++++
- drivers/block/cbd/cbd_handler.c               |  468 +++++++
- drivers/block/cbd/cbd_handler.h               |   66 +
- drivers/block/cbd/cbd_host.c                  |  227 ++++
- drivers/block/cbd/cbd_host.h                  |   67 +
- drivers/block/cbd/cbd_internal.h              |  482 +++++++
- drivers/block/cbd/cbd_main.c                  |  230 ++++
- drivers/block/cbd/cbd_queue.c                 |  516 +++++++
- drivers/block/cbd/cbd_queue.h                 |  288 ++++
- drivers/block/cbd/cbd_segment.c               |  311 +++++
- drivers/block/cbd/cbd_segment.h               |  104 ++
- drivers/block/cbd/cbd_transport.c             | 1186 +++++++++++++++++
- drivers/block/cbd/cbd_transport.h             |  169 +++
- 31 files changed, 9927 insertions(+)
- create mode 100644 drivers/block/cbd/Kconfig
- create mode 100644 drivers/block/cbd/Makefile
- create mode 100644 drivers/block/cbd/cbd_backend.c
- create mode 100644 drivers/block/cbd/cbd_backend.h
- create mode 100644 drivers/block/cbd/cbd_blkdev.c
- create mode 100644 drivers/block/cbd/cbd_blkdev.h
- create mode 100644 drivers/block/cbd/cbd_cache/cbd_cache.c
- create mode 100644 drivers/block/cbd/cbd_cache/cbd_cache.h
- create mode 100644 drivers/block/cbd/cbd_cache/cbd_cache_gc.c
- create mode 100644 drivers/block/cbd/cbd_cache/cbd_cache_internal.h
- create mode 100644 drivers/block/cbd/cbd_cache/cbd_cache_key.c
- create mode 100644 drivers/block/cbd/cbd_cache/cbd_cache_req.c
- create mode 100644 drivers/block/cbd/cbd_cache/cbd_cache_segment.c
- create mode 100644 drivers/block/cbd/cbd_cache/cbd_cache_writeback.c
- create mode 100644 drivers/block/cbd/cbd_channel.c
- create mode 100644 drivers/block/cbd/cbd_channel.h
- create mode 100644 drivers/block/cbd/cbd_handler.c
- create mode 100644 drivers/block/cbd/cbd_handler.h
- create mode 100644 drivers/block/cbd/cbd_host.c
- create mode 100644 drivers/block/cbd/cbd_host.h
- create mode 100644 drivers/block/cbd/cbd_internal.h
- create mode 100644 drivers/block/cbd/cbd_main.c
- create mode 100644 drivers/block/cbd/cbd_queue.c
- create mode 100644 drivers/block/cbd/cbd_queue.h
+Signed-off-by: Dongsheng Yang <dongsheng.yang@linux.dev>
+---
+ drivers/block/cbd/cbd_segment.c | 311 ++++++++++++++++++++++++++++++++
+ drivers/block/cbd/cbd_segment.h | 104 +++++++++++
+ 2 files changed, 415 insertions(+)
  create mode 100644 drivers/block/cbd/cbd_segment.c
  create mode 100644 drivers/block/cbd/cbd_segment.h
- create mode 100644 drivers/block/cbd/cbd_transport.c
- create mode 100644 drivers/block/cbd/cbd_transport.h
 
+diff --git a/drivers/block/cbd/cbd_segment.c b/drivers/block/cbd/cbd_segment.c
+new file mode 100644
+index 000000000000..fc1c4701d343
+--- /dev/null
++++ b/drivers/block/cbd/cbd_segment.c
+@@ -0,0 +1,311 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++#include <linux/dax.h>
++
++#include "cbd_internal.h"
++#include "cbd_transport.h"
++#include "cbd_segment.h"
++
++static ssize_t type_show(struct device *dev,
++			 struct device_attribute *attr,
++			 char *buf)
++{
++	struct cbd_segment_device *segment_dev;
++	struct cbd_segment_info *segment_info;
++
++	segment_dev = container_of(dev, struct cbd_segment_device, dev);
++	segment_info = cbdt_segment_info_read(segment_dev->cbdt, segment_dev->id);
++	if (!segment_info)
++		return 0;
++
++	if (segment_info->state == CBD_SEGMENT_STATE_NONE)
++		return 0;
++
++	return sprintf(buf, "%s\n", cbds_type_str(segment_info->type));
++}
++
++static DEVICE_ATTR_ADMIN_RO(type);
++
++static struct attribute *cbd_segment_attrs[] = {
++	&dev_attr_type.attr,
++	NULL
++};
++
++static struct attribute_group cbd_segment_attr_group = {
++	.attrs = cbd_segment_attrs,
++};
++
++static const struct attribute_group *cbd_segment_attr_groups[] = {
++	&cbd_segment_attr_group,
++	NULL
++};
++
++static void cbd_segment_release(struct device *dev)
++{
++}
++
++const struct device_type cbd_segment_type = {
++	.name       = "cbd_segment",
++	.groups     = cbd_segment_attr_groups,
++	.release    = cbd_segment_release,
++};
++
++const struct device_type cbd_segments_type = {
++	.name       = "cbd_segments",
++	.release    = cbd_segment_release,
++};
++
++void cbd_segment_init(struct cbd_transport *cbdt, struct cbd_segment *segment,
++		      struct cbds_init_options *options)
++{
++	segment->cbdt = cbdt;
++	segment->seg_id = options->seg_id;
++	segment->seg_ops = options->seg_ops;
++	segment->data_size = CBDT_SEG_SIZE - options->data_off;
++
++	segment->data = cbd_segment_addr(segment) + options->data_off;
++}
++
++void cbd_segment_clear(struct cbd_transport *cbdt, u32 seg_id)
++{
++	struct cbd_segment_info *segment_info;
++
++	segment_info = cbdt_get_segment_info(cbdt, seg_id);
++	cbdt_zero_range(cbdt, segment_info, CBDT_SEG_SIZE);
++}
++
++void cbd_segment_info_clear(struct cbd_segment *segment)
++{
++	cbdt_segment_info_clear(segment->cbdt, segment->seg_id);
++}
++
++void cbds_copy_data(struct cbd_seg_pos *dst_pos,
++		struct cbd_seg_pos *src_pos, u32 len)
++{
++	u32 copied = 0;
++	u32 to_copy;
++
++	while (copied < len) {
++		if (dst_pos->off >= dst_pos->segment->data_size)
++			dst_pos->segment->seg_ops->sanitize_pos(dst_pos);
++		if (src_pos->off >= src_pos->segment->data_size)
++			src_pos->segment->seg_ops->sanitize_pos(src_pos);
++
++		to_copy = len - copied;
++
++		if (to_copy > dst_pos->segment->data_size - dst_pos->off)
++			to_copy = dst_pos->segment->data_size - dst_pos->off;
++		if (to_copy > src_pos->segment->data_size - src_pos->off)
++			to_copy = src_pos->segment->data_size - src_pos->off;
++
++		memcpy_flushcache(dst_pos->segment->data + dst_pos->off, src_pos->segment->data + src_pos->off, to_copy);
++
++		copied += to_copy;
++		cbds_pos_advance(dst_pos, to_copy);
++		cbds_pos_advance(src_pos, to_copy);
++	}
++}
++
++int cbds_copy_to_bio(struct cbd_segment *segment,
++		u32 data_off, u32 data_len, struct bio *bio, u32 bio_off)
++{
++	struct bio_vec bv;
++	struct bvec_iter iter;
++	void *dst;
++	u32 to_copy, page_off = 0;
++	struct cbd_seg_pos pos = { .segment = segment,
++				   .off = data_off };
++next:
++	bio_for_each_segment(bv, bio, iter) {
++		if (bio_off > bv.bv_len) {
++			bio_off -= bv.bv_len;
++			continue;
++		}
++		page_off = bv.bv_offset;
++		page_off += bio_off;
++		bio_off = 0;
++
++		dst = kmap_local_page(bv.bv_page);
++again:
++		if (pos.off >= pos.segment->data_size)
++			segment->seg_ops->sanitize_pos(&pos);
++		segment = pos.segment;
++
++		to_copy = min(bv.bv_offset + bv.bv_len - page_off,
++				segment->data_size - pos.off);
++		if (to_copy > data_len)
++			to_copy = data_len;
++
++		flush_dcache_page(bv.bv_page);
++		memcpy(dst + page_off, segment->data + pos.off, to_copy);
++
++		/* advance */
++		pos.off += to_copy;
++		page_off += to_copy;
++		data_len -= to_copy;
++		if (!data_len) {
++			kunmap_local(dst);
++			return 0;
++		}
++
++		/* more data in this bv page */
++		if (page_off < bv.bv_offset + bv.bv_len)
++			goto again;
++		kunmap_local(dst);
++	}
++
++	if (bio->bi_next) {
++		bio = bio->bi_next;
++		goto next;
++	}
++
++	return 0;
++}
++
++void cbds_copy_from_bio(struct cbd_segment *segment,
++		u32 data_off, u32 data_len, struct bio *bio, u32 bio_off)
++{
++	struct bio_vec bv;
++	struct bvec_iter iter;
++	void *src;
++	u32 to_copy, page_off = 0;
++	struct cbd_seg_pos pos = { .segment = segment,
++				   .off = data_off };
++next:
++	bio_for_each_segment(bv, bio, iter) {
++		if (bio_off > bv.bv_len) {
++			bio_off -= bv.bv_len;
++			continue;
++		}
++		page_off = bv.bv_offset;
++		page_off += bio_off;
++		bio_off = 0;
++
++		src = kmap_local_page(bv.bv_page);
++again:
++		if (pos.off >= pos.segment->data_size)
++			segment->seg_ops->sanitize_pos(&pos);
++		segment = pos.segment;
++
++		to_copy = min(bv.bv_offset + bv.bv_len - page_off,
++				segment->data_size - pos.off);
++		if (to_copy > data_len)
++			to_copy = data_len;
++
++		memcpy_flushcache(segment->data + pos.off, src + page_off, to_copy);
++		flush_dcache_page(bv.bv_page);
++
++		/* advance */
++		pos.off += to_copy;
++		page_off += to_copy;
++		data_len -= to_copy;
++		if (!data_len) {
++			kunmap_local(src);
++			return;
++		}
++
++		/* more data in this bv page */
++		if (page_off < bv.bv_offset + bv.bv_len)
++			goto again;
++		kunmap_local(src);
++	}
++
++	if (bio->bi_next) {
++		bio = bio->bi_next;
++		goto next;
++	}
++}
++
++u32 cbd_seg_crc(struct cbd_segment *segment, u32 data_off, u32 data_len)
++{
++	u32 crc = 0;
++	u32 crc_size;
++	struct cbd_seg_pos pos = { .segment = segment,
++				   .off = data_off };
++
++	while (data_len) {
++		if (pos.off >= pos.segment->data_size)
++			segment->seg_ops->sanitize_pos(&pos);
++		segment = pos.segment;
++
++		crc_size = min(segment->data_size - pos.off, data_len);
++
++		crc = crc32(crc, segment->data + pos.off, crc_size);
++
++		data_len -= crc_size;
++		pos.off += crc_size;
++	}
++
++	return crc;
++}
++
++int cbds_map_pages(struct cbd_segment *segment,
++		   struct bio *bio,
++		   u32 off, u32 size)
++{
++	struct cbd_transport *cbdt = segment->cbdt;
++	u32 done = 0;
++	struct page *page;
++	u32 page_off;
++	int ret = 0;
++	int id;
++
++	id = dax_read_lock();
++	while (size) {
++		unsigned int len = min_t(size_t, PAGE_SIZE, size);
++		struct cbd_seg_pos pos = { .segment = segment,
++					   .off = off + done };
++
++		if (pos.off >= pos.segment->data_size)
++			segment->seg_ops->sanitize_pos(&pos);
++		segment = pos.segment;
++
++		u64 transport_off = segment->data -
++					(void *)cbdt->transport_info_addr + pos.off;
++
++		page = cbdt_page(cbdt, transport_off, &page_off);
++
++		ret = bio_add_page(bio, page, len, 0);
++		if (unlikely(ret != len)) {
++			cbd_segment_err(segment, "failed to add page\n");
++			goto out;
++		}
++
++		done += len;
++		size -= len;
++	}
++
++	ret = 0;
++out:
++	dax_read_unlock(id);
++	return ret;
++}
++
++int cbds_pos_advance(struct cbd_seg_pos *seg_pos, u32 len)
++{
++	u32 to_advance;
++
++	while (len) {
++		to_advance = len;
++
++		if (seg_pos->off >= seg_pos->segment->data_size)
++			seg_pos->segment->seg_ops->sanitize_pos(seg_pos);
++
++		if (to_advance > seg_pos->segment->data_size - seg_pos->off)
++			to_advance = seg_pos->segment->data_size - seg_pos->off;
++
++		seg_pos->off += to_advance;
++
++		len -= to_advance;
++	}
++
++	return 0;
++}
++
++void *cbd_segment_addr(struct cbd_segment *segment)
++{
++	struct cbd_segment_info *seg_info;
++
++	seg_info = cbdt_get_segment_info(segment->cbdt, segment->seg_id);
++
++	return (void *)seg_info;
++}
+diff --git a/drivers/block/cbd/cbd_segment.h b/drivers/block/cbd/cbd_segment.h
+new file mode 100644
+index 000000000000..99fccb8c49ba
+--- /dev/null
++++ b/drivers/block/cbd/cbd_segment.h
+@@ -0,0 +1,104 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#ifndef _CBD_SEGMENT_H
++#define _CBD_SEGMENT_H
++
++#include <linux/bio.h>
++
++#include "cbd_internal.h"
++
++#define cbd_segment_err(segment, fmt, ...)					\
++	cbdt_err(segment->cbdt, "segment%d: " fmt,				\
++		 segment->seg_id, ##__VA_ARGS__)
++#define cbd_segment_info(segment, fmt, ...)					\
++	cbdt_info(segment->cbdt, "segment%d: " fmt,				\
++		 segment->seg_id, ##__VA_ARGS__)
++#define cbd_segment_debug(segment, fmt, ...)					\
++	cbdt_debug(segment->cbdt, "segment%d: " fmt,				\
++		 segment->seg_id, ##__VA_ARGS__)
++
++
++CBD_DEVICE(segment);
++
++#define CBD_SEGMENT_STATE_NONE		0
++#define CBD_SEGMENT_STATE_RUNNING	1
++
++#define CBDS_TYPE_NONE			0
++#define CBDS_TYPE_CHANNEL		1
++#define CBDS_TYPE_CACHE			2
++
++static inline const char *cbds_type_str(u8 type)
++{
++	if (type == CBDS_TYPE_CHANNEL)
++		return "channel";
++	else if (type == CBDS_TYPE_CACHE)
++		return "cache";
++
++	return "Unknown";
++}
++
++struct cbd_segment_info {
++	struct cbd_meta_header	meta_header;	/* Metadata header for the segment */
++	u8			type;
++	u8			state;
++	u16			flags;
++	u32			next_seg;
++	u32			backend_id;
++};
++
++#define CBD_SEG_INFO_FLAGS_HAS_NEXT	(1 << 0)
++
++static inline bool cbd_segment_info_has_next(struct cbd_segment_info *seg_info)
++{
++	return (seg_info->flags & CBD_SEG_INFO_FLAGS_HAS_NEXT);
++}
++
++struct cbd_seg_pos {
++	struct cbd_segment	*segment;	/* Segment associated with the position */
++	u32			off;		/* Offset within the segment */
++};
++
++struct cbd_seg_ops {
++	void (*sanitize_pos)(struct cbd_seg_pos *pos);
++};
++
++struct cbds_init_options {
++	u8			type;
++	u8			state;
++	u32			seg_id;
++	u32			data_off;
++	struct cbd_seg_ops	*seg_ops;
++};
++
++struct cbd_segment {
++	struct cbd_transport	*cbdt;
++	struct cbd_seg_ops	*seg_ops;
++	u32			seg_id;
++
++	void			*data;
++	u32			data_size;
++};
++
++void cbd_segment_info_clear(struct cbd_segment *segment);
++void cbd_segment_clear(struct cbd_transport *cbdt, u32 segment_id);
++void cbd_segment_init(struct cbd_transport *cbdt, struct cbd_segment *segment,
++		      struct cbds_init_options *options);
++int cbds_copy_to_bio(struct cbd_segment *segment,
++		      u32 data_off, u32 data_len, struct bio *bio, u32 bio_off);
++void cbds_copy_from_bio(struct cbd_segment *segment,
++			u32 data_off, u32 data_len, struct bio *bio, u32 bio_off);
++u32 cbd_seg_crc(struct cbd_segment *segment, u32 data_off, u32 data_len);
++int cbds_map_pages(struct cbd_segment *segment,
++		   struct bio *bio,
++		   u32 off, u32 size);
++int cbds_pos_advance(struct cbd_seg_pos *seg_pos, u32 len);
++void cbds_copy_data(struct cbd_seg_pos *dst_pos,
++		    struct cbd_seg_pos *src_pos, u32 len);
++void *cbd_segment_addr(struct cbd_segment *segment);
++
++#define cbd_for_each_segment_info(cbdt, i, segment_info)			\
++	for (i = 0;								\
++	     i < cbdt->transport_info.segment_num &&				\
++	     (segment_info = cbdt_segment_info_read(cbdt, i));			\
++	     i++)
++
++#endif /* _CBD_SEGMENT_H */
 -- 
 2.34.1
 
