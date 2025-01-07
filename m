@@ -1,61 +1,61 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96611F0E38;
-	Tue,  7 Jan 2025 12:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933631EE7B4;
+	Tue,  7 Jan 2025 12:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736251782; cv=none; b=oXnkkWaO0EATK7vjhNIfxpUCPGxmtE2ccIMy/DQ4QZ9eAuQ4QhcEXkbWugc8kgWckmavsUdSqxJ6TCHwsy3rAA8hh44L3La/8dHmcCi6cNgiPFPpDb+5x3ddwmuJTe4TUhJkRlxCIM9e3PZ+brfr4g4EFoi102R3DOIVlvvVzOU=
+	t=1736251792; cv=none; b=ZGSXuQqILfRBYVKf7JEpl8lmwYdLGAbboME+PFVK1KNMA49/KA07wOFHK3OJZPQpguO1IbbW9lp4+pPFXjuzk2tX2R275hkdlkPoyKSbrL6nwvJ6XS7ubinC9qsMj0YIug/OCvaFA90PD0Wt79kepTflUkNElbC6e8xmwDMLZCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736251782; c=relaxed/simple;
-	bh=RA3agkgGPoh3lll3WbU1VW0805xDHkJnUwLXxAsotgw=;
+	s=arc-20240116; t=1736251792; c=relaxed/simple;
+	bh=f5L3NOtDgrIxKxz+MIuEtL6HHvK1MQWt487MDa2bWI8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cwlVUz11WhlzFjXl8sEKVs6PweujnKKs7tgU5vAG8KOWyzb9MweJFM1DHf5eko8GJg2gJK8PlxiD1S+BaQ/Rd5c3uFBW3mCXSSr6YQm9Extpd1O04YmMwBRNeUTqHZ3vgMhRg6cKlK8ora6h7/8H+kySrj1DQLamuHzx2v2K0Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P2hsUFGZ; arc=none smtp.client-ip=209.85.214.179
+	 MIME-Version; b=o9Pt17trSgt+gTZdZxvBfE1iCSjW9eznuaGhs7NLtWceJNpaS5sxsl2LHFdRGiCrG5JHc4CVIdyD8ozBqb6u7e5N/BbkmQwLRZ6PiC2Zo10jPEhInlMkiXKCxSA+2+ezMwTuEdxm2UqL/3qCZ+81IWmBzp8cOzbZD5dTYp6Y2o8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mc/8B4EL; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P2hsUFGZ"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21669fd5c7cso228823805ad.3;
-        Tue, 07 Jan 2025 04:08:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mc/8B4EL"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21636268e43so45719895ad.2;
+        Tue, 07 Jan 2025 04:09:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736251722; x=1736856522; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736251738; x=1736856538; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3G38mp2BMfe/0ANq/zJ1yKW8K0dgj9kh1DASCV+yEbE=;
-        b=P2hsUFGZSNz3dAciWLz9svBy6DYas8hGLVQ6HcKM5PujCZaGu84v6uk78opVv1UPoo
-         rpgcGRcRQQtQ4qyzBgx90+UUO5ET4rD146nf/OGBslKpdOrG+v8ZX/4syagKOkQxjwQM
-         2oKNlJTaVleFJt26djlqNu9CPQO1J/GM3ZVVsFhiEzacCEdmyMesuDN44JlxqSuFRjI5
-         FvrHtoaKcbwvN1m1pwyT/YKDYzSc4VncGouGRs0oK18BmL96nO3tLqseYvyD8TlE3koM
-         Sz/1lT9w3U6SW3lF5rBU2orUXwKt+ZfuenKrsMnDtnbqPwErbmbXmYCgUE/kuU7sYhOt
-         27VQ==
+        bh=3BuNFZWGqYgSgLMfecofkQzEbOmOZM/5htkp9yJ0Ubs=;
+        b=mc/8B4ELowCq+NBsdTQwy1ysL3c0Zg6F1FIQj2dpXw3+jzD7cvU+w1F0W27mDKRA+2
+         DJq5X5mUid0fVVLiCuiH3YNUC2k+1zi5QHgZ/zFTpC/t2+M/LOywbKc9PmcnFIJgJbT2
+         BfNilZCZAlM6tzpq1/vGtl3XOVD31TWK86Wd2JMCGmFub7E0NdCetkYo/dN49QAThbvn
+         VTJuUkd10RySjn0xjKqApSwuqwCI40rS9GW0s/mUkQy5iHtSCuAJNAFQywTHZi7KFTEB
+         C+ARXRHOgdMO8o+neiqGFqnPAvKcp5WxGp23HVkIee6mKd8XnetL6H10Pof33STcH9AH
+         CS1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736251722; x=1736856522;
+        d=1e100.net; s=20230601; t=1736251738; x=1736856538;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3G38mp2BMfe/0ANq/zJ1yKW8K0dgj9kh1DASCV+yEbE=;
-        b=OTkobXi1LAc/psstd+CphLowhxhSqATFr8AG3vHVtz0RPgg0oKnT+DjJX9VrnAflSy
-         0/DE/J8yHXHqoypzOBDS4grdnB2riNHr1SueHm9Z2OHYeWPSHfzFiqBoSS9vsIjUHNzF
-         JHKo0yN7kk6/z047W7PhZ5dNBWXrnbfyPerDR0xyRtQb5QwiETO7BXUm7X2YEa5AqBNs
-         FeI+JG7OmDrghr5na+jrUYCUVcAQSdV47sEFnBDntM6ZaUx2sBVwPX+/DZ1PdcoE7QSr
-         X58zGmBatUCkSNvigxv6QlHGhDpF1VV8yzRmFakTA/CTlUgfYod6ZaO3+wdG4JuFDTeo
-         MRgg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2SgWam3Cj1hIrgeml4gjFXzYCuW6vbI/dkh+9yxSulQ6W1eZWaM3xLJd/ccBXB0++FCorc9TCsvs5/A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvKIMWhaASwXN0n0AMJQd4B06MFcwD+i41SlAKfhogDWVWf6K/
-	Q8LaV/nLb+7e396zqnRx3CHxqGg9/jd2ZBWr8HakJwEbELyfcsIv
-X-Gm-Gg: ASbGncuXZ0+XCs7OFl/XSBBgIvk1Es9CIYKy2zaQbZUduHSacP5qYYlXA/MGyA44cBc
-	PP7VkWbEleVkaSgG921xJ0FsUwP9Edm7hInw0hkQLMLRD9aCr15IqXgZUAueALXZumanJ3ZhzMl
-	c/pN95Q/F+XL3dC2yWKGu2U7oyYBWpGMd9pStyoZBz+KCqG+f0twmI8YfE6ae5J5zvmRZYk2s1t
-	r+u2KhkodnyNSnGJbALyKx9TQfY7DePrTj4CEL5WJB0/WO1FhUy0Ziw2PYsSeSqMnWf
-X-Google-Smtp-Source: AGHT+IH+93tib9I3CsDT9s05atKapyruR2G4c7itWJkFbpoz+llX05XKNRiFeZJKnIGE8qw8pVE66g==
-X-Received: by 2002:a05:6a21:3985:b0:1e1:9662:a6f2 with SMTP id adf61e73a8af0-1e5e07f973dmr108038894637.35.1736251722083;
-        Tue, 07 Jan 2025 04:08:42 -0800 (PST)
+        bh=3BuNFZWGqYgSgLMfecofkQzEbOmOZM/5htkp9yJ0Ubs=;
+        b=TS0rTCitAfwMCswxxOlBZrVbkvYM9jckxoiMrnDtQoZmJ+W2Gmge7ETnJLhuapyfgi
+         pzDoyeW2CDeV3v766i1ah2Fba8lTKPsIjEEGs5WG8tD0+S8ze5gBDwU+fMxetkYU5w2V
+         o/fm75goyiZb/BX8Q+Scq+c1w7ps73Qh2MRObmjH08lE5JnhabVuBlSmwSjl7HIVByaA
+         pvkHYvfcm+CqZt4lGZ5LyawT/VkhjoM+GivKmk/ipCqgi+uF1Kx0MCYJYlQUcHXyK+a5
+         xmFvpDFcH7U/Ibx8qwpr1ob7WBiiwZsRxdGTToDC9i5PMnfoYC54pqlj35eiqnGF+1cY
+         CUdA==
+X-Forwarded-Encrypted: i=1; AJvYcCX50qiIkWN8WzhCRaIknJXyRP1YKhOH7gdyzkWiy+B63wtaAdbmmPddISEOvF/CO292XulUqSm/Z9iJjQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNUFXoflpv/tkl09VoxQjaIsQbmf7/x0JiHGmDMhr7+B8aZhde
+	555YMxXPlkE1/hrIycU+0erchJOkdp5ZxNAQVyZEfWiG3lSTmpHI
+X-Gm-Gg: ASbGnctNkmCAiMCGO15MXPHbNaylPQdlwL9P4VyTRvUzYdhZwsuM3WhW50OgW9SXOkj
+	1gNvPOvFY8Df87oG4ZluA8PSJwDTzJdZ8NaDvCq9EKv+VcvSa8NoMf9VBhfL0++Q4hhRC1FHoq+
+	iR58j+T0imDfEo855yox5nECnghxHjjhVMktTcjBp6BMekab9sC/evFbJ8uoYouWnLfN5cxmrgA
+	xqyOX7NkK3GFJ8ny5iZtzZ4MoGTUWR95jefY0uTnQN2be2pZXAwlV5Vj6zf+2NbActF
+X-Google-Smtp-Source: AGHT+IGENnGhBxrC+8M9hZHMO9JRu9R3U8nGFcolu2U0Lqgy068q45LLaSI4e7pHEXjT8WUH7Mdzsw==
+X-Received: by 2002:a05:6a21:6d86:b0:1e0:ae58:2945 with SMTP id adf61e73a8af0-1e5e081179bmr115955173637.31.1736251738479;
+        Tue, 07 Jan 2025 04:08:58 -0800 (PST)
 Received: from fedora.redhat.com ([2001:250:3c1e:503:ffff:ffff:ffea:4903])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-72aad835b8dsm34245118b3a.63.2025.01.07.04.08.39
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-72aad835b8dsm34245118b3a.63.2025.01.07.04.08.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 04:08:41 -0800 (PST)
+        Tue, 07 Jan 2025 04:08:57 -0800 (PST)
 From: Ming Lei <tom.leiming@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -64,9 +64,9 @@ Cc: bpf@vger.kernel.org,
 	Martin KaFai Lau <martin.lau@linux.dev>,
 	Yonghong Song <yonghong.song@linux.dev>,
 	Ming Lei <tom.leiming@gmail.com>
-Subject: [RFC PATCH 15/22] ublk: bpf: add bpf aio kfunc
-Date: Tue,  7 Jan 2025 20:04:06 +0800
-Message-ID: <20250107120417.1237392-16-tom.leiming@gmail.com>
+Subject: [RFC PATCH 20/22] selftests: add tests for ublk bpf aio
+Date: Tue,  7 Jan 2025 20:04:11 +0800
+Message-ID: <20250107120417.1237392-21-tom.leiming@gmail.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20250107120417.1237392-1-tom.leiming@gmail.com>
 References: <20250107120417.1237392-1-tom.leiming@gmail.com>
@@ -78,453 +78,587 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Define bpf aio kfunc for bpf prog to submit AIO, so far it begins with
-filesystem IO only, and in the future, it may be extended for network IO.
-
-Only bvec buffer is covered for doing FS IO over this buffer, but it
-is easy to cover UBUF because we have the great iov iter.
-
-With bpf aio, not only user-kernel context switch is avoided, but also
-user-kernel buffer copy is saved. It is very similar with loop's direct
-IO implementation.
-
-These kfuncs can be used for other subsystems, and should have belong to
-lib/, but let's start from ublk first. When it becomes mature or gets more
-use cases, it can be moved to /lib.
-
-Define bpf struct_ops of bpf_aio_complete_ops which needs to be implemented
-by the caller for completing bpf aio via bpf prog, which will be done in the
-following patches.
+Create ublk loop target which uses bpf aio to submit & complete FS
+IO, then run write & read & verify on the ublk loop disk for making
+sure ublk bpf aio works as expected.
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- drivers/block/ublk/Makefile  |   2 +-
- drivers/block/ublk/bpf.c     |  40 +++++-
- drivers/block/ublk/bpf.h     |   1 +
- drivers/block/ublk/bpf_aio.c | 251 +++++++++++++++++++++++++++++++++++
- drivers/block/ublk/bpf_aio.h |  66 +++++++++
- 5 files changed, 358 insertions(+), 2 deletions(-)
- create mode 100644 drivers/block/ublk/bpf_aio.c
- create mode 100644 drivers/block/ublk/bpf_aio.h
+ tools/testing/selftests/ublk/Makefile         |   3 +
+ .../selftests/ublk/progs/ublk_bpf_kfunc.h     |  11 ++
+ .../testing/selftests/ublk/progs/ublk_loop.c  | 166 ++++++++++++++++++
+ tools/testing/selftests/ublk/test_common.sh   |  47 +++++
+ tools/testing/selftests/ublk/test_loop_01.sh  |  33 ++++
+ tools/testing/selftests/ublk/test_loop_02.sh  |  24 +++
+ tools/testing/selftests/ublk/ublk_bpf.c       | 141 ++++++++++++++-
+ 7 files changed, 419 insertions(+), 6 deletions(-)
+ create mode 100644 tools/testing/selftests/ublk/progs/ublk_loop.c
+ create mode 100755 tools/testing/selftests/ublk/test_loop_01.sh
+ create mode 100755 tools/testing/selftests/ublk/test_loop_02.sh
 
-diff --git a/drivers/block/ublk/Makefile b/drivers/block/ublk/Makefile
-index f843a9005cdb..7094607c040d 100644
---- a/drivers/block/ublk/Makefile
-+++ b/drivers/block/ublk/Makefile
-@@ -5,6 +5,6 @@ ccflags-y			+= -I$(src)
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index 38903f05d99d..2540ae7a75a3 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -24,6 +24,9 @@ TEST_PROGS += test_null_02.sh
+ TEST_PROGS += test_null_03.sh
+ TEST_PROGS += test_null_04.sh
  
- ublk_drv-$(CONFIG_BLK_DEV_UBLK)	:= main.o
- ifeq ($(CONFIG_UBLK_BPF), y)
--ublk_drv-$(CONFIG_BLK_DEV_UBLK)	+= bpf_ops.o bpf.o
-+ublk_drv-$(CONFIG_BLK_DEV_UBLK)	+= bpf_ops.o bpf.o bpf_aio.o
- endif
- obj-$(CONFIG_BLK_DEV_UBLK)	+= ublk_drv.o
-diff --git a/drivers/block/ublk/bpf.c b/drivers/block/ublk/bpf.c
-index ef1546a7ccda..d5880d61abe5 100644
---- a/drivers/block/ublk/bpf.c
-+++ b/drivers/block/ublk/bpf.c
-@@ -155,8 +155,23 @@ BTF_ID_FLAGS(func, ublk_bpf_get_iod, KF_TRUSTED_ARGS | KF_RET_NULL)
- BTF_ID_FLAGS(func, ublk_bpf_get_io_tag, KF_TRUSTED_ARGS)
- BTF_ID_FLAGS(func, ublk_bpf_get_queue_id, KF_TRUSTED_ARGS)
- BTF_ID_FLAGS(func, ublk_bpf_get_dev_id, KF_TRUSTED_ARGS)
++TEST_PROGS += test_loop_01.sh
++TEST_PROGS += test_loop_02.sh
 +
-+/* bpf aio kfunc */
-+BTF_ID_FLAGS(func, bpf_aio_alloc, KF_RET_NULL)
-+BTF_ID_FLAGS(func, bpf_aio_alloc_sleepable, KF_RET_NULL)
-+BTF_ID_FLAGS(func, bpf_aio_release)
-+BTF_ID_FLAGS(func, bpf_aio_submit)
- BTF_KFUNCS_END(ublk_bpf_kfunc_ids)
+ # Order correspond to 'make run_tests' order
+ TEST_GEN_PROGS_EXTENDED = ublk_bpf
  
-+__bpf_kfunc void bpf_aio_release_dtor(void *aio)
+diff --git a/tools/testing/selftests/ublk/progs/ublk_bpf_kfunc.h b/tools/testing/selftests/ublk/progs/ublk_bpf_kfunc.h
+index 1db8870b57d6..9fb134e40d49 100644
+--- a/tools/testing/selftests/ublk/progs/ublk_bpf_kfunc.h
++++ b/tools/testing/selftests/ublk/progs/ublk_bpf_kfunc.h
+@@ -21,6 +21,17 @@ extern int ublk_bpf_get_dev_id(const struct ublk_bpf_io *io) __ksym;
+ extern int ublk_bpf_get_queue_id(const struct ublk_bpf_io *io) __ksym;
+ extern int ublk_bpf_get_io_tag(const struct ublk_bpf_io *io) __ksym;
+ 
++extern void ublk_bpf_dettach_and_complete_aio(struct bpf_aio *aio) __ksym;
++extern int ublk_bpf_attach_and_prep_aio(const struct ublk_bpf_io *_io, unsigned off, unsigned bytes, struct bpf_aio *aio) __ksym;
++extern struct ublk_bpf_io *ublk_bpf_acquire_io_from_aio(struct bpf_aio *aio) __ksym;
++extern void ublk_bpf_release_io_from_aio(struct ublk_bpf_io *io) __ksym;
++
++extern struct bpf_aio *bpf_aio_alloc(unsigned int op, enum bpf_aio_flag flags) __ksym;
++extern struct bpf_aio *bpf_aio_alloc_sleepable(unsigned int op, enum bpf_aio_flag flags) __ksym;
++extern void bpf_aio_release(struct bpf_aio *aio) __ksym;
++extern int bpf_aio_submit(struct bpf_aio *aio, int fd, loff_t pos,
++                unsigned bytes, unsigned io_flags) __ksym;
++
+ static inline unsigned long long build_io_key(const struct ublk_bpf_io *io)
+ {
+ 	unsigned long long dev_id = (unsigned short)ublk_bpf_get_dev_id(io);
+diff --git a/tools/testing/selftests/ublk/progs/ublk_loop.c b/tools/testing/selftests/ublk/progs/ublk_loop.c
+new file mode 100644
+index 000000000000..952caf7b7399
+--- /dev/null
++++ b/tools/testing/selftests/ublk/progs/ublk_loop.c
+@@ -0,0 +1,166 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include "vmlinux.h"
++#include <linux/const.h>
++#include <linux/errno.h>
++#include <linux/falloc.h>
++#include <bpf/bpf_helpers.h>
++#include <bpf/bpf_tracing.h>
++
++//#define DEBUG
++#include "ublk_bpf.h"
++
++/* libbpf v1.4.5 is required for struct_ops to work */
++
++struct {
++	__uint(type, BPF_MAP_TYPE_HASH);
++	__uint(max_entries, 128);
++	__type(key, unsigned int);	/* dev id */
++	__type(value, int);		/* backing file fd */
++} fd_map SEC(".maps");
++
++static inline void ublk_loop_comp_and_release_aio(struct bpf_aio *aio, int ret)
 +{
++	struct ublk_bpf_io *io = ublk_bpf_acquire_io_from_aio(aio);
++
++	ublk_bpf_complete_io(io, ret);
++	ublk_bpf_release_io_from_aio(io);
++
++	ublk_bpf_dettach_and_complete_aio(aio);
 +	bpf_aio_release(aio);
 +}
-+CFI_NOSEAL(bpf_aio_release_dtor);
-+BTF_ID_LIST(bpf_aio_dtor_ids)
-+BTF_ID(struct, bpf_aio)
-+BTF_ID(func, bpf_aio_release_dtor)
 +
- static const struct btf_kfunc_id_set ublk_bpf_kfunc_set = {
- 	.owner = THIS_MODULE,
- 	.set   = &ublk_bpf_kfunc_ids,
-@@ -164,6 +179,12 @@ static const struct btf_kfunc_id_set ublk_bpf_kfunc_set = {
- 
- int __init ublk_bpf_init(void)
- {
-+	const struct btf_id_dtor_kfunc aio_dtors[] = {
-+		{
-+			.btf_id	      = bpf_aio_dtor_ids[0],
-+			.kfunc_btf_id = bpf_aio_dtor_ids[1]
-+		},
-+	};
- 	int err;
- 
- 	err = register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS,
-@@ -172,5 +193,22 @@ int __init ublk_bpf_init(void)
- 		pr_warn("error while setting UBLK BPF tracing kfuncs: %d", err);
- 		return err;
- 	}
--	return ublk_bpf_struct_ops_init();
-+
-+	err = ublk_bpf_struct_ops_init();
-+	if (err) {
-+		pr_warn("error while initializing ublk bpf struct_ops: %d", err);
-+		return err;
-+	}
-+
-+	err = register_btf_id_dtor_kfuncs(aio_dtors, ARRAY_SIZE(aio_dtors),
-+			THIS_MODULE);
-+	if (err) {
-+		pr_warn("error while registering aio destructor: %d", err);
-+		return err;
-+	}
-+
-+	err = bpf_aio_init();
-+	if (err)
-+		pr_warn("error while initializing bpf aio kfunc: %d", err);
-+	return err;
- }
-diff --git a/drivers/block/ublk/bpf.h b/drivers/block/ublk/bpf.h
-index 4e178cbecb74..0ab25743ae7d 100644
---- a/drivers/block/ublk/bpf.h
-+++ b/drivers/block/ublk/bpf.h
-@@ -3,6 +3,7 @@
- #define UBLK_INT_BPF_HEADER
- 
- #include "bpf_reg.h"
-+#include "bpf_aio.h"
- 
- typedef unsigned long ublk_bpf_return_t;
- typedef ublk_bpf_return_t (*queue_io_cmd_t)(struct ublk_bpf_io *io, unsigned int);
-diff --git a/drivers/block/ublk/bpf_aio.c b/drivers/block/ublk/bpf_aio.c
-new file mode 100644
-index 000000000000..65013fe8054f
---- /dev/null
-+++ b/drivers/block/ublk/bpf_aio.c
-@@ -0,0 +1,251 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2024 Red Hat */
-+
-+#include <linux/init.h>
-+#include <linux/types.h>
-+#include <linux/bpf.h>
-+#include <linux/bpf_mem_alloc.h>
-+#include <linux/btf.h>
-+#include <linux/btf_ids.h>
-+#include <linux/filter.h>
-+
-+#include "bpf_aio.h"
-+
-+static int __bpf_aio_submit(struct bpf_aio *aio);
-+
-+static struct kmem_cache *bpf_aio_cachep;
-+static struct kmem_cache *bpf_aio_work_cachep;
-+static struct workqueue_struct *bpf_aio_wq;
-+
-+static inline bool bpf_aio_is_rw(int op)
++SEC("struct_ops/bpf_aio_complete_cb")
++void BPF_PROG(ublk_loop_comp_cb, struct bpf_aio *aio, long ret)
 +{
-+	return op == BPF_AIO_OP_FS_READ || op == BPF_AIO_OP_FS_WRITE;
++	BPF_DBG("aio result %d, back_file %s pos %llx", ret,
++			aio->iocb.ki_filp->f_path.dentry->d_name.name,
++			aio->iocb.ki_pos);
++	ublk_loop_comp_and_release_aio(aio, ret);
 +}
 +
-+/* check if it is short read */
-+static bool bpf_aio_is_short_read(const struct bpf_aio *aio, long ret)
++SEC(".struct_ops.link")
++struct bpf_aio_complete_ops loop_ublk_bpf_aio_ops = {
++	.id = 16,
++	.bpf_aio_complete_cb = (void *)ublk_loop_comp_cb,
++};
++
++static inline int ublk_loop_submit_backing_io(const struct ublk_bpf_io *io,
++		const struct ublksrv_io_desc *iod, int backing_fd)
 +{
-+	return ret >= 0 && ret < aio->bytes &&
-+		bpf_aio_get_op(aio) == BPF_AIO_OP_FS_READ;
-+}
++	unsigned int op_flags = 0;
++	struct bpf_aio *aio;
++	int res = -EINVAL;
++	int op;
 +
-+/* zeroing the remained bytes starting from `off` to end */
-+static void bpf_aio_zero_remained(const struct bpf_aio *aio, long off)
-+{
-+	struct iov_iter iter;
-+
-+	iov_iter_bvec(&iter, ITER_DEST, aio->buf.bvec, aio->buf.nr_bvec, aio->bytes);
-+	iter.iov_offset = aio->buf.bvec_off;
-+
-+	iov_iter_advance(&iter, off);
-+	iov_iter_zero(aio->bytes - off, &iter);
-+}
-+
-+static void bpf_aio_do_completion(struct bpf_aio *aio)
-+{
-+	if (aio->iocb.ki_filp)
-+		fput(aio->iocb.ki_filp);
-+	if (aio->work)
-+		kmem_cache_free(bpf_aio_work_cachep, aio->work);
-+}
-+
-+/* ->ki_complete callback */
-+static void bpf_aio_complete(struct kiocb *iocb, long ret)
-+{
-+	struct bpf_aio *aio = container_of(iocb, struct bpf_aio, iocb);
-+
-+	if (unlikely(ret == -EAGAIN)) {
-+		aio->opf |= BPF_AIO_FORCE_WQ;
-+		ret = __bpf_aio_submit(aio);
-+		if (!ret)
-+			return;
-+	}
-+
-+	/* zero the remained bytes in case of short read */
-+	if (bpf_aio_is_short_read(aio, ret))
-+		bpf_aio_zero_remained(aio, ret);
-+
-+	bpf_aio_do_completion(aio);
-+	aio->ops->bpf_aio_complete_cb(aio, ret);
-+}
-+
-+static void bpf_aio_prep_rw(struct bpf_aio *aio, unsigned int rw,
-+		struct iov_iter *iter)
-+{
-+	iov_iter_bvec(iter, rw, aio->buf.bvec, aio->buf.nr_bvec, aio->bytes);
-+	iter->iov_offset = aio->buf.bvec_off;
-+
-+	if (unlikely(aio->opf & BPF_AIO_FORCE_WQ)) {
-+		aio->iocb.ki_flags &= ~IOCB_NOWAIT;
-+		aio->iocb.ki_complete = NULL;
-+	} else {
-+		aio->iocb.ki_flags |= IOCB_NOWAIT;
-+		aio->iocb.ki_complete = bpf_aio_complete;
-+	}
-+}
-+
-+static int bpf_aio_do_submit(struct bpf_aio *aio)
-+{
-+	int op = bpf_aio_get_op(aio);
-+	struct iov_iter iter;
-+	struct file *file = aio->iocb.ki_filp;
-+	int ret;
-+
-+	switch (op) {
-+	case BPF_AIO_OP_FS_READ:
-+		bpf_aio_prep_rw(aio, ITER_DEST, &iter);
-+		if (file->f_op->read_iter)
-+			ret = file->f_op->read_iter(&aio->iocb, &iter);
-+		else
-+			ret = -EOPNOTSUPP;
++	/* translate ublk opcode into backing file's */
++	switch (iod->op_flags & 0xff) {
++	case 0 /*UBLK_IO_OP_READ*/:
++		op = BPF_AIO_OP_FS_READ;
 +		break;
-+	case BPF_AIO_OP_FS_WRITE:
-+		bpf_aio_prep_rw(aio, ITER_SOURCE, &iter);
-+		if (file->f_op->write_iter)
-+			ret = file->f_op->write_iter(&aio->iocb, &iter);
-+		else
-+			ret = -EOPNOTSUPP;
++	case 1 /*UBLK_IO_OP_WRITE*/:
++		op = BPF_AIO_OP_FS_WRITE;
 +		break;
-+	case BPF_AIO_OP_FS_FSYNC:
-+		ret = vfs_fsync_range(aio->iocb.ki_filp, aio->iocb.ki_pos,
-+				aio->iocb.ki_pos + aio->bytes - 1, 0);
-+		if (unlikely(ret && ret != -EINVAL))
-+			ret = -EIO;
++	case 2 /*UBLK_IO_OP_FLUSH*/:
++		op = BPF_AIO_OP_FS_FSYNC;
 +		break;
-+	case BPF_AIO_OP_FS_FALLOCATE:
-+		ret = vfs_fallocate(aio->iocb.ki_filp, aio->iocb.ki_flags,
-+				aio->iocb.ki_pos, aio->bytes);
++	case 3 /*UBLK_IO_OP_DISCARD*/:
++		op = BPF_AIO_OP_FS_FALLOCATE;
++		op_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
++		break;
++	case 4 /*UBLK_IO_OP_WRITE_SAME*/:
++		op = BPF_AIO_OP_FS_FALLOCATE;
++		op_flags = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
++		break;
++	case 5 /*UBLK_IO_OP_WRITE_ZEROES*/:
++		op = BPF_AIO_OP_FS_FALLOCATE;
++		op_flags = FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE;
 +		break;
 +	default:
-+		ret = -EINVAL;
++		return -EINVAL;
 +	}
 +
-+	if (ret == -EIOCBQUEUED) {
-+		ret = 0;
-+	} else if (ret != -EAGAIN) {
-+		bpf_aio_complete(&aio->iocb, ret);
-+		ret = 0;
++	res = -ENOMEM;
++	aio = bpf_aio_alloc(op, 0);
++	if (!aio)
++		goto fail;
++
++	/* attach aio into the specified range of this io command */
++	res = ublk_bpf_attach_and_prep_aio(io, 0, iod->nr_sectors << 9, aio);
++	if (res < 0) {
++		bpf_printk("bpf aio attaching failed %d\n", res);
++		goto fail;
 +	}
 +
-+	return ret;
++	/* submit this aio onto the backing file */
++	res = bpf_aio_submit(aio, backing_fd, iod->start_sector << 9,
++			iod->nr_sectors << 9, op_flags);
++	if (res < 0) {
++		bpf_printk("aio submit failed %d\n", res);
++		ublk_loop_comp_and_release_aio(aio, res);
++	}
++	return 0;
++fail:
++	return res;
 +}
 +
-+static void bpf_aio_submit_work(struct work_struct *work)
++static inline ublk_bpf_return_t __ublk_loop_handle_io_cmd(const struct ublk_bpf_io *io, unsigned int off)
 +{
-+	struct bpf_aio_work *aio_work = container_of(work, struct bpf_aio_work, work);
++	const struct ublksrv_io_desc *iod;
++	int res = -EINVAL;
++	int fd_key = ublk_bpf_get_dev_id(io);
++	int *fd;
++	ublk_bpf_return_t ret = ublk_bpf_return_val(UBLK_BPF_IO_QUEUED, 0);
 +
-+	bpf_aio_do_submit(aio_work->aio);
-+}
-+
-+static int __bpf_aio_submit(struct bpf_aio *aio)
-+{
-+	struct work_struct *work;
-+
-+do_submit:
-+	if (likely(!(aio->opf & BPF_AIO_FORCE_WQ))) {
-+		int ret = bpf_aio_do_submit(aio);
-+
-+		/* retry via workqueue in case of -EAGAIN */
-+		if (ret != -EAGAIN)
-+			return ret;
-+		aio->opf |= BPF_AIO_FORCE_WQ;
++	iod = ublk_bpf_get_iod(io);
++	if (!iod) {
++		ublk_bpf_complete_io(io, res);
++		return ret;
 +	}
 +
-+	if (!aio->work) {
-+		bool in_irq = in_interrupt();
-+		gfp_t gfpflags = in_irq ? GFP_ATOMIC : GFP_NOIO;
++	BPF_DBG("ublk dev %u qid %u: handle io cmd tag %u op %u %lx-%d off %u",
++			ublk_bpf_get_dev_id(io),
++			ublk_bpf_get_queue_id(io),
++			ublk_bpf_get_io_tag(io),
++			iod->op_flags & 0xff,
++			iod->start_sector << 9,
++			iod->nr_sectors << 9, off);
 +
-+		aio->work = kmem_cache_alloc(bpf_aio_work_cachep, gfpflags);
-+		if (unlikely(!aio->work)) {
-+			if (in_irq)
-+				return -ENOMEM;
-+			aio->opf &= ~BPF_AIO_FORCE_WQ;
-+			goto do_submit;
++	/* retrieve backing file descriptor */
++	fd = bpf_map_lookup_elem(&fd_map, &fd_key);
++	if (!fd) {
++		bpf_printk("can't get FD from %d\n", fd_key);
++		return ret;
++	}
++
++	/* handle this io command by submitting IOs on backing file */
++	res = ublk_loop_submit_backing_io(io, iod, *fd);
++
++exit:
++	/* io cmd can't be completes until this reference is dropped */
++	if (res < 0)
++		ublk_bpf_complete_io(io, io->res);
++
++	return ublk_bpf_return_val(UBLK_BPF_IO_QUEUED, 0);
++}
++
++SEC("struct_ops/ublk_bpf_release_io_cmd")
++void BPF_PROG(ublk_loop_release_io_cmd, struct ublk_bpf_io *io)
++{
++	BPF_DBG("%s: released io command %d", __func__, io->res);
++}
++
++SEC("struct_ops.s/ublk_bpf_queue_io_cmd_daemon")
++ublk_bpf_return_t BPF_PROG(ublk_loop_handle_io_cmd, struct ublk_bpf_io *io, unsigned int off)
++{
++	return __ublk_loop_handle_io_cmd(io, off);
++}
++
++SEC(".struct_ops.link")
++struct ublk_bpf_ops loop_ublk_bpf_ops = {
++	.id = 16,
++	.queue_io_cmd_daemon = (void *)ublk_loop_handle_io_cmd,
++	.release_io_cmd = (void *)ublk_loop_release_io_cmd,
++};
++
++char LICENSE[] SEC("license") = "GPL";
+diff --git a/tools/testing/selftests/ublk/test_common.sh b/tools/testing/selftests/ublk/test_common.sh
+index 466b82e77860..4727a6ec9734 100755
+--- a/tools/testing/selftests/ublk/test_common.sh
++++ b/tools/testing/selftests/ublk/test_common.sh
+@@ -70,3 +70,50 @@ _add_ublk_dev() {
+ 	fi
+ 	udevadm settle
+ }
++
++_create_backfile() {
++        local my_size=$1
++        local my_file=`mktemp ublk_bpf_${my_size}_XXXXX`
++
++        truncate -s ${my_size} ${my_file}
++	echo $my_file
++}
++
++_remove_backfile() {
++        local file=$1
++
++        [ -f "$file" ] && rm -f $file
++}
++
++_create_tmp_dir() {
++        local my_file=`mktemp -d ublk_bpf_dir_XXXXX`
++
++	echo $my_file
++}
++
++_remove_tmp_dir() {
++	local dir=$1
++
++	[ -d "$dir" ] && rmdir $dir
++}
++
++_mkfs_mount_test()
++{
++	local dev=$1
++	local err_code=0
++	local mnt_dir=`_create_tmp_dir`
++
++	mkfs.ext4 -F $dev > /dev/null 2>&1
++	err_code=$?
++	if [ $err_code -ne 0 ]; then
++		return $err_code
++	fi
++
++	mount -t ext4 $dev $mnt_dir > /dev/null 2>&1
++	umount $dev
++	err_code=$?
++	_remove_tmp_dir $mnt_dir
++	if [ $err_code -ne 0 ]; then
++		return $err_code
++	fi
++}
+diff --git a/tools/testing/selftests/ublk/test_loop_01.sh b/tools/testing/selftests/ublk/test_loop_01.sh
+new file mode 100755
+index 000000000000..10c73ec0a01a
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_loop_01.sh
+@@ -0,0 +1,33 @@
++#!/bin/bash
++
++. test_common.sh
++
++TID="loop_01"
++ERR_CODE=0
++
++# prepare & register and pin bpf prog
++_prep_bpf_test "loop" ublk_loop.bpf.o
++
++backfile_0=`_create_backfile 256M`
++
++# add two ublk null disks with the pinned bpf prog
++_add_ublk_dev -t loop -n 0 --bpf_prog 16 --bpf_aio_prog 16 --quiet $backfile_0
++
++# run fio over the ublk disk
++fio --name=write_and_verify \
++    --filename=/dev/ublkb0 \
++    --ioengine=libaio --iodepth=4 \
++    --rw=write \
++    --size=256M \
++    --direct=1 \
++    --verify=crc32c \
++    --do_verify=1 \
++    --bs=4k > /dev/null 2>&1
++ERR_CODE=$?
++
++# cleanup & unregister and unpin the bpf prog
++_cleanup_bpf_test "loop"
++
++_remove_backfile $backfile_0
++
++_show_result $TID $ERR_CODE
+diff --git a/tools/testing/selftests/ublk/test_loop_02.sh b/tools/testing/selftests/ublk/test_loop_02.sh
+new file mode 100755
+index 000000000000..05c3a863f517
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_loop_02.sh
+@@ -0,0 +1,24 @@
++#!/bin/bash
++
++. test_common.sh
++
++TID="loop_02"
++ERR_CODE=0
++
++# prepare & register and pin bpf prog
++_prep_bpf_test "loop" ublk_loop.bpf.o
++
++backfile_0=`_create_backfile 256M`
++
++# add two ublk null disks with the pinned bpf prog
++_add_ublk_dev -t loop -n 0 --bpf_prog 16 --bpf_aio_prog 16 --quiet $backfile_0
++
++_mkfs_mount_test /dev/ublkb0
++ERR_CODE=$?
++
++# cleanup & unregister and unpin the bpf prog
++_cleanup_bpf_test "loop"
++
++_remove_backfile $backfile_0
++
++_show_result $TID $ERR_CODE
+diff --git a/tools/testing/selftests/ublk/ublk_bpf.c b/tools/testing/selftests/ublk/ublk_bpf.c
+index e2c2e92268e1..c24d5e18a1b1 100644
+--- a/tools/testing/selftests/ublk/ublk_bpf.c
++++ b/tools/testing/selftests/ublk/ublk_bpf.c
+@@ -64,6 +64,7 @@ struct dev_ctx {
+ 	int nr_files;
+ 	char *files[MAX_BACK_FILES];
+ 	int bpf_prog_id;
++	int bpf_aio_prog_id;
+ 	unsigned int	logging:1;
+ 	unsigned int	all:1;
+ };
+@@ -107,7 +108,10 @@ struct ublk_tgt {
+ 	unsigned int  cq_depth;
+ 	const struct ublk_tgt_ops *ops;
+ 	struct ublk_params params;
+-	char backing_file[1024 - 8 - sizeof(struct ublk_params)];
++
++	int nr_backing_files;
++	unsigned long backing_file_size[MAX_BACK_FILES];
++	char backing_file[MAX_BACK_FILES][PATH_MAX];
+ };
+ 
+ struct ublk_queue {
+@@ -133,12 +137,13 @@ struct ublk_dev {
+ 	struct ublksrv_ctrl_dev_info  dev_info;
+ 	struct ublk_queue q[UBLK_MAX_QUEUES];
+ 
+-	int fds[2];	/* fds[0] points to /dev/ublkcN */
++	int fds[MAX_BACK_FILES + 1];	/* fds[0] points to /dev/ublkcN */
+ 	int nr_fds;
+ 	int ctrl_fd;
+ 	struct io_uring ring;
+ 
+ 	int bpf_prog_id;
++	int bpf_aio_prog_id;
+ };
+ 
+ #ifndef offsetof
+@@ -983,7 +988,7 @@ static int cmd_dev_add(struct dev_ctx *ctx)
+ 	struct ublk_dev *dev;
+ 	int dev_id = ctx->dev_id;
+ 	char ublkb[64];
+-	int ret;
++	int ret, i;
+ 
+ 	ops = ublk_find_tgt(tgt_type);
+ 	if (!ops) {
+@@ -1022,6 +1027,13 @@ static int cmd_dev_add(struct dev_ctx *ctx)
+ 	dev->tgt.sq_depth = depth;
+ 	dev->tgt.cq_depth = depth;
+ 	dev->bpf_prog_id = ctx->bpf_prog_id;
++	dev->bpf_aio_prog_id = ctx->bpf_aio_prog_id;
++	for (i = 0; i < MAX_BACK_FILES; i++) {
++		if (ctx->files[i]) {
++			strcpy(dev->tgt.backing_file[i], ctx->files[i]);
++			dev->tgt.nr_backing_files++;
 +		}
 +	}
+ 
+ 	ret = ublk_ctrl_add_dev(dev);
+ 	if (ret < 0) {
+@@ -1271,14 +1283,14 @@ static int cmd_dev_reg_bpf(struct dev_ctx *ctx)
+ 
+ static int cmd_dev_help(char *exe)
+ {
+-	printf("%s add -t [null] [-q nr_queues] [-d depth] [-n dev_id] [--bpf_prog ublk_prog_id] [backfile1] [backfile2] ...\n", exe);
++	printf("%s add -t [null|loop] [-q nr_queues] [-d depth] [-n dev_id] [--bpf_prog ublk_prog_id] [--bpf_aio_prog ublk_aio_prog_id] [backfile1] [backfile2] ...\n", exe);
+ 	printf("\t default: nr_queues=2(max 4), depth=128(max 128), dev_id=-1(auto allocation)\n");
+ 	printf("%s del [-n dev_id] -a \n", exe);
+ 	printf("\t -a delete all devices -n delete specified device\n");
+ 	printf("%s list [-n dev_id] -a \n", exe);
+ 	printf("\t -a list all devices, -n list specified device, default -a \n");
+-	printf("%s reg -t [null] bpf_prog_obj_path \n", exe);
+-	printf("%s unreg -t [null]\n", exe);
++	printf("%s reg -t [null|loop] bpf_prog_obj_path \n", exe);
++	printf("%s unreg -t [null|loop]\n", exe);
+ 	return 0;
+ }
+ 
+@@ -1356,12 +1368,125 @@ static int ublk_null_queue_io(struct ublk_queue *q, int tag)
+ 	return 0;
+ }
+ 
++static void backing_file_tgt_deinit(struct ublk_dev *dev)
++{
++	int i;
 +
-+	aio->work->aio = aio;
-+	work = &aio->work->work;
-+	INIT_WORK(work, bpf_aio_submit_work);
-+	queue_work(bpf_aio_wq, work);
-+
-+	return 0;
++	for (i = 1; i < dev->nr_fds; i++) {
++		fsync(dev->fds[i]);
++		close(dev->fds[i]);
++	}
 +}
 +
-+static struct bpf_aio *__bpf_aio_alloc(gfp_t gfpflags, unsigned op,
-+				       enum bpf_aio_flag aio_flags)
++static int backing_file_tgt_init(struct ublk_dev *dev)
 +{
-+	struct bpf_aio *aio;
++	int fd, i;
 +
-+	if (op >= BPF_AIO_OP_LAST)
-+		return NULL;
++	assert(dev->nr_fds == 1);
 +
-+	if (aio_flags & BPF_AIO_OP_MASK)
-+		return NULL;
++	for (i = 0; i < dev->tgt.nr_backing_files; i++) {
++		char *file = dev->tgt.backing_file[i];
++		unsigned long bytes;
++		struct stat st;
 +
-+	aio = kmem_cache_alloc(bpf_aio_cachep, gfpflags);
-+	if (!aio)
-+		return NULL;
++		ublk_dbg(UBLK_DBG_DEV, "%s: file %d: %s\n", __func__, i, file);
 +
-+	memset(aio, 0, sizeof(*aio));
-+	aio->opf = op | (unsigned int)aio_flags;
-+	return aio;
-+}
++		fd = open(file, O_RDWR | O_DIRECT);
++		if (fd < 0) {
++			ublk_err("%s: backing file %s can't be opened: %s\n",
++					__func__, file, strerror(errno));
++			return -EBADF;
++		}
 +
-+__bpf_kfunc struct bpf_aio *bpf_aio_alloc(unsigned int op, enum bpf_aio_flag aio_flags)
-+{
-+	return __bpf_aio_alloc(GFP_ATOMIC, op, aio_flags);
-+}
++		if (fstat(fd, &st) < 0) {
++			close(fd);
++			return -EBADF;
++		}
 +
-+__bpf_kfunc struct bpf_aio *bpf_aio_alloc_sleepable(unsigned int op, enum bpf_aio_flag aio_flags)
-+{
-+	return __bpf_aio_alloc(GFP_NOIO, op, aio_flags);
-+}
++		if (S_ISREG(st.st_mode))
++			bytes = st.st_size;
++		else if (S_ISBLK(st.st_mode)) {
++			if (ioctl(fd, BLKGETSIZE64, &bytes) != 0)
++				return -1;
++		} else {
++			return -EINVAL;
++		}
 +
-+__bpf_kfunc void bpf_aio_release(struct bpf_aio *aio)
-+{
-+	kmem_cache_free(bpf_aio_cachep, aio);
-+}
-+
-+/* Submit AIO from bpf prog */
-+__bpf_kfunc int bpf_aio_submit(struct bpf_aio *aio, int fd, loff_t pos,
-+		unsigned bytes, unsigned io_flags)
-+{
-+	struct file *file;
-+
-+	if (!aio->ops)
-+		return -EINVAL;
-+
-+	file = fget(fd);
-+	if (!file)
-+		return -EINVAL;
-+
-+	/* we could be called from io completion handler */
-+	if (in_interrupt())
-+		aio->opf |= BPF_AIO_FORCE_WQ;
-+
-+	aio->iocb.ki_pos = pos;
-+	aio->iocb.ki_filp = file;
-+	aio->iocb.ki_flags = io_flags;
-+	aio->bytes = bytes;
-+	if (bpf_aio_is_rw(bpf_aio_get_op(aio))) {
-+		if (file->f_flags & O_DIRECT)
-+			aio->iocb.ki_flags |= IOCB_DIRECT;
-+		else
-+			aio->opf |= BPF_AIO_FORCE_WQ;
-+		aio->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
-+	} else {
-+		aio->opf |= BPF_AIO_FORCE_WQ;
++		dev->tgt.backing_file_size[i] = bytes;
++		dev->fds[dev->nr_fds] = fd;
++		dev->nr_fds += 1;
 +	}
 +
-+	return __bpf_aio_submit(aio);
++	return 0;
 +}
 +
-+int __init bpf_aio_init(void)
++static int loop_bpf_setup_fd(unsigned dev_id, int fd)
 +{
-+	bpf_aio_cachep = KMEM_CACHE(bpf_aio, SLAB_PANIC);
-+	bpf_aio_work_cachep = KMEM_CACHE(bpf_aio_work, SLAB_PANIC);
-+	bpf_aio_wq = alloc_workqueue("bpf_aio", WQ_MEM_RECLAIM | WQ_HIGHPRI, 0);
++	int map_fd;
++	int err;
++
++	map_fd = bpf_obj_get("/sys/fs/bpf/ublk/loop/fd_map");
++	if (map_fd < 0) {
++		ublk_err("Error getting map file descriptor from pinned map\n");
++		return -EINVAL;
++	}
++
++	err = bpf_map_update_elem(map_fd, &dev_id, &fd, BPF_ANY);
++	if (err) {
++		ublk_err("Error updating map element: %d\n", errno);
++		return -EINVAL;
++	}
 +
 +	return 0;
 +}
-diff --git a/drivers/block/ublk/bpf_aio.h b/drivers/block/ublk/bpf_aio.h
-new file mode 100644
-index 000000000000..625737965c90
---- /dev/null
-+++ b/drivers/block/ublk/bpf_aio.h
-@@ -0,0 +1,66 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* Copyright (c) 2024 Red Hat */
-+#ifndef UBLK_BPF_AIO_HEADER
-+#define UBLK_BPF_AIO_HEADER
 +
-+#define	BPF_AIO_OP_BITS		8
-+#define	BPF_AIO_OP_MASK		((1 << BPF_AIO_OP_BITS) - 1)
-+
-+enum bpf_aio_op {
-+	BPF_AIO_OP_FS_READ	= 0,
-+	BPF_AIO_OP_FS_WRITE,
-+	BPF_AIO_OP_FS_FSYNC,
-+	BPF_AIO_OP_FS_FALLOCATE,
-+	BPF_AIO_OP_LAST,
-+};
-+
-+enum bpf_aio_flag_bits {
-+	/* force to submit io from wq */
-+	__BPF_AIO_FORCE_WQ	= BPF_AIO_OP_BITS,
-+	__BPF_AIO_NR_BITS,	/* stops here */
-+};
-+
-+enum bpf_aio_flag {
-+	BPF_AIO_FORCE_WQ	= (1 << __BPF_AIO_FORCE_WQ),
-+};
-+
-+struct bpf_aio_work {
-+	struct bpf_aio		*aio;
-+	struct work_struct	work;
-+};
-+
-+/* todo: support ubuf & iovec in future */
-+struct bpf_aio_buf {
-+	unsigned int		bvec_off;
-+	int			nr_bvec;
-+	const struct bio_vec	*bvec;
-+};
-+
-+struct bpf_aio {
-+	unsigned int opf;
-+	unsigned int bytes;
-+	struct bpf_aio_buf	buf;
-+	struct bpf_aio_work	*work;
-+	const struct bpf_aio_complete_ops *ops;
-+	struct kiocb iocb;
-+};
-+
-+typedef void (*bpf_aio_complete_t)(struct bpf_aio *io, long ret);
-+
-+struct bpf_aio_complete_ops {
-+	unsigned int		id;
-+	bpf_aio_complete_t	bpf_aio_complete_cb;
-+};
-+
-+static inline unsigned int bpf_aio_get_op(const struct bpf_aio *aio)
++static int ublk_loop_tgt_init(struct ublk_dev *dev)
 +{
-+	return aio->opf & BPF_AIO_OP_MASK;
++	unsigned long long bytes;
++	int ret;
++	struct ublk_params p = {
++		.types = UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_BPF,
++		.basic = {
++			.logical_bs_shift	= 9,
++			.physical_bs_shift	= 12,
++			.io_opt_shift	= 12,
++			.io_min_shift	= 9,
++			.max_sectors = dev->dev_info.max_io_buf_bytes >> 9,
++		},
++		.bpf = {
++			.flags = UBLK_BPF_HAS_OPS_ID | UBLK_BPF_HAS_AIO_OPS_ID,
++			.ops_id = dev->bpf_prog_id,
++			.aio_ops_id = dev->bpf_aio_prog_id,
++		},
++	};
++
++	assert(dev->tgt.nr_backing_files == 1);
++	ret = backing_file_tgt_init(dev);
++	if (ret)
++		return ret;
++
++	assert(loop_bpf_setup_fd(dev->dev_info.dev_id, dev->fds[1]) == 0);
++
++	bytes = dev->tgt.backing_file_size[0];
++	dev->tgt.dev_size = bytes;
++	p.basic.dev_sectors = bytes >> 9;
++	dev->tgt.params = p;
++
++	return 0;
 +}
 +
-+int bpf_aio_init(void);
-+struct bpf_aio *bpf_aio_alloc(unsigned int op, enum bpf_aio_flag aio_flags);
-+struct bpf_aio *bpf_aio_alloc_sleepable(unsigned int op, enum bpf_aio_flag aio_flags);
-+void bpf_aio_release(struct bpf_aio *aio);
-+int bpf_aio_submit(struct bpf_aio *aio, int fd, loff_t pos, unsigned bytes,
-+		unsigned io_flags);
-+#endif
++
+ static const struct ublk_tgt_ops tgt_ops_list[] = {
+ 	{
+ 		.name = "null",
+ 		.init_tgt = ublk_null_tgt_init,
+ 		.queue_io = ublk_null_queue_io,
+ 	},
++	{
++		.name = "loop",
++		.init_tgt = ublk_loop_tgt_init,
++		.deinit_tgt = backing_file_tgt_deinit,
++	},
+ };
+ 
+ static const struct ublk_tgt_ops *ublk_find_tgt(const char *name)
+@@ -1389,6 +1514,7 @@ int main(int argc, char *argv[])
+ 		{ "debug_mask",		1,	NULL,  0  },
+ 		{ "quiet",		0,	NULL,  0  },
+ 		{ "bpf_prog",		1,	NULL,  0  },
++		{ "bpf_aio_prog",	1,	NULL,  0  },
+ 		{ 0, 0, 0, 0 }
+ 	};
+ 	int option_idx, opt;
+@@ -1398,6 +1524,7 @@ int main(int argc, char *argv[])
+ 		.nr_hw_queues	=	2,
+ 		.dev_id		=	-1,
+ 		.bpf_prog_id	=	-1,
++		.bpf_aio_prog_id	=	-1,
+ 	};
+ 	int ret = -EINVAL, i;
+ 
+@@ -1433,6 +1560,8 @@ int main(int argc, char *argv[])
+ 				ctx.bpf_prog_id = strtol(optarg, NULL, 10);
+ 				ctx.flags |= UBLK_F_BPF;
+ 			}
++			if (!strcmp(longopts[option_idx].name, "bpf_aio_prog"))
++				ctx.bpf_aio_prog_id = strtol(optarg, NULL, 10);
+ 			break;
+ 		}
+ 	}
 -- 
 2.47.0
 
