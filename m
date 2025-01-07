@@ -1,185 +1,86 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473C11662F1
-	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 07:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98769154C15
+	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 07:38:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736235501; cv=none; b=h9PohSFwb7o3RCvkxzVmW3JTnlzjErVbbfBSeKzDC5Y0xITwY1+m2LWVihXla1Tn4U0pUTSugA25HvqxTpKds7M/U8aqYvcoqoLmk6kti6OGxuwqYi691KOX+ys2ZIMRF1JA+sJLOFqDJxC/ASpFge6gSXTZnJA4ETZNtcWm6lU=
+	t=1736235526; cv=none; b=WUgq8N2bdevivNKZovziNBGF3NrIHq/TnI2pWCFwVcbVy2WQ8FWHT6gFxzhlLo9+OiVrLJDz7xh0tqHKGEhERt9oxxt7rxt/u9J9yX+GYrtYbXZRBLHkEHYl+SWoyZsJ3A6vlyPp4avGcx4Rs2QnMBz3TP6UxYnu4hGrMJDcr3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736235501; c=relaxed/simple;
-	bh=MeHjwlmHyRYJwqF55zIqyHrTafSLhdOwEGgkfNw2/cA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CJOUt8QImfgRPoMwVjEfpCz+fzTKiFs2AedB8LdUEzSzEO/pxQIroJSv9M7eGQCjdpbJVhlD+cyZ4QVIX5lfVv4n65e7/9rZb5XJnVP26t6KIYuGpKAxZa5+83T0aJkHesYQqT+7Wx3LVnKQT3NP7lCnox6emMpCVHWHEKBZy6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=PWBJOlhH; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	s=arc-20240116; t=1736235526; c=relaxed/simple;
+	bh=eVJmQfqk+wa5AZU0IhCkNx/9MfMPryn71yEHOV3FSII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Aj8ye94nFB23GfldxNdhWhOpJBGMoc02FjuW58z34DFCBdC5vMXnhclMVOaoWdAUVHGaB5hGhTxTn2K58xbcEI0WfjveepW5NiGVYlwDJ39SCEfYrjhIBKFoB3G0VTknRKWg/Y1Tu6c88IYKf+0gIjwv96JcyahUCNtxQofwuUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=K7iamkj3; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="PWBJOlhH"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3cd821c60so3505441a12.3
-        for <linux-block@vger.kernel.org>; Mon, 06 Jan 2025 23:38:16 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="K7iamkj3"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2164b662090so194612445ad.1
+        for <linux-block@vger.kernel.org>; Mon, 06 Jan 2025 23:38:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1736235495; x=1736840295; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+K5NTtkkHH0F4j1K3TcqwFsH8+ooT4rladtnvSGOOpM=;
-        b=PWBJOlhHnrza5YuqS+/eAUU/E7AJYPJNX5NTjD4Jq2xbCGX9xjRHThB2uleP/MMWRb
-         /uDWgRg+DmWDNfxN7jScC6fQ4X962sGfiWe8CwAQGm1i/4l4U8C7xyuKTCtPzbbo2Flg
-         Ntg7KSCogu7U6uz8wOOHuKcYxTTR5ZShdc4f2yKUZYS1awUmzoLEb9cGOUP/749qxlPf
-         WMfF42Q/nraqjamWDz/Ao9kYAwUFOX98dRqPTzyoDnRuvzRyQc1AfpLbdwnrG7/qAEPA
-         lJkMTsjcS7f71L+OuyUEr1dmK/9b2wsByl18SqlIesLK5HXDw0Dm52A75CJbWNiO6Cwu
-         +Smw==
+        d=chromium.org; s=google; t=1736235522; x=1736840322; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c6TpyBIBHhRqCq2NSRZgwqe9hlCBkCrXXo96kF987tg=;
+        b=K7iamkj3gTXDw0vIgQVPISht3cQa2rah3gmhdGA9ZPZohcNgMyCQ5xu8U+EuNwMWVn
+         fpLvRRXifggqtG1Bat2LoIR2yhnwj8wxQwdWZ1FVCzBrCeU06AMFDcGZQ3idL9uEXi1C
+         HNgigDZfT2eqbzg3XDHysb4ftyfzKTvATAesM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736235495; x=1736840295;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+K5NTtkkHH0F4j1K3TcqwFsH8+ooT4rladtnvSGOOpM=;
-        b=Z3pNEfQxIafTuYEc+Q79WBM1h+J6RhRLvaQkeVyPifpW4yY8qOBABQOlcrMnbUcagj
-         pMeRWuy2Tl03iYPaFVIxufZq1sWMCoTS+84pRTTxHHEaKAZlwVZOBszqxWYgoKy91bCU
-         Md0RmxT77CAgKWaoqvo26uEX7UFRG9/9P/yIguB6GTI/VbUJ+giAyQ8PQoiq8Y7R77f/
-         ucBghrZ3VwHflmF0+JKdPEymrxAoK+u0BsyfyK+9c0kDhSAFgKwTw96st6sd31GIuByn
-         TUMoFAx8RjP/53QeMAcLWJXoArtEX3C58sIbMpr9X/iMkZsSHY8joRFcwQulN3BxHqAW
-         2EKg==
-X-Gm-Message-State: AOJu0YyNjgEjeFQ9uDIk8RGjROXD1K2wA6U577cnF2r59JZVupAGHK3w
-	GI8T2dVn34qd/waJeT1+uEXd3hK74XJjSSWwTVd/kvYNEVBOW4zQKXQQwO7rNmptalD5hQ2c/ro
-	zmXPYTCbJz1z7R5tw5foW/bWlVRl8IULDwyzOBw==
-X-Gm-Gg: ASbGncu23TeTJdBJ7xDPA81ArlEy0ut9zOFxO2pez8/tk+SVhPcO3RkgYWlskyhkQd4
-	06QBC0EcrqCMO8hLoxuwMvWOrKJAu+V1Az7ZbickVeBHxECEpaUh2k/KQfiZYle53Yxx/zcQ=
-X-Google-Smtp-Source: AGHT+IH0yHgQYI52xxhkAl+Pv+y2nSjW7oz6dhILeey3Yd3VP16wJofS2RwX7ROj0q0KGDxt7BeW9iSgKHibBj84w+w=
-X-Received: by 2002:a05:6402:5187:b0:5d0:bf79:e925 with SMTP id
- 4fb4d7f45d1cf-5d81de07d1dmr19780495a12.6.1736235495597; Mon, 06 Jan 2025
- 23:38:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1736235522; x=1736840322;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c6TpyBIBHhRqCq2NSRZgwqe9hlCBkCrXXo96kF987tg=;
+        b=GzFDfGdUFyVckmyuAktcIibfGUXNowNKX1r4ntUYbh2XP55e+T/ZfcGPPFHoS3cQln
+         rW8/TzqKnmelmVGY06DJxvK+1+QQY13tEO8BFlwESYS60kNkSIbIWSAdWgLXClBcwOSE
+         9qthjbC6WcQlNkS5k0X3SXmXdchaI3MUES5q07ovOE/pPWQU6Nd1hOA+reKKM5jWoXp6
+         8AKeV+5WuaBkxR53gJ6Evvv4T3/YXxObRDoAa9FSUdz+pLXcyygrJw0OfkQGLqy+p2W9
+         Zd0bmHklhEFihAU/XJGHRJjEsg5YBZlho/ld5WvBUuxmhu9LkqxnWeEUGCtHBGEnk/mg
+         jN4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU2n8MO4J0hLcHKEnEKsqxn3qSLo5VrJSTUwEVelbJPqHm5Dd/W3p3gq6JZRc0lVQ6lka1gEyZb9zH+7A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YymkGsi6dP82hH4mfRUiw2i3C25ETo04UEaUjGG+W3Omjz3hQlR
+	sRTAsLO0UxNCdJ7OKSoUNj6h9iCZUS+3UPpPrthD2EcD6GGrKoI9ZZY8fqYDLw==
+X-Gm-Gg: ASbGnctdKOXJY2e3+FiY2f/KZ7/sq2/HRov8iB9BuVHPGxb/rzDRb1cQnVvPuCi7APk
+	jC1rgCQEA+M2bUvXFvz9aMLYFI3dHXXESr9iqntTwuVZ3UNOHuVy6UmVYFrU95w2TgLCOHiT7tJ
+	EZz/dVN5w2O8bWBCkw54dJQ+awzQ/TqMUqJyU8Si3IvWACn7ob2z1IJQ99FH6pJ95Q0zMQ2suoQ
+	uIJi6EQKJMTNFC71SzkqiRPNcborChnHrrcokItI9iFvEzrhjIcj1bafA+V
+X-Google-Smtp-Source: AGHT+IFP9fBz3XVX9qDbkVrQfLxKKg2cGiqLB8JwvWr59yDGayoZBFKqHGqMHDY/d4+jdwiBBRO7JQ==
+X-Received: by 2002:a05:6a21:33aa:b0:1e5:a0d8:5a33 with SMTP id adf61e73a8af0-1e5e048adb9mr95188628637.18.1736235521892;
+        Mon, 06 Jan 2025 23:38:41 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:c142:c1e8:32c2:942a])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad81582asm32720364b3a.9.2025.01.06.23.38.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jan 2025 23:38:41 -0800 (PST)
+Date: Tue, 7 Jan 2025 16:38:36 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>, 
+	Kairui Song <kasong@tencent.com>
+Cc: linux-mm@kvack.org, Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Subject: Re: [PATCH] zram: fix potential UAF of zram table
+Message-ID: <sbdzv6z5sixmj7fr3jmjwxqce3tbbzvshbb7qgumio4jdahn24@jvvadmtindgs>
+References: <20250107065446.86928-1-ryncsn@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250107060810.91111-1-lizhijian@fujitsu.com> <20250107060810.91111-2-lizhijian@fujitsu.com>
-In-Reply-To: <20250107060810.91111-2-lizhijian@fujitsu.com>
-From: Jinpu Wang <jinpu.wang@ionos.com>
-Date: Tue, 7 Jan 2025 08:38:05 +0100
-Message-ID: <CAMGffEnkqZSEts7Cu9pCUmi9uYtP-vgjQ4qPYkDdkZpG=A_HNw@mail.gmail.com>
-Subject: Re: [PATCH blktests v4 2/2] tests/rnbd: Implement RNBD regression test
-To: Li Zhijian <lizhijian@fujitsu.com>
-Cc: linux-block@vger.kernel.org, shinichiro.kawasaki@wdc.com, 
-	linux-rdma@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, "Md. Haris Iqbal" <haris.iqbal@ionos.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250107065446.86928-1-ryncsn@gmail.com>
 
-On Tue, Jan 7, 2025 at 7:08=E2=80=AFAM Li Zhijian <lizhijian@fujitsu.com> w=
-rote:
->
-> This test case has been in my possession for quite some time.
-> I am upstreaming it now because it has once again detected a regression i=
-n
-> a recent kernel release[0].
->
-> It's just stupid to connect and disconnect RNBD on localhost and expect
-> no dmesg exceptions, with some attempts actually succeeding.
->
-> rnbd/002 (Start Stop RNBD repeatedly)                        [passed]
->     runtime                   13.252s  ...  13.099s
->     start/stop success ratio  100/100  ...  100/100
->
-> [0] https://lore.kernel.org/linux-rdma/20241223025700.292536-1-lizhijian@=
-fujitsu.com/
->
-> Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
-Thx for the patch, LGTM
-Reviewed-by: Jack Wang <jinpu.wang@ionos.com>
-> ---
-> V4:
->   - Fix a typo and update the passed condition # Shinichiro Kawasaki <shi=
-nichiro.kawasaki@wdc.com>
->   - rename test_start_stop() to test_start_stop_repeatedly()
->
-> V3:
->   - Always stop the rnbd regardless of the result of start
->
-> V2:
->   - address comments from Shinichiro
->   - minor fixes
->
-> Copy to the RDMA/rtrs guys:
->
-> Cc: Jack Wang <jinpu.wang@ionos.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Leon Romanovsky <leon@kernel.org>
-> Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
-> ---
->  tests/rnbd/002     | 47 ++++++++++++++++++++++++++++++++++++++++++++++
->  tests/rnbd/002.out |  2 ++
->  2 files changed, 49 insertions(+)
->  create mode 100755 tests/rnbd/002
->  create mode 100644 tests/rnbd/002.out
->
-> diff --git a/tests/rnbd/002 b/tests/rnbd/002
-> new file mode 100755
-> index 000000000000..7d7da9401974
-> --- /dev/null
-> +++ b/tests/rnbd/002
-> @@ -0,0 +1,47 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (c) 2024 FUJITSU LIMITED. All Rights Reserved.
-> +#
-> +# Commit 667db86bcbe8 ("RDMA/rtrs: Register ib event handler") introduce=
-d a
-> +# new element .deinit but never used it at all that lead to a
-> +# 'list_add corruption' kernel warning.
-> +#
-> +# This test is intended to check whether the current kernel is affected.
-> +# The following patch resolves this issue.
-> +#  RDMA/rtrs: Add missing deinit() call
-> +#
-> +. tests/rnbd/rc
-> +
-> +DESCRIPTION=3D"Start Stop RNBD repeatedly"
-> +CHECK_DMESG=3D1
-> +QUICK=3D1
-> +
-> +requires() {
-> +       _have_rnbd
-> +       _have_loop
-> +}
-> +
-> +test_start_stop_repeatedly()
-> +{
-> +       _setup_rnbd || return
-> +
-> +       local loop_dev i j=3D0
-> +       loop_dev=3D"$(losetup -f)"
-> +
-> +       for ((i=3D0;i<100;i++))
-> +       do
-> +               _start_rnbd_client "${loop_dev}" &>/dev/null
-> +               # Always stop it so that the next start has change to wor=
-k
-> +               _stop_rnbd_client &>/dev/null && ((j++))
-> +       done
-> +
-> +       TEST_RUN["start/stop success ratio"]=3D"${j}/${i}"
-> +
-> +       _cleanup_rnbd
-> +}
-> +
-> +test() {
-> +       echo "Running ${TEST_NAME}"
-> +       test_start_stop_repeatedly
-> +       echo "Test complete"
-> +}
-> diff --git a/tests/rnbd/002.out b/tests/rnbd/002.out
-> new file mode 100644
-> index 000000000000..2f055b8c82f9
-> --- /dev/null
-> +++ b/tests/rnbd/002.out
-> @@ -0,0 +1,2 @@
-> +Running rnbd/002
-> +Test complete
-> --
-> 2.47.0
->
+On (25/01/07 14:54), Kairui Song wrote:
+> From: Kairui Song <kasong@tencent.com>
+> 
+> If zram_meta_alloc failed early, it frees allocated zram->table without
+> setting it NULL. Which will potentially cause zram_meta_free to access
+> the table if user reset an failed and uninitialized device.
+> 
+> Fixes: 74363ec674cb ("zram: fix uninitialized ZRAM not releasing backing device")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Kairui Song <kasong@tencent.com>
+
+Reviewed-by:  Sergey Senozhatsky <senozhatsky@chromium.org>
