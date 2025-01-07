@@ -1,68 +1,68 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CD8194A7C
-	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 07:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473C11662F1
+	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 07:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736235467; cv=none; b=Snplsp6WR32TeKuQ/qpq9/7KI56EjRfkmeTqjdPL2J2R3vZ2wuokEfeegZUlLHndErkGrpoHdudBNVNq3GBDLuKovALUEKYTZEn77+CmbSqHHX0hv/8ZzEGgLLbcZNPTGRRzdHvf2/gO057tGikrkWcwpvgbrm0SK2BfEtzV+P8=
+	t=1736235501; cv=none; b=h9PohSFwb7o3RCvkxzVmW3JTnlzjErVbbfBSeKzDC5Y0xITwY1+m2LWVihXla1Tn4U0pUTSugA25HvqxTpKds7M/U8aqYvcoqoLmk6kti6OGxuwqYi691KOX+ys2ZIMRF1JA+sJLOFqDJxC/ASpFge6gSXTZnJA4ETZNtcWm6lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736235467; c=relaxed/simple;
-	bh=G0SNaoKmbujuoRbYi3RItEIAYIfkojoXo0Uyf/uEh+A=;
+	s=arc-20240116; t=1736235501; c=relaxed/simple;
+	bh=MeHjwlmHyRYJwqF55zIqyHrTafSLhdOwEGgkfNw2/cA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RB5g1d4Rg5ZqeWzqsw+KOGVHuETmao0vWahdkpW+vTLW+hE2de5hy7ItHvNAt3miwR3LS+9nCO+5hyvI5p5iZoScUCXoWw1+Uke69NLaY4YSleCuUE+ll0OC5Nnu5KRSt8EDryTTqwcqS/sGoBXVXoU/CGd/seDz12SItamd8WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=cIIse52q; arc=none smtp.client-ip=209.85.208.51
+	 To:Cc:Content-Type; b=CJOUt8QImfgRPoMwVjEfpCz+fzTKiFs2AedB8LdUEzSzEO/pxQIroJSv9M7eGQCjdpbJVhlD+cyZ4QVIX5lfVv4n65e7/9rZb5XJnVP26t6KIYuGpKAxZa5+83T0aJkHesYQqT+7Wx3LVnKQT3NP7lCnox6emMpCVHWHEKBZy6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=PWBJOlhH; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ionos.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="cIIse52q"
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5d3ce64e7e5so2844215a12.0
-        for <linux-block@vger.kernel.org>; Mon, 06 Jan 2025 23:37:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="PWBJOlhH"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3cd821c60so3505441a12.3
+        for <linux-block@vger.kernel.org>; Mon, 06 Jan 2025 23:38:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1736235461; x=1736840261; darn=vger.kernel.org;
+        d=ionos.com; s=google; t=1736235495; x=1736840295; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bx+19x0B2gmDNiPmEgOxy9mSgxj2NhTgxhyx+fJPwMI=;
-        b=cIIse52qF9qKKdbDe8MRc5La1gHFmZM84uUFajFRqyyoVbkCGxUOkZKV/q6bF1JMbL
-         WmVMsJHiZ29qEzdyxgLhE4xEHEDwxYj6zHDr+gK9MSnJGo+6qrdA3O4b9R8E+5ZkOQTY
-         FdZN3hVylVvjfLYSiyoTOknt5vHzTZ3N6yI7G/QtGZurNKy/ow4X3gQDzD9+PJachTpe
-         HQpWWtzr/hH7kLrUcwx0rf599oyDVvhL/HRbuDDywTMqHddMlaOr4Pnb7Srpo6IKBHPG
-         jsCACtjoxru99YL89iNd3d1CG2rtR7WIikqtj0joljKi8JtStzv6Mk8acpz1tHaQAvY9
-         aOaA==
+        bh=+K5NTtkkHH0F4j1K3TcqwFsH8+ooT4rladtnvSGOOpM=;
+        b=PWBJOlhHnrza5YuqS+/eAUU/E7AJYPJNX5NTjD4Jq2xbCGX9xjRHThB2uleP/MMWRb
+         /uDWgRg+DmWDNfxN7jScC6fQ4X962sGfiWe8CwAQGm1i/4l4U8C7xyuKTCtPzbbo2Flg
+         Ntg7KSCogu7U6uz8wOOHuKcYxTTR5ZShdc4f2yKUZYS1awUmzoLEb9cGOUP/749qxlPf
+         WMfF42Q/nraqjamWDz/Ao9kYAwUFOX98dRqPTzyoDnRuvzRyQc1AfpLbdwnrG7/qAEPA
+         lJkMTsjcS7f71L+OuyUEr1dmK/9b2wsByl18SqlIesLK5HXDw0Dm52A75CJbWNiO6Cwu
+         +Smw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736235461; x=1736840261;
+        d=1e100.net; s=20230601; t=1736235495; x=1736840295;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bx+19x0B2gmDNiPmEgOxy9mSgxj2NhTgxhyx+fJPwMI=;
-        b=EfnqXRcr/Zxsw2iET/mVuYmw2j/NnGyXUavGjButA3VcpB7ZS3y3ifbCB1HcJW4VXO
-         OKcMKx/qViYbnuLnizBzgjIY6vpJu4Lm3m+N8Y+L/TsML1goplFgAWr0enM2rQsO1QUV
-         /tAEclbmU59TNZbaz+94oHvqcXjUH5CgHuD63c+pvUyqqJOtUFIjdCilRvJBmuh27LJO
-         Wp+4f0+qrm6jTYClvSeJmcwu0Ei3wARXtI89Rf8mg/r0CQxqaspRu3NbdDMlOKoBKudk
-         Sm0ZpM33kn4r4KGspAy2WDqu7ZSsVIKmEN+gHN8Up22oZyk4mBZoHN5pucfBavqYyaWL
-         3f4g==
-X-Gm-Message-State: AOJu0YyczGyC2R4pqPYm/5I7vFzrV9QgUQbNcyZ8f4dwE6JC/uYu7dXb
-	Ov4DAd6tzjR6CgAspMYsp8OoY+c6+cys8aNBu5AzbfQlgkJY+iN3omnYBknFNBrjGmJIYHE/cfc
-	ToiKnkdrfhzHsFNCFA2Byzt8Anxbk+fswUcgr2+SCCjYt13rB
-X-Gm-Gg: ASbGnct40Z9BNaSehvDwbZNknjCl71Vr5svoJwvY+1iizJ5Us0XF86MGhI2Iy5z1piB
-	vvcxlqY505NCi52rfur3ZyjrV1VjutT0VPo+2gMlU2GvIc+5H6zzYsiBmIygLFdVy0HR1SGE=
-X-Google-Smtp-Source: AGHT+IFHiWN7HRV0tjVYeqqyJzr7VZvRlCA285ZkJj39Az5Q+NOXa/GqcYy3kqLT8UjvlN/1cFajXcSI9RNarU2euj8=
-X-Received: by 2002:a05:6402:2790:b0:5d0:e852:dca0 with SMTP id
- 4fb4d7f45d1cf-5d81de1c377mr21426236a12.11.1736235461329; Mon, 06 Jan 2025
- 23:37:41 -0800 (PST)
+        bh=+K5NTtkkHH0F4j1K3TcqwFsH8+ooT4rladtnvSGOOpM=;
+        b=Z3pNEfQxIafTuYEc+Q79WBM1h+J6RhRLvaQkeVyPifpW4yY8qOBABQOlcrMnbUcagj
+         pMeRWuy2Tl03iYPaFVIxufZq1sWMCoTS+84pRTTxHHEaKAZlwVZOBszqxWYgoKy91bCU
+         Md0RmxT77CAgKWaoqvo26uEX7UFRG9/9P/yIguB6GTI/VbUJ+giAyQ8PQoiq8Y7R77f/
+         ucBghrZ3VwHflmF0+JKdPEymrxAoK+u0BsyfyK+9c0kDhSAFgKwTw96st6sd31GIuByn
+         TUMoFAx8RjP/53QeMAcLWJXoArtEX3C58sIbMpr9X/iMkZsSHY8joRFcwQulN3BxHqAW
+         2EKg==
+X-Gm-Message-State: AOJu0YyNjgEjeFQ9uDIk8RGjROXD1K2wA6U577cnF2r59JZVupAGHK3w
+	GI8T2dVn34qd/waJeT1+uEXd3hK74XJjSSWwTVd/kvYNEVBOW4zQKXQQwO7rNmptalD5hQ2c/ro
+	zmXPYTCbJz1z7R5tw5foW/bWlVRl8IULDwyzOBw==
+X-Gm-Gg: ASbGncu23TeTJdBJ7xDPA81ArlEy0ut9zOFxO2pez8/tk+SVhPcO3RkgYWlskyhkQd4
+	06QBC0EcrqCMO8hLoxuwMvWOrKJAu+V1Az7ZbickVeBHxECEpaUh2k/KQfiZYle53Yxx/zcQ=
+X-Google-Smtp-Source: AGHT+IH0yHgQYI52xxhkAl+Pv+y2nSjW7oz6dhILeey3Yd3VP16wJofS2RwX7ROj0q0KGDxt7BeW9iSgKHibBj84w+w=
+X-Received: by 2002:a05:6402:5187:b0:5d0:bf79:e925 with SMTP id
+ 4fb4d7f45d1cf-5d81de07d1dmr19780495a12.6.1736235495597; Mon, 06 Jan 2025
+ 23:38:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250107060810.91111-1-lizhijian@fujitsu.com>
-In-Reply-To: <20250107060810.91111-1-lizhijian@fujitsu.com>
+References: <20250107060810.91111-1-lizhijian@fujitsu.com> <20250107060810.91111-2-lizhijian@fujitsu.com>
+In-Reply-To: <20250107060810.91111-2-lizhijian@fujitsu.com>
 From: Jinpu Wang <jinpu.wang@ionos.com>
-Date: Tue, 7 Jan 2025 08:37:30 +0100
-Message-ID: <CAMGffEmi5odRsHvjbqXiLNvuy8AFMJBOw1vv7HHGE9kep=HGgA@mail.gmail.com>
-Subject: Re: [PATCH blktests v4 1/2] tests/rnbd: Add a basic RNBD test
+Date: Tue, 7 Jan 2025 08:38:05 +0100
+Message-ID: <CAMGffEnkqZSEts7Cu9pCUmi9uYtP-vgjQ4qPYkDdkZpG=A_HNw@mail.gmail.com>
+Subject: Re: [PATCH blktests v4 2/2] tests/rnbd: Implement RNBD regression test
 To: Li Zhijian <lizhijian@fujitsu.com>
 Cc: linux-block@vger.kernel.org, shinichiro.kawasaki@wdc.com, 
 	linux-rdma@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>, 
@@ -73,27 +73,36 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, Jan 7, 2025 at 7:08=E2=80=AFAM Li Zhijian <lizhijian@fujitsu.com> w=
 rote:
 >
-> It attempts to connect and disconnect the rnbd service on localhost.
-> Actually, It also reveals a real kernel issue[0].
+> This test case has been in my possession for quite some time.
+> I am upstreaming it now because it has once again detected a regression i=
+n
+> a recent kernel release[0].
 >
-> rnbd/001 (Start Stop RNBD)                                   [passed]
->     runtime  1.425s  ...  1.157s
+> It's just stupid to connect and disconnect RNBD on localhost and expect
+> no dmesg exceptions, with some attempts actually succeeding.
 >
-> Please note that currently, only RTRS over RXE is supported.
+> rnbd/002 (Start Stop RNBD repeatedly)                        [passed]
+>     runtime                   13.252s  ...  13.099s
+>     start/stop success ratio  100/100  ...  100/100
 >
-> [0] https://lore.kernel.org/linux-rdma/20241231013416.1290920-1-lizhijian=
-@fujitsu.com/
+> [0] https://lore.kernel.org/linux-rdma/20241223025700.292536-1-lizhijian@=
+fujitsu.com/
 >
 > Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
 Thx for the patch, LGTM
 Reviewed-by: Jack Wang <jinpu.wang@ionos.com>
 > ---
 > V4:
->   test start_soft_rdma # Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com=
+>   - Fix a typo and update the passed condition # Shinichiro Kawasaki <shi=
+nichiro.kawasaki@wdc.com>
+>   - rename test_start_stop() to test_start_stop_repeatedly()
 >
 > V3:
->   new patch, add a seperate basic rnbd test and simplify the _start_rnbd_=
-client
+>   - Always stop the rnbd regardless of the result of start
+>
+> V2:
+>   - address comments from Shinichiro
+>   - minor fixes
 >
 > Copy to the RDMA/rtrs guys:
 >
@@ -102,29 +111,34 @@ client
 > Cc: Leon Romanovsky <leon@kernel.org>
 > Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
 > ---
->  tests/rnbd/001     | 39 ++++++++++++++++++++++++++++++++++
->  tests/rnbd/001.out |  2 ++
->  tests/rnbd/rc      | 52 ++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 93 insertions(+)
->  create mode 100755 tests/rnbd/001
->  create mode 100644 tests/rnbd/001.out
->  create mode 100644 tests/rnbd/rc
+>  tests/rnbd/002     | 47 ++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/rnbd/002.out |  2 ++
+>  2 files changed, 49 insertions(+)
+>  create mode 100755 tests/rnbd/002
+>  create mode 100644 tests/rnbd/002.out
 >
-> diff --git a/tests/rnbd/001 b/tests/rnbd/001
+> diff --git a/tests/rnbd/002 b/tests/rnbd/002
 > new file mode 100755
-> index 000000000000..ace2f8ea8a2b
+> index 000000000000..7d7da9401974
 > --- /dev/null
-> +++ b/tests/rnbd/001
-> @@ -0,0 +1,39 @@
+> +++ b/tests/rnbd/002
+> @@ -0,0 +1,47 @@
 > +#!/bin/bash
 > +# SPDX-License-Identifier: GPL-3.0+
 > +# Copyright (c) 2024 FUJITSU LIMITED. All Rights Reserved.
 > +#
-> +# Basic RNBD test
+> +# Commit 667db86bcbe8 ("RDMA/rtrs: Register ib event handler") introduce=
+d a
+> +# new element .deinit but never used it at all that lead to a
+> +# 'list_add corruption' kernel warning.
+> +#
+> +# This test is intended to check whether the current kernel is affected.
+> +# The following patch resolves this issue.
+> +#  RDMA/rtrs: Add missing deinit() call
 > +#
 > +. tests/rnbd/rc
 > +
-> +DESCRIPTION=3D"Start Stop RNBD"
+> +DESCRIPTION=3D"Start Stop RNBD repeatedly"
 > +CHECK_DMESG=3D1
 > +QUICK=3D1
 > +
@@ -133,96 +147,39 @@ client
 > +       _have_loop
 > +}
 > +
-> +test_start_stop()
+> +test_start_stop_repeatedly()
 > +{
 > +       _setup_rnbd || return
 > +
-> +       local loop_dev
+> +       local loop_dev i j=3D0
 > +       loop_dev=3D"$(losetup -f)"
 > +
-> +       if _start_rnbd_client "${loop_dev}"; then
-> +               sleep 0.5
-> +               _stop_rnbd_client || echo "Failed to disconnect rnbd"
-> +       else
-> +               echo "Failed to connect rnbd"
-> +       fi
+> +       for ((i=3D0;i<100;i++))
+> +       do
+> +               _start_rnbd_client "${loop_dev}" &>/dev/null
+> +               # Always stop it so that the next start has change to wor=
+k
+> +               _stop_rnbd_client &>/dev/null && ((j++))
+> +       done
+> +
+> +       TEST_RUN["start/stop success ratio"]=3D"${j}/${i}"
 > +
 > +       _cleanup_rnbd
 > +}
 > +
 > +test() {
 > +       echo "Running ${TEST_NAME}"
-> +       test_start_stop
+> +       test_start_stop_repeatedly
 > +       echo "Test complete"
 > +}
-> diff --git a/tests/rnbd/001.out b/tests/rnbd/001.out
+> diff --git a/tests/rnbd/002.out b/tests/rnbd/002.out
 > new file mode 100644
-> index 000000000000..c1f9980d0f7b
+> index 000000000000..2f055b8c82f9
 > --- /dev/null
-> +++ b/tests/rnbd/001.out
+> +++ b/tests/rnbd/002.out
 > @@ -0,0 +1,2 @@
-> +Running rnbd/001
+> +Running rnbd/002
 > +Test complete
-> diff --git a/tests/rnbd/rc b/tests/rnbd/rc
-> new file mode 100644
-> index 000000000000..a5edc2e5ad9c
-> --- /dev/null
-> +++ b/tests/rnbd/rc
-> @@ -0,0 +1,52 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (c) 2024 FUJITSU LIMITED. All Rights Reserved.
-> +#
-> +# RNBD tests.
-> +
-> +. common/rc
-> +. common/multipath-over-rdma
-> +
-> +_have_rnbd() {
-> +       if [[ "$USE_RXE" !=3D 1 ]]; then
-> +               SKIP_REASONS+=3D("Only USE_RXE=3D1 is supported")
-> +       fi
-> +       _have_driver rdma_rxe
-> +       _have_driver rnbd_server
-> +       _have_driver rnbd_client
-> +}
-> +
-> +_setup_rnbd() {
-> +       start_soft_rdma || return $?
-> +
-> +       for i in $(rdma_network_interfaces)
-> +       do
-> +               ipv4_addr=3D$(get_ipv4_addr "$i")
-> +               if [[ -n "${ipv4_addr}" ]]; then
-> +                       def_traddr=3D${ipv4_addr}
-> +               fi
-> +       done
-> +}
-> +
-> +_cleanup_rnbd()
-> +{
-> +       stop_soft_rdma
-> +}
-> +
-> +_stop_rnbd_client() {
-> +       local s sessions
-> +
-> +       sessions=3D$(ls -d /sys/block/rnbd* 2>/dev/null)
-> +       for s in $sessions
-> +       do
-> +               grep -qx blktest "$s"/rnbd/session && echo "normal" > "$s=
-"/rnbd/unmap_device
-> +       done
-> +}
-> +
-> +_start_rnbd_client() {
-> +       local blkdev=3D$1
-> +
-> +       # Stop potential remaining blktest sessions first
-> +       _stop_rnbd_client
-> +       echo "sessname=3Dblktest path=3Dip:$def_traddr device_path=3D$blk=
-dev" > /sys/devices/virtual/rnbd-client/ctl/map_device
-> +}
 > --
 > 2.47.0
 >
