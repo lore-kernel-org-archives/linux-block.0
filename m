@@ -1,61 +1,61 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357CB1EF092;
-	Tue,  7 Jan 2025 12:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96611F0E38;
+	Tue,  7 Jan 2025 12:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736251777; cv=none; b=DfRxyts3jz8/BExYHt+5fwuSy47TixPOgUFo+2V48yoqj5N/mSrVJ/f7VnVEH5NTbpNKEFP+DQ8kJRzfJzzKjqzwYUCiD+gIW17BTzcCR9xmJvWJGhC6hFA4Fg5Tp2ks2MttvzThHGUb40SAK/0RERZTuvrLpXl8HFDVlUObzq0=
+	t=1736251782; cv=none; b=oXnkkWaO0EATK7vjhNIfxpUCPGxmtE2ccIMy/DQ4QZ9eAuQ4QhcEXkbWugc8kgWckmavsUdSqxJ6TCHwsy3rAA8hh44L3La/8dHmcCi6cNgiPFPpDb+5x3ddwmuJTe4TUhJkRlxCIM9e3PZ+brfr4g4EFoi102R3DOIVlvvVzOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736251777; c=relaxed/simple;
-	bh=BcJ1+ErwhpYwGh/rfChvp0JPwe2mgonl6PVzz/hWq0k=;
+	s=arc-20240116; t=1736251782; c=relaxed/simple;
+	bh=RA3agkgGPoh3lll3WbU1VW0805xDHkJnUwLXxAsotgw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Di3Oe86HEMvvuM4vtf3afH//V7VljkwR5QmjSgMqbGSbxSfilylYCY0QvEjTvNL2ug4qcMrmNUE2iTXXC6lYWF90hazsaVwPz+/yU2bypmkHEw6y7EVG9Zus8yx/u8Z/ToR+YcCy/LDMwfLJDsJqJ0vgNPDgZVAx8KNEI8h3U+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jGZKwhbh; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=cwlVUz11WhlzFjXl8sEKVs6PweujnKKs7tgU5vAG8KOWyzb9MweJFM1DHf5eko8GJg2gJK8PlxiD1S+BaQ/Rd5c3uFBW3mCXSSr6YQm9Extpd1O04YmMwBRNeUTqHZ3vgMhRg6cKlK8ora6h7/8H+kySrj1DQLamuHzx2v2K0Ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P2hsUFGZ; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jGZKwhbh"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-216401de828so212315825ad.3;
-        Tue, 07 Jan 2025 04:09:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P2hsUFGZ"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21669fd5c7cso228823805ad.3;
+        Tue, 07 Jan 2025 04:08:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736251745; x=1736856545; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736251722; x=1736856522; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vJ+VSImmiXFzQePcnrhQ+GQSKc7zTHd3WIb9Tq+VcQU=;
-        b=jGZKwhbhZe5dmKulvH3lvUFIl28F10h3VsucOdkdMB6K6Th2k7GqNkXHZdAY2AoEg2
-         8z1TdOiK9QIJDPqeFAFUGjFFkPR84Wia8TwqYxf7oun0UKeM0tPtY/oqYl0YkBtiS8zY
-         /rqNA2t+aEOb1xknTMG9+80OZi2nabn/jnDmCrN3OrP9evGDyOTYtiqNuw+j35N1uhhq
-         CVEHjgDslhRSZBPkhD3+hy+1zsSP4CBZyagZBAeKTLOjNGU2keR2tPBmizHoHzOpEiRF
-         2QXZxnfx0J5ImI3tnU79GoqynpT/CTMoMZUiMg4INnEX/OupKSy3mVbCPh10TJPjdQCk
-         rbyw==
+        bh=3G38mp2BMfe/0ANq/zJ1yKW8K0dgj9kh1DASCV+yEbE=;
+        b=P2hsUFGZSNz3dAciWLz9svBy6DYas8hGLVQ6HcKM5PujCZaGu84v6uk78opVv1UPoo
+         rpgcGRcRQQtQ4qyzBgx90+UUO5ET4rD146nf/OGBslKpdOrG+v8ZX/4syagKOkQxjwQM
+         2oKNlJTaVleFJt26djlqNu9CPQO1J/GM3ZVVsFhiEzacCEdmyMesuDN44JlxqSuFRjI5
+         FvrHtoaKcbwvN1m1pwyT/YKDYzSc4VncGouGRs0oK18BmL96nO3tLqseYvyD8TlE3koM
+         Sz/1lT9w3U6SW3lF5rBU2orUXwKt+ZfuenKrsMnDtnbqPwErbmbXmYCgUE/kuU7sYhOt
+         27VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736251745; x=1736856545;
+        d=1e100.net; s=20230601; t=1736251722; x=1736856522;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vJ+VSImmiXFzQePcnrhQ+GQSKc7zTHd3WIb9Tq+VcQU=;
-        b=rFrWTf15Ah+KzuYZBK7qrQbLMZ7URq9noP64wjuLjJIpmNqOhuhHrToRQVtZ7meeEC
-         CQ9y0sBnw5CYfJP9/78+c+ez5tMR0xKJVuBjymBk4crETez7AKWzZYqTzI93TNYa3Ndd
-         DoeaRvYs7z0whFsUg7ky2MtksKXXUuzfBELdbhvHUe9zTK3rTLp2ZltTjKUI2h5Zuya7
-         N2BvGquVZ1WWQ5YoU9NNvP2mXPGlNpLPvct5GXFIuOwYZ86o57DXUPdw0OXVabSkrydx
-         Ar/UzxCeWNvug7ZjZ3w/trf8lLXd6elxTxAp7ctBwkb/RBaUcEeMI4MOFb/BOKbrcYJ+
-         G4pw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDIN9eA5MgEdw5NJBCzj24LclnXY/K+VlXcgHdz5PT7yYPw36xbSuzfvIzlDPJQBCDYH/USiYjnpMB8A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvWiRDu9ulhd0vjBfLfYmHCDW+FDedtoa2tNzi1M7xufOMBXgY
-	LLnAiqOWjzfnpHcwiRIhzAqV4BMpy39wXVfSzMy2NxV+hJg7Y9gEzU9q3R4UunM=
-X-Gm-Gg: ASbGncvpuirh/z3o2vhpOj3oW/q85eaIp1X25cDKY1sIyfvmDAiav/U7/0gJhXXPV7d
-	NZ1ZKb4zZBby3vva0XfEK0Zk5fyNJMUJpXwlGRg31YoTqHDnnhZJP+QC83ARP36ldz8ekeHlk3J
-	fmOesr4s2XBLc06leybBtyrzndM1XMELbv5FRjcywWJ4V+cKrcCxEFdKCjbn6TRoLJpwLFmM4nS
-	ueNK+nDrUxSGyWfC4NzbO+zVXpfbOXKWVQOvPQsB17BgXj6CQTUBOSNuV98kvb+oEXl
-X-Google-Smtp-Source: AGHT+IEMyh0qn+48/wwBvNg6K0uoHVG+djpoPH4ToP2Ro3iN6Tdbo264ul/fzW6g4ImCKpyQI8hUMA==
-X-Received: by 2002:a05:6a20:8412:b0:1e2:2e4:6b2a with SMTP id adf61e73a8af0-1e5e044af7bmr93846638637.5.1736251744825;
-        Tue, 07 Jan 2025 04:09:04 -0800 (PST)
+        bh=3G38mp2BMfe/0ANq/zJ1yKW8K0dgj9kh1DASCV+yEbE=;
+        b=OTkobXi1LAc/psstd+CphLowhxhSqATFr8AG3vHVtz0RPgg0oKnT+DjJX9VrnAflSy
+         0/DE/J8yHXHqoypzOBDS4grdnB2riNHr1SueHm9Z2OHYeWPSHfzFiqBoSS9vsIjUHNzF
+         JHKo0yN7kk6/z047W7PhZ5dNBWXrnbfyPerDR0xyRtQb5QwiETO7BXUm7X2YEa5AqBNs
+         FeI+JG7OmDrghr5na+jrUYCUVcAQSdV47sEFnBDntM6ZaUx2sBVwPX+/DZ1PdcoE7QSr
+         X58zGmBatUCkSNvigxv6QlHGhDpF1VV8yzRmFakTA/CTlUgfYod6ZaO3+wdG4JuFDTeo
+         MRgg==
+X-Forwarded-Encrypted: i=1; AJvYcCU2SgWam3Cj1hIrgeml4gjFXzYCuW6vbI/dkh+9yxSulQ6W1eZWaM3xLJd/ccBXB0++FCorc9TCsvs5/A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvKIMWhaASwXN0n0AMJQd4B06MFcwD+i41SlAKfhogDWVWf6K/
+	Q8LaV/nLb+7e396zqnRx3CHxqGg9/jd2ZBWr8HakJwEbELyfcsIv
+X-Gm-Gg: ASbGncuXZ0+XCs7OFl/XSBBgIvk1Es9CIYKy2zaQbZUduHSacP5qYYlXA/MGyA44cBc
+	PP7VkWbEleVkaSgG921xJ0FsUwP9Edm7hInw0hkQLMLRD9aCr15IqXgZUAueALXZumanJ3ZhzMl
+	c/pN95Q/F+XL3dC2yWKGu2U7oyYBWpGMd9pStyoZBz+KCqG+f0twmI8YfE6ae5J5zvmRZYk2s1t
+	r+u2KhkodnyNSnGJbALyKx9TQfY7DePrTj4CEL5WJB0/WO1FhUy0Ziw2PYsSeSqMnWf
+X-Google-Smtp-Source: AGHT+IH+93tib9I3CsDT9s05atKapyruR2G4c7itWJkFbpoz+llX05XKNRiFeZJKnIGE8qw8pVE66g==
+X-Received: by 2002:a05:6a21:3985:b0:1e1:9662:a6f2 with SMTP id adf61e73a8af0-1e5e07f973dmr108038894637.35.1736251722083;
+        Tue, 07 Jan 2025 04:08:42 -0800 (PST)
 Received: from fedora.redhat.com ([2001:250:3c1e:503:ffff:ffff:ffea:4903])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-72aad835b8dsm34245118b3a.63.2025.01.07.04.09.02
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-72aad835b8dsm34245118b3a.63.2025.01.07.04.08.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2025 04:09:04 -0800 (PST)
+        Tue, 07 Jan 2025 04:08:41 -0800 (PST)
 From: Ming Lei <tom.leiming@gmail.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -64,9 +64,9 @@ Cc: bpf@vger.kernel.org,
 	Martin KaFai Lau <martin.lau@linux.dev>,
 	Yonghong Song <yonghong.song@linux.dev>,
 	Ming Lei <tom.leiming@gmail.com>
-Subject: [RFC PATCH 22/22] ublk: document ublk-bpf & bpf-aio
-Date: Tue,  7 Jan 2025 20:04:13 +0800
-Message-ID: <20250107120417.1237392-23-tom.leiming@gmail.com>
+Subject: [RFC PATCH 15/22] ublk: bpf: add bpf aio kfunc
+Date: Tue,  7 Jan 2025 20:04:06 +0800
+Message-ID: <20250107120417.1237392-16-tom.leiming@gmail.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20250107120417.1237392-1-tom.leiming@gmail.com>
 References: <20250107120417.1237392-1-tom.leiming@gmail.com>
@@ -78,198 +78,453 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Document ublk-bpf motivation and implementation.
+Define bpf aio kfunc for bpf prog to submit AIO, so far it begins with
+filesystem IO only, and in the future, it may be extended for network IO.
 
-Document bpf-aio implementation.
+Only bvec buffer is covered for doing FS IO over this buffer, but it
+is easy to cover UBUF because we have the great iov iter.
 
-Document ublk-bpf selftests.
+With bpf aio, not only user-kernel context switch is avoided, but also
+user-kernel buffer copy is saved. It is very similar with loop's direct
+IO implementation.
+
+These kfuncs can be used for other subsystems, and should have belong to
+lib/, but let's start from ublk first. When it becomes mature or gets more
+use cases, it can be moved to /lib.
+
+Define bpf struct_ops of bpf_aio_complete_ops which needs to be implemented
+by the caller for completing bpf aio via bpf prog, which will be done in the
+following patches.
 
 Signed-off-by: Ming Lei <tom.leiming@gmail.com>
 ---
- Documentation/block/ublk.rst | 170 +++++++++++++++++++++++++++++++++++
- 1 file changed, 170 insertions(+)
+ drivers/block/ublk/Makefile  |   2 +-
+ drivers/block/ublk/bpf.c     |  40 +++++-
+ drivers/block/ublk/bpf.h     |   1 +
+ drivers/block/ublk/bpf_aio.c | 251 +++++++++++++++++++++++++++++++++++
+ drivers/block/ublk/bpf_aio.h |  66 +++++++++
+ 5 files changed, 358 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/block/ublk/bpf_aio.c
+ create mode 100644 drivers/block/ublk/bpf_aio.h
 
-diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-index 51665a3e6a50..bf7a3df48036 100644
---- a/Documentation/block/ublk.rst
-+++ b/Documentation/block/ublk.rst
-@@ -309,6 +309,176 @@ with specified IO tag in the command data:
-   ``UBLK_IO_COMMIT_AND_FETCH_REQ`` to the server, ublkdrv needs to copy
-   the server buffer (pages) read to the IO request pages.
+diff --git a/drivers/block/ublk/Makefile b/drivers/block/ublk/Makefile
+index f843a9005cdb..7094607c040d 100644
+--- a/drivers/block/ublk/Makefile
++++ b/drivers/block/ublk/Makefile
+@@ -5,6 +5,6 @@ ccflags-y			+= -I$(src)
  
-+
-+UBLK-BPF support
-+================
-+
-+Motivation
-+----------
-+
-+- support stacking ublk
-+
-+  There are many 3rd party volume manager, ublk may be built over ublk device
-+  for simplifying implementation, however, multiple userspace-kernel context
-+  switchs for handling one single IO can't be accepted from performance view
-+  of point
-+
-+  ublk-bpf can avoid user-kernel context switch in most fast io path, so ublk
-+  over ublk becomes possible
-+
-+- complicated virtual block device
-+
-+  Many complicated virtual block devices have admin&meta code path and normal
-+  IO fast path; meta & admin IO handling is usually complicated, so it can be
-+  moved to ublk server for relieving development burden; meantime IO fast path
-+  can be kept in kernel space for the sake of high performance.
-+
-+  Bpf provides rich maps, which helps a lot for communication between
-+  userspace and prog or between prog and prog.
-+
-+  One typical example is qcow2, which meta IO handling can be kept in
-+  ublk server, and fast IO path is moved to bpf prog. Efficient bpf map can be
-+  looked up first and see if this virtual LBA & host LBA mapping is hit in
-+  the map. If yes, handle the IO with ublk-bpf directly, otherwise forward to
-+  ublk server to populate the mapping first.
-+
-+- some simple high performance virtual devices
-+
-+  Such as null & loop, the whole implementation can be moved to bpf prog
-+  completely.
-+
-+- provides chance to get similar performance with kernel driver
-+
-+  One round of kernel/user context switch is avoided, and one extra IO data
-+  copy is saved
-+
-+bpf aio
-+-------
-+
-+bpf aio exports kfuncs for bpf prog to submit & complete IO in async way.
-+IO completion handler is provided by the bpf aio user, which is still
-+defined in bpf prog(such as ublk bpf prog) as `struct bpf_aio_complete_ops`
-+of bpf struct_ops.
-+
-+bpf aio is designed as generic interface, which can be used for any bpf prog
-+in theory, and it may be move to `/lib/` in future if the interface becomes
-+mature and stable enough.
-+
-+- bpf_aio_alloc()
-+
-+  Allocate one bpf aio instance of `struct bpf_aio`
-+
-+- bpf_aio_release()
-+
-+  Free one bpf aio instance of `struct bpf_aio`
-+
-+- bpf_aio_submit()
-+
-+  Submit one bpf aio instance of `struct bpf_aio` in async way.
-+
-+- `struct bpf_aio_complete_ops`
-+
-+  Define bpf aio completion callback implemented as bpf struct_ops, and
-+  it is called when the submitted bpf aio is completed.
-+
-+
-+ublk bpf implementation
-+-----------------------
-+
-+Export `struct ublk_bpf_ops` as bpf struct_ops, so that ublk IO command
-+can be queued or handled in the callback defined in the ublk bpf struct_ops,
-+see the whole logic in `ublk_run_bpf_handler`:
-+
-+- `UBLK_BPF_IO_QUEUED`
-+
-+  If ->queue_io_cmd() or ->queue_io_cmd_daemon() returns `UBLK_BPF_IO_QUEUED`,
-+  this IO command has been queued by bpf prog, so it won't be forwarded to
-+  ublk server
-+
-+- `UBLK_BPF_IO_REDIRECT`
-+
-+  If ->queue_io_cmd() or ->queue_io_cmd_daemon() returns `UBLK_BPF_IO_REDIRECT`,
-+  this IO command will be forwarded to ublk server
-+
-+- `UBLK_BPF_IO_CONTINUE`
-+
-+  If ->queue_io_cmd() or ->queue_io_cmd_daemon() returns `UBLK_BPF_IO_CONTINUE`,
-+  part of this io command is queued, and `ublk_bpf_return_t` carries how many
-+  bytes queued, so ublk driver will continue to call the callback to queue
-+  remained bytes of this io command further, this way is helpful for
-+  implementing stacking devices by allowing IO command split.
-+
-+ublk bpf provides kfuncs for ublk bpf prog to queue and handle ublk IO command:
-+
-+- ublk_bpf_complete_io()
-+
-+  Complete this ublk IO command
-+
-+- ublk_bpf_get_io_tag()
-+
-+  Get tag of this ublk IO command
-+
-+- ublk_bpf_get_queue_id()
-+
-+  Get queue id of this ublk IO command
-+
-+- ublk_bpf_get_dev_id()
-+
-+  Get device id of this ublk IO command
-+
-+- ublk_bpf_attach_and_prep_aio()
-+
-+  Attach & prepare bpf aio to this ublk IO command, bpf aio buffer is
-+  prepared, and aio's complete callback is setup, so the user prog can
-+  get notified when the bpf aio is completed
-+
-+- ublk_bpf_dettach_and_complete_aio()
-+
-+  Detach bpf aio from this IO command, and it is usually called from bpf
-+  aio's completion callback.
-+
-+- ublk_bpf_acquire_io_from_aio()
-+
-+  Acquire ublk IO command from the aio, one typical use is for calling
-+  ublk_bpf_complete_io() to complete ublk IO command
-+
-+- ublk_bpf_release_io_from_aio()
-+
-+  Release ublk IO command which is acquired from `ublk_bpf_acquire_io_from_aio`
-+
-+
-+Test
-+----
-+
-+- Build kernel & install kernel headers & reboot & test
-+
-+  enable CONFIG_BLK_DEV_UBLK & CONFIG_UBLK_BPF
-+
-+  make
-+
-+  make headers_install INSTALL_HDR_PATH=/usr
-+
-+  reboot
-+
-+  make -C tools/testing/selftests TARGETS=ublk run_test
-+
-+ublk selftests implements null, loop and stripe targets for covering all
-+bpf features:
-+
-+- complete bpf IO handling
-+
-+- complete ublk server IO handling
-+
-+- mixed bpf prog and ublk server IO handling
-+
-+- bpf aio for loop & stripe
-+
-+- IO split via `UBLK_BPF_IO_CONTINUE` for implementing ublk-stripe
-+
-+Write & read verify, and mkfs.ext4 & mount & umount are run in the
-+selftest.
-+
-+
- Future development
- ==================
+ ublk_drv-$(CONFIG_BLK_DEV_UBLK)	:= main.o
+ ifeq ($(CONFIG_UBLK_BPF), y)
+-ublk_drv-$(CONFIG_BLK_DEV_UBLK)	+= bpf_ops.o bpf.o
++ublk_drv-$(CONFIG_BLK_DEV_UBLK)	+= bpf_ops.o bpf.o bpf_aio.o
+ endif
+ obj-$(CONFIG_BLK_DEV_UBLK)	+= ublk_drv.o
+diff --git a/drivers/block/ublk/bpf.c b/drivers/block/ublk/bpf.c
+index ef1546a7ccda..d5880d61abe5 100644
+--- a/drivers/block/ublk/bpf.c
++++ b/drivers/block/ublk/bpf.c
+@@ -155,8 +155,23 @@ BTF_ID_FLAGS(func, ublk_bpf_get_iod, KF_TRUSTED_ARGS | KF_RET_NULL)
+ BTF_ID_FLAGS(func, ublk_bpf_get_io_tag, KF_TRUSTED_ARGS)
+ BTF_ID_FLAGS(func, ublk_bpf_get_queue_id, KF_TRUSTED_ARGS)
+ BTF_ID_FLAGS(func, ublk_bpf_get_dev_id, KF_TRUSTED_ARGS)
++
++/* bpf aio kfunc */
++BTF_ID_FLAGS(func, bpf_aio_alloc, KF_RET_NULL)
++BTF_ID_FLAGS(func, bpf_aio_alloc_sleepable, KF_RET_NULL)
++BTF_ID_FLAGS(func, bpf_aio_release)
++BTF_ID_FLAGS(func, bpf_aio_submit)
+ BTF_KFUNCS_END(ublk_bpf_kfunc_ids)
  
++__bpf_kfunc void bpf_aio_release_dtor(void *aio)
++{
++	bpf_aio_release(aio);
++}
++CFI_NOSEAL(bpf_aio_release_dtor);
++BTF_ID_LIST(bpf_aio_dtor_ids)
++BTF_ID(struct, bpf_aio)
++BTF_ID(func, bpf_aio_release_dtor)
++
+ static const struct btf_kfunc_id_set ublk_bpf_kfunc_set = {
+ 	.owner = THIS_MODULE,
+ 	.set   = &ublk_bpf_kfunc_ids,
+@@ -164,6 +179,12 @@ static const struct btf_kfunc_id_set ublk_bpf_kfunc_set = {
+ 
+ int __init ublk_bpf_init(void)
+ {
++	const struct btf_id_dtor_kfunc aio_dtors[] = {
++		{
++			.btf_id	      = bpf_aio_dtor_ids[0],
++			.kfunc_btf_id = bpf_aio_dtor_ids[1]
++		},
++	};
+ 	int err;
+ 
+ 	err = register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS,
+@@ -172,5 +193,22 @@ int __init ublk_bpf_init(void)
+ 		pr_warn("error while setting UBLK BPF tracing kfuncs: %d", err);
+ 		return err;
+ 	}
+-	return ublk_bpf_struct_ops_init();
++
++	err = ublk_bpf_struct_ops_init();
++	if (err) {
++		pr_warn("error while initializing ublk bpf struct_ops: %d", err);
++		return err;
++	}
++
++	err = register_btf_id_dtor_kfuncs(aio_dtors, ARRAY_SIZE(aio_dtors),
++			THIS_MODULE);
++	if (err) {
++		pr_warn("error while registering aio destructor: %d", err);
++		return err;
++	}
++
++	err = bpf_aio_init();
++	if (err)
++		pr_warn("error while initializing bpf aio kfunc: %d", err);
++	return err;
+ }
+diff --git a/drivers/block/ublk/bpf.h b/drivers/block/ublk/bpf.h
+index 4e178cbecb74..0ab25743ae7d 100644
+--- a/drivers/block/ublk/bpf.h
++++ b/drivers/block/ublk/bpf.h
+@@ -3,6 +3,7 @@
+ #define UBLK_INT_BPF_HEADER
+ 
+ #include "bpf_reg.h"
++#include "bpf_aio.h"
+ 
+ typedef unsigned long ublk_bpf_return_t;
+ typedef ublk_bpf_return_t (*queue_io_cmd_t)(struct ublk_bpf_io *io, unsigned int);
+diff --git a/drivers/block/ublk/bpf_aio.c b/drivers/block/ublk/bpf_aio.c
+new file mode 100644
+index 000000000000..65013fe8054f
+--- /dev/null
++++ b/drivers/block/ublk/bpf_aio.c
+@@ -0,0 +1,251 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2024 Red Hat */
++
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/bpf.h>
++#include <linux/bpf_mem_alloc.h>
++#include <linux/btf.h>
++#include <linux/btf_ids.h>
++#include <linux/filter.h>
++
++#include "bpf_aio.h"
++
++static int __bpf_aio_submit(struct bpf_aio *aio);
++
++static struct kmem_cache *bpf_aio_cachep;
++static struct kmem_cache *bpf_aio_work_cachep;
++static struct workqueue_struct *bpf_aio_wq;
++
++static inline bool bpf_aio_is_rw(int op)
++{
++	return op == BPF_AIO_OP_FS_READ || op == BPF_AIO_OP_FS_WRITE;
++}
++
++/* check if it is short read */
++static bool bpf_aio_is_short_read(const struct bpf_aio *aio, long ret)
++{
++	return ret >= 0 && ret < aio->bytes &&
++		bpf_aio_get_op(aio) == BPF_AIO_OP_FS_READ;
++}
++
++/* zeroing the remained bytes starting from `off` to end */
++static void bpf_aio_zero_remained(const struct bpf_aio *aio, long off)
++{
++	struct iov_iter iter;
++
++	iov_iter_bvec(&iter, ITER_DEST, aio->buf.bvec, aio->buf.nr_bvec, aio->bytes);
++	iter.iov_offset = aio->buf.bvec_off;
++
++	iov_iter_advance(&iter, off);
++	iov_iter_zero(aio->bytes - off, &iter);
++}
++
++static void bpf_aio_do_completion(struct bpf_aio *aio)
++{
++	if (aio->iocb.ki_filp)
++		fput(aio->iocb.ki_filp);
++	if (aio->work)
++		kmem_cache_free(bpf_aio_work_cachep, aio->work);
++}
++
++/* ->ki_complete callback */
++static void bpf_aio_complete(struct kiocb *iocb, long ret)
++{
++	struct bpf_aio *aio = container_of(iocb, struct bpf_aio, iocb);
++
++	if (unlikely(ret == -EAGAIN)) {
++		aio->opf |= BPF_AIO_FORCE_WQ;
++		ret = __bpf_aio_submit(aio);
++		if (!ret)
++			return;
++	}
++
++	/* zero the remained bytes in case of short read */
++	if (bpf_aio_is_short_read(aio, ret))
++		bpf_aio_zero_remained(aio, ret);
++
++	bpf_aio_do_completion(aio);
++	aio->ops->bpf_aio_complete_cb(aio, ret);
++}
++
++static void bpf_aio_prep_rw(struct bpf_aio *aio, unsigned int rw,
++		struct iov_iter *iter)
++{
++	iov_iter_bvec(iter, rw, aio->buf.bvec, aio->buf.nr_bvec, aio->bytes);
++	iter->iov_offset = aio->buf.bvec_off;
++
++	if (unlikely(aio->opf & BPF_AIO_FORCE_WQ)) {
++		aio->iocb.ki_flags &= ~IOCB_NOWAIT;
++		aio->iocb.ki_complete = NULL;
++	} else {
++		aio->iocb.ki_flags |= IOCB_NOWAIT;
++		aio->iocb.ki_complete = bpf_aio_complete;
++	}
++}
++
++static int bpf_aio_do_submit(struct bpf_aio *aio)
++{
++	int op = bpf_aio_get_op(aio);
++	struct iov_iter iter;
++	struct file *file = aio->iocb.ki_filp;
++	int ret;
++
++	switch (op) {
++	case BPF_AIO_OP_FS_READ:
++		bpf_aio_prep_rw(aio, ITER_DEST, &iter);
++		if (file->f_op->read_iter)
++			ret = file->f_op->read_iter(&aio->iocb, &iter);
++		else
++			ret = -EOPNOTSUPP;
++		break;
++	case BPF_AIO_OP_FS_WRITE:
++		bpf_aio_prep_rw(aio, ITER_SOURCE, &iter);
++		if (file->f_op->write_iter)
++			ret = file->f_op->write_iter(&aio->iocb, &iter);
++		else
++			ret = -EOPNOTSUPP;
++		break;
++	case BPF_AIO_OP_FS_FSYNC:
++		ret = vfs_fsync_range(aio->iocb.ki_filp, aio->iocb.ki_pos,
++				aio->iocb.ki_pos + aio->bytes - 1, 0);
++		if (unlikely(ret && ret != -EINVAL))
++			ret = -EIO;
++		break;
++	case BPF_AIO_OP_FS_FALLOCATE:
++		ret = vfs_fallocate(aio->iocb.ki_filp, aio->iocb.ki_flags,
++				aio->iocb.ki_pos, aio->bytes);
++		break;
++	default:
++		ret = -EINVAL;
++	}
++
++	if (ret == -EIOCBQUEUED) {
++		ret = 0;
++	} else if (ret != -EAGAIN) {
++		bpf_aio_complete(&aio->iocb, ret);
++		ret = 0;
++	}
++
++	return ret;
++}
++
++static void bpf_aio_submit_work(struct work_struct *work)
++{
++	struct bpf_aio_work *aio_work = container_of(work, struct bpf_aio_work, work);
++
++	bpf_aio_do_submit(aio_work->aio);
++}
++
++static int __bpf_aio_submit(struct bpf_aio *aio)
++{
++	struct work_struct *work;
++
++do_submit:
++	if (likely(!(aio->opf & BPF_AIO_FORCE_WQ))) {
++		int ret = bpf_aio_do_submit(aio);
++
++		/* retry via workqueue in case of -EAGAIN */
++		if (ret != -EAGAIN)
++			return ret;
++		aio->opf |= BPF_AIO_FORCE_WQ;
++	}
++
++	if (!aio->work) {
++		bool in_irq = in_interrupt();
++		gfp_t gfpflags = in_irq ? GFP_ATOMIC : GFP_NOIO;
++
++		aio->work = kmem_cache_alloc(bpf_aio_work_cachep, gfpflags);
++		if (unlikely(!aio->work)) {
++			if (in_irq)
++				return -ENOMEM;
++			aio->opf &= ~BPF_AIO_FORCE_WQ;
++			goto do_submit;
++		}
++	}
++
++	aio->work->aio = aio;
++	work = &aio->work->work;
++	INIT_WORK(work, bpf_aio_submit_work);
++	queue_work(bpf_aio_wq, work);
++
++	return 0;
++}
++
++static struct bpf_aio *__bpf_aio_alloc(gfp_t gfpflags, unsigned op,
++				       enum bpf_aio_flag aio_flags)
++{
++	struct bpf_aio *aio;
++
++	if (op >= BPF_AIO_OP_LAST)
++		return NULL;
++
++	if (aio_flags & BPF_AIO_OP_MASK)
++		return NULL;
++
++	aio = kmem_cache_alloc(bpf_aio_cachep, gfpflags);
++	if (!aio)
++		return NULL;
++
++	memset(aio, 0, sizeof(*aio));
++	aio->opf = op | (unsigned int)aio_flags;
++	return aio;
++}
++
++__bpf_kfunc struct bpf_aio *bpf_aio_alloc(unsigned int op, enum bpf_aio_flag aio_flags)
++{
++	return __bpf_aio_alloc(GFP_ATOMIC, op, aio_flags);
++}
++
++__bpf_kfunc struct bpf_aio *bpf_aio_alloc_sleepable(unsigned int op, enum bpf_aio_flag aio_flags)
++{
++	return __bpf_aio_alloc(GFP_NOIO, op, aio_flags);
++}
++
++__bpf_kfunc void bpf_aio_release(struct bpf_aio *aio)
++{
++	kmem_cache_free(bpf_aio_cachep, aio);
++}
++
++/* Submit AIO from bpf prog */
++__bpf_kfunc int bpf_aio_submit(struct bpf_aio *aio, int fd, loff_t pos,
++		unsigned bytes, unsigned io_flags)
++{
++	struct file *file;
++
++	if (!aio->ops)
++		return -EINVAL;
++
++	file = fget(fd);
++	if (!file)
++		return -EINVAL;
++
++	/* we could be called from io completion handler */
++	if (in_interrupt())
++		aio->opf |= BPF_AIO_FORCE_WQ;
++
++	aio->iocb.ki_pos = pos;
++	aio->iocb.ki_filp = file;
++	aio->iocb.ki_flags = io_flags;
++	aio->bytes = bytes;
++	if (bpf_aio_is_rw(bpf_aio_get_op(aio))) {
++		if (file->f_flags & O_DIRECT)
++			aio->iocb.ki_flags |= IOCB_DIRECT;
++		else
++			aio->opf |= BPF_AIO_FORCE_WQ;
++		aio->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
++	} else {
++		aio->opf |= BPF_AIO_FORCE_WQ;
++	}
++
++	return __bpf_aio_submit(aio);
++}
++
++int __init bpf_aio_init(void)
++{
++	bpf_aio_cachep = KMEM_CACHE(bpf_aio, SLAB_PANIC);
++	bpf_aio_work_cachep = KMEM_CACHE(bpf_aio_work, SLAB_PANIC);
++	bpf_aio_wq = alloc_workqueue("bpf_aio", WQ_MEM_RECLAIM | WQ_HIGHPRI, 0);
++
++	return 0;
++}
+diff --git a/drivers/block/ublk/bpf_aio.h b/drivers/block/ublk/bpf_aio.h
+new file mode 100644
+index 000000000000..625737965c90
+--- /dev/null
++++ b/drivers/block/ublk/bpf_aio.h
+@@ -0,0 +1,66 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Copyright (c) 2024 Red Hat */
++#ifndef UBLK_BPF_AIO_HEADER
++#define UBLK_BPF_AIO_HEADER
++
++#define	BPF_AIO_OP_BITS		8
++#define	BPF_AIO_OP_MASK		((1 << BPF_AIO_OP_BITS) - 1)
++
++enum bpf_aio_op {
++	BPF_AIO_OP_FS_READ	= 0,
++	BPF_AIO_OP_FS_WRITE,
++	BPF_AIO_OP_FS_FSYNC,
++	BPF_AIO_OP_FS_FALLOCATE,
++	BPF_AIO_OP_LAST,
++};
++
++enum bpf_aio_flag_bits {
++	/* force to submit io from wq */
++	__BPF_AIO_FORCE_WQ	= BPF_AIO_OP_BITS,
++	__BPF_AIO_NR_BITS,	/* stops here */
++};
++
++enum bpf_aio_flag {
++	BPF_AIO_FORCE_WQ	= (1 << __BPF_AIO_FORCE_WQ),
++};
++
++struct bpf_aio_work {
++	struct bpf_aio		*aio;
++	struct work_struct	work;
++};
++
++/* todo: support ubuf & iovec in future */
++struct bpf_aio_buf {
++	unsigned int		bvec_off;
++	int			nr_bvec;
++	const struct bio_vec	*bvec;
++};
++
++struct bpf_aio {
++	unsigned int opf;
++	unsigned int bytes;
++	struct bpf_aio_buf	buf;
++	struct bpf_aio_work	*work;
++	const struct bpf_aio_complete_ops *ops;
++	struct kiocb iocb;
++};
++
++typedef void (*bpf_aio_complete_t)(struct bpf_aio *io, long ret);
++
++struct bpf_aio_complete_ops {
++	unsigned int		id;
++	bpf_aio_complete_t	bpf_aio_complete_cb;
++};
++
++static inline unsigned int bpf_aio_get_op(const struct bpf_aio *aio)
++{
++	return aio->opf & BPF_AIO_OP_MASK;
++}
++
++int bpf_aio_init(void);
++struct bpf_aio *bpf_aio_alloc(unsigned int op, enum bpf_aio_flag aio_flags);
++struct bpf_aio *bpf_aio_alloc_sleepable(unsigned int op, enum bpf_aio_flag aio_flags);
++void bpf_aio_release(struct bpf_aio *aio);
++int bpf_aio_submit(struct bpf_aio *aio, int fd, loff_t pos, unsigned bytes,
++		unsigned io_flags);
++#endif
 -- 
 2.47.0
 
