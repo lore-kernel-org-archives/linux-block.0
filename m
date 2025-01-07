@@ -1,97 +1,92 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBBA2E634
-	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 00:45:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B7D4D8A3
+	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 01:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736210732; cv=none; b=DFIHS2NnENWRVLeg8NYIozZAKSdajxRVpLOKclJjqLbvHblMC2jPog+gBwD/W6ASSf9n3MpXusCeF3NtGOy6/AeM+wVtAAboffqvnrkYndqJxEP+9AIiI8YJkwShYNaEJFTtqv+RqC5kRq1O/QZixoiAifHoQNKEFuE8pGLQh38=
+	t=1736212120; cv=none; b=TtfquGfmu1jFwrtib4HrPr9QCnMJWRKdeBuewp3fRzBpgaGWayFFXKzELoExz5GqO0DqCYzlw1v1SinFSgtXKENURrZNwC/rtCPSFSrdleXNGyfHudwPPmt/EHZ2UwMTRK4QXFzHhFCmjQi3K3k6RNMHJllbWCWPJq8kapZTeX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736210732; c=relaxed/simple;
-	bh=+Wn/MP0S6m5z3l005GkIlGnJGFLeTI5IC0myX7X9ssw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xp1jtvMI8Plak1l/IY9dDZ8GCB3BwWuKXnAW5IQaIt3iW7bN3yt5XX1Xu7Ql1d8ftmeX7O9aXXL5FPGCoRCaVkLZTqA7i7AlpLoebcPMdOgDLeP5hhevY5mB2WeM5/h3fyIk8seUnmALy0udWjpSZuAxyBjEJdO8Lv500kDsgSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FAxPdJ1L; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1736212120; c=relaxed/simple;
+	bh=0O1deFSuqhegkQRnjArcqP152Ab7BEbaIhxVPX1n/0U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SGMnJf0jndYbV5ISJSSoIFbc6Xqv558I5kj98ZkCzuplLLEwyE6CMYaITpTICF82x9FmxEMUbfoyTwaJYiWo4aLz3/8gxNMZiYTPzCpHA9ifgUXo1rxIOxI1C0IIC6PlfTR24lkBVB9lPLCHXhvehv7PekLof26pm4BdWEzrARs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UjkeEk88; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FAxPdJ1L"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736210729;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B2ow3WPU9nS00Hk+pQzwgzy+yTO/847uxs0UlW6oZME=;
-	b=FAxPdJ1LOV1uGkteecqxt8PkYnCrxxYb1q1oyRKhzqFP1BXvRPYqgUq59U1QxLzWFZPTbX
-	yeXdWnH/HK2O3Pc0E+r9Blk5rFVJRvlqEQialAbmPmdQKlJP0iqVq8IVAbd/9PPqTFnNKF
-	p8RGyOIgRDmRcKuZ/s+ihQGK4xi2Clw=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-487-57ER_xUgNEOOYM1u31EC0g-1; Mon,
- 06 Jan 2025 19:45:26 -0500
-X-MC-Unique: 57ER_xUgNEOOYM1u31EC0g-1
-X-Mimecast-MFC-AGG-ID: 57ER_xUgNEOOYM1u31EC0g
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AEC8919560B2;
-	Tue,  7 Jan 2025 00:45:23 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.43])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AC74519560A2;
-	Tue,  7 Jan 2025 00:45:17 +0000 (UTC)
-Date: Tue, 7 Jan 2025 08:45:11 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Nilay Shroff <nilay@linux.ibm.com>
-Subject: Re: [PATCH 1/3] block: Fix sysfs queue freeze and limits lock order
-Message-ID: <Z3x5F3_GIkD4sxl7@fedora>
-References: <20250104132522.247376-1-dlemoal@kernel.org>
- <20250104132522.247376-2-dlemoal@kernel.org>
- <Z3tOn4C5i096owJc@fedora>
- <20250106082902.GC18408@lst.de>
- <Z3u7Twc4UPWvlfJJ@fedora>
- <20250106152931.GC27431@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UjkeEk88"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DF3EC4CEE1;
+	Tue,  7 Jan 2025 01:08:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736212119;
+	bh=0O1deFSuqhegkQRnjArcqP152Ab7BEbaIhxVPX1n/0U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=UjkeEk886TiG47Yh1TRqnSvzR47WrCvlYpGo58Vo0TkGFODWgIdXljVAap020WcGI
+	 MxqmrBzxapuQVigij8q0F3TWN/+072y19B0fkXAxXlGsQRm3oqNCL0Yae3rTUwU5Ry
+	 gJKYwCz+qkCwnMWRzUkYDqn9xMq5BwgtoytZ6DT8DTaTsK7bzJJejeeOH2bLPKOFGg
+	 Kp2uzn7nolCzohTHTYbKFkjbnzags49BWOEYahwlc9aMX/ngi3r+GdwAuHWlQPTffm
+	 MYHCCrin4MnWsCzMDZC+z5lq21klqPKXYaXjBA3ydkufk+wHzL4V0VTw+WcUH6Nhsk
+	 po0ck0ItbQv5g==
+Message-ID: <606367a7-9bb5-48e5-a7ef-466eefd833fb@kernel.org>
+Date: Tue, 7 Jan 2025 10:08:38 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250106152931.GC27431@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] New zoned loop block device driver
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+References: <20250106142439.216598-1-dlemoal@kernel.org>
+ <2f7c9abe-a23f-4b2f-99aa-e6d220c74dd0@kernel.dk>
+ <20250106152118.GB27324@lst.de>
+ <98be988f-5f6a-489d-b0e1-2f783c5b8a32@kernel.dk>
+ <20250106153252.GA27739@lst.de>
+ <0f2eea00-e5e9-4cd1-8fe6-89ed0c2b262b@kernel.dk>
+ <20250106154433.GA28074@lst.de>
+ <5f57ff26-2c87-45fa-bb91-4f68492bac85@kernel.dk>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <5f57ff26-2c87-45fa-bb91-4f68492bac85@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 06, 2025 at 04:29:31PM +0100, Christoph Hellwig wrote:
-> On Mon, Jan 06, 2025 at 07:15:27PM +0800, Ming Lei wrote:
-> > On Mon, Jan 06, 2025 at 09:29:02AM +0100, Christoph Hellwig wrote:
-> > > On Mon, Jan 06, 2025 at 11:31:43AM +0800, Ming Lei wrote:
-> > > > As I mentioned in another thread, freezing queue may not be needed in
-> > > > ->store(), so let's discuss and confirm if it is needed here first.
-> > > > 
-> > > > https://lore.kernel.org/linux-block/Z3tHozKiUqWr7gjO@fedora/
-> > > 
-> > > We do need the freezing.  What you're proposing is playing fast and loose
-> > > which is going to get us in trouble.
-> > 
-> > It is just soft update from sysfs interface, and both the old and new limits
-> > are correct from device viewpoint.
-> > 
-> > What is the trouble? We have run the .store() code without freezing for
-> > more than 10 years, no one report issue in the area.
+On 1/7/25 02:38, Jens Axboe wrote:
+>> I think this is a valid and reasonable discussion.  But maybe we're
+>> just not on the same page.  I don't know anything existing and usable,
+>> maybe I've just not found it?
 > 
-> No, we had various bug reports due to it, including racing with other
-> updates.  Let's stop trying to take shortcuts that will byte us again
-> later and sort this out properly.
+> Not that I'm aware of, it was just a suggestion/thought that we could
+> utilize an existing driver for this, rather than have a separate one.
+> Yes the proposed one is pretty simple and not large, and maintaining it
+> isn't a big deal, but it's still a new driver and hence why I was asking
+> "why can't we just use ublk for this". That also keeps the code mostly
+> in userspace which is nice, rather than needing kernel changes for new
+> features, changes, etc.
 
-Can you share the bug reports? I am curious how it happen.
+I did consider ublk at some point but did not switch to it because a ublk
+backend driver to do the same as zloop in userspace would need a lot more code
+to be efficient. And even then, as Christoph already mentioned, we would still
+have performance suffer from the context switches. But that performance point
+was not the primary stopper though as this driver is not intended for production
+use but rather to be the simplest possible setup that can be used in CI systems
+to test zoned file systems (among other zone related things).
+
+A kernel-based implementation is simpler and the configuration interface
+literally needs only a single echo bash command to add or remove devices. This
+allows minimal VM configurations with no dependencies on user tools/libraries to
+run these zoned devices, which is what we wanted.
+
+I completely agree about the user-space vs kernel tradeoff you mentioned. I did
+consider it but the code simplicity and ease of use in practice won for us and I
+chose to stick with the kernel driver approach.
+
+Note that if you are OK with this, I need to send a V2 to correct the Kconfig
+description which currently shows an invalid configuration command example.
 
 
-Thanks, 
-Ming
-
+-- 
+Damien Le Moal
+Western Digital Research
