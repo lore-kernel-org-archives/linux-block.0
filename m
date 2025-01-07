@@ -1,140 +1,122 @@
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6770B1F4289
-	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 21:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED0D1A83E1;
+	Tue,  7 Jan 2025 23:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736284249; cv=none; b=Je9j3ArLDMuXj7FEiYhEsfJd24MfdT14WmLRTxQCUT7Zz878nZYIvWwgsn4ETYVZsf5nemOMy/QJAlhQkvGcUKgB7onknmiie8LqZyc0O+ed+kyX8Q1RRllNYeEMti4eI0/7cdad2acC/68we09gqo0V8Rw/lA5JsnPdQpssVKc=
+	t=1736291353; cv=none; b=tFNo2xWbGjaNLHydK9fmVI3vi3S3MkDTReZ8laSQLQ3ZCBiQ5smH89TrXhrVcJWTKnrvu+Fk2cF+YnGA9YLloj2KUChx6Tfi1+rFLb80y3CU9lTAYNyYlNtuEU2by2W7dnvwYvVfdvN2TF+HewkxEKYozXOF1zdmWT+IA01gprE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736284249; c=relaxed/simple;
-	bh=bfNiDvyyx7qhUityr421yj4aSLY2Rzm0lbZJ4IVYp3Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ryWMQ4XyhawKn12Lsjkr00k+9xiWrYlvYBv7Rx9PwdyXqfo8e7vErT4hRnn7I216mkKd5os8briPUC8idm2TC+07CkmbQwrKbubM2mDlOnXu05SKP1c550/loUHGdFAw4L/DjM2bgT49kIEbEIqYTYNCmqm5oiEas1c4OLPPACg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Bl+19n7t; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1736291353; c=relaxed/simple;
+	bh=w1XXgL3jt5Aty8Ttw2N2wfWJmLJOID7g/8HTbnQrFBc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S3aNXFZiVm27xa014Soor3GWP2l4RpRGqvpA6mgD9/y5hBKmYdXZiotvn97K/Ls8MJIYzLjs8s4R7TM9BHhGRM8f4QtxndMtZMX158Mi8aUxlyjZv8OaxampMNEDVaPhAGeH7rpuOedmr/bHYoADH0SJMErvkxiFgP6aDCvYkaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=It++wkGW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Bl+19n7t"
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-844e55a981dso631765839f.3
-        for <linux-block@vger.kernel.org>; Tue, 07 Jan 2025 13:10:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736284246; x=1736889046; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=83K2XNnz/iqgOoPPg3qHJnPphRK/d4Ei+N3hZFxkUvg=;
-        b=Bl+19n7tG/mpFYkLyP3BZDvr3H8sHe9tUBq3og1OYSQHkkFhePRQVDkwiXC4It5vJE
-         5UtOyw7G4+m77UpnWdwN/YNER80+nr0c+cP2qGjF4CxEZVa6ATwzfX0n1kbeCkRt0MVs
-         fyNW3R70NQKQv75INGCChwKvEA/w0HEI3SIs5s7nRW4JnrNAuRjMujaJTy6hgNAGrIKJ
-         F+f4yMX5mOLZYPOySwSU8HGVvr0/5tGzFbWqQRJfEnX3ejcuqpqbNI+pE4JRu7N1cADR
-         LDwxjiZSsBS3S4XRhJv8gDNTRjkA74PxPqubHJBEPYV5jnlgGskkLcBdz4m73swCL1fX
-         XGBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736284246; x=1736889046;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=83K2XNnz/iqgOoPPg3qHJnPphRK/d4Ei+N3hZFxkUvg=;
-        b=n+qcsD3Sn5ZZ5jKH4RKhWw1nbqPhC8107mvJm7IlYRNrK6A4uKPcJQwgSblAPVQnIZ
-         OW8FPwajxy0VQISmM2V/itXgTFT7qHQDSTC5RmSagbPuBgcZybSCEfrnN8L4SGrNVvPA
-         6EJdxKT5p2UCgN5kWvspSk6I3HUiT/CZidzDch/7YGCyLo0675q8LQy2JV5h4YSeRtXV
-         UpPA5L2ZQfFcTbMtg99lwYjT/h4M0zawdzCiCPpVuycdQB3CP18Lo1jGZ0uZ1edK9dxB
-         k3qN3oZMcIe8yrlkuaO3NYUH0eEUb8NliQ3vFSiU4E6ORa3ukV9qX6lWk3KLO8kcgXbx
-         aSdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWy1c5cH5lhYCzbYu7kfKnnFwjdbOP29MUv/2LXaHbXDtVM1VGjprShicpvQWbhbx3nwVwGFG7dhGH5Ig==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxJvj3PAYBXll3lUQezP2px7tKw+gzFx47BbTPiIKz5711QuXs
-	re/NoRSudk0D0ZJIPvqBKTBDsFoLxZcuY8UD+5Sfeb56lzB2iHuXhWTUNRJ+sev51741Hk2ds1V
-	P
-X-Gm-Gg: ASbGncvBpy1m+jK9Em590E2L+k4HqE6mh6oFlgeg/6rkg8zZhyN9l4AIhkFvDX3Va8B
-	gV6EB1mYuji2BVq9LuNtXJ5lSapRlLMYM2/AUj3Hoe7Ihd732ZNp7ah6P/fD8zWzJNIlXoTZtBH
-	NDBNWW9X0CwLCrb+ztzGttKd0AvAct4qIsuLFvz/fZIlmNmdd/FUEdRjHrdo3ZwUpN2h+CKgW3n
-	6z7q1wRtxV1Jq2vXqxtWwbFrU1sVGBS4aUWpHiAAFyD5akX8lpt
-X-Google-Smtp-Source: AGHT+IE7bw3JCpJgyK/qY6da49pYx3FffJxVt+/jAW53C5pXT6psrPGT4mvajowgQ/e9vuLbKH1Qkw==
-X-Received: by 2002:a05:6602:378a:b0:843:ec8d:be00 with SMTP id ca18e2360f4ac-84ce018a26bmr50572539f.13.1736284246308;
-        Tue, 07 Jan 2025 13:10:46 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e68bf7eaf0sm10136103173.68.2025.01.07.13.10.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jan 2025 13:10:45 -0800 (PST)
-Message-ID: <4358e12a-066c-4d5b-b686-945843443353@kernel.dk>
-Date: Tue, 7 Jan 2025 14:10:45 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="It++wkGW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4732C4CEE4;
+	Tue,  7 Jan 2025 23:09:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736291352;
+	bh=w1XXgL3jt5Aty8Ttw2N2wfWJmLJOID7g/8HTbnQrFBc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=It++wkGWKq6RCQKaDRYWgQ25W8nTUCjZ0H3DBq6KHE13F0ZwtVtlNdSnm9AsZ7R4G
+	 qiy+J6fqhKx7FDBmijn6kufrRpMuuDlWnGL0s/DW41v0VdqAhmInEfdMq2v8v/+2Ol
+	 7Cm+QgJZGuXvneIB+i46CeUCMdh8i8ZWAFa68tfVo0uwz3HG1k95DQK8hqLN9lNvTP
+	 4ZpbOb6Yoz7raXyG/UFrPNC2RJ9WhcFp9eVq0ep2CQY+f1ebvZ5A3wQgj1GAtz/36H
+	 eVx6e9pmnTU3MWaetuzvnkHDuz3qq6+NTQ35DnZAPrjV03yqju4ytVhgT56d+xC6YP
+	 pERLI1hOvf+rg==
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3a7deec316aso58129255ab.1;
+        Tue, 07 Jan 2025 15:09:12 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUjS1dvfslDH9+M2GYQBS2kKapg+QJ00ycAp7DxiV2AnUSQCnnOjCCW3k9qaSGgf6/RL8x2ah9Cs0pCXw==@vger.kernel.org, AJvYcCUqmZL/wCg9d8iKOqSrOCwn+c3dmh7zz8hTCeGcJi4nPu/Q1FVCGduOBSj6WEbqlvYFJoz1kfqmIW3UlmJT@vger.kernel.org, AJvYcCVfmLtn+0NHb7fa9vk7WlVWaMp/w3NpTA2AIGuoQSXjacUy3e9UkRjlXYlEoaX+yp+AUr/3ygGGEC/ZIg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5eleIA1n5b9zQWP8UOBgQ4QZDNiSkkjXXQDzYG/x65wz9LguS
+	qvDosQA4eyr3xqwmtV2bGKzH8E7Itbr1dOoicf+9gFjhSSkmN2MyhGDczMrBVEPuT/DX3bn+TaF
+	q2ilZ+HSonWTgmVHZxsbr4pIQF2c=
+X-Google-Smtp-Source: AGHT+IHZbes+RVqxODIqD+R4BFoIkf/Jxq+1478KFPSCKdYBPyv4uwxMwi4pid1uHZW/PkxtfgQFc7y+EgBpRECjmHw=
+X-Received: by 2002:a05:6e02:1948:b0:3a7:e4c7:ad18 with SMTP id
+ e9e14a558f8ab-3ce3aa540d2mr6595195ab.18.1736291352136; Tue, 07 Jan 2025
+ 15:09:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] New zoned loop block device driver
-To: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
-References: <20250106142439.216598-1-dlemoal@kernel.org>
- <2f7c9abe-a23f-4b2f-99aa-e6d220c74dd0@kernel.dk>
- <20250106152118.GB27324@lst.de>
- <98be988f-5f6a-489d-b0e1-2f783c5b8a32@kernel.dk>
- <20250106153252.GA27739@lst.de>
- <0f2eea00-e5e9-4cd1-8fe6-89ed0c2b262b@kernel.dk>
- <20250106154433.GA28074@lst.de>
- <5f57ff26-2c87-45fa-bb91-4f68492bac85@kernel.dk>
- <20250106180527.GA31190@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <20250106180527.GA31190@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250102112841.1227111-1-yukuai1@huaweicloud.com>
+ <Z31jQT4Fwba4HJKW@kernel.org> <13a377d4-f647-436a-806e-c05413cef837@gmail.com>
+In-Reply-To: <13a377d4-f647-436a-806e-c05413cef837@gmail.com>
+From: Song Liu <song@kernel.org>
+Date: Tue, 7 Jan 2025 15:09:00 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW5F94zauhvMd79VX0=JsFAY6S-0FJTK6Aqsr++UaDfy_g@mail.gmail.com>
+X-Gm-Features: AbW1kvYIxAFR2oI5w83WjUcDw6unFqRGpFgs2qL48Zjx_Zo-0LNdEHjtzfJs47w
+Message-ID: <CAPhsuW5F94zauhvMd79VX0=JsFAY6S-0FJTK6Aqsr++UaDfy_g@mail.gmail.com>
+Subject: Re: [PATCH RFC md-6.14] md: reintroduce md-linear
+To: RIc Wheeler <ricwheeler@gmail.com>
+Cc: Mike Snitzer <snitzer@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>, yukuai3@huawei.com, 
+	thetanix@gmail.com, colyli@suse.de, linux-kernel@vger.kernel.org, 
+	linux-raid@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com, 
+	dm-devel@lists.linux.dev, axboe@kernel.dk, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/6/25 11:05 AM, Christoph Hellwig wrote:
-> On Mon, Jan 06, 2025 at 10:38:24AM -0700, Jens Axboe wrote:
->>> just not on the same page.  I don't know anything existing and usable,
->>> maybe I've just not found it?
->>
->> Not that I'm aware of, it was just a suggestion/thought that we could
->> utilize an existing driver for this, rather than have a separate one.
->> Yes the proposed one is pretty simple and not large, and maintaining it
->> isn't a big deal, but it's still a new driver and hence why I was asking
->> "why can't we just use ublk for this". That also keeps the code mostly
->> in userspace which is nice, rather than needing kernel changes for new
->> features, changes, etc.
-> 
-> Well, the reason to do a kernel driver rather than a ublk back end
-> boils down to a few things:
-> 
->  - writing highly concurrent code is actually a lot simpler in the kernel
->    than in userspace because we have the right primitives for it
->  - these primitives tend to actually be a lot faster than those available
->    in glibc as well
+On Tue, Jan 7, 2025 at 12:34=E2=80=AFPM RIc Wheeler <ricwheeler@gmail.com> =
+wrote:
+>
+>
+> On 1/7/25 12:24 PM, Mike Snitzer wrote:
+> > On Thu, Jan 02, 2025 at 07:28:41PM +0800, Yu Kuai wrote:
+> >> From: Yu Kuai <yukuai3@huawei.com>
+> >>
+> >> THe md-linear is removed by commit 849d18e27be9 ("md: Remove deprecate=
+d
+> >> CONFIG_MD_LINEAR") because it has been marked as deprecated for a long
+> >> time.
+> >>
+> >> However, md-linear is used widely for underlying disks with different =
+size,
+> >> sadly we didn't know this until now, and it's true useful to create
+> >> partitions and assemble multiple raid and then append one to the other=
+.
+> >>
+> >> People have to use dm-linear in this case now, however, they will pref=
+er
+> >> to minimize the number of involved modules.
+> >>
+> >> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> > I agree with reinstating md-linear.  If/when we do remove md-linear
+> > (again) we first need a seamless upgrade/conversion option (e.g. mdadm
+> > updated to use dm-linear in the backend instead of md-linear).
+>
+>
+> Agree with the need for an upgrade/conversion path.
+>
+> >
+> > This patch's header should probably also have this Fixes tag (unclear
+> > if linux-stable would pick it up but it really is a regression given
+> > there was no upgrade path offered to md-linear users):
+> >
+> > Fixes: 849d18e27be9 md: Remove deprecated CONFIG_MD_LINEAR
+> >
+> > Acked-by: Mike Snitzer <snitzer@kernel.org>
 
-That's certainly true.
+Thanks all for feedback on this move. I agree that reinstating
+md-linear is the right move for now.
 
->  - the double context switch into the kernel and back for a ublk device
->    backed by a file system will actually show up for some xfstests that
->    do a lot of synchronous ops
+Yu Kuai,
 
-Like I replied to Damien, that's mostly a bogus argument. If you're
-doing sync stuff, you can do that with a single system call. If you're
-building up depth, then it doesn't matter.
+It appears to me that the path doesn't apply cleanly on the md-6.14
+branch:
 
->  - having an in-tree kernel driver that you just configure / unconfigure
->    from the shell is a lot easier to use than a daemon that needs to
->    be running.  Especially from xfstests or other test suites that do
->    a lot of per-test setup and teardown
+Applying: md: reintroduce md-linear
+error: patch failed: drivers/md/Makefile:29
+error: drivers/md/Makefile: patch does not apply
+Patch failed at 0001 md: reintroduce md-linear
+hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch
+When you have resolved this problem, run "git am --continue".
+If you prefer to skip this patch, run "git am --skip" instead.
+To restore the original branch and stop patching, run "git am --abort".
 
-This is always true when it's a new piece of userspace, but not
-necessarily true once the use case has been established.
+Please rebase and resend the patch.
 
->  - the kernel actually has really nice infrastructure for block drivers.
->    I'm pretty sure doing this in userspace would actually be more
->    code, while being harder to use and lower performance.
-
-That's very handwavy...
-
-> So we could go both ways, but the kernel version was pretty obviously
-> the preferred one to me.  Maybe that's a little biasses by doing a lot
-> of kernel work, and having run into a lot of problems and performance
-> issues with the SCSI target user backend lately.
-
-Sure, that is understandable.
-
--- 
-Jens Axboe
+Thanks,
+Song
