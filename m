@@ -1,123 +1,213 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2075.outbound.protection.outlook.com [40.107.237.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8563118EAB;
-	Tue,  7 Jan 2025 18:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736273137; cv=none; b=OM1eOvYrBgvenYW9YS1Toli5ROlHV45wbr4GVESL7hTheMyGFhNM/5lVbxnQeolt8H7Jr7UqrNRrn8djPkhTo7g+kfK8dHEqVZaRpgDgty7M45VzbBvt/I7uW3bIyvz/DIqKbVZULz+h6Z99FuPjRy7N4k57DAospXhLGiEVVI8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736273137; c=relaxed/simple;
-	bh=wrAqqHrVAKKCplqjwQymx42sCZiDaJWIjLoGcLkfLsA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=AFAn/1RperDVk/zl+Ks6cc/rtgKrz7dtb/x31tiwBXbIXptB3Qex9K5aWhA0UW9Jxs4HwpDph4l6O2jMED1zAmi+1V8UJgC7fUper5UHuWiUkohSg2FiYM72e16AbvK5xyjTxalCA4msYuFNi4siIcD/ilGtWx1yjUXM6gLFalM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ev85Fl4I; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176C119C54F
+	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 18:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736274418; cv=fail; b=LYFfKJdfQfXY0HaUaZm2U+tg0YIwMMmjb69a5cmbDG0Qq1/wvS7iOZr3aU1zKyxLUIq5qomzSfwq43nrxcqkUMznd/1zQnlm3jmhJ/lFiqY1I8N0Bjvelpq6oN5iItxyocGT8Vz6FqnLqPtZJDNecsbalGbZxZJd1aOsEw6DyDs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736274418; c=relaxed/simple;
+	bh=4rgSOyiXKzurvlz3spMJvoHHUtHnoa9e93Pz0RyTxZA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jLu6uK3vDTZxUyiBxevWliqLG+X9tYS/amxQkCBk7P3MS85TOacB9VkQJOl6TzYBYh01taGuQ9UjdhXMFYnU+D5EheHmXs/1uHGdFuz5vZVUrtp8a/tq5/8l+QWNA6ryw3AXA+ykyVWZKyFOZS8B+sQGYr5SHS1SkkLRM4BLLIs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=5oDmNI05; arc=fail smtp.client-ip=40.107.237.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ev85Fl4I"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 507I4Ban018493;
-	Tue, 7 Jan 2025 18:05:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Tixua4
-	/8Yt4K/L4Isd6EPPDe8vWlwzBHW/TvX++YAOc=; b=Ev85Fl4ILjJFeZ02ehq/bA
-	ND6HfW6sPMhkbbmSdN5HdFCqyeMrnlFUr4mYfDw6f/veaMUli4OVB4zKrruqJf14
-	UsxRd7ApRVzOKkA71eVPnbAKFbOTN9dldhcBoIT60WgKyKAtJSNrjint9I1GBnxM
-	W9VZbXf/R41AYBnWc0O86OA6hSJJBONOdzD98d0BkL/MOti9LXrJ00BBA9DRwX+Q
-	+XqeJqNU43w+lnGJ2veTnPCCgYmlt1NdvkewPcHW2NMN5nc9m/tq9haZcwPoPvK3
-	+/sMoQX5xq/4BEzmFNHJkg1WyIlN1PtwLYOFNWFs92fOZwNZ9QAkCKGvqNVJ8aNw
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 440s0accw3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Jan 2025 18:05:19 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 507HR8vJ027938;
-	Tue, 7 Jan 2025 18:05:19 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yhhk3k95-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Jan 2025 18:05:19 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 507I5HP023986906
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 7 Jan 2025 18:05:18 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 268E458052;
-	Tue,  7 Jan 2025 18:05:18 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B8C3258062;
-	Tue,  7 Jan 2025 18:05:14 +0000 (GMT)
-Received: from [9.171.94.59] (unknown [9.171.94.59])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  7 Jan 2025 18:05:14 +0000 (GMT)
-Message-ID: <1230ea6b-172d-41ae-9c11-402ae7503227@linux.ibm.com>
-Date: Tue, 7 Jan 2025 23:35:12 +0530
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5oDmNI05"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=x+XRKJdaZeT7YAKke4vzMjs7msF5tiu4CeyCoCsfUmdi9j0G62m2Z4plJe2soG6+U1dH2KsK1JVNF2KMU/nm8gkCTbT5Od57hZ1adStRqoJfx76Cq4uEGGCLiBR8eA0TbljaWb45xSe/GRk5AGtH/MK1Q/2AuxJE+H1lFyP8R+f347claJ045onZf59cfUr4ttI9L8ju52AVQu/42vRzkYjS5vFX09LQHti05kGszru6P/4/yudgPV+Q9O08jzM17oTEI7U3gxwTR7LO0wDofH0d32nbBK7+8mQL1TaGBo9G2LV3gIyD5Jm2Q+wvS1NsQcBEYuh4JZLI5teklp4Pvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cnCZD72W1e2mB6A7YSCbiHYKW6Mej/VFIClpAtI493M=;
+ b=dtzXutoZjjjW8dKpAOkIm8l/rtvSNGm8p++SmGvIr09v+By4e43dvFhzhhBIrMk+Lu/IGPYWhPTVGmbfahsCt3H3bmAowvze1zZP04VyOoLy8gXhXHRpvkmCtl1ktvfhZuYFxgUwNOPziFnG+pxps7L2FXNYQQv/unWpCzf2J9tmKCzlHI8sxRCZPiJr+bSPgWlQrngvPKHzjkoNQeGLDdqTaccyeAkmWRsWvG8/vf7YYQWsj3GqG94Bsx4AFAk3Lb5pGRu3dTQoRZOcLhevg8WGo4dAI8Vxn/n/KTjxMrXbHUgdjmUdX7Greft2hxo9Q6QU5ezd4g3sw5hfU1H2cA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=daynix.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cnCZD72W1e2mB6A7YSCbiHYKW6Mej/VFIClpAtI493M=;
+ b=5oDmNI05qsnoq8oo+itYheahzaOxA/G+4LY7nd1h7b9kRIBdBogr7CCe8mQdA56OE6uoP7wOw3x7mOnkwi/fubatd2pTHLpFsaU0trMeMAvwhxIQXUHZ8vBRpotHD0ZRp0XPYqvd7xuqHk2HoLj2S/Co0Ii/5CZ8eLv37ZJ6jdo=
+Received: from CH5P220CA0002.NAMP220.PROD.OUTLOOK.COM (2603:10b6:610:1ef::10)
+ by DS0PR12MB8042.namprd12.prod.outlook.com (2603:10b6:8:141::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.17; Tue, 7 Jan
+ 2025 18:26:46 +0000
+Received: from CH3PEPF00000015.namprd21.prod.outlook.com
+ (2603:10b6:610:1ef:cafe::35) by CH5P220CA0002.outlook.office365.com
+ (2603:10b6:610:1ef::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8314.18 via Frontend Transport; Tue,
+ 7 Jan 2025 18:26:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CH3PEPF00000015.mail.protection.outlook.com (10.167.244.120) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8356.0 via Frontend Transport; Tue, 7 Jan 2025 18:26:46 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 7 Jan
+ 2025 12:26:44 -0600
+From: Andrew Boyer <andrew.boyer@amd.com>
+To: <andrew.boyer@amd.com>
+CC: Viktor Prutyanov <viktor@daynix.com>, "Michael S . Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eugenio Perez
+	<eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jens Axboe
+	<axboe@kernel.dk>, <virtualization@lists.linux.dev>,
+	<linux-block@vger.kernel.org>
+Subject: [PATCH] virtio_blk: always post notifications under the lock
+Date: Tue, 7 Jan 2025 10:25:16 -0800
+Message-ID: <20250107182516.48723-1-andrew.boyer@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/8] block: fix docs for freezing of queue limits updates
-From: Nilay Shroff <nilay@linux.ibm.com>
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Ming Lei <ming.lei@redhat.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        nbd@other.debian.org, linux-scsi@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net
-References: <20250107063120.1011593-1-hch@lst.de>
- <20250107063120.1011593-2-hch@lst.de>
- <668698f6-98d9-4e23-9ea9-ce78bafe64a5@linux.ibm.com>
-Content-Language: en-US
-In-Reply-To: <668698f6-98d9-4e23-9ea9-ce78bafe64a5@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jbKDqevyCgUeJ6YQW_pDfbACbntzIcE7
-X-Proofpoint-ORIG-GUID: jbKDqevyCgUeJ6YQW_pDfbACbntzIcE7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- phishscore=0 mlxlogscore=944 lowpriorityscore=0 impostorscore=0
- malwarescore=0 mlxscore=0 adultscore=0 bulkscore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501070149
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000015:EE_|DS0PR12MB8042:EE_
+X-MS-Office365-Filtering-Correlation-Id: 884feca3-976b-49ff-6a2f-08dd2f48d7e0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|7416014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ZuWNYp6BWLyWpyF/PiREqzsaz4zgXUIHp4DxXwGv52Qe5ae82BKbeIBntD6H?=
+ =?us-ascii?Q?IqL/CMVf+b+Z/r9UWUWUZ/FA6j/N5rhuYbzr6P4CloUxxWGcZ7xkumO35WKh?=
+ =?us-ascii?Q?gS8jLTqP83Hngh93D8TMJoF7LxWf3eH4+te1ahuxpZ+EAUbMknfNytwvt1UR?=
+ =?us-ascii?Q?QBX3mPcTnxXsuXuO2TXxFqze026Dg3ycfTPUczRT+oU7ocSLe0xJxPSMI1Ek?=
+ =?us-ascii?Q?Blf2bkk953xgPNKJpFRh9FdC9v6BW3UlicmmehgEwx9We8Ws/qRdD4hRIcJ9?=
+ =?us-ascii?Q?3fLi0YJsnETq4h0gZD/MzYSl2ZSoEYAlo3+1JpkthbTEzsSKCApQCBad++du?=
+ =?us-ascii?Q?g4fQvT49VYTglp6V3cojDpAz3ghJF+4hd1CioDXFzp1yv7a5PpyBh2gXWtwD?=
+ =?us-ascii?Q?Io07WTOYPyDHR0NzIhVGZ/ib74zwhNiI/9YMC1Hr582LbAnW1rTXQ3cGMho6?=
+ =?us-ascii?Q?z00Lry5HrPnZtdz+KOe8gEKhvwY7oQlKvqcWWf3tdSZozAv/6PU7XWfV/paR?=
+ =?us-ascii?Q?Nqtu/1zKBc4pSECQpNoF5W9inLvYDAnWUX1dnAez1u795Y28dYUg/x6YOVzv?=
+ =?us-ascii?Q?+vd14DsQxYbaKt8A3u61h1YpA4iJR4xmIm5MdGusy8gooTpKB9AWnLHt3pi5?=
+ =?us-ascii?Q?dGTIx9xvZFN4EKIOR6Iex5N7jEMHRO+WnH3pc2BPZkfHoF3OxuuuvK4POIr7?=
+ =?us-ascii?Q?PFxOgaw8M838ehPqxbZyEn6DZ/2K5Aq582fu8ukR5NJVIb/e4But68GkoM1G?=
+ =?us-ascii?Q?jKoJn0IAXQtK8aEe1ijncpZXUzNjUw48+BRObDZR1BwJcRvAcxSeyyz+lmvT?=
+ =?us-ascii?Q?sbRlY110G5Sn59OVPoarlLemXKZODLrM7pY8HBUGuccdFU+iJqa58l1Qp9NX?=
+ =?us-ascii?Q?bdj79QBL6rctBAAHRFaMS9x7EETsszqPET4xN1ek0jihvRyO+uEyunogxzxk?=
+ =?us-ascii?Q?kermyGOHRyvHzYycTFdxAy+l5nGPJSlwQnQReWplgdk1tvMtCaPjpYbxz745?=
+ =?us-ascii?Q?CZFgwu4WVafclvFSF8aguAA0GFR5v1Wb5uxZqWvqcEJ88jL56zDdobnyVgFs?=
+ =?us-ascii?Q?z9KxLOjvkRltItoKIZO0BBAQvB3s5rSuHuexKUlYvd567CxeWjncY22zkS5M?=
+ =?us-ascii?Q?ukb3AZeXYdsL53v0emDCTc1BdvTpC8oywTCq9GdA2QkfNrqL7XgRXGNUuXfC?=
+ =?us-ascii?Q?2blYAAktOhyiKbT7gwsWAG8sRnstuoaTVdHb9jKHIZ14yPB9VxLMCCh0Ppdw?=
+ =?us-ascii?Q?M/an9P6xabMUbXg5sgYYLZTKnYDg7gZBcosAhmAmmq6jlc3pkwWaAduDC4SX?=
+ =?us-ascii?Q?ytmQWPSlkoJCDUwqM5hRT0ejErLhUmcFc2OGL+ockCVjmgpZWJIMkY+xydNa?=
+ =?us-ascii?Q?IEXjQEy04i4iUsK7OVGd7bDqceM7sVb4t7TUc9uHPvQw/xk7jPCXPWveHDm0?=
+ =?us-ascii?Q?VFi/NpnIIzGpF2YC9gtBncviiFinzo18uSxi4Mv6MZu0Y4Jbcmf/FNljmYIb?=
+ =?us-ascii?Q?Hb1u9bvE/5tVS90=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2025 18:26:46.1656
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 884feca3-976b-49ff-6a2f-08dd2f48d7e0
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF00000015.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8042
 
-On 1/7/25 12:31 PM, Nilay Shroff wrote:
-> 
-> 
-> On 1/7/25 12:00 PM, Christoph Hellwig wrote:
->> queue_limits_commit_update is the function that needs to operate on a
->> frozen queue, not queue_limits_start_update.  Update the kerneldoc
->> comments to reflect that.
->>
->> Signed-off-by: Christoph Hellwig <hch@lst.de>
->> ---
->>  block/blk-settings.c   | 3 ++-
->>  include/linux/blkdev.h | 3 +--
->>  2 files changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/block/blk-settings.c b/block/blk-settings.c
->> index 8f09e33f41f6..b6b8c580d018 100644
->> --- a/block/blk-settings.c
->> +++ b/block/blk-settings.c
->> @@ -413,7 +413,8 @@ int blk_set_default_limits(struct queue_limits *lim)
->>   * @lim:	limits to apply
->>   *
->>   * Apply the limits in @lim that were obtained from queue_limits_start_update()
->> - * and updated by the caller to @q.
->> + * and updated by the caller to @q.  The caller must have frozen the queue or
->> + * ensure that there are outstanding I/Os by other means.
-> 
-> Maybe typo: "ensure that there are *NO* outstanding I/Os by other means"
+Commit af8ececda185 ("virtio: add VIRTIO_F_NOTIFICATION_DATA feature
+support") added notification data support to the core virtio driver
+code. When this feature is enabled, the notification includes the
+updated producer index for the queue. Thus it is now critical that
+notifications arrive in order.
 
-Other than typo, everything else looks good. Once the above typo is fixed, please feel free to add:
+The virtio_blk driver has historically not worried about notification
+ordering. Modify it so that the prepare and kick steps are both done
+under the vq lock.
 
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Signed-off-by: Andrew Boyer <andrew.boyer@amd.com>
+Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+Fixes: af8ececda185 ("virtio: add VIRTIO_F_NOTIFICATION_DATA feature support")
+Cc: Viktor Prutyanov <viktor@daynix.com>
+Cc: virtualization@lists.linux.dev
+Cc: linux-block@vger.kernel.org
+---
+ drivers/block/virtio_blk.c | 19 ++++---------------
+ 1 file changed, 4 insertions(+), 15 deletions(-)
 
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 3efe378f1386..14d9e66bb844 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -379,14 +379,10 @@ static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct virtio_blk *vblk = hctx->queue->queuedata;
+ 	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
+-	bool kick;
+ 
+ 	spin_lock_irq(&vq->lock);
+-	kick = virtqueue_kick_prepare(vq->vq);
++	virtqueue_kick(vq->vq);
+ 	spin_unlock_irq(&vq->lock);
+-
+-	if (kick)
+-		virtqueue_notify(vq->vq);
+ }
+ 
+ static blk_status_t virtblk_fail_to_queue(struct request *req, int rc)
+@@ -432,7 +428,6 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+ 	unsigned long flags;
+ 	int qid = hctx->queue_num;
+-	bool notify = false;
+ 	blk_status_t status;
+ 	int err;
+ 
+@@ -454,12 +449,10 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 		return virtblk_fail_to_queue(req, err);
+ 	}
+ 
+-	if (bd->last && virtqueue_kick_prepare(vblk->vqs[qid].vq))
+-		notify = true;
++	if (bd->last)
++		virtqueue_kick(vblk->vqs[qid].vq);
+ 	spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+ 
+-	if (notify)
+-		virtqueue_notify(vblk->vqs[qid].vq);
+ 	return BLK_STS_OK;
+ }
+ 
+@@ -476,7 +469,6 @@ static void virtblk_add_req_batch(struct virtio_blk_vq *vq,
+ {
+ 	struct request *req;
+ 	unsigned long flags;
+-	bool kick;
+ 
+ 	spin_lock_irqsave(&vq->lock, flags);
+ 
+@@ -492,11 +484,8 @@ static void virtblk_add_req_batch(struct virtio_blk_vq *vq,
+ 		}
+ 	}
+ 
+-	kick = virtqueue_kick_prepare(vq->vq);
++	virtqueue_kick(vq->vq);
+ 	spin_unlock_irqrestore(&vq->lock, flags);
+-
+-	if (kick)
+-		virtqueue_notify(vq->vq);
+ }
+ 
+ static void virtio_queue_rqs(struct rq_list *rqlist)
+-- 
+2.17.1
 
