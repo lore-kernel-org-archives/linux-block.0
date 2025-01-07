@@ -1,63 +1,64 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8802C155300
-	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 21:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6770B1F4289
+	for <linux-block@vger.kernel.org>; Tue,  7 Jan 2025 21:10:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736284106; cv=none; b=YW0v05Kw5gKKAlzDIFoz+EJw2/e9RbLeFD7qtVF0j6IvHNfXfZqjbxHzJ301sZoOQ6rb0KlxSAuNktqMY/gw7akRtPL9bbch7NNCWXnqePqihE/pY1j01r1jzvDj1Ne6QOPkmNULWONYCtI/TdC2h93+UGMVtYG1QnPrOPOc0D4=
+	t=1736284249; cv=none; b=Je9j3ArLDMuXj7FEiYhEsfJd24MfdT14WmLRTxQCUT7Zz878nZYIvWwgsn4ETYVZsf5nemOMy/QJAlhQkvGcUKgB7onknmiie8LqZyc0O+ed+kyX8Q1RRllNYeEMti4eI0/7cdad2acC/68we09gqo0V8Rw/lA5JsnPdQpssVKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736284106; c=relaxed/simple;
-	bh=ajK78RXyq1O94Pl7HhaSLJC+8DH32J/R/vN4Y2P3VV4=;
+	s=arc-20240116; t=1736284249; c=relaxed/simple;
+	bh=bfNiDvyyx7qhUityr421yj4aSLY2Rzm0lbZJ4IVYp3Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uggJJDXo1tFUX9VGHz6oC/O25WRbTCu/BO+ohwoezRzJnPSI9MvnJ7KgU0drCq4yqPEsSVS5qjnKBdGFtUB9vVxqxRaYRXOJpIN5ZjHszqQhqCQltSY9lTmQJ4crR4Jr0v0bY2DMGGG/4LDlj+5z+VCoIDzd9XwWO0yYXrKrIT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qhOy6O3S; arc=none smtp.client-ip=209.85.166.179
+	 In-Reply-To:Content-Type; b=ryWMQ4XyhawKn12Lsjkr00k+9xiWrYlvYBv7Rx9PwdyXqfo8e7vErT4hRnn7I216mkKd5os8briPUC8idm2TC+07CkmbQwrKbubM2mDlOnXu05SKP1c550/loUHGdFAw4L/DjM2bgT49kIEbEIqYTYNCmqm5oiEas1c4OLPPACg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Bl+19n7t; arc=none smtp.client-ip=209.85.166.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qhOy6O3S"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3a81324bbdcso124009565ab.1
-        for <linux-block@vger.kernel.org>; Tue, 07 Jan 2025 13:08:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Bl+19n7t"
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-844e55a981dso631765839f.3
+        for <linux-block@vger.kernel.org>; Tue, 07 Jan 2025 13:10:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736284102; x=1736888902; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736284246; x=1736889046; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=1uKAunzPNSW7Biux9bsGQxRAKRn3CJRvoHvnghZtPTk=;
-        b=qhOy6O3S+eB8dPaMfuLVgyXEyVMiOnYqmHzP00QGdYT3QtqZ/jYeqN2uG3WgDT2aIE
-         w0JHcXvwJLWsPsWyAMXUYl5itoNV+ODdw/W8JVjZ0SqevylvzhT+kJF50hG0cEqKvC7v
-         RZbUwSRzL6rsmjzvKpynS9sFKy1q7oxTuAjuwynInvaODAlIMJ/BY+PU6ucR/rN0/Kux
-         +vBRgbf2Bh/ikkOOAQ/5xoaRW7KHaw1Ou15q3Mu4toE5/1kKYBp1twxBKrx5vS/huxqA
-         OhlouaT/y7O7WJovtzbG5yjnsA+Laq05uGgZEHq+ESGqZ8E7lO4UpW3m2QY9dKLqDd+D
-         FTQg==
+        bh=83K2XNnz/iqgOoPPg3qHJnPphRK/d4Ei+N3hZFxkUvg=;
+        b=Bl+19n7tG/mpFYkLyP3BZDvr3H8sHe9tUBq3og1OYSQHkkFhePRQVDkwiXC4It5vJE
+         5UtOyw7G4+m77UpnWdwN/YNER80+nr0c+cP2qGjF4CxEZVa6ATwzfX0n1kbeCkRt0MVs
+         fyNW3R70NQKQv75INGCChwKvEA/w0HEI3SIs5s7nRW4JnrNAuRjMujaJTy6hgNAGrIKJ
+         F+f4yMX5mOLZYPOySwSU8HGVvr0/5tGzFbWqQRJfEnX3ejcuqpqbNI+pE4JRu7N1cADR
+         LDwxjiZSsBS3S4XRhJv8gDNTRjkA74PxPqubHJBEPYV5jnlgGskkLcBdz4m73swCL1fX
+         XGBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736284102; x=1736888902;
-        h=content-transfer-encoding:in-reply-to:from:content-language
+        d=1e100.net; s=20230601; t=1736284246; x=1736889046;
+        h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1uKAunzPNSW7Biux9bsGQxRAKRn3CJRvoHvnghZtPTk=;
-        b=VEu1doIFOueYh+pUuSGHqgqd4be408/nAnLCnsZpfYp+0KuXsgm3vyUcPTqi97Dt/J
-         2i5yFtnGLACPdUDuaLrw19i4tQ+CQ2gag6pSoCpuQ01/XKxSqRBzbIy26SGk0/LqDO3p
-         LERtjERgirIGS6BARkthBoyGIalC8SjiPfcpUnbSPIGiu/MjnmHKHVHJlQ3xOMNBWQQJ
-         IbiaqOlwTLOKm+uauvs6rTxejYtb0RVKX9AqcQYOVSF6VSdhWN195ss45HnsoQyZ6rST
-         E+p42l1g5BEMcs9bjickotyNowIbYm5oLQjKkcpplDYPt6lMreoN8LLJA5g3ZY4jLRdX
-         AhLA==
-X-Gm-Message-State: AOJu0Yx8c542NAcR1KNf34t4lfgnKgTgwZM0O7S6ETezZ7bKgVJEHIPE
-	JG31m6CNgP8+y1bXy9r1N3Vv/LPv/um7A0e9Lsmibl9a5U/0dI+WEoRNGyg8+Qu5qAaVr0zMIpj
-	f
-X-Gm-Gg: ASbGncvjuH3gcbVQsZ3oNQQKkdn8JIzLE7463ISd+v5O8EQE5hdg7ejPiktCxfoPqce
-	uu5sKvLVEOhJL1DyVJjk+ujiLtQ0AbyZgu0t8fTogHH7Tmm6C0Wd4qbubG0gxPdOM4/L4gcluSy
-	0eMcohtgrvRp9uxGh+57b1dBeQiOryfGjc+vqfn2lz8PqLDqnpOtIa9BWaTaB66m52SfmREP3q9
-	Pw0i6k/lmBhzbVx+uRk1gguPsZIO+gmYM0VzlYKIg5hCtxLfQqG
-X-Google-Smtp-Source: AGHT+IG4HooKJfms91Zj4kscDkD42FmDoLBdlGdTJsBXIj3WiAYT3Rkur5LErVb097BEOXlqob9eoA==
-X-Received: by 2002:a05:6e02:2607:b0:3ab:1b7a:5932 with SMTP id e9e14a558f8ab-3ce3aa72788mr6290785ab.18.1736284102312;
-        Tue, 07 Jan 2025 13:08:22 -0800 (PST)
+        bh=83K2XNnz/iqgOoPPg3qHJnPphRK/d4Ei+N3hZFxkUvg=;
+        b=n+qcsD3Sn5ZZ5jKH4RKhWw1nbqPhC8107mvJm7IlYRNrK6A4uKPcJQwgSblAPVQnIZ
+         OW8FPwajxy0VQISmM2V/itXgTFT7qHQDSTC5RmSagbPuBgcZybSCEfrnN8L4SGrNVvPA
+         6EJdxKT5p2UCgN5kWvspSk6I3HUiT/CZidzDch/7YGCyLo0675q8LQy2JV5h4YSeRtXV
+         UpPA5L2ZQfFcTbMtg99lwYjT/h4M0zawdzCiCPpVuycdQB3CP18Lo1jGZ0uZ1edK9dxB
+         k3qN3oZMcIe8yrlkuaO3NYUH0eEUb8NliQ3vFSiU4E6ORa3ukV9qX6lWk3KLO8kcgXbx
+         aSdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWy1c5cH5lhYCzbYu7kfKnnFwjdbOP29MUv/2LXaHbXDtVM1VGjprShicpvQWbhbx3nwVwGFG7dhGH5Ig==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxJvj3PAYBXll3lUQezP2px7tKw+gzFx47BbTPiIKz5711QuXs
+	re/NoRSudk0D0ZJIPvqBKTBDsFoLxZcuY8UD+5Sfeb56lzB2iHuXhWTUNRJ+sev51741Hk2ds1V
+	P
+X-Gm-Gg: ASbGncvBpy1m+jK9Em590E2L+k4HqE6mh6oFlgeg/6rkg8zZhyN9l4AIhkFvDX3Va8B
+	gV6EB1mYuji2BVq9LuNtXJ5lSapRlLMYM2/AUj3Hoe7Ihd732ZNp7ah6P/fD8zWzJNIlXoTZtBH
+	NDBNWW9X0CwLCrb+ztzGttKd0AvAct4qIsuLFvz/fZIlmNmdd/FUEdRjHrdo3ZwUpN2h+CKgW3n
+	6z7q1wRtxV1Jq2vXqxtWwbFrU1sVGBS4aUWpHiAAFyD5akX8lpt
+X-Google-Smtp-Source: AGHT+IE7bw3JCpJgyK/qY6da49pYx3FffJxVt+/jAW53C5pXT6psrPGT4mvajowgQ/e9vuLbKH1Qkw==
+X-Received: by 2002:a05:6602:378a:b0:843:ec8d:be00 with SMTP id ca18e2360f4ac-84ce018a26bmr50572539f.13.1736284246308;
+        Tue, 07 Jan 2025 13:10:46 -0800 (PST)
 Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3c0de05327asm103411045ab.1.2025.01.07.13.08.21
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e68bf7eaf0sm10136103173.68.2025.01.07.13.10.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jan 2025 13:08:21 -0800 (PST)
-Message-ID: <3a1314db-ed44-4c22-8fc1-0cf672003026@kernel.dk>
-Date: Tue, 7 Jan 2025 14:08:20 -0700
+        Tue, 07 Jan 2025 13:10:45 -0800 (PST)
+Message-ID: <4358e12a-066c-4d5b-b686-945843443353@kernel.dk>
+Date: Tue, 7 Jan 2025 14:10:45 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,8 +67,8 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 0/2] New zoned loop block device driver
-To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org
+To: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
 References: <20250106142439.216598-1-dlemoal@kernel.org>
  <2f7c9abe-a23f-4b2f-99aa-e6d220c74dd0@kernel.dk>
  <20250106152118.GB27324@lst.de>
@@ -76,16 +77,15 @@ References: <20250106142439.216598-1-dlemoal@kernel.org>
  <0f2eea00-e5e9-4cd1-8fe6-89ed0c2b262b@kernel.dk>
  <20250106154433.GA28074@lst.de>
  <5f57ff26-2c87-45fa-bb91-4f68492bac85@kernel.dk>
- <606367a7-9bb5-48e5-a7ef-466eefd833fb@kernel.org>
-Content-Language: en-US
+ <20250106180527.GA31190@lst.de>
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <606367a7-9bb5-48e5-a7ef-466eefd833fb@kernel.org>
+Content-Language: en-US
+In-Reply-To: <20250106180527.GA31190@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/6/25 6:08 PM, Damien Le Moal wrote:
-> On 1/7/25 02:38, Jens Axboe wrote:
->>> I think this is a valid and reasonable discussion.  But maybe we're
+On 1/6/25 11:05 AM, Christoph Hellwig wrote:
+> On Mon, Jan 06, 2025 at 10:38:24AM -0700, Jens Axboe wrote:
 >>> just not on the same page.  I don't know anything existing and usable,
 >>> maybe I've just not found it?
 >>
@@ -97,42 +97,44 @@ On 1/6/25 6:08 PM, Damien Le Moal wrote:
 >> in userspace which is nice, rather than needing kernel changes for new
 >> features, changes, etc.
 > 
-> I did consider ublk at some point but did not switch to it because a
-> ublk backend driver to do the same as zloop in userspace would need a
-> lot more code to be efficient. And even then, as Christoph already
-> mentioned, we would still have performance suffer from the context
-> switches. But that performance point was not the primary stopper
-
-I don't buy this context switch argument at all. Why would it mean more
-sleeping? There's absolutely zero reason why a ublk solution would be at
-least as performant as the kernel one.
-
-And why would it need "a lot more code to be efficient"?
-
-> though as this driver is not intended for production use but rather to
-> be the simplest possible setup that can be used in CI systems to test
-> zoned file systems (among other zone related things).
-
-Right, that too.
-
-> A kernel-based implementation is simpler and the configuration
-> interface literally needs only a single echo bash command to add or
-> remove devices. This allows minimal VM configurations with no
-> dependencies on user tools/libraries to run these zoned devices, which
-> is what we wanted.
+> Well, the reason to do a kernel driver rather than a ublk back end
+> boils down to a few things:
 > 
-> I completely agree about the user-space vs kernel tradeoff you
-> mentioned. I did consider it but the code simplicity and ease of use
-> in practice won for us and I chose to stick with the kernel driver
-> approach.
-> 
-> Note that if you are OK with this, I need to send a V2 to correct the
-> Kconfig description which currently shows an invalid configuration
-> command example.
+>  - writing highly concurrent code is actually a lot simpler in the kernel
+>    than in userspace because we have the right primitives for it
+>  - these primitives tend to actually be a lot faster than those available
+>    in glibc as well
 
-Sure, I'm not totally against it, even if I think the arguments are
-very weak, and in some places also just wrong. It's not like it's a
-huge driver.
+That's certainly true.
+
+>  - the double context switch into the kernel and back for a ublk device
+>    backed by a file system will actually show up for some xfstests that
+>    do a lot of synchronous ops
+
+Like I replied to Damien, that's mostly a bogus argument. If you're
+doing sync stuff, you can do that with a single system call. If you're
+building up depth, then it doesn't matter.
+
+>  - having an in-tree kernel driver that you just configure / unconfigure
+>    from the shell is a lot easier to use than a daemon that needs to
+>    be running.  Especially from xfstests or other test suites that do
+>    a lot of per-test setup and teardown
+
+This is always true when it's a new piece of userspace, but not
+necessarily true once the use case has been established.
+
+>  - the kernel actually has really nice infrastructure for block drivers.
+>    I'm pretty sure doing this in userspace would actually be more
+>    code, while being harder to use and lower performance.
+
+That's very handwavy...
+
+> So we could go both ways, but the kernel version was pretty obviously
+> the preferred one to me.  Maybe that's a little biasses by doing a lot
+> of kernel work, and having run into a lot of problems and performance
+> issues with the SCSI target user backend lately.
+
+Sure, that is understandable.
 
 -- 
 Jens Axboe
