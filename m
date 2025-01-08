@@ -1,95 +1,75 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0D21F03F1
-	for <linux-block@vger.kernel.org>; Wed,  8 Jan 2025 09:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B89620B20;
+	Wed,  8 Jan 2025 10:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736329189; cv=none; b=uc9RknZhmkhrMXcOPlySPfbir5Z6R8Y4jTi5u04YV97s4gTDxwvFVC/J4fgSLMYE2n1Yy+Owf90yumrxG/gzROT1k+R659ZkInrAVqAmv2DimvLNf0E5RpVgL1lTixW7mdfeg8202UBb3ZoOSU8cffwwChbyGgQKKKCKYPABJ+g=
+	t=1736331515; cv=none; b=qdSUK+ivf9JyVCPTOuw4XDxPdK721LSaeUyN1vF9nYLeXErDsHEprJfEbJmXGQ1l+Rgy2A22I+CGrOlr/QITxZ8mGsewTjNjTJyWmon3sqjNVCfEcDoJeH92c2eLCWFWx7g2n1/TwPukZF6fdiqxpADsdKAA06QaNWmmdgAm3lM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736329189; c=relaxed/simple;
-	bh=WYhomn70P25FJi9MceIhGf2ntWQ8mL+UaI2z3gI9A6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=suxorXADzLtEhc/bbUq7cpGDbKE0u9+FqkmfcP1/eY0MNQM1BsjmV1KxkVg0cXcAu6h4ld+oL6Ob9jGAHnTbESuJvBq7YPVDbLgt77hH5Jci5zwbY6qcJs3D68PFhYh1Th8nbpP9xK14Tm4aWubnTn7l3aBZy/Ynn7E6pZIim0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=damzhxch; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1736331515; c=relaxed/simple;
+	bh=Iy5y7jGbSKm6Vq5JK20bohcBwxpWKQDfh6OOx83t328=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rt35lgWaI512UgTNUbW9b8jQoiCGqDO+ztACXyRmcXHyMg5njRH0WF6bLjaSHbcHvYpsrr5wLTgmE+WGdJvBZS6ExED392mQsaJyLrmEmpfB261Yyyfr/lsA9w1YcvlK3E9KsELL9Xz0N+i2ktB+JolEM4BW8G4uZUf9RT0V3Tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QD+QE/Tk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="damzhxch"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736329186;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z3vRzSAUwwa8R76b7J7XpJfZw7mhqd47kcxnNLCMmrA=;
-	b=damzhxch2vNy1DXZiTWRzv6nW8l7NMq2ixIN0D9Ov4sNeYjCJ0KIfHb4Xik/SxnJoQVwVD
-	mrrSsvUWrXyz1bS7usoCr+m64dJB07/2Fk2+S5BEMPTS7sVG00vkxH0Qju+amY7e1sPQsf
-	80GowkEaf8srSn1S0IjSDUBoTPfdDQM=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-461-Ra4IlvPmM_af-vbYQriptA-1; Wed,
- 08 Jan 2025 04:39:43 -0500
-X-MC-Unique: Ra4IlvPmM_af-vbYQriptA-1
-X-Mimecast-MFC-AGG-ID: Ra4IlvPmM_af-vbYQriptA
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6F66F195609E;
-	Wed,  8 Jan 2025 09:39:42 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.74])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8AC711956094;
-	Wed,  8 Jan 2025 09:39:38 +0000 (UTC)
-Date: Wed, 8 Jan 2025 17:39:33 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/2] New zoned loop block device driver
-Message-ID: <Z35H1chBIvTt0luL@fedora>
-References: <20250106142439.216598-1-dlemoal@kernel.org>
- <2f7c9abe-a23f-4b2f-99aa-e6d220c74dd0@kernel.dk>
- <20250106152118.GB27324@lst.de>
- <Z33jJV6x1RnOLXvm@fedora>
- <ac42d762-60e5-4550-99f1-bd2072e474c2@kernel.org>
- <CAFj5m9+LUtAt2ST41KzMasx4BuVYBXjAuLg5MDr0Gh31yzZKzw@mail.gmail.com>
- <20250108090912.GA27786@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QD+QE/Tk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1355BC4CEDF;
+	Wed,  8 Jan 2025 10:18:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736331514;
+	bh=Iy5y7jGbSKm6Vq5JK20bohcBwxpWKQDfh6OOx83t328=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QD+QE/TkcsrwKbypzGxkRH74jesRHo7N/TVTwwaRTX1BK6YV31BvoNwrqbEIMyTzc
+	 YsqaLoUBB2CpZLNgCwoSkbjThGxFUFAywHWZh8rrQU0gZqu5xJQWngS0f66RNzIhCs
+	 yr1VQp13GpGvrn86SDRDkZwNzzlr934q084+hllsSS+JINHAi57szQ6f2jfdci1Frx
+	 jRyceuVuRl3A1d0D9YAt2ZcuTmEuIBQAD1JM4yHFDdjdWJ/cxMK5gyqMk+QNR4H1NZ
+	 xeHP+U8QT1AjU/Q3WNvlgg6YwbygxMvHD0pS/pqCZDyl7YRaZukI1yrI6Jq8kL0370
+	 34iL3Hf21PPMw==
+Message-ID: <d5010a1b-f458-4f1e-b7ab-e0f8210b9af7@kernel.org>
+Date: Wed, 8 Jan 2025 19:17:48 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250108090912.GA27786@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/10] block: don't update BLK_FEAT_POLL in
+ __blk_mq_update_nr_hw_queues
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>, Nilay Shroff <nilay@linux.ibm.com>,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ nbd@other.debian.org, linux-scsi@vger.kernel.org,
+ usb-storage@lists.one-eyed-alien.net
+References: <20250108092520.1325324-1-hch@lst.de>
+ <20250108092520.1325324-4-hch@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <20250108092520.1325324-4-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 08, 2025 at 10:09:12AM +0100, Christoph Hellwig wrote:
-> On Wed, Jan 08, 2025 at 04:13:01PM +0800, Ming Lei wrote:
-> > It is backed by virtual memory, which can be big enough because of swap, and
+On 1/8/25 6:25 PM, Christoph Hellwig wrote:
+> When __blk_mq_update_nr_hw_queues changes the number of tag sets, it
+> might have to disable poll queues.  Currently it does so by adjusting
+> the BLK_FEAT_POLL, which is a bit against the intent of features that
+> describe hardware / driver capabilities, but more importantly causes
+> nasty lock order problems with the broadly held freeze when updating the
+> number of hardware queues and the limits lock.  Fix this by leaving
+> BLK_FEAT_POLL alone, and instead check for the number of poll queues in
+> the bio submission and poll handlers.  While this adds extra work to the
+> fast path, the variables are in cache lines used by these operations
+> anyway, so it should be cheap enough.
 > 
-> Good luck getting half way decent performance out of swapping for a 50TB
-> data set.  Or even a partially filled one which really is the use case
-> here so it might only be a TB or so.
-> 
-> > it is also easy to extend to file backed support since zloop doesn't store
-> > zone meta data, which is similar to ram backed zoned actually.
-> 
-> No, zloop does store write point in the file sizse of each zone.  That's
-> sorta the whole point becauce it enables things like mount and even
-> power fail testing.
-> 
-> All of this is mentioned explicitly in the commit logs, documentation and
-> code comments, so claiming something else here feels a bit uninformed.
+> Fixes: 8023e144f9d6 ("block: move the poll flag to queue_limits")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-OK, looks one smart idea.
+Looks OK to me.
 
-It is easy to extend rublk/zoned in this way with io_uring io emulation, :-)
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-
-
-Thanks,
-Ming
-
+-- 
+Damien Le Moal
+Western Digital Research
