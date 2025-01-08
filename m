@@ -1,170 +1,121 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3631A7264;
-	Wed,  8 Jan 2025 07:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20FC1DFD85
+	for <linux-block@vger.kernel.org>; Wed,  8 Jan 2025 08:13:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736320763; cv=none; b=a6btawuBvhrqBJ6Oo5f4slmX5kP5vqvAFis36FY9mybHcKGq4uomFMiKPxmXKWCK8i2z3CR1FMNrF7SI+NilleVwTkiBnbgAT06haPC85icbdGHEDYqNAzA62ik0b+SgJ/U+XiBlyKZDAWRONCm++68AbUnZ06SF6w7SqnCyhsE=
+	t=1736323998; cv=none; b=EHbzd/kA1cfE0t+YzQO/G8fEcQZ0/ZeDrSv7qNywdNHXoWdnyz80FKzcrAK+qKEwkt8EmM9BN/+xjyDeOzuckA7eCD01hXpK/djhgoSGn6iWsurmfBSzZGenGLLYBAl4o0Td+6e+fiBFOKyXrjaVgvMQ08h9vQUN+a9MPxHRhaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736320763; c=relaxed/simple;
-	bh=2OmpbwECjc3ztteZgZS83w5ZYoOVpKG0/XhfbIN52io=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O0WT1T7IwEUboszs6/fnmP0u9Zgx/3VWDRPbZ/eGjU1HM9Zff1wTdLzWixcMlLPMBBsXCNxNW/JxlMe5AfSftUSqpyw8sg6PNT4HEF57c/ZKBXZRdh8pmKLMdjtw9h9S4mCC8+cD6VMp2caWVXARo15d2R8qj0C8nNGT+a6+i3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YHtY3luf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=4OaKIcLN; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=U8BlRzIZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qRu/+kJi; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1736323998; c=relaxed/simple;
+	bh=f244ecSLvwFYWKN+nvVNGZD/CCd1MqPsXtb8FzVcZTM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NwCyJQf93M1Rr6X/S/d4yDxd6NSGSPQjy9Z8CagV4wSX+oUwWH3+PsiyrRIXmcQdTsZgW72GpNByx7UcJmjKLKv0W8Mv7rIOQjQwRFeX9SlyXM8jfU5yqfHgGVzx3aL6FfKq3BM1CU12cQpHRstX/ki4OSkcpkE1m7ZDB5XfFt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NDLa8R/r; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YHtY3luf";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="4OaKIcLN";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="U8BlRzIZ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qRu/+kJi"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id EB00C21109;
-	Wed,  8 Jan 2025 07:19:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1736320760; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NDLa8R/r"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736323995;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UMHSN1RUI191v0AL+xJ8VycN40kw5fLrPVaLypzjD+E=;
-	b=YHtY3lufWWZVElyJtifBFzBtdrFMEJFsJfjmrAPgUD2ZAe/Ct5BA8ENg1wKRwTBZKfoKpF
-	q/gD+XWMMSROgUZbXOEVFhvTcYym/Fj5JF+JxAWq7jH79ASW7ljR9BJq2cs+xQqCnGsGcj
-	RpnVfdNMKQ7oNW3k1AfwNHCWrhrp9M0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1736320760;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UMHSN1RUI191v0AL+xJ8VycN40kw5fLrPVaLypzjD+E=;
-	b=4OaKIcLN+9VWhR6Mn7PYR6Vje53hndZu7LNwssLmjKwu7KPIrWMVLYoGyk9gTj9Kkd5A63
-	aGWBQYpTPddefcBw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1736320759; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UMHSN1RUI191v0AL+xJ8VycN40kw5fLrPVaLypzjD+E=;
-	b=U8BlRzIZ3xaDo2aiJn88NeswoYKPmsMcBAwE6GhQr3dBhr/XwT6dbRUDHaMPmgMGaajzY/
-	La2CUU40RaUCepVxhb/CaT++R7ur/o0LLCRuaDeLTVc6aad+hSGOdn/1oj5AsZU4IBdi98
-	U19iOzSpLPjQg/9PnjHieGftnpNNDak=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1736320759;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UMHSN1RUI191v0AL+xJ8VycN40kw5fLrPVaLypzjD+E=;
-	b=qRu/+kJigVE6teuHtYZdh+XkEMgI/J3KKinf+oiu/1W7kjTtPtxYZgfZfrVAoRac5R9z6k
-	nN+3Te5i303osNAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E16A9137DA;
-	Wed,  8 Jan 2025 07:19:17 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ChdINPUmfme7QAAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 08 Jan 2025 07:19:17 +0000
-Message-ID: <c191fe47-a8d0-4a3e-8dc8-8946ee00808f@suse.de>
-Date: Wed, 8 Jan 2025 08:19:17 +0100
+	bh=TfEn9YjinVVVNTXWON+w9OsxNKAd/5FwACYKd4nqsdM=;
+	b=NDLa8R/rxM7XseQLo9yI4VxpCJzJDSFLlW1Cku4Rd3ikH4qFLkC2jf+r86iPyF3d8xw/Ge
+	naYdVtCrJGwqWzh1Bp7lfVypvk8JxPy2dFcSeBvL9SxqoZnCBPZnpfQ43CKVypGs58ePSc
+	3xHRvyYFNuNIcla90dezA4TtukrSWd0=
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
+ [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-448-1Sp6-gHwOHS_4GwXrKj_uA-1; Wed, 08 Jan 2025 03:13:14 -0500
+X-MC-Unique: 1Sp6-gHwOHS_4GwXrKj_uA-1
+X-Mimecast-MFC-AGG-ID: 1Sp6-gHwOHS_4GwXrKj_uA
+Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-4b2be0369bfso300209137.3
+        for <linux-block@vger.kernel.org>; Wed, 08 Jan 2025 00:13:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736323993; x=1736928793;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TfEn9YjinVVVNTXWON+w9OsxNKAd/5FwACYKd4nqsdM=;
+        b=bbhUOweS/DO43H2OplCPpjaXWW87sMdihbcDmxkRYA4f50uotWplHcH//nMw1RHWE6
+         UgfimbwHidt6K0qpsCYOlES0UnYQjZ2wrLi69ev/5SHV7oQfZFQ4yiFTQsFegcv3Je+W
+         AkNQBUzA7s/yS3eNzJ0l9CJ2qvQQgDZfKt90HUVkz2+zXcfILnOxQvMd1VdBqNp8KyPI
+         GXu6Ux4WUM1qzdi0yfOtXERya0Aw9lMb1mBgHg1nTM4TsIl4OWTTtwxbtaHE/SYlmvU1
+         ogajlkKn2LxjIP54AANsPFm5zax/60fHc1w1ZrAmIDIRqZr3srU7N5OspOaM7+iOtarb
+         INBg==
+X-Forwarded-Encrypted: i=1; AJvYcCVfirFclU9ICR5BzMhoXs9Tgtx2jJGIOAxtJKH59nUEh7TPTBLii4pldaeN7IJjnuKDWet3UaOwYhX+vA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWrYi+UjljR/8G7xWP+nZjddaiaEsAmLrptue4R9AYQg4iCWUS
+	JMtZLAa8lVPfJoYEfCYmKk2WGpN6QFsmi7ozDnMbAqExt+HA0aR8c65wm806dNdQMRpK9EQYc+T
+	eBDuFG9Xn0GvW06dCIsgenGkYBf+rymA9LY6O2H6CpMVLyRFeJiS//6ka8CBMBQTxx49Q+lq2/R
+	OhD18hIpvUIresf4upiQUHzwwWsazcO94XGX4/+12JFU3kYkVI
+X-Gm-Gg: ASbGnctWTqS9GUEqsZK1WBkImIs35r69i9voutGyi2Fi1vt8H17E1jq0zp8broDDDN0
+	aZIZyEEybwtA0GH9pnG8sAgX2p+XTB9y8YyBf/qs=
+X-Received: by 2002:a05:6102:418a:b0:4b1:24c0:4274 with SMTP id ada2fe7eead31-4b3d1069ddbmr1301532137.26.1736323993727;
+        Wed, 08 Jan 2025 00:13:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHx613EHdQQEVNOG6Tu/8kBKTA4XTWVdjzmr2s+rNIR2kYPbmZmPUYN1EKQs0s4RRD9yp/GntaE+IgvvWUKids=
+X-Received: by 2002:a05:6102:418a:b0:4b1:24c0:4274 with SMTP id
+ ada2fe7eead31-4b3d1069ddbmr1301508137.26.1736323991986; Wed, 08 Jan 2025
+ 00:13:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/9] nvme-pci: use block layer helpers to calculate num
- of queues
-To: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, Kashyap Desai
- <kashyap.desai@broadcom.com>, Sumit Saxena <sumit.saxena@broadcom.com>,
- Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
- Chandrakanth patil <chandrakanth.patil@broadcom.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Nilesh Javali <njavali@marvell.com>, GR-QLogic-Storage-Upstream@marvell.com,
- Don Brace <don.brace@microchip.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Thomas Gleixner <tglx@linutronix.de>
-Cc: Costa Shulyupin <costa.shul@redhat.com>,
- Juri Lelli <juri.lelli@redhat.com>, Valentin Schneider
- <vschneid@redhat.com>, Waiman Long <llong@redhat.com>,
- Ming Lei <ming.lei@redhat.com>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>, Frederic Weisbecker <frederic@kernel.org>,
- Mel Gorman <mgorman@suse.de>,
- Sridhar Balaraman <sbalaraman@parallelwireless.com>,
- "brookxu.cn" <brookxu.cn@gmail.com>, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org,
- storagedev@microchip.com, virtualization@lists.linux.dev
-References: <20241217-isolcpus-io-queues-v4-0-5d355fbb1e14@kernel.org>
- <20241217-isolcpus-io-queues-v4-4-5d355fbb1e14@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20241217-isolcpus-io-queues-v4-4-5d355fbb1e14@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[38];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,suse.com,kernel.org,suse.de,parallelwireless.com,gmail.com,vger.kernel.org,lists.infradead.org,broadcom.com,microchip.com,lists.linux.dev];
-	R_RATELIMIT(0.00)[to_ip_from(RLwoqrtcdrtewo8fubna94zinu)];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Level: 
+References: <20250106142439.216598-1-dlemoal@kernel.org> <2f7c9abe-a23f-4b2f-99aa-e6d220c74dd0@kernel.dk>
+ <20250106152118.GB27324@lst.de> <Z33jJV6x1RnOLXvm@fedora> <ac42d762-60e5-4550-99f1-bd2072e474c2@kernel.org>
+In-Reply-To: <ac42d762-60e5-4550-99f1-bd2072e474c2@kernel.org>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Wed, 8 Jan 2025 16:13:01 +0800
+X-Gm-Features: AbW1kvYtXE2hA7tRb7YTQvuyPE-A3XuxemmxzJJD01-0zm23c_i_2Il6UgBQ-ik
+Message-ID: <CAFj5m9+LUtAt2ST41KzMasx4BuVYBXjAuLg5MDr0Gh31yzZKzw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] New zoned loop block device driver
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/17/24 19:29, Daniel Wagner wrote:
-> Multiqueue devices should only allocate queues for the housekeeping CPUs
-> when isolcpus=managed_irq is set. This avoids that the isolated CPUs get
-> disturbed with OS workload.
-> 
-> Use helpers which calculates the correct number of queues which should
-> be used when isolcpus is used.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Daniel Wagner <wagi@kernel.org>
-> ---
->   drivers/nvme/host/pci.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+On Wed, Jan 8, 2025 at 1:07=E2=80=AFPM Damien Le Moal <dlemoal@kernel.org> =
+wrote:
+>
+> On 1/8/25 11:29 AM, Ming Lei wrote:
+> > On Mon, Jan 06, 2025 at 04:21:18PM +0100, Christoph Hellwig wrote:
+> >> On Mon, Jan 06, 2025 at 07:54:05AM -0700, Jens Axboe wrote:
+> >>> On 1/6/25 7:24 AM, Damien Le Moal wrote:
+> >>>> The first patch implements the new "zloop" zoned block device driver
+> >>>> which allows creating zoned block devices using one regular file per
+> >>>> zone as backing storage.
+> >>>
+> >>> Couldn't we do this with ublk and keep most of this stuff in userspac=
+e
+> >>> rather than need a whole new loop driver?
+> >>
+> >> I'm pretty sure we could do that.  But dealing with ublk is complete
+> >> pain especially when setting up and tearing it down all the time for
+> >> test, and would require a lot more code, so why?  As-is I can directly
+> >
+> > You can link with libublk or add it to rublk, which supports ramdisk zo=
+ne
+> > already, then install rublk from crates.io directly for setup the
+> > test.
+>
+> Thanks, but memory backing is not what we want. We need to emulate large =
+drives
+> for FS tests (to catch problems such as overflows), and for that, a file =
+based
+> storage backing is better.
 
-Cheers,
+It is backed by virtual memory, which can be big enough because of swap, an=
+d
+it is also easy to extend to file backed support since zloop doesn't store
+zone meta data, which is similar to ram backed zoned actually.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Not like loop, zloop can only serve for test purposes, because each zone's
+meta data is always reset when adding a new device.
+
+Thanks,
+Ming
+
