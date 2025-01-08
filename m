@@ -1,54 +1,88 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2542D1F63E1
-	for <linux-block@vger.kernel.org>; Wed,  8 Jan 2025 09:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E461DFE0F;
+	Wed,  8 Jan 2025 09:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736327358; cv=none; b=ktG7GMAhiPHMa93xRt/rdTA9uQr6GCQ8QG9NDjyDxbhbLGSvQdMf79jwqhEC8zdJ5gPPDjBQDWr064cf5D8DpT8tTJ3tOVWqKFTu59O5MHwKuZ7kFbRwPFVBKZGbzETESDJiMeypqIiz+RJJuM7JwQvlcQhH8bOhSnMEeNIynas=
+	t=1736328326; cv=none; b=uz/+zxEyWpz7g31o/5KZlIhbMc+qheyT1Ye2SHwKoCTnfL06dGgEx+1O4Af8boW+ZWIXS2nVfZrucZbf70EztPl4w9y2Aka2bDCdKIKtSbieUX9qiKvbj7FOWYB4OKXRZJyMae+bXgY0F4NZ+pel+oN1e1KG1bfrnvYr7cewEdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736327358; c=relaxed/simple;
-	bh=nO5UB7NuniqyyZq5SJ3+zh3UTpkUjSBy3Sds9gpldx8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LEBxNHt4mE0ZKFA+MgEQHhZGNv6dPp27Q2Bx1P8b+ZyaiRPXt+mY7UrbPel5ZS0zC+xYy23d1pIaG+nYJxkZdlwJPfyUXufrsH6gp7WPmOUzkWEVt+So2GlTm1wthFu/lCvI2QBLzKjSeRn7kGzIX9DjCJxAAsDuGGtp9xF1dmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+	s=arc-20240116; t=1736328326; c=relaxed/simple;
+	bh=FFgW0j1yaIXwK39khgwmIcTdemdFiuGf+LUXNTDYOrw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=irER51eO00SvdtK5VErgYLabuhH0lQW3iAgoF34SsigjPPufQuI+3QD9UF1fR3Qsrg374e9BpTlxDV0njXD7O3weqS11mPj/la3ykavBl9NCikKcJsIVLSO3AdYEb9jw+TAivNWpGss1Ty9ixHDHRI/nAJ1M7oOo2jFPe6k3wXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PbEZjoi8; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id BAFC068BEB; Wed,  8 Jan 2025 10:09:12 +0100 (CET)
-Date: Wed, 8 Jan 2025 10:09:12 +0100
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PbEZjoi8"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=ryN0z1Pp3IvUFA7Af5iKRLT0TkpMzEngq0fQMHX47v8=; b=PbEZjoi8R7AHtgeqHEdx2xq/Y+
+	MvbTIP2dqEt3CCoyBUcO9sISsHtvySjiTKrt4IGnxQgzrtm2I9doeRxuMivSaziOhgtGysx0UUGIT
+	3U58D+fiwGqGhmH6jZ33FOXW5flKIqJCV0AKN0viQyzZur5Z+GiV/dIwx3cmYiefoiX3SQ9z4dEIN
+	ME0gTCMsStalLn9jCXgG0aUh95XTBDToq9K9VxOBlHUboRd4FjL12C+WIjJnJ9Vs3H9QvxxuhLMmb
+	aZp0MVyI0DwB2J60GQvvjnc/KAii+8YBZZJrWpqXq/EdCu2K4hc2E24PnVykOuU4sc5p2dtZSWXeS
+	e7Or5HSw==;
+Received: from 2a02-8389-2341-5b80-e44b-b36a-6403-8f06.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:e44b:b36a:6403:8f06] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tVSJX-00000007lPb-02aU;
+	Wed, 08 Jan 2025 09:25:23 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 0/2] New zoned loop block device driver
-Message-ID: <20250108090912.GA27786@lst.de>
-References: <20250106142439.216598-1-dlemoal@kernel.org> <2f7c9abe-a23f-4b2f-99aa-e6d220c74dd0@kernel.dk> <20250106152118.GB27324@lst.de> <Z33jJV6x1RnOLXvm@fedora> <ac42d762-60e5-4550-99f1-bd2072e474c2@kernel.org> <CAFj5m9+LUtAt2ST41KzMasx4BuVYBXjAuLg5MDr0Gh31yzZKzw@mail.gmail.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Ming Lei <ming.lei@redhat.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	nbd@other.debian.org,
+	linux-scsi@vger.kernel.org,
+	usb-storage@lists.one-eyed-alien.net
+Subject: fix queue freeze and limit locking order v2
+Date: Wed,  8 Jan 2025 10:24:57 +0100
+Message-ID: <20250108092520.1325324-1-hch@lst.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFj5m9+LUtAt2ST41KzMasx4BuVYBXjAuLg5MDr0Gh31yzZKzw@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Jan 08, 2025 at 04:13:01PM +0800, Ming Lei wrote:
-> It is backed by virtual memory, which can be big enough because of swap, and
+Hi all,
 
-Good luck getting half way decent performance out of swapping for a 50TB
-data set.  Or even a partially filled one which really is the use case
-here so it might only be a TB or so.
+this is my version of Damien's "Fix queue freeze and limit locking order".
+A lot looks very similar, but it was done independently based on the
+previous discussion.
 
-> it is also easy to extend to file backed support since zloop doesn't store
-> zone meta data, which is similar to ram backed zoned actually.
+Changes since v1:
+ - more comment typo fixing
+ - fix loop as well
+ - make the poll sysfs attr show method more accurate
+ 
+Changes since RFC:
+ - fix a bizzare virtio_blk bisection snafu
+ - set BLK_FEAT_POLL a little less eagerly for blk-mq
+ - drop the loop patch just adding a comment
+ - improve various commit logs and coments
 
-No, zloop does store write point in the file sizse of each zone.  That's
-sorta the whole point becauce it enables things like mount and even
-power fail testing.
-
-All of this is mentioned explicitly in the commit logs, documentation and
-code comments, so claiming something else here feels a bit uninformed.
-
+Diffstat:
+ block/blk-core.c               |   17 ++++-
+ block/blk-integrity.c          |    4 -
+ block/blk-mq.c                 |   17 -----
+ block/blk-settings.c           |   27 +++++++-
+ block/blk-sysfs.c              |  134 ++++++++++++++++++++---------------------
+ block/blk-zoned.c              |    7 --
+ block/blk.h                    |    1 
+ drivers/block/loop.c           |   52 ++++++++++-----
+ drivers/block/nbd.c            |   17 -----
+ drivers/block/virtio_blk.c     |    4 -
+ drivers/nvme/host/core.c       |    9 +-
+ drivers/scsi/sd.c              |   17 +----
+ drivers/scsi/sr.c              |    5 -
+ drivers/usb/storage/scsiglue.c |    5 -
+ include/linux/blkdev.h         |    5 -
+ 15 files changed, 164 insertions(+), 157 deletions(-)
