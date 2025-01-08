@@ -1,122 +1,190 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED0D1A83E1;
-	Tue,  7 Jan 2025 23:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219D92AF0E
+	for <linux-block@vger.kernel.org>; Wed,  8 Jan 2025 02:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736291353; cv=none; b=tFNo2xWbGjaNLHydK9fmVI3vi3S3MkDTReZ8laSQLQ3ZCBiQ5smH89TrXhrVcJWTKnrvu+Fk2cF+YnGA9YLloj2KUChx6Tfi1+rFLb80y3CU9lTAYNyYlNtuEU2by2W7dnvwYvVfdvN2TF+HewkxEKYozXOF1zdmWT+IA01gprE=
+	t=1736301754; cv=none; b=KDFK6+KTKVJHps4mjMnHAshwGQWoys15ByV2oXcDE1dlSsTWs2kkSWMTklBtsyojhtpad1w9JRiryO21qe4rphEOZyMCaUzv/P5Ctw/+OHHmzSHRbwJqdnkLAH23idpcl5WkUfwDxr9OYPrJjneV/e9B9SVdOAJpxpbD1tZUZ/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736291353; c=relaxed/simple;
-	bh=w1XXgL3jt5Aty8Ttw2N2wfWJmLJOID7g/8HTbnQrFBc=;
+	s=arc-20240116; t=1736301754; c=relaxed/simple;
+	bh=bnbdafSHoUIXiLJU0hLjv6jA35U7B1BBo1Y6D1ExIF4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S3aNXFZiVm27xa014Soor3GWP2l4RpRGqvpA6mgD9/y5hBKmYdXZiotvn97K/Ls8MJIYzLjs8s4R7TM9BHhGRM8f4QtxndMtZMX158Mi8aUxlyjZv8OaxampMNEDVaPhAGeH7rpuOedmr/bHYoADH0SJMErvkxiFgP6aDCvYkaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=It++wkGW; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=DIQMZlXufWiOnk4wIbQa4HzrmgjEVzUg8BrdvXizr9FHXYQsC05yqbXbi679WJ2w/iXM+AKVKBfp1juRXlO7NPaWpOSHzXghdv8s8qZ2VS1Wfy5nSh+dmiJNIKgP8lAqKTRjrViStfXa7I3tRMl94z3s1eR9zlidN++B2+c86TQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W/wdNTw2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="It++wkGW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4732C4CEE4;
-	Tue,  7 Jan 2025 23:09:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736291352;
-	bh=w1XXgL3jt5Aty8Ttw2N2wfWJmLJOID7g/8HTbnQrFBc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=It++wkGWKq6RCQKaDRYWgQ25W8nTUCjZ0H3DBq6KHE13F0ZwtVtlNdSnm9AsZ7R4G
-	 qiy+J6fqhKx7FDBmijn6kufrRpMuuDlWnGL0s/DW41v0VdqAhmInEfdMq2v8v/+2Ol
-	 7Cm+QgJZGuXvneIB+i46CeUCMdh8i8ZWAFa68tfVo0uwz3HG1k95DQK8hqLN9lNvTP
-	 4ZpbOb6Yoz7raXyG/UFrPNC2RJ9WhcFp9eVq0ep2CQY+f1ebvZ5A3wQgj1GAtz/36H
-	 eVx6e9pmnTU3MWaetuzvnkHDuz3qq6+NTQ35DnZAPrjV03yqju4ytVhgT56d+xC6YP
-	 pERLI1hOvf+rg==
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3a7deec316aso58129255ab.1;
-        Tue, 07 Jan 2025 15:09:12 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUjS1dvfslDH9+M2GYQBS2kKapg+QJ00ycAp7DxiV2AnUSQCnnOjCCW3k9qaSGgf6/RL8x2ah9Cs0pCXw==@vger.kernel.org, AJvYcCUqmZL/wCg9d8iKOqSrOCwn+c3dmh7zz8hTCeGcJi4nPu/Q1FVCGduOBSj6WEbqlvYFJoz1kfqmIW3UlmJT@vger.kernel.org, AJvYcCVfmLtn+0NHb7fa9vk7WlVWaMp/w3NpTA2AIGuoQSXjacUy3e9UkRjlXYlEoaX+yp+AUr/3ygGGEC/ZIg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5eleIA1n5b9zQWP8UOBgQ4QZDNiSkkjXXQDzYG/x65wz9LguS
-	qvDosQA4eyr3xqwmtV2bGKzH8E7Itbr1dOoicf+9gFjhSSkmN2MyhGDczMrBVEPuT/DX3bn+TaF
-	q2ilZ+HSonWTgmVHZxsbr4pIQF2c=
-X-Google-Smtp-Source: AGHT+IHZbes+RVqxODIqD+R4BFoIkf/Jxq+1478KFPSCKdYBPyv4uwxMwi4pid1uHZW/PkxtfgQFc7y+EgBpRECjmHw=
-X-Received: by 2002:a05:6e02:1948:b0:3a7:e4c7:ad18 with SMTP id
- e9e14a558f8ab-3ce3aa540d2mr6595195ab.18.1736291352136; Tue, 07 Jan 2025
- 15:09:12 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W/wdNTw2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736301751;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S3O4asXjraCLx5UW8S6Qn4t+5ED6yreicv33kZYqYIE=;
+	b=W/wdNTw2vWBIDkYBFgQtdyfQ/Bqxr7LJNPClV1yv/g345ibMi56B+45OqbM3vQDtkr7m50
+	ur+/bjBckHNy424wXAgzjriP6qzxAA/3XwfemReNe7IrvUDwcR4B5mzgODZjACR8FjF54a
+	392DUuXVfG3wRWs9RXt3J33zQzmNSYA=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-1I-rVsGJPJ6OC9ArXGBGGA-1; Tue, 07 Jan 2025 21:02:29 -0500
+X-MC-Unique: 1I-rVsGJPJ6OC9ArXGBGGA-1
+X-Mimecast-MFC-AGG-ID: 1I-rVsGJPJ6OC9ArXGBGGA
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2ef91d5c863so24371074a91.2
+        for <linux-block@vger.kernel.org>; Tue, 07 Jan 2025 18:02:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736301745; x=1736906545;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S3O4asXjraCLx5UW8S6Qn4t+5ED6yreicv33kZYqYIE=;
+        b=KzurfYShpVMr6fLCoMsch0Q7Z5yf7IWauc1Q71+nIS4ZQuMdOboI+EIahCOX6QwlnQ
+         g2RNmOJaieeot0mR0HM3kL9ba0X5F19duX2todPGgEbVHApngIrZqJ+5lz/OrjbD1pIX
+         ubBqsL1qz3woPFpI8eC3wqIuSskKkJN03bA0da15GVR7bBtUsr6ACaVnSP2hw6hxwqp6
+         ZyOHZt4CL+02QviNwazd3jTg37e0Za/UD+74H9OQX4Fr7gtziHeSOcdinbWA68AhE4FZ
+         smDEQ9CQQbaZaKRi5ZnudIs9C0rHCpan2CcEe+ZveN7shD19VTg7Az7gH+uSpJOV8ymz
+         DVfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWIKnvRC0LybPJecncdCK61wP1Cl1hOvkebdlzEhPvdl1ThxxuwMXCjrmuxUQicD2vrNyp76SIwnCmyKg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGHkF5jo1SxOaoAJLdYG9XSvova3nSslnYQY8N7TTWeOFvmtuB
+	N/iqzdrfvUxvMyXK9k966Oi9ThgvOTUONcY2WRPe/zH3ckZargV8p0BRC0y+IWOqD5p3473tLqH
+	whwQUE2M/74/I53aGT9ADnXPoQ3VsfGey2Ch6qniCSvdvkERMbZqf9utbXoX3JQwHpxBRcANZV0
+	Hpyysdfc4ZW/gkB8itZ7DxO1TqKvsdnf7R4TE=
+X-Gm-Gg: ASbGncsZyXOcBCkkjglJhN+Dkmlbg6b70zmjYJC77UOSiXy7IHDAOBEZHTyWABneBa0
+	gmufEMlV3rgYxLXUe4Hp54r8NdImxBqKG+aCzjhM=
+X-Received: by 2002:aa7:9319:0:b0:725:e325:ab3a with SMTP id d2e1a72fcca58-72d21f4c187mr1867002b3a.14.1736301745057;
+        Tue, 07 Jan 2025 18:02:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFEZ9BFWxbThy9xqFzriMnomszTBHHhxQZJ4oGdMaqUnaNUKqZKdEG9BHYR70GXPA0r+I74eLe8+1UXXTotQPA=
+X-Received: by 2002:aa7:9319:0:b0:725:e325:ab3a with SMTP id
+ d2e1a72fcca58-72d21f4c187mr1866956b3a.14.1736301744614; Tue, 07 Jan 2025
+ 18:02:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250102112841.1227111-1-yukuai1@huaweicloud.com>
- <Z31jQT4Fwba4HJKW@kernel.org> <13a377d4-f647-436a-806e-c05413cef837@gmail.com>
-In-Reply-To: <13a377d4-f647-436a-806e-c05413cef837@gmail.com>
-From: Song Liu <song@kernel.org>
-Date: Tue, 7 Jan 2025 15:09:00 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW5F94zauhvMd79VX0=JsFAY6S-0FJTK6Aqsr++UaDfy_g@mail.gmail.com>
-X-Gm-Features: AbW1kvYIxAFR2oI5w83WjUcDw6unFqRGpFgs2qL48Zjx_Zo-0LNdEHjtzfJs47w
-Message-ID: <CAPhsuW5F94zauhvMd79VX0=JsFAY6S-0FJTK6Aqsr++UaDfy_g@mail.gmail.com>
-Subject: Re: [PATCH RFC md-6.14] md: reintroduce md-linear
-To: RIc Wheeler <ricwheeler@gmail.com>
-Cc: Mike Snitzer <snitzer@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>, yukuai3@huawei.com, 
-	thetanix@gmail.com, colyli@suse.de, linux-kernel@vger.kernel.org, 
-	linux-raid@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com, 
-	dm-devel@lists.linux.dev, axboe@kernel.dk, linux-block@vger.kernel.org
+References: <20250107182516.48723-1-andrew.boyer@amd.com>
+In-Reply-To: <20250107182516.48723-1-andrew.boyer@amd.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 8 Jan 2025 10:02:13 +0800
+X-Gm-Features: AbW1kvaXj1MjFHCsg5QMAHaUlm13FiHYH0_03Qv8TJOXkWflZr9GjLeuzmB2ppY
+Message-ID: <CACGkMEt3iM2WZT08rpMHOFp_n2jWnjrG+YML5DgXrW2FbJC6vA@mail.gmail.com>
+Subject: Re: [PATCH] virtio_blk: always post notifications under the lock
+To: Andrew Boyer <andrew.boyer@amd.com>
+Cc: Viktor Prutyanov <viktor@daynix.com>, "Michael S . Tsirkin" <mst@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Eugenio Perez <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Jens Axboe <axboe@kernel.dk>, virtualization@lists.linux.dev, 
+	linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 7, 2025 at 12:34=E2=80=AFPM RIc Wheeler <ricwheeler@gmail.com> =
+On Wed, Jan 8, 2025 at 2:27=E2=80=AFAM Andrew Boyer <andrew.boyer@amd.com> =
 wrote:
 >
+> Commit af8ececda185 ("virtio: add VIRTIO_F_NOTIFICATION_DATA feature
+> support") added notification data support to the core virtio driver
+> code. When this feature is enabled, the notification includes the
+> updated producer index for the queue. Thus it is now critical that
+> notifications arrive in order.
 >
-> On 1/7/25 12:24 PM, Mike Snitzer wrote:
-> > On Thu, Jan 02, 2025 at 07:28:41PM +0800, Yu Kuai wrote:
-> >> From: Yu Kuai <yukuai3@huawei.com>
-> >>
-> >> THe md-linear is removed by commit 849d18e27be9 ("md: Remove deprecate=
-d
-> >> CONFIG_MD_LINEAR") because it has been marked as deprecated for a long
-> >> time.
-> >>
-> >> However, md-linear is used widely for underlying disks with different =
-size,
-> >> sadly we didn't know this until now, and it's true useful to create
-> >> partitions and assemble multiple raid and then append one to the other=
-.
-> >>
-> >> People have to use dm-linear in this case now, however, they will pref=
-er
-> >> to minimize the number of involved modules.
-> >>
-> >> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> > I agree with reinstating md-linear.  If/when we do remove md-linear
-> > (again) we first need a seamless upgrade/conversion option (e.g. mdadm
-> > updated to use dm-linear in the backend instead of md-linear).
+> The virtio_blk driver has historically not worried about notification
+> ordering. Modify it so that the prepare and kick steps are both done
+> under the vq lock.
+
+Do we have performance numbers when VIRTIO_F_NOTIFICATION_DATA is not
+negotiated?
+
+We need to make sure it doesn't introduce any regression in the case
+like virtualization setup since now there could be an vmexit when
+holding the virtqueue lock.
+
+Thanks
+
 >
+> Signed-off-by: Andrew Boyer <andrew.boyer@amd.com>
+> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+> Fixes: af8ececda185 ("virtio: add VIRTIO_F_NOTIFICATION_DATA feature supp=
+ort")
+> Cc: Viktor Prutyanov <viktor@daynix.com>
+> Cc: virtualization@lists.linux.dev
+> Cc: linux-block@vger.kernel.org
+> ---
+>  drivers/block/virtio_blk.c | 19 ++++---------------
+>  1 file changed, 4 insertions(+), 15 deletions(-)
 >
-> Agree with the need for an upgrade/conversion path.
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 3efe378f1386..14d9e66bb844 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -379,14 +379,10 @@ static void virtio_commit_rqs(struct blk_mq_hw_ctx =
+*hctx)
+>  {
+>         struct virtio_blk *vblk =3D hctx->queue->queuedata;
+>         struct virtio_blk_vq *vq =3D &vblk->vqs[hctx->queue_num];
+> -       bool kick;
 >
-> >
-> > This patch's header should probably also have this Fixes tag (unclear
-> > if linux-stable would pick it up but it really is a regression given
-> > there was no upgrade path offered to md-linear users):
-> >
-> > Fixes: 849d18e27be9 md: Remove deprecated CONFIG_MD_LINEAR
-> >
-> > Acked-by: Mike Snitzer <snitzer@kernel.org>
+>         spin_lock_irq(&vq->lock);
+> -       kick =3D virtqueue_kick_prepare(vq->vq);
+> +       virtqueue_kick(vq->vq);
+>         spin_unlock_irq(&vq->lock);
+> -
+> -       if (kick)
+> -               virtqueue_notify(vq->vq);
+>  }
+>
+>  static blk_status_t virtblk_fail_to_queue(struct request *req, int rc)
+> @@ -432,7 +428,6 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_=
+ctx *hctx,
+>         struct virtblk_req *vbr =3D blk_mq_rq_to_pdu(req);
+>         unsigned long flags;
+>         int qid =3D hctx->queue_num;
+> -       bool notify =3D false;
+>         blk_status_t status;
+>         int err;
+>
+> @@ -454,12 +449,10 @@ static blk_status_t virtio_queue_rq(struct blk_mq_h=
+w_ctx *hctx,
+>                 return virtblk_fail_to_queue(req, err);
+>         }
+>
+> -       if (bd->last && virtqueue_kick_prepare(vblk->vqs[qid].vq))
+> -               notify =3D true;
+> +       if (bd->last)
+> +               virtqueue_kick(vblk->vqs[qid].vq);
+>         spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+>
+> -       if (notify)
+> -               virtqueue_notify(vblk->vqs[qid].vq);
+>         return BLK_STS_OK;
+>  }
+>
+> @@ -476,7 +469,6 @@ static void virtblk_add_req_batch(struct virtio_blk_v=
+q *vq,
+>  {
+>         struct request *req;
+>         unsigned long flags;
+> -       bool kick;
+>
+>         spin_lock_irqsave(&vq->lock, flags);
+>
+> @@ -492,11 +484,8 @@ static void virtblk_add_req_batch(struct virtio_blk_=
+vq *vq,
+>                 }
+>         }
+>
+> -       kick =3D virtqueue_kick_prepare(vq->vq);
+> +       virtqueue_kick(vq->vq);
+>         spin_unlock_irqrestore(&vq->lock, flags);
+> -
+> -       if (kick)
+> -               virtqueue_notify(vq->vq);
+>  }
+>
+>  static void virtio_queue_rqs(struct rq_list *rqlist)
+> --
+> 2.17.1
+>
 
-Thanks all for feedback on this move. I agree that reinstating
-md-linear is the right move for now.
-
-Yu Kuai,
-
-It appears to me that the path doesn't apply cleanly on the md-6.14
-branch:
-
-Applying: md: reintroduce md-linear
-error: patch failed: drivers/md/Makefile:29
-error: drivers/md/Makefile: patch does not apply
-Patch failed at 0001 md: reintroduce md-linear
-hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch
-When you have resolved this problem, run "git am --continue".
-If you prefer to skip this patch, run "git am --skip" instead.
-To restore the original branch and stop patching, run "git am --abort".
-
-Please rebase and resend the patch.
-
-Thanks,
-Song
