@@ -1,29 +1,29 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5DC19B586
-	for <linux-block@vger.kernel.org>; Wed,  8 Jan 2025 05:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E70E11CAF
+	for <linux-block@vger.kernel.org>; Wed,  8 Jan 2025 05:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736315085; cv=none; b=Q+S2tBJADFl9fH7K7fXyoddq13taZng5pSRVsBuPwmqK3ZvlS1LBiW3iI6ffiG/0CudbwnG/BXCKW1fUOKIScBX+rMuyIxnlcfRF6US26Un/KAwYkEkOJ9w3TQhF8+k4H6qipitaXYv/qVzG17tYfJdncls2q+FdcSbfQqOZPVc=
+	t=1736315228; cv=none; b=tciQ+R4XlGLFrVV3ESt9SWmxVmYZXMX+kyLLbjWpYlAOpOo9eSK+AQ9kUvonU3bmOJdq+VfgSd6kJvnDmBvZBs0ATK5OozQtNnEzGwfaN+vP6cVBy46yTeVYRkJyx0diSJ/6ZgjlV42gCexoR2uhDJZ8WA+D+69Bq+UQ+tjQQEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736315085; c=relaxed/simple;
-	bh=/lxywidDzjzTzseS0D5yW2/p4trkUPm/8IkIHFtDLSk=;
+	s=arc-20240116; t=1736315228; c=relaxed/simple;
+	bh=KayOgvKf0VHrI28yAbHom3uabGlohiLhKtHo8Nm2mn0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lWvgB1TCxAixqT+Qk0SKoK1O61012bsVS/4/mw4OBVN53BOzA5xHhalhITCeypyo3InFMQIGaFjOrXIgXrI+CjsP34YDt1ewNxisZBAjyVW604HXz0azYbqE/PrObsnflHxDV3xsuu2bW7cDG4JARcXfRc+7q7gim0BKCZ9lStM=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y6s3cExjUea7F0LSMbCJyD35ug3WkHvkq7ihD13SCAxmyLWyx6Mo+n8/4VkW83g91jatjUkA2e9Cn4ImXOefhKz1ygTzWmj2t9nJVE5K8Zh2jZ2we3SLhE52zUToIB2MnTswND+kYOi+MsHWRy2YRIzgFLaBjLbHmVXOFHfbMW8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 0B5BB68BEB; Wed,  8 Jan 2025 06:44:36 +0100 (CET)
-Date: Wed, 8 Jan 2025 06:44:36 +0100
+	id 21AAC68BEB; Wed,  8 Jan 2025 06:47:01 +0100 (CET)
+Date: Wed, 8 Jan 2025 06:47:00 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	linux-block@vger.kernel.org
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
 Subject: Re: [PATCH 0/2] New zoned loop block device driver
-Message-ID: <20250108054436.GA20178@lst.de>
-References: <20250106142439.216598-1-dlemoal@kernel.org> <2f7c9abe-a23f-4b2f-99aa-e6d220c74dd0@kernel.dk> <20250106152118.GB27324@lst.de> <98be988f-5f6a-489d-b0e1-2f783c5b8a32@kernel.dk> <20250106153252.GA27739@lst.de> <0f2eea00-e5e9-4cd1-8fe6-89ed0c2b262b@kernel.dk> <20250106154433.GA28074@lst.de> <5f57ff26-2c87-45fa-bb91-4f68492bac85@kernel.dk> <606367a7-9bb5-48e5-a7ef-466eefd833fb@kernel.org> <3a1314db-ed44-4c22-8fc1-0cf672003026@kernel.dk>
+Message-ID: <20250108054700.GB20178@lst.de>
+References: <20250106142439.216598-1-dlemoal@kernel.org> <2f7c9abe-a23f-4b2f-99aa-e6d220c74dd0@kernel.dk> <20250106152118.GB27324@lst.de> <Z33jJV6x1RnOLXvm@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,36 +32,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3a1314db-ed44-4c22-8fc1-0cf672003026@kernel.dk>
+In-Reply-To: <Z33jJV6x1RnOLXvm@fedora>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Jan 07, 2025 at 02:08:20PM -0700, Jens Axboe wrote:
-> > ublk backend driver to do the same as zloop in userspace would need a
-> > lot more code to be efficient. And even then, as Christoph already
-> > mentioned, we would still have performance suffer from the context
-> > switches. But that performance point was not the primary stopper
-> 
-> I don't buy this context switch argument at all.
+On Wed, Jan 08, 2025 at 10:29:57AM +0800, Ming Lei wrote:
+> You can link with libublk or add it to rublk, which supports ramdisk zone
+> already, then install rublk from crates.io directly for setup the
+> test.
 
-The zloop write goes straight from kblockd into the the filesystem.
-ublk switches to userspace, which goes back to the kernel when the
-file system writes.  Similar double context switch on the completion
-side.
+ramdisk are nicely supported in null_blk already.  And rust crates
+are a massive pain as they tend to not be packaged nicely.  Exatly
+what I do not want to depend on.
 
+> Forking one new loop could add much more pain since you may have to address
+> everything we have fixed for loop, please look at 'git log loop'
 
-> Why would it mean more
-> sleeping?
-
-?
-
-> There's absolutely zero reason why a ublk solution would be at
-> least as performant as the kernel one.
-
-Well, prove it.  From haing worked on similar schemes in the past
-I highly doubt it.
-
-> And why would it need "a lot more code to be efficient"?
-
-Because we don't have all the nice locking and even infrastructure
-in userspace that we have in the kernel.
+The biggest problem with the loop driver is the historic baggage in
+the user interface. That's side stepped by this driver (and even for
+conventional device a loop-ng doing the same might be nice, but that's
+a separate story).
 
