@@ -1,122 +1,95 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A01C1F03C7;
-	Wed,  8 Jan 2025 09:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0D21F03F1
+	for <linux-block@vger.kernel.org>; Wed,  8 Jan 2025 09:39:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736328367; cv=none; b=O2sTUgayZyWcCwo9y1cFBxNVSoXrSIFMAnpLJtnpIT9fVKgUHWHuyG16Pj8oh4mMyDF02AexL9IqQg9qhRIZmYrLWu9+l3zz8JlrdMGttTBJTwYcXqFjrszLz/QNdIoyAA8ruqe3yi/zCKfPzvytbCifM8/D2Mdwudk0iPncViY=
+	t=1736329189; cv=none; b=uc9RknZhmkhrMXcOPlySPfbir5Z6R8Y4jTi5u04YV97s4gTDxwvFVC/J4fgSLMYE2n1Yy+Owf90yumrxG/gzROT1k+R659ZkInrAVqAmv2DimvLNf0E5RpVgL1lTixW7mdfeg8202UBb3ZoOSU8cffwwChbyGgQKKKCKYPABJ+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736328367; c=relaxed/simple;
-	bh=N1rZyYckV9/psrk+5ym2jvZ+sC5iptNam9oZ4mslYUU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FBzPTeENdlSUSI1/8Z8u1HGCYzNizSqiacGOaqratvp1wzQsuauWE6KKFbNoFHfZibJUOZKt7vxLGlVz+SMQQPd6mYy+DZcQouY5RV7LI+LOABvRpXl/fBJ/ErI80zUgFekxjYCqzzD7hyuiHmK20hH3iv39NyDNL6ImI/jpsfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=1tEf1x7/; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1736329189; c=relaxed/simple;
+	bh=WYhomn70P25FJi9MceIhGf2ntWQ8mL+UaI2z3gI9A6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=suxorXADzLtEhc/bbUq7cpGDbKE0u9+FqkmfcP1/eY0MNQM1BsjmV1KxkVg0cXcAu6h4ld+oL6Ob9jGAHnTbESuJvBq7YPVDbLgt77hH5Jci5zwbY6qcJs3D68PFhYh1Th8nbpP9xK14Tm4aWubnTn7l3aBZy/Ynn7E6pZIim0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=damzhxch; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1tEf1x7/"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=l/31ESR3+qEAHHMxPuf7j9P2G6uDf3ZUExmKKhtWzmA=; b=1tEf1x7/XO8v/25JUi9W59yd8c
-	YHpYnpE1lAZONHiLmbW9QE/vRt60M/+Gl0Bl4QMTrQniCQkzE9pl3Xj1Bh6deDn5UcRJ0PvXPUxX0
-	aIDqTvEcljLJ8lqQkAyQGVUiUZVqkc8VxAGxoNNCbdifMpKvMyJPB0U15a6e0GHALwUitznxemd9j
-	Hn5j/NC6QuAUy34lEcNfcJJDC42UHkAV4oJ1EOhnKluzpRU5+PTyuei17Wutf8WbX3ZRhwnwj6T1Z
-	pSkDdimlHJDGUswLYEkDg3CG+Ivnpkw3fVM2H8r/adAu6Igypq3z67ZHuZEiatYAFCnPJ7LWuBldP
-	tAfxtNFQ==;
-Received: from 2a02-8389-2341-5b80-e44b-b36a-6403-8f06.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:e44b:b36a:6403:8f06] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tVSKB-00000007lwB-274R;
-	Wed, 08 Jan 2025 09:26:04 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	nbd@other.debian.org,
-	linux-scsi@vger.kernel.org,
-	usb-storage@lists.one-eyed-alien.net
-Subject: [PATCH 10/10] loop: fix queue freeze vs limits lock order
-Date: Wed,  8 Jan 2025 10:25:07 +0100
-Message-ID: <20250108092520.1325324-11-hch@lst.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250108092520.1325324-1-hch@lst.de>
-References: <20250108092520.1325324-1-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="damzhxch"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736329186;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z3vRzSAUwwa8R76b7J7XpJfZw7mhqd47kcxnNLCMmrA=;
+	b=damzhxch2vNy1DXZiTWRzv6nW8l7NMq2ixIN0D9Ov4sNeYjCJ0KIfHb4Xik/SxnJoQVwVD
+	mrrSsvUWrXyz1bS7usoCr+m64dJB07/2Fk2+S5BEMPTS7sVG00vkxH0Qju+amY7e1sPQsf
+	80GowkEaf8srSn1S0IjSDUBoTPfdDQM=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-461-Ra4IlvPmM_af-vbYQriptA-1; Wed,
+ 08 Jan 2025 04:39:43 -0500
+X-MC-Unique: Ra4IlvPmM_af-vbYQriptA-1
+X-Mimecast-MFC-AGG-ID: Ra4IlvPmM_af-vbYQriptA
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6F66F195609E;
+	Wed,  8 Jan 2025 09:39:42 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.74])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8AC711956094;
+	Wed,  8 Jan 2025 09:39:38 +0000 (UTC)
+Date: Wed, 8 Jan 2025 17:39:33 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/2] New zoned loop block device driver
+Message-ID: <Z35H1chBIvTt0luL@fedora>
+References: <20250106142439.216598-1-dlemoal@kernel.org>
+ <2f7c9abe-a23f-4b2f-99aa-e6d220c74dd0@kernel.dk>
+ <20250106152118.GB27324@lst.de>
+ <Z33jJV6x1RnOLXvm@fedora>
+ <ac42d762-60e5-4550-99f1-bd2072e474c2@kernel.org>
+ <CAFj5m9+LUtAt2ST41KzMasx4BuVYBXjAuLg5MDr0Gh31yzZKzw@mail.gmail.com>
+ <20250108090912.GA27786@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250108090912.GA27786@lst.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Match the locking order used by the core block code by only freezing
-the queue after taking the limits lock using the
-queue_limits_commit_update_frozen helper and document the callers that
-do not freeze the queue at all.
+On Wed, Jan 08, 2025 at 10:09:12AM +0100, Christoph Hellwig wrote:
+> On Wed, Jan 08, 2025 at 04:13:01PM +0800, Ming Lei wrote:
+> > It is backed by virtual memory, which can be big enough because of swap, and
+> 
+> Good luck getting half way decent performance out of swapping for a 50TB
+> data set.  Or even a partially filled one which really is the use case
+> here so it might only be a TB or so.
+> 
+> > it is also easy to extend to file backed support since zloop doesn't store
+> > zone meta data, which is similar to ram backed zoned actually.
+> 
+> No, zloop does store write point in the file sizse of each zone.  That's
+> sorta the whole point becauce it enables things like mount and even
+> power fail testing.
+> 
+> All of this is mentioned explicitly in the commit logs, documentation and
+> code comments, so claiming something else here feels a bit uninformed.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/loop.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+OK, looks one smart idea.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 560d6d5879d6..15e486baa223 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -311,6 +311,13 @@ static void loop_clear_limits(struct loop_device *lo, int mode)
- 		lim.discard_granularity = 0;
- 	}
- 
-+	/*
-+	 * XXX: this updates the queue limits without freezing the queue, which
-+	 * is against the locking protocol and dangerous.  But we can't just
-+	 * freeze the queue as we're inside the ->queue_rq method here.  So this
-+	 * should move out into a workqueue unless we get the file operations to
-+	 * advertise if they support specific fallocate operations.
-+	 */
- 	queue_limits_commit_update(lo->lo_queue, &lim);
- }
- 
-@@ -1091,6 +1098,7 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 
- 	lim = queue_limits_start_update(lo->lo_queue);
- 	loop_update_limits(lo, &lim, config->block_size);
-+	/* No need to freeze the queue as the device isn't bound yet. */
- 	error = queue_limits_commit_update(lo->lo_queue, &lim);
- 	if (error)
- 		goto out_unlock;
-@@ -1151,7 +1159,12 @@ static void __loop_clr_fd(struct loop_device *lo)
- 	lo->lo_sizelimit = 0;
- 	memset(lo->lo_file_name, 0, LO_NAME_SIZE);
- 
--	/* reset the block size to the default */
-+	/*
-+	 * Reset the block size to the default.
-+	 *
-+	 * No queue freezing needed because this is called from the final
-+	 * ->release call only, so there can't be any outstanding I/O.
-+	 */
- 	lim = queue_limits_start_update(lo->lo_queue);
- 	lim.logical_block_size = SECTOR_SIZE;
- 	lim.physical_block_size = SECTOR_SIZE;
-@@ -1471,9 +1484,10 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
- 	sync_blockdev(lo->lo_device);
- 	invalidate_bdev(lo->lo_device);
- 
--	blk_mq_freeze_queue(lo->lo_queue);
- 	lim = queue_limits_start_update(lo->lo_queue);
- 	loop_update_limits(lo, &lim, arg);
-+
-+	blk_mq_freeze_queue(lo->lo_queue);
- 	err = queue_limits_commit_update(lo->lo_queue, &lim);
- 	loop_update_dio(lo);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
--- 
-2.45.2
+It is easy to extend rublk/zoned in this way with io_uring io emulation, :-)
+
+
+
+Thanks,
+Ming
 
