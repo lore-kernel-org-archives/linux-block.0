@@ -1,117 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04AFA17E900;
-	Wed,  8 Jan 2025 16:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D741A0730
+	for <linux-block@vger.kernel.org>; Wed,  8 Jan 2025 16:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736352835; cv=none; b=cHZRg27ece8G4eVAFnz+DQub91nU/rz769MY/dMlXzBeKEtFQKkwXItHXjMh2K3pX57nLUQXO2u4lzKZniMv9fLwFWyuTr8Pa9Ak+iunkUz1oWRjNYumJ4dt8c8itp+nqOcEdc2kfSDCa75zZ8OmB4Z7xpEJMlM4OI8tuIHs8Bs=
+	t=1736354026; cv=none; b=ra6HwRm80Sed6SJ126Dh7HhQPhPHVbMoUavEKNUiz4FqJfmmSl2tEQPnQmiadUCt6Bk2ZzbDm49hsvxxb2GRWvjJn0ecV7rqwL1egkcgS8OYyhfqkMQ6eZelkTNffpb25OAZEML9zBXjLD9xrrqJ3cp6YjiaLJKek8H/U5DjOPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736352835; c=relaxed/simple;
-	bh=tgQXwbQNCWDvMOpzVJxKStfpnMBkUIZICYWlSl3GgsY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G0ICS/YfJvnnlr3DdwgdqP7pbLKMjn0EGf3//FiD9kHIOotBDKv0yLqKrGxdVzQbwLjrMxq/1L7kDhuJTdUX8gfhb6kE1XvW6/tTPi4iGLXVH6VFdfSnrI49IzeMY+An2GL4Fflj29iVpF/XS5poc4orCgaVKou2z5p9is0CZQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RsUtbT9L; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736354026; c=relaxed/simple;
+	bh=JuNFFq+4427zrEDjPFfzKLJaCDIxfV3MbqrZZxVP60Y=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=jyTyOrANjctMHxkOD6aMpIBLpuSfZorEn37wXTZmRmOGyDSyz4bUmtFBEN5O0mEzvW6ZNuSSUHY7RPHNFjMcFqviE/ICevod9yhsGDE2eE2QLsGXCYUAXj4xMsTrwr5h54msahjbbnpnAt2f58mFw+DDlR7YH+APApNravcp7ZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KNdd9sm3; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RsUtbT9L"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CABEC4CED3;
-	Wed,  8 Jan 2025 16:13:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736352834;
-	bh=tgQXwbQNCWDvMOpzVJxKStfpnMBkUIZICYWlSl3GgsY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RsUtbT9Lju55GMfOPtac7Xh97HnJoAH/eUQwCjlz73ILzTJCkI5vyIHdwLPfuDTmd
-	 KapwkxRoP+dCvdMaLmN2/jnA3NvOUc1lqXGNR653xQTmo8G18sw7qoeCJqLRJG5qT8
-	 lVuTeRoEnskWKMS0K7QdgSvJs6b46vVo9WhbRAFisavnmyiGv+PK97KrEHPHs9J76O
-	 1XvhswWMApAhBskrVnIrL6LJafv7tSwz6c7BHZJRtRxWa824oM4EtNBgL3hz6WK21t
-	 lIXI6rETaiVVq1bp+GxT+TBV9rboUOJ/N5mSRgf1IR2U25tFyMTRRjuSpVuvy52thz
-	 73PDaEoqMewnA==
-Date: Wed, 8 Jan 2025 11:13:53 -0500
-From: Mike Snitzer <snitzer@kernel.org>
-To: Song Liu <song@kernel.org>
-Cc: RIc Wheeler <ricwheeler@gmail.com>, Yu Kuai <yukuai1@huaweicloud.com>,
-	yukuai3@huawei.com, thetanix@gmail.com, colyli@suse.de,
-	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-	yi.zhang@huawei.com, yangerkun@huawei.com, dm-devel@lists.linux.dev,
-	axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: [PATCH RFC md-6.14] md: reintroduce md-linear
-Message-ID: <Z36kQW-sNdketOGL@kernel.org>
-References: <20250102112841.1227111-1-yukuai1@huaweicloud.com>
- <Z31jQT4Fwba4HJKW@kernel.org>
- <13a377d4-f647-436a-806e-c05413cef837@gmail.com>
- <CAPhsuW5F94zauhvMd79VX0=JsFAY6S-0FJTK6Aqsr++UaDfy_g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KNdd9sm3"
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2ef87d24c2dso20350465a91.1
+        for <linux-block@vger.kernel.org>; Wed, 08 Jan 2025 08:33:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736354024; x=1736958824; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JuNFFq+4427zrEDjPFfzKLJaCDIxfV3MbqrZZxVP60Y=;
+        b=KNdd9sm3WWZRzzny/cyu0on6hED7MJExZanpEfucMWIfoxotBvUIP1uM4Q9zTb9I+a
+         vYask53p9/j1bHR6Eu+iinXVB7Mhe2bYcFrhPBGs+9m38tBXEvTP3cxavv79d6ReMkYr
+         ELHku4Ay4sX4ptIX4GhGcGvTK8It+BojCk3yXfMwtrhZrE7MjKdGGBbaKFGD6ds/mvQj
+         Veo6oXCM9+ZKYf3nhm6CHqc0Rd6637fYS5uWx3I9qmf2RSa22GjoEqQ9mAq1b/FxQBz9
+         ix0ZvdGC3DeN7CgjghsYvPchSMG4eHsJz08dweFIo5/rwZr/RyLoQQOyLDM/J+gWcmm3
+         uYNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736354024; x=1736958824;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JuNFFq+4427zrEDjPFfzKLJaCDIxfV3MbqrZZxVP60Y=;
+        b=m4fAWAqUMkYffDL7owapN5OSC0+lbZbOQLMyk+Vvr2iEBmRMcIp8fnarS68yxorZrs
+         EHNacgOglbI6CNb0I3j5gL1ii0KDEJgWaKhuPnVopX8RX8HUTyLs3t8uT5S3RAsP4VYD
+         p7tfywlI6FA4S5Zy04DItfkakUNmcWtJW9yKX09/bQVNAIyb6nVFpoIMpRAJL+CPY+kv
+         zVF0xNv2ki9XG+itt8EgV6RccD7awH9rD2vOye57e7K1yHEk2WLfvfTIGtDmrGxJrqNV
+         hBEzU1aektngjzMxNVivc0gN5CmB164fcobpUOd81W9u1jCS56nl0Kv4UkqQGpjU3Hvg
+         DKXg==
+X-Gm-Message-State: AOJu0YzbASKlR2zp0YQF1iTU1FpOTPuzzuMpv/UzcS9e9pKYRbutPxjQ
+	YvJtYjKlIXa7xVGplJB8GdQDQIQYeewkAQZzF97LwWtJj7twvjqBxFQKCcndwxpUWDKGSgQBGhN
+	tXfdtmHVSNXk0+QkggHJ2n8+92gTgNQ==
+X-Gm-Gg: ASbGnctwH9+x4pz1Hk7F1Rp0Tjb1ObjLL6zh5kcFEw/PZn534KzjgJNWSEOGq41R6Fd
+	btSDW+7iu2xauwLE7+HJoYcTyrYegp5smgFkwUAU=
+X-Google-Smtp-Source: AGHT+IEvAAlEWRhWzFbbw1qqf74p4N3VOFnruwa2WNtFp1WfS+M7lkicYmiPofLb/KB3ANAyLIFlj1r4bssr5VZTj1w=
+X-Received: by 2002:a17:90a:c88f:b0:2ea:63e8:f24 with SMTP id
+ 98e67ed59e1d1-2f5490ee6efmr4211714a91.36.1736354023645; Wed, 08 Jan 2025
+ 08:33:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPhsuW5F94zauhvMd79VX0=JsFAY6S-0FJTK6Aqsr++UaDfy_g@mail.gmail.com>
+From: Travis Downs <travis.downs@gmail.com>
+Date: Wed, 8 Jan 2025 13:33:07 -0300
+X-Gm-Features: AbW1kvaSIq7Fw-BU0f8JdJHv8kZ_3nSpc3zE4FPh_XjF9J5bTb-KzKOGl41PvZ4
+Message-ID: <CAOBGo4xx+88nZM=nqqgQU5RRiHP1QOqU4i2dDwXt7rF6K0gaUQ@mail.gmail.com>
+Subject: Semantics of racy O_DIRECT writes
+To: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jan 07, 2025 at 03:09:00PM -0800, Song Liu wrote:
-> On Tue, Jan 7, 2025 at 12:34 PM RIc Wheeler <ricwheeler@gmail.com> wrote:
-> >
-> >
-> > On 1/7/25 12:24 PM, Mike Snitzer wrote:
-> > > On Thu, Jan 02, 2025 at 07:28:41PM +0800, Yu Kuai wrote:
-> > >> From: Yu Kuai <yukuai3@huawei.com>
-> > >>
-> > >> THe md-linear is removed by commit 849d18e27be9 ("md: Remove deprecated
-> > >> CONFIG_MD_LINEAR") because it has been marked as deprecated for a long
-> > >> time.
-> > >>
-> > >> However, md-linear is used widely for underlying disks with different size,
-> > >> sadly we didn't know this until now, and it's true useful to create
-> > >> partitions and assemble multiple raid and then append one to the other.
-> > >>
-> > >> People have to use dm-linear in this case now, however, they will prefer
-> > >> to minimize the number of involved modules.
-> > >>
-> > >> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> > > I agree with reinstating md-linear.  If/when we do remove md-linear
-> > > (again) we first need a seamless upgrade/conversion option (e.g. mdadm
-> > > updated to use dm-linear in the backend instead of md-linear).
-> >
-> >
-> > Agree with the need for an upgrade/conversion path.
-> >
-> > >
-> > > This patch's header should probably also have this Fixes tag (unclear
-> > > if linux-stable would pick it up but it really is a regression given
-> > > there was no upgrade path offered to md-linear users):
-> > >
-> > > Fixes: 849d18e27be9 md: Remove deprecated CONFIG_MD_LINEAR
-> > >
-> > > Acked-by: Mike Snitzer <snitzer@kernel.org>
-> 
-> Thanks all for feedback on this move. I agree that reinstating
-> md-linear is the right move for now.
-> 
-> Yu Kuai,
-> 
-> It appears to me that the path doesn't apply cleanly on the md-6.14
-> branch:
-> 
-> Applying: md: reintroduce md-linear
-> error: patch failed: drivers/md/Makefile:29
-> error: drivers/md/Makefile: patch does not apply
-> Patch failed at 0001 md: reintroduce md-linear
-> hint: Use 'git am --show-current-patch=diff' to see the failed patch
-> When you have resolved this problem, run "git am --continue".
-> If you prefer to skip this patch, run "git am --skip" instead.
-> To restore the original branch and stop patching, run "git am --abort".
-> 
-> Please rebase and resend the patch.
-> 
-> Thanks,
-> Song
+Hello linux-block,
 
-Um, sorry but waiting for a resubmission of a revert due to Makefile
-difference is a needless stall.  You'd do well to fixup the Makefile,
-compile test and also review for any intervening MD (or other kernel)
-API changes since the code was removed from the tree.
+We are experiencing data corruption in our storage intensive server
+application and are wondering about the semantics of "racy" O_DIRECT
+writes.
 
-Mike
+Normally we target XFS, but the question is a general one.
+
+Specifically, imagine that we are writing a single 4K aligned page,
+with contents AB00 (each char being 1K bytes). We only care about
+the first 2048 bytes (the AB part). We are using libaio writes
+(io_submit) with O_DIRECT semantics. While the write is in flight,
+i.e.,
+after we have submitted it and before we reap it in io_getevents, the
+userspace application writes into second half of the page,
+changing it to ABCD (let's say via memcpy). The first half is not changed.
+
+The question then is: is this safe in the sense that would result in
+ABxx being written where xx "is don't care"? Or could it do something
+crazier, like cause later writes to be ignored (e.g. if something in
+the kernel storage layer hashes the page for some purpose and
+this hash is out of sync with the page at the time it was captured, or
+something like that).
+
+Of course, the easy answer is "don't do that", but I still want to
+know what happens if we do.
+
+Travis
