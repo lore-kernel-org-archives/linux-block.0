@@ -1,51 +1,57 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75AD38F82;
-	Wed,  8 Jan 2025 10:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3B51F8686
+	for <linux-block@vger.kernel.org>; Wed,  8 Jan 2025 10:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736332774; cv=none; b=AuxclAxGTnqan6KMGk7NG8SiOwo+suALXPRFGx1/5ITsder+SLNTFhG1+hkfDbR/jEQXPWtrmx9dL+WUUNDNYBVa342h7ciRB40ndntTvb5f6RgccvZnJif544ipstH+sLvnzeyIsabODmmOKRRe0KXhVraFjnjDK55VXQNSOqY=
+	t=1736332776; cv=none; b=C0URxjIr62uhcXd56uCl9moAb6V9vEjb+kG71vmzxeYvmNDwwdtSvyQVI9yRau98UuiVUfJ0IX0UAoQR/KhA7HGlvQku9SFfB6wjXF1vf+oqSca9fjgNpiyMw7YNMPNRvbx1y3iFAR3mgBBa+axMC+HzcImyp7prJXCeZeJKxaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736332774; c=relaxed/simple;
-	bh=wWO6nKxlaHTQ6vNc0Fh7xbXckRbHyUTC/A+5O8lcDs4=;
+	s=arc-20240116; t=1736332776; c=relaxed/simple;
+	bh=A2IyPJwWkj30aPtAZEzNBsxxqeIDBEL196dSUFXRCqE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jR8MbnbJYcvpfrB6ec6HR3MhZMuSGFVlTp0g40nA5h0eH0YE+vyGI4VUoPvof2AHRUuBBPZHK+gvA3fdcTN4T1T/eX8PXVeJ+9dAdJM2EMCM4KaM1XBaXU/wIzOA6LMujHtpsiK2QB3n2QnzDBrNkzRA+1NY0FnBfx3QZh27utQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JvOE7pRE; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=srXfke6WRK8KSfRXvYjkkjJhcP24uAZWIdRjeG7gfcm2GAueOYk2yb/EOv2YAQ2+CRh9BHhuoJK1ACeBMLQDdXYjUVLmPxKwwTZLLmmnrE1TdFjOQXu7uUXenmsj6NQ8EbmXjnAxKDoPhbafEfrEiA9wpo8XETKnwFaFE7BCCWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tzy2g/q4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JvOE7pRE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C209FC4CEDF;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tzy2g/q4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736332773;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C5e7qX6c+UMsIuToE357cYeqwuSYtBePWh3qPklcP7I=;
+	b=Tzy2g/q4sb5M4c8cY7C4noWnpW7Ejw6yI8B1FP/KcqmcmA2WSr8mtK2+zcxyG/cSwyHPjR
+	amEkSEaI0xFv9bZ8ASJZSk2eGjx1fwYZRlKYGDZsIegR8q+0VzEpA0foE4QZsT/jqDGiV0
+	3WruP2/kxaheLRsSoWBsKOV5iAx+XDo=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-643-L_aTQMnBM0So-ZDJs6AXYw-1; Wed,
+ 08 Jan 2025 05:39:32 -0500
+X-MC-Unique: L_aTQMnBM0So-ZDJs6AXYw-1
+X-Mimecast-MFC-AGG-ID: L_aTQMnBM0So-ZDJs6AXYw
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB66919153C8;
 	Wed,  8 Jan 2025 10:39:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736332773;
-	bh=wWO6nKxlaHTQ6vNc0Fh7xbXckRbHyUTC/A+5O8lcDs4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JvOE7pREw2XNT2FOLTj9XPsqmdUeDCjXbEwyNhfEKPa7cxVIO69gpfrMyzn35bcNj
-	 iMJzQvYfKm382us4awXbrEM/hNYmEI2kU9LmXnB45a24U4ZNqSS81qrpyoY9+0cEmL
-	 KBQTxCUgaAWuU8YY5mKpXW7a2dOw0w93XLnr8MiWLQCV4//I1omUR1lbpBdvMpvCoH
-	 lJr2Eo6tE9UM7t07kb8xvCs0q1KaRAzicyugQE0QlBSJ34BBMoWrOe8jenbsiu+Zgv
-	 18H1f1QFusrNdKMR0ldDqAUoMNCwVawZaNxftCXhzc1N4S6yPunX+b9YQZvLaFYSud
-	 TeOhkvgOJhi5w==
-Date: Wed, 8 Jan 2025 11:39:28 +0100
-From: Niklas Cassel <cassel@kernel.org>
-To: Oliver Sang <oliver.sang@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>, oe-lkp@lists.linux.dev, lkp@intel.com,
-	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-nvme@lists.infradead.org, Damien Le Moal <dlemoal@kernel.org>,
-	linux-btrfs@vger.kernel.org, linux-aio@kvack.org
-Subject: Re: [linus:master] [block]  e70c301fae: stress-ng.aiol.ops_per_sec
- 49.6% regression
-Message-ID: <Z35VVvuT0nl0iDfd@ryzen>
-References: <202412122112.ca47bcec-lkp@intel.com>
- <20241213143224.GA16111@lst.de>
- <20241217045527.GA16091@lst.de>
- <Z2EgW8/WNfzZ28mn@xsang-OptiPlex-9020>
- <20241217065614.GA19113@lst.de>
- <Z3ZhNYHKZPMpv8Cz@ryzen>
- <20250103064925.GB27984@lst.de>
- <Z3epOlVGDBqj72xC@ryzen>
- <Z3zlgBB3ZrGApew7@xsang-OptiPlex-9020>
+Received: from fedora (unknown [10.72.116.74])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CF54519560AA;
+	Wed,  8 Jan 2025 10:39:24 +0000 (UTC)
+Date: Wed, 8 Jan 2025 18:39:19 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>,
+	Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, nbd@other.debian.org,
+	linux-scsi@vger.kernel.org, usb-storage@lists.one-eyed-alien.net
+Subject: Re: [PATCH 06/10] nvme: fix queue freeze vs limits lock order
+Message-ID: <Z35V11UDYRCHgJgI@fedora>
+References: <20250108092520.1325324-1-hch@lst.de>
+ <20250108092520.1325324-7-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,69 +60,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z3zlgBB3ZrGApew7@xsang-OptiPlex-9020>
+In-Reply-To: <20250108092520.1325324-7-hch@lst.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Tue, Jan 07, 2025 at 04:27:44PM +0800, Oliver Sang wrote:
-> hi, Niklas,
+On Wed, Jan 08, 2025 at 10:25:03AM +0100, Christoph Hellwig wrote:
+> Match the locking order used by the core block code by only freezing
+> the queue after taking the limits lock.
 > 
-> On Fri, Jan 03, 2025 at 10:09:14AM +0100, Niklas Cassel wrote:
-> > On Fri, Jan 03, 2025 at 07:49:25AM +0100, Christoph Hellwig wrote:
-> > > On Thu, Jan 02, 2025 at 10:49:41AM +0100, Niklas Cassel wrote:
-> > > > > > from below information, it seems an 'ahci' to me. but since I have limited
-> > > > > > knowledge about storage driver, maybe I'm wrong. if you want more information,
-> > > > > > please let us know. thanks a lot!
-> > > > > 
-> > > > > Yes, this looks like ahci.  Thanks a lot!
-> > > > 
-> > > > Did this ever get resolved?
-> > > > 
-> > > > I haven't seen a patch that seems to address this.
-> > > > 
-> > > > AHCI (ata_scsi_queuecmd()) only issues a single command, so if there is any
-> > > > reordering when issuing a batch of commands, my guess is that the problem
-> > > > also affects SCSI / the problem is in upper layers above AHCI, i.e. SCSI lib
-> > > > or block layer.
-> > > 
-> > > I started looking into this before the holidays.  blktrace shows perfectly
-> > > sequential writes without any reordering using ahci, directly on the
-> > > block device or using xfs and btrfs when using dd.  I also started
-> > > looking into what the test does and got as far as checking out the
-> > > stress-ng source tree and looking at stress-aiol.c.  AFAICS the default
-> > > submission does simple reads and writes using increasing offsets.
-> > > So if the test result isn't a fluke either the aio code does some
-> > > weird reordering or btrfs does.
-> > > 
-> > > Oliver, did the test also show any interesting results on non-btrfs
-> > > setups?
-> > > 
-> > 
-> > One thing that came to mind.
-> > Some distros (e.g. Fedora and openSUSE) ship with an udev rule that sets
-> > the I/O scheduler to BFQ for single-queue HDDs.
-> > 
-> > It could very well be the I/O scheduler that reorders.
-> > 
-> > Oliver, which I/O scheduler are you using?
-> > $ cat /sys/block/sdb/queue/scheduler 
-> > none mq-deadline kyber [bfq]
+> Unlike most queue updates this does not use the
+> queue_limits_commit_update_frozen helper as the nvme driver want the
+> queue frozen for more than just the limits update.
 > 
-> while our test running:
-> 
-> # cat /sys/block/sdb/queue/scheduler
-> none [mq-deadline] kyber bfq
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+ 
+Reviewed-by: Ming Lei <ming.lei@redhat.com> 
 
-The stddev numbers you showed is all over the place, so are we certain
-if this is a regression caused by commit e70c301faece ("block:
-don't reorder requests in blk_add_rq_to_plug") ?
+Thanks, 
+Ming
 
-Do you know if the stddev has such big variation for this test even before
-the commit?
-
-
-If it is not too much to ask... It might be interesting to know if we see
-a regression when comparing before/after e70c301faece with scheduler none
-instead of mq-deadline.
-
-
-Kind regards,
-Niklas
