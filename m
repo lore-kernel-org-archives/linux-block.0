@@ -1,81 +1,121 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD051FCF5B
-	for <linux-block@vger.kernel.org>; Wed,  8 Jan 2025 14:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5821FCCF6;
+	Wed,  8 Jan 2025 14:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736346627; cv=none; b=ZwskEP1wSd54UzCFh2WDyq3CQuEleE6YwSpRfPVJl2OSL2yJfr5Mc3EsRI4WtK6O5PZkpLX5wrigtfz8YdbQK67ESk5ArPEmHcEUtU394otR/qDSrbxX06rYJcrAnsqkury2I3hhbjPjlncsyGMqNdsFat+g1S/rnG/FdWuD1W4=
+	t=1736347381; cv=none; b=bUX2w7bMn00BTwpMBgM+pNBsu4ITs0gwG4s8Q+/Ysf2BpJPCqbxZKMfoG17tEerJZQFYN0nWh0/5dp38jM8/kJkaxuS5MExte05d9G4+kj79ZyeIWoQYdpCicO308DOWm9WJ8UQvBNtcVcOTNE93PVGNtkQqj26wRcMLWy8A0jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736346627; c=relaxed/simple;
-	bh=hXxdGM1/ZZBySuqs0woYavYjyNMj+V+ENb4AZAxt8xw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=lbI7k6nKeJCDr4AzFpnmySvSD1PxmvL5o/UaUDWs2v0r8H+su6pQ/AYCK+Jjk+Ai7+2eij7383Km+we6NMvP8+tTWFb7TPBBs9wUGe0ekv34uQ2qObVyCUmpjrCe4bfGn4bs9uMD7goysLGuxI+JpOcrK7TQcKK8nC9FuRoFGbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=l4xn5geR; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1736347381; c=relaxed/simple;
+	bh=xddAnYy+MgV/Qs76atlTi08HILgVY9HKc0Qy/Bun9eA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MNpXZwHq/7VczJgcjK6sSmCzdWZv7JW2AfUvTSDJOWn8hfgJhbKchE90rmYTTjLLt1NIaZBg6IbbQU5etW9Hsbv9UTEy1VYx5e080cUTRnkp80PQL07rC1vzKVYXQftW7HbHZ76o9xnTCIwrU4YVWEPryUq1PDrn9DTXgNEkDvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=FnAAsmVc; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=+KLFfvsR; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=FnAAsmVc; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=+KLFfvsR; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="l4xn5geR"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a9cb667783so126923835ab.1
-        for <linux-block@vger.kernel.org>; Wed, 08 Jan 2025 06:30:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736346624; x=1736951424; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DuVh8yvTcgPWHjlIoS+IJBGxlHJC9yCWBv/cQMDWTMs=;
-        b=l4xn5geR5rSgeYxJRFB65mxhzaETBkonYn6+mlDpcOv0dybNXCQweXdq3ZsSI2mTmG
-         jkJgjpdxAEbonipKNEuvVxx/oRE4fzTfE/0aYpRSfKJYB0YwSBW+wGdfj9amiznVAuJ9
-         UQ+nWX7DDAv4SehyZjYPO46S+B71zL6eKKMpn4PLB8Guzv6RuVRavy7IoPZAcgQhBHXJ
-         fBXJRKxcT5EgaY/03y+PD4Xfn5wjFKYISyLnFWhXlTmmyisDxgLz0uq9auy3ml2SU7mK
-         2EMEq+BOpyOknYV9gQ4caRzUO7OjBlYCVJQRpquDQilZqwUil38JtLQJ2ClUQ4c7tgOV
-         76Jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736346624; x=1736951424;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DuVh8yvTcgPWHjlIoS+IJBGxlHJC9yCWBv/cQMDWTMs=;
-        b=LSnuIlVhhFy8+0l0rLQ6r06DVwZ8X/IMwtvp+/JLdVm9CagJ6JRVUOTzmyXs4EvnQX
-         xitQUzCMIv37EszimKZklWi8ExFYz7MetTuDJhWiRfpbm91C6+AG6c51Ef+OiOFV+kmK
-         z/F5ATiEUt8+HuucuXwnz6ZfvyJ9bexoMKBphAap0sUZVQl1ryC1jizC0cpnJ4VcGlS5
-         ntP6hLtVjPw1xLq4ioyLIMYV7Ta+S8bzi6zVBDKm0pUqTfkc4rpg//wukW3UlSs11/a7
-         Uirn3jOPmGIoDw/IOU4DBoHOGI86pXt+N5fGlvYARPE4XjKxsUrX9ifaGeJttC3u61bf
-         sptQ==
-X-Gm-Message-State: AOJu0YxdekMrQmOjyslo/wGhPhAmlhDvru54LbMUFXsfmc3q8yQh8fHK
-	pB0pLlEZlSsFaOsvz5fc5R1fbQRHTwkWuTa3uYKiRwob6QS6YRgM5G2I8VOVl7A=
-X-Gm-Gg: ASbGncuhuXV/zGw1x3+F0qFzs02D2SeqAUBz4LIQqerQKxLqF9gLDd2uZRBvHNrAhDt
-	JLG1r8NJWOZdbu1m7njuz3aEdY/eCyc4edUwTow02pp0dIoQLsSws2JD/tk20FRvu4yCZqoXreZ
-	Td255KpaWQl86HPW5Kr5HRCjStP7sMWMdahtaIXdNh+oECuhxEaHMJSVTpfyzx8z6Rnomci+R0B
-	xiF9xvkJ7OWpexrYkJDfoNNLseg753Mh5O3yZNNlyx0Ke8=
-X-Google-Smtp-Source: AGHT+IEILOGftdUa2gw3p76dHAOiz0IU4GolIFxvk/mdMt1nBUxede1jLEdZho67wkyulPLiuu8dNg==
-X-Received: by 2002:a05:6e02:156d:b0:3a7:e3e3:bd57 with SMTP id e9e14a558f8ab-3ce3a8beb89mr24027085ab.15.1736346623663;
-        Wed, 08 Jan 2025 06:30:23 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e68c1de6e0sm10602714173.127.2025.01.08.06.30.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 06:30:22 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: jack@suse.cz, yukuai3@huawei.com, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- yi.zhang@huawei.com, yangerkun@huawei.com
-In-Reply-To: <20250108084148.1549973-1-yukuai1@huaweicloud.com>
-References: <20250108084148.1549973-1-yukuai1@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="FnAAsmVc";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="+KLFfvsR";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="FnAAsmVc";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="+KLFfvsR"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 100E61F452;
+	Wed,  8 Jan 2025 14:42:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1736347377; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IR5B7zsm0Q/MBwvaMv+9R/0GdcwPmWzbxoC/Ln39gfE=;
+	b=FnAAsmVcfbReMh6KhQ8jqPxHN0VjkerGFzjYCDNBvR/VNPqWc6IJPNFJhghUt+uKzDQKzr
+	AQP7LibS9sKq0f0xlen/jFtHop4Tj7jf9ZrYJSB1DgLCw0MPmnb3ezmDKJRIU+7+xEDhHF
+	Ac/HnnidujVLwVh9PdWrFYiQPPXQbko=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1736347377;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IR5B7zsm0Q/MBwvaMv+9R/0GdcwPmWzbxoC/Ln39gfE=;
+	b=+KLFfvsRNkLVwt/k0IUSxK6AiqNoe6b3H3btBcZnGz4EDH+hZwtZPlv8e539Z/WoZX9rEA
+	DtsgBmE1JDjQeABA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1736347377; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IR5B7zsm0Q/MBwvaMv+9R/0GdcwPmWzbxoC/Ln39gfE=;
+	b=FnAAsmVcfbReMh6KhQ8jqPxHN0VjkerGFzjYCDNBvR/VNPqWc6IJPNFJhghUt+uKzDQKzr
+	AQP7LibS9sKq0f0xlen/jFtHop4Tj7jf9ZrYJSB1DgLCw0MPmnb3ezmDKJRIU+7+xEDhHF
+	Ac/HnnidujVLwVh9PdWrFYiQPPXQbko=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1736347377;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IR5B7zsm0Q/MBwvaMv+9R/0GdcwPmWzbxoC/Ln39gfE=;
+	b=+KLFfvsRNkLVwt/k0IUSxK6AiqNoe6b3H3btBcZnGz4EDH+hZwtZPlv8e539Z/WoZX9rEA
+	DtsgBmE1JDjQeABA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EB0621351A;
+	Wed,  8 Jan 2025 14:42:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 6YcdOvCOfmcFTwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Wed, 08 Jan 2025 14:42:56 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 91163A0889; Wed,  8 Jan 2025 15:42:51 +0100 (CET)
+Date: Wed, 8 Jan 2025 15:42:51 +0100
+From: Jan Kara <jack@suse.cz>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: jack@suse.cz, yukuai3@huawei.com, axboe@kernel.dk, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, yi.zhang@huawei.com, 
+	yangerkun@huawei.com
 Subject: Re: [PATCH] block, bfq: fix waker_bfqq UAF after bfq_split_bfqq()
-Message-Id: <173634662244.346437.17736271332101517970.b4-ty@kernel.dk>
-Date: Wed, 08 Jan 2025 07:30:22 -0700
+Message-ID: <odhd37amhss2kfhniix2jzy4crg4fb2d7u6qdwplevyiegb6rm@f4fqrg4vebls>
+References: <20250108084148.1549973-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-14bd6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250108084148.1549973-1-yukuai1@huaweicloud.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -3.80
+X-Spam-Flag: NO
 
-
-On Wed, 08 Jan 2025 16:41:48 +0800, Yu Kuai wrote:
+On Wed 08-01-25 16:41:48, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
 > Our syzkaller report a following UAF for v6.6:
 > 
 > BUG: KASAN: slab-use-after-free in bfq_init_rq+0x175d/0x17a0 block/bfq-iosched.c:6958
@@ -117,16 +157,157 @@ On Wed, 08 Jan 2025 16:41:48 +0800, Yu Kuai wrote:
 >  do_syscall_64+0x70/0x120 arch/x86/entry/common.c:81
 >  entry_SYSCALL_64_after_hwframe+0x78/0xe2
 > 
-> [...]
+> Allocated by task 232719:
+>  kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+>  kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+>  __kasan_slab_alloc+0x87/0x90 mm/kasan/common.c:328
+>  kasan_slab_alloc include/linux/kasan.h:188 [inline]
+>  slab_post_alloc_hook mm/slab.h:768 [inline]
+>  slab_alloc_node mm/slub.c:3492 [inline]
+>  kmem_cache_alloc_node+0x1b8/0x6f0 mm/slub.c:3537
+>  bfq_get_queue+0x215/0x1f00 block/bfq-iosched.c:5869
+>  bfq_get_bfqq_handle_split+0x167/0x5f0 block/bfq-iosched.c:6776
+>  bfq_init_rq+0x13a4/0x17a0 block/bfq-iosched.c:6938
+>  bfq_insert_request.isra.0+0xe8/0xa20 block/bfq-iosched.c:6271
+>  bfq_insert_requests+0x27f/0x390 block/bfq-iosched.c:6323
+>  blk_mq_insert_request+0x290/0x8f0 block/blk-mq.c:2660
+>  blk_mq_submit_bio+0x1021/0x15e0 block/blk-mq.c:3143
+>  __submit_bio+0xa0/0x6b0 block/blk-core.c:639
+>  __submit_bio_noacct_mq block/blk-core.c:718 [inline]
+>  submit_bio_noacct_nocheck+0x5b7/0x810 block/blk-core.c:747
+>  submit_bio_noacct+0xca0/0x1990 block/blk-core.c:847
+>  __ext4_read_bh fs/ext4/super.c:205 [inline]
+>  ext4_read_bh_nowait+0x15a/0x240 fs/ext4/super.c:217
+>  ext4_read_bh_lock+0xac/0xd0 fs/ext4/super.c:242
+>  ext4_bread_batch+0x268/0x500 fs/ext4/inode.c:958
+>  __ext4_find_entry+0x448/0x10f0 fs/ext4/namei.c:1671
+>  ext4_lookup_entry fs/ext4/namei.c:1774 [inline]
+>  ext4_lookup.part.0+0x359/0x6f0 fs/ext4/namei.c:1842
+>  ext4_lookup+0x72/0x90 fs/ext4/namei.c:1839
+>  __lookup_slow+0x257/0x480 fs/namei.c:1696
+>  lookup_slow fs/namei.c:1713 [inline]
+>  walk_component+0x454/0x5c0 fs/namei.c:2004
+>  link_path_walk.part.0+0x773/0xda0 fs/namei.c:2331
+>  link_path_walk fs/namei.c:3826 [inline]
+>  path_openat+0x1b9/0x520 fs/namei.c:3826
+>  do_filp_open+0x1b7/0x400 fs/namei.c:3857
+>  do_sys_openat2+0x5dc/0x6e0 fs/open.c:1428
+>  do_sys_open fs/open.c:1443 [inline]
+>  __do_sys_openat fs/open.c:1459 [inline]
+>  __se_sys_openat fs/open.c:1454 [inline]
+>  __x64_sys_openat+0x148/0x200 fs/open.c:1454
+>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+>  do_syscall_64+0x70/0x120 arch/x86/entry/common.c:81
+>  entry_SYSCALL_64_after_hwframe+0x78/0xe2
+> 
+> Freed by task 232726:
+>  kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+>  kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+>  kasan_save_free_info+0x2b/0x50 mm/kasan/generic.c:522
+>  ____kasan_slab_free mm/kasan/common.c:236 [inline]
+>  __kasan_slab_free+0x12a/0x1b0 mm/kasan/common.c:244
+>  kasan_slab_free include/linux/kasan.h:164 [inline]
+>  slab_free_hook mm/slub.c:1827 [inline]
+>  slab_free_freelist_hook mm/slub.c:1853 [inline]
+>  slab_free mm/slub.c:3820 [inline]
+>  kmem_cache_free+0x110/0x760 mm/slub.c:3842
+>  bfq_put_queue+0x6a7/0xfb0 block/bfq-iosched.c:5428
+>  bfq_forget_entity block/bfq-wf2q.c:634 [inline]
+>  bfq_put_idle_entity+0x142/0x240 block/bfq-wf2q.c:645
+>  bfq_forget_idle+0x189/0x1e0 block/bfq-wf2q.c:671
+>  bfq_update_vtime block/bfq-wf2q.c:1280 [inline]
+>  __bfq_lookup_next_entity block/bfq-wf2q.c:1374 [inline]
+>  bfq_lookup_next_entity+0x350/0x480 block/bfq-wf2q.c:1433
+>  bfq_update_next_in_service+0x1c0/0x4f0 block/bfq-wf2q.c:128
+>  bfq_deactivate_entity+0x10a/0x240 block/bfq-wf2q.c:1188
+>  bfq_deactivate_bfqq block/bfq-wf2q.c:1592 [inline]
+>  bfq_del_bfqq_busy+0x2e8/0xad0 block/bfq-wf2q.c:1659
+>  bfq_release_process_ref+0x1cc/0x220 block/bfq-iosched.c:3139
+>  bfq_split_bfqq+0x481/0xdf0 block/bfq-iosched.c:6754
+>  bfq_init_rq+0xf29/0x17a0 block/bfq-iosched.c:6934
+>  bfq_insert_request.isra.0+0xe8/0xa20 block/bfq-iosched.c:6271
+>  bfq_insert_requests+0x27f/0x390 block/bfq-iosched.c:6323
+>  blk_mq_insert_request+0x290/0x8f0 block/blk-mq.c:2660
+>  blk_mq_submit_bio+0x1021/0x15e0 block/blk-mq.c:3143
+>  __submit_bio+0xa0/0x6b0 block/blk-core.c:639
+>  __submit_bio_noacct_mq block/blk-core.c:718 [inline]
+>  submit_bio_noacct_nocheck+0x5b7/0x810 block/blk-core.c:747
+>  submit_bio_noacct+0xca0/0x1990 block/blk-core.c:847
+>  __ext4_read_bh fs/ext4/super.c:205 [inline]
+>  ext4_read_bh+0x15e/0x2e0 fs/ext4/super.c:230
+>  __read_extent_tree_block+0x304/0x6f0 fs/ext4/extents.c:567
+>  ext4_find_extent+0x479/0xd20 fs/ext4/extents.c:947
+>  ext4_ext_map_blocks+0x1a3/0x2680 fs/ext4/extents.c:4182
+>  ext4_map_blocks+0x929/0x15a0 fs/ext4/inode.c:660
+>  ext4_iomap_begin_report+0x298/0x480 fs/ext4/inode.c:3569
+>  iomap_iter+0x3dd/0x1010 fs/iomap/iter.c:91
+>  iomap_fiemap+0x1f4/0x360 fs/iomap/fiemap.c:80
+>  ext4_fiemap+0x181/0x210 fs/ext4/extents.c:5051
+>  ioctl_fiemap.isra.0+0x1b4/0x290 fs/ioctl.c:220
+>  do_vfs_ioctl+0x31c/0x11a0 fs/ioctl.c:811
+>  __do_sys_ioctl fs/ioctl.c:869 [inline]
+>  __se_sys_ioctl+0xae/0x190 fs/ioctl.c:857
+>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+>  do_syscall_64+0x70/0x120 arch/x86/entry/common.c:81
+>  entry_SYSCALL_64_after_hwframe+0x78/0xe2
+> 
+> commit 1ba0403ac644 ("block, bfq: fix uaf for accessing waker_bfqq after
+> splitting") fix the problem that if waker_bfqq is in the merge chain,
+> and current is the only procress, waker_bfqq can be freed from
+> bfq_split_bfqq(). However, the case that waker_bfqq is not in the merge
+> chain is missed, and if the procress reference of waker_bfqq is 0,
+> waker_bfqq can be freed as well.
+> 
+> Fix the problem by checking procress reference if waker_bfqq is not in
+> the merge_chain.
+> 
+> Fixes: 1ba0403ac644 ("block, bfq: fix uaf for accessing waker_bfqq after splitting")
+> Signed-off-by: Hou Tao <houtao1@huawei.com>
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  block/bfq-iosched.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 068c63e95738..c69e9faad15a 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -6844,16 +6844,24 @@ static struct bfq_queue *bfq_waker_bfqq(struct bfq_queue *bfqq)
+>  		if (new_bfqq == waker_bfqq) {
+>  			/*
+>  			 * If waker_bfqq is in the merge chain, and current
+> -			 * is the only procress.
+> +			 * is the only procress, waker_bfqq can be freed.
+					^^^ can you please fix the typo
+while modifying the comment? It should be "process".
 
-Applied, thanks!
 
-[1/1] block, bfq: fix waker_bfqq UAF after bfq_split_bfqq()
-      commit: eb92f7314625807ad569c218039ec90e9e14c784
+>  			 */
+>  			if (bfqq_process_refs(waker_bfqq) == 1)
+>  				return NULL;
+> -			break;
+> +
+> +			return waker_bfqq;
 
-Best regards,
+So how do you know bfqq_process_refs(waker_bfqq) is not 0 in this case?
+
+>  		}
+>  
+>  		new_bfqq = new_bfqq->new_bfqq;
+>  	}
+>  
+> +	/*
+> +	 * If waker_bfqq is not in the merge chain, and it's procress reference
+							     ^^^ process
+> +	 * is 0, waker_bfqq can be freed.
+> +	 */
+> +	if (bfqq_process_refs(waker_bfqq) == 0)
+> +		return NULL;
+> +
+>  	return waker_bfqq;
+>  }
+
+								Honza
 -- 
-Jens Axboe
-
-
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
