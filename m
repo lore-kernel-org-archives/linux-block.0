@@ -1,117 +1,84 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3C021C180
-	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 15:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AE814F98
+	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 15:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736434944; cv=none; b=AnCTThtPFTKTmyMwMxlnRnlcGKBWMilVq9YafvkKhcstAKv9ZKcLj0hcSBFzxdfZzqydT2vooHOyVZgd93rMQ1qbXmB4BVpqpAoXCsRoCUI5oW/C0jC4xc+K4JArw3ZoafzoUSLPAWxGBy/ZEgRlFkoX3HZfVTReGaSd8SfUxpU=
+	t=1736437891; cv=none; b=Co9j3EMbEpz+IMmRI4KSBEzafykkinFy0NhvR+OIsuRw/EEdnwBMFH0vfSBQDID+0obKQaLlLh1+t1Rlf2qRnwZ4RGW+pBLj8Gc1N84JaeKsIn+hkjsk4FSpoC0C3OPh3JRt2WxjMfZnuIFAQ6UI9hAYZAo0I6FvnVwzZnAJsJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736434944; c=relaxed/simple;
-	bh=Bm3USTPGU8ZwzzZeLYZOYCuMRn5v+GbpFizdZkmPpss=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ObpA7EwFOHdOy+SaFIU5/0w2QW34mkLZ+gbg0zaX3ciOOBTK7M3URrZWG9Vmhkj/T3w2T8EKijAzCEktVd+piYf2ht5YhUcoAg6Rl2SobdBSAf9azmVpUrNpT9gi/JyIxDLvOFcqbLG1ByEtz3ZaMLIbYUYwQ9O1DDAPEDcEO/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nWlFy0sI; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736437891; c=relaxed/simple;
+	bh=4aiYhWhM0g7QwkF5ksl0tVwtxnGmzyXfyE4QoE5rUjY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p2F0qd8vcCWmGZ8N480wS1JKErTQUbJwr1Hpj7WTmZiNXcsHzL1jq9Ha3jcNlWAILQRBze9In0zjvUPoe18BsdTKO0bS3hHrgyNDVzl0od+f2tuh4Y6TxU6rqbNnG3ig+FiUdROSxFpotpSj54JFhRICKbG/F8B5nhbg90J+MqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=Es6LonE5; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nWlFy0sI"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2ee397a82f6so1822703a91.2
-        for <linux-block@vger.kernel.org>; Thu, 09 Jan 2025 07:02:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736434942; x=1737039742; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=On6gUqbHqnq50bUuhNL7KyH87lNu1/6Z7WKXoZ05mac=;
-        b=nWlFy0sIVRinj1q2/pTYNXZTmx1U3IteDUoGivOeILYal5KVLvwQecikQZoRxDH4QB
-         UPw6MaSAqH6MoTusdOFUQVCVYcgl6SPsK84MiS9npJ7AE0qELM6xSVeenZtnPfPBUENI
-         Whw6QIYk0kx0I4Us6pHcH1lCP+8CEPnXVU8YpsVZ8vEQNlGDZtldPxQiNFl1eRud0HH9
-         Ye/5cE3c7tLjke7EqIO7jnanXSYrIvzlJyndczDCuNeoFO0Ks8zLXhZ2PqnQdiA6+gR/
-         8ZVP6Cvvg9UqkwHvMi5MQO61KPvggshFXEbTgp8c9yF1Am29YsonjtAxWCv0sg/qxv8Z
-         Be9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736434942; x=1737039742;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=On6gUqbHqnq50bUuhNL7KyH87lNu1/6Z7WKXoZ05mac=;
-        b=t1axpJ99WysTRlupkj+9FBLy84ZGXf0+wVL8rYNb8USxICIROi3w0gt/iQ2Qumvaql
-         WTr0yYohmn+DL8MOqpvcQASMAduR5/0MJwKIIzQVUpWTwyULo3hysTj8X5NpaaHmgKtX
-         JDmQwQCkWFfseES5Toqe5ogjuWJOf0ntuU3bxjwJEVs3KH1Mxk9Ldxeo/uB5coGI/EiS
-         PkcWGSdZm6pIdsUN3b4i9Ak4er8lbWYosNn512g6Zt8g6E54h6H7vpxfM8EQtYdqOmhR
-         GUmyTMRc5Er6sYxFI/iiiSz1Mla0GhpNFzIQBWIOQ52qtSnUImAkvWkfHeUKBOlE6ain
-         XstA==
-X-Gm-Message-State: AOJu0YxStjF3W5sXaeHZk21QOVW4EljT9hLzKTTD/vSKwmCx8L/ZuumX
-	G32vLM8cPj6RcLj6HUgt/VB/Dwr82dvn3QPTjuTsE4WmMy3wZsx8co2cdT5cjvDs5C/aArbkuSY
-	QFEqgi226+ffYhVUBiXYKPoxNB9s=
-X-Gm-Gg: ASbGncv1gVQDLvwimIM2VjI+R+3I+3tXJJPITfxH1/7fqKg0JR1MhedcQXuAtYn/VXM
-	jbZE9qgQip9XAMrtME5KHYOw0Yz6RUR19Zqdo/ME=
-X-Google-Smtp-Source: AGHT+IG9gewI8qk3H4xak82FBx0uVqOQbWiC4q5+Ll933ka5xH7q2RIDqfI8rLuz8GRhKcc3JtMffTfHek0SEH9qROc=
-X-Received: by 2002:a17:90b:4d05:b0:2ea:83a0:47a5 with SMTP id
- 98e67ed59e1d1-2f548f17337mr9957118a91.4.1736434942314; Thu, 09 Jan 2025
- 07:02:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="Es6LonE5"
+Received: from cwcc.thunk.org (pool-173-48-115-53.bstnma.fios.verizon.net [173.48.115.53])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 509FpKcp017820
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 9 Jan 2025 10:51:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1736437881; bh=8AaJlJVyf44Gqzx9KGrBZrl9Suzj2EPcpxvpZkAG8ts=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=Es6LonE5RpXW2VtJUqI6+Wj2zBVvEkhXe8uOcgV0ib+StY4U6o7m1DUIxOR0BVJ3X
+	 ISIigO6M299Se06tuMjK4OSfwuMoL3Hayx8qgmN8IG/p+USuABEvDehXq5LR0swPFX
+	 8lVuMoCld92PWMl0MpE/xbZh+e1D28B2PaiMduYjZDz6vvDZb97Hp45GjMF3KgkiZW
+	 eCVv+UrZhMaocVJr0+CGNKn6VBBbmAfEKKpL3zkUxVR1/aCjrAr6yWRSnalhFqNU/7
+	 EXrsBikhF/RR5uXbOV9E6JQOaDN9bgvKT77MJjAoVawuerMFJXAincm1+0ESKviqHu
+	 Rxus2iPAy09ag==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+	id EDD7E15C0137; Thu, 09 Jan 2025 10:51:19 -0500 (EST)
+Date: Thu, 9 Jan 2025 10:51:19 -0500
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Travis Downs <travis.downs@gmail.com>
+Cc: linux-block@vger.kernel.org
+Subject: Re: Semantics of racy O_DIRECT writes
+Message-ID: <20250109155119.GF1323402@mit.edu>
+References: <CAOBGo4xx+88nZM=nqqgQU5RRiHP1QOqU4i2dDwXt7rF6K0gaUQ@mail.gmail.com>
+ <20250109045743.GE1323402@mit.edu>
+ <CAOBGo4w88v0tqDiTwAPP6OQLXHGdjx1oFKaB0oRY45dmC-D1_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAOBGo4xx+88nZM=nqqgQU5RRiHP1QOqU4i2dDwXt7rF6K0gaUQ@mail.gmail.com>
- <20250109045743.GE1323402@mit.edu> <CAOBGo4w88v0tqDiTwAPP6OQLXHGdjx1oFKaB0oRY45dmC-D1_Q@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <CAOBGo4w88v0tqDiTwAPP6OQLXHGdjx1oFKaB0oRY45dmC-D1_Q@mail.gmail.com>
-From: Travis Downs <travis.downs@gmail.com>
-Date: Thu, 9 Jan 2025 12:01:45 -0300
-X-Gm-Features: AbW1kvZbCQ2XhvyQvFcvBetrl-h_bhWG60fH3_8AV80K-ihMScSbi3JTQPr2Nt0
-Message-ID: <CAOBGo4zdDQ+mV_5X1Y0J2VpV8F63RsBs66Xq4CHPtpBu9MFebg@mail.gmail.com>
-Subject: Re: Semantics of racy O_DIRECT writes
-To: "Theodore Ts'o" <tytso@mit.edu>
-Cc: linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 9, 2025 at 11:16=E2=80=AFAM Travis Downs <travis.downs@gmail.co=
-m> wrote:
->
-> On Thu, Jan 9, 2025 at 1:57=E2=80=AFAM Theodore Ts'o <tytso@mit.edu> wrot=
-e:
-> >
-> > Don't do that.  Really.
-> >
-> > First of all, your program might need to run on OS's other than Linux,
-> > such as Legacy Unix systems, Mac OS X, etc, and officially, there is
-> > zero guarantees about cache coherency between O_DIRECT writes and the
-> > page cache.  So if you use O_DIRECT I/O and buffered I/O or mmap
-> > access to a file.... all bet are off.
->
-> Thanks Theodore for your comprehensive reply. I probably was not very
-> clear in the way I posed my question. To clarify:
->
->  - There is only one process involved here making all the writes
->  - We do only O_DIRECT reads and writes, so I don't expect the page
->    cache to be involved in the usual case (but we can't exclude it entire=
-ly).
+On Thu, Jan 09, 2025 at 11:16:41AM -0300, Travis Downs wrote:
 >  - So the question is large about the possible outcomes of doing a zero-
 >    copy O_DIRECT write (where the block driver will ultimately be reading
 >    directly from the pages allocated by and passed to the kernel by the
->    userspace application) in the situation where a portion of the the pas=
-sed
+>    userspace application) in the situation where a portion of the the passed
 >    pages are modified in a racy way by the userspace application by a
 >    subsequent O_DIRECT write.
 
-Sorry, the last point above is totally wrong (insert excuse about coffee, e=
-tc
-here).
+Yeah, sorry, I thought "modified via memcpy() was via a memcpy to a
+mmap'ed region", which would mean it's in the page cache.  If what you
+mean one thread modifying a block while the O_DIRECT write is
+underway, the answer is "it depends".  For non-Linux systems, it will
+almost certainly be racy.
 
-What it should say is "...where a portion of the passed pages are modified
-in-memory by the application while the write is in flight".
+For Linux, if the block device is one that requires stable writes
+(e.g., for iSCSI writes which include a checksum, or SCSI devices with
+DIF/DIX enabled, or some software RAID 5 block device), where a racy
+write might lead to an I/O error on the write or in the case of RAID
+5, in the subsequent read of the block, Linux will protect against
+this happening by marking the page read-only while the I/O is
+underway, either if it's happening via buffered writeback or O_DIRECT
+writes, and then marking the page read/write afterwards.  Doing this
+has performance implications, since changing the page table and the
+need to do global interprocessor interupts is not free.  So we only do
+it for those block devices that require stable writes, and even if you
+are interested in a Linux-only answer, it's still "it depends".
 
-That is, there is only one O_DIRECT write here. It is issued, and before it
-completes the userspace writes into the same buffers that were passed
-to the O_DIRECT write, modifying some (but not all) bytes.
+Cheers,
 
-Do we have a guarantee that the unmodified bytes will be successfully
-written? Can is cause some corruption/inconsistency in the FS or block
-layer?
-
-TIA
+					- Ted
