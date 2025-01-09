@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A108B2F2D
-	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 08:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CEE2F2D
+	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 08:51:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736412683; cv=none; b=hYaS344FuQxg4DipSLf2kC1QP2YIvKCOY+nIDKmkqaOH19+rs4GggG3yMSmWx/qI/htN9FbE21RjRF2jGdHn9MH4XZqlC2/LEXjvhf+abQgg6SGwV/pIi/6O3kqW8UFYvgLGysuNkYNpCVwh9L+obiyYZnmcolvUIdVKXjOd+1A=
+	t=1736412684; cv=none; b=CkLPgj4VYe8459Ri0t9F2FQhmvC/FSzTWthREooElTqpoq/4nc81iw0RN3a8w37FvyImX31/1O9UQVSOMEWJTx+Td4B9DaOk4AyYhuFmQwL2Idu/Vk5atZyUnS5FSmwt+JvGck9DT9wscr2ycFwZBhdzhYR2C+9TOv4XwUZeqZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736412683; c=relaxed/simple;
-	bh=1W952tijLNbSqW+aYwtzsHRL+U2GovYcy7HKafzq74I=;
+	s=arc-20240116; t=1736412684; c=relaxed/simple;
+	bh=bziIAjADg4HXEJzvUHPvf0bvej+JDFZ8gRajvRoPKEk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P8aokGTuBoVQFLhsQblX7nGGJPtGQNbBDQPr0gEZIL2Vk44s+R3gsNOhEvg4WbXYWuBIfqE9MU0Y65rtIT7+6qSrH/cFC8ObqUOD3btpPO70ThFMLqaZhDuftoxM9UqWwwuq5uu3VWOjF+3jJ2+Gc3pREW+UhtTW3OJ5Fcut4i8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hcIL3Hys; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=fdOoBHmfKIY6btu7H/toFM7utw8JEr8slwvS7Mcvl4811l8gjqXJvwpRsDJ3v2BPqRsEBK0Gm2Nys5zb/zZfpcdyYRbrkk+xuMDcBqfzQ0+4cCElVLmxzZ+tIzM2ooTtpF+PXBWcXo/o/CUeX4wypxACp7yVf+54jRo14CQ5axg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uzMHT1jc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hcIL3Hys"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50746C4CEE1;
-	Thu,  9 Jan 2025 08:51:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzMHT1jc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FF07C4CEDF;
+	Thu,  9 Jan 2025 08:51:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736412683;
-	bh=1W952tijLNbSqW+aYwtzsHRL+U2GovYcy7HKafzq74I=;
+	s=k20201202; t=1736412684;
+	bh=bziIAjADg4HXEJzvUHPvf0bvej+JDFZ8gRajvRoPKEk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hcIL3HysuslYmHlM97F3OgBKtT6ulcHHfUXbHID0bA8BGG4zukyrOnTy6zAxjhq8w
-	 /XYG5kANxZyORrNfSeNiNHOgZQ9KkgvSlW2ct770Yw7Tstydy+0Afr9FrEzfooMwqW
-	 IuIAVc1mWs7eLZhfiGHaTrfSivfFhPUuPO7rwROmiZnc30zH26nbAgEyhMdZ8/m949
-	 ORF7gizini8DjM/EgMZt7WndoHVDyGTDFTo2UGMldnfrUBN2p+yQA8VJRUgsz5Cf7A
-	 PkYQ5g8wVXJYRVHlKoG412Sf9AeY6Pi+tybKNrgV2cTK69KCo69MOAoUqi/aowi4Le
-	 LbU1rZPvypfBQ==
+	b=uzMHT1jcfErHnuKsV+KE7ahDcV22fB1OiTMSenYok9iZNZg6e3xnnWPBXcXeFAhFs
+	 HYAMcu7fZsHFhGDDnvV3tEGZjEyeOg2IqIDiCzdyrvcFxotHd9nsiXMzu2Qc0V6/xj
+	 R/yPeiVCyBYnTAU40MKPrG5J1CwQDp0VMnN86tnfSC55F0I0Mru6yQGWIo5sZszLJ0
+	 rOM4laJhKnhJ5f8G52+FaleLmwFP6JR5w0If+VRjf04DtKXF2lWCXdAqLW2w9w62Q/
+	 H20kml/CEWE3eiOTQiUc7b8AH0u6bgl83AQpBLgJU17btR20sd751UeCzTfAtMkC5U
+	 cNbmTA19vDBdg==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 1/2] block: new zoned loop block device driver
-Date: Thu,  9 Jan 2025 17:50:36 +0900
-Message-ID: <20250109085037.407926-2-dlemoal@kernel.org>
+Subject: [PATCH v2 2/2] Documentation: Document the new zoned loop block device driver
+Date: Thu,  9 Jan 2025 17:50:37 +0900
+Message-ID: <20250109085037.407926-3-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250109085037.407926-1-dlemoal@kernel.org>
 References: <20250109085037.407926-1-dlemoal@kernel.org>
@@ -44,1453 +44,232 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The zoned loop block device driver allows a user to create emulated
-zoned block devices using one regular file per zone as backing storage.
-Compared to null_blk or scsi_debug, it has the advantage of allowing
-emulating large zoned devices without requiring the same amount of
-memory as the capacity of the emulated device. Furthermore, zoned
-devices emulated with this driver can be re-started after a host reboot
-without any loss of the state of the device zones, which is something
-that null_blk and scsi_debug do not support.
+Introduce the zoned_loop.rst documentation file under
+admin-guide/blockdev to document the zoned loop block device driver.
+An overview of the driver is provided and its usage to create and delete
+zoned devices described.
 
-This initial implementation is simple and does not support zone resource
-limits. That is, a zoned loop block device limits for the maximum number
-of open zones and maximum number of active zones is always 0.
-
-This driver can be either compiled in-kernel or as a module, named
-"zloop". Compilation of this driver depends on the block layer support
-for zoned block device (CONFIG_BLK_DEV_ZONED must be set).
-
-Using the zloop driver to create and delete zoned block devices is
-done by writing commands to the zoned loop control character device file
-(/dev/zloop-control). Creating a device is done with:
-
-  $ echo "add [options]" > /dev/zloop-control
-
-The options available for the "add" operation cat be listed by reading
-the zloop-control device file:
-
-  $ cat /dev/zloop-control
-  add id=%d,capacity_mb=%u,zone_size_mb=%u,zone_capacity_mb=%u,conv_zones=%u,base_dir=%s,nr_queues=%u,queue_depth=%u
-  remove id=%d
-
-The options available allow controlling the zoned device total
-capacity, zone size, zone capactity of sequential zones, total number
-of conventional zones, base directory for the zones backing file, number
-of I/O queues and the maximum queue depth of I/O queues.
-
-Deleting a device is done using the "remove" command:
-
-  $ echo "remove id=0" > /dev/zloop-control
-
-This implementation passes various tests using zonefs and fio (t/zbd
-tests) and provides a state machine for zone conditions that is
-compliant with the T10 ZBC and NVMe ZNS specifications.
-
-Co-developed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 ---
- MAINTAINERS            |    7 +
- drivers/block/Kconfig  |   16 +
- drivers/block/Makefile |    1 +
- drivers/block/zloop.c  | 1334 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 1358 insertions(+)
- create mode 100644 drivers/block/zloop.c
+ Documentation/admin-guide/blockdev/index.rst  |   1 +
+ .../admin-guide/blockdev/zoned_loop.rst       | 168 ++++++++++++++++++
+ MAINTAINERS                                   |   1 +
+ drivers/block/Kconfig                         |   3 +
+ 4 files changed, 173 insertions(+)
+ create mode 100644 Documentation/admin-guide/blockdev/zoned_loop.rst
 
+diff --git a/Documentation/admin-guide/blockdev/index.rst b/Documentation/admin-guide/blockdev/index.rst
+index 957ccf617797..3262397ebe8f 100644
+--- a/Documentation/admin-guide/blockdev/index.rst
++++ b/Documentation/admin-guide/blockdev/index.rst
+@@ -11,6 +11,7 @@ Block Devices
+    nbd
+    paride
+    ramdisk
++   zoned_loop
+    zram
+ 
+    drbd/index
+diff --git a/Documentation/admin-guide/blockdev/zoned_loop.rst b/Documentation/admin-guide/blockdev/zoned_loop.rst
+new file mode 100644
+index 000000000000..e437f501b0ae
+--- /dev/null
++++ b/Documentation/admin-guide/blockdev/zoned_loop.rst
+@@ -0,0 +1,168 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++=======================
++Zoned Loop Block Device
++=======================
++
++.. Contents:
++
++	1) Overview
++	2) Creating a Zoned Device
++	3) Deleting a Zoned Device
++	4) Example
++
++
++1) Overview
++-----------
++
++The zoned loop block device driver (zloop) allows a user to create a zoned block
++device using one regular file per zone as backing storage. This driver does not
++directly control any hardware and uses read, write and truncate operations to
++regular files of a file system to emulate a zoned block device.
++
++Using zloop, zoned block devices with a configurable capacity, zone size and
++number of conventional zones can be created. The storage for each zone of the
++device is implemented using a regular file with a maximum size equal to the zone
++size. The size of a file backing a conventional zone is always equal to the zone
++size. The size of a file backing a sequential zone indicates the amount of data
++sequentially written to the file, that is, the size of the file directly
++indicates the position of the write pointer of the zone.
++
++When resetting a sequential zone, its backing file size is truncated to zero.
++Conversely, for a zone finish operation, the backing file is truncated to the
++zone size. With this, the maximum capacity of a zloop zoned block device created
++can be larger configured to be larger than the storage space available on the
++backing file system. Of course, for such configuration, writing more data than
++the storage space available on the backing file system will result in write
++errors.
++
++The zoned loop block device driver implements a complete zone transition state
++machine. That is, zones can be empty, implicitly opened, explicitly opened,
++closed or full. The current implementation does not support any limits on the
++maximum number of open and active zones.
++
++No user tools are necessary to create and delete zloop devices.
++
++2) Creating a Zoned Device
++--------------------------
++
++Once the zloop module is loaded (or if zloop is compiled in the kernel), the
++character device file /dev/zloop-control can be used to add a zloop device.
++This is done by writing an "add" command directly to the /dev/zloop-control
++device::
++
++	$ modprobe zloop
++        $ ls -l /dev/zloop*
++        crw-------. 1 root root 10, 123 Jan  6 19:18 /dev/zloop-control
++
++        $ mkdir -p <base directory/<device ID>
++        $ echo "add [options]" > /dev/zloop-control
++
++The options available for the add command can be listed by reading the
++/dev/zloop-control device::
++
++	$ cat /dev/zloop-control
++        add id=%d,capacity_mb=%u,zone_size_mb=%u,zone_capacity_mb=%u,conv_zones=%u,base_dir=%s,nr_queues=%u,queue_depth=%u
++        remove id=%d
++
++In more details, the options that can be used with the "add" command are as
++follows.
++
++================   ===========================================================
++id                 Device number (the X in /dev/zloopX).
++                   Default: automatically assigned.
++capacity_mb        Device total capacity in MiB. This is always rounded up to
++                   the nearest higher multiple of the zone size.
++                   Default: 16384 MiB (16 GiB).
++zone_size_mb       Device zone size in MiB. Default: 256 MiB.
++zone_capacity_mb   Device zone capacity (must always be equal to or lower than
++                   the zone size. Default: zone size.
++conv_zones         Total number of conventioanl zones starting from sector 0.
++                   Default: 8.
++base_dir           Path to the base directoy where to create the directory
++                   containing the zone files of the device.
++                   Default=/var/local/zloop.
++                   The device directory containing the zone files is always
++                   named with the device ID. E.g. the default zone file
++                   directory for /dev/zloop0 is /var/local/zloop/0.
++nr_queues          Number of I/O queues of the zoned block device. This value is
++                   always capped by the number of online CPUs
++                   Default: 1
++queue_depth        Maximum I/O queue depth per I/O queue.
++                   Default: 64
++================   ===========================================================
++
++3) Deleting a Zoned Device
++--------------------------
++
++Deleting an unused zoned loop block device is done by issuing the "remove"
++command to /dev/zloop-control, specifying the ID of the device to remove::
++
++        $ echo "remove id=X" > /dev/zloop-control
++
++The remove command does not have any option.
++
++A zoned device that was removed can be re-added again without any change to the
++state of the device zones: the device zones are restored to their last state
++before the device was removed. Adding again a zoned device after it was removed
++must always be done using the same configuration as when the device was first
++added. If a zone configuration change is detected, an error will be returned and
++the zoned device will not be created.
++
++To fully delete a zoned device, after executing the remove operation, the device
++base directory containing the backing files of the device zones must be deleted.
++
++4) Example
++----------
++
++The following sequence of commands creates a 2GB zoned device with zones of 64
++MB and a zone capacity of 63 MB::
++
++        $ modprobe zloop
++        $ mkdir -p /var/local/zloop/0
++        $ echo "add capacity_mb=2048,zone_size_mb=64,zone_capacity=63MB" > /dev/zloop-control
++
++For the device created (/dev/zloop0), the zone backing files are all created
++under the default base directory (/var/local/zloop)::
++
++        $ ls -l /var/local/zloop/0
++        total 0
++        -rw-------. 1 root root 67108864 Jan  6 22:23 cnv-000000
++        -rw-------. 1 root root 67108864 Jan  6 22:23 cnv-000001
++        -rw-------. 1 root root 67108864 Jan  6 22:23 cnv-000002
++        -rw-------. 1 root root 67108864 Jan  6 22:23 cnv-000003
++        -rw-------. 1 root root 67108864 Jan  6 22:23 cnv-000004
++        -rw-------. 1 root root 67108864 Jan  6 22:23 cnv-000005
++        -rw-------. 1 root root 67108864 Jan  6 22:23 cnv-000006
++        -rw-------. 1 root root 67108864 Jan  6 22:23 cnv-000007
++        -rw-------. 1 root root        0 Jan  6 22:23 seq-000008
++        -rw-------. 1 root root        0 Jan  6 22:23 seq-000009
++        ...
++
++The zoned device created (/dev/zloop0) can then be used normally::
++
++        $ lsblk -z
++        NAME   ZONED        ZONE-SZ ZONE-NR ZONE-AMAX ZONE-OMAX ZONE-APP ZONE-WGRAN
++        zloop0 host-managed     64M      32         0         0       1M         4K
++        $ blkzone report /dev/zloop0
++          start: 0x000000000, len 0x020000, cap 0x020000, wptr 0x000000 reset:0 non-seq:0, zcond: 0(nw) [type: 1(CONVENTIONAL)]
++          start: 0x000020000, len 0x020000, cap 0x020000, wptr 0x000000 reset:0 non-seq:0, zcond: 0(nw) [type: 1(CONVENTIONAL)]
++          start: 0x000040000, len 0x020000, cap 0x020000, wptr 0x000000 reset:0 non-seq:0, zcond: 0(nw) [type: 1(CONVENTIONAL)]
++          start: 0x000060000, len 0x020000, cap 0x020000, wptr 0x000000 reset:0 non-seq:0, zcond: 0(nw) [type: 1(CONVENTIONAL)]
++          start: 0x000080000, len 0x020000, cap 0x020000, wptr 0x000000 reset:0 non-seq:0, zcond: 0(nw) [type: 1(CONVENTIONAL)]
++          start: 0x0000a0000, len 0x020000, cap 0x020000, wptr 0x000000 reset:0 non-seq:0, zcond: 0(nw) [type: 1(CONVENTIONAL)]
++          start: 0x0000c0000, len 0x020000, cap 0x020000, wptr 0x000000 reset:0 non-seq:0, zcond: 0(nw) [type: 1(CONVENTIONAL)]
++          start: 0x0000e0000, len 0x020000, cap 0x020000, wptr 0x000000 reset:0 non-seq:0, zcond: 0(nw) [type: 1(CONVENTIONAL)]
++          start: 0x000100000, len 0x020000, cap 0x01f800, wptr 0x000000 reset:0 non-seq:0, zcond: 1(em) [type: 2(SEQ_WRITE_REQUIRED)]
++          start: 0x000120000, len 0x020000, cap 0x01f800, wptr 0x000000 reset:0 non-seq:0, zcond: 1(em) [type: 2(SEQ_WRITE_REQUIRED)]
++          ...
++
++Deleting this device is done using the command::
++
++        $ echo "remove id=0" > /dev/zloop-control
++
++The removed device can be re-added again using the same "add" command as when
++the device was first created. To fully delete a zoned device, its backing files
++should also be deleted after executing the remove command::
++
++        $ rm -r /var/local/zloop/0
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 30cbc3d44cd5..49076a506b6b 100644
+index 49076a506b6b..a61b5d2827af 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -25972,6 +25972,13 @@ L:	linux-kernel@vger.kernel.org
+@@ -25977,6 +25977,7 @@ M:	Damien Le Moal <dlemoal@kernel.org>
+ R:	Christoph Hellwig <hch@lst.de>
+ L:	linux-block@vger.kernel.org
  S:	Maintained
- F:	arch/x86/kernel/cpu/zhaoxin.c
++F:	Documentation/admin-guide/blockdev/zoned_loop.rst
+ F:	drivers/block/zloop.c
  
-+ZONED LOOP DEVICE
-+M:	Damien Le Moal <dlemoal@kernel.org>
-+R:	Christoph Hellwig <hch@lst.de>
-+L:	linux-block@vger.kernel.org
-+S:	Maintained
-+F:	drivers/block/zloop.c
-+
  ZONEFS FILESYSTEM
- M:	Damien Le Moal <dlemoal@kernel.org>
- M:	Naohiro Aota <naohiro.aota@wdc.com>
 diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index a97f2c40c640..abdbe5d49026 100644
+index abdbe5d49026..3d8874128157 100644
 --- a/drivers/block/Kconfig
 +++ b/drivers/block/Kconfig
-@@ -413,4 +413,20 @@ config BLKDEV_UBLK_LEGACY_OPCODES
+@@ -427,6 +427,9 @@ config BLK_DEV_ZONED_LOOP
+ 	  echo "add id=0,zone_size_mb=256,capacity_mb=16384,conv_zones=11" > \
+ 		/dev/zloop-control
  
- source "drivers/block/rnbd/Kconfig"
++	  See Documentation/admin-guide/blockdev/zoned_loop.rst for usage
++	  details.
++
+ 	  If unsure, say N.
  
-+config BLK_DEV_ZONED_LOOP
-+	tristate "Zoned loopback device support"
-+	depends on BLK_DEV_ZONED
-+	help
-+	  Saying Y here will allow you to use create a zoned block device using
-+	  regular files for zones (one file per zones). This is useful to test
-+	  file systems, device mapper and applications that support zoned block
-+	  devices. To create a zoned loop device, no user utility is needed, a
-+	  zoned loop device can be created (or re-started) using a command
-+	  like:
-+
-+	  echo "add id=0,zone_size_mb=256,capacity_mb=16384,conv_zones=11" > \
-+		/dev/zloop-control
-+
-+	  If unsure, say N.
-+
  endif # BLK_DEV
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index 1105a2d4fdcb..097707aca725 100644
---- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -41,5 +41,6 @@ obj-$(CONFIG_BLK_DEV_RNBD)	+= rnbd/
- obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk/
- 
- obj-$(CONFIG_BLK_DEV_UBLK)			+= ublk_drv.o
-+obj-$(CONFIG_BLK_DEV_ZONED_LOOP) += zloop.o
- 
- swim_mod-y	:= swim.o swim_asm.o
-diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-new file mode 100644
-index 000000000000..61afc532add1
---- /dev/null
-+++ b/drivers/block/zloop.c
-@@ -0,0 +1,1334 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (c) 2025, Christoph Hellwig.
-+ * Copyright (c) 2025, Western Digital Corporation or its affiliates.
-+ *
-+ * Zoned Loop Device driver - exports a zoned block device using one file per
-+ * zone as backing storage.
-+ */
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
-+#include <linux/blk-mq.h>
-+#include <linux/blkzoned.h>
-+#include <linux/pagemap.h>
-+#include <linux/miscdevice.h>
-+#include <linux/falloc.h>
-+#include <linux/mutex.h>
-+#include <linux/parser.h>
-+#include <linux/seq_file.h>
-+
-+/*
-+ * Options for adding (and removing) a device.
-+ */
-+enum {
-+	ZLOOP_OPT_ERR			= 0,
-+	ZLOOP_OPT_ID			= (1 << 0),
-+	ZLOOP_OPT_CAPACITY		= (1 << 1),
-+	ZLOOP_OPT_ZONE_SIZE		= (1 << 2),
-+	ZLOOP_OPT_ZONE_CAPACITY		= (1 << 3),
-+	ZLOOP_OPT_NR_CONV_ZONES		= (1 << 4),
-+	ZLOOP_OPT_BASE_DIR		= (1 << 5),
-+	ZLOOP_OPT_NR_QUEUES		= (1 << 6),
-+	ZLOOP_OPT_QUEUE_DEPTH		= (1 << 7),
-+};
-+
-+static const match_table_t zloop_opt_tokens = {
-+	{ ZLOOP_OPT_ID,			"id=%d"	},
-+	{ ZLOOP_OPT_CAPACITY,		"capacity_mb=%u"	},
-+	{ ZLOOP_OPT_ZONE_SIZE,		"zone_size_mb=%u"	},
-+	{ ZLOOP_OPT_ZONE_CAPACITY,	"zone_capacity_mb=%u"	},
-+	{ ZLOOP_OPT_NR_CONV_ZONES,	"conv_zones=%u"		},
-+	{ ZLOOP_OPT_BASE_DIR,		"base_dir=%s"		},
-+	{ ZLOOP_OPT_NR_QUEUES,		"nr_queues=%u"		},
-+	{ ZLOOP_OPT_QUEUE_DEPTH,	"queue_depth=%u"	},
-+	{ ZLOOP_OPT_ERR,		NULL			}
-+};
-+
-+/* Default values for the "add" operation. */
-+#define ZLOOP_DEF_ID			-1
-+#define ZLOOP_DEF_ZONE_SIZE		((256ULL * SZ_1M) >> SECTOR_SHIFT)
-+#define ZLOOP_DEF_NR_ZONES		64
-+#define ZLOOP_DEF_NR_CONV_ZONES		8
-+#define ZLOOP_DEF_BASE_DIR		"/var/local/zloop"
-+#define ZLOOP_DEF_NR_QUEUES		1
-+#define ZLOOP_DEF_QUEUE_DEPTH		64
-+
-+/* Arbitrary limit on the zone size (16GB). */
-+#define ZLOOP_MAX_ZONE_SIZE_MB		16384
-+
-+struct zloop_options {
-+	unsigned int		mask;
-+	int			id;
-+	sector_t		capacity;
-+	sector_t		zone_size;
-+	sector_t		zone_capacity;
-+	unsigned int		nr_conv_zones;
-+	char			*base_dir;
-+	unsigned int		nr_queues;
-+	unsigned int		queue_depth;
-+};
-+
-+/*
-+ * Device states.
-+ */
-+enum {
-+	Zlo_creating = 0,
-+	Zlo_live,
-+	Zlo_deleting,
-+};
-+
-+enum zloop_zone_flags {
-+	ZLOOP_ZONE_CONV = 0,
-+	ZLOOP_ZONE_SEQ_ERROR,
-+};
-+
-+struct zloop_zone {
-+	struct file		*file;
-+
-+	unsigned long		flags;
-+	struct mutex		lock;
-+	enum blk_zone_cond	cond;
-+	sector_t		start;
-+	sector_t		wp;
-+
-+	gfp_t			old_gfp_mask;
-+};
-+
-+struct zloop_device {
-+	unsigned int		id;
-+	unsigned int		state;
-+
-+	struct blk_mq_tag_set	tag_set;
-+	struct gendisk		*disk;
-+
-+	spinlock_t		work_lock;
-+	struct workqueue_struct *workqueue;
-+	struct work_struct	work;
-+	struct list_head	cmd_list;
-+
-+	const char		*base_dir;
-+	struct file		*data_dir;
-+
-+	unsigned int		zone_shift;
-+	sector_t		zone_size;
-+	sector_t		zone_capacity;
-+	unsigned int		nr_zones;
-+	unsigned int		nr_conv_zones;
-+
-+	struct zloop_zone	zones[] __counted_by(nr_zones);
-+};
-+
-+struct zloop_cmd {
-+	struct list_head	entry;
-+	atomic_t		ref;
-+	sector_t		sector;
-+	sector_t		nr_sectors;
-+	long			ret;
-+	struct kiocb		iocb;
-+	struct bio_vec		*bvec;
-+};
-+
-+static DEFINE_IDR(zloop_index_idr);
-+static DEFINE_MUTEX(zloop_ctl_mutex);
-+
-+static unsigned int rq_zone_no(struct request *rq)
-+{
-+	struct zloop_device *zlo = rq->q->queuedata;
-+
-+	return blk_rq_pos(rq) >> zlo->zone_shift;
-+}
-+
-+static int zloop_update_seq_zone(struct zloop_device *zlo, unsigned int zone_no)
-+{
-+	struct zloop_zone *zone = &zlo->zones[zone_no];
-+	struct kstat stat;
-+	sector_t file_sectors;
-+	int ret;
-+
-+	lockdep_assert_held(&zone->lock);
-+
-+	ret = vfs_getattr(&zone->file->f_path, &stat, STATX_SIZE, 0);
-+	if (ret < 0) {
-+		pr_err("Failed to get zone %u file stat (err=%d)\n",
-+		       zone_no, ret);
-+		set_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
-+		return ret;
-+	}
-+
-+	file_sectors = stat.size >> SECTOR_SHIFT;
-+	if (file_sectors > zlo->zone_capacity) {
-+		pr_err("Zone %u file too large (%llu sectors > %llu)\n",
-+		       zone_no, file_sectors, zlo->zone_capacity);
-+		return -EINVAL;
-+	}
-+
-+	if (!file_sectors) {
-+		zone->cond = BLK_ZONE_COND_EMPTY;
-+		zone->wp = zone->start;
-+	} else if (file_sectors == zlo->zone_capacity) {
-+		zone->cond = BLK_ZONE_COND_FULL;
-+		zone->wp = zone->start + zlo->zone_size;
-+	} else {
-+		zone->cond = BLK_ZONE_COND_CLOSED;
-+		zone->wp = zone->start + file_sectors;
-+	}
-+
-+	return 0;
-+}
-+
-+static int zloop_open_zone(struct zloop_device *zlo, unsigned int zone_no)
-+{
-+	struct zloop_zone *zone = &zlo->zones[zone_no];
-+	int ret = 0;
-+
-+	if (test_bit(ZLOOP_ZONE_CONV, &zone->flags))
-+		return -EIO;
-+
-+	mutex_lock(&zone->lock);
-+
-+	if (test_and_clear_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags)) {
-+		ret = zloop_update_seq_zone(zlo, zone_no);
-+		if (ret)
-+			goto unlock;
-+	}
-+
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_EXP_OPEN:
-+		break;
-+	case BLK_ZONE_COND_EMPTY:
-+	case BLK_ZONE_COND_CLOSED:
-+	case BLK_ZONE_COND_IMP_OPEN:
-+		zone->cond = BLK_ZONE_COND_EXP_OPEN;
-+		break;
-+	case BLK_ZONE_COND_FULL:
-+	default:
-+		ret = -EIO;
-+		break;
-+	}
-+
-+unlock:
-+	mutex_unlock(&zone->lock);
-+
-+	return ret;
-+}
-+
-+static int zloop_close_zone(struct zloop_device *zlo, unsigned int zone_no)
-+{
-+	struct zloop_zone *zone = &zlo->zones[zone_no];
-+	int ret = 0;
-+
-+	if (test_bit(ZLOOP_ZONE_CONV, &zone->flags))
-+		return -EIO;
-+
-+	mutex_lock(&zone->lock);
-+
-+	if (test_and_clear_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags)) {
-+		ret = zloop_update_seq_zone(zlo, zone_no);
-+		if (ret)
-+			goto unlock;
-+	}
-+
-+	switch (zone->cond) {
-+	case BLK_ZONE_COND_CLOSED:
-+		break;
-+	case BLK_ZONE_COND_IMP_OPEN:
-+	case BLK_ZONE_COND_EXP_OPEN:
-+		if (zone->wp == zone->start)
-+			zone->cond = BLK_ZONE_COND_EMPTY;
-+		else
-+			zone->cond = BLK_ZONE_COND_CLOSED;
-+		break;
-+	case BLK_ZONE_COND_EMPTY:
-+	case BLK_ZONE_COND_FULL:
-+	default:
-+		ret = -EIO;
-+		break;
-+	}
-+
-+unlock:
-+	mutex_unlock(&zone->lock);
-+
-+	return ret;
-+}
-+
-+static int zloop_reset_zone(struct zloop_device *zlo, unsigned int zone_no)
-+{
-+	struct zloop_zone *zone = &zlo->zones[zone_no];
-+
-+	if (test_bit(ZLOOP_ZONE_CONV, &zone->flags))
-+		return -EIO;
-+
-+	if (vfs_truncate(&zone->file->f_path, 0)) {
-+		set_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
-+		return -EIO;
-+	}
-+
-+	mutex_lock(&zone->lock);
-+	zone->cond = BLK_ZONE_COND_EMPTY;
-+	zone->wp = zone->start;
-+	clear_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
-+	mutex_unlock(&zone->lock);
-+
-+	return 0;
-+}
-+
-+static int zloop_reset_all_zones(struct request *rq)
-+{
-+	struct zloop_device *zlo = rq->q->queuedata;
-+	unsigned int i;
-+	int ret;
-+
-+	for (i = zlo->nr_conv_zones; i < zlo->nr_zones; i++) {
-+		ret = zloop_reset_zone(zlo, i);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int zloop_finish_zone(struct zloop_device *zlo, unsigned int zone_no)
-+{
-+	struct zloop_zone *zone = &zlo->zones[zone_no];
-+
-+	if (test_bit(ZLOOP_ZONE_CONV, &zone->flags))
-+		return -EIO;
-+
-+	if (vfs_truncate(&zone->file->f_path, zlo->zone_size << SECTOR_SHIFT)) {
-+		set_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
-+		return -EIO;
-+	}
-+
-+	mutex_lock(&zone->lock);
-+	zone->cond = BLK_ZONE_COND_FULL;
-+	zone->wp = zone->start + zlo->zone_size;
-+	clear_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
-+	mutex_unlock(&zone->lock);
-+
-+	return 0;
-+}
-+
-+static void zloop_put_cmd(struct zloop_cmd *cmd)
-+{
-+	struct request *rq = blk_mq_rq_from_pdu(cmd);
-+
-+	if (!atomic_dec_and_test(&cmd->ref))
-+		return;
-+	kfree(cmd->bvec);
-+	cmd->bvec = NULL;
-+	if (likely(!blk_should_fake_timeout(rq->q)))
-+		blk_mq_complete_request(rq);
-+}
-+
-+static void zloop_rw_complete(struct kiocb *iocb, long ret)
-+{
-+	struct zloop_cmd *cmd = container_of(iocb, struct zloop_cmd, iocb);
-+
-+	cmd->ret = ret;
-+	zloop_put_cmd(cmd);
-+}
-+
-+static void zloop_rw(struct zloop_cmd *cmd)
-+{
-+	struct request *rq = blk_mq_rq_from_pdu(cmd);
-+	struct zloop_device *zlo = rq->q->queuedata;
-+	unsigned int zone_no = rq_zone_no(rq);
-+	sector_t sector = blk_rq_pos(rq);
-+	sector_t nr_sectors = blk_rq_sectors(rq);
-+	bool is_append = req_op(rq) == REQ_OP_ZONE_APPEND;
-+	bool is_write = req_op(rq) == REQ_OP_WRITE || is_append;
-+	int rw = is_write ? ITER_SOURCE : ITER_DEST;
-+	struct req_iterator rq_iter;
-+	struct zloop_zone *zone;
-+	struct iov_iter iter;
-+	struct bio_vec tmp;
-+	sector_t zone_end;
-+	int nr_bvec = 0;
-+	int ret;
-+
-+	cmd->sector = sector;
-+	cmd->nr_sectors = nr_sectors;
-+
-+	/* We should never get an I/O beyond the device capacity. */
-+	if (WARN_ON_ONCE(zone_no >= zlo->nr_zones)) {
-+		ret = -EIO;
-+		goto out;
-+	}
-+	zone = &zlo->zones[zone_no];
-+	zone_end = zone->start + zlo->zone_capacity;
-+
-+	/*
-+	 * The block layer should never send requests that are not fully
-+	 * contained within the zone.
-+	 */
-+	if (WARN_ON_ONCE(sector + nr_sectors > zone->start + zlo->zone_size)) {
-+		ret = -EIO;
-+		goto out;
-+	}
-+
-+	if (test_and_clear_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags)) {
-+		mutex_lock(&zone->lock);
-+		ret = zloop_update_seq_zone(zlo, zone_no);
-+		mutex_unlock(&zone->lock);
-+		if (ret)
-+			goto out;
-+	}
-+
-+	if (!test_bit(ZLOOP_ZONE_CONV, &zone->flags) && is_write) {
-+		mutex_lock(&zone->lock);
-+
-+		if (is_append) {
-+			sector = zone->wp;
-+			cmd->sector = sector;
-+		}
-+
-+		/*
-+		 * Write operations must be aligned to the write pointer and
-+		 * fully contained within the zone capacity.
-+		 */
-+		if (sector != zone->wp || zone->wp + nr_sectors > zone_end) {
-+			pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
-+			       zone_no, sector, zone->wp);
-+			mutex_unlock(&zone->lock);
-+			ret = -EIO;
-+			goto out;
-+		}
-+
-+		/* Implicitly open the target zone. */
-+		if (zone->cond == BLK_ZONE_COND_CLOSED ||
-+		    zone->cond == BLK_ZONE_COND_EMPTY)
-+			zone->cond = BLK_ZONE_COND_IMP_OPEN;
-+
-+		/*
-+		 * Advance the write pointer of sequential zones. If the write
-+		 * fails, the wp position will be corrected when the next I/O
-+		 * copmpletes.
-+		 */
-+		zone->wp += nr_sectors;
-+		if (zone->wp == zone_end)
-+			zone->cond = BLK_ZONE_COND_FULL;
-+
-+		mutex_unlock(&zone->lock);
-+	}
-+
-+	rq_for_each_bvec(tmp, rq, rq_iter)
-+		nr_bvec++;
-+
-+	if (rq->bio != rq->biotail) {
-+		struct bio_vec *bvec;
-+
-+		cmd->bvec = kmalloc_array(nr_bvec, sizeof(*cmd->bvec), GFP_NOIO);
-+		if (!cmd->bvec) {
-+			ret = -EIO;
-+			goto out;
-+		}
-+
-+		/*
-+		 * The bios of the request may be started from the middle of
-+		 * the 'bvec' because of bio splitting, so we can't directly
-+		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_bvec
-+		 * API will take care of all details for us.
-+		 */
-+		bvec = cmd->bvec;
-+		rq_for_each_bvec(tmp, rq, rq_iter) {
-+			*bvec = tmp;
-+			bvec++;
-+		}
-+		iov_iter_bvec(&iter, rw, cmd->bvec, nr_bvec, blk_rq_bytes(rq));
-+	} else {
-+		/*
-+		 * Same here, this bio may be started from the middle of the
-+		 * 'bvec' because of bio splitting, so offset from the bvec
-+		 * must be passed to iov iterator
-+		 */
-+		iov_iter_bvec(&iter, rw,
-+			__bvec_iter_bvec(rq->bio->bi_io_vec, rq->bio->bi_iter),
-+					nr_bvec, blk_rq_bytes(rq));
-+		iter.iov_offset = rq->bio->bi_iter.bi_bvec_done;
-+	}
-+
-+	cmd->iocb.ki_pos = (sector - zone->start) << SECTOR_SHIFT;
-+	cmd->iocb.ki_filp = zone->file;
-+	cmd->iocb.ki_complete = zloop_rw_complete;
-+	cmd->iocb.ki_flags = IOCB_DIRECT;
-+	cmd->iocb.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
-+
-+	if (rw == ITER_SOURCE)
-+		ret = zone->file->f_op->write_iter(&cmd->iocb, &iter);
-+	else
-+		ret = zone->file->f_op->read_iter(&cmd->iocb, &iter);
-+out:
-+	if (ret != -EIOCBQUEUED)
-+		zloop_rw_complete(&cmd->iocb, ret);
-+	zloop_put_cmd(cmd);
-+}
-+
-+static void zloop_handle_cmd(struct zloop_cmd *cmd)
-+{
-+	struct request *rq = blk_mq_rq_from_pdu(cmd);
-+	struct zloop_device *zlo = rq->q->queuedata;
-+
-+	atomic_set(&cmd->ref, 2);
-+	cmd->ret = 0;
-+
-+	switch (req_op(rq)) {
-+	case REQ_OP_READ:
-+	case REQ_OP_WRITE:
-+	case REQ_OP_ZONE_APPEND:
-+		/*
-+		 * zloop_rw() always executes asynchronously or completes
-+		 * directly.
-+		 */
-+		zloop_rw(cmd);
-+		return;
-+	case REQ_OP_FLUSH:
-+		/*
-+		 * sync the entire fs containing the zone files instead of
-+		 * walking all files
-+		 */
-+		if (sync_filesystem(file_inode(zlo->data_dir)->i_sb))
-+			cmd->ret = -EIO;
-+		break;
-+	case REQ_OP_ZONE_RESET:
-+		cmd->ret = zloop_reset_zone(zlo, rq_zone_no(rq));
-+		break;
-+	case REQ_OP_ZONE_RESET_ALL:
-+		cmd->ret = zloop_reset_all_zones(rq);
-+		break;
-+	case REQ_OP_ZONE_FINISH:
-+		cmd->ret = zloop_finish_zone(zlo, rq_zone_no(rq));
-+		break;
-+	case REQ_OP_ZONE_OPEN:
-+		cmd->ret = zloop_open_zone(zlo, rq_zone_no(rq));
-+		break;
-+	case REQ_OP_ZONE_CLOSE:
-+		cmd->ret = zloop_close_zone(zlo, rq_zone_no(rq));
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		pr_err("Unsupported operation %d\n", req_op(rq));
-+		cmd->ret = -EOPNOTSUPP;
-+		break;
-+	}
-+
-+	blk_mq_complete_request(rq);
-+}
-+
-+static struct zloop_cmd *zloop_get_cmd(struct zloop_device *zlo)
-+{
-+	struct zloop_cmd *cmd;
-+
-+	spin_lock_irq(&zlo->work_lock);
-+	cmd = list_first_entry_or_null(&zlo->cmd_list, struct zloop_cmd, entry);
-+	if (cmd)
-+		list_del_init(&cmd->entry);
-+	spin_unlock_irq(&zlo->work_lock);
-+
-+	return cmd;
-+}
-+
-+static void zloop_workfn(struct work_struct *work)
-+{
-+	struct zloop_device *zlo = container_of(work, struct zloop_device, work);
-+	int orig_flags = current->flags;
-+	struct zloop_cmd *cmd;
-+
-+	current->flags |= PF_LOCAL_THROTTLE | PF_MEMALLOC_NOIO;
-+	while ((cmd = zloop_get_cmd(zlo))) {
-+		zloop_handle_cmd(cmd);
-+		cond_resched();
-+	}
-+	current->flags = orig_flags;
-+}
-+
-+static void zloop_complete_rq(struct request *rq)
-+{
-+	struct zloop_cmd *cmd = blk_mq_rq_to_pdu(rq);
-+	struct zloop_device *zlo = rq->q->queuedata;
-+	unsigned int zone_no = cmd->sector >> zlo->zone_shift;
-+	struct zloop_zone *zone = &zlo->zones[zone_no];
-+	blk_status_t sts = BLK_STS_OK;
-+
-+	switch (req_op(rq)) {
-+	case REQ_OP_READ:
-+		if (cmd->ret < 0)
-+			pr_err("Zone %u: failed read sector %llu, %llu sectors\n",
-+			       zone_no, cmd->sector, cmd->nr_sectors);
-+
-+		if (cmd->ret >= 0 && cmd->ret != blk_rq_bytes(rq)) {
-+			/* short read */
-+			struct bio *bio;
-+
-+			__rq_for_each_bio(bio, rq)
-+				zero_fill_bio(bio);
-+		}
-+		break;
-+	case REQ_OP_WRITE:
-+	case REQ_OP_ZONE_APPEND:
-+		if (cmd->ret < 0)
-+			pr_err("Zone %u: failed %swrite sector %llu, %llu sectors\n",
-+			       zone_no,
-+			       req_op(rq) == REQ_OP_WRITE ? "" : "append ",
-+			       cmd->sector, cmd->nr_sectors);
-+
-+		if (cmd->ret >= 0 && cmd->ret != blk_rq_bytes(rq)) {
-+			pr_err("Zone %u: partial write %ld/%u B\n",
-+			       zone_no, cmd->ret, blk_rq_bytes(rq));
-+			cmd->ret = -EIO;
-+		}
-+
-+		if (cmd->ret < 0 && !test_bit(ZLOOP_ZONE_CONV, &zone->flags)) {
-+			/*
-+			 * A write to a sequential zone file failed: mark the
-+			 * zone as having an error. This will be corrected and
-+			 * cleared when the next IO is submitted.
-+			 */
-+			set_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags);
-+			break;
-+		}
-+		if (req_op(rq) == REQ_OP_ZONE_APPEND)
-+			rq->__sector = cmd->sector;
-+
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	if (cmd->ret < 0)
-+		sts = errno_to_blk_status(cmd->ret);
-+	blk_mq_end_request(rq, sts);
-+}
-+
-+static blk_status_t zloop_queue_rq(struct blk_mq_hw_ctx *hctx,
-+		const struct blk_mq_queue_data *bd)
-+{
-+	struct request *rq = bd->rq;
-+	struct zloop_cmd *cmd = blk_mq_rq_to_pdu(rq);
-+	struct zloop_device *zlo = rq->q->queuedata;
-+
-+	if (zlo->state == Zlo_deleting)
-+		return BLK_STS_IOERR;
-+
-+	blk_mq_start_request(rq);
-+
-+	spin_lock_irq(&zlo->work_lock);
-+	list_add_tail(&cmd->entry, &zlo->cmd_list);
-+	queue_work(zlo->workqueue, &zlo->work);
-+	spin_unlock_irq(&zlo->work_lock);
-+	return BLK_STS_OK;
-+}
-+
-+static const struct blk_mq_ops zloop_mq_ops = {
-+	.queue_rq       = zloop_queue_rq,
-+	.complete	= zloop_complete_rq,
-+};
-+
-+static int zloop_open(struct gendisk *disk, blk_mode_t mode)
-+{
-+	struct zloop_device *zlo = disk->private_data;
-+	int ret;
-+
-+	ret = mutex_lock_killable(&zloop_ctl_mutex);
-+	if (ret)
-+		return ret;
-+
-+	if (zlo->state != Zlo_live)
-+		ret = -ENXIO;
-+	mutex_unlock(&zloop_ctl_mutex);
-+	return ret;
-+}
-+
-+static int zloop_report_zones(struct gendisk *disk, sector_t sector,
-+		unsigned int nr_zones, report_zones_cb cb, void *data)
-+{
-+	struct zloop_device *zlo = disk->private_data;
-+	struct blk_zone blkz = {};
-+	unsigned int first, i;
-+	int ret;
-+
-+	first = disk_zone_no(disk, sector);
-+	if (first >= zlo->nr_zones)
-+		return 0;
-+	nr_zones = min(nr_zones, zlo->nr_zones - first);
-+
-+	for (i = 0; i < nr_zones; i++) {
-+		unsigned int zone_no = first + i;
-+		struct zloop_zone *zone = &zlo->zones[zone_no];
-+
-+		mutex_lock(&zone->lock);
-+
-+		if (test_and_clear_bit(ZLOOP_ZONE_SEQ_ERROR, &zone->flags)) {
-+			ret = zloop_update_seq_zone(zlo, zone_no);
-+			if (ret) {
-+				mutex_unlock(&zone->lock);
-+				return ret;
-+			}
-+		}
-+
-+		blkz.start = zone->start;
-+		blkz.len = zlo->zone_size;
-+		blkz.wp = zone->wp;
-+		blkz.cond = zone->cond;
-+		if (test_bit(ZLOOP_ZONE_CONV, &zone->flags)) {
-+			blkz.type = BLK_ZONE_TYPE_CONVENTIONAL;
-+			blkz.capacity = zlo->zone_size;
-+		} else {
-+			blkz.type = BLK_ZONE_TYPE_SEQWRITE_REQ;
-+			blkz.capacity = zlo->zone_capacity;
-+		}
-+
-+		mutex_unlock(&zone->lock);
-+
-+		ret = cb(&blkz, i, data);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return nr_zones;
-+}
-+
-+static void zloop_free_disk(struct gendisk *disk)
-+{
-+	struct zloop_device *zlo = disk->private_data;
-+	unsigned int i;
-+
-+	for (i = 0; i < zlo->nr_zones; i++) {
-+		struct zloop_zone *zone = &zlo->zones[i];
-+
-+		mapping_set_gfp_mask(zone->file->f_mapping,
-+				zone->old_gfp_mask);
-+		fput(zone->file);
-+	}
-+
-+	fput(zlo->data_dir);
-+	destroy_workqueue(zlo->workqueue);
-+	kfree(zlo->base_dir);
-+	kvfree(zlo);
-+}
-+
-+static const struct block_device_operations zloop_fops = {
-+	.owner			= THIS_MODULE,
-+	.open			= zloop_open,
-+	.report_zones		= zloop_report_zones,
-+	.free_disk		= zloop_free_disk,
-+};
-+
-+__printf(3, 4)
-+static struct file *zloop_filp_open_fmt(int oflags, umode_t mode,
-+		const char *fmt, ...)
-+{
-+	struct file *file;
-+	va_list ap;
-+	char *p;
-+
-+	va_start(ap, fmt);
-+	p = kvasprintf(GFP_KERNEL, fmt, ap);
-+	va_end(ap);
-+
-+	if (!p)
-+		return ERR_PTR(-ENOMEM);
-+	file = filp_open(p, oflags, mode);
-+	kfree(p);
-+	return file;
-+}
-+
-+static int zloop_init_zone(struct zloop_device *zlo, unsigned int zone_no,
-+			   bool restore)
-+{
-+	struct zloop_zone *zone = &zlo->zones[zone_no];
-+	int oflags = O_RDWR | O_DIRECT;
-+	struct kstat stat;
-+	sector_t file_sectors;
-+	int ret;
-+
-+	mutex_init(&zone->lock);
-+	zone->start = (sector_t)zone_no << zlo->zone_shift;
-+
-+	if (!restore)
-+		oflags |= O_CREAT;
-+
-+	if (zone_no < zlo->nr_conv_zones) {
-+		/* Conventional zone file. */
-+		set_bit(ZLOOP_ZONE_CONV, &zone->flags);
-+		zone->cond = BLK_ZONE_COND_NOT_WP;
-+		zone->wp = U64_MAX;
-+
-+		zone->file = zloop_filp_open_fmt(oflags, 0600, "%s/%u/cnv-%06u",
-+					zlo->base_dir, zlo->id, zone_no);
-+		if (IS_ERR(zone->file)) {
-+			pr_err("Failed to open zone %u file %s/%u/cnv-%06u (err=%ld)",
-+			       zone_no, zlo->base_dir, zlo->id, zone_no,
-+			       PTR_ERR(zone->file));
-+			return PTR_ERR(zone->file);
-+		}
-+
-+		ret = vfs_getattr(&zone->file->f_path, &stat, STATX_SIZE, 0);
-+		if (ret < 0) {
-+			pr_err("Failed to get zone %u file stat\n", zone_no);
-+			return ret;
-+		}
-+		file_sectors = stat.size >> SECTOR_SHIFT;
-+
-+		if (restore && file_sectors != zlo->zone_size) {
-+			pr_err("Invalid conventional zone %u file size (%llu sectors != %llu)\n",
-+			       zone_no, file_sectors, zlo->zone_capacity);
-+			return ret;
-+		}
-+
-+		ret = vfs_truncate(&zone->file->f_path,
-+				   zlo->zone_size << SECTOR_SHIFT);
-+		if (ret < 0) {
-+			pr_err("Failed to truncate zone %u file (err=%d)\n",
-+			       zone_no, ret);
-+			return ret;
-+		}
-+
-+		return 0;
-+	}
-+
-+	/* Sequential zone file. */
-+	zone->file = zloop_filp_open_fmt(oflags, 0600, "%s/%u/seq-%06u",
-+					 zlo->base_dir, zlo->id, zone_no);
-+	if (IS_ERR(zone->file)) {
-+		pr_err("Failed to open zone %u file %s/%u/seq-%06u (err=%ld)",
-+		       zone_no, zlo->base_dir, zlo->id, zone_no,
-+		       PTR_ERR(zone->file));
-+		return PTR_ERR(zone->file);
-+	}
-+
-+	mutex_lock(&zone->lock);
-+	ret = zloop_update_seq_zone(zlo, zone_no);
-+	mutex_unlock(&zone->lock);
-+
-+	return ret;
-+}
-+
-+static bool zloop_dev_exists(struct zloop_device *zlo)
-+{
-+	struct file *cnv, *seq;
-+	bool exists;
-+
-+	cnv = zloop_filp_open_fmt(O_RDONLY, 0600, "%s/%u/cnv-%06u",
-+				  zlo->base_dir, zlo->id, 0);
-+	seq = zloop_filp_open_fmt(O_RDONLY, 0600, "%s/%u/seq-%06u",
-+				  zlo->base_dir, zlo->id, 0);
-+	exists = !IS_ERR(cnv) || !IS_ERR(seq);
-+
-+	if (!IS_ERR(cnv))
-+		fput(cnv);
-+	if (!IS_ERR(seq))
-+		fput(seq);
-+
-+	return exists;
-+}
-+
-+static int zloop_ctl_add(struct zloop_options *opts)
-+{
-+	struct queue_limits lim = {
-+		.max_hw_sectors		= SZ_1M >> SECTOR_SHIFT,
-+		.max_hw_zone_append_sectors = SZ_1M >> SECTOR_SHIFT,
-+		.chunk_sectors		= opts->zone_size,
-+		.features		= BLK_FEAT_ZONED,
-+	};
-+	unsigned int nr_zones, i, j;
-+	struct zloop_device *zlo;
-+	int block_size;
-+	int ret = -EINVAL;
-+	bool restore;
-+
-+	__module_get(THIS_MODULE);
-+
-+	nr_zones = opts->capacity >> ilog2(opts->zone_size);
-+	if (opts->nr_conv_zones >= nr_zones) {
-+		pr_err("Invalid number of conventional zones %u\n",
-+		       opts->nr_conv_zones);
-+		goto out;
-+	}
-+
-+	zlo = kvzalloc(struct_size(zlo, zones, nr_zones), GFP_KERNEL);
-+	if (!zlo) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+	zlo->state = Zlo_creating;
-+
-+	ret = mutex_lock_killable(&zloop_ctl_mutex);
-+	if (ret)
-+		goto out_free_dev;
-+
-+	/* Allocate id, if @opts->id >= 0, we're requesting that specific id */
-+	if (opts->id >= 0) {
-+		ret = idr_alloc(&zloop_index_idr, zlo,
-+				  opts->id, opts->id + 1, GFP_KERNEL);
-+		if (ret == -ENOSPC)
-+			ret = -EEXIST;
-+	} else {
-+		ret = idr_alloc(&zloop_index_idr, zlo, 0, 0, GFP_KERNEL);
-+	}
-+	mutex_unlock(&zloop_ctl_mutex);
-+	if (ret < 0)
-+		goto out_free_dev;
-+
-+	zlo->id = ret;
-+	spin_lock_init(&zlo->work_lock);
-+	INIT_WORK(&zlo->work, zloop_workfn);
-+	INIT_LIST_HEAD(&zlo->cmd_list);
-+	zlo->zone_shift = ilog2(opts->zone_size);
-+	zlo->zone_size = opts->zone_size;
-+	if (opts->zone_capacity)
-+		zlo->zone_capacity = opts->zone_capacity;
-+	else
-+		zlo->zone_capacity = zlo->zone_size;
-+	zlo->nr_zones = nr_zones;
-+	zlo->nr_conv_zones = opts->nr_conv_zones;
-+
-+	zlo->workqueue = alloc_workqueue("zloop%d", WQ_UNBOUND | WQ_FREEZABLE,
-+					 0, zlo->id);
-+	if (!zlo->workqueue) {
-+		ret = -ENOMEM;
-+		goto out_free_idr;
-+	}
-+
-+	if (opts->base_dir)
-+		zlo->base_dir = kstrdup(opts->base_dir, GFP_KERNEL);
-+	else
-+		zlo->base_dir = kstrdup(ZLOOP_DEF_BASE_DIR, GFP_KERNEL);
-+	if (!zlo->base_dir) {
-+		ret = -ENOMEM;
-+		goto out_destroy_workqueue;
-+	}
-+
-+	zlo->data_dir = zloop_filp_open_fmt(O_RDONLY | O_DIRECTORY, 0, "%s/%u",
-+					    zlo->base_dir, zlo->id);
-+	if (IS_ERR(zlo->data_dir)) {
-+		ret = PTR_ERR(zlo->data_dir);
-+		pr_warn("Failed to open directory %s/%u (err=%d)\n",
-+			zlo->base_dir, zlo->id, ret);
-+		goto out_free_base_dir;
-+	}
-+
-+	/* Use the FS block size as the device sector size. */
-+	block_size = file_inode(zlo->data_dir)->i_sb->s_blocksize;
-+	if (block_size > SZ_4K) {
-+		pr_warn("Unsupported FS block size %d B > 4096\n",
-+			block_size);
-+		goto out_close_data_dir;
-+	}
-+	lim.physical_block_size = block_size;
-+	lim.logical_block_size = block_size;
-+
-+	/*
-+	 * If we already have zone files, we are restoring a device created by a
-+	 * previous add operation. In this case, zloop_init_zone() will check
-+	 * that the zone files are consistent with the zone configuration given.
-+	 */
-+	restore = zloop_dev_exists(zlo);
-+	for (i = 0; i < nr_zones; i++) {
-+		ret = zloop_init_zone(zlo, i, restore);
-+		if (ret)
-+			goto out_close_files;
-+	}
-+
-+	zlo->tag_set.ops = &zloop_mq_ops;
-+	zlo->tag_set.nr_hw_queues = opts->nr_queues;
-+	zlo->tag_set.queue_depth = opts->queue_depth;
-+	zlo->tag_set.numa_node = NUMA_NO_NODE;
-+	zlo->tag_set.cmd_size = sizeof(struct zloop_cmd);
-+	zlo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-+	zlo->tag_set.driver_data = zlo;
-+
-+	ret = blk_mq_alloc_tag_set(&zlo->tag_set);
-+	if (ret) {
-+		pr_err("blk_mq_alloc_tag_set failed (err=%d)\n", ret);
-+		goto out_close_files;
-+	}
-+
-+	zlo->disk = blk_mq_alloc_disk(&zlo->tag_set, &lim, zlo);
-+	if (IS_ERR(zlo->disk)) {
-+		pr_err("blk_mq_alloc_disk failed (err=%d)\n", ret);
-+		ret = PTR_ERR(zlo->disk);
-+		goto out_cleanup_tags;
-+	}
-+	zlo->disk->flags = GENHD_FL_NO_PART;
-+	zlo->disk->fops = &zloop_fops;
-+	zlo->disk->private_data = zlo;
-+	sprintf(zlo->disk->disk_name, "zloop%d", zlo->id);
-+	set_capacity(zlo->disk, (u64)lim.chunk_sectors * zlo->nr_zones);
-+
-+	if (blk_revalidate_disk_zones(zlo->disk))
-+		goto out_cleanup_disk;
-+
-+	ret = add_disk(zlo->disk);
-+	if (ret) {
-+		pr_err("add_disk failed (err=%d)\n", ret);
-+		goto out_cleanup_disk;
-+	}
-+
-+	mutex_lock(&zloop_ctl_mutex);
-+	zlo->state = Zlo_live;
-+	mutex_unlock(&zloop_ctl_mutex);
-+
-+	pr_info("Added device %d\n", zlo->id);
-+
-+	return 0;
-+
-+out_cleanup_disk:
-+	put_disk(zlo->disk);
-+out_cleanup_tags:
-+	blk_mq_free_tag_set(&zlo->tag_set);
-+out_close_files:
-+	for (j = 0; j < i; j++) {
-+		struct zloop_zone *zone = &zlo->zones[j];
-+
-+		if (!IS_ERR_OR_NULL(zone->file))
-+			fput(zone->file);
-+	}
-+out_close_data_dir:
-+	fput(zlo->data_dir);
-+out_free_base_dir:
-+	kfree(zlo->base_dir);
-+out_destroy_workqueue:
-+	destroy_workqueue(zlo->workqueue);
-+out_free_idr:
-+	mutex_lock(&zloop_ctl_mutex);
-+	idr_remove(&zloop_index_idr, zlo->id);
-+	mutex_unlock(&zloop_ctl_mutex);
-+out_free_dev:
-+	kvfree(zlo);
-+out:
-+	module_put(THIS_MODULE);
-+	if (ret == -ENOENT)
-+		ret = -EINVAL;
-+	return ret;
-+}
-+
-+static int zloop_ctl_remove(struct zloop_options *opts)
-+{
-+	struct zloop_device *zlo;
-+	int ret;
-+
-+	if (!(opts->mask & ZLOOP_OPT_ID)) {
-+		pr_err("No ID specified\n");
-+		return -EINVAL;
-+	}
-+
-+	ret = mutex_lock_killable(&zloop_ctl_mutex);
-+	if (ret)
-+		return ret;
-+
-+	zlo = idr_find(&zloop_index_idr, opts->id);
-+	if (!zlo || zlo->state == Zlo_creating) {
-+		ret = -ENODEV;
-+	} else if (zlo->state == Zlo_deleting) {
-+		ret = -EINVAL;
-+	} else {
-+		idr_remove(&zloop_index_idr, zlo->id);
-+		zlo->state = Zlo_deleting;
-+	}
-+
-+	mutex_unlock(&zloop_ctl_mutex);
-+	if (ret)
-+		return ret;
-+
-+	del_gendisk(zlo->disk);
-+	put_disk(zlo->disk);
-+	blk_mq_free_tag_set(&zlo->tag_set);
-+
-+	pr_info("Removed device %d\n", opts->id);
-+
-+	module_put(THIS_MODULE);
-+
-+	return 0;
-+}
-+
-+static int zloop_parse_options(struct zloop_options *opts, const char *buf)
-+{
-+	substring_t args[MAX_OPT_ARGS];
-+	char *options, *o, *p;
-+	unsigned int token;
-+	int ret = 0;
-+
-+	/* Set defaults. */
-+	opts->mask = 0;
-+	opts->id = ZLOOP_DEF_ID;
-+	opts->capacity = ZLOOP_DEF_ZONE_SIZE * ZLOOP_DEF_NR_ZONES;
-+	opts->zone_size = ZLOOP_DEF_ZONE_SIZE;
-+	opts->nr_conv_zones = ZLOOP_DEF_NR_CONV_ZONES;
-+	opts->nr_queues = ZLOOP_DEF_NR_QUEUES;
-+	opts->queue_depth = ZLOOP_DEF_QUEUE_DEPTH;
-+
-+	if (!buf)
-+		return 0;
-+
-+	/* Skip leading spaces before the options. */
-+	while (isspace(*buf))
-+		buf++;
-+
-+	options = o = kstrdup(buf, GFP_KERNEL);
-+	if (!options)
-+		return -ENOMEM;
-+
-+	/* Parse the options, doing only some light invalid value checks. */
-+	while ((p = strsep(&o, ",\n")) != NULL) {
-+		if (!*p)
-+			continue;
-+
-+		token = match_token(p, zloop_opt_tokens, args);
-+		opts->mask |= token;
-+		switch (token) {
-+		case ZLOOP_OPT_ID:
-+			if (match_int(args, &opts->id)) {
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			break;
-+		case ZLOOP_OPT_CAPACITY:
-+			if (match_uint(args, &token)) {
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			if (!token) {
-+				pr_err("Invalid capacity\n");
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			opts->capacity =
-+				((sector_t)token * SZ_1M) >> SECTOR_SHIFT;
-+			break;
-+		case ZLOOP_OPT_ZONE_SIZE:
-+			if (match_uint(args, &token)) {
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			if (!token || token > ZLOOP_MAX_ZONE_SIZE_MB ||
-+			    !is_power_of_2(token)) {
-+				pr_err("Invalid zone size %u\n", token);
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			opts->zone_size =
-+				((sector_t)token * SZ_1M) >> SECTOR_SHIFT;
-+			break;
-+		case ZLOOP_OPT_ZONE_CAPACITY:
-+			if (match_uint(args, &token)) {
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			if (!token) {
-+				pr_err("Invalid zone capacity\n");
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			opts->zone_capacity =
-+				((sector_t)token * SZ_1M) >> SECTOR_SHIFT;
-+			break;
-+		case ZLOOP_OPT_NR_CONV_ZONES:
-+			if (match_uint(args, &token)) {
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			opts->nr_conv_zones = token;
-+			break;
-+		case ZLOOP_OPT_BASE_DIR:
-+			p = match_strdup(args);
-+			if (!p) {
-+				ret = -ENOMEM;
-+				goto out;
-+			}
-+			kfree(opts->base_dir);
-+			opts->base_dir = p;
-+			break;
-+		case ZLOOP_OPT_NR_QUEUES:
-+			if (match_uint(args, &token)) {
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			if (!token) {
-+				pr_err("Invalid number of queues\n");
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			opts->nr_queues = min(token, num_online_cpus());
-+			break;
-+		case ZLOOP_OPT_QUEUE_DEPTH:
-+			if (match_uint(args, &token)) {
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			if (!token) {
-+				pr_err("Invalid queue depth\n");
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			opts->queue_depth = token;
-+			break;
-+		case ZLOOP_OPT_ERR:
-+		default:
-+			pr_warn("unknown parameter or missing value '%s'\n", p);
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+	}
-+
-+	ret = -EINVAL;
-+	if (opts->capacity <= opts->zone_size) {
-+		pr_err("Invalid capacity\n");
-+		goto out;
-+	}
-+
-+	if (opts->zone_capacity > opts->zone_size) {
-+		pr_err("Invalid zone capacity\n");
-+		goto out;
-+	}
-+
-+	ret = 0;
-+out:
-+	kfree(options);
-+	return ret;
-+}
-+
-+enum {
-+	ZLOOP_CTL_ADD,
-+	ZLOOP_CTL_REMOVE,
-+};
-+
-+static struct zloop_ctl_op {
-+	int		code;
-+	const char	*name;
-+} zloop_ctl_ops[] = {
-+	{ ZLOOP_CTL_ADD,	"add" },
-+	{ ZLOOP_CTL_REMOVE,	"remove" },
-+	{ -1,	NULL },
-+};
-+
-+static ssize_t zloop_ctl_write(struct file *file, const char __user *ubuf,
-+			       size_t count, loff_t *pos)
-+{
-+	struct zloop_options opts = { };
-+	struct zloop_ctl_op *op;
-+	const char *buf, *opts_buf;
-+	int i, ret;
-+
-+	if (count > PAGE_SIZE)
-+		return -ENOMEM;
-+
-+	buf = memdup_user_nul(ubuf, count);
-+	if (IS_ERR(buf))
-+		return PTR_ERR(buf);
-+
-+	for (i = 0; i < ARRAY_SIZE(zloop_ctl_ops); i++) {
-+		op = &zloop_ctl_ops[i];
-+		if (!op->name) {
-+			pr_err("Invalid operation\n");
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+		if (!strncmp(buf, op->name, strlen(op->name)))
-+			break;
-+	}
-+
-+	if (count <= strlen(op->name))
-+		opts_buf = NULL;
-+	else
-+		opts_buf = buf + strlen(op->name);
-+
-+	ret = zloop_parse_options(&opts, opts_buf);
-+	if (ret) {
-+		pr_err("Failed to parse options\n");
-+		goto out;
-+	}
-+
-+	switch (op->code) {
-+	case ZLOOP_CTL_ADD:
-+		ret = zloop_ctl_add(&opts);
-+		break;
-+	case ZLOOP_CTL_REMOVE:
-+		ret = zloop_ctl_remove(&opts);
-+		break;
-+	default:
-+		pr_err("Invalid operation\n");
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+out:
-+	kfree(opts.base_dir);
-+	kfree(buf);
-+	return ret ? ret : count;
-+}
-+
-+static int zloop_ctl_show(struct seq_file *seq_file, void *private)
-+{
-+	const struct match_token *tok;
-+	int i;
-+
-+	/* Add operation */
-+	seq_printf(seq_file, "%s ", zloop_ctl_ops[0].name);
-+	for (i = 0; i < ARRAY_SIZE(zloop_opt_tokens); i++) {
-+		tok = &zloop_opt_tokens[i];
-+		if (tok->token == ZLOOP_OPT_ERR)
-+			break;
-+		if (i)
-+			seq_putc(seq_file, ',');
-+		seq_puts(seq_file, tok->pattern);
-+	}
-+	seq_putc(seq_file, '\n');
-+
-+	/* Remove operation */
-+	seq_printf(seq_file, "%s ", zloop_ctl_ops[1].name);
-+	seq_puts(seq_file, "id=%d\n");
-+
-+	return 0;
-+}
-+
-+static int zloop_ctl_open(struct inode *inode, struct file *file)
-+{
-+	file->private_data = NULL;
-+	return single_open(file, zloop_ctl_show, NULL);
-+}
-+
-+static int zloop_ctl_release(struct inode *inode, struct file *file)
-+{
-+	return single_release(inode, file);
-+}
-+
-+static const struct file_operations zloop_ctl_fops = {
-+	.owner		= THIS_MODULE,
-+	.open		= zloop_ctl_open,
-+	.release	= zloop_ctl_release,
-+	.write		= zloop_ctl_write,
-+	.read		= seq_read,
-+};
-+
-+static struct miscdevice zloop_misc = {
-+	.minor		= MISC_DYNAMIC_MINOR,
-+	.name		= "zloop-control",
-+	.fops		= &zloop_ctl_fops,
-+};
-+
-+static int __init zloop_init(void)
-+{
-+	int ret;
-+
-+	ret = misc_register(&zloop_misc);
-+	if (ret) {
-+		pr_err("Failed to register misc device: %d\n", ret);
-+		return ret;
-+	}
-+	pr_info("Module loaded\n");
-+
-+	return 0;
-+}
-+
-+static void __exit zloop_exit(void)
-+{
-+	misc_deregister(&zloop_misc);
-+	idr_destroy(&zloop_index_idr);
-+}
-+
-+module_init(zloop_init);
-+module_exit(zloop_exit);
-+
-+MODULE_DESCRIPTION("Zoned loopback device");
-+MODULE_LICENSE("GPL");
 -- 
 2.47.1
 
