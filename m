@@ -1,143 +1,92 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1DC21639C
-	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 13:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77C68472
+	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 13:49:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736430164; cv=none; b=C+KKIjjAEHF3MapB9O5xwNSoRW97YxJC3jlR3/wj7u6KoypaTg/o7z4fibSNv0H1rYKRqq9zuKCgKb0KPsfldvIBe9HwQQYNkW8Udp5oEdWfLtf/+E7t9x0Sov3zrA1mJI5YLHvQfNLFptC9ZLQ2F55UqP03BntXOvOZLOMi0JU=
+	t=1736430563; cv=none; b=pKWQ/mH2dXKm5KszLzmrwFv2Hc0MV51KNkS4ypHao7f0gAPn+p4mxbPVpfGnKn3EQnm9MPU51TMCHaMi4tzZyZuwBW0R8jjC50caWwNQwso9LKGY23zXd69cjf/QRqbp3jqz8EWXwgOe2tXZ8dJ1XxtR0QjNA4ONhmT30Iqp1ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736430164; c=relaxed/simple;
-	bh=D1tjE5WV0xVZYCiZTVJnAnSFOYdaDTE40svfqGvt1G0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dzz/okqfgJQZDafXJpO3ni6tbLVPxfPNSRNsozzeI1x+xXWZzA2ICaC6uqNMVYO30vMJmkD1332U/WOovSqPFILrVh5zQ+LS/JA9sjXKGZMhM/gYXV2sHeuxzdEOl/74LpyiD9njPeZzmpZxqadtmZOgJ+ih0JyEnmPdKb4vraI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K3nKA7Hq; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1736430563; c=relaxed/simple;
+	bh=TzJOsxj0dkWiwAK+ED7JYMUThliDNRG/ikqiR7rZxSU=;
+	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=Gh8YGAxXTzjyqreweVxvigorCJiSh2CqA9fSJVMOP2AFNJwsx0IoN6XK2Am2sryA037Tqg0f+ywmdns3X0ehSQXt6Ce76wTQ3dF8ZNRYftCuOjKpTHcySsXZZzxUYifY5ml/MB75N8b0KXdHOXkpl9YktIvgqqMTUoOnFjMLQK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KMe2+WH5; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K3nKA7Hq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KMe2+WH5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736430161;
+	s=mimecast20190719; t=1736430560;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tgu9dbtLOnj3MXP8lMoAJCySQHxuL505OovVfJN6VOY=;
-	b=K3nKA7HqQ6nYMotYCoaAPHIDHxNsRV792NkajE51kyJ97q/PEamGOw1ED/y45QAKJQVdae
-	U8OK4lDVA8OsAlgA13vrMh3zjaCxnDnwozcFwAuHC2nLZoWRhD/MAyQLalTWo7g/ioUMT2
-	eljkrFebNmVvIVJwyX/4TowII+9XYAQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-15-8f69VNWwNW-64PZHTBuzGw-1; Thu, 09 Jan 2025 08:42:40 -0500
-X-MC-Unique: 8f69VNWwNW-64PZHTBuzGw-1
-X-Mimecast-MFC-AGG-ID: 8f69VNWwNW-64PZHTBuzGw
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-436723db6c4so6260735e9.3
-        for <linux-block@vger.kernel.org>; Thu, 09 Jan 2025 05:42:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736430159; x=1737034959;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tgu9dbtLOnj3MXP8lMoAJCySQHxuL505OovVfJN6VOY=;
-        b=J9fqBpvCfszrfy9YcXk1k+E6eOWEs3neKa2t4lwTpkraei6L3GrtiPG7RP5zUjZeec
-         QA+RP+jyZEhgYV4hTq6/Yf1gImVM2ssJ+RtATEXFnImqtQ6hkCPHfp6lVO5Jc6gCtIWT
-         9Ypd7zR1N4vUIKAr+c/NJq5YS9aQMbocW8vnZJzDqKvqLWmCreYF9PnVFiJVa4n0HemJ
-         ujOPFj40a9+hjHip5uEm01xXhb4F7p5hduaasALxdxQj+749xqcO28zBzdCcyXOClMwP
-         j6jxZJDkWTqEyxvLMyzTQRq4KwEEjfNt8jPwWRY+3T14pQWaLwkvhXEd6ctlquYxLICk
-         Is/w==
-X-Forwarded-Encrypted: i=1; AJvYcCXu6jklP7IFpkPVpR9kFLvlJksGn31yvbyKwpnSdnVNN0arx0eBZAZxlhEWE2ooq6hjJhZxcc0qtChxiQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+6rv6vq5YvP+IJOJVvSnYoQed/Xfk/AjjYoD2aox9oJBwl8xF
-	R8TqR4o31BoDEdHv3uZG1gYyeGRui7XmsUdYy+qApHuxJDWjMQ8O9BoBSRdHViBqwHtBmINUaz7
-	3fK+VVyXCYwgs1vpopS65kgZ4c9Gz7hjZjR2dmS8tUvjp6EsFFhDoh8pLabOE
-X-Gm-Gg: ASbGncuFzPf3eMsySttE//JKcHkWv4mLr42qlhT6/hJ1+YayR+heMOiWy3q5uPAwSSI
-	vZ3BCCbqinB+wwqP+2Umd5Z7NovTuTvVTYzueKBcwSyXPhw7BJe+4cL4Vsu+JKvp0XDBhnoEL2/
-	12C2IO5GrWkZB9+99UHvsWDSB1zy2mKJaBw8WwCePC8fNSTybYaNLYdTVVlSu5gAFc+SWEjjPdo
-	SKSIxPTvkfuSgHRrFrbRhvYTo/YLMIMU9ZGEKlhvHjQ7AmCU0Q=
-X-Received: by 2002:a05:600c:4446:b0:434:f335:849 with SMTP id 5b1f17b1804b1-436e271cce0mr60626595e9.29.1736430159391;
-        Thu, 09 Jan 2025 05:42:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEWDZ/uz1Nn0qr7lYuRqwiS3nX0As1S7bC6v6LIqtZB2UDhqaEg4XL3T6juiTHl0iuzd3D6AA==
-X-Received: by 2002:a05:600c:4446:b0:434:f335:849 with SMTP id 5b1f17b1804b1-436e271cce0mr60626385e9.29.1736430158984;
-        Thu, 09 Jan 2025 05:42:38 -0800 (PST)
-Received: from redhat.com ([2a02:14f:175:d62d:93ef:d7e2:e7da:ed72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e9e37d3bsm21221385e9.31.2025.01.09.05.42.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 05:42:38 -0800 (PST)
-Date: Thu, 9 Jan 2025 08:42:34 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Andrew Boyer <andrew.boyer@amd.com>,
-	Viktor Prutyanov <viktor@daynix.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio Perez <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jens Axboe <axboe@kernel.dk>, virtualization@lists.linux.dev,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] virtio_blk: always post notifications under the lock
-Message-ID: <20250109083907-mutt-send-email-mst@kernel.org>
-References: <20250107182516.48723-1-andrew.boyer@amd.com>
- <7a4f03a0-9640-4d15-9f0d-4e1ceb82aa8c@linux.ibm.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=7M6JmV1Z4Feo1qwBbf8wulQga1EBG//Hepfi2cQMJUA=;
+	b=KMe2+WH51lM0VhFZcrl/e7ItOH8I41ENFASMEoACp/38K8KO37pZIy2UJCDd6t42pl8tfT
+	ww7i/XIrnUVegRAua1brTPdW1dJ2/qJF55CSth+AuCTvzUlK4UbIS0cKMs/sqpUCaWo5or
+	gXfPR5jZCiFFgYVwOn4PM8cEqoSjDkE=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-258-gtXbp26SP-uj9ipmOh2KlQ-1; Thu,
+ 09 Jan 2025 08:49:17 -0500
+X-MC-Unique: gtXbp26SP-uj9ipmOh2KlQ-1
+X-Mimecast-MFC-AGG-ID: gtXbp26SP-uj9ipmOh2KlQ
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 669A01955F43;
+	Thu,  9 Jan 2025 13:49:16 +0000 (UTC)
+Received: from [10.45.224.27] (unknown [10.45.224.27])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AD2BF19560AD;
+	Thu,  9 Jan 2025 13:49:14 +0000 (UTC)
+Date: Thu, 9 Jan 2025 14:49:11 +0100 (CET)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+    Jens Axboe <axboe@kernel.dk>
+cc: dm-devel@lists.linux.dev, linux-block@vger.kernel.org
+Subject: [PATCH] dm: disable REQ_NOWAIT for flushes
+Message-ID: <79cd51da-2546-de7e-86e1-be6a835721e2@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7a4f03a0-9640-4d15-9f0d-4e1ceb82aa8c@linux.ibm.com>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Thu, Jan 09, 2025 at 01:01:20PM +0100, Christian Borntraeger wrote:
-> 
-> 
-> Am 07.01.25 um 19:25 schrieb Andrew Boyer:
-> > Commit af8ececda185 ("virtio: add VIRTIO_F_NOTIFICATION_DATA feature
-> > support") added notification data support to the core virtio driver
-> > code. When this feature is enabled, the notification includes the
-> > updated producer index for the queue. Thus it is now critical that
-> > notifications arrive in order.
-> > 
-> > The virtio_blk driver has historically not worried about notification
-> > ordering. Modify it so that the prepare and kick steps are both done
-> > under the vq lock.
-> > 
-> > Signed-off-by: Andrew Boyer <andrew.boyer@amd.com>
-> > Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-> > Fixes: af8ececda185 ("virtio: add VIRTIO_F_NOTIFICATION_DATA feature support")
-> > Cc: Viktor Prutyanov <viktor@daynix.com>
-> > Cc: virtualization@lists.linux.dev
-> > Cc: linux-block@vger.kernel.org
-> > ---
-> >   drivers/block/virtio_blk.c | 19 ++++---------------
-> >   1 file changed, 4 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > index 3efe378f1386..14d9e66bb844 100644
-> > --- a/drivers/block/virtio_blk.c
-> > +++ b/drivers/block/virtio_blk.c
-> > @@ -379,14 +379,10 @@ static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
-> >   {
-> >   	struct virtio_blk *vblk = hctx->queue->queuedata;
-> >   	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
-> > -	bool kick;
-> >   	spin_lock_irq(&vq->lock);
-> > -	kick = virtqueue_kick_prepare(vq->vq);
-> > +	virtqueue_kick(vq->vq);
-> >   	spin_unlock_irq(&vq->lock);
-> > -
-> > -	if (kick)
-> > -		virtqueue_notify(vq->vq);
-> >   }
-> 
-> I would assume this will be a performance nightmare for normal IO.
+REQ_NOWAIT for flushes cannot be easily supported by device mapper
+because it may allocate multiple bios and its impossible to undo if one
+of those allocations wants to wait. So, this patch disables REQ_NOWAIT
+flushes in device mapper and we always return EAGAIN.
 
-Indeed.
-AMD guys, can't device survive with reordered notifications?
-Basically just drop a notification if you see index
-going back?
+Previously, the code accepted REQ_NOWAIT flushes, but the non-blocking
+execution was not guaranteed.
 
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
 
--- 
-MST
+---
+ drivers/md/dm.c |    9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+Index: linux-2.6/drivers/md/dm.c
+===================================================================
+--- linux-2.6.orig/drivers/md/dm.c	2025-01-08 17:26:52.000000000 +0100
++++ linux-2.6/drivers/md/dm.c	2025-01-08 17:44:59.000000000 +0100
+@@ -1968,6 +1968,15 @@ static void dm_split_and_process_bio(str
+ 
+ 	/* Only support nowait for normal IO */
+ 	if (unlikely(bio->bi_opf & REQ_NOWAIT) && !is_abnormal) {
++		/*
++		 * Don't support NOWAIT for FLUSH because it may allocate
++		 * multiple bios and there's no easy way how to undo the
++		 * allocations.
++		 */
++		if (bio->bi_opf & REQ_PREFLUSH) {
++			bio_wouldblock_error(bio);
++			return;
++		}
+ 		io = alloc_io(md, bio, GFP_NOWAIT);
+ 		if (unlikely(!io)) {
+ 			/* Unable to do anything without dm_io. */
 
