@@ -1,116 +1,156 @@
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFB9A35
-	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 13:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912BC290F
+	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 14:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736430743; cv=none; b=FxAQM0HzAVIZVel+1deuARRMmricMpSmTFtENKvsn1qf2Ws3lTrfHZi7/7dCOdp2c6+Q2agUrhs5zqjAQ6ARGtd2AZXNeELpPoYXMPDyZnhzvHftuFOzIK4HQx6Nndg/lMZ4HTJWeODs3+0dgZ94ZTvS1VKVCIj65RRpnTf0kdY=
+	t=1736432240; cv=none; b=ganjdcS+c25gT1BJgDURwDanUclhP2hn3BtscwU6QrgLGHtSMhaXI2zP7I0gSlf4HG1sWDq4Y4gnfndGHQ2MBbow4Wvv+ASny0CBCUwnjE+mnEQTsml9SjYLUafDZG2X3ggPBA2l2nzUwYgmSukVeM1lza7aeojGkeaHNx0kJk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736430743; c=relaxed/simple;
-	bh=vJEWTB1+EZZjDYmSpItqMEBTLhhMZBkDvxVvhsQPPio=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WO2KX44OwLnCmXESP4KRNFil5fBMysmJDduVp1nqgACJ82uBa6g4IQGbG9E0dZ2v16v3cjRhhfUfBdWfjtfS+0mz/JMVJ7Gl2iUWIk9AR5Xg6BAbMly5R9Mbyt5lhC+d/MW1B88kdxQ2+aOtSlbDSUFtTPSF4gJeDBe8BXPkYPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ij75ITBO; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1736432240; c=relaxed/simple;
+	bh=HAhE1AD83wdqoRBDAiaKCKYh6ZJDcT/I9ng8cQ86JmQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=utqlZtBCfsJNTanDa/jiXXswcDdR1uUuinoKu0eC7xCG5QvuQNGi3FTE4q3E4Y1kPahJmz3z82GnD3ahBnTBdbsT7LvOOO5BfaTkgFJeJRZysTUNr3/Guf5ZVaxU61toCuRNkSgR3He5/A3BfDL5e37b+qLFmkOK8kWVdBFKSus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j73PAeno; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ij75ITBO"
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-844ee166150so28495039f.2
-        for <linux-block@vger.kernel.org>; Thu, 09 Jan 2025 05:52:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j73PAeno"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2ef8c012913so1312320a91.3
+        for <linux-block@vger.kernel.org>; Thu, 09 Jan 2025 06:17:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736430741; x=1737035541; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lq1DFjqIwAfO5pylU4M+ORRtpviizlgmxklm3SmoyUE=;
-        b=ij75ITBOI0KfwWjTtAe50GVj8afQeEdxBPScty7WUnxmRcUSIrKl9+r3Rv5GU9/gKS
-         f6DAFo5XxO8NlxvdlRxDDIJhgcFb7UuXiqEHX2YKZZQCAEGtgCp56i7oaKyUjLpgn0dP
-         Ekdl5w5k1mUViN3y4hPpKcPVDp3FKkiH552eoxXoOamzH6SFqUMJj6R2xp0d3J6f45ga
-         8xQLhuB3A6D9EVYCBzA7wuCXKBxo8gtJCvRUPuJXitEExYv9YkGGFxz5V6yywui90SSU
-         2u4/hNYFkH463tTV3ytDlFNpR9SkQy+/55fs0dbzhCpLbBPcsH1ccZW6RsLjiZjD+PXe
-         a/kQ==
+        d=gmail.com; s=20230601; t=1736432238; x=1737037038; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GeZi1HN9XgZY2RYtJxTtjcc5xHVEtKCTqeUFBHqXqM4=;
+        b=j73PAenoZ1k7OWT3dLmz/o7hVeSf2oNH2KB7ZPbot09zMy1p3vSHmKZqfGXjh96i0w
+         ThH3ub4SYLqF4vLOJTuhLb9N3E+TBt7pAexkq4TvU0IccK394BmrMV0d1HoNGxS7fBXk
+         MhK4gtR/B8PaWIPkE+cWVoKsgisVVqkN2L1PZznFfqEb2EYGwY5liWh8pw6r6iWEQ9MC
+         AlF1drgg8trDkJ7igoi5+5UvXIyjXivygbUM2uZQb+e0VOsyYqJzNidJWMTPH6LWU1xC
+         HsgAylLqEHExL7XEsAgXixeYmQLL3n8Y2+Hbf7HSFzwdPI971ae0zXJ3fW5ym24bQVWP
+         ynGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736430741; x=1737035541;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lq1DFjqIwAfO5pylU4M+ORRtpviizlgmxklm3SmoyUE=;
-        b=MkNvrhrXdr/kc/nVZT/4ElEWuoBv6a/TJuFSDmcok1Q+8kp7TI5tmViCkRttgbbTWE
-         Uj1tvkZtXrczUxbtF1J7ZuCLF3hTZDWMpy7cKHv42Az73/rMpiKz7kmx3H0c3gDFl4Gy
-         NYwPPi3wMxUD0E7Pqq5wr7jOLS6JZGRcTd++gis5gUFHcDJq+/K64ZYNxXIVqVvQjakW
-         jVEvFghyAw/eLBqeyDocX0NX2z7AP/L8t2S5sHK33CsvJXR53OndQuulNTOaGa7RyF8x
-         fopNifdoxHNDKMmnzQ/zeLqLz4RFTIJV72vl6kGqUAcu3pMhCMGszXkRn4wL7UlzZvgs
-         EUcQ==
-X-Gm-Message-State: AOJu0YyOaWYIK5QIZjOZPUjywx1L5QryZgVz0UCxmTX08fh4t9brzTj+
-	IDsicFloDLGYX7fYmTGX3ePqn/+ey+HApqgRbs+9PJkM9BNm8e/Mjf+iU6pWWxA=
-X-Gm-Gg: ASbGncswLCoF89/rziUzXH+zbO1p4o5SUyJKIdy2R60mVHQXDhCg8GGmmQNegwf07UB
-	HnpbdSL6GEKVgsona2IzVIdcbge02SvpZq1HVMUr9C8mmOgBw0/Ny55YaLBd3FvP9Z3tDAma9AD
-	ZJMb2dq+c8ei05Uwi+5g6n4Q08PnKvQHRQOeGFdPlEyqlHHJMR4NZzUigPoKmG2zWVZA8nqhCQt
-	7qYYGzZ0FmabZHkSSrmkUI3udHRtwOPCE9mD1aIuC2CtacIz/lbuw==
-X-Google-Smtp-Source: AGHT+IEM8tk74VfLplBGsRxJ8ZqPpDWsUS022H5w9VjhpwnJBHLvmHAu99yrEAyTAct+QPK2R4wAfw==
-X-Received: by 2002:a05:6602:3787:b0:843:ea9a:acc4 with SMTP id ca18e2360f4ac-84ce01254c3mr667578039f.8.1736430740780;
-        Thu, 09 Jan 2025 05:52:20 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-84d4fb5c075sm32143839f.30.2025.01.09.05.52.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jan 2025 05:52:20 -0800 (PST)
-Message-ID: <89f3fc0e-ea04-4b29-a79e-5d2f2ef7af6a@kernel.dk>
-Date: Thu, 9 Jan 2025 06:52:19 -0700
+        d=1e100.net; s=20230601; t=1736432238; x=1737037038;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GeZi1HN9XgZY2RYtJxTtjcc5xHVEtKCTqeUFBHqXqM4=;
+        b=SrILXWMgFZ9HRp0Hfr8LcGlCthxTDSZomOZfN1Tg72dXhbKdo8AII+vYSDbkeJSUu/
+         Ma/vaGV01HdMbLYxD8fM9XEIjVCFHcvutx69Du/OgQcJfwNCDJEiGBPbHAxRciDkBJYY
+         8zH2Ez44HQG0ryLhgPCKmwLhffqctiiAwsHy6OyhBZuNasQkxBO7j8AKqTPU7Syvwq+r
+         iwCq8iXot8vNBFl2/2eBfMXQiX4rKEqKNt2C+K+i0mdhNM1b/TZ96OeHNH9UWszmHH18
+         4YPYK46h/Usm7DE1zWP7Yxa56WbPvaWnMGSMPD+dnx6rPQHQLVNuDXgFbQHPSPGx8Iqc
+         zG/w==
+X-Gm-Message-State: AOJu0YwGzOHrU3TrwW2wCxcTIVw2mwrx96lt5g9wYvsWSjqnCVnXSyQd
+	jL/t9DnEw6QhusOVeO9iMIU57UOzNetTiivrLsEWBcUZRLcOa0Wk8IKPbeFXgvxOQbMI378Xuxu
+	9WeTZkNytHjH03j5dLONi2as99Qg=
+X-Gm-Gg: ASbGncsCYZlp/1jGo6YaPBTtPscOw27IdoslRyMlsFNnOWP4eXfdKimN0gwz1wjHYzJ
+	mmy0vgfsyQBqKeGqLnqxAgcVEdN+af1dwMShEpmY=
+X-Google-Smtp-Source: AGHT+IH/zoFssunbUa/I62GF+1omygqIrLA/4t01uYb/cYV+9K9jhgTFBSjixqu/3JMnm9a49c7JYaAJMMq6lBRCz3w=
+X-Received: by 2002:a17:90a:d648:b0:2ef:1134:e350 with SMTP id
+ 98e67ed59e1d1-2f548f4273amr10424729a91.35.1736432237556; Thu, 09 Jan 2025
+ 06:17:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block, bfq: fix waker_bfqq UAF after bfq_split_bfqq()
-To: Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- yi.zhang@huawei.com, yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20250108084148.1549973-1-yukuai1@huaweicloud.com>
- <odhd37amhss2kfhniix2jzy4crg4fb2d7u6qdwplevyiegb6rm@f4fqrg4vebls>
- <db7c26e0-c6b3-c4cf-afa9-557b2841cb69@huaweicloud.com>
- <syxzk4eauh3zzs37y6eirzlblp5lin6wyrpanw2mleliyj6cnr@2y3a7hrnet2o>
-From: Jens Axboe <axboe@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <syxzk4eauh3zzs37y6eirzlblp5lin6wyrpanw2mleliyj6cnr@2y3a7hrnet2o>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CAOBGo4xx+88nZM=nqqgQU5RRiHP1QOqU4i2dDwXt7rF6K0gaUQ@mail.gmail.com>
+ <20250109045743.GE1323402@mit.edu>
+In-Reply-To: <20250109045743.GE1323402@mit.edu>
+From: Travis Downs <travis.downs@gmail.com>
+Date: Thu, 9 Jan 2025 11:16:41 -0300
+X-Gm-Features: AbW1kvZmwsXAFazhkNdZ3ASGoMqtSmC5uaUo_xRtTP_haMS6ji30Uj6GC_VFbDY
+Message-ID: <CAOBGo4w88v0tqDiTwAPP6OQLXHGdjx1oFKaB0oRY45dmC-D1_Q@mail.gmail.com>
+Subject: Re: Semantics of racy O_DIRECT writes
+To: "Theodore Ts'o" <tytso@mit.edu>
+Cc: linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/9/25 1:50 AM, Jan Kara wrote:
-> On Thu 09-01-25 09:32:08, Yu Kuai wrote:
->> Hi,
->>
->> ? 2025/01/08 22:42, Jan Kara ??:
->>>
->>>
->>>>   			 */
->>>>   			if (bfqq_process_refs(waker_bfqq) == 1)
->>>>   				return NULL;
->>>> -			break;
->>>> +
->>>> +			return waker_bfqq;
->>>
->>> So how do you know bfqq_process_refs(waker_bfqq) is not 0 in this case?
->>
->> Because in this case, waker_bfqq is in the merge chain of bfqq, and bfqq
->> is obtained frm the current process, which means waker_bfqq should have
->> at least one process reference that is from current thread.
-> 
-> Ah, right. Thanks for explanation. The except for the typo the patch looks
-> good to me. Feel free to add:
-> 
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> 
-> (although I can see Jens has already picked up the patch so probably this
-> is immaterial).
+On Thu, Jan 9, 2025 at 1:57=E2=80=AFAM Theodore Ts'o <tytso@mit.edu> wrote:
+>
+> Don't do that.  Really.
+>
+> First of all, your program might need to run on OS's other than Linux,
+> such as Legacy Unix systems, Mac OS X, etc, and officially, there is
+> zero guarantees about cache coherency between O_DIRECT writes and the
+> page cache.  So if you use O_DIRECT I/O and buffered I/O or mmap
+> access to a file.... all bet are off.
 
-Still useful! The patch has a link to this thread, so it's still
-connected even if the commit itself isn't updated. Though with the typo
-in process, I'm kind of pondering just amending the commit and then I'll
-add your reviewed-by as well. But usually I don't, but still appreciate
-reviews after it's been queued.
+Thanks Theodore for your comprehensive reply. I probably was not very
+clear in the way I posed my question. To clarify:
 
--- 
-Jens Axboe
+ - There is only one process involved here making all the writes
+ - We do only O_DIRECT reads and writes, so I don't expect the page
+   cache to be involved in the usual case (but we can't exclude it entirely=
+).
+ - So the question is large about the possible outcomes of doing a zero-
+   copy O_DIRECT write (where the block driver will ultimately be reading
+   directly from the pages allocated by and passed to the kernel by the
+   userspace application) in the situation where a portion of the the passe=
+d
+   pages are modified in a racy way by the userspace application by a
+   subsequent O_DIRECT write.
+
+> By definition O_DIRECT I/O bypasses the page cache, so if there is a
+> copy of the file's data block in the page cache, for some
+> implementations of some OS's the page cache might contain the previous
+> stale version of the block, so buffer reads might not have the updated
+> copy reflected by the O_DIRECT write.  And if the page is mmap'ed into
+> some process's address space, and the process dirties that page, that
+> page will get written back to the disk, potentially overwriting
+> O_DIRECT write.
+>
+> Linux will make best efforts to maintain cache coherency between
+> O_DIRECT and the page cache.  It does that by writing out the page in
+> the page cache if it is dirty, and then evicting the the page from the
+> page cache.  In practice this will be good enough to keep programs
+> like a database which locks the database so it can take a consistent
+> snapshot, and then does the backup via buffered write, when the
+> database normally uses O_DIRECT for its transactions, it will work ---
+> since if the database wasn't locked while taking the backup, it would
+> be completely a mess, and the O_DIRECT vs page cache coherency is the
+> *least* of your worries.
+
+Note that we run only on Linux and are heavily tied to the details of linux
+AIO and io_uring, so an "Linux only" response is fine. I am quite sure that
+after an O_DIRECT write completes, a subsequent read through any
+Linux API is going to return the newly written value, not a stale value fro=
+m
+the page cache.
+
+>
+> But in general, don't mix bufered/mmap and O_DIRECT I/O to the same
+> file.  Just don't.  It might work, but remember that raison d'etre for
+> O_DIRECT is performance in support of databases and storage systems
+> where developers Know What They Are Doing(tm) and Follow The
+> Rules(tm).  Linux's cache coherency is best efforts only (and other
+> OS's might not even bother), and database developers and sysadmins
+> would be sad if we compromised O_DIRECT perforance just to make things
+> 100% safe for people want to do things which are breaking the rules.
+
+This is us, we know what we are doing and are writing a database-like
+product. We are heavy users of AIO and in fact many of the discussions
+of AIO and O_DIRECT behavior here on the LKML and elsewhere are
+driven by users of the same framework we use (seastar), so you can
+consider us expert users from that point of view.
+
+>
+> If you like breaking rules, don't use O_DIRECT.  You'll be happier for
+> it, as will hapless future users of your programs.  :-)
+>
+> Remember, good programs are maintainable and portable.  What if some
+> one attempts to take your programs and tries to make it work on MacOS?
+
+Fair enough. In our case, we are writing a high-performance, clustered even=
+t
+store (Redpanda) which is a piece of infrastructure with very little demand
+to run on anything other than Linux, except for "dev" scenarios, where
+emulation is suitable. We make heavy use of aio (later, io_uring) and tune
+for specific kernel features like RWF_NOWAIT, etc.
+
+Thanks again,
+Travis
