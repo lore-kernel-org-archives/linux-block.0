@@ -1,83 +1,181 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586FA747F;
-	Thu,  9 Jan 2025 18:27:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E9919D880
+	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 18:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736447255; cv=none; b=ZHbfNG4FV8aHggQqM/dYR+cjx1VT5n1+mSMmyyb+bREEuPcfqA5zI8XNhiWmN00ncPCj3fcacSBVJOKsq3UCwGZv7cJ0Wh2+m1SPhofBawSndXwOPIx2mFzSrr1YCdfRK6FFwr9KMHy0xPmOFU/LGZuTNFIV4CJCqiFbuV+lTtY=
+	t=1736448627; cv=none; b=aEDh/M0zvwMQ3RqHFCk3awWUZ+5pNri0cgYodb6B88yXSQHABbuOqbmAnko9CCnWALepmzbpXTRqPoX1z3muQblAyuGQEL7zfQQNLOi1698edPBmFi/V8IPKB+BXOZZxjc67WJf0QQ42UhUSQLhIKB6FoZ77LEF3PQcZrX7jsGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736447255; c=relaxed/simple;
-	bh=Fs8V4twkvk7tBlRqTJ3la6qhRiYYNbCMyra3K2Ht4fA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U18bSn3Tox4H3xGrkr1SHO4T47XwGC1zoUf7L2+pWTO6fq7+y4PYsB7l25NKR+xLxGn8vfmOM8R1fUZLkhiCcYQQyHxMZbXmAuEK4JLdL4My59w4isToZFLYIJej3Y6rXEOA+gdjIQI1Y5a6h/SNXu8O9L8GegDwWMTFB5fROVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IKsnRn9t; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IKsnRn9t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32312C4CED2;
-	Thu,  9 Jan 2025 18:27:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736447254;
-	bh=Fs8V4twkvk7tBlRqTJ3la6qhRiYYNbCMyra3K2Ht4fA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IKsnRn9tgf6bkHGuyCYIhEtGjOs3/JOEQ3xCFVM1fXm2hbf3MZqFxPNTP8m4kGsG7
-	 XDcYq9nDfUtKOL3VGzLOkqDzmlHA4OoJzV5dkVkKOFbQWSFZYeE8JVKIs+R9kkE3wK
-	 fZU58ILbdCY+lIxowE6myw1RGBLRMLGMTMOCsOkvBL+ea9pUwT0SkRuCx01d6ZhjGe
-	 GxlWHW/acd33Oy9n3Z8JNrlJGNUVUrV17bZ/ZuuiqtoVU9gR66wCbpemQBELfl4if8
-	 F0ocnGq7ho2LdG++gMPHV5OYYuRGslDQn+m5h6pceBc8/ntrcG04ZoTuTpkD7UgIi1
-	 j84aHqfEfEX5w==
-From: Bjorn Andersson <andersson@kernel.org>
-To: linux-block@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org,
-	linux-mmc@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Cc: Adrian Hunter <adrian.hunter@intel.com>,
-	Alim Akhtar <alim.akhtar@samsung.com>,
-	Avri Altman <avri.altman@wdc.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	"James E . J . Bottomley" <James.Bottomley@HansenPartnership.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>
-Subject: Re: (subset) [PATCH v10 00/15] Support for hardware-wrapped inline encryption keys
-Date: Thu,  9 Jan 2025 12:27:30 -0600
-Message-ID: <173644724820.201886.13724110526590928756.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241213041958.202565-1-ebiggers@kernel.org>
-References: <20241213041958.202565-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1736448627; c=relaxed/simple;
+	bh=H4CZjOmYC0NCec9umLKhSOFtV8cwSdEMnaok6rz7QWY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Q/BT7mRwCHZDa9+pB9KaaHNrrpIPHMjP7BYGfl7riJnzR8AS2Bf2XwRgBGAc3la1wJ9pLjy75GaTjIHk+a2U8aXEUfqBNHHRN2qnJvoWOvDCIhinf9n7BJOf3cY3PZFZwJVUgd+Viij6+HU0OJoGCSu7Gkbsb7vlgAR6HLfjO7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a9cc5c246bso10682985ab.2
+        for <linux-block@vger.kernel.org>; Thu, 09 Jan 2025 10:50:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736448625; x=1737053425;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=THYoIrGbXFYQttYPv4IJLSufIMQMNQ+423rhjxYwkV8=;
+        b=ul15pmLFoPlMkPyEC238dx8yk6QggAmxEpPLa2ZH1+8W40S0OpBHceYjxtx0qJT+BO
+         jZw/86cg5pieZ8+ma5wiXlvfssktfak2Y1oRjVr0Y1iyRM9Mg5M4N52Oqdq8cVDyd8Qu
+         jsIdqUSpyBahsvb4viauVUU9VOg7agaSkksUX9UzOAl7bR74KXAZ3wSGiNRT6GY2PelI
+         c8F0RRUg/ClJAg7OOc29sdrZL61BH9k26pmVu5qLIpnLERuYZUOxmKmfHBbrvDmX0Zoq
+         boJ2EdFXbauSv5tNEtUn1gNogRSWvbYfH3sw4FOeuFRlxYSpvbhE2OOMM+f1ZFJrbEQg
+         r7Dw==
+X-Forwarded-Encrypted: i=1; AJvYcCU68L6BNN+mrasLvh1qkFIfQXrai9E0uMJ8vOgNPoq3aL+g1ASyDWmoCgjLfNdc0ln4hRblMKDDT23iYw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YywjVGNJBZVPTcgq3VYiqPoM5hr4G1hryNv5FyTJUx6YzMAWmwu
+	awRn/SRUZfV9dT0L1nqqZln8XyA2XtIX17NTmEd1JKkY1FwVpPhe040TgasmAn+gq5Cf4hSXFTS
+	CaVfFdk8lWjB/HWrX4JwG/27FYFAf5dJ2AXqaIp5ksz9hZbpy6m4EMgE=
+X-Google-Smtp-Source: AGHT+IG/azm/OO33COTH/MEAo0RdCfHPpAZlNgKdXxjIsa/+yeH1um3lJpzaQofHUUWxZ47B38A4e9hntmQgP5Pg0WF6opMEY6HW
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1524:b0:3a7:764c:42fc with SMTP id
+ e9e14a558f8ab-3ce3aa761famr61729735ab.21.1736448625031; Thu, 09 Jan 2025
+ 10:50:25 -0800 (PST)
+Date: Thu, 09 Jan 2025 10:50:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67801a71.050a0220.25a300.01cb.GAE@google.com>
+Subject: [syzbot] [ext4?] [udf?] [block?] kernel BUG in set_blocksize (2)
+From: syzbot <syzbot+c6e047750c7e8603508b@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, jack@suse.com, linux-block@vger.kernel.org, 
+	linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    ab75170520d4 Merge tag 'linux-watchdog-6.13-rc6' of git://..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1178d418580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ba7cde9482d6bb6
+dashboard link: https://syzkaller.appspot.com/bug?extid=c6e047750c7e8603508b
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11556edf980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/205ade41622a/disk-ab751705.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/39aa1b893dfc/vmlinux-ab751705.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c741f4e4b082/bzImage-ab751705.xz
+mounted in repro #1: https://storage.googleapis.com/syzbot-assets/512e46aed82f/mount_0.gz
+mounted in repro #2: https://storage.googleapis.com/syzbot-assets/1952d0d2f4a4/mount_3.gz
+mounted in repro #3: https://storage.googleapis.com/syzbot-assets/dc175c44b2d4/mount_7.gz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c6e047750c7e8603508b@syzkaller.appspotmail.com
+
+ folios_put_refs+0x76c/0x860 mm/swap.c:962
+ free_pages_and_swap_cache+0x2ea/0x690 mm/swap_state.c:332
+ __tlb_batch_free_encoded_pages mm/mmu_gather.c:136 [inline]
+ tlb_batch_pages_flush mm/mmu_gather.c:149 [inline]
+ tlb_flush_mmu_free mm/mmu_gather.c:366 [inline]
+ tlb_flush_mmu+0x3a3/0x680 mm/mmu_gather.c:373
+ tlb_finish_mmu+0xd4/0x200 mm/mmu_gather.c:465
+ exit_mmap+0x496/0xc20 mm/mmap.c:1681
+ __mmput+0x115/0x3b0 kernel/fork.c:1348
+ exit_mm+0x220/0x310 kernel/exit.c:570
+ do_exit+0x9ad/0x28e0 kernel/exit.c:925
+ do_group_exit+0x207/0x2c0 kernel/exit.c:1087
+ get_signal+0x16b2/0x1750 kernel/signal.c:3017
+ arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:337
+ exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0xce/0x340 kernel/entry/common.c:218
+ do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+------------[ cut here ]------------
+kernel BUG at mm/filemap.c:2114!
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 0 UID: 0 PID: 7712 Comm: syz.3.780 Not tainted 6.13.0-rc5-syzkaller-00163-gab75170520d4 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:find_lock_entries+0xb8a/0xbb0 mm/filemap.c:2113
+Code: 30 c7 ff 4c 89 ff 48 c7 c6 e0 aa 13 8c e8 5e a8 0e 00 90 0f 0b e8 26 30 c7 ff 4c 89 ff 48 c7 c6 c0 a4 13 8c e8 47 a8 0e 00 90 <0f> 0b e8 0f 30 c7 ff 4c 89 ff 48 c7 c6 a0 ad 13 8c e8 30 a8 0e 00
+RSP: 0018:ffffc9000c6f73c0 EFLAGS: 00010246
+RAX: dd31507b3d2b8c00 RBX: ffffc9000c6f7840 RCX: ffffc9000c6f6f03
+RDX: 0000000000000002 RSI: ffffffff8c0aaae0 RDI: ffffffff8c5edd60
+RBP: ffffc9000c6f7510 R08: ffffffff901856b7 R09: 1ffffffff2030ad6
+R10: dffffc0000000000 R11: fffffbfff2030ad7 R12: 0000000000000080
+R13: 0000000000000001 R14: ffffea0000d32180 R15: ffffea0000d32180
+FS:  00007fce2da676c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f78b6e0f000 CR3: 0000000077012000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ truncate_inode_pages_range+0x23b/0x10e0 mm/truncate.c:322
+ kill_bdev block/bdev.c:91 [inline]
+ set_blocksize+0x2f1/0x360 block/bdev.c:172
+ sb_set_blocksize+0x47/0xf0 block/bdev.c:181
+ udf_load_vrs+0xe6/0x1130 fs/udf/super.c:1998
+ udf_fill_super+0x5eb/0x1ed0 fs/udf/super.c:2192
+ get_tree_bdev_flags+0x48c/0x5c0 fs/super.c:1636
+ vfs_get_tree+0x90/0x2b0 fs/super.c:1814
+ do_new_mount+0x2be/0xb40 fs/namespace.c:3507
+ do_mount fs/namespace.c:3847 [inline]
+ __do_sys_mount fs/namespace.c:4057 [inline]
+ __se_sys_mount+0x2d6/0x3c0 fs/namespace.c:4034
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fce2cb874ca
+Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb a6 e8 de 1a 00 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fce2da66e68 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
+RAX: ffffffffffffffda RBX: 00007fce2da66ef0 RCX: 00007fce2cb874ca
+RDX: 0000000020000c40 RSI: 0000000020000c80 RDI: 00007fce2da66eb0
+RBP: 0000000020000c40 R08: 00007fce2da66ef0 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000020000c80
+R13: 00007fce2da66eb0 R14: 0000000000000c40 R15: 000000002000b240
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:find_lock_entries+0xb8a/0xbb0 mm/filemap.c:2113
+Code: 30 c7 ff 4c 89 ff 48 c7 c6 e0 aa 13 8c e8 5e a8 0e 00 90 0f 0b e8 26 30 c7 ff 4c 89 ff 48 c7 c6 c0 a4 13 8c e8 47 a8 0e 00 90 <0f> 0b e8 0f 30 c7 ff 4c 89 ff 48 c7 c6 a0 ad 13 8c e8 30 a8 0e 00
+RSP: 0018:ffffc9000c6f73c0 EFLAGS: 00010246
+RAX: dd31507b3d2b8c00 RBX: ffffc9000c6f7840 RCX: ffffc9000c6f6f03
+RDX: 0000000000000002 RSI: ffffffff8c0aaae0 RDI: ffffffff8c5edd60
+RBP: ffffc9000c6f7510 R08: ffffffff901856b7 R09: 1ffffffff2030ad6
+R10: dffffc0000000000 R11: fffffbfff2030ad7 R12: 0000000000000080
+R13: 0000000000000001 R14: ffffea0000d32180 R15: ffffea0000d32180
+FS:  00007fce2da676c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f78b6e0f000 CR3: 0000000077012000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
 
-On Thu, 12 Dec 2024 20:19:43 -0800, Eric Biggers wrote:
-> This patchset is based on next-20241212 and is also available in git via:
-> 
->     git fetch https://git.kernel.org/pub/scm/fs/fscrypt/linux.git wrapped-keys-v10
-> 
-> This patchset adds support for hardware-wrapped inline encryption keys, a
-> security feature supported by some SoCs.  It adds the block and fscrypt
-> framework for the feature as well as support for it with UFS on Qualcomm SoCs.
-> 
-> [...]
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Applied, thanks!
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-[08/15] firmware: qcom: scm: add calls for wrapped key support
-        commit: 1d45a1cd9f3ae849db868e07e5fee5e5b37eff55
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
