@@ -1,61 +1,45 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7CB8F5E
-	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 02:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A551AAC9
+	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 04:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736389124; cv=none; b=TaDmDsATp8g+LgpN1H6rvlyQUddVG5+SlC6XY8XSHPCdiEZmK8t7TLJIVSSDOI33Ugy86bRv0vkuKaoHQkuPEtFNwu1WHlwWJY6SySFuChIvrNqRTNhRw0szddTLDLsFEbMVR1EpsV/5QatvHTbTeU7mrnlHE6yF2CgrJUd3V6A=
+	t=1736398677; cv=none; b=FGMDI2ESIclELHnrbH0q5ugrgCks7C5xarwPX3VssTBaV+yYMRx0r0p7N4x4WqjWRrhEDmlVO75sjLihTHFeuNAWajVHXnWxJTm6JMao2Fv1Bg5du0OiAaMKM+2zCjJ4BSqotlWLNiJk+CMk8nRH1IrjSBhxFQ/TcwrmA3PxEWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736389124; c=relaxed/simple;
-	bh=blSjv22Y11SbJylCWcSMLd+PbMLZEcWCTOWjZ1C3fQk=;
+	s=arc-20240116; t=1736398677; c=relaxed/simple;
+	bh=+L51x9xUqGjUS62qW1huHmOORbzTw1amS4/WdPbPoOs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DYlPYCj11i5R2QNp6XKGuQ6Mf5GfrGrOqkhHvUI8zGKXK7qxxmjVIK0PQBUH3NVRPqwVtcOWzyDdBIfOA9KH2ONpXN80M9+dEWyd7oIgKWJGtQX0WOr++yv6b8MnKlcW+hzbKVRPX2QD4rnV3afHCSesOPezCzroI7x34DHcbZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UHoSDBN/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=jl8/mr93cfwORFcWVp5s/51FLuAJ9KxxeUR8XB0dsVOYAMa4jurb0L+LoSnW24HAvoaJf4ettkK8P83Rwe/Y6GSFYLjXcFCrfWYjaO4twRqyiYq8sZ6PemksYI4t4v7HGathrYc8hCFRV/nyt5DaYFrsTDSIGI+oDX9ljLz1H5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=NY85Vf8a; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UHoSDBN/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736389121;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NI/7sQZJsUB7MRKETVbNrqqCnlEl+xyWkxCJ71vt8Ik=;
-	b=UHoSDBN/HXxz+81j5QNrM5UI6LXUSRKdTchg+edAL0fNZLeMQ5aiB/as6g8Vs52IBkibXY
-	mj+5HAXFTrGquLVcTwWIzWUylF2qWSZKyvTZIoufUgpTCP8tc+NLVfrKPrYgbc9emuGDnD
-	ntjT7+QYEikpKOYDc/snESuAGMR6liA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-357-7FSoSldJMXm3ogIjfdzqow-1; Wed,
- 08 Jan 2025 21:18:37 -0500
-X-MC-Unique: 7FSoSldJMXm3ogIjfdzqow-1
-X-Mimecast-MFC-AGG-ID: 7FSoSldJMXm3ogIjfdzqow
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E3DF5195608B;
-	Thu,  9 Jan 2025 02:18:34 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.23])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8EB1419560AD;
-	Thu,  9 Jan 2025 02:18:28 +0000 (UTC)
-Date: Thu, 9 Jan 2025 10:18:22 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, nbd@other.debian.org,
-	linux-scsi@vger.kernel.org, usb-storage@lists.one-eyed-alien.net
-Subject: Re: [PATCH 03/10] block: don't update BLK_FEAT_POLL in
- __blk_mq_update_nr_hw_queues
-Message-ID: <Z38x7mzrQPEiUOpv@fedora>
-References: <20250108092520.1325324-1-hch@lst.de>
- <20250108092520.1325324-4-hch@lst.de>
- <Z35T8xeLxhXe-zAS@fedora>
- <20250108152705.GA24792@lst.de>
- <a3bd231c-0568-4dad-9268-bc7edaace94b@kernel.org>
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="NY85Vf8a"
+Received: from cwcc.thunk.org (pool-173-48-116-211.bstnma.fios.verizon.net [173.48.116.211])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 5094vhPd010888
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 8 Jan 2025 23:57:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1736398664; bh=4igc/mM2Tjhse1Geg4vTgxp/w3pQbkhGpu9s3T+/i1I=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=NY85Vf8aYd8WBLXHDTLrZoeuO03B+YbIC6Vdd1FH8nnyXI4MLVsqz4dxqZcdLzRVQ
+	 Pry1eAW3rK7CmuSmNntT+RU5UYtSgR/yQ9s+uVqqndfjtcOP9BCyn2WBPF4H9lYZth
+	 eDKP6ulPH6HH2hu8SOreHRpD1qp2pb7W95zk998bCG5vQMyV6zjZWQsoNvRmuyQe10
+	 RWKWSaFdq7RqyG0ufHrbnsndZenD7qzYe+2hSfDvHSVu/6IYyZFm6LpwZHJbaEBwzF
+	 Nq9MV6WpcpDJt6N3hJ33+rpfJ/9loDyFAGH3nA5cTDHADazzFVVdqTDbXA0meedhUy
+	 N8wJ3SDT2O9pw==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+	id 4B52515C0108; Wed, 08 Jan 2025 23:57:43 -0500 (EST)
+Date: Wed, 8 Jan 2025 23:57:43 -0500
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Travis Downs <travis.downs@gmail.com>
+Cc: linux-block@vger.kernel.org
+Subject: Re: Semantics of racy O_DIRECT writes
+Message-ID: <20250109045743.GE1323402@mit.edu>
+References: <CAOBGo4xx+88nZM=nqqgQU5RRiHP1QOqU4i2dDwXt7rF6K0gaUQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -64,59 +48,84 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a3bd231c-0568-4dad-9268-bc7edaace94b@kernel.org>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <CAOBGo4xx+88nZM=nqqgQU5RRiHP1QOqU4i2dDwXt7rF6K0gaUQ@mail.gmail.com>
 
-On Thu, Jan 09, 2025 at 09:05:49AM +0900, Damien Le Moal wrote:
-> On 1/9/25 00:27, Christoph Hellwig wrote:
-> > On Wed, Jan 08, 2025 at 06:31:15PM +0800, Ming Lei wrote:
-> >>> -	if (!(q->limits.features & BLK_FEAT_POLL) &&
-> >>> -			(bio->bi_opf & REQ_POLLED)) {
-> >>> +	if ((bio->bi_opf & REQ_POLLED) && !bdev_can_poll(bdev)) {
-> >>
-> >> submit_bio_noacct() is called without grabbing .q_usage_counter,
-> >> so tagset may be freed now, then use-after-free on q->tag_set?
-> > 
-> > Indeed.  That also means the previous check wasn't reliable either.
-> > I think we can simple move the check into
-> > blk_mq_submit_bio/__submit_bio which means we'll do a bunch more
-> > checks before we eventually fail, but otherwise it'll work the
-> > same.
+On Wed, Jan 08, 2025 at 01:33:07PM -0300, Travis Downs wrote:
+> Hello linux-block,
 > 
-> Given that the request queue is the same for all tag sets, I do not think we
-
-No, it isn't same.
-
-> need to have the queue_limits_start_update()/commit_update() within the tag set
-> loop in __blk_mq_update_nr_hw_queues(). So something like this should be enough
-> for an initial fix, no ?
+> We are experiencing data corruption in our storage intensive server
+> application and are wondering about the semantics of "racy" O_DIRECT
+> writes.
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 8ac19d4ae3c0..ac71e9cee25b 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4986,6 +4986,7 @@ static void __blk_mq_update_nr_hw_queues(struct
-> blk_mq_tag_set *set,
->                                                         int nr_hw_queues)
->  {
->         struct request_queue *q;
-> +       struct queue_limits lim;
->         LIST_HEAD(head);
->         int prev_nr_hw_queues = set->nr_hw_queues;
->         int i;
-> @@ -4999,8 +5000,10 @@ static void __blk_mq_update_nr_hw_queues(struct
-> blk_mq_tag_set *set,
->         if (set->nr_maps == 1 && nr_hw_queues == set->nr_hw_queues)
->                 return;
+> Normally we target XFS, but the question is a general one.
 > 
-> +       lim = queue_limits_start_update(q);
->         list_for_each_entry(q, &set->tag_list, tag_set_list)
->                 blk_mq_freeze_queue(q);
+> Specifically, imagine that we are writing a single 4K aligned page,
+> with contents AB00 (each char being 1K bytes). We only care about
+> the first 2048 bytes (the AB part). We are using libaio writes
+> (io_submit) with O_DIRECT semantics. While the write is in flight,
+> i.e.,
+> after we have submitted it and before we reap it in io_getevents, the
+> userspace application writes into second half of the page,
+> changing it to ABCD (let's say via memcpy). The first half is not changed.
+> 
+> The question then is: is this safe in the sense that would result in
+> ABxx being written where xx "is don't care"? Or could it do something
+> crazier, like cause later writes to be ignored (e.g. if something in
+> the kernel storage layer hashes the page for some purpose and
+> this hash is out of sync with the page at the time it was captured, or
+> something like that).
+> 
+> Of course, the easy answer is "don't do that", but I still want to
+> know what happens if we do.
 
-It could be worse, since the limits_lock is connected with lots of other
-subsystem's lock(debugfs, sysfs dir, ...), it may introduce new deadlock
-risk.
+Don't do that.  Really.
 
-Thanks,
-Ming
+First of all, your program might need to run on OS's other than Linux,
+such as Legacy Unix systems, Mac OS X, etc, and officially, there is
+zero guarantees about cache coherency between O_DIRECT writes and the
+page cache.  So if you use O_DIRECT I/O and buffered I/O or mmap
+access to a file.... all bet are off.
 
+By definition O_DIRECT I/O bypasses the page cache, so if there is a
+copy of the file's data block in the page cache, for some
+implementations of some OS's the page cache might contain the previous
+stale version of the block, so buffer reads might not have the updated
+copy reflected by the O_DIRECT write.  And if the page is mmap'ed into
+some process's address space, and the process dirties that page, that
+page will get written back to the disk, potentially overwriting
+O_DIRECT write.
+
+Linux will make best efforts to maintain cache coherency between
+O_DIRECT and the page cache.  It does that by writing out the page in
+the page cache if it is dirty, and then evicting the the page from the
+page cache.  In practice this will be good enough to keep programs
+like a database which locks the database so it can take a consistent
+snapshot, and then does the backup via buffered write, when the
+database normally uses O_DIRECT for its transactions, it will work ---
+since if the database wasn't locked while taking the backup, it would
+be completely a mess, and the O_DIRECT vs page cache coherency is the
+*least* of your worries.
+
+But in general, don't mix bufered/mmap and O_DIRECT I/O to the same
+file.  Just don't.  It might work, but remember that raison d'etre for
+O_DIRECT is performance in support of databases and storage systems
+where developers Know What They Are Doing(tm) and Follow The
+Rules(tm).  Linux's cache coherency is best efforts only (and other
+OS's might not even bother), and database developers and sysadmins
+would be sad if we compromised O_DIRECT perforance just to make things
+100% safe for people want to do things which are breaking the rules.
+
+If you like breaking rules, don't use O_DIRECT.  You'll be happier for
+it, as will hapless future users of your programs.  :-)
+
+Remember, good programs are maintainable and portable.  What if some
+one attempts to take your programs and tries to make it work on MacOS?
+
+Cheers,
+
+					- Ted
+
+P.S.  I commend to you the ten commandments for C programmers,
+especially the last one.  Remember, all the world's not Linux!
+	   
+      https://www.lysator.liu.se/c/ten-commandments.html
