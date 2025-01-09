@@ -1,181 +1,106 @@
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E9919D880
-	for <linux-block@vger.kernel.org>; Thu,  9 Jan 2025 18:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FB61891A8;
+	Thu,  9 Jan 2025 19:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736448627; cv=none; b=aEDh/M0zvwMQ3RqHFCk3awWUZ+5pNri0cgYodb6B88yXSQHABbuOqbmAnko9CCnWALepmzbpXTRqPoX1z3muQblAyuGQEL7zfQQNLOi1698edPBmFi/V8IPKB+BXOZZxjc67WJf0QQ42UhUSQLhIKB6FoZ77LEF3PQcZrX7jsGM=
+	t=1736449358; cv=none; b=ci/LzkD39dMKt3rAJtUiP0aNYhhSs2E1vY/TVGTySIjfhrYSgorPFAeDrDqQj7UiqI/GH3Npj26IhkuY2778sw9eCU/0KaOA3Msm6XDV/4cyxWDM7yJ5upPG3bp0HdmGgduVFBjB83kQokhqocFvEj0eRBfDzUJucvpmWkE3A/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736448627; c=relaxed/simple;
-	bh=H4CZjOmYC0NCec9umLKhSOFtV8cwSdEMnaok6rz7QWY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Q/BT7mRwCHZDa9+pB9KaaHNrrpIPHMjP7BYGfl7riJnzR8AS2Bf2XwRgBGAc3la1wJ9pLjy75GaTjIHk+a2U8aXEUfqBNHHRN2qnJvoWOvDCIhinf9n7BJOf3cY3PZFZwJVUgd+Viij6+HU0OJoGCSu7Gkbsb7vlgAR6HLfjO7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a9cc5c246bso10682985ab.2
-        for <linux-block@vger.kernel.org>; Thu, 09 Jan 2025 10:50:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736448625; x=1737053425;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=THYoIrGbXFYQttYPv4IJLSufIMQMNQ+423rhjxYwkV8=;
-        b=ul15pmLFoPlMkPyEC238dx8yk6QggAmxEpPLa2ZH1+8W40S0OpBHceYjxtx0qJT+BO
-         jZw/86cg5pieZ8+ma5wiXlvfssktfak2Y1oRjVr0Y1iyRM9Mg5M4N52Oqdq8cVDyd8Qu
-         jsIdqUSpyBahsvb4viauVUU9VOg7agaSkksUX9UzOAl7bR74KXAZ3wSGiNRT6GY2PelI
-         c8F0RRUg/ClJAg7OOc29sdrZL61BH9k26pmVu5qLIpnLERuYZUOxmKmfHBbrvDmX0Zoq
-         boJ2EdFXbauSv5tNEtUn1gNogRSWvbYfH3sw4FOeuFRlxYSpvbhE2OOMM+f1ZFJrbEQg
-         r7Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCU68L6BNN+mrasLvh1qkFIfQXrai9E0uMJ8vOgNPoq3aL+g1ASyDWmoCgjLfNdc0ln4hRblMKDDT23iYw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YywjVGNJBZVPTcgq3VYiqPoM5hr4G1hryNv5FyTJUx6YzMAWmwu
-	awRn/SRUZfV9dT0L1nqqZln8XyA2XtIX17NTmEd1JKkY1FwVpPhe040TgasmAn+gq5Cf4hSXFTS
-	CaVfFdk8lWjB/HWrX4JwG/27FYFAf5dJ2AXqaIp5ksz9hZbpy6m4EMgE=
-X-Google-Smtp-Source: AGHT+IG/azm/OO33COTH/MEAo0RdCfHPpAZlNgKdXxjIsa/+yeH1um3lJpzaQofHUUWxZ47B38A4e9hntmQgP5Pg0WF6opMEY6HW
+	s=arc-20240116; t=1736449358; c=relaxed/simple;
+	bh=CCTGoJOWnc/MYwMRcCojhftwdXqRVCYgBzd8FQggOUA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k9OpGso5hA5Ow++pTsBufgvxrsfWCVnYsEiYgeX6dvapsB9FHSjN2l3+1XO3HV4urA8mElQa3KOMjy5ADxsPvlH/mgFQzapGVTadqHMpfo/I4RBkvslpsTGO8zGY/dg0eM71NUrRmcnsp/H1YqMDWg6WJiLyQCqcoIGujE19gDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=3OLkC9l+; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="3OLkC9l+"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YTZ0k12rwzlgTWR;
+	Thu,  9 Jan 2025 19:02:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1736449346; x=1739041347; bh=5Jcz49J9an/fkTsGSmQ0+OC4
+	cTU9w8k9nv1b/GaBWVg=; b=3OLkC9l+aLWnkNCKOk3otN8lOFQMV+Oe18aE00Jk
+	+8rkCmuYdmkccBwiQH05KoeBI3g/9G/Mwur0fofieCH0xhrNtTKLku3v7KbLzAyy
+	tjQaeVxGxWeO9W+WTXIEBS/hQatA15MBd+LWzf6VZv1GkUkUbRHkcCFn12F3WPCW
+	suXUlLQvJDq0SZZGk1zi8IyGUY491WxOzcueMLOFjxWE+KwmiE9/ys4zX/9jwnGv
+	VoSXRd2xSrEERDkGlqjeIeq/BZN9EcyD0LdVpbdD6rkfyjXALgc+dC9Al5BchhAw
+	Kr3eH96rwjNAF9NRQdNS1AKzU5W3d6FroOWEGDK9VgCsHQ==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id vMVc0zKKvcFV; Thu,  9 Jan 2025 19:02:26 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YTZ0c4JrSzlgTWM;
+	Thu,  9 Jan 2025 19:02:23 +0000 (UTC)
+Message-ID: <cbbcd4b5-0134-4b8b-bd06-d0a2091118f5@acm.org>
+Date: Thu, 9 Jan 2025 11:02:22 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1524:b0:3a7:764c:42fc with SMTP id
- e9e14a558f8ab-3ce3aa761famr61729735ab.21.1736448625031; Thu, 09 Jan 2025
- 10:50:25 -0800 (PST)
-Date: Thu, 09 Jan 2025 10:50:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67801a71.050a0220.25a300.01cb.GAE@google.com>
-Subject: [syzbot] [ext4?] [udf?] [block?] kernel BUG in set_blocksize (2)
-From: syzbot <syzbot+c6e047750c7e8603508b@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, jack@suse.com, linux-block@vger.kernel.org, 
-	linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 00/26] Improve write performance for zoned UFS devices
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>, Jaegeuk Kim <jaegeuk@kernel.org>
+References: <20241119002815.600608-1-bvanassche@acm.org>
+ <95ab028e-6cf7-474e-aa33-37ab3bccd078@kernel.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <95ab028e-6cf7-474e-aa33-37ab3bccd078@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 11/19/24 12:01 AM, Damien Le Moal wrote:
+> On 11/19/24 09:27, Bart Van Assche wrote:
+>> This patch series improves small write IOPS by a factor of four (+300%) for
+>> zoned UFS devices on my test setup with an UFSHCI 3.0 controller. Although
+>> you are probably busy because the merge window is open, please take a look
+>> at this patch series when you have the time. This patch series is organized
+>> as follows:
+>>   - Bug fixes for existing code at the start of the series.
+>>   - The write pipelining support implementation comes after the bug fixes.
+> 
+> Impressive improvements but the changes are rather invasive. Have you tried
+> simpler solution like forcing unplugging a zone write plug from the driver once
+> a command is passed to the driver and the driver did not reject it ? It seems
+> like this would make everything simpler on the block layer side. But I am not
+> sure if the performance gains would be the same.
 
-syzbot found the following issue on:
+(replying to an email from two months ago)
 
-HEAD commit:    ab75170520d4 Merge tag 'linux-watchdog-6.13-rc6' of git://..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1178d418580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ba7cde9482d6bb6
-dashboard link: https://syzkaller.appspot.com/bug?extid=c6e047750c7e8603508b
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11556edf980000
+Hi Damien,
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/205ade41622a/disk-ab751705.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/39aa1b893dfc/vmlinux-ab751705.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c741f4e4b082/bzImage-ab751705.xz
-mounted in repro #1: https://storage.googleapis.com/syzbot-assets/512e46aed82f/mount_0.gz
-mounted in repro #2: https://storage.googleapis.com/syzbot-assets/1952d0d2f4a4/mount_3.gz
-mounted in repro #3: https://storage.googleapis.com/syzbot-assets/dc175c44b2d4/mount_7.gz
+Here is a strong reason why the simpler solution mentioned above is not
+sufficient: if anything goes wrong with the communication between UFS
+host controller and UFS device (e.g. a command timeout or a power mode
+transition fails) then the SCSI error handler is activated. This results
+in ufshcd_err_handler() being called. That function resets both the host
+controller and the UFS device (ufshcd_reset_and_restore()). At that time
+multiple commands may be outstanding.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c6e047750c7e8603508b@syzkaller.appspotmail.com
+In other words, submitting UFS commands in order is not sufficient. An
+approach is needed that is compatible with the SCSI error handler and
+also that ensures that commands are resubmitted in LBA order per zone
+after the SCSI error handler has completed.
 
- folios_put_refs+0x76c/0x860 mm/swap.c:962
- free_pages_and_swap_cache+0x2ea/0x690 mm/swap_state.c:332
- __tlb_batch_free_encoded_pages mm/mmu_gather.c:136 [inline]
- tlb_batch_pages_flush mm/mmu_gather.c:149 [inline]
- tlb_flush_mmu_free mm/mmu_gather.c:366 [inline]
- tlb_flush_mmu+0x3a3/0x680 mm/mmu_gather.c:373
- tlb_finish_mmu+0xd4/0x200 mm/mmu_gather.c:465
- exit_mmap+0x496/0xc20 mm/mmap.c:1681
- __mmput+0x115/0x3b0 kernel/fork.c:1348
- exit_mm+0x220/0x310 kernel/exit.c:570
- do_exit+0x9ad/0x28e0 kernel/exit.c:925
- do_group_exit+0x207/0x2c0 kernel/exit.c:1087
- get_signal+0x16b2/0x1750 kernel/signal.c:3017
- arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:337
- exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0xce/0x340 kernel/entry/common.c:218
- do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-------------[ cut here ]------------
-kernel BUG at mm/filemap.c:2114!
-Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 0 UID: 0 PID: 7712 Comm: syz.3.780 Not tainted 6.13.0-rc5-syzkaller-00163-gab75170520d4 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:find_lock_entries+0xb8a/0xbb0 mm/filemap.c:2113
-Code: 30 c7 ff 4c 89 ff 48 c7 c6 e0 aa 13 8c e8 5e a8 0e 00 90 0f 0b e8 26 30 c7 ff 4c 89 ff 48 c7 c6 c0 a4 13 8c e8 47 a8 0e 00 90 <0f> 0b e8 0f 30 c7 ff 4c 89 ff 48 c7 c6 a0 ad 13 8c e8 30 a8 0e 00
-RSP: 0018:ffffc9000c6f73c0 EFLAGS: 00010246
-RAX: dd31507b3d2b8c00 RBX: ffffc9000c6f7840 RCX: ffffc9000c6f6f03
-RDX: 0000000000000002 RSI: ffffffff8c0aaae0 RDI: ffffffff8c5edd60
-RBP: ffffc9000c6f7510 R08: ffffffff901856b7 R09: 1ffffffff2030ad6
-R10: dffffc0000000000 R11: fffffbfff2030ad7 R12: 0000000000000080
-R13: 0000000000000001 R14: ffffea0000d32180 R15: ffffea0000d32180
-FS:  00007fce2da676c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f78b6e0f000 CR3: 0000000077012000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- truncate_inode_pages_range+0x23b/0x10e0 mm/truncate.c:322
- kill_bdev block/bdev.c:91 [inline]
- set_blocksize+0x2f1/0x360 block/bdev.c:172
- sb_set_blocksize+0x47/0xf0 block/bdev.c:181
- udf_load_vrs+0xe6/0x1130 fs/udf/super.c:1998
- udf_fill_super+0x5eb/0x1ed0 fs/udf/super.c:2192
- get_tree_bdev_flags+0x48c/0x5c0 fs/super.c:1636
- vfs_get_tree+0x90/0x2b0 fs/super.c:1814
- do_new_mount+0x2be/0xb40 fs/namespace.c:3507
- do_mount fs/namespace.c:3847 [inline]
- __do_sys_mount fs/namespace.c:4057 [inline]
- __se_sys_mount+0x2d6/0x3c0 fs/namespace.c:4034
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fce2cb874ca
-Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb a6 e8 de 1a 00 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fce2da66e68 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
-RAX: ffffffffffffffda RBX: 00007fce2da66ef0 RCX: 00007fce2cb874ca
-RDX: 0000000020000c40 RSI: 0000000020000c80 RDI: 00007fce2da66eb0
-RBP: 0000000020000c40 R08: 00007fce2da66ef0 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000020000c80
-R13: 00007fce2da66eb0 R14: 0000000000000c40 R15: 000000002000b240
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:find_lock_entries+0xb8a/0xbb0 mm/filemap.c:2113
-Code: 30 c7 ff 4c 89 ff 48 c7 c6 e0 aa 13 8c e8 5e a8 0e 00 90 0f 0b e8 26 30 c7 ff 4c 89 ff 48 c7 c6 c0 a4 13 8c e8 47 a8 0e 00 90 <0f> 0b e8 0f 30 c7 ff 4c 89 ff 48 c7 c6 a0 ad 13 8c e8 30 a8 0e 00
-RSP: 0018:ffffc9000c6f73c0 EFLAGS: 00010246
-RAX: dd31507b3d2b8c00 RBX: ffffc9000c6f7840 RCX: ffffc9000c6f6f03
-RDX: 0000000000000002 RSI: ffffffff8c0aaae0 RDI: ffffffff8c5edd60
-RBP: ffffc9000c6f7510 R08: ffffffff901856b7 R09: 1ffffffff2030ad6
-R10: dffffc0000000000 R11: fffffbfff2030ad7 R12: 0000000000000080
-R13: 0000000000000001 R14: ffffea0000d32180 R15: ffffea0000d32180
-FS:  00007fce2da676c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f78b6e0f000 CR3: 0000000077012000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+The statistics I have access to show that the UFS error handler is
+activated infrequently or never on any single device but also that it is
+activated a nontrivial number of times across the entire device
+population.
 
+Thanks,
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Bart.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
