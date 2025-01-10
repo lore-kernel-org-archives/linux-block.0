@@ -1,103 +1,114 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97C1213222;
-	Fri, 10 Jan 2025 18:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA4BD24B221;
+	Fri, 10 Jan 2025 19:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736533076; cv=none; b=eVdBhWDaOqJFgfAUqJfCsMTGvybVGFwYGLpnn+afjMk9oTGLqrwWB+7E5xJOjhc0OWFqS29UYCz2etThjBItpv+XGfhLYo58Dip7vwncxWMqQ6MzQlSUd6gxRCR3/WV94W/Op6RwzYKsaYAYQJUy6GdsFbR+odjTkC6l++hk8gU=
+	t=1736536222; cv=none; b=sTJZUvSJhjfOuRFwHINFTZCH3sqC3plkYjBmJqhOVYhb9wT+1r4DFAUHeHM+io8GZ15qWLs9gDY/A6ca4BrkDjnXK3vpr4GwtSJFteYRY8J9eLBfxMr3bklGVF2kftoRQ2ETxUZDuySlPJNXa73hxkir7b45ePHLX8b4eiG8Zac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736533076; c=relaxed/simple;
-	bh=M4/miNOIFbl9jwExAg2KrDMIy9jYUK3U9gqIYHI+YSA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JbDEux6BtpE3LvYmMANJLGibi7n2SRczOlCinrX4WHzL9G6UOxseOqA7Y1H/KlAaQjJW6V+LrtP1yyFbj2PwPMniutOke/L3fACrL9833SVB98jNHVe02ourRs/HdRO04wJ8F8U4mDyfLkOd7xJF7LPyUWzmOw2276gFXRnqX6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=M/jH4cuM; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1736536222; c=relaxed/simple;
+	bh=abbuXe0efS2QoH5PhHzMi7xNGC82etU29gnMzoWoI/Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LZuR84ylJcaluZFOZrC3wspEZ3eObEhYPjhEexu+7iyCFeCXgj+IXGkmpJq9Q2l2m2Kyusoryv8D3JRZS1+bv6lbydUjvxIjgq/J7DGM56QUT8HVV92kQXrgMWAKEI5JdlLE/G5ZTMp7L4Ip4vqngYreVCAOwScm3STV4B7KdNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j9cnfvGh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="M/jH4cuM"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YV8yf6xcdz6CmQtQ;
-	Fri, 10 Jan 2025 18:17:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1736533063; x=1739125064; bh=LHr63z/qXB61GZgjN3/nqk/O
-	vSZZtv+W4XiU69tj4oU=; b=M/jH4cuM/mNlKz2GRTih1Y6a16+RJa0WzM+ggtJ4
-	AIvbhc+tK/r8UoyCbDAJuaLo1952Uh/FP5EyVBb6x/uS6CJd93xHHkSVNSqLfFRE
-	HoyB0NRhpiAk6BhCxKHNMrtgQHYqOK0UnKI31BWpc5EXudP1ImizUZiPqxmwfNSE
-	XKgYq1/Ak+znCiKMgZqvI7MpdJ5pt4gZlAgZ107VkcLfMLmysweoba/0+EzX/Md6
-	CAiL/bPnYJ3IwoNSyyH7mtMePJ7+wJTdxmttlkTR2ohCGCYxbQ/epKinaIJxigTW
-	fWch5l4DtGiFxDCKIsRUw72/+MLia5fKXzZNVQ+r/SyYxQ==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 6GmqrkNIM9vi; Fri, 10 Jan 2025 18:17:43 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YV8yZ2cGFz6CmQwT;
-	Fri, 10 Jan 2025 18:17:42 +0000 (UTC)
-Message-ID: <3a62c833-42e9-4763-a3d8-18b3edf97db0@acm.org>
-Date: Fri, 10 Jan 2025 10:17:41 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j9cnfvGh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42E47C4CED6;
+	Fri, 10 Jan 2025 19:10:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736536221;
+	bh=abbuXe0efS2QoH5PhHzMi7xNGC82etU29gnMzoWoI/Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=j9cnfvGhPribEablygATyI8cVaiAVMmdZ4x67bKDp5+0wzkYaydbp5k+y3SCoi5TO
+	 a0QggZ3C+xAbDTdqBQdX/U/CmMfgOdnhPNf96KqTfbXn09Cnrm1Xp4y2D+vJEdTkuX
+	 RaCIP5VCKuGDCqXsiDf0G5BTU0vRWp8pmNgjOu1MBMAeWCrmGhvUmFzAfZxXzCUjZX
+	 bj2AqhIxiLJp3OE6t9/YlO5/1A5ZvnWj+4c2qJvDqK09/iyJ+5tUghc+KEXYUCHowP
+	 JszbfYa/8cu3WAYKVCTzbGl0+PQbsMjtwBKMgISsDXXqMamRAZ0I+eRBL0eBYBoGjM
+	 LgSGugnselPBA==
+Date: Fri, 10 Jan 2025 19:10:19 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+	linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>
+Subject: Re: [PATCH v10 00/15] Support for hardware-wrapped inline encryption
+ keys
+Message-ID: <20250110191019.GA24424@google.com>
+References: <20241213041958.202565-1-ebiggers@kernel.org>
+ <CAMRc=MdeZ_k9z+ZKW1ub0m9ymh3eABUU7ZRPY9TYHM_fc+D+qQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 05/26] blk-zoned: Fix a deadlock triggered by
- unaligned writes
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20241119002815.600608-1-bvanassche@acm.org>
- <20241119002815.600608-6-bvanassche@acm.org>
- <6729e88d-5311-4b6e-a3da-0f144aab56c9@kernel.org>
- <8c0c3833-22e4-46ae-8daf-89de989545bf@acm.org>
- <bf6328f2-c660-4431-9ef6-39722dafa9e7@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <bf6328f2-c660-4431-9ef6-39722dafa9e7@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMRc=MdeZ_k9z+ZKW1ub0m9ymh3eABUU7ZRPY9TYHM_fc+D+qQ@mail.gmail.com>
 
-
-On 1/9/25 9:07 PM, Damien Le Moal wrote:
-> On 1/10/25 04:11, Bart Van Assche wrote:
->> On 11/18/24 6:57 PM, Damien Le Moal wrote:
->>> And we also have the possibility of torn writes (partial writes) with
->>> SAS SMR drives. So I really think that you cannot avoid doing a
->>> report zone to recover errors.
->> (replying to an email of two months ago)
->>
->> Hi Damien,
->>
->> How about keeping the current approach (setting the
->> BLK_ZONE_WPLUG_NEED_WP_UPDATE flag after an I/O error has been observed)
->> if write pipelining is disabled and using the wp_offset_compl approach
->> only if write pipelining is enabled? This approach preserves the
->> existing behavior for SAS SMR drives and allows to restore the write
->> pointer after a write error has been observed for UFS devices. Please
->> note that so far I have only observed write errors for UFS devices if I
->> add write error injection code in the UFS driver.
+On Fri, Jan 10, 2025 at 09:44:07AM +0100, Bartosz Golaszewski wrote:
+> On Fri, Dec 13, 2024 at 5:20 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > This patchset is based on next-20241212 and is also available in git via:
+> >
+> >     git fetch https://git.kernel.org/pub/scm/fs/fscrypt/linux.git wrapped-keys-v10
+> >
+> > This patchset adds support for hardware-wrapped inline encryption keys, a
+> > security feature supported by some SoCs.  It adds the block and fscrypt
+> > framework for the feature as well as support for it with UFS on Qualcomm SoCs.
+> >
+> > This feature is described in full detail in the included Documentation changes.
+> > But to summarize, hardware-wrapped keys are inline encryption keys that are
+> > wrapped (encrypted) by a key internal to the hardware so that they can only be
+> > unwrapped (decrypted) by the hardware.  Initially keys are wrapped with a
+> > permanent hardware key, but during actual use they are re-wrapped with a
+> > per-boot ephemeral key for improved security.  The hardware supports importing
+> > keys as well as generating keys itself.
+> >
+> > This differs from the existing support for hardware-wrapped keys in the kernel
+> > crypto API (also called "hardware-bound keys" in some places) in the same way
+> > that the crypto API differs from blk-crypto: the crypto API is for general
+> > crypto operations, whereas blk-crypto is for inline storage encryption.
+> >
+> > This feature is already being used by Android downstream for several years
+> > (https://source.android.com/docs/security/features/encryption/hw-wrapped-keys),
+> > but on other platforms userspace support will be provided via fscryptctl and
+> > tests via xfstests (I have some old patches for this that need to be updated).
+> >
+> > Maintainers, please consider merging the following preparatory patches for 6.14:
+> >
+> >   - UFS / SCSI tree: patches 1-4
+> >   - MMC tree: patches 5-7
+> >   - Qualcomm / MSM tree: patch 8
+> >
 > 
-> If you get write errors, they will be propagated to the user (f2fs in this case
-> I suspect) which should do a report zone to verify things. So I do not see why
-> this part would need to change.
+> IIUC The following patches will have to wait for the v6.15 cycle?
+> 
+> [PATCH v10 9/15] soc: qcom: ice: make qcom_ice_program_key() take
+> struct blk_crypto_key
+> [PATCH v10 10/15] blk-crypto: add basic hardware-wrapped key support
+> [PATCH v10 11/15] blk-crypto: show supported key types in sysfs
+> [PATCH v10 12/15] blk-crypto: add ioctls to create and prepare
+> hardware-wrapped keys
+> [PATCH v10 13/15] fscrypt: add support for hardware-wrapped keys
+> [PATCH v10 14/15] soc: qcom: ice: add HWKM support to the ICE driver
+> [PATCH v10 15/15] ufs: qcom: add support for wrapped keys
 
-Hi Damien,
+Yes, that's correct.
 
-In my email I was referring to write errors that should *not* be
-propagated to the user but that should result in a retry by the kernel.
-This is e.g. necessary if multiple writes are outstanding simultaneously
-and the storage device reports a unit attention condition for any of
-these writes except the last write.
-
-Thanks,
-
-Bart.
+- Eric
