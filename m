@@ -1,152 +1,84 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5712C9D;
-	Fri, 10 Jan 2025 01:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2793B2F3E;
+	Fri, 10 Jan 2025 05:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736473408; cv=none; b=KpzFZwl9uVI9qxPRifjFHkk7kxhcMQ8L/WnkmKfFM7LvnW9W3WfqW/MLjw6U4A00D3lDgr6g1oKm/f+ntgT6ixVxpMOL2qoKodAMVf6K58V8CGuykhFt1dtsGNVs4wVn3f9r7P+p5Ts5rc8EN0wKVl4niLkaLxOyODyL+fQqYE0=
+	t=1736485678; cv=none; b=UXc61hGYBz5hQuQFodsysMCfiZkjSXuQboul6ALv5E61tpwFtBk5MvBZAX4xI3SQPoPP0Yk1dKmSA8pwQifYvlIABeOlS9C7Zdf44HS/+F8lB4X/5ZvpOsVVpVms2AIJ1H2BXNMLJdzwiKqmsT/lRMdE82K+eDeCSW+VWMesMgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736473408; c=relaxed/simple;
-	bh=o2XPZP+0IFA4x7leBl7ilw+adK677OtVOOFJWO/2sEI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i4fxOfTqn2op6yyzTu1iH79wIysrhPQBBIHCD0/jN9VW0i/aJQbo1oBMtX5lThTFpKvcfMIrQP7mAeIZoPCDvc5rJVIwOlsprMJMlpJJpP/mxqgjH46D8myOb9IPXI6IZXL+Hi/2qvbEfVZxO4VFTH/ms0Fd8fePmC27sC/nlz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eejBoRJw; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736485678; c=relaxed/simple;
+	bh=S7Xf9aLv3oCPLGJxtHVkEWSoywvAAp7cOY+G2ljovOc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nRdGsSQnF9QOzqaIiXPL/lKexkFLpUcfrXozcpcUs7dncddLJve1oOxfzd2vbgiAGpPRqhZf7czWWRfvN6p4JgsNyo/g3emBFbFPqM7uU0Ay01t14RgOyIFbfO1ddTWUbzOUMuX194fsdc3mImMMsau4NSaHhKUAAnGOU425n28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jPM8zfv8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eejBoRJw"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-385f06d0c8eso840152f8f.0;
-        Thu, 09 Jan 2025 17:43:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736473405; x=1737078205; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9bpPWe6qYLJI51huF1n3iHHe/0W9cmw4C/J6ySpxfqM=;
-        b=eejBoRJwTxNidihr60ozUMnd9VFiHb/PBIOdr6071nP6HStUloO1Ud5zF4bouMAaGH
-         b963pjkLaqop7zgRivhFeXOciWr06RV7I1RnZ239E1Yc0TgVphqxdauTyp8bR1HPitZg
-         ct0T3nG3xVdyJaMaLdmUSNTI6wRAgE9OAkXUtXOhrWOCKjNjVH1Bf1shrW2r5RQw8qxU
-         TePpj+eXijN+MXRLXIcgvcwBoN0jWTxhwLL1+cbgnhuOM7EtWTN88myLAw5/rXkYFtuz
-         KaF2zbfBbUizHLWxjkDfvK4I5uZrcAA24fhDij4EkR1cfNAKD4dNwGKvvofZmtkXBukn
-         /Jfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736473405; x=1737078205;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9bpPWe6qYLJI51huF1n3iHHe/0W9cmw4C/J6ySpxfqM=;
-        b=Pltcft9ctn1KbnEBLFYRx2BvEYkm1ReFLZ6xMrRbqQBl5GI603v9tDI7UL8AoaFH/P
-         qZGJaMPcliDcV5jN3bx7/4uH87OYiw0I4jmA6lyMq0CY3lng1CpVU3qR5E6hlidUwlCG
-         cDd9aqaqBL4vnz7oEg3T4T8IYhXoAPO1gvsTQuqYoDORjqoXLXeyW5frbOJUUWRx+Ku4
-         LvKZUxFzVh4gnfuvIoHx2XjdIr1h7c5x0LIFRl9DqHLUd56ZLZg11mde3JU92L28Y4uB
-         H2CMA1HGhX0oQPEhZxS2mIHBUGliGut63Nq36rE58/zSxDE2tGBZEYQ+We3NHrEfSDwR
-         ZJTg==
-X-Forwarded-Encrypted: i=1; AJvYcCWb02dhEZUDAZvW0qnie9CT9gap1WeC2qjgeaJ/gzgIN6M3MHyp6g59L0dqMDDfNYXEiycmDUXPJNwAHmc=@vger.kernel.org, AJvYcCWkjOOAwFk6ovaoQt/D2JFqwt7VR/DVhHNX/Jmq2RC1gagf40Fzs7vMHxHcYuRHxzOIqEI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7kApT3lAYF9lzKBmle+3iDBBBU/lhSvV0d98213VPwwABAWZ3
-	n/X8oVVmUtKIOt/LG6yoZl5eE4N9pSqr/y2DLpkIyaPF+HVJVv7xmZ0B2vuc7rjT+3MwS8bK6VK
-	ZzL7f7wVKJuCfWRCn8xOXOK6Skhg=
-X-Gm-Gg: ASbGncsEPZNlzMrBdAiUplon/o+WJe1FXGGxA11IPmfL2r9YWi/YCzXkVMFWFmNwQ6l
-	MuerBnVZeHWqLIV0IOblxzVxM5P1by2Ob00mnK0Vw8oizDF5LnKL0FA==
-X-Google-Smtp-Source: AGHT+IEvr0oS1MEGaOG5kOFAEWtTb0IkThLcUiRcjrb8YJZfEgmbjnUllCZIkZomjpep1vNPTry+F19gn6Or+Sj0vJo=
-X-Received: by 2002:a05:6000:2c5:b0:386:930:fad4 with SMTP id
- ffacd0b85a97d-38a872dec5fmr6612129f8f.19.1736473405113; Thu, 09 Jan 2025
- 17:43:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jPM8zfv8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC0FEC4CED6;
+	Fri, 10 Jan 2025 05:07:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736485677;
+	bh=S7Xf9aLv3oCPLGJxtHVkEWSoywvAAp7cOY+G2ljovOc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jPM8zfv8DqgClXk8x4RzD4kDZAjdZZrBblYHCSbaAaiEt1aWulMH1U7+XNabmX7XO
+	 oa7r0vWauXZJ9RkzxFjuu+E0UkmzFm2fgiRjedAQPZcBkyHueJmBEtHFiyRv4BxNNF
+	 2L2qdmOddWT8L7yOC+XtP3ZMbByCpEaGV+5kaKqMOLU425EkL+CK+Ee6ptBzXSKpRm
+	 x8iKu1VLX8g52JzWw6Rh9Qmjix7AH2xe7CklGh9T8LCD8GMmOSj/xRaPrjPE1RCuWp
+	 7SiFgmSNITSQDlIMceMtZMzRLrmQV8C4OcLEK+203CxCLnmO3FnqSOwHz6o3VvtNBW
+	 FTLuZsy3MZokA==
+Message-ID: <bf6328f2-c660-4431-9ef6-39722dafa9e7@kernel.org>
+Date: Fri, 10 Jan 2025 14:07:55 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250107120417.1237392-1-tom.leiming@gmail.com> <20250107120417.1237392-9-tom.leiming@gmail.com>
-In-Reply-To: <20250107120417.1237392-9-tom.leiming@gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 9 Jan 2025 17:43:12 -0800
-X-Gm-Features: AbW1kvaffMmj9m1lwyhEIOIZAQfcj7ry02wtHwCdPhkUtoCz3G1IJaotii68oNk
-Message-ID: <CAADnVQLGw07CNpi7=XHJRgBL2ku7Q23nfah07pBc45G+xeTKxw@mail.gmail.com>
-Subject: Re: [RFC PATCH 08/22] ublk: bpf: add bpf struct_ops
-To: Ming Lei <tom.leiming@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, bpf <bpf@vger.kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Yonghong Song <yonghong.song@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 05/26] blk-zoned: Fix a deadlock triggered by
+ unaligned writes
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>, Jaegeuk Kim <jaegeuk@kernel.org>
+References: <20241119002815.600608-1-bvanassche@acm.org>
+ <20241119002815.600608-6-bvanassche@acm.org>
+ <6729e88d-5311-4b6e-a3da-0f144aab56c9@kernel.org>
+ <8c0c3833-22e4-46ae-8daf-89de989545bf@acm.org>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <8c0c3833-22e4-46ae-8daf-89de989545bf@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 7, 2025 at 4:08=E2=80=AFAM Ming Lei <tom.leiming@gmail.com> wro=
-te:
-> +
-> +/* Return true if io cmd is queued, otherwise forward it to userspace */
-> +bool ublk_run_bpf_handler(struct ublk_queue *ubq, struct request *req,
-> +                         queue_io_cmd_t cb)
-> +{
-> +       ublk_bpf_return_t ret;
-> +       struct ublk_rq_data *data =3D blk_mq_rq_to_pdu(req);
-> +       struct ublksrv_io_desc *iod =3D ublk_get_iod(ubq, req->tag);
-> +       struct ublk_bpf_io *bpf_io =3D &data->bpf_data;
-> +       const unsigned long total =3D iod->nr_sectors << 9;
-> +       unsigned int done =3D 0;
-> +       bool res =3D true;
-> +       int err;
-> +
-> +       if (!test_bit(UBLK_BPF_IO_PREP, &bpf_io->flags))
-> +               ublk_bpf_prep_io(bpf_io, iod);
-> +
-> +       do {
-> +               enum ublk_bpf_disposition rc;
-> +               unsigned int bytes;
-> +
-> +               ret =3D cb(bpf_io, done);
+On 1/10/25 04:11, Bart Van Assche wrote:
+> On 11/18/24 6:57 PM, Damien Le Moal wrote:
+>> And we also have the possibility of torn writes (partial writes) with
+>> SAS SMR drives. So I really think that you cannot avoid doing a
+>> report zone to recover errors.
+> (replying to an email of two months ago)
+> 
+> Hi Damien,
+> 
+> How about keeping the current approach (setting the 
+> BLK_ZONE_WPLUG_NEED_WP_UPDATE flag after an I/O error has been observed)
+> if write pipelining is disabled and using the wp_offset_compl approach
+> only if write pipelining is enabled? This approach preserves the
+> existing behavior for SAS SMR drives and allows to restore the write
+> pointer after a write error has been observed for UFS devices. Please
+> note that so far I have only observed write errors for UFS devices if I
+> add write error injection code in the UFS driver.
 
-High level observation...
-I suspect forcing all sturct_ops callbacks to have only these
-two arguments and packing args into ublk_bpf_io
-will be limiting in the long term.
+If you get write errors, they will be propagated to the user (f2fs in this case
+I suspect) which should do a report zone to verify things. So I do not see why
+this part would need to change.
 
-And this part of api would need to be redesigned,
-but since it's not an uapi... not a big deal.
+> Thanks,
+> 
+> Bart.
+> 
 
-> +               rc =3D ublk_bpf_get_disposition(ret);
-> +
-> +               if (rc =3D=3D UBLK_BPF_IO_QUEUED)
-> +                       goto exit;
-> +
-> +               if (rc =3D=3D UBLK_BPF_IO_REDIRECT)
-> +                       break;
 
-Same point about return value processing...
-Each struct_ops callback could have had its own meaning
-of retvals.
-I suspect it would have been more flexible and more powerful
-this way.
-
-Other than that bpf plumbing looks good.
-
-There is an issue with leaking allocated memory in bpf_aio_alloc kfunc
-(it probably should be KF_ACQUIRE)
-and a few other things, but before doing any in depth review
-from bpf pov I'd like to hear what block folks think.
-
-Motivation looks useful,
-but the claim of performance gains without performance numbers
-is a leap of faith.
-
-> +
-> +               if (unlikely(rc !=3D UBLK_BPF_IO_CONTINUE)) {
-> +                       printk_ratelimited(KERN_ERR "%s: unknown rc code =
-%d\n",
-> +                                       __func__, rc);
-> +                       err =3D -EINVAL;
-> +                       goto fail;
-> +               }
-> +
-> +               bytes =3D ublk_bpf_get_return_bytes(ret);
-> +               if (unlikely((bytes & 511) || !bytes)) {
-> +                       err =3D -EREMOTEIO;
-> +                       goto fail;
-> +               } else if (unlikely(bytes > total - done)) {
-> +                       err =3D -ENOSPC;
-> +                       goto fail;
-> +               } else {
-> +                       done +=3D bytes;
-> +               }
-> +       } while (done < total);
+-- 
+Damien Le Moal
+Western Digital Research
