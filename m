@@ -1,143 +1,74 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F2F1FF7DA
-	for <linux-block@vger.kernel.org>; Fri, 10 Jan 2025 08:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A59208978
+	for <linux-block@vger.kernel.org>; Fri, 10 Jan 2025 08:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736498662; cv=none; b=Bxtu8frheKfqGgcJxMKSKrntsWQMnAeKjVo1i78J1FBeQNi5p2NAQrxHoKIPFUSDhFnXSffs0BALNc8a68d69S0fKhGlA9iXCKlPlbKEgqIEGliHnII9QI+WN8G6Ymk4WnGDiwPZUvlF1+QkgRLOFP88teb2EKAWgRb9nGhMhrI=
+	t=1736499502; cv=none; b=QS28LpSfXHrhU7lV1mXEIFR4EwGgS9cOR8Y8KtWbIU31fzDCxdioxUwo+aC5etX19o5GBzyz/bSDUGOFVXuZXM9bgtY3F1eHPFUPukM198NcVDwf1w0uGSC3soo4y/ijXPziTgIwHiBO9vErD9v7GWGqK80sywoclj2mlxlQ1l4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736498662; c=relaxed/simple;
-	bh=bcs5XrixjJuICcKrOi0QLiwMCzGybnpSV1jIYpcaEdk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ll9kN5oCp27raH+TH9HDzKtcD8TGaPn3T3PEFFjRJD4FI0oJw3BI4YnPe1ZJMxEyqRvSKEv04vaOishDKHy6Z24oFxsxNkeHpQpY67V5D5dz9Jn/APlrLLg2mSF4gkIFoS32JPyp4u4x+BUkfVRKVyHGNdhEcnXkDg/yFBr6wcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=oqhdcaDh; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1736499502; c=relaxed/simple;
+	bh=Dlr94CqVBpDTfAfvcl3AQN+YxVkdDsYsT2Yat8bkrkQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nAFTXJllj45Jnt5BVZT90+eTQzqUdJiX+TYALaBUrBNOWF9syvkb2zSWVCGCInAH4aHpi0l+zcz015LWklnFHrzrzsXKAD7O2X0AKmmXDiKB4Xq4FK5N/HKk4D/QEP7R8gAN4v8+nPYwogFN6Xv+qdCaastvHB3dIFIsRu62zz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=2CinhbZn; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="oqhdcaDh"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5401c52000fso1677357e87.2
-        for <linux-block@vger.kernel.org>; Fri, 10 Jan 2025 00:44:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1736498659; x=1737103459; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3J6ybie5MZTohAU5zO4AHtHmlS6SVT///Z6RnwOTF0I=;
-        b=oqhdcaDhpg7uKVN/GIznd4jiSK2ORwiXk9h/zpw9FR245bEuGdgGwuv+iH7nlP+B8m
-         9zSJy/VKhvJMc6ppvhGlbHo0DpM4g+sUf+393Z8NQE5l644lXXhX/hc02MoRYreuPbqy
-         1r7QVc8llQBVdCfRPVAL+k/Y9s9TGUl8HgbN9u680Qy4aSKB90ejT4XD+RT9i7blL+NE
-         cGP+WYt29uNl4d9Gw2WB4t37qzpLJXDzmBUYGtIqQZ/70PnLzFAUzfmBXAjKu9Q09iGx
-         +l7IMfhAkeuAw4F38csY9kRhSxRMk/6yUGsObLAkdEDRMnEffvi9RyOJf1veWr4qfHlw
-         KPfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736498659; x=1737103459;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3J6ybie5MZTohAU5zO4AHtHmlS6SVT///Z6RnwOTF0I=;
-        b=cpIGzT21XJZAVl9Brc8Xp3N05e4cplse2rc5iT1/kxSuZa18cob69+iYEbZyKzDpCO
-         Y8i4HlI5GEaRLZXNxvCG+Zmqcs/u5SYBCospyozUf+boLxgj/X1NFnxJUCLqtzsaLXcS
-         g8YmEA8VpvEpA/N8sNFz0oi37FEWIjCAS/jXe8zXt+H5W7ena+czLTmzXylC/4D+uuQI
-         SlC7YRyNq39zxAoVDSXRNQ9ysAKR0rMPVCxDWSsTQfeToWiTIXtegpTTTxKpvpWuKq+2
-         z3eEH2HkqaSu2yxPf+8ZFG1gbYnb3kO2jKO+YiJnB5KXF3KevkiHOECBpBTXvaoA1yok
-         vN5g==
-X-Gm-Message-State: AOJu0YyCcFjiMUO/Y+VPuQR40luUrmn4gSFYmnWyzt9TdbyE+PS1oN+u
-	e2OFSFMooFq8xxSmmARV+ECE01QZUZqnZXWtogdtMVnHnpLBhZI32ybI3dImhxlhhe+tY5O/plT
-	tFT7M65o+CzBgpcApZfdwJy81shLM4CZg1oM3IA==
-X-Gm-Gg: ASbGncsuQ1NP5ka2ikZn1eYmw2s1by0SUON5aOgJ8zoMFCjZq8KwsAt5++4EYdEWNYX
-	nEi1NEkQzbKOqb2sEeKdg2BRW1/zooL38UsucK6vl29C6KYD9TGeuSQbiuUEdVzrmBQw0
-X-Google-Smtp-Source: AGHT+IEyB2cuChMeX1r+nZtaJdP6Mzdmo0n9PGPsFhkwAW7ukTnXjzzz9a+MUocObbefl6A9T2AxU0IqAEz7Wjzjkhg=
-X-Received: by 2002:a05:6512:2399:b0:540:1ea7:44db with SMTP id
- 2adb3069b0e04-542845b1aedmr3480546e87.4.1736498658964; Fri, 10 Jan 2025
- 00:44:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="2CinhbZn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=RDp/DbtGirYJYNAv3Ihs6BUOnf2dqZhzxU2jeAkSL2w=; b=2CinhbZnZejajO/6rqG5dD6Fqr
+	53KF22JUBKIPl/KJc+60SU8jGPo22tL3QFGNGXZ4G2uzGr42zhv/9oMUXi42/fZBvcry8cl0cmeJk
+	FMTU90kdj4ICM0aXt7rtpcivnsi0kJ41qbq0VLdhpplVP0pDA2/o9tto4/h5GX2uX7iy5lW6S8cxc
+	ku35EaZX881ZDnW4VDADbXXo00B+7+4JlJsD1i6H2AE8JpZKdPim9IjSUwOtm4KLvfLshSgQfebNQ
+	yRLuHw+tHQa/pp8lypTS8uTxkvttBHCJDnjzE2Tut7X+EbzVIxazwlcy2E1VPl13L6HjDQ7+K+XBM
+	t5wfGuDA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tWAqR-0000000EcGq-23bb;
+	Fri, 10 Jan 2025 08:58:19 +0000
+Date: Fri, 10 Jan 2025 00:58:19 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Theodore Ts'o <tytso@mit.edu>
+Cc: Travis Downs <travis.downs@gmail.com>, linux-block@vger.kernel.org
+Subject: Re: Semantics of racy O_DIRECT writes
+Message-ID: <Z4DhK_JrkL5jn5P1@infradead.org>
+References: <CAOBGo4xx+88nZM=nqqgQU5RRiHP1QOqU4i2dDwXt7rF6K0gaUQ@mail.gmail.com>
+ <20250109045743.GE1323402@mit.edu>
+ <CAOBGo4w88v0tqDiTwAPP6OQLXHGdjx1oFKaB0oRY45dmC-D1_Q@mail.gmail.com>
+ <20250109155119.GF1323402@mit.edu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241213041958.202565-1-ebiggers@kernel.org>
-In-Reply-To: <20241213041958.202565-1-ebiggers@kernel.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 10 Jan 2025 09:44:07 +0100
-X-Gm-Features: AbW1kvYIJl4nVvnVQIFwQlGZKMe8mAAA_MH2MqnfAcbAm7yp2J-zmj2cn1w9I5U
-Message-ID: <CAMRc=MdeZ_k9z+ZKW1ub0m9ymh3eABUU7ZRPY9TYHM_fc+D+qQ@mail.gmail.com>
-Subject: Re: [PATCH v10 00/15] Support for hardware-wrapped inline encryption keys
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, Gaurav Kashyap <quic_gaurkash@quicinc.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Alim Akhtar <alim.akhtar@samsung.com>, 
-	Avri Altman <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
-	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>, Jens Axboe <axboe@kernel.dk>, 
-	Konrad Dybcio <konradybcio@kernel.org>, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
-	"Martin K . Petersen" <martin.petersen@oracle.com>, Ulf Hansson <ulf.hansson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250109155119.GF1323402@mit.edu>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Dec 13, 2024 at 5:20=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
-wrote:
->
-> This patchset is based on next-20241212 and is also available in git via:
->
->     git fetch https://git.kernel.org/pub/scm/fs/fscrypt/linux.git wrapped=
--keys-v10
->
-> This patchset adds support for hardware-wrapped inline encryption keys, a
-> security feature supported by some SoCs.  It adds the block and fscrypt
-> framework for the feature as well as support for it with UFS on Qualcomm =
-SoCs.
->
-> This feature is described in full detail in the included Documentation ch=
-anges.
-> But to summarize, hardware-wrapped keys are inline encryption keys that a=
-re
-> wrapped (encrypted) by a key internal to the hardware so that they can on=
-ly be
-> unwrapped (decrypted) by the hardware.  Initially keys are wrapped with a
-> permanent hardware key, but during actual use they are re-wrapped with a
-> per-boot ephemeral key for improved security.  The hardware supports impo=
-rting
-> keys as well as generating keys itself.
->
-> This differs from the existing support for hardware-wrapped keys in the k=
-ernel
-> crypto API (also called "hardware-bound keys" in some places) in the same=
- way
-> that the crypto API differs from blk-crypto: the crypto API is for genera=
-l
-> crypto operations, whereas blk-crypto is for inline storage encryption.
->
-> This feature is already being used by Android downstream for several year=
-s
-> (https://source.android.com/docs/security/features/encryption/hw-wrapped-=
-keys),
-> but on other platforms userspace support will be provided via fscryptctl =
-and
-> tests via xfstests (I have some old patches for this that need to be upda=
-ted).
->
-> Maintainers, please consider merging the following preparatory patches fo=
-r 6.14:
->
->   - UFS / SCSI tree: patches 1-4
->   - MMC tree: patches 5-7
->   - Qualcomm / MSM tree: patch 8
->
+On Thu, Jan 09, 2025 at 10:51:19AM -0500, Theodore Ts'o wrote:
+> For Linux, if the block device is one that requires stable writes
+> (e.g., for iSCSI writes which include a checksum, or SCSI devices with
+> DIF/DIX enabled, or some software RAID 5 block device), where a racy
+> write might lead to an I/O error on the write or in the case of RAID
+> 5, in the subsequent read of the block, Linux will protect against
+> this happening by marking the page read-only while the I/O is
+> underway, either if it's happening via buffered writeback or O_DIRECT
+> writes, and then marking the page read/write afterwards.
 
-IIUC The following patches will have to wait for the v6.15 cycle?
+This only happens for buffered I/O, and not for direct I/O.
 
-[PATCH v10 9/15] soc: qcom: ice: make qcom_ice_program_key() take
-struct blk_crypto_key
-[PATCH v10 10/15] blk-crypto: add basic hardware-wrapped key support
-[PATCH v10 11/15] blk-crypto: show supported key types in sysfs
-[PATCH v10 12/15] blk-crypto: add ioctls to create and prepare
-hardware-wrapped keys
-[PATCH v10 13/15] fscrypt: add support for hardware-wrapped keys
-[PATCH v10 14/15] soc: qcom: ice: add HWKM support to the ICE driver
-[PATCH v10 15/15] ufs: qcom: add support for wrapped keys
+But that only matters when your operation is inside the sector (LBA)
+boundary that the device interface operates on, e.g. if you using 512
+byte sector size as long your stay outside of that you're still fine.
 
-Bartosz
+BUT: that assumes device checksums.  File systems can have checksums
+as well and have the same problem.  Because of that for example running
+Windows VM images which tend to somehow generate this pattern on qemu
+using direct I/O on btrfs files has historically causes a lot of
+problems.
+
