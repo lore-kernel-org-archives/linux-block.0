@@ -1,192 +1,121 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDBE6207A15;
-	Fri, 10 Jan 2025 14:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA8E211269
+	for <linux-block@vger.kernel.org>; Fri, 10 Jan 2025 14:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736518423; cv=none; b=g4GAqiY4KYt2ykEQJ4wTCrT6ipLyp5UTvMNkvv6mxrRyZiQXxXrEdt+JlOPBJ+kQsJceY0nK+GPkFY4boMcldj7qdf4AHXYWiUFqWvpSmG4+P7tQ0Mw79MReDMOS7bGvCTClrNrw1BoI2HDWm+R9B6LI9ecc4VCeF0bkW7gyI+Q=
+	t=1736519531; cv=none; b=JRmfIxsyYPBFevdfI1I5T52qPSeEEYvo/+6migTKTTXcbNXJBXEh6zTYTlBsoPxomnLrJ9/6qI8LG5fVQ0dIEodi3zBvekMTMtOXN8TBEkqwccZxKlx+N12GNkQKzv3VnFYI3l8kGYhXvrmm3HnBRGoh1jr0mNQq3pAj7oDpETc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736518423; c=relaxed/simple;
-	bh=cFP3bHfydKoOvJDX4q6qcRv+WfA9oo+5sIiUfxPlzr0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=okogJLwbhldres14ojlVGjH9QCxT9SBk9qvyMj9M+y6qqkuw81+7Yg4lVW6fYuTu6ksgP0WkuymZZfIQOHKBHw7dvSblDSn1NlHLeJR/ZKRrPOzUIUZTH9h7ELN2JbJN3yecTK/NKX1gjudtv24XKWQpCbyE1rlRtEODqCdZyiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GV8XkraW; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736519531; c=relaxed/simple;
+	bh=wjl2kyvrQokdftdcDT7iv1DznyqTSmhketBgodBglC8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=GrFP7wyUibNYGS/eUyP3lYNd/zxp0oXta7s9tI4b6oaQY+9wG6YJA76eYOW9s8BzRBd+MDuuALEYjsvA8VIa18cJfZjGOMKHrnkNgK+d5LNKyuxSpjPiKEqC/xpE9Lfqk3ZAO9Esp9YLm43OwPxAasnPPk1LrySoJSLbpnw4HDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xNZS1KKt; arc=none smtp.client-ip=209.85.166.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GV8XkraW"
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b6e5ee6ac7so161303985a.0;
-        Fri, 10 Jan 2025 06:13:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xNZS1KKt"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-844eb33827eso64778239f.2
+        for <linux-block@vger.kernel.org>; Fri, 10 Jan 2025 06:32:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736518421; x=1737123221; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736519528; x=1737124328; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=g3xGxxcjkV1GQqHW+T0bZftfuqunVR2tHc64hAbzPOU=;
-        b=GV8XkraW7eQJ67ECAJYRHAvX6Kb/HL1AQyseKrCA5GuNbRxLIiVnh5u+i2wXspIx5P
-         U23YxA4EvhCx1KT99RKUpWFH/g6wjGTdn56rokjVLeA2Nc8oWwjO0ZngOjlIHdg+VSmv
-         JaF5iiAbb0af8p5J5PDMe8EZbVfjSs1hJt3TiD/wbVLVHg1BdmF6xEJjdJK/zsg1tLlU
-         nBn0UsrsjhyDXR68yPEdf+FKYr4PmPNyD0v+CJERuCDfZyrPc8bWJkze+Skynx83zb1f
-         +vpqkHpALsTEJOklbPR+cJ7Z60mz5n7nQe0CC43/hVDXH5oUZP7to0vKyRa4z0CnjEmT
-         5EAA==
+        bh=y/gcAKNkCa46sAJjco4x4Dt7XCwnmRxnbzpikJ5Iyr8=;
+        b=xNZS1KKt2shh4V2lOhN52MWj23/hDMmFzIAvaV6Au0Ls4ndjQBec43c4swbYhFNDhg
+         DW2gYzwxXQVQ/P+f62PjW8B1U3CcbCmX28vhxGn0+k8yLKjr75e15wvx1UZEDAicxMp4
+         IWCn3uOHCa+FyzYYwnaPAzom9dbWMrFcbXHQSQkqVg6Qw6bq/zFVcLiYJOT6j9izDeX/
+         gnYre9xzmfk03jNlqG1krw91ufxGuLhjd5N6koPznbIJisLq1CZQRl7FFp41hSRd9SsU
+         n1NnZgY4SiIxL+YwoS7sSz6uowAUz8n9yUgdMdEJMDknlIDzompy+oZs0ogPJKelDC2c
+         BAJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736518421; x=1737123221;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1736519528; x=1737124328;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=g3xGxxcjkV1GQqHW+T0bZftfuqunVR2tHc64hAbzPOU=;
-        b=v0HRGA/gabJOUVtVvgPIOMqvL1W0b5uEAclSTWjWHWjYU2PkBaoDXw3nc4KWHwCDyu
-         EqQCnYihqJpiZfM6sk9sQEyYAIE1QG2OC2hPxNMFd1XlzLx5tihnk1ijVxkDBvE6NgcJ
-         dXT3n9K3sZYpGQl/CLj8xjiYTmCO8TXsjBE78a38/ad5ngznqmDXiJUDExzv64SlVBjf
-         N9Mb4frf1ba5enKRGNiaq+CbWnPUNbV8xMuXK6LHy9jf2imyVDW4g3pXmZeVfqywJPV3
-         XlD7lOsV0IMkEIrBazdYmyOFI3itPoXM/mG9ocwyRhpT413YJ5/HkFuj/CvUbKMZn6HL
-         e9jw==
-X-Forwarded-Encrypted: i=1; AJvYcCUAfXjglFvimCGbm8VZNNfGCzRmJtgTKZ4Z8nlMl4Fkq4mIcjNgbDZ0tKJreZRFQFMxB+RxxdeR0lQ5NdFU@vger.kernel.org, AJvYcCVBn3UOIEDMwBnlkch/Cg3lk6znaz3v/isfNWkppQno5BXOfzlzfzz8HcjGRBlu/rBLBkEssd5C@vger.kernel.org, AJvYcCWE0N6df2Z0/pajGB9VwTPfpVgj7iP0g23n2KAtUE8JIdkDb3Pk/sI24Q//DUZAhbC3eAkNDSjdYVuTGQ==@vger.kernel.org, AJvYcCXWeuVIrU/VPSMdt+x/Bt+uGa1Hm8TbccurcJsbwpA3ZkZMQt/NZrl4guFAdOd4IbMZyovPV3iZAC346/RcFI8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yymln0cE88xojbA6oBlxntkz7fOEwF/um1hDB70gTg6VEnh2L9M
-	h5QrHTCTrR24tDKKoE1hrYjrBXMBpVTB0FAAIaoFEZ4aE0zaMOvB
-X-Gm-Gg: ASbGncs04rRX+zhQHuJrI+sMWWzKB7FtUocOfh3bPc7BneIuzFh6v/6+WzA2MunAf6E
-	nq0q/hTBfqjCm16s7LLD2LJGqWN2duhFsRRJ2oC5TWq+PNWgeClhTaJVh+qHtNp0pi70klFYEsj
-	8FlZIlvBxiFOeN1qpuqX5fw1tLhjLx4s2ILU0Eui2xZqX4moxWFwHuFAZ0LSSzTn8gJhBhZRyYe
-	/0hlPShkZGdDJW5wIymfJkE2aDJxkiBZSRhvErp2qkzKImEKE3uBLDUU9vbW8NrBermBrVqm/pc
-	hADju4q33YDmNYp6Wn2rqGWfsu+Ibgoz9Q/ekmUDqsdn2sg=
-X-Google-Smtp-Source: AGHT+IH/AJg7VLbxKgbG7Pi1UJDN7P0zRvx3nd32SpuhQVy2b3XtRSRC0CSWf3XE+/PwJfIXOKH9Xg==
-X-Received: by 2002:a05:620a:4142:b0:7b7:106a:19b7 with SMTP id af79cd13be357-7bcd970d4b8mr1646495685a.18.1736518420710;
-        Fri, 10 Jan 2025 06:13:40 -0800 (PST)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce350e155sm174951085a.97.2025.01.10.06.13.39
+        bh=y/gcAKNkCa46sAJjco4x4Dt7XCwnmRxnbzpikJ5Iyr8=;
+        b=U22diyRsmvZOzNUIyLiaIEPM4qpbH+evb3E3iAtBWA48EAeJVsX5BoUNjkBGUrAg6x
+         Rjq55TPFH3b7qo9+i0yMBELxMGe2qbFW5yKNHTS6oWSTHt5F8jmIRxjs6m3kLNL/rRnB
+         KIHZWZ51QlhA9uDIyXD81bMsl/fDQAGeBk4BddKFkfIKP2RojcLuxhUIbbwWKt78A8lv
+         vSqvWtO34FCCMIfyRfGT9ZJl4l3sDxL/rzPZp/ElXX8yuzZSHto4oWjW6s1wvF/JVxrZ
+         fLlNw/2tRac1Ey0Dah49Ejyd7IPWo262Yy/5Fh1JgmAnIfbWxZ8ebJBcf9I39anMze4P
+         AABw==
+X-Forwarded-Encrypted: i=1; AJvYcCU2wZ6fblYfDki7REdTjr91CLKIQ0Gt78uDdu4eFvGt8tj1+Kw8cHyMerylTRsM+T8ONcpIKL55JJ6+xQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZlN0S97IzBl64C6Ziwg5GLwebIrHo15ycS1SM2yjfi5fADQgy
+	t9C8cLuTDyxOlZ586u+Hu+GzNrqvNohXtb6GwUw2PrYLaYYtGDzL2TkFtLtxtXQ=
+X-Gm-Gg: ASbGncu84wKdlWMgEywOCiQwFK8R0J8pEcSZhbykMcYMlhbCSjP0wuwabWTjb6DZZnN
+	I3wrtFsuQtOzepGWfkfPW06Al2xTZ+4eP8+jPOJJIusXviZfMsRSWOxXU/PoJq2RZaBvixeWc+X
+	Tmj3jjPn7Hzxb5gZj8iwDFs3v4gjzmQ7VTpwWzHL4lD5JUz5FGVf4xU4LJ1JamFZSz8qJS987Ll
+	bOMv2aS167M+WwEZS6FpmLodd57DO9DZLxDs78w6vh2KiU=
+X-Google-Smtp-Source: AGHT+IHH04d6dGti7fVXw+0NaZh/+tDlC2458jxoW49T1h/PFC0T6YfGUhNP11btFhq4QTA6+HtDyA==
+X-Received: by 2002:a05:6602:3585:b0:84a:51e2:9f93 with SMTP id ca18e2360f4ac-84ce00c49f8mr971265339f.9.1736519528352;
+        Fri, 10 Jan 2025 06:32:08 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-84d61fc84dasm91086539f.46.2025.01.10.06.32.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 06:13:39 -0800 (PST)
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id E0BA9120007B;
-	Fri, 10 Jan 2025 09:13:38 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Fri, 10 Jan 2025 09:13:38 -0500
-X-ME-Sender: <xms:EiuBZw2XQQGXKzRHxWCP5ZF9TIiw4_yfFbzF5PpcvD904wijbN3RBg>
-    <xme:EiuBZ7EalUTYjQmmBEOk6I15iNHW0owqLn69HToj8kifbz6htdxAAbLGTSqwMPwwT
-    TuVcZeFTFOEiKO-YA>
-X-ME-Received: <xmr:EiuBZ467AzrqEeHIO2ZyLK6bVyTR8C9LNMM1IUbTxbcbbeaKGEvmmoZXecc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudegkedgieduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
-    gtohhmqeenucggtffrrghtthgvrhhnpefhtedvgfdtueekvdekieetieetjeeihedvteeh
-    uddujedvkedtkeefgedvvdehtdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdo
-    mhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejke
-    ehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgr
-    mhgvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
-    eplhgvvhihmhhithgthhgvlhhltdesghhmrghilhdrtghomhdprhgtphhtthhopehojhgv
-    uggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrlhgvgidrghgrhihnohhrsehgmh
-    grihhlrdgtohhmpdhrtghpthhtohepfigvughsohhnrghfsehgmhgrihhlrdgtohhmpdhr
-    tghpthhtohepghgrrhihsehgrghrhihguhhordhnvghtpdhrtghpthhtohepsghjohhrnh
-    efpghghhesphhrohhtohhnmhgrihhlrdgtohhmpdhrtghpthhtohepsggvnhhnohdrlhho
-    shhsihhnsehprhhothhonhdrmhgvpdhrtghpthhtoheprghlihgtvghrhihhlhesghhooh
-    hglhgvrdgtohhmpdhrtghpthhtohepthhmghhrohhsshesuhhmihgthhdrvgguuh
-X-ME-Proxy: <xmx:EiuBZ53b410hiT_tH4zrdIbdQ3KT21JRawsgjLL3lwYM8rfXq6D0SQ>
-    <xmx:EiuBZzFUU4il_pl5RCBYIR6nNcPSBzD5S_TNk3jt3TQlUEvs08_Tew>
-    <xmx:EiuBZy97MYXYWQYsFzwiWOFYBkB4XT7HzpaPXRvdv5RIZ-nvaMIFkw>
-    <xmx:EiuBZ4k-r-7GEXVxvXRJ0LWav4iFtDaRUQmwoSaQFY9BgmTO8VPZRg>
-    <xmx:EiuBZzGDyY8n9cek9T8To5f1RW1QUS8t03fiDW9L9Esmpmd24aazS_-F>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 10 Jan 2025 09:13:38 -0500 (EST)
-Date: Fri, 10 Jan 2025 06:12:34 -0800
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Mitchell Levy <levymitchell0@gmail.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
-	Wedson Almeida Filho <wedsonaf@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] rust: lockdep: Fix soundness issue affecting
- LockClassKeys
-Message-ID: <Z4Eq0qoZaIt7j9zW@boqun-archlinux>
-References: <20241219-rust-lockdep-v2-0-f65308fbc5ca@gmail.com>
+        Fri, 10 Jan 2025 06:32:07 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Ming Lei <ming.lei@redhat.com>, 
+ Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org, 
+ linux-nvme@lists.infradead.org, nbd@other.debian.org, 
+ linux-scsi@vger.kernel.org, usb-storage@lists.one-eyed-alien.net
+In-Reply-To: <20250110054726.1499538-1-hch@lst.de>
+References: <20250110054726.1499538-1-hch@lst.de>
+Subject: Re: fix queue freeze and limit locking order v4
+Message-Id: <173651952702.758529.3309066666363818120.b4-ty@kernel.dk>
+Date: Fri, 10 Jan 2025 07:32:07 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241219-rust-lockdep-v2-0-f65308fbc5ca@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-14bd6
 
-On Thu, Dec 19, 2024 at 12:58:54PM -0800, Mitchell Levy wrote:
-> This series is aimed at fixing a soundness issue with how dynamically
-> allocated LockClassKeys are handled. Currently, LockClassKeys can be
-> used without being Pin'd, which can break lockdep since it relies on
-> address stability. Similarly, these keys are not automatically
-> (de)registered with lockdep.
-> 
-> At the suggestion of Alice Ryhl, this series includes a patch for
-> -stable kernels that disables dynamically allocated keys. This prevents
-> backported patches from using the unsound implementation.
-> 
-> Currently, this series requires that all dynamically allocated
-> LockClassKeys have a lifetime of 'static (i.e., they must be leaked
-> after allocation). This is because Lock does not currently keep a
-> reference to the LockClassKey, instead passing it to C via FFI. This
-> causes a problem because the rust compiler would allow creating a
-> 'static Lock with a 'a LockClassKey (with 'a < 'static) while C would
-> expect the LockClassKey to live as long as the lock. This problem
-> represents an avenue for future work.
-> 
 
-Thanks for doing this! I found some clippy warnings with the current
-version, but overall it looks good to me. That said, appreciate it if
-patch #2 gets more reviews on the interface changes, thanks!
+On Fri, 10 Jan 2025 06:47:08 +0100, Christoph Hellwig wrote:
+> this is my version of Damien's "Fix queue freeze and limit locking order".
+> A lot looks very similar, but it was done independently based on the
+> previous discussion.
+> 
+> Changes since v3:
+>  - more comment fixups
+> 
+> [...]
 
-Regards,
-Boqun
+Applied, thanks!
 
-> ---
-> Changes from RFC:
-> - Split into two commits so that dynamically allocated LockClassKeys are
-> removed from stable kernels. (Thanks Alice Ryhl)
-> - Extract calls to C lockdep functions into helpers so things build
-> properly when LOCKDEP=n. (Thanks Benno Lossin)
-> - Remove extraneous `get_ref()` calls. (Thanks Benno Lossin)
-> - Provide better documentation for `new_dynamic()`. (Thanks Benno
-> Lossin)
-> - Ran rustfmt to fix formatting and some extraneous changes. (Thanks
-> Alice Ryhl and Benno Lossin)
-> - Link to RFC: https://lore.kernel.org/r/20240905-rust-lockdep-v1-1-d2c9c21aa8b2@gmail.com
-> 
-> ---
-> Changes in v2:
-> - Dropped formatting change that's already fixed upstream (Thanks Dirk
->   Behme).
-> - Moved safety comment to the right point in the patch series (Thanks
->   Dirk Behme and Boqun Feng).
-> - Added an example of dynamic LockClassKey usage (Thanks Boqun Feng).
-> - Link to v1: https://lore.kernel.org/r/20241004-rust-lockdep-v1-0-e9a5c45721fc@gmail.com
-> 
-> ---
-> Mitchell Levy (2):
->       rust: lockdep: Remove support for dynamically allocated LockClassKeys
->       rust: lockdep: Use Pin for all LockClassKey usages
-> 
->  rust/helpers/helpers.c          |  1 +
->  rust/helpers/sync.c             | 13 +++++++++
->  rust/kernel/sync.rs             | 63 ++++++++++++++++++++++++++++++++++-------
->  rust/kernel/sync/condvar.rs     |  5 ++--
->  rust/kernel/sync/lock.rs        |  9 ++----
->  rust/kernel/sync/lock/global.rs |  5 ++--
->  rust/kernel/sync/poll.rs        |  2 +-
->  rust/kernel/workqueue.rs        |  3 +-
->  8 files changed, 78 insertions(+), 23 deletions(-)
-> ---
-> base-commit: 0c5928deada15a8d075516e6e0d9ee19011bb000
-> change-id: 20240905-rust-lockdep-d3e30521c8ba
-> 
-> Best regards,
-> -- 
-> Mitchell Levy <levymitchell0@gmail.com>
-> 
+[01/11] block: fix docs for freezing of queue limits updates
+        commit: 9c96821b44f893fb63f021a28625d3b32c68e8b3
+[02/11] block: add a queue_limits_commit_update_frozen helper
+        commit: aa427d7b73b196f657d6d2cf0e94eff6b883fdef
+[03/11] block: check BLK_FEAT_POLL under q_usage_count
+        commit: 958148a6ac061a9a80a184ea678a5fa872d0c56f
+[04/11] block: don't update BLK_FEAT_POLL in __blk_mq_update_nr_hw_queues
+        commit: d432c817c21a48c3baaa0d28e4d3e74b6aa238a0
+[05/11] block: add a store_limit operations for sysfs entries
+        commit: a16230649ce27f8ac7dd8a5b079d9657aa96de16
+[06/11] block: fix queue freeze vs limits lock order in sysfs store methods
+        commit: c99f66e4084a62a2cc401c4704a84328aeddc9ec
+[07/11] nvme: fix queue freeze vs limits lock order
+        commit: 473106dd3aa964a62314d858f6602c95e40e6270
+[08/11] nbd: fix queue freeze vs limits lock order
+        commit: f3dec61d7544a90685f1dd9a87fd4afc751996d0
+[09/11] usb-storage: fix queue freeze vs limits lock order
+        commit: 1233751f7df722435bb93e928d64334db260b90d
+[10/11] loop: refactor queue limits updates
+        commit: b38c8be255e89ffcdeb817407222d2de0b573a41
+[11/11] loop: fix queue freeze vs limits lock order
+        commit: b03732a9c0db91522914185739505d92d3b0d816
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
