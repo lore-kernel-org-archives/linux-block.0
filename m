@@ -1,82 +1,82 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5253720FAA8;
-	Fri, 10 Jan 2025 14:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDBE6207A15;
+	Fri, 10 Jan 2025 14:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736518255; cv=none; b=j99E10KhmOyKP78sBZshXgEE+9IlAwdXoZEp3ugVnQDSevLbhZ4aHtMrV36tf9ilIDQkZ/dbNq2Od2Yt5l6baNwkQTAtowolbIUxYyg5fNpYodUQxca6m2O4MnwxLItciPzjYzloUILIU/21CN5ncHAFwXVrvfuzFPjOnRdhlvc=
+	t=1736518423; cv=none; b=g4GAqiY4KYt2ykEQJ4wTCrT6ipLyp5UTvMNkvv6mxrRyZiQXxXrEdt+JlOPBJ+kQsJceY0nK+GPkFY4boMcldj7qdf4AHXYWiUFqWvpSmG4+P7tQ0Mw79MReDMOS7bGvCTClrNrw1BoI2HDWm+R9B6LI9ecc4VCeF0bkW7gyI+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736518255; c=relaxed/simple;
-	bh=prYE8lJKBKfZFFTkbJhe+mbET5uq2vtviQ3+iBLCXgs=;
+	s=arc-20240116; t=1736518423; c=relaxed/simple;
+	bh=cFP3bHfydKoOvJDX4q6qcRv+WfA9oo+5sIiUfxPlzr0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bKtf5TEmQxiTTWEUz7tS2RszaG4TgiINcLJgvaqcv+QGTXiC9slLZdssQKHHNiDNJuenvaofcIzBw346g5f7oksLxmBBoKK9CTj2VsRoLykowctotRwlRGXeV0pnuG9/RG843QbcDllAdQkoYmgFivnDpr2Y+EnBmUNeHW41V9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kltxmgQO; arc=none smtp.client-ip=209.85.222.175
+	 Content-Type:Content-Disposition:In-Reply-To; b=okogJLwbhldres14ojlVGjH9QCxT9SBk9qvyMj9M+y6qqkuw81+7Yg4lVW6fYuTu6ksgP0WkuymZZfIQOHKBHw7dvSblDSn1NlHLeJR/ZKRrPOzUIUZTH9h7ELN2JbJN3yecTK/NKX1gjudtv24XKWQpCbyE1rlRtEODqCdZyiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GV8XkraW; arc=none smtp.client-ip=209.85.222.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kltxmgQO"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7b6c3629816so114035585a.1;
-        Fri, 10 Jan 2025 06:10:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GV8XkraW"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b6e5ee6ac7so161303985a.0;
+        Fri, 10 Jan 2025 06:13:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736518252; x=1737123052; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736518421; x=1737123221; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=n25fGlO9SMtdY7i71AsvjTmeLMMpMqqv9HUeRX+xSdE=;
-        b=kltxmgQOdWyXyPTR7V+EDwzh7prYT0xGePdUiESIB60k0N+7LbSro3EjUrCDssnC01
-         Yydlq1EZcZnhWTtguF2iX3fjHN1K9TUuSI04/xTKDUbRHb6IpCX6vdXPUM8zMw5S8+zu
-         fjEDfkfiI4uPihf5rwak7oADYIbSVKRfyvmvC+u+3XCl54eYSe5MUCP1mrteKgYukllg
-         wDSYZ59okrZF/LIb2StrYOa4mjylkUQeqXkK9suyaLFWabvgKOaWjqh3SB2mOcoDTVis
-         2J7bQNEKz9DWerpFtr7RTFyx6b+ftdAHtcskQNLYHr+HcjnU178yC/cb2p1iViMOkgdX
-         aCtQ==
+        bh=g3xGxxcjkV1GQqHW+T0bZftfuqunVR2tHc64hAbzPOU=;
+        b=GV8XkraW7eQJ67ECAJYRHAvX6Kb/HL1AQyseKrCA5GuNbRxLIiVnh5u+i2wXspIx5P
+         U23YxA4EvhCx1KT99RKUpWFH/g6wjGTdn56rokjVLeA2Nc8oWwjO0ZngOjlIHdg+VSmv
+         JaF5iiAbb0af8p5J5PDMe8EZbVfjSs1hJt3TiD/wbVLVHg1BdmF6xEJjdJK/zsg1tLlU
+         nBn0UsrsjhyDXR68yPEdf+FKYr4PmPNyD0v+CJERuCDfZyrPc8bWJkze+Skynx83zb1f
+         +vpqkHpALsTEJOklbPR+cJ7Z60mz5n7nQe0CC43/hVDXH5oUZP7to0vKyRa4z0CnjEmT
+         5EAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736518252; x=1737123052;
+        d=1e100.net; s=20230601; t=1736518421; x=1737123221;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=n25fGlO9SMtdY7i71AsvjTmeLMMpMqqv9HUeRX+xSdE=;
-        b=w1JqC3EXdEV2YMwa4P9AG0U6qVDksqA1a2p6aoitDllBPifHCr6ZwDtYqFh3FHb+tW
-         n4/hv16fDPzMHsuHHB5CmY6ZH5wGL9nO5pBACuWazTvYzkuc/cF6QnlOgsrh5oHEkvy2
-         cRdOcgoRxa7o7u1IZ1OaQiSr6ieF9YSUlEjjWQmpLJ8aBWe7/Pp+k+z3gvOSQ9bnmn4J
-         9xUnJ8xZybV53SZpU/Fk/ty9coJ4UhS0Qq9WT0TUCS08OKqDhyaW6sXxtk5ijn4ua0fD
-         fSP3+opGCozDTdyPYU/GIFBMn/H/MAwWY/aK1Z0ocVSPLeDFTyW+/qL6UvFkA00q2A5A
-         l0fQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWbrdJD6lBcoBd4yrEiGt7Q6XwovcfpDPl0fksMwnvw9zPKYy/Z7lHT8N5cicjrPlVOtfP7L30O1TDFfA==@vger.kernel.org, AJvYcCWf5FPyYuufmpuazxpN1pnmaCzYa3TcaFPlp+HgyTf3UXjoftMaqIwi5EATa/kqeDmTNEoLoLCZLBon0qwH@vger.kernel.org, AJvYcCX9d80sV4YTeDQkUZXF/jn7GJrdH60GmfIGPGzHPiuKvITrHcNmSljkF+gVn4PaCJW4nJEe4P86+2TOFObgK8Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybeZ0UevZejEkglmxRbVl3cBtT7+yxjnk18Aqq3AqZbzDlx8pP
-	Wi/wvF0m83LGpz/nb2Nt7fB3IVVv+2DoyVClXK4UF4TstFMmT8JB
-X-Gm-Gg: ASbGnct+YglhWNls2fiAOVZWkzIn14BziLX3SrrTCERV88Y4Zs8rI6Pr7/HNBCzyMEC
-	WueUGJy44CUuFb3hgeA7xNScpCVAE9B90DXVDaPlnrOMNgqOGCfgrkZ6bRRmAlw6quPEyQq/RT1
-	vMdVk1G/SpaZ13wpqiBJ+Ac8QjAstMX/Yj3LW/mR5s390c5KWcdHWU2f7YFV+R5BcJQjYzCeohJ
-	/T85/U3QtHvAwWxZc0NlOgpcw9QUMaY0y1ZrCQjmYuPDkfeCqw8+rfq2cc/cnqpOF/9mHAAMB4r
-	aUbzzzzWCiN8bm0uOiWcO+58bK8QX0ZSn2oqi7JEbi85Ku0=
-X-Google-Smtp-Source: AGHT+IExxyfyP3pzF/qLgEJzag8KrRVXiPeoKTsSEhGVAiY9TgR2Lu0YsU2BSoEv8zo/4k9I/qCoQQ==
-X-Received: by 2002:a05:620a:4095:b0:7b6:6b88:cc00 with SMTP id af79cd13be357-7bcd96e8d37mr1905707685a.5.1736518251914;
-        Fri, 10 Jan 2025 06:10:51 -0800 (PST)
+        bh=g3xGxxcjkV1GQqHW+T0bZftfuqunVR2tHc64hAbzPOU=;
+        b=v0HRGA/gabJOUVtVvgPIOMqvL1W0b5uEAclSTWjWHWjYU2PkBaoDXw3nc4KWHwCDyu
+         EqQCnYihqJpiZfM6sk9sQEyYAIE1QG2OC2hPxNMFd1XlzLx5tihnk1ijVxkDBvE6NgcJ
+         dXT3n9K3sZYpGQl/CLj8xjiYTmCO8TXsjBE78a38/ad5ngznqmDXiJUDExzv64SlVBjf
+         N9Mb4frf1ba5enKRGNiaq+CbWnPUNbV8xMuXK6LHy9jf2imyVDW4g3pXmZeVfqywJPV3
+         XlD7lOsV0IMkEIrBazdYmyOFI3itPoXM/mG9ocwyRhpT413YJ5/HkFuj/CvUbKMZn6HL
+         e9jw==
+X-Forwarded-Encrypted: i=1; AJvYcCUAfXjglFvimCGbm8VZNNfGCzRmJtgTKZ4Z8nlMl4Fkq4mIcjNgbDZ0tKJreZRFQFMxB+RxxdeR0lQ5NdFU@vger.kernel.org, AJvYcCVBn3UOIEDMwBnlkch/Cg3lk6znaz3v/isfNWkppQno5BXOfzlzfzz8HcjGRBlu/rBLBkEssd5C@vger.kernel.org, AJvYcCWE0N6df2Z0/pajGB9VwTPfpVgj7iP0g23n2KAtUE8JIdkDb3Pk/sI24Q//DUZAhbC3eAkNDSjdYVuTGQ==@vger.kernel.org, AJvYcCXWeuVIrU/VPSMdt+x/Bt+uGa1Hm8TbccurcJsbwpA3ZkZMQt/NZrl4guFAdOd4IbMZyovPV3iZAC346/RcFI8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yymln0cE88xojbA6oBlxntkz7fOEwF/um1hDB70gTg6VEnh2L9M
+	h5QrHTCTrR24tDKKoE1hrYjrBXMBpVTB0FAAIaoFEZ4aE0zaMOvB
+X-Gm-Gg: ASbGncs04rRX+zhQHuJrI+sMWWzKB7FtUocOfh3bPc7BneIuzFh6v/6+WzA2MunAf6E
+	nq0q/hTBfqjCm16s7LLD2LJGqWN2duhFsRRJ2oC5TWq+PNWgeClhTaJVh+qHtNp0pi70klFYEsj
+	8FlZIlvBxiFOeN1qpuqX5fw1tLhjLx4s2ILU0Eui2xZqX4moxWFwHuFAZ0LSSzTn8gJhBhZRyYe
+	/0hlPShkZGdDJW5wIymfJkE2aDJxkiBZSRhvErp2qkzKImEKE3uBLDUU9vbW8NrBermBrVqm/pc
+	hADju4q33YDmNYp6Wn2rqGWfsu+Ibgoz9Q/ekmUDqsdn2sg=
+X-Google-Smtp-Source: AGHT+IH/AJg7VLbxKgbG7Pi1UJDN7P0zRvx3nd32SpuhQVy2b3XtRSRC0CSWf3XE+/PwJfIXOKH9Xg==
+X-Received: by 2002:a05:620a:4142:b0:7b7:106a:19b7 with SMTP id af79cd13be357-7bcd970d4b8mr1646495685a.18.1736518420710;
+        Fri, 10 Jan 2025 06:13:40 -0800 (PST)
 Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce32381absm176809885a.8.2025.01.10.06.10.51
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce350e155sm174951085a.97.2025.01.10.06.13.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 06:10:51 -0800 (PST)
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailfauth.phl.internal (Postfix) with ESMTP id EB2C4120006D;
-	Fri, 10 Jan 2025 09:10:50 -0500 (EST)
+        Fri, 10 Jan 2025 06:13:39 -0800 (PST)
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id E0BA9120007B;
+	Fri, 10 Jan 2025 09:13:38 -0500 (EST)
 Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Fri, 10 Jan 2025 09:10:50 -0500
-X-ME-Sender: <xms:aiqBZ9gv4sVXb0bEJQsPpmhMT4Xkh93NnPdVCx05o8NOmrVTxaI3fg>
-    <xme:aiqBZyCLYCs8Q2zy3DNJE2hnQai9bKK-3ku_JooqZ05Ytms38lNfFXKXvdqcXDUb9
-    5b_PPh0F7yF63zNDg>
-X-ME-Received: <xmr:aiqBZ9FU-i2R9RMBGDKTkLZmmjLzQse4ez0Jg0oEi8F9-mYJviEPsMtaDko>
+  by phl-compute-01.internal (MEProxy); Fri, 10 Jan 2025 09:13:38 -0500
+X-ME-Sender: <xms:EiuBZw2XQQGXKzRHxWCP5ZF9TIiw4_yfFbzF5PpcvD904wijbN3RBg>
+    <xme:EiuBZ7EalUTYjQmmBEOk6I15iNHW0owqLn69HToj8kifbz6htdxAAbLGTSqwMPwwT
+    TuVcZeFTFOEiKO-YA>
+X-ME-Received: <xmr:EiuBZ467AzrqEeHIO2ZyLK6bVyTR8C9LNMM1IUbTxbcbbeaKGEvmmoZXecc>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudegkedgieduucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
     rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
     htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
     ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
-    gtohhmqeenucggtffrrghtthgvrhhnpefftdeihfeigedtvdeuueffieetvedtgeejuefh
-    hffgudfgfeeggfeftdeigeehvdenucffohhmrghinhepghhithhhuhgsrdgtohhmnecuve
+    gtohhmqeenucggtffrrghtthgvrhhnpefhtedvgfdtueekvdekieetieetjeeihedvteeh
+    uddujedvkedtkeefgedvvdehtdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
     hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdo
     mhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejke
     ehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgr
-    mhgvpdhnsggprhgtphhtthhopedugedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
+    mhgvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
     eplhgvvhihmhhithgthhgvlhhltdesghhmrghilhdrtghomhdprhgtphhtthhopehojhgv
     uggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrlhgvgidrghgrhihnohhrsehgmh
     grihhlrdgtohhmpdhrtghpthhtohepfigvughsohhnrghfsehgmhgrihhlrdgtohhmpdhr
@@ -84,15 +84,15 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudegkedgieduucetufdoteggod
     efpghghhesphhrohhtohhnmhgrihhlrdgtohhmpdhrtghpthhtohepsggvnhhnohdrlhho
     shhsihhnsehprhhothhonhdrmhgvpdhrtghpthhtoheprghlihgtvghrhihhlhesghhooh
     hglhgvrdgtohhmpdhrtghpthhtohepthhmghhrohhsshesuhhmihgthhdrvgguuh
-X-ME-Proxy: <xmx:aiqBZyRPWS82oF8ulKg7_2pGKl4fydTndM2AxPGKK3WWw_01DXHzhg>
-    <xmx:aiqBZ6zOlM9lcskOYZYYm2eIvCh5UiJFechm9PNGwKneIffVlelCyA>
-    <xmx:aiqBZ44jgUOzPv3I2kCEeNCYtiPo-v9fsbYU_Z0zBvd25zNQ1ZWdnA>
-    <xmx:aiqBZ_xIcyGBrMjfolFTqh6b4Jo64ByMTKyp3EGLKSJoAsaQgK2buA>
-    <xmx:aiqBZyhIqao_p2g1pn1pBfzrfqp2-dc6TuVN599lE6zU5d8oGeO03U7p>
+X-ME-Proxy: <xmx:EiuBZ53b410hiT_tH4zrdIbdQ3KT21JRawsgjLL3lwYM8rfXq6D0SQ>
+    <xmx:EiuBZzFUU4il_pl5RCBYIR6nNcPSBzD5S_TNk3jt3TQlUEvs08_Tew>
+    <xmx:EiuBZy97MYXYWQYsFzwiWOFYBkB4XT7HzpaPXRvdv5RIZ-nvaMIFkw>
+    <xmx:EiuBZ4k-r-7GEXVxvXRJ0LWav4iFtDaRUQmwoSaQFY9BgmTO8VPZRg>
+    <xmx:EiuBZzGDyY8n9cek9T8To5f1RW1QUS8t03fiDW9L9Esmpmd24aazS_-F>
 Feedback-ID: iad51458e:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 10 Jan 2025 09:10:50 -0500 (EST)
-Date: Fri, 10 Jan 2025 06:09:46 -0800
+ 10 Jan 2025 09:13:38 -0500 (EST)
+Date: Fri, 10 Jan 2025 06:12:34 -0800
 From: Boqun Feng <boqun.feng@gmail.com>
 To: Mitchell Levy <levymitchell0@gmail.com>
 Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
@@ -103,11 +103,11 @@ Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
 	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
 	Andreas Hindborg <a.hindborg@kernel.org>,
 	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] rust: lockdep: Use Pin for all LockClassKey usages
-Message-ID: <Z4EqKlucyepSsENy@boqun-archlinux>
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] rust: lockdep: Fix soundness issue affecting
+ LockClassKeys
+Message-ID: <Z4Eq0qoZaIt7j9zW@boqun-archlinux>
 References: <20241219-rust-lockdep-v2-0-f65308fbc5ca@gmail.com>
- <20241219-rust-lockdep-v2-2-f65308fbc5ca@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -116,283 +116,77 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241219-rust-lockdep-v2-2-f65308fbc5ca@gmail.com>
+In-Reply-To: <20241219-rust-lockdep-v2-0-f65308fbc5ca@gmail.com>
 
-On Thu, Dec 19, 2024 at 12:58:56PM -0800, Mitchell Levy wrote:
-> Reintroduce dynamically-allocated LockClassKeys such that they are
-> automatically (de)registered. Require that all usages of LockClassKeys
-> ensure that they are Pin'd.
+On Thu, Dec 19, 2024 at 12:58:54PM -0800, Mitchell Levy wrote:
+> This series is aimed at fixing a soundness issue with how dynamically
+> allocated LockClassKeys are handled. Currently, LockClassKeys can be
+> used without being Pin'd, which can break lockdep since it relies on
+> address stability. Similarly, these keys are not automatically
+> (de)registered with lockdep.
 > 
-> Closes: https://github.com/Rust-for-Linux/linux/issues/1102
-> Suggested-by: Benno Lossin <benno.lossin@proton.me>
-> Suggested-by: Boqun Feng <boqun.feng@gmail.com>
-> Signed-off-by: Mitchell Levy <levymitchell0@gmail.com>
-> ---
->  rust/helpers/helpers.c          |  1 +
->  rust/helpers/sync.c             | 13 ++++++++++
->  rust/kernel/sync.rs             | 57 ++++++++++++++++++++++++++++++++++++++---
->  rust/kernel/sync/condvar.rs     |  5 ++--
->  rust/kernel/sync/lock.rs        |  9 +++----
->  rust/kernel/sync/lock/global.rs |  5 ++--
->  rust/kernel/sync/poll.rs        |  2 +-
->  rust/kernel/workqueue.rs        |  3 ++-
->  8 files changed, 79 insertions(+), 16 deletions(-)
+> At the suggestion of Alice Ryhl, this series includes a patch for
+> -stable kernels that disables dynamically allocated keys. This prevents
+> backported patches from using the unsound implementation.
 > 
-> diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
-> index dcf827a61b52..572af343212c 100644
-> --- a/rust/helpers/helpers.c
-> +++ b/rust/helpers/helpers.c
-> @@ -25,6 +25,7 @@
->  #include "signal.c"
->  #include "slab.c"
->  #include "spinlock.c"
-> +#include "sync.c"
->  #include "task.c"
->  #include "uaccess.c"
->  #include "vmalloc.c"
-> diff --git a/rust/helpers/sync.c b/rust/helpers/sync.c
-> new file mode 100644
-> index 000000000000..ff7e68b48810
-> --- /dev/null
-> +++ b/rust/helpers/sync.c
-> @@ -0,0 +1,13 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#include <linux/lockdep.h>
-> +
-> +void rust_helper_lockdep_register_key(struct lock_class_key *k)
-> +{
-> +	lockdep_register_key(k);
-> +}
-> +
-> +void rust_helper_lockdep_unregister_key(struct lock_class_key *k)
-> +{
-> +	lockdep_unregister_key(k);
-> +}
-> diff --git a/rust/kernel/sync.rs b/rust/kernel/sync.rs
-> index ae16bfd98de2..13bfdc647c5b 100644
-> --- a/rust/kernel/sync.rs
-> +++ b/rust/kernel/sync.rs
-> @@ -5,6 +5,8 @@
->  //! This module contains the kernel APIs related to synchronisation that have been ported or
->  //! wrapped for usage by Rust code in the kernel.
->  
-> +use crate::pin_init;
-> +use crate::prelude::*;
->  use crate::types::Opaque;
->  
->  mod arc;
-> @@ -22,15 +24,64 @@
->  
->  /// Represents a lockdep class. It's a wrapper around C's `lock_class_key`.
->  #[repr(transparent)]
-> -pub struct LockClassKey(Opaque<bindings::lock_class_key>);
-> +#[pin_data(PinnedDrop)]
-> +pub struct LockClassKey {
-> +    #[pin]
-> +    inner: Opaque<bindings::lock_class_key>,
-> +}
->  
->  // SAFETY: `bindings::lock_class_key` is designed to be used concurrently from multiple threads and
->  // provides its own synchronization.
->  unsafe impl Sync for LockClassKey {}
->  
->  impl LockClassKey {
-> +    /// Initializes a dynamically allocated lock class key. In the common case of using a
-> +    /// statically allocated lock class key, the static_lock_class! macro should be used instead.
-> +    ///
-> +    /// # Example
-> +    /// ```
-> +    /// # use kernel::{c_str, stack_pin_init};
-> +    /// # use kernel::alloc::KBox;
-> +    /// # use kernel::types::ForeignOwnable;
-> +    /// # use kernel::sync::{LockClassKey, SpinLock};
-> +    ///
-> +    /// let key = KBox::pin_init(LockClassKey::new_dynamic(), GFP_KERNEL)?;
-> +    /// let key_ptr = key.into_foreign();
-> +    ///
-> +    /// // SAFETY: `key_ptr` is returned by the above `into_foreign()`, whose `from_foreign()` has
-> +    /// // not yet been called.
-> +    /// stack_pin_init!(let num: SpinLock<u32> = SpinLock::new(
-> +    ///     0,
-> +    ///     c_str!("my_spinlock"),
+> Currently, this series requires that all dynamically allocated
+> LockClassKeys have a lifetime of 'static (i.e., they must be leaked
+> after allocation). This is because Lock does not currently keep a
+> reference to the LockClassKey, instead passing it to C via FFI. This
+> causes a problem because the rust compiler would allow creating a
+> 'static Lock with a 'a LockClassKey (with 'a < 'static) while C would
+> expect the LockClassKey to live as long as the lock. This problem
+> represents an avenue for future work.
+> 
 
-Clippy complains the following unsafe block doesn't have a safety
-comment, please move the above safety comment here.
-
-> +    ///     unsafe { <Pin<KBox<LockClassKey>> as ForeignOwnable>::borrow(key_ptr) }
-> +    /// ));
-> +    ///
-> +    /// drop(num);
-
-Also clippy doesn't like using drop() on types that don't impl `Drop`,
-we may need to create an extra scope to make clippy happy (in the same
-time it makes no user on `key` anymore, like:
-
-    /// {
-    ///     stack_pin_init!(let num: SpinLock<u32> = SpinLock::new(
-    ///         0,
-    ///         c_str!("my_spinlock"),
-    ///         // SAFETY: `key_ptr` is returned by the above `into_foreign()`, whose `from_foreign()` has
-    ///         // not yet been called.
-    ///         unsafe { <Pin<KBox<LockClassKey>> as ForeignOwnable>::borrow(key_ptr) }
-    ///     ));
-    /// }
-
-Make sure to update the comments and format the code afterwards.
-
-Thanks!
+Thanks for doing this! I found some clippy warnings with the current
+version, but overall it looks good to me. That said, appreciate it if
+patch #2 gets more reviews on the interface changes, thanks!
 
 Regards,
 Boqun
 
-> +    ///
-> +    /// // SAFETY: We dropped `num`, the only use of the key, so the result of the previous
-> +    /// // `borrow` has also been dropped. Thus, it's safe to use from_foreign.
-> +    /// unsafe { drop(<Pin<KBox<LockClassKey>> as ForeignOwnable>::from_foreign(key_ptr)) };
-> +    ///
-> +    /// # Ok::<(), Error>(())
-> +    /// ```
-> +    pub fn new_dynamic() -> impl PinInit<Self> {
-> +        pin_init!(Self {
-> +            // SAFETY: lockdep_register_key expects an uninitialized block of memory
-> +            inner <- Opaque::ffi_init(|slot| unsafe { bindings::lockdep_register_key(slot) })
-> +        })
-> +    }
-> +
->      pub(crate) fn as_ptr(&self) -> *mut bindings::lock_class_key {
-> -        self.0.get()
-> +        self.inner.get()
-> +    }
-> +}
-> +
-> +#[pinned_drop]
-> +impl PinnedDrop for LockClassKey {
-> +    fn drop(self: Pin<&mut Self>) {
-> +        // SAFETY: self.as_ptr was registered with lockdep and self is pinned, so the address
-> +        // hasn't changed. Thus, it's safe to pass to unregister.
-> +        unsafe { bindings::lockdep_unregister_key(self.as_ptr()) }
->      }
->  }
->  
-> @@ -43,7 +94,7 @@ macro_rules! static_lock_class {
->          // lock_class_key
->          static CLASS: $crate::sync::LockClassKey =
->              unsafe { ::core::mem::MaybeUninit::uninit().assume_init() };
-> -        &CLASS
-> +        $crate::prelude::Pin::static_ref(&CLASS)
->      }};
->  }
->  
-> diff --git a/rust/kernel/sync/condvar.rs b/rust/kernel/sync/condvar.rs
-> index 7df565038d7d..29289ccf55cc 100644
-> --- a/rust/kernel/sync/condvar.rs
-> +++ b/rust/kernel/sync/condvar.rs
-> @@ -15,8 +15,7 @@
->      time::Jiffies,
->      types::Opaque,
->  };
-> -use core::marker::PhantomPinned;
-> -use core::ptr;
-> +use core::{marker::PhantomPinned, pin::Pin, ptr};
->  use macros::pin_data;
->  
->  /// Creates a [`CondVar`] initialiser with the given name and a newly-created lock class.
-> @@ -101,7 +100,7 @@ unsafe impl Sync for CondVar {}
->  
->  impl CondVar {
->      /// Constructs a new condvar initialiser.
-> -    pub fn new(name: &'static CStr, key: &'static LockClassKey) -> impl PinInit<Self> {
-> +    pub fn new(name: &'static CStr, key: Pin<&'static LockClassKey>) -> impl PinInit<Self> {
->          pin_init!(Self {
->              _pin: PhantomPinned,
->              // SAFETY: `slot` is valid while the closure is called and both `name` and `key` have
-> diff --git a/rust/kernel/sync/lock.rs b/rust/kernel/sync/lock.rs
-> index 41dcddac69e2..119e5f569bdb 100644
-> --- a/rust/kernel/sync/lock.rs
-> +++ b/rust/kernel/sync/lock.rs
-> @@ -7,12 +7,9 @@
->  
->  use super::LockClassKey;
->  use crate::{
-> -    init::PinInit,
-> -    pin_init,
-> -    str::CStr,
-> -    types::{NotThreadSafe, Opaque, ScopeGuard},
-> +    init::PinInit, pin_init, str::CStr, types::NotThreadSafe, types::Opaque, types::ScopeGuard,
->  };
-> -use core::{cell::UnsafeCell, marker::PhantomPinned};
-> +use core::{cell::UnsafeCell, marker::PhantomPinned, pin::Pin};
->  use macros::pin_data;
->  
->  pub mod mutex;
-> @@ -121,7 +118,7 @@ unsafe impl<T: ?Sized + Send, B: Backend> Sync for Lock<T, B> {}
->  
->  impl<T, B: Backend> Lock<T, B> {
->      /// Constructs a new lock initialiser.
-> -    pub fn new(t: T, name: &'static CStr, key: &'static LockClassKey) -> impl PinInit<Self> {
-> +    pub fn new(t: T, name: &'static CStr, key: Pin<&'static LockClassKey>) -> impl PinInit<Self> {
->          pin_init!(Self {
->              data: UnsafeCell::new(t),
->              _pin: PhantomPinned,
-> diff --git a/rust/kernel/sync/lock/global.rs b/rust/kernel/sync/lock/global.rs
-> index 480ee724e3cc..d65f94b5caf2 100644
-> --- a/rust/kernel/sync/lock/global.rs
-> +++ b/rust/kernel/sync/lock/global.rs
-> @@ -13,6 +13,7 @@
->  use core::{
->      cell::UnsafeCell,
->      marker::{PhantomData, PhantomPinned},
-> +    pin::Pin,
->  };
->  
->  /// Trait implemented for marker types for global locks.
-> @@ -26,7 +27,7 @@ pub trait GlobalLockBackend {
->      /// The backend used for this global lock.
->      type Backend: Backend + 'static;
->      /// The class for this global lock.
-> -    fn get_lock_class() -> &'static LockClassKey;
-> +    fn get_lock_class() -> Pin<&'static LockClassKey>;
->  }
->  
->  /// Type used for global locks.
-> @@ -270,7 +271,7 @@ impl $crate::sync::lock::GlobalLockBackend for $name {
->              type Item = $valuety;
->              type Backend = $crate::global_lock_inner!(backend $kind);
->  
-> -            fn get_lock_class() -> &'static $crate::sync::LockClassKey {
-> +            fn get_lock_class() -> Pin<&'static $crate::sync::LockClassKey> {
->                  $crate::static_lock_class!()
->              }
->          }
-> diff --git a/rust/kernel/sync/poll.rs b/rust/kernel/sync/poll.rs
-> index d5f17153b424..c4934f82d68b 100644
-> --- a/rust/kernel/sync/poll.rs
-> +++ b/rust/kernel/sync/poll.rs
-> @@ -89,7 +89,7 @@ pub struct PollCondVar {
->  
->  impl PollCondVar {
->      /// Constructs a new condvar initialiser.
-> -    pub fn new(name: &'static CStr, key: &'static LockClassKey) -> impl PinInit<Self> {
-> +    pub fn new(name: &'static CStr, key: Pin<&'static LockClassKey>) -> impl PinInit<Self> {
->          pin_init!(Self {
->              inner <- CondVar::new(name, key),
->          })
-> diff --git a/rust/kernel/workqueue.rs b/rust/kernel/workqueue.rs
-> index 1dcd53478edd..f8f2f971f985 100644
-> --- a/rust/kernel/workqueue.rs
-> +++ b/rust/kernel/workqueue.rs
-> @@ -369,7 +369,8 @@ unsafe impl<T: ?Sized, const ID: u64> Sync for Work<T, ID> {}
->  impl<T: ?Sized, const ID: u64> Work<T, ID> {
->      /// Creates a new instance of [`Work`].
->      #[inline]
-> -    pub fn new(name: &'static CStr, key: &'static LockClassKey) -> impl PinInit<Self>
-> +    #[allow(clippy::new_ret_no_self)]
-> +    pub fn new(name: &'static CStr, key: Pin<&'static LockClassKey>) -> impl PinInit<Self>
->      where
->          T: WorkItem<ID>,
->      {
+> ---
+> Changes from RFC:
+> - Split into two commits so that dynamically allocated LockClassKeys are
+> removed from stable kernels. (Thanks Alice Ryhl)
+> - Extract calls to C lockdep functions into helpers so things build
+> properly when LOCKDEP=n. (Thanks Benno Lossin)
+> - Remove extraneous `get_ref()` calls. (Thanks Benno Lossin)
+> - Provide better documentation for `new_dynamic()`. (Thanks Benno
+> Lossin)
+> - Ran rustfmt to fix formatting and some extraneous changes. (Thanks
+> Alice Ryhl and Benno Lossin)
+> - Link to RFC: https://lore.kernel.org/r/20240905-rust-lockdep-v1-1-d2c9c21aa8b2@gmail.com
 > 
+> ---
+> Changes in v2:
+> - Dropped formatting change that's already fixed upstream (Thanks Dirk
+>   Behme).
+> - Moved safety comment to the right point in the patch series (Thanks
+>   Dirk Behme and Boqun Feng).
+> - Added an example of dynamic LockClassKey usage (Thanks Boqun Feng).
+> - Link to v1: https://lore.kernel.org/r/20241004-rust-lockdep-v1-0-e9a5c45721fc@gmail.com
+> 
+> ---
+> Mitchell Levy (2):
+>       rust: lockdep: Remove support for dynamically allocated LockClassKeys
+>       rust: lockdep: Use Pin for all LockClassKey usages
+> 
+>  rust/helpers/helpers.c          |  1 +
+>  rust/helpers/sync.c             | 13 +++++++++
+>  rust/kernel/sync.rs             | 63 ++++++++++++++++++++++++++++++++++-------
+>  rust/kernel/sync/condvar.rs     |  5 ++--
+>  rust/kernel/sync/lock.rs        |  9 ++----
+>  rust/kernel/sync/lock/global.rs |  5 ++--
+>  rust/kernel/sync/poll.rs        |  2 +-
+>  rust/kernel/workqueue.rs        |  3 +-
+>  8 files changed, 78 insertions(+), 23 deletions(-)
+> ---
+> base-commit: 0c5928deada15a8d075516e6e0d9ee19011bb000
+> change-id: 20240905-rust-lockdep-d3e30521c8ba
+> 
+> Best regards,
 > -- 
-> 2.34.1
+> Mitchell Levy <levymitchell0@gmail.com>
 > 
