@@ -1,73 +1,105 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A311E129A78
-	for <linux-block@vger.kernel.org>; Sat, 11 Jan 2025 06:28:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA29190059
+	for <linux-block@vger.kernel.org>; Sat, 11 Jan 2025 16:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736576882; cv=none; b=fEEkT7xHSWkldHAKVDVeYky2ZL2lQRms7NGMiU+U3R5Eb6KvB5pFs6G9qbIGtVOm4ND0bRR0xuJEIiX+Ie3CgqLU8YXh0yC7Acs4dO1sBk5QbYgv9LA8P+ncZ4KBsA0S43M35Msnh1j9SLsZV7xzNEm0GBLtwUOcBJmi3Tbppdo=
+	t=1736612385; cv=none; b=W2UKdsyJh60+6EmxsaJlD2JD0KIWx+Nboy1bfdh27d+sPmeLg/c1EoCFGCCwxOtv9W7IxS6OqZ8XbI8oBKbMJf4v5WZLbOMsRkFQE2mUc18Jw+ZOxPosHwrt9bKhH0Ue3HIkraeGiLsPNDdh71ieqhn2tdvBdEqe/eho2GfTPWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736576882; c=relaxed/simple;
-	bh=Ex2plrUMn+L/qLKOHWGpC2CFFaV6KbU5qncHtiErq9U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qmte5wQ0Xqvoym1+jP2ZvQXu9lxHwUPf5QZuF7c80yaAnk7GzRzOSAuYZdh8QKWY2duX7TpaeGpsZEEvMQWtk/GN/Irj8SWuYGSSCaoL8ItxMDtVb8/TeUe9wo7WdGcHiemVkNbaUR15yHZkLK0ZlSPEU4Blx5xDwI/Ss5PodTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qE6DyCzI; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1736612385; c=relaxed/simple;
+	bh=p9RbMyk2aHge/NMu4YrPSM2Yb4yebWp+9nam0A8yJR8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=XIsj+uwuSHH23gTKN+ZbNJLTqwPedp9BGf+P4pmuSi6mI6SStF89F8Zo147l9/2YUK1r+Fzfm3t8VKIeXQdaClWIxc+2cVVqqJCeuSJtX5pomFYdsJgVB5rvmDAGJrOfEQBpLBDIrfkjYIMqmIJrXV3cGVnx2B4DXsnVnQSDh98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3YKTnV+j; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qE6DyCzI"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=oR0J1yJ3iMDsAYZn016AHSObSP2Ip6FoC6wkatQksY8=; b=qE6DyCzI4YJEkaMceiNe0Hjgjd
-	dGTXjlWYqRyESESuGPnIlfQL2rjC14HzXC8u27Wj98ATclSARGWMbqEY6E4kMsbKp7kC+jHFu4YOt
-	ubAOhWCipsPhaR4Ob1Vu5WREVOkH9UQ9wNbniprnxsXQA+4Lri9vUezd+ceglVMVII+LeJtf/7DKF
-	RoxZCZm2mL/VCToLeELnB4wj3Bxcf9ErjzFBDxwnoqw9Gh2N4fFusRl5OL/5e0hGfdpWoFSSx610m
-	RpFkmhJgn/YJ9nySj9NCtjmcNEpLAwIawEhdRUrwNlfoXaBPfrJZq5tnrfmK/8haUXMZ8ezTsYmVX
-	rLHN8sAg==;
-Received: from [50.53.2.24] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tWUyV-00000000H5q-1uMv;
-	Sat, 11 Jan 2025 06:27:59 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: linux-block@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	"Richard Russon (FlatCap)" <ldm@flatcap.org>,
-	linux-ntfs-dev@lists.sourceforge.net,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] partitions: ldm: remove the initial kernel-doc notation
-Date: Fri, 10 Jan 2025 22:27:58 -0800
-Message-ID: <20250111062758.910458-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.47.1
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3YKTnV+j"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-844d7f81dd1so102422939f.2
+        for <linux-block@vger.kernel.org>; Sat, 11 Jan 2025 08:19:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736612382; x=1737217182; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LcHX/08zilpmViev4xCeK1fvu86rTyO6UFUJZwksaWk=;
+        b=3YKTnV+jtGqPK5bYiCzVvNQ5BHsnlcFw1JjAIvxUe5ig1eYzml8bY/RgoLoJhy5WWV
+         iBvHU+1w5R1zoLDd8/XZyX8F86vRyS4xAzaVeJjXvLEQ1ZhTCqTkN/6UOK1OWcVze7xP
+         m45/iHna2TEwKS9lVI43P4PfdhQ0mqoW9g/9FccX8u98AEteT8/PBnt50pVTLjqSYwiG
+         OwMHL3TbS9xODFlhJPEybW6Ud7ZcgRIGoOqMc33A/QQHmdW33k/Nr0u4mdbcLgAwgFeN
+         temqENqKIX8wiyjBMGFjZhY0u7Jq7BqHWOAFcnViMop4SufgionmhXEHahEscQDuL8wM
+         DVhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736612382; x=1737217182;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LcHX/08zilpmViev4xCeK1fvu86rTyO6UFUJZwksaWk=;
+        b=rIwpfzyUpMXlMJVEzFPopL7s63H+L4at0Z/DLPevK/7Sez0dxOv3xIfAc6wBl9i7nc
+         CjcJRHuzvZJ/fo7RqNHWKBmRbayXE7H5+3RnKI2o58RKG7Fc9Jnk2W0FFJUlFeHoE8yn
+         VIgVZCbs+EssStEsyUWiX7BEh6DLkqCzp6d2MOqCDcZZAu/7Qeyz6qza0h3DfdQhzEsU
+         N+B6HE3zgtW7/3KzdYFJPDJDxbjosQgyDHprRmUMeW9P/YGWpLu2Y1L0+EOlqGUEcWAs
+         zou2b5tGyNLTve6uVd4NT5S4BDYEoG2ilQ8xpa9hZ3aincL27T9hMiLdQbdNGYYjhQOP
+         jS0A==
+X-Gm-Message-State: AOJu0YzULmlptXWsvVaNcoQKnBIQsGykG/1YOXEaFdNLK9BB8oML9xTl
+	5kSkSTw+hpIIChQeYdjh/d9Ov6Q84M31zWS6XVeckuzIKk9wTnyYUpMGoI+6BteLONqabYkffKX
+	F
+X-Gm-Gg: ASbGncuC0FpzITZBOgn/DsUieEGo7EVeXMJq9H8yfIM+7feTzY0lKMlE+aO/pzykjyj
+	VskM6OIkmoDDJ22nVYrrjhnHAWT9apNANAwYDUd9ORHNG+Fhz1E+UCGxH348ZTkZZKtS0aN6vlO
+	4rAddp5InEaYQjgtGcS546yzrAjChsnXIt01/rTFKBi5zn7DVOrspomkMQrhtlEsBay/XrjpXXB
+	L0JZMKoRVbVYrCJXqaIqdxbc6p/uORW0VpVKVuHhKMotRQLACr4qA==
+X-Google-Smtp-Source: AGHT+IFAIFtb0MZ7W/nR/vA5DVzDsPG+f+K2tEGdDD80eM3RzmSRfB6LH10rn0u7wGXw6lCVaQMbYA==
+X-Received: by 2002:a05:6602:720f:b0:83a:a305:d9ee with SMTP id ca18e2360f4ac-84ce0162dfbmr1449227539f.12.1736612382549;
+        Sat, 11 Jan 2025 08:19:42 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ea1b718bafsm1602219173.96.2025.01.11.08.19.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 11 Jan 2025 08:19:41 -0800 (PST)
+Message-ID: <7f932dbd-f009-4df8-8d8e-618ec036a004@kernel.dk>
+Date: Sat, 11 Jan 2025 09:19:41 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fix for 6.13-rc7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Remove the file's first comment describing what the file is.
-This comment is not in kernel-doc format so it causes a kernel-doc
-warning.
+Hi Linus,
 
-ldm.h:13: warning: expecting prototype for ldm(). Prototype was for _FS_PT_LDM_H_() instead
+Just a single fix for a use-after-free in the BFQ IO scheduler. Please
+pull!
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: "Richard Russon (FlatCap)" <ldm@flatcap.org>
-Cc: linux-ntfs-dev@lists.sourceforge.net
-Cc: Jens Axboe <axboe@kernel.dk>
----
- block/partitions/ldm.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- linux-next-20250108.orig/block/partitions/ldm.h
-+++ linux-next-20250108/block/partitions/ldm.h
-@@ -1,5 +1,5 @@
- // SPDX-License-Identifier: GPL-2.0-or-later
--/**
-+/*
-  * ldm - Part of the Linux-NTFS project.
-  *
-  * Copyright (C) 2001,2002 Richard Russon <ldm@flatcap.org>
+The following changes since commit cc0331e29fce4c3c2eaedeb7029360be6ed1185c:
+
+  Merge tag 'nvme-6.13-2024-12-31' of git://git.infradead.org/nvme into block-6.13 (2024-12-31 10:41:58 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.13-20250111
+
+for you to fetch changes up to fcede1f0a043ccefe9bc6ad57f12718e42f63f1d:
+
+  block, bfq: fix waker_bfqq UAF after bfq_split_bfqq() (2025-01-09 06:52:46 -0700)
+
+----------------------------------------------------------------
+block-6.13-20250111
+
+----------------------------------------------------------------
+Yu Kuai (1):
+      block, bfq: fix waker_bfqq UAF after bfq_split_bfqq()
+
+ block/bfq-iosched.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+-- 
+Jens Axboe
+
