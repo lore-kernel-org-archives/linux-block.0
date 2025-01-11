@@ -1,105 +1,63 @@
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA29190059
-	for <linux-block@vger.kernel.org>; Sat, 11 Jan 2025 16:19:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7296A17C68
+	for <linux-block@vger.kernel.org>; Sat, 11 Jan 2025 20:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736612385; cv=none; b=W2UKdsyJh60+6EmxsaJlD2JD0KIWx+Nboy1bfdh27d+sPmeLg/c1EoCFGCCwxOtv9W7IxS6OqZ8XbI8oBKbMJf4v5WZLbOMsRkFQE2mUc18Jw+ZOxPosHwrt9bKhH0Ue3HIkraeGiLsPNDdh71ieqhn2tdvBdEqe/eho2GfTPWQ=
+	t=1736625658; cv=none; b=DeTbN0ynBr4jXj6ZLbi09E6G6q8PmfXm9IwzKcMtgsc8+hSE2fzpWU8i3qjgqWkWVAL6y9XepW9IVFPonqGvqv9t72nyLFXZgbBSLTnOOHAnv/76Rcaxb4uaAgGGlzggtCgznAnaGo2XBGUOheC4GUwNvHFhyaDzdQDVIk4i3Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736612385; c=relaxed/simple;
-	bh=p9RbMyk2aHge/NMu4YrPSM2Yb4yebWp+9nam0A8yJR8=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=XIsj+uwuSHH23gTKN+ZbNJLTqwPedp9BGf+P4pmuSi6mI6SStF89F8Zo147l9/2YUK1r+Fzfm3t8VKIeXQdaClWIxc+2cVVqqJCeuSJtX5pomFYdsJgVB5rvmDAGJrOfEQBpLBDIrfkjYIMqmIJrXV3cGVnx2B4DXsnVnQSDh98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3YKTnV+j; arc=none smtp.client-ip=209.85.166.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1736625658; c=relaxed/simple;
+	bh=j6VGNivdrabXxBP2b3pV+7kN+vCL2f9SYw+lo+7pzE0=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=qBuLznfaVVWxUx9sXEAEFKRVw6PFHzlJ5bbiVqnD0rMQhZXRIKnLV73qnSSBW1AjQ7U2bGG/NEolnchYIC97htGd/mK/7601yFh5pnrQTay3MM09NENqGHAohGKPWV3imBBRfdUvSmlt7KIOCR3nwEN1HoCdrcePG/CTP/tw8jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rt9tgnD5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3YKTnV+j"
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-844d7f81dd1so102422939f.2
-        for <linux-block@vger.kernel.org>; Sat, 11 Jan 2025 08:19:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736612382; x=1737217182; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LcHX/08zilpmViev4xCeK1fvu86rTyO6UFUJZwksaWk=;
-        b=3YKTnV+jtGqPK5bYiCzVvNQ5BHsnlcFw1JjAIvxUe5ig1eYzml8bY/RgoLoJhy5WWV
-         iBvHU+1w5R1zoLDd8/XZyX8F86vRyS4xAzaVeJjXvLEQ1ZhTCqTkN/6UOK1OWcVze7xP
-         m45/iHna2TEwKS9lVI43P4PfdhQ0mqoW9g/9FccX8u98AEteT8/PBnt50pVTLjqSYwiG
-         OwMHL3TbS9xODFlhJPEybW6Ud7ZcgRIGoOqMc33A/QQHmdW33k/Nr0u4mdbcLgAwgFeN
-         temqENqKIX8wiyjBMGFjZhY0u7Jq7BqHWOAFcnViMop4SufgionmhXEHahEscQDuL8wM
-         DVhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736612382; x=1737217182;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LcHX/08zilpmViev4xCeK1fvu86rTyO6UFUJZwksaWk=;
-        b=rIwpfzyUpMXlMJVEzFPopL7s63H+L4at0Z/DLPevK/7Sez0dxOv3xIfAc6wBl9i7nc
-         CjcJRHuzvZJ/fo7RqNHWKBmRbayXE7H5+3RnKI2o58RKG7Fc9Jnk2W0FFJUlFeHoE8yn
-         VIgVZCbs+EssStEsyUWiX7BEh6DLkqCzp6d2MOqCDcZZAu/7Qeyz6qza0h3DfdQhzEsU
-         N+B6HE3zgtW7/3KzdYFJPDJDxbjosQgyDHprRmUMeW9P/YGWpLu2Y1L0+EOlqGUEcWAs
-         zou2b5tGyNLTve6uVd4NT5S4BDYEoG2ilQ8xpa9hZ3aincL27T9hMiLdQbdNGYYjhQOP
-         jS0A==
-X-Gm-Message-State: AOJu0YzULmlptXWsvVaNcoQKnBIQsGykG/1YOXEaFdNLK9BB8oML9xTl
-	5kSkSTw+hpIIChQeYdjh/d9Ov6Q84M31zWS6XVeckuzIKk9wTnyYUpMGoI+6BteLONqabYkffKX
-	F
-X-Gm-Gg: ASbGncuC0FpzITZBOgn/DsUieEGo7EVeXMJq9H8yfIM+7feTzY0lKMlE+aO/pzykjyj
-	VskM6OIkmoDDJ22nVYrrjhnHAWT9apNANAwYDUd9ORHNG+Fhz1E+UCGxH348ZTkZZKtS0aN6vlO
-	4rAddp5InEaYQjgtGcS546yzrAjChsnXIt01/rTFKBi5zn7DVOrspomkMQrhtlEsBay/XrjpXXB
-	L0JZMKoRVbVYrCJXqaIqdxbc6p/uORW0VpVKVuHhKMotRQLACr4qA==
-X-Google-Smtp-Source: AGHT+IFAIFtb0MZ7W/nR/vA5DVzDsPG+f+K2tEGdDD80eM3RzmSRfB6LH10rn0u7wGXw6lCVaQMbYA==
-X-Received: by 2002:a05:6602:720f:b0:83a:a305:d9ee with SMTP id ca18e2360f4ac-84ce0162dfbmr1449227539f.12.1736612382549;
-        Sat, 11 Jan 2025 08:19:42 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ea1b718bafsm1602219173.96.2025.01.11.08.19.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Jan 2025 08:19:41 -0800 (PST)
-Message-ID: <7f932dbd-f009-4df8-8d8e-618ec036a004@kernel.dk>
-Date: Sat, 11 Jan 2025 09:19:41 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rt9tgnD5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5150FC4CED2;
+	Sat, 11 Jan 2025 20:00:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736625658;
+	bh=j6VGNivdrabXxBP2b3pV+7kN+vCL2f9SYw+lo+7pzE0=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=rt9tgnD5FBvBLSsBE8Jiy3Z7DlTrrp9tkWKnaJY1jlaAnp0cLnWVCFCOIGJG9d2Vy
+	 RwqEfJZSjInMpDvi2RMrk3TFjb9GeYyR9gt3C0rOl4IUg/5ETVEeg3Ttd708On35Vt
+	 cNpwk3mUlSh4GCG+MdBGVNZK5li6yfQBXz8sxpJXTleEeE5G6XcpsMkn7Fp7DEJQL8
+	 he16Yw3OegYPYZ5rJO201r+qF4r58s95H5tgEfFXTq/evg4/GJDOO4ciUwh4OD6fkP
+	 ZovCEIKY3GPU9CsQhjTq0w40q+gUXKESqOw3s+jiYkC3WlojyE0OFhXCbi7uSvrGHX
+	 B1uYW3mFLE9Og==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD47380AA54;
+	Sat, 11 Jan 2025 20:01:21 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fix for 6.13-rc7
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <7f932dbd-f009-4df8-8d8e-618ec036a004@kernel.dk>
+References: <7f932dbd-f009-4df8-8d8e-618ec036a004@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <7f932dbd-f009-4df8-8d8e-618ec036a004@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.13-20250111
+X-PR-Tracked-Commit-Id: fcede1f0a043ccefe9bc6ad57f12718e42f63f1d
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 05c2d1f2728240f7cd750ea389d4ad87fba0ad03
+Message-Id: <173662568035.2439897.11950180859702410094.pr-tracker-bot@kernel.org>
+Date: Sat, 11 Jan 2025 20:01:20 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 6.13-rc7
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+The pull request you sent on Sat, 11 Jan 2025 09:19:41 -0700:
 
-Just a single fix for a use-after-free in the BFQ IO scheduler. Please
-pull!
+> git://git.kernel.dk/linux.git tags/block-6.13-20250111
 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/05c2d1f2728240f7cd750ea389d4ad87fba0ad03
 
-The following changes since commit cc0331e29fce4c3c2eaedeb7029360be6ed1185c:
-
-  Merge tag 'nvme-6.13-2024-12-31' of git://git.infradead.org/nvme into block-6.13 (2024-12-31 10:41:58 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.13-20250111
-
-for you to fetch changes up to fcede1f0a043ccefe9bc6ad57f12718e42f63f1d:
-
-  block, bfq: fix waker_bfqq UAF after bfq_split_bfqq() (2025-01-09 06:52:46 -0700)
-
-----------------------------------------------------------------
-block-6.13-20250111
-
-----------------------------------------------------------------
-Yu Kuai (1):
-      block, bfq: fix waker_bfqq UAF after bfq_split_bfqq()
-
- block/bfq-iosched.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
