@@ -1,330 +1,464 @@
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2D64315A;
-	Sun, 12 Jan 2025 10:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C525533F7
+	for <linux-block@vger.kernel.org>; Sun, 12 Jan 2025 11:33:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736676854; cv=none; b=puhN5sG722c+lRCe8QvRzjK/GrXbL+88OCdeJDfdUGiINwaIoHKopPSFeHBXn5ULzBg89zSi3lazpAMf8XHPmW4K7gFez2KM+sxw/7RlcqzrX/ZWM2nx6GYru922sxOIKOmWr7V/JheA1pZmi3wioikx8vV0Ww1U7trk5mCgqqo=
+	t=1736681600; cv=none; b=KZyokUwUuWfWwZ5eL2bk1AtUJUI9MtEw3Hi0UESW9DI+JMsqs6r1jE/x1OyhAelmV+vG1wBJg90G31vQR3fvVAaR+R/Fe5LjGmizzdQWrXY4FSP+eb2XHMz6IPtcue0oVxMWnTOTcG6ALB2gMEdS2c3VeAIEvgNQWWyJx34k4xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736676854; c=relaxed/simple;
-	bh=DThcMsiKpCiUffIIchuQLXGpk8elXBupZu0kyS9l9aE=;
-	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:Cc:To; b=f7e9kKkS8hKAghUmFEgaZV3k08QkWHS/gcWsQz4iQp3SYB5FvcoC7Zf7IbYPXfL/FZwGn3SHmBh0wvUhJ4tNpheDbgzZc4wmLdCy55U2cEcTellLQZyTK53hggsrqC0I4D7OixbPsZaPFImTq2Sv2tzpOSb7nT658NZzHGtIRZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn; spf=pass smtp.mailfrom=m.fudan.edu.cn; dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b=tOyJ8thl; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=m.fudan.edu.cn
+	s=arc-20240116; t=1736681600; c=relaxed/simple;
+	bh=8kPS2kDpI6evovNl4IdRHmluMfiJqHZ6mS7ksOteL2g=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ocREDD8HMsiBJCOsefrxofxo0SKy7dNm9Q+fa9s7oRDE3q8PeVuc29u9CXuXBHypnrhocwM+TUNfPno81YL9TnrsyjXjwwL/vtGEt2Hz0qNKxGsBRJTYhVDo3LGzUnvx4Dw7VF1Baq/A6k6tmjIjb6AcaNZcPEhm3RG7wILvD9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VjrxFnZR; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b="tOyJ8thl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=m.fudan.edu.cn;
-	s=sorc2401; t=1736676707;
-	bh=b0HuQVLXBLFTK8eWeQ/w8MXUCWf1jSP/G+y0W5MfDfg=;
-	h=From:Mime-Version:Subject:Message-Id:Date:To;
-	b=tOyJ8thlKQpOmDTv8yX5RNT2I7qNAJSRm6ugOxPxu+wfD3ToWsO6yTvNlyOqpWkdP
-	 fST9e2bJe9GYiictc70iLZCxojL9oeoc2Dj53LTyv+GK8SsXvLCKWGbHtc5q2exkSn
-	 6NDzb4Kmc9Sbdqg5zj95xI0tUOt9WMoj7Aus3fdc=
-X-QQ-mid: bizesmtpip3t1736676705tjeiddr
-X-QQ-Originating-IP: VwRLs/PRoPO+NvNjfvNMhogo2M6k12FkNowjNkaD4Hc=
-Received: from smtpclient.apple ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 12 Jan 2025 18:11:43 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 16102354572167166007
-From: Kun Hu <huk23@m.fudan.edu.cn>
-Content-Type: text/plain;
-	charset=us-ascii
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VjrxFnZR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736681599; x=1768217599;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=8kPS2kDpI6evovNl4IdRHmluMfiJqHZ6mS7ksOteL2g=;
+  b=VjrxFnZRnGzNOkT95aE8fbwZumCi7mPl5pLtxAAGBVn4eetsvyOJFs7i
+   kXNBLtuuCrolCbmOcn9GBmJYco1vfgtibluaeF35fmwVCntPPpj0LCpci
+   DvZBFLXw3xt1TzoebyXyyu6PkrsYeRh3WiiqU0WISDVpKFolVnPCjtGn5
+   5VQxYqFoLHfwPb+HVJUltC8zMNN/eRjZzGkIkl0UnDmvXv24CQEJBtRZF
+   u40g04RiHlYowUGmS2kxFZ0tvhRkxKif4Ut6JiP0wRAlnfl4x0mgHyTLr
+   fRRIMk4BWpIh8cRa7oUU01Rc2pQADQwHI6JOdOF4yh4MH5r0pNg051kkE
+   A==;
+X-CSE-ConnectionGUID: GUglDZIETZCoff+AfuFVIw==
+X-CSE-MsgGUID: yeilcvXwSF6es8fB+03qbg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11312"; a="36136018"
+X-IronPort-AV: E=Sophos;i="6.12,309,1728975600"; 
+   d="scan'208";a="36136018"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2025 03:33:18 -0800
+X-CSE-ConnectionGUID: juWdk/94TV2smfatkyfUvA==
+X-CSE-MsgGUID: MoUL9R+tRlmClcopWoYfdw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="109206800"
+Received: from slindbla-desk.ger.corp.intel.com (HELO [10.245.246.93]) ([10.245.246.93])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2025 03:33:16 -0800
+Message-ID: <ead7c5ce5138912c1f3179d62370b84a64014a38.camel@linux.intel.com>
+Subject: Re: Blockdev 6.13-rc lockdep splat regressions
+From: Thomas =?ISO-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, 
+	linux-block@vger.kernel.org
+Date: Sun, 12 Jan 2025 12:33:13 +0100
+In-Reply-To: <Z4HgDJjMRv4s5phx@fedora>
+References: <65a8ef7321bf905ab27c383395016fe299f6dfd9.camel@linux.intel.com>
+	 <Z4EO6YMM__e6nLNr@fedora>
+	 <7017f6bf8df5bbd8824f9f69e627c3f33b9aa7cd.camel@linux.intel.com>
+	 <Z4HgDJjMRv4s5phx@fedora>
+Organization: Intel Sweden AB, Registration Number: 556189-6027
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.2 (3.54.2-1.fc41) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3818.100.11.1.3\))
-Subject: Bug: possible deadlock in jfs_fsync
-Message-Id: <359BC288-B0B1-4815-9F01-3A349B12E816@m.fudan.edu.cn>
-Date: Sun, 12 Jan 2025 18:11:33 +0800
-Cc: "jjtan24@m.fudan.edu.cn" <jjtan24@m.fudan.edu.cn>,
- linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org,
- jfs-discussion@lists.sourceforge.net
-To: viro@zeniv.linux.org.uk,
- hch@lst.de,
- ming.lei@redhat.com,
- jack@suse.cz,
- josef@redhat.com
-X-Mailer: Apple Mail (2.3818.100.11.1.3)
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpip:m.fudan.edu.cn:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MzMRvi13BjTi8MMAuZ8iW5Cdx2XGnabilgSK4Pv+VTBd8rbjalipzLMq
-	iQBj7MQz51mBASatsLyHOFekvgIDPUoEXkhJgaT4FgW4uzNCbaduYjfyrk/MEuJU9QrrVnK
-	MA10XcMVWrl3e7OWvNKRGlb5q5BoogXQ2hhm99Y7g0HxkPrAH4QN+WMYeVWAeYGhBXvrbPg
-	pvs0gLuCGWshzV1ANuz0hAd9YVUSFW23mnlgSClP93K44s1ixuc1d4gm02JABi6CWRD5ciB
-	tx5RPRPlX1hntVC891IwpmGQGY5zpnQKLIGskW09r4VB62+9otRW+1W25T7dr/A6BascJ3/
-	Qur3nZKqMhnxvN3H+pHK+rR8LOHQhCArTain4o2acratDLCdaRlrITqYJ8aEiZXQVuVylkB
-	i8pDh3+Uc/A8nDXd9TDaOMuqOl67dXEQBIfk0k+TWo/AiV3H8mugpfQoNVjPNniOKCOrW7e
-	awgxiLek07fyymeGS97q8LxLu2oLVL3O2Nz1CPn/YZn5SjB2z8dzH8mKV/3vJs/MhkkXx/3
-	Jue0z3Z/V6Heph7n1lmR2Y3P5jeyudSLVE9B0tl+PqZ4vwh1e+ce5rzMLpuTRpYBwyqAdA6
-	/yKQq2v1J6HMi/dkcZsbV2XHUxxfBLbigPylS+7fROFqo5HjHCZjeSjUuUf3I9HAPf9yYnX
-	583fOY600b+gnFB/WQSogbnCJhc0K9SvuiKmFPk2xKkNXDRc3bQyQQwXIkDA/+Knl4whYeu
-	yquwFESvpNMeGoYTHyuqCzpTf6nUi/IAiAYRXzY6DeMj3RUpNuaC4I28xuxWh5UymBpqow4
-	h69/CS68/Myyn6IQkrxYK9ExpGixff4AQPeCkij/Iy3cQvZl32rULsEAL8nOgLH22ll7AC5
-	E2WNLLfVFMK0zZ+870+tzwifpOZfBQl7pUKl7xRiWQxmRaXxCctJmT6yXh5k8WoYU/Tr7F2
-	7EZLxLP2NbIv2/QaaMPNheeVvJBto4WVHziaoLy7d4B5GhngNKAdc7IhRurXrnecmoQ0=
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
 
-Hello,
-
-When using our customized fuzzer tool to fuzz the latest Linux kernel, =
-the following crash (44s)
-was triggered.
-
-HEAD commit: 9d89551994a430b50c4fffcb1e617a057fa76e20
-git tree: upstream
-Console output: =
-https://github.com/pghk13/Kernel-Bug/blob/main/0110_6.13rc6/44-possible%20=
-deadlock%20in%20jfs_fsync/log0
-Kernel config: =
-https://github.com/pghk13/Kernel-Bug/blob/main/0110_6.13rc6/config.txt
-C reproducer: =
-https://github.com/pghk13/Kernel-Bug/blob/main/0110_6.13rc6/44-possible%20=
-deadlock%20in%20jfs_fsync/13generated_program.c
-Syzlang reproducer: =
-https://github.com/pghk13/Kernel-Bug/blob/main/0110_6.13rc6/44-possible%20=
-deadlock%20in%20jfs_fsync/13_repro.txt
-
-We first found the issue without a stable C and Syzlang reproducers, but =
-later I tried multiple rounds of replication and got the C and Syzlang =
-reproducers.
-
-I suspect the issue may stem from potential circular locking or resource =
-contention, as indicated by interactions between loop_change_fd, =
-blk_mq_freeze_queue, and JFS-specific functions like jfs_fsync and =
-jfs_setattr. The circular locking dependency, involving locks such as =
-&sb->s_type->i_mutex_key#36, &(log)->loglock, and =
-&q->q_usage_counter(io)#5, suggests possible challenges in =
-synchronization or dependency management. Could you kindly help review =
-these areas to narrow down the root cause? Your expertise would be =
-greatly appreciated.
-
-Could you kindly help review these areas to narrow down the root cause? =
-Your expertise would be greatly appreciated.
-
-If you fix this issue, please add the following tag to the commit:
-Reported-by: Kun Hu <huk23@m.fudan.edu.cn>, Jiaji Qin =
-<jjtan24@m.fudan.edu.cn>
-
-loop1: detected capacity change from 0 to 32768
+On Sat, 2025-01-11 at 11:05 +0800, Ming Lei wrote:
+> On Fri, Jan 10, 2025 at 03:36:44PM +0100, Thomas Hellstr=C3=B6m wrote:
+> > On Fri, 2025-01-10 at 20:13 +0800, Ming Lei wrote:
+> > > On Fri, Jan 10, 2025 at 11:12:58AM +0100, Thomas Hellstr=C3=B6m wrote=
+:
+> > > > Ming, Others
+> > > >=20
+> > > > On 6.13-rc6 I'm seeing a couple of lockdep splats which appear
+> > > > introduced by the commit
+> > > >=20
+> > > > f1be1788a32e ("block: model freeze & enter queue as lock for
+> > > > supporting
+> > > > lockdep")
+> > >=20
+> > > The freeze lock connects all kinds of sub-system locks, that is
+> > > why
+> > > we see lots of warnings after the commit is merged.
+> > >=20
+> > > ...
+> > >=20
+> > > > #1
+> > > > [=C2=A0 399.006581]
+> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
+> > > > [=C2=A0 399.006756] WARNING: possible circular locking dependency
+> > > > detected
+> > > > [=C2=A0 399.006767] 6.12.0-rc4+ #1 Tainted: G=C2=A0=C2=A0=C2=A0=C2=
+=A0 U=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 N
+> > > > [=C2=A0 399.006776] -----------------------------------------------=
+-
+> > > > ----
+> > > > --
+> > > > [=C2=A0 399.006801] kswapd0/116 is trying to acquire lock:
+> > > > [=C2=A0 399.006810] ffff9a67a1284a28 (&q-
+> > > > >q_usage_counter(io)){++++}-
+> > > > {0:0},
+> > > > at: __submit_bio+0xf0/0x1c0
+> > > > [=C2=A0 399.006845]=20
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 but task is already holding lock:
+> > > > [=C2=A0 399.006856] ffffffff8a65bf00 (fs_reclaim){+.+.}-{0:0}, at:
+> > > > balance_pgdat+0xe2/0xa20
+> > > > [=C2=A0 399.006874]=20
+> > >=20
+> > > The above one is solved in for-6.14/block of block tree:
+> > >=20
+> > > 	block: track queue dying state automatically for
+> > > modeling
+> > > queue freeze lockdep
+> >=20
+> > Hmm. I applied this series:
+> >=20
+> > https://patchwork.kernel.org/project/linux-block/list/?series=3D912824&=
+archive=3Dboth
+> >=20
+> > on top of -rc6, but it didn't resolve that splat. Am I using the
+> > correct patches?
+> >=20
+> > Perhaps it might be a good idea to reclaim-prime those lockdep maps
+> > taken during reclaim to have the splats happen earlier.
+>=20
+> for-6.14/block does kill the dependency between fs_reclaim and
+> q->q_usage_counter(io) in scsi_add_lun() when scsi disk isn't
+> added yet.
+>=20
+> Maybe it is another warning, care to post the warning log here?
+
+Ah, You're right, it's a different warning this time. Posted the
+warning below. (Note: This is also with Christoph's series applied on
+top).
+
+May I also humbly suggest the following lockdep priming to be able to
+catch the reclaim lockdep splats early without reclaim needing to
+happen. That will also pick up splat #2 below.
+
+8<-------------------------------------------------------------
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 32fb28a6372c..2dd8dc9aed7f 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -458,6 +458,11 @@ struct request_queue *blk_alloc_queue(struct
+queue_limits *lim, int node_id)
+=20
+        q->nr_requests =3D BLKDEV_DEFAULT_RQ;
+=20
++       fs_reclaim_acquire(GFP_KERNEL);
++       rwsem_acquire_read(&q->io_lockdep_map, 0, 0, _RET_IP_);
++       rwsem_release(&q->io_lockdep_map, _RET_IP_);
++       fs_reclaim_release(GFP_KERNEL);
++
+        return q;
+=20
+ fail_stats:
+
+8<-------------------------------------------------------------
+
+#1:
+  106.921533] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-WARNING: possible circular locking dependency detected
-6.13.0-rc6 #1 Tainted: G        W        =20
-------------------------------------------------------
-syz.1.415/3703 is trying to acquire lock:
-ff11000020ac8578 (&sb->s_type->i_mutex_key#36){+.+.}-{4:4}, at: =
-inode_lock include/linux/fs.h:818 [inline]
-ff11000020ac8578 (&sb->s_type->i_mutex_key#36){+.+.}-{4:4}, at: =
-jfs_fsync+0xaa/0x220 fs/jfs/file.c:28
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[  106.921716] WARNING: possible circular locking dependency detected
+[  106.921725] 6.13.0-rc6+ #121 Tainted: G     U           =20
+[  106.921734] ------------------------------------------------------
+[  106.921743] kswapd0/117 is trying to acquire lock:
+[  106.921751] ffff8ff4e2da09f0 (&q->q_usage_counter(io)){++++}-{0:0},
+at: __submit_bio+0x80/0x220
+[  106.921769]=20
+               but task is already holding lock:
+[  106.921778] ffffffff8e65e1c0 (fs_reclaim){+.+.}-{0:0}, at:
+balance_pgdat+0xe2/0xa10
+[  106.921791]=20
+               which lock already depends on the new lock.
 
-but task is already holding lock:
-ff11000008551db8 (&q->q_usage_counter(io)#5){++++}-{0:0}, at: =
-blk_mq_freeze_queue+0x15/0x20 block/blk-mq.c:213
+[  106.921803]=20
+               the existing dependency chain (in reverse order) is:
+[  106.921814]=20
+               -> #1 (fs_reclaim){+.+.}-{0:0}:
+[  106.921824]        fs_reclaim_acquire+0x9d/0xd0
+[  106.921833]        __kmalloc_cache_node_noprof+0x5d/0x3f0
+[  106.921842]        blk_mq_init_tags+0x3d/0xb0
+[  106.921851]        blk_mq_alloc_map_and_rqs+0x4e/0x3d0
+[  106.921860]        blk_mq_init_sched+0x100/0x260
+[  106.921868]        elevator_switch+0x8d/0x2e0
+[  106.921877]        elv_iosched_store+0x174/0x1e0
+[  106.921885]        queue_attr_store+0x142/0x180
+[  106.921893]        kernfs_fop_write_iter+0x168/0x240
+[  106.921902]        vfs_write+0x2b2/0x540
+[  106.921910]        ksys_write+0x72/0xf0
+[  106.921916]        do_syscall_64+0x95/0x180
+[  106.921925]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  106.921935]=20
+               -> #0 (&q->q_usage_counter(io)){++++}-{0:0}:
+[  106.921946]        __lock_acquire+0x1339/0x2180
+[  106.921955]        lock_acquire+0xd0/0x2e0
+[  106.921963]        blk_mq_submit_bio+0x88b/0xb60
+[  106.921972]        __submit_bio+0x80/0x220
+[  106.921980]        submit_bio_noacct_nocheck+0x324/0x420
+[  106.921989]        swap_writepage+0x399/0x580
+[  106.921997]        pageout+0x129/0x2d0
+[  106.922005]        shrink_folio_list+0x5a0/0xd80
+[  106.922013]        evict_folios+0x27d/0x7b0
+[  106.922020]        try_to_shrink_lruvec+0x21b/0x2b0
+[  106.922028]        shrink_one+0x102/0x1f0
+[  106.922035]        shrink_node+0xb8e/0x1300
+[  106.922043]        balance_pgdat+0x550/0xa10
+[  106.922050]        kswapd+0x20a/0x440
+[  106.922057]        kthread+0xd2/0x100
+[  106.922064]        ret_from_fork+0x31/0x50
+[  106.922072]        ret_from_fork_asm+0x1a/0x30
+[  106.922080]=20
+               other info that might help us debug this:
 
-which lock already depends on the new lock.
+[  106.922092]  Possible unsafe locking scenario:
+
+[  106.922101]        CPU0                    CPU1
+[  106.922108]        ----                    ----
+[  106.922115]   lock(fs_reclaim);
+[  106.922121]                                lock(&q-
+>q_usage_counter(io));
+[  106.922132]                                lock(fs_reclaim);
+[  106.922141]   rlock(&q->q_usage_counter(io));
+[  106.922148]=20
+                *** DEADLOCK ***
+
+[  106.922476] 1 lock held by kswapd0/117:
+[  106.922802]  #0: ffffffff8e65e1c0 (fs_reclaim){+.+.}-{0:0}, at:
+balance_pgdat+0xe2/0xa10
+[  106.923138]=20
+               stack backtrace:
+[  106.923806] CPU: 3 UID: 0 PID: 117 Comm: kswapd0 Tainted: G     U =20
+6.13.0-rc6+ #121
+[  106.924173] Tainted: [U]=3DUSER
+[  106.924523] Hardware name: ASUS System Product Name/PRIME B560M-A
+AC, BIOS 2001 02/01/2023
+[  106.924882] Call Trace:
+[  106.925223]  <TASK>
+[  106.925559]  dump_stack_lvl+0x6e/0xa0
+[  106.925893]  print_circular_bug.cold+0x178/0x1be
+[  106.926233]  check_noncircular+0x148/0x160
+[  106.926565]  ? unwind_next_frame+0x42a/0x750
+[  106.926905]  __lock_acquire+0x1339/0x2180
+[  106.927227]  lock_acquire+0xd0/0x2e0
+[  106.927546]  ? __submit_bio+0x80/0x220
+[  106.927892]  ? blk_mq_submit_bio+0x860/0xb60
+[  106.928212]  ? lock_release+0xd2/0x2a0
+[  106.928536]  blk_mq_submit_bio+0x88b/0xb60
+[  106.928850]  ? __submit_bio+0x80/0x220
+[  106.929184]  __submit_bio+0x80/0x220
+[  106.929499]  ? lockdep_hardirqs_on_prepare+0xdb/0x190
+[  106.929833]  ? submit_bio_noacct_nocheck+0x324/0x420
+[  106.930147]  submit_bio_noacct_nocheck+0x324/0x420
+[  106.930464]  swap_writepage+0x399/0x580
+[  106.930794]  pageout+0x129/0x2d0
+[  106.931114]  shrink_folio_list+0x5a0/0xd80
+[  106.931447]  ? evict_folios+0x25d/0x7b0
+[  106.931776]  evict_folios+0x27d/0x7b0
+[  106.932092]  try_to_shrink_lruvec+0x21b/0x2b0
+[  106.932410]  shrink_one+0x102/0x1f0
+[  106.932742]  shrink_node+0xb8e/0x1300
+[  106.933056]  ? shrink_node+0x9c1/0x1300
+[  106.933368]  ? shrink_node+0xb64/0x1300
+[  106.933679]  ? balance_pgdat+0x550/0xa10
+[  106.933988]  balance_pgdat+0x550/0xa10
+[  106.934296]  ? lockdep_hardirqs_on_prepare+0xdb/0x190
+[  106.934607]  ? finish_task_switch.isra.0+0xc4/0x2a0
+[  106.934920]  kswapd+0x20a/0x440
+[  106.935229]  ? __pfx_autoremove_wake_function+0x10/0x10
+[  106.935542]  ? __pfx_kswapd+0x10/0x10
+[  106.935881]  kthread+0xd2/0x100
+[  106.936191]  ? __pfx_kthread+0x10/0x10
+[  106.936501]  ret_from_fork+0x31/0x50
+[  106.936810]  ? __pfx_kthread+0x10/0x10
+[  106.937120]  ret_from_fork_asm+0x1a/0x30
+[  106.937433]  </TASK>
+
+#2:
+[    5.595482] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[    5.596353] WARNING: possible circular locking dependency detected
+[    5.597231] 6.13.0-rc6+ #122 Tainted: G     U           =20
+[    5.598182] ------------------------------------------------------
+[    5.599149] (udev-worker)/867 is trying to acquire lock:
+[    5.600075] ffff9211c02f7948 (&root->kernfs_rwsem){++++}-{4:4}, at:
+kernfs_remove+0x31/0x50
+[    5.600987]=20
+               but task is already holding lock:
+[    5.603025] ffff9211e86f41a0 (&q->q_usage_counter(io)#3){++++}-
+{0:0}, at: blk_mq_freeze_queue+0x12/0x20
+[    5.603033]=20
+               which lock already depends on the new lock.
+
+[    5.603034]=20
+               the existing dependency chain (in reverse order) is:
+[    5.603035]=20
+               -> #2 (&q->q_usage_counter(io)#3){++++}-{0:0}:
+[    5.603038]        blk_alloc_queue+0x319/0x350
+[    5.603041]        blk_mq_alloc_queue+0x63/0xd0
+[    5.603043]        scsi_alloc_sdev+0x281/0x3c0
+[    5.603045]        scsi_probe_and_add_lun+0x1f5/0x450
+[    5.603046]        __scsi_scan_target+0x112/0x230
+[    5.603048]        scsi_scan_channel+0x59/0x90
+[    5.603049]        scsi_scan_host_selected+0xe5/0x120
+[    5.603051]        do_scan_async+0x1b/0x160
+[    5.603052]        async_run_entry_fn+0x31/0x130
+[    5.603055]        process_one_work+0x21a/0x590
+[    5.603058]        worker_thread+0x1c3/0x3b0
+[    5.603059]        kthread+0xd2/0x100
+[    5.603061]        ret_from_fork+0x31/0x50
+[    5.603064]        ret_from_fork_asm+0x1a/0x30
+[    5.603066]=20
+               -> #1 (fs_reclaim){+.+.}-{0:0}:
+[    5.603068]        fs_reclaim_acquire+0x9d/0xd0
+[    5.603070]        kmem_cache_alloc_lru_noprof+0x57/0x3f0
+[    5.603072]        alloc_inode+0x97/0xc0
+[    5.603074]        iget_locked+0x141/0x310
+[    5.603076]        kernfs_get_inode+0x1a/0xf0
+[    5.603077]        kernfs_get_tree+0x17b/0x2c0
+[    5.603080]        sysfs_get_tree+0x1a/0x40
+[    5.603081]        vfs_get_tree+0x29/0xe0
+[    5.603083]        path_mount+0x49a/0xbd0
+[    5.603085]        __x64_sys_mount+0x119/0x150
+[    5.603086]        do_syscall_64+0x95/0x180
+[    5.603089]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[    5.603092]=20
+               -> #0 (&root->kernfs_rwsem){++++}-{4:4}:
+[    5.603094]        __lock_acquire+0x1339/0x2180
+[    5.603097]        lock_acquire+0xd0/0x2e0
+[    5.603099]        down_write+0x2e/0xb0
+[    5.603101]        kernfs_remove+0x31/0x50
+[    5.603103]        __kobject_del+0x2e/0x90
+[    5.603104]        kobject_del+0x13/0x30
+[    5.603104]        elevator_switch+0x44/0x2e0
+[    5.603106]        elv_iosched_store+0x174/0x1e0
+[    5.603107]        queue_attr_store+0x142/0x180
+[    5.603108]        kernfs_fop_write_iter+0x168/0x240
+[    5.603110]        vfs_write+0x2b2/0x540
+[    5.603111]        ksys_write+0x72/0xf0
+[    5.603111]        do_syscall_64+0x95/0x180
+[    5.603113]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[    5.603114]=20
+               other info that might help us debug this:
+
+[    5.603115] Chain exists of:
+                 &root->kernfs_rwsem --> fs_reclaim --> &q-
+>q_usage_counter(io)#3
+
+[    5.603117]  Possible unsafe locking scenario:
+
+[    5.603117]        CPU0                    CPU1
+[    5.603117]        ----                    ----
+[    5.603118]   lock(&q->q_usage_counter(io)#3);
+[    5.603119]                                lock(fs_reclaim);
+[    5.603119]                                lock(&q-
+>q_usage_counter(io)#3);
+[    5.603120]   lock(&root->kernfs_rwsem);
+[    5.603121]=20
+                *** DEADLOCK ***
+
+[    5.603121] 6 locks held by (udev-worker)/867:
+[    5.603122]  #0: ffff9211c16dd420 (sb_writers#4){.+.+}-{0:0}, at:
+ksys_write+0x72/0xf0
+[    5.603125]  #1: ffff9211e28f3e88 (&of->mutex#2){+.+.}-{4:4}, at:
+kernfs_fop_write_iter+0x121/0x240
+[    5.603128]  #2: ffff921203524f28 (kn->active#101){.+.+}-{0:0}, at:
+kernfs_fop_write_iter+0x12a/0x240
+[    5.603131]  #3: ffff9211e86f46d0 (&q->sysfs_lock){+.+.}-{4:4}, at:
+queue_attr_store+0x12b/0x180
+[    5.603133]  #4: ffff9211e86f41a0 (&q->q_usage_counter(io)#3){++++}-
+{0:0}, at: blk_mq_freeze_queue+0x12/0x20
+[    5.603136]  #5: ffff9211e86f41d8 (&q-
+>q_usage_counter(queue)#3){++++}-{0:0}, at:
+blk_mq_freeze_queue+0x12/0x20
+[    5.603139]=20
+               stack backtrace:
+[    5.603140] CPU: 4 UID: 0 PID: 867 Comm: (udev-worker) Tainted: G =20
+U             6.13.0-rc6+ #122
+[    5.603142] Tainted: [U]=3DUSER
+[    5.603142] Hardware name: ASUS System Product Name/PRIME B560M-A
+AC, BIOS 2001 02/01/2023
+[    5.603143] Call Trace:
+[    5.603144]  <TASK>
+[    5.603146]  dump_stack_lvl+0x6e/0xa0
+[    5.603148]  print_circular_bug.cold+0x178/0x1be
+[    5.603151]  check_noncircular+0x148/0x160
+[    5.603154]  __lock_acquire+0x1339/0x2180
+[    5.603156]  lock_acquire+0xd0/0x2e0
+[    5.603158]  ? kernfs_remove+0x31/0x50
+[    5.603160]  ? sysfs_remove_dir+0x32/0x60
+[    5.603162]  ? lock_release+0xd2/0x2a0
+[    5.603164]  down_write+0x2e/0xb0
+[    5.603165]  ? kernfs_remove+0x31/0x50
+[    5.603166]  kernfs_remove+0x31/0x50
+[    5.603168]  __kobject_del+0x2e/0x90
+[    5.603170]  elevator_switch+0x44/0x2e0
+[    5.603172]  elv_iosched_store+0x174/0x1e0
+[    5.603174]  queue_attr_store+0x142/0x180
+[    5.603176]  ? lock_acquire+0xd0/0x2e0
+[    5.603177]  ? kernfs_fop_write_iter+0x12a/0x240
+[    5.603179]  ? lock_is_held_type+0x9a/0x110
+[    5.603182]  kernfs_fop_write_iter+0x168/0x240
+[    5.657060]  vfs_write+0x2b2/0x540
+[    5.657470]  ksys_write+0x72/0xf0
+[    5.657475]  do_syscall_64+0x95/0x180
+[    5.657480]  ? lock_acquire+0xd0/0x2e0
+[    5.657484]  ? ktime_get_coarse_real_ts64+0x12/0x60
+[    5.657486]  ? find_held_lock+0x2b/0x80
+[    5.657489]  ? ktime_get_coarse_real_ts64+0x12/0x60
+[    5.657490]  ? file_has_perm+0xa9/0xf0
+[    5.657494]  ? syscall_exit_to_user_mode_prepare+0x21b/0x250
+[    5.657499]  ? lockdep_hardirqs_on_prepare+0xdb/0x190
+[    5.657501]  ? syscall_exit_to_user_mode+0x97/0x290
+[    5.657504]  ? do_syscall_64+0xa1/0x180
+[    5.657507]  ? lock_acquire+0xd0/0x2e0
+[    5.662389]  ? fd_install+0x3e/0x300
+[    5.662395]  ? find_held_lock+0x2b/0x80
+[    5.663189]  ? fd_install+0xbb/0x300
+[    5.663194]  ? do_sys_openat2+0x9c/0xe0
+[    5.664093]  ? kmem_cache_free+0x13e/0x450
+[    5.664099]  ? syscall_exit_to_user_mode_prepare+0x21b/0x250
+[    5.664952]  ? lockdep_hardirqs_on_prepare+0xdb/0x190
+[    5.664956]  ? syscall_exit_to_user_mode+0x97/0x290
+[    5.664961]  ? do_syscall_64+0xa1/0x180
+[    5.664964]  ? syscall_exit_to_user_mode_prepare+0x21b/0x250
+[    5.664967]  ? lockdep_hardirqs_on_prepare+0xdb/0x190
+[    5.664969]  ? syscall_exit_to_user_mode+0x97/0x290
+[    5.664972]  ? do_syscall_64+0xa1/0x180
+[    5.664974]  ? clear_bhb_loop+0x45/0xa0
+[    5.664977]  ? clear_bhb_loop+0x45/0xa0
+[    5.664979]  ? clear_bhb_loop+0x45/0xa0
+[    5.664982]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[    5.664985] RIP: 0033:0x7fe72d2f4484
+[    5.664988] Code: c7 00 16 00 00 00 b8 ff ff ff ff c3 66 2e 0f 1f 84
+00 00 00 00 00 f3 0f 1e fa 80 3d 45 9c 10 00 00 74 13 b8 01 00
+ 00 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 55 48 89 e5 48 83 ec
+20 48 89
+[    5.664990] RSP: 002b:00007ffe51665998 EFLAGS: 00000202 ORIG_RAX:
+0000000000000001
+[    5.664992] RAX: ffffffffffffffda RBX: 0000000000000003 RCX:
+00007fe72d2f4484
+[    5.664994] RDX: 0000000000000003 RSI: 00007ffe51665ca0 RDI:
+0000000000000038
+[    5.664995] RBP: 00007ffe516659c0 R08: 00007fe72d3f51c8 R09:
+00007ffe51665a70
+[    5.664996] R10: 0000000000000000 R11: 0000000000000202 R12:
+0000000000000003
+[    5.664997] R13: 00007ffe51665ca0 R14: 000055a1bab093b0 R15:
+00007fe72d3f4e80
+[    5.665001]  </TASK>
+
+Thanks,
+Thomas
 
 
-the existing dependency chain (in reverse order) is:
-
--> #4 (&q->q_usage_counter(io)#5){++++}-{0:0}:
-       bio_queue_enter block/blk.h:75 [inline]
-       blk_mq_submit_bio+0x18eb/0x1fe0 block/blk-mq.c:3090
-       __submit_bio+0x1ac/0xed0 block/blk-core.c:629
-       __submit_bio_noacct_mq block/blk-core.c:710 [inline]
-       submit_bio_noacct_nocheck block/blk-core.c:739 [inline]
-       submit_bio_noacct_nocheck+0x67e/0xd40 block/blk-core.c:716
-       submit_bio_noacct+0x649/0x13a0 block/blk-core.c:868
-       metapage_write_folio+0x6ea/0xa50 fs/jfs/jfs_metapage.c:440
-       write_cache_pages+0xa6/0x120 mm/page-writeback.c:2659
-       metapage_writepages+0x8f/0xe0 fs/jfs/jfs_metapage.c:474
-       do_writepages+0x19d/0x7d0 mm/page-writeback.c:2702
-       filemap_fdatawrite_wbc+0xe9/0x120 mm/filemap.c:388
-       __filemap_fdatawrite_range+0xc1/0x110 mm/filemap.c:421
-       write_special_inodes+0x84/0x170 fs/jfs/jfs_logmgr.c:207
-       lmLogSync+0x46b/0x840 fs/jfs/jfs_logmgr.c:937
-       jfs_syncpt+0x8d/0xa0 fs/jfs/jfs_logmgr.c:1041
-       jfs_sync_fs+0x84/0xb0 fs/jfs/super.c:650
-       sync_filesystem fs/sync.c:66 [inline]
-       sync_filesystem+0x1d5/0x2a0 fs/sync.c:30
-       generic_shutdown_super+0x74/0x380 fs/super.c:621
-       kill_block_super+0x3b/0x90 fs/super.c:1710
-       deactivate_locked_super+0xbb/0x130 fs/super.c:473
-       deactivate_super fs/super.c:506 [inline]
-       deactivate_super+0xb1/0xd0 fs/super.c:502
-       cleanup_mnt+0x378/0x510 fs/namespace.c:1373
-       task_work_run+0x173/0x280 kernel/task_work.c:239
-       resume_user_mode_work include/linux/resume_user_mode.h:50 =
-[inline]
-       exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
-       exit_to_user_mode_prepare include/linux/entry-common.h:329 =
-[inline]
-       __syscall_exit_to_user_mode_work kernel/entry/common.c:207 =
-[inline]
-       syscall_exit_to_user_mode+0x261/0x270 kernel/entry/common.c:218
-       do_syscall_64+0xd0/0x1d0 arch/x86/entry/common.c:89
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #3 (&(log)->loglock){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x16f/0x1eb0 kernel/locking/mutex.c:735
-       lmLog+0x86/0xb90 fs/jfs/jfs_logmgr.c:236
-       diLog fs/jfs/jfs_txnmgr.c:1452 [inline]
-       txLog fs/jfs/jfs_txnmgr.c:1404 [inline]
-       txCommit+0xdba/0x4720 fs/jfs/jfs_txnmgr.c:1264
-       jfs_commit_inode+0x453/0x570 fs/jfs/inode.c:108
-       jfs_write_inode+0x104/0x240 fs/jfs/inode.c:132
-       write_inode fs/fs-writeback.c:1525 [inline]
-       __writeback_single_inode+0xb09/0x1010 fs/fs-writeback.c:1745
-       writeback_sb_inodes+0x5ee/0xf00 fs/fs-writeback.c:1976
-       wb_writeback+0x1a9/0xb50 fs/fs-writeback.c:2156
-       wb_do_writeback fs/fs-writeback.c:2303 [inline]
-       wb_workfn+0x134/0xe10 fs/fs-writeback.c:2343
-       process_one_work kernel/workqueue.c:3229 [inline]
-       process_scheduled_works+0x5ee/0x1ba0 kernel/workqueue.c:3310
-       worker_thread+0x59f/0xcf0 kernel/workqueue.c:3391
-       kthread+0x345/0x450 kernel/kthread.c:389
-       ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
--> #2 (&jfs_ip->commit_mutex){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x16f/0x1eb0 kernel/locking/mutex.c:735
-       jfs_truncate_nolock+0x1cf/0x300 fs/jfs/inode.c:386
-       jfs_truncate+0xe9/0x170 fs/jfs/inode.c:412
-       jfs_setattr+0x2cf/0x770 fs/jfs/file.c:119
-       notify_change+0x677/0x1240 fs/attr.c:552
-       do_truncate+0x143/0x200 fs/open.c:65
-       handle_truncate fs/namei.c:3449 [inline]
-       do_open fs/namei.c:3832 [inline]
-       path_openat+0x22d6/0x2970 fs/namei.c:3987
-       do_filp_open+0x1fa/0x2f0 fs/namei.c:4014
-       do_sys_openat2+0x641/0x6e0 fs/open.c:1402
-       do_sys_open+0xc7/0x150 fs/open.c:1417
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xc3/0x1d0 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (&jfs_ip->rdwrlock#3){++++}-{4:4}:
-       down_write_nested+0x96/0x210 kernel/locking/rwsem.c:1693
-       jfs_truncate+0xc6/0x170 fs/jfs/inode.c:411
-       jfs_setattr+0x2cf/0x770 fs/jfs/file.c:119
-       notify_change+0x677/0x1240 fs/attr.c:552
-       do_truncate+0x143/0x200 fs/open.c:65
-       handle_truncate fs/namei.c:3449 [inline]
-       do_open fs/namei.c:3832 [inline]
-       path_openat+0x22d6/0x2970 fs/namei.c:3987
-       do_filp_open+0x1fa/0x2f0 fs/namei.c:4014
-       do_sys_openat2+0x641/0x6e0 fs/open.c:1402
-       do_sys_open+0xc7/0x150 fs/open.c:1417
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xc3/0x1d0 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&sb->s_type->i_mutex_key#36){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3161 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3280 [inline]
-       validate_chain kernel/locking/lockdep.c:3904 [inline]
-       __lock_acquire+0x29fe/0x4a10 kernel/locking/lockdep.c:5226
-       lock_acquire kernel/locking/lockdep.c:5849 [inline]
-       lock_acquire+0x1b1/0x580 kernel/locking/lockdep.c:5814
-       down_write+0x92/0x200 kernel/locking/rwsem.c:1577
-       inode_lock include/linux/fs.h:818 [inline]
-       jfs_fsync+0xaa/0x220 fs/jfs/file.c:28
-       vfs_fsync_range+0x13d/0x230 fs/sync.c:187
-       __loop_update_dio+0x18f/0x5d0 drivers/block/loop.c:204
-       loop_update_dio drivers/block/loop.c:525 [inline]
-       loop_change_fd drivers/block/loop.c:629 [inline]
-       lo_ioctl+0x131d/0x1760 drivers/block/loop.c:1535
-       blkdev_ioctl+0x27e/0x6d0 block/ioctl.c:693
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:906 [inline]
-       __se_sys_ioctl fs/ioctl.c:892 [inline]
-       __x64_sys_ioctl+0x19e/0x210 fs/ioctl.c:892
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xc3/0x1d0 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &sb->s_type->i_mutex_key#36 --> &(log)->loglock --> =
-&q->q_usage_counter(io)#5
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&q->q_usage_counter(io)#5);
-                               lock(&(log)->loglock);
-                               lock(&q->q_usage_counter(io)#5);
-  lock(&sb->s_type->i_mutex_key#36);
-
- *** DEADLOCK ***
-
-3 locks held by syz.1.415/3703:
- #0: ff110000085fb360 (&lo->lo_mutex){+.+.}-{4:4}, at: =
-loop_global_lock_killable+0x88/0xc0 drivers/block/loop.c:120
- #1: ff11000008551db8 (&q->q_usage_counter(io)#5){++++}-{0:0}, at: =
-blk_mq_freeze_queue+0x15/0x20 block/blk-mq.c:213
- #2: ff11000008551df0 (&q->q_usage_counter(queue)#7){+.+.}-{0:0}, at: =
-blk_mq_freeze_queue+0x15/0x20 block/blk-mq.c:213
-
-stack backtrace:
-CPU: 2 UID: 0 PID: 3703 Comm: syz.1.415 Tainted: G        W          =
-6.13.0-rc6 #1
-Tainted: [W]=3DWARN
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
-1.13.0-1ubuntu1.1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1b0 lib/dump_stack.c:120
- print_circular_bug.isra.0+0x5b5/0x9c0 kernel/locking/lockdep.c:2074
- check_noncircular+0x2f3/0x3d0 kernel/locking/lockdep.c:2206
- check_prev_add kernel/locking/lockdep.c:3161 [inline]
- check_prevs_add kernel/locking/lockdep.c:3280 [inline]
- validate_chain kernel/locking/lockdep.c:3904 [inline]
- __lock_acquire+0x29fe/0x4a10 kernel/locking/lockdep.c:5226
- lock_acquire kernel/locking/lockdep.c:5849 [inline]
- lock_acquire+0x1b1/0x580 kernel/locking/lockdep.c:5814
- down_write+0x92/0x200 kernel/locking/rwsem.c:1577
- inode_lock include/linux/fs.h:818 [inline]
- jfs_fsync+0xaa/0x220 fs/jfs/file.c:28
- vfs_fsync_range+0x13d/0x230 fs/sync.c:187
- __loop_update_dio+0x18f/0x5d0 drivers/block/loop.c:204
- loop_update_dio drivers/block/loop.c:525 [inline]
- loop_change_fd drivers/block/loop.c:629 [inline]
- lo_ioctl+0x131d/0x1760 drivers/block/loop.c:1535
- blkdev_ioctl+0x27e/0x6d0 block/ioctl.c:693
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:906 [inline]
- __se_sys_ioctl fs/ioctl.c:892 [inline]
- __x64_sys_ioctl+0x19e/0x210 fs/ioctl.c:892
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xc3/0x1d0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f79c2ea971d
-Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 =
-f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 =
-f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f79c1afcba8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f79c306bf80 RCX: 00007f79c2ea971d
-RDX: 0000000000000004 RSI: 0000000000004c06 RDI: 0000000000000006
-RBP: 00007f79c2f1e425 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f79c306bf8c R14: 00007f79c306c018 R15: 00007f79c1afcd40
- </TASK>
-
----------------
-thanks,
-Kun Hu=
