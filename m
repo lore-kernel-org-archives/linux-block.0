@@ -1,157 +1,98 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0639B1C07FE;
-	Mon, 13 Jan 2025 07:25:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2B523237C
+	for <linux-block@vger.kernel.org>; Mon, 13 Jan 2025 08:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736753130; cv=none; b=BNJvABvXGF4j3YmKQ+Kw2GmCBQzXQ+aaq3rHezsVswJ5bjBYKFut0uKQFHiaVv1Bfq8BwcSrhi+/uEV8yHDoQeKm6iNunSsrVVW4XUYR2VcnNWlzFaiMo4NRrOORbQcjIofeblS9rUAd/j+8cXWF4GEm+7+vhpbfwC/DxIG4kDw=
+	t=1736756590; cv=none; b=jYszRAcwdCXTfyz/EDzoymN772PnyAeRPzVMAIs3bP9PXXJYF/FNvAS1/0FMJ/e2mx1NLJoSvWg/MjMRA3bPbYPXb2dNCeTf1BFPGfmOwuLH78+03ug5ph9GKzd3eGGN3PhOiTu1nByOWP9/Jm2fmqWCBp07vdhVE8AB0PcmEgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736753130; c=relaxed/simple;
-	bh=Zq7eHzX7xbbJe85HX5xgsOtgrxN7bfbFuTXjHe4i7V8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rV8DuAOiSOZGmxg+2USouqN5pP5cOd/a1UU7HwVIVd4lhZLtqTXo8xMaqHI6fblZj6c1Z5EwVBOZwyOAB2bFgNu3oD51WiQJCgXLpe2tFb9WFs5u18oPP83kx/n6xubUTUX3t88P+HqvNjPBTzLJM/wRbROZL2U5xNdd/A5K8lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0OxxtmGa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tjuL/suI; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0OxxtmGa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=tjuL/suI; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1736756590; c=relaxed/simple;
+	bh=/HC/w7F2ShPZMkZNrCCCYt5w9g9LTuFPunCm31V9P+U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fJXYMuSmUtta4oLMT8ywty/YdGmJDTDAwbY5PMnxDEiCAPVFA49UJI87cTjcUurbIoHZSLvooshgqgqZqNs2zbPh+0Lrt3aM6p4z+5W3hUSPGhVqEwelOBTVqdszEGYYrMoQeJXLlcTZCtYs5QUYaCfrObyIG8HZeWWUPeK/oCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L8aqmA0o; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0OxxtmGa";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tjuL/suI";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0OxxtmGa";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="tjuL/suI"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8aqmA0o"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736756587;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gTlivx8Egr6tYdQampClg14FCqdSDAST3SdF+HthHss=;
+	b=L8aqmA0onmlsMjfFId+8AOW18hXSZawL89MfDdfOTRy/PSPXNqBUaHRwkD1LPY4t/WHdg0
+	GkdCYmHf+RZfIMIFQMQtGLdEUetaWD08VTsldKiWxPL0nEFhFnaStuqplqdQUu1og8LMWX
+	uwqc4hTc1TuyvkZdQkyOSB8CCxQ0v3M=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-591-LdkO5Xz6MwKdx_r93yqguQ-1; Mon,
+ 13 Jan 2025 03:23:04 -0500
+X-MC-Unique: LdkO5Xz6MwKdx_r93yqguQ-1
+X-Mimecast-MFC-AGG-ID: LdkO5Xz6MwKdx_r93yqguQ
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 22FDA1F394;
-	Mon, 13 Jan 2025 07:25:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1736753125; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SPMujG4Ms43NVefw5djXYekatCdjL2IaFIVDnYRZmRs=;
-	b=0OxxtmGaRhWQhiCpd0QH/9+pI++QHE1qHpsRRWEJIcUs/8LtMYhqzmhQuspFrGQu8eMpP4
-	m72dnmh8Vf8HxEWwjNDyhNfXbm/JzRUuNZLLEri8Ia95zNHUPzSzWPmZrm+lOcGbf7IMI/
-	vh0vWRDbulMhrIvspaBLrYXV2rCB51o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1736753125;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SPMujG4Ms43NVefw5djXYekatCdjL2IaFIVDnYRZmRs=;
-	b=tjuL/suIYABpIe5i4xj/+fZwjIP1XB6ttvrPshUrsB6Necyycue8yUJsz4TH9my9Hr7RNp
-	qObWZpZCID4RqdCQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1736753125; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SPMujG4Ms43NVefw5djXYekatCdjL2IaFIVDnYRZmRs=;
-	b=0OxxtmGaRhWQhiCpd0QH/9+pI++QHE1qHpsRRWEJIcUs/8LtMYhqzmhQuspFrGQu8eMpP4
-	m72dnmh8Vf8HxEWwjNDyhNfXbm/JzRUuNZLLEri8Ia95zNHUPzSzWPmZrm+lOcGbf7IMI/
-	vh0vWRDbulMhrIvspaBLrYXV2rCB51o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1736753125;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SPMujG4Ms43NVefw5djXYekatCdjL2IaFIVDnYRZmRs=;
-	b=tjuL/suIYABpIe5i4xj/+fZwjIP1XB6ttvrPshUrsB6Necyycue8yUJsz4TH9my9Hr7RNp
-	qObWZpZCID4RqdCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BD7AC13310;
-	Mon, 13 Jan 2025 07:25:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id IfMmLOS/hGdXLgAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 13 Jan 2025 07:25:24 +0000
-Message-ID: <f3983911-74d6-4602-af60-17ba37d4c66c@suse.de>
-Date: Mon, 13 Jan 2025 08:25:24 +0100
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6CE5619560AA;
+	Mon, 13 Jan 2025 08:23:01 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.4])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D8F6619560AD;
+	Mon, 13 Jan 2025 08:22:56 +0000 (UTC)
+Date: Mon, 13 Jan 2025 16:22:51 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Kun Hu <huk23@m.fudan.edu.cn>, Jiaji Qin <jjtan24@m.fudan.edu.cn>
+Subject: Re: [PATCH] loop: don't call vfs_flush() with queue frozen
+Message-ID: <Z4TNW2PYyPUqwLaD@fedora>
+References: <20250113022426.703537-1-ming.lei@redhat.com>
+ <Z4Spc75EiBXowzMu@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 05/10] block: fix queue freeze vs limits lock order in
- sysfs store methods
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Ming Lei <ming.lei@redhat.com>,
- Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, nbd@other.debian.org,
- linux-scsi@vger.kernel.org, usb-storage@lists.one-eyed-alien.net
-References: <20250108092520.1325324-1-hch@lst.de>
- <20250108092520.1325324-6-hch@lst.de>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250108092520.1325324-6-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:email,suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z4Spc75EiBXowzMu@infradead.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 1/8/25 10:25, Christoph Hellwig wrote:
-> queue_attr_store() always freezes a device queue before calling the
-> attribute store operation. For attributes that control queue limits, the
-> store operation will also lock the queue limits with a call to
-> queue_limits_start_update(). However, some drivers (e.g. SCSI sd) may
-> need to issue commands to a device to obtain limit values from the
-> hardware with the queue limits locked. This creates a potential ABBA
-> deadlock situation if a user attempts to modify a limit (thus freezing
-> the device queue) while the device driver starts a revalidation of the
-> device queue limits.
+On Sun, Jan 12, 2025 at 09:49:39PM -0800, Christoph Hellwig wrote:
+> On Mon, Jan 13, 2025 at 10:24:26AM +0800, Ming Lei wrote:
+> > If vfs_flush() is called with queue frozen, the queue freeze lock may be
+> > connected with FS internal lock
 > 
-> Avoid such deadlock by not freezing the queue before calling the
-> ->store_limit() method in struct queue_sysfs_entry and instead use the
-> queue_limits_commit_update_frozen helper to freeze the queue after taking
-> the limits lock.
-> 
-> (commit log adapted from a similar patch from  Damien Le Moal)
-> 
-> Fixes: ff956a3be95b ("block: use queue_limits_commit_update in queue_discard_max_store")
-> Fixes: 0327ca9d53bf ("block: use queue_limits_commit_update in queue_max_sectors_store")
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
-> ---
->   block/blk-sysfs.c | 18 ++++++++++--------
->   1 file changed, 10 insertions(+), 8 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+> What "FS internal lock" ?
 
-Cheers,
+Please see the report:
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+https://lore.kernel.org/linux-block/359BC288-B0B1-4815-9F01-3A349B12E816@m.fudan.edu.cn/T/#u
+
+> 
+> > , and potential deadlock could be
+> > triggered.
+> > 
+> > Fix it by moving vfs_flush() out of queue freezing.
+> 
+> That doesn't work.  The pagecache will be dirties by any command
+> processed using buffered I/O, so we need to freeze first to ensure
+> that there are no outstanding commands.
+
+vfs_flush() is called in case of previous buffered IO for flushing dirty
+pages.
+
+The call from loop_change_fd() has been broken, because ->lo_backing_file
+is updated to new one when calling loop_update_dio(), and I will cover
+this case in V2.
+
+For others in which backing file isn't changed, the patch is just fine
+in case of new buffered IO mode, isn't it?
+
+
+Thanks,
+Ming
+
