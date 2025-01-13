@@ -1,212 +1,64 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69398248C;
-	Mon, 13 Jan 2025 04:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CAFC10E0;
+	Mon, 13 Jan 2025 05:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736741302; cv=none; b=RVd0LplQKvRvRZGdr/aj1ibq+sVSsjNhDEm5sUrDE5aK1aEKY/pbxGotBLHDT3Fio2fc0t8CGBg8wJT6y9OlJ6ExOQu04kmtSvOVN6pYHE8/1ENMGU2MKGUTZbCXpmm6Kb86lzNf6e4PM6VTlTazkX8lgGxHJnSdp/I95MhBsdY=
+	t=1736747226; cv=none; b=fyRiDa7AR6ppmcJ/R/kaMymxjlU46WJCMg0DvdXY7eLa9Q32bjLxb38YG7kuDnYbsumdEOOh86wZfsT1OJysuv600x47qmbARqaxLd14K6B2+MPjLZNO8nup+GZlwFabR5N0KxHRBMuHmctTqTV4jXKlYImWdwtBVLP6UuWTKAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736741302; c=relaxed/simple;
-	bh=0Uz4yQG4wZ+nbc6zM7VzZVDYDJ+2olnmJX/iIu+0dXI=;
+	s=arc-20240116; t=1736747226; c=relaxed/simple;
+	bh=WxjPia5DOZxFoTySNZERWmTCb9+dkDfsOBYYwX7BeG4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dKKRuk6JfI2PO1L45yYx+i8RK+wjID12YKgsp3nLWpNcEsUbjOqKwateKDSouAoQ0FNfVxMY7yActctlsnJ4wz2blLmAHGOWDQPZNW0WYBlFjuTEgHM+jCUB9aAJTHxzHwyf+/H/JxLtHHYDJlMT7Uqa9AZpI+MxEXQmreJY3vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fdu8Kb89; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=PGjv0ur9qpuJb/UpzJNMI8GP/lM15iemAl9/9uvGUTd6CPxOmJuHR+Atdt/Sr49HdL/EYgeJD3Ft7x+w4I7wQsIp9kMrgFyrSYoPidnI3NXYAWfR9zO56WuNe65Iw8TMK8fZy/zaOf8m2FOJ3e5bpu8Dt3yCVqJz2Ybheh6zs/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Gvb1JbKg; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fdu8Kb89"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2166f1e589cso79154505ad.3;
-        Sun, 12 Jan 2025 20:08:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736741300; x=1737346100; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=O61dNdsPd81LhYeEXdbyMEZmy6qvkd3iBvbUJscPe5A=;
-        b=fdu8Kb89XMTXTNsa+EgfCmnaPsj5aegW9O7Dw5Dvo0X/IlDJwt7mfVShZcuG0pQJKj
-         zFMy4NJM9YWy7Js9Y1yoU48iZSgSMB8UsLrS57Cl7hV6ZRBtKe8W3s6mIv6BGGBJiFsV
-         iiUqM/jvbiUixp6vdyUu0aGjxD1RwqC1DK4EannHQbpbK2R2+Cja4dZ2y7yVSx+a+A0r
-         cywx2qIocZFfMAifosi97aKleJ+pozD0qlx2727cpzrPnmcrrfbioTQVvEy4TBUa1ebV
-         jmsQf7+yLdlaFij5eaBn2PJVVWfvAODv8xEbC1o7eKt95BkpF9TVxCWKZwv2aqJ199pl
-         wmsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736741300; x=1737346100;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O61dNdsPd81LhYeEXdbyMEZmy6qvkd3iBvbUJscPe5A=;
-        b=ITRYQjlEk7Z3/KxPkCr+AA8ZCMzwwkGIgvrjjawhNvyRnG0iGH/RO+TVB0PiUJNULF
-         7P+BvSNWUujmuDC1C07cbLMt9BXaKbtvpYUnCNX+j0hL7gpClAA0Jq4SgaPlS84SNmMv
-         mVov9GPImOYAxIWmAUlYC0TJAW/NQAo3abuRgtJZ9MzT6GldKKfMVj+OpJ5dSrfsdBcD
-         lYERw1J71ZYGj7v6LB7n5lnXYBBMwWmMQmZnvNPFFn+afdGA1JnDayUKsdT59qLaXY3W
-         aaNYVqHmZS/AkxU4xzSBvk38FHFN1c4+FhXPeQrRGXMeyNrzFZkEOLjRYjipkGWUn2Ui
-         Eieg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZoE4Al09EMHlFQobv87Asng93vkebeEji4NjG/uGe40bFxIdvvr1/p0dhMe3n4jj6gukZOj2GQZZTQ8I=@vger.kernel.org, AJvYcCUoYL8BNh3Ea4iNgLFTgSxzs/yYh6IxP56Q0zvUZgLt8eSRS09+/vww0meCCxno1sLMfl8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcDp3bTlmISLzpIUi+YR9Gb8s2lYTFAjEON3BCVOqsYsCjrqyw
-	jiam4paSRDPzVh05wu85pbn36T+FyBkxqtnmIWiUMr7Ai/QEpSnP3pJIGwYu
-X-Gm-Gg: ASbGncuKNpf0xlWUGjITvEXlrdCcxct31tma2MDYV5b2gGfeaJ/FhNEI6yrhmnCdZED
-	xwZNlHkGGmcJ9NGyqMXGZKcvMv0RX/mgIy3YyGu12cecinmaJXzvDuGBaZvHV2QH7TsqHhdy0z7
-	Eu93yxR5VR5ooBq4x5Dv0AHnyCtBcc7FanpSEi/6oODUHGHKttPzVHSd6rCI2V6n0iYa91jnao1
-	jtohwASqQM9FJARHQZlDl4eYtca/0Tjt9la7p5Rixa1M6fLrE89Ww==
-X-Google-Smtp-Source: AGHT+IGmhet9oAIKMSii4iwHB7ez148VxH6bFDTlFPTXroqUm58h35zj33g7DHxfZ4p9oOsfx7TJvw==
-X-Received: by 2002:a17:902:d4cd:b0:215:6f9b:e447 with SMTP id d9443c01a7336-21a83f665d4mr281988345ad.30.1736741299933;
-        Sun, 12 Jan 2025 20:08:19 -0800 (PST)
-Received: from fedora ([2001:250:3c1e:503:ffff:ffff:ffaa:4903])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f10e0b9sm44731935ad.44.2025.01.12.20.08.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jan 2025 20:08:19 -0800 (PST)
-Date: Mon, 13 Jan 2025 12:08:14 +0800
-From: Ming Lei <tom.leiming@gmail.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Gvb1JbKg"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Ad6vN+9jm5mfnc84bnorTllpfcNEkE7FxLBj4K2qyJ4=; b=Gvb1JbKgM26C8KgKznRbayHR4T
+	RYO4Sjlpu6aS5TWw5KLmi7FuzZQGQPqcUfQ0iybSe1ywLqqpx2zHEK2HobZ3ha33sRjO2FFCXDkH8
+	nhjEBmGzpu3aHokasNqPKXibiFE4p5gfnnbmjVhIqXHm+TVnISTLoyK7eR/ACXIEB1pmYwHh5R2ku
+	+GNqK29IK215mY2MbtGX+2HUgP+bIFxormVDtQ5SqDaj25rjA5lXqaNPiomUaZ9Lp1omAYim66Hrp
+	nhXgQNoLHxkw9ux2EhVo37bowO4qsKnzMdDs+KR+UdiVT3CVU1GkhHtXxu7aHSOkZSvUDQOMCRirL
+	OWatxAhw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tXDHz-000000044tu-44Je;
+	Mon, 13 Jan 2025 05:47:03 +0000
+Date: Sun, 12 Jan 2025 21:47:03 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <tom.leiming@gmail.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Yonghong Song <yonghong.song@linux.dev>
-Subject: Re: [RFC PATCH 08/22] ublk: bpf: add bpf struct_ops
-Message-ID: <Z4SRrrXeoZ2MwH96@fedora>
-References: <20250107120417.1237392-1-tom.leiming@gmail.com>
- <20250107120417.1237392-9-tom.leiming@gmail.com>
- <CAADnVQLGw07CNpi7=XHJRgBL2ku7Q23nfah07pBc45G+xeTKxw@mail.gmail.com>
+	Ming Lei <ming.lei@redhat.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] block: mark GFP_NOIO around sysfs ->store()
+Message-ID: <Z4So1wfnrdf4uSxb@infradead.org>
+References: <20250113015833.698458-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQLGw07CNpi7=XHJRgBL2ku7Q23nfah07pBc45G+xeTKxw@mail.gmail.com>
+In-Reply-To: <20250113015833.698458-1-ming.lei@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Hello Alexei,
-
-Thanks for your comments!
-
-On Thu, Jan 09, 2025 at 05:43:12PM -0800, Alexei Starovoitov wrote:
-> On Tue, Jan 7, 2025 at 4:08 AM Ming Lei <tom.leiming@gmail.com> wrote:
-> > +
-> > +/* Return true if io cmd is queued, otherwise forward it to userspace */
-> > +bool ublk_run_bpf_handler(struct ublk_queue *ubq, struct request *req,
-> > +                         queue_io_cmd_t cb)
-> > +{
-> > +       ublk_bpf_return_t ret;
-> > +       struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
-> > +       struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
-> > +       struct ublk_bpf_io *bpf_io = &data->bpf_data;
-> > +       const unsigned long total = iod->nr_sectors << 9;
-> > +       unsigned int done = 0;
-> > +       bool res = true;
-> > +       int err;
-> > +
-> > +       if (!test_bit(UBLK_BPF_IO_PREP, &bpf_io->flags))
-> > +               ublk_bpf_prep_io(bpf_io, iod);
-> > +
-> > +       do {
-> > +               enum ublk_bpf_disposition rc;
-> > +               unsigned int bytes;
-> > +
-> > +               ret = cb(bpf_io, done);
+On Mon, Jan 13, 2025 at 09:58:33AM +0800, Ming Lei wrote:
+> sysfs ->store is called with queue freezed, meantime we have several
+> ->store() callbacks(update_nr_requests, wbt, scheduler) to allocate
+> memory with GFP_KERNEL which may run into direct reclaim code path,
+> then potential deadlock can be caused.
 > 
-> High level observation...
-> I suspect forcing all sturct_ops callbacks to have only these
-> two arguments and packing args into ublk_bpf_io
-> will be limiting in the long term.
+> Fix the issue by marking NOIO around sysfs ->store()
 
-There are three callbacks defined, and only the two with same type for
-queuing io commands are covered in this function.
+Yes, that's a good thing, and we should aim for more of that for
+block layer code that requires NOIO:
 
-But yes, callback type belongs to API, which should be designed
-carefully, and I will think about further.
-
-> 
-> And this part of api would need to be redesigned,
-> but since it's not an uapi... not a big deal.
-> 
-> > +               rc = ublk_bpf_get_disposition(ret);
-> > +
-> > +               if (rc == UBLK_BPF_IO_QUEUED)
-> > +                       goto exit;
-> > +
-> > +               if (rc == UBLK_BPF_IO_REDIRECT)
-> > +                       break;
-> 
-> Same point about return value processing...
-> Each struct_ops callback could have had its own meaning
-> of retvals.
-> I suspect it would have been more flexible and more powerful
-> this way.
-
-Yeah, I agree, just the 3rd callback of release_io_cmd_t isn't covered
-in this function.
-
-> 
-> Other than that bpf plumbing looks good.
-> 
-> There is an issue with leaking allocated memory in bpf_aio_alloc kfunc
-> (it probably should be KF_ACQUIRE)
-
-It is one problem which troubles me too:
-
-- another callback of struct_ops/bpf_aio_complete_cb is guaranteed to be
-called after the 'struct bpf_aio' instance is submitted via kfunc
-bpf_aio_submit(), and it is supposed to be freed from
-struct_ops/bpf_aio_complete_cb
-
-- but the following verifier failure is triggered if bpf_aio_alloc and
-bpf_aio_release are marked as KF_ACQUIRE & KF_RELEASE.
-
-```
-libbpf: prog 'ublk_loop_comp_cb': -- BEGIN PROG LOAD LOG --
-Global function ublk_loop_comp_cb() doesn't return scalar. Only those are supported.
-```
-
-Here 'struct bpf_aio' instance isn't stored in map, and it is provided
-from struct_ops callback(bpf_aio_complete_cb), I appreciate you may share
-any idea about how to let KF_ACQUIRE/KF_RELEASE cover the usage here.
-
-> and a few other things, but before doing any in depth review
-> from bpf pov I'd like to hear what block folks think.
-
-Me too, look forward to comments from our block guys.
-
-> 
-> Motivation looks useful,
-> but the claim of performance gains without performance numbers
-> is a leap of faith.
-
-Follows some data:
-
-1) ublk-null bpf vs. ublk-null with bpf
-
-- 1.97M IOPS vs. 3.7M IOPS  
-
-- setup ublk-null
-
-	cd tools/testing/selftests/ublk
-	./ublk_bpf add -t null -q 2
-
-- setup ublk-null wit bpf
-
-	cd tools/testing/selftests/ublk
-	./ublk_bpf reg -t null ./ublk_null.bpf.o
-	./ublk_bpf add -t null -q 2 --bpf_prog 0
-
-- run  `fio/t/io_uring -p 0 /dev/ublkb0`
-
-2) ublk-loop
-
-The built-in utility of `ublk_bpf` only supports bpf io handling, but compared
-with ublksrv, the improvement isn't so big, still with ~10%. One reason
-is that bpf aio is just started, not optimized, in theory:
-
-- it saves one kernel-user context switch
-- save one time of user-kernel IO buffer copy
-- much less io handling code footprint compared with userspace io handling
-
-The improvement is supposed to be big especially in big chunk size
-IO workload.
-
-
-Thanks,
-Ming
+Reviewed-by: Christoph Hellwig <hch@lst.de>
