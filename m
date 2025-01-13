@@ -1,169 +1,212 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE488F7D
-	for <linux-block@vger.kernel.org>; Mon, 13 Jan 2025 02:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69398248C;
+	Mon, 13 Jan 2025 04:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736735082; cv=none; b=B7UI6DjYHXYvwJeJMygJxf8cjJESJ9DHbfDcqeW0IPyw9UX6gr8+Ai4qRl6UgAaUrG3ogl18ggspKa4SH0Pioj8p6BhYHZBiGDjLOd5FyMf/P4ZYgrplTuuQLJULwIko3bQWNgvys32VbuAvTAURWg5zQyiPul7MKnEtP1TdJBA=
+	t=1736741302; cv=none; b=RVd0LplQKvRvRZGdr/aj1ibq+sVSsjNhDEm5sUrDE5aK1aEKY/pbxGotBLHDT3Fio2fc0t8CGBg8wJT6y9OlJ6ExOQu04kmtSvOVN6pYHE8/1ENMGU2MKGUTZbCXpmm6Kb86lzNf6e4PM6VTlTazkX8lgGxHJnSdp/I95MhBsdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736735082; c=relaxed/simple;
-	bh=qk/2j3llk/eYkog6UXNOQq5XIxGOc4pUo/9C/tPtaLw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K+jvADgtEM1kfyJto3v1HpruaM/HcnS5LQyihzn8UWpqc2KvIHyBfN8YdIWmQ/vXKQBbGPWBiYdbYCJ3Jv0782wYh6FK/IsFHHkIqYEMxohJuNJDdgZFuhLT1g/DEjdZlpTFUj45m0D0+SMavEUTvyL2aeeKld5iJSzL2ez296A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bcinPiPW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1736741302; c=relaxed/simple;
+	bh=0Uz4yQG4wZ+nbc6zM7VzZVDYDJ+2olnmJX/iIu+0dXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dKKRuk6JfI2PO1L45yYx+i8RK+wjID12YKgsp3nLWpNcEsUbjOqKwateKDSouAoQ0FNfVxMY7yActctlsnJ4wz2blLmAHGOWDQPZNW0WYBlFjuTEgHM+jCUB9aAJTHxzHwyf+/H/JxLtHHYDJlMT7Uqa9AZpI+MxEXQmreJY3vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fdu8Kb89; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bcinPiPW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736735077;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=NRM1WhMmmYx3tHFT1bKd+6OiMlTGYfQVwYtxcgI/Bls=;
-	b=bcinPiPW4Gh7MA2pycvzlmMMPAfxABRdCceRL/E5jqcH1Fz2cID1+OqRyHfwLkcgooFNlB
-	AfiE5O+ipqrYhGQoCuMJmc7avmwiDmyP2CCQHfBBnjCX+Q14Xt1o2/HAO5oZNHaNDxObgw
-	QPQ3PZHfc9dozzcG0gxTkXI1wb6I1is=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-258-l2Y9udwWNsGeGxFwNfbP4g-1; Sun,
- 12 Jan 2025 21:24:34 -0500
-X-MC-Unique: l2Y9udwWNsGeGxFwNfbP4g-1
-X-Mimecast-MFC-AGG-ID: l2Y9udwWNsGeGxFwNfbP4g
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C6D8D1955DCC;
-	Mon, 13 Jan 2025 02:24:32 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.56])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DCB77195E3D9;
-	Mon, 13 Jan 2025 02:24:30 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Kun Hu <huk23@m.fudan.edu.cn>,
-	Jiaji Qin <jjtan24@m.fudan.edu.cn>
-Subject: [PATCH] loop: don't call vfs_flush() with queue frozen
-Date: Mon, 13 Jan 2025 10:24:26 +0800
-Message-ID: <20250113022426.703537-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fdu8Kb89"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2166f1e589cso79154505ad.3;
+        Sun, 12 Jan 2025 20:08:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736741300; x=1737346100; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=O61dNdsPd81LhYeEXdbyMEZmy6qvkd3iBvbUJscPe5A=;
+        b=fdu8Kb89XMTXTNsa+EgfCmnaPsj5aegW9O7Dw5Dvo0X/IlDJwt7mfVShZcuG0pQJKj
+         zFMy4NJM9YWy7Js9Y1yoU48iZSgSMB8UsLrS57Cl7hV6ZRBtKe8W3s6mIv6BGGBJiFsV
+         iiUqM/jvbiUixp6vdyUu0aGjxD1RwqC1DK4EannHQbpbK2R2+Cja4dZ2y7yVSx+a+A0r
+         cywx2qIocZFfMAifosi97aKleJ+pozD0qlx2727cpzrPnmcrrfbioTQVvEy4TBUa1ebV
+         jmsQf7+yLdlaFij5eaBn2PJVVWfvAODv8xEbC1o7eKt95BkpF9TVxCWKZwv2aqJ199pl
+         wmsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736741300; x=1737346100;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O61dNdsPd81LhYeEXdbyMEZmy6qvkd3iBvbUJscPe5A=;
+        b=ITRYQjlEk7Z3/KxPkCr+AA8ZCMzwwkGIgvrjjawhNvyRnG0iGH/RO+TVB0PiUJNULF
+         7P+BvSNWUujmuDC1C07cbLMt9BXaKbtvpYUnCNX+j0hL7gpClAA0Jq4SgaPlS84SNmMv
+         mVov9GPImOYAxIWmAUlYC0TJAW/NQAo3abuRgtJZ9MzT6GldKKfMVj+OpJ5dSrfsdBcD
+         lYERw1J71ZYGj7v6LB7n5lnXYBBMwWmMQmZnvNPFFn+afdGA1JnDayUKsdT59qLaXY3W
+         aaNYVqHmZS/AkxU4xzSBvk38FHFN1c4+FhXPeQrRGXMeyNrzFZkEOLjRYjipkGWUn2Ui
+         Eieg==
+X-Forwarded-Encrypted: i=1; AJvYcCUZoE4Al09EMHlFQobv87Asng93vkebeEji4NjG/uGe40bFxIdvvr1/p0dhMe3n4jj6gukZOj2GQZZTQ8I=@vger.kernel.org, AJvYcCUoYL8BNh3Ea4iNgLFTgSxzs/yYh6IxP56Q0zvUZgLt8eSRS09+/vww0meCCxno1sLMfl8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcDp3bTlmISLzpIUi+YR9Gb8s2lYTFAjEON3BCVOqsYsCjrqyw
+	jiam4paSRDPzVh05wu85pbn36T+FyBkxqtnmIWiUMr7Ai/QEpSnP3pJIGwYu
+X-Gm-Gg: ASbGncuKNpf0xlWUGjITvEXlrdCcxct31tma2MDYV5b2gGfeaJ/FhNEI6yrhmnCdZED
+	xwZNlHkGGmcJ9NGyqMXGZKcvMv0RX/mgIy3YyGu12cecinmaJXzvDuGBaZvHV2QH7TsqHhdy0z7
+	Eu93yxR5VR5ooBq4x5Dv0AHnyCtBcc7FanpSEi/6oODUHGHKttPzVHSd6rCI2V6n0iYa91jnao1
+	jtohwASqQM9FJARHQZlDl4eYtca/0Tjt9la7p5Rixa1M6fLrE89Ww==
+X-Google-Smtp-Source: AGHT+IGmhet9oAIKMSii4iwHB7ez148VxH6bFDTlFPTXroqUm58h35zj33g7DHxfZ4p9oOsfx7TJvw==
+X-Received: by 2002:a17:902:d4cd:b0:215:6f9b:e447 with SMTP id d9443c01a7336-21a83f665d4mr281988345ad.30.1736741299933;
+        Sun, 12 Jan 2025 20:08:19 -0800 (PST)
+Received: from fedora ([2001:250:3c1e:503:ffff:ffff:ffaa:4903])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f10e0b9sm44731935ad.44.2025.01.12.20.08.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Jan 2025 20:08:19 -0800 (PST)
+Date: Mon, 13 Jan 2025 12:08:14 +0800
+From: Ming Lei <tom.leiming@gmail.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Yonghong Song <yonghong.song@linux.dev>
+Subject: Re: [RFC PATCH 08/22] ublk: bpf: add bpf struct_ops
+Message-ID: <Z4SRrrXeoZ2MwH96@fedora>
+References: <20250107120417.1237392-1-tom.leiming@gmail.com>
+ <20250107120417.1237392-9-tom.leiming@gmail.com>
+ <CAADnVQLGw07CNpi7=XHJRgBL2ku7Q23nfah07pBc45G+xeTKxw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+In-Reply-To: <CAADnVQLGw07CNpi7=XHJRgBL2ku7Q23nfah07pBc45G+xeTKxw@mail.gmail.com>
 
-If vfs_flush() is called with queue frozen, the queue freeze lock may be
-connected with FS internal lock, and potential deadlock could be
-triggered.
+Hello Alexei,
 
-Fix it by moving vfs_flush() out of queue freezing.
+Thanks for your comments!
 
-Reported-by: Kun Hu <huk23@m.fudan.edu.cn>
-Reported-by: Jiaji Qin <jjtan24@m.fudan.edu.cn>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+On Thu, Jan 09, 2025 at 05:43:12PM -0800, Alexei Starovoitov wrote:
+> On Tue, Jan 7, 2025 at 4:08 AM Ming Lei <tom.leiming@gmail.com> wrote:
+> > +
+> > +/* Return true if io cmd is queued, otherwise forward it to userspace */
+> > +bool ublk_run_bpf_handler(struct ublk_queue *ubq, struct request *req,
+> > +                         queue_io_cmd_t cb)
+> > +{
+> > +       ublk_bpf_return_t ret;
+> > +       struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
+> > +       struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
+> > +       struct ublk_bpf_io *bpf_io = &data->bpf_data;
+> > +       const unsigned long total = iod->nr_sectors << 9;
+> > +       unsigned int done = 0;
+> > +       bool res = true;
+> > +       int err;
+> > +
+> > +       if (!test_bit(UBLK_BPF_IO_PREP, &bpf_io->flags))
+> > +               ublk_bpf_prep_io(bpf_io, iod);
+> > +
+> > +       do {
+> > +               enum ublk_bpf_disposition rc;
+> > +               unsigned int bytes;
+> > +
+> > +               ret = cb(bpf_io, done);
+> 
+> High level observation...
+> I suspect forcing all sturct_ops callbacks to have only these
+> two arguments and packing args into ublk_bpf_io
+> will be limiting in the long term.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 1ec7417c7f00..9adf496b3f93 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -203,7 +203,7 @@ static bool lo_can_use_dio(struct loop_device *lo)
-  * loop_get_status will always report the effective LO_FLAGS_DIRECT_IO flag and
-  * not the originally passed in one.
-  */
--static inline void loop_update_dio(struct loop_device *lo)
-+static inline bool loop_update_dio(struct loop_device *lo)
- {
- 	bool dio_in_use = lo->lo_flags & LO_FLAGS_DIRECT_IO;
- 
-@@ -217,8 +217,7 @@ static inline void loop_update_dio(struct loop_device *lo)
- 		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
- 
- 	/* flush dirty pages before starting to issue direct I/O */
--	if ((lo->lo_flags & LO_FLAGS_DIRECT_IO) && !dio_in_use)
--		vfs_fsync(lo->lo_backing_file, 0);
-+	return (lo->lo_flags & LO_FLAGS_DIRECT_IO) && !dio_in_use;
- }
- 
- /**
-@@ -589,6 +588,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	int error;
- 	bool partscan;
- 	bool is_loop;
-+	bool flush;
- 
- 	if (!file)
- 		return -EBADF;
-@@ -629,11 +629,14 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	lo->old_gfp_mask = mapping_gfp_mask(file->f_mapping);
- 	mapping_set_gfp_mask(file->f_mapping,
- 			     lo->old_gfp_mask & ~(__GFP_IO|__GFP_FS));
--	loop_update_dio(lo);
-+	flush = loop_update_dio(lo);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
- 	loop_global_unlock(lo, is_loop);
- 
-+	if (flush)
-+		vfs_fsync(lo->lo_backing_file, 0);
-+
- 	/*
- 	 * Flush loop_validate_file() before fput(), for l->lo_backing_file
- 	 * might be pointing at old_file which might be the last reference.
-@@ -1255,6 +1258,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	int err;
- 	bool partscan = false;
- 	bool size_changed = false;
-+	bool flush = false;
- 
- 	err = mutex_lock_killable(&lo->lo_mutex);
- 	if (err)
-@@ -1292,7 +1296,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	}
- 
- 	/* update the direct I/O flag if lo_offset changed */
--	loop_update_dio(lo);
-+	flush = loop_update_dio(lo);
- 
- out_unfreeze:
- 	blk_mq_unfreeze_queue(lo->lo_queue);
-@@ -1302,6 +1306,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	mutex_unlock(&lo->lo_mutex);
- 	if (partscan)
- 		loop_reread_partitions(lo);
-+	if (flush)
-+		vfs_fsync(lo->lo_backing_file, 0);
- 
- 	return err;
- }
-@@ -1473,6 +1479,7 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
- {
- 	struct queue_limits lim;
- 	int err = 0;
-+	bool flush;
- 
- 	if (lo->lo_state != Lo_bound)
- 		return -ENXIO;
-@@ -1488,8 +1495,10 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
- 
- 	blk_mq_freeze_queue(lo->lo_queue);
- 	err = queue_limits_commit_update(lo->lo_queue, &lim);
--	loop_update_dio(lo);
-+	flush = loop_update_dio(lo);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
-+	if (flush)
-+		vfs_fsync(lo->lo_backing_file, 0);
- 
- 	return err;
- }
--- 
-2.44.0
+There are three callbacks defined, and only the two with same type for
+queuing io commands are covered in this function.
 
+But yes, callback type belongs to API, which should be designed
+carefully, and I will think about further.
+
+> 
+> And this part of api would need to be redesigned,
+> but since it's not an uapi... not a big deal.
+> 
+> > +               rc = ublk_bpf_get_disposition(ret);
+> > +
+> > +               if (rc == UBLK_BPF_IO_QUEUED)
+> > +                       goto exit;
+> > +
+> > +               if (rc == UBLK_BPF_IO_REDIRECT)
+> > +                       break;
+> 
+> Same point about return value processing...
+> Each struct_ops callback could have had its own meaning
+> of retvals.
+> I suspect it would have been more flexible and more powerful
+> this way.
+
+Yeah, I agree, just the 3rd callback of release_io_cmd_t isn't covered
+in this function.
+
+> 
+> Other than that bpf plumbing looks good.
+> 
+> There is an issue with leaking allocated memory in bpf_aio_alloc kfunc
+> (it probably should be KF_ACQUIRE)
+
+It is one problem which troubles me too:
+
+- another callback of struct_ops/bpf_aio_complete_cb is guaranteed to be
+called after the 'struct bpf_aio' instance is submitted via kfunc
+bpf_aio_submit(), and it is supposed to be freed from
+struct_ops/bpf_aio_complete_cb
+
+- but the following verifier failure is triggered if bpf_aio_alloc and
+bpf_aio_release are marked as KF_ACQUIRE & KF_RELEASE.
+
+```
+libbpf: prog 'ublk_loop_comp_cb': -- BEGIN PROG LOAD LOG --
+Global function ublk_loop_comp_cb() doesn't return scalar. Only those are supported.
+```
+
+Here 'struct bpf_aio' instance isn't stored in map, and it is provided
+from struct_ops callback(bpf_aio_complete_cb), I appreciate you may share
+any idea about how to let KF_ACQUIRE/KF_RELEASE cover the usage here.
+
+> and a few other things, but before doing any in depth review
+> from bpf pov I'd like to hear what block folks think.
+
+Me too, look forward to comments from our block guys.
+
+> 
+> Motivation looks useful,
+> but the claim of performance gains without performance numbers
+> is a leap of faith.
+
+Follows some data:
+
+1) ublk-null bpf vs. ublk-null with bpf
+
+- 1.97M IOPS vs. 3.7M IOPS  
+
+- setup ublk-null
+
+	cd tools/testing/selftests/ublk
+	./ublk_bpf add -t null -q 2
+
+- setup ublk-null wit bpf
+
+	cd tools/testing/selftests/ublk
+	./ublk_bpf reg -t null ./ublk_null.bpf.o
+	./ublk_bpf add -t null -q 2 --bpf_prog 0
+
+- run  `fio/t/io_uring -p 0 /dev/ublkb0`
+
+2) ublk-loop
+
+The built-in utility of `ublk_bpf` only supports bpf io handling, but compared
+with ublksrv, the improvement isn't so big, still with ~10%. One reason
+is that bpf aio is just started, not optimized, in theory:
+
+- it saves one kernel-user context switch
+- save one time of user-kernel IO buffer copy
+- much less io handling code footprint compared with userspace io handling
+
+The improvement is supposed to be big especially in big chunk size
+IO workload.
+
+
+Thanks,
+Ming
