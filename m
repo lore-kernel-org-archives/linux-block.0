@@ -1,133 +1,203 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A261CAA89
-	for <linux-block@vger.kernel.org>; Mon, 13 Jan 2025 12:06:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C00625760;
+	Mon, 13 Jan 2025 13:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736770020; cv=none; b=XRINzlNevb7LOJObF69O9XZvGFdsYsautQ3edmFyQ4Ugw/TGWHshHdy9cyb8Zf+SoV47SDhJRaJ8Jb8q2CBbdJFE2xrrHY7xWIcESoWRKNBoYkz4Yi4W7KuWbBmJ8HM0dUOCcvlJH9rUEWzFowQzvmjFFcG56vWOmHm3eRHmwOA=
+	t=1736774358; cv=none; b=gZUzEvkT6C7q2LhnD6EwIA1rRbE/ngiUpjzcaQkfJ/TwqZpiHXXNXZxxaMCi/16ye1SrM1Q5S6R53RnQdmm0MUGJSLJV3GvNsnua8SjmJ5l9/XEVr+08fAUgojG3s6PWDq4bxHbq/51WguZGkdYQ5rvhqyU4KgpmdbRxbctxjXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736770020; c=relaxed/simple;
-	bh=r30vt+5OTMFPh/fF4H7OdSBQz/CZLVZrwGnm3KxYiWU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RDcmmykp/OzzxycyI8CRugVsGuWlaKEcCAu7xuhiCU/Cx1kMSvknMhdHjhYEMzqU1Sss8YapQjSd6Lsc1y4ok9Tv2VA46RKKmxDPv64FayMlRvpf2xg0ocEHAajj7J6rmteIGbTIZIUwmM87ANv1gkASe0V68f+U+S+J5Rr4aLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YjWUDkPv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1736774358; c=relaxed/simple;
+	bh=TE1VgIcDpVbxf0N+g7FTI8eBRS9eegkK3O/MK1j5RH0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NEB4Bl6OLn0L0v0f+6EeyMHrnKkVu2oAvj9jYKJS2JBfv9fZ8rOs/bBHYbD0bwAXUoEhq30Wyr/hJtoVcy8rQnwcqGVYWxGPBU0K+UfUXD6bxXwCLbvODyH8Ei6y901ssJdF0643wEEKVrXG2h78AnyxP9K3c2eolUQZ7KNVwRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AzCXjj0I; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Y6Nf78CC; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AzCXjj0I; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Y6Nf78CC; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YjWUDkPv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736770016;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ybAu5i+n18hZUZxjbZyBc8U2lbO2B4XwwyzHK8p6Qbo=;
-	b=YjWUDkPvpgQqjI/3XAAhGPbaT5BW7BUSUCEK7aZsQUMnBHMTjVOddfJMhT1kMX3e4tIpGm
-	kYOZSk3hQnjrP1AXBhacjdmHhKpA0AGQRJ+mwY3KKUy21spRDv+VtEfEkmd4bwpB3r13OW
-	gbUGzHWPN0wWN+B+FF4eyhdaaMdpgUc=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-536-f-ry0qUMMA-S2rUaRDS-JA-1; Mon,
- 13 Jan 2025 07:06:55 -0500
-X-MC-Unique: f-ry0qUMMA-S2rUaRDS-JA-1
-X-Mimecast-MFC-AGG-ID: f-ry0qUMMA-S2rUaRDS-JA
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AzCXjj0I";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Y6Nf78CC";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AzCXjj0I";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Y6Nf78CC"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2A4481956065;
-	Mon, 13 Jan 2025 12:06:53 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.4])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D70DD30001BE;
-	Mon, 13 Jan 2025 12:06:50 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Kun Hu <huk23@m.fudan.edu.cn>,
-	Jiaji Qin <jjtan24@m.fudan.edu.cn>
-Subject: [PATCH] loop: move vfs_fsync() out of loop_update_dio()
-Date: Mon, 13 Jan 2025 20:06:44 +0800
-Message-ID: <20250113120644.811886-1-ming.lei@redhat.com>
+	by smtp-out2.suse.de (Postfix) with ESMTPS id D13341F37C;
+	Mon, 13 Jan 2025 13:19:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1736774354; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hk3TAm3KuJF1wWNhcwjdPo+b1BCvU/jsmXrNHxfsCJo=;
+	b=AzCXjj0IB7HJ0lRlZfkhGJ9yptYRAVmDHjPpl+PAX0axC4BEMgZeFboZGM8lsV7e6EYv5x
+	tsKp7ZOGlY7/IxbVIonpm7mnDaK0GsYpfZa6t1AElG3Ij+7pB2WKPpr3NkRJhUb6OMBT7H
+	yN9dBqxGdUBcuJj2PEr+LgNz5bzMULM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1736774354;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hk3TAm3KuJF1wWNhcwjdPo+b1BCvU/jsmXrNHxfsCJo=;
+	b=Y6Nf78CCmw1r042Y0Fgj387JxecUE5Atb8GuuYI7GkCPF14NwtorxBu6pdKNojRAL0FQvz
+	QpqHePj1TvHsQTDg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1736774354; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hk3TAm3KuJF1wWNhcwjdPo+b1BCvU/jsmXrNHxfsCJo=;
+	b=AzCXjj0IB7HJ0lRlZfkhGJ9yptYRAVmDHjPpl+PAX0axC4BEMgZeFboZGM8lsV7e6EYv5x
+	tsKp7ZOGlY7/IxbVIonpm7mnDaK0GsYpfZa6t1AElG3Ij+7pB2WKPpr3NkRJhUb6OMBT7H
+	yN9dBqxGdUBcuJj2PEr+LgNz5bzMULM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1736774354;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hk3TAm3KuJF1wWNhcwjdPo+b1BCvU/jsmXrNHxfsCJo=;
+	b=Y6Nf78CCmw1r042Y0Fgj387JxecUE5Atb8GuuYI7GkCPF14NwtorxBu6pdKNojRAL0FQvz
+	QpqHePj1TvHsQTDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BC67B13A6F;
+	Mon, 13 Jan 2025 13:19:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Nbj4LdIShWc1IgAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Mon, 13 Jan 2025 13:19:14 +0000
+Date: Mon, 13 Jan 2025 14:19:14 +0100
+From: Daniel Wagner <dwagner@suse.de>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Daniel Wagner <wagi@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+	Kashyap Desai <kashyap.desai@broadcom.com>, Sumit Saxena <sumit.saxena@broadcom.com>, 
+	Shivasharan S <shivasharan.srikanteshwara@broadcom.com>, Chandrakanth patil <chandrakanth.patil@broadcom.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Nilesh Javali <njavali@marvell.com>, 
+	GR-QLogic-Storage-Upstream@marvell.com, Don Brace <don.brace@microchip.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Costa Shulyupin <costa.shul@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
+	Valentin Schneider <vschneid@redhat.com>, Waiman Long <llong@redhat.com>, 
+	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Mel Gorman <mgorman@suse.de>, Hannes Reinecke <hare@suse.de>, 
+	Sridhar Balaraman <sbalaraman@parallelwireless.com>, "brookxu.cn" <brookxu.cn@gmail.com>, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	megaraidlinux.pdl@broadcom.com, linux-scsi@vger.kernel.org, storagedev@microchip.com, 
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH v4 8/9] blk-mq: use hk cpus only when
+ isolcpus=managed_irq is enabled
+Message-ID: <4047eb51-ee6b-46ae-a67b-ce74c54c41e7@flourine.local>
+References: <20241217-isolcpus-io-queues-v4-0-5d355fbb1e14@kernel.org>
+ <20241217-isolcpus-io-queues-v4-8-5d355fbb1e14@kernel.org>
+ <Z2PlbL0XYTQ_LxTw@fedora>
+ <cc5e44dd-e1dc-4f24-88d9-ce45a8b0794f@flourine.local>
+ <Z2UwvQoDM3f4zAxG@fedora>
+ <ae9abe4c-010a-41ff-be44-1d52a331eb11@flourine.local>
+ <Z4Hl_oQhJ2u6g2B3@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z4Hl_oQhJ2u6g2B3@fedora>
+X-Spam-Score: -2.80
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_TLS_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[39];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,kernel.dk,lst.de,grimberg.me,broadcom.com,oracle.com,marvell.com,microchip.com,redhat.com,linux.alibaba.com,linux-foundation.org,linutronix.de,suse.com,suse.de,parallelwireless.com,gmail.com,vger.kernel.org,lists.infradead.org,lists.linux.dev];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	R_RATELIMIT(0.00)[to_ip_from(RLtq7xx1p6rx585ucya5i3u39z)]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-If vfs_flush() is called with queue frozen, the queue freeze lock may be
-connected with FS internal lock, and lockdep warning can be triggered
-because the queue freeze lock is connected with too many global or
-sub-system locks.
+Hi Ming,
 
-Fix the warning by moving vfs_fsync() out of loop_update_dio():
+On Sat, Jan 11, 2025 at 11:31:10AM +0800, Ming Lei wrote:
+> > What about a commit message like:
+> > 
+> >   When isolcpus=managed_irq is enabled, and the last housekeeping CPU for
+> >   a given hardware context goes offline, there is no CPU left which
+> >   handles the IOs anymore. If isolated CPUs mapped to this hardware
+> >   context are online and an application running on these isolated CPUs
+> >   issue an IO this will lead to stalls.
+> 
+> It isn't correct, the in-tree code doesn't have such stall, no matter if
+> IO is issued from HK or isolated CPUs since the managed irq is guaranteed to
+> live if any mapped CPU is online.
 
-- vfs_fsync() is only needed when switching to dio
+Yes, it has different properties.
 
-- only loop_change_fd() and loop_configure() may switch from buffered
-IO to direct IO, so call vfs_fsync() directly here. This way is safe
-because either loop is in unbound, or new file isn't attached
+> Please see irq_do_set_affinity():
+> 
+>         if (irqd_affinity_is_managed(data) &&
+>               housekeeping_enabled(HK_TYPE_MANAGED_IRQ)) {
+>                   const struct cpumask *hk_mask;
+> 
+>                   hk_mask = housekeeping_cpumask(HK_TYPE_MANAGED_IRQ);
+> 
+>                   cpumask_and(&tmp_mask, mask, hk_mask);
+>                   if (!cpumask_intersects(&tmp_mask, cpu_online_mask))
+>                           prog_mask = mask;
+>                   else
+>                           prog_mask = &tmp_mask;
+>           } else {
+>                   prog_mask = mask;
+> 
+> The whole mask which may include isolated CPUs is only programmed to
+> hardware if there isn't any online CPU in `irq_mask & hk_mask`.
 
-- for the other two cases of set_status and set_block_size, direct IO
-can only become off, so no need to call vfs_fsync()
+This is not what I try to achieve here. The main motivation with this
+series is that isolated CPUs are never serving IRQs.
 
-Cc: Christoph Hellwig <hch@infradead.org>
-Reported-by: Kun Hu <huk23@m.fudan.edu.cn>
-Reported-by: Jiaji Qin <jjtan24@m.fudan.edu.cn>
-Closes: https://lore.kernel.org/linux-block/359BC288-B0B1-4815-9F01-3A349B12E816@m.fudan.edu.cn/T/#u
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+> > I was talking about implementing the feature which would remap the
+> > isolated CPUs to online hardware context when the current hardware
+> > context goes offline. I didn't find a solution which I think would be
+> > worth presenting. All involved some sort of locking/refcounting in the
+> > hotpath, which I think we should just avoid.
+> 
+> I understand the trouble, but it is still one improvement from user
+> viewpoint instead of feature since the interface of 'isolcpus=manage_irq'
+> isn't changed.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 1ec7417c7f00..be7e20064427 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -205,8 +205,6 @@ static bool lo_can_use_dio(struct loop_device *lo)
-  */
- static inline void loop_update_dio(struct loop_device *lo)
- {
--	bool dio_in_use = lo->lo_flags & LO_FLAGS_DIRECT_IO;
--
- 	lockdep_assert_held(&lo->lo_mutex);
- 	WARN_ON_ONCE(lo->lo_state == Lo_bound &&
- 		     lo->lo_queue->mq_freeze_depth == 0);
-@@ -215,10 +213,6 @@ static inline void loop_update_dio(struct loop_device *lo)
- 		lo->lo_flags |= LO_FLAGS_DIRECT_IO;
- 	if ((lo->lo_flags & LO_FLAGS_DIRECT_IO) && !lo_can_use_dio(lo))
- 		lo->lo_flags &= ~LO_FLAGS_DIRECT_IO;
--
--	/* flush dirty pages before starting to issue direct I/O */
--	if ((lo->lo_flags & LO_FLAGS_DIRECT_IO) && !dio_in_use)
--		vfs_fsync(lo->lo_backing_file, 0);
- }
- 
- /**
-@@ -621,6 +615,9 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	if (get_loop_size(lo, file) != get_loop_size(lo, old_file))
- 		goto out_err;
- 
-+	/* may work in dio, so flush page cache for avoiding race */
-+	vfs_fsync(file, 0);
-+
- 	/* and ... switch */
- 	disk_force_media_change(lo->lo_disk);
- 	blk_mq_freeze_queue(lo->lo_queue);
-@@ -1098,6 +1095,9 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 	if (error)
- 		goto out_unlock;
- 
-+	/* may work in dio, so flush page cache for avoiding race */
-+	vfs_fsync(file, 0);
-+
- 	loop_update_dio(lo);
- 	loop_sysfs_init(lo);
- 
--- 
-2.44.0
+Ah, I understood you wrong. I didn't want to upset you. I thought you
+were fine by changing how managed_irq works.
 
+> > Indeed, I forgot to update the documentation. I'll update it accordingly.
+> 
+> It isn't documentation thing, it breaks the no-regression policy, which crosses
+> our red-line.
+> 
+> If you really want to move on, please add one new kernel command
+> line with documenting the new usage which requires applications to
+> offline CPU in order.
+
+Sure, I'll bring the separate command line option back.
+
+Thanks,
+Daniel
