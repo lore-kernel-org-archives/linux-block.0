@@ -1,99 +1,87 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E3A23A0E7
-	for <linux-block@vger.kernel.org>; Mon, 13 Jan 2025 14:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E851FBBFF
+	for <linux-block@vger.kernel.org>; Mon, 13 Jan 2025 15:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736779661; cv=none; b=JuA/Qn3swF0CQ99SId4Dv3Bl7YUKe9i7ZjdZc9ALN4LVGBpytKHH8+Yr6j4eZYd6vY5mI+oZz7HCnUyPMftdIbr1VLJl/SZksC4pBMnwXezRcwivFxICAx6PXDwLUOJ29K+eUxrfocoAaRL42zKGpwrhWG7z7ap7rWcEKpGxNjs=
+	t=1736780711; cv=none; b=eKBODSPzGRon2XXIjazkCY5BXsmxNJsqzjF/0TXH9fZvGU1u8H3MGOL9C3qOmRPXzwQ3abRK/LbawGGY56ypJD3m3xowowLdf02x1LzXZ0fUePPUfyQEXseE4mCTcIe+rZyhLNdP9JG8lC/1CTBpypJxVcNpOfCa9+TGYJJ1dPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736779661; c=relaxed/simple;
-	bh=w3xFV48L7K6Gx1qvRlknzOzse/4GL+sC+J61jzHFXVU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=RNMzKRu807pXKgC3XJfyFpLcbREMZl+2NAMC51uDMNL7l6x6Eon1vHh2EvFO8wOSLC/4XUPUoK6UyPO2bemYjCoByfxNb8yyzA408Z4zcK1wSiR/GU/FKXZ70II0xeYchjyMNhiHhkl1yKR2n0DGN/c2/KVp+oVqxNzz1QGte40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=BIUexG3D; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1736780711; c=relaxed/simple;
+	bh=gF7akPQck8VqayQLn+XL9KZU4z03sp0uXtv01Rqya00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D+wsyiKyeC0lChCoFAVkeIoYCBEZ7HC5nWPU6zc830shNRnqUi7OeJwcVLGBheCJSzmbS4MKPv0JqFpD7lyGSOW2+nTkOtnImbDAYCBW+Px06FZJnHMNobV2s2UDGqHRhiPwQ99/LG6FrvNOSDBT1PC8fSKEod7uMLmn++DUrdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TDmpsz2a; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="BIUexG3D"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-844d7f81dd1so158040539f.2
-        for <linux-block@vger.kernel.org>; Mon, 13 Jan 2025 06:47:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736779659; x=1737384459; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o62hMA98/bRxM6fdmM7b38fy78anUvDPQ8PqFAsKK88=;
-        b=BIUexG3DDdpsd5GT24rLOi46CIvcQLxQ+EBFNCbCnqLm725BDAIKVsIe2UmvZYI7TW
-         rGf/jofq4RA7hGkqpCgYBTZwGOf3siUb8MUkrIaet7gEtycwdHfVk2RZjzCqf09UjDBE
-         9FcRpq6+ta954/kP6kxiGGjdSLyZJySHWFdFSyW0M9CXCSOpORX3gmhS2aPkG3tjrVWh
-         Jhf/RgRFJwVZ/yjxeAQejPH1bOOYfpNMh0FtVTG5aIm4pE6HzbPZi0c7j4iSM+qFUPPT
-         kolcwB58EFeu2tiBlBXLo3++VsqWPf9ZXtVjq17Tpj/xq8ZJSMZ+qVUU3FaMVCQ7D71+
-         VmIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736779659; x=1737384459;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o62hMA98/bRxM6fdmM7b38fy78anUvDPQ8PqFAsKK88=;
-        b=lzAR0TBICLtWav1pdd0c13UAIN2fles7y+rgo2NP10/MAGPtSo/A5cf8b0gwY42jVG
-         ZghvcM8fEmxCm3rzr7itkPnkYY3QVntDLe7xdkA/wRbq/L0KNZazocwYXqRqDvywMszD
-         liV2buX9eaISccQnBd24DYb7GTyn4HWX+lpghLo2mrTmXSxiBIjLpUis6I3yzMfpP/jt
-         VZbMtVVIkwl+FdZnMCdeBAtlNzaIEjwhvVJPGNheYE9pQSo3mq0UvFeIDn+Agsk2mbyK
-         RivFedBayHgdktTzbSJ+nRTgCXxZecZggMU5GmMkqEaHfpAG1GggFtyic5n7bhwcEBW6
-         Xatg==
-X-Gm-Message-State: AOJu0YwwngopBeoqkvenINUng9JIi5W5mPpXzXqjpfkLf42x6cOAkYRN
-	xfMlRguKG+qLGON0WwwjbAEoOG8jUl1y7QZyWri8nSt4NJPcFUxeqhu34rRBhjI=
-X-Gm-Gg: ASbGncuBNe7ViL2AVmnN3Rs8n1duPRNseeyhYJ2kW3snTpIIhrO2ygLVcsqYRhnf54E
-	jxENW6FuJsGxMJ8Uae+4K7iWiBZ/y42Q8Xjzv9HB/SSZTgMwDFbIi6SL6zqBq10ELiDipMUrWl8
-	Sk1qlnBVDwdhYVuN2Ws3GahcqHYFrpFry+CCPQY5JSkiDZwQrn3IfkIjekcxIGxMQzQ3OMqFQ6x
-	vY7bvewps+EED4fV4+vZ4OcVtv6MnpXnvxPpy2roDW4D6I=
-X-Google-Smtp-Source: AGHT+IEhVcmz2FEH54p4MZ54Eyi46I1ThIv1W3jOEvT3NqBJ8E8cO001T+ALkmYH/dwGreT7/eefLA==
-X-Received: by 2002:a05:6e02:18cc:b0:3ce:6628:3e0 with SMTP id e9e14a558f8ab-3ce662805eemr45446365ab.17.1736779659535;
-        Mon, 13 Jan 2025 06:47:39 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ea1b7459e9sm2768810173.118.2025.01.13.06.47.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jan 2025 06:47:38 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-Cc: "Richard Russon (FlatCap)" <ldm@flatcap.org>, 
- linux-ntfs-dev@lists.sourceforge.net
-In-Reply-To: <20250111062758.910458-1-rdunlap@infradead.org>
-References: <20250111062758.910458-1-rdunlap@infradead.org>
-Subject: Re: [PATCH] partitions: ldm: remove the initial kernel-doc
- notation
-Message-Id: <173677965850.1125204.10539957651432273035.b4-ty@kernel.dk>
-Date: Mon, 13 Jan 2025 07:47:38 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TDmpsz2a"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736780709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D0VIsHVJkTNcm+Rri4tUndPShw+MRzPuSqi6HfumbSs=;
+	b=TDmpsz2amtm5ujiTJKlUrptakTF1G+1lzga/RMCbrawZazgwkXAI9pOcpoSeceB/rKrVjG
+	Z0dgvBo5b+huKMUUSOfkIMSFAqspOB0OEQbvNH5FX2AoEtzo2S3VZcdToImCfkscxq/+tx
+	LOEZlkpaeN1V+cEbqHoNklnjtEqeXeQ=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-484-e2lTjiuHN6WOpkmoiNdlvw-1; Mon,
+ 13 Jan 2025 10:05:05 -0500
+X-MC-Unique: e2lTjiuHN6WOpkmoiNdlvw-1
+X-Mimecast-MFC-AGG-ID: e2lTjiuHN6WOpkmoiNdlvw
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A79611955BD2;
+	Mon, 13 Jan 2025 15:05:03 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.15])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 791C81956056;
+	Mon, 13 Jan 2025 15:04:56 +0000 (UTC)
+Date: Mon, 13 Jan 2025 23:04:51 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Kun Hu <huk23@m.fudan.edu.cn>, Jiaji Qin <jjtan24@m.fudan.edu.cn>
+Subject: Re: [PATCH] loop: move vfs_fsync() out of loop_update_dio()
+Message-ID: <Z4Urk9NvFqcVhgoS@fedora>
+References: <20250113120644.811886-1-ming.lei@redhat.com>
+ <Z4UaKmN551grXYMn@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-14bd6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z4UaKmN551grXYMn@infradead.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+
+On Mon, Jan 13, 2025 at 05:50:34AM -0800, Christoph Hellwig wrote:
+> NAK for the same reason as v1.  It's not needed because there is no
+> deadlock, just a false positive due to missing annotations of lock
+
+Yes, but annotation should be the last straw.
+
+> instances, and we need to fsync with a frozen queue to ensure there
+> is no outstanding I/O.
+
+loop_configure() is on unbound loop, so there isn't outstanding I/O.
+
+loop_change_fd() is switching to this new file, so no outstanding I/O
+on this new file before unfreeze.
+
+The other two can only switch to buffered IO, which needn't the fsync.
+
+So can you point out anything is wrong?
+
+And this way is sort of simplification.
 
 
-On Fri, 10 Jan 2025 22:27:58 -0800, Randy Dunlap wrote:
-> Remove the file's first comment describing what the file is.
-> This comment is not in kernel-doc format so it causes a kernel-doc
-> warning.
-> 
-> ldm.h:13: warning: expecting prototype for ldm(). Prototype was for _FS_PT_LDM_H_() instead
-> 
-> 
-> [...]
-
-Applied, thanks!
-
-[1/1] partitions: ldm: remove the initial kernel-doc notation
-      commit: e494e451611a3de6ae95f99e8339210c157d70fb
-
-Best regards,
--- 
-Jens Axboe
-
-
+Thanks,
+Ming
 
