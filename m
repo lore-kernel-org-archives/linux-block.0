@@ -1,108 +1,136 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BD325760
-	for <linux-block@vger.kernel.org>; Mon, 13 Jan 2025 15:52:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2B5190692;
+	Mon, 13 Jan 2025 17:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736783554; cv=none; b=GNV42GTp/RJwXrlWBloNTha9Sz3yrJe8V/VSrMbd03ce21NSftq0jyYcff/inTWK5qro81Ej/E135eN8QKDsqpqywAP+qrmgB0IuOOGMWo5B+qU5LZ2SXhzYsSQ3Z10R/M2DvjR0t9ZzDubLUVFZEs/uu1LCKqHyqK3RnAd09+w=
+	t=1736789497; cv=none; b=dOQVcziUoU/NsnormfCGs1uemIZZHOH+Sx3L/CspMSAzLMVBQWenvqc2ug7EaCDh7uMP96oQLARLV+pPCXzUN9nfu3LYK5rC3Jw11Ku0ImqTUDvIc1JjbTFDX2NpHgeEFr5urBOfGHckdzIW6PklMtkp8tiameh78dI3uQm1Hjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736783554; c=relaxed/simple;
-	bh=P7Fn49/t1DpRmieGAFkWQjWqqafWi+02WDelDO3olcY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QqiSmuXfIRRM/PnJ0rYwZPCH8m93z2DAw23wmm49YAkofiB4fztOuYSaufZOvq1c6vPj+zFDlopLdz3/F1oyGWcBU/UsTTvRNWh3bJizWxyemtUNn9pOFkW8lQONRBzFqH5SSbdB8u4ORvw7MHYpybNEA6N2DuG/5pmwHWG8rEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=SQxZ1sjP; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1736789497; c=relaxed/simple;
+	bh=W7U+X60WBv3j+Yw7DI10/ECvBYx1n4vUUezoN4EQtEM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SzU3i7HF2HCVDdwdJc6uMxG4+pRfR2kth3e3lEX6c+PKlndypeqZNpE21qODdt4VxgIZK1PY7bFDCpgNkX1UI/p/He7pSzJ7PrwhWSj/Q67epDbHl1bS5tG7tQ1ZB16oYS1N7Z39NrFIu/Qpl/+KcXhB6tH895+in4f4/A8JC3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e1bj167T; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="SQxZ1sjP"
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3a777958043so15117345ab.2
-        for <linux-block@vger.kernel.org>; Mon, 13 Jan 2025 07:52:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1bj167T"
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e545c1e8a15so6930998276.1;
+        Mon, 13 Jan 2025 09:31:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736783551; x=1737388351; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=b7cxbbTow7iNQKCzQXtILN57RRyk69S7IZ0yWn6+gj8=;
-        b=SQxZ1sjPdh4TpIFf5uEAopGggF2OvKCJrz+HVmHG7YxTrLPO6NxrUvaXLst1kyiXan
-         SZU9zYY/u7kMm8NdSg1caBZchaZCgHBwUKtat9IBR8l8/3gAFPdliUn/BIZ70RCvvzZ5
-         k1PHno4sAUPDOBx3VBx2JvDU4c3ScglLkE1uzlfcQU4fD0N6WKnvFOgs9yTLHos/v9l5
-         o7TJLLTctZCV27yxgcnpXjX9vEcCQjoS5PtpkwqwLHzR4vKDptl/J3/GxRUFvmYP3yDa
-         akpCZI3XoYeNS4ETN2ynX9CuPy4vs52Q9ufGKW5TVyBC7c1ChlhEXsyGwNgg93O0MZg0
-         0axw==
+        d=gmail.com; s=20230601; t=1736789494; x=1737394294; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lpBtrDCior8O34MzUqT/yqPqqHhYm723171PHTvnTNk=;
+        b=e1bj167TQ01lOyIvdp0zsDD5dCdhfLV9BBPj9BuC3NyDHIGh7Q4peX1a4/DLquq5Vf
+         HjW2LBSTjkYpfTdgfoMSV4RtdBO/B8PWQonS081gqaDSeFGctjUB/jFx8bl+W5ef0bAM
+         Mm7ITep5X1L+76gtxXLePqgJL5uo1bBPpZofHzPKYoyUIln/1Bowm5+iPdhA6jvF7qmg
+         TvR9DLpmQKBnw3lDkFcC4hQShBCD0R4aaznpx1sGxfxZH7X+bqthkanzTspMBLA3whoZ
+         GDFz38Bx5iYaf+gmd41t2oQRYqapwbhrZ4rTcKRQ/4RyE0z6/tRt35x/OZ7aZSI341Ht
+         1LtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736783551; x=1737388351;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b7cxbbTow7iNQKCzQXtILN57RRyk69S7IZ0yWn6+gj8=;
-        b=rt+8qAHafqWesLT7df+Tk8d9VFQ1+9P5Ao2A4frH7BOFjrg1YxmwpKOdwlYRRb2ViD
-         Ew0Djm/vO/5PSymbSG0gHcVbk6yW2GQ8VCG54db67Fo79tWjDnLcx6W8Auro7bTl9dwy
-         D3ibn7Iz19EWSgwyzFRgY+vFK20MoNbZ7SlY4+rZKedTENeT8cxj81EKcvKedPnv0Z8i
-         QtLTPdWRzOJ/ZadCOuMorjDR0lhpej3iAoWsZpEyCG6PKHQAXXpp30UsLE8ADNmKZeM5
-         fTo2cfaamVQfyGZGXmy/ix2PtIeDcorhyv+JVBbUkl57QQKOE+0fTxIFqQmjJb+6ooSE
-         x5Tw==
-X-Forwarded-Encrypted: i=1; AJvYcCU3zjTHaqiBTejy+gdVth6ufGAe9iGJ6HmFUdIWNv2cbm+KekI0syg88XSuBLHXrVP6Sg3bq1b/F1exEg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZ2Gv3HC5VQDKikvjoR3TSpLT9rWd3u9uLqel4k5+Bo9QUMSry
-	ngw2TtaC1PoGtfMTTZdy/1QX1MzlYeuXqEa+TfSNjgSAHceclyzJ7PfDBhZ7EVw=
-X-Gm-Gg: ASbGncuSbtEkJ2oEVrdCVsd42eHNwzA+L7sj9jVHcQ3ZihLjen2sdflTOEAG8qpOYoR
-	omXW//dd9ruGRxpEOeyto8Jk/Es+TOBw8kdagtXk/2uuDeDuDtB3p4bhxoaY3IpWQqBOtnUd6L9
-	6cfH3EJhCSaFgmOf81hII7JuDO647idFVedgpDidauiVSQdMhKiDsIIZAozYaqx6bDdSNbbMPJm
-	M20lua6Etd3oEz3IejCfxyOmXIWaJDGP5qcLKSR1quc6ep75CoE
-X-Google-Smtp-Source: AGHT+IE2stu9drzc/N/VaaEwWSLBWoGbif0Kk3wSMExZH/wQ1mMpu3kjPdZv601I2lZ6YgUIwvWU3w==
-X-Received: by 2002:a05:6e02:12ef:b0:3a7:8720:9de5 with SMTP id e9e14a558f8ab-3ce3a9a50b3mr151457935ab.1.1736783551275;
-        Mon, 13 Jan 2025 07:52:31 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ce4addba24sm27298125ab.42.2025.01.13.07.52.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jan 2025 07:52:30 -0800 (PST)
-Message-ID: <8bf0bfeb-06ae-4efd-ae0f-bad6bb5646ec@kernel.dk>
-Date: Mon, 13 Jan 2025 08:52:29 -0700
+        d=1e100.net; s=20230601; t=1736789494; x=1737394294;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lpBtrDCior8O34MzUqT/yqPqqHhYm723171PHTvnTNk=;
+        b=rM19xV/ozeyfwMqk8VYK0ElkSeanOQzm0OqcRbk/W3JA2uE1/b+LxY/18kmMZrPkzb
+         X5605fQG+eJ221NUDEmVmsTwUYGZH0rx+pOY1e/1618UARd6F7bzJDJYqBMBlp5hndbM
+         ccVp7PY8kRQEEoQdK+suxMZzmpDonuYfQUysRFawIXmd14vF2cPEcrGECed8gDyJWJIs
+         W4MP6UGCMB5AmLzNTqaU8t9FgWrdTCNHK53pB8FRiQIsdq5WeBmK1jit/vbwVP1CGX/O
+         nNRcCQD6naq5UV+dovtoLQxwFjRgl1lA17C6wLCfgUjGk4AGfNqBR6vFB/xXBW9ravnT
+         fNng==
+X-Forwarded-Encrypted: i=1; AJvYcCWumvVYmU266uJOrN0Ox+HihhjrQh6W8v6WYZRXO98G2t8MWF/grrzQMWt43ihHSNdsvlk=@vger.kernel.org, AJvYcCXnffiecuFoQPCRna/EiZ3JZI/NWzlW1gM26/fsg20zUpfeIaRdkMcjQfRw2ibBX2OECbwY9abXz8Ga4z8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzueyj0zt8aKfDDQODdBsfm09iMNNy75iDcRJ2Rf/SZMxnXe3jL
+	ejVLpMmcY9lxpQqtozqSiLg6BS29JAcszwDnZffHkRFKVgxwVsZ4jls/Sd8YlQ5SuWAmnvc8F7F
+	8h5+YKs9DpIwaMnDwtWf3ZHmPUwA=
+X-Gm-Gg: ASbGncuZNPKOYw+VFz1F6rzKe/gxFtYn8ZIe5FQL32l+Ankcten6xwI8WMoyDM+KcKE
+	PZgry4DCyzrFSiH4OP2nloiMvXiV2+8mNEEMJyBs=
+X-Google-Smtp-Source: AGHT+IGIYqrqJhbpEwAM5/MQ91bcPCmKZWFG0YoEFTypIrbLLyMAsNZInZc1ueMG8J/fuioNF/gFOXOTG4k8lQAjtnk=
+X-Received: by 2002:a05:6902:18d5:b0:e57:4a0d:4716 with SMTP id
+ 3f1490d57ef6-e574a0d488amr4980639276.38.1736789492541; Mon, 13 Jan 2025
+ 09:31:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 3/3] block: model freeze & enter queue as lock for
- supporting lockdep
-To: Chris Bainbridge <chris.bainbridge@gmail.com>,
- Ming Lei <ming.lei@redhat.com>
-Cc: "Lai, Yi" <yi1.lai@linux.intel.com>, linux-block@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Peter Zijlstra <peterz@infradead.org>,
- Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
- Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
- linux-kernel@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
- yi1.lai@intel.com, syzkaller-bugs@googlegroups.com
-References: <20241025003722.3630252-4-ming.lei@redhat.com>
- <ZyHV7xTccCwN8j7b@ly-workstation> <ZyHchfaUe2cEzFMm@fedora>
- <ZyHzb8ExdDG4b8lo@ly-workstation>
- <CAFj5m9+bL23T7mMwR7g_8umTzkNJa14n8AhR3_g6QjB2YCcc5A@mail.gmail.com>
- <ZyIM0dWzxC9zBIuf@ly-workstation> <ZyITwN0ihIFiz9M2@fedora>
- <Z0/K0bDHBUWlt0Hl@ly-workstation> <Z4Ulmv7e0-Q4wMGq@debian.local>
- <Z4UtPNtdgVrA9ztl@fedora> <Z4UyUntV70G_RYyF@debian.local>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Z4UyUntV70G_RYyF@debian.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CAJHDoJac2Qa6QjhDFi7YZf0D05=Svc13ZQyX=92KsM7pkkVbJA@mail.gmail.com>
+ <CAPhsuW7+ORExwn5fkRykEmEp-wm0YE788Tkd39rK5cZ-Q3dfUw@mail.gmail.com>
+ <CAJHDoJYESDzDf9KJgfSfGGit6JPyxtf3miNbnM7BzNfjOi7CQw@mail.gmail.com>
+ <CAPhsuW6W=08Vf=W6GZ9DCzwu4wq_AgNOayo50vxvqFMr9CcDcg@mail.gmail.com> <677c56994576b_f58f29445@dwillia2-xfh.jf.intel.com.notmuch>
+In-Reply-To: <677c56994576b_f58f29445@dwillia2-xfh.jf.intel.com.notmuch>
+From: Vishnu ks <ksvishnu56@gmail.com>
+Date: Mon, 13 Jan 2025 23:01:30 +0530
+X-Gm-Features: AbW1kvY3SmWXc2HmqTHOHcCdiV_aRXeOTyMqdUtAYuxzDS2HNXhoSW9rgdWo-9g
+Message-ID: <CAJHDoJZ5rFhgu-R_N6e82bqkY43S-sXKVs2khnnnZrqJH1vcHw@mail.gmail.com>
+Subject: Re: [Lsf-pc] [LSF/MM/BPF TOPIC] Improving Block Layer Tracepoints for
+ Next-Generation Backup Systems
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Song Liu via Lsf-pc <lsf-pc@lists.linux-foundation.org>, hch@infradead.org, 
+	yanjun.zhu@linux.dev, linux-block@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-nvme@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/13/25 8:33 AM, Chris Bainbridge wrote:
-> On Mon, Jan 13, 2025 at 11:11:56PM +0800, Ming Lei wrote:
->>
->> This one has been solved in for-6.14/block:
->>
->> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/?h=for-6.14/block
-> 
-> Thank you, yes I thought that might be the case.
-> 
-> Would it not make sense for the fix to be included in 6.13? Or is it too
-> big a change / just too late?
+Thanks everyone for the detailed technical feedback and clarifications
+- they've been extremely valuable in understanding the fundamental
+challenges and existing solutions.
 
-It's too late. If need be, we can shuffle them towards stable once
-6.13 has been released.
+I appreciate the points about md-cluster and DRBD's network RAID
+capabilities. While these are robust solutions for network-based
+replication, I'm particularly interested in the point-in-time recovery
+capability for scenarios like ransomware recovery, where being able to
+roll back to a specific point before encryption occurred would be
+valuable.
 
--- 
-Jens Axboe
+Regarding blk_filter - I've been exploring it since it was mentioned,
+and it indeed seems to be the right approach for what we're trying to
+achieve. However, I've found that many of our current requirements can
+actually be implemented using eBPF without additional kernel modules.
+I plan to create a detailed demonstration video to share my findings
+with this thread. Additionally, I'll be cleaning up and open-sourcing
+our replicator utility implementation for community feedback.
 
+I would very much like to attend the LSF/MM/BPF summit to discuss
+these ideas in person and learn more about blk_filter and proper block
+layer fundamentals. Would it be possible for someone to help me with
+an invitation?
+
+Thanks again to everyone who took the time to explain the intricacies
+of write caching, sector tracking limitations, and data persistence
+guarantees. This discussion has been incredibly educational.
+
+Thanks and regards,
+Vishnu KS
+
+On Tue, 7 Jan 2025 at 03:48, Dan Williams <dan.j.williams@intel.com> wrote:
+>
+> Song Liu via Lsf-pc wrote:
+> > On Sat, Jan 4, 2025 at 9:52=E2=80=AFAM Vishnu ks <ksvishnu56@gmail.com>=
+ wrote:
+> > >
+> > [...]
+> > >
+> > > @Song: Our approach fundamentally differs from md/raid in several way=
+s:
+> > >
+> > > 1. Network-based vs Local:
+> > >    - Our system operates over network, allowing replication across
+> > > geographically distributed systems
+> > >    - md/raid works only with locally attached storage devices
+> >
+> > md-cluster (https://docs.kernel.org/driver-api/md/md-cluster.html)
+> > does support RAID in a cluster.
+>
+> Also,
+>
+> https://docs.kernel.org/admin-guide/blockdev/drbd/index.html
+
+--=20
+Vishnu KS,
+Opensource contributor and researcher,
+https://iamvishnuks.com
