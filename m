@@ -1,129 +1,206 @@
-Received: from out162-62-57-64.mail.qq.com (out162-62-57-64.mail.qq.com [162.62.57.64])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8E2433D1;
-	Tue, 14 Jan 2025 02:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7332135AF
+	for <linux-block@vger.kernel.org>; Tue, 14 Jan 2025 03:21:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736822080; cv=none; b=SeO9L/WkW5O0KrXfy8fWRJHQfRdiuHGt9+7DC9IIUY4+c1cC2oNPJtKGuQ+MnybBB781og7qkjmUYwaxdrjdb2CDhAKhGKWMRqdt1AeG3BD1Be33dlzNkk6+H7nLWIA8K4RnAjtHmthZTvrz97dOnX/cplek4/OJpP/i/u/iHJA=
+	t=1736824927; cv=none; b=vDs7P/1FV1kBBwzB4OoqMp0lLI7reqJDgFLOaGHWA907T6BugE/CzyWgrZayy9YheudY44qMnqP3sCDnEsRHXeUM9jawNlm/+eWX6olNkNuFI7zvV3dKJtjLrJiiKl/U19RyQLJNJAUOsckpBpqZuCwyhu+BbGVm3YApzZnyepo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736822080; c=relaxed/simple;
-	bh=5Dw7+waMNCkEW91RAETEKUbDfcESvcZeV9RpTnctHzE=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=pB7bY/YGVYUZshsfF8oCsHnQzqma2MFmeUUA4EEYYE/ThU1YzdvhnXpCtp7IeOePKU/VF2T3FaaoTSC1+tx/7z22t2MU2Aw3ytIh4Ccm3Tq7EvO2JjG5Wu1EuHE0HVLFJB+ARy0sZkB6SNPELLXhhLjiu5TE9qdG4qLJEOAlvxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=ysy0M3RC; arc=none smtp.client-ip=162.62.57.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1736824927; c=relaxed/simple;
+	bh=ASEzdU0Dt5yRYAXZrvQOcsMTDNraja+0LoFgeeYo0ZI=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=Qas0SxrnSevAuA0tc5WwRhaKERyTZIZDGDruXBGKCXoW58DinHSJNlgFwxgWpudcLODFvRz9H1mqyk/sJCrFflk6W/Or+7y7H6t9rPDwWgg7JS5uxmJWmzluTJNtQCBpoRyBx7jkji38bAnmaLvMp7r6BaDAToapmti6b8keO4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn; spf=pass smtp.mailfrom=m.fudan.edu.cn; dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b=URYagUOM; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=m.fudan.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="ysy0M3RC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1736822071; bh=rNAeVnkpK1AIHChvwH7YUf6I2CKXx8Ze5sTc3cKWbfQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ysy0M3RCYryenskWmMXAKhdGy9MAQcp6y9TrzVnjDeK1wBRYHMdREB5veqAIPdafl
-	 +MkNwN19PW6E1fYnqqeg8EVZRr0x2aRc4CVv/5fPl1JlMND5jFtaQvo+8zBb9r/pfn
-	 sR6KVmktIKsIaU3aWOzrctIgLisBZROc5jO22ZM0=
-Received: from pek-lxu-l1.wrs.com ([114.244.57.157])
-	by newxmesmtplogicsvrsza36-0.qq.com (NewEsmtp) with SMTP
-	id 7101C8EA; Tue, 14 Jan 2025 10:28:16 +0800
-X-QQ-mid: xmsmtpt1736821696t2x21fdx5
-Message-ID: <tencent_E820E9DAED3ACC3079BA6F3C2E896FA4950A@qq.com>
-X-QQ-XMAILINFO: NQR8mRxMnur97laG+t3qcFKMLbpdKorRZDQOaQToC6f6VLgKBgqihpg9ULp0mu
-	 K+1S27dA2xtZ8jUo4WcgXoaXpId2pLyB/JiLoUgQYVghs4V6bhEv6K418fX30if3xwtWJ5XiKxuX
-	 A27n4ir3oUeCwALlNy+nEAMhye7rtAhSZ57AGGwjRcOYNpXIS5lnOFdaaNd9TKfnAuoEQdS0aJfZ
-	 ZEiQSZqf11zcX4uq55La/osZWo3X6cXcQYQZJ3rBlEMZp/iM7MqiweUAlmESLyKrKUH0ingaS6pE
-	 h58vE29n1Mu/g/JcTkD95nVVQZShYIrBPlJlLg8/1F37UZBPX0O7nGzItXjZsl7x3J72flFr8Fdp
-	 dyqNUa9dCem/pDG9JnEpNDmU0fBCZGj02ggRtgFoRgsMTYEYcOan/LGyhvqrCKZq10fNOk93JANt
-	 Mf2FyVwT9sDLSsiabkzFizbQmQusOJzLeDz55vlrzgZL76CuBedxZm0rKYmrLZ/q2uadvqePYGfS
-	 45QGHZDSOo3k+ZFYTJm3YL/z3hIJQ7zlOLMjamCwl61Cnuvr9DRPaM39GJR1Vamdb+2UyQAwRvKD
-	 xMeQZwWISm3KD/5i19Bhjo+AAdgHCXgFa4ndaWOKb3yhMSChAZXrUmLeUWXzQoMlQ3fKuBy9/2Gg
-	 5zyXmYDfKd8PFMxzAZm0h6oKVarhhazp/5y/09VKfSTVH34Q+DDtB/vhuHz+J1dVoOwYLr3uOnxY
-	 2biIUaR/tgzYTUzstBu6cE1YfI+NV16nlIErPXtY3amRmVZTOfL0YHmEggwnqd8YNgQyozHBv9vs
-	 E1Y0szigFi+d481BTaSMexvfxzumXQ5/aG791abzkZOJjB8EJa5kPhIktFdTkyRKpTQEOsLk8olr
-	 W/asNarhw5rs4vAZwIREQdLZTIY3HugU+yuqNTC8i/V6WcZyclSGI=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+fcee6b76cf2e261c51a4@syzkaller.appspotmail.com
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] block: no show partitions if partno corrupted
-Date: Tue, 14 Jan 2025 10:28:16 +0800
-X-OQ-MSGID: <20250114022815.2178893-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <67841058.050a0220.216c54.0034.GAE@google.com>
-References: <67841058.050a0220.216c54.0034.GAE@google.com>
+	dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b="URYagUOM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=m.fudan.edu.cn;
+	s=sorc2401; t=1736824894;
+	bh=ahfNESBqxXzJMjzQTv6Bs/9WG4kIJKwYFLG1dqbvuec=;
+	h=Mime-Version:Subject:From:Date:Message-Id:To;
+	b=URYagUOM782OxRxO7PKX32HDB1ENp/Oa0wm4Ye+3p8Qz2b8phpeKtHirM83YQeld0
+	 NphmJwy59xy/qKHQSUk/zTgtpQL/rGDHeczuAajMNgpMpVhbVHAUo6fpC4rG03MINh
+	 b4gIMSP+pJJ1tqq04E1oX5vpLjKR5UtEUmzkSH7U=
+X-QQ-mid: bizesmtpip3t1736824889tjrgkvq
+X-QQ-Originating-IP: VGfKhvh1rKFPlSfP1bN3hBhqeQth+IeM1kUzh3PlUa0=
+Received: from smtpclient.apple ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 14 Jan 2025 11:21:28 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 676082716532487257
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3818.100.11.1.3\))
+Subject: Re: [PATCH] loop: don't call vfs_flush() with queue frozen
+From: Kun Hu <huk23@m.fudan.edu.cn>
+In-Reply-To: <20250113022426.703537-1-ming.lei@redhat.com>
+Date: Tue, 14 Jan 2025 11:21:17 +0800
+Cc: Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org,
+ "jjtan24@m.fudan.edu.cn" <jjtan24@m.fudan.edu.cn>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <7D60046B-4E85-4EAA-A864-C7897539524A@m.fudan.edu.cn>
+References: <20250113022426.703537-1-ming.lei@redhat.com>
+To: Ming Lei <ming.lei@redhat.com>
+X-Mailer: Apple Mail (2.3818.100.11.1.3)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:m.fudan.edu.cn:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: ND3CPZxVFFQc7AHkhtUk7ppgK4Fa9gGEA4wTpwfFZo8wxo/e2HTakYM+
+	Y/mwJY9QQDt/CyNeN+DGpJ6WGGT0mWhOTNac9fdPghd3wbkwta4vOHyYJpZus0I+3VBwh2D
+	59FNPi/A4JcoLJVyk/umDJOKGDNJ5EoEU5J2KhX9uI0AH2VjKL4hfjV+sT8Zu1j1aqbz258
+	pGzBQNWt6ScPLgsrQS1p3uwmKouM0Uv7UsNN8dnwvGos9EyxiRe0MY8RjyuHC1MQjSSkJV/
+	WopEqNuVTu40v0472z/RivJ2oN107SqJxAcQ+JLqA+1hJ5GGrxgfBabmMeIeg5rOFnEXfVO
+	pMJL+qRLW8yT4JXzvWDOEUGTyTlVngsX8m4fJDZzhvJiQx/ioUSJpHcc1tsn/H/neuwedZQ
+	lP2SRH1gfu4Bx3nE57cdcbajvQBuxBnK09/CKoJ6EQqg5r9zJY3WAY7mfe9IhAsdhYmqoW6
+	hNlol59qZKD6+hhdgZhZuhu7DhgwjiX9uNLXnLfEzw4pkKcmzEJ1NOpfbV2ly0t7Y3hOXAB
+	KAeDZ1SqU4jAo1qBahbOhrG/rRWRBvafp+d1RLmMvHBCZuoHDGKzE6W7yVcZMy8n840BqyV
+	/+pLmNL2grTYel3MQM9rLfD05Ar9lRx47awSAsiMGfCrSTYsz1+5Xgw2EbUHfmkqO7Q5fAW
+	1NrLdoSCQYh0Bmh5F8re0QRViYbfJJell74Qm1WHJ1NdObHgX2BS3nsiA9cpQXerYyBulIi
+	3DwWhcZ2m11ziYSHITdmSDNK8oUflNX74AVh2w5pfPl2HY+Xex3BKVnI4D2tsK0GgOrHrQN
+	ZESUc4/gkJHpq/4nc2Q/jsI3XczKgMZqvAa9WRekRNRfYfR0zv8I+ERezLWf94bLtQSvwa6
+	yuGGXFCoEvSyTaM5U5EpgShkzyMLRWVAvdu9aM0ZbHxR91/y9Ci8f5rlfCUjawob9tHbUWw
+	cGLS/64L3PI0b+WkVRl7YFrLm99SNsX6YobIbD7krCVfCEQH66a0nuxgNzCJUcC5n4e1SsQ
+	xEFH1IOFjDxLQnVZymeWczntYQ65o=
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-QQ-RECHKSPAM: 0
 
-syzbot reported a global-out-of-bounds in number. [1]
+>=20
+>=20
+> If vfs_flush() is called with queue frozen, the queue freeze lock may =
+be
+> connected with FS internal lock, and potential deadlock could be
+> triggered.
+>=20
+> Fix it by moving vfs_flush() out of queue freezing.
+>=20
+> Reported-by: Kun Hu <huk23@m.fudan.edu.cn>
+> Reported-by: Jiaji Qin <jjtan24@m.fudan.edu.cn>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> drivers/block/loop.c | 21 +++++++++++++++------
+> 1 file changed, 15 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 1ec7417c7f00..9adf496b3f93 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -203,7 +203,7 @@ static bool lo_can_use_dio(struct loop_device *lo)
+>  * loop_get_status will always report the effective LO_FLAGS_DIRECT_IO =
+flag and
+>  * not the originally passed in one.
+>  */
+> -static inline void loop_update_dio(struct loop_device *lo)
+> +static inline bool loop_update_dio(struct loop_device *lo)
+> {
+> bool dio_in_use =3D lo->lo_flags & LO_FLAGS_DIRECT_IO;
+>=20
+> @@ -217,8 +217,7 @@ static inline void loop_update_dio(struct =
+loop_device *lo)
+> lo->lo_flags &=3D ~LO_FLAGS_DIRECT_IO;
+>=20
+> /* flush dirty pages before starting to issue direct I/O */
+> - if ((lo->lo_flags & LO_FLAGS_DIRECT_IO) && !dio_in_use)
+> - vfs_fsync(lo->lo_backing_file, 0);
+> + return (lo->lo_flags & LO_FLAGS_DIRECT_IO) && !dio_in_use;
+> }
+>=20
+> /**
+> @@ -589,6 +588,7 @@ static int loop_change_fd(struct loop_device *lo, =
+struct block_device *bdev,
+> int error;
+> bool partscan;
+> bool is_loop;
+> + bool flush;
+>=20
+> if (!file)
+> return -EBADF;
+> @@ -629,11 +629,14 @@ static int loop_change_fd(struct loop_device =
+*lo, struct block_device *bdev,
+> lo->old_gfp_mask =3D mapping_gfp_mask(file->f_mapping);
+> mapping_set_gfp_mask(file->f_mapping,
+>     lo->old_gfp_mask & ~(__GFP_IO|__GFP_FS));
+> - loop_update_dio(lo);
+> + flush =3D loop_update_dio(lo);
+> blk_mq_unfreeze_queue(lo->lo_queue);
+> partscan =3D lo->lo_flags & LO_FLAGS_PARTSCAN;
+> loop_global_unlock(lo, is_loop);
+>=20
+> + if (flush)
+> + vfs_fsync(lo->lo_backing_file, 0);
+> +
+> /*
+> * Flush loop_validate_file() before fput(), for l->lo_backing_file
+> * might be pointing at old_file which might be the last reference.
+> @@ -1255,6 +1258,7 @@ loop_set_status(struct loop_device *lo, const =
+struct loop_info64 *info)
+> int err;
+> bool partscan =3D false;
+> bool size_changed =3D false;
+> + bool flush =3D false;
+>=20
+> err =3D mutex_lock_killable(&lo->lo_mutex);
+> if (err)
+> @@ -1292,7 +1296,7 @@ loop_set_status(struct loop_device *lo, const =
+struct loop_info64 *info)
+> }
+>=20
+> /* update the direct I/O flag if lo_offset changed */
+> - loop_update_dio(lo);
+> + flush =3D loop_update_dio(lo);
+>=20
+> out_unfreeze:
+> blk_mq_unfreeze_queue(lo->lo_queue);
+> @@ -1302,6 +1306,8 @@ loop_set_status(struct loop_device *lo, const =
+struct loop_info64 *info)
+> mutex_unlock(&lo->lo_mutex);
+> if (partscan)
+> loop_reread_partitions(lo);
+> + if (flush)
+> + vfs_fsync(lo->lo_backing_file, 0);
+>=20
+> return err;
+> }
+> @@ -1473,6 +1479,7 @@ static int loop_set_block_size(struct =
+loop_device *lo, unsigned long arg)
+> {
+> struct queue_limits lim;
+> int err =3D 0;
+> + bool flush;
+>=20
+> if (lo->lo_state !=3D Lo_bound)
+> return -ENXIO;
+> @@ -1488,8 +1495,10 @@ static int loop_set_block_size(struct =
+loop_device *lo, unsigned long arg)
+>=20
+> blk_mq_freeze_queue(lo->lo_queue);
+> err =3D queue_limits_commit_update(lo->lo_queue, &lim);
+> - loop_update_dio(lo);
+> + flush =3D loop_update_dio(lo);
+> blk_mq_unfreeze_queue(lo->lo_queue);
+> + if (flush)
+> + vfs_fsync(lo->lo_backing_file, 0);
+>=20
+> return err;
+> }
+> --=20
+> 2.44.0
+>=20
+>=20
 
-Corrupted partno causes out-of-bounds access when accessing the hex_asc_upper
-array.
+Hello Ming,
 
-To avoid this issue, skip partitions with partno greater than DISK_MAX_PARTS.
+Should we test the fixed code through multiple rounds? Is there a =
+conclusion to the ongoing discussion about the patch?
 
-[1]
-BUG: KASAN: global-out-of-bounds in number+0x3be/0xf40 lib/vsprintf.c:494
-Read of size 1 at addr ffffffff8c5fc971 by task syz-executor351/5832
-
-CPU: 0 UID: 0 PID: 5832 Comm: syz-executor351 Not tainted 6.13.0-rc6-next-20250107-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:489
- kasan_report+0x143/0x180 mm/kasan/report.c:602
- number+0x3be/0xf40 lib/vsprintf.c:494
- pointer+0x764/0x1210 lib/vsprintf.c:2484
- vsnprintf+0x75a/0x1220 lib/vsprintf.c:2846
- seq_vprintf fs/seq_file.c:391 [inline]
- seq_printf+0x172/0x270 fs/seq_file.c:406
- show_partition+0x29f/0x3f0 block/genhd.c:905
- seq_read_iter+0x969/0xd70 fs/seq_file.c:272
- proc_reg_read_iter+0x1c2/0x290 fs/proc/inode.c:299
- copy_splice_read+0x63a/0xb40 fs/splice.c:365
- do_splice_read fs/splice.c:985 [inline]
- splice_direct_to_actor+0x4af/0xc80 fs/splice.c:1089
- do_splice_direct_actor fs/splice.c:1207 [inline]
- do_splice_direct+0x289/0x3e0 fs/splice.c:1233
- do_sendfile+0x564/0x8a0 fs/read_write.c:1363
- __do_sys_sendfile64 fs/read_write.c:1424 [inline]
- __se_sys_sendfile64+0x17c/0x1e0 fs/read_write.c:1410
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Reported-by: syzbot+fcee6b76cf2e261c51a4@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=fcee6b76cf2e261c51a4
-Tested-by: syzbot+fcee6b76cf2e261c51a4@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- block/genhd.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 9130e163e191..8d539a4a3b37 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -890,7 +890,9 @@ static int show_partition(struct seq_file *seqf, void *v)
- 
- 	rcu_read_lock();
- 	xa_for_each(&sgp->part_tbl, idx, part) {
--		if (!bdev_nr_sectors(part))
-+		int partno = bdev_partno(part);
-+
-+		if (!bdev_nr_sectors(part) || partno >= DISK_MAX_PARTS)
- 			continue;
- 		seq_printf(seqf, "%4d  %7d %10llu %pg\n",
- 			   MAJOR(part->bd_dev), MINOR(part->bd_dev),
--- 
-2.47.0
+=E2=80=94=E2=80=94
+Thanks,
+Kun Hu
 
