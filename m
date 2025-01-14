@@ -1,102 +1,135 @@
-Received: from out203-205-221-239.mail.qq.com (out203-205-221-239.mail.qq.com [203.205.221.239])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C07F17A90F;
-	Tue, 14 Jan 2025 15:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F02155A34
+	for <linux-block@vger.kernel.org>; Tue, 14 Jan 2025 15:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736867730; cv=none; b=cfEf4ynEgK5bME1nuYe91ONLzoGo/gpSN+b7cggKfKKJFGgUgUFZpeI4Ky3/oJS9XhQUL1pKbd9Tu+CBs4SkCRbE7oP0uuVvVOLNNrjwyoMf13ip8xNkUwQX/p3IC5pD9ruL0K3RIhjq2gSprO6hh45GU87aTyvLwveddRqDl8Q=
+	t=1736868318; cv=none; b=IZhPXVYa2v+jAdb5YK5/DYQaesNnPqX8asn44ouoKKK5XY1NMpOvOeDDtLd+Bms2mL1otXG2MVp0ib2NjysZsORxfVoSMvQgauMakojiCOocDUE4wG5Lt+ULLQ9VkJNB8O/AWc05PIA3GdQhHpNEXNlfxz86bCXDA3i49QHJjO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736867730; c=relaxed/simple;
-	bh=PnJTQh+Tn8yC3I5toflX+Z6xisXx8PzEO4PPI5l6A54=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=RoOg/gZukQtHm/PkOTuCFtZ2a8H2xICqGoFYbfPrcat/7GItj5hiY2gKf7+uPZXSLnDuC0P1xCUFis9gF8t8HDnlhahPd5sJRvfWUVAKfnj/NIkTwMe+sPxhZzTCqTWvrl8GTQYe1AolT+HZGb5nG0A2MilKfoneeFeKgGzFoM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=XjZjl+GO; arc=none smtp.client-ip=203.205.221.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1736868318; c=relaxed/simple;
+	bh=bfYihCfAIigf4GfbI86CDwscUaj/dr6QORIh9fL1WHk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SGskHhW4AzhvXN8gCcGSKbHg1uh7ZXc2EYRvflNBzoZmB3LpuaRpDUDxRFhy2C3mlSq9pVydGwMyK5SHVsjBNDiNJlFXtpl1488/cxaPr/ggAfAb/dx8LLDSu6KbkLjnaEBKoPdBLGYL21Sp9HPEF7Yh4U7c88YAtVSB9qO/hcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DGN+KMOE; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="XjZjl+GO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1736867723; bh=QlONSP1b4Vvd4zi4WAv9b3Z9ZK/YyIymb8jB7CXzOpw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XjZjl+GO7m2kSgqJDClNfXSF41Nr8imGEyL5qhYnZtA+BX/ZxO+3oJMDT6SuzPpgS
-	 PYpwemFwAwaAU8+ypr2zFjZqbpCNGVJiGDX2tUFHMZsyFuG5zhxlOJJEJUqXsNnuge
-	 ppv+GsIS3SU1gTPyzUuKIORKzFRwlAfPDbfyd24I=
-Received: from pek-lxu-l1.wrs.com ([114.244.57.157])
-	by newxmesmtplogicsvrsza36-0.qq.com (NewEsmtp) with SMTP
-	id 3D42F449; Tue, 14 Jan 2025 23:15:20 +0800
-X-QQ-mid: xmsmtpt1736867720tzmmivf8j
-Message-ID: <tencent_A26C4964E3A9444A17685771A6D2F367A305@qq.com>
-X-QQ-XMAILINFO: MB5+LsFw85NocU4h9huvo05w2942a2MtYZz0ZB5IQjUZWI68BaDwoTMJWZhUGK
-	 ojoRZ+imMi7/p+aVDY0N0aWWYJ4OJMXmFzBslqaRAJgIpL2Fz1pd4djA10cHJmsJzQwc9N/3ISTG
-	 XTEMJidBix+E4k9CC6Da+Y2kHrpt8kPYz+HKxp39Oq9vrENMBguHLKkSpxWySLs67HZjRN4W3qGX
-	 c0xQwz8XWlYasxAYe8KDIB7mYw7QjD2zNNnCHhxMRa2Cs6GHzW/zpYkBbqhmCeIStcRVazx41YF9
-	 QFpaEhAhZiRc7WBaghtW3oo/yF8o4ScRncEge4TCsFfJu/0loYtuB8oUDr3xDkQEGKisfrrbSUhJ
-	 mglxMx/gTYSksRVlZe4CzJBitFys9pGxj6OHjlY8xZZUK9GtO5XpGJYdOzUFnUMFdl7fCmLjzWy7
-	 sDNLY5Gv/glLl/VQkNMRGsQmCLpG2sxeSsRdVrHfD6pWcrxTAlgioU0DN0aSBwzJ5xhPtidA6JH1
-	 LV8t3KXqNEICyV4b3ZgzxLKEx5LPABYHB1S986937fQ8yrZSeFCkJ8YWStxaFNxkYBKMnr07ZXp4
-	 QcOKFVj5my7M6JSZqzaOFv5Af+ycYSMx37dCtsfszKvWR38+M0dQnwSB9vcefyGXMuHPwIyCn3gp
-	 UcXtJJ/XXLy6b4KrlUBQ1Jrc357oOgxEfSuaA7UIkrpTw4naRR7CC0zmSqn3GLomnHcIg1QI7hr0
-	 6JdaNzirAZkHc86O8H1mJWlhsb6egv8icSBCHkDbdLIjNq/obwroCaJK+xwogLmdsPGw97+nPs3o
-	 rXQ3jp5EgN7z7en8H+PqC2eexMP9XdYZC8ePgYrHePOVJUR3+3uRhgU58GeE7PTsVxcQIVBA9J1/
-	 /2Y/BSwiwcgTU+DPhu4g3gYzrJUT59LtTdDSSqYTnhQnF/b+ZqJ5EfA9ROP6ODlLmFxep27tVnZ0
-	 KTWRjrGXNhd18HiH/gug4PoPahUkFBIaF0VjMdC5xZ+tzFZndMdZjZNif/wxp3
-X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
-From: Edward Adam Davis <eadavis@qq.com>
-To: axboe@kernel.dk
-Cc: eadavis@qq.com,
-	hare@suse.de,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+fcee6b76cf2e261c51a4@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH V3] block: no show partitions if partno corrupted
-Date: Tue, 14 Jan 2025 23:15:21 +0800
-X-OQ-MSGID: <20250114151520.2958158-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <813564af-a67a-4feb-ab32-1ca3bb41edfb@kernel.dk>
-References: <813564af-a67a-4feb-ab32-1ca3bb41edfb@kernel.dk>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DGN+KMOE"
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3cdd57060acso18490835ab.0
+        for <linux-block@vger.kernel.org>; Tue, 14 Jan 2025 07:25:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1736868314; x=1737473114; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=v+1Lu+c4d+CZfkxxtpb+u7W/NPbLrNX6Z4fG+B04hbI=;
+        b=DGN+KMOEpMJphLFL3Hj19J9zSa7DC3nUazi0Dx6qp6KUB58NprtnUPGRlyHR/9G7yb
+         /T7KZO1kMdZ26UGLbIaw6QCW40ePUTImssP84MSBXE0nUW+U7ZTZalS37KpgE1KCxEv8
+         zwM48keCglnJJQC3/evlZgqtSPDggU8twNJSQntQAqFMaKMNiAmR72pWPPgMgsGacPSF
+         qZBYPViDW5YBUBPEBJJ6M33Y1ns03AahrntSev8JVqBTMdkE5BKcJeOps1/w/AIFQB0k
+         K/2lTZ0yXUjJC6r1wCNEoKosdr5fQU+DdXnr1R/vXcF68+Tm19/U32MjN9P1+6kjePN2
+         Ng8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736868314; x=1737473114;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=v+1Lu+c4d+CZfkxxtpb+u7W/NPbLrNX6Z4fG+B04hbI=;
+        b=LcjdO8ioRU71ISkRJpfE4j/g1q5Z9VLh6IrkMADH8v1FwnZruCbFyjRopU+BK96Hlb
+         FEuVRsLV9UYxPv+QdAAIZ5N5aN29TEB+QjJQGxKhNRSMkFD5A+4GJeTQRIZ7pD0+z6n9
+         We6Co03fWFZY6GYmu9HPAQd1miGTdDB10TTZZHNeQGL6QrAbDf2szi2LmHLOpNL36DiB
+         lElmUxWKtjEQ1ru9upCueqWfa4aDLHOUDGn9CZ7Xovef3Sk9fPI5ppe4cZ1wwY5M3FxO
+         ckqbMDSdVK3DcdtGEkNznGeWWw/SWNd5OGvpXgLT/P4zsUs9UU7lB+yWXJaTqGz9g66y
+         9juQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWzoAxqmYQGSEoB+q7q8PgyWq6R+/8vLczlHpUa25A1kL5MXnrUqqP8JE8pLF8aYXgOo9hAWqlmd5iiYA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbBryoEYLyga6DCdoYdEb6smSU8EuUQYQluSRk05WKDsrRvYTE
+	8E8V8yRpCBR2YgiZ2jABvkUoYyoC3bU/9k1m6A7ayr+yh9U108vKpgrupB+coqk=
+X-Gm-Gg: ASbGnctTDHhTrbu41x8p7qTlTEYhT8S//UIKp3HXXcIBpk7uzhQLMpTh+nPhl/tHI6w
+	VqyhYkUWx1n/UnGSxcAo/R5RSadg2Tj78AhpIhA5RVJLzonmC90ZPKZ/qnMpUHrljXKr+M6LAfV
+	czpLuWj/K8l8YyBHPzNwounsrtgF5n8QQric78GPrEI1MUPXb9qF9ox+mA9ULANZ96eehSuoRIz
+	fPT/skajOGKicYprw0o1xTbiu7pqJHjNHJwzTq6oxYVOTWFcJFD
+X-Google-Smtp-Source: AGHT+IF8LamTOlS2aHRZbet7Phl2C57F9X7NDOwRyxc5onvJqlq3yKESwAxYurSfcbjuvtoQHrJY2g==
+X-Received: by 2002:a05:6e02:1687:b0:3a7:85ee:fa78 with SMTP id e9e14a558f8ab-3ce3a9c190dmr195163205ab.18.1736868314572;
+        Tue, 14 Jan 2025 07:25:14 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ce4af56569sm34515995ab.63.2025.01.14.07.25.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jan 2025 07:25:13 -0800 (PST)
+Message-ID: <2df5c0d7-cf9e-49ce-a39a-4e3d50c6df0c@kernel.dk>
+Date: Tue, 14 Jan 2025 08:25:13 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3] block: no show partitions if partno corrupted
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: hare@suse.de, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+fcee6b76cf2e261c51a4@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com
+References: <813564af-a67a-4feb-ab32-1ca3bb41edfb@kernel.dk>
+ <tencent_A26C4964E3A9444A17685771A6D2F367A305@qq.com>
+From: Jens Axboe <axboe@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <tencent_A26C4964E3A9444A17685771A6D2F367A305@qq.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 14 Jan 2025 08:02:15 -0700, Jens Axboe wrote:
-> > diff --git a/block/genhd.c b/block/genhd.c
-> > index 9130e163e191..3a9c36ad6bbd 100644
-> > --- a/block/genhd.c
-> > +++ b/block/genhd.c
-> > @@ -890,6 +890,9 @@ static int show_partition(struct seq_file *seqf, void *v)
-> >
-> >  	rcu_read_lock();
-> >  	xa_for_each(&sgp->part_tbl, idx, part) {
-> > +		int partno = bdev_partno(part);
-> > +
-> > +		WARN_ON_ONCE(partno >= DISK_MAX_PARTS);
-> >  		if (!bdev_nr_sectors(part))
-> >  			continue;
-> >  		seq_printf(seqf, "%4d  %7d %10llu %pg\n",
-> 
-> Surely you still want to continue for that condition?
-No.
-But like following, ok?
-diff --git a/block/genhd.c b/block/genhd.c
-index 9130e163e191..142b13620f0c 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -890,7 +890,10 @@ static int show_partition(struct seq_file *seqf, void *v)
- 
-        rcu_read_lock();
-        xa_for_each(&sgp->part_tbl, idx, part) {
--               if (!bdev_nr_sectors(part))
-+               int partno = bdev_partno(part);
-+
-+               WARN_ON_ONCE(partno >= DISK_MAX_PARTS);
-+               if (!bdev_nr_sectors(part) || partno >= DISK_MAX_PARTS)
-                        continue;
-                seq_printf(seqf, "%4d  %7d %10llu %pg\n",
-                           MAJOR(part->bd_dev), MINOR(part->bd_dev),
+On 1/14/25 8:15 AM, Edward Adam Davis wrote:
+> On Tue, 14 Jan 2025 08:02:15 -0700, Jens Axboe wrote:
+>>> diff --git a/block/genhd.c b/block/genhd.c
+>>> index 9130e163e191..3a9c36ad6bbd 100644
+>>> --- a/block/genhd.c
+>>> +++ b/block/genhd.c
+>>> @@ -890,6 +890,9 @@ static int show_partition(struct seq_file *seqf, void *v)
+>>>
+>>>  	rcu_read_lock();
+>>>  	xa_for_each(&sgp->part_tbl, idx, part) {
+>>> +		int partno = bdev_partno(part);
+>>> +
+>>> +		WARN_ON_ONCE(partno >= DISK_MAX_PARTS);
+>>>  		if (!bdev_nr_sectors(part))
+>>>  			continue;
+>>>  		seq_printf(seqf, "%4d  %7d %10llu %pg\n",
+>>
+>> Surely you still want to continue for that condition?
+> No.
 
+No?
+
+> But like following, ok?
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 9130e163e191..142b13620f0c 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -890,7 +890,10 @@ static int show_partition(struct seq_file *seqf, void *v)
+>  
+>         rcu_read_lock();
+>         xa_for_each(&sgp->part_tbl, idx, part) {
+> -               if (!bdev_nr_sectors(part))
+> +               int partno = bdev_partno(part);
+> +
+> +               WARN_ON_ONCE(partno >= DISK_MAX_PARTS);
+> +               if (!bdev_nr_sectors(part) || partno >= DISK_MAX_PARTS)
+>                         continue;
+>                 seq_printf(seqf, "%4d  %7d %10llu %pg\n",
+>                            MAJOR(part->bd_dev), MINOR(part->bd_dev),
+
+That's just silly...
+
+	xa_for_each(&sgp->part_tbl, idx, part) {
+		int partno = bdev_partno(part);
+
+		if (!bdev_nr_sectors(part))
+			continue;
+		if (WARN_ON_ONCE(partno >= DISK_MAX_PARTS))
+			continue;
+
+		...
+	}
+
+-- 
+Jens Axboe
