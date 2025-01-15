@@ -1,87 +1,127 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB8D1EEA5D
-	for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 09:40:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A741E98F2;
+	Wed, 15 Jan 2025 11:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736934024; cv=none; b=ipdUPPReU6gEGZo4znPLklZpYsSWRtK2Zm8xaWZjT1b1hI+8HUKwt2nEJWOfUxeQNPZpfDQIMzVLn8ei6lVco9lcQfKakZ8NStO671HhxaHYxtPBzpsi9zJakyexQdtfErniZye9gl2+Aezj6wrUjNmygFbvbCqb9Dvl44fr40c=
+	t=1736941359; cv=none; b=t6HqSAZgv01Ey5lrALKlXPSyr+lyx5uYjDMqQdueZdq/yuTWx+ZIvYCJqOahM5hSsEIjMr5CK/isqAfb1YT9sbnexHOK3jeiWzeSINVF+jYSU2VSDzSpoqmdHpqjM54bn18CCvT6zrSRLT/gPISUP8UFRYxYsGnUzWZ2TqF0OWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736934024; c=relaxed/simple;
-	bh=6lPjAmeDCXAeOtmiHlwtrV53k9jOFvmtkglvGTXtXKg=;
+	s=arc-20240116; t=1736941359; c=relaxed/simple;
+	bh=pq/v0VSJ9VsZQn33S7S7wvNcGH+oudGNlgIaUU4DpJU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kfH5zSiMCPOPU1bWYCnOVQM1O5g8/f4T3rSTJZTrwSHPQeOWfZV2rPmWCn4usNZtt8yJpWNG4KhKD+eBXgm+umI7wv6cEAqiTqxgdubnUUE3cdd2imlupFfRos11O+Eo00Uo7jAIs4o1l18h+tBXWwusffrmdp/dyJBurskrnik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=oGGyOUKd; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=M4yg66guxVSbb9RfULqrHZ245e/xlLmveEGvj0O6QKNtByWlbQ9wS5wYhIBcS7Y29YRamjtUNHgWSPMedb4+Hzc+5SsqTFo1MAEc3LwFBQvMv4Q0b93FLw/sYHTsOLjIPO6UBlgj7te9TNxPAhUqti8AX0pfyvJ1FkCb8Kxgqkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SK1UM+rf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oGGyOUKd"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=by7rn55csOxL0JGDQjJxb2FE9GA9xzEYYkNHIPobIqw=; b=oGGyOUKdlu0Tj/Osd8ky/E3Ntg
-	JqBVcTC+r1mRrutmBorzUgOQ46bIwHLxU+oETmF9HW6oQkVjrYflk/OpuMdCPSdF6OYHyZWQnUyk+
-	LGaVe/OqJf0zp/S2WmRiI6JdUaB0U4g66I3TYUNI+0knH0eKHvpogk4KTlvh95Uxk4r7UHO0ekI57
-	RC2+xtKN+dcjEQTFUQDdIyW7+Im/ZNcktlZHcB5tYExTpXDOl+uInEKEnk/eeQSEP3raxmahp0p8t
-	n2P+SSWK8bi8BHRnU5GqBnCZgu/Qb4Xeg6oi9oZGVQuN86nfWNjMvmghLkTF39yv88sbHKI6TQWM/
-	CfbjnFvQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tXzsr-0000000BNMj-1vhG;
-	Wed, 15 Jan 2025 09:40:21 +0000
-Date: Wed, 15 Jan 2025 01:40:21 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Kun Hu <huk23@m.fudan.edu.cn>,
-	Jiaji Qin <jjtan24@m.fudan.edu.cn>
-Subject: Re: [PATCH] loop: don't call vfs_flush() with queue frozen
-Message-ID: <Z4eChfyt15sCL8rV@infradead.org>
-References: <20250113022426.703537-1-ming.lei@redhat.com>
- <Z4Spc75EiBXowzMu@infradead.org>
- <Z4TNW2PYyPUqwLaD@fedora>
- <Z4TaSGZDu_B2GS1c@infradead.org>
- <Z4Tb3pmnXMk_z2Fm@fedora>
- <Z4UZ947fLqHusJzv@infradead.org>
- <Z4UsPor30ss0ML9s@fedora>
- <Z4cfVBrd9OJiYYG-@fedora>
- <Z4deHFfJ2qC8VHjT@infradead.org>
- <Z4dwFFIb6gjAa4wd@fedora>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SK1UM+rf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 562EAC4CEE6;
+	Wed, 15 Jan 2025 11:42:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736941358;
+	bh=pq/v0VSJ9VsZQn33S7S7wvNcGH+oudGNlgIaUU4DpJU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SK1UM+rfoqKh/h3BU5ce3vIkS003NTSuW+v6diKDwjMb+JbyjOu6hOcQ4NbQfqUJN
+	 94c5rc6AwA+9T1Vy+2lvYgfbl+d62DXYW9tNBrP9p8znN6P96ewJ7Wyys4JPP3EJrd
+	 Tx92bEk2LuC3tN50gYqtCXmFbwoq8BA0L2jMNdx3E5n6Q9B3D6V7f6xpO7LGAanP4t
+	 rKrNSLjQcpmSGj3fQD9UCpBUoi7+cHw5KwxrVZ+S0noeNhLliYvjdIkBIKEdA89flU
+	 YJ9F9cJat63XgK20QD2vguEaHDAf6dEsfajhwp08RlohMxVkDV//k28maTUzgDi4o/
+	 HfCCCKF5ZhMpQ==
+Date: Wed, 15 Jan 2025 12:42:33 +0100
+From: Niklas Cassel <cassel@kernel.org>
+To: Oliver Sang <oliver.sang@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>, oe-lkp@lists.linux.dev, lkp@intel.com,
+	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-nvme@lists.infradead.org, Damien Le Moal <dlemoal@kernel.org>,
+	linux-btrfs@vger.kernel.org, linux-aio@kvack.org
+Subject: Re: [linus:master] [block]  e70c301fae: stress-ng.aiol.ops_per_sec
+ 49.6% regression
+Message-ID: <Z4efKYwbf2QYBx40@ryzen>
+References: <20241213143224.GA16111@lst.de>
+ <20241217045527.GA16091@lst.de>
+ <Z2EgW8/WNfzZ28mn@xsang-OptiPlex-9020>
+ <20241217065614.GA19113@lst.de>
+ <Z3ZhNYHKZPMpv8Cz@ryzen>
+ <20250103064925.GB27984@lst.de>
+ <Z3epOlVGDBqj72xC@ryzen>
+ <Z3zlgBB3ZrGApew7@xsang-OptiPlex-9020>
+ <Z35VVvuT0nl0iDfd@ryzen>
+ <Z4DD1Lgzvv66tS3w@xsang-OptiPlex-9020>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z4dwFFIb6gjAa4wd@fedora>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z4DD1Lgzvv66tS3w@xsang-OptiPlex-9020>
 
-On Wed, Jan 15, 2025 at 04:21:40PM +0800, Ming Lei wrote:
-> On Tue, Jan 14, 2025 at 11:05:00PM -0800, Christoph Hellwig wrote:
-> > On Wed, Jan 15, 2025 at 10:37:08AM +0800, Ming Lei wrote:
-> > > Actually some FSs may call kmalloc(GFP_KERNEL) with i_rwsem grabbed,
-> > > which could call into real deadlock if IO on the loop disk is caused by
-> > > the kmalloc(GFP_KERNEL).
+Hello Oliver,
+
+On Fri, Jan 10, 2025 at 02:53:08PM +0800, Oliver Sang wrote:
+> On Wed, Jan 08, 2025 at 11:39:28AM +0100, Niklas Cassel wrote:
+> > > > Oliver, which I/O scheduler are you using?
+> > > > $ cat /sys/block/sdb/queue/scheduler 
+> > > > none mq-deadline kyber [bfq]
+> > > 
+> > > while our test running:
+> > > 
+> > > # cat /sys/block/sdb/queue/scheduler
+> > > none [mq-deadline] kyber bfq
 > > 
-> > Well, loop can always deadlock when the lower fs is doing allocations,
-> > even without the freeze.  I'm actually kinda surprised loop doesn't
-> > force a context noio as we'd really need that.
+> > The stddev numbers you showed is all over the place, so are we certain
+> > if this is a regression caused by commit e70c301faece ("block:
+> > don't reorder requests in blk_add_rq_to_plug") ?
+> > 
+> > Do you know if the stddev has such big variation for this test even before
+> > the commit?
 > 
-> Loop does call mapping_set_gfp_mask(~(__GFP_IO|__GFP_FS)).
+> in order to address your concern, we rebuild kernels for e70c301fae and its
+> parent a3396b9999, also for v6.12-rc4. the config is still same as shared
+> in our original report:
+> https://download.01.org/0day-ci/archive/20241212/202412122112.ca47bcec-lkp@intel.com/config-6.12.0-rc4-00120-ge70c301faece
 
-But that only helps with page cache allocations, not other allocations
-don't in the I/O path, of which there are plenty in modern file systems.
+Thank you for putting in the work to do some extra tests.
 
-> > And all of these are caused by not breaking the dependency loop..
-> 
-> Can you share how to break the dependency? Such as fs_reclaim &
-> mm->mmap_lock.
+(Doing performance regression testing is really important IMO,
+as without it you are essentially in the blind.
+Thank you guys for taking on the role of this important work!)
 
-fs_reclaim should not be broken.  It's a fake lockdep key annotation
-the reclaim path.  Everything under it needs to be NOFS, or in case
-of loop NOIO (see above).  I think mmap_lock is just an indirect chain
-here, but I need to take a closer look.  A little busty this week and
-only sporadically online, sorry.
 
+Looking at the extended number of iterations that you've in this email,
+it is quite clear that e70c301faece, at least with the workload provided
+by stress-ng + mq-deadline, introduced a regression:
+
+       v6.12-rc4 a3396b99990d8b4e5797e7b16fd e70c301faece15b618e54b613b1
+---------------- --------------------------- ---------------------------
+         %stddev     %change         %stddev     %change         %stddev
+             \          |                \          |                \
+    187.64 ±  5%      -0.6%     186.48 ±  7%     -47.6%      98.29 ± 17%  stress-ng.aiol.ops_per_sec
+
+
+
+
+Looking at your results from stress-ng + none scheduler:
+
+         %stddev     %change         %stddev     %change         %stddev
+             \          |                \          |                \
+    114.62 ± 19%      -1.9%     112.49 ± 17%     -32.4%      77.47 ± 21%  stress-ng.aiol.ops_per_sec
+
+
+Which shows a change, but -32% rather than -47%, also seems to suggest a
+regression for the stress-ng workload.
+
+
+
+
+Looking closer at the raw number for stress-ng + none scheduler, in your
+other email, it seems clear that the raw values from the stress-ng workload
+can vary quite a lot. In the long run, I wonder if we perhaps can find a
+workload that has less variation. E.g. fio test for IOPS and fio test for
+throughout. But perhaps such workloads are already part of lkp-tests?
+
+
+Kind regards,
+Niklas
