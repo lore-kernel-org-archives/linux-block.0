@@ -1,127 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A741E98F2;
-	Wed, 15 Jan 2025 11:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0942416A0;
+	Wed, 15 Jan 2025 11:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736941359; cv=none; b=t6HqSAZgv01Ey5lrALKlXPSyr+lyx5uYjDMqQdueZdq/yuTWx+ZIvYCJqOahM5hSsEIjMr5CK/isqAfb1YT9sbnexHOK3jeiWzeSINVF+jYSU2VSDzSpoqmdHpqjM54bn18CCvT6zrSRLT/gPISUP8UFRYxYsGnUzWZ2TqF0OWU=
+	t=1736941935; cv=none; b=uVlU4QLYpNKLJUG91aStGDKSq0IaCZPedtF1bCIkG9GrIxWQPdw0MvSWOYfBIGuwG/zgNFECJloVzq3Qi7SRWhDu9NJtTTpkhsE//3f6c7K8U9ailk4EuXqJXDJV13C7SPW+C73R+6TJfd3UMO3F/QsI6B3X2DH+9UHlvmAZyW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736941359; c=relaxed/simple;
-	bh=pq/v0VSJ9VsZQn33S7S7wvNcGH+oudGNlgIaUU4DpJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M4yg66guxVSbb9RfULqrHZ245e/xlLmveEGvj0O6QKNtByWlbQ9wS5wYhIBcS7Y29YRamjtUNHgWSPMedb4+Hzc+5SsqTFo1MAEc3LwFBQvMv4Q0b93FLw/sYHTsOLjIPO6UBlgj7te9TNxPAhUqti8AX0pfyvJ1FkCb8Kxgqkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SK1UM+rf; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SK1UM+rf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 562EAC4CEE6;
-	Wed, 15 Jan 2025 11:42:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736941358;
-	bh=pq/v0VSJ9VsZQn33S7S7wvNcGH+oudGNlgIaUU4DpJU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SK1UM+rfoqKh/h3BU5ce3vIkS003NTSuW+v6diKDwjMb+JbyjOu6hOcQ4NbQfqUJN
-	 94c5rc6AwA+9T1Vy+2lvYgfbl+d62DXYW9tNBrP9p8znN6P96ewJ7Wyys4JPP3EJrd
-	 Tx92bEk2LuC3tN50gYqtCXmFbwoq8BA0L2jMNdx3E5n6Q9B3D6V7f6xpO7LGAanP4t
-	 rKrNSLjQcpmSGj3fQD9UCpBUoi7+cHw5KwxrVZ+S0noeNhLliYvjdIkBIKEdA89flU
-	 YJ9F9cJat63XgK20QD2vguEaHDAf6dEsfajhwp08RlohMxVkDV//k28maTUzgDi4o/
-	 HfCCCKF5ZhMpQ==
-Date: Wed, 15 Jan 2025 12:42:33 +0100
-From: Niklas Cassel <cassel@kernel.org>
-To: Oliver Sang <oliver.sang@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>, oe-lkp@lists.linux.dev, lkp@intel.com,
-	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-nvme@lists.infradead.org, Damien Le Moal <dlemoal@kernel.org>,
-	linux-btrfs@vger.kernel.org, linux-aio@kvack.org
-Subject: Re: [linus:master] [block]  e70c301fae: stress-ng.aiol.ops_per_sec
- 49.6% regression
-Message-ID: <Z4efKYwbf2QYBx40@ryzen>
-References: <20241213143224.GA16111@lst.de>
- <20241217045527.GA16091@lst.de>
- <Z2EgW8/WNfzZ28mn@xsang-OptiPlex-9020>
- <20241217065614.GA19113@lst.de>
- <Z3ZhNYHKZPMpv8Cz@ryzen>
- <20250103064925.GB27984@lst.de>
- <Z3epOlVGDBqj72xC@ryzen>
- <Z3zlgBB3ZrGApew7@xsang-OptiPlex-9020>
- <Z35VVvuT0nl0iDfd@ryzen>
- <Z4DD1Lgzvv66tS3w@xsang-OptiPlex-9020>
+	s=arc-20240116; t=1736941935; c=relaxed/simple;
+	bh=34A7PDLZ8mF6GKEkFqLnWG4X8tYtxPQ2DBhm0IJb0Ag=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=cKiDj+9vUlzuGyoLCpIsci81HKgiAKGUj9taIIj+4GXJn435fkEpxZyDP8hyJ4hRaPWs7MPuWE1BWGYpxiOSCnhVjFXHXjU7fiGUxprNzR9Ue6/85i5vrQpCY6VJoO2BfxCC7VT8AdVHlJuR4kf0vtc4uYbmrvoo/ii9cK8t/tU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YY4953bZ2z4f3jqy;
+	Wed, 15 Jan 2025 19:51:53 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id ABB2C1A0B62;
+	Wed, 15 Jan 2025 19:52:08 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgC3Gl9aoYdnvK0ZBA--.21959S6;
+	Wed, 15 Jan 2025 19:52:08 +0800 (CST)
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+To: linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	hch@lst.de,
+	tytso@mit.edu,
+	djwong@kernel.org,
+	yi.zhang@huawei.com,
+	yi.zhang@huaweicloud.com,
+	chengzhihao1@huawei.com,
+	yukuai3@huawei.com,
+	yangerkun@huawei.com
+Subject: [RFC PATCH v2 2/8] nvme: set BLK_FEAT_WRITE_ZEROES_UNMAP if device supports DEAC bit
+Date: Wed, 15 Jan 2025 19:46:31 +0800
+Message-Id: <20250115114637.2705887-3-yi.zhang@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20250115114637.2705887-1-yi.zhang@huaweicloud.com>
+References: <20250115114637.2705887-1-yi.zhang@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z4DD1Lgzvv66tS3w@xsang-OptiPlex-9020>
+X-CM-TRANSID:gCh0CgC3Gl9aoYdnvK0ZBA--.21959S6
+X-Coremail-Antispam: 1UD129KBjvJXoW7ury8Ar4xJF4kuF15CrWUCFg_yoW8CFW5pF
+	W3Xa42k348WF47C3sxXw47AFy5Gw1kGa4UWF1xK345Wr15A34Fgr1Fka43XrWkX3s3WayY
+	yF4DK3srCa15XwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUm014x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+	xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+	JVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67
+	kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY
+	6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0x
+	vEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVj
+	vjDU0xZFpf9x0JUl9a9UUUUU=
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-Hello Oliver,
+From: Zhang Yi <yi.zhang@huawei.com>
 
-On Fri, Jan 10, 2025 at 02:53:08PM +0800, Oliver Sang wrote:
-> On Wed, Jan 08, 2025 at 11:39:28AM +0100, Niklas Cassel wrote:
-> > > > Oliver, which I/O scheduler are you using?
-> > > > $ cat /sys/block/sdb/queue/scheduler 
-> > > > none mq-deadline kyber [bfq]
-> > > 
-> > > while our test running:
-> > > 
-> > > # cat /sys/block/sdb/queue/scheduler
-> > > none [mq-deadline] kyber bfq
-> > 
-> > The stddev numbers you showed is all over the place, so are we certain
-> > if this is a regression caused by commit e70c301faece ("block:
-> > don't reorder requests in blk_add_rq_to_plug") ?
-> > 
-> > Do you know if the stddev has such big variation for this test even before
-> > the commit?
-> 
-> in order to address your concern, we rebuild kernels for e70c301fae and its
-> parent a3396b9999, also for v6.12-rc4. the config is still same as shared
-> in our original report:
-> https://download.01.org/0day-ci/archive/20241212/202412122112.ca47bcec-lkp@intel.com/config-6.12.0-rc4-00120-ge70c301faece
+When the device supports the Write Zeroes command and the DEAC bit, it
+indicates that the deallocate bit in the Write Zeroes command is
+supported, and the bytes read from a deallocated logical block are
+zeroes. This means the device supports unmap Write Zeroes, so set the
+BLK_FEAT_WRITE_ZEROES_UNMAP feature to the device's queue limit.
 
-Thank you for putting in the work to do some extra tests.
+Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+---
+ drivers/nvme/host/core.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-(Doing performance regression testing is really important IMO,
-as without it you are essentially in the blind.
-Thank you guys for taking on the role of this important work!)
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index a970168a3014..8a359370154d 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2210,22 +2210,25 @@ static int nvme_update_ns_info_block(struct nvme_ns *ns,
+ 	if (!nvme_init_integrity(ns->head, &lim, info))
+ 		capacity = 0;
+ 
+-	ret = queue_limits_commit_update(ns->disk->queue, &lim);
+-	if (ret) {
+-		blk_mq_unfreeze_queue(ns->disk->queue);
+-		goto out;
+-	}
+-
+-	set_capacity_and_notify(ns->disk, capacity);
+-
+ 	/*
+ 	 * Only set the DEAC bit if the device guarantees that reads from
+ 	 * deallocated data return zeroes.  While the DEAC bit does not
+ 	 * require that, it must be a no-op if reads from deallocated data
+ 	 * do not return zeroes.
+ 	 */
+-	if ((id->dlfeat & 0x7) == 0x1 && (id->dlfeat & (1 << 3)))
++	if ((id->dlfeat & 0x7) == 0x1 && (id->dlfeat & (1 << 3))) {
+ 		ns->head->features |= NVME_NS_DEAC;
++		if (lim.max_write_zeroes_sectors)
++			lim.features |= BLK_FEAT_WRITE_ZEROES_UNMAP;
++	}
++
++	ret = queue_limits_commit_update(ns->disk->queue, &lim);
++	if (ret) {
++		blk_mq_unfreeze_queue(ns->disk->queue);
++		goto out;
++	}
++
++	set_capacity_and_notify(ns->disk, capacity);
+ 	set_disk_ro(ns->disk, nvme_ns_is_readonly(ns, info));
+ 	set_bit(NVME_NS_READY, &ns->flags);
+ 	blk_mq_unfreeze_queue(ns->disk->queue);
+-- 
+2.39.2
 
-
-Looking at the extended number of iterations that you've in this email,
-it is quite clear that e70c301faece, at least with the workload provided
-by stress-ng + mq-deadline, introduced a regression:
-
-       v6.12-rc4 a3396b99990d8b4e5797e7b16fd e70c301faece15b618e54b613b1
----------------- --------------------------- ---------------------------
-         %stddev     %change         %stddev     %change         %stddev
-             \          |                \          |                \
-    187.64 ±  5%      -0.6%     186.48 ±  7%     -47.6%      98.29 ± 17%  stress-ng.aiol.ops_per_sec
-
-
-
-
-Looking at your results from stress-ng + none scheduler:
-
-         %stddev     %change         %stddev     %change         %stddev
-             \          |                \          |                \
-    114.62 ± 19%      -1.9%     112.49 ± 17%     -32.4%      77.47 ± 21%  stress-ng.aiol.ops_per_sec
-
-
-Which shows a change, but -32% rather than -47%, also seems to suggest a
-regression for the stress-ng workload.
-
-
-
-
-Looking closer at the raw number for stress-ng + none scheduler, in your
-other email, it seems clear that the raw values from the stress-ng workload
-can vary quite a lot. In the long run, I wonder if we perhaps can find a
-workload that has less variation. E.g. fio test for IOPS and fio test for
-throughout. But perhaps such workloads are already part of lkp-tests?
-
-
-Kind regards,
-Niklas
