@@ -1,58 +1,58 @@
 Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076E51DCB2D
-	for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 22:47:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F27A1DD520
+	for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 22:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736981229; cv=none; b=UlKMtolqwfFJrdEk6s27ARE1EZpSTt49b7CpOi1QHyEflMF75K1TZqQO/r3XELmBXabrn8Y+YK3BmXt+gNeK7ezO3Po7M34XuFNTKsjH/8rwaBHfO0pEI4ef0GanM15Mn83PuMVK0RqboSDd9MQxMX+Z+7aIAiuwNbBGeEDNVr4=
+	t=1736981231; cv=none; b=idrjwTySWRt9kHCJ05AQOScFrAGz94hS88eUK4ooD28ryiRnBaA4Y1Nd0QsXtmat0BAzF6TykKBifIOqI6YYSdaEl3wy5iIQBYpUM9iXhrGVlz31JKwddOWtomjifOyEmqFmvb+abVANMy/+kmmmtSMkZvwkt4DuGq7rzIRdUOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736981229; c=relaxed/simple;
-	bh=Vl376vBzbC3818vHqyrU+BG0ANdndjucMMWz/Ja/Jus=;
+	s=arc-20240116; t=1736981231; c=relaxed/simple;
+	bh=sN0I09t5+4VIk54P5Q4iVxRAnAfjcZv7g5EecMQO1sY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UVOmedWklXUnGk857uvv1FJVUN9bgk1Tq+C9nyWsZC3GVZVrmMgJQoDCGGWmmoO/3QX9P7g+2KNzSEOHuBdVDgcpTjC0thlZhmzrlKr8r7DjupbmbvwZJwZ4syOK687BndyornkhV/8zfTKb6stng9oC5+Rh9x8PljJK7WAE07s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=dGA4I5X7; arc=none smtp.client-ip=199.89.1.11
+	 MIME-Version; b=StVBeCE3hH2CwQG65b4blz4q6UvzsD86DL+bodKxiF5JrVP3orjfLbJx9L3sEEsh3eTB3w0HiKQQrc1RfMrU7+sHhB6HZwMDy2kO8z6P1GbjgNj1Qs+Z9E3iFkKgBMHWWdhaPhSLKMh/xaoqmrqJ177DmYSS/qA+ZVmS1O/5ICQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Rz0Xr7BD; arc=none smtp.client-ip=199.89.1.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="dGA4I5X7"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Rz0Xr7BD"
 Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YYLj62wQ0z6CmQyl;
-	Wed, 15 Jan 2025 22:47:06 +0000 (UTC)
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YYLj95Cbjz6CmQyY;
+	Wed, 15 Jan 2025 22:47:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1736981221; x=1739573222; bh=2oQci
-	tnXPB1PGgSCEGuTk8GRrlHVH4EXutGmUuz0FuU=; b=dGA4I5X7DTz10cSqUKI89
-	vBvdk4HbBLKqyEcSmGPfrJoDG7/TUHwbZEC+ZuUmCCGrW2beiR+EfrA1BA+83aAz
-	2wRchEdKueequfGH1+66MZwMd8hl6FEHqA+8ucn54KnLEclpnYlm6wCaiOlGkftL
-	vENIHCGDMMLLjeK0RGQjpDZOcFJgUMUex1lGR7dgVmEnjVuxIj0EEJaTM+bRW3Ov
-	upba1BnaU1JZPeseOb7RSuQGOC8E6kQD3rNhdJOeiuxYVnIaFG+zd6a6JfryqTaA
-	toP3yBduyJz+sCTLzBQgKWumhXe7IVPN415fxY8asyoEUH2NkcSzHcNUc8n3UQKP
+	:received:received; s=mr01; t=1736981225; x=1739573226; bh=o60G3
+	w0NbtF4/aQV5VamjBXkULtyPdmW2grUeoAUUSE=; b=Rz0Xr7BDVsXNhZPPzud+d
+	5nO8O15R3cHSEGBpd/OTCQMVREp8Ws22eVEtFY3kq1wIbd21X1/PufjBPxqgoVfN
+	E3rtjLDNl0lzm+3VfFxtM4am47MQpUWSuN8PEups7ZuJfhZV8wWZPjXMK0D7IvR7
+	KDUfHGYSMKOxq3KpOCHT5Tu+KrKcVOGgvCzKEi1qiDLpuSlAVbzJ0DtWk8j0UylD
+	W7P4swF81bQh6o4t77m/7/rewsVbLSl7wrLG87c373+Zf9jszYFxziim6lGSd7BH
+	r23VITyxJ8UF41D/DcESCgTv11g933mEudr5y/mxGq35UL+tFaAkK52MeLI5hU8h
 	Q==
 X-Virus-Scanned: by MailRoute
 Received: from 008.lax.mailroute.net ([127.0.0.1])
  by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 1hb4lZKh1uDK; Wed, 15 Jan 2025 22:47:01 +0000 (UTC)
+ id L18z9L71kr5O; Wed, 15 Jan 2025 22:47:05 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YYLhy59qwz6CmQtQ;
-	Wed, 15 Jan 2025 22:46:58 +0000 (UTC)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YYLj20tpvz6Cp2tZ;
+	Wed, 15 Jan 2025 22:47:01 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Damien Le Moal <dlemoal@kernel.org>,
 	Bart Van Assche <bvanassche@acm.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v17 01/14] block: Support block drivers that preserve the order of write requests
-Date: Wed, 15 Jan 2025 14:46:35 -0800
-Message-ID: <20250115224649.3973718-2-bvanassche@acm.org>
+	Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>
+Subject: [PATCH v17 02/14] dm-linear: Report to the block layer that the write order is preserved
+Date: Wed, 15 Jan 2025 14:46:36 -0800
+Message-ID: <20250115224649.3973718-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
 In-Reply-To: <20250115224649.3973718-1-bvanassche@acm.org>
 References: <20250115224649.3973718-1-bvanassche@acm.org>
@@ -64,52 +64,39 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Some storage controllers preserve the request order per hardware queue.
-Introduce the request queue limit member variable
-'driver_preserves_write_order' to allow block drivers to indicate that
-the order of write commands is preserved per hardware queue and hence
-that serialization of writes per zone is not required if all pending
-writes are submitted to the same hardware queue.
+Enable write pipelining if dm-linear is stacked on top of a driver that
+supports write pipelining.
 
-Cc: Damien Le Moal <dlemoal@kernel.org>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Nitesh Shetty <nj.shetty@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Alasdair Kergon <agk@redhat.com>
+Cc: Mike Snitzer <snitzer@kernel.org>
+Cc: Mikulas Patocka <mpatocka@redhat.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-settings.c   | 2 ++
- include/linux/blkdev.h | 5 +++++
- 2 files changed, 7 insertions(+)
+ drivers/md/dm-linear.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index c8368ee8de2e..18bcf6e6dc60 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -796,6 +796,8 @@ int blk_stack_limits(struct queue_limits *t, struct q=
-ueue_limits *b,
- 	}
- 	t->max_secure_erase_sectors =3D min_not_zero(t->max_secure_erase_sector=
-s,
- 						   b->max_secure_erase_sectors);
-+	t->driver_preserves_write_order =3D t->driver_preserves_write_order &&
-+		b->driver_preserves_write_order;
- 	t->zone_write_granularity =3D max(t->zone_write_granularity,
- 					b->zone_write_granularity);
- 	if (!(t->features & BLK_FEAT_ZONED)) {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 7ac153e4423a..df9887412a9e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -399,6 +399,11 @@ struct queue_limits {
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index 49fb0f684193..967fbf856abc 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -148,6 +148,11 @@ static int linear_report_zones(struct dm_target *ti,
+ #define linear_report_zones NULL
+ #endif
 =20
- 	unsigned int		max_open_zones;
- 	unsigned int		max_active_zones;
-+	/*
-+	 * Whether or not the block driver preserves the order of write
-+	 * requests. Set by the block driver.
-+	 */
-+	bool			driver_preserves_write_order;
-=20
- 	/*
- 	 * Drivers that set dma_alignment to less than 511 must be prepared to
++static void linear_io_hints(struct dm_target *ti, struct queue_limits *l=
+imits)
++{
++	limits->driver_preserves_write_order =3D true;
++}
++
+ static int linear_iterate_devices(struct dm_target *ti,
+ 				  iterate_devices_callout_fn fn, void *data)
+ {
+@@ -209,6 +214,7 @@ static struct target_type linear_target =3D {
+ 	.map    =3D linear_map,
+ 	.status =3D linear_status,
+ 	.prepare_ioctl =3D linear_prepare_ioctl,
++	.io_hints =3D linear_io_hints,
+ 	.iterate_devices =3D linear_iterate_devices,
+ 	.direct_access =3D linear_dax_direct_access,
+ 	.dax_zero_page_range =3D linear_dax_zero_page_range,
