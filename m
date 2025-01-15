@@ -1,220 +1,258 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219522416A0;
-	Wed, 15 Jan 2025 11:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F6F2475CC;
+	Wed, 15 Jan 2025 11:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736941940; cv=none; b=LRhfVDZkau768Kg5038eGMxu+GA3WCwB+RbS4JL9iOQpSDbN/QknWJ6Dbbk+fVNTycgIyBuJEL0QjW9S6j7rGS4ugnMspw280bzrYKMGFL18gYkZQUWnAbvc2G5ye4mRqbOM4gt1V/ZRkP7OTn7W1gt8Urq8tURF2WNdNF62xi4=
+	t=1736942317; cv=none; b=jeIeb+le6iyLVysdZ40/UGlUS2+pJ/lP0J5K0dEoMO0Sira+t0QgaItsRLcnCQsAQ4mntYz8IZh69nOYoQKq1gJv6/+qOgEcP3w8s/OLhHxVBDVLdP5AKSReiCKZO56ACBulGG2Jb5IY4qcj1hXy9tigUbXE9jpQVqXEBxAAmKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736941940; c=relaxed/simple;
-	bh=JgsJW573ldrbF6x31hKKXz0mNmXN80sqUcdXYcBP948=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eSeCgTmetuQucKBG8Om0V1K1x570kjub+zUs4hNpVm2gP5Q0egVEORRUVR+jYUdTPwsG88cUE3RGNK2BlkR/0Qh6aKprzoAJtyXX097wTJfykVjcPSqdv0tX9eKiC+gaoZQyo8H3+7AisVyIdBA24GYMowbsKnX2Ymk8RTi7O2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YY4991F4Fz4f3jss;
-	Wed, 15 Jan 2025 19:51:57 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 5C2941A0DBA;
-	Wed, 15 Jan 2025 19:52:12 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgC3Gl9aoYdnvK0ZBA--.21959S12;
-	Wed, 15 Jan 2025 19:52:12 +0800 (CST)
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	linux-nvme@lists.infradead.org,
-	linux-scsi@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	hch@lst.de,
-	tytso@mit.edu,
-	djwong@kernel.org,
-	yi.zhang@huawei.com,
-	yi.zhang@huaweicloud.com,
-	chengzhihao1@huawei.com,
-	yukuai3@huawei.com,
-	yangerkun@huawei.com
-Subject: [RFC PATCH v2 8/8] ext4: add FALLOC_FL_WRITE_ZEROES support
-Date: Wed, 15 Jan 2025 19:46:37 +0800
-Message-Id: <20250115114637.2705887-9-yi.zhang@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250115114637.2705887-1-yi.zhang@huaweicloud.com>
-References: <20250115114637.2705887-1-yi.zhang@huaweicloud.com>
+	s=arc-20240116; t=1736942317; c=relaxed/simple;
+	bh=sMl9f2LkaeCiTy2z2bfw5tskHF+O1pC5QN3LwdDdF7o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b7kgnDIk0qkZNFvCtGw09kOPryYnmd91S/ZlzsLAb16orinqC+1R/UPVjs3OHTBmKy/8ZzCFSp6kewv2jG4P43gPJGgAKLSjqNTfN36LRqvK3RwTuTB1V12clnQ9ew/EGTqzih1/rgBq0O+lXRz7luB3xexwOnUSxsXrVfu5nFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YlSZTR1V; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlSZTR1V"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21631789fcdso9168795ad.1;
+        Wed, 15 Jan 2025 03:58:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736942315; x=1737547115; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1oZOXJlrtV3ptX1wxOX2lKlYPN9rLc+sd9YiORr12FU=;
+        b=YlSZTR1V1jXT/CVKVms7ScRFJnMn2RzKSPA/JT6WvteLJSWQhoc5sxBMzwJmEi3YFP
+         6dYygPL3bCjqMBmoFRxP0aeCvrEkwWmWruZ+26cOJyDr5QEw8UGer1NfBPTNXs6CLQnP
+         uGr44gfSXPYMd5ggjW+G/G4zxMMKLU96YeKaYPxleOuWa4OsP9MuaG7C0cVPSyb76YZH
+         FYUwfXs2zDDmdxRb23Prc1ORGulJTEXrXJpd+owHZ6GbcuPhqniMsfpkprdRtDumwoDi
+         wzzo1WS4oUX73bRYxrcmlu8lkIs7SGE1BBYHqQg4mQdPJhbEE9WMemsg+WUr/kYShJPp
+         gzHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736942315; x=1737547115;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1oZOXJlrtV3ptX1wxOX2lKlYPN9rLc+sd9YiORr12FU=;
+        b=jnhl2M75jGqovD94bS/fV8bN+mkQT22/ssZQmclr1fEDHIQi06vCG7qq5Pxhl867A1
+         MsIsYWqiJy2Q0ShQXfzJ+vq63GtEwzYS14UjPpwD3pVi0xmJMjGYuzDAgQFwDCfT+wpI
+         tLnmpY9nG8T5B/GDX8n7vgnRKkpQMIPvWTCCubH3XrrlL9uDYMNJAWxroGPKgI5vKoV/
+         Yf+DtooB9iajEMi6qZbLDYv87v9lUs6uaO4QhzYeD4XadIeduxTR4a697mgg1aJP68c0
+         HE6joUiXevIMvAhVFeDGON3avxefft63xWoMnd9KemrDiRbJ2sSTIEK1a8n6uo7pZXZn
+         CHTg==
+X-Forwarded-Encrypted: i=1; AJvYcCU3TkLI+85KgeiYHCogm1jfrHd3kXDYY5aqPdbHNm68jwLumrKtoWyM8rAVKRqg43ZrmiQUYbc0cr2cUxM=@vger.kernel.org, AJvYcCX8z7dSJvm5qfxLZCiUxaNCknYxWFf7AuEcch/OXC8o3BIJyGYXD2cWI7ACecCpABBzljs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFOMn4V4A9XkYffriXVItaqODUuCUKuVhHIQZS+tNTwSIfW0bW
+	2fqKZwrocpTWLTGVtwlhnxcu+MGquxh5/wLBSBht/RMYJyitkE0I
+X-Gm-Gg: ASbGncsYcjuYu/fGvENuALj7u2gx3suMHXAv8bzcVPvbkUJYd3vQqQZ9Z6j2jZl8ymD
+	B4b8T3k3rYMKO263k82QhhtMiP6VBFhuFaDekDY70eyzH3AApx2AJXC8cyXcAdQGDTFtGkzxWZI
+	yRtBiDMOsuOpZJNZeq8NVICkiBKZ6G8TgkDxLm4lS1Pxv6mcfAaEEv9WBbvfgfx1SR/EMoxT+Pw
+	eiW94XtYY8X9gmIkJ/wFbbcQQWkrzAivjv1kDROO8MKi/Qo4nWvRQ==
+X-Google-Smtp-Source: AGHT+IE85pf02XYgOqWJTk5Oj3SNAlQRq6+w4IfdCka+V3TtAHSmTn/vQXJogWGVmd93J6MlQ7VYDg==
+X-Received: by 2002:a05:6a00:8c0b:b0:725:e386:3c5b with SMTP id d2e1a72fcca58-72d8c4ae2b5mr3989391b3a.5.1736942314520;
+        Wed, 15 Jan 2025 03:58:34 -0800 (PST)
+Received: from fedora ([2001:250:3c1e:503:ffff:ffff:ffaa:4903])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d40567624sm8933101b3a.41.2025.01.15.03.58.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jan 2025 03:58:33 -0800 (PST)
+Date: Wed, 15 Jan 2025 19:58:27 +0800
+From: Ming Lei <tom.leiming@gmail.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@kernel.org>,
+	Amery Hung <ameryhung@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, bpf <bpf@vger.kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Yonghong Song <yonghong.song@linux.dev>
+Subject: Re: [RFC PATCH 08/22] ublk: bpf: add bpf struct_ops
+Message-ID: <Z4ei40AVuX2sCTmE@fedora>
+References: <20250107120417.1237392-1-tom.leiming@gmail.com>
+ <20250107120417.1237392-9-tom.leiming@gmail.com>
+ <CAADnVQLGw07CNpi7=XHJRgBL2ku7Q23nfah07pBc45G+xeTKxw@mail.gmail.com>
+ <Z4SRrrXeoZ2MwH96@fedora>
+ <CAADnVQK1y2A_-Co5Jx=eeusbcMbEgErxuPzgCqA0yvUU6Uw1CA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgC3Gl9aoYdnvK0ZBA--.21959S12
-X-Coremail-Antispam: 1UD129KBjvJXoW3Xry7Ar13Xw13XFy8XFW3GFg_yoW7GF4UpF
-	Z8XF1rKFWIq3429r4fCw4kurn0q3WkKry5WrWSgry093yUJr1fKFn09Fy8uas0gFW8AF45
-	Xa1Y9ryDK3W7A37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUmS14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67
-	AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI
-	42IY6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
-	4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBI
-	daVFxhVjvjDU0xZFpf9x0JUljgxUUUUU=
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+In-Reply-To: <CAADnVQK1y2A_-Co5Jx=eeusbcMbEgErxuPzgCqA0yvUU6Uw1CA@mail.gmail.com>
 
-From: Zhang Yi <yi.zhang@huawei.com>
+Hello Alexei,
 
-Add support for FALLOC_FL_WRITE_ZEROES. This first allocates blocks as
-unwritten, then issues a zero command outside of the running journal
-handle, and finally converts them to a written state.
+On Mon, Jan 13, 2025 at 01:30:45PM -0800, Alexei Starovoitov wrote:
+> On Sun, Jan 12, 2025 at 8:08 PM Ming Lei <tom.leiming@gmail.com> wrote:
+> >
+> > Hello Alexei,
+> >
+> > Thanks for your comments!
+> >
+> > On Thu, Jan 09, 2025 at 05:43:12PM -0800, Alexei Starovoitov wrote:
+> > > On Tue, Jan 7, 2025 at 4:08 AM Ming Lei <tom.leiming@gmail.com> wrote:
+> > > > +
+> > > > +/* Return true if io cmd is queued, otherwise forward it to userspace */
+> > > > +bool ublk_run_bpf_handler(struct ublk_queue *ubq, struct request *req,
+> > > > +                         queue_io_cmd_t cb)
+> > > > +{
+> > > > +       ublk_bpf_return_t ret;
+> > > > +       struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
+> > > > +       struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
+> > > > +       struct ublk_bpf_io *bpf_io = &data->bpf_data;
+> > > > +       const unsigned long total = iod->nr_sectors << 9;
+> > > > +       unsigned int done = 0;
+> > > > +       bool res = true;
+> > > > +       int err;
+> > > > +
+> > > > +       if (!test_bit(UBLK_BPF_IO_PREP, &bpf_io->flags))
+> > > > +               ublk_bpf_prep_io(bpf_io, iod);
+> > > > +
+> > > > +       do {
+> > > > +               enum ublk_bpf_disposition rc;
+> > > > +               unsigned int bytes;
+> > > > +
+> > > > +               ret = cb(bpf_io, done);
+> > >
+> > > High level observation...
+> > > I suspect forcing all sturct_ops callbacks to have only these
+> > > two arguments and packing args into ublk_bpf_io
+> > > will be limiting in the long term.
+> >
+> > There are three callbacks defined, and only the two with same type for
+> > queuing io commands are covered in this function.
+> >
+> > But yes, callback type belongs to API, which should be designed
+> > carefully, and I will think about further.
+> >
+> > >
+> > > And this part of api would need to be redesigned,
+> > > but since it's not an uapi... not a big deal.
+> > >
+> > > > +               rc = ublk_bpf_get_disposition(ret);
+> > > > +
+> > > > +               if (rc == UBLK_BPF_IO_QUEUED)
+> > > > +                       goto exit;
+> > > > +
+> > > > +               if (rc == UBLK_BPF_IO_REDIRECT)
+> > > > +                       break;
+> > >
+> > > Same point about return value processing...
+> > > Each struct_ops callback could have had its own meaning
+> > > of retvals.
+> > > I suspect it would have been more flexible and more powerful
+> > > this way.
+> >
+> > Yeah, I agree, just the 3rd callback of release_io_cmd_t isn't covered
+> > in this function.
+> >
+> > >
+> > > Other than that bpf plumbing looks good.
+> > >
+> > > There is an issue with leaking allocated memory in bpf_aio_alloc kfunc
+> > > (it probably should be KF_ACQUIRE)
+> >
+> > It is one problem which troubles me too:
+> >
+> > - another callback of struct_ops/bpf_aio_complete_cb is guaranteed to be
+> > called after the 'struct bpf_aio' instance is submitted via kfunc
+> > bpf_aio_submit(), and it is supposed to be freed from
+> > struct_ops/bpf_aio_complete_cb
+> >
+> > - but the following verifier failure is triggered if bpf_aio_alloc and
+> > bpf_aio_release are marked as KF_ACQUIRE & KF_RELEASE.
+> >
+> > ```
+> > libbpf: prog 'ublk_loop_comp_cb': -- BEGIN PROG LOAD LOG --
+> > Global function ublk_loop_comp_cb() doesn't return scalar. Only those are supported.
+> > ```
+> 
+> That's odd.
+> Adding KF_ACQ/REL to bpf_aio_alloc/release kfuncs shouldn't affect
+> verification of ublk_loop_comp_cb() prog. It's fine for it to stay 'void'
+> return.
+> You probably made it global function and that's was the reason for this
+> verifier error. Global funcs have to return scalar for now.
+> We can relax this restriction if necessary.
 
-Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
----
- fs/ext4/extents.c           | 59 ++++++++++++++++++++++++++++++-------
- include/trace/events/ext4.h |  3 +-
- 2 files changed, 50 insertions(+), 12 deletions(-)
+Looks marking ublk_loop_comp_cb() as static doesn't work:
 
-diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
-index 1b028be19193..e937a714085c 100644
---- a/fs/ext4/extents.c
-+++ b/fs/ext4/extents.c
-@@ -4483,6 +4483,8 @@ static int ext4_alloc_file_blocks(struct file *file, ext4_lblk_t offset,
- 	struct ext4_map_blocks map;
- 	unsigned int credits;
- 	loff_t epos, old_size = i_size_read(inode);
-+	unsigned int blkbits = inode->i_blkbits;
-+	bool alloc_zero = false;
- 
- 	BUG_ON(!ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS));
- 	map.m_lblk = offset;
-@@ -4495,6 +4497,17 @@ static int ext4_alloc_file_blocks(struct file *file, ext4_lblk_t offset,
- 	if (len <= EXT_UNWRITTEN_MAX_LEN)
- 		flags |= EXT4_GET_BLOCKS_NO_NORMALIZE;
- 
-+	/*
-+	 * Do the actual write zero during a running journal transaction
-+	 * costs a lot. First allocate an unwritten extent and then
-+	 * convert it to written after zeroing it out.
-+	 */
-+	if (flags & EXT4_GET_BLOCKS_ZERO) {
-+		flags &= ~EXT4_GET_BLOCKS_ZERO;
-+		flags |= EXT4_GET_BLOCKS_UNWRIT_EXT;
-+		alloc_zero = true;
-+	}
-+
- 	/*
- 	 * credits to insert 1 extent into extent tree
- 	 */
-@@ -4531,9 +4544,7 @@ static int ext4_alloc_file_blocks(struct file *file, ext4_lblk_t offset,
- 		 * allow a full retry cycle for any remaining allocations
- 		 */
- 		retries = 0;
--		map.m_lblk += ret;
--		map.m_len = len = len - ret;
--		epos = (loff_t)map.m_lblk << inode->i_blkbits;
-+		epos = (loff_t)(map.m_lblk + ret) << blkbits;
- 		inode_set_ctime_current(inode);
- 		if (new_size) {
- 			if (epos > new_size)
-@@ -4553,6 +4564,21 @@ static int ext4_alloc_file_blocks(struct file *file, ext4_lblk_t offset,
- 		ret2 = ret3 ? ret3 : ret2;
- 		if (unlikely(ret2))
- 			break;
-+
-+		if (alloc_zero &&
-+		    (map.m_flags & (EXT4_MAP_MAPPED | EXT4_MAP_UNWRITTEN))) {
-+			ret2 = ext4_issue_zeroout(inode, map.m_lblk, map.m_pblk,
-+						  map.m_len);
-+			if (likely(!ret2))
-+				ret2 = ext4_convert_unwritten_extents(NULL,
-+					inode, (loff_t)map.m_lblk << blkbits,
-+					(loff_t)map.m_len << blkbits);
-+			if (ret2)
-+				break;
-+		}
-+
-+		map.m_lblk += ret;
-+		map.m_len = len = len - ret;
- 	}
- 	if (ret == -ENOSPC && ext4_should_retry_alloc(inode->i_sb, &retries))
- 		goto retry;
-@@ -4618,7 +4644,11 @@ static long ext4_zero_range(struct file *file, loff_t offset,
- 	if (end_lblk > start_lblk) {
- 		ext4_lblk_t zero_blks = end_lblk - start_lblk;
- 
--		flags |= (EXT4_GET_BLOCKS_CONVERT_UNWRITTEN | EXT4_EX_NOCACHE);
-+		if (mode & FALLOC_FL_WRITE_ZEROES)
-+			flags = EXT4_GET_BLOCKS_CREATE_ZERO | EXT4_EX_NOCACHE;
-+		else
-+			flags |= (EXT4_GET_BLOCKS_CONVERT_UNWRITTEN |
-+				  EXT4_EX_NOCACHE);
- 		ret = ext4_alloc_file_blocks(file, start_lblk, zero_blks,
- 					     new_size, flags);
- 		if (ret)
-@@ -4730,8 +4760,8 @@ long ext4_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
- 
- 	/* Return error if mode is not supported */
- 	if (mode & ~(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |
--		     FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE |
--		     FALLOC_FL_INSERT_RANGE))
-+		     FALLOC_FL_ZERO_RANGE | FALLOC_FL_COLLAPSE_RANGE |
-+		     FALLOC_FL_INSERT_RANGE | FALLOC_FL_WRITE_ZEROES))
- 		return -EOPNOTSUPP;
- 
- 	inode_lock(inode);
-@@ -4762,16 +4792,23 @@ long ext4_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
- 	if (ret)
- 		goto out_invalidate_lock;
- 
--	if (mode & FALLOC_FL_PUNCH_HOLE)
-+	switch (mode & FALLOC_FL_MODE_MASK) {
-+	case FALLOC_FL_PUNCH_HOLE:
- 		ret = ext4_punch_hole(file, offset, len);
--	else if (mode & FALLOC_FL_COLLAPSE_RANGE)
-+		break;
-+	case FALLOC_FL_COLLAPSE_RANGE:
- 		ret = ext4_collapse_range(file, offset, len);
--	else if (mode & FALLOC_FL_INSERT_RANGE)
-+		break;
-+	case FALLOC_FL_INSERT_RANGE:
- 		ret = ext4_insert_range(file, offset, len);
--	else if (mode & FALLOC_FL_ZERO_RANGE)
-+		break;
-+	case FALLOC_FL_ZERO_RANGE:
-+	case FALLOC_FL_WRITE_ZEROES:
- 		ret = ext4_zero_range(file, offset, len, mode);
--	else
-+		break;
-+	default:
- 		ret = -EOPNOTSUPP;
-+	}
- 
- out_invalidate_lock:
- 	filemap_invalidate_unlock(mapping);
-diff --git a/include/trace/events/ext4.h b/include/trace/events/ext4.h
-index 156908641e68..6f9cf2811733 100644
---- a/include/trace/events/ext4.h
-+++ b/include/trace/events/ext4.h
-@@ -92,7 +92,8 @@ TRACE_DEFINE_ENUM(ES_REFERENCED_B);
- 	{ FALLOC_FL_KEEP_SIZE,		"KEEP_SIZE"},		\
- 	{ FALLOC_FL_PUNCH_HOLE,		"PUNCH_HOLE"},		\
- 	{ FALLOC_FL_COLLAPSE_RANGE,	"COLLAPSE_RANGE"},	\
--	{ FALLOC_FL_ZERO_RANGE,		"ZERO_RANGE"})
-+	{ FALLOC_FL_ZERO_RANGE,		"ZERO_RANGE"},		\
-+	{ FALLOC_FL_WRITE_ZEROES,	"WRITE_ZEROES"})
- 
- TRACE_DEFINE_ENUM(EXT4_FC_REASON_XATTR);
- TRACE_DEFINE_ENUM(EXT4_FC_REASON_CROSS_RENAME);
--- 
-2.39.2
+[root@ktest-40 ublk]# make
+  CLNG-BPF ublk_loop.bpf.o
+  GEN-SKEL ublk_loop.skel.h
+libbpf: relocation against STT_SECTION in non-exec section is not supported!
+Error: failed to link '/root/git/linux/tools/testing/selftests/ublk/ublk_loop.bpf.o': Invalid argument (22)
 
+But seems not big deal because we can change its return type to 'int'.
+
+> 
+> >
+> > Here 'struct bpf_aio' instance isn't stored in map, and it is provided
+> > from struct_ops callback(bpf_aio_complete_cb), I appreciate you may share
+> > any idea about how to let KF_ACQUIRE/KF_RELEASE cover the usage here.
+> 
+> This is so that:
+> 
+> ublk_loop_comp_cb ->
+>   ublk_loop_comp_and_release_aio ->
+>     bpf_aio_release
+> 
+> would properly recognize that ref to aio is dropped?
+> 
+> Currently the verifier doesn't support that,
+> but there is work in progress to add this feature:
+> 
+> https://lore.kernel.org/bpf/20241220195619.2022866-2-amery.hung@gmail.com/
+> 
+> then in cfi_stabs annotated bio argument in bpf_aio_complete_cb()
+> as "struct bpf_aio *aio__ref"
+> 
+> Then the verifier will recognize that callback argument
+> comes refcounted and the prog has to call KF_RELEASE kfunc on it.
+
+This looks one very nice feature, thanks for sharing it!
+
+I tried to apply the above patch and patch 3 on next tree and pass 'aio__ref' to the
+callback cfi_stabs, but still failed:
+
+[root@ktest-40 ublk]# ./test_loop_01.sh
+libbpf: prog 'ublk_loop_comp_cb': BPF program load failed: -EINVAL
+libbpf: prog 'ublk_loop_comp_cb': -- BEGIN PROG LOAD LOG --
+0: R1=ctx() R10=fp0
+; int BPF_PROG(ublk_loop_comp_cb, struct bpf_aio *aio, long ret) @ ublk_loop.c:34
+0: (79) r7 = *(u64 *)(r1 +8)          ; R1=ctx() R7_w=scalar()
+1: (79) r6 = *(u64 *)(r1 +0)
+func 'bpf_aio_complete_cb' arg0 has btf_id 37354 type STRUCT 'bpf_aio'
+2: R1=ctx() R6_w=trusted_ptr_bpf_aio()
+; struct ublk_bpf_io *io = ublk_bpf_acquire_io_from_aio(aio); @ ublk_loop.c:24
+2: (bf) r1 = r6                       ; R1_w=trusted_ptr_bpf_aio() R6_w=trusted_ptr_bpf_aio()
+3: (85) call ublk_bpf_acquire_io_from_aio#43231       ; R0_w=ptr_ublk_bpf_io(ref_obj_id=1) refs=1
+4: (bf) r8 = r0                       ; R0_w=ptr_ublk_bpf_io(ref_obj_id=1) R8_w=ptr_ublk_bpf_io(ref_obj_id=1) refs=1
+; ublk_bpf_complete_io(io, ret); @ ublk_loop.c:26
+5: (bf) r1 = r8                       ; R1_w=ptr_ublk_bpf_io(ref_obj_id=1) R8_w=ptr_ublk_bpf_io(ref_obj_id=1) refs=1
+6: (bc) w2 = w7                       ; R2_w=scalar(smin=0,smax=umax=0xffffffff,var_off=(0x0; 0xffffffff)) R7_w=scalar() refs=1
+7: (85) call ublk_bpf_complete_io#43241       ; refs=1
+; ublk_bpf_release_io_from_aio(io); @ ublk_loop.c:27
+8: (bf) r1 = r8                       ; R1_w=ptr_ublk_bpf_io(ref_obj_id=1) R8=ptr_ublk_bpf_io(ref_obj_id=1) refs=1
+9: (85) call ublk_bpf_release_io_from_aio#43257       ;
+; ublk_bpf_dettach_and_complete_aio(aio); @ ublk_loop.c:29
+10: (bf) r1 = r6                      ; R1_w=trusted_ptr_bpf_aio() R6=trusted_ptr_bpf_aio()
+11: (85) call ublk_bpf_dettach_and_complete_aio#43245         ;
+; bpf_aio_release(aio); @ ublk_loop.c:30
+12: (bf) r1 = r6                      ; R1_w=trusted_ptr_bpf_aio() R6=trusted_ptr_bpf_aio()
+13: (85) call bpf_aio_release#95841
+release kernel function bpf_aio_release expects refcounted PTR_TO_BTF_ID
+processed 14 insns (limit 1000000) max_states_per_insn 0 total_states 1 peak_states 1 mark_read 1
+-- END PROG LOAD LOG --
+libbpf: prog 'ublk_loop_comp_cb': failed to load: -EINVAL
+libbpf: failed to load object 'ublk_loop.bpf.o'
+fail to load bpf obj from ublk_loop.bpf.o
+fail to register bpf prog loop ublk_loop.bpf.o
+
+
+
+Thanks,
+Ming
