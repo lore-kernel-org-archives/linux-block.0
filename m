@@ -1,52 +1,35 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A0C23F29B
-	for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 09:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA29248164;
+	Wed, 15 Jan 2025 09:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736933226; cv=none; b=cihT0uIQyVikcDu/rnmySonTYN+p4mrfID0qINnyvv3tAbEUvo/s3llQ7Sgqo7Y4dcyTtEBLTZF1F9n9oX9IPp68SjYZC33hCZwSDSiyKpRbVn688YrIwpbegzWlglOowyuW1Jq8sU+/TsxAB06hGQ92k9LP2hEeHrQF+j+xoy4=
+	t=1736933845; cv=none; b=B4W7eFZyxwLL+yXMlaCM9N+xD6yV7hZ3WmfD5HulTiZ89+u9BcZIs4wq/6acduasPI8UuAd+KgH0eH3dp6c2BWBeWfCR2F1ThYJZeMLV8Znt5a/NCfstoknv+Yw/V7ulMWIpe7sCtz31VWPBdtRx/UlQKwOQGn5/8fYze3smsPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736933226; c=relaxed/simple;
-	bh=HRuynDTjVeVzGfMxgATd2ozGoRfCzQJex+LLSl9v4sc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NgiL6d5ntAt0otMHErwW6nfyCSK+SaLSflBnir0HK8QF0OWqL9rDvB46400gVNxyWGQ3PDLvypfeN/tMZP2KqZWUzl847BWl1CG06MQNy7HOZadtCaPgQZsCDcyiHPli7dhMT6lWbxJ1nJ3Njt+9E2BImOe/G/VHTjxctLvWdcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hsJboMT+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hsJboMT+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736933223;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=33Thuv6bBji2Q9STFyfa+uQEJS3KDxg05CxOfWDCCEs=;
-	b=hsJboMT+320J+ExrIhVRMrleLy4PsrKWnf/n+QAYrOoVs7f9g2tJ/OEXNBG1CdrU4+r1nY
-	yBqeRYIqOY7PRBQXxcxOvmAHFwjGiudMEZw/IAE7v7aqjFztOQf0/LDL4s/QMQ1FVdu8Zv
-	q0Z28pxY3zqpnMl3ywCLwgtGC4PneGA=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-93-8O_FV8cDPhagQZ9uLW_2rw-1; Wed,
- 15 Jan 2025 04:26:59 -0500
-X-MC-Unique: 8O_FV8cDPhagQZ9uLW_2rw-1
-X-Mimecast-MFC-AGG-ID: 8O_FV8cDPhagQZ9uLW_2rw
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 05F591956048;
-	Wed, 15 Jan 2025 09:26:58 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.128])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 008D93003FD3;
-	Wed, 15 Jan 2025 09:26:55 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] block: limit disk max sectors to (LLONG_MAX >> 9)
-Date: Wed, 15 Jan 2025 17:26:48 +0800
-Message-ID: <20250115092648.1104452-1-ming.lei@redhat.com>
+	s=arc-20240116; t=1736933845; c=relaxed/simple;
+	bh=RICQ+FugO2UuAfARIMKAug4IAivXM59w3ZjanIHQpkc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iN0lfQrPRcc5XY0NCOehem8tyDZi7ZKinHkDAMb9VL///AddYGNw/mGq7dXm2ZABqV7jYCy9nfqfxOKos5UlDO69WwmO9C+n6RkOnvxT0Sc5M0xX0IQeyYJNHygJLTubbbDH4RTUMybEgl7FrTMIPw5s42vvX7nLjBooIQjqkFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=193.43.8.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: from altlinux.ipa.basealt.ru (unknown [178.76.204.78])
+	by air.basealt.ru (Postfix) with ESMTPSA id 3B720233A9;
+	Wed, 15 Jan 2025 12:37:20 +0300 (MSK)
+From: Vasiliy Kovalev <kovalev@altlinux.org>
+To: stable@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	kovalev@altlinux.org,
+	Tejun Heo <tj@kernel.org>,
+	Abagail ren <renzezhongucas@gmail.com>,
+	Linus Torvalds <torvalds@linuxfoundation.org>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 5.10/5.15] blk-cgroup: Fix UAF in blkcg_unpin_online()
+Date: Wed, 15 Jan 2025 12:37:09 +0300
+Message-Id: <20250115093709.335950-1-kovalev@altlinux.org>
+X-Mailer: git-send-email 2.33.8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,62 +37,91 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Kernel `loff_t` is defined as `long long int`, so we can't support disk
-which size is > LLONG_MAX.
+From: Tejun Heo <tj@kernel.org>
 
-There are many virtual block drivers, and hardware may report bad capacity
-too, so limit max sectors to (LLONG_MAX >> 9) for avoiding potential
-trouble.
+commit 86e6ca55b83c575ab0f2e105cf08f98e58d3d7af upstream.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+blkcg_unpin_online() walks up the blkcg hierarchy putting the online pin. To
+walk up, it uses blkcg_parent(blkcg) but it was calling that after
+blkcg_destroy_blkgs(blkcg) which could free the blkcg, leading to the
+following UAF:
+
+  ==================================================================
+  BUG: KASAN: slab-use-after-free in blkcg_unpin_online+0x15a/0x270
+  Read of size 8 at addr ffff8881057678c0 by task kworker/9:1/117
+
+  CPU: 9 UID: 0 PID: 117 Comm: kworker/9:1 Not tainted 6.13.0-rc1-work-00182-gb8f52214c61a-dirty #48
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS unknown 02/02/2022
+  Workqueue: cgwb_release cgwb_release_workfn
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x27/0x80
+   print_report+0x151/0x710
+   kasan_report+0xc0/0x100
+   blkcg_unpin_online+0x15a/0x270
+   cgwb_release_workfn+0x194/0x480
+   process_scheduled_works+0x71b/0xe20
+   worker_thread+0x82a/0xbd0
+   kthread+0x242/0x2c0
+   ret_from_fork+0x33/0x70
+   ret_from_fork_asm+0x1a/0x30
+   </TASK>
+  ...
+  Freed by task 1944:
+   kasan_save_track+0x2b/0x70
+   kasan_save_free_info+0x3c/0x50
+   __kasan_slab_free+0x33/0x50
+   kfree+0x10c/0x330
+   css_free_rwork_fn+0xe6/0xb30
+   process_scheduled_works+0x71b/0xe20
+   worker_thread+0x82a/0xbd0
+   kthread+0x242/0x2c0
+   ret_from_fork+0x33/0x70
+   ret_from_fork_asm+0x1a/0x30
+
+Note that the UAF is not easy to trigger as the free path is indirected
+behind a couple RCU grace periods and a work item execution. I could only
+trigger it with artifical msleep() injected in blkcg_unpin_online().
+
+Fix it by reading the parent pointer before destroying the blkcg's blkg's.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Reported-by: Abagail ren <renzezhongucas@gmail.com>
+Suggested-by: Linus Torvalds <torvalds@linuxfoundation.org>
+Fixes: 4308a434e5e0 ("blkcg: don't offline parent blkcg first")
+Cc: stable@vger.kernel.org # v5.7+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+[kovalev: in versions 5.10 and 5.15, the blkcg_unpin_online()
+function was not moved to the block/blk-cgroup.c file]
+Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
 ---
- block/blk.h   |  2 ++
- block/genhd.c | 10 ++++++++++
- 2 files changed, 12 insertions(+)
+Backport to fix CVE-2024-56672
+Link: https://www.cve.org/CVERecord/?id=CVE-2024-56672
+---
+ include/linux/blk-cgroup.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk.h b/block/blk.h
-index 4904b86d5fec..90fa5f28ccab 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -13,6 +13,8 @@
- 
- struct elevator_type;
- 
-+#define	BLK_DEV_MAX_SECTORS	(LLONG_MAX >> 9)
-+
- /* Max future timer expiry for timeouts */
- #define BLK_MAX_TIMEOUT		(5 * HZ)
- 
-diff --git a/block/genhd.c b/block/genhd.c
-index befb7a516bcf..e9375e20d866 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -58,6 +58,13 @@ static DEFINE_IDA(ext_devt_ida);
- 
- void set_capacity(struct gendisk *disk, sector_t sectors)
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 0e6e84db06f674..b89099360a8673 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -428,10 +428,14 @@ static inline void blkcg_pin_online(struct blkcg *blkcg)
+ static inline void blkcg_unpin_online(struct blkcg *blkcg)
  {
-+	if (sectors > BLK_DEV_MAX_SECTORS) {
-+		pr_warn_once("%s: truncate capacity from %lld to %lld\n",
-+				disk->disk_name, sectors,
-+				BLK_DEV_MAX_SECTORS);
-+		sectors = BLK_DEV_MAX_SECTORS;
-+	}
+ 	do {
++		struct blkcg *parent;
 +
- 	bdev_set_nr_sectors(disk->part0, sectors);
+ 		if (!refcount_dec_and_test(&blkcg->online_pin))
+ 			break;
++
++		parent = blkcg_parent(blkcg);
+ 		blkcg_destroy_blkgs(blkcg);
+-		blkcg = blkcg_parent(blkcg);
++		blkcg = parent;
+ 	} while (blkcg);
  }
- EXPORT_SYMBOL(set_capacity);
-@@ -400,6 +407,9 @@ int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
- 	struct device *ddev = disk_to_dev(disk);
- 	int ret;
  
-+	if (WARN_ON_ONCE(bdev_nr_sectors(disk->part0) > BLK_DEV_MAX_SECTORS))
-+		return -EINVAL;
-+
- 	if (queue_is_mq(disk->queue)) {
- 		/*
- 		 * ->submit_bio and ->poll_bio are bypassed for blk-mq drivers.
 -- 
-2.44.0
+2.33.8
 
