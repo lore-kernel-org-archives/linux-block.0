@@ -1,202 +1,289 @@
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2060.outbound.protection.outlook.com [40.107.237.60])
+Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C7F1D88D7;
-	Wed, 15 Jan 2025 21:07:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736975255; cv=fail; b=gpO/4FKowe5dQ0k+nnivH7QwJTgfszXSOGJZwIrD1X7+EECa9Kov+ySasbbj9fa7KztVkopP6E8iHze9ECITkebTQWHeLZMDnAg+jShUwRKeTmj+FJvpTgn4UvEWEWYrpo9Sjm01YI1AoTnBXS1OxZZyK61Yo/RL4kKr0LfKhNk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736975255; c=relaxed/simple;
-	bh=q2z0d9AHaYrIa6/u5aTMcZyK6moW/1ZH9kveojHwyMM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=m1jY/pj+sIQYIAWyk30opGlJP/sdcOko+Pc97+sQAeBvQfAOsW9mEUPH7q/CIhDYWX8IlPe+IzMHnQWMDSLhAFRtMhudxlW9TDLCDIQg1bDl3MPSSjDJCRFWdh7RkRjWL32hU9nR3NRq5UWiuFTzmOyoYGTZSwq0mtqhZdH9UAs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=G1dBD5d+; arc=fail smtp.client-ip=40.107.237.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18CB51D6DDA
+	for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 22:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736981228; cv=none; b=jR6gy7WUG4Q1rWe78iB2gPD03QyldOuL0Uzod5tOAyU00Qs1fZ6lX4Kphk2jL+aZME8LvQamwR/KKcKrYLdS/q1sv6MVoJHvQfWnOjXHs+J041ukJgbwMnmm1BWUohYULVwrMciAnFVrksek1OxbAdUxJnGaQ8HpewI3iRmSd5k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736981228; c=relaxed/simple;
+	bh=TJR7pVhJscDnisut/Z7wWgP0dKgTP7eaPEk+hTPN8f8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BrJpNmPW7uudhRjeyFDQEPBIGuoWYSzKw0y7VFDJTX1DaF+d9+RPkBu0rn20CTOo4/wgWgsn+lVOOT5sTVM4xUfYsVpz1wXjw6SuucCygJqEj1skAXCNH8+EoOY401c4X/0ghruDB3pzN+jfVuH3F6Ob+k+3oRi32gGrdW8MLRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=2Y9QD+aq; arc=none smtp.client-ip=199.89.1.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="G1dBD5d+"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UCVg8h4zD2mau2r9RD9GLFB81fi/gQOeOMw4efCYk3yzffx9VhmBk6/rJCcibPkhdkwvgkJCH2PJATQpguNwyruCzPfaOeVdnxJHKs6TraPntAbRPOonEPxKq+AC7IsGExWM5q8Fwpd8UFgQUpKkLS7oa1Yvo6MHyhLeRFPMrCuc2R6BOV+BacMiA2zmZ2Y2Jw6Vl8lZMzt39Rzarfg3I0l/dwkcX2u4qThw26lC/srDRjDtCJyxYTblmlZMUJ0EHKcqEGFultV1WqtneqVExaAZBTNXPrhKtykMHcK6zszfRdInY1ubY8NJJL1MPzTqABoAzonqwgqr9WFd/hbzAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=q2z0d9AHaYrIa6/u5aTMcZyK6moW/1ZH9kveojHwyMM=;
- b=P3WYIqUcLWXCTBtLHnS4FFlr8b9IJ8k1zPsXMngb7807Z9Q3KuqYzdIs2gdcgg9M3tAZAe61uWHTeAjJnOS9C/Pejw6lAmVgTxKvJ8AdjnbcgrhfsxnyEgGMGrse+VN1YLQRTrq44hzVw/VM2h26vGndgb01A9ftNncY0TEjpurCxLkPmfR3hiEFj2iencppP7AfM3Kk0zYFE8gQivOiRoJL5ECjgtHEmdvOUWK79sXEFSPP7FjpkfFOo3z/rwipDvt+jnR1QJh0nSCP+hwJ/bI0eBihiiWsMLfrYT5C1gW4YFIs5qjwfFvJwBTuhkZIZpo4l7b56oT0fbso0Ndo0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q2z0d9AHaYrIa6/u5aTMcZyK6moW/1ZH9kveojHwyMM=;
- b=G1dBD5d+2LcZ7mVvkTEd/8BfWrphcD/DBsPHUwWG2jLScPMsFoNtg383AJx1XRRw//tdhj/dYvQMl1hAdDy0aGX07tbe0mMGMA8rEKWA3eFbjtvzf7BjJ6v5ZRY1fbBOqhICCutK2izoc1a0GtRzlRb1zRk5Rm2lu0F8GllLOvX3kufHN6LozoFLpREHdYtreJIxm7r+lq8RSJ0GHwBWAx54gnC1PN2LC/M5tLNSRwn/qg07wZQPgc6g2cUC+BJgjD4OkLLPHgrpwzQI7U//PomjLz1ITPGS6KM02iXQuwRWqso8GNoQQo+GV1B35BSNgTjbCr6Cw0t9HXygdqwkLQ==
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
- by MN0PR12MB5714.namprd12.prod.outlook.com (2603:10b6:208:371::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.13; Wed, 15 Jan
- 2025 21:07:29 +0000
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::57ac:82e6:1ec5:f40b]) by LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::57ac:82e6:1ec5:f40b%6]) with mapi id 15.20.8335.017; Wed, 15 Jan 2025
- 21:07:29 +0000
-From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To: Zhang Yi <yi.zhang@huaweicloud.com>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-ext4@vger.kernel.org"
-	<linux-ext4@vger.kernel.org>, "linux-block@vger.kernel.org"
-	<linux-block@vger.kernel.org>, "dm-devel@lists.linux.dev"
-	<dm-devel@lists.linux.dev>, "linux-nvme@lists.infradead.org"
-	<linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org"
-	<linux-scsi@vger.kernel.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"hch@lst.de" <hch@lst.de>, "tytso@mit.edu" <tytso@mit.edu>,
-	"djwong@kernel.org" <djwong@kernel.org>, "yi.zhang@huawei.com"
-	<yi.zhang@huawei.com>, "chengzhihao1@huawei.com" <chengzhihao1@huawei.com>,
-	"yukuai3@huawei.com" <yukuai3@huawei.com>, "yangerkun@huawei.com"
-	<yangerkun@huawei.com>, Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [RFC PATCH v2 0/8] fallocate: introduce FALLOC_FL_WRITE_ZEROES
- flag
-Thread-Topic: [RFC PATCH v2 0/8] fallocate: introduce FALLOC_FL_WRITE_ZEROES
- flag
-Thread-Index: AQHbZ0QJnN9JMxAGd0WQ00eLUDP5bbMYVG8A
-Date: Wed, 15 Jan 2025 21:07:28 +0000
-Message-ID: <ccebada1-ac72-468e-8342-a9c645e5221e@nvidia.com>
-References: <20250115114637.2705887-1-yi.zhang@huaweicloud.com>
-In-Reply-To: <20250115114637.2705887-1-yi.zhang@huaweicloud.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|MN0PR12MB5714:EE_
-x-ms-office365-filtering-correlation-id: 26fd8b49-665d-4509-c083-08dd35a89eb9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|10070799003|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?Y1ZrRTNiZmhHckowZWo5bW9QNkdIblFZUXNSMWNzZkpBZ20rOUVzcS9LZFVu?=
- =?utf-8?B?Z2dwVjE0S2dhRXhPbXpWTkxFWE1vc0NOU0ZJNW9YV2JZUHVzT1kydUhxekJt?=
- =?utf-8?B?MldNL2EzRC9GaElNajBsVGZRZWhSNk9ocy9Vc1J3R0puVm0yV3l3Sjh1ZFJP?=
- =?utf-8?B?WmFHRzRmbzdIa3BmT0ZFZi9TTVlFT3Uwby9iNkRQc0lGWlhGRkFVd245YzFE?=
- =?utf-8?B?MnZZZnpkcXBXVXNWMnZTYUdITWwvUXV5ZlNjNk1OMytIbEVMVmp3TDF5OElo?=
- =?utf-8?B?NDRuckhLcnFGYVIvRDBubGR0MW53QXBZdVA3QVlEOWlJcWgzQ0xKMGx0L0xw?=
- =?utf-8?B?OUNvbGdLSVpXQ2lVcngvZytQS0lUTWVlc1BCOU91dlB2OGNtemJyMmM1R2xk?=
- =?utf-8?B?N1R3UmF5N0NxZ0FEeG9jN0tvUk9lTk1DTndoYjl5K25paFR6OW1PWTExSHBB?=
- =?utf-8?B?dnVsYXZjN0ZPc3BFeHdhSzgvMWtJUWE4UFN6VjN2bk1acjhTOUh5N1hnRnFD?=
- =?utf-8?B?bVBlTERDNnEzbzMxL0diMGZXSGdwQzd5dUZLcnlDV3RzdTU0L2ZkNmI2YVpY?=
- =?utf-8?B?OEkyYVVYWDVRc2IrYWlOYzFXY20xQkpjKzJhSWRSdG83V29SOW1raG52NGky?=
- =?utf-8?B?SVc2NnUrODZTSDdvcmZleitvNW91Rk0yVm9YekdoYVVxcHNWOE5pMVRTSHNY?=
- =?utf-8?B?c1dxQUJHSVlPMUxjbStPTnJCNzNJek5ZeDRCeCtJVnFkYzZqL2tKa3p3WkVV?=
- =?utf-8?B?UmxWK2JyYUt4MXo3Mk1Xb3E3TjdyUDVIMFhJbGwwODliMjNGeUpVVzI3R3g1?=
- =?utf-8?B?dnBOVGtwWDFzWnFJRUhnYnltS2lrKzJ3U0xxNUVyeE8rYzVjYkluSW80N1Y1?=
- =?utf-8?B?YTFCZHFXUE5HZDdLUTRiUnVWYWpkdHRpNkdQRS9tKzl0RTE3VGkvdSs4MXpR?=
- =?utf-8?B?eWtDMXZkQWU1eFU0ODE3TXVVR1BscmdwMXR0bXBvbFNWKzBkUndDa1RJckZm?=
- =?utf-8?B?NzZqeFpBdVFBajVEZ0l3ZnRQUlpFbFc2SFZ0QkRiRnBZemdlQWJqTjFTMW1s?=
- =?utf-8?B?d2lnenZXcHpWL2tTcCtOTFg4QXkzQjY4THFFc3NQOTk4SHJTSFErdFhFdldx?=
- =?utf-8?B?Q0ZOd2lod2VsNHJZMTRoQ3RKR1B1TmZZSTVMVVkvMW5zczRSMStJM25HMGxz?=
- =?utf-8?B?MGltVE5xSmpTY05WRnBiVnVEWVlBQllYVzZvNmFUbVNLYytoRHgzK2Mvb0Y5?=
- =?utf-8?B?SndISFNlVXBtU2pyTCthc3N4QjBURGxKS3pyQU5jM2ZvNVlhUjgrd3RjYlVC?=
- =?utf-8?B?VDYzamllNjNucDVxNUE3QzM0QkdmS25XSnNGQ0p5VTBCb050WVcwRk41Ukda?=
- =?utf-8?B?U0ZpWW4vNHEzcDlUNTgyU05vTkNNRUlnNjZwaW5qckhKTnNETmZvVjRlU0h6?=
- =?utf-8?B?OU9WVVhzRzlmTy82TG54ZzN3aXEyQ0cvZVYzRGdxdTdmOVFjWHB6Y3orU1lZ?=
- =?utf-8?B?TytLclptWnhZSlFTbEdpa2tkMGZEL1h1SWJVbXg5Q2t3S0VmOGRRb3BjcStw?=
- =?utf-8?B?NmlJSXhzT1E2SXFVVnBtUHlTYTZSMWJzbHRCcyt5eGwvRnIvTHZoYmZvYStJ?=
- =?utf-8?B?WlFEazF0dEZ1K3BpL1N2MVB5cXlhenYwTi9CK3hOc2NiU2JqSG1LUDBoMndD?=
- =?utf-8?B?NGxENDdlV01KSWVRRXVGQmMwYnBmdDZ2eFlJOFBvVUhjYlUxQVp4OWdPRVJ5?=
- =?utf-8?B?UUN6ZTZJY28zb2ZTWmhHQWREeHFTVW5Wcm1obEZ1UllWdGl1SEdTWXkyWC9J?=
- =?utf-8?B?UlpGeWFnT1hjNmQvRUZmZ0k2YkZKSzFUUlQrcWFLRCtQNUoxTjBjMFltUE1K?=
- =?utf-8?B?YjhtWlpiTS85dXQvUEVFTk5IY3dwc0RpSWYvQ2I2ei9CbGp2TncyV3d0ZjM1?=
- =?utf-8?Q?TEkVGbEvwTsjdRF+ZNz6F8qlObd7U6rz?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(10070799003)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?T21xSW1CZ3NNYlZ5bFRUK0l4ODFRd3FUZnYvR2pUUVBvNFlmWFNhRmJXWW9L?=
- =?utf-8?B?cktraG5LaFVIOHo2YndNNW1sWjF6UzI0NjcvQVMwQXZ1Y2FBUXU3TmlRODFs?=
- =?utf-8?B?NDdVdEJZeEVIbzlLa0xINE5TWW1ycmxrblh4Rk4wZ0ZpWUd3OUVHM3lwTWJw?=
- =?utf-8?B?aDV3Vm1XcUZxMDFHUk5CS01HMlpmSE84UDVLSG5zRWp6K2tiTVhTdGhadG9G?=
- =?utf-8?B?SnpOLzlGd3ZGTzJxelloWUtLa0d2RU05cnhaNTAxaXVtbDB0TW1ueCtkYjNa?=
- =?utf-8?B?c2QxTWhjQXNqRndHcThFZTRHeHFoWDZSb1VXVXErZmJSRkNxQ2piRzFjQ0ZC?=
- =?utf-8?B?c2oyNnF3WUJCWVRLZlBVd0F5Wjgrb3c1VHBMZzg1WFhNalRza2JnZmVkSEtE?=
- =?utf-8?B?c2wranIyQndNK1VvdXgrYWdDVzVsbUhacjZzcGZVOXc1UnNMSTgwZTlQKytC?=
- =?utf-8?B?NkFKQ0ZKS0RkNnNtbkVRUUkvQmExL1dkV0duNGhSc2gxZ1VQa2ZVaVU5WCsv?=
- =?utf-8?B?OElXSFgyRHhVQ291L3oxaWl2anVDbmo3ZXhhY3pTL3lIWkx2VVk0dTNCVWRq?=
- =?utf-8?B?Q2Z3UXprUUo3c1hBNjZ3T08wUWc0ZDNVVllwa3M1cVcyTTJ1eTltRkw1clhz?=
- =?utf-8?B?U1MwUDdFVjlXSnFIcDBQOGZuZlpMdHRCRVZ5cXJpUjl6K3ZlWkdvSDJWMWtu?=
- =?utf-8?B?YWs5ZC9HaGk1TW5VRFNaaUtrRHJ5UTFKWVFOTldBRTNwTmJwV2xrNHhQaW9j?=
- =?utf-8?B?K3hsSHNsbGJydjFEMmpJWjAzS1o1alhYZ3NCeDRxWW9zWlRSZGUvaHRYOWtw?=
- =?utf-8?B?SkdqVEorcHc4SWx6RkdWS1B6eXlKRzFWdlVSMDR3Y1ZXVzh0REllR3ovRUFT?=
- =?utf-8?B?RWp5Q2xSbmcvNTdGdWNuK2hpS2twYmxNUmZVMktxMTRCL2hEV3pHZzNzc2pn?=
- =?utf-8?B?RVdWNlNQeUJUT1hHeTF6N0c3Qng1Um5QcFR6VmpMYmFnbi9remthVTBkMzEx?=
- =?utf-8?B?aW9rdjJONDdLZEVyOWRWRUtweW5CMUt6b2N6SVF5Z0swZm9NQ0VNdUR1K3Fa?=
- =?utf-8?B?bk5RSVZqbG5ZUW53REZqTFk1Q2ZKelFPbzNRczMwYVUzK0htZUtZbFFZZXpw?=
- =?utf-8?B?L2lVUFpVeHM0dHhtaW1kWEdDdmNHbHEzUGtQSm5SRFlwUk05eXlKdmpWOG1h?=
- =?utf-8?B?QWVPRlFPcGRqZDRrY1dMTncxakVXMUVjVUNTaVpadFYzcG82L1VUV013cnd1?=
- =?utf-8?B?amo4REFFd2pmTDNLM0EzSzlUVHhEYjVzWHV5bDQ4bnpleXZ6WVlGZ2RiUjdh?=
- =?utf-8?B?UDlBdjNvODlUWk91eGliSHdVRGV0d0ZEeVBZTU5CNlBzSFhqNnBEL21CLzlU?=
- =?utf-8?B?eWVWUUtnSkFrcE9tNzlySlJoVGRsSW91NTNMK1dZaXlmQ1dLQTRYRGNQTUhX?=
- =?utf-8?B?NG5iQzFSY05NZGlYa2ZWK05jaGwrWFcrYitTcEdxTjVtZHNDSENseGl4VVZB?=
- =?utf-8?B?eXJVN1BSNmRRR05nMjE5SDIzQzVLY3pmWGFZQTUyd2ZYMXY0aEU1RTVCSTRP?=
- =?utf-8?B?dGZFRjVrc01LczNMRis0K1RsZEovTlN2Y2NLd0RYM1pMZE01eHZYS20zUEho?=
- =?utf-8?B?bGRKMUlOVFNSMDFiOGNpYTd3UlR6SlI2NDJRUEZBM0c1SXFaelU5Q3dRaVp2?=
- =?utf-8?B?TGcrM0NJdzkzSjYzeVJLNjhvVUtNckMvYUQrMWtZZ3YyVzdpM2ljYkNha0Y0?=
- =?utf-8?B?UDZSZGhvNHcxbWtqRGdNbkVlY2JycDg3UCtxZytORmpYNkx3QUZxMzNOVGQ4?=
- =?utf-8?B?c0lLTlZXeFVza0hjczZ5RGxpbXBqU1RTYnZBOS8rdCt6MUpVR1M2RzhkUHI0?=
- =?utf-8?B?T1l6Mk1wVXJHU1VoV2xmejUxU1RYN2VHSDNWS09LRjJJZFEwZFVPMmlEMXk1?=
- =?utf-8?B?Y0hrT21tSUtpWVJlWlNIWkh5T3lTMFIzZTVmMDBDN3FmUUhOMEdpdm9paFlt?=
- =?utf-8?B?MnhLQk9MRWtkT3hvay9lcFJPb3c4ZDdhQk84dEo2ZTV3UFB1NGcycVVON3lM?=
- =?utf-8?B?bW5wR0NMM2VCSE9tWjhOeTl2b3pieEZ1WTVTdkdZYStUcXdpOEVObWcyd09M?=
- =?utf-8?B?d3M2VEFVRjdWYjBMcWFxWHlHYVl1VElQQm9WRSthdnIydXFDQmEvN1R6anRE?=
- =?utf-8?Q?+5Zh2YE+6wiQXqMi6eO1n7iqqBu0+RQdUhjmC49WX77S?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B800232B8EFEEB48B658525552E22516@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="2Y9QD+aq"
+Received: from localhost (localhost [127.0.0.1])
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YYLj52whpz6CmQyY;
+	Wed, 15 Jan 2025 22:47:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1736981218; x=1739573219; bh=9zmItiBmKaKBeK+GbLI9Vu0yvkWx7p5MaDM
+	1TFcZ6Ho=; b=2Y9QD+aqnJPjzuwZkof3fWim9O5Gt/BaimqBiybB/5kPav3mgtt
+	uePqQ91cxvk8NCtgvx95j1RGdSP+SyjjRKznIQ/zE4G6IkpaGB2mp+3ucBYg4t+G
+	yA4aB2+SRCt6r/1/994dZTmMmjfP1nXNu2/x4QWbutNm4rnNOf5DYXdH5XugK/jM
+	sqbpZUHgv7KxMZrPgfIUPKVjAU/YzbhLypRpkgJLu2uuFe+GHtV4e2Biw+MMFzrq
+	xiHSAoHN7envgM1qHoCmd9nMjBJ8a3brgfV+aGhrUk1WFFn5VRAgPAvIdZpHQtCP
+	lBrCvuKR++pNUEkuZM4knf27xu+N9mgjEsQ==
+X-Virus-Scanned: by MailRoute
+Received: from 008.lax.mailroute.net ([127.0.0.1])
+ by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id VfqrOIpUpN73; Wed, 15 Jan 2025 22:46:58 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YYLhw2rGdz6CmR5y;
+	Wed, 15 Jan 2025 22:46:55 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v17 00/14] Improve write performance for zoned UFS devices
+Date: Wed, 15 Jan 2025 14:46:34 -0800
+Message-ID: <20250115224649.3973718-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 26fd8b49-665d-4509-c083-08dd35a89eb9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jan 2025 21:07:28.9873
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TDbssn+JkdEFfHC2LfDe765AEyMLnAu8tcU+qslTW/nI4osTS8GYKkuk0MAWeP2thaBq8U+VOQqSDS/Ok8S/Vg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5714
+Content-Transfer-Encoding: quoted-printable
 
-T24gMS8xNS8yNSAwMzo0NiwgWmhhbmcgWWkgd3JvdGU6DQo+IEN1cnJlbnRseSwgd2UgY2FuIHVz
-ZSB0aGUgZmFsbG9jYXRlIGNvbW1hbmQgdG8gcXVpY2tseSBjcmVhdGUgYQ0KPiBwcmUtYWxsb2Nh
-dGVkIGZpbGUuIEhvd2V2ZXIsIG9uIG1vc3QgZmlsZXN5c3RlbXMsIHN1Y2ggYXMgZXh0NCBhbmQg
-WEZTLA0KPiBmYWxsb2NhdGUgY3JlYXRlIHByZS1hbGxvY2F0aW9uIGJsb2NrcyBpbiBhbiB1bndy
-aXR0ZW4gc3RhdGUsIGFuZCB0aGUNCj4gRkFMTE9DX0ZMX1pFUk9fUkFOR0UgZmxhZyBhbHNvIGJl
-aGF2ZXMgc2ltaWxhcmx5LiBUaGUgZXh0ZW50IHN0YXRlIG11c3QNCj4gYmUgY29udmVydGVkIHRv
-IGEgd3JpdHRlbiBzdGF0ZSB3aGVuIHRoZSB1c2VyIHdyaXRlcyBkYXRhIGludG8gdGhpcw0KPiBy
-YW5nZSBsYXRlciwgd2hpY2ggY2FuIHRyaWdnZXIgbnVtZXJvdXMgbWV0YWRhdGEgY2hhbmdlcyBh
-bmQgY29uc2VxdWVudA0KPiBqb3VybmFsIEkvTy4gVGhpcyBtYXkgbGVhZHMgdG8gc2lnbmlmaWNh
-bnQgd3JpdGUgYW1wbGlmaWNhdGlvbiBhbmQNCj4gcGVyZm9ybWFuY2UgZGVncmFkYXRpb24gaW4g
-c3luY2hyb25vdXMgd3JpdGUgbW9kZS4gVGhlcmVmb3JlLCB3ZSBuZWVkIGENCj4gbWV0aG9kIHRv
-IGNyZWF0ZSBhIHByZS1hbGxvY2F0ZWQgZmlsZSB3aXRoIHdyaXR0ZW4gZXh0ZW50cyB0aGF0IGNh
-biBiZQ0KPiB1c2VkIGZvciBwdXJlIG92ZXJ3cml0aW5nLiBBdCB0aGUgbW9uZW50LCB0aGUgb25s
-eSBtZXRob2QgYXZhaWxhYmxlIGlzDQo+IHRvIGNyZWF0ZSBhbiBlbXB0eSBmaWxlIGFuZCB3cml0
-ZSB6ZXJvIGRhdGEgaW50byBpdCAoZm9yIGV4YW1wbGUsIHVzaW5nDQo+ICdkZCcgd2l0aCBhIGxh
-cmdlIGJsb2NrIHNpemUpLiBIb3dldmVyLCB0aGlzIG1ldGhvZCBpcyBzbG93IGFuZCBjb25zdW1l
-cw0KPiBhIGNvbnNpZGVyYWJsZSBhbW91bnQgb2YgZGlzayBiYW5kd2lkdGgsIHdlIG11c3QgcHJl
-LWFsbG9jYXRlIGZpbGVzIGluDQo+IGFkdmFuY2UgYnV0IGNhbm5vdCBhZGQgcHJlLWFsbG9jYXRl
-ZCBmaWxlcyB3aGlsZSB1c2VyIGJ1c2luZXNzIHNlcnZpY2VzDQo+IGFyZSBydW5uaW5nLg0KDQpp
-dCB3aWxsIGJlIHZlcnkgdXNlZnVsIGlmIHdlIGNhbiBnZXQgc29tZSBibGt0ZXN0cyBmb3Igc2Nz
-aS9udm1lL2RtLg0KUGxlYXNlIG5vdGUgdGhhdCB0aGlzIG5vdCBhIGJsb2NrZXIgdG8gZ2V0IHRo
-aXMgcGF0aCBzZXJpZXMgdG8gYmUgbWVyZ2VkLA0KYnV0IHRoaXMgd2lsbCBoZWxwIGV2ZXJ5b25l
-IGluY2x1ZGluZyByZWd1bGFyIHRlc3RzIHJ1bnMgd2UgZG8gdG8gZW5zdXJlDQp0aGUgc3RhYmls
-aXR5IG9mIG5ldyBpbnRlcmZhY2UuDQoNCmlmIHlvdSBkbyBwbGVhc2UgQ0MgYW5kIFNoaW5pY2hp
-cm8gKGFkZGVkIHRvIENDIGxpc3QpIHRvIHdlIGNhbiBoZWxwIHRob3NlDQp0ZXN0cyByZXZpZXcg
-YW5kIHBvdGVudGlhbGx5IGFsc28gY2FuIHByb3ZpZGUgdGVzdGVkIGJ5IHRhZyB0aHQgY2FuIGhl
-bHANCnRoaXMgd29yayB0byBtb3ZlIGZvcndhcmQuDQoNCi1jaw0KDQoNCg==
+Hi Damien and Christoph,
+
+This patch series improves small write IOPS by a factor of four (+300%) f=
+or
+zoned UFS devices on my test setup. Please help with reviewing this patch
+series.
+
+Thanks,
+
+Bart.
+
+Changes compared to v16:
+ - Rebased the entire patch series on top of Jens' for-next branch. Compa=
+red
+   to when v16 of this series was posted, the BLK_ZONE_WPLUG_NEED_WP_UPDA=
+TE
+   flag has been introduced and support for REQ_NOWAIT has been fixed.
+ - The behavior for SMR disks is preserved: if .driver_preserves_write_or=
+der
+   has not been set, BLK_ZONE_WPLUG_NEED_WP_UPDATE is still set if a writ=
+e
+   error has been encountered. If .driver_preserves_write_order has not b=
+een
+   set, the write pointer is restored and the failed zoned writes are ret=
+ried.
+ - The superfluous "disk->zone_wplugs_hash_bits !=3D 0" tests have been r=
+emoved.
+
+Changes compared to v15:
+ - Reworked this patch series on top of the zone write plugging approach.
+ - Moved support for requeuing requests from the SCSI core into the block
+   layer core.
+ - In the UFS driver, instead of disabling write pipelining if
+   auto-hibernation is enabled, rely on the requeuing mechanism to handle
+   reordering caused by resuming from auto-hibernation.
+
+Changes compared to v14:
+ - Removed the drivers/scsi/Kconfig.kunit and drivers/scsi/Makefile.kunit
+   files. Instead, modified drivers/scsi/Kconfig and added #include "*_te=
+st.c"
+   directives in the appropriate .c files. Removed the EXPORT_SYMBOL()
+   directives that were added to make the unit tests link.
+ - Fixed a double free in a unit test.
+
+Changes compared to v13:
+ - Reworked patch "block: Preserve the order of requeued zoned writes".
+ - Addressed a performance concern by removing the eh_needs_prepare_resub=
+mit
+   SCSI driver callback and by introducing the SCSI host template flag
+   .needs_prepare_resubmit instead.
+ - Added a patch that adds a 'host' argument to scsi_eh_flush_done_q().
+ - Made the code in unit tests less repetitive.
+
+Changes compared to v12:
+ - Added two new patches: "block: Preserve the order of requeued zoned wr=
+ites"
+   and "scsi: sd: Add a unit test for sd_cmp_sector()"
+ - Restricted the number of zoned write retries. To my surprise I had to =
+add
+   "&& scmd->retries <=3D scmd->allowed" in the SCSI error handler to lim=
+it the
+   number of retries.
+ - In patch "scsi: ufs: Inform the block layer about write ordering", onl=
+y set
+   ELEVATOR_F_ZBD_SEQ_WRITE for zoned block devices.
+
+Changes compared to v11:
+ - Fixed a NULL pointer dereference that happened when booting from an AT=
+A
+   device by adding an scmd->device !=3D NULL check in scsi_needs_prepara=
+tion().
+ - Updated Reviewed-by tags.
+
+Changes compared to v10:
+ - Dropped the UFS MediaTek and HiSilicon patches because these are not c=
+orrect
+   and because it is safe to drop these patches.
+ - Updated Acked-by / Reviewed-by tags.
+
+Changes compared to v9:
+ - Introduced an additional scsi_driver callback: .eh_needs_prepare_resub=
+mit().
+ - Renamed the scsi_debug kernel module parameter 'no_zone_write_lock' in=
+to
+   'preserves_write_order'.
+ - Fixed an out-of-bounds access in the unit scsi_call_prepare_resubmit()=
+ unit
+   test.
+ - Wrapped ufshcd_auto_hibern8_update() calls in UFS host drivers with
+   WARN_ON_ONCE() such that a kernel stack appears in case an error code =
+is
+   returned.
+ - Elaborated a comment in the UFSHCI driver.
+
+Changes compared to v8:
+ - Fixed handling of 'driver_preserves_write_order' and 'use_zone_write_l=
+ock'
+   in blk_stack_limits().
+ - Added a comment in disk_set_zoned().
+ - Modified blk_req_needs_zone_write_lock() such that it returns false if
+   q->limits.use_zone_write_lock is false.
+ - Modified disk_clear_zone_settings() such that it clears
+   q->limits.use_zone_write_lock.
+ - Left out one change from the mq-deadline patch that became superfluous=
+ due to
+   the blk_req_needs_zone_write_lock() change.
+ - Modified scsi_call_prepare_resubmit() such that it only calls list_sor=
+t() if
+   zoned writes have to be resubmitted for which zone write locking is di=
+sabled.
+ - Added an additional unit test for scsi_call_prepare_resubmit().
+ - Modified the sorting code in the sd driver such that only those SCSI c=
+ommands
+   are sorted for which write locking is disabled.
+ - Modified sd_zbc.c such that ELEVATOR_F_ZBD_SEQ_WRITE is only set if th=
+e
+   write order is not preserved.
+ - Included three patches for UFS host drivers that rework code that wrot=
+e
+   directly to the auto-hibernation controller register.
+ - Modified the UFS driver such that enabling auto-hibernation is not all=
+owed
+   if a zoned logical unit is present and if the controller operates in l=
+egacy
+   mode.
+ - Also in the UFS driver, simplified ufshcd_auto_hibern8_update().
+
+Changes compared to v7:
+ - Split the queue_limits member variable `use_zone_write_lock' into two =
+member
+   variables: `use_zone_write_lock' (set by disk_set_zoned()) and
+   `driver_preserves_write_order' (set by the block driver or SCSI LLD). =
+This
+   should clear up the confusion about the purpose of this variable.
+ - Moved the code for sorting SCSI commands by LBA from the SCSI error ha=
+ndler
+   into the SCSI disk (sd) driver as requested by Christoph.
+  =20
+Changes compared to v6:
+ - Removed QUEUE_FLAG_NO_ZONE_WRITE_LOCK and instead introduced a flag in
+   the request queue limits data structure.
+
+Changes compared to v5:
+ - Renamed scsi_cmp_lba() into scsi_cmp_sector().
+ - Improved several source code comments.
+
+Changes compared to v4:
+ - Dropped the patch that introduces the REQ_NO_ZONE_WRITE_LOCK flag.
+ - Dropped the null_blk patch and added two scsi_debug patches instead.
+ - Dropped the f2fs patch.
+ - Split the patch for the UFS driver into two patches.
+ - Modified several patch descriptions and source code comments.
+ - Renamed dd_use_write_locking() into dd_use_zone_write_locking().
+ - Moved the list_sort() call from scsi_unjam_host() into scsi_eh_flush_d=
+one_q()
+   such that sorting happens just before reinserting.
+ - Removed the scsi_cmd_retry_allowed() call from scsi_check_sense() to m=
+ake
+   sure that the retry counter is adjusted once per retry instead of twic=
+e.
+
+Changes compared to v3:
+ - Restored the patch that introduces QUEUE_FLAG_NO_ZONE_WRITE_LOCK. That=
+ patch
+   had accidentally been left out from v2.
+ - In patch "block: Introduce the flag REQ_NO_ZONE_WRITE_LOCK", improved =
+the
+   patch description and added the function blk_no_zone_write_lock().
+ - In patch "block/mq-deadline: Only use zone locking if necessary", move=
+d the
+   blk_queue_is_zoned() call into dd_use_write_locking().
+ - In patch "fs/f2fs: Disable zone write locking", set REQ_NO_ZONE_WRITE_=
+LOCK
+   from inside __bio_alloc() instead of in f2fs_submit_write_bio().
+
+Changes compared to v2:
+ - Renamed the request queue flag for disabling zone write locking.
+ - Introduced a new request flag for disabling zone write locking.
+ - Modified the mq-deadline scheduler such that zone write locking is onl=
+y
+   disabled if both flags are set.
+ - Added an F2FS patch that sets the request flag for disabling zone writ=
+e
+   locking.
+ - Only disable zone write locking in the UFS driver if auto-hibernation =
+is
+   disabled.
+
+Changes compared to v1:
+ - Left out the patches that are already upstream.
+ - Switched the approach in patch "scsi: Retry unaligned zoned writes" fr=
+om
+   retrying immediately to sending unaligned write commands to the SCSI e=
+rror
+   handler.
+
+Bart Van Assche (14):
+  block: Support block drivers that preserve the order of write requests
+  dm-linear: Report to the block layer that the write order is preserved
+  block: Rework request allocation in blk_mq_submit_bio()
+  block: Support allocating from a specific software queue
+  blk-mq: Restore the zoned write order when requeuing
+  blk-zoned: Track the write pointer per zone
+  blk-zoned: Defer error handling
+  blk-zoned: Add an argument to blk_zone_plug_bio()
+  blk-zoned: Support pipelining of zoned writes
+  scsi: core: Retry unaligned zoned writes
+  scsi: sd: Increase retry count for zoned writes
+  scsi: scsi_debug: Add the preserves_write_order module parameter
+  scsi: scsi_debug: Support injecting unaligned write errors
+  scsi: ufs: Inform the block layer about write ordering
+
+ block/bfq-iosched.c       |   2 +
+ block/blk-mq.c            |  82 +++++----
+ block/blk-mq.h            |   3 +
+ block/blk-settings.c      |   2 +
+ block/blk-zoned.c         | 342 ++++++++++++++++++++++++++++++++++----
+ block/blk.h               |  31 +++-
+ block/kyber-iosched.c     |   2 +
+ block/mq-deadline.c       |   7 +-
+ drivers/md/dm-linear.c    |   6 +
+ drivers/md/dm.c           |   2 +-
+ drivers/scsi/scsi_debug.c |  21 ++-
+ drivers/scsi/scsi_error.c |  16 ++
+ drivers/scsi/sd.c         |   7 +
+ drivers/ufs/core/ufshcd.c |   7 +
+ include/linux/blk-mq.h    |  13 +-
+ include/linux/blkdev.h    |  14 +-
+ 16 files changed, 492 insertions(+), 65 deletions(-)
+
