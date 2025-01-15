@@ -1,180 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCEB155A30;
-	Wed, 15 Jan 2025 08:33:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A0C23F29B
+	for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 09:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736930028; cv=none; b=Ci4AKJ2mvPeFzISvnZg0jbrpFYPjhwoBlz07PofTf3GMTdoWl162ltrBiGpw13upMf+Kiu/8eIXZOWw6CggVnhO6J2A+fbT1DBSSEBUo+cR7cIb2hhF4RCPVHcn6MAqR40vX/y0Q1aoR2hJ8IvHHz3hoj1iLslAhREsWMCRIWFU=
+	t=1736933226; cv=none; b=cihT0uIQyVikcDu/rnmySonTYN+p4mrfID0qINnyvv3tAbEUvo/s3llQ7Sgqo7Y4dcyTtEBLTZF1F9n9oX9IPp68SjYZC33hCZwSDSiyKpRbVn688YrIwpbegzWlglOowyuW1Jq8sU+/TsxAB06hGQ92k9LP2hEeHrQF+j+xoy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736930028; c=relaxed/simple;
-	bh=q//4PX+/kKs0NcRsMaK0IRFD8IgnEeYPZkHGethy6Xc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tn0yaW4j8kX4iyFRYf/5dGgqhuZTLTjk0y72MAmWT25GUPotSTZ2la6ZC2qbxGEj9K+Desd8CdC+bVp/4eMYBpmfz7p/r5lWTOeJ0J+Au8h5bq/axFylcRUM5zHnoBkTn7xw+YmYOZMaz/GbhYCnFVRAfzp+UBYgZaMzAIAgPpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mCWDVkUq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736933226; c=relaxed/simple;
+	bh=HRuynDTjVeVzGfMxgATd2ozGoRfCzQJex+LLSl9v4sc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NgiL6d5ntAt0otMHErwW6nfyCSK+SaLSflBnir0HK8QF0OWqL9rDvB46400gVNxyWGQ3PDLvypfeN/tMZP2KqZWUzl847BWl1CG06MQNy7HOZadtCaPgQZsCDcyiHPli7dhMT6lWbxJ1nJ3Njt+9E2BImOe/G/VHTjxctLvWdcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hsJboMT+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mCWDVkUq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E083DC4CEE2;
-	Wed, 15 Jan 2025 08:33:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736930028;
-	bh=q//4PX+/kKs0NcRsMaK0IRFD8IgnEeYPZkHGethy6Xc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mCWDVkUqHQRGTYemu0OT2ih+ESCVIZ/aTGA9LOFnN2apzUXuQ6js3wGRvMvmPD0Q4
-	 qPuVV2jFdCTf9DIs+hAcwNkgetPw+3PG1Lpnlw/6yRfq11aaFbmf0jL/DFWnEBrlVw
-	 Ua5VHXN/Wk/lZkcpIs8HKqmwrhDVRgZOiJTe7WsPa5iJP6YN5+bhjqq5Jd10hVAZze
-	 QrEQ79dFiDRigierP81hoV+aRHQMIswxIRHmBXxqXzkaq8aaF3N2iCj59qFjsa3k/F
-	 66JPQhMe1Azzt9/n3bF5LnqLwPghqkXaMemOLirAJWtGi32tua3HSrRA0qNoLRzLR7
-	 YnubzClMeJP7Q==
-Date: Wed, 15 Jan 2025 10:33:40 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v5 07/17] dma-mapping: Implement link/unlink ranges API
-Message-ID: <20250115083340.GL3146852@unreal>
-References: <cover.1734436840.git.leon@kernel.org>
- <fa43307222f263e65ae0a84c303150def15e2c77.1734436840.git.leon@kernel.org>
- <ad2312e0-10d5-467a-be5e-75e80805b311@arm.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hsJboMT+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736933223;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=33Thuv6bBji2Q9STFyfa+uQEJS3KDxg05CxOfWDCCEs=;
+	b=hsJboMT+320J+ExrIhVRMrleLy4PsrKWnf/n+QAYrOoVs7f9g2tJ/OEXNBG1CdrU4+r1nY
+	yBqeRYIqOY7PRBQXxcxOvmAHFwjGiudMEZw/IAE7v7aqjFztOQf0/LDL4s/QMQ1FVdu8Zv
+	q0Z28pxY3zqpnMl3ywCLwgtGC4PneGA=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-93-8O_FV8cDPhagQZ9uLW_2rw-1; Wed,
+ 15 Jan 2025 04:26:59 -0500
+X-MC-Unique: 8O_FV8cDPhagQZ9uLW_2rw-1
+X-Mimecast-MFC-AGG-ID: 8O_FV8cDPhagQZ9uLW_2rw
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 05F591956048;
+	Wed, 15 Jan 2025 09:26:58 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.128])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 008D93003FD3;
+	Wed, 15 Jan 2025 09:26:55 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] block: limit disk max sectors to (LLONG_MAX >> 9)
+Date: Wed, 15 Jan 2025 17:26:48 +0800
+Message-ID: <20250115092648.1104452-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad2312e0-10d5-467a-be5e-75e80805b311@arm.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tue, Jan 14, 2025 at 08:50:35PM +0000, Robin Murphy wrote:
-> On 17/12/2024 1:00 pm, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Introduce new DMA APIs to perform DMA linkage of buffers
-> > in layers higher than DMA.
-> > 
-> > In proposed API, the callers will perform the following steps.
-> > In map path:
-> > 	if (dma_can_use_iova(...))
-> > 	    dma_iova_alloc()
-> > 	    for (page in range)
-> > 	       dma_iova_link_next(...)
-> > 	    dma_iova_sync(...)
-> > 	else
-> > 	     /* Fallback to legacy map pages */
-> >               for (all pages)
-> > 	       dma_map_page(...)
-> > 
-> > In unmap path:
-> > 	if (dma_can_use_iova(...))
-> > 	     dma_iova_destroy()
-> > 	else
-> > 	     for (all pages)
-> > 		dma_unmap_page(...)
-> > 
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >   drivers/iommu/dma-iommu.c   | 259 ++++++++++++++++++++++++++++++++++++
-> >   include/linux/dma-mapping.h |  32 +++++
-> >   2 files changed, 291 insertions(+)
+Kernel `loff_t` is defined as `long long int`, so we can't support disk
+which size is > LLONG_MAX.
 
-<...>
+There are many virtual block drivers, and hardware may report bad capacity
+too, so limit max sectors to (LLONG_MAX >> 9) for avoiding potential
+trouble.
 
-> > +static void iommu_dma_iova_unlink_range_slow(struct device *dev,
-> > +		dma_addr_t addr, size_t size, enum dma_data_direction dir,
-> > +		unsigned long attrs)
-> > +{
-> > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
-> > +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
-> > +	struct iova_domain *iovad = &cookie->iovad;
-> > +	size_t iova_start_pad = iova_offset(iovad, addr);
-> > +	dma_addr_t end = addr + size;
-> > +
-> > +	do {
-> > +		phys_addr_t phys;
-> > +		size_t len;
-> > +
-> > +		phys = iommu_iova_to_phys(domain, addr);
-> > +		if (WARN_ON(!phys))
-> > +			continue;
-> 
-> Infinite WARN_ON loop, nice.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk.h   |  2 ++
+ block/genhd.c | 10 ++++++++++
+ 2 files changed, 12 insertions(+)
 
-No problem, will change it to WARN_ON_ONCE.
+diff --git a/block/blk.h b/block/blk.h
+index 4904b86d5fec..90fa5f28ccab 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -13,6 +13,8 @@
+ 
+ struct elevator_type;
+ 
++#define	BLK_DEV_MAX_SECTORS	(LLONG_MAX >> 9)
++
+ /* Max future timer expiry for timeouts */
+ #define BLK_MAX_TIMEOUT		(5 * HZ)
+ 
+diff --git a/block/genhd.c b/block/genhd.c
+index befb7a516bcf..e9375e20d866 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -58,6 +58,13 @@ static DEFINE_IDA(ext_devt_ida);
+ 
+ void set_capacity(struct gendisk *disk, sector_t sectors)
+ {
++	if (sectors > BLK_DEV_MAX_SECTORS) {
++		pr_warn_once("%s: truncate capacity from %lld to %lld\n",
++				disk->disk_name, sectors,
++				BLK_DEV_MAX_SECTORS);
++		sectors = BLK_DEV_MAX_SECTORS;
++	}
++
+ 	bdev_set_nr_sectors(disk->part0, sectors);
+ }
+ EXPORT_SYMBOL(set_capacity);
+@@ -400,6 +407,9 @@ int __must_check add_disk_fwnode(struct device *parent, struct gendisk *disk,
+ 	struct device *ddev = disk_to_dev(disk);
+ 	int ret;
+ 
++	if (WARN_ON_ONCE(bdev_nr_sectors(disk->part0) > BLK_DEV_MAX_SECTORS))
++		return -EINVAL;
++
+ 	if (queue_is_mq(disk->queue)) {
+ 		/*
+ 		 * ->submit_bio and ->poll_bio are bypassed for blk-mq drivers.
+-- 
+2.44.0
 
-> 
-> > +		len = min_t(size_t,
-> > +			end - addr, iovad->granule - iova_start_pad);
-
-<...>
-
-> > +
-> > +		swiotlb_tbl_unmap_single(dev, phys, len, dir, attrs);
-> 
-> This is still dumb. For everything other than the first and last granule,
-> either it's definitely not in SWIOTLB, or it is (per the unaligned size
-> thing above) but then "len" is definitely wrong and SWIOTLB will complain.
-
-Like Christoph said, we tested it with NVMe which uses SWIOTLB path and
-despite having a lot of unaligned sizes, it worked without SWIOTLB
-complains.
-
-> 
-> > +
-> > +		addr += len;
-> > +		iova_start_pad = 0;
-> > +	} while (addr < end);
-> > +}
-> > +
-> > +static void __iommu_dma_iova_unlink(struct device *dev,
-> > +		struct dma_iova_state *state, size_t offset, size_t size,
-> > +		enum dma_data_direction dir, unsigned long attrs,
-> > +		bool free_iova)
-> > +{
-> > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
-> > +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
-> > +	struct iova_domain *iovad = &cookie->iovad;
-> > +	dma_addr_t addr = state->addr + offset;
-> > +	size_t iova_start_pad = iova_offset(iovad, addr);
-> > +	struct iommu_iotlb_gather iotlb_gather;
-> > +	size_t unmapped;
-> > +
-> > +	if ((state->__size & DMA_IOVA_USE_SWIOTLB) ||
-> > +	    (!dev_is_dma_coherent(dev) && !(attrs & DMA_ATTR_SKIP_CPU_SYNC)))
-> > +		iommu_dma_iova_unlink_range_slow(dev, addr, size, dir, attrs);
-> > +
-> > +	iommu_iotlb_gather_init(&iotlb_gather);
-> > +	iotlb_gather.queued = free_iova && READ_ONCE(cookie->fq_domain);
-> 
-> This makes things needlessly hard to follow, just keep the IOVA freeing
-> separate. And by that I really mean just have unlink and free, since
-> dma_iova_destroy() really doesn't seem worth the extra complexity to save
-> one line in one caller...
-
-In initial versions, I didn't implement dma_iova_destroy() and used
-unlink->free calls directly. Both Jason and Christoph asked me to
-provide dma_iova_destroy(), so we can reuse same iotlb_gather.
-
-Almost all callers (except HMM-like) will use this API call.
-
-Let's keep it.
-
-Thanks
