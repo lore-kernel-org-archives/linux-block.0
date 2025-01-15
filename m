@@ -1,55 +1,56 @@
 Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D541DD872
-	for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 22:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364191DD874
+	for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 22:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736981235; cv=none; b=LNidF9C5zJt0zUls9f6PQJL0HP3flVSj6UI3ktCu/CMJdHn3FpMpcrK/Nysm4neJBNtVuorWhzSxUjvjc0f/KDS7s+UFnP47zIsYtsjwW//kizVSUxCWpIaaNcPYheKPhEoxbwIRCaWGiqPs5PYtP3nZw56E4GnuEEpEKhM3cA4=
+	t=1736981241; cv=none; b=IdRpxcgjDxEP4WLLIc2MD6Qf3pVmmVPG6506YREowt8A4EFMlgFyy9+uUSbT6vTGQF9DrecaEtl3thPDxt5I13MVOXM6dScAVk778p/kbEf1V9UbAoC7/Ubm/EUdbK6Q/5KNxR/BEaL1JHlEfnVTMDKfl6vr0cpv6SORSIxYrYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736981235; c=relaxed/simple;
-	bh=4GCCqIDZujNuQ4iOfAV76l8g6eZ5Wo0+bzJlP+ck8vc=;
+	s=arc-20240116; t=1736981241; c=relaxed/simple;
+	bh=AIWGLAFmYK7HmxLiqsKkn4tnss5KadvATTg9LJLXdEQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kz6DYNTZRRvLChM3zU/roEr4vo1Zzm/IlRgynqe77dYUjo7+131hOLW/l1D6vDy+wnvGAdQekNbiGlE/Ymz8xJIyVKhx9UVyyvNvpvS+rBhkB6zMDQzgRWNQT1wUrRbQjV+aglNu43IxNzMuzhHOLAruaIv0XMKDOBszBuw8qWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=diUOB4Bp; arc=none smtp.client-ip=199.89.1.11
+	 MIME-Version; b=JDAGIqeLTbKX08GQv4EhB3eT2VPtsT8PUZr9bXTHNX3Hze4CKZdAiAm/hriu8twkZUjw/K2a5e3BDd8lHPsA6o2YnnYrN5l8XTCn8KS247b9+GwpBeIPNQIfGBg/0GtaU0dcnlTZRwLAU9B/5cvH+XvdQ0vuaIqIbVFXipH9bXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=yMSMPirE; arc=none smtp.client-ip=199.89.1.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="diUOB4Bp"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="yMSMPirE"
 Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YYLjG0k43z6CmM6Q;
-	Wed, 15 Jan 2025 22:47:14 +0000 (UTC)
+	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YYLjL4ppSz6CmM6d;
+	Wed, 15 Jan 2025 22:47:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:mime-version:references:in-reply-to
 	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1736981229; x=1739573230; bh=1meVa
-	6+cXI2xhPzQYIN+eJ30Zh47fE3MjJOPmo1Kd0U=; b=diUOB4BpU3eA8KXLpdVBr
-	yvacROE3VeAQOp6/NJWsleCKEJI0g7hMMyM0wS/S+e47wmE+dYGNJOLgtpe2T4fV
-	05WPvwlF9tf4rPOpZCpkqTH1r6HTAxZvwBhct62DPvKc0NdS8L7JeBg1qWxLUgeq
-	ePx0Ik3PWIIo6X9VVr8ucE6jrzUzk/T4+3Zb5UlPUO9K+ojRk1Ggf0DlqOM2Wq11
-	wmvyD9fgW65sOeUplslRQ4n36sGGrNMJgQFq+TnmInEjdCkE+1GEqejj16KLrttW
-	5yeAYmQQHxhnGv4Jfy76QRYnvReX6mS1iFjlIKMpbGh6LxO40sAJvGGNHinOXDJT
-	g==
+	:received:received; s=mr01; t=1736981232; x=1739573233; bh=WfoHu
+	efnwx8BAwBgYDC7Q/3S4Nf80YWNAHsqKZY4Tss=; b=yMSMPirE47xhKx19BsK4K
+	7fa/7z9T9VAaxic4rQoumUN293/235uqAg/auQsGyj8jONXY8rjQcidKLEWfHgpc
+	g5Gd/tDHzAZ5eTyExq/GHKA0Zm6wgNfE0tHAAT0o2QYzzOG3fvoMDvUQ5z4Ts6/B
+	rLJkUA7G04tPvegsPOfs6rlv5KuI8ezXVHeyG/KxHzUdEMye2AGwlsUgLLvUag3C
+	bYIvtvlQacf9LKRFAFgXjPFOlJs9CJgNfIhNrEpX+DoWMyL1aOhCSqfK51HTrtKM
+	laLtzUIX9dgjzIzhlUa6IPV5NGo6SuiYw41+6CejHSoJP8FFlneuU1FpQGBOW9u5
+	w==
 X-Virus-Scanned: by MailRoute
 Received: from 008.lax.mailroute.net ([127.0.0.1])
  by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id HePNhly0cOUx; Wed, 15 Jan 2025 22:47:09 +0000 (UTC)
+ id Lw3up8S2K4mx; Wed, 15 Jan 2025 22:47:12 +0000 (UTC)
 Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YYLj773Wkz6CmQvG;
-	Wed, 15 Jan 2025 22:47:07 +0000 (UTC)
+	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YYLjB29bMz6CmQyl;
+	Wed, 15 Jan 2025 22:47:09 +0000 (UTC)
 From: Bart Van Assche <bvanassche@acm.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Damien Le Moal <dlemoal@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v17 04/14] block: Support allocating from a specific software queue
-Date: Wed, 15 Jan 2025 14:46:38 -0800
-Message-ID: <20250115224649.3973718-5-bvanassche@acm.org>
+	Bart Van Assche <bvanassche@acm.org>,
+	Yu Kuai <yukuai3@huawei.com>
+Subject: [PATCH v17 05/14] blk-mq: Restore the zoned write order when requeuing
+Date: Wed, 15 Jan 2025 14:46:39 -0800
+Message-ID: <20250115224649.3973718-6-bvanassche@acm.org>
 X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
 In-Reply-To: <20250115224649.3973718-1-bvanassche@acm.org>
 References: <20250115224649.3973718-1-bvanassche@acm.org>
@@ -61,135 +62,166 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-A later patch will preserve the order of pipelined zoned writes by
-submitting all zoned writes per zone to the same software queue as
-previously submitted zoned writes. Hence support allocating a request
-from a specific software queue.
+Zoned writes may be requeued. This happens if a block driver returns
+BLK_STS_RESOURCE, to handle SCSI unit attentions or by the SCSI error
+handler after error handling has finished. Requests may be requeued in
+another order than submitted. Restore the request order if requests are
+requeued. Add RQF_DONTPREP to RQF_NOMERGE_FLAGS because this patch may
+cause RQF_DONTPREP requests to be sent to the code that checks whether
+a request can be merged and RQF_DONTPREP requests must not be merged.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Yu Kuai <yukuai3@huawei.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-mq.c | 18 ++++++++++++++----
- block/blk-mq.h |  1 +
- 2 files changed, 15 insertions(+), 4 deletions(-)
+ block/bfq-iosched.c    |  2 ++
+ block/blk-mq.c         | 20 +++++++++++++++++++-
+ block/blk-mq.h         |  2 ++
+ block/kyber-iosched.c  |  2 ++
+ block/mq-deadline.c    |  7 ++++++-
+ include/linux/blk-mq.h | 13 ++++++++++++-
+ 6 files changed, 43 insertions(+), 3 deletions(-)
 
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 167542201603..ffa4ca3aad62 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -6276,6 +6276,8 @@ static void bfq_insert_request(struct blk_mq_hw_ctx=
+ *hctx, struct request *rq,
+=20
+ 	if (flags & BLK_MQ_INSERT_AT_HEAD) {
+ 		list_add(&rq->queuelist, &bfqd->dispatch);
++	} else if (flags & BLK_MQ_INSERT_ORDERED) {
++		blk_mq_insert_ordered(rq, &bfqd->dispatch);
+ 	} else if (!bfqq) {
+ 		list_add_tail(&rq->queuelist, &bfqd->dispatch);
+ 	} else {
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 666e6e6ba143..4262c85be206 100644
+index 4262c85be206..01478777ae5f 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -495,6 +495,7 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_dat=
-a *data)
- static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data =
-*data)
- {
- 	struct request_queue *q =3D data->q;
-+	int swq_cpu =3D data->swq_cpu;
- 	u64 alloc_time_ns =3D 0;
- 	struct request *rq;
- 	unsigned int tag;
-@@ -507,7 +508,8 @@ static struct request *__blk_mq_alloc_requests(struct=
- blk_mq_alloc_data *data)
- 		data->flags |=3D BLK_MQ_REQ_NOWAIT;
-=20
- retry:
--	data->ctx =3D blk_mq_get_ctx(q);
-+	data->swq_cpu =3D swq_cpu >=3D 0 ? swq_cpu : raw_smp_processor_id();
-+	data->ctx =3D __blk_mq_get_ctx(q, data->swq_cpu);
- 	data->hctx =3D blk_mq_map_queue(q, data->cmd_flags, data->ctx);
-=20
- 	if (q->elevator) {
-@@ -587,6 +589,7 @@ static struct request *blk_mq_rq_cache_fill(struct re=
-quest_queue *q,
- 		.cmd_flags	=3D opf,
- 		.nr_tags	=3D plug->nr_ios,
- 		.cached_rqs	=3D &plug->cached_rqs,
-+		.swq_cpu	=3D -1,
- 	};
- 	struct request *rq;
-=20
-@@ -648,6 +651,7 @@ struct request *blk_mq_alloc_request(struct request_q=
-ueue *q, blk_opf_t opf,
- 			.flags		=3D flags,
- 			.cmd_flags	=3D opf,
- 			.nr_tags	=3D 1,
-+			.swq_cpu	=3D -1,
- 		};
- 		int ret;
-=20
-@@ -2964,12 +2968,14 @@ static bool blk_mq_attempt_bio_merge(struct reque=
-st_queue *q,
+@@ -1557,7 +1557,9 @@ static void blk_mq_requeue_work(struct work_struct =
+*work)
+ 		 * already.  Insert it into the hctx dispatch list to avoid
+ 		 * block layer merges for the request.
+ 		 */
+-		if (rq->rq_flags & RQF_DONTPREP)
++		if (blk_rq_is_seq_zoned_write(rq))
++			blk_mq_insert_request(rq, BLK_MQ_INSERT_ORDERED);
++		else if (rq->rq_flags & RQF_DONTPREP)
+ 			blk_mq_request_bypass_insert(rq, 0);
+ 		else
+ 			blk_mq_insert_request(rq, BLK_MQ_INSERT_AT_HEAD);
+@@ -2592,6 +2594,20 @@ static void blk_mq_insert_requests(struct blk_mq_h=
+w_ctx *hctx,
+ 	blk_mq_run_hw_queue(hctx, run_queue_async);
  }
 =20
- static struct request *blk_mq_get_new_requests(struct request_queue *q,
-+					       int swq_cpu,
- 					       struct blk_plug *plug,
- 					       struct bio *bio,
- 					       unsigned int nsegs)
++void blk_mq_insert_ordered(struct request *rq, struct list_head *list)
++{
++	struct request_queue *q =3D rq->q;
++	struct request *rq2;
++
++	list_for_each_entry(rq2, list, queuelist)
++		if (rq2->q =3D=3D q && blk_rq_pos(rq2) > blk_rq_pos(rq))
++			break;
++
++	/* Insert rq before rq2. If rq2 is the list head, append at the end. */
++	list_add_tail(&rq->queuelist, &rq2->queuelist);
++}
++EXPORT_SYMBOL_GPL(blk_mq_insert_ordered);
++
+ static void blk_mq_insert_request(struct request *rq, blk_insert_t flags=
+)
  {
- 	struct blk_mq_alloc_data data =3D {
- 		.q		=3D q,
-+		.swq_cpu	=3D swq_cpu,
- 		.nr_tags	=3D 1,
- 		.cmd_flags	=3D bio->bi_opf,
- 	};
-@@ -2993,7 +2999,8 @@ static struct request *blk_mq_get_new_requests(stru=
-ct request_queue *q,
-  * Check if there is a suitable cached request and return it.
-  */
- static struct request *blk_mq_peek_cached_request(struct blk_plug *plug,
--		struct request_queue *q, blk_opf_t opf)
-+						  struct request_queue *q,
-+						  int swq_cpu, blk_opf_t opf)
- {
- 	enum hctx_type type =3D blk_mq_get_hctx_type(opf);
- 	struct request *rq;
-@@ -3003,6 +3010,8 @@ static struct request *blk_mq_peek_cached_request(s=
-truct blk_plug *plug,
- 	rq =3D rq_list_peek(&plug->cached_rqs);
- 	if (!rq || rq->q !=3D q)
- 		return NULL;
-+	if (swq_cpu >=3D 0 && rq->mq_ctx->cpu !=3D swq_cpu)
-+		return NULL;
- 	if (type !=3D rq->mq_hctx->type &&
- 	    (type !=3D HCTX_TYPE_READ || rq->mq_hctx->type !=3D HCTX_TYPE_DEFAU=
-LT))
- 		return NULL;
-@@ -3061,6 +3070,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned int nr_segs;
- 	struct request *rq;
-+	int swq_cpu =3D -1;
- 	blk_status_t ret;
-=20
- 	/*
-@@ -3109,7 +3119,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 		goto queue_exit;
-=20
- new_request:
--	rq =3D blk_mq_peek_cached_request(plug, q, bio->bi_opf);
-+	rq =3D blk_mq_peek_cached_request(plug, q, swq_cpu, bio->bi_opf);
- 	if (rq) {
- 		blk_mq_use_cached_rq(rq, plug, bio);
- 		/*
-@@ -3119,7 +3129,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 		 */
- 		blk_queue_exit(q);
- 	} else {
--		rq =3D blk_mq_get_new_requests(q, plug, bio, nr_segs);
-+		rq =3D blk_mq_get_new_requests(q, swq_cpu, plug, bio, nr_segs);
- 		if (unlikely(!rq)) {
- 			if (bio->bi_opf & REQ_NOWAIT)
- 				bio_wouldblock_error(bio);
+ 	struct request_queue *q =3D rq->q;
+@@ -2646,6 +2662,8 @@ static void blk_mq_insert_request(struct request *r=
+q, blk_insert_t flags)
+ 		spin_lock(&ctx->lock);
+ 		if (flags & BLK_MQ_INSERT_AT_HEAD)
+ 			list_add(&rq->queuelist, &ctx->rq_lists[hctx->type]);
++		else if (flags & BLK_MQ_INSERT_ORDERED)
++			blk_mq_insert_ordered(rq, &ctx->rq_lists[hctx->type]);
+ 		else
+ 			list_add_tail(&rq->queuelist,
+ 				      &ctx->rq_lists[hctx->type]);
 diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 44979e92b79f..d5536dcf2182 100644
+index d5536dcf2182..4035643c51a7 100644
 --- a/block/blk-mq.h
 +++ b/block/blk-mq.h
-@@ -158,6 +158,7 @@ struct blk_mq_alloc_data {
- 	struct rq_list *cached_rqs;
+@@ -40,8 +40,10 @@ enum {
 =20
- 	/* input & output parameter */
-+	int swq_cpu;
- 	struct blk_mq_ctx *ctx;
- 	struct blk_mq_hw_ctx *hctx;
- };
+ typedef unsigned int __bitwise blk_insert_t;
+ #define BLK_MQ_INSERT_AT_HEAD		((__force blk_insert_t)0x01)
++#define BLK_MQ_INSERT_ORDERED		((__force blk_insert_t)0x02)
+=20
+ void blk_mq_submit_bio(struct bio *bio);
++void blk_mq_insert_ordered(struct request *rq, struct list_head *list);
+ int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, struct io_comp=
+_batch *iob,
+ 		unsigned int flags);
+ void blk_mq_exit_queue(struct request_queue *q);
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index dc31f2dfa414..2877cce690f3 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -603,6 +603,8 @@ static void kyber_insert_requests(struct blk_mq_hw_ct=
+x *hctx,
+ 		trace_block_rq_insert(rq);
+ 		if (flags & BLK_MQ_INSERT_AT_HEAD)
+ 			list_move(&rq->queuelist, head);
++		else if (flags & BLK_MQ_INSERT_ORDERED)
++			blk_mq_insert_ordered(rq, head);
+ 		else
+ 			list_move_tail(&rq->queuelist, head);
+ 		sbitmap_set_bit(&khd->kcq_map[sched_domain],
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 754f6b7415cd..78534279adab 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -710,7 +710,12 @@ static void dd_insert_request(struct blk_mq_hw_ctx *=
+hctx, struct request *rq,
+ 		 * set expire time and add to fifo list
+ 		 */
+ 		rq->fifo_time =3D jiffies + dd->fifo_expire[data_dir];
+-		list_add_tail(&rq->queuelist, &per_prio->fifo_list[data_dir]);
++		if (flags & BLK_MQ_INSERT_ORDERED)
++			blk_mq_insert_ordered(rq,
++					      &per_prio->fifo_list[data_dir]);
++		else
++			list_add_tail(&rq->queuelist,
++				      &per_prio->fifo_list[data_dir]);
+ 	}
+ }
+=20
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index a0a9007cc1e3..482d5432817c 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -85,7 +85,7 @@ enum {
+=20
+ /* flags that prevent us from merging requests: */
+ #define RQF_NOMERGE_FLAGS \
+-	(RQF_STARTED | RQF_FLUSH_SEQ | RQF_SPECIAL_PAYLOAD)
++	(RQF_STARTED | RQF_FLUSH_SEQ | RQF_DONTPREP | RQF_SPECIAL_PAYLOAD)
+=20
+ enum mq_rq_state {
+ 	MQ_RQ_IDLE		=3D 0,
+@@ -1152,4 +1152,15 @@ static inline int blk_rq_map_sg(struct request_que=
+ue *q, struct request *rq,
+ }
+ void blk_dump_rq_flags(struct request *, char *);
+=20
++static inline bool blk_rq_is_seq_zoned_write(struct request *rq)
++{
++	switch (req_op(rq)) {
++	case REQ_OP_WRITE:
++	case REQ_OP_WRITE_ZEROES:
++		return bdev_zone_is_seq(rq->q->disk->part0, blk_rq_pos(rq));
++	default:
++		return false;
++	}
++}
++
+ #endif /* BLK_MQ_H */
