@@ -1,236 +1,117 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF3922F170
-	for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 04:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C2A22E41E;
+	Wed, 15 Jan 2025 06:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736915359; cv=none; b=ErtCT8R8ZpNIQDsi4w6XTVFLhnrYjUu7lomvvijSYtaapZNMd/N2kQgVw+b73qLxT4buHjipwkfo7NF89XqGO4+pi9VbLwu6ZDbgxOstL1KM+7MaUr7fuaDmhSLShlvA2D6fp0X1wU1s4Bhtu+e4GBA9BNV5oCY5CMs5oMiuuvw=
+	t=1736921615; cv=none; b=hExpO6q1Q+yh8+k7NV0x+FPQElQ3ruoKlkkQrov2JKeKqzAi8yAsYjY6MdeK67MMuKQi2KKJ13UP688dXOgi1PX0K+JoEtJTK3JUUW+XHT6ov8IzM3fZzkkHxX5Vsdaa3mJJouQVnDTWUgAndK21Off+cDZjufY3s9qoCkjylN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736915359; c=relaxed/simple;
-	bh=mxB2cG4m3EKJMNrpLvuXaRaJ4gdaqOkpIm9mnVn6aHE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LqfKJBiUtjMKD/GZd1N05V9GOytfwJXnhUAMxK3A8iMIM7ACW0TZ3g3cj3e+KjNLvwndiExFw00jvKY8RQtpeaHmtcfyPEzjb5ijaj1qmNIXQ6H9NeYzErIhtIJfFIvQ3b6NyNy2zc+3VRPw6e3j7V7ASv/LAp6iJ3u06yS8tkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=U9M1qncy; arc=none smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="U9M1qncy"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1736915358; x=1768451358;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=mxB2cG4m3EKJMNrpLvuXaRaJ4gdaqOkpIm9mnVn6aHE=;
-  b=U9M1qncyLpv50Egc3geZotUAQczQRdoumIMchE9b5rXpND6xiAA02Kvu
-   VCOT05jaVzkgUEcqZ3HPUuiQ62xOeR5zT1Y3mXIeMrpbe+AMnzWJH0e31
-   8RFEZs6debsQDDF+Xd2ny9N5iwjG07nRn06bB5MMNKpRAQ/bCCtm8jldS
-   xvK6K+/BVBUALiBPREhX0T9nKi4IaotgC/R+c+kKAX1oGCGH/CuP8o23w
-   ayvuPkUJksmt6KHtr+bcDgvFyRRcOkT8k9gC6EpV7oG99qARfHy5z7bOE
-   DHsPR5OYc5V10yDV74wRH+/j1+3XynD+n1jxbUkkweENvK25ti9ax9y3G
-   A==;
-X-CSE-ConnectionGUID: xKf1HnblTHq3aBd0Y6CGAQ==
-X-CSE-MsgGUID: 564nkL1sRD+AIqwhcXZgtw==
-X-IronPort-AV: E=Sophos;i="6.12,316,1728921600"; 
-   d="scan'208";a="35958019"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Jan 2025 12:29:18 +0800
-IronPort-SDR: 67872ac5_tiGj0ySPPW2s29rC6eULsypsgg/U0rLQdHUk8O2umPqNpq4
- 3QFNhFbnS1kSDEkGCJLEtQe2jizITkGt8RuSilQ==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jan 2025 19:25:58 -0800
-WDCIronportException: Internal
-Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip02.wdc.com with ESMTP; 14 Jan 2025 20:29:16 -0800
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH for-next v3 5/5] null_blk: do partial IO for bad blocks
-Date: Wed, 15 Jan 2025 13:29:10 +0900
-Message-ID: <20250115042910.1149966-6-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20250115042910.1149966-1-shinichiro.kawasaki@wdc.com>
-References: <20250115042910.1149966-1-shinichiro.kawasaki@wdc.com>
+	s=arc-20240116; t=1736921615; c=relaxed/simple;
+	bh=IJpGGqTdTn3Pi3/xnnXvoMDIxvhrzP92PeGu0JYmNS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bHlyHNBz+cC3GVDmLNT/HaXc5j7TbusI2Las05Fu6JqjKT760uw4h0vJcWNkaopdTRiXkFqOGCwC5KLWAKYFCyqr0P8FOLF/wGCHb9QUxY84yDva8+L+1kSkEhzXO64bObSgM3iZ1ypqk2WoIaWHAaw+T+cCwfhaU0jdEovDveE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id F412068B05; Wed, 15 Jan 2025 07:13:26 +0100 (CET)
+Date: Wed, 15 Jan 2025 07:13:26 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v5 05/17] dma-mapping: Provide an interface to allow
+ allocate IOVA
+Message-ID: <20250115061326.GA29643@lst.de>
+References: <cover.1734436840.git.leon@kernel.org> <fac6bc6fdcf8e13bd5668386d36289ee38a8a95b.1734436840.git.leon@kernel.org> <ecb59036-b279-4412-9a09-40e05af3b9ea@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ecb59036-b279-4412-9a09-40e05af3b9ea@arm.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-The current null_blk implementation checks if any bad blocks exist in
-the target blocks of each IO. If so, the IO fails and data is not
-transferred for all of the IO target blocks. However, when real storage
-devices have bad blocks, the devices may transfer data partially up to
-the first bad blocks (e.g., SAS drives). Especially, when the IO is a
-write operation, such partial IO leaves partially written data on the
-device.
+On Tue, Jan 14, 2025 at 08:50:28PM +0000, Robin Murphy wrote:
+>> +bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
+>> +		phys_addr_t phys, size_t size)
+>> +{
+>> +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+>> +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+>> +	struct iova_domain *iovad = &cookie->iovad;
+>> +	size_t iova_off = iova_offset(iovad, phys);
+>> +	dma_addr_t addr;
+>> +
+>> +	memset(state, 0, sizeof(*state));
+>> +	if (!use_dma_iommu(dev))
+>> +		return false;
+>
+> Can you guess why that return won't ever be taken?
 
-To simulate such partial IO using null_blk, introduce the new parameter
-'badblocks_partial_io'. When this parameter is set,
-null_handle_badblocks() returns the number of the sectors for the
-partial IO as its third pointer argument. Pass the returned number of
-sectors to the following calls to null_handle_memory_backend() in
-null_process_cmd() and null_zone_write().
+It is regularly taken.  Now that it's quoted this way it would probably
+good to split the thing up to not do the deferferences above, as they
+might cause problems if the compiler wasn't smart enough to only
+perform them after the check..
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- drivers/block/null_blk/main.c     | 39 ++++++++++++++++++++++++-------
- drivers/block/null_blk/null_blk.h |  4 ++--
- drivers/block/null_blk/zoned.c    |  9 ++++---
- 3 files changed, 39 insertions(+), 13 deletions(-)
+>> +	if (static_branch_unlikely(&iommu_deferred_attach_enabled) &&
+>> +	    iommu_deferred_attach(dev, iommu_get_domain_for_dev(dev)))
+>> +		return false;
+>> +
+>> +	if (WARN_ON_ONCE(!size))
+>> +		return false;
+>> +	if (WARN_ON_ONCE(size & DMA_IOVA_USE_SWIOTLB))
+>
+> This looks weird. Why would a caller ever set an effectively-private flag 
+> in the first place? If it's actually supposed to be a maximum size check, 
+> please make it look like a maximum size check.
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 71c86775354e..d9332b013844 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -474,6 +474,7 @@ NULLB_DEVICE_ATTR(shared_tag_bitmap, bool, NULL);
- NULLB_DEVICE_ATTR(fua, bool, NULL);
- NULLB_DEVICE_ATTR(rotational, bool, NULL);
- NULLB_DEVICE_ATTR(badblocks_once, bool, NULL);
-+NULLB_DEVICE_ATTR(badblocks_partial_io, bool, NULL);
- 
- static ssize_t nullb_device_power_show(struct config_item *item, char *page)
- {
-@@ -595,6 +596,7 @@ CONFIGFS_ATTR_WO(nullb_device_, zone_offline);
- static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_badblocks,
- 	&nullb_device_attr_badblocks_once,
-+	&nullb_device_attr_badblocks_partial_io,
- 	&nullb_device_attr_blocking,
- 	&nullb_device_attr_blocksize,
- 	&nullb_device_attr_cache_size,
-@@ -1320,19 +1322,39 @@ static inline blk_status_t null_handle_throttled(struct nullb_cmd *cmd)
- 	return sts;
- }
- 
-+/*
-+ * Check if the command should fail for the badblocks. If so, return
-+ * BLK_STS_IOERR and return number of partial I/O sectors.
-+ *
-+ * @cmd:        The command to handle.
-+ * @sector:     The start sector for I/O.
-+ * @nr_sectors: The caller specifies number of sectors to write or read.
-+ *              Returns number of sectors to be written or read for partial I/O.
-+ */
- blk_status_t null_handle_badblocks(struct nullb_cmd *cmd, sector_t sector,
--				   sector_t nr_sectors)
-+				   unsigned int *nr_sectors)
- {
- 	struct badblocks *bb = &cmd->nq->dev->badblocks;
-+	struct nullb_device *dev = cmd->nq->dev;
-+	unsigned int block_sectors = dev->blocksize >> SECTOR_SHIFT;
- 	sector_t first_bad;
- 	int bad_sectors;
-+	unsigned int partial_io_sectors = 0;
- 
--	if (!badblocks_check(bb, sector, nr_sectors, &first_bad, &bad_sectors))
-+	if (!badblocks_check(bb, sector, *nr_sectors, &first_bad, &bad_sectors))
- 		return BLK_STS_OK;
- 
- 	if (cmd->nq->dev->badblocks_once)
- 		badblocks_clear(bb, first_bad, bad_sectors);
- 
-+	if (cmd->nq->dev->badblocks_partial_io) {
-+		if (!IS_ALIGNED(first_bad, block_sectors))
-+			first_bad = ALIGN_DOWN(first_bad, block_sectors);
-+		if (sector < first_bad)
-+			partial_io_sectors = first_bad - sector;
-+	}
-+	*nr_sectors = partial_io_sectors;
-+
- 	return BLK_STS_IOERR;
- }
- 
-@@ -1391,18 +1413,19 @@ blk_status_t null_process_cmd(struct nullb_cmd *cmd, enum req_op op,
- 			      sector_t sector, unsigned int nr_sectors)
- {
- 	struct nullb_device *dev = cmd->nq->dev;
-+	blk_status_t badblocks_ret = BLK_STS_OK;
- 	blk_status_t ret;
- 
--	if (dev->badblocks.shift != -1) {
--		ret = null_handle_badblocks(cmd, sector, nr_sectors);
-+	if (dev->badblocks.shift != -1)
-+		badblocks_ret = null_handle_badblocks(cmd, sector, &nr_sectors);
-+
-+	if (dev->memory_backed && nr_sectors) {
-+		ret = null_handle_memory_backed(cmd, op, sector, nr_sectors);
- 		if (ret != BLK_STS_OK)
- 			return ret;
- 	}
- 
--	if (dev->memory_backed)
--		return null_handle_memory_backed(cmd, op, sector, nr_sectors);
--
--	return BLK_STS_OK;
-+	return badblocks_ret;
- }
- 
- static void null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index ee60f3a88796..7bb6128dbaaf 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -64,6 +64,7 @@ struct nullb_device {
- 	unsigned int curr_cache;
- 	struct badblocks badblocks;
- 	bool badblocks_once;
-+	bool badblocks_partial_io;
- 
- 	unsigned int nr_zones;
- 	unsigned int nr_zones_imp_open;
-@@ -133,11 +134,10 @@ blk_status_t null_handle_discard(struct nullb_device *dev, sector_t sector,
- blk_status_t null_process_cmd(struct nullb_cmd *cmd, enum req_op op,
- 			      sector_t sector, unsigned int nr_sectors);
- blk_status_t null_handle_badblocks(struct nullb_cmd *cmd, sector_t sector,
--				   sector_t nr_sectors);
-+				   unsigned int *nr_sectors);
- blk_status_t null_handle_memory_backed(struct nullb_cmd *cmd, enum req_op op,
- 				       sector_t sector, sector_t nr_sectors);
- 
--
- #ifdef CONFIG_BLK_DEV_ZONED
- int null_init_zoned_dev(struct nullb_device *dev, struct queue_limits *lim);
- int null_register_zoned_dev(struct nullb *nullb);
-diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-index 09dae8d018aa..c9f984445005 100644
---- a/drivers/block/null_blk/zoned.c
-+++ b/drivers/block/null_blk/zoned.c
-@@ -353,6 +353,7 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 	struct nullb_device *dev = cmd->nq->dev;
- 	unsigned int zno = null_zone_no(dev, sector);
- 	struct nullb_zone *zone = &dev->zones[zno];
-+	blk_status_t badblocks_ret = BLK_STS_OK;
- 	blk_status_t ret;
- 
- 	trace_nullb_zone_op(cmd, zno, zone->cond);
-@@ -390,9 +391,11 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 	}
- 
- 	if (dev->badblocks.shift != -1) {
--		ret = null_handle_badblocks(cmd, sector, nr_sectors);
--		if (ret != BLK_STS_OK)
-+		badblocks_ret = null_handle_badblocks(cmd, sector, &nr_sectors);
-+		if (badblocks_ret != BLK_STS_OK && !nr_sectors) {
-+			ret = badblocks_ret;
- 			goto unlock_zone;
-+		}
- 	}
- 
- 	if (zone->cond == BLK_ZONE_COND_CLOSED ||
-@@ -438,7 +441,7 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 		zone->cond = BLK_ZONE_COND_FULL;
- 	}
- 
--	ret = BLK_STS_OK;
-+	ret = badblocks_ret;
- 
- unlock_zone:
- 	null_unlock_zone(dev, zone);
--- 
-2.47.0
+As the person who added it - this is to catch a user passing in a value
+that would set it.  To me this looks obvious, but should we add a
+comment?
+
+> (Which also makes me consider iommu_dma_max_mapping_size() returning 
+> SIZE_MAX isn't strictly accurate, ho hum...)
+
+You can still map SIZE_MAX, just not using this interface.  Assuming
+no other real life limitations get in way, which I bet they will.
+
+>> @@ -72,6 +74,21 @@
+>>     #define DMA_BIT_MASK(n)	(((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
+>>   +struct dma_iova_state {
+>> +	dma_addr_t addr;
+>> +	size_t __size;
+>> +};
+>> +
+>> +/*
+>> + * Use the high bit to mark if we used swiotlb for one or more ranges.
+>> + */
+>> +#define DMA_IOVA_USE_SWIOTLB		(1ULL << 63)
+>
+> This will give surprising results for 32-bit size_t (in fact I guess it 
+> might fire some build warnings already).
+
+Good point.  I guess __size should simply become a u64.
 
