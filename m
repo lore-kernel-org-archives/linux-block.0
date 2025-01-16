@@ -1,99 +1,110 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA26A94A
-	for <linux-block@vger.kernel.org>; Thu, 16 Jan 2025 00:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4A61EA90;
+	Thu, 16 Jan 2025 02:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736988102; cv=none; b=Y67RBAwNXy6meqXOXImRodPQ0lwN/b16gyn8ylURgcHd1M2/4S57DhJfpimWwRTdMxNvLiI1eCU1/MYtYWi4qBcO7IYvGUXKVReP4KqFd0A0ER1mYfZNxoQRhrBs063kSzL2RiAwLf2VpS84Ej4tgwGJP0dRL+oni0TtQRkKll8=
+	t=1736993509; cv=none; b=SJB5TEXSCKqGFOqDXEKwgh+yTRAJ8Dm4QXNKPflrjNyrwKS40yRjM9I14AP8al+orTl8X3o/wISX39IEq7oG625S0nGXINCEQUehGQxX4xcY8B8QnAhzHfPLiLxrO6QR4GnK5KlDjlWBZ/EoWFBTm+tCXmu3J41nzeRao8Pg3tI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736988102; c=relaxed/simple;
-	bh=DaxSHKul3vLu4Fzx0kqGnf8Es9IgOSP4iIPSFx+eSoc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kkulw5mOOt/t5ChXBScX9SLUCTKNS1ji6LfL85OBOLjInqjNz28DJmtP9Lt1lhwTrAGJ6xDoiobMEuqnTzJdVAtk8DN/aE0FLnQuQ2MlH5yakrBblMZI+cef2jxzxr0fRvrbRbC06CfRy4GkkRV9VzeLd/AXsqyoHQLbwLHNzLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=c2ALvChm; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1736993509; c=relaxed/simple;
+	bh=PA1DXVARjqJJFLI2ePpc8ilF8IQ+E85vOlbWDcXFCaM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tJi4qV4UwER+pvkuENr6Qycu61jxSeQ9hcKsq1DAM6PlGiUuOPGJ+IHOz4yCdxPFwcwy2a3UhEUsaC3bO25ydo6ytqt33lPeLiraoRDGEPZVVjPjuJmw31PtvVrqaRGzKdzVUif4k+xswY5o7cnhj0OdmX5cKAJK5HLX7hHiNi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ic+mNCCN; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="c2ALvChm"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2efded08c79so608354a91.0
-        for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 16:41:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ic+mNCCN"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2ee8e8e29f6so666771a91.0;
+        Wed, 15 Jan 2025 18:11:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1736988100; x=1737592900; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2/REPRuAQRQKcKfA3HHYPj6NAjhg6mrxoQvl+BUtmD8=;
-        b=c2ALvChmeCU9lxCMaUydyShMO3hf3t+mTa/fajFf9EMel7Z/0RFinrTOZFAOg3QCUS
-         NtVB2nTY5B4bddTyyx5F/XFj75hMgOA5ieHwcFPAQSo3UihC08xalzBjOLqnkGfnnj6Q
-         Bg4vU7WWtvCXpMuNut1Si5LG9mu8NV2kWW4ds=
+        d=gmail.com; s=20230601; t=1736993507; x=1737598307; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BoaBUpRpUubqD+tM/F5e4x0FQyJkK/Ce/WA2Bx67Y0E=;
+        b=Ic+mNCCNRmZY3IAWZdARducgKVrvhluVt9KMnkQf24d3cIvR+IZeQXPLAFUuQOKw+/
+         tA4AfIxhzLToah/+1cURkMTmiuVgrl1ZJcLGEo3fWmfjTyfnzShcVgf4wFGt5hmTqbGi
+         f4SlQxJvcnECR/vgHQsij9py49+HZGUWtaBtpkd3tVTBaX8QlgUkKWjjdz58aWqfvT2h
+         L4m2fImP1Yba8U4VJPiOSzUshMHf/6WTuArbI59WFYLi4y+MjXodCkSAEl/RwiORKrOt
+         OHOZstqrG6TfOqW63TPO44GkiCN0t7PoRf0H3dyl294qSQSNx0cbewjVFgPrf2a2KO5u
+         FFqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736988100; x=1737592900;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2/REPRuAQRQKcKfA3HHYPj6NAjhg6mrxoQvl+BUtmD8=;
-        b=T9QQS4cmRKEZYf+GZyN8kxZn8kV2mVVx+/CX0WLx6Nd6W/V/pLjmePByb7n9/f5sdh
-         BizfSVcvDFlEJbVt7lIK3zKNjHYchE9DMgRCHQSy2E4U3iF2RgR7LnDbxuEq0cxXj0z7
-         Hc47p5JEsHPVRNnnXGYgPosANNNTva0F5GnIsVxDPwYS11PoIrxs2e3Mlwfla3n/USpr
-         xInwq3AQSPjGvFUVY2rfxl6fG9J3BBDMNKmr6EQ2z0monZlL68kMtNcSotAN7t906bsQ
-         zlFrlc83lx8FGJs2FKfUDLQJ40d8y9fbrsIiqZxpxbG2S8O/+EOttAtqo1PUfvJLtJMA
-         CVlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWaS4B4gc65SqzIySPyMvKcz9KJ38v40LgxScHaok4nlFf58kY19sMdYj3J/yGY4MYehdtzVUmbS/zzRw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlnPsiWQYVXRht3Ux1e4y9z/msbXMZtl/6TqcsL1vZv5ygJf6B
-	LsCZDyZmXZ10D0M4SOeENcqbQul1zGOVcqIPrHNN83JAjecXyVrwbh+I63tpeQ==
-X-Gm-Gg: ASbGnctjlV/YyA2c0lTiRFVwvGWG9lhbFDj0ikAeo+sbj4P5I1r0MwwW0bg8L582RsR
-	DJgX9qTaBtrq0V1NoM1ZUo7ByQIYc328h+Qc0P8s5xuLfkBAFmS7SDqjtwSLipHEpcP6VAzubnX
-	VAh515J1YyhDd9pAXTzXEalmNhwNp03DbAuYi/6t3n2rahGFYqN+v36Oi0fGeCGIpW7P+ehMZL4
-	ebVTPWu4TOT8LxGqLc1Bw2sjHMMJYFysB7pB1QWhXtQClT5+Dbs4FXx9rrr
-X-Google-Smtp-Source: AGHT+IGWIcw0FCPwqDY2LRyBn7ZtzZiH0QECZZB8FXEiQTRYjNuUZY0oIimYMkgGsQOkZA7uKpRBoA==
-X-Received: by 2002:a17:90b:2642:b0:2ea:aa56:499 with SMTP id 98e67ed59e1d1-2f548e9aed3mr40818506a91.1.1736988100602;
-        Wed, 15 Jan 2025 16:41:40 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:8be4:86b8:bd3d:aa3c])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f72c18b076sm2003354a91.15.2025.01.15.16.41.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2025 16:41:40 -0800 (PST)
-Date: Thu, 16 Jan 2025 09:41:34 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Wenchao Hao <haowenchao22@gmail.com>
-Cc: Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] zram: cleanup in zram_read_from_zspool()
-Message-ID: <iiiqdmxebni4sfal7rguy4me24tgmzym2v4oz5hzjv624vavr6@kida3yjmoecs>
-References: <20250115145545.51561-1-haowenchao22@gmail.com>
+        d=1e100.net; s=20230601; t=1736993507; x=1737598307;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BoaBUpRpUubqD+tM/F5e4x0FQyJkK/Ce/WA2Bx67Y0E=;
+        b=U2ol1+AR522JYc02HSlLjoe+9U2sgtuX9MeTdSkZkOq1KzbYWyn2khjVASlYuGSQpK
+         lufWi7u/XXWjiyEANZaP+I0+fkihEaB07k4EGmWchT9SUpxuVh+Oatj3Cmq0gOhc+xPi
+         cLPXKSYJ+l91h3YXZnlO7bOsteFUML0iTuNwM8kcJIkV93OofNIU1baLJ3vSveROsfnH
+         YzqEh6IEvfzuX0mn25RvWlInEnb7mw82iHhmzRSG93mBqIiuJ8eYkf88dURu0CJa9zl1
+         ay0QExDOy1gn3LCKIzPcu+bk36UZ42OK+DcWPR+qeq9flH8qZy2Q7ybPowFDelWF2Oj2
+         liBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUSiB0RbqVlCAGJfDelYtzzO8cXV1du1Xs5BBQpq7BxNeQDPcdcybWjtk/IKKBDPHaP9LZgcYhF7lV/mw==@vger.kernel.org, AJvYcCWl1KpdkqV9EybyTea/AvMG5YOOSnanhFoB9rAK3K96/zUwz7GO7kqRPTyXQuqK7WFXFoS878Y7SSSXUyII@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRF7q3xTncvOwUCBAlKChzh3z/t8Tc4V+BxsnQGbTPEUCc4qGI
+	N7mfImmPFrbcEljyZQdc+3Jdeh/OuqwbuJGmYiRTJAaO4aJ6Kr/5
+X-Gm-Gg: ASbGncuIAz4ytsxlniGBNgapqQcIV2XlNLOc3m3RTEvjrEXsAv72pY4x99lt5uZtiVF
+	l8dmUfm1YU68wG/G/HVDX05mk88oNjdmZ2L38o80cOPkB5mo+MA+T2ab1WkNOCmLi2oo6Xjl1F5
+	+jhgvkZqJwmtbCQ92jg49mFvgWO3HPItMGiyywJgYBqcIYYOPsuO9ahO2hl/Jr6s9GMeuPalgtz
+	/xAymiD0G+J9WCECUGUogSiF23Q9NT9lh7TBYeplXrQHdR4LzmDCKOs+CmHR7lYzKwdJaCZ
+X-Google-Smtp-Source: AGHT+IF6Gd4CTfNYdhiTeZ+4wPQj0hmN7n2N/3zk3WhqsOGJBgtobC50NwQ0kB+q8OL4BKoZ6u2unQ==
+X-Received: by 2002:a17:90b:2650:b0:2ee:d7d3:3008 with SMTP id 98e67ed59e1d1-2f548f33b37mr54502241a91.12.1736993506592;
+        Wed, 15 Jan 2025 18:11:46 -0800 (PST)
+Received: from [10.234.9.0] ([43.224.245.235])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f72c33172dsm2065870a91.47.2025.01.15.18.11.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Jan 2025 18:11:46 -0800 (PST)
+Message-ID: <5cc90e64-4f17-487a-9ab6-691de00c4cb8@gmail.com>
+Date: Thu, 16 Jan 2025 10:11:42 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250115145545.51561-1-haowenchao22@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] zram: cleanup in zram_read_from_zspool()
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20250115145545.51561-1-haowenchao22@gmail.com>
+ <iiiqdmxebni4sfal7rguy4me24tgmzym2v4oz5hzjv624vavr6@kida3yjmoecs>
+Content-Language: en-US
+From: Wenchao Hao <haowenchao22@gmail.com>
+In-Reply-To: <iiiqdmxebni4sfal7rguy4me24tgmzym2v4oz5hzjv624vavr6@kida3yjmoecs>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On (25/01/15 22:55), Wenchao Hao wrote:
-> @@ -1561,11 +1561,6 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
->  
->  	size = zram_get_obj_size(zram, index);
->  
-> -	if (size != PAGE_SIZE) {
-> -		prio = zram_get_priority(zram, index);
-> -		zstrm = zcomp_stream_get(zram->comps[prio]);
-> -	}
-> -
->  	src = zs_map_object(zram->mem_pool, handle, ZS_MM_RO);
->  	if (size == PAGE_SIZE) {
->  		dst = kmap_local_page(page);
-> @@ -1573,6 +1568,9 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
->  		kunmap_local(dst);
->  		ret = 0;
->  	} else {
-> +		prio = zram_get_priority(zram, index);
-> +		zstrm = zcomp_stream_get(zram->comps[prio]);
-> +
->  		dst = kmap_local_page(page);
->  		ret = zcomp_decompress(zram->comps[prio], zstrm,
->  				       src, size, dst);
+On 2025/1/16 8:41, Sergey Senozhatsky wrote:
+> On (25/01/15 22:55), Wenchao Hao wrote:
+>> @@ -1561,11 +1561,6 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
+>>  
+>>  	size = zram_get_obj_size(zram, index);
+>>  
+>> -	if (size != PAGE_SIZE) {
+>> -		prio = zram_get_priority(zram, index);
+>> -		zstrm = zcomp_stream_get(zram->comps[prio]);
+>> -	}
+>> -
+>>  	src = zs_map_object(zram->mem_pool, handle, ZS_MM_RO);
+>>  	if (size == PAGE_SIZE) {
+>>  		dst = kmap_local_page(page);
+>> @@ -1573,6 +1568,9 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
+>>  		kunmap_local(dst);
+>>  		ret = 0;
+>>  	} else {
+>> +		prio = zram_get_priority(zram, index);
+>> +		zstrm = zcomp_stream_get(zram->comps[prio]);
+>> +
+>>  		dst = kmap_local_page(page);
+>>  		ret = zcomp_decompress(zram->comps[prio], zstrm,
+>>  				       src, size, dst);
+> 
+> I think you are looking at some old code base (or maybe vanilla kernel),
+> that function does not look like this in the current mm tree (or linux-next).
+Yes, it's from https://github.com/torvalds/linux. Sorry I did not examine the
+latest code, please ignore this thread.
 
-I think you are looking at some old code base (or maybe vanilla kernel),
-that function does not look like this in the current mm tree (or linux-next).
+Thanks.
