@@ -1,68 +1,67 @@
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0EB1F37CE
-	for <linux-block@vger.kernel.org>; Thu, 16 Jan 2025 14:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D6222ACEF
+	for <linux-block@vger.kernel.org>; Thu, 16 Jan 2025 14:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737036817; cv=none; b=sR2RYS9ePAtv+Yq8gQQaBGGDZuQ3hjev7rQqExAWLAlMaMSlnSinaRd3qxRDX1UblkJbld9YCXptR6irIyxFfjEdJVcp58GRXkPliGEYsbewF+FQ4RJw36gSBPczZze33hVYrLNIJ+OIx3+LCprl9StE1nmPy35L3RgeCaljiiA=
+	t=1737036819; cv=none; b=JFaLCRzLfv0FW28HKm/XMtXmGm49vD+S2ipaZM8ir/4XVts88F3m5Cl4y/7Hi7KbZXuhN/jivogLphOpDp26Nq2zpBf7Rp+BfWMAnljLcXqe9S5qhwKQ4Y+jcFMKNgOJ4OFEtkeOG4Y4QTPi4py/58eKYNT+wZq83XqqJVghpPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737036817; c=relaxed/simple;
-	bh=XkrUTtlKH39hWswXHA3y3nMxEuAA4w1hvpOu95EzHZ8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=DYOT+gAgUCqC+UhoASp/OntW83awBfFaIwkZaYyI8YOdSUMXSmQ5xcwLSai5YafKKeyeFheLhrbmprktPYi7NnQrtwo6aJV6+k+rErozQOyXhKbZitfH2J7Q4f+rfcJdpHqi3Up4Id+97/IEd9RnWvwAawSpz2BxDDohY06xu8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=n1CWBpC/; arc=none smtp.client-ip=209.85.166.46
+	s=arc-20240116; t=1737036819; c=relaxed/simple;
+	bh=gX8GP2PT41IzW7O6biBPIEvCMWkVfbVdWdv6YRQXWU0=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=MO4fqBsR4HbQuCkr7STZFWu//uEZ/lybvV/gqhNf1+d1vEwNqtcjngxFz9czt5G25lACL+mFJ+f/k5qFDPFuGOoxHls+vnnRGT8qW+07iP3FAN7ulWeKW81LHernQd75pyv9fzOAoL25NKeZTVs8lO7FsAgCwEDwB8TgElX8vOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=SGqxeLaY; arc=none smtp.client-ip=209.85.166.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="n1CWBpC/"
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-844ee166150so27935439f.2
-        for <linux-block@vger.kernel.org>; Thu, 16 Jan 2025 06:13:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="SGqxeLaY"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-844eb33827eso29251639f.2
+        for <linux-block@vger.kernel.org>; Thu, 16 Jan 2025 06:13:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1737036814; x=1737641614; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1737036816; x=1737641616; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j4UzF9fwMyRMRgDkplrGQmvMhEdB/FGisfpMIwMXJ/Y=;
-        b=n1CWBpC/YmiBUNQVQFtJ02o1npuGaqpv4XdepOUWjJRMgI+3BdmK5fGu1XWRaxny+c
-         Y1oU42KH68qOxFG3J2IPGEMZBu74nGK8pU/Ie9UnvMpkx1vHzsOnHk+iRUcEqhUm9qvU
-         Lt/BF40fMrr2aYvgxgmTzJoKUZutX3+TNIcJfLteJ6h+hkmypmWbGKlEe5MUcmX/Th2Y
-         eVGyAl1CN9YibhoufwO2F4NAU5kmLeXwkzYkSRpjrDGGIIacU5COZPwsrajF6fC4QC2w
-         orvvRw7ryTado6NUl8JAiJjJzqvGt+EEQ/uFLJ8iMIgpt2oXRSr9yOwIxcd7zyVtgNz6
-         G0mg==
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lTsqQBcR8nikRY1mHRlAq11hBDBCDSStNgwzcFfh57c=;
+        b=SGqxeLaYKXaYz7VSnLGmLKiVW8DCcmArmV9mL+v4C97YHWNALEVBFosAJblrffr+Y3
+         mm2JqdcxzeprcWvTxE1ibRzoIG89Ib52BRbPn2z9UcH934+p0fp8CfVS+JxomNJSxQ0j
+         7/YRaOQJEmHg1XpS7u7R+oi5Ml0QGV0M5tanaAS457Nl6xilOYHJZVf4NibWQQnt/VN2
+         KRz8fVGsdJA3gvnf1gZ+I49mXEb9x1q0/9WtTRYug8M/Bz5YXaVbzeutB+nhAtNWKxKJ
+         ZvRHvDHEFYmmw5CAgPtbKKsSY3ehBP94qdJnNTs2fHXm5htnAs2rFhi771qWx2T2U0pO
+         PAgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737036814; x=1737641614;
+        d=1e100.net; s=20230601; t=1737036816; x=1737641616;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j4UzF9fwMyRMRgDkplrGQmvMhEdB/FGisfpMIwMXJ/Y=;
-        b=CtZo3Sgg12IytH2cj56LAdzrkgGHTlI1F9usmAK3L5XoK+8WdHFVn4/hkcfmOBGUIR
-         WiyAAFYDUaqYzXzKZOVgHsW+L0TK5fAZ40mEPax6A4ss/PYqP+K+Xmg1JkHFi+/AKk+f
-         kDsOd7dVLzQ9Zf3f6BgG/yDWr8jBpP7RMRBt97tpBS2+tNfC/ccH+pEDiGNQUQ/1so8B
-         eMYi3y5etmsr3eypBo3Gk3mvhSMzkHlHDsUG4VF//lokEjLEoOJvklmnPqfoxO8iJ7M5
-         iK2sM1EE7nj5Zg0PNFo2h5w8n404fzyDqOjknDnrCR/b7UZXt5QBHboyVxVWO0iNp3iP
-         wxiw==
-X-Gm-Message-State: AOJu0Yz0fro69OisJNRys+m2oHkvOqHFtzmGiOqs1/R6c0n3EI2T2za2
-	hjIWxMqZDlKv32fpI3q/bhcToKvrRFeNi01WpNXy5X1yZrGUybIxwyWQLC+df8I=
-X-Gm-Gg: ASbGncvq89XQ6APpQ8gNeV8FlYnWayIzyKQ7wc7/2A52kxFmlnY4zTZdxBAgWbZA5pe
-	UsX8UOaKB3hFpIKV0ZVJqVBZ+fKhjTKUTcY4cWnTAXYAo9pG4x2XSFf6xuvp9s2+CF7xOouG0Mu
-	vVmDzpCpTAxwuauBKV5XtTWX/WhPa6VRAodp0CWlmfl1GdlbMhe6IPvVwAJCQkeMsS4kYJotIAE
-	znwG1cjvycCWNuVB6jWWYhjthYfsz/1I2HnyfKsDNTuf/U=
-X-Google-Smtp-Source: AGHT+IFbkAlyO8S6KytSnrQsF4ahczrXbmlDA+fE4PGyZuUt+HdGamzWILU1jppb9w/kprEw5l01eQ==
-X-Received: by 2002:a05:6e02:1:b0:3ce:7bbd:971c with SMTP id e9e14a558f8ab-3ce7bbd9852mr105291635ab.15.1737036814001;
-        Thu, 16 Jan 2025 06:13:34 -0800 (PST)
+        bh=lTsqQBcR8nikRY1mHRlAq11hBDBCDSStNgwzcFfh57c=;
+        b=GQQNo9lK0Lkg1i6GQ5V9zaU0DoKG7BfWurbWc5UNN/Z58WGF0XhtV4fi/NoDxudcUP
+         /phB6ekd8uWGdKpiqxAwiyCLA0Nvv+9UsRYwyLRfymJfJf8Ckx38V8PC5LIet9/ZGt/i
+         PWrfHUCQdzj6qEB8yz2yEsLVfoQiYmvZVCFFfuz1xi4xRC4fBAs54DZau+CXmTl7PZwL
+         rOD/6rq8k2SDWzawVnEHqggfJj8CR6iHt1i09MrvEC46v9Z7CJ6MtvZXXbULCu93ZewP
+         NuJXzZiSVfDPp/TZnDpf98RN125FqC2mKxqJST5Ax0i85ZT+7F6glgfbgOkkHsq5WdcY
+         /fGw==
+X-Gm-Message-State: AOJu0YzTqBRd7+6E+P7HAxzw6xbMfNW019x/LKn9DfcC//udtRebLt+v
+	tch8IRVXwEWXheENn9tZpU8u40UNfN6Wgi1mz+HIzO1R/mOLV0B5sDeFP0Zqkxw=
+X-Gm-Gg: ASbGnct7LOfXfhGn8K0jUE7F8FFbcaiFfuzIdTm3RryqHd3prbjL/IErRAEMaAeJ+50
+	C1919rFRGLzcDOxcQxV4aXY1nypvRfdQ28t0qe0swI55b1i+pay1xD7fNdg0SM9ysMasES8hQZk
+	trMMp3P0Ui3w56lwMNdRkd030gKGGvuUYrLzHTR4sN7WV+hjmCQxQNoOSsTIERiJipk4aMKDaQz
+	s7Soan+YGbWkvu5GQyNpsAisS0dX3r1/HxvE0VD3Obv/OQ=
+X-Google-Smtp-Source: AGHT+IGANY8niyLF3uWa+S2iTfC6oasfW1qBS4d76l855fE+sIT/SX6M88SviEF0wM6UKp/gDW5gmA==
+X-Received: by 2002:a05:6e02:198d:b0:3cf:6d33:d410 with SMTP id e9e14a558f8ab-3cf6d33d5femr10711675ab.7.1737036816642;
+        Thu, 16 Jan 2025 06:13:36 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ea756bae75sm36808173.132.2025.01.16.06.13.33
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ea756bae75sm36808173.132.2025.01.16.06.13.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 06:13:33 -0800 (PST)
+        Thu, 16 Jan 2025 06:13:35 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: John Garry <john.g.garry@oracle.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, martin.petersen@oracle.com
-In-Reply-To: <20250109114000.2299896-1-john.g.garry@oracle.com>
-References: <20250109114000.2299896-1-john.g.garry@oracle.com>
-Subject: Re: [PATCH 0/2] block: Stacked device atomic writes fixes
-Message-Id: <173703681323.10865.17086419533205015442.b4-ty@kernel.dk>
-Date: Thu, 16 Jan 2025 07:13:33 -0700
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+In-Reply-To: <20250115092648.1104452-1-ming.lei@redhat.com>
+References: <20250115092648.1104452-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] block: limit disk max sectors to (LLONG_MAX >> 9)
+Message-Id: <173703681553.10865.2377147280762674021.b4-ty@kernel.dk>
+Date: Thu, 16 Jan 2025 07:13:35 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,23 +73,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3-dev-14bd6
 
 
-On Thu, 09 Jan 2025 11:39:58 +0000, John Garry wrote:
-> This series is spun off the dm atomic writes series at [0], as the first
-> patch fixes behaviour for md raid atomic write support also.
+On Wed, 15 Jan 2025 17:26:48 +0800, Ming Lei wrote:
+> Kernel `loff_t` is defined as `long long int`, so we can't support disk
+> which size is > LLONG_MAX.
 > 
-> https://lore.kernel.org/linux-block/5a24c8ca-bd0f-6cd0-a3f0-09482a562efe@redhat.com/T/#m42a9481059ef011f2267db1ec2e00edb1ba4758d
-> 
-> Based on block/6.13 . Patch 2/2 is only required for dm atomic write
-> support, so could be added to the block/6.14 queue.
+> There are many virtual block drivers, and hardware may report bad capacity
+> too, so limit max sectors to (LLONG_MAX >> 9) for avoiding potential
+> trouble.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/2] block: Ensure start sector is aligned for stacking atomic writes
-      commit: 6564862d646e7d630929ba1ff330740bb215bdac
-[2/2] block: Change blk_stack_atomic_writes_limits() unit_min check
-      commit: 5d1f7ee7f0b6362c9148d500aeebe49b64b64df4
+[1/1] block: limit disk max sectors to (LLONG_MAX >> 9)
+      commit: 3d9a9e9a77c5ebecda43b514f2b9659644b904d0
 
 Best regards,
 -- 
