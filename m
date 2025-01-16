@@ -1,116 +1,368 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from esa12.hc1455-7.c3s2.iphmx.com (esa12.hc1455-7.c3s2.iphmx.com [139.138.37.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CB6156F3C;
-	Thu, 16 Jan 2025 03:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926D241C6A;
+	Thu, 16 Jan 2025 04:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.37.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736996686; cv=none; b=lrXQvekCIcbOEn/rUteDS/HULxzefaH7fzu56l0E24HTxCBM6gr++2/ICAYOl9gOIpJM+wVaabFmqpmALpI65ZFzR6/H7P6jZh31onc9hvVH3OwIXACaH1E7r6pXwZUL80Bdyz70eNF3qj7QpjXBfHZVknYfnz/bHut84/nzS0M=
+	t=1737000347; cv=none; b=Yc0MALmodl2N1TJFYXL8icxxFv0XuF7PrH3Gfd47Y7NEvq/DpfCWy9V7T1lxbR5h59Mta8M9jqs9r30ezR7PBH7v8HC8EiZye6leM/wYedrPbDUFzwuPjebUryQ2aBpcq/O5P85efRY3hlT1/pREzc/87mC6WaKmULMToarsTsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736996686; c=relaxed/simple;
-	bh=EBV0OW05/JxgCgTU9SnU/dFX3BjZl3agdkLEtQYLN4k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lGCdzJX9cYIPMmx7btjTb0oake4KhVI95WwF0/auANfWDicqrE5rnVc/qVaXYWcTiKC85NdHrDv7DD/Vi3KEaY2kUntfbQFrSjWDwr1hxCn7dfQFoY9ji+ExrbocDGxoNBXehb6UN+SzYudMWJ4LdcGbrir6p27AZHwfzXWJBvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YYSPs3q4lz4f3l26;
-	Thu, 16 Jan 2025 11:04:17 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 2E1901A0E96;
-	Thu, 16 Jan 2025 11:04:39 +0800 (CST)
-Received: from [10.174.179.80] (unknown [10.174.179.80])
-	by APP4 (Coremail) with SMTP id gCh0CgDHKl9Fd4hnGHdVBA--.30220S3;
-	Thu, 16 Jan 2025 11:04:38 +0800 (CST)
-Message-ID: <a8ea2143-0b10-43ba-a464-7ce3348bb5af@huaweicloud.com>
-Date: Thu, 16 Jan 2025 11:04:36 +0800
+	s=arc-20240116; t=1737000347; c=relaxed/simple;
+	bh=7lIrF7oO4Pwd4L12BlIXY2/1HqjaOPrMQyk1MFQIJpI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XRFSdISoV1Lh2mHZcp33KdM0AjVqFk23/tOcCAOwLcKK1OBa9jdDoBv3RCALnHtk5Lh1ffIi6pRhKBrr5pfo9Qz9bXjbYa3Q2RUyOSup0+MCTUTRsGi+19mZlMJqNb1Has9l3MaI3d2no/ThN3YcJX19G/B6XU8Cu6RAhSKwv/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=X+ltxZ1r; arc=none smtp.client-ip=139.138.37.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="X+ltxZ1r"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1737000345; x=1768536345;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7lIrF7oO4Pwd4L12BlIXY2/1HqjaOPrMQyk1MFQIJpI=;
+  b=X+ltxZ1rFtUJNYQ6K0eiVMKddIfcb/GjMQVWh1SBiAV9jSrlCrUes1pY
+   lg3FujVXH5gUkUnEXZ6NQ9sdPWJXlN+pHil8+v0xQbIYxKTBmfVjICXua
+   4XyWFFMAqdlI/X+6hISNnmnw5K2RQ3k6dV08J5MAbGpDovb0RtlNWYWbu
+   /skP0frtCnou5DgBwqWtE9TtniodAWat7pmC4BrHlRby6IB579h20bmpb
+   xxJu/X8LlNH+NviqIEednTG7CAXX0BwhmUXdd71xzSwXSr4CB6Vdn3SZ9
+   5gueYHrtgw5RwZaYqj8yDSksFbJ0FILil63HnD4AI1NIMD9mgEu9mfpah
+   w==;
+X-CSE-ConnectionGUID: LFpgde60Tu2cebYlAAIQDA==
+X-CSE-MsgGUID: OXDBUgpQSY21Sxg2zEepSA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="165642541"
+X-IronPort-AV: E=Sophos;i="6.13,208,1732546800"; 
+   d="scan'208";a="165642541"
+Received: from unknown (HELO oym-r3.gw.nic.fujitsu.com) ([210.162.30.91])
+  by esa12.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 13:05:36 +0900
+Received: from oym-m1.gw.nic.fujitsu.com (oym-nat-oym-m1.gw.nic.fujitsu.com [192.168.87.58])
+	by oym-r3.gw.nic.fujitsu.com (Postfix) with ESMTP id DAE34C2260;
+	Thu, 16 Jan 2025 13:05:33 +0900 (JST)
+Received: from kws-ab4.gw.nic.fujitsu.com (kws-ab4.gw.nic.fujitsu.com [192.51.206.22])
+	by oym-m1.gw.nic.fujitsu.com (Postfix) with ESMTP id B30FBD8AF6;
+	Thu, 16 Jan 2025 13:05:33 +0900 (JST)
+Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
+	by kws-ab4.gw.nic.fujitsu.com (Postfix) with ESMTP id 3EE0D6B64B;
+	Thu, 16 Jan 2025 13:05:33 +0900 (JST)
+Received: from iaas-rpma.. (unknown [10.167.135.44])
+	by edo.cn.fujitsu.com (Postfix) with ESMTP id 915171A0073;
+	Thu, 16 Jan 2025 12:05:30 +0800 (CST)
+From: Li Zhijian <lizhijian@fujitsu.com>
+To: linux-block@vger.kernel.org
+Cc: shinichiro.kawasaki@wdc.com,
+	linux-rdma@vger.kernel.org,
+	Li Zhijian <lizhijian@fujitsu.com>
+Subject: [PATCH blktests v2] tests: Remove unnecessary '&&' in requires() functions
+Date: Thu, 16 Jan 2025 12:05:25 +0800
+Message-Id: <20250116040525.173256-1-lizhijian@fujitsu.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 0/8] fallocate: introduce FALLOC_FL_WRITE_ZEROES
- flag
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "hch@lst.de" <hch@lst.de>, "tytso@mit.edu" <tytso@mit.edu>,
- "djwong@kernel.org" <djwong@kernel.org>,
- "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
- "chengzhihao1@huawei.com" <chengzhihao1@huawei.com>,
- "yukuai3@huawei.com" <yukuai3@huawei.com>,
- "yangerkun@huawei.com" <yangerkun@huawei.com>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <20250115114637.2705887-1-yi.zhang@huaweicloud.com>
- <ccebada1-ac72-468e-8342-a9c645e5221e@nvidia.com>
-Content-Language: en-US
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-In-Reply-To: <ccebada1-ac72-468e-8342-a9c645e5221e@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgDHKl9Fd4hnGHdVBA--.30220S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7KFW8AryxWrW8Kr4xAw18Zrb_yoW8Aw43pF
-	WUXrZ8KrWkuF40yrnrua17u34fXw4xCr1fArWUWFyUZ3ZxAry7CanxK3yj9FW8uF9agF1j
-	vrW8JF9rCr4FyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
-	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1
-	aFAJUUUUU==
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28926.004
+X-TM-AS-User-Approved-Sender: Yes
+X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28926.004
+X-TMASE-Result: 10--12.800000-10.000000
+X-TMASE-MatchedRID: yLHOPqhdQyVzKOD0ULzeCUocPLxXXRnc2FA7wK9mP9fVjNsehGf0vTos
+	Lf1kH5Cf4QymIl443zKoQPOGYWh+VYV0mK0vUjwHAiwTe0IqjZfFmmMdIwjrDqr4vEVTsLe2i3G
+	OCGgGiOaPHlfcV0jhQOaffHI8kAmiHY/bzRmIaZGqh5pv1eDPz0xUJyPnqTyGzAdJD7JeNMPIvl
+	CZY6Ax8LX80TaNz00Y2kWu1n9CuOHyq/cli2hvDTllFsU0CXSPwJjn8yqLU6LIFck3f6fvyA57Z
+	+qS9uMQTbaQJuvVgicxBm2TrrWsvOVHGbcDbAq6FEUknJ/kEl7dB/CxWTRRu25FeHtsUoHu64m6
+	9tDAKAacGLKN1Nr+/fLxngnWo/hwDYPL3ugnpjY+kK598Yf3Mg==
+X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
 
-On 2025/1/16 5:07, Chaitanya Kulkarni wrote:
-> On 1/15/25 03:46, Zhang Yi wrote:
->> Currently, we can use the fallocate command to quickly create a
->> pre-allocated file. However, on most filesystems, such as ext4 and XFS,
->> fallocate create pre-allocation blocks in an unwritten state, and the
->> FALLOC_FL_ZERO_RANGE flag also behaves similarly. The extent state must
->> be converted to a written state when the user writes data into this
->> range later, which can trigger numerous metadata changes and consequent
->> journal I/O. This may leads to significant write amplification and
->> performance degradation in synchronous write mode. Therefore, we need a
->> method to create a pre-allocated file with written extents that can be
->> used for pure overwriting. At the monent, the only method available is
->> to create an empty file and write zero data into it (for example, using
->> 'dd' with a large block size). However, this method is slow and consumes
->> a considerable amount of disk bandwidth, we must pre-allocate files in
->> advance but cannot add pre-allocated files while user business services
->> are running.
-> 
-> it will be very useful if we can get some blktests for scsi/nvme/dm.
-> Please note that this not a blocker to get this path series to be merged,
-> but this will help everyone including regular tests runs we do to ensure
-> the stability of new interface.
+The '&&' operator should only be used when the second operand
+is dependent on the first. In the context of requires() functions,
+we prefer to evaluate all conditions independently to display
+all SKIP_REASONS at once. This change separates the conditions
+into individual lines to ensure each condition is evaluated
+regardless of the others.
 
-Hello, Chaitanya,
+After this patch, there are a few '&&' remain
+$ git grep -wl 'requires()' | xargs -I {} sed -n '/^requires() *{/,/}/p' {} | grep '&&'
+        _have_null_blk && _have_module_param null_blk blocking
+        _have_null_blk && _have_module_param null_blk shared_tags
+        _have_null_blk && _have_module_param null_blk timeout
+        _have_null_blk && _have_module_param null_blk requeue
+        _have_null_blk && _have_module_param null_blk shared_tags
+        _have_null_blk && _have_module_param null_blk init_hctx
+        _have_module nvme_tcp && _have_module_param nvme_tcp ddp_offload
+        _have_program mkfs.btrfs && have_good_mkfs_btrfs
 
-Thanks for your feedback! Yeah, the proposal for this series is still under
-discussion, I will add counterpart tests to both blktests and fstests once
-the solution is determined.
+Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
+---
+V2:
+  rebase and
+  Even though '_have_null_blk &&  _have_module_param null_blk' can be simplify to
+  '_have_module_param null_blk', I keep it as it's so that we are safe to
+  have updates in _have_null_blk() in the future.
+---
+ tests/block/006 | 3 ++-
+ tests/block/008 | 3 ++-
+ tests/block/010 | 3 ++-
+ tests/block/011 | 3 ++-
+ tests/block/019 | 3 ++-
+ tests/block/020 | 3 ++-
+ tests/block/029 | 3 ++-
+ tests/loop/002  | 4 +++-
+ tests/nbd/001   | 4 +++-
+ tests/nbd/002   | 3 ++-
+ tests/nbd/003   | 3 ++-
+ tests/nvme/005  | 3 ++-
+ tests/nvme/010  | 3 ++-
+ tests/nvme/039  | 4 ++--
+ tests/nvme/056  | 4 +++-
+ tests/scsi/001  | 3 ++-
+ tests/scsi/002  | 3 ++-
+ 17 files changed, 37 insertions(+), 18 deletions(-)
 
-> 
-> if you do please CC and Shinichiro (added to CC list) to we can help those
-> tests review and potentially also can provide tested by tag tht can help
-> this work to move forward.
-> 
-Sure, this will be very helpful.
-
-Thanks,
-Yi.
+diff --git a/tests/block/006 b/tests/block/006
+index 7d05b1113fb9..8601397f4bf8 100755
+--- a/tests/block/006
++++ b/tests/block/006
+@@ -15,7 +15,8 @@ TIMED=1
+ CAN_BE_ZONED=1
+ 
+ requires() {
+-	_have_null_blk && _have_module_param null_blk blocking && _have_fio
++	_have_null_blk && _have_module_param null_blk blocking
++	_have_fio
+ }
+ 
+ test() {
+diff --git a/tests/block/008 b/tests/block/008
+index cd0935259157..859c0fe7d85e 100755
+--- a/tests/block/008
++++ b/tests/block/008
+@@ -12,7 +12,8 @@ TIMED=1
+ CAN_BE_ZONED=1
+ 
+ requires() {
+-	_have_cpu_hotplug && _have_fio
++	_have_cpu_hotplug
++	_have_fio
+ }
+ 
+ test_device() {
+diff --git a/tests/block/010 b/tests/block/010
+index ed5613525255..5b52fdb948c7 100755
+--- a/tests/block/010
++++ b/tests/block/010
+@@ -15,7 +15,8 @@ TIMED=1
+ CAN_BE_ZONED=1
+ 
+ requires() {
+-	_have_null_blk && _have_module_param null_blk shared_tags && _have_fio
++	_have_null_blk && _have_module_param null_blk shared_tags
++	_have_fio
+ }
+ 
+ run_fio_job() {
+diff --git a/tests/block/011 b/tests/block/011
+index 63212122a736..662f41c301ce 100755
+--- a/tests/block/011
++++ b/tests/block/011
+@@ -24,7 +24,8 @@ pci_dev_mounted() {
+ }
+ 
+ requires() {
+-	_have_fio && _have_program setpci
++	_have_fio
++	_have_program setpci
+ }
+ 
+ device_requires() {
+diff --git a/tests/block/019 b/tests/block/019
+index 58aca4cc1020..723eb61350f9 100755
+--- a/tests/block/019
++++ b/tests/block/019
+@@ -11,7 +11,8 @@ QUICK=1
+ CAN_BE_ZONED=1
+ 
+ requires() {
+-	_have_fio && _have_program setpci
++	_have_fio
++	_have_program setpci
+ }
+ 
+ device_requires() {
+diff --git a/tests/block/020 b/tests/block/020
+index 5ffa23248804..66f380edfc61 100755
+--- a/tests/block/020
++++ b/tests/block/020
+@@ -14,7 +14,8 @@ QUICK=1
+ CAN_BE_ZONED=1
+ 
+ requires() {
+-	_have_null_blk && _have_fio
++	_have_null_blk
++	_have_fio
+ }
+ 
+ test() {
+diff --git a/tests/block/029 b/tests/block/029
+index b9a897dbf830..c00bdeba28e1 100755
+--- a/tests/block/029
++++ b/tests/block/029
+@@ -11,7 +11,8 @@ DESCRIPTION="trigger blk_mq_update_nr_hw_queues()"
+ QUICK=1
+ 
+ requires() {
+-	_have_fio && _have_null_blk
++	_have_fio
++	_have_null_blk
+ }
+ 
+ modify_nr_hw_queues() {
+diff --git a/tests/loop/002 b/tests/loop/002
+index d0ef964989e6..07b9c6c53c9c 100755
+--- a/tests/loop/002
++++ b/tests/loop/002
+@@ -15,7 +15,9 @@ DESCRIPTION="try various loop device block sizes"
+ QUICK=1
+ 
+ requires() {
+-	_have_program xfs_io && _have_src_program loblksize && _have_loop_set_block_size
++	_have_program xfs_io
++	_have_src_program loblksize
++	_have_loop_set_block_size
+ }
+ 
+ test() {
+diff --git a/tests/nbd/001 b/tests/nbd/001
+index 0975af0543e2..cc083e3ce6ed 100755
+--- a/tests/nbd/001
++++ b/tests/nbd/001
+@@ -11,7 +11,9 @@ DESCRIPTION="resize a connected nbd device"
+ QUICK=1
+ 
+ requires() {
+-	_have_nbd && _have_program parted && _have_src_program nbdsetsize
++	_have_nbd
++	_have_program parted
++	_have_src_program nbdsetsize
+ }
+ 
+ test() {
+diff --git a/tests/nbd/002 b/tests/nbd/002
+index 8e4e062eba66..00701b11236d 100755
+--- a/tests/nbd/002
++++ b/tests/nbd/002
+@@ -17,7 +17,8 @@ DESCRIPTION="tests on partition handling for an nbd device"
+ QUICK=1
+ 
+ requires() {
+-	_have_nbd_netlink && _have_program parted
++	_have_nbd_netlink
++	_have_program parted
+ }
+ 
+ test() {
+diff --git a/tests/nbd/003 b/tests/nbd/003
+index 57fb63a9e70f..4fabdebc8f6a 100755
+--- a/tests/nbd/003
++++ b/tests/nbd/003
+@@ -11,7 +11,8 @@ DESCRIPTION="mount/unmount concurrently with NBD_CLEAR_SOCK"
+ QUICK=1
+ 
+ requires() {
+-	_have_nbd && _have_src_program mount_clear_sock
++	_have_nbd
++	_have_src_program mount_clear_sock
+ }
+ 
+ test() {
+diff --git a/tests/nvme/005 b/tests/nvme/005
+index 66c12fdb7d8d..8fc1f574ce3d 100755
+--- a/tests/nvme/005
++++ b/tests/nvme/005
+@@ -12,7 +12,8 @@ QUICK=1
+ 
+ requires() {
+ 	_nvme_requires
+-	_have_loop && _have_module_param_value nvme_core multipath Y
++	_have_loop
++	_have_module_param_value nvme_core multipath Y
+ 	_require_nvme_trtype_is_fabrics
+ }
+ 
+diff --git a/tests/nvme/010 b/tests/nvme/010
+index a5ddf581ecc9..58c8693b1373 100755
+--- a/tests/nvme/010
++++ b/tests/nvme/010
+@@ -11,7 +11,8 @@ TIMED=1
+ 
+ requires() {
+ 	_nvme_requires
+-	_have_fio && _have_loop
++	_have_fio
++	_have_loop
+ 	_require_nvme_trtype_is_fabrics
+ }
+ 
+diff --git a/tests/nvme/039 b/tests/nvme/039
+index eca8ba35475e..ab58f3b91c7d 100755
+--- a/tests/nvme/039
++++ b/tests/nvme/039
+@@ -14,8 +14,8 @@ QUICK=1
+ 
+ requires() {
+ 	_have_program nvme
+-	_have_kernel_option FAULT_INJECTION && \
+-	    _have_kernel_option FAULT_INJECTION_DEBUG_FS
++	_have_kernel_option FAULT_INJECTION
++	_have_kernel_option FAULT_INJECTION_DEBUG_FS
+ }
+ 
+ device_requires() {
+diff --git a/tests/nvme/056 b/tests/nvme/056
+index d4dda2d98b91..958c2e31165c 100755
+--- a/tests/nvme/056
++++ b/tests/nvme/056
+@@ -30,7 +30,9 @@ requires() {
+ 	_have_fio
+ 	_have_program ip
+ 	_have_program ethtool
+-	_have_kernel_source && _have_program python3 && have_netlink_cli
++	_have_kernel_source
++	_have_program python3
++	have_netlink_cli
+ 	have_iface
+ }
+ 
+diff --git a/tests/scsi/001 b/tests/scsi/001
+index 54ca58227659..9e43c8dfbd11 100755
+--- a/tests/scsi/001
++++ b/tests/scsi/001
+@@ -11,7 +11,8 @@ DESCRIPTION="try triggering a kernel GPF with 0 byte SG reads"
+ QUICK=1
+ 
+ requires() {
+-	_have_scsi_generic && _have_src_program sg/syzkaller1
++	_have_scsi_generic
++	_have_src_program sg/syzkaller1
+ }
+ 
+ test_device() {
+diff --git a/tests/scsi/002 b/tests/scsi/002
+index b38706447f83..82e9d8a554ca 100755
+--- a/tests/scsi/002
++++ b/tests/scsi/002
+@@ -11,7 +11,8 @@ DESCRIPTION="perform a SG_DXFER_FROM_DEV from the /dev/sg read-write interface"
+ QUICK=1
+ 
+ requires() {
+-	_have_scsi_generic && _have_src_program sg/dxfer-from-dev
++	_have_scsi_generic
++	_have_src_program sg/dxfer-from-dev
+ }
+ 
+ test_device() {
+-- 
+2.47.0
 
