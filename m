@@ -1,151 +1,138 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3132F157E88
-	for <linux-block@vger.kernel.org>; Thu, 16 Jan 2025 07:44:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAEF1991CF;
+	Thu, 16 Jan 2025 10:04:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737013490; cv=none; b=k7i3yZro+4XCBZewlugGGGn2TLWl4HNmyRwIzLtuhvnYxn22dme6VMtMqS7iM5z2KkPfVN80TwQX83azGhCyj+TKUtlugf721yuHgYbeDy9XPvxmQu+GtvwPyED8hO7BL9bphxv9yfUSUyaJGVgeXBaAibUJG73Pf+5lZ8/wxsc=
+	t=1737021883; cv=none; b=fjkGr22ETS2fRhudb7TlahR52/Og1P1woGwvGF70TO3Ftr+YqgKuPFrjbiyDFY1Gfvnc97bTlKpnA2BUntyUmHpY5FaVD9XHwVNF9fv+DIR6wRXjcD2WGNEFkbGhnw73Jh2l1CR2Q/lURNphSDlafp8mj41oaUU67fTeFGy7/7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737013490; c=relaxed/simple;
-	bh=vCUL355PUmxQkHoUZjQusX+HzCE2DufxqUmBkiy4UWg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qfZnMY76jfSJawrQCWMCWJh7O0cSUAzQ+mKq7UT7Lx6Ma/CvzHjxmh3kXHLo9/EipAnSwtGpZpWG/zQFZgB1Su8XhmPbKMl/GUSedTutYUxZzvrjYwCCE5oEumDfXnM6P2jp8Hn16qIQB0yFH/gjvXRGxfFmyxMcDtp5Ip4YGeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WKxARc0F; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1737021883; c=relaxed/simple;
+	bh=umRE6v25xluhGP765JX3qQKm9iDvOyK2b54s+f7mP5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aKpEu7mMRSQRuJ6WKG0IyUtGvZ7bddsqPCEhuGYuM+8dCIRRF1lNdQGX2+99L+Gg/eNpA5s943EWzCa29StZhb0zNeNS8/U3Eiani8IcuAgId+THsSI6rOLbylGs25wJaA4V6cl9umQFVxzkxEsOzbfhdPB/BfXk/smWPtF3V+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V+LUdMcW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WKxARc0F"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50G3Hxu9025801;
-	Thu, 16 Jan 2025 07:44:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	EQoTO7/2AaY5MfsO2OXUF4bpfLihZ/AjYN/01loV764=; b=WKxARc0FgWHhHSYG
-	oR6UR5Sw7rW47fHNVRhAszvkZRe885W2PEbWeu47IZv5I0f3m4hRKVurd2SR5dw2
-	21uWZfv24dQjeXn9+Hvlq6AIflpIQTJoB6Hm7QVd9svchTdGLeE7Fmq7jq7OpVb0
-	qPnf6eiN9uobhQJC4zXTl8F2PHL7HZMQo6JXcLxxTNiDIm+v4gwP1H7VmqTyQczD
-	5TXhjfa8IOJwbclOkvdDKKdMSQD5e/dIIiPpOEb7xlr2TqyCYHSValu7/33Jlsoa
-	QYtyydbXonxSQRD+r+wnyIEsn2Anfe0VGk1DiJDgizQrCaFpbRafm7gFPKCC+nF2
-	L3j8FA==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 446t348hpe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 07:44:25 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50G7iOcP004164
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 07:44:24 GMT
-Received: from [10.253.34.248] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 15 Jan
- 2025 23:44:22 -0800
-Message-ID: <48378035-f0f2-714d-6172-bbaac285e3d8@quicinc.com>
-Date: Thu, 16 Jan 2025 15:43:57 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V+LUdMcW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B18E2C4CED6;
+	Thu, 16 Jan 2025 10:04:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737021882;
+	bh=umRE6v25xluhGP765JX3qQKm9iDvOyK2b54s+f7mP5w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V+LUdMcWSz6X0NwN2VNwxC18SbqevUZzZF8qtF5uuMwgUobfeARBDRExAA/Br6LLU
+	 4RsBrAC6sLgqV4uEtwS4uppHqkaEzEC95BuWO7NUpiHoE2oUkB551WKoQ9SyGe1XQ0
+	 SZKt8/9g0nHClUkYXBbbM0EdANZO63jSgVd4nQHIKPRujdjEeX4gneeDTnKMDqa5VH
+	 0WBDUV/bn4GRzPALGj2rB1j2hxX4yjdcjGBesXzU1cssKtpp01fQ0O/GSGIplAgcxg
+	 Xy6WqJUVqPMl0FzVExkqFy0HG96UvxihmvbWRrr3k5EbYsVv9eYI3hGgiVhV/5D3AE
+	 jFbIznUVIvk2g==
+Date: Thu, 16 Jan 2025 11:04:36 +0100
+From: Niklas Cassel <cassel@kernel.org>
+To: Oliver Sang <oliver.sang@intel.com>
+Cc: Christoph Hellwig <hch@lst.de>, oe-lkp@lists.linux.dev, lkp@intel.com,
+	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-nvme@lists.infradead.org, Damien Le Moal <dlemoal@kernel.org>,
+	linux-btrfs@vger.kernel.org, linux-aio@kvack.org
+Subject: Re: [linus:master] [block]  e70c301fae: stress-ng.aiol.ops_per_sec
+ 49.6% regression
+Message-ID: <Z4jZtH2lhsZ3JTZ9@ryzen>
+References: <Z2EgW8/WNfzZ28mn@xsang-OptiPlex-9020>
+ <20241217065614.GA19113@lst.de>
+ <Z3ZhNYHKZPMpv8Cz@ryzen>
+ <20250103064925.GB27984@lst.de>
+ <Z3epOlVGDBqj72xC@ryzen>
+ <Z3zlgBB3ZrGApew7@xsang-OptiPlex-9020>
+ <Z35VVvuT0nl0iDfd@ryzen>
+ <Z4DD1Lgzvv66tS3w@xsang-OptiPlex-9020>
+ <Z4efKYwbf2QYBx40@ryzen>
+ <Z4ipFFdAppraxrmA@xsang-OptiPlex-9020>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v17 14/14] scsi: ufs: Inform the block layer about write
- ordering
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, Christoph Hellwig <hch@lst.de>,
-        "Damien Le
- Moal" <dlemoal@kernel.org>,
-        "Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Avri Altman
-	<avri.altman@wdc.com>
-References: <20250115224649.3973718-1-bvanassche@acm.org>
- <20250115224649.3973718-15-bvanassche@acm.org>
-Content-Language: en-US
-From: Can Guo <quic_cang@quicinc.com>
-In-Reply-To: <20250115224649.3973718-15-bvanassche@acm.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: z1pPeEXZ6151UoVqCel07qXCyumNIA4w
-X-Proofpoint-GUID: z1pPeEXZ6151UoVqCel07qXCyumNIA4w
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-16_03,2025-01-15_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- adultscore=0 suspectscore=0 priorityscore=1501 phishscore=0
- mlxlogscore=999 spamscore=0 impostorscore=0 lowpriorityscore=0
- clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501160054
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z4ipFFdAppraxrmA@xsang-OptiPlex-9020>
+
+On Thu, Jan 16, 2025 at 02:37:08PM +0800, Oliver Sang wrote:
+> On Wed, Jan 15, 2025 at 12:42:33PM +0100, Niklas Cassel wrote:
+> > 
+> > Looking closer at the raw number for stress-ng + none scheduler, in your
+> > other email, it seems clear that the raw values from the stress-ng workload
+> > can vary quite a lot. In the long run, I wonder if we perhaps can find a
+> > workload that has less variation. E.g. fio test for IOPS and fio test for
+> > throughout. But perhaps such workloads are already part of lkp-tests?
+> 
+> yes, we have fio tests [1].
+> as in [2], we get it from https://github.com/axboe/fio
+> not sure if it's just the fio you mentioned?
+
+Yes, that's the one :)
+
+
+> 
+> our framework is basically automatic. bot merged repo/branches it monitors
+> into so-called hourly kernel, then if found performance difference with base,
+> bisect will be triggered to capture which commit causes the change.
+> 
+> due to resource constraint, we cannot allot all testsuites (we have around 80)
+> to all platforms, and there are other various reasons which could cause us to
+> miss some performance differences.
+> 
+> if you have interests, could you help check those fio-basic-*.yaml files under
+> [3]? if you can spot out the correct case, we could do more tests to check
+> e70c301fae and its parent. thanks!
+> 
+> [1] https://github.com/intel/lkp-tests/tree/master/programs/fio
+> [2] https://github.com/intel/lkp-tests/blob/master/programs/fio/pkg/PKGBUILD
+> [3] https://github.com/intel/lkp-tests/tree/master/jobs
+
+I'm probably not the best qualified person to review this, would be nice if e.g.
+Jens himself (or others block layer folks) could have a look at these.
+
+What I can see is:
+https://github.com/intel/lkp-tests/blob/master/jobs/fio-basic-local-disk.yaml
+
+seems to do:
+    - randrw
+
+but only on for SSDs, not HDDs, and only on ext4.
 
 
 
-On 1/16/2025 6:46 AM, Bart Van Assche wrote:
->  From the UFSHCI 4.0 specification, about the legacy (single queue) mode:
-> "The host controller always process transfer requests in-order according
-> to the order submitted to the list. In case of multiple commands with
-> single doorbell register ringing (batch mode), The dispatch order for
-> these transfer requests by host controller will base on their index in
-> the List. A transfer request with lower index value will be executed
-> before a transfer request with higher index value."
->
->  From the UFSHCI 4.0 specification, about the MCQ mode:
-> "Command Submission
-> 1. Host SW writes an Entry to SQ
-> 2. Host SW updates SQ doorbell tail pointer
->
-> Command Processing
-> 3. After fetching the Entry, Host Controller updates SQ doorbell head
->     pointer
-> 4. Host controller sends COMMAND UPIU to UFS device"
->
-> In other words, for both legacy and MCQ mode, UFS controllers are
-> required to forward commands to the UFS device in the order these
-> commands have been received from the host.
->
-> Notes:
-> - For legacy mode this is only correct if the host submits one
->    command at a time. The UFS driver does this.
-> - Also in legacy mode, the command order is not preserved if
->    auto-hibernation is enabled in the UFS controller.
->
-> This patch improves performance as follows on a test setup with UFSHCI
-> 3.0 controller:
-> - With the mq-deadline scheduler: 2.5x more IOPS for small writes.
-> - When not using an I/O scheduler compared to using mq-deadline with
->    zone locking: 4x more IOPS for small writes.
->
-> Cc: Bao D. Nguyen <quic_nguyenb@quicinc.com>
-> Cc: Can Guo <quic_cang@quicinc.com>
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: Avri Altman <avri.altman@wdc.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->   drivers/ufs/core/ufshcd.c | 7 +++++++
->   1 file changed, 7 insertions(+)
->
-> diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-> index 3094f3c89e82..08803ba21668 100644
-> --- a/drivers/ufs/core/ufshcd.c
-> +++ b/drivers/ufs/core/ufshcd.c
-> @@ -5255,6 +5255,13 @@ static int ufshcd_device_configure(struct scsi_device *sdev,
->   	struct ufs_hba *hba = shost_priv(sdev->host);
->   	struct request_queue *q = sdev->request_queue;
->   
-> +	/*
-> +	 * With auto-hibernation disabled, the write order is preserved per
-> +	 * MCQ. Auto-hibernation may cause write reordering that results in
-> +	 * unaligned write errors. The SCSI core will retry the failed writes.
-> +	 */
-> +	lim->driver_preserves_write_order = true;
-> +
->   	lim->dma_pad_mask = PRDT_DATA_BYTE_COUNT_PAD - 1;
->   
->   	/*
-Review-by: Can Guo <quic_cang@quicinc.com>
+https://github.com/intel/lkp-tests/blob/master/jobs/fio-basic-1hdd-write.yaml
 
+does test ext4, btrfs, and xfs,
+but it does not do randrw.
+
+
+What are the thresholds for these tests counting as a regression?
+Are you comparing BW, or IOPS, or both?
+
+Looking at:
+https://github.com/intel/lkp-tests/blob/master/programs/fio/parse
+
+It seems to produce points for:
+bw_MBps
+iops
+total_ios
+clat_mean_ns
+clat_stddev
+slat_mean_us
+slat_stddev
+and more.
+
+So it does seem to compare BW, IOPS, total IOs, which is what I was looking
+for.
+
+Possibly even too much, as enabling too much logging will actually affect
+the results, since you need to write way more output to the logs.
+
+But again, Jens (and other block layer folks) are the experts.
+
+
+Kind regards,
+Niklas
