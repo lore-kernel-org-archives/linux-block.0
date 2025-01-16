@@ -1,138 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAEF1991CF;
-	Thu, 16 Jan 2025 10:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825AC1DDA31
+	for <linux-block@vger.kernel.org>; Thu, 16 Jan 2025 11:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737021883; cv=none; b=fjkGr22ETS2fRhudb7TlahR52/Og1P1woGwvGF70TO3Ftr+YqgKuPFrjbiyDFY1Gfvnc97bTlKpnA2BUntyUmHpY5FaVD9XHwVNF9fv+DIR6wRXjcD2WGNEFkbGhnw73Jh2l1CR2Q/lURNphSDlafp8mj41oaUU67fTeFGy7/7U=
+	t=1737026557; cv=none; b=iihpVyDfDOW1sx6GltJll0EAiGT60507HnNl2vJUTVoep4TQg1y0uIQElPNybmI+RGBcMtlObnaQYBPW7JNlN0xnhBujVl/IEaNAwKu7cL/6875nAQMwExqi95DwzsyVpfk9RZfbIfrlmO1zKjTUGonF6yngFUK3eprjA5gRZOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737021883; c=relaxed/simple;
-	bh=umRE6v25xluhGP765JX3qQKm9iDvOyK2b54s+f7mP5w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aKpEu7mMRSQRuJ6WKG0IyUtGvZ7bddsqPCEhuGYuM+8dCIRRF1lNdQGX2+99L+Gg/eNpA5s943EWzCa29StZhb0zNeNS8/U3Eiani8IcuAgId+THsSI6rOLbylGs25wJaA4V6cl9umQFVxzkxEsOzbfhdPB/BfXk/smWPtF3V+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V+LUdMcW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1737026557; c=relaxed/simple;
+	bh=OWAs1gTLJN+Kj/+qFZDsKsFqESVullwJf9p4WeDj/uI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rggTaCmiNWKLVTbiSfJ1jZ/+0XkcSNJG6eSPGqoAZ4PfzqKUo67nar/Rkz+e7ipkMoKu+HENmV5jasyYrQX6XWg8Lh9ftq7e5HkkeswajRm1b8zFx1mZRxNKc0UKgh3uKuVo1RctZdHC4iMhpRJX7pab3nZ24/J5bbJ2Q8xRUts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tqWoX+c8; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V+LUdMcW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B18E2C4CED6;
-	Thu, 16 Jan 2025 10:04:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737021882;
-	bh=umRE6v25xluhGP765JX3qQKm9iDvOyK2b54s+f7mP5w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V+LUdMcWSz6X0NwN2VNwxC18SbqevUZzZF8qtF5uuMwgUobfeARBDRExAA/Br6LLU
-	 4RsBrAC6sLgqV4uEtwS4uppHqkaEzEC95BuWO7NUpiHoE2oUkB551WKoQ9SyGe1XQ0
-	 SZKt8/9g0nHClUkYXBbbM0EdANZO63jSgVd4nQHIKPRujdjEeX4gneeDTnKMDqa5VH
-	 0WBDUV/bn4GRzPALGj2rB1j2hxX4yjdcjGBesXzU1cssKtpp01fQ0O/GSGIplAgcxg
-	 Xy6WqJUVqPMl0FzVExkqFy0HG96UvxihmvbWRrr3k5EbYsVv9eYI3hGgiVhV/5D3AE
-	 jFbIznUVIvk2g==
-Date: Thu, 16 Jan 2025 11:04:36 +0100
-From: Niklas Cassel <cassel@kernel.org>
-To: Oliver Sang <oliver.sang@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>, oe-lkp@lists.linux.dev, lkp@intel.com,
-	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-nvme@lists.infradead.org, Damien Le Moal <dlemoal@kernel.org>,
-	linux-btrfs@vger.kernel.org, linux-aio@kvack.org
-Subject: Re: [linus:master] [block]  e70c301fae: stress-ng.aiol.ops_per_sec
- 49.6% regression
-Message-ID: <Z4jZtH2lhsZ3JTZ9@ryzen>
-References: <Z2EgW8/WNfzZ28mn@xsang-OptiPlex-9020>
- <20241217065614.GA19113@lst.de>
- <Z3ZhNYHKZPMpv8Cz@ryzen>
- <20250103064925.GB27984@lst.de>
- <Z3epOlVGDBqj72xC@ryzen>
- <Z3zlgBB3ZrGApew7@xsang-OptiPlex-9020>
- <Z35VVvuT0nl0iDfd@ryzen>
- <Z4DD1Lgzvv66tS3w@xsang-OptiPlex-9020>
- <Z4efKYwbf2QYBx40@ryzen>
- <Z4ipFFdAppraxrmA@xsang-OptiPlex-9020>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tqWoX+c8"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50G865Jp021162;
+	Thu, 16 Jan 2025 11:22:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=upiXXp
+	zW/o2vUWv4FXOH/EWlVFIMkPzLreLiZ7kX1hU=; b=tqWoX+c8Q1whCEEIuTGlfx
+	zYCeTalG/KC7D/Sl3CPleHI02ZiM15eO4ZEnI1dfZ9ckyf+hoS76VVTwD2Oi/wnp
+	kkWpx+ptLtjE7QFplZsVAK4QEwhyuVRNs8kClKNrj/9jfd3kl+06HGr2pXjkKgBm
+	ucedyUBLFT0QreCIBo6JT3TCE5lpGw+v7fxB6kJ1IPgeQVtJ1/W2rxx1IAeW63Wu
+	17QKy5Q8yUkfqoNyPRpno36ObbLEg6NOXaCI0ktCKwF1bmzgVpbrS0YdQiY+hX++
+	toJGxkuBeizUmJvQZwkt11dyg/CXN6QLc9oWTBaJ1Hhg0Q/OzBSddGkhf3B2UiFg
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446xa38wwm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 11:22:13 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50GA8rnF017359;
+	Thu, 16 Jan 2025 11:22:12 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4444fkdf2k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 11:22:12 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50GBMCWn19071504
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 16 Jan 2025 11:22:12 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4123358062;
+	Thu, 16 Jan 2025 11:22:12 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4E63A5805A;
+	Thu, 16 Jan 2025 11:22:10 +0000 (GMT)
+Received: from [9.109.198.241] (unknown [9.109.198.241])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 16 Jan 2025 11:22:09 +0000 (GMT)
+Message-ID: <5507bb17-b2aa-4df7-ac3b-73b7a8e4a096@linux.ibm.com>
+Date: Thu, 16 Jan 2025 16:52:08 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z4ipFFdAppraxrmA@xsang-OptiPlex-9020>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 blktests 0/2] throtl: fix IO block-size and race while
+ submitting IO
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "yukuai3@huawei.com" <yukuai3@huawei.com>,
+        "yi.zhang@redhat.com" <yi.zhang@redhat.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "gjoyce@ibm.com" <gjoyce@ibm.com>
+References: <20241218134326.2164105-1-nilay@linux.ibm.com>
+ <3bttr4zv2clzes6q4cuyy3l35ls7cm2r6ljzcgzc3cpvut7dmn@grxcm43s2yse>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <3bttr4zv2clzes6q4cuyy3l35ls7cm2r6ljzcgzc3cpvut7dmn@grxcm43s2yse>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: qIHJZSbUttTHl_0Iu6ev9U_sP_uKhRXN
+X-Proofpoint-ORIG-GUID: qIHJZSbUttTHl_0Iu6ev9U_sP_uKhRXN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-16_04,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ bulkscore=0 clxscore=1015 adultscore=0 mlxlogscore=867 priorityscore=1501
+ suspectscore=0 spamscore=0 phishscore=0 impostorscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501160082
 
-On Thu, Jan 16, 2025 at 02:37:08PM +0800, Oliver Sang wrote:
-> On Wed, Jan 15, 2025 at 12:42:33PM +0100, Niklas Cassel wrote:
-> > 
-> > Looking closer at the raw number for stress-ng + none scheduler, in your
-> > other email, it seems clear that the raw values from the stress-ng workload
-> > can vary quite a lot. In the long run, I wonder if we perhaps can find a
-> > workload that has less variation. E.g. fio test for IOPS and fio test for
-> > throughout. But perhaps such workloads are already part of lkp-tests?
+Hi Shinichiro,
+
+On 12/24/24 1:56 PM, Shinichiro Kawasaki wrote:
+> On Dec 18, 2024 / 19:13, Nilay Shroff wrote:
+>> Hi,
+>>
+>> The first patch fixes the IO block-size used for submitting IO depending
+>> on the throttle device max-sectors settings.
+>>
+>> The second patch fixes the potential race condition between submitting IO
+>> and setting PID of the background IO process to cgroup.procs.
+>>
+>> Changes from v1:
+>>     - Use $BASHPID to write the child sub-shell PID into cgroup.procs
+>>       (Shinichiro Kawasaki)
+>>     - Link to v1: https://lore.kernel.org/all/20241217131440.1980151-1-nilay@linux.ibm.com/
 > 
-> yes, we have fio tests [1].
-> as in [2], we get it from https://github.com/axboe/fio
-> not sure if it's just the fio you mentioned?
+> Thanks for this v2 series. The patches looks good to me. In case anyone has
+> some more comments after this vacation season, I will wait several days before
+> applying them.
 
-Yes, that's the one :)
+A gentle ping...
 
+Just wanted to check with you whether did you get a chance to merge this change?
 
-> 
-> our framework is basically automatic. bot merged repo/branches it monitors
-> into so-called hourly kernel, then if found performance difference with base,
-> bisect will be triggered to capture which commit causes the change.
-> 
-> due to resource constraint, we cannot allot all testsuites (we have around 80)
-> to all platforms, and there are other various reasons which could cause us to
-> miss some performance differences.
-> 
-> if you have interests, could you help check those fio-basic-*.yaml files under
-> [3]? if you can spot out the correct case, we could do more tests to check
-> e70c301fae and its parent. thanks!
-> 
-> [1] https://github.com/intel/lkp-tests/tree/master/programs/fio
-> [2] https://github.com/intel/lkp-tests/blob/master/programs/fio/pkg/PKGBUILD
-> [3] https://github.com/intel/lkp-tests/tree/master/jobs
-
-I'm probably not the best qualified person to review this, would be nice if e.g.
-Jens himself (or others block layer folks) could have a look at these.
-
-What I can see is:
-https://github.com/intel/lkp-tests/blob/master/jobs/fio-basic-local-disk.yaml
-
-seems to do:
-    - randrw
-
-but only on for SSDs, not HDDs, and only on ext4.
-
-
-
-https://github.com/intel/lkp-tests/blob/master/jobs/fio-basic-1hdd-write.yaml
-
-does test ext4, btrfs, and xfs,
-but it does not do randrw.
-
-
-What are the thresholds for these tests counting as a regression?
-Are you comparing BW, or IOPS, or both?
-
-Looking at:
-https://github.com/intel/lkp-tests/blob/master/programs/fio/parse
-
-It seems to produce points for:
-bw_MBps
-iops
-total_ios
-clat_mean_ns
-clat_stddev
-slat_mean_us
-slat_stddev
-and more.
-
-So it does seem to compare BW, IOPS, total IOs, which is what I was looking
-for.
-
-Possibly even too much, as enabling too much logging will actually affect
-the results, since you need to write way more output to the logs.
-
-But again, Jens (and other block layer folks) are the experts.
-
-
-Kind regards,
-Niklas
+Thanks,
+--Nilay
