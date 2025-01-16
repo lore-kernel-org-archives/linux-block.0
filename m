@@ -1,129 +1,99 @@
-Received: from 008.lax.mailroute.net (008.lax.mailroute.net [199.89.1.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236511D9350
-	for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 22:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA26A94A
+	for <linux-block@vger.kernel.org>; Thu, 16 Jan 2025 00:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736981269; cv=none; b=aMfGLrjTQcftjTJdWjaHjGy0s+XzIG+nEY8fLtHbxeysDVYcm915SpU0lL1hCQRMuYTSOcRdesQm2a2Auz5pxBByAmV69L5iEnWiI8KU9upCGDYE0Wc5dK0QiS8ysTXpfawQH1k4Dti5GRF8gm0RBCAkjCGsqmCIMfak1mC4Vb8=
+	t=1736988102; cv=none; b=Y67RBAwNXy6meqXOXImRodPQ0lwN/b16gyn8ylURgcHd1M2/4S57DhJfpimWwRTdMxNvLiI1eCU1/MYtYWi4qBcO7IYvGUXKVReP4KqFd0A0ER1mYfZNxoQRhrBs063kSzL2RiAwLf2VpS84Ej4tgwGJP0dRL+oni0TtQRkKll8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736981269; c=relaxed/simple;
-	bh=VxZAq3k1numrivsoeehmfhaUDP/RVl58WLFtd9RVTtE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HFyj9TtUTyBKe0sfzfJOZqEwb90SALYKIRK1wIKPwAcEPig5CNcF1VwtrUjV6koW7I8zKndss7iGEMgVnc/kCpfqmo0Vkk60V9HgpeKZe/0bjxkAM4tDjpgdIripB73dFYH31Jy/A0XmgPOOGhni+0vBlWLmfcKKhuBRNH5lHu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=pNqRF+Fd; arc=none smtp.client-ip=199.89.1.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1736988102; c=relaxed/simple;
+	bh=DaxSHKul3vLu4Fzx0kqGnf8Es9IgOSP4iIPSFx+eSoc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kkulw5mOOt/t5ChXBScX9SLUCTKNS1ji6LfL85OBOLjInqjNz28DJmtP9Lt1lhwTrAGJ6xDoiobMEuqnTzJdVAtk8DN/aE0FLnQuQ2MlH5yakrBblMZI+cef2jxzxr0fRvrbRbC06CfRy4GkkRV9VzeLd/AXsqyoHQLbwLHNzLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=c2ALvChm; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="pNqRF+Fd"
-Received: from localhost (localhost [127.0.0.1])
-	by 008.lax.mailroute.net (Postfix) with ESMTP id 4YYLjr4KjWz6CmR5y;
-	Wed, 15 Jan 2025 22:47:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1736981258; x=1739573259; bh=w43fq
-	ie8sFeviDvAwAfj/UUjn3xnlWRs5/7ncET4ttM=; b=pNqRF+FdUB11Ke9EMMUwq
-	XzaozEUYTAdy9Pr//ErVCBrNINgbdzVqR26DFaV+2wC7QPrTISxfUPRl9nY75fUW
-	BGMcT9YhgidPAORZ42vM679JV8z4u3eG27vnLw6k+8ooeLkcRThGeQe5i5Yzg16b
-	TXpDJApiS+/j5JMfTFp7czrxiySTZ7913JJOBHRCDc2SdY/e86sIAi5lRFSxfl66
-	BJZoq5DGiGKaqEtWjiT3/668glvkVWLgCL27uZJha17rH2f1zk6oNB2F7ljz3oQG
-	526jLhddCxoyA52Kxk9YUDgzARba34kjvcp6ZyIZMptBDAGNkzHDVsXTa6r/TU2t
-	Q==
-X-Virus-Scanned: by MailRoute
-Received: from 008.lax.mailroute.net ([127.0.0.1])
- by localhost (008.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id hTfTkWVimpWe; Wed, 15 Jan 2025 22:47:38 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 008.lax.mailroute.net (Postfix) with ESMTPSA id 4YYLjg1PQ9z6CmM6d;
-	Wed, 15 Jan 2025 22:47:34 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	"Bao D. Nguyen" <quic_nguyenb@quicinc.com>,
-	Can Guo <quic_cang@quicinc.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Avri Altman <avri.altman@wdc.com>
-Subject: [PATCH v17 14/14] scsi: ufs: Inform the block layer about write ordering
-Date: Wed, 15 Jan 2025 14:46:48 -0800
-Message-ID: <20250115224649.3973718-15-bvanassche@acm.org>
-X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-In-Reply-To: <20250115224649.3973718-1-bvanassche@acm.org>
-References: <20250115224649.3973718-1-bvanassche@acm.org>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="c2ALvChm"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2efded08c79so608354a91.0
+        for <linux-block@vger.kernel.org>; Wed, 15 Jan 2025 16:41:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1736988100; x=1737592900; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2/REPRuAQRQKcKfA3HHYPj6NAjhg6mrxoQvl+BUtmD8=;
+        b=c2ALvChmeCU9lxCMaUydyShMO3hf3t+mTa/fajFf9EMel7Z/0RFinrTOZFAOg3QCUS
+         NtVB2nTY5B4bddTyyx5F/XFj75hMgOA5ieHwcFPAQSo3UihC08xalzBjOLqnkGfnnj6Q
+         Bg4vU7WWtvCXpMuNut1Si5LG9mu8NV2kWW4ds=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736988100; x=1737592900;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2/REPRuAQRQKcKfA3HHYPj6NAjhg6mrxoQvl+BUtmD8=;
+        b=T9QQS4cmRKEZYf+GZyN8kxZn8kV2mVVx+/CX0WLx6Nd6W/V/pLjmePByb7n9/f5sdh
+         BizfSVcvDFlEJbVt7lIK3zKNjHYchE9DMgRCHQSy2E4U3iF2RgR7LnDbxuEq0cxXj0z7
+         Hc47p5JEsHPVRNnnXGYgPosANNNTva0F5GnIsVxDPwYS11PoIrxs2e3Mlwfla3n/USpr
+         xInwq3AQSPjGvFUVY2rfxl6fG9J3BBDMNKmr6EQ2z0monZlL68kMtNcSotAN7t906bsQ
+         zlFrlc83lx8FGJs2FKfUDLQJ40d8y9fbrsIiqZxpxbG2S8O/+EOttAtqo1PUfvJLtJMA
+         CVlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWaS4B4gc65SqzIySPyMvKcz9KJ38v40LgxScHaok4nlFf58kY19sMdYj3J/yGY4MYehdtzVUmbS/zzRw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlnPsiWQYVXRht3Ux1e4y9z/msbXMZtl/6TqcsL1vZv5ygJf6B
+	LsCZDyZmXZ10D0M4SOeENcqbQul1zGOVcqIPrHNN83JAjecXyVrwbh+I63tpeQ==
+X-Gm-Gg: ASbGnctjlV/YyA2c0lTiRFVwvGWG9lhbFDj0ikAeo+sbj4P5I1r0MwwW0bg8L582RsR
+	DJgX9qTaBtrq0V1NoM1ZUo7ByQIYc328h+Qc0P8s5xuLfkBAFmS7SDqjtwSLipHEpcP6VAzubnX
+	VAh515J1YyhDd9pAXTzXEalmNhwNp03DbAuYi/6t3n2rahGFYqN+v36Oi0fGeCGIpW7P+ehMZL4
+	ebVTPWu4TOT8LxGqLc1Bw2sjHMMJYFysB7pB1QWhXtQClT5+Dbs4FXx9rrr
+X-Google-Smtp-Source: AGHT+IGWIcw0FCPwqDY2LRyBn7ZtzZiH0QECZZB8FXEiQTRYjNuUZY0oIimYMkgGsQOkZA7uKpRBoA==
+X-Received: by 2002:a17:90b:2642:b0:2ea:aa56:499 with SMTP id 98e67ed59e1d1-2f548e9aed3mr40818506a91.1.1736988100602;
+        Wed, 15 Jan 2025 16:41:40 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:8be4:86b8:bd3d:aa3c])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f72c18b076sm2003354a91.15.2025.01.15.16.41.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jan 2025 16:41:40 -0800 (PST)
+Date: Thu, 16 Jan 2025 09:41:34 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Wenchao Hao <haowenchao22@gmail.com>
+Cc: Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] zram: cleanup in zram_read_from_zspool()
+Message-ID: <iiiqdmxebni4sfal7rguy4me24tgmzym2v4oz5hzjv624vavr6@kida3yjmoecs>
+References: <20250115145545.51561-1-haowenchao22@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250115145545.51561-1-haowenchao22@gmail.com>
 
-From the UFSHCI 4.0 specification, about the legacy (single queue) mode:
-"The host controller always process transfer requests in-order according
-to the order submitted to the list. In case of multiple commands with
-single doorbell register ringing (batch mode), The dispatch order for
-these transfer requests by host controller will base on their index in
-the List. A transfer request with lower index value will be executed
-before a transfer request with higher index value."
+On (25/01/15 22:55), Wenchao Hao wrote:
+> @@ -1561,11 +1561,6 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
+>  
+>  	size = zram_get_obj_size(zram, index);
+>  
+> -	if (size != PAGE_SIZE) {
+> -		prio = zram_get_priority(zram, index);
+> -		zstrm = zcomp_stream_get(zram->comps[prio]);
+> -	}
+> -
+>  	src = zs_map_object(zram->mem_pool, handle, ZS_MM_RO);
+>  	if (size == PAGE_SIZE) {
+>  		dst = kmap_local_page(page);
+> @@ -1573,6 +1568,9 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
+>  		kunmap_local(dst);
+>  		ret = 0;
+>  	} else {
+> +		prio = zram_get_priority(zram, index);
+> +		zstrm = zcomp_stream_get(zram->comps[prio]);
+> +
+>  		dst = kmap_local_page(page);
+>  		ret = zcomp_decompress(zram->comps[prio], zstrm,
+>  				       src, size, dst);
 
-From the UFSHCI 4.0 specification, about the MCQ mode:
-"Command Submission
-1. Host SW writes an Entry to SQ
-2. Host SW updates SQ doorbell tail pointer
-
-Command Processing
-3. After fetching the Entry, Host Controller updates SQ doorbell head
-   pointer
-4. Host controller sends COMMAND UPIU to UFS device"
-
-In other words, for both legacy and MCQ mode, UFS controllers are
-required to forward commands to the UFS device in the order these
-commands have been received from the host.
-
-Notes:
-- For legacy mode this is only correct if the host submits one
-  command at a time. The UFS driver does this.
-- Also in legacy mode, the command order is not preserved if
-  auto-hibernation is enabled in the UFS controller.
-
-This patch improves performance as follows on a test setup with UFSHCI
-3.0 controller:
-- With the mq-deadline scheduler: 2.5x more IOPS for small writes.
-- When not using an I/O scheduler compared to using mq-deadline with
-  zone locking: 4x more IOPS for small writes.
-
-Cc: Bao D. Nguyen <quic_nguyenb@quicinc.com>
-Cc: Can Guo <quic_cang@quicinc.com>
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Avri Altman <avri.altman@wdc.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/ufs/core/ufshcd.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/ufs/core/ufshcd.c b/drivers/ufs/core/ufshcd.c
-index 3094f3c89e82..08803ba21668 100644
---- a/drivers/ufs/core/ufshcd.c
-+++ b/drivers/ufs/core/ufshcd.c
-@@ -5255,6 +5255,13 @@ static int ufshcd_device_configure(struct scsi_dev=
-ice *sdev,
- 	struct ufs_hba *hba =3D shost_priv(sdev->host);
- 	struct request_queue *q =3D sdev->request_queue;
-=20
-+	/*
-+	 * With auto-hibernation disabled, the write order is preserved per
-+	 * MCQ. Auto-hibernation may cause write reordering that results in
-+	 * unaligned write errors. The SCSI core will retry the failed writes.
-+	 */
-+	lim->driver_preserves_write_order =3D true;
-+
- 	lim->dma_pad_mask =3D PRDT_DATA_BYTE_COUNT_PAD - 1;
-=20
- 	/*
+I think you are looking at some old code base (or maybe vanilla kernel),
+that function does not look like this in the current mm tree (or linux-next).
