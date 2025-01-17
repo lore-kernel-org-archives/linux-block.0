@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3441B0F2C
-	for <linux-block@vger.kernel.org>; Fri, 17 Jan 2025 22:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3961D9A49
+	for <linux-block@vger.kernel.org>; Fri, 17 Jan 2025 22:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737154280; cv=none; b=DNBbDB9SzZi62576rTkfZUYghwEramTaT5FPaNsoHYvVB6gQ+GJZRPvDo/CFZYoLFPZw9rY0cJDAQB6edpxQtyvDGRV4igfnYA/AmaQvRjhVSCBf8WwbYiZTD150IRljbkk0DGkRzkEj7WlWjLVN06fLjh9cNHCjWSYnf5uva98=
+	t=1737154375; cv=none; b=MszcuUwY5e/TJGklwNhP8PDPq7hX4jaN3tJ55DyHwf7jYkrz41ek5V2bOg/PSwkR9LfgeTpkSJwtZuFcS0HEjczyOGYoOtcuKjejlQH5icjxCxqR+Xns1kfGjUAt9SdZnWJZFe3LG7YHLVt1TKqSLNyODhh30PjEhK2DgGgQOtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737154280; c=relaxed/simple;
-	bh=tUkw30uDpzIzxDYNG2E00PPxHyTijgtGuBR9VicYbh4=;
+	s=arc-20240116; t=1737154375; c=relaxed/simple;
+	bh=3l64EK8hFV6ILpGFcLF6HRYbymecwT55SuJN2J9hN1E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QRmO4AHXE6XeHTQHMgO36opouI+p1tkeMFWrowu/TV50pD3lHOmxqrrmkEHYm4TEC+n4DwhJUxTtt6qfc2RVqLPY+xXswxR3Awfm8Ef3KcBVKqOskIBKYPAIQl4iNOhAWYG/i9n9oL1lkoaqBV4BzxJVCw48O3OnewZXKXvqgAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mXkpg7AR; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=h0DzaX1zFP5T6Qq0rOLzUovNX3l8lHCktD4dm5p/W3IPZOVst/+gPiO9kAhQ7hqlWNMVF1+WKGaMPlC0cJA8AiDEP2Aa5zrNXINPmDU64b9a/HT3gHb/zZoxk1Zw8AIIE+Eswp1Q6AJX+Ys4ZCru7t8WISMWhBr1CG4vqCXvDK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VfChBHHI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mXkpg7AR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C44DC4CEDD;
-	Fri, 17 Jan 2025 22:51:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VfChBHHI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A83BBC4CEE3;
+	Fri, 17 Jan 2025 22:52:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737154280;
-	bh=tUkw30uDpzIzxDYNG2E00PPxHyTijgtGuBR9VicYbh4=;
+	s=k20201202; t=1737154374;
+	bh=3l64EK8hFV6ILpGFcLF6HRYbymecwT55SuJN2J9hN1E=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mXkpg7AR8zrsHQv+BsrEuSL3B80x3YEmP5LpjkTR7iVrJDkEiu3SqDE614n1kdC7E
-	 uJpRtu9BPpdz2MWeUgo6jULXwis2tipC8qiQupBfLUXQ/7bC9tHL96RRwPDMf5yNGr
-	 jZp+XIPjJe75PjhONORlnxRcGolpxmSABSRLekZOpbaero4wTjW/Fq0j6/QTzRxzZ8
-	 GETETddR/J37tSrqKVgUjJw4QNoSNJAE0Cu3Ml6KvH89h+O/hHPDnp+K1NbufeSMPy
-	 0QO/UwbDN1OZbhJd97/I9w3uEwZT0km0Ii7+EVqdeFpz5Q82eQ7Uu2teFZtuA6mNJb
-	 AI1MUPS8a+fIA==
-Message-ID: <5ee4f1a0-5d6c-4011-ac7d-ed6c17d2cfe5@kernel.org>
-Date: Sat, 18 Jan 2025 07:51:15 +0900
+	b=VfChBHHI80Dnq9oIErWHc1N2UNisamre9/2wVWMb5urfSaOPnqwFKlHDc9j+gJ6Aa
+	 TRR0k4n8zbRA15+ADtDK0m9iMUNG7OB15lb6yV89V53rXjXLl9zMwS0ov7p6dc/5/7
+	 h2m09LZEGo/BVBPicR5rP2lFrtUTM7ULE6LKsFMwnh4nx+wkzi4O8xrbbci13GoBo9
+	 X3XMke/DDqmjbYaBKzBdD0/HfKnHklRQGARLyw2R1lFpgokzB8bEvOgIAdeVY6nlrb
+	 WGzSY9hmQ/U7WyB/MZQsklUdN6QT06+BXEb52fC/2L0YJhfbP98zIq7IN50yYdKiat
+	 O5weK+MvA4tmQ==
+Message-ID: <adc95349-c682-49b5-9f48-238a06b4aafd@kernel.org>
+Date: Sat, 18 Jan 2025 07:52:51 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,39 +35,29 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH for-next v3 1/5] null_blk: generate null_blk configfs
- features string
+Subject: Re: [PATCH for-next v3 2/5] null_blk: introduce badblocks_once
+ parameter
 To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
  linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 Cc: Bart Van Assche <bvanassche@acm.org>
 References: <20250115042910.1149966-1-shinichiro.kawasaki@wdc.com>
- <20250115042910.1149966-2-shinichiro.kawasaki@wdc.com>
+ <20250115042910.1149966-3-shinichiro.kawasaki@wdc.com>
 From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
 Organization: Western Digital Research
-In-Reply-To: <20250115042910.1149966-2-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20250115042910.1149966-3-shinichiro.kawasaki@wdc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 1/15/25 1:29 PM, Shin'ichiro Kawasaki wrote:
-> The null_blk configfs file 'features' provides a string that lists
-> available null_blk features for userspace programs to reference.
-> The string is defined as a long constant in the code, which tends to be
-> forgotten for updates. It also causes checkpatch.pl to report
-> "WARNING: quoted string split across lines".
+> When IO errors happen on real storage devices, the IOs repeated to the
+> same target range can success by virtue of recovery features by devices,
+> such as reserved block assignment. To simulate such IO errors and
+> recoveries, introduce the new parameter badblocks_once parameter. When
+> this parameter is set to 1, the specified badblocks are cleared after
+> the first IO error, so that the next IO to the blocks succeed.
 > 
-> To avoid these drawbacks, generate the feature string on the fly. Refer
-> to the ca_name field of each element in the nullb_device_attrs table and
-> concatenate them in the given buffer. Also, sorted nullb_device_attrs
-> table elements in alphabetical order.
-> 
-> Of note is that the feature "index" was missing before this commit.
-> This commit adds it to the generated string.
-> 
-> Suggested-by: Bart Van Assche <bvanassche@acm.org>
 > Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-
-Nice cleanup !
 
 Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
