@@ -1,91 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CECDA18FDC8
-	for <linux-block@vger.kernel.org>; Mon, 20 Jan 2025 15:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC23319BA6;
+	Mon, 20 Jan 2025 16:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737386199; cv=none; b=myUAbb8PDryuJnYsDXz2YVTqJ8X3zbNwrWwqRBem/xomkqhMkjkIKzunyXutUCPke9/9F1OPdcNo7xd3mwvSRq7Hnv+elPTkNmZthK6nn8EAFKNC2LiPFi1yK/oRL/yVWawXO+JJhjBM8PoEe6xreuM6VP3SmgHxNLpPeQNwabI=
+	t=1737390088; cv=none; b=MKY2oLG07SXqfYDkmit5d4zcVwO2btSNXU15ahJ7aipgdpI9efEyrnVgw9ObfLXx0w7326I7Jj5HmcnOdcOUkMU9JJTDVDuKx56Bg1nExeJRHQesj3uW50eojQMWINEJ08V3eG/WQSyexA/kPEcvK1gGCGPvlPj/qZBNxiK89xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737386199; c=relaxed/simple;
-	bh=N/09wP0BL+H92OwKbasER3ehiHFLHhxOkwKi4aXhZqU=;
-	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=NGD3JYd8p7eecu9o/7AOvK8hkyAogacOMLgH4oOoxkOoMpOkxGK2AwNUNF5z4Gg1I5I/DW7Q74NvqrGueY/8PzTswis5847CNI//7BqqpvMOVcYr7+fqq6gEUafKjYJbNDf+rEup/UORgAAWHtmPMXYTt6x8cTwUMQH5jGm6tM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ri+lr4E9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1737390088; c=relaxed/simple;
+	bh=7A+s5dqBOmuxkxC843S6h9qfugL5aMEJ9Bx0V/C9LB8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u+EB8G3xNV4NmJTGbyb5R68OF/z2RWjMW8NpmLcS9LvvekQvV0thDUiiXXY1+/yiSdEHPC+7DHbTJ3QyukmwHyWm3ycgsQUPJdos3WT6gdzE+A+Z6U0o23Ce58nKbwpGObL14bAEs4quAfA978nTZ4TPzY2Ah1F6AAJdW4BaNeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uL3GMOqQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ri+lr4E9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737386196;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=DtCbR8FTF1GLHpSQcORCkWOKw6JmrqvTdAcRj4GwZpE=;
-	b=Ri+lr4E9Cle3H6K1JPGSc7umZLPoARcoeUHdyD1wHzlPausjDQzkiW4YNBspBqQ6v3iEBI
-	/jzamiHX+v9LCiDwwQDi5+0fs/8y1BfxfV8RalUVl+Z8viYCBQ/aZECNe/kvMzl4a/JZIh
-	OxvinmeGPoutlE7iiXJ9Yh0r49msBZs=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-530-JwY416IONamA_MimYDbvow-1; Mon,
- 20 Jan 2025 10:16:35 -0500
-X-MC-Unique: JwY416IONamA_MimYDbvow-1
-X-Mimecast-MFC-AGG-ID: JwY416IONamA_MimYDbvow
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 977971955DCD;
-	Mon, 20 Jan 2025 15:16:33 +0000 (UTC)
-Received: from [10.45.224.57] (unknown [10.45.224.57])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C08C53003E7F;
-	Mon, 20 Jan 2025 15:16:31 +0000 (UTC)
-Date: Mon, 20 Jan 2025 16:16:26 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-cc: Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
-    Zdenek Kabelac <zkabelac@redhat.com>, linux-block@vger.kernel.org, 
-    dm-devel@lists.linux.dev
-Subject: [PATCH] blk-settings: round down io_opt to at least 4K
-Message-ID: <81b399f6-55f5-4aa2-0f31-8b4f8a44e6a4@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uL3GMOqQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D25FEC4CEDD;
+	Mon, 20 Jan 2025 16:21:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737390087;
+	bh=7A+s5dqBOmuxkxC843S6h9qfugL5aMEJ9Bx0V/C9LB8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=uL3GMOqQXoOq3Tw1zdy2vLzLr/0KsB1soF/EY7aJr4DRCDzsJ5vcpOziD0V+ZcCCH
+	 n4gywjuURU6K1FIJVlIdgqk6DZQI43gjcIn7sR1C0lzzWTCuz4Ia5O9MUtekc1TuDn
+	 bR/GiI/cp9cA9zM5ocbbsXLq8Oxu37X0zKvPg59cP6jAMQwIyD4ANL9BKCOKWRh8Sj
+	 vy4uEmccBXyTR59XEvj6AZlzS41/T7iIG1LYk7eG/bNYHPYktJfc/Xzo6iCKW5XZFb
+	 1QDwaBCHwaW3EXqpOGU9odc1AOL0Z4ckANSQLxI5oYKEJvH5ik7+slEtXrmMWDgIPI
+	 QsYDFWe9fItcA==
+From: Philipp Stanner <phasta@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Hannes Reinecke <hare@suse.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Philipp Stanner <phasta@kernel.org>,
+	John Garry <john.g.garry@oracle.com>,
+	Li Zetao <lizetao1@huawei.com>,
+	Al Viro <viro@zeniv.linux.org.uk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] block: mtip32xx: Remove unnecessary function calls
+Date: Mon, 20 Jan 2025 17:20:22 +0100
+Message-ID: <20250120162020.67024-3-phasta@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
 
-Some SATA SSDs and most NVMe SSDs report physical block size 512 bytes,
-but they use 4K remapping table internally and they do slow
-read-modify-write cycle for requests that are not aligned on 4K boundary.
-Therefore, io_opt should be aligned on 4K.
+pcim_iounmap_regions() does not have to be called, because the regions
+are automatically unmapped since they were mapped with managed
+functions. Moreover, that function is deprecated anyways.
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Fixes: a23634644afc ("block: take io_opt and io_min into account for max_sectors")
-Fixes: 9c0ba14828d6 ("blk-settings: round down io_opt to physical_block_size")
-Cc: stable@vger.kernel.org	# v6.11+
+Furthermore, setting the drvdata to NULL is unnecessary in a driver
+remove() function.
 
+Remove the unnecessary calls.
+
+Signed-off-by: Philipp Stanner <phasta@kernel.org>
 ---
- block/blk-settings.c |    6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+This patch had been around before in a series [1], but I unfortunately
+messed it up and caused a race [2], which is why this patch here exists.
+It's independent and fixes the rest of the pcim_ API up in this driver
+once and for all :)
 
-Index: linux-2.6/block/blk-settings.c
-===================================================================
---- linux-2.6.orig/block/blk-settings.c	2025-01-03 21:10:56.000000000 +0100
-+++ linux-2.6/block/blk-settings.c	2025-01-20 15:59:13.000000000 +0100
-@@ -269,8 +269,12 @@ int blk_validate_limits(struct queue_lim
- 	 * The optimal I/O size may not be aligned to physical block size
- 	 * (because it may be limited by dma engines which have no clue about
- 	 * block size of the disks attached to them), so we round it down here.
-+	 *
-+	 * Note that some SSDs erroneously report physical_block_size 512
-+	 * despite the fact that they have remapping table granularity 4K and
-+	 * they perform read-modify-write for unaligned requests.
- 	 */
--	lim->io_opt = round_down(lim->io_opt, lim->physical_block_size);
-+	lim->io_opt = round_down(lim->io_opt, max(4096, lim->physical_block_size));
+P.
+
+[1] https://lore.kernel.org/all/20241016094911.24818-6-pstanner@redhat.com/
+[2] https://lore.kernel.org/all/20241107162459.71e0288a@canb.auug.org.au/
+---
+ drivers/block/mtip32xx/mtip32xx.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 43701b7b10a7..aa9badb9a51d 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -3718,7 +3718,7 @@ static int mtip_pci_probe(struct pci_dev *pdev,
+ 	rv = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+ 	if (rv) {
+ 		dev_warn(&pdev->dev, "64-bit DMA enable failed\n");
+-		goto setmask_err;
++		goto iomap_err;
+ 	}
  
- 	/*
- 	 * max_hw_sectors has a somewhat weird default for historical reason,
+ 	/* Copy the info we may need later into the private data structure. */
+@@ -3734,7 +3734,7 @@ static int mtip_pci_probe(struct pci_dev *pdev,
+ 	if (!dd->isr_workq) {
+ 		dev_warn(&pdev->dev, "Can't create wq %d\n", dd->instance);
+ 		rv = -ENOMEM;
+-		goto setmask_err;
++		goto iomap_err;
+ 	}
+ 
+ 	memset(cpu_list, 0, sizeof(cpu_list));
+@@ -3831,8 +3831,6 @@ static int mtip_pci_probe(struct pci_dev *pdev,
+ 		drop_cpu(dd->work[1].cpu_binding);
+ 		drop_cpu(dd->work[2].cpu_binding);
+ 	}
+-setmask_err:
+-	pcim_iounmap_regions(pdev, 1 << MTIP_ABAR);
+ 
+ iomap_err:
+ 	kfree(dd);
+@@ -3907,10 +3905,6 @@ static void mtip_pci_remove(struct pci_dev *pdev)
+ 	}
+ 
+ 	pci_disable_msi(pdev);
+-
+-	pcim_iounmap_regions(pdev, 1 << MTIP_ABAR);
+-	pci_set_drvdata(pdev, NULL);
+-
+ 	put_disk(dd->disk);
+ }
+ 
+-- 
+2.47.1
 
