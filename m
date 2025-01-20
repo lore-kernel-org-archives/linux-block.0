@@ -1,96 +1,81 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4711E0DDF
-	for <linux-block@vger.kernel.org>; Mon, 20 Jan 2025 13:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD07F13D531;
+	Mon, 20 Jan 2025 14:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737378386; cv=none; b=B9rkuSTx6gG69lVGSaNOGiVeHtB4yXYxn+B2NgqwHRvRNcm1aEWma+HKbvXJTemR4FIFEGVGLH5AyPQtTla2/84gb+r8AQobUQM1f2SHY6RHmxNEPOLTpMqkalW90EoxQ5F80HC3TYz1kr6ok/kmkC65XjEqMe0hMcM34jKtYXI=
+	t=1737382941; cv=none; b=tDECKvTrEwCPE1F0zqdu+B8li7yjYo2oh0A6qjfIEWi4UW8kuy8znYQg756uM1cdMz3LGrXeOVuzBoHWfxJnFuvcGC7/l68mF3a9AaCP9o9MpBgjCh6lWT9HCTIFRE7PmUkYtSN/GkRz0FHwhaPO0x9kJ7JBaR2a7w3C5SALG7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737378386; c=relaxed/simple;
-	bh=eylIaYrCeBd7TLXqFTpQAEcjvFtqUFLHN/uXIUU1+fQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=M0ED62o0+zaoWiQdbysmBPSznLDQJwMUbnPPiP4ISFkKChrt85GZl5VuEcMrPT7QmI4TPTK493d8ElL3XmSPqSAxhhWbmqQbU2ed3ipz8YBMfuV1IyMJrd4KUkflVBL8gukU0NRI3mh8/3jMVBu+UgJoCoSl3KxnPw3WRMDDl6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3cf6ceaccdbso31555125ab.1
-        for <linux-block@vger.kernel.org>; Mon, 20 Jan 2025 05:06:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737378384; x=1737983184;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ngBXUoN0qgly+v92vCKvkPOzlgH1yvouV0caRkqUsGw=;
-        b=OCV6zJUZB18mNSR6oIw8y9r7+6N2qxiGSJsezQAvAPI254vQ91fRnymEqmohpHVSXO
-         2vUZYOS+Bu7rvUtzZxekdpMtO+4PSrijeusgDtzIdLWPAgIowuIOsssg8/Go7UMmh7Ri
-         VBFFVy/t1OShm/9lc+TrOVPiLlOjybUx4m+xq+TJ2C1ZcdUGOz3eN38QnHMCwP40d1kw
-         nVwT4fNiB+jtB1V/JzJnRAp//1r1b5By3qPS6zenfu11iipRXAFvacVCxa7SQmgEXgnX
-         kilf17UnWP9YgAeIbw+c/NP5ukyzYQ4rcANgptcd2Ui/oIxU/Sko8R2K/iDKii9RHPkL
-         mEiQ==
-X-Gm-Message-State: AOJu0YzYqq4v3s18ujl9eG0gJDkTeF7HwQ+zkBkO7gcV+koojRf7cQrr
-	iG0iqodB2QH/oqzOAn8X4JqQvP7CnvhidpG5/g6pdTr+7XJA7sog+/J3r1rYkK1Y8BHoEVqg/YK
-	xkDUtNn2lGxeUxwZCJ8Vf43NXbYKOYeMAt2dqzRLGjoMQ6PdG8GjeVjk=
-X-Google-Smtp-Source: AGHT+IH5ku0WyA3TxFpVGYns42Rz+kgFSxFGEIGq86SdTigAd6FZUumdcLL/0lcVJJxQeeV8d3nPPNJ081mE77mLXXB7Uy7Fi2/p
+	s=arc-20240116; t=1737382941; c=relaxed/simple;
+	bh=Q/ah7Xad9Pkqp3TtguBsx5XKqUkR2Fz8GupvOx/hv9c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hjYov7FU33SR04Bi6AxjqKa+1bXiugrKAwEohvOk1dZCt+zNLJUjWzloJIdUmaZ4clExck/V53EgDF0ThV9FmK49IO46B/prmKzMDDfbCHkp8N6f8ZdHVklsROgl6WjUa8BGJUE4026k2VxB+2alaHL9qQ+Df5r7hRkPWWwbBGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=btF4+XTF; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="btF4+XTF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E5B3C4CEDD;
+	Mon, 20 Jan 2025 14:22:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737382941;
+	bh=Q/ah7Xad9Pkqp3TtguBsx5XKqUkR2Fz8GupvOx/hv9c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=btF4+XTFOp0ga6T7d+3J8b/geuEwFuwnlTi+lf83vRcdKRoTVfYz+j7wryq5Tg4lu
+	 ZK3w9rFFY3hmH8PuksePlIqesvWZnTUqA5jg6XYq0s3ob+luFv7MtS9OMUIw9Fb+d1
+	 PpTguh1N6eFf7/CK1jWbCTnY1iq78Zvb3ZoUwJ2J9PeBxfNfaTQ1fh/lj/8M8/iUgY
+	 EHdLjEY/Swkp03kzxyfecr+1HAz3x7k6EHPdayAGuGa01d6bD/g5yKqk6R2xDjIVze
+	 ItO6SThpO9X9ifELiuv6JUqG2086TJNksTrRHaJ2VUjnGiHZkb8ogNz+vmlMHbJNkL
+	 Sy6xKQupyurPQ==
+Date: Mon, 20 Jan 2025 16:22:17 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: lsf-pc@lists.linux-foundation.org, John Hubbard <jhubbard@nvidia.com>,
+	Matthew Wilcox <willy@infradead.org>, brauner@kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Improving iov_iter - and replacing
+ scatterlists
+Message-ID: <20250120142217.GA153811@unreal>
+References: <886959.1737148612@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:16ce:b0:3ce:8d4e:9c79 with SMTP id
- e9e14a558f8ab-3cf743d2bcamr103391435ab.4.1737378383917; Mon, 20 Jan 2025
- 05:06:23 -0800 (PST)
-Date: Mon, 20 Jan 2025 05:06:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <678e4a4f.050a0220.303755.0077.GAE@google.com>
-Subject: [syzbot] Monthly block report (Jan 2025)
-From: syzbot <syzbot+listfc97652af697e61c3368@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <886959.1737148612@warthog.procyon.org.uk>
 
-Hello block maintainers/developers,
+On Fri, Jan 17, 2025 at 09:16:52PM +0000, David Howells wrote:
+> Hi,
+> 
+> I'd like to propose a discussion of two things: firstly, how might we improve
+> iov_iter and, secondly, would it be possible to replace scatterlists.
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+<...>
 
-During the period, 5 new issues were detected and 0 were fixed.
-In total, 46 issues are still open and 94 have already been fixed.
+> Rumour has it that John Hubbard may be working along similar lines, possibly
+> just in the area of bio_vecs and ITER_BVEC.
+> 
+> 
+> [*] Second: Can we replace the uses of scatterlist with iov_iter and reduce
+> the number of iterator classes we have?
 
-Some of the still happening issues:
+<...>
 
-Ref  Crashes Repro Title
-<1>  59531   Yes   possible deadlock in __submit_bio
-                   https://syzkaller.appspot.com/bug?extid=949ae54e95a2fab4cbb4
-<2>  4822    Yes   KMSAN: kernel-infoleak in filemap_read
-                   https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
-<3>  2964    Yes   possible deadlock in blk_trace_setup
-                   https://syzkaller.appspot.com/bug?extid=0d8542c90a512dc95185
-<4>  2822    Yes   possible deadlock in loop_reconfigure_limits
-                   https://syzkaller.appspot.com/bug?extid=867b0179d31db9955876
-<5>  2461    Yes   INFO: task hung in bdev_release
-                   https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
-<6>  1865    Yes   KASAN: slab-use-after-free Read in percpu_ref_put (2)
-                   https://syzkaller.appspot.com/bug?extid=905d719acdbd213bf67e
-<7>  1662    Yes   INFO: task hung in blkdev_fallocate
-                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<8>  594     No    INFO: task hung in bdev_open
-                   https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
-<9>  345     No    possible deadlock in loop_set_status
-                   https://syzkaller.appspot.com/bug?extid=9b145229d11aa73e4571
-<10> 40      Yes   possible deadlock in blk_mq_submit_bio
-                   https://syzkaller.appspot.com/bug?extid=5218c85078236fc46227
+I would say yes to the questions.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Regarding rumors, I don't know, but Christoph, Jason and I are working towards
+this goal. We proposed new DMA API which doesn't need scatterlists and allows
+callers to implement their own data-structures.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+See this "[PATCH v6 00/17] Provide a new two step DMA mapping API" series
+https://lore.kernel.org/all/cover.1737106761.git.leon@kernel.org
+and its block layer followup "[RFC PATCH 0/7] Block and NMMe PCI use of
+new DMA mapping API"
+https://lore.kernel.org/all/cover.1730037261.git.leon@kernel.org
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Thanks
