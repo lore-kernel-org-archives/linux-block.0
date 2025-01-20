@@ -1,454 +1,245 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5681BD531
-	for <linux-block@vger.kernel.org>; Sun, 19 Jan 2025 15:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737302225; cv=none; b=LNFWxVYYqcOnFxCnVZvCt7Gd6whN2iWRHqPq4zAuBFpJBil/AvcB/bB+XB3aR7sV4ScCC2UUiI4f+y9KxNX6EkQwkUaG4Hbjazljj/L0WNK5HF06UveOKj2+fpte4avwUTfzvxyJb77jl4WbUuFtwjdFl6m+omOD0K/32xoi4pc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737302225; c=relaxed/simple;
-	bh=GTdxyPMCtGyYcC0zw6gPrv0UsFDHgo4Cv8vxRLw1BGE=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=jYnSaUTiKmZEQg5vVdDapo1kZystZul8ew+DzUhLOiUI1qApjBDEFUGI7+mENwAMFjmsafvzfF4Qx1NwNAAYT4kbftKXi95seuMsL30mIa3t1ON8B4vNN3LUMXAFK4e3rjUWoLN75EwFQF/Fq3+K058h9WTQUvD/OT6yzUaKuVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=osgymPDd; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17669149DF0
+	for <linux-block@vger.kernel.org>; Mon, 20 Jan 2025 08:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737362022; cv=fail; b=MOMOKiLrgSm8M61q7+W+XFwIGrhvVXWHnlHuD26C3DsZq1Ltw5wMQKIz/hflpBvEK+6+9qdmom0WIYi6kBMZeidYUYeLgiUCwHoOSENP4RHBkTy1RMIGSmaSWubBXkUxtyq05Dnt4VnvKbxy1mcp6Lt9TgYANLICJ+Dz7JuHfaw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737362022; c=relaxed/simple;
+	bh=/JYi6+OIScs937nl0/Vfd9rWLu6eG1Sl7Cs4D8VqesY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QqBl7HTq2yRhyBab3841lrrm6TVUYKNccP1etOUJ6ZNfWXdVC4w5ain8XxRThKsByKS+P0yyKuhpBg5QvWIW8YV/fixpyfJd+7qs1S/UVbVTCAC87FysoK5rev4wI7QRvY1gq5IVenSjhxRIFbpbTTGtvxSKII0BAwCFypn+8+8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=S6WEm8s3; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=NNhlFHuO; arc=fail smtp.client-ip=216.71.153.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="osgymPDd"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2166022c5caso59656865ad.2
-        for <linux-block@vger.kernel.org>; Sun, 19 Jan 2025 07:57:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="S6WEm8s3";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="NNhlFHuO"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1737362021; x=1768898021;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=/JYi6+OIScs937nl0/Vfd9rWLu6eG1Sl7Cs4D8VqesY=;
+  b=S6WEm8s3KMs1lMnL33EvZ/A2Zlq27XwkgTF4yKjXNREfED+LPzZDarjc
+   s8FxMFocZoJY9KajhilbepeVrDb+4dlaStV82yXPhWho52BthVmuLGF4J
+   Ak/HUoPSSsnYDYsTZHQ/yH1ahJ6SD3cwRnQCPBertneUwYyhvvcDDpxeJ
+   2R8HC5RbG1t37n1853G7uQvtMYyrRgRmI1DmBj+4yI9PePVwlDqql+xKl
+   s67zkawuz6LdGMZ5VyYYyy3bpaSfNt0uQSPaHKsqz8+fS9XtOxKlbJ1Ib
+   gFM0hG2pf4YmwUOfU//xfpvDYdBmKFJAjpuxnZMbwjiz+c83T3zqNyLg1
+   g==;
+X-CSE-ConnectionGUID: W6+CUqCETgqgHBw7iR+fqw==
+X-CSE-MsgGUID: 3zJU8J/eSbKwB+D6w+feQA==
+X-IronPort-AV: E=Sophos;i="6.13,218,1732550400"; 
+   d="scan'208";a="37353243"
+Received: from mail-dm6nam12lp2169.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.169])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Jan 2025 16:33:33 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dFr2+lJlGSkImn+Ank/D5TSbUDyZhwU/I9cHIcGlUbHjiW2eEZGx+5w87cqSpy0NvTpu3wPSCxvi40wphxzqY09fgaWGGP8RDe5m6bEwGa77y+akdsBVDv+H19FUKPXkOAhk/Y6IPFsjRRFqwrHJibq0+wxiNqG18iL4BX9oYQdWj6VJIq2AQUQyu7QcfOmYz+ZOpBcmeLZ/1aj6GOUfS+1ygTu9w/qC007RQZ86Je4g80Gge7Jq/Gs/l3KqmNHk9tXrU5qgCK+xNLvFcw/3IU9EQ4hk6FWjKPKzaPWZYZHt5ztzMQKxczw7TdcG3pJs4aKcURXbUybNcdGhSNdqJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZscLFkb3aJRKOTOwQqbj9SucwwbShgR7RZrVLgxAMDw=;
+ b=nuhmJuTd9qH2n2+N5xs6KqRTeJDbT6jcaJ2Dg83sQB+IHQ3o1SgwWyQ0Sc1Hefl4X3E9VGkbvUrk98R5Gd+3ACXTwp4B6JjE39k7Lwabf1Lkhb5QhH8AaDRfTwdjREnJ+anRkxw72Vc5o0WDv8dO6khYbBt3li/cum4EPv+uhLlnZQDH8bxjuCNFhDadVWVKmm/Mr9YvnAARcVNpbZS2o9+Lecm4jqguo/G5K9UWbGcQC/+VKyw4MsJVzPq+OifK37sKaruP0gVfMGRYtsb2o2zeILBb0sHWdZPYSUi45mp+3hkqhlnj88yM8DayH/X1tEM3hQPlrI9caiXXDi0n8Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1737302220; x=1737907020; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=00dmyVvr/1u7gcMXktt2g3mWJ/sU5zj+b/liZMlC194=;
-        b=osgymPDd+6+iermiPHxAWO9Vjq92ELP2LB+5YI/fT+OnzPgRyAnMyzN9xOGaisKyMV
-         p5Q/v5byXQe9xuVAbCha7RHVO49w+q5J2BX/EhH+Q7CMwkAcQWhXJlbY1z5BwX1ZvQmc
-         A3nHt3tOs3cYPF3IW8ibE//nm3bCtiwoCYPNpVyYFgMWpsxEUx2kPuV1T21iFkU+k171
-         O8XsnQ63UNedGhodxsT3AYYESBRybPCQ/CR1SV8RiDUHTxSTwDCzZu83V+iACTiirBYG
-         RYbiVbed6FzPU4A49IPuDiuKI/qZrbLu94abuD8W3dfNlbbpZW2TmSHS13aUB5R9hUK5
-         EKsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737302220; x=1737907020;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=00dmyVvr/1u7gcMXktt2g3mWJ/sU5zj+b/liZMlC194=;
-        b=fV9uTLwouSy2qgm77FVm0v01fqecfp+a0WSbIxmRd83CYLW+UFVctfbmBSK5pJertU
-         yvyjxigFp7rACugd+wWd6I1USlZ3+n15XmX6zAMh94pjJzXP7/qWmLNXZBishAFAg52M
-         jST8vgHuCzDBz6lx9GK5rCjY9Ovwr35KqMbvijBuyJ3bE6O0MAms0WlU321tSCxe47Q1
-         4sMWs8u0ELUWkVRwdBIM7VWVtiFmlQ2dmJSfrzp99gSStO5DrUIT6rgw10UeQ3H8se+/
-         +nZuBBLUeAmUjvReDF7YMfw1Qd/ipGnPJfFW66wsTSAzBHRkJ31CzFx7Y9PxbHDb3cdq
-         Bkpw==
-X-Gm-Message-State: AOJu0Yyz/8T7FAL8h5p0hbMtKGCHBvf3mdSkSUbHPuzaZAN/0x5JoCOd
-	HxerhTnk6npyv2l9J4ulbghndpGdKE7HBMxcjEjWzlxQCIUTcpPkWA1oJezGbEdzpB7GmAGwzyF
-	k
-X-Gm-Gg: ASbGncsqKGxV+/Hu2VaTU/17uu6QVZAjtzJsMaTk2jnwd+I24tmIanmG2fm6mtH9oBI
-	PBe7IPDQ+W+gXu7FEkSOWH89AvLiNITddUduowJIdIfOs+n1hwzX6GEa8TA/LtczO3BoFIDBCu+
-	NGf6NN05ln4RNHxZ8QUCJFZTvHPkwQUcsJLYJvFBlHnJO7/uwCtdmGYVVH9w5MBz9KGm7qNXcD4
-	nfeNYBcpzbFu6c7dJLscmOfIf/1bee7pFuYSOIsUqpMbfn8rmLTA5ZUrZHatMkyF6Q=
-X-Google-Smtp-Source: AGHT+IGOIk1yHI6f3Yne7D/TiQ+BY6e8/PcJ07/iDysRCABXLxLdGpGn+V+oiwXrtuXSwFDJR8jQyw==
-X-Received: by 2002:a17:903:120a:b0:215:9f5a:a236 with SMTP id d9443c01a7336-21c351cfb3dmr109862505ad.6.1737302220467;
-        Sun, 19 Jan 2025 07:57:00 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2d3aca04sm46135385ad.135.2025.01.19.07.56.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Jan 2025 07:56:59 -0800 (PST)
-Message-ID: <488c1331-386f-4eba-a2d8-33f81a21e3c8@kernel.dk>
-Date: Sun, 19 Jan 2025 08:56:58 -0700
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZscLFkb3aJRKOTOwQqbj9SucwwbShgR7RZrVLgxAMDw=;
+ b=NNhlFHuOuuvvz4uOrY+D7khb8oLzQQdMM3tcWtDNP4wYl2+eNIIqQNEQkPzCsy6Ck1AuY/IFXfIovQ1CzXg6ZhesROkTlyyh7onLjLJqeA5FpHv/NX54o5uD7Tt21oJ51NHZIUFPrPnkuRb8UU8NwS1wFlOYR/2i4kIdILAqXvg=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ IA0PR04MB8833.namprd04.prod.outlook.com (2603:10b6:208:489::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.20; Mon, 20 Jan
+ 2025 08:33:32 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::b27f:cdfa:851:e89a%5]) with mapi id 15.20.8356.020; Mon, 20 Jan 2025
+ 08:33:32 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Damien Le Moal <dlemoal@kernel.org>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe
+	<axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH for-next v3 3/5] null_blk: fix zone resource management
+ for badblocks
+Thread-Topic: [PATCH for-next v3 3/5] null_blk: fix zone resource management
+ for badblocks
+Thread-Index: AQHbaTOWPfBrpGPdekqJvhtw7so2Q7MfWZGA
+Date: Mon, 20 Jan 2025 08:33:32 +0000
+Message-ID: <ltwae3kgwvmx37pro45rwenlmescfbcpt6zd6r3fx5o6z5fweq@6cx6tfnw2aw2>
+References: <20250115042910.1149966-1-shinichiro.kawasaki@wdc.com>
+ <20250115042910.1149966-4-shinichiro.kawasaki@wdc.com>
+ <22e5c5a8-ad31-4a0f-a64e-33b34075a97d@kernel.org>
+In-Reply-To: <22e5c5a8-ad31-4a0f-a64e-33b34075a97d@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|IA0PR04MB8833:EE_
+x-ms-office365-filtering-correlation-id: 0eb4064c-db3e-4885-c1e0-08dd392d1f90
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?GBe/NIwNg06JMQ7Ms4St/sZ2Mqrjg1xb4PEfVNBJ/TIL9kF3nx2kt1uiZqNS?=
+ =?us-ascii?Q?6lme/y5dSMX7xKsrrp//ndeZtYibwJv5rpRYVL1EyO1SSRTOiwAHcatuZ2z6?=
+ =?us-ascii?Q?0QDYbYWm0lk/MWMgpRXhZ0akuzyaNtp/H6EQwnkkVfYB6kPJieaDGeXXdNbK?=
+ =?us-ascii?Q?426ydxH+ZaXjTyl7kuzDu1GuQuDpfAGyZVGf5vdAM9JbUhZ+APBFWQNzLs0J?=
+ =?us-ascii?Q?gVBc2gu5Ybh4sbGs3Bfch+5FB7xHbbY569zJgTvrrfIslEuPoGeX2m/2m1Ln?=
+ =?us-ascii?Q?RbwNaNf4oWBWvJfvdelGbcvXXDcNYaCHneKR0ktv/Wrb8LckpKuOfN0JmZ3A?=
+ =?us-ascii?Q?v774GhN+LZdWMOQiJ99XLmXmo9YPoB44D+yVkFBDmuseq8ZeGt8mI81BX4mm?=
+ =?us-ascii?Q?NaILeb+ZeKlXC1TXJoQsD9RnMrA8CloEMndTFyKzWHykI47suOF0+jyqlx6X?=
+ =?us-ascii?Q?OrJrJDceAvEw/YysTHq0zqqgbA44FRWP99BicAVl2cbRHury2gbmsw1y0nBK?=
+ =?us-ascii?Q?jMXwWxJyvA9Cc/Myb6t/bjebF8Ao9xQQ7UN4567bFMj1eoqX1z1ylQrHv2Qb?=
+ =?us-ascii?Q?9tki6QbQ/tsjI6pLb2Pno/idOyAgWD0tNsjc94+WU/J3woyXZBzFMIvoZY7e?=
+ =?us-ascii?Q?iGX6mQFemswNA+LtEVYtuUI8P12rg75NoqSqsNtEgUXwS6aZN83xCBxESJ4c?=
+ =?us-ascii?Q?5CETRJdBVHBRrY2FASLUBpvuwKdm6lK7MhNsrPfwb0jfYDzzSRqn2XHHg0MZ?=
+ =?us-ascii?Q?alJG4TFSwWp6hWLjWdFGsTXqD4owOiHXMliQDdWCVbCr9ZkOZ6sRU9JM8AnH?=
+ =?us-ascii?Q?DLzC+4NAolQObAqHdrWokJcH/ZnxWHK7ErYG9a0qTgElAwExpMfFAKhpMvzZ?=
+ =?us-ascii?Q?A0xjkr66vNg0FIs2LFkzQ+jgv8p4xXNXhh0DbcLZqpgtJVYADB0qcb2qMHH/?=
+ =?us-ascii?Q?Eoib9r2LYZDgMIzsrIVEaiJu7uybSoSYlzBoSwW+Ngzu3n3469+Zb/Vop01v?=
+ =?us-ascii?Q?kfeK2baozkzvEjKCuC40y1YO7xoe9FQzSLzZTwZmEZJ8PoR1ZO5GjGiCVQ8X?=
+ =?us-ascii?Q?BJ9McWP8htBIDV42vz3PBEIFjV+pbPq1Plx5gL7KC7Y671xfRRDImrVPURV7?=
+ =?us-ascii?Q?IaJB8cvnfDBJ3afYav5128ZPm6MzBGQiTZ9/DvI/Gu7nyNFHeO9CDDW83ufL?=
+ =?us-ascii?Q?+WJG1Uax6GLUzDrbbqS774AAG+EWAm6HSdWEgBq6ObxPlUEWe+jTQt8oCODD?=
+ =?us-ascii?Q?irsIYEveeZKLCPGF9kI47PyZxRNIxTIHAfV+qNbf+HAJVMhn1tFqMw0T350B?=
+ =?us-ascii?Q?rx84Nl/jY6jsqwx5gTpemAOljobvjoj7WlSwkOfmLOjW+8cpD0En+TeStFvS?=
+ =?us-ascii?Q?sFpLnIvU/iMdXebkrn+u4kKilnyGBbzwoHdAgAPwYt5NmAeM8SyubEkYu/Ly?=
+ =?us-ascii?Q?j9fZ3obr3Lbd3VDBzFXKM5Q7hw4HEBkS?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?lJtvmb8XBpLWcegbysBbchO1DMOJu4/7ukRfylIyh9tJxFkwrldaxICVIQgA?=
+ =?us-ascii?Q?amSPnImPa8QFyHqHOrCqs9pyeKUMhox97oaP+wr+11GesWWMmar4NjyNOMiz?=
+ =?us-ascii?Q?AdYVETempQsoWsc3Jb7VGuFR9eC7+HOg8vA1W3plyDL3TXWCTPFvK4sLyOyW?=
+ =?us-ascii?Q?gv2nNR5o4tb2iP1avMA9pnwxz457rgtn6uW66hEQFx69y3mXGmzymqbDwrm6?=
+ =?us-ascii?Q?1Jhhe9Wdwvb0wFnJaozOgjVdL+aekS1yCZmJ/DzztWEGtE3d9abZopFWqgdB?=
+ =?us-ascii?Q?CsKuy+YrrnFQx3X1dZ9NIC41ME1+TUgKyVDQFdBaFmvgP1b3KfP2xhTIqEJP?=
+ =?us-ascii?Q?X6yCsO+HlVvKgaDZffNzz9Vc6JLcp+2QEQ/iLOCGPd6BS1AeQoAbDzVAolwH?=
+ =?us-ascii?Q?ODI+cCPYXAbRwlw0iyyQRPq0/HdFTYk+YV0nTocBJUzZ0wW4U1LxzTZTUBE3?=
+ =?us-ascii?Q?neF1OcrbGXsXiZ5rAO1FLURM9v2Nze5+wyRo5Y50rOCa6471og6y5id/eT10?=
+ =?us-ascii?Q?RjxB1DVrNuhGbPeYVbySKB/9z+sOWDBgwDV1gYFfp0T9A4ApoLPUcSBQDuaR?=
+ =?us-ascii?Q?IU4M4mBXGQhkSVP000FOVSfZ2h5DmLZUSaca9P9FsNW5+HA/kyU1QDowplAp?=
+ =?us-ascii?Q?gsC9hGHubV0F/VikH3ode2gjrUbB8hjYaUW+l36TfsZJgJVjgSx0TgeEqxSk?=
+ =?us-ascii?Q?3arLYuKqe65hevx33msu8/zqdnPmZ7Y26jsDc15uvnZnVRjQIJ/YldestzZw?=
+ =?us-ascii?Q?NE9iU3keqBPcu33OBsBxuUYRItWT49Fk5HleHBgCFiJPZVPDx69ZeXqxa8q/?=
+ =?us-ascii?Q?Rw1XFwbDk4LHxaPxb95hRmY90oCYCf+MM35wEIwZGOSPsXKkhwqDcuPiP1zP?=
+ =?us-ascii?Q?f+537WgZPkltBR8DY4BOusFx0lmpZGqxjY4INbO8LBAwHEEVYeMnkJiGe9rj?=
+ =?us-ascii?Q?gtgn5viZQ2Exv00FGQjnWR7L2pdW6jIXDHur+wEHHKx4cNZV0FWjW90Kgh91?=
+ =?us-ascii?Q?WgR5ZY5u6BItGff6JmlHKbLycQ61PKwd70HGenD6ykWOCR0wGx7aqOdD+DHs?=
+ =?us-ascii?Q?jwkYyAA/kEW3iqKS7Uj3DK/dZifMcwjB50WpZj+KSQ3RkipJDGskXfnf/GW8?=
+ =?us-ascii?Q?Tm/FSDqXhKKQMeeOvlQ3Oun4O7UPxRDT7i74ngd4mupHDO5tuZoyNASmdPnb?=
+ =?us-ascii?Q?Gf8E0L0TZIEViTxtdVj57b58YDinuHxDUGr1zjSGYtgkjrGja4geHV4TizVU?=
+ =?us-ascii?Q?xMish057VG64QIg8zZKQD4x6+IyLaq7xdcW0nzxdoiPFycyMwcxv4iW8ZpEE?=
+ =?us-ascii?Q?eyKDEwbvyfYkbQjP25p9BPf7+QL1zypoQ+TTT3ylxxcCsSglmK2zsUOn9OAG?=
+ =?us-ascii?Q?witbjHhfE9Iw1IZO8WI6QYUe8co7uu2lYRGH/ARhtMr9rhpM/I0V+HGzCQJ2?=
+ =?us-ascii?Q?+OjcLVrzV1Ki+FFptD2UKONvOfZe5lQbhSFhy1fceSP4wceYKv9FTZFJEySr?=
+ =?us-ascii?Q?rK1rG7rXhE48niGszzRQwAs83/VQfaKhRum0XNwGxuseP1roIDbbIlOafKLy?=
+ =?us-ascii?Q?KpzN1Ko6snsaJww43Wk6q5Y+JmRgRgneHE12g63xPgG1dSsC7X07COsKqO1f?=
+ =?us-ascii?Q?GY9nWWlBKETeIsnYqqpsFtA=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <F93738FDA90DDC4B8400BED5E4DA86A5@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block updates for 6.14-rc1
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	NOxufTl2xnyEuBmnV94FbjSyaxo/omHAkZ3Tgzv5Rfm/47zS2Re/RFXsYVy1yqsRglfVlqP3iKCXbGr2Qb+X0DFD5bwZ23FMFnUQzuVlI9ZEIAkZnS00JHgdxY/vOImkWzxIlsXHJe/oxH7j/sash9bpGR+sxaz8ImvWnO2pSMiE/VXSCN62QUMJQLDccXd/jbc5tZQsNiGeFjmJ2VXdk/B8Laz9oNdKb2MqxzvPV1JoSpkhSoSKZtaQJ+T+dDc/CxcRJEA19E1VsU1BghWGCiRS1Vv2uoqcpxlVg0jMDr1W455z7AGZ9OpSZSzSpbZF7xZLFDWbnk4B3gWz01PuYH53Eg8FefpWzJfC6lmGYTnDpAxU5oQUPi8VfaZA6ikY7RecqlMGm9r4O3xYETWEaaDwBDn3x4LVN0wtdf1TSdaYdCv9ykSXjvXy7zWqPX30HRWVMI06bWbtAYbyVopfU+X4PrB4WxhaKkzvKpNB/GCN0wbK55xflWG8XrgwBPUI1XWvqrXM68hi19lxxhIv7hbPKy1o8jEiN4zGMEaB7UFu++IpjBCMtgOK4AxnByAZSFm0cfgWAwGt8osv+yjdLZU8HuYYOwZPrSzpiQ893tlIDWPpbG4EI6VCDhWfMohI
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0eb4064c-db3e-4885-c1e0-08dd392d1f90
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2025 08:33:32.2214
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 4yOE5r2DwrTPudtjj5MBgS90PCN2s4woNPeYzoTnjXPtpj9QhqkNRfM6qCsijIQuYj0J0pIBTk2qmyg0AHWEBuuSqJ0efShEXc9N9sWdUSw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR04MB8833
 
-Hi Linus,
+On Jan 18, 2025 / 08:00, Damien Le Moal wrote:
+> On 1/15/25 1:29 PM, Shin'ichiro Kawasaki wrote:
+> > When the badblocks parameter is set for zoned null_blk, zone resource
+> > management does not work correctly. This issue arises because
+> > null_zone_write() modifies the zone resource status and then call
+> > null_process_cmd(), which handles the badblocks parameter. When
+> > badblocks cause IO failures and no IO happens, the zone resource status
+> > should not change. However, it has already changed.
+>=20
+> And that is correct in general. E.g. if an SMR HDD encounters a bad block=
+ while
+> executing a write command, the bad block may endup failing the write comm=
+and but
+> the write operation was already started, meaning that the zone was at lea=
+st
+> implicitly open first to start writing. So doing zone management first an=
+d then
+> handling the bad blocks (eventually failing the write operation) is the c=
+orrect
+> order to do things.
+>=20
+> I commented on the previous version that partially advancing the wp for a=
+ write
+> that is failed due to a bad block was incorrect because zone resource man=
+agement
+> needed to be done. But it seems I was mistaken since you are saying here =
+that
+> zone management is already done before handling bad blocks. So I do not t=
+hink we
+> need this change. Or is it me who is completely confused ?
 
-Here are the block related updates for the 6.14 merge window. This pull
-request contains:
+Based on your comment on the previous version, I checked the code and found
+the call chain was as follows:
 
-- NVMe pull requests via Keith
-	- Target support for PCI-Endpoint transport (Damien)
-	- TCP IO queue spreading fixes (Sagi, Chaitanya)
-	- Target handling for "limited retry" flags (Guixen)
-	- Poll type fix (Yongsoo)
-	- Xarray storage error handling (Keisuke)
-	- Host memory buffer free size fix on error (Francis)
+null_process_zoned_cmd()
+ null_zone_write()
+  do zone resource management: zone resource management is done here,
+                               assuming writes always succeed
+  null_process_cmd()
+   null_handle_badblocks() ... v2 3rd patch added wp move for partial write=
+s
 
-- MD pull requests via Song
-	- Reintroduce md-linear, by Yu Kuai
-	- md-bitmap refactor and fix, by Yu Kuai
-	- Replace kmap_atomic with kmap_local_page, by David Reaver
+So, the zone resource management was done before applying the v2 patch seri=
+es.
 
-- Quite a few queue freeze and debugfs deadlock fixes. Ming introduced
-  lockdep support for this in the 6.13 kernel, and it's (unsurprisingly)
-  uncovered quite a few issues
+However, the zone resource management did not care the write failure by
+badblocks. It assumed that as if the writes fully succeed always. When badb=
+locks
+causes write failure for zoned null_blk, it leaves wrong zone resource stat=
+us.
 
-- Use const attributes for IO schedulers
+I would say, this patch does not respond to your comment for the previous
+version. It addresses the problem I found when I thought about your comment=
+.
 
-- Remove bio ioprio wrappers
+With this patch, the function call chain will be as follows:
 
-- Fixes for stacked device atomic write support
+null_process_zoned_cmd()
+ null_zone_write()
+  null_handle_badblocks()     ... checks how many sectors to be written
+  do zone resource management ... zone resource management is done reflecti=
+ng
+                                  the result of null_handle_badblocks() cal=
+l
+   null_handle_memory_backed()
 
-- Refactor queue affinity helpers, in preparation for better supporting
-  isolated CPUs
-
-- Cleanups of loop O_DIRECT handling
-
-- Cleanup of BLK_MQ_F_* flags
-
-- Add rotational support for null_blk
-
-- Various fixes and cleanups
-
-This will throw a trivial conflict in drivers/md/dm-verity-fec.c due to
-the bio ioprio wrapper removal. The merge is simple, just replace
-bio_prio(bio) with bio->bi_ioprio in both cases.
-
-Please pull!
-
-
-The following changes since commit 4bbf9020becbfd8fc2c3da790855b7042fad455b:
-
-  Linux 6.13-rc4 (2024-12-22 13:22:21 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/for-6.14/block-20250118
-
-for you to fetch changes up to 554b22864cc79e28cd65e3a6e1d0d1dfa8581c68:
-
-  block: Don't trim an atomic write (2025-01-17 13:13:55 -0700)
-
-----------------------------------------------------------------
-for-6.14/block-20250118
-
-----------------------------------------------------------------
-Andreas Hindborg (1):
-      rust: block: fix use of BLK_MQ_F_SHOULD_MERGE
-
-Bart Van Assche (6):
-      blk-zoned: Minimize #include directives
-      blk-zoned: Document locking assumptions
-      blk-zoned: Improve the queue reference count strategy documentation
-      blk-zoned: Split queue_zone_wplugs_show()
-      block: Reorder the request allocation code in blk_mq_submit_bio()
-      blk-mq: Move more error handling into blk_mq_submit_bio()
-
-Baruch Siach (1):
-      nvme-pci: fix comment typo
-
-Benoît du Garreau (1):
-      block: rnull: Initialize the module in place
-
-Christoph Hellwig (28):
-      block: remove BLK_MQ_F_SHOULD_MERGE
-      block: remove bio_add_pc_page
-      block: remove blk_rq_bio_prep
-      block: use page_to_phys in bvec_phys
-      block: add a dma mapping iterator
-      block: better split mq vs non-mq code in add_disk_fwnode
-      block: remove blk_mq_init_bitmaps
-      block: remove BLK_MQ_F_NO_SCHED
-      block: simplify tag allocation policy selection
-      block: fix docs for freezing of queue limits updates
-      block: add a queue_limits_commit_update_frozen helper
-      block: check BLK_FEAT_POLL under q_usage_count
-      block: don't update BLK_FEAT_POLL in __blk_mq_update_nr_hw_queues
-      block: add a store_limit operations for sysfs entries
-      block: fix queue freeze vs limits lock order in sysfs store methods
-      nvme: fix queue freeze vs limits lock order
-      nbd: fix queue freeze vs limits lock order
-      usb-storage: fix queue freeze vs limits lock order
-      loop: refactor queue limits updates
-      loop: fix queue freeze vs limits lock order
-      loop: move updating lo_flags out of loop_set_status_from_info
-      loop: update commands in loop_set_status still referring to transfers
-      loop: create a lo_can_use_dio helper
-      loop: only write back pagecache when starting to to use direct I/O
-      loop: open code the direct I/O flag update in loop_set_dio
-      loop: allow loop_set_status to re-enable direct I/O
-      loop: don't freeze the queue in loop_update_dio
-      loop: remove the use_dio field in struct loop_device
-
-Colin Ian King (1):
-      blktrace: remove redundant return at end of function
-
-Damien Le Moal (19):
-      null_blk: Add rotational feature support
-      nvme: Move opcode string helper functions declarations
-      nvmet: Add vendor_id and subsys_vendor_id subsystem attributes
-      nvmet: Export nvmet_update_cc() and nvmet_cc_xxx() helpers
-      nvmet: Introduce nvmet_get_cmd_effects_admin()
-      nvmet: Add drvdata field to struct nvmet_ctrl
-      nvme: Add PCI transport type
-      nvmet: Improve nvmet_alloc_ctrl() interface and implementation
-      nvmet: Introduce nvmet_req_transfer_len()
-      nvmet: Introduce nvmet_sq_create() and nvmet_cq_create()
-      nvmet: Add support for I/O queue management admin commands
-      nvmet: Do not require SGL for PCI target controller commands
-      nvmet: Introduce get/set_feature controller operations
-      nvmet: Implement host identifier set feature support
-      nvmet: Implement interrupt coalescing feature support
-      nvmet: Implement interrupt config feature support
-      nvmet: Implement arbitration feature support
-      nvmet: New NVMe PCI endpoint function target driver
-      Documentation: Document the NVMe PCI endpoint target driver
-
-Dan Carpenter (1):
-      md/md-linear: Fix a NULL vs IS_ERR() bug in linear_add()
-
-Daniel Wagner (8):
-      driver core: bus: add irq_get_affinity callback to bus_type
-      PCI: hookup irq_get_affinity callback
-      virtio: hookup irq_get_affinity callback
-      blk-mq: introduce blk_mq_map_hw_queues
-      scsi: replace blk_mq_pci_map_queues with blk_mq_map_hw_queues
-      nvme: replace blk_mq_pci_map_queues with blk_mq_map_hw_queues
-      virtio: blk/scsi: replace blk_mq_virtio_map_queues with blk_mq_map_hw_queues
-      blk-mq: remove unused queue mapping helpers
-
-David Reaver (1):
-      md: Replace deprecated kmap_atomic() with kmap_local_page()
-
-Francis Pravin (1):
-      nvme-pci: use correct size to free the hmb buffer
-
-Geert Uytterhoeven (1):
-      ps3disk: Do not use dev->bounce_size before it is set
-
-Guixin Liu (1):
-      nvmet: handle rw's limited retry flag
-
-Jens Axboe (4):
-      Merge tag 'nvme-6.14-2025-01-12' of git://git.infradead.org/nvme into for-6.14/block
-      nvme: fix bogus kzalloc() return check in nvme_init_effects_log()
-      Merge tag 'md-6.14-20250113' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into for-6.14/block
-      Merge tag 'md-6.14-20250116' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into for-6.14/block
-
-John Garry (6):
-      block: Delete bio_prio()
-      block: Delete bio_set_prio()
-      block: Ensure start sector is aligned for stacking atomic writes
-      block: Change blk_stack_atomic_writes_limits() unit_min check
-      block: Add common atomic writes enable flag
-      block: Don't trim an atomic write
-
-Keisuke Nishimura (2):
-      nvme: Add error check for xa_store in nvme_get_effects_log
-      nvme: Add error path for xa_store in nvme_init_effects
-
-Matthew Wilcox (Oracle) (1):
-      null_blk: Remove accesses to page->index
-
-Ming Lei (9):
-      block: remove unnecessary check in blk_unfreeze_check_owner()
-      block: track disk DEAD state automatically for modeling queue freeze lockdep
-      block: don't verify queue freeze manually in elevator_init_mq()
-      block: track queue dying state automatically for modeling queue freeze lockdep
-      blktrace: don't centralize grabbing q->debugfs_mutex in blk_trace_ioctl
-      blktrace: move copy_[to|from]_user() out of ->debugfs_lock
-      block: mark GFP_NOIO around sysfs ->store()
-      nbd: fix partial sending
-      block: limit disk max sectors to (LLONG_MAX >> 9)
-
-Randy Dunlap (3):
-      blk-cgroup: fix kernel-doc warnings in header file
-      blk-cgroup: rwstat: fix kernel-doc warnings in header file
-      partitions: ldm: remove the initial kernel-doc notation
-
-Sagi Grimberg (1):
-      nvme-tcp: Fix I/O queue cpu spreading for multiple controllers
-
-Song Liu (1):
-      Merge branch 'md-6.14-bitmap' into md-6.14
-
-Thomas Weißschuh (4):
-      elevator: Enable const sysfs attributes
-      block: mq-deadline: Constify sysfs attributes
-      block, bfq: constify sysfs attributes
-      kyber: constify sysfs attributes
-
-Yang Erkun (1):
-      block: retry call probe after request_module in blk_request_module
-
-Yongsoo Joo (1):
-      nvme: change return type of nvme_poll_cq() to bool
-
-Yu Kuai (7):
-      nbd: don't allow reconnect after disconnect
-      md: reintroduce md-linear
-      md/md-bitmap: factor behind write counters out from bitmap_{start/end}write()
-      md/md-bitmap: remove the last parameter for bimtap_ops->endwrite()
-      md: add a new callback pers->bitmap_sector()
-      md/raid5: implement pers->bitmap_sector()
-      md/md-bitmap: move bitmap_{start, end}write to md upper layer
-
- Documentation/PCI/endpoint/index.rst             |    1 +
- Documentation/PCI/endpoint/pci-nvme-function.rst |   13 +
- Documentation/nvme/index.rst                     |   12 +
- Documentation/nvme/nvme-pci-endpoint-target.rst  |  368 +++
- Documentation/subsystem-apis.rst                 |    1 +
- arch/um/drivers/ubd_kern.c                       |    1 -
- block/Makefile                                   |    2 -
- block/bfq-iosched.c                              |    2 +-
- block/bio.c                                      |  111 +-
- block/blk-cgroup-rwstat.h                        |    5 +-
- block/blk-cgroup.h                               |   10 +-
- block/blk-core.c                                 |   21 +-
- block/blk-integrity.c                            |    4 +-
- block/blk-map.c                                  |  128 +-
- block/blk-merge.c                                |  177 +-
- block/blk-mq-cpumap.c                            |   37 +
- block/blk-mq-debugfs.c                           |   27 +-
- block/blk-mq-pci.c                               |   46 -
- block/blk-mq-sched.c                             |    3 +-
- block/blk-mq-tag.c                               |   41 +-
- block/blk-mq-virtio.c                            |   46 -
- block/blk-mq.c                                   |   71 +-
- block/blk-mq.h                                   |   11 +-
- block/blk-settings.c                             |   42 +-
- block/blk-sysfs.c                                |  140 +-
- block/blk-zoned.c                                |   65 +-
- block/blk.h                                      |   33 +-
- block/bsg-lib.c                                  |    2 +-
- block/elevator.c                                 |   35 +-
- block/elevator.h                                 |    2 +-
- block/genhd.c                                    |   63 +-
- block/kyber-iosched.c                            |    2 +-
- block/mq-deadline.c                              |    2 +-
- block/partitions/ldm.h                           |    2 +-
- drivers/ata/ahci.h                               |    2 +-
- drivers/ata/pata_macio.c                         |    2 +-
- drivers/ata/sata_mv.c                            |    2 +-
- drivers/ata/sata_nv.c                            |    4 +-
- drivers/ata/sata_sil24.c                         |    1 -
- drivers/block/amiflop.c                          |    1 -
- drivers/block/aoe/aoeblk.c                       |    1 -
- drivers/block/ataflop.c                          |    1 -
- drivers/block/floppy.c                           |    1 -
- drivers/block/loop.c                             |  178 +-
- drivers/block/mtip32xx/mtip32xx.c                |    1 -
- drivers/block/nbd.c                              |  116 +-
- drivers/block/null_blk/main.c                    |   31 +-
- drivers/block/null_blk/null_blk.h                |    1 +
- drivers/block/ps3disk.c                          |    7 +-
- drivers/block/rbd.c                              |    1 -
- drivers/block/rnbd/rnbd-clt.c                    |    3 +-
- drivers/block/rnbd/rnbd-srv.c                    |    2 +-
- drivers/block/rnull.rs                           |   30 +-
- drivers/block/sunvdc.c                           |    2 +-
- drivers/block/swim.c                             |    2 +-
- drivers/block/swim3.c                            |    3 +-
- drivers/block/ublk_drv.c                         |    1 -
- drivers/block/virtio_blk.c                       |    9 +-
- drivers/block/xen-blkfront.c                     |    1 -
- drivers/block/z2ram.c                            |    1 -
- drivers/cdrom/gdrom.c                            |    2 +-
- drivers/md/Kconfig                               |   13 +
- drivers/md/Makefile                              |    2 +
- drivers/md/bcache/movinggc.c                     |    2 +-
- drivers/md/bcache/writeback.c                    |    2 +-
- drivers/md/dm-rq.c                               |    2 +-
- drivers/md/dm-verity-fec.c                       |    6 +-
- drivers/md/dm-verity-target.c                    |    4 +-
- drivers/md/md-autodetect.c                       |    8 +-
- drivers/md/md-bitmap.c                           |  116 +-
- drivers/md/md-bitmap.h                           |    7 +-
- drivers/md/md-linear.c                           |  354 +++
- drivers/md/md.c                                  |   31 +-
- drivers/md/md.h                                  |    5 +
- drivers/md/raid0.c                               |    2 +-
- drivers/md/raid1.c                               |   36 +-
- drivers/md/raid1.h                               |    1 -
- drivers/md/raid10.c                              |   28 +-
- drivers/md/raid10.h                              |    1 -
- drivers/md/raid5-cache.c                         |   20 +-
- drivers/md/raid5.c                               |  111 +-
- drivers/md/raid5.h                               |    4 -
- drivers/memstick/core/ms_block.c                 |    3 +-
- drivers/memstick/core/mspro_block.c              |    3 +-
- drivers/mmc/core/queue.c                         |    2 +-
- drivers/mtd/mtd_blkdevs.c                        |    2 +-
- drivers/mtd/ubi/block.c                          |    2 +-
- drivers/nvme/host/apple.c                        |    2 -
- drivers/nvme/host/core.c                         |   46 +-
- drivers/nvme/host/fc.c                           |    1 -
- drivers/nvme/host/nvme.h                         |   39 -
- drivers/nvme/host/pci.c                          |   17 +-
- drivers/nvme/host/tcp.c                          |   70 +-
- drivers/nvme/target/Kconfig                      |   11 +
- drivers/nvme/target/Makefile                     |    2 +
- drivers/nvme/target/admin-cmd.c                  |  388 +++-
- drivers/nvme/target/configfs.c                   |   49 +
- drivers/nvme/target/core.c                       |  266 ++-
- drivers/nvme/target/discovery.c                  |   17 +
- drivers/nvme/target/fabrics-cmd-auth.c           |   14 +-
- drivers/nvme/target/fabrics-cmd.c                |  101 +-
- drivers/nvme/target/io-cmd-bdev.c                |    3 +
- drivers/nvme/target/nvmet.h                      |  110 +-
- drivers/nvme/target/passthru.c                   |   18 +-
- drivers/nvme/target/pci-epf.c                    | 2591 ++++++++++++++++++++++
- drivers/nvme/target/zns.c                        |    3 +-
- drivers/pci/pci-driver.c                         |   14 +
- drivers/s390/block/dasd_genhd.c                  |    1 -
- drivers/s390/block/scm_blk.c                     |    1 -
- drivers/scsi/fnic/fnic_main.c                    |    3 +-
- drivers/scsi/hisi_sas/hisi_sas.h                 |    1 -
- drivers/scsi/hisi_sas/hisi_sas_v3_hw.c           |    6 +-
- drivers/scsi/megaraid/megaraid_sas_base.c        |    3 +-
- drivers/scsi/mpi3mr/mpi3mr.h                     |    1 -
- drivers/scsi/mpi3mr/mpi3mr_os.c                  |    2 +-
- drivers/scsi/mpt3sas/mpt3sas_scsih.c             |    3 +-
- drivers/scsi/pm8001/pm8001_init.c                |    2 +-
- drivers/scsi/pm8001/pm8001_sas.h                 |    1 -
- drivers/scsi/qla2xxx/qla_nvme.c                  |    3 +-
- drivers/scsi/qla2xxx/qla_os.c                    |    4 +-
- drivers/scsi/scsi_lib.c                          |    5 +-
- drivers/scsi/sd.c                                |   18 +-
- drivers/scsi/smartpqi/smartpqi_init.c            |    7 +-
- drivers/scsi/sr.c                                |    5 +-
- drivers/scsi/virtio_scsi.c                       |    3 +-
- drivers/target/target_core_pscsi.c               |    6 +-
- drivers/ufs/core/ufshcd.c                        |    1 -
- drivers/usb/storage/scsiglue.c                   |    5 +-
- drivers/virtio/virtio.c                          |   19 +
- fs/bcachefs/move.c                               |    6 +-
- include/linux/bio.h                              |    5 -
- include/linux/blk-mq-pci.h                       |   11 -
- include/linux/blk-mq-virtio.h                    |   11 -
- include/linux/blk-mq.h                           |   35 +-
- include/linux/blkdev.h                           |   36 +-
- include/linux/bvec.h                             |    7 +-
- include/linux/device/bus.h                       |    3 +
- include/linux/libata.h                           |    4 +-
- include/linux/nvme.h                             |   42 +
- include/scsi/scsi_host.h                         |    6 +-
- include/uapi/linux/raid/md_p.h                   |    2 +-
- include/uapi/linux/raid/md_u.h                   |    2 +
- kernel/trace/blktrace.c                          |   36 +-
- rust/kernel/block/mq/tag_set.rs                  |    2 +-
- 144 files changed, 5354 insertions(+), 1415 deletions(-)
- create mode 100644 Documentation/PCI/endpoint/pci-nvme-function.rst
- create mode 100644 Documentation/nvme/index.rst
- create mode 100644 Documentation/nvme/nvme-pci-endpoint-target.rst
- delete mode 100644 block/blk-mq-pci.c
- delete mode 100644 block/blk-mq-virtio.c
- create mode 100644 drivers/md/md-linear.c
- create mode 100644 drivers/nvme/target/pci-epf.c
- delete mode 100644 include/linux/blk-mq-pci.h
- delete mode 100644 include/linux/blk-mq-virtio.h
-
--- 
-Jens Axboe
-
+The zone resource management part will be skipped when badblocks causes no
+write. The 5th patch in this 3rd series will modify null_handle_badblocks()=
+ to
+support partial writes by badblocks, and the zone resource management will =
+be
+done for such partial writes.=
