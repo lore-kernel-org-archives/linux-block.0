@@ -1,56 +1,56 @@
 Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF30A1AFB36
-	for <linux-block@vger.kernel.org>; Tue, 21 Jan 2025 08:15:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8D51B4156
+	for <linux-block@vger.kernel.org>; Tue, 21 Jan 2025 08:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737447329; cv=none; b=IuWXrkAD2TO7Vae6VoqtyiZCJcuPcsKv0iOetPX9DQ0k1k9jYVW+4TRT1PjZ9HKsfaEgmnyau2JZ+9568tb9WiQ5Vf7cNNWqMcdV5Lt8auPFukJlFt/QfdLtPpEE3OZv1/KzgLMs7HNQJ2CXO6q+g7cG2y+XJOPMRxE7GlzRTZI=
+	t=1737447329; cv=none; b=H10eBF9xT6HhdSXJfQSVKe+bPH0x/aZ7sRI4oKyRkVVv07kah3uKzlO6+dNzoYeg00KnRAGGNSGm+l0GVEfQaniCIRUiwB5GfAOlQKvs8mVddtI8zdt4JtT3nEJIDXMbPJyAHp4viaacmKoGWpp3oBBSMHBJT3AoAC0x5CPACYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1737447329; c=relaxed/simple;
-	bh=NEU8/bjKUkJ2yiA62sKp1N5ee0MPHR3UFQl5iATMtoY=;
+	bh=RarQCw0Q/MlT/SjTk/J/KIrVuLDkJ91fM5OsKJ2AiRk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=skKddXxTsl0+s49i/a1duRgLvC1XCG3H+fWTpeDEP16n2fYS01Kb1gyf7CPp1fWtHv0Z9pMj6SrfkCT7J715r7oi5NrGwu9rEVXgUdXVddynwTIxLf1ixKRTBAqg1id7zqA8NYfS1oDnJ3pfi7Bjl4ABV1gz9Uwkq/bO560WPfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=EBgFfA20; arc=none smtp.client-ip=216.71.154.45
+	 MIME-Version; b=iOrfejW+tL2XbVPOGDev8q6dlJkcWuCFO24o9fhcpOS3G8m+9yGX6kLMYK7Ybxaw5BMfSMgGRS7oHAKmjbe4lRreYdsKGQD6npidrVVO9lOTllK/d9B4pHWYnTA5S0cvE5gXB7kizDhew6DQJ5qUemyy4hsAVd28emQW2MkQgIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=eGchEs3n; arc=none smtp.client-ip=216.71.154.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="EBgFfA20"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eGchEs3n"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1737447327; x=1768983327;
+  t=1737447328; x=1768983328;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NEU8/bjKUkJ2yiA62sKp1N5ee0MPHR3UFQl5iATMtoY=;
-  b=EBgFfA20VFNQym/P/m6GJXceB2wL9vAn6qf3v6Fmr6iCIVrS/3Rdqz9T
-   YpKP+7IOUWjz8mvhg4SDd6hhS+qxaiNuXVN59qnpqqJSXVDVHbtcncUNC
-   fXOYa4jm3Zs5s39AP0jc+HOqDsE+M9xJGuWKkeIxZJU0myTZLnE+8QsnZ
-   iWtlwPlfx/B6H0oETbDDRyVkgm/2pbckXZsnn+RV1anw0njkm6+0svIox
-   i5BaHW3T7L8MwZ3zEfNJmnDeSx0vmQVOQgBgZOmCMbyHf+1UKYdp0RbLY
-   noJMO7HYfvv5aWDP/OxfzrTITneps+LPNuixhqX+BBZDNq1q9/bs0VIp9
-   A==;
-X-CSE-ConnectionGUID: tNw6URauQKy482JE8QmTQg==
-X-CSE-MsgGUID: SG1MoTHSS6eiZywd/MzBtw==
+  bh=RarQCw0Q/MlT/SjTk/J/KIrVuLDkJ91fM5OsKJ2AiRk=;
+  b=eGchEs3nW0r7jBneXKZthCcIwOGHO/HZDfJh5IxdhHE3Z6wYf5jvpFDc
+   whA6ungLkD6zpEcTrd4Y8DTj/xrdlP9QAlzYpaIWIDrAFkh6/CFPSq+eE
+   US14ko+DyTev8TkwKm2x10x5nXieK53X9HIFz24gv3q1syCgamPIG/iv1
+   RnJxazsml1I7eFJMOotSkyqOjEaVpEES6n2/WD9JRE/cXEyG+m47Np2Lv
+   kONow00QlPMaxPQUevFEzCHH5KEYidwnfbpFLi+QU3P3j+Bt3fs5+FpH6
+   NUk+9pGt2Bam7ZaFB+aVGEOPrZ0fAKhH2c1gucYi73fc+xM3Gj8Fn2GFE
+   Q==;
+X-CSE-ConnectionGUID: qe0dpo4HQGmvWefALMCxUA==
+X-CSE-MsgGUID: wOTOJ8ToReaNKyHY271t5w==
 X-IronPort-AV: E=Sophos;i="6.13,221,1732550400"; 
-   d="scan'208";a="36182070"
+   d="scan'208";a="36182076"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Jan 2025 16:15:21 +0800
-IronPort-SDR: 678f4a04_oKypfGbFm0Iovf4fT5bWjPPduYFtdkldL28u9D7iawBNsfB
- 4LaBBZOPJ6B5jRPujZeU/1W6hi8D0jS8IA4sggw==
+  by ob1.hgst.iphmx.com with ESMTP; 21 Jan 2025 16:15:23 +0800
+IronPort-SDR: 678f4a06_pnnUR6FvKru/rjqkJPCSiGM7VvwL6IkMPMeyZb0vPevWvrl
+ gsDgP+rWUo1KF+0JhIRAAfodA/FUc0OevxWdXnA==
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Jan 2025 23:17:24 -0800
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Jan 2025 23:17:26 -0800
 WDCIronportException: Internal
 Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip01.wdc.com with ESMTP; 21 Jan 2025 00:15:20 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 21 Jan 2025 00:15:22 -0800
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: linux-block@vger.kernel.org,
 	Jens Axboe <axboe@kernel.dk>
 Cc: Damien Le Moal <dlemoal@kernel.org>,
 	Bart Van Assche <bvanassche@acm.org>,
 	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH for-next v4 2/5] null_blk: introduce badblocks_once parameter
-Date: Tue, 21 Jan 2025 17:15:14 +0900
-Message-ID: <20250121081517.1212575-3-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH for-next v4 4/5] null_blk: pass transfer size to null_handle_rq()
+Date: Tue, 21 Jan 2025 17:15:16 +0900
+Message-ID: <20250121081517.1212575-5-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20250121081517.1212575-1-shinichiro.kawasaki@wdc.com>
 References: <20250121081517.1212575-1-shinichiro.kawasaki@wdc.com>
@@ -62,69 +62,69 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When IO errors happen on real storage devices, the IOs repeated to the
-same target range can success by virtue of recovery features by devices,
-such as reserved block assignment. To simulate such IO errors and
-recoveries, introduce the new parameter badblocks_once parameter. When
-this parameter is set to 1, the specified badblocks are cleared after
-the first IO error, so that the next IO to the blocks succeed.
+As preparation to support partial data transfer, add a new argument to
+null_handle_rq() to pass the number of sectors to transfer. While at it,
+rename the function from null_handle_rq to null_handle_data_transfer.
+This commit does not change the behavior.
 
 Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- drivers/block/null_blk/main.c     | 11 ++++++++---
- drivers/block/null_blk/null_blk.h |  1 +
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ drivers/block/null_blk/main.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 0725d221cff4..2a060a6ea8c0 100644
+index 87037cb375c9..802576698812 100644
 --- a/drivers/block/null_blk/main.c
 +++ b/drivers/block/null_blk/main.c
-@@ -473,6 +473,7 @@ NULLB_DEVICE_ATTR(shared_tags, bool, NULL);
- NULLB_DEVICE_ATTR(shared_tag_bitmap, bool, NULL);
- NULLB_DEVICE_ATTR(fua, bool, NULL);
- NULLB_DEVICE_ATTR(rotational, bool, NULL);
-+NULLB_DEVICE_ATTR(badblocks_once, bool, NULL);
- 
- static ssize_t nullb_device_power_show(struct config_item *item, char *page)
- {
-@@ -593,6 +594,7 @@ CONFIGFS_ATTR_WO(nullb_device_, zone_offline);
- 
- static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_badblocks,
-+	&nullb_device_attr_badblocks_once,
- 	&nullb_device_attr_blocking,
- 	&nullb_device_attr_blocksize,
- 	&nullb_device_attr_cache_size,
-@@ -1315,10 +1317,13 @@ static inline blk_status_t null_handle_badblocks(struct nullb_cmd *cmd,
- 	sector_t first_bad;
- 	int bad_sectors;
- 
--	if (badblocks_check(bb, sector, nr_sectors, &first_bad, &bad_sectors))
--		return BLK_STS_IOERR;
-+	if (!badblocks_check(bb, sector, nr_sectors, &first_bad, &bad_sectors))
-+		return BLK_STS_OK;
- 
--	return BLK_STS_OK;
-+	if (cmd->nq->dev->badblocks_once)
-+		badblocks_clear(bb, first_bad, bad_sectors);
-+
-+	return BLK_STS_IOERR;
+@@ -1263,25 +1263,37 @@ static int null_transfer(struct nullb *nullb, struct page *page,
+ 	return err;
  }
  
- static inline blk_status_t null_handle_memory_backed(struct nullb_cmd *cmd,
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index 6f9fe6171087..3c4c07f0418b 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -63,6 +63,7 @@ struct nullb_device {
- 	unsigned long flags; /* device flags */
- 	unsigned int curr_cache;
- 	struct badblocks badblocks;
-+	bool badblocks_once;
+-static blk_status_t null_handle_rq(struct nullb_cmd *cmd)
++/*
++ * Transfer data for the given request. The transfer size is capped with the
++ * nr_sectors argument.
++ */
++static blk_status_t null_handle_data_transfer(struct nullb_cmd *cmd,
++					      sector_t nr_sectors)
+ {
+ 	struct request *rq = blk_mq_rq_from_pdu(cmd);
+ 	struct nullb *nullb = cmd->nq->dev->nullb;
+ 	int err = 0;
+ 	unsigned int len;
+ 	sector_t sector = blk_rq_pos(rq);
++	unsigned int max_bytes = nr_sectors << SECTOR_SHIFT;
++	unsigned int transferred_bytes = 0;
+ 	struct req_iterator iter;
+ 	struct bio_vec bvec;
  
- 	unsigned int nr_zones;
- 	unsigned int nr_zones_imp_open;
+ 	spin_lock_irq(&nullb->lock);
+ 	rq_for_each_segment(bvec, rq, iter) {
+ 		len = bvec.bv_len;
++		if (transferred_bytes + len > max_bytes)
++			len = max_bytes - transferred_bytes;
+ 		err = null_transfer(nullb, bvec.bv_page, len, bvec.bv_offset,
+ 				     op_is_write(req_op(rq)), sector,
+ 				     rq->cmd_flags & REQ_FUA);
+ 		if (err)
+ 			break;
+ 		sector += len >> SECTOR_SHIFT;
++		transferred_bytes += len;
++		if (transferred_bytes >= max_bytes)
++			break;
+ 	}
+ 	spin_unlock_irq(&nullb->lock);
+ 
+@@ -1333,7 +1345,7 @@ blk_status_t null_handle_memory_backed(struct nullb_cmd *cmd, enum req_op op,
+ 	if (op == REQ_OP_DISCARD)
+ 		return null_handle_discard(dev, sector, nr_sectors);
+ 
+-	return null_handle_rq(cmd);
++	return null_handle_data_transfer(cmd, nr_sectors);
+ }
+ 
+ static void nullb_zero_read_cmd_buffer(struct nullb_cmd *cmd)
 -- 
 2.47.0
 
