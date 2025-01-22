@@ -1,225 +1,144 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD95214205
-	for <linux-block@vger.kernel.org>; Wed, 22 Jan 2025 15:15:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739D2214205
+	for <linux-block@vger.kernel.org>; Wed, 22 Jan 2025 15:36:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737558909; cv=none; b=FrBmuqoEMCPBTku4kgie179imtX3posVszqr18DkhvPBCTU6xBLtw+guuXmKm8+Uney1IRMK9R0Sso4lcKT/6b1iuHECwMjE2Z0SWVdCT/So2QRJ0mKuQXLuG+bXDZQ+iHJk64A761JLZospXZZFB5RbDAc/I9x8OrY4V1HVnx0=
+	t=1737560215; cv=none; b=AWqg9EBP9yQG7jRdgW/mwDRLNouBBifO0N1qFBi3Zkpqpz4g0osqQkgDTcMq+KaDLiD+RUhZNqYP6mamWDOTnqWT/lDx3Cj8vkJQ/l+ZPoIFD15p4ixU2vJu5nZ/9bkIUJxVz6YNUGpmPTD+F8+tNlzuKtowHfUXZ6LdpZrycZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737558909; c=relaxed/simple;
-	bh=lPpWLlbJJUl6vnHfBxOZiUWLcQ6TXq9Fpz0DN6GGV64=;
+	s=arc-20240116; t=1737560215; c=relaxed/simple;
+	bh=N8p0TD5QOTHYruWkg6jskvTBbKx7Yf/2rt53l8kao8Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V+KbyHe69E/ZHSblMSau8OygS6ogrY8BCLNgcdgRxTJ3v3aHUmwSITtwBBg/0U2WVU61E+6ucDf/MCXuASMyABPzyF66fs8sxoMPFrbZFIuCBU2EBV3efo/YTmwpnAbpUMIQck03kc/vKFLIBV6Tbwih2k72r8NYnH9259cFFg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B2uL7Kgh; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=qONgcKc7j7o8qhmXWb0xcTp2pQBjoqQRXNsd/1EzipfDbqW1OvUa1fj9ZAE7RFNxUQF9RzZ9q52a2LmnyA9Hfr90CvBtP+UmMld0sK1bu1LYlX//uyGUOwQPyb4lsf9NRRiNRyLrri4nPi9ZCPo20zRcBnHgWTKKKDdDPoh/RnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NUUC9yRt; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B2uL7Kgh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NUUC9yRt"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737558906;
+	s=mimecast20190719; t=1737560212;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ce/QjhBqtYOPMLAkiHTYh++zKrz+BhDW7xpfx4DdWe4=;
-	b=B2uL7KghsRc9eFMu3qjTGoIMCbUu2e6Tg5xHWTs0Pw0zRWKyw/qtqjjGcfvkZ+sQ83g1Uu
-	KfiIJyouSX1bY8EGA72gWiu8tXlZpJJfkTsJvqlUHtcc1MWUJfvHc0C4D0FEikKptLwZS8
-	zOjl4+brSpZJ0nc84LMirM2bnNdHwSE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-382-cSiLSTwPMGW-wVkAyq42hQ-1; Wed, 22 Jan 2025 10:15:05 -0500
-X-MC-Unique: cSiLSTwPMGW-wVkAyq42hQ-1
-X-Mimecast-MFC-AGG-ID: cSiLSTwPMGW-wVkAyq42hQ
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385e00ebb16so2790315f8f.3
-        for <linux-block@vger.kernel.org>; Wed, 22 Jan 2025 07:15:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737558904; x=1738163704;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ce/QjhBqtYOPMLAkiHTYh++zKrz+BhDW7xpfx4DdWe4=;
-        b=J2Fx9QuJ7+sE3LIEEwsdn8tPB4SCdZ6QvO1tFe5bIV4Gj8X0tRc5SRq6QeJ3gNJXJf
-         SQNloktP3PbjAI31siz08IaPPgzTmOaKPESgbrsJc/pmUfdRr2I2nW3Rk81MInAIA7MA
-         KxDxxpw+rXHydG9BE8hCBFJF0GNBEpT9IabldJVWunuFZ8sP/D2B+u8t2/eXj2uobI23
-         7yoJc/8R5gIo/KJLuDV+iRTuZbqt+FmC5gFK/WiRvAcKxzTYUFAJiRD/lV3glYxIXqv+
-         m4wZx65A8VQvOXYyRJWiNRJmv/iZgA55cGTCzgNCXl1qOF8EimZJ+CczkPs56oYtqvvY
-         7TJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVoM1Ot4bFA4JKuMyoDq9Shh4EebUeL/F7N++WpqhWFZ6UESUKR30fIjxIr2JJ/06c7QyVFXbr9V4+NYw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmmByz/0bUHz5xcOa8qlcYQS5v3iwj4UcLG2la9cXcLErgY4wE
-	VoniMy9ksY9LnflP0lAzy+D0oHNLjI1uW8w7ZgjmNtYzmVl4xOaAXdqxRylSxvVRdQIF4aiRt+l
-	yfoGE9Z7qAIQPifyKW95DcLhqoHhpYESPD4mVQaTxGv481N3zLUl4hHFgxUQP
-X-Gm-Gg: ASbGncvbyBVYlTJiUz5FarcT2G1Emp/W6woZlRRR7OOfiKqUpp5SbYTQ1NmJWsBp4jY
-	wQ00XDU22uYfFvMzGZ7bcxtpLplnVbFWJ2SGxYbt0xRS/rz2HhHKyTu8HpKgfQM/zfEu09Uv6op
-	EeuEiXJbJWCVpOKDGy35wKVTjNpRs/jI+lITcnAdnqUWrWk6vRDXmAl7PSpAK0PQBQuz12H6iXT
-	k9fKcutxlpw5ZCU5fiB0FZvc71fIMUahOquuV0nFQYAhGJMOsGsyASoTXh7wUmf
-X-Received: by 2002:a05:6000:144f:b0:38a:615b:9ec0 with SMTP id ffacd0b85a97d-38bf57c0670mr20994576f8f.54.1737558904489;
-        Wed, 22 Jan 2025 07:15:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEWxbfA/SDt4BIMqHMb03+C8Lkaoo8RRwpEoMVY535ijCwj1N9P4T9iUGlJ8w8iJUU5Mj2ZIg==
-X-Received: by 2002:a05:6000:144f:b0:38a:615b:9ec0 with SMTP id ffacd0b85a97d-38bf57c0670mr20994540f8f.54.1737558904146;
-        Wed, 22 Jan 2025 07:15:04 -0800 (PST)
-Received: from redhat.com ([2a02:14f:1ee:98b0:e487:57f1:2425:c846])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3214fc9sm16205499f8f.6.2025.01.22.07.15.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 07:15:03 -0800 (PST)
-Date: Wed, 22 Jan 2025 10:15:00 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Boyer, Andrew" <Andrew.Boyer@amd.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio Perez <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"Nelson, Shannon" <Shannon.Nelson@amd.com>,
-	"Creeley, Brett" <Brett.Creeley@amd.com>,
-	"Hubbe, Allen" <Allen.Hubbe@amd.com>
-Subject: (repost) Re: [PATCH] virtio_blk: always post notifications under the
- lock
-Message-ID: <20250122100622-mutt-send-email-mst-v2@kernel.org>
-References: <20250107182516.48723-1-andrew.boyer@amd.com>
- <7a4f03a0-9640-4d15-9f0d-4e1ceb82aa8c@linux.ibm.com>
- <20250109083907-mutt-send-email-mst@kernel.org>
- <FE77DD4F-AB39-4781-9D24-06F171F47FED@amd.com>
+	bh=f8o7BcBFaAoDGx++JxsrnkYwkUHP1K1/2VxPdWlLaLw=;
+	b=NUUC9yRttjMHb+U/2QYWEXRY78aeZVxpOaDSgISn8WJZ4GbMDGLDv265Si3xo2h4VAXyLX
+	svhslu/DzCTYQpCzW+zY8l+2+IWVqvQ1oNMile2xe7jg4UQ1zg+trg5fWF6Q6n6SC50CKV
+	ZnaRQCsuDX+fOlK342TdS2HYokj8Cvk=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-610-uN1Ft24uNiK_FZilbzhcqw-1; Wed,
+ 22 Jan 2025 10:36:48 -0500
+X-MC-Unique: uN1Ft24uNiK_FZilbzhcqw-1
+X-Mimecast-MFC-AGG-ID: uN1Ft24uNiK_FZilbzhcqw
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E7F6195395C;
+	Wed, 22 Jan 2025 15:36:45 +0000 (UTC)
+Received: from localhost (unknown [10.2.16.37])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F145219560AA;
+	Wed, 22 Jan 2025 15:36:43 +0000 (UTC)
+Date: Wed, 22 Jan 2025 10:36:42 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Media <linux-media@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Block Devices <linux-block@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Power Management <linux-pm@vger.kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Bingbu Cao <bingbu.cao@intel.com>,
+	Tianshu Qiu <tian.shu.qiu@intel.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH 2/3] Documentation: ublk: Drop Stefan Hajnoczi's message
+ footnote
+Message-ID: <20250122153642.GA178738@fedora>
+References: <20250122143456.68867-1-bagasdotme@gmail.com>
+ <20250122143456.68867-3-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="G5Xn2h19SQtLrBjV"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <FE77DD4F-AB39-4781-9D24-06F171F47FED@amd.com>
-
-On Wed, Jan 22, 2025 at 02:44:50PM +0000, Boyer, Andrew wrote:
-> 
-> 
->     On Jan 9, 2025, at 8:42 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> 
->     On Thu, Jan 09, 2025 at 01:01:20PM +0100, Christian Borntraeger wrote:
-> 
-> 
->         Am 07.01.25 um 19:25 schrieb Andrew Boyer:
-> 
->             Commit af8ececda185 ("virtio: add VIRTIO_F_NOTIFICATION_DATA
->             feature
->             support") added notification data support to the core virtio driver
->             code. When this feature is enabled, the notification includes the
->             updated producer index for the queue. Thus it is now critical that
->             notifications arrive in order.
-> 
->             The virtio_blk driver has historically not worried about
->             notification
->             ordering. Modify it so that the prepare and kick steps are both
->             done
->             under the vq lock.
-> 
->             Signed-off-by: Andrew Boyer <andrew.boyer@amd.com>
->             Reviewed-by: Brett Creeley <brett.creeley@amd.com>
->             Fixes: af8ececda185 ("virtio: add VIRTIO_F_NOTIFICATION_DATA
->             feature support")
->             Cc: Viktor Prutyanov <viktor@daynix.com>
->             Cc: virtualization@lists.linux.dev
->             Cc: linux-block@vger.kernel.org
->             ---
->              drivers/block/virtio_blk.c | 19 ++++---------------
->              1 file changed, 4 insertions(+), 15 deletions(-)
-> 
->             diff --git a/drivers/block/virtio_blk.c b/drivers/block/
->             virtio_blk.c
->             index 3efe378f1386..14d9e66bb844 100644
->             --- a/drivers/block/virtio_blk.c
->             +++ b/drivers/block/virtio_blk.c
->             @@ -379,14 +379,10 @@ static void virtio_commit_rqs(struct
->             blk_mq_hw_ctx *hctx)
->              {
->                struct virtio_blk *vblk = hctx->queue->queuedata;
->                struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
->             -   bool kick;
->                spin_lock_irq(&vq->lock);
->             -   kick = virtqueue_kick_prepare(vq->vq);
->             +   virtqueue_kick(vq->vq);
->                spin_unlock_irq(&vq->lock);
->             -
->             -   if (kick)
->             -           virtqueue_notify(vq->vq);
->              }
-> 
-> 
->         I would assume this will be a performance nightmare for normal IO.
-> 
-> 
-> 
-> 
-> Hello Michael and Christian and Jason,
-> Thank you for taking a look.
-> 
-> Is the performance concern that the vmexit might lead to the underlying virtual
-> storage stack doing the work immediately? Any other job posting to the same
-> queue would presumably be blocked on a vmexit when it goes to attempt its own
-> notification. That would be almost the same as having the other job block on a
-> lock during the operation, although I guess if you are skipping notifications
-> somehow it would look different.
-> 
-> I don't have any sort of setup where I can try it but I would appreciate it if
-> someone else could.
-> 
-> 
->     Hmm. Not good, notify can be very slow, holding a lock is a bad idea.
->     Basically, virtqueue_notify must work ouside of locks, this
->     means af8ececda185 is broken and we did not notice.
-> 
->     Let's fix it please.
-> 
-> 
-> With so many broken kernels already in the wild, I think disabling
-> F_NOTIFICATION_DATA for virtio-blk would be a reasonable solution.
-
-Some devices might fail feature negotiation then.
-I am not sure they are broken, devices might simply be able to
-handle out of order values.
+In-Reply-To: <20250122143456.68867-3-bagasdotme@gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
 
-> 
->     Try some kind of compare and swap scheme where we detect that index
->     was updated since? Will allow skipping a notification, too.
-> 
-> 
-> Do you have an idea of how this might be done? Anything I've come up with
-> involves a lock.
->
-> Would it be doable to have a lock for the vq management stuff
-> and a second one to post notifications?
+--G5Xn2h19SQtLrBjV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jan 22, 2025 at 09:34:55PM +0700, Bagas Sanjaya wrote:
+> Sphinx reports unreferenced footnote warning pointing to ubd-control
+> message by Stefan Hajnoczi [1]:
+>=20
+> Documentation/block/ublk.rst:336: WARNING: Footnote [#] is not referenced=
+=2E [ref.footnote]
+>=20
+> Drop the footnote to squash above warning.
+>=20
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Fixes: 7a3d2225f1ae ("Documentation: document ublk")
 
-and only for when F_NOTIFICATION_DATA is set. not terrible ok I think.
+The commit that introduced the unreferenced footnote was:
 
-> 
->     AMD guys, can't device survive with reordered notifications?
->     Basically just drop a notification if you see index
->     going back?
-> 
-> 
-> This is the driver lying to us about the state of the queue; it's not going to
-> be possible for us to work around it in hardware. For starters, how would we
-> detect queue wrap around?
-> 
-> Thank you,
-> Andrew
+Fixes: 4093cb5a0634 ("ublk_drv: add mechanism for supporting unprivileged u=
+blk device")
 
-The index is a running value for split, for wrap arounds, there is
-a special bit for that. No?
+Other than that:
 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> 
-> 
->     --
->     MST
-> 
-> 
+> Link: https://lore.kernel.org/linux-block/YoOr6jBfgVm8GvWg@stefanha-x1.lo=
+caldomain/ [1]
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> ---
+>  Documentation/block/ublk.rst | 2 --
+>  1 file changed, 2 deletions(-)
+>=20
+> diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
+> index 51665a3e6a50cd..1e0e7358e14a96 100644
+> --- a/Documentation/block/ublk.rst
+> +++ b/Documentation/block/ublk.rst
+> @@ -333,6 +333,4 @@ References
+> =20
+>  .. [#userspace_readme] https://github.com/ming1/ubdsrv/blob/master/README
+> =20
+> -.. [#stefan] https://lore.kernel.org/linux-block/YoOr6jBfgVm8GvWg@stefan=
+ha-x1.localdomain/
+> -
+>  .. [#xiaoguang] https://lore.kernel.org/linux-block/YoOr6jBfgVm8GvWg@ste=
+fanha-x1.localdomain/
+> --=20
+> An old man doll... just what I always wanted! - Clara
+>=20
+
+--G5Xn2h19SQtLrBjV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmeREIoACgkQnKSrs4Gr
+c8jWNQf/d04gunXlgUuBBbP2JPmmUQ5tjr8BCc6SUve2iTkZZ40s+OMLA1pQTeVt
+TrNpE5B0MndLQEtx9SJ2WQ7D/jZ18GJgoAklyQ9OYB8d47ViuxERgjytDGcx4dFe
+ju/neQmr1HtxyE4hK1IMrNB5llOP7w3aBRdTgNBGnrhNM8kaexp5Cfp+UAxLN25L
+c82oQ/NxCkJ/M8xCQ94LRQrWh5bJs+9XMANZr80YY8BRQTVuylN4A4f06bvPRznM
+rz0aKGUEZiFaLAQKXDiRbqWutf+glkM3zGjh9VBLYw3pFZkiS910OYD5DTKeM700
+DN24tDG8WwVF66EAz+4bWmJJ+GFSxg==
+=2fOo
+-----END PGP SIGNATURE-----
+
+--G5Xn2h19SQtLrBjV--
 
