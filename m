@@ -1,198 +1,109 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB791F470D
-	for <linux-block@vger.kernel.org>; Thu, 23 Jan 2025 07:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBFD1C1F0C;
+	Thu, 23 Jan 2025 07:27:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737617011; cv=none; b=iSq375Xtswq+pp5+5L3WatB3R4f3QjFlnnMkgtgaXbeP0daw4DylHUHlHc1C/GdtXqOzRpEBzPmr9IFflK6E5Qr2Un+RYPsLM4x9qGcJmauE9fbMnw3jNWb7T4LIZJNj32GQ51KDlo7inDtc5SRWq2JQPlof2UFk+yZEpENuFRY=
+	t=1737617274; cv=none; b=Ig0vWJHmBUGjMbl2yePm4GCWn/Qciatbi6DtXttJX1Arv9onnW9Gq2DExwTuep+CWEMx36LHqfWXM5QIDPBfkN/CzX22m5NH5i3GWvX5JsGMc3EdJ7kWPfapAVvNm6J4gaZIFmWINJckvFx8sp33UXhjvmCUCKX9lhiI5G6YIuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737617011; c=relaxed/simple;
-	bh=Cj26cskdJAfLewDEV5iNIb1OHKs1+zCO9WSBAIvdmIo=;
+	s=arc-20240116; t=1737617274; c=relaxed/simple;
+	bh=gdr9OSLvfa/rDxAwNiHVCieR3Q9qH1tE8U7hPjzIo2Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ngvj757LWwPmNbe58mcK2YT7fBXBoxo5v1r5GHcvli1C68hR3yHbdvUlC5Rju6BN/4R3s88s9SA5nIfZfQXCWbUTx+Lm19zfjOOWLBfyseI/bfpS/TzQfVDw6cjrgzTyjrWwoB+5/vPs8/JdPzxv2XeN3KylfVQQZcvCQbY3pZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dmPIAdfG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=JENeVJsL0J41+Pij56VWDpg2+8cCaKcjwX1RsncPeU88YrcBOxBYhDvlG3gi6WDD+WZpW2RPabo4ON+EEBPnIPeCDs6xaKwJMowrX8l4gtIhWKVboZBhSN9n/MopORWrSeFFO1+aALlOGHoKj4VMusqbaYVwHYTDq1J14R7Imno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jkgNbWKU; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dmPIAdfG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737617008;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JEjZ3DIkUiMscnADmgxdYLnNl1viSPj/Nq8G2dSYRQk=;
-	b=dmPIAdfGNZdF/MJsiQ/TZYXsEh575hc5bgjWKNTVYEW0hBIEtbgF8gxy7kWKL8bCCxE3Bn
-	ru8b4OxeYG2AeLILfUosSmJv5ea2f08DT5csA8+VDWtyoMS5Utw+QAe/ch5Hhi1eXCzKjT
-	a3x/lD5mpk47uG2ya3BgdzdaVKquz3U=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-663-QrBLoMokPIqAL84V3D25bQ-1; Thu, 23 Jan 2025 02:23:27 -0500
-X-MC-Unique: QrBLoMokPIqAL84V3D25bQ-1
-X-Mimecast-MFC-AGG-ID: QrBLoMokPIqAL84V3D25bQ
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38c24ac3706so378328f8f.0
-        for <linux-block@vger.kernel.org>; Wed, 22 Jan 2025 23:23:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737617006; x=1738221806;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JEjZ3DIkUiMscnADmgxdYLnNl1viSPj/Nq8G2dSYRQk=;
-        b=F34cwbdwh2DIZ+MifKLbeNlMYcykGMj6eL/Wigig4bw/O/ZOApvKcZl35+07kj5Hou
-         YefLxKw0GEq+pzL20aulrDPpBOZ5kZjXpYoQ5EdOlG3DOhJDhfuqpHmitu9TOx0Z0y+l
-         h2QUm231oNHM4jHFbOohBWneyfO9K0VJkNaEx+PqI0hXPQHbUf9OLwSBjbM+Kfecujld
-         oI/Tkr+TCvAh3cu4RRhbNTH7R6Z2pX58+u3ctF0P9Bc55byaYOMcuJEM1S469PJP2KA/
-         0lE2US1MXEb4b5H2VLInKDwWznh552m/dwgQypYDoCZCm3T3jkkUKoIA59ooW9ZZwN6m
-         UWkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXQffsNI4RuVXqQrs5kW9ysuZ3vn2GPfxiQOWu6cJ7VeIvxnblervOQwozlYnOllykgdD/D5vEQconIYQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLnVVdhmujsuNw5bj8+YphuhSPCcvIHQFc/XQzyNaHHX5R5OZN
-	eAM3ao7reNVbAZgHSLrjcNCLo0/n1l5EdhfoZyjn9ks7RxQwJP7VR047qnYLAgjxSios4qkZCRU
-	4KUjuFh6sOghg3VzkyGRLIpgnK4XgjjVmUBcbsgj3MzvjE3tyfssk7IJ+n9rK
-X-Gm-Gg: ASbGncsReEk6mjjTypX8ygji4cmMthMHX0wGpyWcjEuBoCJ2i9oR/YrIyC+2bq0dxy5
-	X2tUWwyPviw2z0cPFw0ojdJgUskZ2R9FtyKreRvjvzsS2+Jc2jswjJ9XJDGp7dB6EHs6HJkQuSs
-	1b57E7YQfmNm25atiy+f4UpnoM8FFZzGkH6OGahgcWfK0eKRQKHW50yaHryjCZo2qorRya+YIP6
-	7MPgQ2DGmfPqpGzDr2zT6joSERYjtXPPPo7IDm/G49aKDLWdn0WyPg8CX48POg=
-X-Received: by 2002:a05:6000:2a7:b0:38a:615c:8225 with SMTP id ffacd0b85a97d-38bf577ff42mr24558328f8f.15.1737617005963;
-        Wed, 22 Jan 2025 23:23:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHPiImKfEJi/7FivTSc2UB3WJZJ0sYMW32d83TGxasXwFBmg/HvTr5DTVHuAiFshHvv5ywOeA==
-X-Received: by 2002:a05:6000:2a7:b0:38a:615c:8225 with SMTP id ffacd0b85a97d-38bf577ff42mr24558293f8f.15.1737617005572;
-        Wed, 22 Jan 2025 23:23:25 -0800 (PST)
-Received: from redhat.com ([2a02:14f:1f4:7f17:bbf:7fe7:5101:d895])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf322236csm18572097f8f.39.2025.01.22.23.23.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 23:23:24 -0800 (PST)
-Date: Thu, 23 Jan 2025 02:23:17 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Boyer, Andrew" <Andrew.Boyer@amd.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio Perez <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"Nelson, Shannon" <Shannon.Nelson@amd.com>,
-	"Creeley, Brett" <Brett.Creeley@amd.com>,
-	"Hubbe, Allen" <Allen.Hubbe@amd.com>
-Subject: Re: [PATCH] virtio_blk: always post notifications under the lock
-Message-ID: <20250123022305-mutt-send-email-mst@kernel.org>
-References: <20250107182516.48723-1-andrew.boyer@amd.com>
- <7a4f03a0-9640-4d15-9f0d-4e1ceb82aa8c@linux.ibm.com>
- <20250109083907-mutt-send-email-mst@kernel.org>
- <FE77DD4F-AB39-4781-9D24-06F171F47FED@amd.com>
- <dcbce68c-f448-4bbf-8db9-c3cd3231b5dd@linux.ibm.com>
- <20250122165854-mutt-send-email-mst@kernel.org>
- <CB749FA4-79E2-49F0-9BDF-67B089A8EC35@amd.com>
- <20250122172108-mutt-send-email-mst@kernel.org>
- <CF92E813-EE94-4F61-A8A9-278CA1BD3629@amd.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jkgNbWKU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737617272; x=1769153272;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gdr9OSLvfa/rDxAwNiHVCieR3Q9qH1tE8U7hPjzIo2Q=;
+  b=jkgNbWKUeD6pFnqsALkJE8mw2NP+7J17aJ6oThW7DVNRA63vIciV0MY4
+   HMnD2S+sk6iuiDXL3bH0ZjFWwk8bQoTHrwsofmMtgxRmZVf2PC34+dPF5
+   J2cuviuB78FJ/mCqU2i1XA4MUc3mA6hJhaRCkBFnEyAeVsm1ub7+zV64Y
+   wXIBWeQSN7LNy58vHHLyWLLWnkJzdQfwBRKorLYiRYZcrC+HC5RtsZth+
+   j+9F1jYjX5FuHMjJBogVRIJhKShoJsmQXo9efRB0xwuJQX9LH6AyMjrv8
+   JtKVwkQBlGLsuhJuuBULln818aCwGF8anDb42FAmJY+nO3oJXA2Aw2QSG
+   Q==;
+X-CSE-ConnectionGUID: Xfu0ECBOS5i5Aff/kUeexQ==
+X-CSE-MsgGUID: OFf7UllpTme6hs4HvGeh0Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="38206719"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="38206719"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 23:27:52 -0800
+X-CSE-ConnectionGUID: 4VXT0TrlRmmXcoj/lpPvJw==
+X-CSE-MsgGUID: qDTHyeruT8CCrMlh51oj/w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="107233295"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 23:27:48 -0800
+Received: from kekkonen.localdomain (localhost [127.0.0.1])
+	by kekkonen.fi.intel.com (Postfix) with SMTP id 2C27611F95E;
+	Thu, 23 Jan 2025 09:27:45 +0200 (EET)
+Date: Thu, 23 Jan 2025 07:27:45 +0000
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Media <linux-media@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Block Devices <linux-block@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Power Management <linux-pm@vger.kernel.org>,
+	Bingbu Cao <bingbu.cao@intel.com>,
+	Tianshu Qiu <tian.shu.qiu@intel.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	Rajmohan Mani <rajmohan.mani@intel.com>
+Subject: Re: [PATCH 1/3] media: ipu3.rst: Prune unreferenced footnotes
+Message-ID: <Z5HvcW2WXibhsTgm@kekkonen.localdomain>
+References: <20250122143456.68867-1-bagasdotme@gmail.com>
+ <20250122143456.68867-2-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CF92E813-EE94-4F61-A8A9-278CA1BD3629@amd.com>
+In-Reply-To: <20250122143456.68867-2-bagasdotme@gmail.com>
 
-On Wed, Jan 22, 2025 at 10:34:25PM +0000, Boyer, Andrew wrote:
-> 
-> > On Jan 22, 2025, at 5:25 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > 
-> > Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> > 
-> > 
-> > On Wed, Jan 22, 2025 at 10:14:52PM +0000, Boyer, Andrew wrote:
-> >> 
-> >>> On Jan 22, 2025, at 5:07 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >>> 
-> >>> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> >>> 
-> >>> 
-> >>> On Wed, Jan 22, 2025 at 06:33:04PM +0100, Christian Borntraeger wrote:
-> >>>> Am 22.01.25 um 15:44 schrieb Boyer, Andrew:
-> >>>> [...]
-> >>>> 
-> >>>>>>>> --- a/drivers/block/virtio_blk.c
-> >>>>>>>> +++ b/drivers/block/virtio_blk.c
-> >>>>>>>> @@ -379,14 +379,10 @@ static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
-> >>>>>>>> {
-> >>>>>>>>  struct virtio_blk *vblk = hctx->queue->queuedata;
-> >>>>>>>>  struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
-> >>>>>>>> -   bool kick;
-> >>>>>>>>  spin_lock_irq(&vq->lock);
-> >>>>>>>> -   kick = virtqueue_kick_prepare(vq->vq);
-> >>>>>>>> +   virtqueue_kick(vq->vq);
-> >>>>>>>>  spin_unlock_irq(&vq->lock);
-> >>>>>>>> -
-> >>>>>>>> -   if (kick)
-> >>>>>>>> -           virtqueue_notify(vq->vq);
-> >>>>>>>> }
-> >>>>>>> 
-> >>>>>>> I would assume this will be a performance nightmare for normal IO.
-> >>>>>> 
-> >>>>> 
-> >>>>> Hello Michael and Christian and Jason,
-> >>>>> Thank you for taking a look.
-> >>>>> 
-> >>>>> Is the performance concern that the vmexit might lead to the underlying virtual storage stack doing the work immediately? Any other job posting to the same queue would presumably be blocked on a vmexit when it goes to attempt its own notification. That would be almost the same as having the other job block on a lock during the operation, although I guess if you are skipping notifications somehow it would look different.
-> >>>> 
-> >>>> The performance concern is that you hold a lock and then exit. Exits are expensive and can schedule so you will increase the lock holding time significantly. This is begging for lock holder preemption.
-> >>>> Really, dont do it.
-> >>> 
-> >>> 
-> >>> The issue is with hardware that wants a copy of an index sent to
-> >>> it in a notification. Now, you have a race:
-> >>> 
-> >>> thread 1:
-> >>> 
-> >>>       index = 1
-> >>>               ->                      -> send 1 to hardware
-> >>> 
-> >>> 
-> >>> thread 2:
-> >>> 
-> >>>       index = 2
-> >>>               -> send 2 to hardware
-> >>> 
-> >>> the spec unfortunately does not say whether that is legal.
-> >>> 
-> >>> As far as I could tell, the device can easily use the
-> >>> wrap counter inside the notification to detect this
-> >>> and simply discard the "1" notification.
-> >>> 
-> >>> 
-> >>> If not, I'd like to understand why.
-> >> 
-> >> "Easily"?
-> >> 
-> >> This is a hardware doorbell block used for many different interfaces and devices. When the notification write comes through, the doorbell block updates the queue state and schedules the queue for work. If a second notification comes in and overwrites that update before the queue is able to run (going backwards but not wrapping), we'll have no way of detecting it.
-> >> 
-> >> -Andrew
-> >> 
-> > 
-> > Does not this work?
-> > 
-> > notification includes two values:
-> > 
-> > 1. offset
-> > 2. wrap_counter
-> > 
-> > if ((offset2 < offset1 && wrap_counter2 == wrap_counter1) ||
-> >     offset1 > offset1 && wrap_counter2 != wrap_counter1)) {
-> >        printf("going backwards, discard offset2");
-> > }
-> > 
-> 
-> No, Michael, this does not work in our programmable hardware device, because it is not software.
-> 
-> -Andrew
-> 
+Hi Bagas,
 
-Of course. The hardware equivalent.
+Thanks for the patches.
 
+On Wed, Jan 22, 2025 at 09:34:54PM +0700, Bagas Sanjaya wrote:
+> Sphinx reports unreferenced footnotes warning on ipu3 docs:
+> 
+> Documentation/admin-guide/media/ipu3.rst:592: WARNING: Footnote [#] is not referenced. [ref.footnote]
+> Documentation/admin-guide/media/ipu3.rst:598: WARNING: Footnote [#] is not referenced. [ref.footnote]
+> 
+> Fix above warnings by pruning unreferenced footnote to intel_ipu3.h
+> UAPI header (already referenced in its full path in "Running mode and
+> firmware binary selection") and by directly link to v4l-utils repo in
+> ov5670 configuration example with media-ctl (since the example is in
+> literal code block).
+> 
+> Footnote numbers are unchanged.
+> 
+> Cc: Rajmohan Mani <rajmohan.mani@intel.com>
+> Fixes: dc794d3d2424 ("media: staging: ipu3-imgu: Move the UAPI header from include under include/uapi")
+> Fixes: 34fc0e1bf892 ("media: doc-rst: Add Intel IPU3 documentation")
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+
+The issues fixed by this patch have already been fixed in commit
+688c0a6907a7c6e6776f314195c10536f249b37f (in media tree).
+
+-- 
+Kind regards,
+
+Sakari Ailus
