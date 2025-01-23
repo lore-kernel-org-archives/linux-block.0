@@ -1,102 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4114B2F3B;
-	Thu, 23 Jan 2025 13:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A889920E6EE
+	for <linux-block@vger.kernel.org>; Thu, 23 Jan 2025 13:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737637715; cv=none; b=IhseofWmheEuJNjQOkdyr7bD+uDC/8wOjZmAsVEIXm0xMFZ1DZ65nblCXC/+VCym+R9hFnO0Ae0diuoVfAcxd1C0GTOEbEiBYQci4+fjojTNOxntfYTM+mLdLgVoPavHH5VlWqn3urOc55KknmGPPRPwKx2ogBpWvdcAdFjMIo4=
+	t=1737638287; cv=none; b=TdIrsb6V7zN9bHcnPQX7CEIvkyGv4pyioD+ggEx1by+44HoNtLIf7Miap4b2LOeTRVJeSJrfWAJNV/O2RrMl+LFKBd9PryHHymj/WgCPf3ofcIiAvevzf00eW5DyTlhh30vJoNHBWzD4rjq3HV/4Mz6R6hDcBBM1lViQAIFtdH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737637715; c=relaxed/simple;
-	bh=bokt7W96nNVQcWceuR7vwKQMgtuaAZDEF/ZkyrMVbOA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KpJMRDvchh9JWZhFdE55PK30K0tk4Vlcwk3pj9gvXcmvuMiDbZkPnIWIUWsGlL9i2ghxlhdwCf2AXYrKZMeg2BD7pv0I7r92Yc8TWTQI0HMXpxuAEdFpRH7oudD5Sdv3bBR4q58K6/Y5ln/8/vxYIbPKJHxi00dFBLxc0gT9KU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oh6EQioA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1737638287; c=relaxed/simple;
+	bh=xBKbNvSotp+Y071aLmv3gNwZBcLQ9Uvc9+MqzR7Zav0=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=QZ/iTEHrkqWsoePNgkOfaKjD8i+nZNE4rPg5x2QKUESqdSlwTN8z9lOhffVPlcPedhde25U6iO8g9LWF7Uxzw6IGpXWcf/CcHV0ENbKGe3IE7LzPd8iObYVn3tAVsNLXElZqpqGhnKYhJyrlqfUAF4B3W9F2UscHjmscE94aH+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ghxhVIFh; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oh6EQioA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EDA8C4CED3;
-	Thu, 23 Jan 2025 13:08:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737637714;
-	bh=bokt7W96nNVQcWceuR7vwKQMgtuaAZDEF/ZkyrMVbOA=;
-	h=From:Date:Subject:To:Cc:From;
-	b=Oh6EQioAvayPDPoHbD7hPAaWQ21bLDN1HFBoXN0BFy+76dke9nmbg+HJ/Rj4VV1Bb
-	 Q9CGY1qtsUUBokJT7Qm+ausy1BMnQkxofS/ucj3DCa2uCeTT7V/Id3HEP/Krjt03ju
-	 ktAG2IklCWAg5J3Uv4wnRyovHlBqv6TU8x00KoCsjtgIqqDPiGrB0ApUV8sv5RRLDb
-	 4leg4p6oa4eCMLIyCzbDwujpvPCX9Hu3TDUa1px5JRqSuCiisnF4sKidhtE/HZ6skP
-	 FdYVWjnXz0KOY6tdY77OuKBpOF2J3t9GJFjfXMEL38/NwWVqNNHZUO6t1QLDY5xjtH
-	 EduajJX0YaeMg==
-From: Daniel Wagner <wagi@kernel.org>
-Date: Thu, 23 Jan 2025 14:08:29 +0100
-Subject: [PATCH] blk-mq: create correct map for fallback case
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ghxhVIFh"
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3cfa9272c14so3061765ab.3
+        for <linux-block@vger.kernel.org>; Thu, 23 Jan 2025 05:18:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1737638283; x=1738243083; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QQwLVuZ67fRKefl8hFx+ExezQ7Esj5qTwVa0bsQz+c4=;
+        b=ghxhVIFh8/2z8orrH1t4vLGLe7maN48ibyjhAzxaSFZQOeSw7QQmj8arNYDI0sIzvV
+         sIPx3W7bFOH+ZMHjpsoz4ifayep7CI1qib1X0/C4zWMGhvdT2NkUyYGIEkGLm4qodDCG
+         X5Dp8OEDrTH8vTggoC7zZQ7UftcxWXhrLJlhQinDh1NbI5P1CtfsKUhvJKGmhuC7eg1a
+         cPnZd6RRvZTa59ofE0nYeyIVVUEDW/vFsQerG7Txq+o7QtFebUKwhCxMMHXitc/Pck/A
+         g1B45JbeFfROzZWk32lEA1CXDUI6y4rqtYUhKpdCp4ZmcjWeLui8PzfMwK4qxNYhK6lo
+         D9pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737638283; x=1738243083;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=QQwLVuZ67fRKefl8hFx+ExezQ7Esj5qTwVa0bsQz+c4=;
+        b=sHNkFv9Bkcklee4grotMbifJnAzicCHaQIqKHjdl2VrihIkNOmD74jZiEc0hT2JT8F
+         Ao86FgqFJHcoLgVOzJ9OQQ5UFwfNk3/IZdOJeCxfILl4GZwxiXhxeKBPK9elw8hmXTBb
+         /1qhEdJatfKFbvqlxieP1sBjOdtEPtjGXPM3zWumOoT2420u37c4bq15qARQGKqZs8zd
+         aOaI/uDf5rXoqlKEtIzhoF5eD1nCIYhvd7Ww7XtAe4XCB22JJnllPdV0yRG5BYIuebft
+         kth731v0ZI1k44sqRb0bWSdhhOuuypIiOxKuvGcoHyLaF3eUoThUo9qQToXM7AK0zQOr
+         gKNQ==
+X-Gm-Message-State: AOJu0YwcPqy293+jDRxvTnXPSVmmqGANJxJ9TM0y55e/AMwxckWjSVyB
+	d73EvXwVXVFAYQAXLRz2PdxyLStnqMhQ/knMqUIYL74AsaTFtemtSwimGNdirBNcWIfC8dJk4MJ
+	i
+X-Gm-Gg: ASbGncsKMSpuOvCujwc7xtrgxbUQ4BFag9lNAEVVBKRtQK7+6OFEz8NUT+Pmaa8fy2L
+	lB00voQ40SvGHXxKbAHNlPgXY5c9AQN5t2TotQC/g+3sZS/eN0E5DGLFiUN+z0r45dByZbGEjUb
+	La41cKgyjz1bS4eYBv9VUqx1F6WT28F4uHQDDA33VzjA1jJIAzA56TMxHm9kRHwcCXpgKsrmKUB
+	OQ+ciJWKb4WGFE8zB8G5uMdyIXSvGol3LZwXyl5+1PwmJZsxfZzruBfNeiy+gQZvBFmQ3CU2tey
+	3A==
+X-Google-Smtp-Source: AGHT+IEW/5rIi7dQjm3Jed2p8SS+TGBjr+9AcIg7FHeIC7peK5ZKsyEQTkYwVDTgAPf6gRpjH/3z2Q==
+X-Received: by 2002:a05:6e02:4803:b0:3ce:7ae7:a8c2 with SMTP id e9e14a558f8ab-3cf74426a65mr145809815ab.11.1737638282941;
+        Thu, 23 Jan 2025 05:18:02 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3cfa10c3495sm21646625ab.59.2025.01.23.05.18.01
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Jan 2025 05:18:02 -0800 (PST)
+Message-ID: <47af5107-96fb-426c-961e-25d464f3b26b@kernel.dk>
+Date: Thu, 23 Jan 2025 06:18:01 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: don't revert iter for -EIOCBQUEUED
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250123-fix-blk_mq_map_hw_queues-v1-1-08dbd01f2c39@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAEw/kmcC/x2M7QpAMBRAX2Xd31Y2obyKtK65uGHY8lHy7pafp
- 845DwTyTAEq8YCnkwOvLoJKBNgR3UCSu8igU52nSmey51u282SW3Sy4mfEy+0EHBdnZUmOBypY
- KIeabp+j+67p53w8IAUkQagAAAA==
-X-Change-ID: 20250123-fix-blk_mq_map_hw_queues-dc72a6a1c71a
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Steven Rostedt <rostedt@goodmis.org>, Hannes Reinecke <hare@suse.de>, 
- Ming Lei <ming.lei@redhat.com>, John Garry <john.g.garry@oracle.com>, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Daniel Wagner <wagi@kernel.org>
-X-Mailer: b4 0.14.2
 
-The fallback code in blk_mq_map_hw_queues is original from
-blk_mq_pci_map_queues and was added to handle the case where
-pci_irq_get_affinity will return NULL for !SMP configuration.
+blkdev_read_iter() has a few odd checks, like gating the position and
+count adjustment on whether or not the result is bigger-than-or-equal to
+zero (where bigger than makes more sense), and not checking the return
+value of blkdev_direct_IO() before doing an iov_iter_revert(). The
+latter can lead to attempting to revert with a negative value, which
+when passed to iov_iter_revert() as an unsigned value will lead to
+throwing a WARN_ON() because unroll is bigger than MAX_RW_COUNT.
 
-blk_mq_map_hw_queues replaces besides blk_mq_pci_map_queues also
-blk_mq_virtio_map_queues which used to use blk_mq_map_queues for the
-fallback.
+Be sane and don't revert for -EIOCBQUEUED, like what is done in other
+spots.
 
-It's possible to use blk_mq_map_queues for both cases though.
-blk_mq_map_queues creates the same map as blk_mq_clear_mq_map for !SMP
-that is CPU 0 will be mapped to hctx 0.
+Cc: stable@vger.kernel.org
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-The WARN_ON_ONCE has to be dropped for virtio as the fallback is also
-taken for certain configuration on default. Though there is still a
-WARN_ON_ONCE check in lib/group_cpus.c:
-
-       WARN_ON(nr_present + nr_others < numgrps);
-
-which will trigger if the caller tries to create more hardware queues
-than CPUs. It tests the same as the WARN_ON_ONCE in
-blk_mq_pci_map_queues did.
-
-Fixes: a5665c3d150c ("virtio: blk/scsi: replace blk_mq_virtio_map_queues with blk_mq_map_hw_queues")
-Reported-by: Steven Rostedt <rostedt@goodmis.org>
-Closes: https://lore.kernel.org/all/20250122093020.6e8a4e5b@gandalf.local.home/
-Signed-off-by: Daniel Wagner <wagi@kernel.org>
 ---
- block/blk-mq-cpumap.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
-index ad8d6a363f24ae11968b42f7bcfd6a719a0499b7..444798c5374f48088b661b519f2638bda8556cf2 100644
---- a/block/blk-mq-cpumap.c
-+++ b/block/blk-mq-cpumap.c
-@@ -87,7 +87,6 @@ void blk_mq_map_hw_queues(struct blk_mq_queue_map *qmap,
- 	return;
+diff --git a/block/fops.c b/block/fops.c
+index 6d5c4fc5a216..be9f1dbea9ce 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -783,11 +783,12 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 		file_accessed(iocb->ki_filp);
  
- fallback:
--	WARN_ON_ONCE(qmap->nr_queues > 1);
--	blk_mq_clear_mq_map(qmap);
-+	blk_mq_map_queues(qmap);
- }
- EXPORT_SYMBOL_GPL(blk_mq_map_hw_queues);
+ 		ret = blkdev_direct_IO(iocb, to);
+-		if (ret >= 0) {
++		if (ret > 0) {
+ 			iocb->ki_pos += ret;
+ 			count -= ret;
+ 		}
+-		iov_iter_revert(to, count - iov_iter_count(to));
++		if (ret != -EIOCBQUEUED)
++			iov_iter_revert(to, count - iov_iter_count(to));
+ 		if (ret < 0 || !count)
+ 			goto reexpand;
+ 	}
 
----
-base-commit: c4b9570cfb63501638db720f3bee9f6dfd044b82
-change-id: 20250123-fix-blk_mq_map_hw_queues-dc72a6a1c71a
-
-Best regards,
 -- 
-Daniel Wagner <wagi@kernel.org>
+Jens Axboe
 
