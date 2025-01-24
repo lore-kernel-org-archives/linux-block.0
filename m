@@ -1,81 +1,80 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A118C23B0
-	for <linux-block@vger.kernel.org>; Fri, 24 Jan 2025 04:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.141.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D773217FE;
+	Fri, 24 Jan 2025 05:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737692763; cv=fail; b=d20fpgUT8bTk/4xXBFqEVSeSpYfLhHP3DTZhPiQX47j5pQzBlARzE8efRf4guTPGRj5Hppta+Ut+FHbHa5dwF928axS5lBGKtUUn2337/Wi/l/mBK63AQ6Y31Vho0JTudt64e99fuERlkOZnNZEJRBKMq9AqLRhxCkiIHm8hy88=
+	t=1737696989; cv=fail; b=uyp1WDWkEU/KAWs9xSxsH7XBdlsMFnPvC+uy0vYCGTPCPQ9If78Lixpo9bgfLbhnX1Mnnf1k/YR15AvS81c+rmJQ1j64ju253uRXgVlp9nmQam4qhRJd2O8xH6E3vvMH7NMCiLUKGThPodKhJKS8nStflW67xgXR6ZJvj1h1NK4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737692763; c=relaxed/simple;
-	bh=z5wY8NaTY0lKx2NFZTCjDVKYtyjLpKU/om2VKjEHvPU=;
+	s=arc-20240116; t=1737696989; c=relaxed/simple;
+	bh=SEXO5nSG9n98tVcSuInGE9uCx9fmq3OZeTyo9qKnF90=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=UH9uGr/kcPMMjtn0w3TXnXfDbGia5eVJbYyCSLixQA08ErdHgDcjAq2ynbXeWu/i0x4UqdMysMX90JCvSLMluK7jf7ezEhUCdwgQZlMhzEevGZv4KbjzxLI65QkrF424eUYeQy9Wkxzk/D5Yyz5z2S1DNQEhmHhJCK/ossTu9F4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=XlE1w5U9; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=DCsDgRLF; arc=fail smtp.client-ip=68.232.141.245
+	 Content-Type:MIME-Version; b=oOy1+ee560SokoTKIEL8qfiqxx6LrAOZ+kqlWeqejs/Wq8nDW/Q2ddC8ztPflK8pa0OsP/h4Y2WwBc3ZKwWZAqCC+ebM5+Es4n4jPuNxSF+5CNgZr37nNPXxcUIa3f1mbFq+N79m8O8DrQkOPjDffABWZ42WN2HRnjhsyIZ8Lkk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=grcOSRf+; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=pwqHa3Hr; arc=fail smtp.client-ip=68.232.143.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="XlE1w5U9";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="DCsDgRLF"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="grcOSRf+";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="pwqHa3Hr"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1737692760; x=1769228760;
+  t=1737696986; x=1769232986;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-id:content-transfer-encoding:
    mime-version;
-  bh=z5wY8NaTY0lKx2NFZTCjDVKYtyjLpKU/om2VKjEHvPU=;
-  b=XlE1w5U9rLdEZHKqT570785F+hLJKq7EoiSarXXyOk3qYAdAs6kHUtMV
-   AKYtxAcdgd4nZi1/w6Nikn7ufOWECMz85JdMr6YmgoKyDNMugl9N5L3qs
-   WGTAuNffMv+xc17nGOj4dPU8cbwkpWvyXFSSOAavTddm4F2AVAlOf78KM
-   kMwE9jAgg3fVtjVCWs+NcKR7DrwWprbozrGBs3QlMHOe2b6TfRkaGrFRn
-   ir2TXKKoQQNonPwtGALqp2Tq/n62Fl7Vxp0Ol5b6g+weOFZFKvUHBnUuv
-   kUOnHkHppemF5/0nmTyePhuBLvuVKxb5HGwu3x1t6ngL8/U3J9NU4fEuc
+  bh=SEXO5nSG9n98tVcSuInGE9uCx9fmq3OZeTyo9qKnF90=;
+  b=grcOSRf+i/Bhxvxy5jQ5w/WOBLPU8ru7CIFs+E0ltBz1SOoKOSPbEoCM
+   //geOHAk0AZV9QfynrP9EEXn1JLHNh6O/OvU2sKBADrBGUgMvIt9/SDHw
+   KfPxlYG47OmEKltmSs902+aRsqLEOBHQq/5fA7wgWOHSTGJqZVn25VBXC
+   IQfjmdby9vKc1oaG3Bl2Cg7GsLqJU1EidDvZMymVwZO1G8+jshXHKmq06
+   lPxMyQD/j6WEtE/V032oA3eRdi0KSPp3Q3ts8KItW3MkUJ1oDGlCw3u/3
+   mqJjF61KR8FrtMFImai/ZmVdAvKqK+x+qRIfIk0+g2hlPcuNFUwG22HCR
    w==;
-X-CSE-ConnectionGUID: zwwXOYBwQsiwB/P08NoBzw==
-X-CSE-MsgGUID: 0nXzkUv0SdSLZTYjP1brnQ==
+X-CSE-ConnectionGUID: p7jx8WFSRi2DTOF5NAm2KQ==
+X-CSE-MsgGUID: VAA0x9atQMGSVty+QJJ9TA==
 X-IronPort-AV: E=Sophos;i="6.13,230,1732550400"; 
-   d="scan'208";a="37896744"
-Received: from mail-centralusazlp17010006.outbound.protection.outlook.com (HELO DM1PR04CU001.outbound.protection.outlook.com) ([40.93.13.6])
-  by ob1.hgst.iphmx.com with ESMTP; 24 Jan 2025 12:25:53 +0800
+   d="scan'208";a="37218029"
+Received: from mail-westcentralusazlp17011026.outbound.protection.outlook.com (HELO CY4PR02CU008.outbound.protection.outlook.com) ([40.93.6.26])
+  by ob1.hgst.iphmx.com with ESMTP; 24 Jan 2025 13:36:19 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G/a5ygVjXg1lxxMApkCuTfLAxyN+sEPpLsn/QsOtHspHE6kxP9qMKfawJG6w3Vgs+v4P/Gko2a4mZk9XLaXH24UgDabOGS4MGeSuH+NdX2pgEjtubojs7TCiEY6eXhr8QlMb6aXKbuUyMnL9xQ0YE0iduUaTzyoPC5kDCERF9pmhMg1hNdoB1iAwFzKnbbMb9mFox/WSC263+QxCTCg5/VcdfRfPD92jAgZa8faT0mY8zsploIVkNjXnK9FMVMzq7WZcjy4+Xve7Pg/Rd7Ikf0TfHb9WC7vPaCg/CA5ud0Q8kzxFpgJwDYQlPX+wS9WprQ/58VPLSaq0DflBEptMvA==
+ b=CeKZPnLPJo4dsMYOGALJf9fKytiU8mbt0Xb6x4Z2Lp6BqKi1MvBM2GLPnNsOH9u10E3awbOCbn+Rr0i7eHNy7jy2Fc5gZ1fdRprtCcAuiH7v7irDcTNFbHXxXRVPJkk/yy/9+Q9Ky1ADqYJQ5gop1Bk+aNClivwl9S79OFrwWx1BGgOOeN2TjjP4wgq6qy+V2kyZ7mPFUjB5c68MGqunnbQW9o1JvJi3hK92yHSKmojIZuGwFMkf2oTUNpeQLYJFdoOpQN198WlCmVb68ZnPe2xcX0oFPrMfawsnWE29xKuZ2LruzXoZpB1mEzNOfPPwmkY3TKDQB9vy0/LyHKdTPw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=y4jEZgfCEz162kCZowfaGWVzBg4yN02q7xfXajP8kmU=;
- b=avfMnlPT2MoD1AQFFVOjxHjkniuFZTRb8ldyoKDY73RH1C/68QlcES1UOVyHtZTVGDX4n6gOWLZAVYn6GrxACfMwiswXsEmL1xS1990Np3sdnLZ0ye859ZqsA5szTMRX096efnu97iOpAIRLTY77OaWBA2RyhJzu4p8EUcBs5mb1NtJ6e+BQDoyz5HEKAMnPeOm5SKIcZ6Ln5rRtxnTXzhTwmDrBBXeCyrM3wgcWjtp+VQ6bCRjGGmSF4moAteUCahdgbKFo5c2hsgGB0YoCz5KeVMcvfG9O+z1f2yC+lkP/xNKqn8a9Umu0hSAjjVzt8BZO0OYqIzEyq3tFsiaujg==
+ bh=ppkStwoN32/awE5MecCD0pPBHiJ8n7Lfl9VKf+ojwWU=;
+ b=uMrrJvsOECPqCs6LnVje2J/gh1sP7CS1Zb+yTZaXBG1/cuiOsJr9ktOfXD52mXkyWeqyPigsn9Rg8v6U5oPphs6NPNuzjd3omvo5DaD9/93jx7tiOyRtKg15eozfzejwsF95G+YCPXbGwrEzOvVXv2XDf+97iHi0+B5BNht7rqh0CghliAT5nRSYIESH8S4Ku3HJwkEKAErTpJBdlg18GP02CrnaMESfWV/P5lx3N9DiCiRm/L9THAJpF7fH5pBYQf2Kt9ObiwFL3IPsUEcCqKfrdD3G/Bl6VJEyFEhl/glooQJDLZFxwO9seO4sfWTiO3V09k4WZkzNAEyycOZSZg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y4jEZgfCEz162kCZowfaGWVzBg4yN02q7xfXajP8kmU=;
- b=DCsDgRLFymRZJQD+uCrR1+6NYEzpA0lz3+xYOgJ56ODA/tah5FCHDwH3eSfXZfnfDijPEeY7scFYPLbcwDTIk7SN8wYbvbVMDt6gTl2PWK3o37ThLGfgfiwteBDy2uTFL+AlCzXTiqXoGN4crShCo0uZZ7rIZW+EUZWxe6jC7tc=
+ bh=ppkStwoN32/awE5MecCD0pPBHiJ8n7Lfl9VKf+ojwWU=;
+ b=pwqHa3HrmasufHO4jBwoE8Ge7dJcon3hOJq7zDHKLPMYHe1wua69Tz8Tq6l6irDaf2zm4FgA7w7DvdO7bk5TH6KrFZlHSOk+BvoB0kjoT2UReKfRM7ZxoFEpBESGOhOEgPt+w6qWXQwLpQoSjuyAN2Ac7Gl2tiPEgGyzXIXSUjk=
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- SJ0PR04MB8538.namprd04.prod.outlook.com (2603:10b6:a03:4eb::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.17; Fri, 24 Jan
- 2025 04:25:51 +0000
+ PH0PR04MB7704.namprd04.prod.outlook.com (2603:10b6:510:4c::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8377.16; Fri, 24 Jan 2025 05:36:18 +0000
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::b27f:cdfa:851:e89a%6]) with mapi id 15.20.8377.009; Fri, 24 Jan 2025
- 04:25:51 +0000
+ 05:36:18 +0000
 From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jens Axboe
-	<axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH for-next v4 3/5] null_blk: fix zone resource management
- for badblocks
-Thread-Topic: [PATCH for-next v4 3/5] null_blk: fix zone resource management
- for badblocks
-Thread-Index: AQHba9yk00IPExgt9E6jXosDrdH+4rMjuHgAgAGf5wA=
-Date: Fri, 24 Jan 2025 04:25:50 +0000
-Message-ID: <r7f5pfp4qfon7g6l3mzmuuae3a5e75xvsjwoc5qfkc33zmaa6l@dup7i5ncdqvo>
-References: <20250121081517.1212575-1-shinichiro.kawasaki@wdc.com>
- <20250121081517.1212575-4-shinichiro.kawasaki@wdc.com>
- <762c1246-5436-494c-b7e0-0f4ace34e88b@kernel.org>
-In-Reply-To: <762c1246-5436-494c-b7e0-0f4ace34e88b@kernel.org>
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+CC: Alan Adamson <alan.adamson@oracle.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH blktests 1/2] scsi/009: add atomic write tests
+Thread-Topic: [PATCH blktests 1/2] scsi/009: add atomic write tests
+Thread-Index: AQHbbFI6cGOdyGm4iUyywl/pJR3X07Mh9uAAgAN0QoA=
+Date: Fri, 24 Jan 2025 05:36:17 +0000
+Message-ID: <zwtv2kp2e422c7ryc5gucf5qfbdf2iqg7vcvm5haldykbjo26c@wnqhfm2uksts>
+References: <20250121222530.2824516-1-alan.adamson@oracle.com>
+ <20250121222530.2824516-2-alan.adamson@oracle.com>
+ <4b78a64d-bdb8-411b-ac5d-13f1df3f8f11@nvidia.com>
+In-Reply-To: <4b78a64d-bdb8-411b-ac5d-13f1df3f8f11@nvidia.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -83,72 +82,72 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SJ0PR04MB8538:EE_
-x-ms-office365-filtering-correlation-id: 2c677d05-8cac-4f89-0926-08dd3c2f2f36
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|PH0PR04MB7704:EE_
+x-ms-office365-filtering-correlation-id: cd2b677d-3c61-47d1-caa2-08dd3c3906bd
 wdcipoutbound: EOP-TRUE
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
 x-microsoft-antispam-message-info:
- =?us-ascii?Q?d+F5jzE8aifuLf+G7TL8/WK5NGpqNx7Pwu9569k6KtNP6/uQ5Ni4dx2dcIPy?=
- =?us-ascii?Q?4x804XJ5vcgOgOMR3y/hUwFkZhy/QOHFKGMxy1/G53i4xuXT/In9UvW/nau2?=
- =?us-ascii?Q?116+mRjePA+p6khMxx8DikFNNfF5Xzp/Kt2b4iFurGQ7f7+aFTsTpLJkVJsc?=
- =?us-ascii?Q?IZhZRBvkUkGKxP979EL/1JvEV7cI+DUhLhxBlST8IlXQaZXiIMQhBM+SkRee?=
- =?us-ascii?Q?/cJXgmOKZIrDCWny81/QhLdOmX9349CUiNvckCFhpKmnIRGW7NAA3q0X8PZh?=
- =?us-ascii?Q?LKgrp8rRTHJ8X2hbUd6lQlRzL/epIFlKfeWGlEXPvUG92oFaDlJaMsaLTWCM?=
- =?us-ascii?Q?WMQmiwEmXRvT8nAVCXg0mtV0BWaLoiEK1HtUHV648Iz4kuOCh4mSTCVtOzJa?=
- =?us-ascii?Q?BkB/1BO36q2yF1nHS3Fpus7NwfNONqLB08MVoFYnDChTGP6PVWafPIxDnqMR?=
- =?us-ascii?Q?XHJFK6Uk9U2OuD910w0frhT/OdPfrRpAUF3qVvFnbOq4JaWupWvgewxkcfZ9?=
- =?us-ascii?Q?98aEz/t9kBAI7aiuRIGbkN6WSRZ3HZFS64nPb2pjbfYfiMJcCJFTneGgQGHY?=
- =?us-ascii?Q?eqJXI8hXaK1dTyMwi5XBCMrCwA1rofVeOmsHhMPxbpaiHzjszWyY0rODtY29?=
- =?us-ascii?Q?XcjNixBWQ7Gcrk58Kb7VvFZMcFRkJA/bPH7rE1ADq6n9KIEvW7WMYFGwds0i?=
- =?us-ascii?Q?Lf7BQHeaTHCM4ZkicyHbxq0WfKn2xu/ieNCEqWMRxODQsy4bDnkLK1jsoMs9?=
- =?us-ascii?Q?nbPANTtSIZWRdBKIZqIUV1lSprbNKS1ubDjj2dwPLeqmypdOncHlxoU3bujk?=
- =?us-ascii?Q?CsdIRVmuirqSqBVs/D3KXq2q7j6RgykB1MtLJ61G1XLLL/d9mnaPDX1LZ79r?=
- =?us-ascii?Q?X4zI0Y1YFtQXtdIMr0Z2gtVyrxUsObqINVPJGjKPrum7uAC7HP9zJkiIHqpw?=
- =?us-ascii?Q?EQDQMPa2S08WfxmwaBZqNiG9yEvgzmCi9kQJqDcszlDRLfuf1Wa7g4qr4Qg7?=
- =?us-ascii?Q?Ueg71dIF1SfFKGytkMBDvbpwgA1DfAX+nXgxK7ZwcyZaRjcOdI/8KYhJzMu7?=
- =?us-ascii?Q?dRiC4TTZeHPwB9LWOIXjltbHfi0AuoMBQk1H0f8DJbHnbxJRwpE7oFALkwIN?=
- =?us-ascii?Q?sX2rGx4ymYS9GuIppnH7zbcgrkWxf9Z5sJk2o60K95NPoftnp1De82ERGHPR?=
- =?us-ascii?Q?GVPvOGhJDRnPPRjNCWzrJ2rPk3B0uf9k2ZD/hP5nuVXhPeDxL1HcdMnKuz/E?=
- =?us-ascii?Q?scT3KN9k6ulRm66HgUOoP+TRGoOzgiMxwRL1zejjp3mUbEciEhmAewVqM2vF?=
- =?us-ascii?Q?A0Wo4/nmhNz6HoH0GI580YyNwnrnoqlQLMHPyMBRBy1cMFn5kmm4pKIReNdK?=
- =?us-ascii?Q?Gd2dECsnrZn7OnvFeCSkk9/5bAP3DbPc5v405eQaVn15E7EYfdmozfUvipkY?=
- =?us-ascii?Q?+XCt7JVduW6uxTJGvApWyE8krF9bNW68?=
+ =?us-ascii?Q?EgkB2Pyo6C0zQ//rNkaesgDs33v4S4ToLTi8JDvIjkcdbK9aEClwmXp6gJ/1?=
+ =?us-ascii?Q?wL6x59CiUlciQ8la8jFc9j2Ov6+UZsYt47g/xxCkhRX4mpZp1TwVF8YxWXFF?=
+ =?us-ascii?Q?fHpmt+JTgzFD3b2GGCSFuAXGnFfGBJW/42cGR8/MZB1FPGxe35RLDR2tJb7x?=
+ =?us-ascii?Q?NY9kXSNmnnU1FM6ktdOmUdeHirC5LsNEpDpeJs5A24moc/qM/WaZt9Khp4F1?=
+ =?us-ascii?Q?lI8NxWyLR1a4N41y70xxKmJYaVmCbha1b+ugSZEbq0IRkub7ZUW36ptCoUNS?=
+ =?us-ascii?Q?qhqbSxtSQ/053oezdHxGVFsfo1sjbyV1+nNoGjBNf9sSkCVKT8roOsSIsXRK?=
+ =?us-ascii?Q?gLphcXXKJwkosR8DuQ7f2c/yJC0mW0vbDWqZG3rCzTGkFFF0ID85vrexwtLd?=
+ =?us-ascii?Q?m6L4Hbvx1BBAt/28kNDld/2fgGwpriSGEhac8ky0jHWpF43eygywPz6UlzdA?=
+ =?us-ascii?Q?FWmwRo9F5kq74bv630fSzve9oThoinT+a3SdK2ZmQQbC+tsAYPmebxiArG6j?=
+ =?us-ascii?Q?ieOoa1ZiwXAWQPFii2OV98mxa03PBz99yErBt0UowfB9mk3RrNmmLoPmuYjr?=
+ =?us-ascii?Q?clI3tESzYkugjDFWrtTvFQRU74qmg0e+DV9n9p91Fi0YNbOBhqO75rmcXU9B?=
+ =?us-ascii?Q?hQsr+7eeUZTxUZmdswmM66+6wvDLlnNxRBVF0FdRV8IztZz1hzAmLSkxNqEj?=
+ =?us-ascii?Q?vy7owFPCkCqhGk2XPxVliR8TRfFoNoRWwHS2Ejlny7txB2UZ59RegTe+3ssu?=
+ =?us-ascii?Q?9kJLMvH6BLZT8Ui4XO4pDxpqetdQxtVYXtX6wRroYuEk+MfBGyphwmz53d6b?=
+ =?us-ascii?Q?WmM2zCJi965EbRf8xBr7lHXCB1YX0NMidO9JT/Voy1HRoDDqiP8augfVa+I6?=
+ =?us-ascii?Q?aXlxc7lckkkqtjpH9TSDT67M685BwzXPFWH4mirgCj/Nn+zlVGV6u0vS8fDn?=
+ =?us-ascii?Q?BYVsKnTFmrevkPTClCq0ZIcCWogzq4Lmv35QeZYCgpM3yx8BFWYU1F3xlGUI?=
+ =?us-ascii?Q?YsV18ULUnDxLqizs01g1WqVoKVKHD5R73mavyq3fkQJ/9RDFEJ7GRvl974mL?=
+ =?us-ascii?Q?3GGnNcOpxyrjNUUPrcMQZSGM5rHF6rHHRgL7tr1qV27eMf/RnziPViaSdUOd?=
+ =?us-ascii?Q?MbrGhY+KHYL2mYB88dgrB8u6eFuT1UmqsayaqbAunFNsVXOEETopCHsB/Hml?=
+ =?us-ascii?Q?BUB8tSYH7j1vUJodlwiXRVcJo/pmR6Y+WD6Xn9A/l4inLbHFRo4x6FRC9ilY?=
+ =?us-ascii?Q?zGI13z7Snw2+iv4ZAXQrOIAqVvy1rlWIdHwW5YsMIQDRzZIFsSoDP0qQQ/LX?=
+ =?us-ascii?Q?VWHTqkbuY0dgxzq+ZWVITq2Byn6jkhPPQXVZ0OM6kETligOAmA+VDW33DBht?=
+ =?us-ascii?Q?JP9AlvLDsw5GTFS/MKWBhTt5RcppvNGwfzJuOxX5/Ng0VZmqYrIDBdI1leFE?=
+ =?us-ascii?Q?7V6kBxNpLqxJNUlw0B4Pfu/XuXw/kNFs?=
 x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?BzIo1lqREHqdyoxJ92dV9l9P6BedQYH97bL80fMEpf9N9dIa5v0HfgzpWV6L?=
- =?us-ascii?Q?zwdQiFSwiA/yzCPoB+5wVpRoJYdSZ0/dIyzQG2HtWsy7gUsLhRBRksXbtJ+c?=
- =?us-ascii?Q?mgfbdc+OPM1BcF5WSJPjl2v++eiDHhCBrUQNLe1/WZuzEyy1RWKQCB9z6f0Y?=
- =?us-ascii?Q?+kysrcgsonuhH/+kUodFuC/cqS4etwJo/894HtXguxa0ZOk05BDey5zEDLea?=
- =?us-ascii?Q?aCMHeO+f2Xmha0ISyHqZ3T+N4SJkrPjUozLNHEn54quElh4HIwf5l+a8HdWN?=
- =?us-ascii?Q?URs93JUPyxjLOjUcw2yl5uXDED7pM8SaPw3fJ5e+46FiYXdFzdUEq8Wyi6rt?=
- =?us-ascii?Q?P0uk2joLNwFg6Mz5NOBBmfDdjBQ15N+uSJpcB+hwSKStGzXhusMhkYwu/fOx?=
- =?us-ascii?Q?rnhiv951RXKXC1y0dAXFO7HJJ8TD4mgpFl2n9Zho4TdpfAUtPWu2sjTgR/Ao?=
- =?us-ascii?Q?wQGWVot8qfJwa5kj2KEMbbD50sUN3mkGXtDwto+4dHQSHRo2L/wWWpB2O2/S?=
- =?us-ascii?Q?AhhWWCBYWX717dQ0ksttiJkSX3fU63QpkGm6dyc8MmJE7dhpdkgoENsRZcZn?=
- =?us-ascii?Q?X1omknUCPdCUPxMGgMZIyLNjYfIOt9ireaJxD86iZi8IvgNyExTwzF9TlClk?=
- =?us-ascii?Q?KetiotmFyQ3eq7nFTcsEVKGY3K8UGMM8HMZ0uISAc0hQL+FSP5xw0t1UfKkm?=
- =?us-ascii?Q?EP3jCVg7Tosl2F5qybpcQSO10tW/d2rKYXBHZ7Y3gLwBW/OkJEiUKL1h9hEh?=
- =?us-ascii?Q?I98AhD1CNboiDGz3B9WDgSEwwPtekVBaioZiwVcqZ3P0O2yTf7SQHqhKhG0s?=
- =?us-ascii?Q?99MtA2E/YfG/SnaIXbZbss/Or+kzJKv8HyQv2P/briHlp4prMyezr2gUmzhT?=
- =?us-ascii?Q?OwX3NRoiimJn4E/RaZM8sj9jhZ6x4Z1x+wXUuokvBq0f+zCU6sYBju/24+HE?=
- =?us-ascii?Q?jwVMFNBU+31Xgyo2pa4A5Kda7xml12w5ZesPaDrzG7Myilw+O6cwwSVmwqFs?=
- =?us-ascii?Q?BY3H5teE66U4d6y+YNoBYYxFLBRgdLrsvWq1W43pVxfqNHfwEGYcHSP1WOFA?=
- =?us-ascii?Q?KPMVVyjhmv5O1qIlPPdPJ5SHmL2eJzW8lrrwEVUbtRSQAFKY9+5zt9AQKOJp?=
- =?us-ascii?Q?KqsM5ZGOxBdoJ9Q/tLh7HsOk6ckpDLyICtMdvqwZtev77JGNpoOHb6qaPei0?=
- =?us-ascii?Q?sE+A0mVNpe/3pWftliqH9UUgNJqtZemWXfASGhLYnf14vZlit3gcSzgi8eMi?=
- =?us-ascii?Q?aFxluCZX8Iv0rGyTNMNUGBFWCLCZILetfEgfmo8A20rSd0F6R1LNTe7zg7Fb?=
- =?us-ascii?Q?5fzkkeOL2OEYIBLEGrbCPHCPqvvXWJIp18TgqmnyjgG2DHOjLV5quEVV55bo?=
- =?us-ascii?Q?T2yx3qpvBukduCJTyLOCcj8R12mO1NYfjS5GGlTCyjM9M3Kep9vi129YEXXp?=
- =?us-ascii?Q?FvPWixGlF14a5G/vQQ/TgPZm9JSIatPdMI//SHIh/91CqLYB3BPC+rgORjAt?=
- =?us-ascii?Q?7dhhypJtEdmXMC3WANmJDXyYTBJKwrUfx1ZIyxQIZn5OaaY1GaxYSKJCp/Hb?=
- =?us-ascii?Q?OfP9ZGZLre1qDVn2xr1vJv5gvN5pe68sfLueBpELGT5APW6Yma3PQZoDL4k+?=
- =?us-ascii?Q?h/gliMwkL0NwM/eQdHA+L7g=3D?=
+ =?us-ascii?Q?qusyoNnDIBqBP7TGgcQJrGEI8x5X10MmR5IkOfu+DZP8eASDqhW8/2VXaSWz?=
+ =?us-ascii?Q?SkRvMV0sU1ARc4gZIILVwM8bSTZA2qaomSQCXVsrQGLTg+nMBvv7QgdEOh5X?=
+ =?us-ascii?Q?acHjZPDHz4a+LBshKMZS3C/r9gqBRlOafLgpN+IPLhf9+zwEiXqF9yet8G8X?=
+ =?us-ascii?Q?i/qCPuxeGR5S/JZX1FfjzeNsUEuugHe7TjCGuJO+01UkmvfNppPuBsEKjujV?=
+ =?us-ascii?Q?3cxF3XhybUOZChkBxc4sTRXqh6zU8AeoccbJ1Osw5jtJIP9RuTJBUZzsQBQC?=
+ =?us-ascii?Q?O6YxU79WMGQ4c4iYqDXu0a0xuY15djfxqGPPSuTZFRHC7dRk7EApleBNICAz?=
+ =?us-ascii?Q?nCmZ0yDWzqd9S34fbHLWeXLByTkbEfghu7A7nEnaLgjUM8nZdwz4laksGlqq?=
+ =?us-ascii?Q?tr2gTifkpDClD5ufDuQtvP857XAmnb01+uNDYzL6dI3aqpp7Vlec0G6AIzey?=
+ =?us-ascii?Q?YL1aXpWvsnzturuRCJYdBVJU6u47SBPwBY3CYpAlpYXa8q9h0cwk6CiprZOo?=
+ =?us-ascii?Q?gojfjU8hbEVlu0uoXLk5caGXXuCFBfXsd41bLuyRxqx0AVoQL6+5VCHw6Fi8?=
+ =?us-ascii?Q?6hl1MbV0AYpfLckY89715sL7MX9s781jdNmkPtFY9yGJquu1ZWIy0K+fnKlW?=
+ =?us-ascii?Q?I6ML1+dUuBKB7Xp3+oLVDufn6HP6TQNJ3HK3HIOtwjWOCT2xJE1cCugL6WA7?=
+ =?us-ascii?Q?whyH0o+2vnGIoNYSk0YUVd3ISWS4jkzPoKA66qfN64JiGgycU4GpEjipA7JS?=
+ =?us-ascii?Q?dXeztjScq3wL8q4IaSnSvEU/jMwYI7kHX+rtrkDcavsq/QyY3qFFBBzmLHi9?=
+ =?us-ascii?Q?nwAPMplKawN/HSVcmo5VTbKO/7yy57U+ndIOl/zWCwjvYAQwLY4zWqUM4ZSm?=
+ =?us-ascii?Q?ooIYB5MX9mcMa3pvN/PJzjV4J5Ac+RucimCFwJdHpAmNXhb0RZGnBq8sxLhu?=
+ =?us-ascii?Q?RHw30tioDUZ5cJvtCd+cqyvNXoJQFuWyTS8kcs15byq89yGtjRbGK0IhC3yl?=
+ =?us-ascii?Q?e5omUxnsSTtT+h56+b1zInKxk/TwiWtiDuCOqK7t3qGCU/lJ+ZLMB89Dm8Oi?=
+ =?us-ascii?Q?oY922ZeliYr2NmKEZRxEtfgfNOf+q5J2di6YUtAYVDh8xZtSmMrQiTEY/5ho?=
+ =?us-ascii?Q?QIXiQxcbH1MogJ0Reie6BWWT722LQpgzl/RqxPgXzfEFN54UJfz+DgdYUN4D?=
+ =?us-ascii?Q?LrfcT+FOZC6Csb6hgO5KWDo6xplPf0/Qu4uRj4GEf/nWURxgNbn+v9dgKIi4?=
+ =?us-ascii?Q?zFSqqXn11wzeypWc1IkpQVkXGtKub5WlAwaNY8lLvcFoQBb5hb8l643Ztl8J?=
+ =?us-ascii?Q?UAYLUeAGpFg//CZlMdF0jIVKKjdwdQzO3kcuqy9ypQ7addDzMZrqW1kvUz+S?=
+ =?us-ascii?Q?C1M1+98OA/FsUUCxbFTzhEIZQc/ooJvqKJQZkUjX68I1zsZe8BCx9zp8Zs+y?=
+ =?us-ascii?Q?bjBY+I/HH6O8iXfq6E1A2H2FyHKRBhFuoWTNlYTXhwJJosbZOsWliD1JwMf6?=
+ =?us-ascii?Q?pAwav32DjIRPccz9yPbmrDhIi9Fv8Vo9MGp5wKRCaa+8wXxiSw9Ygb/1XuKC?=
+ =?us-ascii?Q?hmoxHQzW8mTNSmt/ERLVCrfLR4ZJXVw5wQAQLjY38vRYz3RFXc34EmX/AXi/?=
+ =?us-ascii?Q?oTIsj762onYgJSEK4B8UQp4=3D?=
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <F0BEAA9A184DC54E9F6722C73FDDDCEE@namprd04.prod.outlook.com>
+Content-ID: <607E9A1BE020DB409A7F5A7864675292@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -158,159 +157,465 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	vT2xXI3BINxZN1V6u802E4R9h47b45xHJry4CbdaRgEQX4vGiHr/j4RTGEPbp3XL+w12FPhOLlJKkh0uspxE4/L3LnqpMmM8Fg1YV6tvgaYPGJ/Qyia0nsXWyhjQ9gD1krcvZ+TU0U/gniP/qopOQwXG0tT0IjoKH0vw0BZOGTm+ow18yRn4Eq1xOpz48jmCRf+3eYQngY/fHyR0YZssV4AGPXw3kTZVGt2BqMtBiIKnEJ6jSDyFxcLkkxDlymlvAgR33Q46pcbtUk/1edfAIONWDsPViZBbZSPhdIGcxQ/UA59G3dCCV6KruSWprI7Vv6+W7JiDW7mfOVyqjOU6X08UGs/OGH0vPtzSnqSt/OOx51py0joQM2N4ttS7ob5diI0ouV6YSRM4psD5OUgPjNdZk+l32t4mCtXRrLS/mgD9XFi9IGmt3DVftZn/uMElSWxG8n5uFHI0EsEZfERDekLi6fwbeE6VlirhOW5+I3WzyGx9lQc+4kx3RRorQI3/YSJM+rnBtSV4OdwOJNVNr/7QFURVYcrW9IdvSJrN86s8D+7Aou31oubb1kKGtZeLK1CbocoPyMYbCgQSSEHqVhyk2qpWCF2q0XuXdWgwRX2U3FaRpx29rjTYCrp8yzzZ
+	md3GGvK2OuXfA6FeCG6Zub0YjiOk/8zCxA1wUmsIbhYDKq7SjplRvLu7ZV+w06WXI/EpuFUJunBo8zBBz1Jq9JIy/APQGxCz5ER0NBj91QAqpWHjgCVDUjlxPEvrvFR9xN3w4PI5IEDrthj/N4QJPDrQgkxJ7UHz+UYUUjptHsH15v07kYGH7qVhmglw1o8yJwLIAkdBtagcBxLjIMWNC4KTV79HUQ6dlKj5s+APvLigpuHekP9S6eeTa0xDO7gRE0drg5AJ3v9J/U4dub2Xv3L7m1CzrgTFBFOHeRfCyyBSxKxtdX1fnO+vPJv5vax//OOg9hhxPQ14OhDP2bRGBzyMS2hPKzN/B30I+3l7LYqz58UnJxBjLXudZCYfCJW/li1QZ0MeXLr+kdV7tptJ2sy4qTxPwo9FKZ+ylmSymF6OoLjX3YvMcJHh1rlc+PEB3PCJ9Vx6vAfpu29nY4tbOwq66OhIIea86rkc43EcKp8Ylr7LeOnWyAWcrP53c2Lan7+yuZHcYe2Ftv2RKt9sXNJiTI1L7VYmoPUWIWENs/JYuEI+zI0t6uLfHddWHX6XhbuWPcTmwFaog3WWiqxnc9GW6u4/OMXCHzlRnyQH8a16JDZq8DX9zmIRLl3lXdrl
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2c677d05-8cac-4f89-0926-08dd3c2f2f36
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jan 2025 04:25:50.9472
+X-MS-Exchange-CrossTenant-Network-Message-Id: cd2b677d-3c61-47d1-caa2-08dd3c3906bd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jan 2025 05:36:18.0150
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mChTDTNDu7zai9Zn4Qq6P7wgT93d1mtLg7sB+Uy9m5E2fa9URoN+7nwbCbFCkN6mEgmaK86YnGdp6l7Stn6zSobAuw8wwK05yrmLZ9PrTDM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB8538
+X-MS-Exchange-CrossTenant-userprincipalname: odJcGd5f8+BvY3n1BDuhn6WdjiRmsh/fIjIixzdqcMnP9AEPIEz42QGubOOPNHKCe2og2170Hh74ylXXs7Ygy3PS471C6wBIxPnXRQP/ErM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7704
 
-On Jan 23, 2025 / 12:37, Damien Le Moal wrote:
-> On 1/21/25 5:15 PM, Shin'ichiro Kawasaki wrote:
-> > When the badblocks parameter is set for zoned null_blk, zone resource
-> > management does not work correctly. This issue arises because
-> > null_zone_write() modifies the zone resource status and then call
-> > null_process_cmd(), which handles the badblocks parameter. When
-> > badblocks cause IO failures and no IO happens, the zone resource status
-> > should not change. However, it has already changed.
+On Jan 22, 2025 / 00:51, Chaitanya Kulkarni wrote:
+> On 1/21/25 14:25, Alan Adamson wrote:
+> > Uses scsi_debug to test basic atomic write functionality. Testing
+> > areas include:
+> >
+> > - Verify sysfs atomic write attributes are consistent with
+> >    atomic write attributes advertised by scsi_debug.
+> > - Verify the atomic write paramters of statx are correct using
+> >    xfs_io.
+> > - Perform a pwritev2() (with and without RWF_ATOMIC flag) using
+> >    xfs_io:
+> >      - maximum byte size (atomic_write_unit_max_bytes)
+> >      - minimum byte size (atomic_write_unit_min_bytes)
+> >      - a write larger than atomic_write_unit_max_bytes
+> >      - a write smaller than atomic_write_unit_min_bytes
+> >
+> > Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
 >=20
-> s/zone resource status/zone condition
->=20
-> s/it has already changed/it may have already changed
-> (because not all write operations change the zone condition)
->=20
-> > To fix the unexpected change in zone resource status, when writes are
-> > requested for sequential write required zones, handle badblocks not in
-> > null_process_cmd() but in null_zone_write(). Modify null_zone_write() t=
-o
-> > call null_handle_badblocks() before changing the zone resource status.
-> > Also, call null_handle_memory_backed() instead of null_process_cmd().
+> Thanks a lot for the testcase, this is really useful based on
+> amount of work has been done on the kernel side.
 
-I will rewrite the whole commit message. Please see my comment below.
+Agreed, I also think these test cases are valuable :)
 
-> >=20
-> > Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+>=20
 > > ---
-> >  drivers/block/null_blk/main.c     | 11 ++++-------
-> >  drivers/block/null_blk/null_blk.h |  5 +++++
-> >  drivers/block/null_blk/zoned.c    | 15 ++++++++++++---
-> >  3 files changed, 21 insertions(+), 10 deletions(-)
-> >=20
-> > diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/mai=
-n.c
-> > index 2a060a6ea8c0..87037cb375c9 100644
-> > --- a/drivers/block/null_blk/main.c
-> > +++ b/drivers/block/null_blk/main.c
-> > @@ -1309,9 +1309,8 @@ static inline blk_status_t null_handle_throttled(=
-struct nullb_cmd *cmd)
-> >  	return sts;
-> >  }
-> > =20
-> > -static inline blk_status_t null_handle_badblocks(struct nullb_cmd *cmd=
-,
-> > -						 sector_t sector,
-> > -						 sector_t nr_sectors)
-> > +blk_status_t null_handle_badblocks(struct nullb_cmd *cmd, sector_t sec=
-tor,
-> > +				   sector_t nr_sectors)
-> >  {
-> >  	struct badblocks *bb =3D &cmd->nq->dev->badblocks;
-> >  	sector_t first_bad;
-> > @@ -1326,10 +1325,8 @@ static inline blk_status_t null_handle_badblocks=
-(struct nullb_cmd *cmd,
-> >  	return BLK_STS_IOERR;
-> >  }
-> > =20
-> > -static inline blk_status_t null_handle_memory_backed(struct nullb_cmd =
-*cmd,
-> > -						     enum req_op op,
-> > -						     sector_t sector,
-> > -						     sector_t nr_sectors)
-> > +blk_status_t null_handle_memory_backed(struct nullb_cmd *cmd, enum req=
-_op op,
-> > +				       sector_t sector, sector_t nr_sectors)
-> >  {
-> >  	struct nullb_device *dev =3D cmd->nq->dev;
-> > =20
-> > diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk=
-/null_blk.h
-> > index 3c4c07f0418b..ee60f3a88796 100644
-> > --- a/drivers/block/null_blk/null_blk.h
-> > +++ b/drivers/block/null_blk/null_blk.h
-> > @@ -132,6 +132,11 @@ blk_status_t null_handle_discard(struct nullb_devi=
-ce *dev, sector_t sector,
-> >  				 sector_t nr_sectors);
-> >  blk_status_t null_process_cmd(struct nullb_cmd *cmd, enum req_op op,
-> >  			      sector_t sector, unsigned int nr_sectors);
-> > +blk_status_t null_handle_badblocks(struct nullb_cmd *cmd, sector_t sec=
-tor,
-> > +				   sector_t nr_sectors);
-> > +blk_status_t null_handle_memory_backed(struct nullb_cmd *cmd, enum req=
-_op op,
-> > +				       sector_t sector, sector_t nr_sectors);
+> >   common/xfs         |  49 +++++++++++
+> >   tests/scsi/009     | 213 ++++++++++++++++++++++++++++++++++++++++++++=
++
+> >   tests/scsi/009.out |  18 ++++
+> >   3 files changed, 280 insertions(+)
+> >   create mode 100755 tests/scsi/009
+> >   create mode 100644 tests/scsi/009.out
+> >
+> > diff --git a/common/xfs b/common/xfs
+> > index 569770fecd53..284c6d7cdc40 100644
+> > --- a/common/xfs
+> > +++ b/common/xfs
+> > @@ -6,6 +6,28 @@
+> >  =20
+> >   . common/shellcheck
+> >  =20
+> > +_have_xfs_io() {
+> > +	if ! _have_program xfs_io; then
+> > +		return 1
+> > +	fi
+> > +	return 0
+> > +}
 > > +
-> > =20
-> >  #ifdef CONFIG_BLK_DEV_ZONED
-> >  int null_init_zoned_dev(struct nullb_device *dev, struct queue_limits =
-*lim);
-> > diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zo=
-ned.c
-> > index 0d5f9bf95229..09dae8d018aa 100644
-> > --- a/drivers/block/null_blk/zoned.c
-> > +++ b/drivers/block/null_blk/zoned.c
-> > @@ -389,6 +389,12 @@ static blk_status_t null_zone_write(struct nullb_c=
-md *cmd, sector_t sector,
-> >  		goto unlock_zone;
-> >  	}
-> > =20
-> > +	if (dev->badblocks.shift !=3D -1) {
-> > +		ret =3D null_handle_badblocks(cmd, sector, nr_sectors);
-> > +		if (ret !=3D BLK_STS_OK)
-> > +			goto unlock_zone;
-> > +	}
+> > +# Check whether the version of xfs_io is greater than or equal to $1.$=
+2.$3
+> > +_have_xfs_io_ver() {
+> > +	local d=3D$1 e=3D$2 f=3D$3
 > > +
+> > +	_have_xfs_io || return $?
+> > +
+> > +	IFS=3D'.' read -r a b c < <(xfs_io -V | sed 's/xfs_io version *//')
+> > +	if [ $((a * 65536 + b * 256 + c)) -lt $((d * 65536 + e * 256 + f)) ];
 >=20
-> This should come after the below zone condition check and change...
->=20
-> >  	if (zone->cond =3D=3D BLK_ZONE_COND_CLOSED ||
-> >  	    zone->cond =3D=3D BLK_ZONE_COND_EMPTY) {
-> >  		if (dev->need_zone_res_mgmt) {
-> > @@ -412,9 +418,12 @@ static blk_status_t null_zone_write(struct nullb_c=
-md *cmd, sector_t sector,
-> >  		zone->cond =3D BLK_ZONE_COND_IMP_OPEN;
-> >  	}
-> > =20
-> > -	ret =3D null_process_cmd(cmd, REQ_OP_WRITE, sector, nr_sectors);
-> > -	if (ret !=3D BLK_STS_OK)
-> > -		goto unlock_zone;
->=20
-> ...so about here. If null_handle_badblocks() return BLK_STS_IOERR because=
- the
-> first sector of the write operation is the bad one, then we will return a=
-n error
-> and not change the write pointer, but we do have correctly changed the zo=
-ne
-> condition nevertheless, exactly like a real drive would.
+> can we add some comments for above calculations ?
 
-Thanks. Now I see your point. I thought that the zone resource management p=
-art
-should be skipped if the first sector of the write operation is the bad one=
-. But
-as you pointed out, that does not simulate real drives well. Even when the =
-write
-pointer does not move, it's the better to change the zone condition.
+These are checking xfs_io command version, and I think the numbers and the =
+logic
+were copied form _have_kver().
 
-When I modified this patch as you suggested, I noticed that this patch no l=
-onger
-changes the behavior. Even before this change, null_process_cmd() returns
-BLK_STS_IOERR, and null_zone_write() skips the write pointer move. I still =
-think
-this patch is needed for easier review as a preparation for the 5th patch. =
-I
-keep this patch in v5, and will rewrite the whole commit message.
+Anyway, I wonder if we really need this helper function. In general, versio=
+n
+dependency is not the best approach and we should avoid them as much as we =
+can.
+Instead, I suggest to check output of "xfs_io -c help" command. The old ver=
+sion,
+the output is as follows and the -A option is not printed.
+
+$ xfs_io -c help | grep pwrite
+pwrite [-i infile [-qdDwNOW] [-s skip]] [-b bs] [-S seed] [-FBR [-Z N]] [-V=
+ N] off len -- writes a number of bytes at a specified offset
+
+With this approach, we can implement a helper function with name
+_have_xfs_io_atomic_write() or something, and call it from requires() in
+scsi/009 and nvme/059.
+
+>=20
+> > +	then
+> > +		SKIP_REASONS+=3D("xfs_io version too old")
+> > +		return 1
+> > +	fi
+> > +	return 0
+> > +}
+> > +
+> >   _have_xfs() {
+> >   	_have_fs xfs && _have_program mkfs.xfs
+> >   }
+> > @@ -52,3 +74,30 @@ _xfs_run_fio_verify_io() {
+> >  =20
+> >   	return "${rc}"
+> >   }
+> > +
+> > +run_xfs_io_pwritev2() {
+> > +	local dev=3D$1
+> > +	local bytes_to_write=3D$2
+> > +	local bytes_written
+> > +
+> > +	bytes_written=3D$(xfs_io -d -C "pwrite -b ${bytes_to_write} -V 1 -D 0=
+ ${bytes_to_write}" "$dev" | grep "wrote" | sed 's/\// /g' | awk '{ print $=
+2 }')
+>=20
+> same here little comment would be really useful
+>=20
+> > +	echo "$bytes_written"
+> > +}
+> > +
+> > +run_xfs_io_pwritev2_atomic() {
+> > +	local dev=3D$1
+> > +	local bytes_to_write=3D$2
+> > +	local bytes_written
+> > +
+> > +	bytes_written=3D$(xfs_io -d -C "pwrite -b ${bytes_to_write} -V 1 -A -=
+D 0 ${bytes_to_write}" "$dev" | grep "wrote" | sed 's/\// /g' | awk '{ prin=
+t $2 }')
+>=20
+> same here
+>=20
+> > +	echo "$bytes_written"
+> > +}
+> > +
+> > +run_xfs_io_xstat() {
+> > +	local dev=3D$1
+> > +	local field=3D$2
+> > +	local statx_output
+> > +
+> > +	statx_output=3D$(xfs_io -c "statx -r -m 0x00010000" "$dev" | grep "$f=
+ield" | awk '{ print $3 }')
+>=20
+> same here
+>=20
+> > +	echo "$statx_output"
+> > +}
+> > diff --git a/tests/scsi/009 b/tests/scsi/009
+> > new file mode 100755
+> > index 000000000000..f3ab00f61369
+> > --- /dev/null
+> > +++ b/tests/scsi/009
+> > @@ -0,0 +1,213 @@
+> > +#!/bin/bash
+> > +# SPDX-License-Identifier: GPL-3.0+
+> > +# Copyright (C) 2025 Oracle and/or its affiliates
+> > +#
+> > +# Test SCSI Atomic Writes with scsi_debug
+> > +
+> > +. tests/scsi/rc
+> > +. common/scsi_debug
+> > +. common/xfs
+> > +
+> > +DESCRIPTION=3D"test scsi atomic writes"
+> > +QUICK=3D1
+> > +
+> > +requires() {
+> > +	_have_driver scsi_debug
+> > +	_have_kver 6 11
+
+I suggest to remove this kernel version dependency also. Let me describe ho=
+w to
+do it below.
+
+> > +	_have_xfs_io_ver 6 12 0
+> > +}
+> > +
+> > +test() {
+> > +	local dev
+> > +	local scsi_debug_atomic_wr_max_length
+> > +	local scsi_debug_atomic_wr_gran
+> > +	local scsi_atomic_max_bytes
+> > +	local scsi_atomic_min_bytes
+> > +	local sysfs_max_hw_sectors_kb
+> > +	local max_hw_bytes
+> > +	local sysfs_logical_block_size
+> > +	local sysfs_atomic_max_bytes
+> > +	local sysfs_atomic_unit_max_bytes
+> > +	local sysfs_atomic_unit_min_bytes
+> > +	local statx_atomic_min
+> > +	local statx_atomic_max
+> > +	local bytes_to_write
+> > +	local bytes_written
+> > +
+> > +	echo "Running ${TEST_NAME}"
+> > +
+> > +	local scsi_debug_params=3D(
+> > +		delay=3D0
+> > +		atomic_wr=3D1
+> > +	)
+> > +	_configure_scsi_debug "${scsi_debug_params[@]}"
+> > +	dev=3D"/dev/${SCSI_DEBUG_DEVICES[0]}"
+> > +	sysfs_logical_block_size=3D$(cat /sys/block/"${SCSI_DEBUG_DEVICES[0]}=
+"/queue/logical_block_size)
+>=20
+> you can also use the local variable for following path to trim down the
+> cat operations where :-
+>=20
+> /sys/block/"${SCSI_DEBUG_DEVICES[0]}"/queue
+>=20
+> makes the code easy to read ...
+>=20
+> > +	sysfs_max_hw_sectors_kb=3D$(cat /sys/block/"${SCSI_DEBUG_DEVICES[0]}"=
+/queue/max_hw_sectors_kb)
+> > +	max_hw_bytes=3D$(( "$sysfs_max_hw_sectors_kb" * 1024 ))
+> > +	sysfs_atomic_max_bytes=3D$(cat /sys/block/"${SCSI_DEBUG_DEVICES[0]}"/=
+queue/atomic_write_max_bytes)
+> > +	sysfs_atomic_unit_max_bytes=3D$(cat /sys/block/"${SCSI_DEBUG_DEVICES[=
+0]}"/queue/atomic_write_unit_max_bytes)
+> > +	sysfs_atomic_unit_min_bytes=3D$(cat /sys/block/"${SCSI_DEBUG_DEVICES[=
+0]}"/queue/atomic_write_unit_min_bytes)
+
+I agree that these lines are lengthy.
+
+Taking this chance, let me suggest to use fallback_device() and
+cleanup_fallback_device(). (They are not well documented, but are used in s=
+ome
+test cases like zbd/001 or block/007). When a test case with test_device()
+implements these hooks, blktests runs the test case even when TEST_DEVS is
+empty. It calls fallback_device() to set up the test target TEST_DEV then r=
+un
+test_device(). After the test completion, it calls cleanup_fallback_device(=
+) to
+clean up TEST_DEV. For this test case, fallback_device() can call
+_configure_scsi_debug with atmoic_wr=3D1 option. With this approach, we can=
+ refer
+to TEST_DEV and TEST_DEV_SYSFS in test_device().
+
+This approach has following benefits:
+
+- Using TEST_DEV_SYSFS, the sysfs attribute reference codes will simpler an=
+d
+  similar as nvme/059 in the next patch.
+- We can call "_require_test_dev_sysfs queue/atomic_write_max_bytes" in
+  device_requires to check that the kernel supports amotic writes. This wil=
+l
+  avoid the kernel version dependency.
+- If users have real scsi devices with atomic write support, the users can
+  specify the devices in TEST_DEVS and run this test case with them.
+  (We need to skip the test if the devices do not support atomic writes,
+   by checking the queue/atomic_write_max_bytes value in device_requires())
+
+For your reference, here I share the change needed for this approach. It is
+untested. I hope it is enough to convey my idea.
+
+diff --git a/tests/scsi/009 b/tests/scsi/009
+index f3ab00f..686cc8a 100755
+--- a/tests/scsi/009
++++ b/tests/scsi/009
+@@ -13,12 +13,34 @@ QUICK=3D1
+=20
+ requires() {
+ 	_have_driver scsi_debug
+-	_have_kver 6 11
+-	_have_xfs_io_ver 6 12 0
+ }
+=20
+-test() {
+-	local dev
++device_requires() {
++	_require_test_dev_sysfs queue/atomic_write_max_bytes
++	if (( $(< ${TEST_DEV_SYSFS}/queue/atomic_write_max_bytes) =3D=3D 0 )); th=
+en
++		SKIP_REASONS+=3D("${TEST_DEV} does not support atomic write")
++		return 1
++	fi
++}
++
++fallback_device() {
++	local scsi_debug_params=3D(
++		delay=3D0
++		atomic_wr=3D1
++	)
++	if ! _configure_scsi_debug "${scsi_debug_params[@]}"; then
++		return 1
++	fi
++	echo "/dev/${SCSI_DEBUG_DEVICES[0]}"
++}
++
++cleanup_fallback_device() {
++	_exit_scsi_debug
++
++}
++
++test_device() {
+ 	local scsi_debug_atomic_wr_max_length
+ 	local scsi_debug_atomic_wr_gran
+ 	local scsi_atomic_max_bytes
+@@ -36,20 +58,14 @@ test() {
+=20
+ 	echo "Running ${TEST_NAME}"
+=20
+-	local scsi_debug_params=3D(
+-		delay=3D0
+-		atomic_wr=3D1
+-	)
+-	_configure_scsi_debug "${scsi_debug_params[@]}"
+-	dev=3D"/dev/${SCSI_DEBUG_DEVICES[0]}"
+-	sysfs_logical_block_size=3D$(cat /sys/block/"${SCSI_DEBUG_DEVICES[0]}"/qu=
+eue/logical_block_size)
+-	sysfs_max_hw_sectors_kb=3D$(cat /sys/block/"${SCSI_DEBUG_DEVICES[0]}"/que=
+ue/max_hw_sectors_kb)
++	sysfs_logical_block_size=3D$(< "${TEST_DEV_SYSFS}"/queue/logical_block_si=
+ze)
++	sysfs_max_hw_sectors_kb=3D$(< "${TEST_DEV_SYSFS}"/queue/max_hw_sectors_kb=
+)
+ 	max_hw_bytes=3D$(( "$sysfs_max_hw_sectors_kb" * 1024 ))
+-	sysfs_atomic_max_bytes=3D$(cat /sys/block/"${SCSI_DEBUG_DEVICES[0]}"/queu=
+e/atomic_write_max_bytes)
+-	sysfs_atomic_unit_max_bytes=3D$(cat /sys/block/"${SCSI_DEBUG_DEVICES[0]}"=
+/queue/atomic_write_unit_max_bytes)
+-	sysfs_atomic_unit_min_bytes=3D$(cat /sys/block/"${SCSI_DEBUG_DEVICES[0]}"=
+/queue/atomic_write_unit_min_bytes)
+-	scsi_debug_atomic_wr_max_length=3D$(cat /sys/module/scsi_debug/parameters=
+/atomic_wr_max_length)
+-	scsi_debug_atomic_wr_gran=3D$(cat /sys/module/scsi_debug/parameters/atomi=
+c_wr_gran)
++	sysfs_atomic_max_bytes=3D$(< "${TEST_DEV_SYSFS}"/queue/atomic_write_max_b=
+ytes)
++	sysfs_atomic_unit_max_bytes=3D$(< "${TEST_DEV_SYSFS}"/queue/atomic_write_=
+unit_max_bytes)
++	sysfs_atomic_unit_min_bytes=3D$(< "${TEST_DEV_SYSFS}"/queue/atomic_write_=
+unit_min_bytes)
++	scsi_debug_atomic_wr_max_length=3D$(< /sys/module/scsi_debug/parameters/a=
+tomic_wr_max_length)
++	scsi_debug_atomic_wr_gran=3D$(< /sys/module/scsi_debug/parameters/atomic_=
+wr_gran)
+ 	scsi_atomic_max_bytes=3D$(( "$scsi_debug_atomic_wr_max_length" * "$sysfs_=
+logical_block_size" ))
+ 	scsi_atomic_min_bytes=3D$(( "$scsi_debug_atomic_wr_gran" * "$sysfs_logica=
+l_block_size" ))
+=20
+@@ -102,7 +118,7 @@ test() {
+ 	fi
+=20
+ 	# TEST 5 - check statx stx_atomic_write_unit_min
+-	statx_atomic_min=3D$(run_xfs_io_xstat "$dev" "stat.atomic_write_unit_min"=
+)
++	statx_atomic_min=3D$(run_xfs_io_xstat "$TEST_DEV" "stat.atomic_write_unit=
+_min")
+ 	if [ "$statx_atomic_min" =3D "$scsi_atomic_min_bytes" ]
+ 	then
+ 		echo "TEST 5 - pass"
+@@ -111,7 +127,7 @@ test() {
+ 	fi
+=20
+ 	# TEST  6 - check statx stx_atomic_write_unit_max
+-	statx_atomic_max=3D$(run_xfs_io_xstat "$dev" "stat.atomic_write_unit_max"=
+)
++	statx_atomic_max=3D$(run_xfs_io_xstat "$TEST_DEV" "stat.atomic_write_unit=
+_max")
+ 	if [ "$statx_atomic_max" =3D "$sysfs_atomic_unit_max_bytes" ]
+ 	then
+ 		echo "TEST 6 - pass"
+@@ -121,7 +137,7 @@ test() {
+=20
+ 	# TEST 7 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes wi=
+th no RWF_ATOMIC flag - pwritev2 should
+ 	# be succesful.
+-	bytes_written=3D$(run_xfs_io_pwritev2 "$dev" "$sysfs_atomic_unit_max_byte=
+s")
++	bytes_written=3D$(run_xfs_io_pwritev2 "$TEST_DEV" "$sysfs_atomic_unit_max=
+_bytes")
+ 	if [ "$bytes_written" =3D "$sysfs_atomic_unit_max_bytes" ]
+ 	then
+ 		echo "TEST 7 - pass"
+@@ -131,7 +147,7 @@ test() {
+=20
+ 	# TEST 8 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes wi=
+th RWF_ATOMIC flag - pwritev2 should
+ 	# be succesful.
+-	bytes_written=3D$(run_xfs_io_pwritev2_atomic "$dev" "$sysfs_atomic_unit_m=
+ax_bytes")
++	bytes_written=3D$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$sysfs_atomic_u=
+nit_max_bytes")
+ 	if [ "$bytes_written" =3D "$sysfs_atomic_unit_max_bytes" ]
+ 	then
+ 		echo "TEST 8 - pass"
+@@ -142,7 +158,7 @@ test() {
+ 	# TEST 9 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes + =
+512 bytes with no RWF_ATOMIC flag - pwritev2
+ 	# should be succesful.
+ 	bytes_to_write=3D$(( "${sysfs_atomic_unit_max_bytes}" + "$sysfs_logical_b=
+lock_size" ))
+-	bytes_written=3D$(run_xfs_io_pwritev2 "$dev" "$bytes_to_write")
++	bytes_written=3D$(run_xfs_io_pwritev2 "$TEST_DEV" "$bytes_to_write")
+ 	if [ "$bytes_written" =3D "$bytes_to_write" ]
+ 	then
+ 		echo "TEST 9 - pass"
+@@ -152,7 +168,7 @@ test() {
+=20
+ 	# TEST 10 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes +=
+ 512 bytes with RWF_ATOMIC flag - pwritev2
+ 	# should not be succesful.
+-	bytes_written=3D$(run_xfs_io_pwritev2_atomic "$dev" "$bytes_to_write")
++	bytes_written=3D$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$bytes_to_write=
+")
+ 	if [ "$bytes_written" =3D "" ]
+ 	then
+ 		echo "TEST 10 - pass"
+@@ -162,7 +178,7 @@ test() {
+=20
+ 	# TEST 11 - perform a pwritev2 with size of sysfs_atomic_unit_min_bytes w=
+ith no RWF_ATOMIC flag - pwritev2 should
+ 	# be succesful.
+-	bytes_written=3D$(run_xfs_io_pwritev2 "$dev" "$sysfs_atomic_unit_min_byte=
+s")
++	bytes_written=3D$(run_xfs_io_pwritev2 "$TEST_DEV" "$sysfs_atomic_unit_min=
+_bytes")
+ 	if [ "$bytes_written" =3D "$sysfs_atomic_unit_min_bytes" ]
+ 	then
+ 		echo "TEST 11 - pass"
+@@ -172,7 +188,7 @@ test() {
+=20
+ 	# TEST 12 - perform a pwritev2 with size of sysfs_atomic_unit_min_bytes w=
+ith RWF_ATOMIC flag - pwritev2 should
+ 	# be succesful.
+-	bytes_written=3D$(run_xfs_io_pwritev2_atomic "$dev" "$sysfs_atomic_unit_m=
+in_bytes")
++	bytes_written=3D$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$sysfs_atomic_u=
+nit_min_bytes")
+ 	if [ "$bytes_written" =3D "$sysfs_atomic_unit_min_bytes" ]
+ 	then
+ 		echo "TEST 12 - pass"
+@@ -191,14 +207,14 @@ test() {
+ 		echo "TEST 13 - pass"
+ 		echo "TEST 14 - pass"
+ 	else
+-		bytes_written=3D$(run_xfs_io_pwritev2 "$dev" "$bytes_to_write")
++		bytes_written=3D$(run_xfs_io_pwritev2 "$TEST_DEV" "$bytes_to_write")
+ 		if [ "$bytes_written" =3D "$bytes_to_write" ]
+ 		then
+ 			echo "TEST 13 - pass"
+ 		else
+ 			echo "TEST 13 - fail $bytes_written - $bytes_to_write"
+ 		fi
+-		bytes_written=3D$(run_xfs_io_pwritev2_atomic "$dev" "$bytes_to_write")
++		bytes_written=3D$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$bytes_to_writ=
+e")
+ 		if [ "$bytes_written" =3D "" ]
+ 		then
+ 			echo "TEST 14 - pass"
+@@ -207,7 +223,5 @@ test() {
+ 		fi
+ 	fi
+=20
+-	_exit_scsi_debug
+-
+ 	echo "Test complete"
+ }=
