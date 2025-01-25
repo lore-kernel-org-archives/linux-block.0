@@ -1,838 +1,279 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204D21DD866;
-	Sat, 25 Jan 2025 12:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737807911; cv=none; b=H5SiigMYsvSVD55tD8FyhKBrrc+z4b6nMnXU/x6DyVk7H2wGhgBhJzEJ5FeFzEJvd9mmfi71bLDweGMGnzKC+x4L4X9aYPfX8FPRs6fRCLrtX+oz/q7zM1Vv609VQppZNBaNx5PiQqQy84uoBdaLz1FjLXuhR+7mZthWzI8U+XA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737807911; c=relaxed/simple;
-	bh=8Lw+SSA2CWUmdE/uxkA4KIyZhEePXJbVlAiBkFHjI7I=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FUPMvlu714Lqxp7p59mfj1M+uUMxoJs/gwU04BAq8nBGy3Uw2KOYgHtNzz+cAGBpSM/psoMSM0aw3B6lsv7WypXscK/Wt3qs2fbeepB6sbYGzwLYgANjwYPNjap9IWz3VnGUZ3ZrHkhQZhTHTiYZ1zgmKrJt/wI61DfLmKQi7wY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WDZ+ZVB+; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408235680;
+	Sat, 25 Jan 2025 13:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737811930; cv=fail; b=EYr9ss+LSvHTM88XC09Yfpvsmn/TBGdEpZm0jCyUn5jNCrwgL8HaRQb7hQzrro/X9/sjGf4Q5ZZD3p5wZvgjJu9GVS4ZmSU6ezkc3o1cRP+0l90HA5+fGOq1fJPRB+iCO9g52xbYUVxCwhG4Jcu4TmNETP9Zzs4dAI9D4ukFT9s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737811930; c=relaxed/simple;
+	bh=8QrtpsI0O8PdJDF35XtUzWN9NwZYhPgP13cZYnGZ5qI=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:MIME-Version; b=I2Z6n7wsf7Vgt8eWmFKnHFHpkZua0ZG5kqvhl8a9bvBnXPYZcO+fDP+SM12z5QU3QLq1f4MBRmZAOAVvCiCLrW+QeUmyEhnaFhhVQymWVRzMpT1TkTJI+ho4G3jOOzumB2knJws1FMj3VGcRFQYF7eaHlIlL/aNv8MH9vO2Lc94=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gj5ytX+M; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WDZ+ZVB+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 584F8C4CED6;
-	Sat, 25 Jan 2025 12:25:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737807910;
-	bh=8Lw+SSA2CWUmdE/uxkA4KIyZhEePXJbVlAiBkFHjI7I=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=WDZ+ZVB+Vgy4ULL3/gIMFv0GSp4rEnnzFjm6/8jBrPLguQbM6X/sQihj1rNnmymFa
-	 AsUtpohvoU8IEVrPPyZwsuqVnOfzZH9eOViaIQ4OA9C+HlCe6uaEfckglEur9Gi9NF
-	 ioUMlmgMn3HrW4TvqKRN+LrnIuHWiGTO3VuRoTNZSov8WBUTVizA1V3FqWlJMbBi/P
-	 K09iRO3z4y7z+NGypPzVtiFsyWM6ZsM3F7XK+GI9J4WrHwiayQIF0Nc8ygk5onKQty
-	 fRB7lV0smhiEmHtwf89ViYa0g+4ZjwGd5bX4k9lfE5A714WFNGRNPACNAd6mVvXBJF
-	 xadPAsCjOt9+Q==
-Message-ID: <7e6eb0d6f42ec77779e2da211db8854dffa6dbcd.camel@kernel.org>
-Subject: Re: [RFC PATCH] Introduce generalized data temperature estimation
- framework
-From: Jeff Layton <jlayton@kernel.org>
-To: Viacheslav Dubeyko <slava@dubeyko.com>, linux-fsdevel@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Cc: linux-mm@kvack.org, javier.gonz@samsung.com, Slava.Dubeyko@ibm.com
-Date: Sat, 25 Jan 2025 07:25:08 -0500
-In-Reply-To: <20250123202455.11338-1-slava@dubeyko.com>
-References: <20250123202455.11338-1-slava@dubeyko.com>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gj5ytX+M"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737811928; x=1769347928;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=8QrtpsI0O8PdJDF35XtUzWN9NwZYhPgP13cZYnGZ5qI=;
+  b=gj5ytX+MuVpCNMwgN1XjyB1RtjFjsD+Pg58cQWAoU2Hwj2EBdT4V2q3J
+   Y/JzRA0HfiYXmZPgy2mdcZsMrebLfvF+YLOWhNewxZvoVZ/+AjXo04us3
+   2fQXFqZZgA8NjykfyWCdocoOkMkNJYaOn+IzcclnyZusvcHTKvIgiEZgX
+   sFXssz8q8jUVFF0zO0xfyLR0c5znykAuGiYJ2GyEXNjYV0AxfboVFbvyq
+   LiUq3AMGcbpOgxDqBQEVWSCMu95rXLQRf+ej2EmY5Fqc9pntFii1Fhtl4
+   51/NC4a7R5i1KZKaUy84vfLSWw3cl+oQ3JLwmXoqxLWJFktpiFfwpTVbi
+   A==;
+X-CSE-ConnectionGUID: ItJah180RS+CAH41WwUbAg==
+X-CSE-MsgGUID: 19grYd0hT6OuaxY38XJzcA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11326"; a="55875866"
+X-IronPort-AV: E=Sophos;i="6.13,234,1732608000"; 
+   d="scan'208";a="55875866"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2025 05:32:08 -0800
+X-CSE-ConnectionGUID: zFb2/OqFS16w2OwIPxRM2Q==
+X-CSE-MsgGUID: KktAIWNSS4aZgqtCSkaz1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="108449732"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Jan 2025 05:32:08 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Sat, 25 Jan 2025 05:32:07 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Sat, 25 Jan 2025 05:32:07 -0800
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.171)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Sat, 25 Jan 2025 05:32:06 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mMAKmE1TWlFDOt61+UNt05zBEA7eoFb9xg/QYA5YsOqlJ0uO1GK+OwhjOV6lS/uta59FojjAhQztmC0fGchdGrsepqI6us24OLe+TwI53xTvWn87Uuk7RI3ThYtpaQvDdQ5P4MAlnRi6mYPdLAZmbhUkih7FbTjE0Mvj+0RA0bJq9fOfQ7ancM+yEDwpfDFzZAWiqJXmBx0bBDDCqzyqXSkH4wK1jC9AGuzR34l0ttRkrlM+adoe4dnmJ9qsAI3iKR4bjmTY5EMzecAO98ITx1MBk7ikkSTbC9lcDZdFQHumPwjHtE8bw6JWrwAKwiCzaAarsSSOYwqPnalhDk8H6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YVHFS8q3sROcAnKkbLMN+4WiB9Yk8H1r1QFcoed9gxM=;
+ b=tJwJ1S7WhRWefU6wSZ12X6hPR94xXEJUcPKdVF7Zfbf+ajpQvpJnQnxbZ9OwHtwt02gNz5ShXES7aZciZ3oNDjFMfGMwf6LO0ZGrDGeVLiRdgvUfyto5PyGRHSMQAFm902BA6xR6/kQKc48rOyV3nVC/fIKT9zRRK18gGIWoOy476USUHBbnkVy+UI8q9+am1fvh0bzf2JRBd7U+JxnmEM1YK64Lx5yLr/fLZh0VDL/s74gOWWghYox5yK4YUW8bAd5rxZzqbac5NBDIPdQvTrNPnDZRX91VKNDL4kkglXK7Xul+nI7E1ML6LNm1LAgVN473gfW2hCE6qD+TUxIZnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
+ by PH7PR11MB8551.namprd11.prod.outlook.com (2603:10b6:510:30d::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.17; Sat, 25 Jan
+ 2025 13:31:24 +0000
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c]) by LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c%3]) with mapi id 15.20.8377.009; Sat, 25 Jan 2025
+ 13:31:24 +0000
+Date: Sat, 25 Jan 2025 21:31:14 +0800
+From: kernel test robot <oliver.sang@intel.com>
+To: Christoph Hellwig <hch@lst.de>
+CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <linux-kernel@vger.kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+	<ltp@lists.linux.it>, <oliver.sang@intel.com>
+Subject: [linus:master] [loop]  ae074d07a0: ltp.ioctl_loop01.fail
+Message-ID: <202501252047.54df4ae2-lkp@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-ClientProxiedBy: SI1PR02CA0053.apcprd02.prod.outlook.com
+ (2603:1096:4:1f5::8) To LV3PR11MB8603.namprd11.prod.outlook.com
+ (2603:10b6:408:1b6::9)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-
-On Thu, 2025-01-23 at 12:24 -0800, Viacheslav Dubeyko wrote:
-> [PROBLEM DECLARATION]
-> Efficient data placement policy is a Holy Grail for data
-> storage and file system engineers. Achieving this goal is
-> equally important and really hard. Multiple data storage
-> and file system technologies have been invented to manage
-> the data placement policy (for example, COW, ZNS, FDP, etc).
-> But these technologies still require the hints related to
-> nature of data from application side.
->=20
-> [DATA "TEMPERATURE" CONCEPT]
-> One of the widely used and intuitively clear idea of data
-> nature definition is data "temperature" (cold, warm,
-> hot data). However, data "temperature" is as intuitively
-> sound as illusive definition of data nature. Generally
-> speaking, thermodynamics defines temperature as a way
-> to estimate the average kinetic energy of vibrating
-> atoms in a substance. But we cannot see a direct analogy
-> between data "temperature" and temperature in physics
-> because data is not something that has kinetic energy.
->=20
-> [WHAT IS GENERALIZED DATA "TEMPERATURE" ESTIMATION]
-> We usually imply that if some data is updated more
-> frequently, then such data is more hot than other one.
-> But, it is possible to see several problems here:
-> (1) How can we estimate the data "hotness" in
-> quantitative way? (2) We can state that data is "hot"
-> after some number of updates. It means that this
-> definition implies state of the data in the past.
-> Will this data continue to be "hot" in the future?
-> Generally speaking, the crucial problem is how to define
-> the data nature or data "temperature" in the future.
-> Because, this knowledge is the fundamental basis for
-> elaboration an efficient data placement policy.
-> Generalized data "temperature" estimation framework
-> suggests the way to define a future state of the data
-> and the basis for quantitative measurement of data
-> "temperature".
->=20
-> [ARCHITECTURE OF FRAMEWORK]
-> Usually, file system has a page cache for every inode. And
-> initially memory pages become dirty in page cache. Finally,
-> dirty pages will be sent to storage device. Technically
-> speaking, the number of dirty pages in a particular page
-> cache is the quantitative measurement of current "hotness"
-> of a file. But number of dirty pages is still not stable
-> basis for quantitative measurement of data "temperature".
-> It is possible to suggest of using the total number of
-> logical blocks in a file as a unit of one degree of data
-> "temperature". As a result, if the whole file was updated
-> several times, then "temperature" of the file has been
-> increased for several degrees. And if the file is under
-> continous updates, then the file "temperature" is growing.
->=20
-> We need to keep not only current number of dirty pages,
-> but also the number of updated pages in the near past
-> for accumulating the total "temperature" of a file.
-> Generally speaking, total number of updated pages in the
-> nearest past defines the aggregated "temperature" of file.
-> And number of dirty pages defines the delta of
-> "temperature" growth for current update operation.
-> This approach defines the mechanism of "temperature" growth.
->=20
-> But if we have no more updates for the file, then
-> "temperature" needs to decrease. Starting and ending
-> timestamps of update operation can work as a basis for
-> decreasing "temperature" of a file. If we know the number
-> of updated logical blocks of the file, then we can divide
-> the duration of update operation on number of updated
-> logical blocks. As a result, this is the way to define
-> a time duration per one logical block. By means of
-> multiplying this value (time duration per one logical
-> block) on total number of logical blocks in file, we
-> can calculate the time duration of "temperature"
-> decreasing for one degree. Finally, the operation of
-> division the time range (between end of last update
-> operation and begin of new update operation) on
-> the time duration of "temperature" decreasing for
-> one degree provides the way to define how many
-> degrees should be subtracted from current "temperature"
-> of the file.
->=20
-> [HOW TO USE THE APPROACH]
-> The lifetime of data "temperature" value for a file
-> can be explained by steps: (1) iget() method sets
-> the data "temperature" object; (2) folio_account_dirtied()
-> method accounts the number of dirty memory pages and
-> tries to estimate the current temperature of the file;
-> (3) folio_clear_dirty_for_io() decrease number of dirty
-> memory pages and increases number of updated pages;
-> (4) folio_account_dirtied() also decreases file's
-> "temperature" if updates hasn't happened some time;
-> (5) file system can get file's temperature and
-> to share the hint with block layer; (6) inode
-> eviction method removes and free the data "temperature"
-> object.
->=20
-> Signed-off-by: Viacheslav Dubeyko <slava@dubeyko.com>
-> ---
->  fs/Kconfig                             |   2 +
->  fs/Makefile                            |   1 +
->  fs/data-temperature/Kconfig            |  11 +
->  fs/data-temperature/Makefile           |   3 +
->  fs/data-temperature/data_temperature.c | 347 +++++++++++++++++++++++++
->  include/linux/data_temperature.h       | 124 +++++++++
->  include/linux/fs.h                     |   4 +
->  mm/page-writeback.c                    |   9 +
->  8 files changed, 501 insertions(+)
->  create mode 100644 fs/data-temperature/Kconfig
->  create mode 100644 fs/data-temperature/Makefile
->  create mode 100644 fs/data-temperature/data_temperature.c
->  create mode 100644 include/linux/data_temperature.h
->=20
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3PR11MB8603:EE_|PH7PR11MB8551:EE_
+X-MS-Office365-Filtering-Correlation-Id: a674d923-3a52-4cb5-38d8-08dd3d44902d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?V5c+X64hxk3MEffI6OAPNIh4u+BunfOekrKCmH9gbCcFm1F9iOYO1WgObx3d?=
+ =?us-ascii?Q?w+ZqrWee5wZyLVojDx2eokvx5uiVrKp1Ot303o9rs1A9a8PCNtTVa4HMfTAL?=
+ =?us-ascii?Q?HP9tvSPV1To4ACulvaDY8BBlJ8MmFDEh2nNSCw2dN/FONsQ5kgUTYM6zIfgm?=
+ =?us-ascii?Q?uaZ1IGRBhjLrfwtbNHVry2rETkC92h64bLAgO/b7IDjB1gIIULlu0RFxTfzq?=
+ =?us-ascii?Q?vlgSKdFBytJP/fKQrno/eoPtSYDpw3ZpR2p162OzOTAc4w/Od7ZxUS51yDXC?=
+ =?us-ascii?Q?rHEMGKUC9lHJE5AvVlEiXVFETWN5tx8EpRXajC3oqfFaZzZuHZzF/v1vkOOB?=
+ =?us-ascii?Q?/DjMDgrvJm2YfsxlVW8VHVI2bdYSQ63luMghz1xFtdVdS5BckxcGRt/M5dmi?=
+ =?us-ascii?Q?3GyBlyNyhAnD2wM00O+n/HTk1Fuxu2vmRWG7Yax+DCLyC72kQEWi7fC8xrSV?=
+ =?us-ascii?Q?2z8vWt3zZQEjPJ1uSlDlKbGV+He7uQvweMESsfJ3wo5rkZ1LWjz5p/PwZEn2?=
+ =?us-ascii?Q?GWQvoHPgo3+W/9712KZcbVGOYApypHkbNmrYByO+CrPDgoJ3hqkiRgRI27+b?=
+ =?us-ascii?Q?I+wDaBhxpA5MLftBuNikPmzCSBmkmTmU0q4OW1Tl1nTBbyEQXSC02FISSpaZ?=
+ =?us-ascii?Q?yIrex7p008AdOfsIv9ZWw5Cc1uPzTbxgPeeIQjOq3bpB/6ib9/rFZ0bbmsT6?=
+ =?us-ascii?Q?yRRVRPWYH5oAEDoT7Z5WUSrpu1gDsGJpbnthMzShHdjhkKozRgOn7EJGFVhJ?=
+ =?us-ascii?Q?Xxp2CHhLB+SR6d419vxW7yTPImqPit1r2RRGn2qAH2NX5unoBeKqW37PjruN?=
+ =?us-ascii?Q?lTVHM8kX+An9mwAavtfZhczBhqrPZXgYoupLYDzRf3YSQF1t5m1/Sr/qF+rr?=
+ =?us-ascii?Q?w9bCR7oX9Z5ta3CDNAimjmiI/Q4Xyy+EHLVVAaBETS6GLPyhyRqOqxFV1lDy?=
+ =?us-ascii?Q?GqCqyJWTu48j+kb3IcIMdGHgoidtvLwnWz4u1mJqK9CV/dzXFJzbLRATyGOJ?=
+ =?us-ascii?Q?8Hdr7rFC3ZYSNh7G4x8/rOAjygBKHwsf5OZCg4raVs3Hx5PEXFNDSE9sfg2t?=
+ =?us-ascii?Q?C3jeYV/48wHUdSQPWTea9h5SiI15cZZcqiylv2KRpt+FJlbzbgEeoJ5q83Wq?=
+ =?us-ascii?Q?7s9w/20c4kYxY9x/DaZvK/7MhTNXqd+d0V+Sr9eNR3mO63R7lfGjvqLMqjXp?=
+ =?us-ascii?Q?1eLe95ith9QvaBLdNvqr0zBpXlFS2Cg+FUJFxuJRBCNJxex+jIsIddnsspdJ?=
+ =?us-ascii?Q?AfFc5mZvDS5L+jw3oGKZDXISK22Jp22/L7j1KApnzR1dg5LWuvqSG8m/KCGB?=
+ =?us-ascii?Q?Xp6U8K/0s6wJdZ6Uu1lOmjLUqIXsIA21Z2B4E5uRv+0j3g=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8603.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?RE9YGvZVP/aogoUmg5KWX/uNOVKGwc6oQiRY9catB1nGmAShQebom4rDTcqp?=
+ =?us-ascii?Q?FFKL9KQqQ9avCF4rUJPxWPHld815/XF/yUfOcc2LT6eO0ZahLScAVeCpFO1v?=
+ =?us-ascii?Q?5Z9hsBV78oHWkOU9Mj+6ejzLy3b4ZrynUUUe0qL0SYGJ3FzL1IvHhYA79Ym3?=
+ =?us-ascii?Q?RS7du0QqCZuvJEHLQFgR5Omsyy2rAr0grQkHCX/Ga624laTHt5/Vr+43lu1v?=
+ =?us-ascii?Q?+GPKZsDR6+Bg7rtu5oEBhcBmb2qlcI9+5BMae+qQYGS5XT3FcBuQongKM2s5?=
+ =?us-ascii?Q?LEijuEdtRHZwDWYAl3/ehHiZIrHuidTnb7aisG7iTwqYBH0/KCwPM6Cf2Q5o?=
+ =?us-ascii?Q?/hSfN75FVUVxvXPYHl+5XgyWwGNKbhJMUJJ1fBtT9/Qul43mOEGg7jtgBm67?=
+ =?us-ascii?Q?+h7J3sQfQrG/qPEbW9v8khuyyEg8ZWftt1TBpdV7tpuc0vqBm/Wh4jBV+Zt/?=
+ =?us-ascii?Q?KTf1oH6Dyi45QTu4hklSZqlIZx2c7pJUBBKLmICy4JUXyE1TGAOo1A+FLAJT?=
+ =?us-ascii?Q?xMunvuEoryMEhPTR+IFh7exbFGCp333+YLv2T6+AAGJHc1e+NtP6XWuqOCZu?=
+ =?us-ascii?Q?HmdzjrrJREihwS90dis6xIUUHnLkqY+UeTNz/8xg6T2LXi7UbYFJp0U6ReZi?=
+ =?us-ascii?Q?0HSFmI1yEfkEhhqjnJdIOwoLqxduXJU7AfRFwrKjO4q+ThA+OA/ToHcwmoUF?=
+ =?us-ascii?Q?/A/MrXqoKzU2SSCCVVRXOAKYpG7I4bhsAg2h+Y3Huo4hzKUwr0zTXXJ8ne+Y?=
+ =?us-ascii?Q?kkFXZhXSDDPdCicDY+MfSsTOQxF7XF5cwNc0NyAg19GHANtqLgdmXndlDu+9?=
+ =?us-ascii?Q?cidbtB+6rorx2OO4szZx7Le87NvVsEpU1CbJJkqTFkYu0Z0QLk6CtqS8nAZR?=
+ =?us-ascii?Q?+QcyHjkrEYtaWmBQC1gQq0DsocxeeJkQh2LuRK2Sof1FQ/I3/a0RiNj6L0qR?=
+ =?us-ascii?Q?cCj1B7sKTBBSukyimFOhgi4h813zTiqDPDU5qq2HRD6iEb1dSjsC5oRRuI3S?=
+ =?us-ascii?Q?J40hXLCKq1wV9EKoRVjBYcqD18unbJ01CxbG8NOaLw7C5w5uOXtS3Xr2/TgH?=
+ =?us-ascii?Q?oNmBYyNAP/FP7owE6GG2RY7e6bfLforS1XR/49ZwThhMYtAxZ1VvKWwU7D99?=
+ =?us-ascii?Q?3yt57t1s4hz6yOCphQYyuuh0KT/qT1WKV3uLWZbU+T5CD69qdpCjGGAXK53C?=
+ =?us-ascii?Q?O3sIZMzjirzYXlNzWNZABNpgJ247upZAm/qQzzs6GQb+zeWc6dmZHEaqeIeV?=
+ =?us-ascii?Q?vYmSXrMWxApSQFsSy1VO/4alxv2JTiQp5oi/7YPmJtrXb9M2lrgfin/mqcJN?=
+ =?us-ascii?Q?4AWgF71gP28RAbMnRvMhxAeRkxo+GpdejrV6YsPNaqAqEcYEgda1FQw1Dict?=
+ =?us-ascii?Q?ZKutx0ISJuKHXuGF5mL90z5sqC4ZIxGWseOTAjvhYGsaR09NoDhRFalJJC6O?=
+ =?us-ascii?Q?Rf2eloJNTckw/5ANzGYozwU4RUjPkVHKlD2eKEpyYLwzgHYf3+4m6OEqMh8h?=
+ =?us-ascii?Q?5TyCcki1zhOAlVtk6FG58SCkZ2CQ1azSs6PbvoCtoC7alKf0h11fKyur8mBW?=
+ =?us-ascii?Q?HYNt8Hh/xYkbmiups+Kcu56ZGtLq62n3GlOBlw+brbiOEllk+AuJ5YEgkKDE?=
+ =?us-ascii?Q?rQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a674d923-3a52-4cb5-38d8-08dd3d44902d
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8603.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2025 13:31:24.3318
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gRsMah+FKz9LgU6kwZPt5mCiBPTGGg7w+llGISlSjt9LAc6ePWaXr+IgX8Wlgg+oMPYjtnJxTngu/dqqhUjGwg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8551
+X-OriginatorOrg: intel.com
 
 
-This seems like an interesting idea, but how do you intend to use the
-temperature?
 
-With this patch, it looks like you're just calculating it, but there is
-nothing that uses it and there is no way to access the temperature from
-userland. It would be nice to see this value used by an existing
-subsystem to drive data placement so we can see how it will help
-things.
+Hello,
 
-> diff --git a/fs/Kconfig b/fs/Kconfig
-> index 64d420e3c475..ae117c2e3ce2 100644
-> --- a/fs/Kconfig
-> +++ b/fs/Kconfig
-> @@ -139,6 +139,8 @@ source "fs/autofs/Kconfig"
->  source "fs/fuse/Kconfig"
->  source "fs/overlayfs/Kconfig"
-> =20
-> +source "fs/data-temperature/Kconfig"
-> +
->  menu "Caches"
-> =20
->  source "fs/netfs/Kconfig"
-> diff --git a/fs/Makefile b/fs/Makefile
-> index 15df0a923d3a..c7e6ccac633d 100644
-> --- a/fs/Makefile
-> +++ b/fs/Makefile
-> @@ -129,3 +129,4 @@ obj-$(CONFIG_EROFS_FS)		+=3D erofs/
->  obj-$(CONFIG_VBOXSF_FS)		+=3D vboxsf/
->  obj-$(CONFIG_ZONEFS_FS)		+=3D zonefs/
->  obj-$(CONFIG_BPF_LSM)		+=3D bpf_fs_kfuncs.o
-> +obj-$(CONFIG_DATA_TEMPERATURE)	+=3D data-temperature/
-> diff --git a/fs/data-temperature/Kconfig b/fs/data-temperature/Kconfig
-> new file mode 100644
-> index 000000000000..1cade2741982
-> --- /dev/null
-> +++ b/fs/data-temperature/Kconfig
-> @@ -0,0 +1,11 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +config DATA_TEMPERATURE
-> +	bool "Data temperature approach for efficient data placement"
-> +	help
-> +	  Enable data "temperature" estimation for efficient data
-> +	  placement policy. This approach is file based and
-> +	  it estimates "temperature" for every file independently.
-> +	  The goal of the approach is to provide valuable hints
-> +	  to file system or/and SSD for isolation and proper
-> +	  managament of data with different temperatures.
-> diff --git a/fs/data-temperature/Makefile b/fs/data-temperature/Makefile
-> new file mode 100644
-> index 000000000000..8e089a681360
-> --- /dev/null
-> +++ b/fs/data-temperature/Makefile
-> @@ -0,0 +1,3 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +obj-$(CONFIG_DATA_TEMPERATURE) +=3D data_temperature.o
-> diff --git a/fs/data-temperature/data_temperature.c b/fs/data-temperature=
-/data_temperature.c
-> new file mode 100644
-> index 000000000000..ea43fbfc3976
-> --- /dev/null
-> +++ b/fs/data-temperature/data_temperature.c
-> @@ -0,0 +1,347 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Data "temperature" paradigm implementation
-> + *
-> + * Copyright (c) 2024-2025 Viacheslav Dubeyko <slava@dubeyko.com>
-> + */
-> +
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/pagemap.h>
-> +#include <linux/data_temperature.h>
-> +#include <linux/fs.h>
-> +
-> +#define TIME_IS_UNKNOWN		(U64_MAX)
-> +
-> +struct kmem_cache *data_temperature_info_cachep;
-> +
-> +static inline
-> +void create_data_temperature_info(struct data_temperature *dt_info)
-> +{
-> +	if (!dt_info)
-> +		return;
-> +
-> +	atomic_set(&dt_info->temperature, 0);
-> +	dt_info->updated_blocks =3D 0;
-> +	dt_info->dirty_blocks =3D 0;
-> +	dt_info->start_timestamp =3D TIME_IS_UNKNOWN;
-> +	dt_info->end_timestamp =3D TIME_IS_UNKNOWN;
-> +	dt_info->state =3D DATA_TEMPERATURE_CREATED;
-> +}
-> +
-> +static inline
-> +void free_data_temperature_info(struct data_temperature *dt_info)
-> +{
-> +	if (!dt_info)
-> +		return;
-> +
-> +	kmem_cache_free(data_temperature_info_cachep, dt_info);
-> +}
-> +
-> +int __set_data_temperature_info(struct inode *inode)
-> +{
-> +	struct data_temperature *dt_info;
-> +
-> +	dt_info =3D kmem_cache_zalloc(data_temperature_info_cachep, GFP_KERNEL)=
-;
-> +	if (!dt_info)
-> +		return -ENOMEM;
-> +
-> +	spin_lock_init(&dt_info->change_lock);
-> +	create_data_temperature_info(dt_info);
-> +
-> +	if (cmpxchg_release(&inode->i_data_temperature_info,
-> +					NULL, dt_info) !=3D NULL) {
-> +		free_data_temperature_info(dt_info);
-> +		get_data_temperature_info(inode);
-> +	}
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(__set_data_temperature_info);
-> +
-> +void __remove_data_temperature_info(struct inode *inode)
-> +{
-> +	free_data_temperature_info(inode->i_data_temperature_info);
-> +	inode->i_data_temperature_info =3D NULL;
-> +}
-> +EXPORT_SYMBOL_GPL(__remove_data_temperature_info);
-> +
-> +int __get_data_temperature(const struct inode *inode)
-> +{
-> +	struct data_temperature *dt_info;
-> +
-> +	if (!S_ISREG(inode->i_mode))
-> +		return 0;
-> +
-> +	dt_info =3D get_data_temperature_info(inode);
-> +	if (IS_ERR_OR_NULL(dt_info))
-> +		return 0;
-> +
-> +	return atomic_read(&dt_info->temperature);
-> +}
-> +EXPORT_SYMBOL_GPL(__get_data_temperature);
-> +
-> +static inline
-> +bool is_timestamp_invalid(struct data_temperature *dt_info)
-> +{
-> +	if (!dt_info)
-> +		return false;
-> +
-> +	if (dt_info->start_timestamp =3D=3D TIME_IS_UNKNOWN ||
-> +	    dt_info->end_timestamp =3D=3D TIME_IS_UNKNOWN)
-> +		return true;
-> +
-> +	if (dt_info->start_timestamp > dt_info->end_timestamp)
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
-> +static inline
-> +u64 get_current_timestamp(void)
-> +{
-> +	return ktime_get_boottime_ns();
-> +}
-> +
-> +static inline
-> +void start_account_data_temperature_info(struct data_temperature *dt_inf=
-o)
-> +{
-> +	if (!dt_info)
-> +		return;
-> +
-> +	dt_info->dirty_blocks =3D 1;
-> +	dt_info->start_timestamp =3D get_current_timestamp();
-> +	dt_info->end_timestamp =3D TIME_IS_UNKNOWN;
-> +	dt_info->state =3D DATA_TEMPERATURE_UPDATE_STARTED;
-> +}
-> +
-> +static inline
-> +void __increase_data_temperature(struct inode *inode,
-> +				 struct data_temperature *dt_info)
-> +{
-> +	u64 bytes_count;
-> +	u64 file_blocks;
-> +	u32 block_bytes;
-> +	int dirty_blocks_ratio;
-> +	int updated_blocks_ratio;
-> +	int old_temperature;
-> +	int calculated;
-> +
-> +	if (!inode || !dt_info)
-> +		return;
-> +
-> +	block_bytes =3D 1 << inode->i_blkbits;
-> +	bytes_count =3D i_size_read(inode) + block_bytes - 1;
-> +	file_blocks =3D bytes_count >> inode->i_blkbits;
-> +
-> +	dt_info->dirty_blocks++;
-> +
-> +	if (file_blocks > 0) {
-> +		old_temperature =3D atomic_read(&dt_info->temperature);
-> +
-> +		dirty_blocks_ratio =3D div_u64(dt_info->dirty_blocks,
-> +						file_blocks);
-> +		updated_blocks_ratio =3D div_u64(dt_info->updated_blocks,
-> +						file_blocks);
-> +		calculated =3D max_t(int, dirty_blocks_ratio,
-> +					updated_blocks_ratio);
-> +
-> +		if (calculated > 0 && old_temperature < calculated)
-> +			atomic_set(&dt_info->temperature, calculated);
-> +	}
-> +}
-> +
-> +static inline
-> +void __decrease_data_temperature(struct inode *inode,
-> +				 struct data_temperature *dt_info)
-> +{
-> +	u64 timestamp;
-> +	u64 time_range;
-> +	u64 time_diff;
-> +	u64 bytes_count;
-> +	u64 file_blocks;
-> +	u32 block_bytes;
-> +	u64 blks_per_temperature_degree;
-> +	u64 ns_per_block;
-> +	u64 temperature_diff;
-> +
-> +	if (!inode || !dt_info)
-> +		return;
-> +
-> +	if (is_timestamp_invalid(dt_info)) {
-> +		create_data_temperature_info(dt_info);
-> +		return;
-> +	}
-> +
-> +	timestamp =3D get_current_timestamp();
-> +
-> +	if (dt_info->end_timestamp > timestamp) {
-> +		create_data_temperature_info(dt_info);
-> +		return;
-> +	}
-> +
-> +	time_range =3D dt_info->end_timestamp - dt_info->start_timestamp;
-> +	time_diff =3D timestamp - dt_info->end_timestamp;
-> +
-> +	block_bytes =3D 1 << inode->i_blkbits;
-> +	bytes_count =3D i_size_read(inode) + block_bytes - 1;
-> +	file_blocks =3D bytes_count >> inode->i_blkbits;
-> +
-> +	blks_per_temperature_degree =3D file_blocks;
-> +	if (blks_per_temperature_degree =3D=3D 0) {
-> +		start_account_data_temperature_info(dt_info);
-> +		return;
-> +	}
-> +
-> +	if (dt_info->updated_blocks =3D=3D 0 || time_range =3D=3D 0) {
-> +		start_account_data_temperature_info(dt_info);
-> +		return;
-> +	}
-> +
-> +	ns_per_block =3D div_u64(time_range, dt_info->updated_blocks);
-> +	if (ns_per_block =3D=3D 0)
-> +		ns_per_block =3D 1;
-> +
-> +	if (time_diff =3D=3D 0) {
-> +		start_account_data_temperature_info(dt_info);
-> +		return;
-> +	}
-> +
-> +	temperature_diff =3D div_u64(time_diff, ns_per_block);
-> +	temperature_diff =3D div_u64(temperature_diff,
-> +					blks_per_temperature_degree);
-> +
-> +	if (temperature_diff =3D=3D 0)
-> +		return;
-> +
-> +	if (temperature_diff <=3D atomic_read(&dt_info->temperature)) {
-> +		atomic_sub(temperature_diff, &dt_info->temperature);
-> +		dt_info->updated_blocks -=3D
-> +			temperature_diff * blks_per_temperature_degree;
-> +	} else {
-> +		atomic_set(&dt_info->temperature, 0);
-> +		dt_info->updated_blocks =3D 0;
-> +	}
-> +}
-> +
-> +int __increase_data_temperature_by_dirty_folio(struct folio *folio)
-> +{
-> +	struct inode *inode;
-> +	struct data_temperature *dt_info;
-> +
-> +	if (!folio || !folio->mapping)
-> +		return 0;
-> +
-> +	inode =3D folio_inode(folio);
-> +
-> +	if (!S_ISREG(inode->i_mode))
-> +		return 0;
-> +
-> +	dt_info =3D get_data_temperature_info(inode);
-> +	if (IS_ERR_OR_NULL(dt_info))
-> +		return 0;
-> +
-> +	spin_lock(&dt_info->change_lock);
-> +	switch (dt_info->state) {
-> +	case DATA_TEMPERATURE_CREATED:
-> +		atomic_set(&dt_info->temperature, 0);
-> +		start_account_data_temperature_info(dt_info);
-> +		break;
-> +
-> +	case DATA_TEMPERATURE_UPDATE_STARTED:
-> +		__increase_data_temperature(inode, dt_info);
-> +		break;
-> +
-> +	case DATA_TEMPERATURE_UPDATE_FINISHED:
-> +		__decrease_data_temperature(inode, dt_info);
-> +		start_account_data_temperature_info(dt_info);
-> +		break;
-> +
-> +	default:
-> +		/* do nothing */
-> +		break;
-> +	}
-> +	spin_unlock(&dt_info->change_lock);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(__increase_data_temperature_by_dirty_folio);
-> +
-> +static inline
-> +void decrement_dirty_blocks(struct data_temperature *dt_info)
-> +{
-> +	if (!dt_info)
-> +		return;
-> +
-> +	if (dt_info->dirty_blocks > 0) {
-> +		dt_info->dirty_blocks--;
-> +		dt_info->updated_blocks++;
-> +	}
-> +}
-> +
-> +static inline
-> +void finish_increasing_data_temperature(struct data_temperature *dt_info=
-)
-> +{
-> +	if (!dt_info)
-> +		return;
-> +
-> +	if (dt_info->dirty_blocks =3D=3D 0) {
-> +		dt_info->end_timestamp =3D get_current_timestamp();
-> +		dt_info->state =3D DATA_TEMPERATURE_UPDATE_FINISHED;
-> +	}
-> +}
-> +
-> +int __account_flushed_folio_by_data_temperature(struct folio *folio)
-> +{
-> +	struct inode *inode;
-> +	struct data_temperature *dt_info;
-> +
-> +	if (!folio || !folio->mapping)
-> +		return 0;
-> +
-> +	inode =3D folio_inode(folio);
-> +
-> +	if (!S_ISREG(inode->i_mode))
-> +		return 0;
-> +
-> +	dt_info =3D get_data_temperature_info(inode);
-> +	if (IS_ERR_OR_NULL(dt_info))
-> +		return 0;
-> +
-> +	spin_lock(&dt_info->change_lock);
-> +	switch (dt_info->state) {
-> +	case DATA_TEMPERATURE_CREATED:
-> +		create_data_temperature_info(dt_info);
-> +		break;
-> +
-> +	case DATA_TEMPERATURE_UPDATE_STARTED:
-> +		if (dt_info->dirty_blocks > 0)
-> +			decrement_dirty_blocks(dt_info);
-> +		if (dt_info->dirty_blocks =3D=3D 0)
-> +			finish_increasing_data_temperature(dt_info);
-> +		break;
-> +
-> +	case DATA_TEMPERATURE_UPDATE_FINISHED:
-> +		/* do nothing */
-> +		break;
-> +
-> +	default:
-> +		/* do nothing */
-> +		break;
-> +	}
-> +	spin_unlock(&dt_info->change_lock);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(__account_flushed_folio_by_data_temperature);
-> +
-> +static int __init data_temperature_init(void)
-> +{
-> +	data_temperature_info_cachep =3D KMEM_CACHE(data_temperature,
-> +						  SLAB_RECLAIM_ACCOUNT);
-> +	if (!data_temperature_info_cachep)
-> +		return -ENOMEM;
-> +
-> +	return 0;
-> +}
-> +late_initcall(data_temperature_init)
-> diff --git a/include/linux/data_temperature.h b/include/linux/data_temper=
-ature.h
-> new file mode 100644
-> index 000000000000..40abf6322385
-> --- /dev/null
-> +++ b/include/linux/data_temperature.h
-> @@ -0,0 +1,124 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Data "temperature" paradigm declarations
-> + *
-> + * Copyright (c) 2024-2025 Viacheslav Dubeyko <slava@dubeyko.com>
-> + */
-> +
-> +#ifndef _LINUX_DATA_TEMPERATURE_H
-> +#define _LINUX_DATA_TEMPERATURE_H
-> +
-> +/*
-> + * struct data_temperature - data temperature definition
-> + * @temperature: current temperature of a file
-> + * @change_lock: modification lock
-> + * @state: current state of data temperature object
-> + * @dirty_blocks: current number of dirty blocks in page cache
-> + * @updated_blocks: number of updated blocks [start_timestamp, end_times=
-tamp]
-> + * @start_timestamp: starting timestamp of update operations
-> + * @end_timestamp: finishing timestamp of update operations
-> + */
-> +struct data_temperature {
-> +	atomic_t temperature;
-> +
-> +	spinlock_t change_lock;
-> +	int state;
-> +	u64 dirty_blocks;
-> +	u64 updated_blocks;
-> +	u64 start_timestamp;
-> +	u64 end_timestamp;
-> +};
-> +
-> +enum data_temperature_state {
-> +	DATA_TEMPERATURE_UNKNOWN_STATE,
-> +	DATA_TEMPERATURE_CREATED,
-> +	DATA_TEMPERATURE_UPDATE_STARTED,
-> +	DATA_TEMPERATURE_UPDATE_FINISHED,
-> +	DATA_TEMPERATURE_STATE_MAX
-> +};
-> +
-> +#ifdef CONFIG_DATA_TEMPERATURE
-> +
-> +int __set_data_temperature_info(struct inode *inode);
-> +void __remove_data_temperature_info(struct inode *inode);
-> +int __get_data_temperature(const struct inode *inode);
-> +int __increase_data_temperature_by_dirty_folio(struct folio *folio);
-> +int __account_flushed_folio_by_data_temperature(struct folio *folio);
-> +
-> +static inline
-> +struct data_temperature *get_data_temperature_info(const struct inode *i=
-node)
-> +{
-> +	return smp_load_acquire(&inode->i_data_temperature_info);
-> +}
-> +
-> +static inline
-> +int set_data_temperature_info(struct inode *inode)
-> +{
-> +	return __set_data_temperature_info(inode);
-> +}
-> +
-> +static inline
-> +void remove_data_temperature_info(struct inode *inode)
-> +{
-> +	__remove_data_temperature_info(inode);
-> +}
-> +
-> +static inline
-> +int get_data_temperature(const struct inode *inode)
-> +{
-> +	return __get_data_temperature(inode);
-> +}
-> +
-> +static inline
-> +int increase_data_temperature_by_dirty_folio(struct folio *folio)
-> +{
-> +	return __increase_data_temperature_by_dirty_folio(folio);
-> +}
-> +
-> +static inline
-> +int account_flushed_folio_by_data_temperature(struct folio *folio)
-> +{
-> +	return __account_flushed_folio_by_data_temperature(folio);
-> +}
-> +
-> +#else  /* !CONFIG_DATA_TEMPERATURE */
-> +
-> +static inline
-> +int set_data_temperature_info(struct inode *inode)
-> +{
-> +	return 0;
-> +}
-> +
-> +static inline
-> +void remove_data_temperature_info(struct inode *inode)
-> +{
-> +	return;
-> +}
-> +
-> +static inline
-> +struct data_temperature *get_data_temperature_info(const struct inode *i=
-node)
-> +{
-> +	return ERR_PTR(-EOPNOTSUPP);
-> +}
-> +
-> +static inline
-> +int get_data_temperature(const struct inode *inode)
-> +{
-> +	return 0;
-> +}
-> +
-> +static inline
-> +int increase_data_temperature_by_dirty_folio(struct folio *folio)
-> +{
-> +	return 0;
-> +}
-> +
-> +static inline
-> +int account_flushed_folio_by_data_temperature(struct folio *folio)
-> +{
-> +	return 0;
-> +}
-> +
-> +#endif	/* CONFIG_DATA_TEMPERATURE */
-> +
-> +#endif	/* _LINUX_DATA_TEMPERATURE_H */
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index a4af70367f8a..57c4810a28a0 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -753,6 +753,10 @@ struct inode {
->  	struct fsverity_info	*i_verity_info;
->  #endif
-> =20
-> +#ifdef CONFIG_DATA_TEMPERATURE
-> +	struct data_temperature		*i_data_temperature_info;
-> +#endif
-> +
->  	void			*i_private; /* fs or device private pointer */
->  } __randomize_layout;
-> =20
-> diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-> index d9861e42b2bd..5de458b7fefc 100644
-> --- a/mm/page-writeback.c
-> +++ b/mm/page-writeback.c
-> @@ -38,6 +38,7 @@
->  #include <linux/sched/rt.h>
->  #include <linux/sched/signal.h>
->  #include <linux/mm_inline.h>
-> +#include <linux/data_temperature.h>
->  #include <trace/events/writeback.h>
-> =20
->  #include "internal.h"
-> @@ -2775,6 +2776,10 @@ static void folio_account_dirtied(struct folio *fo=
-lio,
->  		__this_cpu_add(bdp_ratelimits, nr);
-> =20
->  		mem_cgroup_track_foreign_dirty(folio, wb);
-> +
-> +#ifdef CONFIG_DATA_TEMPERATURE
-> +		increase_data_temperature_by_dirty_folio(folio);
-> +#endif	/* CONFIG_DATA_TEMPERATURE */
->  	}
->  }
-> =20
-> @@ -3006,6 +3011,10 @@ bool folio_clear_dirty_for_io(struct folio *folio)
-> =20
->  	VM_BUG_ON_FOLIO(!folio_test_locked(folio), folio);
-> =20
-> +#ifdef CONFIG_DATA_TEMPERATURE
-> +	account_flushed_folio_by_data_temperature(folio);
-> +#endif	/* CONFIG_DATA_TEMPERATURE */
-> +
->  	if (mapping && mapping_can_writeback(mapping)) {
->  		struct inode *inode =3D mapping->host;
->  		struct bdi_writeback *wb;
+kernel test robot noticed "ltp.ioctl_loop01.fail" on:
 
---=20
-Jeff Layton <jlayton@kernel.org>
+commit: ae074d07a0e5c05769f1a9a2faa260c36d69465e ("loop: move updating lo_flags out of loop_set_status_from_info")
+https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+
+[test failed on linus/master      d0d106a2bd21499901299160744e5fe9f4c83ddb]
+[test failed on linux-next/master 853d1f41ba73e78d22e7075d9a95670aab187eba]
+
+in testcase: ltp
+version: ltp-x86_64-14c1f76-1_20250118
+with following parameters:
+
+	disk: 1HDD
+	fs: f2fs
+	test: syscalls-02/ioctl_loop01
+
+
+
+config: x86_64-rhel-9.4-ltp
+compiler: gcc-12
+test machine: 16 threads 1 sockets Intel(R) Xeon(R) E-2278G CPU @ 3.40GHz (Coffee Lake-E) with 32G memory
+
+(please refer to attached dmesg/kmsg for entire log/backtrace)
+
+
+
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <oliver.sang@intel.com>
+| Closes: https://lore.kernel.org/oe-lkp/202501252047.54df4ae2-lkp@intel.com
+
+
+<<<test_start>>>
+tag=ioctl_loop01 stime=1737653109
+cmdline="ioctl_loop01"
+contacts=""
+analysis=exit
+<<<test_output>>>
+tst_tmpdir.c:316: TINFO: Using /fs/sda2/tmpdir/ltp-OFRIRZBJcX/LTP_ioc76XFGO as tmpdir (f2fs filesystem)
+tst_test.c:1900: TINFO: LTP version: 20240930-220-g02d5e99df
+tst_test.c:1904: TINFO: Tested kernel: 6.13.0-rc4-00053-gae074d07a0e5 #1 SMP PREEMPT_DYNAMIC Fri Jan 24 00:58:06 CST 2025 x86_64
+tst_kconfig.c:88: TINFO: Parsing kernel config '/proc/config.gz'
+tst_kconfig.c:667: TINFO: CONFIG_KASAN kernel option detected which might slow the execution
+tst_test.c:1722: TINFO: Overall timeout per run is 0h 10m 00s
+tst_device.c:96: TINFO: Found free device 0 '/dev/loop0'
+tst_buffers.c:57: TINFO: Test is using guarded buffers
+ioctl_loop01.c:86: TPASS: /sys/block/loop0/loop/partscan = 0
+ioctl_loop01.c:87: TPASS: /sys/block/loop0/loop/autoclear = 0
+ioctl_loop01.c:88: TPASS: /sys/block/loop0/loop/backing_file = '/fs/sda2/tmpdir/ltp-OFRIRZBJcX/LTP_ioc76XFGO/test.img'
+ioctl_loop01.c:58: TPASS: get expected lo_flag 12
+ioctl_loop01.c:60: TPASS: /sys/block/loop0/loop/partscan = 1
+ioctl_loop01.c:61: TPASS: /sys/block/loop0/loop/autoclear = 1
+tst_kconfig.c:88: TINFO: Parsing kernel config '/proc/config.gz'
+tst_kconfig.c:667: TINFO: CONFIG_KASAN kernel option detected which might slow the execution
+ioctl_loop01.c:70: TPASS: access /dev/loop0p1 succeeds
+tst_kconfig.c:88: TINFO: Parsing kernel config '/proc/config.gz'
+tst_kconfig.c:667: TINFO: CONFIG_KASAN kernel option detected which might slow the execution
+ioctl_loop01.c:76: TPASS: access /sys/block/loop0/loop0p1 succeeds
+ioctl_loop01.c:92: TINFO: Test flag can be clear
+ioctl_loop01.c:58: TPASS: get expected lo_flag 0
+ioctl_loop01.c:60: TFAIL: /sys/block/loop0/loop/partscan != 1 got 0
+ioctl_loop01.c:61: TPASS: /sys/block/loop0/loop/autoclear = 0
+tst_kconfig.c:88: TINFO: Parsing kernel config '/proc/config.gz'
+tst_kconfig.c:667: TINFO: CONFIG_KASAN kernel option detected which might slow the execution
+ioctl_loop01.c:70: TPASS: access /dev/loop0p1 succeeds
+tst_kconfig.c:88: TINFO: Parsing kernel config '/proc/config.gz'
+tst_kconfig.c:667: TINFO: CONFIG_KASAN kernel option detected which might slow the execution
+ioctl_loop01.c:76: TPASS: access /sys/block/loop0/loop0p1 succeeds
+
+HINT: You _MAY_ be missing kernel fixes:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=10c70d95c0f2
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6ac92fb5cdff
+
+Summary:
+passed   12
+failed   1
+broken   0
+skipped  0
+warnings 0
+incrementing stop
+<<<execution_status>>>
+initiation_status="ok"
+duration=1 termination_type=exited termination_id=1 corefile=no
+cutime=1 cstime=8
+<<<test_end>>>
+INFO: ltp-pan reported some tests FAIL
+LTP Version: 20240930-220-g02d5e99df
+
+       ###############################################################
+
+            Done executing testcases.
+            LTP Version:  20240930-220-g02d5e99df
+       ###############################################################
+
+
+
+
+The kernel config and materials to reproduce are available at:
+https://download.01.org/0day-ci/archive/20250125/202501252047.54df4ae2-lkp@intel.com
+
+
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
