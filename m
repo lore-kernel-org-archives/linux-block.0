@@ -1,44 +1,56 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A06318A93E;
-	Fri, 24 Jan 2025 22:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB251DE4EA
+	for <linux-block@vger.kernel.org>; Sat, 25 Jan 2025 01:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737759074; cv=none; b=ctqdxFqaTAusLmBIUqiHVwyRDlHiMYbF0QF1M/K0tED4UxNtXXP2SjQZWudqN9Jf0LsV1sD2Wmuqp/HoNNoaFhDBXwuNn3X06KBxdohsdl0aLJgWw+76ONq++4ViO05Mb79nOJy3JpxnaX9+ZjYdUCpSC1yRNi5LrrtbZ1nZ/GY=
+	t=1737768552; cv=none; b=kfBP6ZOZoBOX1+JD+N8mmJpvgjvt9NTe2v7ZaapnDKZlMkPHFxn6T1KFQ/Ph4EaEKwZte/x8O37W/xLtxp8R7uIdqchmugh3FVQdmbhd92MZaDMiArh+vu/GH8cbBjxQrXrKO3/Eope+Rn2clKnFhBPckSZYThaPVq+0gzAO2vU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737759074; c=relaxed/simple;
-	bh=/4ia0cKzOQoJsdsRk6UHyV8zwNTGzhHMTsimoeWVHb8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mvdhnTTmiVRpy6paQB0jknbJ5zfx1OaoeyBvyYPMDGfkz9Ge6D0fEBL7pHfrUYcR5f+HeeIyLNluWF8q4cPaNWaJmPc0SrCGL01TP1k2GfzZDEb+GXMS4dgqXwasZkP30MveqPUKaj1bM47vLB8pqp2vMJbnzSa4r/qVicgPGk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mSSDvrXL; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1737768552; c=relaxed/simple;
+	bh=IAs4tz9TAZjxKmr/w3h/EXDqCxy8fntJfmuvyt8iXn8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GRXlaGpUDVdK+4eUkW3Ies9WgnEUTDUm04Jku2wERw3j4UQZLkpKKugyGvJAbzOG7DRS4HVZhiZ+M3PNpRCMtgS95OCP7+wwcUPNo4f/k3P7JW4hR8dvOozEzjPpa7OhykTW+Duzou8RS8wjXdLWs4h2qpqSfyzAzgRg1TeFaKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=QwnGPbMM; arc=none smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mSSDvrXL"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=ONWpJCQ1y00OH6khfXOorwlc6DOA2hoNVf6rj3r415k=; b=mSSDvrXLHDHaJ7EETzZqcol+L9
-	aQqG11IdzpunfkNU/3p9wBluCbkh63f+B7K7KCitdir9MuUxm1raLnes16gAzD2z6Y5nfqg+ZfJdm
-	KoN1opGDxUsKejCki1u1TwOkKxicCTS8GahOoarsdGy7Fo2qtVxRFcPso6SpzFRp5QSJ7dt0pVrkH
-	eU3ZaVQXeOCZes+55eYTxVt0MFO8RENG3HWCS7DIwVJ/x3gM9XnV5953FBjACWLK/sKMxO8ekhCb7
-	VON/BcObaTBmtxZkevtitKGBnMRqonZxrB4PL54yGzkvNUdsHDNIOQ+s74RRY+/zItlQJLbFdIdAd
-	p3sw5wSA==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tbSW6-00000001N2G-45Iz;
-	Fri, 24 Jan 2025 22:51:11 +0000
-From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	linux-mm@kvack.org,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Andres Freund <andres@anarazel.de>
-Subject: [PATCH] block: Skip the folio lock if the folio is already dirty
-Date: Fri, 24 Jan 2025 22:51:02 +0000
-Message-ID: <20250124225104.326613-1-willy@infradead.org>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="QwnGPbMM"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1737768550; x=1769304550;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=IAs4tz9TAZjxKmr/w3h/EXDqCxy8fntJfmuvyt8iXn8=;
+  b=QwnGPbMMUQWI11gfOvph4god8rsbEf/DB3BWKnNvnku+xa4mWEDzL2ar
+   OB4fZO7XwxZj0y5tBOWMACBfW+/o5Ch5HbYdNPkh78XQ32SqqibZ1YN9E
+   RtzdwpaPkoh1hCnnmuzH5a1Ci/RcV7qT2k7luTURsrD9KqGFUnJAtIsK6
+   MQVc6hWtjJuJ63vHWU2yWmjJwa59BK/L9LfvMRxFPF30jBRKNGw0PLPLC
+   D+UqmfYe+dpIX1cLk3MRQI8x7sFGtj2puid1/H9YoR5cvLZpUQBg774b7
+   wp9RQzcbsED0PnaEeA1bcQub1YhMYdi7wmeCY27jtp3bBXl+ECdYDoNWS
+   g==;
+X-CSE-ConnectionGUID: Dv1GrvpyQmSYPv/ceTML4w==
+X-CSE-MsgGUID: Byb/4rEWTfW1PYi6kWZnNA==
+X-IronPort-AV: E=Sophos;i="6.13,232,1732550400"; 
+   d="scan'208";a="37973934"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Jan 2025 09:29:09 +0800
+IronPort-SDR: 679430cb_E4GYU8XjaEs8pb+KyT+1R1EsT86Iagz8HUnLbWy82gAJ1xE
+ r7SpRt6nDs2oYOemDrzhWnyMphlPkV/Ah2VvsUg==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Jan 2025 16:31:08 -0800
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
+  by uls-op-cesaip01.wdc.com with ESMTP; 24 Jan 2025 17:29:09 -0800
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH v5 0/5] null_blk: improve write failure simulation
+Date: Sat, 25 Jan 2025 10:29:03 +0900
+Message-ID: <20250125012908.1259887-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,38 +59,58 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Postgres sees significant contention on the hashed folio waitqueue lock
-when performing direct I/O to 1GB hugetlb pages.  This is because we
-mark the destination pages as dirty, and the locks end up 512x more
-contended with 1GB pages than with 2MB pages.
+Currently, null_blk has 'badblocks' parameter to simulate IO failures
+for broken blocks. This helps checking if userland tools can handle IO
+failures. However, this badblocks feature has two differences from the
+IO failures on real storage devices. Firstly, when write operations fail
+for the badblocks, null_blk does not write any data, while real storage
+devices sometimes do partial data write. Secondly, null_blk always make
+write operations fail for the specified badblocks, while real storage
+devices can recover the bad blocks so that next write operations can
+succeed after failure. Hence, real storage devices are required to check
+if userland tools support such partial writes or bad blocks recovery.
 
-We can skip the locking if the folio is already marked as dirty.
-The writeback path clears the dirty flag before commencing writeback,
-if we see the dirty flag set, the data written to the folio will be
-written back.
+This series improves write failure simulation by null_blk to allow
+checking userland tools without real storage devices. The first patch
+is a preparation to make new feature addition simpler. The second patch
+introduces the 'badblocks_once' parameter to simulate bad blocks
+recovery. The third and the fourth patches prepare for the fifth patch.
+The fifth patch adds the partial IO support and introduces the
+'badblocks_partial_io' parameter.
 
-In one test, throughput increased from 18GB/s to 20GB/s and moved the
-bottleneck elsewhere.
+Changes from v4:
+* 3rd patch: Moved null_handle_badblocks() call and rewrote commit message
+* Added Reviewed-by tags
 
-Reported-by: Andres Freund <andres@anarazel.de>
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- block/bio.c | 2 ++
- 1 file changed, 2 insertions(+)
+Changes from v3:
+* 4th patch: Renamed null_handle_rq() to null_handle_data_transfer()
+* 5th patch: Improved comments of null_handle_badblocks()
+* Added Reviewed-by tags
 
-diff --git a/block/bio.c b/block/bio.c
-index f0c416e5931d..58d30b1dc08e 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1404,6 +1404,8 @@ void bio_set_pages_dirty(struct bio *bio)
- 	struct folio_iter fi;
- 
- 	bio_for_each_folio_all(fi, bio) {
-+		if (folio_test_dirty(fi.folio))
-+			continue;
- 		folio_lock(fi.folio);
- 		folio_mark_dirty(fi.folio);
- 		folio_unlock(fi.folio);
+Changes from v2:
+* 1st patch: Reflected comments on the list
+* 2nd patch: Moved the 4th patch in v2 series to 2nd
+             Reduced if-block nest level
+* 3rd patch: Added to fix zone resource management bug
+* 4th patch: Added to prepare for the next patch
+* 5th patch: Rewritten to care zone resource management
+             Introduced badblocks_patial_io parameter
+
+Changes from v1:
+* Added the first patch which avoids the long, multi-line features string
+
+Shin'ichiro Kawasaki (5):
+  null_blk: generate null_blk configfs features string
+  null_blk: introduce badblocks_once parameter
+  null_blk: replace null_process_cmd() call in null_zone_write()
+  null_blk: pass transfer size to null_handle_rq()
+  null_blk: do partial IO for bad blocks
+
+ drivers/block/null_blk/main.c     | 164 +++++++++++++++++++-----------
+ drivers/block/null_blk/null_blk.h |   6 ++
+ drivers/block/null_blk/zoned.c    |  20 +++-
+ 3 files changed, 129 insertions(+), 61 deletions(-)
+
 -- 
-2.45.2
+2.47.0
 
