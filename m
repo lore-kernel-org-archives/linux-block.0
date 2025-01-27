@@ -1,42 +1,47 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9AA14E2E8
-	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 16:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9EE433CB
+	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 16:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737995047; cv=none; b=Rhuupw/KYV0rCQ2noOli+Ytpwa1oOvQnXO+NCm45RGx1ajZ9CKE8Ei9SyF8wZ+P1dBSvHH0tsumYJ2PKXIvpbfWgP8Ql13LI4XQhC1lSEmkLLmoMxhEH+r5wJL/R7ZnbMYDiWWlGRDrtErS2ITVBdb1m4uGck6u3RebpbZ9hRK8=
+	t=1737996973; cv=none; b=tumUj89p6ws1t2hXKAIgvbvDGYBnalNAehJDAlxR8kaffZUK848lEcXhNtKwefFiTINS8+USHjrDe5/F5TJS1l1AbMQzZWtpY38eF1gyIe7mg2bblvbyE7JfjG6NPYn6B8D6P7ds5iWXTFq0PAmAEjhzWogxY4myL4dV4oDB8Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737995047; c=relaxed/simple;
-	bh=WXa2YJuiY0ajuOmlaEQtEB/6JZudO0/adZLI3G3ihj8=;
+	s=arc-20240116; t=1737996973; c=relaxed/simple;
+	bh=Uea695+hgXefabi04BAaIGX/jFULstr2RuV81+JXuEI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o78g+K5ltRVsbiWCyv0MWyyZqYnmPMF8eOXP6NpAEpIn9Ugy167u9p47FgjytD6uvKp9wMy2iQGDhaQIISZILCbYhqLIRm26Nu14QsusO3a9VAOtA7VwRhygnYGGq5DOvFZTh0K35VELDM0OrLfLSp7yUKANm9s88e4H9eT9GtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzkShxc4; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ASUf60Ss/l5lMRlJWx27Jny1nEntBORY+JuxMM+zeMIKIPaVUjP0lIicXVh9O3jN5It7m/LR8ceUBIPreslIzd1BzIYauwM4FeytAoEZmriDQ99+RW+6PCqHGAmxBmmCIZFH9RVv6KIuH2Z3lHDOkGcHFn4IDyY5NrIFmhh/+5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=trEJLPBQ; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzkShxc4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FF58C4CEE0;
-	Mon, 27 Jan 2025 16:24:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737995046;
-	bh=WXa2YJuiY0ajuOmlaEQtEB/6JZudO0/adZLI3G3ihj8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VzkShxc45o6Inpo+sIiqo0h43EnBDypXGHHC/FEVup6W/ufdTLisj0W5T6gIG25hT
-	 18sSWfgzp/I1CVhs9s18clswhZNuwkXVcqzeJoAQPBIDGFpMytdJx/XcrcE2d/zq27
-	 011o9mwkwVpyKxUyTLVYtB4vWbCM2TmW+zaHjW+kQW8mOL//k4owIsyB5K9fOYGvtm
-	 m6Aw5s2MNXumD618aVqPvNg9CfInf+uaL4zJLv1oEG4os3wqzcoE4GetoEmiePQDBi
-	 EedINY/t5XuZZhkXIpB3l87LD0UDMg+8biV24Q3xKK9M+OZ50ZAyLUuH3xRuqk1syO
-	 EBAWWa/HQkXlA==
-Date: Mon, 27 Jan 2025 09:24:03 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: David Hildenbrand <david@redhat.com>, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, Muchun Song <muchun.song@linux.dev>,
-	Jane Chu <jane.chu@oracle.com>, Andres Freund <andres@anarazel.de>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="trEJLPBQ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=XY1ZfVc8WmomcNIooSDhWek/rzvPOimXm1nFYmDzRBQ=; b=trEJLPBQ9BS8VeeidK2KU4Rb0O
+	IImqYNuNIJRIcpu1g8ntmGDT9C9YJ85XCGSrqNPXjbu0hnmlrrCdPxPKMQ2uQ25xk9InUPy7gsdez
+	M1Gz4Wn/Dwr60mUo0YRTdY4OJ8+VIQTk60ZAcTOTMPZByRjlHfETkz3AzPTy6lbqyuFXtbXl2Xuzs
+	i/9J3ATg6Q3KzJBeYAvKySA+MpuLa9lYrC2pEIQJjt3urnJ13OC0ogl84iMQODU20dohZzB6vj+w4
+	HzsW4RWkI9keKF236bsRe8OG07zautcoTeytNaY9I1BebdLYcH6snTE7IqNWAqE97S26NOJJa3NZo
+	tkIoZF1Q==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tcSP9-00000009fxz-44xx;
+	Mon, 27 Jan 2025 16:56:08 +0000
+Date: Mon, 27 Jan 2025 16:56:07 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-mm@kvack.org, linux-block@vger.kernel.org,
+	Muchun Song <muchun.song@linux.dev>, Jane Chu <jane.chu@oracle.com>,
+	Andres Freund <andres@anarazel.de>
 Subject: Re: Direct I/O performance problems with 1GB pages
-Message-ID: <Z5ezI5qHksE3Tbzy@kbusch-mbp>
+Message-ID: <Z5e6p4itt-g5Ys97@casper.infradead.org>
 References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
  <e0ba55af-23c4-455e-9449-e74de652fb7c@redhat.com>
  <Z5euIf-OvrE1suWH@casper.infradead.org>
+ <f3710cc4-cbbf-4f1e-93a0-9eb6697df2d3@redhat.com>
+ <503c29c8-bcc7-4a6c-ab2e-ebf238a9a1db@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,18 +50,47 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z5euIf-OvrE1suWH@casper.infradead.org>
+In-Reply-To: <503c29c8-bcc7-4a6c-ab2e-ebf238a9a1db@redhat.com>
 
-On Mon, Jan 27, 2025 at 04:02:41PM +0000, Matthew Wilcox wrote:
-> Now, since postgres is using io_uring, perhaps there could be a path
-> which registers the memory with the iouring (doing the refcount/pincount
-> dance once), and then use that pinned memory for each I/O.  Maybe that
-> already exists; I'm not keeping up with io_uring development and I can't
-> seem to find any documentation on what things like io_provide_buffers()
-> actually do.
+On Mon, Jan 27, 2025 at 05:20:25PM +0100, David Hildenbrand wrote:
+> > >       14.04%  postgres         [kernel.kallsyms]          [k] try_grab_folio_fast
+> > >               |
+> > >                --14.04%--try_grab_folio_fast
+> > >                          gup_fast_fallback
+> > >                          |
+> > >                           --13.85%--iov_iter_extract_pages
+> > >                                     bio_iov_iter_get_pages
+> > >                                     iomap_dio_bio_iter
+> > >                                     __iomap_dio_rw
+> > >                                     iomap_dio_rw
+> > >                                     xfs_file_dio_read
+> > >                                     xfs_file_read_iter
+> > >                                     __io_read
+> > >                                     io_read
+> > >                                     io_issue_sqe
+> > >                                     io_submit_sqes
+> > >                                     __do_sys_io_uring_enter
+> > >                                     do_syscall_64
+> 
+> BTW, two things that come to mind:
+> 
+> 
+> (1) We always fallback to GUP-slow, I wonder why. GUP-fast would go via
+> try_grab_folio_fast().
 
-Yes, io_uring does hqve this capability. Here's a doc describing the
-liburing function that sets it up, and explains how to reference it in
-subsequent IO:
+I don't think we do?
 
-  https://unixism.net/loti/ref-liburing/advanced_usage.html#c.io_uring_register_buffers
+iov_iter_extract_pages() calls
+iov_iter_extract_user_pages() calls
+pin_user_pages_fast() calls
+gup_fast_fallback() calls
+gup_fast() calls
+gup_fast_pgd_range() calls
+gup_fast_p4d_range() calls
+gup_fast_pud_range() calls
+gup_fast_pud_leaf() calls
+try_grab_folio_fast() which is where we see the contention.
+
+If that were to fail, we'd see contention in __get_user_pages_locked(),
+right?
+
