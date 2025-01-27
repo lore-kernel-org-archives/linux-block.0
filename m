@@ -1,163 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF96194080;
-	Sun, 26 Jan 2025 14:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE7025A65E;
+	Mon, 27 Jan 2025 07:52:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737902940; cv=none; b=HrcSXD1Q5gOjwM5pBtKNAliFYFm+6eifMRvI5B1jATG1UnCR1sX8HuqBZu51b1IKfQFJfPCLtJNGaovGp/TVKOj4xILJ9MZroafo8qTCO9SR57xBeE7pHTJ8JC7bS+YmMoboWAyPA4eLAELxaUHwRzk4vklXMzqiR2nQxq9TiAM=
+	t=1737964333; cv=none; b=H1OxkqGIYfsKYbRjOFb0jCjsxleWMqlUKyfV3G8lNQ2+rBuDobSG175Lc6AT0SsSFKc0bA5uwDhEu/EoDFF4SXe9gxBp78n2bCs7rICwFrqsgVY01GxmwVZkBjCPsb+T7D6pvhFnPLV4Koz2ApNVLpNNEV9e8V1su+KywH5vm2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737902940; c=relaxed/simple;
-	bh=pSyI6sYQUIy8age47j4+sm2JuPCMfmeGvUHk9jzoqy4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uC3wvXHUbA9u/AMhbiT/dmSyARx/3DEfkPlLeL2h0tqKp3P2W+YO8whXiQewpAP2ICY8Od01hZ1vjtPWKwk4raiovGA+QX74wyfs4322gn3lTFk/2V1yTObFVxp9gxkYScy46w9kuZIFwH5uzQmN5XUa7u64u+ShyKZzjE17uVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eoVF0wXA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1737964333; c=relaxed/simple;
+	bh=eX8UEoc4fFngshTtGs9aGW8k3YdKYCh1ppa0H21yKDk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NJmX4pgK4xL/n/HPFod3eG8+bo1FCG3BpmnJgNSqLu45Ggg4NQ4R637VrC7wY5uktmEb4hKBSgmUGaogMlTl0TqHs3z9ev5SvzAijXqUXW6aA0qbRUr/foWfrNgeEtUrZ5LKP8VLv4Fx7L0/V48dtDu02+NRc0lxznQ8MV3dvEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yosWjN2y; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=pWQ1oK4R; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yosWjN2y; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=pWQ1oK4R; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eoVF0wXA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B172C4CEE2;
-	Sun, 26 Jan 2025 14:48:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737902940;
-	bh=pSyI6sYQUIy8age47j4+sm2JuPCMfmeGvUHk9jzoqy4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eoVF0wXA8jg1Fk4P/Sd8TL2RlhY/cy1hu7ODWMsTfp0GEGzhxJ+O66VBBK5nWIEq9
-	 3Z8kM89Tic5ijdjaJNyIu915ta/bwxic9uoVIq7Gz/CnD2atKWJ8Nc19KiAuivKjFX
-	 JnG+0LU3OmdKGP5jD0XCMcmxy3fveiYVtlTonNW8MPd9VAgkAIDU/WCJtUaYRYKEYb
-	 rtX12zjBCLWMQkE90yq0yjbmfMn/NU/w/shBJvqHLyero3tOG1HkCT71xUvb9oSD8/
-	 sCUmAGn9UGi6vTjW2X9v3GxnxT/N13HEiM+jxIxHGPp5CmkjphpaUqeeMI8DKpmbUW
-	 iVVAeRvldor7A==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>,
-	Ming Lei <ming.lei@redhat.com>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 3/6] block: check BLK_FEAT_POLL under q_usage_count
-Date: Sun, 26 Jan 2025 09:48:50 -0500
-Message-Id: <20250126144854.925377-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250126144854.925377-1-sashal@kernel.org>
-References: <20250126144854.925377-1-sashal@kernel.org>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yosWjN2y";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="pWQ1oK4R";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yosWjN2y";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="pWQ1oK4R"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 7BBFB21114;
+	Mon, 27 Jan 2025 07:52:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1737964328; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HOVLpoaZTDnha9bY1uEyVw6fbwPqCer/OmqkPcifpwU=;
+	b=yosWjN2yiUpKSokwv6E86cYpWLnbfQn9y/k/zaf0+ve0aGaQpOcXJ68hH7LlhzlwlmZTU6
+	lgUIj0LB9JjskMX6ZN0ULJcH5mTI0wQFIt8hdsD9nPbo7r9YjXysS5UOomF5ieHFhvjNdn
+	mQlCgoMkWpNskcdf7e7ghXj5IQXLk0A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1737964328;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HOVLpoaZTDnha9bY1uEyVw6fbwPqCer/OmqkPcifpwU=;
+	b=pWQ1oK4RzhvLPISTPnIcdtlRoLklOfNkpMuFhnWcZ/yTlxOenlhj6hkCcb8yHQbbHs9QeR
+	RCiG+wvfe980twCw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1737964328; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HOVLpoaZTDnha9bY1uEyVw6fbwPqCer/OmqkPcifpwU=;
+	b=yosWjN2yiUpKSokwv6E86cYpWLnbfQn9y/k/zaf0+ve0aGaQpOcXJ68hH7LlhzlwlmZTU6
+	lgUIj0LB9JjskMX6ZN0ULJcH5mTI0wQFIt8hdsD9nPbo7r9YjXysS5UOomF5ieHFhvjNdn
+	mQlCgoMkWpNskcdf7e7ghXj5IQXLk0A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1737964328;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HOVLpoaZTDnha9bY1uEyVw6fbwPqCer/OmqkPcifpwU=;
+	b=pWQ1oK4RzhvLPISTPnIcdtlRoLklOfNkpMuFhnWcZ/yTlxOenlhj6hkCcb8yHQbbHs9QeR
+	RCiG+wvfe980twCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 33E69137C0;
+	Mon, 27 Jan 2025 07:52:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id KX7KCig7l2faMQAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 27 Jan 2025 07:52:08 +0000
+Message-ID: <8a7b1eb9-6b9b-4883-9813-401cabf669da@suse.de>
+Date: Mon, 27 Jan 2025 08:52:07 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.11
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] block: Skip the folio lock if the folio is already dirty
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>
+Cc: linux-mm@kvack.org, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, Andres Freund <andres@anarazel.de>
+References: <20250124224832.322771-1-willy@infradead.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250124224832.322771-1-willy@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.30
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_FIVE(0.00)[6]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-From: Christoph Hellwig <hch@lst.de>
+On 1/24/25 23:48, Matthew Wilcox (Oracle) wrote:
+> Postgres sees significant contention on the hashed folio waitqueue lock
+> when performing direct I/O to 1GB hugetlb pages.  This is because we
+> mark the destination pages as dirty, and the locks end up 512x more
+> contended with 1GB pages than with 2MB pages.
+> 
+> We can skip the locking if the folio is already marked as dirty.
+> The writeback path clears the dirty flag before commencing writeback,
+> if we see the dirty flag set, the data written to the folio will be
+> written back.
+> 
+> In one test, throughput increased from 18GB/s to 20GB/s and moved the
+> bottleneck elsewhere.
+> 
+> Reported-by: Andres Freund <andres@anarazel.de>
+> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> ---
+>   block/bio.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index f0c416e5931d..e8d18a0fecb5 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1404,6 +1404,8 @@ void bio_set_pages_dirty(struct bio *bio)
+>   	struct folio_iter fi;
+>   
+>   	bio_for_each_folio_all(fi, bio) {
+> +		if (folio_test_dirty(folio))
+> +			continue;
+>   		folio_lock(fi.folio);
+>   		folio_mark_dirty(fi.folio);
+>   		folio_unlock(fi.folio);
 
-[ Upstream commit 958148a6ac061a9a80a184ea678a5fa872d0c56f ]
+The same reasoning can probably applied to __bio_release_pages().
 
-Otherwise feature reconfiguration can race with I/O submission.
+Cheers,
 
-Also drop the bio_clear_polled in the error path, as the flag does not
-matter for instant error completions, it is a left over from when we
-allowed polled I/O to proceed unpolled in this case.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Link: https://lore.kernel.org/r/20250110054726.1499538-4-hch@lst.de
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-core.c | 22 ++++++++++++----------
- block/blk-mq.c   | 12 ++++++++++--
- 2 files changed, 22 insertions(+), 12 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 4f791a3114a12..487e8cafccc55 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -629,8 +629,14 @@ static void __submit_bio(struct bio *bio)
- 		blk_mq_submit_bio(bio);
- 	} else if (likely(bio_queue_enter(bio) == 0)) {
- 		struct gendisk *disk = bio->bi_bdev->bd_disk;
--
--		disk->fops->submit_bio(bio);
-+	
-+		if ((bio->bi_opf & REQ_POLLED) &&
-+		    !(disk->queue->limits.features & BLK_FEAT_POLL)) {
-+			bio->bi_status = BLK_STS_NOTSUPP;
-+			bio_endio(bio);
-+		} else {
-+			disk->fops->submit_bio(bio);
-+		}
- 		blk_queue_exit(disk->queue);
- 	}
- 
-@@ -805,12 +811,6 @@ void submit_bio_noacct(struct bio *bio)
- 		}
- 	}
- 
--	if (!(q->limits.features & BLK_FEAT_POLL) &&
--			(bio->bi_opf & REQ_POLLED)) {
--		bio_clear_polled(bio);
--		goto not_supported;
--	}
--
- 	switch (bio_op(bio)) {
- 	case REQ_OP_READ:
- 		break;
-@@ -935,7 +935,7 @@ int bio_poll(struct bio *bio, struct io_comp_batch *iob, unsigned int flags)
- 		return 0;
- 
- 	q = bdev_get_queue(bdev);
--	if (cookie == BLK_QC_T_NONE || !(q->limits.features & BLK_FEAT_POLL))
-+	if (cookie == BLK_QC_T_NONE)
- 		return 0;
- 
- 	blk_flush_plug(current->plug, false);
-@@ -951,7 +951,9 @@ int bio_poll(struct bio *bio, struct io_comp_batch *iob, unsigned int flags)
- 	 */
- 	if (!percpu_ref_tryget(&q->q_usage_counter))
- 		return 0;
--	if (queue_is_mq(q)) {
-+	if (!(q->limits.features & BLK_FEAT_POLL)) {
-+		ret = 0;
-+	} else if (queue_is_mq(q)) {
- 		ret = blk_mq_poll(q, cookie, iob, flags);
- 	} else {
- 		struct gendisk *disk = q->disk;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4e76651e786d1..784d41eb0abba 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3092,14 +3092,22 @@ void blk_mq_submit_bio(struct bio *bio)
- 	}
- 
- 	/*
--	 * Device reconfiguration may change logical block size, so alignment
--	 * check has to be done with queue usage counter held
-+	 * Device reconfiguration may change logical block size or reduce the
-+	 * number of poll queues, so the checks for alignment and poll support
-+	 * have to be done with queue usage counter held.
- 	 */
- 	if (unlikely(bio_unaligned(bio, q))) {
- 		bio_io_error(bio);
- 		goto queue_exit;
- 	}
- 
-+	if ((bio->bi_opf & REQ_POLLED) &&
-+	    !(q->limits.features & BLK_FEAT_POLL)) {
-+		bio->bi_status = BLK_STS_NOTSUPP;
-+		bio_endio(bio);
-+		goto queue_exit;
-+	}
-+
- 	bio = __bio_split_to_limits(bio, &q->limits, &nr_segs);
- 	if (!bio)
- 		goto queue_exit;
+Hannes
 -- 
-2.39.5
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
