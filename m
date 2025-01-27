@@ -1,162 +1,111 @@
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC1B17ADF8
-	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 18:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C76C1607AA
+	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 18:54:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738002089; cv=none; b=RJafZiG3FRucIFs+B07nOB/FrQdR2N8na8wWCdnV56CGPUUjeg0I6XSPdrfQfAntKIawzbKIwyeWz0mHtOFN73dEzZvfP9FluanCOIgUNRjz1uLUwOqj0cgSu3K2LiFdlAUqZmnSDCu5chAsNeAZVwac+8LO7mxahLaqui7yBAI=
+	t=1738004057; cv=none; b=oDg3AqwNLL3PMPiERiRzDh2Rka2J6iuXyeLKBz7yTwU61tJIT1ObDuhMr3u/+m4fZCzPqjzPsK6lv9K6lqMhGO+mVDB9M6c1H9/3kvl6/aLhZ0nc2/vtzJqq4ovhYbp2Y8GfwISMuKd/wpvI2O0iLbj+fDifnEULowQi2PnVYho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738002089; c=relaxed/simple;
-	bh=9oX8XBT+ckRfQ+RBrNdl9bknDKxI5UM7mVVoNmjLB9U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eGEPat1fu+eAe5g69hhbhELR6yeLhO77E1hnRA0qke8MtgXolePcZSeRCgmmLGr781WW8R7k8DenRnsW/7laX8rWEnqqgDRKaeKvBfmHkwH9G214n6D72fnuaAgha0ORHY0Cy6KoxVtWzHGBeQlLApLc9QGmTHbTDUUNKFWaTBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=anarazel.de; spf=pass smtp.mailfrom=anarazel.de; dkim=pass (2048-bit key) header.d=anarazel.de header.i=@anarazel.de header.b=K0yBw62Y; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GwFb7Etg; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=anarazel.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=anarazel.de
+	s=arc-20240116; t=1738004057; c=relaxed/simple;
+	bh=X4x6cLXxnF3YBraFA4F6G39tyFA7xGE5YQkjAwJ3eLI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NnXwehCZC5T4aQs8nG5quq4cH4TKaM8zVjthZ8Eb/U/lo/jSaKpMjMA/W5ByxyGz67IA56xDb5tz7scNdPpk3XWfssdRMJc6ty/xd+jbHbZFLrjDv9HXbY0XLqoYxKXJPY2bIWgbvFQVvGWFmpf1oe/Ik9rRREiLPR+PiKilDZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=CUkSXd6K; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=anarazel.de header.i=@anarazel.de header.b="K0yBw62Y";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GwFb7Etg"
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id EAFCE2540113;
-	Mon, 27 Jan 2025 13:21:25 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Mon, 27 Jan 2025 13:21:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anarazel.de; h=
-	cc:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1738002085; x=1738088485; bh=cRP+DK217q
-	jmvyi+zlvZh1DoEcriRk8x6tJpLrq4SHM=; b=K0yBw62Yb73WbXUBEHoqCbzA+7
-	oawTh2Z2nU0/MMW6wXT6zqkMFcHCJptD84p8RdOGJHpMNYe+OY5nZ9JgprrWipuk
-	286OUDsKkJIgSjiNHFGINcKfgajKgMsuQnjMWR32LoaQ1SSsCsO3nW+Io3fX66An
-	DlJz0Kz40KWaiHgVOjcIr1lp6skGFNihS2pWuVokdyRum9vjD4hcOl/r1RvSicyn
-	bZhut7QTzBuOlnAGatCNo6osy4Qj4Ah5i5tJnE3LpeXzPqd0PxXbKXFV3eZCINB/
-	M0ujUbI+lep7UKZLJEFHR9qZQ8dTnJEpfcboyfUXPVcp2CKqX405+S/fPNJQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1738002085; x=1738088485; bh=cRP+DK217qjmvyi+zlvZh1DoEcriRk8x6tJ
-	pLrq4SHM=; b=GwFb7Etgx0E50q70h1p1A1jM7hE3M4U17QQDLkBD7U74JQhxfnx
-	aeWGhG3UsGp6Maglika6CmVq0G4cS5Ilbac8aAvCETRzcnmN9mbRKZhL8ih5bSTa
-	iEDi6Czt5IVh48iwKe6wcVgHrRPKRfG3hHOcajbIOMMyE2xlPsu+qXrJqKBnahsp
-	dppzmF0fx9s/iKkoc4nYYqArmXmtol8fsY+kbDlwNq4t3YMcgX3BN6R5kmiHWwi+
-	0lwl8HmCL60t2gCeeuf48EfDvVG8ZA0K6t/R6UE382AmELji3D/nPxV0h1X3qrvd
-	geB5uP6hKfh0lAXc6ocpWvVtpYLUG8fFz3A==
-X-ME-Sender: <xms:pc6XZ907hJ1w2pjDWPNUWbuxIZ6Wa8tp0W8--HgDUXUkt5jXFO9kDQ>
-    <xme:pc6XZ0EnyPxKxG_MluTi3IdPl-kosK8tf1S6ty1Hzc4gcR1RblcV1AVc-b7Y3RzEg
-    jH4T5au3HfXDa4Rhg>
-X-ME-Received: <xmr:pc6XZ950yfnZNdvFuqSTaW3D6xmua2bOLM4IgA43sLIRAb3L91HSWu7itZ18mLeB56kFBaq24yetVL_htO-WT3kkIj5UeYmCaHOk8WoUqg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudejgedgudefkeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddt
-    vdenucfhrhhomheptehnughrvghsucfhrhgvuhhnugcuoegrnhgurhgvshesrghnrghrrg
-    iivghlrdguvgeqnecuggftrfgrthhtvghrnhepfeffgfelvdffgedtveelgfdtgefghfdv
-    kefggeetieevjeekteduleevjefhueegnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomheprghnughrvghssegrnhgrrhgriigvlhdruggvpdhnsggp
-    rhgtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeifihhllhihse
-    hinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheprgigsghovgeskhgvrhhnvghlrdgu
-    khdprhgtphhtthhopehlihhnuhigqdhmmheskhhvrggtkhdrohhrghdprhgtphhtthhope
-    hmuhgthhhunhdrshhonhhgsehlihhnuhigrdguvghvpdhrtghpthhtohepjhgrnhgvrdgt
-    hhhusehorhgrtghlvgdrtghomhdprhgtphhtthhopegurghvihgusehrvgguhhgrthdrtg
-    homhdprhgtphhtthhopehlihhnuhigqdgslhhotghksehvghgvrhdrkhgvrhhnvghlrdho
-    rhhg
-X-ME-Proxy: <xmx:pc6XZ62iUd_iyq4TAVpDsDqCe90iLTTn-Ep6PLdJ89tZOCZunh2yhA>
-    <xmx:pc6XZwF2qads1gBwWYkTbCDoY-RDvsfb2JdINLqn-7XbRz3proyUMw>
-    <xmx:pc6XZ7_A_sq3t-ygPilTyxNPX4yZuXjla3MlcwBvRMBMiWk6hOH1JQ>
-    <xmx:pc6XZ9k8VRTkq5WyEyOkKq0ZpMk8-MApYzByqwl8sDYEXrld8TwEuA>
-    <xmx:pc6XZ70D_tpEWdJTmerntpCQS4iYfiuTronlWa0xfOfI2vbKiBp5FR6o>
-Feedback-ID: id4a34324:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 27 Jan 2025 13:21:25 -0500 (EST)
-Date: Mon, 27 Jan 2025 13:21:24 -0500
-From: Andres Freund <andres@anarazel.de>
-To: David Hildenbrand <david@redhat.com>
-Cc: Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, Muchun Song <muchun.song@linux.dev>, 
-	Jane Chu <jane.chu@oracle.com>, Jens Axboe <axboe@kernel.dk>
-Subject: Re: Direct I/O performance problems with 1GB pages
-Message-ID: <6ulkhmnl4rot5vrywoxvoewko7vbgkhypcwxjccghdu26kwsx5@bnseuzrsedte>
-References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
- <e0ba55af-23c4-455e-9449-e74de652fb7c@redhat.com>
- <Z5euIf-OvrE1suWH@casper.infradead.org>
- <f3710cc4-cbbf-4f1e-93a0-9eb6697df2d3@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CUkSXd6K"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-851c4ee2a37so324919139f.3
+        for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 10:54:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1738004051; x=1738608851; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sIyBoJGroUyTZpx6n/1BSJQGh7wzm8syWELiQ274Xzo=;
+        b=CUkSXd6KUtEIcmcYu6JIQW2snChjb1hurpE6rb/DTJY0sznoV0q/hv8u3gSCyattPJ
+         2a9u9f/eZbpVNtJJn3x9x4wzOTNIKLqRmPOtbnkd0HShKFtUwqPFQyJoFYzl7ZeDmVBK
+         vJu+ccmXi8HXtMNp4uJp/TH2x3+r/ITHgF47W5FJVswVo7VtXReIdZPvU8HQWUDp1rsI
+         faUo5vGP10ckJ7IIGuuwAssmsKS8SQxAiWoQu6cwMs4SuVGc6lou/IeW1LZCRHMLzmR1
+         9qmb7+gvjel7VHtNXHW916J2k4ga/ANfZN0IvEn6Fs7dA4VFdkX+5xlBqoLXVKJ26RF1
+         GYgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738004051; x=1738608851;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sIyBoJGroUyTZpx6n/1BSJQGh7wzm8syWELiQ274Xzo=;
+        b=lLpMZP54Ao/vQVYIFsITzJj1Nr0J2xmqGh12SIeIcwKLqtSDmXGqnQDl/s5aV1ei14
+         /sGcfC9MQRQsyio1C53ISZtcAfP2ECKbmn4zzPYKR6Pro2BYbr90MVbMxTOo3pDlhDub
+         ouOga3YA03rY6NOsxgoNOLaKaCNoQ+3sD2bu1rVTkZ+/ZEhyFDasQQ2X/y2+zLIG0V0W
+         58x0eeczZ3vZwsXOi1XyLpGS6g4niHkyVlTwWQ1nMaLhftEFav4QI68XvNRaZeKEhCa9
+         SgNKcK3A7n9RTjWDJKSUeq/QqSV0TJqIKGp25u16cnv0VBy4pNi/igwuePAreVC4wwHg
+         ZYLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUFY5VmGcoSiwtQAE1xsUhrhY79jOuMcDa5GIfc9517F4+V/bRZlXhDhfA0WK0zz1DAZQKZ1H1LB4XQNA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq9cEZvqR3/2+sCyo8T2NHs0oJ/ASs3vNLVo99jYta+l4k2Zm3
+	GO24gNLuFRiHgoFfrY4HxCR9OeeDOsyvnGWmiWLICbsV+pvGcoLdSkG6dKT4UgY=
+X-Gm-Gg: ASbGncs4aYotppj2mvBLt56lP2thobk54tlvzdWetTkGaazct1TiidYoAIGNAPYqG/e
+	qyhpfBBOBCHF+hKrSj48ds2qhPd5HfPEEVY9O1oOJDQHf3RRDG8udukg7VWa65ilSzh1A5HDUA3
+	cTTu+LVlCE24N7R1XAeIvfG3eJNk363zn04ptaRUAMij1JW+CURhlfJRhJdgas9rWP9FCa1SX20
+	Ts9ep//LlvJ8tOgfEfisrAjASSuygb6EDgbx6T/41mT6oMJ7e0lnT3VxDaOWzV9LhEkdJUhTOA/
+	eg==
+X-Google-Smtp-Source: AGHT+IFv9j+W6RuVCqdh4BJBXNTF9oEOZFuXXEm2c24r/6X+ifQU1oBGtRPGZlVEgbHvG/0hDG84JA==
+X-Received: by 2002:a05:6602:6d1a:b0:84c:ea14:931f with SMTP id ca18e2360f4ac-851b627fbd6mr3512940939f.11.1738004051522;
+        Mon, 27 Jan 2025 10:54:11 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8521dbb3acdsm288925439f.0.2025.01.27.10.54.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Jan 2025 10:54:10 -0800 (PST)
+Message-ID: <108b6ae7-a272-482b-b3da-60f1fc6617ee@kernel.dk>
+Date: Mon, 27 Jan 2025 11:54:09 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f3710cc4-cbbf-4f1e-93a0-9eb6697df2d3@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Direct I/O performance problems with 1GB pages
+To: Andres Freund <andres@anarazel.de>, David Hildenbrand <david@redhat.com>
+Cc: Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+ linux-block@vger.kernel.org, Muchun Song <muchun.song@linux.dev>,
+ Jane Chu <jane.chu@oracle.com>, Pavel Begunkov <asml.silence@gmail.com>
+References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
+ <e0ba55af-23c4-455e-9449-e74de652fb7c@redhat.com>
+ <Z5euIf-OvrE1suWH@casper.infradead.org>
+ <f3710cc4-cbbf-4f1e-93a0-9eb6697df2d3@redhat.com>
+ <6ulkhmnl4rot5vrywoxvoewko7vbgkhypcwxjccghdu26kwsx5@bnseuzrsedte>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <6ulkhmnl4rot5vrywoxvoewko7vbgkhypcwxjccghdu26kwsx5@bnseuzrsedte>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 1/27/25 11:21 AM, Andres Freund wrote:
+>> That's precisely what io-uring fixed buffers do :)
+> 
+> I looked at using them at some point - unfortunately it seems that there is
+> just {READ,WRITE}_FIXED not {READV,WRITEV}_FIXED. It's *exceedingly* common
+> for us to do reads/writes where source/target buffers aren't wholly
+> contiguous. Thus - unless I am misunderstanding something, entirely plausible
+> - using fixed buffers would unfortunately increase the number of IOs
+> noticeably.
+> 
+> Should have sent an email about that...
+> 
+> I guess we could add some heuristic to use _FIXED if it doesn't require
+> splitting an IO into too many sub-ios. But that seems pretty gnarly.
 
-On 2025-01-27 17:09:57 +0100, David Hildenbrand wrote:
-> > Andres shared some gists, but I don't want to send those to a
-> > mailing list without permission.  Here's the kernel part of the
-> > perf report:
-> >
-> >      14.04%  postgres         [kernel.kallsyms]          [k] try_grab_folio_fast
-> >              |
-> >               --14.04%--try_grab_folio_fast
-> >                         gup_fast_fallback
-> >                         |
-> >                          --13.85%--iov_iter_extract_pages
-> >                                    bio_iov_iter_get_pages
-> >                                    iomap_dio_bio_iter
-> >                                    __iomap_dio_rw
-> >                                    iomap_dio_rw
-> >                                    xfs_file_dio_read
-> >                                    xfs_file_read_iter
-> >                                    __io_read
-> >                                    io_read
-> >                                    io_issue_sqe
-> >                                    io_submit_sqes
-> >                                    __do_sys_io_uring_enter
-> >                                    do_syscall_64
-> >
-> > Now, since postgres is using io_uring, perhaps there could be a path
-> > which registers the memory with the iouring (doing the refcount/pincount
-> > dance once), and then use that pinned memory for each I/O.  Maybe that
-> > already exists; I'm not keeping up with io_uring development and I can't
-> > seem to find any documentation on what things like io_provide_buffers()
-> > actually do.
+Adding Pavel, he's been working on support registered buffers with
+readv/writev.
 
-Worth noting that we'll not always use io_uring. Partially for portability to
-other platforms, partially because it turns out that io_uring is disabled in
-enough environments that we can't rely on it. The generic fallback
-implementation is a pool of worker processes connected via shared memory. The
-worker process approach did run into this issue, fwiw.
+> I dimly recall that I also ran into some around using fixed buffers as a
+> non-root user. It might just be the accounting of registered buffers as
+> mlocked memory and the difficulty of configuring that across
+> distributions. But I unfortunately don't remember any details anymore.
 
-That's not to say that a legit answer to this scalability issue can't be "use
-fixed bufs with io_uring", just wanted to give context.
+Should just be accounting.
 
-
-> That's precisely what io-uring fixed buffers do :)
-
-I looked at using them at some point - unfortunately it seems that there is
-just {READ,WRITE}_FIXED not {READV,WRITEV}_FIXED. It's *exceedingly* common
-for us to do reads/writes where source/target buffers aren't wholly
-contiguous. Thus - unless I am misunderstanding something, entirely plausible
-- using fixed buffers would unfortunately increase the number of IOs
-noticeably.
-
-Should have sent an email about that...
-
-I guess we could add some heuristic to use _FIXED if it doesn't require
-splitting an IO into too many sub-ios. But that seems pretty gnarly.
-
-
-I dimly recall that I also ran into some around using fixed buffers as a
-non-root user. It might just be the accounting of registered buffers as
-mlocked memory and the difficulty of configuring that across
-distributions. But I unfortunately don't remember any details anymore.
-
-
-Greetings,
-
-Andres Freund
+-- 
+Jens Axboe
