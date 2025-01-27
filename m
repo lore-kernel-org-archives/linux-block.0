@@ -1,136 +1,98 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA1C2AD21
-	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 16:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5012433CB
+	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 16:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737993767; cv=none; b=sQwrSgWUsOQAZn0t/eN4eB9MWzT2tEoy8WHJ80iRncMCEnfraRILHoO1QHHLYSkINHgO/BzcvPJSLmwGhKX9230x0skfG+R8krVicFysAVZABLn6HNqEg9G2nV71fYYDbiuf/PKxfM5v24dYa7GF1yAOAYQcOhxfcLwFn8JkODA=
+	t=1737994015; cv=none; b=D7BcN+e1i+Mz/cXQxoFDDBXTuRYD/OXT6I3/1TeYann8XM86lE9NWbXhl0PHBBsRGYV2zOT8VuYfz3MsSKRGSi7tz1eHSSUYwNxRhlcfBKwu+gHXrid6M6UoCJrQaF/FoM6ymac1WX62mcdS0+X9YTJiUO7hW6RGvvS6f3W8+F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737993767; c=relaxed/simple;
-	bh=OyHgj3UTv8yH/X1kktHy69aOaqacSy1Vr5vrG/aLKWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c+npWzi/vcyBeulXj6Ku7/U1my+JIfDdwhJl9+jhWNab+aIHmhzlg1R1BfQtpeieKauWq89dPyPYNJxEhlVipbexHjjcrwQ16s+/32TWqAl8CxbxCG0/Jmvq8icsZpa+1kXgZeH7PKxqDWMPAARXtfZwQmU2s6t+vVeijKCpJPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UZLpSog+; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1737994015; c=relaxed/simple;
+	bh=ffZrL93oJTsYMKxnQ7eYUCisSmpEMzVujTTbvm3KV9s=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=QIYLFO/zgjIw7joyy5Gk/qjaE8TtulfmhMMMqzyfsolev3d5qvFvOSTEMXexCofbcPEyMXuCIiCGywoNQOmleHyhYUwZxns9ZLkvLdtWtP1tz5Ag6TAVjioxGj/wuiuEh1kzmacpuEjenWDGT9FrXfuJNHmekvZjywC8XyJQJcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dcgw3/Rw; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UZLpSog+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=28LMBxDMd1K+Lfe4Mecb7NBAlb5zAN2Qnc1EAyl4s3g=; b=UZLpSog+4jqsQvTtbD5DQhK/Ba
-	6sKjwyDUJ1w3HFoKe4RSIVo39MHzvdP29gL/WjK9zjfBDnnSaAvuIPi9HUkGU1it3xCV2FKQi79z7
-	9gkR6vQfLS4nsdQEhHSD9LB/fV1BXDMwbvs6ptmVWDqqRqyIr5zJtZXS8nqFvEdpmTIppmxPcGxRC
-	2qErTZgSm8wuGoVjUs80nPQB1e3OPMBGgT8IJOsxeHf4Bm40gyRjQptc3pqHBQa1EGcTphIWdOWSO
-	zX4BpQiBnpI8TaUgCwi3rFh0NhdV+ugIvgOn2oB8tSzRiuFSpdcFTiObm9+AF+rZPgTMVxhazPZr/
-	HN705aUQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tcRZR-00000009c6H-1KNG;
-	Mon, 27 Jan 2025 16:02:41 +0000
-Date: Mon, 27 Jan 2025 16:02:41 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-mm@kvack.org, linux-block@vger.kernel.org,
-	Muchun Song <muchun.song@linux.dev>, Jane Chu <jane.chu@oracle.com>,
-	Andres Freund <andres@anarazel.de>
-Subject: Re: Direct I/O performance problems with 1GB pages
-Message-ID: <Z5euIf-OvrE1suWH@casper.infradead.org>
-References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
- <e0ba55af-23c4-455e-9449-e74de652fb7c@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dcgw3/Rw"
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3cfdf301fa4so5224235ab.0
+        for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 08:06:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1737994010; x=1738598810; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ScX37g4UMB22SFk1EjpDaEV/7JxbN0UVWumVF2788q4=;
+        b=dcgw3/Rwr28qYxSLxqNMrCOdgYuZIOgQ6ykNCu2K/P0MYsDGR2ZlMRXXwpqOHpB22S
+         ByVawiYI6EUO85O/OZg6FUkNRvG4WEcRlIYTOhALr+pMV08jiVWujJ/YeEK3iCuIBs1z
+         TWc9KQ1w0/A4E35JCe7lOT/U8WnMk3NpL7Va1pwUqcZoxZtRYLLfUNNVPFlJk6p9BFRK
+         cmrR66GFeWthCBLbk6ZjtxHvnH1F7n6AZTknyf+Oe51BbiIg1n7Mw8aNNU/Vn3CIpAGa
+         7ab3K21G7EacwGJsxPG85+jqSPiKvT+uqA4Ut1shThYsq2EnTbKEiWZ/yl0XYrVFy8e6
+         zC1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737994010; x=1738598810;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ScX37g4UMB22SFk1EjpDaEV/7JxbN0UVWumVF2788q4=;
+        b=Px10yU+P/+jVuEEVQ3gwPM0LBfKtgJj0Lf6IsvqZh5PzUAKvOeTZ0OIP2KvjeCYJN9
+         yPVA/uPLgAq+5+GyKllIv+XvE67QzBTpDaVk+/QKqQh46kkNIn7JIvHrH2VKYDc3/wHt
+         PRGdGF0xRgAKGFWN+ngMWgR1Xkg8TgVnk4g4z4+G6xJV1MdGs/dFlOXnCbH/19hYATTe
+         qUeJvxzyvgInvsC+TVBh66NRFcFOcfNLvCdLYEIi/NQHbbYs/Bykv12ekzyCfAg9ek+n
+         1yi5LY769qWJJ5IoxLoy2w4VryApj5iz6SOwfAXLUs28hVfXpvkc0Ie82IVkyC6UZY+Y
+         Dkpw==
+X-Gm-Message-State: AOJu0YyGn9hMUvfEap1rW5l1MZ9nxTB3BQu2A51S8m6ml4/3CBdw3NGQ
+	krVd0SVRDRLvRp60bjFGQN3NnQdjRYkqxe/5KBrmlMSW52sZubaXbyITacVyH1A=
+X-Gm-Gg: ASbGncvVpj/J40Gso+29DlUxnzThE9RdfrFU2us5YqtfFw0ZKVE04jWprAVNldjpwK8
+	2lOqr3ajWw5pEWogXqc5WqqLopHE4gPrNCe3wpQzAAZwM8M7uLMeY+X/BWcZZ70Qw+ob9YR8wuC
+	PeC4AAxaB+lDlPj+pGSc8PDKshLV7CcZp4csNBNPDkTbPZCfCNgIVeCka9BgCKz2IgLNFWkEg76
+	xQkUq87QaMDfKz7X+PB9BJCVl4I38oY75lgs/RgF6nrMNv779HY15BSVyD+3Qjsi4mowusq
+X-Google-Smtp-Source: AGHT+IFyc0j4t8ajzUK1HT+Jyvmkuwy//NtZsEhXSmWVJzkQmAnGiXgyId2pgsF6DKLA4JQtAKhmkA==
+X-Received: by 2002:a05:6e02:1a67:b0:3a7:87f2:b010 with SMTP id e9e14a558f8ab-3cf743ab4fcmr308375515ab.5.1737994010624;
+        Mon, 27 Jan 2025 08:06:50 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ec1db82486sm2621641173.104.2025.01.27.08.06.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jan 2025 08:06:49 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, kernel test robot <oliver.sang@intel.com>
+In-Reply-To: <20250127143045.538279-1-hch@lst.de>
+References: <20250127143045.538279-1-hch@lst.de>
+Subject: Re: [PATCH] loop: don't clear LO_FLAGS_PARTSCAN on
+ LOOP_SET_STATUS{,64}
+Message-Id: <173799400974.9350.16981827021602955933.b4-ty@kernel.dk>
+Date: Mon, 27 Jan 2025 09:06:49 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e0ba55af-23c4-455e-9449-e74de652fb7c@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-14bd6
 
-[Adding Andres to the cc.  Sorry for leaving you off in the initial mail]
 
-On Mon, Jan 27, 2025 at 03:09:23PM +0100, David Hildenbrand wrote:
-> On 26.01.25 01:46, Matthew Wilcox wrote:
-> > Postgres are experimenting with doing direct I/O to 1GB hugetlb pages.
-> > Andres has gathered some performance data showing significantly worse
-> > performance with 1GB pages compared to 2MB pages.  I sent a patch
-> > recently which improves matters [1], but problems remain.
-> > 
-> > The primary problem we've identified is contention of folio->_refcount
-> > with a strong secondary contention on folio->_pincount.  This is coming
-> > from the call chain:
-> > 
-> > iov_iter_extract_pages ->
-> > gup_fast_fallback ->
-> > try_grab_folio_fast
-> > 
-> > Obviously we can fix this by sharding the counts.  We could do that by
-> > address, since there's no observed performance problem with 2MB pages.
-> > But I think we'd do better to shard by CPU.  We have percpu-refcount.h
-> > already, and I think it'll work.
-> > 
-> > The key to percpu refcounts is knowing at what point you need to start
-> > caring about whether the refcount has hit zero (we don't care if the
-> > refcount oscillates between 1 and 2, but we very much care about when
-> > we hit 0).
-> > 
-> > I think the point at which we call percpu_ref_kill() is when we remove a
-> > folio from the page cache.  Before that point, the refcount is guaranteed
-> > to always be positive.  After that point, once the refcount hits zero,
-> > we must free the folio.
-> > 
-> > It's pretty rare to remove a hugetlb page from the page cache while it's
-> > still mapped.  So we don't need to worry about scalability at that point.
-> > 
-> > Any volunteers to prototype this?  Andres is a delight to work with,
-> > but I just don't have time to take on this project right now.
+On Mon, 27 Jan 2025 15:30:44 +0100, Christoph Hellwig wrote:
+> LOOP_SET_STATUS{,64} can set a lot more flags than it is supposed to
+> clear (the LOOP_SET_STATUS_CLEARABLE_FLAGS vs
+> LOOP_SET_STATUS_SETTABLE_FLAGS defines should have been a hint..).
 > 
-> Hmmm ... do we really want to make refcounting more complicated, and more
-> importantly, hugetlb-refcounting more special ?! :)
+> Fix this by only clearing the bits in LOOP_SET_STATUS_CLEARABLE_FLAGS.
+> 
+> 
+> [...]
 
-No, I really don't.  But I've always been mildly concerned about extra
-contention on folio locks, folio refcounts, etc.  I don't know if 2MB
-page performance might be improved by a scheme like this, and we might
-even want to cut over for sizes larger than, say, 64kB.  That would be
-something interesting to investigate.
+Applied, thanks!
 
-> If the workload doing a lot of single-page try_grab_folio_fast(), could it
-> do so on a larger area (multiple pages at once -> single refcount update)?
+[1/1] loop: don't clear LO_FLAGS_PARTSCAN on LOOP_SET_STATUS{,64}
+      commit: 5aa21b0495df1fac6d39f45011c1572bb431c44c
 
-Not really.  This is memory that's being used as the buffer cache, so
-every thread in your database is hammering on it and pulling in exactly
-the data that it needs for the SQL query that it's processing.
+Best regards,
+-- 
+Jens Axboe
 
-> Maybe there is a link to the report you could share, thanks.
 
-Andres shared some gists, but I don't want to send those to a
-mailing list without permission.  Here's the kernel part of the
-perf report:
 
-    14.04%  postgres         [kernel.kallsyms]          [k] try_grab_folio_fast
-            |
-             --14.04%--try_grab_folio_fast
-                       gup_fast_fallback
-                       |
-                        --13.85%--iov_iter_extract_pages
-                                  bio_iov_iter_get_pages
-                                  iomap_dio_bio_iter
-                                  __iomap_dio_rw
-                                  iomap_dio_rw
-                                  xfs_file_dio_read
-                                  xfs_file_read_iter
-                                  __io_read
-                                  io_read
-                                  io_issue_sqe
-                                  io_submit_sqes
-                                  __do_sys_io_uring_enter
-                                  do_syscall_64
-
-Now, since postgres is using io_uring, perhaps there could be a path
-which registers the memory with the iouring (doing the refcount/pincount
-dance once), and then use that pinned memory for each I/O.  Maybe that
-already exists; I'm not keeping up with io_uring development and I can't
-seem to find any documentation on what things like io_provide_buffers()
-actually do.
