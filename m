@@ -1,181 +1,242 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4C51FCFD6
-	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 14:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AEF05227
+	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 14:19:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737986972; cv=none; b=c9vYvnMucyeEJ/wO0L2MyU2/hxz8/cz86jYWcIc2/3VQsQOUZAxV+JAgPHhMOhHMYt25xythnZ8QiQ04pzUd8t41uUuDpM+qjru0iLSM8AkpmFHCEtrA9QjWbpdWcNbgl2HnnuyjU0kFavFWJgAnI9VK1jB4e3DvC0twHc8jk3Q=
+	t=1737987557; cv=none; b=hLb8QQ63jCKFRy7dVvUt0Cs2cj9gLHmgAxvyxl2liqb05lydj9Ep2/nmDprqJ09I4XojzeooaA2TBYgDyXQJjXoMgUTTYv6+cn8zw4kJF1nkj+PXfKkOu+RBZ2YtUAuAvJQMNgZjclcIc3Er80gBKzBMCWRnsDAOMfH2ZMU+1os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737986972; c=relaxed/simple;
-	bh=HOiBWB/RTY22NyI9YEthoXytHU/KGCy6+/1YDcvvheM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tK99Cz2sb9M0vKRa0eqiWfHDnSqdgaatK7VNM0Xr/U8GLo+P1dGMOWWlUOO9EngQBf//B0VhDPYk8gW9SMBqjcA8VFlJvKTwYzWzO6Iw2qOvMVguPot/LERYFkqXihFugj9+Rpc2FnNYx3uRmo7EIHDEalvarNhglJJBfUay8R4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D8PKcBpQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1737987557; c=relaxed/simple;
+	bh=TtVETOkjVQNiuB6BExHpYfE5R9ivpefpJx1OeZeUvfs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gDf/xJdqeTITPdja6P0yw1wV6AVO6u9n5krdz72OWKTCMxEiAiky7D9G8vBkXQI6Fyf5mDjFU7uVsAm2XI2UYe/uIkvk8XqeTqGI/5ade+6efW+nbtLCBcmBRzcIZR9bs8+C2CNJPY1vHp8pKvh/ozp8Eo/izIiwHzvYptkFu9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com; spf=none smtp.mailfrom=owltronix.com; dkim=pass (2048-bit key) header.d=owltronix-com.20230601.gappssmtp.com header.i=@owltronix-com.20230601.gappssmtp.com header.b=K+kSSmz5; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=owltronix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D8PKcBpQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737986969;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=PMAThEskvb6BByDS8Og4WVQHcMWJkXn2vL7PMgjUI7Q=;
-	b=D8PKcBpQiShj6ozUDplOAvXsddnPFPkP7CciWo9HE9aKH5DH5AUC+g7vOVta4pn0AN/70u
-	bCE20Y13g2nWA0B1VRk2mFdTpql7M+hn/aXN4RzXrmZP+qrEevEc12jsqTJZp/BEK7jIZS
-	mdaT/Bx1+2FRRGSh1mwFHnSY52PoPLc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-570-clt31qoTNWChlgxRoQ6Rhw-1; Mon, 27 Jan 2025 09:09:28 -0500
-X-MC-Unique: clt31qoTNWChlgxRoQ6Rhw-1
-X-Mimecast-MFC-AGG-ID: clt31qoTNWChlgxRoQ6Rhw
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-385e1fd40acso2650670f8f.3
-        for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 06:09:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=owltronix-com.20230601.gappssmtp.com header.i=@owltronix-com.20230601.gappssmtp.com header.b="K+kSSmz5"
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5dc052246e3so9168106a12.2
+        for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 06:19:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20230601.gappssmtp.com; s=20230601; t=1737987554; x=1738592354; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i8JswBiIDdf2ONRiHmThNOEcSiIxwep3mEKDcXVvDhg=;
+        b=K+kSSmz5JXbiYRdFHWoUT/GTI33nFlJLx2v/Tny3l2RW6NWEVUfBCk6G2ZpcSQkt8a
+         A7NXf2l4jv4FCBb4FVCRYw1rBBNTIvKISAt7ukh9bOy6AfBYn/bZY2zQDfGi/5Fm8XKf
+         wdzyzkk1+p97o0v3JQN/1HfxiOwDguadMcCYHFzrWJQX5kpI8LvpQc7Vl7A8+9AWDnb2
+         Vq9KLRYUru/p5uifgjySjnoCXhUWzXY/qvyUmZsK3ISRQe65CXXl8kd0r3MD5ZNIH4AY
+         brLdCgOEVomNMdjYAOhnOrQJhh7LpPN0H4zm/C0ZLt1/g8jsZpeRJtGCQPHVcqfMF10B
+         hSFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737986966; x=1738591766;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PMAThEskvb6BByDS8Og4WVQHcMWJkXn2vL7PMgjUI7Q=;
-        b=KghNgu+kMzxuntVsMQD9XVavfzx3V2zkqTmvZulmHSrEAUDX8j+qoDNU/CQB6yd9Xe
-         RawyB8oNHMfdLsiGiGxYSVtqzP4Axgij0WDvkfI/FF2IIkM556beTk6oK97nRnGZKFc6
-         4tJ+ALRzqqVFLRcfnNKW2sD0X5TKm2OqIVp0Cs+vSYtgsz2etO0JzoVgeAH4TaB1RsAG
-         /c32B/BJhVTUrVifr/AOgHrYxhVzaNFPfg2FiwIzDAdfBq8U7MverVxdPHVoaq3TvFiJ
-         n7A1xNo05H5kh/HqKtSyrnxvHu6TjOxWO3T3a3bXc6+VzcuoM9P/AOTHklYhA+g/eh3e
-         hXJQ==
-X-Gm-Message-State: AOJu0YwZ2WJcilsfL8NaHjDQseTnMjGHH9Ea7DwBduE/eys+QzyBfZpu
-	dsNNAR5+eJ8CH3v1pC7pNI/8IbNYIs4A9YUcvrVljsXbAPwLKdTeAWj8r1IlFBs4s2KL5EqhusC
-	Q5BoVmafcftPN2fgZvYMHw1UD7pkMDH++mHKPbp+cIBRF8zVOgFp1wA3rRcgh
-X-Gm-Gg: ASbGncslH+PlLpuNjtdeez8tfOdB284Im0vMkd9fWUtIWSF9eFe9Z/I+4eMk3vV5qiv
-	KUZvz6vaAYaaGXGbWOEQNXKXWlcMHz24S4TuXhloxV59Uw12xJjsPFI4AIG/GD0Rzg2744H7E6X
-	lEuvlBQYzfeSG5X1ftsgsWc9W3YvGqdGrqY+7QNFEzkDmW80UQuGuew2K6LB6Km/8DW7EdSADHV
-	aTt0sxo/oJbwpbRSRKEtiW/EqcqlX1UA8zU+NpUT4TTFwdu+feKIEAN+/VOcFA9b1SY50H1J81T
-	7jK5jVRrzNxD5rPydmmrgquyL0C+Mw7sQkMwfC2/lecPi1tomm/wwvkttEIqlFYAguCzNLxN/re
-	CCyrnuFNyo+WG0pE/jK63mr3EOfLE51mb
-X-Received: by 2002:a5d:438c:0:b0:38a:2b39:679d with SMTP id ffacd0b85a97d-38bf57a9d66mr26731273f8f.32.1737986966380;
-        Mon, 27 Jan 2025 06:09:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFuaw7OBO/jCK1QSCEgvo+PMAXwmWjl9WioW5ZjVX1pbgqwDlBdt9wgGi+uhD5iENSul83oVg==
-X-Received: by 2002:a5d:438c:0:b0:38a:2b39:679d with SMTP id ffacd0b85a97d-38bf57a9d66mr26731255f8f.32.1737986966057;
-        Mon, 27 Jan 2025 06:09:26 -0800 (PST)
-Received: from ?IPV6:2003:cb:c736:ca00:b4c3:24bd:c2f5:863c? (p200300cbc736ca00b4c324bdc2f5863c.dip0.t-ipconnect.de. [2003:cb:c736:ca00:b4c3:24bd:c2f5:863c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1c3994sm10960317f8f.81.2025.01.27.06.09.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jan 2025 06:09:24 -0800 (PST)
-Message-ID: <e0ba55af-23c4-455e-9449-e74de652fb7c@redhat.com>
-Date: Mon, 27 Jan 2025 15:09:23 +0100
+        d=1e100.net; s=20230601; t=1737987554; x=1738592354;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i8JswBiIDdf2ONRiHmThNOEcSiIxwep3mEKDcXVvDhg=;
+        b=NOyHSGLFEz2ZgZos61AUghOVWa4534wgnYQHUgmErajYnJwGGYLPRLMO/R+QIYCsCZ
+         nRPBjHzPArX1DgTgs8wR1EcU0DGvXD0gSAjSuDgOQf2exLqI4JoYmGbJg1eRu7D6arLU
+         Fh9BU+mQpJ18Y1Qjfy9sIp2iJFbdcbSxBPRpLP83nyBVUM/bxBuiYM/SH4VFxlYoiazD
+         cQlkakqAENAayAC0Lpis9BCp/cj61wOmAS2lq88A2hfawQSsoP42g8CupZcqiui+t2DM
+         pgsNdG2IWc0ATSDQl5jlWH65g7PnaHNuak7j0VtS9ZCx7G514Syeg+MCbyoLTElSennN
+         wZTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWgM7I0FMTjcoimA3jKM+uviAenW9615uKLBc2Wx//NAaKYhqdkrr2w38a74XRdZDrs9V64p5YJGihyIw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi7FsHzUV/KUWm1rPIc1q+BOaTAC5xyHZ45ULEwVHHq6ZDhjHo
+	NpWoAWs0dVqXMO4bscwWL3iUIaDYEdpJ0tq43ccS/D/BYxBSagyGDYdnbSN7gEheeqyj5amF0K8
+	lsOwICeId/3onz/JHn/V/5g0Up4zpldf00xwlSA==
+X-Gm-Gg: ASbGncu+U4maHAnLi5uuAhSx5P58FwYxyCAIgasiJn6w89Z8DRDe7Gfn7LeKYYUskSY
+	RKDcf/6zWgMao9JVmMoJQA/C360WwkHJq0AB1Hqn4PvHl0Yofk310zR8PLEOfIA==
+X-Google-Smtp-Source: AGHT+IFmjLjtSeQweT/B8NnjDuPyAyhFDziYdB83b9RBPOIrw2k6Ie/OQhH8/CkRofqsGpFdSHhX1dCfEx+TUXlFbMk=
+X-Received: by 2002:a05:6402:3510:b0:5d6:37e5:792a with SMTP id
+ 4fb4d7f45d1cf-5db7d2e86dbmr30843583a12.2.1737987553422; Mon, 27 Jan 2025
+ 06:19:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Direct I/O performance problems with 1GB pages
-To: Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org
-Cc: linux-block@vger.kernel.org, Muchun Song <muchun.song@linux.dev>,
- Jane Chu <jane.chu@oracle.com>
-References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250123202455.11338-1-slava@dubeyko.com> <fd012640-5107-4d44-9572-4dffb2fd4665@wdc.com>
+ <f44878932fd26bb273c7948710b23b0e2768852a.camel@ibm.com>
+In-Reply-To: <f44878932fd26bb273c7948710b23b0e2768852a.camel@ibm.com>
+From: Hans Holmberg <hans@owltronix.com>
+Date: Mon, 27 Jan 2025 15:19:02 +0100
+X-Gm-Features: AWEUYZkxwsj25lAi_rBwrHrcO_R9W5CYKte7_bNZJPfH0--0TQoSa8h8ZA0z488
+Message-ID: <CANr-nt2+Yk5fVVjU2zs+F1ZrLZGBBy3HwNOuYOK9smDeoZV9Rg@mail.gmail.com>
+Subject: Re: [RFC PATCH] Introduce generalized data temperature estimation framework
+To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+Cc: "Johannes.Thumshirn@wdc.com" <Johannes.Thumshirn@wdc.com>, "slava@dubeyko.com" <slava@dubeyko.com>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"javier.gonz@samsung.com" <javier.gonz@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 26.01.25 01:46, Matthew Wilcox wrote:
-> Postgres are experimenting with doing direct I/O to 1GB hugetlb pages.
-> Andres has gathered some performance data showing significantly worse
-> performance with 1GB pages compared to 2MB pages.  I sent a patch
-> recently which improves matters [1], but problems remain.
-> 
-> The primary problem we've identified is contention of folio->_refcount
-> with a strong secondary contention on folio->_pincount.  This is coming
-> from the call chain:
-> 
-> iov_iter_extract_pages ->
-> gup_fast_fallback ->
-> try_grab_folio_fast
-> 
-> Obviously we can fix this by sharding the counts.  We could do that by
-> address, since there's no observed performance problem with 2MB pages.
-> But I think we'd do better to shard by CPU.  We have percpu-refcount.h
-> already, and I think it'll work.
-> 
-> The key to percpu refcounts is knowing at what point you need to start
-> caring about whether the refcount has hit zero (we don't care if the
-> refcount oscillates between 1 and 2, but we very much care about when
-> we hit 0).
-> 
-> I think the point at which we call percpu_ref_kill() is when we remove a
-> folio from the page cache.  Before that point, the refcount is guaranteed
-> to always be positive.  After that point, once the refcount hits zero,
-> we must free the folio.
-> 
-> It's pretty rare to remove a hugetlb page from the page cache while it's
-> still mapped.  So we don't need to worry about scalability at that point.
-> 
-> Any volunteers to prototype this?  Andres is a delight to work with,
-> but I just don't have time to take on this project right now.
+On Fri, Jan 24, 2025 at 10:03=E2=80=AFPM Viacheslav Dubeyko
+<Slava.Dubeyko@ibm.com> wrote:
+>
+> On Fri, 2025-01-24 at 08:19 +0000, Johannes Thumshirn wrote:
+> > On 23.01.25 21:30, Viacheslav Dubeyko wrote:
+> > > [PROBLEM DECLARATION]
+> > > Efficient data placement policy is a Holy Grail for data
+> > > storage and file system engineers. Achieving this goal is
+> > > equally important and really hard. Multiple data storage
+> > > and file system technologies have been invented to manage
+> > > the data placement policy (for example, COW, ZNS, FDP, etc).
+> > > But these technologies still require the hints related to
+> > > nature of data from application side.
+> > >
+> > > [DATA "TEMPERATURE" CONCEPT]
+> > > One of the widely used and intuitively clear idea of data
+> > > nature definition is data "temperature" (cold, warm,
+> > > hot data). However, data "temperature" is as intuitively
+> > > sound as illusive definition of data nature. Generally
+> > > speaking, thermodynamics defines temperature as a way
+> > > to estimate the average kinetic energy of vibrating
+> > > atoms in a substance. But we cannot see a direct analogy
+> > > between data "temperature" and temperature in physics
+> > > because data is not something that has kinetic energy.
+> > >
+> > > [WHAT IS GENERALIZED DATA "TEMPERATURE" ESTIMATION]
+> > > We usually imply that if some data is updated more
+> > > frequently, then such data is more hot than other one.
+> > > But, it is possible to see several problems here:
+> > > (1) How can we estimate the data "hotness" in
+> > > quantitative way? (2) We can state that data is "hot"
+> > > after some number of updates. It means that this
+> > > definition implies state of the data in the past.
+> > > Will this data continue to be "hot" in the future?
+> > > Generally speaking, the crucial problem is how to define
+> > > the data nature or data "temperature" in the future.
+> > > Because, this knowledge is the fundamental basis for
+> > > elaboration an efficient data placement policy.
+> > > Generalized data "temperature" estimation framework
+> > > suggests the way to define a future state of the data
+> > > and the basis for quantitative measurement of data
+> > > "temperature".
+> > >
+> > > [ARCHITECTURE OF FRAMEWORK]
+> > > Usually, file system has a page cache for every inode. And
+> > > initially memory pages become dirty in page cache. Finally,
+> > > dirty pages will be sent to storage device. Technically
+> > > speaking, the number of dirty pages in a particular page
+> > > cache is the quantitative measurement of current "hotness"
+> > > of a file. But number of dirty pages is still not stable
+> > > basis for quantitative measurement of data "temperature".
+> > > It is possible to suggest of using the total number of
+> > > logical blocks in a file as a unit of one degree of data
+> > > "temperature". As a result, if the whole file was updated
+> > > several times, then "temperature" of the file has been
+> > > increased for several degrees. And if the file is under
+> > > continous updates, then the file "temperature" is growing.
+> > >
+> > > We need to keep not only current number of dirty pages,
+> > > but also the number of updated pages in the near past
+> > > for accumulating the total "temperature" of a file.
+> > > Generally speaking, total number of updated pages in the
+> > > nearest past defines the aggregated "temperature" of file.
+> > > And number of dirty pages defines the delta of
+> > > "temperature" growth for current update operation.
+> > > This approach defines the mechanism of "temperature" growth.
+> > >
+> > > But if we have no more updates for the file, then
+> > > "temperature" needs to decrease. Starting and ending
+> > > timestamps of update operation can work as a basis for
+> > > decreasing "temperature" of a file. If we know the number
+> > > of updated logical blocks of the file, then we can divide
+> > > the duration of update operation on number of updated
+> > > logical blocks. As a result, this is the way to define
+> > > a time duration per one logical block. By means of
+> > > multiplying this value (time duration per one logical
+> > > block) on total number of logical blocks in file, we
+> > > can calculate the time duration of "temperature"
+> > > decreasing for one degree. Finally, the operation of
+> > > division the time range (between end of last update
+> > > operation and begin of new update operation) on
+> > > the time duration of "temperature" decreasing for
+> > > one degree provides the way to define how many
+> > > degrees should be subtracted from current "temperature"
+> > > of the file.
+> > >
+> > > [HOW TO USE THE APPROACH]
+> > > The lifetime of data "temperature" value for a file
+> > > can be explained by steps: (1) iget() method sets
+> > > the data "temperature" object; (2) folio_account_dirtied()
+> > > method accounts the number of dirty memory pages and
+> > > tries to estimate the current temperature of the file;
+> > > (3) folio_clear_dirty_for_io() decrease number of dirty
+> > > memory pages and increases number of updated pages;
+> > > (4) folio_account_dirtied() also decreases file's
+> > > "temperature" if updates hasn't happened some time;
+> > > (5) file system can get file's temperature and
+> > > to share the hint with block layer; (6) inode
+> > > eviction method removes and free the data "temperature"
+> > > object.
+> >
+> > I don't want to pour gasoline on old flame wars, but what is the
+> > advantage of this auto-magic data temperature framework vs the existing
+> > framework?
+> >
+>
+> There is no magic in this framework. :) It's simple and compact framework=
+.
+>
+> >  'enum rw_hint' has temperature in the range of none, short,
+> > medium, long and extreme (what ever that means), can be set by an
+> > application via an fcntl() and is plumbed down all the way to the bio
+> > level by most FSes that care.
+>
+> I see your point. But the 'enum rw_hint' defines qualitative grades again=
+:
+>
+> enum rw_hint {
+>         WRITE_LIFE_NOT_SET      =3D RWH_WRITE_LIFE_NOT_SET,
+>         WRITE_LIFE_NONE         =3D RWH_WRITE_LIFE_NONE,
+>         WRITE_LIFE_SHORT        =3D RWH_WRITE_LIFE_SHORT,  <-- HOT data
+>         WRITE_LIFE_MEDIUM       =3D RWH_WRITE_LIFE_MEDIUM, <-- WARM data
+>         WRITE_LIFE_LONG         =3D RWH_WRITE_LIFE_LONG,   <-- COLD data
+>         WRITE_LIFE_EXTREME      =3D RWH_WRITE_LIFE_EXTREME,
+> } __packed;
+>
+> First of all, again, it's hard to compare the hotness of different files
+> on such qualitative basis. Secondly, who decides what is hotness of a par=
+ticular
+> data? People can only guess or assume the nature of data based on
+> experience in the past. But workloads are changing and evolving
+> continuously and in real-time manner. Technically speaking, application c=
+an
+> try to estimate the hotness of data, but, again, file system can receive
+> requests from multiple threads and multiple applications. So, application
+> can guess about real nature of data too. Especially, nobody would like
+> to implement dedicated logic in application for data hotness estimation.
+>
+> This framework is inode based and it tries to estimate file's
+> "temperature" on quantitative basis. Advantages of this framework:
+> (1) we don't need to guess about data hotness, temperature will be
+> calculated quantitatively; (2) quantitative basis gives opportunity
+> for fair comparison of different files' temperature; (3) file's temperatu=
+re
+> will change with workload(s) changing in real-time; (4) file's
+> temperature will be correctly accounted under the load from multiple
+> applications. I believe these are advantages of the suggested framework.
+>
 
-Hmmm ... do we really want to make refcounting more complicated, and 
-more importantly, hugetlb-refcounting more special ?! :)
+While I think the general idea(using file-overwrite-rates as a
+parameter when doing data placement) could be useful, it could not
+replace the user space hinting we already have.
 
-If the workload doing a lot of single-page try_grab_folio_fast(), could 
-it do so on a larger area (multiple pages at once -> single refcount 
-update)?
+Applications(e.g. RocksDB) doing sequential writes to files that are
+immutable until deleted(no overwrites) would not benefit. We need user
+space help to estimate data lifetime for those workloads and the
+relative write lifetime hints are useful for that.
 
-Maybe there is a link to the report you could share, thanks.
+So what I am asking myself is if this framework is added, who would
+benefit? Without any benchmark results it's a bit hard to tell :)
 
--- 
-Cheers,
+Also, is there a good reason for only supporting buffered io? Direct
+IO could benefit in the same way, right?
 
-David / dhildenb
-
+Thanks,
+Hans
