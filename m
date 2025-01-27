@@ -1,64 +1,47 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2119D18FDD2
-	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 21:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33556B64A;
+	Mon, 27 Jan 2025 22:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738013504; cv=none; b=l/kK1WUqvvpeN+vHoj24aa061d2HVzgQUicWZrkEh+bjF67VctU8+wxpKZC7E4ZgZZDOEYzlhiIVH/mwMeDeERliEkXo57Yv1KQTbuG9mPrCUOTl8dR6WMqOQrEhDoN05HSKXO6PjlYh5JmARqiP6aJ+RyeVLt5HZ+/BJOkSdug=
+	t=1738017290; cv=none; b=ETKrjCVkZTky3794ZqWvcTeNmRSyrFXa+6pbkD9vEZlxyXXDGUAzRArXX5urJt/YcBY23B8GK1WqckzA4pp5XLGAGqoN5xizBp4yGB20yGl/CBdKXj1STRvVqXNru2kLspyB3QkiIY8cOH7/ScZlbbCWfmA6QoKGVln+stLK6JI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738013504; c=relaxed/simple;
-	bh=ZYvCZbtUoAT5JiJuAg8XDR0w4hfFoWqTwv+bLVbN1yg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oGqfwiyud6JTXPix2NSHSzthIISf5DRLqrgCywzWi6jN4UQyts4TviCflpdzBg+aU6jTX8BhJFPgNovyjG5kUCM5NJpu+oar4lQALafeKoyMnbYWW6zqqTt/uCYVxM+mGhb7bzI+LAyWxsr/ZiKB46/gZzZaTIdnJ1v+tIhhAWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i7Knc/0R; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1738017290; c=relaxed/simple;
+	bh=NIdQaGJ0O7j2mAPWnOGxQEOLufGMr3jQ1Cjdlyo5+2c=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=GiBwWvkcSEP/iS6DpVTbnatleXFvf5q+bCa2tXeDW2EHzaSepanikYnEf760RhNP0xFQW9Xv3tF6uYh4onNOo+AMfTiugxHTBLRe6tn21nfiUrN+wNfDdCSmfvmU6yR6sE45pWD8DITkvTYMJCBCTcQX2W3eLzgUvimqKrGcFPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=4+CKRpVW; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i7Knc/0R"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ab651f1dd36so979202366b.0
-        for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 13:31:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738013501; x=1738618301; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=H8Ix5bawk3vcAfD33vhDdhZSL9A70/0kQOyvn23giZE=;
-        b=i7Knc/0Ri7mm2CzQS8Rj9VD2/C2YNWINpS9KgGhmw6h7JDEGvNlq3VQDTzeOC62ML3
-         XqImrkFkXenr4izoFMv2r+H8xcUkjokozoPKkh1aeERjSH9c6gLpnEYPT74g+4glEBNA
-         6kphCYyRN2KxvP8XNS+ka6sDuuRm4W1nNn1hrLiRNpsJVy/xWHENaGUVtqEu4JHcDVCu
-         LubUczN8dyed8Jyyt03pwmTK9liIZfXgB22dkowAxRqr+RdY5Fck89PalOvqGUfUYLy6
-         ho/LPaZAtk8a7xZRopEjYE4rNwWUK23TYR1LOp9/GGWVMjdnOtRx7jiA8EPPiWEy7jt3
-         jqJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738013501; x=1738618301;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H8Ix5bawk3vcAfD33vhDdhZSL9A70/0kQOyvn23giZE=;
-        b=LXiHFIJhw+XfxxGxMkkcoDjnR37oB3LfXKWYj+0EtGEBvj5yaOIZ78cgb9Qu/1yU2F
-         /XA4LGadrD73zJJNgbF8Yx5MOPeu240ZdRWnjCzwsfmnYfNqUrPF5yGus1y6+NFFNJIH
-         bruxrV0PqivUuju0tbZiS8+zS/jxvbRtU8ttzFMQ4Eef4uEIRkbuBEmPXEZ5sKTc5XSe
-         Crz4pTwyceGnCh3DY85/cUoiDjwAriQhGVR0T2+2QSLhY6aKHp/aWwx+SaIkOBi+I5lo
-         9+OMkioueU4Tb5LFDNr2FtQ61hIE3piainYTBWP4qTlm6xNPy46im/vygz/FT2Ly+Y5E
-         BAzw==
-X-Forwarded-Encrypted: i=1; AJvYcCVH5zCH8oXwCrDUhWmAfeNZR3i1fgV6QD8xiAg0lUdwR8EIBvF6fLPIyTCDXYpTKCk6ZRNFsd5OsPTt2w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlCI0O4huf5wJhCbbCPGSx/TY0ljSrdJ66F5T01ordkLMt/9oY
-	jwxEaeyILlWN7IsK4mk0lr0ijId4Y2u7SbCo1hAYEFCQRhraXlCB
-X-Gm-Gg: ASbGncteBEgliEKv7DKBjznuldBmbiZ2C5mEJQPzMngQrX/nrhtBMYPybIaQueq8Z9u
-	ZUJDPtKhz3RY+7OkDyx+dqg1lppcc+CfZF63wVp48pby0eE7n+yMNKfzbJeJvDsIcTp5tEN3tJW
-	YIx8PPRuiLXWDwU7yIM8w+n5whdg7TLzzMAGDK6NlzbjgYtLqv0EIUBcBazOjYjte6t3fDvzF17
-	Clk3+6z2P2lGQgR7Q5VN++aH5nsgqWEiHmQ2IW9Fo2cwP1M5znJRoxWHuc663/yJgfKnP3QqxsB
-	V/uPLXjzK6OGJw==
-X-Google-Smtp-Source: AGHT+IHVJPLDwM6pv2kJlP80pKtzffSY3kmJQHtOcyku7NWQen1NwlAloUpu1svNA6mHUq0uRNRsxA==
-X-Received: by 2002:a17:907:3da1:b0:aa6:8bb4:5030 with SMTP id a640c23a62f3a-ab38aedf0eamr4227794166b.0.1738013501094;
-        Mon, 27 Jan 2025 13:31:41 -0800 (PST)
-Received: from [192.168.8.100] ([148.252.145.92])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6760fc485sm646346566b.160.2025.01.27.13.31.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jan 2025 13:31:40 -0800 (PST)
-Message-ID: <31cfafe8-c6bb-43fc-883b-356a23d4f434@gmail.com>
-Date: Mon, 27 Jan 2025 21:32:03 +0000
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="4+CKRpVW"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YhjsN2hRbzlgMVd;
+	Mon, 27 Jan 2025 22:34:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type
+	:content-language:subject:subject:from:from:user-agent
+	:mime-version:date:date:message-id:received:received; s=mr01; t=
+	1738017281; x=1740609282; bh=s/d/ASauSl/0SZWIhV1x7z0/BvXH1j1F4TT
+	ySnAypFg=; b=4+CKRpVWIDp+Lu8ncj3j5j6vycAJpoDy98AGzuUWIEYBB8iyBxY
+	/OmNznup9iclmYNKNzzsugyCJaSvu9sZ9YIVH+0Rvkipi1XQtVqUf+7etJ7UjAhY
+	L4CXvzzGnf6x/0ghSXjrRmrz3iqPXAlsEgk8fqhMd8Nq5wbTPmcnisHyA9N0rq2w
+	fb3gIKIoBB6E3aonkXqeAK2wpNgeC1Dk7SfOzkWlVCWhf4oroH2XACcUj+Mv1Dr/
+	3gQPiI5xbxZbmvLFn2gUt/KtW2MJnd/dDq7VFDF4QszGsG1fXqLVEonUcqh4C8g6
+	LDHAysFmCivHB6hnSvE67j/t/mmJ/eOgpmg==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id opoqWIsJoUZd; Mon, 27 Jan 2025 22:34:41 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4Yhjs86sNDzlgTWM;
+	Mon, 27 Jan 2025 22:34:36 +0000 (UTC)
+Message-ID: <ad1018b6-7c0b-4d70-b845-c869287d3cf3@acm.org>
+Date: Mon, 27 Jan 2025 14:34:35 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,55 +49,79 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Direct I/O performance problems with 1GB pages
-To: Jens Axboe <axboe@kernel.dk>, Andres Freund <andres@anarazel.de>,
- David Hildenbrand <david@redhat.com>
-Cc: Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
- linux-block@vger.kernel.org, Muchun Song <muchun.song@linux.dev>,
- Jane Chu <jane.chu@oracle.com>
-References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
- <e0ba55af-23c4-455e-9449-e74de652fb7c@redhat.com>
- <Z5euIf-OvrE1suWH@casper.infradead.org>
- <f3710cc4-cbbf-4f1e-93a0-9eb6697df2d3@redhat.com>
- <6ulkhmnl4rot5vrywoxvoewko7vbgkhypcwxjccghdu26kwsx5@bnseuzrsedte>
- <108b6ae7-a272-482b-b3da-60f1fc6617ee@kernel.dk>
+From: Bart Van Assche <bvanassche@acm.org>
+Subject: [LSF/MM/BPF Topic] Energy-Efficient I/O
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Cc: "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+ Jens Axboe <axboe@kernel.dk>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ Christoph Hellwig <hch@lst.de>, Qais Yousef <qyousef@layalina.io>,
+ Tero Kristo <tero.kristo@linux.intel.com>, Can Guo <quic_cang@quicinc.com>,
+ Avri Altman <avri.altman@wdc.com>, Bean Huo <beanhuo@micron.com>,
+ Peter Wang <peter.wang@mediatek.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <108b6ae7-a272-482b-b3da-60f1fc6617ee@kernel.dk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/27/25 18:54, Jens Axboe wrote:
-> On 1/27/25 11:21 AM, Andres Freund wrote:
->>> That's precisely what io-uring fixed buffers do :)
->>
->> I looked at using them at some point - unfortunately it seems that there is
->> just {READ,WRITE}_FIXED not {READV,WRITEV}_FIXED. It's *exceedingly* common
->> for us to do reads/writes where source/target buffers aren't wholly
->> contiguous. Thus - unless I am misunderstanding something, entirely plausible
->> - using fixed buffers would unfortunately increase the number of IOs
->> noticeably.
->>
->> Should have sent an email about that...
->>
->> I guess we could add some heuristic to use _FIXED if it doesn't require
->> splitting an IO into too many sub-ios. But that seems pretty gnarly.
-> 
-> Adding Pavel, he's been working on support registered buffers with
-> readv/writev.
+Energy efficiency is very important for battery-powered devices like
+smartphones. In battery-powered devices, CPU cores and peripherals
+support multiple power states. A lower power state is entered if no work
+is pending. Typically the more power that is saved, the more time it
+takes to exit the power saving state.
 
-Yes, there are patches from last year out there, I'm going to pick
-them up and, hopefully for 6.15. I'll keep you in the loop.
+Switching to a lower power state if no work is pending works well for
+CPU-intensive tasks but is not optimal for latency-sensitive tasks like
+block I/O with a low queue depth. If a CPU core transitions to a lower
+power state after each I/O has been submitted and has to be woken up
+every time an I/O completes, this can increase I/O latency
+significantly. The cpu_latency_qos_update_request(..., max_latency)
+function can be used to specify a maximum wakeup latency and hence can
+be used to prevent a transition to a lower power state before an I/O
+completes. However, cpu_latency_qos_update_request() is too expensive to
+be called from the I/O submission path for every request.
 
+In the UFS driver the cpu_latency_qos_update_request() is called from
+the devfreq_dev_profile::target() callback. That callback checks the
+hba->clk_scaling.active_reqs variable, a variable that tracks the number
+of outstanding commands. Updates of that variable are protected by a
+spinlock and hence are a contention point. Having to maintain this or a
+similar infrastructure in every block driver is not ideal.
 
->> I dimly recall that I also ran into some around using fixed buffers as a
->> non-root user. It might just be the accounting of registered buffers as
->> mlocked memory and the difficulty of configuring that across
->> distributions. But I unfortunately don't remember any details anymore.
-> 
-> Should just be accounting.
-> 
+A possible solution is to tie QoS updates to the runtime-power
+management (RPM) mechanism. The block layer interacts as follows with
+the RPM mechanism:
+* pm_runtime_mark_last_busy(dev) is called by the block layer upon
+   request completion. This call updates dev->power.last_busy. The RPM
+   mechanism uses this information to decide when to check whether a
+   block device can be suspended.
+* pm_request_resume() is called by the block layer if a block device has
+   been runtime suspended and needs to be resumed.
+* If the RPM timer expires, the block driver .runtime_suspend() callback
+   is invoked. The .runtime_suspend() callback is expected to call
+   blk_pre_runtime_suspend() and blk_post_runtime_suspend().
+   blk_pre_runtime_suspend() checks whether q->q_usage_counter is zero.
 
--- 
-Pavel Begunkov
+It is not my goal to replace the iowait boost mechanism. This mechanism
+boosts the CPU frequency when a task that is in the iowait state wakes
+up after the I/O operation completes.
 
+The purpose of this session is to discuss the following:
+* A solution that exists in the block layer instead of in block drivers.
+* A solution that does not cause contention between block layer hardware
+   queues.
+* A solution that does not measurable increase the number of CPU cycles
+   per I/O.
+* A solution that does not require users to provide I/O latency
+   estimates.
+
+See also:
+* https://www.kernel.org/doc/Documentation/power/pm_qos_interface.txt
+* Tero Kristo, [PATCHv2 0/2] blk-mq: add CPU latency limit control,
+   2024-10-18 
+(https://lore.kernel.org/linux-block/20241018075416.436916-1-tero.kristo@linux.intel.com/).
+* The cpu_latency_constraints definition in kernel/power/qos.c.
+
+Thanks,
+
+Bart.
