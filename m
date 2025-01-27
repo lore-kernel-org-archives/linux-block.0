@@ -1,96 +1,162 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F4917BA1
-	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 17:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC1B17ADF8
+	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 18:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738000567; cv=none; b=mKY1Be5uQtJXhYbsuGMgjxsAnoiOY9bAojKkX4CZ4BpqvRCisszQdiDqCPl66XsZtQXjG+5a9gfK+RQ+Q8EaWNkkYTuiDdeWHEsKvZ7W972k+LachGPFIumhLJoK+0lYcrI+JGeanqbBCkZMBmuYWR+Re6B2LKlm32GcJBPRMjs=
+	t=1738002089; cv=none; b=RJafZiG3FRucIFs+B07nOB/FrQdR2N8na8wWCdnV56CGPUUjeg0I6XSPdrfQfAntKIawzbKIwyeWz0mHtOFN73dEzZvfP9FluanCOIgUNRjz1uLUwOqj0cgSu3K2LiFdlAUqZmnSDCu5chAsNeAZVwac+8LO7mxahLaqui7yBAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738000567; c=relaxed/simple;
-	bh=fZF7B91NYTsHaZ7DGIpW7kTE9R7yjMdrf4ME515/WDs=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=KBD1BWHTzgudPLkRfjqOTD8FqNE9nIgnTm/LkUrrYTG3eoTE/+kDM7XipePR14divLAq9gPbSi0tTvquU/XAQPz6vP+0csXJFbkLEWix6o0+qjSMeAJ4Bn5Jx7mWC/EKehy68wtXBtQaruZ2Ev+3uz8g2PwNdbYCE1KOMm9WS/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c/kSMOlE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1738002089; c=relaxed/simple;
+	bh=9oX8XBT+ckRfQ+RBrNdl9bknDKxI5UM7mVVoNmjLB9U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eGEPat1fu+eAe5g69hhbhELR6yeLhO77E1hnRA0qke8MtgXolePcZSeRCgmmLGr781WW8R7k8DenRnsW/7laX8rWEnqqgDRKaeKvBfmHkwH9G214n6D72fnuaAgha0ORHY0Cy6KoxVtWzHGBeQlLApLc9QGmTHbTDUUNKFWaTBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=anarazel.de; spf=pass smtp.mailfrom=anarazel.de; dkim=pass (2048-bit key) header.d=anarazel.de header.i=@anarazel.de header.b=K0yBw62Y; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GwFb7Etg; arc=none smtp.client-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=anarazel.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=anarazel.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/kSMOlE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738000564;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NtkL2XkEzqj46VL+eqj4l5IKFcws6Me10SqKUziFnbg=;
-	b=c/kSMOlEnd7yvBOWgraNSu+Yc3f1LLrj/kaDtMcrw3IMEiwPN7paJgat+0h14gI1He5IQB
-	hyBqBoPprBkJEqm45hhNTxIT++IMvkj7kXAWW/w+Z0KMOHFSIDfRn2joTBA5YJUGbNk/pA
-	qAAG696w+kuraDfTBwKg9xYjibpVEj8=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-504-FpCtCt6EMh2qXHtxyZiQWg-1; Mon,
- 27 Jan 2025 12:56:00 -0500
-X-MC-Unique: FpCtCt6EMh2qXHtxyZiQWg-1
-X-Mimecast-MFC-AGG-ID: FpCtCt6EMh2qXHtxyZiQWg
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 194CA19560B0;
-	Mon, 27 Jan 2025 17:55:58 +0000 (UTC)
-Received: from [10.45.224.57] (unknown [10.45.224.57])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7D471195608E;
-	Mon, 27 Jan 2025 17:55:55 +0000 (UTC)
-Date: Mon, 27 Jan 2025 18:55:50 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Bart Van Assche <bvanassche@acm.org>
-cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-    Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>, 
-    Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>
-Subject: Re: [PATCH v17 02/14] dm-linear: Report to the block layer that the
- write order is preserved
-In-Reply-To: <785fd5c7-e0a2-47f7-a7b0-f10c24142dfa@acm.org>
-Message-ID: <c73ed1d4-b580-be42-48a5-dfa4c920d192@redhat.com>
-References: <20250115224649.3973718-1-bvanassche@acm.org> <20250115224649.3973718-3-bvanassche@acm.org> <b0717657-8ecd-0fcf-4ca1-eb9f91ad01cf@redhat.com> <785fd5c7-e0a2-47f7-a7b0-f10c24142dfa@acm.org>
+	dkim=pass (2048-bit key) header.d=anarazel.de header.i=@anarazel.de header.b="K0yBw62Y";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GwFb7Etg"
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id EAFCE2540113;
+	Mon, 27 Jan 2025 13:21:25 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Mon, 27 Jan 2025 13:21:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anarazel.de; h=
+	cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1738002085; x=1738088485; bh=cRP+DK217q
+	jmvyi+zlvZh1DoEcriRk8x6tJpLrq4SHM=; b=K0yBw62Yb73WbXUBEHoqCbzA+7
+	oawTh2Z2nU0/MMW6wXT6zqkMFcHCJptD84p8RdOGJHpMNYe+OY5nZ9JgprrWipuk
+	286OUDsKkJIgSjiNHFGINcKfgajKgMsuQnjMWR32LoaQ1SSsCsO3nW+Io3fX66An
+	DlJz0Kz40KWaiHgVOjcIr1lp6skGFNihS2pWuVokdyRum9vjD4hcOl/r1RvSicyn
+	bZhut7QTzBuOlnAGatCNo6osy4Qj4Ah5i5tJnE3LpeXzPqd0PxXbKXFV3eZCINB/
+	M0ujUbI+lep7UKZLJEFHR9qZQ8dTnJEpfcboyfUXPVcp2CKqX405+S/fPNJQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738002085; x=1738088485; bh=cRP+DK217qjmvyi+zlvZh1DoEcriRk8x6tJ
+	pLrq4SHM=; b=GwFb7Etgx0E50q70h1p1A1jM7hE3M4U17QQDLkBD7U74JQhxfnx
+	aeWGhG3UsGp6Maglika6CmVq0G4cS5Ilbac8aAvCETRzcnmN9mbRKZhL8ih5bSTa
+	iEDi6Czt5IVh48iwKe6wcVgHrRPKRfG3hHOcajbIOMMyE2xlPsu+qXrJqKBnahsp
+	dppzmF0fx9s/iKkoc4nYYqArmXmtol8fsY+kbDlwNq4t3YMcgX3BN6R5kmiHWwi+
+	0lwl8HmCL60t2gCeeuf48EfDvVG8ZA0K6t/R6UE382AmELji3D/nPxV0h1X3qrvd
+	geB5uP6hKfh0lAXc6ocpWvVtpYLUG8fFz3A==
+X-ME-Sender: <xms:pc6XZ907hJ1w2pjDWPNUWbuxIZ6Wa8tp0W8--HgDUXUkt5jXFO9kDQ>
+    <xme:pc6XZ0EnyPxKxG_MluTi3IdPl-kosK8tf1S6ty1Hzc4gcR1RblcV1AVc-b7Y3RzEg
+    jH4T5au3HfXDa4Rhg>
+X-ME-Received: <xmr:pc6XZ950yfnZNdvFuqSTaW3D6xmua2bOLM4IgA43sLIRAb3L91HSWu7itZ18mLeB56kFBaq24yetVL_htO-WT3kkIj5UeYmCaHOk8WoUqg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudejgedgudefkeekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddt
+    vdenucfhrhhomheptehnughrvghsucfhrhgvuhhnugcuoegrnhgurhgvshesrghnrghrrg
+    iivghlrdguvgeqnecuggftrfgrthhtvghrnhepfeffgfelvdffgedtveelgfdtgefghfdv
+    kefggeetieevjeekteduleevjefhueegnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomheprghnughrvghssegrnhgrrhgriigvlhdruggvpdhnsggp
+    rhgtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeifihhllhihse
+    hinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheprgigsghovgeskhgvrhhnvghlrdgu
+    khdprhgtphhtthhopehlihhnuhigqdhmmheskhhvrggtkhdrohhrghdprhgtphhtthhope
+    hmuhgthhhunhdrshhonhhgsehlihhnuhigrdguvghvpdhrtghpthhtohepjhgrnhgvrdgt
+    hhhusehorhgrtghlvgdrtghomhdprhgtphhtthhopegurghvihgusehrvgguhhgrthdrtg
+    homhdprhgtphhtthhopehlihhnuhigqdgslhhotghksehvghgvrhdrkhgvrhhnvghlrdho
+    rhhg
+X-ME-Proxy: <xmx:pc6XZ62iUd_iyq4TAVpDsDqCe90iLTTn-Ep6PLdJ89tZOCZunh2yhA>
+    <xmx:pc6XZwF2qads1gBwWYkTbCDoY-RDvsfb2JdINLqn-7XbRz3proyUMw>
+    <xmx:pc6XZ7_A_sq3t-ygPilTyxNPX4yZuXjla3MlcwBvRMBMiWk6hOH1JQ>
+    <xmx:pc6XZ9k8VRTkq5WyEyOkKq0ZpMk8-MApYzByqwl8sDYEXrld8TwEuA>
+    <xmx:pc6XZ70D_tpEWdJTmerntpCQS4iYfiuTronlWa0xfOfI2vbKiBp5FR6o>
+Feedback-ID: id4a34324:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 27 Jan 2025 13:21:25 -0500 (EST)
+Date: Mon, 27 Jan 2025 13:21:24 -0500
+From: Andres Freund <andres@anarazel.de>
+To: David Hildenbrand <david@redhat.com>
+Cc: Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org, Muchun Song <muchun.song@linux.dev>, 
+	Jane Chu <jane.chu@oracle.com>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: Direct I/O performance problems with 1GB pages
+Message-ID: <6ulkhmnl4rot5vrywoxvoewko7vbgkhypcwxjccghdu26kwsx5@bnseuzrsedte>
+References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
+ <e0ba55af-23c4-455e-9449-e74de652fb7c@redhat.com>
+ <Z5euIf-OvrE1suWH@casper.infradead.org>
+ <f3710cc4-cbbf-4f1e-93a0-9eb6697df2d3@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f3710cc4-cbbf-4f1e-93a0-9eb6697df2d3@redhat.com>
+
+Hi,
+
+On 2025-01-27 17:09:57 +0100, David Hildenbrand wrote:
+> > Andres shared some gists, but I don't want to send those to a
+> > mailing list without permission.  Here's the kernel part of the
+> > perf report:
+> >
+> >      14.04%  postgres         [kernel.kallsyms]          [k] try_grab_folio_fast
+> >              |
+> >               --14.04%--try_grab_folio_fast
+> >                         gup_fast_fallback
+> >                         |
+> >                          --13.85%--iov_iter_extract_pages
+> >                                    bio_iov_iter_get_pages
+> >                                    iomap_dio_bio_iter
+> >                                    __iomap_dio_rw
+> >                                    iomap_dio_rw
+> >                                    xfs_file_dio_read
+> >                                    xfs_file_read_iter
+> >                                    __io_read
+> >                                    io_read
+> >                                    io_issue_sqe
+> >                                    io_submit_sqes
+> >                                    __do_sys_io_uring_enter
+> >                                    do_syscall_64
+> >
+> > Now, since postgres is using io_uring, perhaps there could be a path
+> > which registers the memory with the iouring (doing the refcount/pincount
+> > dance once), and then use that pinned memory for each I/O.  Maybe that
+> > already exists; I'm not keeping up with io_uring development and I can't
+> > seem to find any documentation on what things like io_provide_buffers()
+> > actually do.
+
+Worth noting that we'll not always use io_uring. Partially for portability to
+other platforms, partially because it turns out that io_uring is disabled in
+enough environments that we can't rely on it. The generic fallback
+implementation is a pool of worker processes connected via shared memory. The
+worker process approach did run into this issue, fwiw.
+
+That's not to say that a legit answer to this scalability issue can't be "use
+fixed bufs with io_uring", just wanted to give context.
 
 
+> That's precisely what io-uring fixed buffers do :)
 
-On Tue, 21 Jan 2025, Bart Van Assche wrote:
+I looked at using them at some point - unfortunately it seems that there is
+just {READ,WRITE}_FIXED not {READV,WRITEV}_FIXED. It's *exceedingly* common
+for us to do reads/writes where source/target buffers aren't wholly
+contiguous. Thus - unless I am misunderstanding something, entirely plausible
+- using fixed buffers would unfortunately increase the number of IOs
+noticeably.
 
-> > How is write pipelining supposed to work with suspend/resume? dm doesn't
-> > preserve the order of writes in case of suspend.
-> 
-> That's an interesting question. I expect that the following will happen
-> upon resume if zoned writes would have been reordered by dm-linear:
-> * The block device reports one or more unaligned write errors.
-> * For the zones for which an unaligned write error has been reported,
->   the flag BLK_ZONE_WPLUG_ERROR is set (see also patch 07/14 in this
->   series).
-> * Further zoned writes are postponed for the BLK_ZONE_WPLUG_ERROR zones
->   until all pending zoned writes have completed.
-> * Once all pending zoned writes have completed for a
->   BLK_ZONE_WPLUG_ERROR zone, these are resubmitted. This happens in LBA
->   order.
-> * The resubmitted writes will succeed unless the submitter (e.g. a
->   filesystem) left a gap between the zoned writes. If the submitter
->   does not follow the zoned block device specification, the zoned
->   writes will be retried until the number of retries has been exhausted.
->   Block devices are expected to set the number of retries to a small
->   positive number.
+Should have sent an email about that...
 
-On suspend, dm_submit_bio calls queue_io to add bios to a list. On resume, 
-the list is processed in order and the bios are submitted, but this 
-submitting of deferred bios may race with new bios that may be received 
-and directed to the underlying block device - so, the new bios may be 
-submitted before the old bios.
+I guess we could add some heuristic to use _FIXED if it doesn't require
+splitting an IO into too many sub-ios. But that seems pretty gnarly.
 
-Mikulas
 
+I dimly recall that I also ran into some around using fixed buffers as a
+non-root user. It might just be the accounting of registered buffers as
+mlocked memory and the difficulty of configuring that across
+distributions. But I unfortunately don't remember any details anymore.
+
+
+Greetings,
+
+Andres Freund
