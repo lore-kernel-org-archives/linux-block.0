@@ -1,183 +1,136 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E81F8837
-	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 15:22:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA1C2AD21
+	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 16:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737991363; cv=none; b=CFtNork13Al/KE1uG8Id6yWlw89YET4RFnqN/RHK+lOgYKONkB1MZNe4+0rTRr/lYU4FcN8JbvOpNnlPZNtBWo2Ct0yLec2KoG1NxFX8HVeVoGhKzB29SYoaBa44WRkg2bPF3/oURktxp2FLhQsKVc3n+co3qpuNOanHVC+hBIs=
+	t=1737993767; cv=none; b=sQwrSgWUsOQAZn0t/eN4eB9MWzT2tEoy8WHJ80iRncMCEnfraRILHoO1QHHLYSkINHgO/BzcvPJSLmwGhKX9230x0skfG+R8krVicFysAVZABLn6HNqEg9G2nV71fYYDbiuf/PKxfM5v24dYa7GF1yAOAYQcOhxfcLwFn8JkODA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737991363; c=relaxed/simple;
-	bh=0ynk7ndU1jivvo/ZEQnYjK+cLrSa+xxA9CcO9a+/M7Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q941+0a02EzzJkQntiO0NGjQaWHjtr5viZOwWHluxNf2LjY0K0adMJ3kTksHuvES01igHExUjK33+b373Wcm+XdUuDwLRgwxNY79bJKwh++z2JHN1vHJthRpafs2dtSKvTUcroKxeunpjj/SawZN8frc1a0mRcWHTT+dner5pd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qQjoobz+; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1737993767; c=relaxed/simple;
+	bh=OyHgj3UTv8yH/X1kktHy69aOaqacSy1Vr5vrG/aLKWs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c+npWzi/vcyBeulXj6Ku7/U1my+JIfDdwhJl9+jhWNab+aIHmhzlg1R1BfQtpeieKauWq89dPyPYNJxEhlVipbexHjjcrwQ16s+/32TWqAl8CxbxCG0/Jmvq8icsZpa+1kXgZeH7PKxqDWMPAARXtfZwQmU2s6t+vVeijKCpJPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UZLpSog+; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qQjoobz+"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UZLpSog+"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=nQIYlth5/SosC9aSvpoeuOTf59ddrduNWisWejmm280=; b=qQjoobz+eE09aCDt1SaKqbZjop
-	6wolUuuTHAg451PbV5BzzttnsXPgoKr2N0AFvaHgR7/YL+7Vm92dQo5wheZkFIRgx0RXdI4p3G/nm
-	aVHeWarEZ4Czn8M++3W+wdJlUVdRhoVCnguWtw44f8qwD4/erm9Uwrw0uWbB8OPEKJBxZ1D9OS1/L
-	RcxOCIrrql52i5v9+SFbKnYqZDDv1EMnKByKjY+zsZZdOcWWrjP4Z7sSbBvjLsV/C14amE3ghWHKv
-	mvm2yx7dJAgsEanFfK1xquOaDIz0iIutIP6klOo8fl3d/eTIlKCe1ynMvS0hdL5hMThOTwbYQ3N1C
-	+ER3MAUw==;
-Received: from 2a02-8389-2341-5b80-b8ca-be22-b5e2-4029.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:b8ca:be22:b5e2:4029] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tcQwg-00000002aLl-1yvb;
-	Mon, 27 Jan 2025 15:22:39 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH] loop: take the file system minimum dio alignment into account
-Date: Mon, 27 Jan 2025 16:22:36 +0100
-Message-ID: <20250127152236.612108-1-hch@lst.de>
-X-Mailer: git-send-email 2.45.2
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=28LMBxDMd1K+Lfe4Mecb7NBAlb5zAN2Qnc1EAyl4s3g=; b=UZLpSog+4jqsQvTtbD5DQhK/Ba
+	6sKjwyDUJ1w3HFoKe4RSIVo39MHzvdP29gL/WjK9zjfBDnnSaAvuIPi9HUkGU1it3xCV2FKQi79z7
+	9gkR6vQfLS4nsdQEhHSD9LB/fV1BXDMwbvs6ptmVWDqqRqyIr5zJtZXS8nqFvEdpmTIppmxPcGxRC
+	2qErTZgSm8wuGoVjUs80nPQB1e3OPMBGgT8IJOsxeHf4Bm40gyRjQptc3pqHBQa1EGcTphIWdOWSO
+	zX4BpQiBnpI8TaUgCwi3rFh0NhdV+ugIvgOn2oB8tSzRiuFSpdcFTiObm9+AF+rZPgTMVxhazPZr/
+	HN705aUQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tcRZR-00000009c6H-1KNG;
+	Mon, 27 Jan 2025 16:02:41 +0000
+Date: Mon, 27 Jan 2025 16:02:41 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-mm@kvack.org, linux-block@vger.kernel.org,
+	Muchun Song <muchun.song@linux.dev>, Jane Chu <jane.chu@oracle.com>,
+	Andres Freund <andres@anarazel.de>
+Subject: Re: Direct I/O performance problems with 1GB pages
+Message-ID: <Z5euIf-OvrE1suWH@casper.infradead.org>
+References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
+ <e0ba55af-23c4-455e-9449-e74de652fb7c@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e0ba55af-23c4-455e-9449-e74de652fb7c@redhat.com>
 
-The loop driver currently uses the logical block size of the underlying
-bdev as the lower bound of the loop device block size.  While this works
-for many cases, it fails for file systems made up of multiple devices
-with different logic block size (e.g. XFS with a RT device that has a
-larger logical block size), or when the file systems doesn't support
-direct I/O writes at the sector size granularity (e.g. because it does
-out of place writes with a file system block size larger than the sector
-size).
+[Adding Andres to the cc.  Sorry for leaving you off in the initial mail]
 
-Fix this by querying the minimum direct I/O alignment from statx when
-available.
+On Mon, Jan 27, 2025 at 03:09:23PM +0100, David Hildenbrand wrote:
+> On 26.01.25 01:46, Matthew Wilcox wrote:
+> > Postgres are experimenting with doing direct I/O to 1GB hugetlb pages.
+> > Andres has gathered some performance data showing significantly worse
+> > performance with 1GB pages compared to 2MB pages.  I sent a patch
+> > recently which improves matters [1], but problems remain.
+> > 
+> > The primary problem we've identified is contention of folio->_refcount
+> > with a strong secondary contention on folio->_pincount.  This is coming
+> > from the call chain:
+> > 
+> > iov_iter_extract_pages ->
+> > gup_fast_fallback ->
+> > try_grab_folio_fast
+> > 
+> > Obviously we can fix this by sharding the counts.  We could do that by
+> > address, since there's no observed performance problem with 2MB pages.
+> > But I think we'd do better to shard by CPU.  We have percpu-refcount.h
+> > already, and I think it'll work.
+> > 
+> > The key to percpu refcounts is knowing at what point you need to start
+> > caring about whether the refcount has hit zero (we don't care if the
+> > refcount oscillates between 1 and 2, but we very much care about when
+> > we hit 0).
+> > 
+> > I think the point at which we call percpu_ref_kill() is when we remove a
+> > folio from the page cache.  Before that point, the refcount is guaranteed
+> > to always be positive.  After that point, once the refcount hits zero,
+> > we must free the folio.
+> > 
+> > It's pretty rare to remove a hugetlb page from the page cache while it's
+> > still mapped.  So we don't need to worry about scalability at that point.
+> > 
+> > Any volunteers to prototype this?  Andres is a delight to work with,
+> > but I just don't have time to take on this project right now.
+> 
+> Hmmm ... do we really want to make refcounting more complicated, and more
+> importantly, hugetlb-refcounting more special ?! :)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/loop.c | 58 ++++++++++++++++++++++++--------------------
- 1 file changed, 32 insertions(+), 26 deletions(-)
+No, I really don't.  But I've always been mildly concerned about extra
+contention on folio locks, folio refcounts, etc.  I don't know if 2MB
+page performance might be improved by a scheme like this, and we might
+even want to cut over for sizes larger than, say, 64kB.  That would be
+something interesting to investigate.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d1f1d6bef2e6..84b810b0f278 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -54,7 +54,8 @@ struct loop_device {
- 	int		lo_flags;
- 	char		lo_file_name[LO_NAME_SIZE];
- 
--	struct file *	lo_backing_file;
-+	struct file	*lo_backing_file;
-+	unsigned int	lo_min_dio_size;
- 	struct block_device *lo_device;
- 
- 	gfp_t		old_gfp_mask;
-@@ -169,29 +170,14 @@ static loff_t get_loop_size(struct loop_device *lo, struct file *file)
-  * of backing device, and the logical block size of loop is bigger than that of
-  * the backing device.
-  */
--static bool lo_bdev_can_use_dio(struct loop_device *lo,
--		struct block_device *backing_bdev)
--{
--	unsigned int sb_bsize = bdev_logical_block_size(backing_bdev);
--
--	if (queue_logical_block_size(lo->lo_queue) < sb_bsize)
--		return false;
--	if (lo->lo_offset & (sb_bsize - 1))
--		return false;
--	return true;
--}
--
- static bool lo_can_use_dio(struct loop_device *lo)
- {
--	struct inode *inode = lo->lo_backing_file->f_mapping->host;
--
- 	if (!(lo->lo_backing_file->f_mode & FMODE_CAN_ODIRECT))
- 		return false;
--
--	if (S_ISBLK(inode->i_mode))
--		return lo_bdev_can_use_dio(lo, I_BDEV(inode));
--	if (inode->i_sb->s_bdev)
--		return lo_bdev_can_use_dio(lo, inode->i_sb->s_bdev);
-+	if (queue_logical_block_size(lo->lo_queue) < lo->lo_min_dio_size)
-+		return false;
-+	if (lo->lo_offset & (lo->lo_min_dio_size - 1))
-+		return false;
- 	return true;
- }
- 
-@@ -541,6 +527,25 @@ static void loop_reread_partitions(struct loop_device *lo)
- 			__func__, lo->lo_number, lo->lo_file_name, rc);
- }
- 
-+static void loop_query_min_dio_size(struct loop_device *lo)
-+{
-+	struct file *file = lo->lo_backing_file;
-+	struct block_device *sb_bdev = file->f_mapping->host->i_sb->s_bdev;
-+	struct kstat st;
-+
-+	if (!vfs_getattr(&file->f_path, &st, STATX_DIOALIGN, 0) &&
-+	    (st.result_mask & STATX_DIOALIGN))
-+		lo->lo_min_dio_size = st.dio_offset_align;
-+	/*
-+	 * In a perfect world this wouldn't be needed, but as of Linux 6.13 only
-+	 * a handful of file systems support the STATX_DIOALIGN flag.
-+	 */
-+	else if (sb_bdev)
-+		lo->lo_min_dio_size = bdev_logical_block_size(sb_bdev);
-+	else
-+		lo->lo_min_dio_size = SECTOR_SIZE;
-+}
-+
- static inline int is_loop_device(struct file *file)
- {
- 	struct inode *i = file->f_mapping->host;
-@@ -629,6 +634,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	lo->old_gfp_mask = mapping_gfp_mask(file->f_mapping);
- 	mapping_set_gfp_mask(file->f_mapping,
- 			     lo->old_gfp_mask & ~(__GFP_IO|__GFP_FS));
-+	loop_query_min_dio_size(lo);
- 	loop_update_dio(lo);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
-@@ -970,12 +976,11 @@ loop_set_status_from_info(struct loop_device *lo,
- 	return 0;
- }
- 
--static unsigned int loop_default_blocksize(struct loop_device *lo,
--		struct block_device *backing_bdev)
-+static unsigned int loop_default_blocksize(struct loop_device *lo)
- {
--	/* In case of direct I/O, match underlying block size */
--	if ((lo->lo_backing_file->f_flags & O_DIRECT) && backing_bdev)
--		return bdev_logical_block_size(backing_bdev);
-+	/* In case of direct I/O, match underlying minimum I/O size */
-+	if (lo->lo_backing_file->f_flags & O_DIRECT)
-+		return lo->lo_min_dio_size;
- 	return SECTOR_SIZE;
- }
- 
-@@ -993,7 +998,7 @@ static void loop_update_limits(struct loop_device *lo, struct queue_limits *lim,
- 		backing_bdev = inode->i_sb->s_bdev;
- 
- 	if (!bsize)
--		bsize = loop_default_blocksize(lo, backing_bdev);
-+		bsize = loop_default_blocksize(lo);
- 
- 	loop_get_discard_config(lo, &granularity, &max_discard_sectors);
- 
-@@ -1090,6 +1095,7 @@ static int loop_configure(struct loop_device *lo, blk_mode_t mode,
- 	lo->lo_backing_file = file;
- 	lo->old_gfp_mask = mapping_gfp_mask(mapping);
- 	mapping_set_gfp_mask(mapping, lo->old_gfp_mask & ~(__GFP_IO|__GFP_FS));
-+	loop_query_min_dio_size(lo);
- 
- 	lim = queue_limits_start_update(lo->lo_queue);
- 	loop_update_limits(lo, &lim, config->block_size);
--- 
-2.45.2
+> If the workload doing a lot of single-page try_grab_folio_fast(), could it
+> do so on a larger area (multiple pages at once -> single refcount update)?
 
+Not really.  This is memory that's being used as the buffer cache, so
+every thread in your database is hammering on it and pulling in exactly
+the data that it needs for the SQL query that it's processing.
+
+> Maybe there is a link to the report you could share, thanks.
+
+Andres shared some gists, but I don't want to send those to a
+mailing list without permission.  Here's the kernel part of the
+perf report:
+
+    14.04%  postgres         [kernel.kallsyms]          [k] try_grab_folio_fast
+            |
+             --14.04%--try_grab_folio_fast
+                       gup_fast_fallback
+                       |
+                        --13.85%--iov_iter_extract_pages
+                                  bio_iov_iter_get_pages
+                                  iomap_dio_bio_iter
+                                  __iomap_dio_rw
+                                  iomap_dio_rw
+                                  xfs_file_dio_read
+                                  xfs_file_read_iter
+                                  __io_read
+                                  io_read
+                                  io_issue_sqe
+                                  io_submit_sqes
+                                  __do_sys_io_uring_enter
+                                  do_syscall_64
+
+Now, since postgres is using io_uring, perhaps there could be a path
+which registers the memory with the iouring (doing the refcount/pincount
+dance once), and then use that pinned memory for each I/O.  Maybe that
+already exists; I'm not keeping up with io_uring development and I can't
+seem to find any documentation on what things like io_provide_buffers()
+actually do.
