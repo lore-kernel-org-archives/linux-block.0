@@ -1,72 +1,73 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4263D18A6A1
-	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 19:07:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A6417B50A
+	for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 19:20:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738004850; cv=none; b=gXSsCPMETtu3yp0eaCqunPwYEXna6GZ19vaA10hr87aPIk6rjRvZ3vagSK+aHgXfGhSrw/visZGpdShrFOU3a0H+2RdfAS6tuNZPgUChZsvABtpUi1ytZ9WwlYRyhkpYSac8fNP/jyRZUNE6wQBSELdMh2CJn2OoDmBPwDDIQJA=
+	t=1738005650; cv=none; b=XEh60IH1wtOJIWzI1dizUMMXSHzHrY5vsB0SZcMOfNV0BFRAkMHNvBEvvhxFIZaNuSmg+jLcofkVHqCAELtHRpmBe8oKSm5BqTf6SYcf3/Bb/5xI6y4396OrqVeFdyEZZwHLds5+Dr2HSZyCEcHFE4ibtACkyXThbHK3NMeHZOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738004850; c=relaxed/simple;
-	bh=pGkEuQXy3VwysjIwr7MmmjLQJdVrfw6t2tcN4YH/yMs=;
+	s=arc-20240116; t=1738005650; c=relaxed/simple;
+	bh=J9Ld9x0FerJUUfhgNjWZRFrM0pc7Iaid6LOvXGnkuio=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E2UpnAKmf4q9syZWySt/XnJ5t7wGO5W88uU6VFJ+PyXSEHrCvu4A+Qm5Aso5cUmitz5Hm0y95CuWrQ9cUcj0YwB9E+GrEc0nN9gZiRdS0E9CuB6vNZg69nkd+oeTaKy037esX6k4EhSgntcm3Ik/euuzd5o1mM6Se2w+lmsXXSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a3k543Zb; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=EHfAdHXftwKZYsR+4MEDvp/hRWLNVN0mA771JbC6nwycRdk1dPnuhUlSNT5K3nIcAi1x1YbQvGyEj3GhUHvNSysQdWCIl3iPr8YXWuU8kGa0JC6gLyrrhnMR7l5rsSk29kglFO++4msRLLlmTjTCWjalbELzzyGPx70+t3AFvIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pfqma1Xm; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a3k543Zb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pfqma1Xm"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738004846;
+	s=mimecast20190719; t=1738005647;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=uyc6LsJO6G5L79Np/T/dFGFGyW2JSn82k2kpERB4ue8=;
-	b=a3k543Zb2y4vlCQlwXxH3JhtYSCcYbkqO4uKeIOxzbPgMex+EcQXEtm1qy4kMsuDKziLj0
-	C5dewiiMPyOM7CsL6rceu2EnwbvabeZJPPfgIJZjAT9t1UO+OzCi15TfcNykELIQZ3O7kN
-	OPPP4V4hxlnIX1x8hlFocVeh5ss7lbo=
+	bh=D+8R7XrLPo3OtDW62lIO0QU1wUpoT+3fFURlZ+FCeic=;
+	b=Pfqma1XmvKHc6AD17O2z61Xcyoz4jxFwAisSC7doHQ/82LmAjD7kt9iS+lnMUhoGfnjXRr
+	eNq1qTKtQXf87jSHeNpoY7isheHQdp1b+qQQ2gHo5b5ZPenzDrS6zjYVfQ25WhKukUrscr
+	dxcH9Z0SHYzyuULbUoM8hp/SiposG/I=
 Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
  [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-438-hpgAIH-jPaySJcu9ofQdSQ-1; Mon, 27 Jan 2025 14:07:24 -0500
-X-MC-Unique: hpgAIH-jPaySJcu9ofQdSQ-1
-X-Mimecast-MFC-AGG-ID: hpgAIH-jPaySJcu9ofQdSQ
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43628594d34so27594915e9.2
-        for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 11:07:24 -0800 (PST)
+ us-mta-300-QkpuKAQNNY-8zFPEVR9bqg-1; Mon, 27 Jan 2025 14:20:45 -0500
+X-MC-Unique: QkpuKAQNNY-8zFPEVR9bqg-1
+X-Mimecast-MFC-AGG-ID: QkpuKAQNNY-8zFPEVR9bqg
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4361efc9dc6so26222835e9.3
+        for <linux-block@vger.kernel.org>; Mon, 27 Jan 2025 11:20:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738004843; x=1738609643;
+        d=1e100.net; s=20230601; t=1738005644; x=1738610444;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=uyc6LsJO6G5L79Np/T/dFGFGyW2JSn82k2kpERB4ue8=;
-        b=VxRQRLi9NERvmedZhsYimxtafh84F8kUdcRW1Wy4QKcKZRAifGXT2g0Lkc1F///y8e
-         eFhNm8b6Ro5ESUMamvS9DidbEvtvMLkkRLkxbwKGxVsy1QSZeCUmt7X0Q3aINHI0lb2U
-         dPE2YzEvpp+w/YO0Rq5xlshwEYrIpPFXeCQ5GRHyLNnxXZ1s3a+6BCqxuWj7L+aSuW3Y
-         Qiuc74ufk6J3/M+uPkBGFuVajBOP+aWvFhdpn+G5JsQyUWcDlpKkSFb8qCPoTtboWQLq
-         nbBKIj3C/tdX4wAd2tqmRO6JI2991S8PQKdIlqpglCp31aMDLEvdyHviM2AKG9n/VVYw
-         aV0w==
-X-Forwarded-Encrypted: i=1; AJvYcCUDIcB+eot+ScvZ3KBaFJdetxdmYC7jbM4ISWgCvptChzsJTgSx488aMqxlT0kdFYOWyBFdct9633Mliw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQyHH+L9Gpz2HtH3tVIIrxYuLbIwCBNjdyedwVKNB2ziSoe5BO
-	pmixs8fgBLMueNbqhd3kxPh9vPSxifDAH1nS8s+cM1AgId3nyrXZ4YXAkG0kV534Wn0GVA7B0hB
-	61ExaZHjCNpSsSmnnEp+1kUiumpbTFKPt7/cv+u5XndRd4GkY+DwpKJ1eoFNF
-X-Gm-Gg: ASbGncvEU/LNEw44+if4mr0Ra3mw8ojzNHkCNb0747AieyQfbTmWSLO14Tg+UtFr02D
-	ykonhHTsiq0YpTrDafvGz2pJORqgmfuRijNjEvs55kf06Q4DY78TkYJEzJKZxuhPFqRc4KLr+u8
-	YgcUAltaYEujkTo3GFrn/fojDD800e3VGKR2zYeHdQkdLViaiXich63QCUKkjZaW/ZIYRpXL2qP
-	H6BaXqchpV3bQqPqemnlFZ1RSy/7ySlfvZA6sKUxdvMQ6zOl0aPyWAiuzkmA7cozrPfD8LiOnuK
-	lptN7tMFmA3URyx8YN84KGAyhjQluf6IUQ==
-X-Received: by 2002:a7b:cc8f:0:b0:438:a214:52f4 with SMTP id 5b1f17b1804b1-438a2145332mr283852815e9.25.1738004843289;
-        Mon, 27 Jan 2025 11:07:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGIZwwQqlpfDcO0LIhEPhQczdmtW4UN2i5WfpIeT5O+BT0FbU2U86NgKeo9p7Ti9SzMoqMOWw==
-X-Received: by 2002:a7b:cc8f:0:b0:438:a214:52f4 with SMTP id 5b1f17b1804b1-438a2145332mr283852555e9.25.1738004842863;
-        Mon, 27 Jan 2025 11:07:22 -0800 (PST)
-Received: from [192.168.3.141] (p5b0c639d.dip0.t-ipconnect.de. [91.12.99.157])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd47f269sm143800015e9.8.2025.01.27.11.07.20
+        bh=D+8R7XrLPo3OtDW62lIO0QU1wUpoT+3fFURlZ+FCeic=;
+        b=e9GGj9ULVxqBx3g223BRQhNcQE2CZkSvKcNz1A05pBj5gjrRix57OFgXhuy2O8hmiM
+         rneHw56VtxHb2+/z4BGNFp2cqusJXGy8e0521iWzYKMlma3wwjt87TAQFGZA94FXfnb6
+         AksnD5kVDFoyJmxmLNluZMtPclUvk4rkkLw5zlTMJF7m/I2M3V0eGgd6YbFf2V+15Yvv
+         v9DAPPnYghzxSEit+gU9MOVwBwA0+JAYIVDvAs+xvEO5jBqAn8bqOF6PXN4fIR58Gzas
+         Br4H/FAMEenUUpYU3rR88Ne2IGC2N0hoKoqvnsIzwrz2KEKXm5tEEDCS6eDQsjtM8/S3
+         /8DQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXlbHS7VhMGMfrz39hk0bwBL/VMJg34yXMHwBUN2QELBvalIzKdhjhthTCbZSLmJ0rR3Um7a1riylWxNA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhlvFynj67lqi4Bc9bjinb6ppPomOlcwvMAyBEEe2JGZc+A0x7
+	Y5ANpvgV0k1FRjxZxD/0l9wYkN0y2mf6hMlkwQIIzrsAb9QnLGCxcXZIh9YfSYKiGyKAusmWsFM
+	+09yc/HXo6LX3vr95DJ1Owd2LMKXbhyKyqTqfNmuTP/X/zetgWAAXaFzcNCvWrtrfEStEZjA=
+X-Gm-Gg: ASbGnctz3RICjg40ZwnirT8PnAYZrmj/OFTY/ye163X3fDiUUyWB/Pt+RE1eW3My5Xn
+	QgvILWpxzcJvM5Yd1TDulLRrDpN90Nxuh0sVD+Gz2bv9h5QyBrZHSnK/FC44drUWY7kys2TXsnW
+	aG13Q8MiaVmeCb/tUh3jpioft5hH1aWvEP6vaBsKXUT3FjYYfEdxpyRIRDqI9GX3JTc1DhR/9t+
+	LCaDAGaxrhVGw/tYDsuHk9Lo0CcN52UkTFpZEm1uUmxGUU9JaGV4+uc24KoyMywN9l5h3oIUZ4u
+	m1mgNVndOVisfclhV2TQpECEp/dqo6QEbKmu4/ptm2S6DzwhKiHDNMQd5QXOZoE2kLKzXWRqJLD
+	ORSiTJQsLrcUzP8QmQbKr4VpMsdiH0dkD
+X-Received: by 2002:a05:600c:450c:b0:434:a91e:c709 with SMTP id 5b1f17b1804b1-4389145145fmr339222285e9.28.1738005644527;
+        Mon, 27 Jan 2025 11:20:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE71Hb4CqPQKpkvShDriyZvslj57JxR0E6S5UA5j86UPY5xzedYcuYXgqse5phY7+vcZEkC4A==
+X-Received: by 2002:a05:600c:450c:b0:434:a91e:c709 with SMTP id 5b1f17b1804b1-4389145145fmr339222105e9.28.1738005644181;
+        Mon, 27 Jan 2025 11:20:44 -0800 (PST)
+Received: from ?IPV6:2003:cb:c736:ca00:b4c3:24bd:c2f5:863c? (p200300cbc736ca00b4c324bdc2f5863c.dip0.t-ipconnect.de. [2003:cb:c736:ca00:b4c3:24bd:c2f5:863c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd54c0ecsm144033105e9.30.2025.01.27.11.20.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jan 2025 11:07:21 -0800 (PST)
-Message-ID: <f9c96dce-1fa5-4054-83d4-143ab6e2175b@redhat.com>
-Date: Mon, 27 Jan 2025 20:07:19 +0100
+        Mon, 27 Jan 2025 11:20:42 -0800 (PST)
+Message-ID: <4a75d25f-bcb9-42b6-aa9e-1e63e4be98e3@redhat.com>
+Date: Mon, 27 Jan 2025 20:20:41 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,16 +76,13 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: Direct I/O performance problems with 1GB pages
-To: Jens Axboe <axboe@kernel.dk>, Andres Freund <andres@anarazel.de>
+To: Andres Freund <andres@anarazel.de>
 Cc: Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
  linux-block@vger.kernel.org, Muchun Song <muchun.song@linux.dev>,
- Jane Chu <jane.chu@oracle.com>, Pavel Begunkov <asml.silence@gmail.com>
+ Jane Chu <jane.chu@oracle.com>
 References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
  <e0ba55af-23c4-455e-9449-e74de652fb7c@redhat.com>
- <Z5euIf-OvrE1suWH@casper.infradead.org>
- <f3710cc4-cbbf-4f1e-93a0-9eb6697df2d3@redhat.com>
- <6ulkhmnl4rot5vrywoxvoewko7vbgkhypcwxjccghdu26kwsx5@bnseuzrsedte>
- <108b6ae7-a272-482b-b3da-60f1fc6617ee@kernel.dk>
+ <w7vcs35omcdqkaszcc6fzvakzdoqkzjwtvdsc3lelcnjgzytib@siim7yk4qjrf>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -132,38 +130,99 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <108b6ae7-a272-482b-b3da-60f1fc6617ee@kernel.dk>
+In-Reply-To: <w7vcs35omcdqkaszcc6fzvakzdoqkzjwtvdsc3lelcnjgzytib@siim7yk4qjrf>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 27.01.25 19:54, Jens Axboe wrote:
-> On 1/27/25 11:21 AM, Andres Freund wrote:
->>> That's precisely what io-uring fixed buffers do :)
->>
->> I looked at using them at some point - unfortunately it seems that there is
->> just {READ,WRITE}_FIXED not {READV,WRITEV}_FIXED. It's *exceedingly* common
->> for us to do reads/writes where source/target buffers aren't wholly
->> contiguous. Thus - unless I am misunderstanding something, entirely plausible
->> - using fixed buffers would unfortunately increase the number of IOs
->> noticeably.
->>
->> Should have sent an email about that...
->>
->> I guess we could add some heuristic to use _FIXED if it doesn't require
->> splitting an IO into too many sub-ios. But that seems pretty gnarly.
+On 27.01.25 18:25, Andres Freund wrote:
+> Hi,
 > 
-> Adding Pavel, he's been working on support registered buffers with
-> readv/writev.
+> On 2025-01-27 15:09:23 +0100, David Hildenbrand wrote:
+>> Hmmm ... do we really want to make refcounting more complicated, and more
+>> importantly, hugetlb-refcounting more special ?! :)
 > 
->> I dimly recall that I also ran into some around using fixed buffers as a
->> non-root user. It might just be the accounting of registered buffers as
->> mlocked memory and the difficulty of configuring that across
->> distributions. But I unfortunately don't remember any details anymore.
-> 
-> Should just be accounting.
+> I don't know the answer to that - I mainly wanted to report the issue because
+> it was pretty nasty to debug and initially surprising (to me).
 
-For hugetlb we might be able to relax the accounting restriction. It's 
-effectively mlocked already, and setting up hugetlb requires privileges.
+Thanks for reporting!
+> 
+> 
+>> If the workload doing a lot of single-page try_grab_folio_fast(), could it
+>> do so on a larger area (multiple pages at once -> single refcount update)?
+> 
+> In the original case I hit this I (a VM with 10 PCIe 3x NVMEs JBODed
+> together), the IO size averaged something like ~240kB (most 256kB, with some
+> smaller ones thrown in). Increasing the IO size further than that starts to
+> hurt latency and thus requires even deeper IO queues...
+
+Makes sense.
+
+> 
+> Unfortunately for the VMs with those disks I don't have access to hardware
+> performance counters :(.
+ > >
+>> Maybe there is a link to the report you could share, thanks.
+> 
+> A profile of the "original" case where I hit this, without the patch that
+> Willy linked to:
+> 
+> Note this is a profile *not* using hardware perf counters, thus likely to be
+> rather skewed:
+> https://gist.github.com/anarazel/304aa6b81d05feb3f4990b467d02dabc
+> (this was on Debian Sid's 6.12.6)
+> 
+> Without the patch I achieved ~18GB/s with 1GB pages and ~35GB/s with 2MB
+> pages.
+
+Out of interest, did you ever compare it to 4k?
+
+> 
+> After applying the patch to add an unlocked already-dirty check to
+> bio_set_pages_dirty() performance improves to ~20GB/s when using 1GB pages.
+> 
+> A differential profile comparing 2MB and 1GB pages with the patch applied
+> (again, without hardware perf counters):
+> https://gist.github.com/anarazel/f993c238ea7d2c34f44440336d90ad8f
+> 
+> 
+> Willy then asked me for perf annotate of where in gup_fast_fallback() time is
+> spent.  I didn't have access to the VM at that point, and tried to repro the
+> problem with local hardware.
+> 
+> 
+> As I don't have quite enough IO throughput available locally, I couldn't repro
+> the problem quite as easily. But after lowering the average IO size (which is
+> not unrealistic, far from every workload is just a bulk sequential scan), it
+> showed up when just using two PCIe 4 NVMe SSDs.
+> 
+> Here are profiles of the 2MB and 1GB cases, with the bio_set_pages_dirty()
+> patch applied:
+> https://gist.github.com/anarazel/f0d0a884c55ee18851dc9f15f03f7583
+> 
+> 2MB pages get ~12.5GB/s, 1GB pages ~7GB/s, with a *lot* of variance.
+
+Thanks!
+
+> 
+> This time it's actual hardware perf counters...
+> 
+> Relevant details about the c2c report, excerpted from IRC:
+> 
+> andres | willy: Looking at a bit more detail into the c2c report, it looks
+>           like the dirtying is due to folio->_pincount and folio->_refcount in
+>           about equal measure and folio->flags being modified in
+>           gup_fast_fallback(). The modifications then, unsurprisingly, cause a
+>           lot of cache misses for reads (like in bio_set_pages_dirty() and
+>           bio_check_pages_dirty()).
+> 
+>   willy | andres: that makes perfect sense, thanks
+>   willy | really, the only way to fix that is to split it up
+>   willy | and either we can split it per-cpu or per-physical-address-range
+
+As discussed, even better is "not repeatedly pinning/unpinning" at all :)
+
+I'm curious, are multiple processes involved, or is this all within a 
+single process?
 
 -- 
 Cheers,
