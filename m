@@ -1,153 +1,329 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E9A4430
-	for <linux-block@vger.kernel.org>; Tue, 28 Jan 2025 07:11:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3EFA1E521
+	for <linux-block@vger.kernel.org>; Tue, 28 Jan 2025 08:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738048310; cv=none; b=j2+3jvokxtA3sgg0g9jdf0UB6QKlEaW0upvIs40Rm+tzVVR+a9JGkYagY61rad2otj85TLbh5EhiuJ3Ac+96sC/vjfoVwArLwwGYxUQeyaV9LEmDFyjCN/XvfIPN/2r8YS/YxIZ3Dnk5F2QxmaE4A6FOQNM+nqp4flei9dyZBpU=
+	t=1738053946; cv=none; b=oMqD9s6mgneRTlcFpXeL0DEckHqt7ukJn1x/ytzKJcGTyNGQgVauAU4qkUgjRrQsmmE2AJyrAJDK9XmOjPVWRahK35/FXFUOwpW3MGJDPOfxIT1uDAMQ6g/F2SrIoLjcc3LteF5QVcXqSldBsVnIXYYmR5Jkt8HrhH1IiN2ExqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738048310; c=relaxed/simple;
-	bh=HpnWKn04Qy4+miKmDmyr3a4SC1UBbfUCRooIPjd5+oc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Thpt+tbCuZiyfq/mXnHd3vtsqr9B/Kd+P6Da7wb6t+qLkTM/MZ1DiWKpMz1DGBEneXxdCTG903CnoWphZWJ9TEqLKl2QZMrWgaIffiY3zEMAmHP58afg7ixnPO8XnRAzBr2guW/BcAKRD4MjMlY+08xFL9p7KokTQvce2ogFo0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sI52Bsj2; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1738053946; c=relaxed/simple;
+	bh=K8lMLxYfwOiPXDnUH0ZzdUsP5+IZz3pZ5gqlNQPG4ns=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VbiIPi6aHzK2cQRrIUSP4fPuQqcLFXJkpcUUIhnLSUbaUgKZvP6oKx3nqlGbiPwco3IoBuAOgkFEXa9rURjb+sq9MDlE29JHkEpzn3O6zYrjh7hYN9APKWmuXAb/MoIxGBg105RzOLSzJ5BW6MKeFF/x9pOJACdnHXV+NLU2pLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com; spf=none smtp.mailfrom=owltronix.com; dkim=pass (2048-bit key) header.d=owltronix-com.20230601.gappssmtp.com header.i=@owltronix-com.20230601.gappssmtp.com header.b=qaaDxfu/; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=owltronix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sI52Bsj2"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50RLITv0026972;
-	Tue, 28 Jan 2025 07:11:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=C/rpk7
-	a8S4+crdzBSryHBSnMFxuM6hH6xV1VSwEjVCw=; b=sI52Bsj2WiSo8r+KLFMceK
-	FkPlWcf0i6Gd96CssF4o6fwvi5xx+1cyq8Edx50CpxV7oUR+Bn2xCk6/mS+b/Tw7
-	xsuDZnotaiYflqTuJ8ms+hJRuJ/UqFlEIfzOULm59oNpUTbdNOwS41BapO66Rr6n
-	6wrh051qVwV6gnWp2j6bOl1WKhXtYlIHi8XoLb8oeOQPYiR3YLQD95UW2nI5ECGq
-	fULjhRlNj+6lphlQcBW41Dqz0WzkcLKtlBCA7demNmQj5qgMxGVNCVijzKErvz0v
-	aU1UmDlomvwLWfzHMOOEGFNpMDBbvShy50OZ6/lJxQuV8um4bJeKEZaDwmFmSREQ
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44e5undjas-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Jan 2025 07:11:41 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50S5UO06028099;
-	Tue, 28 Jan 2025 07:11:40 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44dbska0wg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Jan 2025 07:11:40 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50S7BdOT20447974
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 28 Jan 2025 07:11:39 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AB3A558057;
-	Tue, 28 Jan 2025 07:11:39 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DFE8F5805D;
-	Tue, 28 Jan 2025 07:11:37 +0000 (GMT)
-Received: from [9.171.27.96] (unknown [9.171.27.96])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 28 Jan 2025 07:11:37 +0000 (GMT)
-Message-ID: <426538d1-0039-43e1-9bec-30b43b80775b@linux.ibm.com>
-Date: Tue, 28 Jan 2025 12:41:36 +0530
+	dkim=pass (2048-bit key) header.d=owltronix-com.20230601.gappssmtp.com header.i=@owltronix-com.20230601.gappssmtp.com header.b="qaaDxfu/"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3bdccba49so9883435a12.1
+        for <linux-block@vger.kernel.org>; Tue, 28 Jan 2025 00:45:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20230601.gappssmtp.com; s=20230601; t=1738053943; x=1738658743; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hi1PDYct20yoCac+m36vvt1TMeZnhSDK67+M1pJQBfg=;
+        b=qaaDxfu/82eAZdy3JC09PfVmoCpORxGUcH7AFa+mkrU+lprO0xVpodZv8rodX+lyNZ
+         2c7HJbxrd9PfkJ7YgYbe9J+csp3PnLYVp0vrtSIuApF06OEcaoFLFKAqJNttckQiKSrO
+         mkSrPYy2PL59EeEHznIAQq/zAHybvKj31SH1Oaj0XUUroGYzdWMzDMHATamskjAcSJjO
+         CxPLyOflncmfABNcApwblaVuKzuG0JInZwOJ1jVcMyio7NXojqsu3zLvGTlA5ZoESLzT
+         Lg+5VmqccyppCsPGA9ZlH11j2C4nQOQcpYhk2cFpWAMtGaCWsR+UyJTXe3G5pZot45qo
+         J0xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738053943; x=1738658743;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Hi1PDYct20yoCac+m36vvt1TMeZnhSDK67+M1pJQBfg=;
+        b=qpbl8CmYhunkw55+WPFXjKbkeV5f8GwS1RDkyebDwwxR6aqUsXcBDFzd3q1qrTmwJp
+         kZ4OMWe/GMQFjfXI6IS3RD+uCn/TE23bgP0govDiIQFExuSm4FQRQ8xYgL/WpeiEMCsU
+         KW4Jr9GCrhy9p66eoooHg4VJtISrXj+97xE6ca2zn1T35rvkFzWUZgRhePowTPtWHpcR
+         ub6mvi15wk/SvWDxI0BcpKiKEChgzK1Yvr6Dp5YgIXgnW/Uz5a6kv3n7vONQY47h5+u0
+         +qQ72uIQ1pywuykFCHEMtIPGTekLRvE6nkMdWikxaeYBz/jyLccS/IqD9VSzhYBqPkfs
+         KUQg==
+X-Forwarded-Encrypted: i=1; AJvYcCWZynlAfPLtoPnj0oDj5GNAWbgaYRBG46vJvTNToPR/2Sjlr1EuAOkJyMlfINq02wfDU+O5kgsqwYx7iQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8neJqPe1m5jQC3vMOvxX9A/aBZrkEPxeiV64U98g5GPS9UzgR
+	gIx/jFXTA4lTuInAwU3fX2nN3SXXptLMtduIFG1zMoJneHikDxNiaUJ9jTaO+rBFEGNB8ra/9SY
+	b6yPWw1MRPtRZUcDb3pc4oCuQ+clcJ9Ugc6QhYg==
+X-Gm-Gg: ASbGncuj9NCbV4mPi8wItn3jlrxPKVHeOKP9psBhaIC1XPpIed4dp7gjXS7JczPrdhj
+	vKMW7xXiPJfnsELoKAcusU1sXyIZX5J5UJ3WzhIBfPHXKwEOYGIKo1IJdIn8y+0KlhWrvMqb/
+X-Google-Smtp-Source: AGHT+IHAGnRsTwVr80LuhfGtSL3RBmru+u3FKvFsIpw7jjpy58rmVEPdwza58ZSzMeDSjBCXWVedDCMIGGLbazAG350=
+X-Received: by 2002:a17:907:1c2a:b0:aac:832:9bf7 with SMTP id
+ a640c23a62f3a-ab38b27be47mr3909003166b.24.1738053942699; Tue, 28 Jan 2025
+ 00:45:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCHv2 2/2] block: fix nr_hw_queue update racing with disk
- addition/removal
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org, ming.lei@redhat.com, dlemoal@kernel.org,
-        axboe@kernel.dk, gjoyce@ibm.com
-References: <20250123174124.24554-1-nilay@linux.ibm.com>
- <20250123174124.24554-3-nilay@linux.ibm.com> <20250128054957.GB19976@lst.de>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250128054957.GB19976@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LUP0PEzVeaMqGf_7-RJ4CNzsU0nr_ZDv
-X-Proofpoint-ORIG-GUID: LUP0PEzVeaMqGf_7-RJ4CNzsU0nr_ZDv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-28_02,2025-01-27_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 lowpriorityscore=0 adultscore=0 mlxscore=0 spamscore=0
- clxscore=1015 mlxlogscore=999 bulkscore=0 phishscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501280048
+References: <20250123202455.11338-1-slava@dubeyko.com> <fd012640-5107-4d44-9572-4dffb2fd4665@wdc.com>
+ <f44878932fd26bb273c7948710b23b0e2768852a.camel@ibm.com> <CANr-nt2+Yk5fVVjU2zs+F1ZrLZGBBy3HwNOuYOK9smDeoZV9Rg@mail.gmail.com>
+ <063856b9c67289b1dd979a12c8cfe8d203786acc.camel@ibm.com>
+In-Reply-To: <063856b9c67289b1dd979a12c8cfe8d203786acc.camel@ibm.com>
+From: Hans Holmberg <hans@owltronix.com>
+Date: Tue, 28 Jan 2025 09:45:30 +0100
+X-Gm-Features: AWEUYZkCjn7l1RjVmW25YZJ8K7woj0q0aPOGpEvKeH8Ngm4K4rQxLrNq_zx5pTo
+Message-ID: <CANr-nt2bbienm=L48uEgjmuLqMnFBXUfHVZfEo3VBFwUsutE6A@mail.gmail.com>
+Subject: Re: [RFC PATCH] Introduce generalized data temperature estimation framework
+To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+Cc: "Johannes.Thumshirn@wdc.com" <Johannes.Thumshirn@wdc.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"slava@dubeyko.com" <slava@dubeyko.com>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"javier.gonz@samsung.com" <javier.gonz@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Jan 27, 2025 at 9:59=E2=80=AFPM Viacheslav Dubeyko
+<Slava.Dubeyko@ibm.com> wrote:
+>
+> On Mon, 2025-01-27 at 15:19 +0100, Hans Holmberg wrote:
+> > On Fri, Jan 24, 2025 at 10:03=E2=80=AFPM Viacheslav Dubeyko
+> > <Slava.Dubeyko@ibm.com> wrote:
+> > >
+> > > On Fri, 2025-01-24 at 08:19 +0000, Johannes Thumshirn wrote:
+> > > > On 23.01.25 21:30, Viacheslav Dubeyko wrote:
+> > > > > [PROBLEM DECLARATION]
+> > > > > Efficient data placement policy is a Holy Grail for data
+> > > > > storage and file system engineers. Achieving this goal is
+> > > > > equally important and really hard. Multiple data storage
+> > > > > and file system technologies have been invented to manage
+> > > > > the data placement policy (for example, COW, ZNS, FDP, etc).
+> > > > > But these technologies still require the hints related to
+> > > > > nature of data from application side.
+> > > > >
+> > > > > [DATA "TEMPERATURE" CONCEPT]
+> > > > > One of the widely used and intuitively clear idea of data
+> > > > > nature definition is data "temperature" (cold, warm,
+> > > > > hot data). However, data "temperature" is as intuitively
+> > > > > sound as illusive definition of data nature. Generally
+> > > > > speaking, thermodynamics defines temperature as a way
+> > > > > to estimate the average kinetic energy of vibrating
+> > > > > atoms in a substance. But we cannot see a direct analogy
+> > > > > between data "temperature" and temperature in physics
+> > > > > because data is not something that has kinetic energy.
+> > > > >
+> > > > > [WHAT IS GENERALIZED DATA "TEMPERATURE" ESTIMATION]
+> > > > > We usually imply that if some data is updated more
+> > > > > frequently, then such data is more hot than other one.
+> > > > > But, it is possible to see several problems here:
+> > > > > (1) How can we estimate the data "hotness" in
+> > > > > quantitative way? (2) We can state that data is "hot"
+> > > > > after some number of updates. It means that this
+> > > > > definition implies state of the data in the past.
+> > > > > Will this data continue to be "hot" in the future?
+> > > > > Generally speaking, the crucial problem is how to define
+> > > > > the data nature or data "temperature" in the future.
+> > > > > Because, this knowledge is the fundamental basis for
+> > > > > elaboration an efficient data placement policy.
+> > > > > Generalized data "temperature" estimation framework
+> > > > > suggests the way to define a future state of the data
+> > > > > and the basis for quantitative measurement of data
+> > > > > "temperature".
+> > > > >
+> > > > > [ARCHITECTURE OF FRAMEWORK]
+> > > > > Usually, file system has a page cache for every inode. And
+> > > > > initially memory pages become dirty in page cache. Finally,
+> > > > > dirty pages will be sent to storage device. Technically
+> > > > > speaking, the number of dirty pages in a particular page
+> > > > > cache is the quantitative measurement of current "hotness"
+> > > > > of a file. But number of dirty pages is still not stable
+> > > > > basis for quantitative measurement of data "temperature".
+> > > > > It is possible to suggest of using the total number of
+> > > > > logical blocks in a file as a unit of one degree of data
+> > > > > "temperature". As a result, if the whole file was updated
+> > > > > several times, then "temperature" of the file has been
+> > > > > increased for several degrees. And if the file is under
+> > > > > continous updates, then the file "temperature" is growing.
+> > > > >
+> > > > > We need to keep not only current number of dirty pages,
+> > > > > but also the number of updated pages in the near past
+> > > > > for accumulating the total "temperature" of a file.
+> > > > > Generally speaking, total number of updated pages in the
+> > > > > nearest past defines the aggregated "temperature" of file.
+> > > > > And number of dirty pages defines the delta of
+> > > > > "temperature" growth for current update operation.
+> > > > > This approach defines the mechanism of "temperature" growth.
+> > > > >
+> > > > > But if we have no more updates for the file, then
+> > > > > "temperature" needs to decrease. Starting and ending
+> > > > > timestamps of update operation can work as a basis for
+> > > > > decreasing "temperature" of a file. If we know the number
+> > > > > of updated logical blocks of the file, then we can divide
+> > > > > the duration of update operation on number of updated
+> > > > > logical blocks. As a result, this is the way to define
+> > > > > a time duration per one logical block. By means of
+> > > > > multiplying this value (time duration per one logical
+> > > > > block) on total number of logical blocks in file, we
+> > > > > can calculate the time duration of "temperature"
+> > > > > decreasing for one degree. Finally, the operation of
+> > > > > division the time range (between end of last update
+> > > > > operation and begin of new update operation) on
+> > > > > the time duration of "temperature" decreasing for
+> > > > > one degree provides the way to define how many
+> > > > > degrees should be subtracted from current "temperature"
+> > > > > of the file.
+> > > > >
+> > > > > [HOW TO USE THE APPROACH]
+> > > > > The lifetime of data "temperature" value for a file
+> > > > > can be explained by steps: (1) iget() method sets
+> > > > > the data "temperature" object; (2) folio_account_dirtied()
+> > > > > method accounts the number of dirty memory pages and
+> > > > > tries to estimate the current temperature of the file;
+> > > > > (3) folio_clear_dirty_for_io() decrease number of dirty
+> > > > > memory pages and increases number of updated pages;
+> > > > > (4) folio_account_dirtied() also decreases file's
+> > > > > "temperature" if updates hasn't happened some time;
+> > > > > (5) file system can get file's temperature and
+> > > > > to share the hint with block layer; (6) inode
+> > > > > eviction method removes and free the data "temperature"
+> > > > > object.
+> > > >
+> > > > I don't want to pour gasoline on old flame wars, but what is the
+> > > > advantage of this auto-magic data temperature framework vs the exis=
+ting
+> > > > framework?
+> > > >
+> > >
+> > > There is no magic in this framework. :) It's simple and compact frame=
+work.
+> > >
+> > > >  'enum rw_hint' has temperature in the range of none, short,
+> > > > medium, long and extreme (what ever that means), can be set by an
+> > > > application via an fcntl() and is plumbed down all the way to the b=
+io
+> > > > level by most FSes that care.
+> > >
+> > > I see your point. But the 'enum rw_hint' defines qualitative grades a=
+gain:
+> > >
+> > > enum rw_hint {
+> > >         WRITE_LIFE_NOT_SET      =3D RWH_WRITE_LIFE_NOT_SET,
+> > >         WRITE_LIFE_NONE         =3D RWH_WRITE_LIFE_NONE,
+> > >         WRITE_LIFE_SHORT        =3D RWH_WRITE_LIFE_SHORT,  <-- HOT da=
+ta
+> > >         WRITE_LIFE_MEDIUM       =3D RWH_WRITE_LIFE_MEDIUM, <-- WARM d=
+ata
+> > >         WRITE_LIFE_LONG         =3D RWH_WRITE_LIFE_LONG,   <-- COLD d=
+ata
+> > >         WRITE_LIFE_EXTREME      =3D RWH_WRITE_LIFE_EXTREME,
+> > > } __packed;
+> > >
+> > > First of all, again, it's hard to compare the hotness of different fi=
+les
+> > > on such qualitative basis. Secondly, who decides what is hotness of a=
+ particular
+> > > data? People can only guess or assume the nature of data based on
+> > > experience in the past. But workloads are changing and evolving
+> > > continuously and in real-time manner. Technically speaking, applicati=
+on can
+> > > try to estimate the hotness of data, but, again, file system can rece=
+ive
+> > > requests from multiple threads and multiple applications. So, applica=
+tion
+> > > can guess about real nature of data too. Especially, nobody would lik=
+e
+> > > to implement dedicated logic in application for data hotness estimati=
+on.
+> > >
+> > > This framework is inode based and it tries to estimate file's
+> > > "temperature" on quantitative basis. Advantages of this framework:
+> > > (1) we don't need to guess about data hotness, temperature will be
+> > > calculated quantitatively; (2) quantitative basis gives opportunity
+> > > for fair comparison of different files' temperature; (3) file's tempe=
+rature
+> > > will change with workload(s) changing in real-time; (4) file's
+> > > temperature will be correctly accounted under the load from multiple
+> > > applications. I believe these are advantages of the suggested framewo=
+rk.
+> > >
+> >
+> > While I think the general idea(using file-overwrite-rates as a
+> > parameter when doing data placement) could be useful, it could not
+> > replace the user space hinting we already have.
+> >
+> > Applications(e.g. RocksDB) doing sequential writes to files that are
+> > immutable until deleted(no overwrites) would not benefit. We need user
+> > space help to estimate data lifetime for those workloads and the
+> > relative write lifetime hints are useful for that.
+> >
+>
+> I don't see any competition or conflict here. Suggested approach and user=
+-space
+> hinting could be complementary techniques. If user-space logic would like=
+ to use
+> a special data placement policy, then it can share hints in its own way. =
+But,
+> potentially, suggested approach of temperature calculation can be used to=
+ check
+> the effectiveness of the user-space hinting, and, maybe, correcting it. S=
+o, I
+> don't see any conflict here.
 
+I don't see a conflict here either, my point is just that this
+framework cannot replace the user hints.
 
-On 1/28/25 11:19 AM, Christoph Hellwig wrote:
-> On Thu, Jan 23, 2025 at 11:10:24PM +0530, Nilay Shroff wrote:
->>  
->> +	mutex_lock(&q->tag_set->tag_list_lock);
->> +
->>  	queue_for_each_hw_ctx(q, hctx, i) {
->>  		ret = blk_mq_register_hctx(hctx);
->> -		if (ret)
->> +		if (ret) {
->> +			mutex_unlock(&q->tag_set->tag_list_lock);
->>  			goto unreg;
->> +		}
->>  	}
->>  
->> +	mutex_unlock(&q->tag_set->tag_list_lock);
->>  
->>  out:
->>  	return ret;
->>  
->>  unreg:
->> +	mutex_lock(&q->tag_set->tag_list_lock);
->> +
-> 
-> No real need for a unlock/lock cycle here I think.  Also as something
-> that is really just a nitpick, I love to keep the locks for the critical
-> sections close to the code they're protecting.  e.g. format this as:
-> 
-> 	if (ret < 0)
-> 		return ret;
-> 
-> 	mutex_lock(&q->tag_set->tag_list_lock);
-> 	queue_for_each_hw_ctx(q, hctx, i) {
-> 		ret = blk_mq_register_hctx(hctx);
-> 		if (ret)
-> 			goto out_unregister;
-> 	}
-> 	mutex_unlock(&q->tag_set->tag_list_lock);
->  	return 0
-> 
-> out_unregister:
-> 	queue_for_each_hw_ctx(q, hctx, j) {
->  		if (j < i)
-> 			blk_mq_unregister_hctx(hctx);
-> 	}
-> 	mutex_unlock(&q->tag_set->tag_list_lock);
-> 
-> ...
-> 
-> (and similar for blk_mq_sysfs_unregister).
+>
+> > So what I am asking myself is if this framework is added, who would
+> > benefit? Without any benchmark results it's a bit hard to tell :)
+> >
+>
+> Which benefits would you like to see? I assume we would like: (1) prolong=
+ device
+> lifetime, (2) improve performance, (3) decrease GC burden. Do you mean th=
+ese
+> benefits?
 
-Yes looks good. I will update code and send next patch.
+Yep, decreased write amplification essentially.
 
-> I assume you did run this through blktests and xfstests with lockdep
-> enabled to catch if we created some new lock ordering problems?
-> I can't think of any right now, but it's good to validate that.
-> 
-Yeah I ran blktests with lockdep enabled before submitting patch to
-ensure that lockdep doesn't generate any waning with changes. However
-I didn't run xfstests. Anyways, I would now run both blktests and 
-xfstests before submitting the next patch.
+>
+> As far as I can see, different file systems can use temperature in differ=
+ent
+> way. And this is slightly complicates the benchmarking. So, how can we de=
+fine
+> the effectiveness here and how can we measure it? Do you have a vision he=
+re? I
+> am happy to make more benchmarking.
+>
+> My point is that the calculated file's temperature gives the quantitative=
+ way to
+> distribute even user data among several temperature groups ("baskets"). A=
+nd
+> these baskets/segments/anything-else gives the way to properly group data=
+. File
+> systems can employ the temperature in various ways, but it can definitely=
+ helps
+> to elaborate proper data placement policy. As a result, GC burden can be
+> decreased, performance can be improved, and lifetime device can be prolon=
+g. So,
+> how can we benchmark these points? And which approaches make sense to com=
+pare?
+>
 
-Thanks,
---Nilay 
+To start off, it would be nice to demonstrate that write amplification
+decreases for some workload when the temperature is taken into
+account. It would be great if the workload would be an actual
+application workload or a synthetic one mimicking some real-world-like
+use case.
+Run the same workload twice, measure write amplification and compare result=
+s.
+
+What user workloads do you see benefiting from this framework? Which would =
+not?
+
+> > Also, is there a good reason for only supporting buffered io? Direct
+> > IO could benefit in the same way, right?
+> >
+>
+> I think that Direct IO could benefit too. The question here how to accoun=
+t dirty
+> memory pages and updated memory pages. Currently, I am using
+> folio_account_dirtied() and folio_clear_dirty_for_io() to implement the
+> calculation the temperature. As far as I can see, Direct IO requires anot=
+her
+> methods of doing this. The rest logic can be the same.
+
+It's probably a good idea to cover direct IO as well then as this is
+intended to be a generalized framework.
