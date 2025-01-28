@@ -1,98 +1,88 @@
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37AB61B2EF2
-	for <linux-block@vger.kernel.org>; Tue, 28 Jan 2025 15:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3BC1A2387;
+	Tue, 28 Jan 2025 16:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738078440; cv=none; b=kI/WkaOBvUHQ1bzXG566uOSEuv1TNOAqHx73u+M5B+3WpPLkNItjck6QaKRHs4tP9hBii8SUHk4YzLTMLrZXoUwTa83vFcCh3tdrfTw+Kw31DQzI/VSg1P+loZwiDr8648eOr9ITsjkGREdsTSVDFdqfn6E0Oea2p2ExDEcoyxU=
+	t=1738082108; cv=none; b=lEBKJhwwNTUPm22vzGAPga/bKTaNiNrBFkzPXtoKMaclw5NO11M6E4OOA0nzqFIRPlvHFUg5JsrUXCvEZjyrlLhdgiyubylkqba4F/l6iONXGJRpNeBNuFLUFtyKkCrK1odgxJJRJVCCwTXWXa8xA7Ofq66+PkTTxUasZimhQTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738078440; c=relaxed/simple;
-	bh=jlIiq8XF36Q5tjUAtZm/LyBhvHksPJzd7zM157cXZ6o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=suLz83L0UEsOYl3DrjTDaivFH6tNuvPHG4DIqNZeLK8ROky0ilqS0euuFEvrZ3Fgru4k7qd3kEdZdOFXonmxM5nGB1d8zR6WT3jnddekTt1CphqBnKie4qgr31r6YGCbDHkZh7cVZCi7zM7CPWmDsi5XukAznDUm8JH+HQ8EWd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=v6rkoDzP; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1738082108; c=relaxed/simple;
+	bh=+i4tg6wE02L6FB7dQQmetQJ529MBj4JsPPL5ArjcfAY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=HHNBn7HBVO2LHX/zyE247DrxZ4ZpUREACvM607p5ny6mdFWqktkluo+T0+IkY8RvyQJmYbRy1xC87qU9VovcvOb5r6NC2j/nexOt/O/zDzN34O1IPOFzzfVIK0PFM9U/j5KD8AT1ze0MMVYTfeiG6MdtJWoliRFE29V3z4RFPR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eAZnRNUz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="v6rkoDzP"
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-8521df70be6so357389639f.1
-        for <linux-block@vger.kernel.org>; Tue, 28 Jan 2025 07:33:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1738078436; x=1738683236; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6an6bUbxEkbIyN7QVIDWH3rFKz7RNe6o1iTmjpRuPFk=;
-        b=v6rkoDzPS8mKKQOImsBsw26YxTg/OxiWjxbga24O7y6mM2RNO68T9kI1KXy9DJ+2uB
-         afrpvSaUY7jjlmx3lko4Qk8rVgrylrn4fxChdeM3dsWRLra0aFErgH8cS7eYzgXOl9UD
-         G9XqQ1uWI5d0JwHVNzGWiSn7PoN/o713y/9a5W1khqDCWHdk2dJ1UBQ8cKsC5kzqCAs0
-         0QbuhOkynv/JbKJbOlQwKlK1YUAZx+mtfRGdm+spd/mr61or92iW3U1KjzJV7OQGDO28
-         3UJtImI/ellYH938rd1ri7INCc7KoQilG0VpDWPQvQ4WSkWIeMRKw7KV08/8DOxgxT4U
-         F0qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738078436; x=1738683236;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6an6bUbxEkbIyN7QVIDWH3rFKz7RNe6o1iTmjpRuPFk=;
-        b=TMXVpp8dvT4gCXT0P9412CsYGxfO023NJMK1s48ISnXo9cNVUjUHXAD54hnS67oSii
-         hPf5WU4pYIvrWZxndUT6tuwW6fZIHb6NV2u41rF1fSNWAhvJ4XvEqWhkYbV/MVyQWpyn
-         R5DFXvhPOf6wnZLS/7dM12RH7SSbowlFUn69wEelH7KWOgCQDmEceAbobd+yla8hLmsd
-         IQjQXDjBzppZdzupEV0DefTgislQVcM08a4YsO2LGNAaRe5Uq8DjLTG1JOvshhP02nZZ
-         jXjgqTUq+q9Y73eyzoikCopU8g9ynKr7pbFzeH8qerSj+edDKsQQESSqD1Vj1noJPbkp
-         9apw==
-X-Gm-Message-State: AOJu0YxKk54rhlnyeDyGY4eoT2im5RLmTYNBEzE1EI0WX2mxXEyxY7d2
-	Y8QDPwvnZPoaR7oNcnbItFp5bQa3wYfZ0fYcXaa1eEjwnAlJ0Z5wk9Qz19ihfRGYAgh8R89diQE
-	g
-X-Gm-Gg: ASbGncuaO8q98LloLMtQJEH9RStYpS5u8/mOfmuJeGUQkHU/2qoa3iFIQo765BJsUo9
-	mZGQ1UuhGgBKUJhk29TVHPJBL8+/o4bSjnayx0q4ZnWtRSGfJnTkfkWouIWMj7ekPRgGC7vUqqK
-	3HftBDq473FGeGeyrduj8tCDnpsdMh09k+MRA2nhscbZ7HwT1A9I4rNKqwTMk9OkvEcLm0M4HFg
-	NrALc1Z/1QS0JeM93hUVOrePF4vL7FObzxlhbKQjJo0ovv/SXXvKgMyI1EXFKEStnY0ob32rfyU
-	7tM6W6ag3J0=
-X-Google-Smtp-Source: AGHT+IE95pvUCCkoINhOtmHAQ0ZLhG1Z9CEatZ3MOkTDY6mhSqW46j/jW5fgO4MJF1ysUHzcGwKhxQ==
-X-Received: by 2002:a05:6602:6c1a:b0:844:e06e:53c5 with SMTP id ca18e2360f4ac-851b61d5ea2mr3918405139f.8.1738078435999;
-        Tue, 28 Jan 2025 07:33:55 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8521e013fe9sm332604039f.35.2025.01.28.07.33.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Jan 2025 07:33:55 -0800 (PST)
-Message-ID: <61f2f171-f688-404e-82bd-b064c579dbab@kernel.dk>
-Date: Tue, 28 Jan 2025 08:33:54 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eAZnRNUz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9E27C4CED3;
+	Tue, 28 Jan 2025 16:35:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738082107;
+	bh=+i4tg6wE02L6FB7dQQmetQJ529MBj4JsPPL5ArjcfAY=;
+	h=From:Subject:Date:To:Cc:From;
+	b=eAZnRNUzLBhTkcwUtzf/2S3oCvllOy3LSenFgcMWE/wrQeaesOAKayxCfp0izNXZf
+	 hlNgDNbLJj8pTwdRmMY2lp01W0LXvElaj9Ppb4HsQgkI+ql0LwsmXKpzDt4ALy99oB
+	 royjcDwmuFjjYfcqtYJ5sULcmdicMRHbYlZgTaO5o4IJU0cVFiMEI+BF3NASV9A+vx
+	 vmvSjG9exCw2vCkJEbAdbxuafSu/Vr0FPqEXhLjTMJiNwXFdxQZjEktc22HJYix4z9
+	 kKH0jiiEMWAi/67LoK9SNMxvaiJAZW1CPGzoHPEVNwXa+/3gZq6CgBvMDGewqbJ1lP
+	 DMWILvugELCdA==
+From: Daniel Wagner <wagi@kernel.org>
+Subject: [PATCH 0/3] misc nvme related fixes
+Date: Tue, 28 Jan 2025 17:34:45 +0100
+Message-Id: <20250128-nvme-misc-fixes-v1-0-40c586581171@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: don't revert iter for -EIOCBQUEUED
-To: Christoph Hellwig <hch@infradead.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <47af5107-96fb-426c-961e-25d464f3b26b@kernel.dk>
- <Z5hyKbWbEEcxV8fg@infradead.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Z5hyKbWbEEcxV8fg@infradead.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACUHmWcC/x3LQQqAIBBA0avErBtQIZOuEi3CmWoWWjgQQXj3p
+ OXj819QLsIKU/dC4VtUztxg+w7iseadUagZnHGDsS5gvhNjEo24ycOKZuRAK3nrI0G7rsJ/aNO
+ 81PoBU5XAV2EAAAA=
+X-Change-ID: 20250128-nvme-misc-fixes-07e8dad616cd
+To: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+ Ming Lei <ming.lei@redhat.com>
+Cc: James Smart <james.smart@broadcom.com>, Hannes Reinecke <hare@suse.de>, 
+ linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, Daniel Wagner <wagi@kernel.org>
+X-Mailer: b4 0.14.2
 
-On 1/27/25 10:59 PM, Christoph Hellwig wrote:
-> On Thu, Jan 23, 2025 at 06:18:01AM -0700, Jens Axboe wrote:
->> blkdev_read_iter() has a few odd checks, like gating the position and
->> count adjustment on whether or not the result is bigger-than-or-equal to
->> zero (where bigger than makes more sense), and not checking the return
->> value of blkdev_direct_IO() before doing an iov_iter_revert(). The
->> latter can lead to attempting to revert with a negative value, which
->> when passed to iov_iter_revert() as an unsigned value will lead to
->> throwing a WARN_ON() because unroll is bigger than MAX_RW_COUNT.
-> 
-> How did you reproduce that?  Can we add it to blktests?
+While working on a patchset for TP4129 (kato corrections and
+clarifications) I run into a bunch small issues:
 
-Via one of the io_uring test cases, when used on a SCSI device. Not
-easy to write a reliable reproducer for this, and honestly I'm kind
-of puzzled I haven't hit it before recently.
+- nvme-tcp was spamming the kernel messages, thus I think it makes sense
+to rate limit those messages. I observed this with my changes, so it
+might not happen that often in mainline right now but still I think it
+makes sense to rate limit them.
 
+- nvme-fc should use the nvme state accossor to ensure it always sees
+the current state.
+
+- blk_mq_tagset_wait_completed_request was hanging on ctrl deletion path
+and after a bit of head scratching I figured
+blk_mq_tagset_wait_completed_request does not do what it claims. After
+this fix, the shutdown path works fine and I think this could go in
+without my other pending stuff I am working on. As the only user of this
+function is the nvme subsytem, I included in this mini series.
+
+Signed-off-by: Daniel Wagner <wagi@kernel.org>
+---
+Daniel Wagner (3):
+      nvme-tcp: rate limit error message in send path
+      nvme-fc: use ctrl state getter
+      blk-mq: fix wait condition for tagset wait completed check
+
+ block/blk-mq-tag.c      | 6 +++---
+ drivers/nvme/host/fc.c  | 9 ++++++---
+ drivers/nvme/host/tcp.c | 4 ++--
+ 3 files changed, 11 insertions(+), 8 deletions(-)
+---
+base-commit: fd6102e646a888931ad6ab21843c6ee4355e7525
+change-id: 20250128-nvme-misc-fixes-07e8dad616cd
+
+Best regards,
 -- 
-Jens Axboe
+Daniel Wagner <wagi@kernel.org>
 
