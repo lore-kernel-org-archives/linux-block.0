@@ -1,247 +1,127 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7623C33CFC;
-	Tue, 28 Jan 2025 00:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D534D125DF
+	for <linux-block@vger.kernel.org>; Tue, 28 Jan 2025 00:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738022797; cv=none; b=czQx09cJQyQSZBP1BGgcNSPDnT/33NLH458yGgYegrxzEkMlKIWHpoEiTAZ81pp0GgYXFyfn2bx+1M2nBKPqio9+O9McP1ALYdDeIrCoR2S9pBV33Hu9yjghdInZOAMNq5+aqlc8LYgOqjeumxcERC58NaqefZZ9Ri/y5OdRAMY=
+	t=1738025592; cv=none; b=oGWQVKO6aMMYLsH3TeriKxZhUbUsJvQ9hUEaO5vu4t6EL1NRgO7m4oHdm5t3vE0LMCqycxz6Jc6TR6JqE9iRucWQH/wLrK0iQdbXZk48h56T2OVhFiv0O972UgXxnQBE3G79M9ZQschZtxE9blKc6d0MpFERX0EHDOWubTDbaRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738022797; c=relaxed/simple;
-	bh=x0APBPBQWrivChaCg4k0Jly7N3L+drRwEE2afrYm3Ko=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pG7vhzPeB2x/+yDwbNhJFIvm2jB/JWVTv+koS8hxTDg5Z8vqsXUMFlVaWKj0c1vnGe3Ib5tI8WY+a0QWCU7JGNxXNd2ZOTeL6JU+kenOZTLGkalPyzF3gOL/8SADA4mtZH/PNqc1Qu9OOsNupeiDlZQVhQmePYu7Rk4kIqicx/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVMdUUsP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738025592; c=relaxed/simple;
+	bh=V8hCmqSu648rjGj9uef2mOgFY3g/hPMBNN/V/Gn2vkg=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=mQ9+TePfjZbM54HDSUXsQzw9JPlpTLQ//k9KypC2qLypvlN50SUuoScErNOMvFyD0CTPWKP/YDIKF7qNFExoVXdh9DxPvUbtJwkG+u6ejwINh7WfGdyFuGrwOYxn1SYPiOk9+J4NzKryfa5nMXB791S+NjIdy8WHSHzd11YvBrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=PsUE3hI+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVMdUUsP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA0CDC4CEE7;
-	Tue, 28 Jan 2025 00:06:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738022796;
-	bh=x0APBPBQWrivChaCg4k0Jly7N3L+drRwEE2afrYm3Ko=;
-	h=From:To:Cc:Subject:Date:From;
-	b=YVMdUUsPMxPbkAk4qEzxydaiheiKgPq0V/bec3NjHqtsuNI4LbgEBDEej9+LgNza+
-	 ljIEnlJ8dOW66epiiZtLELOhM7CI9Xmfl04mwJsxOPi5DZqupGOzyLYI8OrEB0YMLK
-	 2aabCdo/efDt+1ketrNTclboOiYMqtBF3chVGB2EMC4yfr4ULHJGHphSkN/9c0uXJr
-	 2zeCibWgf8wkOz10yK0tDHg/2UyTNfnmjDli87oee4K3CFTkaD0PhvQA9VygWXf7kB
-	 Qo1Ry12uzmRsVIoEnhnI2jD01cboTneK2GBz8V4u2Zk1oJeS56JxjuAeS7Lo5BEMUu
-	 9jWWaNQP5ViKg==
-Received: from mchehab by mail.kernel.org with local (Exim 4.98)
-	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1tcZ7h-0000000DRKO-2KyQ;
-	Tue, 28 Jan 2025 01:06:33 +0100
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-hardening@vger.kernel.org,
-	linux-iio@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	workflows@vger.kernel.org
-Subject: [RFC v2 00/38] Improve ABI documentation generation
-Date: Tue, 28 Jan 2025 01:05:49 +0100
-Message-ID: <cover.1738020236.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="PsUE3hI+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B665C4CED2;
+	Tue, 28 Jan 2025 00:53:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1738025592;
+	bh=V8hCmqSu648rjGj9uef2mOgFY3g/hPMBNN/V/Gn2vkg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PsUE3hI+T7bp7NhvLcEykdZQ8RJk4lCsCeT9XhOeZUT5LHHMC2yAV4/rdLc/i+l6j
+	 T6rvaDuvbUlzDUBv1xLHbWbWHl+eAmDcvnzcIxuQsQ5tcUY/LL8zDtlYzw+MxZu3vx
+	 o7LXMuDnFwQ+fiDNw0hKtQY+KBV9rD8+UrIZ166s=
+Date: Mon, 27 Jan 2025 16:53:11 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: sooraj <sooraj20636@gmail.com>
+Cc: linux-mm@kvack.org, Tejun Heo <tj@kernel.org>,
+ linux-block@vger.kernel.org
+Subject: Re: [PATCH] mm/bdi: fix race between cgwb_create and conflicting
+ blkcg associations
+Message-Id: <20250127165311.f51b98290b548aff1df92a81@linux-foundation.org>
+In-Reply-To: <20250128075250.11500-1-sooraj20636@gmail.com>
+References: <20250128075250.11500-1-sooraj20636@gmail.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Jon/Greg,
+On Tue, 28 Jan 2025 02:52:50 -0500 sooraj <sooraj20636@gmail.com> wrote:
 
-That's the second version of my RFC patches meant to modenize the ABI
-parser that I wrote in Perl.
+> Ensure cgwb (cgroup writeback) structures are uniquely associated with a
+> memcg-blkcg pair to prevent inconsistencies when concurrent cgwb_create
+> calls race. This resolves a scenario where two threads creating cgwbs
+> for the same memory cgroup (memcg) but different I/O control groups (blkcg)
+> could insert conflicting entries.
+> 
+> The fix rechecks for existing cgwbs under the cgwb_lock spinlock after
+> initial creation. If a conflicting cgwb (same memcg, different blkcg) is
+> found, it is killed before inserting the new entry. This guarantees a
+> 1:1 relationship between memcg-blkcg pairs and their cgwbs, preserving
+> system invariants.
 
-I originally started it due to some issues I noticed when searching for
-ABI symbols. While I could just go ahead and fix the already existing
-script, I noticed that the script maintainance didn't have much care over
-all those years, probably because it is easier to find Python programmers
-those days.
+Thanks.
 
-Also, the code is complex and was not using modules or classes and
-were using lots of global variables.
+This looks sensible, but it would be best to bring it to Tejun's attention.
 
-So, I decided to rewrite it in Python. I started with a manual conversion
-for each function. Yet, to avoid future maintainership issues, I opted to
-divide the code on three classes. One class for the ABI parser, another
-one for regex conversion (used when checking symbols from local hardware,
-and an extra class for undefined symbols check.
+I assume that this race has been observed in the real world?  If so,
+please fully describe the circumstances under which it occurred, and
+describe the userspace-visible effects.
 
-I opted to change the Sphinx integration gradually using different
-patch sets on 4 phases:
+Probably a "Cc: <stable@vger.kernel.org>" is appropriate.  And it looks
+like the offending code is so old that a Fixes: won't be needed.
 
-1. minimal integration: just execute the new script on a similar way as
-   the perl one;
-2. the kernel_abi module was changed to import the ABI parser class,
-   using it directly;
-3. the logic at kernel_abi were rewritten to better integrate. As a bonus,
-   Sphinx now imports ReST data symbol by symbol. That solves one of
-   the issues I was discomfortable with the original approach: when lots
-   of data is sent to Sphinx parser, it stops in the middle of processing.
-   This was addressed in the past on a hacky way, but it could cause
-   problems in the future as the number of symbols increase;
-4. the ABI parser part is now called either by automarkup and kernel_abi.
-   This allowed automarkup to solve ABI symbols.
-
-Together with this series, I added some patches fixing issues and warnings
-when generating documentation.
-
-Some notes about this new RFC:
-
-- despite being able to generate documentation cross-references with
-  auto-markup, the documentation build timt didn't increase on my machine
-  (it was actually 5 seconds faster);
-- I rewrote some algorithms at the undefined symbol detection code. With
-  that, it is now a lot faster than the previous version, at least on my desktop
-  (wich has 24 CPU threads). I didn't try it on a server yet;
-- the undefined parser can optionally use multiple CPUs. This sounds
-  fancier than it seems: Python (up to version 3.12) is really bad with
-  multi-CPU support and doesn't have real multi-thread support. Python
-  3.13 has now an optional way to address that (although I didn't test yet,
-  as it requires Python manual compilation). When such feature becomes
-  standard, maybe the undefined symbols detection will be faster.
-
-Btw, I'm opting to send this as an RFC because I'd like to have more
-people testing and checking it. In particular, the undefined ABI check
-is complex, as it requires lots of tricks to reduce the run time from hours
-to seconds.
-  
-On this series we have:
-
-patches 1 to 11: several bug fixes addressing issues at ABI symbols;
-patch 12: a fix for scripts/documentation-file-ref-check
-patches 13-15: create new script with rest and search logic and 
-  minimally integrate with kernel_abi Sphinx extension(phase 1);
-patches 16-19: implement phase 2: class integration (phase 2);
-patch 20: fix a bug at kernel_abi: the way it splits lines is buggy;
-patches  21-24: rewrite kernel_abi logic to make it simpler and more
-  robust;
-patches 25-27: add cross-reference support at automarkup;
-patches 28-36: several ABI cleanups to cope with the improvements;
-patch 37: implement undefined command;
-patch 38: get rid of the old Perl script.
-
-To make it easier to review/apply, I may end breaking the next version
-on a couple of different patchsets. Still it would be nice to have more
-people testing it and providing some feedback.
-
----
-RFC v2:
-  - Dropped a patch touching the perl script;
-  - Implemented phases 2-4 of the script's logic;
-  - Added ABI cross-references via automarkup;
-  - Added support for undefined logic;
-  - Added more ABI and scripts' fixes;
-  - Added undefined logic;
-  - Added a patch to remove the old tool.
-
-Mauro Carvalho Chehab (38):
-  docs: power: video.rst: fix a footnote reference
-  docs: media: ipu3: fix two footnote references
-  docs: block: ublk.rst: remove a reference from a dropped text
-  docs: sphinx: remove kernellog.py file
-  docs: sphinx/kernel_abi: adjust coding style
-  docs: admin-guide: abi: add SPDX tags to ABI files
-  ABI: sysfs-class-rfkill: fix kernelversion tags
-  ABI: sysfs-bus-coresight-*: fix kernelversion tags
-  ABI: sysfs-driver-dma-idxd: fix date tags
-  ABI: sysfs-fs-f2fs: fix date tags
-  ABI: sysfs-power: fix a what tag
-  scripts/documentation-file-ref-check: don't check perl/python scripts
-  scripts/get_abi.py: add a Python tool to generate ReST output
-  scripts/get_abi.py: add support for symbol search
-  docs: use get_abi.py for ABI generation
-  scripts/get_abi.py: optimize parse_abi() function
-  scripts/get_abi.py: use an interactor for ReST output
-  docs: sphinx/kernel_abi: use AbiParser directly
-  docs: sphinx/kernel_abi: reduce buffer usage for ABI messages
-  docs: sphinx/kernel_abi: properly split lines
-  scripts/get_abi.pl: Add filtering capabilities to rest output
-  scripts/get_abi.pl: add support to parse ABI README file
-  docs: sphinx/kernel_abi: parse ABI files only once
-  docs: admin-guide/abi: split files from symbols
-  docs: sphinx/automarkup: add cross-references for ABI
-  docs: sphinx/kernel_abi: avoid warnings during Sphinx module init
-  scripts/get_abi.py: Rename title name for ABI files
-  docs: media: Allow creating cross-references for RC ABI
-  docs: thunderbolt: Allow creating cross-references for ABI
-  docs: arm: asymmetric-32bit: Allow creating cross-references for ABI
-  docs: arm: generic-counter: Allow creating cross-references for ABI
-  docs: iio: Allow creating cross-references ABI
-  docs: networking: Allow creating cross-references statistics ABI
-  docs: submit-checklist: Allow creating cross-references for ABI README
-  docs: translations: Allow creating cross-references for ABI README
-  docs: ABI: drop two duplicate symbols
-  scripts/get_abi.py: add support for undefined ABIs
-  scripts/get_abi.pl: drop now obsoleted script
-
- Documentation/ABI/removed/sysfs-class-rfkill  |    2 +-
- Documentation/ABI/stable/sysfs-class-rfkill   |   12 +-
- .../ABI/stable/sysfs-devices-system-cpu       |   10 -
- .../ABI/stable/sysfs-driver-dma-idxd          |    4 +-
- .../testing/sysfs-bus-coresight-devices-cti   |   78 +-
- .../testing/sysfs-bus-coresight-devices-tpdm  |   52 +-
- Documentation/ABI/testing/sysfs-fs-f2fs       |    4 +-
- Documentation/ABI/testing/sysfs-power         |    2 +-
- .../admin-guide/abi-obsolete-files.rst        |    7 +
- Documentation/admin-guide/abi-obsolete.rst    |    6 +-
- Documentation/admin-guide/abi-readme-file.rst |    6 +
- .../admin-guide/abi-removed-files.rst         |    7 +
- Documentation/admin-guide/abi-removed.rst     |    6 +-
- .../admin-guide/abi-stable-files.rst          |    7 +
- Documentation/admin-guide/abi-stable.rst      |    6 +-
- .../admin-guide/abi-testing-files.rst         |    7 +
- Documentation/admin-guide/abi-testing.rst     |    6 +-
- Documentation/admin-guide/abi.rst             |   17 +
- Documentation/admin-guide/media/ipu3.rst      |   12 +-
- Documentation/admin-guide/thunderbolt.rst     |    2 +-
- Documentation/arch/arm64/asymmetric-32bit.rst |    2 +-
- Documentation/block/ublk.rst                  |    2 -
- Documentation/driver-api/generic-counter.rst  |    4 +-
- Documentation/driver-api/iio/core.rst         |    2 +-
- Documentation/iio/iio_devbuf.rst              |    2 +-
- Documentation/networking/statistics.rst       |    2 +-
- Documentation/power/video.rst                 |    2 +-
- Documentation/process/submit-checklist.rst    |    2 +-
- Documentation/sphinx/automarkup.py            |   56 +
- Documentation/sphinx/kernel_abi.py            |  162 +-
- Documentation/sphinx/kerneldoc.py             |   14 +-
- Documentation/sphinx/kernellog.py             |   22 -
- Documentation/sphinx/kfigure.py               |   81 +-
- .../it_IT/process/submit-checklist.rst        |    2 +-
- .../sp_SP/process/submit-checklist.rst        |    2 +-
- .../zh_CN/process/submit-checklist.rst        |    2 +-
- .../zh_TW/process/submit-checklist.rst        |    2 +-
- .../userspace-api/media/rc/rc-sysfs-nodes.rst |    2 +-
- scripts/documentation-file-ref-check          |    2 +-
- scripts/get_abi.pl                            | 1103 -------------
- scripts/get_abi.py                            | 1437 +++++++++++++++++
- 41 files changed, 1804 insertions(+), 1354 deletions(-)
- create mode 100644 Documentation/admin-guide/abi-obsolete-files.rst
- create mode 100644 Documentation/admin-guide/abi-readme-file.rst
- create mode 100644 Documentation/admin-guide/abi-removed-files.rst
- create mode 100644 Documentation/admin-guide/abi-stable-files.rst
- create mode 100644 Documentation/admin-guide/abi-testing-files.rst
- delete mode 100644 Documentation/sphinx/kernellog.py
- delete mode 100755 scripts/get_abi.pl
- create mode 100755 scripts/get_abi.py
-
--- 
-2.48.1
-
+> --- a/mm/backing-dev.c
+> +++ b/mm/backing-dev.c
+> @@ -723,24 +723,39 @@ static int cgwb_create(struct backing_dev_info *bdi,
+>  	spin_lock_irqsave(&cgwb_lock, flags);
+>  	if (test_bit(WB_registered, &bdi->wb.state) &&
+>  	    blkcg_cgwb_list->next && memcg_cgwb_list->next) {
+> -		/* we might have raced another instance of this function */
+> -		ret = radix_tree_insert(&bdi->cgwb_tree, memcg_css->id, wb);
+> -		if (!ret) {
+> -			list_add_tail_rcu(&wb->bdi_node, &bdi->wb_list);
+> -			list_add(&wb->memcg_node, memcg_cgwb_list);
+> -			list_add(&wb->blkcg_node, blkcg_cgwb_list);
+> -			blkcg_pin_online(blkcg_css);
+> -			css_get(memcg_css);
+> -			css_get(blkcg_css);
+> +		/* Re-check under lock to handle races */
+> +		struct bdi_writeback *existing;
+> +
+> +		existing = radix_tree_lookup(&bdi->cgwb_tree, memcg_css->id);
+> +		if (existing) {
+> +			if (existing->blkcg_css != blkcg_css) {
+> +				cgwb_kill(existing);
+> +				existing = NULL;
+> +			} else {
+> +				ret = 0; /* Already exists, treat as success */
+> +			}
+> +		}
+> +
+> +		if (!existing) {
+> +			ret = radix_tree_insert(&bdi->cgwb_tree, memcg_css->id, wb);
+> +			if (!ret) {
+> +				list_add_tail_rcu(&wb->bdi_node, &bdi->wb_list);
+> +				list_add(&wb->memcg_node, memcg_cgwb_list);
+> +				list_add(&wb->blkcg_node, blkcg_cgwb_list);
+> +				blkcg_pin_online(blkcg_css);
+> +				css_get(memcg_css);
+> +				css_get(blkcg_css);
+> +			}
+>  		}
+>  	}
+>  	spin_unlock_irqrestore(&cgwb_lock, flags);
+> -	if (ret) {
+> -		if (ret == -EEXIST)
+> -			ret = 0;
+> +
+> +	if (!ret)
+> +		goto out_put;
+> +	if (ret == -EEXIST)
+> +		ret = 0; /* Lost race, another thread created the same wb */
+> +	else
+>  		goto err_fprop_exit;
+> -	}
+> -	goto out_put;
+>  
+>  err_fprop_exit:
+>  	bdi_put(bdi);
 
