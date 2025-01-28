@@ -1,43 +1,43 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E9083A14
-	for <linux-block@vger.kernel.org>; Tue, 28 Jan 2025 05:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828B11487F8;
+	Tue, 28 Jan 2025 05:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738043808; cv=none; b=oMVA5+UrIqQayPwE8Fd1DrVEsTHM56bI1G7vpW9achpD7iYno4qF9SJeG48UZ9n+tvvgkgHLDqwM1EOHai+MlscvDKmmIHeQTE8dlfdEuVNc4mSIfjB9lvQe+ep3Bv/6BrxpavxzPbPfTvc3wm3HwmB65y2sY9NpwDi5OLNHXoQ=
+	t=1738043888; cv=none; b=XLkz1oHmH/tK7XKQzxZW+nfvGgWZ8ikhtxTJJRbKq22Q8AZy4FEeOnbA3uKI9YAkcs8ypOPGDIptCbg4dRbxH0IIyUExjtVMnOWn1grlkRDTAaRiAyGtVCn8J1QtLdQwCHl7/D2PiiNqqJ5xBm7m0d8OJnRL4jrD0oTgG8bZm7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738043808; c=relaxed/simple;
-	bh=49tLfvVgRZnmfOpIcbVQY23mjHunXA9mp2eLuiqBrqI=;
+	s=arc-20240116; t=1738043888; c=relaxed/simple;
+	bh=443tAtrVlLikomEJW+bLkAx7edk1X/tJzL8RS/qf27Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bha9c9czrbLx2vOTf2xTwczya4rxd3bnbLw71KqlL5ckJGc9XUeTpZbqy/L/Q3j7oEKwNt06GhMcvoEo08Be4MYLJChZL1ASCfhxN+de53l8nIHpUBusOqgp3K/K/f7l4kHjdFzRXdsyprmo7p2X42fvHSqlslNt1D6+2mh79SE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3Cl3iidw; arc=none smtp.client-ip=198.137.202.133
+	 Content-Type:Content-Disposition:In-Reply-To; b=fEkTSHOR0/pK1cEB7QWc8eYJOdFLRKS7XkfaK5qcGJZMQyOUbnDJfyog8LIESZ/eCD6xJ5mBvCmhXHTyLLQdQa+kNqgqmrjsgzTUaT+GojmZP11cxvsgQkKPpUAJBQajghJWV9W2gcYNZ+/xLzIGbXf3/W4uu0nYrR3zasDdNOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Kb4PacBE; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3Cl3iidw"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Kb4PacBE"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
 	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=DNd70bAlVPOMS3w/LevWF2lfIDuBK/+gDQJteY8KR6k=; b=3Cl3iidwjVfupbx3RJEDRR5LFx
-	mQkPGChDB8LfWBNQczyOc1vnlSUNLSh/8G+cykxM+o4NKItoCypdp302E3QQxNcmTHYzJrQYwC5Zm
-	PjBBSczdfqRe2ba1f8rMysaUNon0Kclc1EtQtn47fl4nO05JsUqKnB+CKo9F9DbqXfbk2ojpS7hIr
-	pYXS1jQEMaQuFSitAucbP3plh+ZX6bPWvMOWsDXFtQb1JovU08wIH60l+F7R6bifBbt7rVpaQ1KLe
-	EGvMaboB48zmvLncfH5Msv9It2z2DXVxKTnxdb/lG3/2mME9wy0HBX8j3oGdOqFQusdWIIJ06lK+M
-	FEOjpp2Q==;
+	bh=lhu4zGDd4xcVjurqw3pEZgdUvwfwUI8PbgF5I8pxXXI=; b=Kb4PacBEHapoUCCQu26lxil/n1
+	S58HQfGSICL1sGPjpCbdThVmEZT0aaePsta/lLI9RN4j8QtceGCTBOMg5x/heRmSxghef444rMhio
+	Oaj5vYAMqrhS6uYUOp+3HXj8Y6LUdk0ll6aC2ZSP1RI54nb89CQqOviI1tiuDEqATu1vD89XzXw7h
+	UWkvM3VMGkA1K+XaDRaebzED8OllJevw2agswa36riMUHLOvMrMWtGSVnMQTxCsn4q9oVPXc1Xo1z
+	Am4gk/HEunIu7snaDFJp/ihlewz+u/pD/mLPzrssqv0uy9Xq/xpObbTMYD1v4K42hRBGpkLL0kjFa
+	mI0qtOag==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tceab-00000004BYO-3lMu;
-	Tue, 28 Jan 2025 05:56:45 +0000
-Date: Mon, 27 Jan 2025 21:56:45 -0800
+	id 1tcebu-00000004BbM-34R2;
+	Tue, 28 Jan 2025 05:58:06 +0000
+Date: Mon, 27 Jan 2025 21:58:06 -0800
 From: Christoph Hellwig <hch@infradead.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: linux-mm@kvack.org, linux-block@vger.kernel.org,
-	Muchun Song <muchun.song@linux.dev>, Jane Chu <jane.chu@oracle.com>,
-	David Hildenbrand <david@redhat.com>
-Subject: Re: Direct I/O performance problems with 1GB pages
-Message-ID: <Z5hxnRqbvi7KiXBW@infradead.org>
-References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	Andres Freund <andres@anarazel.de>
+Subject: Re: [PATCH] block: Skip the folio lock if the folio is already dirty
+Message-ID: <Z5hx7kpk4UyF0NYN@infradead.org>
+References: <20250124225104.326613-1-willy@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -46,36 +46,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
+In-Reply-To: <20250124225104.326613-1-willy@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-I read through this and unfortunately have nothing useful to contribute
-to the actual lock sharding.  Just two semi-related bits:
+On Fri, Jan 24, 2025 at 10:51:02PM +0000, Matthew Wilcox (Oracle) wrote:
+>  	bio_for_each_folio_all(fi, bio) {
+> +		if (folio_test_dirty(fi.folio))
+> +			continue;
 
-On Sun, Jan 26, 2025 at 12:46:45AM +0000, Matthew Wilcox wrote:
-> Postgres are experimenting with doing direct I/O to 1GB hugetlb pages.
-> Andres has gathered some performance data showing significantly worse
-> performance with 1GB pages compared to 2MB pages.  I sent a patch
-> recently which improves matters [1], but problems remain.
-> 
-> The primary problem we've identified is contention of folio->_refcount
-> with a strong secondary contention on folio->_pincount.  This is coming
-> from the call chain:
-> 
-> iov_iter_extract_pages ->
-> gup_fast_fallback ->
-> try_grab_folio_fast
+Can you add a comment why this is safe (the answer probably is "folio
+dirtying through direct I/O is racy as hell anyway and we don't care")
+and desirable?
 
-Eww, gup_fast_fallback sent me down the wrong path, as it suggests that
-is is the fallback slow path, but it's not.  It got renamed from
-internal_get_user_pages_fast in commit 23babe1934d7 ("mm/gup:
-consistently name GUP-fast functions").  While old name wasn't all
-that great the new one including fallback is just horrible.  Can we
-please fix this up?
-
-The other thing is that the whole GUP machinery takes a reference
-per page fragment it touches and not just per folio fragment.
-I'm not sure how fair access to the atomics is, but I suspect the
-multiple calls to increment/decrement them per operation probably
-don't make the lock contention any better.
+Otherwise this looks great.
 
