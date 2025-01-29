@@ -1,68 +1,46 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783AA7FD;
-	Wed, 29 Jan 2025 05:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26C31EEE6
+	for <linux-block@vger.kernel.org>; Wed, 29 Jan 2025 06:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738128079; cv=none; b=lf3yaGbRDIUsZvz2XocGVUOn4a2Fwbl6R3NkEt3yEg4guQcZH9n8F2TOGjtcoBBpYwYbQvNfk+FQz8ohTRORLoYC0hKwe2xATP+d3elEb9EsFTC0ULxWke5XaQNpDkaCX6IIbNlfeD9QtlyW62NQHChyOLe/qkfFxiP0yYm+Emw=
+	t=1738130589; cv=none; b=D9N7Otab4aHuaAIw8P4CGGjJZA9ccM6/9v43zgCgeb0tvdsZbAW9x4PjKeZdTFWfmsPdipFX2u4hJq2ecKicRO7ScRK8j++bZA5mw/IaHJvf5jkr9KNDFU+CY107wbOhstK7TQ+Y6L1/9jhhH6dG2w7ruWmj8hp8WRmRvyr5MGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738128079; c=relaxed/simple;
-	bh=ACIYfpK3sqEuBM7DUH4EwFypm+EtJKmU+sY1LGf0wCE=;
+	s=arc-20240116; t=1738130589; c=relaxed/simple;
+	bh=6Bn92NSr4CMCPxUwU0F8vv3bKvTpSeWMgOZcLQn5kAI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XzB4l3Qk9HKsHNTDnEabH71WT0KdWAQ+PCgJ/uXger4eAKk3qhlSyD+LbvbiJNgLkniIBL1pYTuF0OpaDvzoT6i9u2Xs3IDEkfpQdis5tT1eWN1vRwIIULuEm435OumKfsWOWJ0mJ1a+B3lm9YysXXibuYC2G4525ICWBGjaKSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 77CD368BEB; Wed, 29 Jan 2025 06:21:08 +0100 (CET)
-Date: Wed, 29 Jan 2025 06:21:08 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Yaron Avizrat <yaron.avizrat@intel.com>,
-	Oded Gabbay <ogabbay@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>,
-	James Smart <james.smart@broadcom.com>,
-	Dick Kennedy <dick.kennedy@broadcom.com>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-	David Sterba <dsterba@suse.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Dongsheng Yang <dongsheng.yang@easystack.cn>,
-	Jens Axboe <axboe@kernel.dk>, Xiubo Li <xiubli@redhat.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>, Carlos Maiolino <cem@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Sebastian Reichel <sre@kernel.org>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Frank Li <Frank.Li@nxp.com>, Mark Brown <broonie@kernel.org>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
-	Selvin Xavier <selvin.xavier@broadcom.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	cocci@inria.fr, linux-kernel@vger.kernel.org,
-	linux-scsi@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-sound@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-spi@vger.kernel.org, imx@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org,
-	ibm-acpi-devel@lists.sourceforge.net, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 09/16] xfs: convert timeouts to secs_to_jiffies()
-Message-ID: <20250129052108.GB28513@lst.de>
-References: <20250128-converge-secs-to-jiffies-part-two-v1-0-9a6ecf0b2308@linux.microsoft.com> <20250128-converge-secs-to-jiffies-part-two-v1-9-9a6ecf0b2308@linux.microsoft.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VCgbzU5Cq2KB1m1QOQGO0DL+Vi8EBjZ1/56ShhJJg6LlJ8YpHj8IYqebt+SsqPHiYHDCvWeaGiQkaY+nLmsBMtuvKjjtXE/6qbSepeVUh5Pet4Dug3U7bOuftVDwOsnQMhLeRMH/N6gcFv/WjEZhtKqQqvC4UkfpUdFdIGO6Cn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mZ7y9Fk4; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mZ7y9Fk4"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=hiq1uScUML6Rsu2S+zgxlNvLPyp4iGtnsMkJjdwAtNQ=; b=mZ7y9Fk4dGIXhI5NWhZA3+Aio+
+	o3LrzoIz+L+Kp1Q6445Ua0/YG78zDtSGdZ4XWofQ+taJODq42y1iQuspFwKsyPnOUUvhIwvtCOjmP
+	IDXE+sJtD+4fme0fDjZHGRGX+4aeNrL76R+os4ZtF+GfVnsbFh4SiGyxC8ssmJNyqqfFlR5hzRDPV
+	TwGXwCP+8IDfms3STsUnfrsdN5CsCvpk0fS+akdoR/ju79FK+rGEZ0xyw8oL0S63rAG5Aney917RA
+	bNeQegGWl6bVULcQFBwNXaLNbDYrE6nw3j2Yf5LK43/WqCjz0JUgXrc1qYUvglVYRFhy23G/fYZAw
+	V8BkieFA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1td1AI-00000006Ngg-2eT6;
+	Wed, 29 Jan 2025 06:03:06 +0000
+Date: Tue, 28 Jan 2025 22:03:06 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, Muchun Song <muchun.song@linux.dev>,
+	Jane Chu <jane.chu@oracle.com>
+Subject: Re: Direct I/O performance problems with 1GB pages
+Message-ID: <Z5nEmo3ggTuRu2yX@infradead.org>
+References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
+ <Z5hxnRqbvi7KiXBW@infradead.org>
+ <d2471b37-15bf-4d67-932c-7e25c226db79@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -71,15 +49,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250128-converge-secs-to-jiffies-part-two-v1-9-9a6ecf0b2308@linux.microsoft.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <d2471b37-15bf-4d67-932c-7e25c226db79@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Jan 28, 2025 at 06:21:54PM +0000, Easwar Hariharan wrote:
->  		else
-> -			cfg->retry_timeout = msecs_to_jiffies(
-> -					init[i].retry_timeout * MSEC_PER_SEC);
-> +			cfg->retry_timeout = secs_to_jiffies(init[i].retry_timeout);
+On Tue, Jan 28, 2025 at 10:47:12AM +0100, David Hildenbrand wrote:
+> Yes, I did that renaming as part of that series after the name was suggested
+> during review. I got confused myself reading this report.
+> 
+> 	internal_get_user_pages_fast() -> gup_fast_fallback()
+> 
+> Was certainly an improvement. Naming is hard, we want to express "try fast,
+> but fallback to slow if it fails".
+> 
+> Maybe "gup_fast_with_fallback" might be clearer, not sure.
 
-This messes up the formatting by introducing an overly long line.
+gup_common?
 
-Otherwise the change looks fine.
