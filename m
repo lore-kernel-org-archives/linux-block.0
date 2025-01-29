@@ -1,143 +1,160 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29842176FB0;
-	Wed, 29 Jan 2025 06:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97D86A33F
+	for <linux-block@vger.kernel.org>; Wed, 29 Jan 2025 06:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738132063; cv=none; b=cniOJtudTc1YDj8AJ0wZ8nPqosoQs3jmcOw/QAlAE6Rdlpa0IoXe6rfjmQUsXGoIIMpKE5rB1/czlo68MvPhOAIA1ZvFWVTWCCaQS0miSngOB7m6LDlfFVpMBLM8xRqQylTB149/Z3MbfbQqxL08tfGndtqQFx47badtQg0X/tk=
+	t=1738133252; cv=none; b=nTch4AtonJBUn6IT7fpD60lb0U0jmYgAFgTB+7SJVC3ukFal/YyvpcmmFBGC6l4Ayz7SOQ3+riI0At8CsZBIr6LRRwggBu+wkqB14CCHeR+aaFTF2qVTqYKyB+Fk8ebcPAZjF0a9ByTyeoesJ/Nm1lFw8SxxVORpuxEXLIfyTQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738132063; c=relaxed/simple;
-	bh=BcheDkbF7i4plK077EE5fx0I+7LaoMSZmCvmiRwCLWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qP+y1JYHovCjyi9sK70N/J1fhOdvICAJIL1jb+UZQNeAjCxsyv6OC13eWlgDMxi6rxthxaT6xMyn3Jgo/nFvO4dsDYAELRTfLDThRRor/9GAA4oDi9YI1oR54TmXx8qS9tnKAeWxz+rIb/Pu/08XMDUcySRe8nG9aUQAY5fML9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tYXlaTpf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738133252; c=relaxed/simple;
+	bh=2qzY+ir8hdE6PW6xqY6S/48m1ECHrJkFHnastDM+J4o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s3xVPS2Eo3rM2dXEbSjnSneKXAhA5Y4LaCUUura2Id8dZsFlvhGZR6s9FRA0h14ewI2lOxos+IhY+DhuKU5WSz+bUOHrobfM16cu/ng/XF3SXY0obyoVUwzIXKZwcmMC3NCRXYqzMCJUueXCK1P6ok2/ATZj88je7EtFAN1qI8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GqPg8Jez; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=E15KA4xr; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GqPg8Jez; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=E15KA4xr; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYXlaTpf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E108EC4CED3;
-	Wed, 29 Jan 2025 06:27:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738132062;
-	bh=BcheDkbF7i4plK077EE5fx0I+7LaoMSZmCvmiRwCLWc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tYXlaTpf1UHLxCOLY2b71oBs1Z8jmc+k88hDg4mxgy9BfVh5FaZFJ0sctqiMaUJa3
-	 0ERjR88O2sKxLaXENNFiYXgW5V6EWANwLybrlRdZ0uAueHnvFc/luTGhJJHi5qSyHf
-	 Qhwk4n5jqTURqvwR6zUdrtKBktKuVAQJmisiNKpSZSSK6LJmo4zYOOzg6tSFgxCsOc
-	 Qfzb+Ch4Hp08uSkL1c1h9vCW8n/kbD+KUJVXjOVTrDcLl+peTbMx/iozRX16+XGbqx
-	 LmxLOokGigU1zjIvh0goqBVkjBWqvL4YDcg+yxNUApdR5ACop75NXb+fT4J9+7jnPJ
-	 KRVcLrP4/YQHg==
-Date: Wed, 29 Jan 2025 07:27:24 +0100
-From: Carlos Maiolino <cem@kernel.org>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Yaron Avizrat <yaron.avizrat@intel.com>, Oded Gabbay <ogabbay@kernel.org>, 
-	Julia Lawall <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, 
-	James Smart <james.smart@broadcom.com>, Dick Kennedy <dick.kennedy@broadcom.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Chris Mason <clm@fb.com>, 
-	Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, 
-	Ilya Dryomov <idryomov@gmail.com>, Dongsheng Yang <dongsheng.yang@easystack.cn>, 
-	Jens Axboe <axboe@kernel.dk>, Xiubo Li <xiubli@redhat.com>, 
-	Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
-	"Darrick J. Wong" <djwong@kernel.org>, Sebastian Reichel <sre@kernel.org>, 
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	Frank Li <Frank.Li@nxp.com>, Mark Brown <broonie@kernel.org>, Shawn Guo <shawnguo@kernel.org>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Fabio Estevam <festevam@gmail.com>, Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, 
-	Hans de Goede <hdegoede@redhat.com>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
-	Henrique de Moraes Holschuh <hmh@hmh.eng.br>, Selvin Xavier <selvin.xavier@broadcom.com>, 
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, cocci@inria.fr, linux-kernel@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-sound@vger.kernel.org, 
-	linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-ide@vger.kernel.org, linux-xfs@vger.kernel.org, linux-pm@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, linux-spi@vger.kernel.org, imx@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, platform-driver-x86@vger.kernel.org, 
-	ibm-acpi-devel@lists.sourceforge.net, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 09/16] xfs: convert timeouts to secs_to_jiffies()
-Message-ID: <kywszbmxtm27rlgaefr6xus6l4bpdiouqqe72px7ml72hh4ozc@5orjtzsbg75s>
-References: <20250128-converge-secs-to-jiffies-part-two-v1-0-9a6ecf0b2308@linux.microsoft.com>
- <JZGx8kYNWP54f9cEViEKZlR6sGGADv31K4TOPtwvyeoDEFkRKICiFaQy04EvZtsQtc44Zozh76mkch2s8rz7mQ==@protonmail.internalid>
- <20250128-converge-secs-to-jiffies-part-two-v1-9-9a6ecf0b2308@linux.microsoft.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GqPg8Jez";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="E15KA4xr";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GqPg8Jez";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="E15KA4xr"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 8A3F31F365;
+	Wed, 29 Jan 2025 06:47:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1738133247; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/gtIZOSk3enw/QUP8eLfDrfZ+vdpswptAFzuAX81EXY=;
+	b=GqPg8Jez7rq7EWjOO00vuVM/vWDtr+Ma2GK+smNHd19Rp5G8HbalCC70NQQ6wBHl9SzOMI
+	r8hrtzUehCa1U4/YudJur8zbq7cPbRgSghZdwa4LI+Cs1wmGUo1H8WZ4e86inxgjrs/5Xq
+	GBeA1yxAOR20h013whH0g7m0B2fUALw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1738133247;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/gtIZOSk3enw/QUP8eLfDrfZ+vdpswptAFzuAX81EXY=;
+	b=E15KA4xrtmyZkPsK09CPBVh03BohHf/BBupMA6T8DaRzo5/0vFsAWoG8gNHVchUvQMhpZb
+	nUdeshiZUWOk+pAA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1738133247; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/gtIZOSk3enw/QUP8eLfDrfZ+vdpswptAFzuAX81EXY=;
+	b=GqPg8Jez7rq7EWjOO00vuVM/vWDtr+Ma2GK+smNHd19Rp5G8HbalCC70NQQ6wBHl9SzOMI
+	r8hrtzUehCa1U4/YudJur8zbq7cPbRgSghZdwa4LI+Cs1wmGUo1H8WZ4e86inxgjrs/5Xq
+	GBeA1yxAOR20h013whH0g7m0B2fUALw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1738133247;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/gtIZOSk3enw/QUP8eLfDrfZ+vdpswptAFzuAX81EXY=;
+	b=E15KA4xrtmyZkPsK09CPBVh03BohHf/BBupMA6T8DaRzo5/0vFsAWoG8gNHVchUvQMhpZb
+	nUdeshiZUWOk+pAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2139B13AE1;
+	Wed, 29 Jan 2025 06:47:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id s9ixBf/OmWdHeAAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 29 Jan 2025 06:47:27 +0000
+Message-ID: <b520a3ae-5199-4246-aba3-76c060401de4@suse.de>
+Date: Wed, 29 Jan 2025 07:47:26 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250128-converge-secs-to-jiffies-part-two-v1-9-9a6ecf0b2308@linux.microsoft.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCHv3 1/2] block: get rid of request queue
+ ->sysfs_dir_lock
+To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
+Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, axboe@kernel.dk,
+ gjoyce@ibm.com
+References: <20250128143436.874357-1-nilay@linux.ibm.com>
+ <20250128143436.874357-2-nilay@linux.ibm.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250128143436.874357-2-nilay@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-On Tue, Jan 28, 2025 at 06:21:54PM +0000, Easwar Hariharan wrote:
-> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
-> secs_to_jiffies().  As the value here is a multiple of 1000, use
-> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
+On 1/28/25 15:34, Nilay Shroff wrote:
+> The request queue uses ->sysfs_dir_lock for protecting the addition/
+> deletion of kobject entries under sysfs while we register/unregister
+> blk-mq. However kobject addition/deletion is already protected with
+> kernfs/sysfs internal synchronization primitives. So use of q->sysfs_
+> dir_lock seems redundant.
 > 
-> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
-> the following Coccinelle rules:
+> Moreover, q->sysfs_dir_lock is also used at few other callsites along
+> with q->sysfs_lock for protecting the addition/deletion of kojects.
+> One such example is when we register with sysfs a set of independent
+> access ranges for a disk. Here as well we could get rid off q->sysfs_
+> dir_lock and only use q->sysfs_lock.
 > 
-> @depends on patch@
-> expression E;
-> @@
+> The only variable which q->sysfs_dir_lock appears to protect is q->
+> mq_sysfs_init_done which is set/unset while registering/unregistering
+> blk-mq with sysfs. But use of q->mq_sysfs_init_done could be easily
+> replaced using queue registered bit QUEUE_FLAG_REGISTERED.
 > 
-> -msecs_to_jiffies
-> +secs_to_jiffies
-> (E
-> - * \( 1000 \| MSEC_PER_SEC \)
-> )
+> So with this patch we remove q->sysfs_dir_lock from each callsite
+> and replace q->mq_sysfs_init_done using QUEUE_FLAG_REGISTERED.
 > 
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
 > ---
->  fs/xfs/xfs_icache.c | 2 +-
->  fs/xfs/xfs_sysfs.c  | 7 +++----
->  2 files changed, 4 insertions(+), 5 deletions(-)
+>   block/blk-core.c       |  1 -
+>   block/blk-ia-ranges.c  |  4 ----
+>   block/blk-mq-sysfs.c   | 23 +++++------------------
+>   block/blk-sysfs.c      |  5 -----
+>   include/linux/blkdev.h |  3 ---
+>   5 files changed, 5 insertions(+), 31 deletions(-)
 > 
-> diff --git a/fs/xfs/xfs_icache.c b/fs/xfs/xfs_icache.c
-> index 7b6c026d01a1fc020a41a678964cdbf7a8113323..7a1feb8dc21f6f71d04f88de866e5a95925e0c54 100644
-> --- a/fs/xfs/xfs_icache.c
-> +++ b/fs/xfs/xfs_icache.c
-> @@ -230,7 +230,7 @@ xfs_blockgc_queue(
->  	rcu_read_lock();
->  	if (radix_tree_tagged(&pag->pag_ici_root, XFS_ICI_BLOCKGC_TAG))
->  		queue_delayed_work(mp->m_blockgc_wq, &pag->pag_blockgc_work,
-> -				   msecs_to_jiffies(xfs_blockgc_secs * 1000));
-> +				   secs_to_jiffies(xfs_blockgc_secs));
->  	rcu_read_unlock();
->  }
-> 
-> diff --git a/fs/xfs/xfs_sysfs.c b/fs/xfs/xfs_sysfs.c
-> index 60cb5318fdae3cc246236fd988b4749df57f8bfc..eed0f28afe97ead762a9539e45f292db7d0d0c4a 100644
-> --- a/fs/xfs/xfs_sysfs.c
-> +++ b/fs/xfs/xfs_sysfs.c
-> @@ -568,8 +568,8 @@ retry_timeout_seconds_store(
->  	if (val == -1)
->  		cfg->retry_timeout = XFS_ERR_RETRY_FOREVER;
->  	else {
-> -		cfg->retry_timeout = msecs_to_jiffies(val * MSEC_PER_SEC);
-> -		ASSERT(msecs_to_jiffies(val * MSEC_PER_SEC) < LONG_MAX);
-> +		cfg->retry_timeout = secs_to_jiffies(val);
-> +		ASSERT(secs_to_jiffies(val) < LONG_MAX);
->  	}
->  	return count;
->  }
-> @@ -686,8 +686,7 @@ xfs_error_sysfs_init_class(
->  		if (init[i].retry_timeout == XFS_ERR_RETRY_FOREVER)
->  			cfg->retry_timeout = XFS_ERR_RETRY_FOREVER;
->  		else
-> -			cfg->retry_timeout = msecs_to_jiffies(
-> -					init[i].retry_timeout * MSEC_PER_SEC);
-> +			cfg->retry_timeout = secs_to_jiffies(init[i].retry_timeout);
->  	}
->  	return 0;
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Looks fine to me.
+Cheers,
 
-Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
-
-> 
-> 
-> --
-> 2.43.0
-> 
-> 
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
