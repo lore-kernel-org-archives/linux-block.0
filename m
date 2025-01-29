@@ -1,105 +1,169 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6EA42049
-	for <linux-block@vger.kernel.org>; Wed, 29 Jan 2025 14:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0FD1B4250;
+	Wed, 29 Jan 2025 14:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738160243; cv=none; b=jUPMPCKY0WuAw76hvs2NMFSfHJff5MA7vvYkaExUw+996tkJ3GMtQ7d8fnwghbpot+Ap0mdT3BFEfYaqVMKwWAa9GZsRR+yUqdyLNo+TSOUVbGyLbb/x5n4ThfNkKkRs8IfFJvZZ8xS757AiThgIO/5bh18G7kQ6PB/nd0WoxSw=
+	t=1738160531; cv=none; b=MqzDk1aNZ+SSNVjv43r4DyISKUzQeEur/oOfPpDJVbGMYIhfSoem97n2BmiBhK0LOSlbUi6MHFZMfYIHkszoGcX92cm12kX+0gBhYvhpZ0agiWJyX50xHbA2Vi80OMyiKsC13Ly+IxtIKsD73SR11miLV9aFhQ8o4Nw35yCqzDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738160243; c=relaxed/simple;
-	bh=UEzhS532+hwt1opM67nDRSyRlgihhNytgfPcLWnWGNU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=GH1TXaUX6eEfIzGsKB6iXDr9lr0OOUpUfkR8+7Hc6hvYd6v/ayCxtjZ1Ss+0VimwcqJdlYHlYsuIMe+GnMyCy8AFmJT/+i6HFgZy9888+i4K6JQZ7sxsatVxXacnnZeEXvWyw3c2SGAia/0oibtVQ+i56RDtaRuL58jwrDL7dv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=BlTKYRfI; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1738160531; c=relaxed/simple;
+	bh=/uy2KVK+92bnjkNkIT1iw5CrTdiZ0e2lwuNq07xf8OM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dIjz3OvimteobWYLHRjzWMXoKzWhEPpYBp/O6JqsOwdVvdewpUnFs1NaqCTilPqJWha4nHJJxRgrUqN6Ert/SPUSHV3gZV96iRKaCGnvu0jrAToRkBvclybo2sg/eWRoCriqyANIdJ1Hi/K9TsDOeM+JG4ZBtncizAKGRA2A1hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=djFiyaI1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="BlTKYRfI"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3ce915a8a25so22757035ab.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Jan 2025 06:17:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1738160240; x=1738765040; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7Pt3Vj241rHbwS/dznbhD7KSksrHr+Vxru0qaVZYKTw=;
-        b=BlTKYRfIpUtMIqO2VEDUlI+x5hGAfzJaWlxAeS8N5Cyxa44jbTh8T1ic9Vpjjdc7AP
-         /niI9ivFti51nAgnoGRqBNaHUz20+vzSBrYER/QsP5uos0Bt45Cyt8nh8YHZylIvPk2a
-         t5d4gSJ7d5B5lmK64FciVe+8YA6XWMN97uQvtzPuoYnkzo2nFX7QYOOwddsgpvh8hEfz
-         EfQNbumkPCwaPpqkUSrmHN5/v3H3o+ubM/+0V5lZpc7+vm1enzufk3RaV7I9DIwbeJjN
-         MdD23qsJaG8y8MDsxV1jKpCM85bhHDsKjHySo1QAEKEGi7WGtIFpmc9yLpY94tKH555i
-         YztA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738160240; x=1738765040;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7Pt3Vj241rHbwS/dznbhD7KSksrHr+Vxru0qaVZYKTw=;
-        b=JSkKMaqzyYTB2SyiA3yT/Tki40GgCZqgzAZ/C7na3mSLUIp9JG2SxUMJL+KnuMBhpM
-         pS6c6qQs466gWkp9C6fLfOiIamDdzdXwFT7pjj1xOiBNiZvovfjfwBs2jCggeqf9AR8a
-         Mg9ByeotYSslVDpjRW7WANw3ACMJkjZcBm7giC4UD3nHQCZPHSrJKCGxGDyLbAZBVTHc
-         rYlUNdrv1lkz2OCjmDmCnCrwaOsdWFx1mJ5tr90goYNcWBG6hZf5iNc2S0M9aYuwVadB
-         Hzra/xBHstEa9tKngVWVkxxPbSiveTkF+dRIAI9L8ZaQoXn07k1MmAuvK3JFFx2huqcs
-         19pg==
-X-Gm-Message-State: AOJu0YwDHiOd9ylw4d2N250Rdz6UL2sJmFr3LBTvMcmrpJIPQBbAqxrw
-	ogWTNajaIPz5mnpdLX5Sasit3Mgdt8/msY2gOe5wjRr+h38/ixAzxohlnl/gDBM=
-X-Gm-Gg: ASbGncuDypFj12C7bYMBS+mkT7TJcEWwSwrvGzB6sPQo5r27AW2RYBcPHFmo92jPZKq
-	qb3z9UYZKBwYVyhN5yhZX4wZbxw+A3ro7aGlclzkMnKv64g0iyY4R+avvpicAunyeN8n6HzEPGF
-	VgYIbXlIKDYC8mKwidmJyUWFQHmldo67bQ0Oci0uPA2rEhkLu4M6R8UkatjKHXyvklQrSaMNCFb
-	zh7JHvRTN7JnxJWVxi4gulbhi41TATk8xqtLE5snIOIdLxwGdfwnPWKJLw/C6hu5q/b5o5UNusK
-	pmAC9Q==
-X-Google-Smtp-Source: AGHT+IEpvHfTHy0QgZepC/stNlH+UxtBwBDX0r/YQoFuHmw82IyBPEH1kqxubAbLQBnr3cye1w5A6w==
-X-Received: by 2002:a05:6e02:b44:b0:3ce:6cb7:1e6 with SMTP id e9e14a558f8ab-3cffe39c03bmr21251575ab.10.1738160239818;
-        Wed, 29 Jan 2025 06:17:19 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3cfc740f7a7sm37458265ab.6.2025.01.29.06.17.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jan 2025 06:17:18 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>
-Cc: hch@lst.de, ming.lei@redhat.com, dlemoal@kernel.org, gjoyce@ibm.com
-In-Reply-To: <20250128143436.874357-1-nilay@linux.ibm.com>
-References: <20250128143436.874357-1-nilay@linux.ibm.com>
-Subject: Re: [RFC PATCHv3 0/2] block: remove q->sysfs_dir_lock and fix race
- updating nr_hw_queue
-Message-Id: <173816023843.10270.10658013197443984372.b4-ty@kernel.dk>
-Date: Wed, 29 Jan 2025 07:17:18 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="djFiyaI1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69A63C4CED3;
+	Wed, 29 Jan 2025 14:22:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738160530;
+	bh=/uy2KVK+92bnjkNkIT1iw5CrTdiZ0e2lwuNq07xf8OM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=djFiyaI1DlJWiFHE8181GXXxjAr3wEqHuYYG3QsXELwZvDKxnRVxjUbFdIQbTnmLU
+	 Lt9fufnc/G7WtGz9dtGAS3ZPyc4zzMF7RCfLnP+iBbDKwR+eb444lgkHrtJ/IVzKnP
+	 WXttUr2Yxs6fWKBISWq0/x5ZYEIrKYg1CFR9lX/xH1tZyDicoyC+ae2lT5AysNsQ5+
+	 Zrzl0ec3PcPgnqhqfetOvYwj+teyI/gwI8joVAbOMvx/WjRa3zWtMYKccoxnJSJUEq
+	 elKqiXQFndQZbOtUJb0kgnqPfoQifhZUjqbQYA3D92ZpRy6VKsPv9SGhYwjgHdtLhq
+	 gPYPXMPtSHgOQ==
+Date: Wed, 29 Jan 2025 15:22:03 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, coresight@lists.linaro.org,
+ linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, linux-hardening@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ workflows@vger.kernel.org
+Subject: Re: [RFC v2 00/38] Improve ABI documentation generation
+Message-ID: <20250129152203.0dda53ca@foz.lan>
+In-Reply-To: <20250129024518.69c0be81@foz.lan>
+References: <cover.1738020236.git.mchehab+huawei@kernel.org>
+	<87h65i7e87.fsf@trenco.lwn.net>
+	<20250129024518.69c0be81@foz.lan>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-14bd6
 
+Em Wed, 29 Jan 2025 02:45:18 +0100
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> escreveu:
 
-On Tue, 28 Jan 2025 20:04:12 +0530, Nilay Shroff wrote:
-> There're two patches in this patchest.
-> The first patch removes redundant q->sysfs_dir_lock.
-> The second patch fixes nr_hw_queue update racing with disk addition/
-> removal.
+> > I've only tested with current Sphinx,
+> > have you tried this with the more ancient versions we support?  
 > 
-> In the current implementation we use q->sysfs_dir_lock for protecting
-> kobject addition/deletion while we register/unregister blk-mq with
-> sysfs. However the sysfs/kernfs internal implementation already protects
-> against the simultaneous addtion/deletion of kobjects. So in that sense
-> use of q->sysfs_dir_lock appears redundant.
-> 
-> [...]
+> Not yet, but I double-checked at Sphinx documentation to be sure that
+> I won't be using any newer methods: I just kept using the same Sphinx
+> API as used by other extensions at the Kernel.
 
-Applied, thanks!
+Just checked it with Python 3.6 and Sphinx 3.4 on Fedora 41 with:
 
-[1/2] block: get rid of request queue ->sysfs_dir_lock
-      commit: fe6628608627424fb4a6d4c8d2235822457c5d9c
-[2/2] block: fix nr_hw_queue update racing with disk addition/removal
-      commit: 14ef49657ff3b7156952b2eadcf2e5bafd735795
+	sudo dnf install python3.6.x86_64
+	python3.6 -m venv Sphinx-3.4
+	pip install alabaster Sphinx==3.4.3 pyyaml
 
-Best regards,
--- 
-Jens Axboe
+There were some issues related to problems with early f-string
+support, as reported by Akira.
 
+After applying the enclosed patch, it is now working fine. The only
+drawback is here:
 
+	- print(f"Defined on file{'s'[:len(files) ^ 1]}:\t{", ".join(files)}")
+	+ print("Defined on file(s):\t" + ", ".join(files))
 
+As I removed the file/files auto-plural logic depending on the files
+array length. Not a big deal.
+
+I'll double-check if there's no other diff between old/new version
+and add the enclosed patch in the end.
+
+Thanks,
+Mauro
+
+[PATCH] scripts/get_abi.py: make it backward-compatible with Python 3.6
+
+Despite being introduced on Python 3.6, the original implementation
+was too limited: it doesn't accept anything but the argument.
+
+Even on python 3.10.12, support was still limited, as more complex
+operations cause SyntaxError:
+
+	Exception occurred:
+	  File ".../linux/Documentation/sphinx/kernel_abi.py", line 48, in <module>
+	    from get_abi import AbiParser
+	  File ".../linux/scripts/get_abi.py", line 525
+	    msg += f"{part}\n{"-" * len(part)}\n\n"
+                       ^
+	SyntaxError: f-string: expecting '}'
+
+Replace f-strings by normal string concatenation when it doesn't
+work on Python 3.6.
+
+Reported-by: Akira Yokosawa <akiyks@gmail.com>
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+
+diff --git a/scripts/get_abi.py b/scripts/get_abi.py
+index 543bed397c8c..e6e94f721fff 100755
+--- a/scripts/get_abi.py
++++ b/scripts/get_abi.py
+@@ -522,7 +522,7 @@ class AbiParser:
+ 
+                 if cur_part and cur_part != part:
+                     part = cur_part
+-                    msg += f"{part}\n{"-" * len(part)}\n\n"
++                    msg += part + "\n"+ "-" * len(part) +"\n\n"
+ 
+                 msg += f".. _{key}:\n\n"
+ 
+@@ -546,7 +546,7 @@ class AbiParser:
+                     msg += f"Defined on file :ref:`{base} <{ref[1]}>`\n\n"
+ 
+             if wtype == "File":
+-                msg += f"{names[0]}\n{"-" * len(names[0])}\n\n"
++                msg += names[0] +"\n" + "-" * len(names[0]) +"\n\n"
+ 
+             desc = v.get("description")
+             if not desc and wtype != "File":
+@@ -570,7 +570,8 @@ class AbiParser:
+ 
+             users = v.get("users")
+             if users and users.strip(" \t\n"):
+-                msg += f"Users:\n\t{users.strip("\n").replace('\n', '\n\t')}\n\n"
++                users = users.strip("\n").replace('\n', '\n\t')
++                msg += f"Users:\n\t{users}\n\n"
+ 
+             ln = v.get("line_no", 1)
+ 
+@@ -596,7 +597,9 @@ class AbiParser:
+                 elif len(lines) == 1:
+                     f.append(f"{fname}:{lines[0]}")
+                 else:
+-                    f.append(f"{fname} lines {", ".join(str(x) for x in lines)}")
++                    m = fname + "lines "
++                    m += ", ".join(str(x) for x in lines)
++                    f.append(m)
+ 
+             self.log.warning("%s is defined %d times: %s", what, len(f), "; ".join(f))
+ 
+@@ -644,10 +647,11 @@ class AbiParser:
+                     if users:
+                         print(f"Users:\t\t\t{users}")
+ 
+-                    print(f"Defined on file{'s'[:len(files) ^ 1]}:\t{", ".join(files)}")
++                    print("Defined on file(s):\t" + ", ".join(files))
+ 
+                     if desc:
+-                        print(f"\n{desc.strip("\n")}\n")
++                        desc = desc.strip("\n")
++                        print(f"\n{desc}\n")
+ 
+         if not found_keys:
+             print(f"Regular expression /{expr}/ not found.")
