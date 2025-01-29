@@ -1,30 +1,42 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2355E1DDA3D
-	for <linux-block@vger.kernel.org>; Wed, 29 Jan 2025 15:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCEBB15B102;
+	Wed, 29 Jan 2025 15:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738164381; cv=none; b=HSejtUx1LDQZVrutzxIuOl0eWtuU978+gI2yLCIHaR/nQ7TB/sledfgGbi6msQOLATZPlgnLgxSSAsl1awEybMMElBi2w9JWEJf5T+/U+cKJL3FY/8rTz9IFixzCywO4EFurZ2Cl6PEoj1YeNslNS1MaPSG99jahCcwKtVjcc+A=
+	t=1738164506; cv=none; b=GyZ2yNSiVkT76ctFhUVf6raUVvl0OBA1sWYdaYj75mtwo7ZvM5XE4ct4BEPudkcsTtw6WF4OKgUSQU0G430S3rpdRNTTLwlRaqrAyiTuLQIl0+pt0kTUB1JcJYIktV2/F6xqtw7Cr3kvEgxp5mM3atai1ozuwmnw19UE5+kwVAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738164381; c=relaxed/simple;
-	bh=1Wd1GdJLKWSV0+fejmK2lTf9IFE2odETOBWy3LpPAJc=;
+	s=arc-20240116; t=1738164506; c=relaxed/simple;
+	bh=SeZspGMtd29bXBRJEo6j1b1maNPj6nnM3pShwptmW2A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H1lEanH1j2ToZUo3zJdxfiTQtLzo+cfh897pI+tEHCGXBdC5HXGowGF6Nge7UG+GqFk9NhbQkxadM/pDEjziGTzzaXYrA1+Gdsc4OYDgakxZQrF1MfE38yuaQSS9TiEMLBNtCfivV8UI+co2kgDwiGgCtW5CNhRngxA4uATGjTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3271368D07; Wed, 29 Jan 2025 16:26:13 +0100 (CET)
-Date: Wed, 29 Jan 2025 16:26:12 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>, Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: in-kernel verification of user PI?
-Message-ID: <20250129152612.GA5356@lst.de>
-References: <20250129124648.GA24891@lst.de> <yq15xlxsqkg.fsf@ca-mkp.ca.oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IR7H+4Ps8ZIyVUkZdnLMLqrbABznL9MK8XqNm/Af6SJfgAvnFIUeX4OcXm14QObi6xALjbV36Z5/J6LHdUa7Uicz4C4h7GMIszrRQ4UPAP2BZEUJ5A3n6GO73wbT9M8acyJ5iMCh3zjIEbCA9MeJV+Z8YvsnIt11CNE4dgw9yJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YElx4xGB; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YElx4xGB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDBC6C4CED3;
+	Wed, 29 Jan 2025 15:28:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738164506;
+	bh=SeZspGMtd29bXBRJEo6j1b1maNPj6nnM3pShwptmW2A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YElx4xGBKbiZmg/exChiKs++JAtGnxXODnvPFQa5wutbWImPHv1PuvB9WfYDr+97b
+	 sWYFohrvpcIW4NN7mJhDA1pW9x2VAfcvXgTDqp0aE/R3S1FsYciLUSbPW9J5lMx0YK
+	 uqGjynyy1FQgR+0ho/v3YZLB9MuAwVtMpemx51Ss2OKLcG8H4X4dYXRUqf+8BlulbG
+	 RO2k+5l/P+L1tJs4ha5c0BI+Apar/T7EYK9xO9v6ND/BpTVoqv0QuFkKXpNAuuffgo
+	 i3yiTcsI3VkziJ4ycdUI2pg5ckG/4PrJaU/Z+LVOXVj2mqu3yAKL7JrfRPTLlWTeq+
+	 UlWr5/5QR2Oyw==
+Date: Wed, 29 Jan 2025 08:28:24 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: josef@toxicpanda.com, dsterba@suse.com, clm@fb.com, axboe@kernel.dk,
+	hch@lst.de, linux-btrfs@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com
+Subject: Re: [RFC 0/3] Btrfs checksum offload
+Message-ID: <Z5pJGHAR7AWCC0T4@kbusch-mbp>
+References: <CGME20250129141039epcas5p11feb1be4124c0db3c5223325924183a3@epcas5p1.samsung.com>
+ <20250129140207.22718-1-joshi.k@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,32 +45,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq15xlxsqkg.fsf@ca-mkp.ca.oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250129140207.22718-1-joshi.k@samsung.com>
 
-On Wed, Jan 29, 2025 at 09:23:37AM -0500, Martin K. Petersen wrote:
-> Doing a verification pass in the write hot path had a substantial
-> performance impact when I originally did this.
+On Wed, Jan 29, 2025 at 07:32:04PM +0530, Kanchan Joshi wrote:
+> There is value in avoiding Copy-on-write (COW) checksum tree on
+> a device that can anyway store checksums inline (as part of PI).
+> This would eliminate extra checksum writes/reads, making I/O
+> more CPU-efficient.
 
-Oh yes, it absolutely will.  While the CRC implementations got a lot
-faster in the last years, there's still a cost.  It also touches a lot of
-cache lines.
+Another potential benefit: if the device does the checksum, then I think
+btrfs could avoid the stable page writeback overhead and let the
+contents be changable all the way until it goes out on the wire.
 
-> Even remapping the ref
-> tag has an impact on cache. That's why DIX1.1 moved ref tag remapping to
-> the HBA so we could avoid touching the PI buffer altogether in the hot
-> path.
-
-As in supplying an offset for the ref tag somewhere in the HBA specific
-per-command payload?  That's not implemented in Linux as far as I can
-tell, or did I miss something?
-
-> > I.e. if userspace passes incorrect information it can trigger a
-> > command failure and thus the driver error handler, which is something
-> > we don't usually allow for "regular" I/O.
-> 
-> Do you trigger EH in NVMe? For SCSI we just bubble the PI error up
-> without retrying.
-
-We don't have the EH thread from hell, but there is error handling yes.
-
+Though I feel the very specific device format constraints that can
+support an offload like this are a unfortunate.
