@@ -1,159 +1,200 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2FC1ACEC2;
-	Wed, 29 Jan 2025 09:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D14A1A3BC0
+	for <linux-block@vger.kernel.org>; Wed, 29 Jan 2025 10:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738144518; cv=none; b=L+LFTZRuP52wBx6iQ4mmw0+hdEWhyUe05TLJDkPOzg3TXadLMUzbZmCZ5LNXz8FmMmmStDeeN+48SkTkqEM0mL5FtxxL3fq5VRqy9n7fZmgbRh+T6jCL1fLKoua4qRRcJYfY4LAewvdj8561/smQ5wIIMA2UL+PXx/urW8jGLzM=
+	t=1738146195; cv=none; b=cey04B4eON7KaQBV5SENhX4+C9TTKvz7yiFmm/h4MSDNPFA0Tzq3KRnwsJg3zdN5to2o5NjceTpTnlNOFzyv9RKgbRGtWmuWqEF6z2CFyd4PbNRtkMXoq2k9Zvg0WLGXc3PMjSriL/n1t/xfWCSzS47Opovd+kVUDXPlUw472pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738144518; c=relaxed/simple;
-	bh=nurb2gdfnmsDf5k9lQZ2GeI9jK1G4SPomiZAkgbzTtM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CSMGZXvT/G5Rrm31vUCugaDDNgB2dyUc5H3WD85+04yUZCmbMNWMnF0Z8PfAQ+fgmzCNqvxrq1zXURJmy+fpAXGXNi5qpJBIMDGxKMYJ4Qa4WVAlTioupJ3cAeDzMW/MFfcpcIJHkfp17Q4QX5AaBl8Yp8EStUijHlsk2/Jvhk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=S69PLcWW; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1738146195; c=relaxed/simple;
+	bh=xgwRc/1ONSozeehQ8z3TORPSjFcNWEWiOPwPnGU/SB0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h2ZaNk1pwbtr58PhCXMMVxkiQko3Sgvv28ZPNPlzERpn/pMHy/Tv2Jk7GQeaKKDSyyCSukXyQtwfLsgoHTRuWeNaTNJRmbNte3qkjUM01GfABJ0D6mJfE0GEATdb72LIdmyndUnfWuj6K3z8SYHgJMK3Q+kjTDcrBW52fGD45D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com; spf=none smtp.mailfrom=owltronix.com; dkim=pass (2048-bit key) header.d=owltronix-com.20230601.gappssmtp.com header.i=@owltronix-com.20230601.gappssmtp.com header.b=vcwYiBEa; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=owltronix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="S69PLcWW"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50T21IAc029637;
-	Wed, 29 Jan 2025 09:54:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=usmjl7
-	ABJRKotUzXG1g98T82o0226T/3yDvMFxw9pTY=; b=S69PLcWWqcpiDgXDcVKjNE
-	O+QG7CPlpqlE2AnHa0AcE2cCiuc3+fLNOvVhttBKsdKa7r4Q0Kelv6FhZBF0blMa
-	E3/IIr0I5XZHpPMbJrwq8fva1TvH9XgwV5+LqKQcM7cYpCq7jHSWuvYWniBM7hxC
-	/fQ/cTIClK0kqMVUhmCrBbH0H7S5JICvXTgJDzpz+lZkBudzXHaE7kOXjZ2mWgG6
-	huvuicH2a99EPnnSFLT7DbxiRiOzhmc7u0RBaKprQvXRUsrKMP/Bkgt1rqnkDmrX
-	sgAuqPMNQnO7zX7Yq9546JpPm3FyTk5+NEqspNNnwO5Z+LM/7NuLRLA/ENFbbRZg
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44fb609hg7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Jan 2025 09:54:58 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50T6P3Zc018922;
-	Wed, 29 Jan 2025 09:54:58 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 44dd01fksn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 Jan 2025 09:54:58 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50T9svG731195802
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 29 Jan 2025 09:54:57 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3494258055;
-	Wed, 29 Jan 2025 09:54:57 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2061A58043;
-	Wed, 29 Jan 2025 09:54:54 +0000 (GMT)
-Received: from [9.109.198.253] (unknown [9.109.198.253])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 29 Jan 2025 09:54:53 +0000 (GMT)
-Message-ID: <669a9e1c-bde2-4323-b997-cdbd82a26eab@linux.ibm.com>
-Date: Wed, 29 Jan 2025 15:24:52 +0530
+	dkim=pass (2048-bit key) header.d=owltronix-com.20230601.gappssmtp.com header.i=@owltronix-com.20230601.gappssmtp.com header.b="vcwYiBEa"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d3d479b1e6so9440215a12.2
+        for <linux-block@vger.kernel.org>; Wed, 29 Jan 2025 02:23:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20230601.gappssmtp.com; s=20230601; t=1738146191; x=1738750991; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xgwRc/1ONSozeehQ8z3TORPSjFcNWEWiOPwPnGU/SB0=;
+        b=vcwYiBEamZNhpZTtknPzd6skzIwKDnVtQYHN+VtxtHaFRvLZ2JcOdsZFj9je1GsrRP
+         DDyJFJZRofv38i+1FWh5dpnItiN3qS6yWly1/QK4cMm3kgC5jhla9obmhZWdKBNZ7rnT
+         A/Ysg/kxZ5pORyX2eACd4TtXMQpeeKpkGwACZqQERiEwHhKy0miVC16z8JuZC45Q9YHf
+         zCzw6anr8jbScwKJs88iF8Gpc7h2YvHrZdMO0sxyDbgAitCOvl63WK4tDmWcRWKvvQYj
+         2m1nIEe0d5aZhSEGo4qHbIyhGQFKULTrUVaYUHsiBVlox5eLHg0UG0GNfltyl90+SJav
+         Gm+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738146191; x=1738750991;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xgwRc/1ONSozeehQ8z3TORPSjFcNWEWiOPwPnGU/SB0=;
+        b=o7+TX8VenLFlAJTOtjrM0UHl/cxu4bKQjg9rmKMs6Tjg0wxRHBbsBATcnrBz6WZgWy
+         HgpuO22YpVSgWJth72zjhZxAHO0pYkdat48LeG5V9ng9+36AsuVZHcPDrXrkMpBxvFbB
+         VzNgMGKI2zJgHiSifyy3xAlYKGQdhOlovtH813NOyBBWIR8z5FRdaTkO3+5raJGx2iwk
+         A9hufnsM+EpfTb1gSb0n3P5XemovjIGYkK8dWnM2Do17JruKwBuYjpmYL4i7xN3wdDgp
+         nrBefdFOFTXbFATuKyNfKzgGuYuI6Qcw6uhLAt/KwJh8xNrNWfJm8CaSpKL3ymEEL3EE
+         t15Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX7ZtpCTvFBy2LK/0J/nTQ0t0gMA/fMI4ozMAY8V9BHUjU8wKPfVubuoOyRa8dsZED5+qtBLgUN5qmdNA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwS+ni+WU5nJjK29EG9EQOIiXKi9hdSslduMkYKPNDN9nhsl3LL
+	rna5JuKJ7YL0N81dNazDqchfkfV+wpmWB/KnXF08N4dkaEL1hONmo31WPtf0BKW0X6XTzfdJrVA
+	ZY3BSVVrp50NoRGUnSje3ZFjqbvEZ23bkzVrV3g==
+X-Gm-Gg: ASbGncvS5NGFI+ms6IYRa7P7y+UG08wiUjDt90lCiBkcOnC281a+5OYegA8+S2wyXuX
+	dhih/gtdQXvYZWe/QAqqDfFNRnnsPV122ZKMBmtJuGrfYyktY5jgDVwutpQtDcvspW3IB1t4=
+X-Google-Smtp-Source: AGHT+IE9d6LfbcU0wDNpEcTGDR9ln7RBsLHKBWG3fVvfG4lMTfyh+rEGVDJcsyB23DOFtvLGf0bQ9pubsFprQiPoUFc=
+X-Received: by 2002:a05:6402:4311:b0:5db:f5e9:6760 with SMTP id
+ 4fb4d7f45d1cf-5dc5efa8bcdmr5710865a12.2.1738146191373; Wed, 29 Jan 2025
+ 02:23:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] blk-mq: fix wait condition for tagset wait completed
- check
-To: Daniel Wagner <wagi@kernel.org>, Keith Busch <kbusch@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>
-Cc: James Smart <james.smart@broadcom.com>, Hannes Reinecke <hare@suse.de>,
-        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20250128-nvme-misc-fixes-v1-0-40c586581171@kernel.org>
- <20250128-nvme-misc-fixes-v1-3-40c586581171@kernel.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20250128-nvme-misc-fixes-v1-3-40c586581171@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: d2EY-MP-VCV9R6ZjNtuHoq6fqyixjhZ_
-X-Proofpoint-ORIG-GUID: d2EY-MP-VCV9R6ZjNtuHoq6fqyixjhZ_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-28_04,2025-01-27_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 clxscore=1011 lowpriorityscore=0 mlxlogscore=999
- bulkscore=0 spamscore=0 suspectscore=0 phishscore=0 priorityscore=1501
- mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501290077
+References: <20250123202455.11338-1-slava@dubeyko.com> <fd012640-5107-4d44-9572-4dffb2fd4665@wdc.com>
+ <f44878932fd26bb273c7948710b23b0e2768852a.camel@ibm.com> <CANr-nt2+Yk5fVVjU2zs+F1ZrLZGBBy3HwNOuYOK9smDeoZV9Rg@mail.gmail.com>
+ <063856b9c67289b1dd979a12c8cfe8d203786acc.camel@ibm.com> <CANr-nt2bbienm=L48uEgjmuLqMnFBXUfHVZfEo3VBFwUsutE6A@mail.gmail.com>
+ <a09665a84d11c3d184346b1f55515ac912b061c3.camel@ibm.com>
+In-Reply-To: <a09665a84d11c3d184346b1f55515ac912b061c3.camel@ibm.com>
+From: Hans Holmberg <hans@owltronix.com>
+Date: Wed, 29 Jan 2025 11:23:00 +0100
+X-Gm-Features: AWEUYZnrsXzP2Xt_ZlJzA9oa1fTRpVosixwgwed2gSRg-PlOoBVS6lq-K17iGac
+Message-ID: <CANr-nt0nRZp=g2kbUqd5PoNbH-m9MWd_4x+LmR6x-gTT92MoVQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] Introduce generalized data temperature estimation framework
+To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+Cc: "Johannes.Thumshirn@wdc.com" <Johannes.Thumshirn@wdc.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"slava@dubeyko.com" <slava@dubeyko.com>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"javier.gonz@samsung.com" <javier.gonz@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jan 28, 2025 at 11:31=E2=80=AFPM Viacheslav Dubeyko
+<Slava.Dubeyko@ibm.com> wrote:
+>
+> On Tue, 2025-01-28 at 09:45 +0100, Hans Holmberg wrote:
+> > On Mon, Jan 27, 2025 at 9:59=E2=80=AFPM Viacheslav Dubeyko
+> > <Slava.Dubeyko@ibm.com> wrote:
+> > >
+> > > On Mon, 2025-01-27 at 15:19 +0100, Hans Holmberg wrote:
+> > > > On Fri, Jan 24, 2025 at 10:03=E2=80=AFPM Viacheslav Dubeyko
+> > > > <Slava.Dubeyko@ibm.com> wrote:
+> > > > >
+> > > > >
+> > >
+> > > > So what I am asking myself is if this framework is added, who would
+> > > > benefit? Without any benchmark results it's a bit hard to tell :)
+> > > >
+> > >
+> > > Which benefits would you like to see? I assume we would like: (1) pro=
+long device
+> > > lifetime, (2) improve performance, (3) decrease GC burden. Do you mea=
+n these
+> > > benefits?
+> >
+> > Yep, decreased write amplification essentially.
+> >
+>
+> The important point here that the suggested framework offers only means t=
+o
+> estimate temperature. But only file system technique can decrease or incr=
+ease
+> write amplification. So, we need to compare apples with apples. As far as=
+ I
+> know, F2FS has algorithm of estimation and employing temperature. Do you =
+imply
+> F2FS or how do you see the way of estimation the write amplification decr=
+easing?
+> Because, every file system should have own way to employ temperature.
 
+If you could show that this framework can decrease write amplification
+in ssdfs, f2fs or
+any other file system, I think that would be a good start.
 
-On 1/28/25 10:04 PM, Daniel Wagner wrote:
-> blk_mq_tagset_count_completed_reqs returns the number of completed
-> requests. The only user of this function is
-> blk_mq_tagset_wait_completed_request which wants to know how many
-> request are not yet completed. Thus return the number of in flight
-> requests and terminate the wait loop when there is no inflight request.
-> 
-> Fixes: f9934a80f91d ("blk-mq: introduce blk_mq_tagset_wait_completed_request()")
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Daniel Wagner <wagi@kernel.org>
-> ---
->  block/blk-mq-tag.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index b9f417d980b46d54b74dec8adcb5b04e6a78635c..3ce46afb65e3c3de9f11ca440bf0f335f21d0998 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -450,11 +450,11 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
->  }
->  EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
->  
-> -static bool blk_mq_tagset_count_completed_rqs(struct request *rq, void *data)
-> +static bool blk_mq_tagset_count_inflight_rqs(struct request *rq, void *data)
->  {
->  	unsigned *count = data;
->  
-> -	if (blk_mq_request_completed(rq))
-> +	if (blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT)
->  		(*count)++;
->  	return true;
->  }
-> @@ -472,7 +472,7 @@ void blk_mq_tagset_wait_completed_request(struct blk_mq_tag_set *tagset)
->  		unsigned count = 0;
->  
->  		blk_mq_tagset_busy_iter(tagset,
-> -				blk_mq_tagset_count_completed_rqs, &count);
-> +				blk_mq_tagset_count_inflight_rqs, &count);
->  		if (!count)
->  			break;
->  		msleep(5);
-> 
-I see that blk_mq_tagset_wait_completed_request() is called from nvme_cancel_tagset()
-and nvme_cancel_admin_tagset(). And it seems to me that the intention here's to wait 
-until each completed requests are freed (or change its state to MQ_RQ_IDLE). 
+Compare using your generated temperatures vs not using the temperature info=
+.
 
-Looking at code, the nvme_cancel_xxx() first invokes blk_mq_tagset_busy_iter() which 
-iterates through tagset and cancels each in-flight request and marks the request state
-to MQ_RQ_COMPLETE. Next in blk_mq_tagset_wait_completed_request(), we wait for each
-completed request state changed to anything but MQ_RQ_COMPLETE. The next state of the 
-request would be naturally MQ_RQ_IDLE once that request is freed. So in blk_mq_tagset_
-wait_completed_request(), essentially we wait for request state change from MQ_RQ_COMPLETE
-to MQ_RQ_IDLE.
+>
+> > >
+> > > As far as I can see, different file systems can use temperature in di=
+fferent
+> > > way. And this is slightly complicates the benchmarking. So, how can w=
+e define
+> > > the effectiveness here and how can we measure it? Do you have a visio=
+n here? I
+> > > am happy to make more benchmarking.
+> > >
+> > > My point is that the calculated file's temperature gives the quantita=
+tive way to
+> > > distribute even user data among several temperature groups ("baskets"=
+). And
+> > > these baskets/segments/anything-else gives the way to properly group =
+data. File
+> > > systems can employ the temperature in various ways, but it can defini=
+tely helps
+> > > to elaborate proper data placement policy. As a result, GC burden can=
+ be
+> > > decreased, performance can be improved, and lifetime device can be pr=
+olong. So,
+> > > how can we benchmark these points? And which approaches make sense to=
+ compare?
+> > >
+> >
+> > To start off, it would be nice to demonstrate that write amplification
+> > decreases for some workload when the temperature is taken into
+> > account. It would be great if the workload would be an actual
+> > application workload or a synthetic one mimicking some real-world-like
+> > use case.
+> > Run the same workload twice, measure write amplification and compare re=
+sults.
+> >
+>
+> Another trouble here. What is the way to measure write amplification, fro=
+m your
+> point of view? Which benchmarking tool or framework do you suggest for wr=
+ite
+> amplification estimation?
 
-So now if the proposal is that blk_mq_tagset_wait_completed_request() has to wait only 
-if there's any in-flight request then it seems this function would never need to wait 
-and looks redundant because req->state would never be MQ_RQ_IN_FLIGHT as those would 
-have been already changed to MQ_RQ_COMPLETE when nvme_cancel_xxx() invokes blk_mq_tagset_
-busy_iter(ctrl->tagset, nvme_cancel_request, ctrl).
+FDP drives expose this information. You can retrieve the stats using
+the nvme cli.
+If you are using zoned storage, you can add write amp metrics inside
+the file system
+or just measure the amount of blocks written to the device using iostat.
 
-Having said that, I am not sure what was the real intention here, in nvme_cancel_xxx(), 
-do we really need to wait only until in-flight requests are completed or synchronize with 
-request's completion callback (i.e. wait until all completed requests are freed)? 
+> > > > Also, is there a good reason for only supporting buffered io? Direc=
+t
+> > > > IO could benefit in the same way, right?
+> > > >
+> > >
+> > > I think that Direct IO could benefit too. The question here how to ac=
+count dirty
+> > > memory pages and updated memory pages. Currently, I am using
+> > > folio_account_dirtied() and folio_clear_dirty_for_io() to implement t=
+he
+> > > calculation the temperature. As far as I can see, Direct IO requires =
+another
+> > > methods of doing this. The rest logic can be the same.
+> >
+> > It's probably a good idea to cover direct IO as well then as this is
+> > intended to be a generalized framework.
+>
+> To cover Direct IO is a good point. But even page cache based approach ma=
+kes
+> sense because LFS and GC based file systems needs to manage data in effic=
+ient
+> way. By the way, do you have a vision which methods can be used for the c=
+ase of
+> Direct IO to account dirty and updated memory pages?
+>
 
-Thanks,
---Nilay
+Temperature feedback could instead be provided by file systems that
+would actually
+care about using the information.
