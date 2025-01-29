@@ -1,226 +1,194 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469372CA9
-	for <linux-block@vger.kernel.org>; Wed, 29 Jan 2025 16:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738167354; cv=fail; b=imKwJfu7zzPHRaNlubgjJWGxk68WxBDgFvmfG/mWYg1DMdON96WbKOQrFfxEEfOY+3+1voaLpCG6ehlUEnE1EV63vzIlMrfMHFrBpE7PlXbo75l78ELWh38XdCtJoOWAoVUbr8sb94VnMReUrw+orq8G0KqTUY6tpP7dTxItDNo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738167354; c=relaxed/simple;
-	bh=cdF8wEI1k96z9ybgv3n6Ji3K1Jkans6SsLqUX7YBGsw=;
-	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
-	 Content-Type:MIME-Version; b=Qb/HLMGOqzGEfkcNVCuHueQn4ORJN5iOHcW0jiwlMH8Zc0bdJQBia4g1jH/B2ufriQEstFjZQwcBV6RBOSdySjRyLhlELAwe1VCJ8+xy0TiyadPfn5FrPLJB5HOrfHKuUQayXB/bbQc3yNTYcbZj7sY1RCm9jyfUVsTwIuah0Qc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=AYYno6hW; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=eR0Z+aRX; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE0228EB;
+	Wed, 29 Jan 2025 16:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738167569; cv=none; b=K6ZXkCa6FvrRRx45ew/+4I0fv2d90yQkbZmPmXXVXjduNPECCes6nqUrmppH3b8nSV8uMR4S47oMklJsWUD3sC6gIWyj97TeWH9SFYNyLT8HGE0v29a4xIT0BgC6gkj2ybibkgnLt7sNi+gVtxWMaeCAiD1T063PzfeFyjJAtLI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738167569; c=relaxed/simple;
+	bh=VQ1tE7auwykWHFaAWlmFtxRv+H5gTV+mb3VLluuo+bU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lqzadzTRERZY+E6SIv5+4fNfw0TM3HQpyCZ0D5wRZh29RYk6+9gxQ91aCn25YVkydcXJRbVoZwhcCOUT4Dlu6XLQRkJaDp5ImK5cFc8o2LT9/xJklj00KwyAE4bmHYDo79ZRlrH0Qa8MZZY0EaqOL0pA5w9aR2ooiaLe3HqL7bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/4WzsGK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AYYno6hW";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="eR0Z+aRX"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50TFilCH030358;
-	Wed, 29 Jan 2025 16:15:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2023-11-20; bh=bi7d7nT0dhBsNcds5y
-	lX9Zd45/aewUjRTOL8bcgI8Z8=; b=AYYno6hWAmIBufGf1voLMXsPSORu3RLkjt
-	3hWr3lCEzHM3agpX/3pN4/I/NYJy/zBi8KHgqmEUvMsoCK6RjWS1sjfPTK3zHgjQ
-	H/uEltUeEanGX05lQpHYHPg2mwj8zZMcsPZ1PQb8B8+b78O1Tx6ukszYBG4GBIUI
-	MdgPv8P9ujWnXYCf3iKCj0+BEDVDVXugsSDiGBeH9MzggiWj4QPOGVl+Yn/9MSRw
-	JweYoyh0CbxiNXBuDIbX4Or4EF8k527dUq4NMVWhnz7LemBKoeRPXcSPKGhfvFsM
-	VcwXPQEwEHWHOT68rGv6gQQvsvJEYnmpaoPqVZO5TCe/1xXj8Tqw==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 44fmut8ex3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 29 Jan 2025 16:15:42 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 50TFSOG5011665;
-	Wed, 29 Jan 2025 16:15:41 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2175.outbound.protection.outlook.com [104.47.59.175])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 44cpd9nmkw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 29 Jan 2025 16:15:41 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SpXhMnOT6EjpOdqMvPNEEF/Vjjvev94lqvfTS9tFGOWyX7LjiCfsGXFYw41+Aiqzy2JeQVaxE79mqq+isRNWzS2sqlDFgHpf9kncgtdedVgeT5B5CNcyrrMItfZKrUOVVsnK48aUcJCMOOlv74qih0Ov+zZfeNyt6Yf0S1VRO8EcU31ZhXwMp+Yu7q3aRFPKgDG3/gy9eshf0VXjQt8ziJORGc0c+gsqxM/wz52GLTg3E41BpIPbjtWMWfOaf6ZutRxJ0xdPSaJtLuR66W4ghJEJUY/htNuuCPPcx4MsOp09g2Mw0BMTZqLRqEwFQNWW+YTFo6YPLB+YSwjUXflYAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bi7d7nT0dhBsNcds5ylX9Zd45/aewUjRTOL8bcgI8Z8=;
- b=TFAE0KT6doBVT0bSGJ3yg8iqpHwI+GLg/SLRvAe70sazuwbIfHisXD4kbECWL8YESmCuiGDNwU3WNTicp1pp2tENL1urluEQzMzGL/4/fONlnDBDaA3fsJ0oJQrX+Ynj8BSuH1wNE3bpw0v+Rvlgc4Q21ksr9pFZx1bVmhxQOR9J9BnV0n9xNEBH/mBScT2+4BQY656zWqYXkg4eg/bgfFqMHHFRksbhC1souIDvguGuFmMG/I0zlyTdr5fZlI6w/QoY2O7owZdQmxlCmhgUi5slsdYYE8R+x0xMLAYWYILaIEUv1UDBpw5Fwyt0OEp0UeSniBgNEAovexlIHwrNsA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bi7d7nT0dhBsNcds5ylX9Zd45/aewUjRTOL8bcgI8Z8=;
- b=eR0Z+aRXSWp6A4dFPN60h02TLWMPew4wC/huQ83REHaEi5Amp7DOgl2NtEEBE67GeWyrsE9soTWb71IqnlaiqfMpU02HwKHo02zsqIvF8xnTrtcsKr8TvSxq89z5mcfiqo8+eG5NcR6pbPrcTM98qiyHMtoJDZj1J+/7EMOmM8A=
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
- by PH7PR10MB6284.namprd10.prod.outlook.com (2603:10b6:510:1aa::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.20; Wed, 29 Jan
- 2025 16:15:38 +0000
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf]) by CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf%4]) with mapi id 15.20.8398.017; Wed, 29 Jan 2025
- 16:15:38 +0000
-To: Christoph Hellwig <hch@lst.de>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Kanchan Joshi
- <joshi.k@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>, Keith Busch
- <kbusch@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: in-kernel verification of user PI?
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-In-Reply-To: <20250129154315.GB7369@lst.de> (Christoph Hellwig's message of
-	"Wed, 29 Jan 2025 16:43:15 +0100")
-Organization: Oracle Corporation
-Message-ID: <yq1jzadr5a6.fsf@ca-mkp.ca.oracle.com>
-References: <20250129124648.GA24891@lst.de>
-	<yq15xlxsqkg.fsf@ca-mkp.ca.oracle.com> <20250129152612.GA5356@lst.de>
-	<yq1tt9hr62s.fsf@ca-mkp.ca.oracle.com> <20250129154315.GB7369@lst.de>
-Date: Wed, 29 Jan 2025 11:15:35 -0500
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR13CA0118.namprd13.prod.outlook.com
- (2603:10b6:a03:2c5::33) To CH0PR10MB5338.namprd10.prod.outlook.com
- (2603:10b6:610:cb::8)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/4WzsGK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDB92C4CED1;
+	Wed, 29 Jan 2025 16:19:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738167568;
+	bh=VQ1tE7auwykWHFaAWlmFtxRv+H5gTV+mb3VLluuo+bU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n/4WzsGK81F59SkkUMb+WMCMS5ZHaRbmeLw6ahJDhfCBABA4a6KVBCSwK9uQe2dCx
+	 x0mNRgNXoAzA3H2ahKHYKJqAKXXN8MREVyvIrV0GgJAcoI7h6gX9LHdjLTxtClMSx4
+	 EddIHSjyw6wAz2IS3Q+EeK4Ip3z4ZZbwoD7CtalDQ7OeIU8gJmPRFPLhFO6904UeOL
+	 pbOtP49em5EsHn7LjmGJCQd4vKS5POHzZdHn43fsshTYlLqDnGfVcMwX7Xp0QR2BJT
+	 vmSJuwnOZQMB3s3i2xEUR2Vvxazeak0N6s9PY8c7YRZAkNftTuLHW4TgGq2APSSIua
+	 GqdW/Bxq24vdQ==
+Date: Wed, 29 Jan 2025 17:19:22 +0100
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, coresight@lists.linaro.org,
+ linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, linux-hardening@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ workflows@vger.kernel.org
+Subject: Re: [RFC v2 00/38] Improve ABI documentation generation
+Message-ID: <20250129171922.4322c338@foz.lan>
+In-Reply-To: <87a5b96296.fsf@trenco.lwn.net>
+References: <cover.1738020236.git.mchehab+huawei@kernel.org>
+	<87h65i7e87.fsf@trenco.lwn.net>
+	<20250129164157.3c7c072d@foz.lan>
+	<87a5b96296.fsf@trenco.lwn.net>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|PH7PR10MB6284:EE_
-X-MS-Office365-Filtering-Correlation-Id: fae9f2ff-c08c-4b56-7c91-08dd40802b1d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?mT+4Fd6yKTB5Fk0RgFF8h3yOR9JmzCadhozxB7ZuR567vhxN4AHCGZUcDIKL?=
- =?us-ascii?Q?e/wcKLPfpfKUYOWtYtcFBINQzOsNscJiw2fMGB4e7O5PZOWt3RJ/aDVd7xFc?=
- =?us-ascii?Q?qIrR6KzsPmnVg6FMRVhOeMWEdZlTRsjUcYoolz3mJ4VnmGB9iRizf1WE34HR?=
- =?us-ascii?Q?UOA+DnOo51RRmwq1tApWlFDEWYL8B/lVDGm4MAVh3l5m037qDwgNUKGKN8Tb?=
- =?us-ascii?Q?arKCEyi5R9F65JKa3+aeKC/6zpH6J1p/8vsG/r4ZkumjRq0l0IVKLdh8S3Rj?=
- =?us-ascii?Q?0CNbaK51b0IyQZbqYyZbXjX3lnjgFNqeOIiogjCS1muHe2I3juOkyxAxHx1f?=
- =?us-ascii?Q?MHskWPnhgoX7ob1fN+UFiWUFrjU4WlDMNoTgMwxhrWsMtILz5RoZZPKBrHr3?=
- =?us-ascii?Q?8KWjEfIjY92QehGSKxjagJqlLJax9O3NZ1C/u6Yebq/RnzJCWKCpxD57G9f1?=
- =?us-ascii?Q?Ju05Ldy+bibjqObGZ4B+WGOXMt0+B9PP8GhcVe2nlQCa/jsSO4PH/CWL+Cky?=
- =?us-ascii?Q?p2iAn/DL7jFM+BKsSzUzMt5y1IlO2fYabi9ISDbZAqff7nYoyr6QwnpIrLxf?=
- =?us-ascii?Q?9p1o4aj5Urma0wshysPiPaJSbWtvTsS8q0+R6fVX8uCDePyuIThHdEOvYDuM?=
- =?us-ascii?Q?WVgYako3MY82WKC+ctDHW92ZNG5xZbXvG5Cu/015h+I3kfNhIGhIM4vHlLgY?=
- =?us-ascii?Q?jFyttt8SAl0fsm8nssDl8igd8MpWoBEyY5rnsugk5itr5Xts9xJahjFrciNl?=
- =?us-ascii?Q?7WPrUhAVnMTbq/RKkSB9IpsWigJh3x/QucRwuB5sO3ioomisYFuHvq2oZ703?=
- =?us-ascii?Q?Q8eXbfizjaNTOTfLrs0kyQiZ8wgItYEq+rLgXXuyqUNJ0RLtWpwniSU4yyV6?=
- =?us-ascii?Q?PW7S5rgq+H+qf4m3oWYvPK9UMFSAEf7qzWxRMLCvf8frNpSAFe6J3TEsJr3k?=
- =?us-ascii?Q?5fv3l9m+lzXzm54JyasCv09mgLfCZk4bIVd3m0FOlBLMq4d8Hn+eMxxOFKNY?=
- =?us-ascii?Q?Ri1zwUQxdRMjRcxoUVJXP9HGrKluZ6S7NO64SPcaZVX0vxOFWrnamtKYgyZY?=
- =?us-ascii?Q?7F/T2C1oWFFhJwV1qB5tzikrl+9cSFrljI3O6U7Jx8pch1m0v69S2r339Utq?=
- =?us-ascii?Q?mWd+cY2T1vrBQ2naCngF7YrdCMbAp1hropR+FtDYn1moZIGNutzqxzHm6I7s?=
- =?us-ascii?Q?I9hpnudXsTk8B8LW7LPybXH1VwA/RO25n2o8KyLRODUnPHTrhmQJP8ji3rJR?=
- =?us-ascii?Q?yn6NzGbn996dbatRSr4j+yIbqYOjjs6vgGXXcWvVK+GN1i1taQTAOd74bGpk?=
- =?us-ascii?Q?QKIK0/m2F5qvAOAUWqjIn1hAZ9+ad73wMBBpMug7llr7SbcyZ83es1cG2IfR?=
- =?us-ascii?Q?dcXyipBH0Dy94dYNDENPJNZBTDQw?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?vsJ3DxNKgADtFWUth7bLeF3ztwgcaKtkbm/Lufje+6DjUK8pGFzLSRzMdC7e?=
- =?us-ascii?Q?EWsRtTvojWLu8S2Y3I37uBfbtnq6S7RRA4KZaySiK4bfd/WaLuxzlLA3DWvl?=
- =?us-ascii?Q?3n5UeXYiv03XAi/vXZGKsEyWxQgh5Q6UrUcWHwNCjI6/WM6/8Cg50WUfwsK9?=
- =?us-ascii?Q?EMoZBz9RUqGE7RFCjC04/oS5yVy/axTc3DUrAOycTL92INHG4MBkQyNu3Sl4?=
- =?us-ascii?Q?8/cfRg3+VQ3A1IvPFWCUIhTGZ5r1RWlJuWDckBm1da0xB3Y1bnHDCRuGzuLn?=
- =?us-ascii?Q?3l1PrP8mNy2/sr1L6fkktJ1l0j7YZ9xJv3KYeSQGKDoCxMQPc1+zukl/VGbB?=
- =?us-ascii?Q?hmq5q6pfhTOlkclN2fiKQTuOdPs2cHt98yhzlXIU6FF62vg9qBPubWXsjaDa?=
- =?us-ascii?Q?733R3l1xAgu/MCYfNY5G3k+iuhEFVtOKNc2pQ9quA9ySgjRyxIYK/Tcstbtw?=
- =?us-ascii?Q?zWvQmmArdh+OhofPVKu6/JGnzd2aONbgbxFjwdBivQxT0GxDohrSU9rGxuNo?=
- =?us-ascii?Q?pks8SObZIFVmyqkt/6WzjvpQzCOyqEOHU2aqVtwpSp/6lbHPCZl6S1RByCr1?=
- =?us-ascii?Q?9PqcgoFOmz7srMI2jhjK1NUM4DzjagEiPka7XNfSRIdeLYZHjJUCgpsuMkKg?=
- =?us-ascii?Q?M5l4e2k68T2pSQ2f2CKfnkmQxE7lDmB5tuKf4AuGd45CxOCMR5LFiSkue246?=
- =?us-ascii?Q?4d/aiEi1WwjqLcBJPUH7p+CGnsHQ+TZbuXC2H4cAyeH5+iAVNcswZY5URs0/?=
- =?us-ascii?Q?HKaNjDHK+DKW1sfftOOAKAgGmbCrFgNLqQLrGserqHylNsVb69cITSAocyFe?=
- =?us-ascii?Q?o7rTBmyTzpYhVU5Xm4t4h3miieFOZCEYVuRGW1imaarlcm1XXr7HV2ZDRuO/?=
- =?us-ascii?Q?AevodG7JxOpaFstgk9PlZqqmg8BgRTaV9Jd4l5xo32L3FDee4J1D+AJCSF+/?=
- =?us-ascii?Q?QK/Szd8H0VqMxswVCjKKWrf3tWLLAN4pfOBSydjgVKuNHasShWDWwkitMqpi?=
- =?us-ascii?Q?Z+eJVpj7KX30lsZ37PpTWo3MP3LDg/+YVR0Ki8NqDDqdY39NqU5WbwbC7xrS?=
- =?us-ascii?Q?/Ov0ohMiIii7oZUJmw++i36P/wutIBUYJ2kSqaRmNHqwVEZGjOaDgwIshAJp?=
- =?us-ascii?Q?ch4C6KmIWWrwzk+RdrCQTTIGNwLBQfZQXrzcsBy2n/v1Bgr6zJKcg2FkaGIF?=
- =?us-ascii?Q?KofDgcvghGB5GHgBks16FV9QZBoEgnrYwxpFmLdxq9udWLGK3X2qgKJayukV?=
- =?us-ascii?Q?S1oBIYUuMf52zoWnUMIWUwplc9JVY/6x+1LMw+e8Fd+sRcg5HyrGlLJmMmLM?=
- =?us-ascii?Q?ucxzoVdhbcVPKkAN4nFujs1kVVV/97+zF56LIcOxg29G+aikXV6H7y8uU3ak?=
- =?us-ascii?Q?CSz8tDd4YfNTLOmeykBkN8xo/Et82yTonbEBPnTGuYCGj+5F1DkAXFMisTtV?=
- =?us-ascii?Q?pX/h354tWXRFd2RCM40CqlwWRUl11R1wDMbw4mmKhF4qpPZNXswe3AdHrrup?=
- =?us-ascii?Q?IuW2Q1rh7edklIKr0xcT548ruqcPExBsdY1x2Y97wIxvEd2RP0hYQSUwEEog?=
- =?us-ascii?Q?gabTNCHAg6yHLQbwRsEWnr8Lx9Gkde+OQP7nhzjaQSt95OnJ7uKi4/aT2Ffc?=
- =?us-ascii?Q?3g=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	MZXcFBjM4aqWCKREMsaqDwyJmkJFa7CAL8rc2R/CFRZBiI6ezPeqhhleqz8Hzi/o25rb319pTPGH+rAAz2XE3U8Yf2+gN1nuvVaN3m6XuhhKhylq8G6ifBvipOV9Ze8kTxjmN2P/sHHRdwzDd3uUnWedNrpgzgsL6uWv6rXqnSOjOt/P+fghaYZRfdeV2pwZf019SRTtG9ZnyLbfFY1axQ/Kt/op9jGHhVsohCjzuFM4csrgbAzMv03xIHOnLlXpLjmPrLhpCoLea9D/qAXgrGuKLtd5ptPbcl30oo5trwui2bVTQ5PWulmKCUrJ1uYoz9LU0dTK0WTIFsED8InWIbnTmj1x8XY8vV860T6LyHT6tk7fUiP0ReyUdBZDnn8DAdryp7Z+XDNcqf8E5g3q9cwZhSX7AZBKeBNzeC4CdL63t2Pd3cHQNE2jkeUo3acGZnNPEjpgDyF1uOCOT4UKBFAyulhBbmyRdVvkNOgIJhCtyZZjZA0KeG/4hc2k+iChFjH0kmdopKCrpI6QOw0pXmRM3g5mFTMv/JfomaMHpFGr7kOhw87ZYCPGUc3yPm5SVjVi5NJPDO7IKeSBjVsP8LvU138tyCJDc3F4F+LwKME=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fae9f2ff-c08c-4b56-7c91-08dd40802b1d
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2025 16:15:38.2065
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: McX8qtiYZomvYaVttbn06cz7PqUlIEgziXdHCnykWbDDvv7CKP8pPfjt9ifRX2NglvljTdJ57cH42UIa5XuBJYkwi9NcGTjnHyxXTIXct64=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB6284
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-29_03,2025-01-29_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0 spamscore=0
- malwarescore=0 mlxlogscore=999 bulkscore=0 phishscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2411120000
- definitions=main-2501290130
-X-Proofpoint-GUID: QbA4cd3G-JnGQ37uUVKJezpm81u4DP-s
-X-Proofpoint-ORIG-GUID: QbA4cd3G-JnGQ37uUVKJezpm81u4DP-s
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+Em Wed, 29 Jan 2025 08:58:13 -0700
+Jonathan Corbet <corbet@lwn.net> escreveu:
 
-Christoph,
+> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+> 
+> > So, I'm proposing to change the minimal requirements to:
+> > 	- Sphinx 3.4.3;
+> > 	- Python 3.9
+> >
+> > By setting Sphinx minimal version to 3.4.3, we can get rid of all
+> > Sphinx backward-compatible code.  
+> 
+> That's certainly a nice thought.
+> 
+> With regard to Python ... are all reasonable distributions at 3.9 at
+> least?  CentOS 9 seems to be there, and Debian beyond it.  So probably
+> that is a reasonable floor to set?
 
->> It fell by the wayside for various reasons. I would love to revive it,
->> all it did was skip the remapping step if a flag was set in the profile.
->
-> How much remapping could the hardware do?  Would this also work for
-> remapping a inode-relative ref tag?  Do we need to bring it into NVMe?
+I didn't check, but those are the current minimal versions above 3.5 for
+what we have at the Kernel tree[1]:
 
-One of the reasons it lost momentum was that NVMe didn't do it for
-ILBRT/EILBRT. Although of course NVMe doesn't really have an
-intermediate HBA entity like SCSI. For SCSI it was natural for the HBA
-to convert between what the host sees and what the disk sees, RAID
-controllers do it all the time. NVMe didn't pick up that wrinkle.
+            !2, 3.10     tools/net/sunrpc/xdrgen/generators/__init__.py
+            !2, 3.10     tools/net/sunrpc/xdrgen/generators/program.py
+            !2, 3.10     tools/net/sunrpc/xdrgen/subcmds/source.py
+            !2, 3.10     tools/net/sunrpc/xdrgen/xdr_ast.py
+            !2, 3.10     tools/power/cpupower/bindings/python/test_raw_pylibcpupower.py
+            !2, 3.9      tools/testing/selftests/net/rds/test.py
+            !2, 3.9      tools/net/ynl/ethtool.py
+            !2, 3.9      tools/net/ynl/cli.py
+            !2, 3.9      scripts/checktransupdate.py
+            !2, 3.8      tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
+            !2, 3.8      tools/testing/selftests/hid/tests/base.py
+            !2, 3.7      tools/testing/selftests/turbostat/smi_aperf_mperf.py
+            !2, 3.7      tools/testing/selftests/turbostat/defcolumns.py
+            !2, 3.7      tools/testing/selftests/turbostat/added_perf_counters.py
+            !2, 3.7      tools/testing/selftests/hid/tests/conftest.py
+            !2, 3.7      tools/testing/kunit/qemu_config.py
+            !2, 3.7      tools/testing/kunit/kunit_tool_test.py
+            !2, 3.7      tools/testing/kunit/kunit.py
+            !2, 3.7      tools/testing/kunit/kunit_parser.py
+            !2, 3.7      tools/testing/kunit/kunit_kernel.py
+            !2, 3.7      tools/testing/kunit/kunit_json.py
+            !2, 3.7      tools/testing/kunit/kunit_config.py
+            !2, 3.7      tools/perf/scripts/python/gecko.py
+            !2, 3.7      scripts/rust_is_available_test.py
+            !2, 3.7      scripts/bpf_doc.py
+            !2, 3.6      tools/writeback/wb_monitor.py
+            !2, 3.6      tools/workqueue/wq_monitor.py
+            !2, 3.6      tools/workqueue/wq_dump.py
+            !2, 3.6      tools/usb/p9_fwd.py
+            !2, 3.6      tools/tracing/rtla/sample/timerlat_load.py
+            !2, 3.6      tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+            !2, 3.6      tools/testing/selftests/net/nl_netdev.py
+            !2, 3.6      tools/testing/selftests/net/lib/py/ynl.py
+            !2, 3.6      tools/testing/selftests/net/lib/py/utils.py
+            !2, 3.6      tools/testing/selftests/net/lib/py/nsim.py
+            !2, 3.6      tools/testing/selftests/net/lib/py/netns.py
+            !2, 3.6      tools/testing/selftests/net/lib/py/ksft.py
+            !2, 3.6      tools/testing/selftests/kselftest/ksft.py
+            !2, 3.6      tools/testing/selftests/hid/tests/test_tablet.py
+            !2, 3.6      tools/testing/selftests/hid/tests/test_sony.py
+            !2, 3.6      tools/testing/selftests/hid/tests/test_multitouch.py
+            !2, 3.6      tools/testing/selftests/hid/tests/test_mouse.py
+            !2, 3.6      tools/testing/selftests/hid/tests/base_gamepad.py
+            !2, 3.6      tools/testing/selftests/hid/tests/base_device.py
+            !2, 3.6      tools/testing/selftests/drivers/net/stats.py
+            !2, 3.6      tools/testing/selftests/drivers/net/shaper.py
+            !2, 3.6      tools/testing/selftests/drivers/net/queues.py
+            !2, 3.6      tools/testing/selftests/drivers/net/ping.py
+            !2, 3.6      tools/testing/selftests/drivers/net/lib/py/remote_ssh.py
+            !2, 3.6      tools/testing/selftests/drivers/net/lib/py/load.py
+            !2, 3.6      tools/testing/selftests/drivers/net/lib/py/__init__.py
+            !2, 3.6      tools/testing/selftests/drivers/net/lib/py/env.py
+            !2, 3.6      tools/testing/selftests/drivers/net/hw/rss_ctx.py
+            !2, 3.6      tools/testing/selftests/drivers/net/hw/pp_alloc_fail.py
+            !2, 3.6      tools/testing/selftests/drivers/net/hw/nic_performance.py
+            !2, 3.6      tools/testing/selftests/drivers/net/hw/nic_link_layer.py
+            !2, 3.6      tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py
+            !2, 3.6      tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
+            !2, 3.6      tools/testing/selftests/drivers/net/hw/devmem.py
+            !2, 3.6      tools/testing/selftests/drivers/net/hw/devlink_port_split.py
+            !2, 3.6      tools/testing/selftests/drivers/net/hw/csum.py
+            !2, 3.6      tools/testing/selftests/devices/probe/test_discoverable_devices.py
+            !2, 3.6      tools/testing/selftests/bpf/test_bpftool_synctypes.py
+            !2, 3.6      tools/testing/selftests/bpf/generate_udp_fragments.py
+            !2, 3.6      tools/testing/kunit/run_checks.py
+            !2, 3.6      tools/testing/kunit/kunit_printer.py
+            !2, 3.6      tools/sched_ext/scx_show_state.py
+            !2, 3.6      tools/perf/tests/shell/lib/perf_metric_validation.py
+            !2, 3.6      tools/perf/tests/shell/lib/perf_json_output_lint.py
+            !2, 3.6      tools/perf/scripts/python/parallel-perf.py
+            !2, 3.6      tools/perf/scripts/python/flamegraph.py
+            !2, 3.6      tools/perf/scripts/python/arm-cs-trace-disasm.py
+            !2, 3.6      tools/perf/pmu-events/models.py
+            !2, 3.6      tools/perf/pmu-events/metric_test.py
+            !2, 3.6      tools/perf/pmu-events/metric.py
+            !2, 3.6      tools/perf/pmu-events/jevents.py
+            !2, 3.6      tools/net/ynl/ynl-gen-rst.py
+            !2, 3.6      tools/net/ynl/ynl-gen-c.py
+            !2, 3.6      tools/net/ynl/lib/ynl.py
+            !2, 3.6      tools/net/ynl/lib/nlspec.py
+            !2, 3.6      tools/crypto/tcrypt/tcrypt_speed_compare.py
+            !2, 3.6      tools/cgroup/iocost_monitor.py
+            !2, 3.6      tools/cgroup/iocost_coef_gen.py
+            !2, 3.6      scripts/make_fit.py
+            !2, 3.6      scripts/macro_checker.py
+            !2, 3.6      scripts/get_abi.py
+            !2, 3.6      scripts/generate_rust_analyzer.py
+            !2, 3.6      scripts/gdb/linux/timerlist.py
+            !2, 3.6      scripts/gdb/linux/pgtable.py
+            !2, 3.6      scripts/clang-tools/run-clang-tools.py
+            !2, 3.6      Documentation/sphinx/automarkup.py
 
-With DIX1.1, you tell the HBA what to expect the first received ref tag
-to be. That could be the application's file offset or whatever you want.
-It's just the seed value chosen by the application when the PI was
-generated. That's passed down the stack along with the PI buffer itself.
+[1] Checked with:
+	vermin -v $(git ls-files *.py)
 
-And then the controller ASIC uses that seed value to program the
-register for validating the ref tags as it DMAs from host memory. On the
-outbound side it uses a different value to seed the ref tag generation
-register when sending the PI on to the drive. I.e. LBA for Type 1.
+    Please notice that vermin is not perfect: my script passed as version 3.6
+    because the f-string check there didn't verify f-string improvements over
+    time. Still, it is a quick way to check that our current minimal version
+    is not aligned with reality.
+ 
+Btw, vermin explains what is requiring more at the scripts. For instance:
 
-It's really just a matter of the device having separate, programmable
-registers for ref tag verification and generation.
+	$ vermin -vv scripts/checktransupdate.py
+	...
+	!2, 3.9      /new_devel/v4l/docs/scripts/checktransupdate.py
+	  'argparse' module requires 2.7, 3.2
+	  'argparse.BooleanOptionalAction' member requires !2, 3.9
+	  'datetime' module requires 2.3, 3.0
+	  'datetime.datetime.strptime' member requires 2.5, 3.0
+	  'logging' module requires 2.3, 3.0
+	  'logging.StreamHandler' member requires 2.6, 3.0
+	  'os.path.relpath' member requires 2.6, 3.0
+	  f-strings require !2, 3.6
 
-So in terms of NVMe, it's like having ILBRT and EILBRT specified at the
-same time. The drive should use EILBRT for validating the ref tag in the
-PI received from host and then use a separate ILBRT as the initial value
-for the ref tag when writing the PI to media.
-
-On reads it works the same way. The controller validates that the ref
-tag read from media matches the LBA. And then uses the separate register
-to generate a new ref tag initialized with the seed value requested by
-the application.
-
-Not sure if we'd have room for both an EILBRT and an ILBRT in the same
-command? Sounds like it would be difficult, especially with the larger
-ref tags in NVMe. But I'm happy to pursue in NVMe if there is interest.
-Because it did make a performance difference not having to touch the PI
-buffer in the I/O path.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Thanks,
+Mauro
