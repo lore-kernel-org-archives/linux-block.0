@@ -1,40 +1,32 @@
-Received: from libero.it (smtp-18.italiaonline.it [213.209.10.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E64184
-	for <linux-block@vger.kernel.org>; Wed, 29 Jan 2025 19:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.209.10.18
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A0C194AD1;
+	Wed, 29 Jan 2025 21:03:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738177486; cv=none; b=TvgAGNbBnaQzOKImu8E+GXDATqbJfNRihx3mdGjE47TnUT9p8uaEIi28reHplVDbiBt0cOA0wCMfgWmLNNBpnazYF4KKaiMXnvBUnFypz6O78PjjGkXDZYWNqQDMyDsKUuWqWXK4wVLomo+RvmQdvU8+0qN0zw8HdQsPZiCcWjk=
+	t=1738184639; cv=none; b=iqXScunONgiNMwtPXJWqFWoxCswuc+i9MaH4v1tStpQ7FRKjUmm0Pxm8+U0+ppKCy923BhxnqT2at2r8BTKxdEqTp1bnp79htTRKvMKxG0f5Pd9/3HGUdm1M4D+RSYuAe8SpA+q2ieCPeLbAelkrvCXgTjFnHvlwdParb8RwLIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738177486; c=relaxed/simple;
-	bh=uOK5tHtdBFtQ+uuB75hCUqyEXqtRgqopYCaGI+Ype1Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Aw9rMUoEAhKYNwOCTZTKD6nvRDjXtwseT3uZZ6vHt7AVMalL2HQKdWfAZnbRsHOPwCKShTQqJK2ZOJEOnV2kBDzNz3yOyJkNKhdybPvpfUykTtKos9bm9FFYeBJu843P1B3FEJ2GVhwB/+yRr5GRJ9Q24Yy3ekGkaHm/jANoC+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=libero.it; spf=pass smtp.mailfrom=libero.it; dkim=pass (2048-bit key) header.d=libero.it header.i=@libero.it header.b=0MAc0AgZ; arc=none smtp.client-ip=213.209.10.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=libero.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=libero.it
+	s=arc-20240116; t=1738184639; c=relaxed/simple;
+	bh=EsYz53Al9cDMt+LJZ12iOWeqRoB03Is/uiVHJBAKxPs=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=BZc+/O8yiOc62L9cJbuootJUxhPyNTgFd8JuyYdOU0kXvBEsPhylS2xqlxrwkK+4po+Mc276fW+Vqjl7EnjgIY/ItpdPJZFNsUU2m9K5C10fK1KQikJ+HXLZ4hN8MQvKkQi8IK0gTmoD6Q+LOesDIcZ7a9qHN4OqiLw6/mhH/Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=mY3mAkZd; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=libero.it header.i=@libero.it header.b="0MAc0AgZ"
-Received: from [192.168.1.27] ([84.220.171.3])
-	by smtp-18.iol.local with ESMTPA
-	id dDK7tLmCk5LVidDK7tuU5X; Wed, 29 Jan 2025 20:02:05 +0100
-x-libjamoibt: 1601
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=libero.it; s=s2021;
-	t=1738177325; bh=Dm3Wthh3Fmw7cWLh7JvtK6wWvuTAS9Lb+ZHNQ12VKL4=;
-	h=From;
-	b=0MAc0AgZm4XiO2Nn39YPgHGN17LqnPhayTPKt0H7Aav6UnK576K4ZBd3Lafz66IfR
-	 Ncf3Ql69XaTXL+5gec8nMaehgPMqfYy2KGWASIwo/vRKR4q3JLI1QhoOTh5KiInxjV
-	 OHXBZqcDh2+tMN/n6Yu7/IUWNQvh4tioq/m4AVEwYXBNFYoUi+Z5K2BIPsnFVhlr4l
-	 Gvqg42Um9TjXMjLkn3t1ZecUIfxTsmOeO5rt+BDE742+ffC4t5tCsQYcdjM3DbrCJc
-	 cLaezrDtn99Rld8xDx5kHEWqY5MfcgaHJ7/njf0gvnd4JOdt5nDDTS5oKFTNjLLHMW
-	 9GQVrXy4TJ3NA==
-X-CNFS-Analysis: v=2.4 cv=StRb6+O0 c=1 sm=1 tr=0 ts=679a7b2d cx=a_exe
- a=hciw9o01/L1eIHAASTHaSw==:117 a=hciw9o01/L1eIHAASTHaSw==:17
- a=IkcTkHD0fZMA:10 a=WJyTCbUXE8ZVV855lvUA:9 a=QEXdDO2ut3YA:10
- a=ZXulRonScM0A:10 a=zZCYzV9kfG8A:10
-Message-ID: <83b8c701-7719-4e90-b435-6398e132b921@libero.it>
-Date: Wed, 29 Jan 2025 20:02:03 +0100
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="mY3mAkZd"
+Received: from [100.65.161.47] (unknown [20.236.11.29])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 4FFDA2109A5E;
+	Wed, 29 Jan 2025 13:03:55 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4FFDA2109A5E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1738184637;
+	bh=O+JFGGFluQhzEspwlwz6aXkZ7QKW4DjxL6knEN3myoo=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=mY3mAkZdBwX5JW6v0rHOcPwixnNpeCwrI5i6lioeivoGl5PeSwTfMHOmjED6AV41/
+	 5wIYfQa9MecJKhXc6T7//bDDoOB4BG1MPO3Miu2pGAWJwBcdsKKFOS1hzy+NN34ovy
+	 jA6uxIox2R9YzB3PKnfuI/uqwUCqDlg2DifBsbMw=
+Message-ID: <dd0358b1-7c8a-4c9e-88c5-2e1db69a3a35@linux.microsoft.com>
+Date: Wed, 29 Jan 2025 13:03:57 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,48 +34,98 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: kreijack@inwind.it
-Subject: Re: [RFC 0/3] Btrfs checksum offload
-To: Kanchan Joshi <joshi.k@samsung.com>, josef@toxicpanda.com,
- dsterba@suse.com, clm@fb.com, axboe@kernel.dk, kbusch@kernel.org, hch@lst.de
-Cc: linux-btrfs@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-block@vger.kernel.org, gost.dev@samsung.com
-References: <CGME20250129141039epcas5p11feb1be4124c0db3c5223325924183a3@epcas5p1.samsung.com>
- <20250129140207.22718-1-joshi.k@samsung.com>
+Cc: Yaron Avizrat <yaron.avizrat@intel.com>, Oded Gabbay
+ <ogabbay@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ Nicolas Palix <nicolas.palix@imag.fr>, James Smart
+ <james.smart@broadcom.com>, Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+ David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ Carlos Maiolino <cem@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
+ Sebastian Reichel <sre@kernel.org>, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ Frank Li <Frank.Li@nxp.com>, Mark Brown <broonie@kernel.org>,
+ Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>,
+ Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+ Hans de Goede <hdegoede@redhat.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
+ Selvin Xavier <selvin.xavier@broadcom.com>,
+ Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ eahariha@linux.microsoft.com, cocci@inria.fr, linux-kernel@vger.kernel.org,
+ linux-scsi@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-sound@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-spi@vger.kernel.org, imx@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, platform-driver-x86@vger.kernel.org,
+ ibm-acpi-devel@lists.sourceforge.net, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH 06/16] rbd: convert timeouts to secs_to_jiffies()
+To: Andrew Morton <akpm@linux-foundation.org>,
+ Ilya Dryomov <idryomov@gmail.com>,
+ Dongsheng Yang <dongsheng.yang@easystack.cn>, Jens Axboe <axboe@kernel.dk>,
+ ceph-devel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20250128-converge-secs-to-jiffies-part-two-v1-0-9a6ecf0b2308@linux.microsoft.com>
+ <20250128-converge-secs-to-jiffies-part-two-v1-6-9a6ecf0b2308@linux.microsoft.com>
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
 Content-Language: en-US
-From: Goffredo Baroncelli <kreijack@libero.it>
-In-Reply-To: <20250129140207.22718-1-joshi.k@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20250128-converge-secs-to-jiffies-part-two-v1-6-9a6ecf0b2308@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-CMAE-Envelope: MS4xfCkU6Ctt9veVANLcmm22pdNQVNMnyeTYb76F8RfeZVZ3cJzJxfW4tBqUf0X9NE0G0rWGDopElgxfXFLpDuRX8cHTOV8x3cuFVK7pHjUmwE+jN60QTOdw
- JUW8PVie0x7Nr2hdmbucatzt5s5YAjK2o2+3li7rWcI8gyTikJNfL8DeJiEst2OfqmVZ7xr1zDffrAt0ugX2kVkpf5F5IqsM4dwrEzKA6HcRtmSyhTb/v5NB
- Y5BPOaXiSOOGw5nn7PsIadJPJ8XyqrJ4L0lKOXKJJf+ZmTuC+hCDzywmOwJlJUJYa1MErFxAxmYr0iXmHFVkkv91CRGDlfr4CaNq9Pf3iRitQBdW+3IE9c42
- qMNWp0M8cLvbYJx7+5gGFAl4yBVwg8xJQqT4tkUhIVnssL4dfvXzhxAbJG1ozkp7EfEdE2htwEgMJVfbj4/mWb6XXcjZo2jWyLpkeuyeFqIdedyMFXNNHnqB
- CUpc6nhX65L7Mh4ZuX8prDmvqGNgLumGE0kcbQ==
 
-On 29/01/2025 15.02, Kanchan Joshi wrote:
-> TL;DR first: this makes Btrfs chuck its checksum tree and leverage NVMe
-> SSD for data checksumming.
+On 1/28/2025 10:21 AM, Easwar Hariharan wrote:
+> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
+> secs_to_jiffies().  As the value here is a multiple of 1000, use
+> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
 > 
-> Now, the longer version for why/how.
+> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
+> the following Coccinelle rules:
 > 
-> End-to-end data protection (E2EDP)-capable drives require the transfer
-> of integrity metadata (PI).
-> This is currently handled by the block layer, without filesystem
-> involvement/awareness.
-> The block layer attaches the metadata buffer, generates the checksum
-> (and reftag) for write I/O, and verifies it during read I/O.
+> @depends on patch@
+> expression E;
+> @@
 > 
-May be this is a stupid question, but if we can (will) avoid storing the checksum
-in the FS, which is the advantage of having a COW filesystem ?
+> -msecs_to_jiffies
+> +secs_to_jiffies
+> (E
+> - * \( 1000 \| MSEC_PER_SEC \)
+> )
+> 
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+> ---
+>  drivers/block/rbd.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
 
-My understand is that a COW filesystem is needed mainly to synchronize
-csum and data. Am I wrong ?
+<snip>
 
-[...]
+> @@ -6283,9 +6283,9 @@ static int rbd_parse_param(struct fs_parameter *param,
+>  		break;
+>  	case Opt_lock_timeout:
+>  		/* 0 is "wait forever" (i.e. infinite timeout) */
+> -		if (result.uint_32 > INT_MAX / 1000)
+> +		if (result.uint_32 > INT_MAX)
+>  			goto out_of_range;
+> -		opt->lock_timeout = msecs_to_jiffies(result.uint_32 * 1000);
+> +		opt->lock_timeout = secs_to_jiffies(result.uint_32);
+>  		break;
+>  	case Opt_pool_ns:
+>  		kfree(pctx->spec->pool_ns);
+> 
 
-BR
+Hi Ilya, Dongsheng, Jens, others,
 
--- 
-gpg @keyserver.linux.it: Goffredo Baroncelli <kreijackATinwind.it>
-Key fingerprint BBF5 1610 0B64 DAC6 5F7D  17B2 0EDA 9B37 8B82 E0B5
+Could you please review this hunk and confirm the correct range check
+here? I figure this is here because of the multiplier to
+msecs_to_jiffies() and therefore unneeded after the conversion. If so, I
+noticed patch 07 has similar range checks that I neglected to fix and
+can do in a v2.
+
+Thanks,
+Easwar (he/him)
