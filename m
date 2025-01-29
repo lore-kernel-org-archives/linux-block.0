@@ -1,46 +1,33 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26C31EEE6
-	for <linux-block@vger.kernel.org>; Wed, 29 Jan 2025 06:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1DD190072;
+	Wed, 29 Jan 2025 06:05:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738130589; cv=none; b=D9N7Otab4aHuaAIw8P4CGGjJZA9ccM6/9v43zgCgeb0tvdsZbAW9x4PjKeZdTFWfmsPdipFX2u4hJq2ecKicRO7ScRK8j++bZA5mw/IaHJvf5jkr9KNDFU+CY107wbOhstK7TQ+Y6L1/9jhhH6dG2w7ruWmj8hp8WRmRvyr5MGA=
+	t=1738130741; cv=none; b=UJ3Tp7hW1FCA0OiOiCDyKhDCOu54K5brW57nnYOObnuhNLtHC6soLOxt/LC2vSS5LB52VIjHuQq9w1Wgp6j/F96n+IjixWZ4fpFM5nWZXpmgUdaM462LecR1tWZqrRlB+myiHiTaOTZKETvUEe4TMui7FBhK/hupSfoz+NQySFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738130589; c=relaxed/simple;
-	bh=6Bn92NSr4CMCPxUwU0F8vv3bKvTpSeWMgOZcLQn5kAI=;
+	s=arc-20240116; t=1738130741; c=relaxed/simple;
+	bh=cAcU/NMmMwccLJ32HqOy0i9+ApE+bJLVFSnoJdp1fP0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VCgbzU5Cq2KB1m1QOQGO0DL+Vi8EBjZ1/56ShhJJg6LlJ8YpHj8IYqebt+SsqPHiYHDCvWeaGiQkaY+nLmsBMtuvKjjtXE/6qbSepeVUh5Pet4Dug3U7bOuftVDwOsnQMhLeRMH/N6gcFv/WjEZhtKqQqvC4UkfpUdFdIGO6Cn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mZ7y9Fk4; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mZ7y9Fk4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=hiq1uScUML6Rsu2S+zgxlNvLPyp4iGtnsMkJjdwAtNQ=; b=mZ7y9Fk4dGIXhI5NWhZA3+Aio+
-	o3LrzoIz+L+Kp1Q6445Ua0/YG78zDtSGdZ4XWofQ+taJODq42y1iQuspFwKsyPnOUUvhIwvtCOjmP
-	IDXE+sJtD+4fme0fDjZHGRGX+4aeNrL76R+os4ZtF+GfVnsbFh4SiGyxC8ssmJNyqqfFlR5hzRDPV
-	TwGXwCP+8IDfms3STsUnfrsdN5CsCvpk0fS+akdoR/ju79FK+rGEZ0xyw8oL0S63rAG5Aney917RA
-	bNeQegGWl6bVULcQFBwNXaLNbDYrE6nw3j2Yf5LK43/WqCjz0JUgXrc1qYUvglVYRFhy23G/fYZAw
-	V8BkieFA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1td1AI-00000006Ngg-2eT6;
-	Wed, 29 Jan 2025 06:03:06 +0000
-Date: Tue, 28 Jan 2025 22:03:06 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: David Hildenbrand <david@redhat.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, Muchun Song <muchun.song@linux.dev>,
-	Jane Chu <jane.chu@oracle.com>
-Subject: Re: Direct I/O performance problems with 1GB pages
-Message-ID: <Z5nEmo3ggTuRu2yX@infradead.org>
-References: <Z5WF9cA-RZKZ5lDN@casper.infradead.org>
- <Z5hxnRqbvi7KiXBW@infradead.org>
- <d2471b37-15bf-4d67-932c-7e25c226db79@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=s4Y5cbBguwHYRrhrOrnx2vUGiS663/P6zl0q1H0VhqCHTXnosmtVkv/rZ9CLoCA0aWdEu7l1uRHYoA8eXhT16Gbv7OhX/9DmvNFi56p1J1HoqvKC02n19rchEkAq86WzmJYvmXZQs0Pnfjq2PZkGRyVWweHMPEl/uAggFPvatJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 544CB68D13; Wed, 29 Jan 2025 07:05:34 +0100 (CET)
+Date: Wed, 29 Jan 2025 07:05:34 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Daniel Wagner <wagi@kernel.org>
+Cc: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Ming Lei <ming.lei@redhat.com>,
+	James Smart <james.smart@broadcom.com>,
+	Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/3] nvme-tcp: rate limit error message in send path
+Message-ID: <20250129060534.GA29266@lst.de>
+References: <20250128-nvme-misc-fixes-v1-0-40c586581171@kernel.org> <20250128-nvme-misc-fixes-v1-1-40c586581171@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,19 +36,14 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d2471b37-15bf-4d67-932c-7e25c226db79@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250128-nvme-misc-fixes-v1-1-40c586581171@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Jan 28, 2025 at 10:47:12AM +0100, David Hildenbrand wrote:
-> Yes, I did that renaming as part of that series after the name was suggested
-> during review. I got confused myself reading this report.
-> 
-> 	internal_get_user_pages_fast() -> gup_fast_fallback()
-> 
-> Was certainly an improvement. Naming is hard, we want to express "try fast,
-> but fallback to slow if it fails".
-> 
-> Maybe "gup_fast_with_fallback" might be clearer, not sure.
+On Tue, Jan 28, 2025 at 05:34:46PM +0100, Daniel Wagner wrote:
+> If a lot of request are in the queue, this message is spamming the logs,
+> thus rate limit it.
 
-gup_common?
+Are in the queue when what happens?  Not that I'm against this,
+but if we have a known condition where this error is printed a lot
+we should probably skip it entirely for that?
 
