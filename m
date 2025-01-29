@@ -1,57 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from libero.it (smtp-18.italiaonline.it [213.209.10.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684E31E04BD;
-	Wed, 29 Jan 2025 18:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E64184
+	for <linux-block@vger.kernel.org>; Wed, 29 Jan 2025 19:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.209.10.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738175965; cv=none; b=fkmig88hU27jlhBp4jnHk4Xo64MEgaB1nfZffAnTXb8+4Nu+VhLbx83kCi4o+JFcB5JMkbMViEYn6E2A07SWrI3aakjlPKYM5gBvHQdB/sM8pHDnAE+Ve9DhNiyvU2MzOSXu7fJbDpP28CkczU1jUJbf9TSkfG6wtwWP9gPJmMA=
+	t=1738177486; cv=none; b=TvgAGNbBnaQzOKImu8E+GXDATqbJfNRihx3mdGjE47TnUT9p8uaEIi28reHplVDbiBt0cOA0wCMfgWmLNNBpnazYF4KKaiMXnvBUnFypz6O78PjjGkXDZYWNqQDMyDsKUuWqWXK4wVLomo+RvmQdvU8+0qN0zw8HdQsPZiCcWjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738175965; c=relaxed/simple;
-	bh=inaXZEkG5qTCLCyeiXKTHQhfKOCqT5k0FMO8Ol4EZ+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pDMwbuZLXlbQudcCOiBAuSq3O8wWK3Css6ppkS99SM5Ibx38kWmUcpP9QwSjvdMUJbG3UZHMXfNUnPCuvBwtxI/t7Lm2J3nesq8FmhSU/S9gj6Eu4ofbRFTmdW5cCYsZ4tzZu6IIy+eoay+MUCQuCvRq7bbhUWytNfaXmv+XIoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iIZ+NEVD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738177486; c=relaxed/simple;
+	bh=uOK5tHtdBFtQ+uuB75hCUqyEXqtRgqopYCaGI+Ype1Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Aw9rMUoEAhKYNwOCTZTKD6nvRDjXtwseT3uZZ6vHt7AVMalL2HQKdWfAZnbRsHOPwCKShTQqJK2ZOJEOnV2kBDzNz3yOyJkNKhdybPvpfUykTtKos9bm9FFYeBJu843P1B3FEJ2GVhwB/+yRr5GRJ9Q24Yy3ekGkaHm/jANoC+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=libero.it; spf=pass smtp.mailfrom=libero.it; dkim=pass (2048-bit key) header.d=libero.it header.i=@libero.it header.b=0MAc0AgZ; arc=none smtp.client-ip=213.209.10.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=libero.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=libero.it
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iIZ+NEVD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D088C4CED1;
-	Wed, 29 Jan 2025 18:39:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738175964;
-	bh=inaXZEkG5qTCLCyeiXKTHQhfKOCqT5k0FMO8Ol4EZ+c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iIZ+NEVDyjE1YJe7CwGx1Ygfu6g1cMwv9niAOvE6oZs34VQWisZncgQreB9O/qiKL
-	 3AfHkcFPH/efQeNQNajKZsT8t9Ewb20fIzrkANYOrktm2n9mda6+TrdxpVF1oqxcTe
-	 BZi8nsTO+TFuqS+VG6QclmoFxJv2JEtb0lgBVaA5Cp+qy8SBZIfYhQvb7g7DB//qOE
-	 tvFMA+o60FeCFJNmSLpRKnbG6MIGZ+gX+klNAeRI+voiWIM7jLu28PyMN+r3IC1/Y+
-	 7jC8ouR0ZzkOU2bkZTBPFg0WP0v2aKsjugN1ZzDMqBRDlAeN4LH+cLsuSV4hNcuuL8
-	 EbMuNi5J6DIIw==
-Date: Wed, 29 Jan 2025 11:39:22 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Daniel Wagner <wagi@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>,
-	James Smart <james.smart@broadcom.com>,
-	Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/3] nvme-fc: use ctrl state getter
-Message-ID: <Z5p12hWxmdIadNIX@kbusch-mbp>
-References: <20250128-nvme-misc-fixes-v1-0-40c586581171@kernel.org>
- <20250128-nvme-misc-fixes-v1-2-40c586581171@kernel.org>
+	dkim=pass (2048-bit key) header.d=libero.it header.i=@libero.it header.b="0MAc0AgZ"
+Received: from [192.168.1.27] ([84.220.171.3])
+	by smtp-18.iol.local with ESMTPA
+	id dDK7tLmCk5LVidDK7tuU5X; Wed, 29 Jan 2025 20:02:05 +0100
+x-libjamoibt: 1601
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=libero.it; s=s2021;
+	t=1738177325; bh=Dm3Wthh3Fmw7cWLh7JvtK6wWvuTAS9Lb+ZHNQ12VKL4=;
+	h=From;
+	b=0MAc0AgZm4XiO2Nn39YPgHGN17LqnPhayTPKt0H7Aav6UnK576K4ZBd3Lafz66IfR
+	 Ncf3Ql69XaTXL+5gec8nMaehgPMqfYy2KGWASIwo/vRKR4q3JLI1QhoOTh5KiInxjV
+	 OHXBZqcDh2+tMN/n6Yu7/IUWNQvh4tioq/m4AVEwYXBNFYoUi+Z5K2BIPsnFVhlr4l
+	 Gvqg42Um9TjXMjLkn3t1ZecUIfxTsmOeO5rt+BDE742+ffC4t5tCsQYcdjM3DbrCJc
+	 cLaezrDtn99Rld8xDx5kHEWqY5MfcgaHJ7/njf0gvnd4JOdt5nDDTS5oKFTNjLLHMW
+	 9GQVrXy4TJ3NA==
+X-CNFS-Analysis: v=2.4 cv=StRb6+O0 c=1 sm=1 tr=0 ts=679a7b2d cx=a_exe
+ a=hciw9o01/L1eIHAASTHaSw==:117 a=hciw9o01/L1eIHAASTHaSw==:17
+ a=IkcTkHD0fZMA:10 a=WJyTCbUXE8ZVV855lvUA:9 a=QEXdDO2ut3YA:10
+ a=ZXulRonScM0A:10 a=zZCYzV9kfG8A:10
+Message-ID: <83b8c701-7719-4e90-b435-6398e132b921@libero.it>
+Date: Wed, 29 Jan 2025 20:02:03 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250128-nvme-misc-fixes-v1-2-40c586581171@kernel.org>
+User-Agent: Mozilla Thunderbird
+Reply-To: kreijack@inwind.it
+Subject: Re: [RFC 0/3] Btrfs checksum offload
+To: Kanchan Joshi <joshi.k@samsung.com>, josef@toxicpanda.com,
+ dsterba@suse.com, clm@fb.com, axboe@kernel.dk, kbusch@kernel.org, hch@lst.de
+Cc: linux-btrfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-block@vger.kernel.org, gost.dev@samsung.com
+References: <CGME20250129141039epcas5p11feb1be4124c0db3c5223325924183a3@epcas5p1.samsung.com>
+ <20250129140207.22718-1-joshi.k@samsung.com>
+Content-Language: en-US
+From: Goffredo Baroncelli <kreijack@libero.it>
+In-Reply-To: <20250129140207.22718-1-joshi.k@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfCkU6Ctt9veVANLcmm22pdNQVNMnyeTYb76F8RfeZVZ3cJzJxfW4tBqUf0X9NE0G0rWGDopElgxfXFLpDuRX8cHTOV8x3cuFVK7pHjUmwE+jN60QTOdw
+ JUW8PVie0x7Nr2hdmbucatzt5s5YAjK2o2+3li7rWcI8gyTikJNfL8DeJiEst2OfqmVZ7xr1zDffrAt0ugX2kVkpf5F5IqsM4dwrEzKA6HcRtmSyhTb/v5NB
+ Y5BPOaXiSOOGw5nn7PsIadJPJ8XyqrJ4L0lKOXKJJf+ZmTuC+hCDzywmOwJlJUJYa1MErFxAxmYr0iXmHFVkkv91CRGDlfr4CaNq9Pf3iRitQBdW+3IE9c42
+ qMNWp0M8cLvbYJx7+5gGFAl4yBVwg8xJQqT4tkUhIVnssL4dfvXzhxAbJG1ozkp7EfEdE2htwEgMJVfbj4/mWb6XXcjZo2jWyLpkeuyeFqIdedyMFXNNHnqB
+ CUpc6nhX65L7Mh4ZuX8prDmvqGNgLumGE0kcbQ==
 
-On Tue, Jan 28, 2025 at 05:34:47PM +0100, Daniel Wagner wrote:
-> Do not access the state variable directly, instead use proper
-> synchronization so not stale data is read.
+On 29/01/2025 15.02, Kanchan Joshi wrote:
+> TL;DR first: this makes Btrfs chuck its checksum tree and leverage NVMe
+> SSD for data checksumming.
 > 
-> Fixes: e6e7f7ac03e4 ("nvme: ensure reset state check ordering")
+> Now, the longer version for why/how.
+> 
+> End-to-end data protection (E2EDP)-capable drives require the transfer
+> of integrity metadata (PI).
+> This is currently handled by the block layer, without filesystem
+> involvement/awareness.
+> The block layer attaches the metadata buffer, generates the checksum
+> (and reftag) for write I/O, and verifies it during read I/O.
+> 
+May be this is a stupid question, but if we can (will) avoid storing the checksum
+in the FS, which is the advantage of having a COW filesystem ?
 
-Thanks, applied to nvme-6.14.
+My understand is that a COW filesystem is needed mainly to synchronize
+csum and data. Am I wrong ?
+
+[...]
+
+BR
+
+-- 
+gpg @keyserver.linux.it: Goffredo Baroncelli <kreijackATinwind.it>
+Key fingerprint BBF5 1610 0B64 DAC6 5F7D  17B2 0EDA 9B37 8B82 E0B5
