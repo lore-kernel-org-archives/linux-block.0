@@ -1,103 +1,57 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 620F61DE2DF;
-	Wed, 29 Jan 2025 18:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684E31E04BD;
+	Wed, 29 Jan 2025 18:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738174481; cv=none; b=jPrJqsHa5qkfCuM2ysIpBmWpw0sqkajgsg6rK9Zj5csipyTNvkkEYVQVGK5b9eKCOW03rlztihYANQx8Zy58u0pJxPVZS7rHokqNG7r+WPSfXVfyketJgmP72xcZk+hz5Ecyc+nmzOQHAjeqGTMIaTbqFdw0azUsuH65kNgfLkI=
+	t=1738175965; cv=none; b=fkmig88hU27jlhBp4jnHk4Xo64MEgaB1nfZffAnTXb8+4Nu+VhLbx83kCi4o+JFcB5JMkbMViEYn6E2A07SWrI3aakjlPKYM5gBvHQdB/sM8pHDnAE+Ve9DhNiyvU2MzOSXu7fJbDpP28CkczU1jUJbf9TSkfG6wtwWP9gPJmMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738174481; c=relaxed/simple;
-	bh=RUlBLbu2dRvKVCN3bBJhGTTBjAhlfapqs+U8UGJ1e6Q=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=eeVWYFe65Fih8wiNU2SrsWRG+lGtixKgeCxE7Aa589yUcLoUrLF24jZYw73KPDQgdj9llHEGEkDKNwVbVwSA9OSmd3euNib7bfdL5e5K5deoo4mBm8IuyQd/hr6kcc6TtaasMZqjcjUCcCiZtB3g7Gc2U0NrGT1Wmh3YuYbWXlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=aAf9IIr/; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1738175965; c=relaxed/simple;
+	bh=inaXZEkG5qTCLCyeiXKTHQhfKOCqT5k0FMO8Ol4EZ+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pDMwbuZLXlbQudcCOiBAuSq3O8wWK3Css6ppkS99SM5Ibx38kWmUcpP9QwSjvdMUJbG3UZHMXfNUnPCuvBwtxI/t7Lm2J3nesq8FmhSU/S9gj6Eu4ofbRFTmdW5cCYsZ4tzZu6IIy+eoay+MUCQuCvRq7bbhUWytNfaXmv+XIoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iIZ+NEVD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="aAf9IIr/"
-Received: from [100.65.98.224] (unknown [20.236.10.163])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 28F3F2066C1F;
-	Wed, 29 Jan 2025 10:14:38 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 28F3F2066C1F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1738174479;
-	bh=tZu7Aqdcq4BHW7QoklKujtbGCaxot/XApiLegvlW9Cg=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=aAf9IIr/I90cgqgEBczLilZ7bdtCYRLZiEJHEhBdKJpSoOCumeMDEGeLf0xioaxnU
-	 Cxs0rQCB+cTOuTBJEpsGVDSTUnsyW+Sqnpdni5YRWUzescyOcAANxe89dy6cL7UnK5
-	 9o+lRZL0v3hO8jHtI+YxGsr5kQTHif7tO+OZbuMk=
-Message-ID: <670dbe5b-cf5b-4994-9a47-53b0b52a4b20@linux.microsoft.com>
-Date: Wed, 29 Jan 2025 10:14:40 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iIZ+NEVD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D088C4CED1;
+	Wed, 29 Jan 2025 18:39:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738175964;
+	bh=inaXZEkG5qTCLCyeiXKTHQhfKOCqT5k0FMO8Ol4EZ+c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iIZ+NEVDyjE1YJe7CwGx1Ygfu6g1cMwv9niAOvE6oZs34VQWisZncgQreB9O/qiKL
+	 3AfHkcFPH/efQeNQNajKZsT8t9Ewb20fIzrkANYOrktm2n9mda6+TrdxpVF1oqxcTe
+	 BZi8nsTO+TFuqS+VG6QclmoFxJv2JEtb0lgBVaA5Cp+qy8SBZIfYhQvb7g7DB//qOE
+	 tvFMA+o60FeCFJNmSLpRKnbG6MIGZ+gX+klNAeRI+voiWIM7jLu28PyMN+r3IC1/Y+
+	 7jC8ouR0ZzkOU2bkZTBPFg0WP0v2aKsjugN1ZzDMqBRDlAeN4LH+cLsuSV4hNcuuL8
+	 EbMuNi5J6DIIw==
+Date: Wed, 29 Jan 2025 11:39:22 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Daniel Wagner <wagi@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>,
+	James Smart <james.smart@broadcom.com>,
+	Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/3] nvme-fc: use ctrl state getter
+Message-ID: <Z5p12hWxmdIadNIX@kbusch-mbp>
+References: <20250128-nvme-misc-fixes-v1-0-40c586581171@kernel.org>
+ <20250128-nvme-misc-fixes-v1-2-40c586581171@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: eahariha@linux.microsoft.com, Andrew Morton <akpm@linux-foundation.org>,
- Yaron Avizrat <yaron.avizrat@intel.com>, Oded Gabbay <ogabbay@kernel.org>,
- Julia Lawall <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>,
- James Smart <james.smart@broadcom.com>,
- Dick Kennedy <dick.kennedy@broadcom.com>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
- David Sterba <dsterba@suse.com>, Ilya Dryomov <idryomov@gmail.com>,
- Dongsheng Yang <dongsheng.yang@easystack.cn>, Jens Axboe <axboe@kernel.dk>,
- Xiubo Li <xiubli@redhat.com>, Damien Le Moal <dlemoal@kernel.org>,
- Niklas Cassel <cassel@kernel.org>, Carlos Maiolino <cem@kernel.org>,
- "Darrick J. Wong" <djwong@kernel.org>, Sebastian Reichel <sre@kernel.org>,
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Frank Li <Frank.Li@nxp.com>, Mark Brown <broonie@kernel.org>,
- Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>,
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
- Selvin Xavier <selvin.xavier@broadcom.com>,
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- cocci@inria.fr, linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-sound@vger.kernel.org,
- linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
- linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-pm@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-spi@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- platform-driver-x86@vger.kernel.org, ibm-acpi-devel@lists.sourceforge.net,
- linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 09/16] xfs: convert timeouts to secs_to_jiffies()
-To: Christoph Hellwig <hch@lst.de>
-References: <20250128-converge-secs-to-jiffies-part-two-v1-0-9a6ecf0b2308@linux.microsoft.com>
- <20250128-converge-secs-to-jiffies-part-two-v1-9-9a6ecf0b2308@linux.microsoft.com>
- <20250129052108.GB28513@lst.de>
- <3e4a8a44-483b-457a-b193-4119e4adfa85@linux.microsoft.com>
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Content-Language: en-US
-In-Reply-To: <3e4a8a44-483b-457a-b193-4119e4adfa85@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250128-nvme-misc-fixes-v1-2-40c586581171@kernel.org>
 
-On 1/29/2025 9:12 AM, Easwar Hariharan wrote:
-> On 1/28/2025 9:21 PM, Christoph Hellwig wrote:
->> On Tue, Jan 28, 2025 at 06:21:54PM +0000, Easwar Hariharan wrote:
->>>  		else
->>> -			cfg->retry_timeout = msecs_to_jiffies(
->>> -					init[i].retry_timeout * MSEC_PER_SEC);
->>> +			cfg->retry_timeout = secs_to_jiffies(init[i].retry_timeout);
->>
->> This messes up the formatting by introducing an overly long line.
->>
->> Otherwise the change looks fine.
+On Tue, Jan 28, 2025 at 05:34:47PM +0100, Daniel Wagner wrote:
+> Do not access the state variable directly, instead use proper
+> synchronization so not stale data is read.
 > 
-> I'll fix this in v2. Thanks for the review!
-> 
-> - Easwar (he/him)
+> Fixes: e6e7f7ac03e4 ("nvme: ensure reset state check ordering")
 
-Andrew seems to have fixed it up in his copy, so I'll skip this change
-in v2. Thanks Andrew!
-
-- Easwar
+Thanks, applied to nvme-6.14.
