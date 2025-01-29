@@ -1,198 +1,159 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5161CAB3;
-	Wed, 29 Jan 2025 09:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2FC1ACEC2;
+	Wed, 29 Jan 2025 09:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738144018; cv=none; b=ABiyuxgAMYOQc6JH+syRX6mhQxQt4g+RQazOuoomRpPr0XoiR7V3b392xoAy3D1U7iGvCsJRYeXOFu15cfFHmFa1fmlQb6Xg1LIufScOQ4x06tzSH+TVJVZaZWLCw26EHIkU3GlVCFpWHwuy2VK6SPZjgBMaFWDfUDfU0HRiiNA=
+	t=1738144518; cv=none; b=L+LFTZRuP52wBx6iQ4mmw0+hdEWhyUe05TLJDkPOzg3TXadLMUzbZmCZ5LNXz8FmMmmStDeeN+48SkTkqEM0mL5FtxxL3fq5VRqy9n7fZmgbRh+T6jCL1fLKoua4qRRcJYfY4LAewvdj8561/smQ5wIIMA2UL+PXx/urW8jGLzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738144018; c=relaxed/simple;
-	bh=2tmtqzDlpvJYjOhymjjxXT2d5hZdqgkkSfR6apUc4LU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CCd9/zuf1WLHZRGVej8XZNqUaH/FxzQ428NpXrvi3vqEa/OsWydGdM3fZM6LZCzfKdVNHLhf/I6xSOpa6SDu0072ZG0Y9zQCiVi0MMEunae484Qh55IhKhUdTFBSTMkIK6oQnGg6RYDpUxYc1FLbZs7C/45mH17AstHNOTiCpwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=i5Mwxy/R; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=pmRhPydC; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=i5Mwxy/R; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=pmRhPydC; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1738144518; c=relaxed/simple;
+	bh=nurb2gdfnmsDf5k9lQZ2GeI9jK1G4SPomiZAkgbzTtM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CSMGZXvT/G5Rrm31vUCugaDDNgB2dyUc5H3WD85+04yUZCmbMNWMnF0Z8PfAQ+fgmzCNqvxrq1zXURJmy+fpAXGXNi5qpJBIMDGxKMYJ4Qa4WVAlTioupJ3cAeDzMW/MFfcpcIJHkfp17Q4QX5AaBl8Yp8EStUijHlsk2/Jvhk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=S69PLcWW; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="i5Mwxy/R";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="pmRhPydC";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="i5Mwxy/R";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="pmRhPydC"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B8E0D210F5;
-	Wed, 29 Jan 2025 09:46:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1738144014; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5GnOF+VEY7TThX1eeQY6brGBNSRNv8obohwk3AJ667M=;
-	b=i5Mwxy/RNBFOPwFWyefOclI67Mfl4LeClU7BnbzMU2Z49ioZnnFhEdIes2aDRWIG5Qpb0p
-	rLBunYuvEC7qM4x5OkOhkaKWeK+V8WjsDgKTMLf0D51Ecutz5uFtjpJqDsgAbMqJDTQ7GK
-	s83Yq9bri99hD1Q5u+s3qZtg9o5bDOg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1738144014;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5GnOF+VEY7TThX1eeQY6brGBNSRNv8obohwk3AJ667M=;
-	b=pmRhPydCZ+RgrhzOPZu1wdQVPJGdMmu2lFLf4y8etatrnARzlhrJMUPMdZgyI5WSug4evo
-	LP9tmUY05JKAOgCQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1738144014; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5GnOF+VEY7TThX1eeQY6brGBNSRNv8obohwk3AJ667M=;
-	b=i5Mwxy/RNBFOPwFWyefOclI67Mfl4LeClU7BnbzMU2Z49ioZnnFhEdIes2aDRWIG5Qpb0p
-	rLBunYuvEC7qM4x5OkOhkaKWeK+V8WjsDgKTMLf0D51Ecutz5uFtjpJqDsgAbMqJDTQ7GK
-	s83Yq9bri99hD1Q5u+s3qZtg9o5bDOg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1738144014;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5GnOF+VEY7TThX1eeQY6brGBNSRNv8obohwk3AJ667M=;
-	b=pmRhPydCZ+RgrhzOPZu1wdQVPJGdMmu2lFLf4y8etatrnARzlhrJMUPMdZgyI5WSug4evo
-	LP9tmUY05JKAOgCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6489C137DB;
-	Wed, 29 Jan 2025 09:46:53 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id C9NOFw35mWf7LAAAD6G6ig
-	(envelope-from <tiwai@suse.de>); Wed, 29 Jan 2025 09:46:53 +0000
-Date: Wed, 29 Jan 2025 10:46:53 +0100
-Message-ID: <87o6zq6jg2.wl-tiwai@suse.de>
-From: Takashi Iwai <tiwai@suse.de>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,	Yaron Avizrat
- <yaron.avizrat@intel.com>,	Oded Gabbay <ogabbay@kernel.org>,	Julia Lawall
- <Julia.Lawall@inria.fr>,	Nicolas Palix <nicolas.palix@imag.fr>,	James Smart
- <james.smart@broadcom.com>,	Dick Kennedy <dick.kennedy@broadcom.com>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,	Jaroslav Kysela
- <perex@perex.cz>,	Takashi Iwai <tiwai@suse.com>,	Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>,	David Sterba <dsterba@suse.com>,	Ilya
- Dryomov <idryomov@gmail.com>,	Dongsheng Yang <dongsheng.yang@easystack.cn>,
-	Jens Axboe <axboe@kernel.dk>,	Xiubo Li <xiubli@redhat.com>,	Damien Le Moal
- <dlemoal@kernel.org>,	Niklas Cassel <cassel@kernel.org>,	Carlos Maiolino
- <cem@kernel.org>,	"Darrick J. Wong" <djwong@kernel.org>,	Sebastian Reichel
- <sre@kernel.org>,	Keith Busch <kbusch@kernel.org>,	Christoph Hellwig
- <hch@lst.de>,	Sagi Grimberg <sagi@grimberg.me>,	Frank Li
- <Frank.Li@nxp.com>,	Mark Brown <broonie@kernel.org>,	Shawn Guo
- <shawnguo@kernel.org>,	Sascha Hauer <s.hauer@pengutronix.de>,	Pengutronix
- Kernel Team <kernel@pengutronix.de>,	Fabio Estevam <festevam@gmail.com>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,	Hans de Goede
- <hdegoede@redhat.com>,	Ilpo =?ISO-8859-1?Q?J=E4rvinen?=
- <ilpo.jarvinen@linux.intel.com>,	Henrique de Moraes Holschuh
- <hmh@hmh.eng.br>,	Selvin Xavier <selvin.xavier@broadcom.com>,	Kalesh AP
- <kalesh-anakkur.purayil@broadcom.com>,	Jason Gunthorpe <jgg@ziepe.ca>,	Leon
- Romanovsky <leon@kernel.org>,	cocci@inria.fr,
-	linux-kernel@vger.kernel.org,	linux-scsi@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,	linux-sound@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,	ceph-devel@vger.kernel.org,
-	linux-block@vger.kernel.org,	linux-ide@vger.kernel.org,
-	linux-xfs@vger.kernel.org,	linux-pm@vger.kernel.org,
-	linux-nvme@lists.infradead.org,	linux-spi@vger.kernel.org,
-	imx@lists.linux.dev,	linux-arm-kernel@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org,	ibm-acpi-devel@lists.sourceforge.net,
-	linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 04/16] ALSA: ac97: convert timeouts to secs_to_jiffies()
-In-Reply-To: <20250128-converge-secs-to-jiffies-part-two-v1-4-9a6ecf0b2308@linux.microsoft.com>
-References: <20250128-converge-secs-to-jiffies-part-two-v1-0-9a6ecf0b2308@linux.microsoft.com>
-	<20250128-converge-secs-to-jiffies-part-two-v1-4-9a6ecf0b2308@linux.microsoft.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="S69PLcWW"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50T21IAc029637;
+	Wed, 29 Jan 2025 09:54:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=usmjl7
+	ABJRKotUzXG1g98T82o0226T/3yDvMFxw9pTY=; b=S69PLcWWqcpiDgXDcVKjNE
+	O+QG7CPlpqlE2AnHa0AcE2cCiuc3+fLNOvVhttBKsdKa7r4Q0Kelv6FhZBF0blMa
+	E3/IIr0I5XZHpPMbJrwq8fva1TvH9XgwV5+LqKQcM7cYpCq7jHSWuvYWniBM7hxC
+	/fQ/cTIClK0kqMVUhmCrBbH0H7S5JICvXTgJDzpz+lZkBudzXHaE7kOXjZ2mWgG6
+	huvuicH2a99EPnnSFLT7DbxiRiOzhmc7u0RBaKprQvXRUsrKMP/Bkgt1rqnkDmrX
+	sgAuqPMNQnO7zX7Yq9546JpPm3FyTk5+NEqspNNnwO5Z+LM/7NuLRLA/ENFbbRZg
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44fb609hg7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Jan 2025 09:54:58 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50T6P3Zc018922;
+	Wed, 29 Jan 2025 09:54:58 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 44dd01fksn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Jan 2025 09:54:58 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50T9svG731195802
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 29 Jan 2025 09:54:57 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3494258055;
+	Wed, 29 Jan 2025 09:54:57 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2061A58043;
+	Wed, 29 Jan 2025 09:54:54 +0000 (GMT)
+Received: from [9.109.198.253] (unknown [9.109.198.253])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 29 Jan 2025 09:54:53 +0000 (GMT)
+Message-ID: <669a9e1c-bde2-4323-b997-cdbd82a26eab@linux.ibm.com>
+Date: Wed, 29 Jan 2025 15:24:52 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Level: 
-X-Spamd-Result: default: False [-1.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[linux-foundation.org,intel.com,kernel.org,inria.fr,imag.fr,broadcom.com,HansenPartnership.com,oracle.com,perex.cz,suse.com,fb.com,toxicpanda.com,gmail.com,easystack.cn,kernel.dk,redhat.com,lst.de,grimberg.me,nxp.com,pengutronix.de,amd.com,linux.intel.com,hmh.eng.br,ziepe.ca,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,lists.linux.dev,lists.sourceforge.net];
-	R_RATELIMIT(0.00)[to_ip_from(RL41ih3fejwepcmbj4wj583m3u)];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[59];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -1.80
-X-Spam-Flag: NO
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] blk-mq: fix wait condition for tagset wait completed
+ check
+To: Daniel Wagner <wagi@kernel.org>, Keith Busch <kbusch@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>
+Cc: James Smart <james.smart@broadcom.com>, Hannes Reinecke <hare@suse.de>,
+        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20250128-nvme-misc-fixes-v1-0-40c586581171@kernel.org>
+ <20250128-nvme-misc-fixes-v1-3-40c586581171@kernel.org>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20250128-nvme-misc-fixes-v1-3-40c586581171@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: d2EY-MP-VCV9R6ZjNtuHoq6fqyixjhZ_
+X-Proofpoint-ORIG-GUID: d2EY-MP-VCV9R6ZjNtuHoq6fqyixjhZ_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-28_04,2025-01-27_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 clxscore=1011 lowpriorityscore=0 mlxlogscore=999
+ bulkscore=0 spamscore=0 suspectscore=0 phishscore=0 priorityscore=1501
+ mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501290077
 
-On Tue, 28 Jan 2025 19:21:49 +0100,
-Easwar Hariharan wrote:
+
+
+On 1/28/25 10:04 PM, Daniel Wagner wrote:
+> blk_mq_tagset_count_completed_reqs returns the number of completed
+> requests. The only user of this function is
+> blk_mq_tagset_wait_completed_request which wants to know how many
+> request are not yet completed. Thus return the number of in flight
+> requests and terminate the wait loop when there is no inflight request.
 > 
-> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
-> secs_to_jiffies().  As the value here is a multiple of 1000, use
-> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
-> 
-> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
-> the following Coccinelle rules:
-> 
-> @depends on patch@
-> expression E;
-> @@
-> 
-> -msecs_to_jiffies
-> +secs_to_jiffies
-> (E
-> - * \( 1000 \| MSEC_PER_SEC \)
-> )
-> 
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-
-Acked-by: Takashi Iwai <tiwai@suse.de>
-
-
-thanks,
-
-Takashi
-
-
+> Fixes: f9934a80f91d ("blk-mq: introduce blk_mq_tagset_wait_completed_request()")
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Daniel Wagner <wagi@kernel.org>
 > ---
->  sound/pci/ac97/ac97_codec.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  block/blk-mq-tag.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/sound/pci/ac97/ac97_codec.c b/sound/pci/ac97/ac97_codec.c
-> index 6e710dce5c6068ec20c2da751b6f5372ad1df211..88ac37739b7653f69af430dd0163f5ab4ddf0d0c 100644
-> --- a/sound/pci/ac97/ac97_codec.c
-> +++ b/sound/pci/ac97/ac97_codec.c
-> @@ -2461,8 +2461,7 @@ int snd_ac97_update_power(struct snd_ac97 *ac97, int reg, int powerup)
->  		 * (for avoiding loud click noises for many (OSS) apps
->  		 *  that open/close frequently)
->  		 */
-> -		schedule_delayed_work(&ac97->power_work,
-> -				      msecs_to_jiffies(power_save * 1000));
-> +		schedule_delayed_work(&ac97->power_work, secs_to_jiffies(power_save));
->  	else {
->  		cancel_delayed_work(&ac97->power_work);
->  		update_power_regs(ac97);
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index b9f417d980b46d54b74dec8adcb5b04e6a78635c..3ce46afb65e3c3de9f11ca440bf0f335f21d0998 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -450,11 +450,11 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+>  }
+>  EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+>  
+> -static bool blk_mq_tagset_count_completed_rqs(struct request *rq, void *data)
+> +static bool blk_mq_tagset_count_inflight_rqs(struct request *rq, void *data)
+>  {
+>  	unsigned *count = data;
+>  
+> -	if (blk_mq_request_completed(rq))
+> +	if (blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT)
+>  		(*count)++;
+>  	return true;
+>  }
+> @@ -472,7 +472,7 @@ void blk_mq_tagset_wait_completed_request(struct blk_mq_tag_set *tagset)
+>  		unsigned count = 0;
+>  
+>  		blk_mq_tagset_busy_iter(tagset,
+> -				blk_mq_tagset_count_completed_rqs, &count);
+> +				blk_mq_tagset_count_inflight_rqs, &count);
+>  		if (!count)
+>  			break;
+>  		msleep(5);
 > 
-> -- 
-> 2.43.0
-> 
+I see that blk_mq_tagset_wait_completed_request() is called from nvme_cancel_tagset()
+and nvme_cancel_admin_tagset(). And it seems to me that the intention here's to wait 
+until each completed requests are freed (or change its state to MQ_RQ_IDLE). 
+
+Looking at code, the nvme_cancel_xxx() first invokes blk_mq_tagset_busy_iter() which 
+iterates through tagset and cancels each in-flight request and marks the request state
+to MQ_RQ_COMPLETE. Next in blk_mq_tagset_wait_completed_request(), we wait for each
+completed request state changed to anything but MQ_RQ_COMPLETE. The next state of the 
+request would be naturally MQ_RQ_IDLE once that request is freed. So in blk_mq_tagset_
+wait_completed_request(), essentially we wait for request state change from MQ_RQ_COMPLETE
+to MQ_RQ_IDLE.
+
+So now if the proposal is that blk_mq_tagset_wait_completed_request() has to wait only 
+if there's any in-flight request then it seems this function would never need to wait 
+and looks redundant because req->state would never be MQ_RQ_IN_FLIGHT as those would 
+have been already changed to MQ_RQ_COMPLETE when nvme_cancel_xxx() invokes blk_mq_tagset_
+busy_iter(ctrl->tagset, nvme_cancel_request, ctrl).
+
+Having said that, I am not sure what was the real intention here, in nvme_cancel_xxx(), 
+do we really need to wait only until in-flight requests are completed or synchronize with 
+request's completion callback (i.e. wait until all completed requests are freed)? 
+
+Thanks,
+--Nilay
