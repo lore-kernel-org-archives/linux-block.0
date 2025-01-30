@@ -1,42 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1041E9B28;
-	Thu, 30 Jan 2025 15:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F01F13FEE;
+	Thu, 30 Jan 2025 15:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738249790; cv=none; b=TUe2bjnDDkrGMaT0nt1k5R7dAA0DW3O1AkTBnvYQG5SM2XOpy+cS5f9BkT7XnVuQgu5fZ3anJxwPKnu9MZlCI8uE7WOupvhy42vZw1MI6k5oVGbN4cBqx/ErbGNxFRdf0CFKY0qsteQByKkbZCIibin+d09c5VJZPOqjv7gVRpk=
+	t=1738250740; cv=none; b=lXmKn/UcE5W/IbkHk9PtONIV/PGf4t1BXt77bGZRffP01vyjJ64azbb9LodGNkkqDS9oqZnM4Ml9Mnco/z1cuXyWU7aJqKKC6x+nAdM8zC8hxyW3G4o9G4Fs/3o55WsQZC2OZEvHLxg103R+2GW1ycNSYbW68vfczW+irMLNW1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738249790; c=relaxed/simple;
-	bh=BmvrqUeskOzmL87ygitO7gL+DDkfBFwSTEs/5Pv1ceI=;
+	s=arc-20240116; t=1738250740; c=relaxed/simple;
+	bh=5jPWKLNesjifMXdgjs+g2wuSE6mSbvzJyPlTCh9k4bs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O7BCAFU1uYjbohagFJTTpKYfUSwHGmYGFutgX8URkenuxStuWCy3tHou6G9znk0rqRqLs0kHbb5UeD4S1sz+KoUw4BUmNhzEIY0rH6KCke6gn/hnvvvxwpUhPyX8MnHrGAx+LhIYR22q/+8FhnYt2QZ6i9Qd/Og5XYVXgz4PC60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e8WP4n5i; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=fnEdHnmcstH+F4xqitff8xyWU3IiEl7RV8l7VrNBgmeRVMi15BhNb46xM+Pu+7JRYt2JvrzHPEogu4JXn0bP7VkTRG6/64cKjFNb8ScYGmrwYkwJhEztKV/1ncPwJ3tx/YL+oLSAhkC1zWbSb9ldTgqetfeD3B5CzCL8JeEF/mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=G/S331RP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BeuH8oCI; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=G/S331RP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BeuH8oCI; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e8WP4n5i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD762C4CED2;
-	Thu, 30 Jan 2025 15:09:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738249789;
-	bh=BmvrqUeskOzmL87ygitO7gL+DDkfBFwSTEs/5Pv1ceI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e8WP4n5iI+VUnz5D4D7bq7gCNn9cqx6ps9bG28REVuNCs2UlEC/zF54qeIgqCqgZ8
-	 Jz8M8KF0+fByiqPY5QLl41xxHnfyDvfOg1+TaxOPuiHoNxngq4Qho/0KsVk6MqOvBk
-	 xxCoXcIkYNK7mgPziaJN4xBFic7FXuPO/fsdwzZ+rJfd8SLE4OlPuPro3SlHEAz3SD
-	 +LbHANctn8I+QMBB+FkGhmUusrN0rcdkbHZT6iIswNiG0vMpypxuWxF6chsmGJ5HIk
-	 f6ra5W43FWBrc6oTku5YeUu5/PV1l6HQ+GWLcF1Eb/jV+RCPYePNwvyBd3X2BZgjYy
-	 TC2No3Kef5Wtg==
-Date: Thu, 30 Jan 2025 08:09:46 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	x86@kernel.org, linux-block@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v2 00/11] CRC64 library rework and x86 CRC optimization
-Message-ID: <Z5uWOnj8T7OO4LH8@kbusch-mbp>
-References: <20250130035130.180676-1-ebiggers@kernel.org>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="G/S331RP";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BeuH8oCI";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="G/S331RP";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BeuH8oCI"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 479892117F;
+	Thu, 30 Jan 2025 15:25:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1738250736; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QXqnGoRaI66tmMlBOUK4wmzdfIDwO2FaFNK6NEuhUPU=;
+	b=G/S331RPzqeN8RLclPgCZBvBthOz9gB0ZitX2Gu7+lqZBITnB+iVcui5MiN0z6054kMZBJ
+	Y0w3l7l4GvrqnG9F10YFNzG1AomoaKlytP4D/FkYjh/G8Xo7s07rmyaUPealClXSDO+Apy
+	mcblW5qFWlKL7U7Ik2gyZpv3NQK+3qg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1738250736;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QXqnGoRaI66tmMlBOUK4wmzdfIDwO2FaFNK6NEuhUPU=;
+	b=BeuH8oCIrs5fkeTJQo5zyGo2q6mVspG5ylgU7tjnLP6tQ9TxyUfBBvZkA1p2+pIaWKDzrW
+	Me9Q9u8TRgnZbbAg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="G/S331RP";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=BeuH8oCI
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1738250736; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QXqnGoRaI66tmMlBOUK4wmzdfIDwO2FaFNK6NEuhUPU=;
+	b=G/S331RPzqeN8RLclPgCZBvBthOz9gB0ZitX2Gu7+lqZBITnB+iVcui5MiN0z6054kMZBJ
+	Y0w3l7l4GvrqnG9F10YFNzG1AomoaKlytP4D/FkYjh/G8Xo7s07rmyaUPealClXSDO+Apy
+	mcblW5qFWlKL7U7Ik2gyZpv3NQK+3qg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1738250736;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QXqnGoRaI66tmMlBOUK4wmzdfIDwO2FaFNK6NEuhUPU=;
+	b=BeuH8oCIrs5fkeTJQo5zyGo2q6mVspG5ylgU7tjnLP6tQ9TxyUfBBvZkA1p2+pIaWKDzrW
+	Me9Q9u8TRgnZbbAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3477B1366F;
+	Thu, 30 Jan 2025 15:25:36 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id /PP1C/CZm2cXBQAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Thu, 30 Jan 2025 15:25:36 +0000
+Date: Thu, 30 Jan 2025 16:25:35 +0100
+From: Daniel Wagner <dwagner@suse.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Daniel Wagner <wagi@kernel.org>, Keith Busch <kbusch@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>, Ming Lei <ming.lei@redhat.com>, 
+	James Smart <james.smart@broadcom.com>, Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/3] nvme-tcp: rate limit error message in send path
+Message-ID: <216ab5ef-1c8b-4f3e-8a1a-f11e28994620@flourine.local>
+References: <20250128-nvme-misc-fixes-v1-0-40c586581171@kernel.org>
+ <20250128-nvme-misc-fixes-v1-1-40c586581171@kernel.org>
+ <20250129060534.GA29266@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,21 +90,53 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250130035130.180676-1-ebiggers@kernel.org>
+In-Reply-To: <20250129060534.GA29266@lst.de>
+X-Rspamd-Queue-Id: 479892117F
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	MISSING_XM_UA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.51
+X-Spam-Flag: NO
 
-On Wed, Jan 29, 2025 at 07:51:19PM -0800, Eric Biggers wrote:
-> Patch 11 wires up the same optimization to crc64_be() and crc64_nvme()
-> (a.k.a. the old "crc64_rocksoft") which previously were unoptimized,
+On Wed, Jan 29, 2025 at 07:05:34AM +0100, Christoph Hellwig wrote:
+> On Tue, Jan 28, 2025 at 05:34:46PM +0100, Daniel Wagner wrote:
+> > If a lot of request are in the queue, this message is spamming the logs,
+> > thus rate limit it.
+> 
+> Are in the queue when what happens?  Not that I'm against this,
+> but if we have a known condition where this error is printed a lot
+> we should probably skip it entirely for that?
 
-Yes, I mistakenly thought the name of the table in the spec was the
-name of the CRC, but that was just referring to format of how the
-parameters were displayed. It really should have been crc64_nvme, so
-thank you for clearing up the naming confusion.
+The condition is that all the elements in the queue->send_list could fail as a
+batch. I had a bug in my patches which re-queued all the failed command
+immediately and semd them out again, thus spamming the log.
 
-> improving the performance of those CRC functions by as much as 100x.
-
-Awesome!
-
-Looks good:
-
-Acked-by: Keith Busch <kbusch@kernel.org>
+This behavior doesn't exist in upstream. I just thought it might make
+sense to rate limit as precaution. I don't know if it is worth the code
+churn.
