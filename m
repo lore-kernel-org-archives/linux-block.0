@@ -1,48 +1,42 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1308F1BD9D3
-	for <linux-block@vger.kernel.org>; Thu, 30 Jan 2025 14:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1041E9B28;
+	Thu, 30 Jan 2025 15:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738247354; cv=none; b=ghxk8r+xgvSGGF+SP1pKVeN641+TCvwyh7WIGH/AGL/CoPOYqUH1+amFV2WaBbsxPnlF90nDRO1gz1e3zyHuHHpFTpB/XJA9IWkPyxFX4Z+xI+n4lgjDuPbEnO5Ot+WD8/vihlf4PXalUHpejboPACQ01mWE1VWxiEciMLNMbXI=
+	t=1738249790; cv=none; b=TUe2bjnDDkrGMaT0nt1k5R7dAA0DW3O1AkTBnvYQG5SM2XOpy+cS5f9BkT7XnVuQgu5fZ3anJxwPKnu9MZlCI8uE7WOupvhy42vZw1MI6k5oVGbN4cBqx/ErbGNxFRdf0CFKY0qsteQByKkbZCIibin+d09c5VJZPOqjv7gVRpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738247354; c=relaxed/simple;
-	bh=TB8rkidUprAZce/0uRE2RtxtIg2DEg5hLYqfvl4yowk=;
+	s=arc-20240116; t=1738249790; c=relaxed/simple;
+	bh=BmvrqUeskOzmL87ygitO7gL+DDkfBFwSTEs/5Pv1ceI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fKGvR8DRdB53Jk45y8xDXVmzSnKU7UHd+FLyg6rECvluEEjZWf4W5vQmwqS1ON363dSgGRrf57FJ0LuFhr0ycxoS9GbuP1L1R2w/nHt6uaXk0as6tMKKG+mEinEZR4ubthIUREG7JcU9L0EYncA+hdv7+cPyczLO0UotBjJtOdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=L59Kx8DF; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+	 Content-Type:Content-Disposition:In-Reply-To; b=O7BCAFU1uYjbohagFJTTpKYfUSwHGmYGFutgX8URkenuxStuWCy3tHou6G9znk0rqRqLs0kHbb5UeD4S1sz+KoUw4BUmNhzEIY0rH6KCke6gn/hnvvvxwpUhPyX8MnHrGAx+LhIYR22q/+8FhnYt2QZ6i9Qd/Og5XYVXgz4PC60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e8WP4n5i; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="L59Kx8DF"
-Received: from macsyma.thunk.org ([12.221.73.181])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 50UESvQI005998
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 Jan 2025 09:28:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1738247341; bh=qsthqpO7eT/PN4h6zfRCZRC0k8LPYXxQFOt5Xt6pPl8=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=L59Kx8DF9Ed5Y2eTvdXfoE/6o8wmClyKDv+ynISKDMYdJvTiGCf5SwK9vP8TtFcjR
-	 WOA+q+/DMs6ngERetvncxFYIvZtCmnkzEz+v+GI7l4LGPN0A8F9G//O3IUx/T68N9a
-	 tnTlWQmplKXqq+Spsb0PGzkJIshxphZkfmF1wj+iLHTtgvH2BBGcTqx0Q4e45tLtEd
-	 oICFQ+Apmxkny8WRh7ZKQbYDygSz8m2LMTabL3utUTeWHDChwCutrvflMkBt6jeO/6
-	 F+o4GDxFWHf2fXs+oLbhZ5G9OHnOio1+RQ9aYy84/0mQwOi1EKDp9sMPyym2of0jPk
-	 Rs9z+Az+1jz3Q==
-Received: by macsyma.thunk.org (Postfix, from userid 15806)
-	id 0C9853404C7; Thu, 30 Jan 2025 06:28:57 -0800 (PST)
-Date: Thu, 30 Jan 2025 06:28:57 -0800
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: lsf-pc@lists.linux-foundation.org, linux-btrfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, josef@toxicpanda.com
-Subject: Re: [LSF/MM/BPF TOPIC] File system checksum offload
-Message-ID: <20250130142857.GB401886@mit.edu>
-References: <CGME20250130092400epcas5p1a3a9d899583e9502ed45fe500ae8a824@epcas5p1.samsung.com>
- <20250130091545.66573-1-joshi.k@samsung.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e8WP4n5i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD762C4CED2;
+	Thu, 30 Jan 2025 15:09:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738249789;
+	bh=BmvrqUeskOzmL87ygitO7gL+DDkfBFwSTEs/5Pv1ceI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e8WP4n5iI+VUnz5D4D7bq7gCNn9cqx6ps9bG28REVuNCs2UlEC/zF54qeIgqCqgZ8
+	 Jz8M8KF0+fByiqPY5QLl41xxHnfyDvfOg1+TaxOPuiHoNxngq4Qho/0KsVk6MqOvBk
+	 xxCoXcIkYNK7mgPziaJN4xBFic7FXuPO/fsdwzZ+rJfd8SLE4OlPuPro3SlHEAz3SD
+	 +LbHANctn8I+QMBB+FkGhmUusrN0rcdkbHZT6iIswNiG0vMpypxuWxF6chsmGJ5HIk
+	 f6ra5W43FWBrc6oTku5YeUu5/PV1l6HQ+GWLcF1Eb/jV+RCPYePNwvyBd3X2BZgjYy
+	 TC2No3Kef5Wtg==
+Date: Thu, 30 Jan 2025 08:09:46 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	x86@kernel.org, linux-block@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v2 00/11] CRC64 library rework and x86 CRC optimization
+Message-ID: <Z5uWOnj8T7OO4LH8@kbusch-mbp>
+References: <20250130035130.180676-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,43 +45,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250130091545.66573-1-joshi.k@samsung.com>
+In-Reply-To: <20250130035130.180676-1-ebiggers@kernel.org>
 
-On Thu, Jan 30, 2025 at 02:45:45PM +0530, Kanchan Joshi wrote:
-> I would like to propose a discussion on employing checksum offload in
-> filesystems.
-> It would be good to co-locate this with the storage track, as the
-> finer details lie in the block layer and NVMe driver.
+On Wed, Jan 29, 2025 at 07:51:19PM -0800, Eric Biggers wrote:
+> Patch 11 wires up the same optimization to crc64_be() and crc64_nvme()
+> (a.k.a. the old "crc64_rocksoft") which previously were unoptimized,
 
-I wouldn't call this "file system offload".  Enabling the data
-integrity feature or whatever you want to call it is really a block
-layer issue.  The file system doesn't need to get involved at all.
-Indeed, looking the patch, the only reason why the file system is
-getting involved is because (a) you've added a mount option, and (b)
-the mount option flips a bit in the bio that gets sent to the block
-layer.
+Yes, I mistakenly thought the name of the table in the spec was the
+name of the CRC, but that was just referring to format of how the
+parameters were displayed. It really should have been crc64_nvme, so
+thank you for clearing up the naming confusion.
 
-But this could also be done by adding a queue specific flag, at which
-point the file system doesn't need to be involved at all.  Why would
-you want to enable the data ingregity feature on a per block I/O
-basis, if the device supports it?
+> improving the performance of those CRC functions by as much as 100x.
 
-We can debate whether it should be defaulted to on if the device
-supports it, or whether the needs to be explicitly enabled.  It's true
-that relative to not doing checksumming at all, it it's not "free".
-The CPU has to calculate the checksum, so there are power, CPU, and
-memory bandwidth costs.  I'd still tend to lean towards defaulting it
-to on, so that the user doesn't need do anything special if they have
-hardware is capable of supporting the data integrity feature.
+Awesome!
 
-It would be enlightening to measure the performance and power using
-some file system benchmark with and without the block layer data
-integrity enabled, with no other changes in the file system.  If
-there's no difference, then enabling it queue-wide, for any file
-system, would be a no-brainer.  If we discover that there is a
-downside to enabling it, then we might decide how we want to enable
-it.
+Looks good:
 
-Cheers,
-
-					- Ted
+Acked-by: Keith Busch <kbusch@kernel.org>
