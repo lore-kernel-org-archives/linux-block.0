@@ -1,30 +1,48 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495FC1DDC22
-	for <linux-block@vger.kernel.org>; Thu, 30 Jan 2025 13:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1308F1BD9D3
+	for <linux-block@vger.kernel.org>; Thu, 30 Jan 2025 14:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738242139; cv=none; b=bzp9yKZOXVM/hXfTC+4q+ZlQVlA+zeDHED+jkgbaFj8iMtkzvHmv3ZlJqm2u+iGuoGdWlI3Qh01jc2eaw/dBbvepBNKi5MzIi8TD3n7kXqZFYcTOkeIJrX+CCKI6Ha46K3lLWocARkr19TNmf1C6F5gi78Z74bb4chLOlw05EKo=
+	t=1738247354; cv=none; b=ghxk8r+xgvSGGF+SP1pKVeN641+TCvwyh7WIGH/AGL/CoPOYqUH1+amFV2WaBbsxPnlF90nDRO1gz1e3zyHuHHpFTpB/XJA9IWkPyxFX4Z+xI+n4lgjDuPbEnO5Ot+WD8/vihlf4PXalUHpejboPACQ01mWE1VWxiEciMLNMbXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738242139; c=relaxed/simple;
-	bh=8WMQMpHRmsknwX0cP9ZJMZI7KOol8fNFxr8IYbSRZN8=;
+	s=arc-20240116; t=1738247354; c=relaxed/simple;
+	bh=TB8rkidUprAZce/0uRE2RtxtIg2DEg5hLYqfvl4yowk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uqCI5dgJVwv77oYRS5KLN5ftVGrkHrV+R+kSyE1+wB07M9YDvZfZt1CVDxxHfGfNUBCr/Kt63FMfO/yCHfxulkeM6Gy+GQNxo9X/pxUTwVV22Nzbpjp2exVFGDOaKHqtz2gsrmG3snzWfdA/unw+DcqVxAyIdumBA2dxyNYIdeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8ED5668C4E; Thu, 30 Jan 2025 14:02:12 +0100 (CET)
-Date: Thu, 30 Jan 2025 14:02:12 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>, Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: in-kernel verification of user PI?
-Message-ID: <20250130130212.GA19522@lst.de>
-References: <20250129124648.GA24891@lst.de> <yq15xlxsqkg.fsf@ca-mkp.ca.oracle.com> <20250129152612.GA5356@lst.de> <yq1tt9hr62s.fsf@ca-mkp.ca.oracle.com> <20250129154315.GB7369@lst.de> <yq1jzadr5a6.fsf@ca-mkp.ca.oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fKGvR8DRdB53Jk45y8xDXVmzSnKU7UHd+FLyg6rECvluEEjZWf4W5vQmwqS1ON363dSgGRrf57FJ0LuFhr0ycxoS9GbuP1L1R2w/nHt6uaXk0as6tMKKG+mEinEZR4ubthIUREG7JcU9L0EYncA+hdv7+cPyczLO0UotBjJtOdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=L59Kx8DF; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="L59Kx8DF"
+Received: from macsyma.thunk.org ([12.221.73.181])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 50UESvQI005998
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 Jan 2025 09:28:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1738247341; bh=qsthqpO7eT/PN4h6zfRCZRC0k8LPYXxQFOt5Xt6pPl8=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=L59Kx8DF9Ed5Y2eTvdXfoE/6o8wmClyKDv+ynISKDMYdJvTiGCf5SwK9vP8TtFcjR
+	 WOA+q+/DMs6ngERetvncxFYIvZtCmnkzEz+v+GI7l4LGPN0A8F9G//O3IUx/T68N9a
+	 tnTlWQmplKXqq+Spsb0PGzkJIshxphZkfmF1wj+iLHTtgvH2BBGcTqx0Q4e45tLtEd
+	 oICFQ+Apmxkny8WRh7ZKQbYDygSz8m2LMTabL3utUTeWHDChwCutrvflMkBt6jeO/6
+	 F+o4GDxFWHf2fXs+oLbhZ5G9OHnOio1+RQ9aYy84/0mQwOi1EKDp9sMPyym2of0jPk
+	 Rs9z+Az+1jz3Q==
+Received: by macsyma.thunk.org (Postfix, from userid 15806)
+	id 0C9853404C7; Thu, 30 Jan 2025 06:28:57 -0800 (PST)
+Date: Thu, 30 Jan 2025 06:28:57 -0800
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Kanchan Joshi <joshi.k@samsung.com>
+Cc: lsf-pc@lists.linux-foundation.org, linux-btrfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, josef@toxicpanda.com
+Subject: Re: [LSF/MM/BPF TOPIC] File system checksum offload
+Message-ID: <20250130142857.GB401886@mit.edu>
+References: <CGME20250130092400epcas5p1a3a9d899583e9502ed45fe500ae8a824@epcas5p1.samsung.com>
+ <20250130091545.66573-1-joshi.k@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,43 +51,43 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq1jzadr5a6.fsf@ca-mkp.ca.oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250130091545.66573-1-joshi.k@samsung.com>
 
-On Wed, Jan 29, 2025 at 11:15:35AM -0500, Martin K. Petersen wrote:
-> 
-> Christoph,
-> 
-> >> It fell by the wayside for various reasons. I would love to revive it,
-> >> all it did was skip the remapping step if a flag was set in the profile.
-> >
-> > How much remapping could the hardware do?  Would this also work for
-> > remapping a inode-relative ref tag?  Do we need to bring it into NVMe?
-> 
-> One of the reasons it lost momentum was that NVMe didn't do it for
-> ILBRT/EILBRT. Although of course NVMe doesn't really have an
-> intermediate HBA entity like SCSI.
+On Thu, Jan 30, 2025 at 02:45:45PM +0530, Kanchan Joshi wrote:
+> I would like to propose a discussion on employing checksum offload in
+> filesystems.
+> It would be good to co-locate this with the storage track, as the
+> finer details lie in the block layer and NVMe driver.
 
-Or any kind of coherent architecture for PI..
+I wouldn't call this "file system offload".  Enabling the data
+integrity feature or whatever you want to call it is really a block
+layer issue.  The file system doesn't need to get involved at all.
+Indeed, looking the patch, the only reason why the file system is
+getting involved is because (a) you've added a mount option, and (b)
+the mount option flips a bit in the bio that gets sent to the block
+layer.
 
-> With DIX1.1, you tell the HBA what to expect the first received ref tag
-> to be. That could be the application's file offset or whatever you want.
-> It's just the seed value chosen by the application when the PI was
-> generated. That's passed down the stack along with the PI buffer itself.
+But this could also be done by adding a queue specific flag, at which
+point the file system doesn't need to be involved at all.  Why would
+you want to enable the data ingregity feature on a per block I/O
+basis, if the device supports it?
 
-Yeah.  NVMe actually kinda supports this, but for zone append only as we
-need that for PI with zone append.   But it is limited to remapping from
-a starting reftag that is the zone start address, so it's not quite as
-flexibble.  Search for the PIREMAP bit in the ZNS spec.
+We can debate whether it should be defaulted to on if the device
+supports it, or whether the needs to be explicitly enabled.  It's true
+that relative to not doing checksumming at all, it it's not "free".
+The CPU has to calculate the checksum, so there are power, CPU, and
+memory bandwidth costs.  I'd still tend to lean towards defaulting it
+to on, so that the user doesn't need do anything special if they have
+hardware is capable of supporting the data integrity feature.
 
-> Not sure if we'd have room for both an EILBRT and an ILBRT in the same
-> command? Sounds like it would be difficult, especially with the larger
-> ref tags in NVMe. But I'm happy to pursue in NVMe if there is interest.
-> Because it did make a performance difference not having to touch the PI
-> buffer in the I/O path.
+It would be enlightening to measure the performance and power using
+some file system benchmark with and without the block layer data
+integrity enabled, with no other changes in the file system.  If
+there's no difference, then enabling it queue-wide, for any file
+system, would be a no-brainer.  If we discover that there is a
+downside to enabling it, then we might decide how we want to enable
+it.
 
-I guess you'd do it by treating type1 PI as actual type1 PI, that is
-the ILBRT is derived from the LBA.  But I'd need to think more about
-it, and without a clear customer use case it's probably not going to
-happen in NVMe.
+Cheers,
 
+					- Ted
