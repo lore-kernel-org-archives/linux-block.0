@@ -1,113 +1,122 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D983E819
-	for <linux-block@vger.kernel.org>; Thu, 30 Jan 2025 08:07:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323F01474DA
+	for <linux-block@vger.kernel.org>; Thu, 30 Jan 2025 08:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738224446; cv=none; b=bnW4z3QF19BvtVtwaAJacuH8Mji7b2TGukvNb/cOTmvXXhaedcbK1b3q7txA222MaiLq+3j5hQrB1dOb9XXCuVJzcWgUg6qw0cbgbzddOolaaHvylqGTXv2m1WXJ7j4V0m+fp8lqWE4F9Ge3E2V6IRwqnrEoYr38+mij57kUlKY=
+	t=1738225633; cv=none; b=GlzhrWL4UBFWCjh4BASHhkHCauloQLTomEYmywZ8Eu21VI51EyGxdIpPDoJgYiOKkwDfT0PcyXtWIVaNhqYjIzn0S5n1xjxXzJpmsSdcB0dw90vWid09dmOqPhLotUpILhkfuE6Ve3w/0JrepX7NcmeYmEL6Yr/NSpahf242JIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738224446; c=relaxed/simple;
-	bh=vxfvtIHoiH7P5nvTjP7xIHE6c9GhvRSqK3sGxM2SH/Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RjS/UxOhFqYwkKI41KYh89mD84gwf3QAYTc2ZDc6HeMPyV57VTrg9dqhevmf67nt40OoCHnZuUEc05XXIPuVPAzK9utByXzigrnBs62b54/zWu48Q0dWNWFN6bmYB68u9/5suRZ+CW+lmKCZRXqqgqSyy2Gs9V6iVbS12g3G2Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Lp/B6SzL; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1738225633; c=relaxed/simple;
+	bh=o5uUF57OHCbQZuAJjf/hGqkqrUhfw55bKkKQn3k967Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dXyunfv4UCphxceexAc7QJ+ifspt9633O91LM9T8oUah8LV4Tbx4qoenXC4MgnobTnFGmLDKfa76U/HAYFSR4FeLX+Br6/sLUuy4yybtQHFFidC2Wm6FNcrJo7/Co9hI02juLwaNy2FLHf0obIPJBes4w/K5fKjLyxdu8INmlQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=YRkjI+C2; arc=none smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Lp/B6SzL"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2eeb4d643a5so782106a91.3
-        for <linux-block@vger.kernel.org>; Thu, 30 Jan 2025 00:07:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1738224444; x=1738829244; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XsEYcP1NGDh7kuRB+cYt1IsW+UDamKaWDnpnO8cQSo4=;
-        b=Lp/B6SzLcTyPJQwvHGM86H5hvD308e9m2WEQzSCWwoLhyTfP4V7QpSUz1QvHKunkEA
-         qGMDqTD2HrecFu7CHmrRkavXGT/xER3H5rEuAAaSlnDVZVZriGKQoq2PMLRRL3yAqcdh
-         llFqtI2p+6Mel5JAvVutqbu0YPta9GZYqFeJY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738224444; x=1738829244;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XsEYcP1NGDh7kuRB+cYt1IsW+UDamKaWDnpnO8cQSo4=;
-        b=uiJEGZYMUzcilFUyr0Rjs6611o++CfzrpnPh4X3Wp/mg5f+W56snCUOEMZaHmNrxqv
-         fbzjOufiI+x35zdy7jINYq6yDhbC/NtGKTomTGf3rxNCKivAty/NJVM7ZXmU6Xc+Ens0
-         vrSknABfMSF6JuV+V+D5G1yNMk81zgjtbuMT9qNU3AnGEXteMFEJCrzzFgYyg9qS4yX7
-         F14x0HKrlGkEcl/VAv3kk3Nn3LTzqgvACtTkDA1TcFOjr2bm++t6Ba5CqbHbB58v8yi5
-         EZHDEXThLvo0Md5hTJdl9e7xt04az5eObq/V3ARYeJXiRMruRyHwTFOwpPf1lf+JDZmD
-         QEow==
-X-Forwarded-Encrypted: i=1; AJvYcCUpqiE/LD1eH9tciqbn9Qfu5feePcJUZG8uYCrW4bRaaSxJUz1+MGBpABcH6z3ZcLj3sVoEFtvGBQhhzw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxb+381cicDy2vNJlXGVrR65jJlsXMsSJT0O9loDlt+T+i1KPgR
-	pL6/sa9q9C0j3iEVnRnG/JxruYynyMHD9r39rBbTPee1fIjIeA7itzatOsijTg==
-X-Gm-Gg: ASbGncuQXr51aUoVDs1BFQD2d/l63E3rcxW0CAQGltN68ZMjXxBjBGI9AWUP+7Y9rms
-	WUKdzEQsNtbI8jv34p2FPxet/+8KX0FCeYzm5KOvLFdElkfc9P5LN3hRdVmY2sEN/tAjlJbTgmR
-	vrc1Arku1wYZcrWzBG3ns/Yv4EHGzPFge03Xb8v+bldsmUeuc7mdDjrN68J6c9c0z7FFVlsSQTq
-	T/MgjXKbUEpFfVpzKHSMjkY4DVsLYGqFcfhi2tKFiYOAF8IpoJL/HJmQA9u+PM23TAjdNdTNyG3
-	y64b0JXn+QXAH3fUuQ==
-X-Google-Smtp-Source: AGHT+IHH5iWlIjO4Eq7Q+EqfVEm7K/OwOAqDScxv/BnOtotmv9zSEti5npxfhQOovsFQCQdLUWPMhA==
-X-Received: by 2002:a17:90b:2e8b:b0:2ee:9e06:7db0 with SMTP id 98e67ed59e1d1-2f83abd933cmr9991694a91.11.1738224444091;
-        Thu, 30 Jan 2025 00:07:24 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:d4ce:e744:f46b:4fb])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f84897a290sm1019361a91.1.2025.01.30.00.07.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jan 2025 00:07:23 -0800 (PST)
-Date: Thu, 30 Jan 2025 17:07:19 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	linux-block@vger.kernel.org
-Subject: Re: [bug report] zram: unlock slot during recompression
-Message-ID: <kjfjox2rxvsxsbaqobypihcu53cjfoakebdojj7mx66g2agqqr@yuo24tu3gj6f>
-References: <7694cba5-d9ea-4f73-9962-ea67637d1f2c@stanley.mountain>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YRkjI+C2"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1738225632; x=1769761632;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=o5uUF57OHCbQZuAJjf/hGqkqrUhfw55bKkKQn3k967Q=;
+  b=YRkjI+C2fQULNkm7QmvLKirsPHFb4If+UL/vO+FlCod4QPGYxNYKEcd0
+   qXkUKGMnLqH6LfpS02LVytK4ZfUAF2JkDPdfkALSuBuwBGylQIM4ZuG8d
+   mARg8sNYTah1o3lVFRdaBrQDlT+BMeHiaU5fRNm22I5RO7Zo/YiqxLoOc
+   fsltd1jQyvi6PWMW8z4dyG062jEN5xtL5H3KTCXFlnmq7DcOtKMaCX2Ko
+   mEUnLSXgRD6sESp4AQ8e506IxKPDevEf0ZVK5cjTZfRjyQFsKLzRRb5iC
+   +NvBEdgZL39ydGY+i0sBNDHoMXxMSRp+2Oq4OZRbLRJa/J2HdK+bCQzKg
+   Q==;
+X-CSE-ConnectionGUID: HDDZM4FLSVmpiyIepWOYyw==
+X-CSE-MsgGUID: UJrJH52yT4CjPTemwAWxgg==
+X-IronPort-AV: E=Sophos;i="6.13,244,1732550400"; 
+   d="scan'208";a="38377842"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Jan 2025 16:27:05 +0800
+IronPort-SDR: 679b2a37_ggqZv4PB5q4k8JbXNbwxN//6oaeALpC4i4iM/gRY1E+Useq
+ R9TIoRK+7gNgYUpid1C4YN2IbYYqL36uH/vRIrw==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Jan 2025 23:28:56 -0800
+WDCIronportException: Internal
+Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
+  by uls-op-cesaip02.wdc.com with ESMTP; 30 Jan 2025 00:27:05 -0800
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH v6 0/5] null_blk: improve write failure simulation
+Date: Thu, 30 Jan 2025 17:26:58 +0900
+Message-ID: <20250130082703.1330857-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7694cba5-d9ea-4f73-9962-ea67637d1f2c@stanley.mountain>
+Content-Transfer-Encoding: 8bit
 
-On (25/01/30 09:08), Dan Carpenter wrote:
-> Commit 7ec2cb65ef0d ("zram: unlock slot during recompression") from
-> Jan 27, 2025 (linux-next), leads to the following Smatch static
-> checker warning:
-> 
-> 	drivers/block/zram/zram_drv.c:1960 recompress_slot()
-> 	warn: passing freed memory 'zstrm' (line 1943)
-> 
+Currently, null_blk has 'badblocks' parameter to simulate IO failures
+for broken blocks. This helps checking if userland tools can handle IO
+failures. However, this badblocks feature has two differences from the
+IO failures on real storage devices. Firstly, when write operations fail
+for the badblocks, null_blk does not write any data, while real storage
+devices sometimes do partial data write. Secondly, null_blk always make
+write operations fail for the specified badblocks, while real storage
+devices can recover the bad blocks so that next write operations can
+succeed after failure. Hence, real storage devices are required to check
+if userland tools support such partial writes or bad blocks recovery.
 
-Hi Dan,
-Thank you for the report.
+This series improves write failure simulation by null_blk to allow
+checking userland tools without real storage devices. The first patch
+is a preparation to make new feature addition simpler. The second patch
+introduces the 'badblocks_once' parameter to simulate bad blocks
+recovery. The third and the fourth patches prepare for the fifth patch.
+The fifth patch adds the partial IO support and introduces the
+'badblocks_partial_io' parameter.
 
-[..]
->     1923         for (; prio < prio_max; prio++) {
->     1924                 if (!zram->comps[prio])
->     1925                         continue;
->     1926 
->     1927                 num_recomps++;
->     1928                 zstrm = zcomp_stream_get(zram->comps[prio]);
->     1929                 src = kmap_local_page(page);
->     1930                 ret = zcomp_compress(zram->comps[prio], zstrm,
->     1931                                      src, &comp_len_new);
->     1932                 kunmap_local(src);
->     1933 
->     1934                 if (ret)
->     1935                         break;
->     1936 
->     1937                 class_index_new = zs_lookup_class_index(zram->mem_pool,
->     1938                                                         comp_len_new);
->     1939 
->     1940                 /* Continue until we make progress */
->     1941                 if (class_index_new >= class_index_old ||
->     1942                     (threshold && comp_len_new >= threshold)) {
->     1943                         zcomp_stream_put(zram->comps[prio], zstrm);
-> 
-> Imagine we hit this continue path.  The right thing is probably to set
-> zstrm = NULL before the continue or it might be to set ret = -EINVAL.
+Changes from v5:
+* 3rd patch: Improved the commit message per comment on the list
+* Added Reviewed-by tags
 
-We still need to make sure that ZRAM_INCOMPRESSIBLE is set appropriately,
-so zstrm = NULL won't do the trick.  Let me take a look.
+Changes from v4:
+* 3rd patch: Moved null_handle_badblocks() call and rewrote commit message
+* Added Reviewed-by tags
+
+Changes from v3:
+* 4th patch: Renamed null_handle_rq() to null_handle_data_transfer()
+* 5th patch: Improved comments of null_handle_badblocks()
+* Added Reviewed-by tags
+
+Changes from v2:
+* 1st patch: Reflected comments on the list
+* 2nd patch: Moved the 4th patch in v2 series to 2nd
+             Reduced if-block nest level
+* 3rd patch: Added to fix zone resource management bug
+* 4th patch: Added to prepare for the next patch
+* 5th patch: Rewritten to care zone resource management
+             Introduced badblocks_patial_io parameter
+
+Changes from v1:
+* Added the first patch which avoids the long, multi-line features string
+
+Shin'ichiro Kawasaki (5):
+  null_blk: generate null_blk configfs features string
+  null_blk: introduce badblocks_once parameter
+  null_blk: replace null_process_cmd() call in null_zone_write()
+  null_blk: pass transfer size to null_handle_rq()
+  null_blk: do partial IO for bad blocks
+
+ drivers/block/null_blk/main.c     | 164 +++++++++++++++++++-----------
+ drivers/block/null_blk/null_blk.h |   6 ++
+ drivers/block/null_blk/zoned.c    |  20 +++-
+ 3 files changed, 129 insertions(+), 61 deletions(-)
+
+-- 
+2.47.0
+
