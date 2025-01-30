@@ -1,243 +1,144 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FAF1B0415
-	for <linux-block@vger.kernel.org>; Thu, 30 Jan 2025 08:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C788718F2DD
+	for <linux-block@vger.kernel.org>; Thu, 30 Jan 2025 09:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738225637; cv=none; b=QAD3eUc4cMfgT8VnLTkQLEMh71H+pd7BclA+CX2+cqBTje/hac44lC1TjOjicVU01RI+cdDt4L2sCp+e134BLkbBLdKHD4jd1uWLpNjkU7Cov/Fv7kx28s0kqbzUk2zjYp1yeN4BQG+iUYPKQvNjzTQgh0um2vxvglP12ff8B7U=
+	t=1738228953; cv=none; b=agFVYJ48i8MZuq062NP/552NtGCAmuKL14eJ/2mqtvjl1ORulTXBOAQF545/7UqQPz61QLyAIXGvPWiYVF+Qjf1GDJSq27aRSfYUMFiAzdsJLxEgrrXB8mhd41sLvDiwxc3aD88skkWND9xOSQTFIDtA7vXPNUkspKEcnz3zmRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738225637; c=relaxed/simple;
-	bh=13WItm/cmZtHL87Hk457nTb6ISavmMO8sjEE8fA7cgU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ANFMDIw7Wk4600b7PYpq3yAQxK1KzStfxqLi2PyuT0RTVd3KfDI1WsFsigClMP9Tn9FIhGPQkWsc82mzY0xDo2q3KYQ19IIsa+2FX7u4nVfF7z6j7bgvLdH0DEEflYL+iTFb0vqAgyKUF2xe30BGL2iNPlZAj6UE6B0Q0iW+hOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=p6Vwdk0p; arc=none smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1738228953; c=relaxed/simple;
+	bh=DOCdZIHH/1FRG8QI3qLuBCgOBISF39Jb/YszNlNSb2M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=nv7NN/r9H839f+Iqsif2v6zFCZH5RSGNYoEXYxd3xKZCv/nE4Qelqvz5iLTHHNH0gquP5f5OJHYstOwyXuk4/unr3TMjMbQqfxr1eDeFfKVV++eJ2el/KABid01acd4UhmClnInRW9q16283SKz6HvEi0d6z1Vwt3vqcoIUr/n0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=UR/iiUHQ; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="p6Vwdk0p"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1738225635; x=1769761635;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=13WItm/cmZtHL87Hk457nTb6ISavmMO8sjEE8fA7cgU=;
-  b=p6Vwdk0pCYhbSpBHm2TwGIdVg3j1RzXj7Ge/ZYJ3oJUc5ch2Kby8nB5a
-   riNCJRq6g2Vom2jjoqOR6UNboMHMpw0nMkoOKaJAK5/kdttm52bIeVMho
-   +PfDaNo8fMmFGtPrLwTjyMfATK89xr/94Bk/2RSWNeUey81sS80RlMfvE
-   MV588+5x+xa8+LYNfmoRPfL9dtshMwW1uUaYjpp7reujqG9XF9Vy5w9hl
-   R/9OQpQ5cRvTaTieMdHcWt1zGqQR/X0nvli1Kw0XPDHMElNahA3LHFIGC
-   pacTp80ZgINNC/d+sSCEfm0K9P3sb3jNOpa2gLxmkBBmAYbu0VPr1c/g3
-   A==;
-X-CSE-ConnectionGUID: +S/ytE9yQ0a0Y37bwNCOfw==
-X-CSE-MsgGUID: +V5s6u2nQ3yxj9QaDeHInA==
-X-IronPort-AV: E=Sophos;i="6.13,244,1732550400"; 
-   d="scan'208";a="38377850"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Jan 2025 16:27:11 +0800
-IronPort-SDR: 679b2a3e_E9oWve04MN2u3wD/rwFI2cp9DCc75lPCKG1kz6vyxoLWw9Z
- I0icI4sZrpPnYy8vt6h/7W1JEJmVyeKc93zf7JA==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Jan 2025 23:29:03 -0800
-WDCIronportException: Internal
-Received: from unknown (HELO shindev.ssa.fujisawa.hgst.com) ([10.149.66.30])
-  by uls-op-cesaip02.wdc.com with ESMTP; 30 Jan 2025 00:27:11 -0800
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH v6 5/5] null_blk: do partial IO for bad blocks
-Date: Thu, 30 Jan 2025 17:27:03 +0900
-Message-ID: <20250130082703.1330857-6-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20250130082703.1330857-1-shinichiro.kawasaki@wdc.com>
-References: <20250130082703.1330857-1-shinichiro.kawasaki@wdc.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="UR/iiUHQ"
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250130092228epoutp02557a1565e7126ca84f2d8a047a4f8d7d~fbgT3gVf60431304313epoutp02P
+	for <linux-block@vger.kernel.org>; Thu, 30 Jan 2025 09:22:28 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250130092228epoutp02557a1565e7126ca84f2d8a047a4f8d7d~fbgT3gVf60431304313epoutp02P
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1738228948;
+	bh=Wx7aZCGHZqI05fpqUcDZen/kuLIz9kgd4IntaYov6A8=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=UR/iiUHQio+Ruwh19yWhLObeDCjsm65POfDFiWszE0VI0d0+wDPLB/CZ2sbPAd+uP
+	 9xnh+MWIcZMxNluHZ5nzu5+r6Ys8uQcmfVq5vd0WAygW+eTPboLlebGkLTPJZ7QhOn
+	 gsWedmxM9fbFO0K+1tV3JW8XxsgklOu1AatUucXo=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20250130092228epcas5p237fe7db3196715a946b65bda1c7b9a5f~fbgTMX06D2560325603epcas5p2I;
+	Thu, 30 Jan 2025 09:22:28 +0000 (GMT)
+Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.179]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4YkD7k5915z4x9Px; Thu, 30 Jan
+	2025 09:22:26 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	D2.EB.29212.2D44B976; Thu, 30 Jan 2025 18:22:26 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20250130092226epcas5p4c8830a18efedb85436a2167c5146058c~fbgRcCQ5P3189131891epcas5p4U;
+	Thu, 30 Jan 2025 09:22:26 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250130092226epsmtrp1fc9bfa099aecd7f940cedb88d2feb898~fbgRbMQ-q2846128461epsmtrp1r;
+	Thu, 30 Jan 2025 09:22:26 +0000 (GMT)
+X-AuditID: b6c32a50-7ebff7000000721c-6c-679b44d2dd6f
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	9E.DC.18949.2D44B976; Thu, 30 Jan 2025 18:22:26 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20250130092224epsmtip1d983c41a07ed41df2dd58005c2805c44~fbgP7FMmy1288612886epsmtip15;
+	Thu, 30 Jan 2025 09:22:24 +0000 (GMT)
+Message-ID: <b5fe3e15-cd7f-41ce-9ac8-70dca0fee37a@samsung.com>
+Date: Thu, 30 Jan 2025 14:52:23 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 0/3] Btrfs checksum offload
+To: Christoph Hellwig <hch@lst.de>
+Cc: josef@toxicpanda.com, dsterba@suse.com, clm@fb.com, axboe@kernel.dk,
+	kbusch@kernel.org, linux-btrfs@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20250129153524.GB5356@lst.de>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrJJsWRmVeSWpSXmKPExsWy7bCmhu4ll9npBg1fVSxW3+1ns5jUP4Pd
+	4sKPRiaLmwd2MlmsXH2UyeLPQ0OLSYeuMVrsvaVtcenxCnaL+cuesjtweUxsfsfucflsqcem
+	VZ1sHpuX1HvsvtnA5tG3ZRWjx/otV1k8JmzeyOrxeZNcAGdUtk1GamJKapFCal5yfkpmXrqt
+	kndwvHO8qZmBoa6hpYW5kkJeYm6qrZKLT4CuW2YO0JVKCmWJOaVAoYDE4mIlfTubovzSklSF
+	jPziElul1IKUnAKTAr3ixNzi0rx0vbzUEitDAwMjU6DChOyMTf1bWQtuclb8nWLUwPiUvYuR
+	k0NCwESi7ch7li5GLg4hgT2MEpNnrGGDcD4xSqyY28wI4XxjlDhz6QQrTMv+O4+YIRJ7GSW2
+	v+iAct4ySmzqXswCUsUrYCfxePIiZhCbRUBV4u+vq0wQcUGJkzOfgNWICshL3L81A+gQdg5h
+	AV2JHdEgUREBJYmnr86CLWYWuMAosXLPI7BWZgFxiVtP5gPZHBxsApoSFyaXgoQ5BbQlfs88
+	wwZRIi+x/e0csHMkBPZwSOw/+50R4mgXid+bT0LZwhKvjm+B+l9K4mV/G5SdLfHg0QMWCLtG
+	YsfmPqiH7SUa/txgBdnLDLR3/S59iF18Er2/n4CdIyHAK9HRJgRRrShxb9JTqE5xiYczlkDZ
+	HhIvJhyDBu5qRom7N6+xTWBUmIUUKLOQfDkLyTuzEDYvYGRZxSiVWlCcm56abFpgqJuXWg6P
+	7+T83E2M4DSsFbCDcfWGv3qHGJk4GA8xSnAwK4nwxp6bkS7Em5JYWZValB9fVJqTWnyI0RQY
+	PROZpUST84GZIK8k3tDE0sDEzMzMxNLYzFBJnLd5Z0u6kEB6YklqdmpqQWoRTB8TB6dUAxNT
+	6B7/Q7cnMGRxvNsr1BZwaUKhOAPP0vdnJ9Sb+M7LLAyX/GVuPP33t3PbS8yLLzervbpj+O7o
+	hi0dn6ynL/8q5HYtcpfQ/z2fL+9Yd2dtwBxxa9buGcnSaZ58fw6LG7LNFl6ZUtGRcGqJARdj
+	SrbPpbn7pnf/i+3KLn7y/oKCkdOv+62PBPTFfN85Orto3CzNsDvnu3qJ1OwpdlXrMpdOWLru
+	90zd4FMZWyTjp/R9kkk+uzXi5uuf4p6LNHaLBE+86eK4oj8ogDUo5y5vK6/YYkZJ/kqhzK/B
+	k1cFNouxrvzMd0C7oH+6gdVL65ZgAZfey09rV0srbmPumJewuvZ/hPGSJrvnmjHZc/5r3ldi
+	Kc5INNRiLipOBAAhsS8CTAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprCIsWRmVeSWpSXmKPExsWy7bCSnO4ll9npBv+usFqsvtvPZjGpfwa7
+	xYUfjUwWNw/sZLJYufook8Wfh4YWkw5dY7TYe0vb4tLjFewW85c9ZXfg8pjY/I7d4/LZUo9N
+	qzrZPDYvqffYfbOBzaNvyypGj/VbrrJ4TNi8kdXj8ya5AM4oLpuU1JzMstQifbsEroxN/VtZ
+	C25yVvydYtTA+JS9i5GTQ0LARGL/nUfMXYxcHEICuxkldvbNYoRIiEs0X/sBVSQssfLfc3aI
+	oteMEq2d05lAErwCdhKPJy9iBrFZBFQl/v66ChUXlDg58wkLiC0qIC9x/9YMoGZ2DmEBXYkd
+	0SBREQEliaevzjKCjGQWuMAoseTyEUaI+asZJXb9PwJ2BDPQEbeezAeaycHBJqApcWFyKUiY
+	U0Bb4vfMM2wQJWYSXVu7oMrlJba/ncM8gVFoFpIrZiGZNAtJyywkLQsYWVYxSqYWFOem5xYb
+	FhjlpZbrFSfmFpfmpesl5+duYgRHnJbWDsY9qz7oHWJk4mA8xCjBwawkwht7bka6EG9KYmVV
+	alF+fFFpTmrxIUZpDhYlcd5vr3tThATSE0tSs1NTC1KLYLJMHJxSDUx8+xiyZj76+Gm2YdND
+	WXX1KSHGbx+1MrWy7jyp+D+v0XDm77vP1OKjmNZ6Nrx54Ppraw1P/2bBNbYcHyx9mm++ufrV
+	u5exRnKXcCFr6++VT4uUPmnkqwfw7bJj0LB3NhOUXfdk4fIrShPLLR7pyh2UTrQ6wnq/0ufa
+	wVnJgWrxIqayOWc+Xli8pXl/m5TV25avT+e4bF+R1VWl5hJvUX7N+mxIYK3umrrp9r1S7nV+
+	gXEnmeb/3P5z4hObnnUNr64Vsh9a7fRP5fY7tV0rz89SbN4XmBV2N6BhQdOdg1zf3kjetZrw
+	x3SbMluV8qHvTUVaYT7r2jK2rVgZK3/ZO0rbfHKkVjtf9e7N84qvrVFiKc5INNRiLipOBACO
+	1ZfqJwMAAA==
+X-CMS-MailID: 20250130092226epcas5p4c8830a18efedb85436a2167c5146058c
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250129141039epcas5p11feb1be4124c0db3c5223325924183a3
+References: <CGME20250129141039epcas5p11feb1be4124c0db3c5223325924183a3@epcas5p1.samsung.com>
+	<20250129140207.22718-1-joshi.k@samsung.com> <20250129153524.GB5356@lst.de>
 
-The current null_blk implementation checks if any bad blocks exist in
-the target blocks of each IO. If so, the IO fails and data is not
-transferred for all of the IO target blocks. However, when real storage
-devices have bad blocks, the devices may transfer data partially up to
-the first bad blocks (e.g., SAS drives). Especially, when the IO is a
-write operation, such partial IO leaves partially written data on the
-device.
+On 1/29/2025 9:05 PM, Christoph Hellwig wrote:
+>> This patch series: (a) adds checksum offload awareness to the
+>> block layer (patch #1),
+> I've skipped over the patches and don't understand what this offload
+> awareness concept does compared the file system simply attaching PI
+> metadata.
 
-To simulate such partial IO using null_blk, introduce the new parameter
-'badblocks_partial_io'. When this parameter is set,
-null_handle_badblocks() returns the number of the sectors for the
-partial IO as its third pointer argument. Pass the returned number of
-sectors to the following calls to null_handle_memory_backend() in
-null_process_cmd() and null_zone_write().
+Difference is that FS does not have to attach any PI for offload.
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- drivers/block/null_blk/main.c     | 40 ++++++++++++++++++++++++-------
- drivers/block/null_blk/null_blk.h |  4 ++--
- drivers/block/null_blk/zoned.c    |  9 ++++---
- 3 files changed, 40 insertions(+), 13 deletions(-)
+Offload is about the Host doing as little as possible, and the closest 
+we get there is by setting PRACT bit.
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 802576698812..31d44cef6841 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -474,6 +474,7 @@ NULLB_DEVICE_ATTR(shared_tag_bitmap, bool, NULL);
- NULLB_DEVICE_ATTR(fua, bool, NULL);
- NULLB_DEVICE_ATTR(rotational, bool, NULL);
- NULLB_DEVICE_ATTR(badblocks_once, bool, NULL);
-+NULLB_DEVICE_ATTR(badblocks_partial_io, bool, NULL);
- 
- static ssize_t nullb_device_power_show(struct config_item *item, char *page)
- {
-@@ -595,6 +596,7 @@ CONFIGFS_ATTR_WO(nullb_device_, zone_offline);
- static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_badblocks,
- 	&nullb_device_attr_badblocks_once,
-+	&nullb_device_attr_badblocks_partial_io,
- 	&nullb_device_attr_blocking,
- 	&nullb_device_attr_blocksize,
- 	&nullb_device_attr_cache_size,
-@@ -1321,19 +1323,40 @@ static inline blk_status_t null_handle_throttled(struct nullb_cmd *cmd)
- 	return sts;
- }
- 
-+/*
-+ * Check if the command should fail for the badblocks. If so, return
-+ * BLK_STS_IOERR and return number of partial I/O sectors to be written or read,
-+ * which may be less than the requested number of sectors.
-+ *
-+ * @cmd:        The command to handle.
-+ * @sector:     The start sector for I/O.
-+ * @nr_sectors: Specifies number of sectors to write or read, and returns the
-+ *              number of sectors to be written or read.
-+ */
- blk_status_t null_handle_badblocks(struct nullb_cmd *cmd, sector_t sector,
--				   sector_t nr_sectors)
-+				   unsigned int *nr_sectors)
- {
- 	struct badblocks *bb = &cmd->nq->dev->badblocks;
-+	struct nullb_device *dev = cmd->nq->dev;
-+	unsigned int block_sectors = dev->blocksize >> SECTOR_SHIFT;
- 	sector_t first_bad;
- 	int bad_sectors;
-+	unsigned int partial_io_sectors = 0;
- 
--	if (!badblocks_check(bb, sector, nr_sectors, &first_bad, &bad_sectors))
-+	if (!badblocks_check(bb, sector, *nr_sectors, &first_bad, &bad_sectors))
- 		return BLK_STS_OK;
- 
- 	if (cmd->nq->dev->badblocks_once)
- 		badblocks_clear(bb, first_bad, bad_sectors);
- 
-+	if (cmd->nq->dev->badblocks_partial_io) {
-+		if (!IS_ALIGNED(first_bad, block_sectors))
-+			first_bad = ALIGN_DOWN(first_bad, block_sectors);
-+		if (sector < first_bad)
-+			partial_io_sectors = first_bad - sector;
-+	}
-+	*nr_sectors = partial_io_sectors;
-+
- 	return BLK_STS_IOERR;
- }
- 
-@@ -1392,18 +1415,19 @@ blk_status_t null_process_cmd(struct nullb_cmd *cmd, enum req_op op,
- 			      sector_t sector, unsigned int nr_sectors)
- {
- 	struct nullb_device *dev = cmd->nq->dev;
-+	blk_status_t badblocks_ret = BLK_STS_OK;
- 	blk_status_t ret;
- 
--	if (dev->badblocks.shift != -1) {
--		ret = null_handle_badblocks(cmd, sector, nr_sectors);
-+	if (dev->badblocks.shift != -1)
-+		badblocks_ret = null_handle_badblocks(cmd, sector, &nr_sectors);
-+
-+	if (dev->memory_backed && nr_sectors) {
-+		ret = null_handle_memory_backed(cmd, op, sector, nr_sectors);
- 		if (ret != BLK_STS_OK)
- 			return ret;
- 	}
- 
--	if (dev->memory_backed)
--		return null_handle_memory_backed(cmd, op, sector, nr_sectors);
--
--	return BLK_STS_OK;
-+	return badblocks_ret;
- }
- 
- static void null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index ee60f3a88796..7bb6128dbaaf 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -64,6 +64,7 @@ struct nullb_device {
- 	unsigned int curr_cache;
- 	struct badblocks badblocks;
- 	bool badblocks_once;
-+	bool badblocks_partial_io;
- 
- 	unsigned int nr_zones;
- 	unsigned int nr_zones_imp_open;
-@@ -133,11 +134,10 @@ blk_status_t null_handle_discard(struct nullb_device *dev, sector_t sector,
- blk_status_t null_process_cmd(struct nullb_cmd *cmd, enum req_op op,
- 			      sector_t sector, unsigned int nr_sectors);
- blk_status_t null_handle_badblocks(struct nullb_cmd *cmd, sector_t sector,
--				   sector_t nr_sectors);
-+				   unsigned int *nr_sectors);
- blk_status_t null_handle_memory_backed(struct nullb_cmd *cmd, enum req_op op,
- 				       sector_t sector, sector_t nr_sectors);
- 
--
- #ifdef CONFIG_BLK_DEV_ZONED
- int null_init_zoned_dev(struct nullb_device *dev, struct queue_limits *lim);
- int null_register_zoned_dev(struct nullb *nullb);
-diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-index 7677f6cf23f4..4e5728f45989 100644
---- a/drivers/block/null_blk/zoned.c
-+++ b/drivers/block/null_blk/zoned.c
-@@ -353,6 +353,7 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 	struct nullb_device *dev = cmd->nq->dev;
- 	unsigned int zno = null_zone_no(dev, sector);
- 	struct nullb_zone *zone = &dev->zones[zno];
-+	blk_status_t badblocks_ret = BLK_STS_OK;
- 	blk_status_t ret;
- 
- 	trace_nullb_zone_op(cmd, zno, zone->cond);
-@@ -413,9 +414,11 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 	}
- 
- 	if (dev->badblocks.shift != -1) {
--		ret = null_handle_badblocks(cmd, sector, nr_sectors);
--		if (ret != BLK_STS_OK)
-+		badblocks_ret = null_handle_badblocks(cmd, sector, &nr_sectors);
-+		if (badblocks_ret != BLK_STS_OK && !nr_sectors) {
-+			ret = badblocks_ret;
- 			goto unlock_zone;
-+		}
- 	}
- 
- 	if (dev->memory_backed) {
-@@ -438,7 +441,7 @@ static blk_status_t null_zone_write(struct nullb_cmd *cmd, sector_t sector,
- 		zone->cond = BLK_ZONE_COND_FULL;
- 	}
- 
--	ret = BLK_STS_OK;
-+	ret = badblocks_ret;
- 
- unlock_zone:
- 	null_unlock_zone(dev, zone);
--- 
-2.47.0
+Attaching PI is not really needed, neither for FS nor for block-layer, 
+for pure offload.
+When device has "ms == pi_size" format, we only need to send I/O with 
+PRACT set and device take care of attaching integrity buffer and 
+checksum generation/verification.
+This is abstracted as 'offload type 1' in this series.
 
+For other format "ms > pi_size" also we set the PRACT but integrity 
+buffer also needs to be passed. This is abstracted as 'offload type 2'.
+Still offload as the checksum processing is done only by the device.
+
+Block layer Auto-PI is a good place because all above details are common 
+and remain abstracted, while filesystems only need to decide whether 
+they want to send the flag (REQ_INTEGRITY_OFFLOAD) to use the facility.
