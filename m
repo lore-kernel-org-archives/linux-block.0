@@ -1,57 +1,57 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABED22615
-	for <linux-block@vger.kernel.org>; Fri, 31 Jan 2025 19:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4491F2369
+	for <linux-block@vger.kernel.org>; Fri, 31 Jan 2025 20:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738353558; cv=none; b=FkXEfxFF4SErm/MXl6d3vwR6HKSKI3eVCKEmbcJ4/BZmeYEddvlvFXN5lDkUnrC6YjQ68dJzr8FpTp4TCk3uLuZ8q/dka8WBue/uRO7H0BQJxeJDDZoCjDG8R4Nc170OpnoeqoTbM4M37zZyIEWzhBQrqjPoZTyBeM8iFOQrpWo=
+	t=1738354049; cv=none; b=M7X1ZaHVIAekqTXL8CizDlqdiC+6E1+WBqDMEtM040wobFaRRSQuL2wSPjWF09AroC3y/1keBFXlci0o60AEyv4oxbkIc9rWelS6gzjXzI9rdfJjpeCABqBkCH97tRw1/xdnXzJP5LbD1haaEBfcQeTK2tpAmf9QJZNedkkXn/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738353558; c=relaxed/simple;
-	bh=17el+ADTwxXBp5MOIBwfzED8HdqlGU895MY2gC9ezwg=;
+	s=arc-20240116; t=1738354049; c=relaxed/simple;
+	bh=cWtzQbEgZPAq+mH95aWLjasbStFBal1CvhZspkrtVMw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HpRCmh9R1GK4Q1hgCr7b8fWj8QB0n4TZuR5P11/5D93jDHcLNvyNX1BkKf0C71JjhRvEuZKeJXyiPjadbp2tZ/L8r185x7EWmjxdPUpVCIhhwq7rLwO303HPYgrTcxIcUGezTVYQrIQIyUOb82i7boiM5ziDuMojDgBC7Vd39BA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J/CkH6vM; arc=none smtp.client-ip=209.85.216.42
+	 To:Cc:Content-Type; b=loSFdUW3wO7r795Um5k7u9gsBhEWCRNoSGsKd6/VEhOAvHtiUur+azAHYq4KblQXv+aZetIqu+M6ZWK4GpjmSPQseOfavI19leVVt9mxQlxxXPabgwOYydEswsInaCzRKUPeV390e8oTJfc5dWRzb+ohWTx52KtwLh/u0is71qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nkae82rM; arc=none smtp.client-ip=209.85.216.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J/CkH6vM"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2efe25558ddso3187637a91.2
-        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2025 11:59:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nkae82rM"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2ee709715d9so3323377a91.3
+        for <linux-block@vger.kernel.org>; Fri, 31 Jan 2025 12:07:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738353555; x=1738958355; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738354047; x=1738958847; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=17el+ADTwxXBp5MOIBwfzED8HdqlGU895MY2gC9ezwg=;
-        b=J/CkH6vM1K4kfK165TJ65xxlPwT8iDGFEpDJvSzzHoP8tB/p7sgWRzPRpNjKDuD6Bv
-         ooUeWYAvkDwrr6ixCESYVfUl1U43ONrnSEJ6hK2+AjLCAYptmkwcub532GFjEp3wm11A
-         k14FEwgLdok/ckzUCTJt9C1abEB/Pgh7LLmNghO/RKmkNIp47e7al5RAA90UdVYid86U
-         tD13MLMDuExrxXf4l/Njyeg3MKT7XVkaAXVqdjndUEotcLdRPYFRPHfxCb7a72Mq0vbk
-         XFl55L2HlCmaosOdI79quGQPUk4r/lB6utTSf81o3h/VaaSuXJqZDRnt9M3ieetOIW5o
-         0c/A==
+        bh=TI5V1/OQyv2H0OpRJJwzwoIlcN4peiCQ44wdj1tTeSA=;
+        b=Nkae82rMQe1yxCUbpt5qJCq4WTqhpUzxZFKaXv3acbtgt3akixFY0OT1PjYggjrT+s
+         fu+6q22aj7OI/pJDSAOtS/LnuYl/uz/kOtL5sF3s8E/VHkf3uzTBykP7sop+eyrEVUaM
+         LLLW9G1ol7tnbAXoowuDg/CtSHT+Ki6bm+l9Fk/+SaN+5QxO5wNyy0dp3HC2wFy0t+F9
+         LslSw0LO0/gdlgonV7WmEa9MCh4IYgFg/wuUac/DU9MvE5xEBkQeYR04R20VWcid9Qqv
+         mXi28MmH17CP3Ubmu/MUH45JEd2VGwzMVlMomH/1IvqV2BqLkibdHVNnxUZ+o9ZAyoxx
+         EFZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738353555; x=1738958355;
+        d=1e100.net; s=20230601; t=1738354047; x=1738958847;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=17el+ADTwxXBp5MOIBwfzED8HdqlGU895MY2gC9ezwg=;
-        b=f10OGVjdpjWQyOrSdDoPxxP3kObkoc81lq07qmkxoxbcusAnE1jwc2NU8XT0O7H/74
-         7nBo0hBssjkPTleNzLNJMtKaBwyfEsS+mJrmd4gkL9QX+LLh/iLl6wFUGgAvCxA5uLab
-         aI825If6kw5yNjpp5N/EV1cIMDETBO8wYTBa4DWCtJMov5UX1SnFD+ZW/BpgmRI613rn
-         LuLJ3R/oq8e0Am27FcggwqYp6QTf3HI/Z2tflyeqnOhAPyHZqlXZyQLSR0JNkBcZfPgF
-         9a0YHx/EF364Uh+QTaHb8YHMhfYVKaBVuYC/IjEc43U7qR+3BTiHkkAIRo2Y2W2hdxe/
-         h5ig==
-X-Forwarded-Encrypted: i=1; AJvYcCWv+eaRUo6cVD29g4eXufPx0WyX4umTUbuLiBfR0UVtYsftT72zADm+GVJnebARZ9CgcPyZall3NVERPg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4d4QJb+M8YeP29HqgtlpU0nlTpNozIVR7Jsm8wLttoZnv1fJb
-	trIEqCRVVYDYqVKpfpIMED/uhUF+VLoqj55i2/MJlX6Dk8BdjMymcK9WK1dRh/4+WVKHFd+vNm2
-	i3t0GVyiWf1OTBkPhrze6L0IU4jYkYfUX
-X-Gm-Gg: ASbGnctrKNQBS99uYrD3cwLlvWUCsi9WGapf4CIY5bmgIjlKCG/KKoqx9ZZk15XpvkP
-	U6f9ViRH+VPsq12yYq3G4Okvsh89l/NO3tEcvf/aSX1smsLD7HtwmmVWXlRRAcj6SY0JkaEc=
-X-Google-Smtp-Source: AGHT+IEdz+PUksdDfWR4Ut69T7hAs/nk6qgNXncnnf/UaAPmP4FVOrqUe+Cxrgi4In7rmdxq5b7K/K2hnW+gUEh4jC8=
-X-Received: by 2002:a17:90b:2f0d:b0:2ee:45fe:63b5 with SMTP id
- 98e67ed59e1d1-2f83abbd6e9mr16489290a91.3.1738353553920; Fri, 31 Jan 2025
- 11:59:13 -0800 (PST)
+        bh=TI5V1/OQyv2H0OpRJJwzwoIlcN4peiCQ44wdj1tTeSA=;
+        b=pG79s1dMci+/62pyHfERh8B7Z2mmd6MELWN8ivziyJRRbXJnjkaUgZ815YXw/nCMmI
+         QgRX1NJ3i11Y7gDAsxceXGKPuzOX50XoOCJONqIdAPFhXdhrQPNmjejnNmE6ARJ0IMCe
+         GpdO39dg6pUa90RW4XFEJ/0yCPJUbCP5TdTz/pbM0U0kYsGOw/Y4tL/+PehiiipzhWMH
+         u6Ts0kVlG0G8uscd8HZOzEdBHpr76G2zy80if57gdBzQESkJKGvNFMwgtGRyWjIwvG36
+         5DIEIKj7jvxGrhesGTPlM4r9zbcvEW+WSgOxaPCavYw2NqsiyKPWMMISIY0fpu8TaHw1
+         fC2A==
+X-Forwarded-Encrypted: i=1; AJvYcCVl7XaKL/cbTecg69pXPIpRxoqXWHL81qXzK/M0adB2whHzCDt6vsm9uPeMd65uAFiscwdxxSQjF06UhA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzm17GT4CFT1UWCqeTtJ4bs0sNuBJ9SpLxt7u5+5LhnNy7s2/hV
+	2kqnzr8oBSWgH7UxnIbc/2+xu4BU0MdxzHQhpY3ns2up07K3SevW9M+TM8Q0JC+2HYOvLAmACLd
+	cbVhdg+JJUs1Vk2gqGS7jqZhBN54=
+X-Gm-Gg: ASbGncu1Ge/TEzvDfVI6j1DR8i3m4Vxam4JXBIlPT2H+cs28mLiOUL0AnQVVLvvvQTd
+	5pBQn4WCSvMmBHMisPL50BHlm48GuH59LFyOzZvbDMfC6qmIuPqpKLPEc5sB4RQiHkc1uPek=
+X-Google-Smtp-Source: AGHT+IGvaq3Co3JmSgBBFQMHYxYFOJLYw5BChtm16cmkI3EWKem0JZbt4AMmTJaq8haSXCNMsIwAYYd3xLxtr4mTrs8=
+X-Received: by 2002:a17:90b:2d48:b0:2ee:c5ea:bd91 with SMTP id
+ 98e67ed59e1d1-2f83ac8acfcmr18113513a91.29.1738354047044; Fri, 31 Jan 2025
+ 12:07:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -60,34 +60,70 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <CAOBGo4xx+88nZM=nqqgQU5RRiHP1QOqU4i2dDwXt7rF6K0gaUQ@mail.gmail.com>
  <20250109045743.GE1323402@mit.edu> <CAOBGo4w88v0tqDiTwAPP6OQLXHGdjx1oFKaB0oRY45dmC-D1_Q@mail.gmail.com>
- <CAOBGo4zdDQ+mV_5X1Y0J2VpV8F63RsBs66Xq4CHPtpBu9MFebg@mail.gmail.com>
- <d2951075-e9e8-460c-9dbf-34bfeb942aa4@acm.org> <Z4Drg8pewTBbs0sy@infradead.org>
-In-Reply-To: <Z4Drg8pewTBbs0sy@infradead.org>
+ <20250109155119.GF1323402@mit.edu> <Z4DhK_JrkL5jn5P1@infradead.org>
+In-Reply-To: <Z4DhK_JrkL5jn5P1@infradead.org>
 From: Travis Downs <travis.downs@gmail.com>
-Date: Fri, 31 Jan 2025 16:58:37 -0300
-X-Gm-Features: AWEUYZmsVxC3Fi1GEkd0v_5VCxWz2PQ1H5xcQjXI62xu7O_gMUebqyAwQ0FzUw0
-Message-ID: <CAOBGo4wRNmMNy1ArCXphEpV+NrcJ0nyHtew6nwJLeJYGqM7fXQ@mail.gmail.com>
+Date: Fri, 31 Jan 2025 17:06:50 -0300
+X-Gm-Features: AWEUYZmTObX6fGSyQ7ZMMALbKek-_ziJfPE94STCjadBypwFlQ20iwcySk9MIbg
+Message-ID: <CAOBGo4y_zo08BX=hRYsAQrdSfaLfn2kMci+Jk1R+B1-kjzsX1g@mail.gmail.com>
 Subject: Re: Semantics of racy O_DIRECT writes
 To: Christoph Hellwig <hch@infradead.org>
-Cc: Bart Van Assche <bvanassche@acm.org>, "Theodore Ts'o" <tytso@mit.edu>, linux-block@vger.kernel.org
+Cc: "Theodore Ts'o" <tytso@mit.edu>, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 10, 2025 at 6:42=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
+On Fri, Jan 10, 2025 at 5:58=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
 g> wrote:
 >
-> On Thu, Jan 09, 2025 at 09:32:54AM -0800, Bart Van Assche wrote:
-> > in trouble. Additionally, since typical storage controllers use DMA to
-> > transfer data, and since DMA may happen out of order, another pattern
-> > than AB00 or ABCD could end up on the storage device, e.g. AB0D.
+> On Thu, Jan 09, 2025 at 10:51:19AM -0500, Theodore Ts'o wrote:
+> > For Linux, if the block device is one that requires stable writes
+> > (e.g., for iSCSI writes which include a checksum, or SCSI devices with
+> > DIF/DIX enabled, or some software RAID 5 block device), where a racy
+> > write might lead to an I/O error on the write or in the case of RAID
+> > 5, in the subsequent read of the block, Linux will protect against
+> > this happening by marking the page read-only while the I/O is
+> > underway, either if it's happening via buffered writeback or O_DIRECT
+> > writes, and then marking the page read/write afterwards.
 >
-> Only when using an LBA size larger than each chunk, e.g. in the scenario
-> mentioned by Travis if using a 4k LBA size and not a 512 byte LBA size.
+> This only happens for buffered I/O, and not for direct I/O.
+
+Thank you. To clarify, "this" means the RO protection, right? So in direct =
+IO
+there is no such protection?
+
 >
+> But that only matters when your operation is inside the sector (LBA)
+> boundary that the device interface operates on, e.g. if you using 512
+> byte sector size as long your stay outside of that you're still fine.
 
-Thanks Christoph, your reply is appreciated.
+Sorry it's not clear if you are talking about the buffered or direct
+I/O case here.
 
-In our case any pattern that is ABxx is fine. We don't have any
-expectations about the about xx part, it's fine if they have a torn
-write, out of order write, total garbage etc, but we'd like ABxx to be
-intact (see also my coming reply on a parallel branch).
+Also, my problem description was not clear enough. I made it sound as if
+we only concurrently write to different 1k blocks than the data we care abo=
+ut,
+but there is actually no such alignment: we might write to adjacent bytes o=
+f
+alignment 1.
+
+That is, we may write bytes [0, 777) of some 4K block, then send it down fo=
+r
+direct IO via io_submit, and before that returns we may write the next regi=
+on
+[777, 1234) or whatever. So we are definitely interested in the case where
+there are writes within the same 512-byte sector.
+
+>
+> BUT: that assumes device checksums.  File systems can have checksums
+> as well and have the same problem.  Because of that for example running
+> Windows VM images which tend to somehow generate this pattern on qemu
+> using direct I/O on btrfs files has historically causes a lot of
+> problems.
+
+So is it fair to say that for direct IO these types of racy writes are not =
+safe?
+
+Specifically, we are looking at behavior in a 3rd party, proprietary
+block device
+(implemented as a kernel module) and are wondering if these types of racy
+writes break the implied or explicit semantics of safe direct IO writes.
