@@ -1,31 +1,31 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F67169397
-	for <linux-block@vger.kernel.org>; Fri, 31 Jan 2025 10:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4311779B8;
+	Fri, 31 Jan 2025 10:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738319792; cv=none; b=pwH2sKtZu/to35/Y7rKwoAImJ29MIc0Y9vgp54wjf9Vk5U0CkSpDIyNF8E06i92Lr3R2bUp0Sm7slkCXO+rq0c6PmBB68IpJL97D1xFmCEE1RC/dHkFrfLPTjVetMwdSycEoU0ALTRC8tGhnhd+MrMNGhSOkY6OYwo33Dm4pAW8=
+	t=1738320188; cv=none; b=DI3hqOKHtb+umj6xcwPB277oFFbI3Pg/vp0DxFMWkrrPgCsw4NyOq+GhlOfVh6yirttbSzZMTOFHy+t/8DXhEW0PFGrQvOZL2R75YRJct69Hn3s56O2aKY6XPM5ube+yVv2NFdYexTrbR+jmT0q/hkovxsYDzsuXgUgc/TqGWJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738319792; c=relaxed/simple;
-	bh=BZVBALT3kaSUC/x7zpfoR0bXbKDTlW4CdZ5GQ+mUAsw=;
+	s=arc-20240116; t=1738320188; c=relaxed/simple;
+	bh=7YuYotA467XIRFTLLAiDaaEj24Zkk+sK4MQQJdS41WU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aGWVtU7UoRTpPoSa0mvXy9LBcAwKzVJauGCBQ7EbfGKFYNERlw978J8O33WmtZGHx1mb15xxTfQKzH3yMWmfRo5yVZFmH1ZxUc3jSIVffU+KBHhsbkm53LiUQB9Rz2DSvmrHkSE2A8TPRKzLEqmZRVrG0dyJd5BvZDOiahNIVB8=
+	 Content-Type:Content-Disposition:In-Reply-To; b=UZGNWCkE8DX0eRFA0waWslfrbfWiwJFiGGr5KDDhkkIFDVW5R273I6Gsf374DtFJkHQBbppBWUoUoLOBvjT3xPi4VOouU80H6gQrdhTrK/nByPgVLVSA7yQB3BS6/PM5KBWPQnmiOz6gDpGlxIgawApaGHkGWzvIE7g/gZpb3/Q=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 654B168B05; Fri, 31 Jan 2025 11:36:25 +0100 (CET)
-Date: Fri, 31 Jan 2025 11:36:25 +0100
+	id 557D568C4E; Fri, 31 Jan 2025 11:43:00 +0100 (CET)
+Date: Fri, 31 Jan 2025 11:42:59 +0100
 From: Christoph Hellwig <hch@lst.de>
 To: Kanchan Joshi <joshi.k@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>, Anuj Gupta <anuj20.g@samsung.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: Re: in-kernel verification of user PI?
-Message-ID: <20250131103625.GA20115@lst.de>
-References: <CGME20250129124655epcas5p39750f07e5015f1dd5e198c72cca0aa4e@epcas5p3.samsung.com> <20250129124648.GA24891@lst.de> <3e7a79d7-b5ed-4ad2-a2d2-84c2c6cda757@samsung.com>
+Cc: Christoph Hellwig <hch@lst.de>, josef@toxicpanda.com, dsterba@suse.com,
+	clm@fb.com, axboe@kernel.dk, kbusch@kernel.org,
+	linux-btrfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [RFC 0/3] Btrfs checksum offload
+Message-ID: <20250131104259.GA20153@lst.de>
+References: <CGME20250129141039epcas5p11feb1be4124c0db3c5223325924183a3@epcas5p1.samsung.com> <20250129140207.22718-1-joshi.k@samsung.com> <20250129153524.GB5356@lst.de> <b5fe3e15-cd7f-41ce-9ac8-70dca0fee37a@samsung.com> <20250130125306.GA19390@lst.de> <12ee6895-aafe-491e-8dea-c024a2a34563@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,19 +34,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3e7a79d7-b5ed-4ad2-a2d2-84c2c6cda757@samsung.com>
+In-Reply-To: <12ee6895-aafe-491e-8dea-c024a2a34563@samsung.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, Jan 31, 2025 at 04:04:53PM +0530, Kanchan Joshi wrote:
-> On 1/29/2025 6:16 PM, Christoph Hellwig wrote:
-> > Also another thing is that right now the holder of a path or fd has no
-> > idea what metadata it is supposed to pass.  For block device special
-> > files find the right sysfs directory is relatively straight forward
-> > (but still annoying), but one a file is on a file systems that becomes
-> > impossible.  I think we'll need an ioctl that exposes the equivalent
-> > of the integrity sysfs directory to make this usable by applications.
+On Fri, Jan 31, 2025 at 03:59:17PM +0530, Kanchan Joshi wrote:
+> > Also if you trust the device to get things right you do not
+> > need to use PI at all - SSDs or hard drives that support PI generally
+> > use PI internally anyway, and PRACT just means you treat a format
+> > with PI like one without.  In other words - no need for an offload
+> > here, you might as well just trust the device if you're not doing
+> > end to end protection.
 > 
-> Are you thinking this ioctl to be on a regular file?
+> Agree that device maybe implementing internal E2E, but that's not a 
+> contract to be honored. Host can't trust until device says it explicitly.
 
-On anything that supports passing PI through io_uring.  So block devices
-and (some) regular files.
+But you're not doing end to end protection.  Once you set PRACT you
+basically tell the device to pretend the LU/namespace was formatted
+without protection information.  That fact that you even need the
+flag has always been very confusing to me - the logical way to expose
+PI would have been to make PRACT the default and require a flag to
+actually look at the passed information.  I suspect for SCSI this
+is a result of shoe-horning DIF and DIX into existing infrastructure,
+and NVMe then blindly copied much of that without thinking how it
+fits into an architecture without a separate HBA and without all
+the legacy concerns.
+
