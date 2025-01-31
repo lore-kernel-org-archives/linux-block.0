@@ -1,236 +1,156 @@
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DE01DFF0;
-	Fri, 31 Jan 2025 12:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.141
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738327844; cv=fail; b=F/BtJiZbLb4GapTsBGADzfs/vkwWPZ9xApuoHMFDoeCZZIs/eGy/+7EtyKQ8n5uN60VwhxgUjAJj48SSYleJQM/34MR7HOIBr5r/02Uo7Js3X8JmYZ9MV4B5sxDqdofWqcwcLoevY25NZzqD8npBhu1vKnullekNZ57RAsdOk0U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738327844; c=relaxed/simple;
-	bh=NIyfWncNWKDYCt0eAbmcdLF/xxFjXgvJIUzQc6OQtvY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=f9obBmD9hgB8V5ozsPkXgSd+kqlOub43ZSTu+GDtlQX+QyMLuPoq09m5xeQ4ep61o+2uzqXXoE3S39Su2+GjFySFZr1eqqvwSbt93LEH3ptfEKYdcO4LQGMFbqAacDIovebGQIaaoBEXqJPO36Hr4zjKDlRf5orYkOswwXBYtHQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=jNQzU8A8; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=Gf7NLGDc; arc=fail smtp.client-ip=216.71.153.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF301C3BF9
+	for <linux-block@vger.kernel.org>; Fri, 31 Jan 2025 13:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738329081; cv=none; b=sWDw/FBJ5rB3hOWV7Wv1mIec7VrWPRuZsm4YrYn0z1+IGMBXQl9ipDH6+3jxhlS8YGEoiL7x5hEm4kjHuViowz82MTy+uFIkKcYp1l43zZQhbfnQjfQ/No+S1HLT9uTohg5o0g1ZkMbzqO67tkd5bdBT/X3Kn/RV7Wkz6Z9j/kg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738329081; c=relaxed/simple;
+	bh=LZGSTGyPYKuePoSMcqCKlxfYS+MScEGdpk1BF3pNv2k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=oa//s9toJ0i/YVH6ywfhlz8jfgxkUULQalMrNcJ5FxHLNG4URF4vL7sq4ed0bae4aANqDm2hv4B381fcm+tccKPJkhCws0XLVefwRucEroNZ7NwTpWlPHf2fhNdZxhKy+O85knKcnc7306lWgy1xCeiYWXwkxWwWVP1mWEPhMFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=IRCrVGRa; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jNQzU8A8";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Gf7NLGDc"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1738327843; x=1769863843;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=NIyfWncNWKDYCt0eAbmcdLF/xxFjXgvJIUzQc6OQtvY=;
-  b=jNQzU8A8JEiylYin3m+pdpNBK+Ig9uN4QlS5EV1Q7K9yYhiAP6AS+PEK
-   3P0PzZ9t2BpBo50doKi4WsLMAtQYYmV4BM9UUhtfNM4wXWAyDmGHCXWGn
-   2EDBX0jBUUZSph3HDGcZEQaT4xpxMuD1Zpg4Ggjn8sYRKEUTWx9AXW/AV
-   AoJ0WKTywrS9VK9cCH9MKGnzj3a9X+tcAmTKN1SBFPyytGLGo/C3/eTI1
-   uGJjFRAy8vLFyGdyuGkFup9S0OOH4W8W88VWXN2E6i2Au56VISLsJiLJ6
-   N7faxzq0t2ZUTSuY7Q0uZf1fmJAENtIIv3M3EaNhruVuzSp6ByQblgdgP
-   g==;
-X-CSE-ConnectionGUID: Vo3gOJsWRUCDeYGsswIOfA==
-X-CSE-MsgGUID: BmQkBddcQjyStq+mRzQevQ==
-X-IronPort-AV: E=Sophos;i="6.13,248,1732550400"; 
-   d="scan'208";a="37259505"
-Received: from mail-westcentralusazlp17013076.outbound.protection.outlook.com (HELO CY3PR05CU001.outbound.protection.outlook.com) ([40.93.6.76])
-  by ob1.hgst.iphmx.com with ESMTP; 31 Jan 2025 20:50:36 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GJ9kkB6Fc5I+N08Qs8Dujebk0DmuaxJMDFD0XJpkGralVrCKkLfO0v/gxp+04kuDLNG57ZNoX8X8ehtbyI3PQD+lkomsLnX40MBAzhGqnbfOQ/pR79ng4By6PuiogJeDCrhGenCnu5RRsY47+RGuJnrFMVulsnfFmMxI6cCV0rmi5G4uHwsqM32lmdupyvGO6kBD1uE+82OgcBAIRBcXrFDt2AEoJB3cGOy5hEYU/FKJbRwMXCTjlvGSaXqJJTctbkx+9hfI5zNDPm0d6eKVAOoJTXYS3tKMdmDQdK86as22JUg/YG9c0kxvK+2Hc2J7N8frcSirUNSWzbwzCPECuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S/uaw4e8yOhg10hLDdEvRyyu+pE98/D9ddDiUJJJheE=;
- b=SpIv+ew1CK8AnubmTK7gcIOYUYJ2Dd3Fyn4Ma7hC43PKWqylR7TSZh81Qk2nhd6QapgVk8XoXWKqYRazUPOgdC+a7NIrt9D14VhEJoh/7BWzwEVQ2WebEy/fqRsk2PuuHFUB8yo1EkOT0tCe/C6Ldo7nnTnybeweGiB8GeiU6W92F+PXX/M3fTeV+TdU3vQslRfcRLOSuVXnMDcrWlrzA9PP92VI5qilGcQdGGl0W4FvGG0S23ZC2JjjBMeHOx5zqHv5sWQpTbpasm8TXZOa4FNm4XPH3ZBdAoXmTJCrNhnpq/WUb6iKvNZuIJk2NrqPpM7gTFsMjbHzKi/KkkF5og==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S/uaw4e8yOhg10hLDdEvRyyu+pE98/D9ddDiUJJJheE=;
- b=Gf7NLGDctUv6JMaQ2m6e1++WBt8zCkqKteI7pxx6OdVBjif4QQWW1acbLbzSZIChUWJ/9BRaq8UtcpWcv94GcKwL/pyzz5aAoYqnraSQOo0D+PRxF6zzdQgiR7faIxc0wQzlfPBENA7A12w+1Pgu/6hqIbDp7EfXt1Mw0V3bh3E=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- PH0PR04MB7622.namprd04.prod.outlook.com (2603:10b6:510:4f::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8398.20; Fri, 31 Jan 2025 12:50:34 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::b27f:cdfa:851:e89a%7]) with mapi id 15.20.8398.020; Fri, 31 Jan 2025
- 12:50:34 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: Alan Adamson <alan.adamson@oracle.com>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH v2 blktests 2/2] nvme/059: add atomic write tests
-Thread-Topic: [PATCH v2 blktests 2/2] nvme/059: add atomic write tests
-Thread-Index: AQHbcd5GhXZw5pnsok+/fq73K7lry7Mw2bGA
-Date: Fri, 31 Jan 2025 12:50:34 +0000
-Message-ID: <vhdb3rsa4vgxm6nm7js75cnlxpv7d4rjxdvqpa5b63u442m3sd@b7w5w6mzjj35>
-References: <20250128235034.307987-1-alan.adamson@oracle.com>
- <20250128235034.307987-3-alan.adamson@oracle.com>
-In-Reply-To: <20250128235034.307987-3-alan.adamson@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|PH0PR04MB7622:EE_
-x-ms-office365-filtering-correlation-id: 6f5f39f1-c12b-428e-a4a0-08dd41f5da84
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?e6r/2T0NJq+2NDe+3pEXxek9PC5oUC5Yhlt3ZQ1ioKII4JU/fqPUbb6o8ceX?=
- =?us-ascii?Q?IO1jN9ruBYMMrmI3pL/c9yGHiHkhRV9tFZ6dj79eulK8y/DQkiuCrqlFqyxP?=
- =?us-ascii?Q?0SHYOPSyZSbMFAGdvd6CKq4n9bv+aMLxoCrJAggMNPbbGXWJsYptyZe+np8F?=
- =?us-ascii?Q?NjnN6DR6kG0brzOowj62R4BcXhgwxe1D8GZ3Y8fRlC3uN3DW4NnmhaqgQK2b?=
- =?us-ascii?Q?leRaKrsK/CLUAazc/0Y+72kxFCjlWQZSRAtY88hTNKmU3gJnIIHvUhjrH4zo?=
- =?us-ascii?Q?aKRbULykYD37cVKOw7HJDLYFtxTd4ArEJwhGZTzdgYMXmTL8mBliTY+0vqZN?=
- =?us-ascii?Q?cXJL4Bd2CeuBNi6nC8GAJsXYQcemUSyHjAEXNYx5EpvMtCncH/HkE/sa5xZm?=
- =?us-ascii?Q?GExG6sWRp5gVLphTl6/6YzQIGNwsvNnvK2yySU8yaCLbtjyeiJyM+4fhfVOa?=
- =?us-ascii?Q?nfE9IICIuEWct7XRDJ7kEFwAOk2IbuagCcbZNEriqqIFY/+af4FhgxKzy/1j?=
- =?us-ascii?Q?OU7F/aX0l95wMMSD3lHd0yaHjwsI/VfT5WCf8eMchM/AQ4G+wxmoBLCYZAdR?=
- =?us-ascii?Q?WDk7mSVVMVBH4tKl/pI7I1u/BGFP5N8wCqpRmNEmv6MeVRu+DUuOK0ik/u/9?=
- =?us-ascii?Q?XZFaqnTyhKLUhioIh2dj6S262Boy8ghDzVWQbfOXchUAg5xueIWXUuRHkg5Q?=
- =?us-ascii?Q?HGMFqK9NuJIqt57w5T2DL9tAxjBoHonT8bZJmwbzRopd8mwClkjWhX1IIr5J?=
- =?us-ascii?Q?vam1FUKCut2qIXDw5qyzqj+XsAQefyH4LL2e86uLvbxrcBBL97AmtPUMat9U?=
- =?us-ascii?Q?rXAsiPwwGpZyr7I0VPD38IT83HoVCEsfMuzA1b9LlxNb7SVxWi3xbwI1Og+n?=
- =?us-ascii?Q?j0JYnw+Ajam3fut3ZjBDS/pRQmKYFyEkEtTaeSgM3Ho2IuN+PF4EonIS1cTv?=
- =?us-ascii?Q?9KIuP2oh7qGppc05lVD0RauWSpfPrgeO+W3pPk5A1IsbZLhnD2MtcRKhVDsV?=
- =?us-ascii?Q?sCFAHvSaJ02XKFmhqi1/6pDdoDNirzNw1BZ9o63RXdewFoWW2uoYkaOfjo/S?=
- =?us-ascii?Q?KVVhfUnHfaef+mREUFhWaV0cEKfWvnggIyaE9ffKhgE05HaRSgHolKr8m0kA?=
- =?us-ascii?Q?lXyjwG+HsH8MZAR6t5StuzdRoKf5ROZo+r06t0FTivi1nEyy8y0x3oTPHtZp?=
- =?us-ascii?Q?PvVEIHErhl+R2N1RSkEtSBGHRnPvae5dYp3J+R+ZUtCipeoGfMlun0U31n8+?=
- =?us-ascii?Q?ScpuOywFTs9Ox4dcYGr7z2cnzQUHqCb2ChmpRYCA2WvcWMYXD3xUQmc5Jl6K?=
- =?us-ascii?Q?xxJIDv1P+3XSj0FXdKa+PyQicRL4JiV4Ki+/lUhlruD0d+xx3AYTO2iTh8Lb?=
- =?us-ascii?Q?Sh3zbRbFKJ4JnNc2oGs3YxHtUsdCviBvO/E9jJM0n0SoMGAu1SYk9WvGnaNL?=
- =?us-ascii?Q?YyszJiJ3ez91FD+vZWRCs2T1ICEhpaqV?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?uveCnfee6ibIsuCWN8qhPJoMiNzUuo1UvKwUF/CbYOCK/SeAxM6fE1y2PBI5?=
- =?us-ascii?Q?bkxhY5x0JuVSaire1VM7W2XzM9eJX8ZliByIYiu43hBHo/vsq8MMFHoZTSVP?=
- =?us-ascii?Q?RuoUKHBuHx1UcEekL6y8/qcOSOcPUVxFb5Jt5EX9l3orvuEJsXkP1DnIy6yG?=
- =?us-ascii?Q?40fU72GmeBTGj+0NsXndVLeCP7rJGd/79sVI5N6uNmimtipEvo5Fb4zOnnPT?=
- =?us-ascii?Q?3ToNKWv+PJZQZYJadA4zyPXarNoi1n9xSFVCXke4kbwAu769TQdUV3mVnVT9?=
- =?us-ascii?Q?ej+ZJzDBEjcsLCkgKESErSCAFDt+0/IQlGmKU14a85MIgXZEytozlbDYjxX5?=
- =?us-ascii?Q?1u1l7NRmJGL1b+xUM4sjKJ1PZWCxyUjdP1ebRt810YzaFIdMILFp390A+YBd?=
- =?us-ascii?Q?Ielw2Q0Jrlv1hFRTwOen6Bc9j+6mPVubUzSf41OhH4fAZobBDr5m2dsK+q4g?=
- =?us-ascii?Q?LLwI2fTAtFI3IZhgwZcB9m0WRO7N8atbVaF6K5zntfJ0e6JzrTbFyO36HRFM?=
- =?us-ascii?Q?VAo29JRs5JkyZ48N7v5cXtJ23d3gG1j5ZsufOra90Fq3Ab1dJOPP0hKTJi6h?=
- =?us-ascii?Q?XEJKclgbiIqtjJHPynDtN9rylQ438n9LLVIE5eJSP4GTczxKOvmiRZlMAsCh?=
- =?us-ascii?Q?rm5Ey+z+ErgiXwUBxJluHfW05dY1DnRXbenvhjst+nE2A74mXeTAofrA/oZs?=
- =?us-ascii?Q?l2Li/ygeZxi/xRMm8GwQK4kDzbFAbClj8AisnHfMxCkzhTshz9n/OcLHO3OR?=
- =?us-ascii?Q?s3RlGVH3zlX2dkqM8EJo1nu/FnSfaXOUslIVBHz+Aqmhy/KDZbtbv66tODlb?=
- =?us-ascii?Q?DR5hqgrOrjF/7QS2IOzpdfupexZooXmfHgoIMJnTMKCOOxDK2JcaSbpRho1D?=
- =?us-ascii?Q?SelooOe3HtjEt6BDz0F5OKsh7FHlnUuPly/nyKrjtq2KyE2dn8wHXr9B27HT?=
- =?us-ascii?Q?D2JB+nYCRspLu4j6VP8rNpRdHtbARRP9S1ePs/dxi9PiQTvNiYfnBhJEkke9?=
- =?us-ascii?Q?82wXykPn1tyKroeNv0F6y+0f2m4xFly8jVxUfZ8kBeU/Y6CzvoqVMOi/7seb?=
- =?us-ascii?Q?wf0xQKwNJDMv2JJ2zRNUM/fUA1F9mSKUUzpTDqdLbpLAm5PYstRE2+lRuOVK?=
- =?us-ascii?Q?td5Zle8jQUt68xfibn3U5Oz2m2Rq7kY/rL1pgcz6JvatXn7S56++mKHWl68j?=
- =?us-ascii?Q?40AHHTwxcWSqPbcDp/GTDfqgUk47urrGR32yMkf0QYIBWXhKYaAEWRapoD8U?=
- =?us-ascii?Q?QyjxMbI5Z7qa2phv0vQSeCKWbqbwcGaqnNPJBdNaFtE/yQNVFhgs0juWrkP9?=
- =?us-ascii?Q?U7Pb5MbEPUiC7c+isVnYXn7mEA2swGSrWxBu22P1hqQvG5Tn5QeVlOYg/8q7?=
- =?us-ascii?Q?Lo/h7qTvb0ocsJAT2hxkhe168i6IC4bzguFPrSu0I2OWgNW14CZvocAPEO/M?=
- =?us-ascii?Q?sWhDBAlyVAaJFOSyT2j0G3VDFdVaAzKtOSMh96WhHklkL1oP7aYumnppENZK?=
- =?us-ascii?Q?9k6GwShABE6eGVTmHngsJDTk/7GW8DltHi69sbtbQRcNQhXSTvRlefAK15kp?=
- =?us-ascii?Q?iDW5y8K9mrfl6wPs2Ols+hXsSW5vUwFmoD5zalZSdhwLuG2Gd+gOZXzOaCY4?=
- =?us-ascii?Q?S3KAI+tb/MZ0+VPFhtC/b14=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <76E93A5A8C2CE246B9E8F7CE0C0DC028@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="IRCrVGRa"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20250131131116epoutp04b490d0e24057f1079615c7bbf3024ac3~fyRXaTDaI0489404894epoutp04B
+	for <linux-block@vger.kernel.org>; Fri, 31 Jan 2025 13:11:16 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20250131131116epoutp04b490d0e24057f1079615c7bbf3024ac3~fyRXaTDaI0489404894epoutp04B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1738329076;
+	bh=YPz+mnqDAuRhGxytNtDUw+AGJf9uG05dBV7mBgFPIKU=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=IRCrVGRa6VS9kX6aIc6NydUxFpJieh136u3IO68XyvcNoPXNALZAUkIWUMtLgCNO/
+	 Psou2bDZvqiFTwBMYoEXilZ7GJW0uUuppktX15Sq/T95RyWnGmVlm9pkc7A1RvbP3F
+	 hJURz1a1G50AxantaFlineDgZ0k6jgaPP8Od9zKo=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+	20250131131116epcas5p271bc8ad5d1711023c4b2d089800fcf9f~fyRXGK7j81952019520epcas5p2K;
+	Fri, 31 Jan 2025 13:11:16 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.175]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4Ykx9G5Mhgz4x9Pv; Fri, 31 Jan
+	2025 13:11:14 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	EB.E3.19956.2FBCC976; Fri, 31 Jan 2025 22:11:14 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20250131131114epcas5p1b067a3bba165e1c0bf17d0326546282d~fyRVLeJBw0442704427epcas5p1w;
+	Fri, 31 Jan 2025 13:11:14 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20250131131114epsmtrp201e3e29812477ac3dc894c62795c1af3~fyRVK5I_d0528805288epsmtrp2i;
+	Fri, 31 Jan 2025 13:11:14 +0000 (GMT)
+X-AuditID: b6c32a4b-fe9f470000004df4-54-679ccbf2ae18
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	E3.FE.33707.2FBCC976; Fri, 31 Jan 2025 22:11:14 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20250131131113epsmtip2c6fd8f56e41d50bcffd6222c053ed5dc~fyRUAnqkL2324023240epsmtip2z;
+	Fri, 31 Jan 2025 13:11:13 +0000 (GMT)
+Message-ID: <97f402bc-4029-48d4-bd03-80af5b799d04@samsung.com>
+Date: Fri, 31 Jan 2025 18:41:12 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	KJSY+Y61okL+GrpD/7Ixkqh4CVph+2eIEDLd4xnt2br5e28CClN49rpV4vv2NnphtzXFUiLOfYCgt2BIxpj4U33fmgw1hlw9kU5I5XxEshm2lROu0mSm4TqSR+GMYfwLQMTrxYdgKNjWXvjdjXTnI7SeQRosWHUnAU9cirKfT6C/loIqPy6/4QOn095Lbc4qIuSfQ63PXkIAVeToFM2pjnVg18vYX1YBzKVjaCR7Czz7iJDsSQ0wPomD3CCmQD3IdMD3fkvDCz35DGDjP1TTWFrerKswHuMb03JLZSwxBMH/EJ2jZDwHZQgf8zBG/Wk8teOslnd4l9R56i5lsWFFw3oN7znFirzNk65aIX9k8EeScX2tPb/GIOq95yD/oYTkix97EP4jUkS6M0PGquY30sdYq9RuDof8SSbhy9e/J73jjz+8eWrI47C7lsGZAJdQxLrpQ5IoD7pgMZt15KrerzFHUVHnYC0TUSJxjWKPQOij8HzLKfk/AfOT0hcgnoCOT/9UuJmq47HsrbzL2HIy5t5GLTX7WP+/xiYr/NW83Br6w7vpTO0HYVYRx4Kp4JTADRv5w16KNS9znrB5XR2nQdJwE14LfDbNYybGEBBH9U0UmIxUQrSaEQ87WFnzIlTo
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f5f39f1-c12b-428e-a4a0-08dd41f5da84
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jan 2025 12:50:34.4804
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: HRU0v/rM3v+COFqVX5Gi62dhA3o+9Cp/UP2IcGpse7ZvrLOJWpPMoFpRb9qVQ2KOaCpLats6vJwIL7B5Mz9cDbaOnhOellAdMt0Gv6k65C0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7622
+User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM/BPF TOPIC] File system checksum offload
+To: Theodore Ts'o <tytso@mit.edu>
+Cc: lsf-pc@lists.linux-foundation.org, linux-btrfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, josef@toxicpanda.com
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20250130142857.GB401886@mit.edu>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBJsWRmVeSWpSXmKPExsWy7bCmlu6n03PSDU5N0bL489DQYu8tbYtL
+	j1ewW+zZe5LFYv6yp+wW+17vZbZo7fnJ7sDusXlJvcfkG8sZPZrOHGX2mLB5I6vH501yAaxR
+	2TYZqYkpqUUKqXnJ+SmZeem2St7B8c7xpmYGhrqGlhbmSgp5ibmptkouPgG6bpk5QDcoKZQl
+	5pQChQISi4uV9O1sivJLS1IVMvKLS2yVUgtScgpMCvSKE3OLS/PS9fJSS6wMDQyMTIEKE7Iz
+	tk+4z1qwmL/ix4qprA2Ms3i6GDk5JARMJI7MOs3WxcjFISSwm1FixtvPjBDOJ0aJtbenssM5
+	e/8uYINp2dezjxkisZNR4k3nd6iWt4wS1z53MYJU8QrYSRz4NhPMZhFQlXhw9BYbRFxQ4uTM
+	JywgtqiAvMT9WzPYQWxhARuJ7l2HwGpEBBQlbrV8AdvALLCDUWLhqV1MIAlmAXGJW0/mA9kc
+	HGwCmhIXJpeChDkF9CQOdb+AKpGX2P52DjPEpa0cEucW6ELYLhKXPm6GigtLvDq+hR3ClpL4
+	/G4v1GfZEg8ePWCBsGskdmzuY4Ww7SUa/txgBVnLDLR2/S59iFV8Er2/n4BdIyHAK9HRJgRR
+	rShxb9JTqE5xiYczlkDZHhKXVm1mggTVBkaJO/OPsE9gVJiFFCqzkDw5C8k3sxA2L2BkWcUo
+	mVpQnJueWmxaYJyXWg6P8OT83E2M4CSq5b2D8dGDD3qHGJk4GA8xSnAwK4nwchyeky7Em5JY
+	WZValB9fVJqTWnyI0RQYPROZpUST84FpPK8k3tDE0sDEzMzMxNLYzFBJnLd5Z0u6kEB6Yklq
+	dmpqQWoRTB8TB6dUA5NAi8a5SMOT0x99+m4/o+NKbE7a7JIXsc8sax9xXW89IvRWaPYF15TH
+	nTH7Hk3MWSop8dBf4CPjPb2XR+cuXLAqVJZBe6fSw88XspxeZO8QOCveyaD5wKa47MSS2K2L
+	17fMKM2TlDxadFdj3Un7N/zmFgJTJ879d8YxSyTn+ez77dJh3T+jtEKcLKbe26FkKFWy7I0+
+	97J73Le6PsQ5S85Sndn6ynDShov6k226rlw6kvXobRtP687Uk/bbju99wzH334u73hrHjIw6
+	165vNX72rMv1+AzL6E1X6/ae8bxR0HY+gSOUcc3dTrOyeSfWnnMRtbn1Q//clKyfD6+KlKdN
+	3pSVP+tSoSOv7OPOJYs5lFiKMxINtZiLihMBlXZXACsEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrILMWRmVeSWpSXmKPExsWy7bCSvO6n03PSDaZ8FbX489DQYu8tbYtL
+	j1ewW+zZe5LFYv6yp+wW+17vZbZo7fnJ7sDusXlJvcfkG8sZPZrOHGX2mLB5I6vH501yAaxR
+	XDYpqTmZZalF+nYJXBnbJ9xnLVjMX/FjxVTWBsZZPF2MnBwSAiYS+3r2MXcxcnEICWxnlDh4
+	agcTREJcovnaD3YIW1hi5b/n7BBFrxkleh43soIkeAXsJA58m8kIYrMIqEo8OHqLDSIuKHFy
+	5hMWEFtUQF7i/q0ZYIOEBWwkuncdAqsREVCUuNXyBWwzs8AORokj3z8xQmzYwCgx4/UnsKnM
+	QGfcejIf6CQODjYBTYkLk0tBwpwCehKHul8wQZSYSXRt7YIql5fY/nYO8wRGoVlI7piFZNIs
+	JC2zkLQsYGRZxSiaWlCcm56bXGCoV5yYW1yal66XnJ+7iREcK1pBOxiXrf+rd4iRiYPxEKME
+	B7OSCC/H4TnpQrwpiZVVqUX58UWlOanFhxilOViUxHmVczpThATSE0tSs1NTC1KLYLJMHJxS
+	DUzRKxV+d2VfORY4PVPrzcHVRV6vbnNs6u77L2l1+j2f0vF7q+veT/15yTTjWmSnyP6OQ/NO
+	iom8bxD6a2s09b+5vG/YZe+3s/0i8r9nHH1u18D0rZUh4/EVbftmiaabOqJLd326Lbd3+Yk5
+	L2q0z/tlcF+exLbO5jr/71OBNbIP/2178vem16+TS6c02DMzplkbL9Pm21fVbH/rRfoZlpXs
+	Css7OArsZzaYpOx4milns8u1z+TZXA3rPKsj2/d94dMvsT94Z/2apLUxuxkTr2Vw2mb/npZZ
+	fqxIZ6mK2Pwjf1uWp2VkLrTNXj3LsfR5wyXvT92pV5cdSz6l/1f35Y0pYdM2+ddN+K/Brq99
+	ZsJaJZbijERDLeai4kQAcymx2gQDAAA=
+X-CMS-MailID: 20250131131114epcas5p1b067a3bba165e1c0bf17d0326546282d
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250130092400epcas5p1a3a9d899583e9502ed45fe500ae8a824
+References: <CGME20250130092400epcas5p1a3a9d899583e9502ed45fe500ae8a824@epcas5p1.samsung.com>
+	<20250130091545.66573-1-joshi.k@samsung.com>
+	<20250130142857.GB401886@mit.edu>
 
-On Jan 28, 2025 / 15:50, Alan Adamson wrote:
-> Tests basic atomic write functionality using NVMe devices
-> that support the AWUN and AWUPF Controller Atomic Parameters
-> and NAWUN and NAWUPF Namespace Atomic Parameters.
->=20
-> Testing areas include:
->=20
-> - Verify sysfs atomic write attributes are consistent with
->   atomic write capablities advertised by the NVMe HW.
->=20
-> - Verify the atomic write paramters of statx are correct using
->   xfs_io.
->=20
-> - Perform a pwritev2() (with and without RWF_ATOMIC flag) using
->   xfs_io:
->     - maximum byte size (atomic_write_unit_max_bytes)
->     - a write larger than atomic_write_unit_max_bytes
+On 1/30/2025 7:58 PM, Theodore Ts'o wrote:
+> On Thu, Jan 30, 2025 at 02:45:45PM +0530, Kanchan Joshi wrote:
+>> I would like to propose a discussion on employing checksum offload in
+>> filesystems.
+>> It would be good to co-locate this with the storage track, as the
+>> finer details lie in the block layer and NVMe driver.
+> 
+> I wouldn't call this "file system offload".  Enabling the data
+> integrity feature or whatever you want to call it is really a block
+> layer issue.  The file system doesn't need to get involved at all.
+> Indeed, looking the patch, the only reason why the file system is
+> getting involved is because (a) you've added a mount option, and (b)
+> the mount option flips a bit in the bio that gets sent to the block
+> layer.
 
-These test contests are smallre than those in scsi/009. Is it intentional?
-No "minimum byte size" test, and no "a write smaller than
-atomic_write_unit_min_bytes" test.
+Mount option was only for the RFC. If everything else gets sorted, it 
+would be about choosing whatever is liked by the Btrfs.
+   > But this could also be done by adding a queue specific flag, at which
+> point the file system doesn't need to be involved at all.  Why would
+> you want to enable the data ingregity feature on a per block I/O
+> basis, if the device supports it?
 
->=20
-> Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
-> ---
->  tests/nvme/059     | 151 +++++++++++++++++++++++++++++++++++++++++++++
->  tests/nvme/059.out |  10 +++
->  2 files changed, 161 insertions(+)
->  create mode 100755 tests/nvme/059
->  create mode 100644 tests/nvme/059.out
->=20
-> diff --git a/tests/nvme/059 b/tests/nvme/059
-> new file mode 100755
-> index 000000000000..032f793e222d
-> --- /dev/null
-> +++ b/tests/nvme/059
-> @@ -0,0 +1,151 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2025 Oracle and/or its affiliates
-> +#
-> +# Test NVMe Atomic Writes
-> +
-> +. tests/nvme/rc
-> +. common/xfs
-> +
-> +DESCRIPTION=3D"test atomic writes"
-> +QUICK=3D1
-> +
-> +requires() {
-> +	_nvme_requires
-> +	_have_program nvme
-> +	_have_xfs_io_atomic_write
-> +}
-> +
-> +device_requires() {
-> +	_require_test_dev_sysfs queue/atomic_write_max_bytes
-> +	if (( $(< "${TEST_DEV_SYSFS}"/queue/atomic_write_max_bytes) =3D=3D 0 ))=
-; then
-> +		SKIP_REASONS+=3D("${TEST_DEV} does not support atomic write")
-> +		return 1
-> +	fi
-> +}
+Because I thought users (filesystems) would prefer flexibility. Per-IO 
+control helps to choose different policy for say data and meta. Let me 
+outline the differences.
 
-As I commented for the other patch, I suggest to factor out the check in
-device_requires().=
+Block-layer auto integrity
+- always attaches integrity-payload for each I/O.
+- it does compute checksum/reftag for each I/O. And this part does not 
+do justice to the label 'offload'.
+
+The patches make auto-integrity
+- attach the integrity-buffer only if the device configuration demands.
+- never compute checksum/reftag at the block-layer.
+- keeps the offload choice at per I/O level.
+
+Btrfs checksum tree is created only for data blocks, so the patches 
+apply the flag (REQ_INTEGRITY_OFFLOAD) on that. While metadata blocks, 
+which maybe more important, continue to get checksummed at two levels 
+(block and device).
