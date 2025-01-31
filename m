@@ -1,85 +1,141 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA0714A4C7;
-	Fri, 31 Jan 2025 08:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62FD139E;
+	Fri, 31 Jan 2025 08:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738311233; cv=none; b=n6SgyL8OREXM7Ytg1au+J2oVHom5VxgEZFg78GHPhv1weMlXno8cXuKibdKQwbFMCijjoYKxypNpN3WhuQ500oYMbSN1MZcRIEybv8ZNipwSncSlqh2hSe4/zVNzy4zyHlB9n8TjIrrDcJUz+cU+GjTL/wVIElyIyOXieiZ0NXE=
+	t=1738313210; cv=none; b=ZWTAaUhNUYFR0D/SJ89dFHzuEmFWaycxQQBJiLY6RSTUDgg5BsjzT9pBbGA86xlx2b8j045nLLlKzupSWfaCpTU0nQGlCm6yozHDB7xZrAdqYomfyaUZt+yrXp5gpB9Jhr5fsiC8amB+VsSLGmtOKq2aMHSC3o456DvVpXhYs9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738311233; c=relaxed/simple;
-	bh=oxkRbc3o2P0p/SsOZc3MA32q9r/+xAgUWRcI37qjvj4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LbkF/BtTfeL1fRlMzH2/Cj4EVhsligfZfNEnN0FHEJqYOaJov5qiSD0xl0fcRB3WzbnmuuNuYYeKOycB3Gcj1DKiwIzn6VEv/hMjJYQBoMCEin1L1uvZ742mSN2gjQGl2vM1qMmyKL7xj01CG8QxlhfVDRBZjfiJ9gTxUwP8sbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4361c705434so12444925e9.3;
-        Fri, 31 Jan 2025 00:13:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738311230; x=1738916030;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=50CUTD+eXlDFcOOIGMT4jmUgN1KvlNlJfvsnt0dgNiQ=;
-        b=bWoVLXzledjSk4AONgHep1gZbpajCLQqiGkFBKn7FJSQsePumy1XwcXaVOMp18u6rJ
-         5ahUo5+2G4L6wZiu+O7wjqaGCLfSyoNyY7OH/dwTWuyoAhAN8NFWLVmAIEd+papzfJzK
-         lXjPsz+Ej7n18GKVEqy4fZRDZ1an4AUwQCGU8dsXvzl8ljLBjKtaKfaZrL6RNvSDk0aO
-         aK2vIkRB8abqkrd7S/xw7/yDaoWd44sOEQYA/HOFZsSLfEOLdbhwDJ++WGqCgHytMmqR
-         oPHUu/LVkQGYFgy/XEnQoZNv5fM+PRFgvHvGXlS4Ovbd50eQcHeyFzpH9em3TT1rtgli
-         5rSw==
-X-Forwarded-Encrypted: i=1; AJvYcCVyZOXvUcEHJciTuceG3aMdAhteSJk21eDmhBa/QxPNit6skgxLqElhY2IHodc/DmZwi+v40W/KGdMKkA==@vger.kernel.org, AJvYcCXkl55XmpxQA2sqhHJw64CFd2cgq5zGTUI82wMB+oYNH6Olt8J2BQega1Dmeq8X1f7B5GvmP9r7EMcFW3Wu@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYcAdnL3jrLg7EkGeFLXFLqe95M7uOIoynKeQJsNU9HUFaJzyj
-	5c3CVbXY/2ebquBo3U0dd7iWn/WOOW1QjD1BQ4Rv5ry3wGfzV3TE
-X-Gm-Gg: ASbGnctxAhEn5d6o5mtG74kRlykg/os4Gp6UITk9cALuc97YbsDAfTiJ+YIQSmo5tdm
-	BPKRTcR+02BS65yjAN4ojb5QmikAgvZJp+jnbTjvUUZIfnqXHY5Ch979O/+C62DjAuoLqYEee4b
-	4fsZwYZLpNTYC2jzCay7MAGhzxJxbPShs9vnw15xNCdEEqEqzw0mZqWcG1Rc6Cu30GgLiSNIuiO
-	TbKRCE3cQpfV+7+nEt35bA5rsBy/TjBuql0ecNRwrxbSGUQgjG5elNMY4EeKQtLfNnG4CLanQWn
-	v8VS/M1N8ciTaeIcF0RNC/i2sDJEKJzIYI/uujbMZpoD62C0nnc=
-X-Google-Smtp-Source: AGHT+IEHmAcCX7brBdYswAnG+ah2odio1aZslsU8WT8VXhb3+lqKiizin7jbBKbTFIpnR2Acwshg1g==
-X-Received: by 2002:a05:600c:5252:b0:431:6153:a258 with SMTP id 5b1f17b1804b1-438dc3ca802mr92486035e9.13.1738311230257;
-        Fri, 31 Jan 2025 00:13:50 -0800 (PST)
-Received: from [10.100.102.74] (89-138-75-149.bb.netvision.net.il. [89.138.75.149])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438e244f087sm46717975e9.29.2025.01.31.00.13.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 31 Jan 2025 00:13:49 -0800 (PST)
-Message-ID: <b53dad99-6a8e-402e-9330-597289ecd8fd@grimberg.me>
-Date: Fri, 31 Jan 2025 10:13:47 +0200
+	s=arc-20240116; t=1738313210; c=relaxed/simple;
+	bh=MN2DvM770rgo/i2pspY0MDVIBzuyFuURDLT/LlnxGOo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E6HbSorfKVd/TPDIzyBMfb45EFSTxhqlZDarsTYVhbBT2FeuIZQIv1dXq13iaD0AboYPXa+yWpFiQ6mLuxJExwy6tG5yiLIE2UTYzeHGZkhv8GbRwDRLAN6wSjKRUmYjUZbJFNFCT1b1v6usT8OKy8cWgVi8n+zBdhM50/vWOQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=b+iwE5oO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NGfGL+0k; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=b+iwE5oO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NGfGL+0k; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="b+iwE5oO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NGfGL+0k";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="b+iwE5oO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NGfGL+0k"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id CD0282116C;
+	Fri, 31 Jan 2025 08:46:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1738313206; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YkmclvEd+NPcLHMTM1fnvRHy8VVE/STQCjvVBsWmSps=;
+	b=b+iwE5oOQnvpjWxeeGP4MU8c78NwiNAycoab+sG4+SdmWFiNJJtecvhgTFgM+naSgq/9dd
+	nbMwkJ83rsNrEE8NeIGz9VO0VU+crqMicQ3vqHRXtJt+Dragsj4amk00+FsYnRaPkCxlp/
+	nqAoU4KuhKbirt5NRajPE92COa56dcs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1738313206;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YkmclvEd+NPcLHMTM1fnvRHy8VVE/STQCjvVBsWmSps=;
+	b=NGfGL+0kN1OZIm/RNkRLGVK9LIg5n21zVgJwpKU0OGV6uyVSYVk/9Q+ILZ40E9ifHtCTh9
+	iGfDK+yUQo3vuZAg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1738313206; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YkmclvEd+NPcLHMTM1fnvRHy8VVE/STQCjvVBsWmSps=;
+	b=b+iwE5oOQnvpjWxeeGP4MU8c78NwiNAycoab+sG4+SdmWFiNJJtecvhgTFgM+naSgq/9dd
+	nbMwkJ83rsNrEE8NeIGz9VO0VU+crqMicQ3vqHRXtJt+Dragsj4amk00+FsYnRaPkCxlp/
+	nqAoU4KuhKbirt5NRajPE92COa56dcs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1738313206;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YkmclvEd+NPcLHMTM1fnvRHy8VVE/STQCjvVBsWmSps=;
+	b=NGfGL+0kN1OZIm/RNkRLGVK9LIg5n21zVgJwpKU0OGV6uyVSYVk/9Q+ILZ40E9ifHtCTh9
+	iGfDK+yUQo3vuZAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B93101364B;
+	Fri, 31 Jan 2025 08:46:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Du9SLPaNnGeNEAAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Fri, 31 Jan 2025 08:46:46 +0000
+Date: Fri, 31 Jan 2025 09:46:46 +0100
+From: Daniel Wagner <dwagner@suse.de>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Daniel Wagner <wagi@kernel.org>, Keith Busch <kbusch@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>, 
+	James Smart <james.smart@broadcom.com>, Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/3] blk-mq: fix wait condition for tagset wait completed
+ check
+Message-ID: <04ca03dd-d240-458a-a049-8cf0ea7f9dcc@flourine.local>
+References: <20250128-nvme-misc-fixes-v1-0-40c586581171@kernel.org>
+ <20250128-nvme-misc-fixes-v1-3-40c586581171@kernel.org>
+ <b53dad99-6a8e-402e-9330-597289ecd8fd@grimberg.me>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] blk-mq: fix wait condition for tagset wait completed
- check
-To: Daniel Wagner <wagi@kernel.org>, Keith Busch <kbusch@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- Ming Lei <ming.lei@redhat.com>
-Cc: James Smart <james.smart@broadcom.com>, Hannes Reinecke <hare@suse.de>,
- linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org
-References: <20250128-nvme-misc-fixes-v1-0-40c586581171@kernel.org>
- <20250128-nvme-misc-fixes-v1-3-40c586581171@kernel.org>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20250128-nvme-misc-fixes-v1-3-40c586581171@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b53dad99-6a8e-402e-9330-597289ecd8fd@grimberg.me>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_DN_SOME(0.00)[]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
+On Fri, Jan 31, 2025 at 10:13:47AM +0200, Sagi Grimberg wrote:
+> On 28/01/2025 18:34, Daniel Wagner wrote:
+> > blk_mq_tagset_count_completed_reqs returns the number of completed
+> > requests. The only user of this function is
+> > blk_mq_tagset_wait_completed_request which wants to know how many
+> > request are not yet completed. Thus return the number of in flight
+> > requests and terminate the wait loop when there is no inflight request.
+> > 
+> > Fixes: f9934a80f91d ("blk-mq: introduce blk_mq_tagset_wait_completed_request()")
+> 
+> Can you please describe what this patch is fixing? i.e. what is the observed
+> bug?
+> It is not clear (to me) from the patch.
 
+I have to double check again my reasoning after reading Nilay's reply.
 
+The problem I am running into with my wip tp4129 patchset is that
+requests are pending an newly introduce requeue_list queue and never get
+canceled because these requests stay in the COMPLETE state at the
+moment. This blocked the shutdown path.
 
-On 28/01/2025 18:34, Daniel Wagner wrote:
-> blk_mq_tagset_count_completed_reqs returns the number of completed
-> requests. The only user of this function is
-> blk_mq_tagset_wait_completed_request which wants to know how many
-> request are not yet completed. Thus return the number of in flight
-> requests and terminate the wait loop when there is no inflight request.
->
-> Fixes: f9934a80f91d ("blk-mq: introduce blk_mq_tagset_wait_completed_request()")
+I don't think this problem exists right now in upstream but I was under
+the impression that the check is incorrect here. I mean the
+only request we need to cancel are the ones which are not idle, no?
 
-Can you please describe what this patch is fixing? i.e. what is the 
-observed bug?
-It is not clear (to me) from the patch.
+Anyway, I'll have to go back and do some more homework.
