@@ -1,134 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E08169397;
-	Fri, 31 Jan 2025 23:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6958B629;
+	Sat,  1 Feb 2025 00:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738364589; cv=none; b=c0MuSFWYVYc59s7rGABWm+rxsjqw04Eb0JiL4DFsYQLdvqF6qX2VqEQqiam59IctB7uvqH95DHdSsaVHjabNIcDMxCadQQyOOQqMOLyM7ne7pSdZUUqsIGV4BMAPjKEBnYImjmTrtTASylLou0kxJooAHgEAcyH9yr4C7cZAaTM=
+	t=1738368706; cv=none; b=EfOr2AueiKCrE6e6bafHX50hGrP0LkZtd+TWaPBNY3T+DdgnGhpIlQ6bQmJPg8/5x8oBHp8pwzYivwK8i4FeDtfKCyN0Mhcq8lhuaQTiO8JJXJsp179qzJwlRBV65oG/w6BYx8TPtDXrY2QP24S4BttdvH9MQcOPvR/CHmUJRRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738364589; c=relaxed/simple;
-	bh=ECvrADFKO+JO1OIYd7W9HzcU4KYHzpYZYv/Lgir63/c=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Gp/osjsP+dLsnx1aNda/+tGbVm0i9i/TS7msCBWR6Xa28kBkaZw1XWRWlsrZoMXI4IqWWyeSuKjotNSdOeGUK4fSoLpHLUrfI+yCQ/HTk6WLQodBXEmz878cJpDYa1i6K0MeLM4btL0GoYE1O50O42Ve5rtoQd3+T/xFYQqtTRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SoANj1i7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738368706; c=relaxed/simple;
+	bh=MYKomRfEqunKF+5LDSAdQtifzb1Zt5hNQibIdFjJ+s8=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ien2NZeGrw1V2KBJmjzy20S23UL2MD2y8OH1JJCfbdPJimvNplJvMxT3OuOSgxkDub5wrR+Qe9ZUAPheNwCzr2PPh1WeeUh6yEQFcZ+glIwbXsAfgCFs2noD8Zj47Wv5kYd6SXiOFOmCJdM4HBNvYUMfwx1CnrD8PQ/zBgoTLqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=VAieKTRU; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SoANj1i7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D137C4CED1;
-	Fri, 31 Jan 2025 23:03:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738364588;
-	bh=ECvrADFKO+JO1OIYd7W9HzcU4KYHzpYZYv/Lgir63/c=;
-	h=Date:From:To:Cc:Subject:Reply-To:From;
-	b=SoANj1i7fF/2nxDE3KUxRrsljAaVjBeDTC6LQC4Lb0Ca6b1D1VxAn7836nyKhHk/J
-	 zEZZJenMUHFlOLpjny8rzKx0cw4lgaAAbw4E2zk64y51Hyks2oAe5xFUbW1D5+pN9z
-	 +iz9/YFG3JWGxZsnYk0Wqy4lFAtu9EFieljY1PA/ELFRFX+2Q/LYOSoAHtV3CWtjl/
-	 iKRs3t7RkeRY3nacYj1OfmQstA9EKCWzH8/vX3i9d78e45dVydnXsn4gL64Y4Xfh83
-	 hh2JSL/kG+k0Yqn+H4OPsUoreF3jySJsfcwET93X2oPVTwH04s86HVaiZCUHjlZM4Y
-	 dcAQm4OLh8aFg==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 16203CE37DA; Fri, 31 Jan 2025 15:03:08 -0800 (PST)
-Date: Fri, 31 Jan 2025 15:03:08 -0800
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: lsf-pc@lists.linux-foundation.org
-Cc: bpf@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org
-Subject: [LSF/MM/BPF TOPIC] An SRCU that is faster than RCU Tasks Trace
-Message-ID: <dab29bdf-1c33-416d-a5d7-fcc6829a4b60@paulmck-laptop>
-Reply-To: paulmck@kernel.org
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="VAieKTRU"
+Received: from [100.65.234.206] (unknown [20.236.11.185])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 7E312210C329;
+	Fri, 31 Jan 2025 16:11:36 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7E312210C329
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1738368698;
+	bh=URcW5d1wFUuTsZZ61zIwPjo02bqd3Xwwrj5siI/ejR4=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=VAieKTRUQduuqC4WMWksNFGAWFpl7wH2vcfIqWTtocImegfQz7yg09xx/uVhF84+8
+	 X7djRP48uKGESU6HAg1NDd667oKEWQCkly+4NL3U6jOR2q4YvgMKiwE4cdu5TQF7bE
+	 8JEcr4WkbAHOc5PABGxI8dv7PLkq6NUdzzexdebM=
+Message-ID: <632be2db-78d2-4249-92f0-3f60e0373172@linux.microsoft.com>
+Date: Fri, 31 Jan 2025 16:11:37 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Cc: cocci@inria.fr, kernel-janitors@vger.kernel.org,
+ eahariha@linux.microsoft.com, LKML <linux-kernel@vger.kernel.org>,
+ linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-sound@vger.kernel.org,
+ linux-spi@vger.kernel.org, linux-xfs@vger.kernel.org,
+ ceph-devel@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, ibm-acpi-devel@lists.sourceforge.net,
+ imx@lists.linux.dev, kernel@pengutronix.de,
+ linux-arm-kernel@lists.infradead.org,
+ Andrew Morton <akpm@linux-foundation.org>, Carlos Maiolino <cem@kernel.org>,
+ Chris Mason <clm@fb.com>, Christoph Hellwig <hch@lst.de>,
+ Damien Le Moal <dlemoal@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
+ David Sterba <dsterba@suse.com>, Dick Kennedy <dick.kennedy@broadcom.com>,
+ Dongsheng Yang <dongsheng.yang@easystack.cn>,
+ Fabio Estevam <festevam@gmail.com>, Frank Li <Frank.Li@nxp.com>,
+ Hans de Goede <hdegoede@redhat.com>,
+ Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
+ James Bottomley <James.Bottomley@HansenPartnership.com>,
+ James Smart <james.smart@broadcom.com>, Jaroslav Kysela <perex@perex.cz>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+ Josef Bacik <josef@toxicpanda.com>, Julia Lawall <Julia.Lawall@inria.fr>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Ilya Dryomov <idryomov@gmail.com>,
+ Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>,
+ Keith Busch <kbusch@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ Mark Brown <broonie@kernel.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Nicolas Palix <nicolas.palix@imag.fr>, Niklas Cassel <cassel@kernel.org>,
+ Oded Gabbay <ogabbay@kernel.org>, Ricardo Ribalda <ribalda@google.com>,
+ Sagi Grimberg <sagi@grimberg.me>, Sascha Hauer <s.hauer@pengutronix.de>,
+ Sebastian Reichel <sre@kernel.org>,
+ Selvin Xavier <selvin.xavier@broadcom.com>, Shawn Guo <shawnguo@kernel.org>,
+ Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Takashi Iwai <tiwai@suse.com>,
+ Victor Gambier <victor.gambier@inria.fr>, Xiubo Li <xiubli@redhat.com>,
+ Yaron Avizrat <yaron.avizrat@intel.com>,
+ Ricardo Ribalda <ribalda@chromium.org>
+Subject: Re: [PATCH 01/16] coccinelle: misc: secs_to_jiffies: Patch
+ expressions too
+To: Markus Elfring <Markus.Elfring@web.de>
+References: <20250128-converge-secs-to-jiffies-part-two-v1-1-9a6ecf0b2308@linux.microsoft.com>
+ <e06cb7f5-7aa3-464c-a8a1-2c7b9b6a29eb@web.de>
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+Content-Language: en-US
+In-Reply-To: <e06cb7f5-7aa3-464c-a8a1-2c7b9b6a29eb@web.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello!
+On 1/30/2025 3:01 AM, Markus Elfring wrote:
+>> Teach the script to suggest conversions for timeout patterns where the
+>> arguments to msecs_to_jiffies() are expressions as well.
+> 
+> Does anything hinder to benefit any more from a source code analysis approach
+> (like the following by the extended means of the semantic patch language)?
+> 
 
-Some recent patches [1] include changes providing srcu_read_lock_fast(),
-srcu_read_unlock_fast(), srcu_down_read(), and srcu_up_read(),
-which incur about 20% less read-side overhead than RCU Tasks
-Trace's rcu_read_lock_trace() and rcu_read_unlock_trace(), as well
-as about an order of magnitude less overhead than srcu_read_lock()
-and srcu_read_unlock().  In both cases, these performance numbers were
-collected using an unrealistic empty-reader benchmark on my laptop.
+Thank you, this is much more useful feedback, specifically due to the
+suggested patch below. I did intend to learn about the other modes and
+progressively upgrade secs_to_jiffies.cocci with them in the future once
+the existing instances were resolved, to help with future code
+submissions. The patch below will be super helpful in that.
 
-These new SRCU-fast read-side APIs are likely to be used for uretprobes
-[2], but might be useful elsewhere.
+As it stands, I'll fix up the current rules in v2 following your
+suggestion to keep the multiplication in each line to allow Coccinelle
+to use the commutativity properties and find more instances.
 
-The goal of this proposal is to gain additional feedback for SRCU-fast
-and to see what other uses it might be put to.  A quick "find" command
-locate instances of srcu_read_lock() in the fs, mm, and block subsystems,
-so I CCed those lists just in case.  If things go well, I expect these
-to go into the v6.15 merge window.
+I'll refrain from implementing the report mode until current instances
+have been fixed because of the issue we have already seen[1] with CI
+builds being broken. I would not want to break a strict CI build that is
+looking for coccicheck REPORT to return 0 results.
 
-More details and tradeoffs below.
+[1]:
+https://lore.kernel.org/all/20250129-secs_to_jiffles-v1-1-35a5e16b9f03@chromium.org/
 
-							Thanx, Paul
+<snip>
 
-------------------------------------------------------------------------
-
-SRCU-fast's increased read-side performance does not come for free.
-Here are some downsides compared to both RCU Tasks Trace and stock SRCU
-(as in the srcu_read_lock() function):
-
-o	SRCU-fast readers are permitted only where rcu_is_watching()
-	returns true.
-
-Downsides compared to stock SRCU:
-
-o	In the absence of readers, a synchronize_srcu() having _fast()
-	readers will incur the latency of at least two normal RCU grace
-	periods.  For purposes of comparison, in the absence of readers,
-	an isolated stock SRCU grace period might incur sub-millisecond
-	latency.  (However, this latency is artificially increased when
-	there are concurrent SRCU grace periods for the same srcu_struct
-	in order to limit CPU utilization.)
-
-o	The srcu_read_lock() function returns an int that must be
-	passed to the matching srcu_read_unlock(), which is a 32-bit
-	quantity.  In contrast, on 64-bit systems srcu_read_lock_fast()
-	returns a 64-bit pointer that must be passed to the matching
-	srcu_read_unlock_fast().
-
-o	SRCU-fast readers are NMI-safe (as are those of RCU Tasks
-	Trace), which means that they incur additional atomic-instruction
-	overhead on systems having NMIs but not NMI-safe implementations
-	of this_cpu_inc().  These systems are arm, mips, powerpc, sh,
-	and sparc.  Note "arm", as in 32-bit.  The 64-bit arm64 systems
-	have full-speed SRCU-fast readers.
-
-Downsides compared to RCU Tasks Trace:
-
-o	There are no SRCU CPU stall warnings.  (Some might consider this
-	an advantage, at least until they were in a debugging session
-	in need of such warnings.)
-
-o	The rcu_read_lock_trace() function is of void type.  In contrast,
-	srcu_read_lock_fast() returns a pointer that must be passed to
-	the matching srcu_read_unlock_fast().
-
-o	Neither RCU Tasks Trace nor SRCU provide priority boosting,
-	in part because boosting a blocked (as opposed to preempted)
-	reader is unhelpful.  However, if some use case arose where
-	boosting actually made sense, it could be added to RCU Tasks
-	Trace more easily (and with less overhead) than to SRCU.
-
-On the other hand, SRCU-fast has a couple of advantages compared to RCU
-Tasks Trace:
-
-o	RCU Tasks Trace uses a scheduler hook, and SRCU (whether fast
-	or otherwise) needs no such hook.
-
-o	SRCU-fast provides the srcu_down_read_fast() and
-	srcu_up_read_fast() functions, which allow entering a read-side
-	critical section in one context (for example, task level)
-	and exiting it in another (for example, in a timer handler).
-	This might not be impossible to provide in RCU Tasks Trace,
-	but some thought would be required due to RCU Tasks Trace's
-	current reliance on the task_struct structure.
-
-[1] https://lore.kernel.org/all/1034ef54-b6b3-42bb-9bd8-4c37c164950d@paulmck-laptop/
-[2] https://lore.kernel.org/all/20240903174603.3554182-1-andrii@kernel.org/
+Thanks,
+Easwar (he/him)
