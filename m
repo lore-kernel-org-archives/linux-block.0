@@ -1,115 +1,141 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6958B629;
-	Sat,  1 Feb 2025 00:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EFF1ADC9D
+	for <linux-block@vger.kernel.org>; Sat,  1 Feb 2025 18:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738368706; cv=none; b=EfOr2AueiKCrE6e6bafHX50hGrP0LkZtd+TWaPBNY3T+DdgnGhpIlQ6bQmJPg8/5x8oBHp8pwzYivwK8i4FeDtfKCyN0Mhcq8lhuaQTiO8JJXJsp179qzJwlRBV65oG/w6BYx8TPtDXrY2QP24S4BttdvH9MQcOPvR/CHmUJRRQ=
+	t=1738435231; cv=none; b=Hon9mHccBwYBRCXb+sS93ex/ZXqiyoCxISeBGWLHuD2I9QA10+DXKY0fLm4U9uCUsSfysadbUwpJQynvPVip+fWrhDwmwQb+zTHyrtkqjT8clrgX4b043o+GbMg17MpH7ZeHZBnCQA718uAwqXU5QmyhF0WY1mP9jFyDyJqawxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738368706; c=relaxed/simple;
-	bh=MYKomRfEqunKF+5LDSAdQtifzb1Zt5hNQibIdFjJ+s8=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ien2NZeGrw1V2KBJmjzy20S23UL2MD2y8OH1JJCfbdPJimvNplJvMxT3OuOSgxkDub5wrR+Qe9ZUAPheNwCzr2PPh1WeeUh6yEQFcZ+glIwbXsAfgCFs2noD8Zj47Wv5kYd6SXiOFOmCJdM4HBNvYUMfwx1CnrD8PQ/zBgoTLqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=VAieKTRU; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1738435231; c=relaxed/simple;
+	bh=1o7sOkPb5nJdnBqBtICR2UF/HxZ3MzNFgwk5GGH7JWk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=StGr8mkgtXLKx9IVmoviHfWIvoT+YNCRl3oVcPaXQnNsSSrlWISQHXUqA+/ONwLnz0ucufLomFbNDso0gKLw98ObJWDc3o7M3oIAofvDpjJbXW3A37YUcI1KqZ8zhwqnSSBYhEJfq/7cWEDP0RZwAe2lAx4Nbk9y6ms1MSC7se8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ly7nN9/c; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="VAieKTRU"
-Received: from [100.65.234.206] (unknown [20.236.11.185])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 7E312210C329;
-	Fri, 31 Jan 2025 16:11:36 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7E312210C329
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1738368698;
-	bh=URcW5d1wFUuTsZZ61zIwPjo02bqd3Xwwrj5siI/ejR4=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=VAieKTRUQduuqC4WMWksNFGAWFpl7wH2vcfIqWTtocImegfQz7yg09xx/uVhF84+8
-	 X7djRP48uKGESU6HAg1NDd667oKEWQCkly+4NL3U6jOR2q4YvgMKiwE4cdu5TQF7bE
-	 8JEcr4WkbAHOc5PABGxI8dv7PLkq6NUdzzexdebM=
-Message-ID: <632be2db-78d2-4249-92f0-3f60e0373172@linux.microsoft.com>
-Date: Fri, 31 Jan 2025 16:11:37 -0800
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ly7nN9/c"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5115CPHs023233;
+	Sat, 1 Feb 2025 18:40:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=s0x1j4WXm+nEf5UF1Ri4rpkXs2VBLDfrms72NlTQ+
+	wo=; b=Ly7nN9/cQJ+/Trx80OsuWsx6joi+ZuvYFYath68Xo3lkM5mpBli5nN7en
+	28EigAR1pt2Xj+oqIPuU9fJp/6AwkTwmSRHaUbhqog4vv0iZq9jsayFXPcMu5hPI
+	Ax1ezQvhdczYUu4KpZboohaz9rjDUZpLTfqlqwnXByLnoi7OLD6SbVU9Ep932YqG
+	OIdVHVspKjBBsRKHMLJe3CrBmEy1e5hpzz/zmBxTcO7LdrrUHfdvaKfOezoojVLf
+	k5Ipxj2aesLGR44760/JRAYZejbLtwDUMq+WFb/nhG5hioafjsYnceUw82RJs6qS
+	t01ssZdC9fg8QLgtOUBnYaQ37IZNQ==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44hd8k1vkp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 01 Feb 2025 18:40:28 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 511GA5ZO000922;
+	Sat, 1 Feb 2025 18:40:27 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44hdb029kx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 01 Feb 2025 18:40:27 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 511IePBH34603590
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 1 Feb 2025 18:40:25 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 29F7120108;
+	Sat,  1 Feb 2025 18:40:25 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9AA4720105;
+	Sat,  1 Feb 2025 18:40:23 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.171.82.150])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Sat,  1 Feb 2025 18:40:23 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: linux-block@vger.kernel.org
+Cc: shinichiro.kawasaki@wdc.com, gjoyce@ibm.com
+Subject: [PATCH blktests] srp: skip test if scsi_transport_srp module is loaded and in use
+Date: Sun,  2 Feb 2025 00:10:11 +0530
+Message-ID: <20250201184021.278437-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: cocci@inria.fr, kernel-janitors@vger.kernel.org,
- eahariha@linux.microsoft.com, LKML <linux-kernel@vger.kernel.org>,
- linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-sound@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-xfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, platform-driver-x86@vger.kernel.org,
- dri-devel@lists.freedesktop.org, ibm-acpi-devel@lists.sourceforge.net,
- imx@lists.linux.dev, kernel@pengutronix.de,
- linux-arm-kernel@lists.infradead.org,
- Andrew Morton <akpm@linux-foundation.org>, Carlos Maiolino <cem@kernel.org>,
- Chris Mason <clm@fb.com>, Christoph Hellwig <hch@lst.de>,
- Damien Le Moal <dlemoal@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
- David Sterba <dsterba@suse.com>, Dick Kennedy <dick.kennedy@broadcom.com>,
- Dongsheng Yang <dongsheng.yang@easystack.cn>,
- Fabio Estevam <festevam@gmail.com>, Frank Li <Frank.Li@nxp.com>,
- Hans de Goede <hdegoede@redhat.com>,
- Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
- James Bottomley <James.Bottomley@HansenPartnership.com>,
- James Smart <james.smart@broadcom.com>, Jaroslav Kysela <perex@perex.cz>,
- Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
- Josef Bacik <josef@toxicpanda.com>, Julia Lawall <Julia.Lawall@inria.fr>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Ilya Dryomov <idryomov@gmail.com>,
- Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>,
- Keith Busch <kbusch@kernel.org>, Leon Romanovsky <leon@kernel.org>,
- Mark Brown <broonie@kernel.org>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Nicolas Palix <nicolas.palix@imag.fr>, Niklas Cassel <cassel@kernel.org>,
- Oded Gabbay <ogabbay@kernel.org>, Ricardo Ribalda <ribalda@google.com>,
- Sagi Grimberg <sagi@grimberg.me>, Sascha Hauer <s.hauer@pengutronix.de>,
- Sebastian Reichel <sre@kernel.org>,
- Selvin Xavier <selvin.xavier@broadcom.com>, Shawn Guo <shawnguo@kernel.org>,
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Takashi Iwai <tiwai@suse.com>,
- Victor Gambier <victor.gambier@inria.fr>, Xiubo Li <xiubli@redhat.com>,
- Yaron Avizrat <yaron.avizrat@intel.com>,
- Ricardo Ribalda <ribalda@chromium.org>
-Subject: Re: [PATCH 01/16] coccinelle: misc: secs_to_jiffies: Patch
- expressions too
-To: Markus Elfring <Markus.Elfring@web.de>
-References: <20250128-converge-secs-to-jiffies-part-two-v1-1-9a6ecf0b2308@linux.microsoft.com>
- <e06cb7f5-7aa3-464c-a8a1-2c7b9b6a29eb@web.de>
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Content-Language: en-US
-In-Reply-To: <e06cb7f5-7aa3-464c-a8a1-2c7b9b6a29eb@web.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Wf-6IKhGhQo_bfI3rN-dAad3LPsQ5Zd2
+X-Proofpoint-GUID: Wf-6IKhGhQo_bfI3rN-dAad3LPsQ5Zd2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-01_08,2025-01-31_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ lowpriorityscore=0 phishscore=0 impostorscore=0 mlxscore=0 clxscore=1015
+ malwarescore=0 priorityscore=1501 bulkscore=0 mlxlogscore=999 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
+ definitions=main-2502010161
 
-On 1/30/2025 3:01 AM, Markus Elfring wrote:
->> Teach the script to suggest conversions for timeout patterns where the
->> arguments to msecs_to_jiffies() are expressions as well.
-> 
-> Does anything hinder to benefit any more from a source code analysis approach
-> (like the following by the extended means of the semantic patch language)?
-> 
+The srp/* tests requires exclusive access to scsi_transport_srp
+module. Running srp/* tests would definitely fail if the test can't
+get exclusive access of scsi_transport_srp module as shown below:
 
-Thank you, this is much more useful feedback, specifically due to the
-suggested patch below. I did intend to learn about the other modes and
-progressively upgrade secs_to_jiffies.cocci with them in the future once
-the existing instances were resolved, to help with future code
-submissions. The patch below will be super helpful in that.
+$ lsmod | grep scsi_transport_srp
+scsi_transport_srp    327680  1 ibmvscsi
 
-As it stands, I'll fix up the current rules in v2 following your
-suggestion to keep the multiplication in each line to allow Coccinelle
-to use the commutativity properties and find more instances.
+$ ./check srp/001
+srp/001 (Create and remove LUNs)                             [failed]
+    runtime    ...  0.249s
+tests/srp/rc: line 263: /sys/class/srp_remote_ports/port-0:1/delete: Permission denied
+tests/srp/rc: line 263: /sys/class/srp_remote_ports/port-0:1/delete: Permission denied
+modprobe: FATAL: Module scsi_transport_srp is in use.
+error: Invalid argument
+error: Invalid argument
 
-I'll refrain from implementing the report mode until current instances
-have been fixed because of the issue we have already seen[1] with CI
-builds being broken. I would not want to break a strict CI build that is
-looking for coccicheck REPORT to return 0 results.
+So if the scsi_transport_srp module is loaded and in use then skip
+running srp/* tests.
 
-[1]:
-https://lore.kernel.org/all/20250129-secs_to_jiffles-v1-1-35a5e16b9f03@chromium.org/
+Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+ common/rc    | 11 +++++++++++
+ tests/srp/rc |  1 +
+ 2 files changed, 12 insertions(+)
 
-<snip>
+diff --git a/common/rc b/common/rc
+index bcb215d..73e0b9a 100644
+--- a/common/rc
++++ b/common/rc
+@@ -78,6 +78,17 @@ _have_module() {
+ 	return 0
+ }
+ 
++_have_module_not_in_use() {
++       _have_module "$1" || return
++
++       if [ -d "/sys/module/$1" ]; then
++               refcnt="$(cat /sys/module/$1/refcnt)"
++               if [ "$refcnt" -ne "0" ]; then
++                       SKIP_REASONS+=("module $1 is in use")
++               fi
++       fi
++}
++
+ _have_module_param() {
+ 	 _have_driver "$1" || return
+ 
+diff --git a/tests/srp/rc b/tests/srp/rc
+index 85bd1dd..1bc7b20 100755
+--- a/tests/srp/rc
++++ b/tests/srp/rc
+@@ -61,6 +61,7 @@ group_requires() {
+ 	_have_module scsi_debug
+ 	_have_module target_core_iblock
+ 	_have_module target_core_mod
++	_have_module_not_in_use scsi_transport_srp
+ 
+ 	for p in mkfs.ext4 mkfs.xfs multipath multipathd pidof rdma \
+ 		 sg_reset fio; do
+-- 
+2.47.1
 
-Thanks,
-Easwar (he/him)
