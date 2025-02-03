@@ -1,93 +1,68 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBE91FC0EA;
-	Mon,  3 Feb 2025 08:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2551D798E;
+	Mon,  3 Feb 2025 09:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738573038; cv=none; b=tHVPc8k1wk6vsm+kvU+EE96Nu/c9Kw1tK+Jm8BrBSsJXmNc2u2wWalpd++ToeFYNHqSKbc51wAP8TkyakFnbTdaHh+L+SWxMp/fjxfM/P22t4isgz6UmIch/9+Tr0j6Km7JObeBBl7Zz+ribgw3iG2mEgqlVSlcvu2Y7rYKUXj0=
+	t=1738575810; cv=none; b=JVYn0WLV9bzy3l8uLM5TkyKJ93pur1ebmO+cjuOWSMimNBvQCme8IxowU62N52tM7kTB4c1onZPrsBYmTZXxjLwB/bblzmiWy3O3V/xxoizF873cdabYjVUyRQXITC3ZSfg8hTAxPVw1LZfeLz8lI2cKLZkN7DIAAvYg+R2uUaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738573038; c=relaxed/simple;
-	bh=SJgIaXOVMyKhCtZ5k3ogP4qNf4MgVQPKGRWgaNCYi48=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kTZUPK7Lnlp3D0DBIP46QLgwa2pcFmzehMcoSyhDRmjn4Y0zWXOlcarkGhEa+q4glqubjmT+YKUAkvdNR3epJW1AhOGMi3kVG0ogeL6PKvRlb9t2FGm9itXYMW99BrooWGHGoDGi+K02rSRNLaKrGjKhuUF0o0ws9LzMXEMfnA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qbqxY0fj; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	s=arc-20240116; t=1738575810; c=relaxed/simple;
+	bh=d5dY980y6eK/R+y1YcCGzlDtYoeQoPLVt60LO6V+l3s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X1AidsElPI/tBAS1IwhM6PJ7vgEgOYKPYXkzkygYMiHSc4reAUWjxdxu6f3AahT02oD4aoZxBP2s4ynitRgizXBMABgGSETcQ27/B/+ODiZPHsI2gd7OsIqK3RVeFhOiat5RHKr9sLjFSa0WK4/gloeSV5lWl2Ges9HQpcwivzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=cybf6Fm0; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qbqxY0fj"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cybf6Fm0"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=nLBTGoyTXREWOm8+XpqdKdan9El1S9L8BTRgkHy3elg=; b=qbqxY0fjMAAncLy3nDByxKQSky
-	IVfplr7a79B1wNDFd9X4YTLDFIH/2OQqkQ2cIvfnKoI1SjjRs6syrNRrtteHIO7Q1jv7w8aKkPAkL
-	4cW6WW8Rq5Kj8J0T+RhPRWA3zJuG4KHV+t6kFQA9WA5nF1+O/4qsyiDZysdXaPkQ2Sc6pUDZ9xYs+
-	sF8NB9Fv9htdDYYx1TobCv7q6eJVursYgwMTHl648OFYILyI7qRv94OoHziMclexcz6sNlmQ9YAFS
-	GEQb8HTTW0a2dTL5DzQulEDaPZ1EXciXWXaSE4h4+5kes8u8bfg5zI7BcM9S4LoowseEFdyymjKqk
-	4WH7pbGw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tesGW-0000000EvP6-1mSl;
-	Mon, 03 Feb 2025 08:57:12 +0000
-Date: Mon, 3 Feb 2025 00:57:12 -0800
-From: "hch@infradead.org" <hch@infradead.org>
-To: Qu Wenruo <wqu@suse.com>
-Cc: "hch@infradead.org" <hch@infradead.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-	Kanchan Joshi <joshi.k@samsung.com>, Theodore Ts'o <tytso@mit.edu>,
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>
-Subject: Re: [LSF/MM/BPF TOPIC] File system checksum offload
-Message-ID: <Z6CE6GzkldcEGPSQ@infradead.org>
-References: <97f402bc-4029-48d4-bd03-80af5b799d04@samsung.com>
- <b8790a76-fd4e-49b6-bc08-44e5c3bf348a@wdc.com>
- <Z6B2oq_aAaeL9rBE@infradead.org>
- <bb516f19-a6b3-4c6b-89f9-928d46b66e2a@wdc.com>
- <eaec853d-eda6-4ee9-abb6-e2fa32f54f5c@suse.com>
- <Z6B9uSTQK8s-i9TM@casper.infradead.org>
- <Z6B-luT-CzxyDGft@infradead.org>
- <efcb712d-15f9-49ab-806d-a924a614034f@suse.com>
- <Z6CA9sDUZ_nDj5LD@infradead.org>
- <26a5ee76-3e5c-441d-b335-41ee4c879e0e@suse.com>
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=dDdMPMOHiydJcOazDXKDrMW9Qwj8NeVaCW081hdBtCU=; b=cybf6Fm0kj5CvOgbKqUrlmVP/E
+	x1TWrhU2SIkp4xBZhOgruEyVvlhvQ7kYjzx8o4ppRtSrOctb2HxswptO8HWC1ltPGRMWVNcVqDIbc
+	Lg6lrKJZ2vZfUxDVSX1zg8BWkQTqGD1mUmR11dESx3s4NYDwgJTJWX7HUjzY6WmMacVs/kOLx+NY1
+	u7Jis1+Wfoc+twhAEk1kyC6JATslIluHCEFvpTrXlVyufVOvOaFiM+8jQQwwPzDgpTSEXPdR6Sf/U
+	mTPjGxHaImOE/0QUphAIwxgP07xEjYPCCRbnDjecuxKDGeQqCLH0JM+gm9eUdf9GFlnoY9aaHg64O
+	smjFVhOA==;
+Received: from 2a02-8389-2341-5b80-b79f-eb9e-0b40-3aae.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:b79f:eb9e:b40:3aae] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1teszF-0000000F1fJ-2TQc;
+	Mon, 03 Feb 2025 09:43:25 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Kanchan Joshi <joshi.k@samsung.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+	Qu Wenruo <wqu@suse.com>,
+	Goldwyn Rodrigues <rgoldwyn@suse.com>,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org
+Subject: PI and data checksumming for XFS
+Date: Mon,  3 Feb 2025 10:43:04 +0100
+Message-ID: <20250203094322.1809766-1-hch@lst.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <26a5ee76-3e5c-441d-b335-41ee4c879e0e@suse.com>
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Feb 03, 2025 at 07:21:08PM +1030, Qu Wenruo wrote:
-> That always falling-back-to-buffered-IO sounds pretty good.
-> (For NODATASUM inodes, we do not need to fallback though).
+Hi all,
 
-Yes, that's what I meant above.
+with all the PI and checksumming discussions I decided to dust of my old
+XFS PI and data checksumming prototypes.  This is pre-alpha code so
+handle it with care.  I tried to document most issues and limitations
+in the patch, but I might have missed some.  It survives an xfstests
+quick run with just three failures, one of which is a pre-existing
+failure on a PI disable device when creating dm-thin.
 
-> 
-> The only concern is performance.
-> I guess even for the uncached write it still involves some extra folio copy,
-> thus not completely the same performance level of direct IO?
+As it depends on various other in-flight patch series anyone
+daring to it should use the git branch here:
 
-In general buffered I/O is going to be slower, but at least the uncached
-mode will avoid the cache pollution.
+    git://git.infradead.org/users/hch/misc.git xfs-data-crc
 
-> And always falling back (for inodes with datacsum) may also sound a little
-> overkilled.
-> If the program is properly coded, and no contents change halfway, we always
-> pay the performance penalty but without really any extra benefit.
-
-But you don't know that, and people have very different expectations for
-"properly coded" :)  So I'd opt for the safe variant (copy) an allow an
-opt-in for the faster but less safe variant (realy direct I/O without
-copy with checksums).  And hopefully we can eventually find a version
-that will bounce buffer when modifying pages that are in-flight for
-direct I/O which would be safe and fast.
-
+instead.
