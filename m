@@ -1,179 +1,148 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE8B1FFC5F;
-	Mon,  3 Feb 2025 09:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B4D2040B5
+	for <linux-block@vger.kernel.org>; Mon,  3 Feb 2025 13:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738575827; cv=none; b=ExeEMWq82VXU3m42rBPLiNlfHyFgKnnm2IeMB7qLsBvVpDBT/4gopVx5og5gtgDXOkEvxSPRHZwnaD2mvIL94O6CqbgY1sZtBo9bnyE281K2eC5fZuFmqa1Op8A5idaFhadPZSWHvyuZt8t8E/FYZj7RPWxoQ9ANE3sVDJ5D4yI=
+	t=1738589063; cv=none; b=fgAmOKmxUyTAKyg2F8GkdpM/iID8CQNNyHyT8ZrLHZv3ScLKBL2g8reMcJ9O9B9EjE7EWcn6CTG4YzZlvDUEyq0k2HHvw6pY+AVhPCtY0Ei0PwpZmQX1Z6KnC+sYQzItxWyW5RMp9VoyoOybYt9OH3+ACbCglmXfTXyk1dk8gtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738575827; c=relaxed/simple;
-	bh=dCXeVt8dRfbqbGCPB6sMufQYJnUBcCFfMLj5eq+b8vk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gqCm3qeDWd3nBfgp8VCI/sTD68N/y1a05QszJdh+64p3rCRlvyKUP7SbaHAdUU1xrvGOEQ6FJbGTADSOXYcv0FWdxYejZCG+VcviRjAhJSMNtNzLoDa4r+dSC/Ml7KSn0w1YO9iZxMBe+RS0WkfhsMV5kxvl6N+x4zvIJSZXi50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=4Ljqzspb; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1738589063; c=relaxed/simple;
+	bh=bC58ZbxOqrWm4WBeGh1U9NXjSYnsRuHa/Frf2nB9chc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=Wjb0hkVFM9sXOjbFTGngxbYM20Puhhqqx9FrhL2W+xc24vnp76BaWNUTUoNbYiHz1ITh1lQgHHCqvUtKBIupp5oQvuFkEUAR5mNHbqv13iSDYo/wueSdKSxL03OWyPTJMFu7HFasiGmuvdLwPLkrntKVMbT3C1hdaHOY3vt7ok0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=AHtunDDM; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="4Ljqzspb"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=8sfW3RXcNW2wYU3qaS4CmyxX4fJw7263JCYLxDjNqIM=; b=4LjqzspbiHr0LX8gKdzlN7Mo7a
-	zH/Ibi9sX70MS7OzjAWWcWtB9xsn0sWWZbi+8SGPIdDDOWrUaIBdoHUnZZPWQLFyHu7ykiai9DSli
-	XDUDR2l+TqLmxWf/9fMe/APmYpXSNtY1ZwFlGzv0BrfV3WWLFq/00Z/FZ/pdqpYzMMZ5+5oxFUvN8
-	sHt4JSK1jN82koHs1aLfwXIvKpdLUNwDZsXuXHLIXfp0Nn2ABjXp4K62BtalUURngdQs01Mu4zwx4
-	i5AbIRVEXybAOLbwu25E+hUtXX7e4gBiUqenJOk1Wb+0EZjkaUXi7lze3t2xI/IVEzFO6Y43N89Vs
-	IGzyVxpQ==;
-Received: from 2a02-8389-2341-5b80-b79f-eb9e-0b40-3aae.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:b79f:eb9e:b40:3aae] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1teszY-0000000F1kl-34oe;
-	Mon, 03 Feb 2025 09:43:45 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Kanchan Joshi <joshi.k@samsung.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-	Qu Wenruo <wqu@suse.com>,
-	Goldwyn Rodrigues <rgoldwyn@suse.com>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Subject: [PATCH 7/7] xfs: implement block-metadata based data checksums
-Date: Mon,  3 Feb 2025 10:43:11 +0100
-Message-ID: <20250203094322.1809766-8-hch@lst.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250203094322.1809766-1-hch@lst.de>
-References: <20250203094322.1809766-1-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="AHtunDDM"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250203132418epoutp03f6884c27de044326f9e3b1a5d4d3dc33~gtYmBz2zG1912219122epoutp03q
+	for <linux-block@vger.kernel.org>; Mon,  3 Feb 2025 13:24:18 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250203132418epoutp03f6884c27de044326f9e3b1a5d4d3dc33~gtYmBz2zG1912219122epoutp03q
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1738589058;
+	bh=Sn+l8rsPtEhyWYMBjkIq4jtvzDpqY2GJAHjNtkksugQ=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=AHtunDDMi6rEsI3gTIFeSBgoKszxjVcgGim08o5J0D5v0iUnsARHkIQERo6TfhsPD
+	 7xvJ7wZtb0BcqTUV2Q2fY0VlNKFZ9i0fDdZM2jmZ5qoJRrlcoAjzBX+8aDjRXSuhaR
+	 ucERe/0nU6gmsAygUwqEcrJe1wTghvqj7TTzJIa0=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20250203132417epcas5p3c4586138db1e4f70dccd7f85835b0023~gtYlld50F2449724497epcas5p3G;
+	Mon,  3 Feb 2025 13:24:17 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.181]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4YmnJw39bWz4x9Px; Mon,  3 Feb
+	2025 13:24:16 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	15.9B.19933.083C0A76; Mon,  3 Feb 2025 22:24:16 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250203132416epcas5p29b636c04f0bef56c8f90bb30d21273a6~gtYj689-N2636126361epcas5p2f;
+	Mon,  3 Feb 2025 13:24:16 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250203132416epsmtrp11bb8e49ea840d78ca84826ba12ec386e~gtYj6Q_GA2429824298epsmtrp1g;
+	Mon,  3 Feb 2025 13:24:16 +0000 (GMT)
+X-AuditID: b6c32a4a-c1fda70000004ddd-c8-67a0c3805888
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	D4.66.18729.F73C0A76; Mon,  3 Feb 2025 22:24:15 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20250203132414epsmtip1fa462c58e50f2fd28bf556d2e12d2b06~gtYiSTaaN2785527855epsmtip1I;
+	Mon,  3 Feb 2025 13:24:14 +0000 (GMT)
+Message-ID: <f336dbed-895c-4aa6-a621-84112e047989@samsung.com>
+Date: Mon, 3 Feb 2025 18:54:13 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 0/3] Btrfs checksum offload
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: josef@toxicpanda.com, dsterba@suse.com, clm@fb.com, axboe@kernel.dk,
+	kbusch@kernel.org, hch@lst.de, linux-btrfs@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <yq134h0p1m5.fsf@ca-mkp.ca.oracle.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrEJsWRmVeSWpSXmKPExsWy7bCmhm7D4QXpBi8mi1qsvtvPZjGpfwa7
+	xYUfjUwWNw/sZLJYufook8Wfh4YWkw5dY7TYe0vb4tLjFewW85c9ZbdYfvwfkwO3x8Tmd+we
+	l8+Wemxa1cnmsXlJvcfumw1sHh+f3mLx6NuyitFj/ZarLB4TNm9k9fi8SS6AKyrbJiM1MSW1
+	SCE1Lzk/JTMv3VbJOzjeOd7UzMBQ19DSwlxJIS8xN9VWycUnQNctMwfoXiWFssScUqBQQGJx
+	sZK+nU1RfmlJqkJGfnGJrVJqQUpOgUmBXnFibnFpXrpeXmqJlaGBgZEpUGFCdsaUWU2sBdO5
+	K04tmMjWwPiXo4uRk0NCwERi9/qZzF2MXBxCArsZJeb/vMoG4XxilNi0eD0LhPONUeL+gd3s
+	MC2/Lr5mhEjsZZRYdeUtVMtbRonuzxNYQap4Bewkpj+YxAJiswioSJz9eY4dIi4ocXLmE7C4
+	qIC8xP1bM4Di7BzCAroSO6JBoiICphKTP20FG8kscIdRYubRuYwgCWYBcYlbT+YzdTFycLAJ
+	aEpcmFwKEuYUMJbY/ucRO0SJvMT2t3OYIe68wCHRtlsYwnaRuDqrmxXCFpZ4dXwL1C9SEi/7
+	26DsbIkHjx6wQNg1Ejs290HV20s0/LnBCrKWGWjt+l36EKv4JHp/PwG7RkKAV6KjTQiiWlHi
+	3qSnUJ3iEg9nLIGyPSReTDgGDaitjBI//u9ln8CoMAspTGYheXIWkm9mIWxewMiyilEytaA4
+	Nz212LTAKC+1HB7dyfm5mxjBiVnLawfjwwcf9A4xMnEwHmKU4GBWEuE9vX1BuhBvSmJlVWpR
+	fnxRaU5q8SFGU2DkTGSWEk3OB+aGvJJ4QxNLAxMzMzMTS2MzQyVx3uadLelCAumJJanZqakF
+	qUUwfUwcnFINTAnmp2zUezrm84e+7yw+0DHXz6R13rcLU363+IqGnHUpijxy4IXv1PVPjjSu
+	i7ERjhaL1fHxYdt6wNL2uNVln0VMnZ3V8We+N72zcAtNdVn1WcCAP/nGmrLLs2/vn8xZYr52
+	bc72/2sEluWb7L3m83yBld3R/Z0hth2661WLcwJEg+eGGN0vnnzjuh+rrOL6cE3xxp35WivP
+	xNQ/ncp6VjD7Z1mUYs+JuY4vnZcXlroEe0QoWn3LOHRTeE01U7SHNoP9MiF2xqzCiOl3zB72
+	FF3eubYrV+nNn3dprxM87KOt7Y6yPzzhtdZRObPrd0xy6d3Q6y6GKS9iEsu3hCuqSm0+ssfm
+	VOLsb8vtnsUosRRnJBpqMRcVJwIAuETp41UEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprPIsWRmVeSWpSXmKPExsWy7bCSnG794QXpBhtf2VisvtvPZjGpfwa7
+	xYUfjUwWNw/sZLJYufook8Wfh4YWkw5dY7TYe0vb4tLjFewW85c9ZbdYfvwfkwO3x8Tmd+we
+	l8+Wemxa1cnmsXlJvcfumw1sHh+f3mLx6NuyitFj/ZarLB4TNm9k9fi8SS6AK4rLJiU1J7Ms
+	tUjfLoErY8qsJtaC6dwVpxZMZGtg/MvRxcjJISFgIvHr4mvGLkYuDiGB3YwSp/p+sEEkxCWa
+	r/1gh7CFJVb+e84OUfSaUWLvgmZWkASvgJ3E9AeTWEBsFgEVibM/z7FDxAUlTs58AhYXFZCX
+	uH9rBlCcnUNYQFdiRzRIVETAVGLyp61sICOZBe4wSvybe4MJYv5WRoltt88wglQxAx1x68l8
+	oAQHB5uApsSFyaUgYU4BY4ntfx6xQ5SYSXRt7YIql5fY/nYO8wRGoVlIrpiFZNIsJC2zkLQs
+	YGRZxSiZWlCcm55bbFhgmJdarlecmFtcmpeul5yfu4kRHIdamjsYt6/6oHeIkYmD8RCjBAez
+	kgjv6e0L0oV4UxIrq1KL8uOLSnNSiw8xSnOwKInzir/oTRESSE8sSc1OTS1ILYLJMnFwSjUw
+	Me1eff/IYd6loffrZmev9rNiX3bH/vh/hZrH95u0ViXM0hP0MXKarOPNZsf0l8sknWH14+vX
+	oncUX32fqb1uwZwFF3ff3NfwOK10p5nt926717EL8ytt28LsGrec0nb/8veNfN0T74tH5lz3
+	7JdRPnQ54IGv4vYJefdO/sk2+j930sEQyfjed5syjp59Fz/jEJu7FL/R+o6FOckJ2wQOrTmw
+	q1fX/jzXytArfQofZRSfsNf0bhVw2f9b+d+iF5M/BTu+WbKp/e3DqAlzRe+YeD0SK/2setne
+	x8jj8Zo5v7q3NIWp7QkyzHzP+fTjjO4v2XLuFSWKDAuqTqvlO7Q+2y9xduc7EyXlJZ/f7z+c
+	cEuJpTgj0VCLuag4EQBWN79mMgMAAA==
+X-CMS-MailID: 20250203132416epcas5p29b636c04f0bef56c8f90bb30d21273a6
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250129141039epcas5p11feb1be4124c0db3c5223325924183a3
+References: <CGME20250129141039epcas5p11feb1be4124c0db3c5223325924183a3@epcas5p1.samsung.com>
+	<20250129140207.22718-1-joshi.k@samsung.com>
+	<yq134h0p1m5.fsf@ca-mkp.ca.oracle.com>
 
-This is a quick hack to demonstrate how data checksumming can be
-implemented when it can be stored in the out of line metadata for each
-logical block.  It builds on top of the previous PI infrastructure
-and instead of generating/verifying protection information it simply
-generates and verifies a crc32c checksum and stores it in the non-PI
-metadata.  It misses a feature bit in the superblock, checking that
-enough size is available in the metadata and many other things.
+On 1/31/2025 1:51 AM, Martin K. Petersen wrote:
+>> There is value in avoiding Copy-on-write (COW) checksum tree on a
+>> device that can anyway store checksums inline (as part of PI). This
+>> would eliminate extra checksum writes/reads, making I/O more
+>> CPU-efficient. Additionally, usable space would increase, and write
+>> amplification, both in Btrfs and eventually at the device level, would
+>> be reduced [*].
+> I have a couple of observations.
+> 
+> First of all, there is no inherent benefit to PI if it is generated at
+> the same time as the ECC. The ECC is usually far superior when it comes
+> to protecting data at rest. And you'll still get an error if uncorrected
+> corruption is detected. So BLK_INTEGRITY_OFFLOAD_NO_BUF does not offer
+> any benefits in my book.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/xfs/xfs_data_csum.c | 79 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 76 insertions(+), 3 deletions(-)
+I fully agree, there is no benefit if we see it from E2E use case.
+But for a different use case (i.e., checksum offload), 
+BLK_INTEGRITY_OFFLOAD_NO_BUF is as good as it gets.
 
-diff --git a/fs/xfs/xfs_data_csum.c b/fs/xfs/xfs_data_csum.c
-index d9d3620654b1..862388803398 100644
---- a/fs/xfs/xfs_data_csum.c
-+++ b/fs/xfs/xfs_data_csum.c
-@@ -14,6 +14,73 @@
- #include <linux/blk-integrity.h>
- #include <linux/bio-integrity.h>
- 
-+static inline void *xfs_csum_buf(struct bio *bio)
-+{
-+	return bvec_virt(bio_integrity(bio)->bip_vec);
-+}
-+
-+static inline __le32
-+xfs_data_csum(
-+	void			*data,
-+	unsigned int		len)
-+{
-+	return xfs_end_cksum(crc32c(XFS_CRC_SEED, data, len));
-+}
-+
-+static void
-+__xfs_data_csum_generate(
-+	struct bio		*bio)
-+{
-+	unsigned int		ssize = bdev_logical_block_size(bio->bi_bdev);
-+	__le32			*csum_buf = xfs_csum_buf(bio);
-+	struct bvec_iter_all	iter;
-+	struct bio_vec		*bv;
-+	int			c = 0;
-+
-+	bio_for_each_segment_all(bv, bio, iter) {
-+		void		*p;
-+		unsigned int	off;
-+
-+		p = bvec_kmap_local(bv);
-+		for (off = 0; off < bv->bv_len; off += ssize)
-+			csum_buf[c++] = xfs_data_csum(p + off, ssize);
-+		kunmap_local(p);
-+	}
-+}
-+
-+static int
-+__xfs_data_csum_verify(
-+	struct bio		*bio,
-+	struct xfs_inode	*ip,
-+	xfs_off_t		file_offset)
-+{
-+	unsigned int		ssize = bdev_logical_block_size(bio->bi_bdev);
-+	__le32			*csum_buf = xfs_csum_buf(bio);
-+	int			c = 0;
-+	struct bvec_iter_all	iter;
-+	struct bio_vec		*bv;
-+
-+	bio_for_each_segment_all(bv, bio, iter) {
-+		void		*p;
-+		unsigned int	off;
-+
-+		p = bvec_kmap_local(bv);
-+		for (off = 0; off < bv->bv_len; off += ssize) {
-+			if (xfs_data_csum(p + off, ssize) != csum_buf[c++]) {
-+				kunmap_local(p);
-+				xfs_warn(ip->i_mount,
-+"checksum mismatch at inode 0x%llx offset %lld",
-+					ip->i_ino, file_offset);
-+				return -EFSBADCRC;
-+			}
-+			file_offset += ssize;
-+		}
-+		kunmap_local(p);
-+	}
-+
-+	return 0;
-+}
-+
- void *
- xfs_data_csum_alloc(
- 	struct bio		*bio)
-@@ -53,11 +120,14 @@ xfs_data_csum_generate(
- {
- 	struct blk_integrity	*bi = blk_get_integrity(bio->bi_bdev->bd_disk);
- 
--	if (!bi || !bi->csum_type)
-+	if (!bi)
- 		return;
- 
- 	xfs_data_csum_alloc(bio);
--	blk_integrity_generate(bio);
-+	if (!bi->csum_type)
-+		__xfs_data_csum_generate(bio);
-+	else
-+		blk_integrity_generate(bio);
- }
- 
- int
-@@ -67,7 +137,10 @@ xfs_data_csum_verify(
- 	struct bio		*bio = &ioend->io_bio;
- 	struct blk_integrity	*bi = blk_get_integrity(bio->bi_bdev->bd_disk);
- 
--	if (!bi || !bi->csum_type)
-+	if (!bi)
- 		return 0;
-+	if (!bi->csum_type)
-+		return __xfs_data_csum_verify(&ioend->io_bio,
-+				XFS_I(ioend->io_inode), ioend->io_offset);
- 	return blk_integrity_verify_all(bio, ioend->io_sector);
- }
--- 
-2.45.2
+[Application -> FS -> Block-layer -> Device]
 
+I understand that E2E gets stronger when integrity/checksum is placed at 
+the origin of data (application), and then each component collaborates 
+in checking it.
+
+But I am not doing E2E here. Call it abuse or creative, but I am using 
+the same E2E capable device to do checksum-offload. If the device had 
+exposed checksum-offload in a different way, I would have taken that 
+route rather than E2E one.
