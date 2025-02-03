@@ -1,147 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8901520A5CD;
-	Mon,  3 Feb 2025 14:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E017111A8
+	for <linux-block@vger.kernel.org>; Mon,  3 Feb 2025 14:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738591202; cv=none; b=J98OSpwszwLbiiEjiaM9jMZQk+8mqaIzje+6k1XRRfPnxc70ibhmTERkg/oZcSX1i+C4BG96EEdBhp7EXyyKSaJavK0E99K5Ail3VGeNVOupi3OEhVjvOuCpAq2nvCYoaNGAPiaFFS1mrRtcU47dWECY0Qquq58Tz2P9u/KjA0s=
+	t=1738591441; cv=none; b=bosvOr2+dl9+i7v6+KYTitJqhdo5lh4BChvwu0+KHRkSPVCkP+R/VkvOjTjdTYJFH/i/h092vSz8mIwtzsy1BBptETk4xtQGm4/C/D2GcfKNcLyvgcKGdvIka5lGma6Lk3N+luJbCkbZWYDsQTfGe1Ep9uEL05p9wJUiDJVQywk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738591202; c=relaxed/simple;
-	bh=DodJHTwvmvoQJhOboL7veVJCLIW/qyqGwOMGQqc+N4I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lUkzvB++HMBjTA22YUQT4xY39OTQR+Nn9DVC6349XIloiar2kf8+XApgCtVOcq+b+6Y6C8WjFM2gvCKCFO8C5IZG/o3D9Vwsb5BANDlC64XEB1aDatNUMc/2/FrfL4ZSogbNx1+SaqXxOduh+L+StS8bzJotdZPUG+uE/xyI7OE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HgvYe2rP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738591441; c=relaxed/simple;
+	bh=nxq06s0DI0Ylg3jRif469JTU6nFclSqLO/fFYKyzB9M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=k6p+PJpYSQqo/6y3YkWzq3HmHpcz+ULuQeVX8jhvY/HwRojtoYlF1w4NVnPlQsMHz1bypiL3/e5+JvY4VGI/TDaG1jwHSzoyo3UzGeXibRq03vb5+exzgBbciVURtjaTGgDa/awQqb+tYoybo/UPrH0sB32pKSx1rS3hxsuuj0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Pj3XMqFO; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HgvYe2rP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81BBBC4CED2;
-	Mon,  3 Feb 2025 14:00:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738591202;
-	bh=DodJHTwvmvoQJhOboL7veVJCLIW/qyqGwOMGQqc+N4I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HgvYe2rPWcMjSyAu3Eokhg0NfcNuRWANm4Gyz/4hOOBktMJSf8tin3RUlguKJqOk4
-	 bEgKeU/PSciJwSbVdm+qO/peNzrP+IoB9+9Opsuh9POZy7jilaHSxoGkCMYHtaUNan
-	 E1eQtyzugdwz57zepOXLKhHZvZNCnWGn/8+e9Od8224p/I9D5sTNS9ve7HWAlZ3nAN
-	 bYEqYGuuOk+Y44bUThSnihWPSNVGLIOQksmEe65mV/BNjt7Zo3tQ5Vts3dzpogMa+5
-	 2juoCX6Yg03qW7uTt9yZ2o6FWyEdnAipDTyI7/rlKj1/6SBiMVgl4aYefXniuy7c1Q
-	 yNcWcJlhI7Eig==
-Date: Mon, 3 Feb 2025 06:00:00 -0800
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: hare@suse.de, dave@stgolabs.net, david@fromorbit.com, djwong@kernel.org,
-	kbusch@kernel.org, john.g.garry@oracle.com, hch@lst.de,
-	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-	linux-block@vger.kernel.org, gost.dev@samsung.com,
-	p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
-Subject: Re: [PATCH 0/5] fs/buffer: strack reduction on async read
-Message-ID: <Z6DL4MrsHbtX_MIs@bombadil.infradead.org>
-References: <20241218022626.3668119-1-mcgrof@kernel.org>
- <Z2MrCey3RIBJz9_E@casper.infradead.org>
- <Z2OEmALBGB8ARLlc@bombadil.infradead.org>
- <Z2OYRkpRcUFIOFog@casper.infradead.org>
- <Z50AR0RKSKmsumFN@bombadil.infradead.org>
- <Z51ISh2YAlwoLo5h@casper.infradead.org>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Pj3XMqFO"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20250203140357epoutp041f2abc44e9c3a8cb471270ba82533af6~gt7NeUKBe3258932589epoutp04N
+	for <linux-block@vger.kernel.org>; Mon,  3 Feb 2025 14:03:57 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20250203140357epoutp041f2abc44e9c3a8cb471270ba82533af6~gt7NeUKBe3258932589epoutp04N
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1738591437;
+	bh=+iNyyksu3oqdbKY7StoHcCgtEjGDaVz45hLSqCNeAQc=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=Pj3XMqFO768vu/L2hWZxg4bI8YMDpSrZ2T9FIBQLfSOFXHUb1MnKc/hcIoJjRM1PV
+	 fiWTT37RZUPaZ6Ux2yN4p5OIA2hTCyfPcx6+3M3bivY74JHrdD5wPOwTPcdCi9k2Ro
+	 JjBN0m2YZYqooGGdmBHAM9aJepR1O8dBmdSKhdfE=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20250203140356epcas5p4589e76aeacc793515748b236fce0f4ab~gt7NGV0pC1511215112epcas5p46;
+	Mon,  3 Feb 2025 14:03:56 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.175]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4YmpBg3BNhz4x9Q1; Mon,  3 Feb
+	2025 14:03:55 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+	epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	40.2D.20052.BCCC0A76; Mon,  3 Feb 2025 23:03:55 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20250203140355epcas5p39624b1d4924f53e2c4cb9dd0188160ec~gt7LfJReZ0816408164epcas5p3q;
+	Mon,  3 Feb 2025 14:03:55 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20250203140355epsmtrp262868bfe281810560d487e0ae97a3698~gt7LdpY7T2289522895epsmtrp2b;
+	Mon,  3 Feb 2025 14:03:55 +0000 (GMT)
+X-AuditID: b6c32a49-3d20270000004e54-c9-67a0cccb6730
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	29.A0.33707.ACCC0A76; Mon,  3 Feb 2025 23:03:54 +0900 (KST)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20250203140353epsmtip15aafa852148ac72e8e84f938bb4751eb~gt7J1A-Z81698316983epsmtip1i;
+	Mon,  3 Feb 2025 14:03:53 +0000 (GMT)
+Message-ID: <330a257d-e276-40d2-855c-8d108abfde02@samsung.com>
+Date: Mon, 3 Feb 2025 19:33:52 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z51ISh2YAlwoLo5h@casper.infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 0/3] Btrfs checksum offload
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, "josef@toxicpanda.com"
+	<josef@toxicpanda.com>, "dsterba@suse.com" <dsterba@suse.com>, "clm@fb.com"
+	<clm@fb.com>, "axboe@kernel.dk" <axboe@kernel.dk>, "kbusch@kernel.org"
+	<kbusch@kernel.org>, hch <hch@lst.de>
+Cc: "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <f2ccdba4-86df-49ae-a465-1f8003fc1fb3@wdc.com>
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrPJsWRmVeSWpSXmKPExsWy7bCmhu7pMwvSDW53iVmsvtvPZjGpfwa7
+	xYUfjUwWNw/sZLJYufook8XfrntMFn8eGlpMOnSN0WLvLW2LS49XsFvMX/aU3YHbY2LzO3aP
+	y2dLPTat6mTz2Lyk3mP3zQY2j74tqxg91m+5yuIxYfNGVo/Pm+Q82g90MwVwRWXbZKQmpqQW
+	KaTmJeenZOal2yp5B8c7x5uaGRjqGlpamCsp5CXmptoqufgE6Lpl5gDdq6RQlphTChQKSCwu
+	VtK3synKLy1JVcjILy6xVUotSMkpMCnQK07MLS7NS9fLSy2xMjQwMDIFKkzIzjj5OaWgg6Vi
+	9szXjA2My5i7GDk5JARMJKY+eMzSxcjFISSwm1GiZcM1FpCEkMAnRomVHyMgEkD2mt29rDAd
+	L14+YIVI7ATqWHmIGcJ5C1T1vYMNpIpXwE7i/bYOpi5GDg4WARWJQ/cqIMKCEidnPgHbICog
+	L3H/1gz2LkZ2DmEBXYkd0SBTRAS6mCQOr1kONp9Z4AujxI/nR8AWMwuIS9x6Mh9sJJuApsSF
+	yaUgJqeAtcSXxa4QFfIS29/OgXrsCIfE5UmmELaLxKZ9c5kgbGGJV8e3sEPYUhKf3+1lg7Cz
+	JR48esACYddI7NjcB/WuvUTDnxusIKuYgbau36UPsYpPovf3E7BjJAR4JTrahCCqFSXuTXoK
+	1Sku8XDGEijbQ+LFhGNskHDqZJY4f7iNeQKjwiykMJmF5MdZSL6ZhbB5ASPLKkbJ1ILi3PTU
+	YtMCw7zUcnhcJ+fnbmIEp2Qtzx2Mdx980DvEyMTBeIhRgoNZSYT39PYF6UK8KYmVValF+fFF
+	pTmpxYcYTYFxM5FZSjQ5H5gV8kriDU0sDUzMzMxMLI3NDJXEeZt3tqQLCaQnlqRmp6YWpBbB
+	9DFxcEo1MK1Qyzb94OgRKKt230vt0qWnDRGhPz+9cNVsyWaxZF7DKGx3V7H5KL/J5YkOb9br
+	b/zK0TK1w0Nmn7l8t3km72/3Tys1+FiOcIcUN+QJpDRePbqmsWfxw98nVFvjHLguTu5pL2f0
+	0JynUnI1e8q8G/vSvO1fs//IeH72GPO6AEvtlqjqGzIbuPa/eszj45HYL/J2bW9N19qDGRym
+	Dv4HM7+9KZq6dG94a2r1nYc7boSrbWyZfmCKgI3z/HfNB3Rd9pi+fxG5ur5/hYGK2j+5tgsm
+	pyoeRPBx6OpVves9Hc0oZNce3PllKvf5FTP+nym7Y2C/b1uVFE/y11syIp2yzw5+/R28lvOx
+	t6tJl4K5EktxRqKhFnNRcSIAGudcC1IEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJIsWRmVeSWpSXmKPExsWy7bCSnO6pMwvSDX6vNbVYfbefzWJS/wx2
+	iws/Gpksbh7YyWSxcvVRJou/XfeYLP48NLSYdOgao8XeW9oWlx6vYLeYv+wpuwO3x8Tmd+we
+	l8+Wemxa1cnmsXlJvcfumw1sHn1bVjF6rN9ylcVjwuaNrB6fN8l5tB/oZgrgiuKySUnNySxL
+	LdK3S+DKOPk5paCDpWL2zNeMDYzLmLsYOTkkBEwkXrx8wNrFyMUhJLCdUWLrpaOMEAlxieZr
+	P9ghbGGJlf+es0MUvWaUmHLnBVgRr4CdxPttHUxdjBwcLAIqEofuVUCEBSVOznzCAmKLCshL
+	3L81A6iXnUNYQFdiRzTIFBGBHiaJc+d3MYI4zAJfGCV2XrvKCDG/k1ni1sWfYIuZgY649WQ+
+	2Hw2AU2JC5NLQUxOAWuJL4tdISrMJLq2djFC2PIS29/OYZ7AKDQLyRWzkAyahaRlFpKWBYws
+	qxhFUwuKc9NzkwsM9YoTc4tL89L1kvNzNzGCY08raAfjsvV/9Q4xMnEwHmKU4GBWEuE9vX1B
+	uhBvSmJlVWpRfnxRaU5q8SFGaQ4WJXFe5ZzOFCGB9MSS1OzU1ILUIpgsEwenVAOT662Ijsbv
+	FaeCJFdyxSz94zx/hgXHM8Z/qbWrhLwX3uSXiL1RuX/D2jcids4pGiUVhn7CDPWnV+nt2aTj
+	s8Ns5zrZY2k+HSUfPGpcTnQLrlqSEXf36dbF8x/ZtCs4+hu+FEwLVuxJ1lzefWvmGt/ff6Mr
+	t7Ad3BTE4bxeWPam99UTL7M/PI5g2bZi5Zf410enrtgtw9Sn9cLZ6eXbdy3x7K0J7e4hU7+7
+	B2x0MbxzqPOx+LbN8f8X5C6USU8z6ShTmjn5euJ6xwRBN+ngV8fWmuhpRTJdNda0jMjZIH7t
+	zLMjCXtFREybNgox6qj3bblRoWllekQj/q/IniceLSqLXTcUvI77tunAHwZBm+9KLMUZiYZa
+	zEXFiQBLIVlgLAMAAA==
+X-CMS-MailID: 20250203140355epcas5p39624b1d4924f53e2c4cb9dd0188160ec
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250129141039epcas5p11feb1be4124c0db3c5223325924183a3
+References: <CGME20250129141039epcas5p11feb1be4124c0db3c5223325924183a3@epcas5p1.samsung.com>
+	<20250129140207.22718-1-joshi.k@samsung.com>
+	<299a886d-c065-4b75-b0be-625710f7348c@wdc.com>
+	<572e0418-de26-47ec-b536-b63291acff52@samsung.com>
+	<73ba28f4-0588-4ca8-b64f-2a6dd593606b@wdc.com>
+	<8e548c8f-7a05-4e82-aed7-6044a0d247c9@samsung.com>
+	<f2ccdba4-86df-49ae-a465-1f8003fc1fb3@wdc.com>
 
-On Fri, Jan 31, 2025 at 10:01:46PM +0000, Matthew Wilcox wrote:
-> On Fri, Jan 31, 2025 at 08:54:31AM -0800, Luis Chamberlain wrote:
-> > On Thu, Dec 19, 2024 at 03:51:34AM +0000, Matthew Wilcox wrote:
-> > > On Wed, Dec 18, 2024 at 06:27:36PM -0800, Luis Chamberlain wrote:
-> > > > On Wed, Dec 18, 2024 at 08:05:29PM +0000, Matthew Wilcox wrote:
-> > > > > On Tue, Dec 17, 2024 at 06:26:21PM -0800, Luis Chamberlain wrote:
-> > > > > > This splits up a minor enhancement from the bs > ps device support
-> > > > > > series into its own series for better review / focus / testing.
-> > > > > > This series just addresses the reducing the array size used and cleaning
-> > > > > > up the async read to be easier to read and maintain.
-> > > > > 
-> > > > > How about this approach instead -- get rid of the batch entirely?
-> > > > 
-> > > > Less is more! I wish it worked, but we end up with a null pointer on
-> > > > ext4/032 (and indeed this is the test that helped me find most bugs in
-> > > > what I was working on):
-> > > 
-> > > Yeah, I did no testing; just wanted to give people a different approach
-> > > to consider.
-> > > 
-> > > > [  106.034851] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> > > > [  106.046300] RIP: 0010:end_buffer_async_read_io+0x11/0x90
-> > > > [  106.047819] Code: f2 ff 0f 1f 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 53 48 8b 47 10 48 89 fb 48 8b 40 18 <48> 8b 00 f6 40 0d 40 74 0d 0f b7 00 66 25 00 f0 66 3d 00 80 74 09
-> > > 
-> > > That decodes as:
-> > > 
-> > >    5:	53                   	push   %rbx
-> > >    6:	48 8b 47 10          	mov    0x10(%rdi),%rax
-> > >    a:	48 89 fb             	mov    %rdi,%rbx
-> > >    d:	48 8b 40 18          	mov    0x18(%rax),%rax
-> > >   11:*	48 8b 00             	mov    (%rax),%rax		<-- trapping instruction
-> > >   14:	f6 40 0d 40          	testb  $0x40,0xd(%rax)
-> > > 
-> > > 6: bh->b_folio
-> > > d: b_folio->mapping
-> > > 11: mapping->host
-> > > 
-> > > So folio->mapping is NULL.
-> > > 
-> > > Ah, I see the problem.  end_buffer_async_read() uses the buffer_async_read
-> > > test to decide if all buffers on the page are uptodate or not.  So both
-> > > having no batch (ie this patch) and having a batch which is smaller than
-> > > the number of buffers in the folio can lead to folio_end_read() being
-> > > called prematurely (ie we'll unlock the folio before finishing reading
-> > > every buffer in the folio).
-> > 
-> > But:
-> > 
-> > a) all batched buffers are locked in the old code, we only unlock
-> >    the currently evaluated buffer, the buffers from our pivot are locked
-> >    and should also have the async flag set. That fact that buffers ahead
-> >    should have the async flag set should prevent from calling
-> >    folio_end_read() prematurely as I read the code, no?
-> 
-> I'm sure you know what you mean by "the old code", but I don't.
-> 
-> If you mean "the code in 6.13", here's what it does:
+On 2/3/2025 7:10 PM, Johannes Thumshirn wrote:
+> But NODATASUM isn't something that is actively recommended unless you
+> know what you're doing. I thought of your patches as an offload of the
+> checksum tree to the T10-PI extended sector format
 
-Yes that is what I meant, sorry.
-
-> 
->         tmp = bh;
->         do {
->                 if (!buffer_uptodate(tmp))
->                         folio_uptodate = 0;
->                 if (buffer_async_read(tmp)) {
->                         BUG_ON(!buffer_locked(tmp));
->                         goto still_busy;
->                 }
->                 tmp = tmp->b_this_page;
->         } while (tmp != bh);
->         folio_end_read(folio, folio_uptodate);
-> 
-> so it's going to cycle around every buffer on the page, and if it finds
-> none which are marked async_read, it'll call folio_end_read().
-> That's fine in 6.13 because in stage 2, all buffers which are part of
-> this folio are marked as async_read.
-
-Indeed, also, its not just every buffer on the page, since we can call
-end_buffer_async_read() on every buffer in the page we can end up
-calling end_buffer_async_read() on every buffer in the worst case, and
-on each loop above we start from the pivot buffer up to the end of the
-page.
-
-> In your patch, you mark every buffer _in the batch_ as async_read
-> and then submit the entire batch.  So if they all complete before you
-> mark the next bh as being uptodate, it'll think the read is complete
-> and call folio_end_read().
-
-Ah yes, thanks, this clarifies to me what you meant!
-
-  Luis
+You thought right, patches do "offload to T10-PI format" part. That part 
+is generic for any upper-layer user. One only needs to send flag 
+REQ_INTEGRITY_OFFLOAD for that.
+And for the other part "suppress data-csums at Btrfs level", I thought 
+of using NODATASUM.
