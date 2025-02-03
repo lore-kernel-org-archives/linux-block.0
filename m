@@ -1,56 +1,56 @@
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1301E1D5CC4
-	for <linux-block@vger.kernel.org>; Mon,  3 Feb 2025 18:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC5670821
+	for <linux-block@vger.kernel.org>; Mon,  3 Feb 2025 18:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738608242; cv=none; b=oq2xBDMQEuy94hm9hCDz2klQAFEUpKoJMRjSFtDYt3I/6fn8XKXRAlv+jEqz5OTmVtxnB7KPqiizIt0G/yIzaGqWVyjBN99huQpYSNo1Z36Uyu4ZUZQvqIx6APB5+TtuwUDHK8lrMOs7CKWKAoKtxfW7c5zEwHKJHYn6gXykfd8=
+	t=1738608414; cv=none; b=PsO+zRsIFELrRwOFbnMOwOoB/t0WyhQpaM/3UBYBIDgiShOJaycWNPbj3wigiVQ1lHYagik1GmbMwv9TrDZr03NydJZRAZvtiYkQqmjp/0esSPo6y5Hy4o/LRPhN5HZR3yWYDUvuE7+SJpjpjWCSyjUgpYwZhLxvfXu4lBOkJIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738608242; c=relaxed/simple;
-	bh=ktr9PiP+oadbzrXwSkUjSXD2dPHBC0UhG57Ju1uoEuk=;
+	s=arc-20240116; t=1738608414; c=relaxed/simple;
+	bh=ZmPBU+y0wUs+Dct6iyCseKDNT93XKYQWtki3HrGZh9I=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gTg5BxExi6gE6z9WOee46HngU5Vj3wPIKbEmP5s+eRJE/ghDQEp2Q5jNSk31nVJq9j64H9nPf2mxz5/QNyLaxijvqgJnHHruix/dvZRn26GbOE7/Pa3yFlJd9Hf0lxPHR1vWBQoRUckPlNa8B2VqhbAQGKbyRiZT6+2NEky2NOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=cb5NDdv2; arc=none smtp.client-ip=67.231.153.30
+	 MIME-Version:Content-Type; b=poVsHkd1aQ4qjqZ71UoFrbUA8WbwZveU6Ob8rzDd6PPlRDwbEfFKc26P320bQEUeKmwES7EYY9il02gbol+RkoXenlQC64KuZGokk87i8huKx0qg6dH0jWXTdxeY3CjHcEPz0jp2cOGjNk4QSkK0vnDYrfrdOqmXHbOxlmEx3BA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=T0T50WP7; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="cb5NDdv2"
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-	by m0089730.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 513IHqSh006896
-	for <linux-block@vger.kernel.org>; Mon, 3 Feb 2025 10:43:59 -0800
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="T0T50WP7"
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 513IHo8R002115
+	for <linux-block@vger.kernel.org>; Mon, 3 Feb 2025 10:46:52 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=vD+7nw2tYMtvjJDa1Yiet8R2DOiSYjvA3pTIKc83e0U=; b=cb5NDdv286fe
-	BxtdSO0DIgVsyN/eMzpAwWDAw2FWXpf7to23pxs4TydYyYthX1L2fHZ/6JsCr456
-	EdF+Y7LrMPMgzh1rh9bNfDl0vILtN9A80ZofsjxDwga2OwJqQPJTdSdcxxb4ZHoq
-	uUVBHBhZ6BkMjKlRxiMj3zJMdBWNVAQyA9aJrkgGHxTtf8Uk6Ug4TbLUXO4vHsLr
-	L73fiaOVT3cn6fmjufx3B7VR47hCaTWSkjSvdkavNztAk6Ld1bzlQ/rzv9Sep99K
-	+SVVvwQs+7c2DBnrCUWtWVhgs50Jc+fRBCOq9KbOa+yPcqFHe8oYZKchQPvU7aXd
-	6NF/b7+tXA==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by m0089730.ppops.net (PPS) with ESMTPS id 44k21sgr9b-18
+	 bh=CRYlmtHGoiktA/eCNL20FwlrxpVyl/ohOo4w2aG06+M=; b=T0T50WP766gj
+	3YC8kKmGOJkP1AH49JGSBoafmicnhf9tx+hBjarsECY/i6GfC182OLN5E65/BlUT
+	1/k4fiarPx/Dqhig672oiCRTK8lWJHVOcNdwpBbOIuCiY8gjungehKqcXbXVmS8/
+	d6pbAE53wA1o7W309CUaR3dI+JQdzFYCi3AHn+gfEV0hNG85CDHL1iJ0s5j0FULU
+	m5GC+vQ7ftUf1K6rKoeIdOkjQJ0uYH0cQE3+yg2L2bWeEMgpCQwv5Cd/NqGNzbKU
+	m7YCv6oqETDhQhrdM7s374PA/UiBIZGF5xYR7DD8tg0SZhDrRiMdPcvgoQvLcKfS
+	CjYeNKqFHQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 44k21ugsgm-3
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 03 Feb 2025 10:43:59 -0800 (PST)
-Received: from twshared53813.03.ash8.facebook.com (2620:10d:c0a8:1b::8e35) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Mon, 03 Feb 2025 10:46:51 -0800 (PST)
+Received: from twshared55211.03.ash8.facebook.com (2620:10d:c085:208::7cb7) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Mon, 3 Feb 2025 18:43:52 +0000
+ 15.2.1544.14; Mon, 3 Feb 2025 18:46:50 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 95317179C2627; Mon,  3 Feb 2025 10:41:34 -0800 (PST)
+	id C3E71179C262F; Mon,  3 Feb 2025 10:41:34 -0800 (PST)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-nvme@lists.infradead.org>, <io-uring@vger.kernel.org>,
         <linux-block@vger.kernel.org>
 CC: <linux-fsdevel@vger.kernel.org>, <asml.silence@gmail.com>,
         <axboe@kernel.dk>, <hch@lst.de>, <sagi@grimberg.me>,
+        Hannes Reinecke
+	<hare@suse.de>, Nitesh Shetty <nj.shetty@samsung.com>,
         Keith Busch
-	<kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>,
-        Nitesh Shetty
-	<nj.shetty@samsung.com>
-Subject: [PATCHv2 03/11] block: introduce max_write_streams queue limit
-Date: Mon, 3 Feb 2025 10:41:21 -0800
-Message-ID: <20250203184129.1829324-4-kbusch@meta.com>
+	<kbusch@kernel.org>
+Subject: [PATCHv2 07/11] nvme: add a nvme_get_log_lsi helper
+Date: Mon, 3 Feb 2025 10:41:25 -0800
+Message-ID: <20250203184129.1829324-8-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20250203184129.1829324-1-kbusch@meta.com>
 References: <20250203184129.1829324-1-kbusch@meta.com>
@@ -63,107 +63,75 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: VpbZNXAvIy2NigzOuLh17ZoACXzkssQj
-X-Proofpoint-GUID: VpbZNXAvIy2NigzOuLh17ZoACXzkssQj
+X-Proofpoint-ORIG-GUID: je6JKnGdkZa0UWy6BC9D5Xhg-i4ndfPU
+X-Proofpoint-GUID: je6JKnGdkZa0UWy6BC9D5Xhg-i4ndfPU
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-03_08,2025-01-31_02,2024-11-22_01
 
-From: Keith Busch <kbusch@kernel.org>
+From: Christoph Hellwig <hch@lst.de>
 
-Drivers with hardware that support write streams need a way to export how
-many are available so applications can generically query this.
+For log pages that need to pass in a LSI value, while at the same time
+not touching all the existing nvme_get_log callers.
 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-[hch: renamed hints to streams, removed stacking]
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- Documentation/ABI/stable/sysfs-block | 7 +++++++
- block/blk-sysfs.c                    | 3 +++
- include/linux/blkdev.h               | 9 +++++++++
- 3 files changed, 19 insertions(+)
+ drivers/nvme/host/core.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/sta=
-ble/sysfs-block
-index 0cceb2badc836..f67139b8b8eff 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -506,6 +506,13 @@ Description:
- 		[RO] Maximum size in bytes of a single element in a DMA
- 		scatter/gather list.
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 653aa6544a90e..8c43823cc37e1 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -150,6 +150,8 @@ static void nvme_remove_invalid_namespaces(struct nvm=
+e_ctrl *ctrl,
+ 					   unsigned nsid);
+ static void nvme_update_keep_alive(struct nvme_ctrl *ctrl,
+ 				   struct nvme_command *cmd);
++static int nvme_get_log_lsi(struct nvme_ctrl *ctrl, u32 nsid, u8 log_pag=
+e,
++		u8 lsp, u8 csi, void *log, size_t size, u64 offset, u16 lsi);
 =20
-+What:		/sys/block/<disk>/queue/max_write_streams
-+Date:		November 2024
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		[RO] Maximum number of write streams supported, 0 if not
-+		supported. If supported, valid values are 1 through
-+		max_write_streams, inclusive.
-=20
- What:		/sys/block/<disk>/queue/max_segments
- Date:		March 2010
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index e09b455874bfd..8b8f2b0f0c048 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -106,6 +106,7 @@ QUEUE_SYSFS_LIMIT_SHOW(max_segments)
- QUEUE_SYSFS_LIMIT_SHOW(max_discard_segments)
- QUEUE_SYSFS_LIMIT_SHOW(max_integrity_segments)
- QUEUE_SYSFS_LIMIT_SHOW(max_segment_size)
-+QUEUE_SYSFS_LIMIT_SHOW(max_write_streams)
- QUEUE_SYSFS_LIMIT_SHOW(logical_block_size)
- QUEUE_SYSFS_LIMIT_SHOW(physical_block_size)
- QUEUE_SYSFS_LIMIT_SHOW(chunk_sectors)
-@@ -434,6 +435,7 @@ QUEUE_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_=
-kb");
- QUEUE_RO_ENTRY(queue_max_segments, "max_segments");
- QUEUE_RO_ENTRY(queue_max_integrity_segments, "max_integrity_segments");
- QUEUE_RO_ENTRY(queue_max_segment_size, "max_segment_size");
-+QUEUE_RO_ENTRY(queue_max_write_streams, "max_write_streams");
- QUEUE_RW_LOAD_MODULE_ENTRY(elv_iosched, "scheduler");
-=20
- QUEUE_RO_ENTRY(queue_logical_block_size, "logical_block_size");
-@@ -568,6 +570,7 @@ static struct attribute *queue_attrs[] =3D {
- 	&queue_max_discard_segments_entry.attr,
- 	&queue_max_integrity_segments_entry.attr,
- 	&queue_max_segment_size_entry.attr,
-+	&queue_max_write_streams_entry.attr,
- 	&queue_hw_sector_size_entry.attr,
- 	&queue_logical_block_size_entry.attr,
- 	&queue_physical_block_size_entry.attr,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 76f0a4e7c2e5d..f92db4b35f4b6 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -397,6 +397,8 @@ struct queue_limits {
- 	unsigned short		max_integrity_segments;
- 	unsigned short		max_discard_segments;
-=20
-+	unsigned short		max_write_streams;
-+
- 	unsigned int		max_open_zones;
- 	unsigned int		max_active_zones;
-=20
-@@ -1245,6 +1247,13 @@ static inline unsigned int bdev_max_segments(struc=
-t block_device *bdev)
- 	return queue_max_segments(bdev_get_queue(bdev));
+ void nvme_queue_scan(struct nvme_ctrl *ctrl)
+ {
+@@ -3083,8 +3085,8 @@ static int nvme_init_subsystem(struct nvme_ctrl *ct=
+rl, struct nvme_id_ctrl *id)
+ 	return ret;
  }
 =20
-+static inline unsigned short bdev_max_write_streams(struct block_device =
-*bdev)
+-int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp, =
+u8 csi,
+-		void *log, size_t size, u64 offset)
++static int nvme_get_log_lsi(struct nvme_ctrl *ctrl, u32 nsid, u8 log_pag=
+e,
++		u8 lsp, u8 csi, void *log, size_t size, u64 offset, u16 lsi)
+ {
+ 	struct nvme_command c =3D { };
+ 	u32 dwlen =3D nvme_bytes_to_numd(size);
+@@ -3098,10 +3100,18 @@ int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid=
+, u8 log_page, u8 lsp, u8 csi,
+ 	c.get_log_page.lpol =3D cpu_to_le32(lower_32_bits(offset));
+ 	c.get_log_page.lpou =3D cpu_to_le32(upper_32_bits(offset));
+ 	c.get_log_page.csi =3D csi;
++	c.get_log_page.lsi =3D cpu_to_le16(lsi);
+=20
+ 	return nvme_submit_sync_cmd(ctrl->admin_q, &c, log, size);
+ }
+=20
++int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp, =
+u8 csi,
++		void *log, size_t size, u64 offset)
 +{
-+	if (bdev_is_partition(bdev))
-+		return 0;
-+	return bdev_limits(bdev)->max_write_streams;
++	return nvme_get_log_lsi(ctrl, nsid, log_page, lsp, csi, log, size,
++			offset, 0);
 +}
 +
- static inline unsigned queue_logical_block_size(const struct request_que=
-ue *q)
+ static int nvme_get_effects_log(struct nvme_ctrl *ctrl, u8 csi,
+ 				struct nvme_effects_log **log)
  {
- 	return q->limits.logical_block_size;
 --=20
 2.43.5
 
