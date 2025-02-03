@@ -1,56 +1,56 @@
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D20B20C472
-	for <linux-block@vger.kernel.org>; Mon,  3 Feb 2025 18:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E8B20C472
+	for <linux-block@vger.kernel.org>; Mon,  3 Feb 2025 18:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738608421; cv=none; b=kXS7rHlY4T1SHk6nCGAKmRUfvzWSHAMBYsfCMKKmhEAkuSzd5PrSw2+c1tOGS8F92m1mqNtuR/WSOt88wINJ8KvGtxzGqu6MIPv0JOda5xsx0huTa9RYIr6VRwiR4/LEpKPDDo1FtJu2+AYDW17751hyCccen2eZ+P+XjbfnFD4=
+	t=1738608425; cv=none; b=aN1vQsebNhFU4fqCsMK1FbJoQfhtv5b9gmF/QN02hSJRMUJhNHA4UfOvw/4cKhBNZyeFDKWY/p+He7Vl+v1Hb2Lbb0VG0aJ1oyJGh+dCb6tk0zxRd0WiMN1Cv3OEJuhUbJlGljxNNDGZhjPRexJ0T7irjPg9WxZkW65zyVrgdzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738608421; c=relaxed/simple;
-	bh=hBTdVLWotElbjiKrJMGMO0Vizdmv5SGCkBv7KTRDkYA=;
+	s=arc-20240116; t=1738608425; c=relaxed/simple;
+	bh=/WYgHsLI5eifEYT5swohdT4yQ+49Q6fPRUFAd6eM6kk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PGhp7bEfzL3A13DzbG5lAeJkXgyGOVYbleUQ/gxUikbwAL4FeY1XRzsn+szGsxDhtR9BqBTEEmv5TSvNYKirxZOsEfz19Nt6OZjZY2KxxZxeuX0xf0gIfkiVO6hVEexEBfw5cIag8tCBq6xQkzlOYaN5hvf+wV8v6M/nR00aolU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=An0L3zW8; arc=none smtp.client-ip=67.231.153.30
+	 MIME-Version:Content-Type; b=SCIWnQfHf0hUtAOPksptrQFd6S94WkgnJBxadiFI+TUqr9vbb+iT7PueJfrU8a+63u29ch6LerTKCzMbxbfQbBD/ApzU0BfdsybvT02HPmR2aW37FgK/K53P0DaRYTxOcuFZ+zT9xENllB6tJuzZfZNxesHIE90HFRCbhKPlXcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=GJXBlChF; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="An0L3zW8"
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 513IHlw9010010
-	for <linux-block@vger.kernel.org>; Mon, 3 Feb 2025 10:46:58 -0800
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="GJXBlChF"
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 513II7Uk006733
+	for <linux-block@vger.kernel.org>; Mon, 3 Feb 2025 10:47:02 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=rTPoyzw51Yec8rpjP1Uz2mSVpEeoAASdS67qh/SGUII=; b=An0L3zW8RuKD
-	uKOaaOPi1Ge4984Vsh3aVVqxwvBlzZimK7RElx7D+sKrPzjjoi/n1TRNp+rB25/P
-	KWmjTalU5E8l1bcU9PQpC3WmstCSuyps0UgfoZjNYt3+IeLn/VrQy1braIQl8Mfn
-	NogxsMLAYxFsz7ZcARAeBYpnUdOCGm3kcwJHkT3m+u5sWteidEAl0P0aezofsEZm
-	5z8PASaDRWcGOMHNmQ8+EYXM2d1syukgMWCL9qvjjOM/0idOmxjpkCPC/G7X6P+q
-	natJ/aiMLmHZdNNoMDIbp1IpVVka8DWbt9LwYTiC07OnVYhqecaF2tzdhvlQyHzJ
-	i9t0s8JHWw==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by m0001303.ppops.net (PPS) with ESMTPS id 44k21s8sgb-2
+	 bh=KNtJy29+KoGrn3iBKs7XMNaUdfIgRyhno7K3eRzagcM=; b=GJXBlChF282J
+	pNKHtixW1I3z5kcn6syrvDgUb2CEPZdC3pi4zqy4duQWcsP6ggnIaRdJrj1MOG7b
+	ALlG9M29qgH48FKs77VgmUztkdrK/+/tlRP1LsFRby6RDpPIv6PkcC86gYsaCw66
+	0EScuVLNCdXhWxt+DkPZE7h5LR9q5ODem0QZoUV2gykrYsmrLebd0ElRffe0Y7IE
+	KE3cfyrMVeEdaF83iqOddRf3FxPvi4BXEsBN7iR/MZQShonaTomqbl/3bWTbT9Ps
+	7RDjuxFdrV37GrS+/60PrjlZQO2Q73HiDOIH30B94FBJmcu7AAOsHpwB+/ukGysx
+	jbMR4++c/A==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 44k2468qsc-4
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 03 Feb 2025 10:46:57 -0800 (PST)
-Received: from twshared29376.33.frc3.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Mon, 03 Feb 2025 10:47:02 -0800 (PST)
+Received: from twshared3076.40.frc1.facebook.com (2620:10d:c0a8:1c::11) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Mon, 3 Feb 2025 18:46:56 +0000
+ 15.2.1544.14; Mon, 3 Feb 2025 18:47:00 +0000
 Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id B7B05179C262D; Mon,  3 Feb 2025 10:41:34 -0800 (PST)
+	id D021F179C2631; Mon,  3 Feb 2025 10:41:34 -0800 (PST)
 From: Keith Busch <kbusch@meta.com>
 To: <linux-nvme@lists.infradead.org>, <io-uring@vger.kernel.org>,
         <linux-block@vger.kernel.org>
 CC: <linux-fsdevel@vger.kernel.org>, <asml.silence@gmail.com>,
         <axboe@kernel.dk>, <hch@lst.de>, <sagi@grimberg.me>,
+        Hannes Reinecke
+	<hare@suse.de>, Nitesh Shetty <nj.shetty@samsung.com>,
         Keith Busch
-	<kbusch@kernel.org>, Hannes Reinecke <hare@suse.de>,
-        Nitesh Shetty
-	<nj.shetty@samsung.com>
-Subject: [PATCHv2 06/11] io_uring: enable per-io write streams
-Date: Mon, 3 Feb 2025 10:41:24 -0800
-Message-ID: <20250203184129.1829324-7-kbusch@meta.com>
+	<kbusch@kernel.org>
+Subject: [PATCHv2 08/11] nvme: pass a void pointer to nvme_get/set_features for the result
+Date: Mon, 3 Feb 2025 10:41:26 -0800
+Message-ID: <20250203184129.1829324-9-kbusch@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20250203184129.1829324-1-kbusch@meta.com>
 References: <20250203184129.1829324-1-kbusch@meta.com>
@@ -63,76 +63,70 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: _XfECLpmloObiCutD34fSSTYeM1M5Sr7
-X-Proofpoint-GUID: _XfECLpmloObiCutD34fSSTYeM1M5Sr7
+X-Proofpoint-ORIG-GUID: tKDfgR1DgwvP0QOOy0KDvfSa-H0HVq0_
+X-Proofpoint-GUID: tKDfgR1DgwvP0QOOy0KDvfSa-H0HVq0_
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-03_08,2025-01-31_02,2024-11-22_01
 
-From: Keith Busch <kbusch@kernel.org>
+From: Christoph Hellwig <hch@lst.de>
 
-Allow userspace to pass a per-I/O write stream in the SQE:
-
-      __u8 write_stream;
-
-The __u8 type matches the size the filesystems and block layer support.
-
-Application can query the supported values from the block devices
-max_write_streams sysfs attribute. Unsupported values are ignored by
-file operations that do not support write streams or rejected with an
-error by those that support them.
+That allows passing in structures instead of the u32 result, and thus
+reduce the amount of bit shifting and masking required to parse the
+result.
 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- include/uapi/linux/io_uring.h | 4 ++++
- io_uring/io_uring.c           | 2 ++
- io_uring/rw.c                 | 1 +
- 3 files changed, 7 insertions(+)
+ drivers/nvme/host/core.c | 4 ++--
+ drivers/nvme/host/nvme.h | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.=
-h
-index e11c826385277..df191ccbcd7bf 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -92,6 +92,10 @@ struct io_uring_sqe {
- 			__u16	addr_len;
- 			__u16	__pad3[1];
- 		};
-+		struct {
-+			__u8	write_stream;
-+			__u8	__pad4[3];
-+		};
- 	};
- 	union {
- 		struct {
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index 263e504be4a8b..944ce66d4f1e2 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -3875,6 +3875,8 @@ static int __init io_uring_init(void)
- 	BUILD_BUG_SQE_ELEM(44, __s32,  splice_fd_in);
- 	BUILD_BUG_SQE_ELEM(44, __u32,  file_index);
- 	BUILD_BUG_SQE_ELEM(44, __u16,  addr_len);
-+	BUILD_BUG_SQE_ELEM(44, __u8,   write_stream);
-+	BUILD_BUG_SQE_ELEM(45, __u8,   __pad4[0]);
- 	BUILD_BUG_SQE_ELEM(46, __u16,  __pad3[0]);
- 	BUILD_BUG_SQE_ELEM(48, __u64,  addr3);
- 	BUILD_BUG_SQE_ELEM_SIZE(48, 0, cmd);
-diff --git a/io_uring/rw.c b/io_uring/rw.c
-index 991ecfbea88e3..641d484d2a9e8 100644
---- a/io_uring/rw.c
-+++ b/io_uring/rw.c
-@@ -298,6 +298,7 @@ static int io_prep_rw(struct io_kiocb *req, const str=
-uct io_uring_sqe *sqe,
- 	}
- 	rw->kiocb.dio_complete =3D NULL;
- 	rw->kiocb.ki_flags =3D 0;
-+	rw->kiocb.ki_write_stream =3D READ_ONCE(sqe->write_stream);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 8c43823cc37e1..324b31ba270a6 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1678,7 +1678,7 @@ static int nvme_features(struct nvme_ctrl *dev, u8 =
+op, unsigned int fid,
 =20
- 	rw->addr =3D READ_ONCE(sqe->addr);
- 	rw->len =3D READ_ONCE(sqe->len);
+ int nvme_set_features(struct nvme_ctrl *dev, unsigned int fid,
+ 		      unsigned int dword11, void *buffer, size_t buflen,
+-		      u32 *result)
++		      void *result)
+ {
+ 	return nvme_features(dev, nvme_admin_set_features, fid, dword11, buffer=
+,
+ 			     buflen, result);
+@@ -1687,7 +1687,7 @@ EXPORT_SYMBOL_GPL(nvme_set_features);
+=20
+ int nvme_get_features(struct nvme_ctrl *dev, unsigned int fid,
+ 		      unsigned int dword11, void *buffer, size_t buflen,
+-		      u32 *result)
++		      void *result)
+ {
+ 	return nvme_features(dev, nvme_admin_get_features, fid, dword11, buffer=
+,
+ 			     buflen, result);
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 7be92d07430e9..9c94c1085869b 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -895,10 +895,10 @@ int __nvme_submit_sync_cmd(struct request_queue *q,=
+ struct nvme_command *cmd,
+ 		int qid, nvme_submit_flags_t flags);
+ int nvme_set_features(struct nvme_ctrl *dev, unsigned int fid,
+ 		      unsigned int dword11, void *buffer, size_t buflen,
+-		      u32 *result);
++		      void *result);
+ int nvme_get_features(struct nvme_ctrl *dev, unsigned int fid,
+ 		      unsigned int dword11, void *buffer, size_t buflen,
+-		      u32 *result);
++		      void *result);
+ int nvme_set_queue_count(struct nvme_ctrl *ctrl, int *count);
+ void nvme_stop_keep_alive(struct nvme_ctrl *ctrl);
+ int nvme_reset_ctrl(struct nvme_ctrl *ctrl);
 --=20
 2.43.5
 
