@@ -1,104 +1,180 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F195B3D81
-	for <linux-block@vger.kernel.org>; Tue,  4 Feb 2025 05:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0BB1EEA4E
+	for <linux-block@vger.kernel.org>; Tue,  4 Feb 2025 05:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738646350; cv=none; b=f0q+cErGP+OKTeiYc9g+vU1G8fNPF3o/zNdbkGOXf1Oo2Unf8sU2T+9EicGp1LMNM6BLMZiNxhPEHrMnlDSMEZyoyiASI5fZzhKvvM2SSE2yDZ9ebCczI2ErzX45LdZ2d2T4oeRfWvEsboDbEHTWbeIglXNun+kRGXgoePWw4sI=
+	t=1738647075; cv=none; b=ZudfAX3Q336+ney0ucGU06hAHIPB+35m41EYF+eKTZrokHKjZGkMQxPfD+5UeczbNvz/ZAeDtuBEyJcyH6jiFyfDKNBe889AiWB64At5DrABv6jwDXD8qGI8goJJooE+GRDD4rdpNnAPAHC9tM9xL1mkw8e/WlA1Jh2NHqA/ezw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738646350; c=relaxed/simple;
-	bh=EGLBDArbX+38NlrhsorBMyZvcARfxkrHSjhL954I8qk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IEm2aOJJxcb6ZORVWCi3XublVRgiWjdztMJgECeO/yzWBDvesGL6IwXJVxynQ5onQRELXJdMqVfnqPX6Q8kyI+IecAgqbUMS/7Z/kEy4yS7ifvUx59hAw4DufeDSGXrmmtIBicU5qeG/wKskgH3vawrwOl8JPsQV9yEXWB9r2TQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LlIVw3hu; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1738647075; c=relaxed/simple;
+	bh=PCN6BSDqgPcfSNKaZIAupKQk76R/FYJVzH3vGhPXDrY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=GJTJXrdxXnHO80mQ7owaf5ksc17TWZS1k8yPJJgHOxJ/xzsd954qTD45BVvs5x1J+F7E9vknyvVSPASd/4Ycsi/9CVdypAcnIIdGtWQ2GsubMz3RPVJMoZpE03fYQtlSwirMWibj9OsoQWwsYf5TOulR7leOXwOqYAe99nB2A1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=AUu1xDuZ; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LlIVw3hu"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=ZkPUHLuqz3/xYLfqs60LiRIZbDDeKbs4v86qemwevcg=; b=LlIVw3huGBpYiuDKvbAAC0KtaG
-	4tg88hDrAWWtz4tJtOf9YejXzcoLY+qrLzzditGo26uiVraN/+WB85i4lkrWq+PK/lv+Jxhiku+7I
-	Y1deU+KcaTBVeVsXZQcWnFg0dR4gp1MZ04CUo7XzzGZWWv0BW1NGe1LOfRX9Nj8OWORUM7ivZIhKU
-	AwNE5MatzC2QPUe/4oKyzMIyGqtbyne6J6caXXI7/jJs/0CD37dN8LE+G2ycpJzfKN++zzblfWvtB
-	Ouy84Ut0OlSddZ59s1GyeMtGYYb9S4VTpOzi586My81rIHLDm6XWlUfnkDQcWt+QNVwTzMHnpZlKW
-	4I26HNvg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tfBL1-0000000HGkb-2Eh5;
-	Tue, 04 Feb 2025 05:19:07 +0000
-Date: Mon, 3 Feb 2025 21:19:07 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Travis Downs <travis.downs@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Theodore Ts'o <tytso@mit.edu>,
-	linux-block@vger.kernel.org
-Subject: Re: Semantics of racy O_DIRECT writes
-Message-ID: <Z6GjS9rOmm4el9Za@infradead.org>
-References: <CAOBGo4xx+88nZM=nqqgQU5RRiHP1QOqU4i2dDwXt7rF6K0gaUQ@mail.gmail.com>
- <20250109045743.GE1323402@mit.edu>
- <CAOBGo4w88v0tqDiTwAPP6OQLXHGdjx1oFKaB0oRY45dmC-D1_Q@mail.gmail.com>
- <20250109155119.GF1323402@mit.edu>
- <Z4DhK_JrkL5jn5P1@infradead.org>
- <CAOBGo4y_zo08BX=hRYsAQrdSfaLfn2kMci+Jk1R+B1-kjzsX1g@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="AUu1xDuZ"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250204053105epoutp0391a4f0a0ed98d56190027f212e007878~g6ktighv31358813588epoutp031
+	for <linux-block@vger.kernel.org>; Tue,  4 Feb 2025 05:31:05 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250204053105epoutp0391a4f0a0ed98d56190027f212e007878~g6ktighv31358813588epoutp031
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1738647065;
+	bh=d+w9M9YoUAvSGZfteBcBIVBmN6FPU951O7mIxkYvjro=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AUu1xDuZ5YMCbddmm6yoUW3fKa8jfgK50xwfkkJWQd4HC8eqQxJYL71kqwPaHWn31
+	 WCLIXoZwo+rQLyGXsrXbyfykOdPtX7f+IWorvnToUt74PQS5YWomLt1a6pH1gCn9jz
+	 xL/3XOdODA2heNGwabngapzj1PCFJ8GHqKUW/fKU=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20250204053105epcas5p3257817e15d0d2296321c33e49ea9ff8d~g6ks_B9ab1272512725epcas5p3I;
+	Tue,  4 Feb 2025 05:31:05 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.180]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4YnBmR26p4z4x9QJ; Tue,  4 Feb
+	2025 05:31:03 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	D2.06.19710.716A1A76; Tue,  4 Feb 2025 14:31:03 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20250203144800epcas5p42bc46752c8353c2a34c7b7a6691a9d4e~guhrleqri2470424704epcas5p4P;
+	Mon,  3 Feb 2025 14:48:00 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20250203144800epsmtrp2a1ae9366eb3a7143b1416d8d75c253da~guhrkplix1519215192epsmtrp20;
+	Mon,  3 Feb 2025 14:48:00 +0000 (GMT)
+X-AuditID: b6c32a44-363dc70000004cfe-f8-67a1a6174c2a
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	F4.79.18729.027D0A76; Mon,  3 Feb 2025 23:48:00 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20250203144758epsmtip1bff49deb539d8b23f41706ce22046714~guhpUQejQ1320113201epsmtip1o;
+	Mon,  3 Feb 2025 14:47:58 +0000 (GMT)
+Date: Mon, 3 Feb 2025 20:09:48 +0530
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: axboe@kernel.dk, kbusch@kernel.org, martin.petersen@oracle.com,
+	asml.silence@gmail.com, anuj1072538@gmail.com, brauner@kernel.org,
+	jack@suse.cz, viro@zeniv.linux.org.uk, io-uring@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, linux-scsi@vger.kernel.org, vishak.g@samsung.com,
+	linux-fsdevel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
+Subject: Re: [PATCH v11 07/10] block: introduce
+ BIP_CHECK_GUARD/REFTAG/APPTAG bip_flags
+Message-ID: <20250203143948.GA17571@green245>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20250203065331.GA16999@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Tf0wTZxjH996Vu4OkzVFRXzG67nRTkGIrBQ4CzGSE3DZ/EBe2yDLgAmdh
+	lGtzLbhBFnEIUxyiJuqAOmAz8mvO0bGOglVWfkUYMIdjE3Rz2uIPgo7iwIWBK1xZ/O/zPO/3
+	+z7v8z7vS6ByFxZIZPEmTuBZHYX5SaydQcHK1edrtar+EoKe+ntOQpsbrYBuulWO0ROdbkDf
+	6LAhdENTN0I/Kh6U0FVnihC6+9kkRp90jADaPrqFvmS/KqGrz7tw+uivrRhd17uA0EPzvT70
+	UKUZ3+7P2Cpv4czwQC5jaTyCMd+eO8C03yjEmCnXqIQ51tIImB9runBm2rKesTgnkUS/5OyY
+	TI7N4AQFx6frM7J4bSz15lupr6WGR6jUSnUUHUkpeDaHi6XidyQqE7J0nnYoRR6ry/WkElmj
+	kdoaFyPoc02cIlNvNMVSnCFDZ9AYQo1sjjGX14bynClarVJtC/cI07Iz6yeKccO4/wdlp5vx
+	QnBbVgp8CUhq4FlriU8p8CPkZDuAV1zfIGLgBvDJzB1cDGYALOsox5Yt7norKi7YATzYcNZr
+	GQdwYq7JZ1ElITfCm9enJIuMkZtg171isMgBJAVdDwfAogElK1A4WP3dkmgFuRcOLTTjiywl
+	ldBiu4CK7A+vVjiXNL5kCHSPm5c2WklugB3WXkQ8kpOAI78IIsfDiws/AZFXwIe9LbjIgXD6
+	kd3bghY+HXZ5vQZY1HPZq38VFveVL9VFyUw4/0OZ17sOnur7GhHzMlg25/R6pbD182Wm4CcN
+	Zi9DaB8s9DIDZ+dLvNc1BuBdW6vkOHix8rneKp+rJ3IIrGl3Y5WA8PBaWLdAiBgEL7ZtrQE+
+	jWANZzDmaLn0cIOa5/b/P/J0fY4FLL334PhW8Fv1QqgDIARwAEigVIC0//sarVyawX6Yzwn6
+	VCFXxxkdINwzrBNo4Mp0vefD8KZUtSZKpYmIiNBEhUWoqdXSItshrZzUsiYum+MMnLDsQwjf
+	wEKEGQlU/TPdYe6PGd1ziHX9+UTQDdy93zm7rzbg2m5nQnL5puZ9X05emD15auzTj/JmS4/m
+	nTnySl1pSF9BklHeo/FPaQ9jlbbofGVhy4lt8de5LafvBKmtze+VpP38cfLwukFbRtg7fNzh
+	+++iuzbMPYi75qx9e+L3Vf2X7Q8O41Vofsq5ktgrSd0qbZWw/fHTlGQ4ZmeRnAamLS1+7Ks9
+	wcjMmvXWAOaAVDZn6np/c7q5/mBC423L60mJeUXWtegLj7HiVoWMHVI76qLtPm3WN/bfjJIc
+	68vfu+tS5DP35t2ygSblZ/+ahvmCl+tDXiL+irxXIKtTfGHdsQrfWdETIDj+oCTGTFYdjApG
+	9j/LIdJjeAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrMIsWRmVeSWpSXmKPExsWy7bCSnK7C9QXpBgeu61l8/PqbxWLOqm2M
+	Fqvv9rNZvD78idHi5oGdTBYrVx9lsnjXeo7FYvb0ZiaLo//fsllMOnSN0WLvLW2LPXtPsljM
+	X/aU3aL7+g42i+XH/zFZnP97nNXi/Kw57A6CHjtn3WX3uHy21GPTqk42j81L6j1232xg8/j4
+	9BaLR9+WVYweZxYcYff4vEnOY9OTt0wBXFFcNimpOZllqUX6dglcGWvmJxQs46948TSugXEn
+	TxcjJ4eEgInEpxXbmEFsIYHdjBKr/6lAxCUkTr1cxghhC0us/PecvYuRC6jmCaPE3asQDSwC
+	KhJ3rnxkAbHZBNQljjxvBWsQEVCSePrqLCNIA7PAbGaJ1xMegzUIC0RK9M+/zQRi8wroSmza
+	uRZq811GiU/ntCHighInZz4BG8osoCVx499LoHoOIFtaYvk/DpAwp4COxKdnc8B2iQooSxzY
+	dpxpAqPgLCTds5B0z0LoXsDIvIpRMrWgODc9t9iwwDAvtVyvODG3uDQvXS85P3cTIzgetTR3
+	MG5f9UHvECMTB+MhRgkOZiUR3tPbF6QL8aYkVlalFuXHF5XmpBYfYpTmYFES5xV/0ZsiJJCe
+	WJKanZpakFoEk2Xi4JRqYJr5pMJtisbP9kuej6Q/T9rFIsT0pZXF/1uqROLysBNbdDfZ37b4
+	a9q19vLTsEW39wcHTY1fo7b29V+mRGN5lq+LszZoiHlkMx576up96Gbh5gXMJa9MV5UX/8my
+	fZL/o+USl3DV5zynL4u8m59eOtQ669kU9VW9zKGu9/sqXY91Pb3FyNLzjaH+W1tZko//tWMZ
+	6StkmJ3C/iav+PX26v4QX+YzmyztJe6kB/9fxfFg89M+I5mrcul3HS7nm7htiviVckGP+YJA
+	wJMvWQ85zn71aGNtkp7N83Re0tbHMScnn+Bol/xQF3uwaPn8gqeWyUkf/lxpWO9hMCllvncv
+	57UoIzW7p4/vi6zxd7yz8aUSS3FGoqEWc1FxIgBq4p1SNgMAAA==
+X-CMS-MailID: 20250203144800epcas5p42bc46752c8353c2a34c7b7a6691a9d4e
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----8pCVYZkCOGUjObx0wm0yJlGbi0Dl-Xo5m.-jYkYL.P4N.DQv=_2404f_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20241128113112epcas5p186ef86baaa3054effb7244c54ee2f991
+References: <20241128112240.8867-1-anuj20.g@samsung.com>
+	<CGME20241128113112epcas5p186ef86baaa3054effb7244c54ee2f991@epcas5p1.samsung.com>
+	<20241128112240.8867-8-anuj20.g@samsung.com> <20250203065331.GA16999@lst.de>
+
+------8pCVYZkCOGUjObx0wm0yJlGbi0Dl-Xo5m.-jYkYL.P4N.DQv=_2404f_
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOBGo4y_zo08BX=hRYsAQrdSfaLfn2kMci+Jk1R+B1-kjzsX1g@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Jan 31, 2025 at 05:06:50PM -0300, Travis Downs wrote:
-> On Fri, Jan 10, 2025 at 5:58 AM Christoph Hellwig <hch@infradead.org> wrote:
-> >
-> > On Thu, Jan 09, 2025 at 10:51:19AM -0500, Theodore Ts'o wrote:
-> > > For Linux, if the block device is one that requires stable writes
-> > > (e.g., for iSCSI writes which include a checksum, or SCSI devices with
-> > > DIF/DIX enabled, or some software RAID 5 block device), where a racy
-> > > write might lead to an I/O error on the write or in the case of RAID
-> > > 5, in the subsequent read of the block, Linux will protect against
-> > > this happening by marking the page read-only while the I/O is
-> > > underway, either if it's happening via buffered writeback or O_DIRECT
-> > > writes, and then marking the page read/write afterwards.
-> >
-> > This only happens for buffered I/O, and not for direct I/O.
+On Mon, Feb 03, 2025 at 07:53:31AM +0100, Christoph Hellwig wrote:
+> Hi Anuj,
 > 
-> Thank you. To clarify, "this" means the RO protection, right? So in direct IO
-> there is no such protection?
-
-Yes.
-
-> > But that only matters when your operation is inside the sector (LBA)
-> > boundary that the device interface operates on, e.g. if you using 512
-> > byte sector size as long your stay outside of that you're still fine.
+> I just stumbled over this patch when forward porting my XFS PI support
+> code over the weekend, which failed badly because it didn't set the
+> new BIP_CHECK_GUARD and BIP_CHECK_REFTAG flags.  Now for the XFS side
+> that was just me being to lazy to forward port, but when I started
+> looking over bio_integrity_add_page users as part of doing this I think
+> I found a regression caused by this patch.
 > 
-> Sorry it's not clear if you are talking about the buffered or direct
-> I/O case here.
+> The scsi and nvme targets never sets these new flags when passing on PI,
+> so that will probably stop working.  So we'll need to set them and for
+> nvmet we could also improve the code to actually pass through the
+> individual flags.  Note that this is just by observation, I didn't find
+> time to actually set up the SCSI and NVMe target code with PI support.
 
-This is all about direct I/O.
+Hi Christoph,
 
-> > BUT: that assumes device checksums.  File systems can have checksums
-> > as well and have the same problem.  Because of that for example running
-> > Windows VM images which tend to somehow generate this pattern on qemu
-> > using direct I/O on btrfs files has historically causes a lot of
-> > problems.
-> 
-> So is it fair to say that for direct IO these types of racy writes are not safe?
+Thanks for sharing. Right, the target code is not setting these flags.
+I tried to reproduce it by creating a target setup. nvme-tcp doesn't
+support T-10 PI (it doesn't set the NVMF_METADATA_SUPPORTED flag).
+nvme-rdma supports T-10 PI, trying to reproduce it there.
 
-In general: yes.
+Something like this (compile-tested only) [1] could work for
+nvme-fabrics. Will investigate more and test.
 
-> 
-> Specifically, we are looking at behavior in a 3rd party, proprietary
-> block device
-> (implemented as a kernel module) and are wondering if these types of racy
-> writes break the implied or explicit semantics of safe direct IO writes.
+[1]
 
-I have no interest in helping anyone into looking proprietary drivers.
-But every single one I've looked at was somewhere between somewhat to
-totally broken in many way.
+diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
+index c1f574fe3280..a3152699b7de 100644
+--- a/drivers/nvme/target/io-cmd-bdev.c
++++ b/drivers/nvme/target/io-cmd-bdev.c
+@@ -210,6 +210,10 @@ static int nvmet_bdev_alloc_bip(struct nvmet_req *req, struct bio *bio,
+ 		return PTR_ERR(bip);
+ 	}
+ 
++	if (bi->csum_type == BLK_INTEGRITY_CSUM_IP)
++		bip->bip_flags |= BIP_IP_CHECKSUM;
++	if (bi->flags & BLK_INTEGRITY_REF_TAG)
++		bip->bip_flags |= BIP_CHECK_REFTAG;
+ 	/* virtual start sector must be in integrity interval units */
+ 	bip_set_seed(bip, bio->bi_iter.bi_sector >>
+ 		     (bi->interval_exp - SECTOR_SHIFT));
+
+
+Thanks,
+Anuj Gupta
+
+------8pCVYZkCOGUjObx0wm0yJlGbi0Dl-Xo5m.-jYkYL.P4N.DQv=_2404f_
+Content-Type: text/plain; charset="utf-8"
+
+
+------8pCVYZkCOGUjObx0wm0yJlGbi0Dl-Xo5m.-jYkYL.P4N.DQv=_2404f_--
