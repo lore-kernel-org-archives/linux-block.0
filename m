@@ -1,28 +1,32 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AAFC2153CD
-	for <linux-block@vger.kernel.org>; Tue,  4 Feb 2025 13:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBB520DD79;
+	Tue,  4 Feb 2025 13:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738676874; cv=none; b=Ztmm8J85drdCSEZ6rMqtQwnkzAAdnkzJgrP9RSrqbvPAu0tWCjBIEHo9dl/dkY26rvmYfRPeBy/14An0YvQhCx/l4/9bht9hpELgJ2Egmz/F93g5du8IUb8T8SM9FF9aIj7UmAjgQzCRGhA5YjEp51JhvBn5sRe/Spi/8F0ynkk=
+	t=1738676949; cv=none; b=tn/XbjG9tlsNHa/kgMIVJxH3QR81ALrNGeepmNEFTjr/loxvXWlzNsT3/Zu9N4YrAAI+0JWz8noy8X10Tj6nkuwcGXGK7AbZ1WHYubGPc7RG1hNmRSCTPGCTE70DFXAxXxMLJG2aVOg5Ybop21dycq5BkNGA+F0AD2ksfXnBQuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738676874; c=relaxed/simple;
-	bh=LvXLigVxju7GY0Jjj70BwLRrpX/ZTRGsH+1Rojsoyu8=;
+	s=arc-20240116; t=1738676949; c=relaxed/simple;
+	bh=S7vAkxtOE9yBZCnA7S1RsSnD5HPre7KO6PV4xtrABWc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tz+RlGlKTFo6EUTeJcOMITK1atYwA+p2NR0idZtTHk4RGsmw9S1y0yFUPkGL/6tCZcWyV//qunGorquLFzAQP5HSdztWPsZ8Wiv3AbhFWTu8aPB5q/Gj7bpAVvExu8VtDwgWqmVmxIlFJqCMQfQGdSWK6Syoheda2c3J/atoGq4=
+	 Content-Type:Content-Disposition:In-Reply-To; b=IdCmsukHGKfO8cBVZ0Pg/6M4pmbkOtKeganFhYzLygr8kVEyJy0cQ7AtyPkRUbKY4eVwvLTNeoPXGQEbc91ad1CLqNQPCgGoKVQlVd4TKNiQZCsyC17fI4tgMWputXvYtYSaL5fBoHujPDaTg3WtFtYluwnIR/p8BaJDr0F0X8Y=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 7EB8568D07; Tue,  4 Feb 2025 14:47:41 +0100 (CET)
-Date: Tue, 4 Feb 2025 14:47:41 +0100
+	id 2825968D05; Tue,  4 Feb 2025 14:49:02 +0100 (CET)
+Date: Tue, 4 Feb 2025 14:49:01 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
-Subject: Re: [bug report] block: force noio scope in blk_mq_freeze_queue
-Message-ID: <20250204134741.GA11882@lst.de>
-References: <46e5676f-742e-4c18-8140-a3e249235a4f@stanley.mountain>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
+	josef@toxicpanda.com, dsterba@suse.com, clm@fb.com, axboe@kernel.dk,
+	kbusch@kernel.org, linux-btrfs@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com
+Subject: Re: [RFC 0/3] Btrfs checksum offload
+Message-ID: <20250204134901.GA11902@lst.de>
+References: <CGME20250129141039epcas5p11feb1be4124c0db3c5223325924183a3@epcas5p1.samsung.com> <20250129140207.22718-1-joshi.k@samsung.com> <yq134h0p1m5.fsf@ca-mkp.ca.oracle.com> <20250131074424.GA16182@lst.de> <yq17c66kfxs.fsf@ca-mkp.ca.oracle.com> <20250204051208.GG28103@lst.de> <yq15xlpg9tj.fsf@ca-mkp.ca.oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -31,19 +35,27 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <46e5676f-742e-4c18-8140-a3e249235a4f@stanley.mountain>
+In-Reply-To: <yq15xlpg9tj.fsf@ca-mkp.ca.oracle.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Feb 04, 2025 at 02:15:37PM +0300, Dan Carpenter wrote:
-> Hello Christoph Hellwig,
-> 
-> Commit 1e1a9cecfab3 ("block: force noio scope in
-> blk_mq_freeze_queue") from Jan 31, 2025 (linux-next), leads to the
-> following Smatch static checker warning:
-> 
-> 	include/linux/blk-mq.h:910 blk_mq_freeze_queue()
-> 	warn: sleeping in atomic context
+On Tue, Feb 04, 2025 at 07:52:38AM -0500, Martin K. Petersen wrote:
+> I have been told that some arrays use it to disable PI when writing the
+> RAID parity blocks. I guess that makes sense if the array firmware is
+> mixing data and parity blocks in a single write operation. For my test
+> tool I just use WRPROTECT=3 to disable checking when writing "bad" PI.
 
-AFAIK this is a pre-existing (real) bug.  I'll take a look, but aoe
-is a total mess unfortunately.
+Hmm, why would you disable PI for parity blocks?  But yes, outside of
+Linux there might be uses.  Just thinking of a "perfect" format for
+our needs.
+
+> >
+> > That would also work fine.  NVMe supports 4byte crc32c + 2 byte app tag +
+> > 12 byte guard tag / storage tag and 8-byte crc64 + 2 byte app tag + 6
+> > byte guard / storage tag, although Linux only supports the latter so far.
+> 
+> Yep, the CRC32C variant should be easy to wire up. I've thought about
+> the storage tag but haven't really come up with a good use case. It's
+> essentially the same situation as with the app tag.
+
+Exactly, it's an app tag by other means.
 
