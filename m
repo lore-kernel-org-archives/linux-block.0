@@ -1,71 +1,64 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6832A1CF;
-	Tue,  4 Feb 2025 05:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768B712D758;
+	Tue,  4 Feb 2025 05:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738645234; cv=none; b=UnwVq027Eut9DNHWdhf4SVU4k2RWG+E686abznihvx/HCOBEoQA6+KK8cU3b8WkgHaK2moOJRyqb+IC7h31DMI1CASJ3/MJ4S2hU1BYL+t77nXNYqcndmWFUtkhMEX6MMcB5s4AhWGVdmG0Qebges9rvoabDYwbVTgsUtvNg3Bo=
+	t=1738645937; cv=none; b=MfcRXdJWF6+lLLKfN9a5XHm9p0+ozXjfToTOKWad0ij6N2wCk72fux7vy057Xb73WuEAYaMkUCOqM6ajJZ5WO1RaDNp/lVo7odKLLrLKJYAKdwko2GyMDdmdNARLMMhzHCdTIWqHlmFExnHPKhrSZ31O1RMP9g2LJzpZnQOXoog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738645234; c=relaxed/simple;
-	bh=g+L+5q7NWigNCwUlM43VpZ+ukkZrwSNgi9fq4/8jA00=;
+	s=arc-20240116; t=1738645937; c=relaxed/simple;
+	bh=1L+Z81WayhZk/cFtAsdZO0aI4Qela1jUgmtsvzY7Bjk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cNm0mgFxYhSiqGKoLeGL19ewIA6AZzg/OHDbKYXbJxLM8e/MYbyU3s1youjNX/e+joBTKQ2/UZLrc2Ilq4dbw8TF2thqwVi3ftwFhwV4DBxqYWyIlFyYIW6Tp2vvlxoOhkTmPopYp7ThvDMbCj800X7hezq0sP61TEibnVXGJlY=
+	 Content-Type:Content-Disposition:In-Reply-To; b=NvxLJluIIDTS8ARvp8KRahBXlspJQCLav1B4ksPzFFECRMQr32UakZ7GJ3BBUUDR/I0nWiE3dB6nPU5mthR2eUCp9//HlQKPVDsW470cpUZHfY3KlskIW9rqf4bpNglwD/oCYn4tZsNJRIGrqNFnvsTFyiUOFBIJxUqxkn1UlbQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 3901968AFE; Tue,  4 Feb 2025 06:00:25 +0100 (CET)
-Date: Tue, 4 Feb 2025 06:00:25 +0100
+	id 6583668AFE; Tue,  4 Feb 2025 06:12:08 +0100 (CET)
+Date: Tue, 4 Feb 2025 06:12:08 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: "Darrick J. Wong" <djwong@kernel.org>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
 Cc: Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-	Qu Wenruo <wqu@suse.com>, Goldwyn Rodrigues <rgoldwyn@suse.com>,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 7/7] xfs: implement block-metadata based data checksums
-Message-ID: <20250204050025.GE28103@lst.de>
-References: <20250203094322.1809766-1-hch@lst.de> <20250203094322.1809766-8-hch@lst.de> <20250203222031.GB134507@frogsfrogsfrogs>
+	josef@toxicpanda.com, dsterba@suse.com, clm@fb.com, axboe@kernel.dk,
+	kbusch@kernel.org, linux-btrfs@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com
+Subject: Re: [RFC 0/3] Btrfs checksum offload
+Message-ID: <20250204051208.GG28103@lst.de>
+References: <CGME20250129141039epcas5p11feb1be4124c0db3c5223325924183a3@epcas5p1.samsung.com> <20250129140207.22718-1-joshi.k@samsung.com> <yq134h0p1m5.fsf@ca-mkp.ca.oracle.com> <20250131074424.GA16182@lst.de> <yq17c66kfxs.fsf@ca-mkp.ca.oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250203222031.GB134507@frogsfrogsfrogs>
+In-Reply-To: <yq17c66kfxs.fsf@ca-mkp.ca.oracle.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Feb 03, 2025 at 02:20:31PM -0800, Darrick J. Wong wrote:
-> On Mon, Feb 03, 2025 at 10:43:11AM +0100, Christoph Hellwig wrote:
-> > This is a quick hack to demonstrate how data checksumming can be
-> > implemented when it can be stored in the out of line metadata for each
-> > logical block.  It builds on top of the previous PI infrastructure
-> > and instead of generating/verifying protection information it simply
-> > generates and verifies a crc32c checksum and stores it in the non-PI
+On Mon, Feb 03, 2025 at 02:31:13PM -0500, Martin K. Petersen wrote:
+> > I never could come up with a good use of the app_tag for file systems,
+> > so not wasting space for that is actually a good thing.
 > 
-> PI can do crc32c now?  I thought it could only do that old crc16 from
-> like 15 years ago and crc64?
+> I wish we could just do 4 bytes of CRC32C + 4 bytes of ref tag. I think
+> that would be a reasonable compromise between space and utility.
 
-NVMe has a protection information format with a crc32c, but it's not
-supported by Linux yet.
+Agreed.
 
-> If we try to throw crc32c at a device,
-> won't it then reject the "incorrect" checksums?  Or is there some other
-> magic in here where it works and I'm just too out of date to know?
+> But we
+> can't do that because of the app tag escape. We're essentially wasting 2
+> bytes per block to store a single bit flag.
 
-This patch implements XFS-level data checksums on devices that implement
-non-PI metadata, that is the device allows to store extra data with the
-LBA, but doesn't actually interpret and verify it іn any way.
+Well, what do we actually need the app tag escape for except for
+historical precedence?  In NVMe the app tag escape is an option for
+deallocated blocks, but it's only one of the options, there other beeing
+a synthetic guard/ref tag with the expected value.
 
-> The crc32c generation and validation looks decent though we're
-> definitely going to want an inode flag so that we're not stuck with
-> stable page writes.
+> In general I think 4096+16 is a reasonable format going forward. With
+> either CRC32C or CRC64 plus full LBA as ref tag.
 
-Yeah, support the NOCOW flag, have a sb flag to enable the checksums,
-maybe even a field about what checksum to use, yodda, yodda.
-
+That would also work fine.  NVMe supports 4byte crc32c + 2 byte app tag +
+12 byte guard tag / storage tag and 8-byte crc64 + 2 byte app tag + 6
+byte guard / storage tag, although Linux only supports the latter so far.
