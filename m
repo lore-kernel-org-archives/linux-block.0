@@ -1,32 +1,48 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA751C5F37;
-	Tue,  4 Feb 2025 16:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAD7215770
+	for <linux-block@vger.kernel.org>; Tue,  4 Feb 2025 18:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738686024; cv=none; b=INxy0sYbZ5u/Roa62L409GTK4AKUDw6mdAPARySW/Q4Iuosx55+UpHXkQqDau8QrleXxbd6nIHQqepHcDvAl+tsKcejxZTyuhx316dcBVPE12ndRngQjHKlPrEmvOtv5z/IADxPzb79p7LEhKwGVTCRPSj/JOOwqDjUiJkncWm8=
+	t=1738692030; cv=none; b=WE6qeMTokAaDgTNhFPBYCP3cbY01S+9QQ/Nh45jF5KQBtn2ukSp+G4VSeeviw23379FPIgElF7Yxg4pnynK69WTov9LbYXQ2l89px0HNik3onkF/MGKcu02X5wqTFbaYwZopGDlflLFZFECPVjOyvWet47YU4MPSUZV5QuOqlIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738686024; c=relaxed/simple;
-	bh=qsQ3qC5Tpg63dCD7/jZT/AEnIALZtLkxfeA7sZPfYvI=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=jSoQXLmbQ/YQPUosTOYOD+xQ+tlWkOdgPX+RT8J1dgkNSMEKqHfY23HYQesElQZLzXPLIJiO1px0HFwDWKSzjJYBupTLmug31GNPlZPTyOuLIFju41DM+KwiCg5AMZONDS4YNxvAFKsS5hdoMdloXUARe8YidpGF63YqrLSj+dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=JFNqQ3WM; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1738692030; c=relaxed/simple;
+	bh=1k2UYKIFbo3X5iKK9oCUCvYMbMyfyeFn9MU/NBcdXT8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fcHGbgqAIJySF9N759vEyNFDRqLB/3LUoacTNhP79sxHWghGSM5KDTk5kRkJ9F6ErkSiEp7CSNGZZBOXOrWk9D00uFxAVB7cPnZjsc4n610EN6jsjowtHbdyiGOHlQCfrjhtHHeVUKtMNgY+yGDiyCk5ppwFqv1tkWj99APDJpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=0GssmVP6; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="JFNqQ3WM"
-Received: from [100.65.217.97] (unknown [20.236.10.120])
-	by linux.microsoft.com (Postfix) with ESMTPSA id A1B222054913;
-	Tue,  4 Feb 2025 08:20:16 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A1B222054913
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1738686017;
-	bh=qsQ3qC5Tpg63dCD7/jZT/AEnIALZtLkxfeA7sZPfYvI=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=JFNqQ3WMJYt9x5FlRLFXv9KHyV1pKDlzhODb53QoWzpp6J3AdAjnkgoFXzX5upaKS
-	 NFB7RQX/lTZhUgAoDftbhFMBWRFjJJRgsKy9ZaQziRTcbj53IbbgDHyBHFcvhpmjTi
-	 8Sj+Z0cZpDnm8hl7T3Q2wnghxJwrjTRbik8PdIpE=
-Message-ID: <974a03d2-3f3f-4be2-9dba-ece6dca8015e@linux.microsoft.com>
-Date: Tue, 4 Feb 2025 08:20:16 -0800
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="0GssmVP6"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YnWP16tS9zlgTxJ;
+	Tue,  4 Feb 2025 18:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1738692020; x=1741284021; bh=1k2UYKIFbo3X5iKK9oCUCvYM
+	bMyfyeFn9MU/NBcdXT8=; b=0GssmVP6co37ENFHn8gWLsA4+Y49cS+nBwCT0g/g
+	lt1Y+RSJooc9ye5Vi+XUDkEZFqF9ngAcl3x/qoDs8EVZ5WrDFnJppRK2LFpaPiWk
+	hFLugFKlOCNXV4DrUaCGkdQpL8y1oH/GTy72BcOQGAfrUUxGMZZhc9pyIUEjsGtQ
+	jXi0bwsPw5pRYJ5yvhnV/fRSVjffANMwjkGPpKJo9aJXdA+PCUnv4ehcxMU+0cZt
+	iTsS8nsOVWcsHKwUJ4fgFzo9MucdTFDdKP5RvLGLqv5WZlauN9Ygc4jGYPTpNpOV
+	vFHbNKDGcPYYxpKDnj0qIv+M2U86uteJvMn5JcwJawpdDw==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 5OMWcxlEtV3M; Tue,  4 Feb 2025 18:00:20 +0000 (UTC)
+Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YnWNy4sT8zlgTvr;
+	Tue,  4 Feb 2025 18:00:18 +0000 (UTC)
+Message-ID: <76edbee8-9d5f-47a5-a6ae-932ff1b711b8@acm.org>
+Date: Tue, 4 Feb 2025 10:00:17 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,32 +50,23 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: cocci@inria.fr, Andrew Morton <akpm@linux-foundation.org>,
- Dongsheng Yang <dongsheng.yang@easystack.cn>,
- Ilya Dryomov <idryomov@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Julia Lawall <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>,
- Ricardo Ribalda <ribalda@chromium.org>, Xiubo Li <xiubli@redhat.com>,
- eahariha@linux.microsoft.com, LKML <linux-kernel@vger.kernel.org>,
- kernel-janitors@vger.kernel.org, ceph-devel@vger.kernel.org,
- linux-block@vger.kernel.org
-Subject: Re: [cocci] [PATCH v2 1/3] coccinelle: misc: secs_to_jiffies: Patch
- expressions too
-To: Markus Elfring <Markus.Elfring@web.de>
-References: <20250203-converge-secs-to-jiffies-part-two-v2-0-d7058a01fd0e@linux.microsoft.com>
- <20250203-converge-secs-to-jiffies-part-two-v2-1-d7058a01fd0e@linux.microsoft.com>
- <49533960-e437-4042-951a-0221164bfa3d@web.de>
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
+Subject: Re: [PATCH blktests] srp: skip test if scsi_transport_srp module is
+ loaded and in use
+To: Nilay Shroff <nilay@linux.ibm.com>, linux-block@vger.kernel.org
+Cc: shinichiro.kawasaki@wdc.com, gjoyce@ibm.com
+References: <20250201184021.278437-1-nilay@linux.ibm.com>
 Content-Language: en-US
-In-Reply-To: <49533960-e437-4042-951a-0221164bfa3d@web.de>
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250201184021.278437-1-nilay@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2/3/2025 11:56 PM, Markus Elfring wrote:
->> Teach the script to suggest conversions for timeout patterns where the
->> arguments to msecs_to_jiffies() are expressions as well.
-> How do you imagine that the shown SmPL code fits ever to patch reviews?
+On 2/1/25 10:40 AM, Nilay Shroff wrote:
+> +_have_module_not_in_use() {
 
-By the simple fact of accomplishing the same result despite differences in
-code style, as explicitly called out in the changelog.
+The name "_have_module_not_in_use()" sounds weird to me. Wouldn't
+_module_not_in_use() be a better name?
 
-- Easwar (he/him)
+Thanks,
+
+Bart.
