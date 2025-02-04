@@ -1,104 +1,136 @@
-Received: from mout.web.de (mout.web.de [217.72.192.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3887205E3B;
-	Tue,  4 Feb 2025 07:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8F520A5DA
+	for <linux-block@vger.kernel.org>; Tue,  4 Feb 2025 10:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738655818; cv=none; b=U9a9qdA+Zn2bh9PLOulLd2N9HZebRCsYnShKRXk6hHpZnEJJzFw6QpC8OMKX6pODmSIYxPin3X0tX0hEmuBLHWM77xCD1LJj9dQfCwgCA4VvDXnnopbKqzBoOt7wZRiOeWvdavmBWIAzSuj46maExgUVpgpU19wIFs0p7gyYBYI=
+	t=1738665780; cv=none; b=De0LhW7Z45MOHs5m2h5ujnp0WxD7EF/EzOcxuizUtqx+hN8ka6aLrjeb93ZJsGuEJvLD2KTJL/Evyn3uDsH98I3VIORs90cRFQPGERMoYGM2BglKRxW13fuzt8Ds6WktzjNMfMXbGFZQeTs22kH17zCOZWa/FQhoKUDNL5Djq9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738655818; c=relaxed/simple;
-	bh=nPkr2UB70awK3XWuSVG0b1Id4751pK/Rp5g+eClX9/w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=I1kMp8J94VnbBu0GlxeOaQNN0pFK69EBQKIRd86Bh3Bv6Fe783q9AelLITXYq80kBqRKx8SGqXbuBWzJjZb5lh/Ftg4pnCq2wbIZnW3RY5hRmhG5XTq9BroF36hcyCohFzxkr64OxewXY81bx4BJFhSuUWUC21qC5BQ5UN2/qA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=VS8cyP0Z; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1738665780; c=relaxed/simple;
+	bh=O9fK3I1pzwKP4nLc6/iAkvLdftAlb3h+THZJIPaOcUM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Got3IEZTuOmp2LuxVQhDzSg1WB70tb1VdcVyyij6gdvsTMmvpWsgNu7gZnu809cfFlXKF3xwJB1BsUUXevpWyCi8ccZyfL0BNuB7m0Ly1LDcJjECSjG0epnZNJOa60CZHymgbJIj1SEhbkW/icT8Q64BSpwsYHVCc5wO+k9Y4vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=I7lYGzHv; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="VS8cyP0Z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1738655788; x=1739260588; i=markus.elfring@web.de;
-	bh=5BLD/YXsVrr465Xy+2dikLtLlRq1lKGR/pqrjopbAvs=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:
-	 References:From:Cc:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=VS8cyP0ZtaRn7Ltz9iSNzbc76UnXwmi60vJYLu8Iy+3H3yXtujIJZE1a95aAR/yP
-	 9gsXJHhR1kXb+oB50IqSm71wuDH7Gh4FkhbNCZMXOOIp5x+1g/5qEr0wTNxdsUl74
-	 5yzQGy2xw2WzWV2vxTR7T3l0jeqiewAAGzJ4YzHixUN0Ul4S7TQx3pFLRcYc48hEQ
-	 QEKn85Ohbf3TWuKrMLbaUn8dEk6FHNiFoJy3yB93T6EOdKHKwvsriKxxK7iaWgp0V
-	 Xi7htv5fhs4/xei0Zq700SN2DT/NBFm5W+W8fmuUnAt2tckUyOoqrnYBJgiZc4jxA
-	 q+ff2Yla7sU0vsHpAg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.93.16]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MdO9K-1t5t2h442K-00gdth; Tue, 04
- Feb 2025 08:56:28 +0100
-Message-ID: <49533960-e437-4042-951a-0221164bfa3d@web.de>
-Date: Tue, 4 Feb 2025 08:56:06 +0100
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="I7lYGzHv"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5439e331cceso490663e87.1
+        for <linux-block@vger.kernel.org>; Tue, 04 Feb 2025 02:42:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1738665777; x=1739270577; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lE2w/bQJpX8Ezf3hOPnZ8S+RoX8BTDVVvaDLT5mRYhc=;
+        b=I7lYGzHvU0BIKzXN8+MYN6s/pBGNbsu18VNl0KVMsNRP/0bQJL0KbLWpSvTLgIL6fm
+         xZcumAOfZcd1ZZM1Au5prZx3JuRGG36Uddc6zNG5mX1QqVr1FbQfMafvYZXC5fUyxEN3
+         06zeMYaNVxPHWmxAVm4q9Ti5UiExaSR1/CSJLFFTfAjCc0HiNWwnTRWb8U2CRzz4v9ps
+         6GqUzZj4enmv9KiMdaKU8d/rIq95qB91+dXwCcx0WsdxsmlWhJQK0F0DKap/fnuPAI38
+         WbvBRHTiAy1yJb6bv6MqPpjRW6NncHqUQp3wjlw8d8nxjrklqtNTkb+rNH7Y61hLQJK7
+         lw6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738665777; x=1739270577;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lE2w/bQJpX8Ezf3hOPnZ8S+RoX8BTDVVvaDLT5mRYhc=;
+        b=AicP1tFICSDRVhrNRNCamwoTGenYJSxiN0ij+qrG5yXEBdW+N78xDhKfyzkqV+5x3D
+         AaxNPoIEvYMoH/P8Ki/MU5q9J81HiQYD9/iCx9IS2aJ87HAqe3WFmIWprfEFx//LABEO
+         HpOrp1m946NjPI+yG9BZ/+CUegOeFsz7xcXbtbRXXDx2NInB//WNmhw+VKPuq/qOo0ih
+         YWBnPutS2v//O6vZk1K1ofx/R6KTadFroutsdhqt3waRae18wfrkzOR5RFnRXPoozAYQ
+         bW8gb8n1vvzJr0sCRsGcMkghiWfyyy1M2z8TgB89WSyBFXxDJA4vcMEA7ZNWtovKvoDe
+         yGuQ==
+X-Gm-Message-State: AOJu0Yy/a252k+d7LLIfOrNvbgimlKTby9T38dET2VOR1YEd3WHHMA44
+	NfWLe9Tq8rgVLKqfc5bmz/8ZWgVNbAkcKI4Hd4q6eXmgSMlBwuH/LFpJvdWfVfByShFnC6urb9m
+	Pb6S4oMa2d/Tnft05ZoDtXGoji+O9SgYWwzOzia3jLWsB4EOFhvE=
+X-Gm-Gg: ASbGnctNsWCar9xzRYC0PwfCbigb/mIOSeesyKB6NDWk1kHw7i8+H0KyPNiltmfbilr
+	7IM9eGy2GtRCSPBSx9HaJxY8FMr+mrakxE566G5UsGqrSiBfyRhffmr8R0gqSJQHAMh95BkGg5S
+	+eAQG1VPBy3RQDXpAZlMN/4ns6E3v7
+X-Google-Smtp-Source: AGHT+IE5CYBdpn6DfP3V68IEBp+LNXJHRO3XMVbiHUUscPeksGzYuA8lgJODapvJJrdvbNiLHm9bcRL2vHNots0NUJA=
+X-Received: by 2002:ac2:4f85:0:b0:542:2999:399c with SMTP id
+ 2adb3069b0e04-543e4c3cac2mr6409529e87.46.1738665776073; Tue, 04 Feb 2025
+ 02:42:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [cocci] [PATCH v2 1/3] coccinelle: misc: secs_to_jiffies: Patch
- expressions too
-To: Easwar Hariharan <eahariha@linux.microsoft.com>, cocci@inria.fr,
- Andrew Morton <akpm@linux-foundation.org>,
- Dongsheng Yang <dongsheng.yang@easystack.cn>,
- Ilya Dryomov <idryomov@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Julia Lawall <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>,
- Ricardo Ribalda <ribalda@chromium.org>, Xiubo Li <xiubli@redhat.com>
-References: <20250203-converge-secs-to-jiffies-part-two-v2-0-d7058a01fd0e@linux.microsoft.com>
- <20250203-converge-secs-to-jiffies-part-two-v2-1-d7058a01fd0e@linux.microsoft.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
- ceph-devel@vger.kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <20250203-converge-secs-to-jiffies-part-two-v2-1-d7058a01fd0e@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:aQc8RcrZc7c8bcNHaQ18iCrIJX16D9D0++QdETw7fZSrfDWQqsc
- K4Gk/cqtNbPZ4gSOIiWA/yDQecBHoggZG1iWIlf1browyUtzxnvEU7n+DPN5fyWA26YKWkI
- ZKtYClolm2KTwF1jw0ruRv8/iQ15ULWedSowFddVZQW3Ctia67sQ/eOv4Bwiat+amAPzRzW
- Gwj6TlyCQIJ5htGV5DZRQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:g9xXUJLcnkU=;BPnZKWpwl3c5/Z81VR1BJF2NLey
- 7KmTDfH/dErzC57mKitzacacH5QWXShj7dWV31d+qLWzJcEtI1LHG9pbt1CynKTkcrkdJFAkl
- aTVATFbWRAiKBVj1S0WskrCik+niedHj3rXXJuHTid1iLShvda+2ddnAyuzUJCuiWRHncLXnI
- IZ4m64c2X2DWwJv6guJW2jJUfLtKAPVYUcu8N9KkXbaIGXvqeiMr71auJE4p6GGg4ZTLKNmn0
- JmscL4Jwe5MOz0YyQyJhCSAh9V6CFw9sND0IVmhV6eDi4jWDEqafCQwaiiZ8iAhh0/WIxK+nb
- kip0rSSptO79y1CfZEbzOXmPc1wBPDUmtmD5/QzhInOTjl1UqPGk5GDYw4jTbwYafatxp5xvp
- NzZhiT9jb44JLlBS9p1nW2sbo/ONakwvyoQnX+Ddzz0Njde5RkkZWC9dgNIBMIR8T9MtBhaMY
- 5GjZ97gnvL1RigBNu9p0ovNQ/KtEy8avOOzXNyPXoYVk+YQSny4f3/niOL3lolUmpGE6a3HLY
- jtZQcc0QLfYq25/t7nyhtoCAoHuJ6CUJoYLb5K5hlq3ISTP+bS+GepLgo/Pt6NgIJ5xmAfR15
- g03gXL+jHbW6kS9SFZu+z8iewAb2Oy85zWtGhSp1Vgu9hL+ttETwanNZemEDesYoAkhYBqip9
- 3DnFTHa4Ay9/VvyvHJ4wyXcypTylcsng4vHLBBsULGgHy2sVMUKWIZ8TtT8BdARS4AsGyElnZ
- f1SlkVkszVA8hDByqAcBNeBKirGIKjKWokP7QEkbDYNVJveJ2DArWXLPcEYw/bDlxV+wDPdnF
- x4fa0AWXaCGUGSujljRizjORr5EVnCo+SgU0pn8UI1Oaad6t+JMw2jOXCa+y25LhE3hYusZG1
- 6Yv4kSv3e5Hj81Yw10uYjjHyzitolWuv8Ewbi1Y0Cu/HqmVdIlpQ0VuqelLxZ0tQLQFocOxKW
- S34hOQbQzebRXvPbduDdBe0dKDLTbjVcu7KnOQqTIgnChAdnd0WewxdOBmHJQXH0VkhgZbt69
- gmADZ3PJZS+x8rhXoiuMuT78s+au8M+4S1fYvgi+PRRchhC3OT1zB3eJPKKSv+r0AkzPH9cmp
- FqY+sRwfB6raXh48DoNM32mJJIxQuwPj0bpPFPHTwltJ7NPBjOorSmJ5cYKsHxtMIzSqi+PnC
- lwhuAuCDRgrBUyMZgwsfSdagK64Nc3MxGIkvC+9B6FttH6N+JIV9/o/N7MEUr++voAWGE52sc
- nJrzRJmRv5IUUAr2c9kn9hU1SN4wSQMb/QagvbzoBXT/6OYlmyZ1qhWDat6NRMRF9WJjqPq7U
- 9VkVJ6ZREp7rOYzYJ8yLkB0T7Hi4ewJX3cnanqf1/cro/ERdUQlrksVO0529gNS5qm9
+References: <20250204060041.409950-1-ebiggers@kernel.org>
+In-Reply-To: <20250204060041.409950-1-ebiggers@kernel.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 4 Feb 2025 11:42:45 +0100
+X-Gm-Features: AWEUYZnKZTyWo8D9zkwZDMqGx-d60ikbe91VkAnSO7h5ypwW4ujvIIcv_3fYFsw
+Message-ID: <CAMRc=Mf-iTgUM4K1c6NpsWL+dk9BP72rJsXKf6tCKUTB=SSizA@mail.gmail.com>
+Subject: Re: [PATCH v11 0/7] Support for hardware-wrapped inline encryption keys
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, 
+	Gaurav Kashyap <quic_gaurkash@quicinc.com>, linux-fscrypt@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Teach the script to suggest conversions for timeout patterns where the
-> arguments to msecs_to_jiffies() are expressions as well.
-How do you imagine that the shown SmPL code fits ever to patch reviews?
+On Tue, Feb 4, 2025 at 7:03=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> w=
+rote:
+>
+> This patchset is based on v6.14-rc1 and is also available at:
+>
+>     git fetch https://git.kernel.org/pub/scm/fs/fscrypt/linux.git wrapped=
+-keys-v11
+>
+> This patchset adds support for hardware-wrapped inline encryption keys,
+> a security feature supported by some SoCs.  It adds the block and
+> fscrypt framework for the feature as well as support for it with UFS on
+> Qualcomm SoCs.
+>
+> This feature is described in full detail in the included Documentation
+> changes.  But to summarize, hardware-wrapped keys are inline encryption
+> keys that are wrapped (encrypted) by a key internal to the hardware so
+> that they can only be unwrapped (decrypted) by the hardware.  Initially
+> keys are wrapped with a permanent hardware key, but during actual use
+> they are re-wrapped with a per-boot ephemeral key for improved security.
+> The hardware supports importing keys as well as generating keys itself.
+>
+> This differs from the existing support for hardware-wrapped keys in the
+> kernel crypto API (also called "hardware-bound keys" in some places) in
+> the same way that the crypto API differs from blk-crypto: the crypto API
+> is for general crypto operations, whereas blk-crypto is for inline
+> storage encryption.
+>
+> This feature is already being used by Android downstream for several
+> years
+> (https://source.android.com/docs/security/features/encryption/hw-wrapped-=
+keys),
+> but on other platforms userspace support will be provided via fscryptctl
+> and tests via xfstests.  The tests have been merged into xfstests, and
+> they pass on the SM8650 HDK with the upstream kernel plus this patchset.
+>
+> This is targeting 6.15.  As per the suggestion from Jens
+> (https://lore.kernel.org/linux-block/c3407d1c-6c5c-42ee-b446-ccbab1643a62=
+@kernel.dk/),
+> I'd like patches 1-3 to be queued up into a branch that gets pulled into
+> the block tree.  I'll then take patches 4-7 through the fscrypt tree,
+> also for 6.15.  If I end up with too many merge conflicts by trying to
+> take patches 5-7 (given that this is a cross-subsystem feature), my
+> fallback plan will be to wait until 6.16 to land patches 5-7, when they
+> will finally be unblocked by the block patches having landed.
+>
+> Changed in v11:
+>   - Rebased onto v6.14-rc1.  Dropped the patches that were upstreamed in
+>     6.14, and put the block patches first in the series again.
+>   - Significantly cleaned up the patch "soc: qcom: ice: add HWKM support
+>     to the ICE driver".  Some of the notable changes were dropping the
+>     unnecessary support for HWKM v1, and replacing qcom_ice_using_hwkm()
+>     with qcom_ice_get_supported_key_type().
+>   - Consistently used and documented the EBADMSG error code for invalid
+>     hardware-wrapped keys.
+>   - Other minor cleanups.
+>
 
-Examples:
-* https://lore.kernel.org/cocci/80cae791-663c-4589-b67e-d4d1049fcd98@web.de/
-  https://sympa.inria.fr/sympa/arc/cocci/2025-02/msg00002.html
-  https://lkml.org/lkml/2025/2/3/151
-
-* https://lore.kernel.org/cocci/e06cb7f5-7aa3-464c-a8a1-2c7b9b6a29eb@web.de/
-  https://sympa.inria.fr/sympa/arc/cocci/2025-01/msg00122.html
-  https://lkml.org/lkml/2025/1/30/307
-
-
-Regards,
-Markus
+Tested-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org> # sm8650
