@@ -1,32 +1,33 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5377A21C168;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A5B21B181;
 	Tue,  4 Feb 2025 22:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738709853; cv=none; b=WcSUw80NKwRnwwFxRZ5upNeO400Tdg/UqoLwgV3gdo7wxV5maDCtbQf97QPY5oqjpn9fIzsMTaVInccJgPJ6mGxiirgA4ztZyOpPRlEPKP3w3kET5fIinLje1VcFrAISC2UtHiYQviq/WMB3PBQlzfUyFx9OHbOQEwb4HFMz0fI=
+	t=1738709853; cv=none; b=YXOI7YtRBXXMUv5s4wanBa1xFDb79ZVXyhhKIEd2bfHcp6p/+cEcTOs9fZfOAtpbxzx1Kn23iDpINcjZ3YjSCPpX1XCtxptn/Wn34eYL56UsCBOSROhNvNZV4C1IflMinU8n33kzZJAgBGFyaoIoR2UEMNbEmGkmd1wJSIqNKcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738709853; c=relaxed/simple;
-	bh=mTY+DrKg05PZUhHlWuukW5rELcmGnBoUUOaEVnlcjr8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E9F++ZGAavoHnv3KpJiQSQ83sxxziB85I4+fqLFyfAVAfh+B+qPWZtmA4vKL4WODELn2TNhYT0eIo4iOYAXJHmw5PXitcbXeJDdiPbhMVYu5zBWzSsrxDmqbjc0lhQ/EhFCYKu6AUtTV8PIJlL+RsglIG8FIbgPJ4R/d0ii1lCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ogIH2AeD; arc=none smtp.client-ip=198.137.202.133
+	bh=+sEXBuqmpbVuSN4Obp7rsVTc0g+gOMgqn8snZuHBnsc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FepDWgSVR5eJAlG8FKk1JLCSYMXPikuPXZSWfL0jNVBGRwLuDJtQ7w+xTB4Zk1BQgmFvCgpemUZ2Ut9QUerthxP68zh+uqD/z5MIM36izTf7mgIo0DUTZAOwXIO181in+KXtNH0JSvxN7ggCLOQoP4WSR8/PwXMcgEdQTySDRwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=OXBsfztz; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ogIH2AeD"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OXBsfztz"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=ORxEaFpzeoq4+yV0cPvXeAvVVVHMpbAET1BB2wadKeI=; b=ogIH2AeDYoCIw6OTZLcwNDZ7Xb
-	7dDdeqDlvRiHayjDWA1o6/pFKKhvl8k4Fp1+V6CVzqM0IejHvEGkgMFDvX//tHWNi7qiAlhAMCki7
-	aQHgBe+pLZ6H+IR3rJjz3Zr/S39OhNrmU+cYHTVknwHzJOdsxpXNJkLlG8n5oqdkekPjDP0Slzj7Y
-	U5JMK236kZuWPHvigcx6lRvzK+c3C2/b0D/kqr4ZgNKsx/TnpOd5g27r5w75/8CVW3VIifCShmzRf
-	RFJe/FdS1fR0xV23aiRLQui4BXzSu/P/Tih1I87JfwiChYXggtLlrMEhqA+zPbShJTw9OB5rd+Jvu
-	l7q6coSQ==;
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+	Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=QarJhWvhvzscEqk1hK64UZ1lx9htgiBiWPInl87qBdw=; b=OXBsfztzeCul4tIizLK9z2R8YD
+	aD4IDFjh4gCmzOLNOXkZE05geFJ/HW3WyhDqpesS1tirqcj8ua1hcJ0dwH3ggBgB7jnMNKxXDCTpV
+	4xTLMwYV15TBXfNPX89cjgzh6N2txoe/T7c4HOZAg7KD1ti74N94831cjvpQySd1h3WSw7rSl6wYN
+	d8dn7uX74ETR350GwuT2LWwy6vZkQ1aBZHq5k/OMRv5yvUZmXmyvcLkwsG4SG8VTjdsuxKOpl/aqo
+	YMS9tuZwQqNBs3hB13+oHbrH0zA7y7pKhYW8iuhuf53LdKKHZZ3ZUQBsGkKTqDfceMsb1f9g+Yafa
+	Fd3SX/YA==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tfRrH-00000001m1x-1AaE;
+	id 1tfRrH-00000001m23-1YV9;
 	Tue, 04 Feb 2025 22:57:31 +0000
 From: Luis Chamberlain <mcgrof@kernel.org>
 To: shinichiro.kawasaki@wdc.com
@@ -35,10 +36,12 @@ Cc: linux-block@vger.kernel.org,
 	patches@lists.linux.dev,
 	gost.dev@samsung.com,
 	mcgrof@kernel.org
-Subject: [PATCH blktests v2 0/4] enable bs > ps device testing 
-Date: Tue,  4 Feb 2025 14:57:25 -0800
-Message-ID: <20250204225729.422949-1-mcgrof@kernel.org>
+Subject: [PATCH blktests v2 3/4] tests: use test device min io to support bs > ps
+Date: Tue,  4 Feb 2025 14:57:28 -0800
+Message-ID: <20250204225729.422949-4-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250204225729.422949-1-mcgrof@kernel.org>
+References: <20250204225729.422949-1-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,36 +51,85 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-This v2 series addresses the feedback from the first series [0], namely:
+When a block device supports a minimum block size > ps we must
+ensure we don't issue IOs below what is supported. Just leverage
+the min optimal IO to also ensure we use the optimal IO as well.
 
-  - uses less device specific names
-  - checks for fio arguments --filename or --directory to extract the
-    min io target or path
-  - adds a new patch to verify the sector size will work before creating
-    a filesystem
-  - a diagram is provided to help easily disect why we use statx
-    blocksize, although not included in the docs we could later if
-    it helps
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ tests/block/003 | 4 +++-
+ tests/block/007 | 3 ++-
+ tests/nvme/049  | 8 ++++++--
+ 3 files changed, 11 insertions(+), 4 deletions(-)
 
-This goes tested against a 64k sector size NVMe drive, the patches for
-which will be posted soon rebased on v6.14-rc1.
-
-[0] https://lkml.kernel.org/r/20241218112153.3917518-1-mcgrof@kernel.org
-[1] https://docs.google.com/drawings/d/e/2PACX-1vQeZaBq2a0dgg9RDyd_XAJBSH-wbuGCtm95sLp2oFj66oghHWmXunib7tYOTPr84AlQ791VGiaKWvKF/pub?w=1006&h=929                                                  
-Luis Chamberlain (4):
-  common: add and use min io for fio
-  common/xfs: use min io for fs blocksize
-  tests: use test device min io to support bs > ps
-  common/xfs: check for max supported sector size
-
- common/fio      | 23 +++++++++++++++++++++--
- common/rc       | 21 +++++++++++++++++++++
- common/xfs      | 15 ++++++++++++++-
- tests/block/003 |  4 +++-
- tests/block/007 |  3 ++-
- tests/nvme/049  |  8 ++++++--
- 6 files changed, 67 insertions(+), 7 deletions(-)
-
+diff --git a/tests/block/003 b/tests/block/003
+index 2af9b89ec3e5..d59f2eadd465 100755
+--- a/tests/block/003
++++ b/tests/block/003
+@@ -18,10 +18,12 @@ device_requires() {
+ }
+ 
+ test_device() {
++	local test_dev_bs=$(_min_io $TEST_DEV)
++
+ 	echo "Running ${TEST_NAME}"
+ 
+ 	FIO_PERF_FIELDS=("trim iops")
+-	_fio_perf --bsrange=4k-4g --rw=randtrim --norandommap --name=discards \
++	_fio_perf --bsrange=${test_dev_bs}-4g --rw=randtrim --norandommap --name=discards \
+ 		--filename="$TEST_DEV" --number_ios=200k
+ 
+ 	echo "Test complete"
+diff --git a/tests/block/007 b/tests/block/007
+index 3b68d0deec35..8d4ee0758b12 100755
+--- a/tests/block/007
++++ b/tests/block/007
+@@ -31,13 +31,14 @@ cleanup_fallback_device() {
+ }
+ 
+ run_fio_job() {
++	local test_dev_bs=$(_min_io $TEST_DEV)
+ 	if _test_dev_is_rotational; then
+ 		size="32m"
+ 	else
+ 		size="1g"
+ 	fi
+ 
+-	_fio_perf --bs=4k --rw=randread --norandommap --name=reads \
++	_fio_perf --bs=$test_dev_bs --rw=randread --norandommap --name=reads \
+ 		--filename="$TEST_DEV" --size="$size" --direct=1 \
+ 		--ioengine=pvsync2 --hipri="$1"
+ }
+diff --git a/tests/nvme/049 b/tests/nvme/049
+index 88d4fb122988..77bb4daf5b08 100755
+--- a/tests/nvme/049
++++ b/tests/nvme/049
+@@ -19,10 +19,12 @@ test_device() {
+ 	echo "Running ${TEST_NAME}"
+ 
+ 	local ngdev=${TEST_DEV/nvme/ng}
++	local test_dev_bs=$(_min_io $ngdev)
++	local target_size=4096
+ 	local common_args=(
+ 		--size=1M
+ 		--filename="$ngdev"
+-		--bs=4k
++		--bs=$test_dev_bs
+ 		--rw=randread
+ 		--numjobs=1
+ 		--iodepth=16
+@@ -34,8 +36,10 @@ test_device() {
+ 	)
+ 	local fio_output
+ 
++	((test_dev_bs > target_size)) && target_size=$test_dev_bs
++
+ 	# check security permission
+-	if ! fio_output=$(fio --name=check --size=4k --filename="$ngdev" \
++	if ! fio_output=$(fio --name=check --bs=$test_dev_bs --size=$target_size --filename="$ngdev" \
+ 			    --rw=read --ioengine=io_uring_cmd 2>&1) &&
+ 			grep -q -e "Operation not permitted" \
+ 				-e "Permission denied" <<< "$fio_output"; then
 -- 
 2.45.2
 
