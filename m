@@ -1,51 +1,33 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE69139579;
-	Tue,  4 Feb 2025 05:57:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B90825A655;
+	Tue,  4 Feb 2025 06:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738648668; cv=none; b=Kuj7VmGZCNzsdws41m34P6vWtrWVcbjOGJXJ5el2rhxKp4uDWJYKL+g53+RZK8tY0n2Y0ZbZ5jzPPvT6dEapu4dGLLrdAIDKdeTnyajaLBPaxCG1WxpgEB+EYrHrhBYGMmhTX1qeH38Uz4gVd/xt5i66wGDDgva6Waa4WlHwNL0=
+	t=1738648839; cv=none; b=rnDBVbzT20VWxp4bGE60xwc2A0S0/eyNzjs0Yz+sFv5pYiHMlMnFe85pavEhRM1n//5z4DuQG1ftwRnbBQIxyXnaWBU7J9vFZCyRulgkBntRNW9mbkAOxmO+imF08IpEEghyDUbeAyYm8BZ052fSsvJutDz6sjm0/S94yus54cA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738648668; c=relaxed/simple;
-	bh=mNZkayeWsP1H55nQJQORCfUaDELBL2iJMSIlfaZ9+kI=;
+	s=arc-20240116; t=1738648839; c=relaxed/simple;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n7ZC3tn58zPRMFgKgBRTyJ2+Fwe70UUDY7G+KHBTD+cTKVMiBI0F2iBiPVic3xiq3Z5hyEi1iiJBeWs9obTMi0OG9u8E77yzerJz0dIOL2Za0i1lkZ2YEYJ07D/hUmz/vDOFk8CKeFFZRFLiYJ1L7aQ0Y9uzmk9k2BKO2GShrVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=RoiqVP4t; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RoiqVP4t"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Sn61CPCkLvOkWeJUEivSGz9P/YnVf3mNFzsAOFhGZDo=; b=RoiqVP4t8Mq4aDtmmouDgoDyZZ
-	ODTjSb1eZoQnYZETiPnzhwJusPMreVTpCDVL6cOTPPRUYxfjT7McLG5Svx8hQl5/1Vj9qGxncQ1ec
-	X9ekw8GwHS0hogT8rAScEX7j2J1DTrzsWrsThB05wA0hLwIXsaUZGF4zioww6d2Q2INjcH9p/6ynE
-	iMxnGabT4F1reLPRWdVnL9iWU0LWoYED4NnjAfKmbyZ+rTiS8skMJmhWqAPgm5zmiciOp90m8ykj0
-	vxEbJPzkZMd3WHOc79/H3IXwk3qaYdvc4qtOZ7HHuQPoLpCkVwqHC8SdBosG75hrMyJrNoTb6Pa9l
-	Uhonbhvw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tfBwP-0000000HJRq-2O6i;
-	Tue, 04 Feb 2025 05:57:45 +0000
-Date: Mon, 3 Feb 2025 21:57:45 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Mikulas Patocka <mpatocka@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Zdenek Kabelac <zkabelac@redhat.com>,
-	Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev
-Subject: Re: [PATCH] blk-settings: round down io_opt to at least 4K
-Message-ID: <Z6GsWU9tt6dYfqBL@infradead.org>
-References: <81b399f6-55f5-4aa2-0f31-8b4f8a44e6a4@redhat.com>
- <Z5CMPdUFNj0SvzpE@infradead.org>
- <e53588c8-77f0-5751-ad27-d6a3c4f88634@redhat.com>
- <yq1cyfykgng.fsf@ca-mkp.ca.oracle.com>
- <28dcf41a-db7d-f8e7-d6b7-acef325c758c@redhat.com>
- <yq1bjviflwb.fsf@ca-mkp.ca.oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bBUONwPgyY2uOcFpunv4nPTTk2Rg+IZ20zCuIVRR1PpKxsQhnBdiEL7tZuMGIsw+JiFLFRwuocp7LIsDN+KT8oqmhQ2CO28u8VpYrBG/pRfbzAzqzCrm9dGcWjJBYSsnzTSW/92gw2YnkbKyZEylDkmDU1PUuIA2jT5akUXlfvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 03DF668AFE; Tue,  4 Feb 2025 07:00:31 +0100 (CET)
+Date: Tue, 4 Feb 2025 07:00:31 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@meta.com>
+Cc: linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	asml.silence@gmail.com, axboe@kernel.dk, hch@lst.de,
+	sagi@grimberg.me, Keith Busch <kbusch@kernel.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [PATCHv2 06/11] io_uring: enable per-io write streams
+Message-ID: <20250204060031.GA29177@lst.de>
+References: <20250203184129.1829324-1-kbusch@meta.com> <20250203184129.1829324-7-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,14 +36,10 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq1bjviflwb.fsf@ca-mkp.ca.oracle.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250203184129.1829324-7-kbusch@meta.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Mon, Feb 03, 2025 at 10:30:42PM -0500, Martin K. Petersen wrote:
-> I'm willing to entertain having a quirk to ignore reported values of
-> 0xffff (have also seen 0xfffe) for USB-ATA bridge devices.
+Looks good:
 
-0xffff as the max and a weirdly uneven number even for partity RAID
-seems like a good value to ignore by default.  But then again just
-dealing with USB will probably catch the majority of cases.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
