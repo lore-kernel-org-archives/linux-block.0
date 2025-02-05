@@ -1,206 +1,242 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E828C214A8C
-	for <linux-block@vger.kernel.org>; Wed,  5 Feb 2025 02:42:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738723325; cv=fail; b=qvAaWEJlX6nNE5Sd3qKZzFU/8XWaU8ds72La9U80VTHx8ydpxMidmz+4vdkZsgaRAaNcGuJ7MCfpggZLuJ2FRxrfR99m8bs4GX6ut2Y+vEzOvvCVHFu68UHb59hyj+YZP9jkVCtfJgxuIsm4dTnE6XtlbQMfDsfCRDLOkp59Ck8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738723325; c=relaxed/simple;
-	bh=XQjdO0kSgENQis2ofsxHOBXjQTrj066aW/YMERl04zk=;
-	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
-	 Content-Type:MIME-Version; b=rybx7x9ui4Bh/KSLcmxhgu2SouBp49y5Sxwfz51lyrx3EeAviijm+ow9FhAnZS8KfGNwqinel9uhDMNVeh/emhWefT5RRiRgJQSw3HAr5yanj0aEHuh6qywd7rJVEjrQz1k/Q6DDK1ilURnfqiWiW3GH5GNAwKTjdLeh5jeDv9I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=O7/o1hT6; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=B/UpZcwV; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A17C2EF
+	for <linux-block@vger.kernel.org>; Wed,  5 Feb 2025 03:43:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738727021; cv=none; b=A/7n+ffSk4x9diXW0qXVYVwgOk6Sf5WoSf0A518S10PMnud3e/NkDLU9TDdpgC2QxrNmsa0es+GMJsgr/JASd0bAtIJQiz8/nTTfjOa6d1eAqWi/99WuZj2GTSfOFiqcDAFaXqe8TsDb2xg2uOy6TMGwnBJVSgRbzWP6jVsGMEc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738727021; c=relaxed/simple;
+	bh=PZ/aBcioxUtkm3dDR5XmAFgkv828VHHvzAUodIki40w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ba/Ahkge/YhuOdAX+HJmAG3Cq+sm3ANAtYwVxQglbX6NOmtGZZB5+gywxev4HCYAVhTNhKB7em9OjuMAJj9Yez95RBrEMr9NrtVyfHTxkjLB6ss3FX3nsRllh4za6+cfQI+LLiSCMADyXK5nD3NagR4mz0OhzKeMs3NIZlOpjy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jPRrKyQy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="O7/o1hT6";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="B/UpZcwV"
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 514NBrDT013153;
-	Wed, 5 Feb 2025 02:41:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2023-11-20; bh=Rqkqko+heyeP6Q3x5M
-	iJdVKUBaWG55vo7EqqgVlmR8s=; b=O7/o1hT6IfbsOcrhhkK1B8CO1hhGnBtbHf
-	evZqfeuibc0nX3oMdqPf9bD1mTh8VQKU/WhuX/jPExvzDqTp0F1rFXFqsf/VxE4q
-	bd0FuCjQartZ8Lk1xy1e1mOPjdnjLhqQe2G9pyiU2Cn5rsXENcI4D3dwlXCvQ5mo
-	QT81ILWbRHod4KuNzOLJGiOndIoiEfDo1RkOI+fuyDnGe+6UG69Fz83meM1WkVB8
-	SnfhYthrwPVoguvjFzSSvcO+8nlBN103JM24oApw0FbJ/W+QpvWCNOn5VmwJXMj9
-	0TAgwWW9G8zFwMkWGEwydT015K4dxm9d8UjXjqbt+y6RmaS1h7Jw==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 44hhbte87d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 05 Feb 2025 02:41:42 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 515149YX037964;
-	Wed, 5 Feb 2025 02:41:42 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2047.outbound.protection.outlook.com [104.47.58.47])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 44j8ghs2d2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 05 Feb 2025 02:41:42 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NDSpsdd5iUr/9eoNcB3fj9OQcMgweAq9Pz3Rfy43vT1OgoRo1nj+q2k0yrIoKVulKAd/8J6eYg95OVogOyPMK354A5bC3rXX3TqqhR4ucbhgESCmUFEmTl44XebORGDnB50CioPife1nQpAHckYU8pBg7NB2N8l1EivQSnUqj0ycPk8dkomL5G/CZR0pFlQHxWpidnbzYsQCjLLXuBkWhx959DaOlYTHTld1xhU7T3JhIasXB2oC6rYm6HA8sD3gfJPVfrHwpXAxl9QD20xmSCY1M+4YfxL2ocd+POv+dTDo+LYygPYFaZ7SFWsRNEA81sSW58L5mn/q5oOCinN6Tg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Rqkqko+heyeP6Q3x5MiJdVKUBaWG55vo7EqqgVlmR8s=;
- b=drelMpJipUSpnEQDUpXA8Znepeg6csq1FJdiKtwL/R4vzYKUrqjpedym2so4r+AzwZG56VZ6PFXeQxH5qr+hKpyvrR3LoKgeata31TGVWnoYcKIOXX1A6XII8s+1L1cHV0WbIT72Gtz+bkG3XbB1YPsGfWsyzZBZ39aJZTdmtzqGC5htObcnUklaqT5QGZqP3vq7XaW9QMZnPoKhn7/4N+P8yfvCJSavnAzio7a0p+lIwo41UTlIEPSJseZWx408NH2AysnfLgK0HJciEGlzFct1JVhPsHxOQe3zm9db/0I/5KmdlPGJ09h7XltDQjUopJsfw2/fBPO8DEHg8ECJVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Rqkqko+heyeP6Q3x5MiJdVKUBaWG55vo7EqqgVlmR8s=;
- b=B/UpZcwV9Vb/QSZ2M7yLZX4/j3hH0Zo6w7F6vGbnLHcIu9AN/XVkoaepv7fpKrQ1jLfAUetYm+uyZlic+H9lMrZHMZVM4YodBnUGTomXchQy9CwSjDSP5rQWkG4oSEw/W2/QUSndIBzrieisII+7fKxFUsXN2ED8oy3SXkbSjWk=
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
- by SJ0PR10MB4736.namprd10.prod.outlook.com (2603:10b6:a03:2d6::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.10; Wed, 5 Feb
- 2025 02:41:38 +0000
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf]) by CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf%4]) with mapi id 15.20.8398.025; Wed, 5 Feb 2025
- 02:41:38 +0000
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig
- <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon
- <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-        Zdenek Kabelac
- <zkabelac@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org,
-        dm-devel@lists.linux.dev
-Subject: Re: [PATCH] blk-settings: round down io_opt to at least 4K
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-In-Reply-To: <00717ba6-0ce9-5ccd-d93d-ce5db89d85ff@redhat.com> (Mikulas
-	Patocka's message of "Tue, 4 Feb 2025 15:56:11 +0100 (CET)")
-Organization: Oracle Corporation
-Message-ID: <yq1cyfxdsmz.fsf@ca-mkp.ca.oracle.com>
-References: <81b399f6-55f5-4aa2-0f31-8b4f8a44e6a4@redhat.com>
-	<Z5CMPdUFNj0SvzpE@infradead.org>
-	<e53588c8-77f0-5751-ad27-d6a3c4f88634@redhat.com>
-	<yq1cyfykgng.fsf@ca-mkp.ca.oracle.com>
-	<28dcf41a-db7d-f8e7-d6b7-acef325c758c@redhat.com>
-	<yq1bjviflwb.fsf@ca-mkp.ca.oracle.com>
-	<00717ba6-0ce9-5ccd-d93d-ce5db89d85ff@redhat.com>
-Date: Tue, 04 Feb 2025 21:41:36 -0500
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR13CA0003.namprd13.prod.outlook.com
- (2603:10b6:208:160::16) To CH0PR10MB5338.namprd10.prod.outlook.com
- (2603:10b6:610:cb::8)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPRrKyQy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738727018;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mSsWj8LNQdz2tcqWbyO4UyrDW2svsaI8vA5XJVU+fw0=;
+	b=jPRrKyQyF68rrMg2/uMKeNqJbzESnU+4cbw4bD9HSvCpVdLPjFqaqssfltC5x1RxFcTNfI
+	Y6DUgfY2EKNLoz4hb0dIDTtr6tMuUlG/avPxcaNwwfnmLyOdBGfVDmBDuyLLMUFnfz01fj
+	wmZLx0Rus4T2zA47eopb2BBtRaq70EM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-333-Zk2Ijm4BPmO93ba5qxZxoA-1; Tue,
+ 04 Feb 2025 22:43:37 -0500
+X-MC-Unique: Zk2Ijm4BPmO93ba5qxZxoA-1
+X-Mimecast-MFC-AGG-ID: Zk2Ijm4BPmO93ba5qxZxoA
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 661A719560B1;
+	Wed,  5 Feb 2025 03:43:35 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.78])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 94BA418008C8;
+	Wed,  5 Feb 2025 03:43:31 +0000 (UTC)
+Date: Wed, 5 Feb 2025 11:43:26 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/2] New zoned loop block device driver
+Message-ID: <Z6LeXsYw_qq4hqoC@fedora>
+References: <ac42d762-60e5-4550-99f1-bd2072e474c2@kernel.org>
+ <CAFj5m9+LUtAt2ST41KzMasx4BuVYBXjAuLg5MDr0Gh31yzZKzw@mail.gmail.com>
+ <20250108090912.GA27786@lst.de>
+ <Z35H1chBIvTt0luL@fedora>
+ <Z4ETvfwVfzNWtgAo@fedora>
+ <d5e59531-c19b-4332-8f47-b380ab9678be@kernel.org>
+ <Z5OHy76X2F9H6EWP@fedora>
+ <cb5d4dad-35a9-400e-9c53-785fba6f5a87@kernel.org>
+ <Z5xJh84xZbjcO-nJ@fedora>
+ <a63406f1-6a45-4d07-b998-504bd2d6d0d7@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|SJ0PR10MB4736:EE_
-X-MS-Office365-Filtering-Correlation-Id: 947f5bf6-294a-40d8-898b-08dd458e9cfc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?sIyuGOkhmjsQMFe1wcKV+g0tRO79SkXtSiCNbMPaFUl4/S/r8+GwmOXuuM6r?=
- =?us-ascii?Q?T0j6fyGmk+f3tQKjaMG7sod2SkIyy/pihWRhs1/r0hhwpK46e7NmSXDqEtwa?=
- =?us-ascii?Q?7MCRfQjEgPZYJP0QOwLxGKeOjZTghS2UAjzha4Wvk0JvNc4QZwYTO5N7x68Z?=
- =?us-ascii?Q?es7VqOo3ijxaQ3wX1GuVWcHlTsLjCE2d3mnh5tVXQsQri8XdtMEbbbPSfH2l?=
- =?us-ascii?Q?dWraqaOTjBxKOPtrNiRnklw1aIUnPFMkWAO3e3APLNQ8YgYa1V8nKOhUP/ox?=
- =?us-ascii?Q?oPRxmqN5VhXGVlJa2194XdAONgxorEraNF3i1lXq4rLsegAITffrdJlN9tnA?=
- =?us-ascii?Q?PUzApi4fOtRj2TocNYxM3DH/hFRW/lqIpN62cru+4DfS8P6Ti5Ik3f0DM687?=
- =?us-ascii?Q?mtlmsSC/ANGS+GB166+AFdbmtCoCWQcnIAGMCh5EvM8Wo6PlIQ2WXn/5KDO8?=
- =?us-ascii?Q?j5g81sRgMCvBWt6jaL3BZUGDFUeUGPX8onuKNPg1DudxKOA69QeQj7G5fnfU?=
- =?us-ascii?Q?LEnsQ5Wni6E8MNtuPMPpyc/UpOoLCuicWfKvGwvpIh4E8+qPBqMjDa8x7L9o?=
- =?us-ascii?Q?kqGCeYmz96fYebHg/MnEXbAZziIKnyV2jnBrkrXjtGDVtQisjNSJt5ohM+0p?=
- =?us-ascii?Q?iBJDLiw998Lo46Xk0gXpiD13kaDccBUe5JgMI5xgKJuz6A6BOa2KZfpSH861?=
- =?us-ascii?Q?Z2ROJHkcbm2XZPW0QS47KQmnp4TfdJ0F6eeBU02RnCBKZVBzpugXBFN5XA9N?=
- =?us-ascii?Q?r952CRCC20uoPAL4uywTQ5ZCG59DuMHBH9/uzZKXwtSsOK7iX6kdLlDFjp/s?=
- =?us-ascii?Q?0oussFMOY8Xls3+zGvfBgWRWcD1ENdpcZ0B816ScjEkgSg17PkbQCDJ6Q8uv?=
- =?us-ascii?Q?ukiBrKWosa0U5GrOdD34Low0KCWdBBt82wYrd0iPF+YMxlE9yqQ++TZVoG34?=
- =?us-ascii?Q?4SgENbJ0Z8tA2crYUA+FJv7JCtkBuWJBbYy/uUpXaD2l/iwZ0OeBZyIC6/kI?=
- =?us-ascii?Q?/mtQXcAd77V+vEKkMS3LDQ8cyekHRfDiPtSSodhjONjjGfS7+ALSFmhJixs1?=
- =?us-ascii?Q?Ay2TaYdniFFR7hY+h6+lqMoymEHQjbm9lbF6LkFZk43q3fk/blTn15GdRGJO?=
- =?us-ascii?Q?u/GZSLYse5si61d9blCu63zMWSiIw7EMHepICpnRm4IgeXUM8EbqDJye7Ozv?=
- =?us-ascii?Q?iCQdFI5GSrqD2VtuD2BPiefGbjL2WtioHd/1b+XAZayilqvRv17UHp3va8d5?=
- =?us-ascii?Q?x96GWzwKFAU8EFTUSX7mF62hsiRwy74TD3QEeQb24KT9vPwSsmQZaVJz6h+L?=
- =?us-ascii?Q?1eSj3/mSPHDnJdYXzh/+wGCpCT5drDWI0TvUh03jxlGGLfxbwlQNODQLi5yJ?=
- =?us-ascii?Q?ZbYjJjRkRtCfYydcEmMrdC/CmCoV?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?smFE1xjJpcx+tjpSUxhMK2sjshfZhiK+nILhqEd6VWKTHCbQR9+Up3aqQXHl?=
- =?us-ascii?Q?DIcyblKMy+RGYUTGmi4rFvJemG/3n9+Mr6nSkzA2iy0Hk1ojCrE3LA51hQj1?=
- =?us-ascii?Q?4kCDhKrFMXRp2nAg0TjgqRxckmGSe8KobgTy9AYlZRj8uYRQuVc1wCker056?=
- =?us-ascii?Q?/LaBJflFAl1HnCrZKqlXkgShTSSked+XFe08o3muXQrTZi391Z7ZismY+oOa?=
- =?us-ascii?Q?tqaHSd68kHgeoMSlJEaVTYiYABo+4S9c/MB0ITYalG1d6ScADz5jE1pADV69?=
- =?us-ascii?Q?ujLbArMVp67NuinlRdyFVL2tq1583yhchQo4v+hrzoq/ZOPH0AfPxbrBdUZj?=
- =?us-ascii?Q?+I8BQxTFoLH6oG2Kw6asJC01m4jznO3TbH8jT5ozXh206YUee0ciNHiib2lo?=
- =?us-ascii?Q?a2Tqj8DxT7dPmzUQQFP0Jvx1XySNbG/zmKO1HhvES5Bjxt3uqHqQ/5EepB3W?=
- =?us-ascii?Q?suoYYQU5Qp12N8mzRFTA+K4t651YqLwaRFnUaR314jKY5Q+pRzwN9qIERvHy?=
- =?us-ascii?Q?r1yLGkmyV1Xj+niRlFSDVOzOn0gR03qTI4ibP7GGizDWZR0TtIQYmrTymc7J?=
- =?us-ascii?Q?FLaNP0Kc6+XtemfKJKTVCFAUyRX1anPnI/Ksi+TcPyVWGjqVNW+9JQ6WGwdJ?=
- =?us-ascii?Q?55hLhd0UZIctx8d/mWJl4C+tKnuEyT4kEb6xzGujE1WVrlda7r81njL1eisL?=
- =?us-ascii?Q?T222xTfwHGTOfbV/MNDZ6l+ax3A7t45pEh8JU53IeTgbEXTxoKOLHtFCZ0x5?=
- =?us-ascii?Q?tiGj+iYBm5omVXPIf3fciM9OowDNiwZS6+nwZmMFfFHI14TumJ7IKR9LBAK/?=
- =?us-ascii?Q?SdAPpZJzve4LonSiYFDeUqhrHylp5bcdjg/dUtJ0a9weqF/Imm59s2s7MtTu?=
- =?us-ascii?Q?5UBmdHeUxIHWnuXGD1ftt11TwONGvUvkMPiSFHCThw0ce6wUdhFmogq37OF/?=
- =?us-ascii?Q?cc4bUDVWk3JVL7x1mGuREq0RG+jP+KbR1jcLLTUytfwldruyKIJ5LTX9wa8R?=
- =?us-ascii?Q?hyyA5JWKQztwfqmlsN9pGPuuEIgY+1q77J+jHcHzOQfNRgwgC/oXJyYaBzAl?=
- =?us-ascii?Q?m9rDtRtKdQIxQJEtwhrQGbFRP9K7oIPEyHmY2MylkVQ5yzfXswuikbRe9gxw?=
- =?us-ascii?Q?XDWXbo3WvjWM9nSUCdYg7wiFuPWYbU7pxS65nxn3Yf0L4TCgIJmCg3J3/ttr?=
- =?us-ascii?Q?n2CLB/2HjGBAPjZ08vR0EmwWbiTq3uKWg/1bnGLC8ntmWu9Ne+zjuWqBgf3f?=
- =?us-ascii?Q?UfP9G7SEdiygYM7OccQmWWs3W23flmts4FqBb0xZSt1JrUwYJRrjn1jF8JZw?=
- =?us-ascii?Q?QKnv91xWzdpe/JkOTbvYPM6zLnW1Ib0SqqTOOEqWgokIgAYcjTm0nESARFkz?=
- =?us-ascii?Q?C1jkK4X34tYzBRfZ+VWRz2eRnkBQlZ1KUDQouFrb/GpONp3kn9H91IcdN9IM?=
- =?us-ascii?Q?EgDiOoucuuGaimnuAAwuX6qggFYG0671ybZQC1rHNX8bHJeuW5p3ldXYViuL?=
- =?us-ascii?Q?yeyoBHIizPQjWuXoIXkNJRjaUYPp9FNCOb3lEbqhKL1MEW0nwiMgTMbn+aLX?=
- =?us-ascii?Q?zfYIJaEowlokbemORNfp+WkA//PhXUXUD9SAmCJMuzQZ9KPSxBvL32U+0lz+?=
- =?us-ascii?Q?OQ=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	VvPqAMzFd+5quXB5ncBO3nesBtqRjUiRady2GGj3ubnbA2IX+fMBNUARo6FYH+1W1dgb8Wneh4NDV/QzGePnJU4qnLFNpVwAI0YAadWZlivoVKfBbqp3I/z0Bs7+ykgfHTScRm7anQChBazVWrlL0howW9CIZbR0bNd6SAhzNwockc7H3g8tv6tkcH1AIENFsNjUSdGzdKhqT6+lA6YZQ11bpzEvtNDu2ydcqQ5BG/NJPx9CH7U0WjRdnvh2C3KqKUzccGMMiLru0PcoHXBJ2keCquTkTwOISBVp1NyJPi8ngtwnnmS2p/AcWA3KwHdXRWWkBObbt1S2e/L6d/ixIgBMbUMSS3CXrdIi5qAbkKrqUGrCxqdDWuvohizjAw5w2oiYbtizU2uqTwWn/I65U/Nk0LZGqd7bJaWkCX02nA+ok7FaavhIarpC3ZMTNniUEBHIVqpNFsd2iC41as62m8yZeZAFAVB9/tBlhni5QrEnodnyKH30+Tb0/4e0yqRR1PS3kSoVXo/gN7a5jrYULr09JYPWiS+t7fUe3RweCF3XusI2L6LKPPnpnn1wX78IbR2biWFuw6+EpnLyRXdMCwUzAMWUcy+vRVZ4g89mqcg=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 947f5bf6-294a-40d8-898b-08dd458e9cfc
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2025 02:41:37.9369
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Sv/nebQLgaABC0XN8CE1soxrBUJFlGRDNG801Bm9hy79CBRhngV3LojczdBrWYBwwi6Iz12M3R7qewOMLfEPE4NWJDOmof/x6kGpoJNKQ3w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4736
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-04_10,2025-02-04_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0 phishscore=0
- spamscore=0 mlxscore=0 mlxlogscore=787 suspectscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2501170000
- definitions=main-2502050016
-X-Proofpoint-GUID: HNEwnEC0fhd358GW_184lJOCTGf4zUgN
-X-Proofpoint-ORIG-GUID: HNEwnEC0fhd358GW_184lJOCTGf4zUgN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a63406f1-6a45-4d07-b998-504bd2d6d0d7@kernel.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+
+On Tue, Feb 04, 2025 at 12:22:53PM +0900, Damien Le Moal wrote:
+> On 1/31/25 12:54, Ming Lei wrote:
+> > On Wed, Jan 29, 2025 at 05:10:32PM +0900, Damien Le Moal wrote:
+> >> On 1/24/25 21:30, Ming Lei wrote:
+> >>>> 1 queue:
+> >>>> ========
+> >>>>                               +-------------------+-------------------+
+> >>>>                               | ublk (IOPS / BW)  | zloop (IOPS / BW) |
+> >>>>  +----------------------------+-------------------+-------------------+
+> >>>>  | QD=1,    4K rnd wr, 1 job  | 11.7k / 47.8 MB/s | 15.8k / 53.0 MB/s |
+> >>>>  | QD=32,   4K rnd wr, 8 jobs | 63.4k / 260 MB/s  | 101k / 413 MB/s   |
+> >>>
+> >>> I can't reproduce the above two, actually not observe obvious difference
+> >>> between rublk/zoned and zloop in my test VM.
+> >>
+> >> I am using bare-metal machines for these tests as I do not want any
+> >> noise from a VM/hypervisor in the numbers. And I did say that this is with a
+> >> tweaked version of zloop that I have not posted yet (I was waiting for rc1 to
+> >> repost as a rebase is needed to correct a compilation failure du to the nomerge
+> >> tage set flag being removed). I am attaching the patch I used here (it applies
+> >> on top of current Linus tree)
+> >>
+> >>> Maybe rublk works at debug mode, which reduces perf by half usually.
+> >>> And you need to add device via 'cargo run -r -- add zoned' for using
+> >>> release mode.
+> >>
+> >> Well, that is not an obvious thing for someone who does not know rust well. The
+> >> README file of rublk also does not mention that. So no, I did not run it like
+> >> this. I followed the README and call rublk directly. It would be great to
+> >> document that.
+> > 
+> > OK, that is fine, and now you can install rublk/zoned with 'cargo
+> > install rublk' directly, which always build & install the binary of
+> > release version.
+> > 
+> >>
+> >>> Actually there is just single io_uring_enter() running in each ublk queue
+> >>> pthread, perf should be similar with kernel IO handling, and the main extra
+> >>> load is from the single syscall kernel/user context switch and IO data copy,
+> >>> and data copy effect can be neglected in small io size usually(< 64KB).
+> >>>
+> >>>>  | QD=32, 128K rnd wr, 1 job  | 5008 / 656 MB/s   | 5993 / 786 MB/s   |
+> >>>>  | QD=32, 128K seq wr, 1 job  | 2636 / 346 MB/s   | 5393 / 707 MB/s   |
+> >>>
+> >>> ublk 128K BS may be a little slower since there is one extra copy.
+> >>
+> >> Here are newer numbers running rublk as you suggested (using cargo run -r).
+> >> The backend storage is on an XFS file system using a PCI gen4 4TB M.2 SSD that
+> >> is empty (the FS is empty on start). The emulated zoned disk has a capacity of
+> >> 512GB with sequential zones only of 256 MB (that is, there are 2048
+> >> zones/files). Each data point is from a 1min run of fio.
+> > 
+> > Can you share how you create rublk/zoned and zloop and the underlying
+> > device info? Especially queue depth and nr_queues(both rublk/zloop &
+> > underlying disk) plays a big role.
+> 
+> rublk:
+> 
+> cargo run -r -- add zoned --size 524288 --zone-size 256 --conv-zones 0 \
+> 		--logical-block-size 4096 --queue ${nrq} --depth 128 \
+> 		--path /mnt/zloop/0
+> 
+> zloop:
+> 
+> echo "add conv_zones=0,capacity_mb=524288,zone_size_mb=256,\
+> base_dir=/mnt/zloop,nr_queues=${nrq},queue_depth=128" > /dev/zloop-control
+
+zone is actually stateful, maybe it is better to use standalone backing
+directory/files.
+
+> 
+> The backing storage is using XFS on a PCIe Gen4 4TB M.2 SSD (my Xeon machine is
+> PCIe Gen3 though). This drive has a large enough max_qid to provide one IO queue
+> pair per CPU for up to 32 CPUs (16-cores / 32-threads).
+
+I just setup one XFS over nvme in real hardware, still can't reproduce the big gap in
+your test result. Kernel is v6.13 with zloop patch v2.
+
+`8 queues` should only make a difference for the test of "QD=32,   4K rnd wr, 8 jobs".
+For other single job test, single queue supposes to be same with 8 queues.
+
+The big gap is mainly in test of 'QD=32, 128K seq wr, 1 job ', maybe your local
+change improves zloop's merge? In my test:
+
+	- ublk/zoned : 912 MiB/s
+	- zloop(v2) : 960 MiB/s.
+
+BTW, my test is over btrfs, and follows the test script:
+
+ fio --size=32G --time_based --bsrange=128K-128K --runtime=40 --numjobs=1 \
+ 	--ioengine=libaio --iodepth=32 --directory=./ublk --group_reporting=1 --direct=1 \
+	--fsync=0 --name=f1 --stonewall --rw=write
+
+> 
+> > I will take your setting on real hardware and re-run the test after I
+> > return from the Spring Festival holiday.
+> > 
+> >>
+> >> On a 8-cores Intel Xeon test box, which has PCI gen 3 only, I get:
+> >>
+> >> Single queue:
+> >> =============
+> >>                               +-------------------+-------------------+
+> >>                               | ublk (IOPS / BW)  | zloop (IOPS / BW) |
+> >>  +----------------------------+-------------------+-------------------+
+> >>  | QD=1,    4K rnd wr, 1 job  | 2859 / 11.7 MB/s  | 5535 / 22.7 MB/s  |
+> >>  | QD=32,   4K rnd wr, 8 jobs | 24.5k / 100 MB/s  | 24.6k / 101 MB/s  |
+> >>  | QD=32, 128K rnd wr, 1 job  | 14.9k / 1954 MB/s | 19.6k / 2571 MB/s |
+> >>  | QD=32, 128K seq wr, 1 job  | 1516 / 199 MB/s   | 10.6k / 1385 MB/s |
+> >>  +----------------------------+-------------------+-------------------+
+> >>
+> >> 8 queues:
+> >> =========
+> >>                               +-------------------+-------------------+
+> >>                               | ublk (IOPS / BW)  | zloop (IOPS / BW) |
+> >>  +----------------------------+-------------------+-------------------+
+> >>  | QD=1,    4K rnd wr, 1 job  | 5387 / 22.1 MB/s  | 5436 / 22.3 MB/s  |
+> >>  | QD=32,   4K rnd wr, 8 jobs | 16.4k / 67.0 MB/s | 26.3k / 108 MB/s  |
+> >>  | QD=32, 128K rnd wr, 1 job  | 6101 / 800 MB/s   | 19.8k / 2591 MB/s |
+> >>  | QD=32, 128K seq wr, 1 job  | 3987 / 523 MB/s   | 10.6k / 1391 MB/s |
+> >>  +----------------------------+-------------------+-------------------+
+> >>
+> >> I have no idea why ublk is generally slower when setup with 8 I/O queues. The
+> >> qd=32 4K random write with 8 jobs is generally faster with ublk than zloop, but
+> >> that varies. I tracked that down to CPU utilization which is generally much
+> >> better (all CPUs used) with ublk compared to zloop, as zloop is at the mercy of
+> >> the workqueue code and how it schedules unbound work items.
+> > 
+> > Maybe it is related with queue depth? The default ublk queue depth is
+> > 128, and 8jobs actually causes 256 in-flight IOs, and default ublk nr_queue
+> > is 1.
+> 
+> See above: both rublk and zloop are setup with the exact same number of queues
+> and max qd.
+> 
+> > Another thing I mentioned is that ublk has one extra IO data copy, which
+> > slows IO especially when IO size is > 64K usually.
+> 
+> Yes. I do keep this in mind when looking at the results.
+> 
+> [...]
+> 
+> >>> Simplicity need to be observed from multiple dimensions, 300 vs. 1500 LoC has
+> >>> shown something already, IMO.
+> >>
+> >> Sure. But given the very complicated syntax of rust, a lower LoC for rust
+> >> compared to C is very subjective in my opinion.
+> >>
+> >> I said "simplicity" in the context of the driver use. And rublk is not as
+> >> simple to use as zloop as it needs rust/cargo installed which is not an
+> >> acceptable dependency for xfstests. Furthermore, it is very annoying to have to
+> > 
+> > xfstests just need user to pass the zoned block device, so the same test can
+> > cover any zoned device.
+> 
+> Sure. But the environment that allows that still needs to have the rust
+> dependency to pull-in and build rublk before using it to run the tests. That is
+> more dependencies for a CI system or minimal VMs that are not necessarilly based
+> on a full distro but used to run xfstests.
+
+OK, it isn't too hard to solve:
+
+- `install cargo` in the distribution if `cargo` doesn't exist
+
+- run 'cargo install rublk' if rublk isn't installed
 
 
-Mikulas,
 
-> If there is some particular SSD that has more write IOPS for 8k requests 
-> than for 4k requests, I'd like to know about it - out of curiosity.
+Thanks,
+Ming
 
-SSD blocks are getting bigger and bigger, some drives hide it better
-than others. Also look at all the efforts going on wrt. supporting
-larger block sizes in the kernel.
-
-Can you send me the output of:
-
-# sg_vpd -p bl /dev/sdN
-
-and maybe hdparm -I too? I'd like to see if we can come up with a
-reasonable heuristic.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
