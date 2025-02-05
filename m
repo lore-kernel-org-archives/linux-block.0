@@ -1,81 +1,186 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14C4192B95;
-	Wed,  5 Feb 2025 16:00:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0411519BA;
+	Wed,  5 Feb 2025 16:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738771246; cv=none; b=DQRudB+DUX6nGPfjRmyh5AV4Yg7Nsocx59kWn4x7pF2NuguCA32WqEUs3E3jaGOIppnP0lTRC/2iQzgX2f19TajJOOq1d6K73um7TTiPgUH3TPmxPH8s99xpK9qzGFTN63O5AldYF0yaJTaEul5gdQ/RJg28bK91fyg6B1yTVAA=
+	t=1738772305; cv=none; b=kzzVeSa/D1VFBh+2qdW6amuS13+IMoYUj2aHmtBCpc6vllmDArdlOjZBGo6Prp95CSSCby7zCmsY8PY967YfIU4hgjNSxUlP/UgIT+xWnvsQ22v3JedKh6zDo0vCUaAe6htae1srWUua0BDTBwocbT+irZRU/TLk3JMsRPJUKxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738771246; c=relaxed/simple;
-	bh=+eZI6yISLtOCNguyEuiajeh+jRXwEj3Tqhyr4xhrF/0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cv0ocfH5iBzLiRYes42DVedW6e08/atLT4mMA1ngeMQlOxn7IpMwxB3GHSly/3cEzg+4hol4f0CBai7iRRwMqJK40gCJeYlN/PSGaMA+SgaEcLC3lzY6M3GRqnt8RvQh2GqBwHiNCg4X9FShDIVdYWuGBO6JziGdnrDcoRTnag8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=G5IbGVuC; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1738772305; c=relaxed/simple;
+	bh=P056bjDNXC4WDtTebP9aDBpebM865lPz+KZT7ckxHTc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c5ccFqPrdccfWu3XZJEzJRnYq2Dn0tju+wSS5Hv9EsJUh2SkrppT11Oil5M07qvUfYNOqy7CSmZ3DQJEwmfOuXi3OZbj7fBg0u1RXQjjL8zGGY1cGysPHLtTOlPOWck+JVGY1PRtOnrt0/34GDGnNjLOz1SDkUVyVjxtj2KOKkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=DMrpjL3L; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kQMH8M2I; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=DMrpjL3L; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kQMH8M2I; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="G5IbGVuC"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=kHkOXmc0WL3fracXvIpybHt4FahneUTnJB7/Y+AClqo=; b=G5IbGVuCdXQeN9GGhWKEizwf5n
-	jgZGhsG1JjkGjXUSvbGBHWtCPyIDDFPYqpcexFpYPBPiorZHz1Cng3YzJ9O+XGpQUjNngyFkNCynw
-	UIBBBrB7xYuHKdkdOkLpGGLgdE4hjXWMyENPD1Y99HTdGOS/5CmwNA3n37VzbVJmatWH1tGCUHa0I
-	5t4fddwmIvZTkqmepGGp0ernbZK3EzyED2eT7oNUHfF4bJgIHnZ7c4Q/s5IEVuwU22CyQocUDUsKZ
-	ZdSWk5Fth/pij80JV1cxjS5vQUQlvi+OckO2huG3KyLLOLHpuTdQgsOc7QE4R1mKayfknbs/WHUqZ
-	9rXImOjQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tfhpQ-00000003sxd-3RkR;
-	Wed, 05 Feb 2025 16:00:40 +0000
-Date: Wed, 5 Feb 2025 08:00:40 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Zdenek Kabelac <zkabelac@redhat.com>,
-	Milan Broz <gmazyland@gmail.com>, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev
-Subject: Re: [PATCH] blk-settings: round down io_opt to at least 4K
-Message-ID: <Z6OLKInjfd1QxXRI@infradead.org>
-References: <81b399f6-55f5-4aa2-0f31-8b4f8a44e6a4@redhat.com>
- <Z5CMPdUFNj0SvzpE@infradead.org>
- <e53588c8-77f0-5751-ad27-d6a3c4f88634@redhat.com>
- <yq1cyfykgng.fsf@ca-mkp.ca.oracle.com>
- <28dcf41a-db7d-f8e7-d6b7-acef325c758c@redhat.com>
- <yq1bjviflwb.fsf@ca-mkp.ca.oracle.com>
- <Z6GsWU9tt6dYfqBL@infradead.org>
- <yq1zfj1eusl.fsf@ca-mkp.ca.oracle.com>
- <Z6IbGNYoY6DjjYpG@infradead.org>
- <yq1ikppdsv3.fsf@ca-mkp.ca.oracle.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DMrpjL3L";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kQMH8M2I";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DMrpjL3L";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kQMH8M2I"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 983AC2127C;
+	Wed,  5 Feb 2025 16:18:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1738772301; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qqXMYTGRPo//iC4U6ET+snD1ntsXXfRNOFComRHHCgM=;
+	b=DMrpjL3L5UVfUDm93oaO+VKDWFmu/e+rkIpfk5qrtpgk9AdAMMU2a8GdsXXzklH3oDQ+bd
+	1Cxgz/phvR/+65wq9qwyDITOIarvFMhzFCHFdgZ880ZSwvml/9IPY3pubHupqFUeF1JQPf
+	QECo89Bc9mmEWJ0KtLzcxjcqkATVfT0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1738772301;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qqXMYTGRPo//iC4U6ET+snD1ntsXXfRNOFComRHHCgM=;
+	b=kQMH8M2IwNV5WtepSpNP4NeSL02tUF3TlNkvI9+uubUP6vBuVY9Yt9I6DDLvfMCOSmYKDn
+	2EKHTenv7NvRXEBA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=DMrpjL3L;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=kQMH8M2I
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1738772301; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qqXMYTGRPo//iC4U6ET+snD1ntsXXfRNOFComRHHCgM=;
+	b=DMrpjL3L5UVfUDm93oaO+VKDWFmu/e+rkIpfk5qrtpgk9AdAMMU2a8GdsXXzklH3oDQ+bd
+	1Cxgz/phvR/+65wq9qwyDITOIarvFMhzFCHFdgZ880ZSwvml/9IPY3pubHupqFUeF1JQPf
+	QECo89Bc9mmEWJ0KtLzcxjcqkATVfT0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1738772301;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qqXMYTGRPo//iC4U6ET+snD1ntsXXfRNOFComRHHCgM=;
+	b=kQMH8M2IwNV5WtepSpNP4NeSL02tUF3TlNkvI9+uubUP6vBuVY9Yt9I6DDLvfMCOSmYKDn
+	2EKHTenv7NvRXEBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2365813694;
+	Wed,  5 Feb 2025 16:18:21 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Fpb7Bk2Po2eNMwAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 05 Feb 2025 16:18:21 +0000
+Message-ID: <1b211dd3-a45d-4a2e-aa2a-e0d3e302d4ca@suse.de>
+Date: Wed, 5 Feb 2025 17:18:20 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq1ikppdsv3.fsf@ca-mkp.ca.oracle.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/8] fs/buffer: simplify block_read_full_folio() with
+ bh_offset()
+To: Luis Chamberlain <mcgrof@kernel.org>, willy@infradead.org,
+ dave@stgolabs.net, david@fromorbit.com, djwong@kernel.org, kbusch@kernel.org
+Cc: john.g.garry@oracle.com, hch@lst.de, ritesh.list@gmail.com,
+ linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-mm@kvack.org, linux-block@vger.kernel.org, gost.dev@samsung.com,
+ p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
+References: <20250204231209.429356-1-mcgrof@kernel.org>
+ <20250204231209.429356-2-mcgrof@kernel.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250204231209.429356-2-mcgrof@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 983AC2127C
+X-Spam-Score: -3.01
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TAGGED_RCPT(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_ALL(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[oracle.com,lst.de,gmail.com,vger.kernel.org,kvack.org,samsung.com,pankajraghav.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On Tue, Feb 04, 2025 at 09:36:46PM -0500, Martin K. Petersen wrote:
+On 2/5/25 00:12, Luis Chamberlain wrote:
+> When we read over all buffers in a folio we currently use the
+> buffer index on the folio and blocksize to get the offset. Simplify
+> this with bh_offset(). This simplifies the loop while making no
+> functional changes.
 > 
-> Christoph,
+> Suggested-by: Matthew Wilcox <willy@infradead.org>
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> ---
+>   fs/buffer.c | 5 ++---
+>   1 file changed, 2 insertions(+), 3 deletions(-)
 > 
-> >> Quite a few SCSI devices report 0xffff to indicate that the optimal
-> >> transfer length is the same as the maximum transfer length which for
-> >> low-byte commands is capped at 0xffff. That's where the odd value comes
-> >> from in some cases.
-> >
-> > Hmm, optimal == max is odd,
-> 
-> What they mean to convey is that "device has no constraints". As opposed
-> to a value of 0 which means "not reported".
+> diff --git a/fs/buffer.c b/fs/buffer.c
+> index cc8452f60251..b99560e8a142 100644
+> --- a/fs/buffer.c
+> +++ b/fs/buffer.c
+> @@ -2381,7 +2381,6 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+>   	lblock = div_u64(limit + blocksize - 1, blocksize);
+>   	bh = head;
+>   	nr = 0;
+> -	i = 0;
+>   
+>   	do {
+>   		if (buffer_uptodate(bh))
+> @@ -2398,7 +2397,7 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+>   					page_error = true;
+>   			}
+>   			if (!buffer_mapped(bh)) {
+> -				folio_zero_range(folio, i * blocksize,
+> +				folio_zero_range(folio, bh_offset(bh),
+>   						blocksize);
+>   				if (!err)
+>   					set_buffer_uptodate(bh);
+> @@ -2412,7 +2411,7 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+>   				continue;
+>   		}
+>   		arr[nr++] = bh;
+> -	} while (i++, iblock++, (bh = bh->b_this_page) != head);
+> +	} while (iblock++, (bh = bh->b_this_page) != head);
+>   
+>   	if (fully_mapped)
+>   		folio_set_mappedtodisk(folio);
 
-I'm pretty sure that confuses some users, given normally optimal == lba
-size mean not reported.  Either way we really need to document these
-somewhere.
+One wonders: shouldn't we use plugging here to make I/O more efficient?
 
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
