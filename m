@@ -1,179 +1,159 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8802288C3
-	for <linux-block@vger.kernel.org>; Wed,  5 Feb 2025 12:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D177DA32
+	for <linux-block@vger.kernel.org>; Wed,  5 Feb 2025 13:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738758406; cv=none; b=Oj1d1JNH8E46GKVVByN5rx0jWY2nCgncEpbjak+RdM/7GfGWPAX0jNqkCGTpV67SUpdKixHLybePbVhqaTd6wbYnT6HCzz9jhyRuemY7q5KTEbQOhVjDdWtOJChLmVKoH9xhi3KLlJBEtWxJsU+nxqSvMDtt6PsIdWkcli/E7gw=
+	t=1738762067; cv=none; b=SDM3uJnL/eSZEkBB+ezj372SVZGuentEeeeZXD61TxnCUnwRnKWiQ0v/HOgl7Y5ndxJ7wKM8LUhi37N70HRU6U0CEXA1TDT/0uzCjgzoXMeN2gNYcPPHAzrb6C32PU9WpPkujNDze/ksC4pSHxgJ393ZR/Te9CXKRGmMaEqPwgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738758406; c=relaxed/simple;
-	bh=vXPUaXRhwSc0w98Bhb/lgKRgy81BGYtAixlspIMZ14E=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=TLxydhZMniBmxLXtXQtU+oajqoLhOhLlJ+zGUGvI4k9aCbew75GXqvsJXdVERanGW4Q4wkyT+eDLTNUeL/O6vzgeddVcp4TKqnqrdSiIY9SnKCVQnKQiHTwbUMzN/bNZKwTm6U1SGR/URT2cgUnZd5AR3oY1Eg+Ep96gQOmu6XA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Da5XInYN; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1738762067; c=relaxed/simple;
+	bh=XPkJdjQRPGlBY9IL2wnC6vEn3uAScAhMrGoRum1Ozlc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DR0MmeLsRKE0xhVXMp8VboZIv96kU8uUHoTLgWjZi5V77fw+G4clnDw9gP9j01dDBmYYxbh0THNWNFWzE4jVHTFSaYsrzQTzaSnur2jIKVl2Q9HmGNGmeYwrCGFub/qAGz0ZHSvuYodOxOW0dA3xck1WOLHmeiRa31Z6UWMOqHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NgKDmFbn; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Da5XInYN"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250205122636epoutp03de2f82bb23b9c05b9e6b59bc1153bb34~hT4ykUOC61235512355epoutp03H
-	for <linux-block@vger.kernel.org>; Wed,  5 Feb 2025 12:26:36 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250205122636epoutp03de2f82bb23b9c05b9e6b59bc1153bb34~hT4ykUOC61235512355epoutp03H
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1738758396;
-	bh=OFXNe1O8H7u+VEHWybFlvY72xtEvNQblJAGg9yvCBQE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Da5XInYNO4QRtc31pU0iHWRlKtF7oUWVl/bKQ/mlDuw80ksdnXhAj4AKS8Rs3Tp9U
-	 ZhrmHCUYPsPd4fHCl6jUNeIlHcQ57iJsrxFSt5uGfqvKZ7NOkbyQFY5OcxnLVY2UaM
-	 9OWPkoQIJo3vnUUeXmdTG5PjV/4ijzswXMqyV+fM=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-	20250205122636epcas5p1c4e24fc8327dff774be9c7231ce0a822~hT4yDsC3S1755017550epcas5p1L;
-	Wed,  5 Feb 2025 12:26:36 +0000 (GMT)
-Received: from epsmgec5p1-new.samsung.com (unknown [182.195.38.174]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4YnzxQ1vl0z4x9Pt; Wed,  5 Feb
-	2025 12:26:34 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-	epsmgec5p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	69.9A.29212.AF853A76; Wed,  5 Feb 2025 21:26:34 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20250205115945epcas5p3fe280131617e4b986d93b618f7a68e90~hThVzYXPP2773727737epcas5p3c;
-	Wed,  5 Feb 2025 11:59:45 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20250205115945epsmtrp25acddee2195c7aa42dc3e72a28d4e07d~hThVyeLum1749417494epsmtrp2C;
-	Wed,  5 Feb 2025 11:59:45 +0000 (GMT)
-X-AuditID: b6c32a50-801fa7000000721c-e5-67a358fa37d8
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	2E.9F.18949.0B253A76; Wed,  5 Feb 2025 20:59:45 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250205115942epsmtip2d33bc80b6db05cc115c8726412cee178~hThTa-h__2344223442epsmtip2O;
-	Wed,  5 Feb 2025 11:59:42 +0000 (GMT)
-Date: Wed, 5 Feb 2025 17:21:34 +0530
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: axboe@kernel.dk, kbusch@kernel.org, martin.petersen@oracle.com,
-	asml.silence@gmail.com, anuj1072538@gmail.com, brauner@kernel.org,
-	jack@suse.cz, viro@zeniv.linux.org.uk, io-uring@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com, linux-scsi@vger.kernel.org, vishak.g@samsung.com,
-	linux-fsdevel@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v11 07/10] block: introduce
- BIP_CHECK_GUARD/REFTAG/APPTAG bip_flags
-Message-ID: <20250205115134.GA16697@green245>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NgKDmFbn"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5157WjMf000508;
+	Wed, 5 Feb 2025 13:27:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=WMpwoF
+	MTeiab/R30/eWfvI0ywJCIDQ1rmwpgwXL6YNU=; b=NgKDmFbnH1Wpww5u5kWPyY
+	yFs0RPNx9QH/IoIZ4tKc8L57+dD4bcoVBcfgW12F3idEMUHD7ESBA1RdX2Oj+CHM
+	KyVHMURQDvJCGsU/Y3zHBZvG6Fqxfn+UzRqFOZBxzm5A9r9fVl7AQmojkKkj67Ua
+	S/V5WsTZBK+4k3TgPfstc6Mc2+QComf5zqInDWUWGCkXS8l3bM3bQgiSDHptNzal
+	HSt7tFeyR57EQ+Qeo61EX2/9zPuol6s7V2aHrO42f3Kc22ZLRefZfksB8a0fMlHj
+	BqsdvGHa5QmaUHhTpeoBga7Oe5gE5ZI9GZsykI0SUGnzpCrivl4PggG9xsF7kDkw
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44m3pnskjt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Feb 2025 13:27:41 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 515CZqgP006516;
+	Wed, 5 Feb 2025 13:27:40 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44hyekgufr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Feb 2025 13:27:40 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 515DRepJ19989076
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 5 Feb 2025 13:27:40 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6993058058;
+	Wed,  5 Feb 2025 13:27:40 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C0B155805B;
+	Wed,  5 Feb 2025 13:27:38 +0000 (GMT)
+Received: from [9.171.80.122] (unknown [9.171.80.122])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  5 Feb 2025 13:27:38 +0000 (GMT)
+Message-ID: <7513082f-8ac7-4058-a72c-d062bd436591@linux.ibm.com>
+Date: Wed, 5 Feb 2025 18:57:36 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250204053914.GA28919@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA03Tf0wTVwAHcN9dez3qas4K462OUc9lBBRspZRDQUlk7BJdRrJMkAW7E86W
-	UdraH25zJmMiGjCKopNRqxQdMGDjpyIMqoYfMuWXk4wVE5AtdEQ2YMLYHBa2loPF/z738v2+
-	H/fucFTswiR4us7MGnWMlsSEvMb24ODQ+aRrallJuZB6OvecR9kqGwFVNZyPUb+1zwBq6E4z
-	QlVUdSLUVE4fj7pUmI1Qnf9OYlRB2yCgHI82Ua2OezyquMwloE791IRR5V2LCNW/0MWn+q02
-	Qexautk6LKAHei10fWUuRjd89RndMpSF0U9dj3j0meuVgO6xdwjo2frX6PqxSSRBmJwRrWGZ
-	NNYoZXWp+rR0nTqG3P2uapcqQimTh8qjqEhSqmMy2Rgybk9CaHy61nMcUnqY0Vo8QwmMyURu
-	2RFt1FvMrFSjN5ljSNaQpjUoDGEmJtNk0anDdKx5m1wm2xrhCX6QobEPP0ANduJj9+QJkAWc
-	ojzgg0NCAUsuLWB5QIiLiVYAS3OP8biHGQAvj7ej3pSY+AvAgsHwlUaN1S7gQg4AL7bO87jQ
-	rwBaa/d4zSNeh9Ul83yvMSIIdoznAK99CRK6JnqBt4wSRSjsK76xVF5H7IP9i3UCr0VEKHSO
-	TqCc18J7RWNLGR9iM6zpvLI0qR+xEd5p7EK8E0FiDIfOsw/53PbiYNHjfh7ndXCi67qAswTO
-	Tjkwzmr4bMCFcDbA7Lu3AOedMOd+/tLCKKGBNrtruRsAv7hfjXDja+Dp52PLXRFsurJiEp6s
-	sC0bQkdf1rJp+PfCCZR7XcUI/OZcP3IWBFpfOJz1hfU4b4b2lhnMCnCP18PyRZxjMKz5bosd
-	8CuBhDWYMtVsaoRBHqpjP/r/ylP1mfVg6XsPSWgCVbULYW0AwUEbgDhK+oq6b9rVYlEa88kR
-	1qhXGS1a1tQGIjzXdQ6V+KXqPT+MzqySK6JkCqVSqYgKV8pJf1F283G1mFAzZjaDZQ2scaWH
-	4D6SLGRf4lBnNpNfVh+f4Y5GG5S3B6f5juMDVeNHXx5NL6ySgrrCtyJtp0PmU/zfi58U/T49
-	siFxa8veb3W3vj6w8/2TtU6/ngdX/2lw/3AtQRbwdh3BXx2TapuO3R1T+qk7oEMSqwk4T+B1
-	c9SN4B5w/qA4r/D2oTXr3aXbKzv8VlnfeCkpSBR0NPgiOVKd+Kzjl+E5t6rtkDB8anG/qOHV
-	qcjylNyNm+CkMKXi2M8hCmlc4c0kFjsykqy9fHC6tED1x5/uwS/9e/d+ePjHx76wc/WTsm2K
-	UsvD2Xe2bziw/8L3iVdfcb5Jt+TGn7obOD3b8/kT3arAkQv+87t2uEe7nZbm5DP+3aMkz6Rh
-	5CGo0cT8B/dM+eV4BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrGIsWRmVeSWpSXmKPExsWy7bCSvO7GoMXpBrMPMVl8/PqbxWLOqm2M
-	Fqvv9rNZvD78idHi5oGdTBYrVx9lsnjXeo7FYvb0ZiaLo//fsllMOnSN0WLvLW2LPXtPsljM
-	X/aU3aL7+g42i+XH/zFZnP97nNXi/Kw57A6CHjtn3WX3uHy21GPTqk42j81L6j1232xg8/j4
-	9BaLR9+WVYweZxYcYff4vEnOY9OTt0wBXFFcNimpOZllqUX6dglcGU8abzAXPOCt+PUjoIFx
-	I3cXIyeHhICJxPpZC9i7GLk4hAR2M0rMmbaXBSIhIXHq5TJGCFtYYuW/51BFTxglFl1/wwyS
-	YBFQkVi38BcriM0moC5x5HkrWIOIgJLE01dnGUEamAVmM0u8nvAYrEFYIFKif/5tJhCbV0BX
-	4saDV8wQUxczSfw5/BAqIShxcuYTsDOYBbQkbvx7CRTnALKlJZb/4wAJcwroSKw/Og9ssaiA
-	ssSBbceZJjAKzkLSPQtJ9yyE7gWMzKsYJVMLinPTc4sNC4zyUsv1ihNzi0vz0vWS83M3MYKj
-	UktrB+OeVR/0DjEycTAeYpTgYFYS4T29fUG6EG9KYmVValF+fFFpTmrxIUZpDhYlcd5vr3tT
-	hATSE0tSs1NTC1KLYLJMHJxSDUy5misV90W9mNEzz7xhq0LYy+tLvqjsUN/rUJ+xZ/denzUb
-	3lxJOf6sxODWDrb7i57oMhf2tXDWC+olBKp2h2vETlhwr/PfFeFi19dJjSGXLC8pLrdftu15
-	dFuS9DFxbUldpiuF3r8uFndwmMTXiay66RHfObeViV1aJaH4zAS5bZ8rfosl/spe1H45Ueqx
-	RGWhl7cUf02m0nVlfYmtO/9UzL12tfHSS+H3vRbls3/JW54r2Wekk1mStXvRsVM7ZSZfl37r
-	80JSXYl791r2RsfZEmy5hW1fOSx6JA231f4RYd+YXl5gLLWxJu7J03USK358SY436n2xPkYn
-	5s+fi1WvZHYJR83Ovj1PmMv6kBJLcUaioRZzUXEiAHPBooI5AwAA
-X-CMS-MailID: 20250205115945epcas5p3fe280131617e4b986d93b618f7a68e90
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----knAlFONTECbX-FcfvlefBkarukSN3r7qQKLuxxl86w44aglH=_2dec9_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20241128113112epcas5p186ef86baaa3054effb7244c54ee2f991
-References: <20241128112240.8867-1-anuj20.g@samsung.com>
-	<CGME20241128113112epcas5p186ef86baaa3054effb7244c54ee2f991@epcas5p1.samsung.com>
-	<20241128112240.8867-8-anuj20.g@samsung.com> <20250203065331.GA16999@lst.de>
-	<20250203143948.GA17571@green245> <20250204053914.GA28919@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests] srp: skip test if scsi_transport_srp module is
+ loaded and in use
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "gjoyce@ibm.com" <gjoyce@ibm.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>
+References: <20250201184021.278437-1-nilay@linux.ibm.com>
+ <xcgbpthn7v3xpprcqyer7jvfgzlaavvm2i3kureaqc74df263h@vuv5a23bbocp>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <xcgbpthn7v3xpprcqyer7jvfgzlaavvm2i3kureaqc74df263h@vuv5a23bbocp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: WHTU-P0uKuAdu9yE_NNPYhO-2JLiV3wj
+X-Proofpoint-GUID: WHTU-P0uKuAdu9yE_NNPYhO-2JLiV3wj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-05_05,2025-02-05_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 spamscore=0
+ mlxscore=0 suspectscore=0 adultscore=0 priorityscore=1501 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502050104
 
-------knAlFONTECbX-FcfvlefBkarukSN3r7qQKLuxxl86w44aglH=_2dec9_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
 
-On Tue, Feb 04, 2025 at 06:39:14AM +0100, Christoph Hellwig wrote:
-> On Mon, Feb 03, 2025 at 08:09:48PM +0530, Anuj Gupta wrote:
-> > +	if (bi->csum_type == BLK_INTEGRITY_CSUM_IP)
-> > +		bip->bip_flags |= BIP_IP_CHECKSUM;
+
+On 2/4/25 5:25 PM, Shinichiro Kawasaki wrote:
+> CC+: Bart,
 > 
-> We'll also need to set the BIP_CHECK_GUARD flag here I think.
+> On Feb 02, 2025 / 00:10, Nilay Shroff wrote:
+>> The srp/* tests requires exclusive access to scsi_transport_srp
+>> module. Running srp/* tests would definitely fail if the test can't
+>> get exclusive access of scsi_transport_srp module as shown below:
+>>
+>> $ lsmod | grep scsi_transport_srp
+>> scsi_transport_srp    327680  1 ibmvscsi
+>>
+>> $ ./check srp/001
+>> srp/001 (Create and remove LUNs)                             [failed]
+>>     runtime    ...  0.249s
+>> tests/srp/rc: line 263: /sys/class/srp_remote_ports/port-0:1/delete: Permission denied
+>> tests/srp/rc: line 263: /sys/class/srp_remote_ports/port-0:1/delete: Permission denied
+>> modprobe: FATAL: Module scsi_transport_srp is in use.
+>> error: Invalid argument
+>> error: Invalid argument
+>>
+>> So if the scsi_transport_srp module is loaded and in use then skip
+>> running srp/* tests.
+> 
+> Thanks. I think this is a good improvement.
+> 
+>>
+>> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+>> ---
+>>  common/rc    | 11 +++++++++++
+>>  tests/srp/rc |  1 +
+>>  2 files changed, 12 insertions(+)
+>>
+>> diff --git a/common/rc b/common/rc
+>> index bcb215d..73e0b9a 100644
+>> --- a/common/rc
+>> +++ b/common/rc
+>> @@ -78,6 +78,17 @@ _have_module() {
+>>  	return 0
+>>  }
+>>  
+>> +_have_module_not_in_use() {
+>> +       _have_module "$1" || return
+>> +
+>> +       if [ -d "/sys/module/$1" ]; then
+>> +               refcnt="$(cat /sys/module/$1/refcnt)"
+>> +               if [ "$refcnt" -ne "0" ]; then
+>> +                       SKIP_REASONS+=("module $1 is in use")
+>> +               fi
+>> +       fi
+>> +}
+> 
+> Spaces are used for indents. Please use tabs instead.
+> 
+Grrr.. I think my editor inserted spaces instead of tabs, I would fix this
+in the next version of the patch.
 
-Right, I think this patch should address the problem [*]
-I couldn't test this patch, as nvme-tcp doesn't support T10-PI and so
-does rdma_rxe. I don't have rdma h/w to test this.
-It would be great if someone can give this a run.
+> Nit: "refcnt" is not declared as a local variable. Let's declare it. Or, it
+> would be the better to avoid "refcnt". Instead, $(< /sys/module/$1/refcnt)
+> can be used as follows. Either way is fine for me.
+> 
+>        if [ -d "/sys/module/$1" ] && (($(</sys/module/"$1"/refcnt) != 0)); then
+>                SKIP_REASONS+=("module $1 is in use")
+>        fi
+Okay, I'd make "refcnt" local and update.
 
-[*]
+Thanks,
+--Nilay
 
-Subject: [PATCH] nvmet: set bip_flags to specify integrity checks
-
-A recent patch [1] changed how the driver sets checks for integrity buffer.
-The checks are now specified via newly introduced bip_flags that indicate
-how to check the integrity payload. nvme target never sets these flags.
-Modify it, so that it starts using these new bip_flags.
-
-[1] https://lore.kernel.org/linux-nvme/20241128112240.8867-8-anuj20.g@samsung.com/
-
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
----
- drivers/nvme/target/io-cmd-bdev.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index c1f574fe3280..4bab24bcd6e8 100644
---- a/drivers/nvme/target/io-cmd-bdev.c
-+++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -210,6 +210,10 @@ static int nvmet_bdev_alloc_bip(struct nvmet_req *req, struct bio *bio,
- 		return PTR_ERR(bip);
- 	}
- 
-+	if (bi->csum_type)
-+		bip->bip_flags |= BIP_CHECK_GUARD;
-+	if (bi->flags & BLK_INTEGRITY_REF_TAG)
-+		bip->bip_flags |= BIP_CHECK_REFTAG;
- 	/* virtual start sector must be in integrity interval units */
- 	bip_set_seed(bip, bio->bi_iter.bi_sector >>
- 		     (bi->interval_exp - SECTOR_SHIFT));
--- 
-2.25.1
-
-------knAlFONTECbX-FcfvlefBkarukSN3r7qQKLuxxl86w44aglH=_2dec9_
-Content-Type: text/plain; charset="utf-8"
-
-
-------knAlFONTECbX-FcfvlefBkarukSN3r7qQKLuxxl86w44aglH=_2dec9_--
