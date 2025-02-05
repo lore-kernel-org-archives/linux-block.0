@@ -1,36 +1,30 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F40015854F;
-	Wed,  5 Feb 2025 15:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E5118DF65
+	for <linux-block@vger.kernel.org>; Wed,  5 Feb 2025 15:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738770141; cv=none; b=aDD5aW+alm8p7PeBNpzl1FEa8zu1ILd5R86OanJNs3DpRx9W/Lrs2UmT4U255BhEpFSMoJH40YdRLEYFgEIDMv/snyzVqNcX0GEsbEg6dJkoS25ty98QT+hadkX2mZm7JnR+pXdrLVz7rqNkqfQXelPpNYw62Rv0iN+guDzO2oU=
+	t=1738770818; cv=none; b=ToG+eSuKeEfIKfEgbLO4sa79Xltv9WSI59mI4dBcK/85A5xcJZgwnS7DWoS4m1fJ6hxMBUT0WfXuh7fijQgnhdLaaxoZrYJbSi53OQrKIHD+8x33Df+QD1kAA8z+WnRenPyqXRubUFxUPfDEdk4LAWT+euOibZtVSv0a6FKS5tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738770141; c=relaxed/simple;
-	bh=m2nOXibL+fGpe0G1tswQJTFHG8wwtAmmoV7YtVSBXtU=;
+	s=arc-20240116; t=1738770818; c=relaxed/simple;
+	bh=W1FdautvrDaArBZJxLReAXjdUYHglvfEc3eieP3ISR4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XTj6Pfz/PG8pZQNsDgWjgL5QAvZ5mzyyREX6NiMorwiXiMl57b/aTJSymbcqyjtyVYl0K41Oney57+lUmamI4mMAWhF+FCXfnge7kvKHwQkS8eSTOiaFLRB+xPP7t6zVT6y1kRRkgvQQO8QHhabBOkuNE+PaT/2e2B56wTtRAVQ=
+	 Content-Type:Content-Disposition:In-Reply-To; b=jm86e9o3pyTB9UD6LVoRsBEzebLfhsGNHTJhL2OvluDZf+Q6fdztO2PmEjSTpKP8zgUmdjyPYKBAEkKTbMRDroszRU+U2E4xT/ENJTfMIYekqGiiNEqtq9sq+bpnT0qJtRNi1ZpfaKrx4B6Dh648n1AVeaO/jFMQdz8uIzQvKfw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 40BFE68BFE; Wed,  5 Feb 2025 16:42:07 +0100 (CET)
-Date: Wed, 5 Feb 2025 16:42:06 +0100
+	id F3FD468BFE; Wed,  5 Feb 2025 16:53:30 +0100 (CET)
+Date: Wed, 5 Feb 2025 16:53:30 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Anuj Gupta <anuj20.g@samsung.com>
-Cc: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
-	martin.petersen@oracle.com, asml.silence@gmail.com,
-	anuj1072538@gmail.com, brauner@kernel.org, jack@suse.cz,
-	viro@zeniv.linux.org.uk, io-uring@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	gost.dev@samsung.com, linux-scsi@vger.kernel.org,
-	vishak.g@samsung.com, linux-fsdevel@vger.kernel.org,
-	Kanchan Joshi <joshi.k@samsung.com>
-Subject: Re: [PATCH v11 07/10] block: introduce
- BIP_CHECK_GUARD/REFTAG/APPTAG bip_flags
-Message-ID: <20250205154206.GA13814@lst.de>
-References: <20241128112240.8867-1-anuj20.g@samsung.com> <CGME20241128113112epcas5p186ef86baaa3054effb7244c54ee2f991@epcas5p1.samsung.com> <20241128112240.8867-8-anuj20.g@samsung.com> <20250203065331.GA16999@lst.de> <20250203143948.GA17571@green245> <20250204053914.GA28919@lst.de> <20250205115134.GA16697@green245>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: linux-block@vger.kernel.org, hch@lst.de, ming.lei@redhat.com,
+	dlemoal@kernel.org, axboe@kernel.dk, gjoyce@ibm.com
+Subject: Re: [PATCH 2/2] block: avoid acquiring q->sysfs_lock while
+ accessing sysfs attributes
+Message-ID: <20250205155330.GA14133@lst.de>
+References: <20250205144506.663819-1-nilay@linux.ibm.com> <20250205144506.663819-3-nilay@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,24 +33,22 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250205115134.GA16697@green245>
+In-Reply-To: <20250205144506.663819-3-nilay@linux.ibm.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Feb 05, 2025 at 05:21:34PM +0530, Anuj Gupta wrote:
-> On Tue, Feb 04, 2025 at 06:39:14AM +0100, Christoph Hellwig wrote:
-> > On Mon, Feb 03, 2025 at 08:09:48PM +0530, Anuj Gupta wrote:
-> > > +	if (bi->csum_type == BLK_INTEGRITY_CSUM_IP)
-> > > +		bip->bip_flags |= BIP_IP_CHECKSUM;
-> > 
-> > We'll also need to set the BIP_CHECK_GUARD flag here I think.
-> 
-> Right, I think this patch should address the problem [*]
-> I couldn't test this patch, as nvme-tcp doesn't support T10-PI and so
-> does rdma_rxe. I don't have rdma h/w to test this.
-> It would be great if someone can give this a run.
+On Wed, Feb 05, 2025 at 08:14:48PM +0530, Nilay Shroff wrote:
+> The sysfs attributes are already protected with sysfs/kernfs internal
+> locking. So acquiring q->sysfs_lock is not needed while accessing sysfs
+> attribute files. So this change helps avoid holding q->sysfs_lock while
+> accessing sysfs attribute files.
 
-I'll add support to nvmet-loop, which should make testing either.
+the sysfs/kernfs locking only protects against other accesses using
+sysfs.  But that's not really the most interesting part here.  We
+also want to make sure nothing changes underneath in a way that
+could cause crashes (and maybe even torn information).
 
-Note that the SCSI target code has the same issues and might be a
-little easier to test.
+We'll really need to audit what is accessed in each method and figure
+out what protects it.  Chances are that sysfs_lock provides that
+protection in some case right now, and chances are also very high
+that a lot of this is pretty broken.
 
