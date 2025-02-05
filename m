@@ -1,80 +1,115 @@
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1D421D597
-	for <linux-block@vger.kernel.org>; Wed,  5 Feb 2025 05:58:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 202A6221D86
+	for <linux-block@vger.kernel.org>; Wed,  5 Feb 2025 06:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738735086; cv=none; b=hD8QXaGlaj1KNV/nJIzGAHPFpJ9HYAGBuhatVi+5ob/aDlhROl0gttj97sL3ViDH4ZymPgwzhG9KEpT0XEtfOFiKF1YbZAdFHJ8hxEf7IyYt5Gvd+IFN49VFxxr7xP4UBGp3KwHMs29CC7onAqWhkHorc3LN1+pswlbd7pwfYDE=
+	t=1738735737; cv=none; b=hORRfzaqpqBUGLnQkbGMDh8f72BQBKT7VcelIt2eODyRsKximCCcoLSEqaPb2f1u9nFpIsZYcPw0o3yKUSXjEqHnihcThMMusT7TATy2wJtKbHQ/4w/F65ZSldIbpXp1uvttcu50eV7rArBRQLZ7G4YUs5Avn0u8byudY21pjX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738735086; c=relaxed/simple;
-	bh=eCnvaDRC7nQVJQXr7yFA3eXDOv1kw8Jo9IyBztnYNLA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=DKr6eaRO4i+ZOMHSh06Tou61abUvv31mbRmd353jQvRG7G1bFsTfL+E0YJC5dHb9X+DRZSlbbzW36IbzYKJbCEbqfX6aDn2CjFe2TcY7eA4NH41hovuGszzaQabcu9+ZForbnFeMxDefDGUsFaClJ0sKmXGJWW8fsPesCJJ3XsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3d04f20f2baso10440935ab.1
-        for <linux-block@vger.kernel.org>; Tue, 04 Feb 2025 21:58:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738735084; x=1739339884;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YgoGYXPL3jaqGsvD6yqUXKZyHZuAvF3NbJLN1Y2+mos=;
-        b=TWAuJ7S4tnK5VcDiK5Qy47aM0fujXBstnarLfi605vMX9qMx2IexaW2zK1btT4MklN
-         HdGfSBXhzrOySLJUenTZ8aCyE4mR9mX3lXioclKW+pjCK9UtzZiBVQDFSAVpADkArs8B
-         xnnfKmvXw78VP2xlx56vZvcOHT2Tp5FkXcTXWaS6WWCxYAtUDdunC+x612Y1wFN/OW9v
-         DjKzXXEvRLKsYkzEMrIu9UBnq/LrPfhDrGEukHF5sPi5/dGj4ECBeKhnMDXTTwi37rAT
-         GKIu5gRfUddaVUKApbyzp3rqiXTBHF6o/dk35xzOuQufLGSdXL9RK0v9kvd3ElquUBzF
-         bt1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWjqlLyxAWmt7IOM14vze2CMRN2vn8SlNONxo3lr66puRZHS3LX8I6u3/p/nC4p6oPqpmp7VTQg5inAsQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYTO8GB9DPO59JJGH8LMrXDbM+xli7RO3LRrjBHJ6wJmYbm3KY
-	fc3+1TulGSp73a9x25nzCRpKozauHNP4Rm+2UMu9Q9gzGUpou44KPWWcPfUC7z0man2xbuAJYvC
-	FMp9TQXDB+QOxvY8F2yuapNh12BsbeYzj1r2N7qd8ri2r7nuWz4bc1EY=
-X-Google-Smtp-Source: AGHT+IH2nDOcRyAbsP/ZFFbGw/cJPsTUsTveiVlP2eXWQqknQYXSK25WNlXoJeeQrPdOOXsXY/uUaSs949Dx2cxKLiUZKAR2dHni
+	s=arc-20240116; t=1738735737; c=relaxed/simple;
+	bh=PCAHOmXTXpvaAi5mBNCqYwHpll0rkzL3ghd7yfyMyXQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FBMAnbJDbva1QdI1kMxUgH2ReTiSNbJX2adfX3DqlaOxIxQbp4zlQ6DmbK1VAUdefjbt29fENc9bzXICsX8W1b0C5/xtyIhow7C+lAqSHdc6BrkJMOeKRa9pEpGZLIq7cu92l3ueMV0n2g9cKhKpc2tothUdZoiSmoKw9CyXQe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nODmQYEp; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nODmQYEp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8AF7C4CEE3;
+	Wed,  5 Feb 2025 06:08:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738735736;
+	bh=PCAHOmXTXpvaAi5mBNCqYwHpll0rkzL3ghd7yfyMyXQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=nODmQYEpZ3OfNrI71cTUvj/Yi1q66R6OL/V3JJyP3RQjH5LCjZQ55DQqoc7r/ZYCh
+	 NWRLZ9gkaIfDd/J+ifiCGJr6pZSF7rLV8/ZqD6/0YHa3ejnKoTUy259c9icWY8EMEU
+	 m92qbbFxG4cNbEstw1MqTSuvFMu+58w18W7TGdaumUoOvhi9Ch44fnxpNi8NW/KNLe
+	 BPga5+kWJWpzO1GsmDnV/qpEqOQK/nzv0XXV9EJ6Cdbip0ZtXG+AvQli+JWM2zzwzZ
+	 8doQwc3/zDAULjL0TKblTOtn15qqFgtnPR1Cam19lznJa6jN+bG1HA+rkeC4RRS4QR
+	 eel/VaXKxt1NA==
+Message-ID: <f6d82d47-ff27-43e8-a772-0ab90a2f86c4@kernel.org>
+Date: Wed, 5 Feb 2025 15:07:51 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d1d:b0:3d0:28d3:e4ba with SMTP id
- e9e14a558f8ab-3d04f917ccamr14330045ab.18.1738735083923; Tue, 04 Feb 2025
- 21:58:03 -0800 (PST)
-Date: Tue, 04 Feb 2025 21:58:03 -0800
-In-Reply-To: <67a23341.050a0220.163cdc.0069.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67a2fdeb.050a0220.50516.000e.GAE@google.com>
-Subject: Re: [syzbot] [block?] BUG: sleeping function called from invalid
- context in unmap_mapping_folio
-From: syzbot <syzbot+95f1db35defd8524f1dd@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, ansuelsmth@gmail.com, axboe@kernel.dk, 
-	david@redhat.com, dianders@google.com, kirill.shutemov@linux.intel.com, 
-	lilingfeng3@huawei.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, riyandhiman14@gmail.com, 
-	syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] New zoned loop block device driver
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+References: <ac42d762-60e5-4550-99f1-bd2072e474c2@kernel.org>
+ <CAFj5m9+LUtAt2ST41KzMasx4BuVYBXjAuLg5MDr0Gh31yzZKzw@mail.gmail.com>
+ <20250108090912.GA27786@lst.de> <Z35H1chBIvTt0luL@fedora>
+ <Z4ETvfwVfzNWtgAo@fedora> <d5e59531-c19b-4332-8f47-b380ab9678be@kernel.org>
+ <Z5OHy76X2F9H6EWP@fedora> <cb5d4dad-35a9-400e-9c53-785fba6f5a87@kernel.org>
+ <Z5xJh84xZbjcO-nJ@fedora> <a63406f1-6a45-4d07-b998-504bd2d6d0d7@kernel.org>
+ <Z6LeXsYw_qq4hqoC@fedora>
+From: Damien Le Moal <dlemoal@kernel.org>
+Content-Language: en-US
+Organization: Western Digital Research
+In-Reply-To: <Z6LeXsYw_qq4hqoC@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-syzbot has bisected this issue to:
+On 2/5/25 12:43 PM, Ming Lei wrote:
+>>> Can you share how you create rublk/zoned and zloop and the underlying
+>>> device info? Especially queue depth and nr_queues(both rublk/zloop &
+>>> underlying disk) plays a big role.
+>>
+>> rublk:
+>>
+>> cargo run -r -- add zoned --size 524288 --zone-size 256 --conv-zones 0 \
+>> 		--logical-block-size 4096 --queue ${nrq} --depth 128 \
+>> 		--path /mnt/zloop/0
+>>
+>> zloop:
+>>
+>> echo "add conv_zones=0,capacity_mb=524288,zone_size_mb=256,\
+>> base_dir=/mnt/zloop,nr_queues=${nrq},queue_depth=128" > /dev/zloop-control
+> 
+> zone is actually stateful, maybe it is better to use standalone backing
+> directory/files.
 
-commit 1760a1b5aacbe00dec464b1bf2b10443c10377ad
-Author: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-Date:   Thu Jan 30 10:00:45 2025 +0000
+I do not understand what you are saying... I reformat the backing FS and
+recreate the same /mnt/zloop/0 directory for every test, to be sure I am not
+seeing an artifact from the FS.
 
-    mm/vmscan: use PG_dropbehind instead of PG_reclaim in shrink_folio_list()
+>> The backing storage is using XFS on a PCIe Gen4 4TB M.2 SSD (my Xeon machine is
+>> PCIe Gen3 though). This drive has a large enough max_qid to provide one IO queue
+>> pair per CPU for up to 32 CPUs (16-cores / 32-threads).
+> 
+> I just setup one XFS over nvme in real hardware, still can't reproduce the big gap in
+> your test result. Kernel is v6.13 with zloop patch v2.
+> 
+> `8 queues` should only make a difference for the test of "QD=32,   4K rnd wr, 8 jobs".
+> For other single job test, single queue supposes to be same with 8 queues.
+> 
+> The big gap is mainly in test of 'QD=32, 128K seq wr, 1 job ', maybe your local
+> change improves zloop's merge? In my test:
+> 
+> 	- ublk/zoned : 912 MiB/s
+> 	- zloop(v2) : 960 MiB/s.
+> 
+> BTW, my test is over btrfs, and follows the test script:
+> 
+>  fio --size=32G --time_based --bsrange=128K-128K --runtime=40 --numjobs=1 \
+>  	--ioengine=libaio --iodepth=32 --directory=./ublk --group_reporting=1 --direct=1 \
+> 	--fsync=0 --name=f1 --stonewall --rw=write
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14c2ef64580000
-start commit:   40b8e93e17bf Add linux-next specific files for 20250204
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16c2ef64580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12c2ef64580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ec880188a87c6aad
-dashboard link: https://syzkaller.appspot.com/bug?extid=95f1db35defd8524f1dd
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16010df8580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12f078a4580000
+If you add an FS on top of the emulated zoned deive, you are testing the FS
+perf as much as the backing dev. I focused on the backing dev so I ran fio
+directly on top of the emulated drive. E.g.:
 
-Reported-by: syzbot+95f1db35defd8524f1dd@syzkaller.appspotmail.com
-Fixes: 1760a1b5aacb ("mm/vmscan: use PG_dropbehind instead of PG_reclaim in shrink_folio_list()")
+fio --name=test --filename=${dev} --rw=randwrite \
+                --ioengine=libaio --iodepth=32 --direct=1 --bs=4096 \
+                --zonemode=zbd --numjobs=8 --group_reporting --norandommap \
+                --cpus_allowed=0-7 --cpus_allowed_policy=split \
+                --runtime=${runtime} --ramp_time=5 --time_based
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+(you must use libaio here)
+
+-- 
+Damien Le Moal
+Western Digital Research
