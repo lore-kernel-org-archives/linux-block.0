@@ -1,339 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF43225799;
-	Thu,  6 Feb 2025 07:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17311FCFCB
+	for <linux-block@vger.kernel.org>; Thu,  6 Feb 2025 08:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738827625; cv=none; b=nBSBVh0NhIrBheTakC99TsirYHgDJI50wkTPfsLo0Zwq0apZRyiTIpmAMyVKE4RVcqPivLgfvzxoqocjJ88nG7XOIiU/fFOqh501u532VEUvr/sU0BChIYhFHwKW57mHpK6dQ9fYTjq9Nl2PNtKd8Jn3KZW7tftFu7GFOWG3PR0=
+	t=1738828824; cv=none; b=kWXmPfmSXGv0xPxyQH4YdE08BiCNwjp3dtwGm+JEHlhwi4Vt1C1OzQXm/LEd6+mk/DdQ92bJDH2eWvfLYGf6JZwDYU7mr+GT3xJi+auvHrymAH8Vc9TuWBiTT34O+gVLZw9I5tLiog8Sbs0SEBrCIRBU3JcebuQfdRYFLtyx650=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738827625; c=relaxed/simple;
-	bh=C8cL1XsRmxe/mGkGlOBuQj7eOApK9RrvJpUEkAeYoVM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H9eAWpUtdmcP/rZhXCOLIzm7a8mIxETZkZrsaA2QwlTbcm1ejfgr0Mth/8o2nZjM5aJ50yIWcHHZb4tbUfr7/8Zuq1uywxPsI8tvcOib1zN6CTjv1hfcifZ6cekU3fCDNEkOjBRU++/Ol0f0LmE6PCoPY8xc69/ULYOQ71VL3AI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bserjmM1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738828824; c=relaxed/simple;
+	bh=hbgZDF5c0CDtttVg1c0iGpgYnifwm2dl79coVeP664g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jFLzlEdKvylP0D7XmhkrPVe+XoWq/0ZUNAQhfEfc1ak7ClEHKsnDTpjLK0A6+fF/vQ33XUEyRf/x5/mx7EgIo2qCrjtEgG2tVsXK6oYondqZitVsmOvSKECRJ1C+UN4P3PaBoh08ptCvCbNTWVJbaLanK5RiBWR49Z9P2TftVVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com; spf=none smtp.mailfrom=owltronix.com; dkim=pass (2048-bit key) header.d=owltronix-com.20230601.gappssmtp.com header.i=@owltronix-com.20230601.gappssmtp.com header.b=iz1MHYHv; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=owltronix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bserjmM1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C03FC4CEE0;
-	Thu,  6 Feb 2025 07:40:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738827625;
-	bh=C8cL1XsRmxe/mGkGlOBuQj7eOApK9RrvJpUEkAeYoVM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bserjmM1Sy2puDKJXiCnihbLEFUBW3/i91fEwQO+iAqQCj7AzJ0UUdip868cexPvZ
-	 CijYHNUOcHm/kfPXc2B6mZBv9ZdS1y919ohE/F302kzDcuTOl/5/dT5KEoS7nHZvwk
-	 3PXoOCNw64/z4wJIVesrB8xg5peKOFx4ulbqYcxHerkK/qpcGgRzFNPw5XgIkpXQ9M
-	 0VXhd2uyN1RFikdy/l/UFkyscKl2DERQnTQx2AwuVO3e/z2cmfc9khdUgDLLH9td87
-	 81iIyhr0MMLTRHkcx2xxQTNVqM/G87lHwxb9dU7T2SOuQdcwkkHVidZJ9UNo8Z4TA8
-	 luRiQRabBqSOw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	x86@kernel.org,
-	linux-block@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Keith Busch <kbusch@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v3 6/6] x86/crc64: implement crc64_be and crc64_nvme using new template
-Date: Wed,  5 Feb 2025 23:39:48 -0800
-Message-ID: <20250206073948.181792-7-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250206073948.181792-1-ebiggers@kernel.org>
-References: <20250206073948.181792-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=owltronix-com.20230601.gappssmtp.com header.i=@owltronix-com.20230601.gappssmtp.com header.b="iz1MHYHv"
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5dccaaca646so1212486a12.0
+        for <linux-block@vger.kernel.org>; Thu, 06 Feb 2025 00:00:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20230601.gappssmtp.com; s=20230601; t=1738828821; x=1739433621; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hbgZDF5c0CDtttVg1c0iGpgYnifwm2dl79coVeP664g=;
+        b=iz1MHYHvXkcX+boB0DrRXqpMNHTZ+txviSigD5CI+epKZ/mQ3I/ZAsAlCqXRUmYvFa
+         KziKeuhEDDzt2ubWJFP7THIJhG04mgWwbfvn6ZPhgWj7Qvr4HgzcGN4IMK3A7RYdUTT7
+         uBad4WbnTR15maw8vhDOKw7XuRUpX7Ke7P4K3835wHtshlcFqPtSSMRwVwPYdBj12ncc
+         38+oDhpdLtPHkqH0xnjCNPMms9H3ofiXJiOhMeqJfP/ATRtp1HOr2hFaDLcjZzPsznmu
+         DOQpB6T9CaOUFgRJsM0v2c5V90FNAVquSH/PXRHbcMGlFlAW1GVhszSpmwugMbV9kul4
+         RZRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738828821; x=1739433621;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hbgZDF5c0CDtttVg1c0iGpgYnifwm2dl79coVeP664g=;
+        b=rd04hFTpeob63OwPEH2btUApr+O9AgnfXSzaMair2V1g+QZEwM3mGTH3MxDyFM6LZq
+         s7VCnMe2+Hpq+JUVgJT3P7xjS9vByuYgrmCBrReYYl5CVQGa5qAI9Cw0eGL8+BXGP5at
+         95GvRRtcOzsIAUVOD23TnaB4vtUuebotCkAMa/a9AMyrHkJVs3iam8OfGAkUjaawfuJV
+         6xrg4W3TLQJmgxvRxbYhwuDEBWFDCNuckAnwsMR9SX4+yXaSXi4+6lKkLuVRm7pV87w8
+         9ZhzQ9PykbnYH4DnaLQHW3pkBh4FcwsAghfyJg9p3qrGgMxH0gJVQARckhNM6sJH0JK7
+         zxzw==
+X-Forwarded-Encrypted: i=1; AJvYcCW3Xb+IeRxgc3wZ/VCmlRQywqS/MPzDUhUu8Wm4EJaKCPSj+dftpPXSq8yI6uYHafCGxj2+T45xQV/SWg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6MS1oUaLSyR+9qH145704tBNc0d6EjMKjGxd5uE5eus802NpO
+	DuU7Tutcs03jRvufOr5TSldMz53G+UEYODFVecCPsxjwoHqq2GLl8PiKFN0XzXovd4vx2/5aung
+	3hVAdjj9/QTuWk0ACoy5/0xL4Y/ngYd9PJPZzvA==
+X-Gm-Gg: ASbGnctzUWxdrc/ZpxDH9QaKQtkRrU0FPMCC15IHMOoDo3jZXPWOp0Ac7Xm2V/tQLtB
+	c+kH8/gGjELdI9YG7d+oXlp3zyeEIWUqSxysRpx18OqitLvkW3OKUWlKkfO6xDbH6s27CnLxVIg
+	==
+X-Google-Smtp-Source: AGHT+IElRzdXU9ihnCWisqkyOvOPlw1yUKPT3RVc8XB0QIPGKptq6RLAqxQ6e7F7OtfcIdOIWTr8PicD7kCqwOpbH3A=
+X-Received: by 2002:a05:6402:3491:b0:5d9:f3fb:fa45 with SMTP id
+ 4fb4d7f45d1cf-5dcecd03156mr2299095a12.16.1738828820703; Thu, 06 Feb 2025
+ 00:00:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250123202455.11338-1-slava@dubeyko.com> <fd012640-5107-4d44-9572-4dffb2fd4665@wdc.com>
+ <f44878932fd26bb273c7948710b23b0e2768852a.camel@ibm.com> <CANr-nt2+Yk5fVVjU2zs+F1ZrLZGBBy3HwNOuYOK9smDeoZV9Rg@mail.gmail.com>
+ <063856b9c67289b1dd979a12c8cfe8d203786acc.camel@ibm.com> <CANr-nt2bbienm=L48uEgjmuLqMnFBXUfHVZfEo3VBFwUsutE6A@mail.gmail.com>
+ <a09665a84d11c3d184346b1f55515ac912b061c3.camel@ibm.com> <CANr-nt0nRZp=g2kbUqd5PoNbH-m9MWd_4x+LmR6x-gTT92MoVQ@mail.gmail.com>
+ <4907d1ff5cd5a846188b2c9d77d110d926a37ac7.camel@ibm.com>
+In-Reply-To: <4907d1ff5cd5a846188b2c9d77d110d926a37ac7.camel@ibm.com>
+From: Hans Holmberg <hans@owltronix.com>
+Date: Thu, 6 Feb 2025 09:00:09 +0100
+X-Gm-Features: AWEUYZk1oWymAO0tivzc4PDnt_uFIZ6c8QzmNk589SrSt0_xIRlit5PPTit-q4Y
+Message-ID: <CANr-nt2qRQUJJF_WwFGndANjb9=uSuY2Yzc-wsgtSZ9fUycgHw@mail.gmail.com>
+Subject: Re: [RFC PATCH] Introduce generalized data temperature estimation framework
+To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+Cc: "Johannes.Thumshirn@wdc.com" <Johannes.Thumshirn@wdc.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"slava@dubeyko.com" <slava@dubeyko.com>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"javier.gonz@samsung.com" <javier.gonz@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Eric Biggers <ebiggers@google.com>
+On Thu, Jan 30, 2025 at 7:31=E2=80=AFPM Viacheslav Dubeyko
+<Slava.Dubeyko@ibm.com> wrote:
+>
+> On Wed, 2025-01-29 at 11:23 +0100, Hans Holmberg wrote:
+> > On Tue, Jan 28, 2025 at 11:31=E2=80=AFPM Viacheslav Dubeyko
+> > <Slava.Dubeyko@ibm.com> wrote:
+> > >
+> > >
+>
+> <skipped>
+>
+> > > >
+> > >
+> > > Another trouble here. What is the way to measure write amplification,=
+ from your
+> > > point of view? Which benchmarking tool or framework do you suggest fo=
+r write
+> > > amplification estimation?
+> >
+> > FDP drives expose this information. You can retrieve the stats using
+> > the nvme cli.
+>
+> Do you mean that FDP drives has some additional info in S.M.A.R.T subsyst=
+em?
+> Does it some special subsystem in FDP drives? Is it regular statistics or=
+ some
+> debug feature of the device?
 
-Add x86_64 [V]PCLMULQDQ optimized implementations of crc64_be() and
-crc64_nvme() by wiring them up to crc-pclmul-template.S.
+It's mandatory for FDP drives.
 
-crc64_be() is used by bcache and bcachefs, and crc64_nvme() is used by
-blk-integrity.  Both features can CRC large amounts of data, and the
-developers of both features have expressed interest in having these CRCs
-be optimized.  So this optimization should be worthwhile.  (See
-https://lore.kernel.org/r/v36sousjd5ukqlkpdxslvpu7l37zbu7d7slgc2trjjqwty2bny@qgzew34feo2r
-and
-https://lore.kernel.org/r/20220222163144.1782447-11-kbusch@kernel.org)
+The "nvme fdp stats" nvme-cli command will report host and media bytes writ=
+ten,
+and you can calculate write amplification based on that.
 
-Benchmark results on AMD Ryzen 9 9950X (Zen 5) using crc_kunit:
 
-crc64_be:
+>
+> > If you are using zoned storage, you can add write amp metrics inside
+> > the file system
+> > or just measure the amount of blocks written to the device using iostat=
+.
+> >
+>
+> I see the point with iostat or blktrace, for example. But what do you imp=
+ly by
+> adding write amp metric inside the file system? Especially, if you are
+> mentioning zoned storage. What is the difference here between conventiona=
+l and
+> zoned storage devices?
 
-	Length     Before        After
-	------     ------        -----
-	     1     633 MB/s      477 MB/s
-	    16     717 MB/s     2517 MB/s
-	    64     715 MB/s     7525 MB/s
-	   127     714 MB/s    10002 MB/s
-	   128     713 MB/s    13344 MB/s
-	   200     715 MB/s    15752 MB/s
-	   256     714 MB/s    22933 MB/s
-	   511     715 MB/s    28025 MB/s
-	   512     714 MB/s    49772 MB/s
-	  1024     715 MB/s    65261 MB/s
-	  3173     714 MB/s    78773 MB/s
-	  4096     714 MB/s    83315 MB/s
-	 16384     714 MB/s    89487 MB/s
+Since garbage collection happens on the host side for zoned storage, you ha=
+ve to
+measure the write amp there. It would be convenient to have the write
+amp statistics
+in the file system for this case (otherwise you have to count user
+writes and device
+writes through some other method). It adds some overhead though.
 
-crc64_nvme:
-
-        Length     Before        After
-	------     ------        -----
-	     1     716 MB/s      474 MB/s
-	    16     717 MB/s     3303 MB/s
-	    64     713 MB/s     7940 MB/s
-	   127     715 MB/s     9867 MB/s
-	   128     714 MB/s    13698 MB/s
-	   200     715 MB/s    15995 MB/s
-	   256     714 MB/s    23479 MB/s
-	   511     714 MB/s    28013 MB/s
-	   512     715 MB/s    51533 MB/s
-	  1024     715 MB/s    66788 MB/s
-	  3173     715 MB/s    79182 MB/s
-	  4096     715 MB/s    83966 MB/s
-	 16384     715 MB/s    89739 MB/s
-
-Acked-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/Kconfig                 |  1 +
- arch/x86/lib/Makefile            |  3 +
- arch/x86/lib/crc-pclmul-consts.h | 98 +++++++++++++++++++++++++++++++-
- arch/x86/lib/crc64-glue.c        | 50 ++++++++++++++++
- arch/x86/lib/crc64-pclmul.S      |  7 +++
- 5 files changed, 158 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/lib/crc64-glue.c
- create mode 100644 arch/x86/lib/crc64-pclmul.S
-
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 7f59d73201ce7..aa7c9d57e4d37 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -75,10 +75,11 @@ config X86
- 	select ARCH_HAS_CACHE_LINE_SIZE
- 	select ARCH_HAS_CPU_CACHE_INVALIDATE_MEMREGION
- 	select ARCH_HAS_CPU_FINALIZE_INIT
- 	select ARCH_HAS_CPU_PASID		if IOMMU_SVA
- 	select ARCH_HAS_CRC32
-+	select ARCH_HAS_CRC64			if X86_64
- 	select ARCH_HAS_CRC_T10DIF
- 	select ARCH_HAS_CURRENT_STACK_POINTER
- 	select ARCH_HAS_DEBUG_VIRTUAL
- 	select ARCH_HAS_DEBUG_VM_PGTABLE	if !X86_PAE
- 	select ARCH_HAS_DEVMEM_IS_ALLOWED
-diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
-index 08496e221a7d1..71c14329fd799 100644
---- a/arch/x86/lib/Makefile
-+++ b/arch/x86/lib/Makefile
-@@ -40,10 +40,13 @@ lib-$(CONFIG_MITIGATION_RETPOLINE) += retpoline.o
- 
- obj-$(CONFIG_CRC32_ARCH) += crc32-x86.o
- crc32-x86-y := crc32-glue.o crc32-pclmul.o
- crc32-x86-$(CONFIG_64BIT) += crc32c-3way.o
- 
-+obj-$(CONFIG_CRC64_ARCH) += crc64-x86.o
-+crc64-x86-y := crc64-glue.o crc64-pclmul.o
-+
- obj-$(CONFIG_CRC_T10DIF_ARCH) += crc-t10dif-x86.o
- crc-t10dif-x86-y := crc-t10dif-glue.o crc16-msb-pclmul.o
- 
- obj-y += msr.o msr-reg.o msr-reg-export.o hweight.o
- obj-y += iomem.o
-diff --git a/arch/x86/lib/crc-pclmul-consts.h b/arch/x86/lib/crc-pclmul-consts.h
-index 089954988f977..fcc63c0643330 100644
---- a/arch/x86/lib/crc-pclmul-consts.h
-+++ b/arch/x86/lib/crc-pclmul-consts.h
-@@ -1,10 +1,10 @@
- /* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  * CRC constants generated by:
-  *
-- *	./scripts/gen-crc-consts.py x86_pclmul crc16_msb_0x8bb7,crc32_lsb_0xedb88320
-+ *	./scripts/gen-crc-consts.py x86_pclmul crc16_msb_0x8bb7,crc32_lsb_0xedb88320,crc64_msb_0x42f0e1eba9ea3693,crc64_lsb_0x9a6c9329ac4bc9b5
-  *
-  * Do not edit manually.
-  */
- 
- /*
-@@ -95,5 +95,101 @@ static const struct {
- 	.barrett_reduction_consts = {
- 		0xb4e5b025f7011641,	/* HI64_TERMS: floor(x^95 / G) */
- 		0x00000001db710640,	/* LO64_TERMS: (G - x^32) * x^31 */
- 	},
- };
-+
-+/*
-+ * CRC folding constants generated for most-significant-bit-first CRC-64 using
-+ * G(x) = x^64 + x^62 + x^57 + x^55 + x^54 + x^53 + x^52 + x^47 + x^46 + x^45 +
-+ *        x^40 + x^39 + x^38 + x^37 + x^35 + x^33 + x^32 + x^31 + x^29 + x^27 +
-+ *        x^24 + x^23 + x^22 + x^21 + x^19 + x^17 + x^13 + x^12 + x^10 + x^9 +
-+ *        x^7 + x^4 + x^1 + x^0
-+ */
-+static const struct {
-+	u8 bswap_mask[16];
-+	u64 fold_across_2048_bits_consts[2];
-+	u64 fold_across_1024_bits_consts[2];
-+	u64 fold_across_512_bits_consts[2];
-+	u64 fold_across_256_bits_consts[2];
-+	u64 fold_across_128_bits_consts[2];
-+	u8 shuf_table[48];
-+	u64 barrett_reduction_consts[2];
-+} crc64_msb_0x42f0e1eba9ea3693_consts ____cacheline_aligned __maybe_unused = {
-+	.bswap_mask = {15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
-+	.fold_across_2048_bits_consts = {
-+		0x7f52691a60ddc70d,	/* LO64_TERMS: (x^2048 mod G) * x^0 */
-+		0x7036b0389f6a0c82,	/* HI64_TERMS: (x^2112 mod G) * x^0 */
-+	},
-+	.fold_across_1024_bits_consts = {
-+		0x05cf79dea9ac37d6,	/* LO64_TERMS: (x^1024 mod G) * x^0 */
-+		0x001067e571d7d5c2,	/* HI64_TERMS: (x^1088 mod G) * x^0 */
-+	},
-+	.fold_across_512_bits_consts = {
-+		0x5f6843ca540df020,	/* LO64_TERMS: (x^512 mod G) * x^0 */
-+		0xddf4b6981205b83f,	/* HI64_TERMS: (x^576 mod G) * x^0 */
-+	},
-+	.fold_across_256_bits_consts = {
-+		0x571bee0a227ef92b,	/* LO64_TERMS: (x^256 mod G) * x^0 */
-+		0x44bef2a201b5200c,	/* HI64_TERMS: (x^320 mod G) * x^0 */
-+	},
-+	.fold_across_128_bits_consts = {
-+		0x05f5c3c7eb52fab6,	/* LO64_TERMS: (x^128 mod G) * x^0 */
-+		0x4eb938a7d257740e,	/* HI64_TERMS: (x^192 mod G) * x^0 */
-+	},
-+	.shuf_table = {
-+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-+		 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-+	},
-+	.barrett_reduction_consts = {
-+		0x42f0e1eba9ea3693,	/* LO64_TERMS: (G - x^64) * x^0 */
-+		0x578d29d06cc4f872,	/* HI64_TERMS: (floor(x^127 / G) * x) - x^64 */
-+	},
-+};
-+
-+/*
-+ * CRC folding constants generated for least-significant-bit-first CRC-64 using
-+ * G(x) = x^64 + x^63 + x^61 + x^59 + x^58 + x^56 + x^55 + x^52 + x^49 + x^48 +
-+ *        x^47 + x^46 + x^44 + x^41 + x^37 + x^36 + x^34 + x^32 + x^31 + x^28 +
-+ *        x^26 + x^23 + x^22 + x^19 + x^16 + x^13 + x^12 + x^10 + x^9 + x^6 +
-+ *        x^4 + x^3 + x^0
-+ */
-+static const struct {
-+	u64 fold_across_2048_bits_consts[2];
-+	u64 fold_across_1024_bits_consts[2];
-+	u64 fold_across_512_bits_consts[2];
-+	u64 fold_across_256_bits_consts[2];
-+	u64 fold_across_128_bits_consts[2];
-+	u8 shuf_table[48];
-+	u64 barrett_reduction_consts[2];
-+} crc64_lsb_0x9a6c9329ac4bc9b5_consts ____cacheline_aligned __maybe_unused = {
-+	.fold_across_2048_bits_consts = {
-+		0x37ccd3e14069cabc,	/* HI64_TERMS: (x^2111 mod G) * x^0 */
-+		0xa043808c0f782663,	/* LO64_TERMS: (x^2047 mod G) * x^0 */
-+	},
-+	.fold_across_1024_bits_consts = {
-+		0xa1ca681e733f9c40,	/* HI64_TERMS: (x^1087 mod G) * x^0 */
-+		0x5f852fb61e8d92dc,	/* LO64_TERMS: (x^1023 mod G) * x^0 */
-+	},
-+	.fold_across_512_bits_consts = {
-+		0x0c32cdb31e18a84a,	/* HI64_TERMS: (x^575 mod G) * x^0 */
-+		0x62242240ace5045a,	/* LO64_TERMS: (x^511 mod G) * x^0 */
-+	},
-+	.fold_across_256_bits_consts = {
-+		0xb0bc2e589204f500,	/* HI64_TERMS: (x^319 mod G) * x^0 */
-+		0xe1e0bb9d45d7a44c,	/* LO64_TERMS: (x^255 mod G) * x^0 */
-+	},
-+	.fold_across_128_bits_consts = {
-+		0xeadc41fd2ba3d420,	/* HI64_TERMS: (x^191 mod G) * x^0 */
-+		0x21e9761e252621ac,	/* LO64_TERMS: (x^127 mod G) * x^0 */
-+	},
-+	.shuf_table = {
-+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-+		 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-+	},
-+	.barrett_reduction_consts = {
-+		0x27ecfa329aef9f77,	/* HI64_TERMS: floor(x^127 / G) */
-+		0x34d926535897936a,	/* LO64_TERMS: (G - x^64 - x^0) / x */
-+	},
-+};
-diff --git a/arch/x86/lib/crc64-glue.c b/arch/x86/lib/crc64-glue.c
-new file mode 100644
-index 0000000000000..b0e1b719ecbfb
---- /dev/null
-+++ b/arch/x86/lib/crc64-glue.c
-@@ -0,0 +1,50 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * CRC64 using [V]PCLMULQDQ instructions
-+ *
-+ * Copyright 2025 Google LLC
-+ */
-+
-+#include <linux/crc64.h>
-+#include <linux/module.h>
-+#include "crc-pclmul-template.h"
-+
-+static DEFINE_STATIC_KEY_FALSE(have_pclmulqdq);
-+
-+DECLARE_CRC_PCLMUL_FUNCS(crc64_msb, u64);
-+DECLARE_CRC_PCLMUL_FUNCS(crc64_lsb, u64);
-+
-+u64 crc64_be_arch(u64 crc, const u8 *p, size_t len)
-+{
-+	CRC_PCLMUL(crc, p, len, crc64_msb, crc64_msb_0x42f0e1eba9ea3693_consts,
-+		   have_pclmulqdq);
-+	return crc64_be_generic(crc, p, len);
-+}
-+EXPORT_SYMBOL_GPL(crc64_be_arch);
-+
-+u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
-+{
-+	CRC_PCLMUL(crc, p, len, crc64_lsb, crc64_lsb_0x9a6c9329ac4bc9b5_consts,
-+		   have_pclmulqdq);
-+	return crc64_nvme_generic(crc, p, len);
-+}
-+EXPORT_SYMBOL_GPL(crc64_nvme_arch);
-+
-+static int __init crc64_x86_init(void)
-+{
-+	if (boot_cpu_has(X86_FEATURE_PCLMULQDQ)) {
-+		static_branch_enable(&have_pclmulqdq);
-+		INIT_CRC_PCLMUL(crc64_msb);
-+		INIT_CRC_PCLMUL(crc64_lsb);
-+	}
-+	return 0;
-+}
-+arch_initcall(crc64_x86_init);
-+
-+static void __exit crc64_x86_exit(void)
-+{
-+}
-+module_exit(crc64_x86_exit);
-+
-+MODULE_DESCRIPTION("CRC64 using [V]PCLMULQDQ instructions");
-+MODULE_LICENSE("GPL");
-diff --git a/arch/x86/lib/crc64-pclmul.S b/arch/x86/lib/crc64-pclmul.S
-new file mode 100644
-index 0000000000000..4173051b5197c
---- /dev/null
-+++ b/arch/x86/lib/crc64-pclmul.S
-@@ -0,0 +1,7 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+// Copyright 2025 Google LLC
-+
-+#include "crc-pclmul-template.S"
-+
-+DEFINE_CRC_PCLMUL_FUNCS(crc64_msb, /* bits= */ 64, /* lsb= */ 0)
-+DEFINE_CRC_PCLMUL_FUNCS(crc64_lsb, /* bits= */ 64, /* lsb= */ 1)
--- 
-2.48.1
-
+Cheers,
+Hans
