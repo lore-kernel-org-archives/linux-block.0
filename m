@@ -1,453 +1,175 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F28215176;
-	Wed,  5 Feb 2025 23:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D117F70838
+	for <linux-block@vger.kernel.org>; Thu,  6 Feb 2025 03:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738796556; cv=none; b=H7zG8B+dBjL753V+wZrg871scceLxjvdH2EfuhwW2RdN/wCrVFiH0zXUh0nwbPEOR/recXF2VoB8L0Qr57VkdnhCZnM7fY7O2bwQYYEIEuAgCVSSVoeD8xZ5IrijwewSSuqIXDVp4ADX4qQtUozcV6RRkrviyHOuEkaV40F3Vck=
+	t=1738812292; cv=none; b=MIbDAmGjoiD8sg9xuzgv9mjfnpUFdNci4AwI8YsjFNKkYk18bgQUCHAlt9PVXvOVheZTTWH5TjkSvwIjynBAbMrWZoybm3X7ptRC4WLmmWnYhl4NZqgxtPxKk0+CIS0Ka4foPg0sbHig8d6lZkslTz7wCzgSZtuxcIzOEK/NttA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738796556; c=relaxed/simple;
-	bh=cp+p/NRgcu9XI+ixbYJpQ7sLc3HwfVcNwRe8iB2fd5E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k/uPQ+NGP+jRlZyVM3D+9/68s0bKuTK/a2b0r9Mrg/0UVBdtfqM+N6lsWAbCP57xl6/ukuS0t+XIl0GpcQZz6oYxflHvlO7plIkKWSsf3k6jNqV/UEZKm8XKUI8TDEodwUD22q3wWuRQ3Ehc+a7um72AdkPO/im56nlber7URX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=cKD0W1NP; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1738812292; c=relaxed/simple;
+	bh=h383WTieKGBXuyD4LGBsdDNiqVZtRmPi096eiHFI4S8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CWOqv1Mqhh1OQxPWezS/4n9TzeIALpQoHqRrOx3SVQHSMfvmTMV/0ZjBkmzQZeD0NdUrZfkvGIuinpfAswf6W35dQOYpHnIWlhvIEX9SjVsrJ8Dz0BEbZ6IiVYu4CBZURYrmcuxc1xc4r+5ZXVqkVu3jMIR9d/JW7t8h3jQdzDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iQf3ifiE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cKD0W1NP"
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 515N15Dc009518;
-	Wed, 5 Feb 2025 23:02:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2023-11-20; bh=vw+9q
-	MusOrDDnEO0NKnpytKkXfp/W4mbSKIt8xbYN7Y=; b=cKD0W1NP5S2Lt0Jjj45pL
-	/1tuVPryNQKvNbp837lA/qVpT5OrdKjnt0IjFfRzV4hPmeo/3alYC9XQO6L4fZU3
-	7NNaWpRvC/CqIkWAcv9ivYQsrrkXt8IS98XSI4ZDpW92ZBVYLJZ9orDYkq7rKN9b
-	y4fw0wTfJ6PYTkFb6Nv9IOc6oB+79hdlSQwF3uFl35E50PYJZSOVqve01dnJCopl
-	Y+R3q8DkPGffiNrYAeJ2J7Rt/xmmf+mM+OF9He3+TRc1GXZbU6h6AwVslBGr5U7f
-	0C2HccEdU4tRynzGxfHfoyC3TqHqiqNoeZyPxEFNFcWea02EXxCaPmiEsqnzF9/F
-	w==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 44m50u9jnw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 05 Feb 2025 23:02:30 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 515Ll3kw022622;
-	Wed, 5 Feb 2025 23:02:29 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 44j8e9r5n1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 05 Feb 2025 23:02:28 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 515N2Rfk040085;
-	Wed, 5 Feb 2025 23:02:28 GMT
-Received: from ca-dev94.us.oracle.com (ca-dev94.us.oracle.com [10.129.136.30])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 44j8e9r5m8-2;
-	Wed, 05 Feb 2025 23:02:28 +0000
-From: Alan Adamson <alan.adamson@oracle.com>
-To: linux-block@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org, alan.adamson@oracle.com,
-        linux-nvme@lists.infradead.org, shinichiro.kawasaki@wdc.com
-Subject: [PATCH v3 blktests 1/2] scsi/009: add atomic write tests
-Date: Wed,  5 Feb 2025 15:10:59 -0800
-Message-ID: <20250205231100.391005-2-alan.adamson@oracle.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250205231100.391005-1-alan.adamson@oracle.com>
-References: <20250205231100.391005-1-alan.adamson@oracle.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iQf3ifiE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738812288;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=72Yvsn7/ra1USam5/8ljvS+Hw1RNlRQujL6a4iWdwuc=;
+	b=iQf3ifiEn5IxEHHHNIGNArCjYKWKR+Q/KtQ+96JsJgyc8d9JM1HMsKD61eKIPMOyvMM1Am
+	xbLl10883CxL+/wBxTM2a+RC8BQ/Dfq6tA2GiL/Tx2s9J+6rHrdfWu2zLn37wZjOQM2jiY
+	3ZXMvHunxURkxPBYBNJltF0ydFSUOwM=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-261-SfN4wQcNPMG6JhPtrm1Ckw-1; Wed,
+ 05 Feb 2025 22:24:44 -0500
+X-MC-Unique: SfN4wQcNPMG6JhPtrm1Ckw-1
+X-Mimecast-MFC-AGG-ID: SfN4wQcNPMG6JhPtrm1Ckw
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C3EA1955DDD;
+	Thu,  6 Feb 2025 03:24:42 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.133])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA7C5195608D;
+	Thu,  6 Feb 2025 03:24:38 +0000 (UTC)
+Date: Thu, 6 Feb 2025 11:24:33 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH 0/2] New zoned loop block device driver
+Message-ID: <Z6QrceGGAJl_X_BM@fedora>
+References: <20250108090912.GA27786@lst.de>
+ <Z35H1chBIvTt0luL@fedora>
+ <Z4ETvfwVfzNWtgAo@fedora>
+ <d5e59531-c19b-4332-8f47-b380ab9678be@kernel.org>
+ <Z5OHy76X2F9H6EWP@fedora>
+ <cb5d4dad-35a9-400e-9c53-785fba6f5a87@kernel.org>
+ <Z5xJh84xZbjcO-nJ@fedora>
+ <a63406f1-6a45-4d07-b998-504bd2d6d0d7@kernel.org>
+ <Z6LeXsYw_qq4hqoC@fedora>
+ <f6d82d47-ff27-43e8-a772-0ab90a2f86c4@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-05_08,2025-02-05_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
- phishscore=0 adultscore=0 malwarescore=0 bulkscore=0 suspectscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2501170000 definitions=main-2502050176
-X-Proofpoint-GUID: rXzr4b7jsRgsFaoyv5OTYGokqAn4qNE8
-X-Proofpoint-ORIG-GUID: rXzr4b7jsRgsFaoyv5OTYGokqAn4qNE8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f6d82d47-ff27-43e8-a772-0ab90a2f86c4@kernel.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Tests basic atomic write functionality. If no scsi test device is provided,
-a scsi_debug device will be used. Testing areas include:
+On Wed, Feb 05, 2025 at 03:07:51PM +0900, Damien Le Moal wrote:
+> On 2/5/25 12:43 PM, Ming Lei wrote:
+> >>> Can you share how you create rublk/zoned and zloop and the underlying
+> >>> device info? Especially queue depth and nr_queues(both rublk/zloop &
+> >>> underlying disk) plays a big role.
+> >>
+> >> rublk:
+> >>
+> >> cargo run -r -- add zoned --size 524288 --zone-size 256 --conv-zones 0 \
+> >> 		--logical-block-size 4096 --queue ${nrq} --depth 128 \
+> >> 		--path /mnt/zloop/0
+> >>
+> >> zloop:
+> >>
+> >> echo "add conv_zones=0,capacity_mb=524288,zone_size_mb=256,\
+> >> base_dir=/mnt/zloop,nr_queues=${nrq},queue_depth=128" > /dev/zloop-control
+> > 
+> > zone is actually stateful, maybe it is better to use standalone backing
+> > directory/files.
+> 
+> I do not understand what you are saying... I reformat the backing FS and
+> recreate the same /mnt/zloop/0 directory for every test, to be sure I am not
+> seeing an artifact from the FS.
 
-- Verify sysfs atomic write attributes are consistent with
-  atomic write attributes advertised by scsi_debug.
-- Verify the atomic write paramters of statx are correct using
-  xfs_io.
-- Perform a pwritev2() (with and without RWF_ATOMIC flag) using
-  xfs_io:
-    - maximum byte size (atomic_write_unit_max_bytes)
-    - minimum byte size (atomic_write_unit_min_bytes)
-    - a write larger than atomic_write_unit_max_bytes
-    - a write smaller than atomic_write_unit_min_bytes
+I meant same backfiles are shared for two devices.
 
-Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
----
- common/rc          |   8 ++
- common/xfs         |  58 ++++++++++++
- tests/scsi/009     | 229 +++++++++++++++++++++++++++++++++++++++++++++
- tests/scsi/009.out |  18 ++++
- 4 files changed, 313 insertions(+)
- create mode 100755 tests/scsi/009
- create mode 100644 tests/scsi/009.out
+But I guess it may not be big deal.
 
-diff --git a/common/rc b/common/rc
-index bcb215d35114..06c0a416e3e1 100644
---- a/common/rc
-+++ b/common/rc
-@@ -292,6 +292,14 @@ _require_test_dev_can_discard() {
- 	return 0
- }
- 
-+_require_device_support_atomic_writes() {
-+	_require_test_dev_sysfs queue/atomic_write_max_bytes
-+	if (( $(< "${TEST_DEV_SYSFS}"/queue/atomic_write_max_bytes) == 0 )); then
-+		SKIP_REASONS+=("${TEST_DEV} does not support atomic write")
-+		return 1
-+	fi
-+}
-+
- _test_dev_queue_get() {
- 	if [[ $1 = scheduler ]]; then
- 		sed -e 's/.*\[//' -e 's/\].*//' "${TEST_DEV_SYSFS}/queue/scheduler"
-diff --git a/common/xfs b/common/xfs
-index 569770fecd53..0b1ca7c29049 100644
---- a/common/xfs
-+++ b/common/xfs
-@@ -6,6 +6,22 @@
- 
- . common/shellcheck
- 
-+_have_xfs_io_atomic_write() {
-+	local s
-+
-+	_have_program xfs_io || return $?
-+
-+	# If the pwrite command supports the -A option then this version
-+	# of xfs_io supports atomic writes.
-+	s=$(xfs_io -c help | grep pwrite | awk '{ print $4}')
-+	if [[ $s == *"A"* ]];
-+	then
-+		return 0
-+	fi
-+	SKIP_REASONS+=("xfs_io does not support the -A option")
-+	return 1
-+}
-+
- _have_xfs() {
- 	_have_fs xfs && _have_program mkfs.xfs
- }
-@@ -52,3 +68,45 @@ _xfs_run_fio_verify_io() {
- 
- 	return "${rc}"
- }
-+
-+# Use xfs_io to perform a non-atomic write using pwritev2().
-+# Args:    $1 - device to write to
-+#          $2 - number of bytes to write
-+# Returns: Number of bytes written
-+run_xfs_io_pwritev2() {
-+	local dev=$1
-+	local bytes_to_write=$2
-+	local bytes_written
-+
-+	# Perform write and extract out bytes written from xfs_io output
-+	bytes_written=$(xfs_io -d -C \
-+		"pwrite -b ${bytes_to_write} -V 1 -D 0 ${bytes_to_write}" \
-+		"$dev" | grep "wrote" | sed 's/\// /g' | awk '{ print $2 }')
-+	echo "$bytes_written"
-+}
-+
-+# Use xfs_io to perform an atomic write using pwritev2().
-+# Args:    $1 - device to write to
-+#          $2 - number of bytes to write
-+# Returns: Number of bytes written
-+run_xfs_io_pwritev2_atomic() {
-+	local dev=$1
-+	local bytes_to_write=$2
-+	local bytes_written
-+
-+	# Perform atomic write and extract out bytes written from xfs_io output
-+	bytes_written=$(xfs_io -d -C \
-+		"pwrite -b ${bytes_to_write} -V 1 -A -D 0 ${bytes_to_write}" \
-+		"$dev" | grep "wrote" | sed 's/\// /g' | awk '{ print $2 }')
-+	echo "$bytes_written"
-+}
-+
-+run_xfs_io_xstat() {
-+	local dev=$1
-+	local field=$2
-+	local statx_output
-+
-+	statx_output=$(xfs_io -c "statx -r -m 0x00010000" "$dev" | \
-+		grep "$field" | awk '{ print $3 }')
-+	echo "$statx_output"
-+}
-diff --git a/tests/scsi/009 b/tests/scsi/009
-new file mode 100755
-index 000000000000..b114d92dd3db
---- /dev/null
-+++ b/tests/scsi/009
-@@ -0,0 +1,229 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2025 Oracle and/or its affiliates
-+#
-+# Test SCSI Atomic Writes with scsi_debug
-+
-+. tests/scsi/rc
-+. common/scsi_debug
-+. common/xfs
-+
-+DESCRIPTION="test scsi atomic writes"
-+QUICK=1
-+
-+requires() {
-+	_have_driver scsi_debug
-+	_have_xfs_io_atomic_write
-+}
-+
-+device_requires() {
-+	_require_device_support_atomic_writes
-+}
-+
-+fallback_device() {
-+	local scsi_debug_params=(
-+		delay=0
-+		atomic_wr=1
-+	)
-+	if ! _configure_scsi_debug "${scsi_debug_params[@]}"; then
-+		return 1
-+		fi
-+	echo "/dev/${SCSI_DEBUG_DEVICES[0]}"
-+}
-+
-+cleanup_fallback_device() {
-+	_exit_scsi_debug
-+}
-+
-+test_device() {
-+	local scsi_debug_atomic_wr_max_length
-+	local scsi_debug_atomic_wr_gran
-+	local scsi_atomic_max_bytes
-+	local scsi_atomic_min_bytes
-+	local sysfs_max_hw_sectors_kb
-+	local max_hw_bytes
-+	local sysfs_logical_block_size
-+	local sysfs_atomic_max_bytes
-+	local sysfs_atomic_unit_max_bytes
-+	local sysfs_atomic_unit_min_bytes
-+	local statx_atomic_min
-+	local statx_atomic_max
-+	local bytes_to_write
-+	local bytes_written
-+	local test_desc
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	sysfs_logical_block_size=$(< "${TEST_DEV_SYSFS}"/queue/logical_block_size)
-+	sysfs_max_hw_sectors_kb=$(< "${TEST_DEV_SYSFS}"/queue/max_hw_sectors_kb)
-+	max_hw_bytes=$(( "$sysfs_max_hw_sectors_kb" * 1024 ))
-+	sysfs_atomic_max_bytes=$(< "${TEST_DEV_SYSFS}"/queue/atomic_write_max_bytes)
-+	sysfs_atomic_unit_max_bytes=$(< "${TEST_DEV_SYSFS}"/queue/atomic_write_unit_max_bytes)
-+	sysfs_atomic_unit_min_bytes=$(< "${TEST_DEV_SYSFS}"/queue/atomic_write_unit_min_bytes)
-+	scsi_debug_atomic_wr_max_length=$(< /sys/module/scsi_debug/parameters/atomic_wr_max_length)
-+	scsi_debug_atomic_wr_gran=$(< /sys/module/scsi_debug/parameters/atomic_wr_gran)
-+	scsi_atomic_max_bytes=$(( "$scsi_debug_atomic_wr_max_length" * "$sysfs_logical_block_size" ))
-+	scsi_atomic_min_bytes=$(( "$scsi_debug_atomic_wr_gran" * "$sysfs_logical_block_size" ))
-+
-+	test_desc="TEST 1 - Verify sysfs atomic attributes"
-+	if [ "$max_hw_bytes" -ge "$sysfs_atomic_max_bytes" ] &&
-+		[ "$sysfs_atomic_max_bytes" -ge "$sysfs_atomic_unit_max_bytes" ] &&
-+		[ "$sysfs_atomic_unit_max_bytes" -ge "$sysfs_atomic_unit_min_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $max_hw_bytes - $sysfs_max_hw_sectors_kb -" \
-+			"$sysfs_atomic_max_bytes - $sysfs_atomic_unit_max_bytes -" \
-+			"$sysfs_atomic_unit_min_bytes"
-+	fi
-+
-+	test_desc="TEST 2 - check scsi_debug atomic_wr_max_length is the same as sysfs atomic_write_max_bytes"
-+	if [ "$scsi_atomic_max_bytes" -le "$max_hw_bytes" ]
-+	then
-+		if [ "$scsi_atomic_max_bytes" = "$sysfs_atomic_max_bytes" ]
-+		then
-+			echo "$test_desc - pass"
-+		else
-+			echo "$test_desc - fail $scsi_atomic_max_bytes - $max_hw_bytes -" \
-+				"$sysfs_atomic_max_bytes"
-+		fi
-+	else
-+		if [ "$sysfs_atomic_max_bytes" = "$max_hw_bytes" ]
-+		then
-+			echo "$test_desc - pass"
-+		else
-+			echo "$test_desc - fail $scsi_atomic_max_bytes - $max_hw_bytes -" \
-+				"$sysfs_atomic_max_bytes"
-+		fi
-+	fi
-+
-+	test_desc="TEST 3 - check sysfs atomic_write_unit_max_bytes <= scsi_debug atomic_wr_max_length"
-+	if (("$sysfs_atomic_unit_max_bytes" <= "$scsi_atomic_max_bytes"))
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $sysfs_atomic_unit_max_bytes - $scsi_atomic_max_bytes"
-+	fi
-+
-+	test_desc="TEST 4 - check sysfs atomic_write_unit_min_bytes = scsi_debug atomic_wr_gran"
-+	if [ "$sysfs_atomic_unit_min_bytes" = "$scsi_atomic_min_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $sysfs_atomic_unit_min_bytes - $scsi_atomic_min_bytes"
-+	fi
-+
-+	test_desc="TEST 5 - check statx stx_atomic_write_unit_min"
-+	statx_atomic_min=$(run_xfs_io_xstat "$TEST_DEV" "stat.atomic_write_unit_min")
-+	if [ "$statx_atomic_min" = "$scsi_atomic_min_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $statx_atomic_min - $scsi_atomic_min_bytes"
-+	fi
-+
-+	test_desc="TEST 6 - check statx stx_atomic_write_unit_max"
-+	statx_atomic_max=$(run_xfs_io_xstat "$TEST_DEV" "stat.atomic_write_unit_max")
-+	if [ "$statx_atomic_max" = "$sysfs_atomic_unit_max_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $statx_atomic_max - $sysfs_atomic_unit_max_bytes"
-+	fi
-+
-+	test_desc="TEST 7 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes "
-+	test_desc+="with no RWF_ATOMIC flag - pwritev2 should be succesful"
-+	bytes_written=$(run_xfs_io_pwritev2 "$TEST_DEV" "$sysfs_atomic_unit_max_bytes")
-+	if [ "$bytes_written" = "$sysfs_atomic_unit_max_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $bytes_written - $sysfs_atomic_unit_max_bytes"
-+	fi
-+
-+	test_desc="TEST 8 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes with "
-+	test_desc+="RWF_ATOMIC flag - pwritev2 should be succesful"
-+	bytes_written=$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$sysfs_atomic_unit_max_bytes")
-+	if [ "$bytes_written" = "$sysfs_atomic_unit_max_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $bytes_written - $sysfs_atomic_unit_max_bytes"
-+	fi
-+
-+	test_desc="TEST 9 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes + 512 "
-+	test_desc+="bytes with no RWF_ATOMIC flag - pwritev2 should be succesful"
-+	bytes_to_write=$(( "${sysfs_atomic_unit_max_bytes}" + "$sysfs_logical_block_size" ))
-+	bytes_written=$(run_xfs_io_pwritev2 "$TEST_DEV" "$bytes_to_write")
-+	if [ "$bytes_written" = "$bytes_to_write" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $bytes_written - $bytes_to_write"
-+	fi
-+
-+	test_desc="TEST 10 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes + 512 "
-+	test_desc+="bytes with RWF_ATOMIC flag - pwritev2 should not be succesful"
-+	bytes_written=$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$bytes_to_write")
-+	if [ "$bytes_written" = "" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $bytes_written - $bytes_to_write"
-+	fi
-+
-+	test_desc="TEST 11 - perform a pwritev2 with size of sysfs_atomic_unit_min_bytes "
-+	test_desc+="with no RWF_ATOMIC flag - pwritev2 should be succesful"
-+	bytes_written=$(run_xfs_io_pwritev2 "$TEST_DEV" "$sysfs_atomic_unit_min_bytes")
-+	if [ "$bytes_written" = "$sysfs_atomic_unit_min_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $bytes_written - $scsi_atomic_min_bytes"
-+	fi
-+
-+	test_desc="TEST 12 - perform a pwritev2 with size of sysfs_atomic_unit_min_bytes "
-+	test_desc+="with RWF_ATOMIC flag - pwritev2 should be succesful"
-+	bytes_written=$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$sysfs_atomic_unit_min_bytes")
-+	if [ "$bytes_written" = "$sysfs_atomic_unit_min_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $bytes_written - $scsi_atomic_min_bytes"
-+	fi
-+
-+	test_desc="TEST 13 - perform a pwritev2 with a size of sysfs_atomic_unit_min_bytes - 512 "
-+	test_desc+="bytes with no RWF_ATOMIC flag - pwritev2 should be succesful"
-+	bytes_to_write=$(( "${sysfs_atomic_unit_min_bytes}" - "${sysfs_logical_block_size}" ))
-+	if [ "$bytes_to_write" = 0 ]
-+	then
-+		echo "$test_desc - pass"
-+		echo "pwrite: Invalid argument"
-+	else
-+		bytes_written=$(run_xfs_io_pwritev2 "$TEST_DEV" "$bytes_to_write")
-+		if [ "$bytes_written" = "$bytes_to_write" ]
-+		then
-+			echo "$test_desc - pass"
-+		else
-+			echo "$test_desc - fail $bytes_written - $bytes_to_write"
-+		fi
-+	fi
-+	test_desc="TEST 14 - perform a pwritev2 with a size of sysfs_atomic_unit_min_bytes - 512 "
-+	test_desc+="bytes with RWF_ATOMIC flag - pwritev2 should fail"
-+	if [ "$bytes_to_write" = 0 ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		bytes_written=$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$bytes_to_write")
-+		if [ "$bytes_written" = "" ]
-+		then
-+			echo "$test_desc - pass"
-+		else
-+			echo "$test_desc - fail $bytes_written - $bytes_to_write"
-+		fi
-+	fi
-+
-+	_exit_scsi_debug
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/scsi/009.out b/tests/scsi/009.out
-new file mode 100644
-index 000000000000..e31416b93515
---- /dev/null
-+++ b/tests/scsi/009.out
-@@ -0,0 +1,18 @@
-+Running scsi/009
-+TEST 1 - Verify sysfs atomic attributes - pass
-+TEST 2 - check scsi_debug atomic_wr_max_length is the same as sysfs atomic_write_max_bytes - pass
-+TEST 3 - check sysfs atomic_write_unit_max_bytes <= scsi_debug atomic_wr_max_length - pass
-+TEST 4 - check sysfs atomic_write_unit_min_bytes = scsi_debug atomic_wr_gran - pass
-+TEST 5 - check statx stx_atomic_write_unit_min - pass
-+TEST 6 - check statx stx_atomic_write_unit_max - pass
-+TEST 7 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes with no RWF_ATOMIC flag - pwritev2 should be succesful - pass
-+TEST 8 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes with RWF_ATOMIC flag - pwritev2 should be succesful - pass
-+TEST 9 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes + 512 bytes with no RWF_ATOMIC flag - pwritev2 should be succesful - pass
-+pwrite: Invalid argument
-+TEST 10 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes + 512 bytes with RWF_ATOMIC flag - pwritev2 should not be succesful - pass
-+TEST 11 - perform a pwritev2 with size of sysfs_atomic_unit_min_bytes with no RWF_ATOMIC flag - pwritev2 should be succesful - pass
-+TEST 12 - perform a pwritev2 with size of sysfs_atomic_unit_min_bytes with RWF_ATOMIC flag - pwritev2 should be succesful - pass
-+TEST 13 - perform a pwritev2 with a size of sysfs_atomic_unit_min_bytes - 512 bytes with no RWF_ATOMIC flag - pwritev2 should be succesful - pass
-+pwrite: Invalid argument
-+TEST 14 - perform a pwritev2 with a size of sysfs_atomic_unit_min_bytes - 512 bytes with RWF_ATOMIC flag - pwritev2 should fail - pass
-+Test complete
--- 
-2.43.5
+> 
+> >> The backing storage is using XFS on a PCIe Gen4 4TB M.2 SSD (my Xeon machine is
+> >> PCIe Gen3 though). This drive has a large enough max_qid to provide one IO queue
+> >> pair per CPU for up to 32 CPUs (16-cores / 32-threads).
+> > 
+> > I just setup one XFS over nvme in real hardware, still can't reproduce the big gap in
+> > your test result. Kernel is v6.13 with zloop patch v2.
+> > 
+> > `8 queues` should only make a difference for the test of "QD=32,   4K rnd wr, 8 jobs".
+> > For other single job test, single queue supposes to be same with 8 queues.
+> > 
+> > The big gap is mainly in test of 'QD=32, 128K seq wr, 1 job ', maybe your local
+> > change improves zloop's merge? In my test:
+> > 
+> > 	- ublk/zoned : 912 MiB/s
+> > 	- zloop(v2) : 960 MiB/s.
+> > 
+> > BTW, my test is over btrfs, and follows the test script:
+> > 
+> >  fio --size=32G --time_based --bsrange=128K-128K --runtime=40 --numjobs=1 \
+> >  	--ioengine=libaio --iodepth=32 --directory=./ublk --group_reporting=1 --direct=1 \
+> > 	--fsync=0 --name=f1 --stonewall --rw=write
+> 
+> If you add an FS on top of the emulated zoned deive, you are testing the FS
+> perf as much as the backing dev. I focused on the backing dev so I ran fio
+> directly on top of the emulated drive. E.g.:
+> 
+> fio --name=test --filename=${dev} --rw=randwrite \
+>                 --ioengine=libaio --iodepth=32 --direct=1 --bs=4096 \
+>                 --zonemode=zbd --numjobs=8 --group_reporting --norandommap \
+>                 --cpus_allowed=0-7 --cpus_allowed_policy=split \
+>                 --runtime=${runtime} --ramp_time=5 --time_based
+> 
+> (you must use libaio here)
+
+Thanks for sharing the '--zonemode=zbd'.
+
+I can reproduce the perf issue with the above script, and the reason is related
+to io-uring emulation and zone space pre-allocation.
+
+When FS WRITE IO needs to allocate space, .write_iter() returns -EAGAIN
+for each io-uring write, then the write is always fallback to io-wq, cause
+very bad sequential write perf.
+
+It can be fixed[1] simply by pre-allocating space before writing to the
+beginning of each seq-zone.
+
+Now follows result in my test over real nvme/XFS:
+
++ ./zfio /dev/zloop0 write 1 40
+    write /dev/zloop0: jobs   1 io_depth   32 time   40sec
+	BS   4k: IOPS   171383 BW   685535KiB/s fio_cpu_util(25% 38%)
+	BS 128k: IOPS     7669 BW   981846KiB/s fio_cpu_util( 5% 11%)
++ ./zfio /dev/ublkb0 write 1 40
+    write /dev/ublkb0: jobs   1 io_depth   32 time   40sec
+	BS   4k: IOPS   179861 BW   719448KiB/s fio_cpu_util(29% 42%)
+	BS 128k: IOPS     7239 BW   926786KiB/s fio_cpu_util( 6%  9%)
+
++ ./zfio /dev/zloop0 randwrite 1 40
+randwrite /dev/zloop0: jobs   1 io_depth   32 time   40sec
+	BS   4k: IOPS     8909 BW    35642KiB/s fio_cpu_util( 2%  5%)
+	BS 128k: IOPS      210 BW    27035KiB/s fio_cpu_util( 0%  0%)
++ ./zfio /dev/ublkb0 randwrite 1 40
+randwrite /dev/ublkb0: jobs   1 io_depth   32 time   40sec
+	BS   4k: IOPS    20500 BW    82001KiB/s fio_cpu_util( 5% 12%)
+	BS 128k: IOPS     5622 BW   719792KiB/s fio_cpu_util( 6%  8%)
+
+
+
+[1] https://github.com/ublk-org/rublk/commit/fd01a87abb2f9b8e94c8da24e73683e4bb12659b
+
+[2] `z` (zone fio test script) https://github.com/ublk-org/rublk/blob/main/scripts/zfio
+
+Thanks,
+Ming
 
