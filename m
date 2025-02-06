@@ -1,31 +1,39 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E236125
-	for <linux-block@vger.kernel.org>; Thu,  6 Feb 2025 14:15:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39EAE1C700E;
+	Thu,  6 Feb 2025 15:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738851324; cv=none; b=ZObWV/3urm4dQ27DMC31cgXEDCN2ZQmno8Jpndw+nC4zm1PTc307gnDH9Krhg/zp57SsMNfV47Imv45dMMOmEQh4ONqH54EZJk2kJmltwvsxtgQwFm5MuqSu0UFZYTJUIn3We0oEdMz6mCAu0O4r6oRwp+XpNScIA3nAAMSorAI=
+	t=1738855698; cv=none; b=DONuHZ1F/fPtW92PFIL/e+UvNjq8b+joz3H6mU4JJbwKLUenC50VrFjIcqOw2+0GAyo7rYdMkfLao2EAi5+nWl7gEsM5cvXchZSn4cDVTAoVFseX62aOQ/4v5MzVZ4n/3pOx+fI4pPLzQq8RshM4IZU9i5ix2+v0i7F2y0GfHPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738851324; c=relaxed/simple;
-	bh=KFWF/7nkLPqQqrwPAIs55g6bzdTIXPz6YDyJxE0+kis=;
+	s=arc-20240116; t=1738855698; c=relaxed/simple;
+	bh=YFM96TimLftIQcPo7yQ5XjDyl/LRN+ingKQpzSWqN54=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qB8kiGPcmpcLKyvrOA2YiVfH4g0J12Ykyv2dOrPNq8Rk1Rgi86CsvbA6PDY2SGRZOlvg52yc9jezDPlKD2/E5yuB+tnNneWu4TqWDoQ5Px/WWXnXcR72PXfhQObSzGThRzyDdU+KWvDECuxNuCbwzIPapRMJZ6Cx5T5TrgvaNqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 7F38E68D0D; Thu,  6 Feb 2025 15:15:18 +0100 (CET)
-Date: Thu, 6 Feb 2025 15:15:18 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-	ming.lei@redhat.com, dlemoal@kernel.org, axboe@kernel.dk,
-	gjoyce@ibm.com
-Subject: Re: [PATCH 1/2] block: fix lock ordering between the queue
- ->sysfs_lock and freeze-lock
-Message-ID: <20250206141518.GA3304@lst.de>
-References: <20250205144506.663819-1-nilay@linux.ibm.com> <20250205144506.663819-2-nilay@linux.ibm.com> <20250205155952.GB14133@lst.de> <715ba1fd-2151-4c39-9169-2559176e30b5@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MzTSG84+WZpA7/lKpMZMVv2uF6jqCZg1DOqBrFfHV2dtnErR9zLx0T9Ln2m+sr58F0gMf6G6JcbIXrQi1WXj1/Z/0MAVo94WRWUTQKtS8Y3UWCbtSGVdPjeC014EWw1Dfr7UgPtpbAPXt0guBX2oDy4suzPAvI42iNId20Pv+1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aoc3SRQx; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aoc3SRQx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F37FC4CEDF;
+	Thu,  6 Feb 2025 15:28:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738855697;
+	bh=YFM96TimLftIQcPo7yQ5XjDyl/LRN+ingKQpzSWqN54=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Aoc3SRQxDoRSE6HPqESrw5uUPbP/dFfZzgdx61UNOzn0rXYGl0Pgz50uirR5cVTVj
+	 zSMB+4NRuHjckbwkBzU03ie/1kER4hbQxk77BlqlPS4JnOepLqJn7Ew6dAEK9W8GNk
+	 G6UdBcQQF9da5m9kXrQP3hJloO4iZf6p5/Jn8IPnJkiZeMjYKum9iy+5bN1Ml91x0s
+	 oGBkxvKWMEY/fL/gl+50GQsw2dZb+wxcJJAN0fC6M02wy0An2pynWHNb+pGDBj/y9C
+	 +K6IspXohAhr+PQgmW7GHmceF2D49SXPXTcNPJN7Mi2MdHQlZnjsSRbYvo4uqkPNEB
+	 zQnZjPOrqGG5w==
+Date: Thu, 6 Feb 2025 08:28:15 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Keith Busch <kbusch@meta.com>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+	ming.lei@redhat.com, axboe@kernel.dk, asml.silence@gmail.com
+Subject: Re: [PATCH 0/6] ublk zero-copy support
+Message-ID: <Z6TVD5KuRSQKsPVJ@kbusch-mbp>
+References: <20250203154517.937623-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,30 +42,47 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <715ba1fd-2151-4c39-9169-2559176e30b5@linux.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20250203154517.937623-1-kbusch@meta.com>
 
-On Thu, Feb 06, 2025 at 06:52:36PM +0530, Nilay Shroff wrote:
-> Yeah I tested with a multi namespace NVMe disk and lockdep didn't 
-> complain. Agreed we need to hold up q->sysfs_lock for multiple 
-> request queues at the same time and that may not be elegant, but 
-> looking at the mess in __blk_mq_update_nr_hw_queues we may not
-> have other choice which could help correct the lock order.
+On Mon, Feb 03, 2025 at 07:45:11AM -0800, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> This is a new look at supporting zero copy with ublk.
 
-Odd, as it's usually very unhappy about nesting locks of the
-same kind unless specifically annotated.
+Just to give some numbers behind this since I didn't in the original
+cover letter. The numbers are from a 1.6GHz Xeon platform.
 
-> Yes this is probably a good idea, that instead of using q->sysfs_lock 
-> we may depend on q->tag_set->tag_list_lock here for sched/elevator updates
-> as a fact that __blk_mq_update_nr_hw_queues already runs with tag_list_lock
-> held.
+Using the ublksrv patch I provided in the cover letter, created two ublk
+block devices with null_blk backings:
 
-Yes.
+  ublk add -t loop -f /dev/nullb0
+  ublk add -t loop -f /dev/nullb1 -z
 
-> But then it also requires using the same tag_list_lock instead of 
-> current sysfs_lock while we update the scheduler from sysfs. But that's
-> a trivial change.
+Using t/io_uring, comparing the ublk device without zero-copy vs the one
+with zero-copy (-z) enabled
 
-Yes.  I think it's a good idea, but maybe wait a bit to see if Jens
-or Ming also have opinions on this before starting the work.
+4k read:
+ Legacy:
+  IOPS=387.78K, BW=1514MiB/s, IOS/call=32/32
+  IOPS=395.14K, BW=1543MiB/s, IOS/call=32/32
+  IOPS=395.68K, BW=1545MiB/s, IOS/call=32/31
 
+ Zero-copy:
+  IOPS=482.69K, BW=1885MiB/s, IOS/call=32/31
+  IOPS=481.34K, BW=1880MiB/s, IOS/call=32/32
+  IOPS=481.66K, BW=1881MiB/s, IOS/call=32/32
+
+64k read:
+ Legacy:
+  IOPS=73248, BW=4.58GiB/s, IOS/call=32/32
+  IOPS=73664, BW=4.60GiB/s, IOS/call=32/32
+  IOPS=72288, BW=4.52GiB/s, IOS/call=32/32
+
+ Zero-copy:
+  IOPS=381.76K, BW=23.86GiB/s, IOS/call=32/31
+  IOPS=378.18K, BW=23.64GiB/s, IOS/call=32/32
+  IOPS=379.52K, BW=23.72GiB/s, IOS/call=32/32
+
+The register/unregister overhead is low enough to show a decent
+improvement even at 4k IO. And it's using half the memory with lower CPU
+utilization per IO, so all good wins.
