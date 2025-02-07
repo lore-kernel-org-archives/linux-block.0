@@ -1,30 +1,64 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20C02417EF;
-	Fri,  7 Feb 2025 12:31:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E802B33EC;
+	Fri,  7 Feb 2025 12:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738931483; cv=none; b=E37vSV1OP2PYsdMli6iOZIgOmo1VhYHDUutrI8yM8/MwsQ05f6nMb1YUoF+X5366QZE8JiGI/hdB+SCXkNDhtcPjxUfwyAfTcD7jwX5lv6FuL/FIENWvFnusNiO7I5eAaHa5Ayj4Bz5udWUwjLy5NbleTbvFcGtDG5lJkVlgCAk=
+	t=1738932075; cv=none; b=f+pfmjOad77brdHh5kxy1UITdxODjsz93Q5efITT+PnEl8wC6Fkai8oyNPcDhNED3RIqcW9FUQwT5xQDYmup7Twp2+dPX2iWLVdYlTzstEkhZezKiAcnRNAQXwkjighFe2kTqn8pqCw/s7MWVTvfLhP89XpRSwmSoyEcf2z8xKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738931483; c=relaxed/simple;
-	bh=ZSK3tTd78SFDrWY+mZUtcmMtccUuEPDk96bqa5dR+YU=;
+	s=arc-20240116; t=1738932075; c=relaxed/simple;
+	bh=MspCQtuF1L1uj1gmBsMFVAfZQuU7Dmgijjzp4TtZSCs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b34d9sG/wYJZFvEdX0ypnxbjdI/k2afaFqWuWxtkxuUk1/qa6UBw3Nlr0QyagYxkNZdY8v/Ur0pOgi+jziAQA9rYAVm/pVHbfEU6ieWytczIMV+zjP7Jbv00+k4U+VPWqBHn4sgt1ti0TiUkURzDkWTYiAiNVwTWuJpXceN/LBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4YqCxX6Pzbz4f3jXT;
-	Fri,  7 Feb 2025 20:30:56 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 12D4B1A1422;
-	Fri,  7 Feb 2025 20:31:18 +0800 (CST)
-Received: from [10.174.179.80] (unknown [10.174.179.80])
-	by APP4 (Coremail) with SMTP id gCh0CgD3Wl8V_aVnR2qtDA--.49471S3;
-	Fri, 07 Feb 2025 20:31:17 +0800 (CST)
-Message-ID: <5e4cfa32-83bc-4025-a5db-298b7c080037@huaweicloud.com>
-Date: Fri, 7 Feb 2025 20:31:16 +0800
+	 In-Reply-To:Content-Type; b=W8XzRIuhjG7bPcc/hbM+pNrs9NFXqWZpym7kV1FrhKB2TTk4fO8R0FpkMIVmwgR1lRY9Ve09tnmmdIKhe4yeV68ZkmlwlL9S5REgG3bXya/ads+S+BJrkw0DaKbW0IF5dr1A3l/gANj3F8/Ax8qPWhh4r5HxAqJokC2ME28BYrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=md7a5Tgw; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="md7a5Tgw"
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ab7430e27b2so375557666b.3;
+        Fri, 07 Feb 2025 04:41:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738932072; x=1739536872; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=luRbu+qxp5tYTbAPnrQjWIZLwECTkT6rgueITNh5cGE=;
+        b=md7a5TgwSdD5p9WvJ7A4TvBNjEWSKL9bJ06h4ZbPeQMWMqih+hY0005ORKMDijNWK8
+         8q6hsj6a1Q5d9b+JAjj6mNfl5NxW4s4Gx9dMTYQDQ1s6tTKcbsxFtjkMYEbZUndGQ3Uf
+         ISgpASLfd0jVr+7AG4gYR52IjzXig0Z1aPEHymX0IFT43B9p+s51ySqDYuRnJZOEppFU
+         UcVbu2Kst1mCDCOMTagFnoju0CYbJ4ESu+OyHnQM1fJChMeqRixCJSpDeJ4Ez+qrYL29
+         pE0DZY2Pl/WFOiGQJpik+d53ti9Dj6irYPI4IASBXvh3RFjPBOmBN3N3ifacTU7SrOox
+         QNRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738932072; x=1739536872;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=luRbu+qxp5tYTbAPnrQjWIZLwECTkT6rgueITNh5cGE=;
+        b=MiCXosY62bLT6XJTTuSaeBNSNHbTAL9y7nm7HwiQuDED/VA5KB6oO/FND979NCvrSg
+         qLSW2W602AxBP1K5YJMdHsHHPj7JyN/MSGSYzSLZZX9eCK3fbgB0iYdoqmKd1+/7fcGH
+         thBWtMrbTM550IiArh0dlS96Gtev6ZdLq4roe6SGp71VLEd8PI9Skk4qZzfekGTBaY39
+         5HLag0NLc1SmzugDpsrzP3eqQSVReDBIb+CKKuKGuVsU9U5UdzRQnjnAN9hi5RfFspKt
+         jc+MxndttmrzUVJN4DMwxGstvSyIH4/Lbm2yAvZ+6EtFxBs8jJsI6pQcQGhz1VOxFnZ2
+         L6PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUSYXpInzrjftDXxrM/+k3tThORyf/gzUjFI0zamzA+ehkOpmSO0Gpqp06c7xvD8APQhjy0b4LLRdug3Ig=@vger.kernel.org, AJvYcCUtwohtkNhINDpzmyPnygDQG+wjoiJYh/0aY/Do3U4+sG9iyuibLgUm9xF6gIELiRPxZguxsBgqVA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywb6v9KjqExVJSMp7RtvL6bdaLMj7cmlbvRO9N4r24qXk3nfxEA
+	vuHj7JNnv42UPd5gjHexCrVyrMBQo9GE1jJJYJm+gxzRQi032rNQiiRWsA==
+X-Gm-Gg: ASbGncubcpAfxQveY0S0iIACInjcE7dJzB7WRqGf7hec71ajoJDgSVXBl+3E1w+/XAE
+	IfKuRQtcRaEH6O0G/h0vGjKJhz8eKQm7jLz8LH+c7yGI8u1lVPlLBsY7niW6NOOh6gap9vIt8rP
+	4BT444ojxiOMFqmutqadeFvV5zNatD4MaJisV6TE2KNG6LUW4fD65nHL7M8IB0/YbTFEZoUCsH7
+	5AInecjb+TlhAZz/UBd0w537ymQAwtnRhW6seQrhClmWDDxkkwqJ5r4FVgvINXNktbYhI5ohrt3
+	wO0G28HTyXCXL9cEAnucnyplqjlvnoImvhFOb1EgcStjtDUh
+X-Google-Smtp-Source: AGHT+IFe67U49RcIQtd8/cPi8kX86e5CxUBCkNHuuOrF9vP5BxLv5warogiRIPjyMz/W5j2EcWNvCw==
+X-Received: by 2002:a17:907:d8f:b0:aac:1e96:e7d2 with SMTP id a640c23a62f3a-ab789c834f5mr310503966b.54.1738932071849;
+        Fri, 07 Feb 2025 04:41:11 -0800 (PST)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:8e12])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab795848f79sm7424666b.52.2025.02.07.04.41.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Feb 2025 04:41:11 -0800 (PST)
+Message-ID: <a6845bcf-8881-4b92-acc0-0aab8d98cba9@gmail.com>
+Date: Fri, 7 Feb 2025 12:41:17 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,107 +66,106 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 1/8] block: introduce BLK_FEAT_WRITE_ZEROES_UNMAP
- to queue limits features
-To: John Garry <john.g.garry@oracle.com>
-Cc: linux-kernel@vger.kernel.org, hch@lst.de, tytso@mit.edu,
- djwong@kernel.org, chengzhihao1@huawei.com, yukuai3@huawei.com,
- yangerkun@huawei.com, Zhang Yi <yi.zhang@huawei.com>,
- linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
-References: <20250115114637.2705887-1-yi.zhang@huaweicloud.com>
- <20250115114637.2705887-2-yi.zhang@huaweicloud.com>
- <d0f8315b-e006-498a-b3e8-77542f352d40@oracle.com>
- <dfd16793-f1fb-4ce6-8ad8-86de0818ff4e@huaweicloud.com>
+Subject: Re: [PATCH 6/6] io_uring: cache nodes and mapped buffers
+To: Keith Busch <kbusch@meta.com>, io-uring@vger.kernel.org,
+ linux-block@vger.kernel.org, ming.lei@redhat.com, axboe@kernel.dk
+Cc: Keith Busch <kbusch@kernel.org>
+References: <20250203154517.937623-1-kbusch@meta.com>
+ <20250203154517.937623-7-kbusch@meta.com>
 Content-Language: en-US
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-In-Reply-To: <dfd16793-f1fb-4ce6-8ad8-86de0818ff4e@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250203154517.937623-7-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgD3Wl8V_aVnR2qtDA--.49471S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxCFWrKF18ZryfJryUAr4Utwb_yoW5WF4rpF
-	yvgFyDtr93tF1xAwn2vanFgFW5Zws3Aa4fGwn8tryj9rs8ZFySgFW0gFy5u347Wryfuw18
-	tFWYvr9xCa10yF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUrs
-	qXDUUUU
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-On 2025/2/7 20:22, Zhang Yi wrote:
-> On 2025/1/29 0:46, John Garry wrote:
->> On 15/01/2025 11:46, Zhang Yi wrote:
->>> From: Zhang Yi <yi.zhang@huawei.com>
->>>
->>> Currently, it's hard to know whether the storage device supports unmap
->>> write zeroes. We cannot determine it only by checking if the disk
->>> supports the write zeroes command, as for some HDDs that do submit
->>> actual zeros to the disk media even if they claim to support the write
->>> zeroes command, but that should be very slow.
->>
->> This second sentence is too long, such that your meaning is hard to understand.
->>
->>>
->>> Therefor, add a new queue limit feature, BLK_FEAT_WRITE_ZEROES_UNMAP and
->>
->> Therefore?
->>
->>> the corresponding sysfs entry, to indicate whether the block device
->>> explicitly supports the unmapped write zeroes command. Each device
->>> driver should set this bit if it is certain that the attached disk
->>> supports this command. 
->>
->> How can they be certain? You already wrote that some claim to support it, yet don't really. Well, I think that is what you meant.
->>
+On 2/3/25 15:45, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
-> Hi, John. thanks for your reply!
+> Frequent alloc/free cycles on these is pretty costly. Use an io cache to
+> more efficiently reuse these buffers.
 > 
-> Sorry for the late and not make it clear enough earlier. Currently, there
-> are four situations of write zeroes command (aka REQ_OP_WRITE_ZEROES)
-> supported by various disks and backend storage devices.
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>   include/linux/io_uring_types.h |  16 ++---
+>   io_uring/filetable.c           |   2 +-
+>   io_uring/rsrc.c                | 108 ++++++++++++++++++++++++---------
+>   io_uring/rsrc.h                |   2 +-
+>   4 files changed, 92 insertions(+), 36 deletions(-)
 > 
-> A. Devices that do not support the write zeroes command
->    These devices have bdev_limits(bdev)->max_write_zeroes_sectors set to
->    zero.
-> B. Devices that support the write zeroes command
->    These devices have bdev_limits(bdev)->max_write_zeroes_sectors set to a
->    non-zero value. They can be further categorized into three
->    sub-situations:
-> B.1. Devices that write physical zeroes to the media
->      These devices perform the write zeroes operation by physically writing
->      zeroes to the storage media, which can be very slow (e.g., HDDs).
-> B.2. Devices that support unmap write zeroes
->      These devices can offload the write zeroes operation by unmapping the
->      logical blocks, effectively putting them into a deallocated state
->      (e.g., SSDs). This operation is typically very fast, allowing
->      filesystems to use this command to quickly create zeroed files. NVMe
->      and SCSI disk drivers already support this and can query the attached
->      disks to determine whether they support unmap write zeroes (please see
->      patches 2 and 3 for details).
-> B.3. The implementation of write zeroes on disks are unknown
->      This category includes non-standard disks and some network storage
->      devices where the exact implementation of the write zeroes command is
->      unclear.
-> 
-> Currently, users can only distinguish A and B through querying
-> 
->    /sys/block/<disk>/queue/write_zeroes_unmap
-                             ^^^^^^^^^^^^^^^^^^
-Oh, sorry, it should be 'write_zeroes_max_bytes'
+> diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
+> index aa661ebfd6568..c0e0c1f92e5b1 100644
+> --- a/include/linux/io_uring_types.h
+> +++ b/include/linux/io_uring_types.h
+> @@ -67,8 +67,17 @@ struct io_file_table {
+>   	unsigned int alloc_hint;
+>   };
+>   
+> +struct io_alloc_cache {
+> +	void			**entries;
+> +	unsigned int		nr_cached;
+> +	unsigned int		max_cached;
+> +	size_t			elem_size;
+> +};
+> +
+>   struct io_buf_table {
+>   	struct io_rsrc_data	data;
+> +	struct io_alloc_cache	node_cache;
+> +	struct io_alloc_cache	imu_cache;
 
-     /sys/block/<disk>/queue/write_zeroes_max_bytes
+We can avoid all churn if you kill patch 5/6 and place put the
+caches directly into struct io_ring_ctx. It's a bit better for
+future cache improvements and we can even reuse the node cache
+for files.
 
-Thanks,
-Yi.
+...
+> diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+> index 864c2eabf8efd..5434b0d992d62 100644
+> --- a/io_uring/rsrc.c
+> +++ b/io_uring/rsrc.c
+> @@ -117,23 +117,39 @@ static void io_buffer_unmap(struct io_ring_ctx *ctx, struct io_rsrc_node *node)
+>   				unpin_user_page(imu->bvec[i].bv_page);
+>   		if (imu->acct_pages)
+>   			io_unaccount_mem(ctx, imu->acct_pages);
+> -		kvfree(imu);
+> +		if (struct_size(imu, bvec, imu->nr_bvecs) >
+> +				ctx->buf_table.imu_cache.elem_size ||
 
+It could be quite a large allocation, let's not cache it if
+it hasn't came from the cache for now. We can always improve
+on top.
+
+And can we invert how it's calculated? See below. You'll have
+fewer calculations in the fast path, and I don't really like
+users looking at ->elem_size when it's not necessary.
+
+
+#define IO_CACHED_BVEC_SEGS	N
+
+io_alloc_cache_init(&table->imu_cache, ...,
+		    /* elem_size */ struct_size(imu, ..., IO_CACHED_BVEC_SEGS));
+
+alloc(bvec_segs) {
+	if (bvec_segs <= IO_CACHED_BVEC_SEGS)
+		/* use the cache */
+	...
+}
+
+free() {
+	if (imu->nr_segs == IO_CACHED_BVEC_SEGS)
+		/* return to cache */
+	else {
+		WARN_ON_ONCE(imu->nr_segs < IO_CACHED_BVEC_SEGS);
+		...
+	}
+}
+
+
+> +		    !io_alloc_cache_put(&ctx->buf_table.imu_cache, imu))
+> +			kvfree(imu);
+>   	}
+>   }
+>   
+
+-- 
+Pavel Begunkov
 
