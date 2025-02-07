@@ -1,39 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D95419F11B
-	for <linux-block@vger.kernel.org>; Fri,  7 Feb 2025 20:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8378C71747;
+	Fri,  7 Feb 2025 20:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738959223; cv=none; b=Nf7UnqhQoa1rp/eM+X7j7KfH5/tEABFvCnhuuhs27PGnaXMjoQTT1swsk3tgYdKXN5Xeu2GoSErbU9p3W9LeLfddzhm918+1ptlFT1SGvInbeBDT6V1nh/Ts3jyuWEn90UaMWfR1+mIYKKUZuoF0x1tc7ss4VyTcVS3sI3dtDjs=
+	t=1738961209; cv=none; b=ZWsWxe8dENW5wHX5x6n+yFTdxCrJE9L8cFgfaayLYKqEAFD7h3HDLURlwe4xhPPQWMUIsRspu+Ibai5XMK6AE9YvxskJCpKHanA5nK6C5CI4/BiBRk8hhL8IwbZyUmTYpE64u3rTULMMq4MVJxu+90UZipmlmZwhrPabng2OREc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738959223; c=relaxed/simple;
-	bh=uLUDHY/xQ22hJ9LRsrli76Ju7cNmHT2Dk172yvN8bqY=;
+	s=arc-20240116; t=1738961209; c=relaxed/simple;
+	bh=1fYUJ+LhYeoDWIm+VOurfFaBDo1s6mGKw0VzRhYPhAc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CNz5ECb8MgUlF5MpLXW9cS70EY83G+PCUPtOG0hu8Mr/3FoeWm3PLEkSV+u5PlIIiv5D3P1U5V36ed+10aVRYsYdK5T5gEWbwN1oT6D4+IJKD1ZPGEtDTJwLnZtMb6yBQW9eKVm4icXK2rt6ZKeLF+yldXF68FBuquqd6bXTcXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kgJsWzet; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=GD+oEw5b3fYPf2KoFvwXy5bxlGzJUan97UVoMFl8kJVQBcO0bv5aTVlFiObqrukhksFS40dY4iwLyDGgcNyqcAZ2dMeatdoFoR+AU8l53ijlpzzzu0LTB2SfS+fTdyLH90/tU1feGP12ReRhFGsb8rijGoKaPT9CtDwMV//9//w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ou01An6j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kgJsWzet"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94286C4CED1;
-	Fri,  7 Feb 2025 20:13:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ou01An6j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF79BC4CEE2;
+	Fri,  7 Feb 2025 20:46:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738959222;
-	bh=uLUDHY/xQ22hJ9LRsrli76Ju7cNmHT2Dk172yvN8bqY=;
+	s=k20201202; t=1738961209;
+	bh=1fYUJ+LhYeoDWIm+VOurfFaBDo1s6mGKw0VzRhYPhAc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kgJsWzetFnE7h3eCygcrTBgoZ5KZ+XfxU0PJA+0HB6jEDrrM20kWLsHXAk+dpHG11
-	 6RW8W1Ha1FHiz7p/m/jT/8UWVgC76wozrwhoSMzKDlwnPGFsONWo7yVvZr1vSPyGzw
-	 5mdtb5xruOJ4MrD0ClaKtXOFSv//VsplTl/4LHMrJEU/uRHZe6csxuvlVWZtN76IAo
-	 PkYJQqhDD4bDBCOu4olA4/yxSZtGW0InZH1AIPmkDEfoL25tElxTJtWMoGj0S6V7dj
-	 McfQydcfPEq8HVElPYIQ8wMY2ZDgWMD/nEOU73452iqsK8nuG0lOC/4KqxDSkMmsYj
-	 G2sCNhbELjYwA==
-Date: Fri, 7 Feb 2025 13:13:40 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Matthew Broomfield <mattysweeps@google.com>
-Cc: linux-block@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: ublk: expose ublk device info in sysfs or support ioctls on
- ublk-control
-Message-ID: <Z6ZpdKDo7Ao803NP@kbusch-mbp>
-References: <CALEiSPxGXy5faNFiiPt_tOF=K2cS=02RVdjw1JGuokNV7JPHJw@mail.gmail.com>
+	b=Ou01An6jn/wT7n67rjrvNN+YGi+kDGXB9ZgOqjKiAavICJ+15ugnu1oXlhrgsrp1c
+	 AiB1mKOkExQFve8I/Jm0pmBIKRMIH8S4FTrfdbff7nTJ07WS/Q7fSVWcM+qjoloHpD
+	 BPtvSLhC4fSW+LnGKXbknYHjsyjEhmfXPzShtL6QgEhYKg+zJIbduSliGbVYoNstAv
+	 ykXeZLJmxyIrHJc5E/X0wa72efiqouN5iL9mlVSc6U37MnxkoEEsTCO2voXA4p1F2V
+	 8eNjV0lNN6xC2tpTfQgdZI4h7deTb+WBPvWzMu4BnG48eMqkovJRbhlN8q5oSJhrfR
+	 a3+0FwAy8Sbsw==
+Date: Fri, 7 Feb 2025 12:46:47 -0800
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hare@suse.de" <hare@suse.de>,
+	"patches@lists.linux.dev" <patches@lists.linux.dev>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>
+Subject: Re: [PATCH blktests v2 4/4] common/xfs: check for max supported
+ sector size
+Message-ID: <Z6ZxNznj2MLoq2_4@bombadil.infradead.org>
+References: <20250204225729.422949-1-mcgrof@kernel.org>
+ <20250204225729.422949-5-mcgrof@kernel.org>
+ <7ug4nasddicvqix5wjw5mbvjurvgdxmmj6j7i5xgb4dlozswjd@okvt2f3qfj32>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -42,30 +47,53 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALEiSPxGXy5faNFiiPt_tOF=K2cS=02RVdjw1JGuokNV7JPHJw@mail.gmail.com>
+In-Reply-To: <7ug4nasddicvqix5wjw5mbvjurvgdxmmj6j7i5xgb4dlozswjd@okvt2f3qfj32>
 
-On Fri, Feb 07, 2025 at 11:50:33AM -0800, Matthew Broomfield wrote:
-> Hi all,
+On Fri, Feb 07, 2025 at 11:58:29AM +0000, Shinichiro Kawasaki wrote:
+> On Feb 04, 2025 / 14:57, Luis Chamberlain wrote:
+> > mkfs.xfs will use the sector size exposed by the device, if this
+> > is larger than 32k this will fail as the largest sector size on XFS
+> > is 32k. Provide a sanity check to ensure we skip creating a filesystem
+> > if the sector size is larger than what XFS supports.
+> > 
+> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > ---
+> >  common/xfs | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> > 
+> > diff --git a/common/xfs b/common/xfs
+> > index 8b068837fa37..dbae572e4390 100644
+> > --- a/common/xfs
+> > +++ b/common/xfs
+> > @@ -15,11 +15,18 @@ _xfs_mkfs_and_mount() {
+> >  	local mount_dir=$2
+> >  	local bs=$(_min_io $bdev)
+> >  	local xfs_logsize="64m"
+> > +	local sysfs="/sys/block/${bdev#/dev/}"
+> > +	local logical_block_size=$(cat $sysfs/queue/logical_block_size)
+> >  
+> >  	if [[ $bs -gt 4096 ]]; then
+> >  		xfs_logsize="128m"
+> >  	fi
+> >  
+> > +	if [[ $logical_block_size -gt 32768 ]]; then
+> > +		SKIP_REASONS+=("max sector size for XFS is 32768 but device $bdev has a larger sector size $logical_block_size")
 > 
-> It would be great if there was a sysfs file which exposed "struct
-> ublksrv_ctrl_dev_info" so programs written in languages without
-> io_uring libraries (such as python) could easily read this information
-> for management, testing, or record keeping. Ideally if possible this
-> could be something like "/sys/block/ublkbX/ublk_info". Is this
-> possible?
+> Adding SKIP_REASONS here is not ideal, since this function is called from
+> test() or test_device(). It's the better to check the requirement in
+> requires() or device_requires(), before touching the test target devices.
 > 
-> Alternatively, the "/dev/ublk-control" file could support ioctls which
-> mimic the io_uring cmds such as UBLK_CMD_GET_DEV_INFO,
-> UBLK_CMD_ADD_DEV, etc. This would be more powerful as the block device
-> lifecycle management program could be completely independent of both
-> io_uring and the program which handles the block IO. However I'm
-> skeptical it's worth it in the long run to create a ioctl -> io_uring
-> adapter. (As opposed to languages natively supporting io_uring)
+> If test() calls _xfs_mkfs_and_mount(), the test case should be able to
+> control the sector size smaller than 32k, so no need to check the
+> requirement.
 
-It's really not that difficult to make an equivalent ioctl from an
-existing uring_cmd.
+I see, I'll fix.
 
-I think it would be even easier if the ioctl was exposed on the
-/dev/ublkcX device instead of the general purpose ublk-control. This way
-you can just use the path of the device you want to query instead of
-having to look up its dev_id.
+> I think block/032 and nvme/012 fall in this category.
+
+Indeed. I also noted _min_io() needs to return 4096 by default too as we
+want to use it as default in case we get a lower value to retain
+backward compatbility. That fixed some block/032 and nvme/012 issues
+with 512 min-io values.
+
+  Luis
