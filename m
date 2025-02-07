@@ -1,136 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-10629.protonmail.ch (mail-10629.protonmail.ch [79.135.106.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F022417EF;
-	Thu,  6 Feb 2025 23:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465C481E;
+	Fri,  7 Feb 2025 00:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738885262; cv=none; b=t3bkU7rp/uM2M7uqKwMybMrI3seLYUYzd3rlGX67KlpxORzCeDf46RoseblE8vls7sb3/a6Lu1+ni0VNsJ1wMvK7fy7DSkGBX53Ad4YU4G54Ue2fGYGiEMWVJLpA/IZ5Dz8mv4lZcdhtJY2j1JXPyQv6Hj1butg3WPHFBuFzYzM=
+	t=1738887754; cv=none; b=nVamVha5v4zFyl3m8cqMAiFzDLzAFPGbltw89Z0jrFU8nXtLwwr7ekER+0ldDJxVfkOZ6xsJptvQl4ceXBKqqmN6Ne0DSg1pPkGH48qciRndRVzMm4MTWX3Ujjq75onN+mGThHuQKUnAbtvWUoZUbRd8x8XXbQpkQklmyPBYrtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738885262; c=relaxed/simple;
-	bh=ltfuyNhdWl4e6tB5cb6tu2xTiV8jlDxP3SA4YXI2rB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EpJx42QWRkC3m2F8KrTDqsHIbcgm7ErcfMIMXgRCCQpgrsRGzuiWhJxUZcyj67bk/p5l3m64SNOtP2l5muJw1v/m7g5ZsG9jPXB6mw5H/lr8WspzKj3wnQh6WBBtbC3kqVdX4Z9CVQNOBN9XFZAbNJ2/KT2yhujKE76PuY9/hcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WDaePLSC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738887754; c=relaxed/simple;
+	bh=6b3ryVNAh20yAK7GjwDQ3dKje8y8c2XGMb6l1IDq7Zc=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qszloXRL6p4fGYZBTSqRHmoUx/9w9bYOJRnu7Lohe4xkuqe7xkVx0M6aXT+U9gmcWcayGS2bzc2gSYgux7BsdGN28mFSXTwsABaqYJoMoE8kHSDTkSn4BBVDQYOCg2PNlN6cJHSViG9ULHzlDHevDTrUGxmBiXZsTrPXoUM45eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=YfdshQHL; arc=none smtp.client-ip=79.135.106.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WDaePLSC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E074C4CEDD;
-	Thu,  6 Feb 2025 23:41:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738885261;
-	bh=ltfuyNhdWl4e6tB5cb6tu2xTiV8jlDxP3SA4YXI2rB4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WDaePLSCpEQGbwjYg5BcVXYGsSsqnSwD/FLaD4TPnbNxAzAq3V6+JzmNx1scaVeRb
-	 eD2FQ+9Q6P/vqvZ+lUHYQwxLs32klrcltQDjzfLGV9k1QrRS3EdxmZAzsBA41Fx0V4
-	 9Gb68oJ9bP3UV+H0x49PIGlqNYRKiCSOEn9S+ozTLS85/QD9Xe1JksIrVQax2mfBoN
-	 gsI1sKi2Mw+cF3MAwDtRj1HHXG9fUIcsDZDTJnV19JqoorndeJ5eAyh6GkRHIKdOgP
-	 sEiSjznzcjWM07BYCy4mZJWo4uXWBdfFkV49kpXwswbPtMxpB9TqNhGz0wgg44c+xX
-	 lbqtfSn5wR61g==
-Date: Thu, 6 Feb 2025 23:41:00 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	x86@kernel.org, linux-block@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>, Keith Busch <kbusch@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v3 2/6] scripts/gen-crc-consts: add gen-crc-consts.py
-Message-ID: <20250206234100.GA2582574@google.com>
-References: <20250206073948.181792-1-ebiggers@kernel.org>
- <20250206073948.181792-3-ebiggers@kernel.org>
- <20250206193117.7a9a463c@pumpkin>
- <20250206200843.GA1237@sol.localdomain>
- <20250206222853.1f9d11c3@pumpkin>
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="YfdshQHL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1738887743; x=1739146943;
+	bh=9T7XSNw/kizcEbjL2Viub98tRwKtukopTvWu1rGwul8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=YfdshQHLh09+E4e5L1Kg9RLonuPQopEj8WKC+jGe5XK8L/QIaBHZTZnh2Q5tCdMSg
+	 FyVG0MxaWwBc3IrXXstl8yfE82ePHaa+jOFA3frbtwp112swXi8QLllNIW4dEjevU5
+	 tI7nQVRYTlnZYDIiAGcWiG0/kN4Eibtkv/2YfwjTXTZaAaVDaTovbTVkleKMlZC3uD
+	 TAQoWmFuTLm7a8R0wkLKcMTNFONfoeMFrvaALVlAhReXaFwOq1vm62+lHoxyfHBBib
+	 eDS5WQ21e98c1upl7kt+v46wSWE8y+esnalim1Xa4inxKXN1IUOQW3zLwomUOFDLFI
+	 8W00NKUzGnrYA==
+Date: Fri, 07 Feb 2025 00:22:19 +0000
+To: Boqun Feng <boqun.feng@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: Mitchell Levy <levymitchell0@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] rust: lockdep: Use Pin for all LockClassKey usages
+Message-ID: <7bc31b4e-cfe2-40ff-9a00-a73bff64df1c@proton.me>
+In-Reply-To: <Z6UpNpefdxyvYBPe@boqun-archlinux>
+References: <20250205-rust-lockdep-v3-0-5313e83a0bef@gmail.com> <20250205-rust-lockdep-v3-2-5313e83a0bef@gmail.com> <19dfbe36-237c-4da8-acfb-1d14069a8d1c@proton.me> <Z6UpNpefdxyvYBPe@boqun-archlinux>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: e69e7d16d99b7256a7ff876c462a0af5ee988207
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250206222853.1f9d11c3@pumpkin>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 06, 2025 at 10:28:53PM +0000, David Laight wrote:
-> On Thu, 6 Feb 2025 12:08:43 -0800
-> Eric Biggers <ebiggers@kernel.org> wrote:
-> 
-> > On Thu, Feb 06, 2025 at 07:31:17PM +0000, David Laight wrote:
-> > > On Wed,  5 Feb 2025 23:39:44 -0800
-> > > Eric Biggers <ebiggers@kernel.org> wrote:
-> > >   
-> > > > From: Eric Biggers <ebiggers@google.com>
-> > > > 
-> > > > Add a Python script that generates constants for computing the given CRC
-> > > > variant(s) using x86's pclmulqdq or vpclmulqdq instructions.
-> > > > 
-> > > > This is specifically tuned for x86's crc-pclmul-template.S.  However,
-> > > > other architectures with a 64x64 => 128-bit carryless multiplication
-> > > > instruction should be able to use the generated constants too.  (Some
-> > > > tweaks may be warranted based on the exact instructions available on
-> > > > each arch, so the script may grow an arch argument in the future.)
-> > > > 
-> > > > The script also supports generating the tables needed for table-based
-> > > > CRC computation.  Thus, it can also be used to reproduce the tables like
-> > > > t10_dif_crc_table[] and crc16_table[] that are currently hardcoded in
-> > > > the source with no generation script explicitly documented.
-> > > > 
-> > > > Python is used rather than C since it enables implementing the CRC math
-> > > > in the simplest way possible, using arbitrary precision integers.  The
-> > > > outputs of this script are intended to be checked into the repo, so
-> > > > Python will continue to not be required to build the kernel, and the
-> > > > script has been optimized for simplicity rather than performance.  
-> > > 
-> > > It might be better to output #defines that just contain array
-> > > initialisers rather than the definition of the actual array itself.
-> > > 
-> > > Then any code that wants the values can include the header and
-> > > just use the constant data it wants to initialise its own array.
-> > > 
-> > > 	David  
-> > 
-> > The pclmul constants use structs, not arrays.  Maybe you are asking for the
-> > script to only generate the struct initializers?
-> 
-> I'd not read the python that closely.
-> 
-> > This suggestion seems a bit more complicated than just having everything in one place.
-> 
-> It'll be in several places anyway since the python file is only going
-> to generate the lookup tables.
-> 
-> > It would allow
-> > putting the struct definitions in the CRC-variant-specific files while keeping
-> > the struct initializers all in one file, so __maybe_unused would no longer need
-> > to be used on the definitions.  But the actual result would be the same, just
-> > achieved in what seems like a slightly more difficult way.
-> 
-> It would leave the variable declarations in the file that used them - making
-> it easier to see what they are.
-> It also gives the option of minor changes in the variable name/attributes
-> which might be useful at some point (or some architecture).
-> 
-> I've got some similar tables for a normal byte-lookup crc16 (hdlc).
-> And for doing the hdlc bit-stuffing and flag/abort detection on
-> a byte-by-byte basis
-> The whole lot is 11k - quite a lot of memory inside an fpga!
-> I started with the 'header' containing the initialised data, but
-> later changed it to just #define for the initialiser - worked better
-> that way.
+On 06.02.25 22:27, Boqun Feng wrote:
+> On Wed, Feb 05, 2025 at 08:30:50PM +0000, Benno Lossin wrote:
+>> On 05.02.25 20:59, Mitchell Levy wrote:
+>>> diff --git a/rust/kernel/sync/lock.rs b/rust/kernel/sync/lock.rs
+>>> index 41dcddac69e2..119e5f569bdb 100644
+>>> --- a/rust/kernel/sync/lock.rs
+>>> +++ b/rust/kernel/sync/lock.rs
+>>> @@ -7,12 +7,9 @@
+>>>
+>>>  use super::LockClassKey;
+>>>  use crate::{
+>>> -    init::PinInit,
+>>> -    pin_init,
+>>> -    str::CStr,
+>>> -    types::{NotThreadSafe, Opaque, ScopeGuard},
+>>> +    init::PinInit, pin_init, str::CStr, types::NotThreadSafe, types::O=
+paque, types::ScopeGuard,
+>>>  };
+>>> -use core::{cell::UnsafeCell, marker::PhantomPinned};
+>>> +use core::{cell::UnsafeCell, marker::PhantomPinned, pin::Pin};
+>>>  use macros::pin_data;
+>>>
+>>>  pub mod mutex;
+>>> @@ -121,7 +118,7 @@ unsafe impl<T: ?Sized + Send, B: Backend> Sync for =
+Lock<T, B> {}
+>>>
+>>>  impl<T, B: Backend> Lock<T, B> {
+>>>      /// Constructs a new lock initialiser.
+>>> -    pub fn new(t: T, name: &'static CStr, key: &'static LockClassKey) =
+-> impl PinInit<Self> {
+>>> +    pub fn new(t: T, name: &'static CStr, key: Pin<&'static LockClassK=
+ey>) -> impl PinInit<Self> {
+>>
+>> Static references do not need `Pin`, since `Pin::static_ref` [1] exists,
+>> so you can just as well not add the `Pin` here and the other places
+>> where you have `Pin<&'static T>`.
+>>
+>=20
+> You're right about `Pin` not needed for 'static. However, the
+> `Pin<&'static LockClassKey>` signature is the intermediate state, and
+> eventually we will need to support initializing a lock (and others) with
+> a dynamically allocated `LockClassKey`, and when that is available, the
+> type of `key` will become `Pin<&'a LockClassKey>`, so `Pin` is needed.
+>=20
+> So I would like to keep this patch as it is. Works for you?
 
-Again, for now gen-crc-consts.py is only used for generating the structs of
-constants used by the x86 pclmul code.  They are indeed all in one header file.
-They all need the same declarations and attributes, and it is convenient to
-generate them all at once, and name and document them in a consistent way.
-Please take a closer look at the patchset (if you are interested), as it's not
-entirely clear what you're attempting to comment on exactly.
+Makes sense and fine by me. It would be nice if it was also mentioned in
+the commit message. Thanks!
 
-gen-crc-consts.py does also have support for generating slice-by-N tables, which
-it seems is what you may be attempting to comment on, but that is not currently
-used for real.  It just seemed convenient to include, since it is just ~20 extra
-lines in the script, and it is sufficient to reproduce any of the existing CRC
-tables that are hardcoded in the kernel, and the table for any new CRC variant
-that might get added in the future.  If we decide to start using that part "for
-real", we could always tweak the exact formatting of the tables a bit if needed.
+---
+Cheers,
+Benno
 
-- Eric
+>=20
+> Regards,
+> Boqun
+>=20
+>> The reasoning is that since the data lives for `'static` at that
+>> location, it will never move (since it is borrowed for `'static` after
+>> all).
+>>
+>> [1]: https://doc.rust-lang.org/std/pin/struct.Pin.html#method.static_ref
+>>
+>> ---
+>> Cheers,
+>> Benno
+>>
+>>>          pin_init!(Self {
+>>>              data: UnsafeCell::new(t),
+>>>              _pin: PhantomPinned,
+>>> diff --git a/rust/kernel/sync/lock/global.rs b/rust/kernel/sync/lock/gl=
+obal.rs
+>>> index 480ee724e3cc..d65f94b5caf2 100644
+>>> --- a/rust/kernel/sync/lock/global.rs
+>>> +++ b/rust/kernel/sync/lock/global.rs
+>>> @@ -13,6 +13,7 @@
+>>>  use core::{
+>>>      cell::UnsafeCell,
+>>>      marker::{PhantomData, PhantomPinned},
+>>> +    pin::Pin,
+>>>  };
+>>>
+>>>  /// Trait implemented for marker types for global locks.
+>>
+>>
+
