@@ -1,53 +1,54 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF922417E0
-	for <linux-block@vger.kernel.org>; Fri,  7 Feb 2025 02:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2A912E1CD
+	for <linux-block@vger.kernel.org>; Fri,  7 Feb 2025 03:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738895972; cv=none; b=RdIh4G/urnedDNzhNZDahilqbmjhyElzNR9GtVEGOpPb6RDurDzVVsSzOJOlpjzd8YhWQQw0hQ16plx8I3z+fC8DOQR3i8Khv9OdwnheE03XH5mpiOhuJ4TK/KCr5D3We9zpHldNM0/8aXZHVjryhIHrCsnuHpBvXKbNKUoaQxM=
+	t=1738900330; cv=none; b=GhB3nKK6Y71+/vs++Dwy2u7O18qsA6u3f8XoqIs35axoxri6FEOrMeZLsatGuyBHDaof0e/SW4mahWZL2y8QX1zsXoTYrg66si77kI9Xyr83Na0GABQ9LlZQJUk2HuLjjjY+xYQAIXWs4bA/jdoNCbfBIfmoRSei/MZCsVo7nuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738895972; c=relaxed/simple;
-	bh=JvWA+gZnFGD2Wx2vPDVpWjjmg4vdJ41Wksr+oWa4f9I=;
+	s=arc-20240116; t=1738900330; c=relaxed/simple;
+	bh=gLyOIxyU/lTzYHzQgUlsX6k87vGwfj77cTC+EmtQumI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D8iWyHzF+pBab6dGVwzKCXXWVWe3WMJ9WXShZuCCOENa0Pg/o0aeFk4JGUjD1/ijEWVn5UImAUSUxSProJrb4KEpsAa9+q2ic3debm96PlN7S2S8r6fNbOcQK702HSNLSOrkBjHjDMnWXcuvKRUyPHSTT3DQPGJhXSABkQh6V6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HIDPHUGW; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y1qRgqP4cA8XlXK7rgDvTXzXWPgedvoevcVYSejZ0QySnyA74vrEr7zABDMdF8arfqwkgVNO2TqvzcVzWE16U2pMTEoIeQGgpn+YUTxmlMbQkIuO3zYJaPulpWif30R0NYZWS8ft9IALX7jLMryZOx3xTdgssvsHkk4aUxUwnVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NviQFyn+; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HIDPHUGW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NviQFyn+"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738895968;
+	s=mimecast20190719; t=1738900327;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=D+JWHUT7Z1fxT+zobpObJB9SyncARUjxWk08EF0gQHs=;
-	b=HIDPHUGWj3HWR/loHPxuuJq/H2ThMhB2qYGp+xqKQEjLIvia9pSZgW2HJTKuYEan/zeTMs
-	Wyv/6dAfD3FCLcTrhiVE5pMghxy/eS7M2T3Bjia+FCpmUQguMzUMiI1wosxoozshLFYzJj
-	qo9N5yYH//Av5KqwJ+MbjfmJvmWKsIs=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=BxBEek3HoBBjZmmM7Ja8P6ff70Ie4PDh6pjJATyCWGo=;
+	b=NviQFyn+adUs3pMiX7sIX5a9vKpZedO0lkem4eI3I68U8dp1vjWO7rOMirIY6OYxkRPuLp
+	bGQ6GgjLfsbYk8TzZNuFDrWDvMeujV8KR6zipGr/StADW1u5R1YOtJ3wu8kXQQV8DZBjx7
+	9kDdasTr45QVwPYBTVRvKxLoifWNnEc=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-572-Vr_6rdGRPUasFcAkfSDETA-1; Thu,
- 06 Feb 2025 21:39:25 -0500
-X-MC-Unique: Vr_6rdGRPUasFcAkfSDETA-1
-X-Mimecast-MFC-AGG-ID: Vr_6rdGRPUasFcAkfSDETA
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-356-p2XVQIzONkG0SxHi1RasrA-1; Thu,
+ 06 Feb 2025 22:52:03 -0500
+X-MC-Unique: p2XVQIzONkG0SxHi1RasrA-1
+X-Mimecast-MFC-AGG-ID: p2XVQIzONkG0SxHi1RasrA
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 87F931956094;
-	Fri,  7 Feb 2025 02:39:24 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9059C18004A7;
+	Fri,  7 Feb 2025 03:51:59 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.126])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 001DF19560AE;
-	Fri,  7 Feb 2025 02:39:21 +0000 (UTC)
-Date: Fri, 7 Feb 2025 10:39:16 +0800
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D92E319560AE;
+	Fri,  7 Feb 2025 03:51:54 +0000 (UTC)
+Date: Fri, 7 Feb 2025 11:51:49 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Rick Koch <mr.rickkoch@gmail.com>
-Cc: linux-block@vger.kernel.org
-Subject: Re: Kernel Oops in __blk_mq_all_tag_iter() using Raxda CM5
-Message-ID: <Z6VyVEIP-228PiPb@fedora>
-References: <CANa58eceasto+EzkRKp+10vLfUfi_O8gkc9mtu0PR01=o7-ACQ@mail.gmail.com>
+To: Keith Busch <kbusch@meta.com>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org, axboe@kernel.dk,
+	asml.silence@gmail.com, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 0/6] ublk zero-copy support
+Message-ID: <Z6WDVdYxxQT4Trj8@fedora>
+References: <20250203154517.937623-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,45 +57,223 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANa58eceasto+EzkRKp+10vLfUfi_O8gkc9mtu0PR01=o7-ACQ@mail.gmail.com>
+In-Reply-To: <20250203154517.937623-1-kbusch@meta.com>
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Thu, Feb 06, 2025 at 10:29:34AM -0500, Rick Koch wrote:
-> Hello linux-block,
+On Mon, Feb 03, 2025 at 07:45:11AM -0800, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
-> I am seeing a kernel Oops in early booting up of a Radxa CM5 board running
-> Armbian
-> on a 6.12.7 kernel.
+> This is a new look at supporting zero copy with ublk.
 > 
-> I had reported a very similar Oops back on 2024-10-11 (Oct 11, 2024)
+> The previous version from Ming can be viewed here:
 > 
-> https://lore.kernel.org/all/CANa58ee6EeT9V7Q=epoZdqYw3sLh1CZGNWqJ0UcKMp6eRfcd+Q@mail.gmail.com/T/
+>   https://lore.kernel.org/linux-block/20241107110149.890530-1-ming.lei@redhat.com/
 > 
-> Which you had provided me with a patch that fixed the issue and has not
-> occurred again.
+> Based on the feedback from that thread, the desired io_uring interfaces
+> needed to be simpler, and the kernel registered resources need to behave
+> more similiar to user registered buffers.
 > 
-> Here is the current Oops I am experiencing, maybe 1 out of every 10 boots.
-> It does lockup after this, requiring me to re-power/boot the board.
+> This series introduces a new resource node type, KBUF, which, like the
+> BUFFER resource, needs to be installed into an io_uring buf_node table
+> in order for the user to access it in a fixed buffer command. The
+> new io_uring kernel API provides a way for a user to register a struct
+> request's bvec to a specific index, and a way to unregister it.
 > 
-> Starting kernel ...
-> 
-> [    1.582430] Internal error: Oops: 0000000096000004 [#1] PREEMPT SMP
-> [    1.582984] Modules linked in:
-> [    1.583256] CPU: 6 UID: 0 PID: 46 Comm: cpuhp/6 Not tainted
-> 6.12.7-edge-rockchip64 #7
-> [    1.583942] Hardware name: Saturn SDR, Radxa CM5, 8inch LCD/Touch panel
-> (DT)
-> [    1.584557] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS
-> BTYPE=--)
-> [    1.585167] pc : __blk_mq_all_tag_iter+0x3c/0x274
-> [    1.585584] lr : blk_mq_all_tag_iter+0x14/0x20
+> When the ublk server receives notification of a new command, it must
+> first select an index and register the zero copy buffer. It may use that
+> index for any number of fixed buffer commands, then it must unregister
+> the index when it's done. This can all be done in a single io_uring_enter
+> if desired, or it can be split into multiple enters if needed.
 
-Can you share where '__blk_mq_all_tag_iter+0x3c' points to?
+I suspect it may not be done in single io_uring_enter() because there
+is strict dependency among the three OPs(register buffer, read/write,
+unregister buffer).
 
-Also running kernel with KASAN enabled often provides more helpful hint.
+> 
+> The io_uring instance that gets the zero copy registration doesn't
+> necessarily need to be the same ring that is receiving notifcations from
+> the ublk_drv module. This allows you to split frontend and backend rings
+> if desired.
+> 
+> At the end of this cover letter, I've provided a patch to the ublksrv to
+> demonstrate how to use this.
+> 
+> Jens Axboe (1):
+>   io_uring: use node for import
+> 
+> Keith Busch (5):
+>   block: const blk_rq_nr_phys_segments request
+>   io_uring: add support for kernel registered bvecs
+>   ublk: zc register/unregister bvec
+>   io_uring: add abstraction for buf_table rsrc data
+>   io_uring: cache nodes and mapped buffers
+> 
+>  drivers/block/ublk_drv.c       | 139 +++++++++++++-----
+>  include/linux/blk-mq.h         |   2 +-
+>  include/linux/io_uring.h       |   1 +
+>  include/linux/io_uring_types.h |  25 +++-
+>  include/uapi/linux/ublk_cmd.h  |   4 +
+>  io_uring/fdinfo.c              |   8 +-
+>  io_uring/filetable.c           |   2 +-
+>  io_uring/net.c                 |   5 +-
+>  io_uring/nop.c                 |   2 +-
+>  io_uring/register.c            |   2 +-
+>  io_uring/rsrc.c                | 259 ++++++++++++++++++++++++++-------
+>  io_uring/rsrc.h                |   8 +-
+>  io_uring/rw.c                  |   4 +-
+>  io_uring/uring_cmd.c           |   4 +-
+>  14 files changed, 351 insertions(+), 114 deletions(-)
+> 
+> -- 
+> 2.43.5
+> 
+> ublksrv:
+> 
+> https://github.com/ublk-org/ublksrv
+> 
+> ---
+>  include/ublk_cmd.h    |  4 +++
+>  include/ublksrv_tgt.h | 13 ++++++++
+>  lib/ublksrv.c         |  9 ++++++
+>  tgt_loop.cpp          | 74 +++++++++++++++++++++++++++++++++++++++++--
+>  ublksrv_tgt.cpp       |  2 +-
+>  5 files changed, 99 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/ublk_cmd.h b/include/ublk_cmd.h
+> index 0150003..07439be 100644
+> --- a/include/ublk_cmd.h
+> +++ b/include/ublk_cmd.h
+> @@ -94,6 +94,10 @@
+>  	_IOWR('u', UBLK_IO_COMMIT_AND_FETCH_REQ, struct ublksrv_io_cmd)
+>  #define	UBLK_U_IO_NEED_GET_DATA		\
+>  	_IOWR('u', UBLK_IO_NEED_GET_DATA, struct ublksrv_io_cmd)
+> +#define UBLK_U_IO_REGISTER_IO_BUF	\
+> +	_IOWR('u', 0x23, struct ublksrv_io_cmd)
+> +#define UBLK_U_IO_UNREGISTER_IO_BUF	\
+> +	_IOWR('u', 0x24, struct ublksrv_io_cmd)
+>  
+>  /* only ABORT means that no re-fetch */
+>  #define UBLK_IO_RES_OK			0
+> diff --git a/include/ublksrv_tgt.h b/include/ublksrv_tgt.h
+> index 1deee2b..6291531 100644
+> --- a/include/ublksrv_tgt.h
+> +++ b/include/ublksrv_tgt.h
+> @@ -189,4 +189,17 @@ static inline void ublk_get_sqe_pair(struct io_uring *r,
+>  		*sqe2 = io_uring_get_sqe(r);
+>  }
+>  
+> +static inline void ublk_get_sqe_three(struct io_uring *r,
+> +		struct io_uring_sqe **sqe1, struct io_uring_sqe **sqe2,
+> +		struct io_uring_sqe **sqe3)
+> +{
+> +	unsigned left = io_uring_sq_space_left(r);
+> +
+> +	if (left < 3)
+> +		io_uring_submit(r);
+> +
+> +	*sqe1 = io_uring_get_sqe(r);
+> +	*sqe2 = io_uring_get_sqe(r);
+> +	*sqe3 = io_uring_get_sqe(r);
+> +}
+>  #endif
+> diff --git a/lib/ublksrv.c b/lib/ublksrv.c
+> index 16a9e13..7205247 100644
+> --- a/lib/ublksrv.c
+> +++ b/lib/ublksrv.c
+> @@ -619,6 +619,15 @@ skip_alloc_buf:
+>  		goto fail;
+>  	}
+>  
+> +	if (ctrl_dev->dev_info.flags & UBLK_F_SUPPORT_ZERO_COPY) {
+> +		ret = io_uring_register_buffers_sparse(&q->ring, q->q_depth);
+> +		if (ret) {
+> +			ublk_err("ublk dev %d queue %d register spare buffers failed %d",
+> +					q->dev->ctrl_dev->dev_info.dev_id, q->q_id, ret);
+> +			goto fail;
+> +		}
+> +	}
+> +
+>  	io_uring_register_ring_fd(&q->ring);
+>  
+>  	/*
+> diff --git a/tgt_loop.cpp b/tgt_loop.cpp
+> index 0f16676..ce44c7d 100644
+> --- a/tgt_loop.cpp
+> +++ b/tgt_loop.cpp
+> @@ -246,12 +246,62 @@ static inline int loop_fallocate_mode(const struct ublksrv_io_desc *iod)
+>         return mode;
+>  }
+>  
+> +static inline void io_uring_prep_buf_register(struct io_uring_sqe *sqe,
+> +		int dev_fd, int tag, int q_id, __u64 index)
+> +{
+> +	struct ublksrv_io_cmd *cmd = (struct ublksrv_io_cmd *)sqe->cmd;
+> +
+> +	io_uring_prep_read(sqe, dev_fd, 0, 0, 0);
+> +	sqe->opcode		= IORING_OP_URING_CMD;
+> +	sqe->flags		|= IOSQE_CQE_SKIP_SUCCESS | IOSQE_FIXED_FILE;
+
+IOSQE_IO_LINK is missed, because the following buffer consumer OP
+has to be issued after this buffer register OP is completed.
+
+> +	sqe->cmd_op		= UBLK_U_IO_REGISTER_IO_BUF;
+> +
+> +	cmd->tag		= tag;
+> +	cmd->addr		= index;
+> +	cmd->q_id		= q_id;
+> +}
+> +
+> +static inline void io_uring_prep_buf_unregister(struct io_uring_sqe *sqe,
+> +		int dev_fd, int tag, int q_id, __u64 index)
+> +{
+> +	struct ublksrv_io_cmd *cmd = (struct ublksrv_io_cmd *)sqe->cmd;
+> +
+> +	io_uring_prep_read(sqe, dev_fd, 0, 0, 0);
+> +	sqe->opcode		= IORING_OP_URING_CMD;
+> +	sqe->flags		|= IOSQE_CQE_SKIP_SUCCESS | IOSQE_FIXED_FILE;
+> +	sqe->cmd_op		= UBLK_U_IO_UNREGISTER_IO_BUF;
+
+IOSQE_IO_LINK is missed, because buffer un-register OP has to be issued
+after the previous buffer consumer OP is completed.
+
+> +
+> +	cmd->tag		= tag;
+> +	cmd->addr		= index;
+> +	cmd->q_id		= q_id;
+> +}
+> +
+>  static void loop_queue_tgt_read(const struct ublksrv_queue *q,
+>  		const struct ublksrv_io_desc *iod, int tag)
+>  {
+> +	const struct ublksrv_ctrl_dev_info *info =
+> +		ublksrv_ctrl_get_dev_info(ublksrv_get_ctrl_dev(q->dev));
+>  	unsigned ublk_op = ublksrv_get_op(iod);
+>  
+> -	if (user_copy) {
+> +	if (info->flags & UBLK_F_SUPPORT_ZERO_COPY) {
+> +		struct io_uring_sqe *reg;
+> +		struct io_uring_sqe *read;
+> +		struct io_uring_sqe *ureg;
+> +
+> +		ublk_get_sqe_three(q->ring_ptr, &reg, &read, &ureg);
+> +
+> +		io_uring_prep_buf_register(reg, 0, tag, q->q_id, tag);
+> +
+> +		io_uring_prep_read_fixed(read, 1 /*fds[1]*/,
+> +			0,
+> +			iod->nr_sectors << 9,
+> +			iod->start_sector << 9,
+> +			tag);
+> +		io_uring_sqe_set_flags(read, IOSQE_FIXED_FILE);
+> +		read->user_data = build_user_data(tag, ublk_op, 0, 1);
+
+Does this interface support to read to partial buffer? Which is useful
+for stacking device cases.
+
+Also does this interface support to consume the buffer from multiple
+OPs concurrently? 
 
 
-
-Thanks,
+Thanks, 
 Ming
 
