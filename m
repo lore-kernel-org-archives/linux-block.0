@@ -1,63 +1,60 @@
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15EE161320
-	for <linux-block@vger.kernel.org>; Fri,  7 Feb 2025 16:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0882C1990A2
+	for <linux-block@vger.kernel.org>; Fri,  7 Feb 2025 18:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738947034; cv=none; b=Ceo4UVmxX2gFqcb6zlOrqZUVKabedjo1nK3KVpCB4fBjfhMyWR8KcofqCC6m3XdhLwHQJ2hr0WiHEirJOGh4JPaPgMxDljwCgG//KGmE4L1P64gZWX6NV2tqbJJiJXnySeDyd7ihev224sJ2zRB1wF58waMswTwrF5MpIhLPRks=
+	t=1738951373; cv=none; b=kytEFPbuyj2fkfc4vRclHgvUksf8m30RqQZ5Z17Ubxzhw049sSNJEgi3YQiamFJit5onp6iX542VZuzLVlnGGsj4W9TeYbcAT1Pb3Ezx7CnJnP5jqcNialeYbgC1WPa0B45zkdz1az8e2FPWfdCjEYfLozQAHHf7yjigLflZhaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738947034; c=relaxed/simple;
-	bh=MB/beSe+1IjpgprWpSQS858gfi2yu4f4YLuEqeyHYHI=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=qpo4olfKbW7RbSDIuT1cgBAKK1sujQ3GIQq0HGUTwrqxiP9IVWtES5xYniXhbrBEWcqXbC5LbifLX+O/3XZykFgtD32iro7lnwd6bq/v3ugJWo0nZucs1k1LJaDXkqtA5UWoAtfxn5bkwcrX5/ZBWjaoph4IwZNGIl6cmyFiL/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HBk3dI8L; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1738951373; c=relaxed/simple;
+	bh=0p7IgJ0rIYv7ZJPhRSgxogBlfbhRdNgfKwPJM+OLjng=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N9luViigiMHadcAd+FX7wl8Vk8JX+HcdCEbeOWrGH6iO8TmhxcXsLAqDQ1srcwTgtJT0tEMedP7mW227cMeQVJY7B6lJKQe2xv6aVDIW1juaNI8lW1XoGMeLB9cZosvvZ4Yk/4OPKTDD+tEsy1BASLniQwMQ+ZbEpYqMOu4FUgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=b/ZpRg6U; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HBk3dI8L"
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-844e7bc6d84so71809839f.0
-        for <linux-block@vger.kernel.org>; Fri, 07 Feb 2025 08:50:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1738947031; x=1739551831; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FZcAoGvteKYNahIOBBHOqLUlnzalvic6fO+6tu7n2II=;
-        b=HBk3dI8L056OSm5zI2JjwcO4hq+wjCFYwQvHF+4pVV4xZfpcIh9qJjCa1DOHZPWdyp
-         stnWtt+lMSNf7qlXzaS95WEqNKOwNne+Sdkuht7sZw4EiMwpPHEaefgm5Zf/9B8oxOO/
-         KmdLZK3trBizbvx1XKWZjrxpeiw1oD/PbHtqH11uFKwcRi53spmbP3WTiO5kQDRXy0g7
-         c1AE7jnRZaIDz0EDVlz0ySsHAQnn6MNdSWqZyulkulQLC7MHNAK5EtMJzo7mXHEelsrn
-         jXhH3Uby4PnE7mDONaEmml3jR04ojBiV+eHvM/DWoCaJ8tcNiBcAe5JD0d8xFzE3eDeT
-         CqIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738947031; x=1739551831;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=FZcAoGvteKYNahIOBBHOqLUlnzalvic6fO+6tu7n2II=;
-        b=vO4zVssQshYMvc5Ns50yEZFEsQLbEO014YX+6ZO5WQazkmU8f4JpZRrSW3v0yjXVvt
-         IVc6mwJkMKNpm3V8YeXCrdPT0uxW8UbNPmE07HZAN6tEVBWJzRy0hoZHIyY3CgkrjM43
-         XB07bMHeCXR8gqTzcI0h8N9rYzewecujyD3TEICqZhGn/6RND5hczbpo1qG3eUuOdDy2
-         aUVT0pT9ebdNe2YIfu3bJCLvCH4iIlR4B2zyPjNgdQBILW3VcHsVSOJ/je9K4cnkR7FZ
-         MoPkp9QXMDwZpJ9xVVlP/q7SVkyLjQTweqJLCfBpIT00ONkMRz65mJYqETtNFvdIw+HC
-         PU6g==
-X-Gm-Message-State: AOJu0YwIKsDGSbmNw+BC1mpO5QmdT8G/iyHitL0G1J0tJfpZD0ynK3Ya
-	maEiRgqZ/+C9B/GFC8ImmmPNoifWknlVPlpyqt757TFgZWbIRqou7LnBrGCRUDosmQVXvMKaWOc
-	L
-X-Gm-Gg: ASbGncsfccUGf3Czg92A8KMU/FGnoKvjYop9mjPjz18k7QvPGUe7S/ewcfMZXo6d+wb
-	nJ2BauxJOhvFVU7Yg4DxN1YqDgbiRPXtqMw842HtYAa97JqwKZR0kTBjxp06vGKFvToefpgdXUw
-	DvEAIXAeBPzAUec/AFGuHxnqp7avivVXCTBjXYtDW4CYexQmBzUbI4wyqBxPZWPShRer57JD+Bq
-	jtftuO1u+slquPAM1dRHPciDznRF7clx7F5nW9ig9KnYdpUPztZdM94p+iuWEfYVwtETVYN+AvL
-	4DEnxenoQfI=
-X-Google-Smtp-Source: AGHT+IEKtH3p0iZWvc4wvI4zaSl3ZCdVDJ4IvQh/wzRHlhk03vJGSzcy0GuY/PrLDGigIjdRABZanA==
-X-Received: by 2002:a05:6602:4a05:b0:84a:51e2:9fa5 with SMTP id ca18e2360f4ac-854fe4c17femr248352239f.3.1738947027199;
-        Fri, 07 Feb 2025 08:50:27 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-854f666c96csm77498739f.19.2025.02.07.08.50.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Feb 2025 08:50:26 -0800 (PST)
-Message-ID: <1abded6e-1d80-4876-ae7d-7e575959ba25@kernel.dk>
-Date: Fri, 7 Feb 2025 09:50:25 -0700
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="b/ZpRg6U"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 517BVFOn027661;
+	Fri, 7 Feb 2025 18:02:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=yIpQp1
+	2FTZ/2uHY1soGCDp2OsIbMPf+vb5Dpc83DTI8=; b=b/ZpRg6Uk1CrxbtXFOgEon
+	MOIN7DLPHYzus7kbb3ZHANX7gnB5WVSiELBcY5bHOja4v8sk7A2l61uwQ54Skb7c
+	pJgCVOF4xjSaiL+W8880xdETUoccuS/9L/9cTuounxrzZYRcTzxwEELQzF6Br1IS
+	Tp1neetwZPvNL3B4tyBqjMV1Y3Vb+bGCMv7VnA9G+suGd7qN5lpTLeVlAzOB7JaE
+	6BS/fety6UDxopqulLeM/Bx5ZxAB2kEUKGKUCTuUes3KghDuYqre0TE97d1qjgYz
+	+ramJ5ik51+UaxjSXWA+4t2YgBWSn1V9bRhrsdGJXkdmKwnlu2oSAMGAWTd8l6JQ
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44n910c8vj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Feb 2025 18:02:43 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 517FEB2B007130;
+	Fri, 7 Feb 2025 18:02:43 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44hxb04uty-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Feb 2025 18:02:43 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 517I2gM925166414
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 7 Feb 2025 18:02:42 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EA2385804B;
+	Fri,  7 Feb 2025 18:02:42 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 121CF58055;
+	Fri,  7 Feb 2025 18:02:40 +0000 (GMT)
+Received: from [9.171.18.147] (unknown [9.171.18.147])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  7 Feb 2025 18:02:39 +0000 (GMT)
+Message-ID: <fee9de06-e235-43c1-b756-b10e9fa2c68e@linux.ibm.com>
+Date: Fri, 7 Feb 2025 23:32:37 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,98 +62,80 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: fix lock ordering between the queue
+ ->sysfs_lock and freeze-lock
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        dlemoal@kernel.org, axboe@kernel.dk, gjoyce@ibm.com
+References: <20250205144506.663819-1-nilay@linux.ibm.com>
+ <20250205144506.663819-2-nilay@linux.ibm.com> <20250205155952.GB14133@lst.de>
+ <715ba1fd-2151-4c39-9169-2559176e30b5@linux.ibm.com>
+ <Z6X1hbzI4euK_r-S@fedora>
 Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.14-rc2
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <Z6X1hbzI4euK_r-S@fedora>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-
-Hi Linus,
-
-A small set of fixes that should go into the 6.14-rc2 kernel release.
-This pull request contains:
-
-- MD pull request via Song
-	- fix an error handling path for md-linear
-
-- NVMe pull request via Keith
-	- Connection fixes for fibre channel transport (Daniel)
-	- Endian fixes (Keith, Christoph)
-	- Cleanup fix for host memory buffer (Francis)
-	- Platform specific power quirks (Georg)
-	- Target memory leak (Sagi)
-	- Use appropriate controller state accessor (Daniel)
-
-- Fixup for a regression introduced last week, where sunvdc wasn't
-  updated for an API change, causing compilation failures on sparc64.
-
-Please pull!
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: LUR9AntVGEjvPmghVcxFskwjAiCUWL3W
+X-Proofpoint-GUID: LUR9AntVGEjvPmghVcxFskwjAiCUWL3W
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-07_08,2025-02-07_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ priorityscore=1501 impostorscore=0 bulkscore=0 clxscore=1015
+ lowpriorityscore=0 phishscore=0 spamscore=0 malwarescore=0 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502070134
 
 
-The following changes since commit 1e1a9cecfab3f22ebef0a976f849c87be8d03c1c:
 
-  block: force noio scope in blk_mq_freeze_queue (2025-01-31 07:20:08 -0700)
+On 2/7/25 5:29 PM, Ming Lei wrote:
+> On Thu, Feb 06, 2025 at 06:52:36PM +0530, Nilay Shroff wrote:
+>>
+>>
+>> On 2/5/25 9:29 PM, Christoph Hellwig wrote:
+>>> On Wed, Feb 05, 2025 at 08:14:47PM +0530, Nilay Shroff wrote:
+>>>>  
+>>>>  static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>>>> @@ -5006,8 +5008,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>>>>  		return;
+>>>>  
+>>>>  	memflags = memalloc_noio_save();
+>>>> -	list_for_each_entry(q, &set->tag_list, tag_set_list)
+>>>> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+>>>> +		mutex_lock(&q->sysfs_lock);
+>>>
+>>> This now means we hold up to number of request queues sysfs_lock
+>>> at the same time.  I doubt lockdep will be happy about this.
+>>> Did you test this patch with a multi-namespace nvme device or
+>>> a multi-LU per host SCSI setup?
+>>>
+>> Yeah I tested with a multi namespace NVMe disk and lockdep didn't 
+>> complain. Agreed we need to hold up q->sysfs_lock for multiple 
+>> request queues at the same time and that may not be elegant, but 
+>> looking at the mess in __blk_mq_update_nr_hw_queues we may not
+>> have other choice which could help correct the lock order.
+> 
+> All q->sysfs_lock instance actually shares same lock class, so this way
+> should have triggered double lock warning, please see mutex_init().
+> 
+Well, my understanding about lockdep is that even though all q->sysfs_lock
+instances share the same lock class key, lockdep differentiates locks 
+based on their memory address. Since each instance of &q->sysfs_lock has 
+got different memory address, lockdep treat each of them as distinct locks 
+and IMO, that avoids triggering double lock warning.
 
-are available in the Git repository at:
+> The ->sysfs_lock involved in this patch looks only for sync elevator
+> switch with reallocating hctxs, so I am wondering why not add new
+> dedicated lock for this purpose only?
+> 
+> Then we needn't to worry about its dependency with q->q_usage_counter(io)?
+> 
+Yes that should be possible but then as Christoph suggested, __blk_mq_update_
+nr_hw_queues already runs holding tag_list_lock and so why shouldn't we use
+the same tag_list_lock even for sched/elevator updates? That way we may avoid
+adding another new lock.
 
-  git://git.kernel.dk/linux.git tags/block-6.14-20250207
-
-for you to fetch changes up to 96b531f9bb0da924299d1850bb9b2911f5c0c50a:
-
-  Merge tag 'md-6.14-20250206' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into block-6.14 (2025-02-07 07:23:03 -0700)
-
-----------------------------------------------------------------
-block-6.14-20250207
-
-----------------------------------------------------------------
-Bart Van Assche (1):
-      md: Fix linear_set_limits()
-
-Christoph Hellwig (2):
-      nvmet: the result field in nvmet_alloc_ctrl_args is little endian
-      nvmet: add a missing endianess conversion in nvmet_execute_admin_connect
-
-Daniel Wagner (4):
-      nvme-fc: go straight to connecting state when initializing
-      nvme: handle connectivity loss in nvme_set_queue_count
-      nvme-fc: do not ignore connectivity loss during connecting
-      nvme-fc: use ctrl state getter
-
-Francis Pravin (1):
-      nvme-pci: remove redundant dma frees in hmb
-
-Georg Gottleuber (2):
-      nvme-pci: Add TUXEDO InfinityFlex to Samsung sleep quirk
-      nvme-pci: Add TUXEDO IBP Gen9 to Samsung sleep quirk
-
-Jens Axboe (2):
-      Merge tag 'nvme-6.14-2025-01-31' of git://git.infradead.org/nvme into block-6.14
-      Merge tag 'md-6.14-20250206' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into block-6.14
-
-Keith Busch (2):
-      nvmet: fix rw control endian access
-      nvme: make nvme_tls_attrs_group static
-
-Sagi Grimberg (1):
-      nvmet: fix a memory leak in controller identify
-
-Stephen Rothwell (1):
-      drivers/block/sunvdc.c: update the correct AIP call
-
- drivers/block/sunvdc.c            |  4 ++--
- drivers/md/md-linear.c            |  4 +---
- drivers/nvme/host/core.c          |  8 +++++++-
- drivers/nvme/host/fc.c            | 35 +++++++++++++++++++++++++----------
- drivers/nvme/host/pci.c           | 12 +++---------
- drivers/nvme/host/sysfs.c         |  2 +-
- drivers/nvme/target/admin-cmd.c   |  1 +
- drivers/nvme/target/fabrics-cmd.c |  2 +-
- drivers/nvme/target/io-cmd-bdev.c |  2 +-
- drivers/nvme/target/nvmet.h       |  2 +-
- 10 files changed, 43 insertions(+), 29 deletions(-)
-
--- 
-Jens Axboe
-
+Thanks,
+--Nilay
