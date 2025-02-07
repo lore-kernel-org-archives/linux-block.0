@@ -1,115 +1,124 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0F9194C6A;
-	Fri,  7 Feb 2025 23:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A4F19259D;
+	Fri,  7 Feb 2025 23:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738969922; cv=none; b=kP0jqUPObr6UFAWKpEjkY4akVm+V6SkFSuD3mnoWKf8kyQe+ULVlttvuuNu4xOHgMevOynIOmi1Cy7zp9OmHDUTjdANLtucfTXJ4/HWXrUNgVx2lQ597XPv74HaySSEMMmgSocCv80x5xZHyrI6DiaSzhntWzZnXdeS7LgKTLfE=
+	t=1738972049; cv=none; b=KA/QTkd9iQzlYdlWl6RtgAuz3ToA51cucKUop8s0mwd1+GqV1bHKaMzkUwK3AOPrOzuS4iXhSANoahwjoXlWURRHN5/G+OseqngbZydiMflFLJVzlk0pw4sxMsyUO8uOz7w5vtbNW5V2dOtGiqH+3XjwTWboUWrwgukfSGI6Xwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738969922; c=relaxed/simple;
-	bh=Oo3RrxKhrvpz9Z7Fg0GxqsF0JzC7ycu+gkRfh21rysA=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lLZYmyDWYzvrhfuyVV8rchCoqZk+EcCr/f1Fjki9LwGr6LDemMfRbEhC+GnVgXyV4ieXMvMdGt00sCzcCr8gzIRTNKm/5J+l0h88WceUBKEEMr71C6gwstFOl9mJyeSqags5ryHR/jYRgoMCxkju7ilINLUAlzeLEfQ85Fa/1OE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K+X8Pp+x; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1738972049; c=relaxed/simple;
+	bh=wKDmae79VNgiANKxlLgspJDihSPWVbopgsgLD4UPplw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KszliiunueNcF3H1lPal57ZVW61mDnd3sTZh/sqByP7Pt2dHr6XrJGY1GG00f2aiU5yBMIUm1qKrRIV6FT0L/eh3Dp6nE2LNC45l50NosXpQUReKDo12uCF84IWEHuy/bTtPDuR9Qc9PeEQDbXpswe1oI709YHnUqy0YGRJKEbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=nvSulILx; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K+X8Pp+x"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2166651f752so59165775ad.3;
-        Fri, 07 Feb 2025 15:12:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738969920; x=1739574720; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9xzwGP71iBtkAnKWv/v4nhquoUa3DKrGdnwtB4xMVLo=;
-        b=K+X8Pp+xBzJ8+yqC/8BiHQ8AxFzDD7c3yA1OCgmQuSA0eMmsqE9VQBDD7kqnw1QTEu
-         4bD1ObgFkIeSFRHQt7+awKc047GHPr8V/sk9pZmMVbBE2PiSAE/QaKdGBY8Moq0BjhsJ
-         sJQMD2XZljuyBMOIzOMB1My4dkucPY0bup1aYZhosaifD4PIrTttzzfQ36BcCoM+LSOy
-         SWHgWb7PHGLgk4jYstT6KoipNNxkUKNyCGNqnl+dFOgxj2b/TSnLkDkERd3RB1pswmfS
-         TuSqleCMO/WEBcOKepefg7UyVF/59cmstW6PdYQdqibnJWC6o6P6LKPoY6vHF2weruJe
-         o8Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738969920; x=1739574720;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9xzwGP71iBtkAnKWv/v4nhquoUa3DKrGdnwtB4xMVLo=;
-        b=A55tk+q1WZU9M0K1pJX/aU9hTkeXtvmOsl+GPoSiTjyi+rm6XxbKsMsnaHzgpjHJFv
-         N8fZZ8JbGknMEdbj2GH3cGgXBhMGeoS4y7/wbbNY90RCaOWyQVpfud8chMuHfKNs8++p
-         yQMNksPoPADLtN9BGcn2wBTES5Og3vErhWu/fVPk7v5NH7TIU9W7ZEztC/yWgRZRNwe2
-         VXmRH6h6wI6o+nEKRO2x75VDfggCeVoJrrIdPymFY8y7UJ3H/NSYBLPK3uE9qEfqPHnB
-         /hRaKppcSeE9Wga3FKfnE2J5kSJOiFN3rM0r/5UqPMs9fPcpME5fW0Scbb5HaPf0sejx
-         3cUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUVd2ZVPe61BZGPi3IPOS8aBp1cyGUpoLlKvY6Em8K/4MOfgboIR/i0EcoLBq/MPkx9f5JmvbU8rdD/X0z0@vger.kernel.org, AJvYcCUgV9erx9fDn3LKgBjN3f/RHCHsbAkV79GNN6cmRhYa5IKhFo0/iFJ0F8SlFN3KmZQAEg6E6EPiSOAEnA==@vger.kernel.org, AJvYcCWTtHqHWRwYQPummElo6nCYGGLq/APj2gXjiPebpnCobMK7N5WQucM5n+ug16OZQavUohkak8KiiFLY8RGQ2rk=@vger.kernel.org, AJvYcCXO4mWMvPG/lo4sFfBI5sfphQit7IHRjyvvxHTZeyUnqWTrHtuI6cpEP6wfuKvbc4YpL0a9hvh3@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfXAMYILKHSUtXx5IEXHzcHRB+5AuhPKurxi5jo+PWRqcCrPLd
-	fUWHsTIU/Nko+FjelQ/p2ULpaFdw8zo3Plw7olI9yG87Zfq8jwEV
-X-Gm-Gg: ASbGnctI1hKGS3yExFO8DviDI8QrDuTjTXRM+bYohGITbTXjp6PaYbP2AXDtMmpr172
-	bVk0pwUAX50DrI8zfrH0l3RhOCC72zxTNsUQs0BgG31ZX8G00skbsqmVEbkVPq/YV7RnYH1OIFR
-	1JdXUhlSfYrDrSmbNyy9U1N+Mc2MbmFy05YIlNDcoIFdbuoskk9r5+XL9att73kEhnqPcW4f8QS
-	tzOB//Obm2HmrNcrRRruBgbu8mzq/P87zhB0HFGtuDu2IP63r8F9OHlNW/PfOkYhzHN+mj6d/tY
-	1YQZmdOlOr8g5p1wmOcdyngZEAL57emQbkdbXwnsqEFfdh5/Ew==
-X-Google-Smtp-Source: AGHT+IEtQgrERIkEeRV6qfsbPPyEM8kqZoR0ydnZ9VRmTggz4ArZtp3fbcDvsY1PAsDkvAGrPJtjCg==
-X-Received: by 2002:a05:6a21:458a:b0:1e4:8fdd:8c77 with SMTP id adf61e73a8af0-1ee03a24353mr10015384637.8.1738969920503;
-        Fri, 07 Feb 2025 15:12:00 -0800 (PST)
-Received: from Cyndaquil. (203.sub-174-224-192.myvzw.com. [174.224.192.203])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ad51af7811asm3703453a12.72.2025.02.07.15.11.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 15:11:59 -0800 (PST)
-Message-ID: <67a6933f.630a0220.137520.f9b8@mx.google.com>
-X-Google-Original-Message-ID: <Z6aTPscqJ5P9Bjsy@Cyndaquil.>
-Date: Fri, 7 Feb 2025 15:11:58 -0800
-From: Mitchell Levy <levymitchell0@gmail.com>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] rust: lockdep: Remove support for dynamically
- allocated LockClassKeys
-References: <20250205-rust-lockdep-v3-0-5313e83a0bef@gmail.com>
- <20250205-rust-lockdep-v3-1-5313e83a0bef@gmail.com>
- <CANiq72kawfy3YYyo7ANYrKVjkh0n53Jt_d0=bHqHfirHCxe6_Q@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nvSulILx"
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 517Lfpr5026273;
+	Fri, 7 Feb 2025 23:47:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2023-11-20; bh=HU5ANisxh20MlKMA70imVgX1Zsd5T
+	X2ZMIFbtyqokPo=; b=nvSulILxDkVwoqPv7LHTYm/zbiwq0JU1THjIxqoteRDrT
+	w0me0+Xe8nxn26xYwqpst0SaiA1Sq7JdISI+x6V68FypuIXSiyj+itnW6+zE6amN
+	dIn1yj9jeDmg8oplWetOVvKBAd2Sga1eGvqd+3VMKztxSc4wYd7l75ExbqRM6IWc
+	G5H8xTskjvIOl1uKnKz2zO82fGRnTInxIT+agvfbeYX7UR8BrH725rmAUeQsQfbh
+	dPP5e2dmnHex30bWWhSO1as9DwRdqq8u5szJGXCW3OVa1boNR2E9m3ND1PzpwdE3
+	o9OnX146RsWvinZkjg8tKXT8gJKCoWbpEV3iH8xkg==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 44m58cntes-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 07 Feb 2025 23:47:23 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 517NUIP6028036;
+	Fri, 7 Feb 2025 23:47:22 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 44j8ds5wse-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 07 Feb 2025 23:47:22 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 517NlMLf001803;
+	Fri, 7 Feb 2025 23:47:22 GMT
+Received: from ca-dev94.us.oracle.com (ca-dev94.us.oracle.com [10.129.136.30])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 44j8ds5ws8-1;
+	Fri, 07 Feb 2025 23:47:21 +0000
+From: Alan Adamson <alan.adamson@oracle.com>
+To: linux-block@vger.kernel.org
+Cc: linux-scsi@vger.kernel.org, alan.adamson@oracle.com,
+        linux-nvme@lists.infradead.org, shinichiro.kawasaki@wdc.com
+Subject: [PATCH v4 blktests 0/2] Add atomic write tests for scsi and nvme
+Date: Fri,  7 Feb 2025 15:55:51 -0800
+Message-ID: <20250207235553.322741-1-alan.adamson@oracle.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72kawfy3YYyo7ANYrKVjkh0n53Jt_d0=bHqHfirHCxe6_Q@mail.gmail.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-07_11,2025-02-07_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0 bulkscore=0
+ mlxlogscore=999 adultscore=0 suspectscore=0 mlxscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2501170000
+ definitions=main-2502070180
+X-Proofpoint-ORIG-GUID: 5WDXrknFEkMOsiKZUSPyDHxiEtVdBbAk
+X-Proofpoint-GUID: 5WDXrknFEkMOsiKZUSPyDHxiEtVdBbAk
 
-On Fri, Feb 07, 2025 at 12:27:58AM +0100, Miguel Ojeda wrote:
-> On Wed, Feb 5, 2025 at 8:59 PM Mitchell Levy <levymitchell0@gmail.com> wrote:
-> >
-> > Currently, dynamically allocated LockCLassKeys can be used from the Rust
-> > side without having them registered. This is a soundness issue, so
-> > remove them.
-> >
-> > Suggested-by: Alice Ryhl <aliceryhl@google.com>
-> > Link: https://lore.kernel.org/rust-for-linux/20240815074519.2684107-3-nmi@metaspace.dk/
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Mitchell Levy <levymitchell0@gmail.com>
-> 
-> I imagine we should have:
-> 
->     Fixes: 6ea5aa08857a ("rust: sync: introduce `LockClassKey`")
-> 
-> Is that right?
+Changes in v4 (per John's comments):
+- Verify sysfs_atomic_unit_min_byte attribute (nvme)
+- Perform atomic write test using sysfs_atomic_unit_min_byte (nvme)
+- fix spelling mis (nvme)
+- Remove tests that don't use the RWF_ATOMIC flag (scsi+nvme)
 
-That's correct. Thank you for catching this! I will include this on a
-resend.
+Changes in v3:
+- Remove _have_xfs_io routine and use _have_program.
+- Comment cleanup in 0001
+- Add SKIP_REASONS when xfs_io -A option is absent.
+- Keep lines <=80 characters.
+- Move device_requires logic in 0001 and 0002 to common/rc.
 
-Mitchell
+Changes in v2:
+- Add additional comments in common/xfs
+- Remove xfs_io and kernel version checking
+- Simplify paths for sysfs attributes
+- Fix failed case output (missing echo) in scsi/009
+- Add local variable that sets Test # and description (test_desc) for scsi/009 and nvme/059
+- Only use scsi_debug device if no scsi test device is provided.
+- nvme testing done with qemu-nvme.
+- scsi testing done with scsi_debug and qemu-scsi (no atomic write support).  No testing on
+  atomic write capable scsi devices was done.
+-------------------------------------------------------------------------------------------
+Add tests for atomic write support.
 
-> Thanks!
-> 
-> Cheers,
-> Miguel
+Tests will be delivered for scsi (using scsi_debug) and nvme.  NVMe can use the qemu-nvme
+emulated device that supports Controller-based Atomic Parameters (QEMU 9.2).
+
+The xfs_io utility delivered with the xfsprogs-devel package (version 6.12) is required by
+these tests.
+
+The Linux Kernel 6.11 (and greater) supports Atomic Writes and is required by these tests.
+
+Alan Adamson (2):
+  scsi/009: add atomic write tests
+  nvme/059: add atomic write tests
+
+ common/rc          |   8 ++
+ common/xfs         |  58 ++++++++++++++
+ tests/nvme/059     | 146 ++++++++++++++++++++++++++++++++++++
+ tests/nvme/059.out |   9 +++
+ tests/scsi/009     | 183 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/scsi/009.out |  13 ++++
+ 6 files changed, 417 insertions(+)
+ create mode 100755 tests/nvme/059
+ create mode 100644 tests/nvme/059.out
+ create mode 100755 tests/scsi/009
+ create mode 100644 tests/scsi/009.out
+
+-- 
+2.43.5
+
