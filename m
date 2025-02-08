@@ -1,229 +1,114 @@
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D4B8F5C
-	for <linux-block@vger.kernel.org>; Sat,  8 Feb 2025 02:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8091547C9;
+	Sat,  8 Feb 2025 03:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738980593; cv=none; b=JYuLQKSILQk49S37pQCs2gyEihtHg9wsQXqgeHgkBhaTsejzkH/AaziLqznCYPFNcePF2f1LRLsclon2UuvLZ71d1+3lMd6+WVmTKvKJ02LbUaFP4NMU5SrdtX0/ivC9Q4LlG2/hqg6qjeRcaPObsufHAP/f4TMqY/A69u67sjQ=
+	t=1738984387; cv=none; b=r4e94GcPY06IHBYK7HlykgWgX6XA/Mrhf7lVj+4vMUsqT4/j5S9dD8t/N80re58pHP4FaGj61ZG+jyD5blLCQ+lxxrhXIvAu0fm+SD0Cffa5ycuMkM6SkJd16sMzpD1eP8VO0RWmBuwaQP2W7lfGEw0RMfarjM+UBHUM3wuFqIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738980593; c=relaxed/simple;
-	bh=Kwys6Yos6rj734gxLEDSjHrgfeugqXZ4WQvmYLgFH8U=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=S503j2B02Cv4iE0yALzezIwaJdBN2MTvUZ8Wc7tOFMOrEZHrlPeRStCmdt4HknXzXHLwqak/uyAA5gJCWewWtkiTjpPaydTkyDvu0ummvf1HyJUZEynJ0wysk8YCMVH7pQlbAJoFJSQs6FrSeG7DYmWzalbSQs8/HhiAM1IY2jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gSu9snl7; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gSu9snl7"
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e5b29779d74so2499224276.2
-        for <linux-block@vger.kernel.org>; Fri, 07 Feb 2025 18:09:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738980590; x=1739585390; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=B7F5+YKw3cfP6u4EjZ/wBC2ChjcnxUSc8br9u3iG6OM=;
-        b=gSu9snl7ew0JRTQI44eArIxjZDg7P5vRazlaQ8NcS18fqAr+FxZ2ZfRYjp6w4egS8t
-         Lg5i9973oXF3C3lFS4DSxZj6eMQ29lgnMS5ZZd4Pnm5KJ/ZL4aXON4B55LWYESimimT3
-         QSxkqpFFCU6gfnkp93BhKz/i3eb5usMcL4kv8Ig+4zUrNM/IdSaQ3ycaf194n6T0EdgP
-         PRs1vnP+Twn85/bJMVzqOgNsjBujAFPavXs2CmRxSIEQIKyA79fFDmDUjbZWdcVnV4d6
-         8aapoaWWYFUcXKcMHjx7wavhFkvBwG0YZ6IZXxsRDWKAxaavNf4Fi8J+xI2uPeCUQGQ7
-         Xq0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738980590; x=1739585390;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B7F5+YKw3cfP6u4EjZ/wBC2ChjcnxUSc8br9u3iG6OM=;
-        b=I24/Re9e2XscdEGSJmf/g5mIAOr3XuDIGXzE1IRkfiqQlRTzz7aoDgHjRB3lePqc50
-         4nkf5Xi6oqEq8r4dS5RyB26IlxM6oXghII3Zt6SXccV+dZrZEUoiiBUWrWy33jNsYcfh
-         2h6DpEgQ1L+4l5BzZ7XB6z4bDudZp2daGdVftoUyRdKl0bVJbdUUMxI9kzKrUqGGcclf
-         gY2tltIL9+1s2t/IcECogkGFzNfePRjB9QrOciwO6VjI87f3liWFx7ymXppoo5B/7H12
-         LBVUPZWgHtwbsBc8GoUAoDp/TVl/H/YbCg7tUwG0ue+3MQ1izINwFcu+WWTfVXLLstoF
-         6Uig==
-X-Gm-Message-State: AOJu0YzLGDxnYlQTcZyZHIZ5O30574cijnji4WehzkyhwSgylXtWK953
-	R48wP4JiIylPxklFSo/37AYNCVAvzeFP0UpidOpcmI9vriMPZpLCmMY3vd3XzXTq8lwHUDyQp3z
-	HPXbl87jPx9v/k1rvj2iTIUSkzRJKow8L
-X-Gm-Gg: ASbGncv1ZkuiaskKss0WDe2WkyKxLe5idkbLI5mgr2G4uin+cqW83YToAlbbRTEXfv5
-	+s/Y7o+IY0TKddmuaVchIYZQAsJGB1YwEmToRfbgCI5+hUuOEYAWAB9I/I0SimX05pCD1ojxN
-X-Google-Smtp-Source: AGHT+IFeWNUAyqwrG5mbDYhTXxW6SrlU+jnCYeBOVAcZBoyBunHpRkaLk/MlBK4MeI6JgDhYBcGGrTjTy4KLFdGv8gs=
-X-Received: by 2002:a05:6902:2185:b0:e5b:3e10:14f2 with SMTP id
- 3f1490d57ef6-e5b46283135mr4476271276.43.1738980590427; Fri, 07 Feb 2025
- 18:09:50 -0800 (PST)
+	s=arc-20240116; t=1738984387; c=relaxed/simple;
+	bh=VX6uwaIuuHIeFUDpO1ARDCQuWM2rr0gm/U8UpfQylTw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YZVc/A8D7KvYWpYpPL/xZfZYQV0x1vNHpuFCkZzrfbxTmXvIInn6svmOt8DkrB+P1JQ7WD3b0cyRpmgXWtjWLahp56OgDF92fHmakwpqdJzUVWM7+wjcGfr9DuVGxr8G2B3YMHaAaaNs7b0w/wgNheC9CKaTtaz8eZ2MbsaultE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YqbVs354vz4f3jMQ;
+	Sat,  8 Feb 2025 11:12:37 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id F0B121A1428;
+	Sat,  8 Feb 2025 11:12:59 +0800 (CST)
+Received: from [10.174.179.80] (unknown [10.174.179.80])
+	by APP4 (Coremail) with SMTP id gCh0CgBHrGC5y6ZnjDPoDA--.64325S3;
+	Sat, 08 Feb 2025 11:12:59 +0800 (CST)
+Message-ID: <3b1dcd45-efa6-4aad-9cd4-3302a29eb093@huaweicloud.com>
+Date: Sat, 8 Feb 2025 11:12:57 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Cheyenne Wills <cheyenne.wills@gmail.com>
-Date: Fri, 7 Feb 2025 19:09:39 -0700
-X-Gm-Features: AWEUYZlC5RnFarKlZl0Obg5b0zZnUule-Pe9EVBZld1tEOebYO-kTGGLGzXOIFY
-Message-ID: <CAHpsFVeew-p9xB9DB52Pk_6mXfFxJbT8p14h5+YRTKabEfU3BQ@mail.gmail.com>
-Subject: BUG: NULL pointer dereferenced within __blk_rq_map_sg
-To: linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 4/8] dm: add BLK_FEAT_WRITE_ZEROES_UNMAP support
+To: Benjamin Marzinski <bmarzins@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+ linux-kernel@vger.kernel.org, hch@lst.de, tytso@mit.edu, djwong@kernel.org,
+ yi.zhang@huawei.com, chengzhihao1@huawei.com, yukuai3@huawei.com,
+ yangerkun@huawei.com
+References: <20250115114637.2705887-1-yi.zhang@huaweicloud.com>
+ <20250115114637.2705887-5-yi.zhang@huaweicloud.com>
+ <Z6aFtJzGWMNhILJW@redhat.com>
+Content-Language: en-US
+From: Zhang Yi <yi.zhang@huaweicloud.com>
+In-Reply-To: <Z6aFtJzGWMNhILJW@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgBHrGC5y6ZnjDPoDA--.64325S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KFWxZr4kXFy8CF1xuw18uFg_yoW8AF15pF
+	n2ga4Iyry5tF47C3W0gFW2vFyYga1YyFy7Cry7C3y5ZF15Kry8KFsFyFy7Wan8Ja47Xw48
+	t3WjkF9rZw4UZ3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
+	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1
+	7KsUUUUUU==
+X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
 
-While I was setting up to test with linux 6.14-rc1 (under Xen), I ran
-into a consistent NULL ptr dereference within __blk_rq_map_sg when
-booting the system.
+On 2025/2/8 6:14, Benjamin Marzinski wrote:
+> On Wed, Jan 15, 2025 at 07:46:33PM +0800, Zhang Yi wrote:
+>> From: Zhang Yi <yi.zhang@huawei.com>
+>>
+>> Set the BLK_FEAT_WRITE_ZEROES_UNMAP feature on stacking queue limits by
+>> default. This feature shall be disabled if any underlying device does
+>> not support it.
+>>
+>> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+>> ---
+>>  drivers/md/dm-table.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+>> index bd8b796ae683..58cce31bcc1e 100644
+>> --- a/drivers/md/dm-table.c
+>> +++ b/drivers/md/dm-table.c
+>> @@ -598,7 +598,8 @@ int dm_split_args(int *argc, char ***argvp, char *input)
+>>  static void dm_set_stacking_limits(struct queue_limits *limits)
+>>  {
+>>  	blk_set_stacking_limits(limits);
+>> -	limits->features |= BLK_FEAT_IO_STAT | BLK_FEAT_NOWAIT | BLK_FEAT_POLL;
+>> +	limits->features |= BLK_FEAT_IO_STAT | BLK_FEAT_NOWAIT | BLK_FEAT_POLL |
+>> +			    BLK_FEAT_WRITE_ZEROES_UNMAP;
+>>  }
+>>  
+> 
+> dm_table_set_restrictions() can set limits->max_write_zeroes_sectors to
+> 0, and it's called after dm_calculate_queue_limits(), which calls
+> blk_stack_limits(). Just to avoid having the BLK_FEAT_WRITE_ZEROES_UNMAP
+> still set while a device's max_write_zeroes_sectors is 0, it seems like
+> you would want to clear it as well if dm_table_set_restrictions() sets
+> limits->max_write_zeroes_sectors to 0.
+> 
 
-Using git bisect I was able to narrow down the "bad" commit to:
+Hi, Ben!
 
-block: add a dma mapping iterator (b7175e24d6acf79d9f3af9ce9d3d50de1fa748ec)
+Yeah, right. Thanks for pointing this out, and I also checked other
+instances in dm where max_write_zeroes_sectors is set to 0, and it seems
+we should also clear BLK_FEAT_WRITE_ZEROES_UNMAP in
+disable_write_zeroes() as well.
 
-Building a kernel with the parent commit
-(2caca8fc7aad9ea9a6ea3ed26ed146b1e5f06fab) using the same .config does
-not fail.
+Thanks,
+Yi.
 
-Following is the console log showing the error as well as the Xen
-(libvirt) configuration for the guest that I'm using.
-
-Please let me know if there is any additional information that I can provide.
-
-cheyenne.wills@gmail.com
-
-Console log with error
-----
-
-[    6.535764] BUG: kernel NULL pointer dereference, address: 0000000000000028
-[    6.547530] #PF: supervisor read access in kernel mode
-[    6.556013] #PF: error_code(0x0000) - not-present page
-[    6.566162] PGD 0 P4D 0
-[    6.572427] Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
-[    6.580457] CPU: 14 UID: 0 PID: 1433 Comm: kworker/14:1H Not
-tainted 6.14.0-rc1+ #1
-[    6.592054] Hardware name: Xen HVM domU, BIOS 4.19.1 01/17/2025
-[    6.600738] Workqueue: kblockd blk_mq_requeue_work
-[    6.610356] RIP: 0010:__blk_rq_map_sg+0x3d/0x410
-[    6.618285] Code: 54 45 31 e4 55 48 89 cd 53 48 89 d3 48 83 ec 60
-48 8b 4e 38 65 48 8b 04 25 28 00 00 00 48 89 44 24 58 31 c0 48 89 e8
-44 89 e5 <44> 8b 69 28 44 8b 41 2c 49 89 c4 44 8b 79 30 e9 b0 00 00 00
-48 85
-[    6.640873] RSP: 0018:ffffbd02005ebb38 EFLAGS: 00010046
-[    6.649672] RAX: ffffbd02005ebc08 RBX: ffffa18cc11a7200 RCX: 0000000000000000
-[    6.660862] RDX: ffffa18cc11a7200 RSI: ffffa18cc11e6600 RDI: ffffa18cc23a8000
-[    6.672288] RBP: 0000000000000000 R08: ffffa18cc23a0000 R09: ffffa18cc11e6600
-[    6.683278] R10: ffffa18cc1642980 R11: ffffa18cc148e400 R12: 0000000000000000
-[    6.695085] R13: ffffa18cc11e6600 R14: ffffa18cc23a0be0 R15: ffffa18cc23a0000
-[    6.708417] FS:  0000000000000000(0000) GS:ffffa18dc6d80000(0000)
-knlGS:0000000000000000
-[    6.724049] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    6.736413] CR2: 0000000000000028 CR3: 000000010a5e2000 CR4: 0000000000750ef0
-[    6.748664] PKRU: 55555554
-[    6.755404] Call Trace:
-[    6.761889]  <TASK>
-[    6.766985]  ? __die+0x23/0x70
-[    6.774405]  ? page_fault_oops+0x158/0x460
-[    6.784689]  ? exc_page_fault+0x6b/0x150
-[    6.793848]  ? asm_exc_page_fault+0x26/0x30
-[    6.801585]  ? __blk_rq_map_sg+0x3d/0x410
-[    6.808362]  blkif_queue_rq+0x1de/0x840
-[    6.816009]  blk_mq_dispatch_rq_list+0x117/0x6b0
-[    6.822869]  __blk_mq_sched_dispatch_requests+0xb0/0x5b0
-[    6.830766]  ? __remove_hrtimer+0x39/0x90
-[    6.837653]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    6.846842]  ? xas_load+0xd/0xd0
-[    6.852211]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    6.858252]  ? xas_find+0x157/0x1a0
-[    6.863941]  blk_mq_sched_dispatch_requests+0x2d/0x70
-[    6.871505]  blk_mq_run_hw_queue+0x22c/0x2f0
-[    6.879164]  blk_mq_run_hw_queues+0x67/0x120
-[    6.887146]  blk_mq_requeue_work+0x162/0x1a0
-[    6.896083]  process_one_work+0x148/0x360
-[    6.905583]  worker_thread+0x2cb/0x3e0
-[    6.914302]  ? __pfx_worker_thread+0x10/0x10
-[    6.923801]  kthread+0xf1/0x1d0
-[    6.931407]  ? __pfx_kthread+0x10/0x10
-[    6.940421]  ret_from_fork+0x34/0x50
-[    6.948756]  ? __pfx_kthread+0x10/0x10
-[    6.956678]  ret_from_fork_asm+0x1a/0x30
-[    6.965756]  </TASK>
-[    6.971401] Modules linked in:
-[    6.977370] CR2: 0000000000000028
-[    6.983075] ---[ end trace 0000000000000000 ]---
-[    6.989697] RIP: 0010:__blk_rq_map_sg+0x3d/0x410
-[    6.998861] Code: 54 45 31 e4 55 48 89 cd 53 48 89 d3 48 83 ec 60
-48 8b 4e 38 65 48 8b 04 25 28 00 00 00 48 89 44 24 58 31 c0 48 89 e8
-44 89 e5 <44> 8b 69 28 44 8b 41 2c 49 89 c4 44 8b 79 30 e9 b0 00 00 00
-48 85
-[    7.027159] RSP: 0018:ffffbd02005ebb38 EFLAGS: 00010046
-[    7.035909] RAX: ffffbd02005ebc08 RBX: ffffa18cc11a7200 RCX: 0000000000000000
-[    7.047863] RDX: ffffa18cc11a7200 RSI: ffffa18cc11e6600 RDI: ffffa18cc23a8000
-[    7.060227] RBP: 0000000000000000 R08: ffffa18cc23a0000 R09: ffffa18cc11e6600
-[    7.070223] R10: ffffa18cc1642980 R11: ffffa18cc148e400 R12: 0000000000000000
-[    7.079521] R13: ffffa18cc11e6600 R14: ffffa18cc23a0be0 R15: ffffa18cc23a0000
-[    7.089842] FS:  0000000000000000(0000) GS:ffffa18dc6d80000(0000)
-knlGS:0000000000000000
-[    7.101846] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    7.110248] CR2: 0000000000000028 CR3: 000000010a5e2000 CR4: 0000000000750ef0
-[    7.121235] PKRU: 55555554
-[    7.126201] note: kworker/14:1H[1433] exited with irqs disabled
-[    7.134082] note: kworker/14:1H[1433] exited with preempt_count 1
-[    7.143106] kworker/14:1H (1433) used greatest stack depth: 12848 bytes left
-[    1.295002] cpu 9 spinlock event irq 121
-
-----
-
-Here is the libvirt/virtmanager configuration for the xen guest (if
-this is of any help).
-The xen hypervisor is: xen_version: 4.19.1 and the dom0 is gentoo with
-a 6.6.67 kernel.
-
-<domain type="xen">
-  <name>linux614-test</name>
-  <uuid>xxxxxxxxxxxxxxxxxx</uuid>
-  <metadata>
-    <libosinfo:libosinfo
-xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">
-      <libosinfo:os id="http://gentoo.org/gentoo/rolling"/>
-    </libosinfo:libosinfo>
-  </metadata>
-  <memory unit="KiB">8388608</memory>
-  <currentMemory unit="KiB">8388608</currentMemory>
-  <vcpu placement="static">16</vcpu>
-  <os>
-    <type arch="x86_64" machine="xenfv">hvm</type>
-    <loader type="rom">/usr/lib/xen/boot/hvmloader</loader>
-    <boot dev="hd"/>
-  </os>
-  <features>
-    <acpi/>
-    <apic/>
-    <pae/>
-  </features>
-  <clock offset="utc"/>
-  <on_poweroff>destroy</on_poweroff>
-  <on_reboot>restart</on_reboot>
-  <on_crash>destroy</on_crash>
-  <devices>
-    <emulator>/usr/lib/xen/bin/qemu-system-i386</emulator>
-    <disk type="file" device="disk">
-      <driver name="qemu" type="raw"/>
-      <source file="/var/lib/libvirt/images/linux614-test.img"/>
-      <target dev="xvda" bus="xen"/>
-    </disk>
-    <controller type="xenbus" index="0"/>
-    <controller type="ide" index="0"/>
-    <interface type="bridge">
-      <mac address="xxxxxxx"/>
-      <source bridge="br0"/>
-      <model type="e1000"/>
-    </interface>
-    <serial type="pty">
-      <target port="0"/>
-    </serial>
-    <console type="pty">
-      <target type="serial" port="0"/>
-    </console>
-    <input type="tablet" bus="usb"/>
-    <input type="mouse" bus="ps2"/>
-    <input type="keyboard" bus="ps2"/>
-    <graphics type="vnc" port="-1" autoport="yes">
-      <listen type="address"/>
-    </graphics>
-    <video>
-      <model type="vga" vram="16384" heads="1" primary="yes"/>
-    </video>
-    <memballoon model="xen"/>
-  </devices>
-</domain>
