@@ -1,60 +1,64 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6BC2179BC
-	for <linux-block@vger.kernel.org>; Sat,  8 Feb 2025 13:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF2C1DDE9;
+	Sat,  8 Feb 2025 14:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739020749; cv=none; b=T0ey+nb21UoaSfKA/AmxSLPDaDEOvcTNFEFk4uFlXU7ZcK8zcTQ7b+mVEOVm/huch8xFOTEOgX5umh9uvuE3haZcWyezniYsl8K/ry9LmRNL75va225q7yug8FRGMZ+rdm5FOGqwfuiK+c+zDmesk19i8ybWZCdhlequXyHepTU=
+	t=1739023242; cv=none; b=gI35Q6W1jNGhYFN3iw11/NZuA7adSz17JsK3p9qc8iEmLhTDWKh+xrWPgAYJWEDtHKVnpk1Tn2alPEuar3gipVuJ/Fm3gD0QxyYKZAzXtEtmScAXVkK5ibV4p8RQfenO7OlY/h350pDqPj/OG6ZHGrbqny3vWd0wNQcfNCHKcFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739020749; c=relaxed/simple;
-	bh=gJ+p+nL+2ZubnnChwgrFmQdUo2yD7zqpW7oMwnfw7oY=;
+	s=arc-20240116; t=1739023242; c=relaxed/simple;
+	bh=6SOJrVkaoPv/LIQ0lX9Pyci6rowXmS+AhmEBv8Lkrm8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pd0U3Ol1ZNqLLZhkex6bi4Uy2IArhk53CUdEA4behncLrGE5d82NuF8+fUVkYXUuczE/nVpE1k9ihFu4qO7st42E8omqIB8Bqs5/TYQd7vrQvKGOj79q9bEu9CTWq5SM1OxpSdFPakeI0Jz42/mky2jrJlpGuLcDkqgEI98EZ2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=s/4ckfbZ; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 In-Reply-To:Content-Type; b=bBQZUEtZtOcE7myN36jHwGFh+QlrVXbrhuE4rS99ykbSlygWs6RZrpfQTrk8+vka+lG7Sk1du+1e0vEJ9I0zJT5Kef8WyASBmTDIfn8WPJWNbswxIxcFbu2ln+TrMkIKyqyHD83xCvE7EiU9EReYxZsM0bTDp/DeSdw4EkW78s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=epRwQqd6; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="s/4ckfbZ"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 518CDZJN028544;
-	Sat, 8 Feb 2025 13:18:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=wX8d9A
-	P+7nCLejUc1EVhWXc3zPn9Y+Pk234meoyA62o=; b=s/4ckfbZsajCLQaXyslmj2
-	SDhRsf+m5+ZUvQauYH6+LjhTH0Ckv2ww28VR/d1s2t4rqGt6eQvQLdlWdhghaJ0s
-	tGel3PMp1WFuXcvxM+SdU7kbae6be49RxMpG32Qt1HGaaXHvwqAze/sSd41hVH/3
-	XeT+PLDXWePjINrbfKAyIfNbSv9IHhOh1fYO2OPqDal8SYg/jT2b2QY5gpzVhe+7
-	LzxZun/E0eY7pzCqZSEKpKtBoNsd/piAURqj9k9a6AP/Yh2h2uzvZv+FFP/1mNxs
-	avM6S66xzBLudEyt9i40scs2TMIX1ptL3mgxT1YmD/aCnzYeSutziJXg0DKpLMgw
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44p2ynrtea-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 08 Feb 2025 13:18:54 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5189njmP024540;
-	Sat, 8 Feb 2025 13:18:54 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44hxxnr5w0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 08 Feb 2025 13:18:54 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 518DIrK129557424
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 8 Feb 2025 13:18:53 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CE06858053;
-	Sat,  8 Feb 2025 13:18:53 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E912B58043;
-	Sat,  8 Feb 2025 13:18:50 +0000 (GMT)
-Received: from [9.171.81.239] (unknown [9.171.81.239])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Sat,  8 Feb 2025 13:18:50 +0000 (GMT)
-Message-ID: <93e9393b-f008-4ef2-bc04-67fdf7af320f@linux.ibm.com>
-Date: Sat, 8 Feb 2025 18:48:48 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="epRwQqd6"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-aaf900cc7fbso513468766b.3;
+        Sat, 08 Feb 2025 06:00:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739023239; x=1739628039; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fGAcqckTNKKDS6462vJ976x93X2f89+XGq5zOwYTOnM=;
+        b=epRwQqd6Kg0SB30WNlpF4fGHqM3bJEDOHJcq++wbRgmH8HAiCtFqtMEQRZhZf/Hfiq
+         z/izxThZ2PaHRcmBR1osvM3lEtJ3vgXnXYxV+cZEQ42kGhjK9TN6sRNn2cNfmaxRmTdD
+         852XkS+LBtyMwfUkE5TZ/Dkjooofra7rK96xfXHWXlwhVK1A4+a+Bqz8GOMXW9XsyEE4
+         OJ9ZdrBSOoRkrKj7iPNaeYvcDGhwjFxEbr674Yt5EgXMxtMN+JVgzUdKjTOk9mdfXii2
+         vEO5b+EdOpDgppn4wutjPj/sGDyBNxNIjqzcx3IUcKtBhYTFdZiW0Lyplqkv166OGpaf
+         ZHQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739023239; x=1739628039;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fGAcqckTNKKDS6462vJ976x93X2f89+XGq5zOwYTOnM=;
+        b=LJTrfA7EyIeCdxvuDg4eqAg1PZHrQWDc3uM1yFzR5ZXOgLgW8DoC3hhKmsRcwDx9t4
+         7/mxIOIiEEvBTOR3xTrlY9Ati7rzdM2ux5xUSiiV55rBrHOCy4Lb/z3DQjYl2jO03Ugy
+         HZls6Wzs/A6yJOX1Z094wrszB3IsDLVTkerWktKDGQBib3395g34CHXN3hwE8eHV+9iu
+         Ki0taMZv2JrSNIsRU2Tj6VLRz+XQu5BDhSQt4lDyw9CxhS/8sQr7j+CYYphXC6Qd2vky
+         yUZy2qogNN/IAEqe2OBCHXkP50v5naIPi2xXTGbSe2DrKWkj6FWaMbHgTguhGp9R7CuM
+         hJKA==
+X-Forwarded-Encrypted: i=1; AJvYcCV2CkR/aUV7ORf91uFkGXhdn/4m0ZOqb9G0Hi4FJcO2CAsVFXyhMjpcrC++OJfIQauqfwseXib8RqOLlcg=@vger.kernel.org, AJvYcCVm0MHn5YS8mH5XelTUW4fX8ZfR/ZRR1uA3HeNgFTjbkvG9MXOIV9yfUS5epUCOXSQdKyAI+lzRAw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyt79MM5KHGrJeOpWDxlNHlCjwGeLk7JNJF9bCA4efeg8rXKcCe
+	IDTBkoK0YVy2950LJJQzAjl3kPv//hxczh+Q2KUfDT4k6PnCJyR0
+X-Gm-Gg: ASbGncuRQq5nJ00srXVjIbRi3l7oDrdZ7r7fqr1zSWm+lMlbNk7F0d3osGuTi1bR+BZ
+	+RjraPwKFcpVnuAxjOkBxITcxhdCJ/jQCrY5t6p+RULlU4JB51I7CFtkStNG0OkNaJ2bKwe/6bG
+	vvnwy5IGCCrdeMIjqUZg2IStDB29a1Us5ZQf4zPYAij0VRWxhxIJQ2eyosmtDw6rAPqHU6DdskO
+	WDzggZYF+JzvYI82KaTUOtQkQO21rXjNNO0JT0zcWaYgY2OkV2yNTDVN9br4fo6tb7Vq/iVXoA7
+	XDNIPf46udEMDiRnmAq8/7eUBA==
+X-Google-Smtp-Source: AGHT+IEpez2orbXRYz2WjK75M4+g/bPcwTODSDFgGlrF6eLh9N+yuQ1pEeui8GK/nKnT+dwNpJNF+g==
+X-Received: by 2002:a17:906:8417:b0:ab7:9285:301e with SMTP id a640c23a62f3a-ab792853034mr420631466b.5.1739023238291;
+        Sat, 08 Feb 2025 06:00:38 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.133.220])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5de58404347sm1876495a12.9.2025.02.08.06.00.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 08 Feb 2025 06:00:36 -0800 (PST)
+Message-ID: <d05ab6d4-8b8b-46c7-9597-f04885c6acda@gmail.com>
+Date: Sat, 8 Feb 2025 14:00:38 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,141 +66,59 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: fix lock ordering between the queue
- ->sysfs_lock and freeze-lock
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        dlemoal@kernel.org, axboe@kernel.dk, gjoyce@ibm.com
-References: <20250205144506.663819-1-nilay@linux.ibm.com>
- <20250205144506.663819-2-nilay@linux.ibm.com> <20250205155952.GB14133@lst.de>
- <715ba1fd-2151-4c39-9169-2559176e30b5@linux.ibm.com>
- <Z6X1hbzI4euK_r-S@fedora>
- <fee9de06-e235-43c1-b756-b10e9fa2c68e@linux.ibm.com>
- <Z6cWE_scvYcE_mWN@fedora>
+Subject: Re: [PATCH 6/6] io_uring: cache nodes and mapped buffers
+To: Keith Busch <kbusch@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, io-uring@vger.kernel.org,
+ linux-block@vger.kernel.org, ming.lei@redhat.com, axboe@kernel.dk
+References: <20250203154517.937623-1-kbusch@meta.com>
+ <20250203154517.937623-7-kbusch@meta.com>
+ <a6845bcf-8881-4b92-acc0-0aab8d98cba9@gmail.com>
+ <Z6Yn1GOPlMfpZqsf@kbusch-mbp>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <Z6cWE_scvYcE_mWN@fedora>
-Content-Type: text/plain; charset=UTF-8
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <Z6Yn1GOPlMfpZqsf@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: MQYQwPdk6naSxfHW0pGx2riA0ODsk7Sp
-X-Proofpoint-ORIG-GUID: MQYQwPdk6naSxfHW0pGx2riA0ODsk7Sp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-08_05,2025-02-07_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- priorityscore=1501 mlxscore=0 impostorscore=0 suspectscore=0
- malwarescore=0 clxscore=1015 lowpriorityscore=0 mlxlogscore=999
- bulkscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502080108
 
+On 2/7/25 15:33, Keith Busch wrote:
+...
+>>> diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+>>> index 864c2eabf8efd..5434b0d992d62 100644
+>>> --- a/io_uring/rsrc.c
+>>> +++ b/io_uring/rsrc.c
+>>> @@ -117,23 +117,39 @@ static void io_buffer_unmap(struct io_ring_ctx *ctx, struct io_rsrc_node *node)
+>>>    				unpin_user_page(imu->bvec[i].bv_page);
+>>>    		if (imu->acct_pages)
+>>>    			io_unaccount_mem(ctx, imu->acct_pages);
+>>> -		kvfree(imu);
+>>> +		if (struct_size(imu, bvec, imu->nr_bvecs) >
+>>> +				ctx->buf_table.imu_cache.elem_size ||
+>>
+>> It could be quite a large allocation, let's not cache it if
+>> it hasn't came from the cache for now. We can always improve
+>> on top.
+> 
+> Eh? This already skips inserting into the cache if it wasn't allocated
+> out of the cache.
 
+Ah yes, you're right, I overlooked it.
 
-On 2/8/25 2:00 PM, Ming Lei wrote:
-> On Fri, Feb 07, 2025 at 11:32:37PM +0530, Nilay Shroff wrote:
+> 
+> I picked an arbitrary size, 512b, as the threshold for caching. If you
+> need more bvecs than fit in that, it falls back to a kvmalloc/kvfree.
+> The allocation overhead is pretty insignificant when you're transferring
+> large payloads like that, and 14 vectors was chosen as the tipping point
+> because it fits in a nice round number.
+>   
+>> And can we invert how it's calculated? See below. You'll have
+>> fewer calculations in the fast path, and I don't really like
+>> users looking at ->elem_size when it's not necessary.
 >>
 >>
->> On 2/7/25 5:29 PM, Ming Lei wrote:
->>> On Thu, Feb 06, 2025 at 06:52:36PM +0530, Nilay Shroff wrote:
->>>>
->>>>
->>>> On 2/5/25 9:29 PM, Christoph Hellwig wrote:
->>>>> On Wed, Feb 05, 2025 at 08:14:47PM +0530, Nilay Shroff wrote:
->>>>>>  
->>>>>>  static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->>>>>> @@ -5006,8 +5008,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
->>>>>>  		return;
->>>>>>  
->>>>>>  	memflags = memalloc_noio_save();
->>>>>> -	list_for_each_entry(q, &set->tag_list, tag_set_list)
->>>>>> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
->>>>>> +		mutex_lock(&q->sysfs_lock);
->>>>>
->>>>> This now means we hold up to number of request queues sysfs_lock
->>>>> at the same time.  I doubt lockdep will be happy about this.
->>>>> Did you test this patch with a multi-namespace nvme device or
->>>>> a multi-LU per host SCSI setup?
->>>>>
->>>> Yeah I tested with a multi namespace NVMe disk and lockdep didn't 
->>>> complain. Agreed we need to hold up q->sysfs_lock for multiple 
->>>> request queues at the same time and that may not be elegant, but 
->>>> looking at the mess in __blk_mq_update_nr_hw_queues we may not
->>>> have other choice which could help correct the lock order.
->>>
->>> All q->sysfs_lock instance actually shares same lock class, so this way
->>> should have triggered double lock warning, please see mutex_init().
->>>
->> Well, my understanding about lockdep is that even though all q->sysfs_lock
->> instances share the same lock class key, lockdep differentiates locks 
->> based on their memory address. Since each instance of &q->sysfs_lock has 
->> got different memory address, lockdep treat each of them as distinct locks 
->> and IMO, that avoids triggering double lock warning.
+>> #define IO_CACHED_BVEC_SEGS	N
 > 
-> That isn't correct, think about how lockdep can deal with millions of
-> lock instances.
-> 
-> Please take a look at the beginning of Documentation/locking/lockdep-design.rst
-> 
-> ```
-> The validator tracks the 'usage state' of lock-classes, and it tracks
-> the dependencies between different lock-classes.
-> ```
-> 
-> Please verify it by the following code:
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 4e76651e786d..a4ffc6198e7b 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -5150,10 +5150,37 @@ void blk_mq_cancel_work_sync(struct request_queue *q)
->  		cancel_delayed_work_sync(&hctx->run_work);
->  }
-> 
-> +struct lock_test {
-> +	struct mutex	lock;
-> +};
-> +
-> +void init_lock_test(struct lock_test *lt)
-> +{
-> +	mutex_init(&lt->lock);
-> +	printk("init lock: %p\n", lt);
-> +}
-> +
-> +static void test_lockdep(void)
-> +{
-> +	struct lock_test A, B;
-> +
-> +	init_lock_test(&A);
-> +	init_lock_test(&B);
-> +
-> +	printk("start lock test\n");
-> +	mutex_lock(&A.lock);
-> +	mutex_lock(&B.lock);
-> +	mutex_unlock(&B.lock);
-> +	mutex_unlock(&A.lock);
-> +	printk("end lock test\n");
-> +}
-> +
->  static int __init blk_mq_init(void)
->  {
->  	int i;
-> 
-> +	test_lockdep();
-> +
->  	for_each_possible_cpu(i)
->  		init_llist_head(&per_cpu(blk_cpu_done, i));
->  	for_each_possible_cpu(i)
-> 
-> 
-> 
-Thank you Ming for providing the patch for testing lockdep!
-You and Christoph were correct. The lockdep should complain about possible 
-recursive locking for q->sysfs_lock and after a bit of debugging I think I found
-the cause about why on my system lockdep was unable to complain about recursive locking. 
-The reason is on my test system, I enabled KASAN and KASAN reported a potential 
-use-after-free bug that tainted the kernel and disabled the further lock debugging. 
-Hence any subsequent locking issues were not detected by lockdep. 
+> Yah, that's fine.
 
-Thanks,
---Nilay
+-- 
+Pavel Begunkov
 
