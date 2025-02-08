@@ -1,167 +1,182 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C1D23C8D6
-	for <linux-block@vger.kernel.org>; Sat,  8 Feb 2025 08:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 848771A8F71
+	for <linux-block@vger.kernel.org>; Sat,  8 Feb 2025 09:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739003431; cv=none; b=MhFRmmIpvdmRXMBU8gSo0YEFrbGTLPiglPkUi5Zvk2elPkHoNu5V0A+PilWHY5NL4fpz/KJL+x6bycN3qtBmk0VstdfryblTpDpR8WN/rJtcy6gxc0AgBeU6FH3zSYvTPfLe2H5aqVidJh9sUywtUQDJC8oj24QMzfrWIDzBao8=
+	t=1739005585; cv=none; b=G7/vG2p7ul/ngBh01YjLgEZhHMlvQ/VFNna2hOH/T2EnxuNo0MGkvufkqq7x/KacWvLkeugmcIEbp1DL06IAG6YQmWV91iq0pYbmIs0OSLK9hOftuLV/byMTYc3mLsxn4+dj+SCxqkiRHCSb9PyqFWegxuskhQEgqfE0J8sMyXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739003431; c=relaxed/simple;
-	bh=Ff186vZTkkWOHTsGRTEcxihh0ir5Ce0THy/5xlTrkQA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q7EKWPsOtxvYrsXLnGoonUtUniKIc7yph1lFhYSzWqKUyXA2i20IyCWQpHDcumh2k7Qinn25IiRbhpAhpee90gmivoJ6vHFpPKxkPju9c+mImcQFazddB5obXcPdvrSFOLvnt68V5k8fOV96ru2//rfb+NLeFecWiMHRqX4ZOqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SdBJGflW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1739005585; c=relaxed/simple;
+	bh=+a6/zIR7aUtVLh/xqg8uHFhRgBSdM5hg5CQ8TUtP3fU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KRbhCTLl1P2wdHQ9D9RH3NDBFSM0jKaXbGNWsufx81oOL+xvZLuNQzcbpyaQ5H/hI1bsbEyeKRVDp+C4bQmNTIUX7S6TnmBrf2IK4I0TNpzYxzXNnDmUsXfYPkejEuo6yftUBaZmn8wC6j0EwXzIQncztrIYgcMevOGGTJU3MS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=YHP9OysS; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SdBJGflW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739003428;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wLdXMMRILupURM/myRQkUyRnuG3IslEM4XpxtbPyZwY=;
-	b=SdBJGflWaIPRkzgtOyEh/VMM5Qa97lCtLX5MyNdzdZLlvJYsxnDnlwQcHmz9gwQ/To3NBS
-	0zEYYuD305F4jTbBIcLa2E0+Pkj/5Fjg18ZEhfoY19cb3Ta/YYnVLMyEMKvaPyvxnNacQ3
-	7iFc0dAyhuw8K42AL+9F/JKT9PpV3b8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-684-zLNU4VJEM32fTah-MhFwzQ-1; Sat,
- 08 Feb 2025 03:30:24 -0500
-X-MC-Unique: zLNU4VJEM32fTah-MhFwzQ-1
-X-Mimecast-MFC-AGG-ID: zLNU4VJEM32fTah-MhFwzQ
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E43DC1956094;
-	Sat,  8 Feb 2025 08:30:22 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.41])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DBDEF19560AE;
-	Sat,  8 Feb 2025 08:30:16 +0000 (UTC)
-Date: Sat, 8 Feb 2025 16:30:11 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-	dlemoal@kernel.org, axboe@kernel.dk, gjoyce@ibm.com
-Subject: Re: [PATCH 1/2] block: fix lock ordering between the queue
- ->sysfs_lock and freeze-lock
-Message-ID: <Z6cWE_scvYcE_mWN@fedora>
-References: <20250205144506.663819-1-nilay@linux.ibm.com>
- <20250205144506.663819-2-nilay@linux.ibm.com>
- <20250205155952.GB14133@lst.de>
- <715ba1fd-2151-4c39-9169-2559176e30b5@linux.ibm.com>
- <Z6X1hbzI4euK_r-S@fedora>
- <fee9de06-e235-43c1-b756-b10e9fa2c68e@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="YHP9OysS"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2f9bac7699aso4212330a91.1
+        for <linux-block@vger.kernel.org>; Sat, 08 Feb 2025 01:06:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1739005583; x=1739610383; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VimOFsgw+Swp8E6M/LlYfD+laUfW9cNd9WZmqvSJYZM=;
+        b=YHP9OysS4YlmXwtCnj8VUgHtvihYqa93pVQNVklHruiEykX1qHV0BQTi3TBR15R7NE
+         +kR5Uqwf9YMcVXnxnHaNgrRUKaLwH0fIAKGRW0Crig9/r5hYzouxWvsKZkhiLCRZOxqx
+         W/W0zjyYnMSsn+DCvvonpItC3blD7nx1yXo9N8TqaoyWq7khuyd+CWchpYUe/QucaDZL
+         xeUqKNBULn7vUCoEWZf0QZovCqz8hCFGRvvU23zusJRzTNNKzwHcyXjKcPyWpeyjcO6+
+         b7/Tu21I2xhEzlb/zgXiU9ZQP16H8y0ud/8wJp/Ts0Vm2WDTnxM/tR7t95CcazTzgVIe
+         efbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739005583; x=1739610383;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VimOFsgw+Swp8E6M/LlYfD+laUfW9cNd9WZmqvSJYZM=;
+        b=Mt7coOV/VGyqpLoROHcaUFI/ecAGh4qo7vabnsj+kFWRffx1SDjUppAHUAjOJkkUF/
+         uX93UbusblZRZqlYlxYOleeHMHdy2FNAf/XzFRLUeWGP7wvqM79d3aKNW5+SIP8pMebQ
+         4T7N8pI84sowO9zY6nHNaAJ14579CtfuGCWkr9YRFimz9+LmiIMXUu8CnzfAEH0AyVzE
+         UKvckVec0G7OKM+6nf5Fcf+vBl7PiZaDDPDe/kVfKiGD8Q9hhqsNEYKpyFQXjplv9p5n
+         n383p9sCSVOTIjocYEK6jMuvbq6paHqvO2MZpX1lXGyjYo/ovNWNRST+/8dWJgI+Ci17
+         +okg==
+X-Forwarded-Encrypted: i=1; AJvYcCWpiWjQNP0vzGGtSxMmOe3/KbajTR7pLwSuG3PnX0wxmytQWYLCvKV18M9aIYzRp/rESujUNzM+gmYDpA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnYMHRTOUprXL71Y/MkpsJuU7rRcLeJF6X0HRlnNP6SSdELWMY
+	ohslbfNbXRCKfEZdKubB/SKOZU47cgmDu2FjySwRs4HyjsYX12WYh2W36Pjgllc=
+X-Gm-Gg: ASbGncsI83qyIRQvEi7LzEzHp4C1MKeViia6MhQd56dTsv4prymYqoswFHvtGhZCIM0
+	uFzef7SW72xBMYJqnYM0FwL906O5REjMJRO6QVyCxM7SD5ItkqsTB8jhwZnMConAGPMt/QpAE1X
+	OL5UPZyyoQ2XWN4XzpBLrDaOFVl8gct0L327p8o31qPjkOXRHnDq/KSeoojuBJS3hmehRqJC5rb
+	Xe27MfKfpRkZQ5LInKe6pKTxmkwwHvEjcg5jzL0xnOrKRB0Spvoi9Ho4SQBKjJ4N5pTfnZr/dat
+	mTbeCfa4cUqn+8fqqcz29fGc9h8KaJ0F9Pb3H4aXph6Ln1yO
+X-Google-Smtp-Source: AGHT+IHIfuv1hiD9aKxowrFs0MBjBUPrCRYc4hhnVJb5nBQslXRDlon9G4j8sz7t8HEc8M7x+hNiTg==
+X-Received: by 2002:a05:6a00:3cc9:b0:725:f1b1:cbc5 with SMTP id d2e1a72fcca58-7305d417203mr11538995b3a.3.1739005582749;
+        Sat, 08 Feb 2025 01:06:22 -0800 (PST)
+Received: from PXLDJ45XCM.bytedance.net ([61.213.176.11])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73048bf1413sm4366493b3a.98.2025.02.08.01.06.16
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 08 Feb 2025 01:06:22 -0800 (PST)
+From: Muchun Song <songmuchun@bytedance.com>
+To: axboe@kernel.dk,
+	tj@kernel.org,
+	yukuai1@huaweicloud.com
+Cc: chengming.zhou@linux.dev,
+	muchun.song@linux.dev,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Muchun Song <songmuchun@bytedance.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH RESEND v2 1/2] block: introduce init_wait_func()
+Date: Sat,  8 Feb 2025 17:04:15 +0800
+Message-Id: <20250208090416.38642-1-songmuchun@bytedance.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fee9de06-e235-43c1-b756-b10e9fa2c68e@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 07, 2025 at 11:32:37PM +0530, Nilay Shroff wrote:
-> 
-> 
-> On 2/7/25 5:29 PM, Ming Lei wrote:
-> > On Thu, Feb 06, 2025 at 06:52:36PM +0530, Nilay Shroff wrote:
-> >>
-> >>
-> >> On 2/5/25 9:29 PM, Christoph Hellwig wrote:
-> >>> On Wed, Feb 05, 2025 at 08:14:47PM +0530, Nilay Shroff wrote:
-> >>>>  
-> >>>>  static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
-> >>>> @@ -5006,8 +5008,10 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
-> >>>>  		return;
-> >>>>  
-> >>>>  	memflags = memalloc_noio_save();
-> >>>> -	list_for_each_entry(q, &set->tag_list, tag_set_list)
-> >>>> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> >>>> +		mutex_lock(&q->sysfs_lock);
-> >>>
-> >>> This now means we hold up to number of request queues sysfs_lock
-> >>> at the same time.  I doubt lockdep will be happy about this.
-> >>> Did you test this patch with a multi-namespace nvme device or
-> >>> a multi-LU per host SCSI setup?
-> >>>
-> >> Yeah I tested with a multi namespace NVMe disk and lockdep didn't 
-> >> complain. Agreed we need to hold up q->sysfs_lock for multiple 
-> >> request queues at the same time and that may not be elegant, but 
-> >> looking at the mess in __blk_mq_update_nr_hw_queues we may not
-> >> have other choice which could help correct the lock order.
-> > 
-> > All q->sysfs_lock instance actually shares same lock class, so this way
-> > should have triggered double lock warning, please see mutex_init().
-> > 
-> Well, my understanding about lockdep is that even though all q->sysfs_lock
-> instances share the same lock class key, lockdep differentiates locks 
-> based on their memory address. Since each instance of &q->sysfs_lock has 
-> got different memory address, lockdep treat each of them as distinct locks 
-> and IMO, that avoids triggering double lock warning.
+There is already a macro DEFINE_WAIT_FUNC() to declare a wait_queue_entry
+with a specified waking function. But there is not a counterpart for
+initializing one wait_queue_entry with a specified waking function. So
+introducing init_wait_func() for this, which also could be used in iocost
+and rq-qos. Using default_wake_function() in rq_qos_wait() to wake up
+waiters, which could remove ->task field from rq_qos_wait_data.
 
-That isn't correct, think about how lockdep can deal with millions of
-lock instances.
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Signed-off-by: Muchun Song <songmuchun@bytedance.com>
+---
+ block/blk-iocost.c   |  3 +--
+ block/blk-rq-qos.c   | 14 +++++++-------
+ include/linux/wait.h |  6 ++++--
+ 3 files changed, 12 insertions(+), 11 deletions(-)
 
-Please take a look at the beginning of Documentation/locking/lockdep-design.rst
-
-```
-The validator tracks the 'usage state' of lock-classes, and it tracks
-the dependencies between different lock-classes.
-```
-
-Please verify it by the following code:
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4e76651e786d..a4ffc6198e7b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -5150,10 +5150,37 @@ void blk_mq_cancel_work_sync(struct request_queue *q)
- 		cancel_delayed_work_sync(&hctx->run_work);
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index a5894ec9696e7..2f611649a2edb 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2718,8 +2718,7 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+ 	 * All waiters are on iocg->waitq and the wait states are
+ 	 * synchronized using waitq.lock.
+ 	 */
+-	init_waitqueue_func_entry(&wait.wait, iocg_wake_fn);
+-	wait.wait.private = current;
++	init_wait_func(&wait.wait, iocg_wake_fn);
+ 	wait.bio = bio;
+ 	wait.abs_cost = abs_cost;
+ 	wait.committed = false;	/* will be set true by waker */
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index eb9618cd68adf..0b1245d368cd1 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -196,7 +196,6 @@ bool rq_depth_scale_down(struct rq_depth *rqd, bool hard_throttle)
+ 
+ struct rq_qos_wait_data {
+ 	struct wait_queue_entry wq;
+-	struct task_struct *task;
+ 	struct rq_wait *rqw;
+ 	acquire_inflight_cb_t *cb;
+ 	void *private_data;
+@@ -218,7 +217,12 @@ static int rq_qos_wake_function(struct wait_queue_entry *curr,
+ 		return -1;
+ 
+ 	data->got_token = true;
+-	wake_up_process(data->task);
++	/*
++	 * autoremove_wake_function() removes the wait entry only when it
++	 * actually changed the task state. We want the wait always removed.
++	 * Remove explicitly and use default_wake_function().
++	 */
++	default_wake_function(curr, mode, wake_flags, key);
+ 	list_del_init_careful(&curr->entry);
+ 	return 1;
  }
-
-+struct lock_test {
-+	struct mutex	lock;
-+};
-+
-+void init_lock_test(struct lock_test *lt)
-+{
-+	mutex_init(&lt->lock);
-+	printk("init lock: %p\n", lt);
-+}
-+
-+static void test_lockdep(void)
-+{
-+	struct lock_test A, B;
-+
-+	init_lock_test(&A);
-+	init_lock_test(&B);
-+
-+	printk("start lock test\n");
-+	mutex_lock(&A.lock);
-+	mutex_lock(&B.lock);
-+	mutex_unlock(&B.lock);
-+	mutex_unlock(&A.lock);
-+	printk("end lock test\n");
-+}
-+
- static int __init blk_mq_init(void)
+@@ -244,11 +248,6 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
+ 		 cleanup_cb_t *cleanup_cb)
  {
- 	int i;
-
-+	test_lockdep();
+ 	struct rq_qos_wait_data data = {
+-		.wq = {
+-			.func	= rq_qos_wake_function,
+-			.entry	= LIST_HEAD_INIT(data.wq.entry),
+-		},
+-		.task = current,
+ 		.rqw = rqw,
+ 		.cb = acquire_inflight_cb,
+ 		.private_data = private_data,
+@@ -259,6 +258,7 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
+ 	if (!has_sleeper && acquire_inflight_cb(rqw, private_data))
+ 		return;
+ 
++	init_wait_func(&data.wq, rq_qos_wake_function);
+ 	has_sleeper = !prepare_to_wait_exclusive(&rqw->wait, &data.wq,
+ 						 TASK_UNINTERRUPTIBLE);
+ 	do {
+diff --git a/include/linux/wait.h b/include/linux/wait.h
+index 6d90ad9744087..2bdc8f47963bf 100644
+--- a/include/linux/wait.h
++++ b/include/linux/wait.h
+@@ -1207,14 +1207,16 @@ int autoremove_wake_function(struct wait_queue_entry *wq_entry, unsigned mode, i
+ 
+ #define DEFINE_WAIT(name) DEFINE_WAIT_FUNC(name, autoremove_wake_function)
+ 
+-#define init_wait(wait)								\
++#define init_wait_func(wait, function)						\
+ 	do {									\
+ 		(wait)->private = current;					\
+-		(wait)->func = autoremove_wake_function;			\
++		(wait)->func = function;					\
+ 		INIT_LIST_HEAD(&(wait)->entry);					\
+ 		(wait)->flags = 0;						\
+ 	} while (0)
+ 
++#define init_wait(wait)	init_wait_func(wait, autoremove_wake_function)
 +
- 	for_each_possible_cpu(i)
- 		init_llist_head(&per_cpu(blk_cpu_done, i));
- 	for_each_possible_cpu(i)
-
-
-
-Thanks,
-Ming
+ typedef int (*task_call_f)(struct task_struct *p, void *arg);
+ extern int task_call_func(struct task_struct *p, task_call_f func, void *arg);
+ 
+-- 
+2.20.1
 
