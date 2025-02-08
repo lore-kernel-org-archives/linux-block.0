@@ -1,402 +1,111 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3693D1D07BA;
-	Fri,  7 Feb 2025 23:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7F9EBE;
+	Sat,  8 Feb 2025 00:51:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738972052; cv=none; b=IcWiPFb8wwaaxV9NBMKv6S2fnLnK5eIpirvnR598GSgJccd2nulziDQSxsuRTMPSgSxXF18Qb/Y07CY4R2ekCQ2xtTjroSI5j4O3AxN+Jjy6fO9681sOMX3pUTbUF6HbTen46bCzVoX9IIXhI4xwcQxwLRK4FBwSP/Gfxal66p4=
+	t=1738975880; cv=none; b=ISjwtyVW8HAVN5cU1OV1IUiD6ath2mwK7EMtd4gcz4pJxDmsp6iw7GJYBAjw9rMOXKllUfj1bbdUXgbbF1fiUoWmip8GrVQ7/vMRnOTp3yldhw1bsCMz7lHmgpm6sJB3L51yT42MUHJdiaaB4NqQmXdijwVyc3HlEppzxuOKuR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738972052; c=relaxed/simple;
-	bh=BsfMoCm8MlH9AGBmYNmCYjQDHjlTEQKUiZ1QFLAvexw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z+CKu0srCJFie9D+LLqI7fj4ZrjW80OST0kr6b/uP3tutTh3FGhCTSK8BKXDBnY/rV+S+MmyyuderpJFt0QKzyVs6zVJw5LVWnMr0zJLEHo6K156wax3T11KzgCRNPyPqxgtA1duB+prxVqrZaSOIkgNqY8ODn/g08/L1hl2IhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=gnGNesvQ; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1738975880; c=relaxed/simple;
+	bh=gjJNzpNM9ApoL9TyIvOqm3oRzhAyI9vLBK92oUmdw1A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D1EMS/tPaEC9bodEqD/rt75lTYgl5XWjPdEGduaimleuiw4am4p6sbdmft+oEQaKmbENPGcxkdDdjhTJdbztzuvK+OQS+tHSFkqsl2A7lvo8hfgWnp538Mu2B1TC3/XJfyn5I40CpNTIBEze9QJAYYGFaZ8k0TLLednBUdtNLso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bsbernd.com; spf=pass smtp.mailfrom=bsbernd.com; dkim=pass (2048-bit key) header.d=bsbernd.com header.i=@bsbernd.com header.b=uRAVrVHF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nkj80CHT; arc=none smtp.client-ip=202.12.124.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bsbernd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bsbernd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gnGNesvQ"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 517Lfpli021110;
-	Fri, 7 Feb 2025 23:47:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2023-11-20; bh=h3F4n
-	/vhHMvSO3obC0vk2jEC+nX67L/UDUxic2UBdIM=; b=gnGNesvQzs21a5mB0/RLK
-	j6HBXnSml/dtr5aHgea/c1aM3OB3tgg+wcQxpQsOrzfvSf9V21XOeJBM5siscoWJ
-	4xfjKVK6fw3LK+k5cvn8xzyLqYXCbEtMhT2q3aYvhNY88zpy2MPKAczWJ9ckC6wV
-	WvmsCRgt5CRb8FFCGuMSFdMtFYDrGESCtfIfFFAf+DURCgsXEryhgtzQyhgz9lyv
-	WvnwdpHNfaQXrJbvzrR8C/AfmB2xOx5pZY4jgknldBBfmUuPV+BH6B6YxDgjY9PL
-	wXhJMX2tlRrk0ncrOW2PZCFQgk0H7LS3LmTASKRCXlbZjTaNGWbnwWFgUF/e3MiJ
-	w==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 44n0fsjs3e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 07 Feb 2025 23:47:24 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 517LUNdR027912;
-	Fri, 7 Feb 2025 23:47:23 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 44j8ds5wsn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 07 Feb 2025 23:47:23 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 517NlMLh001803;
-	Fri, 7 Feb 2025 23:47:22 GMT
-Received: from ca-dev94.us.oracle.com (ca-dev94.us.oracle.com [10.129.136.30])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 44j8ds5ws8-2;
-	Fri, 07 Feb 2025 23:47:22 +0000
-From: Alan Adamson <alan.adamson@oracle.com>
-To: linux-block@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org, alan.adamson@oracle.com,
-        linux-nvme@lists.infradead.org, shinichiro.kawasaki@wdc.com
-Subject: [PATCH v4 blktests 1/2] scsi/009: add atomic write tests
-Date: Fri,  7 Feb 2025 15:55:52 -0800
-Message-ID: <20250207235553.322741-2-alan.adamson@oracle.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250207235553.322741-1-alan.adamson@oracle.com>
-References: <20250207235553.322741-1-alan.adamson@oracle.com>
+	dkim=pass (2048-bit key) header.d=bsbernd.com header.i=@bsbernd.com header.b="uRAVrVHF";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nkj80CHT"
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfout.stl.internal (Postfix) with ESMTP id 607751140157;
+	Fri,  7 Feb 2025 19:51:14 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Fri, 07 Feb 2025 19:51:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bsbernd.com; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1738975874;
+	 x=1739062274; bh=D8dWss3j45ZZkgJBmvb6coXG0YqDaF+50BBK7n5fYZo=; b=
+	uRAVrVHF/yqIlc9dPMFvutcLROGpoCB/s/9ngaLBCMeiBGmoorqzTBSGdEVnr6SD
+	V4V8f/hA158xrV3Ogv1xcTA2kh4FdlrIkxf21cfsQVHZIqiPJKAfPV7lp/O+uHgB
+	l+in4K9d1JyFnkz2zr9zv5eno+xj4qCOiDFclTjrENUee+YdQ48AvFo0knSqVjmO
+	jMFxUCPv77I7AVtb92NIxGXnnZ0ju5L8j9HHc38kKVzCNH579NDnsutrb3R+KqAF
+	jzqBFOndcjchI6uBRF2rWGMlciEDPLrcBzzIpzxXh41E5bB7Rw6T785iPi+5YFcE
+	GyKQ5WGtEOEoye9R3FxFCA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1738975874; x=
+	1739062274; bh=D8dWss3j45ZZkgJBmvb6coXG0YqDaF+50BBK7n5fYZo=; b=n
+	kj80CHTk7V9tqLAF8Z4x+kCVi4PgjcfjKIK8H3QDuyCuPtgxtLMpIZjJn/3f9j9k
+	7yJ9zvwsNSm/ycLMSZRDMGjZ5bex9iXrtt+LA0hJS7+TpA1ncnylsRrdbllV5lg1
+	dq5TgKL83yR3jlxZtAWcytGL8wLIfsMagdtj9OUKcAhYx76ZSLqrS9u8+gaNMyt1
+	xzDDp/Vm7fAbxsQ48tb2tU7/rUn3ZJ2jcPcCc76ukybACENbo3x1c9DE9SYawiCB
+	0uufSOjADCy/usXxBZ0CKLEkDWI7JlxkAsquBGIQxVkVYa3EjiiNDidt2h+F4gMg
+	9CDuyBJQ5eb6TAz80KOmQ==
+X-ME-Sender: <xms:gaqmZ8KTntMhXzZtUQ742nXGyKMXzWaFNj9YLJyzE5zpgclAWcteaw>
+    <xme:gaqmZ8JRE050-vWs2Uvycbir2GXEyNBffDAFDDcVm54zZ6g9lTHyeebcxG_1hfYvv
+    5EfYn9iNag0Wl-d>
+X-ME-Received: <xmr:gaqmZ8tz5ivXe857vgnR3CKSvuHfR6XgxTsZaluqPDYP2XEqMHpRg89KG1nTNKkimpIv2ao_8R5PRmJif6jU_uMP4TfMtJvXoL2vwOmaEZDTznexU8Lg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftdejjecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfesthejredttddv
+    jeenucfhrhhomhepuegvrhhnugcuufgthhhusggvrhhtuceosggvrhhnugessghssggvrh
+    hnugdrtghomheqnecuggftrfgrthhtvghrnhephefhjeeujeelhedtheetfedvgfdtleff
+    uedujefhheegudefvdfhheeuveduueegnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepsggvrhhnugessghssggvrhhnugdrtghomhdpnhgspghr
+    tghpthhtohepjedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepkhgsuhhstghhse
+    hmvghtrgdrtghomhdprhgtphhtthhopehiohdquhhrihhnghesvhhgvghrrdhkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehlihhnuhigqdgslhhotghksehvghgvrhdrkhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtohepmhhinhhgrdhlvghisehrvgguhhgrthdrtghomhdprhgt
+    phhtthhopegrgigsohgvsehkvghrnhgvlhdrughkpdhrtghpthhtoheprghsmhhlrdhsih
+    hlvghntggvsehgmhgrihhlrdgtohhmpdhrtghpthhtohepkhgsuhhstghhsehkvghrnhgv
+    lhdrohhrgh
+X-ME-Proxy: <xmx:gaqmZ5YbL8swAomkkgRwv4Wx5mNXETxcAjZ7aRbM5FhRxn7m7K5x9Q>
+    <xmx:gaqmZzZHY5Q9-W5ePFO3jPSsHMkD4nuduLiJKzAnlWWs8u0A5GMy4A>
+    <xmx:gaqmZ1By7lq-lpxg6HDMOnqAnuWIpyZtkQMXP41gVu_pMTOfKEhmgw>
+    <xmx:gaqmZ5YdmCaHSgIzgY8DSAGr9KA0ArjgZ-O5VkekYIsWtVJB6SfUIw>
+    <xmx:gqqmZ37Q3Lfvaas9__S4vy302EHdMzmt7dYr42SY25aDgiI6Bd425ErZ>
+Feedback-ID: i5c2e48a5:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 7 Feb 2025 19:51:12 -0500 (EST)
+Message-ID: <5f6f6798-8658-4676-8626-44ac6e9b66af@bsbernd.com>
+Date: Sat, 8 Feb 2025 01:51:11 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-07_11,2025-02-07_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0 bulkscore=0
- mlxlogscore=999 adultscore=0 suspectscore=0 mlxscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2501170000
- definitions=main-2502070180
-X-Proofpoint-ORIG-GUID: BB6kOXk3n0dtv1s7Txzy0It0GS8Gtfs4
-X-Proofpoint-GUID: BB6kOXk3n0dtv1s7Txzy0It0GS8Gtfs4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] ublk zero-copy support
+To: Keith Busch <kbusch@meta.com>, io-uring@vger.kernel.org,
+ linux-block@vger.kernel.org, ming.lei@redhat.com, axboe@kernel.dk,
+ asml.silence@gmail.com
+Cc: Keith Busch <kbusch@kernel.org>
+References: <20250203154517.937623-1-kbusch@meta.com>
+From: Bernd Schubert <bernd@bsbernd.com>
+Content-Language: en-US, de-DE, fr
+In-Reply-To: <20250203154517.937623-1-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Tests basic atomic write functionality. If no scsi test device is provided,
-a scsi_debug device will be used. Testing areas include:
+Hi Keith,
 
-- Verify sysfs atomic write attributes are consistent with
-  atomic write attributes advertised by scsi_debug.
-- Verify the atomic write paramters of statx are correct using
-  xfs_io.
-- Perform a pwritev2() (with RWF_ATOMIC flag) using xfs_io:
-    - maximum byte size (atomic_write_unit_max_bytes)
-    - minimum byte size (atomic_write_unit_min_bytes)
-    - a write larger than atomic_write_unit_max_bytes
-    - a write smaller than atomic_write_unit_min_bytes
+On 2/3/25 16:45, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> This is a new look at supporting zero copy with ublk.
 
-Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- common/rc          |   8 ++
- common/xfs         |  58 ++++++++++++++
- tests/scsi/009     | 183 +++++++++++++++++++++++++++++++++++++++++++++
- tests/scsi/009.out |  13 ++++
- 4 files changed, 262 insertions(+)
- create mode 100755 tests/scsi/009
- create mode 100644 tests/scsi/009.out
+will try to look at it over the weekend. Could you please keep me in the
+loop for future versions?
 
-diff --git a/common/rc b/common/rc
-index bcb215d35114..06c0a416e3e1 100644
---- a/common/rc
-+++ b/common/rc
-@@ -292,6 +292,14 @@ _require_test_dev_can_discard() {
- 	return 0
- }
- 
-+_require_device_support_atomic_writes() {
-+	_require_test_dev_sysfs queue/atomic_write_max_bytes
-+	if (( $(< "${TEST_DEV_SYSFS}"/queue/atomic_write_max_bytes) == 0 )); then
-+		SKIP_REASONS+=("${TEST_DEV} does not support atomic write")
-+		return 1
-+	fi
-+}
-+
- _test_dev_queue_get() {
- 	if [[ $1 = scheduler ]]; then
- 		sed -e 's/.*\[//' -e 's/\].*//' "${TEST_DEV_SYSFS}/queue/scheduler"
-diff --git a/common/xfs b/common/xfs
-index 569770fecd53..0b1ca7c29049 100644
---- a/common/xfs
-+++ b/common/xfs
-@@ -6,6 +6,22 @@
- 
- . common/shellcheck
- 
-+_have_xfs_io_atomic_write() {
-+	local s
-+
-+	_have_program xfs_io || return $?
-+
-+	# If the pwrite command supports the -A option then this version
-+	# of xfs_io supports atomic writes.
-+	s=$(xfs_io -c help | grep pwrite | awk '{ print $4}')
-+	if [[ $s == *"A"* ]];
-+	then
-+		return 0
-+	fi
-+	SKIP_REASONS+=("xfs_io does not support the -A option")
-+	return 1
-+}
-+
- _have_xfs() {
- 	_have_fs xfs && _have_program mkfs.xfs
- }
-@@ -52,3 +68,45 @@ _xfs_run_fio_verify_io() {
- 
- 	return "${rc}"
- }
-+
-+# Use xfs_io to perform a non-atomic write using pwritev2().
-+# Args:    $1 - device to write to
-+#          $2 - number of bytes to write
-+# Returns: Number of bytes written
-+run_xfs_io_pwritev2() {
-+	local dev=$1
-+	local bytes_to_write=$2
-+	local bytes_written
-+
-+	# Perform write and extract out bytes written from xfs_io output
-+	bytes_written=$(xfs_io -d -C \
-+		"pwrite -b ${bytes_to_write} -V 1 -D 0 ${bytes_to_write}" \
-+		"$dev" | grep "wrote" | sed 's/\// /g' | awk '{ print $2 }')
-+	echo "$bytes_written"
-+}
-+
-+# Use xfs_io to perform an atomic write using pwritev2().
-+# Args:    $1 - device to write to
-+#          $2 - number of bytes to write
-+# Returns: Number of bytes written
-+run_xfs_io_pwritev2_atomic() {
-+	local dev=$1
-+	local bytes_to_write=$2
-+	local bytes_written
-+
-+	# Perform atomic write and extract out bytes written from xfs_io output
-+	bytes_written=$(xfs_io -d -C \
-+		"pwrite -b ${bytes_to_write} -V 1 -A -D 0 ${bytes_to_write}" \
-+		"$dev" | grep "wrote" | sed 's/\// /g' | awk '{ print $2 }')
-+	echo "$bytes_written"
-+}
-+
-+run_xfs_io_xstat() {
-+	local dev=$1
-+	local field=$2
-+	local statx_output
-+
-+	statx_output=$(xfs_io -c "statx -r -m 0x00010000" "$dev" | \
-+		grep "$field" | awk '{ print $3 }')
-+	echo "$statx_output"
-+}
-diff --git a/tests/scsi/009 b/tests/scsi/009
-new file mode 100755
-index 000000000000..8860e1c0d072
---- /dev/null
-+++ b/tests/scsi/009
-@@ -0,0 +1,183 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2025 Oracle and/or its affiliates
-+#
-+# Test SCSI Atomic Writes with scsi_debug
-+
-+. tests/scsi/rc
-+. common/scsi_debug
-+. common/xfs
-+
-+DESCRIPTION="test scsi atomic writes"
-+QUICK=1
-+
-+requires() {
-+	_have_driver scsi_debug
-+	_have_xfs_io_atomic_write
-+}
-+
-+device_requires() {
-+	_require_device_support_atomic_writes
-+}
-+
-+fallback_device() {
-+	local scsi_debug_params=(
-+		delay=0
-+		atomic_wr=1
-+	)
-+	if ! _configure_scsi_debug "${scsi_debug_params[@]}"; then
-+		return 1
-+		fi
-+	echo "/dev/${SCSI_DEBUG_DEVICES[0]}"
-+}
-+
-+cleanup_fallback_device() {
-+	_exit_scsi_debug
-+}
-+
-+test_device() {
-+	local scsi_debug_atomic_wr_max_length
-+	local scsi_debug_atomic_wr_gran
-+	local scsi_atomic_max_bytes
-+	local scsi_atomic_min_bytes
-+	local sysfs_max_hw_sectors_kb
-+	local max_hw_bytes
-+	local sysfs_logical_block_size
-+	local sysfs_atomic_max_bytes
-+	local sysfs_atomic_unit_max_bytes
-+	local sysfs_atomic_unit_min_bytes
-+	local statx_atomic_min
-+	local statx_atomic_max
-+	local bytes_to_write
-+	local bytes_written
-+	local test_desc
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	sysfs_logical_block_size=$(< "${TEST_DEV_SYSFS}"/queue/logical_block_size)
-+	sysfs_max_hw_sectors_kb=$(< "${TEST_DEV_SYSFS}"/queue/max_hw_sectors_kb)
-+	max_hw_bytes=$(( "$sysfs_max_hw_sectors_kb" * 1024 ))
-+	sysfs_atomic_max_bytes=$(< "${TEST_DEV_SYSFS}"/queue/atomic_write_max_bytes)
-+	sysfs_atomic_unit_max_bytes=$(< "${TEST_DEV_SYSFS}"/queue/atomic_write_unit_max_bytes)
-+	sysfs_atomic_unit_min_bytes=$(< "${TEST_DEV_SYSFS}"/queue/atomic_write_unit_min_bytes)
-+	scsi_debug_atomic_wr_max_length=$(< /sys/module/scsi_debug/parameters/atomic_wr_max_length)
-+	scsi_debug_atomic_wr_gran=$(< /sys/module/scsi_debug/parameters/atomic_wr_gran)
-+	scsi_atomic_max_bytes=$(( "$scsi_debug_atomic_wr_max_length" * "$sysfs_logical_block_size" ))
-+	scsi_atomic_min_bytes=$(( "$scsi_debug_atomic_wr_gran" * "$sysfs_logical_block_size" ))
-+
-+	test_desc="TEST 1 - Verify sysfs atomic attributes"
-+	if [ "$max_hw_bytes" -ge "$sysfs_atomic_max_bytes" ] &&
-+		[ "$sysfs_atomic_max_bytes" -ge "$sysfs_atomic_unit_max_bytes" ] &&
-+		[ "$sysfs_atomic_unit_max_bytes" -ge "$sysfs_atomic_unit_min_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $max_hw_bytes - $sysfs_max_hw_sectors_kb -" \
-+			"$sysfs_atomic_max_bytes - $sysfs_atomic_unit_max_bytes -" \
-+			"$sysfs_atomic_unit_min_bytes"
-+	fi
-+
-+	test_desc="TEST 2 - check scsi_debug atomic_wr_max_length is the same as sysfs atomic_write_max_bytes"
-+	if [ "$scsi_atomic_max_bytes" -le "$max_hw_bytes" ]
-+	then
-+		if [ "$scsi_atomic_max_bytes" = "$sysfs_atomic_max_bytes" ]
-+		then
-+			echo "$test_desc - pass"
-+		else
-+			echo "$test_desc - fail $scsi_atomic_max_bytes - $max_hw_bytes -" \
-+				"$sysfs_atomic_max_bytes"
-+		fi
-+	else
-+		if [ "$sysfs_atomic_max_bytes" = "$max_hw_bytes" ]
-+		then
-+			echo "$test_desc - pass"
-+		else
-+			echo "$test_desc - fail $scsi_atomic_max_bytes - $max_hw_bytes -" \
-+				"$sysfs_atomic_max_bytes"
-+		fi
-+	fi
-+
-+	test_desc="TEST 3 - check sysfs atomic_write_unit_max_bytes <= scsi_debug atomic_wr_max_length"
-+	if (("$sysfs_atomic_unit_max_bytes" <= "$scsi_atomic_max_bytes"))
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $sysfs_atomic_unit_max_bytes - $scsi_atomic_max_bytes"
-+	fi
-+
-+	test_desc="TEST 4 - check sysfs atomic_write_unit_min_bytes = scsi_debug atomic_wr_gran"
-+	if [ "$sysfs_atomic_unit_min_bytes" = "$scsi_atomic_min_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $sysfs_atomic_unit_min_bytes - $scsi_atomic_min_bytes"
-+	fi
-+
-+	test_desc="TEST 5 - check statx stx_atomic_write_unit_min"
-+	statx_atomic_min=$(run_xfs_io_xstat "$TEST_DEV" "stat.atomic_write_unit_min")
-+	if [ "$statx_atomic_min" = "$scsi_atomic_min_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $statx_atomic_min - $scsi_atomic_min_bytes"
-+	fi
-+
-+	test_desc="TEST 6 - check statx stx_atomic_write_unit_max"
-+	statx_atomic_max=$(run_xfs_io_xstat "$TEST_DEV" "stat.atomic_write_unit_max")
-+	if [ "$statx_atomic_max" = "$sysfs_atomic_unit_max_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $statx_atomic_max - $sysfs_atomic_unit_max_bytes"
-+	fi
-+
-+	test_desc="TEST 7 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes with "
-+	test_desc+="RWF_ATOMIC flag - pwritev2 should be succesful"
-+	bytes_written=$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$sysfs_atomic_unit_max_bytes")
-+	if [ "$bytes_written" = "$sysfs_atomic_unit_max_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $bytes_written - $sysfs_atomic_unit_max_bytes"
-+	fi
-+
-+	test_desc="TEST 8 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes + 512 "
-+	test_desc+="bytes with RWF_ATOMIC flag - pwritev2 should not be succesful"
-+	bytes_written=$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$bytes_to_write")
-+	if [ "$bytes_written" = "" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $bytes_written - $bytes_to_write"
-+	fi
-+
-+	test_desc="TEST 9 - perform a pwritev2 with size of sysfs_atomic_unit_min_bytes "
-+	test_desc+="with RWF_ATOMIC flag - pwritev2 should be succesful"
-+	bytes_written=$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$sysfs_atomic_unit_min_bytes")
-+	if [ "$bytes_written" = "$sysfs_atomic_unit_min_bytes" ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		echo "$test_desc - fail $bytes_written - $scsi_atomic_min_bytes"
-+	fi
-+
-+	bytes_to_write=$(( "${sysfs_atomic_unit_min_bytes}" - "${sysfs_logical_block_size}" ))
-+	test_desc="TEST 10 - perform a pwritev2 with a size of sysfs_atomic_unit_min_bytes - 512 "
-+	test_desc+="bytes with RWF_ATOMIC flag - pwritev2 should fail"
-+	if [ "$bytes_to_write" = 0 ]
-+	then
-+		echo "$test_desc - pass"
-+	else
-+		bytes_written=$(run_xfs_io_pwritev2_atomic "$TEST_DEV" "$bytes_to_write")
-+		if [ "$bytes_written" = "" ]
-+		then
-+			echo "$test_desc - pass"
-+		else
-+			echo "$test_desc - fail $bytes_written - $bytes_to_write"
-+		fi
-+	fi
-+
-+	_exit_scsi_debug
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/scsi/009.out b/tests/scsi/009.out
-new file mode 100644
-index 000000000000..e94882d44f60
---- /dev/null
-+++ b/tests/scsi/009.out
-@@ -0,0 +1,13 @@
-+Running scsi/009
-+TEST 1 - Verify sysfs atomic attributes - pass
-+TEST 2 - check scsi_debug atomic_wr_max_length is the same as sysfs atomic_write_max_bytes - pass
-+TEST 3 - check sysfs atomic_write_unit_max_bytes <= scsi_debug atomic_wr_max_length - pass
-+TEST 4 - check sysfs atomic_write_unit_min_bytes = scsi_debug atomic_wr_gran - pass
-+TEST 5 - check statx stx_atomic_write_unit_min - pass
-+TEST 6 - check statx stx_atomic_write_unit_max - pass
-+TEST 7 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes with RWF_ATOMIC flag - pwritev2 should be succesful - pass
-+TEST 8 - perform a pwritev2 with size of sysfs_atomic_unit_max_bytes + 512 bytes with RWF_ATOMIC flag - pwritev2 should not be succesful - pass
-+TEST 9 - perform a pwritev2 with size of sysfs_atomic_unit_min_bytes with RWF_ATOMIC flag - pwritev2 should be succesful - pass
-+pwrite: Invalid argument
-+TEST 10 - perform a pwritev2 with a size of sysfs_atomic_unit_min_bytes - 512 bytes with RWF_ATOMIC flag - pwritev2 should fail - pass
-+Test complete
--- 
-2.43.5
+
+Thanks,
+Bernd
+
 
