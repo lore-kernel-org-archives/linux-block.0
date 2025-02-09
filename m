@@ -1,280 +1,116 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F0C1DF26B
-	for <linux-block@vger.kernel.org>; Sun,  9 Feb 2025 15:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695531BC9E2
+	for <linux-block@vger.kernel.org>; Sun,  9 Feb 2025 16:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739116248; cv=none; b=D+tZCvJW51elqBOWmDeDgQ2KF7Z4Nr0Yib3bUsw7YEM7hQ3XXu+ruYPeWX7fX4ka19VLFZBDcMKlL2vFFIjUb4GMyY5Y6zg9tkQYKr7mFpMR0an2HrQcOGQiTuhNGWoad1TdHSjbRMXiwmhXKmSdPYTEkvzokV9HL8e3T/WynYk=
+	t=1739120116; cv=none; b=Irazzc8bVI3noJA0rpgi9hyoVCNTcfeqXJzQmA8H1qognDN22xcqwNP13ZLvNAG9ShHO7MJJSDGGtseJkif3v4KA/rZiWukBN1EW0okjfmXTRIk7MeKsypCeDf8IpohZrnwr8/oozoOwB1bxJiGUJ+w0F8c6vXzS0zVagrIsMK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739116248; c=relaxed/simple;
-	bh=3tTvuuiVnCPVSn8oE7K5yeOzQnMOW0db5YwDCMguaLo=;
+	s=arc-20240116; t=1739120116; c=relaxed/simple;
+	bh=14Gbc40vH/LGvz81BBABcSPKxrmHTY1anjXiSgClj5s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g26BXtSydBupsUdqbNCXzYFauPmAW818oGn/5ccR7Y8drM67lPw6bGrfVOnnSGaiqKO7iLVhqDsxh6OMs8+nX84Rl/XCcsiySM2P53Pk+1Chdl98guVtW6Wq78ZdRpFpJtKahHsAV1khz7LIxyV1fS/80wwQNIJN1AeNbDsOUu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aVr+PACB; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=IFzTZIchYRj7+97aMbgQKl0ss+lVq2QI1MdWJ3vfCfNUVm+Yqx4B/f6Be+frYVzuTmJ3XAHaYf1XfXrLqThQ7YvO+xNOoWP0ZQ/isyBQFRN731cDGVS83JcnRs5k4jDUQLtROnoU+sicHhBGl1jCURZnWrsf8H03EKP1JBIVvIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XgUN8wlc; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aVr+PACB"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21f6f18b474so13068265ad.1
-        for <linux-block@vger.kernel.org>; Sun, 09 Feb 2025 07:50:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1739116246; x=1739721046; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=z+3e8LQ4+KCVM1ZlHvF+ScpOdJFsseLnvwjtZa8Jb9M=;
-        b=aVr+PACB9VG26qPt95YFGXicHmK+aWC1lxtpVI7fagTPPPPBNww3O4dCVqVNSmLtjQ
-         rC35qvTkFjPhZdDNTLRD6enqpAyOwL4akPZNHf1eOeWajHTlKpjobgNpObn7yV0nZEdF
-         CUSnV2F5Hy6UjmijrGZttCm2tNlkVAQ2IIfhnzt2oXxNdPKebQ5qH+Nf46Pz8xRPCUT8
-         3nBgqRrBAOFCW+EJkVAT0rSGJMAJ+9Kiv1bBBtZ3cl6wR3w7kOR4jEqzTJMgYLCfYqri
-         OMu8D9ILow8rSrAQETeOv8ghx4ocVTKgU1gr/je5UyiKpEpKhDSFLb8sf7KHm9s3PehC
-         Tfqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739116246; x=1739721046;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z+3e8LQ4+KCVM1ZlHvF+ScpOdJFsseLnvwjtZa8Jb9M=;
-        b=qu+uE8Bh0hwoTTuipxOxyF101ykScOD1y8IYRpt/V2RX1yyog2kSkl9cTITaUK5G2W
-         tF0e7YQSE1Oyn1mXssM95nM4pH2nlW5J0oE5fVdIfIsYodD8O269siXxOWuJ1xP6WWGS
-         /KV+zPIDge1x5nwC6QUJAzVX1OTLCZ5kNnBDYpqK55WqL6g4jzrF8S2hRhBEcuIS/4Bf
-         9CgH5T+eBn5vxldd8/FGpPNKBYPra+xyWcf4yaOgOxwwO7wM58pIyjoHIFCZZ3PAbokZ
-         kL0lvRXYaW1HG7IJrjSJHjaa4U/q+57pZMI83KAPPybd3686nzEE6c/grJE7UPpQd1yl
-         kFHA==
-X-Gm-Message-State: AOJu0YymbuJQeWzDUI2VLWx4pAt6s0XShq58dOFIryoxKA6O/w9fu0uX
-	ZSAjPQ7jiTsJJgoALaHb9D0VG9GVC0d0I4Bb3DRFu4HcHUqmlrXb8dcvFndtKw==
-X-Gm-Gg: ASbGncsEN/IVhPKBQskyLR665YYjeottWLcNsCZnsCRu1N5s4R0fQTfBmze6GGAkNt7
-	drfPJZFC96LrOUMbmkyoBAtMAeV4w/yG1J8HNKJHsWurSjThy0mcWd+H0eKtqcFNINJWC26aMlv
-	p1LMjxLYY8AReVn0IJhIH2attOI5um5JSj7JKmemKzGqc3F0QYxvFYDSi5LI1SxL3E+D0SFTpc4
-	tJ7V7DC2T6mvU106pp057q4/GdUjnaZ8mv1QG59bDylqP+w67qEfVKSiM8blkyj3pQxg8jDPVlA
-	F8FvP6SlcWWH5id+rF4GpXjUXwA3
-X-Google-Smtp-Source: AGHT+IE4gdu2yxLbkLWa2z+fxMD4SNoZKshd8ELUK0DWfD4+eLBEQB9U2Q8lXY9MpRroDTXbBu5Psw==
-X-Received: by 2002:a05:6a00:9289:b0:730:8d25:4c31 with SMTP id d2e1a72fcca58-7308d25550amr2078276b3a.8.1739116245689;
-        Sun, 09 Feb 2025 07:50:45 -0800 (PST)
-Received: from thinkpad ([220.158.156.173])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73048ad2866sm6332220b3a.52.2025.02.09.07.50.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Feb 2025 07:50:45 -0800 (PST)
-Date: Sun, 9 Feb 2025 21:20:40 +0530
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-	linux-fscrypt@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Subject: Re: [PATCH v11 5/7] soc: qcom: ice: make qcom_ice_program_key() take
- struct blk_crypto_key
-Message-ID: <20250209155040.gnkf6xuhhzp5jnrw@thinkpad>
-References: <20250204060041.409950-1-ebiggers@kernel.org>
- <20250204060041.409950-6-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XgUN8wlc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739120115; x=1770656115;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=14Gbc40vH/LGvz81BBABcSPKxrmHTY1anjXiSgClj5s=;
+  b=XgUN8wlc1r6XCu1JzUszpPOedgjHTv1QOzajbJggLIDHIYDiI58YJe/c
+   acF4mKB40utoipYcGrCkGpa+qUQ1Ca+X+RnNPyZfZ3O7Wmyjr6SqnZ+gA
+   CEZFYbLqcK/9mUq0efLTsGJDdFhOZxPSswSrFm8/eER19meGVBokmMAdK
+   8tDH1iEc5v+Xm/fk/IUv4LzR0rCT0AgopakQbXbKOw2PsRa/psHJ39vWu
+   rQd+ChRh4we4kxr0TPZm21PvfmA30TiZSo0WjtUN7qaYWj1yKXdwobgOP
+   ZrvL2nx26sa12NIXYh1vdP9x61sV9v7rKjjoUXQM+zRNrWOSt3yvcxUkc
+   w==;
+X-CSE-ConnectionGUID: ZSX6Rw0lSZWXieuDMSJxsQ==
+X-CSE-MsgGUID: Ndo4jnVRRJe5gZWVU92cqw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11340"; a="39613212"
+X-IronPort-AV: E=Sophos;i="6.13,272,1732608000"; 
+   d="scan'208";a="39613212"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2025 08:55:14 -0800
+X-CSE-ConnectionGUID: QebUnKI4SZKqYzxRDLEmwA==
+X-CSE-MsgGUID: /NsRg2IrQLS2Rwp9vrQzTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="116057560"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 09 Feb 2025 08:55:12 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1thAaL-0011hP-3C;
+	Sun, 09 Feb 2025 16:55:09 +0000
+Date: Mon, 10 Feb 2025 00:54:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Christoph Hellwig <hch@lst.de>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 7/7] block: don't grab q->debugfs_mutex
+Message-ID: <202502100010.Kok1H3KF-lkp@intel.com>
+References: <20250209122035.1327325-8-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250204060041.409950-6-ebiggers@kernel.org>
+In-Reply-To: <20250209122035.1327325-8-ming.lei@redhat.com>
 
-On Mon, Feb 03, 2025 at 10:00:39PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> qcom_ice_program_key() currently accepts the key as an array of bytes,
-> algorithm ID, key size enum, and data unit size.  However both callers
-> have a struct blk_crypto_key which contains all that information.  Thus
-> they both have similar code that converts the blk_crypto_key into the
-> form that qcom_ice_program_key() wants.  Once wrapped key support is
-> added, the key type would need to be added to the arguments too.
-> 
-> Therefore, this patch changes qcom_ice_program_key() to take in all this
-> information as a struct blk_crypto_key directly.  The calling code is
-> updated accordingly.  This ends up being much simpler, and it makes the
-> key type be passed down automatically once wrapped key support is added.
-> 
-> Based on a patch by Gaurav Kashyap <quic_gaurkash@quicinc.com> that
-> replaced the byte array argument only.  This patch makes the
-> blk_crypto_key replace other arguments like the algorithm ID too,
-> ensuring that there remains only one source of truth.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+Hi Ming,
 
-For ufs-qcom:
+kernel test robot noticed the following build warnings:
 
-Acked-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.14-rc1 next-20250207]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-- Mani
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/block-remove-hctx-debugfs_dir/20250209-202320
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20250209122035.1327325-8-ming.lei%40redhat.com
+patch subject: [PATCH 7/7] block: don't grab q->debugfs_mutex
+config: arc-randconfig-001-20250209 (https://download.01.org/0day-ci/archive/20250210/202502100010.Kok1H3KF-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250210/202502100010.Kok1H3KF-lkp@intel.com/reproduce)
 
-> ---
->  drivers/mmc/host/sdhci-msm.c | 11 +----------
->  drivers/soc/qcom/ice.c       | 23 ++++++++++++-----------
->  drivers/ufs/host/ufs-qcom.c  | 11 +----------
->  include/soc/qcom/ice.h       | 22 +++-------------------
->  4 files changed, 17 insertions(+), 50 deletions(-)
-> 
-> diff --git a/drivers/mmc/host/sdhci-msm.c b/drivers/mmc/host/sdhci-msm.c
-> index 3c383bce4928f..2c926f566d053 100644
-> --- a/drivers/mmc/host/sdhci-msm.c
-> +++ b/drivers/mmc/host/sdhci-msm.c
-> @@ -1960,20 +1960,11 @@ static int sdhci_msm_ice_keyslot_program(struct blk_crypto_profile *profile,
->  					 unsigned int slot)
->  {
->  	struct sdhci_msm_host *msm_host =
->  		sdhci_msm_host_from_crypto_profile(profile);
->  
-> -	/* Only AES-256-XTS has been tested so far. */
-> -	if (key->crypto_cfg.crypto_mode != BLK_ENCRYPTION_MODE_AES_256_XTS)
-> -		return -EOPNOTSUPP;
-> -
-> -	return qcom_ice_program_key(msm_host->ice,
-> -				    QCOM_ICE_CRYPTO_ALG_AES_XTS,
-> -				    QCOM_ICE_CRYPTO_KEY_SIZE_256,
-> -				    key->bytes,
-> -				    key->crypto_cfg.data_unit_size / 512,
-> -				    slot);
-> +	return qcom_ice_program_key(msm_host->ice, slot, key);
->  }
->  
->  static int sdhci_msm_ice_keyslot_evict(struct blk_crypto_profile *profile,
->  				       const struct blk_crypto_key *key,
->  				       unsigned int slot)
-> diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
-> index 393d2d1d275f1..78780fd508f0b 100644
-> --- a/drivers/soc/qcom/ice.c
-> +++ b/drivers/soc/qcom/ice.c
-> @@ -159,41 +159,42 @@ int qcom_ice_suspend(struct qcom_ice *ice)
->  
->  	return 0;
->  }
->  EXPORT_SYMBOL_GPL(qcom_ice_suspend);
->  
-> -int qcom_ice_program_key(struct qcom_ice *ice,
-> -			 u8 algorithm_id, u8 key_size,
-> -			 const u8 crypto_key[], u8 data_unit_size,
-> -			 int slot)
-> +int qcom_ice_program_key(struct qcom_ice *ice, unsigned int slot,
-> +			 const struct blk_crypto_key *blk_key)
->  {
->  	struct device *dev = ice->dev;
->  	union {
->  		u8 bytes[AES_256_XTS_KEY_SIZE];
->  		u32 words[AES_256_XTS_KEY_SIZE / sizeof(u32)];
->  	} key;
->  	int i;
->  	int err;
->  
->  	/* Only AES-256-XTS has been tested so far. */
-> -	if (algorithm_id != QCOM_ICE_CRYPTO_ALG_AES_XTS ||
-> -	    key_size != QCOM_ICE_CRYPTO_KEY_SIZE_256) {
-> -		dev_err_ratelimited(dev,
-> -				    "Unhandled crypto capability; algorithm_id=%d, key_size=%d\n",
-> -				    algorithm_id, key_size);
-> +	if (blk_key->crypto_cfg.crypto_mode !=
-> +	    BLK_ENCRYPTION_MODE_AES_256_XTS) {
-> +		dev_err_ratelimited(dev, "Unsupported crypto mode: %d\n",
-> +				    blk_key->crypto_cfg.crypto_mode);
->  		return -EINVAL;
->  	}
->  
-> -	memcpy(key.bytes, crypto_key, AES_256_XTS_KEY_SIZE);
-> +	if (blk_key->size != AES_256_XTS_KEY_SIZE) {
-> +		dev_err_ratelimited(dev, "Incorrect key size\n");
-> +		return -EINVAL;
-> +	}
-> +	memcpy(key.bytes, blk_key->bytes, AES_256_XTS_KEY_SIZE);
->  
->  	/* The SCM call requires that the key words are encoded in big endian */
->  	for (i = 0; i < ARRAY_SIZE(key.words); i++)
->  		__cpu_to_be32s(&key.words[i]);
->  
->  	err = qcom_scm_ice_set_key(slot, key.bytes, AES_256_XTS_KEY_SIZE,
->  				   QCOM_SCM_ICE_CIPHER_AES_256_XTS,
-> -				   data_unit_size);
-> +				   blk_key->crypto_cfg.data_unit_size / 512);
->  
->  	memzero_explicit(&key, sizeof(key));
->  
->  	return err;
->  }
-> diff --git a/drivers/ufs/host/ufs-qcom.c b/drivers/ufs/host/ufs-qcom.c
-> index c3f0aa81ff983..9330022e98eec 100644
-> --- a/drivers/ufs/host/ufs-qcom.c
-> +++ b/drivers/ufs/host/ufs-qcom.c
-> @@ -193,21 +193,12 @@ static int ufs_qcom_ice_keyslot_program(struct blk_crypto_profile *profile,
->  {
->  	struct ufs_hba *hba = ufs_hba_from_crypto_profile(profile);
->  	struct ufs_qcom_host *host = ufshcd_get_variant(hba);
->  	int err;
->  
-> -	/* Only AES-256-XTS has been tested so far. */
-> -	if (key->crypto_cfg.crypto_mode != BLK_ENCRYPTION_MODE_AES_256_XTS)
-> -		return -EOPNOTSUPP;
-> -
->  	ufshcd_hold(hba);
-> -	err = qcom_ice_program_key(host->ice,
-> -				   QCOM_ICE_CRYPTO_ALG_AES_XTS,
-> -				   QCOM_ICE_CRYPTO_KEY_SIZE_256,
-> -				   key->bytes,
-> -				   key->crypto_cfg.data_unit_size / 512,
-> -				   slot);
-> +	err = qcom_ice_program_key(host->ice, slot, key);
->  	ufshcd_release(hba);
->  	return err;
->  }
->  
->  static int ufs_qcom_ice_keyslot_evict(struct blk_crypto_profile *profile,
-> diff --git a/include/soc/qcom/ice.h b/include/soc/qcom/ice.h
-> index 5870a94599a25..4cecc7f088b4b 100644
-> --- a/include/soc/qcom/ice.h
-> +++ b/include/soc/qcom/ice.h
-> @@ -4,34 +4,18 @@
->   */
->  
->  #ifndef __QCOM_ICE_H__
->  #define __QCOM_ICE_H__
->  
-> +#include <linux/blk-crypto.h>
->  #include <linux/types.h>
->  
->  struct qcom_ice;
->  
-> -enum qcom_ice_crypto_key_size {
-> -	QCOM_ICE_CRYPTO_KEY_SIZE_INVALID	= 0x0,
-> -	QCOM_ICE_CRYPTO_KEY_SIZE_128		= 0x1,
-> -	QCOM_ICE_CRYPTO_KEY_SIZE_192		= 0x2,
-> -	QCOM_ICE_CRYPTO_KEY_SIZE_256		= 0x3,
-> -	QCOM_ICE_CRYPTO_KEY_SIZE_512		= 0x4,
-> -};
-> -
-> -enum qcom_ice_crypto_alg {
-> -	QCOM_ICE_CRYPTO_ALG_AES_XTS		= 0x0,
-> -	QCOM_ICE_CRYPTO_ALG_BITLOCKER_AES_CBC	= 0x1,
-> -	QCOM_ICE_CRYPTO_ALG_AES_ECB		= 0x2,
-> -	QCOM_ICE_CRYPTO_ALG_ESSIV_AES_CBC	= 0x3,
-> -};
-> -
->  int qcom_ice_enable(struct qcom_ice *ice);
->  int qcom_ice_resume(struct qcom_ice *ice);
->  int qcom_ice_suspend(struct qcom_ice *ice);
-> -int qcom_ice_program_key(struct qcom_ice *ice,
-> -			 u8 algorithm_id, u8 key_size,
-> -			 const u8 crypto_key[], u8 data_unit_size,
-> -			 int slot);
-> +int qcom_ice_program_key(struct qcom_ice *ice, unsigned int slot,
-> +			 const struct blk_crypto_key *blk_key);
->  int qcom_ice_evict_key(struct qcom_ice *ice, int slot);
->  struct qcom_ice *of_qcom_ice_get(struct device *dev);
->  #endif /* __QCOM_ICE_H__ */
-> -- 
-> 2.48.1
-> 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502100010.Kok1H3KF-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   block/blk-sysfs.c: In function 'blk_debugfs_remove':
+>> block/blk-sysfs.c:745:31: warning: unused variable 'q' [-Wunused-variable]
+     745 |         struct request_queue *q = disk->queue;
+         |                               ^
+
+
+vim +/q +745 block/blk-sysfs.c
+
+8324aa91d1e11a Jens Axboe        2008-01-29  742  
+6fc75f309d291d Christoph Hellwig 2022-11-14  743  static void blk_debugfs_remove(struct gendisk *disk)
+6fc75f309d291d Christoph Hellwig 2022-11-14  744  {
+6fc75f309d291d Christoph Hellwig 2022-11-14 @745  	struct request_queue *q = disk->queue;
+6fc75f309d291d Christoph Hellwig 2022-11-14  746  
+6fc75f309d291d Christoph Hellwig 2022-11-14  747  	blk_trace_shutdown(q);
+abe3d073fa86b7 Ming Lei          2025-02-09  748  	debugfs_lookup_and_remove(disk->disk_name, blk_debugfs_root);
+6fc75f309d291d Christoph Hellwig 2022-11-14  749  }
+6fc75f309d291d Christoph Hellwig 2022-11-14  750  
 
 -- 
-மணிவண்ணன் சதாசிவம்
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
