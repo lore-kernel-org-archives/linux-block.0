@@ -1,102 +1,128 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A672917BCE;
-	Mon, 10 Feb 2025 21:49:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF35A253354
+	for <linux-block@vger.kernel.org>; Mon, 10 Feb 2025 22:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739224179; cv=none; b=SlMWAYqDHZuMqhAzwEPLHpqDmfYSEU6wOV6GgRsdNYRdrWqETzKhdyqsHq3lvYhUwGI2mhkA9Zb6W2pCtDDF/7Y9JNi22J4Ay3Lstdb4ig8iV+2/rhf0WjaElnCgIqcAmhRDxIqhpGVuFCmFIsAL9tXfy/4lD7F/QN86qtySo6U=
+	t=1739226900; cv=none; b=Xdmgj+GH17dYr1s34uFwprl7iuLkn02nDDSelJyvD8zYU1AZXYIvVjbYhNFS3N7jDVUTi0kkIEg7Drm4WRmHDKJYP5U8Xa/DwOsGoodYfESf08N0y9+dFeEW5xLv+hVPeznCGGYH6XLlpEoGXD5L/knrNluwLL444SUZXG9wrjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739224179; c=relaxed/simple;
-	bh=CMH0lCE4UKBAqjsbOKBbPK/OudKwXDkpG2SCa7blu+4=;
+	s=arc-20240116; t=1739226900; c=relaxed/simple;
+	bh=2fCX5PStn6c4pFlbyyYdlv5KgQBVPS/Qr6PpU3fb0rY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OTGg7mGok3Y1A7FDd33X5VtbZooGjZDEXKloMFpdZzgMBNesMHeyzo23vNS0mYHIOWZPRXzX+duVFee5Or8/oVUPGjPb6HnFDXxbNrPmEoKdbG50+r8OwAIOOpXvkcfNtmmFlwx6P9cqjI2n9ZKDsDJHOSa+ERM6sLhOGBjyMLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=JwwfSmUU; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=G3alECZ+61WcArDYaYL4E6ncrmWFbL0/FS2AQqZjoJIBvlh3QF3uoSoQhUQQGk1b28+iJsTOrUy1/Sa86Nvq2/KFMeKnD7VlHXN01TiXVCMOqH70B6WODoiDxcZz2uESwK/QUeTBnLnCc6HE8hDW1SGGbiltG2RkvY/jgtBLNTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bEAWC1GE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="JwwfSmUU"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A1E8140E0176;
-	Mon, 10 Feb 2025 21:49:34 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id MLCjmeRqh906; Mon, 10 Feb 2025 21:49:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1739224169; bh=u60Y3XOQngf86+CrfbNHL4uwS9yUESpIZja2xEqG36E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JwwfSmUU4Gs8CFcaAvgJBS300n40txncVCaaS7/rxLP/Zp20jfSU6d+WsnIulEWoI
-	 KBrMo3e0b7gNjmZoUBV4u82BSNgvLCGCYuU03uUXvKHYU8qJkAY6R4Km+ONB+wwZ3v
-	 0YlhSpFSmGvhlGcNk/1ES48Uw8nV/PW3pDE/KRDy7S76ie4UxgxKzCtSn5Tl2V/BYY
-	 +bjR7evz3xE/IEOB6xL4ihDf5xQFYofAVM2U01ip4B3LrgcrZ9iI6kbkNMwm3qmQ8S
-	 SGnHmJsdTIVQr8fAQwYgu3ckkPjx9OKlzIg3cTVV5p/PLAQqAFBpBAknqYFgzD60Qf
-	 SrNVtSgGELV2gXV522ec5ewCMKo6pJCNQ/ZuGOBtwOyzKkE6fxAdkNZhO2XVOD4K28
-	 ze8ncuIMk3JUfJSGn6NDvp/BGqeKiq2vsn/Nz2Mug1EIc3hu/+mU+5PHAjRFsItxcL
-	 GS5LEE6XhwJHtB565ERN0A4cajpOnhe+S0XQOaWhE4XhxDngeBkqxXC+TxRffTRxgK
-	 XfquKXie0Kwf4GSB7ij9T+HUvsvNOmH0FgbzJ/XhwT8LUoOv1+ZXgT3dF9v6i61Sk8
-	 igdU3N767+/DM8Cd/Gmu3h2g3ptA4AM4hU7ifBpodslGxRzDUwXgfT5bmSPJcOpw+4
-	 j+X6KpxOx+1jKsOyLaFKAkJY=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bEAWC1GE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739226897;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=c5r8B8FRtWj5F/lOwyJCGOrGALFwc+xhMPApnCgm2s8=;
+	b=bEAWC1GEGBNOLqft5mraUepwY4bdOhXnC7TtDhNoY7h8W+ajwtg6YksEoeDcV/DvDzVp8Z
+	TUEHsuWv9YI/ubUvoaNEFPT1LuHcdaQGx8K3dqRx5swYlTel3CDYEuF5KJ/FMX3VyIlaiF
+	LZ9DI5mFA4Tv15Gy5kJRA22wfqQ6Nqk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-638-kew8mM_LO_ugytJEgig5uw-1; Mon,
+ 10 Feb 2025 17:34:50 -0500
+X-MC-Unique: kew8mM_LO_ugytJEgig5uw-1
+X-Mimecast-MFC-AGG-ID: kew8mM_LO_ugytJEgig5uw
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 473DB40E016A;
-	Mon, 10 Feb 2025 21:49:19 +0000 (UTC)
-Date: Mon, 10 Feb 2025 22:49:13 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	x86@kernel.org, linux-block@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>, Keith Busch <kbusch@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH v4 1/6] x86: move ZMM exclusion list into CPU feature flag
-Message-ID: <20250210214913.GDZ6p0WdZL259TOMa7@fat_crate.local>
-References: <20250210174540.161705-1-ebiggers@kernel.org>
- <20250210174540.161705-2-ebiggers@kernel.org>
- <20250210204030.GBZ6pkPumjGQMaHWLb@fat_crate.local>
- <20250210210103.GC348261@sol.localdomain>
- <20250210211710.GCZ6ps1pNklAXyqD0p@fat_crate.local>
- <20250210213705.GD348261@sol.localdomain>
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B81111800264;
+	Mon, 10 Feb 2025 22:34:47 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EEF0D30001AB;
+	Mon, 10 Feb 2025 22:34:45 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 51AMYifL838184
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 10 Feb 2025 17:34:44 -0500
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 51AMYg0l838182;
+	Mon, 10 Feb 2025 17:34:42 -0500
+Date: Mon, 10 Feb 2025 17:34:42 -0500
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: Zhang Yi <yi.zhang@huaweicloud.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        linux-kernel@vger.kernel.org, hch@lst.de, tytso@mit.edu,
+        djwong@kernel.org, yi.zhang@huawei.com, chengzhihao1@huawei.com,
+        yukuai3@huawei.com, yangerkun@huawei.com
+Subject: Re: [RFC PATCH v2 4/8] dm: add BLK_FEAT_WRITE_ZEROES_UNMAP support
+Message-ID: <Z6p_AsZy41XMCEh5@redhat.com>
+References: <20250115114637.2705887-1-yi.zhang@huaweicloud.com>
+ <20250115114637.2705887-5-yi.zhang@huaweicloud.com>
+ <Z6aFtJzGWMNhILJW@redhat.com>
+ <3b1dcd45-efa6-4aad-9cd4-3302a29eb093@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250210213705.GD348261@sol.localdomain>
+In-Reply-To: <3b1dcd45-efa6-4aad-9cd4-3302a29eb093@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, Feb 10, 2025 at 01:37:05PM -0800, Eric Biggers wrote:
-> I'll also note that boot_cpu_has() is missing a comment that says it is
-> deprecated (if it really is).
+On Sat, Feb 08, 2025 at 11:12:57AM +0800, Zhang Yi wrote:
+> On 2025/2/8 6:14, Benjamin Marzinski wrote:
+> > On Wed, Jan 15, 2025 at 07:46:33PM +0800, Zhang Yi wrote:
+> >> From: Zhang Yi <yi.zhang@huawei.com>
+> >>
+> >> Set the BLK_FEAT_WRITE_ZEROES_UNMAP feature on stacking queue limits by
+> >> default. This feature shall be disabled if any underlying device does
+> >> not support it.
+> >>
+> >> Signed-off-by: Zhang Yi <yi.zhang@huawei.com>
+> >> ---
+> >>  drivers/md/dm-table.c | 3 ++-
+> >>  1 file changed, 2 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> >> index bd8b796ae683..58cce31bcc1e 100644
+> >> --- a/drivers/md/dm-table.c
+> >> +++ b/drivers/md/dm-table.c
+> >> @@ -598,7 +598,8 @@ int dm_split_args(int *argc, char ***argvp, char *input)
+> >>  static void dm_set_stacking_limits(struct queue_limits *limits)
+> >>  {
+> >>  	blk_set_stacking_limits(limits);
+> >> -	limits->features |= BLK_FEAT_IO_STAT | BLK_FEAT_NOWAIT | BLK_FEAT_POLL;
+> >> +	limits->features |= BLK_FEAT_IO_STAT | BLK_FEAT_NOWAIT | BLK_FEAT_POLL |
+> >> +			    BLK_FEAT_WRITE_ZEROES_UNMAP;
+> >>  }
+> >>  
+> > 
+> > dm_table_set_restrictions() can set limits->max_write_zeroes_sectors to
+> > 0, and it's called after dm_calculate_queue_limits(), which calls
+> > blk_stack_limits(). Just to avoid having the BLK_FEAT_WRITE_ZEROES_UNMAP
+> > still set while a device's max_write_zeroes_sectors is 0, it seems like
+> > you would want to clear it as well if dm_table_set_restrictions() sets
+> > limits->max_write_zeroes_sectors to 0.
+> > 
+> 
+> Hi, Ben!
+> 
+> Yeah, right. Thanks for pointing this out, and I also checked other
+> instances in dm where max_write_zeroes_sectors is set to 0, and it seems
+> we should also clear BLK_FEAT_WRITE_ZEROES_UNMAP in
+> disable_write_zeroes() as well.
 
-/*
- * This is the default CPU features testing macro to use in code.
-^^^^^^^^^^^^^
+Yep. Makes sense.
 
- *
- * It is for detection of features which need kernel infrastructure to be
- * used.  It may *not* directly test the CPU itself.  Use the cpu_has() family
- * if you want true runtime testing of CPU features, like in hypervisor code
- * where you are supporting a possible guest feature where host support for it
- * is not relevant.
- */
-#define cpu_feature_enabled(bit)        \
-        (__builtin_constant_p(bit) && DISABLED_MASK_BIT_SET(bit) ? 0 : static_cpu_has(bit))
+Thanks
+-Ben
 
-#define boot_cpu_has(bit)       cpu_has(&boot_cpu_data, bit)
----
+> 
+> Thanks,
+> Yi.
 
-Forget what I said - we'll convert everything when the time comes.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
