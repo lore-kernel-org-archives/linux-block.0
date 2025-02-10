@@ -1,98 +1,101 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6002236E5
-	for <linux-block@vger.kernel.org>; Mon, 10 Feb 2025 12:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4602253AB
+	for <linux-block@vger.kernel.org>; Mon, 10 Feb 2025 13:26:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739192054; cv=none; b=M6fqap8jUKaskR4DJ0OYJ+QxAWZXF1GlOpi8WTWm5dg6n2qjX+U5bwHgvYhpyr9khikv1kRJQySrL+udGb6fGfrDlPCkSSvBv1rNLwnpinxUssiGiAWfbimmCCb3I7A9KG6dpNWGKlEr5ORyr09bVefzP1my2Y28Bdm3ydyT1vM=
+	t=1739193988; cv=none; b=bTc5FyUJmFOLxE2hXMPhyQmjHIRJHiaeGot6siFD3qp7mV0iA2fKXNuU3faPpK3rFztLfrZFiisIyhHTHTjQ1yvXjM0jpUKVZDMIeienS9uyEagTb7i2xm/AHAwjZbCv3Hf8X+cazN9yUkZRJzl9DyaQ4MbD9nD9vnpE18p1k3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739192054; c=relaxed/simple;
-	bh=QGqalAQ1rnunlXro3KoB8sBbpOQlfMZWddKxwHfcwsQ=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=aBaVOk2g/1dHoMcgG0X+jVVIxE2bV75Sk+zttTTOuITL1UXQilLOpPuYAPluUxZApDIjmI/O9VHrePfnHsBFZAKFpOaCq1H/mH30p3FoAbPw2GDxG7ZnuS9OUYDhJErdcRGVk5z+fhFzOKlC6Yytk6nzs9bjo0petXIeVG3SJRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GMsgKyq8; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1739193988; c=relaxed/simple;
+	bh=RzFhUtwwplkdHMPOpVemh3JherPHaHQRq5G+qYyc/r4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SoXbcBRRQFzED8DJor3pAiJCD7bA83ubm1IvRupaq/TKxHregHNAK/j/atj6rk+WZCxhu0fraIZcg1z8XeexfFWDs9HeTmZ+7jt7nOEQ24M0jSc2QhWQj9NN2idYW2LCM9I9QBAojBNv81diqmgs5XVe/znzeb5NOZoXiPlWrfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SsowDuOT; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GMsgKyq8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SsowDuOT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739192052;
+	s=mimecast20190719; t=1739193985;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YxRVDQx0KBoUs8EflhssFSPDwR4Afm5j1VwyYYrfOfs=;
-	b=GMsgKyq8DHzOcYjfpZ1xS/meoesks260Wz+HXZoSlFC/1n5XC5Ll2+W7Leka/g7iZ+p/ph
-	LJeS6oPFrw4WRoMPk6QXk6pN/MUwfYbdbZ3GQpy6w1/k3nJPMa3X/WpryeXTfrzrLNHKWu
-	ej6Y9POJJGvVYHEn1InDw9Q25ibkfO0=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=E6q/kSsJyA7vK/azlwyGtDb19kZc/IlecclccTu0GH4=;
+	b=SsowDuOTPs8nzZr7Y1yzHBH26+pitn7tEtwLHElQ3bMARWEQfxFuL+SaHNpzgqSmsGaGbV
+	L6SfSnPLQB3Lh3wkCg3DSLydteZBQQQ2sv7g2P3T6ydOmWbU8oKvh9nd5J85ga/U6YlOvm
+	oKlW3qzKHHjqg+ZSYaRBM7ePQeIaCHA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-694-Zrrmm6oYP1ivFem4Io8wlw-1; Mon,
- 10 Feb 2025 07:54:07 -0500
-X-MC-Unique: Zrrmm6oYP1ivFem4Io8wlw-1
-X-Mimecast-MFC-AGG-ID: Zrrmm6oYP1ivFem4Io8wlw
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-158-0slBmrV2Pn-o-8EnrUfs_g-1; Mon,
+ 10 Feb 2025 08:26:23 -0500
+X-MC-Unique: 0slBmrV2Pn-o-8EnrUfs_g-1
+X-Mimecast-MFC-AGG-ID: 0slBmrV2Pn-o-8EnrUfs_g
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3B5681800876;
-	Mon, 10 Feb 2025 12:54:06 +0000 (UTC)
-Received: from [10.45.225.131] (unknown [10.45.225.131])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 83F46195608D;
-	Mon, 10 Feb 2025 12:54:03 +0000 (UTC)
-Date: Mon, 10 Feb 2025 13:54:00 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, 
-    Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
-    Zdenek Kabelac <zkabelac@redhat.com>, Milan Broz <gmazyland@gmail.com>, 
-    linux-block@vger.kernel.org, dm-devel@lists.linux.dev
-Subject: Re: [PATCH] blk-settings: round down io_opt to at least 4K
-In-Reply-To: <yq1cyfxdsmz.fsf@ca-mkp.ca.oracle.com>
-Message-ID: <52b66f23-d8c8-1344-6fd0-277dfa31ce84@redhat.com>
-References: <81b399f6-55f5-4aa2-0f31-8b4f8a44e6a4@redhat.com> <Z5CMPdUFNj0SvzpE@infradead.org> <e53588c8-77f0-5751-ad27-d6a3c4f88634@redhat.com> <yq1cyfykgng.fsf@ca-mkp.ca.oracle.com> <28dcf41a-db7d-f8e7-d6b7-acef325c758c@redhat.com> <yq1bjviflwb.fsf@ca-mkp.ca.oracle.com>
- <00717ba6-0ce9-5ccd-d93d-ce5db89d85ff@redhat.com> <yq1cyfxdsmz.fsf@ca-mkp.ca.oracle.com>
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8F4DE18011E1;
+	Mon, 10 Feb 2025 13:26:20 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.149])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0640B18004A7;
+	Mon, 10 Feb 2025 13:26:14 +0000 (UTC)
+Date: Mon, 10 Feb 2025 21:26:09 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Yi Zhang <yi.zhang@redhat.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	John Garry <john.g.garry@oracle.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH V2] block: make segment size limit workable for > 4K
+ PAGE_SIZE
+Message-ID: <Z6n-cbpvEerzNlAr@fedora>
+References: <20250210090319.1519778-1-ming.lei@redhat.com>
+ <51da6bf9-4226-467d-87c1-e6ec785b1c06@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <51da6bf9-4226-467d-87c1-e6ec785b1c06@suse.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
+On Mon, Feb 10, 2025 at 01:14:00PM +0100, Hannes Reinecke wrote:
+> On 2/10/25 10:03, Ming Lei wrote:
+> > PAGE_SIZE is applied in some block device queue limits, this way is
+> > very fragile and is wrong:
+> > 
+> > - queue limits are read from hardware, which is often one readonly
+> > hardware property
+> > 
+> > - PAGE_SIZE is one config option which can be changed during build time.
+> > 
+> > In RH lab, it has been found that max segment size of some mmc card is
+> > less than 64K, then this kind of card can't work in case of 64K PAGE_SIZE.
+> > 
+> So why isn't this reflected in the blk_min_segment settings?
+> Or, rather, why isn't setting blk_min_segment not enough?
 
-
-On Tue, 4 Feb 2025, Martin K. Petersen wrote:
+There isn't min_segment_size setting, at block layer takes PAGE_SIZE
+as the actual min_segment_size.
 
 > 
-> Mikulas,
-> 
-> > If there is some particular SSD that has more write IOPS for 8k requests 
-> > than for 4k requests, I'd like to know about it - out of curiosity.
-> 
-> SSD blocks are getting bigger and bigger, some drives hide it better
-> than others. Also look at all the efforts going on wrt. supporting
-> larger block sizes in the kernel.
-> 
-> Can you send me the output of:
-> 
-> # sg_vpd -p bl /dev/sdN
-> 
-> and maybe hdparm -I too? I'd like to see if we can come up with a
-> reasonable heuristic.
-> 
-> -- 
-> Martin K. Petersen	Oracle Linux Engineering
+> > Fix this issue by using BLK_MIN_SEGMENT_SIZE in related code for dealing
+> > with queue limits and checking if bio needn't split. Define BLK_MIN_SEGMENT_SIZE
+> > as 4K(minimized PAGE_SIZE).
+> > 
+> But why 4k then? That is a value like anything else, and what is the
+> rationale to use that instead of the more natural sector size?
 
-I don't have that USB-SATA bridge that reports optimal I/O size 65535 
-sectors. Milan talked about it, but maybe he doesn't have it too. Some 
-user reported that cryptsetup behaves badly with this particular bridge, 
-so Milan wrote workaround for it in cryptsetup.
+The comment explains it already: 4K = min(PAGE_SIZE).
 
-You can simulate it with "modprobe scsi_debug dev_size_mb=32 
-sector_size=512 num_tgts=1 opt_blks=65535"
 
-Mikulas
+Thanks,
+Ming
 
