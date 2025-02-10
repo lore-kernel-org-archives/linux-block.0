@@ -1,69 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bsdbackstore.eu (128-116-240-228.dyn.eolo.it [128.116.240.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC162580D6;
-	Mon, 10 Feb 2025 16:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165B82580EA;
+	Mon, 10 Feb 2025 16:40:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.116.240.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739204710; cv=none; b=NL40TZb/79xdiFfirYAyXZN6lBEYj4yQg47xhEMPnuQmHf97hcFVyK7hTgaCByVVbnc4vm3dsjbnHDEJXNF90KoSushR4sJh1O5GZl7hDHCk2USanyzD85r+dm2BJKMG4VW4qeotiz+OI8LXgR1y9LRz/KOwWFhXirZw/A7Rv10=
+	t=1739205621; cv=none; b=XMbLfJF8fXvYCAxGui2Dpp6yUwW+lV4A5FFSFQgBCV7oMZK86UFA5wgRCUjKqnd4MhkYO7quz9znPe4yRYj0z8cmYlCOBmF8teyz2vdPXox+kxV8WFUuk0dUO+CCS8uSmuzCTScxmgvTPpK1e1lpKUQujwhsEazYLAKL/McLKWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739204710; c=relaxed/simple;
-	bh=J1vqTI0fG2ICMpAX1Wcx+LsnGdWVzwbfDeSxED93siY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WSOzxl9R5Wif/tj+moegY81lQuxfV6qLvrcv7U3El8vl4DHRhfVE5Tb10c2BkHBy+zrve6fq7z38HXFfzjOYmZnTu+nbAPb5sYyRcEGH1NqEZ0mC9AC6Ch/jtZ9kGQfhq+zXcyKLmp0oj7blcG5tczgOKlFup2f9wVXw3JgSR7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RjjBvG1I; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RjjBvG1I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 324A8C4CED1;
-	Mon, 10 Feb 2025 16:25:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739204709;
-	bh=J1vqTI0fG2ICMpAX1Wcx+LsnGdWVzwbfDeSxED93siY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RjjBvG1IZ2U2km/x14X8PR2pbtonsPBtFV7ehJYwJsZKDU9A0HwGEpFZzNnSDET7/
-	 ysAxQQMGFU91ZsaxqoESdH1Tlxm32l4DXpkDCRkiyEUMs4d8gPA6cn6p/VRnIJ8ZEk
-	 FuxofcV3pksQpMzY2ypnlz0VkSK5+6Ppf9rotw1nKCNIqPdV4MFIh5yXRKPKIK1WfS
-	 45U3KmqBvrsxy4+t8/6vdRcnVYXXh7u4QjoeuFKjtRnGBApLiwqHf8BjFKTU0v6KMa
-	 er5GsPMdd3UjQRGNgJ+czYXclEMzAMJr1WP6eRs7vX38CBncHKf2nWNJeb1hqXjPVv
-	 xVSpf2HS1Z1qg==
-Date: Mon, 10 Feb 2025 08:25:07 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>,
-	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-	linux-fscrypt@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Subject: Re: [PATCH v11 0/7] Support for hardware-wrapped inline encryption
- keys
-Message-ID: <20250210162507.GB1264@sol.localdomain>
-References: <20250204060041.409950-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1739205621; c=relaxed/simple;
+	bh=pInBy8YX1VZfoKLrPNtGqsHJ8GKtyDoFXM54Z975PS0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=PNhuki2V2t6PumqEwCEfQ8yCMxRTe4TUdbmi8cEjBV68c//71dMr6gKiVaslmSvgLWn0EYnVK69lxe6/7Pp0U4llKOxttXPAKmam/0BABy7jRjj8WgNM9izLNu0Vpn8N/oH3JNa11/VNtzpp61DTFtzJomNOaNaB4h4CzqJMaTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu; spf=pass smtp.mailfrom=bsdbackstore.eu; arc=none smtp.client-ip=128.116.240.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bsdbackstore.eu
+Received: from localhost (128-116-240-228.dyn.eolo.it [128.116.240.228])
+	by bsdbackstore.eu (OpenSMTPD) with ESMTPSA id dc734ee4 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Mon, 10 Feb 2025 17:40:13 +0100 (CET)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250204060041.409950-1-ebiggers@kernel.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 10 Feb 2025 17:40:13 +0100
+Message-Id: <D7OWXONOUZ1Y.19KIRCQDVRTKN@bsdbackstore.eu>
+Subject: Re: nvme-tcp: fix a possible UAF when failing to send request
+From: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>
+To: "Max Gurtovoy" <mgurtovoy@nvidia.com>, "zhang.guanghui@cestc.cn"
+ <zhang.guanghui@cestc.cn>, "sagi" <sagi@grimberg.me>, "kbusch"
+ <kbusch@kernel.org>, "sashal" <sashal@kernel.org>, "chunguang.xu"
+ <chunguang.xu@shopee.com>
+Cc: "linux-kernel" <linux-kernel@vger.kernel.org>, "linux-nvme"
+ <linux-nvme@lists.infradead.org>, "linux-block"
+ <linux-block@vger.kernel.org>
+X-Mailer: aerc
+References: <2025021015413817916143@cestc.cn>
+ <D7OOGIOAJRUH.9LOJ3X4IUKQV@bsdbackstore.eu>
+ <3f1f7ec3-cb49-4d66-b2b0-57276a6c62f0@nvidia.com>
+In-Reply-To: <3f1f7ec3-cb49-4d66-b2b0-57276a6c62f0@nvidia.com>
 
-Hi Jens,
+On Mon Feb 10, 2025 at 11:24 AM CET, Max Gurtovoy wrote:
+>
+> It seems to me that the HOST_PATH_ERROR handling can be improved in=20
+> nvme-tcp.
+>
+> In nvme-rdma we use nvme_host_path_error(rq) and nvme_cleanup_cmd(rq) in=
+=20
+> case we fail to submit a command..
+>
+> can you try to replacing nvme_tcp_end_request(blk_mq_rq_from_pdu(req),=20
+> NVME_SC_HOST_PATH_ERROR); call with the similar logic we use in=20
+> nvme-rdma for host path error handling ?
 
-On Mon, Feb 03, 2025 at 10:00:34PM -0800, Eric Biggers wrote:
-> This is targeting 6.15.  As per the suggestion from Jens
-> (https://lore.kernel.org/linux-block/c3407d1c-6c5c-42ee-b446-ccbab1643a62@kernel.dk/),
-> I'd like patches 1-3 to be queued up into a branch that gets pulled into
-> the block tree.  I'll then take patches 4-7 through the fscrypt tree,
-> also for 6.15.  If I end up with too many merge conflicts by trying to
-> take patches 5-7 (given that this is a cross-subsystem feature), my
-> fallback plan will be to wait until 6.16 to land patches 5-7, when they
-> will finally be unblocked by the block patches having landed.
+Yes, I could try to prepare a patch.
 
-Let me know what you think about this plan.
+In any case, I think the main issue here is that nvme_tcp_poll()
+should be prevented from racing against io_work... and I also think
+there is a possible race condition if nvme_tcp_poll() races against
+the controller resetting code.
 
-- Eric
+Maurizio
