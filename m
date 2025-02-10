@@ -1,129 +1,152 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A20024E4B0
-	for <linux-block@vger.kernel.org>; Mon, 10 Feb 2025 20:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E1225C71C;
+	Mon, 10 Feb 2025 20:25:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739218629; cv=none; b=p4EtowhgiWpuagnYNZFFeQqe7XKIoFlKm9N2TY4ygB2lb4Pcr0HHzqtED/m5lM1S29vEXa9Ko/bF/+Lc7beKmUFelEJ7nTuDiRmDJuZZPVgRcKQzW2ubjBj4nxWaCI0htBHiuY5FS6AMRaaU+tykv460DSAsWzczlIUhadaUFT0=
+	t=1739219109; cv=none; b=lXfS8oQ79SwNVybzpjEshWD6kx9NYC8TDhOZRnhWyETwcKGM51Inqw+OFA+LfElzkH+p6wM+rwTH3e9ZKBkcS+SP3JmgMHISl5Sle/L+2WV7vs5tWc3ht1B7vjcUVNKql2Vr0sjEysOYlpBrGxaTvyOZBtnWhTuwaAKlnqpawHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739218629; c=relaxed/simple;
-	bh=vNS7wWorwHE83g7jtOZau1P3Bd5cO3Zt19RcAolWVA8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ESoRRjCk2lnoMlHAbXo3imxoyEwqLVmep8fTvXvfof/vlc6HuDUUkbrSavJzKehM+RXM1h1YNHh2JrbZOAXHzqRHz5yjNBaFcV02dylX3P7yhkTeUREhCWyUYofHDpJdtm0CwTeEDVOaQ1Qa7ibBtXyRIK9I7i1JE4M3yXkQfdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCuoL9m3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739219109; c=relaxed/simple;
+	bh=vXhVwgAzJRsbMBb4ioYc4lrcIttn/6/nkZ/Jx0CS6GM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nXpzX3pCE/drXvega5vRcuxIK9N0AcPGmF9Fy0dwbYT41atyeez5gGcBSXD8STO9SlSWPBmvZoXeWk0IG2ZaA7z7AymXSqhy/XnQauJndYVH+Zpp73O6Q79u1Xatj58C/RdAQm2iGA4tCbEJSCd/nd4PfaN0LuaQcaRHGwt8hnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BQPJU1lV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCuoL9m3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 665A7C4CED1;
-	Mon, 10 Feb 2025 20:17:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQPJU1lV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 484BFC4CEE4;
+	Mon, 10 Feb 2025 20:25:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739218628;
-	bh=vNS7wWorwHE83g7jtOZau1P3Bd5cO3Zt19RcAolWVA8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DCuoL9m37ff5LzqKrr+RFWSk2hkDTLEqiAFZJZ40FMdxWCxNp2i3rx3AFemN8d832
-	 mITSxXASJC6Q0ZIbPeuiqL2/jmSo/3odmXNSlbBPTnqfGhQD0hVNOzAR/J+OUU+k1I
-	 Wpi/qj5GGDt2u0yYSh/0StGdN/7ce6GrA2I0UZ/HqKlnzSbwqNeXjnr576rODHYkdo
-	 RJUD37ajCysQ0U+1GBzCJRv0D6cfr5RLbXmcJM7UeRFoHwXFX1LwJ+YDGhGJn7SzWg
-	 LjpRVVrBFsxlhyhx8USkqKdO789ZbArTgmNTmXN6hpFC9mH/0IUzdNKafbYNreqesy
-	 F0XX2JhtlHUIg==
-Date: Mon, 10 Feb 2025 12:17:07 -0800
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Yi Zhang <yi.zhang@redhat.com>,
-	John Garry <john.g.garry@oracle.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Keith Busch <kbusch@kernel.org>,
-	Daniel Gomez <da.gomez@samsung.com>
-Subject: Re: [PATCH V2] block: make segment size limit workable for > 4K
- PAGE_SIZE
-Message-ID: <Z6peww6d3EP5-B8n@bombadil.infradead.org>
-References: <20250210090319.1519778-1-ming.lei@redhat.com>
+	s=k20201202; t=1739219108;
+	bh=vXhVwgAzJRsbMBb4ioYc4lrcIttn/6/nkZ/Jx0CS6GM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BQPJU1lVvT59yLO19S+0VFvHodslE1bbsNTJRksP19srUIFw/MHoVBh89aQFJP/Nl
+	 8NrhHpfkwSJegrDFik1Qi924INyer6fAq+VJLwou4Y4D0D219Bhvyme8kAX0wak5u9
+	 6UZPicZqg+oORAPzkYPOP5BPHLKbhoW1Z1g5MzKP2dMwpPz/Olt9HsEd6maKB3hMdF
+	 tEYcsOiEeX0venL7NxxwRUDWvOdnaBHiP8pH1pPqzoPYrzHunYZy4PFfoxu7Z6TFRp
+	 3XpxT+lnV+DC1K9/IjuKH6M5RxI42O78sgfuSqlHNZv842dAoFtq/wx1KFEeyWjmTv
+	 aHKh2ZYgsqgoA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-fscrypt@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Subject: [PATCH v12 0/4] Driver and fscrypt support for HW-wrapped inline encryption keys
+Date: Mon, 10 Feb 2025 12:23:32 -0800
+Message-ID: <20250210202336.349924-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250210090319.1519778-1-ming.lei@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 10, 2025 at 05:03:19PM +0800, Ming Lei wrote:
-> PAGE_SIZE is applied in some block device queue limits, this way is
-> very fragile and is wrong:
-> 
-> - queue limits are read from hardware, which is often one readonly
-> hardware property
-> 
-> - PAGE_SIZE is one config option which can be changed during build time.
+This patchset is based on linux-block/for-next and is also available at:
 
-This is true.
+    git fetch https://git.kernel.org/pub/scm/fs/fscrypt/linux.git wrapped-keys-v12
 
-> In RH lab, it has been found that max segment size of some mmc card is
-> less than 64K, then this kind of card can't work in case of 64K PAGE_SIZE.
+Now that the block layer support for hardware-wrapped inline encryption
+keys has been applied for 6.15
+(https://lore.kernel.org/r/173920649542.40307.8847368467858129326.b4-ty@kernel.dk),
+this series refreshes the remaining patches.  They add the support for
+hardware-wrapped inline encryption keys to the Qualcomm ICE and UFS
+drivers and to fscrypt.  All tested on SM8650 with xfstests.
 
-This is true, but check the note on block/blk-merge.c blk_bvec_map_sg().
-It would seem that this is a limitation of MMC/SD and that this should
-ideally be fixed.
+TBD whether these will land in 6.15 too, or wait until 6.16 when the
+block patches that patches 2-4 depend on will have landed.
 
-> Fix this issue by using BLK_MIN_SEGMENT_SIZE in related code for dealing
-> with queue limits and checking if bio needn't split. Define BLK_MIN_SEGMENT_SIZE
-> as 4K(minimized PAGE_SIZE).
+Changed in v12:
+  - Rebased onto linux-block/for-next
+  - Fixed endianness error in drivers/soc/qcom/ice.c
+  - Added Acked-bys
+  - Updated the fscrypt patch to go back to having just
+    FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED (as in v8) instead of
+    FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED_V0 and
+    FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED_V1.  Upon further discussion it
+    seemed the partial V0 compatibility was not going to be as helpful
+    as I had hoped, so instead we'll just have the single new version
+    that does things properly.  Note, I've updated my wip-wrapped-keys
+    branch of fscryptctl accordingly.
 
-But indeed if the block driver isn't yet fixed, then sure, we have to
-deal with the issue, I am not convinced that the logic below addresses
-this in a generic way, rather it seems to conflate the areas where we
-do need the generic block layer min defined, and when we have a block
-min segment limit.
+Changed in v11:
+  - Rebased onto v6.14-rc1.  Dropped the patches that were upstreamed in
+    6.14, and put the block patches first in the series again.
+  - Significantly cleaned up the patch "soc: qcom: ice: add HWKM support
+    to the ICE driver".  Some of the notable changes were dropping the
+    unnecessary support for HWKM v1, and replacing qcom_ice_using_hwkm()
+    with qcom_ice_get_supported_key_type().
+  - Consistently used and documented the EBADMSG error code for invalid
+    hardware-wrapped keys.
+  - Other minor cleanups.
 
-> Cc: Yi Zhang <yi.zhang@redhat.com>
-> Cc: Luis Chamberlain <mcgrof@kernel.org>
-> Cc: John Garry <john.g.garry@oracle.com>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Keith Busch <kbusch@kernel.org>
-> Link: https://lore.kernel.org/linux-block/20250102015620.500754-1-ming.lei@redhat.com/
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V2:
-> 	- cover bio_split_rw_at()
-> 	- add BLK_MIN_SEGMENT_SIZE
-> 
->  block/blk-merge.c      | 2 +-
->  block/blk-settings.c   | 6 +++---
->  block/blk.h            | 2 +-
->  include/linux/blkdev.h | 1 +
->  4 files changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 15cd231d560c..b55c52a42303 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -329,7 +329,7 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
->  
->  		if (nsegs < lim->max_segments &&
->  		    bytes + bv.bv_len <= max_bytes &&
-> -		    bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
-> +		    bv.bv_offset + bv.bv_len <= BLK_MIN_SEGMENT_SIZE) {
->  			nsegs++;
->  			bytes += bv.bv_len;
+Changed in v10:
+  - Fixed bugs in qcom_scm_derive_sw_secret() and cqhci_crypto_init().
+  - Added "ufs: qcom: fix crypto key eviction" and
+    "mmc: sdhci-msm: fix crypto key eviction".
+  - Split removing ufs_hba_variant_ops::program_key into its own patch.
+  - Minor cleanups.
+  - Added Tested-by.
 
-I'll note that the 64k BLK_MAX_SEGMENT_SIZE is an old "odd historic" default
-value, ie, not a documented hard limit but some odd old thing which
-blk_validate_limits() encourages block drivers to override, so a soft
-max.
+Changed in v9 (relative to v7 patchset from Bartosz Golaszewski):
+  - ufs-qcom and sdhci-msm now just initialize the blk_crypto_profile
+    themselves, like what ufs-exynos was doing.  This avoids needing to
+    add all the host-specific hooks for wrapped key support to the MMC
+    and UFS core drivers.
+  - When passing the blk_crypto_key further down the stack, it now
+    replaces parameters like the algorithm ID, to avoid creating two
+    sources of truth.
+  - The module parameter qcom_ice.use_wrapped_keys should work correctly now.
+  - The fscrypt support no longer uses a policy flag to indicate when a
+    file is protected by a HW-wrapped key, since it was already implied
+    by the file's key identifier being that of a HW-wrapped key.
+    Originally there was an issue where raw and HW-wrapped keys could
+    share key identifiers, but I had fixed that earlier by introducing a
+    new HKDF context byte.
+  - The term "standard keys" is no longer used.  Now "raw keys" is
+    consistently used instead.  I've found that people find the term
+    "raw keys" to be more intuitive.  Also HW-wrapped keys could in
+    principle be standardized.
+  - I've reordered the patchset to place preparatory patches that don't
+    depend on the actual HW-wrapped key support first.
 
-That said, if we validate this soft max and if you also validate the min
-shouldn't value in the above instead be lim->max_segment_size instead,
-provided that we also address the coment in blk_bvec_map_sg()?
+For older changelogs, see
+https://lore.kernel.org/r/20241202-wrapped-keys-v7-0-67c3ca3f3282@linaro.org and
+https://lore.kernel.org/r/20231104211259.17448-1-ebiggers@kernel.org
 
-More forward looking -- are you using BLK_MIN_SEGMENT_SIZE here due to
-the same mmc/sd limitations ? Can we overcome the mmc/sd limitations by
-only using this BLK_MIN_SEGMENT_SIZE only on block drivers which have the
-scatterlists limitation?
+Eric Biggers (3):
+  soc: qcom: ice: make qcom_ice_program_key() take struct blk_crypto_key
+  ufs: qcom: add support for wrapped keys
+  fscrypt: add support for hardware-wrapped keys
 
-The rest in your patch seem like sensible places to use a BLK_MIN_SEGMENT_SIZE
-although I need to think more about bio_may_need_split() with larger segments
-in mind some more.
+Gaurav Kashyap (1):
+  soc: qcom: ice: add HWKM support to the ICE driver
 
-  Luis
+ Documentation/filesystems/fscrypt.rst | 187 +++++++++++---
+ drivers/mmc/host/sdhci-msm.c          |  16 +-
+ drivers/soc/qcom/ice.c                | 350 ++++++++++++++++++++++++--
+ drivers/ufs/host/ufs-qcom.c           |  57 ++++-
+ fs/crypto/fscrypt_private.h           |  75 +++++-
+ fs/crypto/hkdf.c                      |   4 +-
+ fs/crypto/inline_crypt.c              |  44 +++-
+ fs/crypto/keyring.c                   | 138 +++++++---
+ fs/crypto/keysetup.c                  |  63 ++++-
+ fs/crypto/keysetup_v1.c               |   4 +-
+ include/soc/qcom/ice.h                |  34 ++-
+ include/uapi/linux/fscrypt.h          |   6 +-
+ 12 files changed, 809 insertions(+), 169 deletions(-)
+
+
+base-commit: 352245090aa60dbaa11b4f7da18f31caf42aeb82
+-- 
+2.48.1
+
