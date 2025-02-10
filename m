@@ -1,42 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854861F463C;
-	Mon, 10 Feb 2025 18:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A20024E4B0
+	for <linux-block@vger.kernel.org>; Mon, 10 Feb 2025 20:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739210479; cv=none; b=lZoGQ/TKhT//kvKTCYfZMgxpZbRZeQmmz0Y7QnsuW9ScbFV0e5BMlx/CIPyXUYUyaTsN7eKYfEWUC1F1Pc2ayXtwJ0AOQYC/lP8VfSGBTr01MMa+sm8Lw4ISCPtAwN0S+HN/c77wI4b187SJ1xf0e0r+ZFKQLWdxvNA15QI/drc=
+	t=1739218629; cv=none; b=p4EtowhgiWpuagnYNZFFeQqe7XKIoFlKm9N2TY4ygB2lb4Pcr0HHzqtED/m5lM1S29vEXa9Ko/bF/+Lc7beKmUFelEJ7nTuDiRmDJuZZPVgRcKQzW2ubjBj4nxWaCI0htBHiuY5FS6AMRaaU+tykv460DSAsWzczlIUhadaUFT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739210479; c=relaxed/simple;
-	bh=KjTtyrQ6PlZ9M7KRaLHXr40wP8R/TN2mlcE3YgJ21fE=;
+	s=arc-20240116; t=1739218629; c=relaxed/simple;
+	bh=vNS7wWorwHE83g7jtOZau1P3Bd5cO3Zt19RcAolWVA8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jL/R8rMQIO164y4x3BYmegavq8MdZ8r5rcHUkynaQF71q/IL4YRxj8E0xZ0zUpgxc18nvSUOuXAiXMgZsFDhfEZTbKRaGzvOvZXsJzI0JdsB2NhQIdIrqbJEJUbPUYPdZqu5rgu2AXF0wJN64FFksJSvtHqQN04GKIH519sCCK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JWOF1hrP; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ESoRRjCk2lnoMlHAbXo3imxoyEwqLVmep8fTvXvfof/vlc6HuDUUkbrSavJzKehM+RXM1h1YNHh2JrbZOAXHzqRHz5yjNBaFcV02dylX3P7yhkTeUREhCWyUYofHDpJdtm0CwTeEDVOaQ1Qa7ibBtXyRIK9I7i1JE4M3yXkQfdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCuoL9m3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JWOF1hrP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1542C4CED1;
-	Mon, 10 Feb 2025 18:01:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCuoL9m3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 665A7C4CED1;
+	Mon, 10 Feb 2025 20:17:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739210479;
-	bh=KjTtyrQ6PlZ9M7KRaLHXr40wP8R/TN2mlcE3YgJ21fE=;
+	s=k20201202; t=1739218628;
+	bh=vNS7wWorwHE83g7jtOZau1P3Bd5cO3Zt19RcAolWVA8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JWOF1hrP17DAcLqMFntcOd/4JfJqQMkcisGGgOPyewq+pNERmxh4naTI2Qy67VwCc
-	 acyGELt2CoiUom/XA9mmLhgBW7UbvIEerEIglDkmlVpttieWb3SJqvofl3v4bmlHXs
-	 Fg20Jav/aivQZ/HGLa9+kpaA+eOl4Vzpc0ZDDR3IR1IAIryfeG62JqXhWkpk3X5HLH
-	 9HTd+R/LEe0/2IjJbRZlw5YGH3HziCNs1rfZbz5AGGNlHuJliG36IkBzdsu6QjzlLJ
-	 ze9Xqo9VsELcKE7QSB77SaqEPNDbx24NN/H/Rf+UVJyOoz6IgcMcwQWexWgR67Qqpe
-	 n27bO73XittnA==
-Date: Mon, 10 Feb 2025 10:01:17 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org,
-	linux-block@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	b=DCuoL9m37ff5LzqKrr+RFWSk2hkDTLEqiAFZJZ40FMdxWCxNp2i3rx3AFemN8d832
+	 mITSxXASJC6Q0ZIbPeuiqL2/jmSo/3odmXNSlbBPTnqfGhQD0hVNOzAR/J+OUU+k1I
+	 Wpi/qj5GGDt2u0yYSh/0StGdN/7ce6GrA2I0UZ/HqKlnzSbwqNeXjnr576rODHYkdo
+	 RJUD37ajCysQ0U+1GBzCJRv0D6cfr5RLbXmcJM7UeRFoHwXFX1LwJ+YDGhGJn7SzWg
+	 LjpRVVrBFsxlhyhx8USkqKdO789ZbArTgmNTmXN6hpFC9mH/0IUzdNKafbYNreqesy
+	 F0XX2JhtlHUIg==
+Date: Mon, 10 Feb 2025 12:17:07 -0800
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Yi Zhang <yi.zhang@redhat.com>,
+	John Garry <john.g.garry@oracle.com>,
+	Bart Van Assche <bvanassche@acm.org>,
 	Keith Busch <kbusch@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v4 0/6] x86 CRC optimizations
-Message-ID: <20250210180117.GF1264@sol.localdomain>
-References: <20250210174540.161705-1-ebiggers@kernel.org>
+	Daniel Gomez <da.gomez@samsung.com>
+Subject: Re: [PATCH V2] block: make segment size limit workable for > 4K
+ PAGE_SIZE
+Message-ID: <Z6peww6d3EP5-B8n@bombadil.infradead.org>
+References: <20250210090319.1519778-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,22 +47,83 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250210174540.161705-1-ebiggers@kernel.org>
+In-Reply-To: <20250210090319.1519778-1-ming.lei@redhat.com>
 
-On Mon, Feb 10, 2025 at 09:45:34AM -0800, Eric Biggers wrote:
-> This patchset applies to the crc tree and is also available at:
+On Mon, Feb 10, 2025 at 05:03:19PM +0800, Ming Lei wrote:
+> PAGE_SIZE is applied in some block device queue limits, this way is
+> very fragile and is wrong:
 > 
->     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git crc-x86-v4
+> - queue limits are read from hardware, which is often one readonly
+> hardware property
 > 
-> This series replaces the existing x86 PCLMULQDQ optimized CRC code with
-> new code that is shared among the different CRC variants and also adds
-> VPCLMULQDQ support, greatly improving performance on recent CPUs.  The
-> last patch wires up the same optimization to crc64_be() and crc64_nvme()
-> (a.k.a. the old "crc64_rocksoft") which previously were unoptimized,
-> improving the performance of those CRC functions by as much as 100x.
-> crc64_be is used by bcachefs, and crc64_nvme is used by blk-integrity.
-> 
+> - PAGE_SIZE is one config option which can be changed during build time.
 
-FYI, I've applied this to crc-next.
+This is true.
 
-- Eric
+> In RH lab, it has been found that max segment size of some mmc card is
+> less than 64K, then this kind of card can't work in case of 64K PAGE_SIZE.
+
+This is true, but check the note on block/blk-merge.c blk_bvec_map_sg().
+It would seem that this is a limitation of MMC/SD and that this should
+ideally be fixed.
+
+> Fix this issue by using BLK_MIN_SEGMENT_SIZE in related code for dealing
+> with queue limits and checking if bio needn't split. Define BLK_MIN_SEGMENT_SIZE
+> as 4K(minimized PAGE_SIZE).
+
+But indeed if the block driver isn't yet fixed, then sure, we have to
+deal with the issue, I am not convinced that the logic below addresses
+this in a generic way, rather it seems to conflate the areas where we
+do need the generic block layer min defined, and when we have a block
+min segment limit.
+
+> Cc: Yi Zhang <yi.zhang@redhat.com>
+> Cc: Luis Chamberlain <mcgrof@kernel.org>
+> Cc: John Garry <john.g.garry@oracle.com>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Keith Busch <kbusch@kernel.org>
+> Link: https://lore.kernel.org/linux-block/20250102015620.500754-1-ming.lei@redhat.com/
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V2:
+> 	- cover bio_split_rw_at()
+> 	- add BLK_MIN_SEGMENT_SIZE
+> 
+>  block/blk-merge.c      | 2 +-
+>  block/blk-settings.c   | 6 +++---
+>  block/blk.h            | 2 +-
+>  include/linux/blkdev.h | 1 +
+>  4 files changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 15cd231d560c..b55c52a42303 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -329,7 +329,7 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
+>  
+>  		if (nsegs < lim->max_segments &&
+>  		    bytes + bv.bv_len <= max_bytes &&
+> -		    bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
+> +		    bv.bv_offset + bv.bv_len <= BLK_MIN_SEGMENT_SIZE) {
+>  			nsegs++;
+>  			bytes += bv.bv_len;
+
+I'll note that the 64k BLK_MAX_SEGMENT_SIZE is an old "odd historic" default
+value, ie, not a documented hard limit but some odd old thing which
+blk_validate_limits() encourages block drivers to override, so a soft
+max.
+
+That said, if we validate this soft max and if you also validate the min
+shouldn't value in the above instead be lim->max_segment_size instead,
+provided that we also address the coment in blk_bvec_map_sg()?
+
+More forward looking -- are you using BLK_MIN_SEGMENT_SIZE here due to
+the same mmc/sd limitations ? Can we overcome the mmc/sd limitations by
+only using this BLK_MIN_SEGMENT_SIZE only on block drivers which have the
+scatterlists limitation?
+
+The rest in your patch seem like sensible places to use a BLK_MIN_SEGMENT_SIZE
+although I need to think more about bio_may_need_split() with larger segments
+in mind some more.
+
+  Luis
