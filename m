@@ -1,216 +1,244 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D0022FF58
-	for <linux-block@vger.kernel.org>; Mon, 10 Feb 2025 13:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92470231A37
+	for <linux-block@vger.kernel.org>; Mon, 10 Feb 2025 14:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739194632; cv=none; b=bdPAqzH46JkHWynBTz78tTEhla3t2T3bIhKlh4ZO2bQdCfgGdmx4bj5KwPt10QMWuC/ozvO2DJa84W/1Lypo7kHY2PaN07HBxjg91V6o5GIWykKpSDPds45fFnZMSyFuk2Mb5pQAuIkU2dW21y9QSM5BZCHnW+fwacv7a61xhEk=
+	t=1739196783; cv=none; b=I6+vsHarbHEGp1Bj0ADzQklWmZ+TZeK/n2RCMaafgQcW9Cmbe27WnsXs45HI7qemJ5IEcHOiP167nfrLjCUgqxwihs6+wydv0ogKSty/V646y2dfRHhhQkBUtBcQFW5kBVeggyytEWVGTjdhHJrA/5CGadOSrSkcsbIGbx9Tr/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739194632; c=relaxed/simple;
-	bh=4lvL+OGPx6BuEf8PfbuoZnpI0cjlEyVuBZExXP04Bow=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eMzjRyd+kaTOsko8upqC9tYT0Wjj/yPeySP82/7NBNkLCivflw9J3jgdG2IPvikTtLxdEIfx5EFWS+ZdmD6Xi0xpcOCva90H9pmmGOelEK8PcTB+XOtFqTC9tPIaEEw6gplQflxb2gfn6QhNq3t598OcfZ1l/XJ6wjIgenDAElA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=TPVH6j0a; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1739196783; c=relaxed/simple;
+	bh=F1GQunofvZymwaw6OImDDuUuSgczN6ZtGh5ttLFMbz8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KGIKyi7lDhTrQ6o0oyHpcGq9MlL3e76gWCJV6Qo80q2E3BKAd6EecHngX99LgzrthCpsy09oqQA6PUwZsi0DeXaHeAa8ueQBLvy4kYJaHdTh+KtZRIIJ211wE52tOMvn3RBSnFJsY97Xy/VTLKgfUTvQILQ16J5c5JDXO0qIUqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f4Fv6sFl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TPVH6j0a"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51A7XF99021503;
-	Mon, 10 Feb 2025 13:37:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=4a+uwn
-	uDVIE893jKGXM5U4NV+5VvPxtFNmQbkX9D+Q8=; b=TPVH6j0acB+0qMKZtpqaw9
-	PwNXlr7+q3UFIIcwe84V72UgQ1yJMGc/kpTLX5dG5KKGDYFDcG+iuxToZz6x9yOb
-	CxwFvqtCULal/LXC5lTYjn1cLVzEYNXWRBDHZ4eEZJ3qXoDRl4zRtfiZ+O+Yjfy4
-	5eT21IULVgnLXdd6oOD8oC3B4jNSrgdjP0xmXQ9QxciZ/edtA3aFIuflZOznzWlb
-	MPHzeizkBcHB1rXjDZij2zM0FRUk3ebFF77g2c59OFRwCZJywn4MQpNZLvLUbrWl
-	ny0VmKtjM1cgude7tagHBOs8sE771y4F32p6E44H/0TiYLqWoUTSKL4r2PC8weeQ
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44qd5nsmr2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Feb 2025 13:37:04 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51ABJS7a021713;
-	Mon, 10 Feb 2025 13:37:03 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44phksep1v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Feb 2025 13:37:03 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51ADb37Z26739336
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 10 Feb 2025 13:37:03 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4486258043;
-	Mon, 10 Feb 2025 13:37:03 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 701A958055;
-	Mon, 10 Feb 2025 13:37:01 +0000 (GMT)
-Received: from [9.109.198.172] (unknown [9.109.198.172])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 10 Feb 2025 13:37:01 +0000 (GMT)
-Message-ID: <15c24003-c48e-4ca6-856f-5f42944e32a2@linux.ibm.com>
-Date: Mon, 10 Feb 2025 19:06:59 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f4Fv6sFl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739196780;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O/56VSVljZRXAfq5xCEI3sQnGPKbEh4zS3nINFQ+5DY=;
+	b=f4Fv6sFlTjcBzdb7VDJlTxnIkhAhKdu92ph0UQ0i74Juy/ci5DtnSnY+YD8QrjKKiWnjWU
+	fAU6h9ahOFSnizZZzdmwPfY53AqdorVfDlTX2gRh57GUxaAt6sP5rMLRwpIUpx7r+e5PcW
+	pP7y+O6Io/rM3WujaOMsGEQyX4nVqfI=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-IS8gbWHAOEG4oM7Oy5Ep-Q-1; Mon,
+ 10 Feb 2025 09:12:55 -0500
+X-MC-Unique: IS8gbWHAOEG4oM7Oy5Ep-Q-1
+X-Mimecast-MFC-AGG-ID: IS8gbWHAOEG4oM7Oy5Ep-Q
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E8801955D65;
+	Mon, 10 Feb 2025 14:12:54 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.149])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BD3CD195608D;
+	Mon, 10 Feb 2025 14:12:49 +0000 (UTC)
+Date: Mon, 10 Feb 2025 22:12:44 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Keith Busch <kbusch@meta.com>
+Cc: io-uring@vger.kernel.org, linux-block@vger.kernel.org, axboe@kernel.dk,
+	asml.silence@gmail.com, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 3/6] io_uring: add support for kernel registered bvecs
+Message-ID: <Z6oJXIsBMMkCpW_3@fedora>
+References: <20250203154517.937623-1-kbusch@meta.com>
+ <20250203154517.937623-4-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/7] block: don't grab q->debugfs_mutex
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        hch <hch@lst.de>
-References: <20250209122035.1327325-1-ming.lei@redhat.com>
- <20250209122035.1327325-8-ming.lei@redhat.com>
- <vc2tk5rrg4xs4vkxwirokp2ugzg6fpbmhlenw7xvjgpndkzere@peyfaxxwefj3>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <vc2tk5rrg4xs4vkxwirokp2ugzg6fpbmhlenw7xvjgpndkzere@peyfaxxwefj3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: EmiHzNd_L1-e_2FLfVboRWpHJKOTusWk
-X-Proofpoint-ORIG-GUID: EmiHzNd_L1-e_2FLfVboRWpHJKOTusWk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-10_07,2025-02-10_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 phishscore=0 mlxscore=0 clxscore=1015 spamscore=0
- mlxlogscore=999 suspectscore=0 malwarescore=0 impostorscore=0
- lowpriorityscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2501170000 definitions=main-2502100113
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250203154517.937623-4-kbusch@meta.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-
-
-On 2/10/25 6:22 AM, Shinichiro Kawasaki wrote:
-> On Feb 09, 2025 / 20:20, Ming Lei wrote:
->> All block internal state for dealing adding/removing debugfs entries
->> have been removed, and debugfs can sync everything for us in fs level,
->> so don't grab q->debugfs_mutex for adding/removing block internal debugfs
->> entries.
->>
->> Now q->debugfs_mutex is only used for blktrace, meantime move creating
->> queue debugfs dir code out of q->sysfs_lock. Both the two locks are
->> connected with queue freeze IO lock.  Then queue freeze IO lock chain
->> with debugfs lock is cut.
->>
->> The following lockdep report can be fixed:
->>
->> https://lore.kernel.org/linux-block/ougniadskhks7uyxguxihgeuh2pv4yaqv4q3emo4gwuolgzdt6@brotly74p6bs/
->>
->> Follows contexts which adds/removes debugfs entries:
->>
->> - update nr_hw_queues
->>
->> - add/remove disks
->>
->> - elevator switch
->>
->> - blktrace
->>
->> blktrace only adds entries under disk top directory, so we can ignore it,
->> because it can only work iff disk is added. Also nothing overlapped with
->> the other two contex, blktrace context is fine.
->>
->> Elevator switch is only allowed after disk is added, so there isn't race
->> with add/remove disk. blk_mq_update_nr_hw_queues() always restores to
->> previous elevator, so no race between these two. Elevator switch context
->> is fine.
->>
->> So far blk_mq_update_nr_hw_queues() doesn't hold debugfs lock for
->> adding/removing hctx entries, there might be race with add/remove disk,
->> which is just fine in reality:
->>
->> - blk_mq_update_nr_hw_queues() is usually for error recovery, and disk
->> won't be added/removed at the same time
->>
->> - even though there is race between the two contexts, it is just fine,
->> since hctx won't be freed until queue is dead
->>
->> - we never see reports in this area without holding debugfs in
->> blk_mq_update_nr_hw_queues()
->>
->> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
->> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+On Mon, Feb 03, 2025 at 07:45:14AM -0800, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
+> Provide an interface for the kernel to leverage the existing
+> pre-registered buffers that io_uring provides. User space can reference
+> these later to achieve zero-copy IO.
+> 
+> User space must register an empty fixed buffer table with io_uring in
+> order for the kernel to make use of it.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  include/linux/io_uring.h       |   1 +
+>  include/linux/io_uring_types.h |   3 +
+>  io_uring/rsrc.c                | 114 +++++++++++++++++++++++++++++++--
+>  io_uring/rsrc.h                |   1 +
+>  4 files changed, 114 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+> index 85fe4e6b275c7..b5637a2aae340 100644
+> --- a/include/linux/io_uring.h
+> +++ b/include/linux/io_uring.h
+> @@ -5,6 +5,7 @@
+>  #include <linux/sched.h>
+>  #include <linux/xarray.h>
+>  #include <uapi/linux/io_uring.h>
+> +#include <linux/blk-mq.h>
+>  
+>  #if defined(CONFIG_IO_URING)
+>  void __io_uring_cancel(bool cancel_all);
+> diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
+> index 623d8e798a11a..7e5a5a70c35f2 100644
+> --- a/include/linux/io_uring_types.h
+> +++ b/include/linux/io_uring_types.h
+> @@ -695,4 +695,7 @@ static inline bool io_ctx_cqe32(struct io_ring_ctx *ctx)
+>  	return ctx->flags & IORING_SETUP_CQE32;
+>  }
+>  
+> +int io_buffer_register_bvec(struct io_ring_ctx *ctx, const struct request *rq, unsigned int tag);
+> +void io_buffer_unregister_bvec(struct io_ring_ctx *ctx, unsigned int tag);
+> +
+>  #endif
+> diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+> index 4d0e1c06c8bc6..8c4c374abcc10 100644
+> --- a/io_uring/rsrc.c
+> +++ b/io_uring/rsrc.c
+> @@ -111,7 +111,10 @@ static void io_buffer_unmap(struct io_ring_ctx *ctx, struct io_rsrc_node *node)
+>  		if (!refcount_dec_and_test(&imu->refs))
+>  			return;
+>  		for (i = 0; i < imu->nr_bvecs; i++)
+> -			unpin_user_page(imu->bvec[i].bv_page);
+> +			if (node->type == IORING_RSRC_KBUF)
+> +				put_page(imu->bvec[i].bv_page);
+> +			else
+> +				unpin_user_page(imu->bvec[i].bv_page);
+>  		if (imu->acct_pages)
+>  			io_unaccount_mem(ctx, imu->acct_pages);
+>  		kvfree(imu);
+> @@ -240,6 +243,13 @@ static int __io_sqe_buffers_update(struct io_ring_ctx *ctx,
+>  		struct io_rsrc_node *node;
+>  		u64 tag = 0;
+>  
+> +		i = array_index_nospec(up->offset + done, ctx->buf_table.nr);
+> +		node = io_rsrc_node_lookup(&ctx->buf_table, i);
+> +		if (node && node->type != IORING_RSRC_BUFFER) {
+> +			err = -EBUSY;
+> +			break;
+> +		}
+> +
+>  		uvec = u64_to_user_ptr(user_data);
+>  		iov = iovec_from_user(uvec, 1, 1, &fast_iov, ctx->compat);
+>  		if (IS_ERR(iov)) {
+> @@ -258,6 +268,7 @@ static int __io_sqe_buffers_update(struct io_ring_ctx *ctx,
+>  			err = PTR_ERR(node);
+>  			break;
+>  		}
+> +
+>  		if (tag) {
+>  			if (!node) {
+>  				err = -EINVAL;
+> @@ -265,7 +276,6 @@ static int __io_sqe_buffers_update(struct io_ring_ctx *ctx,
+>  			}
+>  			node->tag = tag;
+>  		}
+> -		i = array_index_nospec(up->offset + done, ctx->buf_table.nr);
+>  		io_reset_rsrc_node(ctx, &ctx->buf_table, i);
+>  		ctx->buf_table.nodes[i] = node;
+>  		if (ctx->compat)
+> @@ -453,6 +463,7 @@ void io_free_rsrc_node(struct io_ring_ctx *ctx, struct io_rsrc_node *node)
+>  			fput(io_slot_file(node));
+>  		break;
+>  	case IORING_RSRC_BUFFER:
+> +	case IORING_RSRC_KBUF:
+>  		if (node->buf)
+>  			io_buffer_unmap(ctx, node);
+>  		break;
+> @@ -860,6 +871,92 @@ int io_sqe_buffers_register(struct io_ring_ctx *ctx, void __user *arg,
+>  	return ret;
+>  }
+>  
+> +static struct io_rsrc_node *io_buffer_alloc_node(struct io_ring_ctx *ctx,
+> +						 unsigned int nr_bvecs,
+> +						 unsigned int len)
+> +{
+> +	struct io_mapped_ubuf *imu;
+> +	struct io_rsrc_node *node;
+> +
+> +	node = io_rsrc_node_alloc(IORING_RSRC_KBUF);
+> +	if (!node)
+> +		return NULL;
+> +
+> +	imu = kvmalloc(struct_size(imu, bvec, nr_bvecs), GFP_KERNEL);
+> +	if (!imu) {
+> +		io_put_rsrc_node(ctx, node);
+> +		return NULL;
+> +	}
+> +
+> +	imu->ubuf = 0;
+> +	imu->len = len;
+> +	imu->acct_pages = 0;
+> +	imu->nr_bvecs = nr_bvecs;
+> +	refcount_set(&imu->refs, 1);
+> +
+> +	node->buf = imu;
+> +	return node;
+> +}
+> +
+> +int io_buffer_register_bvec(struct io_ring_ctx *ctx, const struct request *rq,
+> +			    unsigned int index)
+> +{
+> +	struct io_rsrc_data *data = &ctx->buf_table;
+> +	u16 nr_bvecs = blk_rq_nr_phys_segments(rq);
+> +	struct req_iterator rq_iter;
+> +	struct io_rsrc_node *node;
+> +	struct bio_vec bv;
+> +	int i = 0;
+> +
+> +	lockdep_assert_held(&ctx->uring_lock);
+> +
+> +	if (WARN_ON_ONCE(!data->nr))
+> +		return -EINVAL;
+> +	if (WARN_ON_ONCE(index >= data->nr))
+> +		return -EINVAL;
+> +
+> +	node = data->nodes[index];
+> +	if (WARN_ON_ONCE(node))
+> +		return -EBUSY;
+> +
+> +	node = io_buffer_alloc_node(ctx, nr_bvecs, blk_rq_bytes(rq));
+> +	if (!node)
+> +		return -ENOMEM;
+> +
+> +	rq_for_each_bvec(bv, rq, rq_iter) {
+> +		get_page(bv.bv_page);
+> +		node->buf->bvec[i].bv_page = bv.bv_page;
+> +		node->buf->bvec[i].bv_len = bv.bv_len;
+> +		node->buf->bvec[i].bv_offset = bv.bv_offset;
+> +		i++;
 
-[...]
+In this patchset, ublk request buffer may cross uring OPs, so it is inevitable
+for buggy application to complete IO command & ublk request before
+io_uring read/write OP using the buffer/page is completed .
 
-> 
-> [  115.085704] [   T1023] run blktests block/002 at 2025-02-10 09:22:22
-> [  115.383653] [   T1054] sd 9:0:0:0: [sdd] Synchronizing SCSI cache
-> [  115.641933] [   T1055] scsi_debug:sdebug_driver_probe: scsi_debug: trim poll_queues to 0. poll_q/nr_hw = (0/1)
-> [  115.642961] [   T1055] scsi host9: scsi_debug: version 0191 [20210520]
->                             dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
-> [  115.646207] [   T1055] scsi 9:0:0:0: Direct-Access     Linux    scsi_debug       0191 PQ: 0 ANSI: 7
-> [  115.648225] [      C0] scsi 9:0:0:0: Power-on or device reset occurred
-> [  115.654243] [   T1055] sd 9:0:0:0: Attached scsi generic sg3 type 0
-> [  115.656248] [    T100] sd 9:0:0:0: [sdd] 16384 512-byte logical blocks: (8.39 MB/8.00 MiB)
-> [  115.658403] [    T100] sd 9:0:0:0: [sdd] Write Protect is off
-> [  115.659125] [    T100] sd 9:0:0:0: [sdd] Mode Sense: 73 00 10 08
-> [  115.661621] [    T100] sd 9:0:0:0: [sdd] Write cache: enabled, read cache: enabled, supports DPO and FUA
-> [  115.669276] [    T100] sd 9:0:0:0: [sdd] permanent stream count = 5
-> [  115.673375] [    T100] sd 9:0:0:0: [sdd] Preferred minimum I/O size 512 bytes
-> [  115.673974] [    T100] sd 9:0:0:0: [sdd] Optimal transfer size 524288 bytes
-> [  115.710112] [    T100] sd 9:0:0:0: [sdd] Attached SCSI disk
-> 
-> [  116.464802] [   T1079] ======================================================
-> [  116.465540] [   T1079] WARNING: possible circular locking dependency detected
-> [  116.466107] [   T1079] 6.14.0-rc1+ #253 Not tainted
-> [  116.466581] [   T1079] ------------------------------------------------------
-> [  116.467141] [   T1079] blktrace/1079 is trying to acquire lock:
-> [  116.467708] [   T1079] ffff88810539d1e0 (&mm->mmap_lock){++++}-{4:4}, at: __might_fault+0x99/0x120
-> [  116.468439] [   T1079] 
->                           but task is already holding lock:
-> [  116.469052] [   T1079] ffff88810a5fd758 (&sb->s_type->i_mutex_key#3){++++}-{4:4}, at: relay_file_read+0xa3/0x8a0
-> [  116.469901] [   T1079] 
->                           which lock already depends on the new lock.
-> 
-> [  116.470762] [   T1079] 
->                           the existing dependency chain (in reverse order) is:
-> [  116.473187] [   T1079] 
->                           -> #5 (&sb->s_type->i_mutex_key#3){++++}-{4:4}:
-> [  116.475670] [   T1079]        down_read+0x9b/0x470
-> [  116.477001] [   T1079]        lookup_one_unlocked+0xe9/0x120
-> [  116.478333] [   T1079]        lookup_positive_unlocked+0x1d/0x90
-> [  116.479648] [   T1079]        debugfs_lookup+0x47/0xa0
-> [  116.480833] [   T1079]        blk_mq_debugfs_unregister_sched_hctx+0x23/0x50
-> [  116.482215] [   T1079]        blk_mq_exit_sched+0xb6/0x2b0
-> [  116.483466] [   T1079]        elevator_switch+0x12a/0x4b0
-> [  116.484676] [   T1079]        elv_iosched_store+0x29f/0x380
-> [  116.485841] [   T1079]        queue_attr_store+0x313/0x480
-> [  116.487078] [   T1079]        kernfs_fop_write_iter+0x39e/0x5a0
-> [  116.488358] [   T1079]        vfs_write+0x5f9/0xe90
-> [  116.489460] [   T1079]        ksys_write+0xf6/0x1c0
-> [  116.490582] [   T1079]        do_syscall_64+0x93/0x180
-> [  116.491694] [   T1079]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [  116.492996] [   T1079] 
->                           -> #4 (&eq->sysfs_lock){+.+.}-{4:4}:
-> [  116.495135] [   T1079]        __mutex_lock+0x1aa/0x1360
-> [  116.496363] [   T1079]        elevator_switch+0x11f/0x4b0
-> [  116.497499] [   T1079]        elv_iosched_store+0x29f/0x380
-> [  116.498660] [   T1079]        queue_attr_store+0x313/0x480
-> [  116.499752] [   T1079]        kernfs_fop_write_iter+0x39e/0x5a0
-> [  116.500884] [   T1079]        vfs_write+0x5f9/0xe90
-> [  116.501964] [   T1079]        ksys_write+0xf6/0x1c0
-> [  116.503056] [   T1079]        do_syscall_64+0x93/0x180
-> [  116.504194] [   T1079]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [  116.505356] [   T1079] 
-In the above dependency chain, I see that thread #5 is waiting on &sb->s_type->i_mutex_key
-after acquiring q->sysfs_lock and eq->sysfs_lock. And thread #4 would have acquired 
-q->sysfs_lock and now pending on eq->sysfs_lock. But then how is it possible that two threads
-are able to acquire q->sysfs_lock at the same time (assuming this is for the same request_queue). 
-Is this a false-positive report from lockdep? Or am I missing something?
+That is probably the reason why page reference is increased here, then
+bvec page lifetime becomes not aligned with request any more from block
+layer viewpoint.
+
+Not sure this way is safe:
+
+1) for current block storage driver, when request is completed, all
+request bvec page ownership is transferred to upper layer(FS, application, ...),
+but it becomes not true for ublk zero copy with this patchset 
+
+2) BIO_PAGE_PINNED may not be set for bio, so upper layer might think that
+bvec pages can be reused or reclaimed after this ublk bio is completed.
+
+
 
 Thanks,
---Nilay
-
+Ming
 
