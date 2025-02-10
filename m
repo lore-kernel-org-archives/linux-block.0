@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36802136E21;
-	Mon, 10 Feb 2025 15:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6A223C8A6;
+	Mon, 10 Feb 2025 15:32:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739199917; cv=none; b=VdYbyFSBFSjM8Qt0P9Iy3nidHZX3FhzEwCbJMTJMiIy8VdFc2nEKgJOn3FO1FzPWu48VDsD1Fsl5by++wIZl2Vr5LN7zGGE4BLHP2dGT+54UAb+Xb3z5IFMSray1o1Lma7iycgQa+Fjx3oszYZPg1GxyvvpDpWahy0tQoYD4s5Q=
+	t=1739201568; cv=none; b=TO8e6dEFMEgZixxv9EjWK9FIXMgrc0Op+/rD0M5/oRaY8hOiGPAtB7ASabtyV9uMHfbVv/G2n+ZAKxhF5y4ywMvASef6DRC1dCMsSZKA/XR+Dq/riHFq/KIc4oDv7bGW8hpmAShZG4d9rVP7nRydqnYMqApRVUAnK+7JsWQ3rj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739199917; c=relaxed/simple;
-	bh=6pwpcOmnQ+m/cF7eNK960CBBNxK4Uui1P8jZME+h4uc=;
+	s=arc-20240116; t=1739201568; c=relaxed/simple;
+	bh=5FWueVqEZx4BMXghA4HKvnexLXhwaHEUDzs1PUwVEU8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k0WhHJlY14VI09pjx0f4/tXqz3rdVwGKPXF48d2+eytwuU7m6fbhJ0FV6lzr7qTF2YirL+8fv6Wb81MAejcSa7YhMlFv04lgiCONZA60yyfi6TiZa/m1n7jhdAhXLLwSBlFnKGFEAvf3onQnLU02xstNJJWhxHQaMbHlt5Ma0LE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qVqRb4rp; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=IKlNoZ35HhKX+V9gdsJkDT/i19GZOCXsOOqhx2ScfzfNu4QlYKZ3UBhGZ++tymMgtXTrAFFqGjvsxTxVilb2wXKPSJ8CTOniNyW/T053jcYt4XrZCiOfqvyT2NC1khvU+jQ2mDN1f6Oi264rbvMVqAX/qv6iT/xqo+p5AmLx3Is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J082z4xu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qVqRb4rp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71129C4CED1;
-	Mon, 10 Feb 2025 15:05:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J082z4xu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4766EC4CED1;
+	Mon, 10 Feb 2025 15:32:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739199916;
-	bh=6pwpcOmnQ+m/cF7eNK960CBBNxK4Uui1P8jZME+h4uc=;
+	s=k20201202; t=1739201567;
+	bh=5FWueVqEZx4BMXghA4HKvnexLXhwaHEUDzs1PUwVEU8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qVqRb4rpeBANWlsGBPmijGeccYLw9MA6hPh/Jhzqq9FvQibQaXR6FwBL4ndxdBU/y
-	 576KcC9tArG89+nOo4wN90n9cvxWJk2fnFxg8qLz/nFE98oDKVV2jTfMkDx44KG6Yq
-	 R84DnABxa4nrF0KC9Rl3V8IiVBnHAT0+bTFXQF+fGcf0fdZEAPvoSgEHDF57wZz9yW
-	 kvp+SWWq7NKE9YclmPGwQg1736SsRCK81Ue3phSTUZkUr27VMgrRQ/+Lc6hhb9iLNz
-	 Rfcom0I9s4WKyOWdMXT56C5EZTOVoKMURLLNImRUhb3iAHSWrwK79xkjDpz6Ygvqsc
-	 Id0GXQwfZfMmw==
-Date: Mon, 10 Feb 2025 08:05:14 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <kbusch@meta.com>, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, axboe@kernel.dk,
-	asml.silence@gmail.com
-Subject: Re: [PATCH 3/6] io_uring: add support for kernel registered bvecs
-Message-ID: <Z6oVqsG5Mp-PjAwz@kbusch-mbp>
-References: <20250203154517.937623-1-kbusch@meta.com>
- <20250203154517.937623-4-kbusch@meta.com>
- <Z6oJXIsBMMkCpW_3@fedora>
+	b=J082z4xupvWovzsCPEMcJ6eqmjpmRiIF1LkEhjJ85lB7ecbYXBOMC4+62xB6Z4BWz
+	 HHvQDwiOOEuIOJ/8p8D7TRZ1pLcwnN+bIKh+Ke09zwzoqobw6/JZAvJIDM+8LYDqBk
+	 N4AN+2+hyE+6Izh8YhCKOQpA6VwRFsAp5kGQLZasvxlmi1HOovdOlsEiG5NBi6FVTO
+	 Hwk371wOhpbdTSRIQDkWG8MCjrBUMOfEoXPgIj6KSo/C5QaMb77obaPQ1bjYVTCQCJ
+	 /l0kZjZFYYDepcs5ZHE6rt1xkt0voUoJvpmFJzs+fBUz/703DWCs4onQwTGhDT1vnp
+	 Fsn2clRKzbwTQ==
+Date: Mon, 10 Feb 2025 07:32:45 -0800
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hare@suse.de" <hare@suse.de>,
+	"patches@lists.linux.dev" <patches@lists.linux.dev>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>
+Subject: Re: [PATCH blktests v2 0/4] enable bs > ps device testing
+Message-ID: <Z6ocHUjsykrqx7sU@bombadil.infradead.org>
+References: <20250204225729.422949-1-mcgrof@kernel.org>
+ <ny65lqco7qjaahrthyvmlgz26jb3w7jsqxdm6c7vz4qni2x2jd@n2v2jfxwicyh>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,27 +45,44 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z6oJXIsBMMkCpW_3@fedora>
+In-Reply-To: <ny65lqco7qjaahrthyvmlgz26jb3w7jsqxdm6c7vz4qni2x2jd@n2v2jfxwicyh>
 
-On Mon, Feb 10, 2025 at 10:12:44PM +0800, Ming Lei wrote:
-> On Mon, Feb 03, 2025 at 07:45:14AM -0800, Keith Busch wrote:
-> > +	rq_for_each_bvec(bv, rq, rq_iter) {
-> > +		get_page(bv.bv_page);
-> > +		node->buf->bvec[i].bv_page = bv.bv_page;
-> > +		node->buf->bvec[i].bv_len = bv.bv_len;
-> > +		node->buf->bvec[i].bv_offset = bv.bv_offset;
-> > +		i++;
+On Fri, Feb 07, 2025 at 11:24:10AM +0000, Shinichiro Kawasaki wrote:
+> On Feb 04, 2025 / 14:57, Luis Chamberlain wrote:
+> > This v2 series addresses the feedback from the first series [0], namely:
+> > 
+> >   - uses less device specific names
+> >   - checks for fio arguments --filename or --directory to extract the
+> >     min io target or path
+> >   - adds a new patch to verify the sector size will work before creating
+> >     a filesystem
+> >   - a diagram is provided to help easily disect why we use statx
+> >     blocksize, although not included in the docs we could later if
+> >     it helps
 > 
-> In this patchset, ublk request buffer may cross uring OPs, so it is inevitable
-> for buggy application to complete IO command & ublk request before
-> io_uring read/write OP using the buffer/page is completed .
+> Thanks for this v2 series. I ran the tests, and they look working. Good.
+> I also ran "make check" and saw shellcheck warnings. Could you address them?
+> 
+> $ make check
+> shellcheck -x -e SC2119 -f gcc check common/* \
 
-The buggy app would have to both complete the requests and unregister
-the fixed buffer (the registration takes a reference, too) while having
-backend requests in flight using that registered buffer. That could
-happen, which is why the page references are elevated. It should contain
-the fallout of the buggy application to the application's memory.
+I fixed them, will submit shortly.
 
-But if this is really a scenario that we must prevent from happening,
-then I think the indirect callback is really the best option. It's not a
-big deal, I just wanted to try to avoid it.
+> > This goes tested against a 64k sector size NVMe drive, the patches for
+> > which will be posted soon rebased on v6.14-rc1.
+> > 
+> > [0] https://lkml.kernel.org/r/20241218112153.3917518-1-mcgrof@kernel.org
+> > [1] https://docs.google.com/drawings/d/e/2PACX-1vQeZaBq2a0dgg9RDyd_XAJBSH-wbuGCtm95sLp2oFj66oghHWmXunib7tYOTPr84AlQ791VGiaKWvKF/pub?w=1006&h=929
+> 
+> I'm interested in the link [1]. I guess it is the diagram noted, isn't it?
+> But it looks like I can not access it. I just see a blank page.
+
+That's so odd, I embedded this document here too:
+
+https://kernelnewbies.org/KernelProjects/large-block-size
+
+It is below the "stat --print=%o" example:
+
+Can you see that image?
+
+  Luis
