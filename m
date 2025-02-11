@@ -1,101 +1,104 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E181D63D2
-	for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 16:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB0F265610
+	for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 20:04:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739292666; cv=none; b=jA7/OQq/Rn785gi5AVd5I7bn5jQJpn6HNRx9swLcQbkLQVVFk/i8OxRCMEUgm5DWKsq16vMad4uo8PFn7sPztxGg+OxjRs/m2JhYalHwsW2uoPweT1g/kLHfnGDt6CJmUtLZnoB4L9GRWXuGpVfMBpWDTXYrNuLlRJZrhjvWseE=
+	t=1739304293; cv=none; b=WhE1X5FmBa2cSSN9MEt6ymflgExYl6y/0+HoKFxd9MuZMiaorxBvlDe4XHHIY7sneG9U0XIYrA5QmssiXm2GM/3ehgv55E7ldHPTsE9Lw43na2Wj32mwKTh60KQTl4nMTE08+O61tABf6DnzuF6D+qvHLvDW37M0ma+X2JOcuAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739292666; c=relaxed/simple;
-	bh=nlc9058a3V6MJpYn+sPPU8t1IG50HtICtCAlsTCuFeM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IHsjq763HxjYpnfKiCbSGMumIDeDAo6FMEHRp3xYSXJ5fVf3Y5W+GQup1c5r4Zy9va4Cd0VeJORWPsWDqXjoQ1Bmp8ESAYBnYqIfFqoTKd4KGOB/kbVAaHhp5RYRdXCSE9vz3ARr39iFi/O4zR1JiulqEX238dFGL/D/HL9lotk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nlYNawNm; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739304293; c=relaxed/simple;
+	bh=yQ5UQtPrJh6CDgDFQ5kOE10MbeESFXkLMTABKS+oBEM=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=SrrEmJ5p1aEs2aCR8CPAw/0Rb38RFUtAjs5Q5IIo2lH9+/QfHc4moDptch+AOn5JLlH0l2ljnPXQCK4CrvKK9ylN1n900TU3PcOn013sce54eMrwOqoUpbwk7QsryOmxiz2CMRoNwRqj1LyLixSEVCT9Uuza/3H3UMwQkPOFlZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0CUKWNxV; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlYNawNm"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6f9bb24d033so35896367b3.0
-        for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 08:51:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0CUKWNxV"
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3d150512bd5so10822055ab.3
+        for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 12:04:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739292664; x=1739897464; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1739304291; x=1739909091; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nlc9058a3V6MJpYn+sPPU8t1IG50HtICtCAlsTCuFeM=;
-        b=nlYNawNmmrxGypwW6BOyZ4QsNKo2Ud4HhprvcyvibboKuk6RUguR/wsxNdfiDL3Y8/
-         hpfFE17nOVU6c/NZlnJmJOHsR1npFB9zNGHEQRUI5BGKUMA7iMRMP8dy36VtxeR/4iCW
-         ld9UhQhOiva+mOu5YIV4CgKzWVuMLS16bUQBbymzYamNx5WtuJf6dsECa4yvV3lA9bsf
-         fj6016Qq97epEAsFKu0jymqNbTP1sKlPplJd4sE/ZA5T5oGdFQh/I9hStZsV1V2S8QdC
-         xx5elUSr1sTnkhh9OH62qXznUe8cpM/f98on27eLDPXwCbw1n92KaYYL/y5sKaTWJfxX
-         enqQ==
+        bh=oSafBjwhtkCgy84RqH/1n0KPcLrpwZEy3MZrJYm7NDg=;
+        b=0CUKWNxVFt84yl6y1X6llOodW49UnhYhsA57+nG/nlt25WIUSbeT1gLfT4+eefnw2b
+         8mOjWCZNrueD0DzrMj7l9FhdXrnFUDw2kixUU5iNInLG6XJHwnpiNaC1JDy/ZUL+Ffit
+         RXBOubEiLP1uAnJ3SL42OwWKYQasc8fexdPM8eNEPTVnkzN3qXuMPmUjhXB4Nbq1Ocgn
+         5+6b9S+mPJvlUtJyeu95OJXXMHQRdB6XlPRLU+ZNtF0yxmpOa42OUELA5xMe9ZdnxUQs
+         KoW8O5Afs7waEjRNghwVhagBTBNbYL/kSf32hgjKpVcv6JdDkKCi05nCz8ugbMe9T8vw
+         0Dgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739292664; x=1739897464;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1739304291; x=1739909091;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nlc9058a3V6MJpYn+sPPU8t1IG50HtICtCAlsTCuFeM=;
-        b=qiAo2awYpABSrZKxJfCqRyeUXnZgtZEcvi037/0MqMAIFpxRPugz2+RsnnrlQYiIeh
-         fQZqyYlydaN0x9zf7/z714fjB8nhniq80o9/kNlrSNfruwYCMn/i+GIyAeaYLxwAj4gC
-         1d6v8EQ9lUeSF4mGRpGB/4lHMKQMNdBjxC5Ykih5ljWV79OsynSTdJN14cLdNi/Fw3ze
-         bPw16bdOU2cxq5VDXZ2qZOrN1YVEjq+kyQMTanecjBYOk/ns3SwWihw/SPKWK9fXY2LQ
-         2JObekHsl8cuez+OXbHrbWpmw8OJY5nHTMHfLUhFboXs6jYsCIJXaXQeihuSPqRAvCQI
-         fikg==
-X-Forwarded-Encrypted: i=1; AJvYcCUaeNtzgw2EJM7iBLiRCB27pwvOJkOY8j0V2iqsT34gEEJVi3wtJumBmKgEXiylyPlg9xL1ZiUBMxiJtQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDpKER0bR/jkT+Wx736vZXP42KqSX4aTRr9OApPfJMVQNnsmxa
-	gIbRoUAjnL7pTTuZ4AsJJV8vB0pEtwndkG6bqixr9/KomkjCHFA5jU8qNwJ7J492m4Dmdpm1EW+
-	aibvhOnmvgwfEDjCTCPnqlXdozFU=
-X-Gm-Gg: ASbGnctIr6Ki3s9cTfTv9PMida27F6hhMD6TqrPe7xRgfgc7Yiof3fqGeYrF5KNY7Mg
-	KPcE4vGOZ8OyQoO/tY9JTcQV+kUpi+aOopXBc1B4bQnbkB1V7hjg+0nv9644ef1w84F1bPIsx
-X-Google-Smtp-Source: AGHT+IEAjw7jUnSqPPKd9TnLVBbr/Ls5YvDW40MEFWbRPF5gbCmhPvDT5/CcrwQbaQ0UeXVRgCfPhC5JkS7vREmJoGY=
-X-Received: by 2002:a05:690c:9688:b0:6ef:641a:2a73 with SMTP id
- 00721157ae682-6fb1f19ba50mr3060477b3.9.1739292663896; Tue, 11 Feb 2025
- 08:51:03 -0800 (PST)
+        bh=oSafBjwhtkCgy84RqH/1n0KPcLrpwZEy3MZrJYm7NDg=;
+        b=VSpIPH1RZgrgO7hNtqN34Whit0FD+EzEOKe0IRde7rv9WiVsMBa/qQu6sWka9ELRmd
+         DqMuzVGAwbYoFidXhJDZGqSGQTgUgyEFKlXsM6CafUGXiq6g5hhVlFPAPIJ5EnWVUxj/
+         fThbPPuRGL3GXMLTl+UkwORAg+5pEWur3IdzSaZmDWIbkDz5oDHvxc34WKeG6LDnEDs8
+         vt4pS/BMK8v+RXo8IG+iG7+pRTMD8zjjxusCyS3sCHJcuIjhRgGLmSgObWcH5nYYaXOj
+         nRLFu8gw1NMLCJz36tWbx6TwVA1qxXmwn7n7z7cuT1cNcTZn155OGpYqxukyGHuZyKhy
+         2zVA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDtfOCNAFJkMUvfeZatNV78OfApjSKrDTtgtkIV7kb4UOjTUUUZS0ZI+5bG3BA+YXNJ7Tzm899WfoIQA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2rjG5+NwOxl7VLmAHUdFcpaXiJ3XeZ4wBZkSLXzwQXfp7yekx
+	Q4KDvtlQETRT8Drj06KnK7nUpT7uzLUSQ8eb10O+LJTV1ngjt60pUzjQIKgLaeQ=
+X-Gm-Gg: ASbGncsl9NuGSYmdQK+fHpXZEj2W2ycURse+OJxeGUxs2FlKhNrIBDz4kkqFJPI0QUF
+	qjuGChdpf/v/ns6tbF+I0Hxs2Ja0xeePdi3Zra2D67YI1Q8YxZmYAQ/Ol/lUC1JqUyf2//HJoEd
+	7M33uvg08qr7uEdWKho/iRc0c7XhpKOjeGgt+ZAoN42RJN7DpSNjnvvAFbDrL/c3zoDcgKQyGnM
+	VLzQc3C6RZmssEymilSERw3gq1OQPRtWoBXZooqNzUlw8cRSFLu1bgHLf+bNRYtoX4+8e/+fXrE
+	v7MIog==
+X-Google-Smtp-Source: AGHT+IF6ngVv4H+7ay1KS5AYnsWGnxP6t6rI34lhHdXcsNGwsA/2PiydcVTWSg7Ie4NNEWNk4JvMNA==
+X-Received: by 2002:a05:6e02:3184:b0:3d0:4eaa:e480 with SMTP id e9e14a558f8ab-3d17be0cd74mr9013225ab.3.1739304290713;
+        Tue, 11 Feb 2025 12:04:50 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d155e5caa1sm17430295ab.5.2025.02.11.12.04.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2025 12:04:49 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: tj@kernel.org, yukuai1@huaweicloud.com, 
+ Muchun Song <muchun.song@linux.dev>
+Cc: chengming.zhou@linux.dev, muchun.song@linux.dev, 
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>
+In-Reply-To: <20250208090416.38642-1-songmuchun@bytedance.com>
+References: <20250208090416.38642-1-songmuchun@bytedance.com>
+Subject: Re: [PATCH RESEND v2 1/2] block: introduce init_wait_func()
+Message-Id: <173930428956.134224.12826732469038021617.b4-ty@kernel.dk>
+Date: Tue, 11 Feb 2025 13:04:49 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CGME20250206131945epcas5p23d932422bf2f172e132678b756516c0d@epcas5p2.samsung.com>
- <20250206131134.cqlq5fhem34eme2u@ubuntu> <1aad2e80-427e-4f53-9343-baf5bee8e88c@kernel.dk>
-In-Reply-To: <1aad2e80-427e-4f53-9343-baf5bee8e88c@kernel.dk>
-From: Nitesh Shetty <nitheshshetty@gmail.com>
-Date: Tue, 11 Feb 2025 22:20:51 +0530
-X-Gm-Features: AWEUYZmq2CVQMdeSIJ-8Itq-w2EhxIUVnpMm9OEPCV22JHzbIIepfGaBCLgQTMg
-Message-ID: <CAOSviJ3pkqroRutiyqs1DXkrwh3FV=Cm1t8qmzVY4GNaBWFY3A@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] Block IO performance per core?
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Nitesh Shetty <nj.shetty@samsung.com>, lsf-pc@lists.linux-foundation.org, 
-	linux-block@vger.kernel.org, gost.dev@samsung.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-14bd6
 
-On Fri, Feb 7, 2025 at 1:39=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
->
-> While I'm always interested in making per-core IOPS better as it relates
-> to better efficiency in the IO stack, and have done a LOT of work in
-> this area in the past, for this particular case it's also worth
-> highlighting that I bet you could get a lot better performance by doing
-> something smarter with polling multiple devices than what t/io_uring is
-> currently doing - completing 32 requests on each device before moving on
-> to the other one is probably not the best approach. t/io_uring is simply
-> not designed very well for that.
->
-> IOW, I do like this topic, but I think it'd be worthwhile to generate
-> some better numbers with a more targeted approach to polling multiple
-> devices from a single thread first rather than take t/io_uring in its
-> current form as gospel on that front.
->
-Agreed. t/io_uring can be the starting point.
-At present, I see for a single thread, half of the queue depth is
-occupied by one device followed by second device.
-I tried to change the order to interleave devices,
-but overall I see a no gain in performance, there was little drop in
-performance depending on type of interleaving, from 5M IOPS to
-3.8~4.6 M IOPS. With respect to polling multiple devices,
-do you have some other scheme in mind?
 
-Thank you,
-Nitesh Shetty
+On Sat, 08 Feb 2025 17:04:15 +0800, Muchun Song wrote:
+> There is already a macro DEFINE_WAIT_FUNC() to declare a wait_queue_entry
+> with a specified waking function. But there is not a counterpart for
+> initializing one wait_queue_entry with a specified waking function. So
+> introducing init_wait_func() for this, which also could be used in iocost
+> and rq-qos. Using default_wake_function() in rq_qos_wait() to wake up
+> waiters, which could remove ->task field from rq_qos_wait_data.
+> 
+> [...]
+
+Applied, thanks!
+
+[1/2] block: introduce init_wait_func()
+      commit: 36d03cb3277e29beedb87b8efb1e4da02b26e0c0
+[2/2] block: refactor rq_qos_wait()
+      commit: a052bfa636bb763786b9dc13a301a59afb03787a
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
