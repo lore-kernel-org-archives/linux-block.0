@@ -1,104 +1,112 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B3F1EE01A
-	for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 08:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEB9C1FDE35
+	for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 11:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739261546; cv=none; b=TS7OPH46iO01slJt09h4ViMYVHepEsU4QfHwt5ssInnCDRnK0nfqhiqFJRABLwx57RhJhP1TTPxqU22XSxbJmGeZ7gGSo1JCvorLjABY3yknk3SBS/SofzOT1VvNPcb1XrZMuKByj1p2/tTIhz8mv+Y68FoeclnHL4Mtg1Vlz8k=
+	t=1739272604; cv=none; b=eWZTgnG9Vheh6XfDprvqKS93LN3AD7Q4mnkbNgotMnzuwdoBAxzBlv9aADtEoqAz7Xi5ibVbg+IzSobAmLMtTiuopTdPlikP0+0NE16ZdJnKAgIrNiWPXfWG8AifDLw5C2qx7P5l2+/J7GvY973VXVMcNk4b9PhFxrAQqWzr+WI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739261546; c=relaxed/simple;
-	bh=hDZF76s0+s3nQKWmMd335G35ca1BnoygOxqTHvKFjnU=;
+	s=arc-20240116; t=1739272604; c=relaxed/simple;
+	bh=v6L7VWSJIgACPa8S6DIWjcCyagnzXKIIU0w7JFQudHM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VhSAyDKRcZAPyxYKOuxs9pBdP3NSmlYwyn04lvaQNQ15TPpnRc6RAQuphPenti8VizGVEPFM7mCVjObZhEk8V+s4sWE3xvwJ5KuIqNhDXtR7KXDVmyO/bIzU4t1kpgZ+oo2dZj/CjXqCOJdzJHLmrOuK4qP+MLXbptw0lHCfdKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=Srii4Zhw; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	 To:Cc:Content-Type; b=WCphthhhneJqZsiHs4sx+gsbaxB/QL1hrYSGc3yOygGqybpCFNtIVcV9kyu7GK2CAE7oBIDwk+dr/8uCrRXBcOmZKLuK1Kze9neIlPK2iQ+41zQaNHmEdWcdxjq+UaSJKWcud02xhx4o5JVcAVW9/7XRXYyNaMBGXWytIBaxqCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AxagR+QM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="Srii4Zhw"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-308ee953553so19207641fa.0
-        for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 00:12:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1739261542; x=1739866342; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LZBPv6QOC9HyqG83lsiP8B3hCPsDW+zwfD1sc16aqzQ=;
-        b=Srii4ZhwIpcHAV/jIHfFPmKfWk/E0t2DcWQ5xr3tqSSXwPf0gzdKhZ7P/9NfRSbNqh
-         HNlcWekNIUwhrD5OBkeu5rnRkVPia6JIhzIJag2lx5/N9KNM0ZNp2308kS+guuYQxDZD
-         zC5O2OaiysN+F9WW/VBtPFCNWPLptJel+mYVXpc7MkAQe0S+wdk/q7MV5mmatdLmWi/1
-         mARSweym3rzCGN3ZFZ3002Mc8YKQ86J8SdkogDjk4G6vK838i3rpwJ0+JM2gxAJJ4HwR
-         l16WxqA/jh5S8JnV20UxPB8C0HZmRwhZKMs44P/2T3UKxcWEyRHR/ZCyV+WehMWV9XWo
-         ToEg==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AxagR+QM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739272601;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aJzAfhES749wOpuO+4y/0ItmENS5B4AmLoraCFDO8CM=;
+	b=AxagR+QM9UuC4UClBkxpRUCfG5fFFwVFo86dOJPuYddPju40amo+Xnsq80kRtOuSo5K9Pl
+	+3Wf4O0Ml9l9JmgZdOiUOf4Qv0AMgN05Jf4qk2lXiyhS56RuMC6cYsEkZ3nkFZyo/cvCeu
+	wtDaFJrzQykUDYAzR3yt8lFqj9Hy8wo=
+Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
+ [209.85.222.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-275-qYWWULzEORyMXtJqfJzxmQ-1; Tue, 11 Feb 2025 06:16:40 -0500
+X-MC-Unique: qYWWULzEORyMXtJqfJzxmQ-1
+X-Mimecast-MFC-AGG-ID: qYWWULzEORyMXtJqfJzxmQ
+Received: by mail-ua1-f71.google.com with SMTP id a1e0cc1a2514c-8670b638a1bso3083182241.1
+        for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 03:16:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739261542; x=1739866342;
+        d=1e100.net; s=20230601; t=1739272600; x=1739877400;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LZBPv6QOC9HyqG83lsiP8B3hCPsDW+zwfD1sc16aqzQ=;
-        b=LnbGfR2MjIi0KIHE2BYHNn7fFw549tdUhJ927pfLUzbGpYld3IheizP+QmE5X3VLqs
-         laCalpyYn0L5bTM5eG3MPKOMcHWzc1ocsWO7GmGp7fAS5x3gGhG6erIHsDHwjyYZiG4C
-         tn4vx2lWgt6s3GUPpMX14UtkiPGr9Vsjz0GiYptu6lfLfmLgP4LiOnuM4xufss49/IS1
-         2iyAVK7WOVMlHDzZR9ZkYq83Wdhs7FpCk4bFnKgbNNv6xSBAcZ2zysiOVAUZoFyQl1jF
-         6V+22VKxiL+u9SJSCNULjWYpcTDifQx7Y2jcNu57Ila9aiXvj5/cyk8enwpidixohbkk
-         2Vjg==
-X-Forwarded-Encrypted: i=1; AJvYcCVVc39V9G4T6m7DTqoFYBSVktu6XXavF8jBfQfT4mq9mWpQcNOsE5H9IZf6R1YJkL640dZM8vIbMusWJg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyowRsx75LpkMVG+alG8fJTDQjUwXSAfp+gRwfb7/UmVch/J9tp
-	aC+1gQYvDsTaRoDscSibiAW/uZF+pBPMudpu/GAtVfB0U5R2DcW7iY1aqoaH7PuhgBaOHNjRgE1
-	pDQ1f/QvY1uOEbPmz2pNepSacJilOHwMeecG4aQ==
-X-Gm-Gg: ASbGncsQkdi4PzbyBsvWSuRLmmIrYd5mRc/lwbI3fnHuZkCNLO4z+oYAhxiYiClg/WV
-	H11c2BAuCbgfP26ZAfrBnjGYD6dpKVSsybYhHwq+R86l7AM76rQbhxByB0uQsTXYf7xDCv3luqN
-	DMOu0dCfNs68nfzDWvcwZ1xdaMJR4=
-X-Google-Smtp-Source: AGHT+IHsnSGZUFQMOoiXCGeHwOhkS4uzUDRmLLENwo/njPODTJnW3qTKSrQ7Ha1UrP2LHvzY0dNeNgevSz0lHNMxLPY=
-X-Received: by 2002:a2e:bea4:0:b0:308:fd11:76eb with SMTP id
- 38308e7fff4ca-308fd1179e6mr4836001fa.19.1739261542476; Tue, 11 Feb 2025
- 00:12:22 -0800 (PST)
+        bh=aJzAfhES749wOpuO+4y/0ItmENS5B4AmLoraCFDO8CM=;
+        b=a4Wfl4AMkEl9k7+o+JylSIbirTBJh1/xGgkkzyWq8NzCpREu4FZz8Fvz0ReU14xpEv
+         xixHJCQDB6h2/zqwgbdhQpfFk1T+x2X7j6s0ODiITSvfQRa1BustcgF9a0K9c2RV8eeq
+         5iQmkI6NpEl4zCDShSR6VCKUniL82OSzKggbQrlRhnXVuihmQLO7pPuF6/euzhnAncJ5
+         0DugxSk1LudSvqUWLSo8bsj78qI4nXbP8DalxYq3wn7l+4VIUdQYuYqp5/W6YHRbp71G
+         nkyhE5idKQGNRnI5IXGkBCuVx5MxoumIUltCuqKTDewe1Sf9MUCyzR9/S9iTTSiqDTUC
+         Tuvg==
+X-Forwarded-Encrypted: i=1; AJvYcCVct0i0iZResP6LWHtMNugTZMbSFUnJPRKX9zPJx6Xdhxr8KuQDZDotoI+fNmRM1YcFhMjRFHvvcocSOA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwVQOl2awoYiRsy7m52h10i2HUorxU7wqK7Ig/cdPmH97PMDQI
+	w7zVIqVRFa0ZC+6Pl2xTkwSDhwTHDYgG6Sh9soxVidjAAMVJ80IQDEcWfwMfzn0SXPcQn/aiYoA
+	RZeCt3OgbTrU888N4GZGTWnfGsngyBxq6rwFs2sOlLq81+erkL+4uVGhsfhOG57Rm4wbTB4lAv5
+	45I/HlFL4vcShVsHfcV+Pzg3M1Y8+JL4yPAvM=
+X-Gm-Gg: ASbGncsfpoLRKS/hBmo0J/lYWV+Xtl3uRrxAXA0oGnzuuq3CPxvsp1lPjnPkoBetPdC
+	OqAIbv6G5Bp/DRB1nN0NKgZlN9RcSh4SLJuo0PncR73X/TfwZb2zesAw0iqfpBSI=
+X-Received: by 2002:a67:f1d9:0:b0:4bb:b7ff:c486 with SMTP id ada2fe7eead31-4bbe13fa999mr1292522137.12.1739272599838;
+        Tue, 11 Feb 2025 03:16:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFuw4bDbKers2LBOjUPf1ci4KK3E01ua+qHdVX73SzcwbkcrnzDIc9zvq+RgnUVg0CSnXmq1xV980CN5J8Ylpw=
+X-Received: by 2002:a67:f1d9:0:b0:4bb:b7ff:c486 with SMTP id
+ ada2fe7eead31-4bbe13fa999mr1292516137.12.1739272599589; Tue, 11 Feb 2025
+ 03:16:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250210202336.349924-1-ebiggers@kernel.org>
-In-Reply-To: <20250210202336.349924-1-ebiggers@kernel.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 11 Feb 2025 09:12:11 +0100
-X-Gm-Features: AWEUYZkUIVqXHClndXAUtENhhMz-NcIhEeDU_e0vb-Z-ySUsEFA2hwDxIAg98Qo
-Message-ID: <CAMRc=Md0fsB7Yfx9Au1pXi+7Y_5DQf2z430c9R+tyS9e60-y5w@mail.gmail.com>
-Subject: Re: [PATCH v12 0/4] Driver and fscrypt support for HW-wrapped inline
- encryption keys
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-fscrypt@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Gaurav Kashyap <quic_gaurkash@quicinc.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, Jens Axboe <axboe@kernel.dk>, 
-	Konrad Dybcio <konradybcio@kernel.org>, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+References: <20250207091942.3966756-1-zhaoyang.huang@unisoc.com>
+In-Reply-To: <20250207091942.3966756-1-zhaoyang.huang@unisoc.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Tue, 11 Feb 2025 19:16:28 +0800
+X-Gm-Features: AWEUYZngUiVZpgpKMHf6EzK6vzeOH3hPqlgk_AbWr9mji6vpkgOsm0DXze0RF8A
+Message-ID: <CAFj5m9+77j1Y3nNkxqhCcJ5XN719723iudjKVYDsppWfy7sWfQ@mail.gmail.com>
+Subject: Re: [PATCH] driver: block: release the lo_work_lock before queue_work
+To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Dan Schatzberg <schatzberg.dan@gmail.com>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Zhaoyang Huang <huangzhaoyang@gmail.com>, steve.kang@unisoc.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 10, 2025 at 9:25=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
-wrote:
+On Fri, Feb 7, 2025 at 5:20=E2=80=AFPM zhaoyang.huang <zhaoyang.huang@uniso=
+c.com> wrote:
 >
-> This patchset is based on linux-block/for-next and is also available at:
+> From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
 >
->     git fetch https://git.kernel.org/pub/scm/fs/fscrypt/linux.git wrapped=
--keys-v12
+> queue_work could spin on wq->cpu_pwq->pool->lock which could lead to
+> concurrent loop_process_work failed on lo_work_lock contention and
+> increase the request latency. Remove this combination by moving the
+> lock release ahead of queue_work.
 >
-> Now that the block layer support for hardware-wrapped inline encryption
-> keys has been applied for 6.15
-> (https://lore.kernel.org/r/173920649542.40307.8847368467858129326.b4-ty@k=
-ernel.dk),
-> this series refreshes the remaining patches.  They add the support for
-> hardware-wrapped inline encryption keys to the Qualcomm ICE and UFS
-> drivers and to fscrypt.  All tested on SM8650 with xfstests.
+> Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+> ---
+>  drivers/block/loop.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> TBD whether these will land in 6.15 too, or wait until 6.16 when the
-> block patches that patches 2-4 depend on will have landed.
->
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 8f6761c27c68..33e31cd95953 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -890,8 +890,8 @@ static void loop_queue_work(struct loop_device *lo, s=
+truct loop_cmd *cmd)
+>                 cmd_list =3D &lo->rootcg_cmd_list;
+>         }
+>         list_add_tail(&cmd->list_entry, cmd_list);
+> -       queue_work(lo->workqueue, work);
+>         spin_unlock_irq(&lo->lo_work_lock);
+> +       queue_work(lo->workqueue, work);
+>  }
 
-Could Jens provide an immutable branch with these patches? I don't
-think there's a reason to delay it for another 3 months TBH.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Bartosz
