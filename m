@@ -1,99 +1,115 @@
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87992505A8
-	for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 14:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467AE253341
+	for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 15:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739283310; cv=none; b=mfRqQkA0Nbk0RvM7LEX+RPsWUbGiMffZOMkrWRrnVZbi41Uug1VoyaZP8hvpx18o/RI51gC38z3F34ctEVis41fflnEom7AkQWSCC4Y1r/UM8RzpOnRAFZ/d1bbamqB9mI6EmX84ngKw9TvrgDqxNYmkYAeAjfcEMrbKJnp2McY=
+	t=1739287747; cv=none; b=PxyeCNM/ORXL6/UU9QOgVBckd9HVNRa0p5nzuMiNeESq2Oj5InkAiY2gX2PreR/mRg+E5hZoVNh1CqL9fh+7jvr3B5I9shKTLeP0LZhpnyuWJ1l+Kj4UWMKeEviPuo8LADZ/QL3QjLOt01ggt30yaDSwlA9TY3kNck80e1LlbeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739283310; c=relaxed/simple;
-	bh=q+Hs2SHkHkF6zcWiQ6yaGSdhUHx4qOoQaWem7F2T1U8=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=FcKwutmeW0TJrwi9Gn/aA9M8t8N/gpWqoRfxd37ReOaiSEQ672hFUQswSMWmPo2/2X+IHV1F+qyl2luTn3yL66l4rPWdbj67w2iDXfU1DS4wlQiLmRu7JXzkdmTeEHTQS7xfLmn2Ma0TcWtlru910C71UqHlb2M00yEFgLtllPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=D24ok9dW; arc=none smtp.client-ip=209.85.166.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1739287747; c=relaxed/simple;
+	bh=RRujV9c54RXt9MhwuuOTuvvTmxLfU6UUjrSbtZPo4Ek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u4bs6XVhFb8YtIVbPAJKEuSyWl2h75CreXgmiOyzjDuIJFwLSZrlFfNye4letEZ+wZIsZmL4xwFpSt7lUbTyY7HLGa/aR433pwRXq+kjP/JONl3I3FLm9W3moCw1IxwvF4F85pZec4bAOh4NFZDjfflj/kMDAbXAdlWH34WV7g8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bip/R9uH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="D24ok9dW"
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-851c4f1fb18so146903239f.2
-        for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 06:15:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1739283306; x=1739888106; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wdzkzP8yo0lOt6RBy7UoV+VarQja9k3vyWPk7H80DfA=;
-        b=D24ok9dWjBtn4w2E3l5wdlHRbynsl5OL2TfrhJJZaVwPWTw3DhsKyMPprUN4QJXrvI
-         +GpR2BJZIovOsGyRMZYL4mPFS75ytZHKIZfKdltQILcEJcsQGM/B+AZptOY6nCpHqE4d
-         0qNvyhlJXntvOOAgbNWu3TtAc2Kj1H7CRf0AZDdTZztKkXFENNKDS2tBer3dqLyrOvRq
-         EPaG7yDzTM2JtMcb4+eh7ZJAUBIZWo20VG327imkQddSRTajinYP3KR1S9pxvrfx1Tgy
-         TCtPppym29H2LVj9TpDeO8M6Jq3AK722obFuloXr7DMnn0NEk3Om5k/yx8net+Xeb5y3
-         7BCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739283306; x=1739888106;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wdzkzP8yo0lOt6RBy7UoV+VarQja9k3vyWPk7H80DfA=;
-        b=DcLHPy4BeDhCzZR2+eNHYIbLTMlr0Np4HKDbQH5e4sgSuhGq0DV1zeS6jomK3jdvoT
-         DvDl3l/JMZ2e/M4JoUy/+NzkltXFfewXE353DkwiH+ZJC97TWNa4+jmnrzpm846FhaIG
-         +xfwkg1Ah5eOkEOBKx4zbAv53VrsP1Ca58eXjtxSj+kgYfmr8XYYZeqKLndpbRXpTBb9
-         z/A1B5iwBk0lx6Cc89GtVRgDBJ0VsK1YYoJPVyTnaFgVmAvNeByaU/VAb6Qygfgp4/GC
-         ij/jLw12cJMYFrVJqdju3dyH8n967a7aMutYjt5vTl9e8MJObTK90KE27OUEw2lWQb4H
-         C66A==
-X-Forwarded-Encrypted: i=1; AJvYcCUW6oT7NuzUiw8xPz7vhHEPZT0vuOpycMu6+vGdHH9oEeb1CfTConBlWz9QtGqGA70EbDVE6yUXO7qY6Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywf+QEE+kkEm6MpmqrDW2DR86G7eFTQKca+r2zdCMSyX5hu8TtB
-	ppwGDcuYcD7PhnuDpXt//+x0JDPHHp1vIOxQlBdfGnmSLHKi1E3fn9ZLqXSm55Q=
-X-Gm-Gg: ASbGncuuhnXy0YdWy/YeMsUN2ZozrUoFuMt743kLD5LKEyqeSY7s2X4ihRPsU95tVwj
-	mblTjZCjokvWzSV3k3XUd/PJvDMAolhjo1l3CXipIsnwne5T2WmwL30j0cKHTCgfTqVWt9sSPUI
-	Jae3wzpzJ1aWZS+YdDEELKZ9eZNJdQpoxpy9szj43HTQRX+JdVMJLcYedYCdvBVd76tzYxGBjQi
-	IxNDrhZTUBpObjRPP5HgwVBJwBxz0XX+Dy7foI74PaSypKatnN9mItjDruX+b/xDfUk4uhdeAzS
-	jPOcUQ==
-X-Google-Smtp-Source: AGHT+IFKIGv8EDPyy/7bp1zDbh55ZpYoXpz+ZdE0e8eOPJfgRxWp3vIJRcSq5Rk09f6YtFHhhvtzeA==
-X-Received: by 2002:a05:6e02:214b:b0:3cf:b3ab:584d with SMTP id e9e14a558f8ab-3d13de9fc27mr131337185ab.13.1739283306581;
-        Tue, 11 Feb 2025 06:15:06 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d14f21094dsm18094365ab.67.2025.02.11.06.15.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 06:15:05 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Dan Schatzberg <schatzberg.dan@gmail.com>, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Zhaoyang Huang <huangzhaoyang@gmail.com>, 
- steve.kang@unisoc.com, "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
-In-Reply-To: <20250207091942.3966756-1-zhaoyang.huang@unisoc.com>
-References: <20250207091942.3966756-1-zhaoyang.huang@unisoc.com>
-Subject: Re: [PATCH] driver: block: release the lo_work_lock before
- queue_work
-Message-Id: <173928330541.90490.11671067114197076767.b4-ty@kernel.dk>
-Date: Tue, 11 Feb 2025 07:15:05 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bip/R9uH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739287745;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xv1w1DlKbEasrVT1CCHnLjrP7d84p83c/hF32ietdcc=;
+	b=bip/R9uHBVc3QBIs6eRIfqXWZAiMNWQTruCTy5x4VcvwVYa0o2fK7WZ8FZx/bGd37t2v/N
+	bR0KWQljgiUp54+HKyE0A7bMLtopZSM6TofP+dMqgjtO9HyLZIdNVyaG/Jeu20+5eUO53X
+	KRGmAcUNjzNifn5snQAVgOPxjv4U0bg=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-490-7ofXKyztMeiMV23G0rzo3A-1; Tue,
+ 11 Feb 2025 10:29:01 -0500
+X-MC-Unique: 7ofXKyztMeiMV23G0rzo3A-1
+X-Mimecast-MFC-AGG-ID: 7ofXKyztMeiMV23G0rzo3A
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 88C6519560BC;
+	Tue, 11 Feb 2025 15:29:00 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.109])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 459B33001D18;
+	Tue, 11 Feb 2025 15:28:56 +0000 (UTC)
+Date: Tue, 11 Feb 2025 23:28:51 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Cheyenne Wills <cheyenne.wills@gmail.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: BUG: NULL pointer dereferenced within __blk_rq_map_sg
+Message-ID: <Z6tss9YS98AEIwQy@fedora>
+References: <CAHpsFVeew-p9xB9DB52Pk_6mXfFxJbT8p14h5+YRTKabEfU3BQ@mail.gmail.com>
+ <Z6s-3LndN-Gt5sZB@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-14bd6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z6s-3LndN-Gt5sZB@fedora>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-
-On Fri, 07 Feb 2025 17:19:42 +0800, zhaoyang.huang wrote:
-> queue_work could spin on wq->cpu_pwq->pool->lock which could lead to
-> concurrent loop_process_work failed on lo_work_lock contention and
-> increase the request latency. Remove this combination by moving the
-> lock release ahead of queue_work.
+On Tue, Feb 11, 2025 at 08:13:16PM +0800, Ming Lei wrote:
+> On Fri, Feb 07, 2025 at 07:09:39PM -0700, Cheyenne Wills wrote:
+> > While I was setting up to test with linux 6.14-rc1 (under Xen), I ran
+> > into a consistent NULL ptr dereference within __blk_rq_map_sg when
+> > booting the system.
+> > 
+> > Using git bisect I was able to narrow down the "bad" commit to:
+> > 
+> > block: add a dma mapping iterator (b7175e24d6acf79d9f3af9ce9d3d50de1fa748ec)
+> > 
+> > Building a kernel with the parent commit
+> > (2caca8fc7aad9ea9a6ea3ed26ed146b1e5f06fab) using the same .config does
+> > not fail.
+> > 
+> > Following is the console log showing the error as well as the Xen
+> > (libvirt) configuration for the guest that I'm using.
+> > 
+> > Please let me know if there is any additional information that I can provide.
 > 
+> Can you test the following patch?
 > 
 
-Applied, thanks!
-
-[1/1] driver: block: release the lo_work_lock before queue_work
-      commit: 3bee991f2b68175c828dc3f9c26367fe1827319a
-
-Best regards,
--- 
-Jens Axboe
+Please try the revised one:
 
 
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 15cd231d560c..a66d087a6b55 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -493,7 +493,7 @@ static bool blk_map_iter_next(struct request *req,
+ 		return true;
+ 	}
+ 
+-	if (!iter->iter.bi_size)
++	if (!iter->bio || !iter->iter.bi_size)
+ 		return false;
+ 
+ 	bv = mp_bvec_iter_bvec(iter->bio->bi_io_vec, iter->iter);
+@@ -514,6 +514,8 @@ static bool blk_map_iter_next(struct request *req,
+ 			if (!iter->bio->bi_next)
+ 				break;
+ 			iter->bio = iter->bio->bi_next;
++			if (!iter->bio)
++				break;
+ 			iter->iter = iter->bio->bi_iter;
+ 		}
+ 
+
+
+
+Thanks,
+Ming
 
