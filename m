@@ -1,108 +1,80 @@
-Received: from smtp.cecloud.com (unknown [1.203.97.240])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72AC1EF090;
-	Wed, 12 Feb 2025 09:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.203.97.240
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A2F2063D6
+	for <linux-block@vger.kernel.org>; Wed, 12 Feb 2025 09:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739353681; cv=none; b=KVVfPeYYUNhMYnDbh8M6+ii4nqrG1LKEDX5jI1E6E7hqiLIesfls9LJlcelyON4W9+qZyPc4Ky4Wgeq/zjuc6ODnfdrifPha/qIYix1LJxF+ov1Ho9CEXmYLoALQJPVSClF8P3wuDgDhbgK1RD+VCoGu6OJ0iYQzA60L49DPOlI=
+	t=1739354142; cv=none; b=k1yBwV1kOQNm0T7YWmb4x5PyMCFzL9b0+5amGrcU0thRHQmf5cm6Kofmb8dDc+BpAkGBD+rSLoZfNcstlQ/eDH3Df6H77mG3zq1fstdNdZrzd8mLJbcp/pqLj1XX2IpCAgZhwqhHrpwE9wf59DZlKZVxeEVYV7oc2LjXHv76UqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739353681; c=relaxed/simple;
-	bh=xUQ30rhV40fcUwQmaBnExzYBwck0x6MjVWsXHWK2G7Y=;
-	h=Date:From:To:Cc:Subject:References:Mime-Version:Message-ID:
-	 Content-Type; b=CdOL2aPO3sio87N0Ja4qMODlrpBY8erdi0/4TVe1qcBf3rvnDtgMC7Q61Kuxp+NWrOQ7oYdrA4erl56azSDITkkW8IRl3z/yP6+yATj+DDdxk12vJxyJBlEIxy0ez1pHVnsTqHpPpivNtPlxLCvsmx5GC+9oE0bFpcjo5/s4RHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn; spf=pass smtp.mailfrom=cestc.cn; arc=none smtp.client-ip=1.203.97.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cestc.cn
-Received: from localhost (localhost [127.0.0.1])
-	by smtp.cecloud.com (Postfix) with ESMTP id B8A1490011B;
-	Wed, 12 Feb 2025 17:47:47 +0800 (CST)
-X-MAIL-GRAY:0
-X-MAIL-DELIVERY:1
-X-SKE-CHECKED:1
-X-ABS-CHECKED:1
-X-ANTISPAM-LEVEL:2
-Received: from desktop-n31qu50 (unknown [39.156.73.12])
-	by smtp.cecloud.com (postfix) whith ESMTP id P3907749T281458761199984S1739353666453316_;
-	Wed, 12 Feb 2025 17:47:47 +0800 (CST)
-X-IP-DOMAINF:1
-X-RL-SENDER:zhang.guanghui@cestc.cn
-X-SENDER:zhang.guanghui@cestc.cn
-X-LOGIN-NAME:zhang.guanghui@cestc.cn
-X-FST-TO:mlombard@bsdbackstore.eu
-X-RCPT-COUNT:9
-X-LOCAL-RCPT-COUNT:0
-X-MUTI-DOMAIN-COUNT:0
-X-SENDER-IP:39.156.73.12
-X-ATTACHMENT-NUM:0
-X-UNIQUE-TAG:<882da0001598ff412ba171defd5e7094>
-X-System-Flag:0
-Date: Wed, 12 Feb 2025 17:47:45 +0800
-From: "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>
-To: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>, 
-	chunguang.xu <chunguang.xu@shopee.com>
-Cc: mgurtovoy <mgurtovoy@nvidia.com>, 
-	sagi <sagi@grimberg.me>, 
-	kbusch <kbusch@kernel.org>, 
-	sashal <sashal@kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-nvme <linux-nvme@lists.infradead.org>, 
-	linux-block <linux-block@vger.kernel.org>
-Subject: Re: Re: nvme-tcp: fix a possible UAF when failing to send request
-References: <2025021015413817916143@cestc.cn>, 
-	<D7OOGIOAJRUH.9LOJ3X4IUKQV@bsdbackstore.eu>, 
-	<3f1f7ec3-cb49-4d66-b2b0-57276a6c62f0@nvidia.com>, 
-	<D7OWXONOUZ1Y.19KIRCQDVRTKN@bsdbackstore.eu>, 
-	<CAAO4dAWdsMjYMp9jdWXd_48aG0mTtVpRONqjJJ1scnc773tHzg@mail.gmail.com>, 
-	<202502111604342976121@cestc.cn>, 
-	<D7QBDBZMZTCI.1W40WVL5JJ3O7@bsdbackstore.eu>, 
-	<D7QC8AQ7J89A.32TNPSFWV1VNX@bsdbackstore.eu>
-X-Priority: 3
-X-GUID: 9D028B37-D67E-4AA1-BFBF-FC2EAB062C63
-X-Has-Attach: no
-X-Mailer: Foxmail 7.2.25.331[cn]
+	s=arc-20240116; t=1739354142; c=relaxed/simple;
+	bh=Tc/cG7T+M/sAxY1Ck/x8IJAYIxOhHEGgEt7sTf/dxys=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=CYeCRTjjS4plcJ6Nlhw+4+nJPKiLNa0/MBtlMflq3yOT/JkOSYLb0J+eUhir4g8jZOFMC/Ov9svDWb/4kpQ/TyA8HuRMdon33rtgT/vGqOMADhef0whbRDiAP8T5xfL4dozB+DSJTRdIReQ7jv+bhNP7mlSOCM5GmGjE9FdR7Ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=rQz5w4NW; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="rQz5w4NW"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1739354137; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
+	bh=kpD8O0/pBIrsC7i0Bb1MrYIHRtYE1F0jvyEMHEU1yRo=;
+	b=rQz5w4NWNYx0kSTtJAPHV6046JGLRpMrr+rQZUplE3XBhOf/qgJlnsU8Kqd0hhCFyRZ8A6iU04rbDSm4knQWrd+lGn9CjshJaJfIgq+de5nULYupdTWDWPGyHW48hFRkpCk1XC9r3s6xv6K9Ujz49gpSuEr44f2hYCp1IzdhhXM=
+Received: from 30.178.82.44(mailfrom:kanie@linux.alibaba.com fp:SMTPD_---0WPJreib_1739354135 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 12 Feb 2025 17:55:36 +0800
+Message-ID: <ce305c08-af9b-4f4f-86ca-3832791bb7a4@linux.alibaba.com>
+Date: Wed, 12 Feb 2025 17:55:35 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <202502121747455267343@cestc.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+User-Agent: =?UTF-8?B?TW96aWxsYSBUaHVuZGVyYmlyZCDmtYvor5XniYg=?=
+Subject: Re: [PATCH RFC] block: print the real address of request in debugfs
+From: Guixin Liu <kanie@linux.alibaba.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+References: <20250208035224.128454-1-kanie@linux.alibaba.com>
+In-Reply-To: <20250208035224.128454-1-kanie@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-wqDCoMKgwqBIaSwgVGhhbmtzLgrCoMKgwqDCoEkgd2lsbCB0ZXN0IHRoaXMgcGF0Y2gsIGJ1dCBJ
-IGFtIHdvcnJpZWQgd2hldGhlciBpdCB3aWxsIGFmZmVjdCB0aGUgcGVyZm9ybWFuY2UuClNob3Vs
-ZCB3ZSBhbHNvIGNvbnNpZGVyIG51bGwgcG9pbnRlciBwcm90ZWN0aW9uPwoKCnpoYW5nLmd1YW5n
-aHVpQGNlc3RjLmNuCgoKCkZyb206wqBNYXVyaXppbyBMb21iYXJkaQoKCgpEYXRlOsKgMjAyNS0w
-Mi0xMsKgMTY6NTIKCgoKVG86wqBNYXVyaXppbyBMb21iYXJkaTsgemhhbmcuZ3VhbmdodWlAY2Vz
-dGMuY247IGNodW5ndWFuZy54dQoKCgpDQzrCoG1ndXJ0b3ZveTsgc2FnaTsga2J1c2NoOyBzYXNo
-YWw7IGxpbnV4LWtlcm5lbDsgbGludXgtbnZtZTsgbGludXgtYmxvY2sKCgoKU3ViamVjdDrCoFJl
-OiBudm1lLXRjcDogZml4IGEgcG9zc2libGUgVUFGIHdoZW4gZmFpbGluZyB0byBzZW5kIHJlcXVl
-c3QKCgoKT24gV2VkIEZlYiAxMiwgMjAyNSBhdCA5OjExIEFNIENFVCwgTWF1cml6aW8gTG9tYmFy
-ZGkgd3JvdGU6CgoKCj4gT24gVHVlIEZlYiAxMSwgMjAyNSBhdCA5OjA0IEFNIENFVCwgemhhbmcu
-Z3VhbmdodWlAY2VzdGMuY24gd3JvdGU6CgoKCj4+IEhpwqAKCgoKPj4KCgoKPj4gwqAgwqAgVGhp
-cyBpcyBhwqAgcmFjZSBpc3N1ZSzCoMKgSSBjYW4ndCByZXByb2R1Y2UgaXQgc3RhYmx5IHlldC4g
-SSBoYXZlIG5vdCB0ZXN0ZWQgdGhlIGxhdGVzdCBrZXJuZWwuwqAgYnV0IGluIGZhY3QswqDCoEkn
-dmUgc3luY2VkIHNvbWUgbnZtZS10Y3AgcGF0Y2hlcyBmcm9twqAgbGFzdGVzdCB1cHN0cmVhbSwK
-CgoKPgoKCgo+IEhlbGxvLCBjb3VsZCB5b3UgdHJ5IHRoaXMgcGF0Y2g/CgoKCj4KCgoKPiBxdWV1
-ZV9sb2NrIHNob3VsZCBwcm90ZWN0IGFnYWluc3QgY29uY3VycmVudCAiZXJyb3IgcmVjb3Zlcnki
-LAoKCgo+ICsgbXV0ZXhfbG9jaygmcXVldWUtPnF1ZXVlX2xvY2spOwoKCgrCoAoKCgpVbmZvcnR1
-bmF0ZWx5IEkndmUganVzdCByZWFsaXplZCB0aGF0IHF1ZXVlX2xvY2sgd29uJ3Qgc2F2ZSB1cwoK
-Cgpmcm9tIHRoZSByYWNlIGFnYWluc3QgdGhlIGNvbnRyb2xsZXIgcmVzZXQsIGl0J3Mgc3RpbGwg
-cG9zc2libGUKCgoKd2UgbG9jayBhIGRlc3Ryb3llZCBtdXRleC4gU28ganVzdCB0cnkgdGhpcwoK
-CgpzaW1wbGlmaWVkIHBhdGNoLCBJIHdpbGwgdHJ5IHRvIGZpZ3VyZSBvdXQgc29tZXRoaW5nIGVs
-c2U6CgoKCsKgCgoKCmRpZmYgLS1naXQgYS9kcml2ZXJzL252bWUvaG9zdC90Y3AuYyBiL2RyaXZl
-cnMvbnZtZS9ob3N0L3RjcC5jCgoKCmluZGV4IDg0MTIzOGYzOGZkZC4uYjcxNGUxNjkxYzMwIDEw
-MDY0NAoKCgotLS0gYS9kcml2ZXJzL252bWUvaG9zdC90Y3AuYwoKCgorKysgYi9kcml2ZXJzL252
-bWUvaG9zdC90Y3AuYwoKCgpAQCAtMjY2MCw3ICsyNjYwLDEwIEBAIHN0YXRpYyBpbnQgbnZtZV90
-Y3BfcG9sbChzdHJ1Y3QgYmxrX21xX2h3X2N0eCAqaGN0eCwgc3RydWN0IGlvX2NvbXBfYmF0Y2gg
-KmlvYikKCgoKc2V0X2JpdChOVk1FX1RDUF9RX1BPTExJTkcsICZxdWV1ZS0+ZmxhZ3MpOwoKCgpp
-ZiAoc2tfY2FuX2J1c3lfbG9vcChzaykgJiYgc2tiX3F1ZXVlX2VtcHR5X2xvY2tsZXNzKCZzay0+
-c2tfcmVjZWl2ZV9xdWV1ZSkpCgoKCnNrX2J1c3lfbG9vcChzaywgdHJ1ZSk7CgoKCisKCgoKKyBt
-dXRleF9sb2NrKCZxdWV1ZS0+c2VuZF9tdXRleCk7CgoKCm52bWVfdGNwX3RyeV9yZWN2KHF1ZXVl
-KTsKCgoKKyBtdXRleF91bmxvY2soJnF1ZXVlLT5zZW5kX211dGV4KTsKCgoKY2xlYXJfYml0KE5W
-TUVfVENQX1FfUE9MTElORywgJnF1ZXVlLT5mbGFncyk7CgoKCnJldHVybiBxdWV1ZS0+bnJfY3Fl
-OwoKCgp9CgoKCsKgCgoKCk1hdXJpemlvCgoKCsKgCgoKCsKgCgoK
+Gently ping...
 
+Best Regards,
 
+Guixin Liu
 
+在 2025/2/8 11:52, Guixin Liu 写道:
+> Since only root user can access debugfs, for easier issue
+> identification, use '%px' to print the request's real address in
+> debugfs.
+>
+> Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
+> ---
+> Hi,
+>    I notice that block dont print the real address in
+> debugfs for a long time, I wonder what the community's
+> concerns are, thanks, so this is a RFC patch.
+> Best Regards,
+> Guixin Liu
+>
+>   block/blk-mq-debugfs.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index adf5f0697b6b..c430d931512f 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -265,7 +265,7 @@ int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
+>   	BUILD_BUG_ON(ARRAY_SIZE(cmd_flag_name) != __REQ_NR_BITS);
+>   	BUILD_BUG_ON(ARRAY_SIZE(rqf_name) != __RQF_BITS);
+>   
+> -	seq_printf(m, "%p {.op=", rq);
+> +	seq_printf(m, "%px {.op=", rq);
+>   	if (strcmp(op_str, "UNKNOWN") == 0)
+>   		seq_printf(m, "%u", op);
+>   	else
