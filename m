@@ -1,55 +1,56 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6AB378F4E
-	for <linux-block@vger.kernel.org>; Wed, 12 Feb 2025 02:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6A278F5D
+	for <linux-block@vger.kernel.org>; Wed, 12 Feb 2025 02:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739327391; cv=none; b=RiJlGRt2cNk5ork/+8GTlxV0+DBIi8Q3AzKLW84tgN5m4s6yg1Wv7GBBir0k78+OdLWYIvEx7nIVECRjKjy7TUymuDMjloaydG9CTZOIp95n5jHd3UHOB1Baxrooa77VEVOdC15QVuDaTw4iYxQkenZiaZP90xLF9eGZFcQFVpk=
+	t=1739328573; cv=none; b=LMmaA3FWcYWIiGNlSHYG3bi7F4T7K56AO913d7l15nwILh3XryPJE7GMKpiaRHJ1je8DzJ6HpiBL0vsvwJGY7I3D/bAlLSBuGkvWcPwg5UvkiS+92Y0c91cyEICVXDAfgP4bE0+nr8sGHE55knLgBG5uXeCC7cw94u1CWrmBTws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739327391; c=relaxed/simple;
-	bh=2IgyZ0g7V2m88LSvM3T3N2W+3GlHleRe3LMJAhSFzg4=;
+	s=arc-20240116; t=1739328573; c=relaxed/simple;
+	bh=WzlY8jinKS9gY9THs13QL3iYaygsH3DRbOuRAtdSs58=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=efaQmcS6QBpfgAkCp2MaymPzD4By4CqB6iau8Ix1n+Cd34bKNtdPIN5COCV5nkV5KK7KUwR9dPv7Cl4/qFPcaLhU54Xduf7vgRJKteZJu/GIJ8zxPn5qt+qTxbWkQwWUdCVY6FOLW9tTpt03PEPu9BVHF7lOHMNDvth9YpWJOkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IcEO0h/2; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=CLJu2+d2RPtVv7Mn67bkaNTs4aZm1r0IuWBWCkM8GyJNxqMTZ2/sWmjw+gf1t6M09msAqNwBl1XSJI+BkoqHg97NHvzcTu9+4g9Ecv1bFNkLX8EajQoc/xvjuLRCGamatuSoDoSaptioF0CFWI6LD2+817WCY9ptkz3NysEy7VE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ORPNVlle; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IcEO0h/2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ORPNVlle"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739327388;
+	s=mimecast20190719; t=1739328571;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=X39yARt4BW8kEibKLCcAsrQXU54adKPNw9W/thdQxrY=;
-	b=IcEO0h/22csmhYufu3R1Zay/llDGQPy/Op7DgmlqCbsxJdkiLkwuJj0Hf+PT+qlsKWygjX
-	fCJr1X7Prh6Oqai8F/xL3/mXvyMvwqyk7d85KAcivgICi/skl0/P4g9cf3EdLpiga6JAYW
-	K+75viuKS5MrTQV3K0aJS8VzFIktrW4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=NdeC0wtOBQjqtkNusPIbFdjZDkozLCfg+04DlOuXyLI=;
+	b=ORPNVlleUDGN1cwRri/LtCQIovnnAaDl+cpTfRt+PaWnfK0RIX70Y34ANA/czWE9w4/f0S
+	PPdbixR51e8AWk08ea6RXl70fzpCPZBgW0lzC193w+p7Pzkx5ENQXqZZJrGDpe8lRy3+Hn
+	yPLlZR1cnab1+gZ5EhhYZ0r3uicK/ys=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-407-tlW4EdVNOfWTPZgnjJBirA-1; Tue,
- 11 Feb 2025 21:29:45 -0500
-X-MC-Unique: tlW4EdVNOfWTPZgnjJBirA-1
-X-Mimecast-MFC-AGG-ID: tlW4EdVNOfWTPZgnjJBirA
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-74-048g6ZqrNSiY6qEZDeulEQ-1; Tue,
+ 11 Feb 2025 21:49:27 -0500
+X-MC-Unique: 048g6ZqrNSiY6qEZDeulEQ-1
+X-Mimecast-MFC-AGG-ID: 048g6ZqrNSiY6qEZDeulEQ_1739328566
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 31DFF1800374;
-	Wed, 12 Feb 2025 02:29:43 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CFE4F19560AE;
+	Wed, 12 Feb 2025 02:49:25 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.142])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A046918004A7;
-	Wed, 12 Feb 2025 02:29:37 +0000 (UTC)
-Date: Wed, 12 Feb 2025 10:29:32 +0800
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DCB2D18008CC;
+	Wed, 12 Feb 2025 02:49:20 +0000 (UTC)
+Date: Wed, 12 Feb 2025 10:49:15 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Keith Busch <kbusch@meta.com>
 Cc: asml.silence@gmail.com, axboe@kernel.dk, linux-block@vger.kernel.org,
 	io-uring@vger.kernel.org, bernd@bsbernd.com,
 	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv2 0/6] ublk zero-copy support
-Message-ID: <Z6wHjGFcFCLMnUez@fedora>
+Subject: Re: [PATCHv2 4/6] ublk: zc register/unregister bvec
+Message-ID: <Z6wMK5WxvS_MzLh3@fedora>
 References: <20250211005646.222452-1-kbusch@meta.com>
+ <20250211005646.222452-5-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,46 +59,138 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250211005646.222452-1-kbusch@meta.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <20250211005646.222452-5-kbusch@meta.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Mon, Feb 10, 2025 at 04:56:40PM -0800, Keith Busch wrote:
+On Mon, Feb 10, 2025 at 04:56:44PM -0800, Keith Busch wrote:
 > From: Keith Busch <kbusch@kernel.org>
 > 
-> Previous version was discussed here:
+> Provide new operations for the user to request mapping an active request
+> to an io uring instance's buf_table. The user has to provide the index
+> it wants to install the buffer.
 > 
->   https://lore.kernel.org/linux-block/20250203154517.937623-1-kbusch@meta.com/
+> A reference count is taken on the request to ensure it can't be
+> completed while it is active in a ring's buf_table.
 > 
-> The same ublksrv reference code in that link was used to test the kernel
-> side changes.
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  drivers/block/ublk_drv.c      | 145 +++++++++++++++++++++++++---------
+>  include/uapi/linux/ublk_cmd.h |   4 +
+>  2 files changed, 113 insertions(+), 36 deletions(-)
 > 
-> Before listing what has changed, I want to mention what is the same: the
-> reliance on the ring ctx lock to serialize the register ahead of any
-> use. I'm not ignoring the feedback; I just don't have a solid answer
-> right now, and want to progress on the other fronts in the meantime.
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 529085181f355..ccfda7b2c24da 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -51,6 +51,9 @@
+>  /* private ioctl command mirror */
+>  #define UBLK_CMD_DEL_DEV_ASYNC	_IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
+>  
+> +#define UBLK_IO_REGISTER_IO_BUF		_IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
+> +#define UBLK_IO_UNREGISTER_IO_BUF	_IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
 
-It is explained in the following links:
+UBLK_IO_REGISTER_IO_BUF command may be completed, and buffer isn't used
+by RW_FIXED yet in the following cases:
 
-https://lore.kernel.org/linux-block/b6211101-3f74-4dea-a880-81bb75575dbd@gmail.com/
+- application doesn't submit any RW_FIXED consumer OP
 
-- node kbuffer is registered in ublk uring_cmd's ->issue(), but lookup
-  in RW_FIXED OP's ->prep(), and ->prep() is always called before calling
-  ->issue() when the two are submitted in same io_uring_enter(), so you
-  need to move io_rsrc_node_lookup() & buffer importing from RW_FIXED's ->prep()
-  to ->issue() first.
+- io_uring_enter() only issued UBLK_IO_REGISTER_IO_BUF, and the other
+  OPs can't be issued because of out of resource 
 
-- secondly, ->issue() order is only respected by IO_LINK, and io_uring
-  can't provide such guarantee without using IO_LINK:
+...
 
-  Pavel explained it in the following link:
+Then io_uring_enter() returns, and the application is panic or killed,
+how to avoid buffer leak?
 
-  https://lore.kernel.org/linux-block/68256da6-bb13-4498-a0e0-dce88bb32242@gmail.com/
+It need to deal with in io_uring cancel code for calling ->release() if
+the kbuffer node isn't released.
 
-  There are also other examples, such as, register buffer stays in one
-  link chain, and the consumer OP isn't in this chain, the consumer OP
-  can still be issued before issuing register_buffer.
+UBLK_IO_UNREGISTER_IO_BUF still need to call ->release() if the node
+buffer isn't used.
 
+> +
+>  /* All UBLK_F_* have to be included into UBLK_F_ALL */
+>  #define UBLK_F_ALL (UBLK_F_SUPPORT_ZERO_COPY \
+>  		| UBLK_F_URING_CMD_COMP_IN_TASK \
+> @@ -76,6 +79,9 @@ struct ublk_rq_data {
+>  	struct llist_node node;
+>  
+>  	struct kref ref;
+> +
+> +#define UBLK_ZC_REGISTERED 0
+> +	unsigned long flags;
+>  };
+>  
+>  struct ublk_uring_cmd_pdu {
+> @@ -201,7 +207,7 @@ static inline struct ublksrv_io_desc *ublk_get_iod(struct ublk_queue *ubq,
+>  						   int tag);
+>  static inline bool ublk_dev_is_user_copy(const struct ublk_device *ub)
+>  {
+> -	return ub->dev_info.flags & UBLK_F_USER_COPY;
+> +	return ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY);
+>  }
+>  
+>  static inline bool ublk_dev_is_zoned(const struct ublk_device *ub)
+> @@ -581,7 +587,7 @@ static void ublk_apply_params(struct ublk_device *ub)
+>  
+>  static inline bool ublk_support_user_copy(const struct ublk_queue *ubq)
+>  {
+> -	return ubq->flags & UBLK_F_USER_COPY;
+> +	return ubq->flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY);
+>  }
+>  
+>  static inline bool ublk_need_req_ref(const struct ublk_queue *ubq)
+> @@ -1747,6 +1753,102 @@ static inline void ublk_prep_cancel(struct io_uring_cmd *cmd,
+>  	io_uring_cmd_mark_cancelable(cmd, issue_flags);
+>  }
+>  
+> +static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
+> +		struct ublk_queue *ubq, int tag, size_t offset)
+> +{
+> +	struct request *req;
+> +
+> +	if (!ublk_need_req_ref(ubq))
+> +		return NULL;
+> +
+> +	req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
+> +	if (!req)
+> +		return NULL;
+> +
+> +	if (!ublk_get_req_ref(ubq, req))
+> +		return NULL;
+> +
+> +	if (unlikely(!blk_mq_request_started(req) || req->tag != tag))
+> +		goto fail_put;
+> +
+> +	if (!ublk_rq_has_data(req))
+> +		goto fail_put;
+> +
+> +	if (offset > blk_rq_bytes(req))
+> +		goto fail_put;
+> +
+> +	return req;
+> +fail_put:
+> +	ublk_put_req_ref(ubq, req);
+> +	return NULL;
+> +}
+> +
+> +static void ublk_io_release(void *priv)
+> +{
+> +	struct request *rq = priv;
+> +	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
+> +
+> +	ublk_put_req_ref(ubq, rq);
+> +}
 
-Thanks, 
+It isn't enough to just get & put request reference here between registering
+buffer and freeing the registered node buf, because the same reference can be
+dropped from ublk_commit_completion() which is from queueing
+UBLK_IO_COMMIT_AND_FETCH_REQ, and buggy app may queue this command multiple
+times for freeing the request.
+
+One solution is to not allow request completion until the ->release() is
+returned.
+
+Thanks,
 Ming
 
