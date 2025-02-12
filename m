@@ -1,97 +1,86 @@
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from bsdbackstore.eu (128-116-240-228.dyn.eolo.it [128.116.240.228])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3D91DED5F;
-	Wed, 12 Feb 2025 08:32:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C882205E14;
+	Wed, 12 Feb 2025 08:52:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.116.240.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739349152; cv=none; b=grSQeJZvJsLTGgbzBGcQrX47sWt33SZu0zfVBpgZcbNH8bnhQSyA/epFXlyJbUTvI0EuNiin2GnZmucWthaAY6Mkltzkxw2UYnjPSDqBmu9cEB8KoGAz/DCdDwN7vkW1h1JCkmcV7DyfNH01eSRrpBPnimSREQGOOL2aiDaoXEA=
+	t=1739350329; cv=none; b=MuWzQwiLyAE0IOVltZQkAlW/y+WgKZeYVaSNmetSTiMZVAH+8XrszbNRuezfMQUA/gVrcNesv3xHA65IfNU7YQ8Yhdl1kOtTxp4ETWp9i9YwVNpXKfxfUgMg7UUp81dvyojJJ1kIB6j7WU2i8HhIrow0LbrI1S9PNrojeeFQHn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739349152; c=relaxed/simple;
-	bh=M6WO1IkI0Q7T3bIAJj97I6HVMTsXJ9vlKr3NrrCq6kM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q4GXorLIVfx9U7ey0u28jPyJ0BD76M6t5yN4izdOC8El/0eTd4mB0tSRrQz7FJtTEqZ6bi3OxqY9AwNMDRADaDFZwt70kT/WYbrk0C0ziEyf8CU1yjPyllhdT+HOd7/6XFkQgJaB5HMSLwz1ZZNxGU3GyXVv9r3qn0caavdXy6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-05 (Coremail) with SMTP id zQCowAAnkMmUXKxnuhRoDA--.44357S2;
-	Wed, 12 Feb 2025 16:32:22 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk
-Cc: cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] block: Check blkg_to_lat return value to avoid NULL dereference
-Date: Wed, 12 Feb 2025 16:32:03 +0800
-Message-ID: <20250212083203.1030-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1739350329; c=relaxed/simple;
+	bh=7FBrhfHO1+R0el7WD1S2tcnq9wLJ75Ki86w1d36aXqg=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=hBrBiNBI1DxWUZXsF2VOyAOJ+By4notaI89WM3ykr55AX3xtg5VPC80YLQMaHBX2w90FAgUBfwrweOnk6z7MEMd0ENvd31w0+EEEoVHhue7MEgf0/arDRUBE+Igo1L81CanMUC0PWgbSAOX00QIs1NK79543I2h+toYHgOHpQFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu; spf=pass smtp.mailfrom=bsdbackstore.eu; arc=none smtp.client-ip=128.116.240.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bsdbackstore.eu
+Received: from localhost (25.205.forpsi.net [80.211.205.25])
+	by bsdbackstore.eu (OpenSMTPD) with ESMTPSA id ce0058fe (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 12 Feb 2025 09:52:03 +0100 (CET)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAAnkMmUXKxnuhRoDA--.44357S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZrWDZrykZry8JF4DXF1xGrg_yoW8XF1rpa
-	18urZFvay5Gw47XF18Ka1rCryrCr4UKFyUCFZ5Aa4FkF1IgF4rtF10vF10yFWrAFWUCrs8
-	Jr1UtFZYvr45C37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
-	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjMqcUUUUU
-	U==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAULA2esWj4JCwAAss
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 12 Feb 2025 09:52:01 +0100
+Message-Id: <D7QC8AQ7J89A.32TNPSFWV1VNX@bsdbackstore.eu>
+From: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>
+To: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>,
+ "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>, "chunguang.xu"
+ <chunguang.xu@shopee.com>
+Cc: "mgurtovoy" <mgurtovoy@nvidia.com>, "sagi" <sagi@grimberg.me>, "kbusch"
+ <kbusch@kernel.org>, "sashal" <sashal@kernel.org>, "linux-kernel"
+ <linux-kernel@vger.kernel.org>, "linux-nvme"
+ <linux-nvme@lists.infradead.org>, "linux-block"
+ <linux-block@vger.kernel.org>
+Subject: Re: nvme-tcp: fix a possible UAF when failing to send request
+X-Mailer: aerc
+References: <2025021015413817916143@cestc.cn>
+ <D7OOGIOAJRUH.9LOJ3X4IUKQV@bsdbackstore.eu>
+ <3f1f7ec3-cb49-4d66-b2b0-57276a6c62f0@nvidia.com>
+ <D7OWXONOUZ1Y.19KIRCQDVRTKN@bsdbackstore.eu>
+ <CAAO4dAWdsMjYMp9jdWXd_48aG0mTtVpRONqjJJ1scnc773tHzg@mail.gmail.com>
+ <202502111604342976121@cestc.cn>
+ <D7QBDBZMZTCI.1W40WVL5JJ3O7@bsdbackstore.eu>
+In-Reply-To: <D7QBDBZMZTCI.1W40WVL5JJ3O7@bsdbackstore.eu>
 
-The function blkg_to_lat() may return NULL if the blkg is not associated
-with an iolatency group. In iolatency_set_min_lat_nsec() and
-iolatency_pd_init(), the return values are not checked, leading to
-potential NULL pointer dereferences.
+On Wed Feb 12, 2025 at 9:11 AM CET, Maurizio Lombardi wrote:
+> On Tue Feb 11, 2025 at 9:04 AM CET, zhang.guanghui@cestc.cn wrote:
+>> Hi=C2=A0
+>>
+>> =C2=A0 =C2=A0 This is a=C2=A0 race issue,=C2=A0=C2=A0I can't reproduce i=
+t stably yet. I have not tested the latest kernel.=C2=A0 but in fact,=C2=A0=
+=C2=A0I've synced some nvme-tcp patches from=C2=A0 lastest upstream,
+>
+> Hello, could you try this patch?
+>
+> queue_lock should protect against concurrent "error recovery",
+> +	mutex_lock(&queue->queue_lock);
 
-This patch adds checks for the return values of blkg_to_lat and let it
-returns early if it is NULL, preventing the NULL pointer dereference.
+Unfortunately I've just realized that queue_lock won't save us
+from the race against the controller reset, it's still possible
+we lock a destroyed mutex. So just try this
+simplified patch, I will try to figure out something else:
 
-Fixes: d70675121546 ("block: introduce blk-iolatency io controller")
-Cc: stable@vger.kernel.org # 4.19+
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- block/blk-iolatency.c | 4 ++++
- 1 file changed, 4 insertions(+)
+diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+index 841238f38fdd..b714e1691c30 100644
+--- a/drivers/nvme/host/tcp.c
++++ b/drivers/nvme/host/tcp.c
+@@ -2660,7 +2660,10 @@ static int nvme_tcp_poll(struct blk_mq_hw_ctx *hctx,=
+ struct io_comp_batch *iob)
+ 	set_bit(NVME_TCP_Q_POLLING, &queue->flags);
+ 	if (sk_can_busy_loop(sk) && skb_queue_empty_lockless(&sk->sk_receive_queu=
+e))
+ 		sk_busy_loop(sk, true);
++
++	mutex_lock(&queue->send_mutex);
+ 	nvme_tcp_try_recv(queue);
++	mutex_unlock(&queue->send_mutex);
+ 	clear_bit(NVME_TCP_Q_POLLING, &queue->flags);
+ 	return queue->nr_cqe;
+ }
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index ebb522788d97..398f0a1747c4 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -787,6 +787,8 @@ static int blk_iolatency_init(struct gendisk *disk)
- static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
- {
- 	struct iolatency_grp *iolat = blkg_to_lat(blkg);
-+	if (!iolat)
-+		return;
- 	struct blk_iolatency *blkiolat = iolat->blkiolat;
- 	u64 oldval = iolat->min_lat_nsec;
- 
-@@ -1013,6 +1015,8 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
- 	 */
- 	if (blkg->parent && blkg_to_pd(blkg->parent, &blkcg_policy_iolatency)) {
- 		struct iolatency_grp *parent = blkg_to_lat(blkg->parent);
-+		if (!parent)
-+			return;
- 		atomic_set(&iolat->scale_cookie,
- 			   atomic_read(&parent->child_lat.scale_cookie));
- 	} else {
--- 
-2.42.0.windows.2
-
+Maurizio
