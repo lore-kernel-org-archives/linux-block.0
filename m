@@ -1,74 +1,100 @@
-Received: from bsdbackstore.eu (128-116-240-228.dyn.eolo.it [128.116.240.228])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867781DDA1B;
-	Wed, 12 Feb 2025 11:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.116.240.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961A6204F6A;
+	Wed, 12 Feb 2025 13:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739360859; cv=none; b=m23tL6SQ7AV86TLg679UW/e0X+kww8Os7T6yMGTv1xv4d/30B9wW5oW/Z3mAR8aAcJ4lGS4og5fMidlTjEYEUdTt1j57Or+tDvrOsSDeEzT6tOh6rWu0qiN5bJay2ltumSQLno47GCC2nVTmKuyWDpbjo8iDkA0x3Mqau9M/+dY=
+	t=1739365404; cv=none; b=dTbEsUAdoYFbLnCn0eANNrqShjt6U/6gkUD3I8v+rjxQR8LKokUFA/12DsW4JaBO2n9nS2zIK9RqCgPjIQkaMLGWD74PZfmHhQ1LUZ0KdyZPO+mrxak3QREssxC8CB6WVYK/2Lma9uXkiIZDhnA/+qMPT0fY2r4bE7fjFsMcslk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739360859; c=relaxed/simple;
-	bh=3FtJRc2IltoMj+mCq22wPBFnDdU2IMjYKEhIx6mDmDA=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=l/N4FN/riX3lyE+NzqYU+bGDmG/Wiq017Vomo67XeyBJus9Vv6LCP6PJfCFH5xykquuHrZDG+RGH8+7Xt6laWANjl3AkjSn86MQiZV3u085G7Ugdhq7XatMRC7YidJWO+tC5v89Y2GhC/lNVvdOW7q3OXSYY2q+o9O2fer95r/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu; spf=pass smtp.mailfrom=bsdbackstore.eu; arc=none smtp.client-ip=128.116.240.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bsdbackstore.eu
-Received: from localhost (25.205.forpsi.net [80.211.205.25])
-	by bsdbackstore.eu (OpenSMTPD) with ESMTPSA id 25b47fee (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 12 Feb 2025 12:47:34 +0100 (CET)
+	s=arc-20240116; t=1739365404; c=relaxed/simple;
+	bh=+Mc1XOKwygNzl+J75JzAnRhFTS1rDyHjsKiXZ66NZo8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=MZeJs54NEzGxOPlEI/1Mc4IZJomI2Q9mDbXHLr1ckhEk1KeX5UvjjwWScco0zUWorGKEwskGqbub7CyGXZw01MCTMUJWxxC9d9sYCQTRsuzgeoOdyu1GoSH6fnC1mR6KEDKh0Drn+PGBogBcX/Ug1WNQjvNMZ/m1CtCbA2vX9o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=ZngAeNPs; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="ZngAeNPs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1739365380; x=1739970180; i=markus.elfring@web.de;
+	bh=UhVHuDHyu/BxGMdq3OfR7GfxXgzLgEBeqCkCRiMEaAc=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=ZngAeNPsGmfh2V2NCCDFKLgY2b2/CRp/qVQNY7ScrR3Yw+vQ4IFxxh5HypwU/uZI
+	 x96EUUXKpYshPIoihIrcg6wxctVxdTEX95m8d82A1bdvUT1tCYAcSPV2VmfdoygXV
+	 T19bTeVT/KsCKd2HFQUIaJ1QM7gvwi9QZ/5nulOpvekaOJ7kKd3qWeiM5otfOhnGm
+	 ggKdEQPKpz2lHVVOY62Kfz53zHHU+JpxNLPyY2V2C6tclDkyk9O65hHRvQW7qPJXz
+	 kmI11GHDd7e4ODKZdv+r2N8ROciyAcGjmSyyXRyPRDS0vCJNyIDKg2Qyvf5FATfFR
+	 4pjvEofqsg6GhyiVDA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.93.11]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MwR4D-1tPhhZ0GMn-00wHo8; Wed, 12
+ Feb 2025 14:03:00 +0100
+Message-ID: <612ab8e6-a712-41f7-ae7f-7bdc0e3c1b90@web.de>
+Date: Wed, 12 Feb 2025 14:02:58 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: Wentao Liang <vulab@iscas.ac.cn>, cgroups@vger.kernel.org,
+ linux-block@vger.kernel.org
+Cc: stable@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+ Tejun Heo <tj@kernel.org>
+References: <20250212083203.1030-1-vulab@iscas.ac.cn>
+Subject: Re: [PATCH] block: Check blkg_to_lat() return value to avoid NULL
+ dereference
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20250212083203.1030-1-vulab@iscas.ac.cn>
 Content-Type: text/plain; charset=UTF-8
-Date: Wed, 12 Feb 2025 12:47:32 +0100
-Message-Id: <D7QFYOJVX22Z.CU0EL0NHPNS8@bsdbackstore.eu>
-Subject: Re: nvme-tcp: fix a possible UAF when failing to send request
-From: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>
-To: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>,
- "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>, "chunguang.xu"
- <chunguang.xu@shopee.com>
-Cc: "mgurtovoy" <mgurtovoy@nvidia.com>, "sagi" <sagi@grimberg.me>, "kbusch"
- <kbusch@kernel.org>, "sashal" <sashal@kernel.org>, "linux-kernel"
- <linux-kernel@vger.kernel.org>, "linux-nvme"
- <linux-nvme@lists.infradead.org>, "linux-block"
- <linux-block@vger.kernel.org>
-X-Mailer: aerc
-References: <2025021015413817916143@cestc.cn>
- <D7OOGIOAJRUH.9LOJ3X4IUKQV@bsdbackstore.eu>
- <3f1f7ec3-cb49-4d66-b2b0-57276a6c62f0@nvidia.com>
- <D7OWXONOUZ1Y.19KIRCQDVRTKN@bsdbackstore.eu>
- <CAAO4dAWdsMjYMp9jdWXd_48aG0mTtVpRONqjJJ1scnc773tHzg@mail.gmail.com>
- <202502111604342976121@cestc.cn>
- <D7QBDBZMZTCI.1W40WVL5JJ3O7@bsdbackstore.eu>
- <D7QC8AQ7J89A.32TNPSFWV1VNX@bsdbackstore.eu>
- <202502121747455267343@cestc.cn>
- <D7QEA7XPBML4.1R0M64OD4BH43@bsdbackstore.eu>
- <D7QF99BR5YYA.2CXBBA5RYACTY@bsdbackstore.eu>
-In-Reply-To: <D7QF99BR5YYA.2CXBBA5RYACTY@bsdbackstore.eu>
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:oku5XT0L9VHT9UFRSvoG+4mbuVUZMifD03n2hUg0w+6+WPGrNAP
+ Xc/Wbq87YEsS0LU84nPcZYuTW1WT9/t3F9NgZDbVsjz2Hwsd7atkKN5uqtzVK5NCLA+uhz4
+ leeRuhTgcsVWIPuZOkwFAWXYw+gZKn/7tKMn/HAyWOp6saYqAy3I+giefqXhK7N24gH18BU
+ RFUNqC2ZNdf4CfkFZ25Gw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:Br8sEHTNNaU=;7Y7yedgzvBUlld/sjcV0dPcHaOM
+ 7HNJxMyDRZFkPzc5REL5/tjhqNf4HJeBRJCC2DxMgC559YqNeoVtkRMfeBcP2GsAVtezymQ8q
+ Hwe6fexjRkFzTQxoRbJAfcxNMBjOtGwrveenPm+wEJ/WONr5yqLRcjbF8i4OPOWzgJQ5PjgHA
+ 3B8QNxe4sSjd0VeUdvWCRzwwEYWNOzOkA8RrQxOvE08wdGMMkx3ysd1uhjG3SJvIdkMj3NnFs
+ +gRmLXv02iC5sO3KxXFaArPzxX5V+BTAb3lOEP8L1K5TMvXK+oMj3lFxdQ5x9Pv1AgUahE/3x
+ /ki6YUC76RWPfJj3/f9IOrdPC5Hq2Rmg2nH8IQzkMr0Te0GmLDtfzOhxhe/rOKGPerGG/p6e5
+ /9d7Y6R1XtGs2M81vEvcU8qZjlB5Fvi10zQQsB69SUf2KX1fxT+rcvgvZHRMlzRcY83NXV1k4
+ rcnJfDPfSWmQY8reF15Y4MsWTRNnrLo/BQH/2M1FrRxw4deTIMVsM4fdUHP8eJploh7epLz9B
+ J17DEVUTliDQNcpvCrSGYUYi3xhXUPxeXEKwKBvTtlEdhoDJy6P3FqwFM5RePsn5HbTbVXTmb
+ s2SfytFSn+TAbtJ+RaUpgkMmvj5TrgkUtnQzSw63rk2JTvJsBQvcb0FyONX1CtdRhfjxap8lu
+ NS+Y55WQuDnW4u6GulUC9NfU/iChLbbIXMkxnImXdyqK+wLN38N7GKPyDSGLimF8sS23+EBK/
+ 5mu614v9feRwrLSoCBpijCnTyoIYuIZCdFhIiYY3c0sKwPMiXl72Wvm70x4y2f3WUNOtBi3bc
+ nmFT9RJNdnBxK7rQpvZSKrXLXkF6Klmwvl2ZQhhBvAd4WtQ6MG42Z/V3rDtOtolm9ZgvB7osu
+ aYkRBRrO0jLkJA3i6ki9PcuKvtkUNc0tmE64mICv7MTYRdzPQJIDpB8beeCFq9A/H8k1lHBuk
+ SMZFDsgl+GyMKOSQJql85YAoXBzl9rBm0t8+XVsEb6Srcpw8WJUsqQrSstrEvtUYR4go2bD49
+ 0usK+I92gQUI1+RAY3Ca+fNOfv1vixylTYcSpwapi0qHx1mBqwzoTYmzKoEX0QVupOr/xS9q8
+ rOULITCLT5prF5a0ANHeWIiPRSIEFpSjYvB/vMlQ7nQR98xSZJ+s3EEQybycrQDMyLrK16t2u
+ Ton7UNVbFbn3DRDl19BROFlYnx1EXpDOqdjdFDAfPJPCi/qas7f7T7fjhdhUq6z/EmalmyAAO
+ v5M6QLELytl4UrGP04OebNUXXIrbHdJw+zbkHJeNQuKxkjvNv/GOWx9bx2UXLtMolPl4Fkenb
+ dhGhAcRObIVhSfwoWw9TGrQcZjc1fnKV4lBVz2kOXO30eOvm+nGf3MfpT/WTTpxgh90iTQ01Y
+ nxUcBLgxy9wLyGgDVW1evOvWcHogikcGFDGJxkYObAfFVayvxzBj6AlaDCC+HZTi/svDZNP87
+ FamWEQvOrlV04zSmdBtJg+lGRk1M=
 
-On Wed Feb 12, 2025 at 12:14 PM CET, Maurizio Lombardi wrote:
-> On Wed Feb 12, 2025 at 11:28 AM CET, Maurizio Lombardi wrote:
->> On Wed Feb 12, 2025 at 10:47 AM CET, zhang.guanghui@cestc.cn wrote:
->>> =C2=A0=C2=A0=C2=A0=C2=A0Hi, Thanks.
->>> =C2=A0=C2=A0=C2=A0=C2=A0I will test this patch, but I am worried whethe=
-r it will affect the performance.
->>> Should we also consider null pointer protection?
->>
->> Yes, it will likely affect the performance, just check if it works.
->>
->> Probably it could be optimized by just protecting
->> nvme_tcp_fail_request(), which AFAICT is the only function in the
->> nvme_tcp_try_send() code that calls nvme_complete_rq().
->
-> Something like that, maybe, not tested:
+=E2=80=A6
+> This patch adds checks for the return values of blkg_to_lat and let it
 
-Ah wait, this won't fix anything because it will end up with a double
-completion.
-Ok I am not sure how to fix this, someone else maybe has better ideas.
+See also:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv6.14-rc2#n94
 
-Maurizio
+
+> returns early if it is NULL, preventing the NULL pointer dereference.
+
+  return?
+
+
+Regards,
+Markus
