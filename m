@@ -1,131 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bsdbackstore.eu (128-116-240-228.dyn.eolo.it [128.116.240.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991EB1DE4D5;
-	Wed, 12 Feb 2025 04:11:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13DAA204C22;
+	Wed, 12 Feb 2025 08:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.116.240.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739333473; cv=none; b=iOHaPtirEoMq7CmhI1uNOW9l57DJJf0k690u9Gpq3mENvYXggEU96cp8EVAmWg5QJ0bpHzIbA2zkqWfu0Gc5yicOsLA+4hqaTd71I3T9/euOAWxMhYQb1VBI1AK3xuAK3zK3QcIzpNpBs9vFaDSOxgSsFYYBfsbr2Lhnf/Ep2CA=
+	t=1739347911; cv=none; b=VzE2KjJePuA9wTQcfbhN6Uz7i5bvi94Q5YNN7fAZrr2HlHf94kTYeaM1+1+Q82hNV4eQsbFbo86zOMaWSjI4ZyqryekQ11ofKx+3VLDyJDUzHtBO31Tsgcp1+ji6USE8MyIQGTiTVrmGn9OFFK9vjwt+NHfDkGudlF7ctqMgY74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739333473; c=relaxed/simple;
-	bh=HUY9jZq6pe6s6cAP1w8mh9yTzfXKDVkS9aEHrUFESHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cj8Sgwk9VYHyP3tKp205cRq3nhxBVJTtVIHexbkctLwng8AqTbitl+s/o2eRDaa0nNJywvyZKZe8n+/hjclqVPWP/wdoDCL9g/sOconr2MGu5o1TGZ+Yd6KdynO8qE9UC6Irub2yiJs2tcTD61uc/OAWOeEMn3VGlqh0k9sOAsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JD7w5qbp; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JD7w5qbp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99594C4CEDF;
-	Wed, 12 Feb 2025 04:11:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739333473;
-	bh=HUY9jZq6pe6s6cAP1w8mh9yTzfXKDVkS9aEHrUFESHs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JD7w5qbpTxXdFFbuA2eWtw4FBFVtQ/B+MqBkDL1+7zIzP1Ck/zbYCKSKFrVVKzT4G
-	 RGHRhRDcpimrJzzXcKdAtu2VWkU0pxoFEA70TgKB2ez9AFiaEZqaW3mNDDxvF2pO2u
-	 QwoPy7FajieAA9VOdrRVGQN13xw0FDJrNt19aBfEKvOAsbzbh32SAGzRnAhFJtxslu
-	 FHU4tBYvyeHIRy11hhQ8b5VHXOBaz9vT29TKB9S7FwC8zO3gwZXS1RTKTnj1WCk8yM
-	 hujxGqQItK3huhiZAAT81YGhWiKVbhJgytij1FJxcVvqnaBplldh/iuBQr1VEFzQsP
-	 ZvzStpRpcXlaA==
-Date: Tue, 11 Feb 2025 21:11:10 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <kbusch@meta.com>, asml.silence@gmail.com, axboe@kernel.dk,
-	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-	bernd@bsbernd.com
-Subject: Re: [PATCHv2 4/6] ublk: zc register/unregister bvec
-Message-ID: <Z6wfXijUX_6Q3HiC@kbusch-mbp>
-References: <20250211005646.222452-1-kbusch@meta.com>
- <20250211005646.222452-5-kbusch@meta.com>
- <Z6wMK5WxvS_MzLh3@fedora>
+	s=arc-20240116; t=1739347911; c=relaxed/simple;
+	bh=BV+SbdZ1oms0bO2GHFHJ5BLn58tdsad3g4zHGqw2/i0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=HPSrVgtJgpvL9urkB2EX0n4onrMP+K4beDmUEcAgnVgwuwIvLWqo5JgBXDKSXOYM0BC6MkLrJdHZz+yZJIhK5+0x+D4LwWiU+HN67vLr8gnhwHB4kiaADvlosnedKsCJu5IqC5YGoR/d6A9RNSWy5g6vZ+Mdiz+wv+gR6fNECec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu; spf=pass smtp.mailfrom=bsdbackstore.eu; arc=none smtp.client-ip=128.116.240.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bsdbackstore.eu
+Received: from localhost (25.205.forpsi.net [80.211.205.25])
+	by bsdbackstore.eu (OpenSMTPD) with ESMTPSA id 8dfb9e77 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 12 Feb 2025 09:11:37 +0100 (CET)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z6wMK5WxvS_MzLh3@fedora>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 12 Feb 2025 09:11:34 +0100
+Message-Id: <D7QBDBZMZTCI.1W40WVL5JJ3O7@bsdbackstore.eu>
+Cc: "mgurtovoy" <mgurtovoy@nvidia.com>, "sagi" <sagi@grimberg.me>, "kbusch"
+ <kbusch@kernel.org>, "sashal" <sashal@kernel.org>, "linux-kernel"
+ <linux-kernel@vger.kernel.org>, "linux-nvme"
+ <linux-nvme@lists.infradead.org>, "linux-block"
+ <linux-block@vger.kernel.org>
+Subject: Re: nvme-tcp: fix a possible UAF when failing to send request
+From: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>
+To: "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>, "chunguang.xu"
+ <chunguang.xu@shopee.com>
+X-Mailer: aerc
+References: <2025021015413817916143@cestc.cn>
+ <D7OOGIOAJRUH.9LOJ3X4IUKQV@bsdbackstore.eu>
+ <3f1f7ec3-cb49-4d66-b2b0-57276a6c62f0@nvidia.com>
+ <D7OWXONOUZ1Y.19KIRCQDVRTKN@bsdbackstore.eu>
+ <CAAO4dAWdsMjYMp9jdWXd_48aG0mTtVpRONqjJJ1scnc773tHzg@mail.gmail.com>
+ <202502111604342976121@cestc.cn>
+In-Reply-To: <202502111604342976121@cestc.cn>
 
-On Wed, Feb 12, 2025 at 10:49:15AM +0800, Ming Lei wrote:
-> On Mon, Feb 10, 2025 at 04:56:44PM -0800, Keith Busch wrote:
-> > From: Keith Busch <kbusch@kernel.org>
-> > 
-> > Provide new operations for the user to request mapping an active request
-> > to an io uring instance's buf_table. The user has to provide the index
-> > it wants to install the buffer.
-> > 
-> > A reference count is taken on the request to ensure it can't be
-> > completed while it is active in a ring's buf_table.
-> > 
-> > Signed-off-by: Keith Busch <kbusch@kernel.org>
-> > ---
-> >  drivers/block/ublk_drv.c      | 145 +++++++++++++++++++++++++---------
-> >  include/uapi/linux/ublk_cmd.h |   4 +
-> >  2 files changed, 113 insertions(+), 36 deletions(-)
-> > 
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 529085181f355..ccfda7b2c24da 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -51,6 +51,9 @@
-> >  /* private ioctl command mirror */
-> >  #define UBLK_CMD_DEL_DEV_ASYNC	_IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
-> >  
-> > +#define UBLK_IO_REGISTER_IO_BUF		_IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
-> > +#define UBLK_IO_UNREGISTER_IO_BUF	_IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
-> 
-> UBLK_IO_REGISTER_IO_BUF command may be completed, and buffer isn't used
-> by RW_FIXED yet in the following cases:
-> 
-> - application doesn't submit any RW_FIXED consumer OP
-> 
-> - io_uring_enter() only issued UBLK_IO_REGISTER_IO_BUF, and the other
->   OPs can't be issued because of out of resource 
-> 
-> ...
-> 
-> Then io_uring_enter() returns, and the application is panic or killed,
-> how to avoid buffer leak?
+On Tue Feb 11, 2025 at 9:04 AM CET, zhang.guanghui@cestc.cn wrote:
+> Hi=C2=A0
+>
+> =C2=A0 =C2=A0 This is a=C2=A0 race issue,=C2=A0=C2=A0I can't reproduce it=
+ stably yet. I have not tested the latest kernel.=C2=A0 but in fact,=C2=A0=
+=C2=A0I've synced some nvme-tcp patches from=C2=A0 lastest upstream,
 
-The death of the uring that registered the node tears down the table
-that it's registered with, which releases its reference. All good.
- 
-> It need to deal with in io_uring cancel code for calling ->release() if
-> the kbuffer node isn't released.
+Hello, could you try this patch?
 
-There should be no situation here where it isn't released after its use
-is completed. Either the resource was gracefully unregistered or the
-ring close while it was still active, but either one drops its
-reference.
+queue_lock should protect against concurrent "error recovery",
+while send_mutex should serialize try_recv() and try_send(), emulating
+the way io_work works.
+Concurrent calls to try_recv() should already be protected by
+sock_lock.
 
-> UBLK_IO_UNREGISTER_IO_BUF still need to call ->release() if the node
-> buffer isn't used.
+diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+index 841238f38fdd..f464de04ff4d 100644
+--- a/drivers/nvme/host/tcp.c
++++ b/drivers/nvme/host/tcp.c
+@@ -2653,16 +2653,24 @@ static int nvme_tcp_poll(struct blk_mq_hw_ctx *hctx=
+, struct io_comp_batch *iob)
+ {
+ 	struct nvme_tcp_queue *queue =3D hctx->driver_data;
+ 	struct sock *sk =3D queue->sock->sk;
++	int r =3D 0;
+=20
++	mutex_lock(&queue->queue_lock);
+ 	if (!test_bit(NVME_TCP_Q_LIVE, &queue->flags))
+-		return 0;
++		goto out;
+=20
+ 	set_bit(NVME_TCP_Q_POLLING, &queue->flags);
+ 	if (sk_can_busy_loop(sk) && skb_queue_empty_lockless(&sk->sk_receive_queu=
+e))
+ 		sk_busy_loop(sk, true);
++
++	mutex_lock(&queue->send_mutex);
+ 	nvme_tcp_try_recv(queue);
++	r =3D queue->nr_cqe;
++	mutex_unlock(&queue->send_mutex);
+ 	clear_bit(NVME_TCP_Q_POLLING, &queue->flags);
+-	return queue->nr_cqe;
++out:
++	mutex_unlock(&queue->queue_lock);
++	return r;
+ }
+=20
+ static int nvme_tcp_get_address(struct nvme_ctrl *ctrl, char *buf, int siz=
+e)
 
-Only once the last reference is dropped. Which should happen no matter
-which way the node is freed.
 
-> > +static void ublk_io_release(void *priv)
-> > +{
-> > +	struct request *rq = priv;
-> > +	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
-> > +
-> > +	ublk_put_req_ref(ubq, rq);
-> > +}
-> 
-> It isn't enough to just get & put request reference here between registering
-> buffer and freeing the registered node buf, because the same reference can be
-> dropped from ublk_commit_completion() which is from queueing
-> UBLK_IO_COMMIT_AND_FETCH_REQ, and buggy app may queue this command multiple
-> times for freeing the request.
-> 
-> One solution is to not allow request completion until the ->release() is
-> returned.
-
-Double completions are tricky because the same request id can be reused
-pretty quickly and there's no immediate way to tell if the 2nd
-completion is a double or a genuine completion of the reused request.
-
-We have rotating sequence numbers in the nvme driver to try to detect a
-similar situation. So far it hasn't revealed any real bugs as far as I
-know. This feels like the other side screwed up and that's their fault.
+Thanks,
+Maurizio
