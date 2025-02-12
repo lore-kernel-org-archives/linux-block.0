@@ -1,94 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bsdbackstore.eu (128-116-240-228.dyn.eolo.it [128.116.240.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A272221322C;
-	Wed, 12 Feb 2025 15:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1201220B210;
+	Wed, 12 Feb 2025 15:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.116.240.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739374134; cv=none; b=gTKG6nFlexyCwGwDvqqYkElJYnB5Glq/ei3rHdxjxEMUJ8YEXi5s1VE4iv3JdWi1aFFhmBwilWS524D0ceBrrfJrh5KX3vH+pXQTiPa7p/z3xTHRQge09Dw7ZkaXNcUcKhOS8f3zHbTvUNotqxOJ0Gj46SEuy3JiQS37yjcdLqE=
+	t=1739374429; cv=none; b=Ul3MdBRAuoUlgPcN7wORe1yJzzI7NhD5PBOju7PvOxM9WLuroPo+0CgCvkzL1cYctMgsSLlN9qEkNUB6hWxoKJCZrV0Qv15Tla21QwUpd33cUQfnsA+G6Ma9V/UqgxgVyFD9oy6g/It12idqMnSyUVlt5vS/3gmPQoEeEvwX4Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739374134; c=relaxed/simple;
-	bh=LbBtoB5YxzZ1HDwyiWXqxuinvpf/idmjNl6/6wzD9wQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gZtoxSk5Z9S6FkBy9H8KMGq9AovsSaVY4sI14G/+Ai4TQuH+esCpxPNcS5Bqfzp+5o/vUhunXI0qBvcUOBpiBOdb4Ha6Nv+z/iXPOKJWPuSdWuQRsLcBBHm6CnYf8J5Ldf8qXsrZn6kuIPdzFwwhpAk5w30A8+0PCWQOsk+C8UM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pn7Qcp0J; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pn7Qcp0J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00DAAC4CEE2;
-	Wed, 12 Feb 2025 15:28:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739374134;
-	bh=LbBtoB5YxzZ1HDwyiWXqxuinvpf/idmjNl6/6wzD9wQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Pn7Qcp0JVq2NbhXwmADzluobZvHfPkw/Rxk38ptYzVa8OU3pjiFamHZNTWOLKykU+
-	 kOxcgS1et0Yh9nGlgXi7bt3xDtjS9c+XfUULHewnL0U0H5Uz++/rJl3AX0fH8hRQlR
-	 kwpPZ5EWCTQZU+ayfgd3w0KkWALdZ4av2Dsg30m68QlN90ahji3k9ULVNdazaYoZD9
-	 qLnoJxBtQywxvwDkRfuBzBpu6JcOxfTHfj+wjM7nXJ+5S6jDROPrEick5tjBhJA/pe
-	 w8Xo5d7ZeLSdlteP2+Nb+BCORbFtvn7ugvxImQ6JolGxTmDnu1hl+2VOAEC9yNSICE
-	 DVo99g6Cc5F7w==
-Date: Wed, 12 Feb 2025 08:28:51 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <kbusch@meta.com>, asml.silence@gmail.com, axboe@kernel.dk,
-	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-	bernd@bsbernd.com
-Subject: Re: [PATCHv2 0/6] ublk zero-copy support
-Message-ID: <Z6y-M7cby-ZAoLzY@kbusch-mbp>
-References: <20250211005646.222452-1-kbusch@meta.com>
- <Z6wHjGFcFCLMnUez@fedora>
+	s=arc-20240116; t=1739374429; c=relaxed/simple;
+	bh=KtmEQw2SuitsUN1ob3U9iVTKc6sddhkgw1X5cOM+cEM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=aJrJbCbvMwxN7yG3sM8hitGMo6agTMQIjvwtmRfPCpHNonYcQU3Pttoa/1aNeJBAtMatLw0/A9SwKI6WFn6CLaE2huewP6hUOrMfDPRkukwfuF/U2m4/55nEBQmPq4KFsxwW/q9FtfbzKKNnP23ZFPO/ZSqMnYDzWoAsVCXfxtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu; spf=pass smtp.mailfrom=bsdbackstore.eu; arc=none smtp.client-ip=128.116.240.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bsdbackstore.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bsdbackstore.eu
+Received: from localhost (25.205.forpsi.net [80.211.205.25])
+	by bsdbackstore.eu (OpenSMTPD) with ESMTPSA id 394be0f3 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 12 Feb 2025 16:33:43 +0100 (CET)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z6wHjGFcFCLMnUez@fedora>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 12 Feb 2025 16:33:41 +0100
+Message-Id: <D7QKRU1EXDXJ.K6ZXC4V4ZD68@bsdbackstore.eu>
+From: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>
+To: "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>, "sagi"
+ <sagi@grimberg.me>, "mgurtovoy" <mgurtovoy@nvidia.com>, "kbusch"
+ <kbusch@kernel.org>, "sashal" <sashal@kernel.org>, "chunguang.xu"
+ <chunguang.xu@shopee.com>
+Cc: "linux-kernel" <linux-kernel@vger.kernel.org>, "linux-nvme"
+ <linux-nvme@lists.infradead.org>, "linux-block"
+ <linux-block@vger.kernel.org>
+Subject: Re: nvme-tcp: fix a possible UAF when failing to send request
+X-Mailer: aerc
+References: <2025021015413817916143@cestc.cn>
+In-Reply-To: <2025021015413817916143@cestc.cn>
 
-On Wed, Feb 12, 2025 at 10:29:32AM +0800, Ming Lei wrote:
-> It is explained in the following links:
-> 
-> https://lore.kernel.org/linux-block/b6211101-3f74-4dea-a880-81bb75575dbd@gmail.com/
-> 
-> - node kbuffer is registered in ublk uring_cmd's ->issue(), but lookup
->   in RW_FIXED OP's ->prep(), and ->prep() is always called before calling
->   ->issue() when the two are submitted in same io_uring_enter(), so you
->   need to move io_rsrc_node_lookup() & buffer importing from RW_FIXED's ->prep()
->   to ->issue() first.
+On Mon Feb 10, 2025 at 8:41 AM CET, zhang.guanghui@cestc.cn wrote:
+> Hello=20
+>
+> =C2=A0 =C2=A0=C2=A0When using the nvme-tcp driver in a storage cluster, t=
+he driver may trigger a null pointer causing the host to crash several time=
+s.
+> By analyzing the vmcore, we know the direct cause is that=C2=A0 the reque=
+st->mq_hctx was used after free.=20
+>
+> CPU1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0CPU2
+>
+> nvme_tcp_poll=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 nvme_=
+tcp_try_send=C2=A0 --failed to send reqrest 13=C2=A0
+>
+> =C2=A0 =C2=A0=C2=A0nvme_tcp_try_recv=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 nvme_tcp_fail_request
+>
+> =C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0nvme_tcp_recv_skb=C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 nvme_tcp_end_request
+>
+> =C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0nvme_tcp_recv_pd=
+u=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 nvme_complete_rq=C2=A0
+>
+> =C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=
+=A0nvme_tcp_handle_comp=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=
+=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=
+=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =
+=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0nvme_retry_req --=C2=A0request-=
+>mq_hctx have been freed, is NULL. =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =
+=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0
+> =C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=
+=A0=C2=A0 =C2=A0=C2=A0nvme_tcp_process_nvme_cqe=C2=A0 =C2=A0=C2=A0=C2=A0 =
+=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=
+ =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
+=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=
+=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=
+=C2=A0
+>
+> =C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=
+=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0 nvme_complete_rq
+>
+> =C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=
+=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0 nvme_end_req
+>
+> =C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=
+=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=
+=C2=A0=C2=A0 blk_mq_end_request
 
-I don't think that's accurate, at least in practice. In a normal flow,
-we'll have this sequence:
+Taking a step back. Let's take a different approach and try to avoid the
+double completion.
 
- io_submit_sqes
-   io_submit_sqe (uring_cmd ublk register)
-     io_init_req
-       ->prep()
-     io_queue_sqe
-       ->issue()
-   io_submit_sqe (read/write_fixed)
-     io_init_req
-       ->prep()
-     io_queue_sqe
-      ->issue()
+The problem here is that apparently we received a nvme_tcp_rsp capsule
+from the target, meaning that the command has been processed (I guess
+the capsule has an error status?)
 
-The first SQE is handled in its entirety before even looking at the
-subsequent SQE. Since the register is first, then the read/write_fixed's
-prep will have a valid index. Testing this patch series appears to show
-this reliably works.
- 
-> - secondly, ->issue() order is only respected by IO_LINK, and io_uring
->   can't provide such guarantee without using IO_LINK:
-> 
->   Pavel explained it in the following link:
-> 
->   https://lore.kernel.org/linux-block/68256da6-bb13-4498-a0e0-dce88bb32242@gmail.com/
-> 
->   There are also other examples, such as, register buffer stays in one
->   link chain, and the consumer OP isn't in this chain, the consumer OP
->   can still be issued before issuing register_buffer.
+So maybe only part of the command has been sent?
+Why we receive the rsp capsule at all? Shouldn't this be treated as a fatal
+error by the controller?
 
-Yep, I got that. Linking is just something I was hoping to avoid. I
-understand there are conditions that can break the normal flow I'm
-relying on regarding  the ordering. This hasn't appeared to be a problem
-in practice, but I agree this needs to be handled.
+Maurizio
