@@ -1,104 +1,104 @@
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB0F265610
-	for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 20:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3391C2AE90;
+	Wed, 12 Feb 2025 02:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739304293; cv=none; b=WhE1X5FmBa2cSSN9MEt6ymflgExYl6y/0+HoKFxd9MuZMiaorxBvlDe4XHHIY7sneG9U0XIYrA5QmssiXm2GM/3ehgv55E7ldHPTsE9Lw43na2Wj32mwKTh60KQTl4nMTE08+O61tABf6DnzuF6D+qvHLvDW37M0ma+X2JOcuAQ=
+	t=1739327227; cv=none; b=VZ5p3mtR/q6nwzhJQhr6N7Wz4RdVf786aGruayX2G5kSo8tBPI//EKD6s4CehgxLEl32VAQR28bNyEncAowzXoht9U06dcJxenk5lcNU05uNd/H9lnP22x++bcfDVapX+qnYasqetIyP5tvHk5EoWucaPnGfLndbxiDtRQx9rbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739304293; c=relaxed/simple;
-	bh=yQ5UQtPrJh6CDgDFQ5kOE10MbeESFXkLMTABKS+oBEM=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=SrrEmJ5p1aEs2aCR8CPAw/0Rb38RFUtAjs5Q5IIo2lH9+/QfHc4moDptch+AOn5JLlH0l2ljnPXQCK4CrvKK9ylN1n900TU3PcOn013sce54eMrwOqoUpbwk7QsryOmxiz2CMRoNwRqj1LyLixSEVCT9Uuza/3H3UMwQkPOFlZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0CUKWNxV; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0CUKWNxV"
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3d150512bd5so10822055ab.3
-        for <linux-block@vger.kernel.org>; Tue, 11 Feb 2025 12:04:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1739304291; x=1739909091; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oSafBjwhtkCgy84RqH/1n0KPcLrpwZEy3MZrJYm7NDg=;
-        b=0CUKWNxVFt84yl6y1X6llOodW49UnhYhsA57+nG/nlt25WIUSbeT1gLfT4+eefnw2b
-         8mOjWCZNrueD0DzrMj7l9FhdXrnFUDw2kixUU5iNInLG6XJHwnpiNaC1JDy/ZUL+Ffit
-         RXBOubEiLP1uAnJ3SL42OwWKYQasc8fexdPM8eNEPTVnkzN3qXuMPmUjhXB4Nbq1Ocgn
-         5+6b9S+mPJvlUtJyeu95OJXXMHQRdB6XlPRLU+ZNtF0yxmpOa42OUELA5xMe9ZdnxUQs
-         KoW8O5Afs7waEjRNghwVhagBTBNbYL/kSf32hgjKpVcv6JdDkKCi05nCz8ugbMe9T8vw
-         0Dgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739304291; x=1739909091;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oSafBjwhtkCgy84RqH/1n0KPcLrpwZEy3MZrJYm7NDg=;
-        b=VSpIPH1RZgrgO7hNtqN34Whit0FD+EzEOKe0IRde7rv9WiVsMBa/qQu6sWka9ELRmd
-         DqMuzVGAwbYoFidXhJDZGqSGQTgUgyEFKlXsM6CafUGXiq6g5hhVlFPAPIJ5EnWVUxj/
-         fThbPPuRGL3GXMLTl+UkwORAg+5pEWur3IdzSaZmDWIbkDz5oDHvxc34WKeG6LDnEDs8
-         vt4pS/BMK8v+RXo8IG+iG7+pRTMD8zjjxusCyS3sCHJcuIjhRgGLmSgObWcH5nYYaXOj
-         nRLFu8gw1NMLCJz36tWbx6TwVA1qxXmwn7n7z7cuT1cNcTZn155OGpYqxukyGHuZyKhy
-         2zVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDtfOCNAFJkMUvfeZatNV78OfApjSKrDTtgtkIV7kb4UOjTUUUZS0ZI+5bG3BA+YXNJ7Tzm899WfoIQA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2rjG5+NwOxl7VLmAHUdFcpaXiJ3XeZ4wBZkSLXzwQXfp7yekx
-	Q4KDvtlQETRT8Drj06KnK7nUpT7uzLUSQ8eb10O+LJTV1ngjt60pUzjQIKgLaeQ=
-X-Gm-Gg: ASbGncsl9NuGSYmdQK+fHpXZEj2W2ycURse+OJxeGUxs2FlKhNrIBDz4kkqFJPI0QUF
-	qjuGChdpf/v/ns6tbF+I0Hxs2Ja0xeePdi3Zra2D67YI1Q8YxZmYAQ/Ol/lUC1JqUyf2//HJoEd
-	7M33uvg08qr7uEdWKho/iRc0c7XhpKOjeGgt+ZAoN42RJN7DpSNjnvvAFbDrL/c3zoDcgKQyGnM
-	VLzQc3C6RZmssEymilSERw3gq1OQPRtWoBXZooqNzUlw8cRSFLu1bgHLf+bNRYtoX4+8e/+fXrE
-	v7MIog==
-X-Google-Smtp-Source: AGHT+IF6ngVv4H+7ay1KS5AYnsWGnxP6t6rI34lhHdXcsNGwsA/2PiydcVTWSg7Ie4NNEWNk4JvMNA==
-X-Received: by 2002:a05:6e02:3184:b0:3d0:4eaa:e480 with SMTP id e9e14a558f8ab-3d17be0cd74mr9013225ab.3.1739304290713;
-        Tue, 11 Feb 2025 12:04:50 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3d155e5caa1sm17430295ab.5.2025.02.11.12.04.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 12:04:49 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: tj@kernel.org, yukuai1@huaweicloud.com, 
- Muchun Song <muchun.song@linux.dev>
-Cc: chengming.zhou@linux.dev, muchun.song@linux.dev, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>
-In-Reply-To: <20250208090416.38642-1-songmuchun@bytedance.com>
-References: <20250208090416.38642-1-songmuchun@bytedance.com>
-Subject: Re: [PATCH RESEND v2 1/2] block: introduce init_wait_func()
-Message-Id: <173930428956.134224.12826732469038021617.b4-ty@kernel.dk>
-Date: Tue, 11 Feb 2025 13:04:49 -0700
+	s=arc-20240116; t=1739327227; c=relaxed/simple;
+	bh=QlyyhPqk6m3sIo6BvD/9VbX1f3j/d2XmefZRXi1VrAs=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=pytDnjg+MFX/6bcxypM0qp0HHqow40fdNTyhCjBrOc6s9RFRDuQcSOs6jb79YoHOO/eGXuApFMblbClGTeR7OD1TDJTO5gI5koI4O+n9alQcwFHzomkJx4mtssKDdKPqd8cdEPBwxTLfebZXG1PItsUqIfdImixRY1LPQ5HqLgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Yt2Hs099Yz4f3js7;
+	Wed, 12 Feb 2025 10:26:33 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 556341A058E;
+	Wed, 12 Feb 2025 10:26:54 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgBHrGDsBqxnXJBlDg--.62273S3;
+	Wed, 12 Feb 2025 10:26:54 +0800 (CST)
+Subject: Re: [PATCH] blk-cgroup: validate alloc/free function pairs at the
+ start of blkcg_policy_register()
+To: =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+ Chen Linxuan <chenlinxuan@uniontech.com>
+Cc: Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+ Jens Axboe <axboe@kernel.dk>, Wen Tao <wentao@uniontech.com>,
+ cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <EE1CE61DFCF2C98F+20250210031827.25557-1-chenlinxuan@uniontech.com>
+ <i6owvzwb4pjg27tex5utdzcoyeeawqejegvc2byz6tnfn2flmh@2ggun5qyokvs>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <29be6f4e-fc0b-8134-fee6-7b3170f0d806@huaweicloud.com>
+Date: Wed, 12 Feb 2025 10:26:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-14bd6
+In-Reply-To: <i6owvzwb4pjg27tex5utdzcoyeeawqejegvc2byz6tnfn2flmh@2ggun5qyokvs>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBHrGDsBqxnXJBlDg--.62273S3
+X-Coremail-Antispam: 1UD129KBjvJXoWrZF47JF15Cw47GF4DCFW3ZFb_yoW8JryfpF
+	ZIya4rAFy0krWxWanxKaySvr1rWa1kGw47JF90q34fu343AFyrtr4jyan5WF97ZFyIyFya
+	vFyYqaySk3WDA3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU92b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYx
+	BIdaVFxhVjvjDU0xZFpf9x07UAwIDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
+Hi,
 
-On Sat, 08 Feb 2025 17:04:15 +0800, Muchun Song wrote:
-> There is already a macro DEFINE_WAIT_FUNC() to declare a wait_queue_entry
-> with a specified waking function. But there is not a counterpart for
-> initializing one wait_queue_entry with a specified waking function. So
-> introducing init_wait_func() for this, which also could be used in iocost
-> and rq-qos. Using default_wake_function() in rq_qos_wait() to wake up
-> waiters, which could remove ->task field from rq_qos_wait_data.
+在 2025/02/11 21:57, Michal Koutný 写道:
+> Hello Linxuan.
 > 
-> [...]
+> On Mon, Feb 10, 2025 at 11:18:27AM +0800, Chen Linxuan <chenlinxuan@uniontech.com> wrote:
+>> Move the validation check for cpd/pd_alloc_fn and cpd/pd_free_fn function
+>> pairs to the start of blkcg_policy_register(). This ensures we immediately
+>> return -EINVAL if the function pairs are not correctly provided, rather
+>> than returning -ENOSPC after locking and unlocking mutexes unnecessarily.
+>>
+>> Co-authored-by: Wen Tao <wentao@uniontech.com>
+>> Signed-off-by: Wen Tao <wentao@uniontech.com>
+>> Signed-off-by: Chen Linxuan <chenlinxuan@uniontech.com>
+> 
+> If you consider those locks contention a problem (policy registrations
+> are "only" boot time, possibly module load time), then it's good to refer
+> 
+> Fixes: e84010732225c ("blkcg: add sanity check for blkcg policy operations")
 
-Applied, thanks!
+This is super cold path, so I don't think it's a problem.
+> 
+>> ---
+>>   block/blk-cgroup.c | 16 ++++++++--------
+>>   1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> But it's correct,
+> Reviewed-by: Michal Koutný <mkoutny@suse.com>
+> 
 
-[1/2] block: introduce init_wait_func()
-      commit: 36d03cb3277e29beedb87b8efb1e4da02b26e0c0
-[2/2] block: refactor rq_qos_wait()
-      commit: a052bfa636bb763786b9dc13a301a59afb03787a
+Since we're here, can you also change the return value to -ENOMEM from
+error path err_free_cpds?
 
-Best regards,
--- 
-Jens Axboe
-
-
+Thanks,
+Kuai
 
