@@ -1,127 +1,126 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D4F14B95A
-	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 14:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9C026B0A5
+	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 15:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739456920; cv=none; b=CQzPgWGvUF9lRgIbCVHE36WC1XwPY7BiXaS5ktZVETDZkg3kCbS2DZwDQl8QEECXHhZSz2leWvHVzSa6OVWZlsKqg/OlhpUS0G/vx8UA05Dskd2jHR/2Wiz1Ul3ylUZTJhoZJeCgJhInKnsQREM8GyzE3kxFKx4R0OSPKbhBAv8=
+	t=1739459932; cv=none; b=F2RFGObPqgPa2KY9GP4EbVay9ktN86XbilHo5AoxVAvyn38XxrsOPGUg1Q1NoRcwehI5aojL4fUd9d2vYEoMgfG+EGmg1yzrEMuFzJK6jxGif6quRlYTXOe++zyWP1dz9Zl4QuI9Bg8SkjSiwKdBkifEWXM5rIcnEfRau1y7xU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739456920; c=relaxed/simple;
-	bh=P6kYdtdWTG4amcDgsbJjP4qCmz0j3Cwce7Vlx7RP2o8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DHNzWonID8fZzSws9VCgEZq1IJEshEZoRamdJzZdbFEpKhBYN+z4HOoI65+zHZtQ+Inc6Hk4dQegTrMWC9gbyDKV0HKLgRZL0sFurdtynDrb44J+eMirVT+zeSlO+jH8HagTGedg5SX4HgV9Du60gI85fw/sdT9Vg65WOU4g+hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=ViUVlain; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
+	s=arc-20240116; t=1739459932; c=relaxed/simple;
+	bh=s1A+Y5kzlhhTuz/DgbGulVmobjpa8VOcJCacegCISoc=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=BNRmYrQGV/Ck8s1DSFhmVFuYPRnfNcfNvbdtmHlTDSI9QSAYo26b0ZwhQuTDOfG9wOMjn7QVDGdxgyvSbYKdP1Zhi6n0b7IxZPvgJJx/bvzOxFhHo3lW2mgpS07wUOglbAhqTMVUMTmJuOzKJmC5m03U3Dt/FhQs7wli9ceFVKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=aBx+ts0C; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="ViUVlain"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5ded6c31344so445122a12.1
-        for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 06:28:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="aBx+ts0C"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-851c4f1fb18so32004939f.2
+        for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 07:18:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shopee.com; s=shopee.com; t=1739456915; x=1740061715; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1739459928; x=1740064728; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ipm0yflvw3SL7RKduSGbgwE/CsgQaitRRpnD1zan1lA=;
-        b=ViUVlainFkC7l9r2tdLZHuML8SLP5kdfMveYJxFxpcwjLkKEHkMYFhZt8wz1N2qaE9
-         VYIgcbeE9ZiPjmrBI011pAmFsBcAxi6Ur9G/AxRoZR9UPwJ6fmQ5GsID7lOR7Nb5OL/v
-         2eFuVs0mWQprr56sj0iCBNpU/tvW2gnmder4LzPoSzPFwToCVjFc8N1Ac4taJeGcXYxv
-         eyD224oY4CBGJ3bsQ/NV24DWHl0uHjQ5WYXQBaBIPvH5n7kulfG7Cilsc65sSpCZnYPq
-         l+j6yZnOj2bDpg4UWM1qTBM+JF3/4fFbUwHUP7rHocTf3yPRQAvSXLdBddIaV5EP/Vl9
-         E9+Q==
+        bh=V+knxZstdnaugWHjaUUMNfVeCrV53rPdumfau1GeufM=;
+        b=aBx+ts0Cv82d0Ar0jouUfJTjv3OKZWVI/f2jyxqlcUeRONY6fl/x6XHVgHgP3GaNlb
+         CZK5KyWGBve3YcN7epgUKSdfUilcROaYNkVY4J6evgrQwqziWS3fEeAzgFNYNZGe4qNG
+         M5EuzE2l1p9EpVGi2D3PmB04JIx2CouRsCVm6r6NYGkU+AGUdWk2rObHfrgrrkbzwBpZ
+         gXtRE1urv7AweASG0hWRzjYJoeWJGB85aNBZK4CwhOeRXA/FP+REgumcLRcy4KJVrDvi
+         PrQrUg1BqZqYMqYhTf6LYKmQLNXI5ZrG2kkLOUiAVx03AskpJmgiuc9t8vcyVi5A/l1k
+         aolg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739456915; x=1740061715;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ipm0yflvw3SL7RKduSGbgwE/CsgQaitRRpnD1zan1lA=;
-        b=OV93xKKBCTeZRtEq3ZJZn7G6zitNnrZue95h1dVtUgHzOCpk4uRuivWfyiMGNMHF8v
-         Al+UKqaSvxFBQXvcG2xOmmJBKCypGr1KGuwvJFjHUBngOEsL8RuHqBzpwssh9nu7MkWO
-         jP+WYxa5bxJVOMeUcITaX5genOBlh3opKdc/7+y6hKJFoEIwh95FVHGlu7hkYVrSxEZp
-         uCQXbzKxgvYnJAz8evo8W13L4d7FOXAgW4rDcOL4QTngcoNdo2bFPVxYdGclHhDam9AL
-         siCz0Co9jHfBAB4/HD8Hn7RpMN3BQAoUGrSB8FNjHwzlDsQJDXx0IzTfTHo1sWOEOkr7
-         HLOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTGC3e9oZH1pzjycMjmNWbtfVzT9UJ1IoKdxR3M2135I3r+EoH8mTQge/8io7na1kMwXB8wWM/s4gw6A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyKIBNEfj6Kn/sWdgM32tYS06O9o5EGjexegBkUlz1csL31uZ+
-	87T1q9lE1yB13vd4lo9Hb3aKhrQ0CgBWBdGoqAxIadXpLqRBxreFY5sQDIp892hzhCDYhNLyDNC
-	+VwnJdFFtKAhVwgAm30JThn/aGmAG9FNOlDGkU/D/CfQM5uwXWCk=
-X-Gm-Gg: ASbGncvyUIhNPLXd0NjNkNYQ2RURMSpHdWy7bZCL7sCzvH3GOw09SOGNoknEWfCCX3U
-	HrSHH81uysyCPLUqWG0iAXyyhEwcaUzuWbjPdKonQhyCraEsX11vozlAXsdxW/c1HexrL0ACPUw
-	==
-X-Google-Smtp-Source: AGHT+IF0DlphfyDXBQJQrpRoFPWkcp8QLEmA2DcCwLgYvMw8iY4hgRGFJHr0LQyadxz4JM2Ej3JEBOuCTyZ95kwaLOU=
-X-Received: by 2002:a05:6402:458e:b0:5de:5190:cfc7 with SMTP id
- 4fb4d7f45d1cf-5dec9d4b115mr7932622a12.19.1739456913433; Thu, 13 Feb 2025
- 06:28:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739459928; x=1740064728;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=V+knxZstdnaugWHjaUUMNfVeCrV53rPdumfau1GeufM=;
+        b=clwFZKctNF3Bt37ApTp8ClILGb8cVJcMq1n4lXBsGRIzo1t7048/TyfeYx4Rekt0Jx
+         lMuShdJHhRFBsibRxcQ3kyojI0LwpH54hcg2uGtmcg0lD9ys0Sv59g8Xa3Y+ti68I7rQ
+         3wxQl4tb7jmT6tuMiWKkdsljTspTgeNoMwCR9JEuMblNsBMroez62el3AVlTDIddretK
+         DLIvY2lOXS6M/IF5NYuPz9k9KTfGzdcnYXcwS1vPD62hI5Z+Oui9A696h4TgI6K9IAsm
+         o+hMnjoiPFE6qrLNns5OmsjcSgNHKztdE2Te2HEGtwTukXo4/rzYpbw+zXerY1yhExIJ
+         uUjA==
+X-Gm-Message-State: AOJu0YzqL42mum8JCTnwY/TUUVQVxsNaj9wbcefSAEiKfF5MwS28bd/6
+	YMvTYVa9I0LhYMeFocFduO1ksmBKzj8InIqvVVuGHbXtXEK9fAxS+fSH1MgdgSZW6W4nI6t0Vgi
+	V
+X-Gm-Gg: ASbGncuHBfRZj8++559K2voCD9uZDPQwMJi23ckBpcNw1sPjvSIzxwbLgI1M3qGb4Le
+	BA/yAHz+bpAFhrHBZhlQjoBo6DipwbX2eoTpP8o8pQ+iC+MouvzxnQ6FPHvaKFDGv6jbQqsoQ5X
+	W65ojiBNVmk5UeYYlRgoOg8EU8ut3nveEuGxl7rq9cHYLNv++hXuXmuqioAqafgPm+XRpdZkmKQ
+	yl8HkqUkwkBbu2W+GgXOk2ZM6a/r46MnFD5NaWSbyEBX43ud2RvnINioe6sCoRj2+AtloKLCpFr
+	4K4UOnXjGTc=
+X-Google-Smtp-Source: AGHT+IH/PAvblpmLolwRTSOvvxmgkOk0Duj8Z/6p9fjyJuDFNe/pVf4FW1NXemeq7op1QwYvV6Zz4Q==
+X-Received: by 2002:a05:6602:2c95:b0:855:6d7a:1820 with SMTP id ca18e2360f4ac-8556d7a1ebdmr126087839f.4.1739459927844;
+        Thu, 13 Feb 2025 07:18:47 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ed282ae717sm356385173.80.2025.02.13.07.18.47
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Feb 2025 07:18:47 -0800 (PST)
+Message-ID: <20575f0a-656e-4bb3-9d82-dec6c7e3a35c@kernel.dk>
+Date: Thu, 13 Feb 2025 08:18:46 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250213100611.209997-1-yizhou.tang@shopee.com>
- <20250213100611.209997-3-yizhou.tang@shopee.com> <70741bf4-1d1f-e017-7c76-8b7e3b1d9203@huaweicloud.com>
-In-Reply-To: <70741bf4-1d1f-e017-7c76-8b7e3b1d9203@huaweicloud.com>
-From: Tang Yizhou <yizhou.tang@shopee.com>
-Date: Thu, 13 Feb 2025 22:28:21 +0800
-X-Gm-Features: AWEUYZmJF8bIUynT0twrwjquWOmrPkO9Jce7FeZZ_PxCuwIoPGlbwFmDjK1fBTM
-Message-ID: <CACuPKx=th7OBma_fxSRYUWZtKyVR_11JOyguE5MdDR1YJQpVbw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] blk-wbt: Cleanup a comment in wb_timer_fn
-To: Yu Kuai <yukuai1@huaweicloud.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: cleanup and fix batch completion adding conditions
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 13, 2025 at 7:17=E2=80=AFPM Yu Kuai <yukuai1@huaweicloud.com> w=
-rote:
->
-> Hi,
->
-> =E5=9C=A8 2025/02/13 18:06, Tang Yizhou =E5=86=99=E9=81=93:
-> > From: Tang Yizhou <yizhou.tang@shopee.com>
-> >
-> > The original comment contains a grammatical error. Rewrite it into a mo=
-re
-> > easily understandable sentence.
-> >
-> > Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
-> > ---
-> >   block/blk-wbt.c | 6 +++---
-> >   1 file changed, 3 insertions(+), 3 deletions(-)
-> >
->
-> Personally, I don't think this patch is necessary, people can still
-> understand with this error. I'm not expecting a seperate patch :(
->
-> Thanks,
-> Kuai
->
+The conditions for whether or not a request is allowed adding to a
+completion batch are a bit hard to read, and they also have a few
+issues. One is that ioerror may indeed be a random value on passthrough,
+and it's being checked unconditionally of whether or not the given
+request is a passthrough request or not.
 
-Got it. Let's see if others have any suggestions.
+Rewrite the conditions to be separate for easier reading, and only check
+ioerror for non-passthrough requests. This fixes an issue with bio
+unmapping on passthrough, where it fails getting added to a batch. This
+both leads to suboptimal performance, and may trigger a potential
+schedule-under-atomic condition for polled passthrough IO.
 
-Thanks,
-Yi
+Fixes: f794f3351f26 ("block: add support for blk_mq_end_request_batch()")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-> > diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-> > index 8b73c0c11aec..f1754d07f7e0 100644
-> > --- a/block/blk-wbt.c
-> > +++ b/block/blk-wbt.c
-> > @@ -447,9 +447,9 @@ static void wb_timer_fn(struct blk_stat_callback *c=
-b)
-> >               break;
-> >       case LAT_UNKNOWN_WRITES:
-> >               /*
-> > -              * We started a the center step, but don't have a valid
-> > -              * read/write sample, but we do have writes going on.
-> > -              * Allow step to go negative, to increase write perf.
-> > +              * We don't have a valid read/write sample, but we do hav=
-e
-> > +              * writes going on. Allow step to go negative, to increas=
-e
-> > +              * write performance.
-> >                */
-> >               scale_up(rwb);
-> >               break;
-> >
->
+---
+
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index a0a9007cc1e3..cc1cb5de8fb6 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -861,12 +861,22 @@ static inline bool blk_mq_add_to_batch(struct request *req,
+ 				       void (*complete)(struct io_comp_batch *))
+ {
+ 	/*
+-	 * blk_mq_end_request_batch() can't end request allocated from
+-	 * sched tags
++	 * Check various conditions that exclude batch processing:
++	 * 1) No batch container
++	 * 2) Has scheduler data attached
++	 * 3) Not a passthrough request and end_io set
++	 * 4) Not a passthrough request and an ioerror
+ 	 */
+-	if (!iob || (req->rq_flags & RQF_SCHED_TAGS) || ioerror ||
+-			(req->end_io && !blk_rq_is_passthrough(req)))
++	if (!iob)
+ 		return false;
++	if (req->rq_flags & RQF_SCHED_TAGS)
++		return false;
++	if (!blk_rq_is_passthrough(req)) {
++		if (req->end_io)
++			return false;
++		if (ioerror < 0)
++			return false;
++	}
+ 
+ 	if (!iob->complete)
+ 		iob->complete = complete;
+-- 
+Jens Axboe
+
