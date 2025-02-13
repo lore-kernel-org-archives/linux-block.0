@@ -1,29 +1,29 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B667320764B
-	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 06:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6A7BA2D
+	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 06:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739427472; cv=none; b=Usk0TeAcwBg1tkbI2GChTcqBMM0mwCKjhPJBW5+kPFiEh1lFokjEUV9YBOq6I0snPSzselAXWGZ0TztwPbgmkw7Dv0nv9/BC++l5rS81Os0U6FYVCpv8BPwTL4/IBlN0O10qZy/Se2PbJ/rBsLKkWu5kQcmUepImyye5erkty7s=
+	t=1739428343; cv=none; b=ivwKqifxFxS83PfZ4SCq2aOnRCxu98Io4Zh9pnvsiG/+VhhDC8gw0ktN1ASAgQcabbSR07+tHrhV70ksJGNkEBxilKb5/Iyr8lFiN5hVlZR/Hnry82HvsyFuFazhGVM1AGmLh0iRBAqbgjbS1BZLuSFFfKMwqB0JoLN0g5KlNyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739427472; c=relaxed/simple;
-	bh=gvcU+3zx+1+4cYzgvrkVvlK5WM0gScB6nsBZMFaABVo=;
+	s=arc-20240116; t=1739428343; c=relaxed/simple;
+	bh=nKPGgvVNhxfO5axLdwlN9GjZwPpJp4iX0Pz0zp0jqYM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SX8tRuGciiB/nam2kLuYr9XwU633jA/HeMYZOXlSwzeMPq3yfh+TfA+Esyg3SacMIqCnwq8U/skY19TAi50u2iUT+SHS69C0Q3ikvRNd1kwNC29G9OTIq6IG1yohBw8ZiI7bTx7sY+lUMVSMgpujpHKa8vNuQj/6WOqhKiPFYlo=
+	 Content-Type:Content-Disposition:In-Reply-To; b=uXysdG36l3efAOZfg+C+nteZ8u6138nyVEiUDKr5sxr7Ilni87j60udKpvQTRfUlYdMmdYkV7YXvHZR5Y/LhyVjvBETrl1Dywpxk7Nuq1Pvxr6m/3hXsVfjEJ7FV6Xrs5B1i1xhotCgdPxpiimF17ZNW5JI3KmiJs53Cgs/J8Dc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 6627767373; Thu, 13 Feb 2025 07:17:45 +0100 (CET)
-Date: Thu, 13 Feb 2025 07:17:44 +0100
+	id 3F0D267373; Thu, 13 Feb 2025 07:32:15 +0100 (CET)
+Date: Thu, 13 Feb 2025 07:32:14 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Khazhy Kumykov <khazhy@chromium.org>
-Cc: Jens Axboe <axboe@kernel.dk>, ming.lei@redhat.com,
-	Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
-Subject: Re: Question about backporting w/ missing bitenum members
-Message-ID: <20250213061744.GB19608@lst.de>
-References: <CAE5=w7odv-cL6PJ=ie0bE5UYpfzEdqpB4vEo_FQm0fUTLDgXYQ@mail.gmail.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Cheyenne Wills <cheyenne.wills@gmail.com>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: BUG: NULL pointer dereferenced within __blk_rq_map_sg
+Message-ID: <20250213063214.GA20171@lst.de>
+References: <CAHpsFVeew-p9xB9DB52Pk_6mXfFxJbT8p14h5+YRTKabEfU3BQ@mail.gmail.com> <Z6s-3LndN-Gt5sZB@fedora> <Z6tss9YS98AEIwQy@fedora> <CAHpsFVcMnSJgJbGrqiBDmYkHyneJdby4DMkOKQKAuicA0kgJQA@mail.gmail.com> <Z61LEUdHI2Hx3bue@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,21 +32,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAE5=w7odv-cL6PJ=ie0bE5UYpfzEdqpB4vEo_FQm0fUTLDgXYQ@mail.gmail.com>
+In-Reply-To: <Z61LEUdHI2Hx3bue@fedora>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Feb 12, 2025 at 05:10:42PM -0800, Khazhy Kumykov wrote:
-> Heya, I'm backporting 752863bddaca ("block: propagate partition
-> scanning errors to the BLKRRPART ioctl") to LTS and noticed it
-> conflicts in the blkdev.h header, where in upstream we had already
-> introduced another blk_mode_t for bit 5, and this new STRICT_SCAN uses
-> bit 6...
-> 
-> In this scenario, would we prefer keep the bit used consistent (so
-> have a gap with an unused bit 5 - what I would typically go with), or
-> renumber to avoid the gap?
+On Thu, Feb 13, 2025 at 09:29:53AM +0800, Ming Lei wrote:
+> Yeah, turns out oops is triggered in initializing req_iterator for
+> discard req, and the following patch should be enough:
 
-It doesn't really matter as there is no in-kernel ABI  But just keeping
-the upstream value is probably going to create less confusion going
-ahead.
+How do we end up in blk_rq_map_sg for a discard request here?
+dma-mapping doesn't make sense for a non-special pyaload discard
+as used by xxen-blkfront, and xen-blkfront also only calls
+blk_rq_map_sg from blkif_queue_rw_req and not blkif_queue_discard_req.
 
