@@ -1,160 +1,129 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF2784D13
-	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 01:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C570E8633F;
+	Thu, 13 Feb 2025 01:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739410210; cv=none; b=diM0tMRJt+D9GgKFFYUBcNPmRUW1/asuULD4xsbAXnQ37QZNh8GQLqOmXBw/+tnYkx0N0an6YBx/LH8VqGKh/5iCXTxD9Dvc/ihGwuAwUL4LDUxvIrCWt1NWSK75fEhFymNxrNEojoV8gH3C8oJHsdTu8YVVYvmvaOFoljd+UHg=
+	t=1739410212; cv=none; b=areQkjjcjf5MHOYkeTiN0Sy28Y9ft7jlAHPXkv9CoEmEUSBZ2oV19fv+31X+KkC8cDlbFSFVHELjq6N4tsSbq6SEI/0xC7eiVgtE7r3vdTLbZFP0kW212+9NlOM8/+AdZ+/uo+BYeIqHc3rcgTTBva1wBPyIGhgS67PnprsTB7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739410210; c=relaxed/simple;
-	bh=EiC1zxjnBJ5sNjP95zBe28pRac4XL9P9q3glJoMkzdg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nNh3thvA5k+p1EXdq+f2FPm73xOTLWJ/5GeaTUa5IukC+MzMG9MMRWS9/S5v4+3eVSJ+Glc6Lz3DPRPpl+mjWSA0j9MBEIiiMffviTThZB7Fd/AGiAi8wORKzHWt3P51ZxmCxjHDO3jB4Kb+BBKY5c6vPa1V0VQeKwXs7GHA1G8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XW273efr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1739410212; c=relaxed/simple;
+	bh=1oP8+yiNpuNsGHFWFMJieA9478TEX9lWpwyfOO3av1s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZxiNG59NR324CwN3GHvlb3+vASI/sy/+OCPTmNU5FIeFiF62FdVBxKz5nf3AC+cJFvMspp2BPg0LdGatdD2BC03wszI5+9Xb5oR5uS11tF8Fm8raT7EOZocilkUblh2RWQUf06f2B/M7E6nDZNFg/JgYrm9JT4LTXMgmFF2olws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b2UUFdOH; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XW273efr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739410207;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dfI/Q762oLXgRgsEmpqc24xuO0oeEhuZ9btILNENSPw=;
-	b=XW273efrynNIhO9+tRDgqtkzvMmfeQsemx535SMH+e4Csg1WnYsWL1BuDZBT+2u+eJtZ5s
-	xeRwdOwYitV/yEqwbz7aXHvEuuNrgSWsp5JyamAcgGdcwKHReJ56cE2QdZKceesLocSMN4
-	s3xjIMbd3gbAdRbucjZDkzIBWKDI0+w=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-528-b6hIMJYFMxKYngcBoUMI8A-1; Wed,
- 12 Feb 2025 20:30:03 -0500
-X-MC-Unique: b6hIMJYFMxKYngcBoUMI8A-1
-X-Mimecast-MFC-AGG-ID: b6hIMJYFMxKYngcBoUMI8A
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9AC0D1955D68;
-	Thu, 13 Feb 2025 01:30:02 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.6])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 19CAD19560A3;
-	Thu, 13 Feb 2025 01:29:58 +0000 (UTC)
-Date: Thu, 13 Feb 2025 09:29:53 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Cheyenne Wills <cheyenne.wills@gmail.com>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-Subject: Re: BUG: NULL pointer dereferenced within __blk_rq_map_sg
-Message-ID: <Z61LEUdHI2Hx3bue@fedora>
-References: <CAHpsFVeew-p9xB9DB52Pk_6mXfFxJbT8p14h5+YRTKabEfU3BQ@mail.gmail.com>
- <Z6s-3LndN-Gt5sZB@fedora>
- <Z6tss9YS98AEIwQy@fedora>
- <CAHpsFVcMnSJgJbGrqiBDmYkHyneJdby4DMkOKQKAuicA0kgJQA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b2UUFdOH"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43948f77f1aso2063775e9.0;
+        Wed, 12 Feb 2025 17:30:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739410209; x=1740015009; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xkj3Jhs/LiPOwY1FdTT3veaDmNAKq4KIcT+mS0wK9c0=;
+        b=b2UUFdOHa0Z5V9Vv1uGfGdCmAigHbI0muTEo+nUSELZkXSzc3AOqkHTHcGnI7loXRG
+         KJEu8DLU73HJPBE3MPIOB841SrpmfQJQCr9euWi5u06uSEM71JNMLETL1jm1v5b/66/g
+         9oAXIPPbkcILTCpmvT6ZOc8gGlz8IQCO5sHPRfCzlqbMwN5JwhdaNEZW9FQh319c2uic
+         4qp9nbJC4KtRMRazkVTU6Y6P7NtXnmrNOwVxhxyopLFozo4D/eUgayidQK4an1RH65FZ
+         PFuyCcHN5+g9LrxnwM5uPuLvRgGtF0xEKqP8/eTuK+G5yZ7El3CKZDhsp6hJilSkR3va
+         ZzWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739410209; x=1740015009;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xkj3Jhs/LiPOwY1FdTT3veaDmNAKq4KIcT+mS0wK9c0=;
+        b=w2eWKN57Lm5dTmLFTccjXA9HVpMk6LkxpYmChFOtyMevCGjLHQHxRbXzOhCsaBJftN
+         19fvzPMbD5slrH3A16jZ6fP5t1lSE5ioEnVTJ098K+Oau7rxNoBGIS/tT9PkjmxnPryz
+         ibvjMXLVNQHPLuiujKus2hgKsBuXyGp9FSh19iGcMkdIoTkouQ7RTtxuBJwQadD5Y7vO
+         5RH2XpX3gTmY1fnyDXi/io2F63vf/hI0PWK2bOrUvZCeQb6ybDlRG+BrWou4+oF+RK32
+         wQEAR7cfeq4NeJRB0OG7/hheHcexYzsnrbY95JTl284xU+IA2gKqy1uEk7/UVd1qVm1c
+         ytzA==
+X-Forwarded-Encrypted: i=1; AJvYcCWSy9qSOo8b+I+N0enUu1pJxMcdykgywzkvo34bop4qcALDcohC/seXirdZ1Ym70P9XC/C2rk73+A==@vger.kernel.org, AJvYcCXU1677U4td2yxGiMc7P40pN61IhFhfMXsvE1NzIny34JZ/ax1+2rsJlvTtSn8ytLZdk2XdRUe5pQVHzJE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbvN6g9S7qUzOK1nDIQDGT6w2ZpuL0w9oK0J6R1e8GxnDoONO/
+	aCWGAyKaciFngsfctp1OzBRwj8+fZ9NAd9gAyuvAHOo/7VG1egtC
+X-Gm-Gg: ASbGnctw2cxlhvGJd6ZoFT04j3X1SJpd8YKXndWMUTe0k9XM3H5s65DWbmOAgTO309Y
+	tnTENwOvGagqtEghh8ZP0tdPUP9wl/MhSiR6tsXpYtEPO0rXu+c9NWcRBqiVPtukhQb0hIvADGz
+	xcM6yYibnLh26GBmzGIMk7zPyXvC1p6N1XHJuvcruy8lr60cpARV8t0kjEpDLfdOD4nHCtIb0/m
+	fLA8JoUHV7yY/vAtnmsys/sIyx6zXRbHmb36l53/hQ2DDqPvbU7UFpYgWTaOKoCf/VRDmX18h/4
+	3R5U8aVnRlVfXgfCDxARrl+K
+X-Google-Smtp-Source: AGHT+IFh5G9l2WtNhBe+LDmw1hg+lh/Obv3A3yT9Fue2r//FfZruq9M3Jf8jjNP5AyidOiSsq+juDA==
+X-Received: by 2002:a05:600c:3485:b0:439:3e90:c535 with SMTP id 5b1f17b1804b1-439600fed0fmr16888215e9.0.1739410208772;
+        Wed, 12 Feb 2025 17:30:08 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.128.10])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258ddbbdsm442629f8f.37.2025.02.12.17.30.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Feb 2025 17:30:08 -0800 (PST)
+Message-ID: <d24b097b-efea-4780-af67-e7a96eb1d784@gmail.com>
+Date: Thu, 13 Feb 2025 01:31:07 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHpsFVcMnSJgJbGrqiBDmYkHyneJdby4DMkOKQKAuicA0kgJQA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 2/6] io_uring: create resource release callback
+To: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com, axboe@kernel.dk,
+ linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Cc: bernd@bsbernd.com, Keith Busch <kbusch@kernel.org>
+References: <20250211005646.222452-1-kbusch@meta.com>
+ <20250211005646.222452-3-kbusch@meta.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250211005646.222452-3-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 12, 2025 at 04:24:43PM -0700, Cheyenne Wills wrote:
-> On Tue, Feb 11, 2025 at 8:29 AM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Tue, Feb 11, 2025 at 08:13:16PM +0800, Ming Lei wrote:
-> > > On Fri, Feb 07, 2025 at 07:09:39PM -0700, Cheyenne Wills wrote:
-> > > > While I was setting up to test with linux 6.14-rc1 (under Xen), I ran
-> > > > into a consistent NULL ptr dereference within __blk_rq_map_sg when
-> > > > booting the system.
-> > > >
-> > > > Using git bisect I was able to narrow down the "bad" commit to:
-> > > >
-> > > > block: add a dma mapping iterator (b7175e24d6acf79d9f3af9ce9d3d50de1fa748ec)
-> > > >
-> > > > Building a kernel with the parent commit
-> > > > (2caca8fc7aad9ea9a6ea3ed26ed146b1e5f06fab) using the same .config does
-> > > > not fail.
-> > > >
-> > > > Following is the console log showing the error as well as the Xen
-> > > > (libvirt) configuration for the guest that I'm using.
-> > > >
-> > > > Please let me know if there is any additional information that I can provide.
-> > >
-> > > Can you test the following patch?
-> > >
-> >
-> > Please try the revised one:
-> >
-> >
-> > diff --git a/block/blk-merge.c b/block/blk-merge.c
-> > index 15cd231d560c..a66d087a6b55 100644
-> > --- a/block/blk-merge.c
-> > +++ b/block/blk-merge.c
-> > @@ -493,7 +493,7 @@ static bool blk_map_iter_next(struct request *req,
-> >                 return true;
-> >         }
-> >
-> > -       if (!iter->iter.bi_size)
-> > +       if (!iter->bio || !iter->iter.bi_size)
-> >                 return false;
-> >
-> >         bv = mp_bvec_iter_bvec(iter->bio->bi_io_vec, iter->iter);
-> > @@ -514,6 +514,8 @@ static bool blk_map_iter_next(struct request *req,
-> >                         if (!iter->bio->bi_next)
-> >                                 break;
-> >                         iter->bio = iter->bio->bi_next;
-> > +                       if (!iter->bio)
-> > +                               break;
-> >                         iter->iter = iter->bio->bi_iter;
-> >                 }
-> >
-> >
-> >
-> >
-> > Thanks,
-> > Ming
-> >
+On 2/11/25 00:56, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
-> Still getting a BUG at the same location.
+> When a registered resource is about to be freed, check if it has
+> registered a release function, and call it if so. This is preparing for
+> resources that are related to an external component.
 > 
-> I was able to capture the BUG using a xen gdbsx / gdb session (the
-> offending instruction is a mov  0x28(%rdx),%r13d and the bug is that
-> %rdx is zero. -- break *__blk_rq_map_sg+0x5e if $rdx == 0)
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>   io_uring/rsrc.c | 2 ++
+>   io_uring/rsrc.h | 3 +++
+>   2 files changed, 5 insertions(+)
 > 
-> It appears in __blk_rq_map_sg that the rq->bio is NULL at the start of
-> the routine.
+> diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+> index 4d0e1c06c8bc6..30f08cf13ef60 100644
+> --- a/io_uring/rsrc.c
+> +++ b/io_uring/rsrc.c
+> @@ -455,6 +455,8 @@ void io_free_rsrc_node(struct io_ring_ctx *ctx, struct io_rsrc_node *node)
+>   	case IORING_RSRC_BUFFER:
+>   		if (node->buf)
+>   			io_buffer_unmap(ctx, node);
+> +		if (node->release)
+> +			node->release(node->priv);
+>   		break;
+>   	default:
+>   		WARN_ON_ONCE(1);
+> diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
+> index abd0d5d42c3e1..a3826ab84e666 100644
+> --- a/io_uring/rsrc.h
+> +++ b/io_uring/rsrc.h
+> @@ -24,6 +24,9 @@ struct io_rsrc_node {
+>   		unsigned long file_ptr;
+>   		struct io_mapped_ubuf *buf;
+>   	};
+> +
+> +	void (*release)(void *);
+> +	void *priv;
 
-Yeah, turns out oops is triggered in initializing req_iterator for
-discard req, and the following patch should be enough:
+Nodes are more generic than buffers. Unless we want to reuse it
+for files, and I very much doubt that, it should move into
+io_mapped_ubuf.
 
+>   };
+>   
+>   struct io_mapped_ubuf {
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 15cd231d560c..9d7e87052882 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -556,11 +556,13 @@ int __blk_rq_map_sg(struct request_queue *q, struct request *rq,
- {
- 	struct req_iterator iter = {
- 		.bio	= rq->bio,
--		.iter	= rq->bio->bi_iter,
- 	};
- 	struct phys_vec vec;
- 	int nsegs = 0;
- 
-+	if (iter.bio)
-+		iter.iter = iter.bio->bi_iter;
-+
- 	while (blk_map_iter_next(rq, &iter, &vec)) {
- 		*last_sg = blk_next_sg(last_sg, sglist);
- 		sg_set_page(*last_sg, phys_to_page(vec.paddr), vec.len,
-
-
-Thanks,
-Ming
+-- 
+Pavel Begunkov
 
