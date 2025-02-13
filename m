@@ -1,100 +1,89 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81CF211292
-	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 09:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47AE221128A
+	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 10:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739440759; cv=none; b=CfrjfOW4ndw7IgZ4qKzAAtCTWx32N9uPjhd3XiGqKVTAD5C+vA2XkgqzZigVKfyzEL/JZP62CIJPHcpvocO9Klb9GyMzVl/jFYtcovW88FKZ5TzZakxm5AAh16uZfOGv4OYUgmsrJKos28yOrKN9Y+m0le7WOpGT/qB3UZRrGJI=
+	t=1739441182; cv=none; b=i9MJdfzoEzjPMsIcOzEi4sHd7gObns7aKZH+4r2/zQdC7zOkFsNEmSq94ZbDRq7GFfcIISl8TjpnZRaw1a8uDkvnP4RuteL6JR9InC0jRh2ek76RQ0ZpS+WIaZntTnZHhwwTWFSCeaSaOaLhDrHJmv2ACMgHNqneNTcCOy78jXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739440759; c=relaxed/simple;
-	bh=3S+VaLUIycztkQ7kee8T4vPPub8pX5kczbBez29PCZc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D87pXVUjl/Q5hDIJh0wopl3Z06Y2heIKlP2Iu1sFSjwbVgzgn/R2F6ohA5XGapYfQr4pIPo7YCrUQQ6lnv5BK5PKLWYfc746rZbV2hKhngTTydmq0mJ2Qt4l9HZYTpsct5YMImcSWr/Rq6riQkEKsrnUSlqbDktbKPOi9RhvceA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WY9RFK6s; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1739441182; c=relaxed/simple;
+	bh=IrFbBbfqEiJa0zHa0999cM4RYYVv3FsmmGN25izoDuQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=S6pNG0Nl55yLbLYQHgLNHH8s/VeXSEla/oQkkQiL0g7BTo40/rSkKLg0/3DccGic7nf4ghfaMIPDqKdl5N3UdpPidaQNMiq4k4+332B2Az6M0vOy66OzIzxGthDKJYaJQZZrrws/tojj7k0AS1mL7z9ZCP/yShGAzwjIl+RCTjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=MHcRMTDr; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WY9RFK6s"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739440755;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=erE8onpccJmyx8G4Kp6YKUHaPmvGfEo6rtoZHiLg2Q8=;
-	b=WY9RFK6s8YF9qLARjyTr8RXqiiJhZ87NrTtHy5cIz+AF20HafLmCX5tGl5MMcrOFi7+LAO
-	G6mhYE9KaQoPHAe0NZztA5QlGqh3Nj5ECsjG787KlcSZGjyGKDH3Jl1q07CtHHJF4CxT3j
-	gIk8VRmrDEgxFadapsP8NKyomHDLWds=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-551-0ta8TGazNcmqbHePOdG5TQ-1; Thu,
- 13 Feb 2025 04:59:12 -0500
-X-MC-Unique: 0ta8TGazNcmqbHePOdG5TQ-1
-X-Mimecast-MFC-AGG-ID: 0ta8TGazNcmqbHePOdG5TQ
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1BC0319373D8;
-	Thu, 13 Feb 2025 09:59:11 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.6])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 552381955F0F;
-	Thu, 13 Feb 2025 09:59:04 +0000 (UTC)
-Date: Thu, 13 Feb 2025 17:58:59 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: John Garry <john.g.garry@oracle.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Yi Zhang <yi.zhang@redhat.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V2] block: make segment size limit workable for > 4K
- PAGE_SIZE
-Message-ID: <Z63CY9rE7X8m3nmv@fedora>
-References: <20250210090319.1519778-1-ming.lei@redhat.com>
- <faf95365-5b55-40f6-82f8-195ccc3edb9e@oracle.com>
+	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="MHcRMTDr"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-21f7f1e1194so16681675ad.2
+        for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 02:06:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shopee.com; s=shopee.com; t=1739441178; x=1740045978; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ULrQM8jS/N8rKIapgYLPr6eiDKMqeLmtTdffubtbGqg=;
+        b=MHcRMTDrg+lsu0sUpHRMJjp+JMFX2lLQ2nFLlnE+AMbugCryu6Gn6YdQwcp9ao9YgN
+         y4t4svLPL3ri2aWYvIiEsgHo3ALVbQa+FElys5QvqCDxQG33438t5/okWNVF7uDtK+Mq
+         0BPlkYNCzOv/f+r9m6n4rd5zxOcoIdqA3kO7UkFb6a7VpoFJN58b5hBrsWXL/6laiDAZ
+         ExxPt6PVspAuZwzvMrIyINXuaObh+rFIuGi+vJiUCy38PFYm15A4sXkZ5sIP6xLNmjBm
+         VJl8RL46cVh+rIjDCoZhssuj3v4wBH8iN0nlnrIkAXJlXWH/EC7vwA0jzF3aE3TS/wqR
+         1XDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739441178; x=1740045978;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ULrQM8jS/N8rKIapgYLPr6eiDKMqeLmtTdffubtbGqg=;
+        b=g54RC5uW7m2eoE2rQLtp6K9p5/lx2A1JF9U3Y5w+1CkgQ/FQivE4mnXNc6swt22uTZ
+         B+3GfjfLRtcV3pAMBSOPuAuAndUTqW0lKwQZxnGtH1lN5ExfzVUdbgaK19Gqr/NeF3lw
+         SeDE4lMMct1OzTxL8R2UnM3yg8t9U/l6/btXQxWO3D2WiQI/4DJ9CTb6+LgiJrmXw2nu
+         SZo1Xj9tVRDTvHHlJ+Sr1vq56jfNGAtd5dSzTk1y4kEFOBkzuf5ulGDiuVVeGF+95n50
+         THvXpUugEPrf1me28oo86Ikhf98VyuvLHml1Q9LdLrHlgZ0C4MuLHFx0xVfKsDzFOdmx
+         7wfw==
+X-Gm-Message-State: AOJu0YwuaVoHvmcDxM/+J77ud1dIcEdDR2+yg9tzD7WOHTL7d3jGe6Jk
+	IZg8IfaiG951OMoqx44u8cXIN2Z8Zv8m9tVHAs7mhKDpaZPZ4fzZXHqnTPrKSsM=
+X-Gm-Gg: ASbGncvWMt87Ev7ywAdvXemeyzAZWB2ijel952uHjKPK+6u1Iuy1/iv6CAJrbL0vPvU
+	Wvdfx+beR4SX/3Ccb7KrPhMEXGqOBwzG6OManjB4BiUlUrQOjgWiE+K36lLyMZ9AnUftJtNncMM
+	SNY+VDvXGWwoitBTLZlj7HiHFkA++JBTS/9NBWwTi6dFeNYsTreSPKGGi2TdmWnuXXwbjix5gco
+	jpQGXAxfk6xFxVK2hI1auqL2o2CBbfr/9WDkSBBnApb7HZnfNmk8MHKV5OaEJzxLvhoJ27pY6c6
+X-Google-Smtp-Source: AGHT+IFZcuS+n+mUKTvU8TcdE7azW/glC+u+MrACA5Bttms/YcqUyP54Tik2TARGAWcwEBYeIi+8Qw==
+X-Received: by 2002:a05:6a00:1d99:b0:732:2170:b6aa with SMTP id d2e1a72fcca58-7322c3f4df1mr9438701b3a.16.1739441178506;
+        Thu, 13 Feb 2025 02:06:18 -0800 (PST)
+Received: from localhost.localdomain ([143.92.64.17])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73242761569sm937442b3a.130.2025.02.13.02.06.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Feb 2025 02:06:17 -0800 (PST)
+From: Tang Yizhou <yizhou.tang@shopee.com>
+X-Google-Original-From: Tang Yizhou
+To: yukuai1@huaweicloud.com,
+	axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Tang Yizhou <yizhou.tang@shopee.com>
+Subject: [PATCH v2 0/2] Fix and cleanup some comments in blk-wbt
+Date: Thu, 13 Feb 2025 18:06:09 +0800
+Message-Id: <20250213100611.209997-1-yizhou.tang@shopee.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <faf95365-5b55-40f6-82f8-195ccc3edb9e@oracle.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 13, 2025 at 08:45:18AM +0000, John Garry wrote:
-> On 10/02/2025 09:03, Ming Lei wrote:
-> > PAGE_SIZE is applied in some block device queue limits, this way is
-> > very fragile and is wrong:
-> > 
-> > - queue limits are read from hardware, which is often one readonly
-> > hardware property
-> > 
-> > - PAGE_SIZE is one config option which can be changed during build time.
-> > 
-> > In RH lab, it has been found that max segment size of some mmc card is
-> > less than 64K, then this kind of card can't work in case of 64K PAGE_SIZE.
-> > 
-> > Fix this issue by using BLK_MIN_SEGMENT_SIZE in related code for dealing
-> > with queue limits and checking if bio needn't split. Define BLK_MIN_SEGMENT_SIZE
-> > as 4K(minimized PAGE_SIZE).
-> 
-> Please note that blk_queue_max_quaranteed_bio() for atomic writes assumes
-> that we can fit a PAGE_SIZE in a segment. I suppose that if the
-> max_segment_size < PAGE_SIZE is supported, then the calculation there needs
-> to change.
+From: Tang Yizhou <yizhou.tang@shopee.com>
 
-It isn't related with blk_queue_max_guaranteed_bio() which calculates the max
-allowed ubuf bytes which can fit in a bio, so PAGE_SIZE has to be used here.
+v2: Take Yuai's advice. Modify the subject of patch #1. Move the
+modifications to the comments for wb_timer_fn to patch #2.
 
-BLK_MIN_SEGMENT_SIZE is just one hint which can be used to check if one
-bvec can fit in single segment quickly, otherwise the normal split code
-path is run into.
+Tang Yizhou (2):
+  blk-wbt: Fix some comments
+  blk-wbt: Cleanup a comment in wb_timer_fn
 
+ block/blk-wbt.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-Thanks,
-Ming
+-- 
+2.25.1
 
