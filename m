@@ -1,79 +1,116 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9846FC3
-	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 01:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26D186349;
+	Thu, 13 Feb 2025 01:27:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739409056; cv=none; b=VOq2sjYKODXkoGqtvdtQ+TRzcbqK3GmE+8cKuSio7vAyI9u/kXahrnxmuy22XcMxu3gTfsrTx4ba6j0vBPBtjRADTZPOZJbzsdzNFyvRQuc3CxRmRtO8dN76g3XuSyFrPBFqH2nu+zuWzjU4GZgZJZ81sT9l6SjTP5aJ31fj5ik=
+	t=1739410039; cv=none; b=Y/jIof7qHiLdpjmZ3pSo2w52v4ULeSKEfwcInZbNfvB1MPek8qe9xpPjfBvD4Z9Fv+Or5n6Jqcqx6BnSkGemedqMWKg525ay1rvNT2cw6HEpFZNniKuw83l0NJ3t+Ey9GPaw+OM5xuUZ5kkXIKp8e8leaxhiFy1hQaeB15/nlZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739409056; c=relaxed/simple;
-	bh=OPsH+J0IMjvbXM5Z80c3rcRa1r3Wk7HlHjbd9Nuzr9A=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=n4CpZ4FjcoaTv4vboQiu6sAw1YyBm/pqY1BVDM8h7M4XWJ1ZKaG+lAmVZrPYfFg71ZvXNSBc9tp501ZLWfCqDn+svMQvLJ2KOtZLzjtDm4KBbsDSgj/s8Nq04AprV2il5PrO59jluBbvm553pMHZqGFSnIfOpf4VLymbQkItZzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=beZS+NuJ; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="beZS+NuJ"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6e41e17645dso3328746d6.2
-        for <linux-block@vger.kernel.org>; Wed, 12 Feb 2025 17:10:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1739409054; x=1740013854; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KBTW067S0LsI0ydyCH/iAFJRADoFFD4WiemBeNRQ8bE=;
-        b=beZS+NuJd8CyLRSvdVqxGrPqbUOAu19htvQlZT9n14El+WvTdJsva4kePB5JEk4FN9
-         LMYoIyG+fY37QAMcrxpnogsjJRm8lM37eDq6xdIYMNg3L4ZQXLwbFPFffpJ+QxwqA1EN
-         szUjDDnxX3byFVZmwQ3lbvpA+zCjg/3qIY3t8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739409054; x=1740013854;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KBTW067S0LsI0ydyCH/iAFJRADoFFD4WiemBeNRQ8bE=;
-        b=voQIHBVJlFIfWyvwd84YnPcfGL76BvgtZkRpIdmjNoL7c3a+8MTVJ/Y4W3r9SMzetB
-         Q9Bf3L6XC9SGGbb6mVGuq1waE/8onqGTxyeNgyWG9FkBLlBIXKHnZsY4/b0aT9Q68LwP
-         yIbC1w34MSDF5NSjR2ZUx6sRdJrqaO1Y2LcOE6EFDgKEQPHfNOmVYGWWdNCxplX6lDXm
-         oniTBoMKfH3hOyTc6+akpFDdhTlRawqsM5sRpd0oKw3eL+oxfwQ/dEd3RcelCnpXutA1
-         lrbiUOv1TJmk8sieDZflXAPiEDgPZWzqnMK4lH4vnOAOmXikroShDKoXUVR3gDLXtyYN
-         gHSA==
-X-Gm-Message-State: AOJu0YyXRw+EPSks4CmAEEG1NfG2DaTIdBNv1EnRd2Vgziq+6oI3NPld
-	3g/ExjNCwksfZ4yqZjJcw6YrOt9H8GfzVZ/rq0j/h8V3T/XXdfwdB0wQigI6kBD7q+aZ9yWElzg
-	J0iWQ348nVEa7dpbC0E2v66JpoJvjmbNBJEX2
-X-Gm-Gg: ASbGncvNukjCBpwAKbLP735bTxBTblSntesdXlwrZRDm4+SoLcW6CSq0PRUprfiZRV7
-	FmoV8WW4hJ3Ka+nkX29OzimMFJHXD/q+PE8ucR2VhygBA1ooc4YZohqNjwuAciON+t9WWYeb1QD
-	wdpLlUpwVfi2Wif9g5bcBqwWSlMQ==
-X-Google-Smtp-Source: AGHT+IGtdfOKy9DB+E7aUcl90+95bCBXSRaedHW7QE863sL1BrkbRcjRAOINQVNnxOZKV9N/kq4s1lABwbURnunNX4g=
-X-Received: by 2002:a05:6214:20aa:b0:6d8:8a7b:66a4 with SMTP id
- 6a1803df08f44-6e46ed82304mr99705796d6.14.1739409053957; Wed, 12 Feb 2025
- 17:10:53 -0800 (PST)
+	s=arc-20240116; t=1739410039; c=relaxed/simple;
+	bh=TCm5BAMNTDYEnSG5kZoN/Oq2zatcj9gc5r0PcZI02qA=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=l/+ljC5dX8+qitHFq6WcjuAd4MTqBOIktA3R87U15bcw5T8yzFHBUrRFyKaROtO6XjG0Aj6n297+gqXHL3JmLEEzZDeFPD+Xr0qu7BSt0rlDBhXZhzyqCJczgHieSaYDkesmyEYrCNb58WrC1S//ff6jdXn8Y6Un0SwQxYWG4ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4YtcwT4588z4f3khS;
+	Thu, 13 Feb 2025 09:26:49 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id DC84E1A1743;
+	Thu, 13 Feb 2025 09:27:10 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgB32l5tSq1ndWXBDg--.7430S3;
+	Thu, 13 Feb 2025 09:27:10 +0800 (CST)
+Subject: Re: [PATCH] block: Check blkg_to_lat return value to avoid NULL
+ dereference
+To: Wentao Liang <vulab@iscas.ac.cn>, tj@kernel.org, josef@toxicpanda.com,
+ axboe@kernel.dk
+Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ "yukuai (C)" <yukuai3@huawei.com>
+References: <20250212083203.1030-1-vulab@iscas.ac.cn>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <8793e238-1b12-5ce9-e9d6-e936750109b2@huaweicloud.com>
+Date: Thu, 13 Feb 2025 09:27:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Khazhy Kumykov <khazhy@chromium.org>
-Date: Wed, 12 Feb 2025 17:10:42 -0800
-X-Gm-Features: AWEUYZnmD9KZ3N5_EgKqOdofTILW6tg5UmqVPWktggKrMjIwqy0TVxyaTM7MKPs
-Message-ID: <CAE5=w7odv-cL6PJ=ie0bE5UYpfzEdqpB4vEo_FQm0fUTLDgXYQ@mail.gmail.com>
-Subject: Question about backporting w/ missing bitenum members
-To: Jens Axboe <axboe@kernel.dk>, ming.lei@redhat.com, Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20250212083203.1030-1-vulab@iscas.ac.cn>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgB32l5tSq1ndWXBDg--.7430S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ww4ftFWUXw1fXr47ZrW5KFg_yoW8AFyxpw
+	48WwsFy3yrWr47XF1xKa1rCryrCr4UKFyUCrs8A34FkF1S9F4rtF1rZ3W5tFWFyrWUCw4D
+	Jr15tF9Yvr45C37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
+	xVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+	AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU17KsU
+	UUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-Heya, I'm backporting 752863bddaca ("block: propagate partition
-scanning errors to the BLKRRPART ioctl") to LTS and noticed it
-conflicts in the blkdev.h header, where in upstream we had already
-introduced another blk_mode_t for bit 5, and this new STRICT_SCAN uses
-bit 6...
+Hi,
 
-In this scenario, would we prefer keep the bit used consistent (so
-have a gap with an unused bit 5 - what I would typically go with), or
-renumber to avoid the gap?
+ÔÚ 2025/02/12 16:32, Wentao Liang Ð´µÀ:
+> The function blkg_to_lat() may return NULL if the blkg is not associated
+> with an iolatency group. In iolatency_set_min_lat_nsec() and
+> iolatency_pd_init(), the return values are not checked, leading to
+> potential NULL pointer dereferences.
+> 
+> This patch adds checks for the return values of blkg_to_lat and let it
+> returns early if it is NULL, preventing the NULL pointer dereference.
+> 
+> Fixes: d70675121546 ("block: introduce blk-iolatency io controller")
+> Cc: stable@vger.kernel.org # 4.19+
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+> ---
+>   block/blk-iolatency.c | 4 ++++
+>   1 file changed, 4 insertions(+)
+> 
+> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+> index ebb522788d97..398f0a1747c4 100644
+> --- a/block/blk-iolatency.c
+> +++ b/block/blk-iolatency.c
+> @@ -787,6 +787,8 @@ static int blk_iolatency_init(struct gendisk *disk)
+>   static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
+>   {
+>   	struct iolatency_grp *iolat = blkg_to_lat(blkg);
+> +	if (!iolat)
+> +		return;
+>   	struct blk_iolatency *blkiolat = iolat->blkiolat;
+>   	u64 oldval = iolat->min_lat_nsec;
 
-In question:
+This is not needed, this is called from iolatency_set_limit() or
+iolatency_pd_offline() where the policy data can't be NULL.
+>   
+> @@ -1013,6 +1015,8 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
+>   	 */
+>   	if (blkg->parent && blkg_to_pd(blkg->parent, &blkcg_policy_iolatency)) {
+>   		struct iolatency_grp *parent = blkg_to_lat(blkg->parent);
+> +		if (!parent)
+> +			return;
 
- /* open for "writes" only for ioctls (specialy hack for floppy.c) */
- #define BLK_OPEN_WRITE_IOCTL   ((__force blk_mode_t)(1 << 4))
-+/* return partition scanning errors */
-+#define BLK_OPEN_STRICT_SCAN   ((__force blk_mode_t)(1 << 6))
+blkg_to_pd() already checked, how can this be NULL?
+
+Thanks,
+Kuai
+>   		atomic_set(&iolat->scale_cookie,
+>   			   atomic_read(&parent->child_lat.scale_cookie));
+>   	} else {
+> 
+
