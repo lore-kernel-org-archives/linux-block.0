@@ -1,186 +1,100 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727B0227EBE
-	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 12:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC3E20C48E
+	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 12:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739448056; cv=none; b=jxVrzlTjWhzZOkbt8oIbXZUdv3vlBNZ3AtuNXB30LjZLbJ5wIWDqbULuWu79ntu84GMSnd8PCAWE6o2nThonJuuTA8GTGYXms4eRcM6ewNgaR71PG0FSs3fa6QQxc1TB1GNQpdxsSFGjKy0iuQqyu3r7jilGDiGfH50Y1a/SCh4=
+	t=1739450384; cv=none; b=ElTysD29TgF52iMXWsJYJjkcVNT4eotu7qemINR9RUE011GDXoqDOLxsWqI9p+RD//vdxZzlk0ielyJJzn0ifW6rBgDCIKuTzGk7Xba7n+o+pj3SSgdX94dyZ66XmeCddNTvbJMd3BG03r59SbONIiEt3LClGgE3clZmaF2iipg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739448056; c=relaxed/simple;
-	bh=aORZ7MDKgtGD93YPuAZMcZ6SPm7OZVFIyZwWQ4oAvck=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cw88MxIRf/vtt04dZM0oI4L7ZcmzWrbZD3oQRDhyTXaXKecheEAP0wNjrZqz88t43TN8UScHb6lrxAm61FVqEnKG+f+IbIYANsz8oXFdCHzNBTODkVzpejofA5sebdawkl7xvtpRjix+2bhfuyPf6LiccL51XgJ7W3bV3DiqB/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JiMutFgo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1739450384; c=relaxed/simple;
+	bh=SwJA6S/tp/y2Rb7TYbNgiE7VIXEAXWUrJeLYW4jxT14=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QDw5H/trIrspkxruYxIiZz21L3KVcrccKEViXTkoMy56vRuU8s9zNn2D+TwDxoskS2udrEakVI1V6Q10zXMYy67AU+BMHNLSLL5D0S+UZ40jU1fqoJvkDccrVSX1XYOjNXF287mOj8g/bSI6z9xnjihVPcu9d8pSL0008o7PU/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=duymWrmw; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JiMutFgo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739448052;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JU22T3CSnH+THatLJhezsF06FYAyScu/GN2ZCLAPZFg=;
-	b=JiMutFgoeOq6L2NYsg8ZCmCvz3XZjC8g+Az0jqosmb//WBuHamfWKlM4elbkO0EInycqHQ
-	b8SkfHWhtv6zprIFClwUGQldPNpVsY4vUgElCNuIVtJJ2837eLBz5Lxl5tlhmdxBSkSWMi
-	T9PNO+5qDRBT9hbWwf0fE7+VeBiA3mg=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-210-3O5MfwjVM2KjNnZEvU_9gQ-1; Thu,
- 13 Feb 2025 07:00:49 -0500
-X-MC-Unique: 3O5MfwjVM2KjNnZEvU_9gQ-1
-X-Mimecast-MFC-AGG-ID: 3O5MfwjVM2KjNnZEvU_9gQ_1739448047
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3C9B418EB2CF;
-	Thu, 13 Feb 2025 12:00:47 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.6])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 96B8D1800360;
-	Thu, 13 Feb 2025 12:00:45 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Paul Bunyan <pbunyan@redhat.com>,
-	Yi Zhang <yi.zhang@redhat.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	John Garry <john.g.garry@oracle.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Keith Busch <kbusch@kernel.org>
-Subject: [PATCH V3] block: make segment size limit workable for > 4K PAGE_SIZE
-Date: Thu, 13 Feb 2025 20:00:40 +0800
-Message-ID: <20250213120040.2271709-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="duymWrmw"
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e5b16621c28so619046276.2
+        for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 04:39:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739450381; x=1740055181; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kZgtM/VzP0ygSUhhZPW5/KCIpzSTTauYjcPdfKEaFSo=;
+        b=duymWrmwKE3DDayW682G/EcgvKv0mmPzF82oMzp+AvszG89skw5/bgCdynFS4+XZNe
+         cYUbUisHyF4bjTpYNm3886gMolCmdp/gDSJDY/CGAhfEHzNurUIAGzd2TTRACC3vNs8a
+         B4eYBITgS9gFYrdkxrMqYP7l6CQezGKmF68oDI5dSp4LDJ27TRBscf1sxd00Rt06ZNcO
+         /Vdy2e3qTEm1srMF1WDuJPB5X1cAk7oWVyLdbdIGhFHmnWNf57JkSJ7tz2Vk9rdDZs8f
+         fOWUezh6dbGL9Oq6Pix7XvaXSgCeD3BKp0d+nI8ZSc3TpXh5CJBYGCHomGmMUqMn7EkD
+         eGaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739450381; x=1740055181;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kZgtM/VzP0ygSUhhZPW5/KCIpzSTTauYjcPdfKEaFSo=;
+        b=KDUNd5MPa6I+2tXnSXAoFKyg1PmWfRPCSE8mRj9wXQ/KVp319VOlKNlCOKtxmfHmOP
+         E1X5PJ+0tjITkHa3wubXnAx1oOcww2zsL3u0cMc7iHcGspMNQFCV86pjX9zqUKcvW2yx
+         nOlBWDVXYNfUXKPFJg3bQVAGgG+3zqV+6Pul8yIZXp/pmagkuQpOeEU8EzvisD4YZrUT
+         vT5NcSwrlwYpPv//wzxE87Bh564r5zlymWIdKU9cjulq9PGLwVTtEnhzy8CcDZtSAMUG
+         NnpCV0BOir3MghFAaWLqHyy4ONl45WsBk+pZLmA6zUbAlOSrM0fCn9TjIrFJADHPleb+
+         Telw==
+X-Forwarded-Encrypted: i=1; AJvYcCXRtRBGY44TiZtFB31jv5JCdNa6H3ZjkmliIWShf+SW20IdW9QQDhgK9k8Qg4BZVYClnPQsJ673dEFZlw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDg3MMKkR6nwxoJ9APh/y2DbW8cH+0lG5gCAn8DZ2yVSUlZ1yN
+	cSTG+VkbxqCgDNKHA9emJdPn/dxAFrvu3pRhWQCdC34cVsy2XhL2+oeHI1ByfKNwbxBZX+xOQWE
+	5LTCwaYy4SkxXJ5miPTMbM44pD4s=
+X-Gm-Gg: ASbGncuUgXjKN9dYkJcqSMX/te3PmVc/MPphCTjplW9qDd/HX3PCXtHGiaY2MxnO80w
+	Olir+H/l46tu1+miz+SjY7nFurfy9alRSg/wZ9ObbEjxDs1ndFVAMYpZ1SpEFHMsgs88hDfF+
+X-Google-Smtp-Source: AGHT+IGG9EqGFu0c5R1XxXYBKscHNi3zma9Z+qM6yVUgKyPHagJtfnLxPSgE1CvdK9rJzdRhYtMmw5miUx5EFb00GAQ=
+X-Received: by 2002:a05:6902:102a:b0:e5b:323b:a1a7 with SMTP id
+ 3f1490d57ef6-e5d9f17f889mr6008681276.42.1739450381585; Thu, 13 Feb 2025
+ 04:39:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+References: <CAHpsFVeew-p9xB9DB52Pk_6mXfFxJbT8p14h5+YRTKabEfU3BQ@mail.gmail.com>
+ <Z6s-3LndN-Gt5sZB@fedora> <Z6tss9YS98AEIwQy@fedora> <CAHpsFVcMnSJgJbGrqiBDmYkHyneJdby4DMkOKQKAuicA0kgJQA@mail.gmail.com>
+ <Z61LEUdHI2Hx3bue@fedora> <20250213063214.GA20171@lst.de> <20250213063814.GB20402@lst.de>
+In-Reply-To: <20250213063814.GB20402@lst.de>
+From: Cheyenne Wills <cheyenne.wills@gmail.com>
+Date: Thu, 13 Feb 2025 05:39:30 -0700
+X-Gm-Features: AWEUYZnbS9GZTK9JtaSBS1KcdF4Zqs7o3ecAeZ-LMLER3qYm5VW1CxxvrkewEKs
+Message-ID: <CAHpsFVeoekuk8_SxQfsggwxUx1c5xTV-Na_8zB9yU8cVK0X0sg@mail.gmail.com>
+Subject: Re: BUG: NULL pointer dereferenced within __blk_rq_map_sg
+To: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-PAGE_SIZE is applied in validating block device queue limits, this way is
-very fragile and is wrong:
+With the patch in __blk_rq_map_sg, I was able to boot successfully.
+(just to note that the code that I tested included the other patch
+that updated blk_map_iter_next with guards as well).  I can do a test
+that just has the update to __blk_rq_map_sg if needed.
 
-- queue limits are read from hardware, which is often one readonly hardware
-property
+Thanks
 
-- PAGE_SIZE is one config option which can be changed during build time.
-
-In RH lab, it has been found that max segment size of some mmc card is
-less than 64K, then this kind of card can't be probed successfully when
-same kernel is re-built with 64K PAGE_SIZE.
-
-Fix this issue by using BLK_MIN_SEGMENT_SIZE in related code for dealing
-with queue limits and checking if bio needn't split as a hint. Define
-BLK_MIN_SEGMENT_SIZE as 4K(minimized PAGE_SIZE).
-
-The following commits are depended for backporting:
-
-commit 6aeb4f836480 ("block: remove bio_add_pc_page")
-commit 02ee5d69e3ba ("block: remove blk_rq_bio_prep")
-commit b7175e24d6ac ("block: add a dma mapping iterator")
-
-Cc: Paul Bunyan <pbunyan@redhat.com>
-Cc: Yi Zhang <yi.zhang@redhat.com>
-Cc: Luis Chamberlain <mcgrof@kernel.org>
-Cc: John Garry <john.g.garry@oracle.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Cc: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V3:
-	- rephrase commit log & fix patch style(Christoph)
-	- more comment log(Christoph)
-V2:
-	- cover bio_split_rw_at()
-	- add BLK_MIN_SEGMENT_SIZE
-
- block/blk-merge.c      | 2 +-
- block/blk-settings.c   | 6 +++---
- block/blk.h            | 8 ++++++--
- include/linux/blkdev.h | 2 ++
- 4 files changed, 12 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 15cd231d560c..b55c52a42303 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -329,7 +329,7 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
- 
- 		if (nsegs < lim->max_segments &&
- 		    bytes + bv.bv_len <= max_bytes &&
--		    bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
-+		    bv.bv_offset + bv.bv_len <= BLK_MIN_SEGMENT_SIZE) {
- 			nsegs++;
- 			bytes += bv.bv_len;
- 		} else {
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index c44dadc35e1e..539a64ad7989 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -303,7 +303,7 @@ int blk_validate_limits(struct queue_limits *lim)
- 	max_hw_sectors = min_not_zero(lim->max_hw_sectors,
- 				lim->max_dev_sectors);
- 	if (lim->max_user_sectors) {
--		if (lim->max_user_sectors < PAGE_SIZE / SECTOR_SIZE)
-+		if (lim->max_user_sectors < BLK_MIN_SEGMENT_SIZE / SECTOR_SIZE)
- 			return -EINVAL;
- 		lim->max_sectors = min(max_hw_sectors, lim->max_user_sectors);
- 	} else if (lim->io_opt > (BLK_DEF_MAX_SECTORS_CAP << SECTOR_SHIFT)) {
-@@ -341,7 +341,7 @@ int blk_validate_limits(struct queue_limits *lim)
- 	 */
- 	if (!lim->seg_boundary_mask)
- 		lim->seg_boundary_mask = BLK_SEG_BOUNDARY_MASK;
--	if (WARN_ON_ONCE(lim->seg_boundary_mask < PAGE_SIZE - 1))
-+	if (WARN_ON_ONCE(lim->seg_boundary_mask < BLK_MIN_SEGMENT_SIZE - 1))
- 		return -EINVAL;
- 
- 	/*
-@@ -362,7 +362,7 @@ int blk_validate_limits(struct queue_limits *lim)
- 		 */
- 		if (!lim->max_segment_size)
- 			lim->max_segment_size = BLK_MAX_SEGMENT_SIZE;
--		if (WARN_ON_ONCE(lim->max_segment_size < PAGE_SIZE))
-+		if (WARN_ON_ONCE(lim->max_segment_size < BLK_MIN_SEGMENT_SIZE))
- 			return -EINVAL;
- 	}
- 
-diff --git a/block/blk.h b/block/blk.h
-index 90fa5f28ccab..0eca1687bec4 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -358,8 +358,12 @@ struct bio *bio_split_zone_append(struct bio *bio,
- static inline bool bio_may_need_split(struct bio *bio,
- 		const struct queue_limits *lim)
- {
--	return lim->chunk_sectors || bio->bi_vcnt != 1 ||
--		bio->bi_io_vec->bv_len + bio->bi_io_vec->bv_offset > PAGE_SIZE;
-+	if (lim->chunk_sectors)
-+		return true;
-+	if (bio->bi_vcnt != 1)
-+		return true;
-+	return bio->bi_io_vec->bv_len + bio->bi_io_vec->bv_offset >
-+		BLK_MIN_SEGMENT_SIZE;
- }
- 
- /**
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 248416ecd01c..2021b2174268 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1163,6 +1163,8 @@ static inline bool bdev_is_partition(struct block_device *bdev)
- enum blk_default_limits {
- 	BLK_MAX_SEGMENTS	= 128,
- 	BLK_SAFE_MAX_SECTORS	= 255,
-+	/* use minimized PAGE_SIZE as min segment size hint */
-+	BLK_MIN_SEGMENT_SIZE	= 4096,
- 	BLK_MAX_SEGMENT_SIZE	= 65536,
- 	BLK_SEG_BOUNDARY_MASK	= 0xFFFFFFFFUL,
- };
--- 
-2.47.1
-
+On Wed, Feb 12, 2025 at 11:38=E2=80=AFPM Christoph Hellwig <hch@lst.de> wro=
+te:
+>
+> On Thu, Feb 13, 2025 at 07:32:14AM +0100, Christoph Hellwig wrote:
+> > On Thu, Feb 13, 2025 at 09:29:53AM +0800, Ming Lei wrote:
+> > > Yeah, turns out oops is triggered in initializing req_iterator for
+> > > discard req, and the following patch should be enough:
+> >
+> > How do we end up in blk_rq_map_sg for a discard request here?
+> > dma-mapping doesn't make sense for a non-special pyaload discard
+> > as used by xxen-blkfront, and xen-blkfront also only calls
+> > blk_rq_map_sg from blkif_queue_rw_req and not blkif_queue_discard_req.
+>
+> I think we're probably dealing with a flush command, as that's the
+> only request that doesn't have a bio except for empty passthrough
+> commands.  xen-blkfront is a bit weird in calling into these data
+> transfer helpers despite not having data to transfer, but I guess
+> something like your patch to safeguard against it should be fine.
+> But add a comment as well please.
