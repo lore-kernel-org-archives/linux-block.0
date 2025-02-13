@@ -1,61 +1,60 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B87212FB0
-	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 10:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB482135D9
+	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 10:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739441184; cv=none; b=YOmGEfsAU9NMCGtWZS5BGvGiW0tR53UXJpF75Wab+ub+DXUlcdy6Zz5sP1PhuYEUqhlj+NFwiHIyzMi+HUpByDOADInjiAhwR/X8eHy3fHy6rgKQIpSLtOcmn9RxkgQ4Xsl22QkKKEMk7WfyIOF6hhwv2EUjoK5ZBYGDv9Aj/AU=
+	t=1739441186; cv=none; b=AAwSbQxzaT2puIxIIB/z7BTJmfXqWmLpMNuMJMKAg+et6WkhhYCnlS1/JrFjkKv35yj2P6oMexXVBOCLEMQVAEl0jd/DjbmdS/tqGLFH1WHWlVwWrkB64ubOvwOXT5AgIkQo30RHYHLnKYfLgaCEed58SctAeDsB9JB/BYzvi/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739441184; c=relaxed/simple;
-	bh=DJxCcTIvgxvkOcXrsiG+p2ey37S3EWiB9CRHiiel0eU=;
+	s=arc-20240116; t=1739441186; c=relaxed/simple;
+	bh=Ozsz8BPgoQN4B3zUUqM964eDIDqr49StEvbvIkkoggw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fZptIAYmxyMQMBqffHB9Z5aVVUmB3j3oqizGGxZzkNkJ5Kgaq+Y+oILZELQslSIWcbV2K+hgkR8qalxV8j5nwVaYeP36K67I7ZsrnxpPENRrPQeTaATShkmvhPktrGAlBxWQKsdvYHGv0MNxyyVPH31O1lk6++Fyt9yvg/1iamc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=NdysdoV7; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=pQ0wp7WZNq3sXKIxwh6WPizywuqEJg5xwVLk9uSocm/FW2qXY0MOIKKh5wtUCw/8vzbnFxNs8P5TyrLUEXwjHDmjQRfqiFcxVSja2vokGFADmWXYkRTHSPMYmIv9f3OkerZRwc1L50+TWZFs6TVhYeAbPfGLzOSF33HtiSwwFZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=RNxX7nqo; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="NdysdoV7"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-220bff984a0so11249375ad.3
-        for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 02:06:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="RNxX7nqo"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-220d132f16dso9083115ad.0
+        for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 02:06:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shopee.com; s=shopee.com; t=1739441181; x=1740045981; darn=vger.kernel.org;
+        d=shopee.com; s=shopee.com; t=1739441184; x=1740045984; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+m8QAd9uSlaB0HjndrS8KytyCEE/0f9gjFGlCPLPPrM=;
-        b=NdysdoV7NvU0DhnyJLWRI7mPN+6KTckiiGcSARvMDkMgdbMI/m+z/qBHEvWcZg5PQ+
-         ruBZQOU3v5w/OgIcpm8CL+yXGCPmZ7HaMCDPVdG54si9pRzVPTHo/MEy+VQvr4G+SoRl
-         ZPIHqJT+MsjDEirR/8dZOrXyB2Ei9j/Zy/9nXHey5KGfBXGTblAFm4Kiu/nOguEl/Mvs
-         CFYcAs3tA2hvBrWIreBUQDY4ys8aWy8A/qNH3wacmTLAV+wa5y4fFujU/2obOSTu8k7w
-         w2FHjLqThW8LrZqfytAI9+LBzV3rSEzzFeyGvHjAOS6HrT96QqlTcQd4nDxP0wMJLChA
-         coEQ==
+        bh=zA+PAF0czZRgWnRE67BxncOcnNW40JhC9/ZsrRpE7vo=;
+        b=RNxX7nqo/QV0eic+o41hW13hbz7hbJBEgQL9KZpLd4XmSrGUnDRgau5A4Vipmr53r6
+         LyzNWneeXZWC7xe+wplb/3urdmJmNkjQeGmKbG9YOgx2XAaCoec6xe9t189oM/gfOL4e
+         68bzcx5IqMdNObXhReixvb/9EDtoG2tyb9dBU9YbTIP96CM1CmAf0uMCquFgVPnl4B0N
+         VJRZly26tjECro8Mp8WJiz0gd6ix+3aBwLRoDdsgQmpdhsHGTEByKwk/ZsE32Fl2l49p
+         CfhdX/c8uF2aPw6g2XULHWuOnPmQNP6+MjPaBg+MctDtI52cE0ZlNghPUTGGcuqrwoBX
+         8NcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739441181; x=1740045981;
+        d=1e100.net; s=20230601; t=1739441184; x=1740045984;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+m8QAd9uSlaB0HjndrS8KytyCEE/0f9gjFGlCPLPPrM=;
-        b=ivyeZBux6q6rndEb372NQy5AFRxNWFa2cCEPuWGGz/aIiG3W1UpgnWflpKArGYedkk
-         IPhacHTltvM5K+ykoVbOYgTC6nCGDWNGs/2R8GEdhoXKvcZHqPEpxXns60EcYoT5jvax
-         CwssKjwT3gi64WV8KB3n8tZMnLbdV84SQ8gpMQggiN5MRb9krCwvjvoP91QP+CV//gTx
-         C3l2VOMyBSFM516Fdm+jW5aTuNseUrfxfeh8IPbvK3H5ShVAi+WUr6s5Wgmty4hSqqsW
-         Bo9b2LTM2fj6ece6EnwpBbSVKbHm2GzJRsQdWCi6Hhg9a3tK961nT2/Ugv5eSp/M4Lvc
-         0aVw==
-X-Gm-Message-State: AOJu0YybH/YQEQRUWaW3GtifAH9HMEI1eO/nuRrngikNF4ZI0qJ3wtd8
-	UioF3um6rAZvYDb/68jhKqIdtlMSPaYWTjeAU00xm+f5it4YKTovB4ZEiVHyrP6HyOCM/nyydM9
-	m
-X-Gm-Gg: ASbGncv0/CYhH/nKQXAsQu+BJakCvSt2OKwMZeLRpPN7E1RYmOpqmcryGYLOa8jUtM0
-	flCOQcivBq+dfZVz0ijQFcWqxR460sXClAgzTv6/ZAKjxOLrvwyJKIoxhp9qwSGNZ4RZtE4DpH4
-	WwKEAn4dGqNyRE5y23u8gEH20z4T47FSLTKKzj9s30u/STwSPozhqZLax43Sna1c2HLZAV6SdL6
-	DEgauJXwXohpYMNI/PhObsMTz85g6/IeSjzL+dYxtqrF2s0MbBOsMysUzEJJTJ2mSjHqTpMb6b2
-X-Google-Smtp-Source: AGHT+IGxuPtgToDHNMzvTl6E3kE57/3yPxyNqRc8cQvsoejoYG+WaIRNLunOFh4IquzPAb8kiixx+g==
-X-Received: by 2002:aa7:8881:0:b0:732:2b64:1021 with SMTP id d2e1a72fcca58-7323c1056c9mr3558957b3a.1.1739441181368;
-        Thu, 13 Feb 2025 02:06:21 -0800 (PST)
+        bh=zA+PAF0czZRgWnRE67BxncOcnNW40JhC9/ZsrRpE7vo=;
+        b=rzN1e5PZ206mcswaU/GF7/XLPu7zKml25cF61OcdqJ6/n5pKvfG6Hqg6NNsQWVwZUr
+         YdZm/w2tf/fq3C9nYhGuN00CjZ7aYZyoKQMnx5AwsOHOmuSo8LdGTX5p+3CYs/6ArsXW
+         yZt+fYy40qvxU4f5LlUvUlBnqo+RqYm/cz2J35jkw2I3CZvP9l6J66KNgjRmabweqt69
+         yu1hfhm/u5Ou5xTGr2QKkGjnDpx581NoaZff8ooNnP7WsoKPSERYHMQHshBYJsfua+ia
+         BWhAIgG431F0beBqL7AaaAPTYX8BfUGEtY8AafGlNbP/k1rlvFrUY7At6F69fYB1S1E2
+         2m8A==
+X-Gm-Message-State: AOJu0Yx8irIpCD+WtJdzIL556IbcgiFwr62f4P+19Dt7JBp38IXx99Lc
+	fi7GSluipEkIRYgTrMMu+ZwXi8JX3QBhtUIOCi2wzgogRdlQdDGIjXIx1QJD42M=
+X-Gm-Gg: ASbGncvio1jsPLceP58sYOaHDr3SCbYu//gkhFsvHDBD2ZoOYpAzT8oPQgZeV2z9mgh
+	zYVI1DjII95tVcLanUtN/HCSEuecLSiYwk0Tf4dA9bQirgI29ExUip4o1PdVoVlf0YjUTG5wuP6
+	dfcu28gK5k1PazqTr1WTFrl9yYd9sTQp9ziqG/DsT67FZU7Mou0rjzzj413ZsN3RCux9zcGqOWn
+	M5FSozho/eOrSSQE447dxqZL0YWomD8b1ZvmKkgljsPiyLXB1m8WToINgZviYf9WdEZXk6mVsrF
+X-Google-Smtp-Source: AGHT+IH6BO48+mvk8WAXI15mKey3CU3lO6dOiK5HN7kUT1OgIzkML5rU7vjzyJAMTQ255bPk7+t6Vg==
+X-Received: by 2002:a05:6a21:6d85:b0:1ee:66f6:87ea with SMTP id adf61e73a8af0-1ee66f68ab4mr8632880637.36.1739441183980;
+        Thu, 13 Feb 2025 02:06:23 -0800 (PST)
 Received: from localhost.localdomain ([143.92.64.17])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73242761569sm937442b3a.130.2025.02.13.02.06.18
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73242761569sm937442b3a.130.2025.02.13.02.06.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 02:06:20 -0800 (PST)
+        Thu, 13 Feb 2025 02:06:22 -0800 (PST)
 From: Tang Yizhou <yizhou.tang@shopee.com>
 X-Google-Original-From: Tang Yizhou
 To: yukuai1@huaweicloud.com,
@@ -63,9 +62,9 @@ To: yukuai1@huaweicloud.com,
 Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Tang Yizhou <yizhou.tang@shopee.com>
-Subject: [PATCH v2 1/2] blk-wbt: Fix some comments
-Date: Thu, 13 Feb 2025 18:06:10 +0800
-Message-Id: <20250213100611.209997-2-yizhou.tang@shopee.com>
+Subject: [PATCH v2 2/2] blk-wbt: Cleanup a comment in wb_timer_fn
+Date: Thu, 13 Feb 2025 18:06:11 +0800
+Message-Id: <20250213100611.209997-3-yizhou.tang@shopee.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20250213100611.209997-1-yizhou.tang@shopee.com>
 References: <20250213100611.209997-1-yizhou.tang@shopee.com>
@@ -79,46 +78,31 @@ Content-Transfer-Encoding: 8bit
 
 From: Tang Yizhou <yizhou.tang@shopee.com>
 
-wbt_wait() no longer uses a spinlock as a parameter. Update the function
-comments accordingly.
-
-RWB_UNKNOWN_BUMP is used when we gradually adjust scale_steps toward the
-center state, which is a value of 0.
+The original comment contains a grammatical error. Rewrite it into a more
+easily understandable sentence.
 
 Signed-off-by: Tang Yizhou <yizhou.tang@shopee.com>
 ---
- block/blk-wbt.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ block/blk-wbt.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 6dfc659d22e2..8b73c0c11aec 100644
+index 8b73c0c11aec..f1754d07f7e0 100644
 --- a/block/blk-wbt.c
 +++ b/block/blk-wbt.c
-@@ -136,8 +136,9 @@ enum {
- 	RWB_MIN_WRITE_SAMPLES	= 3,
- 
- 	/*
--	 * If we have this number of consecutive windows with not enough
--	 * information to scale up or down, scale up.
-+	 * If we have this number of consecutive windows without enough
-+	 * information to scale up or down, slowly return to center state
-+	 * (step == 0).
- 	 */
- 	RWB_UNKNOWN_BUMP	= 5,
- };
-@@ -638,11 +639,7 @@ static void wbt_cleanup(struct rq_qos *rqos, struct bio *bio)
- 	__wbt_done(rqos, flags);
- }
- 
--/*
-- * May sleep, if we have exceeded the writeback limits. Caller can pass
-- * in an irq held spinlock, if it holds one when calling this function.
-- * If we do sleep, we'll release and re-grab it.
-- */
-+/* May sleep, if we have exceeded the writeback limits. */
- static void wbt_wait(struct rq_qos *rqos, struct bio *bio)
- {
- 	struct rq_wb *rwb = RQWB(rqos);
+@@ -447,9 +447,9 @@ static void wb_timer_fn(struct blk_stat_callback *cb)
+ 		break;
+ 	case LAT_UNKNOWN_WRITES:
+ 		/*
+-		 * We started a the center step, but don't have a valid
+-		 * read/write sample, but we do have writes going on.
+-		 * Allow step to go negative, to increase write perf.
++		 * We don't have a valid read/write sample, but we do have
++		 * writes going on. Allow step to go negative, to increase
++		 * write performance.
+ 		 */
+ 		scale_up(rwb);
+ 		break;
 -- 
 2.25.1
 
