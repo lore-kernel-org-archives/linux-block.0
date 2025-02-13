@@ -1,108 +1,155 @@
-Received: from smtp.cecloud.com (unknown [1.203.97.240])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB9D35967;
-	Thu, 13 Feb 2025 02:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.203.97.240
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEABC13D53B;
+	Thu, 13 Feb 2025 02:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739412262; cv=none; b=BRiJQGmAVACGcXg9VbniNhoHCBRoEdy3WHJjcK3R0KIaBdocezPd30BbZyIRotPJAt01pE/zmbQWnyI/QjTjDxp8tUQoYcq/j7ylpB7n4t4Ep1TzTvjYOMw9NiZC6cslguklPWBC14VifcWnDEE8TlyDvCtpBhKA5/PbNsiSgeE=
+	t=1739412717; cv=none; b=Q9ot/uqmAHqXbQIwKNF0vTxnU7t1QuOrfx1kbv7IelumyifTeTLHGDl/+eQaJq1ZWn0304wJ0k9rXQQrMCNTrsTzppRKdckDraBhbENIYGja0qKac3PwCu0lXb/JeeHAH29OdVdzpVDwrgtEazGLl+Blr+jm4hbgZVa+mKE2lx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739412262; c=relaxed/simple;
-	bh=NSDRTuga0MkO0W08CvcqI1raHoXXbW7VQYz2Z9EBuow=;
-	h=Date:From:To:Cc:Subject:References:Mime-Version:Message-ID:
-	 Content-Type; b=DBJ4HXB8SESidm13+tjB16naM2Tnm+FOMZNdmEQ2rZpwUzpKb9+EqS1jdHbjBhh6ytBfLRNTzyfdwEW9LJwlyOXYqDmu3tW6OS5ZjeOSqMgBLaCYGPT1vt6i0IEf8/EoJDJaQ2x6FkyzuINsWRL3IgrO1CPUExozJAoArvBXjuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn; spf=pass smtp.mailfrom=cestc.cn; arc=none smtp.client-ip=1.203.97.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cestc.cn
-Received: from localhost (localhost [127.0.0.1])
-	by smtp.cecloud.com (Postfix) with ESMTP id 75D37900112;
-	Thu, 13 Feb 2025 10:04:14 +0800 (CST)
-X-MAIL-GRAY:0
-X-MAIL-DELIVERY:1
-X-SKE-CHECKED:1
-X-ABS-CHECKED:1
-X-ANTISPAM-LEVEL:2
-Received: from desktop-n31qu50 (unknown [39.156.73.12])
-	by smtp.cecloud.com (postfix) whith ESMTP id P3907749T281457503039856S1739412253345638_;
-	Thu, 13 Feb 2025 10:04:13 +0800 (CST)
-X-IP-DOMAINF:1
-X-RL-SENDER:zhang.guanghui@cestc.cn
-X-SENDER:zhang.guanghui@cestc.cn
-X-LOGIN-NAME:zhang.guanghui@cestc.cn
-X-FST-TO:mlombard@bsdbackstore.eu
-X-RCPT-COUNT:9
-X-LOCAL-RCPT-COUNT:0
-X-MUTI-DOMAIN-COUNT:0
-X-SENDER-IP:39.156.73.12
-X-ATTACHMENT-NUM:0
-X-UNIQUE-TAG:<02ea9cf93b2237e61f342787f67686eb>
-X-System-Flag:0
-Date: Thu, 13 Feb 2025 10:04:12 +0800
-From: "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>
-To: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>, 
-	sagi <sagi@grimberg.me>, 
-	mgurtovoy <mgurtovoy@nvidia.com>, 
-	kbusch <kbusch@kernel.org>, 
-	sashal <sashal@kernel.org>, 
-	chunguang.xu <chunguang.xu@shopee.com>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-nvme <linux-nvme@lists.infradead.org>, 
-	linux-block <linux-block@vger.kernel.org>
-Subject: Re: Re: nvme-tcp: fix a possible UAF when failing to send request
-References: <2025021015413817916143@cestc.cn>, 
-	<D7QKRU1EXDXJ.K6ZXC4V4ZD68@bsdbackstore.eu>, 
-	<D7QLI3PYQ877.1KH6K8K08P2IP@bsdbackstore.eu>
-X-Priority: 3
-X-GUID: 6C6F996D-3B8B-4E53-B9DA-DE2606B99DCC
-X-Has-Attach: no
-X-Mailer: Foxmail 7.2.25.331[cn]
+	s=arc-20240116; t=1739412717; c=relaxed/simple;
+	bh=+H9LgLoRZjxEAjGDJGYN7fWN8wLxbFqAfwvrzyUEhA4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AYwYqr9vMawKYvFyI6tawcq4jWawJg6AbAGcyyazYc4tKKD5fFcxrAcY2nJOksbr0TG61eWVqYe7vzyMxHVTeF5/8lie16oi9isMVnm+TYZkgstNZ6TBqAsdPLoUOt4A6QTCl8dAGQ6Xo6L/CeMPVcJmYjFX7q2jJk98V1OQJSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G3+U1JaY; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3+U1JaY"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4395817a7f2so2085045e9.1;
+        Wed, 12 Feb 2025 18:11:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739412714; x=1740017514; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=skYVDgXFqmEuUM4RgZsTMG18T1SoZZZx0KjEqqAoVBo=;
+        b=G3+U1JaY/WPX8sCL5aX54DKxdAW7kdF0kf7HzpcbjPjyskAvZGwWWhDFyhYWMdXHuU
+         m1DB6k7rGW1AYYCfY6c37ROTgwk7mgkrWPuyGXMpKvY2IN4Y6NU5DyMnaAN2zuiOXWXG
+         jOiLokxkL5d/zymdrJ7xRmRBEOANvQ9VVnHv+ntNyW2f8BDJKSXOTxsUCiVAdSvF7NWd
+         tNEaPvCrc7B9g8KXDVO+FG/EON30IRGitp5ioTRcWaz7IcDLMiyKcvp8DQ8RZOK9W3OL
+         ThKfIvkuT1N6KLDWSwZ/BJXkTcNnryfgbmyXeLiwdJreLz1I0zTn10VDgIZmFwP/jOLj
+         /EWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739412714; x=1740017514;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=skYVDgXFqmEuUM4RgZsTMG18T1SoZZZx0KjEqqAoVBo=;
+        b=WUZAMJYbgrPZziJ1W98MZB+dUY5a1yXxBjh+Y2x94JT8x0XJyztfEsV94s4wwVfHBD
+         V17F4gRZcrqWOds8GaLpsHViSrOcPRYTs0MyQk+HRSmY655bDqZBmLD9dYxx2LmUCq9a
+         q7WWN3DGmQPmMUH/t+rheNbUNguEOvxD8CurWSeBIN902neZSJH0S9evSDzqCT6eHmtJ
+         syl1wBGe+tteZFchVH4cSV4HJ4upCcByKl2Il1Dn+tiSljn8sweNO6ptl6So5F6C4EmM
+         RC6ZBQpTy7wYMw14oS85iB67oshsBYl7c+eUiZ2+DVpFbwgttM7IQQkT/HjtU5bnOJFC
+         oIZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWFCOwib3qbmSvrOIiOrzd3pW/28AHvsT7VzQh9LiYs42oMLEu3ofxtHDRgckASKZ3fT86P8BxJB4dtC1o=@vger.kernel.org, AJvYcCXMJBMqwdwrK5XQsoKoRYn52kcfeJcqdzKq05OE4+wFxZGkPnde533uPfDbXoAIWG6qr2H9LDmCng==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP08e01GCXtCxL5ywtFuhwu684Rf2sLiCVjTdSY+DdX3p6K1Qc
+	dyhy+KwhJQ11L2EWatJ4oOmEXlIFTWLNYXWMzAN36i9dKWH78KaayuD4FA==
+X-Gm-Gg: ASbGnctXBAyqS507J7irmCWJVKCtEhAm2rk3gz0Te8X5/iErtztOQNfKPC/PR/P5QC3
+	UbglvMW3KKScbFnml8rqjXXSXnjwRxl3Xwd07phtnkyqHqjXUe6XGET2+/QFcW+qB+JJ8K5n5Qx
+	dd+U1viQi6mf9J3s+Kt4KqUaey6a96LJOKZ7RfnZnz1mp3G2x13Jk9PDyIsDAWvcB0I5HROG02y
+	HY0LY2um8GwqlND7huM/SH+K1Or3k4IlF/uElwZOoFXptflkc42hb752kpcUYI6pIdpfx3gR40c
+	MPWCwYWIXFRUa+urZ/SYUj3G
+X-Google-Smtp-Source: AGHT+IE42MrX9E7h5krDss9uiNGXJ9ZaV1DUzqaiUa470Szx7gqQ3N/+HT+Aww0F6Rbn6dSGon+4Aw==
+X-Received: by 2002:a05:6000:154c:b0:38d:df70:23e7 with SMTP id ffacd0b85a97d-38f245035f5mr1022088f8f.31.1739412713554;
+        Wed, 12 Feb 2025 18:11:53 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.128.10])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258fc7ecsm488736f8f.49.2025.02.12.18.11.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Feb 2025 18:11:51 -0800 (PST)
+Message-ID: <7dae57d9-bdc8-4262-a47d-55befe2f4b73@gmail.com>
+Date: Thu, 13 Feb 2025 02:12:50 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <2025021310041218941132@cestc.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 4/6] ublk: zc register/unregister bvec
+To: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com, axboe@kernel.dk,
+ linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Cc: bernd@bsbernd.com, Keith Busch <kbusch@kernel.org>
+References: <20250211005646.222452-1-kbusch@meta.com>
+ <20250211005646.222452-5-kbusch@meta.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250211005646.222452-5-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-CkhpIArCoMKgwqDCoCBpbnQgZmFjdCwgIHRoZSBjb21taXQgYWVhY2ZjZWZhMjE4ZjRlZDExZGE0
-NzhlOWI3OTE1YTM3ZDFhZmFmZiAgaGFzIGJlZW4gc3luY2hyb25pemVkLCBidXQgdGhlIGlzc3Vl
-IHN0aWxsIG9jY3Vycy4KCsKgwqDCoMKgSSB0aGluayBzbywgd2hlbiB0aGUgaG9zdCBmYWlsaW5n
-IHRvIHNlbmQgcmVxdWVzdCAtMTMsICAgbWF5YmUgb25seSBwYXJ0IG9mIHRoZSBjb21tYW5kIGhh
-cyBiZWVuIHNlbnQgb3IgIHRoZSBjb250cm9sbGVyIGhhcyByZWNldmVkICBhIGNvbXBsZXRlIGNv
-bW1hbmQuCmJ1dCB0aGUgY29udHJvbGxlciBtYXkgc2VuZCBudm1lX3RjcF9yc3AgIGFuZCAgQzJI
-VGVybVJlcSBjb25zZWN1dGl2ZWx5LiAgTm93IEkgYW0gYW5hbHl6aW5nIHRoZSBjb250cm9sbGVy
-IHNwZGsgcHJvY2Vzc2luZyBsb2dpYy4gCndoZW4gdGhlIGhvc3QgdXNlcyBudm1lX3RjcF9wb2xs
-LCAgaXQgcmVjZWl2ZXMgbnZtZV90Y3BfcnNwIGFuZCBoYW5kbGVzIGl0IGZpcnN0bHksICAgIAp0
-aGVuIHRoZSBob3N0ICBoYXZlIGEgVUFGIGFuZCBjcmFzaGVkLiAgIAoKCgoKemhhbmcuZ3Vhbmdo
-dWlAY2VzdGMuY24KCgoKwqAKCgoKRnJvbTrCoE1hdXJpemlvIExvbWJhcmRpCgoKCkRhdGU6wqAy
-MDI1LTAyLTEzwqAwMDowNwoKCgpUbzrCoE1hdXJpemlvIExvbWJhcmRpOyB6aGFuZy5ndWFuZ2h1
-aUBjZXN0Yy5jbjsgc2FnaTsgbWd1cnRvdm95OyBrYnVzY2g7IHNhc2hhbDsgY2h1bmd1YW5nLnh1
-CgoKCkNDOsKgbGludXgta2VybmVsOyBsaW51eC1udm1lOyBsaW51eC1ibG9jawoKCgpTdWJqZWN0
-OsKgUmU6IG52bWUtdGNwOiBmaXggYSBwb3NzaWJsZSBVQUYgd2hlbiBmYWlsaW5nIHRvIHNlbmQg
-cmVxdWVzdAoKCgpPbiBXZWQgRmViIDEyLCAyMDI1IGF0IDQ6MzMgUE0gQ0VULCBNYXVyaXppbyBM
-b21iYXJkaSB3cm90ZToKCgoKPgoKCgo+IFRha2luZyBhIHN0ZXAgYmFjay4gTGV0J3MgdGFrZSBh
-IGRpZmZlcmVudCBhcHByb2FjaCBhbmQgdHJ5IHRvIGF2b2lkIHRoZQoKCgo+IGRvdWJsZSBjb21w
-bGV0aW9uLgoKCgo+CgoKCj4gVGhlIHByb2JsZW0gaGVyZSBpcyB0aGF0IGFwcGFyZW50bHkgd2Ug
-cmVjZWl2ZWQgYSBudm1lX3RjcF9yc3AgY2Fwc3VsZQoKCgo+IGZyb20gdGhlIHRhcmdldCwgbWVh
-bmluZyB0aGF0IHRoZSBjb21tYW5kIGhhcyBiZWVuIHByb2Nlc3NlZCAoSSBndWVzcwoKCgo+IHRo
-ZSBjYXBzdWxlIGhhcyBhbiBlcnJvciBzdGF0dXM/KQoKCgo+CgoKCj4gU28gbWF5YmUgb25seSBw
-YXJ0IG9mIHRoZSBjb21tYW5kIGhhcyBiZWVuIHNlbnQ/CgoKCj4gV2h5IHdlIHJlY2VpdmUgdGhl
-IHJzcCBjYXBzdWxlIGF0IGFsbD8gU2hvdWxkbid0IHRoaXMgYmUgdHJlYXRlZCBhcyBhIGZhdGFs
-CgoKCj4gZXJyb3IgYnkgdGhlIGNvbnRyb2xsZXI/ICAKCi0tCgoKwqAKCgoKwqAKCgoKPiBUaGUg
-TlZNZS9UQ1Agc3BlY2lmaWNhdGlvbiBzYXlzCgoKCsKgCgoKCioqKioqKgoKCgpXaGVuIGEgY29u
-dHJvbGxlciBkZXRlY3RzIGEgZmF0YWwgZXJyb3IsIHRoYXQgY29udHJvbGxlciBzaGFsbDoKCgoK
-wqAgMS4gc3RvcCBwcm9jZXNzaW5nIGFueSBQRFVzIHRoYXQgYXJyaXZlIG9uIHRoZSBjb25uZWN0
-aW9uOyBhbmQKCgoKwqAgMi4gc2VuZCBhIEMySFRlcm1SZXEgUERVCgoKCioqKioqKgoKCgrCoAoK
-CgpBbmQgaW5kZWVkIEkgc2VlIGluIHRoZSBkbWVzZyB0aGlzOgoKCgrCoAoKCgpudm1lIG52bWUy
-OiB1bnN1cHBvcnRlZCBwZHUgdHlwZSAoMykKCgoKwqAKCgoKVGhpcyBtZWFucyB0aGUgY29udHJv
-bGxlciBkZXRlY3RlZCB0aGUgcHJvYmxlbSBhbmQgc2VudCB0byB0aGUgaG9zdCB0aGUKCgoKQzJI
-VGVybVJlcSBjb21tYW5kLiBVcG9uIHJlY2VpdmluZyB0aGlzIGNvbW1hbmQsIHRoZSBob3N0IGlz
-IHN1cHBvc2VkIHRvCgoKCmNsb3NlIHRoZSBjb25uZWN0aW9uLgoKCgrCoAoKCgpOb3cgSSBnZXQg
-aXQuCgoKCsKgCgoKClpoYW5nLCBkbyB5b3UgaGF2ZSBjb21taXQgYWVhY2ZjZWZhMjE4ZjRlZDEx
-ZGE0NzhlOWI3OTE1YTM3ZDFhZmFmZiBpbgoKCgp5b3VyIGtlcm5lbCwgSSBndWVzcyB5b3UgYXJl
-IG1pc3NpbmcgaXQuIENoZWNrIGl0IHBsZWFzZS4KCgoKwqAKCgoKTWF1cml6aW8KCgoKwqAKCgoK
-wqAKCgoKwqAKCgo=
+On 2/11/25 00:56, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Provide new operations for the user to request mapping an active request
+> to an io uring instance's buf_table. The user has to provide the index
+> it wants to install the buffer.
+> 
+> A reference count is taken on the request to ensure it can't be
+> completed while it is active in a ring's buf_table.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>   drivers/block/ublk_drv.c      | 145 +++++++++++++++++++++++++---------
+>   include/uapi/linux/ublk_cmd.h |   4 +
+>   2 files changed, 113 insertions(+), 36 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 529085181f355..ccfda7b2c24da 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -51,6 +51,9 @@
+...
+> +static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
+> +				  struct ublk_queue *ubq, int tag,
+> +				  const struct ublksrv_io_cmd *ub_cmd)
+> +{
+> +	struct io_ring_ctx *ctx = cmd_to_io_kiocb(cmd)->ctx;
+> +	struct ublk_device *ub = cmd->file->private_data;
+> +	int index = (int)ub_cmd->addr;
+> +	struct ublk_rq_data *data;
+> +	struct request *req;
+> +
+> +	if (!ub)
+> +		return -EPERM;
+> +
+> +	req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
+> +	if (!req)
+> +		return -EINVAL;
+> +
+> +	data = blk_mq_rq_to_pdu(req);
+> +	if (!test_and_clear_bit(UBLK_ZC_REGISTERED, &data->flags))
+> +		return -EINVAL;
 
+Why is it cleared here but not when it's auto removed?
+Do you even need it? For example, take the option of not having
+UBLK_U_IO_UNREGISTER_IO_BUF and doing all unregistrations the
+normal io_uring way. Then you install it, and you know it'll
+be released once and no protection needed.
 
+For ublk_unregister_io_buf() it prevents multiple unregistrations,
+even though io_uring would tolerate that, and I don't see
+anything else meaningful going on here on the ublk side.
+
+Btw, if you do it via ublk like this, then I agree, it's an
+additional callback, though it can be made fancier in the
+future. E.g. peeking at the {release,priv} and avoid flagging
+above, and so on (though maybe flagging helps with ref
+overflows).
+
+All that aside, it looks fine in general. The only concern
+is ublk going away before all buffers are released, but
+maybe it does waits for all its requests to compelte?
+
+> +
+> +	io_buffer_unregister_bvec(ctx, index);
+
+Please pass issue_flags into the helper and do conditional
+locking inside. I understand that you rely on IO_URING_F_UNLOCKED
+checks in ublk, but those are an abuse of io_uring internal
+details by ublk. ublk should've never been allowed to interpret
+issue_flags.
+
+-- 
+Pavel Begunkov
 
