@@ -1,70 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C788635E;
-	Thu, 13 Feb 2025 01:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from smtp.cecloud.com (unknown [1.203.97.240])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB9D35967;
+	Thu, 13 Feb 2025 02:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.203.97.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739411917; cv=none; b=H3Y52XqNDxZXffdDFRu1TPUNqjlM9kB4/tD9AKfsBhQi/a25w/EEn1+avMypUprCZtSZdUW4sMERqWfn/MmAqekvS7Y2AwdheUhRp/vrYGEGSY5Kg0B9AvV/juL2JN9vvl7SlgDxAPqRLHn+F5q+gLa82aS0tf7uyeMHwCLWpug=
+	t=1739412262; cv=none; b=BRiJQGmAVACGcXg9VbniNhoHCBRoEdy3WHJjcK3R0KIaBdocezPd30BbZyIRotPJAt01pE/zmbQWnyI/QjTjDxp8tUQoYcq/j7ylpB7n4t4Ep1TzTvjYOMw9NiZC6cslguklPWBC14VifcWnDEE8TlyDvCtpBhKA5/PbNsiSgeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739411917; c=relaxed/simple;
-	bh=NkrVX57Tz0yQt2AyZmpd4CAH+Jh85ASkX/Gz0++Ddi4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EdorcPiZlqS2B2qbSk5xcrl+8qUtURaUKO5TCei7nrQ24Y1KDtmpha4Gn2Kwr5Be66X4SVXVj2ySYnCoYoGULVtrrgbUaDwJNLbQWKvzYRvgziJo8w6yB3rz+gRQ4Xowveqn9P4zG2o/7k2N0frRekJMfWXHC8g4XGavXpi35UM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mv3Qv+PE; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mv3Qv+PE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98B13C4CEDF;
-	Thu, 13 Feb 2025 01:58:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739411917;
-	bh=NkrVX57Tz0yQt2AyZmpd4CAH+Jh85ASkX/Gz0++Ddi4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mv3Qv+PEIQWMAR4+WzASpqW5/QXbAMDrJhuWwqFF7rs6HEv8TBDw6E37PZywss92F
-	 YgOeLTLoYnzml9+tZAg6Pqrtv++9v0F4WzCTIFiiRiTxRcf6HvjrLgeFuGrYoSzkel
-	 miPPUKIVzrUGRdXJLv3GghmQ8Zpl/gi8ZOdtcj7tr8Xyjiou7nc8kMzXiheom7Tj/T
-	 dC+FRNRf/1+gz/DWv93UcZgu65E1ZxSjVGWbICvdnLzXwxilzKXDAMDrDzklyL4OwW
-	 dt1fGuv0cF3EcG3zjxpQk8k4TzKKxqMNthntroD9E2ycT9/kyXIsUQJNUk/CuJpM09
-	 E768V4Jx0dzoQ==
-Date: Wed, 12 Feb 2025 18:58:34 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com, axboe@kernel.dk,
-	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-	bernd@bsbernd.com
-Subject: Re: [PATCHv2 2/6] io_uring: create resource release callback
-Message-ID: <Z61RyrzGbUopEJiV@kbusch-mbp>
-References: <20250211005646.222452-1-kbusch@meta.com>
- <20250211005646.222452-3-kbusch@meta.com>
- <d24b097b-efea-4780-af67-e7a96eb1d784@gmail.com>
+	s=arc-20240116; t=1739412262; c=relaxed/simple;
+	bh=NSDRTuga0MkO0W08CvcqI1raHoXXbW7VQYz2Z9EBuow=;
+	h=Date:From:To:Cc:Subject:References:Mime-Version:Message-ID:
+	 Content-Type; b=DBJ4HXB8SESidm13+tjB16naM2Tnm+FOMZNdmEQ2rZpwUzpKb9+EqS1jdHbjBhh6ytBfLRNTzyfdwEW9LJwlyOXYqDmu3tW6OS5ZjeOSqMgBLaCYGPT1vt6i0IEf8/EoJDJaQ2x6FkyzuINsWRL3IgrO1CPUExozJAoArvBXjuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn; spf=pass smtp.mailfrom=cestc.cn; arc=none smtp.client-ip=1.203.97.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cestc.cn
+Received: from localhost (localhost [127.0.0.1])
+	by smtp.cecloud.com (Postfix) with ESMTP id 75D37900112;
+	Thu, 13 Feb 2025 10:04:14 +0800 (CST)
+X-MAIL-GRAY:0
+X-MAIL-DELIVERY:1
+X-SKE-CHECKED:1
+X-ABS-CHECKED:1
+X-ANTISPAM-LEVEL:2
+Received: from desktop-n31qu50 (unknown [39.156.73.12])
+	by smtp.cecloud.com (postfix) whith ESMTP id P3907749T281457503039856S1739412253345638_;
+	Thu, 13 Feb 2025 10:04:13 +0800 (CST)
+X-IP-DOMAINF:1
+X-RL-SENDER:zhang.guanghui@cestc.cn
+X-SENDER:zhang.guanghui@cestc.cn
+X-LOGIN-NAME:zhang.guanghui@cestc.cn
+X-FST-TO:mlombard@bsdbackstore.eu
+X-RCPT-COUNT:9
+X-LOCAL-RCPT-COUNT:0
+X-MUTI-DOMAIN-COUNT:0
+X-SENDER-IP:39.156.73.12
+X-ATTACHMENT-NUM:0
+X-UNIQUE-TAG:<02ea9cf93b2237e61f342787f67686eb>
+X-System-Flag:0
+Date: Thu, 13 Feb 2025 10:04:12 +0800
+From: "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>
+To: "Maurizio Lombardi" <mlombard@bsdbackstore.eu>, 
+	sagi <sagi@grimberg.me>, 
+	mgurtovoy <mgurtovoy@nvidia.com>, 
+	kbusch <kbusch@kernel.org>, 
+	sashal <sashal@kernel.org>, 
+	chunguang.xu <chunguang.xu@shopee.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-nvme <linux-nvme@lists.infradead.org>, 
+	linux-block <linux-block@vger.kernel.org>
+Subject: Re: Re: nvme-tcp: fix a possible UAF when failing to send request
+References: <2025021015413817916143@cestc.cn>, 
+	<D7QKRU1EXDXJ.K6ZXC4V4ZD68@bsdbackstore.eu>, 
+	<D7QLI3PYQ877.1KH6K8K08P2IP@bsdbackstore.eu>
+X-Priority: 3
+X-GUID: 6C6F996D-3B8B-4E53-B9DA-DE2606B99DCC
+X-Has-Attach: no
+X-Mailer: Foxmail 7.2.25.331[cn]
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d24b097b-efea-4780-af67-e7a96eb1d784@gmail.com>
+Mime-Version: 1.0
+Message-ID: <2025021310041218941132@cestc.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-On Thu, Feb 13, 2025 at 01:31:07AM +0000, Pavel Begunkov wrote:
-> On 2/11/25 00:56, Keith Busch wrote:
-> > @@ -24,6 +24,9 @@ struct io_rsrc_node {
-> >   		unsigned long file_ptr;
-> >   		struct io_mapped_ubuf *buf;
-> >   	};
-> > +
-> > +	void (*release)(void *);
-> > +	void *priv;
-> 
-> Nodes are more generic than buffers. Unless we want to reuse it
-> for files, and I very much doubt that, it should move into
-> io_mapped_ubuf.
+CkhpIArCoMKgwqDCoCBpbnQgZmFjdCwgIHRoZSBjb21taXQgYWVhY2ZjZWZhMjE4ZjRlZDExZGE0
+NzhlOWI3OTE1YTM3ZDFhZmFmZiAgaGFzIGJlZW4gc3luY2hyb25pemVkLCBidXQgdGhlIGlzc3Vl
+IHN0aWxsIG9jY3Vycy4KCsKgwqDCoMKgSSB0aGluayBzbywgd2hlbiB0aGUgaG9zdCBmYWlsaW5n
+IHRvIHNlbmQgcmVxdWVzdCAtMTMsICAgbWF5YmUgb25seSBwYXJ0IG9mIHRoZSBjb21tYW5kIGhh
+cyBiZWVuIHNlbnQgb3IgIHRoZSBjb250cm9sbGVyIGhhcyByZWNldmVkICBhIGNvbXBsZXRlIGNv
+bW1hbmQuCmJ1dCB0aGUgY29udHJvbGxlciBtYXkgc2VuZCBudm1lX3RjcF9yc3AgIGFuZCAgQzJI
+VGVybVJlcSBjb25zZWN1dGl2ZWx5LiAgTm93IEkgYW0gYW5hbHl6aW5nIHRoZSBjb250cm9sbGVy
+IHNwZGsgcHJvY2Vzc2luZyBsb2dpYy4gCndoZW4gdGhlIGhvc3QgdXNlcyBudm1lX3RjcF9wb2xs
+LCAgaXQgcmVjZWl2ZXMgbnZtZV90Y3BfcnNwIGFuZCBoYW5kbGVzIGl0IGZpcnN0bHksICAgIAp0
+aGVuIHRoZSBob3N0ICBoYXZlIGEgVUFGIGFuZCBjcmFzaGVkLiAgIAoKCgoKemhhbmcuZ3Vhbmdo
+dWlAY2VzdGMuY24KCgoKwqAKCgoKRnJvbTrCoE1hdXJpemlvIExvbWJhcmRpCgoKCkRhdGU6wqAy
+MDI1LTAyLTEzwqAwMDowNwoKCgpUbzrCoE1hdXJpemlvIExvbWJhcmRpOyB6aGFuZy5ndWFuZ2h1
+aUBjZXN0Yy5jbjsgc2FnaTsgbWd1cnRvdm95OyBrYnVzY2g7IHNhc2hhbDsgY2h1bmd1YW5nLnh1
+CgoKCkNDOsKgbGludXgta2VybmVsOyBsaW51eC1udm1lOyBsaW51eC1ibG9jawoKCgpTdWJqZWN0
+OsKgUmU6IG52bWUtdGNwOiBmaXggYSBwb3NzaWJsZSBVQUYgd2hlbiBmYWlsaW5nIHRvIHNlbmQg
+cmVxdWVzdAoKCgpPbiBXZWQgRmViIDEyLCAyMDI1IGF0IDQ6MzMgUE0gQ0VULCBNYXVyaXppbyBM
+b21iYXJkaSB3cm90ZToKCgoKPgoKCgo+IFRha2luZyBhIHN0ZXAgYmFjay4gTGV0J3MgdGFrZSBh
+IGRpZmZlcmVudCBhcHByb2FjaCBhbmQgdHJ5IHRvIGF2b2lkIHRoZQoKCgo+IGRvdWJsZSBjb21w
+bGV0aW9uLgoKCgo+CgoKCj4gVGhlIHByb2JsZW0gaGVyZSBpcyB0aGF0IGFwcGFyZW50bHkgd2Ug
+cmVjZWl2ZWQgYSBudm1lX3RjcF9yc3AgY2Fwc3VsZQoKCgo+IGZyb20gdGhlIHRhcmdldCwgbWVh
+bmluZyB0aGF0IHRoZSBjb21tYW5kIGhhcyBiZWVuIHByb2Nlc3NlZCAoSSBndWVzcwoKCgo+IHRo
+ZSBjYXBzdWxlIGhhcyBhbiBlcnJvciBzdGF0dXM/KQoKCgo+CgoKCj4gU28gbWF5YmUgb25seSBw
+YXJ0IG9mIHRoZSBjb21tYW5kIGhhcyBiZWVuIHNlbnQ/CgoKCj4gV2h5IHdlIHJlY2VpdmUgdGhl
+IHJzcCBjYXBzdWxlIGF0IGFsbD8gU2hvdWxkbid0IHRoaXMgYmUgdHJlYXRlZCBhcyBhIGZhdGFs
+CgoKCj4gZXJyb3IgYnkgdGhlIGNvbnRyb2xsZXI/ICAKCi0tCgoKwqAKCgoKwqAKCgoKPiBUaGUg
+TlZNZS9UQ1Agc3BlY2lmaWNhdGlvbiBzYXlzCgoKCsKgCgoKCioqKioqKgoKCgpXaGVuIGEgY29u
+dHJvbGxlciBkZXRlY3RzIGEgZmF0YWwgZXJyb3IsIHRoYXQgY29udHJvbGxlciBzaGFsbDoKCgoK
+wqAgMS4gc3RvcCBwcm9jZXNzaW5nIGFueSBQRFVzIHRoYXQgYXJyaXZlIG9uIHRoZSBjb25uZWN0
+aW9uOyBhbmQKCgoKwqAgMi4gc2VuZCBhIEMySFRlcm1SZXEgUERVCgoKCioqKioqKgoKCgrCoAoK
+CgpBbmQgaW5kZWVkIEkgc2VlIGluIHRoZSBkbWVzZyB0aGlzOgoKCgrCoAoKCgpudm1lIG52bWUy
+OiB1bnN1cHBvcnRlZCBwZHUgdHlwZSAoMykKCgoKwqAKCgoKVGhpcyBtZWFucyB0aGUgY29udHJv
+bGxlciBkZXRlY3RlZCB0aGUgcHJvYmxlbSBhbmQgc2VudCB0byB0aGUgaG9zdCB0aGUKCgoKQzJI
+VGVybVJlcSBjb21tYW5kLiBVcG9uIHJlY2VpdmluZyB0aGlzIGNvbW1hbmQsIHRoZSBob3N0IGlz
+IHN1cHBvc2VkIHRvCgoKCmNsb3NlIHRoZSBjb25uZWN0aW9uLgoKCgrCoAoKCgpOb3cgSSBnZXQg
+aXQuCgoKCsKgCgoKClpoYW5nLCBkbyB5b3UgaGF2ZSBjb21taXQgYWVhY2ZjZWZhMjE4ZjRlZDEx
+ZGE0NzhlOWI3OTE1YTM3ZDFhZmFmZiBpbgoKCgp5b3VyIGtlcm5lbCwgSSBndWVzcyB5b3UgYXJl
+IG1pc3NpbmcgaXQuIENoZWNrIGl0IHBsZWFzZS4KCgoKwqAKCgoKTWF1cml6aW8KCgoKwqAKCgoK
+wqAKCgoKwqAKCgo=
 
-Good point. Cloning is another reason it should be in the imu.
 
-If we want to save space, the "KBUFFER" type doesn't need ubuf or
-folio_shift, so we could even union the new fields to prevent imu from
-getting any bigger. The downside would be we can't use "release" to
-distinguish kernel vs user buffers, which you suggested in that patch's
-thread. Which option do you prefer?
+
