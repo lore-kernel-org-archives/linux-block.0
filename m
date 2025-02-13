@@ -1,155 +1,118 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEABC13D53B;
-	Thu, 13 Feb 2025 02:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B07E2040AB
+	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 02:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739412717; cv=none; b=Q9ot/uqmAHqXbQIwKNF0vTxnU7t1QuOrfx1kbv7IelumyifTeTLHGDl/+eQaJq1ZWn0304wJ0k9rXQQrMCNTrsTzppRKdckDraBhbENIYGja0qKac3PwCu0lXb/JeeHAH29OdVdzpVDwrgtEazGLl+Blr+jm4hbgZVa+mKE2lx4=
+	t=1739414558; cv=none; b=VFBuV8swXJMytz3hj+UscHDzjcoRMy9n8YHxHosX4LFPWYX/l6JupU13/7OjuT18dD08hhP1KMp0bq+PQHCbyBzaccMQ+GNeCskIYW2hfW5I4TdV3KWL5r0vUJjBvFtvEu/4VZUrKATOYf5OlQIl791i7WRGw87ZPH5LZV8GAVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739412717; c=relaxed/simple;
-	bh=+H9LgLoRZjxEAjGDJGYN7fWN8wLxbFqAfwvrzyUEhA4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AYwYqr9vMawKYvFyI6tawcq4jWawJg6AbAGcyyazYc4tKKD5fFcxrAcY2nJOksbr0TG61eWVqYe7vzyMxHVTeF5/8lie16oi9isMVnm+TYZkgstNZ6TBqAsdPLoUOt4A6QTCl8dAGQ6Xo6L/CeMPVcJmYjFX7q2jJk98V1OQJSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G3+U1JaY; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3+U1JaY"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4395817a7f2so2085045e9.1;
-        Wed, 12 Feb 2025 18:11:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739412714; x=1740017514; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=skYVDgXFqmEuUM4RgZsTMG18T1SoZZZx0KjEqqAoVBo=;
-        b=G3+U1JaY/WPX8sCL5aX54DKxdAW7kdF0kf7HzpcbjPjyskAvZGwWWhDFyhYWMdXHuU
-         m1DB6k7rGW1AYYCfY6c37ROTgwk7mgkrWPuyGXMpKvY2IN4Y6NU5DyMnaAN2zuiOXWXG
-         jOiLokxkL5d/zymdrJ7xRmRBEOANvQ9VVnHv+ntNyW2f8BDJKSXOTxsUCiVAdSvF7NWd
-         tNEaPvCrc7B9g8KXDVO+FG/EON30IRGitp5ioTRcWaz7IcDLMiyKcvp8DQ8RZOK9W3OL
-         ThKfIvkuT1N6KLDWSwZ/BJXkTcNnryfgbmyXeLiwdJreLz1I0zTn10VDgIZmFwP/jOLj
-         /EWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739412714; x=1740017514;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=skYVDgXFqmEuUM4RgZsTMG18T1SoZZZx0KjEqqAoVBo=;
-        b=WUZAMJYbgrPZziJ1W98MZB+dUY5a1yXxBjh+Y2x94JT8x0XJyztfEsV94s4wwVfHBD
-         V17F4gRZcrqWOds8GaLpsHViSrOcPRYTs0MyQk+HRSmY655bDqZBmLD9dYxx2LmUCq9a
-         q7WWN3DGmQPmMUH/t+rheNbUNguEOvxD8CurWSeBIN902neZSJH0S9evSDzqCT6eHmtJ
-         syl1wBGe+tteZFchVH4cSV4HJ4upCcByKl2Il1Dn+tiSljn8sweNO6ptl6So5F6C4EmM
-         RC6ZBQpTy7wYMw14oS85iB67oshsBYl7c+eUiZ2+DVpFbwgttM7IQQkT/HjtU5bnOJFC
-         oIZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWFCOwib3qbmSvrOIiOrzd3pW/28AHvsT7VzQh9LiYs42oMLEu3ofxtHDRgckASKZ3fT86P8BxJB4dtC1o=@vger.kernel.org, AJvYcCXMJBMqwdwrK5XQsoKoRYn52kcfeJcqdzKq05OE4+wFxZGkPnde533uPfDbXoAIWG6qr2H9LDmCng==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzP08e01GCXtCxL5ywtFuhwu684Rf2sLiCVjTdSY+DdX3p6K1Qc
-	dyhy+KwhJQ11L2EWatJ4oOmEXlIFTWLNYXWMzAN36i9dKWH78KaayuD4FA==
-X-Gm-Gg: ASbGnctXBAyqS507J7irmCWJVKCtEhAm2rk3gz0Te8X5/iErtztOQNfKPC/PR/P5QC3
-	UbglvMW3KKScbFnml8rqjXXSXnjwRxl3Xwd07phtnkyqHqjXUe6XGET2+/QFcW+qB+JJ8K5n5Qx
-	dd+U1viQi6mf9J3s+Kt4KqUaey6a96LJOKZ7RfnZnz1mp3G2x13Jk9PDyIsDAWvcB0I5HROG02y
-	HY0LY2um8GwqlND7huM/SH+K1Or3k4IlF/uElwZOoFXptflkc42hb752kpcUYI6pIdpfx3gR40c
-	MPWCwYWIXFRUa+urZ/SYUj3G
-X-Google-Smtp-Source: AGHT+IE42MrX9E7h5krDss9uiNGXJ9ZaV1DUzqaiUa470Szx7gqQ3N/+HT+Aww0F6Rbn6dSGon+4Aw==
-X-Received: by 2002:a05:6000:154c:b0:38d:df70:23e7 with SMTP id ffacd0b85a97d-38f245035f5mr1022088f8f.31.1739412713554;
-        Wed, 12 Feb 2025 18:11:53 -0800 (PST)
-Received: from [192.168.8.100] ([148.252.128.10])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258fc7ecsm488736f8f.49.2025.02.12.18.11.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Feb 2025 18:11:51 -0800 (PST)
-Message-ID: <7dae57d9-bdc8-4262-a47d-55befe2f4b73@gmail.com>
-Date: Thu, 13 Feb 2025 02:12:50 +0000
+	s=arc-20240116; t=1739414558; c=relaxed/simple;
+	bh=19Q1Ju85GtWgTs+zydyPb2txwMZXp8W6Tzek87vllNE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=JTKE2C5tAV59DKoIO/BRFyeBw9zOcWngM2Y8T8RCUbHMRpt1qLqF9K1MVC23qStyuXUstAfeqd2vo+MdiaJJcwdYz8MHiXlUrEtrNkOaz3M7Wo4PKKPFfxraQRQcLvDbcp4ENY1ZH+5QGYIuxZKPgwI0bW28lUBSjeclT1W3G9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YtfbV1MB3z4f3jq4
+	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 10:42:14 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 460AC1A0BF0
+	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 10:42:30 +0800 (CST)
+Received: from [10.174.179.143] (unknown [10.174.179.143])
+	by APP4 (Coremail) with SMTP id gCh0CgAXe18UXK1nfHPGDg--.9490S3;
+	Thu, 13 Feb 2025 10:42:30 +0800 (CST)
+Subject: Re: [PATCH RFC] block: print the real address of request in debugfs
+To: Guixin Liu <kanie@linux.alibaba.com>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <20250208035224.128454-1-kanie@linux.alibaba.com>
+ <ce305c08-af9b-4f4f-86ca-3832791bb7a4@linux.alibaba.com>
+From: Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <9c7e0983-aae2-f0be-a1ac-a36b74a757e8@huaweicloud.com>
+Date: Thu, 13 Feb 2025 10:42:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 4/6] ublk: zc register/unregister bvec
-To: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com, axboe@kernel.dk,
- linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Cc: bernd@bsbernd.com, Keith Busch <kbusch@kernel.org>
-References: <20250211005646.222452-1-kbusch@meta.com>
- <20250211005646.222452-5-kbusch@meta.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250211005646.222452-5-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <ce305c08-af9b-4f4f-86ca-3832791bb7a4@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAXe18UXK1nfHPGDg--.9490S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxJrWfZF4fGr1fur4Dtw47Jwb_yoW8WFyrp3
+	93C3WrGrWDZr1F9F1qqa15X3yfGr4kKF1UXF90kF1rArnxW34aqr1q9rWYgF97Wrs5Ja1a
+	qF4xtr97uF1Uua7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyKb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+	xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
+	7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUzsqWUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 
-On 2/11/25 00:56, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
+Hi,
+
+在 2025/02/12 17:55, Guixin Liu 写道:
+> Gently ping...
 > 
-> Provide new operations for the user to request mapping an active request
-> to an io uring instance's buf_table. The user has to provide the index
-> it wants to install the buffer.
+> Best Regards,
 > 
-> A reference count is taken on the request to ensure it can't be
-> completed while it is active in a ring's buf_table.
+> Guixin Liu
 > 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->   drivers/block/ublk_drv.c      | 145 +++++++++++++++++++++++++---------
->   include/uapi/linux/ublk_cmd.h |   4 +
->   2 files changed, 113 insertions(+), 36 deletions(-)
+> 在 2025/2/8 11:52, Guixin Liu 写道:
+>> Since only root user can access debugfs, for easier issue
+>> identification, use '%px' to print the request's real address in
+>> debugfs.
+
+I search and find out that %p is introduced in the first commit:
+
+320ae51feed5 ("blk-mq: new multi-queue block IO queueing mechanism").
+
+I think usually we should not print address by debugfs, and I don't see
+why this is needed here. For root user trying to debug, the tag
+information should be enough.
+
+Just wonder maybe we can just remove this.
+
+Thanks,
+Kuai
+>>
+>> Signed-off-by: Guixin Liu <kanie@linux.alibaba.com>
+>> ---
+>> Hi,
+>>    I notice that block dont print the real address in
+>> debugfs for a long time, I wonder what the community's
+>> concerns are, thanks, so this is a RFC patch.
+>> Best Regards,
+>> Guixin Liu
+>>
+>>   block/blk-mq-debugfs.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+>> index adf5f0697b6b..c430d931512f 100644
+>> --- a/block/blk-mq-debugfs.c
+>> +++ b/block/blk-mq-debugfs.c
+>> @@ -265,7 +265,7 @@ int __blk_mq_debugfs_rq_show(struct seq_file *m, 
+>> struct request *rq)
+>>       BUILD_BUG_ON(ARRAY_SIZE(cmd_flag_name) != __REQ_NR_BITS);
+>>       BUILD_BUG_ON(ARRAY_SIZE(rqf_name) != __RQF_BITS);
+>> -    seq_printf(m, "%p {.op=", rq);
+>> +    seq_printf(m, "%px {.op=", rq);
+>>       if (strcmp(op_str, "UNKNOWN") == 0)
+>>           seq_printf(m, "%u", op);
+>>       else
 > 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 529085181f355..ccfda7b2c24da 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -51,6 +51,9 @@
-...
-> +static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
-> +				  struct ublk_queue *ubq, int tag,
-> +				  const struct ublksrv_io_cmd *ub_cmd)
-> +{
-> +	struct io_ring_ctx *ctx = cmd_to_io_kiocb(cmd)->ctx;
-> +	struct ublk_device *ub = cmd->file->private_data;
-> +	int index = (int)ub_cmd->addr;
-> +	struct ublk_rq_data *data;
-> +	struct request *req;
-> +
-> +	if (!ub)
-> +		return -EPERM;
-> +
-> +	req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
-> +	if (!req)
-> +		return -EINVAL;
-> +
-> +	data = blk_mq_rq_to_pdu(req);
-> +	if (!test_and_clear_bit(UBLK_ZC_REGISTERED, &data->flags))
-> +		return -EINVAL;
-
-Why is it cleared here but not when it's auto removed?
-Do you even need it? For example, take the option of not having
-UBLK_U_IO_UNREGISTER_IO_BUF and doing all unregistrations the
-normal io_uring way. Then you install it, and you know it'll
-be released once and no protection needed.
-
-For ublk_unregister_io_buf() it prevents multiple unregistrations,
-even though io_uring would tolerate that, and I don't see
-anything else meaningful going on here on the ublk side.
-
-Btw, if you do it via ublk like this, then I agree, it's an
-additional callback, though it can be made fancier in the
-future. E.g. peeking at the {release,priv} and avoid flagging
-above, and so on (though maybe flagging helps with ref
-overflows).
-
-All that aside, it looks fine in general. The only concern
-is ublk going away before all buffers are released, but
-maybe it does waits for all its requests to compelte?
-
-> +
-> +	io_buffer_unregister_bvec(ctx, index);
-
-Please pass issue_flags into the helper and do conditional
-locking inside. I understand that you rely on IO_URING_F_UNLOCKED
-checks in ublk, but those are an abuse of io_uring internal
-details by ublk. ublk should've never been allowed to interpret
-issue_flags.
-
--- 
-Pavel Begunkov
+> .
+> 
 
