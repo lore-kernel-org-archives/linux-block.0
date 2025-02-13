@@ -1,112 +1,80 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E20221732;
-	Thu, 13 Feb 2025 13:05:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13DA281358
+	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 14:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739451925; cv=none; b=gSWvja54UMHxmP2X36D78j4Yi4DUjYhmCRz2zXq+cJjbJZlOL281F7ZGajipQMa6hYO+OVRbyvtZvwpg0wL4t3JNckB1VtdE2h81AxxrXugxuFj9PD7WGLYIu+8LW7za6cuKrzradGe78B4AuHRmmxkVXlQA4tHTG9/TKZQ9GkE=
+	t=1739456327; cv=none; b=ZINbUtJ/yP617MmFy4NVOAsIzJeEPKZfWWUyHazNuZyxpBFrtXZXSEPdtBZ4OhblwssazL/KH2lxD3bwacFhBDMfWDus5XNAjHkJb0FZdUOKrif4jSzWVNtJcNwqlJBs8If3WQzryVEgkAMVMcobi8+anGr7wCyoStPgij/OynY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739451925; c=relaxed/simple;
-	bh=5sRXnAuIDnV9G1PR0cGWGV+JxP3Fg8Z/BulcXwoHT64=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ncBi1IPJ3zoHbmS2UkfmeOx+Py7vpc8iHtrIQZfetNc0VkgV9yFgbGodzuH2s3rxQXYvFN65pPNejehvmj6McwER6vGhDNLzrHNF8Bv5bEP2Viwm9M8HoRbR3HoBKWWX3Qdf02p2YOvVgntMlsG3xHrjCc+XU3dHmW5CqlboKUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IOIaBnkg; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739456327; c=relaxed/simple;
+	bh=7GhCq0iWszfiJSYQtVIZWHEO/m2l7MjDTYqD56ItfnQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jM3QY4Dt9d2f9sKnmC1A7juTcBVS9NRlCrX5BunJTMFFkWf97Vm/ntxANok//dS9Q8AOcho6oA+JOq/3abCp53LIdqn8EV/yKJ7wCDE8gUsV8BIj/7yMGjIUrXhv/JchBIljWZYFbQvYClAnB5wAgTN5Qjh4k3D+D9z6V+Hw7VU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VOsWf9eF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IOIaBnkg"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-aaeec07b705so135504166b.2;
-        Thu, 13 Feb 2025 05:05:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739451922; x=1740056722; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j7nlq4sRW/jfEWtTZUkxQePXzlNZHm3lMS/O1Lofcy4=;
-        b=IOIaBnkgVLsxooh6iwUh4L8KUVr03mncaSDgIVlZ/YzMf2kYjMdIcgGU/eCtN6aK9L
-         BGqKaFZDZLqi+mfa78Ieo3CBE/Ciq/FgmwtLFmhSDnUnetMJ3+GuiY8Ur/jJ6a+BcLtC
-         C3AdVdBOzFlSC52r5GfOEGQEtNqFJ5PP7cNLQGHLnm176vmi+eKv55F+w7E0QWoDVhg4
-         Kcb85/Fh9WDZLbNOczYp8QzwXCqe3GdB1X3tp5wzYuzlnLAHonbTZyGVX2B3cgD61mq0
-         o1wkW65tPNQ8nF8FrqbYxtcXMDlJ8kuAMb99xs9fyvLuXO9Yp5W5hzotV6hwpoRVhki7
-         9qFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739451922; x=1740056722;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j7nlq4sRW/jfEWtTZUkxQePXzlNZHm3lMS/O1Lofcy4=;
-        b=ZH0U5E6fCQJd+oDRctXrme3W42gpbAoxGuAW6l3zyH8K5RtootWFU5RxaeDc4iVXml
-         bkC59q0qGMQgTe5yNrieFFCkJaYXg7oJYJNjaEG8fAQstKJ7jL/KH0w0tg2PXhrIWEN2
-         5Fpk9sORppnQhDeE0tZr7al9f0kAgeAvkFMwtS364guCiBp6Yk3N8pA9W4sV1hh/A80B
-         Za2Tdrp/DlskPiLPLFtnQgnlKj9eh+1w1Xk2yRjvP3lp/vbOWFN2rd0SKuGyb8j+h44R
-         6ffMkJ+soKGsc+cfUhHl5yf4U9NXFxQjDBYQFvHOmINeKAUB9W4FGC4kZJXgfhktB1pT
-         9r1g==
-X-Forwarded-Encrypted: i=1; AJvYcCU+hjVfuRPlzqFKPNXQvjWuY0sDvxX1f9TQx3DHTUSMMz+fGPlNidi8vZDScrrcYoXTD4lPfq71X7g3CnA=@vger.kernel.org, AJvYcCXJOtxk2TnZO9xuzyB61d92LdVKttWqqdQ6dS4sfhcOZHbeLNFZo33a+773gWch0HjHpiD/0K94fw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YywWErcndeTXALXLq0Bg1dX/eqQf+RbskygS3mySYGwBLy+NYy0
-	UHrkd8OEZ7QMXz1mhqyOX33U9UUPhOxkzSuT3qMkeImpPr/JhelA
-X-Gm-Gg: ASbGncsjpDO+nFmEMvGdMY71WfA0MqQuDb+s7U1SR5xQ21QCXOC1j/KxdLZSwfO90wB
-	pTFv+O5yWbTZHSBPcinbolIzlrwerkrq93fgTIZ5acxJbwiSqidueCzP3YflKQbZhUKfdD+/XNu
-	rMvZPDP6YMD03eGVwaPD8+rPGy/B65skBCGxXEO5dOkBM0yWhkN6iLphz8qSLvm/0HTW2m2Q63V
-	mKDv0Iu++/sZYKnYQCARyodz4dmuav26TsQ+nmIfRwJ3JiZvSt9phbIRiJ4/DBtZ64C4UrmuDU8
-	296tbQKUafZO+rFpxQWGT1Idgq5J/xHqA/cOYzGIPB+hET8L
-X-Google-Smtp-Source: AGHT+IE3E4rGqxr3FNOBb/jDXogjBKuZT/raDLcNUJEcKCyILbMeEgGu7eOnXJDCmMpoxLu4NGs+UQ==
-X-Received: by 2002:a05:6402:4303:b0:5d3:bc03:cb7a with SMTP id 4fb4d7f45d1cf-5deade00868mr6858071a12.27.1739451916024;
-        Thu, 13 Feb 2025 05:05:16 -0800 (PST)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:1ba9])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dece270967sm1149131a12.55.2025.02.13.05.05.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 05:05:15 -0800 (PST)
-Message-ID: <1f751a9a-fbf9-4375-a3c9-293d265b6c82@gmail.com>
-Date: Thu, 13 Feb 2025 13:06:14 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VOsWf9eF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDC8CC4CED1;
+	Thu, 13 Feb 2025 14:18:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739456326;
+	bh=7GhCq0iWszfiJSYQtVIZWHEO/m2l7MjDTYqD56ItfnQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VOsWf9eF0tIq0dnCjrReTuv8tlu3t2FXEnZCqKwDtuLIt8tSEqfJBK9RiOtoEBVWA
+	 vBGT8nW/VRxDhOzZtvW1ASmtqU5BbAl+7fthh5a2lDBNTe1Gg+PNCfwsBgQ4HiAQEQ
+	 3Kecj26BRdeSDhdWo3dIzKY7EGhoeTG+qSiVlw3JFegc0nea/HyXUB+nse+5t+Xftf
+	 FxrMxuRnTqgCnR/K4uqklmz9Rj1EHUO+Q4Y1pun0kvWExnBGmYSilkwB8S1ZAXu0hR
+	 yjbp4N5HwUEjhvUCdUlBsLFe9iUapKVVgCekVYQ1ylGsC+1zi/vU9SDwDcDHaZR38N
+	 sd4ishmRS7emw==
+Date: Thu, 13 Feb 2025 15:18:43 +0100
+From: Daniel Gomez <da.gomez@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Yi Zhang <yi.zhang@redhat.com>, John Garry <john.g.garry@oracle.com>, 
+	Bart Van Assche <bvanassche@acm.org>, Keith Busch <kbusch@kernel.org>, 
+	Daniel Gomez <da.gomez@samsung.com>
+Subject: Re: [PATCH V2] block: make segment size limit workable for > 4K
+ PAGE_SIZE
+Message-ID: <csvt2osvntbtvqveufnsiv2dhinz46z744fx4mgjarbd3twg45@k7zm3jv4k2xb>
+References: <20250210090319.1519778-1-ming.lei@redhat.com>
+ <Z6peww6d3EP5-B8n@bombadil.infradead.org>
+ <Z6qxnAEMeTVW-wK-@fedora>
+ <t2o3dadb744eyzy7v6jta3gdjgscpttf4s3abqm2mndk5mvwjl@hbvl7vzv6foj>
+ <Z62nJqXu_et99D02@fedora>
+ <Z62tpanLQgFK8j0i@infradead.org>
+ <Z62yq9bbxWwPvJot@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 2/6] io_uring: create resource release callback
-To: Keith Busch <kbusch@kernel.org>
-Cc: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com, axboe@kernel.dk,
- linux-block@vger.kernel.org, io-uring@vger.kernel.org, bernd@bsbernd.com
-References: <20250211005646.222452-1-kbusch@meta.com>
- <20250211005646.222452-3-kbusch@meta.com>
- <d24b097b-efea-4780-af67-e7a96eb1d784@gmail.com>
- <Z61RyrzGbUopEJiV@kbusch-mbp>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <Z61RyrzGbUopEJiV@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z62yq9bbxWwPvJot@fedora>
 
-On 2/13/25 01:58, Keith Busch wrote:
-> On Thu, Feb 13, 2025 at 01:31:07AM +0000, Pavel Begunkov wrote:
->> On 2/11/25 00:56, Keith Busch wrote:
->>> @@ -24,6 +24,9 @@ struct io_rsrc_node {
->>>    		unsigned long file_ptr;
->>>    		struct io_mapped_ubuf *buf;
->>>    	};
->>> +
->>> +	void (*release)(void *);
->>> +	void *priv;
->>
->> Nodes are more generic than buffers. Unless we want to reuse it
->> for files, and I very much doubt that, it should move into
->> io_mapped_ubuf.
+On Thu, Feb 13, 2025 at 04:51:55PM +0100, Ming Lei wrote:
+> On Thu, Feb 13, 2025 at 12:30:29AM -0800, Christoph Hellwig wrote:
+> > On Thu, Feb 13, 2025 at 04:02:46PM +0800, Ming Lei wrote:
+> > > The problem[1] is that this kind of mmc card fails to be recognized as
+> > > block disk. Block layer io split code can handle this case actually.
+> > 
+> > When we still had bio_add_pc_page it would break the assumption that
+> > you could always add a full page.  With that gone and everything going
+> > through the split machinery we might be fine now, but backporting it
+> > to 6.13 and earlier will cause breakage.
+>  
+> Yes, I will mention the following two are depended for backporting in
+> commit log:
 > 
-> Good point. Cloning is another reason it should be in the imu.
+> 02ee5d69e3ba block: remove blk_rq_bio_prep
+> 6aeb4f836480 block: remove bio_add_pc_page
+
+Ming, is that sufficient for your use case? Or do you still need to remove the
+assumption that the "minimum" segment size is not PAGE_SIZE?
+
 > 
-> If we want to save space, the "KBUFFER" type doesn't need ubuf or
-> folio_shift, so we could even union the new fields to prevent imu from
-> getting any bigger. The downside would be we can't use "release" to
-> distinguish kernel vs user buffers, which you suggested in that patch's
-> thread. Which option do you prefer?
-
-I think we can just grow the struct for now, it's not a big
-problem, and follow up on that separately. Should make it
-easier for the series as well.
-
--- 
-Pavel Begunkov
-
+> Thanks, 
+> Ming
+> 
