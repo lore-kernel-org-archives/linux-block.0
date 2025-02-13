@@ -1,116 +1,160 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26D186349;
-	Thu, 13 Feb 2025 01:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF2784D13
+	for <linux-block@vger.kernel.org>; Thu, 13 Feb 2025 01:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739410039; cv=none; b=Y/jIof7qHiLdpjmZ3pSo2w52v4ULeSKEfwcInZbNfvB1MPek8qe9xpPjfBvD4Z9Fv+Or5n6Jqcqx6BnSkGemedqMWKg525ay1rvNT2cw6HEpFZNniKuw83l0NJ3t+Ey9GPaw+OM5xuUZ5kkXIKp8e8leaxhiFy1hQaeB15/nlZQ=
+	t=1739410210; cv=none; b=diM0tMRJt+D9GgKFFYUBcNPmRUW1/asuULD4xsbAXnQ37QZNh8GQLqOmXBw/+tnYkx0N0an6YBx/LH8VqGKh/5iCXTxD9Dvc/ihGwuAwUL4LDUxvIrCWt1NWSK75fEhFymNxrNEojoV8gH3C8oJHsdTu8YVVYvmvaOFoljd+UHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739410039; c=relaxed/simple;
-	bh=TCm5BAMNTDYEnSG5kZoN/Oq2zatcj9gc5r0PcZI02qA=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=l/+ljC5dX8+qitHFq6WcjuAd4MTqBOIktA3R87U15bcw5T8yzFHBUrRFyKaROtO6XjG0Aj6n297+gqXHL3JmLEEzZDeFPD+Xr0qu7BSt0rlDBhXZhzyqCJczgHieSaYDkesmyEYrCNb58WrC1S//ff6jdXn8Y6Un0SwQxYWG4ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4YtcwT4588z4f3khS;
-	Thu, 13 Feb 2025 09:26:49 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id DC84E1A1743;
-	Thu, 13 Feb 2025 09:27:10 +0800 (CST)
-Received: from [10.174.179.143] (unknown [10.174.179.143])
-	by APP4 (Coremail) with SMTP id gCh0CgB32l5tSq1ndWXBDg--.7430S3;
-	Thu, 13 Feb 2025 09:27:10 +0800 (CST)
-Subject: Re: [PATCH] block: Check blkg_to_lat return value to avoid NULL
- dereference
-To: Wentao Liang <vulab@iscas.ac.cn>, tj@kernel.org, josef@toxicpanda.com,
- axboe@kernel.dk
-Cc: cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org,
- "yukuai (C)" <yukuai3@huawei.com>
-References: <20250212083203.1030-1-vulab@iscas.ac.cn>
-From: Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <8793e238-1b12-5ce9-e9d6-e936750109b2@huaweicloud.com>
-Date: Thu, 13 Feb 2025 09:27:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1739410210; c=relaxed/simple;
+	bh=EiC1zxjnBJ5sNjP95zBe28pRac4XL9P9q3glJoMkzdg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nNh3thvA5k+p1EXdq+f2FPm73xOTLWJ/5GeaTUa5IukC+MzMG9MMRWS9/S5v4+3eVSJ+Glc6Lz3DPRPpl+mjWSA0j9MBEIiiMffviTThZB7Fd/AGiAi8wORKzHWt3P51ZxmCxjHDO3jB4Kb+BBKY5c6vPa1V0VQeKwXs7GHA1G8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XW273efr; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XW273efr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739410207;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dfI/Q762oLXgRgsEmpqc24xuO0oeEhuZ9btILNENSPw=;
+	b=XW273efrynNIhO9+tRDgqtkzvMmfeQsemx535SMH+e4Csg1WnYsWL1BuDZBT+2u+eJtZ5s
+	xeRwdOwYitV/yEqwbz7aXHvEuuNrgSWsp5JyamAcgGdcwKHReJ56cE2QdZKceesLocSMN4
+	s3xjIMbd3gbAdRbucjZDkzIBWKDI0+w=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-528-b6hIMJYFMxKYngcBoUMI8A-1; Wed,
+ 12 Feb 2025 20:30:03 -0500
+X-MC-Unique: b6hIMJYFMxKYngcBoUMI8A-1
+X-Mimecast-MFC-AGG-ID: b6hIMJYFMxKYngcBoUMI8A
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9AC0D1955D68;
+	Thu, 13 Feb 2025 01:30:02 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.6])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 19CAD19560A3;
+	Thu, 13 Feb 2025 01:29:58 +0000 (UTC)
+Date: Thu, 13 Feb 2025 09:29:53 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Cheyenne Wills <cheyenne.wills@gmail.com>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: BUG: NULL pointer dereferenced within __blk_rq_map_sg
+Message-ID: <Z61LEUdHI2Hx3bue@fedora>
+References: <CAHpsFVeew-p9xB9DB52Pk_6mXfFxJbT8p14h5+YRTKabEfU3BQ@mail.gmail.com>
+ <Z6s-3LndN-Gt5sZB@fedora>
+ <Z6tss9YS98AEIwQy@fedora>
+ <CAHpsFVcMnSJgJbGrqiBDmYkHyneJdby4DMkOKQKAuicA0kgJQA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250212083203.1030-1-vulab@iscas.ac.cn>
-Content-Type: text/plain; charset=gbk; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgB32l5tSq1ndWXBDg--.7430S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww4ftFWUXw1fXr47ZrW5KFg_yoW8AFyxpw
-	48WwsFy3yrWr47XF1xKa1rCryrCr4UKFyUCrs8A34FkF1S9F4rtF1rZ3W5tFWFyrWUCw4D
-	Jr15tF9Yvr45C37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
-	xVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j
-	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU17KsU
-	UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+In-Reply-To: <CAHpsFVcMnSJgJbGrqiBDmYkHyneJdby4DMkOKQKAuicA0kgJQA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Hi,
-
-ÔÚ 2025/02/12 16:32, Wentao Liang Ð´µÀ:
-> The function blkg_to_lat() may return NULL if the blkg is not associated
-> with an iolatency group. In iolatency_set_min_lat_nsec() and
-> iolatency_pd_init(), the return values are not checked, leading to
-> potential NULL pointer dereferences.
+On Wed, Feb 12, 2025 at 04:24:43PM -0700, Cheyenne Wills wrote:
+> On Tue, Feb 11, 2025 at 8:29â€¯AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > On Tue, Feb 11, 2025 at 08:13:16PM +0800, Ming Lei wrote:
+> > > On Fri, Feb 07, 2025 at 07:09:39PM -0700, Cheyenne Wills wrote:
+> > > > While I was setting up to test with linux 6.14-rc1 (under Xen), I ran
+> > > > into a consistent NULL ptr dereference within __blk_rq_map_sg when
+> > > > booting the system.
+> > > >
+> > > > Using git bisect I was able to narrow down the "bad" commit to:
+> > > >
+> > > > block: add a dma mapping iterator (b7175e24d6acf79d9f3af9ce9d3d50de1fa748ec)
+> > > >
+> > > > Building a kernel with the parent commit
+> > > > (2caca8fc7aad9ea9a6ea3ed26ed146b1e5f06fab) using the same .config does
+> > > > not fail.
+> > > >
+> > > > Following is the console log showing the error as well as the Xen
+> > > > (libvirt) configuration for the guest that I'm using.
+> > > >
+> > > > Please let me know if there is any additional information that I can provide.
+> > >
+> > > Can you test the following patch?
+> > >
+> >
+> > Please try the revised one:
+> >
+> >
+> > diff --git a/block/blk-merge.c b/block/blk-merge.c
+> > index 15cd231d560c..a66d087a6b55 100644
+> > --- a/block/blk-merge.c
+> > +++ b/block/blk-merge.c
+> > @@ -493,7 +493,7 @@ static bool blk_map_iter_next(struct request *req,
+> >                 return true;
+> >         }
+> >
+> > -       if (!iter->iter.bi_size)
+> > +       if (!iter->bio || !iter->iter.bi_size)
+> >                 return false;
+> >
+> >         bv = mp_bvec_iter_bvec(iter->bio->bi_io_vec, iter->iter);
+> > @@ -514,6 +514,8 @@ static bool blk_map_iter_next(struct request *req,
+> >                         if (!iter->bio->bi_next)
+> >                                 break;
+> >                         iter->bio = iter->bio->bi_next;
+> > +                       if (!iter->bio)
+> > +                               break;
+> >                         iter->iter = iter->bio->bi_iter;
+> >                 }
+> >
+> >
+> >
+> >
+> > Thanks,
+> > Ming
+> >
 > 
-> This patch adds checks for the return values of blkg_to_lat and let it
-> returns early if it is NULL, preventing the NULL pointer dereference.
+> Still getting a BUG at the same location.
 > 
-> Fixes: d70675121546 ("block: introduce blk-iolatency io controller")
-> Cc: stable@vger.kernel.org # 4.19+
-> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
-> ---
->   block/blk-iolatency.c | 4 ++++
->   1 file changed, 4 insertions(+)
+> I was able to capture the BUG using a xen gdbsx / gdb session (the
+> offending instruction is a mov  0x28(%rdx),%r13d and the bug is that
+> %rdx is zero. -- break *__blk_rq_map_sg+0x5e if $rdx == 0)
 > 
-> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-> index ebb522788d97..398f0a1747c4 100644
-> --- a/block/blk-iolatency.c
-> +++ b/block/blk-iolatency.c
-> @@ -787,6 +787,8 @@ static int blk_iolatency_init(struct gendisk *disk)
->   static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
->   {
->   	struct iolatency_grp *iolat = blkg_to_lat(blkg);
-> +	if (!iolat)
-> +		return;
->   	struct blk_iolatency *blkiolat = iolat->blkiolat;
->   	u64 oldval = iolat->min_lat_nsec;
+> It appears in __blk_rq_map_sg that the rq->bio is NULL at the start of
+> the routine.
 
-This is not needed, this is called from iolatency_set_limit() or
-iolatency_pd_offline() where the policy data can't be NULL.
->   
-> @@ -1013,6 +1015,8 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
->   	 */
->   	if (blkg->parent && blkg_to_pd(blkg->parent, &blkcg_policy_iolatency)) {
->   		struct iolatency_grp *parent = blkg_to_lat(blkg->parent);
-> +		if (!parent)
-> +			return;
+Yeah, turns out oops is triggered in initializing req_iterator for
+discard req, and the following patch should be enough:
 
-blkg_to_pd() already checked, how can this be NULL?
+
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 15cd231d560c..9d7e87052882 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -556,11 +556,13 @@ int __blk_rq_map_sg(struct request_queue *q, struct request *rq,
+ {
+ 	struct req_iterator iter = {
+ 		.bio	= rq->bio,
+-		.iter	= rq->bio->bi_iter,
+ 	};
+ 	struct phys_vec vec;
+ 	int nsegs = 0;
+ 
++	if (iter.bio)
++		iter.iter = iter.bio->bi_iter;
++
+ 	while (blk_map_iter_next(rq, &iter, &vec)) {
+ 		*last_sg = blk_next_sg(last_sg, sglist);
+ 		sg_set_page(*last_sg, phys_to_page(vec.paddr), vec.len,
+
 
 Thanks,
-Kuai
->   		atomic_set(&iolat->scale_cookie,
->   			   atomic_read(&parent->child_lat.scale_cookie));
->   	} else {
-> 
+Ming
 
