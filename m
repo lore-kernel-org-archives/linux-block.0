@@ -1,164 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EF620B20B
-	for <linux-block@vger.kernel.org>; Fri, 14 Feb 2025 09:38:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC96186E40;
+	Fri, 14 Feb 2025 10:21:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739525920; cv=none; b=IETDX3DzjMMLtict2C4ImHykaECuB6dsJCPE3iafyO7b3nz/4P9CbZrxuqs46lLlJHlpF+DtLhI6VwwVjBgqHnu3hkivrgP9Sx3z5dRoDozrc4ggKljlJUEgKgrD24oJ1rMURb/hf1Zgx/9SNU5SdoFYMN8cH8Q/uJ2SIw37qx4=
+	t=1739528482; cv=none; b=NB5UG6Ah4kWeJlvbueR5DYk8sOHKziKcHgxlablmNmrms5mOo7TyaTjOyXtl6/EOD3rJOm/ekB/s6SXzbJj7vGZoBYJKds1npGjpYb+QK7BeODHUFaHGcET6hejehQT2OK/jXoBZNgN5OT6d/blll3zMfdVRaSTfPzWgxTipVXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739525920; c=relaxed/simple;
-	bh=Ne3ACQYAYUcYBFmSbEOxzigigxdo8XFOI/38WgX0ENM=;
+	s=arc-20240116; t=1739528482; c=relaxed/simple;
+	bh=98bEcXt55JROtyXwYi0Clj3GjYvpLWLviZsQlMud2Q8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JoOF1EiLd6dPQ3P7sRUQC2bQSCyo6lDNByJA0cbRbKQ/M25tG8Jms7WDZ6JJ4Mww6dWKQ4mwjCKn56oLwgu14PkGHKbeBlTrcGyDUMQNUcay5bMG46zrVTNafaOjnQzt/XU+dP2tXprspw/GKAPyrgkT/cxqc1aZR86kBmSxKpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bMsN1Oka; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=JTaTLpbdKjl8E5tq614BW7TcKINgIwQboYICe0EYWuX+Q1kfANCxDVdfbZmozzYuZy8B/YvBdgVicvV6O3XQnNQfrEeDOW5rrpXcocBz0PhFGFbQLR0UUaup70l7L6r3zi2z3D5WfkRrBOiL51NBxYpuVmR3ll+KBsKOeEzDJkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SX8bqgGN; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bMsN1Oka"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39B5FC4CED1;
-	Fri, 14 Feb 2025 09:38:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739525919;
-	bh=Ne3ACQYAYUcYBFmSbEOxzigigxdo8XFOI/38WgX0ENM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bMsN1OkaFMvcMFeNfeihDsm4ASVMka1/ZQHp+Un39DCB+aRkFifXJB5CAQUV19Xog
-	 7++VQSLT+ayrJ7eRwaTnj1qrBCnycWxZlEG2Q/Q5gSJOBCUDJURmsqwkquXqhJZcv1
-	 kak51bbC84bLvqopi3DKl1EM/jye3OhdebGWsO3GUHlqH0cEUIxarlco0+Tn5KfrVs
-	 DmldvACEkrEcAKFpRg5H/uqFSsyFkSi0UwnmH68aG3rqksTfZrX/EB0f6Jnc3Df0r8
-	 yamNSAGRIWWqBpKEz7TbiCa1wFCkHd5FXw9j34W7KMUFq9qb2e0c+XamqnTyfzR0kZ
-	 0IopT/gpQ+Umw==
-Date: Fri, 14 Feb 2025 10:38:36 +0100
-From: Daniel Gomez <da.gomez@kernel.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Yi Zhang <yi.zhang@redhat.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	John Garry <john.g.garry@oracle.com>, Bart Van Assche <bvanassche@acm.org>, 
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH V2] block: make segment size limit workable for > 4K
- PAGE_SIZE
-Message-ID: <ifgg2za26r6frfco4cky6wxywgdj3l7r6hx6sbqarizqltshfx@kccnmlr3x7nq>
-References: <20250210090319.1519778-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SX8bqgGN"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-220c2a87378so26356575ad.1;
+        Fri, 14 Feb 2025 02:21:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739528480; x=1740133280; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=98bEcXt55JROtyXwYi0Clj3GjYvpLWLviZsQlMud2Q8=;
+        b=SX8bqgGN56Z0MHWh+OG0I9bDighbCK30hAr6QM6nxyQ0nF1etVNxWK0KkDZrJzfIqA
+         kbFCic++Deg38CS5oX31bHxOI31Qwv6MiPNNzYXk9+IG6K2wCvs8GcTvXXooA5dy88jH
+         WaQzhrEcu7+kNziOnkF/WeNUdmdsuR6yUAomnmicapLnp8Z6qa5fm53FOirh7sC4leeG
+         N8fLticw7AquIVBsmMPRzvxADf3hVHyoa1Ab36ojyP6mCondaT1/rvZ7b3c9UsTDhUCh
+         GSODj7NiJb84mW9Orz4xfEbm1StyhBmmUwFemxRZzkQvBa02snfbLXGAGXWQGy2Vglxn
+         EvHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739528480; x=1740133280;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=98bEcXt55JROtyXwYi0Clj3GjYvpLWLviZsQlMud2Q8=;
+        b=OK4DpqqDJ85CNv1WKPST3vXGwIFskH57tFfN/RB170CA4pXNAktLWXp8nJGiMAcq/A
+         AfGelgxjY1emT71ojdibM0GmHDnyhLdT+uqIoKIC3YuJO/F7EIVNWxc8PXla65jXxB9U
+         e25BrLHfnQGaPOf5sY9bEWkRH28uFz195lwL7/YUMmdiRjFlYXTx0HcpTD3KSnhdQItQ
+         ig5PPBEjTrceR/mlsmkZngB3qauuwIidRHMlunzp4/8siidv6UMhyyUkipkz0GJqZ5Bv
+         45H2lDvdXWDlQtL6TAwR0Y9lZBV4uxzlklbcB5mKYkWPKAwhlcNxlTU/sT7sCpnC4BBU
+         EXig==
+X-Forwarded-Encrypted: i=1; AJvYcCVFpt+AdBDn1aV64vw0PBfr7pQvNGPceea+BrQRY5Peo0x4FGP5kkZAUA9sVhL3/OdOr0RMmKXU0XBz+Thn@vger.kernel.org, AJvYcCWYwtIPqY7zTs0pFxqhUZnx10GZGWm/qsxO0O4HDsfzjrHsTOtii41JpfQEeQiT4pUpYnC2wlbqVYDpkg==@vger.kernel.org, AJvYcCXd/7kcmMWGo5BMywA+9HpMhwEJFZZ6YY6Q05ESJ84O2oLP10kXhAqEZ/iDguw1X/4JhBnLjuqPV2gP@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4Al9kKt0DPevF0ndypygZ0e804u6PjN0gzz52X13Z8EUOg7bh
+	zmJiQTo/EGLtnsLN5HBQeuR3neVxRuzsJ46SjgraEL5fKDngTqIu
+X-Gm-Gg: ASbGncs3hbDfOs5Jb/ba7OJKOKLQh8+CmqdD2d8lztAhhQ8853g/TfIVzamwD6hpHdV
+	hjVapjIv1CmbMgpZ6qFDyEzMcyMBZzcLidYzfO1S8dOp/Le/zsGJH/aZRjUilSSpCCHOAOwdZXc
+	31gI2D08DzT7iaDG7cXgY47yfbwrvwd5a9YsXt9HsH8/XYxOq0/QxxGqg0Qe9UWd1SsNZfz6/6o
+	6wUn6Yjxpniouorybn+B2HoKUYseDd/zfAjjsrSICoG/fbyGu7d708EUKj1hP55pK/oM9V0uu9u
+	aR1YbqqOOkNWUYo=
+X-Google-Smtp-Source: AGHT+IG3+qZaSiHpaHbI9CGgZo0hVH86ou68xbLrXQUaLYwXucayzZThjm1qU61E9hPWS6jIb2pumg==
+X-Received: by 2002:a17:902:f601:b0:21f:4144:a06f with SMTP id d9443c01a7336-220bbad659cmr159045815ad.13.1739528480240;
+        Fri, 14 Feb 2025 02:21:20 -0800 (PST)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d53674b1sm26272255ad.98.2025.02.14.02.21.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2025 02:21:19 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id 46C2C41F5559; Fri, 14 Feb 2025 17:21:15 +0700 (WIB)
+Date: Fri, 14 Feb 2025 17:21:15 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: David Reaver <me@davidreaver.com>, Jonathan Corbet <corbet@lwn.net>,
+	Randy Dunlap <rdunlap@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Konstantin Khlebnikov <koct9i@gmail.com>,
+	linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] docs: iostats: Rewrite intro, remove outdated formats
+Message-ID: <Z68ZG3fhdZBO55BL@archie.me>
+References: <0e8c8ead-423a-45f3-9e10-020334ef8907@infradead.org>
+ <20250214051432.207630-1-me@davidreaver.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="y5OXxCA580JKTHBE"
 Content-Disposition: inline
-In-Reply-To: <20250210090319.1519778-1-ming.lei@redhat.com>
+In-Reply-To: <20250214051432.207630-1-me@davidreaver.com>
 
-On Mon, Feb 10, 2025 at 05:03:19PM +0100, Ming Lei wrote:
-> PAGE_SIZE is applied in some block device queue limits, this way is
-> very fragile and is wrong:
-> 
-> - queue limits are read from hardware, which is often one readonly
-> hardware property
-> 
-> - PAGE_SIZE is one config option which can be changed during build time.
-> 
-> In RH lab, it has been found that max segment size of some mmc card is
-> less than 64K, then this kind of card can't work in case of 64K PAGE_SIZE.
-> 
-> Fix this issue by using BLK_MIN_SEGMENT_SIZE in related code for dealing
-> with queue limits and checking if bio needn't split. Define BLK_MIN_SEGMENT_SIZE
-> as 4K(minimized PAGE_SIZE).
-> 
-> Cc: Yi Zhang <yi.zhang@redhat.com>
-> Cc: Luis Chamberlain <mcgrof@kernel.org>
-> Cc: John Garry <john.g.garry@oracle.com>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Keith Busch <kbusch@kernel.org>
-> Link: https://lore.kernel.org/linux-block/20250102015620.500754-1-ming.lei@redhat.com/
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+
+--y5OXxCA580JKTHBE
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Feb 13, 2025 at 09:14:30PM -0800, David Reaver wrote:
+> The discussion of file formats for very old kernel versions obscured the
+> key information in this document. Additionally, the introduction was
+> missing a discussion of flush fields added in b6866318657 ("block: add
+> iostat counters for flush requests") [1].
+>=20
+> Rewrite the introduction to discuss only the current kernel's disk I/O st=
+at
+> file formats. Also, clean up wording to be more concise.
+>=20
+> Link: https://lore.kernel.org/lkml/157433282607.7928.5202409984272248322.=
+stgit@buzz/T/ [1]
+>=20
+> Signed-off-by: David Reaver <me@davidreaver.com>
 > ---
-> V2:
-> 	- cover bio_split_rw_at()
-> 	- add BLK_MIN_SEGMENT_SIZE
-> 
->  block/blk-merge.c      | 2 +-
->  block/blk-settings.c   | 6 +++---
->  block/blk.h            | 2 +-
->  include/linux/blkdev.h | 1 +
->  4 files changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 15cd231d560c..b55c52a42303 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -329,7 +329,7 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
->  
->  		if (nsegs < lim->max_segments &&
->  		    bytes + bv.bv_len <= max_bytes &&
-> -		    bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
-> +		    bv.bv_offset + bv.bv_len <= BLK_MIN_SEGMENT_SIZE) {
->  			nsegs++;
->  			bytes += bv.bv_len;
->  		} else {
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index c44dadc35e1e..539a64ad7989 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -303,7 +303,7 @@ int blk_validate_limits(struct queue_limits *lim)
->  	max_hw_sectors = min_not_zero(lim->max_hw_sectors,
->  				lim->max_dev_sectors);
->  	if (lim->max_user_sectors) {
-> -		if (lim->max_user_sectors < PAGE_SIZE / SECTOR_SIZE)
-> +		if (lim->max_user_sectors < BLK_MIN_SEGMENT_SIZE / SECTOR_SIZE)
->  			return -EINVAL;
->  		lim->max_sectors = min(max_hw_sectors, lim->max_user_sectors);
->  	} else if (lim->io_opt > (BLK_DEF_MAX_SECTORS_CAP << SECTOR_SHIFT)) {
-> @@ -341,7 +341,7 @@ int blk_validate_limits(struct queue_limits *lim)
->  	 */
->  	if (!lim->seg_boundary_mask)
->  		lim->seg_boundary_mask = BLK_SEG_BOUNDARY_MASK;
-> -	if (WARN_ON_ONCE(lim->seg_boundary_mask < PAGE_SIZE - 1))
-> +	if (WARN_ON_ONCE(lim->seg_boundary_mask < BLK_MIN_SEGMENT_SIZE - 1))
->  		return -EINVAL;
->  
->  	/*
-> @@ -362,7 +362,7 @@ int blk_validate_limits(struct queue_limits *lim)
->  		 */
->  		if (!lim->max_segment_size)
->  			lim->max_segment_size = BLK_MAX_SEGMENT_SIZE;
-> -		if (WARN_ON_ONCE(lim->max_segment_size < PAGE_SIZE))
-> +		if (WARN_ON_ONCE(lim->max_segment_size < BLK_MIN_SEGMENT_SIZE))
->  			return -EINVAL;
->  	}
->  
-> diff --git a/block/blk.h b/block/blk.h
-> index 90fa5f28ccab..cbfa8a3d4e42 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -359,7 +359,7 @@ static inline bool bio_may_need_split(struct bio *bio,
->  		const struct queue_limits *lim)
->  {
->  	return lim->chunk_sectors || bio->bi_vcnt != 1 ||
-> -		bio->bi_io_vec->bv_len + bio->bi_io_vec->bv_offset > PAGE_SIZE;
-> +		bio->bi_io_vec->bv_len + bio->bi_io_vec->bv_offset > BLK_MIN_SEGMENT_SIZE;
->  }
->  
->  /**
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 248416ecd01c..32188af4051e 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1163,6 +1163,7 @@ static inline bool bdev_is_partition(struct block_device *bdev)
->  enum blk_default_limits {
->  	BLK_MAX_SEGMENTS	= 128,
->  	BLK_SAFE_MAX_SECTORS	= 255,
-> +	BLK_MIN_SEGMENT_SIZE	= 4096, /* min(PAGE_SIZE) */
+>=20
+> Thanks for the encouragement Randy. Here is a rewrite of the intro.
+>=20
+> This patch is mutually exclusive with the original patch I started this
+> thread with. Let me know if I should submit it as a standalone thread.
+> (I'm fairly new to contributing to the kernel.)
 
-I think it would be useful to expose this value to the queue_limits and
-sysfs (and remove it from here). We can default it to PAGE_SIZE (as it has
-always been) and allow to overwrite it when the block driver initializes the
-limits. This allows to see we are not anymore in the range of PAGE_SIZE -
-max_segment_size 'world' but min_segment_size - max_segment_size one. Unless
-there's a reason to not increase queue_limits data struct?
+This is [PATCH v2] so the next version should be [PATCH v3] (sent as
+separate thread).
 
+> +All fields are cumulative, monotonic counters that start at zero at
+> +boot, except for field 9, which resets to zero as I/Os complete. Other
+> +fields only increase unless they overflow and wrap. Wrapping may occur
+> +on long-running or high-load systems, so applications should handle this
+> +properly. Field types are either 32-bit unsigned integers or unsigned
+> +longs, which may be 32-bit or 64-bit depending on the architecture. As
+> +long as observations are taken at reasonable intervals, wraparounds
+> +should be rare.
 
->  	BLK_MAX_SEGMENT_SIZE	= 65536,
->  	BLK_SEG_BOUNDARY_MASK	= 0xFFFFFFFFUL,
->  };
-> -- 
-> 2.47.1
-> 
+So on x86_64 the field type is 32-bit-sized (u32) instead of u64, right?
+
+Confused...
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--y5OXxCA580JKTHBE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZ68ZFQAKCRD2uYlJVVFO
+o1Q1AP95wTYuUIgYojC9SI7moGLvJ2f9NNWPcaSbEyTX4OiU8gEAk0iSZLlEHgq+
+xnk3psu5TvFTUAuHWU9TjnngTW+bTgw=
+=cw4e
+-----END PGP SIGNATURE-----
+
+--y5OXxCA580JKTHBE--
