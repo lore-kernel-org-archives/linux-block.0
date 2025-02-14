@@ -1,63 +1,48 @@
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9BE268C68
-	for <linux-block@vger.kernel.org>; Fri, 14 Feb 2025 17:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E40267729
+	for <linux-block@vger.kernel.org>; Fri, 14 Feb 2025 17:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739554198; cv=none; b=oMRe7x4OA3Ocej8UNFIxRF9hYIuwtxf9c6eeWzoinXlD8/x0Ahtgru55YqCS4sJX2HGciRILo4/KTjcngZYFlDYCcyfNlr0+FxS8XqhNktwiHeBDTb7hqesMTRdcLapVetFeL4B+YrIP5FKmNOHeSZmoVicoXjIvrSywCiEbQfM=
+	t=1739554635; cv=none; b=qPHvQTQQ3DA9h03Edi5XxMlNHxAd+mUeJVoSeMYiziMPCezUGaABoE1JNg10h+vVVvq9ia0cRBCqgkoHUHUaGF7rlNgMaMO5i7OinzkCZ5KFkklwKif1deW+cXAF6u5yX42hjHGg6pa8o6DS+SyLHzOFd2nsbkWAhDa3SG8Qjs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739554198; c=relaxed/simple;
-	bh=dkhyM7ZfY3apnmQfYhwCim57WopohRPUGYh8hB2XQM8=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=GoPW+RLzCB+pCtOxVmcUgkK5Vm7kZSpuo8cywNeDy3I66Bwr30/zcoZvJba+DtWRh1H41adF8uTcaO42YbiA5qxZreJ6xViq3Qu334pYbHrgyLa14Dtjy2sZt7+jrYvMoHd8FtUzV14amh4J4kPbkibAjTIYTmmviGgMrcVcJfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=cuqrvP8N; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1739554635; c=relaxed/simple;
+	bh=WyzSRAe6kPqQjyT27yPlzrJtQtTf9Bco6D/s3keaNoU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PPto66J43iTy5QJvjy6RB29+jHDQLxZnI0dlBGjFIu17f0b9mduKk7P/qPN+Dy6WWhGmvss6+66njidIERY9jMYzvxbyCljTpinl3zTtItnIozkw2ufB9g/qnSTbn603MduZIDVZyQXyaS0eKQY4L85yqweNQVf3UjQQZ3VXmnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=KcQZSRvV; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="cuqrvP8N"
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3d03d2bd7d2so18411145ab.0
-        for <linux-block@vger.kernel.org>; Fri, 14 Feb 2025 09:29:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1739554195; x=1740158995; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JSy3IS77CALvhus79RBOB+jgwssslV5VW1Rny6qy4A8=;
-        b=cuqrvP8Ndoa+agQsm7qoo5TzZz+A6r3eiccAhyrm2VE2NlJaNd2R1h7ZL4VvW/f/20
-         gUQDL5REQY3K9B0JpCt/q2bWbV8L8KqPFBfAJbCEojmB3kVh9gNcj1dk2ViBa4iewTav
-         0v9iBRbnLALPQ30nwOJnEgP/akOBqKnzTGvg9xw1u3uM5BkHlh2LEnJqIyU9nhMuXhI3
-         Nlz1/l89OZlzimtlmyZw6LKjAnsMuMHolbLwAB6cUaSIaXrGWaOlfWz2Nhxpo7glJ87w
-         /rbyl/WKhEx4Ep2n7a4qdlBK/7BvRXIbd+D0NtyPX2WlTk2RJKrlW4dgli7qtONviXAq
-         kXbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739554195; x=1740158995;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=JSy3IS77CALvhus79RBOB+jgwssslV5VW1Rny6qy4A8=;
-        b=jLhbWEuvAgFCJFjcgEBC4p4kHLlhap8t241pdAlF0jyd5lLLtXbpsfuvlMnyzbm4NL
-         EukuQKdHimKNvFA18HHraB6sN22QZFFt11Pq3Cn0K78M2A8rVIceoShT6S5IjtSXLrqb
-         XtLkggehys+WdMfUsPXnloeMg6iFTUHCAd+0IPajXlTcnMgrTvQJvGJcy+x6uq9t9G7R
-         P04ZNknFeSpyKXFeUzGzb1d+DQFg28JKpz14MFVWhdEDLXtgTUVwNcNxa7vs4QDerTBn
-         zzAyvK+tyEj5HT4EiFlomQN7yH4CEWciHkbyrtnREu5W8DJfzb2+yibygQ/0QUrFwoI/
-         j0Cg==
-X-Gm-Message-State: AOJu0YxjfbnJ9YpUeIH4IF8uz9yIn6Ys4mhFGnjUPg+65B+pJyf+xMmf
-	RtkWPBe4c/SjzU29tsrTzUGX7Kj7mYClJMWTURGXqIPoHZcSZgFlpX/VVukXPpk9VeEubmjE1i1
-	/
-X-Gm-Gg: ASbGnct2xXWlf8YMy62zbkc8njRVmlR0iwqfXAbVwx+QV/1E9/0B48vXHa7y0QqYpgZ
-	OU7tJXuJVudKNZ+CQqAna3ani4VWSmhErGOQ62izHpT8bFQ8g4sODUxyESsF2LDYXp4yhWZ4N/M
-	0P+NhqxxPGDBp6f2OL8+Z9veguuTruerLKKong8FRqZAkBy3+ukeYCelBbLFTXohNbhvdSuThhE
-	mlanoqTOD/rTCRumdFjnUmZlHLXjzf5oeVsO9vNZHgKerNhkYN1I7uAjx9ANyFixD11ai5a5hPB
-	8a4jChT/aKTl
-X-Google-Smtp-Source: AGHT+IGQhseSLaNaXgNYNY5cejFmMJEHDuhXezYGgwA/wjPWpJpzZYUNrowDmQTHbNFRmzzBpT5StA==
-X-Received: by 2002:a05:6e02:3103:b0:3d0:4a82:3f4b with SMTP id e9e14a558f8ab-3d2808fa4a0mr1788255ab.14.1739554195360;
-        Fri, 14 Feb 2025 09:29:55 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ed2819b6f9sm890028173.61.2025.02.14.09.29.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Feb 2025 09:29:54 -0800 (PST)
-Message-ID: <b187b8a3-a9f1-42d8-903e-3fa713416a51@kernel.dk>
-Date: Fri, 14 Feb 2025 10:29:54 -0700
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="KcQZSRvV"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YvfPh5SZwzlgTwr;
+	Fri, 14 Feb 2025 17:37:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1739554631; x=1742146632; bh=P+MwjqFrkGitVFE4cWn3pUUl
+	PKI3Ns73lzowiPhCeIc=; b=KcQZSRvVU5o5ylQTa/vSarP1Y9vb1nlJoUDbKbuc
+	/5P7UBoiddU2gMuOr/mOgzdnjPlP3WXZU6FLmtqHE+rCPQSAHuLLzYau8B0c7I5j
+	E70JvSGgC2u5GpxaKPrhP3JnAbB7IQcff/5mhGPqngkqWz5FYByMusrRC2X/LeU+
+	E2mw83elRFn/4SKxfqQSASHlmEcaWhDOKFOuDx209h1MyrXIS2m85aNBUO6M0dJd
+	WBIcSCeQHGUDHgIP+DpW4z+clCXiV0QqhBgJpoHLudoHuU8dluvRZt7VVTitWS8l
+	ddJX+n3zqkpPwi+9zQJmpuaQlIzx3L2tg4A2HnAz21tT0A==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id NdZ7bbyxWdpg; Fri, 14 Feb 2025 17:37:11 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YvfPc4RXrzlgTwp;
+	Fri, 14 Feb 2025 17:37:08 +0000 (UTC)
+Message-ID: <1a2c11c4-6f38-4bf3-9d7a-2692a1c4d75d@acm.org>
+Date: Fri, 14 Feb 2025 09:37:06 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,52 +50,44 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3] block: make segment size limit workable for > 4K
+ PAGE_SIZE
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org
+Cc: Paul Bunyan <pbunyan@redhat.com>, Yi Zhang <yi.zhang@redhat.com>,
+ Luis Chamberlain <mcgrof@kernel.org>, John Garry <john.g.garry@oracle.com>,
+ Keith Busch <kbusch@kernel.org>
+References: <20250213120040.2271709-1-ming.lei@redhat.com>
 Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.14-rc3
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250213120040.2271709-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+On 2/13/25 4:00 AM, Ming Lei wrote:
+> PAGE_SIZE is applied in validating block device queue limits, this way is
+                ^^^^^^^
+                used?
+> very fragile and is wrong:
+> 
+> - queue limits are read from hardware, which is often one readonly hardware
+                                                             ^^^^^^^^
+                                                             read-only?
+> @@ -1163,6 +1163,8 @@ static inline bool bdev_is_partition(struct block_device *bdev)
+>   enum blk_default_limits {
+>   	BLK_MAX_SEGMENTS	= 128,
+>   	BLK_SAFE_MAX_SECTORS	= 255,
+> +	/* use minimized PAGE_SIZE as min segment size hint */
+> +	BLK_MIN_SEGMENT_SIZE	= 4096,
+>   	BLK_MAX_SEGMENT_SIZE	= 65536,
+>   	BLK_SEG_BOUNDARY_MASK	= 0xFFFFFFFFUL,
+>   };
 
-Two fixes for block that should go into the 6.14-rc3 release. This pull
-request contains:
+The above comment could be made more clear, e.g. "Use 4 KiB as the
+smallest supported DMA segment size limit instead of PAGE_SIZE. This is
+important if the page size is larger than 4 KiB since the maximum DMA
+segment size for some storage controllers (e.g. eMMC) is 4 KiB."
 
-- Fix for request rejection for batch addition.
+Anyway:
 
-- Fix a few issues for bogus mac partition tables.
-
-Please pull!
-
-
-The following changes since commit 96b531f9bb0da924299d1850bb9b2911f5c0c50a:
-
-  Merge tag 'md-6.14-20250206' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into block-6.14 (2025-02-07 07:23:03 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.14-20250214
-
-for you to fetch changes up to 80e648042e512d5a767da251d44132553fe04ae0:
-
-  partitions: mac: fix handling of bogus partition table (2025-02-14 08:38:28 -0700)
-
-----------------------------------------------------------------
-block-6.14-20250214
-
-----------------------------------------------------------------
-Jann Horn (1):
-      partitions: mac: fix handling of bogus partition table
-
-Jens Axboe (1):
-      block: cleanup and fix batch completion adding conditions
-
- block/partitions/mac.c | 18 +++++++++++++++---
- include/linux/blk-mq.h | 18 ++++++++++++++----
- 2 files changed, 29 insertions(+), 7 deletions(-)
-
--- 
-Jens Axboe
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
