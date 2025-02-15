@@ -1,95 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA021A83EB;
-	Sat, 15 Feb 2025 10:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E74191F75;
+	Sat, 15 Feb 2025 11:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739617189; cv=none; b=e+469Mw90H0JEiUnykvhAgmjFWsugr5N8diOwI+zMJaXwnqNJMxAc+90z9APPfRnxAul9ey0JHm9t4LfhQrokUJR/PWrEEnYHDZX/U06pRahcRgZTb/Nm1Ics98ouR1orxK+TvE3d6LBTf2V8I2nARcOUadU94Z7JBJmUdWspHg=
+	t=1739620308; cv=none; b=DpKLP7oH/2S+cXg2wx1K4KDxzC1KESJEka28PFJADwHveeuwMqEU8WL/BitVN+J5f7hEKsfqgr1R0hd1ex8wK6Y3URGanyZA7/MT9qYG+FNJzJaSxifLpA5mMyx8jocrVu5Q5P8uHg8945qgREzkjqjnp0oVGjL6ZSQG+kvA088=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739617189; c=relaxed/simple;
-	bh=v7PXerc38yX4CSSTiNxWoTxizSMopm2JkQfFEFeuHsE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=FafPhtGwR63+y4xlK41UHhE6DlhSjmZDt7bbljZU5kUvEKuG4WF7Ou29iyaNi4CXZF8qnacnhKlX86DxqhE2xwCXnuF+/4PEMgMiA5tuuc8TTBG5kNInh+kfCFMlECs66/MQKGf4bHzI4HV5thTLqMrha2bUM6MUUSw2XZIFFMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DUx0A6Zj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739620308; c=relaxed/simple;
+	bh=ODBV7XxULaEKMbWW5H2hCBCAUiFq5HPbBkqQ992RLs8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iAcWrJECVRe2fEWBunTaP3IwIN4Rb0Q375w5XA8TTJgZ42wxUa5Pr4r8rIg4Tc138+y87YNgZhwWCJKEr39uLJlPPk9a7ZbjznOl4xTjWrckTYZ4h5YgvUW4r8E8sckIgdMDkuARPHN+y2ljgPuKE6o7UWswjCgQbWCPrUv9WC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OZoNOGM0; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DUx0A6Zj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AFBDC4CEDF;
-	Sat, 15 Feb 2025 10:59:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739617188;
-	bh=v7PXerc38yX4CSSTiNxWoTxizSMopm2JkQfFEFeuHsE=;
-	h=From:Date:Subject:To:Cc:From;
-	b=DUx0A6ZjPb9BoXkHbezSjdfVqHsoUe0OAfrSML3F1k49QZuLomKa2q3odI/nq90cD
-	 5ZZRRr7UV541UZXdkxYccEC/oREHDTx/crrd1C4qh6WRl1VS5CU/Z6fhEZFJ92SA3w
-	 H6FOa+CssOG4CkzZFeGwFjiBUnO5ghwDgNO7jFIsjZf4IAqGocTsbpFjaU6mVXmw7e
-	 b4mUYREs/jTGvlp/oVLhRMHpMJE/WtdrGdlSxHzvw/5gyrmu3sc98jkATUng3nCZnx
-	 I9jFC5eBYxpC9RROfH8IeE0nvk3d58oWWuZdILkPjDjxDFBKtMnxBfRKuxXAsiQJU3
-	 OkJBYdoeep/Jw==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Sat, 15 Feb 2025 11:58:15 +0100
-Subject: [PATCH] block: set bi_vcnt when cloning bio
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OZoNOGM0"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43690d4605dso18303035e9.0;
+        Sat, 15 Feb 2025 03:51:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739620305; x=1740225105; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+E8cBYvEaPMhQTBmq7LkfColA/xNBOcLLm60gFA76t0=;
+        b=OZoNOGM0R4CtILKvTLFtUztQObab8k/apdQDMwmdokQKwpuSYwyCxZT6Wgb3yfiQfh
+         u6uT0o/l0TJMUtPZoul4K1vB/sJJz4Uz7kV3aCeHqAWkeYzYZs2h8MWM36/oThzRM7ei
+         AJKu3S0V5gqCkclg3J83xynsdkUpE98ojCuexveGfcui0gDL8XJUGTXn5UWJWXTDRTiH
+         qQ/1YWcR1Oz4DjnZpf9aVTxzy6ToaMUkU9QKus5lXWcEdzOCihsxDxJpBT9Gs9BlYdt0
+         +58dm4LyeBd3O8VVEmghlFz2CpH5gajZ2JEWugA2lobHcDg9tZvGQz3kTU5b94x/WAJM
+         jCQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739620305; x=1740225105;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+E8cBYvEaPMhQTBmq7LkfColA/xNBOcLLm60gFA76t0=;
+        b=rQ19whl+KW4EUjokqg9H9isEq6vU0xRHhpxs8hThWym1nrdt5UECpaTurQepeRtwkg
+         Snp8TJkCqmlWrxMv3NYAJMK+fmo+m2lvkW0qOfpqZvwG6NIRYLxHWtioomNQM9b3cWLi
+         t5xWideYHkhU1o37TuYbEObH0wvM5EiGeUcEakcZEOY8znsoFsCfr7sjnkPE/SJOaTvQ
+         cwZcyWOJfmLfv4TQi1Vl38gHIp1Ad3bQ39On4Pas8jtcwY7mhGm1CzvnmOh50mMF+mnw
+         SEvPlvZXxsKbCqqREVKPhEQxDLlL6hzVxLPURrF1kebdc/JzCZdh8YiaTjoxluMX1V5K
+         9Rnw==
+X-Forwarded-Encrypted: i=1; AJvYcCUgClhxrewZkfo7t3Ln8pm5Y/EefKJDwiq/1vHaBE/WjQi8kC2/Ddko6mfmzsPGyDnBZ0Ybz04AyrfSJw==@vger.kernel.org, AJvYcCXD413dRedTuDC4rxCwuVJR1jCuc1ilMaHkCrnbAQ5+nUqG8eOCqp+3fUJOoe1JwzGavWBbriOx2CBhxTBC@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxgb9wwIRU61PWfUI5ANc/rMlHhzihYt3HeakKqQKtrE0gKDSQf
+	+pMVzDoQTUnPL1XhK4zldjWcziGLirjB8vJh0mH9oCRjQBaow3hD+w4V7Q==
+X-Gm-Gg: ASbGncv62REtVGR085zaT1aupI5C3RVtZufHbmbLyQVk7kTEgEfIMZWy0MvxMTy8Aeg
+	LZU8BiNCsBJ3/BlmMS9dPA17n/eySFkLCD++uwgVubqAQ2zdU0WU1IfrCnvNNVj75ImPHoeumLz
+	JldEVpA2MXsjAwCxwVb94sxosLv9vV4e2o5RsDWNH9G8y7A51ZwDoH1MzohSbpqAVrG0IgxlszP
+	vFPiWwzt4qWG5qiHqtj94XXNzlDyEicqlIXgZ9O/HDHS09E61eu26pymePoSvj5ownslWWcD3t+
+	GmxlFlv/baUp9p/W9H3MaOAjCKGhYaB6B4b4Xtab+xt/gnnNJY20XQ==
+X-Google-Smtp-Source: AGHT+IEQawC7SQVa9UF4slkO3lg86OopnWZ3aLTLVKEXgIrmgEgWz+bCG+8HW/R99D5VLCZ0Ld7EOQ==
+X-Received: by 2002:a05:600c:4e8d:b0:436:488f:4f3 with SMTP id 5b1f17b1804b1-4396e70d13emr25278915e9.17.1739620305242;
+        Sat, 15 Feb 2025 03:51:45 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258dcc45sm7124144f8f.33.2025.02.15.03.51.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Feb 2025 03:51:44 -0800 (PST)
+Date: Sat, 15 Feb 2025 11:51:44 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block/merge: remove unnecessary min() with UINT_MAX
+Message-ID: <20250215115144.6a10dad8@pumpkin>
+In-Reply-To: <20250214193637.234702-1-csander@purestorage.com>
+References: <20250214193637.234702-1-csander@purestorage.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250215-clone-bi_vcnt-v1-1-5d00c95fd53a@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAEZzsGcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1MDI0NT3eSc/LxU3aTM+LLkvBLdNOM0c3MDSwsLC0sTJaCegqLUtMwKsHn
- RsbW1AMAHFYlfAAAA
-X-Change-ID: 20250215-clone-bi_vcnt-f3f770988894
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Oliver Mangold <oliver.mangold@pm.me>, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=780; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=v7PXerc38yX4CSSTiNxWoTxizSMopm2JkQfFEFeuHsE=;
- b=owEBbQKS/ZANAwAIAeG4Gj55KGN3AcsmYgBnsHNWsWLBMjvJzH4+k0Jo39tw83pgfr1HRvVxM
- I9HkjZD6cqJAjMEAAEIAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCZ7BzVgAKCRDhuBo+eShj
- d8m/D/98mFEDqez+HIXSjUNykYa93Js07AnK+4CAp2CL+xvL7IhOuvJm24g6AiqrL6C38f3kKvm
- 6+0Kc+R6UFktOIIO09uPII8SLhi6kOtgWGxTanSYwJbZx6wadCQKchEOk5YeEVF2LPDsukWvXI3
- bSg67dX1GTW0iVOG5r6ar0jdKdyvNJcrZhkq0r/Uk9z8yAVv30RXBXm03LAFJj0cn1gv/cHnQS3
- HdIHw+jMlWA6zG7VbyrpQuzURfpldQC58aAT6SalyChHNoIusuKAW6pk5bf9wYxtuIJd11gjQrv
- I5lJQ3yo2RuzSxZanc+f0CyyLSeFB/BNANjR+mHoaXYMMn2dYsXtr9SRGkuBzx+A/M2+F54/Jw7
- RSnWsWx2q/a8IPAH5QLp6DVe4ur/t/FwjW1a8rovOs51JNhGoYuXU30yRwtuewGmjFhAlx3HH7R
- /yB5OKA0PiS7PB9d1dkZ+uZ9r/jcwBhfasRhV7sVXknjGbcUkVr5UvDqSPDEKc1iUJtvdZLFBRS
- krT9NUcc4TidA1a/4pqR452uA738R13joxxsbuj1PEzbyJcU8M1lIjgqnpx1VImu7Vmk0B70Gmw
- /i4JiYTVHKRs5FcXFQZwjmmJMTqweaO+qWnuEaAK6LO9he/hKA+7LojRgaS+SyVqbdjg2MhGCfH
- USYLR/JUZJSKYKw==
-X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
- fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-When cloning a bio, the `bio.bi_vcnt` field is not cloned. This is a
-problem if users want to perform bounds checks on the `bio.bi_io_vec`
-field.
+On Fri, 14 Feb 2025 12:36:36 -0700
+Caleb Sander Mateos <csander@purestorage.com> wrote:
 
-Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
----
- block/bio.c | 1 +
- 1 file changed, 1 insertion(+)
+> In bvec_split_segs(), max_bytes is an unsigned, so it must be less than
+> or equal to UINT_MAX. Remove the unnecessary min().
+> 
+> Prior to commit 67927d220150 ("block/merge: count bytes instead of
+> sectors"), the min() was with UINT_MAX >> 9, so it did have an effect.
+> 
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> ---
+>  block/blk-merge.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 15cd231d560c..39b738c0e4c9 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -268,11 +268,11 @@ static inline unsigned get_max_segment_size(const struct queue_limits *lim,
+>   */
+>  static bool bvec_split_segs(const struct queue_limits *lim,
+>  		const struct bio_vec *bv, unsigned *nsegs, unsigned *bytes,
+>  		unsigned max_segs, unsigned max_bytes)
+>  {
+> -	unsigned max_len = min(max_bytes, UINT_MAX) - *bytes;
+> +	unsigned max_len = max_bytes - *bytes;
 
-diff --git a/block/bio.c b/block/bio.c
-index f0c416e5931d9..334eedf312803 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -870,6 +870,7 @@ struct bio *bio_alloc_clone(struct block_device *bdev, struct bio *bio_src,
- 		return NULL;
- 	}
- 	bio->bi_io_vec = bio_src->bi_io_vec;
-+	bio->bi_vcnt = bio_src->bi_vcnt;
- 
- 	return bio;
- }
+More interestingly, what stops *bytes being larger than max_bytes?
 
----
-base-commit: a64dcfb451e254085a7daee5fe51bf22959d52d3
-change-id: 20250215-clone-bi_vcnt-f3f770988894
+	David
 
-Best regards,
--- 
-Andreas Hindborg <a.hindborg@kernel.org>
-
+>  	unsigned len = min(bv->bv_len, max_len);
+>  	unsigned total_len = 0;
+>  	unsigned seg_size = 0;
+>  
+>  	while (len && *nsegs < max_segs) {
 
