@@ -1,115 +1,112 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E74191F75;
-	Sat, 15 Feb 2025 11:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A6813AD18;
+	Sat, 15 Feb 2025 17:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739620308; cv=none; b=DpKLP7oH/2S+cXg2wx1K4KDxzC1KESJEka28PFJADwHveeuwMqEU8WL/BitVN+J5f7hEKsfqgr1R0hd1ex8wK6Y3URGanyZA7/MT9qYG+FNJzJaSxifLpA5mMyx8jocrVu5Q5P8uHg8945qgREzkjqjnp0oVGjL6ZSQG+kvA088=
+	t=1739639913; cv=none; b=ikA15+cbJYS5SfyYzu8qEUNOuCb832zVeV9I13vz3NnB5bwC/mYsF1IVfl0ICsugX1zQ2W5Ydh8DLR7ZV8C7J7jZZkvURDq5t7SK+sVR5mwPcO6hZ6qGvnL7bAPizUr3AyLVszoqOF4AnDYx5gYQYH+kjAdbihlGEiDlP7U9gnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739620308; c=relaxed/simple;
-	bh=ODBV7XxULaEKMbWW5H2hCBCAUiFq5HPbBkqQ992RLs8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iAcWrJECVRe2fEWBunTaP3IwIN4Rb0Q375w5XA8TTJgZ42wxUa5Pr4r8rIg4Tc138+y87YNgZhwWCJKEr39uLJlPPk9a7ZbjznOl4xTjWrckTYZ4h5YgvUW4r8E8sckIgdMDkuARPHN+y2ljgPuKE6o7UWswjCgQbWCPrUv9WC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OZoNOGM0; arc=none smtp.client-ip=209.85.128.54
+	s=arc-20240116; t=1739639913; c=relaxed/simple;
+	bh=syfhYjdXfwB3WFjAvZ1Lw4ojSBHHmfK0NVQrluGAilM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mfCp6LMtq0o+s3MhnhzLAfTh5rVnA1sX2T4EmUl14mNldbarfm4zrg5grOqHOLujI7DHTnboDVQeXFriJfWO9UaLnDnbe6E6QGfCW2bfbxzbc9mD9jGbqSY0OW4YeNenrD+Fs/OpHpagPE5+aDWl9KoVr9yLQaMluvUN2dt0Zyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PUbxtvZs; arc=none smtp.client-ip=209.85.216.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OZoNOGM0"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43690d4605dso18303035e9.0;
-        Sat, 15 Feb 2025 03:51:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PUbxtvZs"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2fa48404207so6267254a91.1;
+        Sat, 15 Feb 2025 09:18:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739620305; x=1740225105; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+E8cBYvEaPMhQTBmq7LkfColA/xNBOcLLm60gFA76t0=;
-        b=OZoNOGM0R4CtILKvTLFtUztQObab8k/apdQDMwmdokQKwpuSYwyCxZT6Wgb3yfiQfh
-         u6uT0o/l0TJMUtPZoul4K1vB/sJJz4Uz7kV3aCeHqAWkeYzYZs2h8MWM36/oThzRM7ei
-         AJKu3S0V5gqCkclg3J83xynsdkUpE98ojCuexveGfcui0gDL8XJUGTXn5UWJWXTDRTiH
-         qQ/1YWcR1Oz4DjnZpf9aVTxzy6ToaMUkU9QKus5lXWcEdzOCihsxDxJpBT9Gs9BlYdt0
-         +58dm4LyeBd3O8VVEmghlFz2CpH5gajZ2JEWugA2lobHcDg9tZvGQz3kTU5b94x/WAJM
-         jCQQ==
+        d=gmail.com; s=20230601; t=1739639911; x=1740244711; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=y3rRk+gn9//zXPLARWtdRv3yS/t43lzQ1DoeFoUszLM=;
+        b=PUbxtvZscBFYvGqlVRzbQJMcXvAUwnVZ12985iEXRnYrZ0pLCLylhCVRiTQlC+sn3V
+         f4xl18qZQt/fAB3VzrExqyT/xPg0DDmq/Fuk0ViBlS4LINxLqPkJQIE9ZSQCUeSRQViT
+         O7lXF/QHU12xK/NVZhz7MIYLAYSp0dT9L9zD9zo4HNl+s3xNgUl2xcCDyWTUX8RDlqHA
+         kXA6Q0mOGW/vpFCFcDhpT+B9X0vXk96hUDcIYZsb9tN/6zB/MLA/lA83HCbYuSYaG87q
+         bt9epCnkpmR1YRAfK8X9yY2tnEZAp/1pL9l2srmLlyuCBbgonTT+ffM7cWv6be8KcvmK
+         dNPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739620305; x=1740225105;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+E8cBYvEaPMhQTBmq7LkfColA/xNBOcLLm60gFA76t0=;
-        b=rQ19whl+KW4EUjokqg9H9isEq6vU0xRHhpxs8hThWym1nrdt5UECpaTurQepeRtwkg
-         Snp8TJkCqmlWrxMv3NYAJMK+fmo+m2lvkW0qOfpqZvwG6NIRYLxHWtioomNQM9b3cWLi
-         t5xWideYHkhU1o37TuYbEObH0wvM5EiGeUcEakcZEOY8znsoFsCfr7sjnkPE/SJOaTvQ
-         cwZcyWOJfmLfv4TQi1Vl38gHIp1Ad3bQ39On4Pas8jtcwY7mhGm1CzvnmOh50mMF+mnw
-         SEvPlvZXxsKbCqqREVKPhEQxDLlL6hzVxLPURrF1kebdc/JzCZdh8YiaTjoxluMX1V5K
-         9Rnw==
-X-Forwarded-Encrypted: i=1; AJvYcCUgClhxrewZkfo7t3Ln8pm5Y/EefKJDwiq/1vHaBE/WjQi8kC2/Ddko6mfmzsPGyDnBZ0Ybz04AyrfSJw==@vger.kernel.org, AJvYcCXD413dRedTuDC4rxCwuVJR1jCuc1ilMaHkCrnbAQ5+nUqG8eOCqp+3fUJOoe1JwzGavWBbriOx2CBhxTBC@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxgb9wwIRU61PWfUI5ANc/rMlHhzihYt3HeakKqQKtrE0gKDSQf
-	+pMVzDoQTUnPL1XhK4zldjWcziGLirjB8vJh0mH9oCRjQBaow3hD+w4V7Q==
-X-Gm-Gg: ASbGncv62REtVGR085zaT1aupI5C3RVtZufHbmbLyQVk7kTEgEfIMZWy0MvxMTy8Aeg
-	LZU8BiNCsBJ3/BlmMS9dPA17n/eySFkLCD++uwgVubqAQ2zdU0WU1IfrCnvNNVj75ImPHoeumLz
-	JldEVpA2MXsjAwCxwVb94sxosLv9vV4e2o5RsDWNH9G8y7A51ZwDoH1MzohSbpqAVrG0IgxlszP
-	vFPiWwzt4qWG5qiHqtj94XXNzlDyEicqlIXgZ9O/HDHS09E61eu26pymePoSvj5ownslWWcD3t+
-	GmxlFlv/baUp9p/W9H3MaOAjCKGhYaB6B4b4Xtab+xt/gnnNJY20XQ==
-X-Google-Smtp-Source: AGHT+IEQawC7SQVa9UF4slkO3lg86OopnWZ3aLTLVKEXgIrmgEgWz+bCG+8HW/R99D5VLCZ0Ld7EOQ==
-X-Received: by 2002:a05:600c:4e8d:b0:436:488f:4f3 with SMTP id 5b1f17b1804b1-4396e70d13emr25278915e9.17.1739620305242;
-        Sat, 15 Feb 2025 03:51:45 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258dcc45sm7124144f8f.33.2025.02.15.03.51.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Feb 2025 03:51:44 -0800 (PST)
-Date: Sat, 15 Feb 2025 11:51:44 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block/merge: remove unnecessary min() with UINT_MAX
-Message-ID: <20250215115144.6a10dad8@pumpkin>
-In-Reply-To: <20250214193637.234702-1-csander@purestorage.com>
-References: <20250214193637.234702-1-csander@purestorage.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        d=1e100.net; s=20230601; t=1739639911; x=1740244711;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y3rRk+gn9//zXPLARWtdRv3yS/t43lzQ1DoeFoUszLM=;
+        b=tK6HD1bH4PbYwPQUET0gXBb/AyhIi5GyWLJ5KBwdFExKrWQ1Pi+mAPStv6uK46Rrkk
+         Bv4Vv23cPQSEOwTKnB/q9JZ27p8ohYYfkIEKYubIFsyTvV+ZZDq3qd4yGihuIWnGlL8u
+         eWKkrm/SzawsPbtLw+JtXjNsOW41FwYcp7xLegVLxGSEk9BAFaUzg4urSUZVuK4ocN51
+         BNPGwvuJupSCBv5q4zn2w55gOVp1RSJcYQNqW5NNDMHqMVT+siB8yeMalqyOfm5ix+ZX
+         7lJtdHhf6LMjfVbe03fi/beOGbMKWftMSsVVLY4qIZF+mV250dH80wHCLqw3lycU0dlG
+         CPJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUIvcu+YPqtUY9gXFCCZU4fbdjUrPQ4dTqpVS2OpR/9tCoD2wk3qaeKw2pn/0UC9QfLT1yvv1UACjh4@vger.kernel.org, AJvYcCWMQnafKdX41ER1Uvawb3XsJzPj+4OTflLHnWvWU2koxYeDtDPcMi2PIARWRp/fEgW2FfeuJWEvIlppXw==@vger.kernel.org, AJvYcCWvOsci/KHTWPdjYHMS60RwuyCZzOkSTBTvnJXpo/E9YNtmV8hlernRiEgcNppHoiwnAB6/+g4SVkww2ojP@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFqvaajzt/SY19JUI2MAuAh8JtptxJ4ypPrXkDxKIdqdJk7JEK
+	5wO/Wz2TZ8KmVlZfcKgvw3GHVVIRZAU1bDyUAk65vj3uzw0c2GX4El8PMMOmEbP0cjiWd2qMK/y
+	bSlRHZ3eqZ3CdRZhoDr/m3yTrxc0OxP8x
+X-Gm-Gg: ASbGnctlGWaDj41BUTPPUh57GhW7GTliHl9vxeTbdjA8SP5d4yM6cePQXN8c5/FbCPW
+	Z49W3sBTvLwb6jV6yjTBcBZYPEqDgMeN7ez2XrOwoo8tb6Cpl27uiSYF7Aej2WsZaY+jIGFalaX
+	P7pW9d2J7dTz2mZ4hVUwKKrKEC70o=
+X-Google-Smtp-Source: AGHT+IH2zdiRa2ZNSD2zK+ox8iI7QVeC+t9719g4kVI01lpqPix3B9a0iXWsoIjErPKlDujuZJkGpsthWiW4G/CyLPI=
+X-Received: by 2002:a17:90b:4c07:b0:2ee:b8ac:73b0 with SMTP id
+ 98e67ed59e1d1-2fc40d1245fmr5580596a91.2.1739639911180; Sat, 15 Feb 2025
+ 09:18:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <0e8c8ead-423a-45f3-9e10-020334ef8907@infradead.org>
+ <20250214051432.207630-1-me@davidreaver.com> <CALYGNiOU3vPAyvsNv4rt=qZRbZFVZ9iAe+kzPzGKkx6_L3wG5Q@mail.gmail.com>
+ <864j0wxw74.fsf@davidreaver.com>
+In-Reply-To: <864j0wxw74.fsf@davidreaver.com>
+From: Konstantin Khlebnikov <koct9i@gmail.com>
+Date: Sat, 15 Feb 2025 18:18:20 +0100
+X-Gm-Features: AWEUYZnG0tSbZyT1TSj-Wscf2JYcJrjGbDJVy2WzG7qo0-hz7fiqnDHwTzWS3hg
+Message-ID: <CALYGNiOA4K4PQcJTk_OwkHOamW-Am_gKSUZoog41v+Y_+qEQxg@mail.gmail.com>
+Subject: Re: [PATCH] docs: iostats: Rewrite intro, remove outdated formats
+To: David Reaver <me@davidreaver.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>, Jens Axboe <axboe@kernel.dk>, 
+	linux-doc@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 14 Feb 2025 12:36:36 -0700
-Caleb Sander Mateos <csander@purestorage.com> wrote:
+On Fri, 14 Feb 2025 at 18:39, David Reaver <me@davidreaver.com> wrote:
+>
+> Konstantin Khlebnikov <koct9i@gmail.com> writes:
+>
+> > Wraparounds here are slightly more complicated than simply 32-bit or 64-bit overflows.
+> >
+> > Internal time counters are 64-bit in nanoseconds.
+> >
+> > Values are converted into milliseconds for printing,
+> > also 32-bit architectures truncate printed values to 32-bit.
+> >
+> > So the common trick: delta = (long)(after - before) does not work,
+> > because the time counter wraps around UINT64_MAX/1000.
+> >
+>
+> Thanks Konstantin. What do you think about just removing this entire
+> sentence? It is mostly tweaked from the old text that was rewritten, but
+> I'm not sure it is particularly insightful. That paragraph would look
+> like this:
+>
+>   All fields are cumulative, monotonic counters that start at zero at
+>   boot, except for field 9, which resets to zero as I/Os complete. Other
+>   fields only increase unless they overflow and wrap. Wrapping may occur
+>   on long-running or high-load systems, so applications should handle this
+>   properly.
 
-> In bvec_split_segs(), max_bytes is an unsigned, so it must be less than
-> or equal to UINT_MAX. Remove the unnecessary min().
-> 
-> Prior to commit 67927d220150 ("block/merge: count bytes instead of
-> sectors"), the min() was with UINT_MAX >> 9, so it did have an effect.
-> 
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> ---
->  block/blk-merge.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 15cd231d560c..39b738c0e4c9 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -268,11 +268,11 @@ static inline unsigned get_max_segment_size(const struct queue_limits *lim,
->   */
->  static bool bvec_split_segs(const struct queue_limits *lim,
->  		const struct bio_vec *bv, unsigned *nsegs, unsigned *bytes,
->  		unsigned max_segs, unsigned max_bytes)
->  {
-> -	unsigned max_len = min(max_bytes, UINT_MAX) - *bytes;
-> +	unsigned max_len = max_bytes - *bytes;
+There is another case when counters back to zero:
+device reattachment or reinitialization.
+The device itself might be the same or completely different,
+but statistics sampling will see only restart from zero.
 
-More interestingly, what stops *bytes being larger than max_bytes?
+So, maybe rephrase that counters sometimes restarts at zero.
+For example at boot, device attachment, or counter overflows.
 
-	David
-
->  	unsigned len = min(bv->bv_len, max_len);
->  	unsigned total_len = 0;
->  	unsigned seg_size = 0;
->  
->  	while (len && *nsegs < max_segs) {
-
+>
+> Thanks,
+> David Reaver
