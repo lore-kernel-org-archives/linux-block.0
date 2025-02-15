@@ -1,63 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BDD1FC11C
-	for <linux-block@vger.kernel.org>; Fri, 14 Feb 2025 22:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95DC613C809;
+	Sat, 15 Feb 2025 00:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739573597; cv=none; b=he6utU9iZK+UK9IFo3tH49O9HtaoDIkAcBt6qr9rfS/6+zJio0t/ojxQOoBGmYf21DLLv0OTn7O/jbpQEYm0E3YWt++eLBb04rTIUvyT/orjHJD3SjgG5duVcLqHF2BXuZXQk0NBwpHPXqWU0fF2/pW+xxO+4o/wlSoqg1Sk0Ms=
+	t=1739578717; cv=none; b=Kdrn8HNF083Yw1GZCDdB2KQhmgPXpw3AMPTabPoTLGtJu90aTS6VUR+znIc4YaOklc9207Sa0zpCtSDBjQbBgFkg1QYqhFMGbarXWSj6uWKO99ETL0BkY3kxwiz4nwE0ZhdV3ArNifQPNZuus8JmIk9hsGSC61DWdD3E5fMZObY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739573597; c=relaxed/simple;
-	bh=jp1fAXgntbSuKCG2tYIprs5TLpy0sjQXnMB75r1mP8w=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Mt2d/pcSQtgvPl0IuC8HwzrU+SXrKQFaAj4mTt1sqL90kReM8MYI+VOVSEl1vaghnv8q9vh+LDhfQddlTyQjndJP8VgCER6LV7SQD1jzBK6jYthUKFYXPCMqT4h0pX6hVhTEiDmJOBovsmHLiBB/hEtUTRwZDvd6cinvglC8MS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ks55xqGy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739578717; c=relaxed/simple;
+	bh=DP6GsL2kiXTrrcYvfd1/F15R3RNSwOVsk9p/xw6ZWpg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZM0yHTALr9GlU8BxenTTVgDLpdexF7+rbJ0jYZA7PXWX7Hrv97jTwI87Ce6f+FJggySyqH+L6/hQVCprD8ZhmVso/HTFaYXG9Nedq9O8Wtn3YCe++yxU0bicALZgFhe3XmbR8AdhHMx3m5R28LtdEA5a8w6mLTDNSOZItIbSSXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PFoGy4Nx; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ks55xqGy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5EB8C4CED1;
-	Fri, 14 Feb 2025 22:53:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739573597;
-	bh=jp1fAXgntbSuKCG2tYIprs5TLpy0sjQXnMB75r1mP8w=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=ks55xqGyzqF3sP4nHZ5WmnBtGtBwbQYqDLEryEEmT8ckc0jNTf4/+hrogprBiezqy
-	 Od27ZisakBjM7/H3jiBzzaXoxhAj/GsA9baxRraNJCfqXMdqzqkzqkj8iUiq9zi6+c
-	 GJ3GPGPSWZMdVtqMWc/RjCYsZ+1wntXtKpu/xrJRQ/9ArD9r2hCKUoAmQfWy8+aB/l
-	 K8lNIHgVqdKImtPGK5YJ7OemPctxDAyHUYiizKPryTMi8G3gr5nJDdGC9MJR4c6eSt
-	 mhtILMBY8NP3CvJeqAxfBrKFtS5dI0BsQWcF3IFBic795lIejhyoNjYDj5HD7QOpzW
-	 n18DnTs5df3XQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F3E380CEE8;
-	Fri, 14 Feb 2025 22:53:48 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.14-rc3
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <b187b8a3-a9f1-42d8-903e-3fa713416a51@kernel.dk>
-References: <b187b8a3-a9f1-42d8-903e-3fa713416a51@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <b187b8a3-a9f1-42d8-903e-3fa713416a51@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.14-20250214
-X-PR-Tracked-Commit-Id: 80e648042e512d5a767da251d44132553fe04ae0
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 1b8c8cdad1749d68130147f187008a368d564933
-Message-Id: <173957362700.2130743.8643314088419916421.pr-tracker-bot@kernel.org>
-Date: Fri, 14 Feb 2025 22:53:47 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PFoGy4Nx"
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5450f2959f7so2663163e87.2;
+        Fri, 14 Feb 2025 16:18:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739578714; x=1740183514; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5q0cGxquaLNwCjeJniPTIWT3xWlmuT23BV3wVLOJcDQ=;
+        b=PFoGy4NxddWNwLRRFdHEDOO7GC1GybizWpFjbiiC3Gh9GSeIW56V/O+T7o6PvDSK/a
+         VKSZS/UTPEr+NUzbc2Z4FHe2vkBeWlqIo65ufBUTKjJ7ZOlT6HoET2I3C2MxjnVnUrHV
+         8U2qC2xYD50/GyaK+a9K6G4Y03NlovXvhRVXiZh8Gwj69f5vizI/CNrfZbE6vW1kugVF
+         PJsBKR9qurse+LGwXRIWoatjwJ0OQqmyqRi1mk1/nt/4wQa+vMgDYkLaZUdefR9WeALp
+         /UchtxrVdVT1mWBjyFOZkxKWqgs+BYJtOvlhCZyIwRQRd+mOv8HQS+C9btN1Mfvw9VOV
+         Rn2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739578714; x=1740183514;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5q0cGxquaLNwCjeJniPTIWT3xWlmuT23BV3wVLOJcDQ=;
+        b=fMxhf0BRIcLvbp88cuyjPgvhUQRXSwSfTVYgHsA4okkjO1xn5FS5sOHxtPIRrzPsdS
+         GhPPVe4o99MnTIndqVJILSBCwq/T1OB7cg7wuugoT6wAyac0wYu46EXbfsFfnUZuGcDn
+         nuHIhg1OLwySeWox45qy2kUe6BwEfXCfgeyHTMVvDbbX9HhIb8vLim2xtCkd+NoxZTEG
+         nJbYNHcWfT7I2Rti8R+wVKFhn+lKe1IZY5Zkeu0loidTF8ncJC1hjFnmozaBbgf5cFYk
+         RwsJhIBW3CF+5+cZO4htMvOzoymvPLe1Ua0L9TtvOhGCpHMv81OQU8RBUAyNTMXMjbZe
+         CElw==
+X-Forwarded-Encrypted: i=1; AJvYcCXKFTxyzGAjU7Ri+kvcNaZZRejnCn83EVyWLS6SbG/fwueXNO3aZt+BgnaMt0bQrLQ8wFfkh6Gilj4a2g==@vger.kernel.org, AJvYcCXOtvA0c7sVVaDeh/TeJklpHXTz644cnWAX/I9/TfbRET6dAuFzEuT/j8Pn/kD34cbnFdvO7PC+Ww7KYfIDyBk=@vger.kernel.org, AJvYcCXUHRlRvisei4kbIX5o7la/awgh4Ju/TjS1biWGhbDSvu0Zqm3mzKLAamSD0sKanYLG5uf3iL9CNdrbHlk/6w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzGRDLCPwCgvhTAhUk8t74pyMKXd6z80f4YSNy4fK4KmgDUpOa
+	2cyenI2Yr9w7edlm/SBmFjPbcCMmfVpjIv80hd2sFK7u3UFuxoGr1Mh3wH3pReYyLA9yH1Tl8Jt
+	f4cjunVkHxwXOA2kKOXnZExyVBr0=
+X-Gm-Gg: ASbGncv6smRp7Pswc/w30zrR8WuyPps+iwfhd5oWsXeAB7RRhgtT1Zhwa8RnDbqnyCT
+	rSszpSdz3vKkKmx4EwuGOwfY4edz1eT0EbN0DxvFUMoK7VTENwvwj+yg0Z64WussbO/+QRFkQbf
+	t0+ArptYA5tvgyqzxR4W5qBOwK8o+nhqY=
+X-Google-Smtp-Source: AGHT+IFtmaqWPTKsjF9xPyuivvMTpfcSv9taFHOoRqpftBJxz5+gTjTkafOXFctObtPlzQyB3bqyopqomah5xPPCwn4=
+X-Received: by 2002:a05:6512:3b8e:b0:545:4df:4c1d with SMTP id
+ 2adb3069b0e04-5452fe938b9mr498637e87.46.1739578713338; Fri, 14 Feb 2025
+ 16:18:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <87ldu9uiyo.fsf@kernel.org>
+In-Reply-To: <87ldu9uiyo.fsf@kernel.org>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 14 Feb 2025 18:18:21 -0600
+X-Gm-Features: AWEUYZnZelshUZNe61cfBSMPcuylKF3W5d60tuBaF_HvPU3xYbsEJ4yF2WnLyI0
+Message-ID: <CAH2r5mvh7gFftj1rbZoocbLO9mGffOskVgAhJ3gwSb4ufO5cpA@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Rust in FS, Storage, MM
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org, 
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Fri, 14 Feb 2025 10:29:54 -0700:
+sounds like a good idea.
 
-> git://git.kernel.dk/linux.git tags/block-6.14-20250214
+I would love to have some experimental helper drivers in Rust for
+cifs.ko and/or ksmbd
+(e.g. fs/smb/common module for improved compression support over
+SMB3.1.1, or SMB3.1.1 over QUIC, or for optional protocol features
+that could be segmented into a common module shared by client and
+server in fs/smb/common)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/1b8c8cdad1749d68130147f187008a368d564933
+On Fri, Feb 14, 2025 at 12:41=E2=80=AFAM Andreas Hindborg <a.hindborg@kerne=
+l.org> wrote:
+>
+> Hi All,
+>
+> On behalf of the Linux kernel Rust subsystem team, I would like to sugges=
+t a
+> general plenary session focused on Rust. Based on audience interest we wo=
+uld
+> discuss:
+>
+>  - Status of rust adoption in each subsystem - what did we achieve since =
+last
+>    LSF?
+>  - Insights from the maintainers of subsystems that have merged Rust - ho=
+w was
+>    the experience?
+>  - A reflection on process - does the current approach work or should we =
+change
+>    something?
+>  - General Q&A
+>
+> Please note that unfortunately I will be the only representative from the=
+ Rust
+> subsystem team on site this year.
+>
+> Best regards,
+> Andreas Hindborg
+>
+>
 
-Thank you!
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+--=20
+Thanks,
+
+Steve
