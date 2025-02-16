@@ -1,75 +1,125 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9F413BAE4
-	for <linux-block@vger.kernel.org>; Sun, 16 Feb 2025 16:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58351531E8
+	for <linux-block@vger.kernel.org>; Sun, 16 Feb 2025 22:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739724691; cv=none; b=R0BvIs595RmESoWGFpYMmcuRqYyaP1usgDCjYmi7wWlwawNNxY0ucQJrO7kkqPRLPbn/9jjNR4QUxvfFLGBEvFRJQgdCG4sGMcwMBCZPZsYalJfzIOI4kRrQVeGZ0R16o42uMuVu/8IKrvOznQWoF133yyw7+vMcgfFuqrbR7Rw=
+	t=1739743809; cv=none; b=FBQtDwC/YWvoHT6RT4pxw6UY1GWdYsirCpPfLtJkkKOpwbgoMUZ4ScapLzoj160S/i0JWPzv8/+kr7mOD7sKSMXpAigt2AmtoRUUc5gE6fIeIXUAMZietKOf2l/cDIx5F9mVaQHIWJs02CeWY0YAbTX5AGBreb4seMADK66kq1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739724691; c=relaxed/simple;
-	bh=mQ97y95LIdrraB03cZEreLekHPsr6H/Eh7BYqk2gmiU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=VT0XQUOapS4OG6gSZkIOuwd/ePnmx5GKtJHoAqO2VlboHBIVxUAobphFncQphjdGwQtHlLlQ6bZaVYiF7GNpFEPrxr38LfcUot60mqFAxkTvYoU+pF/LtNDAkug3PPtrjb8A+nH49Vu+rjhqMO4geOkZtyqKrRCobdEGNPGJbr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OFnyFpgw; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739743809; c=relaxed/simple;
+	bh=CkdBIOfKGyvQNLz9XBICP6Cd3ZJnuGzuaK1x7Dkc5PY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Jpp8kuNJnGBiF7vfuFa6S5H96r0fK4mGBvm1Op8jRg5dP4zRZUwwUuF8ZfJ5OFx/luabeM4geq+htZ0SR8mkoZJJFmeTU/bDQgp+7QADS3IUPuShZDy3HmkXKq5cLRZmECxaqNqgkf9hARLqbdg+rXpXQFnHYNYMuRewwBw9IhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=HBaAI/b4; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OFnyFpgw"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6dd0d09215aso30015316d6.2
-        for <linux-block@vger.kernel.org>; Sun, 16 Feb 2025 08:51:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="HBaAI/b4"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22134a64d8cso613455ad.3
+        for <linux-block@vger.kernel.org>; Sun, 16 Feb 2025 14:10:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739724689; x=1740329489; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=mQ97y95LIdrraB03cZEreLekHPsr6H/Eh7BYqk2gmiU=;
-        b=OFnyFpgwmZ/7frdq7V+nz8emc5g4sB7c3ZMfArTR+Whdp+mWTUaWiEdEY0XTzMe7qK
-         BPXs3jrTIMmmFoleOdxxbxgzHbtzI5oxX4kwUQFlhblHe5/8ajA9yLR8UfozCGPT58xo
-         8dqgPe3gwn+SZluPchuwZQA6nXjWm44i5BWmb7ziCIrZMkEuT/S7e75LriBYcC3a9nLJ
-         uvlOrw/H2ifNXbDszg7nyGhj5Tav8pPoBu1w0gSZVDr1EecVUVMrzhGu/pEP87OnskkZ
-         2vfXLqssolqSv/YDxFiVhPW//uF/g/gdRkDjRAGI85wDnP3AKvyMaVL7izj+40n5kbYM
-         SeQQ==
+        d=purestorage.com; s=google2022; t=1739743807; x=1740348607; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=svEMB+fuQjKggY6D7PQDoMNSfyDP3hVbtjvNOR1UMfk=;
+        b=HBaAI/b4+yF0c6+QSIhqO/C7Car6yEXdyHCb/Tq54ACJZaj75IKY+LM1qLkF6fGYXW
+         IDtV9/kPiIXoFjaqBuVfv+/r/lZJkqQzowP9hZjfL6CmmOOYESz09BdiBNJVBqKiOslh
+         n4GkFRXzbSkDPOaTSW84iTj2MGdNINbs4nj2EDHb+8lrkEaR3LUQHzN3i7xjqjlkdIiE
+         g8544jHy7/z+VRHkwVbrAVur0kfeb+blV7y5xPZLuhBrWZPyVctwn3Aux+UuPR5tDT5x
+         6l/zGPMyGaVWQTtmfmve1Ki6fLL6nrlY3V++K9N22k64D3hgftfWxMpoo4I5LqnwYsHL
+         u1EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739724689; x=1740329489;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mQ97y95LIdrraB03cZEreLekHPsr6H/Eh7BYqk2gmiU=;
-        b=cbwx1vsENZmeiFn7lq2BHxhuLVLnsmFMFhtUTFzQ1OZW+TEcY11uD/UoQ8qVQ4fGmG
-         hDkRmC4Rpik5Smm9MnMq00ELrY3ctszp4bfddDQLPnUopmoWg+c4M8ScyGXU41JMRLeC
-         Lw+hT3Z0TtxLFTZxSfO4xs6xF3LcXc98PaPhn9fiCk8+xRvkBaoGkqfPJ4x8pyAnYulS
-         W4aHZ68AsMy07ldWKF55/fsl31a+A/PBnRAQuGe/SHrVdiCtQQ5M2BeqgFQ7MuHvYSO0
-         yLAQxP1mJzenIbBc01yNf0LElwdJ0q8okJSA+HkOw7jfN1nthp5xu18MRJkgnjdfAcbU
-         Mqpg==
-X-Gm-Message-State: AOJu0YwY22gfCwYRlCUutO+kuDXQNge9uDKkZ+32AqGVMNYTSMgrSS+y
-	UGHUiIzjbalkZjYFKo8fsN54S8hSUy3ODFgYShmC4iBkrx+flQ4Qz7zF3e4Jb91T2FJUXxaF0NN
-	fmyV1ONYp5wONEaR7BRKTOBhmj2HLwA==
-X-Gm-Gg: ASbGncu4OG1l87sVAtNUyaS8bOwT9tWLM60iqXS2FjyISPnUpWjsF+ufmoghXLJ2cLU
-	9btmzk8WM5aVnMxJkkDZtI81MHgVFTnCAzEZVUdkEWbsh1riKx4TFXjkJCPkDNCpuTdvBl4k=
-X-Google-Smtp-Source: AGHT+IGdb9hA8iMaUhoFuizK2XH9j5890+/SmM0ARq0RAmuJlNNsp5Sh/O7CtWn3MWorHkmb2kp39NnBfg4BwUQg+IM=
-X-Received: by 2002:ad4:576b:0:b0:6d8:d84d:d938 with SMTP id
- 6a1803df08f44-6e66ccf044cmr105549776d6.28.1739724689022; Sun, 16 Feb 2025
- 08:51:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739743807; x=1740348607;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=svEMB+fuQjKggY6D7PQDoMNSfyDP3hVbtjvNOR1UMfk=;
+        b=EOkBrz7WB28Cyg61VHODovHvuRDkb4Udvday0Aa82+bXFc6DmiPxEx8q9itL4JscZ4
+         aQdbgvVSIa19jRuZ0Nj0OPrRMTJ9vGDZgOpS4z2KHfNWASgs8SMBFxxudY0ijWP7GTYB
+         QnI14fms+CBE5pTocc3ii8MVxfepmze9m+AWav+zeEQfgHgF5JIt6XKBqtK1/z0iX78w
+         ReOoAlxJkTHthB4nQbLZYP7/KYwjP1wV2ZB5T0sZgj5ye+WysG2yth9FRtONz1RN+CZZ
+         hMCdpAqvsAhZyIB8ObjpBbof6A6ieZdSxAQiStrzeW89aCbaomFcvF7oR+KXhTSZKDAf
+         tLPg==
+X-Forwarded-Encrypted: i=1; AJvYcCVogfGrfsS4y+63oLZq+rYdlbzya9PtTm+1Mam2KhemeFtlpIaKzxeKwE/QhJKb6bxFRi1/6aFv5dKTaQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy20r/TwW6JBy1YCw41NHVh2YjvvAow8mdphjLebuzSGNTkz1Fd
+	qR0LtqVZnG/KNAT33OXWOvTKzJkxY5hNsQX4vcbVXVXd8eVCDT3RdX0yW8/IS9EwRHq9R1QDM5M
+	BpxEiAio9mhTzhChzNbqT61ZpxTwcq102eM2d5A==
+X-Gm-Gg: ASbGncuQlORx0DEEXK2DgyAaQDiRQjQwUnduVxsL3h0uZpygxoAMo1fKP+PYmeVgeSB
+	BO/5oifFkVuDu6SDDte4hx+glhQj/60fFbtBVjuvkL7Ht6i7eRmgYGa2uK+mQ+Nk1qb4l63U=
+X-Google-Smtp-Source: AGHT+IHCf1cwz26/6LxZ3CgT7yLxo7A7C8mkN6znzDdjrY4sVFLTH8/84ue7tK2yeT71neju4p2OUL2rCwmBq7xpdnM=
+X-Received: by 2002:a17:902:c94f:b0:220:fce5:977c with SMTP id
+ d9443c01a7336-2210402b42amr43550165ad.8.1739743806990; Sun, 16 Feb 2025
+ 14:10:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Racz Zoli <racz.zoli@gmail.com>
-Date: Sun, 16 Feb 2025 18:51:18 +0200
-X-Gm-Features: AWEUYZkbY64Rbvtl-7auv0AvhDbVJTAPJi2iXhgS3l2ZsdFdauoaP1au8z5i80s
-Message-ID: <CANoGd8nKbSu2iw6GnZ0ArDocsFdtpypyVa6WC6K2T00L-n+zyA@mail.gmail.com>
-Subject: Block changes hook question
-To: linux-block@vger.kernel.org
+References: <20250214193637.234702-1-csander@purestorage.com> <20250215115144.6a10dad8@pumpkin>
+In-Reply-To: <20250215115144.6a10dad8@pumpkin>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Sun, 16 Feb 2025 14:09:55 -0800
+X-Gm-Features: AWEUYZkBZVk86ijik-PVUaU2vN0hDwMhamyD4byjIJ94_ZBdHz98lnubONZNZqE
+Message-ID: <CADUfDZqjDxLctcSpBzjxu8fN9NjrMq9JvKZeJOB__9ZrjyEOOg@mail.gmail.com>
+Subject: Re: [PATCH] block/merge: remove unnecessary min() with UINT_MAX
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
-I apologize if this mailing list is not the right place to ask this
-question, but I`m working on a block level backup utility for linux,
-and I don`t know how I could detect block level changes in the linux
-kernel. Searched the internet and the documentation for days, but I
-can't figure out how could I hook to any function on the block level
-which would be executed every time a block on the disk changes. Maybe
-somebody can help me with an idea.
+On Sat, Feb 15, 2025 at 3:51=E2=80=AFAM David Laight
+<david.laight.linux@gmail.com> wrote:
+>
+> On Fri, 14 Feb 2025 12:36:36 -0700
+> Caleb Sander Mateos <csander@purestorage.com> wrote:
+>
+> > In bvec_split_segs(), max_bytes is an unsigned, so it must be less than
+> > or equal to UINT_MAX. Remove the unnecessary min().
+> >
+> > Prior to commit 67927d220150 ("block/merge: count bytes instead of
+> > sectors"), the min() was with UINT_MAX >> 9, so it did have an effect.
+> >
+> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > ---
+> >  block/blk-merge.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/block/blk-merge.c b/block/blk-merge.c
+> > index 15cd231d560c..39b738c0e4c9 100644
+> > --- a/block/blk-merge.c
+> > +++ b/block/blk-merge.c
+> > @@ -268,11 +268,11 @@ static inline unsigned get_max_segment_size(const=
+ struct queue_limits *lim,
+> >   */
+> >  static bool bvec_split_segs(const struct queue_limits *lim,
+> >               const struct bio_vec *bv, unsigned *nsegs, unsigned *byte=
+s,
+> >               unsigned max_segs, unsigned max_bytes)
+> >  {
+> > -     unsigned max_len =3D min(max_bytes, UINT_MAX) - *bytes;
+> > +     unsigned max_len =3D max_bytes - *bytes;
+>
+> More interestingly, what stops *bytes being larger than max_bytes?
 
-Thank you very much,
-Zoltan.
+bvec_split_segs() has two callers, bio_split_rw_at() and
+blk_recalc_rq_segments(). In both, *bytes =3D 0 originally.
+bio_split_rw_at() has another code path which increments *bytes, but
+it makes sure not to exceed max_bytes. So when bvec_split_segs() is
+called, *bytes <=3D max_bytes. The logic in bvec_split_segs() won't
+increment *bytes by more than len, which is at most max_len =3D
+max_bytes - *bytes. So inductively, *bytes <=3D max_bytes before every
+call to bvec_split_segs().
+
+>
+>         David
+>
+> >       unsigned len =3D min(bv->bv_len, max_len);
+> >       unsigned total_len =3D 0;
+> >       unsigned seg_size =3D 0;
+> >
+> >       while (len && *nsegs < max_segs) {
+>
