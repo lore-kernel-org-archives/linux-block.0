@@ -1,125 +1,555 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58351531E8
-	for <linux-block@vger.kernel.org>; Sun, 16 Feb 2025 22:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735CA1A238B
+	for <linux-block@vger.kernel.org>; Sun, 16 Feb 2025 22:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739743809; cv=none; b=FBQtDwC/YWvoHT6RT4pxw6UY1GWdYsirCpPfLtJkkKOpwbgoMUZ4ScapLzoj160S/i0JWPzv8/+kr7mOD7sKSMXpAigt2AmtoRUUc5gE6fIeIXUAMZietKOf2l/cDIx5F9mVaQHIWJs02CeWY0YAbTX5AGBreb4seMADK66kq1o=
+	t=1739745834; cv=none; b=JtnzUX9qPHC4Zyayl2y21qkdOL8F8ozZ+lmKwwvAonkxSivNQabJUSHm7cvM425WHTvaVyD5CmBMme6RxotIvbfC/SCu4i2v72A7UkP8Qvvt0hLHLR9oqpUBSyOzyw0Kxhw8Jhnn51Wdyir2uc2jpLoZzxsdbFpPdxCmWSnjDJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739743809; c=relaxed/simple;
-	bh=CkdBIOfKGyvQNLz9XBICP6Cd3ZJnuGzuaK1x7Dkc5PY=;
+	s=arc-20240116; t=1739745834; c=relaxed/simple;
+	bh=+f079ju+RCKS/8B9RKXfxi8Zix6bSKSgHVs2wCddcJ8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jpp8kuNJnGBiF7vfuFa6S5H96r0fK4mGBvm1Op8jRg5dP4zRZUwwUuF8ZfJ5OFx/luabeM4geq+htZ0SR8mkoZJJFmeTU/bDQgp+7QADS3IUPuShZDy3HmkXKq5cLRZmECxaqNqgkf9hARLqbdg+rXpXQFnHYNYMuRewwBw9IhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=HBaAI/b4; arc=none smtp.client-ip=209.85.214.175
+	 To:Cc:Content-Type; b=SJ9HdTaJmAyXprCArZbzv2ObXrSEERHm2bFO7Em488M+nNgBqjQgNk52i9F3Jnsr/26GYrg79t4CBu7/avo41AUowCyqo7e97KTZBu9g/YYEgGow0N0WaDjStqQRso1Z344qqK5czl2EkG+xwEmFSFM9NTWqLNH0jnx18BOQXHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=gG3X4ZS+; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="HBaAI/b4"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22134a64d8cso613455ad.3
-        for <linux-block@vger.kernel.org>; Sun, 16 Feb 2025 14:10:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="gG3X4ZS+"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2f9b8ef4261so934804a91.1
+        for <linux-block@vger.kernel.org>; Sun, 16 Feb 2025 14:43:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1739743807; x=1740348607; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1739745832; x=1740350632; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=svEMB+fuQjKggY6D7PQDoMNSfyDP3hVbtjvNOR1UMfk=;
-        b=HBaAI/b4+yF0c6+QSIhqO/C7Car6yEXdyHCb/Tq54ACJZaj75IKY+LM1qLkF6fGYXW
-         IDtV9/kPiIXoFjaqBuVfv+/r/lZJkqQzowP9hZjfL6CmmOOYESz09BdiBNJVBqKiOslh
-         n4GkFRXzbSkDPOaTSW84iTj2MGdNINbs4nj2EDHb+8lrkEaR3LUQHzN3i7xjqjlkdIiE
-         g8544jHy7/z+VRHkwVbrAVur0kfeb+blV7y5xPZLuhBrWZPyVctwn3Aux+UuPR5tDT5x
-         6l/zGPMyGaVWQTtmfmve1Ki6fLL6nrlY3V++K9N22k64D3hgftfWxMpoo4I5LqnwYsHL
-         u1EA==
+        bh=VE4xXMoz0Ys7BYrnHZpYRJdnORPOyFq/c9xefI3cWTU=;
+        b=gG3X4ZS+nmCo88qiFQJXi9Si2r7KmFvTfOPjfploU81E5iYvCWnPD+7FNe1Xa84YOT
+         NTbjMQ+f01hNdRbRETOMYKQXC3ZsbjKjHSoKp8uKtz/5N0LGIXyf6nfXDzII4rtE2dOE
+         wANp8cvrEXuBUG1vprPXgALoTVj6bNo0Op8G4drXbho1lg/HvFamZsIrvsgEQeke/WEU
+         taG5bd34EgNKWtHTWD6DTB2fVQ3Re6mwPWgugjsWwg30xjn3r9FbX4g3WfZaIxGANd4r
+         NGaFGGTwpIQl2bvG0akDbpBtF8aHsrk3uCg0bwtQ7U6D6+v+LKCv6FM2XoOwqAr3szCo
+         cD4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739743807; x=1740348607;
+        d=1e100.net; s=20230601; t=1739745832; x=1740350632;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=svEMB+fuQjKggY6D7PQDoMNSfyDP3hVbtjvNOR1UMfk=;
-        b=EOkBrz7WB28Cyg61VHODovHvuRDkb4Udvday0Aa82+bXFc6DmiPxEx8q9itL4JscZ4
-         aQdbgvVSIa19jRuZ0Nj0OPrRMTJ9vGDZgOpS4z2KHfNWASgs8SMBFxxudY0ijWP7GTYB
-         QnI14fms+CBE5pTocc3ii8MVxfepmze9m+AWav+zeEQfgHgF5JIt6XKBqtK1/z0iX78w
-         ReOoAlxJkTHthB4nQbLZYP7/KYwjP1wV2ZB5T0sZgj5ye+WysG2yth9FRtONz1RN+CZZ
-         hMCdpAqvsAhZyIB8ObjpBbof6A6ieZdSxAQiStrzeW89aCbaomFcvF7oR+KXhTSZKDAf
-         tLPg==
-X-Forwarded-Encrypted: i=1; AJvYcCVogfGrfsS4y+63oLZq+rYdlbzya9PtTm+1Mam2KhemeFtlpIaKzxeKwE/QhJKb6bxFRi1/6aFv5dKTaQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy20r/TwW6JBy1YCw41NHVh2YjvvAow8mdphjLebuzSGNTkz1Fd
-	qR0LtqVZnG/KNAT33OXWOvTKzJkxY5hNsQX4vcbVXVXd8eVCDT3RdX0yW8/IS9EwRHq9R1QDM5M
-	BpxEiAio9mhTzhChzNbqT61ZpxTwcq102eM2d5A==
-X-Gm-Gg: ASbGncuQlORx0DEEXK2DgyAaQDiRQjQwUnduVxsL3h0uZpygxoAMo1fKP+PYmeVgeSB
-	BO/5oifFkVuDu6SDDte4hx+glhQj/60fFbtBVjuvkL7Ht6i7eRmgYGa2uK+mQ+Nk1qb4l63U=
-X-Google-Smtp-Source: AGHT+IHCf1cwz26/6LxZ3CgT7yLxo7A7C8mkN6znzDdjrY4sVFLTH8/84ue7tK2yeT71neju4p2OUL2rCwmBq7xpdnM=
-X-Received: by 2002:a17:902:c94f:b0:220:fce5:977c with SMTP id
- d9443c01a7336-2210402b42amr43550165ad.8.1739743806990; Sun, 16 Feb 2025
- 14:10:06 -0800 (PST)
+        bh=VE4xXMoz0Ys7BYrnHZpYRJdnORPOyFq/c9xefI3cWTU=;
+        b=teQ/De79Vwr82LECs/uNb589h36BO+qEDIJQDK6TsYMCLGU0+IDL2guCnroz2CG6W0
+         +ynJN5IEztTvkiBP1dXDoyADxN4Tb5ZN5MSSkyfRc8mxh+5zjPl9XC+fhD+pkkHLglQE
+         hMvAYQd7t96quvjBimLTcbpTSMsaSbTzqWIn77uBZ0Nxi5Ii1ulD3H/ccdd0nW3eHYRE
+         YdFvmoqnvoDJUWtdmRiMlFLokTbmezHCQ+q8jf1Fbv2Jqz9IdhlXnT3UHdccN9Nf8yxm
+         8diRiyjvAH4s8875irUmhZfJnAgvaYI3n1V1h4vQmI/mmkNG9N8hR/gKodZKdumyvsST
+         lMnA==
+X-Forwarded-Encrypted: i=1; AJvYcCVCxCrM8uXCJObX2NSYMp/3RNmIhDvY0WmNEF76vSx7gH8S5MXhxPbVznNgOb7b3AI2tFiBlk3WKMrBuA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwStfAL1bkMefKg1mXTSCxpSUUBSuTdfd2tAcn14PeE70Gg7QHe
+	FiiNzkaaStjT9DV96U2QK1jhKayGbxTNioaDSdvoyUkqBVUxel4Z2DMyrpPrhoBn7/Q3jGINRI1
+	QPD2Kku0tUbpSUy7D9pGIRs4UiL0KYb7a9dvriw==
+X-Gm-Gg: ASbGncvMc986WTNLtWc/MhZFcwybmLGLhsMo8EYAyZv8QUte0ui03koVVSF/I+uBjIG
+	hIAcN+UC6SSdq5eu/2itV5xjg5ZnkSipAfWubSHABmhhreNnSnyUURGTAqJyOIR7mBUEVDbg=
+X-Google-Smtp-Source: AGHT+IHz8RTxMUMjMChP3ve/ZdjRSw9H7HH2/mYpLVQiVrDLHqVtCN8qvE8gL+JS5KSR4QT6/NmmZ7N8HwZzkvIFB30=
+X-Received: by 2002:a17:90b:510c:b0:2fc:25b3:6a7b with SMTP id
+ 98e67ed59e1d1-2fc411679ddmr4380284a91.6.1739745831511; Sun, 16 Feb 2025
+ 14:43:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214193637.234702-1-csander@purestorage.com> <20250215115144.6a10dad8@pumpkin>
-In-Reply-To: <20250215115144.6a10dad8@pumpkin>
+References: <20250214154348.2952692-1-kbusch@meta.com> <20250214154348.2952692-6-kbusch@meta.com>
+ <CADUfDZpM-TXBYQy0B4xRnKjT=-OfX+AYo+6HGA7e7pyT39LxEA@mail.gmail.com>
+In-Reply-To: <CADUfDZpM-TXBYQy0B4xRnKjT=-OfX+AYo+6HGA7e7pyT39LxEA@mail.gmail.com>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Sun, 16 Feb 2025 14:09:55 -0800
-X-Gm-Features: AWEUYZkBZVk86ijik-PVUaU2vN0hDwMhamyD4byjIJ94_ZBdHz98lnubONZNZqE
-Message-ID: <CADUfDZqjDxLctcSpBzjxu8fN9NjrMq9JvKZeJOB__9ZrjyEOOg@mail.gmail.com>
-Subject: Re: [PATCH] block/merge: remove unnecessary min() with UINT_MAX
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+Date: Sun, 16 Feb 2025 14:43:40 -0800
+X-Gm-Features: AWEUYZm3HqPAZf-PlzLHpptiLuK81jNLBto6Av57jEbNk1VFWMNUuSQ9GfTIrQc
+Message-ID: <CADUfDZrfmpy3hxD5z0ADxCUkWPbU0aZDMiqpyPE+AZbeDSgZ=g@mail.gmail.com>
+Subject: Re: [PATCHv3 5/5] io_uring: cache nodes and mapped buffers
+To: Keith Busch <kbusch@meta.com>
+Cc: ming.lei@redhat.com, asml.silence@gmail.com, axboe@kernel.dk, 
+	linux-block@vger.kernel.org, io-uring@vger.kernel.org, bernd@bsbernd.com, 
+	Keith Busch <kbusch@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 15, 2025 at 3:51=E2=80=AFAM David Laight
-<david.laight.linux@gmail.com> wrote:
+On Fri, Feb 14, 2025 at 6:22=E2=80=AFPM Caleb Sander Mateos
+<csander@purestorage.com> wrote:
 >
-> On Fri, 14 Feb 2025 12:36:36 -0700
-> Caleb Sander Mateos <csander@purestorage.com> wrote:
->
-> > In bvec_split_segs(), max_bytes is an unsigned, so it must be less than
-> > or equal to UINT_MAX. Remove the unnecessary min().
+> On Fri, Feb 14, 2025 at 7:46=E2=80=AFAM Keith Busch <kbusch@meta.com> wro=
+te:
 > >
-> > Prior to commit 67927d220150 ("block/merge: count bytes instead of
-> > sectors"), the min() was with UINT_MAX >> 9, so it did have an effect.
+> > From: Keith Busch <kbusch@kernel.org>
 > >
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > Frequent alloc/free cycles on these is pretty costly. Use an io cache t=
+o
+> > more efficiently reuse these buffers.
+> >
+> > Signed-off-by: Keith Busch <kbusch@kernel.org>
 > > ---
-> >  block/blk-merge.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >  include/linux/io_uring_types.h |  18 +++---
+> >  io_uring/filetable.c           |   2 +-
+> >  io_uring/rsrc.c                | 114 +++++++++++++++++++++++++--------
+> >  io_uring/rsrc.h                |   2 +-
+> >  4 files changed, 99 insertions(+), 37 deletions(-)
 > >
-> > diff --git a/block/blk-merge.c b/block/blk-merge.c
-> > index 15cd231d560c..39b738c0e4c9 100644
-> > --- a/block/blk-merge.c
-> > +++ b/block/blk-merge.c
-> > @@ -268,11 +268,11 @@ static inline unsigned get_max_segment_size(const=
- struct queue_limits *lim,
-> >   */
-> >  static bool bvec_split_segs(const struct queue_limits *lim,
-> >               const struct bio_vec *bv, unsigned *nsegs, unsigned *byte=
-s,
-> >               unsigned max_segs, unsigned max_bytes)
+> > diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_ty=
+pes.h
+> > index d8d717cce427f..ebaaa1c7e210f 100644
+> > --- a/include/linux/io_uring_types.h
+> > +++ b/include/linux/io_uring_types.h
+> > @@ -67,8 +67,18 @@ struct io_file_table {
+> >         unsigned int alloc_hint;
+> >  };
+> >
+> > +struct io_alloc_cache {
+> > +       void                    **entries;
+> > +       unsigned int            nr_cached;
+> > +       unsigned int            max_cached;
+> > +       size_t                  elem_size;
+> > +       unsigned int            init_clear;
+> > +};
+> > +
+> >  struct io_buf_table {
+> >         struct io_rsrc_data     data;
+> > +       struct io_alloc_cache   node_cache;
+> > +       struct io_alloc_cache   imu_cache;
+> >  };
+> >
+> >  struct io_hash_bucket {
+> > @@ -222,14 +232,6 @@ struct io_submit_state {
+> >         struct blk_plug         plug;
+> >  };
+> >
+> > -struct io_alloc_cache {
+> > -       void                    **entries;
+> > -       unsigned int            nr_cached;
+> > -       unsigned int            max_cached;
+> > -       unsigned int            elem_size;
+> > -       unsigned int            init_clear;
+> > -};
+> > -
+> >  struct io_ring_ctx {
+> >         /* const or read-mostly hot data */
+> >         struct {
+> > diff --git a/io_uring/filetable.c b/io_uring/filetable.c
+> > index dd8eeec97acf6..a21660e3145ab 100644
+> > --- a/io_uring/filetable.c
+> > +++ b/io_uring/filetable.c
+> > @@ -68,7 +68,7 @@ static int io_install_fixed_file(struct io_ring_ctx *=
+ctx, struct file *file,
+> >         if (slot_index >=3D ctx->file_table.data.nr)
+> >                 return -EINVAL;
+> >
+> > -       node =3D io_rsrc_node_alloc(IORING_RSRC_FILE);
+> > +       node =3D io_rsrc_node_alloc(ctx, IORING_RSRC_FILE);
+> >         if (!node)
+> >                 return -ENOMEM;
+> >
+> > diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+> > index fd7a1b04db8b7..26ff9b5851d94 100644
+> > --- a/io_uring/rsrc.c
+> > +++ b/io_uring/rsrc.c
+> > @@ -32,6 +32,8 @@ static struct io_rsrc_node *io_sqe_buffer_register(st=
+ruct io_ring_ctx *ctx,
+> >  #define IORING_MAX_FIXED_FILES (1U << 20)
+> >  #define IORING_MAX_REG_BUFFERS (1U << 14)
+> >
+> > +#define IO_CACHED_BVECS_SEGS   32
+> > +
+> >  int __io_account_mem(struct user_struct *user, unsigned long nr_pages)
 > >  {
-> > -     unsigned max_len =3D min(max_bytes, UINT_MAX) - *bytes;
-> > +     unsigned max_len =3D max_bytes - *bytes;
->
-> More interestingly, what stops *bytes being larger than max_bytes?
-
-bvec_split_segs() has two callers, bio_split_rw_at() and
-blk_recalc_rq_segments(). In both, *bytes =3D 0 originally.
-bio_split_rw_at() has another code path which increments *bytes, but
-it makes sure not to exceed max_bytes. So when bvec_split_segs() is
-called, *bytes <=3D max_bytes. The logic in bvec_split_segs() won't
-increment *bytes by more than len, which is at most max_len =3D
-max_bytes - *bytes. So inductively, *bytes <=3D max_bytes before every
-call to bvec_split_segs().
-
->
->         David
->
-> >       unsigned len =3D min(bv->bv_len, max_len);
-> >       unsigned total_len =3D 0;
-> >       unsigned seg_size =3D 0;
+> >         unsigned long page_limit, cur_pages, new_pages;
+> > @@ -122,19 +124,33 @@ static void io_buffer_unmap(struct io_ring_ctx *c=
+tx, struct io_rsrc_node *node)
+> >         kvfree(imu);
+> >  }
 > >
-> >       while (len && *nsegs < max_segs) {
+> > -struct io_rsrc_node *io_rsrc_node_alloc(int type)
+> > +
+> > +struct io_rsrc_node *io_rsrc_node_alloc(struct io_ring_ctx *ctx, int t=
+ype)
 >
+> nit: extra blank line added here
+>
+> >  {
+> >         struct io_rsrc_node *node;
+> >
+> > -       node =3D kzalloc(sizeof(*node), GFP_KERNEL);
+> > +       if (type =3D=3D IORING_RSRC_FILE)
+> > +               node =3D kmalloc(sizeof(*node), GFP_KERNEL);
+> > +       else
+> > +               node =3D io_cache_alloc(&ctx->buf_table.node_cache, GFP=
+_KERNEL);
+> >         if (node) {
+> >                 node->type =3D type;
+> >                 node->refs =3D 1;
+> > +               node->tag =3D 0;
+> > +               node->file_ptr =3D 0;
+> >         }
+> >         return node;
+> >  }
+> >
+> > -__cold void io_rsrc_data_free(struct io_ring_ctx *ctx, struct io_rsrc_=
+data *data)
+> > +static __cold void __io_rsrc_data_free(struct io_rsrc_data *data)
+> > +{
+> > +       kvfree(data->nodes);
+> > +       data->nodes =3D NULL;
+> > +       data->nr =3D 0;
+> > +}
+> > +
+> > +__cold void io_rsrc_data_free(struct io_ring_ctx *ctx,
+> > +                             struct io_rsrc_data *data)
+> >  {
+> >         if (!data->nr)
+> >                 return;
+> > @@ -142,9 +158,7 @@ __cold void io_rsrc_data_free(struct io_ring_ctx *c=
+tx, struct io_rsrc_data *data
+> >                 if (data->nodes[data->nr])
+> >                         io_put_rsrc_node(ctx, data->nodes[data->nr]);
+> >         }
+> > -       kvfree(data->nodes);
+> > -       data->nodes =3D NULL;
+> > -       data->nr =3D 0;
+> > +       __io_rsrc_data_free(data);
+> >  }
+> >
+> >  __cold int io_rsrc_data_alloc(struct io_rsrc_data *data, unsigned nr)
+> > @@ -158,6 +172,33 @@ __cold int io_rsrc_data_alloc(struct io_rsrc_data =
+*data, unsigned nr)
+> >         return -ENOMEM;
+> >  }
+> >
+> > +static __cold int io_rsrc_buffer_alloc(struct io_buf_table *table, uns=
+igned nr)
+> > +{
+> > +       const int imu_cache_size =3D struct_size_t(struct io_mapped_ubu=
+f, bvec,
+> > +                                                IO_CACHED_BVECS_SEGS);
+> > +       int ret;
+> > +
+> > +       ret =3D io_rsrc_data_alloc(&table->data, nr);
+> > +       if (ret)
+> > +               return ret;
+> > +
+> > +       ret =3D io_alloc_cache_init(&table->node_cache, nr,
+> > +                                 sizeof(struct io_rsrc_node), 0);
+> > +       if (ret)
+> > +               goto out_1;
+> > +
+> > +       ret =3D io_alloc_cache_init(&table->imu_cache, nr, imu_cache_si=
+ze, 0);
+> > +       if (ret)
+> > +               goto out_2;
+>
+> io_alloc_cache_init() returns bool. Probably these cases should return
+> -ENOMEM instead of 1?
+>
+> > +
+> > +       return 0;
+> > +out_2:
+> > +       io_alloc_cache_free(&table->node_cache, kfree);
+> > +out_1:
+> > +       __io_rsrc_data_free(&table->data);
+> > +       return ret;
+> > +}
+> > +
+> >  static int __io_sqe_files_update(struct io_ring_ctx *ctx,
+> >                                  struct io_uring_rsrc_update2 *up,
+> >                                  unsigned nr_args)
+> > @@ -207,7 +248,7 @@ static int __io_sqe_files_update(struct io_ring_ctx=
+ *ctx,
+> >                                 err =3D -EBADF;
+> >                                 break;
+> >                         }
+> > -                       node =3D io_rsrc_node_alloc(IORING_RSRC_FILE);
+> > +                       node =3D io_rsrc_node_alloc(ctx, IORING_RSRC_FI=
+LE);
+> >                         if (!node) {
+> >                                 err =3D -ENOMEM;
+> >                                 fput(file);
+> > @@ -269,7 +310,7 @@ static int __io_sqe_buffers_update(struct io_ring_c=
+tx *ctx,
+> >                         }
+> >                         node->tag =3D tag;
+> >                 }
+> > -               i =3D array_index_nospec(up->offset + done, ctx->buf_ta=
+ble.nr);
+> > +               i =3D array_index_nospec(up->offset + done, ctx->buf_ta=
+ble.data.nr);
+>
+> Looks like this change belongs in the prior patch "io_uring: add
+> abstraction for buf_table rsrc data"?
+>
+> >                 io_reset_rsrc_node(ctx, &ctx->buf_table.data, i);
+> >                 ctx->buf_table.data.nodes[i] =3D node;
+> >                 if (ctx->compat)
+> > @@ -459,6 +500,8 @@ void io_free_rsrc_node(struct io_ring_ctx *ctx, str=
+uct io_rsrc_node *node)
+> >         case IORING_RSRC_BUFFER:
+> >                 if (node->buf)
+> >                         io_buffer_unmap(ctx, node);
+> > +               if (io_alloc_cache_put(&ctx->buf_table.node_cache, node=
+))
+> > +                       return;
+> >                 break;
+> >         default:
+> >                 WARN_ON_ONCE(1);
+> > @@ -527,7 +570,7 @@ int io_sqe_files_register(struct io_ring_ctx *ctx, =
+void __user *arg,
+> >                         goto fail;
+> >                 }
+> >                 ret =3D -ENOMEM;
+> > -               node =3D io_rsrc_node_alloc(IORING_RSRC_FILE);
+> > +               node =3D io_rsrc_node_alloc(ctx, IORING_RSRC_FILE);
+> >                 if (!node) {
+> >                         fput(file);
+> >                         goto fail;
+> > @@ -547,11 +590,19 @@ int io_sqe_files_register(struct io_ring_ctx *ctx=
+, void __user *arg,
+> >         return ret;
+> >  }
+> >
+> > +static void io_rsrc_buffer_free(struct io_ring_ctx *ctx,
+> > +                               struct io_buf_table *table)
+> > +{
+> > +       io_rsrc_data_free(ctx, &table->data);
+> > +       io_alloc_cache_free(&table->node_cache, kfree);
+> > +       io_alloc_cache_free(&table->imu_cache, kfree);
+> > +}
+> > +
+> >  int io_sqe_buffers_unregister(struct io_ring_ctx *ctx)
+> >  {
+> >         if (!ctx->buf_table.data.nr)
+> >                 return -ENXIO;
+> > -       io_rsrc_data_free(ctx, &ctx->buf_table.data);
+> > +       io_rsrc_buffer_free(ctx, &ctx->buf_table);
+> >         return 0;
+> >  }
+> >
+> > @@ -716,6 +767,15 @@ bool io_check_coalesce_buffer(struct page **page_a=
+rray, int nr_pages,
+> >         return true;
+> >  }
+> >
+> > +static struct io_mapped_ubuf *io_alloc_imu(struct io_ring_ctx *ctx,
+> > +                                          int nr_bvecs)
+> > +{
+> > +       if (nr_bvecs <=3D IO_CACHED_BVECS_SEGS)
+> > +               return io_cache_alloc(&ctx->buf_table.imu_cache, GFP_KE=
+RNEL);
+>
+> If there is no entry available in the cache, this will heap-allocate
+> one with enough space for all IO_CACHED_BVECS_SEGS bvecs. Consider
+> using io_alloc_cache_get() instead of io_cache_alloc(), so the
+> heap-allocated fallback uses the minimal size.
+>
+> Also, where are these allocations returned to the imu_cache? Looks
+> like kvfree(imu) in io_buffer_unmap() and io_sqe_buffer_register()
+> needs to try io_alloc_cache_put() first.
+
+Another issue I see is that io_alloc_cache elements are allocated with
+kmalloc(), so they can't be freed with kvfree(). When the imu is
+freed, we could check nr_bvecs <=3D IO_CACHED_BVECS_SEGS to tell whether
+to call io_alloc_cache_put() (with a fallback to kfree()) or kvfree().
+
+>
+> Best,
+> Caleb
+>
+> > +       return kvmalloc(struct_size_t(struct io_mapped_ubuf, bvec, nr_b=
+vecs),
+> > +                       GFP_KERNEL);
+> > +}
+> > +
+> >  static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx =
+*ctx,
+> >                                                    struct iovec *iov,
+> >                                                    struct page **last_h=
+page)
+> > @@ -732,7 +792,7 @@ static struct io_rsrc_node *io_sqe_buffer_register(=
+struct io_ring_ctx *ctx,
+> >         if (!iov->iov_base)
+> >                 return NULL;
+> >
+> > -       node =3D io_rsrc_node_alloc(IORING_RSRC_BUFFER);
+> > +       node =3D io_rsrc_node_alloc(ctx, IORING_RSRC_BUFFER);
+> >         if (!node)
+> >                 return ERR_PTR(-ENOMEM);
+> >         node->buf =3D NULL;
+> > @@ -752,7 +812,7 @@ static struct io_rsrc_node *io_sqe_buffer_register(=
+struct io_ring_ctx *ctx,
+> >                         coalesced =3D io_coalesce_buffer(&pages, &nr_pa=
+ges, &data);
+> >         }
+> >
+> > -       imu =3D kvmalloc(struct_size(imu, bvec, nr_pages), GFP_KERNEL);
+> > +       imu =3D io_alloc_imu(ctx, nr_pages);
+> >         if (!imu)
+> >                 goto done;
+> >
+> > @@ -800,9 +860,9 @@ int io_sqe_buffers_register(struct io_ring_ctx *ctx=
+, void __user *arg,
+> >                             unsigned int nr_args, u64 __user *tags)
+> >  {
+> >         struct page *last_hpage =3D NULL;
+> > -       struct io_rsrc_data data;
+> >         struct iovec fast_iov, *iov =3D &fast_iov;
+> >         const struct iovec __user *uvec;
+> > +       struct io_buf_table table;
+> >         int i, ret;
+> >
+> >         BUILD_BUG_ON(IORING_MAX_REG_BUFFERS >=3D (1u << 16));
+> > @@ -811,13 +871,14 @@ int io_sqe_buffers_register(struct io_ring_ctx *c=
+tx, void __user *arg,
+> >                 return -EBUSY;
+> >         if (!nr_args || nr_args > IORING_MAX_REG_BUFFERS)
+> >                 return -EINVAL;
+> > -       ret =3D io_rsrc_data_alloc(&data, nr_args);
+> > +       ret =3D io_rsrc_buffer_alloc(&table, nr_args);
+> >         if (ret)
+> >                 return ret;
+> >
+> >         if (!arg)
+> >                 memset(iov, 0, sizeof(*iov));
+> >
+> > +       ctx->buf_table =3D table;
+> >         for (i =3D 0; i < nr_args; i++) {
+> >                 struct io_rsrc_node *node;
+> >                 u64 tag =3D 0;
+> > @@ -857,10 +918,8 @@ int io_sqe_buffers_register(struct io_ring_ctx *ct=
+x, void __user *arg,
+> >                         }
+> >                         node->tag =3D tag;
+> >                 }
+> > -               data.nodes[i] =3D node;
+> > +               table.data.nodes[i] =3D node;
+> >         }
+> > -
+> > -       ctx->buf_table.data =3D data;
+>
+> Is it necessary to move this assignment? I found the existing location
+> easier to reason about, since the assignment of ctx->buf_table
+> represents a transfer of ownership from the local variable.
+>
+> >         if (ret)
+> >                 io_sqe_buffers_unregister(ctx);
+> >         return ret;
+> > @@ -891,14 +950,15 @@ int io_buffer_register_bvec(struct io_ring_ctx *c=
+tx, struct request *rq,
+> >                 goto unlock;
+> >         }
+> >
+> > -       node =3D io_rsrc_node_alloc(IORING_RSRC_BUFFER);
+> > +       node =3D io_rsrc_node_alloc(ctx, IORING_RSRC_BUFFER);
+> >         if (!node) {
+> >                 ret =3D -ENOMEM;
+> >                 goto unlock;
+> >         }
+> >
+> >         nr_bvecs =3D blk_rq_nr_phys_segments(rq);
+> > -       imu =3D kvmalloc(struct_size(imu, bvec, nr_bvecs), GFP_KERNEL);
+> > +
+> > +       imu =3D io_alloc_imu(ctx, nr_bvecs);
+> >         if (!imu) {
+> >                 kfree(node);
+> >                 ret =3D -ENOMEM;
+> > @@ -1028,7 +1088,7 @@ static void lock_two_rings(struct io_ring_ctx *ct=
+x1, struct io_ring_ctx *ctx2)
+> >  static int io_clone_buffers(struct io_ring_ctx *ctx, struct io_ring_ct=
+x *src_ctx,
+> >                             struct io_uring_clone_buffers *arg)
+> >  {
+> > -       struct io_rsrc_data data;
+> > +       struct io_buf_table table;
+> >         int i, ret, off, nr;
+> >         unsigned int nbufs;
+> >
+> > @@ -1059,7 +1119,7 @@ static int io_clone_buffers(struct io_ring_ctx *c=
+tx, struct io_ring_ctx *src_ctx
+> >         if (check_add_overflow(arg->nr, arg->dst_off, &nbufs))
+> >                 return -EOVERFLOW;
+> >
+> > -       ret =3D io_rsrc_data_alloc(&data, max(nbufs, ctx->buf_table.dat=
+a.nr));
+> > +       ret =3D io_rsrc_buffer_alloc(&table, max(nbufs, ctx->buf_table.=
+data.nr));
+> >         if (ret)
+> >                 return ret;
+> >
+> > @@ -1068,7 +1128,7 @@ static int io_clone_buffers(struct io_ring_ctx *c=
+tx, struct io_ring_ctx *src_ctx
+> >                 struct io_rsrc_node *src_node =3D ctx->buf_table.data.n=
+odes[i];
+> >
+> >                 if (src_node) {
+> > -                       data.nodes[i] =3D src_node;
+> > +                       table.data.nodes[i] =3D src_node;
+> >                         src_node->refs++;
+> >                 }
+> >         }
+> > @@ -1098,7 +1158,7 @@ static int io_clone_buffers(struct io_ring_ctx *c=
+tx, struct io_ring_ctx *src_ctx
+> >                 if (!src_node) {
+> >                         dst_node =3D NULL;
+> >                 } else {
+> > -                       dst_node =3D io_rsrc_node_alloc(IORING_RSRC_BUF=
+FER);
+> > +                       dst_node =3D io_rsrc_node_alloc(ctx, IORING_RSR=
+C_BUFFER);
+> >                         if (!dst_node) {
+> >                                 ret =3D -ENOMEM;
+> >                                 goto out_free;
+> > @@ -1107,12 +1167,12 @@ static int io_clone_buffers(struct io_ring_ctx =
+*ctx, struct io_ring_ctx *src_ctx
+> >                         refcount_inc(&src_node->buf->refs);
+> >                         dst_node->buf =3D src_node->buf;
+> >                 }
+> > -               data.nodes[off++] =3D dst_node;
+> > +               table.data.nodes[off++] =3D dst_node;
+> >                 i++;
+> >         }
+> >
+> >         /*
+> > -        * If asked for replace, put the old table. data->nodes[] holds=
+ both
+> > +        * If asked for replace, put the old table. table.data->nodes[]=
+ holds both
+> >          * old and new nodes at this point.
+> >          */
+> >         if (arg->flags & IORING_REGISTER_DST_REPLACE)
+> > @@ -1125,10 +1185,10 @@ static int io_clone_buffers(struct io_ring_ctx =
+*ctx, struct io_ring_ctx *src_ctx
+> >          * entry).
+> >          */
+> >         WARN_ON_ONCE(ctx->buf_table.data.nr);
+> > -       ctx->buf_table.data =3D data;
+> > +       ctx->buf_table =3D table;
+> >         return 0;
+> >  out_free:
+> > -       io_rsrc_data_free(ctx, &data);
+> > +       io_rsrc_buffer_free(ctx, &table);
+> >         return ret;
+> >  }
+> >
+> > diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
+> > index 2e8d1862caefc..c5bdac558a2b4 100644
+> > --- a/io_uring/rsrc.h
+> > +++ b/io_uring/rsrc.h
+> > @@ -47,7 +47,7 @@ struct io_imu_folio_data {
+> >         unsigned int    nr_folios;
+> >  };
+> >
+> > -struct io_rsrc_node *io_rsrc_node_alloc(int type);
+> > +struct io_rsrc_node *io_rsrc_node_alloc(struct io_ring_ctx *ctx, int t=
+ype);
+> >  void io_free_rsrc_node(struct io_ring_ctx *ctx, struct io_rsrc_node *n=
+ode);
+> >  void io_rsrc_data_free(struct io_ring_ctx *ctx, struct io_rsrc_data *d=
+ata);
+> >  int io_rsrc_data_alloc(struct io_rsrc_data *data, unsigned nr);
+> > --
+> > 2.43.5
+> >
+> >
