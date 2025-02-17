@@ -1,127 +1,98 @@
-Received: from mail.tlmp.cc (unknown [148.135.104.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4155821C191;
-	Mon, 17 Feb 2025 13:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.135.104.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A7E42A8B
+	for <linux-block@vger.kernel.org>; Mon, 17 Feb 2025 16:04:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739798041; cv=none; b=MX5ru+cD/YgMQrejwEgEbtopk6d/1chZIhi4A8OUm+NGBF2N2H16vprcusIZYMZQbY0pfqXC0cTNVMbc8+x9d/cqV5lIf1rg4YPuSpbRb2pbv7JE5EvrdZqOo6We7Kc5gdWPOQIMIR3MzWJ/ofyMLEJRD1cJmwBeJJ3LPVRrdSA=
+	t=1739808283; cv=none; b=LV6CmxvLmzD7+xfma50a2NldplJt6Ml/om6PLH6yKeIqr+r8LWJtWessQf3nekhUV0EzR7xP38ca+9wwzkPsfPVQMGA3Bx+KwENMsVDEStTfgopPb+E+4FWC/YkY0AJ2RxMPvZWxLRKWvyx6bqoOTCCtVH80xvCXWfZVhldIVSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739798041; c=relaxed/simple;
-	bh=yfcja7yr+aI/lTUxW5RMXDC86vGcZIWVsYT+gOG/FC0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T9Kkf2jJGdiZSjEcO05cHf1lauE0dDsARzpOow4QXIrjaoUw3Bv4tTBQasfN0kVQ9ks6rPVNKqbVwFXkCkVTc4pyzKHe6gG3q9NzDyL5ImEZ4+uvjPyW/N23yOnYKEDdbpzMQDPULo/gf02YQhlSt0sI5gynHXgSu1EW3nDZLOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tlmp.cc; spf=pass smtp.mailfrom=tlmp.cc; dkim=pass (2048-bit key) header.d=tlmp.cc header.i=@tlmp.cc header.b=Hr76/uRW; arc=none smtp.client-ip=148.135.104.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tlmp.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tlmp.cc
+	s=arc-20240116; t=1739808283; c=relaxed/simple;
+	bh=fHxnkJg/OG5NfLkyUHDjvJdLdqF52ZVcuLZfO9XyvnU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=UJppFTkhTY6ixm9R+dshR66dVst7xMJmMieCKjR6f9V6+o3LHAxabaD/lykcxUVEqDQOio7Mcfc3Wpz9+PzOPvQUFIkYlqYO8dZDnWs6obA4AVOcnseF0uhMFHaT0/L1CF3tiNSeuITIZFxgliirfG7kaSfQWCiq/Fi6yzhQgPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=D8HtBOdX; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tlmp.cc header.i=@tlmp.cc header.b="Hr76/uRW"
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4759F5F587;
-	Mon, 17 Feb 2025 08:08:28 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tlmp.cc; s=dkim;
-	t=1739797721; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=gzJ2YG6weSz+CFbCyKl4mnY+VTrcTl16Wh/C2tZm7So=;
-	b=Hr76/uRWkKlFnJ9mXitWgfsKCR5bkSaoSUi28tvfsejgjGS7BsOSdwwTTBRJ2aMhY84EvA
-	Z1GmO8cvlB684BYprLOXvewp9WqhhBHQWOoFcsRkxFbFGbAi57FqGbl1AozUC+JU+9WIa3
-	yId6kAVXF+SKz8jn8vA53vqzQHdibStxZmf0dXPvMqHff39grxtCH/o72AmCiiWEXVBQel
-	uxHJTSm6BdZT1jAyg02UE4lSjPM3uAo6bUshW2HKEJIJ5ojz3y6eM1BnXR/yA1Nt+kAbiA
-	LHuOAVPMVCvQ5Bloss2LMlUtOnj1icsD4L7xjpZMC0Dcsoqz1XrNrqx6a38WlA==
-Date: Mon, 17 Feb 2025 21:08:21 +0800
-From: Yiyang Wu <toolmanp@tlmp.cc>
-To: Andreas Hindborg <a.hindborg@kernel.org>, 
-	lsf-pc@lists.linux-foundation.org
-Cc: linux-block@vger.kernel.org, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	Gao Xiang <hsiangkao@linux.alibaba.com>, linux-erofs mailing list <linux-erofs@lists.ozlabs.org>
-Subject: Re: [LSF/MM/BPF TOPIC] Rust in FS, Storage, MM
-Message-ID: <g5tqgpda4wbhpmi5ahh5btujwajy5dolcouhk2hx6qo2fg5nwr@ua2wnnuvxmeb>
-Reply-To: 0290170c-39df-4609-8de1-55695d6ec0ad@linux.alibaba.com
-References: <87ldu9uiyo.fsf@kernel.org>
- <0290170c-39df-4609-8de1-55695d6ec0ad@linux.alibaba.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="D8HtBOdX"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-854a68f5a9cso379278339f.0
+        for <linux-block@vger.kernel.org>; Mon, 17 Feb 2025 08:04:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1739808280; x=1740413080; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0Of32kxxqkdQUul3Q/d4M92FwvvmlyFoUH/mlpGvEoM=;
+        b=D8HtBOdXBTYotgYa+MIBzQh68jYXKj7+UtCxARwUPWQniVQLhq9NvH/Gdx+9vgdJV4
+         tCkSz0UYrVZt3yKHNGoLKmaNAjOqEFjvCRNnf+KBlsmZDCF1BEnoINWslsHSEbNJn+Yn
+         33zp7LzvGandug2otwhvm6AcUsB1yaUQyU3ch47HF3tsNt/IYAp5EujH9hHmBjDdbfW6
+         gkXVffE4IYzEu7RwYopHqh8vOEPKN4+NM0ZP6LPiiVWo1pAe/RHgViYZLHEXcX+Jz+Fb
+         5hY1FgPx5p9iegzml8Dn65KBgVX8ckfAVeZEE8VHRmP2LcpCBOEfr6a+steAFGP7/R9t
+         8xWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739808280; x=1740413080;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0Of32kxxqkdQUul3Q/d4M92FwvvmlyFoUH/mlpGvEoM=;
+        b=ay6LGfpXVnqoLoGlWedAWJLnCeQL3Pm4PMYw9gRhXBnrSbrBi+NyBdS4sqI6oWzonj
+         PAztiitak/XAL8y/m2PfA/tv3ovzzcCTSItdbMngNyZVcANroK/2Lo4aw+bvCUndLD6t
+         IFv1wejyjjcl/gUv2Tl1rveRPYNGaYqN+jUAwXeYpCzcK7IexR+iiV5ENbydZkvKBAXa
+         dfYcEDnxJOyp6W3S/6VfyqpPSDxvpGYcjMpoTeMxrz/hhoQpnaBsHnpvpDE8LRSj7IER
+         h5twA9RXaMqH+zzHdaOOsbMkHGOgD+ANgh72uqGLRiGkhCgGAU94ix6MdHpVcFyXIxIP
+         L8Fw==
+X-Gm-Message-State: AOJu0YynR1ornkihMLKW1c7fQX7CbHJb+9VQpU71dO02SDu+y/J/O5zQ
+	AJBndUDMZlKJv8T7xwnhFP5g4RoV7SB1L+kuC9Q7U2g+7uuaccABtTsF5z+6U0ik+FxXLOlxdLS
+	D
+X-Gm-Gg: ASbGncvT4bPdEfHH8bvuMPR4p7LeO9Q4SynmG4D0Nvlipjymd1mdHSQgkrOqoDR8HLH
+	Dv3ULH+V8xZoe2d2jATheCmZJiCJKU0swG0t1eICMQoyiKME/gOfi0wSoj3yo6kIUwAsUUCVQVd
+	cZVVlrNeA/hU6NakDIjLpMdJOK1wAVaYFDrfKunHhqAgNF2m7Q0qa0tdAA21usrR9abPYO4c36n
+	pkfGcj4P/xXUBkT6UaMlnRJPA/Sbxlv1BKidJ+RhfPk/n8Ayo1BxFlNUtWUsXJj/DMqC6YT3Xek
+	9ZKljf8=
+X-Google-Smtp-Source: AGHT+IGwZm5usgS6agwfj0xXvJB05KBP3+53ibIkWRwS+ofepHEW7xllCngLljERba37Dk0vX9Qmwg==
+X-Received: by 2002:a05:6602:6408:b0:855:6fa2:c324 with SMTP id ca18e2360f4ac-8557a0ce310mr1067266139f.4.1739808280199;
+        Mon, 17 Feb 2025 08:04:40 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-85566f8f801sm193285339f.43.2025.02.17.08.04.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Feb 2025 08:04:39 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, 
+ Cheyenne Wills <cheyenne.wills@gmail.com>
+In-Reply-To: <20250217031626.461977-1-ming.lei@redhat.com>
+References: <20250217031626.461977-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2] block: fix NULL pointer dereferenced within
+ __blk_rq_map_sg
+Message-Id: <173980827919.830791.3313165347020167089.b4-ty@kernel.dk>
+Date: Mon, 17 Feb 2025 09:04:39 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0290170c-39df-4609-8de1-55695d6ec0ad@linux.alibaba.com>
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-14bd6
 
-On Mon, Feb 17, 2025 at 06:41:32PM +0800, Gao Xiang wrote:
+
+On Mon, 17 Feb 2025 11:16:26 +0800, Ming Lei wrote:
+> The block layer internal flush request may not have bio attached, so the
+> request iterator has to be initialized from valid req->bio, otherwise NULL
+> pointer dereferenced is triggered.
 > 
 > 
-> On 2025/2/14 14:41, Andreas Hindborg wrote:
-> > Hi All,
-> > 
-> > On behalf of the Linux kernel Rust subsystem team, I would like to suggest a
-> > general plenary session focused on Rust. Based on audience interest we would
-> > discuss:
-> > 
-> >   - Status of rust adoption in each subsystem - what did we achieve since last
-> >     LSF?
-> >   - Insights from the maintainers of subsystems that have merged Rust - how was
-> >     the experience?
-> >   - A reflection on process - does the current approach work or should we change
-> >     something?
-> >   - General Q&A
-> 
-> Last year Yiyang worked on an experimental Rust EROFS codebase and
-> ran into some policy issue (c+rust integration), although Rust
-> adaption is not the top priority stuff in our entire TODO list but
-> we'd like to see it could finally get into shape and landed as an
-> alternative part to replace some C code (maybe finally the whole
-> part) if anyone really would like to try to switch to the new one.
-> 
-> Hopefully some progress could be made this year (by Yiyang), but
-> unfortunately I have no more budget to travel this year, yet
-> that is basically the current status anyway.
-> 
-> Thanks,
-> Gao Xiang
-> 
-> > 
-> > Please note that unfortunately I will be the only representative from the Rust
-> > subsystem team on site this year.
-> > 
-> > Best regards,
-> > Andreas Hindborg
-> > 
-> 
 
-Since i'm cued in, I'd like to share some of my thoughts on the Rust.
+Applied, thanks!
 
-I've worked on the EROFS Rust codebase so far. I may have insights on
-the current status of Rust subsystem progress. On the Filesystem level,
-there still left a lot of yet to be determined especially.
+[1/1] block: fix NULL pointer dereferenced within __blk_rq_map_sg
+      commit: dd8b0582e25e36bba483c60338741c0ba5bc426c
 
-Reimplementing the core functionality of a filesystem is already ok,
-though not from perfect, and certainly we need a better abstraction
-to model the filesystem correctly in rust language.A lot of helpers (MM,
-BDev, Network Application Layer for NFS, etc.)
+Best regards,
+-- 
+Jens Axboe
 
-are still left in the wild to be completed and it requires a lot of
-coordination from other subsystem maintainer and rust maintainer
-to abstract the C-API into Rust code a way that all parties can hold on to.
-I guess it's not the right time to do so in general, we can use rust in
-some specific filesystems but generally before other subsystems's API
-are stabilized, it's not a good idea to refactor the whole VFS codebase
-and abstract the API into Rust one.
 
-Filesystem should be free from memory corruption and rust is
-definitely worth the efforts to refactor some of the codebase. 
-That means that we may need restrict the flexibility or somehow refactor
-the object model that current VFS uses and this certainly requires the
-original team that implements the VFS to be involved, at least express
-some willingness and interest to refactor instead of gatekeeping the
-whole codebase and shutting down the whole discussion (i don't mean to
-make criticism here BTW since we should be pretty cautionous on the
-original code and don't introduce certain regression issues.) But i guess the
-whole community is somehow polarized on this issue, it may not be an
-easy job to begin with, alas.
 
-Best Regards,
-Yiyang
