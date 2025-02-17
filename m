@@ -1,72 +1,38 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A7E42A8B
-	for <linux-block@vger.kernel.org>; Mon, 17 Feb 2025 16:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F37239094
+	for <linux-block@vger.kernel.org>; Mon, 17 Feb 2025 20:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739808283; cv=none; b=LV6CmxvLmzD7+xfma50a2NldplJt6Ml/om6PLH6yKeIqr+r8LWJtWessQf3nekhUV0EzR7xP38ca+9wwzkPsfPVQMGA3Bx+KwENMsVDEStTfgopPb+E+4FWC/YkY0AJ2RxMPvZWxLRKWvyx6bqoOTCCtVH80xvCXWfZVhldIVSA=
+	t=1739825121; cv=none; b=DVkqMRE2Zb3RvUgaW5DXkkqx+fB6t4FulGLT2Fg+ljkJtNGSoqaZSmV7Zm/dHq5iYX3ZdWS0rF4btfeL+xKNG9QXbgOGIWhcxbBDQvCdpaOIM7EVyWcoN1Jecf4IZtpGUMJWfmXQDl9ZFFzuxnmUcz3o7T4rf84o1AJF0d2pylo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739808283; c=relaxed/simple;
-	bh=fHxnkJg/OG5NfLkyUHDjvJdLdqF52ZVcuLZfO9XyvnU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=UJppFTkhTY6ixm9R+dshR66dVst7xMJmMieCKjR6f9V6+o3LHAxabaD/lykcxUVEqDQOio7Mcfc3Wpz9+PzOPvQUFIkYlqYO8dZDnWs6obA4AVOcnseF0uhMFHaT0/L1CF3tiNSeuITIZFxgliirfG7kaSfQWCiq/Fi6yzhQgPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=D8HtBOdX; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="D8HtBOdX"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-854a68f5a9cso379278339f.0
-        for <linux-block@vger.kernel.org>; Mon, 17 Feb 2025 08:04:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1739808280; x=1740413080; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Of32kxxqkdQUul3Q/d4M92FwvvmlyFoUH/mlpGvEoM=;
-        b=D8HtBOdXBTYotgYa+MIBzQh68jYXKj7+UtCxARwUPWQniVQLhq9NvH/Gdx+9vgdJV4
-         tCkSz0UYrVZt3yKHNGoLKmaNAjOqEFjvCRNnf+KBlsmZDCF1BEnoINWslsHSEbNJn+Yn
-         33zp7LzvGandug2otwhvm6AcUsB1yaUQyU3ch47HF3tsNt/IYAp5EujH9hHmBjDdbfW6
-         gkXVffE4IYzEu7RwYopHqh8vOEPKN4+NM0ZP6LPiiVWo1pAe/RHgViYZLHEXcX+Jz+Fb
-         5hY1FgPx5p9iegzml8Dn65KBgVX8ckfAVeZEE8VHRmP2LcpCBOEfr6a+steAFGP7/R9t
-         8xWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739808280; x=1740413080;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0Of32kxxqkdQUul3Q/d4M92FwvvmlyFoUH/mlpGvEoM=;
-        b=ay6LGfpXVnqoLoGlWedAWJLnCeQL3Pm4PMYw9gRhXBnrSbrBi+NyBdS4sqI6oWzonj
-         PAztiitak/XAL8y/m2PfA/tv3ovzzcCTSItdbMngNyZVcANroK/2Lo4aw+bvCUndLD6t
-         IFv1wejyjjcl/gUv2Tl1rveRPYNGaYqN+jUAwXeYpCzcK7IexR+iiV5ENbydZkvKBAXa
-         dfYcEDnxJOyp6W3S/6VfyqpPSDxvpGYcjMpoTeMxrz/hhoQpnaBsHnpvpDE8LRSj7IER
-         h5twA9RXaMqH+zzHdaOOsbMkHGOgD+ANgh72uqGLRiGkhCgGAU94ix6MdHpVcFyXIxIP
-         L8Fw==
-X-Gm-Message-State: AOJu0YynR1ornkihMLKW1c7fQX7CbHJb+9VQpU71dO02SDu+y/J/O5zQ
-	AJBndUDMZlKJv8T7xwnhFP5g4RoV7SB1L+kuC9Q7U2g+7uuaccABtTsF5z+6U0ik+FxXLOlxdLS
-	D
-X-Gm-Gg: ASbGncvT4bPdEfHH8bvuMPR4p7LeO9Q4SynmG4D0Nvlipjymd1mdHSQgkrOqoDR8HLH
-	Dv3ULH+V8xZoe2d2jATheCmZJiCJKU0swG0t1eICMQoyiKME/gOfi0wSoj3yo6kIUwAsUUCVQVd
-	cZVVlrNeA/hU6NakDIjLpMdJOK1wAVaYFDrfKunHhqAgNF2m7Q0qa0tdAA21usrR9abPYO4c36n
-	pkfGcj4P/xXUBkT6UaMlnRJPA/Sbxlv1BKidJ+RhfPk/n8Ayo1BxFlNUtWUsXJj/DMqC6YT3Xek
-	9ZKljf8=
-X-Google-Smtp-Source: AGHT+IGwZm5usgS6agwfj0xXvJB05KBP3+53ibIkWRwS+ofepHEW7xllCngLljERba37Dk0vX9Qmwg==
-X-Received: by 2002:a05:6602:6408:b0:855:6fa2:c324 with SMTP id ca18e2360f4ac-8557a0ce310mr1067266139f.4.1739808280199;
-        Mon, 17 Feb 2025 08:04:40 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-85566f8f801sm193285339f.43.2025.02.17.08.04.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2025 08:04:39 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, 
- Cheyenne Wills <cheyenne.wills@gmail.com>
-In-Reply-To: <20250217031626.461977-1-ming.lei@redhat.com>
-References: <20250217031626.461977-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V2] block: fix NULL pointer dereferenced within
- __blk_rq_map_sg
-Message-Id: <173980827919.830791.3313165347020167089.b4-ty@kernel.dk>
-Date: Mon, 17 Feb 2025 09:04:39 -0700
+	s=arc-20240116; t=1739825121; c=relaxed/simple;
+	bh=igOAyOe0a93PQhLLZM99D+X4R+n8FIOx6J9OuZIDARU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=FkmB35kYDwm1Z9YGXssJtS5Rzc6GcTflQt54vNgnyolfYTpwEHKU7eGjhaiDQk5kipwG5Z3p/1hnixBJuBOc5mx/m6VLIOTJn+pQvGxschKtxt1wBQHtA/6IkiHYPwH+BeY5bIOoQ6ng7itREbQeFYGDFMSiKJ8a2VjcdyKiQPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1tk7zP-0000iy-6L; Mon, 17 Feb 2025 21:45:15 +0100
+Received: from dude05.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::54])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1tk7zO-001TGu-0c;
+	Mon, 17 Feb 2025 21:45:14 +0100
+Received: from localhost ([::1] helo=dude05.red.stw.pengutronix.de)
+	by dude05.red.stw.pengutronix.de with esmtp (Exim 4.96)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1tk7zO-000cxJ-0Q;
+	Mon, 17 Feb 2025 21:45:14 +0100
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Date: Mon, 17 Feb 2025 21:45:03 +0100
+Subject: [PATCH RFC v2] docs: ABI: replace mcroce@microsoft.com with new
+ Meta address
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -75,24 +41,107 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-14bd6
+Message-Id: <20250217-fix-mcroce-mail-bounce-v2-1-e897f4b15c80@pengutronix.de>
+X-B4-Tracking: v=1; b=H4sIAM6fs2cC/4VNSwrCMBC9Spm1kUyswbgSBA/gVrroZ2wHbFKSt
+ lRK7+7QC7h7/7dCosiU4JqtEGnmxMELMYcM6q70LSluhIPRJkeDTr15UX0dQ02qL/mjqjB5wSd
+ zcVqjdbk+g5SHSJLch1/wfNyhELHjNIb43c9m3K1/uzMqVLmTCNrKaqtvA/l2GmPwvBwbgmLbt
+ h/pRhTBxgAAAA==
+X-Change-ID: 20241219-fix-mcroce-mail-bounce-328900169405
+To: Matteo Croce <teknoraver@meta.com>, Jens Axboe <axboe@kernel.dk>, 
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Daniel Lezcano <daniel.lezcano@linaro.org>, linux-block@vger.kernel.org, 
+ linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kernel@pengutronix.de, Ahmad Fatoum <a.fatoum@pengutronix.de>
+X-Mailer: b4 0.14.2
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-block@vger.kernel.org
 
+The Microsoft email address is bouncing:
 
-On Mon, 17 Feb 2025 11:16:26 +0800, Ming Lei wrote:
-> The block layer internal flush request may not have bio attached, so the
-> request iterator has to be initialized from valid req->bio, otherwise NULL
-> pointer dereferenced is triggered.
-> 
-> 
+    550 5.4.1 Recipient address rejected: Access denied.
 
-Applied, thanks!
+So let's replace it with Matteo's current mail address.
 
-[1/1] block: fix NULL pointer dereferenced within __blk_rq_map_sg
-      commit: dd8b0582e25e36bba483c60338741c0ba5bc426c
+Acked-by: Matteo Croce <teknoraver@meta.com>
+Link: https://lore.kernel.org/all/BYAPR15MB2504E4B02DFFB1E55871955DA1062@BYAPR15MB2504.namprd15.prod.outlook.com/
+Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+---
+I ran into this while submitting a series[1] touching sysfs-kernel-reboot
+and b4/get_maintainers.pl picked off the stale address from the file.
+
+[1]: https://lore.kernel.org/all/20241219-hw_protection-reboot-v1-6-263a0c1df802@pengutronix.de/
+---
+Changes in v2:
+- Added Matteo's Acked-by 
+- Link to v1: https://lore.kernel.org/r/20241219-fix-mcroce-mail-bounce-v1-1-4912116b6060@pengutronix.de
+---
+ Documentation/ABI/stable/sysfs-block          |  2 +-
+ Documentation/ABI/testing/sysfs-kernel-reboot | 10 +++++-----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
+index 0cceb2badc836b8cbdade543deff71edef0e3da1..ee1bbb4dfd4ea65fc0aa13c03a5205b8d5816ecf 100644
+--- a/Documentation/ABI/stable/sysfs-block
++++ b/Documentation/ABI/stable/sysfs-block
+@@ -77,7 +77,7 @@ Description:
+ 
+ What:		/sys/block/<disk>/diskseq
+ Date:		February 2021
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:
+ 		The /sys/block/<disk>/diskseq files reports the disk
+ 		sequence number, which is a monotonically increasing
+diff --git a/Documentation/ABI/testing/sysfs-kernel-reboot b/Documentation/ABI/testing/sysfs-kernel-reboot
+index 837330fb251134ffdf29cd68f0b2a845b088e5a0..fb2d21acc6627ee340a3c8327261d5727ad63e15 100644
+--- a/Documentation/ABI/testing/sysfs-kernel-reboot
++++ b/Documentation/ABI/testing/sysfs-kernel-reboot
+@@ -1,7 +1,7 @@
+ What:		/sys/kernel/reboot
+ Date:		November 2020
+ KernelVersion:	5.11
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:	Interface to set the kernel reboot behavior, similarly to
+ 		what can be done via the reboot= cmdline option.
+ 		(see Documentation/admin-guide/kernel-parameters.txt)
+@@ -9,24 +9,24 @@ Description:	Interface to set the kernel reboot behavior, similarly to
+ What:		/sys/kernel/reboot/mode
+ Date:		November 2020
+ KernelVersion:	5.11
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:	Reboot mode. Valid values are: cold warm hard soft gpio
+ 
+ What:		/sys/kernel/reboot/type
+ Date:		November 2020
+ KernelVersion:	5.11
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:	Reboot type. Valid values are: bios acpi kbd triple efi pci
+ 
+ What:		/sys/kernel/reboot/cpu
+ Date:		November 2020
+ KernelVersion:	5.11
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:	CPU number to use to reboot.
+ 
+ What:		/sys/kernel/reboot/force
+ Date:		November 2020
+ KernelVersion:	5.11
+-Contact:	Matteo Croce <mcroce@microsoft.com>
++Contact:	Matteo Croce <teknoraver@meta.com>
+ Description:	Don't wait for any other CPUs on reboot and
+ 		avoid anything that could hang.
+
+---
+base-commit: 78d4f34e2115b517bcbfe7ec0d018bbbb6f9b0b8
+change-id: 20241219-fix-mcroce-mail-bounce-328900169405
 
 Best regards,
 -- 
-Jens Axboe
-
-
+Ahmad Fatoum <a.fatoum@pengutronix.de>
 
