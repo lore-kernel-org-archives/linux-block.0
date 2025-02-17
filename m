@@ -1,140 +1,160 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78BC372
-	for <linux-block@vger.kernel.org>; Mon, 17 Feb 2025 20:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420592A8C1;
+	Mon, 17 Feb 2025 21:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739825183; cv=none; b=BGLTTjPbuVfd64KZpZ9JsBDSYaqNvJ6ZXqB4wX8D+ph3juBa4on2noTPJqAam+EZl3HpSF8cv/vghLnnISs+ekn2dHKaQG/FBMrYVtNo1Di65Gs3Lu8ZCRbVvH8XFQHI1G55i8gmuWaUQ/ts8vkxmk6TyP5ZZRJ4yrrnEXyqWK4=
+	t=1739828410; cv=none; b=eRCD0/s1CMsYdFY37qZIRQwVkMcwhLgqixbBZS2R5mC5+GiUPF9M9aQBP8YDff6pyNDeKrtQi5AVOYevH2zNU/NtarQhkobfLY8cLfh8IGxZ8gcMM8EREU8tIyaZcUXNhkiNQQf+5aT6dw/BbwXXx1aL5AN1uuDiwzOd/x7i/7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739825183; c=relaxed/simple;
-	bh=AY31hYe7mt5ncRT3ZKQBVxcnA+SWDK+vRoripLMek2E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LO7nLG5Hvp+pH0LExun4dPdPGzZ8JWBy+2XZLorSO3f+VO/Q74ik0l0DHgfEJiLsrmFcoFSfPydneWAWXg26NYPjs87DNG13JJgMddSzbtO1flTRGZlaHzcHDl8fApPqPgAuinhY/gHNObHsscAn4GRkRwY+dsxk/7mzKoHKhwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1tk80Q-0000th-EW; Mon, 17 Feb 2025 21:46:18 +0100
-Message-ID: <55fb4104-3f89-44fe-bd30-8b477e00e9d9@pengutronix.de>
-Date: Mon, 17 Feb 2025 21:46:17 +0100
+	s=arc-20240116; t=1739828410; c=relaxed/simple;
+	bh=mDOJpH9wr0GAuWGnE8twFQUiLYLbrcXebGiv62ABvJE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ilKc2KsXGfk7+tL7+lEPC0c4hVJsEGRY8MgSkYA9bcY36NGQjT/tbaI3NwrL32TZdOVf9J+aAObMMosH4m4dv2oixJoMAyuTdx+refF69KT6rYlE8yTftFzJwMT4J2B8ZMUdP5vxQrNdcQJoODN3l16KA5eMfcKAtxL96EozxSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=P9L6uob3; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="P9L6uob3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=KY8nyubrU5h1fWAeCYwM70hwEZhksrwYllCElbQXlTA=; b=P9L6uob3gnsA9z7fl3KVtM5ac1
+	eVA7gQ/xKeKMmu5K/T68/i7b2E7FfiSjoVn6j7pKgh1O40M1rEvWGcgf0YGXHMmfNYX9En37jJpGL
+	xJke9LGh+DVVO0EVQkQSfA1rd53OPsx3VcQIvnbmvmp07QmR4qh9BUkbrFKWhXoVaQSb++xbVU/mF
+	24r9uZvwgbLme2F5nkNGmATd66YThEBl6PsgnKbzWDOwoeryQSd3vmhFu8vUAM8HH1JzvQlJFnLoL
+	I7nRalertEjJ+MhNEKuVc926mVYTTIqe7kRm/bmHIwsNSzKmmGj4EWlykONbrj0JHXU6bgX8klIr8
+	3z46BjHw==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tk8qO-00000001yqZ-0ysr;
+	Mon, 17 Feb 2025 21:40:00 +0000
+Date: Mon, 17 Feb 2025 21:40:00 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Luis Chamberlain <mcgrof@kernel.org>
+Cc: hare@suse.de, dave@stgolabs.net, david@fromorbit.com, djwong@kernel.org,
+	kbusch@kernel.org, john.g.garry@oracle.com, hch@lst.de,
+	ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org, gost.dev@samsung.com,
+	p.raghav@samsung.com, da.gomez@samsung.com, kernel@pankajraghav.com
+Subject: Re: [PATCH v2 2/8] fs/buffer: remove batching from async read
+Message-ID: <Z7OssHQSgVEVzbSZ@casper.infradead.org>
+References: <20250204231209.429356-1-mcgrof@kernel.org>
+ <20250204231209.429356-3-mcgrof@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2] docs: ABI: replace mcroce@microsoft.com with new
- Meta address
-To: Matteo Croce <teknoraver@meta.com>, Jens Axboe <axboe@kernel.dk>,
- Andrew Morton <akpm@linux-foundation.org>
-Cc: Daniel Lezcano <daniel.lezcano@linaro.org>, linux-block@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@pengutronix.de
-References: <20250217-fix-mcroce-mail-bounce-v2-1-e897f4b15c80@pengutronix.de>
-Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <20250217-fix-mcroce-mail-bounce-v2-1-e897f4b15c80@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250204231209.429356-3-mcgrof@kernel.org>
 
-I forgot to omit the RFC, sorry. Please let me know if I should resend.
+On Tue, Feb 04, 2025 at 03:12:03PM -0800, Luis Chamberlain wrote:
+> From: Matthew Wilcox <willy@infradead.org>
 
-On 17.02.25 21:45, Ahmad Fatoum wrote:
-> The Microsoft email address is bouncing:
-> 
->     550 5.4.1 Recipient address rejected: Access denied.
-> 
-> So let's replace it with Matteo's current mail address.
-> 
-> Acked-by: Matteo Croce <teknoraver@meta.com>
-> Link: https://lore.kernel.org/all/BYAPR15MB2504E4B02DFFB1E55871955DA1062@BYAPR15MB2504.namprd15.prod.outlook.com/
-> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-> ---
-> I ran into this while submitting a series[1] touching sysfs-kernel-reboot
-> and b4/get_maintainers.pl picked off the stale address from the file.
-> 
-> [1]: https://lore.kernel.org/all/20241219-hw_protection-reboot-v1-6-263a0c1df802@pengutronix.de/
-> ---
-> Changes in v2:
-> - Added Matteo's Acked-by 
-> - Link to v1: https://lore.kernel.org/r/20241219-fix-mcroce-mail-bounce-v1-1-4912116b6060@pengutronix.de
-> ---
->  Documentation/ABI/stable/sysfs-block          |  2 +-
->  Documentation/ABI/testing/sysfs-kernel-reboot | 10 +++++-----
->  2 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-> index 0cceb2badc836b8cbdade543deff71edef0e3da1..ee1bbb4dfd4ea65fc0aa13c03a5205b8d5816ecf 100644
-> --- a/Documentation/ABI/stable/sysfs-block
-> +++ b/Documentation/ABI/stable/sysfs-block
-> @@ -77,7 +77,7 @@ Description:
->  
->  What:		/sys/block/<disk>/diskseq
->  Date:		February 2021
-> -Contact:	Matteo Croce <mcroce@microsoft.com>
-> +Contact:	Matteo Croce <teknoraver@meta.com>
->  Description:
->  		The /sys/block/<disk>/diskseq files reports the disk
->  		sequence number, which is a monotonically increasing
-> diff --git a/Documentation/ABI/testing/sysfs-kernel-reboot b/Documentation/ABI/testing/sysfs-kernel-reboot
-> index 837330fb251134ffdf29cd68f0b2a845b088e5a0..fb2d21acc6627ee340a3c8327261d5727ad63e15 100644
-> --- a/Documentation/ABI/testing/sysfs-kernel-reboot
-> +++ b/Documentation/ABI/testing/sysfs-kernel-reboot
-> @@ -1,7 +1,7 @@
->  What:		/sys/kernel/reboot
->  Date:		November 2020
->  KernelVersion:	5.11
-> -Contact:	Matteo Croce <mcroce@microsoft.com>
-> +Contact:	Matteo Croce <teknoraver@meta.com>
->  Description:	Interface to set the kernel reboot behavior, similarly to
->  		what can be done via the reboot= cmdline option.
->  		(see Documentation/admin-guide/kernel-parameters.txt)
-> @@ -9,24 +9,24 @@ Description:	Interface to set the kernel reboot behavior, similarly to
->  What:		/sys/kernel/reboot/mode
->  Date:		November 2020
->  KernelVersion:	5.11
-> -Contact:	Matteo Croce <mcroce@microsoft.com>
-> +Contact:	Matteo Croce <teknoraver@meta.com>
->  Description:	Reboot mode. Valid values are: cold warm hard soft gpio
->  
->  What:		/sys/kernel/reboot/type
->  Date:		November 2020
->  KernelVersion:	5.11
-> -Contact:	Matteo Croce <mcroce@microsoft.com>
-> +Contact:	Matteo Croce <teknoraver@meta.com>
->  Description:	Reboot type. Valid values are: bios acpi kbd triple efi pci
->  
->  What:		/sys/kernel/reboot/cpu
->  Date:		November 2020
->  KernelVersion:	5.11
-> -Contact:	Matteo Croce <mcroce@microsoft.com>
-> +Contact:	Matteo Croce <teknoraver@meta.com>
->  Description:	CPU number to use to reboot.
->  
->  What:		/sys/kernel/reboot/force
->  Date:		November 2020
->  KernelVersion:	5.11
-> -Contact:	Matteo Croce <mcroce@microsoft.com>
-> +Contact:	Matteo Croce <teknoraver@meta.com>
->  Description:	Don't wait for any other CPUs on reboot and
->  		avoid anything that could hang.
-> 
-> ---
-> base-commit: 78d4f34e2115b517bcbfe7ec0d018bbbb6f9b0b8
-> change-id: 20241219-fix-mcroce-mail-bounce-328900169405
-> 
-> Best regards,
+From: Matthew Wilcox (Oracle) <willy@infradead.org>
 
+block_read_full_folio() currently puts all !uptodate buffers into
+an array allocated on the stack, then iterates over it twice, first
+locking the buffers and then submitting them for read.  We want to
+remove this array because it occupies too much stack space on
+configurations with a larger PAGE_SIZE (eg 512 bytes with 8 byte
+pointers and a 64KiB PAGE_SIZE).
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+We cannot simply submit buffer heads as we find them as the completion
+handler needs to be able to tell when all reads are finished, so it can
+end the folio read.  So we keep one buffer in reserve (using the 'prev'
+variable) until the end of the function.
+
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+
+> diff --git a/fs/buffer.c b/fs/buffer.c
+> index b99560e8a142..167fa3e33566 100644
+> --- a/fs/buffer.c
+> +++ b/fs/buffer.c
+> @@ -2361,9 +2361,8 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+>  {
+>  	struct inode *inode = folio->mapping->host;
+>  	sector_t iblock, lblock;
+> -	struct buffer_head *bh, *head, *arr[MAX_BUF_PER_PAGE];
+> +	struct buffer_head *bh, *head, *prev = NULL;
+>  	size_t blocksize;
+> -	int nr, i;
+>  	int fully_mapped = 1;
+>  	bool page_error = false;
+>  	loff_t limit = i_size_read(inode);
+> @@ -2380,7 +2379,6 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+>  	iblock = div_u64(folio_pos(folio), blocksize);
+>  	lblock = div_u64(limit + blocksize - 1, blocksize);
+>  	bh = head;
+> -	nr = 0;
+>  
+>  	do {
+>  		if (buffer_uptodate(bh))
+> @@ -2410,40 +2408,33 @@ int block_read_full_folio(struct folio *folio, get_block_t *get_block)
+>  			if (buffer_uptodate(bh))
+>  				continue;
+>  		}
+> -		arr[nr++] = bh;
+> +
+> +		lock_buffer(bh);
+> +		if (buffer_uptodate(bh)) {
+> +			unlock_buffer(bh);
+> +			continue;
+> +		}
+> +
+> +		mark_buffer_async_read(bh);
+> +		if (prev)
+> +			submit_bh(REQ_OP_READ, prev);
+> +		prev = bh;
+>  	} while (iblock++, (bh = bh->b_this_page) != head);
+>  
+>  	if (fully_mapped)
+>  		folio_set_mappedtodisk(folio);
+>  
+> -	if (!nr) {
+> -		/*
+> -		 * All buffers are uptodate or get_block() returned an
+> -		 * error when trying to map them - we can finish the read.
+> -		 */
+> -		folio_end_read(folio, !page_error);
+> -		return 0;
+> -	}
+> -
+> -	/* Stage two: lock the buffers */
+> -	for (i = 0; i < nr; i++) {
+> -		bh = arr[i];
+> -		lock_buffer(bh);
+> -		mark_buffer_async_read(bh);
+> -	}
+> -
+>  	/*
+> -	 * Stage 3: start the IO.  Check for uptodateness
+> -	 * inside the buffer lock in case another process reading
+> -	 * the underlying blockdev brought it uptodate (the sct fix).
+> +	 * All buffers are uptodate or get_block() returned an error
+> +	 * when trying to map them - we must finish the read because
+> +	 * end_buffer_async_read() will never be called on any buffer
+> +	 * in this folio.
+>  	 */
+> -	for (i = 0; i < nr; i++) {
+> -		bh = arr[i];
+> -		if (buffer_uptodate(bh))
+> -			end_buffer_async_read(bh, 1);
+> -		else
+> -			submit_bh(REQ_OP_READ, bh);
+> -	}
+> +	if (prev)
+> +		submit_bh(REQ_OP_READ, prev);
+> +	else
+> +		folio_end_read(folio, !page_error);
+> +
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL(block_read_full_folio);
+> -- 
+> 2.45.2
+> 
