@@ -1,62 +1,87 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A5F215795
-	for <linux-block@vger.kernel.org>; Mon, 17 Feb 2025 09:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C302216E1B;
+	Mon, 17 Feb 2025 10:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739785299; cv=none; b=nlAS8JfmsD05Q0uT2ub4tkD2O591hLkp39SQJ6yh9ji2+tTbcb14bftaYuvoimtdiNdc/vgj9xNFwP4HqiX/sdr+Fl4l+p2yKToxwDP8h0Sn7t9L60BAOUI4AWsN6440+RqRIf3KLL1/lMbb/zEOXE1c3OfI8nbdZn2Nt7jqKuc=
+	t=1739788906; cv=none; b=dxE8SRv93IPq080UXeI6a+5Z9fLKbdQul2aTkDmTW06nPNOfH4dLqUnaxKzmpDBTIngTy0myirLGlcs9lfY9fgi2Kk0VO9JQwmmpOrFWiVtT0Ksyv/XrMYAX4B3h5Ax858RKdZVAhaoup1mjqlJ5I9gHbY15aIpM6RIFLkF+1hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739785299; c=relaxed/simple;
-	bh=+xE+4bAvz9J5GxAz0/tCMPgdiKOLAE5mTZpHnWZbi1k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iylw1rMwhcUWBY7Zv49aMZuSatE0AL3rE/FSsXSi6aWq0U9LkcxublNBA3wCfwCzbym45iH9LkxE2Hv59oUBPtToTMxLil3N0LvTWvvUSTmfwGgGLnnWAlztofE+bftoRrbYu5Q7fBHjWbM6O/DbXPnWnEzNI7X3VPlx5vqfQmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id BB9A368BEB; Mon, 17 Feb 2025 10:41:32 +0100 (CET)
-Date: Mon, 17 Feb 2025 10:41:32 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Nilay Shroff <nilay@linux.ibm.com>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH 0/7] block: remove all debugfs dir & don't grab
- debugfs_mutex
-Message-ID: <20250217094132.GA30499@lst.de>
-References: <20250209122035.1327325-1-ming.lei@redhat.com>
+	s=arc-20240116; t=1739788906; c=relaxed/simple;
+	bh=v2GXHADwm8jyrelNLsN3du0ue6JxDoMDZDX77gfKsDA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BwMEug7VIUKjljOh//tXvVwi86ZnvTQHjj9nMGsK0/3BfCXhVpx5BEm7oA2pumRu5bL+U8PNNjhxxvGM2jSyDI0aeNW2iIBZixCZo7n2xeLRWfxeVnJrVPvWZ/ROOzEwcaXenrbjcBQuG+8yaDJqH/ak333ZonkGPmQHTVFk+qE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=a273VhG8; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="a273VhG8"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1739788894; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=XWTpZGqQz/jMkvs/NObnrKteVXldw/miuF2M3tixfjY=;
+	b=a273VhG85geHLABhrb27oPTRGXNc16KcalNGPvvD8xWIjye39ihZAfamw9z1g+7IEaN4uko1ptGUSSKfo8gv5rkUHJabiV7lOSnySJjxKN5Ybm1rgoULaaw88z9XMppEjUYdhoGaFGtedUZfYOa4UhlebyHaBp6FXdVhzddhIWI=
+Received: from 30.74.130.36(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0WPdpnMQ_1739788893 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 17 Feb 2025 18:41:33 +0800
+Message-ID: <0290170c-39df-4609-8de1-55695d6ec0ad@linux.alibaba.com>
+Date: Mon, 17 Feb 2025 18:41:32 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250209122035.1327325-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM/BPF TOPIC] Rust in FS, Storage, MM
+To: Andreas Hindborg <a.hindborg@kernel.org>,
+ lsf-pc@lists.linux-foundation.org
+Cc: linux-block@vger.kernel.org, linux-mm@kvack.org,
+ linux-fsdevel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ Yiyang Wu <toolmanp@tlmp.cc>, toolmanp@outlook.com,
+ linux-erofs mailing list <linux-erofs@lists.ozlabs.org>
+References: <87ldu9uiyo.fsf@kernel.org>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <87ldu9uiyo.fsf@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Feb 09, 2025 at 08:20:24PM +0800, Ming Lei wrote:
-> Hi,
+
+
+On 2025/2/14 14:41, Andreas Hindborg wrote:
+> Hi All,
 > 
-> The 1st 6 patch removes all kinds of debugfs dir entries of block layer,
-> instead always retrieves them debugfs, so avoid to maintain block
-> internal debugfs state.
+> On behalf of the Linux kernel Rust subsystem team, I would like to suggest a
+> general plenary session focused on Rust. Based on audience interest we would
+> discuss:
+> 
+>   - Status of rust adoption in each subsystem - what did we achieve since last
+>     LSF?
+>   - Insights from the maintainers of subsystems that have merged Rust - how was
+>     the experience?
+>   - A reflection on process - does the current approach work or should we change
+>     something?
+>   - General Q&A
 
-I'm still not sure this is a good idea.  Yes, unregistration is not
-a fast path, but having to reconstruct path names to remove them
-just creates annoying racyness.  Now we'd need to make sure now
-one is creating the same names at the same time.  Which is probably
-fine now, but something entirely non-obvious to keep it mind.  There's
-also a reason why the debugfs API isn't built that way to start with.
+Last year Yiyang worked on an experimental Rust EROFS codebase and
+ran into some policy issue (c+rust integration), although Rust
+adaption is not the top priority stuff in our entire TODO list but
+we'd like to see it could finally get into shape and landed as an
+alternative part to replace some C code (maybe finally the whole
+part) if anyone really would like to try to switch to the new one.
 
-> The 7 patch removes debugfs_mutex for adding/removing debugfs entry
-> because we needn't the protection any more, then one lockdep warning
-> can be fixed.
+Hopefully some progress could be made this year (by Yiyang), but
+unfortunately I have no more budget to travel this year, yet
+that is basically the current status anyway.
 
-I don't see the lockdep dependency anywhere in this thread, but I
-assume it's the mess with updating nr_hw_queues again?
+Thanks,
+Gao Xiang
 
-In that case the fix is going probably going to be the same
-tag_set-wide lock Nilay is looking into for sysfs.
+> 
+> Please note that unfortunately I will be the only representative from the Rust
+> subsystem team on site this year.
+> 
+> Best regards,
+> Andreas Hindborg
+> 
+
