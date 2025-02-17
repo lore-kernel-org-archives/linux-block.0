@@ -1,187 +1,77 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8B117B506;
-	Mon, 17 Feb 2025 07:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132ED18A92D
+	for <linux-block@vger.kernel.org>; Mon, 17 Feb 2025 08:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739778420; cv=none; b=HIOecboPOvIP6y+F72CLtvZC52V/IfJpsXLyHGiP+PCrqqwe9+rJrdlP9GZJ0FHk12OpZyv0hp99535EWnVkINJHsMqPQs62I6OyL/UHIIf04q6G17azefy47VjcIKjgSWuQ/9KVxXp80rhMm4JNWs/h8EW69f0G2afeUQ2ldO4=
+	t=1739782325; cv=none; b=Q8fJcoERGMEEJYocngjoXuzC5eu4dZ1doo0piO2lw6SeSptQ+nxaOxgdJqfJDqVbftjVfb1YnJnj3d+eHLE+S8C0oJdCD8OXfugNNGsMC0SZh9Jr5FN+RzSGjGYxHJYWUBrBKQ1ENNIZvSqePfUXPhoCJyT2bkSP/uSr+FtAmDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739778420; c=relaxed/simple;
-	bh=TV+DcSv0rBlwGnRMkFu2YWVSX+uwz1Iucpa56Paj/uM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fej7WxB7UL5WNg15qrNPGQKOHD7I7Q2CekzCrZQ2zbSMPMNLV7CanhOTvzICy3VK99ptWQbzJT8zqmFemU79jkK5rvk87lFpf+ISBprw3qnjoSSp0w374IJ7/r3LNsnM0ex+xJxL+5PeRztkVrc+QSdkLGbtGw1guzxxLR7hvIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4398738217aso3466655e9.3;
-        Sun, 16 Feb 2025 23:46:58 -0800 (PST)
+	s=arc-20240116; t=1739782325; c=relaxed/simple;
+	bh=pTKM4ONs5xdJ/zoEznz6Tt7sfINMDFv0eJ7Qdu+k/w8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=nznnteEuJwasD6IJudg93K0N2HIBMUdVSPmjPtruvptOGI0y6PktCC5ag2Vi2E8kQcfvUy8wkue8RhUoCpevw1Jqp9lmHkrRGP4/N8cVdZ9Zaej3+ewwEUGNpH28n1O/Q5yU21OJVM1+ec2QKAoqKaNqG5vXusLkyF/nkFDSuBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3d2a407cd16so469625ab.0
+        for <linux-block@vger.kernel.org>; Mon, 17 Feb 2025 00:52:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739778417; x=1740383217;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1739782323; x=1740387123;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fR4NFxuWiqBPtXAx9wkbxWarDCW/Qvh21Mv1E4CO5ZQ=;
-        b=HuUUy9gLBVvd+Nwf/vGqyna5xoGOJTv1o2dP2SCorUXySXI5HQyq6lPXppMVHvOycK
-         nXj99NwMZii8nQcRYyUN7maZJuHATp+mCEKxRqmIaWwJv4Y0QFVohEkn0+2YqNKGPPen
-         r7p3AqvwQWMqyn+dKwgEMlks2ir+9lfqx+QIagaCD3SxiZP1oY0yq3rblTnEEc0Ty/Vu
-         HfuPPX5zpS+bQQeU5KOgC93Fjvm9X2cMIpi2NBSSkFgwY5iMH/BK+kOoEkWIs6sVBapi
-         jaHJtwXIpWmuwRac4xnEG/2RppxJHxbJU9u3jR48wxvLOPoxAKptuClmKnTFxT7oBa8k
-         vsuw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6c63XL0Rlei1WZSRgtWqtXBBE2ODu01WwqAAVVjCiMmy159d88EM6qrT99/SG1OvNsjY2QSolldv1mg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk2GiXWuIBwLv2TGXOH6F/zyPG1c1fcD5C9Z3oOWZ39Im8Wm2T
-	F9/3+YDTy/qsbwdPQBYwADoF7PHYliH4qD2/5hx8Prv5+YKKDq5R
-X-Gm-Gg: ASbGncu1SB2N2CSgr4yG6/eLjbxQCEHVhYyJayPRoTujxMcJX5NdNTyrBShUj5erpnv
-	GjGrnQ33funTZJ/Vv22SHoVYZa+MR8yRKlSQ4XLHkIfpaFj2nBglDePpodRXapEqFh/KqEHxsH7
-	/BULMib3W13IlLiqXrbYqd7+NbsFqonqAr0C6uO2CRHiRXTC6tw0x/wlsWfTW5ff5IWrxqQvYX7
-	13Leblx+M8dos2HmCJjw8/mXEA8YaQ0BOsmKX/kHG4CaaAX1YjYvFaZ3VOlvmhCelNfZavtK9FN
-	BSH9lTR4ZIBV8oV+Eq9UrrfFpFFjjFeUbzXk8YEAOGAt9vyjFM2iniXkyg==
-X-Google-Smtp-Source: AGHT+IFTyXYgme3ewuDw6Ewz/zTtLzn9WnLnVAoLj/JUS8cfpqVznqbExQI7kKDa0eJV3cJ1O50wQg==
-X-Received: by 2002:a05:600c:3106:b0:439:6619:9c1c with SMTP id 5b1f17b1804b1-4396e6d9a8bmr80630955e9.18.1739778416737;
-        Sun, 16 Feb 2025 23:46:56 -0800 (PST)
-Received: from [10.50.4.206] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43987088ecbsm13388325e9.31.2025.02.16.23.46.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 16 Feb 2025 23:46:56 -0800 (PST)
-Message-ID: <aed9dde7-3271-4b97-9632-8380d37505d9@grimberg.me>
-Date: Mon, 17 Feb 2025 09:46:55 +0200
+        bh=v7dkqt5TNcfumetUYnVjyG/hBirM8FVc1r3s0VKr1EU=;
+        b=tykdsNwK7dOX0hvPCHzzhoj8ZM7Vu1x2ZTgPymsvTT9W0qVDPP1RS1OKuHVU/F4RB5
+         VJdaMyQSbapvD2BTIOuZZ6HnV7a2dBlZTieQzTg2tyHljZqGfqMgwfRu9thHPGqYOVMz
+         nj0yxM3RdEjbQGR7EGG8FhzLdnl+xWhbSEym+A6G5J1vuPA0IQaL6rE2xhAWgWaQ3cwn
+         69nQ9fnADqPr4DXPxxuUKnq0a7cTBOkESUlkZRxjiYoIfIwH62JAnefMPLOyf8lcj+Ih
+         emQud6eqvETyC7FQrRiNK9afb5j4OvsnKLDq1jxdtQInI3HtyKxgFlOfrU6jKGS5dbv8
+         CVZg==
+X-Forwarded-Encrypted: i=1; AJvYcCUnMyaoep2JK1JQIcxygncYf1UMbQ6jg29Df8ttPMjTrx/JQUPxcULSrAbSHUFkuhUtianGsbN1vIOg/g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbAoCJyrUiMrHiX+niI5F9ChGH1gUwZKsyyJZnCDmZr1tFCtQv
+	oZrrugx+CzHMr8yDAP+NgitkIKBisE5cmLbep3fKDVEkdGdpikvqaTiPbu8rox49/m8fd+e5YvW
+	4NCo5iCzrb4kEytRwCEmv68Eaajyfy3b5Xa26kOncZ9MCOWHUxTFsaNw=
+X-Google-Smtp-Source: AGHT+IFadkoA3rneb+/gRE8ngOLHkiIC8pgXB6U7bDf3vvzatGshGE1p8RJ8nI2S7qTrxqPWueCsvZB2taQHwL2K7O4VLxN/2L4b
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: nvme-tcp: fix a possible UAF when failing to send request
-To: "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>,
- mgurtovoy <mgurtovoy@nvidia.com>, kbusch <kbusch@kernel.org>,
- sashal <sashal@kernel.org>, "chunguang.xu" <chunguang.xu@shopee.com>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>,
- linux-nvme <linux-nvme@lists.infradead.org>,
- linux-block <linux-block@vger.kernel.org>
-References: <2025021015413817916143@cestc.cn>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <2025021015413817916143@cestc.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:b4b:b0:3d0:e6c:e9c5 with SMTP id
+ e9e14a558f8ab-3d280974ff4mr90204965ab.21.1739782323278; Mon, 17 Feb 2025
+ 00:52:03 -0800 (PST)
+Date: Mon, 17 Feb 2025 00:52:03 -0800
+In-Reply-To: <679fb3a5.050a0220.163cdc.0030.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67b2f8b3.050a0220.173698.0026.GAE@google.com>
+Subject: Re: [syzbot] [bcachefs] general protection fault in bioset_exit (2)
+From: syzbot <syzbot+76f13f2acac84df26aae@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, gregkh@linuxfoundation.org, kent.overstreet@linux.dev, 
+	linux-bcachefs@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com, tj@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+syzbot has bisected this issue to:
 
+commit 14152654805256d760315ec24e414363bfa19a06
+Author: Kent Overstreet <kent.overstreet@linux.dev>
+Date:   Mon Nov 25 05:21:27 2024 +0000
 
+    bcachefs: Bad btree roots are now autofix
 
-On 10/02/2025 9:41, zhang.guanghui@cestc.cn wrote:
-> Hello
->
->
->
->      When using the nvme-tcp driver in a storage cluster, the driver may trigger a null pointer causing the host to crash several times.
->
->
->
-> By analyzing the vmcore, we know the direct cause is that  the request->mq_hctx was used after free.
->
->
->
->
->
-> CPU1                                                                   CPU2
->
->
->
-> nvme_tcp_poll                                                          nvme_tcp_try_send  --failed to send reqrest 13
->
->
->
->      nvme_tcp_try_recv                                                      nvme_tcp_fail_request
->
->
->
->          nvme_tcp_recv_skb                                                      nvme_tcp_end_request
->
->
->
->              nvme_tcp_recv_pdu                                                      nvme_complete_rq
->
->
->
->                  nvme_tcp_handle_comp                                                   nvme_retry_req -- request->mq_hctx have been freed, is NULL.
->
->
->
->                      nvme_tcp_process_nvme_cqe
->
->
->
->                          nvme_complete_rq
->
->
->
->                              nvme_end_req
->
->
->
->                                    blk_mq_end_request
->
->
->
->
->
->
->
-> when nvme_tcp_try_send failed to send reqrest 13, it maybe be resulted by selinux or other reasons, this is a problem. then  the nvme_tcp_fail_request would execute。
->
->
->
-> but the nvme_tcp_recv_pdu may have received the responding pdu and the nvme_tcp_process_nvme_cqe would have completed the request.  request->mq_hctx was used after free.
->
->
->
-> the follow patch is to solve it.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=171a52e4580000
+start commit:   224e74511041 Merge tag 'kbuild-fixes-v6.14-2' of git://git..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=149a52e4580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=109a52e4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e55cabe422b4fcaf
+dashboard link: https://syzkaller.appspot.com/bug?extid=76f13f2acac84df26aae
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14e8b5a4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1155a898580000
 
-Zhang, your email client needs fixing - it is impossible to follow your 
-emails.
+Reported-by: syzbot+76f13f2acac84df26aae@syzkaller.appspotmail.com
+Fixes: 141526548052 ("bcachefs: Bad btree roots are now autofix")
 
->
->
->
-> can you give  some suggestions?  thanks!
-
-The problem is the C2HTerm that the host is unable to handle correctly.
-And it also appears that nvme_tcp_poll() does not signal correctly to 
-blk-mq to stop
-calling poll.
-
-One thing to do is to handle C2HTerm PDU correctly, and, here is a 
-possible fix to try for the UAF issue:
---
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index c637ff04a052..0e390e98aaf9 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -2673,6 +2673,7 @@ static int nvme_tcp_poll(struct blk_mq_hw_ctx 
-*hctx, struct io_comp_batch *iob)
-  {
-         struct nvme_tcp_queue *queue = hctx->driver_data;
-         struct sock *sk = queue->sock->sk;
-+       int ret;
-
-         if (!test_bit(NVME_TCP_Q_LIVE, &queue->flags))
-                 return 0;
-@@ -2680,9 +2681,9 @@ static int nvme_tcp_poll(struct blk_mq_hw_ctx 
-*hctx, struct io_comp_batch *iob)
-         set_bit(NVME_TCP_Q_POLLING, &queue->flags);
-         if (sk_can_busy_loop(sk) && 
-skb_queue_empty_lockless(&sk->sk_receive_queue))
-                 sk_busy_loop(sk, true);
--       nvme_tcp_try_recv(queue);
-+       ret = nvme_tcp_try_recv(queue);
-         clear_bit(NVME_TCP_Q_POLLING, &queue->flags);
--       return queue->nr_cqe;
-+       return ret < 0 ? ret : queue->nr_cqe;
-  }
-
-  static int nvme_tcp_get_address(struct nvme_ctrl *ctrl, char *buf, int 
-size)
---
-
-Does this help?
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
