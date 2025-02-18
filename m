@@ -1,97 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFD61BD017;
-	Tue, 18 Feb 2025 20:12:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA2821B9E1
+	for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 20:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739909562; cv=none; b=lD2wvEsgWpJVi3fFdiI0I5wtggby/VTVHT50ggyPR1x7Hxyd5oQmqyoDwSyYmFlTcpidTqyCjozegCkGJSJlWLjxdn5GILRyvZy0yga1Im7vtW0D8ny21m763FXE+V0VIiKOME2kjyAmnDh70IT874xdDgz4bC9ZmX0E5NBwJ2U=
+	t=1739910060; cv=none; b=js7yq1JwLbhIFb4f056Yj9TY4/jKoI0EQ7yItB8h+u0Enqcl6mn4sbk2gvQwjgNChsRL4YkTKls/37gQ1MJvK+f/HruMQhh/T/8DgZlKQK362y70Y9zRAlg+TIFYk8UNsJ/OiXvGsxWYUibk7dHQkWkyNIv2PgWlEkLSDQpcdrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739909562; c=relaxed/simple;
-	bh=cduoBDkcRVdy9/fwUecZLB4Wfm/9MJKCczW2QEMrK1M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=igO/2CwiTYcdBjZhZs8zO8a13njeBsR2cmjS4+yQ2GtSD5/YYB5zespGuqCjW5azTfQB3+yC8ADC2qzYT9IIjfFGvKFEjveoX+vKN3Yip1ZtFBZLXcOcIqBUjLmtLc3p1DlQfpA8jVB7TY18n+nMjxMuZKMwG+8xi4VAFDSk4Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gy09Pyp1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739910060; c=relaxed/simple;
+	bh=idQR6FMP0hjSHldh+8eNgRaRntbDdUsf2KfANjgGpZ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wv4H/ltSR/WDHxliGTO89ZZdHgCuPDFktvIBFVRLIeyCMNdkTMMhk9WJ1XwEd9Frt8eGxGS0jmvbUfeGwzK3VCS9KvaXY+w4KHaDNFR5A6W1sHSkYA4KilWC1cRn6zNnvxW9bJ8H4cKj/2IDKFU8CxzmSAc/HyOcjlT80lgXa/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XgH0y1qs; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gy09Pyp1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB822C4CEE2;
-	Tue, 18 Feb 2025 20:12:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739909560;
-	bh=cduoBDkcRVdy9/fwUecZLB4Wfm/9MJKCczW2QEMrK1M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Gy09Pyp1HO6oMUfxKvrhJQzwzPVOhZAB9Ax/mGVP+4wmiyz9i8E0HixrNh02cCM4l
-	 NIqEz4lMgwprG7DQoJ1oFOVfEg/6boF4MfbxZJW/7/OfZfUAXYNOjuAudRFTs+gTqk
-	 QdpDHxUIFbQDUzkIAHOfXvm5yec4eIAHNz5ihl+aPBEGGwgLjT3VBlz4tF9z+kv2c7
-	 8KHHcbQALnr+f611gpdMLdU0TLc4K1ky3KPB8xge6QcdcgCevKhByjzj9qo6gZmsFF
-	 44aepBjzeVZtT9d7ZuSsGoZkE+6SBXYwjuqe1fVDPq6egAjqAXYihkG92ASUGPMkhh
-	 RSZfsv9Kw02IQ==
-Date: Tue, 18 Feb 2025 13:12:37 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com,
-	asml.silence@gmail.com, axboe@kernel.dk,
-	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-	bernd@bsbernd.com
-Subject: Re: [PATCHv3 5/5] io_uring: cache nodes and mapped buffers
-Message-ID: <Z7TptdubsPCFulfV@kbusch-mbp>
-References: <20250214154348.2952692-1-kbusch@meta.com>
- <20250214154348.2952692-6-kbusch@meta.com>
- <CADUfDZpM-TXBYQy0B4xRnKjT=-OfX+AYo+6HGA7e7pyT39LxEA@mail.gmail.com>
- <CADUfDZrfmpy3hxD5z0ADxCUkWPbU0aZDMiqpyPE+AZbeDSgZ=g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XgH0y1qs"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2fc288da33eso1034877a91.0
+        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 12:20:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1739910058; x=1740514858; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rDL5ENmYEobOBOGopXLnOpJxyEOQbkaeafJSwgvXG9c=;
+        b=XgH0y1qsmDPH4+mLUGINeUVHRIrZq0QXqUROBMsdK8TZB2Tsdu0XsvxfHK1FOF02lQ
+         tQVmLhfpj/my6mUds/l4RhLN0eisw6G5GfSItfwVHqYA2Pu+k/9blzrO6tI7n1r6QkDo
+         L8SWcqPIwQDYF9gMFkiCQa8IoKAVSNRjS6L/5nFmNbKEWwB6QKxeIK8H6h2Gr18T0k57
+         ZXCbHLxw9/eTRfDVnOvJvbkkUUvcaJcPBaPQm8Wt4WcnD9DOxLZNlfHRy8PuNZYPVpvS
+         pvOtAEJ9uUS1Qf8+aIogZf/O4mN3BjLxxuR+Htyp5hSePoFTXt/iFWAFI9aD2oqbDMxK
+         Crdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739910058; x=1740514858;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rDL5ENmYEobOBOGopXLnOpJxyEOQbkaeafJSwgvXG9c=;
+        b=MszKrt0i6Z1scEwm49wHarCVF512F6N+93Fr3URF/EDcToqJ9OsdLM5+CVlQIIkWlL
+         j9gLGI+32k8rPfgx9ZzW6h6CRETkQYcCiOc6DOwhi0qyEfYJvHzHNpC8GETYkAqCm7rf
+         klfcstph4fA2CUkU6A/LKLKTjFFjeyPPcBnX/o3a959EKr+6ARSaz4herjJOgmPADIVG
+         4Ox/FU+CSgQB1iC+iBnhpWKhXG3n9zkmb1G7lH7rQPbAmDpg6WWjtjefu9agZ2QqiRKG
+         ZrI5GzALeeWtvvuUaB9qiEdp53whZ7CxXCvvx1UmDcRPGLXcg+Nh/5A8S4DZBZRtS+zs
+         kB4g==
+X-Forwarded-Encrypted: i=1; AJvYcCVWmIluLAd4FOV7CNoo9Ztn1xItqRqoG0OAYphJms0E4xJvWvG5tJzhp2O22Hqpsupmp0aLUkbMpHYmQw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxoQHUVjuNtLNUHTqVDWypQtYZM3ISaJtFgiZMqiQihw4T4vFv
+	8uq4nwSVTZDjwPyniq51LTFlNDtNF6p9ljOo+os4fyLagN6Nrbx0c7BpLdIoGopNlnQVvSDz0Na
+	L2NknLeg3B0PZu5SvuuuWoFP7HJMUwIDf+PS7kg==
+X-Gm-Gg: ASbGncuXX/dAOnXnzyUqJwmXhMlwQGLv0XzPnKVdQ+Qfa6BroHd3lN5hEGZxizhqK1C
+	Tk7m8RgbXDVJD9RikRb6rw5wPJsXLpT3k93uFtAJJIg5HNlxs25hrLB9XIEvZf5E8roXcOxw=
+X-Google-Smtp-Source: AGHT+IFzRM9dWI1Dt58bvoJ1SBUSqteELCYJZmXQVmxaJVUkNCmh+yI5Ky9C4ckh4BV7j2wfD7QAXk6K064Fw2GTSEE=
+X-Received: by 2002:a17:90b:33c6:b0:2f4:465d:5c91 with SMTP id
+ 98e67ed59e1d1-2fc41174806mr9071194a91.8.1739910057970; Tue, 18 Feb 2025
+ 12:20:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADUfDZrfmpy3hxD5z0ADxCUkWPbU0aZDMiqpyPE+AZbeDSgZ=g@mail.gmail.com>
+References: <20250214154348.2952692-1-kbusch@meta.com> <20250214154348.2952692-3-kbusch@meta.com>
+ <CADUfDZpbb0mtGSRSqcepXnM9sijP6-3WAZnzUJrDGbC0AuXTrg@mail.gmail.com> <Z7TmrB4_aBnZdFbo@kbusch-mbp>
+In-Reply-To: <Z7TmrB4_aBnZdFbo@kbusch-mbp>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 18 Feb 2025 12:20:46 -0800
+X-Gm-Features: AWEUYZlQ5seoUzPfhkm2G3v0L4jrKcOJ-d0Fq30l0zSfFPjJJDR9eBYRJ3c3ezY
+Message-ID: <CADUfDZorM+T+-Pk4hbsFk_+kJFYMAEaAkLompYdM2UWFucOWsA@mail.gmail.com>
+Subject: Re: [PATCHv3 2/5] io_uring: add support for kernel registered bvecs
+To: Keith Busch <kbusch@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com, asml.silence@gmail.com, 
+	axboe@kernel.dk, linux-block@vger.kernel.org, io-uring@vger.kernel.org, 
+	bernd@bsbernd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Feb 16, 2025 at 02:43:40PM -0800, Caleb Sander Mateos wrote:
-> > > +       io_alloc_cache_free(&table->imu_cache, kfree);
-> > > +}
+On Tue, Feb 18, 2025 at 11:59=E2=80=AFAM Keith Busch <kbusch@kernel.org> wr=
+ote:
+>
+> On Fri, Feb 14, 2025 at 12:38:54PM -0800, Caleb Sander Mateos wrote:
+> > On Fri, Feb 14, 2025 at 7:45=E2=80=AFAM Keith Busch <kbusch@meta.com> w=
+rote:
 > > > +
-> > >  int io_sqe_buffers_unregister(struct io_ring_ctx *ctx)
-> > >  {
-> > >         if (!ctx->buf_table.data.nr)
-> > >                 return -ENXIO;
-> > > -       io_rsrc_data_free(ctx, &ctx->buf_table.data);
-> > > +       io_rsrc_buffer_free(ctx, &ctx->buf_table);
-> > >         return 0;
-> > >  }
-> > >
-> > > @@ -716,6 +767,15 @@ bool io_check_coalesce_buffer(struct page **page_array, int nr_pages,
-> > >         return true;
-> > >  }
-> > >
-> > > +static struct io_mapped_ubuf *io_alloc_imu(struct io_ring_ctx *ctx,
-> > > +                                          int nr_bvecs)
-> > > +{
-> > > +       if (nr_bvecs <= IO_CACHED_BVECS_SEGS)
-> > > +               return io_cache_alloc(&ctx->buf_table.imu_cache, GFP_KERNEL);
+> > > +       nr_bvecs =3D blk_rq_nr_phys_segments(rq);
 > >
-> > If there is no entry available in the cache, this will heap-allocate
-> > one with enough space for all IO_CACHED_BVECS_SEGS bvecs. Consider
-> > using io_alloc_cache_get() instead of io_cache_alloc(), so the
-> > heap-allocated fallback uses the minimal size.
-> >
-> > Also, where are these allocations returned to the imu_cache? Looks
-> > like kvfree(imu) in io_buffer_unmap() and io_sqe_buffer_register()
-> > needs to try io_alloc_cache_put() first.
-> 
-> Another issue I see is that io_alloc_cache elements are allocated with
-> kmalloc(), so they can't be freed with kvfree(). 
+> > Is this guaranteed to match the number of bvecs in the request?
+>
+> Yes.
+>
+> > Wouldn't the number of physical segments depend on how the block
+> > device splits the bvecs?
+>
+> Also yes.
+>
+> >lo_rw_aio() uses rq_for_each_bvec() to count
+> > the number of bvecs, for example.
+>
+> Hm, that seems unnecessary. The request's nr_phys_segments is
+> initialized to the number of bvecs rather than page segments, so it can
+> be used instead of recounting them from a given struct request.
+>
+> The initial number of physical segments for a request is set in
+> bio_split_rw_at(), which uses bio_for_each_bvec(). That's what
+> rq_for_each_bvec would use, too. The same is used for any bio's that get
+> merged into the bio.
 
-You actually can kvfree(kmalloc()); Here's the kernel doc for it:
+Okay, thanks for verifying!
 
-  kvfree frees memory allocated by any of vmalloc(), kmalloc() or kvmalloc()
-
-> When the imu is
-> freed, we could check nr_bvecs <= IO_CACHED_BVECS_SEGS to tell whether
-> to call io_alloc_cache_put() (with a fallback to kfree()) or kvfree().
-
-But you're right, it shouldn't even hit this path because it's supposed
-to try to insert the imu into the cache if that's where it was allocated
-from.
+Best,
+Caleb
