@@ -1,84 +1,107 @@
-Received: from 001.mia.mailroute.net (001.mia.mailroute.net [199.89.3.4])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6961828629B;
-	Tue, 18 Feb 2025 22:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A001B6CEC
+	for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 22:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739917471; cv=none; b=aYHt5sUdqGzkMwMbevG67vKfP+GZgrUHu3bvjwDttADS3F/eP6qguzONgG+egLcI4AVettq2p2OEysjoJk1r3j4/6skTBlVydRT/06O9JF+3ScPUGtDC0KsOwm3BJhYQEdTGIjDBLzfIVgimNnLvLNyvAgUwo1nBDhs7aCT0jxM=
+	t=1739918577; cv=none; b=iU8uQb+nn0hi6V2eTJnYLAmwsT9IzbdZiXICN5tj1kvns0eKIAD43eyGmfNinSy4DFgbmZqb97SpVoaOXJuuAMkkfmq1gGyx1q4ZbNLCNc1CKURqy68BwyzY5r4El6IXPKTyQuJ3Fo+sUIABCUg5YjqWgoax9yErpuJLkWsFZQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739917471; c=relaxed/simple;
-	bh=kCmoXvGtdX3xHMk0kwjR6YvFtUveRkTB815tpRMtgh8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uD+01zke7IaNkwlmoih6f/EdEKtEfcZ8U0Ka24EyDSbPfQivHPR39U+SOClyfUoK1lyK9DZw0a6Z5fxNDeqK0KWnoOwxZCqP61R2thxt/atcQiS3TukWkka/N4YS06ToSR9mULPEPQHcW+PrSq2+/C7y12DphbjJLjZUkIn2lEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Y7AGmSlW; arc=none smtp.client-ip=199.89.3.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1739918577; c=relaxed/simple;
+	bh=fHZLEfX0eVvpMWiOWQKyUceb87Z7nbopPwJUzGmCEMk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=By1W/CZg3oZYM63TK9JMqMeGgt0E6RFUDaYaROfNDjsiWJeoNH59SysT6A3jN1qq+34G9czLrMvCIhzjnqggxCZ80YtmmN4bOaNOPS3mJRkNK7Edg4y1phsZYbERiNTPKiDXdI9jeg1VPTNGG1GpM9Z4hJZfaHr1XWasL8WPJTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=IIkjq+yn; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Y7AGmSlW"
-Received: from localhost (localhost [127.0.0.1])
-	by 001.mia.mailroute.net (Postfix) with ESMTP id 4YyDXV2skrz1Xb877;
-	Tue, 18 Feb 2025 22:22:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1739917321; x=1742509322; bh=92vphjxGRpPWF2H9SmmPDtnz
-	qLQ6gEb/VnixK6UxtKA=; b=Y7AGmSlWBV+nVckc93MaUSUv0WI2aieQ3NCSG4eJ
-	/QhqBHYtcS0MyoAVVAvC47nka+evFaz+R9Wq2C6rkyipXZIULk1j9OJo6PrNO+NL
-	/c6gnXAXQRNILRzCY3xAVns3eoUXqyo682yPgefivVBaQzI197B8q+wfeaus2wlZ
-	qwtXEsa89Qo0Zm3+9mmvLZC0Az3ct/V2hkQP74o4qv1VS+9JSwY0XH/w3wOO/0bn
-	ioynKAZfSgw3ZYdluSAuGmOAWSlajuSu2ArOwWk2E6ZfMuStL1OA+hPxKPukjMGE
-	3hfYpBeQaufZZJOIYTjVR4iY67IzjgwGvCpSmQc9Ue247w==
-X-Virus-Scanned: by MailRoute
-Received: from 001.mia.mailroute.net ([127.0.0.1])
- by localhost (001.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 3K0IWF3JI-4B; Tue, 18 Feb 2025 22:22:01 +0000 (UTC)
-Received: from [100.66.154.22] (unknown [104.135.204.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 001.mia.mailroute.net (Postfix) with ESMTPSA id 4YyDXM4Dqfz1XY6MG;
-	Tue, 18 Feb 2025 22:21:54 +0000 (UTC)
-Message-ID: <6c3d81f0-aee5-4619-82c4-3ce72bdce317@acm.org>
-Date: Tue, 18 Feb 2025 14:21:52 -0800
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="IIkjq+yn"
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 51IM833m012484
+	for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 14:42:54 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2021-q4; bh=JiY33QFrLrp0+oqkp0
+	4LqfCKN8Tidwf7MPyeJpoleB8=; b=IIkjq+yn5wAlz1fJMwx3PdHVETP3YNfD3+
+	4y8kWwbRplBC7YYqYPQtad/DtMVxpHAxnkypgq7fuJlVXNZ+miM/iWspG8hoKZe2
+	UnXvHrqF2E9YUgt9OC+Rb+SzyyPXXOk1fOSxPf8BvkQoCoAK/D0Fgo9IxAze8MDs
+	z76pJ13HwxzZwAyPY/GKNgzN67alcS9lOYdj3rslFH4HUZXwEX3eMExXDLahdGtC
+	wAKxhVF/DgFliBX+gjEPuwJ7L5/r+E1xpc1kayoyIDwweXMxO5omTjXWKyYgsSta
+	RPj5aB2bqwpjZ4mPB9V4aLVSsB+5kYX7dJP/RkOiFEw8ulkWX+7w==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 44w018fc2g-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 14:42:54 -0800 (PST)
+Received: from twshared24170.03.ash8.facebook.com (2620:10d:c0a8:1b::2d) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.14; Tue, 18 Feb 2025 22:42:47 +0000
+Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
+	id 6B144182F61C3; Tue, 18 Feb 2025 14:42:49 -0800 (PST)
+From: Keith Busch <kbusch@meta.com>
+To: <ming.lei@redhat.com>, <asml.silence@gmail.com>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>
+CC: <bernd@bsbernd.com>, <csander@purestorage.com>,
+        Keith Busch
+	<kbusch@kernel.org>
+Subject: [PATCHv4 0/5] ublk zero-copy support
+Date: Tue, 18 Feb 2025 14:42:24 -0800
+Message-ID: <20250218224229.837848-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: set bi_vcnt when cloning bio
-To: John Garry <john.g.garry@oracle.com>,
- Andreas Hindborg <a.hindborg@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Oliver Mangold <oliver.mangold@pm.me>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250215-clone-bi_vcnt-v1-1-5d00c95fd53a@kernel.org>
- <KP4HxjAbrINQTT05XxqLFD7bPj5ONsT3hTQJYUyXtoHBYc7-xFNDZUN3R8pWT-Cd1Q5fguKy97Oy8UJv5Nj1Cw==@protonmail.internalid>
- <f4f4fff4-5055-47f7-9f24-6b1780920f4d@oracle.com> <87r03vfpkm.fsf@kernel.org>
- <464bc3f5-aef2-4e6b-b7cb-035077d1e3f4@oracle.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <464bc3f5-aef2-4e6b-b7cb-035077d1e3f4@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: t7MRZY_w10RwVCgaAhtvKO839TFkgU7-
+X-Proofpoint-ORIG-GUID: t7MRZY_w10RwVCgaAhtvKO839TFkgU7-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-18_10,2025-02-18_01,2024-11-22_01
 
-On 2/18/25 9:12 AM, John Garry wrote:
-> On 18/02/2025 11:40, Andreas Hindborg wrote:
->> But I am genuinely curious if there is a reason for not setting
->> `bi_vcnt` during a clone.
-> 
-> I think that it came from commit 59d276fe0 (with the addition of 
-> bio_clone_fast()), where we assume that the cloned bio is not having the 
-> bio_vec touched and so does not need to know bi_vcnt (or bi_max_vecs). 
-> And it is inefficient to needlessly set bi_vcnt then.
+From: Keith Busch <kbusch@kernel.org>
 
-Hmm ... I prefer paying the very small performance hit caused by copying
-bi_vcnt rather than having to deal with the inconsistency caused by not
-copying that data structure member.
+Changes from v3:
 
-Thanks,
+  Fixed putting the imu back in the cache on free instead of releasing
+  it to the system (Caleb)
 
-Bart.
+  Fixed the build bisect breakage (Caleb)
+
+  Use appropriate error value if cache initialization fails (Caleb)
+
+  Check data direction when importing the buffer (Ming)
+
+  Using the array_no_spec accessor when using a user index (Pavel)
+
+  Various cleanups
+
+Keith Busch (5):
+  io_uring: move fixed buffer import to issue path
+  io_uring: add support for kernel registered bvecs
+  ublk: zc register/unregister bvec
+  io_uring: add abstraction for buf_table rsrc data
+  io_uring: cache nodes and mapped buffers
+
+ drivers/block/ublk_drv.c       | 137 ++++++++++++-----
+ include/linux/io_uring.h       |   1 +
+ include/linux/io_uring_types.h |  33 ++--
+ include/uapi/linux/ublk_cmd.h  |   4 +
+ io_uring/fdinfo.c              |   8 +-
+ io_uring/filetable.c           |   2 +-
+ io_uring/io_uring.c            |  19 +++
+ io_uring/net.c                 |  25 +---
+ io_uring/nop.c                 |  22 +--
+ io_uring/register.c            |   2 +-
+ io_uring/rsrc.c                | 266 ++++++++++++++++++++++++++-------
+ io_uring/rsrc.h                |   6 +-
+ io_uring/rw.c                  |  45 ++++--
+ io_uring/uring_cmd.c           |  16 +-
+ 14 files changed, 419 insertions(+), 167 deletions(-)
+
+--=20
+2.43.5
+
