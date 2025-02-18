@@ -1,107 +1,211 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B31F189B84
-	for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 03:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6425917333F
+	for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 05:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739849615; cv=none; b=QZ0FYRfncD5Wz0dNWN16G7BhntpOvMcy7SCuiS+i5Ze91odHgKS/wD54dtyyJbByDm31bx7qFo2T9XyvNXYLEXR5YOBTqFPv9wgKb8cKa4+95Uzltdq4J05z2CpGnvnDa+7EZeJ5rdxZeLK3e1DuLwBwJ7kcSNXztGqep1LwrKc=
+	t=1739857182; cv=none; b=PpveA4xH3/tC8uswSnHXrBcOwNnSjHB7T+Tpn83qO3TyJMOuxdSh8m6vjD3+xfiOuj/LBl08wB3fDwyIY0T6Wro4ehbMNacSKMcaLwNoVqMFwkqHAg0szCeI50Z2KQdaAYgWepG7qVMIJnrEJP5vcEDbYT4/SJFLSiO2nWiJsXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739849615; c=relaxed/simple;
-	bh=olk7paXU4nOWgLs6rL4qNd27H0bU3veOSCvr0Gq4bzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cNTI//+asOEmsUs3CsTZxlqbDUVrY/P6M/3dqOBLSKX3y/FRBVu/9KfCfzCGxPh/E3g71K9SLt7LSGWEuOvmTfSV+y7onHC5OehCvSJABGI1DonWMJoOjyDVLj1vjUFcVMzVc4rUwEkg9+8/2QEz69j/Y9YPHDIzg0kgvRSbmlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E2/AhSJs; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1739857182; c=relaxed/simple;
+	bh=vRRjgSWKjOydcIHFw8j60aAcR6D03EOap7Smlhm/P0g=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=cZPx0ap0CPsaI1BPU/8/WkDYrN7hOnGIwzah2EWeM+hpWWrgKentK/iHOcAeIvsGveJSuJ9lzPOjhZjKZoEuoK69WPc+VF5xi4kOPQCTYi9MbTbBm11RZviELtCzj4E6rJqv6qmLEpaA5ORyH06UxvkVXWMdG10bOyIPgb8slIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn; spf=pass smtp.mailfrom=m.fudan.edu.cn; dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b=t8GCAd3z; arc=none smtp.client-ip=18.194.254.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=m.fudan.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E2/AhSJs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739849611;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PqYbvYIVpNJaoQl4neS5lrP+Dqq4hXdmS297QcEciNg=;
-	b=E2/AhSJslxbWIAZK7jSrAUDc5t5/H6K+k8eEoFoVLi5GOcIPfQYdvlReIp9QP3Ecqy9qlK
-	1yykOnXWbu2elc4t5tVzfyjZXM07hdXjCthkjoHoWKNlFZw7f26bCfxhvkc1tLHGMRU3oa
-	fTkxzNzyY1I+46Rqev7zwK9WdCC298c=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-652-U99SID0aMYWnU5lMx7_Aqg-1; Mon,
- 17 Feb 2025 22:33:27 -0500
-X-MC-Unique: U99SID0aMYWnU5lMx7_Aqg-1
-X-Mimecast-MFC-AGG-ID: U99SID0aMYWnU5lMx7_Aqg_1739849606
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F2130180036F;
-	Tue, 18 Feb 2025 03:33:25 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.23])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 781DE1800366;
-	Tue, 18 Feb 2025 03:33:21 +0000 (UTC)
-Date: Tue, 18 Feb 2025 11:33:15 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Zhaoyang Huang <huangzhaoyang@gmail.com>
-Cc: syzbot <syzbot+c104904eeb2c0edbdb06@syzkaller.appspotmail.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>
-Subject: Re: reply: [syzbot] [block?] BUG: corrupted list in loop_process_work
-Message-ID: <Z7P_ezl4qVmASrwH@fedora>
-References: <67afa060.050a0220.21dd3.0051.GAE@google.com>
- <1739771872662.83054@unisoc.com>
- <CAGWkznFFN-wBXFc4ReCdEpFFNuc_m_EXDDopfQzZtTHt2t-wKw@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=m.fudan.edu.cn header.i=@m.fudan.edu.cn header.b="t8GCAd3z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=m.fudan.edu.cn;
+	s=sorc2401; t=1739857167;
+	bh=fbLJfUGU9JXb1yuchMtJfvOmanfA1NOlIy+nWkSIRV0=;
+	h=Mime-Version:Subject:From:Date:Message-Id:To;
+	b=t8GCAd3zGF0+iVixbk5BAuNTsNRDiUZd7HZ9OeI9Tii5Znk3sHVZR7PIUScqKLEBJ
+	 ZyeWrm9ODEyAc8xrC+/O+1EwDFM5F72ZeaWmPTkjaHEHb3PAJ+RpI21rjUUSQ9vjXB
+	 hvXRkixwQDJE1aCx7EPcrQ4LTLxx8ib92S8OAp/4=
+X-QQ-mid: bizesmtpip2t1739857163t0sr30a
+X-QQ-Originating-IP: 2KpfU6kzRLAgPw019R7+o5gplrV1cb73pVEGliCoZqU=
+Received: from smtpclient.apple ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 18 Feb 2025 13:39:22 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 12496570759982188897
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGWkznFFN-wBXFc4ReCdEpFFNuc_m_EXDDopfQzZtTHt2t-wKw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-
-Hello Zhaoyang,
-
-On Tue, Feb 18, 2025 at 10:49:04AM +0800, Zhaoyang Huang wrote:
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    c674aa7c289e Add linux-next specific files for 20250212
-> > git tree:       linux-next
-> > console+strace: https://syzkaller.appspot.com/x/log.txt?x=125063f8580000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=a0fd539126ae5541
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=c104904eeb2c0edbdb06
-> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=158a3bdf980000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17e18aa4580000
->  #syz test
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 68c943a77e41..354d77f9228b 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -1972,7 +1972,8 @@ static void loop_process_work(struct loop_worker *worker,
->          * *and* the worker will not run again which ensures that it
->          * is safe to free any worker on the idle list
->          */
-> -       if (worker && !work_pending(&worker->work)) {
-> +       if (worker && !work_pending(&worker->work)
-> +               && list_empty(&worker->idle_list)) {
->                 worker->last_ran_at = jiffies;
->                 list_add_tail(&worker->idle_list, &lo->idle_worker_list);
->                 loop_set_timer(lo);
-
-The `work` to be queued may originate from RB tree or lo->rootcg_work, so it may
-be freed during queuing without the lock.
-
-I think you may need to revert the patch.
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3818.100.11.1.3\))
+Subject: Re: [PATCH] loop: don't call vfs_flush() with queue frozen
+From: Kun Hu <huk23@m.fudan.edu.cn>
+In-Reply-To: <7D60046B-4E85-4EAA-A864-C7897539524A@m.fudan.edu.cn>
+Date: Tue, 18 Feb 2025 13:39:12 +0800
+Cc: Ming Lei <ming.lei@redhat.com>,
+ linux-block@vger.kernel.org,
+ "jjtan24@m.fudan.edu.cn" <jjtan24@m.fudan.edu.cn>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5F0D9626-55E4-4A42-8776-D7793AA86856@m.fudan.edu.cn>
+References: <20250113022426.703537-1-ming.lei@redhat.com>
+ <7D60046B-4E85-4EAA-A864-C7897539524A@m.fudan.edu.cn>
+To: Kun Hu <huk23@m.fudan.edu.cn>
+X-Mailer: Apple Mail (2.3818.100.11.1.3)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:m.fudan.edu.cn:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: N9NPDBT3mqrZ0DJzJrjU0ItqH1eGu/ADhRRNgz6GyHsdLNDzgb67/HJ4
+	HlqHcX4ZUrwNIyxQ4t/LcA0Jcv/VWYF7S21pMZ1MXl/YADwbfIaFe4/LVvLHpoUgrq4XcRL
+	ly3leU21ZYWnV7LjvSJHVQMERogGu4Ofs+nU1asBQWRVF4sCPlzfhlOZALH9SPDgszH714c
+	MVp4JexKVfHz41NLHJ7+ddHJkomz9RHszERqQj1j7e3/4Z1yhy2StVDKA0kJ9m/I60WYaKo
+	Fytqp6+5iwTFmWX+llixojUe0Al13RzfkUjk5jdCIjL9GLFJBCj7J6I6eCgM4U9+5pOjOY4
+	rJnagFEWrIdYtqhmPhLU23XAiIwJMB1deWw9TA54GcGnCkXLHnXZ/zpbObHV/nIlbVBeqAO
+	LmDIdFZc69wtpR+dLKPliQ0PzGSKDEJA9SqheWqMESMiqFGYz0HRHh278apKezGK9qCZStt
+	kdeL8DE4/fyoYPH5xVyacWTvMYEqIEbaprYiBenoyKgY2MLv/3ip3Xej/utF0JcTdScqKnX
+	KsPI0NKynrHjpUJFjoPkE0IJ40RR23h9snj0hQtzPRLlQSGr2l6/yZfe9bbkOf496dSOUCR
+	rv61MfQ7Z/HgtW7BccXM13snfJ2VKGt0ui2BDNixzmQ9JTiIkbzz4I8+DOesRj/ByHy3h4C
+	pZ0T3NwG6CnDVpBIutNK+RCgFqDLjH0VVFZ+d1eQv6yuK+7mEoEZoQK93A/I3fC65JGwOJG
+	q2lDFCWZs7M+5ElvsyoMNMk/ejZfhnl7xbjfU+lZvjq2q6U3TuDQGeIyN8QLOX2nHdBQgad
+	ZRsgnBDN3xTGVGsdrZftYD8qR4v+OvBbGMNASrMt8Y1u7VxNEeXa44xfQ87TrrkzUs3u9x/
+	xnFY7hAoyFdGJ+ovlBy77JKWbWCXwHfbrDWQVHBA4i8iA6o1QleLieaerUqbKh2n9mIhRFv
+	S+P1EQSHC8IUmDHoCVTp2jze0K7Zz7/R1b0Qe90GP6hIABMFCBUeKahd9
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-RECHKSPAM: 0
 
 
-Thanks,
-Ming
+
+> 2025=E5=B9=B41=E6=9C=8814=E6=97=A5 11:21=EF=BC=8CKun Hu =
+<huk23@m.fudan.edu.cn> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+>> If vfs_flush() is called with queue frozen, the queue freeze lock may =
+be
+>> connected with FS internal lock, and potential deadlock could be
+>> triggered.
+>>=20
+>> Fix it by moving vfs_flush() out of queue freezing.
+>>=20
+>> Reported-by: Kun Hu <huk23@m.fudan.edu.cn>
+>> Reported-by: Jiaji Qin <jjtan24@m.fudan.edu.cn>
+>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>> ---
+>> drivers/block/loop.c | 21 +++++++++++++++------
+>> 1 file changed, 15 insertions(+), 6 deletions(-)
+>>=20
+>> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+>> index 1ec7417c7f00..9adf496b3f93 100644
+>> --- a/drivers/block/loop.c
+>> +++ b/drivers/block/loop.c
+>> @@ -203,7 +203,7 @@ static bool lo_can_use_dio(struct loop_device =
+*lo)
+>> * loop_get_status will always report the effective LO_FLAGS_DIRECT_IO =
+flag and
+>> * not the originally passed in one.
+>> */
+>> -static inline void loop_update_dio(struct loop_device *lo)
+>> +static inline bool loop_update_dio(struct loop_device *lo)
+>> {
+>> bool dio_in_use =3D lo->lo_flags & LO_FLAGS_DIRECT_IO;
+>>=20
+>> @@ -217,8 +217,7 @@ static inline void loop_update_dio(struct =
+loop_device *lo)
+>> lo->lo_flags &=3D ~LO_FLAGS_DIRECT_IO;
+>>=20
+>> /* flush dirty pages before starting to issue direct I/O */
+>> - if ((lo->lo_flags & LO_FLAGS_DIRECT_IO) && !dio_in_use)
+>> - vfs_fsync(lo->lo_backing_file, 0);
+>> + return (lo->lo_flags & LO_FLAGS_DIRECT_IO) && !dio_in_use;
+>> }
+>>=20
+>> /**
+>> @@ -589,6 +588,7 @@ static int loop_change_fd(struct loop_device *lo, =
+struct block_device *bdev,
+>> int error;
+>> bool partscan;
+>> bool is_loop;
+>> + bool flush;
+>>=20
+>> if (!file)
+>> return -EBADF;
+>> @@ -629,11 +629,14 @@ static int loop_change_fd(struct loop_device =
+*lo, struct block_device *bdev,
+>> lo->old_gfp_mask =3D mapping_gfp_mask(file->f_mapping);
+>> mapping_set_gfp_mask(file->f_mapping,
+>>    lo->old_gfp_mask & ~(__GFP_IO|__GFP_FS));
+>> - loop_update_dio(lo);
+>> + flush =3D loop_update_dio(lo);
+>> blk_mq_unfreeze_queue(lo->lo_queue);
+>> partscan =3D lo->lo_flags & LO_FLAGS_PARTSCAN;
+>> loop_global_unlock(lo, is_loop);
+>>=20
+>> + if (flush)
+>> + vfs_fsync(lo->lo_backing_file, 0);
+>> +
+>> /*
+>> * Flush loop_validate_file() before fput(), for l->lo_backing_file
+>> * might be pointing at old_file which might be the last reference.
+>> @@ -1255,6 +1258,7 @@ loop_set_status(struct loop_device *lo, const =
+struct loop_info64 *info)
+>> int err;
+>> bool partscan =3D false;
+>> bool size_changed =3D false;
+>> + bool flush =3D false;
+>>=20
+>> err =3D mutex_lock_killable(&lo->lo_mutex);
+>> if (err)
+>> @@ -1292,7 +1296,7 @@ loop_set_status(struct loop_device *lo, const =
+struct loop_info64 *info)
+>> }
+>>=20
+>> /* update the direct I/O flag if lo_offset changed */
+>> - loop_update_dio(lo);
+>> + flush =3D loop_update_dio(lo);
+>>=20
+>> out_unfreeze:
+>> blk_mq_unfreeze_queue(lo->lo_queue);
+>> @@ -1302,6 +1306,8 @@ loop_set_status(struct loop_device *lo, const =
+struct loop_info64 *info)
+>> mutex_unlock(&lo->lo_mutex);
+>> if (partscan)
+>> loop_reread_partitions(lo);
+>> + if (flush)
+>> + vfs_fsync(lo->lo_backing_file, 0);
+>>=20
+>> return err;
+>> }
+>> @@ -1473,6 +1479,7 @@ static int loop_set_block_size(struct =
+loop_device *lo, unsigned long arg)
+>> {
+>> struct queue_limits lim;
+>> int err =3D 0;
+>> + bool flush;
+>>=20
+>> if (lo->lo_state !=3D Lo_bound)
+>> return -ENXIO;
+>> @@ -1488,8 +1495,10 @@ static int loop_set_block_size(struct =
+loop_device *lo, unsigned long arg)
+>>=20
+>> blk_mq_freeze_queue(lo->lo_queue);
+>> err =3D queue_limits_commit_update(lo->lo_queue, &lim);
+>> - loop_update_dio(lo);
+>> + flush =3D loop_update_dio(lo);
+>> blk_mq_unfreeze_queue(lo->lo_queue);
+>> + if (flush)
+>> + vfs_fsync(lo->lo_backing_file, 0);
+>>=20
+>> return err;
+>> }
+>> --=20
+>> 2.44.0
+>>=20
+
+
+Hi Ming,
+
+I wanted to follow up as I haven=E2=80=99t yet seen the fix you =
+provided, titled =E2=80=9C[PATCH] loop: don't call vfs_flush() with =
+queue frozen=E2=80=9D and =E2=80=9C[PATCH] loop: move vfs_fsync() out of =
+loop_update_dio()"  in the kernel tree. Could you kindly confirm if this =
+resolves the issue we=E2=80=99ve been discussing? Additionally, I would =
+greatly appreciate it if you could share any updates regarding the =
+resolution of this matter.
 
