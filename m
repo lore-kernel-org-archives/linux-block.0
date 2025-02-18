@@ -1,172 +1,102 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E0026A0D7
-	for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 15:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467DD1C3054
+	for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 16:28:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739890968; cv=none; b=uab3fsnrq2DE4bJ6saOYvzbphunpHiVKVUvRz9K4OJEUsltTkmvI1Cf2IO42EDWiFkSLpnU90rpio8TbcsKD8GBlXtaUZPtKQDcMtpwJL5LVSYP+DA8qqyxQ3nYV4KmQf6kT2cdz5J0lKkshoMugC5y/6VE45KxOHKSLttthcL8=
+	t=1739896138; cv=none; b=U5Bc5PB23ixyPbyycsQCSyptzpdPVvEhlvWmQMiVOE2zwuD7v16NtJhLnb7xNbiDpoWSvdcuHgVS0QVeU6PdiDAYWJoxo7L0aYZNUXmk8feQuSElbokf/IkI8LtjQpduZrtlDQfnezULGE8izsgvBIw7H/DNRBDenqTb7rb+uNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739890968; c=relaxed/simple;
-	bh=cqL2LF+ND/ZdbWHONpwi2puXTW1mKlzIebK30VWdNYs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZYiOgEOdihlx7f22G0pta3WegyV7o4Wr2VtMS/Wyp9PP6xPcjRskJXnBvtpRzjSJVa0U1iUcK/EyY1Fp+htaWAVmwBj3Qa/Dsh4UZTnvzfA9Adh7wiUYhbwZSfqel8OMc3dw/J5DtsOd2YWGkQTtF4tAl2a7CPIHxp3JSLTpUQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=fail smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TH/vyPra; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Nldm3Xuo; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TH/vyPra; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Nldm3Xuo; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=suse.de
+	s=arc-20240116; t=1739896138; c=relaxed/simple;
+	bh=ZLqIegwy/9OPkRJFz9LymatoR8kXczOAXBYPAKt34o4=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Z/f+PF9Wd69xC8TKyu0LwbUfDWr7mXE0mCQIq2HtVVkyYaJMT/Yx2vZWKKTpPyBTEQReVG1O6lzA7ML3YQKjqi4sTyOUztkiq5nGvJFtFsrJryBN2/obktN3smZoRjXK1P27MsyXr+9rcXqHEuXdHORlz1ZuBPrCi2s/68wXlRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GhmZXsNZ; arc=none smtp.client-ip=209.85.166.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TH/vyPra";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Nldm3Xuo";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TH/vyPra";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Nldm3Xuo"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1F17C2116B;
-	Tue, 18 Feb 2025 15:02:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1739890965; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q7AVrF9ImZMiQtbhCkV0xB4O3QN1TooCyYbbebiN5RI=;
-	b=TH/vyPrak8PCZ0vEaafDeUCYqouDLsldQujzwmjRx3pncH4F+TfCo0qIdTUz/i63MgyJkd
-	yYJkSPZ+3qTwpRyn8foRLIryqazTTXhlct/kV8DVYnQTbXAjjLmYLRQANzrMPFXlPn8ipE
-	x1FsKbfCHoxdiWRuXkLnaUXiStaj1PE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1739890965;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q7AVrF9ImZMiQtbhCkV0xB4O3QN1TooCyYbbebiN5RI=;
-	b=Nldm3XuoIBkSbhWanlQuhz9oeF7EWCcg8C3TA/s98xFav/thw1DTYEhF1FPrjvWZc4CcWW
-	3XirSQkS1Cp3XiAQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="TH/vyPra";
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Nldm3Xuo
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1739890965; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q7AVrF9ImZMiQtbhCkV0xB4O3QN1TooCyYbbebiN5RI=;
-	b=TH/vyPrak8PCZ0vEaafDeUCYqouDLsldQujzwmjRx3pncH4F+TfCo0qIdTUz/i63MgyJkd
-	yYJkSPZ+3qTwpRyn8foRLIryqazTTXhlct/kV8DVYnQTbXAjjLmYLRQANzrMPFXlPn8ipE
-	x1FsKbfCHoxdiWRuXkLnaUXiStaj1PE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1739890965;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q7AVrF9ImZMiQtbhCkV0xB4O3QN1TooCyYbbebiN5RI=;
-	b=Nldm3XuoIBkSbhWanlQuhz9oeF7EWCcg8C3TA/s98xFav/thw1DTYEhF1FPrjvWZc4CcWW
-	3XirSQkS1Cp3XiAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C5B0613A1D;
-	Tue, 18 Feb 2025 15:02:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id wpbBKxOhtGc6bgAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 18 Feb 2025 15:02:43 +0000
-Message-ID: <a4ba2d82-1f42-4d70-bf66-56ef9c037cca@suse.de>
-Date: Tue, 18 Feb 2025 16:02:43 +0100
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GhmZXsNZ"
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3cfce97a3d9so18674345ab.2
+        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 08:28:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1739896135; x=1740500935; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zZSFheZSQhhD9BZXFMBQVD0TW1CBXyU0mBPRkFUDMV8=;
+        b=GhmZXsNZb/zuvVBqj8z3udk6yxnzpr0z51JAWAZWUgah1OMpyMuUp5O+cxnLPj0IUA
+         1VY0h2t5q6mu3xM31cdhRr8Uul54gKUgiFm+M92aDgdYV36r6b98mh1OEUO8Mi2YJWBh
+         K3MdLPG25wwwH8eAkvGDycb6USnzwrV8FxCJaLyi8xMCmdkcOSDXArfPq3+UxBDhiOOu
+         Embpmu57d49VSBj5dfnBzFhCGPEy+VhKNcRsLeiZ/WSyIxzMwA9U+OsINBhVjI+erUbj
+         jwVkBFLdEtvi+q583DR+pl1wgO7X1cyJ68qQsX/q/zbl7Gr0RcrhO6Z2IcIvl71xHqxc
+         /zXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739896135; x=1740500935;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zZSFheZSQhhD9BZXFMBQVD0TW1CBXyU0mBPRkFUDMV8=;
+        b=nhosptSt20Q3cNmQeFNueSIloBAj1a2BahNn3zHYbGitrYpEghtgIiPcigxYTNWnbf
+         eDtVS7h+Ni3Zq72tCeWLGquztpwFPfRIYID5cSenecTsm6UNUpWYFrNRxHFQSN3NvzvN
+         VC5ttdnpWd4S+n4tMg5e47fvMSxoH4da6avAQ1MLJ6gQeyYxuulvwFGxXsv0hDZ/URIF
+         IhT5v47cK/Fct2CLqEydMAthBk5S6UOG/3rUNyxpuTadTl6kF1AR6v1MXstuWM+l230c
+         2WIpgcteVH9nARPGFmHCzVVgUo6LmnFD339J1V98trvXxMpInolUckbQqMSwQVg5SY1I
+         TXeA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVrcl8EOZ4+OgIYQ5OvDq5ZNuaCJnGUuwtKhNafQiNzgdJStD89mKijk6mp9AfbqtI+pJxPheWJkFXkA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9M/kV6XNbGUBjYZoSXXASk+qZKHc03LHyafFxZE3HNhdUQuQ+
+	Bs34hXnYAhrsUfsgMVr0A2VmE/Rbudtxut/anzRRL1FiWBB/X5meBO7Gbw9HNlI=
+X-Gm-Gg: ASbGncsLEjN98bAIWtktLFXgZkcCrSAByIVUC0eXQfnZyz0Fc4SDzqzyf82McaiECsm
+	r6kvpTColrbLX4epmlBBCFaDLeXNF4YzTuFkMvQt+DpVg0fa+sVHcS/WC0ndYcIXi+xYuWjN6eU
+	Yq34fqruhyNAmAEIY/kBsVz0Em0LSWyzgRx2LxbVi14LoribDDrRCTRUAaRuoW4n7aT8MxqgJAB
+	urfbYFLBacU2hWm8wuU9j3FA6Axn3nkNiO75gieFz3/ECIIqlQRSKWQTouEfeWtAmoqulrD/bkm
+	pR2N2pw=
+X-Google-Smtp-Source: AGHT+IFxS7BlF0CZIeMaviLLRr7C3mH9hEBNvjEDhDAhT5him999heZnOoe+++OGaPF1UldwWm0gGA==
+X-Received: by 2002:a05:6e02:3103:b0:3d0:443d:a5ad with SMTP id e9e14a558f8ab-3d280771825mr144713065ab.2.1739896135029;
+        Tue, 18 Feb 2025 08:28:55 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4eea175b566sm827823173.137.2025.02.18.08.28.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 08:28:54 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Dan Schatzberg <schatzberg.dan@gmail.com>, 
+ Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Zhaoyang Huang <huangzhaoyang@gmail.com>, 
+ steve.kang@unisoc.com, "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
+In-Reply-To: <20250218065835.19503-1-zhaoyang.huang@unisoc.com>
+References: <20250218065835.19503-1-zhaoyang.huang@unisoc.com>
+Subject: Re: [PATCH] Revert "driver: block: release the lo_work_lock before
+ queue_work"
+Message-Id: <173989613412.1451056.13330550436881172975.b4-ty@kernel.dk>
+Date: Tue, 18 Feb 2025 09:28:54 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/8] fs/mpage: use blocks_per_folio instead of
- blocks_per_page
-To: Matthew Wilcox <willy@infradead.org>, Luis Chamberlain <mcgrof@kernel.org>
-Cc: dave@stgolabs.net, david@fromorbit.com, djwong@kernel.org,
- kbusch@kernel.org, john.g.garry@oracle.com, hch@lst.de,
- ritesh.list@gmail.com, linux-fsdevel@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-mm@kvack.org, linux-block@vger.kernel.org,
- gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com,
- kernel@pankajraghav.com
-References: <20250204231209.429356-1-mcgrof@kernel.org>
- <20250204231209.429356-5-mcgrof@kernel.org>
- <Z7Ow_ib2GDobCXdP@casper.infradead.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <Z7Ow_ib2GDobCXdP@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1F17C2116B
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[stgolabs.net,fromorbit.com,kernel.org,oracle.com,lst.de,gmail.com,vger.kernel.org,kvack.org,samsung.com,pankajraghav.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -3.01
-X-Spam-Flag: NO
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3-dev-14bd6
 
-On 2/17/25 22:58, Matthew Wilcox wrote:
-> On Tue, Feb 04, 2025 at 03:12:05PM -0800, Luis Chamberlain wrote:
->> @@ -182,7 +182,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
->>   		goto confused;
->>   
->>   	block_in_file = folio_pos(folio) >> blkbits;
->> -	last_block = block_in_file + args->nr_pages * blocks_per_page;
->> +	last_block = block_in_file + args->nr_pages * blocks_per_folio;
+
+On Tue, 18 Feb 2025 14:58:35 +0800, zhaoyang.huang wrote:
+> This reverts commit ad934fc1784802fd1408224474b25ee5289fadfc.
 > 
-> In mpage_readahead(), we set args->nr_pages to the nunber of pages (not
-> folios) being requested.  In mpage_read_folio() we currently set it to
-> 1.  So this is going to read too far ahead for readahead if using large
-> folios.
+> loop_queue_work should be strictly serialized to loop_process_work since
+> the lo_worker could be freed without noticing new work has been queued
+> again.
 > 
-> I think we need to make nr_pages continue to mean nr_pages.  Or we pass
-> in nr_bytes or nr_blocks.
 > 
-I had been pondering this, too, while developing the patch.
-The idea I had here was to change counting by pages over to counting by 
-folios, as then the logic is essentially unchanged.
+> [...]
 
-Not a big fan of 'nr_pages', as then the question really is how much
-data we should read at the end of the day. So I'd rather go with 
-'nr_blocks' to avoid any confusion.
+Applied, thanks!
 
-Cheers,
+[1/1] Revert "driver: block: release the lo_work_lock before queue_work"
+      commit: 02b3c61aab443d8c1cc7d7eb0ae0a8d86b547224
 
-Hannes
+Best regards,
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Jens Axboe
+
+
+
