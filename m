@@ -1,109 +1,83 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA2821B9E1
-	for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 20:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0161DFE25;
+	Tue, 18 Feb 2025 20:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739910060; cv=none; b=js7yq1JwLbhIFb4f056Yj9TY4/jKoI0EQ7yItB8h+u0Enqcl6mn4sbk2gvQwjgNChsRL4YkTKls/37gQ1MJvK+f/HruMQhh/T/8DgZlKQK362y70Y9zRAlg+TIFYk8UNsJ/OiXvGsxWYUibk7dHQkWkyNIv2PgWlEkLSDQpcdrY=
+	t=1739910614; cv=none; b=K1FlHjdZM+PvXCbhHR4lGUFFpesHfj7+P3mcqx44c3DyRncLzxje3Ib6Ps1uTRAyzAoOhjwsmMCUlaLykDILiFVj8ZHX0+tp8+ucoqpaPfp1Y4iTLk6OuNBJqLkDsKPIargtFQ6QDQ7UAEMmdMKlJmPmiz7+CjCfhKtFgVm8838=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739910060; c=relaxed/simple;
-	bh=idQR6FMP0hjSHldh+8eNgRaRntbDdUsf2KfANjgGpZ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Wv4H/ltSR/WDHxliGTO89ZZdHgCuPDFktvIBFVRLIeyCMNdkTMMhk9WJ1XwEd9Frt8eGxGS0jmvbUfeGwzK3VCS9KvaXY+w4KHaDNFR5A6W1sHSkYA4KilWC1cRn6zNnvxW9bJ8H4cKj/2IDKFU8CxzmSAc/HyOcjlT80lgXa/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XgH0y1qs; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1739910614; c=relaxed/simple;
+	bh=OQQ7m8L1BMzudoAvLK5XOS0A2jo3zwHZiCn7d0G8ezI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pV6ASyOVuM0gX1sjwMWEDmPgXo+hXwYIv/h3EUvMQ3/8m6Zv+5fwUsMgbvwTB4jp0N3peQYLqJ27jDaRdR9Dh3lFo4mUR0U7ucijN3VFTgpzm8Jvpb+RctSWiMIRStnzxVtIyOI/Bb0elNSOvrvJcQ9OuA90cXzo1EbnwBTiBvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=L5fmSxEx; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XgH0y1qs"
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2fc288da33eso1034877a91.0
-        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 12:20:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1739910058; x=1740514858; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rDL5ENmYEobOBOGopXLnOpJxyEOQbkaeafJSwgvXG9c=;
-        b=XgH0y1qsmDPH4+mLUGINeUVHRIrZq0QXqUROBMsdK8TZB2Tsdu0XsvxfHK1FOF02lQ
-         tQVmLhfpj/my6mUds/l4RhLN0eisw6G5GfSItfwVHqYA2Pu+k/9blzrO6tI7n1r6QkDo
-         L8SWcqPIwQDYF9gMFkiCQa8IoKAVSNRjS6L/5nFmNbKEWwB6QKxeIK8H6h2Gr18T0k57
-         ZXCbHLxw9/eTRfDVnOvJvbkkUUvcaJcPBaPQm8Wt4WcnD9DOxLZNlfHRy8PuNZYPVpvS
-         pvOtAEJ9uUS1Qf8+aIogZf/O4mN3BjLxxuR+Htyp5hSePoFTXt/iFWAFI9aD2oqbDMxK
-         Crdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739910058; x=1740514858;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rDL5ENmYEobOBOGopXLnOpJxyEOQbkaeafJSwgvXG9c=;
-        b=MszKrt0i6Z1scEwm49wHarCVF512F6N+93Fr3URF/EDcToqJ9OsdLM5+CVlQIIkWlL
-         j9gLGI+32k8rPfgx9ZzW6h6CRETkQYcCiOc6DOwhi0qyEfYJvHzHNpC8GETYkAqCm7rf
-         klfcstph4fA2CUkU6A/LKLKTjFFjeyPPcBnX/o3a959EKr+6ARSaz4herjJOgmPADIVG
-         4Ox/FU+CSgQB1iC+iBnhpWKhXG3n9zkmb1G7lH7rQPbAmDpg6WWjtjefu9agZ2QqiRKG
-         ZrI5GzALeeWtvvuUaB9qiEdp53whZ7CxXCvvx1UmDcRPGLXcg+Nh/5A8S4DZBZRtS+zs
-         kB4g==
-X-Forwarded-Encrypted: i=1; AJvYcCVWmIluLAd4FOV7CNoo9Ztn1xItqRqoG0OAYphJms0E4xJvWvG5tJzhp2O22Hqpsupmp0aLUkbMpHYmQw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxoQHUVjuNtLNUHTqVDWypQtYZM3ISaJtFgiZMqiQihw4T4vFv
-	8uq4nwSVTZDjwPyniq51LTFlNDtNF6p9ljOo+os4fyLagN6Nrbx0c7BpLdIoGopNlnQVvSDz0Na
-	L2NknLeg3B0PZu5SvuuuWoFP7HJMUwIDf+PS7kg==
-X-Gm-Gg: ASbGncuXX/dAOnXnzyUqJwmXhMlwQGLv0XzPnKVdQ+Qfa6BroHd3lN5hEGZxizhqK1C
-	Tk7m8RgbXDVJD9RikRb6rw5wPJsXLpT3k93uFtAJJIg5HNlxs25hrLB9XIEvZf5E8roXcOxw=
-X-Google-Smtp-Source: AGHT+IFzRM9dWI1Dt58bvoJ1SBUSqteELCYJZmXQVmxaJVUkNCmh+yI5Ky9C4ckh4BV7j2wfD7QAXk6K064Fw2GTSEE=
-X-Received: by 2002:a17:90b:33c6:b0:2f4:465d:5c91 with SMTP id
- 98e67ed59e1d1-2fc41174806mr9071194a91.8.1739910057970; Tue, 18 Feb 2025
- 12:20:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="L5fmSxEx"
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net B6923411AF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1739910611; bh=kFYOYn1MtAEZtgRUc69ZbYn9hJuiwHY+YySaTGJ78RE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=L5fmSxExEYbxUUno45IHgf97DZSNzRAvQkWSZhGw0fgSGkjxTMMHffRfuqIuUXsDh
+	 t8WoD/OPn78iqiNTz1J3JwoCs5Gh1QxrofxjGRk+eE2wgeV8aM7DPB/h1/WXejy6OM
+	 ZMqW/eJ1DsmWZWq93ClvikSknHXh3X+CkH53hoLrTe4kvQKz+eeB3fmc2C0m5v1oVv
+	 s1/h8/Ftjlfr+1o4diYWudXlCqnzBAWDpNyKiH/i+tiqHgUJVjIxbFpe46zKBy7yRP
+	 fJf3wd5gPOycn7cCGQnNyR6q3JC6/DYQFtoATRF4sYvXiZKNaRzKpy1TR+ZRC3otp7
+	 c5lieeHnXpX6w==
+Received: from localhost (unknown [IPv6:2601:280:4600:2d7f::1fe])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id B6923411AF;
+	Tue, 18 Feb 2025 20:30:11 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: David Reaver <me@davidreaver.com>
+Cc: David Reaver <me@davidreaver.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>, Konstantin Khlebnikov <koct9i@gmail.com>,
+ linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] docs: iostats: Rewrite intro, remove outdated formats
+In-Reply-To: <20250215180114.157948-1-me@davidreaver.com>
+References: <20250215180114.157948-1-me@davidreaver.com>
+Date: Tue, 18 Feb 2025 13:30:10 -0700
+Message-ID: <87ldu3ngh9.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214154348.2952692-1-kbusch@meta.com> <20250214154348.2952692-3-kbusch@meta.com>
- <CADUfDZpbb0mtGSRSqcepXnM9sijP6-3WAZnzUJrDGbC0AuXTrg@mail.gmail.com> <Z7TmrB4_aBnZdFbo@kbusch-mbp>
-In-Reply-To: <Z7TmrB4_aBnZdFbo@kbusch-mbp>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 18 Feb 2025 12:20:46 -0800
-X-Gm-Features: AWEUYZlQ5seoUzPfhkm2G3v0L4jrKcOJ-d0Fq30l0zSfFPjJJDR9eBYRJ3c3ezY
-Message-ID: <CADUfDZorM+T+-Pk4hbsFk_+kJFYMAEaAkLompYdM2UWFucOWsA@mail.gmail.com>
-Subject: Re: [PATCHv3 2/5] io_uring: add support for kernel registered bvecs
-To: Keith Busch <kbusch@kernel.org>
-Cc: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com, asml.silence@gmail.com, 
-	axboe@kernel.dk, linux-block@vger.kernel.org, io-uring@vger.kernel.org, 
-	bernd@bsbernd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Tue, Feb 18, 2025 at 11:59=E2=80=AFAM Keith Busch <kbusch@kernel.org> wr=
-ote:
->
-> On Fri, Feb 14, 2025 at 12:38:54PM -0800, Caleb Sander Mateos wrote:
-> > On Fri, Feb 14, 2025 at 7:45=E2=80=AFAM Keith Busch <kbusch@meta.com> w=
-rote:
-> > > +
-> > > +       nr_bvecs =3D blk_rq_nr_phys_segments(rq);
-> >
-> > Is this guaranteed to match the number of bvecs in the request?
->
-> Yes.
->
-> > Wouldn't the number of physical segments depend on how the block
-> > device splits the bvecs?
->
-> Also yes.
->
-> >lo_rw_aio() uses rq_for_each_bvec() to count
-> > the number of bvecs, for example.
->
-> Hm, that seems unnecessary. The request's nr_phys_segments is
-> initialized to the number of bvecs rather than page segments, so it can
-> be used instead of recounting them from a given struct request.
->
-> The initial number of physical segments for a request is set in
-> bio_split_rw_at(), which uses bio_for_each_bvec(). That's what
-> rq_for_each_bvec would use, too. The same is used for any bio's that get
-> merged into the bio.
+David Reaver <me@davidreaver.com> writes:
 
-Okay, thanks for verifying!
+> The introduction discussed stat file formats for very old kernel versions,
+> which obscured key information that readers may find useful. Additionally,
+> the example file contents and the reference to "15 fields" did not account
+> for the flush fields added in b6866318657 ("block: add iostat counters for
+> flush requests") [1].
+>
+> Rewrite the introduction to focus only on the current kernel's disk I/O stat
+> file formats. Also, clean up wording for conciseness.
+>
+> Link: https://lore.kernel.org/lkml/157433282607.7928.5202409984272248322.stgit@buzz/T/ [1]
+>
+> Signed-off-by: David Reaver <me@davidreaver.com>
+> ---
+>
+> Lore links to previous versions:
+> V1: https://lore.kernel.org/linux-doc/20250214013905.60526-1-me@davidreaver.com/
+> V2: https://lore.kernel.org/linux-doc/20250214051432.207630-1-me@davidreaver.com/
+>
+> Changes:
+> V1 -> V2: Rewrite entire introduction instead of just changing 15 -> 17.
+> V2 -> V3: Reword counter reset paragraph for accuracy and clarity.
+>
+>  Documentation/admin-guide/iostats.rst | 89 ++++++++++-----------------
+>  1 file changed, 33 insertions(+), 56 deletions(-)
 
-Best,
-Caleb
+This seems like a definite improvement at this point.  Applied, thanks.
+
+jn
