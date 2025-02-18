@@ -1,45 +1,31 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A698E26D5CA;
-	Tue, 18 Feb 2025 16:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20C11B6D18
+	for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 16:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739896317; cv=none; b=NngXYE0pbsg5LVJeFZsKEJAiLKLkBGT3TNV2yS7hRLFYGfDV4o9FFIeuobieQQXvNtO+bzg9cYQ9h/ERLo6XB6EfP8y6faJaNcJYshOLFPTalumcYAg0vJQsCwnQCfIaRAYKb0ujVHRZBYdyU1jktwivsK5Dqjmyu3WWNDR1seU=
+	t=1739896364; cv=none; b=h0xpf96CO2ByRvUlWcqJQ05hpTJBlkljr9ztzvVx/fnLh87JFQ1AjGY5JB5x6KU+pPyTQl6Li+omL4ijJ5DNfB3KG0L3opad0eX8qdzj7zcm4ZyMSXb0zP308pE9UFZpyqd6qvsoW9+PicGzxm3s4Twa2djIs9tIqr3G6EojElA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739896317; c=relaxed/simple;
-	bh=O1WcDjlB4uYgZf8hrYXTcaBSbG3qW5jv7r+ScLddb9M=;
+	s=arc-20240116; t=1739896364; c=relaxed/simple;
+	bh=d5qm7BFsH0ADcDX+Q4M7SlfhfAOz8Yv8kSPGi9W8nss=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KhtJFAnShief694wPU+6k1cd02UpBiHeQgkYxVNdWN41vZZcLSQU3qrhGjeV2mjyQ6qT8W15HHTA9rvqSd9JpVdUT9srEnNhrfuFsUKoMJjfbRjHm519+yhXuCq9gOna7JOduEhmkEJDzDiEYiO1Pw7aJ56JFzzIUnHsKWL8GGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MUUJk25I; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MUUJk25I"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=DIGo/JNUq06ew0K8FogdXyJj75K+wZ/XtC8vHgqRE+I=; b=MUUJk25IITKibdWYLiOfwJTNHF
-	jTYjZVF0QmUp8zd6mO646+shdzHM+236nm5n5810nL19RjB92XEBaeLj2KOVmo6/7jnEinXumlSeW
-	3tY5oa5JILGbGc2/iSIrfxErQ3284MDTCqGQb3QmioR2zTB/6qz8ZmNOZSNZD6uy5fzS1GYpQ19nd
-	2Aj8wymGQNblO/HLafe28admo3zzYBxSTXWcoJoMyC8X+XHvSvz0pNb1g4NS/OswGPyrkDnDxW/WD
-	snhiObaj4iRIYvhIo24Gqq8tffJcBH5GoXteww5rCfQaNX5otmaYcHCPoGWCMl5nGxAK+H23ROvYt
-	QdTjmYQA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tkQVi-00000008ywd-3kxk;
-	Tue, 18 Feb 2025 16:31:50 +0000
-Date: Tue, 18 Feb 2025 08:31:50 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Dan Schatzberg <schatzberg.dan@gmail.com>,
-	Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Zhaoyang Huang <huangzhaoyang@gmail.com>, steve.kang@unisoc.com
-Subject: Re: [PATCH] Revert "driver: block: release the lo_work_lock before
- queue_work"
-Message-ID: <Z7S19ulXMAs7qy1H@infradead.org>
-References: <20250218065835.19503-1-zhaoyang.huang@unisoc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nKzDPoRLC5/UJzuDuz/y9BMF4F3vTN1Ic1tGhcBbM7ggkg5Nqp08ka9+JSNfVToDQqLawhLqtwBj/DPzrecV92L8dRrWs+DcdVGl32JGv/39ZsFOxGVEeQZ95G8rK/0vpomzW9EfM74TgzjxYRa0cnixPtYNzTiHp26/41NwXcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id CEA8068D07; Tue, 18 Feb 2025 17:32:35 +0100 (CET)
+Date: Tue, 18 Feb 2025 17:32:35 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+	ming.lei@redhat.com, dlemoal@kernel.org, axboe@kernel.dk,
+	gjoyce@ibm.com
+Subject: Re: [PATCHv2 3/6] block: Introduce a dedicated lock for protecting
+ queue elevator updates
+Message-ID: <20250218163235.GB16439@lst.de>
+References: <20250218082908.265283-1-nilay@linux.ibm.com> <20250218082908.265283-4-nilay@linux.ibm.com> <20250218090516.GA12269@lst.de> <e54fc76f-2bb8-4d22-b297-7cd1c94b7e88@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,19 +34,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250218065835.19503-1-zhaoyang.huang@unisoc.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <e54fc76f-2bb8-4d22-b297-7cd1c94b7e88@linux.ibm.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Feb 18, 2025 at 02:58:35PM +0800, zhaoyang.huang wrote:
-> From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
-> 
-> This reverts commit ad934fc1784802fd1408224474b25ee5289fadfc.
-> 
-> loop_queue_work should be strictly serialized to loop_process_work since
-> the lo_worker could be freed without noticing new work has been queued
-> again.
+On Tue, Feb 18, 2025 at 04:44:44PM +0530, Nilay Shroff wrote:
+> So now if you suggest keeping only ->store and do away with ->store_nolock
+> method then we have to move feeze-lock inside each attributes' corresponding 
+> store method as we can't keep freeze-lock under ->store in queue_attr_store().
 
-Btw, if you care about the lock contention you might want to split out
-the trivial non-cgroup version into a separate helper or at least
-branch and reduce the lock hold time there.
+Yes, that's what I suggested in my previous mail:
+
+"So I think part of that prep patch should
+also be moving the queue freezing into ->store and do away with
+the separate ->store_nolock"
 
