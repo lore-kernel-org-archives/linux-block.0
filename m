@@ -1,179 +1,358 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB812169397
-	for <linux-block@vger.kernel.org>; Wed, 19 Feb 2025 02:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E59188596
+	for <linux-block@vger.kernel.org>; Wed, 19 Feb 2025 02:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739930487; cv=none; b=e/bp3fZobQlNkqF8gfAcStsYy1IzFwFLjObuMlKF1D45YvJVIMKN+PKLMJdLcjIG97IXrDrOe6CjLMAZjX+HTt9w9mPx35hQARWVAMLTlvzLNkGX9e7WZJ1sMFPPmbjHHdYSC1XLowjS6Zu5wJN3Jh5oTEOZvUT1uJ0n3tYs8aE=
+	t=1739932603; cv=none; b=D0YoKn88Yux5dN2xpD86h6zIJmKdiB/RYA96g36Q+eyEB6XM+4PcOlTxNfBBFtT6jBPG80+bpEga8U+5o9JPeiGahHJ+E9Lei6mWIRX3l0rEoc23xOIqtJeuvxHw6z1NUdN6M7wEwRgaV0GsUVhO+gjQY55blaOMtbILvToXZm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739930487; c=relaxed/simple;
-	bh=gZqQM7O9ByYPgtbt8cvoz84LcIYYYPm2MVl/usKmDxM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eTDS1jx3RscrzQR8skK7y1S+FX3oaZxQNR3Cgip36Yp9TesxTK5Dg6GGIcLPziiJ+kQCGCWjJoNLL5e0jacWIw9UPHFcTXnRBp4ckVqhrUXQE5FQNlW+ybG40k25RExp+j0YsCd/WXOguiYdxHG1y6Y+GMxLeEVzqkxol3yzilc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AKOR+IaP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1739932603; c=relaxed/simple;
+	bh=Abejg+VcI06exCcW4EB0t78Zjsepxt2XHv1Tgr6Mxgg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=icLhl92luH68tbT4UlkBfgRfDeYcfUU+Pt3V01c+0kVMmCLwiod79CrdyKsZLzfSau3V7y+gIYNnOHiiYi2fRWkUX0U8KOZ17wpDkhcT4IZgBNiHU4B9DrzuMtVVYyMK27opmVbFaQJb5kDo7gTeO+RbkpN6HOlCuly0Oj0OErQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=QCgYVPla; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AKOR+IaP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739930484;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TTYk5mPgovr+xjBEyGONMlriCe8a4cY2bYNbOhvz11I=;
-	b=AKOR+IaPDHiOEAdDsFNYag2yyBQVJpdOQg1tsUMR41FGarL+3Y5ZNI6+fHvd7xFKfeZBcB
-	q/bqPqzp3cz7ltAVgfuCUX4RDLuFAwE3Sy8FrgmUaFRfPa68EGZ0jSiyMU+UEVPDpTqveT
-	wF2l4G8lyu9mej/pWx7wLYrgsVxpbGE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-642-uHOYB5vsO6mICsb6iqyLHA-1; Tue,
- 18 Feb 2025 21:01:19 -0500
-X-MC-Unique: uHOYB5vsO6mICsb6iqyLHA-1
-X-Mimecast-MFC-AGG-ID: uHOYB5vsO6mICsb6iqyLHA_1739930477
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ACDF81800875;
-	Wed, 19 Feb 2025 02:01:16 +0000 (UTC)
-Received: from localhost (unknown [10.2.16.53])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0B788300019F;
-	Wed, 19 Feb 2025 02:01:14 +0000 (UTC)
-Date: Wed, 19 Feb 2025 10:01:12 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Ferry Meng <mengferry@linux.alibaba.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, linux-block@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>, virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
-	Christoph Hellwig <hch@infradead.org>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>
-Subject: Re: [PATCH v1 0/3] virtio-blk: add io_uring passthrough support.
-Message-ID: <20250219020112.GB38164@fedora>
-References: <20241218092435.21671-1-mengferry@linux.alibaba.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="QCgYVPla"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2166db59927so13875945ad.0
+        for <linux-block@vger.kernel.org>; Tue, 18 Feb 2025 18:36:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1739932600; x=1740537400; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l7AAsPzh5+U6yIGHp+5EbW3l+rMiLquCu3XdoxsLq+g=;
+        b=QCgYVPlabPevqKeGL3VY/RAv6EkpDiq5mMl3FhZLRpsME6D/YgMKCxtNFbYZwh1sXn
+         6VGrOTNIx0xLw3UArXK9YfliaG0EwW1swpDgLNEHE6zXttMcT+h3z16djx+dIaruJXkl
+         jUJoSO2et5nE1J9b4GvmHbPsEoSwSQWSnSzR+71CqXD4vsg/JtUcnTaulB4eUcmPeU1U
+         6nJzn7uoBcaZeJmLMcAYeVzgr97VViL54gYKnyM0uTjmaxHncmBl9FR2YK2EHhgH6AxJ
+         0fVGQrknOhnfVrvt9190OCw5RnOtwvNraLQ1qEdnQLWLk0CiuYszn4EOIok3QDYLsWtB
+         VI+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739932600; x=1740537400;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l7AAsPzh5+U6yIGHp+5EbW3l+rMiLquCu3XdoxsLq+g=;
+        b=tXULUW+IKYKkbPAXkf7VX0a9UnsQLNlC5dhV5xV5UscCymQhUqsmJ0T9DM8tvo94G3
+         V4I6PHCV57cZXOXPnUKEY/SfZOhtnc1gUWAWNIOzE6vf2etd+JinDQx1KO2nfB78qHpS
+         m0iVA/P59XoHltm5DqdjQADlSaDyGnkRdUeM6SU7tSXzUJI6VbGq5/GRnKdaOhJECZo0
+         sPzPbBRJxw2FomrYV+eeCRL4vLOzS7Oimu6e5v/w37rq4EmGyXuz1HeEjlh2CPOWW8NU
+         pCZdWbeEXcvBIha4KHnrKt0YU3h/j0ntMxMY1fCbpx0ZpHTQUuFNeaPN4imuuWRaBatI
+         G+rw==
+X-Forwarded-Encrypted: i=1; AJvYcCWuaQ9oCYMdAa3r3dv4jEqgvBjjP9HVxY5OE3TpGmfRyKV9jq8sGkEhUJVX1djS49AKVplKVR/urTF95g==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCIvT/T4yz4qw8tpaCB92S42D7spuW357MHiyuMHEC/Fe1F87w
+	6hhc+/Vpja0JSdL7FvhMcYIPJ4dlkjK226tExD3HsaLsH24fFI2rmCLUu+9TrS4MYZb7kfMzF1Y
+	1W7m6xcjjMH1ej4U8YMJvTVO3qPlp8hjOcltn8g==
+X-Gm-Gg: ASbGncv2wIa/14jRFAr+q1VnqWBeBO1H/v2iKkzf3AhC17CNFA8fODtewhX/q/DLnLK
+	Rf+LyNHYdLQYv7I4Doo7nbp1M8tLIMIhnWMw3iQ/2illDWb+9zJS1D5NrdoY9xbB/OMmvUjE=
+X-Google-Smtp-Source: AGHT+IH+F1ujTBitxv0cCLPp2x2fv8qje21byagQPoXFIvhBnbyA16mRNX3RitItbxRfg3Na6DHXfo91UH74q9Fkj5E=
+X-Received: by 2002:a17:902:c947:b0:21f:139c:5995 with SMTP id
+ d9443c01a7336-22104012425mr97718955ad.4.1739932600440; Tue, 18 Feb 2025
+ 18:36:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="0EDesKCYBKGeMMyG"
-Content-Disposition: inline
-In-Reply-To: <20241218092435.21671-1-mengferry@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-
-
---0EDesKCYBKGeMMyG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20250218224229.837848-1-kbusch@meta.com> <20250218224229.837848-4-kbusch@meta.com>
+In-Reply-To: <20250218224229.837848-4-kbusch@meta.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 18 Feb 2025 18:36:28 -0800
+X-Gm-Features: AWEUYZkqAD0yKTvh2JfHuJBof6qeGLGotLF-ok24s1NzcEqdJmujY1DK0KFncWw
+Message-ID: <CADUfDZq-LnAeP17GAdqGAPzCY77hrj+V+yEVi7G=_Uv4a3txaw@mail.gmail.com>
+Subject: Re: [PATCHv4 3/5] ublk: zc register/unregister bvec
+To: Keith Busch <kbusch@meta.com>
+Cc: ming.lei@redhat.com, asml.silence@gmail.com, axboe@kernel.dk, 
+	linux-block@vger.kernel.org, io-uring@vger.kernel.org, bernd@bsbernd.com, 
+	Keith Busch <kbusch@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 18, 2024 at 05:24:32PM +0800, Ferry Meng wrote:
-> This patchset implements io_uring passthrough surppot in virtio-blk
-> driver, bypass vfs and part of block layer logic, resulting in lower
-> submit latency and increased flexibility when utilizing virtio-blk.
+Sorry, I sent these comments on v3 to you directly and forgot to CC
+the list. Copying them here.
 
-Hi,
-What is the status of this patch series?
+On Tue, Feb 18, 2025 at 2:43=E2=80=AFPM Keith Busch <kbusch@meta.com> wrote=
+:
+>
+> From: Keith Busch <kbusch@kernel.org>
+>
+> Provide new operations for the user to request mapping an active request
+> to an io uring instance's buf_table. The user has to provide the index
+> it wants to install the buffer.
+>
+> A reference count is taken on the request to ensure it can't be
+> completed while it is active in a ring's buf_table.
+>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  drivers/block/ublk_drv.c      | 137 +++++++++++++++++++++++++---------
+>  include/uapi/linux/ublk_cmd.h |   4 +
+>  2 files changed, 105 insertions(+), 36 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 529085181f355..0c753176b14e9 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -51,6 +51,9 @@
+>  /* private ioctl command mirror */
+>  #define UBLK_CMD_DEL_DEV_ASYNC _IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
+>
+> +#define UBLK_IO_REGISTER_IO_BUF                _IOC_NR(UBLK_U_IO_REGISTE=
+R_IO_BUF)
+> +#define UBLK_IO_UNREGISTER_IO_BUF      _IOC_NR(UBLK_U_IO_UNREGISTER_IO_B=
+UF)
+> +
+>  /* All UBLK_F_* have to be included into UBLK_F_ALL */
+>  #define UBLK_F_ALL (UBLK_F_SUPPORT_ZERO_COPY \
+>                 | UBLK_F_URING_CMD_COMP_IN_TASK \
+> @@ -201,7 +204,7 @@ static inline struct ublksrv_io_desc *ublk_get_iod(st=
+ruct ublk_queue *ubq,
+>                                                    int tag);
+>  static inline bool ublk_dev_is_user_copy(const struct ublk_device *ub)
+>  {
+> -       return ub->dev_info.flags & UBLK_F_USER_COPY;
+> +       return ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZE=
+RO_COPY);
+>  }
+>
+>  static inline bool ublk_dev_is_zoned(const struct ublk_device *ub)
+> @@ -581,7 +584,7 @@ static void ublk_apply_params(struct ublk_device *ub)
+>
+>  static inline bool ublk_support_user_copy(const struct ublk_queue *ubq)
+>  {
+> -       return ubq->flags & UBLK_F_USER_COPY;
+> +       return ubq->flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY)=
+;
+>  }
+>
+>  static inline bool ublk_need_req_ref(const struct ublk_queue *ubq)
+> @@ -1747,6 +1750,96 @@ static inline void ublk_prep_cancel(struct io_urin=
+g_cmd *cmd,
+>         io_uring_cmd_mark_cancelable(cmd, issue_flags);
+>  }
+>
+> +static inline struct request *__ublk_check_and_get_req(struct ublk_devic=
+e *ub,
+> +               struct ublk_queue *ubq, int tag, size_t offset)
+> +{
+> +       struct request *req;
+> +
+> +       if (!ublk_need_req_ref(ubq))
+> +               return NULL;
+> +
+> +       req =3D blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
+> +       if (!req)
+> +               return NULL;
+> +
+> +       if (!ublk_get_req_ref(ubq, req))
+> +               return NULL;
+> +
+> +       if (unlikely(!blk_mq_request_started(req) || req->tag !=3D tag))
+> +               goto fail_put;
+> +
+> +       if (!ublk_rq_has_data(req))
+> +               goto fail_put;
+> +
+> +       if (offset > blk_rq_bytes(req))
+> +               goto fail_put;
+> +
+> +       return req;
+> +fail_put:
+> +       ublk_put_req_ref(ubq, req);
+> +       return NULL;
+> +}
+> +
+> +static void ublk_io_release(void *priv)
+> +{
+> +       struct request *rq =3D priv;
+> +       struct ublk_queue *ubq =3D rq->mq_hctx->driver_data;
+> +
+> +       ublk_put_req_ref(ubq, rq);
+> +}
+> +
+> +static int ublk_register_io_buf(struct io_uring_cmd *cmd,
+> +                               struct ublk_queue *ubq, int tag,
+> +                               const struct ublksrv_io_cmd *ub_cmd,
+> +                               unsigned int issue_flags)
+> +{
+> +       struct io_ring_ctx *ctx =3D cmd_to_io_kiocb(cmd)->ctx;
+> +       struct ublk_device *ub =3D cmd->file->private_data;
+> +       int index =3D (int)ub_cmd->addr, ret;
 
-Stefan
+Make index an unsigned to match io_buffer_register_bvec()? Same
+comment for ublk_unregister_io_buf().
 
->=20
-> In this version, currently only supports READ/WRITE vec/no-vec operations,
-> others like discard or zoned ops not considered in. So the userspace-rela=
-ted
-> struct is not complicated.
->=20
-> struct virtblk_uring_cmd {
-> 	__u32 type;
-> 	__u32 ioprio;
-> 	__u64 sector;
-> 	/* above is related to out_hdr */
-> 	__u64 data;  // user buffer addr or iovec base addr.
-> 	__u32 data_len; // user buffer length or iovec count.
-> 	__u32 flag;  // only contains whether a vector rw or not.
-> };=20
->=20
-> To test this patch series, I changed fio's code:=20
-> 1. Added virtio-blk support to engines/io_uring.c.
-> 2. Added virtio-blk support to the t/io_uring.c testing tool.
-> Link: https://github.com/jdmfr/fio
->=20
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> Performance
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> Using t/io_uring-vblk, the performance of virtio-blk based on uring-cmd
-> scales better than block device access. (such as below, Virtio-Blk with Q=
-EMU,
-> 1-depth fio)=20
-> (passthru) read: IOPS=3D17.2k, BW=3D67.4MiB/s (70.6MB/s)=20
-> slat (nsec): min=3D2907, max=3D43592, avg=3D3981.87, stdev=3D595.10=20
-> clat (usec): min=3D38, max=3D285,avg=3D53.47, stdev=3D 8.28=20
-> lat (usec): min=3D44, max=3D288, avg=3D57.45, stdev=3D 8.28
-> (block) read: IOPS=3D15.3k, BW=3D59.8MiB/s (62.7MB/s)=20
-> slat (nsec): min=3D3408, max=3D35366, avg=3D5102.17, stdev=3D790.79=20
-> clat (usec): min=3D35, max=3D343, avg=3D59.63, stdev=3D10.26=20
-> lat (usec): min=3D43, max=3D349, avg=3D64.73, stdev=3D10.21
->=20
-> Testing the virtio-blk device with fio using 'engines=3Dio_uring_cmd'
-> and 'engines=3Dio_uring' also demonstrates improvements in submit latency.
-> (passthru) taskset -c 0 t/io_uring-vblk -b4096 -d8 -c4 -s4 -p0 -F1 -B0 -O=
-0 -n1 -u1 /dev/vdcc0=20
-> IOPS=3D189.80K, BW=3D741MiB/s, IOS/call=3D4/3
-> IOPS=3D187.68K, BW=3D733MiB/s, IOS/call=3D4/3=20
-> (block) taskset -c 0 t/io_uring-vblk -b4096 -d8 -c4 -s4 -p0 -F1 -B0 -O0 -=
-n1 -u0 /dev/vdc=20
-> IOPS=3D101.51K, BW=3D396MiB/s, IOS/call=3D4/3
-> IOPS=3D100.01K, BW=3D390MiB/s, IOS/call=3D4/4
->=20
-> =3D=3D=3D=3D=3D=3D=3D
-> Changes
-> =3D=3D=3D=3D=3D=3D=3D
->=20
-> Changes in v1:
-> --------------
-> * remove virtblk_is_write() helper
-> * fix rq_flags type definition (blk_opf_t), add REQ_ALLOC_CACHE flag.
-> https://lore.kernel.org/io-uring/202412042324.uKQ5KdkE-lkp@intel.com/
->=20
-> RFC discussion:
-> ---------------
-> https://lore.kernel.org/io-uring/20241203121424.19887-1-mengferry@linux.a=
-libaba.com/
->=20
-> Ferry Meng (3):
->   virtio-blk: add virtio-blk chardev support.
->   virtio-blk: add uring_cmd support for I/O passthru on chardev.
->   virtio-blk: add uring_cmd iopoll support.
->=20
->  drivers/block/virtio_blk.c      | 320 +++++++++++++++++++++++++++++++-
->  include/uapi/linux/virtio_blk.h |  16 ++
->  2 files changed, 331 insertions(+), 5 deletions(-)
->=20
-> --=20
+> +       struct ublk_rq_data *data;
+> +       struct request *req;
+> +
+> +       if (!ub)
+> +               return -EPERM;
+
+__ublk_ch_uring_cmd() has already dereferenced ub =3D
+cmd->file->private_data, how is it possible to hit this? Same comment
+for ublk_unregister_io_buf()
+
+> +
+> +       req =3D __ublk_check_and_get_req(ub, ubq, tag, 0);
+
+Consider moving the offset > blk_rq_bytes(req) check from
+__ublk_check_and_get_req() to ublk_check_and_get_req() so we don't
+need to pass an unused offset here.
+
+> +       if (!req)
+> +               return -EINVAL;
+> +
+> +       data =3D blk_mq_rq_to_pdu(req);
+
+data appears unused in this function. Same comment for ublk_unregister_io_b=
+uf().
+
+> +       ret =3D io_buffer_register_bvec(ctx, req, ublk_io_release, index,
+> +                                     issue_flags);
+> +       if (ret) {
+> +               ublk_put_req_ref(ubq, req);
+> +               return ret;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static int ublk_unregister_io_buf(struct io_uring_cmd *cmd,
+> +                                 struct ublk_queue *ubq, int tag,
+> +                                 const struct ublksrv_io_cmd *ub_cmd,
+> +                                 unsigned int issue_flags)
+
+Make tag an unsigned to match __ublk_ch_uring_cmd() and
+blk_mq_tag_to_rq()? Same comment for ublk_register_io_buf().
+
+> +{
+> +       struct io_ring_ctx *ctx =3D cmd_to_io_kiocb(cmd)->ctx;
+> +       struct ublk_device *ub =3D cmd->file->private_data;
+> +       int index =3D (int)ub_cmd->addr;
+> +       struct ublk_rq_data *data;
+> +       struct request *req;
+> +
+> +       if (!ub)
+> +               return -EPERM;
+> +
+> +       req =3D blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
+> +       if (!req)
+> +               return -EINVAL;
+> +
+> +       data =3D blk_mq_rq_to_pdu(req);
+> +       io_buffer_unregister_bvec(ctx, index, issue_flags);
+
+Should we check that the registered bvec actually corresponds to this
+ublk request? Otherwise, I don't see a reason for the unregister
+command to involve the ublk request at all. Perhaps a generic io_uring
+"unregister buffer index" operation similar to IORING_OP_FILES_UPDATE
+would make more sense?
+
+Best,
+Caleb
+
+> +       return 0;
+> +}
+> +
+>  static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+>                                unsigned int issue_flags,
+>                                const struct ublksrv_io_cmd *ub_cmd)
+> @@ -1798,6 +1891,11 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd=
+ *cmd,
+>
+>         ret =3D -EINVAL;
+>         switch (_IOC_NR(cmd_op)) {
+> +       case UBLK_IO_REGISTER_IO_BUF:
+> +               return ublk_register_io_buf(cmd, ubq, tag, ub_cmd, issue_=
+flags);
+> +       case UBLK_IO_UNREGISTER_IO_BUF:
+> +               return ublk_unregister_io_buf(cmd, ubq, tag, ub_cmd,
+> +                                             issue_flags);
+>         case UBLK_IO_FETCH_REQ:
+>                 /* UBLK_IO_FETCH_REQ is only allowed before queue is setu=
+p */
+>                 if (ublk_queue_ready(ubq)) {
+> @@ -1872,36 +1970,6 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd=
+ *cmd,
+>         return -EIOCBQUEUED;
+>  }
+>
+> -static inline struct request *__ublk_check_and_get_req(struct ublk_devic=
+e *ub,
+> -               struct ublk_queue *ubq, int tag, size_t offset)
+> -{
+> -       struct request *req;
+> -
+> -       if (!ublk_need_req_ref(ubq))
+> -               return NULL;
+> -
+> -       req =3D blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
+> -       if (!req)
+> -               return NULL;
+> -
+> -       if (!ublk_get_req_ref(ubq, req))
+> -               return NULL;
+> -
+> -       if (unlikely(!blk_mq_request_started(req) || req->tag !=3D tag))
+> -               goto fail_put;
+> -
+> -       if (!ublk_rq_has_data(req))
+> -               goto fail_put;
+> -
+> -       if (offset > blk_rq_bytes(req))
+> -               goto fail_put;
+> -
+> -       return req;
+> -fail_put:
+> -       ublk_put_req_ref(ubq, req);
+> -       return NULL;
+> -}
+> -
+>  static inline int ublk_ch_uring_cmd_local(struct io_uring_cmd *cmd,
+>                 unsigned int issue_flags)
+>  {
+> @@ -2527,9 +2595,6 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *c=
+md)
+>                 goto out_free_dev_number;
+>         }
+>
+> -       /* We are not ready to support zero copy */
+> -       ub->dev_info.flags &=3D ~UBLK_F_SUPPORT_ZERO_COPY;
+> -
+>         ub->dev_info.nr_hw_queues =3D min_t(unsigned int,
+>                         ub->dev_info.nr_hw_queues, nr_cpu_ids);
+>         ublk_align_max_io_size(ub);
+> @@ -2860,7 +2925,7 @@ static int ublk_ctrl_get_features(struct io_uring_c=
+md *cmd)
+>  {
+>         const struct ublksrv_ctrl_cmd *header =3D io_uring_sqe_cmd(cmd->s=
+qe);
+>         void __user *argp =3D (void __user *)(unsigned long)header->addr;
+> -       u64 features =3D UBLK_F_ALL & ~UBLK_F_SUPPORT_ZERO_COPY;
+> +       u64 features =3D UBLK_F_ALL;
+>
+>         if (header->len !=3D UBLK_FEATURES_LEN || !header->addr)
+>                 return -EINVAL;
+> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
+h
+> index a8bc98bb69fce..74246c926b55f 100644
+> --- a/include/uapi/linux/ublk_cmd.h
+> +++ b/include/uapi/linux/ublk_cmd.h
+> @@ -94,6 +94,10 @@
+>         _IOWR('u', UBLK_IO_COMMIT_AND_FETCH_REQ, struct ublksrv_io_cmd)
+>  #define        UBLK_U_IO_NEED_GET_DATA         \
+>         _IOWR('u', UBLK_IO_NEED_GET_DATA, struct ublksrv_io_cmd)
+> +#define        UBLK_U_IO_REGISTER_IO_BUF       \
+> +       _IOWR('u', 0x23, struct ublksrv_io_cmd)
+> +#define        UBLK_U_IO_UNREGISTER_IO_BUF     \
+> +       _IOWR('u', 0x24, struct ublksrv_io_cmd)
+>
+>  /* only ABORT means that no re-fetch */
+>  #define UBLK_IO_RES_OK                 0
+> --
 > 2.43.5
->=20
-
---0EDesKCYBKGeMMyG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAme1O2gACgkQnKSrs4Gr
-c8g5MAf+O8k3P8AmJJwDbR4DW92CZdhXuLHVJZkQLtaxAhrAyTMb9MkmxoqnWQRc
-/hlcNOeoe3xO9vu53lnY5LiTjh1K77qW7abGrAtzLL4+2VGNmd8rfh/sy+E9Fgse
-LY4YnOupHx/1YlCn3KYabbToQcNqybbfgDD/Lv8zqt+2pFF7lWkAd+1FGOgYFyl2
-5kQhEWRwUiN9GRP7KfnESxjA92QSOFMYtqlhjy4FjYfgaPKePPVXAphfjGeqS1I/
-2IQSETYLfiXAMW6Q6AbL4HMYeSx0OPeozx7SJvG4m5g5aZBbq6tdgqVNvPWUDI1H
-kI7ySFuZWYp+g3EO9+COaYXrk6iJWQ==
-=X8Wb
------END PGP SIGNATURE-----
-
---0EDesKCYBKGeMMyG--
-
+>
