@@ -1,64 +1,64 @@
 Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113292144B8;
-	Wed, 19 Feb 2025 17:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6AF8286284;
+	Wed, 19 Feb 2025 17:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739985290; cv=none; b=cv88GwAzn16qcPHADjw9mwv9GZec3WzgBenqmne/HgHudELnsQZ4DPDeqaWNhoiSR4zT5R2DGPRVksnBWhDwBVc4Z3YI/pPiSrvSa6ldg7MqqfHDFa8hC1Npo3IxSXn33GZaMR2vfy7iuJlpWWhzxDwHGYKOnsr9pYpbjc1j398=
+	t=1739985765; cv=none; b=Sg3DGvbDPSD6MRCRheAeFHzhxWhve5Bn/tD64p3hYKPLPscnvBzEcEIwxtOpls9Hi+lKU9QwfUwLguoSttLwLjIwLSg6qDg19QAjyuIrpHwn11gLx7Kie60ztrqFEWhElYcF+kV23DhAGb/N15b8IOGJzBsafnL0fwfBsIVejl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739985290; c=relaxed/simple;
-	bh=GuICquce9sOsiDKX5dTIFHS1DTSt1nUspPv+g2t1pLE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=uyP/dbd0ldNijOBVUCScOJKglH9XAgif3hfoUj4L78KeZrnX4oMbB6ea5Xge+a67uCQcbC8/D6cImJwZl6TTdzEB90s1xsV/nmAStgqAPqgb978uW5RszsKqAuEOBi0j3zAkBi6Q8ZXMHRvetoTfcO228bqNFFqQ/aHi5DnvQLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nrnMjsco; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1739985765; c=relaxed/simple;
+	bh=X7aHfb6fbZQPpfHEvxh75ezvzfG8laBjMbILc9YwfTc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Snyz2L3AFNA4giRHn5UdvNRwX18jx+FqtuIfGA/T+ZKH2gEvKhm1lgXeqtHwQPueK0oouVTcjRsbA18cwCXF+u1fi3/kwk8UwwOtfhsNzMZOdThDFxhZ1vbv7segyIaRFLPmebK2Il1koiBjT3hmkqejGk/AGH8NMYJ/Ou9Ubnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GENvHTbS; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nrnMjsco"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-439a2780b44so391855e9.1;
-        Wed, 19 Feb 2025 09:14:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GENvHTbS"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4398ec2abc2so27132305e9.1;
+        Wed, 19 Feb 2025 09:22:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739985287; x=1740590087; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zSthPYJAUlXgKqEcib8jIMqIiH7ofla2ph9JMA88yPQ=;
-        b=nrnMjscoNbnwlfYKYn3T6F51qzSmRkVaLoty3dmHtbAFBQeIWx+PonGiQtMzhJpwlK
-         ctOrsxzW3Besml6ISsn7HPB7fzdfvY/X39gwkpmN3pC38/fqP7kGWDLUTUwjcfbrhhNh
-         jF2tR9wSWbXXSQW51tsvplRVUib+k6YdxzKXSKcYFvoK9o6M3tMX2IFymDLRC8ZaGO3i
-         1Bmd5lAwop56TfAxSYmoLeHz8Vq305IchA4WjMPbxQVTuCXt2d7kIE0Qz0JJjf2gzMTj
-         tmLegX1ikSwEO7Ujd3zKhV0GGt71K61hnhfPNjpuu+87NfYN+O7mOGhC9m6DqzNvMmnQ
-         EHgw==
+        d=gmail.com; s=20230601; t=1739985762; x=1740590562; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=liOzWWaQBCDbAVuZ3wSA5gHYo8iwVTkcoCw+gLwOAJU=;
+        b=GENvHTbS0XWaZj5aNGOPbTJYsUgfgPwfEYE8cGt/d60uMaLWVhIobecywp5IN/+BRN
+         m7k/duIooF8tTXUWcepYOjseDbbi7Go59vgdB51f5Orb979nnNpLHmCh/+k0dzgqgN4y
+         BIRR5Yzg85qOfdd8SDjTsFxrF0zu7Yzwyh4C+du1kA241g0Z/M6pRGKmckpnFiHMOwLd
+         uZ+vG7YpMY8g601J0IutzcNWcuMVa+BbDKPy3wzoOpPj8kmccFU6CsaWEHWh+jdahaB3
+         S2/T1xHTWMLwHTpm8LK3eY5gdMxbDmMMpOEJSHLhYKZshYoxc+vPri6A2NE7XdQEDCV5
+         IWVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739985287; x=1740590087;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1739985762; x=1740590562;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zSthPYJAUlXgKqEcib8jIMqIiH7ofla2ph9JMA88yPQ=;
-        b=Up39mk6EH67/AzG3FcgU6RosUkqGN04mplQNXBBxK1/Wbv1hUZGadaRdWmk7Xi4BvL
-         BfaCH4Uw7O51EiB+yrCgMJtMfvkMukvEVMlZOCmZtCK0FiamLc43PoM5/Fmd5WL7RKrK
-         DyVfsVWa8sxasRDqLBQPJ3NPgsVEkibYymcbMScELvVYjdsNX4E8oj0P6OzGPkXgN5fZ
-         eJVokatMZTfPVHOKJZbKNYTtgUPbBrS4AXZETsQejtOqxxs2GL9fRIQJFqlmk8M5wTvZ
-         lrJ7+lsW9Xy0mBhY0+KoQb7hOT7YajFZ+nyzEQ2b6eTDPTksOoEPOJppsQH+qGG/gxuL
-         tSFg==
-X-Forwarded-Encrypted: i=1; AJvYcCV5vbBmPjjL4LmMj1lMWO13nq3c3TzbghcrLkhg6TdX3v1LQdrHC3sxgHyEKDGza/fUin3hqHFZ93kbsHs=@vger.kernel.org, AJvYcCXPyuZPZs1SPI6SSN1x4vXw4Fn5PZoNfsBm+crPUoEkzAgnCO3/3PcH7ZovDYMYvMkfZ6M6pee4Qg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxL3N04tFMdz5oAOD8m34d27SM+q7WuFGbhJ7+H+nLYBYoBYHpk
-	IHVO5EZV8ftfaCtpX9xl45ZXLjAqiiHmA1RSxWF9i8x3bSYQZgQo7LGeKg==
-X-Gm-Gg: ASbGnct0YLJ8rCqTRkK0Tv4pGx8Z1yxUrJWU17jrqdkiLqTxJI1riGCxVShVfoc0bev
-	+ySW5Z1/nquhXizGaPpidKFOaSKcTl8cchnt0HZL5K1jLp1xSsryKTBDvvXqY13Web9xpcQkARW
-	0tpwNvTrwD/x21X/USsnKDbZUUJiopCsUWuEsaeK01EpXtXhzno78TxZfPNS8hlSBKXmNk/gl0k
-	nUpsX3CgFa9uNc7IBijQfbZz8HmVSvA5u3bFELwGn2VSvV4UfKnhbFVf5HkdOlpPq2wu+wluLYT
-	rC0PdOTZbMPFE/eM7kPpjH8D
-X-Google-Smtp-Source: AGHT+IGxYaJhLdtzKIjRy+EQIqJOPe2LCQNYW9GtJZp/f5kcwwZd4ugH131m5vL5Xc9bd8I5/+75Mw==
-X-Received: by 2002:a05:600c:46cf:b0:439:88bb:d006 with SMTP id 5b1f17b1804b1-43999d77085mr42635785e9.6.1739985287020;
-        Wed, 19 Feb 2025 09:14:47 -0800 (PST)
+        bh=liOzWWaQBCDbAVuZ3wSA5gHYo8iwVTkcoCw+gLwOAJU=;
+        b=WYs/zF4rI/icuDe2cO09RpVSxnqEKHHmautyLdNMhnNWhqMZ4z9Qoc3UkmjJJgUoTD
+         15m+kPZrKKKA2iICgMD9wf8S6zOjwz7v3rwMOA2R1PU/0r4vJa1Ug42LxrsgW93yzA/O
+         AhvaTcUBkR+/c3bTjA2BZ233jnWR4afEBhRMs7p9EWH+ZGDnyqU35PkesGi+VAjt+H1d
+         R31Z+HWXwhDc7fkt/GOdsAuVlWqdhbOk3fUUXqfZRdhnmULU+Y06EXZrXoBKhqmWzXBU
+         Vy7+w6TU8fjnUNbkBccepLaNo3hnO62rKgYkiPA/eW2DNYNM7F9PGnvFlSHImsgKpYV4
+         5gLA==
+X-Forwarded-Encrypted: i=1; AJvYcCUqawS/ROYOG6zA4o9VMnLmlyY5GaFj6hQ+7XzeqEw6WxW0vIv7OMtlPyNjS5LmmzQmuJOHTZHaKg==@vger.kernel.org, AJvYcCUvqfqFhY1uDiWlJTZ8t8oeoQr0ZUNKP22mgC46cIWoeZVONtMRc3Vg05MOVo/DeZZz0ZX6y1gknGHUxoI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynJCpy2doJBJutfZyM5bowo6kdI0qyYj9pLBXsJPZLh9YrCEpJ
+	9IhxaV5uVT87SnUiCksofOuI9tM/xeeUu1afyKEvVZplEnNSCpvf
+X-Gm-Gg: ASbGncuVBkh9VcZL4bCjLe/W11Xe5cIBx3DKUbNfnZOUbKilR6SIS0lrJCT9bKBlIMU
+	2uyaRkC0QbglNuXzQUKPC0S36sNiiDZdwXnBKKI0mbjlLHmkedS+7tcv4xhnkR2PfhPnLtIPqgv
+	hrz6s9YrueXYezWpZ7mWt8gaKRFq3j6tahUiaZ4JTB8wLf0hPtY01Fem6Xg/gIOlQacVEp6j8BN
+	lGrqOOia2uLJvKGK0ZPDl9wpIS+phzSoThylVWvQPchl8Ryu0Lf90yuCtBRZnaRK/hkPYzYnDYz
+	4e8q7I3gB5y0S1pQHWxFqKoV
+X-Google-Smtp-Source: AGHT+IGXj6EOXwWhSSEpywwZDcbMJAOX2IpW9ZnvqvVf371rVSwxrmF+EmDhzCied6UVGCzzeVAe7Q==
+X-Received: by 2002:a05:600c:190c:b0:439:65f0:c9ce with SMTP id 5b1f17b1804b1-43999ddac3bmr37044115e9.25.1739985761664;
+        Wed, 19 Feb 2025 09:22:41 -0800 (PST)
 Received: from [192.168.8.100] ([148.252.145.15])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43999e5beebsm32634505e9.22.2025.02.19.09.14.45
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43982bcc607sm97991315e9.16.2025.02.19.09.22.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Feb 2025 09:14:46 -0800 (PST)
-Message-ID: <2cb75ecb-32c9-4698-a735-cd63cd8b0ab0@gmail.com>
-Date: Wed, 19 Feb 2025 17:15:50 +0000
+        Wed, 19 Feb 2025 09:22:40 -0800 (PST)
+Message-ID: <87c5fc22-a1cc-4f7b-9638-207d4b9d1159@gmail.com>
+Date: Wed, 19 Feb 2025 17:23:45 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -66,82 +66,48 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv4 1/5] io_uring: move fixed buffer import to issue path
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com, axboe@kernel.dk,
- linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Cc: bernd@bsbernd.com, csander@purestorage.com,
- Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv4 2/5] io_uring: add support for kernel registered bvecs
+To: Caleb Sander Mateos <csander@purestorage.com>,
+ Keith Busch <kbusch@meta.com>
+Cc: ming.lei@redhat.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+ io-uring@vger.kernel.org, bernd@bsbernd.com, Keith Busch <kbusch@kernel.org>
 References: <20250218224229.837848-1-kbusch@meta.com>
- <20250218224229.837848-2-kbusch@meta.com>
- <c4a0cdb8-ac99-4a7a-9791-d2c833e45533@gmail.com>
+ <20250218224229.837848-3-kbusch@meta.com>
+ <CADUfDZr=8VPEtftPtqaQdr5hjsM4w_iADEAL6Xp06kk42nZfVg@mail.gmail.com>
 Content-Language: en-US
-In-Reply-To: <c4a0cdb8-ac99-4a7a-9791-d2c833e45533@gmail.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CADUfDZr=8VPEtftPtqaQdr5hjsM4w_iADEAL6Xp06kk42nZfVg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 2/19/25 16:48, Pavel Begunkov wrote:
-> On 2/18/25 22:42, Keith Busch wrote:
->> From: Keith Busch <kbusch@kernel.org>
->>
->> Similar to the fixed file path, requests may depend on a previous one
->> to set up an index, so we need to allow linking them. The prep callback
->> happens too soon for linked commands, so the lookup needs to be deferred
->> to the issue path. Change the prep callbacks to just set the buf_index
->> and let generic io_uring code handle the fixed buffer node setup, just
->> like it already does for fixed files.
->>
->> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> 
-> It wasn't great before, and it'd be harder to follow if we shove it
-> into the issue path like that. Add additional overhead in the common
-> path and that it's not super flexible, like the notification problem
-> and what we need out of it for other features.
-> 
-> We're better to remove the lookup vs import split like below.
-> Here is a branch, let's do it on top.
-> 
-> https://github.com/isilence/linux.git regbuf-import
-> 
-> 
-> diff --git a/io_uring/net.c b/io_uring/net.c
-> index ce0a39972cce..322cf023233a 100644
-> --- a/io_uring/net.c
-> +++ b/io_uring/net.c
-> @@ -1360,24 +1360,10 @@ static int io_send_zc_import(struct io_kiocb *req, unsigned int issue_flags)
+On 2/19/25 01:54, Caleb Sander Mateos wrote:
+> On Tue, Feb 18, 2025 at 2:42 PM Keith Busch <kbusch@meta.com> wrote:
 ...
-> -int io_import_fixed(int ddir, struct iov_iter *iter,
-> -               struct io_mapped_ubuf *imu,
-> -               u64 buf_addr, size_t len)
-> +static int io_import_fixed_imu(int ddir, struct iov_iter *iter,
-> +                struct io_mapped_ubuf *imu,
-> +                u64 buf_addr, size_t len)
->   {
->       u64 buf_end;
->       size_t offset;
-> @@ -919,6 +919,35 @@ int io_import_fixed(int ddir, struct iov_iter *iter,
->       return 0;
->   }
+>> diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
+>> index 0bcaefc4ffe02..2aed51e8c79ee 100644
+>> --- a/include/linux/io_uring_types.h
+>> +++ b/include/linux/io_uring_types.h
+>> @@ -709,4 +709,10 @@ static inline bool io_ctx_cqe32(struct io_ring_ctx *ctx)
+>>          return ctx->flags & IORING_SETUP_CQE32;
+>>   }
+>>
+>> +int io_buffer_register_bvec(struct io_ring_ctx *ctx, struct request *rq,
+>> +                           void (*release)(void *), unsigned int index,
+>> +                           unsigned int issue_flags);
+>> +void io_buffer_unregister_bvec(struct io_ring_ctx *ctx, unsigned int index,
+>> +                              unsigned int issue_flags);
 > 
-> +static inline struct io_rsrc_node *io_find_buf_node(struct io_kiocb *req,
-> +                            unsigned issue_flags)
-> +{
-> +    struct io_ring_ctx *ctx = req->ctx;
-> +    struct io_rsrc_node *node;
-> +
-> +    if (req->buf_node)
+> Hmm, io_uring_types.h seems like a strange place for these. The rest
+> of this file consists of types and inline functions. Maybe
+> io_uring/rsrc.h would make more sense?
 
-Seems it should be checking for REQ_F_BUF_NODE instead
+There is linux/io_uring/cmd.h for that
 
-> +        return req->buf_node;
-> +
-> +    io_ring_submit_lock(ctx, issue_flags);
-> +    node = io_rsrc_node_lookup(&ctx->buf_table, req->buf_index);
-> +    if (node)
-> +        io_req_assign_buf_node(req, node);
-> +    io_ring_submit_unlock(ctx, issue_flags);
-> +    return node;
-> +}
+And it should be taking struct io_uring_cmd. ublk shouldn't
+know anything about ctx, and this line from the following
+patch in not allowed.
+
+struct io_ring_ctx *ctx = cmd_to_io_kiocb(cmd)->ctx;
 
 -- 
 Pavel Begunkov
