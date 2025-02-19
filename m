@@ -1,87 +1,77 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from LO3P265CU004.outbound.protection.outlook.com (mail-uksouthazon11020110.outbound.protection.outlook.com [52.101.196.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09A022A4FD
-	for <linux-block@vger.kernel.org>; Wed, 19 Feb 2025 19:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769CA22CBF6;
+	Wed, 19 Feb 2025 20:17:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.196.110
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739992660; cv=fail; b=acTMmXL+iNhgZudW1aGcjMXmKbtVfwmJsyWJOBiyV/23RhBMCTHYNok1tCWBuRqVwEGAwYewYWSKe/bUG0pxalEFA4H09+l/pSKGKEvMKus8K8KkMpNnkAA3gs3MWXNqfvJH7I/3vRC0KtdM2j/FLSIGRsfLJswjriTDesMRRGU=
+	t=1739996261; cv=fail; b=KLMl28t9xcgOANLTxaJ4SAzYIurfcYERtpnotb7kQGlG26WVO4FHLddFvi06jCecfpedaHI+cELP62pFTkZcnZEtZ7rfA0IIkLIH1J2mNmQ6hA7pe4PVWYCG3DfiB6FG2kc14VAtPJoygvjfct3YNFK5ArZPPZCCIWY69iEOXgs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739992660; c=relaxed/simple;
-	bh=2y6etyqME32C8x247wJS7hpZXAVAN0hHHAwpOg7+T7c=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eTv5R5QFTlzZXOpOvSz4BEg/Txq+9ASs5Xx47L3kzcDJDkPhqPgjgybb7JY2ioGhWaoC6coagZR2AEDigzr1zngVSXxlwoMBtNFpGVpkDTlYS9SyzbMtgJByZEBc/lXGtTzLOBaClwkxTPsBq9wvsxhkzgXPmaYaWo9TbsoXVrU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=h5oqkZlC; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=XtbFPLi2; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1739996261; c=relaxed/simple;
+	bh=tQ6EyiTu390h+2n3m4K/LABaO9AXSl96QjCrprD+tg4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=eQ2Bxazjka9cEufU3/50xIYwNMcQ5ERnHqeM5K8Kv9W6pdbuAFJX3hzSCoY627KpCjj617IVjtM75AyhVdudL/bnTLk5mAxg5gyv6pTYkwk8J1GR/g3dYNc8wOgr/aAaTC/9KOB527z29KVqiHmeMQg0e8ZP7W5bDxnRuktcLRI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=ej2ELLtL; arc=fail smtp.client-ip=52.101.196.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="h5oqkZlC";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="XtbFPLi2"
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51JJBY7r020871;
-	Wed, 19 Feb 2025 19:17:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=ErJhotKE6JXQgJ2rfHwkNgzrJUsJJdZ8AqljpMLvMgA=; b=
-	h5oqkZlCFRKxEHRJBbJNQqgLKWQZnRhbEIz0jtnBtfom1CzGJW+oT2AaPaaM97rc
-	hGH0TjoCIEdgfyjtNsN0vclR/CwXZBjBTJDzbQSE71A38vwo/vkYlgAiHSIFIf/h
-	esWlAyLhPuIG9TbQcU1QUEncjQhIMoqSGCfDWV1HHC6JSsU8We7za/OeLAZxK12s
-	VG9ckgRFmt4ZKJ7MUEmru3YFKNNT64rX/jebAFWNM5uxkyeXixbYajUG5GIzEeKj
-	c05a0U7ds1FAaB0//6ttzALIKv69YO5j2S7qYuP1qB3XGZzTJBd6TRAD7GOJVkpw
-	LnD3pvQllEjEDXjZdPxuBA==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 44w00njgny-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Feb 2025 19:17:37 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 51JI1aee012031;
-	Wed, 19 Feb 2025 19:17:36 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2040.outbound.protection.outlook.com [104.47.55.40])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 44w0b2wmef-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Feb 2025 19:17:36 +0000
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="ej2ELLtL"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DNMi3hkLqDHvuLc0Yw/e+mZ9xQVyfqYkz32HCiZBaMmY1NGRfsgy+8oHyQi5q1TGMrcAQ9Vb8LEChcEf9XnPM3NKa2CyRTi3Vm/ox9soAFSkt2VGpT8SdKhv6gR2QVdcve1aNH3fn8zT+s/CZ/4pRHImrcR6MjAwas2fRY8K/9Kkmfs/Xz0vd7IsCEhjEw1yawKvUqSkO2Rxa4+SkSwcZrGfhvvd1PALu4Yu1lWPf/CFNftUkYhiBg5WghHFJ3ZqH1eTEcR61yuEKRy3oW20FflkuKJVSsVQaXKc+fGHL7StvXA5XnRSdXBKmRWXv+UbjEn20mxxZ5XoDvQtRZxotg==
+ b=FzgKYcSXBmU0xYXTkirtGzbhginUldaYlsNdypnOf3Hv/R/SqDndRy/P/rJiv4RLbrM7eOwJvSfggGXVrxvrC0htxNSIUyvRnpME7EbFXkjWDfGZ80uEHF38BPBllGu9BP0aOpBxe6C1zvTjZvi/LphWK3NVFofMFUwoXF1xXzGg3hrBE/keJNjgf5iBc4kCPWXTxE7lYREafMmE5y9VPIl18oaboqOH2fYPVNMWJ0/Fm6dow0E8VcvhpXuX7dS4213m0nDGuw3c6U+jrW4zYWvNlTfudDTfUOzm1BeOlsIfS4FdM9hqYVcg6k4NGiY1Vf2HFpw/3V4QPhGfpIKPVg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ErJhotKE6JXQgJ2rfHwkNgzrJUsJJdZ8AqljpMLvMgA=;
- b=GXQQ1WE6WsY3F/DjnkoM8pOwyxcXf8YlDwzblouh4aafaAe+j2gv0hDM0mJmDxSbwedosJsSQznPcJhkaAigIPDWYuHgp5gu8CMVguOzhV5871zyf3UoZOnf99Ieglr+D6vQfK61VZ/onr0Vq+pRRq5MsicRn3J0igZyKsRV+B8AZq+aCdubyrQkquCsYVefDIdHlvc7rkkrT8al+bPKvSfRF8LghXQoEex/tFDqRnW67rNhY0WBIookfFBuJsevXwMn0Upa4b1Zgl61HT5itS3jEOtibeCFrm4wkhbZRleCbqXEPXxHGvojICV0c/hI0Gbmf6nIlMyK0BLl23WwZA==
+ bh=S6YIJcs5tMZIQ17JbfWb7gmRY4u2A+6Nnhahsu63UIs=;
+ b=eYd7hEVMZ/c5Q6U+TzW69q6IJTfitQjhIjMPPBWJ/hxx9Nr5nxwpMVCUIYa5N1eS0zXWzgg+69azfNFFQOEV8htemwx0CJwpzROeioGvdc0yuH+oqgnpW+u1H3NG4U7W56i674HPcMXI59biz/Yz+IQpbcs6pLHLxGH5FTKvBm1dV6eiCYr+CsqXYuNBDJIooHr5yrZpa2rwddQ3gZ8C2Wio7OlzKWh/NLncZY8DtgpbQBIZZRZWRYkUl9ZV+36YDyZke9uRJduJrIJO3phb867jzh9CkE+lB13iX6OZtp3vqIP4f9XYON8rAbDwkqb4FIWqev6iR1nY5h/Ft8QO4w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ErJhotKE6JXQgJ2rfHwkNgzrJUsJJdZ8AqljpMLvMgA=;
- b=XtbFPLi2S+hGrX9XdrW4fbgTSwRHMkmeXDJdUs0QtrOCeNkaei1d0fM8yZFQXFwy/47+Mef66F6N7rsEwXRBU/4gXZFYZhKLH0pRwGF86KffLv3r7mN2GPiEYE5pbqrVUk3sHow5thppOO4sjF6IPdtNYs3E8aDl/Nq7tfqqwP4=
-Received: from SJ0PR10MB5550.namprd10.prod.outlook.com (2603:10b6:a03:3d3::5)
- by DS0PR10MB7407.namprd10.prod.outlook.com (2603:10b6:8:15c::18) with
+ bh=S6YIJcs5tMZIQ17JbfWb7gmRY4u2A+6Nnhahsu63UIs=;
+ b=ej2ELLtLncZx4CNpV9hywL5rOZ3jperFqZcixunmVzvmQGRZAJC7IFKSTpFdOQUnw8F5LCTPCZDBGxtY6XapFohM4zbaRusq+kFpeqqvOZ30ZlV0HBwyMp3CmLIZCa1PuOAa54QS8FYuG38w2XmuiyvlunSbfWl2vpmo25clz5s=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:253::10)
+ by LO2P265MB2783.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:13d::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.15; Wed, 19 Feb
- 2025 19:17:34 +0000
-Received: from SJ0PR10MB5550.namprd10.prod.outlook.com
- ([fe80::10a5:f5f4:a06d:ecdf]) by SJ0PR10MB5550.namprd10.prod.outlook.com
- ([fe80::10a5:f5f4:a06d:ecdf%5]) with mapi id 15.20.8466.013; Wed, 19 Feb 2025
- 19:17:33 +0000
-Message-ID: <92239c7c-e7e8-494c-9bf9-59a855d70952@oracle.com>
-Date: Wed, 19 Feb 2025 11:17:29 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] block: cleanup and fix batch completion adding conditions
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20575f0a-656e-4bb3-9d82-dec6c7e3a35c@kernel.dk>
- <y7m5kyk5r2eboyfsfprdvhmoo27ur46pz3r2kwb4puhxjhbvt6@zgh4dg3ewya3>
-Content-Language: en-US
-From: alan.adamson@oracle.com
-In-Reply-To: <y7m5kyk5r2eboyfsfprdvhmoo27ur46pz3r2kwb4puhxjhbvt6@zgh4dg3ewya3>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BN9PR03CA0555.namprd03.prod.outlook.com
- (2603:10b6:408:138::20) To SJ0PR10MB5550.namprd10.prod.outlook.com
- (2603:10b6:a03:3d3::5)
+ 2025 20:17:37 +0000
+Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1818:a2bf:38a7:a1e7]) by LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1818:a2bf:38a7:a1e7%4]) with mapi id 15.20.8466.015; Wed, 19 Feb 2025
+ 20:17:36 +0000
+From: Gary Guo <gary@garyguo.net>
+To: Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Francesco Zardi <frazar00@gmail.com>
+Cc: rust-for-linux@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 3/4] rust: block: convert `block::mq` to use `Refcount`
+Date: Wed, 19 Feb 2025 20:15:32 +0000
+Message-ID: <20250219201602.1898383-4-gary@garyguo.net>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250219201602.1898383-1-gary@garyguo.net>
+References: <20250219201602.1898383-1-gary@garyguo.net>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: LO4P265CA0225.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:315::10) To LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:253::10)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -89,153 +79,308 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR10MB5550:EE_|DS0PR10MB7407:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8f977642-7e3c-4bbf-facc-08dd511a0f9b
+X-MS-TrafficTypeDiagnostic: LO2P265MB5183:EE_|LO2P265MB2783:EE_
+X-MS-Office365-Filtering-Correlation-Id: a10227fd-bdf6-4833-cdc8-08dd5122739d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|10070799003|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Q1B2SXAvRUtUN09TUlFSbVA1aERoMDlOUGpKTEdiUW9NR0RiZ2JMWi9kazBI?=
- =?utf-8?B?czRlZWlqRzIrS2ZLc2twU3kzK1VhNXg1RURMTVd0a3d2a3NidTBpeVhXcEp0?=
- =?utf-8?B?L21NSm9SajNuc1BSK3I4eDVRSFIzS3hqekVpVmRDL0M2NTV1cTFqM1U3Ry9m?=
- =?utf-8?B?OWxYZjlMUnROSS90OXhCSHRHNGFETm95SmxLTnRZOEJSSTBIdFV6RWNRVVVr?=
- =?utf-8?B?Z0tzdW5FekUvOE5IVFdvWUx2aDgvd01zckltd1hXcHJIMjJMV041RlRBS2JJ?=
- =?utf-8?B?SG1WN0FoWjQ3aDhISGV6VFhPd0xLNU1QVVJuRWovSnJ4NDFIbU9NQ1lOVnFi?=
- =?utf-8?B?aDlXYTBrUUlRMGpNZURTM2IzdTVMcVoxbXpzdFdReW01b3IzalU0QjR6ZTl0?=
- =?utf-8?B?NmlMVHV6VTNESzdHaldxSWZORWRFSVlIc1JtdktTd2o3STRJSHhDOEwwK2tO?=
- =?utf-8?B?R05EYnNaYnhCSE5xSG1Henpkb3pxekRGTDNwZFI3Q1dIejQ3NENRYk1QeUlq?=
- =?utf-8?B?S0JRM3FqNDU1dHhlLzkwd1BHd1V4ZnQ0djJ1OVJEWnNXVnhBNjZpclhGOGts?=
- =?utf-8?B?cFhqSWJlTjA1N2RkRHQvYitlY29WRGtvUDRjN3Baam9xTlhRZUhoN3ZvbmVY?=
- =?utf-8?B?VjEydVZPZFArTjlSVXFjTkRlbk1hZVRGTXdmWHVJS28rYnovdGdBNHNKL1Vm?=
- =?utf-8?B?cGREMGc2TktCa01EWUZOeWxHa0JmT3JveXBGNW5tVElyMHIvaHBuRjZ4eGx0?=
- =?utf-8?B?UmZsaWpGTDFVT3JXQVRGL3Q3TXh2clRzVnpzZGJ1NlRDdkx6K0JhdUhBdGRk?=
- =?utf-8?B?ajVFbHRhY0dIZHdCa0RNQTJVcG1udWV3NDRBM0IzL0R1QVlqQnJ4dFR0M2tk?=
- =?utf-8?B?dWl0WHpZcGVsT3hDRmJnMkZaTVdMWndCV3VMK2xnSVE1TW9hQnRNaUg0T3JJ?=
- =?utf-8?B?dEJNVmp4M1NvU3M5dHVLdjhCV1JmWEhFWG05dVlBRk42bks4cmpZRktpZUxx?=
- =?utf-8?B?SWJXN1g1T2tNV2pPczN5N24xUXg3TjkzbEdQRmtOcHJkNVhub1R0c3dxZlQ3?=
- =?utf-8?B?ZU1rdVlqNUxnNERRaHY5MVJlcnRyc2g2VXZHZHBTUFhZeGpzVjZCaVVKTHJ4?=
- =?utf-8?B?Z1dCakF0R3V0M21tcUhodHJ4Y2hwK0dHVVlnTXpFeHFQNGdQQjZDbnlGTFY4?=
- =?utf-8?B?Q3lPV29GSE1QRldXdUsvcnRBN0RXZ25hV0hPQi83NEMxY0hDanR1TWY0MEVV?=
- =?utf-8?B?ZlhoQS8wenpPaU50VjVYVE5IVEZkSURKeEhYcnB2enZVOFkyM2cvSzJGYjhP?=
- =?utf-8?B?UWtRTWVZUHFyZmZ3MFEvSE1nYmhDVk1WY001Z3pCU2s0cFRiRkxIZjlna05y?=
- =?utf-8?B?OWgwakRQWndVZUtUdlNLTnhDRjFHeXIvdjV3MWNjNnZRbENtaHlTTDRJeStV?=
- =?utf-8?B?QTRBUUpwUEJlcHZQeHFPa0krTXFLT1B3MTFjSkUyeHJoTHNMb1dHdWszU1Y2?=
- =?utf-8?B?Wi9ONFk5UDFHK1kzL0IveldFd09sZnMzdlJyY216Z1NlVzFsdWtKQUcyMU96?=
- =?utf-8?B?ZnhvNXlSM3lEL3F5UWJCY05YblJSU0FCTDVxN0xyaU16eXpveUw2OGZpamx2?=
- =?utf-8?B?QjR2QUsvZWh1VG9mSCtaUDJ0YVFSVWRTZWVvdC9vOHhKTHhES2V1UTVucVRz?=
- =?utf-8?B?bGZ1YnNDdjdhTWY0TFlhTXdWOWU3RnVCS1lRTU1nKzk0TWRMVDZPdXdzcUhE?=
- =?utf-8?B?VXBFUnduN2JtL2ZNaTBsNVIwSmR1ellOZER5TkhhTEZSYk9QMEN5elB2NG5N?=
- =?utf-8?B?UmE0MmZHNWowQktzL0FKdkFLanhpS3AxM2Eyb2JjTWxTRVdOb3BQOGhKRVBU?=
- =?utf-8?Q?zsX9E6jCuy9WY?=
+	=?us-ascii?Q?ISqJ6rDmieF+vPz6DrW/8BAlwzhznHWYvipM7ev0pnJXml6VVo4zQ2lGm9Ti?=
+ =?us-ascii?Q?RCYTOtUjX4QFqV/Jlupd48KQjVVKTFUIYM4Y6lEMO6/BLhoBe0KFGDvE3/+0?=
+ =?us-ascii?Q?s87LzhocD8oLWJOtNMb3mejDaAMHidMCe2GecIIxjH9CKVk2v5KW+iFup6aq?=
+ =?us-ascii?Q?4yZcC07HRzsR85ngSqleIinz4SIZRSecA9ZNw1dvvEsmp211CTbKttTUMb7M?=
+ =?us-ascii?Q?2OEzAr2o+MVxiCRpTUdoV1j+Utmoy5BWB88+AgZ+B2KTs4nkDpl8l/ul0TvY?=
+ =?us-ascii?Q?514i/Mpxfje4aE4GSY9BNDx/Sd7AkvZDKcZDCqExDBDlkgmHswZ8HQHVgl0G?=
+ =?us-ascii?Q?/wdKKfuLotH2d1x/gtJVLvN4L6XreurclsDZE9Y1ler+juFQ6yfHfRqbyv69?=
+ =?us-ascii?Q?GSBxfOQHqRaV4stsrklZn1MM4ShhCzGkWECVED26sPSzVg4rv7szd6nfegUl?=
+ =?us-ascii?Q?CCWoV1PMBoXdj+2Vy9PVYJbSIy6Q24jzd3AFi6ssTwsBfMYkmG9sFXjSdUBf?=
+ =?us-ascii?Q?XruoAK3XCN90UIMptlA8aTYcK9wnkQMkPD8FJKz3ztQ0qhxwXHzxTA8v2gNz?=
+ =?us-ascii?Q?69v2+yP5bXF2Cp2KGhXTHT/kVS+dxA7QuYVbK8llyTe9bUvt9GS6LrJPSbWz?=
+ =?us-ascii?Q?08wVVbJUamCVJ7foZw53jp7H55smck2hgL/slNRuD6YsDK0StN0mgbJGCC5t?=
+ =?us-ascii?Q?1J0uc0VcbmWGQ/oPn58XZ8FUHlkmoGSATFjrX/fPlqrLFmptFGkALHb63fFc?=
+ =?us-ascii?Q?tS+Jh+MIYSUwOX1z9+CYGQ/I+8yFohL23dL9a2lugSjcrQiwydQyUdbJjTFH?=
+ =?us-ascii?Q?s4DXdV6lBUWuWAmSt7FuwdErXN9czux1Zc8xh4Pv5AAxTPBy5enH3lJ/OEZo?=
+ =?us-ascii?Q?kRFEIA2DCPIWLBKR0x3ZA4zAopqrF31tRVVK252iak6HDwGvyFSaw/sKhn+t?=
+ =?us-ascii?Q?/E7PcgZSz7/Xr7kju2Pyldw6EJSidzswgs7gxyXCPrcsjg5tgUOpW2d0BgZu?=
+ =?us-ascii?Q?RHZAYGbT9XTFVghoUEy2hzoIL3JfaLz38VN4r9czRiU2+W/3bblT2gGA5lJK?=
+ =?us-ascii?Q?TLy+NmUB1FQI+r/M0nLgHdnKKpY8/IImsPeOJgqfWLbtn87SYJ2rL3rdX8z5?=
+ =?us-ascii?Q?NK//hwApsLFnOX9Y9SlUUUNAKQo2gznCD+5Wtzec+s8vKscsdKFLZt2LZUBq?=
+ =?us-ascii?Q?j63t1L4wauIo2Fcmzs1wdh4mXdldJuFqeEPDzVY8UaA71LEssK4m5xFNv9E2?=
+ =?us-ascii?Q?bZFZPNlITpNN/Cg7G5RqeHkJhWUlK+v5wt9WN0q2jhKvQRo6nyHDFnDMJour?=
+ =?us-ascii?Q?d/eX7en0GlaeCHIcVuNYJjD900ZZs4AGbk5I3tF5BGVEavNUQ6KydZAmUojk?=
+ =?us-ascii?Q?n9CelxLbeP8n22+xVj1tnmursOHYvJWS1BArtJVhTq6JKflxrQk03DSAw/Ow?=
+ =?us-ascii?Q?doFfODbQ50w=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR10MB5550.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(10070799003)(921020);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QU84cVBhU1lJNXQzOHM4dk9vZjR6Vkl3M1FkQ1BuRTdzaXBEd3JsS0g4U2Zw?=
- =?utf-8?B?U0kvRDl6RlU2aEtjWk9FUXltQ1VnT0J2RTZEVGlYRGJMaS9NNlRVd0VBYnNS?=
- =?utf-8?B?bitiaGtWNGtQbVYweTdva0FoczNmZ1pBb2ZwaENGZUw1SVF6WEowWmlPWHBV?=
- =?utf-8?B?eHVxZzE4eWgrcmNoVlZ3SWM1UEVGcnZTQ1NudXpZckJhR1k0N0hpV2pXc3pl?=
- =?utf-8?B?Q0RteHhrQ3hmVUJWUFNEbm1vZWtLWitUNkxGOEl0eDBxYWZxTHg0TXU5R0s4?=
- =?utf-8?B?V3dJdmlvKytJYjQya2Q1VUt5RlVHa2RWZVpMSjJwTU82d1ZHVjljbHIxR2RB?=
- =?utf-8?B?YThFdDE4THA3SW5OTjUzdHZoMGptMVBjV3VJNDljOGdKSnlqVS9jdnptN25Y?=
- =?utf-8?B?YjcrQ3J5NnlSUDl5R29UY29qbFl2WExPV0ROL0psU3BtUHdYazcrak84cmpu?=
- =?utf-8?B?NmtuTzhZNXJTdnB2Z21ibGZpb3Y1RTdYZjJ2eVp3a2ZXSEZwSUFVMktxOW92?=
- =?utf-8?B?L1FCdStWNmdxM21waTFFUTc4UnZ2N3NZNUlEVHN5OGRXYUlmZEhHSDFoNlds?=
- =?utf-8?B?S251UDBjSFpnM0pCaUx5dmo5QUZmZXhzZXVaQlUwSm0vL3hvMnMzZmx4ajFv?=
- =?utf-8?B?MHkvUFJKL0RwdTdwMWhwL1FvQ1lDWk9PVkkwYTg2ZURObUNnT3YvUzB5Rktw?=
- =?utf-8?B?bnBtK1BZVm9pQ2FabG1vNmFBcE9VMnlRaDg2ZkIzSEdUaGM2bDZvVG9uUkRN?=
- =?utf-8?B?bm00d0tHV3J3NGVzbEpJOUx1Z3E0a3NpQ3lqanBZVDQxT1JkTk0zLytweVJ2?=
- =?utf-8?B?eU1KSzZRd2M5SWtLWWJkR2V2Z2kwS1lGdnUwcmNIbnVxNTcrRUk1a2lZOGZH?=
- =?utf-8?B?U3BaWkMvR3Bsa04rZTRNd09RUGdWaFlYY3RMVFVIYzB4S3NScGJlMDVEdGVy?=
- =?utf-8?B?RzJuUGZoekdzM3VyakE2cjZuRmN4SjdJQjBLcmVDVnVEdHdEYjdqZWxzZ1Zh?=
- =?utf-8?B?MEh0SXQrR0xCaGFNdUthVkEyN1c0MEFOUklkOGl4ZnpYc3Nab29GTFR6ZGl0?=
- =?utf-8?B?TzVFeGxzK2xlaGdJelZCVnVqdEcwVXRnVmJVYWFDa2RxdHA5Zmo4d2Z6cjQ5?=
- =?utf-8?B?S05yZk5HYlZJWnZPZkhSaysvNlV3YlZXUGR1cjVnTnpZa01QMGFTbXlablJE?=
- =?utf-8?B?WDhGeTc1TFoxSEFBMWJ1K1NZZjhWWFJkR3o5MjRON2ZON01jWjFETmkram9K?=
- =?utf-8?B?ZUREOXYzODZGcHNkQ01IZHVUWUJ3REZRaTBMRFZFV3RJQWIzbVZzK0QrbzNN?=
- =?utf-8?B?N3hNQ0xWTjh6MjdqU0IyZzU1MnlWaGFqcUlOQ1VtaitkbnJ0SDZBSHovOGlO?=
- =?utf-8?B?R0pDTm9GMXFnWHBhSnpZWXNLaDk1czUzaCt6M2pKUCtYdUZkOXlZWlhxUlBO?=
- =?utf-8?B?MXRJYmdXcDhYYXA0cFBPNVRHWWpkZXNvb29nTXJsOG1zK3BUd3hoY2FNa2E1?=
- =?utf-8?B?UXZqTkU5SUFHcTlmbzZuWDUvSllWd3d6dDZRMTJQbjNXcFhaU0N6QnNpaXox?=
- =?utf-8?B?eVlReVR3aHhvYTYwYmtsQ1hoRkNldWsrL0hmV2FiWkhkSVhEYitkOHJINDRm?=
- =?utf-8?B?bXZqZFFqR1Fac3RheTVyallYZng1ZksyeDNUTGM5a3JTLzdyVTZTV01lVW9C?=
- =?utf-8?B?bmZ0Q3Npdm1UcEJaRjFVb0xpN0ZValVneGRkZFhPSjFSUnNJSFNMU1N1RHRO?=
- =?utf-8?B?MmJKZjREQU50UCtENGhjajFadVVPME84TGJYTVhvZnBTWGJja0pPZm5sSzda?=
- =?utf-8?B?bzI0S0hRVkdRRWxYcWg5amZsb0hvZFprL1VXTjBWelp1dGRGbzFxY2pUZ2M2?=
- =?utf-8?B?VVN6T1dKRURxZEFqN0tvb1MxSmoxRUUvY0FYRTRDb3ducksyN0cwLzlFVXE0?=
- =?utf-8?B?MTdrdjgzWnk1OWpEcTRrSFUzOVRKbUd3YWN2Vm5EYmF4eTFIMmowWlpKc0JV?=
- =?utf-8?B?QzdhWnNobW52bStraXh3eXBxaDN4N2RJQmlRVnovaW5EcGVYV2ozLzg2UFRo?=
- =?utf-8?B?T1BqOVZpN1U4c3pRTUlkYWZpbkZBSHQ3R3FlK0tlZU5HRkY3TUo0aWcyTkc5?=
- =?utf-8?B?clRRYlR5Q2Z0QmRzVXlMTjFtVTJsczFrOHpEME5lc1dnSDF5Zjg2Smd1WGNJ?=
- =?utf-8?B?MGc9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	s5InbF72KC6TcEc0NWn1rBw5zSjuYHNvmLrhSxnPCYEf1vbJUZmrKY8stSdMHouaVrwcPUgM8bqtuoFRUfcTd5R7LeDJJ+eqhNtdalKicqqkGzEdNTowrNQ3608HTRoJ8H8s9XFxr+NP2+rfcR5/ji3IryS48WUPtGS1SLbMRoJ2fWbaAniqkg6cdD5Sc5px0llUZlclgosLslynFXld2ieuLtKupf1WElLTS7FpjIpXaquAzf9sHebdrdx33OLuOMTGv8xfYHueo80h8WM3vUmd8S1mvBLRAe1PypPBFKUEm+igyGRKjhX/21/jOtSZDFrE1bR8pxPLhFGerjpdHG9CR6k9CZWLzJtA44xLVgyczxvfRUTtZyanDcLnUVibWn7jt4scMqY1gG5sF+orGhJ/k5TfWD1Q3c7Ad0Sd/+v7U+qb5vSdNnNYziQcp5AaCEfUmnUDR8GatrDUKL/l2h/CZrcwfSlxfmF4492HCNmYL1vbZR7hFBXLSq/WmKzkA0yAyrozSM/kkAilvlA8zAwBMj/58WiNyIhurl3nn05JihlKtwK6oEYLe8V+ILeEMYFdi3KAt1xoiZQttO2YgSXnvom2iulSgGMuniRsLq4=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f977642-7e3c-4bbf-facc-08dd511a0f9b
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR10MB5550.namprd10.prod.outlook.com
+	=?us-ascii?Q?eZZlP8Z+X0c2hieTSiAWmFhc5tTRHt25JG2dEpNAmLAhvqj9ix8S4yhj4aKZ?=
+ =?us-ascii?Q?Nv9dgy7LxBJvEUmPKdHjGJfziWuIa3BvIReWHuq2ECEBWqOhwqLlLJDDoOni?=
+ =?us-ascii?Q?G6zGOVmZGlp20J0TiVDlJr6Y3EzKqjndCwm3GhQJgzJe9VV34t+g1YlgXFEy?=
+ =?us-ascii?Q?tcWSPnys4+FtNV0ZnChuhp3qrbqk4zKIfn0Wy1apO7Sch8whd06Ga/wYO6/u?=
+ =?us-ascii?Q?U04cwuaFhFUZ5dXxfFo3PAJZqBkwjQ2fUQSbDY4xoAFDdOhYX+6c17jb0OyF?=
+ =?us-ascii?Q?nDynneXsjEv4TdDX0f3e4TkpsiP9UwSEMhkoVoULjUAfu6bO6JRbVuxgmUR0?=
+ =?us-ascii?Q?R9NGKDCK5pXW7T+qk1VlUH5jp9MUur86bVuURxSdaE1871thLb9v6VYfK6l4?=
+ =?us-ascii?Q?AmeD22nBxQO7A0OOGWCor/GC2jrgjZf9vLo4dr0mm6xFn7+oHmuYKIFumEyT?=
+ =?us-ascii?Q?y4tiyiiVNbV7sL3+XtJI1Qg3Ae/ASBPiual8RvzH13JEcXKjvdaKGOp4yUZh?=
+ =?us-ascii?Q?wa7oft3/G462SQNpxgJj/WS9z+bHlYD20DZCBUWs3sRKVRA62f6P/F4gXTrX?=
+ =?us-ascii?Q?Xt7Vn9tQBY25OhZvK/7cEQHBSpA3J/pwFItfTtjiwd6cAY1vWBpAJ6MG0KFJ?=
+ =?us-ascii?Q?QnvEWk15/gaYXQnv+iepl5VrCiLpieClYydBBQ57j1uyFYKwVxNW4WMAXlJs?=
+ =?us-ascii?Q?Jh+TeEJsJm8PxTY05qJNdwwc8gOGVsFXlLpDrI8BORyCCkb9+CQin0S2ZIQx?=
+ =?us-ascii?Q?eq6QMclxqQJApHyyi6dxrWTuEfkYruL+UCIhwnVWXCSMmIssRe1oydFvAe77?=
+ =?us-ascii?Q?c+p7lT2OILutzKA3f16CUTEfegd+Zc+X4jOH/OAjPr+OZSAEV5d84C+6BH8Y?=
+ =?us-ascii?Q?tj5Ax1w7NMMH64gI/kIU2SAE1jCsIZsueECCRiN8ajRGsh6YlMbAGiZrvCYO?=
+ =?us-ascii?Q?1WrRnVCLnFMvOmIe9MaKKQTcNyYvtwurAxOOhrmZb83R3jqWdOI8TItXBoF6?=
+ =?us-ascii?Q?qJrYkap5vs1cf+5Ew26IfrQ3y4wNGDtHwhx8dr5MShJQljFo0BMtdD2653N8?=
+ =?us-ascii?Q?wTKRNcJGVn2DDbLKLgny5Cg8GHPrasUAkHfXfGPXP5Tg75DVzhW+//Kjw49u?=
+ =?us-ascii?Q?C+Y27ztqPBTeRqQLVNbtWPGo2U4ZSyJKQYGmSprntzqbJ5r3/klVNLA5H0/I?=
+ =?us-ascii?Q?Hf6ixdjmSR3pOzY2cRTUv7v7DJM6GVNwhZkVS23m02Cz6B4NTH1V6iUTZodz?=
+ =?us-ascii?Q?yREewT2o1iH6AdJvPJNChZgZVzBLa2O3mwL8QNABg0P4mIqKGTZqrWw9ljg5?=
+ =?us-ascii?Q?7ARJT1xYsbEz6s0lYicJtTLaGEaWUVMFvuNc/QtRM6EpCgWiacXn/2yYmKyi?=
+ =?us-ascii?Q?/2baUoZnDwL2ttk3l3s1dTzx4DQ7h6Kv2/+74c/6opK6tQ6bmV64u2Yj2TVS?=
+ =?us-ascii?Q?w3nNnxkKg1rCzKxh1bFe4SDUXkokUetQgcXGnV/W/t9NoIXOyxWc/yJc/Sqq?=
+ =?us-ascii?Q?I6kjeX5C9i+2Ip5gxzMDWJHkh9bRb5lWnspzj/J//YtYSYasX0ccXHy2XblE?=
+ =?us-ascii?Q?sMuTJoe2xy/ZSz7q4GYzZ8S4ZEiikkb9+keHumfRI4PzY+umScUMFFxsKmwv?=
+ =?us-ascii?Q?BA=3D=3D?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: a10227fd-bdf6-4833-cdc8-08dd5122739d
+X-MS-Exchange-CrossTenant-AuthSource: LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2025 19:17:33.1474
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2025 20:17:36.8208
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HfQ2h4uw956msqMSzuHN3jihzzlpzm7Gg1xdqr9zBsLx8TxwWUdhJv9AfLteBdWW6wApevglTTZihazeTEwfAQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB7407
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-19_08,2025-02-19_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 spamscore=0
- adultscore=0 malwarescore=0 suspectscore=0 phishscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502100000
- definitions=main-2502190149
-X-Proofpoint-GUID: YwEm3a7nRjR9jR-ZzjG79Cw41V5RGKb9
-X-Proofpoint-ORIG-GUID: YwEm3a7nRjR9jR-ZzjG79Cw41V5RGKb9
+X-MS-Exchange-CrossTenant-UserPrincipalName: mQdmXesEuPszhVELJjc0+rH9qdcqqzAUYzMD0vxdXEroOmUolKq1GYDc0Vyj2ZXD2o01AgRCFL+A9ynKB+YsEA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO2P265MB2783
 
+Currently there's a custom reference counting in `block::mq`, which uses
+`AtomicU64` Rust atomics, and this type doesn't exist on some 32-bit
+architectures. We cannot just change it to use 32-bit atomics, because
+doing so will make it vulnerable to refcount overflow. So switch it to
+use the kernel refcount `kernel::sync::Refcount` instead.
 
-On 2/18/25 11:26 PM, Shinichiro Kawasaki wrote:
-> CC+: Alan,
->
-> On Feb 13, 2025 / 08:18, Jens Axboe wrote:
->> The conditions for whether or not a request is allowed adding to a
->> completion batch are a bit hard to read, and they also have a few
->> issues. One is that ioerror may indeed be a random value on passthrough,
->> and it's being checked unconditionally of whether or not the given
->> request is a passthrough request or not.
->>
->> Rewrite the conditions to be separate for easier reading, and only check
->> ioerror for non-passthrough requests. This fixes an issue with bio
->> unmapping on passthrough, where it fails getting added to a batch. This
->> both leads to suboptimal performance, and may trigger a potential
->> schedule-under-atomic condition for polled passthrough IO.
->>
->> Fixes: f794f3351f26 ("block: add support for blk_mq_end_request_batch()")
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> I observed the blktests test case nvme/039 failure with v6.14-rc3 kernel. I
-> bisected and found that this patch in the v6.14-rc3 is the trigger.
->
-> The test run output is as follows:
->
-> nvme/039 => nvme0n1 (test error logging)                     [failed]
->      runtime  5.378s  ...  5.354s
->      --- tests/nvme/039.out      2024-09-20 11:20:26.405380875 +0900
->      +++ /home/shin/Blktests/blktests/results/nvme0n1/nvme/039.out.bad   2025-02-19 16:13:05.061387179 +0900
->      @@ -1,7 +1,3 @@
->       Running nvme/039
->      - Read(0x2) @ LBA 0, 1 blocks, Unrecovered Read Error (sct 0x2 / sc 0x81) DNR
->      - Read(0x2) @ LBA 0, 1 blocks, Unknown (sct 0x3 / sc 0x75) DNR
->      - Write(0x1) @ LBA 0, 1 blocks, Write Fault (sct 0x2 / sc 0x80) DNR
->        Identify(0x6), Access Denied (sct 0x2 / sc 0x86) DNR cdw10=0x1 cdw11=0x0 cdw12=0x0 cdw13=0x0 cdw14=0x0 cdw15=0x0
->      - Read(0x2), Invalid Command Opcode (sct 0x0 / sc 0x1) DNR cdw10=0x0 cdw11=0x0 cdw12=0x1 cdw13=0x0 cdw14=0x0 cdw15=0x0
->       Test complete
->
->
-> The test case does error injection. Test method requires reconsideration to
-> adjust to this kernel change, probably. Help for fix will be appreciated.
+There is an operation needed by `block::mq`, atomically decreasing
+refcount from 2 to 0, which is not available through refcount.h, so
+I exposed `Refcount::as_atomic` which allows accessing the refcount
+directly.
 
-Not really an issue with the test, rather the error injector is broken. 
-I'll investigate.
+Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
+Signed-off-by: Gary Guo <gary@garyguo.net>
+---
+ rust/kernel/block/mq/operations.rs |  7 +--
+ rust/kernel/block/mq/request.rs    | 70 ++++++++++--------------------
+ rust/kernel/sync/refcount.rs       | 14 ++++++
+ 3 files changed, 40 insertions(+), 51 deletions(-)
 
-Alan
-
+diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
+index 864ff379dc91..c399dcaa6740 100644
+--- a/rust/kernel/block/mq/operations.rs
++++ b/rust/kernel/block/mq/operations.rs
+@@ -10,9 +10,10 @@
+     block::mq::Request,
+     error::{from_result, Result},
+     prelude::*,
++    sync::Refcount,
+     types::ARef,
+ };
+-use core::{marker::PhantomData, sync::atomic::AtomicU64, sync::atomic::Ordering};
++use core::marker::PhantomData;
+ 
+ /// Implement this trait to interface blk-mq as block devices.
+ ///
+@@ -78,7 +79,7 @@ impl<T: Operations> OperationsVTable<T> {
+         let request = unsafe { &*(*bd).rq.cast::<Request<T>>() };
+ 
+         // One refcount for the ARef, one for being in flight
+-        request.wrapper_ref().refcount().store(2, Ordering::Relaxed);
++        request.wrapper_ref().refcount().set(2);
+ 
+         // SAFETY:
+         //  - We own a refcount that we took above. We pass that to `ARef`.
+@@ -187,7 +188,7 @@ impl<T: Operations> OperationsVTable<T> {
+ 
+             // SAFETY: The refcount field is allocated but not initialized, so
+             // it is valid for writes.
+-            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).write(AtomicU64::new(0)) };
++            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).write(Refcount::new(0)) };
+ 
+             Ok(0)
+         })
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index 7943f43b9575..7c782d70935e 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -8,12 +8,13 @@
+     bindings,
+     block::mq::Operations,
+     error::Result,
++    sync::Refcount,
+     types::{ARef, AlwaysRefCounted, Opaque},
+ };
+ use core::{
+     marker::PhantomData,
+     ptr::{addr_of_mut, NonNull},
+-    sync::atomic::{AtomicU64, Ordering},
++    sync::atomic::Ordering,
+ };
+ 
+ /// A wrapper around a blk-mq [`struct request`]. This represents an IO request.
+@@ -37,6 +38,9 @@
+ /// We need to track 3 and 4 to ensure that it is safe to end the request and hand
+ /// back ownership to the block layer.
+ ///
++/// Note that driver can still obtain new `ARef` even if there is no `ARef`s in existence by using
++/// `tag_to_rq`, hence the need to distinct B and C.
++///
+ /// The states are tracked through the private `refcount` field of
+ /// `RequestDataWrapper`. This structure lives in the private data area of the C
+ /// [`struct request`].
+@@ -98,13 +102,17 @@ pub(crate) unsafe fn start_unchecked(this: &ARef<Self>) {
+     ///
+     /// [`struct request`]: srctree/include/linux/blk-mq.h
+     fn try_set_end(this: ARef<Self>) -> Result<*mut bindings::request, ARef<Self>> {
+-        // We can race with `TagSet::tag_to_rq`
+-        if let Err(_old) = this.wrapper_ref().refcount().compare_exchange(
+-            2,
+-            0,
+-            Ordering::Relaxed,
+-            Ordering::Relaxed,
+-        ) {
++        // To hand back the ownership, we need the current refcount to be 2.
++        // Since we can race with `TagSet::tag_to_rq`, this needs to atomically reduce
++        // refcount to 0. `Refcount` does not provide a way to do this, so use the underlying
++        // atomics directly.
++        if this
++            .wrapper_ref()
++            .refcount()
++            .as_atomic()
++            .compare_exchange(2, 0, Ordering::Relaxed, Ordering::Relaxed)
++            .is_err()
++        {
+             return Err(this);
+         }
+ 
+@@ -168,13 +176,13 @@ pub(crate) struct RequestDataWrapper {
+     /// - 0: The request is owned by C block layer.
+     /// - 1: The request is owned by Rust abstractions but there are no [`ARef`] references to it.
+     /// - 2+: There are [`ARef`] references to the request.
+-    refcount: AtomicU64,
++    refcount: Refcount,
+ }
+ 
+ impl RequestDataWrapper {
+     /// Return a reference to the refcount of the request that is embedding
+     /// `self`.
+-    pub(crate) fn refcount(&self) -> &AtomicU64 {
++    pub(crate) fn refcount(&self) -> &Refcount {
+         &self.refcount
+     }
+ 
+@@ -184,7 +192,7 @@ pub(crate) fn refcount(&self) -> &AtomicU64 {
+     /// # Safety
+     ///
+     /// - `this` must point to a live allocation of at least the size of `Self`.
+-    pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut AtomicU64 {
++    pub(crate) unsafe fn refcount_ptr(this: *mut Self) -> *mut Refcount {
+         // SAFETY: Because of the safety requirements of this function, the
+         // field projection is safe.
+         unsafe { addr_of_mut!((*this).refcount) }
+@@ -200,47 +208,13 @@ unsafe impl<T: Operations> Send for Request<T> {}
+ // mutate `self` are internally synchronized`
+ unsafe impl<T: Operations> Sync for Request<T> {}
+ 
+-/// Store the result of `op(target.load())` in target, returning new value of
+-/// target.
+-fn atomic_relaxed_op_return(target: &AtomicU64, op: impl Fn(u64) -> u64) -> u64 {
+-    let old = target.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| Some(op(x)));
+-
+-    // SAFETY: Because the operation passed to `fetch_update` above always
+-    // return `Some`, `old` will always be `Ok`.
+-    let old = unsafe { old.unwrap_unchecked() };
+-
+-    op(old)
+-}
+-
+-/// Store the result of `op(target.load)` in `target` if `target.load() !=
+-/// pred`, returning [`true`] if the target was updated.
+-fn atomic_relaxed_op_unless(target: &AtomicU64, op: impl Fn(u64) -> u64, pred: u64) -> bool {
+-    target
+-        .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |x| {
+-            if x == pred {
+-                None
+-            } else {
+-                Some(op(x))
+-            }
+-        })
+-        .is_ok()
+-}
+-
+ // SAFETY: All instances of `Request<T>` are reference counted. This
+ // implementation of `AlwaysRefCounted` ensure that increments to the ref count
+ // keeps the object alive in memory at least until a matching reference count
+ // decrement is executed.
+ unsafe impl<T: Operations> AlwaysRefCounted for Request<T> {
+     fn inc_ref(&self) {
+-        let refcount = &self.wrapper_ref().refcount();
+-
+-        #[cfg_attr(not(CONFIG_DEBUG_MISC), allow(unused_variables))]
+-        let updated = atomic_relaxed_op_unless(refcount, |x| x + 1, 0);
+-
+-        #[cfg(CONFIG_DEBUG_MISC)]
+-        if !updated {
+-            panic!("Request refcount zero on clone")
+-        }
++        self.wrapper_ref().refcount().inc();
+     }
+ 
+     unsafe fn dec_ref(obj: core::ptr::NonNull<Self>) {
+@@ -252,10 +226,10 @@ unsafe fn dec_ref(obj: core::ptr::NonNull<Self>) {
+         let refcount = unsafe { &*RequestDataWrapper::refcount_ptr(wrapper_ptr) };
+ 
+         #[cfg_attr(not(CONFIG_DEBUG_MISC), allow(unused_variables))]
+-        let new_refcount = atomic_relaxed_op_return(refcount, |x| x - 1);
++        let is_zero = refcount.dec_and_test();
+ 
+         #[cfg(CONFIG_DEBUG_MISC)]
+-        if new_refcount == 0 {
++        if is_zero {
+             panic!("Request reached refcount zero in Rust abstractions");
+         }
+     }
+diff --git a/rust/kernel/sync/refcount.rs b/rust/kernel/sync/refcount.rs
+index a6a683f5d7b8..3d7a1ffb3a46 100644
+--- a/rust/kernel/sync/refcount.rs
++++ b/rust/kernel/sync/refcount.rs
+@@ -4,6 +4,8 @@
+ //!
+ //! C header: [`include/linux/refcount.h`](srctree/include/linux/refcount.h)
+ 
++use core::sync::atomic::AtomicI32;
++
+ use crate::types::Opaque;
+ 
+ /// Atomic reference counter.
+@@ -30,6 +32,18 @@ fn as_ptr(&self) -> *mut bindings::refcount_t {
+         self.0.get()
+     }
+ 
++    /// Get the underlying atomic counter that backs the refcount.
++    ///
++    /// NOTE: This will be changed to LKMM atomic in the future.
++    #[inline]
++    pub fn as_atomic(&self) -> &AtomicI32 {
++        let ptr = self.0.get() as *const AtomicI32;
++        // SAFETY: `refcount_t` is a transparent wrapper of `atomic_t`, which is an atomic 32-bit
++        // integer that is layout-wise compatible with `AtomicI32`. All values are valid for
++        // `refcount_t`, despite some of the values are considered saturated and "bad".
++        unsafe { &*ptr }
++    }
++
+     /// Set a refcount's value.
+     #[inline]
+     pub fn set(&self, value: i32) {
+-- 
+2.47.2
 
