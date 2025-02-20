@@ -1,104 +1,146 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D28E20D4E2
-	for <linux-block@vger.kernel.org>; Thu, 20 Feb 2025 16:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EB42641C2;
+	Thu, 20 Feb 2025 19:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740069970; cv=none; b=RiIQ7eFjmrWiPgFI60Drj5JgXD7kSItMzswte8GTTKTWhSL/r8hR47Zl78wWfGhL9oEV/B/bWaNiGukG6MgyIFn8ydKZCQEXq2E5sHcTmD5lHgKbPqPJaG3kP9U1kyMy+4l+OacTpQjSqRFwD7rE85Ncf5ymU2BuixWdRRng/mE=
+	t=1740079133; cv=none; b=VURyDzIjPksblULk2fKcpJVMNcdljW/IwSC34v/EKS+NZ85ca8BQ0ENaDHgglb7QpmPd2qBT3OVI5h3F8MS1w7+hQpB4q3vnXfhXuZyqsqDfDVOo4AuxbJY6QJDLGxQdt4FXEh9SFWLucL91384kGpb+Ij81AgbefRnWt7GyKNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740069970; c=relaxed/simple;
-	bh=Q96fH2ufnyrRSkdVqFWpIfJckWGdN24HBgnQJQFk4P0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RJAT/37s5MITxtNGa0dJ3XzIRbEwpCqOypgRWL1ySyFmkc/OgPibOnyVA0orADpsANuqCm4hG+ju4IFNoZk3b+Xk2F7oHndw/XfbiADAmzaucoAo0lNTytBqUjP0UJ807pF/cWFatZkoQAfcuQN7oQXrbXENfVrcEuisXzvO2ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Jw2lEOeO; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1740079133; c=relaxed/simple;
+	bh=4d1KNIx+INvlRFOF2ii16MQOHOzRY+Sq2mlvYHJFWXE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=maPzpqCUNJlsUpmOLMceq+aFmpQZPsZZm9Lj3Nqn6rJbXZG1uiIzNf74wel+PktLxQh2wsNkxURa3FT45Fi8Abdo0vYLnObBPkqYfgpMMiHlxc66BmPMcQDK6mzjugvRz2AICpWTRs5/JSxUxbgpSeBDIHFO71i3SPVgcB90rZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YsnlYSb6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Jw2lEOeO"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3d19f5ce8a0so3526185ab.1
-        for <linux-block@vger.kernel.org>; Thu, 20 Feb 2025 08:46:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740069966; x=1740674766; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Rh4eTXTu+c11RkR0T9DFkG9ZleZyfYRGduufAwusFKE=;
-        b=Jw2lEOeOqtUCX24vu+Jh0LDfwu6zr2LDOafKLp9WXTaTnAbjtai/gChG7SmoUIkVMu
-         ndEVVTLqlYRLW4sJu1syFSw1Sx8PcfyPaTTNdM6Wk32jwKxkEm+b4qriHBwKurV+1mAf
-         jHCC5/OvIrnlnG0rF4VQE3SicENiTBdHK7cUPWh26garY/KyZTb2+SEnCGXuVmVMkc2V
-         D6zJKwVKClWXK8xVGRvhMioWfiLnD/81xxF0wgfkItPRHeCC5ciFjf+NK4YyXXRruyNn
-         zVR1Tp7b1CYjmcv+WfODQqO6SwxVDWEU5QU2hNRGHrJ/cMOG726zb+oWPVYfBa2mTrD/
-         UBzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740069966; x=1740674766;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rh4eTXTu+c11RkR0T9DFkG9ZleZyfYRGduufAwusFKE=;
-        b=QYNqCaJbJpoZsFlp4f8UDeRKFfuB66loGNjAqd1yj6lskhqB6rsi10zwQkNF9SiEoz
-         mmLJzfnaErs0ySEtJqm6MQs9j3Q8YaILEWuWZmLZmPOyQfA3znq/rf6oNOtWanvpP5rp
-         TB1RdqemBD88hPY1T2b7GXn7E152cpe3+43vON4jsA4nwnTII5ra8YnHbF26BddY0+cz
-         yu0PIGpaRJUbPfcENEhkXKNbSEVzBYXTwUXwxeqXcBiwGGRpiiy2oibIVG6n/HfIOyUt
-         sKqx1rg/d1mCkHx02QQMTPhcXGqsqEPUzX2K8fVe/5+ujjJhegoPwQmuxONeQFbQGdjj
-         3g7g==
-X-Forwarded-Encrypted: i=1; AJvYcCVmxzmBpJnoUTO2Pb2HDmRp7xL3LYzc5+Ev4qD6B8iAQ5iuG07lB2189aEmgCBXWzf2zLUA3uI2zINOYQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQrTqJUDR7Pf7+nT7rN+4V58M9PUrZY7CNPqoHkArV0UruqGl1
-	kVsuupNZGg72mr5tdD7RRqHxPLReK8sbHQbF+igsA789K/n7z9gwOk/CCAiwlAI=
-X-Gm-Gg: ASbGnct5D1I50ra6TR87zJ9iCmh7+r40Me1ENXyTVJoupnRr/Ps4u2qngm53GRVHNzC
-	NFKoEsVTk2bbZCyUL2OCZsKiUc5LGU8A4o/bIMUSwHXXfBLhozgPOrpa0EA6OYWB3ADTIkd4ihA
-	S1AL5frO+dlBGCf/u/7WQ73RWqfj2uNIvNmCDQznoT8Q+c8EFwlNyOJDL5XYw5GwouLA0MUGoXs
-	QmaeZerpmgJWxHz3KhRnlCp3hcr+PaWz7BVL4tYIAeGWUHvE5weUh9ahVcdo97Modpjjof6koSx
-	fB/X87JmW5g=
-X-Google-Smtp-Source: AGHT+IG+EYLLqM6THWYE8hAauMhRAcU2Nk6bktOc2WtjLtNwvqYq1DbYMyEayXYWgyo4XXN/dzNAHg==
-X-Received: by 2002:a05:6e02:12e8:b0:3d0:26a5:b2c with SMTP id e9e14a558f8ab-3d2c01cbd32mr32793245ab.8.1740069966144;
-        Thu, 20 Feb 2025 08:46:06 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ee9f935135sm1841325173.42.2025.02.20.08.46.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Feb 2025 08:46:04 -0800 (PST)
-Message-ID: <d178e65f-0168-4046-b516-1304db75820d@kernel.dk>
-Date: Thu, 20 Feb 2025 09:46:03 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YsnlYSb6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A43AEC4CED6;
+	Thu, 20 Feb 2025 19:18:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740079132;
+	bh=4d1KNIx+INvlRFOF2ii16MQOHOzRY+Sq2mlvYHJFWXE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=YsnlYSb63skk/fWlHJtmIfHJag4qUEnaxKf53MBGT67M9wYVeRLnpj5qniNRURqgl
+	 SgJDds7mUqBUsVOb22i9WI7MIK3EzSaSMvYgsBIh2u7hpvN2pauxVs3zWnMqxEJxnW
+	 Udp4wxHheMO0dg9qjGe+WkKaB+NhDLsfTpGv/dLuDwIk1XjN48XywcU/cTIaAg3/im
+	 dwqLYVWGz7mb5+Ma587cAwV6D4RavsJzBGsbvNRH+RTdPYSmlKVgEuGr3nA8vOg4ym
+	 WGvuPg+2dcCd3DpxFNs2zyxbtF0Wac+ZF+tWN3Sa9/waj+0BDW3pMIcwQlKGGySP3o
+	 9IXQaLGAEHWQg==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Gary Guo <gary@garyguo.net>,  Miguel Ojeda <ojeda@kernel.org>,  Alex
+ Gaynor <alex.gaynor@gmail.com>,  Boqun Feng <boqun.feng@gmail.com>,
+  =?utf-8?Q?Bj=C3=B6rn?=
+ Roy Baron <bjorn3_gh@protonmail.com>,  Benno Lossin
+ <benno.lossin@proton.me>,  Alice Ryhl <aliceryhl@google.com>,  Trevor
+ Gross <tmgross@umich.edu>,  Danilo Krummrich <dakr@kernel.org>,  Will
+ Deacon <will@kernel.org>,  Peter Zijlstra <peterz@infradead.org>,  Mark
+ Rutland <mark.rutland@arm.com>,  Jens Axboe <axboe@kernel.dk>,  Francesco
+ Zardi <frazar00@gmail.com>,  rust-for-linux@vger.kernel.org,
+  linux-block@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 3/4] rust: block: convert `block::mq` to use `Refcount`
+In-Reply-To: <CAJ-ks9mEqo72Cwq5_BMtdLPjGSb_sQbm_p+TV_u=iNuYSnuPKQ@mail.gmail.com>
+ (Tamir
+	Duberstein's message of "Wed, 19 Feb 2025 17:53:43 -0500")
+References: <20250219201602.1898383-1-gary@garyguo.net>
+	<20250219201602.1898383-4-gary@garyguo.net>
+	<CAJ-ks9=10h9ha403aqL20Yk+y0oXpgvR=hbxA2+6T_CvbXN2bA@mail.gmail.com>
+	<CAJ-ks9mEqo72Cwq5_BMtdLPjGSb_sQbm_p+TV_u=iNuYSnuPKQ@mail.gmail.com>
+User-Agent: mu4e 1.12.7; emacs 29.4
+Date: Thu, 20 Feb 2025 20:18:37 +0100
+Message-ID: <8734g8ifw2.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: next-20250218: arm64 LTP pids kernel panic loop_free_idle_workers
-To: Naresh Kamboju <naresh.kamboju@linaro.org>,
- linux-block <linux-block@vger.kernel.org>, Cgroups
- <cgroups@vger.kernel.org>, Linux ARM <linux-arm-kernel@lists.infradead.org>,
- linux-mm <linux-mm@kvack.org>, open list <linux-kernel@vger.kernel.org>,
- lkft-triage@lists.linaro.org, LTP List <ltp@lists.linux.it>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Thomas Gleixner <tglx@linutronix.de>,
- Roman Gushchin <roman.gushchin@linux.dev>, Arnd Bergmann <arnd@arndb.de>,
- Dan Carpenter <dan.carpenter@linaro.org>,
- Anders Roxell <anders.roxell@linaro.org>
-References: <CA+G9fYuVngeOP_t063LbiJ+8yf-f+5tRt-A3-Hj=_X9XmZ108w@mail.gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CA+G9fYuVngeOP_t063LbiJ+8yf-f+5tRt-A3-Hj=_X9XmZ108w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 2/20/25 9:13 AM, Naresh Kamboju wrote:
-> Regression on qemu-arm64 the kernel panic noticed while running the
-> LTP controllers pids.sh test cases on Linux next 20250218 and started
-> from the next-20250214
-> 
-> Test regression: arm64 LTP pids kernel panic loop_free_idle_workers
-> 
-> Started noticing from next-20250214.
-> Good: next-20250213
-> Bad: next-20250213..next-20250218
-> 
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Tamir Duberstein <tamird@gmail.com> writes:
 
-Should already be fixed in the current tree.
+> On Wed, Feb 19, 2025 at 5:26=E2=80=AFPM Tamir Duberstein <tamird@gmail.co=
+m> wrote:
+>>
+>> On Wed, Feb 19, 2025 at 3:17=E2=80=AFPM Gary Guo <gary@garyguo.net> wrot=
+e:
+>> >
+>> > Currently there's a custom reference counting in `block::mq`, which us=
+es
+>> > `AtomicU64` Rust atomics, and this type doesn't exist on some 32-bit
+>> > architectures. We cannot just change it to use 32-bit atomics, because
+>> > doing so will make it vulnerable to refcount overflow. So switch it to
+>> > use the kernel refcount `kernel::sync::Refcount` instead.
+>> >
+>> > There is an operation needed by `block::mq`, atomically decreasing
+>> > refcount from 2 to 0, which is not available through refcount.h, so
+>> > I exposed `Refcount::as_atomic` which allows accessing the refcount
+>> > directly.
+>> >
+>> > Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
+>> > Signed-off-by: Gary Guo <gary@garyguo.net>
+>> > ---
+>> >  rust/kernel/block/mq/operations.rs |  7 +--
+>> >  rust/kernel/block/mq/request.rs    | 70 ++++++++++--------------------
+>> >  rust/kernel/sync/refcount.rs       | 14 ++++++
+>> >  3 files changed, 40 insertions(+), 51 deletions(-)
+>> >
+>> > diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq=
+/operations.rs
+>> > index 864ff379dc91..c399dcaa6740 100644
+>> > --- a/rust/kernel/block/mq/operations.rs
+>> > +++ b/rust/kernel/block/mq/operations.rs
+>> > @@ -10,9 +10,10 @@
+>> >      block::mq::Request,
+>> >      error::{from_result, Result},
+>> >      prelude::*,
+>> > +    sync::Refcount,
+>> >      types::ARef,
+>> >  };
+>> > -use core::{marker::PhantomData, sync::atomic::AtomicU64, sync::atomic=
+::Ordering};
+>> > +use core::marker::PhantomData;
+>> >
+>> >  /// Implement this trait to interface blk-mq as block devices.
+>> >  ///
+>> > @@ -78,7 +79,7 @@ impl<T: Operations> OperationsVTable<T> {
+>> >          let request =3D unsafe { &*(*bd).rq.cast::<Request<T>>() };
+>> >
+>> >          // One refcount for the ARef, one for being in flight
+>> > -        request.wrapper_ref().refcount().store(2, Ordering::Relaxed);
+>> > +        request.wrapper_ref().refcount().set(2);
+>> >
+>> >          // SAFETY:
+>> >          //  - We own a refcount that we took above. We pass that to `=
+ARef`.
+>> > @@ -187,7 +188,7 @@ impl<T: Operations> OperationsVTable<T> {
+>> >
+>> >              // SAFETY: The refcount field is allocated but not initia=
+lized, so
+>> >              // it is valid for writes.
+>> > -            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).w=
+rite(AtomicU64::new(0)) };
+>> > +            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).w=
+rite(Refcount::new(0)) };
+>>
+>> Could we just make the field pub and remove refcount_ptr? I believe a
+>> few callers of `wrapper_ptr` could be replaced with `wrapper_ref`.
+>
+> I took a stab at this to check it was possible:
+> https://gist.github.com/tamird/c9de7fa6e54529996f433950268f3f87
 
--- 
-Jens Axboe
+The access method uses a raw pointer because it is not always safe to
+reference the field.
+
+I think line 25 in your patch is UB as the field is not initialized.
+
+At any rate, such a change is orthogonal. You could submit a separate
+patch with that refactor.
+
+
+Best regards,
+Andreas Hindborg
+
+
 
