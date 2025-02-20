@@ -1,146 +1,103 @@
-Received: from smtp.cecloud.com (unknown [1.203.97.240])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D9E1B87D1;
-	Thu, 20 Feb 2025 08:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=1.203.97.240
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CEA1EE032;
+	Thu, 20 Feb 2025 10:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740039666; cv=none; b=u3yZDT3EDRLqpIBySxmMOuIilFhU1AmgULxY8XAjAO44GyIWCZRNWDp0SOWEqSJ+ZjozAktLYr7qQH/bkDj7vMwW/CbOqy/fFumHa6uHptupHcbyS3xSTBZ1qSl/5EuEGKvmRcWWdqh+2HkDc+4Veje85qVc1YTWtTE9B6rKYoo=
+	t=1740046297; cv=none; b=PbAmNspyM/n+l+4kTJVkrmAQA2mWGuqIdA9nsXJ9q0xExergwMrNYL4SDq8D1q8SnKKkzUZ7VeT77+T8558yHTa39xt8+5wHW9MMYpnKHwrFp5x+Hizqyqj5NczuUnIc8Zb35Ppl1dwxR0MtwYpKffnnjMMQMHb/HN/zVzTGFhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740039666; c=relaxed/simple;
-	bh=uWWKRY5OqdO+rjWbyCUqROOK8f0tsrcstsiLFGxs6lo=;
-	h=Date:From:To:Cc:Subject:References:Mime-Version:Message-ID:
-	 Content-Type; b=tm9A0x08IJq7zWBlCJgpeEA0pUkKF/kT5ksXdETrH7prxK9VLY769UhzsWMc0WNGjEXkxUML2eEW+PGIjztzEayrosexDZDZN+V+6gDNkf00XuvKlUODvTaJ18JRZ9yo9mawHCxR7Ad5OctuXS0VAto0NHfs03iyetCw8Hdll98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn; spf=pass smtp.mailfrom=cestc.cn; arc=none smtp.client-ip=1.203.97.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cestc.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cestc.cn
-Received: from localhost (localhost [127.0.0.1])
-	by smtp.cecloud.com (Postfix) with ESMTP id CE4B7900114;
-	Thu, 20 Feb 2025 16:20:51 +0800 (CST)
-X-MAIL-GRAY:0
-X-MAIL-DELIVERY:1
-X-SKE-CHECKED:1
-X-ABS-CHECKED:1
-X-ANTISPAM-LEVEL:2
-Received: from desktop-n31qu50 (unknown [39.156.73.12])
-	by smtp.cecloud.com (postfix) whith ESMTP id P3907749T281458769654128S1740039650735091_;
-	Thu, 20 Feb 2025 16:20:51 +0800 (CST)
-X-IP-DOMAINF:1
-X-RL-SENDER:zhang.guanghui@cestc.cn
-X-SENDER:zhang.guanghui@cestc.cn
-X-LOGIN-NAME:zhang.guanghui@cestc.cn
-X-FST-TO:sagi@grimberg.me
-X-RCPT-COUNT:8
-X-LOCAL-RCPT-COUNT:0
-X-MUTI-DOMAIN-COUNT:0
-X-SENDER-IP:39.156.73.12
-X-ATTACHMENT-NUM:0
-X-UNIQUE-TAG:<fd7484a0a686beb9490205984160b761>
-X-System-Flag:0
-Date: Thu, 20 Feb 2025 16:20:49 +0800
-From: "zhang.guanghui@cestc.cn" <zhang.guanghui@cestc.cn>
-To: sagi <sagi@grimberg.me>, 
-	mgurtovoy <mgurtovoy@nvidia.com>, 
-	kbusch <kbusch@kernel.org>, 
-	sashal <sashal@kernel.org>, 
-	chunguang.xu <chunguang.xu@shopee.com>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-nvme <linux-nvme@lists.infradead.org>, 
-	linux-block <linux-block@vger.kernel.org>
-Subject: Re: Re: nvme-tcp: fix a possible UAF when failing to send request
-References: <2025021015413817916143@cestc.cn>, 
-	<aed9dde7-3271-4b97-9632-8380d37505d9@grimberg.me>
-X-Priority: 3
-X-GUID: 752A99AE-CBA7-430D-A461-66F2A12A1897
-X-Has-Attach: no
-X-Mailer: Foxmail 7.2.25.331[cn]
+	s=arc-20240116; t=1740046297; c=relaxed/simple;
+	bh=jkiVGj/TUdQIFOaAygxX7+Jk2trB891Z7v8mo2A0Eb0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R2+IbRthopkJxJpPRApRugsib3sEt3QOKzS3B7q+D/7pXouRbYeG5gAdAG/sEEB7qQnfyd79H+T4hEyXg0Rcw92HjcOn8/l32l4Yztmg0os8izAZn2YJVDF23yYuWFQ4g8TLRKh5leeTvQozdMiPGKihiv+iQODAQidtXtL4ozQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NwyRd8+/; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NwyRd8+/"
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5e050b1491eso3306711a12.0;
+        Thu, 20 Feb 2025 02:11:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740046294; x=1740651094; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GpFFsAs5cvbWFTBWXYhRXN2UcEGPZZftq0JzXbR36CI=;
+        b=NwyRd8+/kTKuI/K1g5Moa5nQKoH47wbvec+lBp+SUVJuL1k+u9OQcegeRZnyLaOMVv
+         yByulCqxSPeDfw5bbgLY3kS7p+HTqN9MFbxm+Br7/cHDaxb/cMvLR1zu89pfvm7dkjwG
+         2OrTK5rmlct6HWAtBdqnmgWr/5M4koZV8DHNfLpqMDWgDl6eS+AZ5l3osy+x+DSQCfFV
+         p8g453fCNMY+ocgSQSBuw3j0TPPMRtTw7QzPXTityxzH/4n08rWJNkP06qVC29peW29H
+         GQ4aDJuUj5LdrxMhiOTg5ra7ide4ZWvPfzDwv6EPxoV8PPHieOg8tKGmhErQqVIyWtvR
+         /sjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740046294; x=1740651094;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GpFFsAs5cvbWFTBWXYhRXN2UcEGPZZftq0JzXbR36CI=;
+        b=jJoTXh/1hnoJYY8mZOg9fJ9cobAFkoweoycPIEfU50k3Od0+OLV4cEp2a5CnaxfCiM
+         oTvEe5AfhuVKKj5lXeHf/+quAf8/gr4LeNT/WFzN7bGsJGI17VOVXvb59iyRQk/7w5UE
+         +tkKtJxkOnwyig9+DwbQ8TTMXhc7pmjdIc0JTC/s6QS/qv14uj2e+aNDIIEonzdNFQWJ
+         QI+eSCVrnOrNbGD6kp9CJFeI4ht7MulDLFQQmK4veJhy5brtaWBJq+KDmNKs5TmRGE0C
+         2KkQegFd+TzlPWnMXPMqGCsRQTs43Z80g2beicAh5oO8C/obNwtDcf0B4fMlgfvXkl6i
+         mC1w==
+X-Forwarded-Encrypted: i=1; AJvYcCV6ZCkLaVUearVxFYT7y94IKEKzRgKTzzXVTLduYwGncq6Hwj3L9TM4ZjcZHiGnIEh6TqJLRzuRhAM01Ag=@vger.kernel.org, AJvYcCVE3FhGoE7DVDJupdv7rHJNZQMIKDniboQkwQYU+hvDCp1YBu5nAszOoSxYBn0YGSoNqltDtSrR3A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyz5pPwFEJFJPGipGkibbtrpKy9lKw30Rw1WY7gOR1EqI/bZKSW
+	sFp8sf9yQd7JSAiVpExiX3JAmjWSQYFzh1fXB7xBAM+EozL/bTkX
+X-Gm-Gg: ASbGncuWB3HsPKjNp6SKLTCj6zv+/Jtg5Y0qmu+1jGiFPfri30vYVHwHcnHP3zCElic
+	32A1G07KPaHycjO6939wyqe1GgmQOfMDBbf0rTvw/44q7ailbzUhvDnC5B6gJt+tShniblSwgJ7
+	YfMYGPjHor+7xocByzyZLC2CqJiRXtRROZsipbhPwS6xOKuTfTSW4AL5YwagL005/X+bs/N20Oj
+	La0+Or5IT2Db7WR+mUAQnMnU03hYF8/x6iWLkclETm4qki6+BwjhHdWAhLuDhCUMzAxYwoTuH+Y
+	sR0Fcp9c3dUhioX7san/XdFlgNDu6i7IwMrMLLFluJN9KYxv
+X-Google-Smtp-Source: AGHT+IEpnVmezDMTHnEJMcRGWitQtO2QoMSoow/C/56q2yB2h9Q5VP5S9PPFB9LOywGK78RKf91F2g==
+X-Received: by 2002:a17:907:9989:b0:abb:daa7:f769 with SMTP id a640c23a62f3a-abbed5b21b4mr284392866b.0.1740046293733;
+        Thu, 20 Feb 2025 02:11:33 -0800 (PST)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:f455])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abb916db37bsm829929666b.165.2025.02.20.02.11.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Feb 2025 02:11:33 -0800 (PST)
+Message-ID: <06c87de5-6b4d-405d-8b1b-a9684e441ea3@gmail.com>
+Date: Thu, 20 Feb 2025 10:12:36 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <202502201620484789268@cestc.cn>
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv4 1/5] io_uring: move fixed buffer import to issue path
+To: Keith Busch <kbusch@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, ming.lei@redhat.com, axboe@kernel.dk,
+ linux-block@vger.kernel.org, io-uring@vger.kernel.org, bernd@bsbernd.com,
+ csander@purestorage.com
+References: <20250218224229.837848-1-kbusch@meta.com>
+ <20250218224229.837848-2-kbusch@meta.com>
+ <c4a0cdb8-ac99-4a7a-9791-d2c833e45533@gmail.com>
+ <Z7aEhR8qh3P58hkE@kbusch-mbp>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <Z7aEhR8qh3P58hkE@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-CkhpIArCoMKgwqDCoMKgwqDCoMKgQWZ0ZXIgdGVzdGluZyB0aGlzIHBhdGNoLCAgTm8gc2VuZGlu
-ZyByZXF1ZXN0IGZhaWx1cmUgb2NjdXJyZWQsIHRoZSBpc3N1ZSBoYXMgbm90IGJlZW4gcmVwcm9k
-dWNlZCB5ZXQuICAKSXQgbWF5IHRha2UgYSBsb25nIHRpbWUgdG8gdGVzdC4KCmJlc3Qgd2lzaGVz
-CgoKCnpoYW5nLmd1YW5naHVpQGNlc3RjLmNuCgoKCsKgCgoKCuWPkeS7tuS6uu+8msKgU2FnaSBH
-cmltYmVyZwoKCgrlj5HpgIHml7bpl7TvvJrCoDIwMjUtMDItMTfCoDE1OjQ2CgoKCuaUtuS7tuS6
-uu+8msKgemhhbmcuZ3VhbmdodWlAY2VzdGMuY247IG1ndXJ0b3ZveTsga2J1c2NoOyBzYXNoYWw7
-IGNodW5ndWFuZy54dQoKCgrmioTpgIHvvJrCoGxpbnV4LWtlcm5lbDsgbGludXgtbnZtZTsgbGlu
-dXgtYmxvY2sKCgoK5Li76aKY77yawqBSZTogbnZtZS10Y3A6IGZpeCBhIHBvc3NpYmxlIFVBRiB3
-aGVuIGZhaWxpbmcgdG8gc2VuZCByZXF1ZXN044CQ6K+35rOo5oSP77yM6YKu5Lu255Sxc2FnaWdy
-aW1AZ21haWwuY29t5Luj5Y+R44CRCgoKCsKgCgoKCsKgCgoKCsKgCgoKCk9uIDEwLzAyLzIwMjUg
-OTo0MSwgemhhbmcuZ3VhbmdodWlAY2VzdGMuY24gd3JvdGU6CgoKCj4gSGVsbG8KCgoKPgoKCgo+
-CgoKCj4KCgoKPsKgIMKgIMKgwqBXaGVuIHVzaW5nIHRoZSBudm1lLXRjcCBkcml2ZXIgaW4gYSBz
-dG9yYWdlIGNsdXN0ZXIsIHRoZSBkcml2ZXIgbWF5IHRyaWdnZXIgYSBudWxsIHBvaW50ZXIgY2F1
-c2luZyB0aGUgaG9zdCB0byBjcmFzaCBzZXZlcmFsIHRpbWVzLgoKCgo+CgoKCj4KCgoKPgoKCgo+
-IEJ5IGFuYWx5emluZyB0aGUgdm1jb3JlLCB3ZSBrbm93IHRoZSBkaXJlY3QgY2F1c2UgaXMgdGhh
-dMKgIHRoZSByZXF1ZXN0LT5tcV9oY3R4IHdhcyB1c2VkIGFmdGVyIGZyZWUuCgoKCj4KCgoKPgoK
-Cgo+CgoKCj4KCgoKPgoKCgo+IENQVTHCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoENQVTIKCgoKPgoKCgo+CgoKCj4KCgoKPiBudm1lX3RjcF9wb2xswqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgbnZtZV90Y3BfdHJ5X3NlbmTCoCAtLWZhaWxlZCB0byBzZW5k
-IHJlcXJlc3QgMTMKCgoKPgoKCgo+CgoKCj4KCgoKPsKgIMKgIMKgwqBudm1lX3RjcF90cnlfcmVj
-dsKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG52bWVfdGNwX2ZhaWxfcmVxdWVzdAoKCgo+CgoKCj4K
-CgoKPgoKCgo+wqAgwqAgwqDCoMKgIMKgwqBudm1lX3RjcF9yZWN2X3NrYsKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIG52bWVfdGNwX2VuZF9yZXF1ZXN0CgoKCj4KCgoKPgoKCgo+CgoKCj7CoCDCoCDC
-oMKgwqAgwqDCoMKgIMKgwqBudm1lX3RjcF9yZWN2X3BkdcKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IG52bWVfY29tcGxldGVfcnEKCgoKPgoKCgo+CgoKCj4KCgoKPsKgIMKgIMKgwqDCoCDCoMKgwqAg
-wqDCoMKgIMKgwqBudm1lX3RjcF9oYW5kbGVfY29tcMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKg
-wqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDC
-oMKgIMKgbnZtZV9yZXRyeV9yZXEgLS3CoHJlcXVlc3QtPm1xX2hjdHggaGF2ZSBiZWVuIGZyZWVk
-LCBpcyBOVUxMLgoKCgo+CgoKCj4KCgoKPgoKCgo+wqAgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAg
-wqDCoMKgIMKgwqBudm1lX3RjcF9wcm9jZXNzX252bWVfY3FlCgoKCj4KCgoKPgoKCgo+CgoKCj7C
-oCDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgIG52bWVfY29tcGxldGVf
-cnEKCgoKPgoKCgo+CgoKCj4KCgoKPsKgIMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDC
-oMKgwqAgwqDCoMKgIMKgIG52bWVfZW5kX3JlcQoKCgo+CgoKCj4KCgoKPgoKCgo+wqAgwqAgwqDC
-oMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCBibGtf
-bXFfZW5kX3JlcXVlc3QKCgoKPgoKCgo+CgoKCj4KCgoKPgoKCgo+CgoKCj4KCgoKPgoKCgo+IHdo
-ZW4gbnZtZV90Y3BfdHJ5X3NlbmQgZmFpbGVkIHRvIHNlbmQgcmVxcmVzdCAxMywgaXQgbWF5YmUg
-YmUgcmVzdWx0ZWQgYnkgc2VsaW51eCBvciBvdGhlciByZWFzb25zLCB0aGlzIGlzIGEgcHJvYmxl
-bS4gdGhlbsKgIHRoZSBudm1lX3RjcF9mYWlsX3JlcXVlc3Qgd291bGQgZXhlY3V0ZeOAggoKCgo+
-CgoKCj4KCgoKPgoKCgo+IGJ1dCB0aGUgbnZtZV90Y3BfcmVjdl9wZHUgbWF5IGhhdmUgcmVjZWl2
-ZWQgdGhlIHJlc3BvbmRpbmcgcGR1IGFuZCB0aGUgbnZtZV90Y3BfcHJvY2Vzc19udm1lX2NxZSB3
-b3VsZCBoYXZlIGNvbXBsZXRlZCB0aGUgcmVxdWVzdC7CoCByZXF1ZXN0LT5tcV9oY3R4IHdhcyB1
-c2VkIGFmdGVyIGZyZWUuCgoKCj4KCgoKPgoKCgo+CgoKCj4gdGhlIGZvbGxvdyBwYXRjaCBpcyB0
-byBzb2x2ZSBpdC4KCgoKwqAKCgoKWmhhbmcsIHlvdXIgZW1haWwgY2xpZW50IG5lZWRzIGZpeGlu
-ZyAtIGl0IGlzIGltcG9zc2libGUgdG8gZm9sbG93IHlvdXIKCgoKZW1haWxzLgoKCgrCoAoKCgo+
-CgoKCj4KCgoKPgoKCgo+IGNhbiB5b3UgZ2l2ZcKgIHNvbWUgc3VnZ2VzdGlvbnM/wqAgdGhhbmtz
-IQoKCgrCoAoKCgpUaGUgcHJvYmxlbSBpcyB0aGUgQzJIVGVybSB0aGF0IHRoZSBob3N0IGlzIHVu
-YWJsZSB0byBoYW5kbGUgY29ycmVjdGx5LgoKCgpBbmQgaXQgYWxzbyBhcHBlYXJzIHRoYXQgbnZt
-ZV90Y3BfcG9sbCgpIGRvZXMgbm90IHNpZ25hbCBjb3JyZWN0bHkgdG8KCgoKYmxrLW1xIHRvIHN0
-b3AKCgoKY2FsbGluZyBwb2xsLgoKCgrCoAoKCgpPbmUgdGhpbmcgdG8gZG8gaXMgdG8gaGFuZGxl
-IEMySFRlcm0gUERVIGNvcnJlY3RseSwgYW5kLCBoZXJlIGlzIGEKCgoKcG9zc2libGUgZml4IHRv
-IHRyeSBmb3IgdGhlIFVBRiBpc3N1ZToKCgoKLS0KCgoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbnZt
-ZS9ob3N0L3RjcC5jIGIvZHJpdmVycy9udm1lL2hvc3QvdGNwLmMKCgoKaW5kZXggYzYzN2ZmMDRh
-MDUyLi4wZTM5MGU5OGFhZjkgMTAwNjQ0CgoKCi0tLSBhL2RyaXZlcnMvbnZtZS9ob3N0L3RjcC5j
-CgoKCisrKyBiL2RyaXZlcnMvbnZtZS9ob3N0L3RjcC5jCgoKCkBAIC0yNjczLDYgKzI2NzMsNyBA
-QCBzdGF0aWMgaW50IG52bWVfdGNwX3BvbGwoc3RydWN0IGJsa19tcV9od19jdHgKCgoKKmhjdHgs
-IHN0cnVjdCBpb19jb21wX2JhdGNoICppb2IpCgoKCsKgewoKCgrCoMKgwqDCoMKgwqDCoCBzdHJ1
-Y3QgbnZtZV90Y3BfcXVldWUgKnF1ZXVlID0gaGN0eC0+ZHJpdmVyX2RhdGE7CgoKCsKgwqDCoMKg
-wqDCoMKgIHN0cnVjdCBzb2NrICpzayA9IHF1ZXVlLT5zb2NrLT5zazsKCgoKK8KgwqDCoMKgwqDC
-oCBpbnQgcmV0OwoKCgrCoAoKCgrCoMKgwqDCoMKgwqDCoCBpZiAoIXRlc3RfYml0KE5WTUVfVENQ
-X1FfTElWRSwgJnF1ZXVlLT5mbGFncykpCgoKCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCByZXR1cm4gMDsKCgoKQEAgLTI2ODAsOSArMjY4MSw5IEBAIHN0YXRpYyBpbnQgbnZtZV90Y3Bf
-cG9sbChzdHJ1Y3QgYmxrX21xX2h3X2N0eAoKCgoqaGN0eCwgc3RydWN0IGlvX2NvbXBfYmF0Y2gg
-KmlvYikKCgoKwqDCoMKgwqDCoMKgwqAgc2V0X2JpdChOVk1FX1RDUF9RX1BPTExJTkcsICZxdWV1
-ZS0+ZmxhZ3MpOwoKCgrCoMKgwqDCoMKgwqDCoCBpZiAoc2tfY2FuX2J1c3lfbG9vcChzaykgJiYK
-CgoKc2tiX3F1ZXVlX2VtcHR5X2xvY2tsZXNzKCZzay0+c2tfcmVjZWl2ZV9xdWV1ZSkpCgoKCsKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBza19idXN5X2xvb3Aoc2ssIHRydWUpOwoKCgot
-wqDCoMKgwqDCoMKgIG52bWVfdGNwX3RyeV9yZWN2KHF1ZXVlKTsKCgoKK8KgwqDCoMKgwqDCoCBy
-ZXQgPSBudm1lX3RjcF90cnlfcmVjdihxdWV1ZSk7CgoKCsKgwqDCoMKgwqDCoMKgIGNsZWFyX2Jp
-dChOVk1FX1RDUF9RX1BPTExJTkcsICZxdWV1ZS0+ZmxhZ3MpOwoKCgotwqDCoMKgwqDCoMKgIHJl
-dHVybiBxdWV1ZS0+bnJfY3FlOwoKCgorwqDCoMKgwqDCoMKgIHJldHVybiByZXQgPCAwID8gcmV0
-IDogcXVldWUtPm5yX2NxZTsKCgoKwqB9CgoKCsKgCgoKCsKgc3RhdGljIGludCBudm1lX3RjcF9n
-ZXRfYWRkcmVzcyhzdHJ1Y3QgbnZtZV9jdHJsICpjdHJsLCBjaGFyICpidWYsIGludAoKCgpzaXpl
-KQoKCgotLQoKCgrCoAoKCgpEb2VzIHRoaXMgaGVscD8KCgoKwqAKCgoKwqAKCgo=
+On 2/20/25 01:25, Keith Busch wrote:
+> On Wed, Feb 19, 2025 at 04:48:30PM +0000, Pavel Begunkov wrote:
+>> We're better to remove the lookup vs import split like below.
+>> Here is a branch, let's do it on top.
+>>
+>> https://github.com/isilence/linux.git regbuf-import
+> 
+> Your first patch adds a 10th parameter to an nvme function, most of
+> which are unused in half the branches. I think we've done something
+> wrong here, so I want to take a shot at cleaning that up. Otherwise I
+
+That would be great, I didn't feel great about it either, even
+the existing ioucmd arg doesn't seem like a perfect fit.
 
 
+> think what you're proposing is an improvement.
+
+-- 
+Pavel Begunkov
 
