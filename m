@@ -1,169 +1,100 @@
-Received: from mail3.out.flockmail.com (mail3.out.flockmail.com [18.215.190.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2EE1FF1AF
-	for <linux-block@vger.kernel.org>; Fri, 21 Feb 2025 10:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.215.190.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C0F204C3A;
+	Fri, 21 Feb 2025 10:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740134287; cv=none; b=GQX7Dpd7j5KhwBFGeb4l+vBq4NCdxCPwjt77jkkPemKZhIy7RjJbcLNDS1Lvj/ttH9vMgY1vPmR+Wi80nBs2Bt8JcDAfg2AfxGu4v+Z8wN5kBxwpK5qk0OUFMVApeRJQj1tRusbDV/93mwDTvmhXFMGDF0gVuWF/fc86HmzWiMc=
+	t=1740134315; cv=none; b=fXuYW31uURd3rpjSCHz3UgAQ4+cnUbT+1Xr770xTdTmp0MKNW3cE66TTlRDMe7YRw/mIorZF8EjRih358ED+JGx7STuZmme8zasg3UydSGSEY8wuIEBwgU8cW3PcprXNWLLwoyRfdt18EgjkMBQvP8hWpdMwRa0FX2FKYnNU8/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740134287; c=relaxed/simple;
-	bh=ST+REIAvtLM2EfHTQdejogwwPWs0d5CZXLFqhlK+QKs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VLPJgf4upUibD8SJWbKvhSM1SJmevvs1eHIzhf6VxncriadLaTgwOhsJgMnhqpHNKS7MoDbyXuJ+MRPk+tHYCCC6blvD2dqvTMcmBU7r5kf0yRYUlH0NjhT6a/T0CRvz6ZbdapF3XD3I/F9fL1jCaxW0C2YP0IxJZWIj9UR0WyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li; spf=pass smtp.mailfrom=coly.li; dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b=BvQOp7m4; arc=none smtp.client-ip=18.215.190.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coly.li
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=coly.li
+	s=arc-20240116; t=1740134315; c=relaxed/simple;
+	bh=DQ7fsWXnr81TGCvxwT39yv85kiLQ5gpPRFYuWpRLa98=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ke5/D8yN1qw4gIGbaA6ZDyl6HSDvgBhotT9HJFmULFJ8yoaI0vQOQg+YKfC+B9ndAWzpCglrrz3GaYKJFmeGevrm8oW62/5p9TK13ewCtMPGeQGrlXLod/QxSdc0oJ41HThIKvd8yG2YfF0F6yPCfP6MOf9dsctt0ZuY7p+Exnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yp65aKc4; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=t12smtp-sign004.email header.i=@t12smtp-sign004.email header.b="BvQOp7m4"
-DKIM-Signature: a=rsa-sha256; bh=HJViwRYJWG0zNvDaTVc4+RRFIFm3biUDQdBU/Kmd2zQ=;
-	c=relaxed/relaxed; d=t12smtp-sign004.email;
-	h=from:message-id:in-reply-to:to:cc:mime-version:date:subject:references:from:to:cc:subject:date:message-id:in-reply-to:references:reply-to;
-	q=dns/txt; s=titan1; t=1740133684; v=1;
-	b=BvQOp7m46YRQYV50svyQ6koecodDG/5NMZ1UF38ZuolCivbcflH9CYqfws8I3uuV0QqBQ9Tt
-	ne/tv2u/zpF7pqJjplOvpOMEfJc25LVrgVcSnYuTYDElRO0wMIQ1u4AHTiy90cBq3YAccdrTLdX
-	EQ+Fg+8qEfkLJxQeH/Z55vho=
-Received: from studio.local (unknown [141.11.218.23])
-	by smtp-out.flockmail.com (Postfix) with ESMTPA id AC874E04DF;
-	Fri, 21 Feb 2025 10:27:55 +0000 (UTC)
-Date: Fri, 21 Feb 2025 18:27:52 +0800
-Feedback-ID: :i@coly.li:coly.li:flockmailId
-From: Coly Li <i@coly.li>
-To: Zheng Qixing <zhengqixing@huaweicloud.com>
-Cc: axboe@kernel.dk, song@kernel.org, colyli@kernel.org, 
-	yukuai3@huawei.com, dan.j.williams@intel.com, vishal.l.verma@intel.com, 
-	dave.jiang@intel.com, ira.weiny@intel.com, dlemoal@kernel.org, yanjun.zhu@linux.dev, 
-	kch@nvidia.com, hare@suse.de, zhengqixing@huawei.com, john.g.garry@oracle.com, 
-	geliang@kernel.org, xni@redhat.com, colyli@suse.de, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org, nvdimm@lists.linux.dev, 
-	yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH 09/12] badblocks: fix missing bad blocks on retry in
- _badblocks_check()
-Message-ID: <e6iwuml7p5hql4zo4jzkxpr2wgcbqne75xpqva6onteqcxve43@kcr2qzes35ix>
-References: <20250221081109.734170-1-zhengqixing@huaweicloud.com>
- <20250221081109.734170-10-zhengqixing@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yp65aKc4"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-abb7520028bso272849866b.3;
+        Fri, 21 Feb 2025 02:38:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740134312; x=1740739112; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DQ7fsWXnr81TGCvxwT39yv85kiLQ5gpPRFYuWpRLa98=;
+        b=Yp65aKc4KpNpvLYmUC1PNRkaqm8xmbVdWbZQgQ0rEghhV0/FRFkUjflH43ZxX5m3Rq
+         vfG2c1HWfW2L/z8OTG+lRbzn/11unWlJHioTfsA0u9mde0yo/asSijK6y2dRTaHhZbLu
+         HeYhTHqIkbtG9qI1xM2Cl4QBwq6FtO153PNgdZibe5kbiZ95swMdXkj539bOS7Sbry1+
+         D9svKHCfUuM04XYU9o0iAv7fSqG6xRElOaD0hKkqiljYLqykSLGincdDzgtb9Y2ukvAQ
+         3fFcxs04tvDKyPH+ifbuWB/ZhRlkw9TSvqdpslXPncjpfjNgQIRg5rrdVydG2yScGL8O
+         oU3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740134312; x=1740739112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DQ7fsWXnr81TGCvxwT39yv85kiLQ5gpPRFYuWpRLa98=;
+        b=pBt60LX3DmJgzXNvtqieit94iFtfpkiK4AQVb7hh/eVmVCCs9R7kEaoJqtEm/knYh4
+         aG/7yJfTFrXTM7IEijeexZBKAX2093lpqvqpqS3Q0ZOi1TH0AAk2f+MqsKNB+wGu9EeT
+         RDvw4TAkPFA4UN/bODAblg3nXHYNS140mXL+v1YcKtpxLDxme60mJKwPKq2QN6hjsqRS
+         D+miwlBSxDPC+aOzeLCx4FCZr7uxrXbYBI/hm3krqdJyex+LxIzXc/AMpMtbffUrspt2
+         miBXtsEtsuZKZjyF//w/G+HcOjqUm13WHVfaqMWXz/PlBs+4G6rvFtoftWBDPPp9Qe87
+         HHNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVm3N/n8oCjTJwKKwTFMU6dxDf2aAgqAzNCRZNWDq7uMCt/638kBN/OLNPsJ+fbXu0biZ+6E3Zrz8iV1A==@vger.kernel.org, AJvYcCVxitae4Prylm++nTFo0OwZc3YZVQ7MI+mNvJ44Wseyo8rqSIG3TVgMiYVw55wkFHGDZz8YV12McY3iQw==@vger.kernel.org, AJvYcCXqA9H2WvRXyS/luZhVsLZi8t0MrOL1Tjxk4EfyECC3Qubb1oypEHC2PfY+/gzdEYhhcXlB6Nf9pUpNfQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxfWYwxhexTNLkBit+fC11Xd3JoBW2dOJBBi/+iM2GlgNhvzTq
+	flSfjGSdrfMAjn25d5lehS1l+FRoOxrrVBScXoWxJNMIli2D6Fecsd6/WCJU8jDqH7rwjUxcc72
+	Qn2JvLbwPwfFdb+OFstyeMfzTwZceIJVadI6X
+X-Gm-Gg: ASbGnctTGRkFBmgmPCdczqgppNYKhSCbkz+SNysiMIapL7ut5JFlkC4VMRk7JeZNxJh
+	NpSfcmq3AtJZCHMsHVlhAJt8KULe1jSxRnupGQ4UFRtyHyvcUtKy7cjMcL2EJnVQEjLwVWTsjZm
+	isYBxf63ZaB1+htG8ocCRLWn08
+X-Google-Smtp-Source: AGHT+IGD6YiP0dN6ELvQItWtcLSNC+C4YCLGwsEEcWIRRLLW5oS18HX8IlkEy6wochtZC/R6v/sJf4VACOoM2CreUjM=
+X-Received: by 2002:a17:907:2d22:b0:ab7:9b86:598d with SMTP id
+ a640c23a62f3a-abc09a4b7c6mr248969566b.17.1740134311947; Fri, 21 Feb 2025
+ 02:38:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250221081109.734170-10-zhengqixing@huaweicloud.com>
-X-F-Verdict: SPFVALID
-X-Titan-Src-Out: 1740133684737100912.19601.5384099801505103637@prod-use1-smtp-out1004.
-X-CMAE-Score: 0
-X-CMAE-Analysis: v=2.4 cv=bq22BFai c=1 sm=1 tr=0 ts=67b85534
-	a=USBFZE4A2Ag4MGBBroF6Xg==:117 a=USBFZE4A2Ag4MGBBroF6Xg==:17
-	a=IkcTkHD0fZMA:10 a=CEWIc4RMnpUA:10 a=i0EeH86SAAAA:8 a=VwQbUJbxAAAA:8
-	a=MOos5VJAO8cRspPxsMUA:9 a=QEXdDO2ut3YA:10
+References: <f6130475-3ccd-45d2-abde-3ccceada0f0a@linux.ibm.com> <yq18qsjdz0r.fsf@ca-mkp.ca.oracle.com>
+In-Reply-To: <yq18qsjdz0r.fsf@ca-mkp.ca.oracle.com>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Fri, 21 Feb 2025 16:07:55 +0530
+X-Gm-Features: AWEUYZmpH0Apw5ilSxEp1rdIgRl0iRXIb7970HtruWNGBkcA04c-5zyfLHhEwZI
+Message-ID: <CACzX3AvbM4qG+ZOWJoCTNMMgSz8gMjoRcQ10_HJbMyi0Nv9qvQ@mail.gmail.com>
+Subject: Re: Change in reported values of some block integrity sysfs attributes
+To: "Martin K. Petersen" <martin.petersen@oracle.com>, Christoph Hellwig <hch@lst.de>, 
+	Anuj Gupta <anuj20.g@samsung.com>
+Cc: M Nikhil <nikh1092@linux.ibm.com>, linux-block@vger.kernel.org, 
+	dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, nvdimm@lists.linux.dev, 
+	linux-scsi@vger.kernel.org, hare@suse.de, steffen Maier <maier@linux.ibm.com>, 
+	Benjamin Block <bblock@linux.ibm.com>, Nihar Panda <niharp@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Feb 21, 2025 at 04:11:06PM +0800, Zheng Qixing wrote:
-> From: Zheng Qixing <zhengqixing@huawei.com>
-> 
-> The bad blocks check would miss bad blocks when retrying under contention,
-> as checking parameters are not reset. These stale values from the previous
-> attempt could lead to incorrect scanning in the subsequent retry.
-> 
-> Move seqlock to outer function and reinitialize checking state for each
-> retry. This ensures a clean state for each check attempt, preventing any
-> missed bad blocks.
-> 
-> Fixes: 3ea3354cb9f0 ("badblocks: improve badblocks_check() for multiple ranges handling")
-> Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
+> I don't see any change in what's reported with block/for-next in a
+> regular SCSI HBA/disk setup. Will have to look at whether there is a
+> stacking issue wrt. multipathing.
 
-Looks good to me.
+Hi Martin, Christoph,
 
-Acked-by: Coly Li <colyli@kernel.org>
+It seems this change in behaviour is not limited to SCSI only. As Nikhil
+mentioned an earlier commit
+[9f4aa46f2a74 ("block: invert the BLK_INTEGRITY_{GENERATE,VERIFY} flags")]
+causes this change in behaviour. On my setup with a NVMe drive not formatted
+with PI, I see that:
 
-Thanks.
+Without this commit:
+Value reported by read_verify and write_generate sysfs entries is 0.
 
-> ---
->  block/badblocks.c | 50 +++++++++++++++++++++++------------------------
->  1 file changed, 24 insertions(+), 26 deletions(-)
-> 
-> diff --git a/block/badblocks.c b/block/badblocks.c
-> index 381f9db423d6..79d91be468c4 100644
-> --- a/block/badblocks.c
-> +++ b/block/badblocks.c
-> @@ -1191,31 +1191,12 @@ static int _badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
->  static int _badblocks_check(struct badblocks *bb, sector_t s, int sectors,
->  			    sector_t *first_bad, int *bad_sectors)
->  {
-> -	int unacked_badblocks, acked_badblocks;
->  	int prev = -1, hint = -1, set = 0;
->  	struct badblocks_context bad;
-> -	unsigned int seq;
-> +	int unacked_badblocks = 0;
-> +	int acked_badblocks = 0;
-> +	u64 *p = bb->page;
->  	int len, rv;
-> -	u64 *p;
-> -
-> -	WARN_ON(bb->shift < 0 || sectors == 0);
-> -
-> -	if (bb->shift > 0) {
-> -		sector_t target;
-> -
-> -		/* round the start down, and the end up */
-> -		target = s + sectors;
-> -		rounddown(s, 1 << bb->shift);
-> -		roundup(target, 1 << bb->shift);
-> -		sectors = target - s;
-> -	}
-> -
-> -retry:
-> -	seq = read_seqbegin(&bb->lock);
-> -
-> -	p = bb->page;
-> -	unacked_badblocks = 0;
-> -	acked_badblocks = 0;
->  
->  re_check:
->  	bad.start = s;
-> @@ -1281,9 +1262,6 @@ static int _badblocks_check(struct badblocks *bb, sector_t s, int sectors,
->  	else
->  		rv = 0;
->  
-> -	if (read_seqretry(&bb->lock, seq))
-> -		goto retry;
-> -
->  	return rv;
->  }
->  
-> @@ -1324,7 +1302,27 @@ static int _badblocks_check(struct badblocks *bb, sector_t s, int sectors,
->  int badblocks_check(struct badblocks *bb, sector_t s, int sectors,
->  			sector_t *first_bad, int *bad_sectors)
->  {
-> -	return _badblocks_check(bb, s, sectors, first_bad, bad_sectors);
-> +	unsigned int seq;
-> +	int rv;
-> +
-> +	WARN_ON(bb->shift < 0 || sectors == 0);
-> +
-> +	if (bb->shift > 0) {
-> +		/* round the start down, and the end up */
-> +		sector_t target = s + sectors;
-> +
-> +		rounddown(s, 1 << bb->shift);
-> +		roundup(target, 1 << bb->shift);
-> +		sectors = target - s;
-> +	}
-> +
-> +retry:
-> +	seq = read_seqbegin(&bb->lock);
-> +	rv = _badblocks_check(bb, s, sectors, first_bad, bad_sectors);
-> +	if (read_seqretry(&bb->lock, seq))
-> +		goto retry;
-> +
-> +	return rv;
->  }
->  EXPORT_SYMBOL_GPL(badblocks_check);
->  
-> -- 
-> 2.39.2
-> 
+With this commit:
+Value reported by read_verify and write_generate sysfs entries is 1.
 
--- 
-Coly Li
+Diving a bit deeper, both these flags got inverted due to this commit.
+But during init (in nvme_init_integrity) these values get initialized to 0,
+inturn setting the sysfs entries to 1. In order to fix this, the driver has to
+initialize both these flags to 1 in nvme_init_integrity if PI is not supported.
+That way, the value in sysfs for these entries would become 0 again. Tried this
+approach in my setup, and I am able to see the right values now. Then something
+like this would also need to be done for SCSI too.
