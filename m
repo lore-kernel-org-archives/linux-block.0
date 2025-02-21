@@ -1,63 +1,133 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3AD82500D0
-	for <linux-block@vger.kernel.org>; Fri, 21 Feb 2025 17:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5327F2512F9;
+	Fri, 21 Feb 2025 18:59:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740159700; cv=none; b=kyiVYrtW8AmCZf3LCwjETGZlXEqtt9zsdNDX2n0TlZhdnkLDJEPv/Sadal8nfZH4xN0CgKTSONwuumuY540PuoMf4lURHMonMsNfiMQctAb7Q2u0fm2VUDxtErqUVrwFzDES0DTE34AJg/zxSjICG4KnOXM4ylbu1wvnCe4ZjZU=
+	t=1740164341; cv=none; b=OSRyT+yNiXqzkTUxhystuBGuMdPFwcTWDY1gj9TYENbJ/rRXiZvRns5Cb5ZAbE7BM4OMIRPpLetI/yGUXXKemhNGeP3Bu+Aps4avQfSI+CFNJuO4QDgYZPCnSt4KBegUCVtWF3FsWKYyIEWOourewr6FQeFh65zeXzcV1j2bYnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740159700; c=relaxed/simple;
-	bh=v3DbBB+GJe0EuKnLtQTCcpweBDyiJlEShjH6sOBzXMI=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=jChxI4SP8rrf+K+fr/bER0loZxrYK8DHum0I5kkG/Kj/JwcwcW9O2dAG0s+RzBykHg73WQboe0BXBtxFE8crNe9K7tDALzpZ8xviatAfaBOCNtzW9SknG5qLRuaP6zs13eh94xlD47wshV+wUPgBO9iqgwD9o84tMj4XjUF9RUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dgusc1fS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740164341; c=relaxed/simple;
+	bh=D1gndCuNHXnXWR+5KjZLuhUrgN/6gjce6B2PXKEtvJc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EmTdYVazS/Ti2dOgAjQFYEjmqmm+txNzW+BHXsvTqJaucCyFfRD1YDTH1IdD77UHyF1rtIqW04GiMUnJlG4h2GSB8sm95GXZvMYdPt1LhaeanRinLmMLutjolHfvcDW1/yNiqFs2djG6eJ3rPiphoyU/YmS4O2oHPqcpkyMAgoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pNuPejVA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dgusc1fS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3DC8C4CEE4;
-	Fri, 21 Feb 2025 17:41:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pNuPejVA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52E0CC4CED6;
+	Fri, 21 Feb 2025 18:59:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740159699;
-	bh=v3DbBB+GJe0EuKnLtQTCcpweBDyiJlEShjH6sOBzXMI=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=dgusc1fSOSSjdNiXOB2j+CnRFHi31qU59+Xg3pjbQzhS8X9q+VnufhNUhFDMZv4JI
-	 NOS5+vYjk3zzq7F0KA2pin3JdAOdqzJOV4vOscqvhLkk7++Yg2lHo9qZ88sWfxKm0u
-	 nKLuhTHp/OogX51oMATUCBs571hDrnnvLCyO53v5fjh4jIwG04NXs4FFDeCCqVRpvf
-	 qtfphRKingMuGe4rzoWoLuF3u2aqiX0pizb2iiQ4VXCDLss43rf8Sui68HcQiVkbSc
-	 gvJwsvxx88Epky+b//Fv9pQJYo1oy1lRQB7yaL25xsdmFUL5guAdJY37xxjp4IHOIn
-	 aa75dlxXpK+NA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB49B380CEEC;
-	Fri, 21 Feb 2025 17:42:11 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.14-rc4
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <3f1e6c92-ea9b-4d7c-95b9-9cb72311582f@kernel.dk>
-References: <3f1e6c92-ea9b-4d7c-95b9-9cb72311582f@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <3f1e6c92-ea9b-4d7c-95b9-9cb72311582f@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.14-20250221
-X-PR-Tracked-Commit-Id: 70550442f28eba83b3e659618bba2b64eb91575f
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8a61cb6e150ea907b580a1b5e705decb0a3ffc86
-Message-Id: <174015973060.2152716.4419994551647218976.pr-tracker-bot@kernel.org>
-Date: Fri, 21 Feb 2025 17:42:10 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	s=k20201202; t=1740164340;
+	bh=D1gndCuNHXnXWR+5KjZLuhUrgN/6gjce6B2PXKEtvJc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pNuPejVA8VhXg7mw02ryLSNiBIcvpQV48LtkfBDqGeg9IP/S8FDcIKl29JlXQPvvI
+	 3i4e3mveISKcofvf4+fqwGBKOTwXPw11yGMfNkkFwGO4w0EANJPg+LocjTt76vAkJF
+	 qtbWYFpBFNXI4oNjBalh0O/OcmHrCdXnjDz/tjz1VxHUV4ZUP4ORNH3t4e2QQVwYxD
+	 70HC1j/43KbjRK3DBh4xCcvkpN6JL817QUmba+A2MnskvoVrwUuoXqnSgisJ/9a9kl
+	 nPAOgnPPC2W6arLJAs1ly2MSuBTv/qY7/274FMQFx8qutbw1w+rNzZL5eb5k5a4JFa
+	 2F1wx1fBfZI+w==
+Date: Fri, 21 Feb 2025 10:58:58 -0800
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Matthew Wilcox <willy@infradead.org>, dave@stgolabs.net,
+	david@fromorbit.com, djwong@kernel.org, kbusch@kernel.org,
+	john.g.garry@oracle.com, hch@lst.de, ritesh.list@gmail.com,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	gost.dev@samsung.com, p.raghav@samsung.com, da.gomez@samsung.com,
+	kernel@pankajraghav.com
+Subject: Re: [PATCH v2 4/8] fs/mpage: use blocks_per_folio instead of
+ blocks_per_page
+Message-ID: <Z7jM8p5boAOOxz_j@bombadil.infradead.org>
+References: <20250204231209.429356-1-mcgrof@kernel.org>
+ <20250204231209.429356-5-mcgrof@kernel.org>
+ <Z7Ow_ib2GDobCXdP@casper.infradead.org>
+ <a4ba2d82-1f42-4d70-bf66-56ef9c037cca@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a4ba2d82-1f42-4d70-bf66-56ef9c037cca@suse.de>
 
-The pull request you sent on Fri, 21 Feb 2025 09:49:41 -0700:
+On Tue, Feb 18, 2025 at 04:02:43PM +0100, Hannes Reinecke wrote:
+> On 2/17/25 22:58, Matthew Wilcox wrote:
+> > On Tue, Feb 04, 2025 at 03:12:05PM -0800, Luis Chamberlain wrote:
+> > > @@ -182,7 +182,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+> > >   		goto confused;
+> > >   	block_in_file = folio_pos(folio) >> blkbits;
+> > > -	last_block = block_in_file + args->nr_pages * blocks_per_page;
+> > > +	last_block = block_in_file + args->nr_pages * blocks_per_folio;
+> > 
+> > In mpage_readahead(), we set args->nr_pages to the nunber of pages (not
+> > folios) being requested.  In mpage_read_folio() we currently set it to
+> > 1.  So this is going to read too far ahead for readahead if using large
+> > folios.
+> > 
+> > I think we need to make nr_pages continue to mean nr_pages.  Or we pass
+> > in nr_bytes or nr_blocks.
+> > 
+> I had been pondering this, too, while developing the patch.
+> The idea I had here was to change counting by pages over to counting by
+> folios, as then the logic is essentially unchanged.
+> 
+> Not a big fan of 'nr_pages', as then the question really is how much
+> data we should read at the end of the day. So I'd rather go with 'nr_blocks'
+> to avoid any confusion.
 
-> git://git.kernel.dk/linux.git tags/block-6.14-20250221
+I think the easier answer is to adjust nr_pages in terms of min-order
+requirements and fix last_block computation so we don't lie for large
+folios as follows. While at it, I noticed a folio_zero_segment() was
+missing folio_size().
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8a61cb6e150ea907b580a1b5e705decb0a3ffc86
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+diff --git a/fs/mpage.c b/fs/mpage.c
+index c17d7a724e4b..624bf30f0b2e 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -152,6 +152,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+ {
+ 	struct folio *folio = args->folio;
+ 	struct inode *inode = folio->mapping->host;
++	const unsigned min_nrpages = mapping_min_folio_nrpages(folio->mapping);
+ 	const unsigned blkbits = inode->i_blkbits;
+ 	const unsigned blocks_per_folio = folio_size(folio) >> blkbits;
+ 	const unsigned blocksize = 1 << blkbits;
+@@ -172,6 +173,8 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+ 
+ 	/* MAX_BUF_PER_PAGE, for example */
+ 	VM_BUG_ON_FOLIO(folio_test_large(folio), folio);
++	VM_BUG_ON_FOLIO(args->nr_pages < min_nrpages, folio);
++	VM_BUG_ON_FOLIO(!IS_ALIGNED(args->nr_pages, min_nrpages), folio);
+ 
+ 	if (args->is_readahead) {
+ 		opf |= REQ_RAHEAD;
+@@ -182,7 +185,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+ 		goto confused;
+ 
+ 	block_in_file = folio_pos(folio) >> blkbits;
+-	last_block = block_in_file + args->nr_pages * blocks_per_folio;
++	last_block = block_in_file + ((args->nr_pages * PAGE_SIZE) >> blkbits);
+ 	last_block_in_file = (i_size_read(inode) + blocksize - 1) >> blkbits;
+ 	if (last_block > last_block_in_file)
+ 		last_block = last_block_in_file;
+@@ -269,7 +272,7 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+ 	}
+ 
+ 	if (first_hole != blocks_per_folio) {
+-		folio_zero_segment(folio, first_hole << blkbits, PAGE_SIZE);
++		folio_zero_segment(folio, first_hole << blkbits, folio_size(folio));
+ 		if (first_hole == 0) {
+ 			folio_mark_uptodate(folio);
+ 			folio_unlock(folio);
+@@ -385,7 +388,7 @@ int mpage_read_folio(struct folio *folio, get_block_t get_block)
+ {
+ 	struct mpage_readpage_args args = {
+ 		.folio = folio,
+-		.nr_pages = 1,
++		.nr_pages = mapping_min_folio_nrpages(folio->mapping),
+ 		.get_block = get_block,
+ 	};
+ 
