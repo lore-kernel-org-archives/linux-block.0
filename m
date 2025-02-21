@@ -1,151 +1,179 @@
-Received: from secgw1.intern.tuwien.ac.at (secgw1.intern.tuwien.ac.at [128.130.30.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DFC8632E;
-	Fri, 21 Feb 2025 15:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=128.130.30.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205EE1B85FD
+	for <linux-block@vger.kernel.org>; Fri, 21 Feb 2025 16:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740152508; cv=none; b=BTitRZCleDrluEFtndUo8HJdQeQFW0zT3o8GanLxwNdXspbpl31l9T1J/UCxESXQOy69ZuQHAg3e5x+LE7AU8dJ+GQCnQU3R1sqM9yLgKunAfPDjGThgRNT2MVPAYu6+2AHr7xKMIrry/5WmNDJvmEG26kuxIdCrkzN2Ilnchbw=
+	t=1740156587; cv=none; b=JPmQ3wGNWQq5wi++jP+YNm1OPlye1wNQLgzlIRIS9VG+YC5U8GvOOo63I8ERsaT66YB9f2nzPyiR1gOV/TIj1zUCzx5VPOG4xxGvVxHwNcnkm0bGG3+25c3hT8P7654Y2Q06B6IRu55TmhuJtpGsBoWOgKkh3XIybCHNg0lo1iM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740152508; c=relaxed/simple;
-	bh=NHnVmROgJKgOicdXoX3szo0m8m9umbiZAT8YDQYRSB4=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=BOtkNCxZEgy8Lq5/+d9noXfVftAL58mJe28llA9hoZJphsD125ABsaRcwebqaiDFyms9VsypQn2m4OUI+qfCq+BU5Y70+dXpmnSCtVNXDApKMyeVWPSgwhGjdNIAtzIEIx8xZTlxrVeJZq6fChiPJfDFM+o44/sWsrxhokEEsKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tuwien.ac.at; spf=pass smtp.mailfrom=tuwien.ac.at; arc=none smtp.client-ip=128.130.30.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tuwien.ac.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuwien.ac.at
-Received: from Kiteworks (kwmta1.intern.tuwien.ac.at [128.130.30.91])
-	by secgw1.intern.tuwien.ac.at (8.14.7/8.14.7) with ESMTP id 51LFaOsS004695;
-	Fri, 21 Feb 2025 16:36:24 +0100
-Received: from secgw1.intern.tuwien.ac.at ([128.130.30.71])
-          by totemomail.intern.tuwien.ac.at (Totemo SMTP Server) with SMTP ID 272;
-          Fri, 21 Feb 2025 15:36:23 +0000 (GMT)
-Received: from edge19b.intern.tuwien.ac.at (edge19b.intern.tuwien.ac.at [IPv6:2001:629:1005:30::46])
-	by secgw1.intern.tuwien.ac.at (8.14.7/8.14.7) with ESMTP id 51LFaNnc004675
-	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 21 Feb 2025 16:36:23 +0100
-Received: from mbx19b.intern.tuwien.ac.at (2001:629:1005:30::82) by
- edge19b.intern.tuwien.ac.at (2001:629:1005:30::46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Fri, 21 Feb 2025 16:36:23 +0100
-Received: from t197-243.demo.tuwien.ac.at (128.131.197.243) by
- mbx19b.intern.tuwien.ac.at (2001:629:1005:30::82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Fri, 21 Feb 2025 16:36:22 +0100
-Date: Fri, 21 Feb 2025 16:41:02 +0100
-From: Thomas Haschka <thomas.haschka@tuwien.ac.at>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <James.Bottomley@HansenPartnership.com>, <martin.peterson@oracle.com>
-Subject: Patch and bugfix in block/blk-mq.c to regain stability when using
- various SD Cards and Card Readers.
-Message-ID: <c2f50eac-3270-8dfa-2440-4c737c366b17@tuwien.ac.at>
+	s=arc-20240116; t=1740156587; c=relaxed/simple;
+	bh=3qVUvvU3uMFfHhL17H5Y0zMM8ZIbqeGudZTOFEZYOXE=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=INH2R/HncF2BDdG4YdUdXPXhWhjRt//5Bh4J+WsDsxii16A6egIEuFJ3UvlMDay+LeKFmTnhoWTU67iXuQPIDe4X69tNYOlpQcjIgsaFHcab8nY+W2XQTMQ+4wsg6K8LctcO7BnYyuwT3qf1U0C2O2Ow5dSHuw/nqb1DmQPVH9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Vzgdf7ZY; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Vzgdf7ZY"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-855a5aa9604so59119239f.2
+        for <linux-block@vger.kernel.org>; Fri, 21 Feb 2025 08:49:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1740156583; x=1740761383; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aQcNjs38YGiutt9tQSexg/tVmDyBoGH0rc3ELambHuo=;
+        b=Vzgdf7ZYzKID67Dn+E6yrasoK1PtzwTCnsmFe1zw8zcLzTyttkzNinpxCQyMoSvS8N
+         veqpetTf109qkN9cnTboA0E7l/elXvNKYkKO4zkFNpO8HA5H681j4XqdMhvGIA9wmOaT
+         uVuzfWpAlscvv41IqUVGl4oIunmIsDGm2Pwbw9tUmg2BQqpqnlr7YhoFmsqPYkW371V8
+         97kxLpSNjeK+5r/SqEZfOAxZCnt8LHvGNpWHziJjl+H9//9Q8VEJo5bD6p1RW4tDNP3y
+         63GVcfb4bK2h95FQOLQkfxkyHYcBod8UwheQz1Ix8e3/Vh5MSQtC/OQvzYlXKE0edZFx
+         +GAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740156583; x=1740761383;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=aQcNjs38YGiutt9tQSexg/tVmDyBoGH0rc3ELambHuo=;
+        b=NV5yBqrGkJ1bEQJe17v/xIHHRLC1/oWRbxmSZ/Gy5Jx6ZjD+Fkif3vns8gxY0ebLeg
+         qeeN1FryR/cxijR+rADvOxoSxWHnLK+dol50mMyut79eeoOVwyhQXAqKXOUkYWXaUpLp
+         ZzbHyDXDE7/UqGmfAH+J3VYeX6jg5riqimbFNCAWtiGFpeUolm+8jrpBeowGiU5MOPVF
+         Um8cOwt4COXdSPV3mChSDKIK34rH8TWZWhUcQz3Ci/xeti3UjKjp+pwaTle08rEkxNyv
+         KFAK1MimUoQQVUNvSYQRIlCG7oGiy3sGQ2LMAbBPWJhF1ZAOkHQqkQUjVKyHkAg0SO6r
+         o4YQ==
+X-Gm-Message-State: AOJu0YxISWb+Ra88toD3IOB8yfVid2kIQ7QQh3Xj1Bo4uaCd9/mnNwj8
+	UfU4XYOtq/xBIhy0Xz/LQL6NI/B7ONW4KxgSkGzsebcsyq5J2Tb0gLr67nH/TznnsGKjRNT0ObG
+	+
+X-Gm-Gg: ASbGncsktPlZVbcEnG87/z/S4yMIluZM5DgWSegwJKm1QRxM4SNXvmI0R98kf3KdB/h
+	Zffws9lUWRvRoiMFptTsWlLSfz4gUo1b7mswiNLJCoWFnUgvdi99kQ3K7hoSSlP0W6hhaqO7PBG
+	KYycfeZPexjYuoTTKNBzNnL5FkF7lO11Ggsk1uZcXWnxCcHckkFhBvcwTr6OPmV6n+U834mID0P
+	keUuTnQFLY/k/0sXV/cnAAaBMnWT0QWP11I+/LyZO6Qo+iGs8sQixT+4qXbEIODrq+zCjaeEtEv
+	CfmOGIqoF6cG4LvAvDzGnE8=
+X-Google-Smtp-Source: AGHT+IGd7E8+Uy/3N3GOQEpPlFtB9R429Zl/AC82Q2y1fZC6QRttbXctrulBP2Ckiko7g7Gyep58jA==
+X-Received: by 2002:a05:6602:6004:b0:855:8f17:cd8d with SMTP id ca18e2360f4ac-855dac41ffamr458500839f.14.1740156583118;
+        Fri, 21 Feb 2025 08:49:43 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-855b28993b8sm144345739f.9.2025.02.21.08.49.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Feb 2025 08:49:42 -0800 (PST)
+Message-ID: <3f1e6c92-ea9b-4d7c-95b9-9cb72311582f@kernel.dk>
+Date: Fri, 21 Feb 2025 09:49:41 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="0-1230147017-1740152473=:2986"
-X-ClientProxiedBy: mbx19b.intern.tuwien.ac.at (2001:629:1005:30::82) To
- mbx19b.intern.tuwien.ac.at (2001:629:1005:30::82)
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.14-rc4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---0-1230147017-1740152473=:2986
-Content-Type: text/plain; format=flowed; charset="US-ASCII"
+Hi Linus,
 
-Bug Fix: block: Improve stability of SD cards in Microsoft Surface GO 2 and
-     	 	possibly other devices.
+Set of fixes for block that should go into the 6.14 kernel release. This
+pull request contains:
+
+- NVMe pull request via Keith
+	- FC controller state check fixes (Daniel)
+	- PCI Endpoint fixes (Damien)
+	- TCP connection failure fixe (Caleb)
+	- TCP handling C2HTermReq PDU (Maurizio)
+	- RDMA queue state check (Ruozhu)
+	- Apple controller fixes (Hector)
+	- Target crash on disbaled namespace (Hannes)
+
+- MD pull request via Yu
+	- Fix queue limits error handling for raid0, raid1 and raid10.
+
+- Fix for a NULL pointer deref in request data mapping.
+
+- Code cleanup for request merging.
+
+Please pull!
 
 
-The commit 65a558f66c308
-     block: Improve performance for BLK_MQ_F_BLOCKING drivers
+The following changes since commit 80e648042e512d5a767da251d44132553fe04ae0:
 
-basically made the use of SD cards in my Microsoft Surface GO 2 impossible.
-The cards do stop functioning after about 15 minutes. Mostly at io intensive
-tasks.
+  partitions: mac: fix handling of bogus partition table (2025-02-14 08:38:28 -0700)
 
-As outlined in https://bugzilla.kernel.org/show_bug.cgi?id=218821
-i bisected the problem that yielded an unstable operation of the cardreader
-on my Surface GO 2.
-I successfully reversed the commit 65a558f66c308 in 6.12.16 using
-the attached patch. As I suppose the bug introduced with this commit might
-hit other users of sd-cards in similar hardware I suggest this commit shall
-be reversed, even if the improved performance might be gone.
+are available in the Git repository at:
 
-All the best,
-Thomas Haschka
---0-1230147017-1740152473=:2986
-Content-Type: text/plain; charset="US-ASCII";
-	name="surface_go_cardreader_patch.patch"
-Content-Transfer-Encoding: BASE64
-Content-ID: <9b2b82b2-238e-08d9-51c2-0bdfd4ed28c9@tuwien.ac.at>
-Content-Description:
-Content-Disposition: attachment;
-	filename="surface_go_cardreader_patch.patch"
+  git://git.kernel.dk/linux.git tags/block-6.14-20250221
 
-ZGlmZiAnLS1jb2xvcj1hdXRvJyAtdXJwTiBhL2Jsb2NrL2Jsay1tcS5jIGIv
-YmxvY2svYmxrLW1xLmMNCi0tLSBhL2Jsb2NrL2Jsay1tcS5jCTIwMjUtMDIt
-MjEgMTQ6MDE6NDcuMDAwMDAwMDAwICswMTAwDQorKysgYi9ibG9jay9ibGst
-bXEuYwkyMDI1LTAyLTIxIDE1OjUyOjUxLjg0ODA0MTg1MiArMDEwMA0KQEAg
-LTE0MTgsNyArMTQxOCw3IEBAIHZvaWQgYmxrX2V4ZWN1dGVfcnFfbm93YWl0
-KHN0cnVjdCByZXF1ZXMNCiAJfQ0KIA0KIAlibGtfbXFfaW5zZXJ0X3JlcXVl
-c3QocnEsIGF0X2hlYWQgPyBCTEtfTVFfSU5TRVJUX0FUX0hFQUQgOiAwKTsN
-Ci0JYmxrX21xX3J1bl9od19xdWV1ZShoY3R4LCBoY3R4LT5mbGFncyAmIEJM
-S19NUV9GX0JMT0NLSU5HKTsNCisJYmxrX21xX3J1bl9od19xdWV1ZShoY3R4
-LCBmYWxzZSk7DQogfQ0KIEVYUE9SVF9TWU1CT0xfR1BMKGJsa19leGVjdXRl
-X3JxX25vd2FpdCk7DQogDQpAQCAtMjMyMiw4ICsyMzIyLDYgQEAgdm9pZCBi
-bGtfbXFfcnVuX2h3X3F1ZXVlKHN0cnVjdCBibGtfbXFfaA0KIAkgKi8NCiAJ
-V0FSTl9PTl9PTkNFKCFhc3luYyAmJiBpbl9pbnRlcnJ1cHQoKSk7DQogDQot
-CW1pZ2h0X3NsZWVwX2lmKCFhc3luYyAmJiBoY3R4LT5mbGFncyAmIEJMS19N
-UV9GX0JMT0NLSU5HKTsNCi0NCiAJbmVlZF9ydW4gPSBibGtfbXFfaHdfcXVl
-dWVfbmVlZF9ydW4oaGN0eCk7DQogCWlmICghbmVlZF9ydW4pIHsNCiAJCXVu
-c2lnbmVkIGxvbmcgZmxhZ3M7DQpAQCAtMjM0Miw3ICsyMzQwLDggQEAgdm9p
-ZCBibGtfbXFfcnVuX2h3X3F1ZXVlKHN0cnVjdCBibGtfbXFfaA0KIAkJCXJl
-dHVybjsNCiAJfQ0KIA0KLQlpZiAoYXN5bmMgfHwgIWNwdW1hc2tfdGVzdF9j
-cHUocmF3X3NtcF9wcm9jZXNzb3JfaWQoKSwgaGN0eC0+Y3B1bWFzaykpIHsN
-CisJaWYgKGFzeW5jIHx8IChoY3R4LT5mbGFncyAmIEJMS19NUV9GX0JMT0NL
-SU5HKSB8fA0KKwkgICAgIWNwdW1hc2tfdGVzdF9jcHUocmF3X3NtcF9wcm9j
-ZXNzb3JfaWQoKSwgaGN0eC0+Y3B1bWFzaykpIHsNCiAJCWJsa19tcV9kZWxh
-eV9ydW5faHdfcXVldWUoaGN0eCwgMCk7DQogCQlyZXR1cm47DQogCX0NCkBA
-IC0yNDc3LDcgKzI0NzYsNyBAQCB2b2lkIGJsa19tcV9zdGFydF9od19xdWV1
-ZShzdHJ1Y3QgYmxrX21xDQogew0KIAljbGVhcl9iaXQoQkxLX01RX1NfU1RP
-UFBFRCwgJmhjdHgtPnN0YXRlKTsNCiANCi0JYmxrX21xX3J1bl9od19xdWV1
-ZShoY3R4LCBoY3R4LT5mbGFncyAmIEJMS19NUV9GX0JMT0NLSU5HKTsNCisJ
-YmxrX21xX3J1bl9od19xdWV1ZShoY3R4LCBmYWxzZSk7DQogfQ0KIEVYUE9S
-VF9TWU1CT0woYmxrX21xX3N0YXJ0X2h3X3F1ZXVlKTsNCiANCkBAIC0yNTEz
-LDggKzI1MTIsNyBAQCB2b2lkIGJsa19tcV9zdGFydF9zdG9wcGVkX2h3X3F1
-ZXVlcyhzdHJ1DQogCXVuc2lnbmVkIGxvbmcgaTsNCiANCiAJcXVldWVfZm9y
-X2VhY2hfaHdfY3R4KHEsIGhjdHgsIGkpDQotCQlibGtfbXFfc3RhcnRfc3Rv
-cHBlZF9od19xdWV1ZShoY3R4LCBhc3luYyB8fA0KLQkJCQkJKGhjdHgtPmZs
-YWdzICYgQkxLX01RX0ZfQkxPQ0tJTkcpKTsNCisJCWJsa19tcV9zdGFydF9z
-dG9wcGVkX2h3X3F1ZXVlKGhjdHgsIGFzeW5jKTsNCiB9DQogRVhQT1JUX1NZ
-TUJPTChibGtfbXFfc3RhcnRfc3RvcHBlZF9od19xdWV1ZXMpOw0KIA0KQEAg
-LTI1NzIsOCArMjU3MCw2IEBAIHN0YXRpYyB2b2lkIGJsa19tcV9pbnNlcnRf
-cmVxdWVzdHMoc3RydWMNCiAJbGlzdF9mb3JfZWFjaF9lbnRyeShycSwgbGlz
-dCwgcXVldWVsaXN0KSB7DQogCQlCVUdfT04ocnEtPm1xX2N0eCAhPSBjdHgp
-Ow0KIAkJdHJhY2VfYmxvY2tfcnFfaW5zZXJ0KHJxKTsNCi0JCWlmIChycS0+
-Y21kX2ZsYWdzICYgUkVRX05PV0FJVCkNCi0JCQlydW5fcXVldWVfYXN5bmMg
-PSB0cnVlOw0KIAl9DQogDQogCXNwaW5fbG9jaygmY3R4LT5sb2NrKTsNCkBA
-IC0yNzM5LDcgKzI3MzUsNyBAQCBzdGF0aWMgdm9pZCBibGtfbXFfdHJ5X2lz
-c3VlX2RpcmVjdGx5KHN0DQogDQogCWlmICgocnEtPnJxX2ZsYWdzICYgUlFG
-X1VTRV9TQ0hFRCkgfHwgIWJsa19tcV9nZXRfYnVkZ2V0X2FuZF90YWcocnEp
-KSB7DQogCQlibGtfbXFfaW5zZXJ0X3JlcXVlc3QocnEsIDApOw0KLQkJYmxr
-X21xX3J1bl9od19xdWV1ZShoY3R4LCBycS0+Y21kX2ZsYWdzICYgUkVRX05P
-V0FJVCk7DQorCQlibGtfbXFfcnVuX2h3X3F1ZXVlKGhjdHgsIGZhbHNlKTsN
-CiAJCXJldHVybjsNCiAJfQ0KIA0KZGlmZiAnLS1jb2xvcj1hdXRvJyAtdXJw
-TiBhL2RyaXZlcnMvc2NzaS9zY3NpX2xpYi5jIGIvZHJpdmVycy9zY3NpL3Nj
-c2lfbGliLmMNCi0tLSBhL2RyaXZlcnMvc2NzaS9zY3NpX2xpYi5jCTIwMjUt
-MDItMjEgMTQ6MDE6NDcuMDAwMDAwMDAwICswMTAwDQorKysgYi9kcml2ZXJz
-L3Njc2kvc2NzaV9saWIuYwkyMDI1LTAyLTIxIDE1OjUzOjU0LjY1NDA0NDY5
-MSArMDEwMA0KQEAgLTQyOSw4ICs0MjksNyBAQCBzdGF0aWMgdm9pZCBzY3Np
-X3NpbmdsZV9sdW5fcnVuKHN0cnVjdCBzDQogCSAqIGJ1dCBpbiBtb3N0IGNh
-c2VzLCB3ZSB3aWxsIGJlIGZpcnN0LiBJZGVhbGx5LCBlYWNoIExVIG9uIHRo
-ZQ0KIAkgKiB0YXJnZXQgd291bGQgZ2V0IHNvbWUgbGltaXRlZCB0aW1lIG9y
-IHJlcXVlc3RzIG9uIHRoZSB0YXJnZXQuDQogCSAqLw0KLQlibGtfbXFfcnVu
-X2h3X3F1ZXVlcyhjdXJyZW50X3NkZXYtPnJlcXVlc3RfcXVldWUsDQotCQkJ
-ICAgICBzaG9zdC0+cXVldWVjb21tYW5kX21heV9ibG9jayk7DQorCWJsa19t
-cV9ydW5faHdfcXVldWVzKGN1cnJlbnRfc2Rldi0+cmVxdWVzdF9xdWV1ZSwg
-ZmFsc2UpOw0KIA0KIAlzcGluX2xvY2tfaXJxc2F2ZShzaG9zdC0+aG9zdF9s
-b2NrLCBmbGFncyk7DQogCWlmICghc3RhcmdldC0+c3RhcmdldF9zZGV2X3Vz
-ZXIpDQo=
+for you to fetch changes up to 70550442f28eba83b3e659618bba2b64eb91575f:
 
---0-1230147017-1740152473=:2986--
+  Merge tag 'nvme-6.14-2025-02-20' of git://git.infradead.org/nvme into block-6.14 (2025-02-20 17:43:59 -0700)
+
+----------------------------------------------------------------
+block-6.14-20250221
+
+----------------------------------------------------------------
+Bart Van Assche (1):
+      md/raid*: Fix the set_queue_limits implementations
+
+Caleb Sander Mateos (3):
+      block/merge: remove unnecessary min() with UINT_MAX
+      nvme-tcp: fix connect failure on receiving partial ICResp PDU
+      nvme/ioctl: add missing space in err message
+
+Christopher Lentocha (1):
+      nvme-pci: quirk Acer FA100 for non-uniqueue identifiers
+
+Damien Le Moal (6):
+      nvmet: pci-epf: Correctly initialize CSTS when enabling the controller
+      nvmet: pci-epf: Do not uselessly write the CSTS register
+      nvmet: pci-epf: Avoid RCU stalls under heavy workload
+      nvme: tcp: Fix compilation warning with W=1
+      nvme: Cleanup the definition of the controller config register fields
+      nvmet: Use enum definitions instead of hardcoded values
+
+Daniel Wagner (2):
+      nvme-fc: rely on state transitions to handle connectivity loss
+      nvme: only allow entering LIVE from CONNECTING state
+
+Hannes Reinecke (1):
+      nvmet: Fix crash when a namespace is disabled
+
+Hector Martin (2):
+      apple-nvme: Release power domains when probe fails
+      apple-nvme: Support coprocessors left idle
+
+Jens Axboe (2):
+      Merge tag 'md-6.14-20250218' of https://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux into block-6.14
+      Merge tag 'nvme-6.14-2025-02-20' of git://git.infradead.org/nvme into block-6.14
+
+Maurizio Lombardi (1):
+      nvme-tcp: add basic support for the C2HTermReq PDU
+
+Ming Lei (1):
+      block: fix NULL pointer dereferenced within __blk_rq_map_sg
+
+Ruozhu Li (1):
+      nvmet-rdma: recheck queue state is LIVE in state lock in recv done
+
+ block/blk-merge.c             |  7 +++--
+ drivers/md/raid0.c            |  4 +--
+ drivers/md/raid1.c            |  4 +--
+ drivers/md/raid10.c           |  4 +--
+ drivers/nvme/host/apple.c     | 55 ++++++++++++++++++++++++-----------
+ drivers/nvme/host/core.c      |  2 --
+ drivers/nvme/host/fc.c        | 67 ++++---------------------------------------
+ drivers/nvme/host/ioctl.c     |  3 +-
+ drivers/nvme/host/pci.c       |  2 ++
+ drivers/nvme/host/tcp.c       | 50 ++++++++++++++++++++++++++++++--
+ drivers/nvme/target/core.c    | 40 ++++++++++++--------------
+ drivers/nvme/target/nvmet.h   | 14 ++++-----
+ drivers/nvme/target/pci-epf.c | 39 ++++++++++++++++++-------
+ drivers/nvme/target/rdma.c    | 33 ++++++++++++++-------
+ include/linux/nvme-tcp.h      |  2 ++
+ include/linux/nvme.h          | 40 +++++++++++++++++++++-----
+ 16 files changed, 216 insertions(+), 150 deletions(-)
+
+-- 
+Jens Axboe
+
