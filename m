@@ -1,54 +1,57 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EB42641C2;
-	Thu, 20 Feb 2025 19:18:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58372F3B
+	for <linux-block@vger.kernel.org>; Fri, 21 Feb 2025 02:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740079133; cv=none; b=VURyDzIjPksblULk2fKcpJVMNcdljW/IwSC34v/EKS+NZ85ca8BQ0ENaDHgglb7QpmPd2qBT3OVI5h3F8MS1w7+hQpB4q3vnXfhXuZyqsqDfDVOo4AuxbJY6QJDLGxQdt4FXEh9SFWLucL91384kGpb+Ij81AgbefRnWt7GyKNc=
+	t=1740106543; cv=none; b=U9cXaJ/KXXvO+1/LRfZrjeK+vjsLpxLH4GU4+NZmBknBrazgoLcCarYI9rHJaWOJnWXotkEK/no6yRUr6RlFQw6tg/oSYTz7NvOxT33C/QnO/Yavob846T/Mcfkgtgdkzygdj8x4g21Yhqvi0DdRv9CK5ID4irj1iRYxlA5bX2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740079133; c=relaxed/simple;
-	bh=4d1KNIx+INvlRFOF2ii16MQOHOzRY+Sq2mlvYHJFWXE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=maPzpqCUNJlsUpmOLMceq+aFmpQZPsZZm9Lj3Nqn6rJbXZG1uiIzNf74wel+PktLxQh2wsNkxURa3FT45Fi8Abdo0vYLnObBPkqYfgpMMiHlxc66BmPMcQDK6mzjugvRz2AICpWTRs5/JSxUxbgpSeBDIHFO71i3SPVgcB90rZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YsnlYSb6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740106543; c=relaxed/simple;
+	bh=yA9yb+v/RyQTqipBCXHv1BDNck+KMt9TAtL4IzWZgJY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I7UA3+eTXRqhqmGISt+tmdl7N/+4St+9CviPAc20wMg8MqADG6SeumvnH4N4CwAdMNxPhGtL/+x1Gmc22Bbj3vTbbODj/p8lsuwU/cwE3nEWrnS1T9/EGywxiJwXcB2MTsxjXSyThIdS3G82uyQBbw6/f8XTVI2Qxq1KsMfqzW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YtgTFrWI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YsnlYSb6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A43AEC4CED6;
-	Thu, 20 Feb 2025 19:18:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740079132;
-	bh=4d1KNIx+INvlRFOF2ii16MQOHOzRY+Sq2mlvYHJFWXE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=YsnlYSb63skk/fWlHJtmIfHJag4qUEnaxKf53MBGT67M9wYVeRLnpj5qniNRURqgl
-	 SgJDds7mUqBUsVOb22i9WI7MIK3EzSaSMvYgsBIh2u7hpvN2pauxVs3zWnMqxEJxnW
-	 Udp4wxHheMO0dg9qjGe+WkKaB+NhDLsfTpGv/dLuDwIk1XjN48XywcU/cTIaAg3/im
-	 dwqLYVWGz7mb5+Ma587cAwV6D4RavsJzBGsbvNRH+RTdPYSmlKVgEuGr3nA8vOg4ym
-	 WGvuPg+2dcCd3DpxFNs2zyxbtF0Wac+ZF+tWN3Sa9/waj+0BDW3pMIcwQlKGGySP3o
-	 9IXQaLGAEHWQg==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Gary Guo <gary@garyguo.net>,  Miguel Ojeda <ojeda@kernel.org>,  Alex
- Gaynor <alex.gaynor@gmail.com>,  Boqun Feng <boqun.feng@gmail.com>,
-  =?utf-8?Q?Bj=C3=B6rn?=
- Roy Baron <bjorn3_gh@protonmail.com>,  Benno Lossin
- <benno.lossin@proton.me>,  Alice Ryhl <aliceryhl@google.com>,  Trevor
- Gross <tmgross@umich.edu>,  Danilo Krummrich <dakr@kernel.org>,  Will
- Deacon <will@kernel.org>,  Peter Zijlstra <peterz@infradead.org>,  Mark
- Rutland <mark.rutland@arm.com>,  Jens Axboe <axboe@kernel.dk>,  Francesco
- Zardi <frazar00@gmail.com>,  rust-for-linux@vger.kernel.org,
-  linux-block@vger.kernel.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/4] rust: block: convert `block::mq` to use `Refcount`
-In-Reply-To: <CAJ-ks9mEqo72Cwq5_BMtdLPjGSb_sQbm_p+TV_u=iNuYSnuPKQ@mail.gmail.com>
- (Tamir
-	Duberstein's message of "Wed, 19 Feb 2025 17:53:43 -0500")
-References: <20250219201602.1898383-1-gary@garyguo.net>
-	<20250219201602.1898383-4-gary@garyguo.net>
-	<CAJ-ks9=10h9ha403aqL20Yk+y0oXpgvR=hbxA2+6T_CvbXN2bA@mail.gmail.com>
-	<CAJ-ks9mEqo72Cwq5_BMtdLPjGSb_sQbm_p+TV_u=iNuYSnuPKQ@mail.gmail.com>
-User-Agent: mu4e 1.12.7; emacs 29.4
-Date: Thu, 20 Feb 2025 20:18:37 +0100
-Message-ID: <8734g8ifw2.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YtgTFrWI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740106540;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1mVTzm9GkpidsK39/v1CuCMhdkhioOej4w+t01AWWV8=;
+	b=YtgTFrWI7PWkJGwujhh9bwa4zxPum+nbWxf+e5E4L9SFD8enfcolsm6ObJS6l21fu1Ga4O
+	Z50rhgXVr0HcrxEZ+11F5NXiQecTnx5kSQhWQaiyM4eaDh165u9sWKb6uSIiMb/52Nnerq
+	xRWisXRySnBBrITwrbuRYQgqjnqT0bo=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-37-sXRCsVUxOYWV5ca3R50Rvw-1; Thu,
+ 20 Feb 2025 21:55:37 -0500
+X-MC-Unique: sXRCsVUxOYWV5ca3R50Rvw-1
+X-Mimecast-MFC-AGG-ID: sXRCsVUxOYWV5ca3R50Rvw_1740106534
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B228D1800873;
+	Fri, 21 Feb 2025 02:55:33 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.9])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3476C1955BCB;
+	Fri, 21 Feb 2025 02:55:28 +0000 (UTC)
+Date: Fri, 21 Feb 2025 10:55:23 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai1@huaweicloud.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Tejun Heo <tj@kernel.org>, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] block: throttle: don't add one extra jiffy mistakenly
+ for bps limit
+Message-ID: <Z7frGxuMCTLwH9BW@fedora>
+References: <20250220111735.1187999-1-ming.lei@redhat.com>
+ <a8f10a51-c9c8-0d1a-296d-f1f542bf8523@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,91 +59,115 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a8f10a51-c9c8-0d1a-296d-f1f542bf8523@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Tamir Duberstein <tamird@gmail.com> writes:
+Hi Yukuai,
 
-> On Wed, Feb 19, 2025 at 5:26=E2=80=AFPM Tamir Duberstein <tamird@gmail.co=
-m> wrote:
->>
->> On Wed, Feb 19, 2025 at 3:17=E2=80=AFPM Gary Guo <gary@garyguo.net> wrot=
-e:
->> >
->> > Currently there's a custom reference counting in `block::mq`, which us=
-es
->> > `AtomicU64` Rust atomics, and this type doesn't exist on some 32-bit
->> > architectures. We cannot just change it to use 32-bit atomics, because
->> > doing so will make it vulnerable to refcount overflow. So switch it to
->> > use the kernel refcount `kernel::sync::Refcount` instead.
->> >
->> > There is an operation needed by `block::mq`, atomically decreasing
->> > refcount from 2 to 0, which is not available through refcount.h, so
->> > I exposed `Refcount::as_atomic` which allows accessing the refcount
->> > directly.
->> >
->> > Acked-by: Andreas Hindborg <a.hindborg@kernel.org>
->> > Signed-off-by: Gary Guo <gary@garyguo.net>
->> > ---
->> >  rust/kernel/block/mq/operations.rs |  7 +--
->> >  rust/kernel/block/mq/request.rs    | 70 ++++++++++--------------------
->> >  rust/kernel/sync/refcount.rs       | 14 ++++++
->> >  3 files changed, 40 insertions(+), 51 deletions(-)
->> >
->> > diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq=
-/operations.rs
->> > index 864ff379dc91..c399dcaa6740 100644
->> > --- a/rust/kernel/block/mq/operations.rs
->> > +++ b/rust/kernel/block/mq/operations.rs
->> > @@ -10,9 +10,10 @@
->> >      block::mq::Request,
->> >      error::{from_result, Result},
->> >      prelude::*,
->> > +    sync::Refcount,
->> >      types::ARef,
->> >  };
->> > -use core::{marker::PhantomData, sync::atomic::AtomicU64, sync::atomic=
-::Ordering};
->> > +use core::marker::PhantomData;
->> >
->> >  /// Implement this trait to interface blk-mq as block devices.
->> >  ///
->> > @@ -78,7 +79,7 @@ impl<T: Operations> OperationsVTable<T> {
->> >          let request =3D unsafe { &*(*bd).rq.cast::<Request<T>>() };
->> >
->> >          // One refcount for the ARef, one for being in flight
->> > -        request.wrapper_ref().refcount().store(2, Ordering::Relaxed);
->> > +        request.wrapper_ref().refcount().set(2);
->> >
->> >          // SAFETY:
->> >          //  - We own a refcount that we took above. We pass that to `=
-ARef`.
->> > @@ -187,7 +188,7 @@ impl<T: Operations> OperationsVTable<T> {
->> >
->> >              // SAFETY: The refcount field is allocated but not initia=
-lized, so
->> >              // it is valid for writes.
->> > -            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).w=
-rite(AtomicU64::new(0)) };
->> > +            unsafe { RequestDataWrapper::refcount_ptr(pdu.as_ptr()).w=
-rite(Refcount::new(0)) };
->>
->> Could we just make the field pub and remove refcount_ptr? I believe a
->> few callers of `wrapper_ptr` could be replaced with `wrapper_ref`.
->
-> I took a stab at this to check it was possible:
-> https://gist.github.com/tamird/c9de7fa6e54529996f433950268f3f87
+On Thu, Feb 20, 2025 at 09:38:12PM +0800, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2025/02/20 19:17, Ming Lei 写道:
+> > When the current bio needs to be throttled because of bps limit, the wait
+> > time for the extra bytes may be less than 1 jiffy, tg_within_bps_limit()
+> > adds one extra 1 jiffy.
+> > 
+> > However, when taking roundup time into account, the extra 1 jiffy
+> > may become not necessary, then bps limit becomes not accurate. This way
+> > causes blktests throtl/001 failure in case of CONFIG_HZ_100=y.
+> > 
+> > Fix it by not adding the 1 jiffy in case that the roundup time can
+> > cover it.
+> > 
+> > Cc: Tejun Heo <tj@kernel.org>
+> > Cc: Yu Kuai <yukuai3@huawei.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >   block/blk-throttle.c | 6 +++---
+> >   1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> > index 8d149aff9fd0..8348972c517b 100644
+> > --- a/block/blk-throttle.c
+> > +++ b/block/blk-throttle.c
+> > @@ -729,14 +729,14 @@ static unsigned long tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
+> >   	extra_bytes = tg->bytes_disp[rw] + bio_size - bytes_allowed;
+> >   	jiffy_wait = div64_u64(extra_bytes * HZ, bps_limit);
+> > -	if (!jiffy_wait)
+> > -		jiffy_wait = 1;
+> > -
+> >   	/*
+> >   	 * This wait time is without taking into consideration the rounding
+> >   	 * up we did. Add that time also.
+> >   	 */
+> >   	jiffy_wait = jiffy_wait + (jiffy_elapsed_rnd - jiffy_elapsed);
+> > +	if (!jiffy_wait)
+> > +		jiffy_wait = 1;
+> 
+> Just wonder, will wait (0, 1) less jiffies is better than wait (0, 1)
+> more jiffies.
+> 
+> How about following changes?
+> 
+> Thanks,
+> Kuai
+> 
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index 8d149aff9fd0..f8430baf3544 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -703,6 +703,7 @@ static unsigned long tg_within_bps_limit(struct
+> throtl_grp *tg, struct bio *bio,
+>                                 u64 bps_limit)
+>  {
+>         bool rw = bio_data_dir(bio);
+> +       long long carryover_bytes;
+>         long long bytes_allowed;
+>         u64 extra_bytes;
+>         unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
+> @@ -727,10 +728,11 @@ static unsigned long tg_within_bps_limit(struct
+> throtl_grp *tg, struct bio *bio,
+> 
+>         /* Calc approx time to dispatch */
+>         extra_bytes = tg->bytes_disp[rw] + bio_size - bytes_allowed;
+> -       jiffy_wait = div64_u64(extra_bytes * HZ, bps_limit);
+> +       jiffy_wait = div64_u64_rem(extra_bytes * HZ, bps_limit,
+> carryover_bytes);
+> 
 
-The access method uses a raw pointer because it is not always safe to
-reference the field.
+&carryover_bytes
 
-I think line 25 in your patch is UB as the field is not initialized.
+> +       /* carryover_bytes is dispatched without waiting */
+>         if (!jiffy_wait)
+> -               jiffy_wait = 1;
+> +               tg->carryover_bytes[rw] -= carryover_bytes;
+> 
+>         /*
+>          * This wait time is without taking into consideration the rounding
+> 
+> > +
+> >   	return jiffy_wait;
 
-At any rate, such a change is orthogonal. You could submit a separate
-patch with that refactor.
+Looks result is worse with your patch:
+
+throtl/001 (basic functionality)                             [failed]
+    runtime  6.488s  ...  28.862s
+    --- tests/throtl/001.out	2024-11-21 09:20:47.514353642 +0000
+    +++ /root/git/blktests/results/nodev/throtl/001.out.bad	2025-02-21 02:51:36.723754146 +0000
+    @@ -1,6 +1,6 @@
+     Running throtl/001
+    +13
+     1
+    -1
+    -1
+    +13
+     1
+    ...
+    (Run 'diff -u tests/throtl/001.out /root/git/blktests/results/nodev/throtl/001.out.bad' to see the entire diff)
 
 
-Best regards,
-Andreas Hindborg
-
-
+thanks,
+Ming
 
